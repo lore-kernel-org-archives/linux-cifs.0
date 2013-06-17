@@ -1,152 +1,117 @@
 From: Jeff Layton <jlayton@redhat.com>
-Subject: [PATCH v3 10/13] locks: add a new "lm_owner_key" lock operation
-Date: Mon, 17 Jun 2013 11:13:53 -0400
-Message-ID: <1371482036-15958-11-git-send-email-jlayton@redhat.com>
+Subject: [PATCH v3 12/13] seq_file: add seq_list_*_percpu
+	helpers
+Date: Mon, 17 Jun 2013 11:13:55 -0400
+Message-ID: <1371482036-15958-13-git-send-email-jlayton@redhat.com>
 References: <1371482036-15958-1-git-send-email-jlayton@redhat.com>
-Cc: dhowells@redhat.com, sage@inktank.com, smfrench@gmail.com,
-	swhiteho@redhat.com, Trond.Myklebust@netapp.com,
-	akpm@linux-foundation.org, linux-kernel@vger.kernel.org,
-	linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-	cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, piastryyy@gmail.com
+Cc: linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        cluster-devel@redhat.com, sage@inktank.com,
+        samba-technical@lists.samba.org, Trond.Myklebust@netapp.com,
+        linux-kernel@vger.kernel.org, piastryyy@gmail.com,
+        linux-afs@lists.infradead.org, dhowells@redhat.com, smfrench@gmail.com,
+        linux-fsdevel@vger.kernel.org, ceph-devel@vger.kernel.org,
+        akpm@linux-foundation.org
 To: viro@zeniv.linux.org.uk, matthew@wil.cx, bfields@fieldses.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <cluster-devel-bounces@redhat.com>
 In-Reply-To: <1371482036-15958-1-git-send-email-jlayton@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://www.redhat.com/mailman/options/cluster-devel>,
+	<mailto:cluster-devel-request@redhat.com?subject=unsubscribe>
+List-Archive: <https://www.redhat.com/archives/cluster-devel>
+List-Post: <mailto:cluster-devel@redhat.com>
+List-Help: <mailto:cluster-devel-request@redhat.com?subject=help>
+List-Subscribe: <https://www.redhat.com/mailman/listinfo/cluster-devel>,
+	<mailto:cluster-devel-request@redhat.com?subject=subscribe>
+Sender: cluster-devel-bounces@redhat.com
+Errors-To: cluster-devel-bounces@redhat.com
 List-Id: linux-cifs.vger.kernel.org
 
-Currently, the hashing that the locking code uses to add these values
-to the blocked_hash is simply calculated using fl_owner field. That's
-valid in most cases except for server-side lockd, which validates the
-owner of a lock based on fl_owner and fl_pid.
-
-In the case where you have a small number of NFS clients doing a lot
-of locking between different processes, you could end up with all
-the blocked requests sitting in a very small number of hash buckets.
-
-Add a new lm_owner_key operation to the lock_manager_operations that
-will generate an unsigned long to use as the key in the hashtable.
-That function is only implemented for server-side lockd, and simply
-XORs the fl_owner and fl_pid.
+When we convert the file_lock_list to a set of percpu lists, we'll need
+a way to iterate over them in order to output /proc/locks info. Add
+some seq_list_*_percpu helpers to handle that.
 
 Signed-off-by: Jeff Layton <jlayton@redhat.com>
 Acked-by: J. Bruce Fields <bfields@fieldses.org>
 ---
- Documentation/filesystems/Locking |   16 +++++++++++-----
- fs/lockd/svclock.c                |   12 ++++++++++++
- fs/locks.c                        |   12 ++++++++++--
- include/linux/fs.h                |    1 +
- 4 files changed, 34 insertions(+), 7 deletions(-)
+ fs/seq_file.c            |   54 ++++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/seq_file.h |    6 +++++
+ 2 files changed, 60 insertions(+), 0 deletions(-)
 
-diff --git a/Documentation/filesystems/Locking b/Documentation/filesystems/Locking
-index 413685f..dfeb01b 100644
---- a/Documentation/filesystems/Locking
-+++ b/Documentation/filesystems/Locking
-@@ -351,6 +351,7 @@ fl_release_private:	maybe		no
- ----------------------- lock_manager_operations ---------------------------
- prototypes:
- 	int (*lm_compare_owner)(struct file_lock *, struct file_lock *);
-+	unsigned long (*lm_owner_key)(struct file_lock *);
- 	void (*lm_notify)(struct file_lock *);  /* unblock callback */
- 	int (*lm_grant)(struct file_lock *, struct file_lock *, int);
- 	void (*lm_break)(struct file_lock *); /* break_lease callback */
-@@ -360,16 +361,21 @@ locking rules:
- 
- 			inode->i_lock	file_lock_lock	may block
- lm_compare_owner:	yes[1]		maybe		no
-+lm_owner_key		yes[1]		yes		no
- lm_notify:		yes		yes		no
- lm_grant:		no		no		no
- lm_break:		yes		no		no
- lm_change		yes		no		no
- 
--[1]:	->lm_compare_owner is generally called with *an* inode->i_lock held. It
--may not be the i_lock of the inode for either file_lock being compared! This is
--the case with deadlock detection, since the code has to chase down the owners
--of locks that may be entirely unrelated to the one on which the lock is being
--acquired. When doing a search for deadlocks, the file_lock_lock is also held.
-+[1]:	->lm_compare_owner and ->lm_owner_key are generally called with
-+*an* inode->i_lock held. It may not be the i_lock of the inode
-+associated with either file_lock argument! This is the case with deadlock
-+detection, since the code has to chase down the owners of locks that may
-+be entirely unrelated to the one on which the lock is being acquired.
-+For deadlock detection however, the file_lock_lock is also held. The
-+fact that these locks are held ensures that the file_locks do not
-+disappear out from under you while doing the comparison or generating an
-+owner key.
- 
- --------------------------- buffer_head -----------------------------------
- prototypes:
-diff --git a/fs/lockd/svclock.c b/fs/lockd/svclock.c
-index e703318..ce2cdab 100644
---- a/fs/lockd/svclock.c
-+++ b/fs/lockd/svclock.c
-@@ -744,8 +744,20 @@ static int nlmsvc_same_owner(struct file_lock *fl1, struct file_lock *fl2)
- 	return fl1->fl_owner == fl2->fl_owner && fl1->fl_pid == fl2->fl_pid;
+diff --git a/fs/seq_file.c b/fs/seq_file.c
+index 774c1eb..3135c25 100644
+--- a/fs/seq_file.c
++++ b/fs/seq_file.c
+@@ -921,3 +921,57 @@ struct hlist_node *seq_hlist_next_rcu(void *v,
+ 		return rcu_dereference(node->next);
  }
- 
-+/*
-+ * Since NLM uses two "keys" for tracking locks, we need to hash them down
-+ * to one for the blocked_hash. Here, we're just xor'ing the host address
-+ * with the pid in order to create a key value for picking a hash bucket.
+ EXPORT_SYMBOL(seq_hlist_next_rcu);
++
++/**
++ * seq_hlist_start_precpu - start an iteration of a percpu hlist array
++ * @head: pointer to percpu array of struct hlist_heads
++ * @cpu:  pointer to cpu "cursor"
++ * @pos:  start position of sequence
++ *
++ * Called at seq_file->op->start().
 + */
-+static unsigned long
-+nlmsvc_owner_key(struct file_lock *fl)
++struct hlist_node *
++seq_hlist_start_percpu(struct hlist_head __percpu *head, int *cpu, loff_t pos)
 +{
-+	return (unsigned long)fl->fl_owner ^ (unsigned long)fl->fl_pid;
-+}
++	struct hlist_node *node;
 +
- const struct lock_manager_operations nlmsvc_lock_operations = {
- 	.lm_compare_owner = nlmsvc_same_owner,
-+	.lm_owner_key = nlmsvc_owner_key,
- 	.lm_notify = nlmsvc_notify_blocked,
- 	.lm_grant = nlmsvc_grant_deferred,
- };
-diff --git a/fs/locks.c b/fs/locks.c
-index d93b291..55f3af7 100644
---- a/fs/locks.c
-+++ b/fs/locks.c
-@@ -505,10 +505,18 @@ locks_delete_global_locks(struct file_lock *waiter)
- 	spin_unlock(&file_lock_lock);
- }
- 
-+static unsigned long
-+posix_owner_key(struct file_lock *fl)
++	for_each_possible_cpu(*cpu) {
++		hlist_for_each(node, per_cpu_ptr(head, *cpu)) {
++			if (pos-- == 0)
++				return node;
++		}
++	}
++	return NULL;
++}
++EXPORT_SYMBOL(seq_hlist_start_percpu);
++
++/**
++ * seq_hlist_next_percpu - move to the next position of the percpu hlist array
++ * @v:    pointer to current hlist_node
++ * @head: pointer to percpu array of struct hlist_heads
++ * @cpu:  pointer to cpu "cursor"
++ * @pos:  start position of sequence
++ *
++ * Called at seq_file->op->next().
++ */
++struct hlist_node *
++seq_hlist_next_percpu(void *v, struct hlist_head __percpu *head,
++			int *cpu, loff_t *pos)
 +{
-+	if (fl->fl_lmops && fl->fl_lmops->lm_owner_key)
-+		return fl->fl_lmops->lm_owner_key(fl);
-+	return (unsigned long)fl->fl_owner;
-+}
++	struct hlist_node *node = v;
 +
- static inline void
- locks_insert_global_blocked(struct file_lock *waiter)
- {
--	hash_add(blocked_hash, &waiter->fl_link, (unsigned long)waiter->fl_owner);
-+	hash_add(blocked_hash, &waiter->fl_link, posix_owner_key(waiter));
- }
- 
- static inline void
-@@ -739,7 +747,7 @@ static struct file_lock *what_owner_is_waiting_for(struct file_lock *block_fl)
- {
- 	struct file_lock *fl;
- 
--	hash_for_each_possible(blocked_hash, fl, fl_link, (unsigned long)block_fl->fl_owner) {
-+	hash_for_each_possible(blocked_hash, fl, fl_link, posix_owner_key(block_fl)) {
- 		if (posix_same_owner(fl, block_fl))
- 			return fl->fl_next;
- 	}
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 3b340f7..232a345 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -908,6 +908,7 @@ struct file_lock_operations {
- 
- struct lock_manager_operations {
- 	int (*lm_compare_owner)(struct file_lock *, struct file_lock *);
-+	unsigned long (*lm_owner_key)(struct file_lock *);
- 	void (*lm_notify)(struct file_lock *);	/* unblock callback */
- 	int (*lm_grant)(struct file_lock *, struct file_lock *, int);
- 	void (*lm_break)(struct file_lock *);
++	++*pos;
++
++	if (node->next)
++		return node->next;
++
++	for (*cpu = cpumask_next(*cpu, cpu_possible_mask); *cpu < nr_cpu_ids;
++	     *cpu = cpumask_next(*cpu, cpu_possible_mask)) {
++		struct hlist_head *bucket = per_cpu_ptr(head, *cpu);
++
++		if (!hlist_empty(bucket))
++			return bucket->first;
++	}
++	return NULL;
++}
++EXPORT_SYMBOL(seq_hlist_next_percpu);
+diff --git a/include/linux/seq_file.h b/include/linux/seq_file.h
+index 2da29ac..4e32edc 100644
+--- a/include/linux/seq_file.h
++++ b/include/linux/seq_file.h
+@@ -173,4 +173,10 @@ extern struct hlist_node *seq_hlist_start_head_rcu(struct hlist_head *head,
+ extern struct hlist_node *seq_hlist_next_rcu(void *v,
+ 						   struct hlist_head *head,
+ 						   loff_t *ppos);
++
++/* Helpers for iterating over per-cpu hlist_head-s in seq_files */
++extern struct hlist_node *seq_hlist_start_percpu(struct hlist_head __percpu *head, int *cpu, loff_t pos);
++
++extern struct hlist_node *seq_hlist_next_percpu(void *v, struct hlist_head __percpu *head, int *cpu, loff_t *pos);
++
+ #endif
 -- 
 1.7.1
