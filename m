@@ -1,9 +1,8 @@
 From: Jeff Layton <jlayton@redhat.com>
-Subject: [PATCH v3 03/13] locks: comment cleanups and
-	clarifications
-Date: Mon, 17 Jun 2013 11:13:46 -0400
-Message-ID: <1371482036-15958-4-git-send-email-jlayton@redhat.com>
-References: <1371482036-15958-1-git-send-email-jlayton@redhat.com>
+Subject: [PATCH v3 00/13] locks: scalability improvements
+	for file locking
+Date: Mon, 17 Jun 2013 11:13:43 -0400
+Message-ID: <1371482036-15958-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
         cluster-devel@redhat.com, sage@inktank.com,
         samba-technical@lists.samba.org, Trond.Myklebust@netapp.com,
@@ -13,7 +12,6 @@ Cc: linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
         akpm@linux-foundation.org
 To: viro@zeniv.linux.org.uk, matthew@wil.cx, bfields@fieldses.org
 Return-path: <cluster-devel-bounces@redhat.com>
-In-Reply-To: <1371482036-15958-1-git-send-email-jlayton@redhat.com>
 List-Unsubscribe: <https://www.redhat.com/mailman/options/cluster-devel>,
 	<mailto:cluster-devel-request@redhat.com?subject=unsubscribe>
 List-Archive: <https://www.redhat.com/archives/cluster-devel>
@@ -25,93 +23,146 @@ Sender: cluster-devel-bounces@redhat.com
 Errors-To: cluster-devel-bounces@redhat.com
 List-Id: linux-cifs.vger.kernel.org
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
----
- fs/locks.c         |   21 +++++++++++++--------
- include/linux/fs.h |   18 ++++++++++++++++++
- 2 files changed, 31 insertions(+), 8 deletions(-)
+Summary of Significant Changes:
+-------------------------------
+v3:
+- Change spinlock handling to avoid the need to traverse the global
+  blocked_hash when doing output of /proc/locks. This means that the
+  fl_block list must continue to be protected by a global lock, but
+  the fact that the i_lock is also held in most cases means that we
+  can avoid taking it in certain situations.
 
-diff --git a/fs/locks.c b/fs/locks.c
-index e3140b8..1e6301b 100644
---- a/fs/locks.c
-+++ b/fs/locks.c
-@@ -518,9 +518,10 @@ static void locks_insert_block(struct file_lock *blocker,
- 		list_add(&waiter->fl_link, &blocked_list);
- }
- 
--/* Wake up processes blocked waiting for blocker.
-- * If told to wait then schedule the processes until the block list
-- * is empty, otherwise empty the block list ourselves.
-+/*
-+ * Wake up processes blocked waiting for blocker.
-+ *
-+ * Must be called with the file_lock_lock held!
-  */
- static void locks_wake_up_blocks(struct file_lock *blocker)
- {
-@@ -806,6 +807,11 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
- 	}
- 
- 	lock_flocks();
-+	/*
-+	 * New lock request. Walk all POSIX locks and look for conflicts. If
-+	 * there are any, either return error or put the request on the
-+	 * blocker's list of waiters and the global blocked_list.
-+	 */
- 	if (request->fl_type != F_UNLCK) {
- 		for_each_lock(inode, before) {
- 			fl = *before;
-@@ -844,7 +850,7 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
- 		before = &fl->fl_next;
- 	}
- 
--	/* Process locks with this owner.  */
-+	/* Process locks with this owner. */
- 	while ((fl = *before) && posix_same_owner(request, fl)) {
- 		/* Detect adjacent or overlapping regions (if same lock type)
- 		 */
-@@ -930,10 +936,9 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
- 	}
- 
- 	/*
--	 * The above code only modifies existing locks in case of
--	 * merging or replacing.  If new lock(s) need to be inserted
--	 * all modifications are done bellow this, so it's safe yet to
--	 * bail out.
-+	 * The above code only modifies existing locks in case of merging or
-+	 * replacing. If new lock(s) need to be inserted all modifications are
-+	 * done below this, so it's safe yet to bail out.
- 	 */
- 	error = -ENOLCK; /* "no luck" */
- 	if (right && left == right && !new_fl2)
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index b9d7816..94105d2 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -926,6 +926,24 @@ int locks_in_grace(struct net *);
- /* that will die - we need it for nfs_lock_info */
- #include <linux/nfs_fs_i.h>
- 
-+/*
-+ * struct file_lock represents a generic "file lock". It's used to represent
-+ * POSIX byte range locks, BSD (flock) locks, and leases. It's important to
-+ * note that the same struct is used to represent both a request for a lock and
-+ * the lock itself, but the same object is never used for both.
-+ *
-+ * FIXME: should we create a separate "struct lock_request" to help distinguish
-+ * these two uses?
-+ *
-+ * The i_flock list is ordered by:
-+ *
-+ * 1) lock type -- FL_LEASEs first, then FL_FLOCK, and finally FL_POSIX
-+ * 2) lock owner
-+ * 3) lock range start
-+ * 4) lock range end
-+ *
-+ * Obviously, the last two criteria only matter for POSIX locks.
-+ */
- struct file_lock {
- 	struct file_lock *fl_next;	/* singly linked list for this inode  */
- 	struct list_head fl_link;	/* doubly linked list of all locks */
--- 
-1.7.1
+v2:
+- Fix potential races in deadlock detection. Manipulation of global
+  blocked_hash and deadlock detection are now atomic. This is a
+  little slower than the earlier set, but is provably correct. Also,
+  the patch that converts to using the i_lock has been split out from
+  most of the other changes. That should make it easier to review, but
+  it does leave a potential race in the deadlock detection that is fixed
+  up by the following patch. It may make sense to fold patches 7 and 8
+  together before merging.
+
+- Add percpu hlists and lglocks for global file_lock_list. This gives
+  us some speedup since this list is seldom read.
+
+Abstract (tl;dr version):
+-------------------------
+This patchset represents an overhaul of the file locking code with an
+aim toward improving its scalability and making the code a bit easier to
+understand.
+
+Longer version:
+---------------
+When the BKL was finally ripped out of the kernel in 2010, the strategy
+taken for the file locking code was to simply turn it into a new
+file_lock_locks spinlock. It was an expedient way to deal with the file
+locking code at the time, but having a giant spinlock around all of this
+code is clearly not great for scalability. Red Hat has bug reports that
+go back into the 2.6.18 era that point to BKL scalability problems in
+the file locking code and the file_lock_lock suffers from the same
+issues.
+
+This patchset is my first attempt to make this code less dependent on
+global locking. The main change is to switch most of the file locking
+code to be protected by the inode->i_lock instead of the file_lock_lock.
+
+While that works for most things, there are a couple of global data
+structures (lists in the current code) that need a global lock to
+protect them. So we still need a global lock in order to deal with
+those. The remaining patches are intended to make that global locking
+less painful. The big gains are made by turning the blocked_list into a
+hashtable, which greatly speeds up the deadlock detection code and
+making the file_lock_list percpu.
+
+This is not the first attempt at doing this. The conversion to the
+i_lock was originally attempted by Bruce Fields a few years ago. His
+approach was NAK'ed since it involved ripping out the deadlock
+detection. People also really seem to like /proc/locks for debugging, so
+keeping that in is probably worthwhile.
+
+There's more work to be done in this area and this patchset is just a
+start. There's a horrible thundering herd problem when a blocking lock
+is released, for instance. There was also interest in solving the goofy
+"unlock on any close" POSIX lock semantics at this year's LSF. I think
+this patchset will help lay the groundwork for those changes as well.
+
+While file locking is not usually considered to be a high-performance
+codepath, it *is* an IPC mechanism and I think it behooves us to try to
+make it as fast as possible.
+
+I'd like to see this considered for 3.11, but some soak time in -next
+would be good. Comments and suggestions welcome.
+
+Performance testing and results:
+--------------------------------
+In order to measure the benefit of this set, I've written some locking
+performance tests that I've made available here:
+
+    git://git.samba.org/jlayton/lockperf.git
+
+Here are the results from the same 32-way, 4 NUMA node machine that I
+used to generate the v2 patch results. The first number is the mean
+time spent in locking for the test. The number in parenthesis is the
+standard deviation.
+
+		3.10.0-rc5-00219-ga2648eb	3.10.0-rc5-00231-g7569869
+---------------------------------------------------------------------------
+flock01		24119.96 (266.08)		24542.51 (254.89)
+flock02		 1345.09  (37.37)		    8.60   (0.31)
+posix01		31217.14 (320.91)		24899.20 (254.27)
+posix02		 1348.60  (36.83)		   12.70   (0.44)
+
+I wasn't able to reserve the exact same smaller machine for testing this
+set, but this one is comparable with 4 CPUs and UMA architecture:
+
+		3.10.0-rc5-00219-ga2648eb	3.10.0-rc5-00231-g7569869
+---------------------------------------------------------------------------
+flock01		1787.51 (11.23)			1797.75  (9.27)
+flock02		 314.90	 (8.84)			  34.87  (2.82)
+posix01		1843.43 (11.63)			1880.47 (13.47)
+posix02		 325.13  (8.53)			  54.09  (4.02)
+
+I think the conclusion we can draw here is that this patchset it roughly
+as fast as the previous one. In addition, the posix02 test saw a vast
+increase in performance.
+
+I believe that's mostly due to the fact that with this set I added a
+patch that allows the code to avoid taking the global blocked_lock_lock
+when waking up waiters if there aren't any. With that, the
+blocked_lock_lock never has to be taken at all if there's no contention
+for the file_lock (as is the case in the posix02 and flock02 tests).
+
+Jeff Layton (13):
+  cifs: use posix_unblock_lock instead of locks_delete_block
+  locks: make generic_add_lease and generic_delete_lease static
+  locks: comment cleanups and clarifications
+  locks: make "added" in __posix_lock_file a bool
+  locks: encapsulate the fl_link list handling
+  locks: protect most of the file_lock handling with i_lock
+  locks: avoid taking global lock if possible when waking up blocked
+    waiters
+  locks: convert fl_link to a hlist_node
+  locks: turn the blocked_list into a hashtable
+  locks: add a new "lm_owner_key" lock operation
+  locks: give the blocked_hash its own spinlock
+  seq_file: add seq_list_*_percpu helpers
+  locks: move file_lock_list to a set of percpu hlist_heads and convert
+    file_lock_lock to an lglock
+
+ Documentation/filesystems/Locking |   27 +++-
+ fs/afs/flock.c                    |    5 +-
+ fs/ceph/locks.c                   |    2 +-
+ fs/ceph/mds_client.c              |    8 +-
+ fs/cifs/cifsfs.c                  |    2 +-
+ fs/cifs/file.c                    |   15 +-
+ fs/gfs2/file.c                    |    2 +-
+ fs/lockd/svclock.c                |   12 ++
+ fs/lockd/svcsubs.c                |   12 +-
+ fs/locks.c                        |  310 +++++++++++++++++++++++++-----------
+ fs/nfs/delegation.c               |   10 +-
+ fs/nfs/nfs4state.c                |    8 +-
+ fs/nfsd/nfs4state.c               |    8 +-
+ fs/seq_file.c                     |   54 +++++++
+ include/linux/fs.h                |   38 +++--
+ include/linux/seq_file.h          |    6 +
+ 16 files changed, 365 insertions(+), 154 deletions(-)
