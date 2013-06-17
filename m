@@ -1,8 +1,8 @@
 From: Jeff Layton <jlayton@redhat.com>
-Subject: [PATCH v3 12/13] seq_file: add seq_list_*_percpu
-	helpers
-Date: Mon, 17 Jun 2013 11:13:55 -0400
-Message-ID: <1371482036-15958-13-git-send-email-jlayton@redhat.com>
+Subject: [PATCH v3 13/13] locks: move file_lock_list to a
+	set of percpu hlist_heads and convert file_lock_lock to an lglock
+Date: Mon, 17 Jun 2013 11:13:56 -0400
+Message-ID: <1371482036-15958-14-git-send-email-jlayton@redhat.com>
 References: <1371482036-15958-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
         cluster-devel@redhat.com, sage@inktank.com,
@@ -25,93 +25,194 @@ Sender: cluster-devel-bounces@redhat.com
 Errors-To: cluster-devel-bounces@redhat.com
 List-Id: linux-cifs.vger.kernel.org
 
-When we convert the file_lock_list to a set of percpu lists, we'll need
-a way to iterate over them in order to output /proc/locks info. Add
-some seq_list_*_percpu helpers to handle that.
+The file_lock_list is only used for /proc/locks. The vastly common case
+is for locks to be put onto the list and come off again, without ever
+being traversed.
+
+Help optimize for this use-case by moving to percpu hlist_head-s. At the
+same time, we can make the locking less contentious by moving to an
+lglock. When iterating over the lists for /proc/locks, we must take the
+global lock and then iterate over each CPU's list in turn.
+
+This change necessitates a new fl_link_cpu field to keep track of which
+CPU the entry is on. On x86_64 at least, this field is placed within an
+existing hole in the struct to avoid growing the size.
 
 Signed-off-by: Jeff Layton <jlayton@redhat.com>
 Acked-by: J. Bruce Fields <bfields@fieldses.org>
 ---
- fs/seq_file.c            |   54 ++++++++++++++++++++++++++++++++++++++++++++++
- include/linux/seq_file.h |    6 +++++
- 2 files changed, 60 insertions(+), 0 deletions(-)
+ fs/locks.c         |   68 ++++++++++++++++++++++++++++++++++++---------------
+ include/linux/fs.h |    1 +
+ 2 files changed, 49 insertions(+), 20 deletions(-)
 
-diff --git a/fs/seq_file.c b/fs/seq_file.c
-index 774c1eb..3135c25 100644
---- a/fs/seq_file.c
-+++ b/fs/seq_file.c
-@@ -921,3 +921,57 @@ struct hlist_node *seq_hlist_next_rcu(void *v,
- 		return rcu_dereference(node->next);
+diff --git a/fs/locks.c b/fs/locks.c
+index 5db80c7..be9ca57 100644
+--- a/fs/locks.c
++++ b/fs/locks.c
+@@ -127,6 +127,8 @@
+ #include <linux/rcupdate.h>
+ #include <linux/pid_namespace.h>
+ #include <linux/hashtable.h>
++#include <linux/percpu.h>
++#include <linux/lglock.h>
+ 
+ #include <asm/uaccess.h>
+ 
+@@ -155,11 +157,12 @@ int lease_break_time = 45;
+ 	for (lockp = &inode->i_flock; *lockp != NULL; lockp = &(*lockp)->fl_next)
+ 
+ /*
+- * The global file_lock_list is only used for displaying /proc/locks. Protected
+- * by the file_lock_lock.
++ * The global file_lock_list is only used for displaying /proc/locks, so we
++ * keep a list on each CPU, with each list protected by its own spinlock via
++ * the file_lock_lglock.
+  */
+-static HLIST_HEAD(file_lock_list);
+-static DEFINE_SPINLOCK(file_lock_lock);
++DEFINE_STATIC_LGLOCK(file_lock_lglock);
++static DEFINE_PER_CPU(struct hlist_head, file_lock_list);
+ 
+ /*
+  * The blocked_hash is used to find POSIX lock loops for deadlock detection.
+@@ -490,20 +493,30 @@ static int posix_same_owner(struct file_lock *fl1, struct file_lock *fl2)
+ 	return fl1->fl_owner == fl2->fl_owner;
  }
- EXPORT_SYMBOL(seq_hlist_next_rcu);
+ 
++/* Must be called with the i_lock held! */
+ static inline void
+ locks_insert_global_locks(struct file_lock *waiter)
+ {
+-	spin_lock(&file_lock_lock);
+-	hlist_add_head(&waiter->fl_link, &file_lock_list);
+-	spin_unlock(&file_lock_lock);
++	lg_local_lock(&file_lock_lglock);
++	waiter->fl_link_cpu = smp_processor_id();
++	hlist_add_head(&waiter->fl_link, this_cpu_ptr(&file_lock_list));
++	lg_local_unlock(&file_lock_lglock);
+ }
+ 
++/* Must be called with the i_lock held! */
+ static inline void
+ locks_delete_global_locks(struct file_lock *waiter)
+ {
+-	spin_lock(&file_lock_lock);
++	/*
++	 * Avoid taking lock if already unhashed. This is safe since this check
++	 * is done while holding the i_lock, and new insertions into the list
++	 * also require that it be held.
++	 */
++	if (hlist_unhashed(&waiter->fl_link))
++		return;
++	lg_local_lock_cpu(&file_lock_lglock, waiter->fl_link_cpu);
+ 	hlist_del_init(&waiter->fl_link);
+-	spin_unlock(&file_lock_lock);
++	lg_local_unlock_cpu(&file_lock_lglock, waiter->fl_link_cpu);
+ }
+ 
+ static unsigned long
+@@ -2228,6 +2241,11 @@ EXPORT_SYMBOL_GPL(vfs_cancel_lock);
+ #include <linux/proc_fs.h>
+ #include <linux/seq_file.h>
+ 
++struct locks_iterator {
++	int	li_cpu;
++	loff_t	li_pos;
++};
 +
-+/**
-+ * seq_hlist_start_precpu - start an iteration of a percpu hlist array
-+ * @head: pointer to percpu array of struct hlist_heads
-+ * @cpu:  pointer to cpu "cursor"
-+ * @pos:  start position of sequence
-+ *
-+ * Called at seq_file->op->start().
-+ */
-+struct hlist_node *
-+seq_hlist_start_percpu(struct hlist_head __percpu *head, int *cpu, loff_t pos)
-+{
-+	struct hlist_node *node;
+ static void lock_get_status(struct seq_file *f, struct file_lock *fl,
+ 			    loff_t id, char *pfx)
+ {
+@@ -2301,39 +2319,41 @@ static void lock_get_status(struct seq_file *f, struct file_lock *fl,
+ 
+ static int locks_show(struct seq_file *f, void *v)
+ {
++	struct locks_iterator *iter = f->private;
+ 	struct file_lock *fl, *bfl;
+ 
+ 	fl = hlist_entry(v, struct file_lock, fl_link);
+ 
+-	lock_get_status(f, fl, *((loff_t *)f->private), "");
++	lock_get_status(f, fl, iter->li_pos, "");
+ 
+ 	list_for_each_entry(bfl, &fl->fl_block, fl_block)
+-		lock_get_status(f, bfl, *((loff_t *)f->private), " ->");
++		lock_get_status(f, bfl, iter->li_pos, " ->");
+ 
+ 	return 0;
+ }
+ 
+ static void *locks_start(struct seq_file *f, loff_t *pos)
+ {
+-	loff_t *p = f->private;
++	struct locks_iterator *iter = f->private;
+ 
+-	spin_lock(&file_lock_lock);
++	iter->li_pos = *pos + 1;
++	lg_global_lock(&file_lock_lglock);
+ 	spin_lock(&blocked_lock_lock);
+-	*p = (*pos + 1);
+-	return seq_hlist_start(&file_lock_list, *pos);
++	return seq_hlist_start_percpu(&file_lock_list, &iter->li_cpu, *pos);
+ }
+ 
+ static void *locks_next(struct seq_file *f, void *v, loff_t *pos)
+ {
+-	loff_t *p = f->private;
+-	++*p;
+-	return seq_hlist_next(v, &file_lock_list, pos);
++	struct locks_iterator *iter = f->private;
 +
-+	for_each_possible_cpu(*cpu) {
-+		hlist_for_each(node, per_cpu_ptr(head, *cpu)) {
-+			if (pos-- == 0)
-+				return node;
-+		}
-+	}
-+	return NULL;
-+}
-+EXPORT_SYMBOL(seq_hlist_start_percpu);
++	++iter->li_pos;
++	return seq_hlist_next_percpu(v, &file_lock_list, &iter->li_cpu, pos);
+ }
+ 
+ static void locks_stop(struct seq_file *f, void *v)
+ {
+ 	spin_unlock(&blocked_lock_lock);
+-	spin_unlock(&file_lock_lock);
++	lg_global_unlock(&file_lock_lglock);
+ }
+ 
+ static const struct seq_operations locks_seq_operations = {
+@@ -2345,7 +2365,8 @@ static const struct seq_operations locks_seq_operations = {
+ 
+ static int locks_open(struct inode *inode, struct file *filp)
+ {
+-	return seq_open_private(filp, &locks_seq_operations, sizeof(loff_t));
++	return seq_open_private(filp, &locks_seq_operations,
++					sizeof(struct locks_iterator));
+ }
+ 
+ static const struct file_operations proc_locks_operations = {
+@@ -2445,9 +2466,16 @@ EXPORT_SYMBOL(lock_may_write);
+ 
+ static int __init filelock_init(void)
+ {
++	int i;
 +
-+/**
-+ * seq_hlist_next_percpu - move to the next position of the percpu hlist array
-+ * @v:    pointer to current hlist_node
-+ * @head: pointer to percpu array of struct hlist_heads
-+ * @cpu:  pointer to cpu "cursor"
-+ * @pos:  start position of sequence
-+ *
-+ * Called at seq_file->op->next().
-+ */
-+struct hlist_node *
-+seq_hlist_next_percpu(void *v, struct hlist_head __percpu *head,
-+			int *cpu, loff_t *pos)
-+{
-+	struct hlist_node *node = v;
+ 	filelock_cache = kmem_cache_create("file_lock_cache",
+ 			sizeof(struct file_lock), 0, SLAB_PANIC, NULL);
+ 
++	lg_lock_init(&file_lock_lglock, "file_lock_lglock");
 +
-+	++*pos;
++	for_each_possible_cpu(i)
++		INIT_HLIST_HEAD(per_cpu_ptr(&file_lock_list, i));
 +
-+	if (node->next)
-+		return node->next;
-+
-+	for (*cpu = cpumask_next(*cpu, cpu_possible_mask); *cpu < nr_cpu_ids;
-+	     *cpu = cpumask_next(*cpu, cpu_possible_mask)) {
-+		struct hlist_head *bucket = per_cpu_ptr(head, *cpu);
-+
-+		if (!hlist_empty(bucket))
-+			return bucket->first;
-+	}
-+	return NULL;
-+}
-+EXPORT_SYMBOL(seq_hlist_next_percpu);
-diff --git a/include/linux/seq_file.h b/include/linux/seq_file.h
-index 2da29ac..4e32edc 100644
---- a/include/linux/seq_file.h
-+++ b/include/linux/seq_file.h
-@@ -173,4 +173,10 @@ extern struct hlist_node *seq_hlist_start_head_rcu(struct hlist_head *head,
- extern struct hlist_node *seq_hlist_next_rcu(void *v,
- 						   struct hlist_head *head,
- 						   loff_t *ppos);
-+
-+/* Helpers for iterating over per-cpu hlist_head-s in seq_files */
-+extern struct hlist_node *seq_hlist_start_percpu(struct hlist_head __percpu *head, int *cpu, loff_t pos);
-+
-+extern struct hlist_node *seq_hlist_next_percpu(void *v, struct hlist_head __percpu *head, int *cpu, loff_t *pos);
-+
- #endif
+ 	return 0;
+ }
+ 
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 232a345..18e59b8 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -953,6 +953,7 @@ struct file_lock {
+ 	unsigned int fl_flags;
+ 	unsigned char fl_type;
+ 	unsigned int fl_pid;
++	int fl_link_cpu;		/* what cpu's list is this on? */
+ 	struct pid *fl_nspid;
+ 	wait_queue_head_t fl_wait;
+ 	struct file *fl_file;
 -- 
 1.7.1
