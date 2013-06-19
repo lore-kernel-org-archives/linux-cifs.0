@@ -1,160 +1,74 @@
-From: Jeff Layton <jlayton@redhat.com>
-Subject: Re: [PATCH v3 06/13] locks: protect most of the file_lock handling
- with i_lock
-Date: Tue, 18 Jun 2013 13:43:46 -0400
-Message-ID: <20130618134346.79edf0a7@tlielax.poochiereds.net>
-References: <1371482036-15958-1-git-send-email-jlayton@redhat.com>
-	<1371482036-15958-7-git-send-email-jlayton@redhat.com>
-	<20130617114609.708a336b@tlielax.poochiereds.net>
-	<20130617114938.447a8d81@tlielax.poochiereds.net>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: cifs.upcall -c documentation confusion
+Date: Tue, 18 Jun 2013 21:12:14 -0400
+Message-ID: <20130618211214.58c7aace@tlielax.poochiereds.net>
+References: <1371222619.1722.21.camel@hh16.hh3.site>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: viro@zeniv.linux.org.uk, matthew@wil.cx, bfields@fieldses.org,
-	dhowells@redhat.com, sage@inktank.com, smfrench@gmail.com,
-	swhiteho@redhat.com, Trond.Myklebust@netapp.com,
-	akpm@linux-foundation.org, linux-kernel@vger.kernel.org,
-	linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-	cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, piastryyy@gmail.com
-To: Jeff Layton <jlayton@redhat.com>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <20130617114938.447a8d81@tlielax.poochiereds.net>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1371222619.1722.21.camel-HkULYb+WTT7YCGPCin2YbQ@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 17 Jun 2013 11:49:38 -0400
-Jeff Layton <jlayton@redhat.com> wrote:
+On Fri, 14 Jun 2013 17:10:19 +0200
+steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org> wrote:
 
-> On Mon, 17 Jun 2013 11:46:09 -0400
-> Jeff Layton <jlayton@redhat.com> wrote:
+> openSUSE 12.3, samba 4.0 DC, cifs-utils 6.0
 > 
-> > On Mon, 17 Jun 2013 11:13:49 -0400
-> > Jeff Layton <jlayton@redhat.com> wrote:
-> > 
-> > > Having a global lock that protects all of this code is a clear
-> > > scalability problem. Instead of doing that, move most of the code to be
-> > > protected by the i_lock instead. The exceptions are the global lists
-> > > that the ->fl_link sits on, and the ->fl_block list.
-> > > 
-> > > ->fl_link is what connects these structures to the
-> > > global lists, so we must ensure that we hold those locks when iterating
-> > > over or updating these lists.
-> > > 
-> > > Furthermore, sound deadlock detection requires that we hold the
-> > > blocked_list state steady while checking for loops. We also must ensure
-> > > that the search and update to the list are atomic.
-> > > 
-> > > For the checking and insertion side of the blocked_list, push the
-> > > acquisition of the global lock into __posix_lock_file and ensure that
-> > > checking and update of the  blocked_list is done without dropping the
-> > > lock in between.
-> > > 
-> > > On the removal side, when waking up blocked lock waiters, take the
-> > > global lock before walking the blocked list and dequeue the waiters from
-> > > the global list prior to removal from the fl_block list.
-> > > 
-> > > With this, deadlock detection should be race free while we minimize
-> > > excessive file_lock_lock thrashing.
-> > > 
-> > > Finally, in order to avoid a lock inversion problem when handling
-> > > /proc/locks output we must ensure that manipulations of the fl_block
-> > > list are also protected by the file_lock_lock.
-> > > 
-> > > Signed-off-by: Jeff Layton <jlayton@redhat.com>
-> > > ---
-> > >  Documentation/filesystems/Locking |   21 ++++--
-> > >  fs/afs/flock.c                    |    5 +-
-> > >  fs/ceph/locks.c                   |    2 +-
-> > >  fs/ceph/mds_client.c              |    8 +-
-> > >  fs/cifs/cifsfs.c                  |    2 +-
-> > >  fs/cifs/file.c                    |   13 ++--
-> > >  fs/gfs2/file.c                    |    2 +-
-> > >  fs/lockd/svcsubs.c                |   12 ++--
-> > >  fs/locks.c                        |  151 ++++++++++++++++++++++---------------
-> > >  fs/nfs/delegation.c               |   10 +-
-> > >  fs/nfs/nfs4state.c                |    8 +-
-> > >  fs/nfsd/nfs4state.c               |    8 +-
-> > >  include/linux/fs.h                |   11 ---
-> > >  13 files changed, 140 insertions(+), 113 deletions(-)
-> > > 
-> > 
-> > [...]
-> > 
-> > > @@ -1231,7 +1254,7 @@ int __break_lease(struct inode *inode, unsigned int mode)
-> > >  	if (IS_ERR(new_fl))
-> > >  		return PTR_ERR(new_fl);
-> > >  
-> > > -	lock_flocks();
-> > > +	spin_lock(&inode->i_lock);
-> > >  
-> > >  	time_out_leases(inode);
-> > >  
-> > > @@ -1281,11 +1304,11 @@ restart:
-> > >  			break_time++;
-> > >  	}
-> > >  	locks_insert_block(flock, new_fl);
-> > > -	unlock_flocks();
-> > > +	spin_unlock(&inode->i_lock);
-> > >  	error = wait_event_interruptible_timeout(new_fl->fl_wait,
-> > >  						!new_fl->fl_next, break_time);
-> > > -	lock_flocks();
-> > > -	__locks_delete_block(new_fl);
-> > > +	spin_lock(&inode->i_lock);
-> > > +	locks_delete_block(new_fl);
-> > 
-> > Doh -- bug here. This should not have been changed to
-> > locks_delete_block(). My apologies.
-> > 
-> > >  	if (error >= 0) {
-> > >  		if (error == 0)
-> > >  			time_out_leases(inode);
-> > 
-> > [...]
-> > 
-> > >  posix_unblock_lock(struct file *filp, struct file_lock *waiter)
-> > >  {
-> > > +	struct inode *inode = file_inode(filp);
-> > >  	int status = 0;
-> > >  
-> > > -	lock_flocks();
-> > > +	spin_lock(&inode->i_lock);
-> > >  	if (waiter->fl_next)
-> > > -		__locks_delete_block(waiter);
-> > > +		locks_delete_block(waiter);
-> > 
-> > 
-> > Ditto here...
-> > 
-> > >  	else
-> > >  		status = -ENOENT;
-> > > -	unlock_flocks();
-> > > +	spin_unlock(&inode->i_lock);
-> > >  	return status;
-> > >  }
-> > >  
-> > 
+> Hi
+> openSUSE and Ubuntu come with this line as default
+> in /etc/request-key.conf
+> create cifs.spnego * *  /usr/sbin/cifs.upcall -c %k
 > 
-> Bah, scratch that -- this patch is actually fine. We hold the i_lock
-> here and locks_delete_block takes the file_lock_lock, which is correct.
-> There is a potential race in patch 7 though. I'll reply to that patch
-> to point it out in a minute.
+> man cifs.upcall gives:
+> OPTIONS
+> -c
+> This option is deprecated and is currently ignored.
+> 
+> To get cifs.upcall to work, I must specify a key at mount time. This key
+> has to be present in /etc/krb5.keytab.
+> 
+> Jeff Layton has just given me a patch which allows e.g.:
+> create cifs.spnego * *  /usr/sbin/cifs.upcall -d /etc/cifs.keytab %k
+> 
+> 
+> Question:
+> What key does cifs.upcall look for if there is no username= parameter
+> for mount.cifs?
 > 
 
-...and scratch that again...
+mount.cifs always passes a username to the kernel. If you don't specify
+one, it determines it based on the user running the mount.cifs. Most
+likely, it's passing in "username=root" in your case.
 
-There is a bug in the posix_unblock_lock delta above. We don't need to
-hold the i_lock there, but we should probably be taking the
-file_lock_lock before checking fl_next.
+> Should I remove the -c? (nothing is mounted if it is present).
+> 
 
-In truth, I have a hard time seeing how that race would manifest itself
-in practice, but that's how the existing code works so it's probably
-best to preserve that as closely as possible.
+It shouldn't matter either way. The "-c" option is ignored.
 
-Fixed in my git repo and the next spin of this set will have it.
+> syslog errors:
+> cifs.upcall checks the cache's and if it finds none always gives:
+> failed to obtain service ticket
+> even though it just created a cache by looking in the keytab and did the
+> mount
+> Could the error be sent _after_ request-key.conf has been consulted?
+> 
 
-Sorry again for the noise... ;)
+request-key.conf isn't consulted by the program itself. It tells
+request-key which program to run and how to run it in order to handle a
+keys API upcall.
+
+handle_krb5_mech can get called multiple times if the initial attempts
+to get a service ticket for a particular hostname fail. It's true that
+that error gets logged on each attempt, but it's being logged at
+LOG_DEBUG level. I'd be hesitant to remove it since those errors tell
+you something if you're trying to track down problems in this code.
+
+If you're concerned about those messages, then you may want to turn
+down the daemon facility loglevel in syslog.
 
 -- 
-Jeff Layton <jlayton@redhat.com>
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
