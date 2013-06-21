@@ -1,114 +1,210 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v4 10/14] locks: turn the blocked_list into a hashtable
-Date: Fri, 21 Jun 2013 08:58:18 -0400
-Message-ID: <1371819502-26363-11-git-send-email-jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+Subject: [PATCH v4 14/14] locks: move file_lock_list to a set of percpu hlist_heads and convert file_lock_lock to an lglock
+Date: Fri, 21 Jun 2013 08:58:22 -0400
+Message-ID: <1371819502-26363-15-git-send-email-jlayton@redhat.com>
 References: <1371819502-26363-1-git-send-email-jlayton@redhat.com>
-Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, sage-4GqslpFJ+cxBDgjK7y7TUQ@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	swhiteho-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org,
-	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-To: viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, matthew-Ztpu424NOJ8@public.gmane.org, bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1371819502-26363-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: dhowells@redhat.com, sage@inktank.com, smfrench@gmail.com,
+	swhiteho@redhat.com, Trond.Myklebust@netapp.com,
+	akpm@linux-foundation.org, linux-kernel@vger.kernel.org,
+	linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+	cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, piastryyy@gmail.com
+To: viro@zeniv.linux.org.uk, matthew@wil.cx, bfields@fieldses.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1371819502-26363-1-git-send-email-jlayton@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Break up the blocked_list into a hashtable, using the fl_owner as a key.
-This speeds up searching the hash chains, which is especially significant
-for deadlock detection.
+The file_lock_list is only used for /proc/locks. The vastly common case
+is for locks to be put onto the list and come off again, without ever
+being traversed.
 
-Note that the initial implementation assumes that hashing on fl_owner is
-sufficient. In most cases it should be, with the notable exception being
-server-side lockd, which compares ownership using a tuple of the
-nlm_host and the pid sent in the lock request. So, this may degrade to a
-single hash bucket when you only have a single NFS client. That will be
-addressed in a later patch.
+Help optimize for this use-case by moving to percpu hlist_head-s. At the
+same time, we can make the locking less contentious by moving to an
+lglock. When iterating over the lists for /proc/locks, we must take the
+global lock and then iterate over each CPU's list in turn.
 
-The careful observer may note that this patch leaves the file_lock_list
-alone. There's much less of a case for turning the file_lock_list into a
-hashtable. The only user of that list is the code that generates
-/proc/locks, and it always walks the entire list.
+This change necessitates a new fl_link_cpu field to keep track of which
+CPU the entry is on. On x86_64 at least, this field is placed within an
+existing hole in the struct to avoid growing the size.
 
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Acked-by: J. Bruce Fields <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Acked-by: J. Bruce Fields <bfields@fieldses.org>
 ---
- fs/locks.c |   25 +++++++++++++++++--------
- 1 files changed, 17 insertions(+), 8 deletions(-)
+ fs/locks.c         |   69 +++++++++++++++++++++++++++++++++++++---------------
+ include/linux/fs.h |    1 +
+ 2 files changed, 50 insertions(+), 20 deletions(-)
 
 diff --git a/fs/locks.c b/fs/locks.c
-index 941b714..71d847c 100644
+index 04e2c1f..0f544cd 100644
 --- a/fs/locks.c
 +++ b/fs/locks.c
-@@ -126,6 +126,7 @@
- #include <linux/time.h>
+@@ -127,6 +127,8 @@
  #include <linux/rcupdate.h>
  #include <linux/pid_namespace.h>
-+#include <linux/hashtable.h>
+ #include <linux/hashtable.h>
++#include <linux/percpu.h>
++#include <linux/lglock.h>
  
  #include <asm/uaccess.h>
  
-@@ -160,13 +161,21 @@ int lease_break_time = 45;
- static HLIST_HEAD(file_lock_list);
+@@ -155,11 +157,13 @@ int lease_break_time = 45;
+ 	for (lockp = &inode->i_flock; *lockp != NULL; lockp = &(*lockp)->fl_next)
  
  /*
-- * The blocked_list is used to find POSIX lock loops for deadlock detection.
-- * Protected by file_lock_lock.
-+ * The blocked_hash is used to find POSIX lock loops for deadlock detection.
-+ * It is protected by file_lock_lock.
-+ *
-+ * We hash locks by lockowner in order to optimize searching for the lock a
-+ * particular lockowner is waiting on.
-+ *
-+ * FIXME: make this value scale via some heuristic? We generally will want more
-+ * buckets when we have more lockowners holding locks, but that's a little
-+ * difficult to determine without knowing what the workload will look like.
+- * The global file_lock_list is only used for displaying /proc/locks. Protected
+- * by the file_lock_lock.
++ * The global file_lock_list is only used for displaying /proc/locks, so we
++ * keep a list on each CPU, with each list protected by its own spinlock via
++ * the file_lock_lglock. Note that alterations to the list also require that
++ * the relevant i_lock is held.
   */
--static HLIST_HEAD(blocked_list);
-+#define BLOCKED_HASH_BITS	7
-+static DEFINE_HASHTABLE(blocked_hash, BLOCKED_HASH_BITS);
+-static HLIST_HEAD(file_lock_list);
+-static DEFINE_SPINLOCK(file_lock_lock);
++DEFINE_STATIC_LGLOCK(file_lock_lglock);
++static DEFINE_PER_CPU(struct hlist_head, file_lock_list);
  
  /*
-- * This lock protects the blocked_list, and the file_lock_list. Generally, if
-+ * This lock protects the blocked_hash and the file_lock_list. Generally, if
-  * you're accessing one of those lists, you want to be holding this lock.
-  *
-  * In addition, it also protects the fl->fl_block list, and the fl->fl_next
-@@ -515,13 +524,13 @@ locks_delete_global_locks(struct file_lock *fl)
- static inline void
- locks_insert_global_blocked(struct file_lock *waiter)
- {
--	hlist_add_head(&waiter->fl_link, &blocked_list);
-+	hash_add(blocked_hash, &waiter->fl_link, (unsigned long)waiter->fl_owner);
+  * The blocked_hash is used to find POSIX lock loops for deadlock detection.
+@@ -506,20 +510,30 @@ static int posix_same_owner(struct file_lock *fl1, struct file_lock *fl2)
+ 	return fl1->fl_owner == fl2->fl_owner;
  }
  
++/* Must be called with the i_lock held! */
  static inline void
- locks_delete_global_blocked(struct file_lock *waiter)
+ locks_insert_global_locks(struct file_lock *fl)
  {
--	hlist_del_init(&waiter->fl_link);
-+	hash_del(&waiter->fl_link);
+-	spin_lock(&file_lock_lock);
+-	hlist_add_head(&fl->fl_link, &file_lock_list);
+-	spin_unlock(&file_lock_lock);
++	lg_local_lock(&file_lock_lglock);
++	fl->fl_link_cpu = smp_processor_id();
++	hlist_add_head(&fl->fl_link, this_cpu_ptr(&file_lock_list));
++	lg_local_unlock(&file_lock_lglock);
  }
  
- /* Remove waiter from blocker's block list.
-@@ -748,7 +757,7 @@ static struct file_lock *what_owner_is_waiting_for(struct file_lock *block_fl)
++/* Must be called with the i_lock held! */
+ static inline void
+ locks_delete_global_locks(struct file_lock *fl)
  {
- 	struct file_lock *fl;
+-	spin_lock(&file_lock_lock);
++	/*
++	 * Avoid taking lock if already unhashed. This is safe since this check
++	 * is done while holding the i_lock, and new insertions into the list
++	 * also require that it be held.
++	 */
++	if (hlist_unhashed(&fl->fl_link))
++		return;
++	lg_local_lock_cpu(&file_lock_lglock, fl->fl_link_cpu);
+ 	hlist_del_init(&fl->fl_link);
+-	spin_unlock(&file_lock_lock);
++	lg_local_unlock_cpu(&file_lock_lglock, fl->fl_link_cpu);
+ }
  
--	hlist_for_each_entry(fl, &blocked_list, fl_link) {
-+	hash_for_each_possible(blocked_hash, fl, fl_link, (unsigned long)block_fl->fl_owner) {
- 		if (posix_same_owner(fl, block_fl))
- 			return fl->fl_next;
- 	}
-@@ -884,7 +893,7 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
- 	/*
- 	 * New lock request. Walk all POSIX locks and look for conflicts. If
- 	 * there are any, either return error or put the request on the
--	 * blocker's list of waiters and the global blocked_list.
-+	 * blocker's list of waiters and the global blocked_hash.
- 	 */
- 	if (request->fl_type != F_UNLCK) {
- 		for_each_lock(inode, before) {
+ static unsigned long
+@@ -2243,6 +2257,11 @@ EXPORT_SYMBOL_GPL(vfs_cancel_lock);
+ #include <linux/proc_fs.h>
+ #include <linux/seq_file.h>
+ 
++struct locks_iterator {
++	int	li_cpu;
++	loff_t	li_pos;
++};
++
+ static void lock_get_status(struct seq_file *f, struct file_lock *fl,
+ 			    loff_t id, char *pfx)
+ {
+@@ -2316,39 +2335,41 @@ static void lock_get_status(struct seq_file *f, struct file_lock *fl,
+ 
+ static int locks_show(struct seq_file *f, void *v)
+ {
++	struct locks_iterator *iter = f->private;
+ 	struct file_lock *fl, *bfl;
+ 
+ 	fl = hlist_entry(v, struct file_lock, fl_link);
+ 
+-	lock_get_status(f, fl, *((loff_t *)f->private), "");
++	lock_get_status(f, fl, iter->li_pos, "");
+ 
+ 	list_for_each_entry(bfl, &fl->fl_block, fl_block)
+-		lock_get_status(f, bfl, *((loff_t *)f->private), " ->");
++		lock_get_status(f, bfl, iter->li_pos, " ->");
+ 
+ 	return 0;
+ }
+ 
+ static void *locks_start(struct seq_file *f, loff_t *pos)
+ {
+-	loff_t *p = f->private;
++	struct locks_iterator *iter = f->private;
+ 
+-	spin_lock(&file_lock_lock);
++	iter->li_pos = *pos + 1;
++	lg_global_lock(&file_lock_lglock);
+ 	spin_lock(&blocked_lock_lock);
+-	*p = (*pos + 1);
+-	return seq_hlist_start(&file_lock_list, *pos);
++	return seq_hlist_start_percpu(&file_lock_list, &iter->li_cpu, *pos);
+ }
+ 
+ static void *locks_next(struct seq_file *f, void *v, loff_t *pos)
+ {
+-	loff_t *p = f->private;
+-	++*p;
+-	return seq_hlist_next(v, &file_lock_list, pos);
++	struct locks_iterator *iter = f->private;
++
++	++iter->li_pos;
++	return seq_hlist_next_percpu(v, &file_lock_list, &iter->li_cpu, pos);
+ }
+ 
+ static void locks_stop(struct seq_file *f, void *v)
+ {
+ 	spin_unlock(&blocked_lock_lock);
+-	spin_unlock(&file_lock_lock);
++	lg_global_unlock(&file_lock_lglock);
+ }
+ 
+ static const struct seq_operations locks_seq_operations = {
+@@ -2360,7 +2381,8 @@ static const struct seq_operations locks_seq_operations = {
+ 
+ static int locks_open(struct inode *inode, struct file *filp)
+ {
+-	return seq_open_private(filp, &locks_seq_operations, sizeof(loff_t));
++	return seq_open_private(filp, &locks_seq_operations,
++					sizeof(struct locks_iterator));
+ }
+ 
+ static const struct file_operations proc_locks_operations = {
+@@ -2460,9 +2482,16 @@ EXPORT_SYMBOL(lock_may_write);
+ 
+ static int __init filelock_init(void)
+ {
++	int i;
++
+ 	filelock_cache = kmem_cache_create("file_lock_cache",
+ 			sizeof(struct file_lock), 0, SLAB_PANIC, NULL);
+ 
++	lg_lock_init(&file_lock_lglock, "file_lock_lglock");
++
++	for_each_possible_cpu(i)
++		INIT_HLIST_HEAD(per_cpu_ptr(&file_lock_list, i));
++
+ 	return 0;
+ }
+ 
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index e42e04f..039f2ae 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -953,6 +953,7 @@ struct file_lock {
+ 	unsigned int fl_flags;
+ 	unsigned char fl_type;
+ 	unsigned int fl_pid;
++	int fl_link_cpu;		/* what cpu's list is this on? */
+ 	struct pid *fl_nspid;
+ 	wait_queue_head_t fl_wait;
+ 	struct file *fl_file;
 -- 
 1.7.1
