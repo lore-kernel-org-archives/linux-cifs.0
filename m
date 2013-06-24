@@ -1,44 +1,39 @@
-From: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
-Subject: re: [CIFS] Charge at least one credit, if server says that it
- supports multicredit
-Date: Mon, 24 Jun 2013 15:24:49 +0300
-Message-ID: <20130624122449.GA14149@elgon.mountain>
+From: David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>
+Subject: Re: [PATCH] [CIFS] SMB2 FSCTL and IOCTL worker function
+Date: Mon, 24 Jun 2013 15:35:57 +0200
+Message-ID: <20130624153557.2b4081ae@f163.suse.de>
+References: <CAH2r5muUxsPGg6VoiykMx-YiT=zyiF5tfgfs6j2U++KoGVCP+A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
+In-Reply-To: <CAH2r5muUxsPGg6VoiykMx-YiT=zyiF5tfgfs6j2U++KoGVCP+A-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hello Steve French,
+Hi Steve,
 
-This is a semi-automatic email about new static checker warnings.
+On Mon, 24 Jun 2013 02:19:13 -0500
+Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-The patch 7f420cee8bd6: "[CIFS] Charge at least one credit, if server
-says that it supports multicredit" from Jun 23, 2013, leads to the
-following Smatch complaint:
+> +	rc = SendReceive2(xid, ses, iov, num_iovecs, &resp_buftype, 0);
+> +	rsp = (struct smb2_ioctl_rsp *)iov[0].iov_base;
+> +
+> +	if (rc != 0) {
+> +		if (tcon)
+> +			cifs_stats_fail_inc(tcon, SMB2_IOCTL_HE);
+> +		goto ioctl_exit;
+> +	}
 
-fs/cifs/smb2pdu.c:120 smb2_hdr_assemble()
-	 warn: variable dereferenced before check 'tcon->ses' (see line 115)
+IIUC, this throws away any response data if the server reply status
+is unsuccessful.
 
-fs/cifs/smb2pdu.c
-   114		if (tcon->ses->server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU)
-                    ^^^^^^^^^^^
-New dereference.
+The caller may wish to obtain the response data under certain error
+conditions, particularly in the case of FSCTL_SRV_COPYCHUNK, where the
+server returns chunk request limits alongside STATUS_INVALID_PARAMETER
+in some cases. See MS-SMB2 2.2.32.1 for details.
 
-   115			hdr->CreditCharge = cpu_to_le16(1);
-   116		/* else CreditCharge MBZ */
-   117	
-   118		hdr->TreeId = tcon->tid;
-   119		/* Uid is not converted */
-   120		if (tcon->ses)
-                    ^^^^^^^^^
-Old check.
-
-   121			hdr->SessionId = tcon->ses->Suid;
-   122		/* BB check following DFS flags BB */
-
-regards,
-dan carpenter
+Cheers, David
