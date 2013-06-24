@@ -1,39 +1,54 @@
-From: David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>
-Subject: Re: [PATCH] [CIFS] SMB2 FSCTL and IOCTL worker function
-Date: Mon, 24 Jun 2013 15:35:57 +0200
-Message-ID: <20130624153557.2b4081ae@f163.suse.de>
-References: <CAH2r5muUxsPGg6VoiykMx-YiT=zyiF5tfgfs6j2U++KoGVCP+A@mail.gmail.com>
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: linux-next: error fetching the cifs tree
+Date: Tue, 25 Jun 2013 09:51:14 +1000
+Message-ID: <20130625095114.78375db24240f27af94a086f@canb.auug.org.au>
 Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA256";
+ boundary="Signature=_Tue__25_Jun_2013_09_51_14_+1000_J1vFalXaNJ6Yi8zI"
+Cc: linux-next@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Steve French <smfrench@gmail.com>, <linux-cifs@vger.kernel.org>
+Return-path: <linux-next-owner@vger.kernel.org>
+Sender: linux-next-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
+
+--Signature=_Tue__25_Jun_2013_09_51_14_+1000_J1vFalXaNJ6Yi8zI
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5muUxsPGg6VoiykMx-YiT=zyiF5tfgfs6j2U++KoGVCP+A-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Hi Steve,
+Hi all,
 
-On Mon, 24 Jun 2013 02:19:13 -0500
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+Attempting to fetch the cifs tree
+(git://git.samba.org/sfrench/cifs-2.6.git#for-next) produces this error:
 
-> +	rc = SendReceive2(xid, ses, iov, num_iovecs, &resp_buftype, 0);
-> +	rsp = (struct smb2_ioctl_rsp *)iov[0].iov_base;
-> +
-> +	if (rc != 0) {
-> +		if (tcon)
-> +			cifs_stats_fail_inc(tcon, SMB2_IOCTL_HE);
-> +		goto ioctl_exit;
-> +	}
+fatal: Couldn't find remote ref refs/heads/for-next
 
-IIUC, this throws away any response data if the server reply status
-is unsuccessful.
+I am using whatever I have previously fetched.
 
-The caller may wish to obtain the response data under certain error
-conditions, particularly in the case of FSCTL_SRV_COPYCHUNK, where the
-server returns chunk request limits alongside STATUS_INVALID_PARAMETER
-in some cases. See MS-SMB2 2.2.32.1 for details.
+--=20
+Cheers,
+Stephen Rothwell                    sfr@canb.auug.org.au
 
-Cheers, David
+--Signature=_Tue__25_Jun_2013_09_51_14_+1000_J1vFalXaNJ6Yi8zI
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.20 (GNU/Linux)
+
+iQIcBAEBCAAGBQJRyNtyAAoJEECxmPOUX5FEcwsP/Ak0DGydHW+PtCi5bavlqhtz
+xpbXoYDW60l9vIvCE3I8owmOlmGrVd1m0e0Wp7hi9ooaHoQoYEPSCAOE44m5C0wV
+Shh8L1iegdZmeYG+F+n/5AEW5wJUOvBcttFMryggnhVWRbc/o5ZW3+vTYmgu9iA2
+hAE+pYMzCcRRIvVXYJxyjEYzCdcJlfJwjIMTmvtfbEdbeXc/ynXEi8M/3qMraDUg
+QlUn2gZ7mLeecrDYi3N506hBCLV68P45UFSH1txX6FETahZGZhPvRUxMcAvWISeP
+bY13JUUSWI+DTr9nbJAdyFY8JPuUfXxC/yPBljXVMXD6hi6LcRLOsVhKOcess9Ky
+u40dqurCw4oOKmwimfV3PQtUdTN5UlB5CayKeFwHItFPxDRPCUuth8uz8H2vPAyr
+7jfkWAHEVzK4DVc6sXCmKXGjh/hHUXz/gZ94zsHcn/jAzFSHVbpj8g5Pyfq1saDH
+OkPL1Wfi7PSleickia0rO0rSs2QOazIKANJPk+ssk4uNpIJWytMOtL7wzeP+ZTw4
+DYLce4C4ANOgFkxqzsNEqvpLUJ3TkpyrYYx3p+hBKDkJJMIwcwy5uc26IeTM5hni
+6Pnq/6boUhAVUa/ec9RHLH2NYb4ccLKCpJKqh+LrpBfIlMG07e/uMNrD51ywjzY8
+E+/FgOuh+cMJwie9EX2Y
+=YGT8
+-----END PGP SIGNATURE-----
+
+--Signature=_Tue__25_Jun_2013_09_51_14_+1000_J1vFalXaNJ6Yi8zI--
