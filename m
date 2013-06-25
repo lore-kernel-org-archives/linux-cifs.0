@@ -1,95 +1,87 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v2 19/19] cifs: try to handle the MUST SecurityFlags
- sanely
-Date: Tue, 25 Jun 2013 10:07:40 -0400
-Message-ID: <20130625100740.6575141d@tlielax.poochiereds.net>
-References: <1369743120-18941-1-git-send-email-jlayton@redhat.com>
-	<1369743120-18941-20-git-send-email-jlayton@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH v2] cifs.upcall: allow users to specify dedicated keytab on command-line
+Date: Tue, 25 Jun 2013 11:18:48 -0400
+Message-ID: <1372173528-9373-1-git-send-email-jlayton@samba.org>
+Cc: steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1369743120-18941-20-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 28 May 2013 08:12:00 -0400
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+Currently cifs.upcall only looks at the default system keytab
+(/etc/krb5.keytab). It's often the case however that a dedicated keytab
+is desirable. Allow administrators to set one on the command-line.
 
-> The cifs.ko SecurityFlags interface wins my award for worst-designed
-> interface ever, but we're sort of stuck with it since it's documented
-> and people do use it (even if it doesn't work correctly).
-> 
-> Case in point -- you can specify multiple sets of "MUST" flags. It makes
-> absolutely no sense, but you can do it.
-> 
-> What should the effect be in such a case? No one knows or seems to have
-> considered this so far, so let's define it now. If you try to specify
-> multiple MUST flags, clear any other MAY or MUST bits except for the
-> ones that involve signing.
-> 
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> Reviewed-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Reported-by: steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ cifs.upcall.8.in | 7 ++++++-
+ cifs.upcall.c    | 8 ++++++--
+ 2 files changed, 12 insertions(+), 3 deletions(-)
 
-Steve, I noticed you had merged all of the patches in this series
-except this one. Did you find a problem with it or did you just not get
-to it yet?
-
-Thanks,
-
-> ---
->  fs/cifs/cifs_debug.c | 28 ++++++++++++++++++++++++++++
->  1 file changed, 28 insertions(+)
-> 
-> diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-> index 856f8f5..d21339a 100644
-> --- a/fs/cifs/cifs_debug.c
-> +++ b/fs/cifs/cifs_debug.c
-> @@ -595,6 +595,32 @@ static int cifs_security_flags_proc_open(struct inode *inode, struct file *file)
->  	return single_open(file, cifs_security_flags_proc_show, NULL);
->  }
->  
-> +/*
-> + * Ensure that if someone sets a MUST flag, that we disable all other MAY
-> + * flags except for the ones corresponding to the given MUST flag. If there are
-> + * multiple MUST flags, then try to prefer more secure ones.
-> + */
-> +static void
-> +cifs_security_flags_handle_must_flags(unsigned int *flags)
-> +{
-> +	unsigned int signflags = *flags & CIFSSEC_MUST_SIGN;
-> +
-> +	if ((*flags & CIFSSEC_MUST_KRB5) == CIFSSEC_MUST_KRB5)
-> +		*flags = CIFSSEC_MUST_KRB5;
-> +	else if ((*flags & CIFSSEC_MUST_NTLMSSP) == CIFSSEC_MUST_NTLMSSP)
-> +		*flags = CIFSSEC_MUST_NTLMSSP;
-> +	else if ((*flags & CIFSSEC_MUST_NTLMV2) == CIFSSEC_MUST_NTLMV2)
-> +		*flags = CIFSSEC_MUST_NTLMV2;
-> +	else if ((*flags & CIFSSEC_MUST_NTLM) == CIFSSEC_MUST_NTLM)
-> +		*flags = CIFSSEC_MUST_NTLM;
-> +	else if ((*flags & CIFSSEC_MUST_LANMAN) == CIFSSEC_MUST_LANMAN)
-> +		*flags = CIFSSEC_MUST_LANMAN;
-> +	else if ((*flags & CIFSSEC_MUST_PLNTXT) == CIFSSEC_MUST_PLNTXT)
-> +		*flags = CIFSSEC_MUST_PLNTXT;
-> +
-> +	*flags |= signflags;
-> +}
-> +
->  static ssize_t cifs_security_flags_proc_write(struct file *file,
->  		const char __user *buffer, size_t count, loff_t *ppos)
->  {
-> @@ -648,6 +674,8 @@ static ssize_t cifs_security_flags_proc_write(struct file *file,
->  		return -EINVAL;
->  	}
->  
-> +	cifs_security_flags_handle_must_flags(&flags);
-> +
->  	/* flags look ok - update the global security flags for cifs module */
->  	global_secflags = flags;
->  	if (global_secflags & CIFSSEC_MUST_SIGN) {
-
-
+diff --git a/cifs.upcall.8.in b/cifs.upcall.8.in
+index 3ae0562..50f79d1 100644
+--- a/cifs.upcall.8.in
++++ b/cifs.upcall.8.in
+@@ -22,7 +22,7 @@
+ cifs.upcall \- Userspace upcall helper for Common Internet File System (CIFS)
+ .SH "SYNOPSIS"
+ .HP \w'\ 'u
+-cifs\&.upcall [\-\-trust\-dns|\-t] [\-\-version|\-v] [\-\-legacy\-uid|\-l] [--krb5conf=/path/to/krb5.conf|-k /path/to/...] {keyid}
++cifs\&.upcall [\-\-trust\-dns|\-t] [\-\-version|\-v] [\-\-legacy\-uid|\-l] [--krb5conf=/path/to/krb5.conf|-k /path/to/krb5.conf] [--keytab=/path/to/keytab|-K /path/to/keytab] {keyid}
+ .SH "DESCRIPTION"
+ .PP
+ This tool is part of the cifs-utils suite\&.
+@@ -44,6 +44,11 @@ This option allows administrators to set an alternate location for the
+ krb5.conf file that cifs.upcall will use.
+ .RE
+ .PP
++\--keytab=/path/to/keytab|-K /path/to/keytab
++.RS 4
++This option allows administrators to specify a keytab file to be used. When a user has no credential cache already established, cifs.upcall will attempt to use this keytab to acquire them. The default is the system-wide keytab /etc/krb5.keytab.
++.RE
++.PP
+ \-\-trust\-dns|\-t
+ .RS 4
+ With krb5 upcalls, the name used as the host portion of the service principal defaults to the hostname portion of the UNC\&. This option allows the upcall program to reverse resolve the network address of the server in order to get the hostname\&.
+diff --git a/cifs.upcall.c b/cifs.upcall.c
+index 6c0b9de..c16bdfd 100644
+--- a/cifs.upcall.c
++++ b/cifs.upcall.c
+@@ -805,13 +805,14 @@ lowercase_string(char *c)
+ 
+ static void usage(void)
+ {
+-	fprintf(stderr, "Usage: %s [-k /path/to/krb5.conf] [-t] [-v] [-l] key_serial\n", prog);
++	fprintf(stderr, "Usage: %s [ -K /path/to/keytab] [-k /path/to/krb5.conf] [-t] [-v] [-l] key_serial\n", prog);
+ }
+ 
+ const struct option long_options[] = {
+ 	{"krb5conf", 1, NULL, 'k'},
+ 	{"legacy-uid", 0, NULL, 'l'},
+ 	{"trust-dns", 0, NULL, 't'},
++	{"keytab", 1, NULL, 'K'},
+ 	{"version", 0, NULL, 'v'},
+ 	{NULL, 0, NULL, 0}
+ };
+@@ -839,7 +840,7 @@ int main(const int argc, char *const argv[])
+ 
+ 	openlog(prog, 0, LOG_DAEMON);
+ 
+-	while ((c = getopt_long(argc, argv, "ck:ltv", long_options, NULL)) != -1) {
++	while ((c = getopt_long(argc, argv, "ck:K:ltv", long_options, NULL)) != -1) {
+ 		switch (c) {
+ 		case 'c':
+ 			/* legacy option -- skip it */
+@@ -853,6 +854,9 @@ int main(const int argc, char *const argv[])
+ 				goto out;
+ 			}
+ 			break;
++		case 'K':
++			keytab_name = optarg;
++			break;
+ 		case 'l':
+ 			legacy_uid++;
+ 			break;
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.8.1.4
