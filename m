@@ -1,45 +1,57 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: cifs: revalidate directories instiantiated via FIND_* in order
- to handle DFS referrals
-Date: Tue, 25 Jun 2013 11:00:18 -0400
-Message-ID: <20130625110018.0f5fe0eb@tlielax.poochiereds.net>
-References: <CAH2r5ms41WtzRSMD9F229kFQzVVBu=ymDKd3KHV10UpsjNQX2Q@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH] cifs: Handle big endianness in NTLM (ntlmv2) authentication
+Date: Tue, 25 Jun 2013 10:44:37 -0500
+Message-ID: <1372175077-12846-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5ms41WtzRSMD9F229kFQzVVBu=ymDKd3KHV10UpsjNQX2Q-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 25 Jun 2013 01:42:44 -0500
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-> Looking at this issue at the plugfest this week - the recommendation
-> is to add a check for ATTR_REPARSE
-> since this is usually set (for the Windows case) for DFS links (DFS
-> links are one case of reparse points - but the performance hit for
-> revalidating all reparse points is not bad).   Tomorrow we can check
-> for the Samba case in more detail to see how the scenario looks and
-> whether we can workaround it.
-> 
-> We did find another workaround which could be checked, but decided
-> against using that one in preference to simply checking for the
-> reparse attribute.   In the Windows case since you don't create
-> subdirectories under a DFS link on the server side - the creation time
-> and last write time of the directory will match for the case of a DFS
-> link returned by QueryDir or FindFirst (so we also could have refused
-> to cache directories whose creation time and last write time match -
-> which would also mean that we don't cache empty subdirectories which
-> is also a trivial perf hit to not cache those - it would be easy
-> enough to refuse to cache those directories too if you want).
-> 
 
-Sounds reasonable -- you should probably post the patch you've already
-merged into your for-next branch so others can comment and review
-though...
+This is RH bug 970891
+Uppercasing of username during calculation of ntlmv2 hash fails
+because UniStrupr function does not handle big endian wchars.
 
+Also fix a comment in the same code to reflect its correct usage.
+
+
+Reported-by: steve <sanpatr1-xthvdsQ13ZrQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: <stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+---
+ fs/cifs/cifs_unicode.h |    2 +-
+ fs/cifs/cifsencrypt.c  |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/fs/cifs/cifs_unicode.h b/fs/cifs/cifs_unicode.h
+index 4fb0974..bec1137 100644
+--- a/fs/cifs/cifs_unicode.h
++++ b/fs/cifs/cifs_unicode.h
+@@ -334,7 +334,7 @@ UniStrupr(register wchar_t *upin)
+ 
+ 	up = upin;
+ 	while (*up) {		/* For all characters */
+-		*up = UniToupper(*up);
++		*up = cpu_to_le16(UniToupper(le16_to_cpu(*up)));
+ 		up++;
+ 	}
+ 	return upin;		/* Return input pointer */
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 71436d1..8b34a73 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -439,7 +439,7 @@ static int calc_ntlmv2_hash(struct cifs_ses *ses, char *ntlmv2_hash,
+ 		return rc;
+ 	}
+ 
+-	/* convert ses->user_name to unicode and uppercase */
++	/* convert ses->user_name to unicode */
+ 	len = ses->user_name ? strlen(ses->user_name) : 0;
+ 	user = kmalloc(2 + (len * 2), GFP_KERNEL);
+ 	if (user == NULL) {
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.6.0.2
