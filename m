@@ -1,49 +1,34 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] [CIFS] SMB2 FSCTL and IOCTL worker function
-Date: Tue, 25 Jun 2013 01:05:59 -0500
-Message-ID: <CAH2r5msr-SFNgSjF+tcGNwN+2bfzZ0FiEU-EjV9p50YejNPZvA@mail.gmail.com>
-References: <CAH2r5muUxsPGg6VoiykMx-YiT=zyiF5tfgfs6j2U++KoGVCP+A@mail.gmail.com>
-	<20130624153557.2b4081ae@f163.suse.de>
+Subject: Re: cifs: revalidate directories instiantiated via FIND_* in order to
+ handle DFS referrals
+Date: Tue, 25 Jun 2013 01:42:44 -0500
+Message-ID: <CAH2r5ms41WtzRSMD9F229kFQzVVBu=ymDKd3KHV10UpsjNQX2Q@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
-To: David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20130624153557.2b4081ae-c9q3rVCHQSqoYr4blSSd5g@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Jun 24, 2013 at 8:35 AM, David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org> wrote:
-> Hi Steve,
->
-> On Mon, 24 Jun 2013 02:19:13 -0500
-> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> +     rc = SendReceive2(xid, ses, iov, num_iovecs, &resp_buftype, 0);
->> +     rsp = (struct smb2_ioctl_rsp *)iov[0].iov_base;
->> +
->> +     if (rc != 0) {
->> +             if (tcon)
->> +                     cifs_stats_fail_inc(tcon, SMB2_IOCTL_HE);
->> +             goto ioctl_exit;
->> +     }
->
-> IIUC, this throws away any response data if the server reply status
-> is unsuccessful.
->
-> The caller may wish to obtain the response data under certain error
-> conditions, particularly in the case of FSCTL_SRV_COPYCHUNK, where the
-> server returns chunk request limits alongside STATUS_INVALID_PARAMETER
-> in some cases. See MS-SMB2 2.2.32.1 for details.
+Looking at this issue at the plugfest this week - the recommendation
+is to add a check for ATTR_REPARSE
+since this is usually set (for the Windows case) for DFS links (DFS
+links are one case of reparse points - but the performance hit for
+revalidating all reparse points is not bad).   Tomorrow we can check
+for the Samba case in more detail to see how the scenario looks and
+whether we can workaround it.
 
-that is a really good point - I will add handling for that in the code
-to do copychunk (I am running into some alignment issues in my current
-version of the client side of the copychunk path).
-
-AFAICT from the spec, copychunk is the only example of an fsctl where
-(on a specific error) we have to parse a response
-
+We did find another workaround which could be checked, but decided
+against using that one in preference to simply checking for the
+reparse attribute.   In the Windows case since you don't create
+subdirectories under a DFS link on the server side - the creation time
+and last write time of the directory will match for the case of a DFS
+link returned by QueryDir or FindFirst (so we also could have refused
+to cache directories whose creation time and last write time match -
+which would also mean that we don't cache empty subdirectories which
+is also a trivial perf hit to not cache those - it would be easy
+enough to refuse to cache those directories too if you want).
 
 -- 
 Thanks,
