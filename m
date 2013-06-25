@@ -1,75 +1,51 @@
-From: Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
-Subject: Re: [PATCH v4 06/14] locks: encapsulate the fl_link list handling
-Date: Tue, 25 Jun 2013 11:37:04 +1000
-Message-ID: <20130625113704.89a686a55dcec684e5e99434@canb.auug.org.au>
-References: <1371819502-26363-1-git-send-email-jlayton@redhat.com>
-	<1371819502-26363-7-git-send-email-jlayton@redhat.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] [CIFS] SMB2 FSCTL and IOCTL worker function
+Date: Tue, 25 Jun 2013 01:05:59 -0500
+Message-ID: <CAH2r5msr-SFNgSjF+tcGNwN+2bfzZ0FiEU-EjV9p50YejNPZvA@mail.gmail.com>
+References: <CAH2r5muUxsPGg6VoiykMx-YiT=zyiF5tfgfs6j2U++KoGVCP+A@mail.gmail.com>
+	<20130624153557.2b4081ae@f163.suse.de>
 Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA256";
- boundary="Signature=_Tue__25_Jun_2013_11_37_04_+1000_dzYhDLAz_=0wCCci"
-Cc: viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, matthew-Ztpu424NOJ8@public.gmane.org, bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org,
-	dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, sage-4GqslpFJ+cxBDgjK7y7TUQ@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	swhiteho-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org,
-	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
+To: David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1371819502-26363-7-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <20130624153557.2b4081ae-c9q3rVCHQSqoYr4blSSd5g@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
---Signature=_Tue__25_Jun_2013_11_37_04_+1000_dzYhDLAz_=0wCCci
-Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Hi Jeff,
-
-Thanks for doing all this work!
-
-Trivial comments below.
-
-On Fri, 21 Jun 2013 08:58:14 -0400 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+On Mon, Jun 24, 2013 at 8:35 AM, David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org> wrote:
+> Hi Steve,
 >
-> +static inline void
-> +locks_insert_global_locks(struct file_lock *fl)
-> +{
-> +	list_add_tail(&fl->fl_link, &file_lock_list);
-> +}
+> On Mon, 24 Jun 2013 02:19:13 -0500
+> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>
+>> +     rc = SendReceive2(xid, ses, iov, num_iovecs, &resp_buftype, 0);
+>> +     rsp = (struct smb2_ioctl_rsp *)iov[0].iov_base;
+>> +
+>> +     if (rc != 0) {
+>> +             if (tcon)
+>> +                     cifs_stats_fail_inc(tcon, SMB2_IOCTL_HE);
+>> +             goto ioctl_exit;
+>> +     }
+>
+> IIUC, this throws away any response data if the server reply status
+> is unsuccessful.
+>
+> The caller may wish to obtain the response data under certain error
+> conditions, particularly in the case of FSCTL_SRV_COPYCHUNK, where the
+> server returns chunk request limits alongside STATUS_INVALID_PARAMETER
+> in some cases. See MS-SMB2 2.2.32.1 for details.
 
-We generally do not use "inline" in C files any more and leave it to the
-compiler to do that.  Also, without the "inline" these function headers
-should all be able to fit on single lines like the others here i.e.
+that is a really good point - I will add handling for that in the code
+to do copychunk (I am running into some alignment issues in my current
+version of the client side of the copychunk path).
 
-static void locks_insert_global_locks(struct file_lock *fl)
+AFAICT from the spec, copychunk is the only example of an fsctl where
+(on a specific error) we have to parse a response
 
---=20
-Cheers,
-Stephen Rothwell                    sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org
 
---Signature=_Tue__25_Jun_2013_11_37_04_+1000_dzYhDLAz_=0wCCci
-Content-Type: application/pgp-signature
+-- 
+Thanks,
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.20 (GNU/Linux)
-
-iQIcBAEBCAAGBQJRyPREAAoJEECxmPOUX5FEfWIP/1Fcte7TTx0cYdMFqxD6iYFF
-I5QuoxOCEek37xGFhXwztvoI+llIdSH4xYaZXtVyC01jxfejNfGOW6JOuxRWrMCW
-4o0doZNE7fX1CaPJv+O8HS0qGVGVL4En0ZJJrPtjImbrUP1rg+bKAI4GwTZTcxfH
-eDr8Oey4xzzSFR/am+e7IyEjAW4gA7EIOpG4PjcMP+LEbTKOaybUDZBs+IwRBiPL
-ERyuwyW1mdAh5Cd5rssT72osOSq36WvK7f0w7hdzenmJFj5SUY4mmWdQz25J79ZC
-5LOfPxcgZWAv48F4VmmKh0v555f7hVGdtf1eE4cwckzWDQAvvPY27xSFNaYWwvd9
-jpDVPR0CcJeJkRR4qpGE6OO9dRGCoq8aNAmln0ix4ehb7+rGt4KMO0vOplFmfb1y
-oiL/Uzc2WuoFJDQCU1f7Z3EmcBKZBxS+Hs67xuvulBAubLY4r0uYMcA6RLgsbHB7
-k/eyUk9Rsce39jdPNPkFM1AB92F5AvdmaqROH2NKRh9lNOmZDNxxQ3v/9XU9oY6t
-1uNs9dL7H9f2MaMeG4Yx9ircj+NdB7vwbauYlAv/9D1fxRhqoKO1M292CbWhv/l0
-OwcF9Nz9e6aHHZc8HnZzlKjzRaoqJ83eFekWk4RZbmNhEmlLDzHUXfqrke6fn8pn
-Y1vM5HPDCfSDb/sVAmbd
-=q+vx
------END PGP SIGNATURE-----
-
---Signature=_Tue__25_Jun_2013_11_37_04_+1000_dzYhDLAz_=0wCCci--
+Steve
