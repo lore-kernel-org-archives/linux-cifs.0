@@ -1,87 +1,45 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v2] cifs.upcall: allow users to specify dedicated keytab on command-line
-Date: Tue, 25 Jun 2013 11:18:48 -0400
-Message-ID: <1372173528-9373-1-git-send-email-jlayton@samba.org>
-Cc: steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: cifs: revalidate directories instiantiated via FIND_* in order
+ to handle DFS referrals
+Date: Tue, 25 Jun 2013 11:00:18 -0400
+Message-ID: <20130625110018.0f5fe0eb@tlielax.poochiereds.net>
+References: <CAH2r5ms41WtzRSMD9F229kFQzVVBu=ymDKd3KHV10UpsjNQX2Q@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAH2r5ms41WtzRSMD9F229kFQzVVBu=ymDKd3KHV10UpsjNQX2Q-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Currently cifs.upcall only looks at the default system keytab
-(/etc/krb5.keytab). It's often the case however that a dedicated keytab
-is desirable. Allow administrators to set one on the command-line.
+On Tue, 25 Jun 2013 01:42:44 -0500
+Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-Reported-by: steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- cifs.upcall.8.in | 7 ++++++-
- cifs.upcall.c    | 8 ++++++--
- 2 files changed, 12 insertions(+), 3 deletions(-)
+> Looking at this issue at the plugfest this week - the recommendation
+> is to add a check for ATTR_REPARSE
+> since this is usually set (for the Windows case) for DFS links (DFS
+> links are one case of reparse points - but the performance hit for
+> revalidating all reparse points is not bad).   Tomorrow we can check
+> for the Samba case in more detail to see how the scenario looks and
+> whether we can workaround it.
+> 
+> We did find another workaround which could be checked, but decided
+> against using that one in preference to simply checking for the
+> reparse attribute.   In the Windows case since you don't create
+> subdirectories under a DFS link on the server side - the creation time
+> and last write time of the directory will match for the case of a DFS
+> link returned by QueryDir or FindFirst (so we also could have refused
+> to cache directories whose creation time and last write time match -
+> which would also mean that we don't cache empty subdirectories which
+> is also a trivial perf hit to not cache those - it would be easy
+> enough to refuse to cache those directories too if you want).
+> 
 
-diff --git a/cifs.upcall.8.in b/cifs.upcall.8.in
-index 3ae0562..50f79d1 100644
---- a/cifs.upcall.8.in
-+++ b/cifs.upcall.8.in
-@@ -22,7 +22,7 @@
- cifs.upcall \- Userspace upcall helper for Common Internet File System (CIFS)
- .SH "SYNOPSIS"
- .HP \w'\ 'u
--cifs\&.upcall [\-\-trust\-dns|\-t] [\-\-version|\-v] [\-\-legacy\-uid|\-l] [--krb5conf=/path/to/krb5.conf|-k /path/to/...] {keyid}
-+cifs\&.upcall [\-\-trust\-dns|\-t] [\-\-version|\-v] [\-\-legacy\-uid|\-l] [--krb5conf=/path/to/krb5.conf|-k /path/to/krb5.conf] [--keytab=/path/to/keytab|-K /path/to/keytab] {keyid}
- .SH "DESCRIPTION"
- .PP
- This tool is part of the cifs-utils suite\&.
-@@ -44,6 +44,11 @@ This option allows administrators to set an alternate location for the
- krb5.conf file that cifs.upcall will use.
- .RE
- .PP
-+\--keytab=/path/to/keytab|-K /path/to/keytab
-+.RS 4
-+This option allows administrators to specify a keytab file to be used. When a user has no credential cache already established, cifs.upcall will attempt to use this keytab to acquire them. The default is the system-wide keytab /etc/krb5.keytab.
-+.RE
-+.PP
- \-\-trust\-dns|\-t
- .RS 4
- With krb5 upcalls, the name used as the host portion of the service principal defaults to the hostname portion of the UNC\&. This option allows the upcall program to reverse resolve the network address of the server in order to get the hostname\&.
-diff --git a/cifs.upcall.c b/cifs.upcall.c
-index 6c0b9de..c16bdfd 100644
---- a/cifs.upcall.c
-+++ b/cifs.upcall.c
-@@ -805,13 +805,14 @@ lowercase_string(char *c)
- 
- static void usage(void)
- {
--	fprintf(stderr, "Usage: %s [-k /path/to/krb5.conf] [-t] [-v] [-l] key_serial\n", prog);
-+	fprintf(stderr, "Usage: %s [ -K /path/to/keytab] [-k /path/to/krb5.conf] [-t] [-v] [-l] key_serial\n", prog);
- }
- 
- const struct option long_options[] = {
- 	{"krb5conf", 1, NULL, 'k'},
- 	{"legacy-uid", 0, NULL, 'l'},
- 	{"trust-dns", 0, NULL, 't'},
-+	{"keytab", 1, NULL, 'K'},
- 	{"version", 0, NULL, 'v'},
- 	{NULL, 0, NULL, 0}
- };
-@@ -839,7 +840,7 @@ int main(const int argc, char *const argv[])
- 
- 	openlog(prog, 0, LOG_DAEMON);
- 
--	while ((c = getopt_long(argc, argv, "ck:ltv", long_options, NULL)) != -1) {
-+	while ((c = getopt_long(argc, argv, "ck:K:ltv", long_options, NULL)) != -1) {
- 		switch (c) {
- 		case 'c':
- 			/* legacy option -- skip it */
-@@ -853,6 +854,9 @@ int main(const int argc, char *const argv[])
- 				goto out;
- 			}
- 			break;
-+		case 'K':
-+			keytab_name = optarg;
-+			break;
- 		case 'l':
- 			legacy_uid++;
- 			break;
+Sounds reasonable -- you should probably post the patch you've already
+merged into your for-next branch so others can comment and review
+though...
+
 -- 
-1.8.1.4
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
