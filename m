@@ -1,29 +1,20 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: Limiting allocation of smb2 crypto structs to smb2 mounts
-Date: Sun, 30 Jun 2013 14:14:38 -0500
-Message-ID: <CAH2r5mtQhxbQQ=4p_V97VcZgJ-6kfWDuov1FMod-Qt0Qszcq8A@mail.gmail.com>
+Date: Sun, 30 Jun 2013 22:55:23 -0500
+Message-ID: <CADT32eL69Kms70ko-K7M_t=nPESv1i_E-2j+Nc2bWA+j+JA+Bw@mail.gmail.com>
 References: <CAH2r5msin0gn6xDGgm9b7nejUY20wxJKcEFRakPc9QF0FR3r9w@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
 	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <CAH2r5msin0gn6xDGgm9b7nejUY20wxJKcEFRakPc9QF0FR3r9w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
-
-One minor piece I did not add (but need to based on feedback) was the
-error checking
-on the smb2 signing path - what to do we want to do when we are in the
-signing path
-and we can't allocate the needed crypto sessions (take down the session?, not
-sign the packet?).  This is the one case where it would be easier to
-do it at mount
-time (like my earlier patches) so we can at least tell the user that
-it is not going to work.
 
 On Sun, Jun 30, 2013 at 2:10 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 > Updated patch to try to prevent allocation of smb2 or smb3 crypto
@@ -202,6 +193,9 @@ On Sun, Jun 30, 2013 at 2:10 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@p
 > +       if (server->secmech.hmacsha256 == NULL)
 > +               smb2_crypto_shash_allocate(server);
 > +
+
+I think we should check for error here
+
 >         rc = crypto_shash_setkey(server->secmech.hmacsha256,
 >                 server->session_key.response, SMB2_NTLMV2_SESSKEY_SIZE);
 >         if (rc) {
@@ -213,6 +207,9 @@ On Sun, Jun 30, 2013 at 2:10 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@p
 > +       if (server->secmech.hmacsha256 == NULL)
 > +               smb3_crypto_shash_allocate(server);
 > +
+
+This should be smb2_crypto_shash_allocate(sever), with error checked.
+
 >         rc = crypto_shash_setkey(server->secmech.hmacsha256,
 >                 server->session_key.response, SMB2_NTLMV2_SESSKEY_SIZE);
 >         if (rc) {
@@ -224,6 +221,15 @@ On Sun, Jun 30, 2013 at 2:10 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@p
 > +       /* we already allocate sdesccmacaes when we init smb3 signing key,
 > +          so unlike smb2 we do not have to check here if secmech
 > +          are initialized */
+
+I do not see code to allocate cmac-aes.  I think we should do it in
+function smb3_calc_signature.  cmac-aes is not needed to generate the
+smb3 signing key.
+So there should be this call with error checked.
+
+          if (server->secmech.cmacaes == NULL)
+             smb3_crypto_shash_allocate(server);
+
 >         rc = crypto_shash_init(&server->secmech.sdesccmacaes->shash);
 >         if (rc) {
 >                 cifs_dbg(VFS, "%s: Could not init cmac aes\n", __func__);
@@ -284,10 +290,3 @@ On Sun, Jun 30, 2013 at 2:10 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@p
 > Thanks,
 >
 > Steve
-
-
-
--- 
-Thanks,
-
-Steve
