@@ -1,37 +1,146 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH v7 7/7] locks: Disable LOCK_MAND support for MS_SHARELOCK mounts
-Date: Mon,  1 Jul 2013 20:49:59 +0400
-Message-ID: <1372697399-21361-8-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH v7 6/7] NFSD: Pass share reservations flags to VFS
+Date: Mon,  1 Jul 2013 20:49:58 +0400
+Message-ID: <1372697399-21361-7-git-send-email-piastry@etersoft.ru>
 References: <1372697399-21361-1-git-send-email-piastry@etersoft.ru>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
 To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <1372697399-21361-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
+
+that maps them into O_DENY* flags and make them visible for
+applications on mounts with sharelock option.
 
 Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/locks.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ fs/locks.c          |  1 +
+ fs/nfsd/nfs4state.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
+ fs/nfsd/nfsproc.c   |  1 +
+ 3 files changed, 47 insertions(+), 1 deletion(-)
 
 diff --git a/fs/locks.c b/fs/locks.c
-index 60f3ce8..86f3a93 100644
+index 09c1d0e..60f3ce8 100644
 --- a/fs/locks.c
 +++ b/fs/locks.c
-@@ -1758,6 +1758,12 @@ SYSCALL_DEFINE2(flock, unsigned int, fd, unsigned int, cmd)
- 		goto out;
- 	}
+@@ -899,6 +899,7 @@ sharelock_lock_file(struct file *filp)
+ 	locks_free_lock(lock);
+ 	return error;
+ }
++EXPORT_SYMBOL(sharelock_lock_file);
  
-+	/* Disable LOCK_MAND support for FS mounted with MS_SHARELOCK */
-+	if ((cmd & LOCK_MAND) && IS_SHARELOCK(f.file->f_path.dentry->d_inode)) {
-+		error = -EPERM;
-+		goto out;
+ static int __posix_lock_file(struct inode *inode, struct file_lock *request, struct file_lock *conflock)
+ {
+diff --git a/fs/nfsd/nfs4state.c b/fs/nfsd/nfs4state.c
+index f9a5e62..b19cb3a 100644
+--- a/fs/nfsd/nfs4state.c
++++ b/fs/nfsd/nfs4state.c
+@@ -457,6 +457,19 @@ test_deny(u32 access, struct nfs4_ol_stateid *stp)
+ 	return test_bit(access, &stp->st_deny_bmap);
+ }
+ 
++static int nfs4_deny_to_odeny(u32 access)
++{
++	switch (access & NFS4_SHARE_DENY_BOTH) {
++	case NFS4_SHARE_DENY_READ:
++		return O_DENYREAD;
++	case NFS4_SHARE_DENY_WRITE:
++		return O_DENYWRITE;
++	case NFS4_SHARE_DENY_BOTH:
++		return O_DENYREAD | O_DENYWRITE;
 +	}
++	return 0;
++}
 +
- 	can_sleep = !(cmd & LOCK_NB);
- 	cmd &= ~LOCK_NB;
- 	unlock = (cmd == LOCK_UN);
+ static int nfs4_access_to_omode(u32 access)
+ {
+ 	switch (access & NFS4_SHARE_ACCESS_BOTH) {
+@@ -2780,6 +2793,21 @@ nfsd4_truncate(struct svc_rqst *rqstp, struct svc_fh *fh,
+ }
+ 
+ static __be32
++nfs4_vfs_set_deny(struct nfs4_file *fp, unsigned long share_access,
++		  unsigned long deny_access)
++{
++	int oflag, rc;
++	__be32 status = nfs_ok;
++
++	oflag = nfs4_access_to_omode(share_access);
++	fp->fi_fds[oflag]->f_flags |= nfs4_deny_to_odeny(deny_access);
++	rc = sharelock_lock_file(fp->fi_fds[oflag]);
++	if (rc)
++		status = nfserrno(rc);
++	return status;
++}
++
++static __be32
+ nfs4_upgrade_open(struct svc_rqst *rqstp, struct nfs4_file *fp, struct svc_fh *cur_fh, struct nfs4_ol_stateid *stp, struct nfsd4_open *open)
+ {
+ 	u32 op_share_access = open->op_share_access;
+@@ -2800,6 +2828,14 @@ nfs4_upgrade_open(struct svc_rqst *rqstp, struct nfs4_file *fp, struct svc_fh *c
+ 		}
+ 		return status;
+ 	}
++	status = nfs4_vfs_set_deny(fp, op_share_access, open->op_share_deny);
++	if (status) {
++		if (new_access) {
++			int oflag = nfs4_access_to_omode(op_share_access);
++			nfs4_file_put_access(fp, oflag);
++		}
++		return status;
++	}
+ 	/* remember the open */
+ 	set_access(op_share_access, stp);
+ 	set_deny(open->op_share_deny, stp);
+@@ -3033,7 +3069,7 @@ nfsd4_process_open2(struct svc_rqst *rqstp, struct svc_fh *current_fh, struct nf
+ 
+ 	/*
+ 	 * OPEN the file, or upgrade an existing OPEN.
+-	 * If truncate fails, the OPEN fails.
++	 * If truncate or set_deny fails, the OPEN fails.
+ 	 */
+ 	if (stp) {
+ 		/* Stateid was found, this is an OPEN upgrade */
+@@ -3047,6 +3083,10 @@ nfsd4_process_open2(struct svc_rqst *rqstp, struct svc_fh *current_fh, struct nf
+ 		status = nfsd4_truncate(rqstp, current_fh, open);
+ 		if (status)
+ 			goto out;
++		status = nfs4_vfs_set_deny(fp, open->op_share_access,
++					   open->op_share_deny);
++		if (status)
++			goto out;
+ 		stp = open->op_stp;
+ 		open->op_stp = NULL;
+ 		init_open_stateid(stp, fp, open);
+@@ -3745,6 +3785,10 @@ nfsd4_open_downgrade(struct svc_rqst *rqstp,
+ 	}
+ 	nfs4_stateid_downgrade(stp, od->od_share_access);
+ 
++	status = nfs4_vfs_set_deny(stp->st_file, od->od_share_access,
++				   od->od_share_deny);
++	if (status)
++		goto out;
+ 	reset_union_bmap_deny(od->od_share_deny, stp);
+ 
+ 	update_stateid(&stp->st_stid.sc_stateid);
+diff --git a/fs/nfsd/nfsproc.c b/fs/nfsd/nfsproc.c
+index 54c6b3d..ff95544 100644
+--- a/fs/nfsd/nfsproc.c
++++ b/fs/nfsd/nfsproc.c
+@@ -743,6 +743,7 @@ nfserrno (int errno)
+ 		{ nfserr_notsupp, -EOPNOTSUPP },
+ 		{ nfserr_toosmall, -ETOOSMALL },
+ 		{ nfserr_serverfault, -ESERVERFAULT },
++		{ nfserr_share_denied, -ESHAREDENIED },
+ 	};
+ 	int	i;
+ 
 -- 
 1.8.1.5
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
