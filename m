@@ -1,290 +1,118 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: Limiting allocation of smb2 crypto structs to smb2 mounts
-Date: Mon, 1 Jul 2013 06:46:52 -0400
-Message-ID: <20130701064652.1bda0cdc@tlielax.poochiereds.net>
-References: <CAH2r5msin0gn6xDGgm9b7nejUY20wxJKcEFRakPc9QF0FR3r9w@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: [PATCH v7 0/7] Add O_DENY* support for VFS and CIFS/NFS
+Date: Mon,  1 Jul 2013 20:49:52 +0400
+Message-ID: <1372697399-21361-1-git-send-email-piastry@etersoft.ru>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
+To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5msin0gn6xDGgm9b7nejUY20wxJKcEFRakPc9QF0FR3r9w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 30 Jun 2013 14:10:39 -0500
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+Main changes from v6:
+1) Fix LOCK_DELETE mandatory lock detection for O_DENYDELETE opens.
+2) Add ESHAREDENIED error code definition for alpha, mips, parisc and sparc arches.
+3) Remove code changes in do_last function if sharelocks are disabled.
 
-> Updated patch to try to prevent allocation of smb2 or smb3 crypto
-> secmech structures unless needed.  There is probably more updates that
-> could be done to cleanup cifs - but the more important part is to get
-> the smb2/smb3 part cleaned up.
-> 
-> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-> index 3d8bf94..e0d94e1 100644
-> --- a/fs/cifs/cifsencrypt.c
-> +++ b/fs/cifs/cifsencrypt.c
-> @@ -745,20 +745,6 @@ cifs_crypto_shash_allocate(struct TCP_Server_Info *server)
->  		goto crypto_allocate_md5_fail;
->  	}
-> 
-> -	server->secmech.hmacsha256 = crypto_alloc_shash("hmac(sha256)", 0, 0);
-> -	if (IS_ERR(server->secmech.hmacsha256)) {
-> -		cifs_dbg(VFS, "could not allocate crypto hmacsha256\n");
-> -		rc = PTR_ERR(server->secmech.hmacsha256);
-> -		goto crypto_allocate_hmacsha256_fail;
-> -	}
-> -
-> -	server->secmech.cmacaes = crypto_alloc_shash("cmac(aes)", 0, 0);
-> -	if (IS_ERR(server->secmech.cmacaes)) {
-> -		cifs_dbg(VFS, "could not allocate crypto cmac-aes");
-> -		rc = PTR_ERR(server->secmech.cmacaes);
-> -		goto crypto_allocate_cmacaes_fail;
-> -	}
-> -
->  	size = sizeof(struct shash_desc) +
->  			crypto_shash_descsize(server->secmech.hmacmd5);
->  	server->secmech.sdeschmacmd5 = kmalloc(size, GFP_KERNEL);
-> @@ -779,45 +765,12 @@ cifs_crypto_shash_allocate(struct TCP_Server_Info *server)
->  	server->secmech.sdescmd5->shash.tfm = server->secmech.md5;
->  	server->secmech.sdescmd5->shash.flags = 0x0;
-> 
-> -	size = sizeof(struct shash_desc) +
-> -			crypto_shash_descsize(server->secmech.hmacsha256);
-> -	server->secmech.sdeschmacsha256 = kmalloc(size, GFP_KERNEL);
-> -	if (!server->secmech.sdeschmacsha256) {
-> -		rc = -ENOMEM;
-> -		goto crypto_allocate_hmacsha256_sdesc_fail;
-> -	}
-> -	server->secmech.sdeschmacsha256->shash.tfm = server->secmech.hmacsha256;
-> -	server->secmech.sdeschmacsha256->shash.flags = 0x0;
-> -
-> -	size = sizeof(struct shash_desc) +
-> -			crypto_shash_descsize(server->secmech.cmacaes);
-> -	server->secmech.sdesccmacaes = kmalloc(size, GFP_KERNEL);
-> -	if (!server->secmech.sdesccmacaes) {
-> -		cifs_dbg(VFS, "%s: Can't alloc cmacaes\n", __func__);
-> -		rc = -ENOMEM;
-> -		goto crypto_allocate_cmacaes_sdesc_fail;
-> -	}
-> -	server->secmech.sdesccmacaes->shash.tfm = server->secmech.cmacaes;
-> -	server->secmech.sdesccmacaes->shash.flags = 0x0;
-> -
->  	return 0;
-> 
-> -crypto_allocate_cmacaes_sdesc_fail:
-> -	kfree(server->secmech.sdeschmacsha256);
-> -
-> -crypto_allocate_hmacsha256_sdesc_fail:
-> -	kfree(server->secmech.sdescmd5);
-> -
->  crypto_allocate_md5_sdesc_fail:
->  	kfree(server->secmech.sdeschmacmd5);
-> 
->  crypto_allocate_hmacmd5_sdesc_fail:
-> -	crypto_free_shash(server->secmech.cmacaes);
-> -
-> -crypto_allocate_cmacaes_fail:
-> -	crypto_free_shash(server->secmech.hmacsha256);
-> -
-> -crypto_allocate_hmacsha256_fail:
->  	crypto_free_shash(server->secmech.md5);
-> 
->  crypto_allocate_md5_fail:
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index afcb8a1..aa5bf23 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -2108,14 +2108,15 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
->  		goto out_err;
->  	}
-> 
-> +	tcp_ses->ops = volume_info->ops;
-> +	tcp_ses->vals = volume_info->vals;
-> +
->  	rc = cifs_crypto_shash_allocate(tcp_ses);
->  	if (rc) {
->  		cifs_dbg(VFS, "could not setup hash structures rc %d\n", rc);
->  		goto out_err;
->  	}
-> 
-> -	tcp_ses->ops = volume_info->ops;
-> -	tcp_ses->vals = volume_info->vals;
->  	cifs_set_net_ns(tcp_ses, get_net(current->nsproxy->net_ns));
->  	tcp_ses->hostname = extract_hostname(volume_info->UNC);
->  	if (IS_ERR(tcp_ses->hostname)) {
-> diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-> index 09b4fba..ca9d66e 100644
-> --- a/fs/cifs/smb2transport.c
-> +++ b/fs/cifs/smb2transport.c
-> @@ -39,6 +39,65 @@
->  #include "smb2status.h"
->  #include "smb2glob.h"
-> 
-> +static int
-> +smb2_crypto_shash_allocate(struct TCP_Server_Info *server)
-> +{
-> +	unsigned int size;
-> +
-> +	server->secmech.hmacsha256 = crypto_alloc_shash("hmac(sha256)", 0, 0);
-> +	if (IS_ERR(server->secmech.hmacsha256)) {
-> +		cifs_dbg(VFS, "could not allocate crypto hmacsha256\n");
-> +		return PTR_ERR(server->secmech.hmacsha256);
-> +	}
-> +
-> +	size = sizeof(struct shash_desc) +
-> +			crypto_shash_descsize(server->secmech.hmacsha256);
-> +	server->secmech.sdeschmacsha256 = kmalloc(size, GFP_KERNEL);
-> +	if (!server->secmech.sdeschmacsha256) {
-> +		crypto_free_shash(server->secmech.hmacsha256);
-> +		return -ENOMEM;
-> +	}
-> +	server->secmech.sdeschmacsha256->shash.tfm = server->secmech.hmacsha256;
-> +	server->secmech.sdeschmacsha256->shash.flags = 0x0;
-> +
-> +	return 0;
-> +}
-> +
-> +static int
-> +smb3_crypto_shash_allocate(struct TCP_Server_Info *server)
-> +{
-> +	unsigned int size;
-> +	int rc;
-> +
-> +	rc = smb2_crypto_shash_allocate(server);
-> +	if (rc)
-> +		return rc;
-> +
-> +	server->secmech.cmacaes = crypto_alloc_shash("cmac(aes)", 0, 0);
-> +	if (IS_ERR(server->secmech.cmacaes)) {
-> +		cifs_dbg(VFS, "could not allocate crypto cmac-aes");
-> +		kfree(server->secmech.sdeschmacsha256);
-> +		crypto_free_shash(server->secmech.hmacsha256);
-> +		return PTR_ERR(server->secmech.cmacaes);
-> +	}
-> +
-> +	size = sizeof(struct shash_desc) +
-> +			crypto_shash_descsize(server->secmech.cmacaes);
-> +	server->secmech.sdesccmacaes = kmalloc(size, GFP_KERNEL);
-> +	if (!server->secmech.sdesccmacaes) {
-> +		cifs_dbg(VFS, "%s: Can't alloc cmacaes\n", __func__);
-> +		kfree(server->secmech.sdeschmacsha256);
-> +		crypto_free_shash(server->secmech.hmacsha256);
-> +		crypto_free_shash(server->secmech.cmacaes);
-> +		return -ENOMEM;
-> +	}
-> +	server->secmech.sdesccmacaes->shash.tfm = server->secmech.cmacaes;
-> +	server->secmech.sdesccmacaes->shash.flags = 0x0;
-> +
-> +	return 0;
-> +}
-> +
-> +
->  int
->  smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
->  {
-> @@ -52,6 +111,9 @@ smb2_calc_signature(struct smb_rqst *rqst, struct
-> TCP_Server_Info *server)
->  	memset(smb2_signature, 0x0, SMB2_HMACSHA256_SIZE);
->  	memset(smb2_pdu->Signature, 0x0, SMB2_SIGNATURE_SIZE);
-> 
-> +	if (server->secmech.hmacsha256 == NULL)
-> +		smb2_crypto_shash_allocate(server);
-> +
->  	rc = crypto_shash_setkey(server->secmech.hmacsha256,
->  		server->session_key.response, SMB2_NTLMV2_SESSKEY_SIZE);
->  	if (rc) {
-> @@ -129,6 +191,10 @@ generate_smb3signingkey(struct TCP_Server_Info *server)
->  	memset(prfhash, 0x0, SMB2_HMACSHA256_SIZE);
->  	memset(server->smb3signingkey, 0x0, SMB3_SIGNKEY_SIZE);
-> 
-> +	/* SMB3 essentially requires signing so no harm allocating it early */
-> +	if (server->secmech.hmacsha256 == NULL)
-> +		smb3_crypto_shash_allocate(server);
-> +
->  	rc = crypto_shash_setkey(server->secmech.hmacsha256,
->  		server->session_key.response, SMB2_NTLMV2_SESSKEY_SIZE);
->  	if (rc) {
-> @@ -210,6 +276,9 @@ smb3_calc_signature(struct smb_rqst *rqst, struct
-> TCP_Server_Info *server)
->  		return rc;
->  	}
-> 
-> +	/* we already allocate sdesccmacaes when we init smb3 signing key,
-> +	   so unlike smb2 we do not have to check here if secmech
-> +	   are initialized */
->  	rc = crypto_shash_init(&server->secmech.sdesccmacaes->shash);
->  	if (rc) {
->  		cifs_dbg(VFS, "%s: Could not init cmac aes\n", __func__);
-> 
-> On Sun, Jun 30, 2013 at 5:25 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> > On Sat, 29 Jun 2013 23:06:12 -0500
-> > Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> >
-> >> if we setup a socket we send a negotiate protocol
-> >> and decide on the smb version at that point.  If we mount a second
-> >> user to the same server, he will use the same socket and thus the same
-> >> dialect that we did the first mount on - i don't know a way to mix
-> >> multiple dialects on the same socket and I don't think we should.
-> >>
-> > In any case...match_server does this:
-> >
-> >         if ((server->vals != vol->vals) || (server->ops != vol->ops))
-> >                 return 0;
-> >
-> > ...which should make it impossible to share sockets when the versions
-> > don't match. In principle, I guess we could probably share sockets
-> > between (for instance) 2.1 and 2.002, but that's an optimization that
-> > could be done later.
-> 
-> I also don't think that that is a good idea to change the dialect of a user of
-> the socket on the fly.   We will send the negotiate and decide on the dialect
-> when connecting to the socket(s), and each subsequent user will
-> create an new smb2/smb3 session on the same socket, thus with
-> the same smb2 dialect. I don't think there is any case where you expect
-> the server to change from smb2.1 to smb3 or to smb3.02 without
-> dropping the tcp session) - although I am open to the idea of allowing
-> "upgrading security on the fly" to mandate signing (or encryption) on the
-> fly if security needs change due to an emergency.
-> 
+Main changes from v5:
+1) O_DENYDELETE is now supported by VFS.
+2) ESHAREDENIED erro code is introduced to be returned on sharelock conflicts.
+3) forcemand dependancy is removed. CIFS module detects if it should use NTCreateAndX command according to existence of O_DENY flags.
+4) Term 'deny lock' is replaced by 'sharelock' (function names, code comments, patch descriptions).
 
-Yeah, scratch that. I wasn't thinking about this correctly...
+Main changes from v4:
+1) deny_lock_file uses FS_DOES_SHARELOCK flag from fs_flags to determine whether to use VFS locks or not.
+2) Make nfs code return -EBUSY for share conflicts (was -EACCESS).
 
-The dialect is set during the NEGOTIATE, so you really *can't* share
-sockets between different versions.
- 
-> 
-> > The way the crypto is allocated is a serious wart. The algorithms are
-> > being allocated too early. It would be preferable even to delay
-> > allocating the crypto stuff at all until it's actually needed.
-> 
-> Well - the patch I proposed at least allocates the smb2 ones
-> when we have negotiated smb2 or smb2.1, and smb3 ones when
-> smb3 or smb3.02 is negotiated.  The alternative is fine with me,
-> but means checking on EVERY signing request (since you
-> don't have to have signing on the first request(s) but then end
-> up signing a later one - e.g. for the case of secure renogotiate)
-> 
+Main changes from v3
+1) O_DENYMAND is removed, sharelock mount option is introduced.
+2) Patch fcntl.h and VFS patches are united into one.
+3) flock/LOCK_MAND is disabled for sharelock mounts.
 
-An extra NULL pointer check on every signing request doesn't sound too
-onerous. In most cases, you'll just do the allocation once (almost
-always during the TREE_CONNECT) and hold on to them during the life of
-the mount.
+This patchset adds support of O_DENY* flags for Linux fs layer. These flags can be used by any application that needs share reservations to organize a file access. VFS already has some sort of this capability - now it's done through flock/LOCK_MAND mechanism, but that approach is non-atomic. This patchset builds new capabilities on top of the existing one but doesn't bring any changes into the flock call semantic.
 
-> > If, for instance I mount with sec=krb5 and don't request signing,
-> > there's no need to allocate any of this stuff. This is not harmless
-> > either. We have at least one customer that boots their machines with
-> > fips=1. They're basically unable to use cifs.ko at all currently
-> > because the crypto allocations fail.
-> 
-> OK - that is a good point.
-> 
-> 
+These flags can be used by NFS (built-in-kernel) and CIFS (Samba) servers and Wine applications through VFS (for local filesystems) or CIFS/NFS modules. This will help when e.g. Samba and NFS server share the same directory for Windows and Linux users or Wine applications use Samba/NFS share to access the same data from different clients.
 
+According to the previous discussions the most problematic question is how to prevent situations like DoS attacks where e.g /lib/liba.so file can be open with DENYREAD, or smth like this. That's why extra mount option 'sharelock' is added for switching on/off O_DENY* flags processing. It allows us to avoid use of these flags on critical places (like /, /lib) and turn them on if we really want it proccessed that way.
+
+The patchset introduces 3 new flags:
+O_DENYREAD - to prevent other opens with read access,
+O_DENYWRITE - to prevent other opens with write access,
+O_DENYDELETE - to prevent delete operations (this flag can't be implemented for NFS due to the protocol restrictions).
+
+The patchset avoids data races problem on newely created files: open with O_CREAT can return new -ESHAREDENIED error code for a successfully created file if this files was locked with a sharelock by another task. Also, it turns off flock/LOCK_MAND capability for mounts with 'sharelock' option. This lets us not mix one share reservation approach with another.
+
+The #1 and #2 patches add flags to fcntl and implements VFS part. The patches #3 and #4 are related to CIFS-specific changes, #5 and #6 describe NFS and NFSD parts, #7 turns off flock/LOCK_MAND for mounts with 'sharelock' option.
+
+The preliminary patch for Samba that replaces the existing use of flock/LOCK_MAND mechanism with O_DENY* flags:
+http://git.etersoft.ru/people/piastry/packages/?p=samba.git;a=commitdiff;h=173070262b7f29134ad6b2e49a760017c11aec4a
+
+The future part of open man page patch:
+
+-----
+O_DENYREAD, O_DENYWRIYE, O_DENYDELETE - used to inforce a mandatory share reservation scheme of the file access. If these flag is passed, the open fails with -ESHAREDENIED in following cases:
+1) if O_DENYREAD flag is specified and there is another open with READ access to the file;
+2) if O_DENYWRITE flag is specified and there is another open with WRITE access to the file;
+3) if READ access is requested and there is another open with O_DENYREAD flags;
+4) if WRITE access is requested and there is another open with O_DENYWRITE flags.
+
+If O_DENYDELETE flag is specified and the open succeded, any further unlink operation will fail with -ESHAREDENIED untill this open is closed. Now this flag is processed by VFS and CIFS filesystem.
+
+This mechanism is done through flocks. If O_DENY* flags are specified, flock syscall is processed after the open. The share modes are translated into flock according the following rules:
+1) !O_DENYREAD   -> LOCK_READ   | LOCK_MAND
+2) !O_DENYWRITE  -> LOCK_WRITE  | LOCK_MAND
+3) !O_DENYDELETE -> LOCK_DELETE | LOCK_MAND
+---
+
+Pavel Shilovsky (7):
+  VFS: Introduce new O_DENY* open flags
+  VFS: Add O_DENYDELETE support for VFS
+  CIFS: Add share_access parm to open request
+  CIFS: Add O_DENY* open flags support
+  NFSv4: Add O_DENY* open flags support
+  NFSD: Pass share reservations flags to VFS
+  locks: Disable LOCK_MAND support for MS_SHARELOCK mounts
+
+ arch/alpha/include/uapi/asm/errno.h  |   2 +
+ arch/mips/include/uapi/asm/errno.h   |   2 +
+ arch/parisc/include/uapi/asm/errno.h |   2 +
+ arch/sparc/include/uapi/asm/errno.h  |   2 +
+ fs/cifs/cifsacl.c                    |   8 +-
+ fs/cifs/cifsfs.c                     |   2 +-
+ fs/cifs/cifsglob.h                   |  18 +++-
+ fs/cifs/cifsproto.h                  |   8 +-
+ fs/cifs/cifssmb.c                    |  50 ++++++-----
+ fs/cifs/dir.c                        |  16 ++--
+ fs/cifs/file.c                       |  25 ++++--
+ fs/cifs/inode.c                      |  21 ++---
+ fs/cifs/link.c                       |  25 ++----
+ fs/cifs/netmisc.c                    |   2 +-
+ fs/cifs/readdir.c                    |   5 +-
+ fs/cifs/smb1ops.c                    |  16 ++--
+ fs/cifs/smb2file.c                   |  10 +--
+ fs/cifs/smb2inode.c                  |   4 +-
+ fs/cifs/smb2maperror.c               |   2 +-
+ fs/cifs/smb2ops.c                    |  10 ++-
+ fs/cifs/smb2pdu.c                    |   6 +-
+ fs/cifs/smb2proto.h                  |  14 +--
+ fs/fcntl.c                           |   5 +-
+ fs/locks.c                           | 160 ++++++++++++++++++++++++++++++++---
+ fs/namei.c                           |  56 +++++++++++-
+ fs/nfs/dir.c                         |   4 +
+ fs/nfs/internal.h                    |   3 +-
+ fs/nfs/nfs4file.c                    |   4 +
+ fs/nfs/nfs4proc.c                    |   4 +-
+ fs/nfs/nfs4super.c                   |   9 +-
+ fs/nfs/nfs4xdr.c                     |  21 ++++-
+ fs/nfs/super.c                       |   6 +-
+ fs/nfsd/nfs4state.c                  |  46 +++++++++-
+ fs/nfsd/nfsproc.c                    |   1 +
+ fs/proc_namespace.c                  |   1 +
+ include/linux/fs.h                   |  14 +++
+ include/uapi/asm-generic/errno.h     |   2 +
+ include/uapi/asm-generic/fcntl.h     |  12 +++
+ include/uapi/linux/fs.h              |   1 +
+ 39 files changed, 464 insertions(+), 135 deletions(-)
 
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.8.1.5
