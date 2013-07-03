@@ -1,145 +1,432 @@
-From: Jeffrey Layton <jlayton@samba.org>
-Subject: ANNOUNCE: cifs-utils release 6.1 ready for download
-Date: Tue, 02 Jul 2013 15:37:24 -0400
-Message-ID: <1372793844.2302.19.camel@tlielax.poochiereds.net>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] [CIFS] Limit allocation of crypto mechanisms to when we need
+ it for a particular dialect
+Date: Tue, 2 Jul 2013 20:43:15 -0500
+Message-ID: <CAH2r5mtHiVHSa2_3wDT__7cNsiz1CDLWW9SSrSXwp5Yf_zJz5w@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============7866977450627425664=="
-To: linux-cifs@vger.kernel.org, samba@lists.samba.org,
-	samba-technical@lists.samba.org
-Return-path: <samba-bounces@lists.samba.org>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba>,
-	<mailto:samba-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba>
-List-Post: <mailto:samba@lists.samba.org>
-List-Help: <mailto:samba-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba>,
-	<mailto:samba-request@lists.samba.org?subject=subscribe>
-Sender: samba-bounces@lists.samba.org
-Errors-To: samba-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
+Author: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Date:   Tue Jul 2 20:34:49 2013 -0500
 
---===============7866977450627425664==
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature";
-	boundary="=-8jvPOdSAhvNdGof6xAYw"
+    [CIFS] Limit allocation of crypto mechanisms to when we need it
+for a particular dialect
 
+    Updated patch to try to prevent allocation of cifs, smb2 or smb3 crypto
+    secmech structures unless needed.  Currently cifs allocates all crypto
+    mechanisms when the first session is established (4 functions and
+4 contexts),
+    rather than only allocating these when needed (smb3 needs two, the
+rest of the
+    dialects only need one).
 
---=-8jvPOdSAhvNdGof6xAYw
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+    Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-It has been a few months since the last cifs-utils release, and again
-there's been almost no activity. Still, at some point we need to get
-the bugfixes into the field, no matter how minor they are.
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 3d8bf94..bf0de6f 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -31,6 +31,33 @@
+ #include <linux/random.h>
+ #include <linux/highmem.h>
 
-So, nothing much earth-shattering here, mostly just bugfixes, and one
-new feature to allow cifs.upcall to use a dedicated keytab.
++static int
++cifs_crypto_shash_md5_allocate(struct TCP_Server_Info *server)
++{
++	int rc;
++	unsigned int size;
++
++	server->secmech.md5 = crypto_alloc_shash("md5", 0, 0);
++	if (IS_ERR(server->secmech.md5)) {
++		cifs_dbg(VFS, "could not allocate crypto md5\n");
++		return PTR_ERR(server->secmech.md5);
++	}
++
++	size = sizeof(struct shash_desc) +
++			crypto_shash_descsize(server->secmech.md5);
++	server->secmech.sdescmd5 = kmalloc(size, GFP_KERNEL);
++	if (!server->secmech.sdescmd5) {
++		rc = -ENOMEM;
++		crypto_free_shash(server->secmech.md5);
++		server->secmech.md5 = NULL;
++		return rc;
++	}
++	server->secmech.sdescmd5->shash.tfm = server->secmech.md5;
++	server->secmech.sdescmd5->shash.flags = 0x0;
++
++	return 0;
++}
++
+ /*
+  * Calculate and return the CIFS signature based on the mac key and SMB PDU.
+  * The 16 byte signature must be allocated by the caller. Note we only use the
+@@ -50,8 +77,11 @@ static int cifs_calc_signature(struct smb_rqst *rqst,
+ 		return -EINVAL;
 
-Go forth and download!
+ 	if (!server->secmech.sdescmd5) {
+-		cifs_dbg(VFS, "%s: Can't generate signature\n", __func__);
+-		return -1;
++		rc = cifs_crypto_shash_md5_allocate(server);
++		if (rc) {
++			cifs_dbg(VFS, "%s: Can't alloc md5 crypto\n", __func__);
++			return -1;
++		}
+ 	}
 
-webpage:    https://wiki.samba.org/index.php/LinuxCIFS_utils
-tarball:    ftp://ftp.samba.org/pub/linux-cifs/cifs-utils/
-git:        git://git.samba.org/cifs-utils.git
-gitweb:     http://git.samba.org/?p=3Dcifs-utils.git;a=3Dsummary
+ 	rc = crypto_shash_init(&server->secmech.sdescmd5->shash);
+@@ -556,6 +586,29 @@ CalcNTLMv2_response(const struct cifs_ses *ses,
+char *ntlmv2_hash)
+ 	return rc;
+ }
 
-Detailed list of changes since 6.0:
++static int crypto_hmacmd5_alloc(struct TCP_Server_Info *server)
++{
++	unsigned int size;
++
++	server->secmech.hmacmd5 = crypto_alloc_shash("hmac(md5)", 0, 0);
++	if (IS_ERR(server->secmech.hmacmd5)) {
++		cifs_dbg(VFS, "could not allocate crypto hmacmd5\n");
++		return PTR_ERR(server->secmech.hmacmd5);
++	}
++
++	size = sizeof(struct shash_desc) +
++			crypto_shash_descsize(server->secmech.hmacmd5);
++	server->secmech.sdeschmacmd5 = kmalloc(size, GFP_KERNEL);
++	if (!server->secmech.sdeschmacmd5) {
++		crypto_free_shash(server->secmech.hmacmd5);
++		server->secmech.hmacmd5 = NULL;
++		return -ENOMEM;
++	}
++	server->secmech.sdeschmacmd5->shash.tfm = server->secmech.hmacmd5;
++	server->secmech.sdeschmacmd5->shash.flags = 0x0;
++
++	return 0;
++}
 
-commit 0d57c198d6d03117b1e8ebb564ce8ac2535b607d
-Author: Jeff Layton <jlayton@samba.org>
-Date:   Wed Apr 10 13:24:50 2013 -0400
+ int
+ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
+@@ -606,6 +659,12 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const
+struct nls_table *nls_cp)
 
-    cifs-utils: set version to 6.0.1 for interim builds
-   =20
-    Signed-off-by: Jeff Layton <jlayton@samba.org>
+ 	memcpy(ses->auth_key.response + baselen, tiblob, tilen);
 
-commit 6885a6253aa214cbd6f6adbd5c948b74fa4a27a1
-Author: Scott Lovenberg <scott.lovenberg@gmail.com>
-Date:   Wed Apr 10 13:16:52 2013 -0400
++	rc = crypto_hmacmd5_alloc(ses->server);
++	if (rc) {
++		cifs_dbg(VFS, "could not crypto alloc md5 rc %d\n", rc);
++		goto setup_ntlmv2_rsp_ret;
++	}
++
+ 	/* calculate ntlmv2_hash */
+ 	rc = calc_ntlmv2_hash(ses, ntlmv2_hash, nls_cp);
+ 	if (rc) {
+@@ -705,123 +764,32 @@ calc_seckey(struct cifs_ses *ses)
+ void
+ cifs_crypto_shash_release(struct TCP_Server_Info *server)
+ {
+-	if (server->secmech.cmacaes)
++	if (server->secmech.cmacaes) {
+ 		crypto_free_shash(server->secmech.cmacaes);
++		server->secmech.cmacaes = NULL;
++	}
 
-    mount.cifs: Trivial comment fixes
-   =20
-    Two trivial comment fixes.
-   =20
-    Signed-off-by: Scott Lovenberg <scott.lovenberg@gmail.com>
+-	if (server->secmech.hmacsha256)
++	if (server->secmech.hmacsha256) {
+ 		crypto_free_shash(server->secmech.hmacsha256);
++		server->secmech.hmacsha256 = NULL;
++	}
 
-commit 21b5bdcb354bc113473347af5e4995fae2285b58
-Author: Peng Haitao <penght@cn.fujitsu.com>
-Date:   Fri Apr 12 16:58:49 2013 +0800
+-	if (server->secmech.md5)
++	if (server->secmech.md5) {
+ 		crypto_free_shash(server->secmech.md5);
++		server->secmech.md5 = NULL;
++	}
 
-    setcifsacl.c: fix a bug of goto setcifsacl_facenum_ret
-   =20
-    setcifsacl_facenum_ret: is called only if attrlen is equal to -1.
-   =20
-    Signed-off-by: Peng Haitao <penght@cn.fujitsu.com>
+-	if (server->secmech.hmacmd5)
++	if (server->secmech.hmacmd5) {
+ 		crypto_free_shash(server->secmech.hmacmd5);
++		server->secmech.hmacmd5 = NULL;
++	}
 
-commit 76dacff50330dcc55ad5c08bf8610e0d7e3ca2ec
-Author: Peng Haitao <penght@cn.fujitsu.com>
-Date:   Fri May 17 17:27:02 2013 +0800
+ 	kfree(server->secmech.sdesccmacaes);
+-
++	server->secmech.sdesccmacaes = NULL;
+ 	kfree(server->secmech.sdeschmacsha256);
+-
++	server->secmech.sdeschmacsha256 = NULL;
+ 	kfree(server->secmech.sdeschmacmd5);
+-
+-	kfree(server->secmech.sdescmd5);
+-}
+-
+-int
+-cifs_crypto_shash_allocate(struct TCP_Server_Info *server)
+-{
+-	int rc;
+-	unsigned int size;
+-
+-	server->secmech.hmacmd5 = crypto_alloc_shash("hmac(md5)", 0, 0);
+-	if (IS_ERR(server->secmech.hmacmd5)) {
+-		cifs_dbg(VFS, "could not allocate crypto hmacmd5\n");
+-		return PTR_ERR(server->secmech.hmacmd5);
+-	}
+-
+-	server->secmech.md5 = crypto_alloc_shash("md5", 0, 0);
+-	if (IS_ERR(server->secmech.md5)) {
+-		cifs_dbg(VFS, "could not allocate crypto md5\n");
+-		rc = PTR_ERR(server->secmech.md5);
+-		goto crypto_allocate_md5_fail;
+-	}
+-
+-	server->secmech.hmacsha256 = crypto_alloc_shash("hmac(sha256)", 0, 0);
+-	if (IS_ERR(server->secmech.hmacsha256)) {
+-		cifs_dbg(VFS, "could not allocate crypto hmacsha256\n");
+-		rc = PTR_ERR(server->secmech.hmacsha256);
+-		goto crypto_allocate_hmacsha256_fail;
+-	}
+-
+-	server->secmech.cmacaes = crypto_alloc_shash("cmac(aes)", 0, 0);
+-	if (IS_ERR(server->secmech.cmacaes)) {
+-		cifs_dbg(VFS, "could not allocate crypto cmac-aes");
+-		rc = PTR_ERR(server->secmech.cmacaes);
+-		goto crypto_allocate_cmacaes_fail;
+-	}
+-
+-	size = sizeof(struct shash_desc) +
+-			crypto_shash_descsize(server->secmech.hmacmd5);
+-	server->secmech.sdeschmacmd5 = kmalloc(size, GFP_KERNEL);
+-	if (!server->secmech.sdeschmacmd5) {
+-		rc = -ENOMEM;
+-		goto crypto_allocate_hmacmd5_sdesc_fail;
+-	}
+-	server->secmech.sdeschmacmd5->shash.tfm = server->secmech.hmacmd5;
+-	server->secmech.sdeschmacmd5->shash.flags = 0x0;
+-
+-	size = sizeof(struct shash_desc) +
+-			crypto_shash_descsize(server->secmech.md5);
+-	server->secmech.sdescmd5 = kmalloc(size, GFP_KERNEL);
+-	if (!server->secmech.sdescmd5) {
+-		rc = -ENOMEM;
+-		goto crypto_allocate_md5_sdesc_fail;
+-	}
+-	server->secmech.sdescmd5->shash.tfm = server->secmech.md5;
+-	server->secmech.sdescmd5->shash.flags = 0x0;
+-
+-	size = sizeof(struct shash_desc) +
+-			crypto_shash_descsize(server->secmech.hmacsha256);
+-	server->secmech.sdeschmacsha256 = kmalloc(size, GFP_KERNEL);
+-	if (!server->secmech.sdeschmacsha256) {
+-		rc = -ENOMEM;
+-		goto crypto_allocate_hmacsha256_sdesc_fail;
+-	}
+-	server->secmech.sdeschmacsha256->shash.tfm = server->secmech.hmacsha256;
+-	server->secmech.sdeschmacsha256->shash.flags = 0x0;
+-
+-	size = sizeof(struct shash_desc) +
+-			crypto_shash_descsize(server->secmech.cmacaes);
+-	server->secmech.sdesccmacaes = kmalloc(size, GFP_KERNEL);
+-	if (!server->secmech.sdesccmacaes) {
+-		cifs_dbg(VFS, "%s: Can't alloc cmacaes\n", __func__);
+-		rc = -ENOMEM;
+-		goto crypto_allocate_cmacaes_sdesc_fail;
+-	}
+-	server->secmech.sdesccmacaes->shash.tfm = server->secmech.cmacaes;
+-	server->secmech.sdesccmacaes->shash.flags = 0x0;
+-
+-	return 0;
+-
+-crypto_allocate_cmacaes_sdesc_fail:
+-	kfree(server->secmech.sdeschmacsha256);
+-
+-crypto_allocate_hmacsha256_sdesc_fail:
++	server->secmech.sdeschmacmd5 = NULL;
+ 	kfree(server->secmech.sdescmd5);
+-
+-crypto_allocate_md5_sdesc_fail:
+-	kfree(server->secmech.sdeschmacmd5);
+-
+-crypto_allocate_hmacmd5_sdesc_fail:
+-	crypto_free_shash(server->secmech.cmacaes);
+-
+-crypto_allocate_cmacaes_fail:
+-	crypto_free_shash(server->secmech.hmacsha256);
+-
+-crypto_allocate_hmacsha256_fail:
+-	crypto_free_shash(server->secmech.md5);
+-
+-crypto_allocate_md5_fail:
+-	crypto_free_shash(server->secmech.hmacmd5);
+-
+-	return rc;
++	server->secmech.sdescmd5 = NULL;
+ }
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index c8ff018..f7e584d 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -433,7 +433,6 @@ extern int SMBNTencrypt(unsigned char *, unsigned
+char *, unsigned char *,
+ 			const struct nls_table *);
+ extern int setup_ntlm_response(struct cifs_ses *, const struct nls_table *);
+ extern int setup_ntlmv2_rsp(struct cifs_ses *, const struct nls_table *);
+-extern int cifs_crypto_shash_allocate(struct TCP_Server_Info *);
+ extern void cifs_crypto_shash_release(struct TCP_Server_Info *);
+ extern int calc_seckey(struct cifs_ses *);
+ extern void generate_smb3signingkey(struct TCP_Server_Info *);
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index afcb8a1..fa68813 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -2108,12 +2108,6 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 		goto out_err;
+ 	}
 
-    cifs.upcall: the exit code should be 0 when print version
-   =20
-    When print version number, the exit code should be 0
-    and syslog() should not send "Negating key" to the system logger.
-   =20
-    Signed-off-by: Peng Haitao <penght@cn.fujitsu.com>
+-	rc = cifs_crypto_shash_allocate(tcp_ses);
+-	if (rc) {
+-		cifs_dbg(VFS, "could not setup hash structures rc %d\n", rc);
+-		goto out_err;
+-	}
+-
+ 	tcp_ses->ops = volume_info->ops;
+ 	tcp_ses->vals = volume_info->vals;
+ 	cifs_set_net_ns(tcp_ses, get_net(current->nsproxy->net_ns));
+diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+index 09b4fba..5bea1f0 100644
+--- a/fs/cifs/smb2transport.c
++++ b/fs/cifs/smb2transport.c
+@@ -39,6 +39,71 @@
+ #include "smb2status.h"
+ #include "smb2glob.h"
 
-commit e99024cf8f70a1337e09eb9e97a57926f7bc8cac
-Author: Jeff Layton <jlayton@samba.org>
-Date:   Wed May 29 14:54:26 2013 -0400
++static int
++smb2_crypto_shash_allocate(struct TCP_Server_Info *server)
++{
++	unsigned int size;
++
++	server->secmech.hmacsha256 = crypto_alloc_shash("hmac(sha256)", 0, 0);
++	if (IS_ERR(server->secmech.hmacsha256)) {
++		cifs_dbg(VFS, "could not allocate crypto hmacsha256\n");
++		return PTR_ERR(server->secmech.hmacsha256);
++	}
++
++	size = sizeof(struct shash_desc) +
++			crypto_shash_descsize(server->secmech.hmacsha256);
++	server->secmech.sdeschmacsha256 = kmalloc(size, GFP_KERNEL);
++	if (!server->secmech.sdeschmacsha256) {
++		crypto_free_shash(server->secmech.hmacsha256);
++		server->secmech.hmacsha256 = NULL;
++		return -ENOMEM;
++	}
++	server->secmech.sdeschmacsha256->shash.tfm = server->secmech.hmacsha256;
++	server->secmech.sdeschmacsha256->shash.flags = 0x0;
++
++	return 0;
++}
++
++static int
++smb3_crypto_shash_allocate(struct TCP_Server_Info *server)
++{
++	unsigned int size;
++	int rc;
++
++	rc = smb2_crypto_shash_allocate(server);
++	if (rc)
++		return rc;
++
++	server->secmech.cmacaes = crypto_alloc_shash("cmac(aes)", 0, 0);
++	if (IS_ERR(server->secmech.cmacaes)) {
++		cifs_dbg(VFS, "could not allocate crypto cmac-aes");
++		kfree(server->secmech.sdeschmacsha256);
++		server->secmech.sdeschmacsha256 = NULL;
++		crypto_free_shash(server->secmech.hmacsha256);
++		server->secmech.hmacsha256 = NULL;
++		return PTR_ERR(server->secmech.cmacaes);
++	}
++
++	size = sizeof(struct shash_desc) +
++			crypto_shash_descsize(server->secmech.cmacaes);
++	server->secmech.sdesccmacaes = kmalloc(size, GFP_KERNEL);
++	if (!server->secmech.sdesccmacaes) {
++		cifs_dbg(VFS, "%s: Can't alloc cmacaes\n", __func__);
++		kfree(server->secmech.sdeschmacsha256);
++		server->secmech.sdeschmacsha256 = NULL;
++		crypto_free_shash(server->secmech.hmacsha256);
++		crypto_free_shash(server->secmech.cmacaes);
++		server->secmech.hmacsha256 = NULL;
++		server->secmech.cmacaes = NULL;
++		return -ENOMEM;
++	}
++	server->secmech.sdesccmacaes->shash.tfm = server->secmech.cmacaes;
++	server->secmech.sdesccmacaes->shash.flags = 0x0;
++
++	return 0;
++}
++
++
+ int
+ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+ {
+@@ -52,6 +117,14 @@ smb2_calc_signature(struct smb_rqst *rqst, struct
+TCP_Server_Info *server)
+ 	memset(smb2_signature, 0x0, SMB2_HMACSHA256_SIZE);
+ 	memset(smb2_pdu->Signature, 0x0, SMB2_SIGNATURE_SIZE);
 
-    cifs.upcall: allow users to specify dedicated keytab on command-line
-   =20
-    Currently cifs.upcall only looks at the default system keytab
-    (/etc/krb5.keytab). It's often the case however that a dedicated keytab
-    is desirable. Allow administrators to set one on the command-line.
-   =20
-    Reported-by: steve <steve@steve-ss.com>
-    Signed-off-by: Jeff Layton <jlayton@samba.org>
++	if (server->secmech.hmacsha256 == NULL) {
++		rc = smb2_crypto_shash_allocate(server);
++		if (rc) {
++			cifs_dbg(VFS, "%s: shah256 alloc failed\n", __func__);
++			return rc;
++		}
++	}
++
+ 	rc = crypto_shash_setkey(server->secmech.hmacsha256,
+ 		server->session_key.response, SMB2_NTLMV2_SESSKEY_SIZE);
+ 	if (rc) {
+@@ -61,7 +134,7 @@ smb2_calc_signature(struct smb_rqst *rqst, struct
+TCP_Server_Info *server)
 
-commit 069d1efdfab8d0d411b08f2c20f53b111cc92625
-Author: Jeff Layton <jlayton@samba.org>
-Date:   Tue Jul 2 15:13:33 2013 -0400
+ 	rc = crypto_shash_init(&server->secmech.sdeschmacsha256->shash);
+ 	if (rc) {
+-		cifs_dbg(VFS, "%s: Could not init md5\n", __func__);
++		cifs_dbg(VFS, "%s: Could not init sha256", __func__);
+ 		return rc;
+ 	}
 
-    cifs-utils: set version to 6.1
-   =20
-    Signed-off-by: Jeff Layton <jlayton@samba.org>
+@@ -129,6 +202,16 @@ generate_smb3signingkey(struct TCP_Server_Info *server)
+ 	memset(prfhash, 0x0, SMB2_HMACSHA256_SIZE);
+ 	memset(server->smb3signingkey, 0x0, SMB3_SIGNKEY_SIZE);
 
---=20
-Jeffrey Layton <jlayton@samba.org>
++	/* SMB3 essentially requires signing so no harm allocating it early */
++	if (server->secmech.hmacsha256 == NULL) {
++		rc = smb3_crypto_shash_allocate(server);
++		if (rc) {
++			cifs_dbg(VFS, "%s: crypto alloc failed\n", __func__);
++			goto smb3signkey_ret;
++		}
++	}
++
++
+ 	rc = crypto_shash_setkey(server->secmech.hmacsha256,
+ 		server->session_key.response, SMB2_NTLMV2_SESSKEY_SIZE);
+ 	if (rc) {
+@@ -210,6 +293,9 @@ smb3_calc_signature(struct smb_rqst *rqst, struct
+TCP_Server_Info *server)
+ 		return rc;
+ 	}
 
---=-8jvPOdSAhvNdGof6xAYw
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.13 (GNU/Linux)
-
-iQIcBAABAgAGBQJR0yv0AAoJEAAOaEEZVoIVDtsQAMmlEMMxqIXaKg6GX2x/KmML
-k70jtnN4KUMi9H78AOoL6u6z7yix2isb50WSK9shetliQDHfNjDT0/aAPyYT4vrQ
-tVxJ9CgKTawlvXRucroAH28OzYF9zhzXNDu5k6Ar2Yv5JuYDgvIazA/kqrywD3PP
-sJ2JhqxXtVUUGzem+h6qMkbooOJ2Ijuc3rD+2n7ISsfMZ56VPG5rpZ6okcibgOvx
-wL18oVRbKqZptODFQ3N//fyEPmIykEu0BKMAabxfGjUUR36aFeiPslmRfTS5zzDD
-vGWkAJhntmZ/FWgyJJTHk3wng48wmuaQZlvx6oAxkOOTqf3eVELeLl4RtQG0WjV9
-CYFUDpMXCBAWJYydEb/qk3XqguioKpvdBL95oHKgiOfx2wHbXGs+1x/I08/92DbV
-keg5hbFXmPVYqBWdpIDGVf0OQyQkbQ+P7KI1O6FRnnSPoePudJ8OMTuAA7+AuyNd
-8dw/j2uHrpNjHqdpfM8ejz1bpdKwWXFWfhft4z6jE4/Ek/id2EvFFQlxK57BUZ87
-P2LDXOsrY+BBPAHRgdFi8g3tkrxT8gZ6nh25MI8y4mLuIoRhkrYV87V9+hemx6ck
-9O9TX9e6z4yJWXpbtNUIN+sD6sIHTwf3scFptPkLEJFg4ebTAA/FJA2hsNqfc33Z
-gmtsglgEKtj1Eelar/Qk
-=jBdI
------END PGP SIGNATURE-----
-
---=-8jvPOdSAhvNdGof6xAYw--
-
-
---===============7866977450627425664==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
++	/* we already allocate sdesccmacaes when we init smb3 signing key,
++	   so unlike smb2 we do not have to check here if secmech
++	   are initialized */
+ 	rc = crypto_shash_init(&server->secmech.sdesccmacaes->shash);
+ 	if (rc) {
+ 		cifs_dbg(VFS, "%s: Could not init cmac aes\n", __func__);
 
 -- 
-To unsubscribe from this list go to the following URL and read the
-instructions:  https://lists.samba.org/mailman/options/samba
---===============7866977450627425664==--
+Thanks,
+
+Steve
