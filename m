@@ -1,72 +1,90 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: use sensible file nlink values if unprovided
-Date: Fri, 05 Jul 2013 18:26:32 -0400
-Message-ID: <1373063192.2261.21.camel@tlielax.poochiereds.net>
+From: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Subject: RE: [PATCH] cifs: use sensible file nlink values if unprovided
+Date: Sat, 6 Jul 2013 00:13:06 +0000
+Message-ID: <614F550557B82C44AC27C492ADA391AA11ECE73C@TK5EX14MBXC284.redmond.corp.microsoft.com>
 References: <1372961186-19213-1-git-send-email-ddiss@suse.de>
 	 <CAH2r5mtyaufgrOssd872OZzq32TQ8fyprE82aK8FV7MbxceU7g@mail.gmail.com>
 	 <20130705184031.67afd669@f163.suse.de>
 	 <1373061027.2261.14.camel@tlielax.poochiereds.net>
 	 <CAH2r5msgztCnAZyvgmU3Y5Yupv-S=m1FXVzfN-RBQJbp0dRcyw@mail.gmail.com>
+ <1373063192.2261.21.camel@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5msgztCnAZyvgmU3Y5Yupv-S=m1FXVzfN-RBQJbp0dRcyw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1373063192.2261.21.camel-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 2013-07-05 at 17:12 -0500, Steve French wrote:
-> Yes - I noticed that too (although with David's patch at least it is
-> better).  For the POSIX case for readdir we are ok, but for the
-> non-posix case for readdir there is are only two infolevels, one too
-> big and one too small (FILE_STANDARD_INFORMATION) that seem to return
-> nlinks so we should be setting them to default values if we can't get
-> them from the server (ie if cf_attr->nlink is 0).  This patch should
-> fix it by catching it when we are about to update the inode to make
-> sure we are putting a legal value in (I have not tested it yet).
-> Thoughts on this minor followon patch?
-> 
-> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> index 449b6cf..8329c18 100644
-> --- a/fs/cifs/inode.c
-> +++ b/fs/cifs/inode.c
-> @@ -134,7 +134,13 @@ cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr
->         inode->i_mtime = fattr->cf_mtime;
->         inode->i_ctime = fattr->cf_ctime;
->         inode->i_rdev = fattr->cf_rdev;
-> -       set_nlink(inode, fattr->cf_nlink);
-> +       /* number of links on a directory is at least 2, at least 1 for file */
-> +       if ((fattr->cf_cifsattrs & ATTR_DIRECTORY) && (fattr->cf_nlink < 2))
-> +               set_nlink(inode, 2);
-> +       else if (fattr->cf_nlink < 1)
-> +               set_nlink(inode, 1);
-> +       else
-> +               set_nlink(inode, fattr->cf_nlink);
->         inode->i_uid = fattr->cf_uid;
->         inode->i_gid = fattr->cf_gid;
-> 
-
-There are cases where you might see a legit i_nlink value of 0. For
-instance...
-
-client> fd = open("file", ...);
-server> unlink("file");
-client> fstat(file, ...);
-
-...now the server may legitimately report a link count of 0, but with
-this patch we'll end up fudging it to something higher. Hence, I'm a
-little leery of doing this sort of blanket overriding of cf_nlink value,
-especially in the case where POSIX extensions are in force.
-
-I think we should only do this when we really think we can't trust this
-value -- i.e. the non-POSIX case. Experience has shown that
-NumberOfLinks value is not *exactly* a 1:1 match with an i_nlink value
-when talking to windows-y servers.
-
-I dunno...maybe it's time to ask dochelp for clarification on what sort
-of semantics we should be expecting from this field?
-
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+PiBJIGR1bm5vLi4ubWF5YmUgaXQncyB0aW1lIHRvIGFzayBkb2NoZWxwIGZvciBjbGFyaWZpY2F0
+aW9uIG9uIHdoYXQgc29ydCBvZg0KPiBzZW1hbnRpY3Mgd2Ugc2hvdWxkIGJlIGV4cGVjdGluZyBm
+cm9tIHRoaXMgZmllbGQ/DQoNCkl0J2xsIGFsbCBiZSBpbiBNUy1GU0EsIHdoaWNoIGlzIHByZXR0
+eSBzaW1wbGU6DQoNCjIuMS41LjExLjI3ICAgRmlsZVN0YW5kYXJkSW5mb3JtYXRpb24NCk91dHB1
+dEJ1ZmZlciBpcyBvZiB0eXBlIEZJTEVfU1RBTkRBUkRfSU5GT1JNQVRJT04sIGFzIGRlc2NyaWJl
+ZCBpbiBbTVMtRlNDQ10gc2VjdGlvbiAyLjQuMzguDQpQc2V1ZG9jb2RlIGZvciB0aGUgb3BlcmF0
+aW9uIGlzIGFzIGZvbGxvd3M6DQouLi4NCu+CpwlPdXRwdXRCdWZmZXIuTnVtYmVyT2ZMaW5rcyBz
+ZXQgdG8gdGhlIG51bWJlciBvZiBMaW5rIGVsZW1lbnRzIGluIE9wZW4uRmlsZS5MaW5rTGlzdCwg
+ZXhjZXB0IGlmIExpbmsuSXNEZWxldGVkIGZpZWxkIGlzIFRSVUUgKHRoYXQgaXMsIHRoZSBudW1i
+ZXIgb2Ygbm90LWRlbGV0ZWQgbGlua3MgdG8gdGhlIGZpbGUpLjwxMTY+DQrvgqcJSWYgT3V0cHV0
+QnVmZmVyLk51bWJlck9mTGlua3MgaXMgMCwgc2V0IE91dHB1dEJ1ZmZlci5EZWxldGVQZW5kaW5n
+IHRvIDEuDQoNCldCTiAxMTYgaGFzIGFuIGltcG9ydGFudCBzdGF0ZW1lbnQgaG93ZXZlcjoNCg0K
+PDExNj4gU2VjdGlvbiAyLjEuNS4xMS4yNzogVGhpcyBhbGdvcml0aG0gaXMgb25seSBpbXBsZW1l
+bnRlZCBieSBOVEZTIGFuZCBSZUZTLiBUaGUgRkFULCBFWEZBVCwgQ0RGUywgYW5kIFVERlMgZmls
+ZSBzeXN0ZW1zIGFsd2F5cyByZXR1cm4gMS4NCg0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0t
+LS0tDQo+IEZyb206IGxpbnV4LWNpZnMtb3duZXJAdmdlci5rZXJuZWwub3JnIFttYWlsdG86bGlu
+dXgtY2lmcy0NCj4gb3duZXJAdmdlci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgSmVmZiBMYXl0
+b24NCj4gU2VudDogRnJpZGF5LCBKdWx5IDUsIDIwMTMgNjoyNyBQTQ0KPiBUbzogU3RldmUgRnJl
+bmNoDQo+IENjOiBEYXZpZCBEaXNzZWxkb3JwOyBsaW51eC1jaWZzQHZnZXIua2VybmVsLm9yZw0K
+PiBTdWJqZWN0OiBSZTogW1BBVENIXSBjaWZzOiB1c2Ugc2Vuc2libGUgZmlsZSBubGluayB2YWx1
+ZXMgaWYgdW5wcm92aWRlZA0KPiANCj4gT24gRnJpLCAyMDEzLTA3LTA1IGF0IDE3OjEyIC0wNTAw
+LCBTdGV2ZSBGcmVuY2ggd3JvdGU6DQo+ID4gWWVzIC0gSSBub3RpY2VkIHRoYXQgdG9vIChhbHRo
+b3VnaCB3aXRoIERhdmlkJ3MgcGF0Y2ggYXQgbGVhc3QgaXQgaXMNCj4gPiBiZXR0ZXIpLiAgRm9y
+IHRoZSBQT1NJWCBjYXNlIGZvciByZWFkZGlyIHdlIGFyZSBvaywgYnV0IGZvciB0aGUNCj4gPiBu
+b24tcG9zaXggY2FzZSBmb3IgcmVhZGRpciB0aGVyZSBpcyBhcmUgb25seSB0d28gaW5mb2xldmVs
+cywgb25lIHRvbw0KPiA+IGJpZyBhbmQgb25lIHRvbyBzbWFsbCAoRklMRV9TVEFOREFSRF9JTkZP
+Uk1BVElPTikgdGhhdCBzZWVtIHRvDQo+IHJldHVybg0KPiA+IG5saW5rcyBzbyB3ZSBzaG91bGQg
+YmUgc2V0dGluZyB0aGVtIHRvIGRlZmF1bHQgdmFsdWVzIGlmIHdlIGNhbid0IGdldA0KPiA+IHRo
+ZW0gZnJvbSB0aGUgc2VydmVyIChpZSBpZiBjZl9hdHRyLT5ubGluayBpcyAwKS4gIFRoaXMgcGF0
+Y2ggc2hvdWxkDQo+ID4gZml4IGl0IGJ5IGNhdGNoaW5nIGl0IHdoZW4gd2UgYXJlIGFib3V0IHRv
+IHVwZGF0ZSB0aGUgaW5vZGUgdG8gbWFrZQ0KPiA+IHN1cmUgd2UgYXJlIHB1dHRpbmcgYSBsZWdh
+bCB2YWx1ZSBpbiAoSSBoYXZlIG5vdCB0ZXN0ZWQgaXQgeWV0KS4NCj4gPiBUaG91Z2h0cyBvbiB0
+aGlzIG1pbm9yIGZvbGxvd29uIHBhdGNoPw0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2ZzL2NpZnMv
+aW5vZGUuYyBiL2ZzL2NpZnMvaW5vZGUuYyBpbmRleCA0NDliNmNmLi44MzI5YzE4DQo+ID4gMTAw
+NjQ0DQo+ID4gLS0tIGEvZnMvY2lmcy9pbm9kZS5jDQo+ID4gKysrIGIvZnMvY2lmcy9pbm9kZS5j
+DQo+ID4gQEAgLTEzNCw3ICsxMzQsMTMgQEAgY2lmc19mYXR0cl90b19pbm9kZShzdHJ1Y3QgaW5v
+ZGUgKmlub2RlLCBzdHJ1Y3QNCj4gY2lmc19mYXR0cg0KPiA+ICAgICAgICAgaW5vZGUtPmlfbXRp
+bWUgPSBmYXR0ci0+Y2ZfbXRpbWU7DQo+ID4gICAgICAgICBpbm9kZS0+aV9jdGltZSA9IGZhdHRy
+LT5jZl9jdGltZTsNCj4gPiAgICAgICAgIGlub2RlLT5pX3JkZXYgPSBmYXR0ci0+Y2ZfcmRldjsN
+Cj4gPiAtICAgICAgIHNldF9ubGluayhpbm9kZSwgZmF0dHItPmNmX25saW5rKTsNCj4gPiArICAg
+ICAgIC8qIG51bWJlciBvZiBsaW5rcyBvbiBhIGRpcmVjdG9yeSBpcyBhdCBsZWFzdCAyLCBhdCBs
+ZWFzdCAxIGZvciBmaWxlICovDQo+ID4gKyAgICAgICBpZiAoKGZhdHRyLT5jZl9jaWZzYXR0cnMg
+JiBBVFRSX0RJUkVDVE9SWSkgJiYgKGZhdHRyLT5jZl9ubGluayA8IDIpKQ0KPiA+ICsgICAgICAg
+ICAgICAgICBzZXRfbmxpbmsoaW5vZGUsIDIpOw0KPiA+ICsgICAgICAgZWxzZSBpZiAoZmF0dHIt
+PmNmX25saW5rIDwgMSkNCj4gPiArICAgICAgICAgICAgICAgc2V0X25saW5rKGlub2RlLCAxKTsN
+Cj4gPiArICAgICAgIGVsc2UNCj4gPiArICAgICAgICAgICAgICAgc2V0X25saW5rKGlub2RlLCBm
+YXR0ci0+Y2ZfbmxpbmspOw0KPiA+ICAgICAgICAgaW5vZGUtPmlfdWlkID0gZmF0dHItPmNmX3Vp
+ZDsNCj4gPiAgICAgICAgIGlub2RlLT5pX2dpZCA9IGZhdHRyLT5jZl9naWQ7DQo+ID4NCj4gDQo+
+IFRoZXJlIGFyZSBjYXNlcyB3aGVyZSB5b3UgbWlnaHQgc2VlIGEgbGVnaXQgaV9ubGluayB2YWx1
+ZSBvZiAwLiBGb3IgaW5zdGFuY2UuLi4NCj4gDQo+IGNsaWVudD4gZmQgPSBvcGVuKCJmaWxlIiwg
+Li4uKTsNCj4gc2VydmVyPiB1bmxpbmsoImZpbGUiKTsNCj4gY2xpZW50PiBmc3RhdChmaWxlLCAu
+Li4pOw0KPiANCj4gLi4ubm93IHRoZSBzZXJ2ZXIgbWF5IGxlZ2l0aW1hdGVseSByZXBvcnQgYSBs
+aW5rIGNvdW50IG9mIDAsIGJ1dCB3aXRoIHRoaXMgcGF0Y2gNCj4gd2UnbGwgZW5kIHVwIGZ1ZGdp
+bmcgaXQgdG8gc29tZXRoaW5nIGhpZ2hlci4gSGVuY2UsIEknbSBhIGxpdHRsZSBsZWVyeSBvZiBk
+b2luZw0KPiB0aGlzIHNvcnQgb2YgYmxhbmtldCBvdmVycmlkaW5nIG9mIGNmX25saW5rIHZhbHVl
+LCBlc3BlY2lhbGx5IGluIHRoZSBjYXNlIHdoZXJlDQo+IFBPU0lYIGV4dGVuc2lvbnMgYXJlIGlu
+IGZvcmNlLg0KPiANCj4gSSB0aGluayB3ZSBzaG91bGQgb25seSBkbyB0aGlzIHdoZW4gd2UgcmVh
+bGx5IHRoaW5rIHdlIGNhbid0IHRydXN0IHRoaXMgdmFsdWUgLS0NCj4gaS5lLiB0aGUgbm9uLVBP
+U0lYIGNhc2UuIEV4cGVyaWVuY2UgaGFzIHNob3duIHRoYXQgTnVtYmVyT2ZMaW5rcyB2YWx1ZSBp
+cw0KPiBub3QgKmV4YWN0bHkqIGEgMToxIG1hdGNoIHdpdGggYW4gaV9ubGluayB2YWx1ZSB3aGVu
+IHRhbGtpbmcgdG8gd2luZG93cy15DQo+IHNlcnZlcnMuDQo+IA0KPiBJIGR1bm5vLi4ubWF5YmUg
+aXQncyB0aW1lIHRvIGFzayBkb2NoZWxwIGZvciBjbGFyaWZpY2F0aW9uIG9uIHdoYXQgc29ydCBv
+Zg0KPiBzZW1hbnRpY3Mgd2Ugc2hvdWxkIGJlIGV4cGVjdGluZyBmcm9tIHRoaXMgZmllbGQ/DQo+
+IA0KPiAtLQ0KPiBKZWZmIExheXRvbiA8amxheXRvbkByZWRoYXQuY29tPg0KPiANCj4gLS0NCj4g
+VG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJl
+IGxpbnV4LWNpZnMiIGluIHRoZQ0KPiBib2R5IG9mIGEgbWVzc2FnZSB0byBtYWpvcmRvbW9Admdl
+ci5rZXJuZWwub3JnIE1vcmUgbWFqb3Jkb21vIGluZm8gYXQNCj4gaHR0cDovL3ZnZXIua2VybmVs
+Lm9yZy9tYWpvcmRvbW8taW5mby5odG1sDQo=
