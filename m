@@ -1,77 +1,81 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Subject: Re: [PATCH] cifs: use sensible file nlink values if unprovided
-Date: Fri, 5 Jul 2013 22:47:15 -0500
-Message-ID: <CAH2r5msytrhByddBqRndhstonJ4bovMRsejuihyRAsS+PEExgA@mail.gmail.com>
+Date: Sat, 06 Jul 2013 06:52:16 -0400
+Message-ID: <1373107936.2360.10.camel@tlielax.poochiereds.net>
 References: <1372961186-19213-1-git-send-email-ddiss@suse.de>
-	<CAH2r5mtyaufgrOssd872OZzq32TQ8fyprE82aK8FV7MbxceU7g@mail.gmail.com>
-	<20130705184031.67afd669@f163.suse.de>
-	<1373061027.2261.14.camel@tlielax.poochiereds.net>
-	<CAH2r5msgztCnAZyvgmU3Y5Yupv-S=m1FXVzfN-RBQJbp0dRcyw@mail.gmail.com>
-	<1373063192.2261.21.camel@tlielax.poochiereds.net>
+	 <CAH2r5mtyaufgrOssd872OZzq32TQ8fyprE82aK8FV7MbxceU7g@mail.gmail.com>
+	 <20130705184031.67afd669@f163.suse.de>
+	 <1373061027.2261.14.camel@tlielax.poochiereds.net>
+	 <CAH2r5msgztCnAZyvgmU3Y5Yupv-S=m1FXVzfN-RBQJbp0dRcyw@mail.gmail.com>
+	 <1373063192.2261.21.camel@tlielax.poochiereds.net>
+	 <614F550557B82C44AC27C492ADA391AA11ECE73C@TK5EX14MBXC284.redmond.corp.microsoft.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1373063192.2261.21.camel-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <614F550557B82C44AC27C492ADA391AA11ECE73C-Jfd81uAzPQtJjAzVvmUwVFir+X/St4rqwBk/1ggFUS45P9zcU8sUGwC/G2K4zDHf@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, Jul 5, 2013 at 5:26 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> On Fri, 2013-07-05 at 17:12 -0500, Steve French wrote:
->> Yes - I noticed that too (although with David's patch at least it is
->> better).  For the POSIX case for readdir we are ok, but for the
->> non-posix case for readdir there is are only two infolevels, one too
->> big and one too small (FILE_STANDARD_INFORMATION) that seem to return
->> nlinks so we should be setting them to default values if we can't get
->> them from the server (ie if cf_attr->nlink is 0).  This patch should
->> fix it by catching it when we are about to update the inode to make
->> sure we are putting a legal value in (I have not tested it yet).
->> Thoughts on this minor followon patch?
->>
->> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
->> index 449b6cf..8329c18 100644
->> --- a/fs/cifs/inode.c
->> +++ b/fs/cifs/inode.c
->> @@ -134,7 +134,13 @@ cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr
->>         inode->i_mtime = fattr->cf_mtime;
->>         inode->i_ctime = fattr->cf_ctime;
->>         inode->i_rdev = fattr->cf_rdev;
->> -       set_nlink(inode, fattr->cf_nlink);
->> +       /* number of links on a directory is at least 2, at least 1 for file */
->> +       if ((fattr->cf_cifsattrs & ATTR_DIRECTORY) && (fattr->cf_nlink < 2))
->> +               set_nlink(inode, 2);
->> +       else if (fattr->cf_nlink < 1)
->> +               set_nlink(inode, 1);
->> +       else
->> +               set_nlink(inode, fattr->cf_nlink);
->>         inode->i_uid = fattr->cf_uid;
->>         inode->i_gid = fattr->cf_gid;
->>
->
-> There are cases where you might see a legit i_nlink value of 0. For
-> instance...
->
-> client> fd = open("file", ...);
-> server> unlink("file");
-> client> fstat(file, ...);
->
-> ...now the server may legitimately report a link count of 0, but with
-> this patch we'll end up fudging it to something higher. Hence, I'm a
-> little leery of doing this sort of blanket overriding of cf_nlink value,
-> especially in the case where POSIX extensions are in force.
->
-> I think we should only do this when we really think we can't trust this
-> value -- i.e. the non-POSIX case. Experience has shown that
-> NumberOfLinks value is not *exactly* a 1:1 match with an i_nlink value
-> when talking to windows-y servers.
+On Sat, 2013-07-06 at 00:13 +0000, Tom Talpey wrote:
+> > I dunno...maybe it's time to ask dochelp for clarification on what =
+sort of
+> > semantics we should be expecting from this field?
+>=20
+> It'll all be in MS-FSA, which is pretty simple:
+>=20
+> 2.1.5.11.27   FileStandardInformation
+> OutputBuffer is of type FILE_STANDARD_INFORMATION, as described in [M=
+S-FSCC] section 2.4.38.
+> Pseudocode for the operation is as follows:
+> ...
+> =EF=82=A7	OutputBuffer.NumberOfLinks set to the number of Link elemen=
+ts in Open.File.LinkList, except if Link.IsDeleted field is TRUE (that =
+is, the number of not-deleted links to the file).<116>
+> =EF=82=A7	If OutputBuffer.NumberOfLinks is 0, set OutputBuffer.Delete=
+Pending to 1.
+>=20
+> WBN 116 has an important statement however:
+>=20
+> <116> Section 2.1.5.11.27: This algorithm is only implemented by NTFS=
+ and ReFS. The FAT, EXFAT, CDFS, and UDFS file systems always return 1.
+>=20
+>=20
 
-Makes sense - but as Tom notes we should check for the delete pending
-case when number of links is zero, and as you note we should nont be
-overriding number of links everywhere - but should fix the non-posix readdir
-case
+Thanks! I probably should have read the spec before crying to dochelp ;=
+)
 
--- 
-Thanks,
+I think that makes sense. So what we probably want to do is something
+like (pseudocode):
 
-Steve
+if (nlink =3D=3D 0) {
+	if (directory)
+		nlink =3D 2;
+	else if (regular file && !delete pending)
+		nlink =3D 1;
+}
+
+=2E..IOW, leave it at 0 if delete pending is set. It would be preferabl=
+e
+to encapsulate this logic in a function too and call it from all of the
+places where we want to fake up this value.
+
+readdir is tricky since none of the non-POSIX infolevels seem to return
+a NumberOfLinks value or a DeletePending flag. Probably best to just
+fake them up as best we can and hope that a later getattr fetches the
+correct value. If the dirent didn't have a link count of at least 1,
+then it presumably wouldn't be visible to a FIND_* call.
+
+Note too that this does mean that the server that David is trying to
+work around is arguably broken. It's probably reasonable to go ahead an=
+d
+work around it since we need to do something similar for the readdir
+case anyway, but it would be best to have them fix their server as well=
+=2E
+
+--=20
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
