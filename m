@@ -1,76 +1,96 @@
-From: "Alexander E. Patrakov" <patrakov-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: CIFS-related deadlock in 3.10-rc7
-Date: Sun, 7 Jul 2013 22:39:11 +0600
-Message-ID: <CAN_LGv2zhu3zWd+7Jmi9FZd728W5T5kte2P0FMWABzENmyKJ5w@mail.gmail.com>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 30/45] CIFS: Enable signing in SMB2
+Date: Mon, 8 Jul 2013 01:15:45 -0500
+Message-ID: <CADT32eKGnyr=PaFxOuAMkMudTtnGGf9duo7xtE4d2mEGNC9U9g@mail.gmail.com>
+References: <1342626541-29872-1-git-send-email-pshilovsky@samba.org>
+	<1342626541-29872-31-git-send-email-pshilovsky@samba.org>
+	<k0vdnf$434$1@ger.gmane.org>
+	<CADT32e+4DSN=CSCbL+8GoRePknpD3X0HSq1hjVsXf3KHXQcmTw@mail.gmail.com>
+	<5034E29E.7030006@samba.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <5034E29E.7030006-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-While playing a file from a CIFS-mounted samba share (over wireless,
-if that matters), I got this deadlock:
+Any pointers would be really helpful and appreciated...
 
-[ 2164.132440] =============================================
-[ 2164.132443] [ INFO: possible recursive locking detected ]
-[ 2164.132446] 3.10.0-rc7-rafael+ #26 Tainted: G         C
-[ 2164.132448] ---------------------------------------------
-[ 2164.132452] vlc/2370 is trying to acquire lock:
-[ 2164.132454]  (&cifsi->lock_sem){++++.+}, at: [<ffffffffa0913110>]
-cifs_reopen_file+0x270/0x5b0 [cifs]
-[ 2164.132472]
-but task is already holding lock:
-[ 2164.132475]  (&cifsi->lock_sem){++++.+}, at: [<ffffffffa0918ca8>]
-cifs_strict_readv+0x88/0x160 [cifs]
-[ 2164.132488]
-other info that might help us debug this:
-[ 2164.132491]  Possible unsafe locking scenario:
+I am trying to make signing work correctly for smb2
+with key exchange key and ntlmv2/ntlmssp with signing.
 
-[ 2164.132494]        CPU0
-[ 2164.132496]        ----
-[ 2164.132498]   lock(&cifsi->lock_sem);
-[ 2164.132502]   lock(&cifsi->lock_sem);
-[ 2164.132505]
- *** DEADLOCK ***
+So as I see, for the first smb session on a tcp session, everything
+works fine i.e. session setup and tree connect works.
+But for the the second smb session on this tcp session, session setup
+succeeds but tree connect fails i.e. signature is incorrect.
 
-[ 2164.132508]  May be due to missing lock nesting notation
+If the same second smb session happens to be the first smb session
+on a tcp session session setup and tree connect succeeds i.e. signature
+is correct but if the first smb session on this tcp session happens to be
+the second smb session on this tcp session, session setup succeeds
+but tree connect fails i.e. signature is incorrect.
 
-[ 2164.132511] 1 lock held by vlc/2370:
-[ 2164.132513]  #0:  (&cifsi->lock_sem){++++.+}, at:
-[<ffffffffa0918ca8>] cifs_strict_readv+0x88/0x160 [cifs]
-[ 2164.132526]
-stack backtrace:
-[ 2164.132531] CPU: 3 PID: 2370 Comm: vlc Tainted: G         C
-3.10.0-rc7-rafael+ #26
-[ 2164.132534] Hardware name: Sony Corporation VPCZ23A4R/VAIO, BIOS
-R1013H5 05/21/2012
-[ 2164.132537]  ffff880235033f80 ffff8802281fb958 ffffffff8165b7ae
-ffff8802281fba48
-[ 2164.132544]  ffffffff810a0042 ffff8802281fb978 ffffffff826360d0
-ffff8802281fb9c8
-[ 2164.132550]  0000000000000000 0000000000000000 00000000000389b0
-ffff880200000542
-[ 2164.132556] Call Trace:
-[ 2164.132564]  [<ffffffff8165b7ae>] dump_stack+0x19/0x1b
-[ 2164.132569]  [<ffffffff810a0042>] __lock_acquire+0x1522/0x1ee0
-[ 2164.132579]  [<ffffffffa091aa41>] ? cifs_get_inode_info+0x181/0x690 [cifs]
-[ 2164.132587]  [<ffffffffa0913110>] ? cifs_reopen_file+0x270/0x5b0 [cifs]
-[ 2164.132591]  [<ffffffff810a1027>] lock_acquire+0x87/0x150
-[ 2164.132598]  [<ffffffffa0913110>] ? cifs_reopen_file+0x270/0x5b0 [cifs]
-[ 2164.132604]  [<ffffffff8165ed3f>] down_write+0x3f/0x70
-[ 2164.132612]  [<ffffffffa0913110>] ? cifs_reopen_file+0x270/0x5b0 [cifs]
-[ 2164.132622]  [<ffffffffa0927a76>] ? cifs_set_fid+0x26/0x40 [cifs]
-[ 2164.132632]  [<ffffffffa0913110>] cifs_reopen_file+0x270/0x5b0 [cifs]
-[ 2164.132642]  [<ffffffffa0913d0b>] cifs_readpage_worker+0x1ab/0x4e0 [cifs]
-[ 2164.132652]  [<ffffffffa091427e>] cifs_readpage+0x5e/0x160 [cifs]
-[ 2164.132660]  [<ffffffff81109b87>] generic_file_aio_read+0x217/0x760
-[ 2164.132670]  [<ffffffffa0918d51>] cifs_strict_readv+0x131/0x160 [cifs]
-[ 2164.132675]  [<ffffffff8116fff5>] do_sync_read+0x75/0xb0
-[ 2164.132681]  [<ffffffff81170ef7>] vfs_read+0xa7/0x180
-[ 2164.132686]  [<ffffffff81171170>] SyS_read+0x50/0xa0
-[ 2164.132691]  [<ffffffff81668e16>] system_call_fastpath+0x1a/0x1f
+Signature generating algorithm as in ms-smb2 3.1.4.1 is the same
+all the time.
+It is the session.sessionkey varies.
 
--- 
-Alexander E. Patrakov
+As I see from ms-nlmp, nonce is the session.session key (exportedsessionkey)
+as in 3.1.5.1.2.  Since authentication always succeeds for these
+ntlmv2 ntlmssp, encryptedrandomsessionkey must have been correct which means
+keyexchangekey must be correct.
+So not sure why for the second smb session on this tcp session,
+session.sessionkey generates incorrect signature.
+
+
+So in this case, my question is, if authentication/session_setup for
+the second smb session succeeds, how can signing/tree_connect fail?
+
+Regards,
+
+Shirish
+
+On Wed, Aug 22, 2012 at 8:46 AM, Stefan (metze) Metzmacher
+<metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> Hi Shirish,
+>
+>> On Tue, Aug 21, 2012 at 2:35 AM, Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+>>> Hi Pavel,
+>>>
+>>>> Use hmac-sha256 and rather than hmac-md5 that is used for CIFS/SMB.
+>>>>
+>>>> Signature field in SMB2 header is 16 bytes instead of 8 bytes.
+>>>
+>>> Sorry for the late reply, I just found a reference to this patch...
+>>>
+>>> To me it seems that this patch doesn't take care of the fact that
+>>> the signing key in SMB2/3 belongs to the session and not to the transport
+>>> connection.
+>>
+>> metze, where do you see that?  This is the signing key that is used to generate
+>> signature, server->session_key.response.
+>
+> And 'server' is a per connection state not per session...
+> which is ok for smb1 but not for smb2.
+>
+>>> Does the SMB2 code support multiuser mounts yet?
+>>>
+>>> Why are you using some "BSRSPYL " magic? I only saw that from Windows
+>>> clients
+>>> using SMB1. (Note: that servers just echo the signature from the
+>>> request, if they don't do signing).
+>>
+>> IIRC, Jeff Layton added that code to encode BSRSPYL magic (string).
+>> I could be wrong, it has been a while.
+>> But, I do think this is a problem, signature in a smb message is not even
+>> checked till key exchange handshake is session setup is done, right?
+>
+> A session setup response with STATUS_SUCCESS is the first signed message.
+> Before that the server just echos what the client sends.
+>
+> For SMB1 windows client (and smbclient) send BSRSPYL if they would like to
+> turn on signing later. But for SMB2 windows and samba send just zeros,
+> which cifs.ko should also do.
+>
+> metze
+>
