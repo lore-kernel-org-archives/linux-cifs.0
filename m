@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 1/8] CIFS: Fix lease context buffer parsing
-Date: Wed, 10 Jul 2013 13:59:53 +0400
-Message-ID: <1373450401-4135-2-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH 4/8] CIFS: Simplify SMB2 create context handling
+Date: Wed, 10 Jul 2013 13:59:56 +0400
+Message-ID: <1373450401-4135-5-git-send-email-pshilovsky@samba.org>
 References: <1373450401-4135-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,47 +9,71 @@ In-Reply-To: <1373450401-4135-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-to prevent missing RqLs context if it's not the first one.
+to make it easier to add other create context further.
 
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c |   13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ fs/cifs/smb2pdu.c |   38 ++++++++++++++++++++++++++------------
+ 1 file changed, 26 insertions(+), 12 deletions(-)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 2b312e4..19fafeb 100644
+index 9a35dcd..e65ccdb 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -853,23 +853,24 @@ parse_lease_state(struct smb2_create_rsp *rsp)
- 	char *data_offset;
- 	struct create_lease *lc;
- 	bool found = false;
-+	unsigned int next = 0;
-+	char *name;
+@@ -878,6 +878,29 @@ parse_lease_state(struct smb2_create_rsp *rsp)
+ 	return smb2_map_lease_to_oplock(lc->lcontext.LeaseState);
+ }
  
--	data_offset = (char *)rsp;
--	data_offset += 4 + le32_to_cpu(rsp->CreateContextsOffset);
-+	data_offset = (char *)rsp + 4 + le32_to_cpu(rsp->CreateContextsOffset);
- 	lc = (struct create_lease *)data_offset;
- 	do {
--		char *name = le16_to_cpu(lc->ccontext.NameOffset) + (char *)lc;
-+		lc = (struct create_lease *)((char *)lc + next);
-+		name = le16_to_cpu(lc->ccontext.NameOffset) + (char *)lc;
- 		if (le16_to_cpu(lc->ccontext.NameLength) != 4 ||
- 		    strncmp(name, "RqLs", 4)) {
--			lc = (struct create_lease *)((char *)lc
--					+ le32_to_cpu(lc->ccontext.Next));
-+			next = le32_to_cpu(lc->ccontext.Next);
- 			continue;
++static int
++add_lease_context(struct kvec *iov, unsigned int *num_iovec, __u8 *oplock)
++{
++	struct smb2_create_req *req = iov[0].iov_base;
++	unsigned int num = *num_iovec;
++
++	iov[num].iov_base = create_lease_buf(oplock+1, *oplock);
++	if (iov[num].iov_base == NULL)
++		return -ENOMEM;
++	iov[num].iov_len = sizeof(struct create_lease);
++	req->RequestedOplockLevel = SMB2_OPLOCK_LEVEL_LEASE;
++	if (!req->CreateContextsOffset)
++		req->CreateContextsOffset = cpu_to_le32(
++				sizeof(struct smb2_create_req) - 4 +
++				iov[num - 1].iov_len);
++	req->CreateContextsLength = cpu_to_le32(
++				le32_to_cpu(req->CreateContextsLength) +
++				sizeof(struct create_lease));
++	inc_rfc1001_len(&req->hdr, sizeof(struct create_lease));
++	*num_iovec = num + 1;
++	return 0;
++}
++
+ int
+ SMB2_open(const unsigned int xid, struct cifs_tcon *tcon, __le16 *path,
+ 	  u64 *persistent_fid, u64 *volatile_fid, __u32 desired_access,
+@@ -956,21 +979,12 @@ SMB2_open(const unsigned int xid, struct cifs_tcon *tcon, __le16 *path,
+ 	    *oplock == SMB2_OPLOCK_LEVEL_NONE)
+ 		req->RequestedOplockLevel = *oplock;
+ 	else {
+-		iov[num_iovecs].iov_base = create_lease_buf(oplock+1, *oplock);
+-		if (iov[num_iovecs].iov_base == NULL) {
++		rc = add_lease_context(iov, &num_iovecs, oplock);
++		if (rc) {
+ 			cifs_small_buf_release(req);
+ 			kfree(copy_path);
+-			return -ENOMEM;
++			return rc;
  		}
- 		if (lc->lcontext.LeaseFlags & SMB2_LEASE_FLAG_BREAK_IN_PROGRESS)
- 			return SMB2_OPLOCK_LEVEL_NOCHANGE;
- 		found = true;
- 		break;
--	} while (le32_to_cpu(lc->ccontext.Next) != 0);
-+	} while (next != 0);
+-		iov[num_iovecs].iov_len = sizeof(struct create_lease);
+-		req->RequestedOplockLevel = SMB2_OPLOCK_LEVEL_LEASE;
+-		req->CreateContextsOffset = cpu_to_le32(
+-			sizeof(struct smb2_create_req) - 4 +
+-			iov[num_iovecs-1].iov_len);
+-		req->CreateContextsLength = cpu_to_le32(
+-			sizeof(struct create_lease));
+-		inc_rfc1001_len(&req->hdr, sizeof(struct create_lease));
+-		num_iovecs++;
+ 	}
  
- 	if (!found)
- 		return 0;
+ 	rc = SendReceive2(xid, ses, iov, num_iovecs, &resp_buftype, 0);
 -- 
 1.7.10.4
