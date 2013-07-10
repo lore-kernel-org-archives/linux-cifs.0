@@ -1,270 +1,244 @@
-From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 8/8] CIFS: Reconnect durable handles for SMB2
-Date: Wed, 10 Jul 2013 14:00:00 +0400
-Message-ID: <1373450401-4135-9-git-send-email-pshilovsky@samba.org>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 2/8] CIFS: Respect create_options in smb2_open_file
+Date: Wed, 10 Jul 2013 09:45:50 -0500
+Message-ID: <CAH2r5mtvpFs8un95EkNWZLptifoExrm1bJ30UbHi-DEb1ENWxw@mail.gmail.com>
 References: <1373450401-4135-1-git-send-email-pshilovsky@samba.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+	<1373450401-4135-3-git-send-email-pshilovsky@samba.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1373450401-4135-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <1373450401-4135-3-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On reconnects, we need to reopen file and then obtain all byte-range
-locks held by the client. SMB2 protocol provides feature to make
-this process atomic by reconnecting to the same file handle
-with all it's byte-range locks. This patch adds this capability
-for SMB2 shares.
+Won't we need the file attributes parm on SMB2 create to pass in on
+the call to create symlink (where we have to pass that it is a reparse
+point)?
 
-Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- fs/cifs/cifsglob.h  |    1 +
- fs/cifs/dir.c       |    1 +
- fs/cifs/file.c      |   15 +++++++++------
- fs/cifs/smb2file.c  |    3 ++-
- fs/cifs/smb2inode.c |    1 +
- fs/cifs/smb2ops.c   |    3 +++
- fs/cifs/smb2pdu.c   |   38 ++++++++++++++++++++++++++++++++++----
- fs/cifs/smb2pdu.h   |    8 +++++++-
- 8 files changed, 58 insertions(+), 12 deletions(-)
+On Wed, Jul 10, 2013 at 4:59 AM, Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> and eliminated unused file_attribute parms of SMB2_open.
+>
+> Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> ---
+>  fs/cifs/smb2file.c  |    2 +-
+>  fs/cifs/smb2inode.c |   25 ++++++++++++-------------
+>  fs/cifs/smb2ops.c   |    6 +++---
+>  fs/cifs/smb2pdu.c   |   10 +++++++---
+>  fs/cifs/smb2proto.h |    4 ++--
+>  5 files changed, 25 insertions(+), 22 deletions(-)
+>
+> diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
+> index 5da1b55..46a4299 100644
+> --- a/fs/cifs/smb2file.c
+> +++ b/fs/cifs/smb2file.c
+> @@ -88,7 +88,7 @@ smb2_open_file(const unsigned int xid, struct cifs_tcon *tcon, const char *path,
+>
+>         rc = SMB2_open(xid, tcon, smb2_path, &fid->persistent_fid,
+>                        &fid->volatile_fid, desired_access, disposition,
+> -                      0, 0, smb2_oplock, smb2_data);
+> +                      create_options, smb2_oplock, smb2_data);
+>         if (rc)
+>                 goto out;
+>
+> diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+> index fff6dfb..f50eefd 100644
+> --- a/fs/cifs/smb2inode.c
+> +++ b/fs/cifs/smb2inode.c
+> @@ -41,8 +41,7 @@ static int
+>  smb2_open_op_close(const unsigned int xid, struct cifs_tcon *tcon,
+>                    struct cifs_sb_info *cifs_sb, const char *full_path,
+>                    __u32 desired_access, __u32 create_disposition,
+> -                  __u32 file_attributes, __u32 create_options,
+> -                  void *data, int command)
+> +                  __u32 create_options, void *data, int command)
+>  {
+>         int rc, tmprc = 0;
+>         u64 persistent_fid, volatile_fid;
+> @@ -54,8 +53,8 @@ smb2_open_op_close(const unsigned int xid, struct cifs_tcon *tcon,
+>                 return -ENOMEM;
+>
+>         rc = SMB2_open(xid, tcon, utf16_path, &persistent_fid, &volatile_fid,
+> -                      desired_access, create_disposition, file_attributes,
+> -                      create_options, &oplock, NULL);
+> +                      desired_access, create_disposition, create_options,
+> +                      &oplock, NULL);
+>         if (rc) {
+>                 kfree(utf16_path);
+>                 return rc;
+> @@ -129,8 +128,8 @@ smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+>                 return -ENOMEM;
+>
+>         rc = smb2_open_op_close(xid, tcon, cifs_sb, full_path,
+> -                               FILE_READ_ATTRIBUTES, FILE_OPEN, 0, 0,
+> -                               smb2_data, SMB2_OP_QUERY_INFO);
+> +                               FILE_READ_ATTRIBUTES, FILE_OPEN, 0, smb2_data,
+> +                               SMB2_OP_QUERY_INFO);
+>         if (rc)
+>                 goto out;
+>
+> @@ -145,7 +144,7 @@ smb2_mkdir(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
+>            struct cifs_sb_info *cifs_sb)
+>  {
+>         return smb2_open_op_close(xid, tcon, cifs_sb, name,
+> -                                 FILE_WRITE_ATTRIBUTES, FILE_CREATE, 0,
+> +                                 FILE_WRITE_ATTRIBUTES, FILE_CREATE,
+>                                   CREATE_NOT_FILE, NULL, SMB2_OP_MKDIR);
+>  }
+>
+> @@ -164,7 +163,7 @@ smb2_mkdir_setinfo(struct inode *inode, const char *name,
+>         dosattrs = cifs_i->cifsAttrs | ATTR_READONLY;
+>         data.Attributes = cpu_to_le32(dosattrs);
+>         tmprc = smb2_open_op_close(xid, tcon, cifs_sb, name,
+> -                                  FILE_WRITE_ATTRIBUTES, FILE_CREATE, 0,
+> +                                  FILE_WRITE_ATTRIBUTES, FILE_CREATE,
+>                                    CREATE_NOT_FILE, &data, SMB2_OP_SET_INFO);
+>         if (tmprc == 0)
+>                 cifs_i->cifsAttrs = dosattrs;
+> @@ -175,7 +174,7 @@ smb2_rmdir(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
+>            struct cifs_sb_info *cifs_sb)
+>  {
+>         return smb2_open_op_close(xid, tcon, cifs_sb, name, DELETE, FILE_OPEN,
+> -                                 0, CREATE_NOT_FILE | CREATE_DELETE_ON_CLOSE,
+> +                                 CREATE_NOT_FILE | CREATE_DELETE_ON_CLOSE,
+>                                   NULL, SMB2_OP_DELETE);
+>  }
+>
+> @@ -184,7 +183,7 @@ smb2_unlink(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
+>             struct cifs_sb_info *cifs_sb)
+>  {
+>         return smb2_open_op_close(xid, tcon, cifs_sb, name, DELETE, FILE_OPEN,
+> -                                 0, CREATE_DELETE_ON_CLOSE, NULL,
+> +                                 CREATE_DELETE_ON_CLOSE, NULL,
+>                                   SMB2_OP_DELETE);
+>  }
+>
+> @@ -203,7 +202,7 @@ smb2_set_path_attr(const unsigned int xid, struct cifs_tcon *tcon,
+>         }
+>
+>         rc = smb2_open_op_close(xid, tcon, cifs_sb, from_name, access,
+> -                               FILE_OPEN, 0, 0, smb2_to_name, command);
+> +                               FILE_OPEN, 0, smb2_to_name, command);
+>  smb2_rename_path:
+>         kfree(smb2_to_name);
+>         return rc;
+> @@ -234,7 +233,7 @@ smb2_set_path_size(const unsigned int xid, struct cifs_tcon *tcon,
+>  {
+>         __le64 eof = cpu_to_le64(size);
+>         return smb2_open_op_close(xid, tcon, cifs_sb, full_path,
+> -                                 FILE_WRITE_DATA, FILE_OPEN, 0, 0, &eof,
+> +                                 FILE_WRITE_DATA, FILE_OPEN, 0, &eof,
+>                                   SMB2_OP_SET_EOF);
+>  }
+>
+> @@ -250,7 +249,7 @@ smb2_set_file_info(struct inode *inode, const char *full_path,
+>         if (IS_ERR(tlink))
+>                 return PTR_ERR(tlink);
+>         rc = smb2_open_op_close(xid, tlink_tcon(tlink), cifs_sb, full_path,
+> -                               FILE_WRITE_ATTRIBUTES, FILE_OPEN, 0, 0, buf,
+> +                               FILE_WRITE_ATTRIBUTES, FILE_OPEN, 0, buf,
+>                                 SMB2_OP_SET_INFO);
+>         cifs_put_tlink(tlink);
+>         return rc;
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index 92aa87c..85b15e0 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -222,7 +222,7 @@ smb2_is_path_accessible(const unsigned int xid, struct cifs_tcon *tcon,
+>                 return -ENOMEM;
+>
+>         rc = SMB2_open(xid, tcon, utf16_path, &persistent_fid, &volatile_fid,
+> -                      FILE_READ_ATTRIBUTES, FILE_OPEN, 0, 0, &oplock, NULL);
+> +                      FILE_READ_ATTRIBUTES, FILE_OPEN, 0, &oplock, NULL);
+>         if (rc) {
+>                 kfree(utf16_path);
+>                 return rc;
+> @@ -450,7 +450,7 @@ smb2_query_dir_first(const unsigned int xid, struct cifs_tcon *tcon,
+>                 return -ENOMEM;
+>
+>         rc = SMB2_open(xid, tcon, utf16_path, &persistent_fid, &volatile_fid,
+> -                      FILE_READ_ATTRIBUTES | FILE_READ_DATA, FILE_OPEN, 0, 0,
+> +                      FILE_READ_ATTRIBUTES | FILE_READ_DATA, FILE_OPEN, 0,
+>                        &oplock, NULL);
+>         kfree(utf16_path);
+>         if (rc) {
+> @@ -533,7 +533,7 @@ smb2_queryfs(const unsigned int xid, struct cifs_tcon *tcon,
+>         u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
+>
+>         rc = SMB2_open(xid, tcon, &srch_path, &persistent_fid, &volatile_fid,
+> -                      FILE_READ_ATTRIBUTES, FILE_OPEN, 0, 0, &oplock, NULL);
+> +                      FILE_READ_ATTRIBUTES, FILE_OPEN, 0, &oplock, NULL);
+>         if (rc)
+>                 return rc;
+>         buf->f_type = SMB2_MAGIC_NUMBER;
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index 19fafeb..4c046a5 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -881,8 +881,8 @@ parse_lease_state(struct smb2_create_rsp *rsp)
+>  int
+>  SMB2_open(const unsigned int xid, struct cifs_tcon *tcon, __le16 *path,
+>           u64 *persistent_fid, u64 *volatile_fid, __u32 desired_access,
+> -         __u32 create_disposition, __u32 file_attributes, __u32 create_options,
+> -         __u8 *oplock, struct smb2_file_all_info *buf)
+> +         __u32 create_disposition, __u32 create_options, __u8 *oplock,
+> +         struct smb2_file_all_info *buf)
+>  {
+>         struct smb2_create_req *req;
+>         struct smb2_create_rsp *rsp;
+> @@ -895,6 +895,7 @@ SMB2_open(const unsigned int xid, struct cifs_tcon *tcon, __le16 *path,
+>         int copy_size;
+>         int rc = 0;
+>         int num_iovecs = 2;
+> +       __u32 file_attributes = 0;
+>
+>         cifs_dbg(FYI, "create/open\n");
+>
+> @@ -907,13 +908,16 @@ SMB2_open(const unsigned int xid, struct cifs_tcon *tcon, __le16 *path,
+>         if (rc)
+>                 return rc;
+>
+> +       if (create_options & CREATE_OPTION_READONLY)
+> +               file_attributes |= ATTR_READONLY;
+> +
+>         req->ImpersonationLevel = IL_IMPERSONATION;
+>         req->DesiredAccess = cpu_to_le32(desired_access);
+>         /* File attributes ignored on open (used in create though) */
+>         req->FileAttributes = cpu_to_le32(file_attributes);
+>         req->ShareAccess = FILE_SHARE_ALL_LE;
+>         req->CreateDisposition = cpu_to_le32(create_disposition);
+> -       req->CreateOptions = cpu_to_le32(create_options);
+> +       req->CreateOptions = cpu_to_le32(create_options & CREATE_OPTIONS_MASK);
+>         uni_path_len = (2 * UniStrnlen((wchar_t *)path, PATH_MAX)) + 2;
+>         req->NameOffset = cpu_to_le16(sizeof(struct smb2_create_req)
+>                         - 8 /* pad */ - 4 /* do not count rfc1001 len field */);
+> diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+> index d4e1eb8..d71a3e2 100644
+> --- a/fs/cifs/smb2proto.h
+> +++ b/fs/cifs/smb2proto.h
+> @@ -109,8 +109,8 @@ extern int SMB2_tdis(const unsigned int xid, struct cifs_tcon *tcon);
+>  extern int SMB2_open(const unsigned int xid, struct cifs_tcon *tcon,
+>                      __le16 *path, u64 *persistent_fid, u64 *volatile_fid,
+>                      __u32 desired_access, __u32 create_disposition,
+> -                    __u32 file_attributes, __u32 create_options,
+> -                    __u8 *oplock, struct smb2_file_all_info *buf);
+> +                    __u32 create_options, __u8 *oplock,
+> +                    struct smb2_file_all_info *buf);
+>  extern int SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon,
+>                      u64 persistent_fid, u64 volatile_fid, u32 opcode,
+>                      bool is_fsctl, char *in_data, u32 indatalen,
+> --
+> 1.7.10.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 107e657..1b1b144 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -915,6 +915,7 @@ struct cifs_open_parms {
- 	int create_options;
- 	const char *path;
- 	struct cifs_fid *fid;
-+	bool reconnect:1;
- };
- 
- struct cifs_fid {
-diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index 66435c9..585e01a 100644
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@ -327,6 +327,7 @@ cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned int xid,
- 	oparms.disposition = disposition;
- 	oparms.path = full_path;
- 	oparms.fid = fid;
-+	oparms.reconnect = false;
- 
- 	rc = server->ops->open(xid, &oparms, oplock, buf);
- 	if (rc) {
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 12a9754..2cd4a7c 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -232,6 +232,7 @@ cifs_nt_open(char *full_path, struct inode *inode, struct cifs_sb_info *cifs_sb,
- 	oparms.disposition = disposition;
- 	oparms.path = full_path;
- 	oparms.fid = fid;
-+	oparms.reconnect = false;
- 
- 	rc = server->ops->open(xid, &oparms, oplock, buf);
- 
-@@ -594,7 +595,6 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
- 	int desired_access;
- 	int disposition = FILE_OPEN;
- 	int create_options = CREATE_NOT_DIR;
--	struct cifs_fid fid;
- 	struct cifs_open_parms oparms;
- 
- 	xid = get_xid();
-@@ -645,7 +645,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
- 
- 		rc = cifs_posix_open(full_path, NULL, inode->i_sb,
- 				     cifs_sb->mnt_file_mode /* ignored */,
--				     oflags, &oplock, &fid.netfid, xid);
-+				     oflags, &oplock, &cfile->fid.netfid, xid);
- 		if (rc == 0) {
- 			cifs_dbg(FYI, "posix reopen succeeded\n");
- 			goto reopen_success;
-@@ -662,7 +662,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
- 		create_options |= CREATE_OPEN_BACKUP_INTENT;
- 
- 	if (server->ops->get_lease_key)
--		server->ops->get_lease_key(inode, &fid);
-+		server->ops->get_lease_key(inode, &cfile->fid);
- 
- 	oparms.tcon = tcon;
- 	oparms.cifs_sb = cifs_sb;
-@@ -670,7 +670,8 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
- 	oparms.create_options = create_options;
- 	oparms.disposition = disposition;
- 	oparms.path = full_path;
--	oparms.fid = &fid;
-+	oparms.fid = &cfile->fid;
-+	oparms.reconnect = true;
- 
- 	/*
- 	 * Can not refresh inode by passing in file_info buf to be returned by
-@@ -710,8 +711,9 @@ reopen_success:
- 	 * to the server to get the new inode info.
- 	 */
- 
--	server->ops->set_fid(cfile, &fid, oplock);
--	cifs_relock_file(cfile);
-+	server->ops->set_fid(cfile, &cfile->fid, oplock);
-+	if (oparms.reconnect)
-+		cifs_relock_file(cfile);
- 
- reopen_error_exit:
- 	kfree(full_path);
-@@ -1507,6 +1509,7 @@ cifs_setlk(struct file *file, struct file_lock *flock, __u32 type,
- 		if (!rc)
- 			goto out;
- 
-+
- 		/*
- 		 * Windows 7 server can delay breaking lease from read to None
- 		 * if we set a byte-range lock on a file - break it explicitly
-diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
-index 3989929..04a81a4 100644
---- a/fs/cifs/smb2file.c
-+++ b/fs/cifs/smb2file.c
-@@ -40,7 +40,8 @@ smb2_set_oplock_level(struct cifsInodeInfo *cinode, __u32 oplock)
- 	oplock &= 0xFF;
- 	if (oplock == SMB2_OPLOCK_LEVEL_NOCHANGE)
- 		return;
--	if (oplock == SMB2_OPLOCK_LEVEL_EXCLUSIVE) {
-+	if (oplock == SMB2_OPLOCK_LEVEL_EXCLUSIVE ||
-+	    oplock == SMB2_OPLOCK_LEVEL_BATCH) {
- 		cinode->clientCanCacheAll = true;
- 		cinode->clientCanCacheRead = true;
- 		cifs_dbg(FYI, "Exclusive Oplock granted on inode %p\n",
-diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
-index 9841df7..c6ec163 100644
---- a/fs/cifs/smb2inode.c
-+++ b/fs/cifs/smb2inode.c
-@@ -58,6 +58,7 @@ smb2_open_op_close(const unsigned int xid, struct cifs_tcon *tcon,
- 	oparms.disposition = create_disposition;
- 	oparms.create_options = create_options;
- 	oparms.fid = &fid;
-+	oparms.reconnect = false;
- 
- 	rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL);
- 	if (rc) {
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 86954b0..300ff85 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -227,6 +227,7 @@ smb2_is_path_accessible(const unsigned int xid, struct cifs_tcon *tcon,
- 	oparms.disposition = FILE_OPEN;
- 	oparms.create_options = 0;
- 	oparms.fid = &fid;
-+	oparms.reconnect = false;
- 
- 	rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL);
- 	if (rc) {
-@@ -460,6 +461,7 @@ smb2_query_dir_first(const unsigned int xid, struct cifs_tcon *tcon,
- 	oparms.disposition = FILE_OPEN;
- 	oparms.create_options = 0;
- 	oparms.fid = fid;
-+	oparms.reconnect = false;
- 
- 	rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL);
- 	kfree(utf16_path);
-@@ -546,6 +548,7 @@ smb2_queryfs(const unsigned int xid, struct cifs_tcon *tcon,
- 	oparms.disposition = FILE_OPEN;
- 	oparms.create_options = 0;
- 	oparms.fid = &fid;
-+	oparms.reconnect = false;
- 
- 	rc = SMB2_open(xid, &oparms, &srch_path, &oplock, NULL);
- 	if (rc)
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 9d7341d..c7ad06f 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -857,7 +857,7 @@ create_durable_buf(void)
- 		return NULL;
- 
- 	buf->ccontext.DataOffset = cpu_to_le16(offsetof
--					(struct create_durable, Reserved));
-+					(struct create_durable, Data));
- 	buf->ccontext.DataLength = cpu_to_le32(16);
- 	buf->ccontext.NameOffset = cpu_to_le16(offsetof
- 				(struct create_durable, Name));
-@@ -869,6 +869,30 @@ create_durable_buf(void)
- 	return buf;
- }
- 
-+static struct create_durable *
-+create_reconnect_durable_buf(struct cifs_fid *fid)
-+{
-+	struct create_durable *buf;
-+
-+	buf = kzalloc(sizeof(struct create_durable), GFP_KERNEL);
-+	if (!buf)
-+		return NULL;
-+
-+	buf->ccontext.DataOffset = cpu_to_le16(offsetof
-+					(struct create_durable, Data));
-+	buf->ccontext.DataLength = cpu_to_le32(16);
-+	buf->ccontext.NameOffset = cpu_to_le16(offsetof
-+				(struct create_durable, Name));
-+	buf->ccontext.NameLength = cpu_to_le16(4);
-+	buf->Data.Fid.PersistentFileId = fid->persistent_fid;
-+	buf->Data.Fid.VolatileFileId = fid->volatile_fid;
-+	buf->Name[0] = 'D';
-+	buf->Name[1] = 'H';
-+	buf->Name[2] = 'n';
-+	buf->Name[3] = 'C';
-+	return buf;
-+}
-+
- static __u8
- parse_lease_state(struct smb2_create_rsp *rsp)
- {
-@@ -924,12 +948,18 @@ add_lease_context(struct kvec *iov, unsigned int *num_iovec, __u8 *oplock)
- }
- 
- static int
--add_durable_context(struct kvec *iov, unsigned int *num_iovec)
-+add_durable_context(struct kvec *iov, unsigned int *num_iovec,
-+		    struct cifs_open_parms *oparms)
- {
- 	struct smb2_create_req *req = iov[0].iov_base;
- 	unsigned int num = *num_iovec;
- 
--	iov[num].iov_base = create_durable_buf();
-+	if (oparms->reconnect) {
-+		iov[num].iov_base = create_reconnect_durable_buf(oparms->fid);
-+		/* indicate that we don't need to relock the file */
-+		oparms->reconnect = false;
-+	} else
-+		iov[num].iov_base = create_durable_buf();
- 	if (iov[num].iov_base == NULL)
- 		return -ENOMEM;
- 	iov[num].iov_len = sizeof(struct create_durable);
-@@ -1037,7 +1067,7 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
- 			    (struct create_context *)iov[num_iovecs-1].iov_base;
- 			ccontext->Next = sizeof(struct create_lease);
- 		}
--		rc = add_durable_context(iov, &num_iovecs);
-+		rc = add_durable_context(iov, &num_iovecs, oparms);
- 		if (rc) {
- 			cifs_small_buf_release(req);
- 			kfree(copy_path);
-diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 3e30f0a..36b0d37 100644
---- a/fs/cifs/smb2pdu.h
-+++ b/fs/cifs/smb2pdu.h
-@@ -488,7 +488,13 @@ struct create_lease {
- struct create_durable {
- 	struct create_context ccontext;
- 	__u8   Name[8];
--	__u8   Reserved[16];
-+	union {
-+		__u8  Reserved[16];
-+		struct {
-+			__u64 PersistentFileId;
-+			__u64 VolatileFileId;
-+		} Fid;
-+	} Data;
- } __packed;
- 
- /* this goes in the ioctl buffer when doing a copychunk request */
+
+
 -- 
-1.7.10.4
+Thanks,
+
+Steve
