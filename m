@@ -1,76 +1,44 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: SMB2/SMB3 symlinks broken
-Date: Thu, 11 Jul 2013 00:11:18 -0500
-Message-ID: <CAH2r5mvBtbHYteEGH9LvwYJkh1mbzuXK6kbP6E+gEarf+mK_CA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH] CIFS: Reopen the file if reconnect durable handle failed
+Date: Thu, 11 Jul 2013 16:47:09 +0400
+Message-ID: <1373546829-4925-1-git-send-email-pshilovsky@samba.org>
+References: <1373450401-4135-9-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1373450401-4135-9-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Was trying to decide if enabling mfsymlinks by default for smb2/smb3
-made sense (since Windows symlinks are for admin only) and these
-symlinks are commonly used by Apple (and work on cifs), but aren't
-implemented yet in cifs.ko for smb2 or later mounts
+Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ fs/cifs/file.c |    8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-In testing though, noticed that specifying "mfsymlinks" on an
-smb2/smb3 mount causes cifs.ko to send a cifs open (which the server
-rejects forcing a reconnect).   The obvious fix for this would be to
-make link.c protocol generic as we did for a few other cifs functions
-- but I am now leaning against this in favor of adding a new version
-specific op - basically doing an smb2/smb3 protocol worker which calls
-the smb2/smb3 specific "open_op_close" (need to add write as a valid
-op) and then add cleanup if the open succeeds but the write fails.
-Fixing up link.c by making open version generic (see below) is ok (and
-there are only three places that call) - but write is hard to fixup
-correctly in a protocol generic way and it prevents us from doing this
-as one compounded op (open/write/close) or query (open/query/close) to
-optimize in the smb2/smb3 case.  Looks like repeating this type of
-change 3 times in fs/cifs/link.c is the wrong approach so I will work
-on an smb2/smb3 symlink version op tomorrow.
-
-diff --git a/fs/cifs/link.c b/fs/cifs/link.c
-index b83c3f5..5c9c7ad 100644
---- a/fs/cifs/link.c
-+++ b/fs/cifs/link.c
-@@ -189,10 +189,11 @@ CIFSCreateMFSymLink(const unsigned int xid,
-struct cifs_tcon *tcon,
- 	int oplock = 0;
- 	int remap;
- 	int create_options = CREATE_NOT_DIR;
--	__u16 netfid = 0;
- 	u8 *buf;
- 	unsigned int bytes_written = 0;
-+	struct cifs_fid cfile;
- 	struct cifs_io_parms io_parms;
-+	struct cifs_open_parms oparms;
- 	struct nls_table *nls_codepage;
-
- 	nls_codepage = cifs_sb->local_nls;
-@@ -211,9 +212,16 @@ CIFSCreateMFSymLink(const unsigned int xid,
-struct cifs_tcon *tcon,
- 	if (backup_cred(cifs_sb))
- 		create_options |= CREATE_OPEN_BACKUP_INTENT;
-
--	rc = CIFSSMBOpen(xid, tcon, fromName, FILE_CREATE, GENERIC_WRITE,
--			 create_options, &netfid, &oplock, NULL,
--			 nls_codepage, remap);
-+	oparms.tcon = tcon;
-+	oparms.cifs_sb = cifs_sb;
-+	oparms.disposition = FILE_CREATE;
-+	oparms.desired_access = GENERIC_WRITE;
-+	oparms.create_options = create_options;
-+	oparms.path = fromName;
-+	oparms.fid = &cfile->fid;
-+	oparms.reconnect = true;
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 2cd4a7c..b149ae4 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -681,6 +681,13 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
+ 	 * not dirty locally we could do this.
+ 	 */
+ 	rc = server->ops->open(xid, &oparms, &oplock, NULL);
++	if (rc == -ENOENT && oparms.reconnect == false) {
++		/* durable handle timeout is expired - open the file again */
++		rc = server->ops->open(xid, &oparms, &oplock, NULL);
++		/* indicate that we need to relock the file */
++		oparms.reconnect = true;
++	}
 +
-+	rc = server->ops->open(xid, &oparms, &oplock, NULL);
- 	if (rc != 0) {
- 		kfree(buf);
- 		return rc;
-
+ 	if (rc) {
+ 		mutex_unlock(&cfile->fh_mutex);
+ 		cifs_dbg(FYI, "cifs_reopen returned 0x%x\n", rc);
+@@ -1509,7 +1516,6 @@ cifs_setlk(struct file *file, struct file_lock *flock, __u32 type,
+ 		if (!rc)
+ 			goto out;
+ 
+-
+ 		/*
+ 		 * Windows 7 server can delay breaking lease from read to None
+ 		 * if we set a byte-range lock on a file - break it explicitly
 -- 
-Thanks,
-
-Steve
+1.7.10.4
