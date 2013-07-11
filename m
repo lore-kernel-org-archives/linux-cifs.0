@@ -1,92 +1,74 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 0/8] SMB2 durable handles support
-Date: Wed, 10 Jul 2013 12:57:31 -0500
-Message-ID: <CAH2r5ms5ag4k49ungfercgPr+q9cBi3HoWCZFYazCSexzb3ZAw@mail.gmail.com>
-References: <1373450401-4135-1-git-send-email-pshilovsky@samba.org>
-	<CAFB9KM0=SOvVqHsarp9KijoUYeG=7=QwnWZMoJDgajbfPH42ZA@mail.gmail.com>
-	<CAKywueRqRxnuqAG5dyZcmCwFpoYk=XU+jMrJ48RvYvPeBH6doA@mail.gmail.com>
-	<CAFB9KM30q9N0CXbDJM3O_QrQOpPED+74qnhqkuXaHRhUEd0T=g@mail.gmail.com>
+Subject: SMB2/SMB3 symlinks broken
+Date: Thu, 11 Jul 2013 00:11:18 -0500
+Message-ID: <CAH2r5mvBtbHYteEGH9LvwYJkh1mbzuXK6kbP6E+gEarf+mK_CA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAFB9KM30q9N0CXbDJM3O_QrQOpPED+74qnhqkuXaHRhUEd0T=g@mail.gmail.com>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Minor endian warning found and fixed in this series
+Was trying to decide if enabling mfsymlinks by default for smb2/smb3
+made sense (since Windows symlinks are for admin only) and these
+symlinks are commonly used by Apple (and work on cifs), but aren't
+implemented yet in cifs.ko for smb2 or later mounts
 
-Author: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Date:   Wed Jul 10 12:50:57 2013 -0500
+In testing though, noticed that specifying "mfsymlinks" on an
+smb2/smb3 mount causes cifs.ko to send a cifs open (which the server
+rejects forcing a reconnect).   The obvious fix for this would be to
+make link.c protocol generic as we did for a few other cifs functions
+- but I am now leaning against this in favor of adding a new version
+specific op - basically doing an smb2/smb3 protocol worker which calls
+the smb2/smb3 specific "open_op_close" (need to add write as a valid
+op) and then add cleanup if the open succeeds but the write fails.
+Fixing up link.c by making open version generic (see below) is ok (and
+there are only three places that call) - but write is hard to fixup
+correctly in a protocol generic way and it prevents us from doing this
+as one compounded op (open/write/close) or query (open/query/close) to
+optimize in the smb2/smb3 case.  Looks like repeating this type of
+change 3 times in fs/cifs/link.c is the wrong approach so I will work
+on an smb2/smb3 symlink version op tomorrow.
 
-    Fix minor endian error in durable handle patch series
+diff --git a/fs/cifs/link.c b/fs/cifs/link.c
+index b83c3f5..5c9c7ad 100644
+--- a/fs/cifs/link.c
++++ b/fs/cifs/link.c
+@@ -189,10 +189,11 @@ CIFSCreateMFSymLink(const unsigned int xid,
+struct cifs_tcon *tcon,
+ 	int oplock = 0;
+ 	int remap;
+ 	int create_options = CREATE_NOT_DIR;
+-	__u16 netfid = 0;
+ 	u8 *buf;
+ 	unsigned int bytes_written = 0;
++	struct cifs_fid cfile;
+ 	struct cifs_io_parms io_parms;
++	struct cifs_open_parms oparms;
+ 	struct nls_table *nls_codepage;
 
-    Fix endian warning:
+ 	nls_codepage = cifs_sb->local_nls;
+@@ -211,9 +212,16 @@ CIFSCreateMFSymLink(const unsigned int xid,
+struct cifs_tcon *tcon,
+ 	if (backup_cred(cifs_sb))
+ 		create_options |= CREATE_OPEN_BACKUP_INTENT;
 
-      CHECK   fs/cifs/smb2pdu.c
-    fs/cifs/smb2pdu.c:1068:40: warning: incorrect type in assignment
-(different base types)
-    fs/cifs/smb2pdu.c:1068:40:    expected restricted __le32 [usertype] Next
-    fs/cifs/smb2pdu.c:1068:40:    got unsigned long
-
-    Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index c7ad06f..abc9c28 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -1065,7 +1065,8 @@ SMB2_open(const unsigned int xid, struct
-cifs_open_parms *oparms, __le16 *pat
-                if (tcon->ses->server->capabilities & SMB2_GLOBAL_CAP_LEASING) {
-                        struct create_context *ccontext =
-                            (struct create_context *)iov[num_iovecs-1].iov_base;
--                       ccontext->Next = sizeof(struct create_lease);
-+                       ccontext->Next =
-+                               cpu_to_le32(sizeof(struct create_lease));
-                }
-                rc = add_durable_context(iov, &num_iovecs, oparms);
-                if (rc) {
-
-
-On Wed, Jul 10, 2013 at 11:30 AM, Scott Lovenberg
-<scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> On Wed, Jul 10, 2013 at 12:25 PM, Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
->> 2013/7/10 Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
->>> On Wed, Jul 10, 2013 at 5:59 AM, Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
->>>> This patchset implements SMB2 procotol feature -- durable handles. It allows to restore all file handle information after reconnect events. In particular, there is no need to reobtain byte-range locks.
->>>>
->>>> While adding the feature, the patchset simplifies open codepath by introducing new cifs_open_parms structure.
->>>>
->>>> Pavel Shilovsky (8):
->>>>   CIFS: Fix lease context buffer parsing
->>>>   CIFS: Respect create_options in smb2_open_file
->>>>   CIFS: Simplify SMB2_open code path
->>>>   CIFS: Simplify SMB2 create context handling
->>>>   CIFS: Request durable open for SMB2 opens
->>>>   CIFS: Introduce cifs_open_parms struct
->>>>   CIFS: Make SMB2_open use cifs_open_parms struct
->>>>   CIFS: Reconnect durable handles for SMB2
->>>>
->>>
->>> Forgive my ignorance, but I thought this patch set was merged a while
->>> ago (around the 4.0 release)?  Is this a respin?
->>
->> I think you mean Samba 4.0 release but this patchset is targeted for
->> cifs filesystem kernel client.
->
-> D'oh!  Should have had my coffee before posting.  Sorry for the noise.
->
-> --
-> Peace and Blessings,
-> -Scott.
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
+-	rc = CIFSSMBOpen(xid, tcon, fromName, FILE_CREATE, GENERIC_WRITE,
+-			 create_options, &netfid, &oplock, NULL,
+-			 nls_codepage, remap);
++	oparms.tcon = tcon;
++	oparms.cifs_sb = cifs_sb;
++	oparms.disposition = FILE_CREATE;
++	oparms.desired_access = GENERIC_WRITE;
++	oparms.create_options = create_options;
++	oparms.path = fromName;
++	oparms.fid = &cfile->fid;
++	oparms.reconnect = true;
++
++	rc = server->ops->open(xid, &oparms, &oplock, NULL);
+ 	if (rc != 0) {
+ 		kfree(buf);
+ 		return rc;
 
 -- 
 Thanks,
