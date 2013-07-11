@@ -1,91 +1,53 @@
-From: Pavel Shilovsky <piastryyy@gmail.com>
-Subject: Re: CIFS-related deadlock in 3.10-rc7
-Date: Thu, 11 Jul 2013 16:53:18 +0400
-Message-ID: <CAKywueQXGN+W6eMyZ-eQD+pCpgRz86Dpxht+YiMVKAGXVebPFg@mail.gmail.com>
-References: <CAN_LGv2zhu3zWd+7Jmi9FZd728W5T5kte2P0FMWABzENmyKJ5w@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs <linux-cifs@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: "Alexander E. Patrakov" <patrakov@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAN_LGv2zhu3zWd+7Jmi9FZd728W5T5kte2P0FMWABzENmyKJ5w@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH] CIFS: Fix a deadlock when a file is reopened
+Date: Thu, 11 Jul 2013 16:54:04 +0400
+Message-ID: <1373547244-5048-1-git-send-email-pshilovsky@samba.org>
+References: <CAKywueQXGN+W6eMyZ-eQD+pCpgRz86Dpxht+YiMVKAGXVebPFg@mail.gmail.com>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAKywueQXGN+W6eMyZ-eQD+pCpgRz86Dpxht+YiMVKAGXVebPFg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-2013/7/7 Alexander E. Patrakov <patrakov@gmail.com>:
-> While playing a file from a CIFS-mounted samba share (over wireless,
-> if that matters), I got this deadlock:
->
-> [ 2164.132440] =============================================
-> [ 2164.132443] [ INFO: possible recursive locking detected ]
-> [ 2164.132446] 3.10.0-rc7-rafael+ #26 Tainted: G         C
-> [ 2164.132448] ---------------------------------------------
-> [ 2164.132452] vlc/2370 is trying to acquire lock:
-> [ 2164.132454]  (&cifsi->lock_sem){++++.+}, at: [<ffffffffa0913110>]
-> cifs_reopen_file+0x270/0x5b0 [cifs]
-> [ 2164.132472]
-> but task is already holding lock:
-> [ 2164.132475]  (&cifsi->lock_sem){++++.+}, at: [<ffffffffa0918ca8>]
-> cifs_strict_readv+0x88/0x160 [cifs]
-> [ 2164.132488]
-> other info that might help us debug this:
-> [ 2164.132491]  Possible unsafe locking scenario:
->
-> [ 2164.132494]        CPU0
-> [ 2164.132496]        ----
-> [ 2164.132498]   lock(&cifsi->lock_sem);
-> [ 2164.132502]   lock(&cifsi->lock_sem);
-> [ 2164.132505]
->  *** DEADLOCK ***
->
-> [ 2164.132508]  May be due to missing lock nesting notation
->
-> [ 2164.132511] 1 lock held by vlc/2370:
-> [ 2164.132513]  #0:  (&cifsi->lock_sem){++++.+}, at:
-> [<ffffffffa0918ca8>] cifs_strict_readv+0x88/0x160 [cifs]
-> [ 2164.132526]
-> stack backtrace:
-> [ 2164.132531] CPU: 3 PID: 2370 Comm: vlc Tainted: G         C
-> 3.10.0-rc7-rafael+ #26
-> [ 2164.132534] Hardware name: Sony Corporation VPCZ23A4R/VAIO, BIOS
-> R1013H5 05/21/2012
-> [ 2164.132537]  ffff880235033f80 ffff8802281fb958 ffffffff8165b7ae
-> ffff8802281fba48
-> [ 2164.132544]  ffffffff810a0042 ffff8802281fb978 ffffffff826360d0
-> ffff8802281fb9c8
-> [ 2164.132550]  0000000000000000 0000000000000000 00000000000389b0
-> ffff880200000542
-> [ 2164.132556] Call Trace:
-> [ 2164.132564]  [<ffffffff8165b7ae>] dump_stack+0x19/0x1b
-> [ 2164.132569]  [<ffffffff810a0042>] __lock_acquire+0x1522/0x1ee0
-> [ 2164.132579]  [<ffffffffa091aa41>] ? cifs_get_inode_info+0x181/0x690 [cifs]
-> [ 2164.132587]  [<ffffffffa0913110>] ? cifs_reopen_file+0x270/0x5b0 [cifs]
-> [ 2164.132591]  [<ffffffff810a1027>] lock_acquire+0x87/0x150
-> [ 2164.132598]  [<ffffffffa0913110>] ? cifs_reopen_file+0x270/0x5b0 [cifs]
-> [ 2164.132604]  [<ffffffff8165ed3f>] down_write+0x3f/0x70
-> [ 2164.132612]  [<ffffffffa0913110>] ? cifs_reopen_file+0x270/0x5b0 [cifs]
-> [ 2164.132622]  [<ffffffffa0927a76>] ? cifs_set_fid+0x26/0x40 [cifs]
-> [ 2164.132632]  [<ffffffffa0913110>] cifs_reopen_file+0x270/0x5b0 [cifs]
-> [ 2164.132642]  [<ffffffffa0913d0b>] cifs_readpage_worker+0x1ab/0x4e0 [cifs]
-> [ 2164.132652]  [<ffffffffa091427e>] cifs_readpage+0x5e/0x160 [cifs]
-> [ 2164.132660]  [<ffffffff81109b87>] generic_file_aio_read+0x217/0x760
-> [ 2164.132670]  [<ffffffffa0918d51>] cifs_strict_readv+0x131/0x160 [cifs]
-> [ 2164.132675]  [<ffffffff8116fff5>] do_sync_read+0x75/0xb0
-> [ 2164.132681]  [<ffffffff81170ef7>] vfs_read+0xa7/0x180
-> [ 2164.132686]  [<ffffffff81171170>] SyS_read+0x50/0xa0
-> [ 2164.132691]  [<ffffffff81668e16>] system_call_fastpath+0x1a/0x1f
->
-> --
-> Alexander E. Patrakov
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+If we request reading or writing on a file that needs to be
+reopened, it causes the deadlock: we are already holding rw
+semaphore for reading and then we try to acquire it for writing
+in cifs_relock_file. Fix this by acquiring the semaphore for
+reading in cifs_relock_file due to we don't make any changes in
+locks and don't need a write access.
 
-Thank you for pointing it out. I created a patch that should fix the
-problem - will sent separately.
+Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ fs/cifs/file.c |    9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
---
-Best regards,
-Pavel Shilovsky.
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index b149ae4..be24f09 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -561,11 +561,10 @@ cifs_relock_file(struct cifsFileInfo *cfile)
+ 	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
+ 	int rc = 0;
+ 
+-	/* we are going to update can_cache_brlcks here - need a write access */
+-	down_write(&cinode->lock_sem);
++	down_read(&cinode->lock_sem);
+ 	if (cinode->can_cache_brlcks) {
+-		/* can cache locks - no need to push them */
+-		up_write(&cinode->lock_sem);
++		/* can cache locks - no need to relock */
++		up_read(&cinode->lock_sem);
+ 		return rc;
+ 	}
+ 
+@@ -576,7 +575,7 @@ cifs_relock_file(struct cifsFileInfo *cfile)
+ 	else
+ 		rc = tcon->ses->server->ops->push_mand_locks(cfile);
+ 
+-	up_write(&cinode->lock_sem);
++	up_read(&cinode->lock_sem);
+ 	return rc;
+ }
+ 
+-- 
+1.7.10.4
