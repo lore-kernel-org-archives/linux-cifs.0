@@ -1,13 +1,13 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: extend the buffer length enought for sprintf() using
-Date: Tue, 16 Jul 2013 22:54:20 -0500
-Message-ID: <CAH2r5mvKaRPK25GXhEUXdG1nwj_7qsaXB23qhzfyXQ7baJP4Dw@mail.gmail.com>
-References: <51E5E9DA.8020603@asianux.com>
-	<CADT32e+Ydg5N8uWyvCKee8n4iS34LcCFgE1nrC2S8bq7GnA-hg@mail.gmail.com>
+From: Chen Gang <gang.chen-bOixZGp5f+dBDgjK7y7TUQ@public.gmane.org>
+Subject: Re: [PATCH] cifs: extend the buffer length enought for sprintf()
+ using
+Date: Wed, 17 Jul 2013 12:21:56 +0800
+Message-ID: <51E61BE4.6070706@asianux.com>
+References: <51E5E9DA.8020603@asianux.com> <CADT32e+Ydg5N8uWyvCKee8n4iS34LcCFgE1nrC2S8bq7GnA-hg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Chen Gang <gang.chen-bOixZGp5f+dBDgjK7y7TUQ@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
 	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
 	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
 To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
@@ -16,20 +16,24 @@ In-Reply-To: <CADT32e+Ydg5N8uWyvCKee8n4iS34LcCFgE1nrC2S8bq7GnA-hg-JsoAwUIsXosN+B
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-I assumed it was an 80 column thing - but don't know.
- CIFS instead of CIF would be the normal
-
-On Tue, Jul 16, 2013 at 10:47 PM, Shirish Pargaonkar
-<shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On 07/17/2013 11:47 AM, Shirish Pargaonkar wrote:
 > nitpicking...
->
+> 
 > Should it be MAX_CIFS_DOMAINNAME instead of MAX_CIF_DOMAINNAME,
 > unless CIF is short for something here?
->
+> 
+
+Oh, it is my typo mistake, it should be MAX_CIFS_DOMAINNAME.
+
+I will wait for a day to get further checking, if OK, I should send
+patch v2 for it.
+
+Thanks.
+
 > Regards,
->
+> 
 > Shirish
->
+> 
 > On Tue, Jul 16, 2013 at 7:48 PM, Chen Gang <gang.chen-bOixZGp5f+dBDgjK7y7TUQ@public.gmane.org> wrote:
 >> For cifs_set_cifscreds() in "fs/cifs/connect.c", 'desc' buffer length
 >> is 'CIFSCREDS_DESC_SIZE' (56 is less than 256), and 'ses->domainName'
@@ -129,10 +133,9 @@ On Tue, Jul 16, 2013 at 10:47 PM, Shirish Pargaonkar
 >> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
 >> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 >> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
+> 
+> 
 
 
 -- 
-Thanks,
-
-Steve
+Chen Gang
