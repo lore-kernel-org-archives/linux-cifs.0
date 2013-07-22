@@ -1,104 +1,115 @@
-From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs-utils: Correct max string lengths
-Date: Mon, 22 Jul 2013 11:30:11 -0400
-Message-ID: <CAFB9KM37eod2avETEq1KPCcGK5kF7dmikPhdR9MHaDM8KKKXgg@mail.gmail.com>
-References: <1374269172-4964-1-git-send-email-scott.lovenberg@gmail.com>
-	<CAH2r5msAt8ZuXYdNzufB3BOah7f2ywyi3EgbS14ahESWe1BMRw@mail.gmail.com>
-	<C1A22AEB-8028-4D35-9924-83C9D0DD2D5D@gmail.com>
-	<CAH2r5msVGjeJss9vXd-8H3yn58=8q=njTgWjBrssov_MBT-XLg@mail.gmail.com>
-	<8FB3EB95-C367-4DE7-935C-37C7295F7D53@gmail.com>
-	<20130720064344.42d73b04@tlielax.poochiereds.net>
-	<6D61AEAF-9EE2-4F99-BA76-F186A76312E0@gmail.com>
-	<51EC8D09.1020504@asianux.com>
-	<20130722065317.11cd4ffd@corrin.poochiereds.net>
-	<CAFB9KM1XE0hw5yFjyL0DP_6MHCYgXqtKPySTgWV1xpX+J9f6Jg@mail.gmail.com>
-	<20130722111258.1ac02e22@tlielax.poochiereds.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Chen Gang <gang.chen-bOixZGp5f+dBDgjK7y7TUQ@public.gmane.org>,
-	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	"sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org" <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH] RFC cifs-utils: Use autoconf to get kernel headers
+Date: Mon, 22 Jul 2013 13:47:23 -0400
+Message-ID: <1374515243-21624-1-git-send-email-scott.lovenberg@gmail.com>
+Cc: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, gang.chen-bOixZGp5f+dBDgjK7y7TUQ@public.gmane.org,
+	sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20130722111258.1ac02e22-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Jul 22, 2013 at 11:12 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> On Mon, 22 Jul 2013 11:07:47 -0400
-> Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> On Mon, Jul 22, 2013 at 6:53 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->> > On Mon, 22 Jul 2013 09:38:17 +0800
->> > Chen Gang <gang.chen-bOixZGp5f+dBDgjK7y7TUQ@public.gmane.org> wrote:
->> >
->> >> On 07/20/2013 11:24 PM, Scott Lovenberg wrote:
->> >> >
->> >> >
->> >> > Sent from my iPod
->> >> >
->> >> > On Jul 20, 2013, at 6:43, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->> >> >
->> >> >> On Fri, 19 Jul 2013 22:44:22 -0400
->> >> >> Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> >> >>
->> >> >>> On Jul 19, 2013, at 22:34, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> >> >>>
->> >> >>>> Leaving Max share length at 256 is fine with me
->> >> >>> Works for me. Should this be fixed kernel side?
->> >> >>
->> >> >> Yes, I think that would make sense. Scott, I assume you'll send a v2 of
->> >> >> this patch that preserves the share length at 256?
->> >> >>
->> >> >> Once that's done, the ideal thing here would be to move these
->> >> >> definitions in the kernel to a separate header file that lives under
->> >> >> include/linux. Then we could have autoconf in cifs-utils look for that
->> >> >> header and use the #defines from that instead if it's present.
->> >> >>
->> >> >> That way we won't be so reliant on keeping the kernel and cifs-utils in
->> >> >> sync...
->> >> >
->> >> > Yeah. I'll respin and send tomorrow. I have a wedding to attend this afternoon.  Using autoconf would be terrific and I'm completely on board with that idea.
->> >> >
->> >>
->> >> Is it better to let the new header file in "include/uapi/linux" ? It
->> >> belongs to the interface between user mode and kernel mode.
->> >>
->> >
->> > That's more of a long-term fix. We'll still need to build cifs-utils
->> > against kernel headers that don't contain that header file, so fixing
->> > the lengths here is needed anyway.
->> >
->> > Once this patch goes in, adding a header in include/uapi/linux that
->> > holds these lengths (and any others that the mount helper and cifs.ko
->> > need to share) would be helpful. Then we could simply look for that
->> > file at autoconf time, and conditionally include it if it exists.
->> >
->> > --
->> > Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->>
->>
->> Since we're doing that we might as well standardize on the variable
->> names.  Should we just make the mount helper use the same variable
->> names as the kernel to avoid confusion?  That will be an external
->> change (ie, changing a non-static variable) if anyone linked to the
->> mount helper (doubtful, but possible) and it will break their code.
->>
->
-> The variable names aren't terribly important, so I wouldn't go making
-> any sort of change like that for "cleanup". What matters here is the
-> names of the preprocessor constants. Those will need to be unified
-> between userland and kernel in order to make such a scheme work.
->
-> --
-> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-Sorry, I articulated that terribly.  I was referring to the
-preprocessor constants such that we can just wrap our current
-definitions in #ifndef/#endif.  We're on the same page.
+This is an RFC for how we'd use autoconf to get the Linux kernel headers
+in include/uapi/linux/cifs.h.  If this is the correct approach, I'll
+formalize this patch.  I've never played with autoconf before so this is
+completely untested but should (read: might) probably work.
 
---
-Peace and Blessings,
--Scott.
+Signed-off-by: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ configure.ac |  3 +++
+ mount.cifs.c | 27 +++++++++++++++++++--------
+ 2 files changed, 22 insertions(+), 8 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index b5f7c49..708fdeb 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -111,6 +111,9 @@ AC_SUBST(RT_LDADD)
+ # Checks for header files.
+ AC_CHECK_HEADERS([arpa/inet.h ctype.h fcntl.h inttypes.h limits.h mntent.h netdb.h stddef.h stdint.h stdbool.h stdlib.h stdio.h errno.h string.h strings.h sys/mount.h sys/param.h sys/socket.h sys/time.h syslog.h unistd.h], , [AC_MSG_ERROR([necessary header(s) not found])])
+ 
++# Check for linux's cifs.h header that defines string lengths.
++AC_CHECK_HEADER([linux/cifs.h], ,[AC_MSG_WARN([cifs kernel header not found. Using internal values.])])
++
+ # do we have sys/fsuid.h and setfsuid()?
+ AC_CHECK_HEADERS([sys/fsuid.h])
+ AC_CHECK_FUNC(setfsuid, , [AC_MSG_ERROR([System does not support setfsuid()])])
+diff --git a/mount.cifs.c b/mount.cifs.c
+index 77ea0f8..0fca0a9 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -62,6 +62,9 @@
+ #include "mount.h"
+ #include "util.h"
+ #include "resolve_host.h"
++#ifdef HAVE_LINUX_CIFS_H
++#include <linux/cifs.h>
++#endif /* HAVE_LINUX_CIFS_h */
+ 
+ #ifndef MS_MOVE 
+ #define MS_MOVE 8192 
+@@ -91,16 +94,24 @@
+ 
+ /* Max length of the share name portion of a UNC. Share names over 80
+  * characters cannot be accessed via commandline in Windows 2000/XP. */
+-#define MAX_SHARE_LEN 256
++#ifndef MAX_SHARE_SIZE
++#define MAX_SHARE_SIZE 256
++#endif
+ 
+ /* Max user name length. */
++#ifndef MAX_USERNAME_SIZE
+ #define MAX_USERNAME_SIZE 256
++#endif
+ 
+ /* Max domain size. */
+-#define MAX_DOMAIN_SIZE 256
++#ifndef MAX_DOMAINNAME_SIZE
++#define MAX_DOMAINNAME_SIZE 256
++#endif
+ 
+ /* Max password size. */
+-#define MOUNT_PASSWD_SIZE 512
++#ifndef MAX_PASSWORD_SIZE
++#define MAX_PASSWORD_SIZE 512
++#endif
+ 
+ 
+ 
+@@ -176,12 +187,12 @@
+ struct parsed_mount_info {
+ 	unsigned long flags;
+ 	char host[NI_MAXHOST + 1];
+-	char share[MAX_SHARE_LEN + 1];
++	char share[MAX_SHARE_SIZE + 1];
+ 	char prefix[PATH_MAX + 1];
+ 	char options[MAX_OPTIONS_LEN];
+-	char domain[MAX_DOMAIN_SIZE + 1];
++	char domain[MAX_DOMAINNAME_SIZE + 1];
+ 	char username[MAX_USERNAME_SIZE + 1];
+-	char password[MOUNT_PASSWD_SIZE + 1];
++	char password[MAX_PASSWORD_SIZE + 1];
+ 	char addrlist[MAX_ADDR_LIST_LEN];
+ 	unsigned int got_user:1;
+ 	unsigned int got_password:1;
+@@ -1766,13 +1777,13 @@ assemble_mountinfo(struct parsed_mount_info *parsed_info,
+ 	}
+ 
+ 	if (!parsed_info->got_password) {
+-		char tmp_pass[MOUNT_PASSWD_SIZE + 1];
++		char tmp_pass[MAX_PASSWORD_SIZE + 1];
+ 		char *prompt = NULL;
+ 
+ 		if(asprintf(&prompt, "Password for %s@%s: ", parsed_info->username, orig_dev) < 0)
+ 			prompt = NULL;
+ 
+-		if (get_password(prompt ? prompt : "Password: ", tmp_pass, MOUNT_PASSWD_SIZE + 1)) {
++		if (get_password(prompt ? prompt : "Password: ", tmp_pass, MAX_PASSWORD_SIZE + 1)) {
+ 			rc = set_password(parsed_info, tmp_pass);
+ 		} else {
+ 			fprintf(stderr, "Error reading password, exiting\n");
+-- 
+1.8.1.4
