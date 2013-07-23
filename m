@@ -1,150 +1,203 @@
-From: Chen Gang <gang.chen-bOixZGp5f+dBDgjK7y7TUQ@public.gmane.org>
-Subject: Re: [PATCH] RFC cifs-utils: Use autoconf to get kernel headers
-Date: Tue, 23 Jul 2013 08:30:41 +0800
-Message-ID: <51EDCEB1.4090506@asianux.com>
-References: <1374515243-21624-1-git-send-email-scott.lovenberg@gmail.com> <20130722142752.046fde43@tlielax.poochiereds.net> <51EDCC97.9040207@asianux.com>
+From: Dave Chinner <david@fromorbit.com>
+Subject: Re: Recvfile patch used for Samba.
+Date: Tue, 23 Jul 2013 17:10:27 +1000
+Message-ID: <20130723071027.GJ19986@dastard>
+References: <20130722215738.GB20647@samba2>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=GB2312
-Content-Transfer-Encoding: 7bit
-Cc: scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <51EDCC97.9040207-bOixZGp5f+dBDgjK7y7TUQ@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Steve French <smfrench@gmail.com>, Jeff Layton <jlayton@samba.org>,
+	linux-cifs@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>
+To: Jeremy Allison <jra@samba.org>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20130722215738.GB20647@samba2>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On 07/23/2013 08:21 AM, Chen Gang wrote:
-> On 07/23/2013 02:27 AM, Jeff Layton wrote:
->> On Mon, 22 Jul 2013 13:47:23 -0400
->> scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
->>
->>> From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->>>
->>> This is an RFC for how we'd use autoconf to get the Linux kernel headers
->>> in include/uapi/linux/cifs.h.  If this is the correct approach, I'll
->>> formalize this patch.  I've never played with autoconf before so this is
->>> completely untested but should (read: might) probably work.
->>>
->>> Signed-off-by: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->>> ---
->>>  configure.ac |  3 +++
->>>  mount.cifs.c | 27 +++++++++++++++++++--------
->>>  2 files changed, 22 insertions(+), 8 deletions(-)
->>>
->>
->> I think the first step is to do a kernel patch that makes this cifs.h
->> file. I won't commit any sort of patch like this until that's committed
->> first.
->>
->> Also "cifs.h" is somewhat generic. I think you should probably name it
->> a bit more specifically -- maybe include/uapi/linux/cifs/cifs_mount.h...
->>
+On Mon, Jul 22, 2013 at 02:57:38PM -0700, Jeremy Allison wrote:
+> Hi Steve and Jeff (and others).
 > 
-> Do we need add prefix 'CIFS_' for the macro constants to let them in
-> their own name space ? (e.g. use 'CIFS_MAX_DOMAIN_SIZE' instead of
-> 'MAX_DOMAIN_SIZE').
-> 
-> Thanks.
-> 
->>> diff --git a/configure.ac b/configure.ac
->>> index b5f7c49..708fdeb 100644
->>> --- a/configure.ac
->>> +++ b/configure.ac
->>> @@ -111,6 +111,9 @@ AC_SUBST(RT_LDADD)
->>>  # Checks for header files.
->>>  AC_CHECK_HEADERS([arpa/inet.h ctype.h fcntl.h inttypes.h limits.h mntent.h netdb.h stddef.h stdint.h stdbool.h stdlib.h stdio.h errno.h string.h strings.h sys/mount.h sys/param.h sys/socket.h sys/time.h syslog.h unistd.h], , [AC_MSG_ERROR([necessary header(s) not found])])
->>>  
->>> +# Check for linux's cifs.h header that defines string lengths.
->>> +AC_CHECK_HEADER([linux/cifs.h], ,[AC_MSG_WARN([cifs kernel header not found. Using internal values.])])
->>> +
->>>  # do we have sys/fsuid.h and setfsuid()?
->>>  AC_CHECK_HEADERS([sys/fsuid.h])
->>>  AC_CHECK_FUNC(setfsuid, , [AC_MSG_ERROR([System does not support setfsuid()])])
->>> diff --git a/mount.cifs.c b/mount.cifs.c
->>> index 77ea0f8..0fca0a9 100644
->>> --- a/mount.cifs.c
->>> +++ b/mount.cifs.c
->>> @@ -62,6 +62,9 @@
->>>  #include "mount.h"
->>>  #include "util.h"
->>>  #include "resolve_host.h"
->>> +#ifdef HAVE_LINUX_CIFS_H
->>> +#include <linux/cifs.h>
->>> +#endif /* HAVE_LINUX_CIFS_h */
->>>  
->>>  #ifndef MS_MOVE 
->>>  #define MS_MOVE 8192 
->>> @@ -91,16 +94,24 @@
->>>  
->>>  /* Max length of the share name portion of a UNC. Share names over 80
->>>   * characters cannot be accessed via commandline in Windows 2000/XP. */
->>> -#define MAX_SHARE_LEN 256
->>> +#ifndef MAX_SHARE_SIZE
->>> +#define MAX_SHARE_SIZE 256
->>> +#endif
->>>  
->>>  /* Max user name length. */
->>> +#ifndef MAX_USERNAME_SIZE
->>>  #define MAX_USERNAME_SIZE 256
->>> +#endif
->>>  
->>>  /* Max domain size. */
->>> -#define MAX_DOMAIN_SIZE 256
->>> +#ifndef MAX_DOMAINNAME_SIZE
->>> +#define MAX_DOMAINNAME_SIZE 256
->>> +#endif
->>>  
->>>  /* Max password size. */
->>> -#define MOUNT_PASSWD_SIZE 512
->>> +#ifndef MAX_PASSWORD_SIZE
->>> +#define MAX_PASSWORD_SIZE 512
->>> +#endif
->>>  
->>>  
->>>  
->>> @@ -176,12 +187,12 @@
->>>  struct parsed_mount_info {
->>>  	unsigned long flags;
->>>  	char host[NI_MAXHOST + 1];
->>> -	char share[MAX_SHARE_LEN + 1];
->>> +	char share[MAX_SHARE_SIZE + 1];
->>>  	char prefix[PATH_MAX + 1];
->>>  	char options[MAX_OPTIONS_LEN];
->>> -	char domain[MAX_DOMAIN_SIZE + 1];
->>> +	char domain[MAX_DOMAINNAME_SIZE + 1];
+> Here is a patch that Samba vendors have been using
+> to implement recvfile (copy directly from socket
+> to file). It can improve write performance on boxes
+> by a significant amount (10% or more).
 
-Also, as far as I know, MAX_DOMAINNAME_SIZE is 256 which already content
-'\0', do we need consider about it ? (and the same to another macro
-constants).
+Is that all? It's just moving the memcpy() into the kernel?
 
->>>  	char username[MAX_USERNAME_SIZE + 1];
->>> -	char password[MOUNT_PASSWD_SIZE + 1];
->>> +	char password[MAX_PASSWORD_SIZE + 1];
->>>  	char addrlist[MAX_ADDR_LIST_LEN];
->>>  	unsigned int got_user:1;
->>>  	unsigned int got_password:1;
->>> @@ -1766,13 +1777,13 @@ assemble_mountinfo(struct parsed_mount_info *parsed_info,
->>>  	}
->>>  
->>>  	if (!parsed_info->got_password) {
->>> -		char tmp_pass[MOUNT_PASSWD_SIZE + 1];
->>> +		char tmp_pass[MAX_PASSWORD_SIZE + 1];
->>>  		char *prompt = NULL;
->>>  
->>>  		if(asprintf(&prompt, "Password for %s@%s: ", parsed_info->username, orig_dev) < 0)
->>>  			prompt = NULL;
->>>  
->>> -		if (get_password(prompt ? prompt : "Password: ", tmp_pass, MOUNT_PASSWD_SIZE + 1)) {
->>> +		if (get_password(prompt ? prompt : "Password: ", tmp_pass, MAX_PASSWORD_SIZE + 1)) {
->>>  			rc = set_password(parsed_info, tmp_pass);
->>>  		} else {
->>>  			fprintf(stderr, "Error reading password, exiting\n");
->>
->>
+> I'm not qualified to evaluate this code, can someone
+> who is (hi there Steve and Jeff :-) take a look at
+> this and see if it's work shepherding into the kernel ?
+
+It's pretty nasty.
+
 > 
+> Cheers,
 > 
+> 	Jeremy.
 
+> diff -urp linux-2.6.37-rc5.orig/fs/splice.c linux-2.6.37-rc5/fs/splice.c
+> --- linux-2.6.37-rc5.orig/fs/splice.c	2010-12-06 20:09:04.000000000 -0800
+> +++ linux-2.6.37-rc5/fs/splice.c	2010-12-07 16:16:48.000000000 -0800
+> @@ -31,6 +31,7 @@
+>  #include <linux/uio.h>
+>  #include <linux/security.h>
+>  #include <linux/gfp.h>
+> +#include <net/sock.h>
+>  
+>  /*
+>   * Attempt to steal a page from a pipe buffer. This should perhaps go into
+> @@ -1387,6 +1388,141 @@ static long do_splice(struct file *in, l
+>  	return -EINVAL;
+>  }
+>  
+> +static ssize_t do_splice_from_socket(struct file *file, struct socket *sock,
+> +				     loff_t __user *ppos, size_t count)
+> +{		
+> +	struct address_space *mapping = file->f_mapping;
+> +	struct inode	*inode = mapping->host;
+> +	loff_t pos;
+> +	int count_tmp;
+> +	int err = 0;
+> +	int cPagePtr = 0;		
+> +	int cPagesAllocated = 0;
 
+camel case.
+
+> +	struct recvfile_ctl_blk rv_cb[MAX_PAGES_PER_RECVFILE];
+
+MAX_PAGES_PER_RECVFILE = 32, and the structure is 32 bytes on 64
+bit. So 1k of stack usage right there. Bad.
+
+> +	struct kvec iov[MAX_PAGES_PER_RECVFILE];
+
+And that's another 512 bytes of stack. Way too much.
+
+> +	struct msghdr msg;
+
+Another ~52 bytes of stack.
+
+> +	long rcvtimeo;
+> +	int ret;
+> +
+> +	if(copy_from_user(&pos, ppos, sizeof(loff_t)))
+> +		return -EFAULT;
+> +
+> +	if(count > MAX_PAGES_PER_RECVFILE * PAGE_SIZE) {
+> +		printk("%s: count(%u) exceeds maxinum\n", __func__, count);
+> +		return -EINVAL;
+> +	}    
+> +	mutex_lock(&inode->i_mutex);
+
+Locking on write needs to be passed to filesystems, not done by
+generic code. i.e. this isn't sufficient for XFS, and may also be
+problematic for btrfs.
+
+> +
+> +	vfs_check_frozen(inode->i_sb, SB_FREEZE_WRITE);
+
+That doesn't exist anymore - it was removed over a year ago....
+
+> +
+> +	/* We can write back this queue in page reclaim */
+> +	current->backing_dev_info = mapping->backing_dev_info;
+> +
+> +	err = generic_write_checks(file, &pos, &count, S_ISBLK(inode->i_mode));
+> +	if (err != 0 || count == 0)
+> +		goto done;
+> +
+> +	file_remove_suid(file);
+> +	file_update_time(file);	
+
+error checking?
+
+> +
+> +	count_tmp = count;
+> +	do {
+> +		unsigned long bytes;	/* Bytes to write to page */
+> +		unsigned long offset;	/* Offset into pagecache page */
+> +		struct page *pageP;
+
+camel case
+
+> +		void *fsdata;
+> +
+> +		offset = (pos & (PAGE_CACHE_SIZE - 1));
+> +		bytes = PAGE_CACHE_SIZE - offset;
+> +		if (bytes > count_tmp)
+> +			bytes = count_tmp;
+> +		ret = mapping->a_ops->write_begin(file, mapping, pos, bytes,
+> +						  AOP_FLAG_UNINTERRUPTIBLE,
+> +						  &pageP, &fsdata);
+> +
+> +		if (unlikely(ret)) {
+> +			err = ret;
+> +			for(cPagePtr = 0; cPagePtr < cPagesAllocated; cPagePtr++) {
+> +				kunmap(rv_cb[cPagePtr].rv_page);
+> +				ret = mapping->a_ops->write_end(file, mapping,
+> +								rv_cb[cPagePtr].rv_pos,
+> +								rv_cb[cPagePtr].rv_count,
+> +								rv_cb[cPagePtr].rv_count,
+> +								rv_cb[cPagePtr].rv_page,
+> +								rv_cb[cPagePtr].rv_fsdata);
+> +			}
+> +			goto done;
+> +		}
+> +		rv_cb[cPagesAllocated].rv_page = pageP;
+> +		rv_cb[cPagesAllocated].rv_pos = pos;
+> +		rv_cb[cPagesAllocated].rv_count = bytes;
+> +		rv_cb[cPagesAllocated].rv_fsdata = fsdata;
+> +		iov[cPagesAllocated].iov_base = kmap(pageP) + offset;
+> +		iov[cPagesAllocated].iov_len = bytes;
+> +		cPagesAllocated++;
+> +		count_tmp -= bytes;
+> +		pos += bytes;
+> +	} while (count_tmp);
+
+So, we are nesting up to 32 page locks here. That's bad. And we are
+nesting kmap() calls for all the pages individually - is that even
+safe to do?
+
+So, what happens when we've got 16 pages in, and the filesystem has
+allocated space for those 16 blocks, and we get ENOSPC on the 17th?
+Sure, you undo the state here, but what about the 16 blocks that the
+filesystem has allocated to this file? There's no notification to
+the filesystem that they need to be truncated away because the write
+failed....
+
+> +
+> +	/* IOV is ready, receive the date from socket now */
+> +	msg.msg_name = NULL;
+> +	msg.msg_namelen = 0;
+> +	msg.msg_iov = (struct iovec *)&iov[0];
+> +	msg.msg_iovlen = cPagesAllocated ;
+> +	msg.msg_control = NULL;
+> +	msg.msg_controllen = 0;
+> +	msg.msg_flags = MSG_KERNSPACE;
+> +	rcvtimeo = sock->sk->sk_rcvtimeo;    
+> +	sock->sk->sk_rcvtimeo = 8 * HZ;
+
+We can hold the inode and the pages locked for 8 seconds?
+
+I'll stop there. This is fundamentally broken. It's an attempt to do
+a multi-page write operation without any of the supporting
+structures needed to handle the failure cases properly.  The nested
+page locking has "deadlock" written all over it, and the lack of
+partial failure handling shouts "data corruption" and "stale data
+exposure" to me. The fact it can block for up to 8 seconds waiting
+for network shenanigans to be completed while holding lots of locks
+is going to cause all sorts of problems under memory pressure.
+
+Not to mention it means that all memory allocations in the msgrcv
+path need to be done with GFP_NOFS, because GFP_KERNEL allocations
+are almost guaranteed to deadlock on the locked pages this path
+already holds....
+
+Need I say more?
+
+Cheers,
+
+Dave.
 -- 
-Chen Gang
+Dave Chinner
+david@fromorbit.com
