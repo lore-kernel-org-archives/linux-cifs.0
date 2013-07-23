@@ -1,172 +1,28 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Subject: Re: Recvfile patch used for Samba.
-Date: Tue, 23 Jul 2013 09:31:54 -0400
-Message-ID: <20130723093154.4371f346@tlielax.poochiereds.net>
+Date: Tue, 23 Jul 2013 14:58:58 -0700
+Message-ID: <20130723215858.GB16356@samba2>
 References: <20130722215738.GB20647@samba2>
-	<20130723071027.GJ19986@dastard>
+ <20130723071027.GJ19986@dastard>
+Reply-To: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
 	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 To: Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
 In-Reply-To: <20130723071027.GJ19986@dastard>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 23 Jul 2013 17:10:27 +1000
-Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org> wrote:
-
-> On Mon, Jul 22, 2013 at 02:57:38PM -0700, Jeremy Allison wrote:
-> > Hi Steve and Jeff (and others).
-> > 
-> > Here is a patch that Samba vendors have been using
-> > to implement recvfile (copy directly from socket
-> > to file). It can improve write performance on boxes
-> > by a significant amount (10% or more).
-> 
-> Is that all? It's just moving the memcpy() into the kernel?
-> 
-> > I'm not qualified to evaluate this code, can someone
-> > who is (hi there Steve and Jeff :-) take a look at
-> > this and see if it's work shepherding into the kernel ?
-> 
-> It's pretty nasty.
-> 
-> > 
-> > Cheers,
-> > 
-> > 	Jeremy.
-> 
-> > diff -urp linux-2.6.37-rc5.orig/fs/splice.c linux-2.6.37-rc5/fs/splice.c
-> > --- linux-2.6.37-rc5.orig/fs/splice.c	2010-12-06 20:09:04.000000000 -0800
-> > +++ linux-2.6.37-rc5/fs/splice.c	2010-12-07 16:16:48.000000000 -0800
-> > @@ -31,6 +31,7 @@
-> >  #include <linux/uio.h>
-> >  #include <linux/security.h>
-> >  #include <linux/gfp.h>
-> > +#include <net/sock.h>
-> >  
-> >  /*
-> >   * Attempt to steal a page from a pipe buffer. This should perhaps go into
-> > @@ -1387,6 +1388,141 @@ static long do_splice(struct file *in, l
-> >  	return -EINVAL;
-> >  }
-> >  
-> > +static ssize_t do_splice_from_socket(struct file *file, struct socket *sock,
-> > +				     loff_t __user *ppos, size_t count)
-> > +{		
-> > +	struct address_space *mapping = file->f_mapping;
-> > +	struct inode	*inode = mapping->host;
-> > +	loff_t pos;
-> > +	int count_tmp;
-> > +	int err = 0;
-> > +	int cPagePtr = 0;		
-> > +	int cPagesAllocated = 0;
-> 
-> camel case.
-> 
-> > +	struct recvfile_ctl_blk rv_cb[MAX_PAGES_PER_RECVFILE];
-> 
-> MAX_PAGES_PER_RECVFILE = 32, and the structure is 32 bytes on 64
-> bit. So 1k of stack usage right there. Bad.
-> 
-> > +	struct kvec iov[MAX_PAGES_PER_RECVFILE];
-> 
-> And that's another 512 bytes of stack. Way too much.
-> 
-> > +	struct msghdr msg;
-> 
-> Another ~52 bytes of stack.
-> 
-> > +	long rcvtimeo;
-> > +	int ret;
-> > +
-> > +	if(copy_from_user(&pos, ppos, sizeof(loff_t)))
-> > +		return -EFAULT;
-> > +
-> > +	if(count > MAX_PAGES_PER_RECVFILE * PAGE_SIZE) {
-> > +		printk("%s: count(%u) exceeds maxinum\n", __func__, count);
-> > +		return -EINVAL;
-> > +	}    
-> > +	mutex_lock(&inode->i_mutex);
-> 
-> Locking on write needs to be passed to filesystems, not done by
-> generic code. i.e. this isn't sufficient for XFS, and may also be
-> problematic for btrfs.
-> 
-> > +
-> > +	vfs_check_frozen(inode->i_sb, SB_FREEZE_WRITE);
-> 
-> That doesn't exist anymore - it was removed over a year ago....
-> 
-> > +
-> > +	/* We can write back this queue in page reclaim */
-> > +	current->backing_dev_info = mapping->backing_dev_info;
-> > +
-> > +	err = generic_write_checks(file, &pos, &count, S_ISBLK(inode->i_mode));
-> > +	if (err != 0 || count == 0)
-> > +		goto done;
-> > +
-> > +	file_remove_suid(file);
-> > +	file_update_time(file);	
-> 
-> error checking?
-> 
-> > +
-> > +	count_tmp = count;
-> > +	do {
-> > +		unsigned long bytes;	/* Bytes to write to page */
-> > +		unsigned long offset;	/* Offset into pagecache page */
-> > +		struct page *pageP;
-> 
-> camel case
-> 
-> > +		void *fsdata;
-> > +
-> > +		offset = (pos & (PAGE_CACHE_SIZE - 1));
-> > +		bytes = PAGE_CACHE_SIZE - offset;
-> > +		if (bytes > count_tmp)
-> > +			bytes = count_tmp;
-> > +		ret = mapping->a_ops->write_begin(file, mapping, pos, bytes,
-> > +						  AOP_FLAG_UNINTERRUPTIBLE,
-> > +						  &pageP, &fsdata);
-> > +
-> > +		if (unlikely(ret)) {
-> > +			err = ret;
-> > +			for(cPagePtr = 0; cPagePtr < cPagesAllocated; cPagePtr++) {
-> > +				kunmap(rv_cb[cPagePtr].rv_page);
-> > +				ret = mapping->a_ops->write_end(file, mapping,
-> > +								rv_cb[cPagePtr].rv_pos,
-> > +								rv_cb[cPagePtr].rv_count,
-> > +								rv_cb[cPagePtr].rv_count,
-> > +								rv_cb[cPagePtr].rv_page,
-> > +								rv_cb[cPagePtr].rv_fsdata);
-> > +			}
-> > +			goto done;
-> > +		}
-> > +		rv_cb[cPagesAllocated].rv_page = pageP;
-> > +		rv_cb[cPagesAllocated].rv_pos = pos;
-> > +		rv_cb[cPagesAllocated].rv_count = bytes;
-> > +		rv_cb[cPagesAllocated].rv_fsdata = fsdata;
-> > +		iov[cPagesAllocated].iov_base = kmap(pageP) + offset;
-> > +		iov[cPagesAllocated].iov_len = bytes;
-> > +		cPagesAllocated++;
-> > +		count_tmp -= bytes;
-> > +		pos += bytes;
-> > +	} while (count_tmp);
-> 
+On Tue, Jul 23, 2013 at 05:10:27PM +1000, Dave Chinner wrote:
 > So, we are nesting up to 32 page locks here. That's bad. And we are
 > nesting kmap() calls for all the pages individually - is that even
 > safe to do?
 > 
-
-You can do it, but if you run out of kmap space, it'll hang and you'll
-be screwed. Wouldn't take much either -- just a few of these calls
-running in parallel would be enough to deadlock all of them.
-
 > So, what happens when we've got 16 pages in, and the filesystem has
 > allocated space for those 16 blocks, and we get ENOSPC on the 17th?
 > Sure, you undo the state here, but what about the 16 blocks that the
@@ -202,19 +58,19 @@ running in parallel would be enough to deadlock all of them.
 > are almost guaranteed to deadlock on the locked pages this path
 > already holds....
 > 
+> Need I say more?
 
-Yep, pretty broken.
+No, that's great ! :-).
 
-A better approach might be to hook this call up to the sk_write_space
-callback on the socket. Have it block until there is something to
-actually be read, and then do the loop over the pages one at a time at
-that point until all of the ready data is read (non-blocking) into the
-pages. When you run out of data, unlock everything and go back to
-blocking until there is more or until you hit the "len" passed into the
-syscall.
+Thanks for the analysis. I'd heard it wasn't
+near production quality, but not being a kernel
+engineer myself I wasn't able to make that assessment.
 
-Locking and error handling with that approach would still be pretty
-tricky, however...
+Having said that the OEMs that are using it does
+find it improves write speeds by a large amount (10%
+or more), so it's showing there is room for improvement
+here if the correct code can be created for recvfile.
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cheers,
+
+Jeremy.
