@@ -1,431 +1,476 @@
-From: Dave Chinner <david@fromorbit.com>
-Subject: Re: Recvfile patch used for Samba.
-Date: Wed, 24 Jul 2013 12:47:23 +1000
-Message-ID: <20130724024723.GL19986@dastard>
-References: <20130722215738.GB20647@samba2>
- <20130723071027.GJ19986@dastard>
- <20130723215858.GB16356@samba2>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] [cifs] Change session key to per smb session key for smb2 onwards
+Date: Thu, 25 Jul 2013 00:01:49 -0500
+Message-ID: <CADT32eKKVawCFZ1yXp9YR+A1ZV7JsBnwRZFtc=K5Ed4QwS2U4g@mail.gmail.com>
+References: <1374157882-2642-1-git-send-email-shirishpargaonkar@gmail.com>
+	<20130718153845.0a1dee04@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Steve French <smfrench@gmail.com>, Jeff Layton <jlayton@samba.org>,
-	linux-cifs@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>
-To: Jeremy Allison <jra@samba.org>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20130723215858.GB16356@samba2>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20130718153845.0a1dee04-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Jul 23, 2013 at 02:58:58PM -0700, Jeremy Allison wrote:
-> On Tue, Jul 23, 2013 at 05:10:27PM +1000, Dave Chinner wrote:
-> > So, we are nesting up to 32 page locks here. That's bad. And we are
-> > nesting kmap() calls for all the pages individually - is that even
-> > safe to do?
-> > 
-> > So, what happens when we've got 16 pages in, and the filesystem has
-> > allocated space for those 16 blocks, and we get ENOSPC on the 17th?
-> > Sure, you undo the state here, but what about the 16 blocks that the
-> > filesystem has allocated to this file? There's no notification to
-> > the filesystem that they need to be truncated away because the write
-> > failed....
-> > 
-> > > +
-> > > +	/* IOV is ready, receive the date from socket now */
-> > > +	msg.msg_name = NULL;
-> > > +	msg.msg_namelen = 0;
-> > > +	msg.msg_iov = (struct iovec *)&iov[0];
-> > > +	msg.msg_iovlen = cPagesAllocated ;
-> > > +	msg.msg_control = NULL;
-> > > +	msg.msg_controllen = 0;
-> > > +	msg.msg_flags = MSG_KERNSPACE;
-> > > +	rcvtimeo = sock->sk->sk_rcvtimeo;    
-> > > +	sock->sk->sk_rcvtimeo = 8 * HZ;
-> > 
-> > We can hold the inode and the pages locked for 8 seconds?
-> > 
-> > I'll stop there. This is fundamentally broken. It's an attempt to do
-> > a multi-page write operation without any of the supporting
-> > structures needed to handle the failure cases properly.  The nested
-> > page locking has "deadlock" written all over it, and the lack of
-> > partial failure handling shouts "data corruption" and "stale data
-> > exposure" to me. The fact it can block for up to 8 seconds waiting
-> > for network shenanigans to be completed while holding lots of locks
-> > is going to cause all sorts of problems under memory pressure.
-> > 
-> > Not to mention it means that all memory allocations in the msgrcv
-> > path need to be done with GFP_NOFS, because GFP_KERNEL allocations
-> > are almost guaranteed to deadlock on the locked pages this path
-> > already holds....
-> > 
-> > Need I say more?
-> 
-> No, that's great ! :-).
-> 
-> Thanks for the analysis. I'd heard it wasn't
-> near production quality, but not being a kernel
-> engineer myself I wasn't able to make that assessment.
-> 
-> Having said that the OEMs that are using it does
-> find it improves write speeds by a large amount (10%
-> or more), so it's showing there is room for improvement
-> here if the correct code can be created for recvfile.
+On Thu, Jul 18, 2013 at 2:38 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> On Thu, 18 Jul 2013 09:31:22 -0500
+> shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+>
+>> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>>
+>> ---
+>> Change session key to per session key for SMB2 onwards and start
+>> using that for smb2/smb3 signature generation.
+>> Session key is per connection for CIFS/SMB
+>>
+>> Copy auth key to session key for the first SMB/CIFS session per connection
+>> and free the key.  Free session keys for rest of the session for that
+>> connections.
+>> For SMB2/3, do not copy the session key to server structure.
+>>
+>> Do not check signature for session setup response from the server
+>> even though that packet is signed.
+>>
+>> Set key exchange bit for all the sessions even though it does not
+>> matter for subsequent CIFS/SMB sessions.
+>>
+>
+> Honestly, this ought to be at least 3 patches. Squashing all of this
+> together makes this difficult to review since it's trying to do too
+> much at once.
+>
+>
+>>
+>> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>>
+>> ---
+>>  fs/cifs/cifsencrypt.c   | 20 +++++++++++++
+>>  fs/cifs/cifsglob.h      |  8 ++++--
+>>  fs/cifs/cifsproto.h     |  5 +++-
+>>  fs/cifs/connect.c       | 25 ++++++++++------
+>>  fs/cifs/sess.c          | 17 +++++------
+>>  fs/cifs/smb1ops.c       |  1 +
+>>  fs/cifs/smb2transport.c | 76 +++++++++++++++++++++++++++++++++++++++++++------
+>>  7 files changed, 122 insertions(+), 30 deletions(-)
+>>
+>> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+>> index ce2d331..0e7a34a 100644
+>> --- a/fs/cifs/cifsencrypt.c
+>> +++ b/fs/cifs/cifsencrypt.c
+>> @@ -769,6 +769,26 @@ calc_seckey(struct cifs_ses *ses)
+>>  }
+>>
+>>  void
+>> +free_authkey(struct cifs_ses *ses)
+>> +{
+>> +     kfree(ses->auth_key.response);
+>> +     ses->auth_key.response = NULL;
+>> +     ses->auth_key.len = 0;
+>> +}
+>> +
+>> +int
+>> +perconnkey(struct TCP_Server_Info *server, struct cifs_ses *ses)
+>> +{
+>> +     server->session_key.response = kmemdup(ses->auth_key.response,
+>> +                     ses->auth_key.len, GFP_KERNEL);
+>> +     if (!server->session_key.response)
+>> +             return -ENOMEM;
+>> +     server->session_key.len = ses->auth_key.len;
+>> +
+>> +     return 0;
+>> +}
+>> +
+>> +void
+>>  cifs_crypto_shash_release(struct TCP_Server_Info *server)
+>>  {
+>>       if (server->secmech.cmacaes) {
+>> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+>> index 88280e0..3a3420b 100644
+>> --- a/fs/cifs/cifsglob.h
+>> +++ b/fs/cifs/cifsglob.h
+>> @@ -366,7 +366,11 @@ struct smb_version_operations {
+>>       /* generate new lease key */
+>>       void (*new_lease_key)(struct cifs_fid *fid);
+>>       /* The next two functions will need to be changed to per smb session */
+>> -     void (*generate_signingkey)(struct TCP_Server_Info *server);
+>> +     int (*generate_signingkey)(struct TCP_Server_Info *server,
+>> +                                     struct cifs_ses *ses);
+>> +     int (*perconnkey)(struct TCP_Server_Info *server,
+>> +                                     struct cifs_ses *ses);
+>> +     void (*free_authkey)(struct cifs_ses *ses);
+>
+> Hmmm...nothing sets this free_authkey op.
+>
+>>       int (*calc_signature)(struct smb_rqst *rqst,
+>>                                  struct TCP_Server_Info *server);
+>>       int (*query_mf_symlink)(const unsigned char *path, char *pbuf,
+>> @@ -548,7 +552,6 @@ struct TCP_Server_Info {
+>>       int timeAdj;  /* Adjust for difference in server time zone in sec */
+>>       __u64 CurrentMid;         /* multiplex id - rotating counter */
+>>       char cryptkey[CIFS_CRYPTO_KEY_SIZE]; /* used by ntlm, ntlmv2 etc */
+>> -     char smb3signingkey[SMB3_SIGN_KEY_SIZE]; /* for signing smb3 packets */
+>>       /* 16th byte of RFC1001 workstation name is always null */
+>>       char workstation_RFC1001_name[RFC1001_NAME_LEN_WITH_NULL];
+>>       __u32 sequence_number; /* for signing, protected by srv_mutex */
+>> @@ -731,6 +734,7 @@ struct cifs_ses {
+>>       bool need_reconnect:1; /* connection reset, uid now invalid */
+>>  #ifdef CONFIG_CIFS_SMB2
+>>       __u16 session_flags;
+>> +     char smb3signingkey[SMB3_SIGN_KEY_SIZE]; /* for signing smb3 packets */
+>>  #endif /* CONFIG_CIFS_SMB2 */
+>>  };
+>>
+>> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+>> index b29a012..cb65f9d 100644
+>> --- a/fs/cifs/cifsproto.h
+>> +++ b/fs/cifs/cifsproto.h
+>> @@ -435,7 +435,10 @@ extern int setup_ntlm_response(struct cifs_ses *, const struct nls_table *);
+>>  extern int setup_ntlmv2_rsp(struct cifs_ses *, const struct nls_table *);
+>>  extern void cifs_crypto_shash_release(struct TCP_Server_Info *);
+>>  extern int calc_seckey(struct cifs_ses *);
+>> -extern void generate_smb3signingkey(struct TCP_Server_Info *);
+>> +extern int generate_smb3signingkey(struct TCP_Server_Info *,
+>> +                                     struct cifs_ses *);
+>> +extern int perconnkey(struct TCP_Server_Info *, struct cifs_ses *);
+>> +extern void free_authkey(struct cifs_ses *);
+>>
+>>  #ifdef CONFIG_CIFS_WEAK_PW_HASH
+>>  extern int calc_lanman_hash(const char *password, const char *cryptkey,
+>> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+>> index ed6bf20..5cc273c 100644
+>> --- a/fs/cifs/connect.c
+>> +++ b/fs/cifs/connect.c
+>> @@ -2118,6 +2118,8 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+>>               goto out_err_crypto_release;
+>>       }
+>>
+>> +     tcp_ses->session_key.response = NULL;
+>> +     tcp_ses->session_key.len = 0;
+>>       tcp_ses->noblocksnd = volume_info->noblocksnd;
+>>       tcp_ses->noautotune = volume_info->noautotune;
+>>       tcp_ses->tcp_nodelay = volume_info->sockopt_tcp_nodelay;
+>> @@ -2271,6 +2273,8 @@ cifs_put_smb_ses(struct cifs_ses *ses)
+>>               server->ops->logoff(xid, ses);
+>>               _free_xid(xid);
+>>       }
+>> +     if (!server->ops->free_authkey)
+>> +             free_authkey(ses);
+>
+> Don't you need to call server->ops->free_authkey here? What's the
+> significance of checking the operation vector if you never actually call
+> it?
+>
+>>       sesInfoFree(ses);
+>>       cifs_put_tcp_session(server);
+>>  }
+>> @@ -2485,6 +2489,9 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
+>>       ses->sectype = volume_info->sectype;
+>>       ses->sign = volume_info->sign;
+>>
+>> +     ses->auth_key.response = NULL;
+>> +     ses->auth_key.len = 0;
+>> +
+>>       mutex_lock(&ses->session_mutex);
+>>       rc = cifs_negotiate_protocol(xid, ses);
+>>       if (!rc)
+>> @@ -3831,13 +3838,15 @@ cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
+>>       } else {
+>>               mutex_lock(&server->srv_mutex);
+>>               if (!server->session_estab) {
+>> -                     server->session_key.response = ses->auth_key.response;
+>> -                     server->session_key.len = ses->auth_key.len;
+>
+> Hmm ok, so the old code assumed that the first ses was going to hang
+> around for the life of the connection, right? So does the old code have
+> a potential use-after-free? If so, then that ought to be a separate
+> patch as well that we can push to stable.
 
-10% is not very large gain given the complexity it adds, and I
-question that the gain actually comes from moving the memcpy() into
-the kernel.  If this recvfile code enabled zero-copy behaviour into
-the page cache, then it would be worth pursuing. But it doesn't, and
-so IMO the complexity is not worth the gain right now.
+I checked, there is no use-after-free case in the current code.
+session key off of smb connection points to the first smb session's
+auth key and continues doing so for the life of smb connection.
+auth keys (session keys) of subsequent smb session do get freed.
 
-Indeed, I suspect the 10% gain will be from the multi-page write
-behaviour that was hacked into the code. I wrote a multi-page
-write prototype ~3 years ago that showed write(2) performance gains
-of roughly 10% on low CPU power machines running XFS.
-
-$ git branch |grep multi
-  multipage-write
-$ git checkout multipage-write 
-Checking out files: 100% (45114/45114), done.
-Switched to branch 'multipage-write'
-$ head -4 Makefile 
-VERSION = 2
-PATCHLEVEL = 6
-SUBLEVEL = 37
-EXTRAVERSION = -rc6
-$
-
-I should probably pick this up again and push it forwards. FWIW,
-I've attached the first multipage-write infrastructure patch from
-the above branch to show how this sort of operation needs to be done
-from a filesystem and page-cache perspective to avoid locking
-problems have sane error handling.
-
-I beleive the version that Christoph implemented for a couple of
-OEMs around that time de-multiplexed the ->iomap method....
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
-
-multipage-write: introduce iomap infrastructure
-
-From: Dave Chinner <dchinner@redhat.com>
-
-Add infrastructure for multipage writes by defining the mapping interface
-that the multipage writes will use and the main multipage write loop.
-
-Signed-off-by: Dave Chinner <dchinner@redhat.com>
-
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 76041b6..1196877 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -513,6 +513,7 @@ enum positive_aop_returns {
- struct page;
- struct address_space;
- struct writeback_control;
-+struct iomap;
- 
- struct iov_iter {
- 	const struct iovec *iov;
-@@ -604,6 +605,9 @@ struct address_space_operations {
- 	int (*is_partially_uptodate) (struct page *, read_descriptor_t *,
- 					unsigned long);
- 	int (*error_remove_page)(struct address_space *, struct page *);
-+
-+	int (*iomap)(struct address_space *mapping, loff_t pos,
-+			ssize_t length, struct iomap *iomap, int cmd);
- };
- 
- /*
-diff --git a/include/linux/iomap.h b/include/linux/iomap.h
-new file mode 100644
-index 0000000..7708614
---- /dev/null
-+++ b/include/linux/iomap.h
-@@ -0,0 +1,45 @@
-+#ifndef _IOMAP_H
-+#define _IOMAP_H
-+
-+/* ->iomap a_op command types */
-+#define IOMAP_READ	0x01	/* read the current mapping starting at the
-+				   given position, trimmed to a maximum length.
-+				   FS's should use this to obtain and lock
-+				   resources within this range */
-+#define	IOMAP_RESERVE	0x02	/* reserve space for an allocation that spans
-+				   the given iomap */
-+#define IOMAP_ALLOCATE	0x03	/* allocate space in a given iomap - must have
-+				   first been reserved */
-+#define	IOMAP_UNRESERVE	0x04	/* return unused reserved space for the given
-+				   iomap and used space. This will always be
-+				   called after a IOMAP_READ so as to allow the
-+				   FS to release held resources. */
-+
-+/* types of block ranges for multipage write mappings. */
-+#define IOMAP_HOLE	0x01	/* no blocks allocated, need allocation */
-+#define IOMAP_DELALLOC	0x02	/* delayed allocation blocks */
-+#define IOMAP_MAPPED	0x03	/* blocks allocated @blkno */
-+#define IOMAP_UNWRITTEN	0x04	/* blocks allocated @blkno in unwritten state */
-+
-+struct iomap {
-+	sector_t	blkno;	/* first sector of mapping */
-+	loff_t		offset;	/* file offset of mapping, bytes */
-+	ssize_t		length;	/* length of mapping, bytes */
-+	int		type;	/* type of mapping */
-+	void		*priv;	/* fs private data associated with map */
-+};
-+
-+static inline bool
-+iomap_needs_allocation(struct iomap *iomap)
-+{
-+	return iomap->type == IOMAP_HOLE;
-+}
-+
-+/* multipage write interfaces use iomaps */
-+typedef int (*mpw_actor_t)(struct address_space *mapping, void *src,
-+			loff_t pos, ssize_t len, struct iomap *iomap);
-+
-+ssize_t multipage_write_segment(struct address_space *mapping, void *src,
-+			loff_t pos, ssize_t length, mpw_actor_t actor);
-+
-+#endif /* _IOMAP_H */
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 3d4df44..27e2f7d 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -12,6 +12,7 @@
- #include <linux/module.h>
- #include <linux/compiler.h>
- #include <linux/fs.h>
-+#include <linux/iomap.h>
- #include <linux/uaccess.h>
- #include <linux/aio.h>
- #include <linux/capability.h>
-@@ -2221,10 +2222,14 @@ repeat:
- }
- EXPORT_SYMBOL(grab_cache_page_write_begin);
- 
--static ssize_t generic_perform_write(struct file *file,
--				struct iov_iter *i, loff_t pos)
-+static ssize_t
-+__generic_perform_write(
-+	struct file		*file,
-+	struct address_space	*mapping,
-+	struct iov_iter		*i,
-+	loff_t			pos,
-+	void			*priv)
- {
--	struct address_space *mapping = file->f_mapping;
- 	const struct address_space_operations *a_ops = mapping->a_ops;
- 	long status = 0;
- 	ssize_t written = 0;
-@@ -2241,7 +2246,6 @@ static ssize_t generic_perform_write(struct file *file,
- 		unsigned long offset;	/* Offset into pagecache page */
- 		unsigned long bytes;	/* Bytes to write to page */
- 		size_t copied;		/* Bytes copied from user */
--		void *fsdata;
- 
- 		offset = (pos & (PAGE_CACHE_SIZE - 1));
- 		bytes = min_t(unsigned long, PAGE_CACHE_SIZE - offset,
-@@ -2265,7 +2269,7 @@ again:
- 		}
- 
- 		status = a_ops->write_begin(file, mapping, pos, bytes, flags,
--						&page, &fsdata);
-+						&page, priv);
- 		if (unlikely(status))
- 			break;
- 
-@@ -2279,7 +2283,7 @@ again:
- 
- 		mark_page_accessed(page);
- 		status = a_ops->write_end(file, mapping, pos, bytes, copied,
--						page, fsdata);
-+						page, priv);
- 		if (unlikely(status < 0))
- 			break;
- 		copied = status;
-@@ -2310,6 +2314,159 @@ again:
- 	return written ? written : status;
- }
- 
-+static int
-+multipage_write_actor(
-+	struct address_space	*mapping,
-+	void			*src,
-+	loff_t			pos,
-+	ssize_t			length,
-+	struct iomap		*iomap)
-+{
-+	struct iov_iter		*i = src;
-+
-+	return __generic_perform_write(NULL, mapping, i, pos, iomap);
-+}
-+
-+/*
-+ * Execute a multipage write on a segment of the mapping that spans a
-+ * contiguous range of pages that have identical block mapping state.
-+ * This avoids the need to map pages individually, do individual allocations
-+ * for each page and most importantly avoid the need for filesystem specific
-+ * locking per page. Instead, all the operations are amortised over the entire
-+ * range of pages. It is assumed that the filesystems will lock whatever
-+ * resources they require in the IOMAP_READ call, and release them in the
-+ * IOMAP_COMPLETE call.
-+ */
-+ssize_t
-+multipage_write_segment(
-+	struct address_space	*mapping,
-+	void			*src,
-+	loff_t			pos,
-+	ssize_t			length,
-+	mpw_actor_t		actor)
-+{
-+	const struct address_space_operations *a_ops = mapping->a_ops;
-+	long			status;
-+	bool			need_alloc;
-+	struct iomap		iomap = { 0 };
-+
-+	/*
-+	 * need to map a range from start position for count bytes. This can
-+	 * span multiple pages - it is only guaranteed to return a range of a
-+	 * single type of pages (e.g. all into a hole, all mapped or all
-+	 * unwritten). Failure at this point has nothing to undo.
-+	 *
-+	 * We cap the maximum length we map here to MAX_WRITEBACK_PAGES pages
-+	 * to keep the chunks of work done where somewhat symmetric with the
-+	 * work writeback does. This is a completely arbitrary number pulled
-+	 * out of thin air as a best guess for initial testing.
-+	 */
-+	length = min_t(ssize_t, length, 1024 * PAGE_SIZE);
-+	status = a_ops->iomap(mapping, pos, length, &iomap, IOMAP_READ);
-+	if (status)
-+		goto out;
-+
-+	/*
-+	 * If allocation is required for this range, reserve the space now so
-+	 * that the allocation is guaranteed to succeed later on. Once we copy
-+	 * the data into the page cache pages, then we cannot fail otherwise we
-+	 * expose transient stale data. If the reserve fails, we can safely
-+	 * back out at this point as there is nothing to undo.
-+	 */
-+	need_alloc = iomap_needs_allocation(&iomap);
-+	if (need_alloc) {
-+		status = a_ops->iomap(mapping, pos, length, &iomap, IOMAP_RESERVE);
-+		if (status)
-+			goto out;
-+	}
-+
-+	/*
-+	 * because we have now guaranteed that the space allocation will
-+	 * succeed, we can do the copy-in page by page without having to worry
-+	 * about failures exposing transient data. Hence we can mostly reuse
-+	 * the existing method of:
-+	 *	- grab and lock page
-+	 *	- set up page mapping structures (e.g. bufferheads)
-+	 *	- copy data in
-+	 *	- update page state and unlock page
-+	 *
-+	 * This avoids the need to hold MAX_WRITEBACK_PAGES locked at once
-+	 * while we execute the copy-in. It does mean, however, that the
-+	 * filesystem needs to avoid any attempts at writeback of pages in this
-+	 * iomap until the allocation is completed after the copyin.
-+	 *
-+	 * XXX: needs to be done per-filesystem in ->writepage
-+	 */
-+
-+	status = actor(mapping, src, pos, length, &iomap);
-+	printk("mpws: pos %lld, len %lld, status %lld\n", pos, length, status);
-+	if (status == -ERANGE)
-+		status = 0;
-+	if (status <= 0)
-+		goto out_failed_write;
-+
-+	/* now the data has been copied, allocate the range we've copied */
-+	if (need_alloc) {
-+		int error;
-+		/*
-+		 * allocate should not fail unless the filesystem has had a
-+		 * fatal error. Issue a warning here to track this situation.
-+		 */
-+		error = a_ops->iomap(mapping, pos, status, &iomap, IOMAP_ALLOCATE);
-+		if (error) {
-+			WARN_ON(0);
-+			status = error;
-+			/* XXX: mark all pages not-up-to-date? */
-+			goto out_failed_write;
-+		}
-+	}
-+
-+
-+out:
-+	return status;
-+	/*
-+	 * if we copied less than we reserved, release any unused
-+	 * reservation we hold so that we don't leak the space. Unreserving
-+	 * space never fails.
-+	 */
-+out_failed_write:
-+	if (need_alloc)
-+		a_ops->iomap(mapping, pos, 0, &iomap, IOMAP_UNRESERVE);
-+	return status;
-+}
-+EXPORT_SYMBOL(multipage_write_segment);
-+
-+/*
-+ * Loop writing multiple pages in segments until we have run out
-+ * of data to write in the iovec iterator.
-+ */
-+static ssize_t
-+generic_perform_multipage_write(struct file *file,
-+				struct iov_iter *i, loff_t pos)
-+{
-+	long status = 0;
-+	ssize_t written = 0;
-+
-+	do {
-+		status = multipage_write_segment(file->f_mapping, i, pos,
-+				iov_iter_count(i), multipage_write_actor);
-+		if (status <= 0)
-+			break;
-+		pos += status;
-+		written += status;
-+	} while (iov_iter_count(i));
-+
-+	return written ? written : status;
-+}
-+
-+static ssize_t generic_perform_write(struct file *file,
-+				struct iov_iter *i, loff_t pos)
-+{
-+	void *fs_data;
-+
-+	return __generic_perform_write(file, file->f_mapping, i, pos, &fs_data);
-+}
-+
- ssize_t
- generic_file_buffered_write(struct kiocb *iocb, const struct iovec *iov,
- 		unsigned long nr_segs, loff_t pos, loff_t *ppos,
-@@ -2320,13 +2477,17 @@ generic_file_buffered_write(struct kiocb *iocb, const struct iovec *iov,
- 	struct iov_iter i;
- 
- 	iov_iter_init(&i, iov, nr_segs, count, written);
--	status = generic_perform_write(file, &i, pos);
-+
-+	if (file->f_mapping->a_ops->iomap)
-+		status = generic_perform_multipage_write(file, &i, pos);
-+	else
-+		status = generic_perform_write(file, &i, pos);
- 
- 	if (likely(status >= 0)) {
- 		written += status;
- 		*ppos = pos + status;
--  	}
--	
-+	}
-+
- 	return written ? written : status;
- }
- EXPORT_SYMBOL(generic_file_buffered_write);
+>
+>> +                     if (server->ops->perconnkey) {
+>> +                             rc = server->ops->perconnkey(server, ses);
+>> +                             if (rc) {
+>> +                                     mutex_unlock(&server->srv_mutex);
+>> +                                     goto setup_sess_ret;
+>> +                             }
+>> +                     }
+>>                       server->sequence_number = 0x2;
+>>                       server->session_estab = true;
+>> -                     ses->auth_key.response = NULL;
+>> -                     if (server->ops->generate_signingkey)
+>> -                             server->ops->generate_signingkey(server);
+>>               }
+>>               mutex_unlock(&server->srv_mutex);
+>>
+>> @@ -3848,9 +3857,9 @@ cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
+>>               spin_unlock(&GlobalMid_Lock);
+>>       }
+>>
+>> -     kfree(ses->auth_key.response);
+>> -     ses->auth_key.response = NULL;
+>> -     ses->auth_key.len = 0;
+>> +setup_sess_ret:
+>> +     if (server->ops->free_authkey)
+>> +             free_authkey(ses);
+>
+> Again, this will never get called since free_authkey is never set.
+>
+>>       kfree(ses->ntlmssp);
+>>       ses->ntlmssp = NULL;
+>>
+>> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+>> index 106a575..1884884 100644
+>> --- a/fs/cifs/sess.c
+>> +++ b/fs/cifs/sess.c
+>> @@ -426,11 +426,8 @@ void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
+>>       flags = NTLMSSP_NEGOTIATE_56 |  NTLMSSP_REQUEST_TARGET |
+>>               NTLMSSP_NEGOTIATE_128 | NTLMSSP_NEGOTIATE_UNICODE |
+>>               NTLMSSP_NEGOTIATE_NTLM | NTLMSSP_NEGOTIATE_EXTENDED_SEC;
+>> -     if (ses->server->sign) {
+>> -             flags |= NTLMSSP_NEGOTIATE_SIGN;
+>> -             if (!ses->server->session_estab)
+>> -                     flags |= NTLMSSP_NEGOTIATE_KEY_XCH;
+>> -     }
+>> +     if (ses->server->sign)
+>> +             flags |= NTLMSSP_NEGOTIATE_SIGN | NTLMSSP_NEGOTIATE_KEY_XCH;
+>>
+>>       sec_blob->NegotiateFlags = cpu_to_le32(flags);
+>>
+>> @@ -464,11 +461,8 @@ int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+>>               NTLMSSP_REQUEST_TARGET | NTLMSSP_NEGOTIATE_TARGET_INFO |
+>>               NTLMSSP_NEGOTIATE_128 | NTLMSSP_NEGOTIATE_UNICODE |
+>>               NTLMSSP_NEGOTIATE_NTLM | NTLMSSP_NEGOTIATE_EXTENDED_SEC;
+>> -     if (ses->server->sign) {
+>> -             flags |= NTLMSSP_NEGOTIATE_SIGN;
+>> -             if (!ses->server->session_estab)
+>> -                     flags |= NTLMSSP_NEGOTIATE_KEY_XCH;
+>> -     }
+>> +     if (ses->server->sign)
+>> +             flags |= NTLMSSP_NEGOTIATE_SIGN | NTLMSSP_NEGOTIATE_KEY_XCH;
+>>
+>
+> The above two deltas really ought to be a separate patch, with a
+> description of why you're making this change.
+>
+>>       tmp = pbuffer + sizeof(AUTHENTICATE_MESSAGE);
+>>       sec_blob->NegotiateFlags = cpu_to_le32(flags);
+>> @@ -734,6 +728,7 @@ ssetup_ntlmssp_authenticate:
+>>               pSMB->req_no_secext.CaseSensitivePasswordLength =
+>>                       cpu_to_le16(CIFS_AUTH_RESP_SIZE);
+>>
+>> +             free_authkey(ses);
+>>               /* calculate ntlm response and session key */
+>>               rc = setup_ntlm_response(ses, nls_cp);
+>>               if (rc) {
+>> @@ -760,6 +755,7 @@ ssetup_ntlmssp_authenticate:
+>>               } else
+>>                       ascii_ssetup_strings(&bcc_ptr, ses, nls_cp);
+>>       } else if (type == NTLMv2) {
+>> +             free_authkey(ses);
+>>               pSMB->req_no_secext.Capabilities = cpu_to_le32(capabilities);
+>>
+>>               /* LM2 password would be here if we supported it */
+>> @@ -858,6 +854,7 @@ ssetup_ntlmssp_authenticate:
+>>               pSMB->req.Capabilities |= cpu_to_le32(capabilities);
+>>               switch(phase) {
+>>               case NtLmNegotiate:
+>> +                     free_authkey(ses);
+>>                       build_ntlmssp_negotiate_blob(
+>>                               pSMB->req.SecurityBlob, ses);
+>>                       iov[1].iov_len = sizeof(NEGOTIATE_MESSAGE);
+>> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+>> index 6094397..65a94a5 100644
+>> --- a/fs/cifs/smb1ops.c
+>> +++ b/fs/cifs/smb1ops.c
+>> @@ -945,6 +945,7 @@ struct smb_version_operations smb1_operations = {
+>>       .mand_unlock_range = cifs_unlock_range,
+>>       .push_mand_locks = cifs_push_mandatory_locks,
+>>       .query_mf_symlink = open_query_close_cifs_symlink,
+>> +     .perconnkey = perconnkey,
+>>  };
+>>
+>>  struct smb_version_values smb1_values = {
+>> diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+>> index 301b191..eee058d 100644
+>> --- a/fs/cifs/smb2transport.c
+>> +++ b/fs/cifs/smb2transport.c
+>> @@ -109,6 +109,23 @@ smb3_crypto_shash_allocate(struct TCP_Server_Info *server)
+>>       return 0;
+>>  }
+>>
+>> +static struct cifs_ses *
+>> +smb2_find_smb_ses(struct smb2_hdr *smb2hdr, struct TCP_Server_Info *server)
+>> +{
+>> +     struct cifs_ses *ses;
+>> +
+>> +     spin_lock(&cifs_tcp_ses_lock);
+>> +     list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
+>> +             if (ses->Suid != smb2hdr->SessionId)
+>> +                     continue;
+>> +             ++ses->ses_count;
+>> +             spin_unlock(&cifs_tcp_ses_lock);
+>> +             return ses;
+>> +     }
+>> +     spin_unlock(&cifs_tcp_ses_lock);
+>> +
+>> +     return NULL;
+>> +}
+>>
+>>  int
+>>  smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+>> @@ -119,23 +136,40 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+>>       struct kvec *iov = rqst->rq_iov;
+>>       int n_vec = rqst->rq_nvec;
+>>       struct smb2_hdr *smb2_pdu = (struct smb2_hdr *)iov[0].iov_base;
+>> +     struct cifs_ses *ses;
+>> +
+>> +     ses = smb2_find_smb_ses(smb2_pdu, server);
+>> +     if (!ses) {
+>> +             cifs_dbg(VFS, "%s: Could not find session\n", __func__);
+>> +             return 0;
+>> +     }
+>>
+>>       memset(smb2_signature, 0x0, SMB2_HMACSHA256_SIZE);
+>>       memset(smb2_pdu->Signature, 0x0, SMB2_SIGNATURE_SIZE);
+>>
+>>       rc = smb2_crypto_shash_allocate(server);
+>>       if (rc) {
+>> +             spin_lock(&cifs_tcp_ses_lock);
+>> +             --ses->ses_count;
+>> +             spin_unlock(&cifs_tcp_ses_lock);
+>
+> NAK: The whole point of the ses_count is to act as a refcount. So, what
+> happens here if all other references other than the one you hold go
+> away and then you just decrement it here without actually freeing
+> anything?
+>
+> You really want to be using cifs_put_smb_ses() in these places.
+>
+>>               cifs_dbg(VFS, "%s: shah256 alloc failed\n", __func__);
+>>               return rc;
+>>       }
+>>
+>>       rc = crypto_shash_setkey(server->secmech.hmacsha256,
+>> -             server->session_key.response, SMB2_NTLMV2_SESSKEY_SIZE);
+>> +             ses->auth_key.response, SMB2_NTLMV2_SESSKEY_SIZE);
+>>       if (rc) {
+>> +             spin_lock(&cifs_tcp_ses_lock);
+>> +             --ses->ses_count;
+>> +             spin_unlock(&cifs_tcp_ses_lock);
+>>               cifs_dbg(VFS, "%s: Could not update with response\n", __func__);
+>>               return rc;
+>>       }
+>>
+>> +     spin_lock(&cifs_tcp_ses_lock);
+>> +     --ses->ses_count;
+>> +     spin_unlock(&cifs_tcp_ses_lock);
+>> +
+>>       rc = crypto_shash_init(&server->secmech.sdeschmacsha256->shash);
+>>       if (rc) {
+>>               cifs_dbg(VFS, "%s: Could not init sha256", __func__);
+>> @@ -193,8 +227,8 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+>>       return rc;
+>>  }
+>>
+>> -void
+>> -generate_smb3signingkey(struct TCP_Server_Info *server)
+>> +int
+>> +generate_smb3signingkey(struct TCP_Server_Info *server, struct cifs_ses *ses)
+>>  {
+>>       unsigned char zero = 0x0;
+>>       __u8 i[4] = {0, 0, 0, 1};
+>> @@ -204,7 +238,7 @@ generate_smb3signingkey(struct TCP_Server_Info *server)
+>>       unsigned char *hashptr = prfhash;
+>>
+>>       memset(prfhash, 0x0, SMB2_HMACSHA256_SIZE);
+>> -     memset(server->smb3signingkey, 0x0, SMB3_SIGNKEY_SIZE);
+>> +     memset(ses->smb3signingkey, 0x0, SMB3_SIGNKEY_SIZE);
+>>
+>>       rc = smb3_crypto_shash_allocate(server);
+>>       if (rc) {
+>> @@ -213,7 +247,7 @@ generate_smb3signingkey(struct TCP_Server_Info *server)
+>>       }
+>>
+>>       rc = crypto_shash_setkey(server->secmech.hmacsha256,
+>> -             server->session_key.response, SMB2_NTLMV2_SESSKEY_SIZE);
+>> +             ses->auth_key.response, SMB2_NTLMV2_SESSKEY_SIZE);
+>>       if (rc) {
+>>               cifs_dbg(VFS, "%s: Could not set with session key\n", __func__);
+>>               goto smb3signkey_ret;
+>> @@ -267,27 +301,50 @@ generate_smb3signingkey(struct TCP_Server_Info *server)
+>>               goto smb3signkey_ret;
+>>       }
+>>
+>> -     memcpy(server->smb3signingkey, hashptr, SMB3_SIGNKEY_SIZE);
+>> +     memcpy(ses->smb3signingkey, hashptr, SMB3_SIGNKEY_SIZE);
+>>
+>>  smb3signkey_ret:
+>> -     return;
+>> +     return rc;
+>>  }
+>>
+>>  int
+>>  smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+>>  {
+>> -     int i, rc;
+>> +     int i;
+>> +     int rc = 0;
+>>       unsigned char smb3_signature[SMB2_CMACAES_SIZE];
+>>       unsigned char *sigptr = smb3_signature;
+>>       struct kvec *iov = rqst->rq_iov;
+>>       int n_vec = rqst->rq_nvec;
+>>       struct smb2_hdr *smb2_pdu = (struct smb2_hdr *)iov[0].iov_base;
+>> +     struct cifs_ses *ses;
+>> +
+>> +     ses = smb2_find_smb_ses(smb2_pdu, server);
+>> +     if (!ses) {
+>> +             cifs_dbg(VFS, "%s: Could not find session\n", __func__);
+>> +             return 0;
+>> +     }
+>> +
+>> +     if (server->ops->generate_signingkey)
+>> +             rc = server->ops->generate_signingkey(server, ses);
+>> +     if (rc) {
+>> +             spin_lock(&cifs_tcp_ses_lock);
+>> +             --ses->ses_count;
+>> +             spin_unlock(&cifs_tcp_ses_lock);
+>> +             cifs_dbg(VFS, "%s: crypto alloc failed\n", __func__);
+>> +             return rc;
+>> +     }
+>>
+>>       memset(smb3_signature, 0x0, SMB2_CMACAES_SIZE);
+>>       memset(smb2_pdu->Signature, 0x0, SMB2_SIGNATURE_SIZE);
+>>
+>>       rc = crypto_shash_setkey(server->secmech.cmacaes,
+>> -             server->smb3signingkey, SMB2_CMACAES_SIZE);
+>> +             ses->smb3signingkey, SMB2_CMACAES_SIZE);
+>> +
+>> +     spin_lock(&cifs_tcp_ses_lock);
+>> +     --ses->ses_count;
+>> +     spin_unlock(&cifs_tcp_ses_lock);
+>> +
+>>       if (rc) {
+>>               cifs_dbg(VFS, "%s: Could not set key for cmac aes\n", __func__);
+>>               return rc;
+>> @@ -384,6 +441,7 @@ smb2_verify_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+>>       struct smb2_hdr *smb2_pdu = (struct smb2_hdr *)rqst->rq_iov[0].iov_base;
+>>
+>>       if ((smb2_pdu->Command == SMB2_NEGOTIATE) ||
+>> +         (smb2_pdu->Command == SMB2_SESSION_SETUP_HE) ||
+>>           (smb2_pdu->Command == SMB2_OPLOCK_BREAK) ||
+>
+> Why are you using the _HE version of this here? The other comparisons
+> here are vs. the LE versions.
+>
+>>           (!server->session_estab))
+>>               return 0;
+>
+>
+> --
+> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
