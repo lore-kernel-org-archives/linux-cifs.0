@@ -1,42 +1,70 @@
 From: Andi Shyti <andi-ahk0KpmfxKRAfugRpC6u6w@public.gmane.org>
-Subject: Re: [PATCH 2/2] cifs: file: initialize oparms.reconnect before using
- it
-Date: Mon, 29 Jul 2013 10:33:25 +0200
-Message-ID: <20130729083325.GA1948@jack.whiskey>
-References: <CAH2r5msP8+qZnb38Rj5WMWmqWFtopmoe671G6TNTB=61BvYEnA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Andi Shyti <andi-ahk0KpmfxKRAfugRpC6u6w@public.gmane.org>, mikko.rapeli-X3B1VOXEql0@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH RESEND] cifs: file: initialize oparms.reconnect before using it
+Date: Mon, 29 Jul 2013 10:58:13 +0200
+Message-ID: <1375088293-14110-1-git-send-email-andi@etezian.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	mikko.rapeli-X3B1VOXEql0@public.gmane.org, jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <CAH2r5msP8+qZnb38Rj5WMWmqWFtopmoe671G6TNTB=61BvYEnA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi Steve,
+In the cifs_reopen_file function, if the following statement is
+asserted:
 
-> Your patch looks reasonable.   Would you repost the patch to
-> linux-cifs mailing list (and add any additional reviewers or testers
-> if you would like if you got feedback)?
+(tcon->unix_ext && cap_unix(tcon->ses) &&
+		(CIFS_UNIX_POSIX_PATH_OPS_CAP &
+		(tcon->fsUnixInfo.Capability)))
 
-Thanks for your mail,
+and we succeed to open with cifs_posix_open, the function jumps
+to the label reopen_success and checks for oparms.reconnect
+which is not initialized.
 
-Actually linux-cifs is on CC and this is the output of
-get_maintainer:
+To avoid this the oparms structure initialization is anticipated
+before the if statement.
 
-Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> (supporter:COMMON INTERNET F...)
-linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org (open list:COMMON INTERNET F...)
-samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org (moderated list:COMMON INTERNET F...)
-linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org (open list)
+This issue has been reported by scan.coverity.com
 
-All are on CC. get_maintainers, indeed sometimes is not very
-precise since gets the CC list by doing a git blame on the file
-and adding the ones who previously modified the specific lines.
+Signed-off-by: Andi Shyti <andi-ahk0KpmfxKRAfugRpC6u6w@public.gmane.org>
+---
+ fs/cifs/file.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-If this patch got lost I could enrich my To/Cc list by looking at
-git shortlog and more carefully at git blame.
-
-Thanks,
-Andi
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 1e57f36..fbeaf45 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -632,6 +632,15 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
+ 	else
+ 		oplock = 0;
+ 
++	oparms.tcon = tcon;
++	oparms.cifs_sb = cifs_sb;
++	oparms.desired_access = desired_access;
++	oparms.create_options = create_options;
++	oparms.disposition = disposition;
++	oparms.path = full_path;
++	oparms.fid = &cfile->fid;
++	oparms.reconnect = true;
++
+ 	if (tcon->unix_ext && cap_unix(tcon->ses) &&
+ 	    (CIFS_UNIX_POSIX_PATH_OPS_CAP &
+ 				le64_to_cpu(tcon->fsUnixInfo.Capability))) {
+@@ -663,15 +672,6 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
+ 	if (server->ops->get_lease_key)
+ 		server->ops->get_lease_key(inode, &cfile->fid);
+ 
+-	oparms.tcon = tcon;
+-	oparms.cifs_sb = cifs_sb;
+-	oparms.desired_access = desired_access;
+-	oparms.create_options = create_options;
+-	oparms.disposition = disposition;
+-	oparms.path = full_path;
+-	oparms.fid = &cfile->fid;
+-	oparms.reconnect = true;
+-
+ 	/*
+ 	 * Can not refresh inode by passing in file_info buf to be returned by
+ 	 * CIFSSMBOpen and then calling get_inode_info with returned buf since
+-- 
+1.8.3.2
