@@ -1,38 +1,85 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [patch] cifs: arrays are never NULL
-Date: Sun, 28 Jul 2013 23:26:09 +0300
-Message-ID: <20130728202609.GB8684@elgon.mountain>
+From: Chen Gang <gang.chen-bOixZGp5f+dBDgjK7y7TUQ@public.gmane.org>
+Subject: Re: [PATCH 2/2] cifs: Correct comment about domainname length
+Date: Mon, 29 Jul 2013 08:27:52 +0800
+Message-ID: <51F5B708.4090404@asianux.com>
+References: <1374777285-25639-1-git-send-email-scott.lovenberg@gmail.com> <1374777285-25639-2-git-send-email-scott.lovenberg@gmail.com> <51F1C564.5070006@asianux.com> <CAFB9KM2zF9m4Y4vcDRkZpMfvWP8NQWYKQTeJTiwgVVVu=4M6Cw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-	kernel-janitors@vger.kernel.org
-To: Steve French <sfrench@samba.org>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
-Content-Disposition: inline
-Sender: kernel-janitors-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=GB2312
+Content-Transfer-Encoding: 7bit
+Cc: "sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org" <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAFB9KM2zF9m4Y4vcDRkZpMfvWP8NQWYKQTeJTiwgVVVu=4M6Cw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-It causes a static analysis warning when check to see if an array is
-NULL.  I have removed the check.
+On 07/27/2013 02:12 AM, Scott Lovenberg wrote:
+> On Thu, Jul 25, 2013 at 8:40 PM, Chen Gang <gang.chen-bOixZGp5f+dBDgjK7y7TUQ@public.gmane.org> wrote:
+>> On 07/26/2013 02:34 AM, scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+>>> From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>>>
+>>> CIFS_MAX_DOMAINNAME_LEN is the max length for a domain name, not a fully qualified domain name.
+>>>
+>>> Signed-off-by: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>>> ---
+>>>  include/uapi/linux/cifs/cifs_mount.h | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/include/uapi/linux/cifs/cifs_mount.h b/include/uapi/linux/cifs/cifs_mount.h
+>>> index a58fc6e..d2408ec 100644
+>>> --- a/include/uapi/linux/cifs/cifs_mount.h
+>>> +++ b/include/uapi/linux/cifs/cifs_mount.h
+>>> @@ -17,7 +17,7 @@
+>>>  #define _CIFS_MOUNT_H
+>>>
+>>>  /* Max string lengths for cifs mounting options. */
+>>> -#define CIFS_MAX_DOMAINNAME_LEN 256 /* max fully qualified domain name */
+>>> +#define CIFS_MAX_DOMAINNAME_LEN 256 /* max domain name length */
+>>>  #define CIFS_MAX_USERNAME_LEN   256 /* reasonable max for current servers */
+>>>  #define CIFS_MAX_PASSWORD_LEN   512 /* Windows max seems to be 256 wide chars */
+>>>  #define CIFS_MAX_SHARE_LEN      256 /* reasonable max share name length */
+>>>
+>>
+>> For our kernel implementation:
+>>
+>>   for 'CIFS_MAX_DOMAINNAME_LEN', it counts 255 + '\0',
+>>   for 'CIFS_MAX_USERNAME_LEN', it counts 256 (may add additional '\0'),
+>>
+>> And original mail said about 'CIFS_MAX_DOMAINNAME_LEN':
+>>
+>>   "The maximum length of ... the fully qualified domain name (FQDN) is
+>>   63 octets per label and 255 bytes per FQDN. This maximum includes 254
+>>   bytes for the FQDN and one byte for the ending dot."
+>>
+>> And excuse me, I do not know what 'CIFS_MAX_USERNAME_LEN' should be.
+>>
+>> Do we also need consider about it in our definition comments ?
+>>
+>>
+>> Thanks.
+>> --
+>> Chen Gang
+> 
+> Sorry, I misunderstood; I figured that it had to be the domain name
+> without the host since we were allowing a host name that's 1024
+> characters long.  That documentation should probably be added to the
+> cifs_mount.h as well then.
+> 
+> Still, how can we have a FQDN that's 256 characters long when the host
+> name length can be 1024 characters long?
+> 
 
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
----
-Or perhaps the intent was to check
+Excuse me, I am not quite familiar about cifs, so can not provide
+additional more information (I found it only by reading code).
 
-	} else if (strlen(ses->serverName)) {
+But I feel, it really need additional discussion and check by the
+related experts (related members who are familiar with cifs).
 
-I am not very familiar with this code.
+Welcome any members' suggestions and completions.
 
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index bb84d7c..16f4908 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -514,7 +514,7 @@ static int calc_ntlmv2_hash(struct cifs_ses *ses, char *ntlmv2_hash,
- 				 __func__);
- 			return rc;
- 		}
--	} else if (ses->serverName) {
-+	} else {
- 		len = strlen(ses->serverName);
- 
- 		server = kmalloc(2 + (len * 2), GFP_KERNEL);
+Thanks.
+-- 
+Chen Gang
