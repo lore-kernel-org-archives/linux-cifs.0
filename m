@@ -1,153 +1,170 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: fix bad error handling in crypto code
-Date: Wed, 31 Jul 2013 13:48:00 -0400
-Message-ID: <1375292880-24143-1-git-send-email-jlayton@redhat.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: fix bad error handling in crypto code
+Date: Wed, 31 Jul 2013 13:49:05 -0500
+Message-ID: <CAH2r5mtV_fYgrNyTspuAM-fiFyJ2HV5irjzvpjjKDFL1UJbZVg@mail.gmail.com>
+References: <1375292880-24143-1-git-send-email-jlayton@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jarod Wilson <jarod-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
 	Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1375292880-24143-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Jarod reported an Oops like when testing with fips=1:
+Fix added to cifs-2.6.git for-next
 
-CIFS VFS: could not allocate crypto hmacmd5
-CIFS VFS: could not crypto alloc hmacmd5 rc -2
-CIFS VFS: Error -2 during NTLMSSP authentication
-CIFS VFS: Send error in SessSetup = -2
-BUG: unable to handle kernel NULL pointer dereference at 000000000000004e
-IP: [<ffffffff812b5c7a>] crypto_destroy_tfm+0x1a/0x90
-PGD 0
-Oops: 0000 [#1] SMP
-Modules linked in: md4 nls_utf8 cifs dns_resolver fscache kvm serio_raw virtio_balloon virtio_net mperf i2c_piix4 cirrus drm_kms_helper ttm drm i2c_core virtio_blk ata_generic pata_acpi
-CPU: 1 PID: 639 Comm: mount.cifs Not tainted 3.11.0-0.rc3.git0.1.fc20.x86_64 #1
-Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
-task: ffff88007bf496e0 ti: ffff88007b080000 task.ti: ffff88007b080000
-RIP: 0010:[<ffffffff812b5c7a>]  [<ffffffff812b5c7a>] crypto_destroy_tfm+0x1a/0x90
-RSP: 0018:ffff88007b081d10  EFLAGS: 00010282
-RAX: 0000000000001f1f RBX: ffff880037422000 RCX: ffff88007b081fd8
-RDX: 000000000000001f RSI: 0000000000000006 RDI: fffffffffffffffe
-RBP: ffff88007b081d30 R08: ffff880037422000 R09: ffff88007c090100
-R10: 0000000000000000 R11: 00000000fffffffe R12: fffffffffffffffe
-R13: ffff880037422000 R14: ffff880037422000 R15: 00000000fffffffe
-FS:  00007fc322f4f780(0000) GS:ffff88007fc80000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 000000008005003b
-CR2: 000000000000004e CR3: 000000007bdaa000 CR4: 00000000000006e0
-Stack:
- ffffffff81085845 ffff880037422000 ffff8800375e7400 ffff880037422000
- ffff88007b081d48 ffffffffa0176022 ffff880037422000 ffff88007b081d60
- ffffffffa015c07b ffff880037600600 ffff88007b081dc8 ffffffffa01610e1
-Call Trace:
- [<ffffffff81085845>] ? __cancel_work_timer+0x75/0xf0
- [<ffffffffa0176022>] cifs_crypto_shash_release+0x82/0xf0 [cifs]
- [<ffffffffa015c07b>] cifs_put_tcp_session+0x8b/0xe0 [cifs]
- [<ffffffffa01610e1>] cifs_mount+0x9d1/0xad0 [cifs]
- [<ffffffffa014ff50>] cifs_do_mount+0xa0/0x4d0 [cifs]
- [<ffffffff811ab6e9>] mount_fs+0x39/0x1b0
- [<ffffffff811c466f>] vfs_kern_mount+0x5f/0xf0
- [<ffffffff811c6a9e>] do_mount+0x23e/0xa20
- [<ffffffff811c66e6>] ? copy_mount_options+0x36/0x170
- [<ffffffff811c7303>] SyS_mount+0x83/0xc0
- [<ffffffff8165c8d9>] system_call_fastpath+0x16/0x1b
-Code: eb 9e 66 66 66 66 66 66 2e 0f 1f 84 00 00 00 00 00 66 66 66 66 90 55 48 89 e5 41 55 41 54 49 89 fc 53 48 83 ec 08 48 85 ff 74 46 <48> 83 7e 48 00 48 8b 5e 50 74 4b 48 89 f7 e8 83 fc ff ff 4c 8b
-RIP  [<ffffffff812b5c7a>] crypto_destroy_tfm+0x1a/0x90
- RSP <ffff88007b081d10>
-CR2: 000000000000004e
+(also fyi - the iocharset fix added to a new "for-3.12" branch of cifs-2.6.git)
 
-The cifs code allocates some crypto structures. If that fails, it
-returns an error, but it leaves the pointers set to their PTR_ERR
-values. Then later when it tries to clean up, it sees that those values
-are non-NULL and then passes them to the routine that frees them.
+On Wed, Jul 31, 2013 at 12:48 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> Jarod reported an Oops like when testing with fips=1:
+>
+> CIFS VFS: could not allocate crypto hmacmd5
+> CIFS VFS: could not crypto alloc hmacmd5 rc -2
+> CIFS VFS: Error -2 during NTLMSSP authentication
+> CIFS VFS: Send error in SessSetup = -2
+> BUG: unable to handle kernel NULL pointer dereference at 000000000000004e
+> IP: [<ffffffff812b5c7a>] crypto_destroy_tfm+0x1a/0x90
+> PGD 0
+> Oops: 0000 [#1] SMP
+> Modules linked in: md4 nls_utf8 cifs dns_resolver fscache kvm serio_raw virtio_balloon virtio_net mperf i2c_piix4 cirrus drm_kms_helper ttm drm i2c_core virtio_blk ata_generic pata_acpi
+> CPU: 1 PID: 639 Comm: mount.cifs Not tainted 3.11.0-0.rc3.git0.1.fc20.x86_64 #1
+> Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+> task: ffff88007bf496e0 ti: ffff88007b080000 task.ti: ffff88007b080000
+> RIP: 0010:[<ffffffff812b5c7a>]  [<ffffffff812b5c7a>] crypto_destroy_tfm+0x1a/0x90
+> RSP: 0018:ffff88007b081d10  EFLAGS: 00010282
+> RAX: 0000000000001f1f RBX: ffff880037422000 RCX: ffff88007b081fd8
+> RDX: 000000000000001f RSI: 0000000000000006 RDI: fffffffffffffffe
+> RBP: ffff88007b081d30 R08: ffff880037422000 R09: ffff88007c090100
+> R10: 0000000000000000 R11: 00000000fffffffe R12: fffffffffffffffe
+> R13: ffff880037422000 R14: ffff880037422000 R15: 00000000fffffffe
+> FS:  00007fc322f4f780(0000) GS:ffff88007fc80000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 000000008005003b
+> CR2: 000000000000004e CR3: 000000007bdaa000 CR4: 00000000000006e0
+> Stack:
+>  ffffffff81085845 ffff880037422000 ffff8800375e7400 ffff880037422000
+>  ffff88007b081d48 ffffffffa0176022 ffff880037422000 ffff88007b081d60
+>  ffffffffa015c07b ffff880037600600 ffff88007b081dc8 ffffffffa01610e1
+> Call Trace:
+>  [<ffffffff81085845>] ? __cancel_work_timer+0x75/0xf0
+>  [<ffffffffa0176022>] cifs_crypto_shash_release+0x82/0xf0 [cifs]
+>  [<ffffffffa015c07b>] cifs_put_tcp_session+0x8b/0xe0 [cifs]
+>  [<ffffffffa01610e1>] cifs_mount+0x9d1/0xad0 [cifs]
+>  [<ffffffffa014ff50>] cifs_do_mount+0xa0/0x4d0 [cifs]
+>  [<ffffffff811ab6e9>] mount_fs+0x39/0x1b0
+>  [<ffffffff811c466f>] vfs_kern_mount+0x5f/0xf0
+>  [<ffffffff811c6a9e>] do_mount+0x23e/0xa20
+>  [<ffffffff811c66e6>] ? copy_mount_options+0x36/0x170
+>  [<ffffffff811c7303>] SyS_mount+0x83/0xc0
+>  [<ffffffff8165c8d9>] system_call_fastpath+0x16/0x1b
+> Code: eb 9e 66 66 66 66 66 66 2e 0f 1f 84 00 00 00 00 00 66 66 66 66 90 55 48 89 e5 41 55 41 54 49 89 fc 53 48 83 ec 08 48 85 ff 74 46 <48> 83 7e 48 00 48 8b 5e 50 74 4b 48 89 f7 e8 83 fc ff ff 4c 8b
+> RIP  [<ffffffff812b5c7a>] crypto_destroy_tfm+0x1a/0x90
+>  RSP <ffff88007b081d10>
+> CR2: 000000000000004e
+>
+> The cifs code allocates some crypto structures. If that fails, it
+> returns an error, but it leaves the pointers set to their PTR_ERR
+> values. Then later when it tries to clean up, it sees that those values
+> are non-NULL and then passes them to the routine that frees them.
+>
+> Fix this by setting the pointers to NULL after collecting the error code
+> in this situation.
+>
+> Cc: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> Reported-by: Jarod Wilson <jarod-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/cifsencrypt.c   | 12 ++++++++----
+>  fs/cifs/smb2transport.c |  9 +++++++--
+>  2 files changed, 15 insertions(+), 6 deletions(-)
+>
+> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+> index 45e57cc..b8a2568 100644
+> --- a/fs/cifs/cifsencrypt.c
+> +++ b/fs/cifs/cifsencrypt.c
+> @@ -43,17 +43,18 @@ cifs_crypto_shash_md5_allocate(struct TCP_Server_Info *server)
+>         server->secmech.md5 = crypto_alloc_shash("md5", 0, 0);
+>         if (IS_ERR(server->secmech.md5)) {
+>                 cifs_dbg(VFS, "could not allocate crypto md5\n");
+> -               return PTR_ERR(server->secmech.md5);
+> +               rc = PTR_ERR(server->secmech.md5);
+> +               server->secmech.md5 = NULL;
+> +               return rc;
+>         }
+>
+>         size = sizeof(struct shash_desc) +
+>                         crypto_shash_descsize(server->secmech.md5);
+>         server->secmech.sdescmd5 = kmalloc(size, GFP_KERNEL);
+>         if (!server->secmech.sdescmd5) {
+> -               rc = -ENOMEM;
+>                 crypto_free_shash(server->secmech.md5);
+>                 server->secmech.md5 = NULL;
+> -               return rc;
+> +               return -ENOMEM;
+>         }
+>         server->secmech.sdescmd5->shash.tfm = server->secmech.md5;
+>         server->secmech.sdescmd5->shash.flags = 0x0;
+> @@ -591,6 +592,7 @@ CalcNTLMv2_response(const struct cifs_ses *ses, char *ntlmv2_hash)
+>
+>  static int crypto_hmacmd5_alloc(struct TCP_Server_Info *server)
+>  {
+> +       int rc;
+>         unsigned int size;
+>
+>         /* check if already allocated */
+> @@ -600,7 +602,9 @@ static int crypto_hmacmd5_alloc(struct TCP_Server_Info *server)
+>         server->secmech.hmacmd5 = crypto_alloc_shash("hmac(md5)", 0, 0);
+>         if (IS_ERR(server->secmech.hmacmd5)) {
+>                 cifs_dbg(VFS, "could not allocate crypto hmacmd5\n");
+> -               return PTR_ERR(server->secmech.hmacmd5);
+> +               rc = PTR_ERR(server->secmech.hmacmd5);
+> +               server->secmech.hmacmd5 = NULL;
+> +               return rc;
+>         }
+>
+>         size = sizeof(struct shash_desc) +
+> diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+> index 301b191..4f2300d 100644
+> --- a/fs/cifs/smb2transport.c
+> +++ b/fs/cifs/smb2transport.c
+> @@ -42,6 +42,7 @@
+>  static int
+>  smb2_crypto_shash_allocate(struct TCP_Server_Info *server)
+>  {
+> +       int rc;
+>         unsigned int size;
+>
+>         if (server->secmech.sdeschmacsha256 != NULL)
+> @@ -50,7 +51,9 @@ smb2_crypto_shash_allocate(struct TCP_Server_Info *server)
+>         server->secmech.hmacsha256 = crypto_alloc_shash("hmac(sha256)", 0, 0);
+>         if (IS_ERR(server->secmech.hmacsha256)) {
+>                 cifs_dbg(VFS, "could not allocate crypto hmacsha256\n");
+> -               return PTR_ERR(server->secmech.hmacsha256);
+> +               rc = PTR_ERR(server->secmech.hmacsha256);
+> +               server->secmech.hmacsha256 = NULL;
+> +               return rc;
+>         }
+>
+>         size = sizeof(struct shash_desc) +
+> @@ -87,7 +90,9 @@ smb3_crypto_shash_allocate(struct TCP_Server_Info *server)
+>                 server->secmech.sdeschmacsha256 = NULL;
+>                 crypto_free_shash(server->secmech.hmacsha256);
+>                 server->secmech.hmacsha256 = NULL;
+> -               return PTR_ERR(server->secmech.cmacaes);
+> +               rc = PTR_ERR(server->secmech.cmacaes);
+> +               server->secmech.cmacaes = NULL;
+> +               return rc;
+>         }
+>
+>         size = sizeof(struct shash_desc) +
+> --
+> 1.8.3.1
+>
 
-Fix this by setting the pointers to NULL after collecting the error code
-in this situation.
 
-Cc: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Reported-by: Jarod Wilson <jarod-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/cifsencrypt.c   | 12 ++++++++----
- fs/cifs/smb2transport.c |  9 +++++++--
- 2 files changed, 15 insertions(+), 6 deletions(-)
 
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index 45e57cc..b8a2568 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -43,17 +43,18 @@ cifs_crypto_shash_md5_allocate(struct TCP_Server_Info *server)
- 	server->secmech.md5 = crypto_alloc_shash("md5", 0, 0);
- 	if (IS_ERR(server->secmech.md5)) {
- 		cifs_dbg(VFS, "could not allocate crypto md5\n");
--		return PTR_ERR(server->secmech.md5);
-+		rc = PTR_ERR(server->secmech.md5);
-+		server->secmech.md5 = NULL;
-+		return rc;
- 	}
- 
- 	size = sizeof(struct shash_desc) +
- 			crypto_shash_descsize(server->secmech.md5);
- 	server->secmech.sdescmd5 = kmalloc(size, GFP_KERNEL);
- 	if (!server->secmech.sdescmd5) {
--		rc = -ENOMEM;
- 		crypto_free_shash(server->secmech.md5);
- 		server->secmech.md5 = NULL;
--		return rc;
-+		return -ENOMEM;
- 	}
- 	server->secmech.sdescmd5->shash.tfm = server->secmech.md5;
- 	server->secmech.sdescmd5->shash.flags = 0x0;
-@@ -591,6 +592,7 @@ CalcNTLMv2_response(const struct cifs_ses *ses, char *ntlmv2_hash)
- 
- static int crypto_hmacmd5_alloc(struct TCP_Server_Info *server)
- {
-+	int rc;
- 	unsigned int size;
- 
- 	/* check if already allocated */
-@@ -600,7 +602,9 @@ static int crypto_hmacmd5_alloc(struct TCP_Server_Info *server)
- 	server->secmech.hmacmd5 = crypto_alloc_shash("hmac(md5)", 0, 0);
- 	if (IS_ERR(server->secmech.hmacmd5)) {
- 		cifs_dbg(VFS, "could not allocate crypto hmacmd5\n");
--		return PTR_ERR(server->secmech.hmacmd5);
-+		rc = PTR_ERR(server->secmech.hmacmd5);
-+		server->secmech.hmacmd5 = NULL;
-+		return rc;
- 	}
- 
- 	size = sizeof(struct shash_desc) +
-diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-index 301b191..4f2300d 100644
---- a/fs/cifs/smb2transport.c
-+++ b/fs/cifs/smb2transport.c
-@@ -42,6 +42,7 @@
- static int
- smb2_crypto_shash_allocate(struct TCP_Server_Info *server)
- {
-+	int rc;
- 	unsigned int size;
- 
- 	if (server->secmech.sdeschmacsha256 != NULL)
-@@ -50,7 +51,9 @@ smb2_crypto_shash_allocate(struct TCP_Server_Info *server)
- 	server->secmech.hmacsha256 = crypto_alloc_shash("hmac(sha256)", 0, 0);
- 	if (IS_ERR(server->secmech.hmacsha256)) {
- 		cifs_dbg(VFS, "could not allocate crypto hmacsha256\n");
--		return PTR_ERR(server->secmech.hmacsha256);
-+		rc = PTR_ERR(server->secmech.hmacsha256);
-+		server->secmech.hmacsha256 = NULL;
-+		return rc;
- 	}
- 
- 	size = sizeof(struct shash_desc) +
-@@ -87,7 +90,9 @@ smb3_crypto_shash_allocate(struct TCP_Server_Info *server)
- 		server->secmech.sdeschmacsha256 = NULL;
- 		crypto_free_shash(server->secmech.hmacsha256);
- 		server->secmech.hmacsha256 = NULL;
--		return PTR_ERR(server->secmech.cmacaes);
-+		rc = PTR_ERR(server->secmech.cmacaes);
-+		server->secmech.cmacaes = NULL;
-+		return rc;
- 	}
- 
- 	size = sizeof(struct shash_desc) +
 -- 
-1.8.3.1
+Thanks,
+
+Steve
