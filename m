@@ -1,41 +1,45 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: Backporting the CIFS module
-Date: Wed, 31 Jul 2013 11:15:26 -0400
-Message-ID: <20130731111526.6cbf68de@tlielax.poochiereds.net>
-References: <loom.20130731T161003-507@post.gmane.org>
+From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH v2] cifs: extend the buffer length enought for sprintf() using
+Date: Wed, 31 Jul 2013 11:55:08 -0400
+Message-ID: <CAFB9KM1buPJYpF6PdqVWYLFEuURhf07iDBaQzN3aWyRPWdGGTw@mail.gmail.com>
+References: <51E5E9DA.8020603@asianux.com>
+	<CAFB9KM2nJEt-O+o=4bkxNMJ2Fr0TfjkpRF=7B98=Lp9zFu8_og@mail.gmail.com>
+	<CAH2r5msQEbQWpE+wqEoLY_++=ywDVoAg_vmWB3kJG8=ECHC3Pg@mail.gmail.com>
+	<CAFB9KM0rEDyE6hb8t-gDLTDKq9kaRr4Bhs7SLBEZTnyH5u5U-A@mail.gmail.com>
+	<51E74008.8050308@asianux.com>
+	<CAFB9KM2MbLuETpoN9wafZLq6B9StjtXnG15G16uGcOcnRM8+sA@mail.gmail.com>
+	<51E88FF0.2010101@asianux.com>
+	<20130719064531.2a9836f5@tlielax.poochiereds.net>
+	<CAH2r5mvccBQRikYbbUppmbCO1naSOOMJ+wVWxQEQBxhDdmnP_w@mail.gmail.com>
+	<51EC890D.7010306@asianux.com>
+	<CAH2r5mvPC0jiSDh5qTgerEV3JnRwcPPkKvnbT1QCO0CGiVngjg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Dame Dimitrov <ddimitro-vkGj3nKBv85YqTQye2laTg@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Chen Gang <gang.chen-bOixZGp5f+dBDgjK7y7TUQ@public.gmane.org>,
+	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	"sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org" <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <loom.20130731T161003-507-eS7Uydv5nfjZ+VzJOa5vwg@public.gmane.org>
+In-Reply-To: <CAH2r5mvPC0jiSDh5qTgerEV3JnRwcPPkKvnbT1QCO0CGiVngjg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 31 Jul 2013 14:13:46 +0000 (UTC)
-Dame Dimitrov <ddimitro-vkGj3nKBv85YqTQye2laTg@public.gmane.org> wrote:
+On Wed, Jul 31, 2013 at 12:59 AM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> I updated the version of the patch slightly which is in cifs-2.6.git
+> so we don't have to rename the MAX_DOMAINNAME_SIZE field multiple
+> times.  Let me know if you see problems.  It could make Scott's
+> followup patch a little easier to understand without the renamed
+> #define.
+> --
+> Thanks,
+>
+> Steve
 
-> Hi,
-> 
-> We're planning to replace some NFS mounts with CIFS mounts,  with the help
-> multiuser option of CIFS.
-> But unfortunately we have some CentOS 5 machines, and the cifs.ko kernel
-> module (v. 1.60) does not support the multiuser option,
-> Can anyone give a hint how can I backport for example the cifs module from
-> CentOS6 (v. 1.68) to CentOS5, and if it's at all doable?
-> 
-> Thanks and cheers,
-> Dame.
-> 
-
-Heh... *anything* is doable. The problem of course is that it's
-absolutely non-trivial. The VFS layer infrastructure is quite different
-between RHEL5 and RHEL6.
-
-I'm the person who wrote most of that code and I refrained from trying to
-backport any of it to RHEL5 mostly due to the huge amount of changes
-that it would have involved.
++1.  I agree it streamlines the other patch set.
 
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Peace and Blessings,
+-Scott.
