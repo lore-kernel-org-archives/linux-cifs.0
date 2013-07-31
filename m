@@ -1,34 +1,23 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: NTLMSSP unix query info problem
-Date: Wed, 31 Jul 2013 16:35:31 +0400
-Message-ID: <CAKywueQd82GviPr7ACVecMREzLsuR4qC4KBtZPcvAYhbEbcaLA@mail.gmail.com>
-References: <CAKywueTz3hRCgFB00dGPE3Bo2mnPN_efZCtzc-yc4c6umg0pUQ@mail.gmail.com>
-	<CADT32eKTZgH0Tk9YJ9P2eZ_E8k6S9sye89d6syDTprgcP1dB+Q@mail.gmail.com>
-	<CAKywueTOzbS_y0hgAjimjP6eXUaRhdBuveOusAaUxnusF-NunA@mail.gmail.com>
-	<1375186459.4781.9.camel@pico.ipa.ssimo.org>
-	<CAKywueRU4Hte6TnCCatPvL8DArun7FiLxZR10zRp4eGXykELyg@mail.gmail.com>
-	<1375271807.4781.10.camel@pico.ipa.ssimo.org>
-	<CAKywueQdubd_WycmBpOcKi7A1WTjjNzX8szWg+7JGd+j5xSoow@mail.gmail.com>
-	<1375273772.4781.12.camel@pico.ipa.ssimo.org>
+From: Dame Dimitrov <ddimitro-vkGj3nKBv85YqTQye2laTg@public.gmane.org>
+Subject: Backporting the CIFS module
+Date: Wed, 31 Jul 2013 14:13:46 +0000 (UTC)
+Message-ID: <loom.20130731T161003-507@post.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Simo <s@ssimo.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1375273772.4781.12.camel-fj0lwfvWodpMy5p6ylGyhR2eb7JE58TQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2013/7/31 Simo <s@ssimo.org>:
-> Are you saying unix extensions are negotiate differently for SMB1
-> depdending on the sec option ? That would be a bug.
->
+Hi,
 
-Yes, that is exactly what I mean. Samba version is 3.6.6.
+We're planning to replace some NFS mounts with CIFS mounts,  with the help
+multiuser option of CIFS.
+But unfortunately we have some CentOS 5 machines, and the cifs.ko kernel
+module (v. 1.60) does not support the multiuser option,
+Can anyone give a hint how can I backport for example the cifs module from
+CentOS6 (v. 1.68) to CentOS5, and if it's at all doable?
 
--- 
-Best regards,
-Pavel Shilovsky.
+Thanks and cheers,
+Dame.
