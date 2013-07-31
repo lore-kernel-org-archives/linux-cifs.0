@@ -1,45 +1,60 @@
-From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v2] cifs: extend the buffer length enought for sprintf() using
-Date: Wed, 31 Jul 2013 11:55:08 -0400
-Message-ID: <CAFB9KM1buPJYpF6PdqVWYLFEuURhf07iDBaQzN3aWyRPWdGGTw@mail.gmail.com>
-References: <51E5E9DA.8020603@asianux.com>
-	<CAFB9KM2nJEt-O+o=4bkxNMJ2Fr0TfjkpRF=7B98=Lp9zFu8_og@mail.gmail.com>
-	<CAH2r5msQEbQWpE+wqEoLY_++=ywDVoAg_vmWB3kJG8=ECHC3Pg@mail.gmail.com>
-	<CAFB9KM0rEDyE6hb8t-gDLTDKq9kaRr4Bhs7SLBEZTnyH5u5U-A@mail.gmail.com>
-	<51E74008.8050308@asianux.com>
-	<CAFB9KM2MbLuETpoN9wafZLq6B9StjtXnG15G16uGcOcnRM8+sA@mail.gmail.com>
-	<51E88FF0.2010101@asianux.com>
-	<20130719064531.2a9836f5@tlielax.poochiereds.net>
-	<CAH2r5mvccBQRikYbbUppmbCO1naSOOMJ+wVWxQEQBxhDdmnP_w@mail.gmail.com>
-	<51EC890D.7010306@asianux.com>
-	<CAH2r5mvPC0jiSDh5qTgerEV3JnRwcPPkKvnbT1QCO0CGiVngjg@mail.gmail.com>
+From: David McBride <dwm37-KWPb1pKIrIJaa/9Udqfwiw@public.gmane.org>
+Subject: [BUG] Regression in mfsymlink handling introduced by "cifs: only
+ set ops for inodes in I_NEW state"
+Date: Wed, 31 Jul 2013 16:36:43 +0100
+Message-ID: <51F92F0B.7030504@cam.ac.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Chen Gang <gang.chen-bOixZGp5f+dBDgjK7y7TUQ@public.gmane.org>,
-	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	"sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org" <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mvPC0jiSDh5qTgerEV3JnRwcPPkKvnbT1QCO0CGiVngjg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, Jul 31, 2013 at 12:59 AM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> I updated the version of the patch slightly which is in cifs-2.6.git
-> so we don't have to rename the MAX_DOMAINNAME_SIZE field multiple
-> times.  Let me know if you see problems.  It could make Scott's
-> followup patch a little easier to understand without the renamed
-> #define.
-> --
-> Thanks,
->
-> Steve
+The following commit included in 3.10, and copied to some table-series
+kernels:
 
-+1.  I agree it streamlines the other patch set.
+ commit: c2b93e0699723700f886ce17bb65ffd771195a6d
+ cifs: only set ops for inodes in I_NEW state
 
--- 
-Peace and Blessings,
--Scott.
+=2E.. causes a regression in mfsymlink handling under some circumstance=
+s.
+
+Specifically, this patch modified cifs_fattr_to_inode() to only invoke
+cifs_set_ops() if that inode still had the I_NEW flag set --- preventin=
+g
+an inode's ops-set from from being changed after it had been
+initialized, preventing an oops if another thread of execution was
+already chasing that pointer.
+
+However, mfsymlinks are also affected by this commit.  In the cold-cach=
+e
+case, a user invoking stat() on an mfsymlink will still see the correct
+results.  But, if the dentry cache is instead populated via
+cifs_readdir/filldir, then inode property population operates in a two
+stage mode:
+
+ - First, the inode is initialized as a regular file, with the
+   CIFS_FATTR_NEED_REVAL flag set.
+
+ - Later, when the file is stat()'d, then correct operation depends on
+   the (re)validation steps from being able to update the inode's
+   properties --- including the set of file operations permitted.
+
+(A comment explains:  "trying to get the type and mode can be slow, so
+ just call those regular files for now, and mark for reval")
+
+With the above commit, this second revalidation step never updates the
+operations field, resulting in symlinks not having the readlink(), etc.
+functions correctly hooked up.
+
+A na=C3=AFve fix-up is to modify the conditional to also permit (re)set=
+ting
+ops on S_IFLNK-mode files; however, I suspect a correct fix lies elsewh=
+ere?
+
+Cheers,
+David
+--=20
+David McBride <dwm37-KWPb1pKIrIJaa/9Udqfwiw@public.gmane.org>
+Unix Specialist, University Computing Service
