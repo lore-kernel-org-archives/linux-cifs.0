@@ -1,43 +1,40 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: smb2 logoff
-Date: Sun, 4 Aug 2013 21:18:56 -0400
-Message-ID: <20130804211856.7a2f074e@corrin.poochiereds.net>
-References: <CADT32eKr2K8G58ub50FELC=oh78pmBPDs+Fgpd1=_UqKa4OmmA@mail.gmail.com>
+From: Cong Wang <amwang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [Cluster-devel] [Patch net-next v2 6/8] fs: use generic union
+ inet_addr and helper functions
+Date: Mon, 05 Aug 2013 11:16:54 +0800
+Message-ID: <1375672614.32485.9.camel@cr0>
+References: <1375427674-21735-1-git-send-email-amwang@redhat.com>
+	 <1375427674-21735-7-git-send-email-amwang@redhat.com>
+	 <20130802103107.GA17244@infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+	Trond Myklebust <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>
+To: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32eKr2K8G58ub50FELC=oh78pmBPDs+Fgpd1=_UqKa4OmmA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20130802103107.GA17244-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 4 Aug 2013 10:51:44 -0500
-Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-
-> cifs client does not handle error code returned by smb2 session logoff.
-> What if the server returns access denied?
-> I looked in ms-smb2 but it does not say anything about how a client should
-> handle error by smb2 logoff response.
-> This happens when cifs client sends a smb2 logoff request without a
-> signature (because we remove the session from the list before
-> sending off a request and handling the response) and can't verify
-> signature in the response.
-> Also, not sure what happens at the server if the session logoff
-> request is a) unsigned and/or b) server returns error as a response.
+On Fri, 2013-08-02 at 03:31 -0700, Christoph Hellwig wrote:
+> On Fri, Aug 02, 2013 at 03:14:32PM +0800, Cong Wang wrote:
+> > From: Cong Wang <amwang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> > 
+> > nfs and cifs define some helper functions for sockaddr,
+> > they can use the generic functions for union inet_addr too.
+> > 
+> > Since some dlm code needs to compare ->sin_port, introduce a
+> > generic function inet_addr_equal_strict() for it.
 > 
-> I think the patch should be to remove the session from the list
-> after the smb2 logoff request is sent and response is handled.
-> Will submit a patch as part of changing per smb connection key
-> to per session key patchset resubmission.
+> Would sound more useful to have a sockaddr_equal case that can be used
+> on any sockaddr.  For cases that no current user handles just return
+> false.
 > 
 
-That sounds like the correct approach to me. The only tricky part is to
-make sure that new references can't be taken on a session that's being
-torn down.
+Ok, since you and other people ask for it.
 
-I'd suggest making that change as a separate bugfix patch...
-
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Thanks.
