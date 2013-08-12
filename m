@@ -1,60 +1,32 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Sun, 11 Aug 2013 22:54:44 -0500
-Message-ID: <CAH2r5mshu_A4vfqUU145=0d8C3YzY3oRg-FVdYr4yL7pnB6fgg@mail.gmail.com>
+Subject: Re: xfstests integration
+Date: Sun, 11 Aug 2013 23:15:30 -0500
+Message-ID: <CAH2r5mvoxgdubeKZKdeUbhYCadTf0rjEEZB3o=YVcGKCro=KsA@mail.gmail.com>
+References: <20130805165918.2e3ac36e@f163.suse.de>
+	<CAH2r5mv_z=_P0R=uMfrSuwLoUU+OHyf8bmHnuwRuLsN0a8XF-A@mail.gmail.com>
+	<20130806061357.GA16379@infradead.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Cc: David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20130806061357.GA16379-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-A set of small cifs fixes, including 3 relating to symlink handling
+I pulled the latest xfstests - and it looks my earlier patch needs
+additional minor changes before submission due to changes in xfstest.
 
-The following changes since commit ecb2cf1a6b63825a258ff4fe0d7f3070fbe4676b:
+On Tue, Aug 6, 2013 at 1:13 AM, Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org> wrote:
+> On Mon, Aug 05, 2013 at 11:53:17AM -0500, Steve French wrote:
+>> I couldn't find much - but I did see this small patch which I had put
+>> together quickly so they could run against cifs
+>
+> Can you please send it to the xfs list for inclusion?  Thanks!
+>
 
-  Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/net
-(2013-07-18 20:08:47 -0700)
 
-are available in the git repository at:
-
-
-  git://git.samba.org/sfrench/cifs-2.6.git for-next
-
-for you to fetch changes up to 757c4f6260febff982276818bb946df89c1105aa:
-
-  cifs: don't instantiate new dentries in readdir for inodes that need
-to be revalidated immediately (2013-08-07 10:57:06 -0500)
-
-----------------------------------------------------------------
-Andi Shyti (1):
-      cifs: file: initialize oparms.reconnect before using it
-
-Chen Gang (1):
-      cifs: extend the buffer length enought for sprintf() using
-
-Jeff Layton (3):
-      cifs: fix bad error handling in crypto code
-      cifs: set sb->s_d_op before calling d_make_root()
-      cifs: don't instantiate new dentries in readdir for inodes that
-need to be revalidated immediately
-
-Steve French (1):
-      Do not attempt to do cifs operations reading symlinks with SMB2
-
- fs/cifs/cifsencrypt.c   | 14 ++++++---
- fs/cifs/cifsfs.c        | 11 +++----
- fs/cifs/cifsglob.h      |  4 +++
- fs/cifs/cifsproto.h     |  4 ++-
- fs/cifs/connect.c       |  7 +++--
- fs/cifs/file.c          |  1 +
- fs/cifs/link.c          | 84 +++++++++++++++++++++++++++++++------------------
- fs/cifs/readdir.c       |  8 +++++
- fs/cifs/sess.c          |  6 ++--
- fs/cifs/smb1ops.c       |  1 +
- fs/cifs/smb2transport.c |  9 ++++--
- 11 files changed, 98 insertions(+), 51 deletions(-)
 
 -- 
 Thanks,
