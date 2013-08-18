@@ -1,145 +1,106 @@
-From: Richard Sharpe <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Marcus Moeller <marcus.moeller-OI3hZJvNYWs@public.gmane.org>
 Subject: Re: DFS referrals
-Date: Sun, 18 Aug 2013 09:08:39 -0700
-Message-ID: <CACyXjPx+tK+ZfVwm8W3sryZsgq3iEjMhrSv6GEbWgtSZ=7rzMg@mail.gmail.com>
-References: <51DBD032.10305@gmx.ch>
-	<20130709054702.15550964@tlielax.poochiereds.net>
-	<51DBDDEA.9040702@gmx.ch>
-	<20130709081027.450b1849@corrin.poochiereds.net>
-	<51F664FB.5090507@gmx.ch>
-	<20130729090759.62d15e2e@corrin.poochiereds.net>
-	<51F6720C.3060500@gmx.ch>
-	<20130729103445.6629cece@tlielax.poochiereds.net>
-	<51F67EB0.40502@gmx.ch>
-	<51F75300.9000703@gmx.ch>
-	<51F7A513.1090806@gmx.ch>
-	<20130730080116.76df98db@corrin.poochiereds.net>
-	<51F7C67A.6020009@gmx.ch>
-	<20130730101730.71549ec8@tlielax.poochiereds.net>
-	<5209F598.1000101@gmx.ch>
-	<CACyXjPyu+uKW5THRRimpJMLS35KFJRoi_Ck6QLqUP2LZ7nh1+w@mail.gmail.com>
-	<20130813113210.649866dd@tlielax.poochiereds.net>
-	<CACyXjPy69oa02aDp7ZLZx2WbJkXifxnp8yyfSHuBNSw5nBRTYw@mail.gmail.com>
-	<20130818091011.7c2cc8b1@tlielax.poochiereds.net>
-	<CACyXjPzY8bi_m7iJ52RwvFNLYic+YyW_YenBmrirQmG0kS0Y9g@mail.gmail.com>
-	<5210E7AD.1030408@gmx.ch>
-	<CACyXjPw9_DT=nzznniZS_A6_whkvyUp4WQPm07bAWqmUtKfKhA@mail.gmail.com>
+Date: Sun, 18 Aug 2013 19:23:04 +0200
+Message-ID: <521102F8.4070004@gmx.ch>
+References: <51DBD032.10305@gmx.ch> <51DBDDEA.9040702@gmx.ch> <20130709081027.450b1849@corrin.poochiereds.net> <51F664FB.5090507@gmx.ch> <20130729090759.62d15e2e@corrin.poochiereds.net> <51F6720C.3060500@gmx.ch> <20130729103445.6629cece@tlielax.poochiereds.net> <51F67EB0.40502@gmx.ch> <51F75300.9000703@gmx.ch> <51F7A513.1090806@gmx.ch> <20130730080116.76df98db@corrin.poochiereds.net> <51F7C67A.6020009@gmx.ch> <20130730101730.71549ec8@tlielax.poochiereds.net> <5209F598.1000101@gmx.ch> <CACyXjPyu+uKW5THRRimpJMLS35KFJRoi_Ck6QLqUP2LZ7nh1+w@mail.gmail.com> <20130813113210.649866dd@tlielax.poochiereds.net> <CACyXjPy69oa02aDp7ZLZx2WbJkXifxnp8yyfSHuBNSw5nBRTYw@mail.gmail.com> <20130818091011.7c2cc8b1@tlielax.poochiereds.net> <CACyXjPzY8bi_m7iJ52RwvFNLYic+YyW_YenBmrirQmG0kS0Y9g@mail.gmail.com> <521
+ 0E7AD.1030408@gmx.ch> <CACyXjPw9_DT=nzznniZS_A6_whkvyUp4WQPm07bAWqmUtKfKhA@mail.gmail.com> <CACyXjPx+tK+ZfVwm8W3sryZsgq3iEjMhrSv6GEbWgtSZ=7rzMg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=Big5
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Transfer-Encoding: 7bit
 Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Marcus Moeller <marcus.moeller-OI3hZJvNYWs@public.gmane.org>
+To: Richard Sharpe <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CACyXjPw9_DT=nzznniZS_A6_whkvyUp4WQPm07bAWqmUtKfKhA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CACyXjPx+tK+ZfVwm8W3sryZsgq3iEjMhrSv6GEbWgtSZ=7rzMg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, Aug 18, 2013 at 8:57 AM, Richard Sharpe
-<realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> On Sun, Aug 18, 2013 at 8:26 AM, Marcus Moeller <marcus.moeller@gmx.c=
-h> wrote:
->> Am 18.08.2013 17:14, schrieb Richard Sharpe:
+Am 18.08.2013 18:08, schrieb Richard Sharpe:
+> On Sun, Aug 18, 2013 at 8:57 AM, Richard Sharpe
+> <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>> On Sun, Aug 18, 2013 at 8:26 AM, Marcus Moeller <marcus.moeller-OI3hZJvNYWs@public.gmane.org> wrote:
+>>> Am 18.08.2013 17:14, schrieb Richard Sharpe:
+>>>>>>>>
+>>>>>>>> No, it is not possible to set the same SPN on more than one computer
+>>>>>>>> object in AD.
+>>>>>>>>
+>>>>>>>> What happens here is a combination of DNS magic (there are multiple
+>>>>>>>> SRV records) and replication of the DFS info between DCs in the AD
+>>>>>>>> domain.
+>>>>>>>>
+>>>>>>>> A client can query any DC for the translation of a DNS namespace.
+>>>>>>>>
+>>>>>>>> My use case lives below that level and it is all pretty much working
+>>>>>>>> (except for XP, which will not do multiple levels of DFS referrals, it
+>>>>>>>> seems.)
+>>>>>>>>
+>>>>>>>> In any event, I might eventually have to use a shared secrets file,
+>>>>>>>> which overcomes the issue of SPNs.
+>>>>>>>>
 >>>>>>>
->>>>>>> No, it is not possible to set the same SPN on more than one com=
-puter
->>>>>>> object in AD.
->>>>>>>
->>>>>>> What happens here is a combination of DNS magic (there are mult=
-iple
->>>>>>> SRV records) and replication of the DFS info between DCs in the=
- AD
->>>>>>> domain.
->>>>>>>
->>>>>>> A client can query any DC for the translation of a DNS namespac=
-e.
->>>>>>>
->>>>>>> My use case lives below that level and it is all pretty much wo=
-rking
->>>>>>> (except for XP, which will not do multiple levels of DFS referr=
-als, it
->>>>>>> seems.)
->>>>>>>
->>>>>>> In any event, I might eventually have to use a shared secrets f=
-ile,
->>>>>>> which overcomes the issue of SPNs.
->>>>>>>
+>>>>>>> What SRV records are used? Should we fix mount.cifs to try and query
+>>>>>>> for an SRV record first and then try to resolve that hostname before
+>>>>>>> attempting to mount?
 >>>>>>
->>>>>> What SRV records are used? Should we fix mount.cifs to try and q=
-uery
->>>>>> for an SRV record first and then try to resolve that hostname be=
-fore
->>>>>> attempting to mount?
+>>>>>>
+>>>>>> Those are just for finding the namespace, and I am not sure exactly
+>>>>>> how it is handled, but if you have a namespace of
+>>>>>> \\domain.realm\namespace1, I think any DC in that domain can be used
+>>>>>> to get to the first level.
+>>>>>>
 >>>>>
+>>>>> Bear with me, as I'm pretty clueless as to how AD stuff works.
 >>>>>
->>>>> Those are just for finding the namespace, and I am not sure exact=
-ly
->>>>> how it is handled, but if you have a namespace of
->>>>> \\domain.realm\namespace1, I think any DC in that domain can be u=
-sed
->>>>> to get to the first level.
->>>>>
+>>>>> If all I have is \\domain.realm\namespace1 what should I be doing to
+>>>>> connect to it at that point? Currently we just treat "domain.realm" as
+>>>>> a hostname, but evidently that's not quite the right thing to do. Is it?
 >>>>
->>>> Bear with me, as I'm pretty clueless as to how AD stuff works.
 >>>>
->>>> If all I have is \\domain.realm\namespace1 what should I be doing =
-to
->>>> connect to it at that point? Currently we just treat "domain.realm=
-" as
->>>> a hostname, but evidently that's not quite the right thing to do. =
-Is it?
+>>>> Let me check.
+>>>>
+>>>> It might be that Windows returns the IP addresses of all the DCs in
+>>>> that domain in that case (and, if Sites and Services has been set up
+>>>> properly, returns them with the closest ones to you first in the
+>>>> list.) That is, my mentioning of SRV records might be a red herring.
+>>>>
+>>>> In that case, if the first one fails, you should simply try the next
+>>>> one until you find one that responds.
 >>>
 >>>
->>> Let me check.
->>>
->>> It might be that Windows returns the IP addresses of all the DCs in
->>> that domain in that case (and, if Sites and Services has been set u=
-p
->>> properly, returns them with the closest ones to you first in the
->>> list.) That is, my mentioning of SRV records might be a red herring=
-=2E
->>>
->>> In that case, if the first one fails, you should simply try the nex=
-t
->>> one until you find one that responds.
+>>> Yes, that's how it works. It then tries to reverse lookup the ip address in
+>>> order to mount the share. As our reverse DNS Setup is somewhat broken, that
+>>> part fails. I thought that removing the -t option could be a workaround for
+>>> that, but as the cifs/domain SPN can only be set on one DC, that's no option
+>>> to.
 >>
->>
->> Yes, that's how it works. It then tries to reverse lookup the ip add=
-ress in
->> order to mount the share. As our reverse DNS Setup is somewhat broke=
-n, that
->> part fails. I thought that removing the -t option could be a workaro=
-und for
->> that, but as the cifs/domain SPN can only be set on one DC, that's n=
-o option
->> to.
->
-> Well, more precisely, it needs the name in order to generate a servic=
-e
-> ticket. I don't think Windows cares these days what the called-name
-> is.
+>> Well, more precisely, it needs the name in order to generate a service
+>> ticket. I don't think Windows cares these days what the called-name
+>> is.
+> 
+> Do you have a capture?
+> 
+> In my experience, the client has to distinguish between a multi-homed
+> host and a name that refers to a domain.
+> 
+> In the case of a multi-homed host, Windows (at least Win7/Srv 2008)
+> does not seem to bother to back-translate the IP address used to
+> connect to a name.
+> 
+> It simply uses the name presented to look for the SPN and thus
+> generate the ticket.
+> 
+> That is, if you try to connect to
+> \\somemhomedname.realm.com\share-name and it turns out that there are
+> multiple IP addresses for somemhomedname.realm.com windows connects on
+> one of them but uses somemhomedname.realm.com to find the SPN to
+> generate the ticket.
 
-Do you have a capture?
+Yes, connecting directly to a host works without a problem, but I wanted
+to connect using the domain name.
 
-In my experience, the client has to distinguish between a multi-homed
-host and a name that refers to a domain.
+Right now I am using a dirty workaround to figure out the fastest server
+to connect to, and then using it directy.
 
-In the case of a multi-homed host, Windows (at least Win7/Srv 2008)
-does not seem to bother to back-translate the IP address used to
-connect to a name.
+But in the end our DNS setup needs to be fixed.
 
-It simply uses the name presented to look for the SPN and thus
-generate the ticket.
-
-That is, if you try to connect to
-\\somemhomedname.realm.com\share-name and it turns out that there are
-multiple IP addresses for somemhomedname.realm.com windows connects on
-one of them but uses somemhomedname.realm.com to find the SPN to
-generate the ticket.
-
-I have probably deleted my capture so I don't know if it tries to look
-for the SRV records to see if that thing is a domain name.
-
---=20
-Regards,
-Richard Sharpe
-(=A6=F3=A5H=B8=D1=BC~=A1H=B0=DF=A6=B3=A7=F9=B1d=A1C--=B1=E4=BE=DE)
+Greets
+Marcus
