@@ -1,54 +1,139 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 2/3] cifs: Expand max share name length to 256
-Date: Mon, 19 Aug 2013 08:35:10 -0500
-Message-ID: <CAH2r5mteZsyOLK_sz+CMBGa2_WYdEdz1Q93jZg3U0ZPCwk+HgQ@mail.gmail.com>
-References: <1376052439-32441-1-git-send-email-scott.lovenberg@gmail.com>
-	<1376052439-32441-3-git-send-email-scott.lovenberg@gmail.com>
+From: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Subject: RE: DFS referrals
+Date: Mon, 19 Aug 2013 13:37:39 +0000
+Message-ID: <614F550557B82C44AC27C492ADA391AA149D1BAE@TK5EX14MBXC285.redmond.corp.microsoft.com>
+References: <51DBD032.10305@gmx.ch>	<51DBDDEA.9040702@gmx.ch>
+	<20130709081027.450b1849@corrin.poochiereds.net>	<51F664FB.5090507@gmx.ch>
+	<20130729090759.62d15e2e@corrin.poochiereds.net>	<51F6720C.3060500@gmx.ch>
+	<20130729103445.6629cece@tlielax.poochiereds.net>	<51F67EB0.40502@gmx.ch>
+	<51F75300.9000703@gmx.ch>	<51F7A513.1090806@gmx.ch>
+	<20130730080116.76df98db@corrin.poochiereds.net>	<51F7C67A.6020009@gmx.ch>
+	<20130730101730.71549ec8@tlielax.poochiereds.net>	<5209F598.1000101@gmx.ch>
+	<CACyXjPyu+uKW5THRRimpJMLS35KFJRoi_Ck6QLqUP2LZ7nh1+w@mail.gmail.com>
+	<20130813113210.649866dd@tlielax.poochiereds.net>
+	<CACyXjPy69oa02aDp7ZLZx2WbJkXifxnp8yyfSHuBNSw5nBRTYw@mail.gmail.com>
+	<20130818091011.7c2cc8b1@tlielax.poochiereds.net>
+	<CACyXjPzY8bi_m7iJ52RwvFNLYic+YyW_YenBmrirQmG0kS0Y9g@mail.gmail.com>
+	<5210E7AD.1030408@gmx.ch>
+	<CACyXjPw9_DT=nzznniZS_A6_whkvyUp4WQPm07bAWqmUtKfKhA@mail.gmail.com>
+	<CACyXjPx+tK+ZfVwm8W3sryZsgq3iEjMhrSv6GEbWgtSZ=7rzMg@mail.gmail.com>
+ <20130819071133.5680e53c@corrin.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Chen Gang <gang.chen-bOixZGp5f+dBDgjK7y7TUQ@public.gmane.org>, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Marcus Moeller <marcus.moeller-OI3hZJvNYWs@public.gmane.org>,
 	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Richard Sharpe <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1376052439-32441-3-git-send-email-scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <20130819071133.5680e53c-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This and following patch merged into cifs-2.6.git for-next (and for-3.12)
-
-On Fri, Aug 9, 2013 at 7:47 AM,  <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->
-> The old max share name length limit was 80 due to Windows NET SHARE
-> command not allowing more than that.  However, share names can be much
-> longer.  This is a more reasonable maximum share name length.
->
-> Signed-off-by: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  include/uapi/linux/cifs/cifs_mount.h | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/include/uapi/linux/cifs/cifs_mount.h b/include/uapi/linux/cifs/cifs_mount.h
-> index 19063fe..5ac43f0 100644
-> --- a/include/uapi/linux/cifs/cifs_mount.h
-> +++ b/include/uapi/linux/cifs/cifs_mount.h
-> @@ -20,6 +20,7 @@
->  #define CIFS_MAX_DOMAINNAME_LEN 256 /* max fully qualified domain name */
->  #define CIFS_MAX_USERNAME_LEN   256 /* reasonable max for current servers */
->  #define CIFS_MAX_PASSWORD_LEN   512 /* Windows max seems to be 256 wide chars */
-> -#define CIFS_MAX_SHARE_LEN       80
-> +#define CIFS_MAX_SHARE_LEN      256 /* reasonable max share name length */
-> +
->
->  #endif /* _CIFS_MOUNT_H */
-> --
-> 1.8.1.4
->
-
-
-
--- 
-Thanks,
-
-Steve
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51eC1jaWZzLW93bmVyQHZn
+ZXIua2VybmVsLm9yZyBbbWFpbHRvOmxpbnV4LWNpZnMtDQo+IG93bmVyQHZnZXIua2VybmVsLm9y
+Z10gT24gQmVoYWxmIE9mIEplZmYgTGF5dG9uDQo+IFNlbnQ6IE1vbmRheSwgQXVndXN0IDE5LCAy
+MDEzIDc6MTIgQU0NCj4gVG86IFJpY2hhcmQgU2hhcnBlDQo+IENjOiBNYXJjdXMgTW9lbGxlcjsg
+bGludXgtY2lmc0B2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IERGUyByZWZlcnJhbHMN
+Cj4gDQo+IE9uIFN1biwgMTggQXVnIDIwMTMgMDk6MDg6MzkgLTA3MDANCj4gUmljaGFyZCBTaGFy
+cGUgPHJlYWxyaWNoYXJkc2hhcnBlQGdtYWlsLmNvbT4gd3JvdGU6DQo+IA0KPiA+IE9uIFN1biwg
+QXVnIDE4LCAyMDEzIGF0IDg6NTcgQU0sIFJpY2hhcmQgU2hhcnBlDQo+ID4gPHJlYWxyaWNoYXJk
+c2hhcnBlQGdtYWlsLmNvbT4gd3JvdGU6DQo+ID4gPiBPbiBTdW4sIEF1ZyAxOCwgMjAxMyBhdCA4
+OjI2IEFNLCBNYXJjdXMgTW9lbGxlcg0KPiA8bWFyY3VzLm1vZWxsZXJAZ214LmNoPiB3cm90ZToN
+Cj4gPiA+PiBBbSAxOC4wOC4yMDEzIDE3OjE0LCBzY2hyaWViIFJpY2hhcmQgU2hhcnBlOg0KPiA+
+ID4+Pj4+Pj4NCj4gPiA+Pj4+Pj4+IE5vLCBpdCBpcyBub3QgcG9zc2libGUgdG8gc2V0IHRoZSBz
+YW1lIFNQTiBvbiBtb3JlIHRoYW4gb25lDQo+ID4gPj4+Pj4+PiBjb21wdXRlciBvYmplY3QgaW4g
+QUQuDQo+ID4gPj4+Pj4+Pg0KPiA+ID4+Pj4+Pj4gV2hhdCBoYXBwZW5zIGhlcmUgaXMgYSBjb21i
+aW5hdGlvbiBvZiBETlMgbWFnaWMgKHRoZXJlIGFyZQ0KPiA+ID4+Pj4+Pj4gbXVsdGlwbGUgU1JW
+IHJlY29yZHMpIGFuZCByZXBsaWNhdGlvbiBvZiB0aGUgREZTIGluZm8gYmV0d2Vlbg0KPiA+ID4+
+Pj4+Pj4gRENzIGluIHRoZSBBRCBkb21haW4uDQo+ID4gPj4+Pj4+Pg0KPiA+ID4+Pj4+Pj4gQSBj
+bGllbnQgY2FuIHF1ZXJ5IGFueSBEQyBmb3IgdGhlIHRyYW5zbGF0aW9uIG9mIGEgRE5TIG5hbWVz
+cGFjZS4NCj4gPiA+Pj4+Pj4+DQo+ID4gPj4+Pj4+PiBNeSB1c2UgY2FzZSBsaXZlcyBiZWxvdyB0
+aGF0IGxldmVsIGFuZCBpdCBpcyBhbGwgcHJldHR5IG11Y2gNCj4gPiA+Pj4+Pj4+IHdvcmtpbmcg
+KGV4Y2VwdCBmb3IgWFAsIHdoaWNoIHdpbGwgbm90IGRvIG11bHRpcGxlIGxldmVscyBvZg0KPiA+
+ID4+Pj4+Pj4gREZTIHJlZmVycmFscywgaXQNCj4gPiA+Pj4+Pj4+IHNlZW1zLikNCj4gPiA+Pj4+
+Pj4+DQo+ID4gPj4+Pj4+PiBJbiBhbnkgZXZlbnQsIEkgbWlnaHQgZXZlbnR1YWxseSBoYXZlIHRv
+IHVzZSBhIHNoYXJlZCBzZWNyZXRzDQo+ID4gPj4+Pj4+PiBmaWxlLCB3aGljaCBvdmVyY29tZXMg
+dGhlIGlzc3VlIG9mIFNQTnMuDQo+ID4gPj4+Pj4+Pg0KPiA+ID4+Pj4+Pg0KPiA+ID4+Pj4+PiBX
+aGF0IFNSViByZWNvcmRzIGFyZSB1c2VkPyBTaG91bGQgd2UgZml4IG1vdW50LmNpZnMgdG8gdHJ5
+IGFuZA0KPiA+ID4+Pj4+PiBxdWVyeSBmb3IgYW4gU1JWIHJlY29yZCBmaXJzdCBhbmQgdGhlbiB0
+cnkgdG8gcmVzb2x2ZSB0aGF0DQo+ID4gPj4+Pj4+IGhvc3RuYW1lIGJlZm9yZSBhdHRlbXB0aW5n
+IHRvIG1vdW50Pw0KPiA+ID4+Pj4+DQo+ID4gPj4+Pj4NCj4gPiA+Pj4+PiBUaG9zZSBhcmUganVz
+dCBmb3IgZmluZGluZyB0aGUgbmFtZXNwYWNlLCBhbmQgSSBhbSBub3Qgc3VyZQ0KPiA+ID4+Pj4+
+IGV4YWN0bHkgaG93IGl0IGlzIGhhbmRsZWQsIGJ1dCBpZiB5b3UgaGF2ZSBhIG5hbWVzcGFjZSBv
+Zg0KPiA+ID4+Pj4+IFxcZG9tYWluLnJlYWxtXG5hbWVzcGFjZTEsIEkgdGhpbmsgYW55IERDIGlu
+IHRoYXQgZG9tYWluIGNhbiBiZQ0KPiA+ID4+Pj4+IHVzZWQgdG8gZ2V0IHRvIHRoZSBmaXJzdCBs
+ZXZlbC4NCj4gPiA+Pj4+Pg0KPiA+ID4+Pj4NCj4gPiA+Pj4+IEJlYXIgd2l0aCBtZSwgYXMgSSdt
+IHByZXR0eSBjbHVlbGVzcyBhcyB0byBob3cgQUQgc3R1ZmYgd29ya3MuDQo+ID4gPj4+Pg0KPiA+
+ID4+Pj4gSWYgYWxsIEkgaGF2ZSBpcyBcXGRvbWFpbi5yZWFsbVxuYW1lc3BhY2UxIHdoYXQgc2hv
+dWxkIEkgYmUgZG9pbmcNCj4gPiA+Pj4+IHRvIGNvbm5lY3QgdG8gaXQgYXQgdGhhdCBwb2ludD8g
+Q3VycmVudGx5IHdlIGp1c3QgdHJlYXQNCj4gPiA+Pj4+ICJkb21haW4ucmVhbG0iIGFzIGEgaG9z
+dG5hbWUsIGJ1dCBldmlkZW50bHkgdGhhdCdzIG5vdCBxdWl0ZSB0aGUNCj4gcmlnaHQgdGhpbmcg
+dG8gZG8uIElzIGl0Pw0KPiA+ID4+Pg0KPiA+ID4+Pg0KPiA+ID4+PiBMZXQgbWUgY2hlY2suDQo+
+ID4gPj4+DQo+ID4gPj4+IEl0IG1pZ2h0IGJlIHRoYXQgV2luZG93cyByZXR1cm5zIHRoZSBJUCBh
+ZGRyZXNzZXMgb2YgYWxsIHRoZSBEQ3MNCj4gPiA+Pj4gaW4gdGhhdCBkb21haW4gaW4gdGhhdCBj
+YXNlIChhbmQsIGlmIFNpdGVzIGFuZCBTZXJ2aWNlcyBoYXMgYmVlbg0KPiA+ID4+PiBzZXQgdXAg
+cHJvcGVybHksIHJldHVybnMgdGhlbSB3aXRoIHRoZSBjbG9zZXN0IG9uZXMgdG8geW91IGZpcnN0
+DQo+ID4gPj4+IGluIHRoZQ0KPiA+ID4+PiBsaXN0LikgVGhhdCBpcywgbXkgbWVudGlvbmluZyBv
+ZiBTUlYgcmVjb3JkcyBtaWdodCBiZSBhIHJlZCBoZXJyaW5nLg0KPiA+ID4+Pg0KPiA+ID4+PiBJ
+biB0aGF0IGNhc2UsIGlmIHRoZSBmaXJzdCBvbmUgZmFpbHMsIHlvdSBzaG91bGQgc2ltcGx5IHRy
+eSB0aGUNCj4gPiA+Pj4gbmV4dCBvbmUgdW50aWwgeW91IGZpbmQgb25lIHRoYXQgcmVzcG9uZHMu
+DQo+ID4gPj4NCj4gPiA+Pg0KPiA+ID4+IFllcywgdGhhdCdzIGhvdyBpdCB3b3Jrcy4gSXQgdGhl
+biB0cmllcyB0byByZXZlcnNlIGxvb2t1cCB0aGUgaXANCj4gPiA+PiBhZGRyZXNzIGluIG9yZGVy
+IHRvIG1vdW50IHRoZSBzaGFyZS4gQXMgb3VyIHJldmVyc2UgRE5TIFNldHVwIGlzDQo+ID4gPj4g
+c29tZXdoYXQgYnJva2VuLCB0aGF0IHBhcnQgZmFpbHMuIEkgdGhvdWdodCB0aGF0IHJlbW92aW5n
+IHRoZSAtdA0KPiA+ID4+IG9wdGlvbiBjb3VsZCBiZSBhIHdvcmthcm91bmQgZm9yIHRoYXQsIGJ1
+dCBhcyB0aGUgY2lmcy9kb21haW4gU1BODQo+ID4gPj4gY2FuIG9ubHkgYmUgc2V0IG9uIG9uZSBE
+QywgdGhhdCdzIG5vIG9wdGlvbiB0by4NCj4gPiA+DQo+ID4gPiBXZWxsLCBtb3JlIHByZWNpc2Vs
+eSwgaXQgbmVlZHMgdGhlIG5hbWUgaW4gb3JkZXIgdG8gZ2VuZXJhdGUgYQ0KPiA+ID4gc2Vydmlj
+ZSB0aWNrZXQuIEkgZG9uJ3QgdGhpbmsgV2luZG93cyBjYXJlcyB0aGVzZSBkYXlzIHdoYXQgdGhl
+DQo+ID4gPiBjYWxsZWQtbmFtZSBpcy4NCj4gPg0KPiA+IERvIHlvdSBoYXZlIGEgY2FwdHVyZT8N
+Cj4gPg0KPiA+IEluIG15IGV4cGVyaWVuY2UsIHRoZSBjbGllbnQgaGFzIHRvIGRpc3Rpbmd1aXNo
+IGJldHdlZW4gYSBtdWx0aS1ob21lZA0KPiA+IGhvc3QgYW5kIGEgbmFtZSB0aGF0IHJlZmVycyB0
+byBhIGRvbWFpbi4NCj4gPg0KPiA+IEluIHRoZSBjYXNlIG9mIGEgbXVsdGktaG9tZWQgaG9zdCwg
+V2luZG93cyAoYXQgbGVhc3QgV2luNy9TcnYgMjAwOCkNCj4gPiBkb2VzIG5vdCBzZWVtIHRvIGJv
+dGhlciB0byBiYWNrLXRyYW5zbGF0ZSB0aGUgSVAgYWRkcmVzcyB1c2VkIHRvDQo+ID4gY29ubmVj
+dCB0byBhIG5hbWUuDQo+ID4NCj4gPiBJdCBzaW1wbHkgdXNlcyB0aGUgbmFtZSBwcmVzZW50ZWQg
+dG8gbG9vayBmb3IgdGhlIFNQTiBhbmQgdGh1cw0KPiA+IGdlbmVyYXRlIHRoZSB0aWNrZXQuDQo+
+ID4NCj4gPiBUaGF0IGlzLCBpZiB5b3UgdHJ5IHRvIGNvbm5lY3QgdG8NCj4gPiBcXHNvbWVtaG9t
+ZWRuYW1lLnJlYWxtLmNvbVxzaGFyZS1uYW1lIGFuZCBpdCB0dXJucyBvdXQgdGhhdCB0aGVyZQ0K
+PiBhcmUNCj4gPiBtdWx0aXBsZSBJUCBhZGRyZXNzZXMgZm9yIHNvbWVtaG9tZWRuYW1lLnJlYWxt
+LmNvbSB3aW5kb3dzDQo+IGNvbm5lY3RzIG9uDQo+ID4gb25lIG9mIHRoZW0gYnV0IHVzZXMgc29t
+ZW1ob21lZG5hbWUucmVhbG0uY29tIHRvIGZpbmQgdGhlIFNQTiB0bw0KPiA+IGdlbmVyYXRlIHRo
+ZSB0aWNrZXQuDQo+ID4NCj4gPiBJIGhhdmUgcHJvYmFibHkgZGVsZXRlZCBteSBjYXB0dXJlIHNv
+IEkgZG9uJ3Qga25vdyBpZiBpdCB0cmllcyB0byBsb29rDQo+ID4gZm9yIHRoZSBTUlYgcmVjb3Jk
+cyB0byBzZWUgaWYgdGhhdCB0aGluZyBpcyBhIGRvbWFpbiBuYW1lLg0KPiA+DQo+IA0KPiBZZXMs
+IHRoYXQncyB3aGF0IGNpZnMua28gZG9lcyBjdXJyZW50bHkgdG9vLiBXZSBqdXN0IHRyeSB0byB1
+c2UgdGhlIG5hbWUgYXMNCj4gcHJlc2VudGVkLiBJZiB0aGVyZSBpcyBubyBzdWNoIFNQTiwgdGhl
+biB5b3UgY2FuIG9wdGlvbmFsbHkgdHJ5IHRvIHJldmVyc2UtDQo+IHJlc29sdmUgdGhlIGFkZHJl
+c3MgYW5kIHVzZSB0aGF0IHdpdGggdGhlIC10IGZsYWcsIGJ1dCB0aGF0J3Mgc3ViamVjdCB0byBE
+TlMNCj4gc3Bvb2Zpbmcgb2YgY291cnNlLg0KPiANCj4gSG93IGRvZXMgdGhlIHdpbmRvd3MgY2xp
+ZW50IGRldGVybWluZSB3aGV0aGVyIGl0J3MgYSBkb21haW4gb3IgbXVsdGktDQo+IGhvbWVkIGhv
+c3Q/IFBlcmhhcHMgd2UgY291bGQgdHJ5IHRvIGVtdWxhdGUgd2hhdCBpdCBkb2VzIGZvciB0aGlz
+Pw0KDQpEb21haW4gcmVmZXJyYWxzIGFyZSBkaWZmZXJlbnQsIHRoZWlyIHJlc3BvbnNlcyBhcmVu
+J3QgaW50ZXJtaW5nbGVkIHdpdGggZmlsZSByZWZlcnJhbHMuIEFuZCBzZXJ2ZXIgdHlwZXMgaW4g
+dGhlIHJlc3BvbnNlIGFyZSBhbHNvIGRpc3RpbmN0IChSZWZlcnJhbCBzZXJ2ZXJzIHZzIFN0b3Jh
+Z2Ugc2VydmVycykuDQoNCk5vdGUgYWxzbyB0aGVyZSBpcyBhIGRpZmZlcmVuY2UgYmV0d2VlbiB0
+aGUgcmVxdWVzdHMgaXNzdWVkIGJ5IGEgZG9tYWluLWpvaW5lZCBXaW5kb3dzIGNsaWVudCB2cy4g
+bm9uLWRvbWFpbi1qb2luZWQuIElmIHRoZSBXaW5kb3dzIGNsaWVudCBpcyBpc3N1aW5nIFNSViBy
+ZWNvcmQgbG9va3VwcywgaXQgbWF5IGJlIHJlbGF0ZWQgdG8gZG9tYWluIGJlaGF2aW9yLiBJdCdz
+IG5vdCBERlMuDQoNClNlZSBNUy1ERlNDOg0KDQpUaGUgREZTOiBSZWZlcnJhbCBQcm90b2NvbCBp
+cyBhIGNvbW1hbmQvYWNrbm93bGVkZ2UgcHJvdG9jb2wgdGhhdCBzZW5kcyBvdXQgYSBzZXF1ZW5j
+ZSBvZiByZWZlcnJhbCByZXF1ZXN0cyB0byBldmVudHVhbGx5IHJlc29sdmUgdGhlIERGUyBwYXRo
+IHRvIGFuIGFjdHVhbCBwYXRoLiBUaGVyZSBhcmUgZml2ZSB0eXBlcyBvZiByZWZlcnJhbCByZXF1
+ZXN0cywgYXMgc3BlY2lmaWVkIGluIHNlY3Rpb24gMi4yLjI6DQrvgqcJRG9tYWluIHJlZmVycmFs
+cywgd2hpY2ggaWRlbnRpZnkgdGhlIGRvbWFpbnMgaW4gdGhlIGZvcmVzdCB0byB3aGljaCB0aGUg
+REZTIGNsaWVudCBpcyBqb2luZWQgYW5kIHRoZSBkb21haW5zIGluIG90aGVyIGZvcmVzdHMsIHdo
+aWNoIGFyZSBwYXJ0IG9mIGEgdHJ1c3QgcmVsYXRpb25zaGlwIHdpdGggdGhlIERGUyBjbGllbnQn
+cyBmb3Jlc3QuDQrvgqcJREMgcmVmZXJyYWxzLCB3aGljaCBpZGVudGlmeSB0aGUgRENzIG9mIGEg
+c3BlY2lmaWMgZG9tYWluLiANCu+CpwlSb290IHJlZmVycmFscywgd2hpY2ggaWRlbnRpZnkgdGhl
+IERGUyByb290IHRhcmdldHMgb2YgYSBzcGVjaWZpYyBERlMgbmFtZXNwYWNlLiANCu+CpwlMaW5r
+IHJlZmVycmFscywgd2hpY2ggaWRlbnRpdHkgdGhlIERGUyBsaW5rIHRhcmdldHMgb2YgYSBzcGVj
+aWZpYyBsaW5rIGluIGEgREZTIG5hbWVzcGFjZS4gDQrvgqcJU3lzdm9sIHJlZmVycmFscywgd2hp
+Y2ggaWRlbnRpZnkgdGhlIERDcyB0aGF0IGhvc3QgYSBkb21haW4ncyBTWVNWT0wgb3IgTkVUTE9H
+T04gc2hhcmVzLg0KRG9tYWluLWpvaW5lZCBjbGllbnRzIGlzc3VlIGFsbCBmaXZlIHR5cGVzIG9m
+IHJlZmVycmFsIHJlcXVlc3RzLCB3aGlsZSBub24tZG9tYWluLWpvaW5lZCBjbGllbnRzIGlzc3Vl
+IG9ubHkgREZTIHJvb3QgYW5kIERGUyBsaW5rIHJlZmVycmFsIHJlcXVlc3RzLiBPcHRpb25hbGx5
+LCBjbGllbnRzIGNhbiBhbHNvIGJlIHVzZWQgdG8gYWRtaW5pc3RlciBERlMgbmFtZXNwYWNlcyAo
+c2VlIFtNUy1ERlNOTV0pLg0KDQoNClRvbS4NCg==
