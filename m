@@ -1,94 +1,114 @@
-From: Jeff Layton <jlayton@redhat.com>
-Subject: [PATCH 3/3] cifs: add winucase_convert.pl to Documentation/ directory
-Date: Tue, 20 Aug 2013 15:50:11 -0400
-Message-ID: <1377028211-17624-4-git-send-email-jlayton@redhat.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH 2/3] cifs: convert case-insensitive dentry ops to use new case conversion routines
+Date: Tue, 20 Aug 2013 15:50:10 -0400
+Message-ID: <1377028211-17624-3-git-send-email-jlayton@redhat.com>
 References: <1377028211-17624-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	glogow@fbihome.de, bj@sernet.de
-To: smfrench@gmail.com
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <1377028211-17624-1-git-send-email-jlayton@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	glogow-iG8UcmBuX++ELgA04lAiVw@public.gmane.org, bj-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1377028211-17624-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Add the script used to generate the case-conversion tables to the
-Documentation/ directory, in case we ever need to update or regenerate
-these tables in the future.
+Have the case-insensitive d_compare and d_hash routines convert each
+character in the filenames to wchar_t's and then use the new
+cifs_toupper routine to convert those into uppercase.
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+With this scheme we should more closely emulate the case conversion that
+the servers will do.
+
+Reported-and-Tested-by: Jan-Marek Glogowski <glogow-iG8UcmBuX++ELgA04lAiVw@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- Documentation/filesystems/cifs/winucase_convert.pl | 62 ++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
- create mode 100755 Documentation/filesystems/cifs/winucase_convert.pl
+ fs/cifs/dir.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 50 insertions(+), 8 deletions(-)
 
-diff --git a/Documentation/filesystems/cifs/winucase_convert.pl b/Documentation/filesystems/cifs/winucase_convert.pl
-new file mode 100755
-index 0000000..322a9c8
---- /dev/null
-+++ b/Documentation/filesystems/cifs/winucase_convert.pl
-@@ -0,0 +1,62 @@
-+#!/usr/bin/perl -w
-+#
-+# winucase_convert.pl -- convert "Windows 8 Upper Case Mapping Table.txt" to
-+#                        a two-level set of C arrays.
-+#
-+#   Copyright 2013: Jeff Layton <jlayton@redhat.com>
-+#
-+#   This program is free software: you can redistribute it and/or modify
-+#   it under the terms of the GNU General Public License as published by
-+#   the Free Software Foundation, either version 3 of the License, or
-+#   (at your option) any later version.
-+#
-+#   This program is distributed in the hope that it will be useful,
-+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+#   GNU General Public License for more details.
-+#
-+#   You should have received a copy of the GNU General Public License
-+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
+diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+index d62ce0d..d3e2eaa 100644
+--- a/fs/cifs/dir.c
++++ b/fs/cifs/dir.c
+@@ -32,6 +32,7 @@
+ #include "cifsproto.h"
+ #include "cifs_debug.h"
+ #include "cifs_fs_sb.h"
++#include "cifs_unicode.h"
+ 
+ static void
+ renew_parental_timestamps(struct dentry *direntry)
+@@ -834,12 +835,17 @@ static int cifs_ci_hash(const struct dentry *dentry, struct qstr *q)
+ {
+ 	struct nls_table *codepage = CIFS_SB(dentry->d_sb)->local_nls;
+ 	unsigned long hash;
+-	int i;
++	wchar_t c;
++	int i, charlen;
+ 
+ 	hash = init_name_hash();
+-	for (i = 0; i < q->len; i++)
+-		hash = partial_name_hash(nls_tolower(codepage, q->name[i]),
+-					 hash);
++	for (i = 0; i < q->len; i += charlen) {
++		charlen = codepage->char2uni(&q->name[i], q->len - i, &c);
++		/* error out if we can't convert the character */
++		if (unlikely(charlen < 0))
++			return charlen;
++		hash = partial_name_hash(cifs_toupper(c), hash);
++	}
+ 	q->hash = end_name_hash(hash);
+ 
+ 	return 0;
+@@ -849,11 +855,47 @@ static int cifs_ci_compare(const struct dentry *parent, const struct dentry *den
+ 		unsigned int len, const char *str, const struct qstr *name)
+ {
+ 	struct nls_table *codepage = CIFS_SB(parent->d_sb)->local_nls;
++	wchar_t c1, c2;
++	int i, l1, l2;
+ 
+-	if ((name->len == len) &&
+-	    (nls_strnicmp(codepage, name->name, str, len) == 0))
+-		return 0;
+-	return 1;
++	/*
++	 * We make the assumption here that uppercase characters in the local
++	 * codepage are always the same length as their lowercase counterparts.
++	 *
++	 * If that's ever not the case, then this will fail to match it.
++	 */
++	if (name->len != len)
++		return 1;
 +
-+while(<>) {
-+	next if (!/^0x(..)(..)\t0x(....)\t/);
-+	$firstchar = hex($1);
-+	$secondchar = hex($2);
-+	$uppercase = hex($3);
++	for (i = 0; i < len; i += l1) {
++		/* Convert characters in both strings to UTF-16. */
++		l1 = codepage->char2uni(&str[i], len - i, &c1);
++		l2 = codepage->char2uni(&name->name[i], name->len - i, &c2);
 +
-+	$top[$firstchar][$secondchar] = $uppercase;
-+}
-+
-+for ($i = 0; $i < 256; $i++) {
-+	next if (!$top[$i]);
-+
-+	printf("static const wchar_t t2_%2.2x[256] = {", $i);
-+	for ($j = 0; $j < 256; $j++) {
-+		if (($j % 8) == 0) {
-+			print "\n\t";
-+		} else {
-+			print " ";
++		/*
++		 * If we can't convert either character, just declare it to
++		 * be 1 byte long and compare the original byte.
++		 */
++		if (unlikely(l1 < 0 && l2 < 0)) {
++			if (str[i] != name->name[i])
++				return 1;
++			l1 = 1;
++			continue;
 +		}
-+		printf("0x%4.4x,", $top[$i][$j] ? $top[$i][$j] : 0);
-+	}
-+	print "\n};\n\n";
-+}
 +
-+printf("static const wchar_t *const toplevel[256] = {", $i);
-+for ($i = 0; $i < 256; $i++) {
-+	if (($i % 8) == 0) {
-+		print "\n\t";
-+	} elsif ($top[$i]) {
-+		print " ";
-+	} else {
-+		print "  ";
++		/*
++		 * Here, we again ass|u|me that upper/lowercase versions of
++		 * a character are the same length in the local NLS.
++		 */
++		if (l1 != l2)
++			return 1;
++
++		/* Now compare uppercase versions of these characters */
++		if (cifs_toupper(c1) != cifs_toupper(c2))
++			return 1;
 +	}
 +
-+	if ($top[$i]) {
-+		printf("t2_%2.2x,", $i);
-+	} else {
-+		print "NULL,";
-+	}
-+}
-+print "\n};\n\n";
++	return 0;
+ }
+ 
+ const struct dentry_operations cifs_ci_dentry_ops = {
 -- 
 1.8.3.1
-
