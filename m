@@ -1,114 +1,305 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 2/3] cifs: convert case-insensitive dentry ops to use new case conversion routines
-Date: Tue, 20 Aug 2013 15:50:10 -0400
-Message-ID: <1377028211-17624-3-git-send-email-jlayton@redhat.com>
-References: <1377028211-17624-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	glogow-iG8UcmBuX++ELgA04lAiVw@public.gmane.org, bj-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH v2 2/2] cifs: Use per smb session session key instead of
+ per smb connection session key for smb2
+Date: Wed, 21 Aug 2013 08:02:00 -0500
+Message-ID: <CADT32e+soGvZUqn+Pw2jVQE6wac-Dy===Nowfbi4x=bxh8tzLA@mail.gmail.com>
+References: <1375973640-6255-1-git-send-email-shirishpargaonkar@gmail.com>
+	<20130812133931.36fb8f8c@tlielax.poochiereds.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1377028211-17624-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <20130812133931.36fb8f8c-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Have the case-insensitive d_compare and d_hash routines convert each
-character in the filenames to wchar_t's and then use the new
-cifs_toupper routine to convert those into uppercase.
+On Mon, Aug 12, 2013 at 12:39 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> On Thu,  8 Aug 2013 09:54:00 -0500
+> shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+>
+>> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>>
+>> Use per smb session session key for signing for smb2 onwards.
+>> For each signature genereation/validation, look for corrosponding
+>> session (id) to fetch session key.
+>> Skip checking signature of the session setup response.
+>>
+>>
+>> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>> ---
+>>  fs/cifs/cifsglob.h      |  5 +++--
+>>  fs/cifs/cifsproto.h     |  5 ++++-
+>>  fs/cifs/connect.c       | 14 +++++++++---
+>>  fs/cifs/smb2transport.c | 59 +++++++++++++++++++++++++++++++++++++++++--------
+>>  4 files changed, 68 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+>> index 2909380..4e24355 100644
+>> --- a/fs/cifs/cifsglob.h
+>> +++ b/fs/cifs/cifsglob.h
+>> @@ -368,7 +368,8 @@ struct smb_version_operations {
+>>       int (*perconnkey)(struct TCP_Server_Info *server,
+>>                                       struct cifs_ses *ses);
+>>       /* The next two functions will need to be changed to per smb session */
+>> -     void (*generate_signingkey)(struct TCP_Server_Info *server);
+>> +     int (*generate_signingkey)(struct TCP_Server_Info *server,
+>> +                                     struct cifs_ses *ses);
+>>       int (*calc_signature)(struct smb_rqst *rqst,
+>>                                  struct TCP_Server_Info *server);
+>>  };
+>> @@ -546,7 +547,6 @@ struct TCP_Server_Info {
+>>       int timeAdj;  /* Adjust for difference in server time zone in sec */
+>>       __u64 CurrentMid;         /* multiplex id - rotating counter */
+>>       char cryptkey[CIFS_CRYPTO_KEY_SIZE]; /* used by ntlm, ntlmv2 etc */
+>> -     char smb3signingkey[SMB3_SIGN_KEY_SIZE]; /* for signing smb3 packets */
+>>       /* 16th byte of RFC1001 workstation name is always null */
+>>       char workstation_RFC1001_name[RFC1001_NAME_LEN_WITH_NULL];
+>>       __u32 sequence_number; /* for signing, protected by srv_mutex */
+>> @@ -729,6 +729,7 @@ struct cifs_ses {
+>>       bool need_reconnect:1; /* connection reset, uid now invalid */
+>>  #ifdef CONFIG_CIFS_SMB2
+>>       __u16 session_flags;
+>> +     char smb3signingkey[SMB3_SIGN_KEY_SIZE]; /* for signing smb3 packets */
+>>  #endif /* CONFIG_CIFS_SMB2 */
+>>  };
+>>
+>> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+>> index b6c1d03..261c114 100644
+>> --- a/fs/cifs/cifsproto.h
+>> +++ b/fs/cifs/cifsproto.h
+>> @@ -206,6 +206,8 @@ extern void cifs_dfs_release_automount_timer(void);
+>>  void cifs_proc_init(void);
+>>  void cifs_proc_clean(void);
+>>
+>> +extern void cifs_put_smb_ses(struct cifs_ses *);
+>> +
+>>  extern void cifs_move_llist(struct list_head *source, struct list_head *dest);
+>>  extern void cifs_free_llist(struct list_head *llist);
+>>  extern void cifs_del_lock_waiters(struct cifsLockInfo *lock);
+>> @@ -435,7 +437,8 @@ extern int setup_ntlm_response(struct cifs_ses *, const struct nls_table *);
+>>  extern int setup_ntlmv2_rsp(struct cifs_ses *, const struct nls_table *);
+>>  extern void cifs_crypto_shash_release(struct TCP_Server_Info *);
+>>  extern int calc_seckey(struct cifs_ses *);
+>> -extern void generate_smb3signingkey(struct TCP_Server_Info *);
+>> +extern int generate_smb3signingkey(struct TCP_Server_Info *,
+>> +                                     struct cifs_ses *);
+>>
+>>  extern int perconnkey(struct TCP_Server_Info *, struct cifs_ses *);
+>>  extern void free_authkey(struct cifs_ses *);
+>> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+>> index 98deb98..0109046 100644
+>> --- a/fs/cifs/connect.c
+>> +++ b/fs/cifs/connect.c
+>> @@ -2251,7 +2251,7 @@ cifs_find_smb_ses(struct TCP_Server_Info *server, struct smb_vol *vol)
+>>       return NULL;
+>>  }
+>>
+>> -static void
+>> +void
+>>  cifs_put_smb_ses(struct cifs_ses *ses)
+>>  {
+>>       unsigned int xid;
+>> @@ -3847,8 +3847,16 @@ cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
+>>                       server->sequence_number = 0x2;
+>>                       server->session_estab = true;
+>>               }
+>> -             if (server->ops->generate_signingkey)
+>> -                     server->ops->generate_signingkey(server);
+>> +             if (server->ops->generate_signingkey) {
+>> +                     rc = server->ops->generate_signingkey(server, ses);
+>> +                     if (rc) {
+>> +                             cifs_dbg(VFS,
+>> +                                     "%s: Failure to generate signing key\n",
+>> +                                     __func__);
+>> +                             mutex_unlock(&server->srv_mutex);
+>> +                             goto setup_sess_ret;
+>> +                     }
+>> +             }
+>>               mutex_unlock(&server->srv_mutex);
+>>
+>
+> Again, I think it might make sense to move all of the signature key
+> handling into the session setup routines themselves. There doesn't seem
+> to be a strong need to abstract this out at the smb_ops layer.
+>
+>>               cifs_dbg(FYI, "CIFS Session Established successfully\n");
+>> diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+>> index 301b191..570e5b5 100644
+>> --- a/fs/cifs/smb2transport.c
+>> +++ b/fs/cifs/smb2transport.c
+>> @@ -109,6 +109,24 @@ smb3_crypto_shash_allocate(struct TCP_Server_Info *server)
+>>       return 0;
+>>  }
+>>
+>> +static struct cifs_ses *
+>> +smb2_find_smb_ses(struct smb2_hdr *smb2hdr, struct TCP_Server_Info *server)
+>> +{
+>> +     struct cifs_ses *ses;
+>> +
+>> +     spin_lock(&cifs_tcp_ses_lock);
+>> +     list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
+>> +             if (ses->Suid != smb2hdr->SessionId)
+>> +                     continue;
+>> +             ++ses->ses_count;
+>> +             spin_unlock(&cifs_tcp_ses_lock);
+>> +             return ses;
+>> +     }
+>> +     spin_unlock(&cifs_tcp_ses_lock);
+>> +
+>> +     return NULL;
+>> +}
+>> +
+>>
+>
+> I guess this will work but it's not going to be great for scalability
+> since you now have to serialize on this spinlock.
+>
+> The ideal scheme would be to keep a pointer to the smb session in the
+> smb_rqst that gets set when the SessionId field is set. Then you
+> wouldn't need to do this search on every outgoing frame. That's not
+> trivial to do though, due to the fact that much of this code is based
+> around legacy wrappers that don't know anything about struct smb_rqst.
+> So, in light of that, I guess this is ok for now, even if it is ugly.
+>
 
-With this scheme we should more closely emulate the case conversion that
-the servers will do.
+> One thing I'm not clear on though -- why are you bumping the refcount
+> on the session here? It looks to me like you'll always have a pinned
+> session reference any time that you call this, right? Or is that not
+> the case in the receive path?
 
-Reported-and-Tested-by: Jan-Marek Glogowski <glogow-iG8UcmBuX++ELgA04lAiVw@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/dir.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 50 insertions(+), 8 deletions(-)
+I think this is not needed.  By virtue of taking a reference/count,
+every session will be around till it is being taken down.
+Once I fix the case where we remove a session from the list
+after session logoff with smb2/3, this will be the case always.
+Will not add the ++ and put for sesssion during the next spin
+of this patchset.
 
-diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index d62ce0d..d3e2eaa 100644
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@ -32,6 +32,7 @@
- #include "cifsproto.h"
- #include "cifs_debug.h"
- #include "cifs_fs_sb.h"
-+#include "cifs_unicode.h"
- 
- static void
- renew_parental_timestamps(struct dentry *direntry)
-@@ -834,12 +835,17 @@ static int cifs_ci_hash(const struct dentry *dentry, struct qstr *q)
- {
- 	struct nls_table *codepage = CIFS_SB(dentry->d_sb)->local_nls;
- 	unsigned long hash;
--	int i;
-+	wchar_t c;
-+	int i, charlen;
- 
- 	hash = init_name_hash();
--	for (i = 0; i < q->len; i++)
--		hash = partial_name_hash(nls_tolower(codepage, q->name[i]),
--					 hash);
-+	for (i = 0; i < q->len; i += charlen) {
-+		charlen = codepage->char2uni(&q->name[i], q->len - i, &c);
-+		/* error out if we can't convert the character */
-+		if (unlikely(charlen < 0))
-+			return charlen;
-+		hash = partial_name_hash(cifs_toupper(c), hash);
-+	}
- 	q->hash = end_name_hash(hash);
- 
- 	return 0;
-@@ -849,11 +855,47 @@ static int cifs_ci_compare(const struct dentry *parent, const struct dentry *den
- 		unsigned int len, const char *str, const struct qstr *name)
- {
- 	struct nls_table *codepage = CIFS_SB(parent->d_sb)->local_nls;
-+	wchar_t c1, c2;
-+	int i, l1, l2;
- 
--	if ((name->len == len) &&
--	    (nls_strnicmp(codepage, name->name, str, len) == 0))
--		return 0;
--	return 1;
-+	/*
-+	 * We make the assumption here that uppercase characters in the local
-+	 * codepage are always the same length as their lowercase counterparts.
-+	 *
-+	 * If that's ever not the case, then this will fail to match it.
-+	 */
-+	if (name->len != len)
-+		return 1;
-+
-+	for (i = 0; i < len; i += l1) {
-+		/* Convert characters in both strings to UTF-16. */
-+		l1 = codepage->char2uni(&str[i], len - i, &c1);
-+		l2 = codepage->char2uni(&name->name[i], name->len - i, &c2);
-+
-+		/*
-+		 * If we can't convert either character, just declare it to
-+		 * be 1 byte long and compare the original byte.
-+		 */
-+		if (unlikely(l1 < 0 && l2 < 0)) {
-+			if (str[i] != name->name[i])
-+				return 1;
-+			l1 = 1;
-+			continue;
-+		}
-+
-+		/*
-+		 * Here, we again ass|u|me that upper/lowercase versions of
-+		 * a character are the same length in the local NLS.
-+		 */
-+		if (l1 != l2)
-+			return 1;
-+
-+		/* Now compare uppercase versions of these characters */
-+		if (cifs_toupper(c1) != cifs_toupper(c2))
-+			return 1;
-+	}
-+
-+	return 0;
- }
- 
- const struct dentry_operations cifs_ci_dentry_ops = {
--- 
-1.8.3.1
+Regards,
+
+Shirish
+
+>
+>>  int
+>>  smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+>> @@ -119,23 +137,34 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+>>       struct kvec *iov = rqst->rq_iov;
+>>       int n_vec = rqst->rq_nvec;
+>>       struct smb2_hdr *smb2_pdu = (struct smb2_hdr *)iov[0].iov_base;
+>> +     struct cifs_ses *ses;
+>> +
+>> +     ses = smb2_find_smb_ses(smb2_pdu, server);
+>> +     if (!ses) {
+>> +             cifs_dbg(VFS, "%s: Could not find session\n", __func__);
+>> +             return 0;
+>> +     }
+>>
+>>       memset(smb2_signature, 0x0, SMB2_HMACSHA256_SIZE);
+>>       memset(smb2_pdu->Signature, 0x0, SMB2_SIGNATURE_SIZE);
+>>
+>>       rc = smb2_crypto_shash_allocate(server);
+>>       if (rc) {
+>> +             cifs_put_smb_ses(ses);
+>>               cifs_dbg(VFS, "%s: shah256 alloc failed\n", __func__);
+>>               return rc;
+>>       }
+>>
+>>       rc = crypto_shash_setkey(server->secmech.hmacsha256,
+>> -             server->session_key.response, SMB2_NTLMV2_SESSKEY_SIZE);
+>> +             ses->auth_key.response, SMB2_NTLMV2_SESSKEY_SIZE);
+>>       if (rc) {
+>> +             cifs_put_smb_ses(ses);
+>>               cifs_dbg(VFS, "%s: Could not update with response\n", __func__);
+>>               return rc;
+>>       }
+>>
+>> +     cifs_put_smb_ses(ses);
+>> +
+>>       rc = crypto_shash_init(&server->secmech.sdeschmacsha256->shash);
+>>       if (rc) {
+>>               cifs_dbg(VFS, "%s: Could not init sha256", __func__);
+>> @@ -193,8 +222,8 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+>>       return rc;
+>>  }
+>>
+>> -void
+>> -generate_smb3signingkey(struct TCP_Server_Info *server)
+>> +int
+>> +generate_smb3signingkey(struct TCP_Server_Info *server, struct cifs_ses *ses)
+>>  {
+>>       unsigned char zero = 0x0;
+>>       __u8 i[4] = {0, 0, 0, 1};
+>> @@ -204,7 +233,7 @@ generate_smb3signingkey(struct TCP_Server_Info *server)
+>>       unsigned char *hashptr = prfhash;
+>>
+>>       memset(prfhash, 0x0, SMB2_HMACSHA256_SIZE);
+>> -     memset(server->smb3signingkey, 0x0, SMB3_SIGNKEY_SIZE);
+>> +     memset(ses->smb3signingkey, 0x0, SMB3_SIGNKEY_SIZE);
+>>
+>>       rc = smb3_crypto_shash_allocate(server);
+>>       if (rc) {
+>> @@ -213,7 +242,7 @@ generate_smb3signingkey(struct TCP_Server_Info *server)
+>>       }
+>>
+>>       rc = crypto_shash_setkey(server->secmech.hmacsha256,
+>> -             server->session_key.response, SMB2_NTLMV2_SESSKEY_SIZE);
+>> +             ses->auth_key.response, SMB2_NTLMV2_SESSKEY_SIZE);
+>>       if (rc) {
+>>               cifs_dbg(VFS, "%s: Could not set with session key\n", __func__);
+>>               goto smb3signkey_ret;
+>> @@ -267,27 +296,38 @@ generate_smb3signingkey(struct TCP_Server_Info *server)
+>>               goto smb3signkey_ret;
+>>       }
+>>
+>> -     memcpy(server->smb3signingkey, hashptr, SMB3_SIGNKEY_SIZE);
+>> +     memcpy(ses->smb3signingkey, hashptr, SMB3_SIGNKEY_SIZE);
+>>
+>>  smb3signkey_ret:
+>> -     return;
+>> +     return rc;
+>>  }
+>>
+>>  int
+>>  smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+>>  {
+>> -     int i, rc;
+>> +     int i;
+>> +     int rc = 0;
+>>       unsigned char smb3_signature[SMB2_CMACAES_SIZE];
+>>       unsigned char *sigptr = smb3_signature;
+>>       struct kvec *iov = rqst->rq_iov;
+>>       int n_vec = rqst->rq_nvec;
+>>       struct smb2_hdr *smb2_pdu = (struct smb2_hdr *)iov[0].iov_base;
+>> +     struct cifs_ses *ses;
+>> +
+>> +     ses = smb2_find_smb_ses(smb2_pdu, server);
+>> +     if (!ses) {
+>> +             cifs_dbg(VFS, "%s: Could not find session\n", __func__);
+>> +             return 0;
+>> +     }
+>>
+>>       memset(smb3_signature, 0x0, SMB2_CMACAES_SIZE);
+>>       memset(smb2_pdu->Signature, 0x0, SMB2_SIGNATURE_SIZE);
+>>
+>>       rc = crypto_shash_setkey(server->secmech.cmacaes,
+>> -             server->smb3signingkey, SMB2_CMACAES_SIZE);
+>> +             ses->smb3signingkey, SMB2_CMACAES_SIZE);
+>> +
+>> +     cifs_put_smb_ses(ses);
+>> +
+>>       if (rc) {
+>>               cifs_dbg(VFS, "%s: Could not set key for cmac aes\n", __func__);
+>>               return rc;
+>> @@ -384,6 +424,7 @@ smb2_verify_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+>>       struct smb2_hdr *smb2_pdu = (struct smb2_hdr *)rqst->rq_iov[0].iov_base;
+>>
+>>       if ((smb2_pdu->Command == SMB2_NEGOTIATE) ||
+>> +         (smb2_pdu->Command == SMB2_SESSION_SETUP) ||
+>>           (smb2_pdu->Command == SMB2_OPLOCK_BREAK) ||
+>>           (!server->session_estab))
+>>               return 0;
+>
+>
+> --
+> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
