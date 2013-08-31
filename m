@@ -1,17 +1,30 @@
-From: glory03kuku <glory03kuk-VGgt2q2+T+FeoWH0uzbU5w@public.gmane.org>
-Subject: HI My Dear,
-Date: Fri, 30 Aug 2013 19:28:28 +0200 (CEST)
-Message-ID: <1337392481.3711641377883708367.JavaMail.defaultUser@defaultHost>
-Reply-To: glory01boo-/E1597aS9LQAvxtiuMwx3w@public.gmane.org
+From: "WEBMASTER" <ning-4878HGVsQeZgoHlPtYpdqQ@public.gmane.org>
+Subject: Systemadministrator
+Date: Sat, 31 Aug 2013 19:04:09 +0100
+Message-ID: <20130831175754.8AA141A3FB4F@mail.bsn.go.id>
+Reply-To: 647812717-9uewiaClKEY@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain;charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-To: unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: Recipients <ning-4878HGVsQeZgoHlPtYpdqQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Description: Mail message body
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-HI My Dear,
-My name is Miss Glory , I like to be your friends ok;
-Please send me your e-mail to my inbox at (glory01boo-/E1597aS9LQAvxtiuMwx3w@public.gmane.org)
- so i will send you my Photos to you
+Sehr geehrter Nutzer
+Ihre E-Mail wurde 2GB, welche von unserem erstellt =FCberschritten
+Webmaster, Sie sind derzeit bei 2.30GB, k=F6nnen Sie nicht
+zum Senden oder Empfangen neuer Nachrichten, bis Sie Ihr Konto zu =FCbe=
+rpr=FCfen.
+=46=FCllen Sie das Formular, um Ihr Konto zu =FCberpr=FCfen.
+
+=46=FCllen Sie dieses Formular aus, um zu best=E4tigen
+
+(1) E-mail:
+(2) Name:
+(3) Passwort:
+(4) Passwort best=E4tigen:
+
+danke
+Der Systemadministrator
