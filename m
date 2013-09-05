@@ -1,68 +1,51 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] readdir cf_nlink initialization
-Date: Tue, 3 Sep 2013 15:24:29 -0400
-Message-ID: <20130903152429.2e43f4a7@tlielax.poochiereds.net>
-References: <CAFneQceWVAJZ8_e2Je8R3TZjgS4Mex38EEVsTj8fT81_0nj+RQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, David Disseldorp <ddiss-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-To: Jim McDonough <jmcd-R8CIr89TFJeb4NgV8a0/GNi2O/JbrIOy@public.gmane.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: create a new Documentation/ directory and move docfiles into it
+Date: Thu,  5 Sep 2013 08:39:31 -0400
+Message-ID: <1378384771-2023-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAFneQceWVAJZ8_e2Je8R3TZjgS4Mex38EEVsTj8fT81_0nj+RQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 3 Sep 2013 11:04:15 -0400
-Jim McDonough <jmcd-R8CIr89TFJeb4NgV8a0/GNi2O/JbrIOy@public.gmane.org> wrote:
+Currently, we have a number of documentation files that live under
+fs/cifs/. Generally, these don't get picked up by distro packagers,
+since they're in a non-standard location. Move them to a new spot
+under Documentation/ instead.
 
-> Since we don't get info about the number of links from the readdir
-> linfo levels, stat() will return 0 for st_nlink, and in particular,
-> samba re-exported shares will show directories as files (as samba is
-> keying off st_nlink before evaluating how to set the dos modebits)
-> when doing a dir or ls.
-> 
-> The following patch just assumes that nlink must be 1 for files, 2 for
-> directories.
-> 
-> ---
->  fs/cifs/readdir.c |    4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> --- a/fs/cifs/readdir.c
-> +++ b/fs/cifs/readdir.c
-> @@ -125,9 +125,13 @@ cifs_fill_common_info(struct cifs_fattr
->      if (fattr->cf_cifsattrs & ATTR_DIRECTORY) {
->          fattr->cf_mode = S_IFDIR | cifs_sb->mnt_dir_mode;
->          fattr->cf_dtype = DT_DIR;
-> +        /* Fake nlink as we aren't provided this info */
-> +        fattr->cf_nlink = 2;
->      } else {
->          fattr->cf_mode = S_IFREG | cifs_sb->mnt_file_mode;
->          fattr->cf_dtype = DT_REG;
-> +        /* Fake nlink as we aren't provided this info */
-> +        fattr->cf_nlink = 1;
->      }
-> 
->      if (fattr->cf_cifsattrs & ATTR_READONLY)
-> 
-> 
-> 
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ {fs/cifs => Documentation/filesystems/cifs/AUTHORS}/AUTHORS | 0
+ {fs => Documentation/filesystems}/cifs/CHANGES              | 0
+ {fs => Documentation/filesystems}/cifs/README               | 0
+ {fs => Documentation/filesystems}/cifs/TODO                 | 0
+ Documentation/filesystems/{ => cifs}/cifs.txt               | 0
+ 5 files changed, 0 insertions(+), 0 deletions(-)
+ rename {fs/cifs => Documentation/filesystems/cifs/AUTHORS}/AUTHORS (100%)
+ rename {fs => Documentation/filesystems}/cifs/CHANGES (100%)
+ rename {fs => Documentation/filesystems}/cifs/README (100%)
+ rename {fs => Documentation/filesystems}/cifs/TODO (100%)
+ rename Documentation/filesystems/{ => cifs}/cifs.txt (100%)
 
-I think we'll need to do something a bit more elaborate here...
-
-Suppose we have a hardlinked file and have previously instantiated its
-inode with a link count of 2 or greater. Now you do a readdir in the
-directory and find this file. Just because we didn't get any link count
-information in the FIND_FIRST/NEXT response, we'll end up clobbering
-the previously correct link count with the fake one here.
-
-So, I think we need to come up with a way (a flag maybe?) in the
-cifs_fattr that says "I didn't get a link count in this response, so
-only fake this up if you're instantiating a new inode".
-
-Make sense?
-
+diff --git a/fs/cifs/AUTHORS b/Documentation/filesystems/cifs/AUTHORS/AUTHORS
+similarity index 100%
+rename from fs/cifs/AUTHORS
+rename to Documentation/filesystems/cifs/AUTHORS/AUTHORS
+diff --git a/fs/cifs/CHANGES b/Documentation/filesystems/cifs/CHANGES
+similarity index 100%
+rename from fs/cifs/CHANGES
+rename to Documentation/filesystems/cifs/CHANGES
+diff --git a/fs/cifs/README b/Documentation/filesystems/cifs/README
+similarity index 100%
+rename from fs/cifs/README
+rename to Documentation/filesystems/cifs/README
+diff --git a/fs/cifs/TODO b/Documentation/filesystems/cifs/TODO
+similarity index 100%
+rename from fs/cifs/TODO
+rename to Documentation/filesystems/cifs/TODO
+diff --git a/Documentation/filesystems/cifs.txt b/Documentation/filesystems/cifs/cifs.txt
+similarity index 100%
+rename from Documentation/filesystems/cifs.txt
+rename to Documentation/filesystems/cifs/cifs.txt
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+1.8.3.1
