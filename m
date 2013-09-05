@@ -1,53 +1,44 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v2] cifs: create a new Documentation/ directory and move docfiles into it
-Date: Thu,  5 Sep 2013 08:45:39 -0400
-Message-ID: <1378385139-2306-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH 0/8] Implement SMB3 leases support
+Date: Fri,  6 Sep 2013 00:14:55 +0400
+Message-ID: <1378412103-29047-1-git-send-email-pshilovsky@samba.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-v2: fix destination of AUTHORS file
+The goal of this patchset is to add SMB3 leases support.
 
-Currently, we have a number of documentation files that live under
-fs/cifs/. Generally, these don't get picked up by distro packagers,
-since they're in a non-standard location. Move them to a new spot
-under Documentation/ instead.
+The first two patches fixes existing problems in lease break processing code and targeted to stable as well.
 
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- {fs => Documentation/filesystems}/cifs/AUTHORS | 0
- {fs => Documentation/filesystems}/cifs/CHANGES | 0
- {fs => Documentation/filesystems}/cifs/README  | 0
- {fs => Documentation/filesystems}/cifs/TODO    | 0
- Documentation/filesystems/{ => cifs}/cifs.txt  | 0
- 5 files changed, 0 insertions(+), 0 deletions(-)
- rename {fs => Documentation/filesystems}/cifs/AUTHORS (100%)
- rename {fs => Documentation/filesystems}/cifs/CHANGES (100%)
- rename {fs => Documentation/filesystems}/cifs/README (100%)
- rename {fs => Documentation/filesystems}/cifs/TODO (100%)
- rename Documentation/filesystems/{ => cifs}/cifs.txt (100%)
+Then the code is prepared to make adding SMB3 leases easier (patches #3-#6).
 
-diff --git a/fs/cifs/AUTHORS b/Documentation/filesystems/cifs/AUTHORS
-similarity index 100%
-rename from fs/cifs/AUTHORS
-rename to Documentation/filesystems/cifs/AUTHORS
-diff --git a/fs/cifs/CHANGES b/Documentation/filesystems/cifs/CHANGES
-similarity index 100%
-rename from fs/cifs/CHANGES
-rename to Documentation/filesystems/cifs/CHANGES
-diff --git a/fs/cifs/README b/Documentation/filesystems/cifs/README
-similarity index 100%
-rename from fs/cifs/README
-rename to Documentation/filesystems/cifs/README
-diff --git a/fs/cifs/TODO b/Documentation/filesystems/cifs/TODO
-similarity index 100%
-rename from fs/cifs/TODO
-rename to Documentation/filesystems/cifs/TODO
-diff --git a/Documentation/filesystems/cifs.txt b/Documentation/filesystems/cifs/cifs.txt
-similarity index 100%
-rename from Documentation/filesystems/cifs.txt
-rename to Documentation/filesystems/cifs/cifs.txt
+Finaly in last two patches create lease v2 context is added and epoch value from the response is respected.
+
+Pavel Shilovsky (8):
+  CIFS: Fix memory leak when a lease break comes
+  CIFS: Fix missing lease break from a client
+  CIFS: Replace clientCanCache* bools with an integer
+  CIFS: Store lease state itself rather than a mapped oplock value
+  CIFS: Move creating lease buffer to ops struct
+  CIFS: Move parsing lease buffer to ops struct
+  CIFS: Add create lease v2 context for SMB3
+  CIFS: Respect epoch value from create lease context v2
+
+ fs/cifs/cifsfs.c    |   34 ++++---
+ fs/cifs/cifsglob.h  |   42 +++++---
+ fs/cifs/connect.c   |    2 +-
+ fs/cifs/file.c      |   35 ++++---
+ fs/cifs/inode.c     |    8 +-
+ fs/cifs/misc.c      |   12 +--
+ fs/cifs/smb1ops.c   |   12 ++-
+ fs/cifs/smb2file.c  |   23 -----
+ fs/cifs/smb2misc.c  |  182 +++++++++++++++++----------------
+ fs/cifs/smb2ops.c   |  283 +++++++++++++++++++++++++++++++++++++++++++++++++--
+ fs/cifs/smb2pdu.c   |   80 ++++-----------
+ fs/cifs/smb2pdu.h   |   23 +++++
+ fs/cifs/smb2proto.h |    2 -
+ 13 files changed, 497 insertions(+), 241 deletions(-)
+
 -- 
-1.8.3.1
+1.7.10.4
