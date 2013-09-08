@@ -1,122 +1,84 @@
-From: Jim McDonough <jmcd-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH v2] readdir cf_nlink initialization
-Date: Sun, 8 Sep 2013 13:18:21 -0400
-Message-ID: <CAFneQccke1x60Xewe_Tpz=Dt=1LiC+VMTuJ8MxianKPcdMbn_w@mail.gmail.com>
-References: <CAFneQcePFASf4u_Q-xyCy0_cYrpOb7p3+yQV1N1FKxtNYMi2vQ@mail.gmail.com>
- <20130908103237.645ce91d@tlielax.poochiereds.net>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 0/8] Implement SMB3 leases support
+Date: Sun, 8 Sep 2013 17:54:49 -0500
+Message-ID: <CAH2r5mv7J5E7uM+jjd=5vXcDnYudjzSaXvYEs00s4DxkJc9JMg@mail.gmail.com>
+References: <1378412103-29047-1-git-send-email-pshilovsky@samba.org>
+	<CAKywueSL-rv=u_6XFcoBCBU-Ar5Z82SVRKqXscPgSETUWVfE1A@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, David Disseldorp <ddiss-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20130908103237.645ce91d-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <CAKywueSL-rv=u_6XFcoBCBU-Ar5Z82SVRKqXscPgSETUWVfE1A-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, Sep 8, 2013 at 10:32 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> On Sat, 7 Sep 2013 14:49:24 -0400
-> Jim McDonough <jmcd-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
->
->> Here's my second try.  I hope there aren't missed ops which update the
->> inode without having nlink updated.  At worst, they should stop
->> clobbering valid values, which was definitely happening before.
->>
->> Signed-off-by: Jim McDonough <jmcdonough-l3A5Bk7waGM@public.gmane.org>
->>
->> ---
->>  fs/cifs/cifsglob.h |    1 +
->>  fs/cifs/inode.c    |   21 ++++++++++++++++++++-
->>  fs/cifs/readdir.c  |    3 +++
->>  3 files changed, 24 insertions(+), 1 deletion(-)
->>
->> --- a/fs/cifs/cifsglob.h
->> +++ b/fs/cifs/cifsglob.h
->> @@ -712,6 +712,7 @@ struct dfs_info3_param {
->>  #define CIFS_FATTR_DELETE_PENDING    0x2
->>  #define CIFS_FATTR_NEED_REVAL        0x4
->>  #define CIFS_FATTR_INO_COLLISION    0x8
->> +#define CIFS_FATTR_MISSING_NLINK    0x10
->>
->>  struct cifs_fattr {
->>      u32        cf_flags;
->> --- a/fs/cifs/inode.c
->> +++ b/fs/cifs/inode.c
->> @@ -118,6 +118,25 @@ cifs_revalidate_cache(struct inode *inod
->>      cifs_i->invalid_mapping = true;
->>  }
->>
->> +/* copy nlink to the inode, unless it wasn't provided.  Provide
->> +   sane values if we don't have an existing one and none was provided */
->> +static void
->> +cifs_nlink_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr)
->> +{
->> +    if (fattr->cf_nlink) {
->> +        inode->i_nlink = fattr->cf_nlink;
->> +        return;
->> +    }
->> +
->
-> I think it would be best to get rid of the above if block and add an
-> else block to the end of the following if clause that just sets
-> inode->i_nlink = fattr->cf_nlink unconditionally.
->
-> The problem with the logic here is that you're ignoring te
-> (legitimate) case where cf_nlink might be 0 as reported by the server.
->
-Yah, true.  I am assuming it won't change to zero after it's been set
-to something else.
+FYI - The 5th patch in the series has a merge error when based on Jeff
+and Shirish's serieses.
 
->> +    if ((fattr->cf_flags & CIFS_FATTR_MISSING_NLINK) &&
->> +        (inode->i_state & I_NEW)) {
->> +        if (fattr->cf_cifsattrs & ATTR_DIRECTORY)
->> +            inode->i_nlink = 2;
->> +        else
->> +            inode->i_nlink = 1;
->> +    }
->> +}
->> +
->>  /* populate an inode with info from a cifs_fattr struct */
->>  void
->>  cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr)
->> @@ -132,7 +151,7 @@ cifs_fattr_to_inode(struct inode *inode,
->>      inode->i_mtime = fattr->cf_mtime;
->>      inode->i_ctime = fattr->cf_ctime;
->>      inode->i_rdev = fattr->cf_rdev;
->> -    inode->i_nlink = fattr->cf_nlink;
->> +    cifs_nlink_fattr_to_inode(inode, fattr);
->>      inode->i_uid = fattr->cf_uid;
->>      inode->i_gid = fattr->cf_gid;
+[PATCH] CIFS: Move creating lease buffer to ops struct
+
+ I will look at it later - but let me know if you already have a
+rebased version.
+
+Also would be useful if there were more review feedback on these - but
+they seem promising so far.  Let me know if you have gotten any
+offlist feedback because I didn't see much on the list on these
+
+On Thu, Sep 5, 2013 at 3:25 PM, Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> 2013/9/6 Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
+>> The goal of this patchset is to add SMB3 leases support.
 >>
->> --- a/fs/cifs/readdir.c
->> +++ b/fs/cifs/readdir.c
->> @@ -130,6 +130,9 @@ cifs_fill_common_info(struct cifs_fattr
->>          fattr->cf_dtype = DT_REG;
->>      }
+>> The first two patches fixes existing problems in lease break processing code and targeted to stable as well.
 >>
->> +    /* non-unix readdir doesn't provide nlink */
->> +    fattr->cf_flags &= CIFS_FATTR_MISSING_NLINK
->> +
+>> Then the code is prepared to make adding SMB3 leases easier (patches #3-#6).
+>>
+>> Finaly in last two patches create lease v2 context is added and epoch value from the response is respected.
+>>
+>> Pavel Shilovsky (8):
+>>   CIFS: Fix memory leak when a lease break comes
+>>   CIFS: Fix missing lease break from a client
+>>   CIFS: Replace clientCanCache* bools with an integer
+>>   CIFS: Store lease state itself rather than a mapped oplock value
+>>   CIFS: Move creating lease buffer to ops struct
+>>   CIFS: Move parsing lease buffer to ops struct
+>>   CIFS: Add create lease v2 context for SMB3
+>>   CIFS: Respect epoch value from create lease context v2
+>>
+>>  fs/cifs/cifsfs.c    |   34 ++++---
+>>  fs/cifs/cifsglob.h  |   42 +++++---
+>>  fs/cifs/connect.c   |    2 +-
+>>  fs/cifs/file.c      |   35 ++++---
+>>  fs/cifs/inode.c     |    8 +-
+>>  fs/cifs/misc.c      |   12 +--
+>>  fs/cifs/smb1ops.c   |   12 ++-
+>>  fs/cifs/smb2file.c  |   23 -----
+>>  fs/cifs/smb2misc.c  |  182 +++++++++++++++++----------------
+>>  fs/cifs/smb2ops.c   |  283 +++++++++++++++++++++++++++++++++++++++++++++++++--
+>>  fs/cifs/smb2pdu.c   |   80 ++++-----------
+>>  fs/cifs/smb2pdu.h   |   23 +++++
+>>  fs/cifs/smb2proto.h |    2 -
+>>  13 files changed, 497 insertions(+), 241 deletions(-)
+>>
+>> --
+>> 1.7.10.4
+>>
 >
-> Shouldn't that be "|=" ?
-Uh, yeah.  I'd already fixed that but posted the wrong one.  Sigh.
+> Made some changes in patch #1 and #2 descriptions that can be found in
+> for-next branch of my git repository:
+> http://git.altlinux.org/people/piastry/public/?p=cifs-2.6.git;a=shortlog;h=refs/heads/for-next.
 >
->>      if (fattr->cf_cifsattrs & ATTR_READONLY)
->>          fattr->cf_mode &= ~S_IWUGO;
->>
->>
->>
->>
->
-> The only other thing I see is that the code in cifs_all_info_to_fattr
-> ought to be changed to use this flag and not try to fake up the
-> cf_nlink value.
-Ok, I'll add that as well.
+> --
+> Best regards,
+> Pavel Shilovsky.
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
 
 -- 
-Jim McDonough
-Samba Team
-SUSE labs
-jmcd at samba dot org
-jmcd at themcdonoughs dot org
+Thanks,
+
+Steve
