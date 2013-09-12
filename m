@@ -1,83 +1,89 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: dmesg: "CIFS VFS: Unexpected lookup error -26"
-Date: Thu, 12 Sep 2013 05:58:39 -0400
-Message-ID: <20130912055839.5ca8e8c3@tlielax.poochiereds.net>
-References: <op.w295luvq07ery2@nmr100.nioch.nsc.ru>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: "Andrey Shernyukov" <andreysh-0G7livjLyD/FOEHFb8W2jw@public.gmane.org>
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: Avoid calling unlock_page() twice in cifs_readpage() when using fscache
+Date: Thu, 12 Sep 2013 15:58:51 +0100
+Message-ID: <1378997931-19954-1-git-send-email-sprabhu@redhat.com>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <op.w295luvq07ery2-pBYy1DuGxBzUS83QA+KWFijHesifYMBh@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 12 Sep 2013 11:04:32 +0700
-"Andrey Shernyukov" <andreysh-0G7livjLyD/FOEHFb8W2jw@public.gmane.org> wrote:
+When reading a single page with cifs_readpage(), we make a call to
+fscache_read_or_alloc_page() which once done, asynchronously calls
+the completion function cifs_readpage_from_fscache_complete(). This
+completion function unlocks the page once it has been populated from
+cache. The module then attempts to unlock the page a second time in
+cifs_readpage() which leads to warning messages.
 
-> Hi,
-> "CIFS VFS: Unexpected lookup error -26" message appears every time when I  
-> enter into the root directory of win-share (C$) containing the  
-> pagefile.sys and hibernate.sys.
-> 
-> ll /media/share
-> .....
-> -?????????? ? ?      ?          ?            ? hiberfil.sys
-> -rwxr-xr-x. 1 andrew root     609 Sep 30  2008 inclick.txt
-> -r-xr-xr-x. 1 andrew root       0 Apr 13  2008 IO.SYS
-> -r-xr-xr-x. 1 andrew root       0 Apr 13  2008 MSDOS.SYS
-> -r-xr-xr-x. 1 andrew root  251152 Oct 20  2008 ntldr
-> -?????????? ? ?      ?          ?            ? pagefile.sys
-> ...
-> 
+In case of a successful call to fscache_read_or_alloc_page() we should skip
+the second unlock_page() since this will be called by the
+cifs_readpage_from_fscache_complete() once the page has been populated by
+fscache.
 
-Most likely you're getting a NT_STATUS_SHARING_VIOLATION error back
-from the server which is preventing you from fetching information about
-those files. It should be harmless, but there's little we can do to
-prevent that.
+With the modifications to cifs_readpage_worker(), we will need to re-grab the
+page lock in cifs_write_begin().
 
-Arguably, the client shouldn't be spamming the logs with messages about
-that however.
+Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/file.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-
-> cat /proc/mounts | grep share
-> //***.***.***.***/c$/ /media/share cifs  
-> rw,relatime,sec=ntlm,cache=loose,unc=\\***.***.***.***\c$,username=andrew,uid=500,forceuid,gid=0,noforcegid,addr=***.***.***.***,file_mode=0755,dir_mode=0755,nounix,serverino,rsize=16384,wsize=65536,actimeo=1  
-> 0 0
-> 
-> cat /etc/fstab
-> //***.***.***.***/c$ /media/share/ cifs  
-> uid=andrew,nounix,_netdev,credentials=/root/securedir/secfile    0 0
-> 
-> uname -a
-> Linux ***.***.***.*** 2.6.32-358.18.1.el6.i686 #1 SMP Wed Aug 28 14:27:42  
-> UTC 2013 i686 i686 i386 GNU/Linux
-> 
-> /sbin/modinfo cifs
-> filename:        
-> /lib/modules/2.6.32-358.18.1.el6.i686/kernel/fs/cifs/cifs.ko
-> version:        1.68
-> description:    VFS to access servers complying with the SNIA CIFS  
-> Specification e.g. Samba and Windows
-> license:        GPL
-> author:         Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-> srcversion:     15D320AAB626CCD8C6ADAD3
-> depends:
-> vermagic:       2.6.32-358.18.1.el6.i686 SMP mod_unload modversions 686
-> parm:           CIFSMaxBufSize:Network buffer size (not including header).  
-> Default: 16384 Range: 8192 to 130048 (int)
-> parm:           cifs_min_rcv:Network buffers in pool. Default: 4 Range: 1  
-> to 64 (int)
-> parm:           cifs_min_small:Small network buffers in pool. Default: 30  
-> Range: 2 to 256 (int)
-> parm:           cifs_max_pending:Simultaneous requests to server. Default:  
-> 50 Range: 2 to 256 (int)
-> parm:           echo_retries:Number of echo attempts before giving up and  
-> reconnecting server. Default: 5. 0 means never reconnect. (ushort)
-> 
-
-
-
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 69e8431..98e5222 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -3423,6 +3423,7 @@ static int cifs_readpage_worker(struct file *file, struct page *page,
+ io_error:
+ 	kunmap(page);
+ 	page_cache_release(page);
++	unlock_page(page);
+ 
+ read_complete:
+ 	return rc;
+@@ -3447,8 +3448,6 @@ static int cifs_readpage(struct file *file, struct page *page)
+ 
+ 	rc = cifs_readpage_worker(file, page, &offset);
+ 
+-	unlock_page(page);
+-
+ 	free_xid(xid);
+ 	return rc;
+ }
+@@ -3502,6 +3501,7 @@ static int cifs_write_begin(struct file *file, struct address_space *mapping,
+ 			loff_t pos, unsigned len, unsigned flags,
+ 			struct page **pagep, void **fsdata)
+ {
++	int oncethru = 0;
+ 	pgoff_t index = pos >> PAGE_CACHE_SHIFT;
+ 	loff_t offset = pos & (PAGE_CACHE_SIZE - 1);
+ 	loff_t page_start = pos & PAGE_MASK;
+@@ -3511,6 +3511,7 @@ static int cifs_write_begin(struct file *file, struct address_space *mapping,
+ 
+ 	cifs_dbg(FYI, "write_begin from %lld len %d\n", (long long)pos, len);
+ 
++start:
+ 	page = grab_cache_page_write_begin(mapping, index, flags);
+ 	if (!page) {
+ 		rc = -ENOMEM;
+@@ -3552,13 +3553,16 @@ static int cifs_write_begin(struct file *file, struct address_space *mapping,
+ 		}
+ 	}
+ 
+-	if ((file->f_flags & O_ACCMODE) != O_WRONLY) {
++	if ((file->f_flags & O_ACCMODE) != O_WRONLY && !oncethru) {
+ 		/*
+ 		 * might as well read a page, it is fast enough. If we get
+ 		 * an error, we don't need to return it. cifs_write_end will
+ 		 * do a sync write instead since PG_uptodate isn't set.
+ 		 */
+ 		cifs_readpage_worker(file, page, &page_start);
++		page_cache_release(page);
++		oncethru = 1;
++		goto start;
+ 	} else {
+ 		/* we could try using another file handle if there is one -
+ 		   but how would we lock it to prevent close of that handle
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.8.3.1
