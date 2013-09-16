@@ -1,52 +1,40 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Sun, 15 Sep 2013 23:57:19 -0500
-Message-ID: <CAH2r5muOG7Pvg+7qhgb1BuQHQkse4h9GZsf_CMHLaxyPHnpFnQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [GIT PULL] CIFS FS-Cache bugfix
+Date: Mon, 16 Sep 2013 14:34:40 +0100
+Message-ID: <12400.1379338480@warthog.procyon.org.uk>
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cachefs-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Two minor cifs fixes and a minor documentation cleanup for cifs.txt
 
-The following changes since commit bdbdfdef5766c2a60185e946df242f1bc0d3=
-7c09:
+Hi Steve,
 
-  Merge tag 'hwmon-for-linus' of
-git://git.kernel.org/pub/scm/linux/kernel/git/groeck/linux-staging
-(2013-09-13 10:58:41 -0700)
+Could you pull a CIFS bugfix from my fscache branch?
+
+David
+---
+The following changes since commit 5a6f282a2052bb13171b53f03b34501cf72c33f1:
+
+  fscache: Netfs function for cleanup post readpages (2013-09-06 09:17:30 +0100)
 
 are available in the git repository at:
 
+  git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git fscache
 
-  git://git.samba.org/sfrench/cifs-2.6.git for-next
+for you to fetch changes up to 19ce0a7c9e94ae975e1c029b65b332cbf77b41ec:
 
-for you to fetch changes up to 81b66220a9ebea7dd1547388279ee1898d7fe0f9=
-:
-
-  cifs: update cifs.txt and remove some outdated infos (2013-09-13
-16:29:58 -0500)
+  CIFS: FS-Cache: Uncache unread pages in cifs_readpages() before freeing them (2013-09-06 09:17:30 +0100)
 
 ----------------------------------------------------------------
-Bj=F6rn Jacke (1):
-      cifs: update cifs.txt and remove some outdated infos
+David Howells (1):
+      CIFS: FS-Cache: Uncache unread pages in cifs_readpages() before freeing them
 
-Sachin Prabhu (2):
-      cifs: Do not take a reference to the page in cifs_readpage_worker=
-()
-      cifs: Avoid calling unlock_page() twice in cifs_readpage() when
-using fscache
-
- Documentation/filesystems/cifs/cifs.txt | 42 +++++++++----------------=
---------
- fs/cifs/file.c                          | 15 ++++++++----
- 2 files changed, 21 insertions(+), 36 deletions(-)
-
---=20
-Thanks,
-
-Steve
+ fs/cifs/file.c    |  8 ++++++++
+ fs/cifs/fscache.c |  7 +++++++
+ fs/cifs/fscache.h | 13 +++++++++++++
+ 3 files changed, 28 insertions(+)
