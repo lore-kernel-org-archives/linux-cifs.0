@@ -1,56 +1,34 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [GIT PULL] CIFS FS-Cache bugfix
-Date: Mon, 16 Sep 2013 12:56:53 -0500
-Message-ID: <CAH2r5mvyZmjihgy4hqnbf+w9xgfMU_DOGLrnDL1CX3Z5PzkJkQ@mail.gmail.com>
-References: <12400.1379338480@warthog.procyon.org.uk>
+From: Jim McDonough <jmcd-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH v2] readdir cf_nlink initialization
+Date: Mon, 16 Sep 2013 17:11:13 -0400
+Message-ID: <CAFneQccR3FK10Lw0KgMdhQDz6CZGfeHEE05VEv3HTRnpHVZsxA@mail.gmail.com>
+References: <CAFneQcePFASf4u_Q-xyCy0_cYrpOb7p3+yQV1N1FKxtNYMi2vQ@mail.gmail.com>
+ <20130908103237.645ce91d@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-cachefs-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, David Disseldorp <ddiss-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <12400.1379338480-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
+In-Reply-To: <20130908103237.645ce91d-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Sep 16, 2013 at 8:34 AM, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->
-> Hi Steve,
->
-> Could you pull a CIFS bugfix from my fscache branch?
->
-> David
-
-Sounds fine.  May have to wait a day or so though due to pending merge
-request (to upstream).
-
-> ---
-> The following changes since commit 5a6f282a2052bb13171b53f03b34501cf72c33f1:
->
->   fscache: Netfs function for cleanup post readpages (2013-09-06 09:17:30 +0100)
->
-> are available in the git repository at:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git fscache
->
-> for you to fetch changes up to 19ce0a7c9e94ae975e1c029b65b332cbf77b41ec:
->
->   CIFS: FS-Cache: Uncache unread pages in cifs_readpages() before freeing them (2013-09-06 09:17:30 +0100)
->
-> ----------------------------------------------------------------
-> David Howells (1):
->       CIFS: FS-Cache: Uncache unread pages in cifs_readpages() before freeing them
->
->  fs/cifs/file.c    |  8 ++++++++
->  fs/cifs/fscache.c |  7 +++++++
->  fs/cifs/fscache.h | 13 +++++++++++++
->  3 files changed, 28 insertions(+)
-
+On Sun, Sep 8, 2013 at 10:32 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> The only other thing I see is that the code in cifs_all_info_to_fattr
+> ought to be changed to use this flag and not try to fake up the
+> cf_nlink value.
+Ok, after looking a bit more, I'm not sure how we would know what to
+do.  If we're doing a qpathinfo for all_info, aren't we always getting
+a value for nlink?  How would we determine whether it needs to be
+"fixed" or not?  Do we just assume that for all non-unix cases we
+can't trust it?
 
 
 -- 
-Thanks,
-
-Steve
+Jim McDonough
+Samba Team
+SUSE labs
+jmcd at samba dot org
+jmcd at themcdonoughs dot org
