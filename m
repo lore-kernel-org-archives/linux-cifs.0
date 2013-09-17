@@ -1,43 +1,56 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: don't spam the logs on unexpected lookup errors
-Date: Tue, 17 Sep 2013 07:08:11 -0400
-Message-ID: <1379416091-2040-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	"Andrey Shernyukov" <andreysh-0G7livjLyD/FOEHFb8W2jw@public.gmane.org>
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: dmesg: "CIFS VFS: Unexpected lookup error -26"
+Date: Tue, 17 Sep 2013 07:08:49 -0400
+Message-ID: <20130917070849.6c9b9356@tlielax.poochiereds.net>
+References: <op.w295luvq07ery2@nmr100.nioch.nsc.ru>
+	<20130912055839.5ca8e8c3@tlielax.poochiereds.net>
+	<20130914073847.075b1921@tlielax.poochiereds.net>
+	<op.w3h5getf07ery2@nmr100.nioch.nsc.ru>
+	<20130916081653.1567cf04@corrin.poochiereds.net>
+	<op.w3jhe3yi07ery2@nmr100.nioch.nsc.ru>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: "Andrey Shernyukov" <andreysh-0G7livjLyD/FOEHFb8W2jw@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <op.w3jhe3yi07ery2-pBYy1DuGxBzUS83QA+KWFijHesifYMBh@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Andrey reported that he was seeing cifs.ko spam the logs with messages
-like this:
+On Tue, 17 Sep 2013 11:58:05 +0700
+"Andrey Shernyukov" <andreysh-0G7livjLyD/FOEHFb8W2jw@public.gmane.org> wrote:
 
-    CIFS VFS: Unexpected lookup error -26
+> On Mon, 16 Sep 2013 19:16:53 +0700, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> w=
+rote:
+>=20
+> > No, sorry -- that doesn't tell me much. I had pretty much inferred =
+that
+> > from the info before. What would be more interesting is the capture=
+ of
+> > the FIND_FIRST/NEXT calls, in binary format so I can open them with
+> > wireshark and see what it's sending.
+> >
+>=20
+> =D0=9E.=D0=9A. Capture packets are in attachment (except first packet=
+s with =20
+> authorization information) as "libpcap" wireshark format.
+>=20
 
-He was listing the root directory of a server and hitting an error when
-trying to QUERY_PATH_INFO against hiberfil.sys and pagefile.sys. The
-right fix would be to switch the lookup code over to using FIND_FIRST,
-but until then we really don't need to report this at a level of
-KERN_ERR. Convert this message over to FYI level.
+Ok, based on this and the previous text dumps of the QUERY_PATH_INFO
+packets, it looks like FIND_FIRST/NEXT is able to fetch this info
+without issue, but the QUERY_PATH_INFO call gets back an error. There's
+not much we can do about that without some major reworking of the
+lookup code.
 
-Reported-by: "Andrey Shernyukov" <andreysh-0G7livjLyD/FOEHFb8W2jw@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/dir.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I think we really ought to convert the lookup code to use a FIND_FIRST
+call with a specific name instead of QUERY_PATH_INFO. It seems to
+"perturb" things less, plus it also gives us the index number which
+we use as an inode number. That allows us to do lookups on unknown
+dentries without a second call to fetch the UniqueID.
 
-diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index d3e2eaa..55c38cf 100644
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@ -755,7 +755,7 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
- 	/*	if it was once a directory (but how can we tell?) we could do
- 		shrink_dcache_parent(direntry); */
- 	} else if (rc != -EACCES) {
--		cifs_dbg(VFS, "Unexpected lookup error %d\n", rc);
-+		cifs_dbg(FYI, "Unexpected lookup error %d\n", rc);
- 		/* We special case check for Access Denied - since that
- 		is a common return code */
- 	}
--- 
-1.8.3.1
+Additionally, I think we ought to make that error not print by default.
+I'll send a patch to tone that down in a bit.
+
+--=20
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
