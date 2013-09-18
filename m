@@ -1,51 +1,73 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH] cifs.upcall: try to use default credcache if we didn't find one
-Date: Tue, 17 Sep 2013 11:44:58 -0400
-Message-ID: <1379432698-9704-1-git-send-email-jlayton@samba.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Volker Lendecke <Volker.Lendecke@SerNet.DE>
+Subject: Re: [PATCH] cifs: stop trying to use virtual circuits
+Date: Wed, 18 Sep 2013 07:42:09 -0700
+Message-ID: <E1VMJ0n-001ZxR-I8@intern.SerNet.DE>
+References: <1379345025-10868-1-git-send-email-jlayton@redhat.com>
+Reply-To: Volker.Lendecke@SerNet.DE
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Cc: sauron99@gmx.de, smfrench@gmail.com, samba-technical@lists.samba.org, linux-cifs@vger.kernel.org
+To: Jeff Layton <jlayton@redhat.com>
+Return-path: <samba-technical-bounces@lists.samba.org>
+Date: Wed, 18 Sep 2013 07:42:09 -0700
+Content-Disposition: inline
+In-Reply-To: <1379345025-10868-1-git-send-email-jlayton@redhat.com>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Sender: samba-technical-bounces@lists.samba.org
+Errors-To: samba-technical-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-Fedora is in the process of moving to KEYRING: credcaches which are not
-currently handled by cifs.upcall. We could try to detect when they're in
-use, but it's simpler and more robust to just try to use the default
-credcache whenever we don't find a FILE: or DIR: cache.
+On Mon, Sep 16, 2013 at 11:23:45AM -0400, Jeff Layton wrote:
+> Currently, we try to ensure that we use vcnum of 0 on the first
+> established session on a connection and then try to use a different
+> vcnum on each session after that.
+>=20
+> This is a little odd, since there's no real reason to use a different
+> vcnum for each SMB session. I can only assume there was some confusion
+> between SMB sessions and VCs. That's somewhat understandable since they
+> both get created during SESSION_SETUP, but the documentation indicates
+> that they are really orthogonal. The comment on max_vcs in particular
+> looks quite misguided. An SMB session is already uniquely identified
+> by the SMB UID value -- there's no need to again uniquely ID with a
+> VC.
+>=20
+> Furthermore, a vcnum of 0 is a cue to the server that it should release
+> any resources that were previously held by the client. This sounds like
+> a good thing, until you consider that:
+>=20
+> a) it totally ignores the fact that other programs on the box (e.g.
+> smbclient) might have connections established to the server. Using a
+> vcnum of 0 causes them to get kicked off.
+>=20
+> b) it causes problems with NAT. If several clients are connected to the
+> same server via the same NAT'ed address, whenever one connects to the
+> server it kicks off all the others, which then reconnect and kick off
+> the first one...ad nauseum.
+>=20
+> I don't see any reason to ignore the advice in "Implementing CIFS" whic=
+h
+> has a comprehensive treatment of virtual circuits. In there, it states
+> "...and contrary to the specs the client should always use a VcNumber o=
+f
+> one, never zero."
+>=20
+> Have the client just use a hardcoded vcnum of 1, and stop abusing the
+> special behavior of vcnum 0.
 
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- cifs.upcall.c | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
+It's kindof a tough choice, but I like this patch. It does
+solve real problems. The downside certainly is that we have
+worse cleanup behaviour of dead connections, but I would
+prefer not killing NATed connections.
 
-diff --git a/cifs.upcall.c b/cifs.upcall.c
-index 20b562f..cc65824 100644
---- a/cifs.upcall.c
-+++ b/cifs.upcall.c
-@@ -382,11 +382,20 @@ cifs_krb5_get_req(const char *host, const char *ccname,
- 		return ret;
- 	}
- 
--	ret = krb5_cc_resolve(context, ccname, &ccache);
--	if (ret) {
--		syslog(LOG_DEBUG, "%s: unable to resolve %s to ccache\n",
--		       __func__, ccname);
--		goto out_free_context;
-+	if (ccname) {
-+		ret = krb5_cc_resolve(context, ccname, &ccache);
-+		if (ret) {
-+			syslog(LOG_DEBUG, "%s: unable to resolve %s to ccache\n",
-+			       __func__, ccname);
-+			goto out_free_context;
-+		}
-+	} else {
-+		ret = krb5_cc_default(context, &ccache);
-+		if (ret) {
-+			syslog(LOG_DEBUG, "%s: krb5_cc_default: %d",
-+				__func__, (int)ret);
-+			goto out_free_context;
-+		}
- 	}
- 
- 	memset(&in_creds, 0, sizeof(in_creds));
--- 
-1.8.3.1
+Volker
+
+--=20
+SerNet GmbH, Bahnhofsallee 1b, 37081 G=F6ttingen
+phone: +49-551-370000-0, fax: +49-551-370000-9
+AG G=F6ttingen, HRB 2816, GF: Dr. Johannes Loxen
+http://www.sernet.de, mailto:kontakt@sernet.de
