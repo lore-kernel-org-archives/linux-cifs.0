@@ -1,47 +1,41 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>
 Subject: Re: [RFC] extending splice for copy offloading
-Date: Thu, 26 Sep 2013 12:22:49 -0500
-Message-ID: <CAH2r5muBuTK7ZZ+aKGC4q35gqaSWF4o07eoHypLKiNn5Y83RbQ@mail.gmail.com>
+Date: Thu, 26 Sep 2013 21:34:51 +0200
+Message-ID: <20130926213451.33570dc4@linux-y6zt.site>
+References: <CAH2r5muBuTK7ZZ+aKGC4q35gqaSWF4o07eoHypLKiNn5Y83RbQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-To: linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
 	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
 	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAH2r5muBuTK7ZZ+aKGC4q35gqaSWF4o07eoHypLKiNn5Y83RbQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
->>> I suppose, but can't the app achieve a nice middle ground by copying the
->>> file in smaller syscalls?  Avoid bulk data motion back to the client,
->>> but still get notification every, I dunno, few hundred meg?
->> Yes.  And if "cp"  could just be switched from a read+write syscall
->> pair to a single splice syscall using the same buffer size.
-> Will the various magic fs-specific copy operations become inefficient
-> when the range copied is too small?
+Hi Steve,
 
-Yes - it is much less efficient for the network file system cases when
-copy size is small.   Reasonable minimum is probably at least 1MB.
-Windows will use up to 16MB, but a saner approach to this would base
-the copy chunk size on either response time or on network bandwidth
-for the connection.
+On Thu, 26 Sep 2013 12:22:49 -0500
+Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-Copy offload has been done for a long time with CIFS/SMB2/SMB3
-protocol (and obviously helps a lot more over the network for file
-copies than locally), but only recently have we added support for this
-in Samba through David Disseldorp's work.   i have kernel patches
-almost ready to post for cifs.ko for the client side to do copy
-offload (cp --reflink) via CopyChunk fsctl over SMB3 which is
-supported by most all servers now.
+> Windows clients seem to max out at 16MB chunk size when doing copy
+> offload.   I would like to increase chunk size larger than that if
+> network bandwidth (returned at mount time in SMB3 on the query network
+> interfaces FSCTL) is large enough, and response time is not more than
+> 100 (?) milliseconds.
 
-Windows clients seem to max out at 16MB chunk size when doing copy
-offload.   I would like to increase chunk size larger than that if
-network bandwidth (returned at mount time in SMB3 on the query network
-interfaces FSCTL) is large enough, and response time is not more than
-100 (?) milliseconds.
+Sounds good, though with Samba and Btrfs the request latency will be
+heavily effected by whether the FSCTL_SRV_COPYCHUNK wire request byte
+offsets and lengths align to the Btrfs sector-size (4K by default
+IIRC).
+If they do align, then each chunk in the request can be mapped to a
+BTRFS_IOC_CLONE_RANGE ioctl. Otherwise, we need to fall back to a
+server-side local read/write.
 
+We should be able to provide underlying filesystem alignment
+requirements to SMB clients via the new FileFSSectorSizeInformation
+ioctl, but it's not currently supported by Samba.
 
-
--- 
-Thanks,
-
-Steve
+Cheers, David
