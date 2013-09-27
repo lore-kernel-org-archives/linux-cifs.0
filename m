@@ -1,92 +1,119 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Which lsattr / chattr can be reported for cifs/smb2/smb3 (and
- NTFS etc.)
-Date: Thu, 26 Sep 2013 17:42:43 -0500
-Message-ID: <CAH2r5mt3Fygs8bL+MnpVxC1xPLO_1QAW-AVcqrqbYcpXOMj2_g@mail.gmail.com>
-References: <CAH2r5mvjx0rVYCHOAPt61qU3UP6sHNz=HQjhvzvoNRU9OkeocQ@mail.gmail.com>
+Subject: Distinguishing between different types of reparse point symlinks
+Date: Fri, 27 Sep 2013 00:58:05 -0500
+Message-ID: <CAH2r5mvhJ+pqJTEV4Hc8QNzVu7WWXhdvuGUJiGrxp2C-GAe8OA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
+To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mvjx0rVYCHOAPt61qU3UP6sHNz=HQjhvzvoNRU9OkeocQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-File Attributes:
+I have to make some minor fixes to the patch below to account for
+little endian specific fields in symlink reparse point structure, but
+it does fix the problem ("ls -l" to windows 8 or later share which has
+multiple types of reparse points in the same directory, not all of
+which are NTFS symlinks).
 
-WRITE_THROUGH  0x80000000 (which could map to FS_SYNC_FL)
-and
-NO_BUFFERING 0x20000000 (whoch could map to FS_DIRECTIO_FL)
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Date: Thu, 26 Sep 2013 19:49:14 -0500
+Subject: [PATCH] [CIFS] do not treat non-symlink reparse points as valid
+ symlinks
 
-are interesting, but ... they are defined in MS-CIFS, but no longer
-seen in MS-FSCC so ... the obvious question is did they work on
-Windows (and other NAS) for cifs but not for SMB2/SMB3?
+Windows 8 and later can create NFS symlinks (within reparse points)
+which we were assuming were normal NTFS symlinks and thus reporting
+corrupt paths for.  Add check for reparse points to make sure that
+they really are normal symlinks before we try to parse the pathname.
 
-Anyone ever tried to use these attribute flags?  Otherwise will ask the MS guys
+This fixes commit d244bf2dfbebfded05f494ffd53659fa7b1e32c1
+which implemented follow link for non-Unix CIFS mounts
 
-On Wed, Sep 25, 2013 at 7:20 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> Some of the attributes returnable by lsattr have equivalents in
-> cifs/smb2/smb3 (and NTFS).  I just finished coding and testing (in
-> cifs.ko) "setattr +c" (and lsattr) to enable marking a file as
-> compressed over smb3.  David Disseldorp also has been testing patches
-> for Samba server to support this (setting a flag as compressed) on
-> btrfs.   In Windows, it is trivial (very easy for users) in the file
-> manager to mark a file as compressed so it will be useful to support
-> in Samba server.
->
-> The obvious question to ask now is what other file or directory flags
-> can we report in lsattr (and change in chattr) via smb3 (and
-> presumably NTFS) besides whether the file is compressed.   Reporting
-> that a file is immutable could presumably be done by reading the ACL
-> and ensuring that no one has any of the write permissions.
-> Similarly reporting that a file is append only may be equivalent to
-> the case where a  files ACL has no write permissions except
-> FILE_APPEND_DATA among all of the ACEs.
->
-> Any thoughts on reporting FS_IMMUTABLE_FL or FS_APPEND_FL or ideas on
-> how to report any of the other (except compression) flags over
-> CIFS/SMB2/SMB3 (or in Linux NTFS file system).  Here is the complete
-> list from fs.h
->
-> /*
->  * Inode flags (FS_IOC_GETFLAGS / FS_IOC_SETFLAGS)
->  */
-> #define FS_SECRM_FL 0x00000001 /* Secure deletion */
-> #define FS_UNRM_FL 0x00000002 /* Undelete */
-> #define FS_COMPR_FL 0x00000004 /* Compress file */
-> #define FS_SYNC_FL 0x00000008 /* Synchronous updates */
-> #define FS_IMMUTABLE_FL 0x00000010 /* Immutable file */
-> #define FS_APPEND_FL 0x00000020 /* writes to file may only append */
-> #define FS_NODUMP_FL 0x00000040 /* do not dump file */
-> #define FS_NOATIME_FL 0x00000080 /* do not update atime */
-> /* Reserved for compression usage... */
-> #define FS_DIRTY_FL 0x00000100
-> #define FS_COMPRBLK_FL 0x00000200 /* One or more compressed clusters */
-> #define FS_NOCOMP_FL 0x00000400 /* Don't compress */
-> #define FS_ECOMPR_FL 0x00000800 /* Compression error */
-> /* End compression flags --- maybe not all used */
-> #define FS_BTREE_FL 0x00001000 /* btree format dir */
-> #define FS_INDEX_FL 0x00001000 /* hash-indexed directory */
-> #define FS_IMAGIC_FL 0x00002000 /* AFS directory */
-> #define FS_JOURNAL_DATA_FL 0x00004000 /* Reserved for ext3 */
-> #define FS_NOTAIL_FL 0x00008000 /* file tail should not be merged */
-> #define FS_DIRSYNC_FL 0x00010000 /* dirsync behaviour (directories only) */
-> #define FS_TOPDIR_FL 0x00020000 /* Top of directory hierarchies*/
-> #define FS_EXTENT_FL 0x00080000 /* Extents */
-> #define FS_DIRECTIO_FL 0x00100000 /* Use direct i/o */
-> #define FS_NOCOW_FL 0x00800000 /* Do not cow file */
-> #define FS_RESERVED_FL 0x80000000 /* reserved for ext2 lib */
->
-> #define FS_FL_USER_VISIBLE 0x0003DFFF /* User visible flags */
-> #define FS_FL_USER_MODIFIABLE 0x000380FF /* User modifiable flags */
->
-> --
-> Thanks,
->
-> Steve
+CC: Stable <stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Reviewed-by: Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/cifspdu.h  |  2 +-
+ fs/cifs/cifssmb.c  |  9 +++++++--
+ fs/cifs/smbfsctl.h | 14 ++++++++++++++
+ 3 files changed, 22 insertions(+), 3 deletions(-)
 
+diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
+index a630475..5f295f3 100644
+--- a/fs/cifs/cifspdu.h
++++ b/fs/cifs/cifspdu.h
+@@ -1491,7 +1491,7 @@ struct file_notify_information {
+  __u8  FileName[0];
+ } __attribute__((packed));
+
+-struct reparse_data {
++struct reparse_symlink_data {
+  __u32 ReparseTag;
+  __u16 ReparseDataLength;
+  __u16 Reserved;
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 4baf359..0bf7635 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -3088,7 +3088,7 @@ CIFSSMBQuerySymLink(const unsigned int xid,
+struct cifs_tcon *tcon,
+  bool is_unicode;
+  unsigned int sub_len;
+  char *sub_start;
+- struct reparse_data *reparse_buf;
++ struct reparse_symlink_data *reparse_buf;
+  __u32 data_offset, data_count;
+  char *end_of_smb;
+
+@@ -3137,12 +3137,17 @@ CIFSSMBQuerySymLink(const unsigned int xid,
+struct cifs_tcon *tcon,
+  goto qreparse_out;
+  }
+  end_of_smb = 2 + get_bcc(&pSMBr->hdr) + (char *)&pSMBr->ByteCount;
+- reparse_buf = (struct reparse_data *)
++ reparse_buf = (struct reparse_symlink_data *)
+  ((char *)&pSMBr->hdr.Protocol + data_offset);
+  if ((char *)reparse_buf >= end_of_smb) {
+  rc = -EIO;
+  goto qreparse_out;
+  }
++ if (reparse_buf->ReparseTag != IO_REPARSE_TAG_SYMLINK) {
++ rc = -EOPNOTSUPP;
++ goto qreparse_out;
++ }
++
+  if ((reparse_buf->PathBuffer + reparse_buf->PrintNameOffset +
+  reparse_buf->PrintNameLength) > end_of_smb) {
+  cifs_dbg(FYI, "reparse buf beyond SMB\n");
+diff --git a/fs/cifs/smbfsctl.h b/fs/cifs/smbfsctl.h
+index d952ee4..3a10e1c 100644
+--- a/fs/cifs/smbfsctl.h
++++ b/fs/cifs/smbfsctl.h
+@@ -97,9 +97,23 @@
+ #define FSCTL_QUERY_NETWORK_INTERFACE_INFO 0x001401FC /* BB add struct */
+ #define FSCTL_SRV_READ_HASH          0x001441BB /* BB add struct */
+
++/* See FSCC 2.1.2.5 */
+ #define IO_REPARSE_TAG_MOUNT_POINT   0xA0000003
+ #define IO_REPARSE_TAG_HSM           0xC0000004
+ #define IO_REPARSE_TAG_SIS           0x80000007
++#define IO_REPARSE_TAG_HSM2          0x80000006
++#define IO_REPARSE_TAG_DRIVER_EXTENDER 0x80000005
++/* Used by the DFS filter. See MS-DFSC */
++#define IO_REPARSE_TAG_DFS           0x8000000A
++/* Used by the DFS filter See MS-DFSC */
++#define IO_REPARSE_TAG_DFSR          0x80000012
++#define IO_REPARSE_TAG_FILTER_MANAGER 0x8000000B
++/* See section MS-FSCC 2.1.2.4 */
++#define IO_REPARSE_TAG_SYMLINK       0xA000000C
++#define IO_REPARSE_TAG_DEDUP         0x80000013
++#define IO_REPARSE_APPXSTREAM     0xC0000014
++/* NFS symlinks, Win 8/SMB3 and later */
++#define IO_REPARSE_TAG_NFS           0xA0000014
+
+ /* fsctl flags */
+ /* If Flags is set to this value, the request is an FSCTL not ioctl request */
+-- 
+1.7.11.7
 
 
 -- 
