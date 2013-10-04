@@ -1,38 +1,110 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: Question on IPv6 failover.
-Date: Thu, 3 Oct 2013 21:41:53 -0400
-Message-ID: <20131003214153.791c1a7c@corrin.poochiereds.net>
-References: <524DDBF7.5050709@candelatech.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH][cifs-utils] autoconf: update configure.ac a'la autoupdate
+Date: Fri,  4 Oct 2013 07:18:15 -0400
+Message-ID: <1380885495-17897-1-git-send-email-jlayton@samba.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <524DDBF7.5050709-my8/4N5VtI7c+919tysfdA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 03 Oct 2013 14:04:55 -0700
-Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org> wrote:
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ configure.ac | 33 +++++++++++----------------------
+ 1 file changed, 11 insertions(+), 22 deletions(-)
 
-> One of our users is reporting that the CIFS failover case is not working
-> properly.  They have a cluster of CIFS servers that migrate an IPv6 addr
-> to the active system.
-> 
-> Evidently, our client-side CIFS connection follows the first migration,
-> but fails to go back to the original on a second failover.
-> 
-> It could be any number of things, but I wanted first to see if anyone
-> knows how long client-side CIFS will keep attempting to regain contact with it's
-> server?  Forever?
-> 
-
-Yep, forever. The address to connect to is determined by the mount
-helper and passed down to the kernel at mount time. This is the same
-for IPv4 and IPv6. If the address is floating between servers then
-it'll just look like the server rebooted when you fail over, and the
-client should just keep trying to reconnect indefinitely.
-
+diff --git a/configure.ac b/configure.ac
+index c69ede4..e9eb162 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1,7 +1,7 @@
+ #                                               -*- Autoconf -*-
+ # Process this file with autoconf to produce a configure script.
+ 
+-AC_INIT([cifs-utils], [6.1.1], [linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org], [cifs-utils], [https://wiki.samba.org/index.php/LinuxCIFS_utils])
++AC_INIT([cifs-utils],[6.1.1],[linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org],[cifs-utils],[https://wiki.samba.org/index.php/LinuxCIFS_utils])
+ AC_CONFIG_SRCDIR([replace.h])
+ AC_CONFIG_HEADERS([config.h])
+ AC_CONFIG_FILES([Makefile contrib/Makefile contrib/request-key.d/Makefile])
+@@ -11,51 +11,43 @@ AM_INIT_AUTOMAKE
+ 
+ # "enable" options
+ AC_ARG_ENABLE(pie,
+-	[AC_HELP_STRING([--enable-pie],
+-			[Produce position independent executables @<:@default=yes@:>@])],
++	[AS_HELP_STRING([--enable-pie],[Produce position independent executables @<:@default=yes@:>@])],
+ 	enable_pie=$enableval,
+ 	enable_pie="maybe")
+ 
+ AC_ARG_ENABLE(relro,
+-	[AC_HELP_STRING([--enable-relro],
+-			[Enable relocations read-only support @<:@default=yes@:>@])],
++	[AS_HELP_STRING([--enable-relro],[Enable relocations read-only support @<:@default=yes@:>@])],
+ 	enable_relro=$enableval,
+ 	enable_relro="maybe")
+ 
+ AC_ARG_ENABLE(cifsupcall,
+-	[AC_HELP_STRING([--enable-cifsupcall],
+-			[Create cifs.upcall binary @<:@default=yes@:>@])],
++	[AS_HELP_STRING([--enable-cifsupcall],[Create cifs.upcall binary @<:@default=yes@:>@])],
+ 	enable_cifsupcall=$enableval,
+ 	enable_cifsupcall="maybe")
+ 
+ AC_ARG_ENABLE(cifscreds,
+-	[AC_HELP_STRING([--enable-cifscreds],
+-			[Create cifscreds utility @<:@default=yes@:>@])],
++	[AS_HELP_STRING([--enable-cifscreds],[Create cifscreds utility @<:@default=yes@:>@])],
+ 	enable_cifscreds=$enableval,
+ 	enable_cifscreds="maybe")
+ 
+ AC_ARG_ENABLE(cifsidmap,
+-	[AC_HELP_STRING([--enable-cifsidmap],
+-			[Create cifs.idmap binary @<:@default=yes@:>@])],
++	[AS_HELP_STRING([--enable-cifsidmap],[Create cifs.idmap binary @<:@default=yes@:>@])],
+ 	enable_cifsidmap=$enableval,
+ 	enable_cifsidmap="maybe")
+ 
+ AC_ARG_ENABLE(cifsacl,
+-	[AC_HELP_STRING([--enable-cifsacl],
+-			[Create get/set cifsacl binary @<:@default=yes@:>@])],
++	[AS_HELP_STRING([--enable-cifsacl],[Create get/set cifsacl binary @<:@default=yes@:>@])],
+ 	enable_cifsacl=$enableval,
+ 	enable_cifsacl="maybe")
+ 
+ AC_ARG_ENABLE(systemd,
+-	[AC_HELP_STRING([--enable-systemd],
+-			[Enable systemd specific behavior for mount.cifs @<:@default=yes@:>@])],
++	[AS_HELP_STRING([--enable-systemd],[Enable systemd specific behavior for mount.cifs @<:@default=yes@:>@])],
+ 	enable_systemd=$enableval,
+ 	enable_systemd="maybe")
+ 
+ # "with" options
+ AC_ARG_WITH(idmap-plugin,
+-	[AC_HELP_STRING([--with-idmap-plugin=/path/to/plugin],
+-			[Define the path to the plugin that the idmapping infrastructure should use @<:@default=/etc/cifs-utils/idmap-plugin@:>@])],
++	[AS_HELP_STRING([--with-idmap-plugin=/path/to/plugin],[Define the path to the plugin that the idmapping infrastructure should use @<:@default=/etc/cifs-utils/idmap-plugin@:>@])],
+ 	pluginpath=$withval,
+ 	pluginpath="/etc/cifs-utils/idmap-plugin")
+ AC_DEFINE_UNQUOTED(IDMAP_PLUGIN_PATH, "$pluginpath", [Location of plugin that ID mapping infrastructure should use. (usually a symlink to real plugin)])
+@@ -71,7 +63,7 @@ AC_ARG_VAR(ROOTSBINDIR, [Location where files ordinarily under /sbin should be i
+ 
+ # Checks for programs.
+ AC_PROG_CC
+-AC_GNU_SOURCE
++AC_USE_SYSTEM_EXTENSIONS
+ AM_PROG_CC_C_O
+ 
+ # AC_PROG_SED is only avaliable in recent autoconf versions.
+@@ -153,10 +145,7 @@ if test $enable_cifsupcall != "no"; then
+ 
+ 	AC_CACHE_CHECK([for keyvalue in krb5_keyblock],
+ 		[ac_cv_have_krb5_keyblock_keyvalue],[
+-			AC_TRY_COMPILE([$krb5_include],
+-			[krb5_keyblock key; key.keyvalue.data = NULL;],
+-			ac_cv_have_krb5_keyblock_keyvalue=yes,
+-			ac_cv_have_krb5_keyblock_keyvalue=no)])
++			AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[$krb5_include]], [[krb5_keyblock key; key.keyvalue.data = NULL;]])],[ac_cv_have_krb5_keyblock_keyvalue=yes],[ac_cv_have_krb5_keyblock_keyvalue=no])])
+ 	if test x"$ac_cv_have_krb5_keyblock_keyvalue" = x"yes" ; then
+ 		AC_DEFINE(HAVE_KRB5_KEYBLOCK_KEYVALUE,1,
+ 			[Whether the krb5_keyblock struct has a keyvalue property])
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.8.3.1
