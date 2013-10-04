@@ -1,103 +1,148 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: ANNOUNCE: cifs-utils release 6.2 ready for download
-Date: Fri, 4 Oct 2013 07:43:48 -0400
-Message-ID: <20131004074348.6099baf2@tlielax.poochiereds.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH] cifs: Send a logoff request before removing a smb session
+Date: Fri,  4 Oct 2013 14:06:23 -0500
+Message-ID: <1380913583-5506-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpBZ2Fpbiwg
-bm90aGluZyBlYXJ0aC1zaGF0dGVyaW5nIGluIHRoaXMgcmVsZWFzZS4gTW9zdGx5IHNvbWUgbWlu
-b3INCmJ1Z2ZpeGVzIGFuZCBjbGVhbnVwcy4gU29tZSBoaWdobGlnaHRzOg0KDQotIC0gc2V0Y2lm
-c2FjbCBjYW4gbm93IHdvcmsgd2l0aG91dCBhIHBsdWdpbg0KDQotIC0gc3lzdGVtZC1hc2stcGFz
-c3dvcmQgaXMgZm91bmQgdXNpbmcgJFBBVEggbm93DQoNCi0gLSBjaWZzLnVwY2FsbCBub3cgd29y
-a3Mgd2l0aCBLRVlSSU5HOiBjcmVkY2FjaGVzIA0KDQpHbyBmb3J0aCBhbmQgZG93bmxvYWQhDQoN
-CndlYnBhZ2U6ICAgIGh0dHBzOi8vd2lraS5zYW1iYS5vcmcvaW5kZXgucGhwL0xpbnV4Q0lGU191
-dGlscw0KdGFyYmFsbDogICAgZnRwOi8vZnRwLnNhbWJhLm9yZy9wdWIvbGludXgtY2lmcy9jaWZz
-LXV0aWxzLw0KZ2l0OiAgICAgICAgZ2l0Oi8vZ2l0LnNhbWJhLm9yZy9jaWZzLXV0aWxzLmdpdA0K
-Z2l0d2ViOiAgICAgaHR0cDovL2dpdC5zYW1iYS5vcmcvP3A9Y2lmcy11dGlscy5naXQ7YT1zdW1t
-YXJ5DQoNCkRldGFpbGVkIGxpc3Qgb2YgY2hhbmdlcyBzaW5jZSA2LjI6DQoNCmNvbW1pdCA4OTE5
-ZDhjNjQzN2FhYmI2OWE1M2MyNTFlOGZmNmE4MTYzY2EyMjdiDQpBdXRob3I6IEplZmYgTGF5dG9u
-IDxqbGF5dG9uQHNhbWJhLm9yZz4NCkRhdGU6ICAgTW9uIEp1bCA4IDA5OjA2OjQ2IDIwMTMgLTA0
-MDANCg0KICAgIGF1dG9jb25mOiBzZXQgdmVyc2lvbiB0byA2LjEuMSBmb3IgaW50ZXJpbSBidWls
-ZHMNCiAgICANCiAgICBTaWduZWQtb2ZmLWJ5OiBKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5v
-cmc+DQoNCmNvbW1pdCA5ZmQ5ZjcxYWZjOGE4NDlkZjk3OTczNzY0MjI3ZDZhMTNmMjc2OGYzDQpB
-dXRob3I6IEplZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJhLm9yZz4NCkRhdGU6ICAgTW9uIEp1bCA4
-IDA5OjA4OjAxIDIwMTMgLTA0MDANCg0KICAgIG1hbnBhZ2U6IGZpeCBub3VzZXJfeGF0dHIgZGVz
-Y3JpcHRpb24NCiAgICANCiAgICBUaGUgbWFucGFnZSBlcnJvbmVvdXNseSBzdGF0ZXMgdGhhdCBu
-b3VzZXJfeGF0dHIgaXMgdGhlIGRlZmF1bHQsIHdoZW4NCiAgICBpdCdzIGFjdHVhbGx5IHRoZSBy
-ZXZlcnNlLg0KICAgIA0KICAgIFJlcG9ydGVkLWJ5OiBEb21lIDxkb21mZUB0aXNjYWxpLml0Pg0K
-ICAgIFNpZ25lZC1vZmYtYnk6IEplZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJhLm9yZz4NCg0KY29t
-bWl0IGZlMjMwZTVlY2FlZDk4ZDNiYjcwMjkyYjYwZDQ0YzNjN2M0N2M3MjANCkF1dGhvcjogSmVm
-ZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPg0KRGF0ZTogICBUaHUgSnVsIDE4IDEwOjA4OjI3
-IDIwMTMgLTA0MDANCg0KICAgIHNldGNpZnNhY2w6IGFkZCBmYWxsYmFjayBmb3Igd2hlbiBwbHVn
-aW4gY2FuJ3QgYmUgbG9hZGVkDQogICAgDQogICAgQWxsb3cgc2V0Y2lmc2FjbCB0byBmdW5jdGlv
-biBldmVuIGluIHRoZSBjYXNlIHdoZXJlIHRoZSBwbHVnaW4gY2FuJ3QNCiAgICBiZSBpbml0aWFs
-aXplZC4gSUQgbWFwcGluZyBvZiBjb3Vyc2Ugd29uJ3Qgd29yaywgYnV0IHdlIGNhbiBzdGlsbCBh
-bGxvdw0KICAgIGl0IHRvIGFjY2VwdCAicmF3IiBTSUQgc3RyaW5ncy4NCiAgICANCiAgICBTaWdu
-ZWQtb2ZmLWJ5OiBKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+DQoNCmNvbW1pdCBlMThk
-NDJhZGRkYmVhOTE3OGQ5M2I2MDUxMTMyZjljZGVlNGNjOWUwDQpBdXRob3I6IEplZmYgTGF5dG9u
-IDxqbGF5dG9uQHNhbWJhLm9yZz4NCkRhdGU6ICAgVGh1IEp1bCAxOCAxMDoxNDoyMSAyMDEzIC0w
-NDAwDQoNCiAgICBjaWZzLXV0aWxzOiBmaXggc29tZSBzcGFyc2Ugd2FybmluZ3MNCiAgICANCiAg
-ICBTaWduZWQtb2ZmLWJ5OiBKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+DQoNCmNvbW1p
-dCAzZWM2MTlmY2U5YWJhYTM3ZWRkNDU0MDg0MDkxMzY4MmQ0OGM1MzU5DQogICAgDQogICAgRml4
-ZXM6IGh0dHBzOi8vYnVnemlsbGEuc2FtYmEub3JnL3Nob3dfYnVnLmNnaT9pZD0xMDA1NA0KICAg
-IFNpZ25lZC1vZmYtYnk6IE1pY2hhxYIgR8Ozcm55IDxtZ29ybnlAZ2VudG9vLm9yZz4NCg0KY29t
-bWl0IDkyMjYyZWFmYTEyYjRlMTFmY2ExZDZmMzY0N2NmZGVmZjJmNDI4MWMNCkF1dGhvcjogU3Rl
-dmUgRnJlbmNoIDxzbWZyZW5jaEBnbWFpbC5jb20+DQpEYXRlOiAgIE1vbiBTZXAgOSAwOTo1NTo0
-NiAyMDEzIC0wNTAwDQoNCiAgICBhdXRvY29uZjogYWRkIGFub3RoZXIgc3VnZ2VzdGVkIHBhY2th
-Z2UgbmFtZSBmb3Iga3JiNSBoZWFkZXJzDQogICAgDQogICAgQWRkZWQgYW4gYWx0ZXJuYXRlIHBh
-Y2thZ2UgbmFtZSBmb3Iga3JiNSBoZWFkZXJzLg0KICAgIA0KICAgIE5vdGljZWQgdGhlIGZvbGxv
-d2luZyBzdWdnZXN0aW9uIGFza3MgZm9yIHRoZSB3cm9uZyBwYWNrYWdlIChhdCBsZWFzdA0KICAg
-IHdyb25nIGZvciBGQzE3KQ0KICAgIA0KICAgIGNoZWNraW5nIGtyYjUuaCBwcmVzZW5jZS4uLiBu
-bw0KICAgIGNoZWNraW5nIGZvciBrcmI1LmguLi4gbm8NCiAgICBjaGVja2luZyBrcmI1L2tyYjUu
-aCB1c2FiaWxpdHkuLi4gbm8NCiAgICBjaGVja2luZyBrcmI1L2tyYjUuaCBwcmVzZW5jZS4uLiBu
-bw0KICAgIGNoZWNraW5nIGZvciBrcmI1L2tyYjUuaC4uLiBubw0KICAgIGNvbmZpZ3VyZTogV0FS
-TklORzoga3JiNS5oIG5vdCBmb3VuZCwgY29uc2lkZXIgaW5zdGFsbGluZw0KICAgIGtyYjUtbGli
-cy1kZXZlbC4gRGlzYWJsaW5nIGNpZnMudXBjYWxsLg0KICAgIA0KICAgIFtzZnJlbmNoQHc1MDBz
-bWYgY2lmcy11dGlsc10kIHN1ZG8geXVtIGluc3RhbGwga3JiNS1saWJzLWRldmVsDQogICAgTG9h
-ZGVkIHBsdWdpbnM6IGxhbmdwYWNrcywgcHJlc3RvLCByZWZyZXNoLXBhY2thZ2VraXQNCiAgICBO
-byBwYWNrYWdlIGtyYjUtbGlicy1kZXZlbCBhdmFpbGFibGUuDQogICAgRXJyb3I6IE5vdGhpbmcg
-dG8gZG8NCiAgICBbc2ZyZW5jaEB3NTAwc21mIGNpZnMtdXRpbHNdJCBzdWRvIHl1bSBpbnN0YWxs
-IGtyYjUtZGV2ZWwNCiAgICANCiAgICAoaW5zdGFsbGluZyBrcmI1LWRldmVsIHdvcmtlZCwgYnV0
-IG5vdCBrcmI1LWxpYnMtZGV2ZWwgZm9yIHRoaXMgdmVyc2lvbikNCiAgICANCiAgICBTaWduZWQt
-b2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHNtZnJlbmNoQGdtYWlsLmNvbT4NCg0KY29tbWl0IGYwM2M1
-MWJiYmJjNTE2OWZkZjk0MzFhZmQxZjMwZjM3MjUzMWE2YmUNCkF1dGhvcjogSmVmZiBMYXl0b24g
-PGpsYXl0b25Ac2FtYmEub3JnPg0KRGF0ZTogICBUdWUgU2VwIDE3IDExOjM5OjEzIDIwMTMgLTA0
-MDANCg0KICAgIGNpZnMudXBjYWxsOiB0cnkgdG8gdXNlIGRlZmF1bHQgY3JlZGNhY2hlIGlmIHdl
-IGRpZG4ndCBmaW5kIG9uZQ0KICAgIA0KICAgIEZlZG9yYSBpcyBpbiB0aGUgcHJvY2VzcyBvZiBt
-b3ZpbmcgdG8gS0VZUklORzogY3JlZGNhY2hlcyB3aGljaCBhcmUgbm90DQogICAgY3VycmVudGx5
-IGhhbmRsZWQgYnkgY2lmcy51cGNhbGwuIFdlIGNvdWxkIHRyeSB0byBkZXRlY3Qgd2hlbiB0aGV5
-J3JlIGluDQogICAgdXNlLCBidXQgaXQncyBzaW1wbGVyIGFuZCBtb3JlIHJvYnVzdCB0byBqdXN0
-IHRyeSB0byB1c2UgdGhlIGRlZmF1bHQNCiAgICBjcmVkY2FjaGUgd2hlbmV2ZXIgd2UgZG9uJ3Qg
-ZmluZCBhIEZJTEU6IG9yIERJUjogY2FjaGUuDQogICAgDQogICAgU2lnbmVkLW9mZi1ieTogSmVm
-ZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPg0KDQpjb21taXQgMmY4MzJlMzUwZWM0NzJlYTk3
-NGM4MjEzMzczNGM2NDBiYzAyZTg2OQ0KQXV0aG9yOiBKZWZmIExheXRvbiA8amxheXRvbkBzYW1i
-YS5vcmc+DQpEYXRlOiAgIEZyaSBPY3QgNCAwNzoxMjozMiAyMDEzIC0wNDAwDQoNCiAgICBhdXRv
-Y29uZjogdXBkYXRlIGNvbmZpZ3VyZS5hYyBhJ2xhIGF1dG91cGRhdGUNCiAgICANCiAgICBTaWdu
-ZWQtb2ZmLWJ5OiBKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+DQoNCmNvbW1pdCAxYWQy
-ZjEyN2IxNTBiMzIzMjViOTg1ODYzOWY1ZjRmMmFlOTQ5ZjgyDQpBdXRob3I6IEplZmYgTGF5dG9u
-IDxqbGF5dG9uQHNhbWJhLm9yZz4NCkRhdGU6ICAgRnJpIE9jdCA0IDA2OjU2OjQxIDIwMTMgLTA0
-MDANCg0KICAgIGF1dG9jb25mOiBzZXQgdmVyc2lvbiB0byA2LjINCiAgICANCiAgICBTaWduZWQt
-b2ZmLWJ5OiBKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+DQoNCi0gLS0gDQpKZWZmIExh
-eXRvbiA8amxheXRvbkBzYW1iYS5vcmc+DQotLS0tLUJFR0lOIFBHUCBTSUdOQVRVUkUtLS0tLQ0K
-VmVyc2lvbjogR251UEcgdjIuMC4xOSAoR05VL0xpbnV4KQ0KDQppUUljQkFFQkFnQUdCUUpTVHFu
-MEFBb0pFQUFPYUVFWlZvSVZnWmNRQU5IbUpVVTZrUWlzdjRLYURIZjZUMVZXDQpZZUZKRUVGdW9h
-M212WWlsM2svbEtKeHVaVi9LVm5wRXRqQ0s1UTUyVVdXeEYvVEJtSzVTMVZYT0FHWGlxL084DQo1
-ODlpcC9YVHFXZThkSmdxck5ONG1uNi9zSTQ4MUFEbVdkUGk2UlJRNWtuSlY1K0kwMFJ2clNkVzNN
-TlNOTW5DDQpjTUQ5K29Gb2FKd0xjWkI5KzVFcDk0VTg5MUh6QjBWSWgwTHV4V2ZZWWp6aU9vS1Zl
-bDUxTDNWNE44WkJDRUFEDQowd0RzNFh4dUdxWDBDZGsrcWh5NHMrN1BhMHlNY2t6d3ZtQW1FQzh6
-NlNnSlBCUU51YXlENEZHam5ZWTJFNEtPDQppVFZ2Y0JkWElobDJGR3lQaDRSd3JhNERxbjFXVlE2
-ZmRGRnZsMUJ5QU8ySHdGVGcvQzYwNWYxZUZPOHBKdFFsDQpJSUdMNVVNWEdtWWdUbGJ3cENJd2t3
-TFE5QUhCclcyVVNRUmpXT0JsaU1yQzdVRGtDUFlTWWZnS2JkV1o4VEVqDQpaWURnMmgrWXI4bzdM
-TjBCNnpuS3JNVis1T2psSzJham9URG41SzR1L0Z0c3ZNYkQrOXVmZ0ozOTNpbGhIY0JsDQo1SGhs
-K3pocXN2K3ZqMTlrV1dkV21WK2J6czJHY2JxT1RhQXFWODVJeklucnNUb0ZzRXlVWW1EUnZ6Q2Rh
-ZnhnDQpXb1JqMzlGRlFFQzZDZ3dDLzlSSkhGeldMRFRIWFpZcGpBMmVCM2xSUTZ0UDdkcENUb21P
-aldhVXdkQXhmRlRRDQpPVlpZMThXazNLNENKeUt5VjF4U0Q5dktIWERkSlFEVDJVeXNNNmEwZjh5
-NnA0SXR1b2Rrd09ZSGQwbHo0eTZCDQpHQVQyc2xiRWtZOE42VllPT1BERQ0KPW0xb3cNCi0tLS0t
-RU5EIFBHUCBTSUdOQVRVUkUtLS0tLQ0K
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+
+
+Send a smb session logoff request before removing smb session off of the list.
+On a signed smb session, remvoing a session off of the list before sending
+a logoff request results in server returning an error for lack of
+smb signature.
+ 
+If a server returns an error to a logoff request, log and error
+and keep the session on the list.
+
+
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/connect.c       | 32 +++++++++++++++++++++++++++-----
+ fs/cifs/smb2transport.c | 10 ++++++++--
+ fs/cifs/transport.c     | 11 +++++++++--
+ 3 files changed, 44 insertions(+), 9 deletions(-)
+
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index a279ffc..ab3cc8d 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -2242,6 +2242,8 @@ cifs_find_smb_ses(struct TCP_Server_Info *server, struct smb_vol *vol)
+ 
+ 	spin_lock(&cifs_tcp_ses_lock);
+ 	list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
++		if (ses->status == CifsExiting)
++			continue;
+ 		if (!match_session(ses, vol))
+ 			continue;
+ 		++ses->ses_count;
+@@ -2255,24 +2257,44 @@ cifs_find_smb_ses(struct TCP_Server_Info *server, struct smb_vol *vol)
+ static void
+ cifs_put_smb_ses(struct cifs_ses *ses)
+ {
+-	unsigned int xid;
++	unsigned int rc, xid;
+ 	struct TCP_Server_Info *server = ses->server;
+ 
+ 	cifs_dbg(FYI, "%s: ses_count=%d\n", __func__, ses->ses_count);
++
+ 	spin_lock(&cifs_tcp_ses_lock);
++	if (ses->status == CifsExiting) {
++		spin_unlock(&cifs_tcp_ses_lock);
++		return;
++	}
+ 	if (--ses->ses_count > 0) {
+ 		spin_unlock(&cifs_tcp_ses_lock);
+ 		return;
+ 	}
+-
+-	list_del_init(&ses->smb_ses_list);
++	if (ses->status == CifsGood)
++		ses->status = CifsExiting;
+ 	spin_unlock(&cifs_tcp_ses_lock);
+ 
+-	if (ses->status == CifsGood && server->ops->logoff) {
++	if (ses->status == CifsExiting && server->ops->logoff) {
+ 		xid = get_xid();
+-		server->ops->logoff(xid, ses);
++		rc = server->ops->logoff(xid, ses);
+ 		_free_xid(xid);
++
++		if (rc) {
++			cifs_dbg(VFS, "%s: Session Logoff failure rc=%d\n",
++				__func__, rc);
++			spin_lock(&cifs_tcp_ses_lock);
++			++ses->ses_count;
++			ses->status = CifsGood;
++			spin_unlock(&cifs_tcp_ses_lock);
++			return;
++		}
+ 	}
++
++	spin_lock(&cifs_tcp_ses_lock);
++	list_del_init(&ses->smb_ses_list);
++	spin_unlock(&cifs_tcp_ses_lock);
++
+ 	sesInfoFree(ses);
+ 	cifs_put_tcp_session(server);
+ }
+diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+index 340abca..ee1963b 100644
+--- a/fs/cifs/smb2transport.c
++++ b/fs/cifs/smb2transport.c
+@@ -516,13 +516,19 @@ smb2_get_mid_entry(struct cifs_ses *ses, struct smb2_hdr *buf,
+ 		return -EAGAIN;
+ 	}
+ 
+-	if (ses->status != CifsGood) {
+-		/* check if SMB2 session is bad because we are setting it up */
++	if (ses->status == CifsNew) {
+ 		if ((buf->Command != SMB2_SESSION_SETUP) &&
+ 		    (buf->Command != SMB2_NEGOTIATE))
+ 			return -EAGAIN;
+ 		/* else ok - we are setting up session */
+ 	}
++
++	if (ses->status == CifsExiting) {
++		if (buf->Command != SMB2_LOGOFF)
++			return -EAGAIN;
++		/* else ok - we are shutting down the session */
++	}
++
+ 	*mid = smb2_mid_entry_alloc(buf, ses->server);
+ 	if (*mid == NULL)
+ 		return -ENOMEM;
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 800b938..ebb46e3 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -431,13 +431,20 @@ static int allocate_mid(struct cifs_ses *ses, struct smb_hdr *in_buf,
+ 		return -EAGAIN;
+ 	}
+ 
+-	if (ses->status != CifsGood) {
+-		/* check if SMB session is bad because we are setting it up */
++	if (ses->status == CifsNew) {
+ 		if ((in_buf->Command != SMB_COM_SESSION_SETUP_ANDX) &&
+ 			(in_buf->Command != SMB_COM_NEGOTIATE))
+ 			return -EAGAIN;
+ 		/* else ok - we are setting up session */
+ 	}
++
++	if (ses->status == CifsExiting) {
++		/* check if SMB session is bad because we are setting it up */
++		if (in_buf->Command != SMB_COM_LOGOFF_ANDX)
++			return -EAGAIN;
++		/* else ok - we are shutting down session */
++	}
++
+ 	*ppmidQ = AllocMidQEntry(in_buf, ses->server);
+ 	if (*ppmidQ == NULL)
+ 		return -ENOMEM;
+-- 
+1.8.1.2
