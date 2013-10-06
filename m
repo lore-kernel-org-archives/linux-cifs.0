@@ -1,44 +1,62 @@
-From: Simo <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: pam module to set cifs credentials in key store
-Date: Wed, 13 Nov 2013 18:32:19 -0500
-Message-ID: <1384385539.4226.67.camel@pico.ipa.ssimo.org>
-References: <loom.20131113T002139-562@post.gmane.org>
-		 <20131112212536.6061477e@corrin.poochiereds.net>
-		 <5283E835.2090508@cora.nwra.com>
-	 <1384382099.4226.63.camel@pico.ipa.ssimo.org>
-	 <52840177.80901@cora.nwra.com> <52840237.2010206@cora.nwra.com>
+From: Jan Klos <honza.klos@gmail.com>
+Subject: cifs: Fix inability to write files >2GB to SMB2/3 shares
+Date: Sun, 6 Oct 2013 19:57:46 +0200
+Message-ID: <CAMm4rXL3dLeLK0LJpyoxVprr95532mCfQzA4KaUZ09ZM_2gVcQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Orion Poplawski <orion-CVdf0l11yl+B+jHODAdFcQ@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <52840237.2010206-CVdf0l11yl+B+jHODAdFcQ@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: trivial@kernel.org, linux-cifs@vger.kernel.org, Jan Klos <honza.klos@gmail.com>, samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+To: Steve French <sfrench@samba.org>
+Return-path: <samba-technical-bounces@lists.samba.org>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Sender: samba-technical-bounces@lists.samba.org
+Errors-To: samba-technical-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Wed, 2013-11-13 at 15:50 -0700, Orion Poplawski wrote:
-> On 11/13/2013 03:47 PM, Orion Poplawski wrote:
-> > On 11/13/2013 03:34 PM, Simo wrote:
-> >>
-> >> Uhm doesn't this code store the user password in the clear in a key that
-> >> is explicitly made readable to any process of the user in the same
-> >> session ?
-> >>
-> >> Simo.
-> >>
-> >
-> > I tried to mimic exactly what the cifscreds program does, but I may have made
-> > a mistake.  Or perhaps cifscreds is also doing a bad thing.  The key
-> > permissions are set to:
-> >
-> > #define CIFS_KEY_PERMS (KEY_POS_VIEW|KEY_POS_WRITE|KEY_POS_SEARCH| \
-> >                          KEY_USR_VIEW|KEY_USR_WRITE|KEY_USR_SEARCH)
-> >
-> >
-> 
-> We're not setting KEY_*_READ, so one cannot read the contents of the key, IIUIC.
+When connecting to SMB2/3 shares, maximum file size is set to non-LFS
+maximum in superblock. This is due to cap_large_files bit being different
+for SMB1 and SMB2/3 (where it is just an internal flag that is not
+negotiated and the SMB1 one corresponds to multichannel capability) while
+capabilities are checked always for the SMB1 bit in cifs_read_super().
 
-My bad, my eyes saw VIEW but read READ.
+The patch fixes this by checking for the correct bit according to the
+protocol version.
 
-Simo.
+
+Signed-off-by: Jan Klos <honza.klos@gmail.com>
+
+---
+
+diff -uprN a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+--- a/fs/cifs/cifsfs.c 2013-10-05 16:18:07.000000000 +0200
++++ b/fs/cifs/cifsfs.c 2013-10-06 16:18:13.488378000 +0200
+@@ -120,14 +120,16 @@ cifs_read_super(struct super_block *sb)
+ {
+  struct inode *inode;
+  struct cifs_sb_info *cifs_sb;
++ struct cifs_tcon *tcon;
+  int rc = 0;
+
+  cifs_sb = CIFS_SB(sb);
++ tcon = cifs_sb_master_tcon(cifs_sb);
+
+  if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIXACL)
+  sb->s_flags |= MS_POSIXACL;
+
+- if (cifs_sb_master_tcon(cifs_sb)->ses->capabilities & CAP_LARGE_FILES)
++ if (tcon->ses->capabilities & tcon->ses->server->vals->cap_large_files)
+  sb->s_maxbytes = MAX_LFS_FILESIZE;
+  else
+  sb->s_maxbytes = MAX_NON_LFS;
+@@ -147,7 +149,7 @@ cifs_read_super(struct super_block *sb)
+  goto out_no_root;
+  }
+
+- if (cifs_sb_master_tcon(cifs_sb)->nocase)
++ if (tcon->nocase)
+  sb->s_d_op = &cifs_ci_dentry_ops;
+  else
+  sb->s_d_op = &cifs_dentry_ops;
