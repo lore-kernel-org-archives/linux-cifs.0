@@ -1,279 +1,55 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH][cifs-utils] data_blob: clean out unused functions
-Date: Wed,  9 Oct 2013 09:15:52 -0400
-Message-ID: <1381324552-32607-1-git-send-email-jlayton@samba.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH][cifs-utils] getcifsacl: remove some dead code
+Date: Wed, 9 Oct 2013 08:40:03 -0500
+Message-ID: <CADT32e++ZuH5izh8doJXPwUw1bTmSRg3wnHW5P0UXM8t0az2cA@mail.gmail.com>
+References: <1381324473-32474-1-git-send-email-jlayton@samba.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1381324473-32474-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Cut another 6k or so out of the cifs.upcall binary.
+That looks correct.
 
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- data_blob.c | 168 ------------------------------------------------------------
- data_blob.h |  62 ----------------------
- 2 files changed, 230 deletions(-)
+Acked-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-diff --git a/data_blob.c b/data_blob.c
-index 16c78ce..834d810 100644
---- a/data_blob.c
-+++ b/data_blob.c
-@@ -71,18 +71,6 @@ _PUBLIC_ DATA_BLOB data_blob_talloc_named(TALLOC_CTX *mem_ctx, const void *p, si
- }
- 
- /**
-- construct a zero data blob, using supplied TALLOC_CTX. 
-- use this sparingly as it initialises data - better to initialise
-- yourself if you want specific data in the blob
--**/
--_PUBLIC_ DATA_BLOB data_blob_talloc_zero(TALLOC_CTX *mem_ctx, size_t length)
--{
--	DATA_BLOB blob = data_blob_talloc(mem_ctx, NULL, length);
--	data_blob_clear(&blob);
--	return blob;
--}
--
--/**
- free a data blob
- **/
- _PUBLIC_ void data_blob_free(DATA_BLOB *d)
-@@ -94,159 +82,3 @@ _PUBLIC_ void data_blob_free(DATA_BLOB *d)
- 	}
- }
- 
--/**
--clear a DATA_BLOB's contents
--**/
--_PUBLIC_ void data_blob_clear(DATA_BLOB *d)
--{
--	if (d->data) {
--		memset(d->data, 0, d->length);
--	}
--}
--
--/**
--free a data blob and clear its contents
--**/
--_PUBLIC_ void data_blob_clear_free(DATA_BLOB *d)
--{
--	data_blob_clear(d);
--	data_blob_free(d);
--}
--
--
--/**
--check if two data blobs are equal
--**/
--_PUBLIC_ int data_blob_cmp(const DATA_BLOB *d1, const DATA_BLOB *d2)
--{
--	int ret;
--	if (d1->data == NULL && d2->data != NULL) {
--		return -1;
--	}
--	if (d1->data != NULL && d2->data == NULL) {
--		return 1;
--	}
--	if (d1->data == d2->data) {
--		return d1->length - d2->length;
--	}
--	ret = memcmp(d1->data, d2->data, MIN(d1->length, d2->length));
--	if (ret == 0) {
--		return d1->length - d2->length;
--	}
--	return ret;
--}
--
--/**
--print the data_blob as hex string
--**/
--_PUBLIC_ char *data_blob_hex_string_lower(TALLOC_CTX *mem_ctx, const DATA_BLOB *blob)
--{
--	unsigned int i;
--	char *hex_string;
--
--	hex_string = talloc_array(mem_ctx, char, (blob->length*2)+1);
--	if (!hex_string) {
--		return NULL;
--	}
--
--	/* this must be lowercase or w2k8 cannot join a samba domain,
--	   as this routine is used to encode extended DNs and windows
--	   only accepts lowercase hexadecimal numbers */
--	for (i = 0; i < blob->length; i++)
--		slprintf(&hex_string[i*2], 3, "%02x", blob->data[i]);
--
--	hex_string[(blob->length*2)] = '\0';
--	return hex_string;
--}
--
--_PUBLIC_ char *data_blob_hex_string_upper(TALLOC_CTX *mem_ctx, const DATA_BLOB *blob)
--{
--	unsigned int i;
--	char *hex_string;
--
--	hex_string = talloc_array(mem_ctx, char, (blob->length*2)+1);
--	if (!hex_string) {
--		return NULL;
--	}
--
--	for (i = 0; i < blob->length; i++)
--		slprintf(&hex_string[i*2], 3, "%02X", blob->data[i]);
--
--	hex_string[(blob->length*2)] = '\0';
--	return hex_string;
--}
--
--/**
--  useful for constructing data blobs in test suites, while
--  avoiding const warnings
--**/
--_PUBLIC_ DATA_BLOB data_blob_string_const(const char *str)
--{
--	DATA_BLOB blob;
--	blob.data = discard_const_p(uint8_t, str);
--	blob.length = str ? strlen(str) : 0;
--	return blob;
--}
--
--/**
--  useful for constructing data blobs in test suites, while
--  avoiding const warnings
--**/
--_PUBLIC_ DATA_BLOB data_blob_string_const_null(const char *str)
--{
--	DATA_BLOB blob;
--	blob.data = discard_const_p(uint8_t, str);
--	blob.length = str ? strlen(str)+1 : 0;
--	return blob;
--}
--
--/**
-- * Create a new data blob from const data 
-- */
--
--_PUBLIC_ DATA_BLOB data_blob_const(const void *p, size_t length)
--{
--	DATA_BLOB blob;
--	blob.data = discard_const_p(uint8_t, p);
--	blob.length = length;
--	return blob;
--}
--
--
--/**
--  realloc a data_blob
--**/
--_PUBLIC_ bool data_blob_realloc(TALLOC_CTX *mem_ctx, DATA_BLOB *blob, size_t length)
--{
--	blob->data = talloc_realloc(mem_ctx, blob->data, uint8_t, length);
--	if (blob->data == NULL)
--		return false;
--	blob->length = length;
--	return true;
--}
--
--
--/**
--  append some data to a data blob
--**/
--_PUBLIC_ bool data_blob_append(TALLOC_CTX *mem_ctx, DATA_BLOB *blob,
--				   const void *p, size_t length)
--{
--	size_t old_len = blob->length;
--	size_t new_len = old_len + length;
--	if (new_len < length || new_len < old_len) {
--		return false;
--	}
--
--	if ((const uint8_t *)p + length < (const uint8_t *)p) {
--		return false;
--	}
--	
--	if (!data_blob_realloc(mem_ctx, blob, new_len)) {
--		return false;
--	}
--
--	memcpy(blob->data + old_len, p, length);
--	return true;
--}
--
-diff --git a/data_blob.h b/data_blob.h
-index 83e6cd5..ccdf30d 100644
---- a/data_blob.h
-+++ b/data_blob.h
-@@ -61,72 +61,10 @@ _PUBLIC_ DATA_BLOB data_blob_named(const void *p, size_t length, const char *nam
- _PUBLIC_ DATA_BLOB data_blob_talloc_named(TALLOC_CTX *mem_ctx, const void *p, size_t length, const char *name);
- 
- /**
-- construct a zero data blob, using supplied TALLOC_CTX. 
-- use this sparingly as it initialises data - better to initialise
-- yourself if you want specific data in the blob
--**/
--_PUBLIC_ DATA_BLOB data_blob_talloc_zero(TALLOC_CTX *mem_ctx, size_t length);
--
--/**
- free a data blob
- **/
- _PUBLIC_ void data_blob_free(DATA_BLOB *d);
- 
--/**
--clear a DATA_BLOB's contents
--**/
--_PUBLIC_ void data_blob_clear(DATA_BLOB *d);
--
--/**
--free a data blob and clear its contents
--**/
--_PUBLIC_ void data_blob_clear_free(DATA_BLOB *d);
--
--/**
--check if two data blobs are equal
--**/
--_PUBLIC_ int data_blob_cmp(const DATA_BLOB *d1, const DATA_BLOB *d2);
--
--/**
--print the data_blob as hex string
--**/
--_PUBLIC_ char *data_blob_hex_string_upper(TALLOC_CTX *mem_ctx, const DATA_BLOB *blob);
--
--/**
--print the data_blob as hex string
--**/
--_PUBLIC_ char *data_blob_hex_string_lower(TALLOC_CTX *mem_ctx, const DATA_BLOB *blob);
--
--/**
--  useful for constructing data blobs in test suites, while
--  avoiding const warnings
--**/
--_PUBLIC_ DATA_BLOB data_blob_string_const(const char *str);
--
--/**
--  useful for constructing data blobs in test suites, while
--  avoiding const warnings
--
--  includes the terminating null character (as opposed to data_blo_string_const)
--**/
--_PUBLIC_ DATA_BLOB data_blob_string_const_null(const char *str);
--
--/**
-- * Create a new data blob from const data 
-- */
--_PUBLIC_ DATA_BLOB data_blob_const(const void *p, size_t length);
--
--/**
--  realloc a data_blob
--**/
--_PUBLIC_ bool data_blob_realloc(TALLOC_CTX *mem_ctx, DATA_BLOB *blob, size_t length);
--
--/**
--  append some data to a data blob
--**/
--_PUBLIC_ bool data_blob_append(TALLOC_CTX *mem_ctx, DATA_BLOB *blob,
--				   const void *p, size_t length);
--
- extern const DATA_BLOB data_blob_null;
- 
- #endif /* _SAMBA_DATABLOB_H_ */
--- 
-1.8.3.1
+On Wed, Oct 9, 2013 at 8:14 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> Coverity says:
+>
+> Error: DEADCODE (CWE-561): [#def5]
+> cifs-utils-6.2/getcifsacl.c:101: assignment: Assigning: "mflags" = "false".
+> cifs-utils-6.2/getcifsacl.c:109: const: At condition "mflags", the value of "mflags" must be equal to 0.
+> cifs-utils-6.2/getcifsacl.c:109: dead_error_condition: The condition "mflags" cannot be true.
+> cifs-utils-6.2/getcifsacl.c:110: dead_error_line: Execution cannot reach this statement "printf("|");".
+>
+> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> ---
+>  getcifsacl.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+>
+> diff --git a/getcifsacl.c b/getcifsacl.c
+> index b8998ef..8a7f8ba 100644
+> --- a/getcifsacl.c
+> +++ b/getcifsacl.c
+> @@ -106,10 +106,7 @@ print_ace_flags(uint8_t flags, int raw)
+>         }
+>
+>         if (flags & OBJECT_INHERIT_FLAG) {
+> -               if (mflags)
+> -                       printf("|");
+> -               else
+> -                       mflags = true;
+> +               mflags = true;
+>                 printf("OI");
+>         }
+>         if (flags & CONTAINER_INHERIT_FLAG) {
+> --
+> 1.8.3.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
