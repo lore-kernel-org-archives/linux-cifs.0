@@ -1,75 +1,41 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [[PATCH v2] [CIFS] Allow setting per-file compression via SMB2
- and SMB3
-Date: Tue, 8 Oct 2013 17:53:35 -0500
-Message-ID: <CAH2r5mtLYhRxRegVZNZJ1n=7dXizTGd+GTPT2tHjSfeKf=HngA@mail.gmail.com>
-References: <CAH2r5mubgNp_gY=0b_dWuQx2X2S1hESz5iKXwNhGZfXwCM7TsA@mail.gmail.com>
-	<20131009002545.114ae8a5@plati.site>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH][cifs-utils] setcifsacl: fix bad bit-shift in raw_str_to_sid
+Date: Tue,  8 Oct 2013 21:09:39 -0400
+Message-ID: <1381280979-18571-1-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	samba-technical <samba-technical@lists.samba.org>
-To: David Disseldorp <ddiss@suse.de>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <20131009002545.114ae8a5@plati.site>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Oct 8, 2013 at 5:25 PM, David Disseldorp <ddiss@suse.de> wrote:
-> Hi Steve,
->
-> On Tue, 8 Oct 2013 15:41:17 -0500
-> Steve French <smfrench@gmail.com> wrote:
->
->> +                     /* Currently only flag we can set is compressed flag */
->> +                     if ((ExtAttrBits & FS_COMPR_FL) == 0)
->> +                             break;
->> +
->> +                     /* Try to set compress flag */
->> +                     if (tcon->ses->server->ops->set_compression) {
->> +                             rc = tcon->ses->server->ops->set_compression(
->> +                                                     xid, tcon, pSMBFile);
->> +                             cifs_dbg(FYI, "set compress flag rc %d\n", rc);
->>                       }
->
-> Is the FileFsAttributeInformation known at this stage? If so, you may
+A Coverity scan turned up this warning:
 
-During mount we do:
+1. cifs-utils-6.2/setcifsacl.c:578:result_independent_of_operands =E2=80=
+=93 "(x & 0xff0000000000ULL) >> 48" is 0 regardless of the values of it=
+s operands. This occurs as the operand of assignment.
 
-        if (!tcon->ipc && server->ops->qfs_tcon)
-                server->ops->qfs_tcon(xid, tcon);
+=2E..which is entirely true. That shift should be 40 bits, not 48.
 
-(for informational/debug purposes) but qfs_tcon is only defined in
-cifs, not for smb2/smb2.1/smb3.  We could add it easily enough (so you
-could see this info in /proc/fs/cifs/ or perhaps /proc/mounts if that
-were preferred - but in any case added SMB2 QFS Attribute Info would
-probably be better as a distinct patch).
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ setcifsacl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-> wish to check for the FILE_FILE_COMPRESSION capability, and avoid the
-> request dispatch if absent.
-
-There doesn't seem to be much harm in sending the set compression
-fsctl so we know the most uptodate info on whether the server can
-support it or not - since this is an explicit command at cli (not in
-the Linux GUIs AFAIK - although if there were a way to advertise
-per-mount capabilities this would be a logical one to add)
-
-> IIRC, Explorer hides the compression check-checkbox if the capability
-> is missing.
-
-I am a little worried about two cases:
-
-1) what if the server reenabled compression on the underlying volume
-after we mounted the share
-
-2) what if the server exports multiple file systems under a single
-share one which supports compression and one which doesn't - we would
-only query on the root
-
-
--- 
-Thanks,
-
-Steve
+diff --git a/setcifsacl.c b/setcifsacl.c
+index ce708eb..7eeeaa6 100644
+--- a/setcifsacl.c
++++ b/setcifsacl.c
+@@ -575,7 +575,7 @@ raw_str_to_sid(const char *str, struct cifs_sid *cs=
+id)
+ 	csid->authority[3] =3D (x & 0x000000ff0000ULL) >> 16;
+ 	csid->authority[2] =3D (x & 0x0000ff000000ULL) >> 24;
+ 	csid->authority[1] =3D (x & 0x00ff00000000ULL) >> 32;
+-	csid->authority[0] =3D (x & 0xff0000000000ULL) >> 48;
++	csid->authority[0] =3D (x & 0xff0000000000ULL) >> 40;
+=20
+ 	/* now read the the subauthorities and store as __le32 vals */
+ 	p =3D q + 1;
+--=20
+1.8.3.1
