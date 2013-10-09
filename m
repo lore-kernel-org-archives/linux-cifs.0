@@ -1,18 +1,18 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH] [CIFS] Query device characteristics at mount time from server
- on SMB2/3 not just on cifs mounts
-Date: Wed, 9 Oct 2013 13:44:04 -0500
-Message-ID: <CAH2r5mt+1SDYeV_G2duC63BQg274tSaBn9oxrmy+6RNQuHAL=w@mail.gmail.com>
+Subject: [PATCHv2] [CIFS] Query device characteristics at mount time from
+ server on SMB2/3 not just on cifs mounts
+Date: Wed, 9 Oct 2013 15:58:39 -0500
+Message-ID: <CAH2r5mtBYrihQSOZsKXYLLAi6b8cj9-e5XfBmDJ0-rbA0n0sHw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary=047d7b2e0a1101ca9404e85345e1
+Content-Type: multipart/mixed; boundary=047d7b16018d561f2f04e855261c
 To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
---047d7b2e0a1101ca9404e85345e1
+--047d7b16018d561f2f04e855261c
 Content-Type: text/plain; charset=ISO-8859-1
 
 Currently SMB2 and SMB3 mounts do not query the device information at mount time
@@ -20,11 +20,12 @@ from the server at mount time as is done for cifs.  These can be
 useful for debugging.
 This is a minor patch, that extends the previous one (which added ability to
 query file system attributes at mount time - this returns the device
-characteristics - also via in /proc/fs/cifs/DebugData).  I wonder if there is
-a way to make additional device characteristics and fs attributes
-available in consistent
-way for nfs/cifs/smb3 and local file systems (as we do for certain
-file attributes).
+characteristics - also via in /proc/fs/cifs/DebugData)
+
+In second version of patch, I also correct the fs information levels
+we were using
+(we were calling the "passthrough" levels which work,
+but are 0x100 higher than the documented levels for SMB2).
 
 Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
@@ -44,9 +45,9 @@ cifs_tcon *tcon)
 
 -    SMB2_QFS_attr(xid, tcon, fid.persistent_fid, fid.volatile_fid);
 +    SMB2_QFS_attr(xid, tcon, fid.persistent_fid, fid.volatile_fid,
-+            SMB_QUERY_FS_ATTRIBUTE_INFO);
++            FS_ATTRIBUTE_INFORMATION);
 +    SMB2_QFS_attr(xid, tcon, fid.persistent_fid, fid.volatile_fid,
-+            SMB_QUERY_FS_DEVICE_INFO);
++            FS_DEVICE_INFORMATION);
      SMB2_close(xid, tcon, fid.persistent_fid, fid.volatile_fid);
      return;
  }
@@ -71,10 +72,10 @@ index 2ade58b..c822d9a 100644
 
 -    rc = build_qfs_info_req(&iov, tcon, SMB_QUERY_FS_ATTRIBUTE_INFO,
 -                sizeof(FILE_SYSTEM_ATTRIBUTE_INFO),
-+    if (level == SMB_QUERY_FS_DEVICE_INFO) {
++    if (level == FS_DEVICE_INFORMATION) {
 +        max_len = sizeof(FILE_SYSTEM_DEVICE_INFO);
 +        min_len = sizeof(FILE_SYSTEM_DEVICE_INFO);
-+    } else if (level == SMB_QUERY_FS_ATTRIBUTE_INFO) {
++    } else if (level == FS_ATTRIBUTE_INFORMATION) {
 +        max_len = sizeof(FILE_SYSTEM_ATTRIBUTE_INFO);
 +        min_len = MIN_FS_ATTR_INFO_SIZE;
 +    } else {
@@ -97,13 +98,13 @@ cifs_tcon *tcon,
 +    if (rc)
 +        goto qfsattr_exit;
 +
-+    if (level == SMB_QUERY_FS_ATTRIBUTE_INFO)
++    if (level == FS_ATTRIBUTE_INFORMATION)
          memcpy(&tcon->fsAttrInfo, 4 /* RFC1001 len */ + offset
              + (char *)&rsp->hdr, min_t(unsigned int,
 -            rsp_len, sizeof(FILE_SYSTEM_ATTRIBUTE_INFO)));
 -    }
 +            rsp_len, max_len));
-+    else if (level == SMB_QUERY_FS_DEVICE_INFO)
++    else if (level == FS_DEVICE_INFORMATION)
 +        memcpy(&tcon->fsDevInfo, 4 /* RFC1001 len */ + offset
 +            + (char *)&rsp->hdr, sizeof(FILE_SYSTEM_DEVICE_INFO));
 
@@ -132,13 +133,13 @@ Thanks,
 
 Steve
 
---047d7b2e0a1101ca9404e85345e1
+--047d7b16018d561f2f04e855261c
 Content-Type: application/octet-stream;
 	name="0001-CIFS-Query-device-characteristics-at-mount-time-from.patch"
 Content-Disposition: attachment;
 	filename="0001-CIFS-Query-device-characteristics-at-mount-time-from.patch"
 Content-Transfer-Encoding: base64
-X-Attachment-Id: f_hmkwoy4o0
+X-Attachment-Id: f_hml1dld30
 
 RnJvbSA1YTdjODBhNzdjNmQ0NWE4OTEyOTFmYzBkYWRhMzM5Y2JmYjY4MjNmIE1vbiBTZXAgMTcg
 MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZW4gRnJlbmNoIDxzbWZyZW5jaEBnbWFpbC5jb20+CkRh
@@ -161,55 +162,55 @@ YworKysgYi9mcy9jaWZzL3NtYjJvcHMuYwpAQCAtMjI5LDcgKzIyOSwxMCBAQCBzbWIyX3Fmc190
 Y29uKGNvbnN0IHVuc2lnbmVkIGludCB4aWQsIHN0cnVjdCBjaWZzX3Rjb24gKnRjb24pCiAJaWYg
 KHJjKQogCQlyZXR1cm47CiAKLQlTTUIyX1FGU19hdHRyKHhpZCwgdGNvbiwgZmlkLnBlcnNpc3Rl
 bnRfZmlkLCBmaWQudm9sYXRpbGVfZmlkKTsKKwlTTUIyX1FGU19hdHRyKHhpZCwgdGNvbiwgZmlk
-LnBlcnNpc3RlbnRfZmlkLCBmaWQudm9sYXRpbGVfZmlkLAorCQkJU01CX1FVRVJZX0ZTX0FUVFJJ
-QlVURV9JTkZPKTsKKwlTTUIyX1FGU19hdHRyKHhpZCwgdGNvbiwgZmlkLnBlcnNpc3RlbnRfZmlk
-LCBmaWQudm9sYXRpbGVfZmlkLAorCQkJU01CX1FVRVJZX0ZTX0RFVklDRV9JTkZPKTsKIAlTTUIy
-X2Nsb3NlKHhpZCwgdGNvbiwgZmlkLnBlcnNpc3RlbnRfZmlkLCBmaWQudm9sYXRpbGVfZmlkKTsK
-IAlyZXR1cm47CiB9CmRpZmYgLS1naXQgYS9mcy9jaWZzL3NtYjJwZHUuYyBiL2ZzL2NpZnMvc21i
-MnBkdS5jCmluZGV4IDJhZGU1OGIuLmM4MjJkOWEgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvc21iMnBk
-dS5jCisrKyBiL2ZzL2NpZnMvc21iMnBkdS5jCkBAIC0yMzQ3LDE3ICsyMzQ3LDI3IEBAIHFmc2lu
-Zl9leGl0OgogCiBpbnQKIFNNQjJfUUZTX2F0dHIoY29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3Ry
-dWN0IGNpZnNfdGNvbiAqdGNvbiwKLQkgICAgICB1NjQgcGVyc2lzdGVudF9maWQsIHU2NCB2b2xh
-dGlsZV9maWQpCisJICAgICAgdTY0IHBlcnNpc3RlbnRfZmlkLCB1NjQgdm9sYXRpbGVfZmlkLCBp
-bnQgbGV2ZWwpCiB7CiAJc3RydWN0IHNtYjJfcXVlcnlfaW5mb19yc3AgKnJzcCA9IE5VTEw7CiAJ
-c3RydWN0IGt2ZWMgaW92OwogCWludCByYyA9IDA7Ci0JaW50IHJlc3BfYnVmdHlwZTsKKwlpbnQg
-cmVzcF9idWZ0eXBlLCBtYXhfbGVuLCBtaW5fbGVuOwogCXN0cnVjdCBjaWZzX3NlcyAqc2VzID0g
-dGNvbi0+c2VzOwogCXVuc2lnbmVkIGludCByc3BfbGVuLCBvZmZzZXQ7CiAKLQlyYyA9IGJ1aWxk
-X3Fmc19pbmZvX3JlcSgmaW92LCB0Y29uLCBTTUJfUVVFUllfRlNfQVRUUklCVVRFX0lORk8sCi0J
-CQkJc2l6ZW9mKEZJTEVfU1lTVEVNX0FUVFJJQlVURV9JTkZPKSwKKwlpZiAobGV2ZWwgPT0gU01C
-X1FVRVJZX0ZTX0RFVklDRV9JTkZPKSB7CisJCW1heF9sZW4gPSBzaXplb2YoRklMRV9TWVNURU1f
-REVWSUNFX0lORk8pOworCQltaW5fbGVuID0gc2l6ZW9mKEZJTEVfU1lTVEVNX0RFVklDRV9JTkZP
-KTsKKwl9IGVsc2UgaWYgKGxldmVsID09IFNNQl9RVUVSWV9GU19BVFRSSUJVVEVfSU5GTykgewor
-CQltYXhfbGVuID0gc2l6ZW9mKEZJTEVfU1lTVEVNX0FUVFJJQlVURV9JTkZPKTsKKwkJbWluX2xl
-biA9IE1JTl9GU19BVFRSX0lORk9fU0laRTsKKwl9IGVsc2UgeworCQljaWZzX2RiZyhGWUksICJJ
-bnZhbGlkIHFmc2luZm8gbGV2ZWwgJWQiLCBsZXZlbCk7CisJCXJldHVybiAtRUlOVkFMOworCX0K
-KworCXJjID0gYnVpbGRfcWZzX2luZm9fcmVxKCZpb3YsIHRjb24sIGxldmVsLCBtYXhfbGVuLAog
-CQkJCXBlcnNpc3RlbnRfZmlkLCB2b2xhdGlsZV9maWQpOwogCWlmIChyYykKIAkJcmV0dXJuIHJj
-OwpAQCAtMjM3MSwxMiArMjM4MSwxNyBAQCBTTUIyX1FGU19hdHRyKGNvbnN0IHVuc2lnbmVkIGlu
-dCB4aWQsIHN0cnVjdCBjaWZzX3Rjb24gKnRjb24sCiAKIAlyc3BfbGVuID0gbGUzMl90b19jcHUo
-cnNwLT5PdXRwdXRCdWZmZXJMZW5ndGgpOwogCW9mZnNldCA9IGxlMTZfdG9fY3B1KHJzcC0+T3V0
-cHV0QnVmZmVyT2Zmc2V0KTsKLQlyYyA9IHZhbGlkYXRlX2J1ZihvZmZzZXQsIHJzcF9sZW4sICZy
-c3AtPmhkciwgTUlOX0ZTX0FUVFJfSU5GT19TSVpFKTsKLQlpZiAoIXJjKSB7CisJcmMgPSB2YWxp
-ZGF0ZV9idWYob2Zmc2V0LCByc3BfbGVuLCAmcnNwLT5oZHIsIG1pbl9sZW4pOworCWlmIChyYykK
-KwkJZ290byBxZnNhdHRyX2V4aXQ7CisKKwlpZiAobGV2ZWwgPT0gU01CX1FVRVJZX0ZTX0FUVFJJ
-QlVURV9JTkZPKQogCQltZW1jcHkoJnRjb24tPmZzQXR0ckluZm8sIDQgLyogUkZDMTAwMSBsZW4g
-Ki8gKyBvZmZzZXQKIAkJCSsgKGNoYXIgKikmcnNwLT5oZHIsIG1pbl90KHVuc2lnbmVkIGludCwK
-LQkJCXJzcF9sZW4sIHNpemVvZihGSUxFX1NZU1RFTV9BVFRSSUJVVEVfSU5GTykpKTsKLQl9CisJ
-CQlyc3BfbGVuLCBtYXhfbGVuKSk7CisJZWxzZSBpZiAobGV2ZWwgPT0gU01CX1FVRVJZX0ZTX0RF
-VklDRV9JTkZPKQorCQltZW1jcHkoJnRjb24tPmZzRGV2SW5mbywgNCAvKiBSRkMxMDAxIGxlbiAq
-LyArIG9mZnNldAorCQkJKyAoY2hhciAqKSZyc3AtPmhkciwgc2l6ZW9mKEZJTEVfU1lTVEVNX0RF
-VklDRV9JTkZPKSk7CiAKIHFmc2F0dHJfZXhpdDoKIAlmcmVlX3JzcF9idWYocmVzcF9idWZ0eXBl
-LCBpb3YuaW92X2Jhc2UpOwpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9zbWIycHJvdG8uaCBiL2ZzL2Np
-ZnMvc21iMnByb3RvLmgKaW5kZXggNjhkYzAwZC4uMzEzODEzZSAxMDA2NDQKLS0tIGEvZnMvY2lm
-cy9zbWIycHJvdG8uaAorKysgYi9mcy9jaWZzL3NtYjJwcm90by5oCkBAIC0xNTEsNyArMTUxLDcg
-QEAgZXh0ZXJuIGludCBTTUIyX1FGU19pbmZvKGNvbnN0IHVuc2lnbmVkIGludCB4aWQsIHN0cnVj
-dCBjaWZzX3Rjb24gKnRjb24sCiAJCQkgdTY0IHBlcnNpc3RlbnRfZmlsZV9pZCwgdTY0IHZvbGF0
-aWxlX2ZpbGVfaWQsCiAJCQkgc3RydWN0IGtzdGF0ZnMgKkZTRGF0YSk7CiBleHRlcm4gaW50IFNN
-QjJfUUZTX2F0dHIoY29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGNpZnNfdGNvbiAqdGNv
-biwKLQkJCSB1NjQgcGVyc2lzdGVudF9maWxlX2lkLCB1NjQgdm9sYXRpbGVfZmlsZV9pZCk7CisJ
-CQkgdTY0IHBlcnNpc3RlbnRfZmlsZV9pZCwgdTY0IHZvbGF0aWxlX2ZpbGVfaWQsIGludCBsdmwp
-OwogZXh0ZXJuIGludCBTTUIyX2xvY2soY29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGNp
-ZnNfdGNvbiAqdGNvbiwKIAkJICAgICBjb25zdCBfX3U2NCBwZXJzaXN0X2ZpZCwgY29uc3QgX191
-NjQgdm9sYXRpbGVfZmlkLAogCQkgICAgIGNvbnN0IF9fdTMyIHBpZCwgY29uc3QgX191NjQgbGVu
-Z3RoLCBjb25zdCBfX3U2NCBvZmZzZXQsCi0tIAoxLjcuMTAuNAoK
---047d7b2e0a1101ca9404e85345e1--
+LnBlcnNpc3RlbnRfZmlkLCBmaWQudm9sYXRpbGVfZmlkLAorCQkJRlNfQVRUUklCVVRFX0lORk9S
+TUFUSU9OKTsKKwlTTUIyX1FGU19hdHRyKHhpZCwgdGNvbiwgZmlkLnBlcnNpc3RlbnRfZmlkLCBm
+aWQudm9sYXRpbGVfZmlkLAorCQkJRlNfREVWSUNFX0lORk9STUFUSU9OKTsKIAlTTUIyX2Nsb3Nl
+KHhpZCwgdGNvbiwgZmlkLnBlcnNpc3RlbnRfZmlkLCBmaWQudm9sYXRpbGVfZmlkKTsKIAlyZXR1
+cm47CiB9CmRpZmYgLS1naXQgYS9mcy9jaWZzL3NtYjJwZHUuYyBiL2ZzL2NpZnMvc21iMnBkdS5j
+CmluZGV4IDJhZGU1OGIuLmM4MjJkOWEgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvc21iMnBkdS5jCisr
+KyBiL2ZzL2NpZnMvc21iMnBkdS5jCkBAIC0yMzQ3LDE3ICsyMzQ3LDI3IEBAIHFmc2luZl9leGl0
+OgogCiBpbnQKIFNNQjJfUUZTX2F0dHIoY29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGNp
+ZnNfdGNvbiAqdGNvbiwKLQkgICAgICB1NjQgcGVyc2lzdGVudF9maWQsIHU2NCB2b2xhdGlsZV9m
+aWQpCisJICAgICAgdTY0IHBlcnNpc3RlbnRfZmlkLCB1NjQgdm9sYXRpbGVfZmlkLCBpbnQgbGV2
+ZWwpCiB7CiAJc3RydWN0IHNtYjJfcXVlcnlfaW5mb19yc3AgKnJzcCA9IE5VTEw7CiAJc3RydWN0
+IGt2ZWMgaW92OwogCWludCByYyA9IDA7Ci0JaW50IHJlc3BfYnVmdHlwZTsKKwlpbnQgcmVzcF9i
+dWZ0eXBlLCBtYXhfbGVuLCBtaW5fbGVuOwogCXN0cnVjdCBjaWZzX3NlcyAqc2VzID0gdGNvbi0+
+c2VzOwogCXVuc2lnbmVkIGludCByc3BfbGVuLCBvZmZzZXQ7CiAKLQlyYyA9IGJ1aWxkX3Fmc19p
+bmZvX3JlcSgmaW92LCB0Y29uLCBTTUJfUVVFUllfRlNfQVRUUklCVVRFX0lORk8sCi0JCQkJc2l6
+ZW9mKEZJTEVfU1lTVEVNX0FUVFJJQlVURV9JTkZPKSwKKwlpZiAobGV2ZWwgPT0gRlNfREVWSUNF
+X0lORk9STUFUSU9OKSB7CisJCW1heF9sZW4gPSBzaXplb2YoRklMRV9TWVNURU1fREVWSUNFX0lO
+Rk8pOworCQltaW5fbGVuID0gc2l6ZW9mKEZJTEVfU1lTVEVNX0RFVklDRV9JTkZPKTsKKwl9IGVs
+c2UgaWYgKGxldmVsID09IEZTX0FUVFJJQlVURV9JTkZPUk1BVElPTikgeworCQltYXhfbGVuID0g
+c2l6ZW9mKEZJTEVfU1lTVEVNX0FUVFJJQlVURV9JTkZPKTsKKwkJbWluX2xlbiA9IE1JTl9GU19B
+VFRSX0lORk9fU0laRTsKKwl9IGVsc2UgeworCQljaWZzX2RiZyhGWUksICJJbnZhbGlkIHFmc2lu
+Zm8gbGV2ZWwgJWQiLCBsZXZlbCk7CisJCXJldHVybiAtRUlOVkFMOworCX0KKworCXJjID0gYnVp
+bGRfcWZzX2luZm9fcmVxKCZpb3YsIHRjb24sIGxldmVsLCBtYXhfbGVuLAogCQkJCXBlcnNpc3Rl
+bnRfZmlkLCB2b2xhdGlsZV9maWQpOwogCWlmIChyYykKIAkJcmV0dXJuIHJjOwpAQCAtMjM3MSwx
+MiArMjM4MSwxNyBAQCBTTUIyX1FGU19hdHRyKGNvbnN0IHVuc2lnbmVkIGludCB4aWQsIHN0cnVj
+dCBjaWZzX3Rjb24gKnRjb24sCiAKIAlyc3BfbGVuID0gbGUzMl90b19jcHUocnNwLT5PdXRwdXRC
+dWZmZXJMZW5ndGgpOwogCW9mZnNldCA9IGxlMTZfdG9fY3B1KHJzcC0+T3V0cHV0QnVmZmVyT2Zm
+c2V0KTsKLQlyYyA9IHZhbGlkYXRlX2J1ZihvZmZzZXQsIHJzcF9sZW4sICZyc3AtPmhkciwgTUlO
+X0ZTX0FUVFJfSU5GT19TSVpFKTsKLQlpZiAoIXJjKSB7CisJcmMgPSB2YWxpZGF0ZV9idWYob2Zm
+c2V0LCByc3BfbGVuLCAmcnNwLT5oZHIsIG1pbl9sZW4pOworCWlmIChyYykKKwkJZ290byBxZnNh
+dHRyX2V4aXQ7CisKKwlpZiAobGV2ZWwgPT0gRlNfQVRUUklCVVRFX0lORk9STUFUSU9OKQogCQlt
+ZW1jcHkoJnRjb24tPmZzQXR0ckluZm8sIDQgLyogUkZDMTAwMSBsZW4gKi8gKyBvZmZzZXQKIAkJ
+CSsgKGNoYXIgKikmcnNwLT5oZHIsIG1pbl90KHVuc2lnbmVkIGludCwKLQkJCXJzcF9sZW4sIHNp
+emVvZihGSUxFX1NZU1RFTV9BVFRSSUJVVEVfSU5GTykpKTsKLQl9CisJCQlyc3BfbGVuLCBtYXhf
+bGVuKSk7CisJZWxzZSBpZiAobGV2ZWwgPT0gRlNfREVWSUNFX0lORk9STUFUSU9OKQorCQltZW1j
+cHkoJnRjb24tPmZzRGV2SW5mbywgNCAvKiBSRkMxMDAxIGxlbiAqLyArIG9mZnNldAorCQkJKyAo
+Y2hhciAqKSZyc3AtPmhkciwgc2l6ZW9mKEZJTEVfU1lTVEVNX0RFVklDRV9JTkZPKSk7CiAKIHFm
+c2F0dHJfZXhpdDoKIAlmcmVlX3JzcF9idWYocmVzcF9idWZ0eXBlLCBpb3YuaW92X2Jhc2UpOwpk
+aWZmIC0tZ2l0IGEvZnMvY2lmcy9zbWIycHJvdG8uaCBiL2ZzL2NpZnMvc21iMnByb3RvLmgKaW5k
+ZXggNjhkYzAwZC4uMzEzODEzZSAxMDA2NDQKLS0tIGEvZnMvY2lmcy9zbWIycHJvdG8uaAorKysg
+Yi9mcy9jaWZzL3NtYjJwcm90by5oCkBAIC0xNTEsNyArMTUxLDcgQEAgZXh0ZXJuIGludCBTTUIy
+X1FGU19pbmZvKGNvbnN0IHVuc2lnbmVkIGludCB4aWQsIHN0cnVjdCBjaWZzX3Rjb24gKnRjb24s
+CiAJCQkgdTY0IHBlcnNpc3RlbnRfZmlsZV9pZCwgdTY0IHZvbGF0aWxlX2ZpbGVfaWQsCiAJCQkg
+c3RydWN0IGtzdGF0ZnMgKkZTRGF0YSk7CiBleHRlcm4gaW50IFNNQjJfUUZTX2F0dHIoY29uc3Qg
+dW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGNpZnNfdGNvbiAqdGNvbiwKLQkJCSB1NjQgcGVyc2lz
+dGVudF9maWxlX2lkLCB1NjQgdm9sYXRpbGVfZmlsZV9pZCk7CisJCQkgdTY0IHBlcnNpc3RlbnRf
+ZmlsZV9pZCwgdTY0IHZvbGF0aWxlX2ZpbGVfaWQsIGludCBsdmwpOwogZXh0ZXJuIGludCBTTUIy
+X2xvY2soY29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGNpZnNfdGNvbiAqdGNvbiwKIAkJ
+ICAgICBjb25zdCBfX3U2NCBwZXJzaXN0X2ZpZCwgY29uc3QgX191NjQgdm9sYXRpbGVfZmlkLAog
+CQkgICAgIGNvbnN0IF9fdTMyIHBpZCwgY29uc3QgX191NjQgbGVuZ3RoLCBjb25zdCBfX3U2NCBv
+ZmZzZXQsCi0tIAoxLjcuMTAuNAoK
+--047d7b16018d561f2f04e855261c--
