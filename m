@@ -1,31 +1,57 @@
-From: "Stefan (metze) Metzmacher" <metze@samba.org>
-Subject: Re: [[PATCH v2] [CIFS] Allow setting per-file compression via SMB2
- and SMB3
-Date: Thu, 10 Oct 2013 08:25:09 +0200
-Message-ID: <52564845.9040205@samba.org>
-References: <CAH2r5mubgNp_gY=0b_dWuQx2X2S1hESz5iKXwNhGZfXwCM7TsA@mail.gmail.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH v2] get/setcifsacl: fix bad bit-shifts
+Date: Thu, 10 Oct 2013 08:25:36 -0400
+Message-ID: <1381407936-5534-1-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-To: Steve French <smfrench@gmail.com>,
-	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	samba-technical <samba-technical@lists.samba.org>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <CAH2r5mubgNp_gY=0b_dWuQx2X2S1hESz5iKXwNhGZfXwCM7TsA@mail.gmail.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Hi Steve,
+A Coverity scan turned up this warning:
 
-> Allow cifs/smb2/smb3 to return whether or not a file is compressed
-> via lsattr, and allow SMB2/SMB3 to set the per-file compression
-> flag ("chattr +c filename" on an smb2 or smb3 mount).
+1. cifs-utils-6.2/setcifsacl.c:578:result_independent_of_operands =E2=80=
+=93 "(x & 0xff0000000000ULL) >> 48" is 0 regardless of the values of it=
+s operands. This occurs as the operand of assignment.
 
-There're still unrelated generic fixes in SMB2_ioctl(), which would
-a separate commit.
+=2E..which is entirely true. That shift should be 40 bits, not 48. Also
+fix a similar bug in getcifsacl.c.
 
-I also don't understand why the set operation should not be available
-in all protocols, there's nothing SMB2 or SMB3 specific.
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ getcifsacl.c | 2 +-
+ setcifsacl.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-metze
+diff --git a/getcifsacl.c b/getcifsacl.c
+index b8998ef..33f36b4 100644
+--- a/getcifsacl.c
++++ b/getcifsacl.c
+@@ -198,7 +198,7 @@ print_sid_raw:
+ 	id_auth_val +=3D (unsigned long long)csid->authority[3] << 16;
+ 	id_auth_val +=3D (unsigned long long)csid->authority[2] << 24;
+ 	id_auth_val +=3D (unsigned long long)csid->authority[1] << 32;
+-	id_auth_val +=3D (unsigned long long)csid->authority[0] << 48;
++	id_auth_val +=3D (unsigned long long)csid->authority[0] << 40;
+=20
+ 	/*
+ 	 * MS-DTYP states that if the authority is >=3D 2^32, then it should =
+be
+diff --git a/setcifsacl.c b/setcifsacl.c
+index ce708eb..7eeeaa6 100644
+--- a/setcifsacl.c
++++ b/setcifsacl.c
+@@ -575,7 +575,7 @@ raw_str_to_sid(const char *str, struct cifs_sid *cs=
+id)
+ 	csid->authority[3] =3D (x & 0x000000ff0000ULL) >> 16;
+ 	csid->authority[2] =3D (x & 0x0000ff000000ULL) >> 24;
+ 	csid->authority[1] =3D (x & 0x00ff00000000ULL) >> 32;
+-	csid->authority[0] =3D (x & 0xff0000000000ULL) >> 48;
++	csid->authority[0] =3D (x & 0xff0000000000ULL) >> 40;
+=20
+ 	/* now read the the subauthorities and store as __le32 vals */
+ 	p =3D q + 1;
+--=20
+1.8.3.1
