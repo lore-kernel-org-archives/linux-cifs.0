@@ -1,11 +1,16 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH][cifs-utils] mount.cifs: fix bad free() of string returned by dirname()
-Date: Fri, 11 Oct 2013 10:27:53 -0400
-Message-ID: <1381501673-7286-1-git-send-email-jlayton@samba.org>
+Subject: [PATCH v2][cifs-utils] mount.cifs: fix bad free() of string returned by dirname()
+Date: Fri, 11 Oct 2013 11:12:40 -0400
+Message-ID: <1381504360-10831-1-git-send-email-jlayton@samba.org>
+References: <1381501673-7286-1-git-send-email-jlayton@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1381501673-7286-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
+
+v2:
+- explicitly free mtabtmpfile memory
 
 Coverity says:
 
@@ -27,11 +32,11 @@ in del_mtab.
 
 Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- mount.cifs.c | 26 ++++++++++++++++----------
- 1 file changed, 16 insertions(+), 10 deletions(-)
+ mount.cifs.c | 29 ++++++++++++++++++-----------
+ 1 file changed, 18 insertions(+), 11 deletions(-)
 
 diff --git a/mount.cifs.c b/mount.cifs.c
-index 7206dcb..5969afb 100644
+index 7206dcb..497665d 100644
 --- a/mount.cifs.c
 +++ b/mount.cifs.c
 @@ -1508,23 +1508,29 @@ add_mtab_exit:
@@ -42,7 +47,8 @@ index 7206dcb..5969afb 100644
 +	int len, tmprc, rc = 0;
  	FILE *mnttmp, *mntmtab;
  	struct mntent *mountent;
- 	char *mtabfile, *mtabdir, *mtabtmpfile;
+-	char *mtabfile, *mtabdir, *mtabtmpfile;
++	char *mtabfile, *mtabdir, *mtabtmpfile = NULL;
  
  	mtabfile = strdup(MOUNTED);
 -	mtabdir = dirname(mtabfile);
@@ -88,11 +94,12 @@ index 7206dcb..5969afb 100644
  		rc = EX_FILEIO;
  		goto del_mtab_exit;
  	}
-@@ -1587,7 +1593,7 @@ del_mtab(char *mountpoint)
+@@ -1587,7 +1593,8 @@ del_mtab(char *mountpoint)
  
  del_mtab_exit:
  	unlock_mtab();
 -	free(mtabdir);
++	free(mtabtmpfile);
 +	free(mtabfile);
  	return rc;
  
