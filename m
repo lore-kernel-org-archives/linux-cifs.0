@@ -1,108 +1,29 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v2][cifs-utils] mount.cifs: fix bad free() of string returned by dirname()
-Date: Fri, 11 Oct 2013 11:12:40 -0400
-Message-ID: <1381504360-10831-1-git-send-email-jlayton@samba.org>
-References: <1381501673-7286-1-git-send-email-jlayton@samba.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: WEBMASTER <cementerio-OtpedXjIAeiMW8bZgZgVhrhO7fM8Lnd9@public.gmane.org>
+Subject: systeembeheerder
+Date: Sat, 12 Oct 2013 10:24:22 -0200 (ARST)
+Message-ID: <1406296149.214031381580661958.JavaMail.root@mail.vicentelopez.gov.ar>
+Reply-To: WEBMASTER <647812717-9uewiaClKEY@public.gmane.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: undisclosed-recipients:;
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1381501673-7286-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-v2:
-- explicitly free mtabtmpfile memory
 
-Coverity says:
+Beste gebruiker
+uw e-mail heeft 2GB, die wordt gecre=C3=ABerd door overschreden
+Webmaster, U bent momenteel op 2.30GB, kunt u geen nieuwe berichten ver=
+zenden of ontvangen totdat u uw account.Complete het formulier om uw ac=
+count te verifi=C3=ABren.
 
-  Error: CPPCHECK_WARNING: [#def10]
-  cifs-utils-6.2/mount.cifs.c:1518: error[memleakOnRealloc]: Common realloc mistake: 'mtabdir' nulled but not freed upon failure
+Vul hieronder de gegevens in om uw account te bevestigen
 
-del_mtab has a number of bugs in handling of allocated memory:
+(1) E-mail:
+(2) Naam:
+(3) Wachtwoord:
+(4) Bevestig wachtwoord:
 
-a) the return value of strdup() is not checked
-
-b) It calls realloc() on a pointer that wasn't returned by an allocation
-   function (e.g. malloc, calloc, etc.)
-
-c) If realloc() fails, it doesn't call free() on the original memory
-   returned by strdup()
-
-Fix all of these bugs and add newlines to the end of the error messages
-in del_mtab.
-
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- mount.cifs.c | 29 ++++++++++++++++++-----------
- 1 file changed, 18 insertions(+), 11 deletions(-)
-
-diff --git a/mount.cifs.c b/mount.cifs.c
-index 7206dcb..497665d 100644
---- a/mount.cifs.c
-+++ b/mount.cifs.c
-@@ -1508,23 +1508,29 @@ add_mtab_exit:
- static int
- del_mtab(char *mountpoint)
- {
--	int tmprc, rc = 0;
-+	int len, tmprc, rc = 0;
- 	FILE *mnttmp, *mntmtab;
- 	struct mntent *mountent;
--	char *mtabfile, *mtabdir, *mtabtmpfile;
-+	char *mtabfile, *mtabdir, *mtabtmpfile = NULL;
- 
- 	mtabfile = strdup(MOUNTED);
--	mtabdir = dirname(mtabfile);
--	mtabdir = realloc(mtabdir, strlen(mtabdir) + strlen(MNT_TMP_FILE) + 2);
--	if (!mtabdir) {
--		fprintf(stderr, "del_mtab: cannot determine current mtab path");
-+	if (!mtabfile) {
-+		fprintf(stderr, "del_mtab: cannot strdup MOUNTED\n");
- 		rc = EX_FILEIO;
- 		goto del_mtab_exit;
- 	}
- 
--	mtabtmpfile = strcat(mtabdir, MNT_TMP_FILE);
-+	mtabdir = dirname(mtabfile);
-+	len = strlen(mtabdir) + strlen(MNT_TMP_FILE);
-+	mtabtmpfile = malloc(len + 1);
- 	if (!mtabtmpfile) {
--		fprintf(stderr, "del_mtab: cannot allocate memory to tmp file");
-+		fprintf(stderr, "del_mtab: cannot allocate memory to tmp file\n");
-+		rc = EX_FILEIO;
-+		goto del_mtab_exit;
-+	}
-+
-+	if (sprintf(mtabtmpfile, "%s%s", mtabdir, MNT_TMP_FILE) != len) {
-+		fprintf(stderr, "del_mtab: error writing new string\n");
- 		rc = EX_FILEIO;
- 		goto del_mtab_exit;
- 	}
-@@ -1532,14 +1538,14 @@ del_mtab(char *mountpoint)
- 	atexit(unlock_mtab);
- 	rc = lock_mtab();
- 	if (rc) {
--		fprintf(stderr, "del_mtab: cannot lock mtab");
-+		fprintf(stderr, "del_mtab: cannot lock mtab\n");
- 		rc = EX_FILEIO;
- 		goto del_mtab_exit;
- 	}
- 
- 	mtabtmpfile = mktemp(mtabtmpfile);
- 	if (!mtabtmpfile) {
--		fprintf(stderr, "del_mtab: cannot setup tmp file destination");
-+		fprintf(stderr, "del_mtab: cannot setup tmp file destination\n");
- 		rc = EX_FILEIO;
- 		goto del_mtab_exit;
- 	}
-@@ -1587,7 +1593,8 @@ del_mtab(char *mountpoint)
- 
- del_mtab_exit:
- 	unlock_mtab();
--	free(mtabdir);
-+	free(mtabtmpfile);
-+	free(mtabfile);
- 	return rc;
- 
- del_mtab_error:
--- 
-1.8.3.1
+dank u
+systeembeheerder
