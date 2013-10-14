@@ -1,33 +1,220 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH][cifs-utils] asn1: fix use-after-free in asn1_write
-Date: Mon, 14 Oct 2013 06:26:17 -0400
-Message-ID: <1381746377-1870-1-git-send-email-jlayton@samba.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCHv2] [CIFS] Allow setting per-file compression via CIFS
+ protocol
+Date: Mon, 14 Oct 2013 07:21:50 -0400
+Message-ID: <20131014072150.1f7cb240@tlielax.poochiereds.net>
+References: <CAH2r5mu+PiSKxB9GhyHApo4Gkj-p7jP+mT9rQB+5_RA2TF4rYg@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+	"Stefan (metze) Metzmacher" <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAH2r5mu+PiSKxB9GhyHApo4Gkj-p7jP+mT9rQB+5_RA2TF4rYg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-If the talloc_realloc() fails, asn1_write calls talloc_free on the
-context and then immediately dereferences the pointer.
+On Sun, 13 Oct 2013 22:33:07 -0500
+Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-Fix this by skipping the talloc_free here. Let the caller handle it.
+> (PATCHv2 updated to address build problem with SMB2 disabled in .config)
+> 
+> An earlier patch allowed setting the per-file compression flag
+> 
+> "chattr +c filename"
+> 
+> on an smb2 or smb3 mount, and also allowed lsattr to return
+> whether a file on a cifs, or smb2/smb3 mount was compressed.
+> 
+> This patch extends the ability to set the per-file
+> compression flag to the cifs protocol, which uses a somewhat
+> different IOCTL mechanism than SMB2, although the payload
+> (the flags stored in the compression_state) are the same.
+> 
+> Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/cifspdu.h   | 29 +++++++++++++++++++++++++++++
+>  fs/cifs/cifsproto.h |  2 ++
+>  fs/cifs/cifssmb.c   | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  fs/cifs/smb1ops.c   |  8 ++++++++
+>  fs/cifs/smb2pdu.h   |  9 ++++++---
+>  5 files changed, 98 insertions(+), 3 deletions(-)
+> 
+> diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
+> index d40bd77..f9bb497 100644
+> --- a/fs/cifs/cifspdu.h
+> +++ b/fs/cifs/cifspdu.h
+> @@ -1352,6 +1352,35 @@ typedef struct smb_com_transaction_ioctl_req {
+>      __u8 Data[1];
+>  } __attribute__((packed)) TRANSACT_IOCTL_REQ;
+> 
+> +typedef struct smb_com_transaction_compr_ioctl_req {
+> +    struct smb_hdr hdr;    /* wct = 23 */
+> +    __u8 MaxSetupCount;
+> +    __u16 Reserved;
+> +    __le32 TotalParameterCount;
+> +    __le32 TotalDataCount;
+> +    __le32 MaxParameterCount;
+> +    __le32 MaxDataCount;
+> +    __le32 ParameterCount;
+> +    __le32 ParameterOffset;
+> +    __le32 DataCount;
+> +    __le32 DataOffset;
+> +    __u8 SetupCount; /* four setup words follow subcommand */
+> +    /* SNIA spec incorrectly included spurious pad here */
+> +    __le16 SubCommand; /* 2 = IOCTL/FSCTL */
+> +    __le32 FunctionCode;
+> +    __u16 Fid;
+> +    __u8 IsFsctl;  /* 1 = File System Control 0 = device control (IOCTL) */
+> +    __u8 IsRootFlag; /* 1 = apply command to root of share (must be DFS) */
+> +    __le16 ByteCount;
+> +    __u8 Pad[3];
+> +    __le16 compression_state;  /* See below for valid flags */
+> +} __attribute__((packed)) TRANSACT_COMPR_IOCTL_REQ;
+> +
+> +/* compression state flags */
+> +#define COMPRESSION_FORMAT_NONE        0x0000
+> +#define COMPRESSION_FORMAT_DEFAULT    0x0001
+> +#define COMPRESSION_FORMAT_LZNT1    0x0002
+> +
+>  typedef struct smb_com_transaction_ioctl_rsp {
+>      struct smb_hdr hdr;    /* wct = 19 */
+>      __u8 Reserved[3];
+> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> index b5ec2a2..aa33976 100644
+> --- a/fs/cifs/cifsproto.h
+> +++ b/fs/cifs/cifsproto.h
+> @@ -360,6 +360,8 @@ extern int CIFSSMBUnixQuerySymLink(const unsigned int xid,
+>  extern int CIFSSMBQuerySymLink(const unsigned int xid, struct cifs_tcon *tcon,
+>                     __u16 fid, char **symlinkinfo,
+>                     const struct nls_table *nls_codepage);
+> +extern int CIFSSMB_set_compression(const unsigned int xid,
+> +                   struct cifs_tcon *tcon, __u16 fid);
+>  extern int CIFSSMBOpen(const unsigned int xid, struct cifs_tcon *tcon,
+>              const char *fileName, const int disposition,
+>              const int access_flags, const int omode,
+> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> index ccd31ab..ec57dde 100644
+> --- a/fs/cifs/cifssmb.c
+> +++ b/fs/cifs/cifssmb.c
+> @@ -3199,6 +3199,59 @@ qreparse_out:
+>      return rc;
+>  }
+> 
+> +int
+> +CIFSSMB_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
+> +            __u16 fid)
+> +{
+> +    int rc = 0;
+> +    int bytes_returned;
+> +    struct smb_com_transaction_compr_ioctl_req *pSMB;
+> +    struct smb_com_transaction_ioctl_rsp *pSMBr;
+> +
+> +    cifs_dbg(FYI, "Set compression for %u\n", fid);
+> +    rc = smb_init(SMB_COM_NT_TRANSACT, 23, tcon, (void **) &pSMB,
+> +              (void **) &pSMBr);
+> +    if (rc)
+> +        return rc;
+> +
+> +    pSMB->compression_state = cpu_to_le16(COMPRESSION_FORMAT_DEFAULT);
+> +
+> +    pSMB->TotalParameterCount = 0;
+> +    pSMB->TotalDataCount = cpu_to_le32(2);
 
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- asn1.c | 1 -
- 1 file changed, 1 deletion(-)
+Most of these sorts of calls where you're plugging in hardcoded values
+can be "__constant_cpu_to_le32(...)".
 
-diff --git a/asn1.c b/asn1.c
-index ea50a23..4c0e480 100644
---- a/asn1.c
-+++ b/asn1.c
-@@ -47,7 +47,6 @@ bool asn1_write(struct asn1_data *data, const void *p, int len)
- 		uint8_t *newp;
- 		newp = talloc_realloc(data, data->data, uint8_t, data->ofs+len);
- 		if (!newp) {
--			asn1_free(data);
- 			data->has_error = true;
- 			return false;
- 		}
--- 
-1.8.3.1
+> +    pSMB->MaxParameterCount = 0;
+> +    pSMB->MaxDataCount = 0;
+> +    pSMB->MaxSetupCount = 4;
+> +    pSMB->Reserved = 0;
+> +    pSMB->ParameterOffset = 0;
+> +    pSMB->DataCount = cpu_to_le32(2);
+> +    pSMB->DataOffset =
+> +        cpu_to_le32(offsetof(struct smb_com_transaction_compr_ioctl_req,
+> +                compression_state) - 4);  /* 84 */
+> +    pSMB->SetupCount = 4;
+> +    pSMB->SubCommand = cpu_to_le16(NT_TRANSACT_IOCTL);
+> +    pSMB->ParameterCount = 0;
+> +    pSMB->FunctionCode = cpu_to_le32(FSCTL_SET_COMPRESSION);
+> +    pSMB->IsFsctl = 1; /* FSCTL */
+> +    pSMB->IsRootFlag = 0;
+> +    pSMB->Fid = fid; /* file handle always le */
+> +    pSMB->ByteCount = cpu_to_le16(5); /* 3 byte pad 2 byte compress state */
+> +    inc_rfc1001_len(pSMB, 5);
+> +
+> +    rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
+> +             (struct smb_hdr *) pSMBr, &bytes_returned, 0);
+> +    if (rc)
+> +        cifs_dbg(FYI, "Send error in SetCompression = %d\n", rc);
+> +
+> +    cifs_buf_release(pSMB);
+> +
+> +    /*
+> +     * Note: On -EAGAIN error only caller can retry on handle based calls
+> +     * since file handle passed in no longer valid.
+> +     */
+> +    return rc;
+> +}
+> +
+> +
+>  #ifdef CONFIG_CIFS_POSIX
+> 
+>  /*Convert an Access Control Entry from wire format to local POSIX
+> xattr format*/
+> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+> index 8233b17..ea99efe 100644
+> --- a/fs/cifs/smb1ops.c
+> +++ b/fs/cifs/smb1ops.c
+> @@ -807,6 +807,13 @@ out:
+>  }
+> 
+>  static int
+> +cifs_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
+> +           struct cifsFileInfo *cfile)
+> +{
+> +    return CIFSSMB_set_compression(xid, tcon, cfile->fid.netfid);
+> +}
+> +
+> +static int
+>  cifs_query_dir_first(const unsigned int xid, struct cifs_tcon *tcon,
+>               const char *path, struct cifs_sb_info *cifs_sb,
+>               struct cifs_fid *fid, __u16 search_flags,
+> @@ -956,6 +963,7 @@ struct smb_version_operations smb1_operations = {
+>      .set_path_size = CIFSSMBSetEOF,
+>      .set_file_size = CIFSSMBSetFileSize,
+>      .set_file_info = smb_set_file_info,
+> +    .set_compression = cifs_set_compression,
+>      .echo = CIFSSMBEcho,
+>      .mkdir = CIFSSMBMkDir,
+>      .mkdir_setinfo = cifs_mkdir_setinfo,
+> diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+> index 7e44f18..2a72ef2 100644
+> --- a/fs/cifs/smb2pdu.h
+> +++ b/fs/cifs/smb2pdu.h
+> @@ -573,9 +573,12 @@ struct compress_ioctl {
+>      __le16 CompressionState;
+>  } __packed;
+> 
+> -#define COMPRESSION_FORMAT_NONE        0x0000
+> -#define COMPRESSION_FORMAT_DEFAULT    0x0001
+> -#define COMPRESSION_FORMAT_LZNT1    0x0002
+> +/*
+> + * These defines have been moved to cifspdu.h
+> + * #define COMPRESSION_FORMAT_NONE    0x0000
+> + * #define COMPRESSION_FORMAT_DEFAULT    0x0001
+> + * #define COMPRESSION_FORMAT_LZNT1    0x0002
+> + */
+
+Just remove these instead of commenting them out, please.
+
+>  struct smb2_ioctl_req {
+>      struct smb2_hdr hdr;
+>      __le16 StructureSize;    /* Must be 57 */
+
+
+Looks good otherwise...
+
+Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
