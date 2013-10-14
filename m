@@ -1,75 +1,93 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH] [CIFS] Fix corrupt SMB2 ioctl requests
-Date: Mon, 14 Oct 2013 00:52:14 -0500
-Message-ID: <CAH2r5mvtEvGQqHjzkBBXLK0wddZpe=45KRqZ5qRnp=udZcxSOQ@mail.gmail.com>
+Subject: Querying Server Adapter Info at mount time
+Date: Mon, 14 Oct 2013 01:03:14 -0500
+Message-ID: <CAH2r5mtiX65b8ZwAs0D7PdYfGkCW7hNku7oe9f2x8+tfgDCeow@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: "Stefan (metze) Metzmacher" <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Now that I have been able to test a wider variety of
-SMB2/SMB3 ioctls, some with input payloads and
-some without, I have this updated version of the patch
-(which hopefully is cleaner )
+It is easy now in SMB3 to query the information about the server's
+network interfaces (and at least Windows 8 and above do this, if not
+other clients) there are some useful pieces of information you can get
+including:
 
-We were off by one calculating the length of ioctls in some cases
-because the protocol specification for SMB2 ioctl includes a mininum
-one byte payload but not all SMB2 ioctl requests actually have
-a data buffer to send. We were also not zeroing out the
-return buffer (in case of error this is helpful).
+- all of the network interfaces that the server advertises (not just
+the one you are mounting over), and with SMB3 supporting multichannel
+this helps with more than just failover (also aggregating multiple
+sockets under one mount)
 
-Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- fs/cifs/smb2pdu.c | 21 +++++++++++++++++----
- 1 file changed, 17 insertions(+), 4 deletions(-)
+- whether the adapter supports RSS (useful to know if you want to
+estimate whether setting up two or more socket connections to the same
+address is going to be faster due to RSS offload in the adapter)
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index edccb52..afa3829 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -1137,6 +1137,7 @@ SMB2_ioctl(const unsigned int xid, struct
-cifs_tcon *tcon, u64 persistent_fid,
+- whether the server supports RDMA
 
-     cifs_dbg(FYI, "SMB2 IOCTL\n");
+- whether the server has IPv6 interfaces (if you connected over IPv4
+but prefer IPv6 e.g.)
 
-+    *out_data = NULL;
-     /* zero out returned data len, in case of error */
-     if (plen)
-         *plen = 0;
-@@ -1182,11 +1183,23 @@ SMB2_ioctl(const unsigned int xid, struct
-cifs_tcon *tcon, u64 persistent_fid,
-         req->Flags = 0;
+- what the link speed is (you might want to reconnect over a higher
+speed interface if available)
 
-     iov[0].iov_base = (char *)req;
--    /* 4 for rfc1002 length field */
--    iov[0].iov_len = get_rfc1002_length(req) + 4;
+(Of course we could also rerequest this on every mount cheaplly to the
+same server, as Windows apparently does, so we can update the adapter
+info on new mounts, and also on every reconnect if the network
+interface drops temporarily - so we don't have to rely on info from
+the first mount to this server)
 
--    if (indatalen)
--        inc_rfc1001_len(req, indatalen);
-+    /*
-+     * If no input data, the size of ioctl struct in
-+     * protocol spec still includes a 1 byte data buffer,
-+     * but if input data passed to ioctl, we do not
-+     * want to double count this, so we do not send
-+     * the dummy one byte of data in iovec[0] if sending
-+     * input data (in iovec[1]). We also must add 4 bytes
-+     * in first iovec to allow for rfc1002 length field.
-+     */
+It is trivial to request this information (see below sample patch) -
+and certainly is useful when we get to the point of doing multichannel
+(and eventually RDMA), but I am wondering whether saving some of this
+(linkspeed etc.) off for debugging could be useful.
+
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 25759c8..c4ede18 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -209,6 +209,28 @@ smb2_negotiate_rsize(struct cifs_tcon *tcon,
+struct smb_vol *volume_info)
+     return rsize;
+ }
+
++static int
++SMB3_request_interfaces(const unsigned int xid, struct cifs_tcon *tcon)
++{
++    int rc;
++    unsigned int ret_data_len = 0;
++    struct network_interface_info_ioctl_rsp *out_buf;
 +
-+    if (indatalen) {
-+        inc_rfc1001_len(req, indatalen - 1);
-+        iov[0].iov_len = get_rfc1002_length(req) + 4 - 1;
++    rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
++            FSCTL_QUERY_NETWORK_INTERFACE_INFO, true /* is_fsctl */,
++            NULL /* no data input */, 0 /* no data input */,
++            (char **)&out_buf, &ret_data_len);
++
++    if ((rc == 0)  && (ret_data_len > 0)) {
++        /* Dump info on first interface -- REMOVEME */
++        cifs_dbg(VFS, "Capability 0x%x\t", le32_to_cpu(out_buf->Capability));
++        cifs_dbg(VFS, "Link Speed %lld\n", le64_to_cpu(out_buf->LinkSpeed));
 +    } else
-+        iov[0].iov_len = get_rfc1002_length(req) + 4;
++        cifs_dbg(VFS, "error %d on ioctl to get interface list\n", rc);
 +
++    return rc;
++}
++
+ static void
+ smb3_qfs_tcon(const unsigned int xid, struct cifs_tcon *tcon)
+ {
+@@ -229,6 +251,8 @@ smb3_qfs_tcon(const unsigned int xid, struct
+cifs_tcon *tcon)
+     if (rc)
+         return;
 
-     rc = SendReceive2(xid, ses, iov, num_iovecs, &resp_buftype, 0);
-     rsp = (struct smb2_ioctl_rsp *)iov[0].iov_base;
--- 
-1.7.11.7
++    SMB3_request_interfaces(xid, tcon);
++
+     SMB2_QFS_attr(xid, tcon, fid.persistent_fid, fid.volatile_fid,
+             FS_ATTRIBUTE_INFORMATION);
+     SMB2_QFS_attr(xid, tcon, fid.persistent_fid, fid.volatile_fid,
 
 -- 
 Thanks,
