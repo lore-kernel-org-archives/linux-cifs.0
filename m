@@ -1,61 +1,71 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Thu, 17 Oct 2013 16:13:20 -0500
-Message-ID: <CAH2r5msVAfmh=us2SrmS6Em+JvTXHfb0wk=dHS4b=9KnOn_djA@mail.gmail.com>
+From: Ben Hutchings <ben-/+tVBieCtBitmTQ+vhA3Yw@public.gmane.org>
+Subject: Source for winucase.c
+Date: Fri, 18 Oct 2013 02:04:29 +0100
+Message-ID: <1382058269.2794.11.camel@deadeye.wl.decadent.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-BfMq3NFut1snoKL5beFp"
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Five small cifs fixes (includes fixes for: unmount hang, 2 security
-related, symlink, large file writes).
 
-The following changes since commit e62063d69911886a5a92c719d262a2a87e1e5b60:
+--=-BfMq3NFut1snoKL5beFp
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-  Merge branch 'for-linus' of
-git://git.kernel.org/pub/scm/linux/kernel/git/mason/linux-btrfs
-(2013-10-05 12:17:24 -0700)
+fs/cifs/winucase.c is commented as:
 
-are available in the git repository at:
+ * The const tables in this file were converted from the following info
+ * provided by Microsoft:
+ *
+ * 3.1.5.3 Mapping UTF-16 Strings to Upper Case:
+ *
+ * http://msdn.microsoft.com/en-us/library/hh877830.aspx
+ * http://www.microsoft.com/en-us/download/details.aspx?displaylang=3Den&id=
+=3D10921
+ *
+ * In particular, the table in "Windows 8 Upper Case Mapping Table.txt" was
+ * post-processed using the winucase_convert.pl script.
+
+Isn't "Windows 8 Upper Case Mapping Table.txt" then the preferred form
+for modification of the tables?  In which case, it should be included in
+the kernel sources.
+
+Also, shouldn't this file acknowledge Microsoft's copyright, if it's a
+derivative work of their file?
+
+Ben.
+
+--=20
+Ben Hutchings
+Horngren's Observation:
+                   Among economists, the real world is often a special case=
+.
 
 
-  git://git.samba.org/sfrench/cifs-2.6.git for-linus
+--=-BfMq3NFut1snoKL5beFp
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
 
-for you to fetch changes up to 0c26606cbe4937f2228a27bb0c2cad19855be87a:
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (GNU/Linux)
 
-  cifs: ntstatus_to_dos_map[] is not terminated (2013-10-14 12:14:01 -0500)
+iQIVAwUAUmCJHee/yOyVhhEJAQrdmxAApKlS6r/R8SHzdfyjHwf2OpSwcuRSRh47
+p2Bxj71vcBEGOqEAux9gwu1xVDz7yU7Y/26lsV+rE+Yk/BaqIl3PmL8h1JDgzUj2
+Gk6k3dqfcwgg48r0glBw5He5R7Ct8PD0ji+hK7YJ27CI8ZbXsbTnujDjZBhSz94T
+vP0Q2lPjJfxyiPx6YHUahC97Czp/kGDTbwWKTpgCfIFuD4JqZMU2b2Dysy7yzSVA
+dB9aQHjGCdJj6sJ4W07ir/k030ZCak624SI1Qna1KKBjFv8aVsqbWmS1/0gF50el
++OFbYoWHXxAvow9bPzbVtKeV7EMddMwXwNfQdkn1N9NE6wB4pZtvXgpps5ipP2Iw
+jEAWh61xFG6rVtltv2ixITTHcm9AITCPyhmHuQWSvb9k91TjlIzwBCpIrHDLdIpZ
+oy5m+2C4KIJRJ0Tg8lhm2M4u8e6IxLBmzQasHSoa9x+HngZ2S2MNyzj3aHoKghBz
+df14XXsFoewrdTcKg7j6V0eA6mV9+l/iiO+fYC+4iKrD2H5+dUGgmh3YnzLf5Kfl
+OXjnZZ1yAJsCUlM3r0ezDsr3bxussm2Zvt0ycD2+KfRyGcJygTqtHxowjVMCeCTp
+HJWKw38e0jqMkqxn5pLCWtAF/zYR4QQQQBCufgFGUq54OiJ2H3JFicSLjl5Ex1eA
+LSL6MT9WBYo=
+=tt3+
+-----END PGP SIGNATURE-----
 
-----------------------------------------------------------------
-Jan Klos (1):
-      cifs: Fix inability to write files >2GB to SMB2/3 shares
-
-Sachin Prabhu (1):
-      cifs: Allow LANMAN auth method for servers supporting
-unencapsulated authentication methods
-
-Shirish Pargaonkar (1):
-      cifs: Avoid umount hangs with smb2 when server is unresponsive
-
-Steve French (1):
-      do not treat non-symlink reparse points as valid symlinks
-
-Tim Gardner (1):
-      cifs: ntstatus_to_dos_map[] is not terminated
-
- fs/cifs/cifsfs.c    |  6 ++++--
- fs/cifs/cifspdu.h   | 31 +++++++++++++++++++++++--------
- fs/cifs/cifssmb.c   | 40 ++++++++++++++++++++++++++++++++++------
- fs/cifs/netmisc.c   |  4 +++-
- fs/cifs/sess.c      |  4 ++--
- fs/cifs/smb2pdu.c   |  6 ++++++
- fs/cifs/smbfsctl.h  | 14 ++++++++++++++
- fs/cifs/transport.c |  9 +++++++--
- 8 files changed, 93 insertions(+), 21 deletions(-)
-
--- 
-Thanks,
-
-Steve
+--=-BfMq3NFut1snoKL5beFp--
