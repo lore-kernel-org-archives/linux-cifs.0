@@ -1,17 +1,17 @@
 From: Jeff Layton <jlayton@redhat.com>
 Subject: Re: Source for winucase.c
-Date: Fri, 18 Oct 2013 15:56:42 -0400
-Message-ID: <20131018155642.7fc4bace@tlielax.poochiereds.net>
+Date: Fri, 18 Oct 2013 16:03:16 -0400
+Message-ID: <20131018160316.11785f07@tlielax.poochiereds.net>
 References: <1382058269.2794.11.camel@deadeye.wl.decadent.org.uk>
 	<20131018064305.57a78574@tlielax.poochiereds.net>
-	<87li1qs9f5.fsf@ebb.org>
+	<1382125499.18726.10.camel@jesse>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs@vger.kernel.org, tony@sfconservancy.org, Ben Hutchings <ben@decadent.org.uk>, samba-technical@lists.samba.org
-To: "Bradley M. Kuhn" <bkuhn@sfconservancy.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Cc: linux-cifs@vger.kernel.org, "Bradley M. Kuhn" <bkuhn@sfconservancy.org>, Ben Hutchings <ben@decadent.org.uk>, samba-technical@lists.samba.org
+To: Andrew Bartlett <abartlet@samba.org>
 Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <87li1qs9f5.fsf@ebb.org>
+In-Reply-To: <1382125499.18726.10.camel@jesse>
 List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
 List-Archive: <http://lists.samba.org/pipermail/samba-technical>
 List-Post: <mailto:samba-technical@lists.samba.org>
@@ -21,45 +21,76 @@ Sender: samba-technical-bounces@lists.samba.org
 Errors-To: samba-technical-bounces@lists.samba.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Fri, 18 Oct 2013 11:47:42 -0700
-"Bradley M. Kuhn" <bkuhn@sfconservancy.org> wrote:
+On Sat, 19 Oct 2013 08:44:59 +1300
+Andrew Bartlett <abartlet@samba.org> wrote:
 
-> Jeff,
-> 
-> Thanks very much for bringing Conservancy into this thread.
-> 
-> Jeff Layton wrote at 03:43 (PDT):
+> On Fri, 2013-10-18 at 06:43 -0400, Jeff Layton wrote:
+> > On Fri, 18 Oct 2013 02:04:29 +0100
+> > Ben Hutchings <ben@decadent.org.uk> wrote:
+> >=20
+> > > fs/cifs/winucase.c is commented as:
+> > >=20
+> > >  * The const tables in this file were converted from the following in=
+fo
+> > >  * provided by Microsoft:
+> > >  *
+> > >  * 3.1.5.3 Mapping UTF-16 Strings to Upper Case:
+> > >  *
+> > >  * http://msdn.microsoft.com/en-us/library/hh877830.aspx
+> > >  * http://www.microsoft.com/en-us/download/details.aspx?displaylang=
+=3Den&id=3D10921
+> > >  *
+> > >  * In particular, the table in "Windows 8 Upper Case Mapping Table.tx=
+t" was
+> > >  * post-processed using the winucase_convert.pl script.
+> > >=20
+> > > Isn't "Windows 8 Upper Case Mapping Table.txt" then the preferred form
+> > > for modification of the tables?  In which case, it should be included=
+ in
+> > > the kernel sources.
+> > >=20
+> > > Also, shouldn't this file acknowledge Microsoft's copyright, if it's a
+> > > derivative work of their file?
+> > >=20
+> > > Ben.
+> > >=20
+> >=20
+> > (cc'ing samba-technical and Bradley Kuhn in the hopes that he can help
+> > clarify)
+> >=20
+> > Good questions. I'm not certain on either point. When I queried the MS
+> > folks about the licensing on that file, they said:
+> >=20
+> > "I discovered the content you used is in fact referenced by the
+> >  MS-UCODEREF document, in section 3.1.5.2.3.1   Windows Sorting Weight
+> >  Table. I discussed with the appropriate folks here, and for use in
+> >  Samba it's certainly covered under Samba's existing PFIF license."
+> >=20
 > > Bradley, any thoughts as to Ben's questions?
-> 
-> On behalf of the Samba project (which is a member project of
-> Conservancy), I want to study this question with the benefit Samba's and
-> Conservancy's legal counsel (who is Conservancy's General Counsel, Tony
-> Sebro (cc'ed)).  We're going to look into this issue and we'll report
-> back conclusions to the list here.
-> 
-> It may take us a bit of time.  Even seemingly simple questions like this
-> often end up requiring more research and careful investigation than it
-> seems it should. :) In particular, questions that have interrelated
-> copyright and contractual agreements involved can often be like that.
-> 
-> Feel free to ping me if you want a status update on our progress at any
-> point.
+>=20
+> The worked 'referenced' is the key point, because these are the terms on
+> the WSPP docs on their website:
+>=20
+> Copyrights. This documentation is covered by Microsoft copyrights.
+> Regardless of any other terms that are contained in the terms of use for
+> the Microsoft website that hosts this documentation, you may make copies
+> of it in order to develop implementations of the technologies described
+> in the Open Specifications and may distribute portions of it in your
+> implementations using these technologies or your documentation as
+> necessary to properly document the implementation. You may also
+> distribute in your implementation, with or without modification, any
+> schema, IDL=E2=80=99s, or code samples that are included in the documenta=
+tion.
+> This permission also applies to any documents that are referenced in the
+> Open Specifications.=20
+>=20
+> The last line is what they are referring to.
+>=20
 
-Mea culpa -- I should probably have done that when I first proposed
-this patch. Thanks for taking a look. I do want to make sure we have
-everything on the up and up.
-
-In any case, here's a quick summary:
-
-The main patch in question is commit c2ccf53dd0ddf0b48 in the Linux
-kernel. which added a number of tables that I autogenerated using a
-script to postprocess the tables that MS published here.
-
-    http://msdn.microsoft.com/en-us/library/hh877830.aspx
-
-The questions are in Ben's original email, so let us know what you
-think.
+That would seem to indicate that it's OK to include a copy of that file
+in the kernel sources, but I'll wait until the conservancy folks
+confirm this.
 
 Thanks,
--- 
+--=20
 Jeff Layton <jlayton@redhat.com>
