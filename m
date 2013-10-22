@@ -1,113 +1,102 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH linux-next] cifs: Cleanup and clarify CalcNTLMv2_response()
-Date: Sat, 19 Oct 2013 09:08:49 -0500
-Message-ID: <CADT32eKY0roovoZtm5+fVHEVco1G3qawxk-KaBSV3pH95c6jrg@mail.gmail.com>
-References: <1382115075-4386-1-git-send-email-timg@tpi.com>
+From: Steve French <smfrench@gmail.com>
+Subject: Fwd: 3.11+ Problem with cifs links, bisected
+Date: Tue, 22 Oct 2013 13:46:08 -0500
+Message-ID: <CAH2r5mt4xj325suAy9=ToWJu0Obo2rj8AN5kBEE2W28CfhobCw@mail.gmail.com>
+References: <CACG0VPU5zDrYgv99Uk9SEc-+_kh2nOOBBeC14kUf+KhCoy5VtA@mail.gmail.com>
+	<CAH2r5msBqBiNqg=GGPnc8h1XxFjKPyAagrEFNWL70tUxYkM6PQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-To: Tim Gardner <timg-l6nL5VImRDY@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1382115075-4386-1-git-send-email-timg-l6nL5VImRDY@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+To: LKML <linux-kernel@vger.kernel.org>,
+	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CAH2r5msBqBiNqg=GGPnc8h1XxFjKPyAagrEFNWL70tUxYkM6PQ@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Tim,
+---------- Forwarded message ----------
+From: Steve French <smfrench@gmail.com>
+Date: Tue, Oct 22, 2013 at 1:45 PM
+Subject: Re: 3.11+ Problem with cifs links, bisected
+To: Joao Correia <joaomiguelcorreia@gmail.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, Pavel Shilovsky
+<pshilovsky@samba.org>, Jeff Layton <jlayton@redhat.com>
 
-Since when a NTLMv2 response is sent, contains a
-session key, hmac-md5 digest, and the blob,
-the offset has  + 8 to include 16 bytes of hmac-md5 digest.
-hmac-md5 digest is based on 8 bytes of server challenge
-and the blob.
-So hmac-md5 digest (output) overwrites total 16 bytes in overall
-ntlmv2 response after session key and is followed by the blob.
 
-At this point in time, we are dealing with the opaque data, so casting those
-16 bytes (after session key and before the blob) as ntlmv2_response
-structure does not appear correct and can be confusing.
+I wonder if this is a similar issue to what I fixed with
+(Pavel's patch assumed that these reparse points
+were NTFS symlinks but they could be other types
+of reparse points such as the new "NFS symlink"
+format)
 
-Regards,
+commit c31f330719b7331b2112a5525fe5941a99ac223d
+Author: Steve French <smfrench@us.ibm.com>
+Date:   Sat Sep 28 18:24:12 2013 -0500
 
-Shirish
+    do not treat non-symlink reparse points as valid symlinks
 
-On Fri, Oct 18, 2013 at 11:51 AM, Tim Gardner <timg-l6nL5VImRDY@public.gmane.org> wrote:
-> Use of a structure aids in the understanding of this
-> seemingly simple bit of code. The addition of a couple
-> of comments also helps.
+    Windows 8 and later can create NFS symlinks (within reparse points)
+    which we were assuming were normal NTFS symlinks and thus reporting
+    corrupt paths for.  Add check for reparse points to make sure that
+    they really are normal symlinks before we try to parse the pathname.
+
+    We also should not be parsing other types of reparse points (DFS
+    junctions etc) as if they were a  symlink so return EOPNOTSUPP
+    on those.  Also fix endian errors (we were not parsing symlink
+    lengths as little endian).
+
+    This fixes commit d244bf2dfbebfded05f494ffd53659fa7b1e32c1
+    which implemented follow link for non-Unix CIFS mounts
+
+    CC: Stable <stable@kernel.org>
+    Reviewed-by: Andrew Bartlett <abartlet@samba.org>
+    Signed-off-by: Steve French <smfrench@gmail.com>
+
+
+
+
+
+On Tue, Oct 22, 2013 at 8:12 AM, Joao Correia
+<joaomiguelcorreia@gmail.com> wrote:
 >
-> Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> Signed-off-by: Tim Gardner <timg-l6nL5VImRDY@public.gmane.org>
-> ---
+> Hello list
 >
-> I'd just like to be sure that the destructive copy is
-> really what was intended. I can't tell from reading the MSDN
-> section 3.3.2 NTLM v2 Authentication. It sort of makes
-> my head hurt.
+> I've been having a problem mounting windows shares with deduplicated
+> files (from windows 2012 deduplication), as they would show up either
+> garbled or 'ls' would complain it couldn't follow them.
 >
-> rtg
+> Git bisect blames the following:
+> commit b42bf88828cde60772dc08201d0a4f1a0663d7bc
+> CIFS: Implement follow_link for SMB2
+> Author: Pavel Shilovsky <pshilovsky@samba.org>
 >
->  fs/cifs/cifsencrypt.c |   21 ++++++++++++++++-----
->  1 file changed, 16 insertions(+), 5 deletions(-)
+> dmesg doesn't complain at all.
 >
-> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-> index fc6f4f3..fecbfd0 100644
-> --- a/fs/cifs/cifsencrypt.c
-> +++ b/fs/cifs/cifsencrypt.c
-> @@ -548,7 +548,9 @@ static int
->  CalcNTLMv2_response(const struct cifs_ses *ses, char *ntlmv2_hash)
->  {
->         int rc;
-> -       unsigned int offset = CIFS_SESS_KEY_SIZE + 8;
-> +       struct ntlmv2_resp *resp = (struct ntlmv2_resp *)
-> +               (ses->auth_key.response + CIFS_SESS_KEY_SIZE);
-> +       unsigned int hashed_len = ses->auth_key.len - (CIFS_SESS_KEY_SIZE + 8);
+> Reverting the commit fixes the problem and the deduplicated files can
+> be opened perfectly, but more recent updates have been made on top of
+> that one and i think it can't be cleanly reverted on current -next
+> trees (or rcs)
 >
->         if (!ses->server->secmech.sdeschmacmd5) {
->                 cifs_dbg(VFS, "%s: can't generate ntlmv2 hash\n", __func__);
-> @@ -569,21 +571,30 @@ CalcNTLMv2_response(const struct cifs_ses *ses, char *ntlmv2_hash)
->                 return rc;
->         }
+> If i'm not mistaken, windows 2012 treats deduplicated files as links,
+> but that's just what i can surmise from using it, i haven't read
+> anything about it's internals yet.
 >
-> +       /*
-> +        * The cryptkey is part of the buffer that feeds the MD5 hash, but
-> +        * gets over written later by the digest. See crypto_shash_final()
-> +        * below.
-> +        */
->         if (ses->server->negflavor == CIFS_NEGFLAVOR_EXTENDED)
-> -               memcpy(ses->auth_key.response + offset,
-> +               memcpy(&resp->ntlmv2_hash[CIFS_SERVER_CHALLENGE_SIZE],
->                         ses->ntlmssp->cryptkey, CIFS_SERVER_CHALLENGE_SIZE);
->         else
-> -               memcpy(ses->auth_key.response + offset,
-> +               memcpy(&resp->ntlmv2_hash[CIFS_SERVER_CHALLENGE_SIZE],
->                         ses->server->cryptkey, CIFS_SERVER_CHALLENGE_SIZE);
->         rc = crypto_shash_update(&ses->server->secmech.sdeschmacmd5->shash,
-> -               ses->auth_key.response + offset, ses->auth_key.len - offset);
-> +               &resp->ntlmv2_hash[8], hashed_len);
->         if (rc) {
->                 cifs_dbg(VFS, "%s: Could not update with response\n", __func__);
->                 return rc;
->         }
+> I've CC'ed the persons mentioned on the patch, please forward it to
+> anyone else that might be interested and is not on the lkml.
 >
-> +       /*
-> +        * Yes - this is destructive. The 16 byte MD5 digest clobbers the
-> +        * cryptkey that was just copied into &resp->ntlmv2_hash[8].
-> +        */
->         rc = crypto_shash_final(&ses->server->secmech.sdeschmacmd5->shash,
-> -               ses->auth_key.response + CIFS_SESS_KEY_SIZE);
-> +               resp->ntlmv2_hash);
->         if (rc)
->                 cifs_dbg(VFS, "%s: Could not generate md5 hash\n", __func__);
->
-> --
-> 1.7.9.5
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Thanks,
+> Joao Correia
+
+
+
+
+-- 
+Thanks,
+
+Steve
+
+
+
+-- 
+Thanks,
+
+Steve
