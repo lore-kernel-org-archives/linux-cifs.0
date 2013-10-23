@@ -1,110 +1,284 @@
-From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Subject: Re: 3.11+ Problem with cifs links, bisected
-Date: Wed, 23 Oct 2013 17:25:23 +0400
-Message-ID: <CAKywueRsvO7mpJ1B6wUJgEGceQ-7wWyk7wtLZQKbTnx3yWns=Q@mail.gmail.com>
-References: <CACG0VPU5zDrYgv99Uk9SEc-+_kh2nOOBBeC14kUf+KhCoy5VtA@mail.gmail.com>
-	<CAH2r5msBqBiNqg=GGPnc8h1XxFjKPyAagrEFNWL70tUxYkM6PQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Joao Correia <joaomiguelcorreia-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Date: Wed, 23 Oct 2013 18:42:54 +0400
+Message-ID: <1382539375-9871-1-git-send-email-piastry@etersoft.ru>
+References: <CAKywueRsvO7mpJ1B6wUJgEGceQ-7wWyk7wtLZQKbTnx3yWns=Q@mail.gmail.com>
+Cc: joaomiguelcorreia-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5msBqBiNqg=GGPnc8h1XxFjKPyAagrEFNWL70tUxYkM6PQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CAKywueRsvO7mpJ1B6wUJgEGceQ-7wWyk7wtLZQKbTnx3yWns=Q@mail.gmail.com>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2013/10/22 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> I wonder if this is a similar issue to what I fixed with
-> (Pavel's patch assumed that these reparse points
-> were NTFS symlinks but they could be other types
-> of reparse points such as the new "NFS symlink"
-> format)
->
-> commit c31f330719b7331b2112a5525fe5941a99ac223d
-> Author: Steve French <smfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-> Date:   Sat Sep 28 18:24:12 2013 -0500
->
->     do not treat non-symlink reparse points as valid symlinks
->
->     Windows 8 and later can create NFS symlinks (within reparse points)
->     which we were assuming were normal NTFS symlinks and thus reporting
->     corrupt paths for.  Add check for reparse points to make sure that
->     they really are normal symlinks before we try to parse the pathname.
->
->     We also should not be parsing other types of reparse points (DFS
->     junctions etc) as if they were a  symlink so return EOPNOTSUPP
->     on those.  Also fix endian errors (we were not parsing symlink
->     lengths as little endian).
->
->     This fixes commit d244bf2dfbebfded05f494ffd53659fa7b1e32c1
->     which implemented follow link for non-Unix CIFS mounts
->
->     CC: Stable <stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
->     Reviewed-by: Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
->     Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->
->
->
->
->
-> On Tue, Oct 22, 2013 at 8:12 AM, Joao Correia <joaomiguelcorreia-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> wrote:
->>
->> Hello list
->>
->> I've been having a problem mounting windows shares with deduplicated
->> files (from windows 2012 deduplication), as they would show up either
->> garbled or 'ls' would complain it couldn't follow them.
->>
->> Git bisect blames the following:
->> commit b42bf88828cde60772dc08201d0a4f1a0663d7bc
->> CIFS: Implement follow_link for SMB2
->> Author: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
->>
->> dmesg doesn't complain at all.
->>
->> Reverting the commit fixes the problem and the deduplicated files can
->> be opened perfectly, but more recent updates have been made on top of
->> that one and i think it can't be cleanly reverted on current -next
->> trees (or rcs)
->>
->> If i'm not mistaken, windows 2012 treats deduplicated files as links,
->> but that's just what i can surmise from using it, i haven't read
->> anything about it's internals yet.
->>
->> I've CC'ed the persons mentioned on the patch, please forward it to
->> anyone else that might be interested and is not on the lkml.
->>
+I created a slightly tested patch below but can't test with deduplicated files now.
 
-Joao, thank you for reporting the problem!
+Joao, can you check if it fixes your problem, please?
 
-Steve, I think you are right and it's almost the same issue as the NFS
-one that you fixed recenty. Now I started to think that the initial
-approach of marking everything with ATTR_REPARSE as a symlink is
-wrong. We need to distinguish symlinks and other types like junction,
-deduplicated files, NFS symlinks. The reason is that the latter can be
-accessed through reparse points without any other activity from the
-client side. On another hand the symlinks can not be accessed through
-reparse points and have to be parsed manually.
+--------------------------------------------------------------------------
 
-So, we need to figure out whether it is a symbolic link or not when we
-face with ATTR_REPARSE attribute. At first, I think we should mark
-such dentries as NEED_REVAL in readdir to let us investigate them
-further (as it is done for DFS shares and junctions for now). As the
-second step we should move to "Open - QueryFidInfo - Close" mechanism
-of querying file attributes rather than "QueryPath" for CIFS because
-"QueryPath" succeeds for all types of reparse points but "Open" will
-fail on a symbolic link with STATUS_STOPPED_ON_SYMLINK error code.
-SMB2 and SMB3 protocol already use open-query-close mechanism too.
+Distinguish reparse point types into two groups:
+1) that can be accessed directly through a reparse point
+(junctions, deduplicated files, NFS symlinks);
+2) that need to be processed manually (Windows symbolic links, DFS).
 
-The possibility to determine whether is is symbolic link or not lets
-us mark a dentry as a unix symbolic link or not.
+In this case we map only Windows symbolic links to Unix ones.
 
-Thoughts?
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+---
+ fs/cifs/cifsglob.h  |    2 +-
+ fs/cifs/inode.c     |   23 +++++++++++++----------
+ fs/cifs/readdir.c   |   40 ++++++++--------------------------------
+ fs/cifs/smb1ops.c   |   27 ++++++++++++++++++++++-----
+ fs/cifs/smb2inode.c |   15 +++++++++++----
+ fs/cifs/smb2proto.h |    2 +-
+ 6 files changed, 56 insertions(+), 53 deletions(-)
 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index a67cf12..b688f2b 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -261,7 +261,7 @@ struct smb_version_operations {
+ 	/* query path data from the server */
+ 	int (*query_path_info)(const unsigned int, struct cifs_tcon *,
+ 			       struct cifs_sb_info *, const char *,
+-			       FILE_ALL_INFO *, bool *);
++			       FILE_ALL_INFO *, bool *, bool *);
+ 	/* query file data from the server */
+ 	int (*query_file_info)(const unsigned int, struct cifs_tcon *,
+ 			       struct cifs_fid *, FILE_ALL_INFO *);
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 867b7cd..36f9ebb 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -542,7 +542,8 @@ static int cifs_sfu_mode(struct cifs_fattr *fattr, const unsigned char *path,
+ /* Fill a cifs_fattr struct with info from FILE_ALL_INFO */
+ static void
+ cifs_all_info_to_fattr(struct cifs_fattr *fattr, FILE_ALL_INFO *info,
+-		       struct cifs_sb_info *cifs_sb, bool adjust_tz)
++		       struct cifs_sb_info *cifs_sb, bool adjust_tz,
++		       bool symlink)
+ {
+ 	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
+ 
+@@ -569,7 +570,11 @@ cifs_all_info_to_fattr(struct cifs_fattr *fattr, FILE_ALL_INFO *info,
+ 	fattr->cf_createtime = le64_to_cpu(info->CreationTime);
+ 
+ 	fattr->cf_nlink = le32_to_cpu(info->NumberOfLinks);
+-	if (fattr->cf_cifsattrs & ATTR_DIRECTORY) {
++
++	if (symlink) {
++		fattr->cf_mode = S_IFLNK;
++		fattr->cf_dtype = DT_LNK;
++	} else if (fattr->cf_cifsattrs & ATTR_DIRECTORY) {
+ 		fattr->cf_mode = S_IFDIR | cifs_sb->mnt_dir_mode;
+ 		fattr->cf_dtype = DT_DIR;
+ 		/*
+@@ -578,10 +583,6 @@ cifs_all_info_to_fattr(struct cifs_fattr *fattr, FILE_ALL_INFO *info,
+ 		 */
+ 		if (!tcon->unix_ext)
+ 			fattr->cf_flags |= CIFS_FATTR_UNKNOWN_NLINK;
+-	} else if (fattr->cf_cifsattrs & ATTR_REPARSE) {
+-		fattr->cf_mode = S_IFLNK;
+-		fattr->cf_dtype = DT_LNK;
+-		fattr->cf_nlink = le32_to_cpu(info->NumberOfLinks);
+ 	} else {
+ 		fattr->cf_mode = S_IFREG | cifs_sb->mnt_file_mode;
+ 		fattr->cf_dtype = DT_REG;
+@@ -626,7 +627,8 @@ cifs_get_file_info(struct file *filp)
+ 	rc = server->ops->query_file_info(xid, tcon, &cfile->fid, &find_data);
+ 	switch (rc) {
+ 	case 0:
+-		cifs_all_info_to_fattr(&fattr, &find_data, cifs_sb, false);
++		cifs_all_info_to_fattr(&fattr, &find_data, cifs_sb, false,
++				       false);
+ 		break;
+ 	case -EREMOTE:
+ 		cifs_create_dfs_fattr(&fattr, inode->i_sb);
+@@ -673,6 +675,7 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+ 	bool adjust_tz = false;
+ 	struct cifs_fattr fattr;
+ 	struct cifs_search_info *srchinf = NULL;
++	bool symlink = false;
+ 
+ 	tlink = cifs_sb_tlink(cifs_sb);
+ 	if (IS_ERR(tlink))
+@@ -702,12 +705,12 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+ 		}
+ 		data = (FILE_ALL_INFO *)buf;
+ 		rc = server->ops->query_path_info(xid, tcon, cifs_sb, full_path,
+-						  data, &adjust_tz);
++						  data, &adjust_tz, &symlink);
+ 	}
+ 
+ 	if (!rc) {
+-		cifs_all_info_to_fattr(&fattr, (FILE_ALL_INFO *)data, cifs_sb,
+-				       adjust_tz);
++		cifs_all_info_to_fattr(&fattr, data, cifs_sb, adjust_tz,
++				       symlink);
+ 	} else if (rc == -EREMOTE) {
+ 		cifs_create_dfs_fattr(&fattr, sb);
+ 		rc = 0;
+diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+index 53a75f3..5940eca 100644
+--- a/fs/cifs/readdir.c
++++ b/fs/cifs/readdir.c
+@@ -134,22 +134,6 @@ out:
+ 	dput(dentry);
+ }
+ 
+-/*
+- * Is it possible that this directory might turn out to be a DFS referral
+- * once we go to try and use it?
+- */
+-static bool
+-cifs_dfs_is_possible(struct cifs_sb_info *cifs_sb)
+-{
+-#ifdef CONFIG_CIFS_DFS_UPCALL
+-	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
+-
+-	if (tcon->Flags & SMB_SHARE_IS_IN_DFS)
+-		return true;
+-#endif
+-	return false;
+-}
+-
+ static void
+ cifs_fill_common_info(struct cifs_fattr *fattr, struct cifs_sb_info *cifs_sb)
+ {
+@@ -159,27 +143,19 @@ cifs_fill_common_info(struct cifs_fattr *fattr, struct cifs_sb_info *cifs_sb)
+ 	if (fattr->cf_cifsattrs & ATTR_DIRECTORY) {
+ 		fattr->cf_mode = S_IFDIR | cifs_sb->mnt_dir_mode;
+ 		fattr->cf_dtype = DT_DIR;
+-		/*
+-		 * Windows CIFS servers generally make DFS referrals look
+-		 * like directories in FIND_* responses with the reparse
+-		 * attribute flag also set (since DFS junctions are
+-		 * reparse points). We must revalidate at least these
+-		 * directory inodes before trying to use them (if
+-		 * they are DFS we will get PATH_NOT_COVERED back
+-		 * when queried directly and can then try to connect
+-		 * to the DFS target)
+-		 */
+-		if (cifs_dfs_is_possible(cifs_sb) &&
+-		    (fattr->cf_cifsattrs & ATTR_REPARSE))
+-			fattr->cf_flags |= CIFS_FATTR_NEED_REVAL;
+-	} else if (fattr->cf_cifsattrs & ATTR_REPARSE) {
+-		fattr->cf_mode = S_IFLNK;
+-		fattr->cf_dtype = DT_LNK;
+ 	} else {
+ 		fattr->cf_mode = S_IFREG | cifs_sb->mnt_file_mode;
+ 		fattr->cf_dtype = DT_REG;
+ 	}
+ 
++	/*
++	 * We need to revalidate it further to make a decision about whether it
++	 * is a symbolic link, DFS referral or a reparse point with a direct
++	 * access like junctions, deduplicated files, NFS symlinks.
++	 */
++	if (fattr->cf_cifsattrs & ATTR_REPARSE)
++		fattr->cf_flags |= CIFS_FATTR_NEED_REVAL;
++
+ 	/* non-unix readdir doesn't provide nlink */
+ 	fattr->cf_flags |= CIFS_FATTR_UNKNOWN_NLINK;
+ 
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index ea99efe..3bb41cf 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -534,26 +534,43 @@ cifs_is_path_accessible(const unsigned int xid, struct cifs_tcon *tcon,
+ static int
+ cifs_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 		     struct cifs_sb_info *cifs_sb, const char *full_path,
+-		     FILE_ALL_INFO *data, bool *adjustTZ)
++		     FILE_ALL_INFO *data, bool *adjustTZ, bool *symlink)
+ {
+ 	int rc;
++	int oplock = 0;
++	__u16 netfid;
++
++	rc = CIFSSMBOpen(xid, tcon, full_path, FILE_OPEN, FILE_READ_ATTRIBUTES,
++			 0, &netfid, &oplock, NULL, cifs_sb->local_nls,
++			 cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
++	if (rc == -EOPNOTSUPP) {
++		*symlink = true;
++		/* Failed on a symbolic link - query a reparse point info */
++		rc = CIFSSMBOpen(xid, tcon, full_path, FILE_OPEN,
++				 FILE_READ_ATTRIBUTES, OPEN_REPARSE_POINT,
++				 &netfid, &oplock, NULL, cifs_sb->local_nls,
++			cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
++	}
++
++	if (!rc) {
++		rc = CIFSSMBQFileInfo(xid, tcon, netfid, data);
++		CIFSSMBClose(xid, tcon, netfid);
++	}
+ 
+-	/* could do find first instead but this returns more info */
+-	rc = CIFSSMBQPathInfo(xid, tcon, full_path, data, 0 /* not legacy */,
+-			      cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
+-						CIFS_MOUNT_MAP_SPECIAL_CHR);
+ 	/*
+ 	 * BB optimize code so we do not make the above call when server claims
+ 	 * no NT SMB support and the above call failed at least once - set flag
+ 	 * in tcon or mount.
+ 	 */
+ 	if ((rc == -EOPNOTSUPP) || (rc == -EINVAL)) {
++		*symlink = false;
+ 		rc = SMBQueryInformation(xid, tcon, full_path, data,
+ 					 cifs_sb->local_nls,
+ 					 cifs_sb->mnt_cifs_flags &
+ 						CIFS_MOUNT_MAP_SPECIAL_CHR);
+ 		*adjustTZ = true;
+ 	}
++
+ 	return rc;
+ }
+ 
+diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+index 78ff88c..58283dd 100644
+--- a/fs/cifs/smb2inode.c
++++ b/fs/cifs/smb2inode.c
+@@ -123,7 +123,7 @@ move_smb2_info_to_cifs(FILE_ALL_INFO *dst, struct smb2_file_all_info *src)
+ int
+ smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 		     struct cifs_sb_info *cifs_sb, const char *full_path,
+-		     FILE_ALL_INFO *data, bool *adjust_tz)
++		     FILE_ALL_INFO *data, bool *adjust_tz, bool *symlink)
+ {
+ 	int rc;
+ 	struct smb2_file_all_info *smb2_data;
+@@ -136,9 +136,16 @@ smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 		return -ENOMEM;
+ 
+ 	rc = smb2_open_op_close(xid, tcon, cifs_sb, full_path,
+-				FILE_READ_ATTRIBUTES, FILE_OPEN,
+-				OPEN_REPARSE_POINT, smb2_data,
+-				SMB2_OP_QUERY_INFO);
++				FILE_READ_ATTRIBUTES, FILE_OPEN, 0,
++				smb2_data, SMB2_OP_QUERY_INFO);
++	if (rc == -EOPNOTSUPP) {
++		*symlink = true;
++		/* Failed on a symbolic link - query a reparse point info */
++		rc = smb2_open_op_close(xid, tcon, cifs_sb, full_path,
++					FILE_READ_ATTRIBUTES, FILE_OPEN,
++					OPEN_REPARSE_POINT, smb2_data,
++					SMB2_OP_QUERY_INFO);
++	}
+ 	if (rc)
+ 		goto out;
+ 
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index 313813e..b4eea10 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -61,7 +61,7 @@ extern void move_smb2_info_to_cifs(FILE_ALL_INFO *dst,
+ extern int smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 				struct cifs_sb_info *cifs_sb,
+ 				const char *full_path, FILE_ALL_INFO *data,
+-				bool *adjust_tz);
++				bool *adjust_tz, bool *symlink);
+ extern int smb2_set_path_size(const unsigned int xid, struct cifs_tcon *tcon,
+ 			      const char *full_path, __u64 size,
+ 			      struct cifs_sb_info *cifs_sb, bool set_alloc);
 -- 
-Best regards,
-Pavel Shilovsky.
+1.7.10.4
