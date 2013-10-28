@@ -1,152 +1,87 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v2] cifs: Send a logoff request before removing a smb session
-Date: Mon, 28 Oct 2013 09:37:14 -0500
-Message-ID: <CAH2r5ms3uj836SXQ1dY=Q+trq1xUiZef+wdn0nW78mVnf4sh-Q@mail.gmail.com>
-References: <1381590363-4725-1-git-send-email-shirishpargaonkar@gmail.com>
+Subject: Re: [PATCH 1/2 linux-next] cifs: Remove redundant multiplex
+ identifier check from check_smb_hdr()
+Date: Mon, 28 Oct 2013 09:37:56 -0500
+Message-ID: <CAH2r5mvhUWAz3s3QFdK_6vjB_+fhWqSJysU_RDEETbQ0pOnwcw@mail.gmail.com>
+References: <1381936190-67628-1-git-send-email-timg@tpi.com>
+	<20131016113632.6548d399@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: Tim Gardner <timg-l6nL5VImRDY@public.gmane.org>,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1381590363-4725-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <20131016113632.6548d399-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 merged into cifs-2.6.git for-next
 
-On Sat, Oct 12, 2013 at 10:06 AM,  <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+On Wed, Oct 16, 2013 at 10:36 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> On Wed, 16 Oct 2013 09:09:49 -0600
+> Tim Gardner <timg-l6nL5VImRDY@public.gmane.org> wrote:
 >
-> Send a smb session logoff request before removing smb session off of the list.
-> On a signed smb session, remvoing a session off of the list before sending
-> a logoff request results in server returning an error for lack of
-> smb signature.
+>> The only call site for check_smb_header() assigns 'mid' from the SMB
+>> packet, which is then checked again in check_smb_header(). This seems
+>> like redundant redundancy.
+>>
+>> Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+>> Signed-off-by: Tim Gardner <timg-l6nL5VImRDY@public.gmane.org>
+>> ---
+>>  fs/cifs/misc.c |   12 ++----------
+>>  1 file changed, 2 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+>> index 138a011..298e31e 100644
+>> --- a/fs/cifs/misc.c
+>> +++ b/fs/cifs/misc.c
+>> @@ -278,7 +278,7 @@ header_assemble(struct smb_hdr *buffer, char smb_command /* command */ ,
+>>  }
+>>
+>>  static int
+>> -check_smb_hdr(struct smb_hdr *smb, __u16 mid)
+>> +check_smb_hdr(struct smb_hdr *smb)
+>>  {
+>>       /* does it have the right SMB "signature" ? */
+>>       if (*(__le32 *) smb->Protocol != cpu_to_le32(0x424d53ff)) {
+>> @@ -287,13 +287,6 @@ check_smb_hdr(struct smb_hdr *smb, __u16 mid)
+>>               return 1;
+>>       }
+>>
+>> -     /* Make sure that message ids match */
+>> -     if (mid != smb->Mid) {
+>> -             cifs_dbg(VFS, "Mids do not match. received=%u expected=%u\n",
+>> -                      smb->Mid, mid);
+>> -             return 1;
+>> -     }
+>> -
+>>       /* if it's a response then accept */
+>>       if (smb->Flags & SMBFLG_RESPONSE)
+>>               return 0;
+>> @@ -310,7 +303,6 @@ int
+>>  checkSMB(char *buf, unsigned int total_read)
+>>  {
+>>       struct smb_hdr *smb = (struct smb_hdr *)buf;
+>> -     __u16 mid = smb->Mid;
+>>       __u32 rfclen = be32_to_cpu(smb->smb_buf_length);
+>>       __u32 clc_len;  /* calculated length */
+>>       cifs_dbg(FYI, "checkSMB Length: 0x%x, smb_buf_length: 0x%x\n",
+>> @@ -348,7 +340,7 @@ checkSMB(char *buf, unsigned int total_read)
+>>       }
+>>
+>>       /* otherwise, there is enough to get to the BCC */
+>> -     if (check_smb_hdr(smb, mid))
+>> +     if (check_smb_hdr(smb))
+>>               return -EIO;
+>>       clc_len = smbCalcSize(smb);
+>>
 >
-> Never seen an error during smb logoff, so as per MS-SMB2 3.2.5.1,
-> not sure how an error during logoff should be retried. So for now,
-> if a server returns an error to a logoff request, log the error and
-> remove the session off of the list.
+> Nice...
 >
->
-> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> ---
->  fs/cifs/connect.c       | 25 ++++++++++++++++++++-----
->  fs/cifs/smb2transport.c | 10 ++++++++--
->  fs/cifs/transport.c     | 11 +++++++++--
->  3 files changed, 37 insertions(+), 9 deletions(-)
->
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index a279ffc..62a5514 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -2242,6 +2242,8 @@ cifs_find_smb_ses(struct TCP_Server_Info *server, struct smb_vol *vol)
->
->         spin_lock(&cifs_tcp_ses_lock);
->         list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
-> +               if (ses->status == CifsExiting)
-> +                       continue;
->                 if (!match_session(ses, vol))
->                         continue;
->                 ++ses->ses_count;
-> @@ -2255,24 +2257,37 @@ cifs_find_smb_ses(struct TCP_Server_Info *server, struct smb_vol *vol)
->  static void
->  cifs_put_smb_ses(struct cifs_ses *ses)
->  {
-> -       unsigned int xid;
-> +       unsigned int rc, xid;
->         struct TCP_Server_Info *server = ses->server;
->
->         cifs_dbg(FYI, "%s: ses_count=%d\n", __func__, ses->ses_count);
-> +
->         spin_lock(&cifs_tcp_ses_lock);
-> +       if (ses->status == CifsExiting) {
-> +               spin_unlock(&cifs_tcp_ses_lock);
-> +               return;
-> +       }
->         if (--ses->ses_count > 0) {
->                 spin_unlock(&cifs_tcp_ses_lock);
->                 return;
->         }
-> -
-> -       list_del_init(&ses->smb_ses_list);
-> +       if (ses->status == CifsGood)
-> +               ses->status = CifsExiting;
->         spin_unlock(&cifs_tcp_ses_lock);
->
-> -       if (ses->status == CifsGood && server->ops->logoff) {
-> +       if (ses->status == CifsExiting && server->ops->logoff) {
->                 xid = get_xid();
-> -               server->ops->logoff(xid, ses);
-> +               rc = server->ops->logoff(xid, ses);
-> +               if (rc)
-> +                       cifs_dbg(VFS, "%s: Session Logoff failure rc=%d\n",
-> +                               __func__, rc);
->                 _free_xid(xid);
->         }
-> +
-> +       spin_lock(&cifs_tcp_ses_lock);
-> +       list_del_init(&ses->smb_ses_list);
-> +       spin_unlock(&cifs_tcp_ses_lock);
-> +
->         sesInfoFree(ses);
->         cifs_put_tcp_session(server);
->  }
-> diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-> index 340abca..ee1963b 100644
-> --- a/fs/cifs/smb2transport.c
-> +++ b/fs/cifs/smb2transport.c
-> @@ -516,13 +516,19 @@ smb2_get_mid_entry(struct cifs_ses *ses, struct smb2_hdr *buf,
->                 return -EAGAIN;
->         }
->
-> -       if (ses->status != CifsGood) {
-> -               /* check if SMB2 session is bad because we are setting it up */
-> +       if (ses->status == CifsNew) {
->                 if ((buf->Command != SMB2_SESSION_SETUP) &&
->                     (buf->Command != SMB2_NEGOTIATE))
->                         return -EAGAIN;
->                 /* else ok - we are setting up session */
->         }
-> +
-> +       if (ses->status == CifsExiting) {
-> +               if (buf->Command != SMB2_LOGOFF)
-> +                       return -EAGAIN;
-> +               /* else ok - we are shutting down the session */
-> +       }
-> +
->         *mid = smb2_mid_entry_alloc(buf, ses->server);
->         if (*mid == NULL)
->                 return -ENOMEM;
-> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> index 6fdcb1b..fc6e652 100644
-> --- a/fs/cifs/transport.c
-> +++ b/fs/cifs/transport.c
-> @@ -426,13 +426,20 @@ static int allocate_mid(struct cifs_ses *ses, struct smb_hdr *in_buf,
->                 return -EAGAIN;
->         }
->
-> -       if (ses->status != CifsGood) {
-> -               /* check if SMB session is bad because we are setting it up */
-> +       if (ses->status == CifsNew) {
->                 if ((in_buf->Command != SMB_COM_SESSION_SETUP_ANDX) &&
->                         (in_buf->Command != SMB_COM_NEGOTIATE))
->                         return -EAGAIN;
->                 /* else ok - we are setting up session */
->         }
-> +
-> +       if (ses->status == CifsExiting) {
-> +               /* check if SMB session is bad because we are setting it up */
-> +               if (in_buf->Command != SMB_COM_LOGOFF_ANDX)
-> +                       return -EAGAIN;
-> +               /* else ok - we are shutting down session */
-> +       }
-> +
->         *ppmidQ = AllocMidQEntry(in_buf, ses->server);
->         if (*ppmidQ == NULL)
->                 return -ENOMEM;
-> --
-> 1.8.1.2
->
+> Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
 
 
