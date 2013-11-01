@@ -1,338 +1,244 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Fix symbolic links usage
-Date: Fri, 1 Nov 2013 14:00:33 -0400
-Message-ID: <20131101140033.207dc01c@tlielax.poochiereds.net>
-References: <1383314259-4694-1-git-send-email-piastryyy@gmail.com>
-	<20131101134219.02d33b75@tlielax.poochiereds.net>
-	<CAH2r5msFrvfWjYUO7pC84ggOZromA6_9jVM+KOqV_x61vNYSwg@mail.gmail.com>
+From: Steve French <smfrench@gmail.com>
+Subject: Re: [PATCH linux-next V2] cifs: Make big endian multiplex ID
+ sequences monotonic on the wire
+Date: Fri, 1 Nov 2013 13:50:59 -0500
+Message-ID: <CAH2r5mt5kBDR1oZfDNVu+bd7-jf=zQ6tBm2YjKXKBwdYE+YG=w@mail.gmail.com>
+References: <1381941162-72831-1-git-send-email-timg@tpi.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Joao Correia <joaomiguelcorreia-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5msFrvfWjYUO7pC84ggOZromA6_9jVM+KOqV_x61vNYSwg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: Steve French <sfrench@samba.org>, "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>, samba-technical <samba-technical@lists.samba.org>,
+	LKML <linux-kernel@vger.kernel.org>, Jeff Layton <jlayton@redhat.com>
+To: Tim Gardner <timg@tpi.com>
+Return-path: <samba-technical-bounces@lists.samba.org>
+In-Reply-To: <1381941162-72831-1-git-send-email-timg@tpi.com>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Sender: samba-technical-bounces@lists.samba.org
+Errors-To: samba-technical-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Fri, 1 Nov 2013 12:49:47 -0500
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+This has a couple of obvious endian errors.  I will correct your patch
+and remerge into cifs-2.6.git for-next
 
-> FILE_ALL_INFO is not SMB1 specific, we request it in SMB2/SMB3 as well
-> and it is still a common level.  See section 2.2.37 of MS-SMB2 or FSCC
-> description at:
-> 
-> 
-> http://msdn.microsoft.com/en-us/library/cc232117.aspx
-> 
-> Is there a different level that ou would like to call?
-> 
+Please always remember to run endian checks against cifs builds when
+submitting a patch (and make sure sparse is installed)
 
-Ok, good point...
+e.g.
 
-Still...I think we ought to not base this API on on-the-wire formats. It
-ought to use the standard container for passing file attributes around
-(struct cifs_fattr). In most cases where we need to call these
-functions we don't actually have a FILE_ALL_INFO and have to construct
-one. Blech...
+make C=1 M=fs/cifs modules CF=-D__CHECK_ENDIAN__
 
-> On Fri, Nov 1, 2013 at 12:42 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> > On Fri,  1 Nov 2013 17:57:39 +0400
-> > Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> >
-> >> From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> >>
-> >> Now we treat any reparse point as a symbolic link and map it to a Unix
-> >> one that is not true in a common case due to many reparse point types
-> >> supported by SMB servers.
-> >>
-> >> Distinguish reparse point types into two groups:
-> >> 1) that can be accessed directly through a reparse point
-> >> (junctions, deduplicated files, NFS symlinks);
-> >> 2) that need to be processed manually (Windows symbolic links, DFS);
-> >>
-> >> and map only Windows symbolic links to Unix ones.
-> >>
-> >> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> >> ---
-> >>  fs/cifs/cifsglob.h  |    2 +-
-> >>  fs/cifs/inode.c     |   23 +++++++++++++----------
-> >>  fs/cifs/readdir.c   |   40 ++++++++--------------------------------
-> >>  fs/cifs/smb1ops.c   |   21 ++++++++++++++++++++-
-> >>  fs/cifs/smb2inode.c |   16 ++++++++++++----
-> >>  fs/cifs/smb2proto.h |    2 +-
-> >>  6 files changed, 55 insertions(+), 49 deletions(-)
-> >>
-> >> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> >> index a67cf12..b688f2b 100644
-> >> --- a/fs/cifs/cifsglob.h
-> >> +++ b/fs/cifs/cifsglob.h
-> >> @@ -261,7 +261,7 @@ struct smb_version_operations {
-> >>       /* query path data from the server */
-> >>       int (*query_path_info)(const unsigned int, struct cifs_tcon *,
-> >>                              struct cifs_sb_info *, const char *,
-> >> -                            FILE_ALL_INFO *, bool *);
-> >> +                            FILE_ALL_INFO *, bool *, bool *);
-> >
-> >
-> > This looks much better for performance, but I think it really shines a
-> > light on what an abortion the query_path_info and query_file_info
-> > operations are. They work with a FILE_ALL_INFO struct which is SMB1
-> > specific, so for SMB2/3 we have to convert data to something that
-> > doesn't even match the protocol.
-> >
-> > I think it would be best to base this fix on top of a patchset to fix
-> > that properly. Those functions should be changed to pass data around in
-> > a cifs_fattr. With that, you could just add a new cifs_fattr->flags
-> > value and you wouldn't need to add this extra bool * argument.
-> >
-> >
-> >>       /* query file data from the server */
-> >>       int (*query_file_info)(const unsigned int, struct cifs_tcon *,
-> >>                              struct cifs_fid *, FILE_ALL_INFO *);
-> >> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> >> index 867b7cd..36f9ebb 100644
-> >> --- a/fs/cifs/inode.c
-> >> +++ b/fs/cifs/inode.c
-> >> @@ -542,7 +542,8 @@ static int cifs_sfu_mode(struct cifs_fattr *fattr, const unsigned char *path,
-> >>  /* Fill a cifs_fattr struct with info from FILE_ALL_INFO */
-> >>  static void
-> >>  cifs_all_info_to_fattr(struct cifs_fattr *fattr, FILE_ALL_INFO *info,
-> >> -                    struct cifs_sb_info *cifs_sb, bool adjust_tz)
-> >> +                    struct cifs_sb_info *cifs_sb, bool adjust_tz,
-> >> +                    bool symlink)
-> >>  {
-> >>       struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
-> >>
-> >> @@ -569,7 +570,11 @@ cifs_all_info_to_fattr(struct cifs_fattr *fattr, FILE_ALL_INFO *info,
-> >>       fattr->cf_createtime = le64_to_cpu(info->CreationTime);
-> >>
-> >>       fattr->cf_nlink = le32_to_cpu(info->NumberOfLinks);
-> >> -     if (fattr->cf_cifsattrs & ATTR_DIRECTORY) {
-> >> +
-> >> +     if (symlink) {
-> >> +             fattr->cf_mode = S_IFLNK;
-> >> +             fattr->cf_dtype = DT_LNK;
-> >> +     } else if (fattr->cf_cifsattrs & ATTR_DIRECTORY) {
-> >>               fattr->cf_mode = S_IFDIR | cifs_sb->mnt_dir_mode;
-> >>               fattr->cf_dtype = DT_DIR;
-> >>               /*
-> >> @@ -578,10 +583,6 @@ cifs_all_info_to_fattr(struct cifs_fattr *fattr, FILE_ALL_INFO *info,
-> >>                */
-> >>               if (!tcon->unix_ext)
-> >>                       fattr->cf_flags |= CIFS_FATTR_UNKNOWN_NLINK;
-> >> -     } else if (fattr->cf_cifsattrs & ATTR_REPARSE) {
-> >> -             fattr->cf_mode = S_IFLNK;
-> >> -             fattr->cf_dtype = DT_LNK;
-> >> -             fattr->cf_nlink = le32_to_cpu(info->NumberOfLinks);
-> >>       } else {
-> >>               fattr->cf_mode = S_IFREG | cifs_sb->mnt_file_mode;
-> >>               fattr->cf_dtype = DT_REG;
-> >> @@ -626,7 +627,8 @@ cifs_get_file_info(struct file *filp)
-> >>       rc = server->ops->query_file_info(xid, tcon, &cfile->fid, &find_data);
-> >>       switch (rc) {
-> >>       case 0:
-> >> -             cifs_all_info_to_fattr(&fattr, &find_data, cifs_sb, false);
-> >> +             cifs_all_info_to_fattr(&fattr, &find_data, cifs_sb, false,
-> >> +                                    false);
-> >>               break;
-> >>       case -EREMOTE:
-> >>               cifs_create_dfs_fattr(&fattr, inode->i_sb);
-> >> @@ -673,6 +675,7 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
-> >>       bool adjust_tz = false;
-> >>       struct cifs_fattr fattr;
-> >>       struct cifs_search_info *srchinf = NULL;
-> >> +     bool symlink = false;
-> >>
-> >>       tlink = cifs_sb_tlink(cifs_sb);
-> >>       if (IS_ERR(tlink))
-> >> @@ -702,12 +705,12 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
-> >>               }
-> >>               data = (FILE_ALL_INFO *)buf;
-> >>               rc = server->ops->query_path_info(xid, tcon, cifs_sb, full_path,
-> >> -                                               data, &adjust_tz);
-> >> +                                               data, &adjust_tz, &symlink);
-> >>       }
-> >>
-> >>       if (!rc) {
-> >> -             cifs_all_info_to_fattr(&fattr, (FILE_ALL_INFO *)data, cifs_sb,
-> >> -                                    adjust_tz);
-> >> +             cifs_all_info_to_fattr(&fattr, data, cifs_sb, adjust_tz,
-> >> +                                    symlink);
-> >>       } else if (rc == -EREMOTE) {
-> >>               cifs_create_dfs_fattr(&fattr, sb);
-> >>               rc = 0;
-> >> diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
-> >> index 53a75f3..5940eca 100644
-> >> --- a/fs/cifs/readdir.c
-> >> +++ b/fs/cifs/readdir.c
-> >> @@ -134,22 +134,6 @@ out:
-> >>       dput(dentry);
-> >>  }
-> >>
-> >> -/*
-> >> - * Is it possible that this directory might turn out to be a DFS referral
-> >> - * once we go to try and use it?
-> >> - */
-> >> -static bool
-> >> -cifs_dfs_is_possible(struct cifs_sb_info *cifs_sb)
-> >> -{
-> >> -#ifdef CONFIG_CIFS_DFS_UPCALL
-> >> -     struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
-> >> -
-> >> -     if (tcon->Flags & SMB_SHARE_IS_IN_DFS)
-> >> -             return true;
-> >> -#endif
-> >> -     return false;
-> >> -}
-> >> -
-> >>  static void
-> >>  cifs_fill_common_info(struct cifs_fattr *fattr, struct cifs_sb_info *cifs_sb)
-> >>  {
-> >> @@ -159,27 +143,19 @@ cifs_fill_common_info(struct cifs_fattr *fattr, struct cifs_sb_info *cifs_sb)
-> >>       if (fattr->cf_cifsattrs & ATTR_DIRECTORY) {
-> >>               fattr->cf_mode = S_IFDIR | cifs_sb->mnt_dir_mode;
-> >>               fattr->cf_dtype = DT_DIR;
-> >> -             /*
-> >> -              * Windows CIFS servers generally make DFS referrals look
-> >> -              * like directories in FIND_* responses with the reparse
-> >> -              * attribute flag also set (since DFS junctions are
-> >> -              * reparse points). We must revalidate at least these
-> >> -              * directory inodes before trying to use them (if
-> >> -              * they are DFS we will get PATH_NOT_COVERED back
-> >> -              * when queried directly and can then try to connect
-> >> -              * to the DFS target)
-> >> -              */
-> >> -             if (cifs_dfs_is_possible(cifs_sb) &&
-> >> -                 (fattr->cf_cifsattrs & ATTR_REPARSE))
-> >> -                     fattr->cf_flags |= CIFS_FATTR_NEED_REVAL;
-> >> -     } else if (fattr->cf_cifsattrs & ATTR_REPARSE) {
-> >> -             fattr->cf_mode = S_IFLNK;
-> >> -             fattr->cf_dtype = DT_LNK;
-> >>       } else {
-> >>               fattr->cf_mode = S_IFREG | cifs_sb->mnt_file_mode;
-> >>               fattr->cf_dtype = DT_REG;
-> >>       }
-> >>
-> >> +     /*
-> >> +      * We need to revalidate it further to make a decision about whether it
-> >> +      * is a symbolic link, DFS referral or a reparse point with a direct
-> >> +      * access like junctions, deduplicated files, NFS symlinks.
-> >> +      */
-> >> +     if (fattr->cf_cifsattrs & ATTR_REPARSE)
-> >> +             fattr->cf_flags |= CIFS_FATTR_NEED_REVAL;
-> >> +
-> >>       /* non-unix readdir doesn't provide nlink */
-> >>       fattr->cf_flags |= CIFS_FATTR_UNKNOWN_NLINK;
-> >>
-> >> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-> >> index ea99efe..47ab035 100644
-> >> --- a/fs/cifs/smb1ops.c
-> >> +++ b/fs/cifs/smb1ops.c
-> >> @@ -534,10 +534,12 @@ cifs_is_path_accessible(const unsigned int xid, struct cifs_tcon *tcon,
-> >>  static int
-> >>  cifs_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
-> >>                    struct cifs_sb_info *cifs_sb, const char *full_path,
-> >> -                  FILE_ALL_INFO *data, bool *adjustTZ)
-> >> +                  FILE_ALL_INFO *data, bool *adjustTZ, bool *symlink)
-> >>  {
-> >>       int rc;
-> >>
-> >> +     *symlink = false;
-> >> +
-> >>       /* could do find first instead but this returns more info */
-> >>       rc = CIFSSMBQPathInfo(xid, tcon, full_path, data, 0 /* not legacy */,
-> >>                             cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
-> >> @@ -554,6 +556,23 @@ cifs_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
-> >>                                               CIFS_MOUNT_MAP_SPECIAL_CHR);
-> >>               *adjustTZ = true;
-> >>       }
-> >> +
-> >> +     if (!rc && (le32_to_cpu(data->Attributes) & ATTR_REPARSE)) {
-> >> +             int tmprc;
-> >> +             int oplock = 0;
-> >> +             __u16 netfid;
-> >> +
-> >> +             /* Need to check if this is a symbolic link or not */
-> >> +             tmprc = CIFSSMBOpen(xid, tcon, full_path, FILE_OPEN,
-> >> +                              FILE_READ_ATTRIBUTES, 0, &netfid, &oplock,
-> >> +                              NULL, cifs_sb->local_nls,
-> >> +                     cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
-> >> +             if (tmprc == -EOPNOTSUPP)
-> >> +                     *symlink = true;
-> >> +             else
-> >> +                     CIFSSMBClose(xid, tcon, netfid);
-> >> +     }
-> >> +
-> >>       return rc;
-> >>  }
-> >>
-> >> diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
-> >> index 78ff88c..84c012a 100644
-> >> --- a/fs/cifs/smb2inode.c
-> >> +++ b/fs/cifs/smb2inode.c
-> >> @@ -123,12 +123,13 @@ move_smb2_info_to_cifs(FILE_ALL_INFO *dst, struct smb2_file_all_info *src)
-> >>  int
-> >>  smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
-> >>                    struct cifs_sb_info *cifs_sb, const char *full_path,
-> >> -                  FILE_ALL_INFO *data, bool *adjust_tz)
-> >> +                  FILE_ALL_INFO *data, bool *adjust_tz, bool *symlink)
-> >>  {
-> >>       int rc;
-> >>       struct smb2_file_all_info *smb2_data;
-> >>
-> >>       *adjust_tz = false;
-> >> +     *symlink = false;
-> >>
-> >>       smb2_data = kzalloc(sizeof(struct smb2_file_all_info) + MAX_NAME * 2,
-> >>                           GFP_KERNEL);
-> >> @@ -136,9 +137,16 @@ smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
-> >>               return -ENOMEM;
-> >>
-> >>       rc = smb2_open_op_close(xid, tcon, cifs_sb, full_path,
-> >> -                             FILE_READ_ATTRIBUTES, FILE_OPEN,
-> >> -                             OPEN_REPARSE_POINT, smb2_data,
-> >> -                             SMB2_OP_QUERY_INFO);
-> >> +                             FILE_READ_ATTRIBUTES, FILE_OPEN, 0,
-> >> +                             smb2_data, SMB2_OP_QUERY_INFO);
-> >> +     if (rc == -EOPNOTSUPP) {
-> >> +             *symlink = true;
-> >> +             /* Failed on a symbolic link - query a reparse point info */
-> >> +             rc = smb2_open_op_close(xid, tcon, cifs_sb, full_path,
-> >> +                                     FILE_READ_ATTRIBUTES, FILE_OPEN,
-> >> +                                     OPEN_REPARSE_POINT, smb2_data,
-> >> +                                     SMB2_OP_QUERY_INFO);
-> >> +     }
-> >>       if (rc)
-> >>               goto out;
-> >>
-> >> diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-> >> index 313813e..b4eea10 100644
-> >> --- a/fs/cifs/smb2proto.h
-> >> +++ b/fs/cifs/smb2proto.h
-> >> @@ -61,7 +61,7 @@ extern void move_smb2_info_to_cifs(FILE_ALL_INFO *dst,
-> >>  extern int smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
-> >>                               struct cifs_sb_info *cifs_sb,
-> >>                               const char *full_path, FILE_ALL_INFO *data,
-> >> -                             bool *adjust_tz);
-> >> +                             bool *adjust_tz, bool *symlink);
-> >>  extern int smb2_set_path_size(const unsigned int xid, struct cifs_tcon *tcon,
-> >>                             const char *full_path, __u64 size,
-> >>                             struct cifs_sb_info *cifs_sb, bool set_alloc);
-> >
-> >
-> > --
-> > Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> 
-> 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index bc7c978..1a1fdcc 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -630,7 +630,7 @@ get_next_mid64(struct TCP_Server_Info *server)
+     return server->ops->get_next_mid(server);
+ }
+
+-static inline __u16
++static inline __le16
+ get_next_mid(struct TCP_Server_Info *server)
+ {
+     __u16 mid = get_next_mid64(server);
+diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
+index f9bb497..9e5ee34 100644
+--- a/fs/cifs/cifspdu.h
++++ b/fs/cifs/cifspdu.h
+@@ -428,7 +428,7 @@ struct smb_hdr {
+     __u16 Tid;
+     __le16 Pid;
+     __u16 Uid;
+-    __u16 Mid;
++    __le16 Mid;
+     __u8 WordCount;
+ } __attribute__((packed));
+
+On Wed, Oct 16, 2013 at 11:32 AM, Tim Gardner <timg@tpi.com> wrote:
+> The multiplex identifier (MID) in the SMB header is only
+> ever used by the client, in conjunction with PID, to match responses
+> from the server. As such, the endianess of the MID is not important.
+> However, When tracing packet sequences on the wire, protocol analyzers
+> such as wireshark display MID as little endian. It is much more informative
+> for the on-the-wire MID sequences to match debug information emitted by the
+> CIFS driver.  Therefore, one should write and read MID in the SMB header
+> assuming it is always little endian.
+>
+> Observed from wireshark during the protocol negotiation
+> and session setup:
+>
+>         Multiplex ID: 256
+>         Multiplex ID: 256
+>         Multiplex ID: 512
+>         Multiplex ID: 512
+>         Multiplex ID: 768
+>         Multiplex ID: 768
+>
+> After this patch on-the-wire MID values begin at 1 and increase monotonically.
+>
+> Introduce get_next_mid64() for the internal consumers that use the full 64 bit
+> multiplex identifier.
+>
+> Introduce the helpers get_mid() and compare_mid() to make the endian
+> translation clear.
+>
+> Cc: Jeff Layton <jlayton@redhat.com>
+> Cc: Steve French <sfrench@samba.org>
+> Signed-off-by: Tim Gardner <timg@tpi.com>
+> ---
+>
+> V2 - get an endian appropriate copy of 'mid' for debug output in checkSMB().
+>      Actually use the new helper get_mid() wherever smb->Mid is referenced.
+>
+>  fs/cifs/cifsglob.h      |   25 ++++++++++++++++++++++++-
+>  fs/cifs/misc.c          |   10 ++++++----
+>  fs/cifs/smb1ops.c       |    4 ++--
+>  fs/cifs/smb2transport.c |    2 +-
+>  fs/cifs/transport.c     |    2 +-
+>  5 files changed, 34 insertions(+), 9 deletions(-)
+>
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 52b6f6c..535e324 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -620,11 +620,34 @@ set_credits(struct TCP_Server_Info *server, const int val)
+>  }
+>
+>  static inline __u64
+> -get_next_mid(struct TCP_Server_Info *server)
+> +get_next_mid64(struct TCP_Server_Info *server)
+>  {
+>         return server->ops->get_next_mid(server);
+>  }
+>
+> +static inline __u16
+> +get_next_mid(struct TCP_Server_Info *server)
+> +{
+> +       __u16 mid = get_next_mid64(server);
+> +       /*
+> +        * The value in the SMB header should be little endian for easy
+> +        * on-the-wire decoding.
+> +        */
+> +       return cpu_to_le16(mid);
+> +}
+> +
+> +static inline __u16
+> +get_mid(const struct smb_hdr *smb)
+> +{
+> +       return le16_to_cpu(smb->Mid);
+> +}
+> +
+> +static inline bool
+> +compare_mid(__u16 mid, const struct smb_hdr *smb)
+> +{
+> +       return mid == le16_to_cpu(smb->Mid);
+> +}
+> +
+>  /*
+>   * When the server supports very large reads and writes via POSIX extensions,
+>   * we can allow up to 2^24-1, minus the size of a READ/WRITE_AND_X header, not
+> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+> index 298e31e..2f9f379 100644
+> --- a/fs/cifs/misc.c
+> +++ b/fs/cifs/misc.c
+> @@ -295,7 +295,8 @@ check_smb_hdr(struct smb_hdr *smb)
+>         if (smb->Command == SMB_COM_LOCKING_ANDX)
+>                 return 0;
+>
+> -       cifs_dbg(VFS, "Server sent request, not response. mid=%u\n", smb->Mid);
+> +       cifs_dbg(VFS, "Server sent request, not response. mid=%u\n",
+> +                get_mid(smb));
+>         return 1;
+>  }
+>
+> @@ -351,6 +352,7 @@ checkSMB(char *buf, unsigned int total_read)
+>         }
+>
+>         if (4 + rfclen != clc_len) {
+> +               __u16 mid = get_mid(smb);
+>                 /* check if bcc wrapped around for large read responses */
+>                 if ((rfclen > 64 * 1024) && (rfclen > clc_len)) {
+>                         /* check if lengths match mod 64K */
+> @@ -358,11 +360,11 @@ checkSMB(char *buf, unsigned int total_read)
+>                                 return 0; /* bcc wrapped */
+>                 }
+>                 cifs_dbg(FYI, "Calculated size %u vs length %u mismatch for mid=%u\n",
+> -                        clc_len, 4 + rfclen, smb->Mid);
+> +                        clc_len, 4 + rfclen, mid);
+>
+>                 if (4 + rfclen < clc_len) {
+>                         cifs_dbg(VFS, "RFC1001 size %u smaller than SMB for mid=%u\n",
+> -                                rfclen, smb->Mid);
+> +                                rfclen, mid);
+>                         return -EIO;
+>                 } else if (rfclen > clc_len + 512) {
+>                         /*
+> @@ -375,7 +377,7 @@ checkSMB(char *buf, unsigned int total_read)
+>                          * data to 512 bytes.
+>                          */
+>                         cifs_dbg(VFS, "RFC1001 size %u more than 512 bytes larger than SMB for mid=%u\n",
+> -                                rfclen, smb->Mid);
+> +                                rfclen, mid);
+>                         return -EIO;
+>                 }
+>         }
+> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+> index 8233b17..09ef8f3 100644
+> --- a/fs/cifs/smb1ops.c
+> +++ b/fs/cifs/smb1ops.c
+> @@ -67,7 +67,7 @@ send_nt_cancel(struct TCP_Server_Info *server, void *buf,
+>         mutex_unlock(&server->srv_mutex);
+>
+>         cifs_dbg(FYI, "issued NT_CANCEL for mid %u, rc = %d\n",
+> -                in_buf->Mid, rc);
+> +                get_mid(in_buf), rc);
+>
+>         return rc;
+>  }
+> @@ -101,7 +101,7 @@ cifs_find_mid(struct TCP_Server_Info *server, char *buffer)
+>
+>         spin_lock(&GlobalMid_Lock);
+>         list_for_each_entry(mid, &server->pending_mid_q, qhead) {
+> -               if (mid->mid == buf->Mid &&
+> +               if (compare_mid(mid->mid, buf) &&
+>                     mid->mid_state == MID_REQUEST_SUBMITTED &&
+>                     le16_to_cpu(mid->command) == buf->Command) {
+>                         spin_unlock(&GlobalMid_Lock);
+> diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+> index 340abca..c523617 100644
+> --- a/fs/cifs/smb2transport.c
+> +++ b/fs/cifs/smb2transport.c
+> @@ -466,7 +466,7 @@ smb2_verify_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+>  static inline void
+>  smb2_seq_num_into_buf(struct TCP_Server_Info *server, struct smb2_hdr *hdr)
+>  {
+> -       hdr->MessageId = get_next_mid(server);
+> +       hdr->MessageId = get_next_mid64(server);
+>  }
+>
+>  static struct mid_q_entry *
+> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+> index 6fdcb1b..057b2c0 100644
+> --- a/fs/cifs/transport.c
+> +++ b/fs/cifs/transport.c
+> @@ -58,7 +58,7 @@ AllocMidQEntry(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
+>                 return temp;
+>         else {
+>                 memset(temp, 0, sizeof(struct mid_q_entry));
+> -               temp->mid = smb_buffer->Mid;    /* always LE */
+> +               temp->mid = get_mid(smb_buffer);
+>                 temp->pid = current->pid;
+>                 temp->command = cpu_to_le16(smb_buffer->Command);
+>                 cifs_dbg(FYI, "For smb_command %d\n", smb_buffer->Command);
+> --
+> 1.7.9.5
+>
+
 
 
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Thanks,
+
+Steve
