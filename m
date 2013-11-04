@@ -1,47 +1,62 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Fix symbolic links usage
-Date: Sat, 2 Nov 2013 21:14:19 -0400
-Message-ID: <20131102211419.1b86a02d@tlielax.poochiereds.net>
-References: <1383314259-4694-1-git-send-email-piastryyy@gmail.com>
-	<20131101134219.02d33b75@tlielax.poochiereds.net>
-	<CAKywueQGBtpvJwLjPja_xN5OA54qRC=24zSC9pcwhCrRt5Z86A@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: copy chunk preliminary results
+Date: Mon, 4 Nov 2013 00:30:56 -0600
+Message-ID: <CAH2r5mtoGCn-z_-Aetwaxxvn8bS19mexb7Rur3TE=RGipGCppQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Joao Correia <joaomiguelcorreia-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+To: samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueQGBtpvJwLjPja_xN5OA54qRC=24zSC9pcwhCrRt5Z86A-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, 2 Nov 2013 23:47:16 +0400
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+I extended my initial copy chunk kernel client patch to handle files >
+1MB (repeating copychunk requests multiple times, 1 chunk at a time, I
+realize that this will be even faster when I send more than 1 chunk at
+a time)
 
-> 2013/11/1 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> > This looks much better for performance, but I think it really shines a
-> > light on what an abortion the query_path_info and query_file_info
-> > operations are. They work with a FILE_ALL_INFO struct which is SMB1
-> > specific, so for SMB2/3 we have to convert data to something that
-> > doesn't even match the protocol.
-> >
-> > I think it would be best to base this fix on top of a patchset to fix
-> > that properly. Those functions should be changed to pass data around in
-> > a cifs_fattr. With that, you could just add a new cifs_fattr->flags
-> > value and you wouldn't need to add this extra bool * argument.
-> 
-> I agree that using cifs_fattr structure rather than FILE_ALL_INFO
-> simplifies things and makes the code cleaner. But we have a problem in
-> the 3.11 stable branch and I think we should fix it without many
-> patches (code changes). We can apply this patch for stable and then
-> convert the code to use cifs_fattr structure in query path/file info
-> in mainline. Right?
-> 
+Preliminary results local loopback mount of current cifs kernel code
+(vers=3.0) to Samba (master branch, running on Fedora 19 with btrfs):
 
-If you intend to push a fix to stable for this, then that sounds like
-the best approach. It will make cleaning up the API harder, but as long
-as you're ok with that...
+File size of test file (vmlinux.o) was 373987044 bytes
+
+Over the network Copychunk (refcopy) was about six times faster than without.
+ane even local copy (no reflink) is slower than remote copy with
+reflink.  Copychunk would look even better except that the server disk
+is SSD.
+
+
+[sfrench@pc-on-right cifs-2.6]$ time cp vmlinux.o ~/trgt-1-local
+real    0m0.769s
+user    0m0.002s
+sys    0m0.502s
+
+(Local copy with reflink is amazingly fast on btrfs)
+[sfrench@pc-on-right cifs-2.6]$ time cp --reflink vmlinux.o
+~/trgt-2-local-reflink
+real    0m0.004s
+user    0m0.001s
+sys    0m0.002s
+
+(remote copy with reflink to Samba was six times faster than remote
+with no reflink, similar results when repeated)
+[sfrench@pc-on-right cifs-2.6]$ time cp --reflink
+/mnt/cifs-2.6/vmlinux.o /mnt/trgt-3-remote-reflink
+real    0m0.416s
+user    0m0.000s
+sys    0m0.029s
+
+
+[sfrench@pc-on-right cifs-2.6]$ time cp  /mnt/cifs-2.6/vmlinux.o
+/mnt/trgt-3-no-reflink
+real    0m2.596s
+user    0m0.007s
+sys    0m0.860s
+
+
 
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Thanks,
+
+Steve
