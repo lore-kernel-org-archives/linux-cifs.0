@@ -1,90 +1,290 @@
-From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
-Subject: Re: Errors writing Large files to CIFS shares
-Date: Tue, 5 Nov 2013 14:25:33 -0500
-Message-ID: <20131105142533.2b9bd00e@tlielax.poochiereds.net>
-References: <mailman.1277.1383636787.1861.linux-cifs-client@lists.samba.org>
-	<CAHPMNWdLy7cfJdRGp=2-pUQqFO=PgUYT8E2_uW9koNdv1x_D_g@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] CIFS: Fix symbolic links usage
+Date: Tue, 5 Nov 2013 14:31:29 -0500
+Message-ID: <20131105143129.4b717507@tlielax.poochiereds.net>
+References: <1383314259-4694-1-git-send-email-piastryyy@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Neil Sikka <neilsikka-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, joaomiguelcorreia-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAHPMNWdLy7cfJdRGp=2-pUQqFO=PgUYT8E2_uW9koNdv1x_D_g-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1383314259-4694-1-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 5 Nov 2013 10:23:41 -0800
-Neil Sikka <neilsikka-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Fri,  1 Nov 2013 17:57:39 +0400
+Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-> Hello. I am running Debian 7.2, and I get errors writing "large"
-> (32.5KB) files to shares mounted via CIFS. Writing "small" files to
-> the remote share works. I am not sure if its relevant, but this share
-> is mounted over a slow pptp connection. Here are some of the details
-> of what I am running:
+> From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 > 
-> 3.2.0-4-amd64 #1 SMP Debian 3.2.51-1 x86_64 GNU/Linux
+> Now we treat any reparse point as a symbolic link and map it to a Unix
+> one that is not true in a common case due to many reparse point types
+> supported by SMB servers.
 > 
+> Distinguish reparse point types into two groups:
+> 1) that can be accessed directly through a reparse point
+> (junctions, deduplicated files, NFS symlinks);
+> 2) that need to be processed manually (Windows symbolic links, DFS);
+> 
+> and map only Windows symbolic links to Unix ones.
+> 
+> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+> ---
+>  fs/cifs/cifsglob.h  |    2 +-
+>  fs/cifs/inode.c     |   23 +++++++++++++----------
+>  fs/cifs/readdir.c   |   40 ++++++++--------------------------------
+>  fs/cifs/smb1ops.c   |   21 ++++++++++++++++++++-
+>  fs/cifs/smb2inode.c |   16 ++++++++++++----
+>  fs/cifs/smb2proto.h |    2 +-
+>  6 files changed, 55 insertions(+), 49 deletions(-)
+> 
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index a67cf12..b688f2b 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -261,7 +261,7 @@ struct smb_version_operations {
+>  	/* query path data from the server */
+>  	int (*query_path_info)(const unsigned int, struct cifs_tcon *,
+>  			       struct cifs_sb_info *, const char *,
+> -			       FILE_ALL_INFO *, bool *);
+> +			       FILE_ALL_INFO *, bool *, bool *);
+>  	/* query file data from the server */
+>  	int (*query_file_info)(const unsigned int, struct cifs_tcon *,
+>  			       struct cifs_fid *, FILE_ALL_INFO *);
+> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+> index 867b7cd..36f9ebb 100644
+> --- a/fs/cifs/inode.c
+> +++ b/fs/cifs/inode.c
+> @@ -542,7 +542,8 @@ static int cifs_sfu_mode(struct cifs_fattr *fattr, const unsigned char *path,
+>  /* Fill a cifs_fattr struct with info from FILE_ALL_INFO */
+>  static void
+>  cifs_all_info_to_fattr(struct cifs_fattr *fattr, FILE_ALL_INFO *info,
+> -		       struct cifs_sb_info *cifs_sb, bool adjust_tz)
+> +		       struct cifs_sb_info *cifs_sb, bool adjust_tz,
+> +		       bool symlink)
+>  {
+>  	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
+>  
+> @@ -569,7 +570,11 @@ cifs_all_info_to_fattr(struct cifs_fattr *fattr, FILE_ALL_INFO *info,
+>  	fattr->cf_createtime = le64_to_cpu(info->CreationTime);
+>  
+>  	fattr->cf_nlink = le32_to_cpu(info->NumberOfLinks);
+> -	if (fattr->cf_cifsattrs & ATTR_DIRECTORY) {
+> +
+> +	if (symlink) {
+> +		fattr->cf_mode = S_IFLNK;
+> +		fattr->cf_dtype = DT_LNK;
+> +	} else if (fattr->cf_cifsattrs & ATTR_DIRECTORY) {
+>  		fattr->cf_mode = S_IFDIR | cifs_sb->mnt_dir_mode;
+>  		fattr->cf_dtype = DT_DIR;
+>  		/*
+> @@ -578,10 +583,6 @@ cifs_all_info_to_fattr(struct cifs_fattr *fattr, FILE_ALL_INFO *info,
+>  		 */
+>  		if (!tcon->unix_ext)
+>  			fattr->cf_flags |= CIFS_FATTR_UNKNOWN_NLINK;
+> -	} else if (fattr->cf_cifsattrs & ATTR_REPARSE) {
+> -		fattr->cf_mode = S_IFLNK;
+> -		fattr->cf_dtype = DT_LNK;
+> -		fattr->cf_nlink = le32_to_cpu(info->NumberOfLinks);
+>  	} else {
+>  		fattr->cf_mode = S_IFREG | cifs_sb->mnt_file_mode;
+>  		fattr->cf_dtype = DT_REG;
+> @@ -626,7 +627,8 @@ cifs_get_file_info(struct file *filp)
+>  	rc = server->ops->query_file_info(xid, tcon, &cfile->fid, &find_data);
+>  	switch (rc) {
+>  	case 0:
+> -		cifs_all_info_to_fattr(&fattr, &find_data, cifs_sb, false);
+> +		cifs_all_info_to_fattr(&fattr, &find_data, cifs_sb, false,
+> +				       false);
+>  		break;
+>  	case -EREMOTE:
+>  		cifs_create_dfs_fattr(&fattr, inode->i_sb);
+> @@ -673,6 +675,7 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+>  	bool adjust_tz = false;
+>  	struct cifs_fattr fattr;
+>  	struct cifs_search_info *srchinf = NULL;
+> +	bool symlink = false;
+>  
+>  	tlink = cifs_sb_tlink(cifs_sb);
+>  	if (IS_ERR(tlink))
+> @@ -702,12 +705,12 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+>  		}
+>  		data = (FILE_ALL_INFO *)buf;
+>  		rc = server->ops->query_path_info(xid, tcon, cifs_sb, full_path,
+> -						  data, &adjust_tz);
+> +						  data, &adjust_tz, &symlink);
+>  	}
+>  
+>  	if (!rc) {
+> -		cifs_all_info_to_fattr(&fattr, (FILE_ALL_INFO *)data, cifs_sb,
+> -				       adjust_tz);
+> +		cifs_all_info_to_fattr(&fattr, data, cifs_sb, adjust_tz,
+> +				       symlink);
+>  	} else if (rc == -EREMOTE) {
+>  		cifs_create_dfs_fattr(&fattr, sb);
+>  		rc = 0;
+> diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+> index 53a75f3..5940eca 100644
+> --- a/fs/cifs/readdir.c
+> +++ b/fs/cifs/readdir.c
+> @@ -134,22 +134,6 @@ out:
+>  	dput(dentry);
+>  }
+>  
+> -/*
+> - * Is it possible that this directory might turn out to be a DFS referral
+> - * once we go to try and use it?
+> - */
+> -static bool
+> -cifs_dfs_is_possible(struct cifs_sb_info *cifs_sb)
+> -{
+> -#ifdef CONFIG_CIFS_DFS_UPCALL
+> -	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
+> -
+> -	if (tcon->Flags & SMB_SHARE_IS_IN_DFS)
+> -		return true;
+> -#endif
+> -	return false;
+> -}
+> -
+>  static void
+>  cifs_fill_common_info(struct cifs_fattr *fattr, struct cifs_sb_info *cifs_sb)
+>  {
+> @@ -159,27 +143,19 @@ cifs_fill_common_info(struct cifs_fattr *fattr, struct cifs_sb_info *cifs_sb)
+>  	if (fattr->cf_cifsattrs & ATTR_DIRECTORY) {
+>  		fattr->cf_mode = S_IFDIR | cifs_sb->mnt_dir_mode;
+>  		fattr->cf_dtype = DT_DIR;
+> -		/*
+> -		 * Windows CIFS servers generally make DFS referrals look
+> -		 * like directories in FIND_* responses with the reparse
+> -		 * attribute flag also set (since DFS junctions are
+> -		 * reparse points). We must revalidate at least these
+> -		 * directory inodes before trying to use them (if
+> -		 * they are DFS we will get PATH_NOT_COVERED back
+> -		 * when queried directly and can then try to connect
+> -		 * to the DFS target)
+> -		 */
+> -		if (cifs_dfs_is_possible(cifs_sb) &&
+> -		    (fattr->cf_cifsattrs & ATTR_REPARSE))
+> -			fattr->cf_flags |= CIFS_FATTR_NEED_REVAL;
+> -	} else if (fattr->cf_cifsattrs & ATTR_REPARSE) {
+> -		fattr->cf_mode = S_IFLNK;
+> -		fattr->cf_dtype = DT_LNK;
+>  	} else {
+>  		fattr->cf_mode = S_IFREG | cifs_sb->mnt_file_mode;
+>  		fattr->cf_dtype = DT_REG;
+>  	}
+>  
+> +	/*
+> +	 * We need to revalidate it further to make a decision about whether it
+> +	 * is a symbolic link, DFS referral or a reparse point with a direct
+> +	 * access like junctions, deduplicated files, NFS symlinks.
+> +	 */
+> +	if (fattr->cf_cifsattrs & ATTR_REPARSE)
+> +		fattr->cf_flags |= CIFS_FATTR_NEED_REVAL;
+> +
+>  	/* non-unix readdir doesn't provide nlink */
+>  	fattr->cf_flags |= CIFS_FATTR_UNKNOWN_NLINK;
+>  
+> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+> index ea99efe..47ab035 100644
+> --- a/fs/cifs/smb1ops.c
+> +++ b/fs/cifs/smb1ops.c
+> @@ -534,10 +534,12 @@ cifs_is_path_accessible(const unsigned int xid, struct cifs_tcon *tcon,
+>  static int
+>  cifs_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+>  		     struct cifs_sb_info *cifs_sb, const char *full_path,
+> -		     FILE_ALL_INFO *data, bool *adjustTZ)
+> +		     FILE_ALL_INFO *data, bool *adjustTZ, bool *symlink)
+>  {
+>  	int rc;
+>  
+> +	*symlink = false;
+> +
+>  	/* could do find first instead but this returns more info */
+>  	rc = CIFSSMBQPathInfo(xid, tcon, full_path, data, 0 /* not legacy */,
+>  			      cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
+> @@ -554,6 +556,23 @@ cifs_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+>  						CIFS_MOUNT_MAP_SPECIAL_CHR);
+>  		*adjustTZ = true;
+>  	}
+> +
+> +	if (!rc && (le32_to_cpu(data->Attributes) & ATTR_REPARSE)) {
+> +		int tmprc;
+> +		int oplock = 0;
+> +		__u16 netfid;
+> +
+> +		/* Need to check if this is a symbolic link or not */
+> +		tmprc = CIFSSMBOpen(xid, tcon, full_path, FILE_OPEN,
+> +				 FILE_READ_ATTRIBUTES, 0, &netfid, &oplock,
+> +				 NULL, cifs_sb->local_nls,
+> +			cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
+> +		if (tmprc == -EOPNOTSUPP)
+> +			*symlink = true;
+> +		else
+> +			CIFSSMBClose(xid, tcon, netfid);
+> +	}
+> +
+>  	return rc;
+>  }
+>  
+> diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+> index 78ff88c..84c012a 100644
+> --- a/fs/cifs/smb2inode.c
+> +++ b/fs/cifs/smb2inode.c
+> @@ -123,12 +123,13 @@ move_smb2_info_to_cifs(FILE_ALL_INFO *dst, struct smb2_file_all_info *src)
+>  int
+>  smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+>  		     struct cifs_sb_info *cifs_sb, const char *full_path,
+> -		     FILE_ALL_INFO *data, bool *adjust_tz)
+> +		     FILE_ALL_INFO *data, bool *adjust_tz, bool *symlink)
+>  {
+>  	int rc;
+>  	struct smb2_file_all_info *smb2_data;
+>  
+>  	*adjust_tz = false;
+> +	*symlink = false;
+>  
+>  	smb2_data = kzalloc(sizeof(struct smb2_file_all_info) + MAX_NAME * 2,
+>  			    GFP_KERNEL);
+> @@ -136,9 +137,16 @@ smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+>  		return -ENOMEM;
+>  
+>  	rc = smb2_open_op_close(xid, tcon, cifs_sb, full_path,
+> -				FILE_READ_ATTRIBUTES, FILE_OPEN,
+> -				OPEN_REPARSE_POINT, smb2_data,
+> -				SMB2_OP_QUERY_INFO);
+> +				FILE_READ_ATTRIBUTES, FILE_OPEN, 0,
+> +				smb2_data, SMB2_OP_QUERY_INFO);
+> +	if (rc == -EOPNOTSUPP) {
+> +		*symlink = true;
+> +		/* Failed on a symbolic link - query a reparse point info */
+> +		rc = smb2_open_op_close(xid, tcon, cifs_sb, full_path,
+> +					FILE_READ_ATTRIBUTES, FILE_OPEN,
+> +					OPEN_REPARSE_POINT, smb2_data,
+> +					SMB2_OP_QUERY_INFO);
+> +	}
+>  	if (rc)
+>  		goto out;
+>  
+> diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+> index 313813e..b4eea10 100644
+> --- a/fs/cifs/smb2proto.h
+> +++ b/fs/cifs/smb2proto.h
+> @@ -61,7 +61,7 @@ extern void move_smb2_info_to_cifs(FILE_ALL_INFO *dst,
+>  extern int smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+>  				struct cifs_sb_info *cifs_sb,
+>  				const char *full_path, FILE_ALL_INFO *data,
+> -				bool *adjust_tz);
+> +				bool *adjust_tz, bool *symlink);
+>  extern int smb2_set_path_size(const unsigned int xid, struct cifs_tcon *tcon,
+>  			      const char *full_path, __u64 size,
+>  			      struct cifs_sb_info *cifs_sb, bool set_alloc);
 
-3.2 is ancient history now ;)
 
-> The Kernel log contains the following data:
-> 
-> [ 2243.047442] CIFS VFS: Server <IP_REMOVED> has not responded in 300
-> seconds. Reconnecting...
-> [ 2263.693713] CIFS VFS: sends on sock ffff88020e477d40 stuck for 15 seconds
-> [ 2263.693721] CIFS VFS: Error -11 sending data on socket to server
+Looks reasonable for an interim fix I guess. I'm not thrilled with it
+since it doesn't help the code overall, but I guess we can live with it
+until we can clean up the API.
 
-Looks like you're losing connectivity to the server. I'd have a hard
-look at your network connectivity. Maybe sniff traffic and see if you
-can figure out what's happening on the wire.
-
-> [ 2279.434990] INFO: task cp:4807 blocked for more than 120 seconds.
-> [ 2279.434996] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-> disables this message.
-> [ 2279.435000] cp              D ffff88023fc93780     0  4807   4412 0x00000000
-> [ 2279.435009]  ffff8802336281c0 0000000000000086 ffff8802239067f0
-> ffff8802333a5650
-> [ 2279.435017]  0000000000013780 ffff880235ba7fd8 ffff880235ba7fd8
-> ffff8802336281c0
-> [ 2279.435025]  ffffffff810135d2 ffffffff81066245 ffff880233348d70
-> ffff88023fc93fd0
-> [ 2279.435033] Call Trace:
-> [ 2279.435045]  [<ffffffff810135d2>] ? read_tsc+0x5/0x14
-> [ 2279.435052]  [<ffffffff81066245>] ? timekeeping_get_ns+0xd/0x2a
-> [ 2279.435060]  [<ffffffff810b4afb>] ? lock_page+0x20/0x20
-> [ 2279.435067]  [<ffffffff8134e141>] ? io_schedule+0x59/0x71
-> [ 2279.435073]  [<ffffffff810b4b01>] ? sleep_on_page+0x6/0xa
-> [ 2279.435078]  [<ffffffff8134e584>] ? __wait_on_bit+0x3e/0x71
-> [ 2279.435085]  [<ffffffff810b4c3d>] ? wait_on_page_bit+0x6e/0x73
-> [ 2279.435093]  [<ffffffff8105fcad>] ? autoremove_wake_function+0x2a/0x2a
-> [ 2279.435100]  [<ffffffff810b4d15>] ? filemap_fdatawait_range+0x74/0x139
-> [ 2279.435108]  [<ffffffff810b64c9>] ? filemap_write_and_wait+0x24/0x30
-> [ 2279.435124]  [<ffffffffa063d3ce>] ? cifs_flush+0x20/0x50 [cifs]
-> [ 2279.435132]  [<ffffffff810f922d>] ? filp_close+0x3b/0x6a
-> [ 2279.435137]  [<ffffffff810f92ea>] ? sys_close+0x8e/0xcb
-> [ 2279.435143]  [<ffffffff81354212>] ? system_call_fastpath+0x16/0x1b
-> [ 2294.192963] CIFS VFS: sends on sock ffff88020e477d40 stuck for 15 seconds
-> [ 2294.192971] CIFS VFS: Error -11 sending data on socket to server
-> 
-> I mounted the CIFS share using the following command:
-> mount -t cifs //<IP_REMOVED>/share /mnt/net2/ -o username=<USERNAME_REMOVED>
-> 
-> I see many other people had this problem in the past (almost 4 years
-> ago). A similar description can be found here:
-> 
-> https://bugzilla.redhat.com/show_bug.cgi?id=522867
-> 
-> That bug was marked as WONTFIX
-> 
-> Was there ever a workaround or resolution for this bug? I am obviously
-> not running software from 2009 (like in that bugzilla post), so I
-> would have thought this would have been resolved. Could this bug be a
-> regression?
-> 
-> Thanks.
-> 
-
-
--- 
-Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
