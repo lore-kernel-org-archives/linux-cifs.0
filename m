@@ -1,165 +1,74 @@
-From: "ISHIKAWA,chiaki" <ishikawa-FORCTJUUkgPbmG5+kqVDhQ@public.gmane.org>
-Subject: Re: A suggestion for error value, and question regarding EINTR for
- user-space system calls.
-Date: Fri, 08 Nov 2013 02:11:37 +0900
-Message-ID: <527BC9C9.5080502@yk.rim.or.jp>
-References: <527BAFC6.5010600@yk.rim.or.jp> <20131107110353.6d203196@tlielax.poochiereds.net> <CAH2r5mtuM6e7BpHk06sM9rzOxfcRgdkmw0vuQhJfYsrJkfrEdA@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [GIT] CIFS Fixes
+Date: Thu, 7 Nov 2013 13:37:41 -0600
+Message-ID: <CAH2r5ms4VkAK5-Lof6d8gfMeQMhdAZBADCLKCNZHwxGb2Vy_eQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mtuM6e7BpHk06sM9rzOxfcRgdkmw0vuQhJfYsrJkfrEdA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Dear Jeff and Steve,
+Includes a couple of fixes, plus changes to make multiplex identifiers
+easier to read and correlate with network traces, and a set of
+enhancements for SMB3 dialect.  Also adds support for per-file
+compression for both cifs and smb2/smb3 ("chattr +c filename").
 
-Thank you for your attention.
+Should have at least one other merge request ready by next week with
+some new SMB3 security features and copy offload support.
 
-So maybe someone can produce a one line fix for changing ENOMEM to 
-EREMOTEIO when the server complained about the particular ? (yes I 
-prefer EREMOTEIO over EIO because, in this case, remote server is 
-complaining.).
+The following changes since commit 959f58544b7f20c92d5eb43d1232c96c15c01bfb:
 
-I have not downloaded the latest linux kernel source on my computer yet.
+  Linux 3.12-rc7 (2013-10-27 16:12:03 -0700)
 
-I will follow up on my EINTR issue in detail in a separate posting 
-tomorrow.
-It is a long and winding story.
-Basically, I am trying to see whether I should re-try 
-read()/write()/close() in the case of CIFS-share error.
-If, during transient network error, read/write/close may return EINTR,
-I can code a routine to retry these based on errno==EINTR.
-(Oh wait, doe stat, stat64, etc. may also return EINTR? I will follow-up 
-why I am investing this, and the recent hung problem of CIFS during 
-testing. My using Win7 as CIFS-share server is not very good, I know.)
+are available in the git repository at:
 
-TIA
+  git://git.samba.org/sfrench/cifs-2.6.git for-linus
 
+for you to fetch changes up to c481e9feee78c6ce1ba0a1c8c892049f6514f6cf:
 
-(2013/11/08 1:12), Steve French wrote:
-> Your argument for mapping ENOMEM (returned from the server) to an
-> error which indicates server problems (EIO? or better EREMOTEIO?)
-> seems reasonable.
->
-> On Thu, Nov 7, 2013 at 10:03 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->> On Fri, 08 Nov 2013 00:20:38 +0900
->> "ISHIKAWA,chiaki" <ishikawa-FORCTJUUkgPbmG5+kqVDhQ@public.gmane.org> wrote:
->>
->>> I am a newcomer to linux-cifs.
->>>
->>> Thank you for offering the great software package, which has improved
->>> greatly over the last few years.
->>>
->>> I have a suggestion and a question.
->>>
->>> 1. Suggestion: Change the return value ENOMEM -> EREMOTEIO for an error
->>> scenario.
->>>
->>> There was a discussion to changeerror code returned to user-level system
->>> calls when the remote server providing CIFS-share
->>> failing due to the allocation failure of non-paged resources, especially
->>> Windows 7:
->>>
->>> Currently the returned errno value is ENOMEM.
->>>
->>> See the discussion here, for example;
->>> http://thread.gmane.org/gmane.linux.kernel.cifs/4281
->>>
->>> especially the following one:
->>> http://article.gmane.org/gmane.linux.kernel.cifs/4303
->>>
->>> The suggestion there was to change this value to EREMOTEIO.
->>>
->>> I wonder what came out of the discussion.
->>> CIFS client in linux kernel still seems to return ENOMEM instead of
->>> EREMOTEIO.
->>>
->>> I will go for EREMOTEIO change any time.
->>>
->>> ENOMEM suggests to me that there is a LOCAL resource shortage,
->>> and it is difficult to gauge that system is telling us that there is
->>> something missing in the remote end.
->>>
->>> EREMOTEIO is much better in this regard, I think.
->>>
->>> I wasted looking at local log files and dmesg output before
->>> I got wiser and checked the remote Windows 7 system log when I saw
->>> "Cannot allocate memory." message.
->>>
->>> By the way, EREMOTEIO is not defined in POSIX.
->>> Under linux it is defined as
->>> #define       EREMOTEIO       121     /* Remote I/O error */
->>>
->>> (at least in my copy of
->>> Linux vm-debian-amd64 3.10-3-amd64 #1 SMP Debian 3.10.11-1 (2013-09-10)
->>> x86_64 GNU/Linux )
->>>
->>> Since linux-cifs is for linux obviously, I think it is OK to return
->>> EREMOTEIO without bothering the conformance to POSIX here.
->>>
->>> Decreasing the chance of user confusion when they see the message of
->>> "Cannot allocate memory" printed as the error message when mount fails
->>> due to ENOMEM being returned for this error
->>> on the remote side of the connection is more important IMHO.
->>>
->>
->> Agreed. It's terribly confusing. Steve (the maintainer) seemed to be
->> skeptical about the change, so I never actually proposed a patch. Feel
->> free to do so, or I may do it when I get some time.
->>
->>> 2. Question:  Can read()/write()/close() against CIFS-share return EINTR
->>> in errno?
->>>
->>> This may involve a few assumptions regarding the
->>>   - mount parameter: soft (default) vs hard
->>>   - program's signal setting
->>>
->>> Assuming that mount parameter is soft (default),
->>> can read/write/close end up returning EINTR in errno?
->>>
->>> I have seen EHOSTDOWN stored in errno by failing read() when I simulated
->>> network error by disabling network card of a VM in which a copy of
->>> linux runs and when it was mounting a host Windows7 CIFS-share.
->>> (close() returned -1, too. But I forgot to record the errno value then.)
->>>
->>> My question is whether linux CIFS client can return EINTR  in errno by
->>> interrupted read/write/close, and if so, I think I should retry
->>> these system calls up to a certain amount of time (so that the failure
->>> will not block the program forever...)
->>> Currently, there is no clear documentation about the error code returned
->>> to the user-level system calls, and so I am asking the mailing list.
->>>
->>>
->>
->> It's not clear to me what you're asking here. EINTR implies that the
->> process was signaled.
->>
->> Processes stuck in cifs code should generally respond well to SIGKILL
->> since we do put them to sleep in such a way that they respond to that
->> signal. Handling other signals in data-integrity codepaths is quite
->> tricky.
->>
->>>
->>> Thank you, whoever those would be, again for the improved CIFS
->>> package. After I gave up on using CIFS under linux due to its very
->>> slow speed against office server, I was quite pleasantly surprised
->>> with the transfer speed this week when I tried it for the first time
->>> in a few years. (If only my windows7 server didn't hiccup due to the
->>> well known issue.)
->>>
->>
->> Glad it's working well for you.
->>
->> --
->> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
+  Query network adapter info at mount time for debugging (2013-11-02
+12:53:45 -0500)
+
+----------------------------------------------------------------
+Shirish Pargaonkar (1):
+      cifs: Send a logoff request before removing a smb session
+
+Steve French (6):
+      Fix corrupt SMB2 ioctl requests
+      Allow setting per-file compression via SMB2/3
+      Query file system attributes from server on SMB2, not just cifs, mounts
+      Allow setting per-file compression via CIFS protocol
+      Fix unused variable warning when CIFS POSIX disabled
+      Query network adapter info at mount time for debugging
+
+Steven French (2):
+      Query device characteristics at mount time from server on SMB2/3
+not just on cifs mounts
+      Query File System Alignment
+
+Tim Gardner (2):
+      cifs: Remove redundant multiplex identifier check from check_smb_hdr()
+      cifs: Make big endian multiplex ID sequences monotonic on the wire
+
+ fs/cifs/cifsglob.h      |  29 +++++++++++-
+ fs/cifs/cifspdu.h       |  34 +++++++++++++-
+ fs/cifs/cifsproto.h     |   2 +
+ fs/cifs/cifssmb.c       |  54 +++++++++++++++++++++++
+ fs/cifs/connect.c       |  25 ++++++++---
+ fs/cifs/ioctl.c         |  57 ++++++++++++++++--------
+ fs/cifs/misc.c          |  22 ++++-----
+ fs/cifs/smb1ops.c       |  12 ++++-
+ fs/cifs/smb2ops.c       | 114 +++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2pdu.c       | 115 +++++++++++++++++++++++++++++++++++++++++++++---
+ fs/cifs/smb2pdu.h       |  28 ++++++++++--
+ fs/cifs/smb2proto.h     |   4 ++
+ fs/cifs/smb2transport.c |  12 +++--
+ fs/cifs/transport.c     |  13 ++++--
+ 14 files changed, 464 insertions(+), 57 deletions(-)
+
+-- 
+Thanks,
+
+Steve
