@@ -1,583 +1,272 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: "ISHIKAWA,chiaki" <ishikawa-FORCTJUUkgPbmG5+kqVDhQ@public.gmane.org>
 Subject: Re: Hung CIFS driver
-Date: Sun, 10 Nov 2013 07:04:12 -0500
-Message-ID: <20131110070412.0c685682@tlielax.poochiereds.net>
-References: <527BAFC6.5010600@yk.rim.or.jp>
-	<20131107110353.6d203196@tlielax.poochiereds.net>
-	<CAH2r5mtuM6e7BpHk06sM9rzOxfcRgdkmw0vuQhJfYsrJkfrEdA@mail.gmail.com>
-	<527BC9C9.5080502@yk.rim.or.jp>
-	<527D1ABD.3080404@yk.rim.or.jp>
-	<527D2255.1070709@yk.rim.or.jp>
-	<20131109065826.481ff52c@tlielax.poochiereds.net>
-	<527F0E21.603@yk.rim.or.jp>
+Date: Sun, 10 Nov 2013 21:12:09 +0900
+Message-ID: <527F7819.2000208@yk.rim.or.jp>
+References: <527BAFC6.5010600@yk.rim.or.jp> <20131107110353.6d203196@tlielax.poochiereds.net> <CAH2r5mtuM6e7BpHk06sM9rzOxfcRgdkmw0vuQhJfYsrJkfrEdA@mail.gmail.com> <527BC9C9.5080502@yk.rim.or.jp> <527D1ABD.3080404@yk.rim.or.jp> <527D2255.1070709@yk.rim.or.jp> <20131109065826.481ff52c@tlielax.poochiereds.net> <527F0E21.603@yk.rim.or.jp> <527F1E5A.9090900@yk.rim.or.jp>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: "ISHIKAWA,chiaki" <ishikawa-FORCTJUUkgPbmG5+kqVDhQ@public.gmane.org>
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <527F0E21.603-FORCTJUUkgPbmG5+kqVDhQ@public.gmane.org>
+In-Reply-To: <527F1E5A.9090900-FORCTJUUkgPbmG5+kqVDhQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 10 Nov 2013 13:40:01 +0900
-"ISHIKAWA,chiaki" <ishikawa-FORCTJUUkgPbmG5+kqVDhQ@public.gmane.org> wrote:
+(2013/11/10 14:49), ISHIKAWA,chiaki wrote:
+> (2013/11/10 13:40), ISHIKAWA,chiaki wrote:
+>> (2013/11/09 20:58), Jeff Layton wrote:
+>>> On Sat, 09 Nov 2013 02:41:41 +0900
+>>> "ISHIKAWA,chiaki" <ishikawa-FORCTJUUkgPbmG5+kqVDhQ@public.gmane.org> wrote:
+>>>
+>>>> I am keeping this linux running in this manner and so
+>>>> let me know if you need some runtime information which can be
+>>>> gleaned by
+>>>> some means (like system trace, etc.). Please advise how to obtain the
+>>>> information in that case (the particular command to obtain the desired
+>>>> value will be useful.)
+>>>>
+>>>
+>>> I think what's missing here is some information about what's actually
+>>> happening on the network when you try to recontact the server.
+>>>
+>>> When you bring the interface back up, does the client ever send a SYN
+>>> back to the server? If so, does the server respond?
+>>>
+>>
+>> OK, here is my TODO list:
+>> I will try to capture the packet using WireShark on the side of Win7
+>> host.
+>>
+>
+> Sorry, this has to wait. I am not sure what I should do to open a TCP
+> conenction. Should I try to mount a different CIFS-share to the WIN7
+> host and close the connection or should I open a different TCP
+> connection using a different connection? I think the latter
+> is better since it would not disturb the CIFS driver status.
 
-> (2013/11/09 20:58), Jeff Layton wrote:
-> > On Sat, 09 Nov 2013 02:41:41 +0900
-> > "ISHIKAWA,chiaki" <ishikawa-FORCTJUUkgPbmG5+kqVDhQ@public.gmane.org> wrote:
-> >
-> >> (2013/11/09 2:09), ISHIKAWA,chiaki wrote:
-> >>>
-> >>> In my next e-mail, I will report that
-> >>> under Debian GNU/Linux 64bits, the CIFS driver
-> >>> (uname -r shows 3.10-3-amd64)
-> >>> can get hung, after a network error simulation by disabling
-> >>> network interface and enabling again.
-> >>> CIFS connection is reset, but a process gets stuck in I/O state
-> >>> ("D" in ps output), and cannot be killed.
-> >>>
-> >>
-> >> System: Debian GNU/Linux 64-bits running in a VMPlayer hosted on Win7.
-> >>
-> >> Remote host: Win7 (the host)
-> >>
-> >> Test: CIFS-share is mounted
-> >>
-> >> mount.cifs //192.168.0.112/L-temp /tmp/L-temp/ -o username=myid,noperm
-> >>
-> >> and under that mounted directory, the following test is performed.
-> >>
-> >> /tmp/L-temp is where CIFS-share is mounted.
-> >>
-> >> TEST SCRIPT:
-> >> Below,
-> >> |cp-test| is a program that copies bytes from a file to the other using
-> >> read/write system calls. (I can post a source on request.)
-> >>
-> >> The test script is this:
-> >>
-> >> # big-file is a 26+MiB file.
-> >> TDIR=/tmp/L-temp   # changed to suit the system layout.
-> >> while true
-> >> do
-> >> 	# t1=`create a temporary file name`
-> >> 	t1=`mktemp $TDIR/1111XXXX`
-> >> 	t2=`mktemp $TDIR/2222XXXX`
-> >> 	t3=`mktemp $TDIR/3333XXXX`
-> >>
-> >> 	# big-file is a 26+MiB file.
-> >> 	./cp-test big-file ${t1}
-> >> 	sleep 2
-> >> 	./cp-test ${t1} ${t2}
-> >> 	sleep 2
-> >> 	./cp-test ${t2} ${t3}
-> >> 	sleep 4
-> >> 	rm -f ${t1} ${t2} ${t3}
-> >> 	sleep 2
-> >> done
-> >>
-> >> The other side: CIFS share is on Windows 7.
-> >> I tried the remedies discussed in
-> >> https://wiki.archlinux.org/index.php/Samba/Troubleshooting
-> >> and in a few other places
-> >> to remedy the error ("cannot allocate memory" due to non-paged resource
-> >> allocation failure on Win7, and subsequent mount failure on linux side.
-> >>
-> >> Symptom: after a few tests of network failures simulated by
-> >> disabling and enabling network interface of the VMPlayer,
-> >> I noticed an incarnation of the program ./cp-test got stuck
-> >> in "D" state, and could not be interrupted (^C) at all.
-> >> I mounted CIFS-share with default option and so "soft" should be in effect.
-> >>
-> >> Since this happened already after a few tests were performed,
-> >> I cannot exclude the possibility of screwed up Windows7 host, but even
-> >> after a full day,
-> >> I still cannot run "ls -lR" without getting the it hung (I cannot
-> >> interrupt it with
-> >> ^C).
-> >>
-> >> On the remote side, in Win7 system log, I see about the time the problem
-> >> started
-> >> (24 hours ago or so) that windows was complaining that
-> >>
-> >> The system could not allocate 983 work items in 60 seconds
-> >> The system could not allocate 983 work items in 60 seconds
-> >>    etc.
-> >> (my translation : I am using Japanese windows and so not sure what
-> >> the English windows would show.)
-> >>
-> >> Now after 24 hours, I don't see it any more even when local "ls -lR"
-> >> gets hung. I just tested.
-> >> So it now becomes pure local issue. The driver gets hung somewhere
-> >> without accessing the
-> >> remote server at all. (Right, I see not much network traffic.)
-> >>
-> >> Here is the dmesg output : I only copied the last part of the output
-> >> and threw away unrelated messages (unrelated, I hope).
-> >>
-> >> [133221.834132] FS-Cache: Netfs 'cifs' registered for caching
-> >> [133221.834292] Key type cifs.spnego registered
-> >> [133221.834322] Key type cifs.idmap registered
-> >> [133221.966838] Status code returned 0xc000006d NT_STATUS_LOGON_FAILURE
-> >> [133221.966846] CIFS VFS: Send error in SessSetup = -13
-> >> [133221.967211] CIFS VFS: cifs_mount failed w/return code = -13
-> >> [133331.808616] CIFS VFS: Error -104 sending data on socket to server
-> >> [133331.808644] CIFS VFS: Error -32 sending data on socket to server
-> >>
-> >> 		[ lots of same messages (-32)...]
-> >>
-> >> [133331.809348] CIFS VFS: Error -32 sending data on socket to server
-> >>
-> >> 		**** Here I simulated the network error again ****
-> >>
-> >
-> > $ grep 32 /usr/include/asm-generic/errno-base.h
-> > #define	EPIPE		32	/* Broken pipe */
-> >
-> > ...this comes from the socket layer.
-> >
-> 
-> I see.
-> 
-> >> [133566.580607] e1000: eth0 NIC Link is Down
-> >> [133566.580722] e1000 0000:02:01.0 eth0: Reset adapter
-> >> [133604.856771] e1000: eth0 NIC Link is Up 1000 Mbps Full Duplex, Flow
-> >> Control: None
-> >>
-> >>                   **** Somehow CIFS in this version of linux seems to respond
-> >> 		     only after 120 seconds timeout. I thought there was 15 seconds
-> >> 		     timeout. ****
-> >>
-> >> [133690.810481] CIFS VFS: Server 192.168.0.112 has not responded in 120
-> >> seconds. Reconnecting...
-> >
-> > The cifs code attempts to send a SMB echo command (sort of like a ping
-> > at the SMB layer) to the server every 60s. If the server doesn't
-> > respond to two of them, the connection is reestablished.
-> >
-> >> [133929.781446] e1000: eth0 NIC Link is Down
-> >> [133929.781621] e1000 0000:02:01.0 eth0: Reset adapter
-> >> [133957.933636] e1000: eth0 NIC Link is Up 1000 Mbps Full Duplex, Flow
-> >> Control: None
-> >> [134054.949640] CIFS VFS: Server 192.168.0.112 has not responded in 120
-> >> seconds. Reconnecting...
-> >>
-> >> 		**** Obviously a read/write routine gets stuck more than 120 seconds.
-> >> 		     CIFS is being remounted after 120 seconds, but remount took more
-> >> 		     than a few seconds, I guess. So 120+ seconds hung for the
-> >> 		     stucked task/process ****
-> >>
-> >
-> > It depends on what you mean by "routine" here. A read or write system
-> > call may mean more than one SMB being transmitted on the wire. But it
-> > really looks like you're having communications problems with the server.
-> 
-> So a communicatin layer problem may have caused the SMB/CIFS layer to 
-> get stuck (?)
-> >
-> >> [134251.478654] INFO: task kworker/0:166:17092 blocked for more than 120
-> >> seconds.
-> >> [134251.478659] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-> >> disables this message.
-> >> [134251.478661] kworker/0:166   D ffff88028b613f40     0 17092      2
-> >> 0x00000000
-> >> [134251.478694] Workqueue: cifsiod cifs_oplock_break [cifs]
-> >> [134251.478697]  ffff8800a3c54100 0000000000000046 ffffffff81613400
-> >> 0000000000013f40
-> >> [134251.478703]  ffff88005e8a1fd8 ffff88005e8a1fd8 ffff8800a3c54100
-> >> ffff88028b613f40
-> >> [134251.478706]  ffff8800a3c54100 ffff88005e8a1d28 ffffffff810c051f
-> >> 0000000000000002
-> >> [134251.478709] Call Trace:
-> >> [134251.478781]  [<ffffffff810c051f>] ? __lock_page+0x61/0x61
-> >> [134251.478820]  [<ffffffff813858be>] ? io_schedule+0x54/0x69
-> >> [134251.478824]  [<ffffffff810c0524>] ? sleep_on_page+0x5/0x8
-> >> [134251.478827]  [<ffffffff813846dd>] ? __wait_on_bit+0x3b/0x6e
-> >> [134251.478829]  [<ffffffff810c05ce>] ? wait_on_page_bit+0x69/0x6e
-> >> [134251.478851]  [<ffffffff81057ca7>] ? autoremove_wake_function+0x2a/0x2a
-> >> [134251.478854]  [<ffffffff810c0c7b>] ? filemap_fdatawait_range+0x65/0xfa
-> >> [134251.478860]  [<ffffffffa04dec18>] ? cifs_oplock_break+0xd5/0x21d [cifs]
-> >> [134251.478865]  [<ffffffff8105f74a>] ? finish_task_switch+0x81/0xaa
-> >> [134251.478871]  [<ffffffff81052a71>] ? process_one_work+0x18b/0x28c
-> >> [134251.478873]  [<ffffffff81052f1b>] ? worker_thread+0x121/0x1e7
-> >> [134251.478876]  [<ffffffff81052dfa>] ? rescuer_thread+0x265/0x265
-> >> [134251.478878]  [<ffffffff81057325>] ? kthread+0x7d/0x85
-> >> [134251.478881]  [<ffffffff810572a8>] ? __kthread_parkme+0x59/0x59
-> >> [134251.478885]  [<ffffffff8138b47c>] ? ret_from_fork+0x7c/0xb0
-> >> [134251.478887]  [<ffffffff810572a8>] ? __kthread_parkme+0x59/0x59
-> >> [134251.478895] INFO: task pool:17993 blocked for more than 120 seconds.
-> >> [134251.478897] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-> >> disables this message.
-> >> [134251.478898] pool            D ffff88028b613f40     0 17993   5142
-> >> 0x00000000
-> >> [134251.478901]  ffff88027cbe6780 0000000000000082 ffffffff81613400
-> >> 0000000000013f40
-> >> [134251.478904]  ffff880221259fd8 ffff880221259fd8 ffff88027cbe6780
-> >> ffff88028b613f40
-> >> [134251.478906]  ffff88027cbe6780 ffff880221259bc0 ffffffff810c051f
-> >> 0000000000000002
-> >> [134251.478909] Call Trace:
-> >> [134251.478911]  [<ffffffff810c051f>] ? __lock_page+0x61/0x61
-> >> [134251.478914]  [<ffffffff813858be>] ? io_schedule+0x54/0x69
-> >> [134251.478916]  [<ffffffff810c0524>] ? sleep_on_page+0x5/0x8
-> >> [134251.478918]  [<ffffffff813846dd>] ? __wait_on_bit+0x3b/0x6e
-> >> [134251.478920]  [<ffffffff810c05ce>] ? wait_on_page_bit+0x69/0x6e
-> >> [134251.478922]  [<ffffffff81057ca7>] ? autoremove_wake_function+0x2a/0x2a
-> >> [134251.478987]  [<ffffffff810cb14b>] ?
-> >> invalidate_inode_pages2_range+0x94/0x226
-> >> [134251.478995]  [<ffffffffa04e64af>] ?
-> >> cifs_invalidate_mapping+0x22/0x51 [cifs]
-> >> [134251.479000]  [<ffffffffa04dce7a>] ? cifs_d_revalidate+0x17/0x88 [cifs]
-> >> [134251.479022]  [<ffffffff81111ad0>] ? lookup_fast+0x17f/0x213
-> >> [134251.479026]  [<ffffffff81111d7b>] ? walk_component+0x33/0x1a2
-> >> [134251.479029]  [<ffffffff81112b39>] ? path_lookupat+0x8e/0x293
-> >> [134251.479034]  [<ffffffff810fa52e>] ? kmem_cache_alloc+0x8c/0xfd
-> >> [134251.479037]  [<ffffffff81112d5d>] ? filename_lookup+0x1f/0x73
-> >> [134251.479054]  [<ffffffff81114efe>] ? user_path_at_empty+0x6f/0xa6
-> >> [134251.479064]  [<ffffffff8107c8f5>] ? do_futex+0xd1/0x7b5
-> >> [134251.479066]  [<ffffffff8110d1f7>] ? vfs_fstatat+0x3e/0x8b
-> >> [134251.479069]  [<ffffffff8110d4bd>] ? SYSC_newlstat+0x10/0x29
-> >> [134251.479072]  [<ffffffff8138b529>] ? system_call_fastpath+0x16/0x1b
-> >> [134251.479074] INFO: task pool:18378 blocked for more than 120 seconds.
-> >> [134251.479076] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-> >> disables this message.
-> >> [134251.479077] pool            D ffff88028b633f40     0 18378   5142
-> >> 0x00000000
-> >> [134251.479079]  ffff88010cc2c840 0000000000000082 ffff880281179780
-> >> 0000000000013f40
-> >> [134251.479082]  ffff88024678bfd8 ffff88024678bfd8 ffff88010cc2c840
-> >> ffff88028b633f40
-> >> [134251.479084]  ffff88010cc2c840 ffff88024678bbc0 0000000000000002
-> >> ffffffff810c051f
-> >> [134251.479087] Call Trace:
-> >> [134251.479089]  [<ffffffff810c051f>] ? __lock_page+0x61/0x61
-> >> [134251.479092]  [<ffffffff813858be>] ? io_schedule+0x54/0x69
-> >> [134251.479094]  [<ffffffff810c0524>] ? sleep_on_page+0x5/0x8
-> >> [134251.479096]  [<ffffffff813847c0>] ? __wait_on_bit_lock+0x3a/0x7e
-> >> [134251.479098]  [<ffffffff810c051a>] ? __lock_page+0x5c/0x61
-> >> [134251.479101]  [<ffffffff81057ca7>] ? autoremove_wake_function+0x2a/0x2a
-> >> [134251.479105]  [<ffffffff810cb121>] ?
-> >> invalidate_inode_pages2_range+0x6a/0x226
-> >> [134251.479111]  [<ffffffffa04e64af>] ?
-> >> cifs_invalidate_mapping+0x22/0x51 [cifs]
-> >> [134251.479116]  [<ffffffffa04dce7a>] ? cifs_d_revalidate+0x17/0x88 [cifs]
-> >> [134251.479119]  [<ffffffff81111ad0>] ? lookup_fast+0x17f/0x213
-> >> [134251.479122]  [<ffffffff81111d7b>] ? walk_component+0x33/0x1a2
-> >> [134251.479125]  [<ffffffff81112b39>] ? path_lookupat+0x8e/0x293
-> >> [134251.479128]  [<ffffffff810fa52e>] ? kmem_cache_alloc+0x8c/0xfd
-> >> [134251.479131]  [<ffffffff81112d5d>] ? filename_lookup+0x1f/0x73
-> >> [134251.479133]  [<ffffffff81114efe>] ? user_path_at_empty+0x6f/0xa6
-> >> [134251.479136]  [<ffffffff810f9498>] ? ____cache_alloc+0x1d3/0x290
-> >> [134251.479138]  [<ffffffff8110d1f7>] ? vfs_fstatat+0x3e/0x8b
-> >> [134251.479141]  [<ffffffff8109fb12>] ? __call_rcu.constprop.51+0xc2/0x1c6
-> >> [134251.479143]  [<ffffffff8110d4bd>] ? SYSC_newlstat+0x10/0x29
-> >> [134251.479147]  [<ffffffff8104f3f1>] ? SyS_prctl+0x104/0x32f
-> >> [134251.479149]  [<ffffffff8138b529>] ? system_call_fastpath+0x16/0x1b
-> >> [134251.479151] INFO: task pool:18384 blocked for more than 120 seconds.
-> >> [134251.479153] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-> >> disables this message.
-> >> [134251.479154] pool            D ffff88028b613f40     0 18384   5142
-> >> 0x00000000
-> >> [134251.479156]  ffff88027c9c8800 0000000000000082 ffffffff81613400
-> >> 0000000000013f40
-> >> [134251.479159]  ffff88024267dfd8 ffff88024267dfd8 ffff88027c9c8800
-> >> ffff88028b613f40
-> >> [134251.479161]  ffff88027c9c8800 ffff88024267dbc0 0000000000000002
-> >> ffffffff810c051f
-> >> [134251.479163] Call Trace:
-> >> [134251.479166]  [<ffffffff810c051f>] ? __lock_page+0x61/0x61
-> >> [134251.479168]  [<ffffffff813858be>] ? io_schedule+0x54/0x69
-> >> [134251.479170]  [<ffffffff810c0524>] ? sleep_on_page+0x5/0x8
-> >> [134251.479172]  [<ffffffff813847c0>] ? __wait_on_bit_lock+0x3a/0x7e
-> >> [134251.479174]  [<ffffffff810c051a>] ? __lock_page+0x5c/0x61
-> >> [134251.479177]  [<ffffffff81057ca7>] ? autoremove_wake_function+0x2a/0x2a
-> >> [134251.479179]  [<ffffffff810cb121>] ?
-> >> invalidate_inode_pages2_range+0x6a/0x226
-> >> [134251.479184]  [<ffffffffa04e64af>] ?
-> >> cifs_invalidate_mapping+0x22/0x51 [cifs]
-> >> [134251.479189]  [<ffffffffa04dce7a>] ? cifs_d_revalidate+0x17/0x88 [cifs]
-> >> [134251.479192]  [<ffffffff81111ad0>] ? lookup_fast+0x17f/0x213
-> >> [134251.479195]  [<ffffffff81111d7b>] ? walk_component+0x33/0x1a2
-> >> [134251.479197]  [<ffffffff81112b39>] ? path_lookupat+0x8e/0x293
-> >> [134251.479200]  [<ffffffff810fa52e>] ? kmem_cache_alloc+0x8c/0xfd
-> >> [134251.479203]  [<ffffffff81112d5d>] ? filename_lookup+0x1f/0x73
-> >> [134251.479205]  [<ffffffff81114efe>] ? user_path_at_empty+0x6f/0xa6
-> >> [134251.479208]  [<ffffffff8105f5ff>] ? __wake_up_sync_key+0x3d/0x55
-> >> [134251.479211]  [<ffffffff810fa52e>] ? kmem_cache_alloc+0x8c/0xfd
-> >> [134251.479213]  [<ffffffff8110d1f7>] ? vfs_fstatat+0x3e/0x8b
-> >> [134251.479215]  [<ffffffff8109fb12>] ? __call_rcu.constprop.51+0xc2/0x1c6
-> >> [134251.479217]  [<ffffffff8110d4bd>] ? SYSC_newlstat+0x10/0x29
-> >> [134251.479220]  [<ffffffff8104f3f1>] ? SyS_prctl+0x104/0x32f
-> >> [134251.479223]  [<ffffffff8138b529>] ? system_call_fastpath+0x16/0x1b
-> >> [134251.479225] INFO: task pool:18385 blocked for more than 120 seconds.
-> >> [134251.479226] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-> >> disables this message.
-> >> [134251.479227] pool            D ffff88028b613f40     0 18385   5142
-> >> 0x00000000
-> >> [134251.479229]  ffff8802427e9080 0000000000000082 ffffffff81613400
-> >> 0000000000013f40
-> >> [134251.479232]  ffff88024674ffd8 ffff88024674ffd8 ffff8802427e9080
-> >> ffff88028b613f40
-> >> [134251.479234]  ffff8802427e9080 ffff88024674fda8 ffffffff810c051f
-> >> 0000000000000002
-> >> [134251.479236] Call Trace:
-> >> [134251.479239]  [<ffffffff810c051f>] ? __lock_page+0x61/0x61
-> >> [134251.479241]  [<ffffffff813858be>] ? io_schedule+0x54/0x69
-> >> [134251.479243]  [<ffffffff810c0524>] ? sleep_on_page+0x5/0x8
-> >> [134251.479245]  [<ffffffff813846dd>] ? __wait_on_bit+0x3b/0x6e
-> >> [134251.479247]  [<ffffffff810c05ce>] ? wait_on_page_bit+0x69/0x6e
-> >> [134251.479250]  [<ffffffff81057ca7>] ? autoremove_wake_function+0x2a/0x2a
-> >> [134251.479252]  [<ffffffff810c0c7b>] ? filemap_fdatawait_range+0x65/0xfa
-> >> [134251.479259]  [<ffffffffa04e6706>] ? cifs_getattr+0x45/0xe6 [cifs]
-> >> [134251.479262]  [<ffffffff8110d208>] ? vfs_fstatat+0x4f/0x8b
-> >> [134251.479264]  [<ffffffff8110d4bd>] ? SYSC_newlstat+0x10/0x29
-> >> [134251.479267]  [<ffffffff8104f3f1>] ? SyS_prctl+0x104/0x32f
-> >> [134251.479270]  [<ffffffff8138b529>] ? system_call_fastpath+0x16/0x1b
-> >> [134251.479273] INFO: task cp-test:17969 blocked for more than 120 seconds.
-> >> [134251.479275] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-> >> disables this message.
-> >> [134251.479276] cp-test         D ffff88028b613f40     0 17969  16775
-> >> 0x00000000
-> >> [134251.479278]  ffff880221270040 0000000000000086 ffffffff81613400
-> >> 0000000000013f40
-> >> [134251.479281]  ffff88010cc85fd8 ffff88010cc85fd8 ffff880221270040
-> >> ffff88028b613f40
-> >> [134251.479283]  ffff880221270040 ffff88010cc85e38 ffffffff810c051f
-> >> 0000000000000002
-> >> [134251.479285] Call Trace:
-> >> [134251.479288]  [<ffffffff810c051f>] ? __lock_page+0x61/0x61
-> >> [134251.479290]  [<ffffffff813858be>] ? io_schedule+0x54/0x69
-> >> [134251.479292]  [<ffffffff810c0524>] ? sleep_on_page+0x5/0x8
-> >> [134251.479294]  [<ffffffff813846dd>] ? __wait_on_bit+0x3b/0x6e
-> >> [134251.479296]  [<ffffffff810c05ce>] ? wait_on_page_bit+0x69/0x6e
-> >> [134251.479299]  [<ffffffff81057ca7>] ? autoremove_wake_function+0x2a/0x2a
-> >> [134251.479301]  [<ffffffff810c0c7b>] ? filemap_fdatawait_range+0x65/0xfa
-> >> [134251.479304]  [<ffffffff810c22be>] ? filemap_write_and_wait+0x20/0x33
-> >> [134251.479309]  [<ffffffffa04e2d79>] ? cifs_flush+0x1d/0x4d [cifs]
-> >> [134251.479329]  [<ffffffff81107bc5>] ? filp_close+0x37/0x68
-> >> [134251.479333]  [<ffffffff81108c82>] ? SyS_close+0x1a/0x3c
-> >> [134251.479335]  [<ffffffff8138b529>] ? system_call_fastpath+0x16/0x1b
-> >> [134371.629437] INFO: task kworker/0:166:17092 blocked for more than 120
-> >> seconds.
-> >> [134371.629442] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-> >> disables this message.
-> >> [134371.629445] kworker/0:166   D ffff88028b613f40     0 17092      2
-> >> 0x00000000
-> >> [134371.629504] Workqueue: cifsiod cifs_oplock_break [cifs]
-> >> [134371.629507]  ffff8800a3c54100 0000000000000046 ffffffff81613400
-> >> 0000000000013f40
-> >> [134371.629511]  ffff88005e8a1fd8 ffff88005e8a1fd8 ffff8800a3c54100
-> >> ffff88028b613f40
-> >> [134371.629515]  ffff8800a3c54100 ffff88005e8a1d28 ffffffff810c051f
-> >> 0000000000000002
-> >> [134371.629518] Call Trace:
-> >> [134371.629526]  [<ffffffff810c051f>] ? __lock_page+0x61/0x61
-> >> [134371.629532]  [<ffffffff813858be>] ? io_schedule+0x54/0x69
-> >> [134371.629535]  [<ffffffff810c0524>] ? sleep_on_page+0x5/0x8
-> >> [134371.629538]  [<ffffffff813846dd>] ? __wait_on_bit+0x3b/0x6e
-> >> [134371.629541]  [<ffffffff810c05ce>] ? wait_on_page_bit+0x69/0x6e
-> >> [134371.629546]  [<ffffffff81057ca7>] ? autoremove_wake_function+0x2a/0x2a
-> >> [134371.629549]  [<ffffffff810c0c7b>] ? filemap_fdatawait_range+0x65/0xfa
-> >> [134371.629557]  [<ffffffffa04dec18>] ? cifs_oplock_break+0xd5/0x21d [cifs]
-> >> [134371.629562]  [<ffffffff8105f74a>] ? finish_task_switch+0x81/0xaa
-> >> [134371.629566]  [<ffffffff81052a71>] ? process_one_work+0x18b/0x28c
-> >> [134371.629570]  [<ffffffff81052f1b>] ? worker_thread+0x121/0x1e7
-> >> [134371.629573]  [<ffffffff81052dfa>] ? rescuer_thread+0x265/0x265
-> >> [134371.629576]  [<ffffffff81057325>] ? kthread+0x7d/0x85
-> >> [134371.629579]  [<ffffffff810572a8>] ? __kthread_parkme+0x59/0x59
-> >> [134371.629583]  [<ffffffff8138b47c>] ? ret_from_fork+0x7c/0xb0
-> >> [134371.629586]  [<ffffffff810572a8>] ? __kthread_parkme+0x59/0x59
-> >> [134371.629596] INFO: task pool:17993 blocked for more than 120 seconds.
-> >> [134371.629598] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-> >> disables this message.
-> >> [134371.629600] pool            D ffff88028b613f40     0 17993   5142
-> >> 0x00000000
-> >> [134371.629603]  ffff88027cbe6780 0000000000000082 ffffffff81613400
-> >> 0000000000013f40
-> >> [134371.629606]  ffff880221259fd8 ffff880221259fd8 ffff88027cbe6780
-> >> ffff88028b613f40
-> >> [134371.629609]  ffff88027cbe6780 ffff880221259bc0 ffffffff810c051f
-> >> 0000000000000002
-> >> [134371.629613] Call Trace:
-> >> [134371.629616]  [<ffffffff810c051f>] ? __lock_page+0x61/0x61
-> >> [134371.629619]  [<ffffffff813858be>] ? io_schedule+0x54/0x69
-> >> [134371.629622]  [<ffffffff810c0524>] ? sleep_on_page+0x5/0x8
-> >> [134371.629625]  [<ffffffff813846dd>] ? __wait_on_bit+0x3b/0x6e
-> >> [134371.629632]  [<ffffffff810c05ce>] ? wait_on_page_bit+0x69/0x6e
-> >> [134371.629636]  [<ffffffff81057ca7>] ? autoremove_wake_function+0x2a/0x2a
-> >> [134371.629641]  [<ffffffff810cb14b>] ?
-> >> invalidate_inode_pages2_range+0x94/0x226
-> >> [134371.629649]  [<ffffffffa04e64af>] ?
-> >> cifs_invalidate_mapping+0x22/0x51 [cifs]
-> >> [134371.629656]  [<ffffffffa04dce7a>] ? cifs_d_revalidate+0x17/0x88 [cifs]
-> >> [134371.629661]  [<ffffffff81111ad0>] ? lookup_fast+0x17f/0x213
-> >> [134371.629664]  [<ffffffff81111d7b>] ? walk_component+0x33/0x1a2
-> >> [134371.629668]  [<ffffffff81112b39>] ? path_lookupat+0x8e/0x293
-> >> [134371.629673]  [<ffffffff810fa52e>] ? kmem_cache_alloc+0x8c/0xfd
-> >> [134371.629677]  [<ffffffff81112d5d>] ? filename_lookup+0x1f/0x73
-> >> [134371.629680]  [<ffffffff81114efe>] ? user_path_at_empty+0x6f/0xa6
-> >> [134371.629686]  [<ffffffff8107c8f5>] ? do_futex+0xd1/0x7b5
-> >> [134371.629689]  [<ffffffff8110d1f7>] ? vfs_fstatat+0x3e/0x8b
-> >> [134371.629692]  [<ffffffff8110d4bd>] ? SYSC_newlstat+0x10/0x29
-> >> [134371.629696]  [<ffffffff8138b529>] ? system_call_fastpath+0x16/0x1b
-> >> [134371.629699] INFO: task pool:18378 blocked for more than 120 seconds.
-> >> [134371.629700] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-> >> disables this message.
-> >> [134371.629702] pool            D ffff88028b633f40     0 18378   5142
-> >> 0x00000000
-> >> [134371.629705]  ffff88010cc2c840 0000000000000082 ffff880281179780
-> >> 0000000000013f40
-> >> [134371.629708]  ffff88024678bfd8 ffff88024678bfd8 ffff88010cc2c840
-> >> ffff88028b633f40
-> >> [134371.629711]  ffff88010cc2c840 ffff88024678bbc0 0000000000000002
-> >> ffffffff810c051f
-> >> [134371.629715] Call Trace:
-> >> [134371.629717]  [<ffffffff810c051f>] ? __lock_page+0x61/0x61
-> >> [134371.629721]  [<ffffffff813858be>] ? io_schedule+0x54/0x69
-> >> [134371.629723]  [<ffffffff810c0524>] ? sleep_on_page+0x5/0x8
-> >> [134371.629727]  [<ffffffff813847c0>] ? __wait_on_bit_lock+0x3a/0x7e
-> >> [134371.629729]  [<ffffffff810c051a>] ? __lock_page+0x5c/0x61
-> >> [134371.629732]  [<ffffffff81057ca7>] ? autoremove_wake_function+0x2a/0x2a
-> >> [134371.629736]  [<ffffffff810cb121>] ?
-> >> invalidate_inode_pages2_range+0x6a/0x226
-> >> [134371.629743]  [<ffffffffa04e64af>] ?
-> >> cifs_invalidate_mapping+0x22/0x51 [cifs]
-> >> [134371.629749]  [<ffffffffa04dce7a>] ? cifs_d_revalidate+0x17/0x88 [cifs]
-> >> [134371.629753]  [<ffffffff81111ad0>] ? lookup_fast+0x17f/0x213
-> >> [134371.629757]  [<ffffffff81111d7b>] ? walk_component+0x33/0x1a2
-> >> [134371.629760]  [<ffffffff81112b39>] ? path_lookupat+0x8e/0x293
-> >> [134371.629764]  [<ffffffff810fa52e>] ? kmem_cache_alloc+0x8c/0xfd
-> >> [134371.629768]  [<ffffffff81112d5d>] ? filename_lookup+0x1f/0x73
-> >> [134371.629770]  [<ffffffff81114efe>] ? user_path_at_empty+0x6f/0xa6
-> >> [134371.629775]  [<ffffffff810f9498>] ? ____cache_alloc+0x1d3/0x290
-> >> [134371.629777]  [<ffffffff8110d1f7>] ? vfs_fstatat+0x3e/0x8b
-> >> [134371.629781]  [<ffffffff8109fb12>] ? __call_rcu.constprop.51+0xc2/0x1c6
-> >> [134371.629784]  [<ffffffff8110d4bd>] ? SYSC_newlstat+0x10/0x29
-> >> [134371.629788]  [<ffffffff8104f3f1>] ? SyS_prctl+0x104/0x32f
-> >> [134371.629792]  [<ffffffff8138b529>] ? system_call_fastpath+0x16/0x1b
-> >> [134371.629794] INFO: task pool:18384 blocked for more than 120 seconds.
-> >> [134371.629796] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-> >> disables this message.
-> >> [134371.629798] pool            D ffff88028b613f40     0 18384   5142
-> >> 0x00000000
-> >> [134371.629801]  ffff88027c9c8800 0000000000000082 ffffffff81613400
-> >> 0000000000013f40
-> >> [134371.629804]  ffff88024267dfd8 ffff88024267dfd8 ffff88027c9c8800
-> >> ffff88028b613f40
-> >> [134371.629807]  ffff88027c9c8800 ffff88024267dbc0 0000000000000002
-> >> ffffffff810c051f
-> >> [134371.629811] Call Trace:
-> >> [134371.629813]  [<ffffffff810c051f>] ? __lock_page+0x61/0x61
-> >> [134371.629817]  [<ffffffff813858be>] ? io_schedule+0x54/0x69
-> >> [134371.629819]  [<ffffffff810c0524>] ? sleep_on_page+0x5/0x8
-> >> [134371.629822]  [<ffffffff813847c0>] ? __wait_on_bit_lock+0x3a/0x7e
-> >> [134371.629825]  [<ffffffff810c051a>] ? __lock_page+0x5c/0x61
-> >> [134371.629828]  [<ffffffff81057ca7>] ? autoremove_wake_function+0x2a/0x2a
-> >> [134371.629831]  [<ffffffff810cb121>] ?
-> >> invalidate_inode_pages2_range+0x6a/0x226
-> >> [134371.629838]  [<ffffffffa04e64af>] ?
-> >> cifs_invalidate_mapping+0x22/0x51 [cifs]
-> >> [134371.629846]  [<ffffffffa04dce7a>] ? cifs_d_revalidate+0x17/0x88 [cifs]
-> >> [134371.629850]  [<ffffffff81111ad0>] ? lookup_fast+0x17f/0x213
-> >> [134371.629854]  [<ffffffff81111d7b>] ? walk_component+0x33/0x1a2
-> >> [134371.629857]  [<ffffffff81112b39>] ? path_lookupat+0x8e/0x293
-> >> [134371.629861]  [<ffffffff810fa52e>] ? kmem_cache_alloc+0x8c/0xfd
-> >> [134371.629865]  [<ffffffff81112d5d>] ? filename_lookup+0x1f/0x73
-> >> [134371.629868]  [<ffffffff81114efe>] ? user_path_at_empty+0x6f/0xa6
-> >> [134371.629871]  [<ffffffff8105f5ff>] ? __wake_up_sync_key+0x3d/0x55
-> >> [134371.629875]  [<ffffffff810fa52e>] ? kmem_cache_alloc+0x8c/0xfd
-> >> [134371.629878]  [<ffffffff8110d1f7>] ? vfs_fstatat+0x3e/0x8b
-> >> [134371.629881]  [<ffffffff8109fb12>] ? __call_rcu.constprop.51+0xc2/0x1c6
-> >> [134371.629884]  [<ffffffff8110d4bd>] ? SYSC_newlstat+0x10/0x29
-> >> [134371.629888]  [<ffffffff8104f3f1>] ? SyS_prctl+0x104/0x32f
-> >> [134371.629891]  [<ffffffff8138b529>] ? system_call_fastpath+0x16/0x1b
-> >> [184501.155185] CIFS VFS: Server 192.168.0.112 has not responded in 120
-> >> seconds. Reconnecting...
-> >>
-> >> 		**** But now after this, the test program copying a file from the other
-> >> 		     gets stuck in D state and cannot be killed.
-> >> 		     I think only reboot will remedy this situation.
-> >>
-> >
-> > Most of these processes are stuck trying to lock a page to either
-> > invalidate it, or to perform writeback. That implies that something else is holding the lock on that page.
-> >
-> 
-> I see. Now I realize there many lock/validate strings in the function 
-> names in the stack trace.
-> 
+Here are some packet inspecition preliminary.
 
-Yes, but they all pretty much top out at __lock_page, which means
-they're stuck trying to lock a page. The question of course is why
-that's not succeeding.
+I tested this using an ssh connection from
+Win7 host to the Linux.
+I used the latest WireShark on Win7 to capture the packet.
 
-My suspicion is that there's a task that's trying to send a read or
-write and that's stuck because the socket isn't getting set up
-properly. Then all the other tasks that want to use that page have to
-line up behind the others.
+I run ssh to open a connection to linux,
+and while I am running the following loop,
+   while true
+    do
+     ls -l /tmp
+     sleep 5
+     date
+    done
 
-> >> Hope this helps.
-> >>
-> >> Even if this could be triggered by flakey windows 7 CIFS-share issues,
-> >> I think it is worthwhile to make CIFS driver robust in such situations.
-> >>
-> >
-> > Me too -- easier said than done ;)
-> >
-> 
-> Agreed. Just wade through the stack trace and figure out what is going 
-> on is difficult ;)
-> 
-> >> I am keeping this linux running in this manner and so
-> >> let me know if you need some runtime information which can be gleaned by
-> >> some means (like system trace, etc.). Please advise how to obtain the
-> >> information in that case (the particular command to obtain the desired
-> >> value will be useful.)
-> >>
-> >
-> > I think what's missing here is some information about what's actually
-> > happening on the network when you try to recontact the server.
-> >
-> > When you bring the interface back up, does the client ever send a SYN
-> > back to the server? If so, does the server respond?
-> >
-> 
-> OK, here is my TODO list:
-> I will try to capture the packet using WireShark on the side of Win7 host.
-> 
-> Oh wait, can I ping the host right now? Of course, it can.
-> I understand that the suggestion about SYN is regarding the TCP socket 
-> (CIFS now uses TCP, I suppose) reestablishment.
-> 
+I disabled the interface of the linux (inside the VMPlayer) by
+disabling the interface and then reenabling the interface.
+I did not seem to see RST/SYN packet during this process, and
+even after more than 2 minutes (about 2m20sec), ssh connection continued 
+working by printing out presumably the cached output:
+once the ssh connection resumed, I got the consecutive timestamps (5 
+seconds apart) even for period during which the network interface was 
+disabled.
 
-Yeah, an ICMP ping is pretty meaningless here. The question is whether
-the client is attempting to reestablish a TCP socket, and why that's
-not working.
+I *do* see [SYN,ACK], [FIN,ACK] packets for https connection
+done by Dropbox to access home during the same capture time, and so
+I don't think I am missing the SYN orFIN packets.
+Also, I see retransmission of encrypted packets (meaning SSH)
 
-> > Also, what is cifsd (the kernel thread that handles receives) doing at
-> > this point? I'd expect it to be trying to reconnect to the server...
-> >
-> CIFS driver is inside the kernel, correct. I am not entirely sure how I 
-> can do this. Maybe I should use google to figure out how to debug kernel 
-> thread.
-> 
+But then again, I realize SSH connection is a completely state-full 
+connection after all, it has to carry out the shell interaction.
+So it is not likely that sshd daemon will sends out SYN ACK,FIN ACK 
+unless it really times out decides to cut off the connection completely.
 
-cifsd is a kernel thread, which means that it acts like a process but
-always runs in kernel mode. It'll have a name like "[cifsd]" in ps. You
-can get its stack in exactly the same way as any other process
-(/proc/<pid>/stack).
+OTOH, Is CIFS a non-statefull connection? (my tentative answer is yes: 
+by default, "soft" option is in effect. So maybe cifs driver can decide 
+to disconnect and connet at will when it sees network problem.)
 
-> > What kernel version is this too, btw?
-> 
-> uname -r
-> 3.10-3-amd64
-> 
-> It is 3.10.3 64bit.
-> 
+I hate the possibility of disturbing the hung CIFS-mount since there 
+*may* be an additional information we can glean out from the core image 
+in the live kernel.
+But I will mount another CIFS-share from Linux side and
+try too see if SYN/FIN packets are sent between the Win7 host and linux 
+client when I disable the interface and re-enabled it after 10 seconds, 
+20 seconds, and 2min10 seconds or so.
 
-Thanks. It might be worth testing something v3.12-ish, but I sort of
-doubt it'll make much difference.
+TIA
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+
+>
+>> Oh wait, can I ping the host right now? Of course, it can.
+>> I understand that the suggestion about SYN is regarding the TCP socket
+>> (CIFS now uses TCP, I suppose) reestablishment.
+>>
+>>> Also, what is cifsd (the kernel thread that handles receives) doing at
+>>> this point? I'd expect it to be trying to reconnect to the server...
+>>>
+>> CIFS driver is inside the kernel, correct. I am not entirely sure how I
+>> can do this. Maybe I should use google to figure out how to debug kernel
+>> thread.
+>>
+>>> What kernel version is this too, btw?
+>>
+>> uname -r
+>> 3.10-3-amd64
+>>
+>> It is 3.10.3 64bit.
+>
+> I could find out where the lower-level kernel worker threads are stuck.
+> But it may not be high-level enough to know where CIFS driver gets stuck?
+>
+> I search for the process stuck in "D" state.
+> Not knowing what to do, I used "ps -aelfw | grep D" to look for
+> tell-tale "D".
+> I marked the lines relevant to this discussion.
+>
+>      ishikawa@vm-debian-amd64:/var/log$ ps -aelfw | grep D
+>      F S UID        PID  PPID  C PRI  NI ADDR SZ WCHAN  STIME TTY
+> TIME CMD
+>      5 S Debian-+  3009     1  0  80   0 - 12904 ?      Nov06 ? 00:00:00
+> /usr/sbin/exim4 -bd -q30m
+>      4 S root      3129  3108  0  80   0 - 43934 ?      Nov06 ? 00:00:00
+> /usr/lib/gdm3/gdm-simple-slave --display-id /org/gnome/Di
+>      0 S ishikawa  3180  8788  0  80   0 -  2190 -      13:47 pts/8
+> 00:00:00 grep D
+>      0 S ishikawa  3919  3894  0  80   0 -  9632 -      Nov06 ? 00:00:01
+> oclock -xtsessionID 23103f808-3bda-4369-b14c-79eb6dac971e
+> *   1 D root     17092     2  0  80   0 -     0 ?      Nov08 ? 00:00:12
+> [kworker/0:166]
+> *   1 D root     17768     2  0  80   0 -     0 ?      Nov08 ? 00:00:30
+> [kworker/0:0]
+> *   0 D ishikawa 17969     1  0  80   0 -  1050 -      Nov08 ? 00:00:00
+> ./cp-test big-file /tmp/L-temp/1111gQGn
+> *   0 D ishikawa 18801     1  0  80   0 -  7264 -      Nov08 ? 00:00:00
+> ls -aF -ltr /tmp/L-temp/
+> *   0 D ishikawa 25747     1  0  80   0 -  5153 -      Nov09 ? 00:00:00
+> ls -aF /tmp/L-temp/
+>
+> 17092, 17768 are kernel thread: given the date shown they are likely
+> to be related.
+>
+> 17969, 18801, 25757 are the user processed I invoked. "./cp-test" is
+> the copy program. "ls" are when I tried to show the directory listing
+> and got stuck.
+>
+> OK, we may want to find out what kernel threads
+> 17092, and 17768 are doing.
+> (And may want to find out what are the status of page locks and
+> maybe some semaphore/mutex/futex or whatever these threads hold.)
+>
+> I found out that I can print the contents of /proc/[pid]/stack to
+> obtain stacktrace of a process/thread.  From the listing, I gather the
+> following kernel kworker thread seem to get stuck after CIFS-related
+> operations
+>
+> 17092 ... cifs_oplock_break ...
+> 17768 ... cifs_writev_complete ...
+>
+> and then do "wake_bit_function". 17768 does a __lock_page while 17092
+> does wait_on_page_bit, and so the stackstraces are a little bit
+> non-symmetrical. Maybe 17768 and 177092 are locking each other or
+> with other kernel threads? The underlying page(s) are either locked or
+> gone???
+>
+> So I think the mount is still on and reconnected(?)
+>
+> root@vm-debian-amd64:/# cat /proc/17092/stack
+> [<ffffffff810c051f>] sleep_on_page+0x0/0x8
+> [<ffffffff810c0524>] sleep_on_page+0x5/0x8
+> [<ffffffff810c05ce>] wait_on_page_bit+0x69/0x6e
+> [<ffffffff81057ca7>] wake_bit_function+0x0/0x27
+> [<ffffffff810c0c7b>] filemap_fdatawait_range+0x65/0xfa
+> [<ffffffffa04dec18>] cifs_oplock_break+0xd5/0x21d [cifs]
+> [<ffffffff8105f74a>] finish_task_switch+0x81/0xaa
+> [<ffffffff81052a71>] process_one_work+0x18b/0x28c
+> [<ffffffff81052f1b>] worker_thread+0x121/0x1e7
+> [<ffffffff81052dfa>] worker_thread+0x0/0x1e7
+> [<ffffffff81057325>] kthread+0x7d/0x85
+> [<ffffffff810572a8>] kthread+0x0/0x85
+> [<ffffffff8138b47c>] ret_from_fork+0x7c/0xb0
+> [<ffffffff810572a8>] kthread+0x0/0x85
+> [<ffffffffffffffff>] 0xffffffffffffffff
+> root@vm-debian-amd64:/# cat /proc/17768/stack
+> [<ffffffff810c051f>] sleep_on_page+0x0/0x8
+> [<ffffffff810c0524>] sleep_on_page+0x5/0x8
+> [<ffffffff810c051a>] __lock_page+0x5c/0x61
+> [<ffffffff81057ca7>] wake_bit_function+0x0/0x27
+> [<ffffffffa04d17c8>] cifs_writev_complete+0x87/0x17e [cifs]
+> [<ffffffff81052a71>] process_one_work+0x18b/0x28c
+> [<ffffffff81052f1b>] worker_thread+0x121/0x1e7
+> [<ffffffff81052dfa>] worker_thread+0x0/0x1e7
+> [<ffffffff81057325>] kthread+0x7d/0x85
+> [<ffffffff81040900>] do_exit+0x901/0x918
+> [<ffffffff810572a8>] kthread+0x0/0x85
+> [<ffffffff8138b47c>] ret_from_fork+0x7c/0xb0
+> [<ffffffff810572a8>] kthread+0x0/0x85
+> [<ffffffffffffffff>] 0xffffffffffffffff
+> root@vm-debian-amd64:/#
+>
+> I wonder how I can find out about the pages that are the targets of
+> wake_on_page_bit -> sleep_on_page, and
+> __lock_page -> sleep_on_page.
+>
+> TIA
+>
+>
+> PS: mount seems to be still in effect at least on the linux side.
+> (The issue may be  whether this is still valid on Win7 side after
+> two days of hung CIFS driver: so maybe once this hung-state is cleared
+> CIFS may try to reestablish the upper-level connection?)
+>
+> mountinfo as seen by kworker 17768: the last line shows the CIFS-share
+> mount.
+>
+> root@vm-debian-amd64:/# cat /proc/17768/mountinfo
+> 14 19 0:13 / /sys rw,nosuid,nodev,noexec,relatime - sysfs sysfs rw
+> 15 19 0:3 / /proc rw,nosuid,nodev,noexec,relatime - proc proc rw
+> 16 19 0:5 / /dev rw,relatime - devtmpfs udev
+> rw,size=10240k,nr_inodes=1177830,mode=755
+> 17 16 0:10 / /dev/pts rw,nosuid,noexec,relatime - devpts devpts
+> rw,gid=5,mode=620,ptmxmode=000
+> 18 19 0:14 / /run rw,nosuid,noexec,relatime - tmpfs tmpfs
+> rw,size=942744k,mode=755
+> 19 1 8:1 / / rw,relatime - ext4
+> /dev/disk/by-uuid/e5f60120-3afd-457a-be02-9bd6d8cc4f4d
+> rw,errors=remount-ro,data=ordered
+> 20 18 0:15 / /run/lock rw,nosuid,nodev,noexec,relatime - tmpfs tmpfs
+> rw,size=5120k
+> 21 18 0:16 / /run/shm rw,nosuid,nodev,noexec,relatime - tmpfs tmpfs
+> rw,size=2861760k
+> 22 14 0:17 / /sys/fs/fuse/connections rw,relatime - fusectl fusectl rw
+> 23 19 8:3 / /boot rw,relatime - ext2 /dev/sda3 rw,errors=continue
+> 24 19 8:5 / /home rw,relatime - ext4 /dev/sda5 rw,data=ordered
+> 25 19 8:6 / /usr rw,relatime - ext4 /dev/sda6 rw,data=ordered
+> 26 19 8:7 / /var rw,relatime - ext4 /dev/sda7 rw,data=ordered
+> 27 19 8:17 / /TB-NEW rw,relatime - ext4 /dev/sdb1 rw,data=ordered
+> 28 19 8:33 / /FF-NEW rw,relatime - ext4 /dev/sdc1
+> rw,errors=remount-ro,data=ordered
+> 29 19 8:49 / /COMM-CENTRAL rw,relatime - ext4 /dev/sdd1
+> rw,errors=remount-ro,data=ordered
+> 30 19 8:65 / /TEST-MAIL-DIR rw,relatime - ext4 /dev/sde1
+> rw,errors=remount-ro,data=ordered
+> 31 19 8:81 / /REF-COMM-CENTRAL rw,relatime - ext4 /dev/sdf1
+> rw,errors=remount-ro,data=ordered
+> 32 19 8:97 / /REF-OBJ-DIR rw,relatime - ext4 /dev/sdg1 rw
+> 33 18 0:18 / /run/vmblock-fuse rw,nosuid,nodev,relatime -
+> fuse.vmware-vmblock vmware-vmblock
+> rw,user_id=0,group_id=0,default_permissions,allow_other
+> 34 26 0:19 / /var/lib/nfs/rpc_pipefs rw,relatime - rpc_pipefs rpc_pipefs rw
+> 35 15 0:20 / /proc/sys/fs/binfmt_misc rw,nosuid,nodev,noexec,relatime -
+> binfmt_misc binfmt_misc rw
+> 37 19 0:21 / /tmp/L-temp rw,relatime - cifs //192.168.0.112/L-temp
+> rw,vers=1.0,sec=ntlmssp,cache=strict,username=ci,domain=USER-PC,uid=0,noforceuid,gid=0,noforcegid,addr=192.168.0.112,file_mode=0755,dir_mode=0755,nounix,serverino,noperm,rsize=61440,wsize=65536,actimeo=1
+>
+> root@vm-debian-amd64:/#
+>
+>
+>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
