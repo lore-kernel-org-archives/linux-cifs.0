@@ -1,39 +1,66 @@
-From: Li Wang <liwang-qfb7ZC4agRC9jIzG8Sm66w@public.gmane.org>
-Subject: [PATCH 0/7] Cifs and Ceph: Uncache single no-data page in readpage()
-Date: Mon, 11 Nov 2013 23:27:22 +0800
-Message-ID: <cover.1384183054.git.liwang@ubuntukylin.com>
-Cc: ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Sage Weil <sage-4GqslpFJ+cxBDgjK7y7TUQ@public.gmane.org>,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Milosz Tanski <milosz-B5zB6C1i6pkAvxtiuMwx3w@public.gmane.org>,
-	Li Wang <liwang-qfb7ZC4agRC9jIzG8Sm66w@public.gmane.org>
-To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Li Wang <liwang@ubuntukylin.com>
+Subject: [PATCH 5/7] Cifs: Introduce routine for uncaching single no-data page
+Date: Mon, 11 Nov 2013 23:27:27 +0800
+Message-ID: <b4c84ba0eeeda3bf915524c8173d44abb30506ff.1384183054.git.liwang@ubuntukylin.com>
+References: <cover.1384183054.git.liwang@ubuntukylin.com>
+Cc: ceph-devel@vger.kernel.org, Sage Weil <sage@inktank.com>,
+	linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
+	Milosz Tanski <milosz@adfin.com>,
+	Li Wang <liwang@ubuntukylin.com>
+To: linux-kernel@vger.kernel.org
+Return-path: <ceph-devel-owner@vger.kernel.org>
+In-Reply-To: <cover.1384183054.git.liwang@ubuntukylin.com>
+In-Reply-To: <cover.1384183054.git.liwang@ubuntukylin.com>
+References: <cover.1384183054.git.liwang@ubuntukylin.com>
+Sender: ceph-devel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Currently, the page allocated into fscache in readpage() 
-for Cifs and Ceph does not be uncached if no data read due
-to io error. This patch fixes this. fscache_readpages_cancel() 
-is for this kind of job but taking list read * as input, so
-a new routine take page * as input is introduced. 
+Introduce a routine for uncaching single no-data page, typically
+in readpage().
 
-Li Wang (7):
-  Fscache: Introduce new API fscache_readpage_cancel()
-  Fscache: Implement uncaching single no-data page
-  Ceph: Introduce routine for uncaching single no-data page
-  Ceph: Uncaching no-data page in readpage()
-  Cifs: Introduce routine for uncaching single no-data page
-  Cifs: Implement uncaching single no-data page
-  Cifs: Uncaching no-data page in readpage()
+Signed-off-by: Li Wang <liwang@ubuntukylin.com>
+---
+ fs/cifs/fscache.h |   13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
- fs/ceph/addr.c          |    1 +
- fs/ceph/cache.h         |   13 +++++++++++++
- fs/cifs/file.c          |    4 +++-
- fs/cifs/fscache.c       |    7 +++++++
- fs/cifs/fscache.h       |   13 +++++++++++++
- fs/fscache/page.c       |    8 ++++++++
- include/linux/fscache.h |   11 +++++++++++
- 7 files changed, 56 insertions(+), 1 deletion(-)
-
+diff --git a/fs/cifs/fscache.h b/fs/cifs/fscache.h
+index 24794b6..c712f42 100644
+--- a/fs/cifs/fscache.h
++++ b/fs/cifs/fscache.h
+@@ -54,6 +54,7 @@ extern int __cifs_readpages_from_fscache(struct inode *,
+ 					 struct address_space *,
+ 					 struct list_head *,
+ 					 unsigned *);
++extern void __cifs_fscache_readpage_cancel(struct inode *, struct page *);
+ extern void __cifs_fscache_readpages_cancel(struct inode *, struct list_head *);
+ 
+ extern void __cifs_readpage_to_fscache(struct inode *, struct page *);
+@@ -92,6 +93,13 @@ static inline void cifs_readpage_to_fscache(struct inode *inode,
+ 		__cifs_readpage_to_fscache(inode, page);
+ }
+ 
++static inline void cifs_fscache_readpage_cancel(struct inode *inode,
++						struct page *page)
++{
++	if (CIFS_I(inode)->fscache)
++		return __cifs_fscache_readpage_cancel(inode, page);
++}
++
+ static inline void cifs_fscache_readpages_cancel(struct inode *inode,
+ 						 struct list_head *pages)
+ {
+@@ -139,6 +147,11 @@ static inline int cifs_readpages_from_fscache(struct inode *inode,
+ static inline void cifs_readpage_to_fscache(struct inode *inode,
+ 			struct page *page) {}
+ 
++static inline void cifs_fscache_readpage_cancel(struct inode *inode,
++						struct page *page)
++{
++}
++
+ static inline void cifs_fscache_readpages_cancel(struct inode *inode,
+ 						 struct list_head *pages)
+ {
 -- 
 1.7.9.5
+
