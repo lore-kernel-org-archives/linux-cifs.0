@@ -1,7 +1,7 @@
 From: Li Wang <liwang@ubuntukylin.com>
-Subject: [PATCH 6/7] Cifs: Implement uncaching single no-data page
-Date: Mon, 11 Nov 2013 23:27:28 +0800
-Message-ID: <08bbf81e5da33b1a4a6ce8af119acfd2fb8a2760.1384183054.git.liwang@ubuntukylin.com>
+Subject: [PATCH 4/7] Ceph: Uncaching no-data page in readpage()
+Date: Mon, 11 Nov 2013 23:27:26 +0800
+Message-ID: <1328cc859d1b2d40786fc3aa634a36764b286e70.1384183054.git.liwang@ubuntukylin.com>
 References: <cover.1384183054.git.liwang@ubuntukylin.com>
 Cc: ceph-devel@vger.kernel.org, Sage Weil <sage@inktank.com>,
 	linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
@@ -15,32 +15,26 @@ References: <cover.1384183054.git.liwang@ubuntukylin.com>
 Sender: ceph-devel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Implement the routine for uncaching single no-data page, typically
-in readpage().
+Currently, if one page allocated into fscache in readpage(), however, with
+no-data read, it is not uncached. This patch fixes this.
 
 Signed-off-by: Li Wang <liwang@ubuntukylin.com>
 ---
- fs/cifs/fscache.c |    7 +++++++
- 1 file changed, 7 insertions(+)
+ fs/ceph/addr.c |    1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/fs/cifs/fscache.c b/fs/cifs/fscache.c
-index 8d4b7bc..168f184 100644
---- a/fs/cifs/fscache.c
-+++ b/fs/cifs/fscache.c
-@@ -223,6 +223,13 @@ void __cifs_readpage_to_fscache(struct inode *inode, struct page *page)
- 		fscache_uncache_page(CIFS_I(inode)->fscache, page);
- }
- 
-+void __cifs_fscache_readpage_cancel(struct inode *inode, struct page *page)
-+{
-+        cifs_dbg(FYI, "%s: (fsc: %p, i: %p)\n",
-+                 __func__, CIFS_I(inode)->fscache, inode);
-+        fscache_readpage_cancel(CIFS_I(inode)->fscache, page);
-+}
-+
- void __cifs_fscache_readpages_cancel(struct inode *inode, struct list_head *pages)
- {
- 	cifs_dbg(FYI, "%s: (fsc: %p, i: %p)\n",
+diff --git a/fs/ceph/addr.c b/fs/ceph/addr.c
+index 6df8bd4..be5f4b6 100644
+--- a/fs/ceph/addr.c
++++ b/fs/ceph/addr.c
+@@ -209,6 +209,7 @@ static int readpage_nounlock(struct file *filp, struct page *page)
+ 		err = 0;
+ 	if (err < 0) {
+ 		SetPageError(page);
++		ceph_fscache_readpage_cancel(inode, page);
+ 		goto out;
+ 	} else if (err < PAGE_CACHE_SIZE) {
+ 		/* zero fill remainder of page */
 -- 
 1.7.9.5
 
