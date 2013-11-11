@@ -1,58 +1,47 @@
-From: Li Wang <liwang-qfb7ZC4agRC9jIzG8Sm66w@public.gmane.org>
-Subject: [PATCH 3/7] Ceph: Introduce routine for uncaching single no-data page
-Date: Mon, 11 Nov 2013 23:27:25 +0800
-Message-ID: <a10e4947af6b0c7f5fbaa55e2eb920e9914d88fc.1384183054.git.liwang@ubuntukylin.com>
+From: Li Wang <liwang@ubuntukylin.com>
+Subject: [PATCH 2/7] Fscache: Implement uncaching single no-data page
+Date: Mon, 11 Nov 2013 23:27:24 +0800
+Message-ID: <57f79ce8b28f2f0e3837f66c3aa99eb078bc5bf7.1384183054.git.liwang@ubuntukylin.com>
 References: <cover.1384183054.git.liwang@ubuntukylin.com>
-Cc: ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Sage Weil <sage-4GqslpFJ+cxBDgjK7y7TUQ@public.gmane.org>,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Milosz Tanski <milosz-B5zB6C1i6pkAvxtiuMwx3w@public.gmane.org>,
-	Li Wang <liwang-qfb7ZC4agRC9jIzG8Sm66w@public.gmane.org>
-To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <cover.1384183054.git.liwang-qfb7ZC4agRC9jIzG8Sm66w@public.gmane.org>
-In-Reply-To: <cover.1384183054.git.liwang-qfb7ZC4agRC9jIzG8Sm66w@public.gmane.org>
-References: <cover.1384183054.git.liwang-qfb7ZC4agRC9jIzG8Sm66w@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: ceph-devel@vger.kernel.org, Sage Weil <sage@inktank.com>,
+	linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
+	Milosz Tanski <milosz@adfin.com>,
+	Li Wang <liwang@ubuntukylin.com>
+To: linux-kernel@vger.kernel.org
+Return-path: <ceph-devel-owner@vger.kernel.org>
+In-Reply-To: <cover.1384183054.git.liwang@ubuntukylin.com>
+In-Reply-To: <cover.1384183054.git.liwang@ubuntukylin.com>
+References: <cover.1384183054.git.liwang@ubuntukylin.com>
+Sender: ceph-devel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Introduce a routine for uncaching single no-data page, typically
-in readpage().
+Similar to the routine for multiple pages except
+that it takes page * as input rather than list head *.
 
-Signed-off-by: Li Wang <liwang-qfb7ZC4agRC9jIzG8Sm66w@public.gmane.org>
+Signed-off-by: Li Wang <liwang@ubuntukylin.com>
 ---
- fs/ceph/cache.h |   13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ fs/fscache/page.c |    8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/fs/ceph/cache.h b/fs/ceph/cache.h
-index ba94940..eb0ec76 100644
---- a/fs/ceph/cache.h
-+++ b/fs/ceph/cache.h
-@@ -67,6 +67,14 @@ static inline int ceph_release_fscache_page(struct page *page, gfp_t gfp)
- 	return fscache_maybe_release_page(ci->fscache, page, gfp);
+diff --git a/fs/fscache/page.c b/fs/fscache/page.c
+index 7f5c658..0c69f72 100644
+--- a/fs/fscache/page.c
++++ b/fs/fscache/page.c
+@@ -721,6 +721,14 @@ nobufs:
  }
+ EXPORT_SYMBOL(__fscache_alloc_page);
  
-+
-+static inline void cpeh_fscache_readpage_cancel(struct inode *inode,
-+						struct page *page)
++void __fscache_readpage_cancel(struct fscache_cookie *cookie,
++			       struct page *page)
 +{
-+	struct ceph_inode_info *ci = ceph_inode(inode);
-+	return fscache_readpage_cancel(ci->fscache, page);
++	if (PageFsCache(page))
++		__fscache_uncache_page(cookie, page);
 +}
++EXPORT_SYMBOL(__fscache_readpage_cancel);
 +
- static inline void ceph_fscache_readpages_cancel(struct inode *inode,
- 						 struct list_head *pages)
- {
-@@ -145,6 +153,11 @@ static inline int ceph_release_fscache_page(struct page *page, gfp_t gfp)
- 	return 1;
- }
- 
-+static inline void ceph_fscache_readpage_cancel(struct inode *inode,
-+						struct page *page)
-+{
-+}
-+
- static inline void ceph_fscache_readpages_cancel(struct inode *inode,
- 						 struct list_head *pages)
- {
+ /*
+  * Unmark pages allocate in the readahead code path (via:
+  * fscache_readpages_or_alloc) after delegating to the base filesystem
 -- 
 1.7.9.5
+
