@@ -1,28 +1,51 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: pam module to set cifs credentials in key store
-Date: Tue, 12 Nov 2013 21:25:36 -0500
-Message-ID: <20131112212536.6061477e@corrin.poochiereds.net>
-References: <loom.20131113T002139-562@post.gmane.org>
+From: "Carlos O'Donell" <carlos@redhat.com>
+Subject: Re: [PATCH 0/3] Extended file stat system call [ver #2]
+Date: Tue, 12 Nov 2013 23:15:12 -0500
+Message-ID: <5282FCD0.6030307@redhat.com>
+References: <20131112184127.2880.24025.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Orion Poplawski <orion-CVdf0l11yl+B+jHODAdFcQ@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <loom.20131113T002139-562-eS7Uydv5nfjZ+VzJOa5vwg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+	libc-alpha@sourceware.org, linux-api@vger.kernel.org,
+	andreas.gruenbacher@gmail.com, samba-technical@lists.samba.org,
+	linux-fsdevel@vger.kernel.org
+To: David Howells <dhowells@redhat.com>, viro@ZenIV.linux.org.uk
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <20131112184127.2880.24025.stgit@warthog.procyon.org.uk>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Tue, 12 Nov 2013 23:22:57 +0000 (UTC)
-Orion Poplawski <orion-CVdf0l11yl+B+jHODAdFcQ@public.gmane.org> wrote:
-
-> Has anyone started work on a pam module to set the cifs keys on login?  Is
-> this sensible?
+On 11/12/2013 01:41 PM, David Howells wrote:
 > 
-> - Orion
+> Implement a new system call to provide an extended and further extensible stat
+> function.
 > 
+> =======
+> CHANGES
+> =======
+> 
+>  (*) Added an optional auxiliary data buffer pointer argument to sys_statxat()
+>      and moved some of the stuff into it.
+> 
+>  (*) Discarded "has an ACL info flag" for now.
+> 
+>  (*) AFS doesn't need to set time granularity itself as the default is 1s
+>      anyway.
 
-Quite sensible. No one is working on it that I know of...
+David,
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+This looks like great work. I admire the thoroughness and
+the detail of the patches. I don't have much more to say
+other than it looks robust and very well put together.
+
+You have CC'd the glibc development list on these changes
+and I appreciate that as a heads up on new syscalls is very
+very useful for the developers.
+
+Do you have any other expectations from the glibc development
+community? Are you looking for help wiring this up or will
+you be posting glibc patches at a later date?
+
+Cheers,
+Carlos.
