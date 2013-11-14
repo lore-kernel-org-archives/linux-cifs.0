@@ -1,65 +1,35 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Samba POSIX ACL behavior
-Date: Thu, 14 Nov 2013 13:37:09 -0600
-Message-ID: <CAH2r5mswn9+01qj7n+hvgzBTmqQzpc-e8WGGxrqpAEEtMA9AGA@mail.gmail.com>
-References: <CAH2r5msH8qTago4G=-_PpAzPJaOxwPeRVL3E8qfowjqwiSo5LA@mail.gmail.com>
+From: Dave Chinner <david@fromorbit.com>
+Subject: Re: [PATCH 1/3] statxat: Provide IOC flags for Windows fs attributes
+ [ver #2]
+Date: Fri, 15 Nov 2013 09:11:26 +1100
+Message-ID: <20131114221126.GE11434@dastard>
+References: <20131112184127.2880.24025.stgit@warthog.procyon.org.uk>
+ <20131112184134.2880.9974.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5msH8qTago4G=-_PpAzPJaOxwPeRVL3E8qfowjqwiSo5LA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: viro@ZenIV.linux.org.uk, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, libc-alpha@sourceware.org,
+	linux-api@vger.kernel.org, andreas.gruenbacher@gmail.com,
+	samba-technical@lists.samba.org, linux-fsdevel@vger.kernel.org
+To: David Howells <dhowells@redhat.com>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20131112184134.2880.9974.stgit@warthog.procyon.org.uk>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-OK - figured out what the problem with Samba 4.x build (did not have
-package acl-dev on Ubuntu and didn't see any mention of needing to
-install that package in the log - but found the answer to the problem
-googling)
+On Tue, Nov 12, 2013 at 06:41:35PM +0000, David Howells wrote:
+> Provide IOC flags for Windows fs attributes so that they can be retrieved (or
+> even altered) using the FS_IOC_[GS]ETFLAGS ioctl and read using statxat().
 
-So ... the set posix acl call works, but the behavior is similar to
-what Rob and the recent poster described.
+If you're adding FAT specific flags here into the generic xstat
+interface, can we get a bunch of common XFS specific flags into this
+interface as well so people don't need to use xfs_io to get/set
+them?
 
+Cheers,
 
-On Thu, Nov 14, 2013 at 12:13 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> I recently encountered the following strange behavior as mentioned in
->> this post from several years ago:
->>
->>
->> https://lists.samba.org/archive/linux-cifs-client/2009-February/004079.html
->>
->> I'm currently running Ubuntu 12.04 LTS on desktop and server, so
->> I took some time to try the latest packaged versions of Samba and
->> the kernel to make sure that the issue had not yet been fixed.
->>
->> Client:  Ubuntu 12.04 LTS with Kernel 3.11.0-13-generic
->> Server:  Ubuntu 12.04 LTS with Samba 3.6.20 and Kernel 3.5.0-43-generic
->>
->> I tried many other combinations and the behavior is the same.  It
->> looks like setting default ACLs somehow interacts with the
->> non-default ACLs and vice versa.
->
-> I tried this here to Samba 3.6 with slightly different results:
-> 1) If I set both a default and non-default ACL that seems to work
-> 2) but as you and Rob saw, if I setfacl a default ACL it removes the
-> non-default ACL
-> 3) and if I setfacl a non-default ACL it removes the default ACL
->
-> So for case 2 and 3 the behavior is different than for a local file system.
-> This may be a server bug.
->
-> For Samba 4 and Samba 4.2-pre (master) - I get an error not supported on
-> this infolevel 512 (Set POSIX ACL).
->
-> --
-> Thanks,
->
-> Steve
-
-
-
+Dave.
 -- 
-Thanks,
-
-Steve
+Dave Chinner
+david@fromorbit.com
