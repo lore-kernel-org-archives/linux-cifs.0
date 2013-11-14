@@ -1,76 +1,51 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: pam module to set cifs credentials in key store
-Date: Thu, 14 Nov 2013 12:05:48 -0500
-Message-ID: <20131114120548.375617fc@tlielax.poochiereds.net>
-References: <loom.20131113T002139-562@post.gmane.org>
-	<20131112212536.6061477e@corrin.poochiereds.net>
-	<5283E835.2090508@cora.nwra.com>
-	<1384382099.4226.63.camel@pico.ipa.ssimo.org>
-	<52840177.80901@cora.nwra.com>
-	<52840237.2010206@cora.nwra.com>
-	<1384385539.4226.67.camel@pico.ipa.ssimo.org>
-	<20131114080854.546b6069@tlielax.poochiereds.net>
-	<1384445750.4226.71.camel@pico.ipa.ssimo.org>
+From: Steve French <smfrench@gmail.com>
+Subject: Samba POSIX ACL behavior
+Date: Thu, 14 Nov 2013 12:13:35 -0600
+Message-ID: <CAH2r5msH8qTago4G=-_PpAzPJaOxwPeRVL3E8qfowjqwiSo5LA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Orion Poplawski <orion-CVdf0l11yl+B+jHODAdFcQ@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Simo <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1384445750.4226.71.camel-fj0lwfvWodpMy5p6ylGyhR2eb7JE58TQ@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+To: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+	samba-technical <samba-technical@lists.samba.org>, Jeremy Allison <jra@samba.org>
+Return-path: <samba-technical-bounces@lists.samba.org>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Sender: samba-technical-bounces@lists.samba.org
+Errors-To: samba-technical-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Thu, 14 Nov 2013 11:15:50 -0500
-Simo <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> I recently encountered the following strange behavior as mentioned in
+> this post from several years ago:
+>
+>
+https://lists.samba.org/archive/linux-cifs-client/2009-February/004079.html
+>
+> I'm currently running Ubuntu 12.04 LTS on desktop and server, so
+> I took some time to try the latest packaged versions of Samba and
+> the kernel to make sure that the issue had not yet been fixed.
+>
+> Client:  Ubuntu 12.04 LTS with Kernel 3.11.0-13-generic
+> Server:  Ubuntu 12.04 LTS with Samba 3.6.20 and Kernel 3.5.0-43-generic
+>
+> I tried many other combinations and the behavior is the same.  It
+> looks like setting default ACLs somehow interacts with the
+> non-default ACLs and vice versa.
 
-> On Thu, 2013-11-14 at 08:08 -0500, Jeff Layton wrote:
-> > On Wed, 13 Nov 2013 18:32:19 -0500
-> > Simo <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> > 
-> > > On Wed, 2013-11-13 at 15:50 -0700, Orion Poplawski wrote:
-> > > > On 11/13/2013 03:47 PM, Orion Poplawski wrote:
-> > > > > On 11/13/2013 03:34 PM, Simo wrote:
-> > > > >>
-> > > > >> Uhm doesn't this code store the user password in the clear in a key that
-> > > > >> is explicitly made readable to any process of the user in the same
-> > > > >> session ?
-> > > > >>
-> > > > >> Simo.
-> > > > >>
-> > > > >
-> > > > > I tried to mimic exactly what the cifscreds program does, but I may have made
-> > > > > a mistake.  Or perhaps cifscreds is also doing a bad thing.  The key
-> > > > > permissions are set to:
-> > > > >
-> > > > > #define CIFS_KEY_PERMS (KEY_POS_VIEW|KEY_POS_WRITE|KEY_POS_SEARCH| \
-> > > > >                          KEY_USR_VIEW|KEY_USR_WRITE|KEY_USR_SEARCH)
-> > > > >
-> > > > >
-> > > > 
-> > > > We're not setting KEY_*_READ, so one cannot read the contents of the key, IIUIC.
-> > > 
-> > > My bad, my eyes saw VIEW but read READ.
-> > > 
-> > > Simo.
-> > > 
-> > 
-> > Yep, and furthermore...
-> > 
-> > These keys are saved as a "logon" keytype (see kernel commit
-> > 9f6ed2ca257). Those are basically just like the "user" keytype except
-> > that there is no mechanism to report the payload to userland. So even
-> > if the permissions we such that you could read them, there's no way for
-> > the kernel to do so.
-> > 
-> > About the only way to get the password out of the kernel would be to
-> > poke around in /dev/mem or the equivalent. Unfortunately, there's not
-> > much we can do about that...
-> 
-> We could (reversibly) encrypt them with a key held in a TPM chip :-)
-> 
+I tried this here to Samba 3.6 with slightly different results:
+1) If I set both a default and non-default ACL that seems to work
+2) but as you and Rob saw, if I setfacl a default ACL it removes the
+non-default ACL
+3) and if I setfacl a non-default ACL it removes the default ACL
 
-Sure, anything is possible. It's just a simple matter of coding that up... ;)
+So for case 2 and 3 the behavior is different than for a local file
+system.  This may be a server bug.
+
+For Samba 4 and Samba 4.2-pre (master) - I get an error not supported on
+this infolevel 512 (Set POSIX ACL).
 
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Thanks,
+
+Steve
