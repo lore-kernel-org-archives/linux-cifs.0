@@ -1,30 +1,42 @@
-From: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+From: steve <steve@steve-ss.com>
 Subject: Re: setfacl fix
-Date: Sat, 16 Nov 2013 06:55:07 -0800
-Message-ID: <20131116145507.GA22395@infradead.org>
+Date: Sat, 16 Nov 2013 16:15:25 +0100
+Message-ID: <1384614925.3216.6.camel@hh16.hh3.site>
 References: <CAH2r5msswZg_NvY9qMNknh2FWht1jMgwW1s2umtaBj3mHreDAw@mail.gmail.com>
+	 <20131116145507.GA22395@infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <CAH2r5msswZg_NvY9qMNknh2FWht1jMgwW1s2umtaBj3mHreDAw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Steve French <smfrench@gmail.com>, samba-technical <samba-technical@lists.samba.org>, "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+To: Christoph Hellwig <hch@infradead.org>
+Return-path: <samba-technical-bounces@lists.samba.org>
+In-Reply-To: <20131116145507.GA22395@infradead.org>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Sender: samba-technical-bounces@lists.samba.org
+Errors-To: samba-technical-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Fri, Nov 15, 2013 at 08:53:12PM -0600, Steve French wrote:
-> From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> Date: Fri, 15 Nov 2013 20:41:32 -0600
-> Subject: [PATCH] [CIFS] setfacl removes part of ACL when setting POSIX ACLs to
->  Samba
-> 
-> setfacl over cifs mounts can remove the default ACL when setting the
-> (non-default part of) the ACL and vice versa (we were leaving at 0
-> rather than setting to -1 the count field for the unaffected
-> half of the ACL.  For example notice the setfacl removed
-> the default ACL in this sequence:
 
-Can you send a patch to xfstests to make sure we regression test for
-this issue on all filesystems?
+> > From: Steve French <smfrench@gmail.com>
+> > Date: Fri, 15 Nov 2013 20:41:32 -0600
+> > Subject: [PATCH] [CIFS] setfacl removes part of ACL when setting POSIX ACLs to
+> >  Samba
+> > 
+> > setfacl over cifs mounts can remove the default ACL 
+
+Hi
+cifs-utils 6.1 Samba 4.1.0
+
+I don't understand the '...over cifs mounts...' bit.
+
+Does it mean that if I have a share mounted on my Linux box and do a
+setfacl on a file in the share then the default acl will be removed?
+
+Sorry for a non dev question.
+
+Cheers,
+Steve
