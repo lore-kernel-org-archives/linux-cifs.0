@@ -1,411 +1,236 @@
-From: sergio.conrad-QFKgK+z4sOrR7s880joybQ@public.gmane.org
-Subject: Tr:Re: Tr:Re: CIFS VFS: Unexpected SMB signature ...NULL inode in
- lookup
-Date: Wed, 20 Nov 2013 15:21:12 +0100
-Message-ID: <774602681.119320.1384957272191.JavaMail.www@wwinf8225>
-Reply-To: sergio.conrad-QFKgK+z4sOrR7s880joybQ@public.gmane.org
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCHv2][CIFS] Validate Negotiate Info
+Date: Wed, 20 Nov 2013 08:34:31 -0600
+Message-ID: <CADT32e+H=dMyZj+iVxLt9359EDKH2SjoeuP3ZtRikN7Sp0JRig@mail.gmail.com>
+References: <CAH2r5mufCuB6b1aLbezcdPW8uAsFs7ojoW-L3E5MhrouEb9kVQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-cifs vger kernel org <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+	"Stefan (metze) Metzmacher" <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>,
+	Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAH2r5mufCuB6b1aLbezcdPW8uAsFs7ojoW-L3E5MhrouEb9kVQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+On Tue, Nov 19, 2013 at 1:20 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> From e4608aa57f9948a5e160ecb8590c885f76796e34 Mon Sep 17 00:00:00 2001
+> From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Date: Tue, 19 Nov 2013 12:58:08 -0600
+> Subject: [PATCH] [CIFS] Check SMB3 dialects against downgrade attacks
+>
+> When we are running SMB3 or SMB3.02 connections which are signed
+> we need to validate the protocol negotiation information,
+> to ensure that thenegotiate protocol response was not tampered with.
+>
+> Add the missing FSCTL which is sent at mount time (immediately after
+> the SMB3 Tree Connect) to validate that the capabilities match
+> what we think the server sent.
+>
+> "Secure dialect negotiation is introduced in SMB3 to protect against
+> man-in-the-middle attempt to downgrade dialect negotiation.
+> The idea is to prevent an eavesdropper from downgrading the initially
+> negotiated dialect and capabilities between the client and the server."
+>
+> For more explanation see 2.2.31.4 of MS-SMB2 or
+> http://blogs.msdn.com/b/openspecification/archive/2012/06/28/smb3-secure-dialect-negotiation.aspx
+>
+> Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/cifsglob.h  |  1 +
+>  fs/cifs/smb2ops.c   |  1 +
+>  fs/cifs/smb2pdu.c   | 76 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  fs/cifs/smb2pdu.h   | 12 ++++++---
+>  fs/cifs/smb2proto.h |  1 +
+>  fs/cifs/smbfsctl.h  |  2 +-
+>  6 files changed, 89 insertions(+), 4 deletions(-)
+>
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index d9ea7ad..f918a99 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -384,6 +384,7 @@ struct smb_version_operations {
+>   int (*clone_range)(const unsigned int, struct cifsFileInfo *src_file,
+>   struct cifsFileInfo *target_file, u64 src_off, u64 len,
+>   u64 dest_off);
+> + int (*validate_negotiate)(const unsigned int, struct cifs_tcon *);
+>  };
+>
+>  struct smb_version_values {
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index a3968ee..757da3e 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -1319,6 +1319,7 @@ struct smb_version_operations smb30_operations = {
+>   .create_lease_buf = smb3_create_lease_buf,
+>   .parse_lease_buf = smb3_parse_lease_buf,
+>   .clone_range = smb2_clone_range,
+> + .validate_negotiate = smb3_validate_negotiate,
+>  };
+>
+>  struct smb_version_values smb20_values = {
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index 1e136ee..7756f9b 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -454,6 +454,80 @@ neg_exit:
+>   return rc;
+>  }
+>
+> +int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
+> +{
+> + int rc = 0;
+> + struct validate_negotiate_info_req vneg_inbuf;
+> + struct validate_negotiate_info_rsp *pneg_rsp;
+> + u32 rsplen;
+> +
+> + cifs_dbg(VFS, "validate negotiate ");
+> + vneg_inbuf.Capabilities =
+> + cpu_to_le32(tcon->ses->server->vals->req_capabilities);
+> + memcpy(vneg_inbuf.Guid, cifs_client_guid, SMB2_CLIENT_GUID_SIZE);
+> +
+> + /*
+> + * validation ioctl must be signed, so no point sending this if we
+> + * can not sign it.  We could eventually change this to selectively
+> + * sign just this, the first and only signed request on a connection.
+> + * This is good enough for now since a user who wants better security
+> + * would also enable signing on the mount. Having validation of
+> + * negotiate info for signed connections helps reduce attack vectors
+> + */
+> + if (tcon->ses->server->sign == false)
+> + return 0; /* validation requires signing */
 
-Thanks for your response .
+Perhaps we should move this check even before invoking
+validate_negotiate?
 
-I did my tests with a Centos =C2=A02.6.32-358.23.2.el6.i686 up to date,=
- it don't seems to=20
-backport the update.
+Also, not sure -EIO is the right error to return, may be -EACCESS or
+-EINVAL might be better?
 
-Could the latest kernel from a Fedora incorporate the update ? it seems=
- to be=C2=A03.11.x
-I will check either if =C2=A0Scientific Linux do this. How could I know=
- before installing ?
-=C2=A0
-Thanks
-Serge
-=C2=A0
-> Message du 20/11/13 15:17
-> De : sergio.conrad-QFKgK+z4sOrR7s880joybQ@public.gmane.org
-> A : "Jeff Layton"
-> Copie =C3=A0 :
-> Objet : Re: Tr:Re: CIFS VFS: Unexpected SMB signature ...NULL inode i=
-n lookup
+> +
+> + if (tcon->ses->sign)
+> + vneg_inbuf.SecurityMode =
+> + cpu_to_le16(SMB2_NEGOTIATE_SIGNING_REQUIRED);
+> + else if (global_secflags & CIFSSEC_MAY_SIGN)
+> + vneg_inbuf.SecurityMode =
+> + cpu_to_le16(SMB2_NEGOTIATE_SIGNING_ENABLED);
+> + else
+> + vneg_inbuf.SecurityMode = 0;
+> +
+> + vneg_inbuf.DialectCount = cpu_to_le16(1);
+> + vneg_inbuf.Dialects[0] =
+> + cpu_to_le16(tcon->ses->server->vals->protocol_id);
+> +
+> + rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
+> + FSCTL_VALIDATE_NEGOTIATE_INFO, true /* is_fsctl */,
+> + (char *)&vneg_inbuf, sizeof(struct validate_negotiate_info_req),
+> + (char **)&pneg_rsp, &rsplen);
+> +
+> + if (rc != 0) {
+> + cifs_dbg(VFS, "validate protocol negotiate failed: %d\n", rc);
+> + return -EIO;
+> + }
+> +
+> + if (rsplen != sizeof(struct validate_negotiate_info_rsp)) {
+> + cifs_dbg(VFS, "invalid size of protocol negotiate response\n");
+> + return -EIO;
+> + }
+> +
+> + /* check validate negotiate info response matches what we got earlier */
+> + if (pneg_rsp->Dialect !=
+> + cpu_to_le16(tcon->ses->server->vals->protocol_id))
+> + goto vneg_out;
+> +
+> + if (pneg_rsp->SecurityMode != cpu_to_le16(tcon->ses->server->sec_mode))
+> + goto vneg_out;
+> +
+> + /* do not validate server guid because not saved at negprot time yet */
+> +
+> + if ((le32_to_cpu(pneg_rsp->Capabilities) | SMB2_NT_FIND |
+> +      SMB2_LARGE_FILES) != tcon->ses->server->capabilities)
+> + goto vneg_out;
+> +
+> + /* validate negotiate successful */
+> + cifs_dbg(FYI, "validate negotiate info successful\n");
+> + return 0;
+> +
+> +vneg_out:
+> + cifs_dbg(VFS, "protocol revalidation - security settings mismatch\n");
+> + return -EIO;
+> +}
+> +
+>  int
+>  SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
+>   const struct nls_table *nls_cp)
+> @@ -829,6 +903,8 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses
+> *ses, const char *tree,
+>      ((tcon->share_flags & SHI1005_FLAGS_DFS) == 0))
+>   cifs_dbg(VFS, "DFS capability contradicts DFS flag\n");
+>   init_copy_chunk_defaults(tcon);
+> + if (tcon->ses->server->ops->validate_negotiate)
+> + rc = tcon->ses->server->ops->validate_negotiate(xid, tcon);
+>  tcon_exit:
+>   free_rsp_buf(resp_buftype, rsp);
+>   kfree(unc_path);
+> diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+> index f88320b..2022c54 100644
+> --- a/fs/cifs/smb2pdu.h
+> +++ b/fs/cifs/smb2pdu.h
+> @@ -577,13 +577,19 @@ struct copychunk_ioctl_rsp {
+>   __le32 TotalBytesWritten;
+>  } __packed;
 >
+> -/* Response and Request are the same format */
+> -struct validate_negotiate_info {
+> +struct validate_negotiate_info_req {
+>   __le32 Capabilities;
+>   __u8   Guid[SMB2_CLIENT_GUID_SIZE];
+>   __le16 SecurityMode;
+>   __le16 DialectCount;
+> - __le16 Dialect[1];
+> + __le16 Dialects[1]; /* dialect (someday maybe list) client asked for */
+> +} __packed;
+> +
+> +struct validate_negotiate_info_rsp {
+> + __le32 Capabilities;
+> + __u8   Guid[SMB2_CLIENT_GUID_SIZE];
+> + __le16 SecurityMode;
+> + __le16 Dialect; /* Dialect in use for the connection */
+>  } __packed;
 >
-
-=C2=A0
-> Message du 20/11/13 12:33
-> De : "Jeff Layton"
-> A : sergio.conrad-QFKgK+z4sOrR7s880joybQ@public.gmane.org
-> Copie =C3=A0 : "linux-cifs vger kernel org"
-> Objet : Re: Tr:Re: CIFS VFS: Unexpected SMB signature ...NULL inode i=
-n lookup
+>  #define RSS_CAPABLE 0x00000001
+> diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+> index b4eea10..93adc64 100644
+> --- a/fs/cifs/smb2proto.h
+> +++ b/fs/cifs/smb2proto.h
+> @@ -162,5 +162,6 @@ extern int smb2_lockv(const unsigned int xid,
+> struct cifs_tcon *tcon,
+>        struct smb2_lock_element *buf);
+>  extern int SMB2_lease_break(const unsigned int xid, struct cifs_tcon *tcon,
+>      __u8 *lease_key, const __le32 lease_state);
+> +extern int smb3_validate_negotiate(const unsigned int, struct cifs_tcon *);
 >
-> On Wed, 20 Nov 2013 12:22:08 +0100
-> sergio.conrad-QFKgK+z4sOrR7s880joybQ@public.gmane.org wrote:
->
-> >
-> > I can reproduce the error with this procedure :
-> > =C2=A0
-> >
-> > a script:
-> >
-> > for num in $(seq 1 200)
-> > do=C2=A0
-> > dd if=3D/dev/zero of=3Dcifsmount/file${num} bs=3D1024 count=3D1000
-> > done
-> >
-> > =C2=A0
-> >
-> > Execute the script, and send control-C several time when running
-> >
-> > 50 % chance i got unexpected SMB signature
-> >
-> > =C2=A0any idea ?
-> >
-> >
->
-> You need a more recent kernel, or a backport of commit
-> ad313cb86dfba27f8f2306da304974ef17c91c56.
->
-> > =C2=A0
-> > > Message du 20/11/13 08:48
-> > > De : sergio.conrad-QFKgK+z4sOrR7s880joybQ@public.gmane.org
-> > > A : linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > > Copie =C3=A0 :
-> > > Objet : Re: CIFS VFS: Unexpected SMB signature ...NULL inode in l=
-ookup
-> > >
-> > >
-> > > Hello
-> > > I have open a bug quite a while ago https://bugzilla.samba.org/sh=
-ow_bug.cgi?id=3D9477=20
-and
-> > don't have any news.
-> > > I am using sec=3Dkrb5i, but have the same problem with ntlmv2...
-> > >
-> > > The problem is the same with a centos 6 computer.
-> > >
-> > > Perhaps the problem is in the Windows Server ...
-> > > Do I have to change AllowLegacySrvCall as described in
-> > http://support.microsoft.com/kb/957441 ?
-> > > Perhaps I have to put a more recent driver in my server: It is a =
-Dell T610 server
-> > > with a NetExtreme II gigabitE (version 5.2.14 17/12/2009) ?
-> > >
-> > > Please help , as the problems continue ...
-> > > Thanks
-> > > Serge Conrad
-> > >
-> > > Hello ...
-> > > in the messages, you could see an SMB unexpected signature (21 Ja=
-n 16:13:16)
-> > > In the dump file , the trame no 470 is at the same time (16:13:16=
-)
-> > >
-> > > The environnement is the same as described in=20
-https://bugzilla.samba.org/show_bug.cgi?
-> > id=3D9477
-> > >
-> > > Regards,
-> > >
-> > > Serge
-> > >
-> > > > Message du 25/01/13 16:15
-> > > > De : "Steve French"
-> > > > A : "sergio. conrad"
-> > > > Copie =C3=A0 :
-> > > > Objet : Re: CIFS VFS: Unexpected SMB signature ...NULL inode in=
- lookup
-> > > >
-> > > > You could send the trace to me directly
-> > > > On Jan 25, 2013 8:42 AM, "sergio.conrad" wrote:
-> > > >
-> > > > > Hello
-> > > > > I do have a network trace for
-> > > > > https://bugzilla.samba.org/show_bug.cgi?id=3D9477
-> > > > > But there is the public adress ip of the server in the trace.=
- I don't know
-> > > > > how to hide
-> > > > > this. Could I send the trace to you, or must I find a way to =
-hide the
-> > > > > trace ?
-> > > > >
-> > > > > Thanks
-> > > > > Serge
-> > > > >
-> > > > > > Message du 05/12/12 16:18
-> > > > > > De : "Steve French"
-> > > > > > A : "sergio.conrad"
-> > > > > > Copie =C3=A0 : linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > > > > > Objet : Re: CIFS VFS: Unexpected SMB signature ...NULL inod=
-e in lookup
-> > > > > >
-> > > > > > Could you open a bugzilla bug at bugzilla.samba.org and if =
-possible
-> > > > > > attach a network trace around the time that this is trigger=
-ed (if it
-> > > > > > is trivial to reproduce)
-> > > > > > https://wiki.samba.org/index.php/Capture_Packets
-> > > > > >
-> > > > > > On Wed, Dec 5, 2012 at 8:43 AM, sergio.conrad wrote:
-> > > > > > > Hello,
-> > > > > > >
-> > > > > > > The log are from 2.6.43.8-1.fc15.x86_64.
-> > > > > > > I see also the error CIFS VFS: Unexpected SMB signature w=
-ith the same
-> > > > > environnement
-> > > > > on a 3.6.6-1.fc16.x86_64
-> > > > > > >
-> > > > > > > Thanks,
-> > > > > > >
-> > > > > > > Serge
-> > > > > > >
-> > > > > > >
-> > > > > > >> Message du 04/12/12 20:06
-> > > > > > >> De : "Steve French"
-> > > > > > >> A : "sergio.conrad"
-> > > > > > >> Copie =C3=A0 : linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > > > > > >> Objet : Re: CIFS VFS: Unexpected SMB signature ...NULL i=
-node in lookup
-> > > > > > >>
-> > > > > > >> What kernel version?
-> > > > > > >>
-> > > > > > >> I would not expect the "noserverino" mount option to be =
-a factor.
-> > > > > > >> Jeff did fix one warning relating to unexpected signatur=
-es in this
-> > > > > > >> patch, see below (which I don't think is your issue (if =
-the signature
-> > > > > > >> is coming on a transact2 request).
-> > > > > > >>
-> > > > > > >> commit 9c4843ea576107a3c1fb94f2f758f198e9fe9e54
-> > > > > > >> Author: Jeff Layton
-> > > > > > >> Date: Mon Jun 6 15:40:23 2011 -0400
-> > > > > > >>
-> > > > > > >> cifs: silence printk when establishing first session on =
-socket
-> > > > > > >>
-> > > > > > >> When signing is enabled, the first session that's establ=
-ished on a
-> > > > > > >> socket will cause a printk like this to pop:
-> > > > > > >>
-> > > > > > >> CIFS VFS: Unexpected SMB signature
-> > > > > > >>
-> > > > > > >> This is because the key exchange hasn't happened yet, so=
- the signature
-> > > > > > >> field is bogus. Don't try to check the signature on the =
-socket until
-> > > > > the
-> > > > > > >> first session has been established. Also, eliminate the =
-specific check
-> > > > > > >> for SMB_COM_NEGOTIATE since this check covers that case =
-too.
-> > > > > > >>
-> > > > > > >>
-> > > > > > >> On Tue, Dec 4, 2012 at 7:23 AM, sergio.conrad wrote:
-> > > > > > >> > Hi,
-> > > > > > >> >
-> > > > > > >> > I have a problem with users losing their connections f=
-rom linux
-> > > > > clients with cifs
-> > > > > share. (Windows 2008) :CIFS VFS: Unexpected SMB signature
-> > > > > > >> > I am using two methods for mounting: pam_mount and aut=
-ofs, both
-> > > > > with same results.
-> > > > > > >> >
-> > > > > > >> > I am using mount options nounix,noserverino
-> > > > > > >> >
-> > > > > > >> > I am lauching cifs module on boot (rc.local) with
-> > > > > > >> > modprobe cifs
-> > > > > > >> > echo 0 > /proc/fs/cifs/OplockEnabled
-> > > > > > >> > echo 1 > /proc/fs/cifs/MultiuserMount
-> > > > > > >> > echo 7 > /proc/fs/cifs/cifsFYI
-> > > > > > >> >
-> > > > > > >> > What happens :
-> > > > > > >> > in /var/log/messages
-> > > > > > >> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-> > > > > > >> > Dec 3 17:31:01 u1205-08l kernel: [ 3732.140040] CIFS V=
-=46S:
-> > > > > Unexpected lookup error
-> > > > > -512
-> > > > > > >> > Dec 3 17:31:01 u1205-08l kernel: [ 3732.334939] CIFS V=
-=46S:
-> > > > > Unexpected SMB signature
-> > > > > > >> >
-> > > > > > >> > This user was working since one hour with no problem :
-> > > > > > >> > Daemon log :
-> > > > > > >> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > > > > >> > Dec 3 16:29:35 u1205-08l cifs.upcall: key description:
-> > > > > cifs.spnego;0;0;3f000000
-> > > > > > >> >
-> > > > >
-> > > > >=20
-;ver=3D0x2;host=3Dfigue;ip4=3D130.xxx.xxx.xxx;sec=3Dkrb5;uid=3D0x100000=
-5;creduid=3D0x1000005;us
-> > > > > > >> > er=3D21206xxx;pid=3D0x65f
-> > > > > > >> > Dec 3 16:29:35 u1205-08l cifs.upcall: ver=3D2
-> > > > > > >> > Dec 3 16:29:35 u1205-08l cifs.upcall: host=3Dfigue
-> > > > > > >> > Dec 3 16:29:35 u1205-08l cifs.upcall: ip=3D130.120.8.1=
-1
-> > > > > > >> > Dec 3 16:29:35 u1205-08l cifs.upcall: sec=3D1
-> > > > > > >> > Dec 3 16:29:35 u1205-08l cifs.upcall: uid=3D16777221
-> > > > > > >> > Dec 3 16:29:35 u1205-08l cifs.upcall: creduid=3D167772=
-21
-> > > > > > >> > Dec 3 16:29:35 u1205-08l cifs.upcall: user=3D21206xxx
-> > > > > > >> > Dec 3 16:29:35 u1205-08l cifs.upcall: pid=3D1631
-> > > > > > >> > Dec 3 16:29:35 u1205-08l cifs.upcall: find_krb5_cc: co=
-nsidering
-> > > > > /tmp/krb5cc_167
-> > > > > > >> > 77221
-> > > > > > >> > Dec 3 16:29:35 u1205-08l cifs.upcall: find_krb5_cc:
-> > > > > FILE:/tmp/krb5cc_16777221 i
-> > > > > > >> > s valid ccache
-> > > > > > >> >
-> > > > > > >> > in dmesg
-> > > > > > >> > =3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > > > > >> > fs/cifs/inode.c: Getting info on \21206xxx\TP9
-> > > > > > >> > [ 3735.419612] fs/cifs/transport.c: For smb_command 50
-> > > > > > >> > [ 3735.419615] fs/cifs/transport.c: Sending smb: total=
-_len 104
-> > > > > > >> > [ 3735.420257] fs/cifs/connect.c: RFC1002 header 0x23
-> > > > > > >> > [ 3735.420261] fs/cifs/connect.c: invalid transact2 wo=
-rd count
-> > > > > > >> > [ 3735.422403] fs/cifs/transport.c: cifs_sync_mid_resu=
-lt: cmd=3D50
-> > > > > mid=3D37012 state=3D4
-> > > > > > >> > [ 3735.422406] CIFS VFS: Unexpected SMB signature
-> > > > > > >> > [ 3735.422408] Status code returned 0xc0000022
-> > > > > NT_STATUS_ACCESS_DENIED
-> > > > > > >> > [ 3735.422411] fs/cifs/netmisc.c: Mapping smb error co=
-de 0xc0000022
-> > > > > to POSIX err
-> > > > > -13
-> > > > > > >> > [ 3735.422413] fs/cifs/cifssmb.c: Send error in QPathI=
-nfo =3D -13
-> > > > > > >> > [ 3735.422415] fs/cifs/dir.c: CIFS VFS: leaving cifs_l=
-ookup (xid =3D
-> > > > > 76854) rc =3D -13
-> > > > > > >> > [ 3735.422424] fs/cifs/dir.c: CIFS VFS: in cifs_lookup=
- as Xid:
-> > > > > 76855 with uid:
-> > > > > 16777221
-> > > > > > >> > [ 3735.422427] fs/cifs/dir.c: parent inode =3D 0xf1448=
-1f0 name is:
-> > > > > TP9 and dentry =3D
-> > > > > 0xf074e300
-> > > > > > >> > [ 3735.422429] fs/cifs/dir.c: NULL inode in lookup
-> > > > > > >> > [ 3735.422430] fs/cifs/dir.c: Full path: \21206xxx\TP9=
- inode =3D 0x
-> > > > > (null)
-> > > > > > >> >
-> > > > > > >> > I don't understand what happens...
-> > > > > > >> > NULL inode in lookup ... What about noserverino option=
- ?
-> > > > > > >> > Perhaps an unresponsive server... The network infrastr=
-ucture is
-> > > > > old. Last year I
-> > > > > got this working very well, but the server was in a better pl=
-ace (switch
-> > > > > and network
-> > > > > infrastructure speaking)
-> > > > > > >> >
-> > > > > > >> > Regards,
-> > > > > > >> > Thanks in advance
-> > > > > > >> > Serge Conrad
-> > > > > > >> >
-> > > > > > >> > Une messagerie gratuite, garantie =C3=A0 vie et des se=
-rvices en plus, =C3=A7a
-> > > > > vous tente ?
-> > > > > > >> > Je cr=C3=A9e ma bo=C3=AEte mail www.laposte.net
-> > > > > > >> > --
-> > > > > > >> > To unsubscribe from this list: send the line "unsubscr=
-ibe
-> > > > > linux-cifs" in
-> > > > > > >> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > > > > > >> > More majordomo info at http://vger.kernel.org/majordom=
-o-info.html
-> > > > > > >>
-> > > > > > >>
-> > > > > > >>
-> > > > > > >> --
-> > > > > > >> Thanks,
-> > > > > > >>
-> > > > > > >> Steve
-> > > > > > >> --
-> > > > > > >> To unsubscribe from this list: send the line "unsubscrib=
-e linux-cifs"
-> > > > > in
-> > > > > > >> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > > > > > >> More majordomo info at http://vger.kernel.org/majordomo-=
-info.html
-> > > > > > >>
-> > > > > > >
-> > > > > > > Une messagerie gratuite, garantie =C3=A0 vie et des servi=
-ces en plus, =C3=A7a
-> > > > > vous tente ?
-> > > > > > > Je cr=C3=A9e ma bo=C3=AEte mail www.laposte.net
-> > > > > >
-> > > > > >
-> > > > > >
-> > > > > > --
-> > > > > > Thanks,
-> > > > > >
-> > > > > > Steve
-> > > > > > --
-> > > > > > To unsubscribe from this list: send the line "unsubscribe l=
-inux-cifs" in
-> > > > > > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > > > > > More majordomo info at http://vger.kernel.org/majordomo-inf=
-o.html
-> > > > > >
-> > > > >
-> > > > > Une messagerie gratuite, garantie =C3=A0 vie et des services =
-en plus, =C3=A7a vous
-> > > > > tente ?
-> > > > > Je cr=C3=A9e ma bo=C3=AEte mail www.laposte.net
-> > > > >
-> > > >
-> > >
-> > > Une messagerie gratuite, garantie =C3=A0 vie et des services en p=
-lus, =C3=A7a vous tente ?
-> > > Je cr=C3=A9e ma bo=C3=AEte mail www.laposte.net
-> > > --
-> > > To unsubscribe from this list: send the line "unsubscribe linux-c=
-ifs" in
-> > > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > > More majordomo info at http://vger.kernel.org/majordomo-info.html
-> > >
-> > =C2=A0
-> >
-> >
-> > >
-> > >
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-cif=
-s" in
-> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > More majordomo info at http://vger.kernel.org/majordomo-info.html
+>  #endif /* _SMB2PROTO_H */
+> diff --git a/fs/cifs/smbfsctl.h b/fs/cifs/smbfsctl.h
+> index a4b2391f..0e538b5 100644
+> --- a/fs/cifs/smbfsctl.h
+> +++ b/fs/cifs/smbfsctl.h
+> @@ -90,7 +90,7 @@
+>  #define FSCTL_LMR_REQUEST_RESILIENCY 0x001401D4 /* BB add struct */
+>  #define FSCTL_LMR_GET_LINK_TRACK_INF 0x001400E8 /* BB add struct */
+>  #define FSCTL_LMR_SET_LINK_TRACK_INF 0x001400EC /* BB add struct */
+> -#define FSCTL_VALIDATE_NEGOTIATE_INFO 0x00140204 /* BB add struct */
+> +#define FSCTL_VALIDATE_NEGOTIATE_INFO 0x00140204
+>  /* Perform server-side data movement */
+>  #define FSCTL_SRV_COPYCHUNK 0x001440F2
+>  #define FSCTL_SRV_COPYCHUNK_WRITE 0x001480F2
+> --
+> 1.8.3.1
 >
 >
 > --
-> Jeff Layton
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at http://vger.kernel.org/majordomo-info.html
+> Thanks,
 >
-=C2=A0
-
-=C2=A0
-
-=C2=A0
-
-
->
->
+> Steve
