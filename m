@@ -1,55 +1,47 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: mapchars should be default on smb2 and later mounts
-Date: Wed, 20 Nov 2013 15:23:49 -0600
-Message-ID: <CAH2r5mu5SK++C4MaK1M-VQTWBk60JE843wWC-sUBWnYxLnHioQ@mail.gmail.com>
+Subject: [GIT] CIFS Fixes
+Date: Wed, 20 Nov 2013 21:54:21 -0600
+Message-ID: <CAH2r5msTi=keXhjob1F9fxTSR8AVAAzR5PZKHqHXaf6WAdqTpg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Since we don't have posix pathnames in SMB2/SMB3, shouldn't mapchars
-be the default if unspecified at mount to smb2/smb3 server?
+Small set of changes this time.  As promised, the finish up of
+the copy offload support, and a small security feature for SMB3
+needed to prevent certain types of downgrade attacks.
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 8813ff7..cc24459 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1197,6 +1197,7 @@ cifs_parse_mount_options(const char *mountdata,
-const char *devname,
-     short int override_gid = -1;
-     bool uid_specified = false;
-     bool gid_specified = false;
-+    bool mapchar_specified = false;
-     bool sloppy = false;
-     char *invalid = NULL;
-     char *nodename = utsname()->nodename;
-@@ -1339,9 +1340,11 @@ cifs_parse_mount_options(const char *mountdata,
-const char *devname,
-             break;
-         case Opt_mapchars:
-             vol->remap = 1;
-+            mapchar_specified = true;
-             break;
-         case Opt_nomapchars:
-             vol->remap = 0;
-+            mapchar_specified = true;
-             break;
-         case Opt_sfu:
-             vol->sfu_emul = 1;
-@@ -1882,6 +1885,10 @@ cifs_parse_mount_options(const char *mountdata,
-const char *devname,
-         printk(KERN_NOTICE "CIFS: ignoring forcegid mount option "
-                    "specified with no gid= option.\n");
+The following changes since commit 2d3c627502f2a9b0a7de06a5a2df23
+65542a72c9:
 
-+    /* SMB2 and later do not support posix pathnames. default to mapchar */
-+    if ((mapchar_specified == false) && (vol->vals != &smb1_values))
-+        vol->remap = 1;
-+
-     kfree(mountdata_copy);
-     return 0;
+  Revert "init/Kconfig: add option to disable kernel compression"
+(2013-11-17 11:17:36 -0800)
+
+are available in the git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git for-next
+
+for you to fetch changes up to ff1c038addc4f205d5f1ede449426c7d316c0eed:
+
+  Check SMB3 dialects against downgrade attacks (2013-11-19 23:52:54 -0600)
+
+----------------------------------------------------------------
+Steve French (3):
+      CIFS: Fix SMB2/SMB3 Copy offload support (refcopy) for large files
+      Removed duplicated (and unneeded) goto
+      Check SMB3 dialects against downgrade attacks
+
+ fs/cifs/cifsglob.h  |  1 +
+ fs/cifs/smb2ops.c   | 99 ++++++++++++++++++++++++++++++++++++++++++++++-------
+ fs/cifs/smb2pdu.c   | 92 ++++++++++++++++++++++++++++++++++++++++++++++---
+ fs/cifs/smb2pdu.h   | 12 +++++--
+ fs/cifs/smb2proto.h |  1 +
+ fs/cifs/smbfsctl.h  |  2 +-
+ 6 files changed, 185 insertions(+), 22 deletions(-)
+
 
 -- 
 Thanks,
