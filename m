@@ -1,7 +1,7 @@
 From: Gregor Beck <gbeck-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org>
-Subject: [PATCH 4/9] add function CIFSSMBQPathInfoStandard()
-Date: Fri, 22 Nov 2013 11:26:53 +0100
-Message-ID: <1385116018-14068-5-git-send-email-gbeck@sernet.de>
+Subject: [PATCH 5/9] fallback to CIFSSMBQPathInfoBasic() in cifs_is_path_accessible()
+Date: Fri, 22 Nov 2013 11:26:54 +0100
+Message-ID: <1385116018-14068-6-git-send-email-gbeck@sernet.de>
 References: <E1VjSnS-004B9V-Fo@intern.SerNet.DE>
  <1385116018-14068-1-git-send-email-gbeck@sernet.de>
 Cc: Gregor Beck <gbeck-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org>
@@ -12,45 +12,41 @@ Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 ---
- cifsproto.h |    3 +++
- cifssmb.c   |   11 +++++++++++
- 2 files changed, 14 insertions(+)
+ smb1ops.c |   13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/cifsproto.h b/cifsproto.h
-index ea25d0d..d015336 100644
---- a/cifsproto.h
-+++ b/cifsproto.h
-@@ -243,6 +243,9 @@ extern int CIFSSMBQPathInfo(const unsigned int xid, struct cifs_tcon *tcon,
- extern int CIFSSMBQPathInfoBasic(const unsigned int xid, struct cifs_tcon *tcon,
- 				 const char *search_name, FILE_BASIC_INFO *data,
- 				 const struct nls_table *nls_codepage, int remap);
-+extern int CIFSSMBQPathInfoStandard(const unsigned int xid, struct cifs_tcon *tcon,
-+				    const char *search_name, FILE_STANDARD_INFO *data,
-+				    const struct nls_table *nls_codepage, int remap);
- extern int SMBQueryInformation(const unsigned int xid, struct cifs_tcon *tcon,
- 			       const char *search_name, FILE_ALL_INFO *data,
- 			       const struct nls_table *nls_codepage, int remap);
-diff --git a/cifssmb.c b/cifssmb.c
-index d8189b5..38be854 100644
---- a/cifssmb.c
-+++ b/cifssmb.c
-@@ -4076,6 +4076,17 @@ CIFSSMBQPathInfoBasic(const unsigned int xid, struct cifs_tcon *tcon,
- }
- 
- int
-+CIFSSMBQPathInfoStandard(const unsigned int xid, struct cifs_tcon *tcon,
-+			 const char *search_name, FILE_STANDARD_INFO *data,
-+			 const struct nls_table *nls_codepage, int remap)
-+{
-+	return CIFSSMBQPathInfoImpl(xid, tcon, search_name,
-+				    data, sizeof(FILE_STANDARD_INFO),
-+				    SMB_QUERY_FILE_STANDARD_INFO, 24 /*???*/,
-+				    nls_codepage, remap);
-+}
-+
-+int
- CIFSSMBUnixQFileInfo(const unsigned int xid, struct cifs_tcon *tcon,
- 		 u16 netfid, FILE_UNIX_BASIC_INFO *pFindData)
+diff --git a/smb1ops.c b/smb1ops.c
+index 6094397..635b1e5 100644
+--- a/smb1ops.c
++++ b/smb1ops.c
+@@ -513,20 +513,23 @@ cifs_is_path_accessible(const unsigned int xid, struct cifs_tcon *tcon,
  {
+ 	int rc;
+ 	FILE_ALL_INFO *file_info;
++	const int remap = cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR;
+ 
+ 	file_info = kmalloc(sizeof(FILE_ALL_INFO), GFP_KERNEL);
+ 	if (file_info == NULL)
+ 		return -ENOMEM;
+ 
+ 	rc = CIFSSMBQPathInfo(xid, tcon, full_path, file_info,
+-			      0 /* not legacy */, cifs_sb->local_nls,
+-			      cifs_sb->mnt_cifs_flags &
+-				CIFS_MOUNT_MAP_SPECIAL_CHR);
++			      0 /* not legacy */, cifs_sb->local_nls, remap);
++	if (rc == -EIO) {
++		rc = CIFSSMBQPathInfoBasic(xid, tcon, full_path,
++					   (FILE_BASIC_INFO*)file_info,
++					   cifs_sb->local_nls, remap);
++	}
+ 
+ 	if (rc == -EOPNOTSUPP || rc == -EINVAL)
+ 		rc = SMBQueryInformation(xid, tcon, full_path, file_info,
+-				cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
+-				  CIFS_MOUNT_MAP_SPECIAL_CHR);
++					 cifs_sb->local_nls, remap);
+ 	kfree(file_info);
+ 	return rc;
+ }
 -- 
 1.7.9.5
