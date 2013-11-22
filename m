@@ -1,49 +1,146 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 1/9] add struct FILE_STANDARD_INFO
-Date: Fri, 22 Nov 2013 09:15:05 -0500
-Message-ID: <20131122091505.3c642cc5@tlielax.poochiereds.net>
+Subject: Re: [PATCH 2/9] refactor CIFSSMBQPathInfo()
+Date: Fri, 22 Nov 2013 09:19:58 -0500
+Message-ID: <20131122091958.678b8d72@tlielax.poochiereds.net>
 References: <E1VjSnS-004B9V-Fo@intern.SerNet.DE>
 	<1385116018-14068-1-git-send-email-gbeck@sernet.de>
-	<1385116018-14068-2-git-send-email-gbeck@sernet.de>
+	<1385116018-14068-3-git-send-email-gbeck@sernet.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Gregor Beck <gbeck-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1385116018-14068-2-git-send-email-gbeck-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org>
+In-Reply-To: <1385116018-14068-3-git-send-email-gbeck-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 22 Nov 2013 11:26:50 +0100
+On Fri, 22 Nov 2013 11:26:51 +0100
 Gregor Beck <gbeck-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org> wrote:
 
 > ---
->  cifspdu.h |   10 ++++++++++
->  1 file changed, 10 insertions(+)
+>  cifssmb.c |   59 ++++++++++++++++++++++++++++++++---------------------------
+>  1 file changed, 32 insertions(+), 27 deletions(-)
 > 
-> diff --git a/cifspdu.h b/cifspdu.h
-> index 11ca24a..89aa1f2 100644
-> --- a/cifspdu.h
-> +++ b/cifspdu.h
-> @@ -2233,6 +2233,16 @@ typedef struct { /* data block encoding of response to level 263 QPathInfo */
->  	char FileName[1];
->  } __attribute__((packed)) FILE_ALL_INFO;	/* level 0x107 QPathInfo */
+> diff --git a/cifssmb.c b/cifssmb.c
+> index a89c4cb..7b055fe 100644
+> --- a/cifssmb.c
+> +++ b/cifssmb.c
+> @@ -3958,13 +3958,13 @@ QFileInfoRetry:
+>  	return rc;
+>  }
 >  
-> +typedef struct {
-> +	__le64 AllocationSize;
-> +	__le64 EndOfFile;	/* size ie offset to first free byte in file */
-> +	__le32 NumberOfLinks;	/* hard links */
-> +	__u8 DeletePending;
-> +	__u8 Directory;
-> +	__u16 Pad;
-> +} __attribute__((packed)) FILE_STANDARD_INFO;	/* level 0x102 QPathInfo */
-> +
-> +
->  /* defines for enumerating possible values of the Unix type field below */
->  #define UNIX_FILE      0
->  #define UNIX_DIR       1
+> -int
+> -CIFSSMBQPathInfo(const unsigned int xid, struct cifs_tcon *tcon,
+> -		 const char *search_name, FILE_ALL_INFO *data,
+> -		 int legacy /* old style infolevel */,
+> -		 const struct nls_table *nls_codepage, int remap)
+> +static int
+> +CIFSSMBQPathInfoImpl(const unsigned int xid, struct cifs_tcon *tcon,
+> +		     const char *search_name,
+> +		     void *data, int size,
+> +		     __u16 level, __u16 bcc,
+> +		     const struct nls_table *nls_codepage, int remap)
+>  {
+> -	/* level 263 SMB_QUERY_FILE_ALL_INFO */
+>  	TRANSACTION2_QPI_REQ *pSMB = NULL;
+>  	TRANSACTION2_QPI_RSP *pSMBr = NULL;
+>  	int rc = 0;
+> @@ -3972,7 +3972,7 @@ CIFSSMBQPathInfo(const unsigned int xid, struct cifs_tcon *tcon,
+>  	int name_len;
+>  	__u16 params, byte_count;
+>  
+> -	/* cifs_dbg(FYI, "In QPathInfo path %s\n", search_name); */
+> +	cifs_dbg(FYI, "In QPathInfo level %u path %s", level, search_name);
+>  QPathInfoRetry:
+>  	rc = smb_init(SMB_COM_TRANSACTION2, 15, tcon, (void **) &pSMB,
+>  		      (void **) &pSMBr);
+> @@ -4011,10 +4011,7 @@ QPathInfoRetry:
+>  	byte_count = params + 1 /* pad */ ;
+>  	pSMB->TotalParameterCount = cpu_to_le16(params);
+>  	pSMB->ParameterCount = pSMB->TotalParameterCount;
+> -	if (legacy)
+> -		pSMB->InformationLevel = cpu_to_le16(SMB_INFO_STANDARD);
+> -	else
+> -		pSMB->InformationLevel = cpu_to_le16(SMB_QUERY_FILE_ALL_INFO);
+> +	pSMB->InformationLevel = level;
 
-Looks correct...
+should be "cpu_to_le16(level)"
 
-Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>  	pSMB->Reserved4 = 0;
+>  	inc_rfc1001_len(pSMB, byte_count);
+>  	pSMB->ByteCount = cpu_to_le16(byte_count);
+> @@ -4028,25 +4025,10 @@ QPathInfoRetry:
+>  
+>  		if (rc) /* BB add auto retry on EOPNOTSUPP? */
+>  			rc = -EIO;
+> -		else if (!legacy && get_bcc(&pSMBr->hdr) < 40)
+> +		else if (get_bcc(&pSMBr->hdr) < bcc)
+>  			rc = -EIO;	/* bad smb */
+> -		else if (legacy && get_bcc(&pSMBr->hdr) < 24)
+> -			rc = -EIO;  /* 24 or 26 expected but we do not read
+> -					last field */
+>  		else if (data) {
+> -			int size;
+>  			__u16 data_offset = le16_to_cpu(pSMBr->t2.DataOffset);
+> -
+> -			/*
+> -			 * On legacy responses we do not read the last field,
+> -			 * EAsize, fortunately since it varies by subdialect and
+> -			 * also note it differs on Set vs Get, ie two bytes or 4
+> -			 * bytes depending but we don't care here.
+> -			 */
+> -			if (legacy)
+> -				size = sizeof(FILE_INFO_STANDARD);
+> -			else
+> -				size = sizeof(FILE_ALL_INFO);
+>  			memcpy((char *) data, (char *) &pSMBr->hdr.Protocol +
+>  			       data_offset, size);
+>  		} else
+> @@ -4060,6 +4042,29 @@ QPathInfoRetry:
+>  }
+>  
+>  int
+> +CIFSSMBQPathInfo(const unsigned int xid, struct cifs_tcon *tcon,
+> +		 const char *search_name, FILE_ALL_INFO *data,
+> +		 int legacy /* old style infolevel */,
+> +		 const struct nls_table *nls_codepage, int remap)
+> +{
+> +	if (legacy) {
+> +		/* 24 or 26 expected but on legacy responses we do not read the
+> +		   last field, EAsize, fortunately since it varies by subdialect
+> +		   and also note it differs on Set vs. Get, ie two bytes or 4
+> +		   bytes depending but we don't care here */
+
+nit: The above comment should be in kernel standard format (like the one is
+     that you removed).
+
+> +		return CIFSSMBQPathInfoImpl(xid, tcon, search_name,
+> +					    data, sizeof(FILE_INFO_STANDARD),
+> +					    SMB_INFO_STANDARD, 24,
+> +					    nls_codepage, remap);
+> +	} else {
+> +		return CIFSSMBQPathInfoImpl(xid, tcon, search_name,
+> +					    data, sizeof(FILE_ALL_INFO),
+> +					    SMB_QUERY_FILE_ALL_INFO, 40,
+> +					    nls_codepage, remap);
+
+Avoid using "naked" numbers like you are with the bcc values above. At
+the very least if you do use them, please add comments to explain why
+they are what they are.
+
+Yes, it's true that the existing code does that but it's nasty, and the
+time to clean it up is while you're in there.
+
+> +	}
+> +}
+> +
+> +int
+>  CIFSSMBUnixQFileInfo(const unsigned int xid, struct cifs_tcon *tcon,
+>  		 u16 netfid, FILE_UNIX_BASIC_INFO *pFindData)
+>  {
+
+Other than the above, this looks like a reasonable cleanup.
+
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
