@@ -1,7 +1,7 @@
 From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 6/8] cifs: Re-order M-F Symlink code
-Date: Mon, 25 Nov 2013 17:09:53 +0000
-Message-ID: <1385399395-19217-7-git-send-email-sprabhu@redhat.com>
+Subject: [PATCH 8/8] cifs: Add support for readlink on dfs shares under posix extensions
+Date: Mon, 25 Nov 2013 17:09:55 +0000
+Message-ID: <1385399395-19217-9-git-send-email-sprabhu@redhat.com>
 References: <1385399395-19217-1-git-send-email-sprabhu@redhat.com>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,176 +9,78 @@ In-Reply-To: <1385399395-19217-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This patch makes cosmetic changes. We group similar functions together
-and separate out the protocol specific functions.
+When using posix extensions, dfs shares in the dfs root show up as
+symlinks resulting in userland tools such as 'ls' calling readlink() on
+these shares. Since these are dfs shares, readlink fails with -EREMOTE.
+
+With added support for dfs shares on readlink when using unix
+extensions, we call GET_DFS_REFERRAL to obtain the DFS referral and
+return the first node returned.
+
+The dfs share in the dfs root is now displayed in the following manner.
+$ ls -l /mnt
+total 0
+lrwxrwxrwx. 1 root root 19 Nov  6 09:47 test -> \vm140-31\test
+
+Red Hat BZ: 1020715
 
 Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/link.c | 124 +++++++++++++++++++++++++++++++--------------------------
- 1 file changed, 68 insertions(+), 56 deletions(-)
+ fs/cifs/smb1ops.c | 34 +++++++++++++++++++++++++++++++++-
+ 1 file changed, 33 insertions(+), 1 deletion(-)
 
-diff --git a/fs/cifs/link.c b/fs/cifs/link.c
-index d45d43d..ee5ae46 100644
---- a/fs/cifs/link.c
-+++ b/fs/cifs/link.c
-@@ -29,6 +29,10 @@
- #include "cifs_debug.h"
- #include "cifs_fs_sb.h"
- 
-+/*
-+ * M-F Symlink Functions - Begin
-+ */
-+
- #define CIFS_MF_SYMLINK_LEN_OFFSET (4+1)
- #define CIFS_MF_SYMLINK_MD5_OFFSET (CIFS_MF_SYMLINK_LEN_OFFSET+(4+1))
- #define CIFS_MF_SYMLINK_LINK_OFFSET (CIFS_MF_SYMLINK_MD5_OFFSET+(32+1))
-@@ -178,6 +182,20 @@ format_mf_symlink(u8 *buf, unsigned int buf_len, const char *link_str)
- 	return 0;
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index 2d822dd..abd2cc9 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -908,6 +908,33 @@ cifs_mand_lock(const unsigned int xid, struct cifsFileInfo *cfile, __u64 offset,
  }
  
-+bool
-+couldbe_mf_symlink(const struct cifs_fattr *fattr)
+ static int
++cifs_unix_dfs_readlink(const unsigned int xid, struct cifs_tcon *tcon,
++		       const unsigned char *searchName, char **symlinkinfo,
++		       const struct nls_table *nls_codepage)
 +{
-+	if (!(fattr->cf_mode & S_IFREG))
-+		/* it's not a symlink */
-+		return false;
++#ifdef CONFIG_CIFS_DFS_UPCALL
++	int rc;
++	unsigned int num_referrals = 0;
++	struct dfs_info3_param *referrals = NULL;
 +
-+	if (fattr->cf_eof != CIFS_MF_SYMLINK_FILE_SIZE)
-+		/* it's not a symlink */
-+		return false;
++	rc = get_dfs_path(xid, tcon->ses, searchName, nls_codepage,
++			  &num_referrals, &referrals, 0);
 +
-+	return true;
++	if (!rc && num_referrals > 0) {
++		*symlinkinfo = kstrndup(referrals->node_name,
++					strlen(referrals->node_name),
++					GFP_KERNEL);
++		if (!*symlinkinfo)
++			rc = -ENOMEM;
++		free_dfs_info_array(referrals, num_referrals);
++	}
++	return rc;
++#else /* No DFS support */
++	return -EREMOTE;
++#endif
 +}
 +
- static int
- create_mf_symlink(const unsigned int xid, struct cifs_tcon *tcon,
- 		  struct cifs_sb_info *cifs_sb, const char *fromName,
-@@ -241,20 +259,60 @@ out:
- 	return rc;
- }
++static int
+ cifs_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
+ 		   const char *full_path, char **target_path,
+ 		   struct cifs_sb_info *cifs_sb)
+@@ -920,8 +947,13 @@ cifs_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
  
--bool
--couldbe_mf_symlink(const struct cifs_fattr *fattr)
-+int
-+check_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
-+		 struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
-+		 const unsigned char *path)
- {
--	if (!(fattr->cf_mode & S_IFREG))
-+	int rc;
-+	u8 *buf = NULL;
-+	unsigned int link_len = 0;
-+	unsigned int bytes_read = 0;
+ 	/* Check for unix extensions */
+ 	if (cap_unix(tcon->ses)) {
+-		rc = CIFSSMBUnixQuerySymLink(xid, tcon, full_path, &target_path,
++		rc = CIFSSMBUnixQuerySymLink(xid, tcon, full_path, target_path,
+ 					     cifs_sb->local_nls);
++		if (rc == -EREMOTE)
++			rc = cifs_unix_dfs_readlink(xid, tcon, full_path,
++						    target_path,
++						    cifs_sb->local_nls);
 +
-+	if (!couldbe_mf_symlink(fattr))
- 		/* it's not a symlink */
--		return false;
-+		return 0;
+ 		goto out;
+ 	}
  
--	if (fattr->cf_eof != CIFS_MF_SYMLINK_FILE_SIZE)
-+	buf = kmalloc(CIFS_MF_SYMLINK_FILE_SIZE, GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
-+
-+	if (tcon->ses->server->ops->query_mf_symlink)
-+		rc = tcon->ses->server->ops->query_mf_symlink(xid, tcon,
-+					      cifs_sb, path, buf, &bytes_read);
-+	else
-+		rc = -ENOSYS;
-+
-+	if (rc)
-+		goto out;
-+
-+	if (bytes_read == 0) /* not a symlink */
-+		goto out;
-+
-+	rc = parse_mf_symlink(buf, bytes_read, &link_len, NULL);
-+	if (rc == -EINVAL) {
- 		/* it's not a symlink */
--		return false;
-+		rc = 0;
-+		goto out;
-+	}
- 
--	return true;
-+	if (rc != 0)
-+		goto out;
-+
-+	/* it is a symlink */
-+	fattr->cf_eof = link_len;
-+	fattr->cf_mode &= ~S_IFMT;
-+	fattr->cf_mode |= S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
-+	fattr->cf_dtype = DT_LNK;
-+out:
-+	kfree(buf);
-+	return rc;
- }
- 
-+/*
-+ * SMB 1.0 Protocol specific functions
-+ */
-+
- int
- cifs_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
- 		      struct cifs_sb_info *cifs_sb, const unsigned char *path,
-@@ -324,55 +382,9 @@ cifs_create_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
- 	return rc;
- }
- 
--int
--check_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
--		 struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
--		 const unsigned char *path)
--{
--	int rc;
--	u8 *buf = NULL;
--	unsigned int link_len = 0;
--	unsigned int bytes_read = 0;
--
--	if (!couldbe_mf_symlink(fattr))
--		/* it's not a symlink */
--		return 0;
--
--	buf = kmalloc(CIFS_MF_SYMLINK_FILE_SIZE, GFP_KERNEL);
--	if (!buf)
--		return -ENOMEM;
--
--	if (tcon->ses->server->ops->query_mf_symlink)
--		rc = tcon->ses->server->ops->query_mf_symlink(xid, tcon,
--					      cifs_sb, path, buf, &bytes_read);
--	else
--		rc = -ENOSYS;
--
--	if (rc)
--		goto out;
--
--	if (bytes_read == 0) /* not a symlink */
--		goto out;
--
--	rc = parse_mf_symlink(buf, bytes_read, &link_len, NULL);
--	if (rc == -EINVAL) {
--		/* it's not a symlink */
--		rc = 0;
--		goto out;
--	}
--
--	if (rc != 0)
--		goto out;
--
--	/* it is a symlink */
--	fattr->cf_eof = link_len;
--	fattr->cf_mode &= ~S_IFMT;
--	fattr->cf_mode |= S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
--	fattr->cf_dtype = DT_LNK;
--out:
--	kfree(buf);
--	return rc;
--}
-+/*
-+ * M-F Symlink Functions - End
-+ */
- 
- int
- cifs_hardlink(struct dentry *old_file, struct inode *inode,
 -- 
 1.8.3.1
