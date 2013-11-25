@@ -1,86 +1,86 @@
-From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 8/8] cifs: Add support for readlink on dfs shares under posix extensions
-Date: Mon, 25 Nov 2013 17:09:55 +0000
-Message-ID: <1385399395-19217-9-git-send-email-sprabhu@redhat.com>
-References: <1385399395-19217-1-git-send-email-sprabhu@redhat.com>
+From: "pisymbol ." <pisymbol-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Required key not available?
+Date: Mon, 25 Nov 2013 17:41:43 -0500
+Message-ID: <CAPpy_fE=UgnVyUYA7spC7_rdPOvqeJYirKZk=CqqFcoe4e033w@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1385399395-19217-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-When using posix extensions, dfs shares in the dfs root show up as
-symlinks resulting in userland tools such as 'ls' calling readlink() on
-these shares. Since these are dfs shares, readlink fails with -EREMOTE.
+Hoping this is the right list after Googling for quite a while.
 
-With added support for dfs shares on readlink when using unix
-extensions, we call GET_DFS_REFERRAL to obtain the DFS referral and
-return the first node returned.
+I am trying to mount a CIFS share on a Windows 7 SP1 using Kerberos
+but no matter what I try, it fails with this:
 
-The dfs share in the dfs root is now displayed in the following manner.
-$ ls -l /mnt
-total 0
-lrwxrwxrwx. 1 root root 19 Nov  6 09:47 test -> \vm140-31\test
+# mount.cifs -o sec=krb5 //tilt.quest.com/Alex_Documents /mnt
+mount error(126): Required key not available
+Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
 
-Red Hat BZ: 1020715
+# uname -a
+Linux agalloch 2.6.34.9-69.ie5.fc13.x86_64 #1 SMP Sun Aug 14 22:10:19
+EDT 2011 x86_64 x86_64 x86_64 GNU/Linux
 
-Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/smb1ops.c | 34 +++++++++++++++++++++++++++++++++-
- 1 file changed, 33 insertions(+), 1 deletion(-)
+# cat /etc/redhat-release
+Fedora release 13 (Goddard)
 
-diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index 2d822dd..abd2cc9 100644
---- a/fs/cifs/smb1ops.c
-+++ b/fs/cifs/smb1ops.c
-@@ -908,6 +908,33 @@ cifs_mand_lock(const unsigned int xid, struct cifsFileInfo *cfile, __u64 offset,
- }
- 
- static int
-+cifs_unix_dfs_readlink(const unsigned int xid, struct cifs_tcon *tcon,
-+		       const unsigned char *searchName, char **symlinkinfo,
-+		       const struct nls_table *nls_codepage)
-+{
-+#ifdef CONFIG_CIFS_DFS_UPCALL
-+	int rc;
-+	unsigned int num_referrals = 0;
-+	struct dfs_info3_param *referrals = NULL;
-+
-+	rc = get_dfs_path(xid, tcon->ses, searchName, nls_codepage,
-+			  &num_referrals, &referrals, 0);
-+
-+	if (!rc && num_referrals > 0) {
-+		*symlinkinfo = kstrndup(referrals->node_name,
-+					strlen(referrals->node_name),
-+					GFP_KERNEL);
-+		if (!*symlinkinfo)
-+			rc = -ENOMEM;
-+		free_dfs_info_array(referrals, num_referrals);
-+	}
-+	return rc;
-+#else /* No DFS support */
-+	return -EREMOTE;
-+#endif
-+}
-+
-+static int
- cifs_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
- 		   const char *full_path, char **target_path,
- 		   struct cifs_sb_info *cifs_sb)
-@@ -920,8 +947,13 @@ cifs_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
- 
- 	/* Check for unix extensions */
- 	if (cap_unix(tcon->ses)) {
--		rc = CIFSSMBUnixQuerySymLink(xid, tcon, full_path, &target_path,
-+		rc = CIFSSMBUnixQuerySymLink(xid, tcon, full_path, target_path,
- 					     cifs_sb->local_nls);
-+		if (rc == -EREMOTE)
-+			rc = cifs_unix_dfs_readlink(xid, tcon, full_path,
-+						    target_path,
-+						    cifs_sb->local_nls);
-+
- 		goto out;
- 	}
- 
--- 
-1.8.3.1
+# mount.cifs -V
+mount.cifs version: 4.7
+
+# klist -e
+Ticket cache: FILE:/tmp/krb5cc_0
+Default principal: Administrator-LHiAKXGUGmt8zQARNC3f2A@public.gmane.org
+
+Valid starting     Expires            Service principal
+11/25/13 17:21:23  11/26/13 03:21:25  krbtgt/QUEST.COM-LHiAKXGUGmt8zQARNC3f2A@public.gmane.org
+    renew until 12/02/13 17:21:23, Etype (skey, tkt): ArcFour with
+HMAC/md5, ArcFour with HMAC/md5
+
+Some more debugging output:
+
+fs/cifs/sess.c: sess setup type 5
+ fs/cifs/cifs_spnego.c: key description =
+ver=0x2;host=tilt.quest.com;ip4=192.168.17.55;sec=krb5;uid=0x0;user=root;pid=0x4683
+ fs/cifs/sess.c: ssetup freeing small buf ffff88035ff8a700
+ CIFS VFS: Send error in SessSetup = -126
+ fs/cifs/connect.c: CIFS VFS: leaving cifs_mount (xid = 14) rc = -126
+ CIFS VFS: cifs_mount failed w/return code = -126
+...
+Slow work thread pool: Ready
+ CIFS VFS: Send error in SessSetup = -126
+ CIFS VFS: cifs_mount failed w/return code = -126
+ CIFS VFS: Send error in SessSetup = -126
+ CIFS VFS: cifs_mount failed w/return code = -126
+ CIFS VFS: Send error in SessSetup = -126
+ CIFS VFS: cifs_mount failed w/return code = -126
+ CIFS VFS: Send error in SessSetup = -126
+ CIFS VFS: cifs_mount failed w/return code = -126
+ CIFS VFS: Send error in SessSetup = -126
+ CIFS VFS: cifs_mount failed w/return code = -126
+ CIFS VFS: Send error in SessSetup = -126
+ CIFS VFS: cifs_mount failed w/return code = -126
+ CIFS VFS: Send error in SessSetup = -126
+ CIFS VFS: cifs_mount failed w/return code = -126
+ CIFS VFS: Send error in SessSetup = -126
+ CIFS VFS: cifs_mount failed w/return code = -126
+ CIFS VFS: signing required but server lacks support
+ CIFS VFS: cifs_mount failed w/return code = -95
+ CIFS VFS: Send error in SessSetup = -126
+ CIFS VFS: cifs_mount failed w/return code = -126
+
+# cat /etc/request-keys.conf
+...
+create     cifs.spnetgo     *    *         /usr/sbin/cifs.upcall %k
+create     dns_resolver    *     *         /usr/sbin/cifs.upcall %k
+
+I can mount using Samba, I can mount using NTLMv1 and v2. But I can
+not mount using Kerberos. I can use kvno to get a host ticket with
+ease.
+
+Folks, is there anything I'm missing here? Box is joined to AD and can
+query all day long.
+
+Thanks!
+
+-aps
