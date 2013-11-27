@@ -1,136 +1,162 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 1/8] cifs: We do not drop reference to tlink in
- CIFSCheckMFSymlink()
-Date: Wed, 27 Nov 2013 06:35:07 -0500
-Message-ID: <20131127063507.6e1a9a14@tlielax.poochiereds.net>
+Subject: Re: [PATCH 2/8] cifs: Rename and cleanup
+ open_query_close_cifs_symlink()
+Date: Wed, 27 Nov 2013 06:36:07 -0500
+Message-ID: <20131127063607.1ce4a4a2@tlielax.poochiereds.net>
 References: <1385399395-19217-1-git-send-email-sprabhu@redhat.com>
-	<1385399395-19217-2-git-send-email-sprabhu@redhat.com>
+	<1385399395-19217-3-git-send-email-sprabhu@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1385399395-19217-2-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1385399395-19217-3-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 25 Nov 2013 17:09:48 +0000
+On Mon, 25 Nov 2013 17:09:49 +0000
 Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-> When we obtain tcon from cifs_sb, we use cifs_sb_tlink() to first obtain
-> tlink which also grabs a reference to it. We do not drop this reference
-> to tlink once we are done with the call.
+> Rename open_query_close_cifs_symlink to cifs_query_mf_symlink() to make
+> the name more consistent with other protocol version specific functions.
 > 
-> The patch fixes this issue by instead passing tcon as a parameter and
-> avoids having to obtain a reference to the tlink. A lookup for the tcon
-> is already made in the calling functions and this way we avoid having to
-> re-run the lookup. This is also consistent with the argument list for
-> other similar calls for M-F symlinks.
-> 
-> We should also return an ENOSYS when we do not find a protocol specific
-> function to lookup the MF Symlink data.
+> We also pass tcon as an argument to the function. This is already
+> available in the calling functions and we can avoid having to make an
+> unnecessary lookup.
 > 
 > Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > ---
+>  fs/cifs/cifsglob.h  |  5 +++--
 >  fs/cifs/cifsproto.h |  7 ++++---
->  fs/cifs/inode.c     |  6 ++++--
->  fs/cifs/link.c      | 26 +++++++++++---------------
->  3 files changed, 19 insertions(+), 20 deletions(-)
+>  fs/cifs/link.c      | 37 ++++++++++++-------------------------
+>  fs/cifs/smb1ops.c   |  2 +-
+>  4 files changed, 20 insertions(+), 31 deletions(-)
 > 
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index d9ea7ad..e844515 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -370,8 +370,9 @@ struct smb_version_operations {
+>  	void (*new_lease_key)(struct cifs_fid *);
+>  	int (*generate_signingkey)(struct cifs_ses *);
+>  	int (*calc_signature)(struct smb_rqst *, struct TCP_Server_Info *);
+> -	int (*query_mf_symlink)(const unsigned char *, char *, unsigned int *,
+> -				struct cifs_sb_info *, unsigned int);
+> +	int (*query_mf_symlink)(unsigned int, struct cifs_tcon *,
+> +				struct cifs_sb_info *, const unsigned char *,
+> +				char *, unsigned int *);
+>  	/* if we can do cache read operations */
+>  	bool (*is_read_op)(__u32);
+>  	/* set oplock level for the inode */
 > diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index aa33976..2c29db6 100644
+> index 2c29db6..10b9ab1 100644
 > --- a/fs/cifs/cifsproto.h
 > +++ b/fs/cifs/cifsproto.h
-> @@ -477,9 +477,10 @@ extern int CIFSGetExtAttr(const unsigned int xid, struct cifs_tcon *tcon,
->  			const int netfid, __u64 *pExtAttrBits, __u64 *pMask);
->  extern void cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb);
->  extern bool CIFSCouldBeMFSymlink(const struct cifs_fattr *fattr);
-> -extern int CIFSCheckMFSymlink(struct cifs_fattr *fattr,
-> -		const unsigned char *path,
-> -		struct cifs_sb_info *cifs_sb, unsigned int xid);
-> +extern int CIFSCheckMFSymlink(unsigned int xid, struct cifs_tcon *tcon,
-> +			      struct cifs_sb_info *cifs_sb,
-> +			      struct cifs_fattr *fattr,
-> +			      const unsigned char *path);
->  extern int mdfour(unsigned char *, unsigned char *, int);
->  extern int E_md4hash(const unsigned char *passwd, unsigned char *p16,
->  			const struct nls_table *codepage);
-> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> index 36f9ebb..49719b8 100644
-> --- a/fs/cifs/inode.c
-> +++ b/fs/cifs/inode.c
-> @@ -383,7 +383,8 @@ int cifs_get_inode_info_unix(struct inode **pinode,
->  
->  	/* check for Minshall+French symlinks */
->  	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MF_SYMLINKS) {
-> -		int tmprc = CIFSCheckMFSymlink(&fattr, full_path, cifs_sb, xid);
-> +		int tmprc = CIFSCheckMFSymlink(xid, tcon, cifs_sb, &fattr,
-> +					       full_path);
->  		if (tmprc)
->  			cifs_dbg(FYI, "CIFSCheckMFSymlink: %d\n", tmprc);
->  	}
-> @@ -799,7 +800,8 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
->  
->  	/* check for Minshall+French symlinks */
->  	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MF_SYMLINKS) {
-> -		tmprc = CIFSCheckMFSymlink(&fattr, full_path, cifs_sb, xid);
-> +		tmprc = CIFSCheckMFSymlink(xid, tcon, cifs_sb, &fattr,
-> +					   full_path);
->  		if (tmprc)
->  			cifs_dbg(FYI, "CIFSCheckMFSymlink: %d\n", tmprc);
->  	}
+> @@ -496,7 +496,8 @@ void cifs_writev_complete(struct work_struct *work);
+>  struct cifs_writedata *cifs_writedata_alloc(unsigned int nr_pages,
+>  						work_func_t complete);
+>  void cifs_writedata_release(struct kref *refcount);
+> -int open_query_close_cifs_symlink(const unsigned char *path, char *pbuf,
+> -			unsigned int *pbytes_read, struct cifs_sb_info *cifs_sb,
+> -			unsigned int xid);
+> +int cifs_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+> +			  struct cifs_sb_info *cifs_sb,
+> +			  const unsigned char *path, char *pbuf,
+> +			  unsigned int *pbytes_read);
+>  #endif			/* _CIFSPROTO_H */
 > diff --git a/fs/cifs/link.c b/fs/cifs/link.c
-> index cc02347..92aee08 100644
+> index 92aee08..2a5837a 100644
 > --- a/fs/cifs/link.c
 > +++ b/fs/cifs/link.c
-> @@ -354,34 +354,30 @@ open_query_close_cifs_symlink(const unsigned char *path, char *pbuf,
->  
+> @@ -305,54 +305,41 @@ CIFSCouldBeMFSymlink(const struct cifs_fattr *fattr)
+>  }
 >  
 >  int
-> -CIFSCheckMFSymlink(struct cifs_fattr *fattr,
-> -		   const unsigned char *path,
-> -		   struct cifs_sb_info *cifs_sb, unsigned int xid)
-> +CIFSCheckMFSymlink(unsigned int xid, struct cifs_tcon *tcon,
-> +		   struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
-> +		   const unsigned char *path)
+> -open_query_close_cifs_symlink(const unsigned char *path, char *pbuf,
+> -			unsigned int *pbytes_read, struct cifs_sb_info *cifs_sb,
+> -			unsigned int xid)
+> +cifs_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+> +		      struct cifs_sb_info *cifs_sb, const unsigned char *path,
+> +		      char *pbuf, unsigned int *pbytes_read)
 >  {
-> -	int rc = 0;
-> +	int rc;
->  	u8 *buf = NULL;
->  	unsigned int link_len = 0;
->  	unsigned int bytes_read = 0;
+>  	int rc;
+>  	int oplock = 0;
+>  	__u16 netfid = 0;
+> -	struct tcon_link *tlink;
 > -	struct cifs_tcon *ptcon;
+>  	struct cifs_io_parms io_parms;
+>  	int buf_type = CIFS_NO_BUFFER;
+>  	FILE_ALL_INFO file_info;
 >  
->  	if (!CIFSCouldBeMFSymlink(fattr))
->  		/* it's not a symlink */
->  		return 0;
->  
->  	buf = kmalloc(CIFS_MF_SYMLINK_FILE_SIZE, GFP_KERNEL);
-> -	if (!buf) {
-> -		rc = -ENOMEM;
-> -		goto out;
-> -	}
-> +	if (!buf)
-> +		return -ENOMEM;
->  
-> -	ptcon = tlink_tcon(cifs_sb_tlink(cifs_sb));
-> -	if ((ptcon->ses) && (ptcon->ses->server->ops->query_mf_symlink))
-> -		rc = ptcon->ses->server->ops->query_mf_symlink(path, buf,
-> -						 &bytes_read, cifs_sb, xid);
-> +	if (tcon->ses->server->ops->query_mf_symlink)
-> +		rc = tcon->ses->server->ops->query_mf_symlink(path, buf,
-> +						&bytes_read, cifs_sb, xid);
->  	else
-> -		goto out;
-> +		rc = -ENOSYS;
->  
-> -	if (rc != 0)
+> -	tlink = cifs_sb_tlink(cifs_sb);
+> -	if (IS_ERR(tlink))
+> -		return PTR_ERR(tlink);
+> -	ptcon = tlink_tcon(tlink);
+> -
+> -	rc = CIFSSMBOpen(xid, ptcon, path, FILE_OPEN, GENERIC_READ,
+> +	rc = CIFSSMBOpen(xid, tcon, path, FILE_OPEN, GENERIC_READ,
+>  			 CREATE_NOT_DIR, &netfid, &oplock, &file_info,
+>  			 cifs_sb->local_nls,
+>  			 cifs_sb->mnt_cifs_flags &
+>  				CIFS_MOUNT_MAP_SPECIAL_CHR);
+> -	if (rc != 0) {
+> -		cifs_put_tlink(tlink);
 > +	if (rc)
->  		goto out;
+>  		return rc;
+> -	}
 >  
->  	if (bytes_read == 0) /* not a symlink */
-
-This should probably also go to stable?
+> -	if (file_info.EndOfFile != cpu_to_le64(CIFS_MF_SYMLINK_FILE_SIZE)) {
+> -		CIFSSMBClose(xid, ptcon, netfid);
+> -		cifs_put_tlink(tlink);
+> +	if (file_info.EndOfFile != cpu_to_le64(CIFS_MF_SYMLINK_FILE_SIZE))
+>  		/* it's not a symlink */
+> -		return rc;
+> -	}
+> +		goto out;
+>  
+>  	io_parms.netfid = netfid;
+>  	io_parms.pid = current->tgid;
+> -	io_parms.tcon = ptcon;
+> +	io_parms.tcon = tcon;
+>  	io_parms.offset = 0;
+>  	io_parms.length = CIFS_MF_SYMLINK_FILE_SIZE;
+>  
+>  	rc = CIFSSMBRead(xid, &io_parms, pbytes_read, &pbuf, &buf_type);
+> -	CIFSSMBClose(xid, ptcon, netfid);
+> -	cifs_put_tlink(tlink);
+> +out:
+> +	CIFSSMBClose(xid, tcon, netfid);
+>  	return rc;
+>  }
+>  
+> -
+>  int
+>  CIFSCheckMFSymlink(unsigned int xid, struct cifs_tcon *tcon,
+>  		   struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
+> @@ -372,8 +359,8 @@ CIFSCheckMFSymlink(unsigned int xid, struct cifs_tcon *tcon,
+>  		return -ENOMEM;
+>  
+>  	if (tcon->ses->server->ops->query_mf_symlink)
+> -		rc = tcon->ses->server->ops->query_mf_symlink(path, buf,
+> -						&bytes_read, cifs_sb, xid);
+> +		rc = tcon->ses->server->ops->query_mf_symlink(xid, tcon,
+> +					      cifs_sb, path, buf, &bytes_read);
+>  	else
+>  		rc = -ENOSYS;
+>  
+> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+> index 5f5ba0d..099c276 100644
+> --- a/fs/cifs/smb1ops.c
+> +++ b/fs/cifs/smb1ops.c
+> @@ -1009,7 +1009,7 @@ struct smb_version_operations smb1_operations = {
+>  	.mand_lock = cifs_mand_lock,
+>  	.mand_unlock_range = cifs_unlock_range,
+>  	.push_mand_locks = cifs_push_mandatory_locks,
+> -	.query_mf_symlink = open_query_close_cifs_symlink,
+> +	.query_mf_symlink = cifs_query_mf_symlink,
+>  	.is_read_op = cifs_is_read_op,
+>  };
+>  
 
 Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
