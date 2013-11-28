@@ -1,56 +1,31 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Wed, 27 Nov 2013 13:21:59 -0600
-Message-ID: <CAH2r5mtcsBjR5fcLyUjRAgdkSr2M7KUeN4ZzYH-bcLVf=jF9OQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 0/3] Extended file stat functions [ver #2]
+Date: Thu, 28 Nov 2013 13:07:24 +0000
+Message-ID: <14955.1385644044@warthog.procyon.org.uk>
+References: <20131126104034.GA4854@quack.suse.cz> <20100630011656.18960.4255.stgit@warthog.procyon.org.uk>
+Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, viro-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+	jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, mcao-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org,
+	aneesh.kumar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, sjayaraman-l3A5Bk7waGM@public.gmane.org,
+	linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20131126104034.GA4854-+0h/O2h83AeN3ZZ/Hiejyg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-SMB3 "validate negotiate" is needed to prevent certain types of
-downgrade attacks.
-Also changes SMB2/SMB3 copy offload from using the BTRFS copy ioctl
-(BTRFS_IOC_CLONE) to a cifs specific ioctl (CIFS_IOC_COPYCHUNK_FILE)
-to address Christoph's comment that there are semantic differences between
-requesting copy offload in which copy-on-write is mandatory (as in the
-BTRFS ioctl) and optional in the SMB2/SMB3 case.  Also fixes SMB2/SMB3
-copychunk for large files.
+Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org> wrote:
 
-The following changes since commit 2d3c627502f2a9b0a7de06a5a2df2365542a72c9:
+> > 		unsigned long long	st_blocks;
+>   When we are doing this, can we please also change 'st_blocks' to
+> 'st_bytes'? We track space usage in kernel in bytes for a long time so it
+> would be nice to propagate it to userspace via stat instead of a special
+> ioctl (at least quotacheck(8) needs to know the exact value).
 
-  Revert "init/Kconfig: add option to disable kernel compression"
-(2013-11-17 11:17:36 -0800)
+Ummm...  I'm not sure about that.  Ideally, every field that is provided in
+the current stat() buffer must still be there.  On the other hand, since
+they're going to be moved around, presumably there will be a userspace
+translation layer.
 
-are available in the git repository at:
-
-  git://git.samba.org/sfrench/cifs-2.6.git for-next
-
-for you to fetch changes up to f19e84df37bda502a2248d507a9cf2b9e693279e:
-
-  [CIFS] Do not use btrfs refcopy ioctl for SMB2 copy offload
-(2013-11-25 09:50:31 -0600)
-
-----------------------------------------------------------------
-Steve French (4):
-      CIFS: Fix SMB2/SMB3 Copy offload support (refcopy) for large files
-      Removed duplicated (and unneeded) goto
-      Check SMB3 dialects against downgrade attacks
-      [CIFS] Do not use btrfs refcopy ioctl for SMB2 copy offload
-
- fs/cifs/cifsglob.h  |  1 +
- fs/cifs/ioctl.c     |  6 ++--
- fs/cifs/smb2ops.c   | 99 ++++++++++++++++++++++++++++++++++++++++++++++-------
- fs/cifs/smb2pdu.c   | 92 ++++++++++++++++++++++++++++++++++++++++++++++---
- fs/cifs/smb2pdu.h   | 12 +++++--
- fs/cifs/smb2proto.h |  1 +
- fs/cifs/smbfsctl.h  |  2 +-
- 7 files changed, 189 insertions(+), 24 deletions(-)
-
--- 
-Thanks,
-
-Steve
+David
