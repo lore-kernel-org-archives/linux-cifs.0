@@ -1,86 +1,91 @@
 From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 8/8 v3] cifs: Add support for follow_link on dfs shares under posix extensions
-Date: Mon,  2 Dec 2013 16:37:43 +0000
-Message-ID: <1386002263-8630-1-git-send-email-sprabhu@redhat.com>
+Subject: Re: [PATCH 8/8 v2] cifs: Add support for readlink on dfs shares
+ under posix extensions
+Date: Mon, 02 Dec 2013 16:41:32 +0000
+Message-ID: <1386002492.6666.4.camel@sachin-laptop>
 References: <1385399395-19217-1-git-send-email-sprabhu@redhat.com>
+	 <1385558835-7990-1-git-send-email-sprabhu@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1385399395-19217-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1385558835-7990-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-When using posix extensions, dfs shares in the dfs root show up as
-symlinks resulting in userland tools such as 'ls' calling readlink() on
-these shares. Since these are dfs shares, we end up returning -EREMOTE.
+I have posted version 3 of this patch incorporating changes suggested by
+Christoph. The changes made are limited to the patch description with no
+changes to the code.
 
-$ ls -l /mnt
-ls: cannot read symbolic link /mnt/test: Object is remote
-total 0
-lrwxrwxrwx. 1 root root 19 Nov  6 09:47 test
+Sachin Prabhu
 
-With added follow_link() support for dfs shares, when using unix
-extensions, we call GET_DFS_REFERRAL to obtain the DFS referral and
-return the first node returned.
-
-The dfs share in the dfs root is now displayed in the following manner.
-$ ls -l /mnt
-total 0
-lrwxrwxrwx. 1 root root 19 Nov  6 09:47 test -> \vm140-31\test
-
-Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/smb1ops.c | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
-
-diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index 988fddb7..abd2cc9 100644
---- a/fs/cifs/smb1ops.c
-+++ b/fs/cifs/smb1ops.c
-@@ -908,6 +908,33 @@ cifs_mand_lock(const unsigned int xid, struct cifsFileInfo *cfile, __u64 offset,
- }
- 
- static int
-+cifs_unix_dfs_readlink(const unsigned int xid, struct cifs_tcon *tcon,
-+		       const unsigned char *searchName, char **symlinkinfo,
-+		       const struct nls_table *nls_codepage)
-+{
-+#ifdef CONFIG_CIFS_DFS_UPCALL
-+	int rc;
-+	unsigned int num_referrals = 0;
-+	struct dfs_info3_param *referrals = NULL;
-+
-+	rc = get_dfs_path(xid, tcon->ses, searchName, nls_codepage,
-+			  &num_referrals, &referrals, 0);
-+
-+	if (!rc && num_referrals > 0) {
-+		*symlinkinfo = kstrndup(referrals->node_name,
-+					strlen(referrals->node_name),
-+					GFP_KERNEL);
-+		if (!*symlinkinfo)
-+			rc = -ENOMEM;
-+		free_dfs_info_array(referrals, num_referrals);
-+	}
-+	return rc;
-+#else /* No DFS support */
-+	return -EREMOTE;
-+#endif
-+}
-+
-+static int
- cifs_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
- 		   const char *full_path, char **target_path,
- 		   struct cifs_sb_info *cifs_sb)
-@@ -922,6 +949,11 @@ cifs_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
- 	if (cap_unix(tcon->ses)) {
- 		rc = CIFSSMBUnixQuerySymLink(xid, tcon, full_path, target_path,
- 					     cifs_sb->local_nls);
-+		if (rc == -EREMOTE)
-+			rc = cifs_unix_dfs_readlink(xid, tcon, full_path,
-+						    target_path,
-+						    cifs_sb->local_nls);
-+
- 		goto out;
- 	}
- 
--- 
-1.8.3.1
+On Wed, 2013-11-27 at 13:27 +0000, Sachin Prabhu wrote:
+> When using posix extensions, dfs shares in the dfs root show up as
+> symlinks resulting in userland tools such as 'ls' calling readlink() on
+> these shares. Since these are dfs shares, readlink fails with -EREMOTE.
+> 
+> With added support for dfs shares on readlink when using unix
+> extensions, we call GET_DFS_REFERRAL to obtain the DFS referral and
+> return the first node returned.
+> 
+> The dfs share in the dfs root is now displayed in the following manner.
+> $ ls -l /mnt
+> total 0
+> lrwxrwxrwx. 1 root root 19 Nov  6 09:47 test -> \vm140-31\test
+> 
+> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/smb1ops.c | 32 ++++++++++++++++++++++++++++++++
+>  1 file changed, 32 insertions(+)
+> 
+> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+> index 988fddb7..abd2cc9 100644
+> --- a/fs/cifs/smb1ops.c
+> +++ b/fs/cifs/smb1ops.c
+> @@ -908,6 +908,33 @@ cifs_mand_lock(const unsigned int xid, struct cifsFileInfo *cfile, __u64 offset,
+>  }
+>  
+>  static int
+> +cifs_unix_dfs_readlink(const unsigned int xid, struct cifs_tcon *tcon,
+> +		       const unsigned char *searchName, char **symlinkinfo,
+> +		       const struct nls_table *nls_codepage)
+> +{
+> +#ifdef CONFIG_CIFS_DFS_UPCALL
+> +	int rc;
+> +	unsigned int num_referrals = 0;
+> +	struct dfs_info3_param *referrals = NULL;
+> +
+> +	rc = get_dfs_path(xid, tcon->ses, searchName, nls_codepage,
+> +			  &num_referrals, &referrals, 0);
+> +
+> +	if (!rc && num_referrals > 0) {
+> +		*symlinkinfo = kstrndup(referrals->node_name,
+> +					strlen(referrals->node_name),
+> +					GFP_KERNEL);
+> +		if (!*symlinkinfo)
+> +			rc = -ENOMEM;
+> +		free_dfs_info_array(referrals, num_referrals);
+> +	}
+> +	return rc;
+> +#else /* No DFS support */
+> +	return -EREMOTE;
+> +#endif
+> +}
+> +
+> +static int
+>  cifs_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
+>  		   const char *full_path, char **target_path,
+>  		   struct cifs_sb_info *cifs_sb)
+> @@ -922,6 +949,11 @@ cifs_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
+>  	if (cap_unix(tcon->ses)) {
+>  		rc = CIFSSMBUnixQuerySymLink(xid, tcon, full_path, target_path,
+>  					     cifs_sb->local_nls);
+> +		if (rc == -EREMOTE)
+> +			rc = cifs_unix_dfs_readlink(xid, tcon, full_path,
+> +						    target_path,
+> +						    cifs_sb->local_nls);
+> +
+>  		goto out;
+>  	}
+>  
