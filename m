@@ -1,29 +1,86 @@
-From: HELP DESK <web-6Y27zMfHcqdQFI55V6+gNQ@public.gmane.org>
-Subject: =?utf-8?q?um_Ihr_Konto_zu_=C3=BCberpr=C3=BCfen?=
-Date: Sun, 01 Dec 2013 13:57:42 +0100
-Message-ID: <20131201125541.84A0210E22D9@epamig.br>
-Reply-To: 647812717-9uewiaClKEY@public.gmane.org
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: Recipients <web-6Y27zMfHcqdQFI55V6+gNQ@public.gmane.org>
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH 8/8 v3] cifs: Add support for follow_link on dfs shares under posix extensions
+Date: Mon,  2 Dec 2013 16:37:43 +0000
+Message-ID: <1386002263-8630-1-git-send-email-sprabhu@redhat.com>
+References: <1385399395-19217-1-git-send-email-sprabhu@redhat.com>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Description: Mail message body
+In-Reply-To: <1385399395-19217-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Sehr geehrter Nutzer
-Ihre E-Mail hat 2 GB, die von Webmaster erstellt =FCberschritten wird, =
-k=F6nnen Sie derzeit bei 2.30GB ausgef=FChrt werden, kann man nicht sen=
-den oder empfangen, neue Nachrichten, bis Sie Ihre account.Complete das=
- folgende Formular =FCberpr=FCfen, um Ihr Konto zu =FCberpr=FCfen.
-=20
-Bitte f=FCllen Sie die Details unten, um Ihr Konto zu best=E4tigen
-=20
-(1) E-mail:
-(2) Name:
-(3) Passwort:
-(4) Passwort best=E4tigen:
-=20
-danke
-Systemadministrator
+When using posix extensions, dfs shares in the dfs root show up as
+symlinks resulting in userland tools such as 'ls' calling readlink() on
+these shares. Since these are dfs shares, we end up returning -EREMOTE.
+
+$ ls -l /mnt
+ls: cannot read symbolic link /mnt/test: Object is remote
+total 0
+lrwxrwxrwx. 1 root root 19 Nov  6 09:47 test
+
+With added follow_link() support for dfs shares, when using unix
+extensions, we call GET_DFS_REFERRAL to obtain the DFS referral and
+return the first node returned.
+
+The dfs share in the dfs root is now displayed in the following manner.
+$ ls -l /mnt
+total 0
+lrwxrwxrwx. 1 root root 19 Nov  6 09:47 test -> \vm140-31\test
+
+Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/smb1ops.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index 988fddb7..abd2cc9 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -908,6 +908,33 @@ cifs_mand_lock(const unsigned int xid, struct cifsFileInfo *cfile, __u64 offset,
+ }
+ 
+ static int
++cifs_unix_dfs_readlink(const unsigned int xid, struct cifs_tcon *tcon,
++		       const unsigned char *searchName, char **symlinkinfo,
++		       const struct nls_table *nls_codepage)
++{
++#ifdef CONFIG_CIFS_DFS_UPCALL
++	int rc;
++	unsigned int num_referrals = 0;
++	struct dfs_info3_param *referrals = NULL;
++
++	rc = get_dfs_path(xid, tcon->ses, searchName, nls_codepage,
++			  &num_referrals, &referrals, 0);
++
++	if (!rc && num_referrals > 0) {
++		*symlinkinfo = kstrndup(referrals->node_name,
++					strlen(referrals->node_name),
++					GFP_KERNEL);
++		if (!*symlinkinfo)
++			rc = -ENOMEM;
++		free_dfs_info_array(referrals, num_referrals);
++	}
++	return rc;
++#else /* No DFS support */
++	return -EREMOTE;
++#endif
++}
++
++static int
+ cifs_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
+ 		   const char *full_path, char **target_path,
+ 		   struct cifs_sb_info *cifs_sb)
+@@ -922,6 +949,11 @@ cifs_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
+ 	if (cap_unix(tcon->ses)) {
+ 		rc = CIFSSMBUnixQuerySymLink(xid, tcon, full_path, target_path,
+ 					     cifs_sb->local_nls);
++		if (rc == -EREMOTE)
++			rc = cifs_unix_dfs_readlink(xid, tcon, full_path,
++						    target_path,
++						    cifs_sb->local_nls);
++
+ 		goto out;
+ 	}
+ 
+-- 
+1.8.3.1
