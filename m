@@ -1,52 +1,74 @@
-From: mail654-Mmb7MZpHnFY@public.gmane.org
-Subject: blocking write() after disconnecting cifs server
-Date: Tue, 3 Dec 2013 14:16:08 +0100 (CET)
-Message-ID: <trinity-9dbe46e3-d6e6-4e61-84cc-98074cd0fea3-1386076567862@3capp-gmx-bs38>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: packet signing and DFS referrals
+Date: Tue, 3 Dec 2013 08:29:37 -0500
+Message-ID: <20131203082937.56e1b9fe@tlielax.poochiereds.net>
+References: <loom.20131203T105355-222@post.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Michael <mk-cifs-447iRfOSxQ4@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <loom.20131203T105355-222-eS7Uydv5nfjZ+VzJOa5vwg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hello,
+On Tue, 3 Dec 2013 10:11:00 +0000 (UTC)
+Michael <mk-cifs-447iRfOSxQ4@public.gmane.org> wrote:
 
-write() from cifs kernel driver blocks when disconnecting the cifs serv=
-er. The blocking call didn't return after 30 minutes. Client and server=
- are connected via a switch and server's LAN cable is unplugged during =
-the write call. I use kernel 3.11.8 and mounted without "hard" option.
+> Dear cifs experts,
+> 
+> I tried to find some more information about my issue but was unsuccesful so far.
+> We have a mixed Microsoft/Netapp environment with a number of linux clients
+> were DFS was recently enabled. Kerberos Single-Sign-On is broken here
+> because of what I believe are incosistencies with packet signing
+> requirements. The server responsible for the DFS ROOT is requiring signing:
+> 
+> mount -t cifs //master/share mnt -o cruid=someid,sec=krb5,...
+> 
+> mount error(95): Operation not supported
+> Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
+> 
+> [21866613.989219] CIFS VFS: Server requires packet signing to be enabled in
+> /proc/fs/cifs/SecurityFlags.
+> [21866613.989401] CIFS VFS: cifs_mount failed w/return code = -95
+> 
+> 
+> So I enabled it with krb5i:
+> 
+> mount -t cifs //master/share mnt -o cruid=someid,sec=krb5i,...
+> 
+> But when accessing a dfs referral the next server has no packet signing
+> enabled (I believe this is the netapp default).
+> 
+> ls mnt/share2
+> [...]
+> dmesg | tail -n 2
+> 
+> [21866657.445227] CIFS VFS: signing required but server lacks support
+> [21866657.445441] CIFS VFS: cifs_mount failed w/return code = -95
+> 
+> Kernel version is 3.2.39-2 and cifs-utils 5.2-1.
+> 
+> My questions are:
+> 
+>  + might this incosistency really be the problem here?
+>  + are deferral-based security flags supported by the protocol?
+>  + how to proceed? (besides fixing the environment)
+> 
+> kind regards,
+>   Michael
+> 
 
-Is there a possibility for an non-blocking write() without using O_SYNC=
- or "directio" mount option?
+Yeah, that was broken in older kernels.
 
-Way to reproduce the scenario: Below is a sample program which calls wr=
-ite() in a loop. The error messages appear when unplugging the cable du=
-ring this loop.
+There was an overhaul of the auth selection code in v3.11, so it should
+work correctly with current ones.
 
-Kind regards,
-Hagen
+With those, just mount the first server with 'sec=krb5' and ensure that
+0x1 is set in /proc/fs/cifs/SecurityFlags (it should be by default).
+With the current code, if the server requires signing it should be
+transparently enabled unless the client has explicitly disabled it.
 
-CIFS VFS: sends on sock ffff88003710c280 stuck for 15 seconds
-CIFS VFS: Error -11 sending data on socket to server
-
-#include <fstream>
-#include <iostream>
-int main () {
-=C2=A0 const int size =3D 100000;
-=C2=A0 char buffer[size];
-=C2=A0 std::ofstream outfile("/mnt/new.bin",std::ofstream::binary);
-=C2=A0 if (!outfile.is_open())
-=C2=A0 {
-=C2=A0=C2=A0=C2=A0 return 1;
-=C2=A0 }
-=C2=A0 for (int idx=3D0; idx<10000 && outfile.good(); idx++)
-=C2=A0 {
-=C2=A0=C2=A0=C2=A0 outfile.write(buffer,size);
-=C2=A0=C2=A0=C2=A0 std::cout << "written, size=3D" << size << std::endl=
-;
-=C2=A0 }
-=C2=A0 std::cout << "finished " << outfile.good() << std::endl;
-=C2=A0 outfile.close();
-=C2=A0 return 0;
-}
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
