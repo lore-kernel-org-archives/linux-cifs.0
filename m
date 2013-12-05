@@ -1,84 +1,98 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: packet signing and DFS referrals
-Date: Tue, 3 Dec 2013 08:38:53 -0500
-Message-ID: <20131203083853.7ec45351@tlielax.poochiereds.net>
-References: <loom.20131203T105355-222@post.gmane.org>
-	<20131203082937.56e1b9fe@tlielax.poochiereds.net>
+From: Patrick Noffke <patrick-0qqNeQ6W4hOzQB+pC5nmwQ@public.gmane.org>
+Subject: hung system with cifsd, cannot reduce timeout
+Date: Thu, 05 Dec 2013 15:03:32 -0600
+Message-ID: <52A0EA24.9000600@noffke.me>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Michael <mk-cifs-447iRfOSxQ4@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20131203082937.56e1b9fe-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 3 Dec 2013 08:29:37 -0500
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+Hi,
 
-> On Tue, 3 Dec 2013 10:11:00 +0000 (UTC)
-> Michael <mk-cifs-447iRfOSxQ4@public.gmane.org> wrote:
-> 
-> > Dear cifs experts,
-> > 
-> > I tried to find some more information about my issue but was unsuccesful so far.
-> > We have a mixed Microsoft/Netapp environment with a number of linux clients
-> > were DFS was recently enabled. Kerberos Single-Sign-On is broken here
-> > because of what I believe are incosistencies with packet signing
-> > requirements. The server responsible for the DFS ROOT is requiring signing:
-> > 
-> > mount -t cifs //master/share mnt -o cruid=someid,sec=krb5,...
-> > 
-> > mount error(95): Operation not supported
-> > Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
-> > 
-> > [21866613.989219] CIFS VFS: Server requires packet signing to be enabled in
-> > /proc/fs/cifs/SecurityFlags.
-> > [21866613.989401] CIFS VFS: cifs_mount failed w/return code = -95
-> > 
-> > 
-> > So I enabled it with krb5i:
-> > 
-> > mount -t cifs //master/share mnt -o cruid=someid,sec=krb5i,...
-> > 
-> > But when accessing a dfs referral the next server has no packet signing
-> > enabled (I believe this is the netapp default).
-> > 
-> > ls mnt/share2
-> > [...]
-> > dmesg | tail -n 2
-> > 
-> > [21866657.445227] CIFS VFS: signing required but server lacks support
-> > [21866657.445441] CIFS VFS: cifs_mount failed w/return code = -95
-> > 
-> > Kernel version is 3.2.39-2 and cifs-utils 5.2-1.
-> > 
-> > My questions are:
-> > 
-> >  + might this incosistency really be the problem here?
-> >  + are deferral-based security flags supported by the protocol?
-> >  + how to proceed? (besides fixing the environment)
-> > 
-> > kind regards,
-> >   Michael
-> > 
-> 
-> Yeah, that was broken in older kernels.
-> 
-> There was an overhaul of the auth selection code in v3.11, so it should
-> work correctly with current ones.
-> 
-> With those, just mount the first server with 'sec=krb5' and ensure that
-> 0x1 is set in /proc/fs/cifs/SecurityFlags (it should be by default).
-> With the current code, if the server requires signing it should be
-> transparently enabled unless the client has explicitly disabled it.
-> 
+I am having problems similar to those described here:
+http://article.gmane.org/gmane.linux.kernel.cifs/9024
 
-Ahh yeah, there's also commit 0b7bc84000d71f3647ca33ab1bf5bd928535c846
-that may fix the problem in a less invasive way on earlier kernels. I
-think that went into v3.9, but should be easy to backport to earlier
-ones.
+My system is an embedded Linux, kernel version 3.9.0, and the CIFS 
+server is Windows Server 2003, SP1.  I can somewhat reliably produce a 
+system that hangs for about three minutes, then recovers.  I would like 
+to reduce this time, if possible (to more quickly recover under link 
+failures or other conditions that cause the server to not respond).
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+I tried changing SMB_ECHO_INTERVAL to 5 seconds (5 * HZ).  This appears 
+to be working for part of cifs, but I think there is another socket that 
+is still open, and doesn't disconnect until about two minutes later when 
+the server sends a RST.
+
+Here is my sequence of actions:
+
+1. Start lengthy process that accesses files on CIFS mount.
+2. Pull Ethernet cable.
+3. Wait about 20 seconds (with SMB_ECHO_INTERVAL at 5 seconds), then 
+reconnect cable.  Process resumes almost immediately accessing files on 
+CIFS mount.
+4. Pull Ethernet cable again.
+5. Wait about 20 seconds, then reconnect cable.  Process is hung. ps is 
+also hung, printing everything before but not including the hung 
+process.  cifsd was reported to have state DW (it has a PID before my 
+process, so it was printed in the ps output).
+6. About 165 seconds later, the hung process resumes, and the system is 
+functioning normally.
+
+I have a wireshark capture for the above sequence.  I will try to 
+describe the packet sequence corresponding to each of the above steps 
+(except 1).
+
+2. Last packet successfully transmitted is from server to client, which 
+is a TCP segment of a reassembled PDU.  There are several 
+retransmissions of packets from the server (when I pull the plug, I can 
+still see packets from the server, since it is running on the same 
+machine as wireshark).
+3. Client sends new SYN packet (source port 43480), followed by 
+Negotiate Protocol Request, followed by session setup and so forth (the 
+server is responding as appropriate for client requests).
+4. Last packet successfully transmitted is from server to client, and is 
+a Read AndX Response, FID:  0x800f.  Again, there are several 
+retransmissions from server to client.
+5. Client sends new SYN packet (source port 43492), followed by 
+Negotiate Protocol Request.
+  - Server replies with Negotiate Protocol Request.
+  - Then nothing for about 9 seconds.
+  - Client sends Echo Request *on previous TCP connection* (the one that 
+had retransmissions in step 4, source port 43480).
+  - Server sends RST for previous TCP connection (dest port 43480).
+  - Then nothing for 111 sec, when server sends TCP keep-alive (this is 
+also 120 seconds after Negotiate sequence, which is probably the 
+configured TCP keep-alive interval).
+  - Client ACKs keep-alive immediately.
+  - 35 seconds later, server sends RST for new connection (dest port 43492).
+  - Client immediately sends new SYN packet.
+6. 10 seconds after last SYN packet, client Negotiate Protocol Request, 
+and normal communication resumes.
+
+I do see klog messages that the CIFS server has not responded in 10 
+seconds (twice SMB_ECHO_INTERVAL, as expected), and that it is 
+reconnecting.  I believe these correspond to the first two SYN packets 
+above, but it is hard to correlate those timestamps to wireshark, so I 
+can't be sure.  But the last such log occurred 177 seconds before my 
+process resumed working, which makes me think the logs correlate to the 
+first two SYN packets.
+
+Why would the Echo Request go out on the old connection after a new 
+connection has been opened?  And why are there no Echo Requests on the 
+new connection?
+
+I did check the cifsd stack (cat /proc/<cifsd PID>/stack) for previous 
+tests, and it was waiting on a recv, and its state was SW (not DW).  
+Unfortunately, I did not get the stack for this test.
+
+Please let me know if there's any more information I can provide.
+
+Also, is reducing SMB_ECHO_INTERVAL expected to reduce the recovery time 
+under such failures?  If so, should the total time to reconnect to the 
+server be 2 * SMB_ECHO_INTERVAL, or are there other timeouts on top of this?
+
+Best regards,
+Patrick
