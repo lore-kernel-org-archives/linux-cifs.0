@@ -1,8 +1,8 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Subject: Re: [PATCH] cifs-utils: pam module to set cifs credentials in key
  store
-Date: Sat, 7 Dec 2013 09:06:43 -0500
-Message-ID: <20131207090643.127cd0fe@tlielax.poochiereds.net>
+Date: Sat, 7 Dec 2013 09:23:41 -0500
+Message-ID: <20131207092341.16e0fe0c@tlielax.poochiereds.net>
 References: <loom.20131113T002139-562@post.gmane.org>
 	<20131112212536.6061477e@corrin.poochiereds.net>
 	<5283E835.2090508@cora.nwra.com>
@@ -162,10 +162,11 @@ Orion Poplawski <orion-CVdf0l11yl+B+jHODAdFcQ@public.gmane.org> wrote:
 > I've made attempts to implement that.
 > 
 
-Ok, I've got it merged into my staging repo, and will plan to do some
-testing with it in the next few days. At this point, I think the main
-thing the patch is missing is a manpage. Do you mind writing one up for
-it?
+Oh, and one other thing...
+
+Can you resend the above patch with a Signed-off-by line?
+
+Thanks,
 
 -- 
 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
