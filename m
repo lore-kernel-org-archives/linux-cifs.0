@@ -1,15 +1,16 @@
-From: Tim Gardner <timg@tpi.com>
-Subject: [PATCH 5/5 linux-next V2] cifs: Combine set_file_size by handle and path into one function
-Date: Sun,  8 Dec 2013 14:08:44 -0700
-Message-ID: <1386536924-51726-5-git-send-email-timg@tpi.com>
+From: Tim Gardner <timg-l6nL5VImRDY@public.gmane.org>
+Subject: [PATCH 5/5 linux-next V2 (resend)] cifs: Combine set_file_size by handle and path into one function
+Date: Sun,  8 Dec 2013 14:13:37 -0700
+Message-ID: <1386537217-52184-1-git-send-email-timg@tpi.com>
 References: <1386536924-51726-1-git-send-email-timg@tpi.com>
-Cc: Tim Gardner <timg@tpi.com>
-To: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1386536924-51726-1-git-send-email-timg@tpi.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: Tim Gardner <timg-l6nL5VImRDY@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Dean Gehnert <deang-l6nL5VImRDY@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1386536924-51726-1-git-send-email-timg-l6nL5VImRDY@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
 As suggested by Jeff Layton:
 
@@ -44,7 +45,10 @@ the SMBv1 specific handler smb_set_file_size() more or less intact. SMBv2 and hi
 more regular and orthogonal, so the v2 handler smb2_set_file_size() no longer contains
 the legacy hacks.
 
-Signed-off-by: Tim Gardner <timg@tpi.com>
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: Dean Gehnert <deang-l6nL5VImRDY@public.gmane.org>
+Signed-off-by: Tim Gardner <timg-l6nL5VImRDY@public.gmane.org>
 ---
 
 V2 - this is a new patch in the V2 series.
@@ -54,6 +58,8 @@ intermediate steps. Its pretty much all or nothing.
 
 I've only tested against a Linux CIFS server running a 3.2 kernel since I no longer
 have easy access to smbv2 servers (iOS 10.8 or Windows 7).
+
+resent with corrected Cc's
 
 rtg
 
