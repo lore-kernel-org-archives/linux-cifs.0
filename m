@@ -1,471 +1,152 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 5/5 linux-next V2 (resend)] cifs: Combine set_file_size
- by handle and path into one function
-Date: Mon, 9 Dec 2013 06:10:52 -0500
-Message-ID: <20131209061052.49b5db0a@tlielax.poochiereds.net>
-References: <1386536924-51726-1-git-send-email-timg@tpi.com>
-	<1386537217-52184-1-git-send-email-timg@tpi.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 1/8] cifs: We do not drop reference to tlink in CIFSCheckMFSymlink()
+Date: Mon, 9 Dec 2013 09:37:50 -0600
+Message-ID: <CAH2r5mstKNBigxTPHkV6D+psxewHpxTb8b0eFEQtrw=TQrNbTg@mail.gmail.com>
+References: <1385399395-19217-1-git-send-email-sprabhu@redhat.com>
+	<1385399395-19217-2-git-send-email-sprabhu@redhat.com>
+	<20131127063507.6e1a9a14@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Dean Gehnert <deang-l6nL5VImRDY@public.gmane.org>
-To: Tim Gardner <timg-l6nL5VImRDY@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1386537217-52184-1-git-send-email-timg-l6nL5VImRDY@public.gmane.org>
+In-Reply-To: <20131127063507.6e1a9a14-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun,  8 Dec 2013 14:13:37 -0700
-Tim Gardner <timg-l6nL5VImRDY@public.gmane.org> wrote:
+This looks like the only one small enough to merge for 3.13 (and I put
+in cifs-2.6.git for-next).  The others in the series for 3.14.
+Opinions?
 
-> As suggested by Jeff Layton:
-> 
-> --------
-> "Now that I look though, it's clear to me that cifs_set_file_size is
-> just wrong. Currently it calls ops->set_path_size and if that fails
-> with certain error codes it tries to do a SMBLegacyOpen, etc. That's
-> going to fall on its face if this is a SMB2/3 connection.
-> 
-> Here's what should be done instead, I think:
-> 
-> - get rid of both set_path_size and set_file_size operations. The
->   version specific abstraction was implemented at the wrong level, IMO.
-> 
-> - implement a new protocol level operation that basically takes the
->   same args as cifs_set_file_size. cifs_setattr_unix/_nounix should
->   call this operation.
-> 
-> - the set_path_size operation for SMB1 should basically be the function
->   that is cifs_set_file_size today (though that should probably be
->   renamed). That function should be restructured to do the following:
-> 
->   + look for an open filehandle
->   + if there isn't one, open the file
->   + call CIFSSMBSetFileSize
->   + fall back to zero-length write if that fails
->   + close the file if we opened it"
-> --------
-> 
-> This patch also moves all of the SMBv1 legacy hacks from cifs_set_file_size() into
-> the SMBv1 specific handler smb_set_file_size() more or less intact. SMBv2 and higher are
-> more regular and orthogonal, so the v2 handler smb2_set_file_size() no longer contains
-> the legacy hacks.
-> 
-> Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> Cc: Dean Gehnert <deang-l6nL5VImRDY@public.gmane.org>
-> Signed-off-by: Tim Gardner <timg-l6nL5VImRDY@public.gmane.org>
-> ---
-> 
-> V2 - this is a new patch in the V2 series.
-> 
-> I know this is kind of a giant patch, but there really doesn't seem to be any
-> intermediate steps. Its pretty much all or nothing.
-> 
-> I've only tested against a Linux CIFS server running a 3.2 kernel since I no longer
-> have easy access to smbv2 servers (iOS 10.8 or Windows 7).
-> 
-> resent with corrected Cc's
-> 
-> rtg
-> 
->  fs/cifs/cifsglob.h |    9 ++---
->  fs/cifs/inode.c    |  108 +++++----------------------------------------------
->  fs/cifs/smb1ops.c  |  109 +++++++++++++++++++++++++++++++++++++++++++++++++++-
->  fs/cifs/smb2ops.c  |   57 ++++++++++++++++++++++++---
->  4 files changed, 170 insertions(+), 113 deletions(-)
-> 
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 8fd8eb2..6113ce8 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -269,12 +269,9 @@ struct smb_version_operations {
->  	int (*get_srv_inum)(const unsigned int, struct cifs_tcon *,
->  			    struct cifs_sb_info *, const char *,
->  			    u64 *uniqueid, FILE_ALL_INFO *);
-> -	/* set size by path */
-> -	int (*set_file_size_by_path)(const unsigned int, struct cifs_tcon *,
-> -			     const char *, __u64, struct cifs_sb_info *, bool);
-> -	/* set size by file handle */
-> -	int (*set_file_size_by_handle)(const unsigned int, struct cifs_tcon *,
-> -			     struct cifsFileInfo *, __u64, bool);
-> +	/* set file size */
-> +	int (*set_file_size)(struct inode *inode, struct iattr *attrs,
-> +			     unsigned int xid, char *full_path);
->  	/* set attributes */
->  	int (*set_file_info)(struct inode *, const char *, FILE_BASIC_INFO *,
->  			     const unsigned int);
-> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> index e332038..3edeafd 100644
-> --- a/fs/cifs/inode.c
-> +++ b/fs/cifs/inode.c
-> @@ -1899,118 +1899,28 @@ static void cifs_setsize(struct inode *inode, loff_t offset)
->  	truncate_pagecache(inode, offset);
->  }
->  
-> -/*
-> - * Legacy hack to set file length.
-> - */
-> -static int
-> -cifs_legacy_set_file_size(unsigned int xid, __u16 netfid, __u32 pid,
-> -			  unsigned int length, struct cifs_tcon *tcon,
-> -			  char *full_path)
-> -{
-> -	int rc;
-> -	unsigned int bytes_written;
-> -	struct cifs_io_parms io_parms;
-> -
-> -	io_parms.netfid = netfid;
-> -	io_parms.pid = pid;
-> -	io_parms.tcon = tcon;
-> -	io_parms.offset = 0;
-> -	io_parms.length = length;
-> -	rc = CIFSSMBWrite(xid, &io_parms, &bytes_written,
-> -			  NULL, NULL, 1);
-> -	cifs_dbg(FYI, "%s len %d rc %d on %s\n", __func__, length, rc,
-> -		 full_path);
-> -	return rc;
-> -}
-> -
->  static int
->  cifs_set_file_size(struct inode *inode, struct iattr *attrs,
->  		   unsigned int xid, char *full_path)
->  {
-> -	int rc;
-> -	struct cifsFileInfo *open_file;
-> +	int rc = -ENOSYS;
->  	struct cifsInodeInfo *cifsInode = CIFS_I(inode);
->  	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
->  	struct tcon_link *tlink = NULL;
->  	struct cifs_tcon *tcon = NULL;
->  	struct TCP_Server_Info *server;
->  
-> -	/*
-> -	 * To avoid spurious oplock breaks from server, in the case of
-> -	 * inodes that we already have open, avoid doing path based
-> -	 * setting of file size if we can do it by handle.
-> -	 * This keeps our caching token (oplock) and avoids timeouts
-> -	 * when the local oplock break takes longer to flush
-> -	 * writebehind data than the SMB timeout for the SetPathInfo
-> -	 * request would allow
-> -	 */
-> -	open_file = find_writable_file(cifsInode, true);
-> -	if (open_file) {
-> -		tcon = tlink_tcon(open_file->tlink);
-> -		server = tcon->ses->server;
-> -		if (server->ops->set_file_size_by_handle)
-> -			rc = server->ops->set_file_size_by_handle(xid, tcon,
-> -								  open_file,
-> -								  attrs->ia_size,
-> -								  false);
-> -		else
-> -			rc = -ENOSYS;
-> -		cifsFileInfo_put(open_file);
-> -		cifs_dbg(FYI, "SetFSize for attrs rc = %d\n", rc);
-> -		if ((rc == -EINVAL) || (rc == -EOPNOTSUPP)) {
-> -			rc = cifs_legacy_set_file_size(xid,
-> -						       open_file->fid.netfid,
-> -						       open_file->pid,
-> -						       attrs->ia_size,
-> -						       tcon, full_path);
-> -		}
-> -	} else
-> -		rc = -EINVAL;
-> -
-> -	if (!rc)
-> -		goto set_size_out;
-> +	tlink = cifs_sb_tlink(cifs_sb);
-> +	if (IS_ERR(tlink))
-> +		return PTR_ERR(tlink);
-> +	tcon = tlink_tcon(tlink);
-> +	server = tcon->ses->server;
->  
-> -	if (tcon == NULL) {
-> -		tlink = cifs_sb_tlink(cifs_sb);
-> -		if (IS_ERR(tlink))
-> -			return PTR_ERR(tlink);
-> -		tcon = tlink_tcon(tlink);
-> -		server = tcon->ses->server;
-> -	}
-> +	if (server->ops->set_file_size)
-> +		rc = server->ops->set_file_size(inode, attrs, xid, full_path);
->  
-> -	/*
-> -	 * Set file size by pathname rather than by handle either because no
-> -	 * valid, writeable file handle for it was found or because there was
-> -	 * an error setting it by handle.
-> -	 */
-> -	if (server->ops->set_file_size_by_path)
-> -		rc = server->ops->set_file_size_by_path(xid, tcon, full_path,
-> -							attrs->ia_size, cifs_sb,
-> -							false);
-> -	else
-> -		rc = -ENOSYS;
-> -	cifs_dbg(FYI, "SetEOF by path (setattrs) rc = %d\n", rc);
-> -	if ((rc == -EINVAL) || (rc == -EOPNOTSUPP)) {
-> -		__u16 netfid;
-> -		int oplock = 0;
-> -
-> -		rc = SMBLegacyOpen(xid, tcon, full_path, FILE_OPEN,
-> -				   GENERIC_WRITE, CREATE_NOT_DIR, &netfid,
-> -				   &oplock, NULL, cifs_sb->local_nls,
-> -				   cifs_sb->mnt_cifs_flags &
-> -						CIFS_MOUNT_MAP_SPECIAL_CHR);
-> -		if (rc == 0) {
-> -			rc = cifs_legacy_set_file_size(xid, netfid,
-> -						       current->tgid,
-> -						       attrs->ia_size, tcon,
-> -						       full_path);
-> -			CIFSSMBClose(xid, tcon, netfid);
-> -		}
-> -	}
-> -	if (!open_file)
-> -		cifs_put_tlink(tlink);
-> +	cifs_put_tlink(tlink);
->  
-> -set_size_out:
->  	if (rc == 0) {
->  		cifsInode->server_eof = attrs->ia_size;
->  		cifs_setsize(inode, attrs->ia_size);
-> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-> index c5d9ec6..63ab3aa 100644
-> --- a/fs/cifs/smb1ops.c
-> +++ b/fs/cifs/smb1ops.c
-> @@ -755,6 +755,30 @@ cifs_sync_write(const unsigned int xid, struct cifsFileInfo *cfile,
->  	return CIFSSMBWrite2(xid, parms, written, iov, nr_segs);
->  }
->  
-> +/*
-> + * Legacy hack to set file length.
-> + */
-> +static int
-> +cifs_legacy_set_file_size(unsigned int xid, __u16 netfid, __u32 pid,
-> +			  unsigned int length, struct cifs_tcon *tcon,
-> +			  char *full_path)
-> +{
-> +	int rc;
-> +	unsigned int bytes_written;
-> +	struct cifs_io_parms io_parms;
-> +
-> +	io_parms.netfid = netfid;
-> +	io_parms.pid = pid;
-> +	io_parms.tcon = tcon;
-> +	io_parms.offset = 0;
-> +	io_parms.length = length;
-> +	rc = CIFSSMBWrite(xid, &io_parms, &bytes_written,
-> +			  NULL, NULL, 1);
-> +	cifs_dbg(FYI, "%s len %d rc %d on %s\n", __func__, length, rc,
-> +		 full_path);
-> +	return rc;
-> +}
-> +
->  static int
->  smb_set_file_size_by_path(const unsigned int xid, struct cifs_tcon *tcon,
->  	      const char *full_path, __u64 size, struct cifs_sb_info *cifs_sb,
-> @@ -790,6 +814,88 @@ smb_set_file_size_by_path(const unsigned int xid, struct cifs_tcon *tcon,
->  }
->  
->  static int
-> +smb_set_file_size(struct inode *inode, struct iattr *attrs, unsigned int xid,
-> +		  char *full_path)
-> +{
-> +	int rc;
-> +	struct cifsFileInfo *open_file;
-> +	struct cifsInodeInfo *cifsInode = CIFS_I(inode);
-> +	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
-> +	struct tcon_link *tlink = NULL;
-> +	struct cifs_tcon *tcon = NULL;
-> +	struct TCP_Server_Info *server;
-> +
-> +	/*
-> +	 * To avoid spurious oplock breaks from server, in the case of
-> +	 * inodes that we already have open, avoid doing path based
-> +	 * setting of file size if we can do it by handle.
-> +	 * This keeps our caching token (oplock) and avoids timeouts
-> +	 * when the local oplock break takes longer to flush
-> +	 * writebehind data than the SMB timeout for the SetPathInfo
-> +	 * request would allow
-> +	 */
-> +	open_file = find_writable_file(cifsInode, true);
-> +	if (open_file) {
-> +		tcon = tlink_tcon(open_file->tlink);
-> +		server = tcon->ses->server;
-> +		rc = CIFSSMBSetFileSize(xid, tcon, open_file, attrs->ia_size,
-> +					false);
-> +		cifsFileInfo_put(open_file);
-> +		cifs_dbg(FYI, "%s by handle rc = %d for %s\n", __func__, rc,
-> +			 full_path);
-> +		if ((rc == -EINVAL) || (rc == -EOPNOTSUPP))
-> +			rc = cifs_legacy_set_file_size(xid,
-> +						       open_file->fid.netfid,
-> +						       open_file->pid,
-> +						       attrs->ia_size,
-> +						       tcon, full_path);
-
-Ouch, there's an existing bug here that's getting copy and pasted...
-
-We're calling find_writeable_file to get a reference to open_file. Then
-we call cifsFileInfo_put to put that reference, and then we dereference
-that pointer to pass to cifs_legacy_set_file_size.
-
-That cifsFileInfo_put needs to be moved down to after the
-cifs_legacy_set_file_size call. Can you fix that while you're in here?
+On Wed, Nov 27, 2013 at 5:35 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> On Mon, 25 Nov 2013 17:09:48 +0000
+> Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+>
+>> When we obtain tcon from cifs_sb, we use cifs_sb_tlink() to first obtain
+>> tlink which also grabs a reference to it. We do not drop this reference
+>> to tlink once we are done with the call.
+>>
+>> The patch fixes this issue by instead passing tcon as a parameter and
+>> avoids having to obtain a reference to the tlink. A lookup for the tcon
+>> is already made in the calling functions and this way we avoid having to
+>> re-run the lookup. This is also consistent with the argument list for
+>> other similar calls for M-F symlinks.
+>>
+>> We should also return an ENOSYS when we do not find a protocol specific
+>> function to lookup the MF Symlink data.
+>>
+>> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>> ---
+>>  fs/cifs/cifsproto.h |  7 ++++---
+>>  fs/cifs/inode.c     |  6 ++++--
+>>  fs/cifs/link.c      | 26 +++++++++++---------------
+>>  3 files changed, 19 insertions(+), 20 deletions(-)
+>>
+>> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+>> index aa33976..2c29db6 100644
+>> --- a/fs/cifs/cifsproto.h
+>> +++ b/fs/cifs/cifsproto.h
+>> @@ -477,9 +477,10 @@ extern int CIFSGetExtAttr(const unsigned int xid, struct cifs_tcon *tcon,
+>>                       const int netfid, __u64 *pExtAttrBits, __u64 *pMask);
+>>  extern void cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb);
+>>  extern bool CIFSCouldBeMFSymlink(const struct cifs_fattr *fattr);
+>> -extern int CIFSCheckMFSymlink(struct cifs_fattr *fattr,
+>> -             const unsigned char *path,
+>> -             struct cifs_sb_info *cifs_sb, unsigned int xid);
+>> +extern int CIFSCheckMFSymlink(unsigned int xid, struct cifs_tcon *tcon,
+>> +                           struct cifs_sb_info *cifs_sb,
+>> +                           struct cifs_fattr *fattr,
+>> +                           const unsigned char *path);
+>>  extern int mdfour(unsigned char *, unsigned char *, int);
+>>  extern int E_md4hash(const unsigned char *passwd, unsigned char *p16,
+>>                       const struct nls_table *codepage);
+>> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+>> index 36f9ebb..49719b8 100644
+>> --- a/fs/cifs/inode.c
+>> +++ b/fs/cifs/inode.c
+>> @@ -383,7 +383,8 @@ int cifs_get_inode_info_unix(struct inode **pinode,
+>>
+>>       /* check for Minshall+French symlinks */
+>>       if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MF_SYMLINKS) {
+>> -             int tmprc = CIFSCheckMFSymlink(&fattr, full_path, cifs_sb, xid);
+>> +             int tmprc = CIFSCheckMFSymlink(xid, tcon, cifs_sb, &fattr,
+>> +                                            full_path);
+>>               if (tmprc)
+>>                       cifs_dbg(FYI, "CIFSCheckMFSymlink: %d\n", tmprc);
+>>       }
+>> @@ -799,7 +800,8 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+>>
+>>       /* check for Minshall+French symlinks */
+>>       if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MF_SYMLINKS) {
+>> -             tmprc = CIFSCheckMFSymlink(&fattr, full_path, cifs_sb, xid);
+>> +             tmprc = CIFSCheckMFSymlink(xid, tcon, cifs_sb, &fattr,
+>> +                                        full_path);
+>>               if (tmprc)
+>>                       cifs_dbg(FYI, "CIFSCheckMFSymlink: %d\n", tmprc);
+>>       }
+>> diff --git a/fs/cifs/link.c b/fs/cifs/link.c
+>> index cc02347..92aee08 100644
+>> --- a/fs/cifs/link.c
+>> +++ b/fs/cifs/link.c
+>> @@ -354,34 +354,30 @@ open_query_close_cifs_symlink(const unsigned char *path, char *pbuf,
+>>
+>>
+>>  int
+>> -CIFSCheckMFSymlink(struct cifs_fattr *fattr,
+>> -                const unsigned char *path,
+>> -                struct cifs_sb_info *cifs_sb, unsigned int xid)
+>> +CIFSCheckMFSymlink(unsigned int xid, struct cifs_tcon *tcon,
+>> +                struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
+>> +                const unsigned char *path)
+>>  {
+>> -     int rc = 0;
+>> +     int rc;
+>>       u8 *buf = NULL;
+>>       unsigned int link_len = 0;
+>>       unsigned int bytes_read = 0;
+>> -     struct cifs_tcon *ptcon;
+>>
+>>       if (!CIFSCouldBeMFSymlink(fattr))
+>>               /* it's not a symlink */
+>>               return 0;
+>>
+>>       buf = kmalloc(CIFS_MF_SYMLINK_FILE_SIZE, GFP_KERNEL);
+>> -     if (!buf) {
+>> -             rc = -ENOMEM;
+>> -             goto out;
+>> -     }
+>> +     if (!buf)
+>> +             return -ENOMEM;
+>>
+>> -     ptcon = tlink_tcon(cifs_sb_tlink(cifs_sb));
+>> -     if ((ptcon->ses) && (ptcon->ses->server->ops->query_mf_symlink))
+>> -             rc = ptcon->ses->server->ops->query_mf_symlink(path, buf,
+>> -                                              &bytes_read, cifs_sb, xid);
+>> +     if (tcon->ses->server->ops->query_mf_symlink)
+>> +             rc = tcon->ses->server->ops->query_mf_symlink(path, buf,
+>> +                                             &bytes_read, cifs_sb, xid);
+>>       else
+>> -             goto out;
+>> +             rc = -ENOSYS;
+>>
+>> -     if (rc != 0)
+>> +     if (rc)
+>>               goto out;
+>>
+>>       if (bytes_read == 0) /* not a symlink */
+>
+> This should probably also go to stable?
+>
+> Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
-> +	} else
-> +		rc = -EINVAL;
-> +
-> +	if (!rc)
-> +		goto set_size_out;
-> +
-> +	if (tcon == NULL) {
-> +		tlink = cifs_sb_tlink(cifs_sb);
-> +		if (IS_ERR(tlink))
-> +			return PTR_ERR(tlink);
-> +		tcon = tlink_tcon(tlink);
-> +		server = tcon->ses->server;
-> +	}
-> +
-> +	/*
-> +	 * Set file size by pathname rather than by handle either because no
-> +	 * valid, writeable file handle for it was found or because there was
-> +	 * an error setting it by handle.
-> +	 */
-> +	rc = smb_set_file_size_by_path(xid, tcon, full_path, attrs->ia_size,
-> +				       cifs_sb, false);
-> +	cifs_dbg(FYI, "%s by path rc = %d for %s\n", __func__, rc, full_path);
-> +	if ((rc == -EINVAL) || (rc == -EOPNOTSUPP)) {
-> +		__u16 netfid;
-> +		int oplock = 0;
-> +
-> +		rc = SMBLegacyOpen(xid, tcon, full_path, FILE_OPEN,
-> +				   GENERIC_WRITE, CREATE_NOT_DIR, &netfid,
-> +				   &oplock, NULL, cifs_sb->local_nls,
-> +				   cifs_sb->mnt_cifs_flags &
-> +						CIFS_MOUNT_MAP_SPECIAL_CHR);
-> +		if (rc == 0) {
-> +			rc = cifs_legacy_set_file_size(xid, netfid,
-> +						       current->tgid,
-> +						       attrs->ia_size, tcon,
-> +						       full_path);
-> +			CIFSSMBClose(xid, tcon, netfid);
-> +		}
-> +	}
-> +	if (!open_file)
-> +		cifs_put_tlink(tlink);
-> +
-> +set_size_out:
-> +	return rc;
-> +}
-> +
-> +static int
->  smb_set_file_info(struct inode *inode, const char *full_path,
->  		  FILE_BASIC_INFO *buf, const unsigned int xid)
->  {
-> @@ -1013,8 +1119,7 @@ struct smb_version_operations smb1_operations = {
->  	.query_path_info = cifs_query_path_info,
->  	.query_file_info = cifs_query_file_info,
->  	.get_srv_inum = cifs_get_srv_inum,
-> -	.set_file_size_by_path = smb_set_file_size_by_path,
-> -	.set_file_size_by_handle = CIFSSMBSetFileSize,
-> +	.set_file_size = smb_set_file_size,
->  	.set_file_info = smb_set_file_info,
->  	.set_compression = cifs_set_compression,
->  	.echo = CIFSSMBEcho,
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index dc7b1cb..206b45f 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -697,6 +697,54 @@ smb2_set_file_size_by_handle(const unsigned int xid, struct cifs_tcon *tcon,
->  }
->  
->  static int
-> +smb2_set_file_size(struct inode *inode, struct iattr *attrs, unsigned int xid,
-> +		   char *full_path)
-> +{
-> +	int rc;
-> +	struct cifsFileInfo *open_file;
-> +	struct cifsInodeInfo *cifsInode = CIFS_I(inode);
-> +	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
-> +	struct tcon_link *tlink;
-> +	struct cifs_tcon *tcon;
-> +	struct TCP_Server_Info *server;
-> +
-> +	/*
-> +	 * To avoid spurious oplock breaks from server, in the case of
-> +	 * inodes that we already have open, avoid doing path based
-> +	 * setting of file size if we can do it by handle.
-> +	 * This keeps our caching token (oplock) and avoids timeouts
-> +	 * when the local oplock break takes longer to flush
-> +	 * writebehind data than the SMB timeout for the SetPathInfo
-> +	 * request would allow
-> +	 */
-> +	open_file = find_writable_file(cifsInode, true);
-> +	if (open_file) {
-> +		tcon = tlink_tcon(open_file->tlink);
-> +		server = tcon->ses->server;
-> +		rc = smb2_set_file_size_by_handle(xid, tcon, open_file,
-> +						  attrs->ia_size, false);
-> +		cifsFileInfo_put(open_file);
-> +		cifs_dbg(FYI, "%s by handle rc = %d on %s\n", __func__, rc,
-> +			 full_path);
-> +		return rc;
-> +	}
-> +
-> +	tlink = cifs_sb_tlink(cifs_sb);
-> +	if (IS_ERR(tlink))
-> +		return PTR_ERR(tlink);
-> +	tcon = tlink_tcon(tlink);
-> +	server = tcon->ses->server;
-> +
-> +	rc = smb2_set_file_size_by_path(xid, tcon, full_path, attrs->ia_size,
-> +					cifs_sb, false);
-> +	cifs_dbg(FYI, "%s by path rc = %d on %s\n", __func__, rc, full_path);
-> +
-> +	cifs_put_tlink(tlink);
-> +
-> +	return rc;
-> +}
-> +
-> +static int
->  smb2_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
->  		   struct cifsFileInfo *cfile)
->  {
-> @@ -1131,8 +1179,7 @@ struct smb_version_operations smb20_operations = {
->  	.query_path_info = smb2_query_path_info,
->  	.get_srv_inum = smb2_get_srv_inum,
->  	.query_file_info = smb2_query_file_info,
-> -	.set_file_size_by_path = smb2_set_file_size_by_path,
-> -	.set_file_size_by_handle = smb2_set_file_size_by_handle,
-> +	.set_file_size = smb2_set_file_size,
->  	.set_file_info = smb2_set_file_info,
->  	.set_compression = smb2_set_compression,
->  	.mkdir = smb2_mkdir,
-> @@ -1205,8 +1252,7 @@ struct smb_version_operations smb21_operations = {
->  	.query_path_info = smb2_query_path_info,
->  	.get_srv_inum = smb2_get_srv_inum,
->  	.query_file_info = smb2_query_file_info,
-> -	.set_file_size_by_path = smb2_set_file_size_by_path,
-> -	.set_file_size_by_handle = smb2_set_file_size_by_handle,
-> +	.set_file_size = smb2_set_file_size,
->  	.set_file_info = smb2_set_file_info,
->  	.set_compression = smb2_set_compression,
->  	.mkdir = smb2_mkdir,
-> @@ -1280,8 +1326,7 @@ struct smb_version_operations smb30_operations = {
->  	.query_path_info = smb2_query_path_info,
->  	.get_srv_inum = smb2_get_srv_inum,
->  	.query_file_info = smb2_query_file_info,
-> -	.set_file_size_by_path = smb2_set_file_size_by_path,
-> -	.set_file_size_by_handle = smb2_set_file_size_by_handle,
-> +	.set_file_size = smb2_set_file_size,
->  	.set_file_info = smb2_set_file_info,
->  	.set_compression = smb2_set_compression,
->  	.mkdir = smb2_mkdir,
-
-
-The rest of the patch looks good to me though.
 
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Thanks,
+
+Steve
