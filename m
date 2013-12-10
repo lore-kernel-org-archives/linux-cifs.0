@@ -1,465 +1,449 @@
-From: Jeff Layton <jlayton@redhat.com>
-Subject: Re: [PATCH 4/4 linux-next V3] cifs: Combine set_file_size by handle
- and path into one function
-Date: Mon, 9 Dec 2013 14:56:50 -0500
-Message-ID: <20131209145650.666e7af5@tlielax.poochiereds.net>
-References: <1386618116-9672-1-git-send-email-timg@tpi.com>
-	<1386618116-9672-4-git-send-email-timg@tpi.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] cifs-utils: pam module to set cifs credentials in key
+ store
+Date: Tue, 10 Dec 2013 07:21:27 -0500
+Message-ID: <20131210072127.4da4fb66@tlielax.poochiereds.net>
+References: <loom.20131113T002139-562@post.gmane.org>
+	<20131112212536.6061477e@corrin.poochiereds.net>
+	<5283E835.2090508@cora.nwra.com>
+	<20131130053237.5ba7359d@tlielax.poochiereds.net>
+	<529CE146.8090202@cora.nwra.com>
+	<20131207092341.16e0fe0c@tlielax.poochiereds.net>
 Mime-Version: 1.0
+Content-Type: multipart/mixed; boundary="MP_/DJG7C9DNOpMJILSuYj60Hip"
+Cc: Orion Poplawski <orion-CVdf0l11yl+B+jHODAdFcQ@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20131207092341.16e0fe0c-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
+
+--MP_/DJG7C9DNOpMJILSuYj60Hip
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org, Dean Gehnert <deang@tpi.com>, samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
-To: Tim Gardner <timg@tpi.com>
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <1386618116-9672-4-git-send-email-timg@tpi.com>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Disposition: inline
 
-On Mon,  9 Dec 2013 12:41:56 -0700
-Tim Gardner <timg@tpi.com> wrote:
+On Sat, 7 Dec 2013 09:23:41 -0500
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-> As suggested by Jeff Layton:
+> On Mon, 02 Dec 2013 12:36:38 -0700
+> Orion Poplawski <orion-CVdf0l11yl+B+jHODAdFcQ@public.gmane.org> wrote:
 > 
-> --------
-> "Now that I look though, it's clear to me that cifs_set_file_size is
-> just wrong. Currently it calls ops->set_path_size and if that fails
-> with certain error codes it tries to do a SMBLegacyOpen, etc. That's
-> going to fall on its face if this is a SMB2/3 connection.
+> > On 11/30/2013 03:32 AM, Jeff Layton wrote:
+> > > On Wed, 13 Nov 2013 13:59:33 -0700
+> > > Orion Poplawski <orion-CVdf0l11yl+B+jHODAdFcQ@public.gmane.org> wrote:
+> > >
+> > >>  From e2e6e73f05d912377656675292994858b99cabbb Mon Sep 17 00:00:00 2001
+> > >> From: Orion Poplawski <orion-CfuHcwXVrUc@public.gmane.org>
+> > >> Date: Wed, 13 Nov 2013 13:53:30 -0700
+> > >> Subject: [PATCH] Create cifscreds PAM module to insert credentials at login
+> > >>
+> > >
+> > > Sorry for taking so long to review this. This looks like a good start.
+> > > FWIW, I'd like to see this merged for the next release, which should
+> > > happen in the next month or two.
+> > >
+> > 
+> > No problem, thanks for the review.
+> > 
+> > > When you think this is ready for merge, please resend with a real
+> > > '[PATCH]' tag in the subject, so I don't miss it...
+> > 
+> > Hopefully this is okay.
+> > 
+> > >> @@ -231,6 +236,7 @@ AM_CONDITIONAL(CONFIG_CIFSUPCALL, [test "$enable_cifsupcall" != "no"])
+> > >>   AM_CONDITIONAL(CONFIG_CIFSCREDS, [test "$enable_cifscreds" != "no"])
+> > >>   AM_CONDITIONAL(CONFIG_CIFSIDMAP, [test "$enable_cifsidmap" != "no"])
+> > >>   AM_CONDITIONAL(CONFIG_CIFSACL, [test "$enable_cifsacl" != "no"])
+> > >> +AM_CONDITIONAL(CONFIG_PAM, [test "$enable_pam" != "no" -o "$enable_pam" != "no"])
+> > >
+> > > Erm...you're testing the same thing twice here?
+> > 
+> > Oops, copy/paste error.
+> > 
+> > >
+> > > I think the autoconf stuff needs some work.
+> > >
+> > > If the box doesn't have what's needed to build it, the build is going
+> > > to fail unless someone explicitly disables CONFIG_PAM.
+> > >
+> > > Ideally, we'd build this by default and have autoconf test for what's
+> > > required to build the PAM module. If the build requires aren't present,
+> > > then the building of the PAM module should be disabled with a warning
+> > > message that states that.
+> > >
+> > > There are some other examples of that sort of behavior in configure.ac.
+> > > It's a little more complicated, but it makes life easier for people
+> > > building the package.
+> > 
+> > Okay, I've added a section for checking for security/pam_appl.h.  Should we 
+> > also check for the other headers/libraries as well?
+> > 
+> > I've also added to the keyutils.h section so as to disable the pam module 
+> > there too.
+> > 
+> > 
+> > >> +static void
+> > >> +free_password (char *password)
+> > >> +{
+> > >> +	volatile char *vp;
+> > >> +	size_t len;
+> > >> +
+> > >> +	if (!password) {
+> > >> +		return;
+> > >> +	}
+> > >> +
+> > >> +	/* Defeats some optimizations */
+> > >> +	len = strlen (password);
+> > >> +	memset (password, 0xAA, len);
+> > >> +	memset (password, 0xBB, len);
+> > >> +
+> > >> +	/* Defeats others */
+> > >> +	vp = (volatile char*)password;
+> > >> +	while (*vp) {
+> > >> +		*(vp++) = 0xAA;
+> > >> +	}
+> > >> +
+> > >
+> > > I'm all for scrubbing the pw memory but that seems a bit like overkill.
+> > > Got any references to cite about why you need to write over it 3 times?
+> > >
+> > > If that's really necessary, then we should move the password handling
+> > > in cifscreds and mount.cifs binary to use something like this too.
+> > > Maybe consider putting this in an a.out lib and linking it into all 3?
+> > 
+> > This is copied directly from the gnome-keyring pam module.  I don't have any 
+> > references for why it is done.  My guess is because it is part of a PAM chain, 
+> > so perhaps to prevent later modules from accessing it?  Or perhaps just to 
+> > scrub memory?  I suspect that the multiple times is to defeat compiler 
+> > optimization making it a no-op?
+> > 
+> > >> +
+> > >> +/**
+> > >> + * This is called when the PAM session is closed.
+> > >> + *
+> > >> + * Currently it does nothing.  The session closing should remove the passwords
+> > >> + *
+> > >> + * @param ph PAM handle
+> > >> + * @param flags currently unused, TODO: check for silent flag
+> > >> + * @param argc number of arguments for this PAM module
+> > >> + * @param argv array of arguments for this PAM module
+> > >> + * @return PAM_SUCCESS
+> > >> + */
+> > >> +PAM_EXTERN int pam_sm_close_session(pam_handle_t *ph, int flags, int argc, const char **argv)
+> > >> +{
+> > >> +	return PAM_SUCCESS;
+> > >> +}
+> > >> +
+> > >
+> > > Cleaning up after you're done seems like a good thing to do. The thing
+> > > we need to be careful about here is that we might still need these
+> > > creds to write out dirty data. This may require some consideration...
+> > 
+> > Yeah, I'm not sure what there is to do here really.  Anything would be more 
+> > than what is done currently running cifscreds directly.
+> > 
+> > >> +/**
+> > >> + * This is called when PAM is invoked to change the user's authentication token.
+> > >> + * TODO - update the credetials
+> > >> + *
+> > >> + * @param ph PAM handle
+> > >> + * @param flags currently unused, TODO: check for silent flag
+> > >> + * @param argc number of arguments for this PAM module
+> > >> + * @param argv array of arguments for this PAM module
+> > >> + * @return PAM_SUCCESS
+> > >> + */
+> > >> + PAM_EXTERN int pam_sm_setcred(pam_handle_t *ph, int flags, int argc, const char **argv)
+> > >> +{
+> > >> +	return PAM_SUCCESS;
+> > >> +}
+> > >
+> > > The rest looks reasonably straightforward, but I don't PAM that well,
+> > > so it's hard for me to comment.
+> > >
+> > 
+> > Actually, I'm not sure what should be done here.  gnome-keyring doesn't do 
+> > anything.  http://pubs.opengroup.org/onlinepubs/008329799/pam_sm_setcred.htm 
+> > describes the call.
+> > 
+> > Looks like the pam_sm_chauthtok function is used to update the passwords. 
+> > I've made attempts to implement that.
+> > 
 > 
-> Here's what should be done instead, I think:
+> Oh, and one other thing...
 > 
-> - get rid of both set_path_size and set_file_size operations. The
->   version specific abstraction was implemented at the wrong level, IMO.
+> Can you resend the above patch with a Signed-off-by line?
 > 
-> - implement a new protocol level operation that basically takes the
->   same args as cifs_set_file_size. cifs_setattr_unix/_nounix should
->   call this operation.
-> 
-> - the set_path_size operation for SMB1 should basically be the function
->   that is cifs_set_file_size today (though that should probably be
->   renamed). That function should be restructured to do the following:
-> 
->   + look for an open filehandle
->   + if there isn't one, open the file
->   + call CIFSSMBSetFileSize
->   + fall back to zero-length write if that fails
->   + close the file if we opened it"
-> --------
-> 
-> This patch also moves all of the SMBv1 legacy hacks from cifs_set_file_size() into
-> the SMBv1 specific handler smb_set_file_size() more or less intact. SMBv2 and higher are
-> more regular and orthogonal, so the v2 handler smb2_set_file_size() no longer contains
-> the legacy hacks.
-> 
-> Move cifsFileInfo_put(open_file) below the first call to
-> cifs_legacy_set_file_size() so that the reference on open_file stays valid
-> throughout.
-> 
-> Cc: Steve French <sfrench@samba.org>
-> Cc: Jeff Layton <jlayton@redhat.com>
-> Cc: Dean Gehnert <deang@tpi.com>
-> Signed-off-by: Tim Gardner <timg@tpi.com>
-> ---
-> 
-> V3 - dropped 'cifs: fix incorrect reference count check' which impacted this patch.
-> Also moved cifsFileInfo_put(open_file) according to V2 review comments from Jeff Layton.
-> 
-> V2 - this is a new patch in the V2 series.
-> 
-> I know this is kind of a giant patch, but there really doesn't seem to be any
-> intermediate steps. Its pretty much all or nothing.
-> 
-> I've only tested against a Linux CIFS server running a 3.2 kernel since I no longer
-> have easy access to smbv2 servers (iOS 10.8 or Windows 7).
-> 
->  fs/cifs/cifsglob.h |    9 ++---
->  fs/cifs/inode.c    |  108 +++++----------------------------------------------
->  fs/cifs/smb1ops.c  |  109 +++++++++++++++++++++++++++++++++++++++++++++++++++-
->  fs/cifs/smb2ops.c  |   57 ++++++++++++++++++++++++---
->  4 files changed, 170 insertions(+), 113 deletions(-)
-> 
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 8fd8eb2..6113ce8 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -269,12 +269,9 @@ struct smb_version_operations {
->  	int (*get_srv_inum)(const unsigned int, struct cifs_tcon *,
->  			    struct cifs_sb_info *, const char *,
->  			    u64 *uniqueid, FILE_ALL_INFO *);
-> -	/* set size by path */
-> -	int (*set_file_size_by_path)(const unsigned int, struct cifs_tcon *,
-> -			     const char *, __u64, struct cifs_sb_info *, bool);
-> -	/* set size by file handle */
-> -	int (*set_file_size_by_handle)(const unsigned int, struct cifs_tcon *,
-> -			     struct cifsFileInfo *, __u64, bool);
-> +	/* set file size */
-> +	int (*set_file_size)(struct inode *inode, struct iattr *attrs,
-> +			     unsigned int xid, char *full_path);
->  	/* set attributes */
->  	int (*set_file_info)(struct inode *, const char *, FILE_BASIC_INFO *,
->  			     const unsigned int);
-> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> index 3f710c6..3edeafd 100644
-> --- a/fs/cifs/inode.c
-> +++ b/fs/cifs/inode.c
-> @@ -1899,118 +1899,28 @@ static void cifs_setsize(struct inode *inode, loff_t offset)
->  	truncate_pagecache(inode, offset);
->  }
->  
-> -/*
-> - * Legacy hack to set file length.
-> - */
-> -static int
-> -cifs_legacy_set_file_size(unsigned int xid, __u16 netfid, __u32 pid,
-> -			  unsigned int length, struct cifs_tcon *tcon,
-> -			  char *full_path)
-> -{
-> -	int rc;
-> -	unsigned int bytes_written;
-> -	struct cifs_io_parms io_parms;
-> -
-> -	io_parms.netfid = netfid;
-> -	io_parms.pid = pid;
-> -	io_parms.tcon = tcon;
-> -	io_parms.offset = 0;
-> -	io_parms.length = length;
-> -	rc = CIFSSMBWrite(xid, &io_parms, &bytes_written,
-> -			  NULL, NULL, 1);
-> -	cifs_dbg(FYI, "%s len %d rc %d on %s\n", __func__, length, rc,
-> -		 full_path);
-> -	return rc;
-> -}
-> -
->  static int
->  cifs_set_file_size(struct inode *inode, struct iattr *attrs,
->  		   unsigned int xid, char *full_path)
->  {
-> -	int rc;
-> -	struct cifsFileInfo *open_file;
-> +	int rc = -ENOSYS;
->  	struct cifsInodeInfo *cifsInode = CIFS_I(inode);
->  	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
->  	struct tcon_link *tlink = NULL;
->  	struct cifs_tcon *tcon = NULL;
->  	struct TCP_Server_Info *server;
->  
-> -	/*
-> -	 * To avoid spurious oplock breaks from server, in the case of
-> -	 * inodes that we already have open, avoid doing path based
-> -	 * setting of file size if we can do it by handle.
-> -	 * This keeps our caching token (oplock) and avoids timeouts
-> -	 * when the local oplock break takes longer to flush
-> -	 * writebehind data than the SMB timeout for the SetPathInfo
-> -	 * request would allow
-> -	 */
-> -	open_file = find_writable_file(cifsInode, true);
-> -	if (open_file) {
-> -		tcon = tlink_tcon(open_file->tlink);
-> -		server = tcon->ses->server;
-> -		if (server->ops->set_file_size_by_handle)
-> -			rc = server->ops->set_file_size_by_handle(xid, tcon,
-> -								  open_file,
-> -								  attrs->ia_size,
-> -								  false);
-> -		else
-> -			rc = -ENOSYS;
-> -		cifsFileInfo_put(open_file);
-> -		cifs_dbg(FYI, "SetFSize for attrs rc = %d\n", rc);
-> -		if ((rc == -EINVAL) || (rc == -EOPNOTSUPP)) {
-> -			rc = cifs_legacy_set_file_size(xid,
-> -						       open_file->fid.netfid,
-> -						       open_file->pid,
-> -						       attrs->ia_size,
-> -						       tcon, full_path);
-> -		}
-> -	} else
-> -		rc = -EINVAL;
-> -
-> -	if (!rc)
-> -		goto set_size_out;
-> +	tlink = cifs_sb_tlink(cifs_sb);
-> +	if (IS_ERR(tlink))
-> +		return PTR_ERR(tlink);
-> +	tcon = tlink_tcon(tlink);
-> +	server = tcon->ses->server;
->  
-> -	if (tcon == NULL) {
-> -		tlink = cifs_sb_tlink(cifs_sb);
-> -		if (IS_ERR(tlink))
-> -			return PTR_ERR(tlink);
-> -		tcon = tlink_tcon(tlink);
-> -		server = tcon->ses->server;
-> -	}
-> +	if (server->ops->set_file_size)
-> +		rc = server->ops->set_file_size(inode, attrs, xid, full_path);
->  
-> -	/*
-> -	 * Set file size by pathname rather than by handle either because no
-> -	 * valid, writeable file handle for it was found or because there was
-> -	 * an error setting it by handle.
-> -	 */
-> -	if (server->ops->set_file_size_by_path)
-> -		rc = server->ops->set_file_size_by_path(xid, tcon, full_path,
-> -							attrs->ia_size, cifs_sb,
-> -							false);
-> -	else
-> -		rc = -ENOSYS;
-> -	cifs_dbg(FYI, "SetEOF by path (setattrs) rc = %d\n", rc);
-> -	if ((rc == -EINVAL) || (rc == -EOPNOTSUPP)) {
-> -		__u16 netfid;
-> -		int oplock = 0;
-> -
-> -		rc = SMBLegacyOpen(xid, tcon, full_path, FILE_OPEN,
-> -				   GENERIC_WRITE, CREATE_NOT_DIR, &netfid,
-> -				   &oplock, NULL, cifs_sb->local_nls,
-> -				   cifs_sb->mnt_cifs_flags &
-> -						CIFS_MOUNT_MAP_SPECIAL_CHR);
-> -		if (rc == 0) {
-> -			rc = cifs_legacy_set_file_size(xid, netfid,
-> -						       current->tgid,
-> -						       attrs->ia_size, tcon,
-> -						       full_path);
-> -			CIFSSMBClose(xid, tcon, netfid);
-> -		}
-> -	}
-> -	if (tlink)
-> -		cifs_put_tlink(tlink);
-> +	cifs_put_tlink(tlink);
->  
-> -set_size_out:
->  	if (rc == 0) {
->  		cifsInode->server_eof = attrs->ia_size;
->  		cifs_setsize(inode, attrs->ia_size);
-> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-> index c5d9ec6..fd0c124 100644
-> --- a/fs/cifs/smb1ops.c
-> +++ b/fs/cifs/smb1ops.c
-> @@ -755,6 +755,30 @@ cifs_sync_write(const unsigned int xid, struct cifsFileInfo *cfile,
->  	return CIFSSMBWrite2(xid, parms, written, iov, nr_segs);
->  }
->  
-> +/*
-> + * Legacy hack to set file length.
-> + */
-> +static int
-> +cifs_legacy_set_file_size(unsigned int xid, __u16 netfid, __u32 pid,
-> +			  unsigned int length, struct cifs_tcon *tcon,
-> +			  char *full_path)
-> +{
-> +	int rc;
-> +	unsigned int bytes_written;
-> +	struct cifs_io_parms io_parms;
-> +
-> +	io_parms.netfid = netfid;
-> +	io_parms.pid = pid;
-> +	io_parms.tcon = tcon;
-> +	io_parms.offset = 0;
-> +	io_parms.length = length;
-> +	rc = CIFSSMBWrite(xid, &io_parms, &bytes_written,
-> +			  NULL, NULL, 1);
-> +	cifs_dbg(FYI, "%s len %d rc %d on %s\n", __func__, length, rc,
-> +		 full_path);
-> +	return rc;
-> +}
-> +
->  static int
->  smb_set_file_size_by_path(const unsigned int xid, struct cifs_tcon *tcon,
->  	      const char *full_path, __u64 size, struct cifs_sb_info *cifs_sb,
-> @@ -790,6 +814,88 @@ smb_set_file_size_by_path(const unsigned int xid, struct cifs_tcon *tcon,
->  }
->  
->  static int
-> +smb_set_file_size(struct inode *inode, struct iattr *attrs, unsigned int xid,
-> +		  char *full_path)
-> +{
-> +	int rc;
-> +	struct cifsFileInfo *open_file;
-> +	struct cifsInodeInfo *cifsInode = CIFS_I(inode);
-> +	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
-> +	struct tcon_link *tlink = NULL;
-> +	struct cifs_tcon *tcon = NULL;
-> +	struct TCP_Server_Info *server;
-> +
-> +	/*
-> +	 * To avoid spurious oplock breaks from server, in the case of
-> +	 * inodes that we already have open, avoid doing path based
-> +	 * setting of file size if we can do it by handle.
-> +	 * This keeps our caching token (oplock) and avoids timeouts
-> +	 * when the local oplock break takes longer to flush
-> +	 * writebehind data than the SMB timeout for the SetPathInfo
-> +	 * request would allow
-> +	 */
-> +	open_file = find_writable_file(cifsInode, true);
-> +	if (open_file) {
-> +		tcon = tlink_tcon(open_file->tlink);
-> +		server = tcon->ses->server;
-> +		rc = CIFSSMBSetFileSize(xid, tcon, open_file, attrs->ia_size,
-> +					false);
-> +		cifs_dbg(FYI, "%s by handle rc = %d for %s\n", __func__, rc,
-> +			 full_path);
-> +		if ((rc == -EINVAL) || (rc == -EOPNOTSUPP))
-> +			rc = cifs_legacy_set_file_size(xid,
-> +						       open_file->fid.netfid,
-> +						       open_file->pid,
-> +						       attrs->ia_size,
-> +						       tcon, full_path);
-> +		cifsFileInfo_put(open_file);
-> +	} else
-> +		rc = -EINVAL;
-> +
-> +	if (!rc)
-> +		goto set_size_out;
-> +
-> +	if (tcon == NULL) {
-> +		tlink = cifs_sb_tlink(cifs_sb);
-> +		if (IS_ERR(tlink))
-> +			return PTR_ERR(tlink);
-> +		tcon = tlink_tcon(tlink);
-> +		server = tcon->ses->server;
-> +	}
-> +
-> +	/*
-> +	 * Set file size by pathname rather than by handle either because no
-> +	 * valid, writeable file handle for it was found or because there was
-> +	 * an error setting it by handle.
-> +	 */
-> +	rc = smb_set_file_size_by_path(xid, tcon, full_path, attrs->ia_size,
-> +				       cifs_sb, false);
-> +	cifs_dbg(FYI, "%s by path rc = %d for %s\n", __func__, rc, full_path);
-> +	if ((rc == -EINVAL) || (rc == -EOPNOTSUPP)) {
-> +		__u16 netfid;
-> +		int oplock = 0;
-> +
-> +		rc = SMBLegacyOpen(xid, tcon, full_path, FILE_OPEN,
-> +				   GENERIC_WRITE, CREATE_NOT_DIR, &netfid,
-> +				   &oplock, NULL, cifs_sb->local_nls,
-> +				   cifs_sb->mnt_cifs_flags &
-> +						CIFS_MOUNT_MAP_SPECIAL_CHR);
-> +		if (rc == 0) {
-> +			rc = cifs_legacy_set_file_size(xid, netfid,
-> +						       current->tgid,
-> +						       attrs->ia_size, tcon,
-> +						       full_path);
-> +			CIFSSMBClose(xid, tcon, netfid);
-> +		}
-> +	}
-> +	if (tlink)
-> +		cifs_put_tlink(tlink);
-> +
-> +set_size_out:
-> +	return rc;
-> +}
-> +
-> +static int
->  smb_set_file_info(struct inode *inode, const char *full_path,
->  		  FILE_BASIC_INFO *buf, const unsigned int xid)
->  {
-> @@ -1013,8 +1119,7 @@ struct smb_version_operations smb1_operations = {
->  	.query_path_info = cifs_query_path_info,
->  	.query_file_info = cifs_query_file_info,
->  	.get_srv_inum = cifs_get_srv_inum,
-> -	.set_file_size_by_path = smb_set_file_size_by_path,
-> -	.set_file_size_by_handle = CIFSSMBSetFileSize,
-> +	.set_file_size = smb_set_file_size,
->  	.set_file_info = smb_set_file_info,
->  	.set_compression = cifs_set_compression,
->  	.echo = CIFSSMBEcho,
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index dc7b1cb..206b45f 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -697,6 +697,54 @@ smb2_set_file_size_by_handle(const unsigned int xid, struct cifs_tcon *tcon,
->  }
->  
->  static int
-> +smb2_set_file_size(struct inode *inode, struct iattr *attrs, unsigned int xid,
-> +		   char *full_path)
-> +{
-> +	int rc;
-> +	struct cifsFileInfo *open_file;
-> +	struct cifsInodeInfo *cifsInode = CIFS_I(inode);
-> +	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
-> +	struct tcon_link *tlink;
-> +	struct cifs_tcon *tcon;
-> +	struct TCP_Server_Info *server;
-> +
-> +	/*
-> +	 * To avoid spurious oplock breaks from server, in the case of
-> +	 * inodes that we already have open, avoid doing path based
-> +	 * setting of file size if we can do it by handle.
-> +	 * This keeps our caching token (oplock) and avoids timeouts
-> +	 * when the local oplock break takes longer to flush
-> +	 * writebehind data than the SMB timeout for the SetPathInfo
-> +	 * request would allow
-> +	 */
-> +	open_file = find_writable_file(cifsInode, true);
-> +	if (open_file) {
-> +		tcon = tlink_tcon(open_file->tlink);
-> +		server = tcon->ses->server;
-> +		rc = smb2_set_file_size_by_handle(xid, tcon, open_file,
-> +						  attrs->ia_size, false);
-> +		cifsFileInfo_put(open_file);
-> +		cifs_dbg(FYI, "%s by handle rc = %d on %s\n", __func__, rc,
-> +			 full_path);
-> +		return rc;
-> +	}
-> +
-> +	tlink = cifs_sb_tlink(cifs_sb);
-> +	if (IS_ERR(tlink))
-> +		return PTR_ERR(tlink);
-> +	tcon = tlink_tcon(tlink);
-> +	server = tcon->ses->server;
-> +
-> +	rc = smb2_set_file_size_by_path(xid, tcon, full_path, attrs->ia_size,
-> +					cifs_sb, false);
-> +	cifs_dbg(FYI, "%s by path rc = %d on %s\n", __func__, rc, full_path);
-> +
-> +	cifs_put_tlink(tlink);
-> +
-> +	return rc;
-> +}
-> +
-> +static int
->  smb2_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
->  		   struct cifsFileInfo *cfile)
->  {
-> @@ -1131,8 +1179,7 @@ struct smb_version_operations smb20_operations = {
->  	.query_path_info = smb2_query_path_info,
->  	.get_srv_inum = smb2_get_srv_inum,
->  	.query_file_info = smb2_query_file_info,
-> -	.set_file_size_by_path = smb2_set_file_size_by_path,
-> -	.set_file_size_by_handle = smb2_set_file_size_by_handle,
-> +	.set_file_size = smb2_set_file_size,
->  	.set_file_info = smb2_set_file_info,
->  	.set_compression = smb2_set_compression,
->  	.mkdir = smb2_mkdir,
-> @@ -1205,8 +1252,7 @@ struct smb_version_operations smb21_operations = {
->  	.query_path_info = smb2_query_path_info,
->  	.get_srv_inum = smb2_get_srv_inum,
->  	.query_file_info = smb2_query_file_info,
-> -	.set_file_size_by_path = smb2_set_file_size_by_path,
-> -	.set_file_size_by_handle = smb2_set_file_size_by_handle,
-> +	.set_file_size = smb2_set_file_size,
->  	.set_file_info = smb2_set_file_info,
->  	.set_compression = smb2_set_compression,
->  	.mkdir = smb2_mkdir,
-> @@ -1280,8 +1326,7 @@ struct smb_version_operations smb30_operations = {
->  	.query_path_info = smb2_query_path_info,
->  	.get_srv_inum = smb2_get_srv_inum,
->  	.query_file_info = smb2_query_file_info,
-> -	.set_file_size_by_path = smb2_set_file_size_by_path,
-> -	.set_file_size_by_handle = smb2_set_file_size_by_handle,
-> +	.set_file_size = smb2_set_file_size,
->  	.set_file_info = smb2_set_file_info,
->  	.set_compression = smb2_set_compression,
->  	.mkdir = smb2_mkdir,
 
-Looks good.
+Ok, I tested the pam_module this morning and it seems to work as
+expected. At this point, I think we can go ahead and merge it once we
+have a manpage.
 
-Reviewed-by: Jeff Layton <jlayton@redhat.com>
+I also intend to add this patch on top, which just does a little
+cleanup and fixes some build warnings.
+
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+
+--MP_/DJG7C9DNOpMJILSuYj60Hip
+Content-Type: text/x-patch
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment;
+ filename=0001-cifscreds-fix-up-some-whitespace-typos-and-build-war.patch
+
+=46rom d12443fdd268e547412683d43dc03f266260f7c8 Mon Sep 17 00:00:00 2001
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Date: Sat, 7 Dec 2013 06:52:26 -0500
+Subject: [cifs-utils PATCH] cifscreds: fix up some whitespace, typos and bu=
+ild
+ warnings in pam_cifscreds.c
+MIME-Version: 1.0
+Content-Type: text/plain; charset=3DUTF-8
+Content-Transfer-Encoding: 8bit
+
+gcc -g -O2 -Wall -Wextra -D_FORTIFY_SOURCE=3D2 -fpie -pie -Wl,-z,relro,-z,n=
+ow  -shared -fpic -o pam_cifscreds.so pam_cifscreds.c cifskey.c resolve_hos=
+t.c util.c -lpam -lkeyutils
+pam_cifscreds.c: In function =E2=80=98cleanup_free_password=E2=80=99:
+pam_cifscreds.c:143:38: warning: unused parameter =E2=80=98ph=E2=80=99 [-Wu=
+nused-parameter]
+ cleanup_free_password (pam_handle_t *ph, void *data, int pam_end_status)
+                                      ^
+pam_cifscreds.c:143:58: warning: unused parameter =E2=80=98pam_end_status=
+=E2=80=99 [-Wunused-parameter]
+ cleanup_free_password (pam_handle_t *ph, void *data, int pam_end_status)
+                                                          ^
+pam_cifscreds.c: In function =E2=80=98cifscreds_pam_update=E2=80=99:
+pam_cifscreds.c:271:8: warning: variable =E2=80=98addrs=E2=80=99 set but no=
+t used [-Wunused-but-set-variable]
+  char *addrs[16];
+        ^
+pam_cifscreds.c: In function =E2=80=98pam_sm_authenticate=E2=80=99:
+pam_cifscreds.c:359:58: warning: unused parameter =E2=80=98unused=E2=80=99 =
+[-Wunused-parameter]
+ PAM_EXTERN int pam_sm_authenticate(pam_handle_t *ph, int unused, int argc,=
+ const char **argv)
+                                                          ^
+pam_cifscreds.c: In function =E2=80=98pam_sm_open_session=E2=80=99:
+pam_cifscreds.c:414:58: warning: unused parameter =E2=80=98flags=E2=80=99 [=
+-Wunused-parameter]
+ PAM_EXTERN int pam_sm_open_session(pam_handle_t *ph, int flags, int argc, =
+const char **argv)
+                                                          ^
+pam_cifscreds.c: In function =E2=80=98pam_sm_close_session=E2=80=99:
+pam_cifscreds.c:487:51: warning: unused parameter =E2=80=98ph=E2=80=99 [-Wu=
+nused-parameter]
+ PAM_EXTERN int pam_sm_close_session(pam_handle_t *ph, int flags, int argc,=
+ const char **argv)
+                                                   ^
+pam_cifscreds.c:487:59: warning: unused parameter =E2=80=98flags=E2=80=99 [=
+-Wunused-parameter]
+ PAM_EXTERN int pam_sm_close_session(pam_handle_t *ph, int flags, int argc,=
+ const char **argv)
+                                                           ^
+pam_cifscreds.c:487:70: warning: unused parameter =E2=80=98argc=E2=80=99 [-=
+Wunused-parameter]
+ PAM_EXTERN int pam_sm_close_session(pam_handle_t *ph, int flags, int argc,=
+ const char **argv)
+                                                                      ^
+pam_cifscreds.c:487:89: warning: unused parameter =E2=80=98argv=E2=80=99 [-=
+Wunused-parameter]
+ PAM_EXTERN int pam_sm_close_session(pam_handle_t *ph, int flags, int argc,=
+ const char **argv)
+                                                                           =
+              ^
+pam_cifscreds.c: In function =E2=80=98pam_sm_setcred=E2=80=99:
+pam_cifscreds.c:501:45: warning: unused parameter =E2=80=98ph=E2=80=99 [-Wu=
+nused-parameter]
+ PAM_EXTERN int pam_sm_setcred(pam_handle_t *ph, int flags, int argc, const=
+ char **argv)
+                                             ^
+pam_cifscreds.c:501:53: warning: unused parameter =E2=80=98flags=E2=80=99 [=
+-Wunused-parameter]
+ PAM_EXTERN int pam_sm_setcred(pam_handle_t *ph, int flags, int argc, const=
+ char **argv)
+                                                     ^
+pam_cifscreds.c:501:64: warning: unused parameter =E2=80=98argc=E2=80=99 [-=
+Wunused-parameter]
+ PAM_EXTERN int pam_sm_setcred(pam_handle_t *ph, int flags, int argc, const=
+ char **argv)
+                                                                ^
+pam_cifscreds.c:501:83: warning: unused parameter =E2=80=98argv=E2=80=99 [-=
+Wunused-parameter]
+ PAM_EXTERN int pam_sm_setcred(pam_handle_t *ph, int flags, int argc, const=
+ char **argv)
+                                                                           =
+        ^
+
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ pam_cifscreds.c | 34 +++++++++++++++-------------------
+ 1 file changed, 15 insertions(+), 19 deletions(-)
+
+diff --git a/pam_cifscreds.c b/pam_cifscreds.c
+index 1385146..e0d8a55 100644
+--- a/pam_cifscreds.c
++++ b/pam_cifscreds.c
+@@ -140,7 +140,8 @@ free_password (char *password)
+ }
+=20
+ static void
+-cleanup_free_password (pam_handle_t *ph, void *data, int pam_end_status)
++cleanup_free_password (pam_handle_t *ph __attribute__((unused)), void *dat=
+a,
++			int pam_end_status __attribute__((unused)))
+ {
+ 	free_password (data);
+ }
+@@ -268,7 +269,6 @@ static int cifscreds_pam_update(pam_handle_t *ph, const=
+ char *user, const char *
+ 	int ret =3D PAM_SUCCESS;
+ 	char addrstr[MAX_ADDR_LIST_LEN];
+ 	char *currentaddress, *nextaddress;
+-	char *addrs[16];
+ 	int id, count =3D 0;
+ 	char keytype =3D ((args & ARG_DOMAIN) =3D=3D ARG_DOMAIN) ? 'd' : 'a';
+=20
+@@ -308,10 +308,8 @@ static int cifscreds_pam_update(pam_handle_t *ph, cons=
+t char *user, const char *
+ 		*nextaddress++ =3D '\0';
+=20
+ 	while (currentaddress) {
+-		if (key_search(currentaddress, keytype) > 0) {
+-			addrs[count] =3D currentaddress;
++		if (key_search(currentaddress, keytype) > 0)
+ 			count++;
+-		}
+=20
+ 		currentaddress =3D nextaddress;
+ 		if (currentaddress) {
+@@ -322,7 +320,7 @@ static int cifscreds_pam_update(pam_handle_t *ph, const=
+ char *user, const char *
+ 	}
+=20
+ 	if (!count) {
+-		pam_syslog(ph, LOG_ERR, "You have no same stached credentials for %s", h=
+ostdomain);
++		pam_syslog(ph, LOG_ERR, "You have no same stashed credentials for %s", h=
+ostdomain);
+ 		return PAM_SERVICE_ERR;
+ 	}
+=20
+@@ -344,7 +342,7 @@ static int cifscreds_pam_update(pam_handle_t *ph, const=
+ char *user, const char *
+  * scenarios are possible:
+  *
+  * - A session is already available which usually means that the user is a=
+lready
+- *	logged on and PAM has been used inside the screensaver. In that case, n=
+o need to=20
++ *	logged on and PAM has been used inside the screensaver. In that case, n=
+o need to
+  *	do anything(?).
+  *
+  * - A session is not yet available. Store the password inside PAM data so
+@@ -356,7 +354,7 @@ static int cifscreds_pam_update(pam_handle_t *ph, const=
+ char *user, const char *
+  * @param argv array of arguments for this PAM module
+  * @return any of the PAM return values
+  */
+-PAM_EXTERN int pam_sm_authenticate(pam_handle_t *ph, int unused, int argc,=
+ const char **argv)
++PAM_EXTERN int pam_sm_authenticate(pam_handle_t *ph, int unused __attribut=
+e__((unused)), int argc, const char **argv)
+ {
+ 	const char *hostdomain;
+ 	const char *user;
+@@ -365,7 +363,7 @@ PAM_EXTERN int pam_sm_authenticate(pam_handle_t *ph, in=
+t unused, int argc, const
+ 	int ret;
+=20
+ 	args =3D parse_args(ph, argc, argv, &hostdomain);
+-=09
++
+ 	/* Figure out and/or prompt for the user name */
+ 	ret =3D pam_get_user(ph, &user, NULL);
+ 	if (ret !=3D PAM_SUCCESS || !user) {
+@@ -411,7 +409,7 @@ PAM_EXTERN int pam_sm_authenticate(pam_handle_t *ph, in=
+t unused, int argc, const
+  * @param argv array of arguments for this PAM module
+  * @return any of the PAM return values
+  */
+-PAM_EXTERN int pam_sm_open_session(pam_handle_t *ph, int flags, int argc, =
+const char **argv)
++PAM_EXTERN int pam_sm_open_session(pam_handle_t *ph, int flags __attribute=
+__((unused)), int argc, const char **argv)
+ {
+ 	const char *user =3D NULL;
+ 	const char *password =3D NULL;
+@@ -484,7 +482,7 @@ PAM_EXTERN int pam_sm_open_session(pam_handle_t *ph, in=
+t flags, int argc, const
+  * @param argv array of arguments for this PAM module
+  * @return PAM_SUCCESS
+  */
+-PAM_EXTERN int pam_sm_close_session(pam_handle_t *ph, int flags, int argc,=
+ const char **argv)
++PAM_EXTERN int pam_sm_close_session(pam_handle_t *ph __attribute__((unused=
+)), int flags __attribute__((unused)), int argc __attribute__((unused)), co=
+nst char **argv __attribute__((unused)))
+ {
+ 	return PAM_SUCCESS;
+ }
+@@ -498,7 +496,7 @@ PAM_EXTERN int pam_sm_close_session(pam_handle_t *ph, i=
+nt flags, int argc, const
+  * @param argv array of arguments for this PAM module
+  * @return PAM_SUCCESS
+  */
+-PAM_EXTERN int pam_sm_setcred(pam_handle_t *ph, int flags, int argc, const=
+ char **argv)
++PAM_EXTERN int pam_sm_setcred(pam_handle_t *ph __attribute__((unused)), in=
+t flags __attribute__((unused)), int argc __attribute__((unused)), const ch=
+ar **argv __attribute__((unused)))
+ {
+ 	return PAM_SUCCESS;
+ }
+@@ -520,15 +518,14 @@ pam_sm_chauthtok (pam_handle_t *ph, int flags, int ar=
+gc, const char **argv)
+ 	const char *password =3D NULL;
+ 	uint args;
+ 	int ret;
+-=09
++
+ 	args =3D parse_args(ph, argc, argv, &hostdomain);
+=20
+ 	if (flags & PAM_UPDATE_AUTHTOK) {
+ 		/* Figure out the user name */
+ 		ret =3D pam_get_user(ph, &user, NULL);
+ 		if (ret !=3D PAM_SUCCESS) {
+-			pam_syslog(ph, LOG_ERR, "couldn't get the user name: %s",=20
+-				pam_strerror (ph, ret));
++			pam_syslog(ph, LOG_ERR, "couldn't get the user name: %s", pam_strerror =
+(ph, ret));
+ 			return PAM_SERVICE_ERR;
+ 		}
+=20
+@@ -537,14 +534,13 @@ pam_sm_chauthtok (pam_handle_t *ph, int flags, int ar=
+gc, const char **argv)
+ 			if (ret =3D=3D PAM_SUCCESS) {
+ 				pam_syslog(ph, LOG_WARNING, "no password is available for user");
+ 			} else {
+-				pam_syslog(ph, LOG_WARNING, "no password is available for user: %s",
+-					pam_strerror(ph, ret));
++				pam_syslog(ph, LOG_WARNING, "no password is available for user: %s", p=
+am_strerror(ph, ret));
+ 			}
+ 			return PAM_AUTHTOK_RECOVER_ERR;
+ 		}
+-=09
++
+ 		return cifscreds_pam_update(ph, user, password, args, hostdomain);
+ 	}
+-	else=20
++	else
+ 		return PAM_IGNORE;
+ }
+--=20
+1.8.4.2
+
+
+--MP_/DJG7C9DNOpMJILSuYj60Hip--
