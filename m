@@ -1,20 +1,50 @@
-From: rodrivinci-dXALDUftOVpQFI55V6+gNQ@public.gmane.org
-Subject: =?windows-1251?B?7/Dg5+Tt6Oog7eXs+/Hr6Owg4eXnIO7y6+j3?=
-	=?windows-1251?B?7fv1IO/u5ODw6u7iIOgg4iD98u7sIOz7IOLg?=
-	=?windows-1251?B?7CDv7uzu5uXs?=
-Date: Wed, 18 Dec 2013 14:02:42 +0100 (CET)
-Message-ID: <1895542706.20131218140243@ig.com.br>
-Reply-To: rodrivinci-dXALDUftOVpQFI55V6+gNQ@public.gmane.org
+From: Philipp Flesch <philipp-3cc/OM5pcIkb1SvskN2V4Q@public.gmane.org>
+Subject: Mounting error after upgrading to wheezy - Changes in mount.cifs
+ from 4.5 to =?UTF-8?Q?=35=2E=35=3F?=
+Date: Wed, 18 Dec 2013 14:10:17 +0100
+Message-ID: <8f517d28f1398f0410e66e30d0aadd5a@localhost>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1251
+Content-Type: text/plain; charset=UTF-8;
+	format=flowed
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <com_offer-JrzLJE1PczQPV+yCdzcFZQ@public.gmane.org>,
-	<f.neko-uAlqTfIRrB8@public.gmane.org>, <cd-izo-k+OT61UuxXo@public.gmane.org>, <adv-P/AymkIeRFkox3rIn2DAYQ@public.gmane.org>,
-	<schinfo-5MayLIYMBjEJlicLfgYEeA@public.gmane.org>
+To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-=CF=EE=E8=F1=EA =EF=EE=E4=E0=F0=EA=EE=E2 =ED=E5 =E7=E0=E9=EC=B8=F2 =EC=ED=
-=EE=E3=EE =E2=F0=E5=EC=E5=ED=E8, =E5=F1=EB=E8 =E7=E0=E9=E4=B8=F2=E5 =EA=
- =ED=E0=EC http://ufa1.ru/go/?url=3Dhttp://kwn.me/mth9
+Hi from Munich,
+we have some special issues with the current cifs-utils (5.5) in=20
+Debian Wheezy.
+
+A lot of our (raw) logfiles are stored on a Windows 2008 R2=20
+fileserver, while we use Debian to generate the reports.
+
+The share is available as
+\\fs01\Share
+
+while the logfiles can be found in special subdirs
+DepartmentA\Stats
+
+We use a seperate user "stats_user" to access the files. This user has=20
+no "listing-rights=E2=80=9C above the final "\Stats" directory.
+
+Using Windows 7, everything works fine...
+\\fs01\Share\DepartmentA\Stats can be directly mounted to an local=20
+drive...
+
+Using cifs-utils (4.5) in Squeeze everything works fine, too!
+mount -t cifs //fs01/Share/DepartmentA/stats /mnt/DepartmentA_stats -o=20
+user=3Dstats_user,domain=3Dxy,password=3D'xyz'
+makes all files accessible from Debian.
+
+Using the same mount-command with the same user, we got a "permission=20
+denied".
+Retrying with a default-user (with listing-rights) the subdirectory is=20
+mounted without any errors...
+
+Are there any big changes between 4.5 and 5.5 which can cause this=20
+error? Is there a solution, to avoid the issue?
+
+Thank you very much
+
+Philipp
