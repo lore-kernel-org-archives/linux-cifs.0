@@ -1,51 +1,31 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Mon, 30 Dec 2013 18:18:06 -0600
-Message-ID: <CAH2r5mu_QfVAx8psgz2giyw7+tEpQKkV-Y+vbkqurOBB94nY+w@mail.gmail.com>
+From: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Implement fsnotify for cifs (and others).
+Date: Tue, 31 Dec 2013 19:51:06 +0100
+Message-ID: <CANXojcw72QZz6aXb3Kor2omWu13g=aDAuzvtispwD=9z7y6RXQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-A few small cifs fixes including two for stable, and fixing a
-regression introduced by the VFS change to file create.
+Hi,
 
-The following changes since commit f41bfc9423aac4e589d2b3bedf26b3c249c61146:
+earlier we spoke about making fs change notify work for cifs, nfs and fuse.
 
-  Merge tag 'ext4_for_linus' of
-git://git.kernel.org/pub/scm/linux/kernel/git/tytso/ext4 (2013-12-26
-09:26:12 -0800)
+I've contacted Jan Kara about this issue. I've explained that the big
+issue is how the fsevent calls can contact the different filesystems
+about the fact a watch has been set or removed.
 
-are available in the git repository at:
+A callback/hook in fsnotify_add_inode_mark() and
+fsnotify_destroy_inode_mark() is required to make this work.
+The problem here that the original syscall should not wait for the
+setting of the watch has finished on the server, especially
+when dealing with a network fs. Maybe a special fsnotify queue per
+connection/mount is a good idea. The fsnotify
+callback for cifs will put a fs notify watch request on that queue,
+and signal the cifs process about it.
 
+What do you think?
 
-  git://git.samba.org/sfrench/cifs-2.6.git for-linus
-
-for you to fetch changes up to f1e3268126a35b9d3cb8bf67487fcc6cd13991d8:
-
-  cifs: set FILE_CREATED (2013-12-27 15:14:45 -0600)
-
-----------------------------------------------------------------
-Sachin Prabhu (1):
-      cifs: We do not drop reference to tlink in CIFSCheckMFSymlink()
-
-Shirish Pargaonkar (1):
-      cifs: set FILE_CREATED
-
-Steve French (1):
-      Add missing end of line termination to some cifs messages
-
- fs/cifs/cifsproto.h |  7 ++++---
- fs/cifs/cifssmb.c   |  6 +++---
- fs/cifs/dir.c       | 11 ++++++-----
- fs/cifs/inode.c     |  6 ++++--
- fs/cifs/link.c      | 26 +++++++++++---------------
- 5 files changed, 28 insertions(+), 28 deletions(-)
-
--- 
-Thanks,
-
-Steve
+Stef
