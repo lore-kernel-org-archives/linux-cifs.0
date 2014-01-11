@@ -1,51 +1,40 @@
-From: franklinbuthelezi1-/E1597aS9LQAvxtiuMwx3w@public.gmane.org
-Subject: =?UTF-8?Q?DiePresse.com_Mein_Freund,_der_Fahrradh=C3=A4ndler?=
-Date: Fri, 10 Jan 2014 13:36:09 +0100 (CET)
-Message-ID: <1593476469.1389357369298.JavaMail.root@dpoportal4.diepresse.apa.net>
-Reply-To: franklinbuthelezi1-/E1597aS9LQAvxtiuMwx3w@public.gmane.org
+From: Christian Engelmayer <cengelma-RbZlAiThDcE@public.gmane.org>
+Subject: [PATCH] cifs: Fix memory leak in cifs_hardlink()
+Date: Sat, 11 Jan 2014 01:57:22 +0100
+Message-ID: <20140111015722.2c8eb2f6@spike>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-=46olgender Artikel auf http://diepresse.com wird Ihnen von Franklin Bu=
-thelezi empfohlen:
+Fix a potential memory leak in the cifs_hardlink() error handling path.
+Detected by Coverity: CID 728510, CID 728511.
 
-Mein Freund, der Fahrradh=C3=A4ndler
-Manche Dinge ver=C3=A4ndern sich =C3=BCber die langen Wintermonate hinw=
-eg.=20
+Signed-off-by: Christian Engelmayer <cengelma-RbZlAiThDcE@public.gmane.org>
+---
+ fs/cifs/link.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-http://diepresse.com/home/leben/mode/kolumnezumtag/548717/index.do
-
-Notiz:
-Dear friend,
-=20
-I am the international operations manager of ABSA bank South Africa. My=
- name is Franklin Buthelezi. I have a sensitive and private offer from =
-the top executive to seek your partnership in re-profiling some offshor=
-e investment funds worth 11.5M U.S.D (Eleven Million five hundred thous=
-and United States Dollars) I am constrained however to withhold most of=
- the details for now. This is a legitimate transaction.=20
-=20
-If we agree on the terms you will be given 15% of the total funds, if y=
-ou are interested please write back via email providing me your persona=
-l details and phone number for further directives.
-=20
-If you are interested and willing to render your assistance please resp=
-ond via my private email address stated below.
-=20
-I look forward to your response.
-=20
-Best regards
-=46ranklin Buthelezi
-Email: franklinbuthelezi1-/E1597aS9LQAvxtiuMwx3w@public.gmane.org
-
-
-------------------------------------
-DiePresse.com =C3=BCbernimmt keine Haftung f=C3=BCr den Inhalt der pers=
-=C3=B6nlichen Nachricht.
-
-=C2=A9 DiePresse.com - http://diepresse.com
+diff --git a/fs/cifs/link.c b/fs/cifs/link.c
+index 92aee08..28bc8ee 100644
+--- a/fs/cifs/link.c
++++ b/fs/cifs/link.c
+@@ -438,8 +438,10 @@ cifs_hardlink(struct dentry *old_file, struct inode *inode,
+ 						CIFS_MOUNT_MAP_SPECIAL_CHR);
+ 	else {
+ 		server = tcon->ses->server;
+-		if (!server->ops->create_hardlink)
+-			return -ENOSYS;
++		if (!server->ops->create_hardlink) {
++			rc = -ENOSYS;
++			goto cifs_hl_exit;
++		}
+ 		rc = server->ops->create_hardlink(xid, tcon, from_name, to_name,
+ 						  cifs_sb);
+ 		if ((rc == -EIO) || (rc == -EINVAL))
+-- 
+1.8.3.2
