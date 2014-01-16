@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 3/4] CIFS: Remove extra indentation in cifs_sfu_type
-Date: Thu, 16 Jan 2014 15:53:35 +0400
-Message-ID: <1389873217-17519-4-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 4/4] CIFS: Cleanup cifs open codepath
+Date: Thu, 16 Jan 2014 15:53:36 +0400
+Message-ID: <1389873217-17519-5-git-send-email-piastry@etersoft.ru>
 References: <1389873217-17519-1-git-send-email-piastry@etersoft.ru>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,137 +9,655 @@ In-Reply-To: <1389873217-17519-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+Rename CIFSSMBOpen to CIFS_open and make it take
+cifs_open_parms structure as a parm.
+
 Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/inode.c |   97 ++++++++++++++++++++++++++++---------------------------
- 1 file changed, 50 insertions(+), 47 deletions(-)
+ fs/cifs/cifsacl.c   |   40 +++++++++++++++++++---------
+ fs/cifs/cifsproto.h |    7 ++---
+ fs/cifs/cifssmb.c   |   16 +++++++----
+ fs/cifs/dir.c       |   21 ++++++++++-----
+ fs/cifs/file.c      |    2 +-
+ fs/cifs/inode.c     |   73 +++++++++++++++++++++++++++++++++------------------
+ fs/cifs/link.c      |   44 ++++++++++++++++++++-----------
+ fs/cifs/smb1ops.c   |   71 +++++++++++++++++++++++++++++--------------------
+ 8 files changed, 174 insertions(+), 100 deletions(-)
 
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 6f7f57a..5793b5a 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -404,7 +404,7 @@ int cifs_get_inode_info_unix(struct inode **pinode,
+diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+index 51f5e0e..8f9b4f7 100644
+--- a/fs/cifs/cifsacl.c
++++ b/fs/cifs/cifsacl.c
+@@ -895,9 +895,10 @@ static struct cifs_ntsd *get_cifs_acl_by_path(struct cifs_sb_info *cifs_sb,
+ 	int oplock = 0;
+ 	unsigned int xid;
+ 	int rc, create_options = 0;
+-	__u16 fid;
+ 	struct cifs_tcon *tcon;
+ 	struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
++	struct cifs_fid fid;
++	struct cifs_open_parms oparms;
+ 
+ 	if (IS_ERR(tlink))
+ 		return ERR_CAST(tlink);
+@@ -908,12 +909,19 @@ static struct cifs_ntsd *get_cifs_acl_by_path(struct cifs_sb_info *cifs_sb,
+ 	if (backup_cred(cifs_sb))
+ 		create_options |= CREATE_OPEN_BACKUP_INTENT;
+ 
+-	rc = CIFSSMBOpen(xid, tcon, path, FILE_OPEN, READ_CONTROL,
+-			create_options, &fid, &oplock, NULL, cifs_sb->local_nls,
+-			cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
++	oparms.tcon = tcon;
++	oparms.cifs_sb = cifs_sb;
++	oparms.desired_access = READ_CONTROL;
++	oparms.create_options = create_options;
++	oparms.disposition = FILE_OPEN;
++	oparms.path = path;
++	oparms.fid = &fid;
++	oparms.reconnect = false;
++
++	rc = CIFS_open(xid, &oparms, &oplock, NULL);
+ 	if (!rc) {
+-		rc = CIFSSMBGetCIFSACL(xid, tcon, fid, &pntsd, pacllen);
+-		CIFSSMBClose(xid, tcon, fid);
++		rc = CIFSSMBGetCIFSACL(xid, tcon, fid.netfid, &pntsd, pacllen);
++		CIFSSMBClose(xid, tcon, fid.netfid);
+ 	}
+ 
+ 	cifs_put_tlink(tlink);
+@@ -950,10 +958,11 @@ int set_cifs_acl(struct cifs_ntsd *pnntsd, __u32 acllen,
+ 	int oplock = 0;
+ 	unsigned int xid;
+ 	int rc, access_flags, create_options = 0;
+-	__u16 fid;
+ 	struct cifs_tcon *tcon;
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+ 	struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
++	struct cifs_fid fid;
++	struct cifs_open_parms oparms;
+ 
+ 	if (IS_ERR(tlink))
+ 		return PTR_ERR(tlink);
+@@ -969,18 +978,25 @@ int set_cifs_acl(struct cifs_ntsd *pnntsd, __u32 acllen,
+ 	else
+ 		access_flags = WRITE_DAC;
+ 
+-	rc = CIFSSMBOpen(xid, tcon, path, FILE_OPEN, access_flags,
+-			create_options, &fid, &oplock, NULL, cifs_sb->local_nls,
+-			cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
++	oparms.tcon = tcon;
++	oparms.cifs_sb = cifs_sb;
++	oparms.desired_access = access_flags;
++	oparms.create_options = create_options;
++	oparms.disposition = FILE_OPEN;
++	oparms.path = path;
++	oparms.fid = &fid;
++	oparms.reconnect = false;
++
++	rc = CIFS_open(xid, &oparms, &oplock, NULL);
+ 	if (rc) {
+ 		cifs_dbg(VFS, "Unable to open file to set ACL\n");
+ 		goto out;
+ 	}
+ 
+-	rc = CIFSSMBSetCIFSACL(xid, tcon, fid, pnntsd, acllen, aclflag);
++	rc = CIFSSMBSetCIFSACL(xid, tcon, fid.netfid, pnntsd, acllen, aclflag);
+ 	cifs_dbg(NOISY, "SetCIFSACL rc = %d\n", rc);
+ 
+-	CIFSSMBClose(xid, tcon, fid);
++	CIFSSMBClose(xid, tcon, fid.netfid);
+ out:
+ 	free_xid(xid);
+ 	cifs_put_tlink(tlink);
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 582ae61..79e6e9a 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -362,11 +362,8 @@ extern int CIFSSMBQuerySymLink(const unsigned int xid, struct cifs_tcon *tcon,
+ 			       const struct nls_table *nls_codepage);
+ extern int CIFSSMB_set_compression(const unsigned int xid,
+ 				   struct cifs_tcon *tcon, __u16 fid);
+-extern int CIFSSMBOpen(const unsigned int xid, struct cifs_tcon *tcon,
+-		       const char *path, const int disposition,
+-		       const int desired_access, const int create_options,
+-		       __u16 *netfid, int *oplock, FILE_ALL_INFO *buf,
+-		       const struct nls_table *nls, int remap);
++extern int CIFS_open(const unsigned int xid, struct cifs_open_parms *oparms,
++		     int *oplock, FILE_ALL_INFO *buf);
+ extern int SMBLegacyOpen(const unsigned int xid, struct cifs_tcon *tcon,
+ 			const char *fileName, const int disposition,
+ 			const int access_flags, const int omode,
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 8e1ebc2..4d881c3 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -1273,10 +1273,8 @@ OldOpenRetry:
  }
  
- static int
--cifs_sfu_type(struct cifs_fattr *fattr, const unsigned char *path,
-+cifs_sfu_type(struct cifs_fattr *fattr, const char *path,
- 	      struct cifs_sb_info *cifs_sb, unsigned int xid)
+ int
+-CIFSSMBOpen(const unsigned int xid, struct cifs_tcon *tcon,
+-	    const char *path, const int disposition, const int desired_access,
+-	    const int create_options, __u16 *netfid, int *oplock,
+-	    FILE_ALL_INFO *buf, const struct nls_table *nls, int remap)
++CIFS_open(const unsigned int xid, struct cifs_open_parms *oparms, int *oplock,
++	  FILE_ALL_INFO *buf)
+ {
+ 	int rc = -EACCES;
+ 	OPEN_REQ *req = NULL;
+@@ -1284,6 +1282,14 @@ CIFSSMBOpen(const unsigned int xid, struct cifs_tcon *tcon,
+ 	int bytes_returned;
+ 	int name_len;
+ 	__u16 count;
++	struct cifs_sb_info *cifs_sb = oparms->cifs_sb;
++	struct cifs_tcon *tcon = oparms->tcon;
++	int remap = cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR;
++	const struct nls_table *nls = cifs_sb->local_nls;
++	int create_options = oparms->create_options;
++	int desired_access = oparms->desired_access;
++	int disposition = oparms->disposition;
++	const char *path = oparms->path;
+ 
+ openRetry:
+ 	rc = smb_init(SMB_COM_NT_CREATE_ANDX, 24, tcon, (void **)&req,
+@@ -1367,7 +1373,7 @@ openRetry:
+ 	/* 1 byte no need to le_to_cpu */
+ 	*oplock = rsp->OplockLevel;
+ 	/* cifs fid stays in le */
+-	*netfid = rsp->Fid;
++	oparms->fid->netfid = rsp->Fid;
+ 
+ 	/* Let caller know file was created so we can set the mode. */
+ 	/* Do we care about the CreateAction in any other cases? */
+diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+index 0850325..d3a6796 100644
+--- a/fs/cifs/dir.c
++++ b/fs/cifs/dir.c
+@@ -570,7 +570,8 @@ int cifs_mknod(struct inode *inode, struct dentry *direntry, umode_t mode,
+ 	char *full_path = NULL;
+ 	struct inode *newinode = NULL;
+ 	int oplock = 0;
+-	u16 netfid;
++	struct cifs_fid fid;
++	struct cifs_open_parms oparms;
+ 	FILE_ALL_INFO *buf = NULL;
+ 	unsigned int bytes_written;
+ 	struct win_dev *pdev;
+@@ -640,10 +641,16 @@ int cifs_mknod(struct inode *inode, struct dentry *direntry, umode_t mode,
+ 	if (backup_cred(cifs_sb))
+ 		create_options |= CREATE_OPEN_BACKUP_INTENT;
+ 
+-	rc = CIFSSMBOpen(xid, tcon, full_path, FILE_CREATE,
+-			 GENERIC_WRITE, create_options,
+-			 &netfid, &oplock, buf, cifs_sb->local_nls,
+-			 cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
++	oparms.tcon = tcon;
++	oparms.cifs_sb = cifs_sb;
++	oparms.desired_access = GENERIC_WRITE;
++	oparms.create_options = create_options;
++	oparms.disposition = FILE_CREATE;
++	oparms.path = full_path;
++	oparms.fid = &fid;
++	oparms.reconnect = false;
++
++	rc = CIFS_open(xid, &oparms, &oplock, buf);
+ 	if (rc)
+ 		goto mknod_out;
+ 
+@@ -653,7 +660,7 @@ int cifs_mknod(struct inode *inode, struct dentry *direntry, umode_t mode,
+ 	 */
+ 
+ 	pdev = (struct win_dev *)buf;
+-	io_parms.netfid = netfid;
++	io_parms.netfid = fid.netfid;
+ 	io_parms.pid = current->tgid;
+ 	io_parms.tcon = tcon;
+ 	io_parms.offset = 0;
+@@ -671,7 +678,7 @@ int cifs_mknod(struct inode *inode, struct dentry *direntry, umode_t mode,
+ 		rc = CIFSSMBWrite(xid, &io_parms, &bytes_written, (char *)pdev,
+ 				  NULL, 0);
+ 	} /* else if (S_ISFIFO) */
+-	CIFSSMBClose(xid, tcon, netfid);
++	CIFSSMBClose(xid, tcon, fid.netfid);
+ 	d_drop(direntry);
+ 
+ 	/* FIXME: add code here to set EAs */
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 5a5a872..853d6d1 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -678,7 +678,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
+ 
+ 	/*
+ 	 * Can not refresh inode by passing in file_info buf to be returned by
+-	 * CIFSSMBOpen and then calling get_inode_info with returned buf since
++	 * ops->open and then calling get_inode_info with returned buf since
+ 	 * file might have write behind data that needs to be flushed and server
+ 	 * version of file size can be stale. If we knew for sure that inode was
+ 	 * not dirty locally we could do this.
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 5793b5a..9cb9679 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -409,9 +409,10 @@ cifs_sfu_type(struct cifs_fattr *fattr, const char *path,
  {
  	int rc;
-@@ -416,6 +416,7 @@ cifs_sfu_type(struct cifs_fattr *fattr, const unsigned char *path,
+ 	int oplock = 0;
+-	__u16 netfid;
+ 	struct tcon_link *tlink;
+ 	struct cifs_tcon *tcon;
++	struct cifs_fid fid;
++	struct cifs_open_parms oparms;
+ 	struct cifs_io_parms io_parms;
  	char buf[24];
  	unsigned int bytes_read;
- 	char *pbuf;
-+	int buf_type = CIFS_NO_BUFFER;
+@@ -437,18 +438,23 @@ cifs_sfu_type(struct cifs_fattr *fattr, const char *path,
+ 		return PTR_ERR(tlink);
+ 	tcon = tlink_tcon(tlink);
  
- 	pbuf = buf;
- 
-@@ -441,57 +442,59 @@ cifs_sfu_type(struct cifs_fattr *fattr, const unsigned char *path,
- 			 cifs_sb->local_nls,
- 			 cifs_sb->mnt_cifs_flags &
- 				CIFS_MOUNT_MAP_SPECIAL_CHR);
--	if (rc == 0) {
--		int buf_type = CIFS_NO_BUFFER;
--			/* Read header */
--		io_parms.netfid = netfid;
--		io_parms.pid = current->tgid;
--		io_parms.tcon = tcon;
--		io_parms.offset = 0;
--		io_parms.length = 24;
--		rc = CIFSSMBRead(xid, &io_parms, &bytes_read, &pbuf,
--				 &buf_type);
--		if ((rc == 0) && (bytes_read >= 8)) {
--			if (memcmp("IntxBLK", pbuf, 8) == 0) {
--				cifs_dbg(FYI, "Block device\n");
--				fattr->cf_mode |= S_IFBLK;
--				fattr->cf_dtype = DT_BLK;
--				if (bytes_read == 24) {
--					/* we have enough to decode dev num */
--					__u64 mjr; /* major */
--					__u64 mnr; /* minor */
--					mjr = le64_to_cpu(*(__le64 *)(pbuf+8));
--					mnr = le64_to_cpu(*(__le64 *)(pbuf+16));
--					fattr->cf_rdev = MKDEV(mjr, mnr);
--				}
--			} else if (memcmp("IntxCHR", pbuf, 8) == 0) {
--				cifs_dbg(FYI, "Char device\n");
--				fattr->cf_mode |= S_IFCHR;
--				fattr->cf_dtype = DT_CHR;
--				if (bytes_read == 24) {
--					/* we have enough to decode dev num */
--					__u64 mjr; /* major */
--					__u64 mnr; /* minor */
--					mjr = le64_to_cpu(*(__le64 *)(pbuf+8));
--					mnr = le64_to_cpu(*(__le64 *)(pbuf+16));
--					fattr->cf_rdev = MKDEV(mjr, mnr);
--				}
--			} else if (memcmp("IntxLNK", pbuf, 7) == 0) {
--				cifs_dbg(FYI, "Symlink\n");
--				fattr->cf_mode |= S_IFLNK;
--				fattr->cf_dtype = DT_LNK;
--			} else {
--				fattr->cf_mode |= S_IFREG; /* file? */
--				fattr->cf_dtype = DT_REG;
--				rc = -EOPNOTSUPP;
-+	if (rc) {
-+		cifs_put_tlink(tlink);
-+		return rc;
-+	}
+-	rc = CIFSSMBOpen(xid, tcon, path, FILE_OPEN, GENERIC_READ,
+-			 CREATE_NOT_DIR, &netfid, &oplock, NULL,
+-			 cifs_sb->local_nls,
+-			 cifs_sb->mnt_cifs_flags &
+-				CIFS_MOUNT_MAP_SPECIAL_CHR);
++	oparms.tcon = tcon;
++	oparms.cifs_sb = cifs_sb;
++	oparms.desired_access = GENERIC_READ;
++	oparms.create_options = CREATE_NOT_DIR;
++	oparms.disposition = FILE_OPEN;
++	oparms.path = path;
++	oparms.fid = &fid;
++	oparms.reconnect = false;
 +
-+	/* Read header */
-+	io_parms.netfid = netfid;
-+	io_parms.pid = current->tgid;
-+	io_parms.tcon = tcon;
-+	io_parms.offset = 0;
-+	io_parms.length = 24;
-+
-+	rc = CIFSSMBRead(xid, &io_parms, &bytes_read, &pbuf, &buf_type);
-+	if ((rc == 0) && (bytes_read >= 8)) {
-+		if (memcmp("IntxBLK", pbuf, 8) == 0) {
-+			cifs_dbg(FYI, "Block device\n");
-+			fattr->cf_mode |= S_IFBLK;
-+			fattr->cf_dtype = DT_BLK;
-+			if (bytes_read == 24) {
-+				/* we have enough to decode dev num */
-+				__u64 mjr; /* major */
-+				__u64 mnr; /* minor */
-+				mjr = le64_to_cpu(*(__le64 *)(pbuf+8));
-+				mnr = le64_to_cpu(*(__le64 *)(pbuf+16));
-+				fattr->cf_rdev = MKDEV(mjr, mnr);
-+			}
-+		} else if (memcmp("IntxCHR", pbuf, 8) == 0) {
-+			cifs_dbg(FYI, "Char device\n");
-+			fattr->cf_mode |= S_IFCHR;
-+			fattr->cf_dtype = DT_CHR;
-+			if (bytes_read == 24) {
-+				/* we have enough to decode dev num */
-+				__u64 mjr; /* major */
-+				__u64 mnr; /* minor */
-+				mjr = le64_to_cpu(*(__le64 *)(pbuf+8));
-+				mnr = le64_to_cpu(*(__le64 *)(pbuf+16));
-+				fattr->cf_rdev = MKDEV(mjr, mnr);
- 			}
-+		} else if (memcmp("IntxLNK", pbuf, 7) == 0) {
-+			cifs_dbg(FYI, "Symlink\n");
-+			fattr->cf_mode |= S_IFLNK;
-+			fattr->cf_dtype = DT_LNK;
- 		} else {
--			fattr->cf_mode |= S_IFREG; /* then it is a file */
-+			fattr->cf_mode |= S_IFREG; /* file? */
- 			fattr->cf_dtype = DT_REG;
--			rc = -EOPNOTSUPP; /* or some unknown SFU type */
-+			rc = -EOPNOTSUPP;
- 		}
--		CIFSSMBClose(xid, tcon, netfid);
-+	} else {
-+		fattr->cf_mode |= S_IFREG; /* then it is a file */
-+		fattr->cf_dtype = DT_REG;
-+		rc = -EOPNOTSUPP; /* or some unknown SFU type */
++	rc = CIFS_open(xid, &oparms, &oplock, NULL);
+ 	if (rc) {
+ 		cifs_put_tlink(tlink);
+ 		return rc;
  	}
-+	CIFSSMBClose(xid, tcon, netfid);
+ 
+ 	/* Read header */
+-	io_parms.netfid = netfid;
++	io_parms.netfid = fid.netfid;
+ 	io_parms.pid = current->tgid;
+ 	io_parms.tcon = tcon;
+ 	io_parms.offset = 0;
+@@ -494,7 +500,7 @@ cifs_sfu_type(struct cifs_fattr *fattr, const char *path,
+ 		fattr->cf_dtype = DT_REG;
+ 		rc = -EOPNOTSUPP; /* or some unknown SFU type */
+ 	}
+-	CIFSSMBClose(xid, tcon, netfid);
++	CIFSSMBClose(xid, tcon, fid.netfid);
  	cifs_put_tlink(tlink);
  	return rc;
  }
+@@ -1035,7 +1041,8 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
+ {
+ 	int oplock = 0;
+ 	int rc;
+-	__u16 netfid;
++	struct cifs_fid fid;
++	struct cifs_open_parms oparms;
+ 	struct inode *inode = dentry->d_inode;
+ 	struct cifsInodeInfo *cifsInode = CIFS_I(inode);
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+@@ -1058,10 +1065,16 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
+ 		goto out;
+ 	}
+ 
+-	rc = CIFSSMBOpen(xid, tcon, full_path, FILE_OPEN,
+-			 DELETE|FILE_WRITE_ATTRIBUTES, CREATE_NOT_DIR,
+-			 &netfid, &oplock, NULL, cifs_sb->local_nls,
+-			 cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
++	oparms.tcon = tcon;
++	oparms.cifs_sb = cifs_sb;
++	oparms.desired_access = DELETE | FILE_WRITE_ATTRIBUTES;
++	oparms.create_options = CREATE_NOT_DIR;
++	oparms.disposition = FILE_OPEN;
++	oparms.path = full_path;
++	oparms.fid = &fid;
++	oparms.reconnect = false;
++
++	rc = CIFS_open(xid, &oparms, &oplock, NULL);
+ 	if (rc != 0)
+ 		goto out;
+ 
+@@ -1082,7 +1095,7 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
+ 			goto out_close;
+ 		}
+ 		info_buf->Attributes = cpu_to_le32(dosattr);
+-		rc = CIFSSMBSetFileInfo(xid, tcon, info_buf, netfid,
++		rc = CIFSSMBSetFileInfo(xid, tcon, info_buf, fid.netfid,
+ 					current->tgid);
+ 		/* although we would like to mark the file hidden
+  		   if that fails we will still try to rename it */
+@@ -1093,7 +1106,8 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
+ 	}
+ 
+ 	/* rename the file */
+-	rc = CIFSSMBRenameOpenFile(xid, tcon, netfid, NULL, cifs_sb->local_nls,
++	rc = CIFSSMBRenameOpenFile(xid, tcon, fid.netfid, NULL,
++				   cifs_sb->local_nls,
+ 				   cifs_sb->mnt_cifs_flags &
+ 					    CIFS_MOUNT_MAP_SPECIAL_CHR);
+ 	if (rc != 0) {
+@@ -1103,7 +1117,7 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
+ 
+ 	/* try to set DELETE_ON_CLOSE */
+ 	if (!cifsInode->delete_pending) {
+-		rc = CIFSSMBSetFileDisposition(xid, tcon, true, netfid,
++		rc = CIFSSMBSetFileDisposition(xid, tcon, true, fid.netfid,
+ 					       current->tgid);
+ 		/*
+ 		 * some samba versions return -ENOENT when we try to set the
+@@ -1123,7 +1137,7 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
+ 	}
+ 
+ out_close:
+-	CIFSSMBClose(xid, tcon, netfid);
++	CIFSSMBClose(xid, tcon, fid.netfid);
+ out:
+ 	kfree(info_buf);
+ 	cifs_put_tlink(tlink);
+@@ -1135,13 +1149,13 @@ out:
+ 	 * them anyway.
+ 	 */
+ undo_rename:
+-	CIFSSMBRenameOpenFile(xid, tcon, netfid, dentry->d_name.name,
++	CIFSSMBRenameOpenFile(xid, tcon, fid.netfid, dentry->d_name.name,
+ 				cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
+ 					    CIFS_MOUNT_MAP_SPECIAL_CHR);
+ undo_setattr:
+ 	if (dosattr != origattr) {
+ 		info_buf->Attributes = cpu_to_le32(origattr);
+-		if (!CIFSSMBSetFileInfo(xid, tcon, info_buf, netfid,
++		if (!CIFSSMBSetFileInfo(xid, tcon, info_buf, fid.netfid,
+ 					current->tgid))
+ 			cifsInode->cifsAttrs = origattr;
+ 	}
+@@ -1552,7 +1566,8 @@ cifs_do_rename(const unsigned int xid, struct dentry *from_dentry,
+ 	struct tcon_link *tlink;
+ 	struct cifs_tcon *tcon;
+ 	struct TCP_Server_Info *server;
+-	__u16 srcfid;
++	struct cifs_fid fid;
++	struct cifs_open_parms oparms;
+ 	int oplock, rc;
+ 
+ 	tlink = cifs_sb_tlink(cifs_sb);
+@@ -1579,17 +1594,23 @@ cifs_do_rename(const unsigned int xid, struct dentry *from_dentry,
+ 	if (to_dentry->d_parent != from_dentry->d_parent)
+ 		goto do_rename_exit;
+ 
++	oparms.tcon = tcon;
++	oparms.cifs_sb = cifs_sb;
+ 	/* open the file to be renamed -- we need DELETE perms */
+-	rc = CIFSSMBOpen(xid, tcon, from_path, FILE_OPEN, DELETE,
+-			 CREATE_NOT_DIR, &srcfid, &oplock, NULL,
+-			 cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
+-				CIFS_MOUNT_MAP_SPECIAL_CHR);
++	oparms.desired_access = DELETE;
++	oparms.create_options = CREATE_NOT_DIR;
++	oparms.disposition = FILE_OPEN;
++	oparms.path = from_path;
++	oparms.fid = &fid;
++	oparms.reconnect = false;
++
++	rc = CIFS_open(xid, &oparms, &oplock, NULL);
+ 	if (rc == 0) {
+-		rc = CIFSSMBRenameOpenFile(xid, tcon, srcfid,
++		rc = CIFSSMBRenameOpenFile(xid, tcon, fid.netfid,
+ 				(const char *) to_dentry->d_name.name,
+ 				cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
+ 					CIFS_MOUNT_MAP_SPECIAL_CHR);
+-		CIFSSMBClose(xid, tcon, srcfid);
++		CIFSSMBClose(xid, tcon, fid.netfid);
+ 	}
+ do_rename_exit:
+ 	cifs_put_tlink(tlink);
+diff --git a/fs/cifs/link.c b/fs/cifs/link.c
+index 67d9243..46eff5e 100644
+--- a/fs/cifs/link.c
++++ b/fs/cifs/link.c
+@@ -320,16 +320,22 @@ cifs_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+ {
+ 	int rc;
+ 	int oplock = 0;
+-	__u16 netfid = 0;
++	struct cifs_fid fid;
++	struct cifs_open_parms oparms;
+ 	struct cifs_io_parms io_parms;
+ 	int buf_type = CIFS_NO_BUFFER;
+ 	FILE_ALL_INFO file_info;
+ 
+-	rc = CIFSSMBOpen(xid, tcon, path, FILE_OPEN, GENERIC_READ,
+-			 CREATE_NOT_DIR, &netfid, &oplock, &file_info,
+-			 cifs_sb->local_nls,
+-			 cifs_sb->mnt_cifs_flags &
+-				CIFS_MOUNT_MAP_SPECIAL_CHR);
++	oparms.tcon = tcon;
++	oparms.cifs_sb = cifs_sb;
++	oparms.desired_access = GENERIC_READ;
++	oparms.create_options = CREATE_NOT_DIR;
++	oparms.disposition = FILE_OPEN;
++	oparms.path = path;
++	oparms.fid = &fid;
++	oparms.reconnect = false;
++
++	rc = CIFS_open(xid, &oparms, &oplock, &file_info);
+ 	if (rc)
+ 		return rc;
+ 
+@@ -337,7 +343,7 @@ cifs_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+ 		/* it's not a symlink */
+ 		goto out;
+ 
+-	io_parms.netfid = netfid;
++	io_parms.netfid = fid.netfid;
+ 	io_parms.pid = current->tgid;
+ 	io_parms.tcon = tcon;
+ 	io_parms.offset = 0;
+@@ -345,7 +351,7 @@ cifs_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	rc = CIFSSMBRead(xid, &io_parms, pbytes_read, &pbuf, &buf_type);
+ out:
+-	CIFSSMBClose(xid, tcon, netfid);
++	CIFSSMBClose(xid, tcon, fid.netfid);
+ 	return rc;
+ }
+ 
+@@ -356,29 +362,35 @@ cifs_create_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+ {
+ 	int rc;
+ 	int oplock = 0;
+-	__u16 netfid = 0;
++	struct cifs_fid fid;
++	struct cifs_open_parms oparms;
+ 	struct cifs_io_parms io_parms;
+ 	int create_options = CREATE_NOT_DIR;
+ 
+ 	if (backup_cred(cifs_sb))
+ 		create_options |= CREATE_OPEN_BACKUP_INTENT;
+ 
+-	rc = CIFSSMBOpen(xid, tcon, path, FILE_CREATE, GENERIC_WRITE,
+-			 create_options, &netfid, &oplock, NULL,
+-			 cifs_sb->local_nls,
+-			 cifs_sb->mnt_cifs_flags &
+-				CIFS_MOUNT_MAP_SPECIAL_CHR);
++	oparms.tcon = tcon;
++	oparms.cifs_sb = cifs_sb;
++	oparms.desired_access = GENERIC_WRITE;
++	oparms.create_options = create_options;
++	oparms.disposition = FILE_OPEN;
++	oparms.path = path;
++	oparms.fid = &fid;
++	oparms.reconnect = false;
++
++	rc = CIFS_open(xid, &oparms, &oplock, NULL);
+ 	if (rc)
+ 		return rc;
+ 
+-	io_parms.netfid = netfid;
++	io_parms.netfid = fid.netfid;
+ 	io_parms.pid = current->tgid;
+ 	io_parms.tcon = tcon;
+ 	io_parms.offset = 0;
+ 	io_parms.length = CIFS_MF_SYMLINK_FILE_SIZE;
+ 
+ 	rc = CIFSSMBWrite(xid, &io_parms, pbytes_written, pbuf, NULL, 0);
+-	CIFSSMBClose(xid, tcon, netfid);
++	CIFSSMBClose(xid, tcon, fid.netfid);
+ 	return rc;
+ }
+ 
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index abd2cc9..9ac5bfc 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -560,17 +560,24 @@ cifs_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 	if (!rc && (le32_to_cpu(data->Attributes) & ATTR_REPARSE)) {
+ 		int tmprc;
+ 		int oplock = 0;
+-		__u16 netfid;
++		struct cifs_fid fid;
++		struct cifs_open_parms oparms;
++
++		oparms.tcon = tcon;
++		oparms.cifs_sb = cifs_sb;
++		oparms.desired_access = FILE_READ_ATTRIBUTES;
++		oparms.create_options = 0;
++		oparms.disposition = FILE_OPEN;
++		oparms.path = full_path;
++		oparms.fid = &fid;
++		oparms.reconnect = false;
+ 
+ 		/* Need to check if this is a symbolic link or not */
+-		tmprc = CIFSSMBOpen(xid, tcon, full_path, FILE_OPEN,
+-				    FILE_READ_ATTRIBUTES, 0, &netfid, &oplock,
+-				    NULL, cifs_sb->local_nls,
+-			cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
++		tmprc = CIFS_open(xid, &oparms, &oplock, NULL);
+ 		if (tmprc == -EOPNOTSUPP)
+ 			*symlink = true;
+ 		else
+-			CIFSSMBClose(xid, tcon, netfid);
++			CIFSSMBClose(xid, tcon, fid.netfid);
+ 	}
+ 
+ 	return rc;
+@@ -705,12 +712,7 @@ cifs_open_file(const unsigned int xid, struct cifs_open_parms *oparms,
+ 				     oparms->cifs_sb->local_nls,
+ 				     oparms->cifs_sb->mnt_cifs_flags
+ 						& CIFS_MOUNT_MAP_SPECIAL_CHR);
+-	return CIFSSMBOpen(xid, oparms->tcon, oparms->path,
+-			   oparms->disposition, oparms->desired_access,
+-			   oparms->create_options, &oparms->fid->netfid, oplock,
+-			   buf, oparms->cifs_sb->local_nls,
+-			   oparms->cifs_sb->mnt_cifs_flags &
+-						CIFS_MOUNT_MAP_SPECIAL_CHR);
++	return CIFS_open(xid, oparms, oplock, buf);
+ }
+ 
+ static void
+@@ -761,8 +763,9 @@ smb_set_file_info(struct inode *inode, const char *full_path,
+ {
+ 	int oplock = 0;
+ 	int rc;
+-	__u16 netfid;
+ 	__u32 netpid;
++	struct cifs_fid fid;
++	struct cifs_open_parms oparms;
+ 	struct cifsFileInfo *open_file;
+ 	struct cifsInodeInfo *cinode = CIFS_I(inode);
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+@@ -772,7 +775,7 @@ smb_set_file_info(struct inode *inode, const char *full_path,
+ 	/* if the file is already open for write, just use that fileid */
+ 	open_file = find_writable_file(cinode, true);
+ 	if (open_file) {
+-		netfid = open_file->fid.netfid;
++		fid.netfid = open_file->fid.netfid;
+ 		netpid = open_file->pid;
+ 		tcon = tlink_tcon(open_file->tlink);
+ 		goto set_via_filehandle;
+@@ -796,12 +799,17 @@ smb_set_file_info(struct inode *inode, const char *full_path,
+ 		goto out;
+ 	}
+ 
+-	cifs_dbg(FYI, "calling SetFileInfo since SetPathInfo for times not supported by this server\n");
+-	rc = CIFSSMBOpen(xid, tcon, full_path, FILE_OPEN,
+-			 SYNCHRONIZE | FILE_WRITE_ATTRIBUTES, CREATE_NOT_DIR,
+-			 &netfid, &oplock, NULL, cifs_sb->local_nls,
+-			 cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
++	oparms.tcon = tcon;
++	oparms.cifs_sb = cifs_sb;
++	oparms.desired_access = SYNCHRONIZE | FILE_WRITE_ATTRIBUTES;
++	oparms.create_options = CREATE_NOT_DIR;
++	oparms.disposition = FILE_OPEN;
++	oparms.path = full_path;
++	oparms.fid = &fid;
++	oparms.reconnect = false;
+ 
++	cifs_dbg(FYI, "calling SetFileInfo since SetPathInfo for times not supported by this server\n");
++	rc = CIFS_open(xid, &oparms, &oplock, NULL);
+ 	if (rc != 0) {
+ 		if (rc == -EIO)
+ 			rc = -EINVAL;
+@@ -811,12 +819,12 @@ smb_set_file_info(struct inode *inode, const char *full_path,
+ 	netpid = current->tgid;
+ 
+ set_via_filehandle:
+-	rc = CIFSSMBSetFileInfo(xid, tcon, buf, netfid, netpid);
++	rc = CIFSSMBSetFileInfo(xid, tcon, buf, fid.netfid, netpid);
+ 	if (!rc)
+ 		cinode->cifsAttrs = le32_to_cpu(buf->Attributes);
+ 
+ 	if (open_file == NULL)
+-		CIFSSMBClose(xid, tcon, netfid);
++		CIFSSMBClose(xid, tcon, fid.netfid);
+ 	else
+ 		cifsFileInfo_put(open_file);
+ out:
+@@ -941,7 +949,8 @@ cifs_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
+ {
+ 	int rc;
+ 	int oplock = 0;
+-	__u16 netfid;
++	struct cifs_fid fid;
++	struct cifs_open_parms oparms;
+ 
+ 	cifs_dbg(FYI, "%s: path: %s\n", __func__, full_path);
+ 
+@@ -957,21 +966,27 @@ cifs_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
+ 		goto out;
+ 	}
+ 
+-	rc = CIFSSMBOpen(xid, tcon, full_path, FILE_OPEN,
+-			 FILE_READ_ATTRIBUTES, OPEN_REPARSE_POINT, &netfid,
+-			 &oplock, NULL, cifs_sb->local_nls,
+-			 cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
++	oparms.tcon = tcon;
++	oparms.cifs_sb = cifs_sb;
++	oparms.desired_access = FILE_READ_ATTRIBUTES;
++	oparms.create_options = OPEN_REPARSE_POINT;
++	oparms.disposition = FILE_OPEN;
++	oparms.path = full_path;
++	oparms.fid = &fid;
++	oparms.reconnect = false;
++
++	rc = CIFS_open(xid, &oparms, &oplock, NULL);
+ 	if (rc)
+ 		goto out;
+ 
+-	rc = CIFSSMBQuerySymLink(xid, tcon, netfid, target_path,
++	rc = CIFSSMBQuerySymLink(xid, tcon, fid.netfid, target_path,
+ 				 cifs_sb->local_nls);
+ 	if (rc)
+ 		goto out_close;
+ 
+ 	convert_delimiter(*target_path, '/');
+ out_close:
+-	CIFSSMBClose(xid, tcon, netfid);
++	CIFSSMBClose(xid, tcon, fid.netfid);
+ out:
+ 	if (!rc)
+ 		cifs_dbg(FYI, "%s: target path: %s\n", __func__, *target_path);
 -- 
 1.7.10.4
