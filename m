@@ -1,474 +1,740 @@
 From: Pavel Shilovsky <piastry@etersoft.ru>
-Subject: [PATCH v7 1/7] VFS: Introduce new O_DENY* open flags
-Date: Fri, 17 Jan 2014 14:07:06 +0400
-Message-ID: <1389953232-9428-2-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH v7 7/7] NFSv4: Add O_DENY* open flags support
+Date: Fri, 17 Jan 2014 14:07:12 +0400
+Message-ID: <1389953232-9428-8-git-send-email-piastry@etersoft.ru>
 References: <1389953232-9428-1-git-send-email-piastry@etersoft.ru>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
- linux-nfs@vger.kernel.org, wine-devel@winehq.org
+Cc: linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-nfs@vger.kernel.org, wine-devel@winehq.org
 To: linux-kernel@vger.kernel.org
-Return-path: <wine-devel-bounces@winehq.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1389953232-9428-1-git-send-email-piastry@etersoft.ru>
-List-Unsubscribe: <http://www.winehq.org/mailman/options/wine-devel>,
- <mailto:wine-devel-request@winehq.org?subject=unsubscribe>
-List-Archive: <http://www.winehq.org/pipermail/wine-devel/>
-List-Post: <mailto:wine-devel@winehq.org>
-List-Help: <mailto:wine-devel-request@winehq.org?subject=help>
-List-Subscribe: <http://www.winehq.org/mailman/listinfo/wine-devel>,
- <mailto:wine-devel-request@winehq.org?subject=subscribe>
-Errors-To: wine-devel-bounces@winehq.org
-Sender: "wine-devel" <wine-devel-bounces@winehq.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-This patch adds 3 flags:
-1) O_DENYREAD that doesn't permit read access,
-2) O_DENYWRITE that doesn't permit write access,
-3) O_DENYDELETE that doesn't permit delete or rename.
+Pass O_DENY* flags to NFSv4 open request. Make it return
+-ESHAREDENIED on share conflicts with other opens and disable
+O_DENYDELETE support since NFSv4 doesn't support it.
 
-Network filesystems CIFS, SMB2.0, SMB3.0 and NFSv4 have such flags -
-this change can benefit cifs and nfs modules as well as Samba and
-NFS file servers that export the same directory for Windows clients,
-or Wine applications that access the same files simultaneously.
-
-These flags are only take affect for opens on mounts with new sharelock
-option. They are translated to flock's flags:
-
-!O_DENYREAD  -> LOCK_READ  | LOCK_MAND
-!O_DENYWRITE -> LOCK_WRITE | LOCK_MAND
-
-and set through flock_lock_file on a file. If the file can't be locked
-due conflicts with another open with O_DENY* flags, a new -ESHAREDENIED
-error code is returned.
-
-Create codepath is slightly changed to prevent data races on newly
-created files: when open with O_CREAT can return -ESHAREDENIED error
-for successfully created files due to a sharelock set by another task.
-
-Temporary disable O_DENYDELETE support - will enable it in further
-patches.
+Add extra file descriptor counters for every fmode|denymode
+value into nfs4_state. Make the client not repeat the previous
+open requests to the server during delegation recall because
+of possible conflicts with deny modes.
 
 Signed-off-by: Pavel Shilovsky <piastry@etersoft.ru>
 ---
- arch/alpha/include/uapi/asm/errno.h  |    2 +
- arch/alpha/include/uapi/asm/fcntl.h  |    3 ++
- arch/mips/include/uapi/asm/errno.h   |    2 +
- arch/parisc/include/uapi/asm/errno.h |    2 +
- arch/parisc/include/uapi/asm/fcntl.h |    3 ++
- arch/sparc/include/uapi/asm/errno.h  |    2 +
- arch/sparc/include/uapi/asm/fcntl.h  |    3 ++
- fs/fcntl.c                           |    5 +-
- fs/locks.c                           |   97 +++++++++++++++++++++++++++++++---
- fs/namei.c                           |   53 ++++++++++++++++++-
- fs/proc_namespace.c                  |    1 +
- include/linux/fs.h                   |    8 +++
- include/uapi/asm-generic/errno.h     |    2 +
- include/uapi/asm-generic/fcntl.h     |   11 ++++
- include/uapi/linux/fs.h              |    1 +
- 15 files changed, 185 insertions(+), 10 deletions(-)
+ fs/nfs/dir.c       |   39 ++++++++++++++-
+ fs/nfs/inode.c     |    3 +-
+ fs/nfs/internal.h  |    3 +-
+ fs/nfs/nfs4_fs.h   |   48 ++++++++++++++++--
+ fs/nfs/nfs4file.c  |    8 ++-
+ fs/nfs/nfs4proc.c  |  138 +++++++++++++++++++++++++++++++++++++++++++---------
+ fs/nfs/nfs4state.c |   33 +++++++++++--
+ fs/nfs/nfs4super.c |    9 ++--
+ fs/nfs/nfs4xdr.c   |   14 +++++-
+ fs/nfs/super.c     |    7 ++-
+ 10 files changed, 261 insertions(+), 41 deletions(-)
 
-diff --git a/arch/alpha/include/uapi/asm/errno.h b/arch/alpha/include/uapi/asm/errno.h
-index 17f92aa..953a6d6 100644
---- a/arch/alpha/include/uapi/asm/errno.h
-+++ b/arch/alpha/include/uapi/asm/errno.h
-@@ -124,4 +124,6 @@
+diff --git a/fs/nfs/dir.c b/fs/nfs/dir.c
+index fe0c7bb..627f9ea 100644
+--- a/fs/nfs/dir.c
++++ b/fs/nfs/dir.c
+@@ -1362,7 +1362,8 @@ static fmode_t flags_to_mode(int flags)
  
- #define EHWPOISON	139	/* Memory page has hardware error */
- 
-+#define ESHAREDENIED	140	/* File is locked with a sharelock */
-+
- #endif
-diff --git a/arch/alpha/include/uapi/asm/fcntl.h b/arch/alpha/include/uapi/asm/fcntl.h
-index 09f49a6..265344b 100644
---- a/arch/alpha/include/uapi/asm/fcntl.h
-+++ b/arch/alpha/include/uapi/asm/fcntl.h
-@@ -33,6 +33,9 @@
- 
- #define O_PATH		040000000
- #define __O_TMPFILE	0100000000
-+#define O_DENYREAD	0200000000	/* Do not permit read access */
-+#define O_DENYWRITE	0400000000	/* Do not permit write access */
-+#define O_DENYDELETE	01000000000	/* Do not permit delete or rename */
- 
- #define F_GETLK		7
- #define F_SETLK		8
-diff --git a/arch/mips/include/uapi/asm/errno.h b/arch/mips/include/uapi/asm/errno.h
-index 02d645d..f1a4068 100644
---- a/arch/mips/include/uapi/asm/errno.h
-+++ b/arch/mips/include/uapi/asm/errno.h
-@@ -123,6 +123,8 @@
- 
- #define EHWPOISON	168	/* Memory page has hardware error */
- 
-+#define ESHAREDENIED	169	/* File is locked with a sharelock */
-+
- #define EDQUOT		1133	/* Quota exceeded */
- 
- 
-diff --git a/arch/parisc/include/uapi/asm/errno.h b/arch/parisc/include/uapi/asm/errno.h
-index f3a8aa5..654c232 100644
---- a/arch/parisc/include/uapi/asm/errno.h
-+++ b/arch/parisc/include/uapi/asm/errno.h
-@@ -124,4 +124,6 @@
- 
- #define EHWPOISON	257	/* Memory page has hardware error */
- 
-+#define ESHAREDENIED	258	/* File is locked with a sharelock */
-+
- #endif
-diff --git a/arch/parisc/include/uapi/asm/fcntl.h b/arch/parisc/include/uapi/asm/fcntl.h
-index 34a46cb..5865964 100644
---- a/arch/parisc/include/uapi/asm/fcntl.h
-+++ b/arch/parisc/include/uapi/asm/fcntl.h
-@@ -21,6 +21,9 @@
- 
- #define O_PATH		020000000
- #define __O_TMPFILE	040000000
-+#define O_DENYREAD	0200000000	/* Do not permit read access */
-+#define O_DENYWRITE	0400000000	/* Do not permit write access */
-+#define O_DENYDELETE	01000000000	/* Do not permit delete or rename */
- 
- #define F_GETLK64	8
- #define F_SETLK64	9
-diff --git a/arch/sparc/include/uapi/asm/errno.h b/arch/sparc/include/uapi/asm/errno.h
-index 20423e17..fe339b5 100644
---- a/arch/sparc/include/uapi/asm/errno.h
-+++ b/arch/sparc/include/uapi/asm/errno.h
-@@ -114,4 +114,6 @@
- 
- #define EHWPOISON	135	/* Memory page has hardware error */
- 
-+#define ESHAREDENIED	136	/* File is locked with a sharelock */
-+
- #endif
-diff --git a/arch/sparc/include/uapi/asm/fcntl.h b/arch/sparc/include/uapi/asm/fcntl.h
-index 7e8ace5..ab68170 100644
---- a/arch/sparc/include/uapi/asm/fcntl.h
-+++ b/arch/sparc/include/uapi/asm/fcntl.h
-@@ -36,6 +36,9 @@
- 
- #define O_PATH		0x1000000
- #define __O_TMPFILE	0x2000000
-+#define O_DENYREAD	0x4000000	/* Do not permit read access */
-+#define O_DENYWRITE	0x8000000	/* Do not permit write access */
-+#define O_DENYDELETE	0x10000000	/* Do not permit delete or rename */
- 
- #define F_GETOWN	5	/*  for sockets. */
- #define F_SETOWN	6	/*  for sockets. */
-diff --git a/fs/fcntl.c b/fs/fcntl.c
-index ef68665..3f85887 100644
---- a/fs/fcntl.c
-+++ b/fs/fcntl.c
-@@ -729,14 +729,15 @@ static int __init fcntl_init(void)
- 	 * Exceptions: O_NONBLOCK is a two bit define on parisc; O_NDELAY
- 	 * is defined as O_NONBLOCK on some platforms and not on others.
- 	 */
--	BUILD_BUG_ON(20 - 1 /* for O_RDONLY being 0 */ != HWEIGHT32(
-+	BUILD_BUG_ON(23 - 1 /* for O_RDONLY being 0 */ != HWEIGHT32(
- 		O_RDONLY	| O_WRONLY	| O_RDWR	|
- 		O_CREAT		| O_EXCL	| O_NOCTTY	|
- 		O_TRUNC		| O_APPEND	| /* O_NONBLOCK	| */
- 		__O_SYNC	| O_DSYNC	| FASYNC	|
- 		O_DIRECT	| O_LARGEFILE	| O_DIRECTORY	|
- 		O_NOFOLLOW	| O_NOATIME	| O_CLOEXEC	|
--		__FMODE_EXEC	| O_PATH	| __O_TMPFILE
-+		__FMODE_EXEC	| O_PATH	| __O_TMPFILE	|
-+		O_DENYREAD	| O_DENYWRITE	| O_DENYDELETE
- 		));
- 
- 	fasync_cache = kmem_cache_create("fasync_cache",
-diff --git a/fs/locks.c b/fs/locks.c
-index 92a0f0a..ffde4d4 100644
---- a/fs/locks.c
-+++ b/fs/locks.c
-@@ -708,20 +708,73 @@ static int posix_locks_conflict(struct file_lock *caller_fl, struct file_lock *s
- 	return (locks_conflict(caller_fl, sys_fl));
- }
- 
--/* Determine if lock sys_fl blocks lock caller_fl. FLOCK specific
-- * checking before calling the locks_conflict().
-+static unsigned int
-+deny_flags_to_cmd(unsigned int flags)
-+{
-+	unsigned int cmd = LOCK_MAND;
-+
-+	if (!(flags & O_DENYREAD))
-+		cmd |= LOCK_READ;
-+	if (!(flags & O_DENYWRITE))
-+		cmd |= LOCK_WRITE;
-+
-+	return cmd;
-+}
-+
-+/*
-+ * locks_mand_conflict - Determine if there's a share reservation conflict
-+ * @caller_fl: lock we're attempting to acquire
-+ * @sys_fl: lock already present on system that we're checking against
-+ *
-+ * Check to see if there's a share_reservation conflict. LOCK_READ/LOCK_WRITE
-+ * tell us whether the reservation allows other readers and writers.
-+ */
-+static int
-+locks_mand_conflict(struct file_lock *caller_fl, struct file_lock *sys_fl)
-+{
-+	unsigned char caller_type = caller_fl->fl_type;
-+	unsigned char sys_type = sys_fl->fl_type;
-+	fmode_t caller_fmode = caller_fl->fl_file->f_mode;
-+	fmode_t sys_fmode = sys_fl->fl_file->f_mode;
-+
-+	/* they can only conflict if FS is mounted with MS_SHARELOCK */
-+	if (!IS_SHARELOCK(caller_fl->fl_file->f_path.dentry->d_inode))
-+		return 0;
-+
-+	/* they can only conflict if they're both LOCK_MAND */
-+	if (!(caller_type & LOCK_MAND) || !(sys_type & LOCK_MAND))
-+		return 0;
-+
-+	if (!(caller_type & LOCK_READ) && (sys_fmode & FMODE_READ))
-+		return 1;
-+	if (!(caller_type & LOCK_WRITE) && (sys_fmode & FMODE_WRITE))
-+		return 1;
-+	if (!(sys_type & LOCK_READ) && (caller_fmode & FMODE_READ))
-+		return 1;
-+	if (!(sys_type & LOCK_WRITE) && (caller_fmode & FMODE_WRITE))
-+		return 1;
-+
-+	return 0;
-+}
-+
-+/*
-+ * Determine if lock sys_fl blocks lock caller_fl. FLOCK specific checking
-+ * before calling the locks_conflict().
-  */
- static int flock_locks_conflict(struct file_lock *caller_fl, struct file_lock *sys_fl)
+ static struct nfs_open_context *create_nfs_open_context(struct dentry *dentry, int open_flags)
  {
--	/* FLOCK locks referring to the same filp do not conflict with
-+	if (!IS_FLOCK(sys_fl))
-+		return 0;
-+	if ((caller_fl->fl_type & LOCK_MAND) || (sys_fl->fl_type & LOCK_MAND))
-+		return locks_mand_conflict(caller_fl, sys_fl);
-+	/*
-+	 * FLOCK locks referring to the same filp do not conflict with
- 	 * each other.
- 	 */
--	if (!IS_FLOCK(sys_fl) || (caller_fl->fl_file == sys_fl->fl_file))
--		return (0);
--	if ((caller_fl->fl_type & LOCK_MAND) || (sys_fl->fl_type & LOCK_MAND))
-+	if (caller_fl->fl_file == sys_fl->fl_file)
- 		return 0;
- 
--	return (locks_conflict(caller_fl, sys_fl));
-+	return locks_conflict(caller_fl, sys_fl);
+-	return alloc_nfs_open_context(dentry, flags_to_mode(open_flags), 0);
++	return alloc_nfs_open_context(dentry, flags_to_mode(open_flags),
++				      open_flags & (O_DENYREAD|O_DENYWRITE));
  }
  
- void
-@@ -888,6 +941,36 @@ out:
- 	return error;
- }
+ static int do_open(struct inode *inode, struct file *filp)
+@@ -1411,6 +1412,10 @@ int nfs_atomic_open(struct inode *dir, struct dentry *dentry,
+ 	if (err)
+ 		return err;
  
-+/*
-+ * Determine if a file is allowed to be opened with specified access and share
-+ * modes. Lock the file and return 0 if checks passed, otherwise return
-+ * -ESHAREDENIED.
-+ */
-+int
-+sharelock_lock_file(struct file *filp)
-+{
-+	struct file_lock *lock;
-+	int error = 0;
-+
-+	if (!IS_SHARELOCK(filp->f_path.dentry->d_inode))
-+		return error;
-+
-+	/* Disable O_DENYDELETE support for now */
-+	if (filp->f_flags & O_DENYDELETE)
++	/* No support for O_DENYDELETE */
++	if (open_flags & O_DENYDELETE)
 +		return -EINVAL;
 +
-+	error = flock_make_lock(filp, &lock, deny_flags_to_cmd(filp->f_flags));
-+	if (error)
-+		return error;
-+
-+	error = flock_lock_file(filp, lock);
-+	if (error == -EAGAIN)
-+		error = -ESHAREDENIED;
-+
-+	locks_free_lock(lock);
-+	return error;
-+}
-+
- static int __posix_lock_file(struct inode *inode, struct file_lock *request, struct file_lock *conflock)
+ 	/* NFS only supports OPEN on regular files */
+ 	if ((open_flags & O_DIRECTORY)) {
+ 		if (!d_unhashed(dentry)) {
+@@ -2256,7 +2261,37 @@ static int nfs_open_permission_mask(int openflags)
+ 
+ int nfs_may_open(struct inode *inode, struct rpc_cred *cred, int openflags)
  {
- 	struct file_lock *fl;
-diff --git a/fs/namei.c b/fs/namei.c
-index 3531dee..2b741a1 100644
---- a/fs/namei.c
-+++ b/fs/namei.c
-@@ -2725,9 +2725,14 @@ static int atomic_open(struct nameidata *nd, struct dentry *dentry,
- 		acc_mode = MAY_OPEN;
- 	}
- 	error = may_open(&file->f_path, acc_mode, open_flag);
--	if (error)
-+	if (error) {
- 		fput(file);
+-	return nfs_do_access(inode, cred, nfs_open_permission_mask(openflags));
++	int ret;
++	fmode_t mode = OPEN_FMODE(openflags);
++	struct nfs_inode *nfsi = NFS_I(inode);
++	struct nfs4_state *state;
++
++	ret = nfs_do_access(inode, cred, nfs_open_permission_mask(openflags));
++	if (ret)
 +		goto out;
++
++	if (!IS_SHARELOCK(inode))
++		goto out;
++
++	spin_lock(&inode->i_lock);
++	/* Check for share reservation conflicts */
++	list_for_each_entry(state, &nfsi->open_states, inode_states) {
++		if ((state->state & FMODE_READ) && (openflags & O_DENYREAD))
++			goto out_set_err;
++		if ((state->state & FMODE_WRITE) && (openflags & O_DENYWRITE))
++			goto out_set_err;
++		if ((mode & FMODE_READ) && (state->deny_state & O_DENYREAD))
++			goto out_set_err;
++		if ((mode & FMODE_WRITE) && (state->deny_state & O_DENYWRITE))
++			goto out_set_err;
 +	}
- 
-+	error = sharelock_lock_file(file);
-+	if (error)
-+		fput(file);
- out:
- 	dput(dentry);
- 	return error;
-@@ -2919,6 +2924,40 @@ retry_lookup:
- 	}
- 	mutex_lock(&dir->d_inode->i_mutex);
- 	error = lookup_open(nd, path, file, op, got_write, opened);
-+
-+	/*
-+	 * For sharelock mounts if a file was created but not opened, we need
-+	 * to keep parent i_mutex until we finish the open to prevent races when
-+	 * somebody opens newly created by us file and locks it with a sharelock
-+	 * before we open it.
-+	 */
-+	if (IS_SHARELOCK(dir->d_inode) && error > 0 && *opened & FILE_CREATED) {
-+		/* Don't check for write permission, don't truncate */
-+		open_flag &= ~O_TRUNC;
-+		will_truncate = false;
-+		acc_mode = MAY_OPEN;
-+		path_to_nameidata(path, nd);
-+
-+		error = may_open(&nd->path, acc_mode, open_flag);
-+		if (error) {
-+			mutex_unlock(&dir->d_inode->i_mutex);
-+			goto out;
-+		}
-+		file->f_path.mnt = nd->path.mnt;
-+		error = finish_open(file, nd->path.dentry, NULL, opened);
-+		if (error) {
-+			mutex_unlock(&dir->d_inode->i_mutex);
-+			if (error == -EOPENSTALE)
-+				goto stale_open;
-+			goto out;
-+		}
-+		error = sharelock_lock_file(file);
-+		mutex_unlock(&dir->d_inode->i_mutex);
-+		if (error)
-+			goto exit_fput;
-+		goto opened;
-+	}
-+
- 	mutex_unlock(&dir->d_inode->i_mutex);
- 
- 	if (error <= 0) {
-@@ -3034,6 +3073,18 @@ finish_open_created:
- 			goto stale_open;
- 		goto out;
- 	}
-+
-+	if (IS_SHARELOCK(dir->d_inode)) {
-+		/*
-+		 * Lock parent i_mutex to prevent races with sharelocks on
-+		 * newly created files.
-+		 */
-+		mutex_lock(&dir->d_inode->i_mutex);
-+		error = sharelock_lock_file(file);
-+		mutex_unlock(&dir->d_inode->i_mutex);
-+		if (error)
-+			goto exit_fput;
-+	}
- opened:
- 	error = open_check_o_direct(file);
- 	if (error)
-diff --git a/fs/proc_namespace.c b/fs/proc_namespace.c
-index 439406e..dd374d4 100644
---- a/fs/proc_namespace.c
-+++ b/fs/proc_namespace.c
-@@ -44,6 +44,7 @@ static int show_sb_opts(struct seq_file *m, struct super_block *sb)
- 		{ MS_SYNCHRONOUS, ",sync" },
- 		{ MS_DIRSYNC, ",dirsync" },
- 		{ MS_MANDLOCK, ",mand" },
-+		{ MS_SHARELOCK, ",sharelock" },
- 		{ 0, NULL }
- 	};
- 	const struct proc_fs_info *fs_infop;
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 121f11f..aa061ca 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -1029,6 +1029,7 @@ extern int vfs_setlease(struct file *, long, struct file_lock **);
- extern int lease_modify(struct file_lock **, int);
- extern int lock_may_read(struct inode *, loff_t start, unsigned long count);
- extern int lock_may_write(struct inode *, loff_t start, unsigned long count);
-+extern int sharelock_lock_file(struct file *);
- #else /* !CONFIG_FILE_LOCKING */
- static inline int fcntl_getlk(struct file *file, struct flock __user *user)
- {
-@@ -1169,6 +1170,12 @@ static inline int lock_may_write(struct inode *inode, loff_t start,
- {
- 	return 1;
++	spin_unlock(&inode->i_lock);
++out:
++	return ret;
++out_set_err:
++	spin_unlock(&inode->i_lock);
++	ret = -ESHAREDENIED;
++	goto out;
  }
+ EXPORT_SYMBOL_GPL(nfs_may_open);
+ 
+diff --git a/fs/nfs/inode.c b/fs/nfs/inode.c
+index 82f8593..a228dda 100644
+--- a/fs/nfs/inode.c
++++ b/fs/nfs/inode.c
+@@ -846,7 +846,8 @@ int nfs_open(struct inode *inode, struct file *filp)
+ {
+ 	struct nfs_open_context *ctx;
+ 
+-	ctx = alloc_nfs_open_context(filp->f_path.dentry, filp->f_mode, 0);
++	ctx = alloc_nfs_open_context(filp->f_path.dentry, filp->f_mode,
++				     filp->f_flags & (O_DENYREAD|O_DENYWRITE));
+ 	if (IS_ERR(ctx))
+ 		return PTR_ERR(ctx);
+ 	nfs_file_set_open_context(filp, ctx);
+diff --git a/fs/nfs/internal.h b/fs/nfs/internal.h
+index 8b5cc04..98f95fd 100644
+--- a/fs/nfs/internal.h
++++ b/fs/nfs/internal.h
+@@ -7,7 +7,8 @@
+ #include <linux/security.h>
+ #include <linux/crc32.h>
+ 
+-#define NFS_MS_MASK (MS_RDONLY|MS_NOSUID|MS_NODEV|MS_NOEXEC|MS_SYNCHRONOUS)
++#define NFS_MS_MASK (MS_RDONLY | MS_NOSUID | MS_NODEV | MS_NOEXEC | \
++		     MS_SYNCHRONOUS | MS_SHARELOCK)
+ 
+ struct nfs_string;
+ 
+diff --git a/fs/nfs/nfs4_fs.h b/fs/nfs/nfs4_fs.h
+index c455acb..ca86f66 100644
+--- a/fs/nfs/nfs4_fs.h
++++ b/fs/nfs/nfs4_fs.h
+@@ -164,6 +164,10 @@ enum {
+ 	NFS_STATE_RECLAIM_NOGRACE,	/* OPEN stateid needs to recover state */
+ 	NFS_STATE_POSIX_LOCKS,		/* Posix locks are supported */
+ 	NFS_STATE_RECOVERY_FAILED,	/* OPEN stateid state recovery failed */
++	NFS_O_DENYNONE_STATE,		/* OPEN stateid has deny none state */
++	NFS_O_DENYREAD_STATE,		/* OPEN stateid has deny read state */
++	NFS_O_DENYWRITE_STATE,		/* OPEN stateid has deny write state */
++	NFS_O_DENYRDWR_STATE,		/* OPEN stateid has deny rw state */
+ };
+ 
+ struct nfs4_state {
+@@ -181,10 +185,19 @@ struct nfs4_state {
+ 	nfs4_stateid stateid;		/* Current stateid: may be delegation */
+ 	nfs4_stateid open_stateid;	/* OPEN stateid */
+ 
+-	/* The following 3 fields are protected by owner->so_lock */
++	/* The following 12 fields are protected by owner->so_lock */
+ 	unsigned int n_rdonly;		/* Number of read-only references */
+ 	unsigned int n_wronly;		/* Number of write-only references */
+ 	unsigned int n_rdwr;		/* Number of read/write references */
++	unsigned int n_ro_dr;		/* Number of read/denyread refs */
++	unsigned int n_wo_dr;		/* Number of write/denyread refs */
++	unsigned int n_rw_dr;		/* Number of rw/denyread references */
++	unsigned int n_ro_dw;		/* Number of read/denywrite refs */
++	unsigned int n_wo_dw;		/* Number of write/denywrite refs */
++	unsigned int n_rw_dw;		/* Number of rw/denywrite references */
++	unsigned int n_ro_drw;		/* Number of read/denyrw references */
++	unsigned int n_wo_drw;		/* Number of write/denyrw references */
++	unsigned int n_rw_drw;		/* Number of rw/denyrw references */
+ 
+ 	fmode_t state;			/* State on the server (R,W, or RW) */
+ 	unsigned int deny_state;	/* Deny state on the server */
+@@ -512,11 +525,38 @@ get_state_n(struct nfs4_state *state, fmode_t mode, unsigned int deny_mode)
+ {
+ 	switch (mode & (FMODE_READ|FMODE_WRITE)) {
+ 	case FMODE_READ:
+-		return &state->n_rdonly;
++		switch (deny_mode & (O_DENYREAD|O_DENYWRITE)) {
++		case 0:
++			return &state->n_rdonly;
++		case O_DENYREAD:
++			return &state->n_ro_dr;
++		case O_DENYWRITE:
++			return &state->n_ro_dw;
++		case O_DENYREAD|O_DENYWRITE:
++			return &state->n_ro_drw;
++		}
+ 	case FMODE_WRITE:
+-		return &state->n_wronly;
++		switch (deny_mode & (O_DENYREAD|O_DENYWRITE)) {
++		case 0:
++			return &state->n_wronly;
++		case O_DENYREAD:
++			return &state->n_wo_dr;
++		case O_DENYWRITE:
++			return &state->n_wo_dw;
++		case O_DENYREAD|O_DENYWRITE:
++			return &state->n_wo_drw;
++		}
+ 	case FMODE_READ|FMODE_WRITE:
+-		return &state->n_rdwr;
++		switch (deny_mode & (O_DENYREAD|O_DENYWRITE)) {
++		case 0:
++			return &state->n_rdwr;
++		case O_DENYREAD:
++			return &state->n_rw_dr;
++		case O_DENYWRITE:
++			return &state->n_rw_dw;
++		case O_DENYREAD|O_DENYWRITE:
++			return &state->n_rw_drw;
++		}
+ 	}
+ 	return NULL;
+ }
+diff --git a/fs/nfs/nfs4file.c b/fs/nfs/nfs4file.c
+index 5f444f0..bfea7fa 100644
+--- a/fs/nfs/nfs4file.c
++++ b/fs/nfs/nfs4file.c
+@@ -33,6 +33,10 @@ nfs4_file_open(struct inode *inode, struct file *filp)
+ 
+ 	dprintk("NFS: open file(%pd2)\n", dentry);
+ 
++	/* No support for O_DENYDELETE */
++	if (openflags & O_DENYDELETE)
++		return -EINVAL;
 +
-+static inline int sharelock_lock_file(struct file *filp)
+ 	if ((openflags & O_ACCMODE) == 3)
+ 		openflags--;
+ 
+@@ -42,7 +46,8 @@ nfs4_file_open(struct inode *inode, struct file *filp)
+ 	parent = dget_parent(dentry);
+ 	dir = parent->d_inode;
+ 
+-	ctx = alloc_nfs_open_context(filp->f_path.dentry, filp->f_mode, 0);
++	ctx = alloc_nfs_open_context(filp->f_path.dentry, filp->f_mode,
++				     filp->f_flags & (O_DENYREAD|O_DENYWRITE));
+ 	err = PTR_ERR(ctx);
+ 	if (IS_ERR(ctx))
+ 		goto out;
+@@ -63,6 +68,7 @@ nfs4_file_open(struct inode *inode, struct file *filp)
+ 		case -EDQUOT:
+ 		case -ENOSPC:
+ 		case -EROFS:
++		case -ESHAREDENIED:
+ 			goto out_put_ctx;
+ 		default:
+ 			goto out_drop;
+diff --git a/fs/nfs/nfs4proc.c b/fs/nfs/nfs4proc.c
+index 1b6f1fe..8fafe59 100644
+--- a/fs/nfs/nfs4proc.c
++++ b/fs/nfs/nfs4proc.c
+@@ -155,7 +155,7 @@ static int nfs4_map_errors(int err)
+ 	case -NFS4ERR_BADNAME:
+ 		return -EINVAL;
+ 	case -NFS4ERR_SHARE_DENIED:
+-		return -EACCES;
++		return -ESHAREDENIED;
+ 	case -NFS4ERR_MINOR_VERS_MISMATCH:
+ 		return -EPROTONOSUPPORT;
+ 	case -NFS4ERR_ACCESS:
+@@ -996,6 +996,8 @@ static struct nfs4_opendata *nfs4_opendata_alloc(struct dentry *dentry,
+ 	p->owner = sp;
+ 	atomic_inc(&sp->so_count);
+ 	p->o_arg.open_flags = flags;
++	if (!IS_SHARELOCK(dir))
++		p->o_arg.open_flags &= ~(O_DENYREAD | O_DENYWRITE);
+ 	p->o_arg.fmode = fmode & (FMODE_READ|FMODE_WRITE);
+ 	/* don't put an ACCESS op in OPEN compound if O_EXCL, because ACCESS
+ 	 * will return permission denied for all bits until close */
+@@ -1100,6 +1102,20 @@ fmode_to_state_bit(fmode_t mode)
+ 	}
+ }
+ 
++static inline unsigned int
++denymode_to_state_bit(unsigned int deny_mode)
 +{
-+	return 0;
++	switch (deny_mode & (O_DENYREAD|O_DENYWRITE)) {
++	case O_DENYREAD:
++		return NFS_O_DENYREAD_STATE;
++	case O_DENYWRITE:
++		return NFS_O_DENYWRITE_STATE;
++	case O_DENYREAD|O_DENYWRITE:
++		return NFS_O_DENYRDWR_STATE;
++	}
++	return NFS_O_DENYNONE_STATE;
 +}
 +
- #endif /* !CONFIG_FILE_LOCKING */
+ static int can_open_cached(struct nfs4_state *state, fmode_t mode, int open_mode)
+ {
+ 	int ret = 0;
+@@ -1108,6 +1124,15 @@ static int can_open_cached(struct nfs4_state *state, fmode_t mode, int open_mode
+ 	if (open_mode & (O_EXCL|O_TRUNC))
+ 		goto out;
  
- 
-@@ -1675,6 +1682,7 @@ struct super_operations {
- #define IS_PRIVATE(inode)	((inode)->i_flags & S_PRIVATE)
- #define IS_IMA(inode)		((inode)->i_flags & S_IMA)
- #define IS_AUTOMOUNT(inode)	((inode)->i_flags & S_AUTOMOUNT)
-+#define IS_SHARELOCK(inode)	__IS_FLG(inode, MS_SHARELOCK)
- #define IS_NOSEC(inode)		((inode)->i_flags & S_NOSEC)
- 
- /*
-diff --git a/include/uapi/asm-generic/errno.h b/include/uapi/asm-generic/errno.h
-index 1e1ea6e..aff869c 100644
---- a/include/uapi/asm-generic/errno.h
-+++ b/include/uapi/asm-generic/errno.h
-@@ -110,4 +110,6 @@
- 
- #define EHWPOISON	133	/* Memory page has hardware error */
- 
-+#define ESHAREDENIED	134	/* File is locked with a sharelock */
++	if ((state->state & FMODE_READ) && (open_mode & O_DENYREAD))
++		goto out;
++	if ((state->state & FMODE_WRITE) && (open_mode & O_DENYWRITE))
++		goto out;
++	if ((mode & FMODE_READ) && (state->deny_state & O_DENYREAD))
++		goto out;
++	if ((mode & FMODE_WRITE) && (state->deny_state & O_DENYWRITE))
++		goto out;
 +
- #endif
-diff --git a/include/uapi/asm-generic/fcntl.h b/include/uapi/asm-generic/fcntl.h
-index 95e46c8..9881cfe 100644
---- a/include/uapi/asm-generic/fcntl.h
-+++ b/include/uapi/asm-generic/fcntl.h
-@@ -92,6 +92,17 @@
- #define O_TMPFILE (__O_TMPFILE | O_DIRECTORY)
- #define O_TMPFILE_MASK (__O_TMPFILE | O_DIRECTORY | O_CREAT)      
+ 	state_n = get_state_n(state, mode, open_mode);
+ 	if (state_n == NULL)
+ 		goto out;
+@@ -1116,17 +1141,22 @@ static int can_open_cached(struct nfs4_state *state, fmode_t mode, int open_mode
+ 		goto out;
  
-+#ifndef O_DENYREAD
-+#define O_DENYREAD	040000000	/* Do not permit read access */
-+#endif
-+/* FMODE_NONOTIFY	0100000000 */
-+#ifndef O_DENYWRITE
-+#define O_DENYWRITE	0200000000	/* Do not permit write access */
-+#endif
-+#ifndef O_DENYDELETE
-+#define O_DENYDELETE	0400000000	/* Do not permit delete or rename */
-+#endif
+ 	ret |= test_bit(fmode_to_state_bit(mode), &state->flags) != 0 &&
+-		*state_n != 0;
++		test_bit(denymode_to_state_bit(open_mode), &state->flags) != 0
++		&& *state_n != 0;
+ out:
+ 	return ret;
+ }
+ 
+-static int can_open_delegated(struct nfs_delegation *delegation, fmode_t fmode)
++static int
++can_open_delegated(struct nfs_delegation *delegation, fmode_t fmode,
++		   unsigned int deny_mode)
+ {
+ 	if (delegation == NULL)
+ 		return 0;
+ 	if ((delegation->type & fmode) != fmode)
+ 		return 0;
++	if ((deny_mode & O_DENYREAD) && (delegation->type == FMODE_READ))
++		return 0;
+ 	if (test_bit(NFS_DELEGATION_NEED_RECLAIM, &delegation->flags))
+ 		return 0;
+ 	if (test_bit(NFS_DELEGATION_RETURNING, &delegation->flags))
+@@ -1154,6 +1184,7 @@ nfs_set_open_stateid_locked(struct nfs4_state *state, nfs4_stateid *stateid,
+ 	set_bit(NFS_OPEN_STATE, &state->flags);
+ 	if ((fmode & (FMODE_READ|FMODE_WRITE)) != 0)
+ 		set_bit(fmode_to_state_bit(fmode), &state->flags);
++	set_bit(denymode_to_state_bit(deny_mode), &state->flags);
+ }
+ 
+ static void
+@@ -1255,7 +1286,7 @@ static struct nfs4_state *nfs4_try_open_cached(struct nfs4_opendata *opendata)
+ 	struct nfs_delegation *delegation;
+ 	int open_mode = opendata->o_arg.open_flags;
+ 	fmode_t fmode = opendata->o_arg.fmode;
+-	unsigned int deny_mode = 0;
++	unsigned int deny_mode = open_mode & (O_DENYREAD|O_DENYWRITE);
+ 	nfs4_stateid stateid;
+ 	int ret = -EAGAIN;
+ 
+@@ -1271,7 +1302,7 @@ static struct nfs4_state *nfs4_try_open_cached(struct nfs4_opendata *opendata)
+ 		}
+ 		rcu_read_lock();
+ 		delegation = rcu_dereference(nfsi->delegation);
+-		if (!can_open_delegated(delegation, fmode)) {
++		if (!can_open_delegated(delegation, fmode, deny_mode)) {
+ 			rcu_read_unlock();
+ 			break;
+ 		}
+@@ -1353,7 +1384,8 @@ _nfs4_opendata_reclaim_to_nfs4_state(struct nfs4_opendata *data)
+ 		nfs4_opendata_check_deleg(data, state);
+ update:
+ 	update_open_stateid(state, &data->o_res.stateid, NULL,
+-			    data->o_arg.fmode, 0);
++			    data->o_arg.fmode,
++			    data->o_arg.open_flags & (O_DENYREAD|O_DENYWRITE));
+ 	atomic_inc(&state->count);
+ 
+ 	return state;
+@@ -1388,7 +1420,8 @@ _nfs4_opendata_to_nfs4_state(struct nfs4_opendata *data)
+ 	if (data->o_res.delegation_type != 0)
+ 		nfs4_opendata_check_deleg(data, state);
+ 	update_open_stateid(state, &data->o_res.stateid, NULL,
+-			    data->o_arg.fmode, 0);
++			    data->o_arg.fmode,
++			    data->o_arg.open_flags & (O_DENYREAD|O_DENYWRITE));
+ 	iput(inode);
+ out:
+ 	nfs_release_seqid(data->o_arg.seqid);
+@@ -1461,14 +1494,20 @@ nfs4_open_recover_helper(struct nfs4_opendata *opendata, fmode_t fmode,
+ 	return 0;
+ }
+ 
++/*
++ * Recover an open state on the server. @reset indicates if we need to
++ * flush all opens or just those that were cached localy.
++ */
+ static int
+-nfs4_open_recover(struct nfs4_opendata *opendata, struct nfs4_state *state)
++nfs4_open_recover(struct nfs4_opendata *opendata, struct nfs4_state *state,
++		  bool reset)
+ {
+ 	struct nfs4_state *newstate = NULL;
+ 	int ret;
+ 	unsigned int fm, dm;
+ 	fmode_t fmodes[] = {FMODE_READ, FMODE_WRITE, FMODE_READ|FMODE_WRITE};
+-	unsigned int dmodes[] = {0};
++	unsigned int dmodes[] = {0, O_DENYREAD, O_DENYWRITE,
++				 O_DENYREAD|O_DENYWRITE};
+ 
+ 	/* memory barrier prior to reading state->n_* */
+ 	clear_bit(NFS_DELEGATED_STATE, &state->flags);
+@@ -1478,14 +1517,21 @@ nfs4_open_recover(struct nfs4_opendata *opendata, struct nfs4_state *state)
+ 	for (fm = 0; fm < 3; fm++) {
+ 		unsigned int fmode_bit = fmode_to_state_bit(fmodes[fm]);
+ 
+-		for (dm = 0; dm < 1; dm++) {
++		for (dm = 0; dm < 4; dm++) {
+ 			unsigned int *state_n;
++			unsigned int deny_bit;
+ 
+ 			state_n = get_state_n(state, fmodes[fm], dmodes[dm]);
+ 			if (state_n == NULL || *state_n == 0)
+ 				continue;
+ 
++			deny_bit = denymode_to_state_bit(dmodes[dm]);
++			if (!reset && test_bit(fmode_bit, &state->flags) &&
++			    test_bit(deny_bit, &state->flags))
++				continue;
 +
- #ifndef O_NDELAY
- #define O_NDELAY	O_NONBLOCK
- #endif
-diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-index 6c28b61..11f0ecf 100644
---- a/include/uapi/linux/fs.h
-+++ b/include/uapi/linux/fs.h
-@@ -86,6 +86,7 @@ struct inodes_stat_t {
- #define MS_KERNMOUNT	(1<<22) /* this is a kern_mount call */
- #define MS_I_VERSION	(1<<23) /* Update inode I_version field */
- #define MS_STRICTATIME	(1<<24) /* Always perform atime updates */
-+#define MS_SHARELOCK	(1<<25) /* Allow share locks on an FS */
+ 			clear_bit(fmode_bit, &state->flags);
++			clear_bit(deny_bit, &state->flags);
  
- /* These sb flags are internal to the kernel */
- #define MS_NOSEC	(1<<28)
+ 			ret = nfs4_open_recover_helper(opendata, fmodes[fm],
+ 						       dmodes[dm], &newstate);
+@@ -1530,7 +1576,7 @@ static int _nfs4_do_open_reclaim(struct nfs_open_context *ctx, struct nfs4_state
+ 		delegation_type = delegation->type;
+ 	rcu_read_unlock();
+ 	opendata->o_arg.u.delegation_type = delegation_type;
+-	status = nfs4_open_recover(opendata, state);
++	status = nfs4_open_recover(opendata, state, true);
+ 	nfs4_opendata_put(opendata);
+ 	return status;
+ }
+@@ -1628,7 +1674,7 @@ int nfs4_open_delegation_recall(struct nfs_open_context *ctx, struct nfs4_state
+ 	if (IS_ERR(opendata))
+ 		return PTR_ERR(opendata);
+ 	nfs4_stateid_copy(&opendata->o_arg.u.delegation, stateid);
+-	err = nfs4_open_recover(opendata, state);
++	err = nfs4_open_recover(opendata, state, false);
+ 	nfs4_opendata_put(opendata);
+ 	return nfs4_handle_delegation_recall_error(server, state, stateid, err);
+ }
+@@ -1669,7 +1715,8 @@ static void nfs4_open_confirm_release(void *calldata)
+ 		goto out_free;
+ 	state = nfs4_opendata_to_nfs4_state(data);
+ 	if (!IS_ERR(state))
+-		nfs4_close_state(state, data->o_arg.fmode, 0);
++		nfs4_close_state(state, data->o_arg.fmode,
++			data->o_arg.open_flags & (O_DENYREAD|O_DENYWRITE));
+ out_free:
+ 	nfs4_opendata_put(data);
+ }
+@@ -1742,7 +1789,8 @@ static void nfs4_open_prepare(struct rpc_task *task, void *calldata)
+ 		delegation = rcu_dereference(NFS_I(data->state->inode)->delegation);
+ 		if (data->o_arg.claim != NFS4_OPEN_CLAIM_DELEGATE_CUR &&
+ 		    data->o_arg.claim != NFS4_OPEN_CLAIM_DELEG_CUR_FH &&
+-		    can_open_delegated(delegation, data->o_arg.fmode))
++		    can_open_delegated(delegation, data->o_arg.fmode,
++			data->o_arg.open_flags & (O_DENYREAD|O_DENYWRITE)))
+ 			goto unlock_no_action;
+ 		rcu_read_unlock();
+ 	}
+@@ -1829,7 +1877,8 @@ static void nfs4_open_release(void *calldata)
+ 		goto out_free;
+ 	state = nfs4_opendata_to_nfs4_state(data);
+ 	if (!IS_ERR(state))
+-		nfs4_close_state(state, data->o_arg.fmode, 0);
++		nfs4_close_state(state, data->o_arg.fmode,
++			data->o_arg.open_flags & (O_DENYREAD|O_DENYWRITE));
+ out_free:
+ 	nfs4_opendata_put(data);
+ }
+@@ -1941,7 +1990,7 @@ static int nfs4_opendata_access(struct rpc_cred *cred,
+ 		return 0;
+ 
+ 	/* even though OPEN succeeded, access is denied. Close the file */
+-	nfs4_close_state(state, fmode, 0);
++	nfs4_close_state(state, fmode, openflags & (O_DENYREAD|O_DENYWRITE));
+ 	return -EACCES;
+ }
+ 
+@@ -2006,7 +2055,7 @@ static int _nfs4_open_expired(struct nfs_open_context *ctx, struct nfs4_state *s
+ 			NFS4_OPEN_CLAIM_FH);
+ 	if (IS_ERR(opendata))
+ 		return PTR_ERR(opendata);
+-	ret = nfs4_open_recover(opendata, state);
++	ret = nfs4_open_recover(opendata, state, true);
+ 	if (ret == -ESTALE)
+ 		d_drop(ctx->dentry);
+ 	nfs4_opendata_put(opendata);
+@@ -2125,6 +2174,10 @@ static int nfs41_check_open_stateid(struct nfs4_state *state)
+ 		clear_bit(NFS_O_WRONLY_STATE, &state->flags);
+ 		clear_bit(NFS_O_RDWR_STATE, &state->flags);
+ 		clear_bit(NFS_OPEN_STATE, &state->flags);
++		clear_bit(NFS_O_DENYNONE_STATE, &state->flags);
++		clear_bit(NFS_O_DENYREAD_STATE, &state->flags);
++		clear_bit(NFS_O_DENYWRITE_STATE, &state->flags);
++		clear_bit(NFS_O_DENYRDWR_STATE, &state->flags);
+ 	}
+ 	return status;
+ }
+@@ -2498,18 +2551,40 @@ nfs4_close_clear_stateid_flags(struct nfs4_state *state, fmode_t fmode,
+ 			       unsigned int deny_mode)
+ {
+ 	spin_lock(&state->owner->so_lock);
+-	clear_bit(NFS_O_RDWR_STATE, &state->flags);
+ 	switch (fmode & (FMODE_READ|FMODE_WRITE)) {
++	case FMODE_WRITE|FMODE_READ:
++		break;
+ 	case FMODE_WRITE:
++		clear_bit(NFS_O_RDWR_STATE, &state->flags);
+ 		clear_bit(NFS_O_RDONLY_STATE, &state->flags);
+ 		break;
+ 	case FMODE_READ:
++		clear_bit(NFS_O_RDWR_STATE, &state->flags);
+ 		clear_bit(NFS_O_WRONLY_STATE, &state->flags);
+ 		break;
+ 	case 0:
++		clear_bit(NFS_O_RDWR_STATE, &state->flags);
+ 		clear_bit(NFS_O_RDONLY_STATE, &state->flags);
+ 		clear_bit(NFS_O_WRONLY_STATE, &state->flags);
+ 		clear_bit(NFS_OPEN_STATE, &state->flags);
++		clear_bit(NFS_O_DENYNONE_STATE, &state->flags);
++	}
++
++	switch (deny_mode & (O_DENYREAD|O_DENYWRITE)) {
++	case O_DENYREAD|O_DENYWRITE:
++		break;
++	case O_DENYWRITE:
++		clear_bit(NFS_O_DENYRDWR_STATE, &state->flags);
++		clear_bit(NFS_O_DENYREAD_STATE, &state->flags);
++		break;
++	case O_DENYREAD:
++		clear_bit(NFS_O_DENYRDWR_STATE, &state->flags);
++		clear_bit(NFS_O_DENYWRITE_STATE, &state->flags);
++		break;
++	case 0:
++		clear_bit(NFS_O_DENYRDWR_STATE, &state->flags);
++		clear_bit(NFS_O_DENYREAD_STATE, &state->flags);
++		clear_bit(NFS_O_DENYWRITE_STATE, &state->flags);
+ 	}
+ 	spin_unlock(&state->owner->so_lock);
+ }
+@@ -2570,21 +2645,40 @@ static void nfs4_close_prepare(struct rpc_task *task, void *data)
+ 
+ 	task->tk_msg.rpc_proc = &nfs4_procedures[NFSPROC4_CLNT_OPEN_DOWNGRADE];
+ 	calldata->arg.fmode = FMODE_READ|FMODE_WRITE;
+-	calldata->arg.deny_mode = 0;
++	calldata->arg.deny_mode = O_DENYREAD|O_DENYWRITE;
+ 	spin_lock(&state->owner->so_lock);
+ 	/* Calculate the change in open mode */
+-	if (state->n_rdwr == 0) {
+-		if (state->n_rdonly == 0) {
++	if (state->n_rdwr + state->n_rw_dr +
++	    state->n_rw_dw + state->n_rw_drw == 0) {
++		if (state->n_rdonly + state->n_ro_dr + state->n_ro_dw +
++							state->n_ro_drw == 0) {
+ 			call_close |= test_bit(NFS_O_RDONLY_STATE, &state->flags);
+ 			call_close |= test_bit(NFS_O_RDWR_STATE, &state->flags);
+ 			calldata->arg.fmode &= ~FMODE_READ;
+ 		}
+-		if (state->n_wronly == 0) {
++		if (state->n_wronly + state->n_wo_dr + state->n_wo_dw +
++							state->n_wo_drw == 0) {
+ 			call_close |= test_bit(NFS_O_WRONLY_STATE, &state->flags);
+ 			call_close |= test_bit(NFS_O_RDWR_STATE, &state->flags);
+ 			calldata->arg.fmode &= ~FMODE_WRITE;
+ 		}
+ 	}
++	if (state->n_ro_drw + state->n_wo_drw + state->n_rw_drw == 0) {
++		if (state->n_ro_dr + state->n_wo_dr + state->n_rw_dr == 0) {
++			call_close |= test_bit(NFS_O_DENYREAD_STATE,
++					       &state->flags);
++			call_close |= test_bit(NFS_O_DENYRDWR_STATE,
++					       &state->flags);
++			calldata->arg.deny_mode &= ~O_DENYREAD;
++		}
++		if (state->n_ro_dw + state->n_wo_dw + state->n_rw_dw == 0) {
++			call_close |= test_bit(NFS_O_DENYWRITE_STATE,
++					       &state->flags);
++			call_close |= test_bit(NFS_O_DENYRDWR_STATE,
++					       &state->flags);
++			calldata->arg.deny_mode &= ~O_DENYWRITE;
++		}
++	}
+ 	if (!nfs4_valid_open_stateid(state))
+ 		call_close = 0;
+ 	spin_unlock(&state->owner->so_lock);
+diff --git a/fs/nfs/nfs4state.c b/fs/nfs/nfs4state.c
+index 168f868..bdd7808 100644
+--- a/fs/nfs/nfs4state.c
++++ b/fs/nfs/nfs4state.c
+@@ -736,19 +736,23 @@ __nfs4_close(struct nfs4_state *state, fmode_t fmode, unsigned int deny_mode,
+ 	struct nfs4_state_owner *owner = state->owner;
+ 	int call_close = 0;
+ 	fmode_t newstate;
++	unsigned int newdeny_mode;
+ 
+ 	atomic_inc(&owner->so_count);
+ 	/* Protect against nfs4_find_state() */
+ 	spin_lock(&owner->so_lock);
+ 	dec_state_n(state, fmode, deny_mode);
+ 	newstate = FMODE_READ|FMODE_WRITE;
+-	if (state->n_rdwr == 0) {
+-		if (state->n_rdonly == 0) {
++	if (state->n_rdwr + state->n_rw_dr +
++	    state->n_rw_dw + state->n_rw_drw == 0) {
++		if (state->n_rdonly + state->n_ro_dr + state->n_ro_dw +
++							state->n_ro_drw == 0) {
+ 			newstate &= ~FMODE_READ;
+ 			call_close |= test_bit(NFS_O_RDONLY_STATE, &state->flags);
+ 			call_close |= test_bit(NFS_O_RDWR_STATE, &state->flags);
+ 		}
+-		if (state->n_wronly == 0) {
++		if (state->n_wronly + state->n_wo_dr + state->n_wo_dw +
++							state->n_wo_drw == 0) {
+ 			newstate &= ~FMODE_WRITE;
+ 			call_close |= test_bit(NFS_O_WRONLY_STATE, &state->flags);
+ 			call_close |= test_bit(NFS_O_RDWR_STATE, &state->flags);
+@@ -756,7 +760,24 @@ __nfs4_close(struct nfs4_state *state, fmode_t fmode, unsigned int deny_mode,
+ 		if (newstate == 0)
+ 			clear_bit(NFS_DELEGATED_STATE, &state->flags);
+ 	}
+-	nfs4_state_set_mode_locked(state, newstate, 0);
++	newdeny_mode = O_DENYREAD|O_DENYWRITE;
++	if (state->n_ro_drw + state->n_wo_drw + state->n_rw_drw == 0) {
++		if (state->n_ro_dr + state->n_wo_dr + state->n_rw_dr == 0) {
++			newdeny_mode &= ~O_DENYREAD;
++			call_close |= test_bit(NFS_O_DENYREAD_STATE,
++					       &state->flags);
++			call_close |= test_bit(NFS_O_DENYRDWR_STATE,
++					       &state->flags);
++		}
++		if (state->n_ro_dw + state->n_wo_dw + state->n_rw_dw == 0) {
++			newdeny_mode &= ~O_DENYWRITE;
++			call_close |= test_bit(NFS_O_DENYWRITE_STATE,
++					       &state->flags);
++			call_close |= test_bit(NFS_O_DENYRDWR_STATE,
++					       &state->flags);
++		}
++	}
++	nfs4_state_set_mode_locked(state, newstate, newdeny_mode);
+ 	spin_unlock(&owner->so_lock);
+ 
+ 	if (!call_close) {
+@@ -1541,6 +1562,10 @@ static void nfs4_clear_open_state(struct nfs4_state *state)
+ 	clear_bit(NFS_O_RDONLY_STATE, &state->flags);
+ 	clear_bit(NFS_O_WRONLY_STATE, &state->flags);
+ 	clear_bit(NFS_O_RDWR_STATE, &state->flags);
++	clear_bit(NFS_O_DENYNONE_STATE, &state->flags);
++	clear_bit(NFS_O_DENYREAD_STATE, &state->flags);
++	clear_bit(NFS_O_DENYWRITE_STATE, &state->flags);
++	clear_bit(NFS_O_DENYRDWR_STATE, &state->flags);
+ 	spin_lock(&state->state_lock);
+ 	list_for_each_entry(lock, &state->lock_states, ls_locks) {
+ 		lock->ls_seqid.flags = 0;
+diff --git a/fs/nfs/nfs4super.c b/fs/nfs/nfs4super.c
+index 65ab0a0..1f91571 100644
+--- a/fs/nfs/nfs4super.c
++++ b/fs/nfs/nfs4super.c
+@@ -29,7 +29,8 @@ static struct file_system_type nfs4_remote_fs_type = {
+ 	.name		= "nfs4",
+ 	.mount		= nfs4_remote_mount,
+ 	.kill_sb	= nfs_kill_super,
+-	.fs_flags	= FS_RENAME_DOES_D_MOVE|FS_BINARY_MOUNTDATA,
++	.fs_flags	= FS_RENAME_DOES_D_MOVE | FS_BINARY_MOUNTDATA |
++			  FS_DOES_SHARELOCK,
+ };
+ 
+ static struct file_system_type nfs4_remote_referral_fs_type = {
+@@ -37,7 +38,8 @@ static struct file_system_type nfs4_remote_referral_fs_type = {
+ 	.name		= "nfs4",
+ 	.mount		= nfs4_remote_referral_mount,
+ 	.kill_sb	= nfs_kill_super,
+-	.fs_flags	= FS_RENAME_DOES_D_MOVE|FS_BINARY_MOUNTDATA,
++	.fs_flags	= FS_RENAME_DOES_D_MOVE | FS_BINARY_MOUNTDATA |
++			  FS_DOES_SHARELOCK,
+ };
+ 
+ struct file_system_type nfs4_referral_fs_type = {
+@@ -45,7 +47,8 @@ struct file_system_type nfs4_referral_fs_type = {
+ 	.name		= "nfs4",
+ 	.mount		= nfs4_referral_mount,
+ 	.kill_sb	= nfs_kill_super,
+-	.fs_flags	= FS_RENAME_DOES_D_MOVE|FS_BINARY_MOUNTDATA,
++	.fs_flags	= FS_RENAME_DOES_D_MOVE | FS_BINARY_MOUNTDATA |
++			  FS_DOES_SHARELOCK,
+ };
+ 
+ static const struct super_operations nfs4_sops = {
+diff --git a/fs/nfs/nfs4xdr.c b/fs/nfs/nfs4xdr.c
+index ed507f4..870d297 100644
+--- a/fs/nfs/nfs4xdr.c
++++ b/fs/nfs/nfs4xdr.c
+@@ -1377,7 +1377,19 @@ static void encode_share_access(struct xdr_stream *xdr, fmode_t fmode,
+ 	default:
+ 		*p++ = cpu_to_be32(0);
+ 	}
+-	*p = cpu_to_be32(0);		/* for linux, share_deny = 0 always */
++	switch (open_flags & (O_DENYREAD|O_DENYWRITE)) {
++	case O_DENYREAD:
++		*p = cpu_to_be32(NFS4_SHARE_DENY_READ);
++		break;
++	case O_DENYWRITE:
++		*p = cpu_to_be32(NFS4_SHARE_DENY_WRITE);
++		break;
++	case O_DENYREAD|O_DENYWRITE:
++		*p = cpu_to_be32(NFS4_SHARE_DENY_BOTH);
++		break;
++	default:
++		*p = cpu_to_be32(0);
++	}
+ }
+ 
+ static inline void encode_openhdr(struct xdr_stream *xdr, const struct nfs_openargs *arg)
+diff --git a/fs/nfs/super.c b/fs/nfs/super.c
+index 910ed90..73bc4d8 100644
+--- a/fs/nfs/super.c
++++ b/fs/nfs/super.c
+@@ -333,7 +333,8 @@ struct file_system_type nfs4_fs_type = {
+ 	.name		= "nfs4",
+ 	.mount		= nfs_fs_mount,
+ 	.kill_sb	= nfs_kill_super,
+-	.fs_flags	= FS_RENAME_DOES_D_MOVE|FS_BINARY_MOUNTDATA,
++	.fs_flags	= FS_RENAME_DOES_D_MOVE | FS_BINARY_MOUNTDATA |
++			  FS_DOES_SHARELOCK,
+ };
+ MODULE_ALIAS_FS("nfs4");
+ MODULE_ALIAS("nfs4");
+@@ -2699,6 +2700,8 @@ nfs_xdev_mount(struct file_system_type *fs_type, int flags,
+ 	struct nfs_server *server;
+ 	struct dentry *mntroot = ERR_PTR(-ENOMEM);
+ 	struct nfs_subversion *nfs_mod = NFS_SB(data->sb)->nfs_client->cl_nfs_mod;
++	/* save sharelock option */
++	int sharelock = data->sb->s_flags & MS_SHARELOCK;
+ 
+ 	dprintk("--> nfs_xdev_mount()\n");
+ 
+@@ -2710,7 +2713,7 @@ nfs_xdev_mount(struct file_system_type *fs_type, int flags,
+ 	if (IS_ERR(server))
+ 		mntroot = ERR_CAST(server);
+ 	else
+-		mntroot = nfs_fs_mount_common(server, flags,
++		mntroot = nfs_fs_mount_common(server, flags | sharelock,
+ 				dev_name, &mount_info, nfs_mod);
+ 
+ 	dprintk("<-- nfs_xdev_mount() = %ld\n",
 -- 
 1.7.10.4
