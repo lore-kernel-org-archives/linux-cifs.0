@@ -1,49 +1,31 @@
-From: Pavel Shilovsky <piastry@etersoft.ru>
-Subject: [PATCH v7 3/7] locks: Disable LOCK_MAND support for MS_SHARELOCK
- mounts
-Date: Fri, 17 Jan 2014 14:07:08 +0400
-Message-ID: <1389953232-9428-4-git-send-email-piastry@etersoft.ru>
-References: <1389953232-9428-1-git-send-email-piastry@etersoft.ru>
+From: Jarno Malmari <jarno.malmari-qk6XLmcB7GT1KXRcyAk9cg@public.gmane.org>
+Subject: Re: Problems using mounted Windows 8.1 share
+Date: Fri, 17 Jan 2014 13:20:42 +0200
+Message-ID: <CAAM7EN=_ppKjbs4ZYGGYxOBRiN9wJrtxdcNzdRQB2BK+fHnPfA@mail.gmail.com>
+References: <CAAM7ENkPpcDRya0T6H06tKSC17pmVRLLq8P9wsD0sUXA+qAgsg@mail.gmail.com>
+	<20140115082816.279d062d@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
- linux-nfs@vger.kernel.org, wine-devel@winehq.org
-To: linux-kernel@vger.kernel.org
-Return-path: <wine-devel-bounces@winehq.org>
-In-Reply-To: <1389953232-9428-1-git-send-email-piastry@etersoft.ru>
-List-Unsubscribe: <http://www.winehq.org/mailman/options/wine-devel>,
- <mailto:wine-devel-request@winehq.org?subject=unsubscribe>
-List-Archive: <http://www.winehq.org/pipermail/wine-devel/>
-List-Post: <mailto:wine-devel@winehq.org>
-List-Help: <mailto:wine-devel-request@winehq.org?subject=help>
-List-Subscribe: <http://www.winehq.org/mailman/listinfo/wine-devel>,
- <mailto:wine-devel-request@winehq.org?subject=subscribe>
-Errors-To: wine-devel-bounces@winehq.org
-Sender: "wine-devel" <wine-devel-bounces@winehq.org>
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20140115082816.279d062d-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Signed-off-by: Pavel Shilovsky <piastry@etersoft.ru>
----
- fs/locks.c |    6 ++++++
- 1 file changed, 6 insertions(+)
+On 15 January 2014 15:28, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> cifs.ko doesn't currently autonegotiate smb2+ connections. You have to
+> explicitly request them, so you're likely still using smb1 with the
+> above fstab entry.
+>
+> If you're getting -EHOSTDOWN errors back, then it sounds likely that
+> you're losing connectivity to the server. If updating the server
+> changed something then it's likely that that's where the problem is.
+>
+> I'd take a hard look at whether connections are getting dropped by the
+> server and why...
 
-diff --git a/fs/locks.c b/fs/locks.c
-index 7ecc511..c7e780a 100644
---- a/fs/locks.c
-+++ b/fs/locks.c
-@@ -1904,6 +1904,12 @@ SYSCALL_DEFINE2(flock, unsigned int, fd, unsigned int, cmd)
- 		goto out;
- 	}
- 
-+	/* Disable LOCK_MAND support for FS mounted with MS_SHARELOCK */
-+	if ((cmd & LOCK_MAND) && IS_SHARELOCK(f.file->f_path.dentry->d_inode)) {
-+		error = -EPERM;
-+		goto out;
-+	}
-+
- 	can_sleep = !(cmd & LOCK_NB);
- 	cmd &= ~LOCK_NB;
- 	unlock = (cmd == LOCK_UN);
--- 
-1.7.10.4
+Thanks for the pointers and steering me away from SMB. I was able to
+reproduce the issue (sometimes) over a plain TCP connection. I highly
+suspect a driver issue on the server machine.
+
+Anyhow, not CIFS related. Case closed.
