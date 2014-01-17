@@ -1,663 +1,107 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 4/4] CIFS: Cleanup cifs open codepath
-Date: Thu, 16 Jan 2014 15:53:36 +0400
-Message-ID: <1389873217-17519-5-git-send-email-piastry@etersoft.ru>
-References: <1389873217-17519-1-git-send-email-piastry@etersoft.ru>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1389873217-17519-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Subject: [PATCH v7 0/7] Add O_DENY* support for VFS and CIFS/NFS
+Date: Fri, 17 Jan 2014 14:07:05 +0400
+Message-ID: <1389953232-9428-1-git-send-email-piastry@etersoft.ru>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
+To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-Rename CIFSSMBOpen to CIFS_open and make it take
-cifs_open_parms structure as a parm.
+This patchset adds support of O_DENY* flags for Linux fs layer. These flags can be used by any application that needs share reservations to organize a file access. VFS already has some sort of this capability - now it's done through flock/LOCK_MAND mechanis, but that approach is non-atomic. This patchset build new capabilities on top of the existing one but doesn't bring any changes into the flock call semantic.
 
-Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
----
- fs/cifs/cifsacl.c   |   40 +++++++++++++++++++---------
- fs/cifs/cifsproto.h |    7 ++---
- fs/cifs/cifssmb.c   |   16 +++++++----
- fs/cifs/dir.c       |   21 ++++++++++-----
- fs/cifs/file.c      |    2 +-
- fs/cifs/inode.c     |   73 +++++++++++++++++++++++++++++++++------------------
- fs/cifs/link.c      |   44 ++++++++++++++++++++-----------
- fs/cifs/smb1ops.c   |   71 +++++++++++++++++++++++++++++--------------------
- 8 files changed, 174 insertions(+), 100 deletions(-)
+These flags can be used by NFS (built-in-kernel) and CIFS (Samba) servers and Wine applications through VFS (for local filesystems) or CIFS/NFS modules. This will help when e.g. Samba and NFS server share the same directory for Windows and Linux users or Wine applications use Samba/NFS share to access the same data from different clients.
 
-diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
-index 51f5e0e..8f9b4f7 100644
---- a/fs/cifs/cifsacl.c
-+++ b/fs/cifs/cifsacl.c
-@@ -895,9 +895,10 @@ static struct cifs_ntsd *get_cifs_acl_by_path(struct cifs_sb_info *cifs_sb,
- 	int oplock = 0;
- 	unsigned int xid;
- 	int rc, create_options = 0;
--	__u16 fid;
- 	struct cifs_tcon *tcon;
- 	struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
-+	struct cifs_fid fid;
-+	struct cifs_open_parms oparms;
- 
- 	if (IS_ERR(tlink))
- 		return ERR_CAST(tlink);
-@@ -908,12 +909,19 @@ static struct cifs_ntsd *get_cifs_acl_by_path(struct cifs_sb_info *cifs_sb,
- 	if (backup_cred(cifs_sb))
- 		create_options |= CREATE_OPEN_BACKUP_INTENT;
- 
--	rc = CIFSSMBOpen(xid, tcon, path, FILE_OPEN, READ_CONTROL,
--			create_options, &fid, &oplock, NULL, cifs_sb->local_nls,
--			cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
-+	oparms.tcon = tcon;
-+	oparms.cifs_sb = cifs_sb;
-+	oparms.desired_access = READ_CONTROL;
-+	oparms.create_options = create_options;
-+	oparms.disposition = FILE_OPEN;
-+	oparms.path = path;
-+	oparms.fid = &fid;
-+	oparms.reconnect = false;
-+
-+	rc = CIFS_open(xid, &oparms, &oplock, NULL);
- 	if (!rc) {
--		rc = CIFSSMBGetCIFSACL(xid, tcon, fid, &pntsd, pacllen);
--		CIFSSMBClose(xid, tcon, fid);
-+		rc = CIFSSMBGetCIFSACL(xid, tcon, fid.netfid, &pntsd, pacllen);
-+		CIFSSMBClose(xid, tcon, fid.netfid);
- 	}
- 
- 	cifs_put_tlink(tlink);
-@@ -950,10 +958,11 @@ int set_cifs_acl(struct cifs_ntsd *pnntsd, __u32 acllen,
- 	int oplock = 0;
- 	unsigned int xid;
- 	int rc, access_flags, create_options = 0;
--	__u16 fid;
- 	struct cifs_tcon *tcon;
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
- 	struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
-+	struct cifs_fid fid;
-+	struct cifs_open_parms oparms;
- 
- 	if (IS_ERR(tlink))
- 		return PTR_ERR(tlink);
-@@ -969,18 +978,25 @@ int set_cifs_acl(struct cifs_ntsd *pnntsd, __u32 acllen,
- 	else
- 		access_flags = WRITE_DAC;
- 
--	rc = CIFSSMBOpen(xid, tcon, path, FILE_OPEN, access_flags,
--			create_options, &fid, &oplock, NULL, cifs_sb->local_nls,
--			cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
-+	oparms.tcon = tcon;
-+	oparms.cifs_sb = cifs_sb;
-+	oparms.desired_access = access_flags;
-+	oparms.create_options = create_options;
-+	oparms.disposition = FILE_OPEN;
-+	oparms.path = path;
-+	oparms.fid = &fid;
-+	oparms.reconnect = false;
-+
-+	rc = CIFS_open(xid, &oparms, &oplock, NULL);
- 	if (rc) {
- 		cifs_dbg(VFS, "Unable to open file to set ACL\n");
- 		goto out;
- 	}
- 
--	rc = CIFSSMBSetCIFSACL(xid, tcon, fid, pnntsd, acllen, aclflag);
-+	rc = CIFSSMBSetCIFSACL(xid, tcon, fid.netfid, pnntsd, acllen, aclflag);
- 	cifs_dbg(NOISY, "SetCIFSACL rc = %d\n", rc);
- 
--	CIFSSMBClose(xid, tcon, fid);
-+	CIFSSMBClose(xid, tcon, fid.netfid);
- out:
- 	free_xid(xid);
- 	cifs_put_tlink(tlink);
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 582ae61..79e6e9a 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -362,11 +362,8 @@ extern int CIFSSMBQuerySymLink(const unsigned int xid, struct cifs_tcon *tcon,
- 			       const struct nls_table *nls_codepage);
- extern int CIFSSMB_set_compression(const unsigned int xid,
- 				   struct cifs_tcon *tcon, __u16 fid);
--extern int CIFSSMBOpen(const unsigned int xid, struct cifs_tcon *tcon,
--		       const char *path, const int disposition,
--		       const int desired_access, const int create_options,
--		       __u16 *netfid, int *oplock, FILE_ALL_INFO *buf,
--		       const struct nls_table *nls, int remap);
-+extern int CIFS_open(const unsigned int xid, struct cifs_open_parms *oparms,
-+		     int *oplock, FILE_ALL_INFO *buf);
- extern int SMBLegacyOpen(const unsigned int xid, struct cifs_tcon *tcon,
- 			const char *fileName, const int disposition,
- 			const int access_flags, const int omode,
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 8e1ebc2..4d881c3 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -1273,10 +1273,8 @@ OldOpenRetry:
- }
- 
- int
--CIFSSMBOpen(const unsigned int xid, struct cifs_tcon *tcon,
--	    const char *path, const int disposition, const int desired_access,
--	    const int create_options, __u16 *netfid, int *oplock,
--	    FILE_ALL_INFO *buf, const struct nls_table *nls, int remap)
-+CIFS_open(const unsigned int xid, struct cifs_open_parms *oparms, int *oplock,
-+	  FILE_ALL_INFO *buf)
- {
- 	int rc = -EACCES;
- 	OPEN_REQ *req = NULL;
-@@ -1284,6 +1282,14 @@ CIFSSMBOpen(const unsigned int xid, struct cifs_tcon *tcon,
- 	int bytes_returned;
- 	int name_len;
- 	__u16 count;
-+	struct cifs_sb_info *cifs_sb = oparms->cifs_sb;
-+	struct cifs_tcon *tcon = oparms->tcon;
-+	int remap = cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR;
-+	const struct nls_table *nls = cifs_sb->local_nls;
-+	int create_options = oparms->create_options;
-+	int desired_access = oparms->desired_access;
-+	int disposition = oparms->disposition;
-+	const char *path = oparms->path;
- 
- openRetry:
- 	rc = smb_init(SMB_COM_NT_CREATE_ANDX, 24, tcon, (void **)&req,
-@@ -1367,7 +1373,7 @@ openRetry:
- 	/* 1 byte no need to le_to_cpu */
- 	*oplock = rsp->OplockLevel;
- 	/* cifs fid stays in le */
--	*netfid = rsp->Fid;
-+	oparms->fid->netfid = rsp->Fid;
- 
- 	/* Let caller know file was created so we can set the mode. */
- 	/* Do we care about the CreateAction in any other cases? */
-diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index 0850325..d3a6796 100644
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@ -570,7 +570,8 @@ int cifs_mknod(struct inode *inode, struct dentry *direntry, umode_t mode,
- 	char *full_path = NULL;
- 	struct inode *newinode = NULL;
- 	int oplock = 0;
--	u16 netfid;
-+	struct cifs_fid fid;
-+	struct cifs_open_parms oparms;
- 	FILE_ALL_INFO *buf = NULL;
- 	unsigned int bytes_written;
- 	struct win_dev *pdev;
-@@ -640,10 +641,16 @@ int cifs_mknod(struct inode *inode, struct dentry *direntry, umode_t mode,
- 	if (backup_cred(cifs_sb))
- 		create_options |= CREATE_OPEN_BACKUP_INTENT;
- 
--	rc = CIFSSMBOpen(xid, tcon, full_path, FILE_CREATE,
--			 GENERIC_WRITE, create_options,
--			 &netfid, &oplock, buf, cifs_sb->local_nls,
--			 cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
-+	oparms.tcon = tcon;
-+	oparms.cifs_sb = cifs_sb;
-+	oparms.desired_access = GENERIC_WRITE;
-+	oparms.create_options = create_options;
-+	oparms.disposition = FILE_CREATE;
-+	oparms.path = full_path;
-+	oparms.fid = &fid;
-+	oparms.reconnect = false;
-+
-+	rc = CIFS_open(xid, &oparms, &oplock, buf);
- 	if (rc)
- 		goto mknod_out;
- 
-@@ -653,7 +660,7 @@ int cifs_mknod(struct inode *inode, struct dentry *direntry, umode_t mode,
- 	 */
- 
- 	pdev = (struct win_dev *)buf;
--	io_parms.netfid = netfid;
-+	io_parms.netfid = fid.netfid;
- 	io_parms.pid = current->tgid;
- 	io_parms.tcon = tcon;
- 	io_parms.offset = 0;
-@@ -671,7 +678,7 @@ int cifs_mknod(struct inode *inode, struct dentry *direntry, umode_t mode,
- 		rc = CIFSSMBWrite(xid, &io_parms, &bytes_written, (char *)pdev,
- 				  NULL, 0);
- 	} /* else if (S_ISFIFO) */
--	CIFSSMBClose(xid, tcon, netfid);
-+	CIFSSMBClose(xid, tcon, fid.netfid);
- 	d_drop(direntry);
- 
- 	/* FIXME: add code here to set EAs */
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 5a5a872..853d6d1 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -678,7 +678,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
- 
- 	/*
- 	 * Can not refresh inode by passing in file_info buf to be returned by
--	 * CIFSSMBOpen and then calling get_inode_info with returned buf since
-+	 * ops->open and then calling get_inode_info with returned buf since
- 	 * file might have write behind data that needs to be flushed and server
- 	 * version of file size can be stale. If we knew for sure that inode was
- 	 * not dirty locally we could do this.
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 5793b5a..9cb9679 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -409,9 +409,10 @@ cifs_sfu_type(struct cifs_fattr *fattr, const char *path,
- {
- 	int rc;
- 	int oplock = 0;
--	__u16 netfid;
- 	struct tcon_link *tlink;
- 	struct cifs_tcon *tcon;
-+	struct cifs_fid fid;
-+	struct cifs_open_parms oparms;
- 	struct cifs_io_parms io_parms;
- 	char buf[24];
- 	unsigned int bytes_read;
-@@ -437,18 +438,23 @@ cifs_sfu_type(struct cifs_fattr *fattr, const char *path,
- 		return PTR_ERR(tlink);
- 	tcon = tlink_tcon(tlink);
- 
--	rc = CIFSSMBOpen(xid, tcon, path, FILE_OPEN, GENERIC_READ,
--			 CREATE_NOT_DIR, &netfid, &oplock, NULL,
--			 cifs_sb->local_nls,
--			 cifs_sb->mnt_cifs_flags &
--				CIFS_MOUNT_MAP_SPECIAL_CHR);
-+	oparms.tcon = tcon;
-+	oparms.cifs_sb = cifs_sb;
-+	oparms.desired_access = GENERIC_READ;
-+	oparms.create_options = CREATE_NOT_DIR;
-+	oparms.disposition = FILE_OPEN;
-+	oparms.path = path;
-+	oparms.fid = &fid;
-+	oparms.reconnect = false;
-+
-+	rc = CIFS_open(xid, &oparms, &oplock, NULL);
- 	if (rc) {
- 		cifs_put_tlink(tlink);
- 		return rc;
- 	}
- 
- 	/* Read header */
--	io_parms.netfid = netfid;
-+	io_parms.netfid = fid.netfid;
- 	io_parms.pid = current->tgid;
- 	io_parms.tcon = tcon;
- 	io_parms.offset = 0;
-@@ -494,7 +500,7 @@ cifs_sfu_type(struct cifs_fattr *fattr, const char *path,
- 		fattr->cf_dtype = DT_REG;
- 		rc = -EOPNOTSUPP; /* or some unknown SFU type */
- 	}
--	CIFSSMBClose(xid, tcon, netfid);
-+	CIFSSMBClose(xid, tcon, fid.netfid);
- 	cifs_put_tlink(tlink);
- 	return rc;
- }
-@@ -1035,7 +1041,8 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
- {
- 	int oplock = 0;
- 	int rc;
--	__u16 netfid;
-+	struct cifs_fid fid;
-+	struct cifs_open_parms oparms;
- 	struct inode *inode = dentry->d_inode;
- 	struct cifsInodeInfo *cifsInode = CIFS_I(inode);
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
-@@ -1058,10 +1065,16 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
- 		goto out;
- 	}
- 
--	rc = CIFSSMBOpen(xid, tcon, full_path, FILE_OPEN,
--			 DELETE|FILE_WRITE_ATTRIBUTES, CREATE_NOT_DIR,
--			 &netfid, &oplock, NULL, cifs_sb->local_nls,
--			 cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
-+	oparms.tcon = tcon;
-+	oparms.cifs_sb = cifs_sb;
-+	oparms.desired_access = DELETE | FILE_WRITE_ATTRIBUTES;
-+	oparms.create_options = CREATE_NOT_DIR;
-+	oparms.disposition = FILE_OPEN;
-+	oparms.path = full_path;
-+	oparms.fid = &fid;
-+	oparms.reconnect = false;
-+
-+	rc = CIFS_open(xid, &oparms, &oplock, NULL);
- 	if (rc != 0)
- 		goto out;
- 
-@@ -1082,7 +1095,7 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
- 			goto out_close;
- 		}
- 		info_buf->Attributes = cpu_to_le32(dosattr);
--		rc = CIFSSMBSetFileInfo(xid, tcon, info_buf, netfid,
-+		rc = CIFSSMBSetFileInfo(xid, tcon, info_buf, fid.netfid,
- 					current->tgid);
- 		/* although we would like to mark the file hidden
-  		   if that fails we will still try to rename it */
-@@ -1093,7 +1106,8 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
- 	}
- 
- 	/* rename the file */
--	rc = CIFSSMBRenameOpenFile(xid, tcon, netfid, NULL, cifs_sb->local_nls,
-+	rc = CIFSSMBRenameOpenFile(xid, tcon, fid.netfid, NULL,
-+				   cifs_sb->local_nls,
- 				   cifs_sb->mnt_cifs_flags &
- 					    CIFS_MOUNT_MAP_SPECIAL_CHR);
- 	if (rc != 0) {
-@@ -1103,7 +1117,7 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
- 
- 	/* try to set DELETE_ON_CLOSE */
- 	if (!cifsInode->delete_pending) {
--		rc = CIFSSMBSetFileDisposition(xid, tcon, true, netfid,
-+		rc = CIFSSMBSetFileDisposition(xid, tcon, true, fid.netfid,
- 					       current->tgid);
- 		/*
- 		 * some samba versions return -ENOENT when we try to set the
-@@ -1123,7 +1137,7 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
- 	}
- 
- out_close:
--	CIFSSMBClose(xid, tcon, netfid);
-+	CIFSSMBClose(xid, tcon, fid.netfid);
- out:
- 	kfree(info_buf);
- 	cifs_put_tlink(tlink);
-@@ -1135,13 +1149,13 @@ out:
- 	 * them anyway.
- 	 */
- undo_rename:
--	CIFSSMBRenameOpenFile(xid, tcon, netfid, dentry->d_name.name,
-+	CIFSSMBRenameOpenFile(xid, tcon, fid.netfid, dentry->d_name.name,
- 				cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
- 					    CIFS_MOUNT_MAP_SPECIAL_CHR);
- undo_setattr:
- 	if (dosattr != origattr) {
- 		info_buf->Attributes = cpu_to_le32(origattr);
--		if (!CIFSSMBSetFileInfo(xid, tcon, info_buf, netfid,
-+		if (!CIFSSMBSetFileInfo(xid, tcon, info_buf, fid.netfid,
- 					current->tgid))
- 			cifsInode->cifsAttrs = origattr;
- 	}
-@@ -1552,7 +1566,8 @@ cifs_do_rename(const unsigned int xid, struct dentry *from_dentry,
- 	struct tcon_link *tlink;
- 	struct cifs_tcon *tcon;
- 	struct TCP_Server_Info *server;
--	__u16 srcfid;
-+	struct cifs_fid fid;
-+	struct cifs_open_parms oparms;
- 	int oplock, rc;
- 
- 	tlink = cifs_sb_tlink(cifs_sb);
-@@ -1579,17 +1594,23 @@ cifs_do_rename(const unsigned int xid, struct dentry *from_dentry,
- 	if (to_dentry->d_parent != from_dentry->d_parent)
- 		goto do_rename_exit;
- 
-+	oparms.tcon = tcon;
-+	oparms.cifs_sb = cifs_sb;
- 	/* open the file to be renamed -- we need DELETE perms */
--	rc = CIFSSMBOpen(xid, tcon, from_path, FILE_OPEN, DELETE,
--			 CREATE_NOT_DIR, &srcfid, &oplock, NULL,
--			 cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
--				CIFS_MOUNT_MAP_SPECIAL_CHR);
-+	oparms.desired_access = DELETE;
-+	oparms.create_options = CREATE_NOT_DIR;
-+	oparms.disposition = FILE_OPEN;
-+	oparms.path = from_path;
-+	oparms.fid = &fid;
-+	oparms.reconnect = false;
-+
-+	rc = CIFS_open(xid, &oparms, &oplock, NULL);
- 	if (rc == 0) {
--		rc = CIFSSMBRenameOpenFile(xid, tcon, srcfid,
-+		rc = CIFSSMBRenameOpenFile(xid, tcon, fid.netfid,
- 				(const char *) to_dentry->d_name.name,
- 				cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
- 					CIFS_MOUNT_MAP_SPECIAL_CHR);
--		CIFSSMBClose(xid, tcon, srcfid);
-+		CIFSSMBClose(xid, tcon, fid.netfid);
- 	}
- do_rename_exit:
- 	cifs_put_tlink(tlink);
-diff --git a/fs/cifs/link.c b/fs/cifs/link.c
-index 67d9243..46eff5e 100644
---- a/fs/cifs/link.c
-+++ b/fs/cifs/link.c
-@@ -320,16 +320,22 @@ cifs_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
- {
- 	int rc;
- 	int oplock = 0;
--	__u16 netfid = 0;
-+	struct cifs_fid fid;
-+	struct cifs_open_parms oparms;
- 	struct cifs_io_parms io_parms;
- 	int buf_type = CIFS_NO_BUFFER;
- 	FILE_ALL_INFO file_info;
- 
--	rc = CIFSSMBOpen(xid, tcon, path, FILE_OPEN, GENERIC_READ,
--			 CREATE_NOT_DIR, &netfid, &oplock, &file_info,
--			 cifs_sb->local_nls,
--			 cifs_sb->mnt_cifs_flags &
--				CIFS_MOUNT_MAP_SPECIAL_CHR);
-+	oparms.tcon = tcon;
-+	oparms.cifs_sb = cifs_sb;
-+	oparms.desired_access = GENERIC_READ;
-+	oparms.create_options = CREATE_NOT_DIR;
-+	oparms.disposition = FILE_OPEN;
-+	oparms.path = path;
-+	oparms.fid = &fid;
-+	oparms.reconnect = false;
-+
-+	rc = CIFS_open(xid, &oparms, &oplock, &file_info);
- 	if (rc)
- 		return rc;
- 
-@@ -337,7 +343,7 @@ cifs_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
- 		/* it's not a symlink */
- 		goto out;
- 
--	io_parms.netfid = netfid;
-+	io_parms.netfid = fid.netfid;
- 	io_parms.pid = current->tgid;
- 	io_parms.tcon = tcon;
- 	io_parms.offset = 0;
-@@ -345,7 +351,7 @@ cifs_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
- 
- 	rc = CIFSSMBRead(xid, &io_parms, pbytes_read, &pbuf, &buf_type);
- out:
--	CIFSSMBClose(xid, tcon, netfid);
-+	CIFSSMBClose(xid, tcon, fid.netfid);
- 	return rc;
- }
- 
-@@ -356,29 +362,35 @@ cifs_create_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
- {
- 	int rc;
- 	int oplock = 0;
--	__u16 netfid = 0;
-+	struct cifs_fid fid;
-+	struct cifs_open_parms oparms;
- 	struct cifs_io_parms io_parms;
- 	int create_options = CREATE_NOT_DIR;
- 
- 	if (backup_cred(cifs_sb))
- 		create_options |= CREATE_OPEN_BACKUP_INTENT;
- 
--	rc = CIFSSMBOpen(xid, tcon, path, FILE_CREATE, GENERIC_WRITE,
--			 create_options, &netfid, &oplock, NULL,
--			 cifs_sb->local_nls,
--			 cifs_sb->mnt_cifs_flags &
--				CIFS_MOUNT_MAP_SPECIAL_CHR);
-+	oparms.tcon = tcon;
-+	oparms.cifs_sb = cifs_sb;
-+	oparms.desired_access = GENERIC_WRITE;
-+	oparms.create_options = create_options;
-+	oparms.disposition = FILE_OPEN;
-+	oparms.path = path;
-+	oparms.fid = &fid;
-+	oparms.reconnect = false;
-+
-+	rc = CIFS_open(xid, &oparms, &oplock, NULL);
- 	if (rc)
- 		return rc;
- 
--	io_parms.netfid = netfid;
-+	io_parms.netfid = fid.netfid;
- 	io_parms.pid = current->tgid;
- 	io_parms.tcon = tcon;
- 	io_parms.offset = 0;
- 	io_parms.length = CIFS_MF_SYMLINK_FILE_SIZE;
- 
- 	rc = CIFSSMBWrite(xid, &io_parms, pbytes_written, pbuf, NULL, 0);
--	CIFSSMBClose(xid, tcon, netfid);
-+	CIFSSMBClose(xid, tcon, fid.netfid);
- 	return rc;
- }
- 
-diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index abd2cc9..9ac5bfc 100644
---- a/fs/cifs/smb1ops.c
-+++ b/fs/cifs/smb1ops.c
-@@ -560,17 +560,24 @@ cifs_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
- 	if (!rc && (le32_to_cpu(data->Attributes) & ATTR_REPARSE)) {
- 		int tmprc;
- 		int oplock = 0;
--		__u16 netfid;
-+		struct cifs_fid fid;
-+		struct cifs_open_parms oparms;
-+
-+		oparms.tcon = tcon;
-+		oparms.cifs_sb = cifs_sb;
-+		oparms.desired_access = FILE_READ_ATTRIBUTES;
-+		oparms.create_options = 0;
-+		oparms.disposition = FILE_OPEN;
-+		oparms.path = full_path;
-+		oparms.fid = &fid;
-+		oparms.reconnect = false;
- 
- 		/* Need to check if this is a symbolic link or not */
--		tmprc = CIFSSMBOpen(xid, tcon, full_path, FILE_OPEN,
--				    FILE_READ_ATTRIBUTES, 0, &netfid, &oplock,
--				    NULL, cifs_sb->local_nls,
--			cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
-+		tmprc = CIFS_open(xid, &oparms, &oplock, NULL);
- 		if (tmprc == -EOPNOTSUPP)
- 			*symlink = true;
- 		else
--			CIFSSMBClose(xid, tcon, netfid);
-+			CIFSSMBClose(xid, tcon, fid.netfid);
- 	}
- 
- 	return rc;
-@@ -705,12 +712,7 @@ cifs_open_file(const unsigned int xid, struct cifs_open_parms *oparms,
- 				     oparms->cifs_sb->local_nls,
- 				     oparms->cifs_sb->mnt_cifs_flags
- 						& CIFS_MOUNT_MAP_SPECIAL_CHR);
--	return CIFSSMBOpen(xid, oparms->tcon, oparms->path,
--			   oparms->disposition, oparms->desired_access,
--			   oparms->create_options, &oparms->fid->netfid, oplock,
--			   buf, oparms->cifs_sb->local_nls,
--			   oparms->cifs_sb->mnt_cifs_flags &
--						CIFS_MOUNT_MAP_SPECIAL_CHR);
-+	return CIFS_open(xid, oparms, oplock, buf);
- }
- 
- static void
-@@ -761,8 +763,9 @@ smb_set_file_info(struct inode *inode, const char *full_path,
- {
- 	int oplock = 0;
- 	int rc;
--	__u16 netfid;
- 	__u32 netpid;
-+	struct cifs_fid fid;
-+	struct cifs_open_parms oparms;
- 	struct cifsFileInfo *open_file;
- 	struct cifsInodeInfo *cinode = CIFS_I(inode);
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
-@@ -772,7 +775,7 @@ smb_set_file_info(struct inode *inode, const char *full_path,
- 	/* if the file is already open for write, just use that fileid */
- 	open_file = find_writable_file(cinode, true);
- 	if (open_file) {
--		netfid = open_file->fid.netfid;
-+		fid.netfid = open_file->fid.netfid;
- 		netpid = open_file->pid;
- 		tcon = tlink_tcon(open_file->tlink);
- 		goto set_via_filehandle;
-@@ -796,12 +799,17 @@ smb_set_file_info(struct inode *inode, const char *full_path,
- 		goto out;
- 	}
- 
--	cifs_dbg(FYI, "calling SetFileInfo since SetPathInfo for times not supported by this server\n");
--	rc = CIFSSMBOpen(xid, tcon, full_path, FILE_OPEN,
--			 SYNCHRONIZE | FILE_WRITE_ATTRIBUTES, CREATE_NOT_DIR,
--			 &netfid, &oplock, NULL, cifs_sb->local_nls,
--			 cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
-+	oparms.tcon = tcon;
-+	oparms.cifs_sb = cifs_sb;
-+	oparms.desired_access = SYNCHRONIZE | FILE_WRITE_ATTRIBUTES;
-+	oparms.create_options = CREATE_NOT_DIR;
-+	oparms.disposition = FILE_OPEN;
-+	oparms.path = full_path;
-+	oparms.fid = &fid;
-+	oparms.reconnect = false;
- 
-+	cifs_dbg(FYI, "calling SetFileInfo since SetPathInfo for times not supported by this server\n");
-+	rc = CIFS_open(xid, &oparms, &oplock, NULL);
- 	if (rc != 0) {
- 		if (rc == -EIO)
- 			rc = -EINVAL;
-@@ -811,12 +819,12 @@ smb_set_file_info(struct inode *inode, const char *full_path,
- 	netpid = current->tgid;
- 
- set_via_filehandle:
--	rc = CIFSSMBSetFileInfo(xid, tcon, buf, netfid, netpid);
-+	rc = CIFSSMBSetFileInfo(xid, tcon, buf, fid.netfid, netpid);
- 	if (!rc)
- 		cinode->cifsAttrs = le32_to_cpu(buf->Attributes);
- 
- 	if (open_file == NULL)
--		CIFSSMBClose(xid, tcon, netfid);
-+		CIFSSMBClose(xid, tcon, fid.netfid);
- 	else
- 		cifsFileInfo_put(open_file);
- out:
-@@ -941,7 +949,8 @@ cifs_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
- {
- 	int rc;
- 	int oplock = 0;
--	__u16 netfid;
-+	struct cifs_fid fid;
-+	struct cifs_open_parms oparms;
- 
- 	cifs_dbg(FYI, "%s: path: %s\n", __func__, full_path);
- 
-@@ -957,21 +966,27 @@ cifs_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
- 		goto out;
- 	}
- 
--	rc = CIFSSMBOpen(xid, tcon, full_path, FILE_OPEN,
--			 FILE_READ_ATTRIBUTES, OPEN_REPARSE_POINT, &netfid,
--			 &oplock, NULL, cifs_sb->local_nls,
--			 cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
-+	oparms.tcon = tcon;
-+	oparms.cifs_sb = cifs_sb;
-+	oparms.desired_access = FILE_READ_ATTRIBUTES;
-+	oparms.create_options = OPEN_REPARSE_POINT;
-+	oparms.disposition = FILE_OPEN;
-+	oparms.path = full_path;
-+	oparms.fid = &fid;
-+	oparms.reconnect = false;
-+
-+	rc = CIFS_open(xid, &oparms, &oplock, NULL);
- 	if (rc)
- 		goto out;
- 
--	rc = CIFSSMBQuerySymLink(xid, tcon, netfid, target_path,
-+	rc = CIFSSMBQuerySymLink(xid, tcon, fid.netfid, target_path,
- 				 cifs_sb->local_nls);
- 	if (rc)
- 		goto out_close;
- 
- 	convert_delimiter(*target_path, '/');
- out_close:
--	CIFSSMBClose(xid, tcon, netfid);
-+	CIFSSMBClose(xid, tcon, fid.netfid);
- out:
- 	if (!rc)
- 		cifs_dbg(FYI, "%s: target path: %s\n", __func__, *target_path);
+According to the previous discussions the most problematic question is how to prevent situations like DoS attacks where e.g /lib/liba.so file can be open with DENYREAD, or smth like this. That's why extra mount option 'sharelock' is added for switching on/off O_DENY* flags processing. It allows to avoid use of these flags on critical places (like /, /lib) and turn them on if we really want it proccessed that way.
+
+So, we have 3 new flags:
+O_DENYREAD - to prevent other opens with read access,
+O_DENYWRITE - to prevent other opens with write access,
+O_DENYDELETE - to prevent delete operations
+
+The patchset avoids data races problem on newely created files: open with O_CREAT can return the -ESHAREDENIED error for a successfully created file if this files was locked with a sharelock by another task. Also, it turns flock/LOCK_MAND capability off for mounts with 'sharelock' option. This lets not mix one share reservation approach with another.
+
+Patches #1, #2 and #3 add O_DENY* flags to fcntl and implement VFS part. A patch #4 is related to CIFS client changes, #5 -- NFSD, #6 and #7 describe NFSv4 client parts.
+
+The preliminary patch for Samba that replaces the existing use of flock/LOCK_MAND mechanism with O_DENY* flags:
+http://git.etersoft.ru/people/piastry/packages/?p=samba.git;a=commitdiff;h=173070262b7f29134ad6b2e49a760017c11aec4a
+
+The future part of open man page patch:
+
+-----
+O_DENYREAD, O_DENYWRIYE, O_DENYDELETE - used to inforce a mandatory share reservation scheme of the file access. If these flag is passed, the open fails with -ESHAREDENIED in following cases:
+1) if O_DENYREAD flag is specified and there is another open with READ access to the file;
+2) if O_DENYWRITE flag is specified and there is another open with WRITE access to the file;
+3) if READ access is requested and there is another open with O_DENYREAD flags;
+4) if WRITE access is requested and there is another open with O_DENYWRITE flags.
+
+If O_DENYDELETE flag is specified and the open succeded, any further unlink operation will fail with -ESHAREDENIED untill this open is closed. Now this flag is processed by VFS and CIFS filesystem. NFS returns -EINVAL for opens with this flag.
+
+This mechanism is done through flocks. If O_DENY* flags are specified, flock syscall is processed after the open. The share modes are translated into flock according the following rules:
+1) !O_DENYREAD   -> LOCK_READ   | LOCK_MAND
+2) !O_DENYWRITE  -> LOCK_WRITE  | LOCK_MAND
+3) !O_DENYDELETE -> LOCK_DELETE | LOCK_MAND
+-----
+
+Pavel Shilovsky (7):
+  VFS: Introduce new O_DENY* open flags
+  VFS: Add O_DENYDELETE support for VFS
+  locks: Disable LOCK_MAND support for MS_SHARELOCK mounts
+  CIFS: Add O_DENY* open flags support
+  NFSD: Pass share reservations flags to VFS
+  NFSv4: Add deny state handling for nfs4_state struct
+  NFSv4: Add O_DENY* open flags support
+
+ arch/alpha/include/uapi/asm/errno.h  |    2 +
+ arch/alpha/include/uapi/asm/fcntl.h  |    3 +
+ arch/mips/include/uapi/asm/errno.h   |    2 +
+ arch/parisc/include/uapi/asm/errno.h |    2 +
+ arch/parisc/include/uapi/asm/fcntl.h |    3 +
+ arch/sparc/include/uapi/asm/errno.h  |    2 +
+ arch/sparc/include/uapi/asm/fcntl.h  |    3 +
+ fs/cifs/cifsacl.c                    |    2 +
+ fs/cifs/cifsfs.c                     |    2 +-
+ fs/cifs/cifsglob.h                   |   17 +-
+ fs/cifs/cifssmb.c                    |    2 +-
+ fs/cifs/dir.c                        |    6 +
+ fs/cifs/file.c                       |   20 ++-
+ fs/cifs/inode.c                      |   12 +-
+ fs/cifs/link.c                       |    2 +
+ fs/cifs/netmisc.c                    |    2 +-
+ fs/cifs/smb1ops.c                    |    3 +
+ fs/cifs/smb2inode.c                  |    1 +
+ fs/cifs/smb2maperror.c               |    2 +-
+ fs/cifs/smb2ops.c                    |    6 +
+ fs/cifs/smb2pdu.c                    |    2 +-
+ fs/fcntl.c                           |    5 +-
+ fs/locks.c                           |  161 ++++++++++++++++--
+ fs/namei.c                           |   56 +++++-
+ fs/nfs/dir.c                         |   39 ++++-
+ fs/nfs/inode.c                       |    8 +-
+ fs/nfs/internal.h                    |    3 +-
+ fs/nfs/nfs4_fs.h                     |   83 ++++++++-
+ fs/nfs/nfs4file.c                    |    8 +-
+ fs/nfs/nfs4proc.c                    |  310 +++++++++++++++++++++++-----------
+ fs/nfs/nfs4state.c                   |   65 ++++---
+ fs/nfs/nfs4super.c                   |    9 +-
+ fs/nfs/nfs4xdr.c                     |   21 ++-
+ fs/nfs/super.c                       |    7 +-
+ fs/nfsd/nfs4state.c                  |   46 ++++-
+ fs/nfsd/nfsproc.c                    |    1 +
+ fs/proc_namespace.c                  |    1 +
+ include/linux/fs.h                   |   15 ++
+ include/linux/nfs_fs.h               |    5 +-
+ include/linux/nfs_xdr.h              |    1 +
+ include/uapi/asm-generic/errno.h     |    2 +
+ include/uapi/asm-generic/fcntl.h     |   12 ++
+ include/uapi/linux/fs.h              |    1 +
+ 43 files changed, 789 insertions(+), 166 deletions(-)
+
 -- 
 1.7.10.4
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
