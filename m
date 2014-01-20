@@ -1,127 +1,121 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH v7 1/7] VFS: Introduce new O_DENY* open flags
-Date: Mon, 20 Jan 2014 14:45:00 +0400
-Message-ID: <CAKywueT=JsTkNC+w-vrN0ftam7F8Eqb8DXJ0w2G4q9vnt0hVNQ@mail.gmail.com>
-References: <1389953232-9428-1-git-send-email-piastry@etersoft.ru>
-	<1389953232-9428-2-git-send-email-piastry@etersoft.ru>
-	<20140117181847.6c1f3831@alan.etchedpixels.co.uk>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: blocking write() after disconnecting cifs server
+Date: Mon, 20 Jan 2014 07:40:43 -0500
+Message-ID: <20140120074043.30f76463@tlielax.poochiereds.net>
+References: <trinity-9dbe46e3-d6e6-4e61-84cc-98074cd0fea3-1386076567862@3capp-gmx-bs38>
+	<20131223054643.4f6c06c9@tlielax.poochiereds.net>
+	<trinity-2ffa0afb-c02b-46c6-9e2e-31b209aebd8b-1388678667254@3capp-gmx-bs34>
+	<20140102143157.3232068c@corrin.poochiereds.net>
+	<CADT32eLOnvVO3phJTqC7TATdJuhgUXgxvAVvDZS+kmDDr-MmiA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Linux NFS Mailing list <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
-To: One Thousand Gnomes <gnomes-qBU/x9rampVanCEyBjwyrvXRex20P6io@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20140117181847.6c1f3831-mUKnrFFms3BCCTY1wZZT65JpZx93mCW/@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: mail654-Mmb7MZpHnFY@public.gmane.org, linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CADT32eLOnvVO3phJTqC7TATdJuhgUXgxvAVvDZS+kmDDr-MmiA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-2014/1/17 One Thousand Gnomes <gnomes-qBU/x9rampVanCEyBjwyrvXRex20P6io@public.gmane.org>:
->> +#define ESHAREDENIED 258     /* File is locked with a sharelock */
->
-> Have you prepared C library patches to match this ?
+On Sat, 18 Jan 2014 22:40:15 -0600
+Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-I don't have it for now.
+> If an address_space flag has AS_EIO bit set, should the subsequent
+> writes should_fail/start_failing instead of them writing to the page cache?
+> Also not sure what happens to pages with PG_error bit set, probably
+> get discarded.
+> 
 
->
-> (and why not just use EPERM, it has the meaning you want already)
+Yeah, possibly.
 
-We need to determine if we have a share reservation error to map it
-accurately in file servers and wine.
+What the NFS client does is switch to synchronous writes whenever there
+is an issue. See nfs_need_sync_write(). Perhaps cifs should do
+something similar?
 
->
->
->> + * Check to see if there's a share_reservation conflict. LOCK_READ/LOCK_WRITE
->> + * tell us whether the reservation allows other readers and writers.
->> + */
->> +static int
->> +locks_mand_conflict(struct file_lock *caller_fl, struct file_lock *sys_fl)
->> +{
->
-> Shouldn't this also check for CAP_SYS_DAC or some similar permission so
-> that root can override such a mess (eg to fix full disks in an
-> emergency) ?
 
-May be it's better to let root an ability to remount the system
-without sharelock mount option and then fix an emergency?
-
->
->
->> +
->> +     /*
->> +      * For sharelock mounts if a file was created but not opened, we need
->> +      * to keep parent i_mutex until we finish the open to prevent races when
->> +      * somebody opens newly created by us file and locks it with a sharelock
->> +      * before we open it.
->> +      */
->> +     if (IS_SHARELOCK(dir->d_inode) && error > 0 && *opened & FILE_CREATED) {
->> +             /* Don't check for write permission, don't truncate */
->> +             open_flag &= ~O_TRUNC;
->> +             will_truncate = false;
->> +             acc_mode = MAY_OPEN;
->> +             path_to_nameidata(path, nd);
->> +
->> +             error = may_open(&nd->path, acc_mode, open_flag);
->> +             if (error) {
->> +                     mutex_unlock(&dir->d_inode->i_mutex);
->> +                     goto out;
->> +             }
->> +             file->f_path.mnt = nd->path.mnt;
->> +             error = finish_open(file, nd->path.dentry, NULL, opened);
->> +             if (error) {
->> +                     mutex_unlock(&dir->d_inode->i_mutex);
->> +                     if (error == -EOPENSTALE)
->> +                             goto stale_open;
->> +                     goto out;
->> +             }
->> +             error = sharelock_lock_file(file);
->> +             mutex_unlock(&dir->d_inode->i_mutex);
->> +             if (error)
->> +                     goto exit_fput;
->> +             goto opened;
->> +     }
->> +
->>       mutex_unlock(&dir->d_inode->i_mutex);
->
-> What stops the file system changing mount flags via a remount between
-> these two ?
-
-Nothing, but it doesn't bring problems here: if the first IS_SHARELOCK
-condition is true, we don't get into the second (see 'goto opened').
-
->
->>
->>       if (error <= 0) {
->> @@ -3034,6 +3073,18 @@ finish_open_created:
->>                       goto stale_open;
->>               goto out;
->>       }
->> +
->> +     if (IS_SHARELOCK(dir->d_inode)) {
->> +             /*
->> +              * Lock parent i_mutex to prevent races with sharelocks on
->> +              * newly created files.
->> +              */
->> +             mutex_lock(&dir->d_inode->i_mutex);
->> +             error = sharelock_lock_file(file);
->> +             mutex_unlock(&dir->d_inode->i_mutex);
->> +             if (error)
->> +                     goto exit_fput;
->> +     }
->>  opened:
+> On Thu, Jan 2, 2014 at 1:31 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> > On Thu, 2 Jan 2014 17:04:27 +0100 (CET)
+> > mail654-Mmb7MZpHnFY@public.gmane.org wrote:
+> >
+> >> > > write() from cifs kernel driver blocks when disconnecting the cifs server. The blocking call didn't return after 30 minutes. Client and server are connected via a switch and server's LAN cable is unplugged during the write call. I use kernel 3.11.8 and mounted without "hard" option.
+> >> > >
+> >> > > Is there a possibility for an non-blocking write() without using O_SYNC or "directio" mount option?
+> >> > >
+> >> > > Way to reproduce the scenario: Below is a sample program which calls write() in a loop. The error messages appear when unplugging the cable during this loop.
+> >> > >
+> >> > > Kind regards,
+> >> > > Hagen
+> >> > >
+> >> > > CIFS VFS: sends on sock ffff88003710c280 stuck for 15 seconds
+> >> > > CIFS VFS: Error -11 sending data on socket to server
+> >> > >
+> >> > > #include <fstream>
+> >> > > #include <iostream>
+> >> > > int main () {
+> >> > >   const int size = 100000;
+> >> > >   char buffer[size];
+> >> > >   std::ofstream outfile("/mnt/new.bin",std::ofstream::binary);
+> >> > >   if (!outfile.is_open())
+> >> > >   {
+> >> > >     return 1;
+> >> > >   }
+> >> > >   for (int idx=0; idx<10000 && outfile.good(); idx++)
+> >> > >   {
+> >> > >     outfile.write(buffer,size);
+> >> > >     std::cout << "written, size=" << size << std::endl;
+> >> > >   }
+> >> > >   std::cout << "finished " << outfile.good() << std::endl;
+> >> > >   outfile.close();
+> >> > >   return 0;
+> >> > > }
+> >> >
+> >> > A hang of that length is unexpected. If you're able to reproduce this,
+> >> > can you get the stack from the task issuing the write at the time?
+> >> >
+> >> >     $ cat /proc/<pid>/stack
+> >> >
+> >> > That might give us a clue as to what it's doing.
+> >>
+> >> [<ffffffff8170ab8c>] balance_dirty_pages.isra.19+0x4ac/0x55c
+> >> [<ffffffff8115455b>] balance_dirty_pages_ratelimited+0xeb/0x110
+> >> [<ffffffff81148f3a>] generic_perform_write+0x16a/0x210
+> >> [<ffffffff8114903d>] generic_file_buffered_write+0x5d/0x90
+> >> [<ffffffff8114aa66>] __generic_file_aio_write+0x1b6/0x3b0
+> >> [<ffffffff8114acc9>] generic_file_aio_write+0x69/0xd0
+> >> [<ffffffffa03ef225>] cifs_strict_writev+0xa5/0xd0 [cifs]
+> >> [<ffffffff811b2b95>] do_sync_readv_writev+0x65/0x90
+> >> [<ffffffff811b4312>] do_readv_writev+0xd2/0x2b0
+> >> [<ffffffff811b452c>] vfs_writev+0x3c/0x50
+> >> [<ffffffff811b46a2>] SyS_writev+0x52/0xc0
+> >> [<ffffffff8172976f>] tracesys+0xe1/0xe6
+> >> [<ffffffffffffffff>] 0xffffffffffffffff
+> >>
+> >
+> > Looks like it's stuck in dirty page throttling.
+> >
+> > What's likely happening is that you have a bunch of dirty pages when
+> > you go to pull the cable. At that point the system is trying to flush
+> > the pages so that this task can try to dirty more of them.
+> >
+> > What *should* happen (at least if this is a soft mount) is that the
+> > writeback of those pages eventually times out, the pages get their
+> > error bit set and eventually the write() syscalls go through.
+> >
+> > Have you tried stracing this and are able to tell that the write
+> > syscall never returns in this situation? Is it possible that the
+> > write() syscalls are returning, albeit slowly?
+> >
+> > --
+> > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
 > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
-
 -- 
-Best regards,
-Pavel Shilovsky.
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
