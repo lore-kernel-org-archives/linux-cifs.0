@@ -1,121 +1,64 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: blocking write() after disconnecting cifs server
-Date: Mon, 20 Jan 2014 07:40:43 -0500
-Message-ID: <20140120074043.30f76463@tlielax.poochiereds.net>
-References: <trinity-9dbe46e3-d6e6-4e61-84cc-98074cd0fea3-1386076567862@3capp-gmx-bs38>
-	<20131223054643.4f6c06c9@tlielax.poochiereds.net>
-	<trinity-2ffa0afb-c02b-46c6-9e2e-31b209aebd8b-1388678667254@3capp-gmx-bs34>
-	<20140102143157.3232068c@corrin.poochiereds.net>
-	<CADT32eLOnvVO3phJTqC7TATdJuhgUXgxvAVvDZS+kmDDr-MmiA@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: Problem with connecting to SMB server in 3.9.11 kernel.
+Date: Mon, 20 Jan 2014 07:56:57 -0500
+Message-ID: <20140120075657.0e61ecb2@tlielax.poochiereds.net>
+References: <52DAB72C.9030305@candelatech.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: mail654-Mmb7MZpHnFY@public.gmane.org, linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	"Amit Haval (India Bangalore)" <amit.haval-ZIEO9HjW1UBWk0Htik3J/w@public.gmane.org>,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32eLOnvVO3phJTqC7TATdJuhgUXgxvAVvDZS+kmDDr-MmiA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <52DAB72C.9030305-my8/4N5VtI7c+919tysfdA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, 18 Jan 2014 22:40:15 -0600
-Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Sat, 18 Jan 2014 09:17:32 -0800
+Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org> wrote:
 
-> If an address_space flag has AS_EIO bit set, should the subsequent
-> writes should_fail/start_failing instead of them writing to the page cache?
-> Also not sure what happens to pages with PG_error bit set, probably
-> get discarded.
+> Hello!
+> 
+> A customer reported problems connecting our CIFS traffic generation test gear to their SMB server.
+> We are using the 3.9.11+ kernel, and though it is patched, we do not have any
+> patches to cifs.
+> 
+> The OS is Fedora 14, 64-bit.
+> 
+> A similar system on Fedora 14, with a 3.7.10+ kernel was working, but when
+> we tried the 3.7.10+ kernel on the broken machine, it also failed to work.
+> So, it could be the SMB server itself is having issues.  (In the 3.7.10+ failure,
+> the server just failed to respond after "Setup andX Request AUTH message", though we
+> did get the TCP ack so it looks like the message was received by the server.)
+> 
+> I'm attaching a capture taken on the SMB server.
+> 
+>  From looking at this page:
+> 
+> http://msdn.microsoft.com/en-us/library/ff469913.aspx
+> 
+> It appears the problem (STATUS_UNSUCCESSFUL) is:
+> 
+> "The size of the extended attribute list is not correct. Check the EaErrorOffset field for the
+> address of the SMB_GEA structure at which the error was detected."
+> 
+> I did not see anything about extended attribute list in the capture, but if someone else
+> with more knowledge could take a look and see if they notice any problems I would be grateful.
+> 
+> Thanks!
+> Ben
 > 
 
-Yeah, possibly.
+There's no EA list on this call so that description isn't valid here.
 
-What the NFS client does is switch to synchronous writes whenever there
-is an issue. See nfs_need_sync_write(). Perhaps cifs should do
-something similar?
+AIUI, NT_STATUS_UNSUCCESSFUL is basically a generic "something went
+wrong" error (sort of like EIO on POSIX). It looks like the server
+doesn't like something about the request being sent, but it's tough to
+know what it is.
 
-
-> On Thu, Jan 2, 2014 at 1:31 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> > On Thu, 2 Jan 2014 17:04:27 +0100 (CET)
-> > mail654-Mmb7MZpHnFY@public.gmane.org wrote:
-> >
-> >> > > write() from cifs kernel driver blocks when disconnecting the cifs server. The blocking call didn't return after 30 minutes. Client and server are connected via a switch and server's LAN cable is unplugged during the write call. I use kernel 3.11.8 and mounted without "hard" option.
-> >> > >
-> >> > > Is there a possibility for an non-blocking write() without using O_SYNC or "directio" mount option?
-> >> > >
-> >> > > Way to reproduce the scenario: Below is a sample program which calls write() in a loop. The error messages appear when unplugging the cable during this loop.
-> >> > >
-> >> > > Kind regards,
-> >> > > Hagen
-> >> > >
-> >> > > CIFS VFS: sends on sock ffff88003710c280 stuck for 15 seconds
-> >> > > CIFS VFS: Error -11 sending data on socket to server
-> >> > >
-> >> > > #include <fstream>
-> >> > > #include <iostream>
-> >> > > int main () {
-> >> > >   const int size = 100000;
-> >> > >   char buffer[size];
-> >> > >   std::ofstream outfile("/mnt/new.bin",std::ofstream::binary);
-> >> > >   if (!outfile.is_open())
-> >> > >   {
-> >> > >     return 1;
-> >> > >   }
-> >> > >   for (int idx=0; idx<10000 && outfile.good(); idx++)
-> >> > >   {
-> >> > >     outfile.write(buffer,size);
-> >> > >     std::cout << "written, size=" << size << std::endl;
-> >> > >   }
-> >> > >   std::cout << "finished " << outfile.good() << std::endl;
-> >> > >   outfile.close();
-> >> > >   return 0;
-> >> > > }
-> >> >
-> >> > A hang of that length is unexpected. If you're able to reproduce this,
-> >> > can you get the stack from the task issuing the write at the time?
-> >> >
-> >> >     $ cat /proc/<pid>/stack
-> >> >
-> >> > That might give us a clue as to what it's doing.
-> >>
-> >> [<ffffffff8170ab8c>] balance_dirty_pages.isra.19+0x4ac/0x55c
-> >> [<ffffffff8115455b>] balance_dirty_pages_ratelimited+0xeb/0x110
-> >> [<ffffffff81148f3a>] generic_perform_write+0x16a/0x210
-> >> [<ffffffff8114903d>] generic_file_buffered_write+0x5d/0x90
-> >> [<ffffffff8114aa66>] __generic_file_aio_write+0x1b6/0x3b0
-> >> [<ffffffff8114acc9>] generic_file_aio_write+0x69/0xd0
-> >> [<ffffffffa03ef225>] cifs_strict_writev+0xa5/0xd0 [cifs]
-> >> [<ffffffff811b2b95>] do_sync_readv_writev+0x65/0x90
-> >> [<ffffffff811b4312>] do_readv_writev+0xd2/0x2b0
-> >> [<ffffffff811b452c>] vfs_writev+0x3c/0x50
-> >> [<ffffffff811b46a2>] SyS_writev+0x52/0xc0
-> >> [<ffffffff8172976f>] tracesys+0xe1/0xe6
-> >> [<ffffffffffffffff>] 0xffffffffffffffff
-> >>
-> >
-> > Looks like it's stuck in dirty page throttling.
-> >
-> > What's likely happening is that you have a bunch of dirty pages when
-> > you go to pull the cable. At that point the system is trying to flush
-> > the pages so that this task can try to dirty more of them.
-> >
-> > What *should* happen (at least if this is a soft mount) is that the
-> > writeback of those pages eventually times out, the pages get their
-> > error bit set and eventually the write() syscalls go through.
-> >
-> > Have you tried stracing this and are able to tell that the write
-> > syscall never returns in this situation? Is it possible that the
-> > write() syscalls are returning, albeit slowly?
-> >
-> > --
-> > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
+I cc'ed Shirish though as he wrote most of that code. Maybe he has some
+idea?
 
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
