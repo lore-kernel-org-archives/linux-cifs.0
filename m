@@ -1,53 +1,126 @@
-From: Volker Lendecke <Volker.Lendecke-PS7XAnAlDA+VvDNblw4Uiw@public.gmane.org>
-Subject: Re: [PATCH v7 0/7] Add O_DENY* support for VFS and CIFS/NFS
-Date: Mon, 20 Jan 2014 11:31:13 +0100
-Message-ID: <E1W5C8U-000ozD-Ku@intern.SerNet.DE>
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: Re: [PATCH v7 1/7] VFS: Introduce new O_DENY* open flags
+Date: Mon, 20 Jan 2014 14:45:00 +0400
+Message-ID: <CAKywueT=JsTkNC+w-vrN0ftam7F8Eqb8DXJ0w2G4q9vnt0hVNQ@mail.gmail.com>
 References: <1389953232-9428-1-git-send-email-piastry@etersoft.ru>
- <E1W5A0e-000MT9-A1@intern.SerNet.DE>
- <CAKywueQwfFASPpevO8Z-_xwZqRjkzfkOceQJDya8D7FDW+UmMg@mail.gmail.com>
-Reply-To: Volker.Lendecke-PS7XAnAlDA+VvDNblw4Uiw@public.gmane.org
+	<1389953232-9428-2-git-send-email-piastry@etersoft.ru>
+	<20140117181847.6c1f3831@alan.etchedpixels.co.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=ISO-8859-1
 Cc: Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
 	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
 	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
 	Linux NFS Mailing list <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
 	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+To: One Thousand Gnomes <gnomes-qBU/x9rampVanCEyBjwyrvXRex20P6io@public.gmane.org>
 Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Date: Mon, 20 Jan 2014 11:31:13 +0100
-Content-Disposition: inline
-In-Reply-To: <CAKywueQwfFASPpevO8Z-_xwZqRjkzfkOceQJDya8D7FDW+UmMg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20140117181847.6c1f3831-mUKnrFFms3BCCTY1wZZT65JpZx93mCW/@public.gmane.org>
 Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Mon, Jan 20, 2014 at 02:20:43PM +0400, Pavel Shilovsky wrote:
-> > One question: If Samba wants to open a file for delete
-> > access, there's no corresponding flag in the open
-> > permissions. There can be the case where Samba wants to open
-> > *just* for future unlink, no read or write access required.
-> > Is there a way to achieve this atomically correct?
->=20
-> You can try to use O_PATH flag. It doesn't give you a delete access
-> but should be ok because further deleting will be done without file
-> descriptor -- through unlink syscall.
+2014/1/17 One Thousand Gnomes <gnomes-qBU/x9rampVanCEyBjwyrvXRex20P6io@public.gmane.org>:
+>> +#define ESHAREDENIED 258     /* File is locked with a sharelock */
+>
+> Have you prepared C library patches to match this ?
 
-Ok, I did not know about O_PATH. Thanks for that!
+I don't have it for now.
 
-So I do an open with O_PATH. How do I then make sure that
-nobody else has a O_DENYDELETE set without doing the unlink
-itself?
+>
+> (and why not just use EPERM, it has the meaning you want already)
 
-Thanks,
+We need to determine if we have a share reservation error to map it
+accurately in file servers and wine.
 
-Volker
+>
+>
+>> + * Check to see if there's a share_reservation conflict. LOCK_READ/LOCK_WRITE
+>> + * tell us whether the reservation allows other readers and writers.
+>> + */
+>> +static int
+>> +locks_mand_conflict(struct file_lock *caller_fl, struct file_lock *sys_fl)
+>> +{
+>
+> Shouldn't this also check for CAP_SYS_DAC or some similar permission so
+> that root can override such a mess (eg to fix full disks in an
+> emergency) ?
 
---=20
-SerNet GmbH, Bahnhofsallee 1b, 37081 G=F6ttingen
-phone: +49-551-370000-0, fax: +49-551-370000-9
-AG G=F6ttingen, HRB 2816, GF: Dr. Johannes Loxen
-http://www.sernet.de, mailto:kontakt-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org
+May be it's better to let root an ability to remount the system
+without sharelock mount option and then fix an emergency?
+
+>
+>
+>> +
+>> +     /*
+>> +      * For sharelock mounts if a file was created but not opened, we need
+>> +      * to keep parent i_mutex until we finish the open to prevent races when
+>> +      * somebody opens newly created by us file and locks it with a sharelock
+>> +      * before we open it.
+>> +      */
+>> +     if (IS_SHARELOCK(dir->d_inode) && error > 0 && *opened & FILE_CREATED) {
+>> +             /* Don't check for write permission, don't truncate */
+>> +             open_flag &= ~O_TRUNC;
+>> +             will_truncate = false;
+>> +             acc_mode = MAY_OPEN;
+>> +             path_to_nameidata(path, nd);
+>> +
+>> +             error = may_open(&nd->path, acc_mode, open_flag);
+>> +             if (error) {
+>> +                     mutex_unlock(&dir->d_inode->i_mutex);
+>> +                     goto out;
+>> +             }
+>> +             file->f_path.mnt = nd->path.mnt;
+>> +             error = finish_open(file, nd->path.dentry, NULL, opened);
+>> +             if (error) {
+>> +                     mutex_unlock(&dir->d_inode->i_mutex);
+>> +                     if (error == -EOPENSTALE)
+>> +                             goto stale_open;
+>> +                     goto out;
+>> +             }
+>> +             error = sharelock_lock_file(file);
+>> +             mutex_unlock(&dir->d_inode->i_mutex);
+>> +             if (error)
+>> +                     goto exit_fput;
+>> +             goto opened;
+>> +     }
+>> +
+>>       mutex_unlock(&dir->d_inode->i_mutex);
+>
+> What stops the file system changing mount flags via a remount between
+> these two ?
+
+Nothing, but it doesn't bring problems here: if the first IS_SHARELOCK
+condition is true, we don't get into the second (see 'goto opened').
+
+>
+>>
+>>       if (error <= 0) {
+>> @@ -3034,6 +3073,18 @@ finish_open_created:
+>>                       goto stale_open;
+>>               goto out;
+>>       }
+>> +
+>> +     if (IS_SHARELOCK(dir->d_inode)) {
+>> +             /*
+>> +              * Lock parent i_mutex to prevent races with sharelocks on
+>> +              * newly created files.
+>> +              */
+>> +             mutex_lock(&dir->d_inode->i_mutex);
+>> +             error = sharelock_lock_file(file);
+>> +             mutex_unlock(&dir->d_inode->i_mutex);
+>> +             if (error)
+>> +                     goto exit_fput;
+>> +     }
+>>  opened:
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Best regards,
+Pavel Shilovsky.
 --
 To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
 the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
