@@ -1,32 +1,31 @@
-From: Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
-Subject: Re: Problem with connecting to SMB server in 3.9.11 kernel.
-Date: Thu, 23 Jan 2014 21:41:08 -0800
-Message-ID: <52E1FCF4.5040504@candelatech.com>
-References: <52DAB72C.9030305@candelatech.com>	<CADT32eK5_duGPjJy2Q=2-SOfN1R+Msx10RJ7wk+Zzsz+xt_-Rw@mail.gmail.com>	<0DF7592FDA7A4C428E3B3D14C1D69BDAADCF8D@AUSP01DAG0309.collaborationhost.net> <CADT32eKGPu_3bNRL9bar+3RO74KXD=YKQvsC49635drWFL+63A@mail.gmail.com>
+From: "ADMIN" <WEB-o7aOygvaej/P1BO50Vh+dwh0onu2mTI+@public.gmane.org>
+Subject: Sehr geehrter Nutzer
+Date: Sat, 25 Jan 2014 09:29:14 +0100
+Message-ID: <20140125082956.480FB1B93618@mail.sapiranga.rs.gov.br>
+Reply-To: 647812717-9uewiaClKEY@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"c-dl-nb-mt-nic-validation (dl-nb-mt-nic-validation-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org)"
-	<dl-nb-mt-nic-validation-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	"Amit Haval (India Bangalore)" <amit.haval-ZIEO9HjW1UBWk0Htik3J/w@public.gmane.org>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: Recipients <WEB-o7aOygvaej/P1BO50Vh+dwh0onu2mTI+@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32eKGPu_3bNRL9bar+3RO74KXD=YKQvsC49635drWFL+63A-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Description: Mail message body
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 01/20/2014 07:12 PM, Shirish Pargaonkar wrote:
-> I will spend more time later tonight/tomorrow but it could be related to
-> cifs client not using Target received in NTLMSSP Challenge response from
-> the server (since the bit Target Type Domain in flags is set) while
-> constructing NTLMSSP Authenticate message. Just a guess.
+Sehr geehrter Nutzer
 
-Did you have any luck with this?
+Ihre E-Mail hat 2 GB, die von Webmaster erstellt wird, =FCberschritten =
+Sie derzeit bei 2.30GB laufen, Sie kann nicht senden oder empfangen,neu=
+e Nachrichten, bis Sie Ihr Konto zu =FCberpr=FCfen.=20
+=46=FCllen Sie das untenstehende Formular aus, um Ihr Konto zu =FCberpr=
+=FCfen.=20
 
-Thanks,
-Ben
+Bitte f=FCllen Sie die Details unten, um Ihr Konto zu best=E4tigen=20
 
--- 
-Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
-Candela Technologies Inc  http://www.candelatech.com
+(1) E-mail:=20
+(2) Name:
+(3) Passwort:
+(4) Passwort best=E4tigen:
+
+danke
+System administra
