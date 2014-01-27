@@ -1,146 +1,78 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH] [CIFS] Fix SMB2 mounts so they don't try to set or get xattrs
- via cifs
-Date: Sun, 26 Jan 2014 23:59:08 -0600
-Message-ID: <CAH2r5mtpwr_huqivzVXotQaOA_GHPsz_rrn1QvX+m8QYhskv9A@mail.gmail.com>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: Problem with connecting to SMB server in 3.9.11 kernel.
+Date: Mon, 27 Jan 2014 00:07:12 -0600
+Message-ID: <CADT32eL4na+eduUmmWKHe5usN+S2aN+mCUQqU5j8RHaq-3ZVwQ@mail.gmail.com>
+References: <52DAB72C.9030305@candelatech.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"Amit Haval (India Bangalore)" <amit.haval-ZIEO9HjW1UBWk0Htik3J/w@public.gmane.org>
+To: Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <52DAB72C.9030305-my8/4N5VtI7c+919tysfdA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-commit 666753c3ef8fc88b0ddd5be4865d0aa66428ac35
-Author: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Date:   Sun Jan 26 23:53:43 2014 -0600
+Can you try this patch and see if it works?
 
-    [CIFS] Fix SMB2 mounts so they don't try to set or get xattrs via cifs
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index e87387d..ac14d71 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -450,9 +450,8 @@ int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+        sec_blob->WorkstationName.MaximumLength = 0;
+        tmp += 2;
 
-    When mounting with smb2 (or smb2.1 or smb3) we need to check to make
-    sure that attempts to query or set extended attributes do not
-    attempt to send the request with the older cifs protocol instead
-    (eventually we also need to add the support in SMB2
-    to query/set extended attributes but this patch prevents us from
-    using the wrong protocol for extended attribute operations).
+-       if (((ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_KEY_XCH) ||
+-               (ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_EXTENDED_SEC))
+-                       && !calc_seckey(ses)) {
++       if ((ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_KEY_XCH) &&
++                       !calc_seckey(ses)) {
+                memcpy(tmp, ses->ntlmssp->ciphertext, CIFS_CPHTXT_SIZE);
+                sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - pbuffer);
+                sec_blob->SessionKey.Length = cpu_to_le16(CIFS_CPHTXT_SIZE);
 
-    Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 61228b7..a245d18 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -389,6 +389,12 @@ struct smb_version_operations {
-             struct cifsFileInfo *target_file, u64 src_off, u64 len,
-             u64 dest_off);
-     int (*validate_negotiate)(const unsigned int, struct cifs_tcon *);
-+    ssize_t (*query_all_EAs)(const unsigned int, struct cifs_tcon *,
-+            const unsigned char *, const unsigned char *, char *,
-+            size_t, const struct nls_table *, int);
-+    int (*set_EA)(const unsigned int, struct cifs_tcon *, const char *,
-+            const char *, const void *, const __u16,
-+            const struct nls_table *, int);
- };
-
- struct smb_version_values {
-diff --git a/fs/cifs/xattr.c b/fs/cifs/xattr.c
-index 09afda4..95c43bb 100644
---- a/fs/cifs/xattr.c
-+++ b/fs/cifs/xattr.c
-@@ -82,9 +82,11 @@ int cifs_removexattr(struct dentry *direntry, const
-char *ea_name)
-             goto remove_ea_exit;
-
-         ea_name += XATTR_USER_PREFIX_LEN; /* skip past user. prefix */
--        rc = CIFSSMBSetEA(xid, pTcon, full_path, ea_name, NULL,
--            (__u16)0, cifs_sb->local_nls,
--            cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
-+        if (pTcon->ses->server->ops->set_EA)
-+            rc = pTcon->ses->server->ops->set_EA(xid, pTcon,
-+                full_path, ea_name, NULL, (__u16)0,
-+                cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
-+                    CIFS_MOUNT_MAP_SPECIAL_CHR);
-     }
- remove_ea_exit:
-     kfree(full_path);
-@@ -149,18 +151,22 @@ int cifs_setxattr(struct dentry *direntry, const
-char *ea_name,
-             cifs_dbg(FYI, "attempt to set cifs inode metadata\n");
-
-         ea_name += XATTR_USER_PREFIX_LEN; /* skip past user. prefix */
--        rc = CIFSSMBSetEA(xid, pTcon, full_path, ea_name, ea_value,
--            (__u16)value_size, cifs_sb->local_nls,
--            cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
-+        if (pTcon->ses->server->ops->set_EA)
-+            rc = pTcon->ses->server->ops->set_EA(xid, pTcon,
-+                full_path, ea_name, ea_value, (__u16)value_size,
-+                cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
-+                    CIFS_MOUNT_MAP_SPECIAL_CHR);
-     } else if (strncmp(ea_name, XATTR_OS2_PREFIX, XATTR_OS2_PREFIX_LEN)
-            == 0) {
-         if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_XATTR)
-             goto set_ea_exit;
-
-         ea_name += XATTR_OS2_PREFIX_LEN; /* skip past os2. prefix */
--        rc = CIFSSMBSetEA(xid, pTcon, full_path, ea_name, ea_value,
--            (__u16)value_size, cifs_sb->local_nls,
--            cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
-+        if (pTcon->ses->server->ops->set_EA)
-+            rc = pTcon->ses->server->ops->set_EA(xid, pTcon,
-+                full_path, ea_name, ea_value, (__u16)value_size,
-+                cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
-+                    CIFS_MOUNT_MAP_SPECIAL_CHR);
-     } else if (strncmp(ea_name, CIFS_XATTR_CIFS_ACL,
-             strlen(CIFS_XATTR_CIFS_ACL)) == 0) {
- #ifdef CONFIG_CIFS_ACL
-@@ -272,17 +278,21 @@ ssize_t cifs_getxattr(struct dentry *direntry,
-const char *ea_name,
-             /* revalidate/getattr then populate from inode */
-         } /* BB add else when above is implemented */
-         ea_name += XATTR_USER_PREFIX_LEN; /* skip past user. prefix */
--        rc = CIFSSMBQAllEAs(xid, pTcon, full_path, ea_name, ea_value,
--            buf_size, cifs_sb->local_nls,
--            cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
-+        if (pTcon->ses->server->ops->query_all_EAs)
-+            rc = pTcon->ses->server->ops->query_all_EAs(xid, pTcon,
-+                full_path, ea_name, ea_value, buf_size,
-+                cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
-+                    CIFS_MOUNT_MAP_SPECIAL_CHR);
-     } else if (strncmp(ea_name, XATTR_OS2_PREFIX, XATTR_OS2_PREFIX_LEN) == 0) {
-         if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_XATTR)
-             goto get_ea_exit;
-
-         ea_name += XATTR_OS2_PREFIX_LEN; /* skip past os2. prefix */
--        rc = CIFSSMBQAllEAs(xid, pTcon, full_path, ea_name, ea_value,
--            buf_size, cifs_sb->local_nls,
--            cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
-+        if (pTcon->ses->server->ops->query_all_EAs)
-+            rc = pTcon->ses->server->ops->query_all_EAs(xid, pTcon,
-+                full_path, ea_name, ea_value, buf_size,
-+                cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
-+                    CIFS_MOUNT_MAP_SPECIAL_CHR);
-     } else if (strncmp(ea_name, POSIX_ACL_XATTR_ACCESS,
-               strlen(POSIX_ACL_XATTR_ACCESS)) == 0) {
- #ifdef CONFIG_CIFS_POSIX
-@@ -400,11 +410,12 @@ ssize_t cifs_listxattr(struct dentry *direntry,
-char *data, size_t buf_size)
-     /* if proc/fs/cifs/streamstoxattr is set then
-         search server for EAs or streams to
-         returns as xattrs */
--    rc = CIFSSMBQAllEAs(xid, pTcon, full_path, NULL, data,
--                buf_size, cifs_sb->local_nls,
--                cifs_sb->mnt_cifs_flags &
--                    CIFS_MOUNT_MAP_SPECIAL_CHR);
-
-+    if (pTcon->ses->server->ops->query_all_EAs)
-+        rc = pTcon->ses->server->ops->query_all_EAs(xid, pTcon,
-+                full_path, NULL, data, buf_size,
-+                cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
-+                    CIFS_MOUNT_MAP_SPECIAL_CHR);
- list_ea_exit:
-     kfree(full_path);
-     free_xid(xid);
-
--- 
-Thanks,
-
-Steve
+On Sat, Jan 18, 2014 at 11:17 AM, Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org> wrote:
+> Hello!
+>
+> A customer reported problems connecting our CIFS traffic generation test
+> gear to their SMB server.
+> We are using the 3.9.11+ kernel, and though it is patched, we do not have
+> any
+> patches to cifs.
+>
+> The OS is Fedora 14, 64-bit.
+>
+> A similar system on Fedora 14, with a 3.7.10+ kernel was working, but when
+> we tried the 3.7.10+ kernel on the broken machine, it also failed to work.
+> So, it could be the SMB server itself is having issues.  (In the 3.7.10+
+> failure,
+> the server just failed to respond after "Setup andX Request AUTH message",
+> though we
+> did get the TCP ack so it looks like the message was received by the
+> server.)
+>
+> I'm attaching a capture taken on the SMB server.
+>
+> From looking at this page:
+>
+> http://msdn.microsoft.com/en-us/library/ff469913.aspx
+>
+> It appears the problem (STATUS_UNSUCCESSFUL) is:
+>
+> "The size of the extended attribute list is not correct. Check the
+> EaErrorOffset field for the
+> address of the SMB_GEA structure at which the error was detected."
+>
+> I did not see anything about extended attribute list in the capture, but if
+> someone else
+> with more knowledge could take a look and see if they notice any problems I
+> would be grateful.
+>
+> Thanks!
+> Ben
+>
+> --
+> Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
+> Candela Technologies Inc  http://www.candelatech.com
+>
