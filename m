@@ -1,81 +1,42 @@
-From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: cifs: Re-order M-F Symlink code
-Date: Tue, 28 Jan 2014 15:49:22 +0000
-Message-ID: <1390924162.3984.18.camel@sachin-laptop>
-References: <20140127204856.GA3089@elgon.mountain>
-	 <1390915040.3984.11.camel@sachin-laptop> <20140128134913.GB4815@mwanda>
+From: Jeff Berman <spamact-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
+Subject: CIFS VFS: Send error in Flush = -9
+Date: Thu, 30 Jan 2014 11:38:37 -0800 (PST)
+Message-ID: <1391110717.91906.YahooMailNeo@web140302.mail.bf1.yahoo.com>
+References: <1382078007.96414.YahooMailNeo@web140303.mail.bf1.yahoo.com>
+Reply-To: Jeff Berman <spamact-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, NeilBrown <neilb-l3A5Bk7waGM@public.gmane.org>
-To: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20140128134913.GB4815@mwanda>
+In-Reply-To: <1382078007.96414.YahooMailNeo-GNkJ2jOaCZIeBhY5O9xny5EhsgyP+Z75VpNB7YpNyf8@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 2014-01-28 at 16:49 +0300, Dan Carpenter wrote:
-> On Tue, Jan 28, 2014 at 01:17:20PM +0000, Sachin Prabhu wrote:
-> > On Mon, 2014-01-27 at 23:48 +0300, Dan Carpenter wrote:
-> > > Hello Sachin Prabhu,
-> > > 
-> > > The patch 0f8dce1cb745: "cifs: Re-order M-F Symlink code" from Nov
-> > > 25, 2013, leads to the following static checker warning:
-> > > 
-> > > 	fs/cifs/link.c:188 couldbe_mf_symlink()
-> > > 	error: should you be using something like S_ISREG() here?
-> > > 
-> > > fs/cifs/link.c
-> > >    185  bool
-> > >    186  couldbe_mf_symlink(const struct cifs_fattr *fattr)
-> > >    187  {
-> > >    188          if (!(fattr->cf_mode & S_IFREG))
-> > >                                        ^^^^^^
-> > > Should this be:
-> > > 
-> > > 		if (!S_ISREG(fattr->cf_mode))
-> > > 
-> > >    189                  /* it's not a symlink */
-> > >    190                  return false;
-> > >    191  
-> > >    192          if (fattr->cf_eof != CIFS_MF_SYMLINK_FILE_SIZE)
-> > >    193                  /* it's not a symlink */
-> > >    194                  return false;
-> > >    195  
-> > >    196          return true;
-> > >    197  }
-> > > 
-> > > If this a real bug then please give the credit to Neil Brown because he
-> > > suggested I add this to Smatch (not pushed yet).
-> > > 
-> > > Reported-by: NeilBrown <neilb-l3A5Bk7waGM@public.gmane.org>
-> > > 
-> > > regards,
-> > > dan carpenter
-> > 
-> > Hello Dan,
-> > 
-> > There seems to be no difference in operation between the original line
-> > and the proposed line. The newer line just seems to be the preferred way
-> > to test for regular files. Is there a bug I am missing here?
-> 
-> I mean, there is a functional difference in the obvious sense.
-> 
-> #define S_IFSOCK 0140000
-> #define S_IFLNK  0120000
-> #define S_IFREG  0100000
-> #define S_IFBLK  0060000
-> #define S_IFDIR  0040000
-> #define S_IFCHR  0020000
-> #define S_IFIFO  0010000
-> #define S_ISUID  0004000
-> #define S_ISGID  0002000
-> #define S_ISVTX  0001000
-> 
-> 0100000 is set for S_IFREG, S_IFLNK and S_IFSOCK.  But I don't know if
-> this makes a difference for cifs?
-> 
-That is a good point. I will take a look at the code and send in a
-patch.
+Hi there,
 
-Sachin Prabhu
+I'm getting lots of CIFS errors in my system log:
+
+Jan 30 08:46:05 Server1 kernel: [747319.264235] CIFS VFS: Send error in=
+ Flush =3D -9
+Jan 30 08:46:05 Server1 kernel: [747319.264235] CIFS VFS: Send error in=
+ Flush =3D -9
+Jan 30 08:46:05 Server1 kernel: [747319.264235] CIFS VFS: Send error in=
+ Flush =3D -9
+
+Usually 10-20 messages will appear at once like this.=A0 This had happe=
+ned occasionally when I was on Ubuntu 12.04 LTS, but since upgrading to=
+ Ubuntu 13.10 they are appearing daily (I actually upgraded to get a ne=
+wer version of cifs-utils in the hopes that the problem would go away).
+
+Modinfo cifs shows cifs.ko at version 2.01, and cifs-utils is at 6.0.
+
+The share is mounted via fstab:
+//server2/share /media/tm cifs credentials=3D/home/jeff/.smbcredentials=
+,_netdev,uid=3Djeff,gid=3Djeff,file_mode=3D0777,dir_mode=3D0777,iochars=
+et=3Dutf8,sec=3Dntlm 0 0
+
+
+Any suggestions of how to work around this or how to provide more info?
+
+Thanks!
