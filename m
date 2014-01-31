@@ -1,42 +1,42 @@
-From: Jeff Berman <spamact-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
-Subject: CIFS VFS: Send error in Flush = -9
-Date: Thu, 30 Jan 2014 11:38:37 -0800 (PST)
-Message-ID: <1391110717.91906.YahooMailNeo@web140302.mail.bf1.yahoo.com>
-References: <1382078007.96414.YahooMailNeo@web140303.mail.bf1.yahoo.com>
-Reply-To: Jeff Berman <spamact-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: Fix check for regular file in couldbe_mf_symlink()
+Date: Fri, 31 Jan 2014 14:27:16 +0000
+Message-ID: <1391178436-10069-1-git-send-email-sprabhu@redhat.com>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1382078007.96414.YahooMailNeo-GNkJ2jOaCZIeBhY5O9xny5EhsgyP+Z75VpNB7YpNyf8@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi there,
+MF Symlinks are regular files containing content in a specified format.
 
-I'm getting lots of CIFS errors in my system log:
+The function couldbe_mf_symlink() checks the mode for a set S_IFREG bit
+as a test to confirm that it is a regular file. This bit is also set for
+other filetypes and simply checking for this bit being set may return
+false positives.
 
-Jan 30 08:46:05 Server1 kernel: [747319.264235] CIFS VFS: Send error in=
- Flush =3D -9
-Jan 30 08:46:05 Server1 kernel: [747319.264235] CIFS VFS: Send error in=
- Flush =3D -9
-Jan 30 08:46:05 Server1 kernel: [747319.264235] CIFS VFS: Send error in=
- Flush =3D -9
+We ensure that we are actually checking for a regular file by using the
+S_ISREG macro to test instead.
 
-Usually 10-20 messages will appear at once like this.=A0 This had happe=
-ned occasionally when I was on Ubuntu 12.04 LTS, but since upgrading to=
- Ubuntu 13.10 they are appearing daily (I actually upgraded to get a ne=
-wer version of cifs-utils in the hopes that the problem would go away).
+Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Reported-by: Neil Brown <neilb-l3A5Bk7waGM@public.gmane.org>
+Reported-by: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/link.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Modinfo cifs shows cifs.ko at version 2.01, and cifs-utils is at 6.0.
-
-The share is mounted via fstab:
-//server2/share /media/tm cifs credentials=3D/home/jeff/.smbcredentials=
-,_netdev,uid=3Djeff,gid=3Djeff,file_mode=3D0777,dir_mode=3D0777,iochars=
-et=3Dutf8,sec=3Dntlm 0 0
-
-
-Any suggestions of how to work around this or how to provide more info?
-
-Thanks!
+diff --git a/fs/cifs/link.c b/fs/cifs/link.c
+index 52f41f9..264ece7 100644
+--- a/fs/cifs/link.c
++++ b/fs/cifs/link.c
+@@ -185,7 +185,7 @@ format_mf_symlink(u8 *buf, unsigned int buf_len, const char *link_str)
+ bool
+ couldbe_mf_symlink(const struct cifs_fattr *fattr)
+ {
+-	if (!(fattr->cf_mode & S_IFREG))
++	if (!S_ISREG(fattr->cf_mode))
+ 		/* it's not a symlink */
+ 		return false;
+ 
+-- 
+1.8.4.2
