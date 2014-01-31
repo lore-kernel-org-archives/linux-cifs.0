@@ -1,123 +1,83 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH v7 0/7] Add O_DENY* support for VFS and CIFS/NFS
-Date: Fri, 31 Jan 2014 19:51:52 +0400
-Message-ID: <CAKywueSAWjOFH7cCvjQScSiBMGLzGEApjTYNoV03gmzec8uxjQ@mail.gmail.com>
-References: <1389953232-9428-1-git-send-email-piastry@etersoft.ru>
+From: Jeff Berman <spamact-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
+Subject: CIFS VFS: Send error in Flush = -9
+Date: Fri, 31 Jan 2014 19:20:24 +0000 (UTC)
+Message-ID: <loom.20140131T193830-201@post.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Linux NFS Mailing list <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
-To: Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
-	Bruce Fields <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1389953232-9428-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-2014-01-17 Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>:
-> This patchset adds support of O_DENY* flags for Linux fs layer. These flags can be used by any application that needs share reservations to organize a file access. VFS already has some sort of this capability - now it's done through flock/LOCK_MAND mechanis, but that approach is non-atomic. This patchset build new capabilities on top of the existing one but doesn't bring any changes into the flock call semantic.
->
-> These flags can be used by NFS (built-in-kernel) and CIFS (Samba) servers and Wine applications through VFS (for local filesystems) or CIFS/NFS modules. This will help when e.g. Samba and NFS server share the same directory for Windows and Linux users or Wine applications use Samba/NFS share to access the same data from different clients.
->
-> According to the previous discussions the most problematic question is how to prevent situations like DoS attacks where e.g /lib/liba.so file can be open with DENYREAD, or smth like this. That's why extra mount option 'sharelock' is added for switching on/off O_DENY* flags processing. It allows to avoid use of these flags on critical places (like /, /lib) and turn them on if we really want it proccessed that way.
->
-> So, we have 3 new flags:
-> O_DENYREAD - to prevent other opens with read access,
-> O_DENYWRITE - to prevent other opens with write access,
-> O_DENYDELETE - to prevent delete operations
->
-> The patchset avoids data races problem on newely created files: open with O_CREAT can return the -ESHAREDENIED error for a successfully created file if this files was locked with a sharelock by another task. Also, it turns flock/LOCK_MAND capability off for mounts with 'sharelock' option. This lets not mix one share reservation approach with another.
->
-> Patches #1, #2 and #3 add O_DENY* flags to fcntl and implement VFS part. A patch #4 is related to CIFS client changes, #5 -- NFSD, #6 and #7 describe NFSv4 client parts.
->
-> The preliminary patch for Samba that replaces the existing use of flock/LOCK_MAND mechanism with O_DENY* flags:
-> http://git.etersoft.ru/people/piastry/packages/?p=samba.git;a=commitdiff;h=173070262b7f29134ad6b2e49a760017c11aec4a
->
-> The future part of open man page patch:
->
-> -----
-> O_DENYREAD, O_DENYWRIYE, O_DENYDELETE - used to inforce a mandatory share reservation scheme of the file access. If these flag is passed, the open fails with -ESHAREDENIED in following cases:
-> 1) if O_DENYREAD flag is specified and there is another open with READ access to the file;
-> 2) if O_DENYWRITE flag is specified and there is another open with WRITE access to the file;
-> 3) if READ access is requested and there is another open with O_DENYREAD flags;
-> 4) if WRITE access is requested and there is another open with O_DENYWRITE flags.
->
-> If O_DENYDELETE flag is specified and the open succeded, any further unlink operation will fail with -ESHAREDENIED untill this open is closed. Now this flag is processed by VFS and CIFS filesystem. NFS returns -EINVAL for opens with this flag.
->
-> This mechanism is done through flocks. If O_DENY* flags are specified, flock syscall is processed after the open. The share modes are translated into flock according the following rules:
-> 1) !O_DENYREAD   -> LOCK_READ   | LOCK_MAND
-> 2) !O_DENYWRITE  -> LOCK_WRITE  | LOCK_MAND
-> 3) !O_DENYDELETE -> LOCK_DELETE | LOCK_MAND
-> -----
->
-> Pavel Shilovsky (7):
->   VFS: Introduce new O_DENY* open flags
->   VFS: Add O_DENYDELETE support for VFS
->   locks: Disable LOCK_MAND support for MS_SHARELOCK mounts
->   CIFS: Add O_DENY* open flags support
->   NFSD: Pass share reservations flags to VFS
->   NFSv4: Add deny state handling for nfs4_state struct
->   NFSv4: Add O_DENY* open flags support
->
->  arch/alpha/include/uapi/asm/errno.h  |    2 +
->  arch/alpha/include/uapi/asm/fcntl.h  |    3 +
->  arch/mips/include/uapi/asm/errno.h   |    2 +
->  arch/parisc/include/uapi/asm/errno.h |    2 +
->  arch/parisc/include/uapi/asm/fcntl.h |    3 +
->  arch/sparc/include/uapi/asm/errno.h  |    2 +
->  arch/sparc/include/uapi/asm/fcntl.h  |    3 +
->  fs/cifs/cifsacl.c                    |    2 +
->  fs/cifs/cifsfs.c                     |    2 +-
->  fs/cifs/cifsglob.h                   |   17 +-
->  fs/cifs/cifssmb.c                    |    2 +-
->  fs/cifs/dir.c                        |    6 +
->  fs/cifs/file.c                       |   20 ++-
->  fs/cifs/inode.c                      |   12 +-
->  fs/cifs/link.c                       |    2 +
->  fs/cifs/netmisc.c                    |    2 +-
->  fs/cifs/smb1ops.c                    |    3 +
->  fs/cifs/smb2inode.c                  |    1 +
->  fs/cifs/smb2maperror.c               |    2 +-
->  fs/cifs/smb2ops.c                    |    6 +
->  fs/cifs/smb2pdu.c                    |    2 +-
->  fs/fcntl.c                           |    5 +-
->  fs/locks.c                           |  161 ++++++++++++++++--
->  fs/namei.c                           |   56 +++++-
->  fs/nfs/dir.c                         |   39 ++++-
->  fs/nfs/inode.c                       |    8 +-
->  fs/nfs/internal.h                    |    3 +-
->  fs/nfs/nfs4_fs.h                     |   83 ++++++++-
->  fs/nfs/nfs4file.c                    |    8 +-
->  fs/nfs/nfs4proc.c                    |  310 +++++++++++++++++++++++-----------
->  fs/nfs/nfs4state.c                   |   65 ++++---
->  fs/nfs/nfs4super.c                   |    9 +-
->  fs/nfs/nfs4xdr.c                     |   21 ++-
->  fs/nfs/super.c                       |    7 +-
->  fs/nfsd/nfs4state.c                  |   46 ++++-
->  fs/nfsd/nfsproc.c                    |    1 +
->  fs/proc_namespace.c                  |    1 +
->  include/linux/fs.h                   |   15 ++
->  include/linux/nfs_fs.h               |    5 +-
->  include/linux/nfs_xdr.h              |    1 +
->  include/uapi/asm-generic/errno.h     |    2 +
->  include/uapi/asm-generic/fcntl.h     |   12 ++
->  include/uapi/linux/fs.h              |    1 +
->  43 files changed, 789 insertions(+), 166 deletions(-)
->
-> --
-> 1.7.10.4
->
+Hi there,
 
-Any other thoughts/reviews on this patchset?
+I'm getting lots of CIFS errors in my system log:
 
--- 
-Best regards,
-Pavel Shilovsky.
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Jan 30 08:46:05 Server1 kernel: [747319.264235] CIFS VFS: Send error
+ in Flush = -9
+Jan 30 08:46:05 Server1 kernel: [747319.264235] CIFS VFS: Send error
+ in Flush = -9
+Jan 30 08:46:05 Server1 kernel: [747319.264235] CIFS VFS: Send error
+ in Flush = -9
+
+Usually 10-20 messages will appear at once like this.  This had happened
+occasionally when I was on Ubuntu 12.04 LTS, but since upgrading to
+Ubuntu 13.10 they are appearing daily (I actually upgraded to get a 
+newer version of cifs-utils in the hopes that the problem would go away).
+
+Modinfo cifs shows cifs.ko at version 2.01, and cifs-utils is at 6.0.
+
+The share is mounted via fstab:
+//server2/share /media/tm cifs credentials=/home/jeff/.smbcredentials,
+_netdev,uid=jeff,gid=jeff,file_mode=0777,dir_mode=0777,iocharset=utf8
+,sec=ntlm 0 0
+
+I increased logging to level "3" and here is what's going on when the first
+Flush error occurs (sorry about the formatting, Gmane is limiting each
+line to 80 chars):
+
+Jan 31 06:17:36 Server1 kernel: [70838.026873] /build/buildd/linux-3.11.0/
+fs/cifs/connect.c: RFC1002 header 0x23
+Jan 31 06:17:36 Server1 kernel: [70838.026879] /build/buildd/linux-3.11.0/
+fs/cifs/misc.c: checkSMB Length: 0x27, smb_buf_length: 0x23
+Jan 31 06:17:36 Server1 kernel: [70838.026889] /build/buildd/linux-3.11.0/
+fs/cifs/transport.c: cifs_sync_mid_result: cmd=5 mid=34092 state=4
+Jan 31 06:17:36 Server1 kernel: [70838.026893] /build/buildd/linux-3.11.0/
+fs/cifs/file.c: CIFS VFS: leaving cifs_strict_fsync (xid = 2694478) rc = 0
+Jan 31 06:17:36 Server1 kernel: [70838.027602] /build/buildd/linux-3.11.0/
+fs/cifs/file.c: CIFS VFS: in cifs_strict_fsync as Xid: 2694479 with uid: 1000
+Jan 31 06:17:36 Server1 kernel: [70838.027606] /build/buildd/linux-3.11.0/
+fs/cifs/file.c: Sync file - name: 1c datasync: 0x0
+Jan 31 06:17:36 Server1 kernel: [70838.027610] /build/buildd/linux-3.11.0/
+fs/cifs/cifssmb.c: In CIFSSMBFlush
+Jan 31 06:17:36 Server1 kernel: [70838.027614] /build/buildd/linux-3.11.0/
+fs/cifs/transport.c: For smb_command 5
+Jan 31 06:17:36 Server1 kernel: [70838.027618] /build/buildd/linux-3.11.0/
+fs/cifs/transport.c: Sending smb: smb_len=37
+Jan 31 06:17:36 Server1 kernel: [70838.027875] /build/buildd/linux-3.11.0/
+fs/cifs/connect.c: RFC1002 header 0x23
+Jan 31 06:17:36 Server1 kernel: [70838.027882] /build/buildd/linux-3.11.0/
+fs/cifs/misc.c: checkSMB Length: 0x27, smb_buf_length: 0x23
+Jan 31 06:17:36 Server1 kernel: [70838.027896] /build/buildd/linux-3.11.0/
+fs/cifs/transport.c: cifs_sync_mid_result: cmd=5 mid=34093 state=4
+Jan 31 06:17:36 Server1 kernel: [70838.027900] Status code returned 0xc0000008 
+NT_STATUS_INVALID_HANDLE
+Jan 31 06:17:36 Server1 kernel: [70838.027906] /build/buildd/linux-3.11.0/
+fs/cifs/netmisc.c: Mapping smb error code 0xc0000008 to POSIX err -9
+Jan 31 06:17:36 Server1 kernel: [70838.027910] CIFS VFS: Send error in Flush = -9
+Jan 31 06:17:36 Server1 kernel: [70838.027915] /build/buildd/linux-3.11.0/
+fs/cifs/file.c: CIFS VFS: leaving cifs_strict_fsync (xid = 2694479) rc = -9
+Jan 31 06:17:36 Server1 kernel: [70838.027981] /build/buildd/linux-3.11.0/
+fs/cifs/xattr.c: CIFS VFS: in cifs_getxattr as Xid: 2694480 with uid: 1000
+Jan 31 06:17:36 Server1 kernel: [70838.027985] /build/buildd/linux-3.11.0/
+fs/cifs/dir.c: name: \afpd.log
+Jan 31 06:17:36 Server1 kernel: [70838.027989] /build/buildd/linux-3.11.0/
+fs/cifs/xattr.c: Security xattr namespace not supported yet
+Jan 31 06:17:36 Server1 kernel: [70838.027992] /build/buildd/linux-3.11.0/
+fs/cifs/xattr.c: CIFS VFS: leaving cifs_getxattr (xid = 2694480) rc = -95
+
+Any suggestions of how to work around this or how I could provide more info?
+
+
+Thanks!
