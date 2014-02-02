@@ -1,127 +1,84 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v7 1/7] VFS: Introduce new O_DENY* open flags
-Date: Sat, 1 Feb 2014 08:57:10 -0500
-Message-ID: <20140201085710.4ac69808@tlielax.poochiereds.net>
-References: <1389953232-9428-1-git-send-email-piastry@etersoft.ru>
-	<1389953232-9428-2-git-send-email-piastry@etersoft.ru>
-	<20140117181847.6c1f3831@alan.etchedpixels.co.uk>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] [CIFS] Add protocol specific operation for CIFS xattrs
+Date: Sun, 2 Feb 2014 00:25:49 -0600
+Message-ID: <CAH2r5mvMMW2AvPyEo-a1FMRWLRmwsEggZ45WRCTH+U7NaTRGCg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
-To: One Thousand Gnomes <gnomes-qBU/x9rampVanCEyBjwyrvXRex20P6io@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20140117181847.6c1f3831-mUKnrFFms3BCCTY1wZZT65JpZx93mCW/@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 17 Jan 2014 18:18:47 +0000
-One Thousand Gnomes <gnomes-qBU/x9rampVanCEyBjwyrvXRex20P6io@public.gmane.org> wrote:
+>From f87189f8ff97d1f95040b3f07ee1607c608567ad Mon Sep 17 00:00:00 2001
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Date: Sat, 1 Feb 2014 23:27:18 -0600
+Subject: [PATCH] [CIFS] Add protocol specific operation for CIFS xattrs
 
-> > +#define ESHAREDENIED	258	/* File is locked with a sharelock */
-> 
-> Have you prepared C library patches to match this ?
-> 
-> (and why not just use EPERM, it has the meaning you want already)
-> 
+Changeset 666753c3ef8fc88b0ddd5be4865d0aa66428ac35 added protocol
+operations for get/setxattr to avoid calling cifs operations
+on smb2/smb3 mounts for xattr operations and this changeset
+adds the calls to cifs specific protocol operations for xattrs
+(in order to reenable cifs support for xattrs which was
+temporarily disabled by the previous changeset.  We do not
+have SMB2/SMB3 worker function for setting xattrs yet so
+this only enables it for cifs.
 
-Tough call...
+CCing stable since without these two small changsets (its
+small coreq 666753c3ef8fc88b0ddd5be4865d0aa66428ac35 is
+also needed) calling getfattr/setfattr on smb2/smb3 mounts
+causes problems.
 
-On the one hand, ESHAREDENIED is a distinct error code so an
-application has the ability to determine what happened when an open or
-unlink fails.
+Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Reviewed-by: Shirish Pargaonkar <spargaonkar-IBi9RG/b67k@public.gmane.org>
+CC: Stable <stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+---
+ fs/cifs/inode.c   | 13 +++++++++----
+ fs/cifs/smb1ops.c |  4 ++++
+ 2 files changed, 13 insertions(+), 4 deletions(-)
 
-OTOH, a lot of applications won't understand ESHAREDENIED and may barf
-on it. Those apps might handle EPERM better.
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 9cb9679..be58b8f 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -527,10 +527,15 @@ static int cifs_sfu_mode(struct cifs_fattr
+*fattr, const unsigned char *path,
+         return PTR_ERR(tlink);
+     tcon = tlink_tcon(tlink);
 
-I'm not sure what the right approach is there...
+-    rc = CIFSSMBQAllEAs(xid, tcon, path, "SETFILEBITS",
+-                ea_value, 4 /* size of buf */, cifs_sb->local_nls,
+-                cifs_sb->mnt_cifs_flags &
+-                CIFS_MOUNT_MAP_SPECIAL_CHR);
++    if (tcon->ses->server->ops->query_all_EAs == NULL) {
++        cifs_put_tlink(tlink);
++        return -EOPNOTSUPP;
++    }
++
++    rc = tcon->ses->server->ops->query_all_EAs(xid, tcon, path,
++            "SETFILEBITS", ea_value, 4 /* size of buf */,
++            cifs_sb->local_nls,
++            cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
+     cifs_put_tlink(tlink);
+     if (rc < 0)
+         return (int)rc;
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index 9ac5bfc..3e4ff79 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -1067,6 +1067,10 @@ struct smb_version_operations smb1_operations = {
+     .query_mf_symlink = cifs_query_mf_symlink,
+     .create_mf_symlink = cifs_create_mf_symlink,
+     .is_read_op = cifs_is_read_op,
++#ifdef CONFIG_CIFS_XATTR
++    .query_all_EAs = CIFSSMBQAllEAs,
++    .set_EA = CIFSSMBSetEA,
++#endif /* CIFS_XATTR */
+ };
 
-> 
-> > + * Check to see if there's a share_reservation conflict. LOCK_READ/LOCK_WRITE
-> > + * tell us whether the reservation allows other readers and writers.
-> > + */
-> > +static int
-> > +locks_mand_conflict(struct file_lock *caller_fl, struct file_lock *sys_fl)
-> > +{
-> 
-> Shouldn't this also check for CAP_SYS_DAC or some similar permission so
-> that root can override such a mess (eg to fix full disks in an
-> emergency) ?
-> 
-> 
-
-Agreed. This needs a mechanism that allows you to override it, IMO.
-
-CAP_DAC_OVERRIDE doesn't seem quite like the right thing since this
-isn't dealing with permissions, per-se. A new capability bit may even be
-warranted.
-
-> > +
-> > +	/*
-> > +	 * For sharelock mounts if a file was created but not opened, we need
-> > +	 * to keep parent i_mutex until we finish the open to prevent races when
-> > +	 * somebody opens newly created by us file and locks it with a sharelock
-> > +	 * before we open it.
-> > +	 */
-> > +	if (IS_SHARELOCK(dir->d_inode) && error > 0 && *opened & FILE_CREATED) {
-> > +		/* Don't check for write permission, don't truncate */
-> > +		open_flag &= ~O_TRUNC;
-> > +		will_truncate = false;
-> > +		acc_mode = MAY_OPEN;
-> > +		path_to_nameidata(path, nd);
-> > +
-> > +		error = may_open(&nd->path, acc_mode, open_flag);
-> > +		if (error) {
-> > +			mutex_unlock(&dir->d_inode->i_mutex);
-> > +			goto out;
-> > +		}
-> > +		file->f_path.mnt = nd->path.mnt;
-> > +		error = finish_open(file, nd->path.dentry, NULL, opened);
-> > +		if (error) {
-> > +			mutex_unlock(&dir->d_inode->i_mutex);
-> > +			if (error == -EOPENSTALE)
-> > +				goto stale_open;
-> > +			goto out;
-> > +		}
-> > +		error = sharelock_lock_file(file);
-> > +		mutex_unlock(&dir->d_inode->i_mutex);
-> > +		if (error)
-> > +			goto exit_fput;
-> > +		goto opened;
-> > +	}
-> > +
-> >  	mutex_unlock(&dir->d_inode->i_mutex);
-> 
-> What stops the file system changing mount flags via a remount between
-> these two ?
-> 
-> >  
-> >  	if (error <= 0) {
-> > @@ -3034,6 +3073,18 @@ finish_open_created:
-> >  			goto stale_open;
-> >  		goto out;
-> >  	}
-> > +
-> > +	if (IS_SHARELOCK(dir->d_inode)) {
-> > +		/*
-> > +		 * Lock parent i_mutex to prevent races with sharelocks on
-> > +		 * newly created files.
-> > +		 */
-> > +		mutex_lock(&dir->d_inode->i_mutex);
-> > +		error = sharelock_lock_file(file);
-> > +		mutex_unlock(&dir->d_inode->i_mutex);
-> > +		if (error)
-> > +			goto exit_fput;
-> > +	}
-> >  opened:
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+ struct smb_version_values smb1_values = {
 
 
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Thanks,
+
+Steve
