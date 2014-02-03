@@ -1,8 +1,8 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH][CIFS] retrieving CIFS ACLs when mounted with SMB2 fails,
  dropping session
-Date: Sun, 2 Feb 2014 22:41:54 -0600
-Message-ID: <CAH2r5mtSAZfiqCZ9_=wvLCmFO-m0Zz90wTNy301BSLeCZY1tbQ@mail.gmail.com>
+Date: Sun, 2 Feb 2014 23:12:17 -0600
+Message-ID: <CAH2r5muPJVWr5Fi8FeQpPmQgkXu9PeMGP0gXe3_fXyRET5O9ag@mail.gmail.com>
 References: <CAH2r5msK3t2atR5TcaYJcst91HdTPVZnof9N9_byEt4VR6aVHw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
@@ -12,14 +12,8 @@ In-Reply-To: <CAH2r5msK3t2atR5TcaYJcst91HdTPVZnof9N9_byEt4VR6aVHw-JsoAwUIsXosN+B
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Shirish noted the following general suggestion about the way we check
-for protocol specific operations
-
-"Another idea would be perhaps to have a get_cifs_acl/set_cifs_acl ops
-for respective smb version and them returning EOPNOSUPP error
-until they are coded, so an if check for any op could be saved/skipped."
-
-(This could apply to any protocol specific operation)
+ignore this version of the patch - sent older version with typos. Will
+resend fixed one.
 
 On Sun, Feb 2, 2014 at 10:40 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 > From 1c8b653d63c451a57a41a8134d3d07b9210e1d16 Mon Sep 17 00:00:00 2001
