@@ -1,13 +1,13 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: Problem with connecting to SMB server in 3.9.11 kernel.
-Date: Mon, 3 Feb 2014 11:59:19 -0600
-Message-ID: <CAH2r5muM48X5Jy+gOJuNd6zqrFD_+GX7vjMbVFVOa6OS1FHwzA@mail.gmail.com>
-References: <52DAB72C.9030305@candelatech.com> <CADT32eL4na+eduUmmWKHe5usN+S2aN+mCUQqU5j8RHaq-3ZVwQ@mail.gmail.com>
- <52EFD7C3.9020505@candelatech.com>
+Date: Mon, 3 Feb 2014 12:51:52 -0600
+Message-ID: <CADT32eL3wpYNePnQhwJVWzUdJGnK9sGkCorj6uDdqeTz_17vbA@mail.gmail.com>
+References: <52DAB72C.9030305@candelatech.com>
+	<CADT32eL4na+eduUmmWKHe5usN+S2aN+mCUQqU5j8RHaq-3ZVwQ@mail.gmail.com>
+	<52EFD7C3.9020505@candelatech.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
 	"Amit Haval (India Bangalore)" <amit.haval-ZIEO9HjW1UBWk0Htik3J/w@public.gmane.org>
 To: Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -15,7 +15,11 @@ In-Reply-To: <52EFD7C3.9020505-my8/4N5VtI7c+919tysfdA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-username=foo is preferred
+Thanks. Will post a patch on the mailing list.
+
+Regards,
+
+Shirish
 
 On Mon, Feb 3, 2014 at 11:54 AM, Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org> wrote:
 > On 01/26/2014 10:07 PM, Shirish Pargaonkar wrote:
@@ -50,14 +54,3 @@ On Mon, Feb 3, 2014 at 11:54 AM, Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@publ
 > Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
 > Candela Technologies Inc  http://www.candelatech.com
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Thanks,
-
-Steve
