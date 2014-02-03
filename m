@@ -1,7 +1,8 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH] [CIFS] Add protocol specific operation for CIFS xattrs
-Date: Sun, 2 Feb 2014 00:25:49 -0600
-Message-ID: <CAH2r5mvMMW2AvPyEo-a1FMRWLRmwsEggZ45WRCTH+U7NaTRGCg@mail.gmail.com>
+Subject: [PATCH][CIFS] retrieving CIFS ACLs when mounted with SMB2 fails,
+ dropping session
+Date: Sun, 2 Feb 2014 22:40:30 -0600
+Message-ID: <CAH2r5msK3t2atR5TcaYJcst91HdTPVZnof9N9_byEt4VR6aVHw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,73 +10,175 @@ Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
->From f87189f8ff97d1f95040b3f07ee1607c608567ad Mon Sep 17 00:00:00 2001
+>From 1c8b653d63c451a57a41a8134d3d07b9210e1d16 Mon Sep 17 00:00:00 2001
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Date: Sat, 1 Feb 2014 23:27:18 -0600
-Subject: [PATCH] [CIFS] Add protocol specific operation for CIFS xattrs
+Date: Sun, 2 Feb 2014 22:25:41 -0600
+Subject: [PATCH] [CIFS] retrieving CIFS ACLs when mounted with SMB2 fails
+ dropping session
 
-Changeset 666753c3ef8fc88b0ddd5be4865d0aa66428ac35 added protocol
-operations for get/setxattr to avoid calling cifs operations
-on smb2/smb3 mounts for xattr operations and this changeset
-adds the calls to cifs specific protocol operations for xattrs
-(in order to reenable cifs support for xattrs which was
-temporarily disabled by the previous changeset.  We do not
-have SMB2/SMB3 worker function for setting xattrs yet so
-this only enables it for cifs.
+The get/set ACL xattr support for CIFS ACLs attempts to send old
+cifs dialect protocol requests even when mounted with SMB2 or later
+dialects.  So e.g. mounting with cifacl and vers=2.1 will hang until
+the server drops the session due to the illegal request the
+client sends.
 
-CCing stable since without these two small changsets (its
-small coreq 666753c3ef8fc88b0ddd5be4865d0aa66428ac35 is
-also needed) calling getfattr/setfattr on smb2/smb3 mounts
-causes problems.
+This patch makes CIFS ACL operations protocol specific to fix that.
+
+Attempting to query/set CIFS ACLs for SMB2 will now return
+EOPNOTSUPP (until we add worker routines for sending query
+ACL requests via SMB2) instead of sending invalid (cifs)
+requests.
+
+A separate followon patch will be done to fix cifs_acl_to_fattr
+(which takes a cifs specific u16 fid so can't be abstracted
+to work with SMB2 until that is changed).
 
 Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Reviewed-by: Shirish Pargaonkar <spargaonkar-IBi9RG/b67k@public.gmane.org>
 CC: Stable <stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
 ---
- fs/cifs/inode.c   | 13 +++++++++----
- fs/cifs/smb1ops.c |  4 ++++
- 2 files changed, 13 insertions(+), 4 deletions(-)
+ fs/cifs/cifsacl.c  | 28 ++++++++++++++++++++++++----
+ fs/cifs/cifsglob.h |  4 ++++
+ fs/cifs/smb1ops.c  |  4 ++++
+ fs/cifs/xattr.c    | 15 +++++++++++----
+ 4 files changed, 43 insertions(+), 8 deletions(-)
 
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 9cb9679..be58b8f 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -527,10 +527,15 @@ static int cifs_sfu_mode(struct cifs_fattr
-*fattr, const unsigned char *path,
-         return PTR_ERR(tlink);
-     tcon = tlink_tcon(tlink);
+diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+index 8f9b4f7..7efdb7f 100644
+--- a/fs/cifs/cifsacl.c
++++ b/fs/cifs/cifsacl.c
+@@ -1043,15 +1043,30 @@ id_mode_to_cifs_acl(struct inode *inode, const
+char *path, __u64 nmode,
+     __u32 secdesclen = 0;
+     struct cifs_ntsd *pntsd = NULL; /* acl obtained from server */
+     struct cifs_ntsd *pnntsd = NULL; /* modified acl to be sent to server */
++    struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
++    struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
++    struct cifs_tcon tcon;
++
++    if (IS_ERR(tlink))
++        return PTR_ERR(tlink);
++    tcon = tlink_tcon(tlink);
 
--    rc = CIFSSMBQAllEAs(xid, tcon, path, "SETFILEBITS",
--                ea_value, 4 /* size of buf */, cifs_sb->local_nls,
--                cifs_sb->mnt_cifs_flags &
--                CIFS_MOUNT_MAP_SPECIAL_CHR);
-+    if (tcon->ses->server->ops->query_all_EAs == NULL) {
+     cifs_dbg(NOISY, "set ACL from mode for %s\n", path);
+
+     /* Get the security descriptor */
+-    pntsd = get_cifs_acl(CIFS_SB(inode->i_sb), inode, path, &secdesclen);
++
++    if (tcon->ses->server->ops->get_acl == NULL) {
 +        cifs_put_tlink(tlink);
 +        return -EOPNOTSUPP;
 +    }
 +
-+    rc = tcon->ses->server->ops->query_all_EAs(xid, tcon, path,
-+            "SETFILEBITS", ea_value, 4 /* size of buf */,
-+            cifs_sb->local_nls,
-+            cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
-     cifs_put_tlink(tlink);
-     if (rc < 0)
-         return (int)rc;
++    pntsd = tcon->ses->server->ops->get_acl(cifs_sb, inode, path,
++                        &secdesclen);
+     if (IS_ERR(pntsd)) {
+         rc = PTR_ERR(pntsd);
+         cifs_dbg(VFS, "%s: error %d getting sec desc\n", __func__, rc);
+-        goto out;
++        cifs_put_tlink(tlink);
++        return rc;
+     }
+
+     /*
+@@ -1064,6 +1079,7 @@ id_mode_to_cifs_acl(struct inode *inode, const
+char *path, __u64 nmode,
+     pnntsd = kmalloc(secdesclen, GFP_KERNEL);
+     if (!pnntsd) {
+         kfree(pntsd);
++        cifs_put_tlink(tlink);
+         return -ENOMEM;
+     }
+
+@@ -1072,14 +1088,18 @@ id_mode_to_cifs_acl(struct inode *inode, const
+char *path, __u64 nmode,
+
+     cifs_dbg(NOISY, "build_sec_desc rc: %d\n", rc);
+
++    if (tcon->ses->server->ops->set_acl == NULL)
++        rc = -EOPNOTSUPP;
++
+     if (!rc) {
+         /* Set the security descriptor */
+-        rc = set_cifs_acl(pnntsd, secdesclen, inode, path, aclflag);
++        rc = tcon->ses->server->ops->set_acl(pnntsd, secdesclen, inode,
++                             path, aclflag);
+         cifs_dbg(NOISY, "set_cifs_acl rc: %d\n", rc);
+     }
++    cifs_put_tlink(tlink);
+
+     kfree(pnntsd);
+     kfree(pntsd);
+-out:
+     return rc;
+ }
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index a245d18..a18391f 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -395,6 +395,10 @@ struct smb_version_operations {
+     int (*set_EA)(const unsigned int, struct cifs_tcon *, const char *,
+             const char *, const void *, const __u16,
+             const struct nls_table *, int);
++    int (*get_acl)(struct cifs_sb_info *, struct inode *, const char *,
++            u32 *);
++    int (*set_acl)(struct cifs_ntsd *, __u32, struct inode *, const char *,
++            int);
+ };
+
+ struct smb_version_values {
 diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index 9ac5bfc..3e4ff79 100644
+index 3e4ff79..bfd66d8 100644
 --- a/fs/cifs/smb1ops.c
 +++ b/fs/cifs/smb1ops.c
-@@ -1067,6 +1067,10 @@ struct smb_version_operations smb1_operations = {
-     .query_mf_symlink = cifs_query_mf_symlink,
-     .create_mf_symlink = cifs_create_mf_symlink,
-     .is_read_op = cifs_is_read_op,
-+#ifdef CONFIG_CIFS_XATTR
-+    .query_all_EAs = CIFSSMBQAllEAs,
-+    .set_EA = CIFSSMBSetEA,
-+#endif /* CIFS_XATTR */
+@@ -1071,6 +1071,10 @@ struct smb_version_operations smb1_operations = {
+     .query_all_EAs = CIFSSMBQAllEAs,
+     .set_EA = CIFSSMBSetEA,
+ #endif /* CIFS_XATTR */
++#ifdef CONFIG_CIFS_ACL
++    .get_acl = get_cifs_acl,
++    .set_acl = set_cifs_acl,
++#endif /* CIFS_ACL */
  };
 
  struct smb_version_values smb1_values = {
+diff --git a/fs/cifs/xattr.c b/fs/cifs/xattr.c
+index 95c43bb..b163dca 100644
+--- a/fs/cifs/xattr.c
++++ b/fs/cifs/xattr.c
+@@ -176,8 +176,12 @@ int cifs_setxattr(struct dentry *direntry, const
+char *ea_name,
+             rc = -ENOMEM;
+         } else {
+             memcpy(pacl, ea_value, value_size);
+-            rc = set_cifs_acl(pacl, value_size,
+-                direntry->d_inode, full_path, CIFS_ACL_DACL);
++            if (pTcon->ses->server->ops->set_acl)
++                rc = pTcon->set->server->ops->set_acl(pacl,
++                        value_size, direntry->d_inode,
++                        full_path, CIFS_ACL_DACL);
++            else
++                rc = -EOPNOTSUPP;
+             if (rc == 0) /* force revalidate of the inode */
+                 CIFS_I(direntry->d_inode)->time = 0;
+             kfree(pacl);
+@@ -323,8 +327,11 @@ ssize_t cifs_getxattr(struct dentry *direntry,
+const char *ea_name,
+             u32 acllen;
+             struct cifs_ntsd *pacl;
+
+-            pacl = get_cifs_acl(cifs_sb, direntry->d_inode,
+-                        full_path, &acllen);
++            if (pTcon->ses->server->ops->get_acl == NULL)
++                goto get_ea_exit; /* rc already EOPNOTSUPP */
++
++            pacl = pTcon->ses->server->ops->get_acl(cifs_sb,
++                    direntry->d_inode, full_path, &acllen);
+             if (IS_ERR(pacl)) {
+                 rc = PTR_ERR(pacl);
+                 cifs_dbg(VFS, "%s: error %zd getting sec desc\n",
+-- 
+1.8.5.3
 
 
 -- 
