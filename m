@@ -1,19 +1,20 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH] cifs: use a flexarray in cifs_writedata
-Date: Fri, 7 Feb 2014 20:31:19 +0400
-Message-ID: <CAKywueQCtUvEQN9NOocnv5T338uyfQB2J90HROkDD=r7LFC4XA@mail.gmail.com>
+Date: Fri, 7 Feb 2014 20:49:57 -0600
+Message-ID: <CAH2r5mu3MDKthq84+NbBg68GxZen9eUME2kQ6HAyPBnPr-cenA@mail.gmail.com>
 References: <1391789044-26179-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <1391789044-26179-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2014-02-07 20:04 GMT+04:00 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+merged into cifs-2.6.git for-next
+
+On Fri, Feb 7, 2014 at 10:04 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 > The cifs_writedata code uses a single element trailing array, which
 > just adds unneeded complexity. Use a flexarray instead.
 >
@@ -60,15 +61,10 @@ List-ID: <linux-cifs.vger.kernel.org>
 > --
 > 1.8.5.3
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Reasonable.
 
-Reviewed-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 
 -- 
-Best regards,
-Pavel Shilovsky.
+Thanks,
+
+Steve
