@@ -1,108 +1,84 @@
-From: "Suresh Jayaraman" <sjayaraman-Et1tbQHTxzrQT0dZR+AlfA@public.gmane.org>
-Subject: Re: Problem with Samba re-share of a CIFS mount
-Date: Fri, 14 Feb 2014 02:14:56 +0000
-Message-ID: <52FDC978020000F4000256F9@nat28.tlf.novell.com>
-References: <52F9EDA5.1020004@assyoma.it>
- <20140211103302.6d74b90d@tlielax.poochiereds.net>
- <52FA46D5.8020904@assyoma.it>
- <20140211124536.5fdcb56f@tlielax.poochiereds.net>
- <CAH2r5mvQ590zaniv3cDuu+Do0N9TePasTaEFkrNSAdatTiaZ5Q@mail.gmail.com>
- <20140213063738.1b345466@tlielax.poochiereds.net>
- <52FD0109.5030909@assyoma.it>
- <20140213144038.2101ea44@tlielax.poochiereds.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8BIT
-Cc: "Steve French" <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	"James McDonough" <jmcd-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: "Gionatan Danti" <g.danti-N44kj/XGErOonA0d6jMUrA@public.gmane.org>,
-	"Jeff Layton" <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: [PATCH] CIFS: Fix too big maxBuf size for SMB3 mounts
+Date: Fri, 14 Feb 2014 13:31:02 +0400
+Message-ID: <1392370263-10364-1-git-send-email-piastry@etersoft.ru>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20140213144038.2101ea44-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
-Content-Disposition: inline
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
->>> On 2/14/2014 at 01:10 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote: 
-> On Thu, 13 Feb 2014 18:29:45 +0100
-> Gionatan Danti <g.danti-N44kj/XGErOonA0d6jMUrA@public.gmane.org> wrote:
-> 
->> On 02/13/2014 12:37 PM, Jeff Layton wrote:
->> >
->> > Using cache=none sort of defeats the purpose. After all Gionatan said
->> > that he was doing this specifically to use fscache, and that won't work
->> > with cache=none.
->> >
->> 
->> Surely my idea was to use FSCACHE to speed up remote access. Without it, 
->> the entire discussion is pointless...
->> 
->> > But, lets leave that aside for a moment and consider whether this could
->> > work at all. Assume we have samba set up re-share a cifs mount:
->> >
->> > Client sends an open to samba and requests an oplock. Samba then opens
->> > a file on the cifs mount, and does not request an oplock (because of
->> > cache=none). We then attempt to set a lease, which will fail because we
->> > don't have an oplock. Now you're no better off (and probably worse off)
->> > since you have zero caching going on and are having to bounce each
->> > request through an extra hop.
->> >
->> > So, suppose you disable "kernel oplocks" in samba in order to get samba
->> > to hand out L2 oplocks in this situation. Another client then comes
->> > along on the main (primary) server and changes a file. Samba is then
->> > not aware of that change and hilarity (aka data corruption) ensues.
->> >
->> 
->> Are you of the same advice for low-frequency file changes (eg: office 
->> files)?
->> 
->> What about using NFS to export the Fileserver directory, mount it (via 
->> mount.nfs) on the remote Linux box and then sharing via Samba? It is a 
->> horrible frankenstein?
->> 
-> 
-> You'll have similar problems with NFS.
-> 
-> You can't acquire leases on NFS either, so with kernel oplocks enabled
-> on samba you won't ever get oplocks on there. If you turn them off (so
-> that oplocks are tracked internally) you won't be aware of changes that
-> occur outside of samba.
-> 
->> > I just don't see how re-sharing a cifs mount is a good idea, unless you
->> > are absolutely certain that the data you're resharing won't ever
->> > change. If that's the case, then you're almost certainly better off
->> > keeping a local copy on the samba server and sharing that out.
->> >
->> 
->> After many tests, I tend to agree. Using a Fedora 20 test machine with 
->> fscache+cachefilesd as the remote Linux box, I had one kernel panic and 
->> multiple failed file copies (with Windows complaing about a "bad 
->> signature").
->> 
->> I also found this: https://bugzilla.redhat.com/show_bug.cgi?id=646224
->> Maybe the CIFS FSCACHE is not really production-grade on latest distros 
->> also?
->> 
-> 
-> I don't recall whether Suresh ever fixed those bugs. cifs+fsc is
+SMB3 servers can respond with MaxTransactSize of more than 4M
+that can cause a memory allocation error returned from kmalloc
+in a lock codepath. Also the client doesn't support multicredit
+requests now and allows buffer sizes of 65536 bytes only. Set
+MaxTransactSize to this maximum supported value.
 
-If you are referring to this oops http://thread.gmane.org/gmane.linux.file-systems.cachefs.general/2961
-it was fixed by the below commit
+Cc: stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org # 3.7+
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+---
+ fs/cifs/smb2glob.h |    3 +++
+ fs/cifs/smb2ops.c  |   14 ++++----------
+ fs/cifs/smb2pdu.c  |    4 +++-
+ 3 files changed, 10 insertions(+), 11 deletions(-)
 
-commit c902ce1bfb40d8b049bd2319b388b4b68b04bc27
-Author: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Date:   Thu Jul 7 12:19:48 2011 +0100
-
-    FS-Cache: Add a helper to bulk uncache pages on an inode
-
-I remember verifying it by running fsstress for many hours then. I'm not sure what other bugs you are referring to.
-    
-> certainly not widely used, and it wouldn't surprise me if it were still
-> horribly buggy.
-
-Just curious, why would you say so? 
-
-
-
-- Suresh Jayaraman
+diff --git a/fs/cifs/smb2glob.h b/fs/cifs/smb2glob.h
+index c383508..bc0bb9c 100644
+--- a/fs/cifs/smb2glob.h
++++ b/fs/cifs/smb2glob.h
+@@ -57,4 +57,7 @@
+ #define SMB2_CMACAES_SIZE (16)
+ #define SMB3_SIGNKEY_SIZE (16)
+ 
++/* Maximum buffer size value we can send with 1 credit */
++#define SMB2_MAX_BUFFER_SIZE 65536
++
+ #endif	/* _SMB2_GLOB_H */
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 757da3e..192f51a 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -182,11 +182,8 @@ smb2_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
+ 	/* start with specified wsize, or default */
+ 	wsize = volume_info->wsize ? volume_info->wsize : CIFS_DEFAULT_IOSIZE;
+ 	wsize = min_t(unsigned int, wsize, server->max_write);
+-	/*
+-	 * limit write size to 2 ** 16, because we don't support multicredit
+-	 * requests now.
+-	 */
+-	wsize = min_t(unsigned int, wsize, 2 << 15);
++	/* set it to the maximum buffer size value we can send with 1 credit */
++	wsize = min_t(unsigned int, wsize, SMB2_MAX_BUFFER_SIZE);
+ 
+ 	return wsize;
+ }
+@@ -200,11 +197,8 @@ smb2_negotiate_rsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
+ 	/* start with specified rsize, or default */
+ 	rsize = volume_info->rsize ? volume_info->rsize : CIFS_DEFAULT_IOSIZE;
+ 	rsize = min_t(unsigned int, rsize, server->max_read);
+-	/*
+-	 * limit write size to 2 ** 16, because we don't support multicredit
+-	 * requests now.
+-	 */
+-	rsize = min_t(unsigned int, rsize, 2 << 15);
++	/* set it to the maximum buffer size value we can send with 1 credit */
++	rsize = min_t(unsigned int, rsize, SMB2_MAX_BUFFER_SIZE);
+ 
+ 	return rsize;
+ }
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 2013234..787e171 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -413,7 +413,9 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
+ 
+ 	/* SMB2 only has an extended negflavor */
+ 	server->negflavor = CIFS_NEGFLAVOR_EXTENDED;
+-	server->maxBuf = le32_to_cpu(rsp->MaxTransactSize);
++	/* set it to the maximum buffer size value we can send with 1 credit */
++	server->maxBuf = min_t(unsigned int, le32_to_cpu(rsp->MaxTransactSize),
++			       SMB2_MAX_BUFFER_SIZE);
+ 	server->max_read = le32_to_cpu(rsp->MaxReadSize);
+ 	server->max_write = le32_to_cpu(rsp->MaxWriteSize);
+ 	/* BB Do we need to validate the SecurityMode? */
+-- 
+1.7.10.4
