@@ -1,84 +1,63 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH] CIFS: Fix too big maxBuf size for SMB3 mounts
-Date: Fri, 14 Feb 2014 13:31:02 +0400
-Message-ID: <1392370263-10364-1-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH] CIFS: Fix wrong pos argument of cifs_find_lock_conflict
+Date: Fri, 14 Feb 2014 13:31:03 +0400
+Message-ID: <1392370263-10364-2-git-send-email-piastry@etersoft.ru>
+References: <1392370263-10364-1-git-send-email-piastry@etersoft.ru>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1392370263-10364-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-SMB3 servers can respond with MaxTransactSize of more than 4M
-that can cause a memory allocation error returned from kmalloc
-in a lock codepath. Also the client doesn't support multicredit
-requests now and allows buffer sizes of 65536 bytes only. Set
-MaxTransactSize to this maximum supported value.
+and use generic_file_aio_write rather than __generic_file_aio_write
+in cifs_writev.
 
-Cc: stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org # 3.7+
 Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/smb2glob.h |    3 +++
- fs/cifs/smb2ops.c  |   14 ++++----------
- fs/cifs/smb2pdu.c  |    4 +++-
- 3 files changed, 10 insertions(+), 11 deletions(-)
+ fs/cifs/file.c |   24 ++++++------------------
+ 1 file changed, 6 insertions(+), 18 deletions(-)
 
-diff --git a/fs/cifs/smb2glob.h b/fs/cifs/smb2glob.h
-index c383508..bc0bb9c 100644
---- a/fs/cifs/smb2glob.h
-+++ b/fs/cifs/smb2glob.h
-@@ -57,4 +57,7 @@
- #define SMB2_CMACAES_SIZE (16)
- #define SMB3_SIGNKEY_SIZE (16)
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index a7eda8e..d34dc3b 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -2539,31 +2539,19 @@ cifs_writev(struct kiocb *iocb, const struct iovec *iov,
+ 	struct cifsInodeInfo *cinode = CIFS_I(inode);
+ 	struct TCP_Server_Info *server = tlink_tcon(cfile->tlink)->ses->server;
+ 	ssize_t rc = -EACCES;
++	loff_t lock_pos = pos;
  
-+/* Maximum buffer size value we can send with 1 credit */
-+#define SMB2_MAX_BUFFER_SIZE 65536
-+
- #endif	/* _SMB2_GLOB_H */
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 757da3e..192f51a 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -182,11 +182,8 @@ smb2_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
- 	/* start with specified wsize, or default */
- 	wsize = volume_info->wsize ? volume_info->wsize : CIFS_DEFAULT_IOSIZE;
- 	wsize = min_t(unsigned int, wsize, server->max_write);
--	/*
--	 * limit write size to 2 ** 16, because we don't support multicredit
--	 * requests now.
--	 */
--	wsize = min_t(unsigned int, wsize, 2 << 15);
-+	/* set it to the maximum buffer size value we can send with 1 credit */
-+	wsize = min_t(unsigned int, wsize, SMB2_MAX_BUFFER_SIZE);
- 
- 	return wsize;
+-	BUG_ON(iocb->ki_pos != pos);
+-
++	if (file->f_flags & O_APPEND)
++		lock_pos = i_size_read(inode);
+ 	/*
+ 	 * We need to hold the sem to be sure nobody modifies lock list
+ 	 * with a brlock that prevents writing.
+ 	 */
+ 	down_read(&cinode->lock_sem);
+-	if (!cifs_find_lock_conflict(cfile, pos, iov_length(iov, nr_segs),
++	if (!cifs_find_lock_conflict(cfile, lock_pos, iov_length(iov, nr_segs),
+ 				     server->vals->exclusive_lock_type, NULL,
+-				     CIFS_WRITE_OP)) {
+-		mutex_lock(&inode->i_mutex);
+-		rc = __generic_file_aio_write(iocb, iov, nr_segs,
+-					       &iocb->ki_pos);
+-		mutex_unlock(&inode->i_mutex);
+-	}
+-
+-	if (rc > 0) {
+-		ssize_t err;
+-
+-		err = generic_write_sync(file, iocb->ki_pos - rc, rc);
+-		if (err < 0)
+-			rc = err;
+-	}
+-
++				     CIFS_WRITE_OP))
++		rc = generic_file_aio_write(iocb, iov, nr_segs, pos);
+ 	up_read(&cinode->lock_sem);
+ 	return rc;
  }
-@@ -200,11 +197,8 @@ smb2_negotiate_rsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
- 	/* start with specified rsize, or default */
- 	rsize = volume_info->rsize ? volume_info->rsize : CIFS_DEFAULT_IOSIZE;
- 	rsize = min_t(unsigned int, rsize, server->max_read);
--	/*
--	 * limit write size to 2 ** 16, because we don't support multicredit
--	 * requests now.
--	 */
--	rsize = min_t(unsigned int, rsize, 2 << 15);
-+	/* set it to the maximum buffer size value we can send with 1 credit */
-+	rsize = min_t(unsigned int, rsize, SMB2_MAX_BUFFER_SIZE);
- 
- 	return rsize;
- }
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 2013234..787e171 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -413,7 +413,9 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
- 
- 	/* SMB2 only has an extended negflavor */
- 	server->negflavor = CIFS_NEGFLAVOR_EXTENDED;
--	server->maxBuf = le32_to_cpu(rsp->MaxTransactSize);
-+	/* set it to the maximum buffer size value we can send with 1 credit */
-+	server->maxBuf = min_t(unsigned int, le32_to_cpu(rsp->MaxTransactSize),
-+			       SMB2_MAX_BUFFER_SIZE);
- 	server->max_read = le32_to_cpu(rsp->MaxReadSize);
- 	server->max_write = le32_to_cpu(rsp->MaxWriteSize);
- 	/* BB Do we need to validate the SecurityMode? */
 -- 
 1.7.10.4
