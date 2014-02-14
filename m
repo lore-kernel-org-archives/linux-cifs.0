@@ -1,66 +1,48 @@
-From: Gionatan Danti <g.danti-N44kj/XGErOonA0d6jMUrA@public.gmane.org>
-Subject: Re: Problem with Samba re-share of a CIFS mount
-Date: Fri, 14 Feb 2014 15:10:16 +0100
-Message-ID: <52FE23C8.8060804@assyoma.it>
-References: <52F9EDA5.1020004@assyoma.it>	<20140211103302.6d74b90d@tlielax.poochiereds.net>	<52FA46D5.8020904@assyoma.it>	<20140211124536.5fdcb56f@tlielax.poochiereds.net>	<CAH2r5mvQ590zaniv3cDuu+Do0N9TePasTaEFkrNSAdatTiaZ5Q@mail.gmail.com>	<20140213063738.1b345466@tlielax.poochiereds.net>	<52FD0109.5030909@assyoma.it>	<20140213144038.2101ea44@tlielax.poochiereds.net>	<52FDEF0D.8010708@assyoma.it> <20140214071724.725d8545@tlielax.poochiereds.net>
+From: "Dr.William Davies" <purchase-iWkfCuf1Dv8t08DiuWRmVZ/QNRX+jHPU@public.gmane.org>
+Subject: Re: Instructions to release your payment.
+Date: Fri, 14 Feb 2014 18:06:49 +0530
+Message-ID: <05850bfa675129882bc42edd957194c7__12525.2473670573$1392389501$gmane$org@127.0.0.1>
+Reply-To: williamdavies54-/E1597aS9LT10XsdtD+oqA@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	James McDonough <jmcd-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Suresh Jayaraman <sjayaraman-Et1tbQHTxzrQT0dZR+AlfA@public.gmane.org>,
-	"Christopher R. Hertel" <crh-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Gionatan Danti <g.danti-N44kj/XGErOonA0d6jMUrA@public.gmane.org>
-To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+To: undisclosed-recipients:;
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20140214071724.725d8545-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+Attention
 
+Sir,
 
-On 02/14/2014 01:17 PM, Jeff Layton wrote:
->
-> That's basically what cache=loose does with cifs. One might consider
-> that to be an NFS-like caching model. That used to be the default
-> behavior, but we changed it a few years ago since strict adherence
-> to the protocol is really the only way to ensure that you don't end up
-> with data corruption.
->
-> The main problem with that is that Windows servers do lazy updates to
-> their LastWriteTime (aka mtime), so watching for mtime changes is not a
-> reliable method for detecting when a file has changed.
+Following an application brought, seeking the release of your due payment
+through British bank, I am directed to inform you that the application has
+been approved and Natwest bank of London has been mandated to make transfer
+of your payment to the bank account you will nominate. Please kindly reply
+for immediate release of your US$6.2 Million to you nominates account.
 
-Ok
+Sir, for the avoidance of doubts, reconfirm the following information to
+me to enable us forward same to Natwest bank to contact you for your
+payment.
 
-> That's correct. If you however, mount with cache=loose then fsc should
-> persist across reboots as long as the files don't appear to have
-> changed. That has its own problems however, particularly if you're
-> dealing with Windows servers (see the comment above about lazy updates
-> to LastWriteTime).
+Name:
 
-This also match with what I observed through my tests :)
+Address:
 
-> One thing you could consider is looking into BranchCache if you are
-> using a relatively recent Windows infrastructure:
->
->      http://technet.microsoft.com/en-us/network/dd425028.aspx
->
-> Chris Hertel had also started a project to implement something similar
-> on unix-y OS' as well, but I'm not sure of the current state of that
-> work.
->
+Tel/Fax No.:
 
-True, but I can't use Windows 2008R2/2012 on the remote box (this is a 
-requirement), so branchcache is not an option here. After all, in a 
-Windows server to Windows server scenario, DFSR would be a very 
-compelling solution (even better then branchcache, in my opinion).
+Nationality:
 
-Let me thank all you for the time dedicated to me and to the samba project!
+Occupation:
 
--- 
-Danti Gionatan
-Supporto Tecnico
-Assyoma S.r.l. - www.assyoma.it
-email: g.danti-N44kj/XGErOonA0d6jMUrA@public.gmane.org - info-N44kj/XGErOonA0d6jMUrA@public.gmane.org
-GPG public key ID: FF5F32A8
+Date of birth: 
+
+As soon as I received the above information, I will forward them to
+Natwest bank to contact you for your approved payment. Please see in the
+attachment, letter I wrote to Natwest bank informing them of the
+transaction
+
+Yours faithfully
+
+Dr.William Davies
+Chairman,British Banking Regulatory Board.
