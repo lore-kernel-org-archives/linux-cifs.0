@@ -1,112 +1,101 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: Problem with Samba re-share of a CIFS mount
-Date: Fri, 14 Feb 2014 07:17:24 -0500
-Message-ID: <20140214071724.725d8545@tlielax.poochiereds.net>
-References: <52F9EDA5.1020004@assyoma.it>
-	<20140211103302.6d74b90d@tlielax.poochiereds.net>
-	<52FA46D5.8020904@assyoma.it>
-	<20140211124536.5fdcb56f@tlielax.poochiereds.net>
-	<CAH2r5mvQ590zaniv3cDuu+Do0N9TePasTaEFkrNSAdatTiaZ5Q@mail.gmail.com>
-	<20140213063738.1b345466@tlielax.poochiereds.net>
-	<52FD0109.5030909@assyoma.it>
-	<20140213144038.2101ea44@tlielax.poochiereds.net>
-	<52FDEF0D.8010708@assyoma.it>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	James McDonough <jmcd-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	"Suresh Jayaraman" <sjayaraman-Et1tbQHTxzrQT0dZR+AlfA@public.gmane.org>,
-	"Christopher R. Hertel" <crh-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-To: Gionatan Danti <g.danti-N44kj/XGErOonA0d6jMUrA@public.gmane.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: ensure that uncached writes handle unmapped areas correctly
+Date: Fri, 14 Feb 2014 07:20:35 -0500
+Message-ID: <1392380435-6903-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <52FDEF0D.8010708-N44kj/XGErOonA0d6jMUrA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 14 Feb 2014 11:25:17 +0100
-Gionatan Danti <g.danti-N44kj/XGErOonA0d6jMUrA@public.gmane.org> wrote:
+It's possible for userland to pass down an iovec via writev() that has a
+bogus user pointer in it. If that happens and we're doing an uncached
+write, then we can end up getting less bytes than we expect from the
+call to iov_iter_copy_from_user.
 
-> 
-> 
-> On 02/13/2014 08:40 PM, Jeff Layton wrote:
-> >
-> > You'll have similar problems with NFS.
-> >
-> > You can't acquire leases on NFS either, so with kernel oplocks enabled
-> > on samba you won't ever get oplocks on there. If you turn them off (so
-> > that oplocks are tracked internally) you won't be aware of changes that
-> > occur outside of samba.
-> 
-> Ok, so it is the SMB protocol which is intrinsically unfriendly to 
-> persistent caches. Maybe it is for this very same reason that Microsoft 
-> suggest to use the "offline files" feature only where files change on 
-> one single side (eg: laptop).
-> 
-> > I don't recall whether Suresh ever fixed those bugs. cifs+fsc is
-> > certainly not widely used, and it wouldn't surprise me if it were still
-> > horribly buggy.
-> >
-> > fscache is somewhat at odds with the fundamental caching model of the
-> > cifs protocol. The whole point of fscache is to speed up access to
-> > frequently read files when a client starts up, and to reduce load on the
-> > server in these cases.
-> >
-> > For NFS, that works because we rely on looking at inode attributes to
-> > determine whether the file has changed (i.e. the mtime, size, NFSv4
-> > change attribute). So, with NFS we can reasonably tell whether a file
-> > has changed across a client remount.
-> >
-> > For CIFS, things are different. The protocol basically states that you
-> > should only cache file data if you hold an oplock, and you only get an
-> > oplock when you open a file. When you first bring up a client, you
-> > don't hold one, so you really should just toss out any data that you're
-> > caching...thereby making fscache sort of pointless.
-> 
-> What about not having an oplock but watch at file attributes (eg: last 
-> modified date)? I think cache=loose do this same thing. The man page say 
-> that Windows can be "lazy" to update file's attribute, but I think that 
-> we are speaking of some seconds at most. In scenarios with low 
-> cross-editing probability, this some-second window seems reasonable 
-> small. I am missing something?
-> 
+cifs_iovec_write isn't set up to handle that situation however. It'll
+blindly keep chugging through the page array and not filling those pages
+with anything useful. Worse yet, we'll later end up with a negative
+number in wdata->tailsz, which will confuse the sending routines and
+cause an oops at the very least.
 
-That's basically what cache=loose does with cifs. One might consider
-that to be an NFS-like caching model. That used to be the default
-behavior, but we changed it a few years ago since strict adherence
-to the protocol is really the only way to ensure that you don't end up
-with data corruption.
+Fix this by having the copy phase of cifs_iovec_write stop copying data
+in this situation and send the last write as a short one. At the same
+time, we want to avoid sending a zero-length write to the server, so
+break out of the loop and set rc to -EFAULT if that happens. This also
+allows us to handle the case where no address in the iovec is valid.
 
-The main problem with that is that Windows servers do lazy updates to
-their LastWriteTime (aka mtime), so watching for mtime changes is not a
-reliable method for detecting when a file has changed.
+[Note: Marking this for stable on v3.4+ kernels, but kernels as old as
+       v2.6.38 may have a similar problem and may need similar fix]
 
-> > Now, there is some argument that you can use fsc and still follow the
-> > protocol by using it as "swap for pagecache". IOW, you could use it
-> > to cache a large amount of open file data than you have memory. I'm not
-> > aware of anyone having actually tested to see if that works however.
-> >
-> 
-> Mmm... this "swap for pagecache" will not survive reboot, right? Or, 
-> better stated, the cache _will_ survive, but by not having any oplock, 
-> the client will request the live data from the server, right?
-> 
+Cc: <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org> # v3.4+
+Reviewed-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Reported-by: Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/file.c | 37 ++++++++++++++++++++++++++++++++++---
+ 1 file changed, 34 insertions(+), 3 deletions(-)
 
-That's correct. If you however, mount with cache=loose then fsc should
-persist across reboots as long as the files don't appear to have
-changed. That has its own problems however, particularly if you're
-dealing with Windows servers (see the comment above about lazy updates
-to LastWriteTime).
-
-One thing you could consider is looking into BranchCache if you are
-using a relatively recent Windows infrastructure:
-
-    http://technet.microsoft.com/en-us/network/dd425028.aspx
-
-Chris Hertel had also started a project to implement something similar
-on unix-y OS' as well, but I'm not sure of the current state of that
-work.
-
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 03d1f454c713..ae1a4d58e672 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -2387,7 +2387,7 @@ cifs_iovec_write(struct file *file, const struct iovec *iov,
+ 		 unsigned long nr_segs, loff_t *poffset)
+ {
+ 	unsigned long nr_pages, i;
+-	size_t copied, len, cur_len;
++	size_t bytes, copied, len, cur_len;
+ 	ssize_t total_written = 0;
+ 	loff_t offset;
+ 	struct iov_iter it;
+@@ -2442,14 +2442,45 @@ cifs_iovec_write(struct file *file, const struct iovec *iov,
+ 
+ 		save_len = cur_len;
+ 		for (i = 0; i < nr_pages; i++) {
+-			copied = min_t(const size_t, cur_len, PAGE_SIZE);
++			bytes = min_t(const size_t, cur_len, PAGE_SIZE);
+ 			copied = iov_iter_copy_from_user(wdata->pages[i], &it,
+-							 0, copied);
++							 0, bytes);
+ 			cur_len -= copied;
+ 			iov_iter_advance(&it, copied);
++			/*
++			 * If we didn't copy as much as we expected, then that
++			 * may mean we trod into an unmapped area. Stop copying
++			 * at that point. On the next pass through the big
++			 * loop, we'll likely end up getting a zero-length
++			 * write and bailing out of it.
++			 */
++			if (copied < bytes)
++				break;
+ 		}
+ 		cur_len = save_len - cur_len;
+ 
++		/*
++		 * If we have no data to send, then that probably means that
++		 * the copy above failed altogether. That's most likely because
++		 * the address in the iovec was bogus. Set the rc to -EFAULT,
++		 * free anything we allocated and bail out.
++		 */
++		if (!cur_len) {
++			for (i = 0; i < nr_pages; i++)
++				put_page(wdata->pages[i]);
++			kfree(wdata);
++			rc = -EFAULT;
++			break;
++		}
++
++		/*
++		 * i + 1 now represents the number of pages we actually used in
++		 * the copy phase above. Bring nr_pages down to that, and free
++		 * any pages that we didn't use.
++		 */
++		for ( ; nr_pages > i + 1; nr_pages--)
++			put_page(wdata->pages[nr_pages - 1]);
++
+ 		wdata->sync_mode = WB_SYNC_ALL;
+ 		wdata->nr_pages = nr_pages;
+ 		wdata->offset = (__u64)offset;
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+1.8.5.3
