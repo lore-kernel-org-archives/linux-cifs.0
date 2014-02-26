@@ -1,38 +1,67 @@
-From: "Lorenz Bucher" <Lorenz.Bucher@gmx.de>
-Subject: [PATCH] cifs: connect: added option krb5mi which may allow package
- signing
-Date: Wed, 26 Feb 2014 14:46:47 +0100
-Message-ID: <trinity-7e911dab-5097-463a-ba4a-09935acbdc69-1393422407694@3capp-gmx-bs33>
+From: "Ross, Matt" <m.g.ross-OfppCuUFkUX10XsdtD+oqA@public.gmane.org>
+Subject: Using PAM module without Kerberos
+Date: Wed, 26 Feb 2014 15:53:52 +0000
+Message-ID: <BC8B39086BF9F141A4EB3AAF7D7AAF2E026E5E69D5@UH-MAILSTOR.herts.ac.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org, lorenz.bucher@gmx.de
-To: sfrench@samba.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Language: en-US
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Solves an issue with dfs where servers using package signing are
-mixed with servers which don't use package signing.
+Hello,
 
-Signed-off-by: Lorenz Bucher <lorenz.bucher@gmx.de>
----
- fs/cifs/connect.c |    3 +++
- 1 file changed, 3 insertions(+)
+I am trying to add credentials to a multiuser mounted CIFS share using the new PAM module. We do not have Kerberos (and I suspect that's the problem). Our users are in an Edirectory LDAP server. I have compiled from source cifs-utils 6.3, keyutils 1.5.8 and Linux kernel 3.13.3 with all CIFS features enabled. This is an x64 Debian Jessie installation.
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 56c152d..9d06dd8 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1104,6 +1104,9 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
-                        if (!value || !*value) {
-                                cERROR(1, "no security value specified");
-                                continue;
-+                       } else if (strnicmp(value, "krb5mi", 6) == 0) {
-+                               vol->secFlg |= CIFSSEC_MAY_KRB5 | 
-+                                       CIFSSEC_MAY_SIGN;
-                        } else if (strnicmp(value, "krb5i", 5) == 0) {
-                                vol->secFlg |= CIFSSEC_MAY_KRB5 |
-                                        CIFSSEC_MUST_SIGN;
--- 
-1.7.9.5
+Currently I can mount the volume successfully at system boot using:
+
+//cifsserver/share1   /mnt1   cifs    sec=ntlmv2,noserverino,multiuser,user=user1,pass=user1pass
+
+The 'user1' user has limited read rights. When a user logs in I am hoping 'pam_cifscreds' can add their credentials. These are the relevant PAM files:
+
+common-account:
+account sufficient      pam_unix.so
+account required        pam_ldap.so use_first_pass
+
+common-auth:
+auth    sufficient      pam_unix.so nullok_secure
+auth    required        pam_ldap.so use_first_pass
+auth    required        pam_cifscreds.so debug
+
+common-password:
+password        sufficient      pam_unix.so nullok obscure min=4 max=8 md5
+password        required        pam_ldap.so use_first_pass
+
+common-session:
+session optional        pam_keyinit.so force revoke debug
+session sufficient      pam_unix.so
+session required        pam_ldap.so use_first_pass
+session optional        pam_cifscreds.so cifsserver.ourdomain debug
+
+Login succeeds for the user but access to their home directory fails:
+
+Could not chdir to home directory /mnt1/user1: Permission denied
+cp: failed to access '/mnt1/user1/Desktop': Permission denied
+-bash: /mnt1/user1/.bash_profile: Permission denied
+
+At this point the logged in user can manually run 'cifscreds add -u user1 cifsserver' and after entering the password access is granted to their home directory. From then on everything appears to work correctly.
+
+Syslog contains:
+
+Feb 26 15:13:06 pc1 kernel: [   53.466080] type=1006 audit(1393427586.425:2): pid=3370 uid=0 old auid=4294967295 new auid=2471 old ses=4294967295 new ses=1 res=1
+Feb 26 15:13:06 pc1 cifs.upcall: key description: logon;2471;12742;3d010000;cifs:a:192.168.1.15
+Feb 26 15:13:06 pc1 cifs.upcall: unable to get necessary params from key description (0x0)
+Feb 26 15:13:06 pc1 cifs.upcall: Exit status 1
+
+As a failed experiment I tried creating '/etc/request-key.d/logon.conf' containing:
+
+create  logon    * * /usr/sbin/cifs.upcall %k
+
+
+So my question is this: can the pam_cifscreds module be used without Kerberos? If not how could I add the manual 'cifscreds add ...' command into a PAM module to do this without the user having to run that command once logged in?
+
+Thanks,
+
+Matt Ross
