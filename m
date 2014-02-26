@@ -1,40 +1,38 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: mask off top byte in get_rfc1002_length()
-Date: Tue, 25 Feb 2014 05:27:17 -0800
-Message-ID: <1393334837-6480-1-git-send-email-jlayton@redhat.com>
-Cc: klaus-jjkdzbv0JQgAvxtiuMwx3w@public.gmane.org, sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: "Lorenz Bucher" <Lorenz.Bucher@gmx.de>
+Subject: [PATCH] cifs: connect: added option krb5mi which may allow package
+ signing
+Date: Wed, 26 Feb 2014 14:46:47 +0100
+Message-ID: <trinity-7e911dab-5097-463a-ba4a-09935acbdc69-1393422407694@3capp-gmx-bs33>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org, lorenz.bucher@gmx.de
+To: sfrench@samba.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-The 32-bit rfc1002 header field consists of a type byte and then a
-24-bit length field, but get_rfc1002_length doesn't mask off the top
-byte.
+Solves an issue with dfs where servers using package signing are
+mixed with servers which don't use package signing.
 
-In most cases, it's not a problem since the RFC1002_SESSION_MESSAGE type
-is '\0', but when doing a RFC1002 session establishment, the type is
-non-zero and that throws off the returned length in smb_send_rqst.
-
-Reported-by: klaus-jjkdzbv0JQgAvxtiuMwx3w@public.gmane.org
-Tested-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Lorenz Bucher <lorenz.bucher@gmx.de>
 ---
- fs/cifs/cifsglob.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/cifs/connect.c |    3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index e7fe49e..45376a4 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -506,7 +506,7 @@ struct cifs_mnt_data {
- static inline unsigned int
- get_rfc1002_length(void *buf)
- {
--	return be32_to_cpu(*((__be32 *)buf));
-+	return be32_to_cpu(*((__be32 *)buf)) & 0xffffff;
- }
- 
- static inline void
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 56c152d..9d06dd8 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -1104,6 +1104,9 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+                        if (!value || !*value) {
+                                cERROR(1, "no security value specified");
+                                continue;
++                       } else if (strnicmp(value, "krb5mi", 6) == 0) {
++                               vol->secFlg |= CIFSSEC_MAY_KRB5 | 
++                                       CIFSSEC_MAY_SIGN;
+                        } else if (strnicmp(value, "krb5i", 5) == 0) {
+                                vol->secFlg |= CIFSSEC_MAY_KRB5 |
+                                        CIFSSEC_MUST_SIGN;
 -- 
-1.8.5.3
+1.7.9.5
