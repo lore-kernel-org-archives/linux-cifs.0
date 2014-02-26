@@ -1,10 +1,10 @@
 From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Subject: [PATCH] cifs: Allow mounts with restricted intermediate paths (try #2)
-Date: Wed, 26 Feb 2014 13:52:33 -0600
-Message-ID: <1393444353-10343-1-git-send-email-spargaonkar@suse.com>
+Date: Wed, 26 Feb 2014 13:54:08 -0600
+Message-ID: <1393444448-10428-1-git-send-email-spargaonkar@suse.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	Shirish Pargaonkar <spargaonkar-IBi9RG/b67k@public.gmane.org>
-To: sfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
