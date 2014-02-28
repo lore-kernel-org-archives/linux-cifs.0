@@ -1,38 +1,17 @@
-From: Joseph Salisbury <joseph.salisbury@canonical.com>
-Subject: [v3.2.y][PATCH 0/1] cifs: set MAY_SIGN when sec=krb5
-Date: Fri, 28 Feb 2014 16:07:34 -0500
-Message-ID: <cover.1393535604.git.joseph.salisbury@canonical.com>
-Cc: sfrench@samba.org, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-To: ben@decadent.org.uk
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Jantima Khuntaraksa <jantima-gCXJGrAKrFGbm3MfvsbmpNBPR1lH4CV8@public.gmane.org>
+Subject: CONTACT KENYA COMMERCIAL BANK LTD IMMEDIATELY FOR YOUR PAYMENT
+ (3MILLION UNITED STATE DOLLARS)
+Date: Fri, 28 Feb 2014 21:11:48 +0000 (UTC)
+Message-ID: <597971520.33985.1393621908151.JavaMail.root__12219.5095791996$1393630791$gmane$org@steelintertech.com>
+Reply-To: "services1-py1S3xSekbcqXcoKDXGW6Nrp2yU+P/Jj@public.gmane.org"
+	  <services1-py1S3xSekbcqXcoKDXGW6Nrp2yU+P/Jj@public.gmane.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+To: undisclosed-recipients:;
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-BugLink: http://bugs.launchpad.net/bugs/1285723
-
-Hi Ben,
-
-Please consider including a backport of upstream commit 0b7bc84000d71f3647ca33ab1bf5bd928535c846 in the next v3.2.y release.  It was included upstream as of v3.9-rc1.  It has been tested and confirmed to resolve http://bugs.launchpad.net/bugs/1285723 .
-
-commit 0b7bc84000d71f3647ca33ab1bf5bd928535c846
-Author: Martijn de Gouw <martijn.de.gouw@prodrive.nl>
-Date:   Wed Oct 24 11:45:46 2012 +0200
-
-    cifs: set MAY_SIGN when sec=krb5
-
-This commit has a requrement for commit 8830d7e07a5e38bc47650a7554b7c1cfd49902bf, so it does not apply cleanly to v3.2.  I performed a backport to avoid this requirement, which is in email 1/1.
-
-
-Sincerely,
-Joseph Salisbury
-
-Joseph Salisbury (1):
-  cifs: set MAY_SIGN when sec=krb5
-
- fs/cifs/connect.c |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
--- 
-1.7.9.5
+Attention: Please, Kindly contact KENYA COMMERCIAL BANK immediately for your compensation payment of (3MILLION UNITED STATE DOLLARS) via email: Email:(services1-py1S3xSekbcqXcoKDXGW6Nrp2yU+P/Jj@public.gmane.org) quote your payment Ref No:KCB/00Y/2014 For purposes of immediate payment.   
+ 
