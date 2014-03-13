@@ -1,289 +1,429 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: Allow mounts for paths for restricted
- intermediate paths
-Date: Wed, 12 Mar 2014 15:04:36 -0400
-Message-ID: <20140312150436.610544ed@tlielax.poochiereds.net>
-References: <1384878813-7413-1-git-send-email-shirishpargaonkar@gmail.com>
-	<20131119155923.31181d93@tlielax.poochiereds.net>
-	<CADT32eL5R3oFiH9ZO8hK=+QA7wcjCHQbfCFn0W9+o3VH4YfXnw@mail.gmail.com>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH v3] cifs: Wait for writebacks to complete before
+ attempting write.
+Date: Thu, 13 Mar 2014 10:15:43 +0400
+Message-ID: <CAKywueQqsZYy=h2JYbOQnsNSBT6c_jN0FSqX2SZpLQ2615XkFA@mail.gmail.com>
+References: <1394554307-27611-1-git-send-email-sprabhu@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32eL5R3oFiH9ZO8hK=+QA7wcjCHQbfCFn0W9+o3VH4YfXnw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1394554307-27611-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 12 Mar 2014 12:38:02 -0500
-Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+2014-03-11 20:11 GMT+04:00 Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> Problem reported in Red Hat bz 1040329 for strict writes where we cache
+> only when we hold oplock and write direct to the server when we don't.
+>
+> When we receive an oplock break, we first change the oplock value for
+> the inode in cifsInodeInfo->oplock to indicate that we no longer hold
+> the oplock before we enqueue a task to flush changes to the backing
+> device. Once we have completed flushing the changes, we return the
+> oplock to the server.
+>
+> There are 2 ways here where we can have data corruption
+> 1) While we flush changes to the backing device as part of the oplock
+> break, we can have processes write to the file. These writes check for
+> the oplock, find none and attempt to write directly to the server.
+> These direct writes made while we are flushing from cache could be
+> overwritten by data being flushed from the cache causing data
+> corruption.
+> 2) While a thread runs in cifs_strict_writev, the machine could receive
+> and process an oplock break after the thread has checked the oplock and
+> found that it allows us to cache and before we have made changes to the
+> cache. In that case, we end up with a dirty page in cache when we
+> shouldn't have any. This will be flushed later and will overwrite all
+> subsequent writes to the part of the file represented by this page.
+>
+> Before making any writes to the server, we need to confirm that we are
+> not in the process of flushing data to the server and if we are, we
+> should wait until the process is complete before we attempt the write.
+> We should also wait for existing writes to complete before we process
+> an oplock break request which changes oplock values.
+>
+> We add a version specific  downgrade_oplock() operation to allow for
+> differences in the oplock values set for the different smb versions.
+>
+> Cc: stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/cifsfs.c    | 14 +++++++++-
+>  fs/cifs/cifsglob.h  |  8 ++++++
+>  fs/cifs/cifsproto.h |  3 +++
+>  fs/cifs/file.c      | 31 +++++++++++++++++++---
+>  fs/cifs/misc.c      | 74 +++++++++++++++++++++++++++++++++++++++++++++++++++--
+>  fs/cifs/smb1ops.c   | 11 ++++++++
+>  fs/cifs/smb2misc.c  | 18 ++++++++++---
+>  fs/cifs/smb2ops.c   | 14 ++++++++++
+>  8 files changed, 164 insertions(+), 9 deletions(-)
+>
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index 849f613..7c6b73c 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -253,6 +253,11 @@ cifs_alloc_inode(struct super_block *sb)
+>         cifs_set_oplock_level(cifs_inode, 0);
+>         cifs_inode->delete_pending = false;
+>         cifs_inode->invalid_mapping = false;
+> +       clear_bit(CIFS_INODE_PENDING_OPLOCK_BREAK, &cifs_inode->flags);
+> +       clear_bit(CIFS_INODE_PENDING_WRITERS, &cifs_inode->flags);
+> +       clear_bit(CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2, &cifs_inode->flags);
+> +       spin_lock_init(&cifs_inode->writers_lock);
+> +       cifs_inode->writers = 0;
+>         cifs_inode->vfs_inode.i_blkbits = 14;  /* 2**14 = CIFS_MAX_MSGSIZE */
+>         cifs_inode->server_eof = 0;
+>         cifs_inode->uniqueid = 0;
+> @@ -731,19 +736,26 @@ static ssize_t cifs_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
+>                                    unsigned long nr_segs, loff_t pos)
+>  {
+>         struct inode *inode = file_inode(iocb->ki_filp);
+> +       struct cifsInodeInfo *cinode = CIFS_I(inode);
+>         ssize_t written;
+>         int rc;
+>
+> +       written = cifs_get_writer(cinode);
+> +       if (written)
+> +               return written;
+> +
+>         written = generic_file_aio_write(iocb, iov, nr_segs, pos);
+>
+>         if (CIFS_CACHE_WRITE(CIFS_I(inode)))
+> -               return written;
+> +               goto out;
+>
+>         rc = filemap_fdatawrite(inode->i_mapping);
+>         if (rc)
+>                 cifs_dbg(FYI, "cifs_file_aio_write: %d rc on %p inode\n",
+>                          rc, inode);
+>
+> +out:
+> +       cifs_put_writer(cinode);
+>         return written;
+>  }
+>
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index cf32f03..8885ce8 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -228,6 +228,8 @@ struct smb_version_operations {
+>         /* verify the message */
+>         int (*check_message)(char *, unsigned int);
+>         bool (*is_oplock_break)(char *, struct TCP_Server_Info *);
+> +       void (*downgrade_oplock)(struct TCP_Server_Info *,
+> +                                       struct cifsInodeInfo *, bool);
+>         /* process transaction2 response */
+>         bool (*check_trans2)(struct mid_q_entry *, struct TCP_Server_Info *,
+>                              char *, int);
+> @@ -1113,6 +1115,12 @@ struct cifsInodeInfo {
+>         unsigned int epoch;             /* used to track lease state changes */
+>         bool delete_pending;            /* DELETE_ON_CLOSE is set */
+>         bool invalid_mapping;           /* pagecache is invalid */
+> +       unsigned long flags;
+> +#define CIFS_INODE_PENDING_OPLOCK_BREAK   (0) /* oplock break in progress */
+> +#define CIFS_INODE_PENDING_WRITERS       (1) /* Writes in progress */
+> +#define CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2 (2) /* Downgrade oplock to L2 */
+> +       spinlock_t writers_lock;
+> +       unsigned int writers;           /* Number of writers on this inode */
+>         unsigned long time;             /* jiffies of last update of inode */
+>         u64  server_eof;                /* current file size on server -- protected by i_lock */
+>         u64  uniqueid;                  /* server inode number */
+> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> index acc4ee8..ca7980a 100644
+> --- a/fs/cifs/cifsproto.h
+> +++ b/fs/cifs/cifsproto.h
+> @@ -127,6 +127,9 @@ extern u64 cifs_UnixTimeToNT(struct timespec);
+>  extern struct timespec cnvrtDosUnixTm(__le16 le_date, __le16 le_time,
+>                                       int offset);
+>  extern void cifs_set_oplock_level(struct cifsInodeInfo *cinode, __u32 oplock);
+> +extern int cifs_get_writer(struct cifsInodeInfo *cinode);
+> +extern void cifs_put_writer(struct cifsInodeInfo *cinode);
+> +extern void cifs_done_oplock_break(struct cifsInodeInfo *cinode);
+>  extern int cifs_unlock_range(struct cifsFileInfo *cfile,
+>                              struct file_lock *flock, const unsigned int xid);
+>  extern int cifs_push_mandatory_locks(struct cifsFileInfo *cfile);
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index 53c1507..9d07950 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -2620,12 +2620,20 @@ cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
+>         struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
+>         ssize_t written;
+>
+> +       written = cifs_get_writer(cinode);
+> +       if (written)
+> +               return written;
+> +
+>         if (CIFS_CACHE_WRITE(cinode)) {
+>                 if (cap_unix(tcon->ses) &&
+>                 (CIFS_UNIX_FCNTL_CAP & le64_to_cpu(tcon->fsUnixInfo.Capability))
+> -                   && ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0))
+> -                       return generic_file_aio_write(iocb, iov, nr_segs, pos);
+> -               return cifs_writev(iocb, iov, nr_segs, pos);
+> +                 && ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0)) {
+> +                       written = generic_file_aio_write(
+> +                                       iocb, iov, nr_segs, pos);
+> +                       goto out;
+> +               }
+> +               written = cifs_writev(iocb, iov, nr_segs, pos);
+> +               goto out;
+>         }
+>         /*
+>          * For non-oplocked files in strict cache mode we need to write the data
+> @@ -2645,6 +2653,8 @@ cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
+>                          inode);
+>                 cinode->oplock = 0;
+>         }
+> +out:
+> +       cifs_put_writer(cinode);
+>         return written;
+>  }
+>
+> @@ -3656,6 +3666,13 @@ static int cifs_launder_page(struct page *page)
+>         return rc;
+>  }
+>
+> +static int
+> +cifs_pending_writers_wait(void *unused)
+> +{
+> +       schedule();
+> +       return 0;
+> +}
+> +
+>  void cifs_oplock_break(struct work_struct *work)
+>  {
+>         struct cifsFileInfo *cfile = container_of(work, struct cifsFileInfo,
+> @@ -3663,8 +3680,15 @@ void cifs_oplock_break(struct work_struct *work)
+>         struct inode *inode = cfile->dentry->d_inode;
+>         struct cifsInodeInfo *cinode = CIFS_I(inode);
+>         struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
+> +       struct TCP_Server_Info *server = tcon->ses->server;
+>         int rc = 0;
+>
+> +       wait_on_bit(&cinode->flags, CIFS_INODE_PENDING_WRITERS,
+> +                       cifs_pending_writers_wait, TASK_UNINTERRUPTIBLE);
+> +
+> +       server->ops->downgrade_oplock(server, cinode,
+> +               test_bit(CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2, &cinode->flags));
+> +
+>         if (!CIFS_CACHE_WRITE(cinode) && CIFS_CACHE_READ(cinode) &&
+>                                                 cifs_has_mand_locks(cinode)) {
+>                 cifs_dbg(FYI, "Reset oplock to None for inode=%p due to mand locks\n",
+> @@ -3701,6 +3725,7 @@ void cifs_oplock_break(struct work_struct *work)
+>                                                              cinode);
+>                 cifs_dbg(FYI, "Oplock release rc = %d\n", rc);
+>         }
+> +       cifs_done_oplock_break(cinode);
+>  }
+>
+>  /*
+> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+> index 2f9f379..3b0c62e 100644
+> --- a/fs/cifs/misc.c
+> +++ b/fs/cifs/misc.c
+> @@ -466,8 +466,22 @@ is_valid_oplock_break(char *buffer, struct TCP_Server_Info *srv)
+>                                 cifs_dbg(FYI, "file id match, oplock break\n");
+>                                 pCifsInode = CIFS_I(netfile->dentry->d_inode);
+>
+> -                               cifs_set_oplock_level(pCifsInode,
+> -                                       pSMB->OplockLevel ? OPLOCK_READ : 0);
+> +                               set_bit(CIFS_INODE_PENDING_OPLOCK_BREAK,
+> +                                       &pCifsInode->flags);
+> +
+> +                               /*
+> +                                * Set flag if the server downgrades the oplock
+> +                                * to L2 else clear.
+> +                                */
+> +                               if (pSMB->OplockLevel)
+> +                                       set_bit(
+> +                                          CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2,
+> +                                          &pCifsInode->flags);
+> +                               else
+> +                                       clear_bit(
+> +                                          CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2,
+> +                                          &pCifsInode->flags);
+> +
+>                                 queue_work(cifsiod_wq,
+>                                            &netfile->oplock_break);
+>                                 netfile->oplock_break_cancelled = false;
+> @@ -551,6 +565,62 @@ void cifs_set_oplock_level(struct cifsInodeInfo *cinode, __u32 oplock)
+>                 cinode->oplock = 0;
+>  }
+>
+> +static int
+> +cifs_oplock_break_wait(void *unused)
+> +{
+> +       schedule();
+> +       return signal_pending(current) ? -ERESTARTSYS : 0;
+> +}
+> +
+> +/*
+> + * We wait for oplock breaks to be processed before we attempt to perform
+> + * writes.
+> + */
+> +int cifs_get_writer(struct cifsInodeInfo *cinode)
+> +{
+> +       int rc;
+> +
+> +start:
+> +       rc = wait_on_bit(&cinode->flags, CIFS_INODE_PENDING_OPLOCK_BREAK,
+> +                                  cifs_oplock_break_wait, TASK_KILLABLE);
+> +       if (rc)
+> +               return rc;
+> +
+> +       spin_lock(&cinode->writers_lock);
+> +       if (!cinode->writers)
+> +               set_bit(CIFS_INODE_PENDING_WRITERS, &cinode->flags);
+> +       cinode->writers++;
+> +       /* Check to see if we have started servicing an oplock break */
+> +       if (test_bit(CIFS_INODE_PENDING_OPLOCK_BREAK, &cinode->flags)) {
+> +               cinode->writers--;
+> +               if (cinode->writers == 0) {
+> +                       clear_bit(CIFS_INODE_PENDING_WRITERS, &cinode->flags);
+> +                       wake_up_bit(&cinode->flags, CIFS_INODE_PENDING_WRITERS);
+> +               }
+> +               spin_unlock(&cinode->writers_lock);
+> +               goto start;
+> +       }
+> +       spin_unlock(&cinode->writers_lock);
+> +       return 0;
+> +}
+> +
+> +void cifs_put_writer(struct cifsInodeInfo *cinode)
+> +{
+> +       spin_lock(&cinode->writers_lock);
+> +       cinode->writers--;
+> +       if (cinode->writers == 0) {
+> +               clear_bit(CIFS_INODE_PENDING_WRITERS, &cinode->flags);
+> +               wake_up_bit(&cinode->flags, CIFS_INODE_PENDING_WRITERS);
+> +       }
+> +       spin_unlock(&cinode->writers_lock);
+> +}
+> +
+> +void cifs_done_oplock_break(struct cifsInodeInfo *cinode)
+> +{
+> +       clear_bit(CIFS_INODE_PENDING_OPLOCK_BREAK, &cinode->flags);
+> +       wake_up_bit(&cinode->flags, CIFS_INODE_PENDING_OPLOCK_BREAK);
+> +}
+> +
+>  bool
+>  backup_cred(struct cifs_sb_info *cifs_sb)
+>  {
+> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+> index 526fb89..2cc7d78 100644
+> --- a/fs/cifs/smb1ops.c
+> +++ b/fs/cifs/smb1ops.c
+> @@ -372,6 +372,16 @@ coalesce_t2(char *second_buf, struct smb_hdr *target_hdr)
+>         return 0;
+>  }
+>
+> +void
+> +cifs_downgrade_oplock(struct TCP_Server_Info *server,
+> +                       struct cifsInodeInfo *cinode, bool set_level2)
+> +{
+> +       if (set_level2)
+> +               cifs_set_oplock_level(cinode, OPLOCK_READ);
+> +       else
+> +               cifs_set_oplock_level(cinode, 0);
+> +}
+> +
+>  static bool
+>  cifs_check_trans2(struct mid_q_entry *mid, struct TCP_Server_Info *server,
+>                   char *buf, int malformed)
+> @@ -1019,6 +1029,7 @@ struct smb_version_operations smb1_operations = {
+>         .clear_stats = cifs_clear_stats,
+>         .print_stats = cifs_print_stats,
+>         .is_oplock_break = is_valid_oplock_break,
+> +       .downgrade_oplock = cifs_downgrade_oplock,
+>         .check_trans2 = cifs_check_trans2,
+>         .need_neg = cifs_need_neg,
+>         .negotiate = cifs_negotiate,
+> diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
+> index fb39662..b8021fd 100644
+> --- a/fs/cifs/smb2misc.c
+> +++ b/fs/cifs/smb2misc.c
+> @@ -575,9 +575,21 @@ smb2_is_valid_oplock_break(char *buffer, struct TCP_Server_Info *server)
+>                                 else
+>                                         cfile->oplock_break_cancelled = false;
+>
+> -                               server->ops->set_oplock_level(cinode,
+> -                                 rsp->OplockLevel ? SMB2_OPLOCK_LEVEL_II : 0,
+> -                                 0, NULL);
+> +                               set_bit(CIFS_INODE_PENDING_OPLOCK_BREAK,
+> +                                       &cinode->flags);
+> +
+> +                               /*
+> +                                * Set flag if the server downgrades the oplock
+> +                                * to L2 else clear.
+> +                                */
+> +                               if (rsp->OplockLevel)
+> +                                       set_bit(
+> +                                          CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2,
+> +                                          &cinode->flags);
+> +                               else
+> +                                       clear_bit(
+> +                                          CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2,
+> +                                          &cinode->flags);
+>
+>                                 queue_work(cifsiod_wq, &cfile->oplock_break);
+>
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index 192f51a..ab8964d 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -904,6 +904,17 @@ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
+>         return rc;
+>  }
+>
+> +void
+> +smb2_downgrade_oplock(struct TCP_Server_Info *server,
+> +                       struct cifsInodeInfo *cinode, bool set_level2)
+> +{
+> +       if (set_level2)
+> +               server->ops->set_oplock_level(cinode, SMB2_OPLOCK_LEVEL_II,
+> +                                               0, NULL);
+> +       else
+> +               server->ops->set_oplock_level(cinode, 0, 0, NULL);
+> +}
+> +
+>  static void
+>  smb2_set_oplock_level(struct cifsInodeInfo *cinode, __u32 oplock,
+>                       unsigned int epoch, bool *purge_cache)
+> @@ -1110,6 +1121,7 @@ struct smb_version_operations smb20_operations = {
+>         .clear_stats = smb2_clear_stats,
+>         .print_stats = smb2_print_stats,
+>         .is_oplock_break = smb2_is_valid_oplock_break,
+> +       .downgrade_oplock = smb2_downgrade_oplock,
+>         .need_neg = smb2_need_neg,
+>         .negotiate = smb2_negotiate,
+>         .negotiate_wsize = smb2_negotiate_wsize,
+> @@ -1184,6 +1196,7 @@ struct smb_version_operations smb21_operations = {
+>         .clear_stats = smb2_clear_stats,
+>         .print_stats = smb2_print_stats,
+>         .is_oplock_break = smb2_is_valid_oplock_break,
+> +       .downgrade_oplock = smb2_downgrade_oplock,
+>         .need_neg = smb2_need_neg,
+>         .negotiate = smb2_negotiate,
+>         .negotiate_wsize = smb2_negotiate_wsize,
+> @@ -1259,6 +1272,7 @@ struct smb_version_operations smb30_operations = {
+>         .print_stats = smb2_print_stats,
+>         .dump_share_caps = smb2_dump_share_caps,
+>         .is_oplock_break = smb2_is_valid_oplock_break,
+> +       .downgrade_oplock = smb2_downgrade_oplock,
+>         .need_neg = smb2_need_neg,
+>         .negotiate = smb2_negotiate,
+>         .negotiate_wsize = smb2_negotiate_wsize,
+> --
+> 1.8.4.2
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-> On Tue, Nov 19, 2013 at 2:59 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> > On Tue, 19 Nov 2013 10:33:33 -0600
-> > shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
-> >
-> >> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> >>
-> >>
-> >> Allow cifs mounts for a prefixpath with intermediate paths without access,
-> >> so as to continue with the shared superblock model.
-> >>
-> >> For the intermediate path entries that do not allow access, create "placeholder"
-> >> inodes and instantiate dentries with those inodes.
-> >> If and when such a path entry becomes accessible it is filled with correct
-> >> info.
-> >>
-> >
-> > I'm unclear on this last bit...
-> >
-> > How exactly do they end up being filled with the correct info once that
-> > happens?
-> >
-> >> Reference: Samba bugzilla 6950
-> >>
-> >> Signed-off-by: Shirish Pargaonkar <spargaonkar-IBi9RG/b67k@public.gmane.org>
-> >>
-> >> ---
-> >>  fs/cifs/cifsfs.c    | 17 +++++++++++++++--
-> >>  fs/cifs/cifsproto.h |  3 +++
-> >>  fs/cifs/inode.c     | 16 ++++++++++++++++
-> >>  3 files changed, 34 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> >> index 849f613..bce185c 100644
-> >> --- a/fs/cifs/cifsfs.c
-> >> +++ b/fs/cifs/cifsfs.c
-> >> @@ -584,6 +584,9 @@ cifs_get_root(struct smb_vol *vol, struct super_block *sb)
-> >>       char *full_path = NULL;
-> >>       char *s, *p;
-> >>       char sep;
-> >> +     struct inode *dir, *phinode;
-> >> +     struct dentry *child;
-> >> +     struct cifs_fattr phfattr;
-> >>
-> >>       full_path = cifs_build_path_to_root(vol, cifs_sb,
-> >>                                           cifs_sb_master_tcon(cifs_sb));
-> >> @@ -592,13 +595,13 @@ cifs_get_root(struct smb_vol *vol, struct super_block *sb)
-> >>
-> >>       cifs_dbg(FYI, "Get root dentry for %s\n", full_path);
-> >>
-> >> +     fill_phfattr(&phfattr, sb);
-> >
-> > Hmmm...so this function sets up a cifs_fattr struct, including the
-> > cf_uniqueid...which won't be very unique when you reuse that struct
-> > several times in the do...while loop below. Don't you need to call it
-> > again after you use it once?
-> >
-> >>       sep = CIFS_DIR_SEP(cifs_sb);
-> >>       dentry = dget(sb->s_root);
-> >>       p = s = full_path;
-> >>
-> >>       do {
-> >> -             struct inode *dir = dentry->d_inode;
-> >> -             struct dentry *child;
-> >> +             dir = dentry->d_inode;
-> >>
-> >>               if (!dir) {
-> >>                       dput(dentry);
-> >> @@ -626,6 +629,16 @@ cifs_get_root(struct smb_vol *vol, struct super_block *sb)
-> >>               mutex_unlock(&dir->i_mutex);
-> >>               dput(dentry);
-> >>               dentry = child;
-> >> +             if (!IS_ERR(dentry)) {
-> >> +                     if (*s) {
-> >> +                             /* EACCESS on an intermediate dir */
-> >> +                             if (!dentry->d_inode) {
-> >> +                                     phinode = cifs_iget(sb, &phfattr);
-> >> +                                     if (phinode)
-> >> +                                             d_instantiate(dentry, phinode);
-> >> +                             }
-> >> +                     }
-> >> +             }
-> >
-> > This doesn't make any sense to me.
-> >
-> > The do...while loop here is basically doing lookups and instantiating
-> > dentries and inodes down from the root of the mount to the root of the
-> > share. The lookup_one_len call is what does the single-level lookup in
-> > that directory.
-> >
-> > Why are you adding special handling when "dentry" is not an error?
-> > Would it not make more sense to do so when lookup_one_len does return
-> > an error?
-> >
-> >>       } while (!IS_ERR(dentry));
-> >>       kfree(full_path);
-> >>       return dentry;
-> >> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> >> index aa33976..9a84e5c 100644
-> >> --- a/fs/cifs/cifsproto.h
-> >> +++ b/fs/cifs/cifsproto.h
-> >> @@ -498,4 +498,7 @@ void cifs_writedata_release(struct kref *refcount);
-> >>  int open_query_close_cifs_symlink(const unsigned char *path, char *pbuf,
-> >>                       unsigned int *pbytes_read, struct cifs_sb_info *cifs_sb,
-> >>                       unsigned int xid);
-> >> +
-> >> +extern void fill_phfattr(struct cifs_fattr *, struct super_block *);
-> >> +
-> >>  #endif                       /* _CIFSPROTO_H */
-> >> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> >> index 36f9ebb..4f5a09a 100644
-> >> --- a/fs/cifs/inode.c
-> >> +++ b/fs/cifs/inode.c
-> >> @@ -322,6 +322,22 @@ cifs_create_dfs_fattr(struct cifs_fattr *fattr, struct super_block *sb)
-> >>       fattr->cf_flags |= CIFS_FATTR_DFS_REFERRAL;
-> >>  }
-> >>
-> >> +void
-> >> +fill_phfattr(struct cifs_fattr *cf, struct super_block *sb)
-> >> +{
-> >> +     struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
-> >> +
-> >> +     memset(cf, 0, sizeof(*cf));
-> >> +     cf->cf_uniqueid = iunique(sb, ROOT_I);
-> >
-> >
-> > Also, iunique is only guaranteed to return a number that hasn't yet
-> > been used. So suppose we're going to instantiate one of these bogus
-> > inodes. We give it the uniqueid of '3'. Then later, once the mount is
-> > done we find another (legitimate) inode on the server and it also has a
-> > uniqueid of '3'. Now you have a collision. Worse yet, if it's a
-> > directory now it looks like we have a hardlinked directory...
-> >
-> > Once you start using iunique, you can't really go back to using server
-> > inode numbers since you can't guarantee that there won't be collisions.
-> >
-> > One possibility to deal with that would be to tag these entries as
-> > bogus and ensure that cifs_iget will never match them. Another
-> > possibility might be just to never hash these inodes, but I'm not clear
-> > on how kosher that is from a vfs standpoint.
-> >
-> >> +     cf->cf_nlink = 1;
-> >> +     cf->cf_atime = CURRENT_TIME;
-> >> +     cf->cf_ctime = CURRENT_TIME;
-> >> +     cf->cf_mtime = CURRENT_TIME;
-> >> +     cf->cf_mode = S_IFDIR | S_IXUGO | S_IRWXU;
-> >> +     cf->cf_uid = cifs_sb->mnt_uid;
-> >> +     cf->cf_gid = cifs_sb->mnt_gid;
-> >> +}
-> >> +
-> >
-> >
-> >>  static int
-> >>  cifs_get_file_info_unix(struct file *filp)
-> >>  {
-> >
-> >
-> 
-> > I think the thing to do is to step back and describe (in English) how
-> > you envision this working. Then once that's done, we can start
-> > discussing what the code should look like...
-> >
-> > --
-> > Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> 
-> Trying to solve this using like this:
-> 
-> If during mounting a share, if the share path is accessbile but
-> if any of the intermediate paths to the share is inaccessible
-> i.e. returns error EACCES,
->  - get inode info for the share path using query path info
->  - look for a dentry and if not found, add - using d_obtain_alias()
->  - if server does not support unique ids/ inode numbers, add to the
->    begining of the list maintained in superblock, an element consisting of
->    full path, pointer to this dentry, and a pointer to the inode.
-> 
-> During lookup,
->  for a case where server does support unique_ids/inode numbers,
->  - obtain inode info using query path info
->  - splice (d_splice_alias()) the dentry corrosponding to this inode if any
->    if spliced, remove the element from the list maintained in the superblock.
-> 
->  for a case where server does not support unique id/inode number,
->  - search for an entry for inode based on the full path
->    if no such entry, obtain inode info using query path info
->  - splice (d_splice_alias()) the dentry corrosponding to this inode if any
->    if successful, remove the element from the list maintained in the superblock.
-> 
->    That is one way an element will come off of the list maintained in the
->    superblock.  If the dentry does not get ever get spliced, whenever either
->    it is deleted with zero d_count (unmount e.g.) or it is released
->    (superblock is being deleted), cifs d_delete and cifs_d_release
->    respectively, whichever applies first, will take the element off the list
->    and free it.
-> 
->    If the superblock is intact and anonymous root dentry does not get deleted
->    during unmount (d_count is not zero i.e. has child dentries with referenece
->    to the parent) i.e. d_delete does not get called, the dentries would remain
->    till vfs code deletes them as needed (as their d_count starts approaching
->    zero).
-> 
->    Whenever we have the same mount again with a anonymous dentry, the
->    elements are added to the head of the list maintained in the superblock,
->    so stale elements will not be reachable.
-> 
-> Your comments are most welcome.
-> 
-> Regards,
-> 
-> Shirish
-
-Really, the whole problem boils down to this:
-
-Suppose we mount two cifs mounts:
-
-    //server/a on /mnt/a
-
-...and...
-
-    //server/a/b on /mnt/b
-
-Now suppose there is a directory under there:
-
-    /mnt/a/b/c
-
-...so logically, this should be the same dentry:
-
-    /mnt/b/c
-
-The problem is -- how do you know that that's the same dentry?
-
-The reason that the shared superblock stuff works with NFS is that
-there is a 1:1 correspondence between inodes and filehandles. So, even
-if the file is renamed on the server, you end up with the same inode
-and can tell that that dentry is the same as another.
-
-That's more or less the case for CIFS too where you have a uniqueid,
-but when you don't that whole model breaks down.
-
-Hashing filenames sounds like a possibility too, but what happens if
-someone does this on the directory above on the server?
-
-    $ mv c d
-
-Since you can't guard against changes to lookup information on the
-server that makes that method of uniquely id'ing an inode pretty
-worthless.
-
-I think that really leaves you with just two choices:
-
-1) figure out some mechanism to hook things up at mount time.
-Basically, instantiate "placeholder" inodes for directories above the
-root of the mount. IOW, if someone mounts /mnt/b above and then you'd
-need a placeholder inode for "a" that will be filled out when /mnt/a
-mounted.
-
-2) abandon the shared-superblock model altogether. That'll mean that in
-the above mount setup that you don't have cache coherency between the
-two mounts (since they'll be different superblocks), and you may need
-to tweak how fscache works in order to ensure that collisions between
-two different mounts isn't a problem.
-
-At this point #2 doesn't seem altogether unreasonable. Most people
-don't have pathological mount configurations like that so I'm not sure
-it's worthwhile to jump through hoops to enable them.
+It looks good. Reviewed-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Best regards,
+Pavel Shilovsky.
