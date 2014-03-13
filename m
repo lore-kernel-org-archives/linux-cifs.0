@@ -1,426 +1,674 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v3] cifs: Wait for writebacks to complete before
- attempting write.
-Date: Thu, 13 Mar 2014 07:30:26 -0400
-Message-ID: <20140313073026.12cdd79d@tlielax.poochiereds.net>
-References: <1394554307-27611-1-git-send-email-sprabhu@redhat.com>
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: [PATCH] fs: push sync_filesystem() down to the file system's
+ remount_fs()
+Date: Thu, 13 Mar 2014 10:20:56 -0400
+Message-ID: <1394720456-16629-1-git-send-email-tytso@mit.edu>
+References: <20140313073936.GA14663@infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1394554307-27611-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: jfs-discussion@lists.sourceforge.net, Jan Kara <jack@suse.cz>,
+ Anders Larsen <al@alarsen.net>, linux-mtd@lists.infradead.org,
+ Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
+ Petr Vandrovec <petr@vandrovec.name>, linux-cifs@vger.kernel.org,
+ cluster-devel@redhat.com, codalist@coda.cs.cmu.edu,
+ Christoph Hellwig <hch@infradead.org>,
+ Ext4 Developers List <linux-ext4@vger.kernel.org>,
+ Evgeniy Dushistov <dushistov@mail.ru>, Kees Cook <keescook@chromium.org>,
+ fuse-devel@lists.sourceforge.net, reiserfs-devel@vger.kernel.org,
+ xfs@oss.sgi.com, linux-nilfs@vger.kernel.org,
+ OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, linux-nfs@vger.kernel.org,
+ Theodore Ts'o <tytso@mit.edu>, Artem Bityutskiy <dedekind1@gmail.com>,
+ linux-ntfs-dev@lists.sourceforge.net, samba-technical@lists.samba.org,
+ Adrian Hunter <adrian.hunter@intel.com>,
+ linux-f2fs-devel@lists.sourceforge.net, ocfs2-devel@os
+To: linux-fsdevel@thunk.org
+Return-path: <linux-mtd-bounces+gldm-linux-mtd-36=gmane.org@lists.infradead.org>
+In-Reply-To: <20140313073936.GA14663@infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-mtd>,
+ <mailto:linux-mtd-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-mtd/>
+List-Post: <mailto:linux-mtd@lists.infradead.org>
+List-Help: <mailto:linux-mtd-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-mtd>,
+ <mailto:linux-mtd-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-mtd" <linux-mtd-bounces@lists.infradead.org>
+Errors-To: linux-mtd-bounces+gldm-linux-mtd-36=gmane.org@lists.infradead.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Tue, 11 Mar 2014 16:11:47 +0000
-Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+Previously, the no-op "mount -o mount /dev/xxx" operation when the
+file system is already mounted read-write causes an implied,
+unconditional syncfs().  This seems pretty stupid, and it's certainly
+documented or guaraunteed to do this, nor is it particularly useful,
+except in the case where the file system was mounted rw and is getting
+remounted read-only.
 
-> Problem reported in Red Hat bz 1040329 for strict writes where we cache
-> only when we hold oplock and write direct to the server when we don't.
-> 
-> When we receive an oplock break, we first change the oplock value for
-> the inode in cifsInodeInfo->oplock to indicate that we no longer hold
-> the oplock before we enqueue a task to flush changes to the backing
-> device. Once we have completed flushing the changes, we return the
-> oplock to the server.
-> 
-> There are 2 ways here where we can have data corruption
-> 1) While we flush changes to the backing device as part of the oplock
-> break, we can have processes write to the file. These writes check for
-> the oplock, find none and attempt to write directly to the server.
-> These direct writes made while we are flushing from cache could be
-> overwritten by data being flushed from the cache causing data
-> corruption.
-> 2) While a thread runs in cifs_strict_writev, the machine could receive
-> and process an oplock break after the thread has checked the oplock and
-> found that it allows us to cache and before we have made changes to the
-> cache. In that case, we end up with a dirty page in cache when we
-> shouldn't have any. This will be flushed later and will overwrite all
-> subsequent writes to the part of the file represented by this page.
-> 
-> Before making any writes to the server, we need to confirm that we are
-> not in the process of flushing data to the server and if we are, we
-> should wait until the process is complete before we attempt the write.
-> We should also wait for existing writes to complete before we process
-> an oplock break request which changes oplock values.
-> 
-> We add a version specific  downgrade_oplock() operation to allow for
-> differences in the oplock values set for the different smb versions.
-> 
-> Cc: stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/cifsfs.c    | 14 +++++++++-
->  fs/cifs/cifsglob.h  |  8 ++++++
->  fs/cifs/cifsproto.h |  3 +++
->  fs/cifs/file.c      | 31 +++++++++++++++++++---
->  fs/cifs/misc.c      | 74 +++++++++++++++++++++++++++++++++++++++++++++++++++--
->  fs/cifs/smb1ops.c   | 11 ++++++++
->  fs/cifs/smb2misc.c  | 18 ++++++++++---
->  fs/cifs/smb2ops.c   | 14 ++++++++++
->  8 files changed, 164 insertions(+), 9 deletions(-)
-> 
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index 849f613..7c6b73c 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -253,6 +253,11 @@ cifs_alloc_inode(struct super_block *sb)
->  	cifs_set_oplock_level(cifs_inode, 0);
->  	cifs_inode->delete_pending = false;
->  	cifs_inode->invalid_mapping = false;
-> +	clear_bit(CIFS_INODE_PENDING_OPLOCK_BREAK, &cifs_inode->flags);
-> +	clear_bit(CIFS_INODE_PENDING_WRITERS, &cifs_inode->flags);
-> +	clear_bit(CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2, &cifs_inode->flags);
-> +	spin_lock_init(&cifs_inode->writers_lock);
-> +	cifs_inode->writers = 0;
->  	cifs_inode->vfs_inode.i_blkbits = 14;  /* 2**14 = CIFS_MAX_MSGSIZE */
->  	cifs_inode->server_eof = 0;
->  	cifs_inode->uniqueid = 0;
-> @@ -731,19 +736,26 @@ static ssize_t cifs_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
->  				   unsigned long nr_segs, loff_t pos)
->  {
->  	struct inode *inode = file_inode(iocb->ki_filp);
-> +	struct cifsInodeInfo *cinode = CIFS_I(inode);
->  	ssize_t written;
->  	int rc;
->  
-> +	written = cifs_get_writer(cinode);
-> +	if (written)
-> +		return written;
-> +
->  	written = generic_file_aio_write(iocb, iov, nr_segs, pos);
->  
->  	if (CIFS_CACHE_WRITE(CIFS_I(inode)))
-> -		return written;
-> +		goto out;
->  
->  	rc = filemap_fdatawrite(inode->i_mapping);
->  	if (rc)
->  		cifs_dbg(FYI, "cifs_file_aio_write: %d rc on %p inode\n",
->  			 rc, inode);
->  
-> +out:
-> +	cifs_put_writer(cinode);
->  	return written;
->  }
->  
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index cf32f03..8885ce8 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -228,6 +228,8 @@ struct smb_version_operations {
->  	/* verify the message */
->  	int (*check_message)(char *, unsigned int);
->  	bool (*is_oplock_break)(char *, struct TCP_Server_Info *);
-> +	void (*downgrade_oplock)(struct TCP_Server_Info *,
-> +					struct cifsInodeInfo *, bool);
->  	/* process transaction2 response */
->  	bool (*check_trans2)(struct mid_q_entry *, struct TCP_Server_Info *,
->  			     char *, int);
-> @@ -1113,6 +1115,12 @@ struct cifsInodeInfo {
->  	unsigned int epoch;		/* used to track lease state changes */
->  	bool delete_pending;		/* DELETE_ON_CLOSE is set */
->  	bool invalid_mapping;		/* pagecache is invalid */
-> +	unsigned long flags;
-> +#define CIFS_INODE_PENDING_OPLOCK_BREAK   (0) /* oplock break in progress */
-> +#define CIFS_INODE_PENDING_WRITERS	  (1) /* Writes in progress */
-> +#define CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2 (2) /* Downgrade oplock to L2 */
-> +	spinlock_t writers_lock;
-> +	unsigned int writers;		/* Number of writers on this inode */
->  	unsigned long time;		/* jiffies of last update of inode */
->  	u64  server_eof;		/* current file size on server -- protected by i_lock */
->  	u64  uniqueid;			/* server inode number */
-> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index acc4ee8..ca7980a 100644
-> --- a/fs/cifs/cifsproto.h
-> +++ b/fs/cifs/cifsproto.h
-> @@ -127,6 +127,9 @@ extern u64 cifs_UnixTimeToNT(struct timespec);
->  extern struct timespec cnvrtDosUnixTm(__le16 le_date, __le16 le_time,
->  				      int offset);
->  extern void cifs_set_oplock_level(struct cifsInodeInfo *cinode, __u32 oplock);
-> +extern int cifs_get_writer(struct cifsInodeInfo *cinode);
-> +extern void cifs_put_writer(struct cifsInodeInfo *cinode);
-> +extern void cifs_done_oplock_break(struct cifsInodeInfo *cinode);
->  extern int cifs_unlock_range(struct cifsFileInfo *cfile,
->  			     struct file_lock *flock, const unsigned int xid);
->  extern int cifs_push_mandatory_locks(struct cifsFileInfo *cfile);
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 53c1507..9d07950 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -2620,12 +2620,20 @@ cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
->  	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
->  	ssize_t written;
->  
-> +	written = cifs_get_writer(cinode);
-> +	if (written)
-> +		return written;
-> +
->  	if (CIFS_CACHE_WRITE(cinode)) {
->  		if (cap_unix(tcon->ses) &&
->  		(CIFS_UNIX_FCNTL_CAP & le64_to_cpu(tcon->fsUnixInfo.Capability))
-> -		    && ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0))
-> -			return generic_file_aio_write(iocb, iov, nr_segs, pos);
-> -		return cifs_writev(iocb, iov, nr_segs, pos);
-> +		  && ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0)) {
-> +			written = generic_file_aio_write(
-> +					iocb, iov, nr_segs, pos);
-> +			goto out;
-> +		}
-> +		written = cifs_writev(iocb, iov, nr_segs, pos);
-> +		goto out;
->  	}
->  	/*
->  	 * For non-oplocked files in strict cache mode we need to write the data
-> @@ -2645,6 +2653,8 @@ cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
->  			 inode);
->  		cinode->oplock = 0;
->  	}
-> +out:
-> +	cifs_put_writer(cinode);
->  	return written;
->  }
->  
-> @@ -3656,6 +3666,13 @@ static int cifs_launder_page(struct page *page)
->  	return rc;
->  }
->  
-> +static int
-> +cifs_pending_writers_wait(void *unused)
-> +{
-> +	schedule();
-> +	return 0;
-> +}
-> +
->  void cifs_oplock_break(struct work_struct *work)
->  {
->  	struct cifsFileInfo *cfile = container_of(work, struct cifsFileInfo,
-> @@ -3663,8 +3680,15 @@ void cifs_oplock_break(struct work_struct *work)
->  	struct inode *inode = cfile->dentry->d_inode;
->  	struct cifsInodeInfo *cinode = CIFS_I(inode);
->  	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
-> +	struct TCP_Server_Info *server = tcon->ses->server;
->  	int rc = 0;
->  
-> +	wait_on_bit(&cinode->flags, CIFS_INODE_PENDING_WRITERS,
-> +			cifs_pending_writers_wait, TASK_UNINTERRUPTIBLE);
-> +
-> +	server->ops->downgrade_oplock(server, cinode,
-> +		test_bit(CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2, &cinode->flags));
-> +
->  	if (!CIFS_CACHE_WRITE(cinode) && CIFS_CACHE_READ(cinode) &&
->  						cifs_has_mand_locks(cinode)) {
->  		cifs_dbg(FYI, "Reset oplock to None for inode=%p due to mand locks\n",
-> @@ -3701,6 +3725,7 @@ void cifs_oplock_break(struct work_struct *work)
->  							     cinode);
->  		cifs_dbg(FYI, "Oplock release rc = %d\n", rc);
->  	}
-> +	cifs_done_oplock_break(cinode);
->  }
->  
->  /*
-> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-> index 2f9f379..3b0c62e 100644
-> --- a/fs/cifs/misc.c
-> +++ b/fs/cifs/misc.c
-> @@ -466,8 +466,22 @@ is_valid_oplock_break(char *buffer, struct TCP_Server_Info *srv)
->  				cifs_dbg(FYI, "file id match, oplock break\n");
->  				pCifsInode = CIFS_I(netfile->dentry->d_inode);
->  
-> -				cifs_set_oplock_level(pCifsInode,
-> -					pSMB->OplockLevel ? OPLOCK_READ : 0);
-> +				set_bit(CIFS_INODE_PENDING_OPLOCK_BREAK,
-> +					&pCifsInode->flags);
-> +
-> +				/*
-> +				 * Set flag if the server downgrades the oplock
-> +				 * to L2 else clear.
-> +				 */
-> +				if (pSMB->OplockLevel)
-> +					set_bit(
-> +					   CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2,
-> +					   &pCifsInode->flags);
-> +				else
-> +					clear_bit(
-> +					   CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2,
-> +					   &pCifsInode->flags);
-> +
->  				queue_work(cifsiod_wq,
->  					   &netfile->oplock_break);
->  				netfile->oplock_break_cancelled = false;
-> @@ -551,6 +565,62 @@ void cifs_set_oplock_level(struct cifsInodeInfo *cinode, __u32 oplock)
->  		cinode->oplock = 0;
->  }
->  
-> +static int
-> +cifs_oplock_break_wait(void *unused)
-> +{
-> +	schedule();
-> +	return signal_pending(current) ? -ERESTARTSYS : 0;
-> +}
-> +
-> +/*
-> + * We wait for oplock breaks to be processed before we attempt to perform
-> + * writes.
-> + */
-> +int cifs_get_writer(struct cifsInodeInfo *cinode)
-> +{
-> +	int rc;
-> +
-> +start:
-> +	rc = wait_on_bit(&cinode->flags, CIFS_INODE_PENDING_OPLOCK_BREAK,
-> +				   cifs_oplock_break_wait, TASK_KILLABLE);
-> +	if (rc)
-> +		return rc;
-> +
-> +	spin_lock(&cinode->writers_lock);
-> +	if (!cinode->writers)
-> +		set_bit(CIFS_INODE_PENDING_WRITERS, &cinode->flags);
-> +	cinode->writers++;
-> +	/* Check to see if we have started servicing an oplock break */
-> +	if (test_bit(CIFS_INODE_PENDING_OPLOCK_BREAK, &cinode->flags)) {
-> +		cinode->writers--;
-> +		if (cinode->writers == 0) {
-> +			clear_bit(CIFS_INODE_PENDING_WRITERS, &cinode->flags);
-> +			wake_up_bit(&cinode->flags, CIFS_INODE_PENDING_WRITERS);
-> +		}
-> +		spin_unlock(&cinode->writers_lock);
-> +		goto start;
-> +	}
-> +	spin_unlock(&cinode->writers_lock);
-> +	return 0;
-> +}
-> +
-> +void cifs_put_writer(struct cifsInodeInfo *cinode)
-> +{
-> +	spin_lock(&cinode->writers_lock);
-> +	cinode->writers--;
-> +	if (cinode->writers == 0) {
-> +		clear_bit(CIFS_INODE_PENDING_WRITERS, &cinode->flags);
-> +		wake_up_bit(&cinode->flags, CIFS_INODE_PENDING_WRITERS);
-> +	}
-> +	spin_unlock(&cinode->writers_lock);
-> +}
-> +
-> +void cifs_done_oplock_break(struct cifsInodeInfo *cinode)
-> +{
-> +	clear_bit(CIFS_INODE_PENDING_OPLOCK_BREAK, &cinode->flags);
-> +	wake_up_bit(&cinode->flags, CIFS_INODE_PENDING_OPLOCK_BREAK);
-> +}
-> +
->  bool
->  backup_cred(struct cifs_sb_info *cifs_sb)
->  {
-> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-> index 526fb89..2cc7d78 100644
-> --- a/fs/cifs/smb1ops.c
-> +++ b/fs/cifs/smb1ops.c
-> @@ -372,6 +372,16 @@ coalesce_t2(char *second_buf, struct smb_hdr *target_hdr)
->  	return 0;
->  }
->  
-> +void
-> +cifs_downgrade_oplock(struct TCP_Server_Info *server,
-> +			struct cifsInodeInfo *cinode, bool set_level2)
-> +{
-> +	if (set_level2)
-> +		cifs_set_oplock_level(cinode, OPLOCK_READ);
-> +	else
-> +		cifs_set_oplock_level(cinode, 0);
-> +}
-> +
->  static bool
->  cifs_check_trans2(struct mid_q_entry *mid, struct TCP_Server_Info *server,
->  		  char *buf, int malformed)
-> @@ -1019,6 +1029,7 @@ struct smb_version_operations smb1_operations = {
->  	.clear_stats = cifs_clear_stats,
->  	.print_stats = cifs_print_stats,
->  	.is_oplock_break = is_valid_oplock_break,
-> +	.downgrade_oplock = cifs_downgrade_oplock,
->  	.check_trans2 = cifs_check_trans2,
->  	.need_neg = cifs_need_neg,
->  	.negotiate = cifs_negotiate,
-> diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-> index fb39662..b8021fd 100644
-> --- a/fs/cifs/smb2misc.c
-> +++ b/fs/cifs/smb2misc.c
-> @@ -575,9 +575,21 @@ smb2_is_valid_oplock_break(char *buffer, struct TCP_Server_Info *server)
->  				else
->  					cfile->oplock_break_cancelled = false;
->  
-> -				server->ops->set_oplock_level(cinode,
-> -				  rsp->OplockLevel ? SMB2_OPLOCK_LEVEL_II : 0,
-> -				  0, NULL);
-> +				set_bit(CIFS_INODE_PENDING_OPLOCK_BREAK,
-> +					&cinode->flags);
-> +
-> +				/*
-> +				 * Set flag if the server downgrades the oplock
-> +				 * to L2 else clear.
-> +				 */
-> +				if (rsp->OplockLevel)
-> +					set_bit(
-> +					   CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2,
-> +					   &cinode->flags);
-> +				else
-> +					clear_bit(
-> +					   CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2,
-> +					   &cinode->flags);
->  
->  				queue_work(cifsiod_wq, &cfile->oplock_break);
->  
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 192f51a..ab8964d 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -904,6 +904,17 @@ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
->  	return rc;
->  }
->  
-> +void
-> +smb2_downgrade_oplock(struct TCP_Server_Info *server,
-> +			struct cifsInodeInfo *cinode, bool set_level2)
-> +{
-> +	if (set_level2)
-> +		server->ops->set_oplock_level(cinode, SMB2_OPLOCK_LEVEL_II,
-> +						0, NULL);
-> +	else
-> +		server->ops->set_oplock_level(cinode, 0, 0, NULL);
-> +}
-> +
->  static void
->  smb2_set_oplock_level(struct cifsInodeInfo *cinode, __u32 oplock,
->  		      unsigned int epoch, bool *purge_cache)
-> @@ -1110,6 +1121,7 @@ struct smb_version_operations smb20_operations = {
->  	.clear_stats = smb2_clear_stats,
->  	.print_stats = smb2_print_stats,
->  	.is_oplock_break = smb2_is_valid_oplock_break,
-> +	.downgrade_oplock = smb2_downgrade_oplock,
->  	.need_neg = smb2_need_neg,
->  	.negotiate = smb2_negotiate,
->  	.negotiate_wsize = smb2_negotiate_wsize,
-> @@ -1184,6 +1196,7 @@ struct smb_version_operations smb21_operations = {
->  	.clear_stats = smb2_clear_stats,
->  	.print_stats = smb2_print_stats,
->  	.is_oplock_break = smb2_is_valid_oplock_break,
-> +	.downgrade_oplock = smb2_downgrade_oplock,
->  	.need_neg = smb2_need_neg,
->  	.negotiate = smb2_negotiate,
->  	.negotiate_wsize = smb2_negotiate_wsize,
-> @@ -1259,6 +1272,7 @@ struct smb_version_operations smb30_operations = {
->  	.print_stats = smb2_print_stats,
->  	.dump_share_caps = smb2_dump_share_caps,
->  	.is_oplock_break = smb2_is_valid_oplock_break,
-> +	.downgrade_oplock = smb2_downgrade_oplock,
->  	.need_neg = smb2_need_neg,
->  	.negotiate = smb2_negotiate,
->  	.negotiate_wsize = smb2_negotiate_wsize,
+However, it's possible that there might be some file systems that are
+actually depending on this behavior.  In most file systems, it's
+probably fine to only call sync_filesystem() when transitioning from
+read-write to read-only, and there are some file systems where this is
+not needed at all (for example, for a pseudo-filesystem or something
+like romfs).
 
-Looks good.
+Signed-off-by: "Theodore Ts'o" <tytso@mit.edu>
+Cc: linux-fsdevel@vger.kernel.org
+Cc: Christoph Hellwig <hch@infradead.org>
+Cc: Artem Bityutskiy <dedekind1@gmail.com>
+Cc: Adrian Hunter <adrian.hunter@intel.com>
+Cc: Evgeniy Dushistov <dushistov@mail.ru>
+Cc: Jan Kara <jack@suse.cz>
+Cc: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+Cc: Anders Larsen <al@alarsen.net>
+Cc: Phillip Lougher <phillip@squashfs.org.uk>
+Cc: Kees Cook <keescook@chromium.org>
+Cc: Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>
+Cc: Petr Vandrovec <petr@vandrovec.name>
+Cc: xfs@oss.sgi.com
+Cc: linux-btrfs@vger.kernel.org
+Cc: linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org
+Cc: codalist@coda.cs.cmu.edu
+Cc: linux-ext4@vger.kernel.org
+Cc: linux-f2fs-devel@lists.sourceforge.net
+Cc: fuse-devel@lists.sourceforge.net
+Cc: cluster-devel@redhat.com
+Cc: linux-mtd@lists.infradead.org
+Cc: jfs-discussion@lists.sourceforge.net
+Cc: linux-nfs@vger.kernel.org
+Cc: linux-nilfs@vger.kernel.org
+Cc: linux-ntfs-dev@lists.sourceforge.net
+Cc: ocfs2-devel@oss.oracle.com
+Cc: reiserfs-devel@vger.kernel.org
+---
+ fs/adfs/super.c          | 1 +
+ fs/affs/super.c          | 1 +
+ fs/befs/linuxvfs.c       | 1 +
+ fs/btrfs/super.c         | 1 +
+ fs/cifs/cifsfs.c         | 1 +
+ fs/coda/inode.c          | 1 +
+ fs/cramfs/inode.c        | 1 +
+ fs/debugfs/inode.c       | 1 +
+ fs/devpts/inode.c        | 1 +
+ fs/efs/super.c           | 1 +
+ fs/ext2/super.c          | 1 +
+ fs/ext3/super.c          | 2 ++
+ fs/ext4/super.c          | 2 ++
+ fs/f2fs/super.c          | 2 ++
+ fs/fat/inode.c           | 2 ++
+ fs/freevxfs/vxfs_super.c | 1 +
+ fs/fuse/inode.c          | 1 +
+ fs/gfs2/super.c          | 2 ++
+ fs/hfs/super.c           | 1 +
+ fs/hfsplus/super.c       | 1 +
+ fs/hpfs/super.c          | 2 ++
+ fs/isofs/inode.c         | 1 +
+ fs/jffs2/super.c         | 1 +
+ fs/jfs/super.c           | 1 +
+ fs/minix/inode.c         | 1 +
+ fs/ncpfs/inode.c         | 1 +
+ fs/nfs/super.c           | 2 ++
+ fs/nilfs2/super.c        | 1 +
+ fs/ntfs/super.c          | 2 ++
+ fs/ocfs2/super.c         | 2 ++
+ fs/openpromfs/inode.c    | 1 +
+ fs/proc/root.c           | 2 ++
+ fs/pstore/inode.c        | 1 +
+ fs/qnx4/inode.c          | 1 +
+ fs/qnx6/inode.c          | 1 +
+ fs/reiserfs/super.c      | 1 +
+ fs/romfs/super.c         | 1 +
+ fs/squashfs/super.c      | 1 +
+ fs/super.c               | 2 --
+ fs/sysv/inode.c          | 1 +
+ fs/ubifs/super.c         | 1 +
+ fs/udf/super.c           | 1 +
+ fs/ufs/super.c           | 1 +
+ fs/xfs/xfs_super.c       | 1 +
+ 44 files changed, 53 insertions(+), 2 deletions(-)
 
-I still think we need to fix the set_oplock_level operation, but this is fine
-for an interim fix.
+diff --git a/fs/adfs/super.c b/fs/adfs/super.c
+index 7b3003c..952aeb0 100644
+--- a/fs/adfs/super.c
++++ b/fs/adfs/super.c
+@@ -212,6 +212,7 @@ static int parse_options(struct super_block *sb, char *options)
+ 
+ static int adfs_remount(struct super_block *sb, int *flags, char *data)
+ {
++	sync_filesystem(sb);
+ 	*flags |= MS_NODIRATIME;
+ 	return parse_options(sb, data);
+ }
+diff --git a/fs/affs/super.c b/fs/affs/super.c
+index d098731..3074530 100644
+--- a/fs/affs/super.c
++++ b/fs/affs/super.c
+@@ -530,6 +530,7 @@ affs_remount(struct super_block *sb, int *flags, char *data)
+ 
+ 	pr_debug("AFFS: remount(flags=0x%x,opts=\"%s\")\n",*flags,data);
+ 
++	sync_filesystem(sb);
+ 	*flags |= MS_NODIRATIME;
+ 
+ 	memcpy(volume, sbi->s_volume, 32);
+diff --git a/fs/befs/linuxvfs.c b/fs/befs/linuxvfs.c
+index 845d2d6..56d70c8 100644
+--- a/fs/befs/linuxvfs.c
++++ b/fs/befs/linuxvfs.c
+@@ -913,6 +913,7 @@ befs_fill_super(struct super_block *sb, void *data, int silent)
+ static int
+ befs_remount(struct super_block *sb, int *flags, char *data)
+ {
++	sync_filesystem(sb);
+ 	if (!(*flags & MS_RDONLY))
+ 		return -EINVAL;
+ 	return 0;
+diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
+index 97cc241..00cd0c5 100644
+--- a/fs/btrfs/super.c
++++ b/fs/btrfs/super.c
+@@ -1381,6 +1381,7 @@ static int btrfs_remount(struct super_block *sb, int *flags, char *data)
+ 	unsigned int old_metadata_ratio = fs_info->metadata_ratio;
+ 	int ret;
+ 
++	sync_filesystem(sb);
+ 	btrfs_remount_prepare(fs_info);
+ 
+ 	ret = btrfs_parse_options(root, data);
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 849f613..4942c94 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -541,6 +541,7 @@ static int cifs_show_stats(struct seq_file *s, struct dentry *root)
+ 
+ static int cifs_remount(struct super_block *sb, int *flags, char *data)
+ {
++	sync_filesystem(sb);
+ 	*flags |= MS_NODIRATIME;
+ 	return 0;
+ }
+diff --git a/fs/coda/inode.c b/fs/coda/inode.c
+index 506de34..3f48000 100644
+--- a/fs/coda/inode.c
++++ b/fs/coda/inode.c
+@@ -96,6 +96,7 @@ void coda_destroy_inodecache(void)
+ 
+ static int coda_remount(struct super_block *sb, int *flags, char *data)
+ {
++	sync_filesystem(sb);
+ 	*flags |= MS_NOATIME;
+ 	return 0;
+ }
+diff --git a/fs/cramfs/inode.c b/fs/cramfs/inode.c
+index 06610cf..a275911 100644
+--- a/fs/cramfs/inode.c
++++ b/fs/cramfs/inode.c
+@@ -244,6 +244,7 @@ static void cramfs_kill_sb(struct super_block *sb)
+ 
+ static int cramfs_remount(struct super_block *sb, int *flags, char *data)
+ {
++	sync_filesystem(sb);
+ 	*flags |= MS_RDONLY;
+ 	return 0;
+ }
+diff --git a/fs/debugfs/inode.c b/fs/debugfs/inode.c
+index 9c0444c..02928a9 100644
+--- a/fs/debugfs/inode.c
++++ b/fs/debugfs/inode.c
+@@ -218,6 +218,7 @@ static int debugfs_remount(struct super_block *sb, int *flags, char *data)
+ 	int err;
+ 	struct debugfs_fs_info *fsi = sb->s_fs_info;
+ 
++	sync_filesystem(sb);
+ 	err = debugfs_parse_options(data, &fsi->mount_opts);
+ 	if (err)
+ 		goto fail;
+diff --git a/fs/devpts/inode.c b/fs/devpts/inode.c
+index a726b9f..c710380 100644
+--- a/fs/devpts/inode.c
++++ b/fs/devpts/inode.c
+@@ -313,6 +313,7 @@ static int devpts_remount(struct super_block *sb, int *flags, char *data)
+ 	struct pts_fs_info *fsi = DEVPTS_SB(sb);
+ 	struct pts_mount_opts *opts = &fsi->mount_opts;
+ 
++	sync_filesystem(sb);
+ 	err = parse_mount_options(data, PARSE_REMOUNT, opts);
+ 
+ 	/*
+diff --git a/fs/efs/super.c b/fs/efs/super.c
+index 50215bb..103bbd8 100644
+--- a/fs/efs/super.c
++++ b/fs/efs/super.c
+@@ -114,6 +114,7 @@ static void destroy_inodecache(void)
+ 
+ static int efs_remount(struct super_block *sb, int *flags, char *data)
+ {
++	sync_filesystem(sb);
+ 	*flags |= MS_RDONLY;
+ 	return 0;
+ }
+diff --git a/fs/ext2/super.c b/fs/ext2/super.c
+index 20d6697..d260115 100644
+--- a/fs/ext2/super.c
++++ b/fs/ext2/super.c
+@@ -1254,6 +1254,7 @@ static int ext2_remount (struct super_block * sb, int * flags, char * data)
+ 	unsigned long old_sb_flags;
+ 	int err;
+ 
++	sync_filesystem(sb);
+ 	spin_lock(&sbi->s_lock);
+ 
+ 	/* Store the old options */
+diff --git a/fs/ext3/super.c b/fs/ext3/super.c
+index 37fd31e..95c6c5a 100644
+--- a/fs/ext3/super.c
++++ b/fs/ext3/super.c
+@@ -2649,6 +2649,8 @@ static int ext3_remount (struct super_block * sb, int * flags, char * data)
+ 	int i;
+ #endif
+ 
++	sync_filesystem(sb);
++
+ 	/* Store the original options */
+ 	old_sb_flags = sb->s_flags;
+ 	old_opts.s_mount_opt = sbi->s_mount_opt;
+diff --git a/fs/ext4/super.c b/fs/ext4/super.c
+index f5c13b8..aa3842f 100644
+--- a/fs/ext4/super.c
++++ b/fs/ext4/super.c
+@@ -4767,6 +4767,8 @@ static int ext4_remount(struct super_block *sb, int *flags, char *data)
+ #endif
+ 	char *orig_data = kstrdup(data, GFP_KERNEL);
+ 
++	sync_filesystem(sb);
++
+ 	/* Store the original options */
+ 	old_sb_flags = sb->s_flags;
+ 	old_opts.s_mount_opt = sbi->s_mount_opt;
+diff --git a/fs/f2fs/super.c b/fs/f2fs/super.c
+index 1a85f83..856bdf9 100644
+--- a/fs/f2fs/super.c
++++ b/fs/f2fs/super.c
+@@ -568,6 +568,8 @@ static int f2fs_remount(struct super_block *sb, int *flags, char *data)
+ 	struct f2fs_mount_info org_mount_opt;
+ 	int err, active_logs;
+ 
++	sync_filesystem(sb);
++
+ 	/*
+ 	 * Save the old mount options in case we
+ 	 * need to restore them.
+diff --git a/fs/fat/inode.c b/fs/fat/inode.c
+index 854b578..343e477 100644
+--- a/fs/fat/inode.c
++++ b/fs/fat/inode.c
+@@ -635,6 +635,8 @@ static int fat_remount(struct super_block *sb, int *flags, char *data)
+ 	struct msdos_sb_info *sbi = MSDOS_SB(sb);
+ 	*flags |= MS_NODIRATIME | (sbi->options.isvfat ? 0 : MS_NOATIME);
+ 
++	sync_filesystem(sb);
++
+ 	/* make sure we update state on remount. */
+ 	new_rdonly = *flags & MS_RDONLY;
+ 	if (new_rdonly != (sb->s_flags & MS_RDONLY)) {
+diff --git a/fs/freevxfs/vxfs_super.c b/fs/freevxfs/vxfs_super.c
+index e37eb27..7ca8c75 100644
+--- a/fs/freevxfs/vxfs_super.c
++++ b/fs/freevxfs/vxfs_super.c
+@@ -124,6 +124,7 @@ vxfs_statfs(struct dentry *dentry, struct kstatfs *bufp)
+ 
+ static int vxfs_remount(struct super_block *sb, int *flags, char *data)
+ {
++	sync_filesystem(sb);
+ 	*flags |= MS_RDONLY;
+ 	return 0;
+ }
+diff --git a/fs/fuse/inode.c b/fs/fuse/inode.c
+index d468643..ecdb255d 100644
+--- a/fs/fuse/inode.c
++++ b/fs/fuse/inode.c
+@@ -135,6 +135,7 @@ static void fuse_evict_inode(struct inode *inode)
+ 
+ static int fuse_remount_fs(struct super_block *sb, int *flags, char *data)
+ {
++	sync_filesystem(sb);
+ 	if (*flags & MS_MANDLOCK)
+ 		return -EINVAL;
+ 
+diff --git a/fs/gfs2/super.c b/fs/gfs2/super.c
+index 60f60f6..4c6dd50 100644
+--- a/fs/gfs2/super.c
++++ b/fs/gfs2/super.c
+@@ -1175,6 +1175,8 @@ static int gfs2_remount_fs(struct super_block *sb, int *flags, char *data)
+ 	struct gfs2_tune *gt = &sdp->sd_tune;
+ 	int error;
+ 
++	sync_filesystem(sb);
++
+ 	spin_lock(&gt->gt_spin);
+ 	args.ar_commit = gt->gt_logd_secs;
+ 	args.ar_quota_quantum = gt->gt_quota_quantum;
+diff --git a/fs/hfs/super.c b/fs/hfs/super.c
+index 2d2039e..eee7206 100644
+--- a/fs/hfs/super.c
++++ b/fs/hfs/super.c
+@@ -112,6 +112,7 @@ static int hfs_statfs(struct dentry *dentry, struct kstatfs *buf)
+ 
+ static int hfs_remount(struct super_block *sb, int *flags, char *data)
+ {
++	sync_filesystem(sb);
+ 	*flags |= MS_NODIRATIME;
+ 	if ((*flags & MS_RDONLY) == (sb->s_flags & MS_RDONLY))
+ 		return 0;
+diff --git a/fs/hfsplus/super.c b/fs/hfsplus/super.c
+index 80875aa..8eb787b 100644
+--- a/fs/hfsplus/super.c
++++ b/fs/hfsplus/super.c
+@@ -323,6 +323,7 @@ static int hfsplus_statfs(struct dentry *dentry, struct kstatfs *buf)
+ 
+ static int hfsplus_remount(struct super_block *sb, int *flags, char *data)
+ {
++	sync_filesystem(sb);
+ 	if ((*flags & MS_RDONLY) == (sb->s_flags & MS_RDONLY))
+ 		return 0;
+ 	if (!(*flags & MS_RDONLY)) {
+diff --git a/fs/hpfs/super.c b/fs/hpfs/super.c
+index 4534ff6..fe3463a 100644
+--- a/fs/hpfs/super.c
++++ b/fs/hpfs/super.c
+@@ -421,6 +421,8 @@ static int hpfs_remount_fs(struct super_block *s, int *flags, char *data)
+ 	struct hpfs_sb_info *sbi = hpfs_sb(s);
+ 	char *new_opts = kstrdup(data, GFP_KERNEL);
+ 	
++	sync_filesystem(s);
++
+ 	*flags |= MS_NOATIME;
+ 	
+ 	hpfs_lock(s);
+diff --git a/fs/isofs/inode.c b/fs/isofs/inode.c
+index 4a9e10e..6af66ee 100644
+--- a/fs/isofs/inode.c
++++ b/fs/isofs/inode.c
+@@ -117,6 +117,7 @@ static void destroy_inodecache(void)
+ 
+ static int isofs_remount(struct super_block *sb, int *flags, char *data)
+ {
++	sync_filesystem(sb);
+ 	if (!(*flags & MS_RDONLY))
+ 		return -EROFS;
+ 	return 0;
+diff --git a/fs/jffs2/super.c b/fs/jffs2/super.c
+index 0defb1c..0918f0e 100644
+--- a/fs/jffs2/super.c
++++ b/fs/jffs2/super.c
+@@ -243,6 +243,7 @@ static int jffs2_remount_fs(struct super_block *sb, int *flags, char *data)
+ 	struct jffs2_sb_info *c = JFFS2_SB_INFO(sb);
+ 	int err;
+ 
++	sync_filesystem(sb);
+ 	err = jffs2_parse_options(c, data);
+ 	if (err)
+ 		return -EINVAL;
+diff --git a/fs/jfs/super.c b/fs/jfs/super.c
+index e2b7483..97f7fda 100644
+--- a/fs/jfs/super.c
++++ b/fs/jfs/super.c
+@@ -418,6 +418,7 @@ static int jfs_remount(struct super_block *sb, int *flags, char *data)
+ 	int flag = JFS_SBI(sb)->flag;
+ 	int ret;
+ 
++	sync_filesystem(sb);
+ 	if (!parse_options(data, sb, &newLVSize, &flag)) {
+ 		return -EINVAL;
+ 	}
+diff --git a/fs/minix/inode.c b/fs/minix/inode.c
+index 0332109..dcdc298 100644
+--- a/fs/minix/inode.c
++++ b/fs/minix/inode.c
+@@ -123,6 +123,7 @@ static int minix_remount (struct super_block * sb, int * flags, char * data)
+ 	struct minix_sb_info * sbi = minix_sb(sb);
+ 	struct minix_super_block * ms;
+ 
++	sync_filesystem(sb);
+ 	ms = sbi->s_ms;
+ 	if ((*flags & MS_RDONLY) == (sb->s_flags & MS_RDONLY))
+ 		return 0;
+diff --git a/fs/ncpfs/inode.c b/fs/ncpfs/inode.c
+index 2cf2ebe..5f86e80 100644
+--- a/fs/ncpfs/inode.c
++++ b/fs/ncpfs/inode.c
+@@ -99,6 +99,7 @@ static void destroy_inodecache(void)
+ 
+ static int ncp_remount(struct super_block *sb, int *flags, char* data)
+ {
++	sync_filesystem(sb);
+ 	*flags |= MS_NODIRATIME;
+ 	return 0;
+ }
+diff --git a/fs/nfs/super.c b/fs/nfs/super.c
+index 910ed90..2cb5694 100644
+--- a/fs/nfs/super.c
++++ b/fs/nfs/super.c
+@@ -2215,6 +2215,8 @@ nfs_remount(struct super_block *sb, int *flags, char *raw_data)
+ 	struct nfs4_mount_data *options4 = (struct nfs4_mount_data *)raw_data;
+ 	u32 nfsvers = nfss->nfs_client->rpc_ops->version;
+ 
++	sync_filesystem(sb);
++
+ 	/*
+ 	 * Userspace mount programs that send binary options generally send
+ 	 * them populated with default values. We have no way to know which
+diff --git a/fs/nilfs2/super.c b/fs/nilfs2/super.c
+index 7ac2a12..8c532b2 100644
+--- a/fs/nilfs2/super.c
++++ b/fs/nilfs2/super.c
+@@ -1129,6 +1129,7 @@ static int nilfs_remount(struct super_block *sb, int *flags, char *data)
+ 	unsigned long old_mount_opt;
+ 	int err;
+ 
++	sync_filesystem(sb);
+ 	old_sb_flags = sb->s_flags;
+ 	old_mount_opt = nilfs->ns_mount_opt;
+ 
+diff --git a/fs/ntfs/super.c b/fs/ntfs/super.c
+index 82650d5..bd5610d 100644
+--- a/fs/ntfs/super.c
++++ b/fs/ntfs/super.c
+@@ -468,6 +468,8 @@ static int ntfs_remount(struct super_block *sb, int *flags, char *opt)
+ 
+ 	ntfs_debug("Entering with remount options string: %s", opt);
+ 
++	sync_filesystem(sb);
++
+ #ifndef NTFS_RW
+ 	/* For read-only compiled driver, enforce read-only flag. */
+ 	*flags |= MS_RDONLY;
+diff --git a/fs/ocfs2/super.c b/fs/ocfs2/super.c
+index 49d84f8..5f9bf8f 100644
+--- a/fs/ocfs2/super.c
++++ b/fs/ocfs2/super.c
+@@ -631,6 +631,8 @@ static int ocfs2_remount(struct super_block *sb, int *flags, char *data)
+ 	struct ocfs2_super *osb = OCFS2_SB(sb);
+ 	u32 tmp;
+ 
++	sync_filesystem(sb);
++
+ 	if (!ocfs2_parse_options(sb, data, &parsed_options, 1) ||
+ 	    !ocfs2_check_set_options(sb, &parsed_options)) {
+ 		ret = -EINVAL;
+diff --git a/fs/openpromfs/inode.c b/fs/openpromfs/inode.c
+index 8c0ceb8..15e4500 100644
+--- a/fs/openpromfs/inode.c
++++ b/fs/openpromfs/inode.c
+@@ -368,6 +368,7 @@ static struct inode *openprom_iget(struct super_block *sb, ino_t ino)
+ 
+ static int openprom_remount(struct super_block *sb, int *flags, char *data)
+ {
++	sync_filesystem(sb);
+ 	*flags |= MS_NOATIME;
+ 	return 0;
+ }
+diff --git a/fs/proc/root.c b/fs/proc/root.c
+index 87dbcbe..ac823a8 100644
+--- a/fs/proc/root.c
++++ b/fs/proc/root.c
+@@ -92,6 +92,8 @@ static int proc_parse_options(char *options, struct pid_namespace *pid)
+ int proc_remount(struct super_block *sb, int *flags, char *data)
+ {
+ 	struct pid_namespace *pid = sb->s_fs_info;
++
++	sync_filesystem(sb);
+ 	return !proc_parse_options(data, pid);
+ }
+ 
+diff --git a/fs/pstore/inode.c b/fs/pstore/inode.c
+index 1282384..192297b 100644
+--- a/fs/pstore/inode.c
++++ b/fs/pstore/inode.c
+@@ -249,6 +249,7 @@ static void parse_options(char *options)
+ 
+ static int pstore_remount(struct super_block *sb, int *flags, char *data)
+ {
++	sync_filesystem(sb);
+ 	parse_options(data);
+ 
+ 	return 0;
+diff --git a/fs/qnx4/inode.c b/fs/qnx4/inode.c
+index 8955881..c4bcb77 100644
+--- a/fs/qnx4/inode.c
++++ b/fs/qnx4/inode.c
+@@ -44,6 +44,7 @@ static int qnx4_remount(struct super_block *sb, int *flags, char *data)
+ {
+ 	struct qnx4_sb_info *qs;
+ 
++	sync_filesystem(sb);
+ 	qs = qnx4_sb(sb);
+ 	qs->Version = QNX4_VERSION;
+ 	*flags |= MS_RDONLY;
+diff --git a/fs/qnx6/inode.c b/fs/qnx6/inode.c
+index 8d941ed..65cdaab 100644
+--- a/fs/qnx6/inode.c
++++ b/fs/qnx6/inode.c
+@@ -55,6 +55,7 @@ static int qnx6_show_options(struct seq_file *seq, struct dentry *root)
+ 
+ static int qnx6_remount(struct super_block *sb, int *flags, char *data)
+ {
++	sync_filesystem(sb);
+ 	*flags |= MS_RDONLY;
+ 	return 0;
+ }
+diff --git a/fs/reiserfs/super.c b/fs/reiserfs/super.c
+index 2c80335..abf2b76 100644
+--- a/fs/reiserfs/super.c
++++ b/fs/reiserfs/super.c
+@@ -1319,6 +1319,7 @@ static int reiserfs_remount(struct super_block *s, int *mount_flags, char *arg)
+ 	int i;
+ #endif
+ 
++	sync_filesystem(s);
+ 	reiserfs_write_lock(s);
+ 
+ #ifdef CONFIG_QUOTA
+diff --git a/fs/romfs/super.c b/fs/romfs/super.c
+index d841878..ef90e8b 100644
+--- a/fs/romfs/super.c
++++ b/fs/romfs/super.c
+@@ -432,6 +432,7 @@ static int romfs_statfs(struct dentry *dentry, struct kstatfs *buf)
+  */
+ static int romfs_remount(struct super_block *sb, int *flags, char *data)
+ {
++	sync_filesystem(sb);
+ 	*flags |= MS_RDONLY;
+ 	return 0;
+ }
+diff --git a/fs/squashfs/super.c b/fs/squashfs/super.c
+index 202df63..031c8d67 100644
+--- a/fs/squashfs/super.c
++++ b/fs/squashfs/super.c
+@@ -371,6 +371,7 @@ static int squashfs_statfs(struct dentry *dentry, struct kstatfs *buf)
+ 
+ static int squashfs_remount(struct super_block *sb, int *flags, char *data)
+ {
++	sync_filesystem(sb);
+ 	*flags |= MS_RDONLY;
+ 	return 0;
+ }
+diff --git a/fs/super.c b/fs/super.c
+index 80d5cf2..e9dc3c3 100644
+--- a/fs/super.c
++++ b/fs/super.c
+@@ -719,8 +719,6 @@ int do_remount_sb(struct super_block *sb, int flags, void *data, int force)
+ 		}
+ 	}
+ 
+-	sync_filesystem(sb);
+-
+ 	if (sb->s_op->remount_fs) {
+ 		retval = sb->s_op->remount_fs(sb, &flags, data);
+ 		if (retval) {
+diff --git a/fs/sysv/inode.c b/fs/sysv/inode.c
+index c327d4e..4742e58 100644
+--- a/fs/sysv/inode.c
++++ b/fs/sysv/inode.c
+@@ -60,6 +60,7 @@ static int sysv_remount(struct super_block *sb, int *flags, char *data)
+ {
+ 	struct sysv_sb_info *sbi = SYSV_SB(sb);
+ 
++	sync_filesystem(sb);
+ 	if (sbi->s_forced_ro)
+ 		*flags |= MS_RDONLY;
+ 	return 0;
+diff --git a/fs/ubifs/super.c b/fs/ubifs/super.c
+index 5ded849..e1598ab 100644
+--- a/fs/ubifs/super.c
++++ b/fs/ubifs/super.c
+@@ -1827,6 +1827,7 @@ static int ubifs_remount_fs(struct super_block *sb, int *flags, char *data)
+ 	int err;
+ 	struct ubifs_info *c = sb->s_fs_info;
+ 
++	sync_filesystem(sb);
+ 	dbg_gen("old flags %#lx, new flags %#x", sb->s_flags, *flags);
+ 
+ 	err = ubifs_parse_options(c, data, 1);
+diff --git a/fs/udf/super.c b/fs/udf/super.c
+index 3306b9f..64f2b73 100644
+--- a/fs/udf/super.c
++++ b/fs/udf/super.c
+@@ -646,6 +646,7 @@ static int udf_remount_fs(struct super_block *sb, int *flags, char *options)
+ 	int error = 0;
+ 	struct logicalVolIntegrityDescImpUse *lvidiu = udf_sb_lvidiu(sb);
+ 
++	sync_filesystem(sb);
+ 	if (lvidiu) {
+ 		int write_rev = le16_to_cpu(lvidiu->minUDFWriteRev);
+ 		if (write_rev > UDF_MAX_WRITE_VERSION && !(*flags & MS_RDONLY))
+diff --git a/fs/ufs/super.c b/fs/ufs/super.c
+index 329f2f5..b8c6791 100644
+--- a/fs/ufs/super.c
++++ b/fs/ufs/super.c
+@@ -1280,6 +1280,7 @@ static int ufs_remount (struct super_block *sb, int *mount_flags, char *data)
+ 	unsigned new_mount_opt, ufstype;
+ 	unsigned flags;
+ 
++	sync_filesystem(sb);
+ 	lock_ufs(sb);
+ 	mutex_lock(&UFS_SB(sb)->s_lock);
+ 	uspi = UFS_SB(sb)->s_uspi;
+diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
+index f317488..aaa3eca 100644
+--- a/fs/xfs/xfs_super.c
++++ b/fs/xfs/xfs_super.c
+@@ -1197,6 +1197,7 @@ xfs_fs_remount(
+ 	char			*p;
+ 	int			error;
+ 
++	sync_filesystem(sb);
+ 	while ((p = strsep(&options, ",")) != NULL) {
+ 		int token;
+ 
+-- 
+1.9.0
 
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+
+______________________________________________________
+Linux MTD discussion mailing list
+http://lists.infradead.org/mailman/listinfo/linux-mtd/
