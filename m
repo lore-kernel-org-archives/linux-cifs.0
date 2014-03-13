@@ -1,311 +1,685 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Allow mounts for paths for restricted intermediate paths
-Date: Thu, 13 Mar 2014 10:35:59 -0500
-Message-ID: <CADT32eLvot8Qd_4OJ0gt5dD-d9GQiJjQPv593Wt+mu2mHNp92w@mail.gmail.com>
-References: <1384878813-7413-1-git-send-email-shirishpargaonkar@gmail.com>
-	<20131119155923.31181d93@tlielax.poochiereds.net>
-	<CADT32eL5R3oFiH9ZO8hK=+QA7wcjCHQbfCFn0W9+o3VH4YfXnw@mail.gmail.com>
-	<20140312150436.610544ed@tlielax.poochiereds.net>
+From: Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>
+Subject: Re: [PATCH] fs: push sync_filesystem() down to the file system's
+ remount_fs()
+Date: Thu, 13 Mar 2014 17:23:19 +0100
+Message-ID: <20140313162319.GA504@quack.suse.cz>
+References: <20140313073936.GA14663@infradead.org>
+ <1394720456-16629-1-git-send-email-tytso@mit.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20140312150436.610544ed-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-fsdevel-AKGzg7BKzIDYtjvyW6yDsg@public.gmane.org,
+	Ext4 Developers List <linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+	Artem Bityutskiy <dedekind1-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Adrian Hunter <adrian.hunter-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+	Evgeniy Dushistov <dushistov-JGs/UdohzUI@public.gmane.org>, Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>,
+	OGAWA Hirofumi <hirofumi-UIVanBePwB70ZhReMnHkpc8NsWr+9BEh@public.gmane.org>,
+	Anders Larsen <al-V9/YLgxv/GvR7s880joybQ@public.gmane.org>,
+	Phillip Lougher <phillip-Y7wUz+saRi+tmTQ+vhA3Yw@public.gmane.org>,
+	Kees Cook <keescook-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>,
+	Mikulas Patocka <mikulas-TTVWCEgN8Z9G4ohzP4jBZS1Fcj925eT/@public.gmane.org>,
+	Petr Vandrovec <petr-vPk2MGR0e28uaRcfnNAh7A@public.gmane.org>, xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org,
+	linux-btrfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, codalist-/uMB558Y47wP4a1z8dhFYw@public.gmane.org,
+	linux-f2fs-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
+	fuse-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+	linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	jfs-discussion-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nilfs
+To: Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>
+Return-path: <linux-nilfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <1394720456-16629-1-git-send-email-tytso-3s7WtUTddSA@public.gmane.org>
+Sender: linux-nilfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Wed, Mar 12, 2014 at 2:04 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> On Wed, 12 Mar 2014 12:38:02 -0500
-> Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> On Tue, Nov 19, 2013 at 2:59 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->> > On Tue, 19 Nov 2013 10:33:33 -0600
->> > shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
->> >
->> >> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->> >>
->> >>
->> >> Allow cifs mounts for a prefixpath with intermediate paths without access,
->> >> so as to continue with the shared superblock model.
->> >>
->> >> For the intermediate path entries that do not allow access, create "placeholder"
->> >> inodes and instantiate dentries with those inodes.
->> >> If and when such a path entry becomes accessible it is filled with correct
->> >> info.
->> >>
->> >
->> > I'm unclear on this last bit...
->> >
->> > How exactly do they end up being filled with the correct info once that
->> > happens?
->> >
->> >> Reference: Samba bugzilla 6950
->> >>
->> >> Signed-off-by: Shirish Pargaonkar <spargaonkar-IBi9RG/b67k@public.gmane.org>
->> >>
->> >> ---
->> >>  fs/cifs/cifsfs.c    | 17 +++++++++++++++--
->> >>  fs/cifs/cifsproto.h |  3 +++
->> >>  fs/cifs/inode.c     | 16 ++++++++++++++++
->> >>  3 files changed, 34 insertions(+), 2 deletions(-)
->> >>
->> >> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
->> >> index 849f613..bce185c 100644
->> >> --- a/fs/cifs/cifsfs.c
->> >> +++ b/fs/cifs/cifsfs.c
->> >> @@ -584,6 +584,9 @@ cifs_get_root(struct smb_vol *vol, struct super_block *sb)
->> >>       char *full_path = NULL;
->> >>       char *s, *p;
->> >>       char sep;
->> >> +     struct inode *dir, *phinode;
->> >> +     struct dentry *child;
->> >> +     struct cifs_fattr phfattr;
->> >>
->> >>       full_path = cifs_build_path_to_root(vol, cifs_sb,
->> >>                                           cifs_sb_master_tcon(cifs_sb));
->> >> @@ -592,13 +595,13 @@ cifs_get_root(struct smb_vol *vol, struct super_block *sb)
->> >>
->> >>       cifs_dbg(FYI, "Get root dentry for %s\n", full_path);
->> >>
->> >> +     fill_phfattr(&phfattr, sb);
->> >
->> > Hmmm...so this function sets up a cifs_fattr struct, including the
->> > cf_uniqueid...which won't be very unique when you reuse that struct
->> > several times in the do...while loop below. Don't you need to call it
->> > again after you use it once?
->> >
->> >>       sep = CIFS_DIR_SEP(cifs_sb);
->> >>       dentry = dget(sb->s_root);
->> >>       p = s = full_path;
->> >>
->> >>       do {
->> >> -             struct inode *dir = dentry->d_inode;
->> >> -             struct dentry *child;
->> >> +             dir = dentry->d_inode;
->> >>
->> >>               if (!dir) {
->> >>                       dput(dentry);
->> >> @@ -626,6 +629,16 @@ cifs_get_root(struct smb_vol *vol, struct super_block *sb)
->> >>               mutex_unlock(&dir->i_mutex);
->> >>               dput(dentry);
->> >>               dentry = child;
->> >> +             if (!IS_ERR(dentry)) {
->> >> +                     if (*s) {
->> >> +                             /* EACCESS on an intermediate dir */
->> >> +                             if (!dentry->d_inode) {
->> >> +                                     phinode = cifs_iget(sb, &phfattr);
->> >> +                                     if (phinode)
->> >> +                                             d_instantiate(dentry, phinode);
->> >> +                             }
->> >> +                     }
->> >> +             }
->> >
->> > This doesn't make any sense to me.
->> >
->> > The do...while loop here is basically doing lookups and instantiating
->> > dentries and inodes down from the root of the mount to the root of the
->> > share. The lookup_one_len call is what does the single-level lookup in
->> > that directory.
->> >
->> > Why are you adding special handling when "dentry" is not an error?
->> > Would it not make more sense to do so when lookup_one_len does return
->> > an error?
->> >
->> >>       } while (!IS_ERR(dentry));
->> >>       kfree(full_path);
->> >>       return dentry;
->> >> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
->> >> index aa33976..9a84e5c 100644
->> >> --- a/fs/cifs/cifsproto.h
->> >> +++ b/fs/cifs/cifsproto.h
->> >> @@ -498,4 +498,7 @@ void cifs_writedata_release(struct kref *refcount);
->> >>  int open_query_close_cifs_symlink(const unsigned char *path, char *pbuf,
->> >>                       unsigned int *pbytes_read, struct cifs_sb_info *cifs_sb,
->> >>                       unsigned int xid);
->> >> +
->> >> +extern void fill_phfattr(struct cifs_fattr *, struct super_block *);
->> >> +
->> >>  #endif                       /* _CIFSPROTO_H */
->> >> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
->> >> index 36f9ebb..4f5a09a 100644
->> >> --- a/fs/cifs/inode.c
->> >> +++ b/fs/cifs/inode.c
->> >> @@ -322,6 +322,22 @@ cifs_create_dfs_fattr(struct cifs_fattr *fattr, struct super_block *sb)
->> >>       fattr->cf_flags |= CIFS_FATTR_DFS_REFERRAL;
->> >>  }
->> >>
->> >> +void
->> >> +fill_phfattr(struct cifs_fattr *cf, struct super_block *sb)
->> >> +{
->> >> +     struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
->> >> +
->> >> +     memset(cf, 0, sizeof(*cf));
->> >> +     cf->cf_uniqueid = iunique(sb, ROOT_I);
->> >
->> >
->> > Also, iunique is only guaranteed to return a number that hasn't yet
->> > been used. So suppose we're going to instantiate one of these bogus
->> > inodes. We give it the uniqueid of '3'. Then later, once the mount is
->> > done we find another (legitimate) inode on the server and it also has a
->> > uniqueid of '3'. Now you have a collision. Worse yet, if it's a
->> > directory now it looks like we have a hardlinked directory...
->> >
->> > Once you start using iunique, you can't really go back to using server
->> > inode numbers since you can't guarantee that there won't be collisions.
->> >
->> > One possibility to deal with that would be to tag these entries as
->> > bogus and ensure that cifs_iget will never match them. Another
->> > possibility might be just to never hash these inodes, but I'm not clear
->> > on how kosher that is from a vfs standpoint.
->> >
->> >> +     cf->cf_nlink = 1;
->> >> +     cf->cf_atime = CURRENT_TIME;
->> >> +     cf->cf_ctime = CURRENT_TIME;
->> >> +     cf->cf_mtime = CURRENT_TIME;
->> >> +     cf->cf_mode = S_IFDIR | S_IXUGO | S_IRWXU;
->> >> +     cf->cf_uid = cifs_sb->mnt_uid;
->> >> +     cf->cf_gid = cifs_sb->mnt_gid;
->> >> +}
->> >> +
->> >
->> >
->> >>  static int
->> >>  cifs_get_file_info_unix(struct file *filp)
->> >>  {
->> >
->> >
->>
->> > I think the thing to do is to step back and describe (in English) how
->> > you envision this working. Then once that's done, we can start
->> > discussing what the code should look like...
->> >
->> > --
->> > Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->>
->> Trying to solve this using like this:
->>
->> If during mounting a share, if the share path is accessbile but
->> if any of the intermediate paths to the share is inaccessible
->> i.e. returns error EACCES,
->>  - get inode info for the share path using query path info
->>  - look for a dentry and if not found, add - using d_obtain_alias()
->>  - if server does not support unique ids/ inode numbers, add to the
->>    begining of the list maintained in superblock, an element consisting of
->>    full path, pointer to this dentry, and a pointer to the inode.
->>
->> During lookup,
->>  for a case where server does support unique_ids/inode numbers,
->>  - obtain inode info using query path info
->>  - splice (d_splice_alias()) the dentry corrosponding to this inode if any
->>    if spliced, remove the element from the list maintained in the superblock.
->>
->>  for a case where server does not support unique id/inode number,
->>  - search for an entry for inode based on the full path
->>    if no such entry, obtain inode info using query path info
->>  - splice (d_splice_alias()) the dentry corrosponding to this inode if any
->>    if successful, remove the element from the list maintained in the superblock.
->>
->>    That is one way an element will come off of the list maintained in the
->>    superblock.  If the dentry does not get ever get spliced, whenever either
->>    it is deleted with zero d_count (unmount e.g.) or it is released
->>    (superblock is being deleted), cifs d_delete and cifs_d_release
->>    respectively, whichever applies first, will take the element off the list
->>    and free it.
->>
->>    If the superblock is intact and anonymous root dentry does not get deleted
->>    during unmount (d_count is not zero i.e. has child dentries with referenece
->>    to the parent) i.e. d_delete does not get called, the dentries would remain
->>    till vfs code deletes them as needed (as their d_count starts approaching
->>    zero).
->>
->>    Whenever we have the same mount again with a anonymous dentry, the
->>    elements are added to the head of the list maintained in the superblock,
->>    so stale elements will not be reachable.
->>
->> Your comments are most welcome.
->>
->> Regards,
->>
->> Shirish
->
-> Really, the whole problem boils down to this:
->
-> Suppose we mount two cifs mounts:
->
->     //server/a on /mnt/a
->
-> ...and...
->
->     //server/a/b on /mnt/b
->
-> Now suppose there is a directory under there:
->
->     /mnt/a/b/c
->
-> ...so logically, this should be the same dentry:
->
->     /mnt/b/c
->
-> The problem is -- how do you know that that's the same dentry?
+On Thu 13-03-14 10:20:56, Ted Tso wrote:
+> Previously, the no-op "mount -o mount /dev/xxx" operation when the
+                                  ^^remount
 
-So this will be a problem only if a dentry for c is not in dcache,
-is that correct?
+> file system is already mounted read-write causes an implied,
+> unconditional syncfs().  This seems pretty stupid, and it's certainly
+> documented or guaraunteed to do this, nor is it particularly useful,
+> except in the case where the file system was mounted rw and is getting
+> remounted read-only.
+> 
+> However, it's possible that there might be some file systems that are
+> actually depending on this behavior.  In most file systems, it's
+> probably fine to only call sync_filesystem() when transitioning from
+> read-write to read-only, and there are some file systems where this is
+> not needed at all (for example, for a pseudo-filesystem or something
+> like romfs).
+  Hum, I'd avoid this excercise at least for filesystem where
+sync_filesystem() is obviously useless - proc, debugfs, pstore, devpts,
+also always read-only filesystems such as isofs, qnx4, qnx6, befs, cramfs,
+efs, freevxfs, romfs, squashfs. I think you can find a couple more which
+clearly don't care about sync_filesystem() if you look a bit closer.
 
-If so, the problem arises when two lookups for c for two different
-paths go out on the wire because a dentry for c is not in the cache.
-So in that case, in cifs code, can we serialize instantiating a dentry
-i.e. check for a dentry in dcache just before instantiating and if it is,
-discard the inode?
-dentries would be unique with their d_parent and d_name combination.
-
->
-> The reason that the shared superblock stuff works with NFS is that
-> there is a 1:1 correspondence between inodes and filehandles. So, even
-> if the file is renamed on the server, you end up with the same inode
-> and can tell that that dentry is the same as another.
->
-> That's more or less the case for CIFS too where you have a uniqueid,
-> but when you don't that whole model breaks down.
->
-> Hashing filenames sounds like a possibility too, but what happens if
-> someone does this on the directory above on the server?
->
->     $ mv c d
->
-
-Assuming using hashing full path names to generate uniqueids, if above happens,
-would not revalidation of the dentry (for c) fail on the client so we
-will end up discarding
-the inode and dentry and a creating a new dentry with correct d_name
-and an inode with
-hashed full pathname unique_id during lookup?
-
-In above case, wonder how NFS updates d_name of a dentry with the same inode!
-
-
-> Since you can't guard against changes to lookup information on the
-> server that makes that method of uniquely id'ing an inode pretty
-> worthless.
->
-> I think that really leaves you with just two choices:
->
-> 1) figure out some mechanism to hook things up at mount time.
-> Basically, instantiate "placeholder" inodes for directories above the
-> root of the mount. IOW, if someone mounts /mnt/b above and then you'd
-> need a placeholder inode for "a" that will be filled out when /mnt/a
-> mounted.
->
-> 2) abandon the shared-superblock model altogether. That'll mean that in
-> the above mount setup that you don't have cache coherency between the
-> two mounts (since they'll be different superblocks), and you may need
-> to tweak how fscache works in order to ensure that collisions between
-> two different mounts isn't a problem.
->
-> At this point #2 doesn't seem altogether unreasonable. Most people
-> don't have pathological mount configurations like that so I'm not sure
-> it's worthwhile to jump through hoops to enable them.
->
-> --
-> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+								Honza
+> 
+> Signed-off-by: "Theodore Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>
+> Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> Cc: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+> Cc: Artem Bityutskiy <dedekind1-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Cc: Adrian Hunter <adrian.hunter-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+> Cc: Evgeniy Dushistov <dushistov-JGs/UdohzUI@public.gmane.org>
+> Cc: Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>
+> Cc: OGAWA Hirofumi <hirofumi-UIVanBePwB70ZhReMnHkpc8NsWr+9BEh@public.gmane.org>
+> Cc: Anders Larsen <al-V9/YLgxv/GvR7s880joybQ@public.gmane.org>
+> Cc: Phillip Lougher <phillip-Y7wUz+saRi+tmTQ+vhA3Yw@public.gmane.org>
+> Cc: Kees Cook <keescook-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>
+> Cc: Mikulas Patocka <mikulas-TTVWCEgN8Z9G4ohzP4jBZS1Fcj925eT/@public.gmane.org>
+> Cc: Petr Vandrovec <petr-vPk2MGR0e28uaRcfnNAh7A@public.gmane.org>
+> Cc: xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org
+> Cc: linux-btrfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> Cc: samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+> Cc: codalist-/uMB558Y47wP4a1z8dhFYw@public.gmane.org
+> Cc: linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> Cc: linux-f2fs-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org
+> Cc: fuse-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org
+> Cc: cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+> Cc: linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+> Cc: jfs-discussion-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org
+> Cc: linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> Cc: linux-nilfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> Cc: linux-ntfs-dev-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org
+> Cc: ocfs2-devel-N0ozoZBvEnrZJqsBc5GL+g@public.gmane.org
+> Cc: reiserfs-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> ---
+>  fs/adfs/super.c          | 1 +
+>  fs/affs/super.c          | 1 +
+>  fs/befs/linuxvfs.c       | 1 +
+>  fs/btrfs/super.c         | 1 +
+>  fs/cifs/cifsfs.c         | 1 +
+>  fs/coda/inode.c          | 1 +
+>  fs/cramfs/inode.c        | 1 +
+>  fs/debugfs/inode.c       | 1 +
+>  fs/devpts/inode.c        | 1 +
+>  fs/efs/super.c           | 1 +
+>  fs/ext2/super.c          | 1 +
+>  fs/ext3/super.c          | 2 ++
+>  fs/ext4/super.c          | 2 ++
+>  fs/f2fs/super.c          | 2 ++
+>  fs/fat/inode.c           | 2 ++
+>  fs/freevxfs/vxfs_super.c | 1 +
+>  fs/fuse/inode.c          | 1 +
+>  fs/gfs2/super.c          | 2 ++
+>  fs/hfs/super.c           | 1 +
+>  fs/hfsplus/super.c       | 1 +
+>  fs/hpfs/super.c          | 2 ++
+>  fs/isofs/inode.c         | 1 +
+>  fs/jffs2/super.c         | 1 +
+>  fs/jfs/super.c           | 1 +
+>  fs/minix/inode.c         | 1 +
+>  fs/ncpfs/inode.c         | 1 +
+>  fs/nfs/super.c           | 2 ++
+>  fs/nilfs2/super.c        | 1 +
+>  fs/ntfs/super.c          | 2 ++
+>  fs/ocfs2/super.c         | 2 ++
+>  fs/openpromfs/inode.c    | 1 +
+>  fs/proc/root.c           | 2 ++
+>  fs/pstore/inode.c        | 1 +
+>  fs/qnx4/inode.c          | 1 +
+>  fs/qnx6/inode.c          | 1 +
+>  fs/reiserfs/super.c      | 1 +
+>  fs/romfs/super.c         | 1 +
+>  fs/squashfs/super.c      | 1 +
+>  fs/super.c               | 2 --
+>  fs/sysv/inode.c          | 1 +
+>  fs/ubifs/super.c         | 1 +
+>  fs/udf/super.c           | 1 +
+>  fs/ufs/super.c           | 1 +
+>  fs/xfs/xfs_super.c       | 1 +
+>  44 files changed, 53 insertions(+), 2 deletions(-)
+> 
+> diff --git a/fs/adfs/super.c b/fs/adfs/super.c
+> index 7b3003c..952aeb0 100644
+> --- a/fs/adfs/super.c
+> +++ b/fs/adfs/super.c
+> @@ -212,6 +212,7 @@ static int parse_options(struct super_block *sb, char *options)
+>  
+>  static int adfs_remount(struct super_block *sb, int *flags, char *data)
+>  {
+> +	sync_filesystem(sb);
+>  	*flags |= MS_NODIRATIME;
+>  	return parse_options(sb, data);
+>  }
+> diff --git a/fs/affs/super.c b/fs/affs/super.c
+> index d098731..3074530 100644
+> --- a/fs/affs/super.c
+> +++ b/fs/affs/super.c
+> @@ -530,6 +530,7 @@ affs_remount(struct super_block *sb, int *flags, char *data)
+>  
+>  	pr_debug("AFFS: remount(flags=0x%x,opts=\"%s\")\n",*flags,data);
+>  
+> +	sync_filesystem(sb);
+>  	*flags |= MS_NODIRATIME;
+>  
+>  	memcpy(volume, sbi->s_volume, 32);
+> diff --git a/fs/befs/linuxvfs.c b/fs/befs/linuxvfs.c
+> index 845d2d6..56d70c8 100644
+> --- a/fs/befs/linuxvfs.c
+> +++ b/fs/befs/linuxvfs.c
+> @@ -913,6 +913,7 @@ befs_fill_super(struct super_block *sb, void *data, int silent)
+>  static int
+>  befs_remount(struct super_block *sb, int *flags, char *data)
+>  {
+> +	sync_filesystem(sb);
+>  	if (!(*flags & MS_RDONLY))
+>  		return -EINVAL;
+>  	return 0;
+> diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
+> index 97cc241..00cd0c5 100644
+> --- a/fs/btrfs/super.c
+> +++ b/fs/btrfs/super.c
+> @@ -1381,6 +1381,7 @@ static int btrfs_remount(struct super_block *sb, int *flags, char *data)
+>  	unsigned int old_metadata_ratio = fs_info->metadata_ratio;
+>  	int ret;
+>  
+> +	sync_filesystem(sb);
+>  	btrfs_remount_prepare(fs_info);
+>  
+>  	ret = btrfs_parse_options(root, data);
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index 849f613..4942c94 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -541,6 +541,7 @@ static int cifs_show_stats(struct seq_file *s, struct dentry *root)
+>  
+>  static int cifs_remount(struct super_block *sb, int *flags, char *data)
+>  {
+> +	sync_filesystem(sb);
+>  	*flags |= MS_NODIRATIME;
+>  	return 0;
+>  }
+> diff --git a/fs/coda/inode.c b/fs/coda/inode.c
+> index 506de34..3f48000 100644
+> --- a/fs/coda/inode.c
+> +++ b/fs/coda/inode.c
+> @@ -96,6 +96,7 @@ void coda_destroy_inodecache(void)
+>  
+>  static int coda_remount(struct super_block *sb, int *flags, char *data)
+>  {
+> +	sync_filesystem(sb);
+>  	*flags |= MS_NOATIME;
+>  	return 0;
+>  }
+> diff --git a/fs/cramfs/inode.c b/fs/cramfs/inode.c
+> index 06610cf..a275911 100644
+> --- a/fs/cramfs/inode.c
+> +++ b/fs/cramfs/inode.c
+> @@ -244,6 +244,7 @@ static void cramfs_kill_sb(struct super_block *sb)
+>  
+>  static int cramfs_remount(struct super_block *sb, int *flags, char *data)
+>  {
+> +	sync_filesystem(sb);
+>  	*flags |= MS_RDONLY;
+>  	return 0;
+>  }
+> diff --git a/fs/debugfs/inode.c b/fs/debugfs/inode.c
+> index 9c0444c..02928a9 100644
+> --- a/fs/debugfs/inode.c
+> +++ b/fs/debugfs/inode.c
+> @@ -218,6 +218,7 @@ static int debugfs_remount(struct super_block *sb, int *flags, char *data)
+>  	int err;
+>  	struct debugfs_fs_info *fsi = sb->s_fs_info;
+>  
+> +	sync_filesystem(sb);
+>  	err = debugfs_parse_options(data, &fsi->mount_opts);
+>  	if (err)
+>  		goto fail;
+> diff --git a/fs/devpts/inode.c b/fs/devpts/inode.c
+> index a726b9f..c710380 100644
+> --- a/fs/devpts/inode.c
+> +++ b/fs/devpts/inode.c
+> @@ -313,6 +313,7 @@ static int devpts_remount(struct super_block *sb, int *flags, char *data)
+>  	struct pts_fs_info *fsi = DEVPTS_SB(sb);
+>  	struct pts_mount_opts *opts = &fsi->mount_opts;
+>  
+> +	sync_filesystem(sb);
+>  	err = parse_mount_options(data, PARSE_REMOUNT, opts);
+>  
+>  	/*
+> diff --git a/fs/efs/super.c b/fs/efs/super.c
+> index 50215bb..103bbd8 100644
+> --- a/fs/efs/super.c
+> +++ b/fs/efs/super.c
+> @@ -114,6 +114,7 @@ static void destroy_inodecache(void)
+>  
+>  static int efs_remount(struct super_block *sb, int *flags, char *data)
+>  {
+> +	sync_filesystem(sb);
+>  	*flags |= MS_RDONLY;
+>  	return 0;
+>  }
+> diff --git a/fs/ext2/super.c b/fs/ext2/super.c
+> index 20d6697..d260115 100644
+> --- a/fs/ext2/super.c
+> +++ b/fs/ext2/super.c
+> @@ -1254,6 +1254,7 @@ static int ext2_remount (struct super_block * sb, int * flags, char * data)
+>  	unsigned long old_sb_flags;
+>  	int err;
+>  
+> +	sync_filesystem(sb);
+>  	spin_lock(&sbi->s_lock);
+>  
+>  	/* Store the old options */
+> diff --git a/fs/ext3/super.c b/fs/ext3/super.c
+> index 37fd31e..95c6c5a 100644
+> --- a/fs/ext3/super.c
+> +++ b/fs/ext3/super.c
+> @@ -2649,6 +2649,8 @@ static int ext3_remount (struct super_block * sb, int * flags, char * data)
+>  	int i;
+>  #endif
+>  
+> +	sync_filesystem(sb);
+> +
+>  	/* Store the original options */
+>  	old_sb_flags = sb->s_flags;
+>  	old_opts.s_mount_opt = sbi->s_mount_opt;
+> diff --git a/fs/ext4/super.c b/fs/ext4/super.c
+> index f5c13b8..aa3842f 100644
+> --- a/fs/ext4/super.c
+> +++ b/fs/ext4/super.c
+> @@ -4767,6 +4767,8 @@ static int ext4_remount(struct super_block *sb, int *flags, char *data)
+>  #endif
+>  	char *orig_data = kstrdup(data, GFP_KERNEL);
+>  
+> +	sync_filesystem(sb);
+> +
+>  	/* Store the original options */
+>  	old_sb_flags = sb->s_flags;
+>  	old_opts.s_mount_opt = sbi->s_mount_opt;
+> diff --git a/fs/f2fs/super.c b/fs/f2fs/super.c
+> index 1a85f83..856bdf9 100644
+> --- a/fs/f2fs/super.c
+> +++ b/fs/f2fs/super.c
+> @@ -568,6 +568,8 @@ static int f2fs_remount(struct super_block *sb, int *flags, char *data)
+>  	struct f2fs_mount_info org_mount_opt;
+>  	int err, active_logs;
+>  
+> +	sync_filesystem(sb);
+> +
+>  	/*
+>  	 * Save the old mount options in case we
+>  	 * need to restore them.
+> diff --git a/fs/fat/inode.c b/fs/fat/inode.c
+> index 854b578..343e477 100644
+> --- a/fs/fat/inode.c
+> +++ b/fs/fat/inode.c
+> @@ -635,6 +635,8 @@ static int fat_remount(struct super_block *sb, int *flags, char *data)
+>  	struct msdos_sb_info *sbi = MSDOS_SB(sb);
+>  	*flags |= MS_NODIRATIME | (sbi->options.isvfat ? 0 : MS_NOATIME);
+>  
+> +	sync_filesystem(sb);
+> +
+>  	/* make sure we update state on remount. */
+>  	new_rdonly = *flags & MS_RDONLY;
+>  	if (new_rdonly != (sb->s_flags & MS_RDONLY)) {
+> diff --git a/fs/freevxfs/vxfs_super.c b/fs/freevxfs/vxfs_super.c
+> index e37eb27..7ca8c75 100644
+> --- a/fs/freevxfs/vxfs_super.c
+> +++ b/fs/freevxfs/vxfs_super.c
+> @@ -124,6 +124,7 @@ vxfs_statfs(struct dentry *dentry, struct kstatfs *bufp)
+>  
+>  static int vxfs_remount(struct super_block *sb, int *flags, char *data)
+>  {
+> +	sync_filesystem(sb);
+>  	*flags |= MS_RDONLY;
+>  	return 0;
+>  }
+> diff --git a/fs/fuse/inode.c b/fs/fuse/inode.c
+> index d468643..ecdb255d 100644
+> --- a/fs/fuse/inode.c
+> +++ b/fs/fuse/inode.c
+> @@ -135,6 +135,7 @@ static void fuse_evict_inode(struct inode *inode)
+>  
+>  static int fuse_remount_fs(struct super_block *sb, int *flags, char *data)
+>  {
+> +	sync_filesystem(sb);
+>  	if (*flags & MS_MANDLOCK)
+>  		return -EINVAL;
+>  
+> diff --git a/fs/gfs2/super.c b/fs/gfs2/super.c
+> index 60f60f6..4c6dd50 100644
+> --- a/fs/gfs2/super.c
+> +++ b/fs/gfs2/super.c
+> @@ -1175,6 +1175,8 @@ static int gfs2_remount_fs(struct super_block *sb, int *flags, char *data)
+>  	struct gfs2_tune *gt = &sdp->sd_tune;
+>  	int error;
+>  
+> +	sync_filesystem(sb);
+> +
+>  	spin_lock(&gt->gt_spin);
+>  	args.ar_commit = gt->gt_logd_secs;
+>  	args.ar_quota_quantum = gt->gt_quota_quantum;
+> diff --git a/fs/hfs/super.c b/fs/hfs/super.c
+> index 2d2039e..eee7206 100644
+> --- a/fs/hfs/super.c
+> +++ b/fs/hfs/super.c
+> @@ -112,6 +112,7 @@ static int hfs_statfs(struct dentry *dentry, struct kstatfs *buf)
+>  
+>  static int hfs_remount(struct super_block *sb, int *flags, char *data)
+>  {
+> +	sync_filesystem(sb);
+>  	*flags |= MS_NODIRATIME;
+>  	if ((*flags & MS_RDONLY) == (sb->s_flags & MS_RDONLY))
+>  		return 0;
+> diff --git a/fs/hfsplus/super.c b/fs/hfsplus/super.c
+> index 80875aa..8eb787b 100644
+> --- a/fs/hfsplus/super.c
+> +++ b/fs/hfsplus/super.c
+> @@ -323,6 +323,7 @@ static int hfsplus_statfs(struct dentry *dentry, struct kstatfs *buf)
+>  
+>  static int hfsplus_remount(struct super_block *sb, int *flags, char *data)
+>  {
+> +	sync_filesystem(sb);
+>  	if ((*flags & MS_RDONLY) == (sb->s_flags & MS_RDONLY))
+>  		return 0;
+>  	if (!(*flags & MS_RDONLY)) {
+> diff --git a/fs/hpfs/super.c b/fs/hpfs/super.c
+> index 4534ff6..fe3463a 100644
+> --- a/fs/hpfs/super.c
+> +++ b/fs/hpfs/super.c
+> @@ -421,6 +421,8 @@ static int hpfs_remount_fs(struct super_block *s, int *flags, char *data)
+>  	struct hpfs_sb_info *sbi = hpfs_sb(s);
+>  	char *new_opts = kstrdup(data, GFP_KERNEL);
+>  	
+> +	sync_filesystem(s);
+> +
+>  	*flags |= MS_NOATIME;
+>  	
+>  	hpfs_lock(s);
+> diff --git a/fs/isofs/inode.c b/fs/isofs/inode.c
+> index 4a9e10e..6af66ee 100644
+> --- a/fs/isofs/inode.c
+> +++ b/fs/isofs/inode.c
+> @@ -117,6 +117,7 @@ static void destroy_inodecache(void)
+>  
+>  static int isofs_remount(struct super_block *sb, int *flags, char *data)
+>  {
+> +	sync_filesystem(sb);
+>  	if (!(*flags & MS_RDONLY))
+>  		return -EROFS;
+>  	return 0;
+> diff --git a/fs/jffs2/super.c b/fs/jffs2/super.c
+> index 0defb1c..0918f0e 100644
+> --- a/fs/jffs2/super.c
+> +++ b/fs/jffs2/super.c
+> @@ -243,6 +243,7 @@ static int jffs2_remount_fs(struct super_block *sb, int *flags, char *data)
+>  	struct jffs2_sb_info *c = JFFS2_SB_INFO(sb);
+>  	int err;
+>  
+> +	sync_filesystem(sb);
+>  	err = jffs2_parse_options(c, data);
+>  	if (err)
+>  		return -EINVAL;
+> diff --git a/fs/jfs/super.c b/fs/jfs/super.c
+> index e2b7483..97f7fda 100644
+> --- a/fs/jfs/super.c
+> +++ b/fs/jfs/super.c
+> @@ -418,6 +418,7 @@ static int jfs_remount(struct super_block *sb, int *flags, char *data)
+>  	int flag = JFS_SBI(sb)->flag;
+>  	int ret;
+>  
+> +	sync_filesystem(sb);
+>  	if (!parse_options(data, sb, &newLVSize, &flag)) {
+>  		return -EINVAL;
+>  	}
+> diff --git a/fs/minix/inode.c b/fs/minix/inode.c
+> index 0332109..dcdc298 100644
+> --- a/fs/minix/inode.c
+> +++ b/fs/minix/inode.c
+> @@ -123,6 +123,7 @@ static int minix_remount (struct super_block * sb, int * flags, char * data)
+>  	struct minix_sb_info * sbi = minix_sb(sb);
+>  	struct minix_super_block * ms;
+>  
+> +	sync_filesystem(sb);
+>  	ms = sbi->s_ms;
+>  	if ((*flags & MS_RDONLY) == (sb->s_flags & MS_RDONLY))
+>  		return 0;
+> diff --git a/fs/ncpfs/inode.c b/fs/ncpfs/inode.c
+> index 2cf2ebe..5f86e80 100644
+> --- a/fs/ncpfs/inode.c
+> +++ b/fs/ncpfs/inode.c
+> @@ -99,6 +99,7 @@ static void destroy_inodecache(void)
+>  
+>  static int ncp_remount(struct super_block *sb, int *flags, char* data)
+>  {
+> +	sync_filesystem(sb);
+>  	*flags |= MS_NODIRATIME;
+>  	return 0;
+>  }
+> diff --git a/fs/nfs/super.c b/fs/nfs/super.c
+> index 910ed90..2cb5694 100644
+> --- a/fs/nfs/super.c
+> +++ b/fs/nfs/super.c
+> @@ -2215,6 +2215,8 @@ nfs_remount(struct super_block *sb, int *flags, char *raw_data)
+>  	struct nfs4_mount_data *options4 = (struct nfs4_mount_data *)raw_data;
+>  	u32 nfsvers = nfss->nfs_client->rpc_ops->version;
+>  
+> +	sync_filesystem(sb);
+> +
+>  	/*
+>  	 * Userspace mount programs that send binary options generally send
+>  	 * them populated with default values. We have no way to know which
+> diff --git a/fs/nilfs2/super.c b/fs/nilfs2/super.c
+> index 7ac2a12..8c532b2 100644
+> --- a/fs/nilfs2/super.c
+> +++ b/fs/nilfs2/super.c
+> @@ -1129,6 +1129,7 @@ static int nilfs_remount(struct super_block *sb, int *flags, char *data)
+>  	unsigned long old_mount_opt;
+>  	int err;
+>  
+> +	sync_filesystem(sb);
+>  	old_sb_flags = sb->s_flags;
+>  	old_mount_opt = nilfs->ns_mount_opt;
+>  
+> diff --git a/fs/ntfs/super.c b/fs/ntfs/super.c
+> index 82650d5..bd5610d 100644
+> --- a/fs/ntfs/super.c
+> +++ b/fs/ntfs/super.c
+> @@ -468,6 +468,8 @@ static int ntfs_remount(struct super_block *sb, int *flags, char *opt)
+>  
+>  	ntfs_debug("Entering with remount options string: %s", opt);
+>  
+> +	sync_filesystem(sb);
+> +
+>  #ifndef NTFS_RW
+>  	/* For read-only compiled driver, enforce read-only flag. */
+>  	*flags |= MS_RDONLY;
+> diff --git a/fs/ocfs2/super.c b/fs/ocfs2/super.c
+> index 49d84f8..5f9bf8f 100644
+> --- a/fs/ocfs2/super.c
+> +++ b/fs/ocfs2/super.c
+> @@ -631,6 +631,8 @@ static int ocfs2_remount(struct super_block *sb, int *flags, char *data)
+>  	struct ocfs2_super *osb = OCFS2_SB(sb);
+>  	u32 tmp;
+>  
+> +	sync_filesystem(sb);
+> +
+>  	if (!ocfs2_parse_options(sb, data, &parsed_options, 1) ||
+>  	    !ocfs2_check_set_options(sb, &parsed_options)) {
+>  		ret = -EINVAL;
+> diff --git a/fs/openpromfs/inode.c b/fs/openpromfs/inode.c
+> index 8c0ceb8..15e4500 100644
+> --- a/fs/openpromfs/inode.c
+> +++ b/fs/openpromfs/inode.c
+> @@ -368,6 +368,7 @@ static struct inode *openprom_iget(struct super_block *sb, ino_t ino)
+>  
+>  static int openprom_remount(struct super_block *sb, int *flags, char *data)
+>  {
+> +	sync_filesystem(sb);
+>  	*flags |= MS_NOATIME;
+>  	return 0;
+>  }
+> diff --git a/fs/proc/root.c b/fs/proc/root.c
+> index 87dbcbe..ac823a8 100644
+> --- a/fs/proc/root.c
+> +++ b/fs/proc/root.c
+> @@ -92,6 +92,8 @@ static int proc_parse_options(char *options, struct pid_namespace *pid)
+>  int proc_remount(struct super_block *sb, int *flags, char *data)
+>  {
+>  	struct pid_namespace *pid = sb->s_fs_info;
+> +
+> +	sync_filesystem(sb);
+>  	return !proc_parse_options(data, pid);
+>  }
+>  
+> diff --git a/fs/pstore/inode.c b/fs/pstore/inode.c
+> index 1282384..192297b 100644
+> --- a/fs/pstore/inode.c
+> +++ b/fs/pstore/inode.c
+> @@ -249,6 +249,7 @@ static void parse_options(char *options)
+>  
+>  static int pstore_remount(struct super_block *sb, int *flags, char *data)
+>  {
+> +	sync_filesystem(sb);
+>  	parse_options(data);
+>  
+>  	return 0;
+> diff --git a/fs/qnx4/inode.c b/fs/qnx4/inode.c
+> index 8955881..c4bcb77 100644
+> --- a/fs/qnx4/inode.c
+> +++ b/fs/qnx4/inode.c
+> @@ -44,6 +44,7 @@ static int qnx4_remount(struct super_block *sb, int *flags, char *data)
+>  {
+>  	struct qnx4_sb_info *qs;
+>  
+> +	sync_filesystem(sb);
+>  	qs = qnx4_sb(sb);
+>  	qs->Version = QNX4_VERSION;
+>  	*flags |= MS_RDONLY;
+> diff --git a/fs/qnx6/inode.c b/fs/qnx6/inode.c
+> index 8d941ed..65cdaab 100644
+> --- a/fs/qnx6/inode.c
+> +++ b/fs/qnx6/inode.c
+> @@ -55,6 +55,7 @@ static int qnx6_show_options(struct seq_file *seq, struct dentry *root)
+>  
+>  static int qnx6_remount(struct super_block *sb, int *flags, char *data)
+>  {
+> +	sync_filesystem(sb);
+>  	*flags |= MS_RDONLY;
+>  	return 0;
+>  }
+> diff --git a/fs/reiserfs/super.c b/fs/reiserfs/super.c
+> index 2c80335..abf2b76 100644
+> --- a/fs/reiserfs/super.c
+> +++ b/fs/reiserfs/super.c
+> @@ -1319,6 +1319,7 @@ static int reiserfs_remount(struct super_block *s, int *mount_flags, char *arg)
+>  	int i;
+>  #endif
+>  
+> +	sync_filesystem(s);
+>  	reiserfs_write_lock(s);
+>  
+>  #ifdef CONFIG_QUOTA
+> diff --git a/fs/romfs/super.c b/fs/romfs/super.c
+> index d841878..ef90e8b 100644
+> --- a/fs/romfs/super.c
+> +++ b/fs/romfs/super.c
+> @@ -432,6 +432,7 @@ static int romfs_statfs(struct dentry *dentry, struct kstatfs *buf)
+>   */
+>  static int romfs_remount(struct super_block *sb, int *flags, char *data)
+>  {
+> +	sync_filesystem(sb);
+>  	*flags |= MS_RDONLY;
+>  	return 0;
+>  }
+> diff --git a/fs/squashfs/super.c b/fs/squashfs/super.c
+> index 202df63..031c8d67 100644
+> --- a/fs/squashfs/super.c
+> +++ b/fs/squashfs/super.c
+> @@ -371,6 +371,7 @@ static int squashfs_statfs(struct dentry *dentry, struct kstatfs *buf)
+>  
+>  static int squashfs_remount(struct super_block *sb, int *flags, char *data)
+>  {
+> +	sync_filesystem(sb);
+>  	*flags |= MS_RDONLY;
+>  	return 0;
+>  }
+> diff --git a/fs/super.c b/fs/super.c
+> index 80d5cf2..e9dc3c3 100644
+> --- a/fs/super.c
+> +++ b/fs/super.c
+> @@ -719,8 +719,6 @@ int do_remount_sb(struct super_block *sb, int flags, void *data, int force)
+>  		}
+>  	}
+>  
+> -	sync_filesystem(sb);
+> -
+>  	if (sb->s_op->remount_fs) {
+>  		retval = sb->s_op->remount_fs(sb, &flags, data);
+>  		if (retval) {
+> diff --git a/fs/sysv/inode.c b/fs/sysv/inode.c
+> index c327d4e..4742e58 100644
+> --- a/fs/sysv/inode.c
+> +++ b/fs/sysv/inode.c
+> @@ -60,6 +60,7 @@ static int sysv_remount(struct super_block *sb, int *flags, char *data)
+>  {
+>  	struct sysv_sb_info *sbi = SYSV_SB(sb);
+>  
+> +	sync_filesystem(sb);
+>  	if (sbi->s_forced_ro)
+>  		*flags |= MS_RDONLY;
+>  	return 0;
+> diff --git a/fs/ubifs/super.c b/fs/ubifs/super.c
+> index 5ded849..e1598ab 100644
+> --- a/fs/ubifs/super.c
+> +++ b/fs/ubifs/super.c
+> @@ -1827,6 +1827,7 @@ static int ubifs_remount_fs(struct super_block *sb, int *flags, char *data)
+>  	int err;
+>  	struct ubifs_info *c = sb->s_fs_info;
+>  
+> +	sync_filesystem(sb);
+>  	dbg_gen("old flags %#lx, new flags %#x", sb->s_flags, *flags);
+>  
+>  	err = ubifs_parse_options(c, data, 1);
+> diff --git a/fs/udf/super.c b/fs/udf/super.c
+> index 3306b9f..64f2b73 100644
+> --- a/fs/udf/super.c
+> +++ b/fs/udf/super.c
+> @@ -646,6 +646,7 @@ static int udf_remount_fs(struct super_block *sb, int *flags, char *options)
+>  	int error = 0;
+>  	struct logicalVolIntegrityDescImpUse *lvidiu = udf_sb_lvidiu(sb);
+>  
+> +	sync_filesystem(sb);
+>  	if (lvidiu) {
+>  		int write_rev = le16_to_cpu(lvidiu->minUDFWriteRev);
+>  		if (write_rev > UDF_MAX_WRITE_VERSION && !(*flags & MS_RDONLY))
+> diff --git a/fs/ufs/super.c b/fs/ufs/super.c
+> index 329f2f5..b8c6791 100644
+> --- a/fs/ufs/super.c
+> +++ b/fs/ufs/super.c
+> @@ -1280,6 +1280,7 @@ static int ufs_remount (struct super_block *sb, int *mount_flags, char *data)
+>  	unsigned new_mount_opt, ufstype;
+>  	unsigned flags;
+>  
+> +	sync_filesystem(sb);
+>  	lock_ufs(sb);
+>  	mutex_lock(&UFS_SB(sb)->s_lock);
+>  	uspi = UFS_SB(sb)->s_uspi;
+> diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
+> index f317488..aaa3eca 100644
+> --- a/fs/xfs/xfs_super.c
+> +++ b/fs/xfs/xfs_super.c
+> @@ -1197,6 +1197,7 @@ xfs_fs_remount(
+>  	char			*p;
+>  	int			error;
+>  
+> +	sync_filesystem(sb);
+>  	while ((p = strsep(&options, ",")) != NULL) {
+>  		int token;
+>  
+> -- 
+> 1.9.0
+> 
+-- 
+Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>
+SUSE Labs, CR
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nilfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
