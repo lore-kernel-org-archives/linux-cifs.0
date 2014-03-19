@@ -1,32 +1,28 @@
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [RFC PATCH] cifs: Fix possible deadlock with cifs and work
- queues
-Date: Wed, 19 Mar 2014 15:46:56 -0400
-Message-ID: <20140319154656.61e2c9fb@gandalf.local.home>
+From: Peter Zijlstra <peterz-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Subject: Re: [RFC PATCH] cifs: Fix possible deadlock with cifs and work queues
+Date: Wed, 19 Mar 2014 20:47:29 +0100
+Message-ID: <20140319194729.GB11257@laptop.programming.kicks-ass.net>
 References: <20140319151252.16ed3ac6@gandalf.local.home>
-	<20140319193407.GA11257@laptop.programming.kicks-ass.net>
-	<20140319154339.44c327e3@gandalf.local.home>
+ <20140319193407.GA11257@laptop.programming.kicks-ass.net>
+ <20140319154339.44c327e3@gandalf.local.home>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Peter Zijlstra <peterz@infradead.org>,
-	LKML <linux-kernel@vger.kernel.org>, linux-cifs@vger.kernel.org,
-	Steve French <sfrench@samba.org>,
-	Clark Williams <williams@redhat.com>,
-	"Luis Claudio R. Goncalves" <lclaudio@uudg.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Tejun Heo <tj@kernel.org>, uobergfe@redhat.com
-To: Steven Rostedt <rostedt@goodmis.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20140319154339.44c327e3@gandalf.local.home>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Clark Williams <williams-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	"Luis Claudio R. Goncalves" <lclaudio-+PBNgV5/840@public.gmane.org>,
+	Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>,
+	Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, uobergfe-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+To: Steven Rostedt <rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20140319154339.44c327e3-f9ZlEuEWxVcJvu8Pb33WZ0EMvNT87kid@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 19 Mar 2014 15:43:39 -0400
-Steven Rostedt <rostedt@goodmis.org> wrote:
-
+On Wed, Mar 19, 2014 at 03:43:39PM -0400, Steven Rostedt wrote:
 > On Wed, 19 Mar 2014 20:34:07 +0100
-> Peter Zijlstra <peterz@infradead.org> wrote:
+> Peter Zijlstra <peterz-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org> wrote:
 > 
 > > On Wed, Mar 19, 2014 at 03:12:52PM -0400, Steven Rostedt wrote:
 > > > My question to Tejun is, if we create another workqueue, to add the
@@ -55,9 +51,9 @@ Steven Rostedt <rostedt@goodmis.org> wrote:
 > root      1111  0.0  0.0      0     0 ?        S<   15:11   0:00 [cifsiord]
 > 
 > It looks to me that it does create new threads.
-> 
 
-Or is that just the rescuer thread? I can rewrite the patch to use
-kthread_work instead too.
+Ah, I think that's because of the MEM_RECLAIM, not sure if that will
+normally participate in running works. Its been a long time since I
+looked at any of that.
 
--- Steve
+Lets wait for TJ to wake up.
