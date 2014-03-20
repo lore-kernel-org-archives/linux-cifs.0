@@ -1,44 +1,40 @@
-From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH v2] cifs: Stop using NTLMSSP flag bit NTLMSSP_NEGOTIATE_EXTENDED_SEC for key exchange
-Date: Thu, 20 Mar 2014 15:27:06 -0500
-Message-ID: <1395347226-9184-1-git-send-email-spargaonkar@suse.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org,
-	Shirish Pargaonkar <spargaonkar-IBi9RG/b67k@public.gmane.org>
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Tetsuo Handa <penguin-kernel-JPay3/Yim36HaxMnTkn67Xf5DAMn2ifp@public.gmane.org>
+Subject: Re: Question regarding CIFS cache=loose behavior.
+Date: Fri, 21 Mar 2014 05:56:04 +0900
+Message-ID: <201403210556.FEI21354.FLJOQMHtSVOFFO@I-love.SAKURA.ne.jp>
+References: <201403202103.EIE87056.QVtLHSFMFOOFOJ@I-love.SAKURA.ne.jp>
+	<20140320161943.60890dd4@tlielax.poochiereds.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20140320161943.60890dd4-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Shirish Pargaonkar <spargaonkar-IBi9RG/b67k@public.gmane.org>
+Jeff Layton wrote:
+> That's expected behavior. The kernel believes that the file is frozen in
+> length so it returns short read() calls until the size is updated.
 
+The "size is updated" means "stat() detects the growth of file size",
+doesn't it? Then, the former is expected behavior.
 
-Send EncryptedRandomSessionKey in an Authenticate message of NTLMSSP exchange
-based only on whether server set flag bit NTLMSSP_NEGOTIATE_KEY_EXCH in the
-Challenge message of the NTLMSSP exchange.
+> 
+> cache=loose is very much not recommended for use when you have multiple
+> hosts accessing files on the server (or access by processes on the
+> server itself). It only gives you "loose" cache coherency. The whole
+> point of it is to allow the client to cache data even when the protocol
+> says that it shouldn't.
 
-This is per section of MS-NLMP.
-3.1.5.1.2 Client Receives a CHALLENGE_MESSAGE from the Server
+But why is the latter ( "read() returns non-0 when stat() detects the growth
+of file size but the data actually read is '\0'" ) is expected behavior?
+It sounds like a bug that the client caches '\0' (data nobody has ever wrote)
+instead of '.' (data somebody wrote when the file size grew).
 
+> 
+> cache=strict is what is recommended and that's the default these days.
 
-Reported-by: Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
-Signed-off-by: Shirish Pargaonkar <spargaonkar-IBi9RG/b67k@public.gmane.org>
----
- fs/cifs/sess.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index e87387d..1bd6f4f 100644
---- a/fs/cifs/sess.c
-+++ b/fs/cifs/sess.c
-@@ -450,8 +450,7 @@ int build_ntlmssp_auth_blob(unsigned char *pbuffer,
- 	sec_blob->WorkstationName.MaximumLength = 0;
- 	tmp += 2;
- 
--	if (((ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_KEY_XCH) ||
--		(ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_EXTENDED_SEC))
-+	if ((ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_KEY_XCH)
- 			&& !calc_seckey(ses)) {
- 		memcpy(tmp, ses->ntlmssp->ciphertext, CIFS_CPHTXT_SIZE);
- 		sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - pbuffer);
--- 
-1.8.3.2
+Yes, I suggested a customer using CIFS on RHEL6 to use cache=none or
+cache=strict , for that customer's system does not work as expected due to
+the latter behavior when using "tail -f" for checking for appended log.
