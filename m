@@ -1,80 +1,53 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [RFC PATCH] cifs: Fix possible deadlock with cifs and work
- queues
-Date: Thu, 20 Mar 2014 17:02:39 -0400
-Message-ID: <20140320170239.51d20a0e@tlielax.poochiereds.net>
-References: <20140319151252.16ed3ac6@gandalf.local.home>
-	<20140320152833.216d81a0@tlielax.poochiereds.net>
-	<20140320165703.522c7c5c@gandalf.local.home>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: Question regarding CIFS cache=loose behavior.
+Date: Thu, 20 Mar 2014 16:04:13 -0500
+Message-ID: <CAH2r5mssFsz3n7nVMOzNGcvxMNaaBG2TGEusLqGiKLhUtvTKxg@mail.gmail.com>
+References: <201403202103.EIE87056.QVtLHSFMFOOFOJ@I-love.SAKURA.ne.jp>
+ <20140320161943.60890dd4@tlielax.poochiereds.net> <201403210556.FEI21354.FLJOQMHtSVOFFO@I-love.SAKURA.ne.jp>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Peter Zijlstra <peterz-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-	Clark Williams <williams-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	"Luis Claudio R. Goncalves" <lclaudio-+PBNgV5/840@public.gmane.org>,
-	Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>,
-	Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, uobergfe-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-	Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Steven Rostedt <rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Tetsuo Handa <penguin-kernel-1yMVhJb1mP/7nzcFbJAaVXf5DAMn2ifp@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20140320165703.522c7c5c-f9ZlEuEWxVcJvu8Pb33WZ0EMvNT87kid@public.gmane.org>
+In-Reply-To: <201403210556.FEI21354.FLJOQMHtSVOFFO-JPay3/Yim36HaxMnTkn67Xf5DAMn2ifp@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 20 Mar 2014 16:57:03 -0400
-Steven Rostedt <rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org> wrote:
+On Thu, Mar 20, 2014 at 3:56 PM, Tetsuo Handa
+<penguin-kernel-1yMVhJb1mP/7nzcFbJAaVXf5DAMn2ifp@public.gmane.org> wrote:
+> Jeff Layton wrote:
+>> That's expected behavior. The kernel believes that the file is frozen in
+>> length so it returns short read() calls until the size is updated.
+>
+> The "size is updated" means "stat() detects the growth of file size",
+> doesn't it? Then, the former is expected behavior.
 
-> On Thu, 20 Mar 2014 15:28:33 -0400
-> Jeffrey Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> 
->  
-> > Nice analysis! I think eventually we'll need to overhaul this code not
-> 
-> Note, Ulrich Obergfell helped a bit in the initial analysis. He found
-> from a customer core dump that the kworker thread was blocked on the
-> cinode->lock_sem, and the reader was blocked as well. That was enough
-> for me to find where the problem laid.
-> 
+Note that setting cifs mount option "actimeo=0" will cause size not to
+be cached and may help.
 
-Kudos to Uli, then ;)
+>> cache=loose is very much not recommended for use when you have multiple
+>> hosts accessing files on the server (or access by processes on the
+>> server itself). It only gives you "loose" cache coherency. The whole
+>> point of it is to allow the client to cache data even when the protocol
+>> says that it shouldn't.
+>
+> But why is the latter ( "read() returns non-0 when stat() detects the growth
+> of file size but the data actually read is '\0'" ) is expected behavior?
+> It sounds like a bug that the client caches '\0' (data nobody has ever wrote)
+> instead of '.' (data somebody wrote when the file size grew).
+>
+>>
+>> cache=strict is what is recommended and that's the default these days.
+>
+> Yes, I suggested a customer using CIFS on RHEL6 to use cache=none or
+> cache=strict , for that customer's system does not work as expected due to
+> the latter behavior when using "tail -f" for checking for appended log.
 
-> > to use rw semaphores, but that's going to take some redesign. (Wonder
-> > if we could change it to use seqlocks or something?)
-> > 
-> > Out of curiousity, does this eventually time out and unwedge itself?
-> > Usually when the server doesn't get a response to an oplock break in
-> > around a minute or so it gives up and allows the thing that caused the
-> > oplock break to proceed anyway. Not great for performance but it out to
-> > eventually make progress due to that.
-> 
-> No, I believe it's hard locked. Nothing is going to wake up the oplock
-> break  if it is blocked on a down_read(). Only the release of the rwsem
-> will do that. It's the subtle way the kworker threads are done.
-> 
 
-Eventually the server should just allow the read to complete even if
-the client doesn't respond to the oplock break. It has to since clients
-can suddenly drop off the net while holding an oplock. That should
-allow everything to unwedge eventually (though it may take a while).
-
-If that's not happening then I'd be curious as to why...
-
-> > 
-> > In any case, this looks like a reasonable fix for now, but I suspect you
-> > can hit similar problems in the write codepath too. What may be best is
-> > turn this around and queue the oplock break to the new workqueue
-> > instead of the read completion job.
-> 
-> Or perhaps give both the read and write their own workqueues? We have
-> to look at all the work queue handlers, and be careful about any users
-> that take the lock_sem, and separate them out.
-> 
-
-Yeah, I haven't looked closely yet but I'm fairly sure that you could
-hit the same situation in the write codepath as well. Whether adding
-more workqueues will really help, I'm not sure of yet...
 
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Thanks,
+
+Steve
