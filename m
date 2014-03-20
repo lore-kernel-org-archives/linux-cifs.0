@@ -1,40 +1,59 @@
-From: Tetsuo Handa <penguin-kernel-JPay3/Yim36HaxMnTkn67Xf5DAMn2ifp@public.gmane.org>
-Subject: Re: Question regarding CIFS cache=loose behavior.
-Date: Fri, 21 Mar 2014 05:56:04 +0900
-Message-ID: <201403210556.FEI21354.FLJOQMHtSVOFFO@I-love.SAKURA.ne.jp>
-References: <201403202103.EIE87056.QVtLHSFMFOOFOJ@I-love.SAKURA.ne.jp>
-	<20140320161943.60890dd4@tlielax.poochiereds.net>
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: Re: [RFC PATCH] cifs: Fix possible deadlock with cifs and work
+ queues
+Date: Thu, 20 Mar 2014 16:57:03 -0400
+Message-ID: <20140320165703.522c7c5c@gandalf.local.home>
+References: <20140319151252.16ed3ac6@gandalf.local.home>
+	<20140320152833.216d81a0@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20140320161943.60890dd4-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-cifs@vger.kernel.org,
+	Steve French <sfrench@samba.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Clark Williams <williams@redhat.com>,
+	"Luis Claudio R. Goncalves" <lclaudio@uudg.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Tejun Heo <tj@kernel.org>, uobergfe@redhat.com,
+	Pavel Shilovsky <piastryyy@gmail.com>
+To: Jeffrey Layton <jlayton@redhat.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20140320152833.216d81a0@tlielax.poochiereds.net>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Jeff Layton wrote:
-> That's expected behavior. The kernel believes that the file is frozen in
-> length so it returns short read() calls until the size is updated.
+On Thu, 20 Mar 2014 15:28:33 -0400
+Jeffrey Layton <jlayton@redhat.com> wrote:
 
-The "size is updated" means "stat() detects the growth of file size",
-doesn't it? Then, the former is expected behavior.
+ 
+> Nice analysis! I think eventually we'll need to overhaul this code not
+
+Note, Ulrich Obergfell helped a bit in the initial analysis. He found
+from a customer core dump that the kworker thread was blocked on the
+cinode->lock_sem, and the reader was blocked as well. That was enough
+for me to find where the problem laid.
+
+> to use rw semaphores, but that's going to take some redesign. (Wonder
+> if we could change it to use seqlocks or something?)
+> 
+> Out of curiousity, does this eventually time out and unwedge itself?
+> Usually when the server doesn't get a response to an oplock break in
+> around a minute or so it gives up and allows the thing that caused the
+> oplock break to proceed anyway. Not great for performance but it out to
+> eventually make progress due to that.
+
+No, I believe it's hard locked. Nothing is going to wake up the oplock
+break  if it is blocked on a down_read(). Only the release of the rwsem
+will do that. It's the subtle way the kworker threads are done.
 
 > 
-> cache=loose is very much not recommended for use when you have multiple
-> hosts accessing files on the server (or access by processes on the
-> server itself). It only gives you "loose" cache coherency. The whole
-> point of it is to allow the client to cache data even when the protocol
-> says that it shouldn't.
+> In any case, this looks like a reasonable fix for now, but I suspect you
+> can hit similar problems in the write codepath too. What may be best is
+> turn this around and queue the oplock break to the new workqueue
+> instead of the read completion job.
 
-But why is the latter ( "read() returns non-0 when stat() detects the growth
-of file size but the data actually read is '\0'" ) is expected behavior?
-It sounds like a bug that the client caches '\0' (data nobody has ever wrote)
-instead of '.' (data somebody wrote when the file size grew).
+Or perhaps give both the read and write their own workqueues? We have
+to look at all the work queue handlers, and be careful about any users
+that take the lock_sem, and separate them out.
 
-> 
-> cache=strict is what is recommended and that's the default these days.
-
-Yes, I suggested a customer using CIFS on RHEL6 to use cache=none or
-cache=strict , for that customer's system does not work as expected due to
-the latter behavior when using "tail -f" for checking for appended log.
+-- Steve
