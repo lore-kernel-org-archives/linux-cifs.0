@@ -1,118 +1,44 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: Question regarding CIFS cache=loose behavior.
-Date: Thu, 20 Mar 2014 16:19:43 -0400
-Message-ID: <20140320161943.60890dd4@tlielax.poochiereds.net>
-References: <201403202103.EIE87056.QVtLHSFMFOOFOJ@I-love.SAKURA.ne.jp>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Tetsuo Handa <penguin-kernel-JPay3/Yim36HaxMnTkn67Xf5DAMn2ifp@public.gmane.org>
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH v2] cifs: Stop using NTLMSSP flag bit NTLMSSP_NEGOTIATE_EXTENDED_SEC for key exchange
+Date: Thu, 20 Mar 2014 15:27:06 -0500
+Message-ID: <1395347226-9184-1-git-send-email-spargaonkar@suse.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org,
+	Shirish Pargaonkar <spargaonkar-IBi9RG/b67k@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <201403202103.EIE87056.QVtLHSFMFOOFOJ-JPay3/Yim36HaxMnTkn67Xf5DAMn2ifp@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 20 Mar 2014 21:03:03 +0900
-Tetsuo Handa <penguin-kernel-JPay3/Yim36HaxMnTkn67Xf5DAMn2ifp@public.gmane.org> wrote:
+From: Shirish Pargaonkar <spargaonkar-IBi9RG/b67k@public.gmane.org>
 
-> Is the behavior described below ( "read() returns 0 unless stat() detects the
-> growth of file size" and "read() returns non-0 when stat() detects the growth
-> of file size but the data actually read is '\0'" ) a feature of cache=loose
-> option?
-> 
-> Steps to reproduce:
-> 
-> ---------- Start of writer1.c ----------
-> #include <unistd.h>
-> int main(int argc, char *argv[])
-> {
->     while (write(1, ".", 1) == 1)
->         sleep(1);
->     return 0;
-> }
-> ---------- End of writer1.c ----------
-> 
-> ---------- Start of reader1.c ----------
-> #include <unistd.h>
-> int main(int argc, char *argv[])
-> {
->     while (1) {
->         char c;
->         if (read(0, &c, 1) == 1) {
->             if (c)
->                 write(1, &c, 1);
->             else
->                 write(1, "!", 1);
->         } else {
->             sleep(1);
->         }
->     }
->     return 0;
-> }
-> ---------- End of reader1.c ----------
-> 
-> ---------- Start of reader2.c ----------
-> #include <sys/stat.h>
-> #include <unistd.h>
-> int main(int argc, char *argv[])
-> {
->     while (1) {
->         struct stat buf;
->         char c;
->         fstat(0, &buf);
->         if (read(0, &c, 1) == 1) {
->             if (c)
->                 write(1, &c, 1);
->             else
->                 write(1, "!", 1);
->         } else {
->             sleep(1);
->         }
->     }
->     return 0;
-> }
-> ---------- End of reader2.c ----------
-> 
-> Run the following commands on the Samba server side.
-> 
->   $ cc -Wall -O3 -o writer1 writer1.c
->   $ ./writer1 > shared_file
-> 
-> Run the following commands on the Samba client side.
-> 
->   $ cc -Wall -O3 -o reader1 reader1.c
->   $ strace -tt -o /tmp/log1 ./reader1 < shared_file
->   ..........     (<= Makes no progress by default)
-> 
-> The shared_file shown above is a regular file shared via CIFS mounted with
-> cache=loose option. (e.g. "mount -t cifs -o cache=loose //server/path /mnt" )
-> 
-> I expect that the reader1 process reads one byte whenever the writer1
-> process writes one byte. But we can observe via /tmp/log1 that the read()
-> continues returning 0 until the growth of file size of shared_file is
-> recognized by stat() using programs like /bin/ls and /usr/bin/stat .
-> 
-> Then, terminate the reader1 process using Ctrl-C and run the following
-> commands on the Samba client side.
-> 
->   $ cc -Wall -O3 -o reader2 reader2.c
->   $ strace -tt -o /tmp/log2 ./reader2 < shared_file
->   ......................!!!!!!     (<= Makes progress with wrong data)
-> 
-> We can observe via /tmp/log2 that the read() returns 1 because fstat()
-> detects the growth of file size of shared_file . However, the data
-> returned by read() is not '.' but '\0'.
 
-That's expected behavior. The kernel believes that the file is frozen in
-length so it returns short read() calls until the size is updated.
+Send EncryptedRandomSessionKey in an Authenticate message of NTLMSSP exchange
+based only on whether server set flag bit NTLMSSP_NEGOTIATE_KEY_EXCH in the
+Challenge message of the NTLMSSP exchange.
 
-cache=loose is very much not recommended for use when you have multiple
-hosts accessing files on the server (or access by processes on the
-server itself). It only gives you "loose" cache coherency. The whole
-point of it is to allow the client to cache data even when the protocol
-says that it shouldn't.
+This is per section of MS-NLMP.
+3.1.5.1.2 Client Receives a CHALLENGE_MESSAGE from the Server
 
-cache=strict is what is recommended and that's the default these days.
+
+Reported-by: Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
+Signed-off-by: Shirish Pargaonkar <spargaonkar-IBi9RG/b67k@public.gmane.org>
+---
+ fs/cifs/sess.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index e87387d..1bd6f4f 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -450,8 +450,7 @@ int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+ 	sec_blob->WorkstationName.MaximumLength = 0;
+ 	tmp += 2;
+ 
+-	if (((ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_KEY_XCH) ||
+-		(ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_EXTENDED_SEC))
++	if ((ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_KEY_XCH)
+ 			&& !calc_seckey(ses)) {
+ 		memcpy(tmp, ses->ntlmssp->ciphertext, CIFS_CPHTXT_SIZE);
+ 		sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - pbuffer);
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.8.3.2
