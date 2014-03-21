@@ -1,62 +1,61 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [RFC PATCH] cifs: Fix possible deadlock with cifs and work queues
-Date: Fri, 21 Mar 2014 12:32:12 +0400
-Message-ID: <CAKywueT4xRHZGomoPvnA9rob3FpzkPYuuUPe+vEDiOFvTbUiGA@mail.gmail.com>
-References: <20140319151252.16ed3ac6@gandalf.local.home>
-	<20140320152833.216d81a0@tlielax.poochiereds.net>
-	<20140320165703.522c7c5c@gandalf.local.home>
-	<20140320170239.51d20a0e@tlielax.poochiereds.net>
-	<20140320222343.4faaa137@gandalf.local.home>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: Question regarding CIFS cache=loose behavior.
+Date: Fri, 21 Mar 2014 12:56:34 +0400
+Message-ID: <CAKywueTNDHSGia58AcKwuDtZA2zc_yOQR-iFTPq3XTrYm6bNLQ@mail.gmail.com>
+References: <201403202103.EIE87056.QVtLHSFMFOOFOJ@I-love.SAKURA.ne.jp>
+	<20140320161943.60890dd4@tlielax.poochiereds.net>
+	<201403210556.FEI21354.FLJOQMHtSVOFFO@I-love.SAKURA.ne.jp>
+	<20140320191013.110276c0@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+Cc: Tetsuo Handa <penguin-kernel-1yMVhJb1mP/7nzcFbJAaVXf5DAMn2ifp@public.gmane.org>,
 	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Peter Zijlstra <peterz-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-	Clark Williams <williams-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	"Luis Claudio R. Goncalves" <lclaudio-+PBNgV5/840@public.gmane.org>,
-	Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>,
-	Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, uobergfe-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-To: Steven Rostedt <rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org>
+	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20140320222343.4faaa137-f9ZlEuEWxVcJvu8Pb33WZ0EMvNT87kid@public.gmane.org>
+In-Reply-To: <20140320191013.110276c0-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2014-03-21 6:23 GMT+04:00 Steven Rostedt <rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org>:
-> On Thu, 20 Mar 2014 17:02:39 -0400
-> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+2014-03-21 3:10 GMT+04:00 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> On Fri, 21 Mar 2014 05:56:04 +0900
+> Tetsuo Handa <penguin-kernel-JPay3/Yim36HaxMnTkn67Xf5DAMn2ifp@public.gmane.org> wrote:
 >
->> Eventually the server should just allow the read to complete even if
->> the client doesn't respond to the oplock break. It has to since clients
->> can suddenly drop off the net while holding an oplock. That should
->> allow everything to unwedge eventually (though it may take a while).
+>> Jeff Layton wrote:
+>> > That's expected behavior. The kernel believes that the file is frozen in
+>> > length so it returns short read() calls until the size is updated.
 >>
->> If that's not happening then I'd be curious as to why...
+>> The "size is updated" means "stat() detects the growth of file size",
+>> doesn't it? Then, the former is expected behavior.
+>>
+>> >
+>> > cache=loose is very much not recommended for use when you have multiple
+>> > hosts accessing files on the server (or access by processes on the
+>> > server itself). It only gives you "loose" cache coherency. The whole
+>> > point of it is to allow the client to cache data even when the protocol
+>> > says that it shouldn't.
+>>
+>> But why is the latter ( "read() returns non-0 when stat() detects the growth
+>> of file size but the data actually read is '\0'" ) is expected behavior?
+>> It sounds like a bug that the client caches '\0' (data nobody has ever wrote)
+>> instead of '.' (data somebody wrote when the file size grew).
+>>
 >
-> The problem is that the data is being filled in the page and the reader
-> is waiting for the page lock to be released. The kworker for the reader
-> will issue the complete() and unlock the page to wake up the reader.
->
-> But because the other workqueue callback calls down_read(), and there
-> can be a down_write() waiting for the reader to finish, this
-> down_read() will block on the lock as well (rwsems are fair locks).
-> This blocks the other workqueue callback from issuing the complete and
-> page_unlock() that will wake up the reader that is holding the rwsem
-> with down_read().
->
-> DEADLOCK.
+> Yeah, that sounds wrong. What should happen is that the cache is
+> invalidated when the size changes. It's possible there is a race in
+> that code however. The locking around it is pretty sloppy...
 
-Thank you for reporting and clarifying the issue!
+When fstat() get a new file size it sets
+CIFS_I(inode)->invalid_mapping to true but do not revalidate the
+cache. Then generic_file_aio_read() reads the wrong data. I think we
+need to check if CIFS_I(inode)->invalid_mapping is true and revalidate
+the cache before calling generic_file_aio_read() in
+file->f_ops->aio_read(). Now cache revalidation happens in lookup/open
+and mmap codepaths only for cache=loose.
 
-Read and write codepaths both obtain lock_sem for read and then wait
-for cifsiod_wq to complete and release lock_sem. They don't do any
-lock_sem operations inside their work task queued to cifsiod_wq. But
-oplock code can obtain/release lock_sem in its work task. So, that's
-why I agree with Jeff and suggest to move the oplock code to a
-different work queue (cifsioopd_wq?) but leave read and write
-codepaths use cifsiod_wq.
+Of course, cache=loose is not recommended for this sort of work flow
+and cache=strict should be used to provide a data coherency between
+several machines.
 
 -- 
 Best regards,
