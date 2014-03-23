@@ -1,242 +1,106 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v2] cifs: Fix possible deadlock with cifs and work queues
-Date: Sun, 23 Mar 2014 00:57:07 -0500
-Message-ID: <CADT32eJqh3EN=SdQ0CtLEmbnXFi-3=-MsddUv0CatKmGHL_7hw@mail.gmail.com>
-References: <20140319151252.16ed3ac6@gandalf.local.home>
-	<20140320152833.216d81a0@tlielax.poochiereds.net>
-	<20140320165703.522c7c5c@gandalf.local.home>
-	<20140320170239.51d20a0e@tlielax.poochiereds.net>
-	<20140320222343.4faaa137@gandalf.local.home>
-	<CAKywueT4xRHZGomoPvnA9rob3FpzkPYuuUPe+vEDiOFvTbUiGA@mail.gmail.com>
-	<20140321081706.271e390c@gandalf.local.home>
-	<20140321084128.3f499e5c@tlielax.poochiereds.net>
-	<20140321110719.43a6b017@gandalf.local.home>
+From: "Dr. Martin Dustin" <dr.martindd-/E1597aS9LT10XsdtD+oqA@public.gmane.org>
+Subject: Bitte Antworten , Von Dr. Martin Dustin
+Date: Sun, 23 Mar 2014 12:16:37 +0000
+Message-ID: <f486c370c5c1b4b2c6c21d3bf0f93076@savingsiowa.com>
+Reply-To: dr.martin_dustinoffice-/E1597aS9LT10XsdtD+oqA@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Peter Zijlstra <peterz-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-	Clark Williams <williams-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	"Luis Claudio R. Goncalves" <lclaudio-+PBNgV5/840@public.gmane.org>,
-	Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>,
-	Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, uobergfe-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-To: Steven Rostedt <rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8;
+	format=flowed
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: undisclosed-recipients:;
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20140321110719.43a6b017-f9ZlEuEWxVcJvu8Pb33WZ0EMvNT87kid@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Just a thought, although leasing code does not cause such deadlocks with rwsems,
-perhaps leasing and oplock code can reside on one workqueue!
 
 
-On Fri, Mar 21, 2014 at 10:07 AM, Steven Rostedt <rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org> wrote:
->
-> We just had a customer report a deadlock in their 3.8-rt kernel.
-> Looking into this, it is very possible to have the same deadlock in
-> mainline in Linus's tree as it stands today.
->
-> It is much easier to deadlock in the -rt kernel because reader locks
-> are serialized, where a down_read() can block another down_read(). But
-> because rwsems are fair locks, if a writer is waiting, a new reader
-> will then block. This means that if it is possible for a reader to
-> deadlock another reader, this can happen if a write comes along and
-> blocks on a current reader. That will prevent another reader from
-> running, and if that new reader requires to wake up a reader that owns
-> the lock, you have your deadlock.
->
-> Here's the situation with CIFS and workqueues:
->
-> The cifs system has several workqueues used in file.c and other places.
-> One of them is used for completion of a read and to release the
-> page_lock which wakes up the reader. There are several other workqueues
-> that do various other tasks.
->
-> A holder of the reader lock can sleep on a page_lock() and expect the
-> reader workqueue to wake it up (page_unlock()). The reader workqueue
-> takes no locks so this does not seem to be a problem (but it is).
->
-> The other workqueues can take the rwsem for read or for write. But our
-> issue that we tripped over was that it grabs it for read (remember in
-> -rt readers are serialized). But this can also happen if a separate
-> writer is waiting on the lock as that would cause a reader to block on
-> another reader too.
->
-> All the workqueue callbacks are executed on the same workqueue:
->
->         queue_work(cifsiod_wq, &rdata->work);
->         [...]
->         queue_work(cifsiod_wq, &cfile->oplock_break);
->
-> Now if the reader workqueue callback is queued after one of these
-> workqueues that can take the rwsem, we can hit a deadlock. The
-> workqueue code looks to be able to prevent deadlocks of these kinds,
-> but I do not totally understand the workqueue scheduled work structure
-> and perhaps if the kworker thread structure blocks hard it wont move
-> works around.
->
-> Here's what we see:
->
->         rdata->work is scheduled after cfile->oplock_break
->
->         CPU0                                            CPU1
->         ----                                            ----
->
->   do_sync_read()
->     cifs_strict_readv()
->       down_read(cinode->lock_sem);
->       generic_file_aio_read()
->         __lock_page_killable()
->           __wait_on_bit_lock()
->
->        * BLOCKED *
->
->                                                 process_one_work()
->                                                   cifs_oplock_break()
->                                                     cifs_has_mand_locks()
->                                                       down_read(cinode->lock_sem);
->
->                                                    * BLOCKED *
->
->                                               [ note, cifs_oplock_break() can
->                                                 also call cifs_push_locks which takes
->                                                 the lock with down_write() ]
->
-> The key to remember is that the work to wake up the lock owner is queued
-> behind the oplock work which is blocked on the same lock.
->
-> We noticed that the rdata->work was queued to run under the same
-> workqueue task and this work is to wake up the owner of the semaphore.
-> But because the workqueue task is blocked waiting on that lock, it will
-> never wake it up.
->
-> By adding another workqueue that runs all the work that might take a mutex
-> we should be able to avoid this deadlock.
->
-> Link: http://lkml.kernel.org/r/20140319151252.16ed3ac6-f9ZlEuEWxVcJvu8Pb33WZ0EMvNT87kid@public.gmane.org
->
-> Signed-off-by: Steven Rostedt <rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org>
-> ---
->  fs/cifs/cifsfs.c   | 17 ++++++++++++++++-
->  fs/cifs/cifsglob.h |  1 +
->  fs/cifs/misc.c     |  2 +-
->  fs/cifs/smb2misc.c |  6 +++---
->  4 files changed, 21 insertions(+), 5 deletions(-)
->
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index 849f613..b0761c8 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -86,6 +86,12 @@ extern mempool_t *cifs_req_poolp;
->  extern mempool_t *cifs_mid_poolp;
->
->  struct workqueue_struct        *cifsiod_wq;
-> +/*
-> + * The oplock workqueue must be separate to prevent it from blocking
-> + * other work that is queued. Work that requires to grab mutex locks
-> + * must use the 'l' version.
-> + */
-> +struct workqueue_struct        *cifsiold_wq;
->
->  #ifdef CONFIG_CIFS_SMB2
->  __u8 cifs_client_guid[SMB2_CLIENT_GUID_SIZE];
-> @@ -1199,9 +1205,15 @@ init_cifs(void)
->                 goto out_clean_proc;
->         }
->
-> +       cifsiold_wq = alloc_workqueue("cifsiold", WQ_FREEZABLE|WQ_MEM_RECLAIM, 0);
-> +       if (!cifsiold_wq) {
-> +               rc = -ENOMEM;
-> +               goto out_destroy_wq;
-> +       }
-> +
->         rc = cifs_fscache_register();
->         if (rc)
-> -               goto out_destroy_wq;
-> +               goto out_destroy_rwq;
->
->         rc = cifs_init_inodecache();
->         if (rc)
-> @@ -1249,6 +1261,8 @@ out_destroy_inodecache:
->         cifs_destroy_inodecache();
->  out_unreg_fscache:
->         cifs_fscache_unregister();
-> +out_destroy_rwq:
-> +       destroy_workqueue(cifsiold_wq);
->  out_destroy_wq:
->         destroy_workqueue(cifsiod_wq);
->  out_clean_proc:
-> @@ -1273,6 +1287,7 @@ exit_cifs(void)
->         cifs_destroy_inodecache();
->         cifs_fscache_unregister();
->         destroy_workqueue(cifsiod_wq);
-> +       destroy_workqueue(cifsiold_wq);
->         cifs_proc_clean();
->  }
->
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index c0f3718..6c2b5c8 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -1561,6 +1561,7 @@ void cifs_oplock_break(struct work_struct *work);
->
->  extern const struct slow_work_ops cifs_oplock_break_ops;
->  extern struct workqueue_struct *cifsiod_wq;
-> +extern struct workqueue_struct *cifsiold_wq;
->
->  extern mempool_t *cifs_mid_poolp;
->
-> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-> index 2f9f379..1bc94e9 100644
-> --- a/fs/cifs/misc.c
-> +++ b/fs/cifs/misc.c
-> @@ -468,7 +468,7 @@ is_valid_oplock_break(char *buffer, struct TCP_Server_Info *srv)
->
->                                 cifs_set_oplock_level(pCifsInode,
->                                         pSMB->OplockLevel ? OPLOCK_READ : 0);
-> -                               queue_work(cifsiod_wq,
-> +                               queue_work(cifsiold_wq,
->                                            &netfile->oplock_break);
->                                 netfile->oplock_break_cancelled = false;
->
-> diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-> index fb39662..ffea93f 100644
-> --- a/fs/cifs/smb2misc.c
-> +++ b/fs/cifs/smb2misc.c
-> @@ -447,7 +447,7 @@ smb2_tcon_has_lease(struct cifs_tcon *tcon, struct smb2_lease_break *rsp,
->                 else
->                         cfile->oplock_break_cancelled = true;
->
-> -               queue_work(cifsiod_wq, &cfile->oplock_break);
-> +               queue_work(cifsiold_wq, &cfile->oplock_break);
->                 kfree(lw);
->                 return true;
->         }
-> @@ -463,7 +463,7 @@ smb2_tcon_has_lease(struct cifs_tcon *tcon, struct smb2_lease_break *rsp,
->                         memcpy(lw->lease_key, open->lease_key,
->                                SMB2_LEASE_KEY_SIZE);
->                         lw->tlink = cifs_get_tlink(open->tlink);
-> -                       queue_work(cifsiod_wq, &lw->lease_break);
-> +                       queue_work(cifsiold_wq, &lw->lease_break);
->                 }
->
->                 cifs_dbg(FYI, "found in the pending open list\n");
-> @@ -579,7 +579,7 @@ smb2_is_valid_oplock_break(char *buffer, struct TCP_Server_Info *server)
->                                   rsp->OplockLevel ? SMB2_OPLOCK_LEVEL_II : 0,
->                                   0, NULL);
->
-> -                               queue_work(cifsiod_wq, &cfile->oplock_break);
-> +                               queue_work(cifsiold_wq, &cfile->oplock_break);
->
->                                 spin_unlock(&cifs_file_list_lock);
->                                 spin_unlock(&cifs_tcp_ses_lock);
-> --
-> 1.8.1.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+--=20
+Lieber Freund,
+
+Wie geht es Ihnen heute? Ich hoffe, fein, ich bin Dr. Martin Dustin aus=
+=20
+Harlesden , North West London, hier in England. Ich arbeite f=C3=BCr Na=
+tWest=20
+Bank London (National Westminster Bank Plc. ) . Ich schreibe Ihnen aus=20
+meinem B=C3=BCro , die von einer gro=C3=9Fen immensen Nutzen f=C3=BCr b=
+eide von uns=20
+ist. In meiner Abteilung , wobei die Co-Trainer ( Region Greater London=
+)=20
+, entdeckte ich eine verlassene Summe von =C2=A3 16,5 Millionen Pounces=
+ (=20
+Sechzehn Millionen f=C3=BCnfhunderttausend Pounces und Pfund Sterling )=
+ in=20
+einem Konto, das zu einem unserer ausl=C3=A4ndischen Kunden Sp=C3=A4t H=
+err Ron=20
+Bramlage geh=C3=B6rt , ein Amerikaner, der in Kansas Staaten lebt , die=
+ ein=20
+Opfer von einem Hubschrauberabsturz im vergangenen Jahr 8. Juni 2012 wa=
+r=20
+in Florida Sumpf ihn zu t=C3=B6ten und Familienmitgliedern. Ron war 45 =
+Jahre=20
+alt . Auch in der Chopper zum Zeitpunkt des Absturzes war seine Frau=20
+Rebecca , 43, und die Kinder des Paares - Brandon , 15; Boston , 13;=20
+Beau , 11 , und 8 -j=C3=A4hrige Roxanne - wurden get=C3=B6tet. Der Pilo=
+t war auch=20
+tot ist.
+
+
+Die Wahl der Kontaktaufnahme mit Ihnen ist aus der geographischen Natur=
+,=20
+wo Sie leben , vor allem aufgrund der Sensibilit=C3=A4t der Transaktion=
+ und=20
+die Vertraulichkeit hier geweckt , Jetzt ist unsere Bank hat f=C3=BCr k=
+eine=20
+der Verwandten gewartet zu kommen -up f=C3=BCr die Behauptung, aber nie=
+mand=20
+hat getan, ich pers=C3=B6nlich war in der Suche die Verwandten f=C3=BCr=
+ eine lange=20
+Zeit erfolglos. Mein lieber Freund , ich suche Ihre Zustimmung an Sie=20
+als n=C3=A4chsten Angeh=C3=B6rigen / Wird Zuschussempf=C3=A4ngers mit d=
+em Verstorbenen=20
+zu pr=C3=A4sentieren , so dass die Erl=C3=B6se aus diesem Konto bei =C2=
+=A3 16,5 Mio.=20
+Pounces gesch=C3=A4tzt kann Ihnen bezahlt werden.
+
+Dies wird ausgezahlt oder in diese Prozents=C3=A4tze geteilt, 60% f=C3=BC=
+r mich=20
+und 40% f=C3=BCr Sie , ich habe alle notwendigen rechtlichen Dokumente =
+, die=20
+wir verwendet, um diese Behauptung wir machen gesichert. Alles was ich=20
+brauche ist es, in Ihrem Namen zu den Dokumenten zu f=C3=BCllen und=20
+legalisiert es in den Hof und NatWest Bank- hier, um Sie als=20
+berechtigten Empf=C3=A4nger nachweisen , Alles, was ich jetzt brauche I=
+hre=20
+ehrliche Zusammenarbeit, Verschwiegenheit und Vertrauen , damit wir=20
+sehen diese Transaktion durch . Ich garantiere Ihnen, dass dies unter=20
+einer legitimen Anordnung , die Sie von einem Versto=C3=9F gegen das Ge=
+setz=20
+hier in London und in Ihrem Land zu sch=C3=BCtzen wird ausgef=C3=BChrt.
+Bitte , bitte geben Sie mir die folgende : wie wir 5 Tage, um es=20
+durchziehen , das ist sehr , sehr URGENT PLEASE .
+
+Bitte antworten auf meine E-Mail : dr.martin_dustin_office-/E1597aS9LT10XsdtD+oqA@public.gmane.org
+
+
+1 . Vollst=C3=A4ndiger Name:
+2 . Ihre Telefonnummer :
+3 . Ihr Kontakt Adresse:
+4 . Alter / Geschlecht :
+5 . Kern Job / Beruf:
+
+
+Bitte antworten auf meine E-Mail : dr.martin_dustin_office-/E1597aS9LT10XsdtD+oqA@public.gmane.org
+
+Ich habe Sie kontaktiert zu glauben , dass Sie nicht weg mit meinem=20
+eigenen Anteil an diesem Fonds , wenn es Ihrem Konto ankommt , ich=20
+hoffe, Sie k=C3=B6nnen auf diese vertrauen? , wie Sie wissen, diese=20
+Transaktion beinhalten riesige Menge an Geld . Bitte freundlich zeigen=20
+Ihr Interesse , indem sie mich mit Ihren Angaben wie oben, so kann ich=20
+Ihnen weitere Informationen, wie wir gehen , diesen Fonds zu Ihnen=20
+innerhalb von 5 Bank =C3=BCbertragen bekommen liefern Tagen. Endeavour =
+zu=20
+antworten , anstatt halten mich warten .
+
+
+Mit besten Gr=C3=BC=C3=9Fen,
+Dr. Martin Dustin
