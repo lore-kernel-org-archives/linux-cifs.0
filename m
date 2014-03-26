@@ -1,84 +1,101 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [CIFS][PATCH] Return correct error code on query xattr when empty
- xattr list
-Date: Tue, 25 Mar 2014 19:53:40 -0500
-Message-ID: <CAH2r5msaxk6hGCL_HiQ+ZGK4L7Ryr=uKYyhwTfrz7CvtSgd7Pg@mail.gmail.com>
+From: Tetsuo Handa <penguin-kernel-JPay3/Yim36HaxMnTkn67Xf5DAMn2ifp@public.gmane.org>
+Subject: Re: Question regarding CIFS cache=loose behavior.
+Date: Wed, 26 Mar 2014 21:04:15 +0900
+Message-ID: <201403262104.AGG86982.StVMOJOHFOQFLF@I-love.SAKURA.ne.jp>
+References: <201403202103.EIE87056.QVtLHSFMFOOFOJ@I-love.SAKURA.ne.jp>
+	<20140320161943.60890dd4@tlielax.poochiereds.net>
+	<201403210556.FEI21354.FLJOQMHtSVOFFO@I-love.SAKURA.ne.jp>
+	<20140320191013.110276c0@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary=047d7b15a52b8a6bed04f577e77a
-To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20140320191013.110276c0-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
---047d7b15a52b8a6bed04f577e77a
-Content-Type: text/plain; charset=ISO-8859-1
+Jeff Layton wrote:
+> > Yes, I suggested a customer using CIFS on RHEL6 to use cache=none or
+> > cache=strict , for that customer's system does not work as expected due to
+> > the latter behavior when using "tail -f" for checking for appended log.
+> 
+> Yeah, cache=strict should work much better for that sort of use-case.
+> 
+I got another problem where none of cache=none cache=strict actimeo=0 helps.
 
-In working on getting xfstest working on cifs found the following problem.
+Since "tail -f" does "repeat calling sleep() and fstat() until the file size
+increases" -> "do read() until EOF" -> "call fstat() again", "tail -f" prints
+"file truncated" message and prints some portion of already printed lines
+even though the file size on the Samba server never decreased.
+I expect that the latest fstat() returns the up-to-date file size.
+This behavior is observed on 2.6.32-431.11.2.el6.x86_64 and 3.14-rc8.
 
->From c6845613066b4544978de749cd5c73fb14ed936b Mon Sep 17 00:00:00 2001
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Date: Tue, 25 Mar 2014 19:46:36 -0500
-Subject: [PATCH] [CIFS] Return correct error on query of xattr on file with
- empty xattrs
+Steps to reproduce:
 
-xfstest 020 detected a problem with cifs xattr handling.  When a file
-had an empty xattr list, we returned success (with an empty xattr value)
-on query of particular xattrs rather than returning ENODATA.
-This patch fixes it so that query of an xattr returns ENODATA when the
-xattr list is empty for the file.
+---------- Start of testprog.c ----------
+/**
+ * stdin and stdout must refer a regular file which is shared via CIFS.
+ * An example is shown below.
+ *
+ * # mount -t cifs -o cache=strict,actimeo=0 //127.0.0.1/path/to/export /path/to/mount
+ * $ cc -Wall -O3 -o a.out this_file.c
+ * $ ./a.out > /path/to/export/shared_file < /path/to/mount/shared_file
+*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <poll.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
-Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- fs/cifs/cifssmb.c | 3 +++
- 1 file changed, 3 insertions(+)
+int main(int argc, char *argv[])
+{
+	unsigned int delay = argc > 1 ? atoi(argv[1]) : 0;
+	size_t write_pos = 0;
+	size_t read_pos = 0;
+	if (ftruncate(1, 0))
+		return 1;
+	while (1) {
+		struct stat buf;
+		char c;
+		if (write(1, ".", 1) != 1)
+			return 2;
+		write_pos++;
+		if (fstat(1, &buf))
+			return 3;
+		if (buf.st_size != write_pos)
+			return 4;
+		if (read(0, &c, 1) != 1)
+			return 5;
+		if (c != '.')
+			return 6;
+		read_pos++;
+		if (delay)
+			poll(NULL, 0, delay);
+		if (fstat(0, &buf))
+			return 7;
+		if (buf.st_size < read_pos)
+			fprintf(stderr, "read(%lu) - stat(%lu) = %lu\n",
+				read_pos, buf.st_size, read_pos - buf.st_size);
+	}
+}
+---------- End of testprog.c ----------
 
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index f3264bd..6ce4e09 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -6197,6 +6197,9 @@ QAllEAsRetry:
-     cifs_dbg(FYI, "ea length %d\n", list_len);
-     if (list_len <= 8) {
-         cifs_dbg(FYI, "empty EA list returned from server\n");
-+        /* didn't find the named attribute */
-+        if (ea_name)
-+            rc = -ENODATA;
-         goto QAllEAsOut;
-     }
+Make a CIFS mount on localhost where the Samba server process is running.
+Compile testprog.c and run testprog, with stdin redirected to a regular file
+which is accessed via CIFS and stdout redirected to the same regular file
+which is accessed as a local filesystem. An example is shown below.
 
--- 
-1.8.5.3
+  # mount -t cifs -o cache=none,actimeo=0 //127.0.0.1/home /mnt
+  $ cc -Wall -O3 -o testprog testprog.c
+  $ ./testprog > ~/shared_file < /mnt/shared_file
 
--- 
-Thanks,
+According to what testprog.c does, it is expected that nothing is printed by
+testprog process because the bytes read via read() equals the bytes obtained
+via fstat(). However, testprog process prints that the bytes read via read()
+is larger than the bytes obtained via fstat().
 
-Steve
-
---047d7b15a52b8a6bed04f577e77a
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-CIFS-Return-correct-error-on-query-of-xattr-on-file-.patch"
-Content-Disposition: attachment;
-	filename="0001-CIFS-Return-correct-error-on-query-of-xattr-on-file-.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_ht7wf4ob0
-
-RnJvbSBjNjg0NTYxMzA2NmI0NTQ0OTc4ZGU3NDljZDVjNzNmYjE0ZWQ5MzZiIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHNtZnJlbmNoQGdtYWlsLmNvbT4KRGF0
-ZTogVHVlLCAyNSBNYXIgMjAxNCAxOTo0NjozNiAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIFtDSUZT
-XSBSZXR1cm4gY29ycmVjdCBlcnJvciBvbiBxdWVyeSBvZiB4YXR0ciBvbiBmaWxlIHdpdGgKIGVt
-cHR5IHhhdHRycwoKeGZzdGVzdCAwMjAgZGV0ZWN0ZWQgYSBwcm9ibGVtIHdpdGggY2lmcyB4YXR0
-ciBoYW5kbGluZy4gIFdoZW4gYSBmaWxlCmhhZCBhbiBlbXB0eSB4YXR0ciBsaXN0LCB3ZSByZXR1
-cm5lZCBzdWNjZXNzICh3aXRoIGFuIGVtcHR5IHhhdHRyIHZhbHVlKQpvbiBxdWVyeSBvZiBwYXJ0
-aWN1bGFyIHhhdHRycyByYXRoZXIgdGhhbiByZXR1cm5pbmcgRU5PREFUQS4KVGhpcyBwYXRjaCBm
-aXhlcyBpdCBzbyB0aGF0IHF1ZXJ5IG9mIGFuIHhhdHRyIHJldHVybnMgRU5PREFUQSB3aGVuIHRo
-ZQp4YXR0ciBsaXN0IGlzIGVtcHR5IGZvciB0aGUgZmlsZS4KClNpZ25lZC1vZmYtYnk6IFN0ZXZl
-IEZyZW5jaCA8c21mcmVuY2hAZ21haWwuY29tPgotLS0KIGZzL2NpZnMvY2lmc3NtYi5jIHwgMyAr
-KysKIDEgZmlsZSBjaGFuZ2VkLCAzIGluc2VydGlvbnMoKykKCmRpZmYgLS1naXQgYS9mcy9jaWZz
-L2NpZnNzbWIuYyBiL2ZzL2NpZnMvY2lmc3NtYi5jCmluZGV4IGYzMjY0YmQuLjZjZTRlMDkgMTAw
-NjQ0Ci0tLSBhL2ZzL2NpZnMvY2lmc3NtYi5jCisrKyBiL2ZzL2NpZnMvY2lmc3NtYi5jCkBAIC02
-MTk3LDYgKzYxOTcsOSBAQCBRQWxsRUFzUmV0cnk6CiAJY2lmc19kYmcoRllJLCAiZWEgbGVuZ3Ro
-ICVkXG4iLCBsaXN0X2xlbik7CiAJaWYgKGxpc3RfbGVuIDw9IDgpIHsKIAkJY2lmc19kYmcoRllJ
-LCAiZW1wdHkgRUEgbGlzdCByZXR1cm5lZCBmcm9tIHNlcnZlclxuIik7CisJCS8qIGRpZG4ndCBm
-aW5kIHRoZSBuYW1lZCBhdHRyaWJ1dGUgKi8KKwkJaWYgKGVhX25hbWUpCisJCQlyYyA9IC1FTk9E
-QVRBOwogCQlnb3RvIFFBbGxFQXNPdXQ7CiAJfQogCi0tIAoxLjguNS4zCgo=
---047d7b15a52b8a6bed04f577e77a--
+The strace on the smbd process reports that CIFS is omitting lstat() request
+after pread() request if lstat() request was done very recently. Specifying
+delay as the command line argument for testprog process reduces the possibility
+of omitting lstat() request.
