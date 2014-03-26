@@ -1,71 +1,42 @@
-From: Jeffrey Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: Question regarding CIFS cache=loose behavior.
-Date: Wed, 26 Mar 2014 07:12:19 -0700
-Message-ID: <20140326071219.057bf439@ipyr.poochiereds.net>
-References: <201403210556.FEI21354.FLJOQMHtSVOFFO@I-love.SAKURA.ne.jp>
-	<20140320191013.110276c0@tlielax.poochiereds.net>
-	<201403262104.AGG86982.StVMOJOHFOQFLF@I-love.SAKURA.ne.jp>
-	<20140326052119.32405279@ipyr.poochiereds.net>
-	<20140326060305.3226a08c@ipyr.poochiereds.net>
-	<201403262305.GBG17639.MOJLVOOSFHFtQF@I-love.SAKURA.ne.jp>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
-To: Tetsuo Handa <penguin-kernel-JPay3/Yim36HaxMnTkn67Xf5DAMn2ifp@public.gmane.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: fix actimeo=0 corner case when cifs_i->time == jiffies
+Date: Wed, 26 Mar 2014 07:24:23 -0700
+Message-ID: <1395843863-12038-1-git-send-email-jlayton@redhat.com>
+Cc: penguin-kernel-JPay3/Yim36HaxMnTkn67Xf5DAMn2ifp@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <201403262305.GBG17639.MOJLVOOSFHFtQF-JPay3/Yim36HaxMnTkn67Xf5DAMn2ifp@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 26 Mar 2014 23:05:20 +0900
-Tetsuo Handa <penguin-kernel-JPay3/Yim36HaxMnTkn67Xf5DAMn2ifp@public.gmane.org> wrote:
+actimeo=0 is supposed to be a special case that ensures that inode
+attributes are always refetched from the server instead of trusting the
+cache. The cifs code however uses time_in_range() to determine whether
+the attributes have timed out. In the case where cifs_i->time equals
+jiffies, this leads to the cifs code not refetching the inode attributes
+when it should.
 
-> Jeffrey Layton wrote:
-> > > ...or that samba is omitting it and is sending cached info
-> > > instead of doing the lstat() call? I'm not sure if it does that,
-> > > but I don't think you should draw too many conclusions about the
-> > > behavior of cifs.ko from stracing smbd.
-> > > 
-> > > What may make more sense is to get network captures and analyze
-> > > the behavior from that perspective.
-> > > 
-> > 
-> > ...or maybe it *is* cifs.ko. From cifs_inode_needs_reval:
-> > 
-> > 
-> >         if (!time_in_range(jiffies, cifs_i->time,
-> >                                 cifs_i->time + cifs_sb->actimeo))
-> >                 return true;
-> > 
-> > 
-> > ...I think though that if cifs_i->time == jiffies and actimeo=0,
-> > then that condition will be false. As a quick check, it might be
-> > good to add something like this before that if statement and then
-> > rerun your test:
-> > 
-> > 	if (!cifs_sb->actimeo)
-> > 		return true;
-> > 
-> > That should get rid of that particular corner case.
-> 
-> Yes, I confirmed that below change fixes this problem. Thank you.
-> 
-> --- a/fs/cifs/inode.c
-> +++ b/fs/cifs/inode.c
-> @@ -1737,6 +1737,8 @@ cifs_inode_needs_reval(struct inode *inode)
->  	if (cifs_i->time == 0)
->  		return true;
->  
-> +	if (!cifs_sb->actimeo)
-> +		return true;
->  	if (!time_in_range(jiffies, cifs_i->time,
->  				cifs_i->time + cifs_sb->actimeo))
->  		return true;
+Fix this by explicitly testing for actimeo=0, and handling it as a
+special case.
 
-Great, thanks for testing it. I'll send Steve a patch for 3.15 and cc
-you.
+Reported-and-Tested-by: Tetsuo Handa <penguin-kernel-JPay3/Yim36HaxMnTkn67Xf5DAMn2ifp@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/inode.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index aadc2b68678b..a22d667f1069 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -1737,6 +1737,9 @@ cifs_inode_needs_reval(struct inode *inode)
+ 	if (cifs_i->time == 0)
+ 		return true;
+ 
++	if (!cifs_sb->actimeo)
++		return true;
++
+ 	if (!time_in_range(jiffies, cifs_i->time,
+ 				cifs_i->time + cifs_sb->actimeo))
+ 		return true;
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.8.5.3
