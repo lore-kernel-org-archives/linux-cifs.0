@@ -1,146 +1,125 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: CIFS Mount Error -5
-Date: Sun, 30 Mar 2014 17:07:18 -0500
-Message-ID: <CAH2r5mv3CHmfTSWc5-KeSjuwDC73fFYj8RY3R=wLHP3a2_AcVw@mail.gmail.com>
-References: <02a101cf4c5c$83e79c10$8bb6d430$@pcsourcenet.com>
- <CAH2r5mvjVmLbpAg5N8++c1gzWA4rSX=qgnXzR1KLi3TMgn87nw@mail.gmail.com> <02b201cf4c61$ed475f10$c7d61d30$@pcsourcenet.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: Question regarding CIFS cache=loose behavior.
+Date: Mon, 31 Mar 2014 13:48:44 -0400
+Message-ID: <20140331134844.756ff1eb@tlielax.poochiereds.net>
+References: <201403202103.EIE87056.QVtLHSFMFOOFOJ@I-love.SAKURA.ne.jp>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-To: Hamid Majidy <hamid-1WA2RWJAdEzQnzwC+xcbyw@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Tetsuo Handa <penguin-kernel-JPay3/Yim36HaxMnTkn67Xf5DAMn2ifp@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <02b201cf4c61$ed475f10$c7d61d30$@pcsourcenet.com>
+In-Reply-To: <201403202103.EIE87056.QVtLHSFMFOOFOJ-JPay3/Yim36HaxMnTkn67Xf5DAMn2ifp@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Next obvious thing to try - compare the verbose mount string between
-the failing case (where you started with a tcp name for the server)
-and the working case (where you used an ip address for the server) and
-see if there is a difference.  2nd obvious thing to try - type "dmesg"
-after the mount fails and see if it indicates which request failed
-(negotiate, session setup or tree connect).  There could be subtle
-issues related to authentication when the server name differs but it
-is likely to be much simpler than that.    As a comparison point,
-using a totally different implementation, you can try the same
-experiment with smbclient (if that succeeds it might indicate that you
-should change the default security "sec=" option that you try, perhaps
-from to sec=ntlmssp).  If all else fails, we can look at a wireshark
-trace or the server's log to see if it gives a clue as to why it is
-rejecting the request.
+On Thu, 20 Mar 2014 21:03:03 +0900
+Tetsuo Handa <penguin-kernel-JPay3/Yim36HaxMnTkn67Xf5DAMn2ifp@public.gmane.org> wrote:
 
-The reason why it is so important to look at the log file (dmesg) on
-the client (or on the server) is that the mount command restricts the
-number of errors that cifs.ko can send back to a very small set.
-Error EIO can be caused (obviously) by many server or even
-authentication or network problems and is a catch all for many
-different conditions.
-
-On Sun, Mar 30, 2014 at 4:49 PM, Hamid Majidy <hamid-1WA2RWJAdEzQnzwC+xcbyw@public.gmane.org> wrote:
-> Wow a response from Steve French himself! When I add -verbose, I get:
->
-> [root@DataTest-DW ~]# mount.cifs //DataTarget.mydomain.com/case
-> /win/nas02/Case --verbose -o
-> username=Dataanalyticslinux-3Q2Tfjf0mexWk0Htik3J/w@public.gmane.org,password=*******
->
-> mount.cifs kernel mount options:
-> ip=172.18.0.40,unc=\\DataTarget-DW.mydomain.com\case,,ver=1,user=Dataanalyticslinux-3Q2Tfjf0mexWk0Htik3J/w@public.gmane.org,pass=********
->
-> mount error(5): Input/output error
->
-> Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
->
-> The -verbose switch does not seem to add much helpful detail.
->
->
->
-> And, yes, mount.cifs is where you refer to:
->
-> [root@DataTest-DW ~]# ls -l /sbin/mount.cifs
->
-> -rwxr-xr-x. 1 root root 40544 Nov 22 05:56 /sbin/mount.cifs
->
->
->
-> I thought this might be because of a missing PTR records in DNS, but it
-> seems to be there:
->
-> [root@DataTest-DW ~]# nslookup
->
->> set type=ptr
->
->> 172.18.0.40
->
-> Server:         172.18.0.8
->
-> Address:        172.18.0.8#53
->
->
->
-> 136.0.18.172.in-addr.arpa       name = datatest-dw.mydomain.com.
->
-> Any other ideas on why name fails but IP succeeds, given that name resolves
-> to correct IP?
->
->
->
-> Thanks,
->
-> Hamid.
->
-> From: Steve French [mailto:smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org]
-> Sent: Sunday, March 30, 2014 2:25 PM
-> To: Hamid Majidy
->
->
-> Subject: Re: CIFS Mount Error -5
->
->
->
-> IP name address resolution is done by /sbin/mount.cifs so ensure it is
-> present.  If in doubt about what IP address was resolved mount verbosely
-> (remember to specify -verbose before the list of mount options)
->
->
-> On Mar 30, 2014 4:11 PM, "Hamid Majidy" <hamid-1WA2RWJAdEzQnzwC+xcbyw@public.gmane.org> wrote:
->>
->> Hello list. I am getting on my CentOS 5 & 6 servers' /var/log/messages
->> like:
->> Mar 24 20:54:47 server kernel:  CIFS VFS: cifs_mount failed w/return code
->> =
->> -5
->>
->> When I try to mount a Windows 2008 R2 share with:
->> mount.cifs //server_name/share /win/case -o
->> username='user_name',password='user_password'
->>
->> whereas when I do the exact same mount with IP it is successful.
->> mount.cifs //server_IP/share /win/case -o
->> username='user_name',password='user_password'
->>
->> I have checked DNS which does resolve the name correctly, added the entry
->> to
->> /etc/hosts (so resolver does not have to contact DNS), checked
->> /etc/resolv.conf, added 'strace' before command, added '-av' as argument
->> all
->> to no avail. I am just give on using the server name.
->>
->> This happening on CentOS 5.5, 5.6 & 6.5 with different versions of Samba
->> and
->> CIFS (on CentOS 6.5).
->>
->> Anyone have any ideas?
->>
->> Thanks,
->> Hamid.
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Is the behavior described below ( "read() returns 0 unless stat() detects the
+> growth of file size" and "read() returns non-0 when stat() detects the growth
+> of file size but the data actually read is '\0'" ) a feature of cache=loose
+> option?
+> 
+> Steps to reproduce:
+> 
+> ---------- Start of writer1.c ----------
+> #include <unistd.h>
+> int main(int argc, char *argv[])
+> {
+>     while (write(1, ".", 1) == 1)
+>         sleep(1);
+>     return 0;
+> }
+> ---------- End of writer1.c ----------
+> 
+> ---------- Start of reader1.c ----------
+> #include <unistd.h>
+> int main(int argc, char *argv[])
+> {
+>     while (1) {
+>         char c;
+>         if (read(0, &c, 1) == 1) {
+>             if (c)
+>                 write(1, &c, 1);
+>             else
+>                 write(1, "!", 1);
+>         } else {
+>             sleep(1);
+>         }
+>     }
+>     return 0;
+> }
+> ---------- End of reader1.c ----------
+> 
+> ---------- Start of reader2.c ----------
+> #include <sys/stat.h>
+> #include <unistd.h>
+> int main(int argc, char *argv[])
+> {
+>     while (1) {
+>         struct stat buf;
+>         char c;
+>         fstat(0, &buf);
+>         if (read(0, &c, 1) == 1) {
+>             if (c)
+>                 write(1, &c, 1);
+>             else
+>                 write(1, "!", 1);
+>         } else {
+>             sleep(1);
+>         }
+>     }
+>     return 0;
+> }
+> ---------- End of reader2.c ----------
+> 
+> Run the following commands on the Samba server side.
+> 
+>   $ cc -Wall -O3 -o writer1 writer1.c
+>   $ ./writer1 > shared_file
+> 
+> Run the following commands on the Samba client side.
+> 
+>   $ cc -Wall -O3 -o reader1 reader1.c
+>   $ strace -tt -o /tmp/log1 ./reader1 < shared_file
+>   ..........     (<= Makes no progress by default)
+> 
+> The shared_file shown above is a regular file shared via CIFS mounted with
+> cache=loose option. (e.g. "mount -t cifs -o cache=loose //server/path /mnt" )
+> 
+> I expect that the reader1 process reads one byte whenever the writer1
+> process writes one byte. But we can observe via /tmp/log1 that the read()
+> continues returning 0 until the growth of file size of shared_file is
+> recognized by stat() using programs like /bin/ls and /usr/bin/stat .
+> 
+> Then, terminate the reader1 process using Ctrl-C and run the following
+> commands on the Samba client side.
+> 
+>   $ cc -Wall -O3 -o reader2 reader2.c
+>   $ strace -tt -o /tmp/log2 ./reader2 < shared_file
+>   ......................!!!!!!     (<= Makes progress with wrong data)
+> 
+> We can observe via /tmp/log2 that the read() returns 1 because fstat()
+> detects the growth of file size of shared_file . However, the data
+> returned by read() is not '.' but '\0'.
 
 
+I had a chance to poke at this today. I think the main issue is likely
+due to a server-side problem.
+
+smbd.conf defaults to "kernel oplocks = no" now. That means that samba
+is handing out oplocks even when other processes on the box have the
+file open for read or write. Setting that to "yes" should help things
+work better.
+
+It seems like that used to be different, but has apparently changed in
+recent versions of samba. Without that, we get some "interesting"
+effects when the size changes, but we still hold an oplock.
+
+I also have a patchset forthcoming to fix some races in this area too.
+After setting kernel oplocks = yes and applying the patchset, this
+works more like you'd expect.
 
 -- 
-Thanks,
-
-Steve
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
