@@ -1,59 +1,59 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [cifs-utils PATCH] cifs: use krb5_kt_default() to determine default keytab location
-Date: Wed,  2 Apr 2014 21:21:59 -0400
-Message-ID: <1396488119-7796-1-git-send-email-jlayton@samba.org>
-Cc: klepikho-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Cyril Roelandt <tipecaml-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] fs: cifs: remove unused variable.
+Date: Fri,  4 Apr 2014 00:05:21 +0200
+Message-ID: <1396562721-28354-1-git-send-email-tipecaml@gmail.com>
+Cc: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Cyril Roelandt <tipecaml-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-...don't assume that it's in /etc/krb5.keytab.
+In SMB2_set_compression(), the "res_key" variable is only initialized to NULL
+and later kfreed. It is therefore useless and should be removed.
 
-Reported-by: Konstantin Lepikhov <klepikho-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Found with the following semantic patch:
+
+<smpl>
+@@
+identifier foo;
+identifier f;
+type T;
+@@
+* f(...) {
+...
+* T *foo = NULL;
+... when forall
+    when != foo
+* kfree(foo);
+...
+}
+</smpl>
+
+Signed-off-by: Cyril Roelandt <tipecaml-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- cifs.upcall.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ fs/cifs/smb2pdu.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/cifs.upcall.c b/cifs.upcall.c
-index cc65824d3689..e8544c2b68ad 100644
---- a/cifs.upcall.c
-+++ b/cifs.upcall.c
-@@ -55,7 +55,6 @@
- #define	CIFS_DEFAULT_KRB5_DIR		"/tmp"
- #define	CIFS_DEFAULT_KRB5_USER_DIR	"/run/user/%U"
- #define	CIFS_DEFAULT_KRB5_PREFIX	"krb5cc"
--#define CIFS_DEFAULT_KRB5_KEYTAB	"/etc/krb5.keytab"
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 8603447..3802f8c 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1352,7 +1352,6 @@ SMB2_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
+ 		     u64 persistent_fid, u64 volatile_fid)
+ {
+ 	int rc;
+-	char *res_key = NULL;
+ 	struct  compress_ioctl fsctl_input;
+ 	char *ret_data = NULL;
  
- #define	MAX_CCNAME_LEN			PATH_MAX + 5
+@@ -1365,7 +1364,6 @@ SMB2_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
+ 			2 /* in data len */, &ret_data /* out data */, NULL);
  
-@@ -205,9 +204,15 @@ init_cc_from_keytab(const char *keytab_name, const char *user)
- 		goto icfk_cleanup;
- 	}
+ 	cifs_dbg(FYI, "set compression rc %d\n", rc);
+-	kfree(res_key);
  
--	ret = krb5_kt_resolve(context, keytab_name, &keytab);
-+	if (keytab_name)
-+		ret = krb5_kt_resolve(context, keytab_name, &keytab);
-+	else
-+		ret = krb5_kt_default(context, &keytab);
-+
- 	if (ret) {
--		syslog(LOG_DEBUG, "krb5_kt_resolve: %d", (int)ret);
-+		syslog(LOG_DEBUG, "%s: %d",
-+			keytab_name ? "krb5_kt_resolve" : "krb5_kt_default",
-+			(int)ret);
- 		goto icfk_cleanup;
- 	}
- 
-@@ -841,7 +846,7 @@ int main(const int argc, char *const argv[])
- 	struct decoded_args arg;
- 	const char *oid;
- 	uid_t uid;
--	char *keytab_name = CIFS_DEFAULT_KRB5_KEYTAB;
-+	char *keytab_name = NULL;
- 	time_t best_time = 0;
- 
- 	hostbuf[0] = '\0';
+ 	return rc;
+ }
 -- 
-1.9.0
+1.9.1
