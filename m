@@ -1,62 +1,40 @@
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH 2/2] mm: Initialize error in shmem_file_aio_read()
-Date: Sun, 13 Apr 2014 20:46:22 +0200
-Message-ID: <1397414783-28098-2-git-send-email-geert@linux-m68k.org>
+From: Al Viro <viro-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
+Subject: Re: [PATCH 2/2] mm: Initialize error in shmem_file_aio_read()
+Date: Sun, 13 Apr 2014 21:50:29 +0100
+Message-ID: <20140413205029.GO18016@ZenIV.linux.org.uk>
 References: <1397414783-28098-1-git-send-email-geert@linux-m68k.org>
+ <1397414783-28098-2-git-send-email-geert@linux-m68k.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Cc: Steve French <sfrench@samba.org>,
-	linux-cifs@vger.kernel.org,
-	Hugh Dickins <hughd@google.com>,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	Geert Uytterhoeven <geert@linux-m68k.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Andrew Morton <akpm@linux-foundation.org>
-Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <1397414783-28098-1-git-send-email-geert@linux-m68k.org>
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
+	Andrew Morton <akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Hugh Dickins <hughd-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>, linux-mm-Bw31MaZKKs3YtjvyW6yDsg@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <1397414783-28098-2-git-send-email-geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-mm/shmem.c: In function =E2=80=98shmem_file_aio_read=E2=80=99:
-mm/shmem.c:1414: warning: =E2=80=98error=E2=80=99 may be used uninitializ=
-ed in this function
+On Sun, Apr 13, 2014 at 08:46:22PM +0200, Geert Uytterhoeven wrote:
+> mm/shmem.c: In function =E2=80=98shmem_file_aio_read=E2=80=99:
+> mm/shmem.c:1414: warning: =E2=80=98error=E2=80=99 may be used uniniti=
+alized in this function
+>=20
+> If the loop is aborted during the first iteration by one of the two f=
+irst
+> break statements, error will be uninitialized.
+>=20
+> Introduced by commit 6e58e79db8a16222b31fc8da1ca2ac2dccfc4237
+> ("introduce copy_page_to_iter, kill loop over iovec in
+> generic_file_aio_read()").
+>=20
+> Signed-off-by: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
+> ---
+> The code is too complex to see if this is an obvious false positive.
 
-If the loop is aborted during the first iteration by one of the two first
-break statements, error will be uninitialized.
-
-Introduced by commit 6e58e79db8a16222b31fc8da1ca2ac2dccfc4237
-("introduce copy_page_to_iter, kill loop over iovec in
-generic_file_aio_read()").
-
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
----
-The code is too complex to see if this is an obvious false positive.
-
- mm/shmem.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/mm/shmem.c b/mm/shmem.c
-index 8f1a95406bae..9f70e02111c6 100644
---- a/mm/shmem.c
-+++ b/mm/shmem.c
-@@ -1411,7 +1411,7 @@ static ssize_t shmem_file_aio_read(struct kiocb *io=
-cb,
- 	pgoff_t index;
- 	unsigned long offset;
- 	enum sgp_type sgp =3D SGP_READ;
--	int error;
-+	int error =3D 0;
- 	ssize_t retval;
- 	size_t count;
- 	loff_t *ppos =3D &iocb->ki_pos;
---=20
-1.7.9.5
-
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=3Dmailto:"dont@kvack.org"> email@kvack.org </a>
+Good catch; sadly, it *can* be triggered - read() starting past the EOF
+will step into it.  Applied, will push today.
