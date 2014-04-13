@@ -1,7 +1,8 @@
 From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH 1/2] cifs: Use min_t() when comparing "size_t" and "unsigned long"
-Date: Sun, 13 Apr 2014 20:46:21 +0200
-Message-ID: <1397414783-28098-1-git-send-email-geert@linux-m68k.org>
+Subject: [PATCH 2/2] mm: Initialize error in shmem_file_aio_read()
+Date: Sun, 13 Apr 2014 20:46:22 +0200
+Message-ID: <1397414783-28098-2-git-send-email-geert@linux-m68k.org>
+References: <1397414783-28098-1-git-send-email-geert@linux-m68k.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -15,45 +16,42 @@ To: Linus Torvalds <torvalds@linux-foundation.org>,
 	Alexander Viro <viro@zeniv.linux.org.uk>,
 	Andrew Morton <akpm@linux-foundation.org>
 Return-path: <owner-linux-mm@kvack.org>
+In-Reply-To: <1397414783-28098-1-git-send-email-geert@linux-m68k.org>
 Sender: owner-linux-mm@kvack.org
 List-Id: linux-cifs.vger.kernel.org
 
-On 32 bit, size_t is "unsigned int", not "unsigned long", causing the
-following warning when comparing with PAGE_SIZE, which is always "unsigne=
-d
-long":
+mm/shmem.c: In function =E2=80=98shmem_file_aio_read=E2=80=99:
+mm/shmem.c:1414: warning: =E2=80=98error=E2=80=99 may be used uninitializ=
+ed in this function
 
-fs/cifs/file.c: In function =E2=80=98cifs_readdata_to_iov=E2=80=99:
-fs/cifs/file.c:2757: warning: comparison of distinct pointer types lacks =
-a cast
+If the loop is aborted during the first iteration by one of the two first
+break statements, error will be uninitialized.
 
-Introduced by commit 7f25bba819a38ab7310024a9350655f374707e20
-("cifs_iovec_read: keep iov_iter between the calls of
-cifs_readdata_to_iov()"), which changed the signedness of "remaining"
-and the code from min_t() to min().
+Introduced by commit 6e58e79db8a16222b31fc8da1ca2ac2dccfc4237
+("introduce copy_page_to_iter, kill loop over iovec in
+generic_file_aio_read()").
 
 Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
 ---
-PAGE_SIZE should really be size_t, but that would require lots of changes
-all over the place.
+The code is too complex to see if this is an obvious false positive.
 
- fs/cifs/file.c |    2 +-
+ mm/shmem.c |    2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 8807442c94dd..8add25538a3b 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -2754,7 +2754,7 @@ cifs_readdata_to_iov(struct cifs_readdata *rdata, s=
-truct iov_iter *iter)
-=20
- 	for (i =3D 0; i < rdata->nr_pages; i++) {
- 		struct page *page =3D rdata->pages[i];
--		size_t copy =3D min(remaining, PAGE_SIZE);
-+		size_t copy =3D min_t(size_t, remaining, PAGE_SIZE);
- 		size_t written =3D copy_page_to_iter(page, 0, copy, iter);
- 		remaining -=3D written;
- 		if (written < copy && iov_iter_count(iter) > 0)
+diff --git a/mm/shmem.c b/mm/shmem.c
+index 8f1a95406bae..9f70e02111c6 100644
+--- a/mm/shmem.c
++++ b/mm/shmem.c
+@@ -1411,7 +1411,7 @@ static ssize_t shmem_file_aio_read(struct kiocb *io=
+cb,
+ 	pgoff_t index;
+ 	unsigned long offset;
+ 	enum sgp_type sgp =3D SGP_READ;
+-	int error;
++	int error =3D 0;
+ 	ssize_t retval;
+ 	size_t count;
+ 	loff_t *ppos =3D &iocb->ki_pos;
 --=20
 1.7.9.5
 
