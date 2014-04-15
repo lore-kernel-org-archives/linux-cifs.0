@@ -1,73 +1,42 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifskey: better use snprintf()
-Date: Mon, 14 Apr 2014 13:00:27 -0400
-Message-ID: <20140414130027.2518f48e@ipyr.poochiereds.net>
-References: <20140414093941.GA7017@suse.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Sebastian Krahmer <krahmer-l3A5Bk7waGM@public.gmane.org>
+From: Michael Opdenacker <michael.opdenacker-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+Subject: [PATCH] cif: fix dead code
+Date: Tue, 15 Apr 2014 10:06:50 +0200
+Message-ID: <1397549210-29445-1-git-send-email-michael.opdenacker@free-electrons.com>
+Cc: geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Michael Opdenacker <michael.opdenacker-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+To: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20140414093941.GA7017-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 14 Apr 2014 11:39:41 +0200
-Sebastian Krahmer <krahmer-l3A5Bk7waGM@public.gmane.org> wrote:
+This issue was found by Coverity (CID 1202536)
 
-> 
-> Prefer snprintf() over sprintf() in cifskey.c
-> Projects that fork the code (pam_cifscreds) can't rely on
-> the max-size parameters.
-> 
-> Signed-off-by: Sebastian Krahmer <krahmer-l3A5Bk7waGM@public.gmane.org>
-> ---
-> 
-> 
-> --- cifskey.c.orig	2014-04-08 13:10:41.653435040 +0200
-> +++ cifskey.c	2014-04-14 11:19:07.000118206 +0200
-> @@ -29,7 +29,8 @@
->  {
->  	char desc[INET6_ADDRSTRLEN + sizeof(KEY_PREFIX) + 4];
->  
-> -	sprintf(desc, "%s:%c:%s", KEY_PREFIX, keytype, addr);
-> +	if (snprintf(desc, sizeof(desc), "%s:%c:%s", KEY_PREFIX, keytype, addr) >= (int)sizeof(desc))
-> +		return -1;
->  
->  	return keyctl_search(DEST_KEYRING, CIFS_KEY_TYPE, desc, 0);
->  }
-> @@ -38,15 +39,18 @@
->  key_serial_t
->  key_add(const char *addr, const char *user, const char *pass, char keytype)
->  {
-> -	int len;
-> +	int len = 0;
+This proposes a fix for a statement that creates dead code.
+The "rc < 0" statement is within code that is run
+with "rc > 0".
 
-This initialization doesn't appear to be needed.
+It seems like "err < 0" was meant to be used here.
+This way, the error code is returned by the function.
 
->  	char desc[INET6_ADDRSTRLEN + sizeof(KEY_PREFIX) + 4];
->  	char val[MOUNT_PASSWD_SIZE +  MAX_USERNAME_SIZE + 2];
->  
->  	/* set key description */
-> -	sprintf(desc, "%s:%c:%s", KEY_PREFIX, keytype, addr);
-> +	if (snprintf(desc, sizeof(desc), "%s:%c:%s", KEY_PREFIX, keytype, addr) >= (int)sizeof(desc))
-> +		return -1;
->  
->  	/* set payload contents */
-> -	len = sprintf(val, "%s:%s", user, pass);
-> +	len = snprintf(val, sizeof(val), "%s:%s", user, pass);
-> +	if (len >= (int)sizeof(val))
-> +		return -1;
->  
->  	return add_key(CIFS_KEY_TYPE, desc, val, len + 1, DEST_KEYRING);
->  }
-> 
-> 
+Signed-off-by: Michael Opdenacker <michael.opdenacker-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+---
+ fs/cifs/file.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I think we probably need to clean up the error handling in the callers
-of these functions, but that's a separate problem. I'll go ahead and
-merge this, and we can do that in a separate patch.
-
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 8add25538a3b..b6e78632fa97 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -2599,7 +2599,7 @@ cifs_writev(struct kiocb *iocb, const struct iovec *iov,
+ 			ssize_t err;
+ 
+ 			err = generic_write_sync(file, iocb->ki_pos - rc, rc);
+-			if (rc < 0)
++			if (err < 0)
+ 				rc = err;
+ 		}
+ 	} else {
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.8.3.2
