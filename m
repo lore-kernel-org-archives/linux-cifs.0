@@ -1,53 +1,67 @@
-From: isabelle <contact_claude-uSTK/MBzOD0b1SvskN2V4Q@public.gmane.org>
-Subject: spende /Donation
-Date: Tue, 15 Apr 2014 21:47:38 +0200
-Message-ID: <yx4Sef42JyeoopbQKx5pAipXLBt1prSNuXPiRcWu1Nis__17754.6105500825$1397597301$gmane$org@isabelle.de>
-Reply-To: isabelle.claude654-QFKgK+z4sOrR7s880joybQ@public.gmane.org
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] cifskey: better use snprintf()
+Date: Wed, 16 Apr 2014 08:14:06 -0400
+Message-ID: <20140416081406.3449e5d0@tlielax.poochiereds.net>
+References: <20140414093941.GA7017@suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1;
-	format=flowed
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: Undisclosed-Recipients:;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Sebastian Krahmer <krahmer-l3A5Bk7waGM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20140414093941.GA7017-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hallo
-Wenn ich diese Nachricht zu senden wollte, ist dies nicht einfach Zufal=
-l. Dies ist, weil Ihre e-Mail vom elektronischen Roboter gesichert mein=
-e WX.7AR BW ausgew=E4hlt wurde.
-Zun=E4chst m=F6chte ich mich f=FCr dieses Eindringen in Ihr Leben zu en=
-tschuldigen, obwohl ich zugeben, dass es mir sehr wichtig. Ich bin Isab=
-elle Vasudev. Ich leide an Krebs im Hals seit nun mehr als 3 Jahre und =
-eine halbe und es leider, mein Arzt hat gerade informiert mich, dass ic=
-h bin voller unheilbar und, dass meine Tage, wegen meinen etwas gez=E4h=
-lt sind abgebaut Zustand. Ich bin eine Witwe und ich habe keine Kind, d=
-as ich beginne zu bedauern.
-In der Tat ist der Grund, warum ich Sie kontaktieren bin, m=F6chte ich =
-einen Teil von meinem Grundst=FCck zu spenden, weil ich niemand, wer di=
-e Erben konnte. Ich habe fast mein ganzes Zeug, darunter ein Unternehme=
-n der Export von Holz, Gummi und Stahl-Industrie in Afrika, wo ich wohn=
-e nun mehr 10 Jahren, verkauft. Ein gro=DFer Teil der Gelder gesammelt =
-wurde mit unterschiedlichen Verb=E4nden humanit=E4ren Charakter =FCbera=
-ll in der Welt, aber besonders hier in Afrika bezahlt.
-Im Hinblick auf den Rest der Summe genau in H=F6he von 750.000, 00euros=
- (sieben hundert und f=FCnfzig tausend Euro) auf eine gesperrte Mitarbe=
-iter-Account, meine letzte w=FCnschen w=FCrde Sie es spenden, so dass S=
-ie in Ihrer Branche und vor allem den humanit=E4ren investieren k=F6nne=
-n. Ich bin ganz bewusst was ich zu tun beabsichtigen, und ich denke, tr=
-otz der Tatsache, die wir nicht wissen, werdet ihr diese Summe gut nutz=
-en. Ich bitte Sie, bitte dieses Erbe zu akzeptieren, ohne jedoch Fragen=
- Sie alles, was in zur=FCckgeben wenn es nicht immer denken, gutes zu t=
-un, um dich herum, was ich nicht getan habe, in meiner Existenz.
-Das hei=DFt, wird auf einer verantwortlichen Person und besonders gutem=
- Glauben fallen zu lassen beruhigt, ich m=F6chte bitten, dass Sie bitte=
- mich bei den meisten schnell kontaktieren, um weitere Erkl=E4rung =FCb=
-er die Gr=FCnde f=FCr meine Geste und den Verlauf der Dinge zu geben. B=
-itte kontaktieren Sie mich so bald wie m=F6glich, wenn Sie mein Angebot=
- akzeptieren.
-Gott m=F6ge mit dir sein!
-Ich fordere Sie auf, mich =FCber meine pers=F6nliche e-Mail-Adresse zu =
-kontaktieren:
-Isabelle.claude654-QFKgK+z4sOrR7s880joybQ@public.gmane.org
-Der Frieden und Barmherzigkeit Gottes m=F6ge mit dir sein.
-Mrs Isabelle
+On Mon, 14 Apr 2014 11:39:41 +0200
+Sebastian Krahmer <krahmer-l3A5Bk7waGM@public.gmane.org> wrote:
+
+> 
+> Prefer snprintf() over sprintf() in cifskey.c
+> Projects that fork the code (pam_cifscreds) can't rely on
+> the max-size parameters.
+> 
+> Signed-off-by: Sebastian Krahmer <krahmer-l3A5Bk7waGM@public.gmane.org>
+> ---
+> 
+> 
+> --- cifskey.c.orig	2014-04-08 13:10:41.653435040 +0200
+> +++ cifskey.c	2014-04-14 11:19:07.000118206 +0200
+> @@ -29,7 +29,8 @@
+>  {
+>  	char desc[INET6_ADDRSTRLEN + sizeof(KEY_PREFIX) + 4];
+>  
+> -	sprintf(desc, "%s:%c:%s", KEY_PREFIX, keytype, addr);
+> +	if (snprintf(desc, sizeof(desc), "%s:%c:%s", KEY_PREFIX, keytype, addr) >= (int)sizeof(desc))
+> +		return -1;
+>  
+>  	return keyctl_search(DEST_KEYRING, CIFS_KEY_TYPE, desc, 0);
+>  }
+> @@ -38,15 +39,18 @@
+>  key_serial_t
+>  key_add(const char *addr, const char *user, const char *pass, char keytype)
+>  {
+> -	int len;
+> +	int len = 0;
+>  	char desc[INET6_ADDRSTRLEN + sizeof(KEY_PREFIX) + 4];
+>  	char val[MOUNT_PASSWD_SIZE +  MAX_USERNAME_SIZE + 2];
+>  
+>  	/* set key description */
+> -	sprintf(desc, "%s:%c:%s", KEY_PREFIX, keytype, addr);
+> +	if (snprintf(desc, sizeof(desc), "%s:%c:%s", KEY_PREFIX, keytype, addr) >= (int)sizeof(desc))
+> +		return -1;
+>  
+>  	/* set payload contents */
+> -	len = sprintf(val, "%s:%s", user, pass);
+> +	len = snprintf(val, sizeof(val), "%s:%s", user, pass);
+> +	if (len >= (int)sizeof(val))
+> +		return -1;
+>  
+>  	return add_key(CIFS_KEY_TYPE, desc, val, len + 1, DEST_KEYRING);
+>  }
+> 
+> 
+
+Slightly modified version merged. Thanks for the patch!
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
