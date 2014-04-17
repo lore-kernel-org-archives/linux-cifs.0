@@ -1,65 +1,60 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: fix error handling cifs_user_readv
-Date: Wed, 16 Apr 2014 22:56:05 -0500
-Message-ID: <CAH2r5muAmeC6ibLyN9K5EU7OxmY7GzqOqtVtRZi8OF7j_LKq9A@mail.gmail.com>
-References: <1397580529-3305-1-git-send-email-jlayton@redhat.com>
+Subject: Re: [PATCH] cif: fix dead code
+Date: Wed, 16 Apr 2014 23:10:03 -0500
+Message-ID: <CAH2r5mt2CZi039PMfb52-3yEcny9ZpCVZXaYxWAg=nbNgywL9g@mail.gmail.com>
+References: <1397549210-29445-1-git-send-email-michael.opdenacker@free-electrons.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
+	Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Michael Opdenacker <michael.opdenacker-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1397580529-3305-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1397549210-29445-1-git-send-email-michael.opdenacker-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 merged into cifs-2.6.git
 
-On Tue, Apr 15, 2014 at 11:48 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> Coverity says:
+On Tue, Apr 15, 2014 at 3:06 AM, Michael Opdenacker
+<michael.opdenacker-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org> wrote:
+> This issue was found by Coverity (CID 1202536)
 >
-> *** CID 1202537:  Dereference after null check  (FORWARD_NULL)
-> /fs/cifs/file.c: 2873 in cifs_user_readv()
-> 2867                    cur_len = min_t(const size_t, len - total_read, cifs_sb->rsize);
-> 2868                    npages = DIV_ROUND_UP(cur_len, PAGE_SIZE);
-> 2869
-> 2870                    /* allocate a readdata struct */
-> 2871                    rdata = cifs_readdata_alloc(npages,
-> 2872                                                cifs_uncached_readv_complete);
->>>>     CID 1202537:  Dereference after null check  (FORWARD_NULL)
->>>>     Comparing "rdata" to null implies that "rdata" might be null.
-> 2873                    if (!rdata) {
-> 2874                            rc = -ENOMEM;
-> 2875                            goto error;
-> 2876                    }
-> 2877
-> 2878                    rc = cifs_read_allocate_pages(rdata, npages);
+> This proposes a fix for a statement that creates dead code.
+> The "rc < 0" statement is within code that is run
+> with "rc > 0".
 >
-> ...when we "goto error", rc will be non-zero, and then we end up trying
-> to do a kref_put on the rdata (which is NULL). Fix this by replacing
-> the "goto error" with a "break".
+> It seems like "err < 0" was meant to be used here.
+> This way, the error code is returned by the function.
 >
-> Reported-by: <scan-admin-S5/EvlXga/RWk0Htik3J/w@public.gmane.org>
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> Signed-off-by: Michael Opdenacker <michael.opdenacker-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
 > ---
 >  fs/cifs/file.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 >
 > diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 8616256cb93f..325b74798ef3 100644
+> index 8add25538a3b..b6e78632fa97 100644
 > --- a/fs/cifs/file.c
 > +++ b/fs/cifs/file.c
-> @@ -2872,7 +2872,7 @@ ssize_t cifs_user_readv(struct kiocb *iocb, const struct iovec *iov,
->                                             cifs_uncached_readv_complete);
->                 if (!rdata) {
->                         rc = -ENOMEM;
-> -                       goto error;
-> +                       break;
+> @@ -2599,7 +2599,7 @@ cifs_writev(struct kiocb *iocb, const struct iovec *iov,
+>                         ssize_t err;
+>
+>                         err = generic_write_sync(file, iocb->ki_pos - rc, rc);
+> -                       if (rc < 0)
+> +                       if (err < 0)
+>                                 rc = err;
 >                 }
->
->                 rc = cifs_read_allocate_pages(rdata, npages);
+>         } else {
 > --
-> 1.9.0
+> 1.8.3.2
 >
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 
