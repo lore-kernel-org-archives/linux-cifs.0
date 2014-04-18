@@ -1,55 +1,59 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 1/1] Add dditional error text for missing mount.cifs
-Date: Thu, 17 Apr 2014 12:56:51 -0500
-Message-ID: <CAH2r5mt1fvzXtQRUL5yi1WLQC=o4rFJhNubNNGCQGvGu-3rF4Q@mail.gmail.com>
-References: <20140417174223.GD16576@woodpecker.gentoo.org>
+Subject: [GIT] CIFS Fixes
+Date: Fri, 18 Apr 2014 17:42:51 -0500
+Message-ID: <CAH2r5muY4DkuCCJgn+s_xgvmoMJr_xrvpY9u1eCbJqXYjbWXZg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Mike Pagano <mpagano-aBrp7R+bbdUdnm+yROfE0A@public.gmane.org>
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20140417174223.GD16576-WkJ4KB730YtOk+SH+krGketnjj8NnB7F@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Might be better to check for /sbin/mount.cifs unless there are distros
-put mount helpers in a different location
+A set of 5 small cifs fixes
 
-On Thu, Apr 17, 2014 at 12:42 PM, Mike Pagano <mpagano-aBrp7R+bbdUdnm+yROfE0A@public.gmane.org> wrote:
-> If a cifs mount is attempted without mount.cifs present on the
-> system the following appears via dmesg:
->
-> [   25.949378] CIFS VFS: No username specified
->
-> The purpose of this patch is to better inform the user of the
-> possible cause of the error and show a potential solution.
->
-> Signed-off-by: Mike Pagano <mpagano-aBrp7R+bbdUdnm+yROfE0A@public.gmane.org>
-> ---
->  fs/cifs/connect.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 8813ff7..aa3249d 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -3371,7 +3371,7 @@ cifs_setup_volume_info(struct smb_vol *volume_info, char *mount_data,
->         /* BB fixme parse for domain name here */
->         cifs_dbg(FYI, "Username: %s\n", volume_info->username);
->     } else {
-> -       cifs_dbg(VFS, "No username specified\n");
-> +       cifs_dbg(VFS, "No username specified. Check for missing external program mount.cifs\n");
->     /* In userspace mount helper we can get user name from alternate
->        locations such as env variables and files on disk */
->         return -EINVAL;
-> --
-> 1.8.3.2
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+The following changes since commit 0f689a33ad17845363acdc6d52783befd6ad116c:
+
+  Merge branch 'for-linus' of
+git://git.kernel.org/pub/scm/linux/kernel/git/s390/linux (2014-04-16
+11:28:25 -0700)
+
+are available in the git repository at:
 
 
+  git://git.samba.org/sfrench/cifs-2.6.git for-next
+
+for you to fetch changes up to 1f80c0cc39e587edd06a36b43ba3a3b09d4ac428:
+
+  cif: fix dead code (2014-04-16 23:08:57 -0500)
+
+----------------------------------------------------------------
+Cyril Roelandt (1):
+      fs: cifs: remove unused variable.
+
+Jeff Layton (1):
+      cifs: fix error handling cifs_user_readv
+
+Michael Opdenacker (1):
+      cif: fix dead code
+
+Sachin Prabhu (1):
+      cifs: Wait for writebacks to complete before attempting write.
+
+Steve French (1):
+      Return correct error on query of xattr on file with empty xattrs
+
+ fs/cifs/cifsfs.c    | 14 +++++++++-
+ fs/cifs/cifsglob.h  |  8 ++++++
+ fs/cifs/cifsproto.h |  3 +++
+ fs/cifs/cifssmb.c   |  3 +++
+ fs/cifs/file.c      | 35 +++++++++++++++++++++----
+ fs/cifs/misc.c      | 74 +++++++++++++++++++++++++++++++++++++++++++++++++++--
+ fs/cifs/smb1ops.c   | 11 ++++++++
+ fs/cifs/smb2misc.c  | 18 ++++++++++---
+ fs/cifs/smb2ops.c   | 14 ++++++++++
+ fs/cifs/smb2pdu.c   |  2 --
+ 10 files changed, 169 insertions(+), 13 deletions(-)
 
 -- 
 Thanks,
