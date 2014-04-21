@@ -1,61 +1,104 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Fri, 18 Apr 2014 17:42:51 -0500
-Message-ID: <CAH2r5muY4DkuCCJgn+s_xgvmoMJr_xrvpY9u1eCbJqXYjbWXZg@mail.gmail.com>
+From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+Subject: Re: [cifs-utils PATCH 1/2] cifscreds: better error handling when
+ key_search fails
+Date: Sun, 20 Apr 2014 21:02:48 -0400
+Message-ID: <20140420210248.28c142f7@ipyr.poochiereds.net>
+References: <1397652918-14002-1-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Sebastian Krahmer <krahmer-l3A5Bk7waGM@public.gmane.org>
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1397652918-14002-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-A set of 5 small cifs fixes
+On Wed, 16 Apr 2014 08:55:17 -0400
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 
-The following changes since commit 0f689a33ad17845363acdc6d52783befd6ad116c:
+> If we ended up getting a bogus string that would have overflowed, then
+> make key_search set errno to EINVAL before returning. The callers can
+> then test to see if the returned error is what was expected or something
+> else and handle it appropriately.
+> 
+> Cc: Sebastian Krahmer <krahmer-l3A5Bk7waGM@public.gmane.org>
+> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 
-  Merge branch 'for-linus' of
-git://git.kernel.org/pub/scm/linux/kernel/git/s390/linux (2014-04-16
-11:28:25 -0700)
+Merged...
 
-are available in the git repository at:
+> ---
+>  cifscreds.c     | 9 +++++++++
+>  cifskey.c       | 5 ++++-
+>  pam_cifscreds.c | 9 +++++++++
+>  3 files changed, 22 insertions(+), 1 deletion(-)
+> 
+> diff --git a/cifscreds.c b/cifscreds.c
+> index fa05dc88b0e0..64d55b0cac0e 100644
+> --- a/cifscreds.c
+> +++ b/cifscreds.c
+> @@ -188,6 +188,15 @@ static int cifscreds_add(struct cmdarg *arg)
+>  			return EXIT_FAILURE;
+>  		}
+>  
+> +		switch(errno) {
+> +		case ENOKEY:
+> +			/* success */
+> +			break;
+> +		default:
+> +			printf("Key search failed: %s\n", strerror(errno));
+> +			return EXIT_FAILURE;
+> +		}
+> +
+>  		currentaddress = nextaddress;
+>  		if (currentaddress) {
+>  			*(currentaddress - 1) = ',';
+> diff --git a/cifskey.c b/cifskey.c
+> index e89cacf171f2..4f01ed0e10bd 100644
+> --- a/cifskey.c
+> +++ b/cifskey.c
+> @@ -20,6 +20,7 @@
+>  #include <sys/types.h>
+>  #include <keyutils.h>
+>  #include <stdio.h>
+> +#include <errno.h>
+>  #include "cifskey.h"
+>  #include "resolve_host.h"
+>  
+> @@ -29,8 +30,10 @@ key_search(const char *addr, char keytype)
+>  {
+>  	char desc[INET6_ADDRSTRLEN + sizeof(KEY_PREFIX) + 4];
+>  
+> -	if (snprintf(desc, sizeof(desc), "%s:%c:%s", KEY_PREFIX, keytype, addr) >= (int)sizeof(desc))
+> +	if (snprintf(desc, sizeof(desc), "%s:%c:%s", KEY_PREFIX, keytype, addr) >= (int)sizeof(desc)) {
+> +		errno = EINVAL;
+>  		return -1;
+> +	}
+>  
+>  	return keyctl_search(DEST_KEYRING, CIFS_KEY_TYPE, desc, 0);
+>  }
+> diff --git a/pam_cifscreds.c b/pam_cifscreds.c
+> index e0d8a554510e..fb23117953f0 100644
+> --- a/pam_cifscreds.c
+> +++ b/pam_cifscreds.c
+> @@ -206,6 +206,15 @@ static int cifscreds_pam_add(pam_handle_t *ph, const char *user, const char *pas
+>  			return PAM_SERVICE_ERR;
+>  		}
+>  
+> +		switch(errno) {
+> +		case ENOKEY:
+> +			break;
+> +		default:
+> +			pam_syslog(ph, LOG_ERR, "Unable to search keyring for %s (%s)",
+> +					currentaddress, strerror(errno));
+> +			return PAM_SERVICE_ERR;
+> +		}
+> +
+>  		currentaddress = nextaddress;
+>  		if (currentaddress) {
+>  			*(currentaddress - 1) = ',';
 
 
-  git://git.samba.org/sfrench/cifs-2.6.git for-next
-
-for you to fetch changes up to 1f80c0cc39e587edd06a36b43ba3a3b09d4ac428:
-
-  cif: fix dead code (2014-04-16 23:08:57 -0500)
-
-----------------------------------------------------------------
-Cyril Roelandt (1):
-      fs: cifs: remove unused variable.
-
-Jeff Layton (1):
-      cifs: fix error handling cifs_user_readv
-
-Michael Opdenacker (1):
-      cif: fix dead code
-
-Sachin Prabhu (1):
-      cifs: Wait for writebacks to complete before attempting write.
-
-Steve French (1):
-      Return correct error on query of xattr on file with empty xattrs
-
- fs/cifs/cifsfs.c    | 14 +++++++++-
- fs/cifs/cifsglob.h  |  8 ++++++
- fs/cifs/cifsproto.h |  3 +++
- fs/cifs/cifssmb.c   |  3 +++
- fs/cifs/file.c      | 35 +++++++++++++++++++++----
- fs/cifs/misc.c      | 74 +++++++++++++++++++++++++++++++++++++++++++++++++++--
- fs/cifs/smb1ops.c   | 11 ++++++++
- fs/cifs/smb2misc.c  | 18 ++++++++++---
- fs/cifs/smb2ops.c   | 14 ++++++++++
- fs/cifs/smb2pdu.c   |  2 --
- 10 files changed, 169 insertions(+), 13 deletions(-)
 
 -- 
-Thanks,
-
-Steve
+Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
