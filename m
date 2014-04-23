@@ -1,109 +1,62 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [cifs-utils PATCH 2/2] cifscreds: better error handling for
- key_add
-Date: Sun, 20 Apr 2014 21:03:22 -0400
-Message-ID: <20140420210322.61898c01@ipyr.poochiereds.net>
-References: <1397652918-14002-1-git-send-email-jlayton@samba.org>
-	<1397652918-14002-2-git-send-email-jlayton@samba.org>
+From: Mike Pagano <mpagano-aBrp7R+bbdUdnm+yROfE0A@public.gmane.org>
+Subject: [PATCH resubmit 1/1] Add additional error text for missing mount.cifs
+Date: Wed, 23 Apr 2014 14:40:56 -0400
+Message-ID: <20140423184055.GA18378@woodpecker.gentoo.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Sebastian Krahmer <krahmer-l3A5Bk7waGM@public.gmane.org>
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1397652918-14002-2-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Disposition: inline
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 16 Apr 2014 08:55:18 -0400
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+If a cifs mount is attempted without mount.cifs present on the
+system the following appears via dmesg:
 
-> If the string buffers would have been overrun, set errno to EINVAL
-> before returning. Then, have the callers report the errors to
-> stderr or syslog as appropriate.
-> 
-> Cc: Sebastian Krahmer <krahmer-l3A5Bk7waGM@public.gmane.org>
-> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+[   25.949378] CIFS VFS: No username specified
 
-Merged...
+The purpose of this patch is to better inform the user of the
+possible cause of the error and show a potential solution.
 
-> ---
->  cifscreds.c     | 6 +++---
->  cifskey.c       | 8 ++++++--
->  pam_cifscreds.c | 8 ++++----
->  3 files changed, 13 insertions(+), 9 deletions(-)
-> 
-> diff --git a/cifscreds.c b/cifscreds.c
-> index 64d55b0cac0e..5d84c3c87873 100644
-> --- a/cifscreds.c
-> +++ b/cifscreds.c
-> @@ -220,8 +220,8 @@ static int cifscreds_add(struct cmdarg *arg)
->  	while (currentaddress) {
->  		key_serial_t key = key_add(currentaddress, arg->user, pass, arg->keytype);
->  		if (key <= 0) {
-> -			fprintf(stderr, "error: Add credential key for %s\n",
-> -				currentaddress);
-> +			fprintf(stderr, "error: Add credential key for %s: %s\n",
-> +				currentaddress, strerror(errno));
->  		} else {
->  			if (keyctl(KEYCTL_SETPERM, key, CIFS_KEY_PERMS) < 0) {
->  				fprintf(stderr, "error: Setting permissons "
-> @@ -422,7 +422,7 @@ static int cifscreds_update(struct cmdarg *arg)
->  		key_serial_t key = key_add(addrs[id], arg->user, pass, arg->keytype);
->  		if (key <= 0)
->  			fprintf(stderr, "error: Update credential key "
-> -				"for %s\n", addrs[id]);
-> +				"for %s: %s\n", addrs[id], strerror(errno));
->  	}
->  
->  	return EXIT_SUCCESS;
-> diff --git a/cifskey.c b/cifskey.c
-> index 4f01ed0e10bd..919540f549ad 100644
-> --- a/cifskey.c
-> +++ b/cifskey.c
-> @@ -47,13 +47,17 @@ key_add(const char *addr, const char *user, const char *pass, char keytype)
->  	char val[MOUNT_PASSWD_SIZE +  MAX_USERNAME_SIZE + 2];
->  
->  	/* set key description */
-> -	if (snprintf(desc, sizeof(desc), "%s:%c:%s", KEY_PREFIX, keytype, addr) >= (int)sizeof(desc))
-> +	if (snprintf(desc, sizeof(desc), "%s:%c:%s", KEY_PREFIX, keytype, addr) >= (int)sizeof(desc)) {
-> +		errno = EINVAL;
->  		return -1;
-> +	}
->  
->  	/* set payload contents */
->  	len = snprintf(val, sizeof(val), "%s:%s", user, pass);
-> -	if (len >= (int)sizeof(val))
-> +	if (len >= (int)sizeof(val)) {
-> +		errno = EINVAL;
->  		return -1;
-> +	}
->  
->  	return add_key(CIFS_KEY_TYPE, desc, val, len + 1, DEST_KEYRING);
->  }
-> diff --git a/pam_cifscreds.c b/pam_cifscreds.c
-> index fb23117953f0..3459105045b2 100644
-> --- a/pam_cifscreds.c
-> +++ b/pam_cifscreds.c
-> @@ -233,8 +233,8 @@ static int cifscreds_pam_add(pam_handle_t *ph, const char *user, const char *pas
->  	while (currentaddress) {
->  		key_serial_t key = key_add(currentaddress, user, password, keytype);
->  		if (key <= 0) {
-> -			pam_syslog(ph, LOG_ERR, "error: Add credential key for %s",
-> -				currentaddress);
-> +			pam_syslog(ph, LOG_ERR, "error: Add credential key for %s: %s",
-> +				currentaddress, strerror(errno));
->  		} else {
->  			if ((args & ARG_DEBUG) == ARG_DEBUG) {
->  				pam_syslog(ph, LOG_DEBUG, "credential key for \\\\%s\\%s added",
-> @@ -336,8 +336,8 @@ static int cifscreds_pam_update(pam_handle_t *ph, const char *user, const char *
->  	for (id = 0; id < count; id++) {
->  		key_serial_t key = key_add(currentaddress, user, password, keytype);
->  		if (key <= 0) {
-> -			pam_syslog(ph, LOG_ERR, "error: Update credential key for %s",
-> -				currentaddress);
-> +			pam_syslog(ph, LOG_ERR, "error: Update credential key for %s: %s",
-> +				currentaddress, strerror(errno));
->  		}
->  	}
->  
+The output for this error condition will look approximately like this:
+
+[   11.183392] CIFS VFS: No username specified. Could not find 
+/sbin/mount.cifs. Please ensure your system has this userspace program
+installed.
+
+Signed-off-by: Mike Pagano <mpagano-aBrp7R+bbdUdnm+yROfE0A@public.gmane.org>
+---
+ fs/cifs/connect.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 8813ff7..2091709 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -3359,6 +3359,7 @@ cifs_setup_volume_info(struct smb_vol *volume_info, char *mount_data,
+            const char *devname)
+ {
+    int rc = 0;
++   struct path path;
+
+    if (cifs_parse_mount_options(mount_data, devname, volume_info))
+        return -EINVAL;
+@@ -3371,7 +3372,15 @@ cifs_setup_volume_info(struct smb_vol *volume_info, char *mount_data,
+        /* BB fixme parse for domain name here */
+        cifs_dbg(FYI, "Username: %s\n", volume_info->username);
+    } else {
+-       cifs_dbg(VFS, "No username specified\n");
++   /* As an extra step, check for missing /sbin/mount.cifs. Append
++      to error message as we cannot guarantee the location of this
++      binary in userspace */
++       if (kern_path("/sbin/mount.cifs", 0, &path)) {
++           cifs_dbg(VFS, "No username specified. Could not find /sbin/mount.cifs. Please ensure your system has this userspace program installed.\n");
++       }
++       else {
++           cifs_dbg(VFS, "No username specified\n");
++       }
+    /* In userspace mount helper we can get user name from alternate
+       locations such as env variables and files on disk */
+        return -EINVAL;
+--
+1.8.3.2
