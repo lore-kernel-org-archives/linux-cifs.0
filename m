@@ -1,267 +1,385 @@
-From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 3/4] cifs: Split Kerberos authentication off CIFS_SessSetup()
-Date: Mon, 28 Apr 2014 15:12:29 +0100
-Message-ID: <1398694350-8526-4-git-send-email-sprabhu@redhat.com>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 1/4] cifs: Split lanman auth from CIFS_SessSetup()
+Date: Mon, 28 Apr 2014 21:16:34 -0500
+Message-ID: <CADT32eKPm7JwJE9KfQ4BqaNz1XwxsSfbOEtdd+sziSuEhq3jug@mail.gmail.com>
 References: <1398694350-8526-1-git-send-email-sprabhu@redhat.com>
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Simo Sorce <simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+	<1398694350-8526-2-git-send-email-sprabhu@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Simo Sorce <simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1398694350-8526-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1398694350-8526-2-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/sess.c | 209 ++++++++++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 147 insertions(+), 62 deletions(-)
+On Mon, Apr 28, 2014 at 9:12 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> In preparation for splitting CIFS_SessSetup() into smaller more
+> manageable chunks, we first add helper functions.
+>
+> We then proceed to split out lanman auth out of CIFS_SessSetup()
+>
+> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/sess.c | 303 ++++++++++++++++++++++++++++++++++++++++++++++++---------
+>  1 file changed, 259 insertions(+), 44 deletions(-)
+>
+> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+> index e87387d..8481631 100644
+> --- a/fs/cifs/sess.c
+> +++ b/fs/cifs/sess.c
+> @@ -520,6 +520,237 @@ select_sectype(struct TCP_Server_Info *server, enum securityEnum requested)
+>         }
+>  }
+>
+> +struct sess_data {
+> +       unsigned int xid;
+> +       struct cifs_ses *ses;
+> +       struct nls_table *nls_cp;
+> +       void (*func) (struct sess_data *);
+> +       int result;
+> +
+> +       /* we will send the SMB in three pieces:
+> +        * a fixed length beginning part, an optional
+> +        * SPNEGO blob (which can be zero length), and a
+> +        * last part which will include the strings
+> +        * and rest of bcc area. This allows us to avoid
+> +        * a large buffer 17K allocation
+> +        */
+> +       struct kvec iov[3];
+> +       int buf0_type;
+> +};
+> +
+> +static int
+> +sess_alloc_buffer(struct sess_data *sess_data, int wct)
+> +{
+> +       int rc;
+> +       struct cifs_ses *ses = sess_data->ses;
+> +       struct smb_hdr *smb_buf;
+> +
+> +       rc = small_smb_init_no_tc(SMB_COM_SESSION_SETUP_ANDX, wct, ses,
+> +                                 (void **)&smb_buf);
+> +
+> +       if (rc)
+> +               return rc;
+> +
+> +       sess_data->iov[0].iov_base = (char *)smb_buf;
+> +       sess_data->iov[0].iov_len = be32_to_cpu(smb_buf->smb_buf_length) + 4;
+> +       /*
+> + *       * This variable will be used to clear the buffer
+> + *                * allocated above in case of any error in the calling function.
+> + *                         */
+> +       sess_data->buf0_type = CIFS_SMALL_BUFFER;
+> +
+> +       /* 2000 big enough to fit max user, domain, NOS name etc. */
+> +       sess_data->iov[2].iov_base = kmalloc(2000, GFP_KERNEL);
+> +       if (!sess_data->iov[2].iov_base) {
+> +               rc = -ENOMEM;
+> +               goto out_free_smb_buf;
+> +       }
+> +
+> +       return 0;
+> +
+> +out_free_smb_buf:
+> +       kfree(smb_buf);
+> +       sess_data->iov[0].iov_base = NULL;
+> +       sess_data->iov[0].iov_len = 0;
+> +       sess_data->buf0_type = CIFS_NO_BUFFER;
+> +       return rc;
+> +}
+> +
+> +static int
+> +sess_free_buffer(struct sess_data *sess_data)
+> +{
+> +
+> +       if (sess_data->buf0_type == CIFS_SMALL_BUFFER) {
+> +               cifs_dbg(FYI, "%s: freeing small buf %p\n", __func__,
+> +                                       sess_data->iov[0].iov_base);
+> +               cifs_small_buf_release(sess_data->iov[0].iov_base);
+> +       } else if (sess_data->buf0_type == CIFS_LARGE_BUFFER) {
+> +               cifs_dbg(FYI, "%s: freeing small buf %p\n", __func__,
+> +                                       sess_data->iov[0].iov_base);
+> +               cifs_buf_release(sess_data->iov[0].iov_base);
+> +       }
+> +
+> +       kfree(sess_data->iov[2].iov_base);
+> +
+> +       return 0;
+> +}
+> +
+> +static int
+> +sess_establish_session(struct sess_data *sess_data)
+> +{
+> +       struct cifs_ses *ses = sess_data->ses;
+> +
+> +       if (!sess_data->result) {
+> +               mutex_lock(&ses->server->srv_mutex);
+> +               if (!ses->server->session_estab) {
+> +                       if (ses->server->sign) {
+> +                               ses->server->session_key.response =
+> +                                       kmemdup(ses->auth_key.response,
+> +                                       ses->auth_key.len, GFP_KERNEL);
+> +                               if (!ses->server->session_key.response) {
+> +                                       sess_data->result = -ENOMEM;
+> +                                       mutex_unlock(&ses->server->srv_mutex);
+> +                                       return sess_data->result;
+> +                               }
+> +                               ses->server->session_key.len =
+> +                                                       ses->auth_key.len;
+> +                       }
+> +                       ses->server->sequence_number = 0x2;
+> +                       ses->server->session_estab = true;
+> +               }
+> +               mutex_unlock(&ses->server->srv_mutex);
+> +
+> +               cifs_dbg(FYI, "CIFS session established successfully\n");
+> +               spin_lock(&GlobalMid_Lock);
+> +               ses->status = CifsGood;
+> +               ses->need_reconnect = false;
+> +               spin_unlock(&GlobalMid_Lock);
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +static int
+> +sess_sendreceive(struct sess_data *sess_data)
+> +{
+> +       int rc;
+> +       struct smb_hdr *smb_buf = (struct smb_hdr *) sess_data->iov[0].iov_base;
+> +       __u16 count;
+> +
+> +       count = sess_data->iov[1].iov_len + sess_data->iov[2].iov_len;
+> +       smb_buf->smb_buf_length =
+> +               cpu_to_be32(be32_to_cpu(smb_buf->smb_buf_length) + count);
+> +       put_bcc(count, smb_buf);
+> +
+> +       rc = SendReceive2(sess_data->xid, sess_data->ses,
+> +                         sess_data->iov, 3 /* num_iovecs */,
+> +                         &sess_data->buf0_type,
+> +                         CIFS_LOG_ERROR);
+> +
+> +       return rc;
+> +}
+> +
+> +#ifdef CONFIG_CIFS_WEAK_PW_HASH
+> +static void
+> +sess_auth_lanman(struct sess_data *sess_data)
+> +{
+> +       int rc = 0;
+> +       struct smb_hdr *smb_buf;
+> +       SESSION_SETUP_ANDX *pSMB;
+> +       char *bcc_ptr;
+> +       struct cifs_ses *ses = sess_data->ses;
+> +       char lnm_session_key[CIFS_AUTH_RESP_SIZE];
+> +       __u32 capabilities;
+> +       __u16 bytes_remaining;
+> +
+> +       /* lanman 2 style sessionsetup */
+> +       /* wct = 10 */
+> +       rc = sess_alloc_buffer(sess_data, 10);
+> +       if (rc)
+> +               goto out;
+> +
+> +       pSMB = (SESSION_SETUP_ANDX *)sess_data->iov[0].iov_base;
+> +       bcc_ptr = sess_data->iov[2].iov_base;
+> +       capabilities = cifs_ssetup_hdr(ses, pSMB);
+> +
+> +       pSMB->req.hdr.Flags2 &= ~SMBFLG2_UNICODE;
+> +
+> +       /* no capabilities flags in old lanman negotiation */
+> +       pSMB->old_req.PasswordLength = cpu_to_le16(CIFS_AUTH_RESP_SIZE);
+> +
+> +       /* Calculate hash with password and copy into bcc_ptr.
+> +        * Encryption Key (stored as in cryptkey) gets used if the
+> +        * security mode bit in Negottiate Protocol response states
+> +        * to use challenge/response method (i.e. Password bit is 1).
+> +        */
+> +       rc = calc_lanman_hash(ses->password, ses->server->cryptkey,
+> +                             ses->server->sec_mode & SECMODE_PW_ENCRYPT ?
+> +                             true : false, lnm_session_key);
+> +
+> +       memcpy(bcc_ptr, (char *)lnm_session_key, CIFS_AUTH_RESP_SIZE);
+> +       bcc_ptr += CIFS_AUTH_RESP_SIZE;
+> +
+> +       /*
+> +        * can not sign if LANMAN negotiated so no need
+> +        * to calculate signing key? but what if server
+> +        * changed to do higher than lanman dialect and
+> +        * we reconnected would we ever calc signing_key?
+> +        */
+> +
+> +       cifs_dbg(FYI, "Negotiating LANMAN setting up strings\n");
+> +       /* Unicode not allowed for LANMAN dialects */
+> +       ascii_ssetup_strings(&bcc_ptr, ses, sess_data->nls_cp);
+> +
+> +       sess_data->iov[2].iov_len = (long) bcc_ptr -
+> +                       (long) sess_data->iov[2].iov_base;
+> +
+> +       rc = sess_sendreceive(sess_data);
+> +       if (rc)
+> +               goto out;
+> +
+> +       pSMB = (SESSION_SETUP_ANDX *)sess_data->iov[0].iov_base;
+> +       smb_buf = (struct smb_hdr *)sess_data->iov[0].iov_base;
+> +
+> +       /* lanman response has a word count of 3 */
+> +       if (smb_buf->WordCount != 3) {
+> +               rc = -EIO;
+> +               cifs_dbg(VFS, "bad word count %d\n", smb_buf->WordCount);
+> +               goto out;
+> +       }
+> +
+> +       if (le16_to_cpu(pSMB->resp.Action) & GUEST_LOGIN)
+> +               cifs_dbg(FYI, "Guest login\n"); /* BB mark SesInfo struct? */
+> +
+> +       ses->Suid = smb_buf->Uid;   /* UID left in wire format (le) */
+> +       cifs_dbg(FYI, "UID = %llu\n", ses->Suid);
+> +
+> +       bytes_remaining = get_bcc(smb_buf);
+> +       bcc_ptr = pByteArea(smb_buf);
+> +
+> +       /* BB check if Unicode and decode strings */
+> +       if (bytes_remaining == 0) {
+> +               /* no string area to decode, do nothing */
+> +       } else if (smb_buf->Flags2 & SMBFLG2_UNICODE) {
+> +               /* unicode string area must be word-aligned */
+> +               if (((unsigned long) bcc_ptr - (unsigned long) smb_buf) % 2) {
+> +                       ++bcc_ptr;
+> +                       --bytes_remaining;
+> +               }
+> +               decode_unicode_ssetup(&bcc_ptr, bytes_remaining, ses,
+> +                                     sess_data->nls_cp);
+> +       } else {
+> +               decode_ascii_ssetup(&bcc_ptr, bytes_remaining, ses,
+> +                                   sess_data->nls_cp);
+> +       }
+> +
+> +out:
+> +       sess_data->result = rc;
+> +       sess_data->func = NULL;
+> +       sess_free_buffer(sess_data);
+> +       sess_establish_session(sess_data);
+> +}
+> +#endif
+> +
 
-diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index 4428ece..245794d 100644
---- a/fs/cifs/sess.c
-+++ b/fs/cifs/sess.c
-@@ -960,6 +960,144 @@ out:
- 	ses->auth_key.response = NULL;
- }
- 
-+#ifdef CONFIG_CIFS_UPCALL
-+static void
-+sess_auth_kerberos(struct sess_data *sess_data)
-+{
-+	int rc = 0;
-+	struct smb_hdr *smb_buf;
-+	SESSION_SETUP_ANDX *pSMB;
-+	char *bcc_ptr;
-+	struct cifs_ses *ses = sess_data->ses;
-+	__u32 capabilities;
-+	__u16 bytes_remaining;
-+	struct key *spnego_key = NULL;
-+	struct cifs_spnego_msg *msg;
-+	u16 blob_len;
-+
-+	/* extended security */
-+	/* wct = 12 */
-+	rc = sess_alloc_buffer(sess_data, 12);
-+	if (rc)
-+		goto out;
-+
-+	pSMB = (SESSION_SETUP_ANDX *)sess_data->iov[0].iov_base;
-+	bcc_ptr = sess_data->iov[2].iov_base;
-+	capabilities = cifs_ssetup_hdr(ses, pSMB);
-+
-+	spnego_key = cifs_get_spnego_key(ses);
-+	if (IS_ERR(spnego_key)) {
-+		rc = PTR_ERR(spnego_key);
-+		spnego_key = NULL;
-+		goto out;
-+	}
-+
-+	msg = spnego_key->payload.data;
-+	/*
-+	 * check version field to make sure that cifs.upcall is
-+	 * sending us a response in an expected form
-+	 */
-+	if (msg->version != CIFS_SPNEGO_UPCALL_VERSION) {
-+		cifs_dbg(VFS, "incorrect version of cifs.upcall "
-+			      "expected %d but got %d)",
-+			      CIFS_SPNEGO_UPCALL_VERSION, msg->version);
-+		rc = -EKEYREJECTED;
-+		goto out_put_spnego_key;
-+	}
-+
-+	ses->auth_key.response = kmemdup(msg->data, msg->sesskey_len,
-+					 GFP_KERNEL);
-+	if (!ses->auth_key.response) {
-+		cifs_dbg(VFS, "Kerberos can't allocate (%u bytes) memory",
-+				msg->sesskey_len);
-+		rc = -ENOMEM;
-+		goto out_put_spnego_key;
-+	}
-+	ses->auth_key.len = msg->sesskey_len;
-+
-+	pSMB->req.hdr.Flags2 |= SMBFLG2_EXT_SEC;
-+	capabilities |= CAP_EXTENDED_SECURITY;
-+	pSMB->req.Capabilities = cpu_to_le32(capabilities);
-+	sess_data->iov[1].iov_base = msg->data + msg->sesskey_len;
-+	sess_data->iov[1].iov_len = msg->secblob_len;
-+	pSMB->req.SecurityBlobLength = cpu_to_le16(sess_data->iov[1].iov_len);
-+
-+	if (ses->capabilities & CAP_UNICODE) {
-+		/* unicode strings must be word aligned */
-+		if ((sess_data->iov[0].iov_len + sess_data->iov[1].iov_len) % 2) {
-+			*bcc_ptr = 0;
-+			bcc_ptr++;
-+		}
-+		unicode_oslm_strings(&bcc_ptr, sess_data->nls_cp);
-+		unicode_domain_string(&bcc_ptr, ses, sess_data->nls_cp);
-+	} else {
-+		/* BB: is this right? */
-+		ascii_ssetup_strings(&bcc_ptr, ses, sess_data->nls_cp);
-+	}
-+
-+	sess_data->iov[2].iov_len = (long) bcc_ptr -
-+			(long) sess_data->iov[2].iov_base;
-+
-+	rc = sess_sendreceive(sess_data);
-+	if (rc)
-+		goto out_put_spnego_key;
-+
-+	pSMB = (SESSION_SETUP_ANDX *)sess_data->iov[0].iov_base;
-+	smb_buf = (struct smb_hdr *)sess_data->iov[0].iov_base;
-+
-+	if (smb_buf->WordCount != 4) {
-+		rc = -EIO;
-+		cifs_dbg(VFS, "bad word count %d\n", smb_buf->WordCount);
-+		goto out_put_spnego_key;
-+	}
-+
-+	if (le16_to_cpu(pSMB->resp.Action) & GUEST_LOGIN)
-+		cifs_dbg(FYI, "Guest login\n"); /* BB mark SesInfo struct? */
-+
-+	ses->Suid = smb_buf->Uid;   /* UID left in wire format (le) */
-+	cifs_dbg(FYI, "UID = %llu\n", ses->Suid);
-+
-+	bytes_remaining = get_bcc(smb_buf);
-+	bcc_ptr = pByteArea(smb_buf);
-+
-+	blob_len = le16_to_cpu(pSMB->resp.SecurityBlobLength);
-+	if (blob_len > bytes_remaining) {
-+		cifs_dbg(VFS, "bad security blob length %d\n",
-+				blob_len);
-+		rc = -EINVAL;
-+		goto out_put_spnego_key;
-+	}
-+	bcc_ptr += blob_len;
-+	bytes_remaining -= blob_len;
-+
-+	/* BB check if Unicode and decode strings */
-+	if (bytes_remaining == 0) {
-+		/* no string area to decode, do nothing */
-+	} else if (smb_buf->Flags2 & SMBFLG2_UNICODE) {
-+		/* unicode string area must be word-aligned */
-+		if (((unsigned long) bcc_ptr - (unsigned long) smb_buf) % 2) {
-+			++bcc_ptr;
-+			--bytes_remaining;
-+		}
-+		decode_unicode_ssetup(&bcc_ptr, bytes_remaining, ses,
-+				      sess_data->nls_cp);
-+	} else {
-+		decode_ascii_ssetup(&bcc_ptr, bytes_remaining, ses,
-+				    sess_data->nls_cp);
-+	}
-+
-+out_put_spnego_key:
-+	key_invalidate(spnego_key);
-+	key_put(spnego_key);
-+out:
-+	sess_data->result = rc;
-+	sess_data->func = NULL;
-+	sess_free_buffer(sess_data);
-+	sess_establish_session(sess_data);
-+	kfree(ses->auth_key.response);
-+	ses->auth_key.response = NULL;
-+}
-+#endif /* ! CONFIG_CIFS_UPCALL */
- 
- int
- CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
-@@ -977,7 +1115,6 @@ CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
- 	struct kvec iov[3];
- 	enum securityEnum type;
- 	__u16 action, bytes_remaining;
--	struct key *spnego_key = NULL;
- 	__le32 phase = NtLmNegotiate; /* NTLMSSP, if needed, is multistage */
- 	u16 blob_len;
- 	char *ntlmsspblob = NULL;
-@@ -1022,6 +1159,14 @@ CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
- 	case NTLMv2:
-                 sess_auth_ntlmv2(sess_data);
- 		return sess_data->result;
-+	case Kerberos:
-+#ifdef CONFIG_CIFS_UPCALL
-+                sess_auth_kerberos(sess_data);
-+		return sess_data->result;
-+#else
-+		cifs_dbg(VFS, "Kerberos negotiated but upcall support disabled!\n");
-+		return -ENOSYS;
-+#endif /* CONFIG_CIFS_UPCALL */
- 	default:
- 		/* Continue with the rest of the function */
- 		break;
-@@ -1078,63 +1223,7 @@ ssetup_ntlmssp_authenticate:
- 	iov[1].iov_base = NULL;
- 	iov[1].iov_len = 0;
- 
--	if (type == Kerberos) {
--#ifdef CONFIG_CIFS_UPCALL
--		struct cifs_spnego_msg *msg;
--
--		spnego_key = cifs_get_spnego_key(ses);
--		if (IS_ERR(spnego_key)) {
--			rc = PTR_ERR(spnego_key);
--			spnego_key = NULL;
--			goto ssetup_exit;
--		}
--
--		msg = spnego_key->payload.data;
--		/* check version field to make sure that cifs.upcall is
--		   sending us a response in an expected form */
--		if (msg->version != CIFS_SPNEGO_UPCALL_VERSION) {
--			cifs_dbg(VFS, "incorrect version of cifs.upcall "
--				   "expected %d but got %d)",
--				   CIFS_SPNEGO_UPCALL_VERSION, msg->version);
--			rc = -EKEYREJECTED;
--			goto ssetup_exit;
--		}
--
--		ses->auth_key.response = kmemdup(msg->data, msg->sesskey_len,
--						 GFP_KERNEL);
--		if (!ses->auth_key.response) {
--			cifs_dbg(VFS,
--				"Kerberos can't allocate (%u bytes) memory",
--				msg->sesskey_len);
--			rc = -ENOMEM;
--			goto ssetup_exit;
--		}
--		ses->auth_key.len = msg->sesskey_len;
--
--		pSMB->req.hdr.Flags2 |= SMBFLG2_EXT_SEC;
--		capabilities |= CAP_EXTENDED_SECURITY;
--		pSMB->req.Capabilities = cpu_to_le32(capabilities);
--		iov[1].iov_base = msg->data + msg->sesskey_len;
--		iov[1].iov_len = msg->secblob_len;
--		pSMB->req.SecurityBlobLength = cpu_to_le16(iov[1].iov_len);
--
--		if (ses->capabilities & CAP_UNICODE) {
--			/* unicode strings must be word aligned */
--			if ((iov[0].iov_len + iov[1].iov_len) % 2) {
--				*bcc_ptr = 0;
--				bcc_ptr++;
--			}
--			unicode_oslm_strings(&bcc_ptr, nls_cp);
--			unicode_domain_string(&bcc_ptr, ses, nls_cp);
--		} else
--		/* BB: is this right? */
--			ascii_ssetup_strings(&bcc_ptr, ses, nls_cp);
--#else /* ! CONFIG_CIFS_UPCALL */
--		cifs_dbg(VFS, "Kerberos negotiated but upcall support disabled!\n");
--		rc = -ENOSYS;
--		goto ssetup_exit;
--#endif /* CONFIG_CIFS_UPCALL */
--	} else if (type == RawNTLMSSP) {
-+	if (type == RawNTLMSSP) {
- 		if ((pSMB->req.hdr.Flags2 & SMBFLG2_UNICODE) == 0) {
- 			cifs_dbg(VFS, "NTLMSSP requires Unicode support\n");
- 			rc = -ENOSYS;
-@@ -1275,10 +1364,6 @@ ssetup_ntlmssp_authenticate:
- 	}
- 
- ssetup_exit:
--	if (spnego_key) {
--		key_invalidate(spnego_key);
--		key_put(spnego_key);
--	}
- 	kfree(str_area);
- 	kfree(ntlmsspblob);
- 	ntlmsspblob = NULL;
--- 
-1.8.4.2
+I do not think you need ifdef around sess_auth_lanman().
+
+>  int
+>  CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
+>                const struct nls_table *nls_cp)
+> @@ -540,12 +771,20 @@ CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
+>         __le32 phase = NtLmNegotiate; /* NTLMSSP, if needed, is multistage */
+>         u16 blob_len;
+>         char *ntlmsspblob = NULL;
+> +       struct sess_data *sess_data;
+>
+>         if (ses == NULL) {
+>                 WARN(1, "%s: ses == NULL!", __func__);
+>                 return -EINVAL;
+>         }
+>
+> +       sess_data = kzalloc(sizeof(struct sess_data), GFP_KERNEL);
+> +       if (!sess_data)
+> +               return -ENOMEM;
+> +       sess_data->xid = xid;
+> +       sess_data->ses = ses;
+> +       sess_data->nls_cp = (struct nls_table *) nls_cp;
+> +
+>         type = select_sectype(ses->server, ses->sectype);
+>         cifs_dbg(FYI, "sess setup type %d\n", type);
+>         if (type == Unspecified) {
+> @@ -554,6 +793,24 @@ CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
+>                 return -EINVAL;
+>         }
+>
+> +        switch (type) {
+> +        case LANMAN:
+> +                /* LANMAN and plaintext are less secure and off by default.
+> +                 * So we make this explicitly be turned on in kconfig (in the
+> +                 * build) and turned on at runtime (changed from the default)
+> +                 * in proc/fs/cifs or via mount parm.  Unfortunately this is
+> +                 * needed for old Win (e.g. Win95), some obscure NAS and OS/2 */
+> +#ifdef CONFIG_CIFS_WEAK_PW_HASH
+> +                sess_auth_lanman(sess_data);
+> +               return sess_data->result;
+> +#else
+> +                return -EOPNOTSUPP;
+> +#endif
+> +       default:
+> +               /* Continue with the rest of the function */
+> +               break;
+> +       }
+> +
+>         if (type == RawNTLMSSP) {
+>                 /* if memory allocation is successful, caller of this function
+>                  * frees it.
+> @@ -569,17 +826,7 @@ ssetup_ntlmssp_authenticate:
+>         if (phase == NtLmChallenge)
+>                 phase = NtLmAuthenticate; /* if ntlmssp, now final phase */
+>
+> -       if (type == LANMAN) {
+> -#ifndef CONFIG_CIFS_WEAK_PW_HASH
+> -               /* LANMAN and plaintext are less secure and off by default.
+> -               So we make this explicitly be turned on in kconfig (in the
+> -               build) and turned on at runtime (changed from the default)
+> -               in proc/fs/cifs or via mount parm.  Unfortunately this is
+> -               needed for old Win (e.g. Win95), some obscure NAS and OS/2 */
+> -               return -EOPNOTSUPP;
+> -#endif
+> -               wct = 10; /* lanman 2 style sessionsetup */
+> -       } else if ((type == NTLM) || (type == NTLMv2)) {
+> +       if ((type == NTLM) || (type == NTLMv2)) {
+>                 /* For NTLMv2 failures eventually may need to retry NTLM */
+>                 wct = 13; /* old style NTLM sessionsetup */
+>         } else /* same size: negotiate or auth, NTLMSSP or extended security */
+> @@ -618,39 +865,7 @@ ssetup_ntlmssp_authenticate:
+>         iov[1].iov_base = NULL;
+>         iov[1].iov_len = 0;
+>
+> -       if (type == LANMAN) {
+> -#ifdef CONFIG_CIFS_WEAK_PW_HASH
+> -               char lnm_session_key[CIFS_AUTH_RESP_SIZE];
+> -
+> -               pSMB->req.hdr.Flags2 &= ~SMBFLG2_UNICODE;
+> -
+> -               /* no capabilities flags in old lanman negotiation */
+> -
+> -               pSMB->old_req.PasswordLength = cpu_to_le16(CIFS_AUTH_RESP_SIZE);
+> -
+> -               /* Calculate hash with password and copy into bcc_ptr.
+> -                * Encryption Key (stored as in cryptkey) gets used if the
+> -                * security mode bit in Negottiate Protocol response states
+> -                * to use challenge/response method (i.e. Password bit is 1).
+> -                */
+> -
+> -               rc = calc_lanman_hash(ses->password, ses->server->cryptkey,
+> -                                ses->server->sec_mode & SECMODE_PW_ENCRYPT ?
+> -                                       true : false, lnm_session_key);
+> -
+> -               memcpy(bcc_ptr, (char *)lnm_session_key, CIFS_AUTH_RESP_SIZE);
+> -               bcc_ptr += CIFS_AUTH_RESP_SIZE;
+> -
+> -               /* can not sign if LANMAN negotiated so no need
+> -               to calculate signing key? but what if server
+> -               changed to do higher than lanman dialect and
+> -               we reconnected would we ever calc signing_key? */
+> -
+> -               cifs_dbg(FYI, "Negotiating LANMAN setting up strings\n");
+> -               /* Unicode not allowed for LANMAN dialects */
+> -               ascii_ssetup_strings(&bcc_ptr, ses, nls_cp);
+> -#endif
+> -       } else if (type == NTLM) {
+> +       if (type == NTLM) {
+>                 pSMB->req_no_secext.Capabilities = cpu_to_le32(capabilities);
+>                 pSMB->req_no_secext.CaseInsensitivePasswordLength =
+>                         cpu_to_le16(CIFS_AUTH_RESP_SIZE);
+> --
+> 1.8.4.2
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
