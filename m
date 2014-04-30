@@ -1,45 +1,202 @@
 From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
-Subject: [PATCH v2 0/4] cifs: cache invalidation fixes when cache=loose
-Date: Wed, 30 Apr 2014 09:31:44 -0400
-Message-ID: <1398864708-18185-1-git-send-email-jlayton@poochiereds.net>
+Subject: [PATCH v2 3/4] cifs: fix potential races in cifs_revalidate_mapping
+Date: Wed, 30 Apr 2014 09:31:47 -0400
+Message-ID: <1398864708-18185-4-git-send-email-jlayton@poochiereds.net>
+References: <1398864708-18185-1-git-send-email-jlayton@poochiereds.net>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	Tetsuo Handa <penguin-kernel-JPay3/Yim36HaxMnTkn67Xf5DAMn2ifp@public.gmane.org>
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1398864708-18185-1-git-send-email-jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This is the second posting of this patchset. The end result of this set
-should be indentical to the v1 set, but this fixes some problems in the
-intermediate changes that would have introduced bugs for someone doing
-a bisect.
+The handling of the CIFS_INO_INVALID_MAPPING flag is racy. It's possible
+for two tasks to attempt to revalidate the mapping at the same time. The
+first sees that CIFS_INO_INVALID_MAPPING is set. It clears the flag and
+then calls invalidate_inode_pages2 to start shooting down the pagecache.
 
-This patchset fixes up some cache invalidation problems that can occur
-when cache=loose. The main point is to ensure that we revalidate the
-cache prior to satisfying a read.
+While that's going on, another task checks the flag and sees that it's
+clear. It then ends up trusting the pagecache to satisfy a read when it
+shouldn't.
 
-At the same time, I added a fix for a potential problem that cropped up
-with NFS a while back, and to which CIFS is also vulnerable.
+Fix this by adding a bitlock to ensure that the clearing of the flag is
+atomic with respect to the actual cache invalidation. Also, move the
+other existing users of cifs_invalidate_mapping to use a new
+cifs_zap_mapping() function that just sets the INVALID_MAPPING bit and
+then uses the standard codepath to handle the invalidation.
 
-This was originally reported by Tetsuo Handa, and as far as I can tell
-this fixes his testcase, assuming that you also ensure that kernel
-oplocks are enabled.
+Signed-off-by: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+---
+ fs/cifs/cifsfs.h   |  1 +
+ fs/cifs/cifsglob.h |  1 +
+ fs/cifs/file.c     | 12 ++++++------
+ fs/cifs/inode.c    | 50 +++++++++++++++++++++++++++++++++++++++++---------
+ 4 files changed, 49 insertions(+), 15 deletions(-)
 
-Given that we're late in the cycle, I'd like to see these merged for
-v3.16 but getting them into -next soon would be good.
-
-Jeff Layton (4):
-  cifs: convert booleans in cifsInodeInfo to a flags field
-  cifs: new helper function: cifs_revalidate_mapping
-  cifs: fix potential races in cifs_revalidate_mapping
-  cifs: revalidate mapping prior to satisfying aio_read request
-
- fs/cifs/cifsfs.c   | 24 ++++++++++++------
- fs/cifs/cifsfs.h   |  2 ++
- fs/cifs/cifsglob.h |  7 +++---
- fs/cifs/file.c     | 16 ++++++------
- fs/cifs/inode.c    | 71 ++++++++++++++++++++++++++++++++++++++++++------------
- 5 files changed, 86 insertions(+), 34 deletions(-)
-
+diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
+index 40d5a4df1e38..b7cf9ee7654b 100644
+--- a/fs/cifs/cifsfs.h
++++ b/fs/cifs/cifsfs.h
+@@ -68,6 +68,7 @@ extern int cifs_revalidate_file(struct file *filp);
+ extern int cifs_revalidate_dentry(struct dentry *);
+ extern int cifs_invalidate_mapping(struct inode *inode);
+ extern int cifs_revalidate_mapping(struct inode *inode);
++extern int cifs_zap_mapping(struct inode *inode);
+ extern int cifs_getattr(struct vfsmount *, struct dentry *, struct kstat *);
+ extern int cifs_setattr(struct dentry *, struct iattr *);
+ 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 69da55b750e7..630e0f4b2c66 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -1118,6 +1118,7 @@ struct cifsInodeInfo {
+ #define CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2 (2) /* Downgrade oplock to L2 */
+ #define CIFS_INO_DELETE_PENDING		  (3) /* delete pending on server */
+ #define CIFS_INO_INVALID_MAPPING	  (4) /* pagecache is invalid */
++#define CIFS_INO_LOCK			  (5) /* lock bit for synchronization */
+ 	unsigned long flags;
+ 	spinlock_t writers_lock;
+ 	unsigned int writers;		/* Number of writers on this inode */
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index c8a570e87900..208f56eca4bf 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -335,7 +335,7 @@ cifs_new_fileinfo(struct cifs_fid *fid, struct file *file,
+ 	spin_unlock(&cifs_file_list_lock);
+ 
+ 	if (fid->purge_cache)
+-		cifs_invalidate_mapping(inode);
++		cifs_zap_mapping(inode);
+ 
+ 	file->private_data = cfile;
+ 	return cfile;
+@@ -1529,7 +1529,7 @@ cifs_setlk(struct file *file, struct file_lock *flock, __u32 type,
+ 		 */
+ 		if (!CIFS_CACHE_WRITE(CIFS_I(inode)) &&
+ 					CIFS_CACHE_READ(CIFS_I(inode))) {
+-			cifs_invalidate_mapping(inode);
++			cifs_zap_mapping(inode);
+ 			cifs_dbg(FYI, "Set no oplock for inode=%p due to mand locks\n",
+ 				 inode);
+ 			CIFS_I(inode)->oplock = 0;
+@@ -2218,7 +2218,7 @@ int cifs_strict_fsync(struct file *file, loff_t start, loff_t end,
+ 		 file->f_path.dentry->d_name.name, datasync);
+ 
+ 	if (!CIFS_CACHE_READ(CIFS_I(inode))) {
+-		rc = cifs_invalidate_mapping(inode);
++		rc = cifs_zap_mapping(inode);
+ 		if (rc) {
+ 			cifs_dbg(FYI, "rc: %d during invalidate phase\n", rc);
+ 			rc = 0; /* don't care about it in fsync */
+@@ -2649,7 +2649,7 @@ cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
+ 		 * request comes - break it on the client to prevent reading
+ 		 * an old data.
+ 		 */
+-		cifs_invalidate_mapping(inode);
++		cifs_zap_mapping(inode);
+ 		cifs_dbg(FYI, "Set no oplock for inode=%p after a write operation\n",
+ 			 inode);
+ 		cinode->oplock = 0;
+@@ -3112,7 +3112,7 @@ int cifs_file_strict_mmap(struct file *file, struct vm_area_struct *vma)
+ 	xid = get_xid();
+ 
+ 	if (!CIFS_CACHE_READ(CIFS_I(inode))) {
+-		rc = cifs_invalidate_mapping(inode);
++		rc = cifs_zap_mapping(inode);
+ 		if (rc)
+ 			return rc;
+ 	}
+@@ -3670,7 +3670,7 @@ void cifs_oplock_break(struct work_struct *work)
+ 		if (!CIFS_CACHE_READ(cinode)) {
+ 			rc = filemap_fdatawait(inode->i_mapping);
+ 			mapping_set_error(inode->i_mapping, rc);
+-			cifs_invalidate_mapping(inode);
++			cifs_zap_mapping(inode);
+ 		}
+ 		cifs_dbg(FYI, "Oplock flush inode %p rc %d\n", inode, rc);
+ 	}
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index ff420b275777..9ff8df8b4d84 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -22,6 +22,7 @@
+ #include <linux/stat.h>
+ #include <linux/slab.h>
+ #include <linux/pagemap.h>
++#include <linux/freezer.h>
+ #include <asm/div64.h>
+ #include "cifsfs.h"
+ #include "cifspdu.h"
+@@ -1762,29 +1763,60 @@ int
+ cifs_invalidate_mapping(struct inode *inode)
+ {
+ 	int rc = 0;
+-	struct cifsInodeInfo *cifs_i = CIFS_I(inode);
+-
+-	clear_bit(CIFS_INO_INVALID_MAPPING, &cifs_i->flags);
+ 
+ 	if (inode->i_mapping && inode->i_mapping->nrpages != 0) {
+ 		rc = invalidate_inode_pages2(inode->i_mapping);
+-		if (rc) {
++		if (rc)
+ 			cifs_dbg(VFS, "%s: could not invalidate inode %p\n",
+ 				 __func__, inode);
+-			set_bit(CIFS_INO_INVALID_MAPPING, &cifs_i->flags);
+-		}
+ 	}
+ 
+ 	cifs_fscache_reset_inode_cookie(inode);
+ 	return rc;
+ }
+ 
++/**
++ * cifs_wait_bit_killable - helper for functions that are sleeping on bit locks
++ * @word: long word containing the bit lock
++ */
++static int
++cifs_wait_bit_killable(void *word)
++{
++	if (fatal_signal_pending(current))
++		return -ERESTARTSYS;
++	freezable_schedule_unsafe();
++	return 0;
++}
++
+ int
+ cifs_revalidate_mapping(struct inode *inode)
+ {
+-	if (test_bit(CIFS_INO_INVALID_MAPPING, &CIFS_I(inode)->flags))
+-		return cifs_invalidate_mapping(inode);
+-	return 0;
++	int rc;
++	unsigned long *flags = &CIFS_I(inode)->flags;
++
++	rc = wait_on_bit_lock(flags, CIFS_INO_LOCK, cifs_wait_bit_killable,
++				TASK_KILLABLE);
++	if (rc)
++		return rc;
++
++	if (test_and_clear_bit(CIFS_INO_INVALID_MAPPING, flags)) {
++		rc = cifs_invalidate_mapping(inode);
++		if (rc)
++			set_bit(CIFS_INO_INVALID_MAPPING, flags);
++	}
++
++	clear_bit_unlock(CIFS_INO_LOCK, flags);
++	smp_mb__after_clear_bit();
++	wake_up_bit(flags, CIFS_INO_LOCK);
++
++	return rc;
++}
++
++int
++cifs_zap_mapping(struct inode *inode)
++{
++	set_bit(CIFS_INO_INVALID_MAPPING, &CIFS_I(inode)->flags);
++	return cifs_revalidate_mapping(inode);
+ }
+ 
+ int cifs_revalidate_file_attr(struct file *filp)
 -- 
 1.9.0
