@@ -1,36 +1,47 @@
-From: Thomas Creutz <thomas.creutz-Mmb7MZpHnFY@public.gmane.org>
-Subject: Re: character-problems
-Date: Thu, 01 May 2014 13:11:19 +0200
-Message-ID: <53622BD7.7030005@gmx.de>
-References: <53620CE9.10301@gmx.de>	<CAOhYWNKp1QqsebugYqM2yAqOef4yw=t9tNyUmH-9ds59pjygqw@mail.gmail.com>	<53622687.9030306@gmx.de> <CAOhYWN+PNtQ8HMyi3OFyv3KQ-bbvOKcGFNLZw5Jx2zHNdRJ1LQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: unlisted-recipients:; (no To-header on input)
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH 0/4 v2] Split CIFS_SessSetup()
+Date: Thu,  1 May 2014 13:41:01 +0100
+Message-ID: <1398948065-23265-1-git-send-email-sprabhu@redhat.com>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Simo Sorce <simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAOhYWN+PNtQ8HMyi3OFyv3KQ-bbvOKcGFNLZw5Jx2zHNdRJ1LQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+I am investigating the possibility of adding support for gss-proxy in the
+cifs client module. As part of that investigation, I was looking at the
+CIFS_SessSetup() function. This is a long function which handles multiple auths
+using if conditions and switch statements. The code struction makes it
+difficult to modify of add support for new authentication mechanisms.
 
-Am 01.05.2014 12:54, schrieb Jeff Layton:
-> Maybe...
->
-> For your kernel, what is CONFIG_NLS_DEFAULT set to? I know that ubuntu
-> used to set that to iso9959-1, but I think they recently moved to
-> using utf8. If it's set to iso8559-1 then that may be related to the
-> problem.
+The proposal is to split the various authentication code into its own separate
+functions. This increases the lines of code but will simplify maintenance and
+addition of new auth methods.
 
-No, its not a charset problem.
+The short term goal is to add gss-proxy support for kerberos authentication.
+This will require to and fro communication with the gss-proxy module over a
+unix socket.
 
-grep CONFIG_NLS_DEFAULT /boot/config-$(uname -r)
-CONFIG_NLS_DEFAULT="utf8"
+Further long term goals are 
+1) Add support for NTLMSSP using SPNEGO,
+2) Allow clients to negotiate which authentication mechanism to use using SPNEGO.
 
-because I also told, that the file names have the same problem on the
-server (uploaded over php-scripts). Some scripts use utf-8 others
-iso8...., thats why you will never see all chars right on console/samba
-client.
-But, this problem should get handelt by samba/cifs... the files are also
-useable with a windows client (so the access problem is in the cifs
-client, not the samba server)
+I would like the opinion of this list about these proposed changes.
+Is there any part of the code which needs changing?
+
+V2:
+- Ensure that sess_data allocated on intermediate patches are freed.
+- Remove ifdef-endif blocks from the switch statement in CIFS_SessSetup().
+
+Sachin Prabhu (4):
+  cifs: Split lanman auth from CIFS_SessSetup()
+  cifs: Split ntlm and ntlmv2 authentication methods off
+    CIFS_SessSetup()
+  cifs: Split Kerberos authentication off CIFS_SessSetup()
+  cifs: Separate rawntlmssp auth from CIFS_SessSetup()
+
+ fs/cifs/sess.c | 1142 +++++++++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 799 insertions(+), 343 deletions(-)
+
+-- 
+1.8.4.2
