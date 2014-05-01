@@ -1,68 +1,67 @@
-From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
-Subject: [PATCH v2 4/4] cifs: revalidate mapping prior to satisfying aio_read request
-Date: Wed, 30 Apr 2014 09:31:48 -0400
-Message-ID: <1398864708-18185-5-git-send-email-jlayton@poochiereds.net>
-References: <1398864708-18185-1-git-send-email-jlayton@poochiereds.net>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Tetsuo Handa <penguin-kernel-JPay3/Yim36HaxMnTkn67Xf5DAMn2ifp@public.gmane.org>
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Thomas Creutz <thomas.creutz-Mmb7MZpHnFY@public.gmane.org>
+Subject: character-problems
+Date: Thu, 01 May 2014 10:59:21 +0200
+Message-ID: <53620CE9.10301@gmx.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1398864708-18185-1-git-send-email-jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Before satisfying a read with cache=loose, we should always check
-that the pagecache is valid before allowing a read to be satisfied
-out of it.
+Hi List,
 
-Reported-by: Tetsuo Handa <penguin-kernel-JPay3/Yim36HaxMnTkn67Xf5DAMn2ifp@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
----
- fs/cifs/cifsfs.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
+I use samba server on my webserver and mount the share with a linux
+client to backup the files remote. Problem is, that I cannot access all
+files with linux cifs client and secondly filenames are changed, so tha=
+t
+the backup (when possible to access the files) is not well done.
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 3ef0299ed43e..6d3626ba4464 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -729,6 +729,20 @@ out_nls:
- 	goto out;
- }
- 
-+static ssize_t
-+cifs_loose_aio_read(struct kiocb *iocb, const struct iovec *iov,
-+		   unsigned long nr_segs, loff_t pos)
-+{
-+	int rc;
-+	struct inode *inode = file_inode(iocb->ki_filp);
-+
-+	rc = cifs_revalidate_mapping(inode);
-+	if (rc)
-+		return rc;
-+
-+	return generic_file_aio_read(iocb, iov, nr_segs, pos);
-+}
-+
- static ssize_t cifs_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
- 				   unsigned long nr_segs, loff_t pos)
- {
-@@ -886,7 +900,7 @@ const struct inode_operations cifs_symlink_inode_ops = {
- const struct file_operations cifs_file_ops = {
- 	.read = do_sync_read,
- 	.write = do_sync_write,
--	.aio_read = generic_file_aio_read,
-+	.aio_read = cifs_loose_aio_read,
- 	.aio_write = cifs_file_aio_write,
- 	.open = cifs_open,
- 	.release = cifs_close,
-@@ -944,7 +958,7 @@ const struct file_operations cifs_file_direct_ops = {
- const struct file_operations cifs_file_nobrl_ops = {
- 	.read = do_sync_read,
- 	.write = do_sync_write,
--	.aio_read = generic_file_aio_read,
-+	.aio_read = cifs_loose_aio_read,
- 	.aio_write = cifs_file_aio_write,
- 	.open = cifs_open,
- 	.release = cifs_close,
--- 
-1.9.0
+On the server output of ls -lah is:
+insgesamt 400K
+drwxr-xr-x  2 web178 client14 4,0K Mai 28  2008 .
+drwxrwxrwx 13 web178 client14 4,0K Okt 17  2013 ..
+-rw-r--r--  1 web178 client14  59K Mai 28  2008 JulianKiendlGitarre.jpg
+-rw-r--r--  1 web178 client14  79K Mai 28  2008 Kost?me1.jpg
+-rw-r--r--  1 web178 client14  51K Mai 28  2008 Kost?me2.jpg
+-rw-r--r--  1 web178 client14  55K Mai 28  2008 MuellerReeb.jpg
+-rw-r--r--  1 web178 client14  42K Mai 28  2008 Partyraum.jpg
+-rw-r--r--  1 web178 client14  60K Mai 28  2008 Schlegel.jpg
+-rw-r--r--  1 web178 client14  38K Mai 28  2008 Tanzen.jpg
+
+on the client side:
+insgesamt 392K
+drwxr-xr-x  2 1124 1051   0 Mai 28  2008 .
+drwxrwxrwx 13 1124 1051   0 Okt 17  2013 ..
+-rw-r--r--  1 1124 1051 59K Mai 28  2008 JulianKiendlGitarre.jpg
+-rw-r--r--  1 1124 1051 79K Mai 28  2008 Kost_me1.jpg
+-rw-r--r--  1 1124 1051 51K Mai 28  2008 Kost_me2.jpg
+-rw-r--r--  1 1124 1051 55K Mai 28  2008 MuellerReeb.jpg
+-rw-r--r--  1 1124 1051 42K Mai 28  2008 Partyraum.jpg
+-rw-r--r--  1 1124 1051 60K Mai 28  2008 Schlegel.jpg
+-rw-r--r--  1 1124 1051 38K Mai 28  2008 Tanzen.jpg
+
+LANG=3DC cp Kost_me1.jpg /tmp/
+cp: cannot stat `Kost_me1.jpg': No such file or directory
+
+The charset is correct, some folders use the right chars (=FC=E4=F6...)=
+ which
+are displayed on server and client right.
+
+I tested to access the share with windows client and can open the
+picture, so i am able to access the files from windows.
+
+Mounted are the shares with:
+//web1.domain.tld/root$ /backup/src/web1   cifs
+noauto,sec=3Dntlmv2,ver=3D1,cred=3D/root/.smb/web1.domain.tld 0 0
+
+Samba on Server 3.6.3
+Kernel on client 3.5.0-49-generic (Ubuntu)
+
+Any Idea, how I get access to
+1. the original file names (no translation to _)
+2. can access the files (possible done, when 1. is done)
+
+Thanks for you help,
+Thomas
