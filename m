@@ -1,286 +1,64 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 3/4] cifs: Split Kerberos authentication off CIFS_SessSetup()
-Date: Thu, 1 May 2014 17:02:40 -0500
-Message-ID: <CADT32eJZ_FZc+vYS5_Mmhjxc0R3rc7QowmUdQym+p=9zEAHrSQ@mail.gmail.com>
-References: <1398948065-23265-1-git-send-email-sprabhu@redhat.com>
-	<1398948065-23265-4-git-send-email-sprabhu@redhat.com>
+From: =?UTF-8?B?R8O8bnRlciBLdWtrdWtr?= <linux-KQewbsS9MvBBDgjK7y7TUQ@public.gmane.org>
+Subject: Re: character-problems
+Date: Fri, 02 May 2014 04:41:03 +0200
+Message-ID: <536305BF.1060201@kukkukk.com>
+References: <53620CE9.10301@gmx.de>	<CAOhYWNKp1QqsebugYqM2yAqOef4yw=t9tNyUmH-9ds59pjygqw@mail.gmail.com>	<53622687.9030306@gmx.de> <CAOhYWN+PNtQ8HMyi3OFyv3KQ-bbvOKcGFNLZw5Jx2zHNdRJ1LQ@mail.gmail.com> <53622BD7.7030005@gmx.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Simo Sorce <simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Thomas Creutz <thomas.creutz-Mmb7MZpHnFY@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1398948065-23265-4-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <53622BD7.7030005-Mmb7MZpHnFY@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Looks correct.
+Am 01.05.2014 13:11, schrieb Thomas Creutz:
+>=20
+> Am 01.05.2014 12:54, schrieb Jeff Layton:
+>> Maybe...
+>>
+>> For your kernel, what is CONFIG_NLS_DEFAULT set to? I know that ubun=
+tu
+>> used to set that to iso9959-1, but I think they recently moved to
+>> using utf8. If it's set to iso8559-1 then that may be related to the
+>> problem.
+>=20
+> No, its not a charset problem.
+>=20
+> grep CONFIG_NLS_DEFAULT /boot/config-$(uname -r)
+> CONFIG_NLS_DEFAULT=3D"utf8"
+>=20
+> because I also told, that the file names have the same problem on the
+> server (uploaded over php-scripts). Some scripts use utf-8 others
+> iso8...., thats why you will never see all chars right on console/sam=
+ba
+> client.
+> But, this problem should get handelt by samba/cifs... the files are a=
+lso
+> useable with a windows client (so the access problem is in the cifs
+> client, not the samba server)
 
+i've tested this on clients running
+   opensuse-12.3 - kernel 3.7.10-1.28-desktop
+   opensuse-13.1 - kernel 3.11.10-7-desktop
+samba server Version 3.6.12-59.19.1-3208-SUSE-SL12.3-x86_64
+is running on opensuse-12.3.
 
+Here i don't see that
+    Kost?me1.jpg  (i really used a question mark here)
+on the server is changed to
+    Kost_me1.jpg
+on the client.
 
-On Thu, May 1, 2014 at 7:41 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/sess.c | 214 ++++++++++++++++++++++++++++++++++++++++-----------------
->  1 file changed, 152 insertions(+), 62 deletions(-)
->
-> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-> index 661b67d..869ad37 100644
-> --- a/fs/cifs/sess.c
-> +++ b/fs/cifs/sess.c
-> @@ -976,6 +976,154 @@ out:
->         ses->auth_key.response = NULL;
->  }
->
-> +#ifdef CONFIG_CIFS_UPCALL
-> +static void
-> +sess_auth_kerberos(struct sess_data *sess_data)
-> +{
-> +       int rc = 0;
-> +       struct smb_hdr *smb_buf;
-> +       SESSION_SETUP_ANDX *pSMB;
-> +       char *bcc_ptr;
-> +       struct cifs_ses *ses = sess_data->ses;
-> +       __u32 capabilities;
-> +       __u16 bytes_remaining;
-> +       struct key *spnego_key = NULL;
-> +       struct cifs_spnego_msg *msg;
-> +       u16 blob_len;
-> +
-> +       /* extended security */
-> +       /* wct = 12 */
-> +       rc = sess_alloc_buffer(sess_data, 12);
-> +       if (rc)
-> +               goto out;
-> +
-> +       pSMB = (SESSION_SETUP_ANDX *)sess_data->iov[0].iov_base;
-> +       bcc_ptr = sess_data->iov[2].iov_base;
-> +       capabilities = cifs_ssetup_hdr(ses, pSMB);
-> +
-> +       spnego_key = cifs_get_spnego_key(ses);
-> +       if (IS_ERR(spnego_key)) {
-> +               rc = PTR_ERR(spnego_key);
-> +               spnego_key = NULL;
-> +               goto out;
-> +       }
-> +
-> +       msg = spnego_key->payload.data;
-> +       /*
-> +        * check version field to make sure that cifs.upcall is
-> +        * sending us a response in an expected form
-> +        */
-> +       if (msg->version != CIFS_SPNEGO_UPCALL_VERSION) {
-> +               cifs_dbg(VFS, "incorrect version of cifs.upcall "
-> +                             "expected %d but got %d)",
-> +                             CIFS_SPNEGO_UPCALL_VERSION, msg->version);
-> +               rc = -EKEYREJECTED;
-> +               goto out_put_spnego_key;
-> +       }
-> +
-> +       ses->auth_key.response = kmemdup(msg->data, msg->sesskey_len,
-> +                                        GFP_KERNEL);
-> +       if (!ses->auth_key.response) {
-> +               cifs_dbg(VFS, "Kerberos can't allocate (%u bytes) memory",
-> +                               msg->sesskey_len);
-> +               rc = -ENOMEM;
-> +               goto out_put_spnego_key;
-> +       }
-> +       ses->auth_key.len = msg->sesskey_len;
-> +
-> +       pSMB->req.hdr.Flags2 |= SMBFLG2_EXT_SEC;
-> +       capabilities |= CAP_EXTENDED_SECURITY;
-> +       pSMB->req.Capabilities = cpu_to_le32(capabilities);
-> +       sess_data->iov[1].iov_base = msg->data + msg->sesskey_len;
-> +       sess_data->iov[1].iov_len = msg->secblob_len;
-> +       pSMB->req.SecurityBlobLength = cpu_to_le16(sess_data->iov[1].iov_len);
-> +
-> +       if (ses->capabilities & CAP_UNICODE) {
-> +               /* unicode strings must be word aligned */
-> +               if ((sess_data->iov[0].iov_len + sess_data->iov[1].iov_len) % 2) {
-> +                       *bcc_ptr = 0;
-> +                       bcc_ptr++;
-> +               }
-> +               unicode_oslm_strings(&bcc_ptr, sess_data->nls_cp);
-> +               unicode_domain_string(&bcc_ptr, ses, sess_data->nls_cp);
-> +       } else {
-> +               /* BB: is this right? */
-> +               ascii_ssetup_strings(&bcc_ptr, ses, sess_data->nls_cp);
-> +       }
-> +
-> +       sess_data->iov[2].iov_len = (long) bcc_ptr -
-> +                       (long) sess_data->iov[2].iov_base;
-> +
-> +       rc = sess_sendreceive(sess_data);
-> +       if (rc)
-> +               goto out_put_spnego_key;
-> +
-> +       pSMB = (SESSION_SETUP_ANDX *)sess_data->iov[0].iov_base;
-> +       smb_buf = (struct smb_hdr *)sess_data->iov[0].iov_base;
-> +
-> +       if (smb_buf->WordCount != 4) {
-> +               rc = -EIO;
-> +               cifs_dbg(VFS, "bad word count %d\n", smb_buf->WordCount);
-> +               goto out_put_spnego_key;
-> +       }
-> +
-> +       if (le16_to_cpu(pSMB->resp.Action) & GUEST_LOGIN)
-> +               cifs_dbg(FYI, "Guest login\n"); /* BB mark SesInfo struct? */
-> +
-> +       ses->Suid = smb_buf->Uid;   /* UID left in wire format (le) */
-> +       cifs_dbg(FYI, "UID = %llu\n", ses->Suid);
-> +
-> +       bytes_remaining = get_bcc(smb_buf);
-> +       bcc_ptr = pByteArea(smb_buf);
-> +
-> +       blob_len = le16_to_cpu(pSMB->resp.SecurityBlobLength);
-> +       if (blob_len > bytes_remaining) {
-> +               cifs_dbg(VFS, "bad security blob length %d\n",
-> +                               blob_len);
-> +               rc = -EINVAL;
-> +               goto out_put_spnego_key;
-> +       }
-> +       bcc_ptr += blob_len;
-> +       bytes_remaining -= blob_len;
-> +
-> +       /* BB check if Unicode and decode strings */
-> +       if (bytes_remaining == 0) {
-> +               /* no string area to decode, do nothing */
-> +       } else if (smb_buf->Flags2 & SMBFLG2_UNICODE) {
-> +               /* unicode string area must be word-aligned */
-> +               if (((unsigned long) bcc_ptr - (unsigned long) smb_buf) % 2) {
-> +                       ++bcc_ptr;
-> +                       --bytes_remaining;
-> +               }
-> +               decode_unicode_ssetup(&bcc_ptr, bytes_remaining, ses,
-> +                                     sess_data->nls_cp);
-> +       } else {
-> +               decode_ascii_ssetup(&bcc_ptr, bytes_remaining, ses,
-> +                                   sess_data->nls_cp);
-> +       }
-> +
-> +out_put_spnego_key:
-> +       key_invalidate(spnego_key);
-> +       key_put(spnego_key);
-> +out:
-> +       sess_data->result = rc;
-> +       sess_data->func = NULL;
-> +       sess_free_buffer(sess_data);
-> +       sess_establish_session(sess_data);
-> +       kfree(ses->auth_key.response);
-> +       ses->auth_key.response = NULL;
-> +}
-> +
-> +#else
-> +
-> +static void
-> +sess_auth_kerberos(struct sess_data *sess_data)
-> +{
-> +       cifs_dbg(VFS, "Kerberos negotiated but upcall support disabled!\n");
-> +       sess_data->result = -ENOSYS;
-> +       sess_data->func = NULL;
-> +}
-> +#endif /* ! CONFIG_CIFS_UPCALL */
->
->  int
->  CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
-> @@ -993,7 +1141,6 @@ CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
->         struct kvec iov[3];
->         enum securityEnum type;
->         __u16 action, bytes_remaining;
-> -       struct key *spnego_key = NULL;
->         __le32 phase = NtLmNegotiate; /* NTLMSSP, if needed, is multistage */
->         u16 blob_len;
->         char *ntlmsspblob = NULL;
-> @@ -1029,6 +1176,9 @@ CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
->         case NTLMv2:
->                  sess_auth_ntlmv2(sess_data);
->                 goto out;
-> +       case Kerberos:
-> +                sess_auth_kerberos(sess_data);
-> +               goto out;
->         default:
->                 /* Continue with the rest of the function */
->                 break;
-> @@ -1085,63 +1235,7 @@ ssetup_ntlmssp_authenticate:
->         iov[1].iov_base = NULL;
->         iov[1].iov_len = 0;
->
-> -       if (type == Kerberos) {
-> -#ifdef CONFIG_CIFS_UPCALL
-> -               struct cifs_spnego_msg *msg;
-> -
-> -               spnego_key = cifs_get_spnego_key(ses);
-> -               if (IS_ERR(spnego_key)) {
-> -                       rc = PTR_ERR(spnego_key);
-> -                       spnego_key = NULL;
-> -                       goto ssetup_exit;
-> -               }
-> -
-> -               msg = spnego_key->payload.data;
-> -               /* check version field to make sure that cifs.upcall is
-> -                  sending us a response in an expected form */
-> -               if (msg->version != CIFS_SPNEGO_UPCALL_VERSION) {
-> -                       cifs_dbg(VFS, "incorrect version of cifs.upcall "
-> -                                  "expected %d but got %d)",
-> -                                  CIFS_SPNEGO_UPCALL_VERSION, msg->version);
-> -                       rc = -EKEYREJECTED;
-> -                       goto ssetup_exit;
-> -               }
-> -
-> -               ses->auth_key.response = kmemdup(msg->data, msg->sesskey_len,
-> -                                                GFP_KERNEL);
-> -               if (!ses->auth_key.response) {
-> -                       cifs_dbg(VFS,
-> -                               "Kerberos can't allocate (%u bytes) memory",
-> -                               msg->sesskey_len);
-> -                       rc = -ENOMEM;
-> -                       goto ssetup_exit;
-> -               }
-> -               ses->auth_key.len = msg->sesskey_len;
-> -
-> -               pSMB->req.hdr.Flags2 |= SMBFLG2_EXT_SEC;
-> -               capabilities |= CAP_EXTENDED_SECURITY;
-> -               pSMB->req.Capabilities = cpu_to_le32(capabilities);
-> -               iov[1].iov_base = msg->data + msg->sesskey_len;
-> -               iov[1].iov_len = msg->secblob_len;
-> -               pSMB->req.SecurityBlobLength = cpu_to_le16(iov[1].iov_len);
-> -
-> -               if (ses->capabilities & CAP_UNICODE) {
-> -                       /* unicode strings must be word aligned */
-> -                       if ((iov[0].iov_len + iov[1].iov_len) % 2) {
-> -                               *bcc_ptr = 0;
-> -                               bcc_ptr++;
-> -                       }
-> -                       unicode_oslm_strings(&bcc_ptr, nls_cp);
-> -                       unicode_domain_string(&bcc_ptr, ses, nls_cp);
-> -               } else
-> -               /* BB: is this right? */
-> -                       ascii_ssetup_strings(&bcc_ptr, ses, nls_cp);
-> -#else /* ! CONFIG_CIFS_UPCALL */
-> -               cifs_dbg(VFS, "Kerberos negotiated but upcall support disabled!\n");
-> -               rc = -ENOSYS;
-> -               goto ssetup_exit;
-> -#endif /* CONFIG_CIFS_UPCALL */
-> -       } else if (type == RawNTLMSSP) {
-> +       if (type == RawNTLMSSP) {
->                 if ((pSMB->req.hdr.Flags2 & SMBFLG2_UNICODE) == 0) {
->                         cifs_dbg(VFS, "NTLMSSP requires Unicode support\n");
->                         rc = -ENOSYS;
-> @@ -1282,10 +1376,6 @@ ssetup_ntlmssp_authenticate:
->         }
->
->  ssetup_exit:
-> -       if (spnego_key) {
-> -               key_invalidate(spnego_key);
-> -               key_put(spnego_key);
-> -       }
->         kfree(str_area);
->         kfree(ntlmsspblob);
->         ntlmsspblob = NULL;
-> --
-> 1.8.4.2
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+But in fact i really can't test that sanely here, because what is reall=
+y
+byte coded for "?" in Kost?me1.jpg on the server?
+Can you get a hex-representation of that file name?
+
+In addition it could also help when you post your samba server's smb.co=
+nf.
+
+Cheers, G=C3=BCnter
+
+--=20
