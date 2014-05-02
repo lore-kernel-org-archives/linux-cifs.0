@@ -1,80 +1,55 @@
 From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 2/4] cifs: Split ntlm and ntlmv2 authentication methods
- off CIFS_SessSetup()
-Date: Fri, 02 May 2014 14:17:03 +0100
-Message-ID: <1399036623.3970.3.camel@sachin-laptop>
-References: <1398948065-23265-1-git-send-email-sprabhu@redhat.com>
-	 <1398948065-23265-3-git-send-email-sprabhu@redhat.com>
-	 <CADT32e+uuZbXhGyCujnZ2Ed+2nihJeRMduZvqD21yCH=_i-YhA@mail.gmail.com>
-	 <1398961591.3528.8.camel@sachin-laptop>
-	 <CADT32e+VHgmUJoZfR0FJfhBGMLHzG0EfsFDAP+Ex2ikT9353LA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Simo Sorce <simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH 0/4 v3] Split CIFS_SessSetup()
+Date: Fri,  2 May 2014 14:21:27 +0100
+Message-ID: <1399036891-15689-1-git-send-email-sprabhu@redhat.com>
+Cc: Simo Sorce <simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32e+VHgmUJoZfR0FJfhBGMLHzG0EfsFDAP+Ex2ikT9353LA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 2014-05-01 at 15:01 -0500, Shirish Pargaonkar wrote:
-> On Thu, May 1, 2014 at 11:26 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> > On Thu, 2014-05-01 at 10:31 -0500, Shirish Pargaonkar wrote:
-> >
-> >> > +
-> >> > +out:
-> >> > +       sess_data->result = rc;
-> >> > +       sess_data->func = NULL;
-> >> > +       sess_free_buffer(sess_data);
-> >> > +       sess_establish_session(sess_data);
-> >> > +       kfree(ses->auth_key.response);
-> >> > +       ses->auth_key.response = NULL;
-> >> > +}
-> >>
-> >> In all three sess_auth_* functions (ntlm, ntlmv2, and lanman (in
-> >> previous patch),
-> >> we will end up calling sess_establish_session() even if there is an error i.e.
-> >> sess_data->result is not 0.
-> >
-> > We check for any errors within sess_establish_session() before we
-> > attempt to establish session.
-> >
-> > static int
-> > sess_establish_session(struct sess_data *sess_data)
-> > {
-> > ..
-> >         if (!sess_data->result) {
-> >                 //Establish Session.
-> >         }
-> > ..
-> > }
-> >
-> > This isn't a technical issue but maybe considered a style issue.
-> 
-> Sure, would have preferred to call the function before goto lables, but will
-> leave at that.
-> 
+I am investigating the possibility of adding support for gss-proxy in the
+cifs client module. As part of that investigation, I was looking at the
+CIFS_SessSetup() function. This is a long function which handles multiple auths
+using if conditions and switch statements. The code struction makes it
+difficult to modify of add support for new authentication mechanisms.
 
-Having given it another thought, I agree with you. I've made the
-required modifications and tested the new patches. I'll send them to the
-list shortly.
+The proposal is to split the various authentication code into its own separate
+functions. This increases the lines of code but will simplify maintenance and
+addition of new auth methods.
 
-Sachin Prabhu
+The short term goal is to add gss-proxy support for kerberos authentication.
+This will require to and fro communication with the gss-proxy module over a
+unix socket.
+
+Further long term goals are 
+1) Add support for NTLMSSP using SPNEGO,
+2) Allow clients to negotiate which authentication mechanism to use using SPNEGO.
+
+I would like the opinion of this list about these proposed changes.
+Is there any part of the code which needs changing?
+
+V2:
+- Ensure that sess_data allocated on intermediate patches are freed.
+- Remove ifdef-endif blocks from the switch statement in CIFS_SessSetup().
+
+V3:
+- Fix whitespace errors in some patches.
+- Change sess_establish_session to return errors. Call this function only in
+  case of successful establish session calls to the server.
+- Delete an incorrect comment in case of rawntlmssp authentication.
+- Delete an if statement before kfree(ntlmssp) in rawntlmssp authentication.
 
 
-> >
-> >
-> >> > +       if (phase == NtLmChallenge) {
-> >> > +               rc = decode_ntlmssp_challenge(bcc_ptr, blob_len, ses);
-> >> > +               /* now goto beginning for ntlmssp authenticate phase */
-> >>
-> >> I think this comment should move to after if statement
-> >> (it was at wrong place to begin with) i.e. go to authenticate phase
-> >> only if rc is NULL.
-> >
-> > I agree. The comment is actually not required.
-> >
-> > Sachin Prabhu
-> >
+Sachin Prabhu (4):
+  cifs: Split lanman auth from CIFS_SessSetup()
+  cifs: Split ntlm and ntlmv2 authentication methods off
+    CIFS_SessSetup()
+  cifs: Split Kerberos authentication off CIFS_SessSetup()
+  cifs: Separate rawntlmssp auth from CIFS_SessSetup()
+
+ fs/cifs/sess.c | 1138 +++++++++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 796 insertions(+), 342 deletions(-)
+
+-- 
+1.8.4.2
