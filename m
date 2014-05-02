@@ -1,64 +1,80 @@
-From: =?UTF-8?B?R8O8bnRlciBLdWtrdWtr?= <linux-KQewbsS9MvBBDgjK7y7TUQ@public.gmane.org>
-Subject: Re: character-problems
-Date: Fri, 02 May 2014 04:41:03 +0200
-Message-ID: <536305BF.1060201@kukkukk.com>
-References: <53620CE9.10301@gmx.de>	<CAOhYWNKp1QqsebugYqM2yAqOef4yw=t9tNyUmH-9ds59pjygqw@mail.gmail.com>	<53622687.9030306@gmx.de> <CAOhYWN+PNtQ8HMyi3OFyv3KQ-bbvOKcGFNLZw5Jx2zHNdRJ1LQ@mail.gmail.com> <53622BD7.7030005@gmx.de>
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 2/4] cifs: Split ntlm and ntlmv2 authentication methods
+ off CIFS_SessSetup()
+Date: Fri, 02 May 2014 14:17:03 +0100
+Message-ID: <1399036623.3970.3.camel@sachin-laptop>
+References: <1398948065-23265-1-git-send-email-sprabhu@redhat.com>
+	 <1398948065-23265-3-git-send-email-sprabhu@redhat.com>
+	 <CADT32e+uuZbXhGyCujnZ2Ed+2nihJeRMduZvqD21yCH=_i-YhA@mail.gmail.com>
+	 <1398961591.3528.8.camel@sachin-laptop>
+	 <CADT32e+VHgmUJoZfR0FJfhBGMLHzG0EfsFDAP+Ex2ikT9353LA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Thomas Creutz <thomas.creutz-Mmb7MZpHnFY@public.gmane.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Simo Sorce <simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <53622BD7.7030005-Mmb7MZpHnFY@public.gmane.org>
+In-Reply-To: <CADT32e+VHgmUJoZfR0FJfhBGMLHzG0EfsFDAP+Ex2ikT9353LA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Am 01.05.2014 13:11, schrieb Thomas Creutz:
->=20
-> Am 01.05.2014 12:54, schrieb Jeff Layton:
->> Maybe...
->>
->> For your kernel, what is CONFIG_NLS_DEFAULT set to? I know that ubun=
-tu
->> used to set that to iso9959-1, but I think they recently moved to
->> using utf8. If it's set to iso8559-1 then that may be related to the
->> problem.
->=20
-> No, its not a charset problem.
->=20
-> grep CONFIG_NLS_DEFAULT /boot/config-$(uname -r)
-> CONFIG_NLS_DEFAULT=3D"utf8"
->=20
-> because I also told, that the file names have the same problem on the
-> server (uploaded over php-scripts). Some scripts use utf-8 others
-> iso8...., thats why you will never see all chars right on console/sam=
-ba
-> client.
-> But, this problem should get handelt by samba/cifs... the files are a=
-lso
-> useable with a windows client (so the access problem is in the cifs
-> client, not the samba server)
+On Thu, 2014-05-01 at 15:01 -0500, Shirish Pargaonkar wrote:
+> On Thu, May 1, 2014 at 11:26 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> > On Thu, 2014-05-01 at 10:31 -0500, Shirish Pargaonkar wrote:
+> >
+> >> > +
+> >> > +out:
+> >> > +       sess_data->result = rc;
+> >> > +       sess_data->func = NULL;
+> >> > +       sess_free_buffer(sess_data);
+> >> > +       sess_establish_session(sess_data);
+> >> > +       kfree(ses->auth_key.response);
+> >> > +       ses->auth_key.response = NULL;
+> >> > +}
+> >>
+> >> In all three sess_auth_* functions (ntlm, ntlmv2, and lanman (in
+> >> previous patch),
+> >> we will end up calling sess_establish_session() even if there is an error i.e.
+> >> sess_data->result is not 0.
+> >
+> > We check for any errors within sess_establish_session() before we
+> > attempt to establish session.
+> >
+> > static int
+> > sess_establish_session(struct sess_data *sess_data)
+> > {
+> > ..
+> >         if (!sess_data->result) {
+> >                 //Establish Session.
+> >         }
+> > ..
+> > }
+> >
+> > This isn't a technical issue but maybe considered a style issue.
+> 
+> Sure, would have preferred to call the function before goto lables, but will
+> leave at that.
+> 
 
-i've tested this on clients running
-   opensuse-12.3 - kernel 3.7.10-1.28-desktop
-   opensuse-13.1 - kernel 3.11.10-7-desktop
-samba server Version 3.6.12-59.19.1-3208-SUSE-SL12.3-x86_64
-is running on opensuse-12.3.
+Having given it another thought, I agree with you. I've made the
+required modifications and tested the new patches. I'll send them to the
+list shortly.
 
-Here i don't see that
-    Kost?me1.jpg  (i really used a question mark here)
-on the server is changed to
-    Kost_me1.jpg
-on the client.
+Sachin Prabhu
 
-But in fact i really can't test that sanely here, because what is reall=
-y
-byte coded for "?" in Kost?me1.jpg on the server?
-Can you get a hex-representation of that file name?
 
-In addition it could also help when you post your samba server's smb.co=
-nf.
-
-Cheers, G=C3=BCnter
-
---=20
+> >
+> >
+> >> > +       if (phase == NtLmChallenge) {
+> >> > +               rc = decode_ntlmssp_challenge(bcc_ptr, blob_len, ses);
+> >> > +               /* now goto beginning for ntlmssp authenticate phase */
+> >>
+> >> I think this comment should move to after if statement
+> >> (it was at wrong place to begin with) i.e. go to authenticate phase
+> >> only if rc is NULL.
+> >
+> > I agree. The comment is actually not required.
+> >
+> > Sachin Prabhu
+> >
