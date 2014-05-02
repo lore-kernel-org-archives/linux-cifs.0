@@ -1,10 +1,10 @@
 From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
-Subject: Re: [PATCH 2/4] cifs: Split ntlm and ntlmv2 authentication methods
- off CIFS_SessSetup()
-Date: Fri, 2 May 2014 15:26:24 -0400
-Message-ID: <20140502152624.736b8a4a@tlielax.poochiereds.net>
+Subject: Re: [PATCH 3/4] cifs: Split Kerberos authentication off
+ CIFS_SessSetup()
+Date: Fri, 2 May 2014 15:27:53 -0400
+Message-ID: <20140502152753.4ef7eeb5@tlielax.poochiereds.net>
 References: <1399036891-15689-1-git-send-email-sprabhu@redhat.com>
-	<1399036891-15689-3-git-send-email-sprabhu@redhat.com>
+	<1399036891-15689-4-git-send-email-sprabhu@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
@@ -12,28 +12,29 @@ Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
 	Simo Sorce <simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1399036891-15689-3-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1399036891-15689-4-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri,  2 May 2014 14:21:29 +0100
+On Fri,  2 May 2014 14:21:30 +0100
 Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
 > Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > ---
->  fs/cifs/sess.c | 316 ++++++++++++++++++++++++++++++++++++++++++---------------
->  1 file changed, 232 insertions(+), 84 deletions(-)
+>  fs/cifs/sess.c | 215 ++++++++++++++++++++++++++++++++++++++++-----------------
+>  1 file changed, 153 insertions(+), 62 deletions(-)
 > 
 > diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-> index c6aa60b..2be1ecb 100644
+> index 2be1ecb..4780a31 100644
 > --- a/fs/cifs/sess.c
 > +++ b/fs/cifs/sess.c
-> @@ -764,6 +764,216 @@ sess_auth_lanman(struct sess_data *sess_data)
+> @@ -973,6 +973,155 @@ out:
+>  	ses->auth_key.response = NULL;
 >  }
->  #endif
 >  
+> +#ifdef CONFIG_CIFS_UPCALL
 > +static void
-> +sess_auth_ntlm(struct sess_data *sess_data)
+> +sess_auth_kerberos(struct sess_data *sess_data)
 > +{
 > +	int rc = 0;
 > +	struct smb_hdr *smb_buf;
@@ -42,10 +43,13 @@ Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 > +	struct cifs_ses *ses = sess_data->ses;
 > +	__u32 capabilities;
 > +	__u16 bytes_remaining;
+> +	struct key *spnego_key = NULL;
+> +	struct cifs_spnego_msg *msg;
+> +	u16 blob_len;
 > +
-> +	/* old style NTLM sessionsetup */
-> +	/* wct = 13 */
-> +	rc = sess_alloc_buffer(sess_data, 13);
+> +	/* extended security */
+> +	/* wct = 12 */
+> +	rc = sess_alloc_buffer(sess_data, 12);
 > +	if (rc)
 > +		goto out;
 > +
@@ -53,54 +57,71 @@ Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 > +	bcc_ptr = sess_data->iov[2].iov_base;
 > +	capabilities = cifs_ssetup_hdr(ses, pSMB);
 > +
-> +	pSMB->req_no_secext.Capabilities = cpu_to_le32(capabilities);
-> +	pSMB->req_no_secext.CaseInsensitivePasswordLength =
-> +			cpu_to_le16(CIFS_AUTH_RESP_SIZE);
-> +	pSMB->req_no_secext.CaseSensitivePasswordLength =
-> +			cpu_to_le16(CIFS_AUTH_RESP_SIZE);
-> +
-> +	/* calculate ntlm response and session key */
-> +	rc = setup_ntlm_response(ses, sess_data->nls_cp);
-> +	if (rc) {
-> +		cifs_dbg(VFS, "Error %d during NTLM authentication\n",
-> +				 rc);
+> +	spnego_key = cifs_get_spnego_key(ses);
+> +	if (IS_ERR(spnego_key)) {
+> +		rc = PTR_ERR(spnego_key);
+> +		spnego_key = NULL;
 > +		goto out;
 > +	}
 > +
-> +	/* copy ntlm response */
-> +	memcpy(bcc_ptr, ses->auth_key.response + CIFS_SESS_KEY_SIZE,
-> +			CIFS_AUTH_RESP_SIZE);
-> +	bcc_ptr += CIFS_AUTH_RESP_SIZE;
-> +	memcpy(bcc_ptr, ses->auth_key.response + CIFS_SESS_KEY_SIZE,
-> +			CIFS_AUTH_RESP_SIZE);
-> +	bcc_ptr += CIFS_AUTH_RESP_SIZE;
+> +	msg = spnego_key->payload.data;
+> +	/*
+> +	 * check version field to make sure that cifs.upcall is
+> +	 * sending us a response in an expected form
+> +	 */
+> +	if (msg->version != CIFS_SPNEGO_UPCALL_VERSION) {
+> +		cifs_dbg(VFS,
+> +		  "incorrect version of cifs.upcall (expected %d but got %d)",
+> +			      CIFS_SPNEGO_UPCALL_VERSION, msg->version);
+> +		rc = -EKEYREJECTED;
+> +		goto out_put_spnego_key;
+> +	}
+> +
+> +	ses->auth_key.response = kmemdup(msg->data, msg->sesskey_len,
+> +					 GFP_KERNEL);
+> +	if (!ses->auth_key.response) {
+> +		cifs_dbg(VFS, "Kerberos can't allocate (%u bytes) memory",
+> +				msg->sesskey_len);
+> +		rc = -ENOMEM;
+> +		goto out_put_spnego_key;
+> +	}
+> +	ses->auth_key.len = msg->sesskey_len;
+> +
+> +	pSMB->req.hdr.Flags2 |= SMBFLG2_EXT_SEC;
+> +	capabilities |= CAP_EXTENDED_SECURITY;
+> +	pSMB->req.Capabilities = cpu_to_le32(capabilities);
+> +	sess_data->iov[1].iov_base = msg->data + msg->sesskey_len;
+> +	sess_data->iov[1].iov_len = msg->secblob_len;
+> +	pSMB->req.SecurityBlobLength = cpu_to_le16(sess_data->iov[1].iov_len);
 > +
 > +	if (ses->capabilities & CAP_UNICODE) {
 > +		/* unicode strings must be word aligned */
-> +		if (sess_data->iov[0].iov_len % 2) {
+> +		if ((sess_data->iov[0].iov_len
+> +			+ sess_data->iov[1].iov_len) % 2) {
 > +			*bcc_ptr = 0;
 > +			bcc_ptr++;
 > +		}
-> +		unicode_ssetup_strings(&bcc_ptr, ses, sess_data->nls_cp);
+> +		unicode_oslm_strings(&bcc_ptr, sess_data->nls_cp);
+> +		unicode_domain_string(&bcc_ptr, ses, sess_data->nls_cp);
 > +	} else {
+> +		/* BB: is this right? */
 > +		ascii_ssetup_strings(&bcc_ptr, ses, sess_data->nls_cp);
 > +	}
-> +
 > +
 > +	sess_data->iov[2].iov_len = (long) bcc_ptr -
 > +			(long) sess_data->iov[2].iov_base;
 > +
 > +	rc = sess_sendreceive(sess_data);
 > +	if (rc)
-> +		goto out;
+> +		goto out_put_spnego_key;
 > +
 > +	pSMB = (SESSION_SETUP_ANDX *)sess_data->iov[0].iov_base;
 > +	smb_buf = (struct smb_hdr *)sess_data->iov[0].iov_base;
 > +
-> +	if (smb_buf->WordCount != 3) {
+> +	if (smb_buf->WordCount != 4) {
 > +		rc = -EIO;
 > +		cifs_dbg(VFS, "bad word count %d\n", smb_buf->WordCount);
-> +		goto out;
+> +		goto out_put_spnego_key;
 > +	}
 > +
 > +	if (le16_to_cpu(pSMB->resp.Action) & GUEST_LOGIN)
@@ -111,6 +132,16 @@ Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 > +
 > +	bytes_remaining = get_bcc(smb_buf);
 > +	bcc_ptr = pByteArea(smb_buf);
+> +
+> +	blob_len = le16_to_cpu(pSMB->resp.SecurityBlobLength);
+> +	if (blob_len > bytes_remaining) {
+> +		cifs_dbg(VFS, "bad security blob length %d\n",
+> +				blob_len);
+> +		rc = -EINVAL;
+> +		goto out_put_spnego_key;
+> +	}
+> +	bcc_ptr += blob_len;
+> +	bytes_remaining -= blob_len;
 > +
 > +	/* BB check if Unicode and decode strings */
 > +	if (bytes_remaining == 0) {
@@ -129,6 +160,9 @@ Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 > +	}
 > +
 > +	rc = sess_establish_session(sess_data);
+> +out_put_spnego_key:
+> +	key_invalidate(spnego_key);
+> +	key_put(spnego_key);
 > +out:
 > +	sess_data->result = rc;
 > +	sess_data->func = NULL;
@@ -136,259 +170,114 @@ Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 > +	kfree(ses->auth_key.response);
 > +	ses->auth_key.response = NULL;
 > +}
+> +
+> +#else
 > +
 > +static void
-> +sess_auth_ntlmv2(struct sess_data *sess_data)
+> +sess_auth_kerberos(struct sess_data *sess_data)
 > +{
-> +	int rc = 0;
-> +	struct smb_hdr *smb_buf;
-> +	SESSION_SETUP_ANDX *pSMB;
-> +	char *bcc_ptr;
-> +	struct cifs_ses *ses = sess_data->ses;
-> +	__u32 capabilities;
-> +	__u16 bytes_remaining;
-> +
-> +	/* old style NTLM sessionsetup */
-> +	/* wct = 13 */
-> +	rc = sess_alloc_buffer(sess_data, 13);
-> +	if (rc)
-> +		goto out;
-> +
-> +	pSMB = (SESSION_SETUP_ANDX *)sess_data->iov[0].iov_base;
-> +	bcc_ptr = sess_data->iov[2].iov_base;
-> +	capabilities = cifs_ssetup_hdr(ses, pSMB);
-> +
-> +	pSMB->req_no_secext.Capabilities = cpu_to_le32(capabilities);
-> +
-> +	/* LM2 password would be here if we supported it */
-> +	pSMB->req_no_secext.CaseInsensitivePasswordLength = 0;
-> +
-> +	/* calculate nlmv2 response and session key */
-> +	rc = setup_ntlmv2_rsp(ses, sess_data->nls_cp);
-> +	if (rc) {
-> +		cifs_dbg(VFS, "Error %d during NTLMv2 authentication\n", rc);
-> +		goto out;
-> +	}
-> +
-> +	memcpy(bcc_ptr, ses->auth_key.response + CIFS_SESS_KEY_SIZE,
-> +			ses->auth_key.len - CIFS_SESS_KEY_SIZE);
-> +	bcc_ptr += ses->auth_key.len - CIFS_SESS_KEY_SIZE;
-> +
-> +	/* set case sensitive password length after tilen may get
-> +	 * assigned, tilen is 0 otherwise.
-> +	 */
-> +	pSMB->req_no_secext.CaseSensitivePasswordLength =
-> +		cpu_to_le16(ses->auth_key.len - CIFS_SESS_KEY_SIZE);
-> +
-> +	if (ses->capabilities & CAP_UNICODE) {
-> +		if (sess_data->iov[0].iov_len % 2) {
-> +			*bcc_ptr = 0;
-> +			bcc_ptr++;
-> +		}
-> +		unicode_ssetup_strings(&bcc_ptr, ses, sess_data->nls_cp);
-> +	} else {
-> +		ascii_ssetup_strings(&bcc_ptr, ses, sess_data->nls_cp);
-> +	}
-> +
-> +
-> +	sess_data->iov[2].iov_len = (long) bcc_ptr -
-> +			(long) sess_data->iov[2].iov_base;
-> +
-> +	rc = sess_sendreceive(sess_data);
-> +	if (rc)
-> +		goto out;
-> +
-> +	pSMB = (SESSION_SETUP_ANDX *)sess_data->iov[0].iov_base;
-> +	smb_buf = (struct smb_hdr *)sess_data->iov[0].iov_base;
-> +
-> +	if (smb_buf->WordCount != 3) {
-> +		rc = -EIO;
-> +		cifs_dbg(VFS, "bad word count %d\n", smb_buf->WordCount);
-> +		goto out;
-> +	}
-> +
-> +	if (le16_to_cpu(pSMB->resp.Action) & GUEST_LOGIN)
-> +		cifs_dbg(FYI, "Guest login\n"); /* BB mark SesInfo struct? */
-> +
-> +	ses->Suid = smb_buf->Uid;   /* UID left in wire format (le) */
-> +	cifs_dbg(FYI, "UID = %llu\n", ses->Suid);
-> +
-> +	bytes_remaining = get_bcc(smb_buf);
-> +	bcc_ptr = pByteArea(smb_buf);
-> +
-> +	/* BB check if Unicode and decode strings */
-> +	if (bytes_remaining == 0) {
-> +		/* no string area to decode, do nothing */
-> +	} else if (smb_buf->Flags2 & SMBFLG2_UNICODE) {
-> +		/* unicode string area must be word-aligned */
-> +		if (((unsigned long) bcc_ptr - (unsigned long) smb_buf) % 2) {
-> +			++bcc_ptr;
-> +			--bytes_remaining;
-> +		}
-> +		decode_unicode_ssetup(&bcc_ptr, bytes_remaining, ses,
-> +				      sess_data->nls_cp);
-> +	} else {
-> +		decode_ascii_ssetup(&bcc_ptr, bytes_remaining, ses,
-> +				    sess_data->nls_cp);
-> +	}
-> +
-> +	rc = sess_establish_session(sess_data);
-> +out:
-> +	sess_data->result = rc;
+> +	cifs_dbg(VFS, "Kerberos negotiated but upcall support disabled!\n");
+> +	sess_data->result = -ENOSYS;
 > +	sess_data->func = NULL;
-> +	sess_free_buffer(sess_data);
-> +	kfree(ses->auth_key.response);
-> +	ses->auth_key.response = NULL;
 > +}
-> +
-> +
+> +#endif /* ! CONFIG_CIFS_UPCALL */
+>  
 >  int
 >  CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
->  	       const struct nls_table *nls_cp)
-> @@ -810,6 +1020,12 @@ CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
->  	case LANMAN:
->  		sess_auth_lanman(sess_data);
+> @@ -990,7 +1139,6 @@ CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
+>  	struct kvec iov[3];
+>  	enum securityEnum type;
+>  	__u16 action, bytes_remaining;
+> -	struct key *spnego_key = NULL;
+>  	__le32 phase = NtLmNegotiate; /* NTLMSSP, if needed, is multistage */
+>  	u16 blob_len;
+>  	char *ntlmsspblob = NULL;
+> @@ -1026,6 +1174,9 @@ CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
+>  	case NTLMv2:
+>  		sess_auth_ntlmv2(sess_data);
 >  		goto out;
-> +	case NTLM:
-> +		sess_auth_ntlm(sess_data);
-> +		goto out;
-> +	case NTLMv2:
-> +		sess_auth_ntlmv2(sess_data);
+> +	case Kerberos:
+> +		sess_auth_kerberos(sess_data);
 > +		goto out;
 >  	default:
 >  		/* Continue with the rest of the function */
 >  		break;
-> @@ -830,11 +1046,8 @@ ssetup_ntlmssp_authenticate:
->  	if (phase == NtLmChallenge)
->  		phase = NtLmAuthenticate; /* if ntlmssp, now final phase */
->  
-> -	if ((type == NTLM) || (type == NTLMv2)) {
-> -		/* For NTLMv2 failures eventually may need to retry NTLM */
-> -		wct = 13; /* old style NTLM sessionsetup */
-> -	} else /* same size: negotiate or auth, NTLMSSP or extended security */
-> -		wct = 12;
-> +	/* same size: negotiate or auth, NTLMSSP or extended security */
-> +	wct = 12;
->  
->  	rc = small_smb_init_no_tc(SMB_COM_SESSION_SETUP_ANDX, wct, ses,
->  			    (void **)&smb_buf);
-> @@ -869,70 +1082,7 @@ ssetup_ntlmssp_authenticate:
+> @@ -1082,63 +1233,7 @@ ssetup_ntlmssp_authenticate:
 >  	iov[1].iov_base = NULL;
 >  	iov[1].iov_len = 0;
 >  
-> -	if (type == NTLM) {
-> -		pSMB->req_no_secext.Capabilities = cpu_to_le32(capabilities);
-> -		pSMB->req_no_secext.CaseInsensitivePasswordLength =
-> -			cpu_to_le16(CIFS_AUTH_RESP_SIZE);
-> -		pSMB->req_no_secext.CaseSensitivePasswordLength =
-> -			cpu_to_le16(CIFS_AUTH_RESP_SIZE);
+> -	if (type == Kerberos) {
+> -#ifdef CONFIG_CIFS_UPCALL
+> -		struct cifs_spnego_msg *msg;
 > -
-> -		/* calculate ntlm response and session key */
-> -		rc = setup_ntlm_response(ses, nls_cp);
-> -		if (rc) {
-> -			cifs_dbg(VFS, "Error %d during NTLM authentication\n",
-> -				 rc);
+> -		spnego_key = cifs_get_spnego_key(ses);
+> -		if (IS_ERR(spnego_key)) {
+> -			rc = PTR_ERR(spnego_key);
+> -			spnego_key = NULL;
 > -			goto ssetup_exit;
 > -		}
 > -
-> -		/* copy ntlm response */
-> -		memcpy(bcc_ptr, ses->auth_key.response + CIFS_SESS_KEY_SIZE,
-> -				CIFS_AUTH_RESP_SIZE);
-> -		bcc_ptr += CIFS_AUTH_RESP_SIZE;
-> -		memcpy(bcc_ptr, ses->auth_key.response + CIFS_SESS_KEY_SIZE,
-> -				CIFS_AUTH_RESP_SIZE);
-> -		bcc_ptr += CIFS_AUTH_RESP_SIZE;
+> -		msg = spnego_key->payload.data;
+> -		/* check version field to make sure that cifs.upcall is
+> -		   sending us a response in an expected form */
+> -		if (msg->version != CIFS_SPNEGO_UPCALL_VERSION) {
+> -			cifs_dbg(VFS, "incorrect version of cifs.upcall "
+> -				   "expected %d but got %d)",
+> -				   CIFS_SPNEGO_UPCALL_VERSION, msg->version);
+> -			rc = -EKEYREJECTED;
+> -			goto ssetup_exit;
+> -		}
+> -
+> -		ses->auth_key.response = kmemdup(msg->data, msg->sesskey_len,
+> -						 GFP_KERNEL);
+> -		if (!ses->auth_key.response) {
+> -			cifs_dbg(VFS,
+> -				"Kerberos can't allocate (%u bytes) memory",
+> -				msg->sesskey_len);
+> -			rc = -ENOMEM;
+> -			goto ssetup_exit;
+> -		}
+> -		ses->auth_key.len = msg->sesskey_len;
+> -
+> -		pSMB->req.hdr.Flags2 |= SMBFLG2_EXT_SEC;
+> -		capabilities |= CAP_EXTENDED_SECURITY;
+> -		pSMB->req.Capabilities = cpu_to_le32(capabilities);
+> -		iov[1].iov_base = msg->data + msg->sesskey_len;
+> -		iov[1].iov_len = msg->secblob_len;
+> -		pSMB->req.SecurityBlobLength = cpu_to_le16(iov[1].iov_len);
 > -
 > -		if (ses->capabilities & CAP_UNICODE) {
 > -			/* unicode strings must be word aligned */
-> -			if (iov[0].iov_len % 2) {
+> -			if ((iov[0].iov_len + iov[1].iov_len) % 2) {
 > -				*bcc_ptr = 0;
 > -				bcc_ptr++;
 > -			}
-> -			unicode_ssetup_strings(&bcc_ptr, ses, nls_cp);
+> -			unicode_oslm_strings(&bcc_ptr, nls_cp);
+> -			unicode_domain_string(&bcc_ptr, ses, nls_cp);
 > -		} else
+> -		/* BB: is this right? */
 > -			ascii_ssetup_strings(&bcc_ptr, ses, nls_cp);
-> -	} else if (type == NTLMv2) {
-> -		pSMB->req_no_secext.Capabilities = cpu_to_le32(capabilities);
-> -
-> -		/* LM2 password would be here if we supported it */
-> -		pSMB->req_no_secext.CaseInsensitivePasswordLength = 0;
-> -
-> -		/* calculate nlmv2 response and session key */
-> -		rc = setup_ntlmv2_rsp(ses, nls_cp);
-> -		if (rc) {
-> -			cifs_dbg(VFS, "Error %d during NTLMv2 authentication\n",
-> -				 rc);
-> -			goto ssetup_exit;
-> -		}
-> -		memcpy(bcc_ptr, ses->auth_key.response + CIFS_SESS_KEY_SIZE,
-> -				ses->auth_key.len - CIFS_SESS_KEY_SIZE);
-> -		bcc_ptr += ses->auth_key.len - CIFS_SESS_KEY_SIZE;
-> -
-> -		/* set case sensitive password length after tilen may get
-> -		 * assigned, tilen is 0 otherwise.
-> -		 */
-> -		pSMB->req_no_secext.CaseSensitivePasswordLength =
-> -			cpu_to_le16(ses->auth_key.len - CIFS_SESS_KEY_SIZE);
-> -
-> -		if (ses->capabilities & CAP_UNICODE) {
-> -			if (iov[0].iov_len % 2) {
-> -				*bcc_ptr = 0;
-> -				bcc_ptr++;
-> -			}
-> -			unicode_ssetup_strings(&bcc_ptr, ses, nls_cp);
-> -		} else
-> -			ascii_ssetup_strings(&bcc_ptr, ses, nls_cp);
-> -	} else if (type == Kerberos) {
-> +	if (type == Kerberos) {
->  #ifdef CONFIG_CIFS_UPCALL
->  		struct cifs_spnego_msg *msg;
->  
-> @@ -1083,7 +1233,7 @@ ssetup_ntlmssp_authenticate:
->  	if (rc)
->  		goto ssetup_exit;
->  
-> -	if ((smb_buf->WordCount != 3) && (smb_buf->WordCount != 4)) {
-> +	if (smb_buf->WordCount != 4) {
->  		rc = -EIO;
->  		cifs_dbg(VFS, "bad word count %d\n", smb_buf->WordCount);
->  		goto ssetup_exit;
-> @@ -1098,22 +1248,20 @@ ssetup_ntlmssp_authenticate:
->  	bytes_remaining = get_bcc(smb_buf);
->  	bcc_ptr = pByteArea(smb_buf);
->  
-> -	if (smb_buf->WordCount == 4) {
-> -		blob_len = le16_to_cpu(pSMB->resp.SecurityBlobLength);
-> -		if (blob_len > bytes_remaining) {
-> -			cifs_dbg(VFS, "bad security blob length %d\n",
-> -				 blob_len);
-> -			rc = -EINVAL;
-> +	blob_len = le16_to_cpu(pSMB->resp.SecurityBlobLength);
-> +	if (blob_len > bytes_remaining) {
-> +		cifs_dbg(VFS, "bad security blob length %d\n",
-> +			 blob_len);
-> +		rc = -EINVAL;
-> +		goto ssetup_exit;
-> +	}
-> +	if (phase == NtLmChallenge) {
-> +		rc = decode_ntlmssp_challenge(bcc_ptr, blob_len, ses);
-> +		if (rc)
->  			goto ssetup_exit;
-> -		}
-> -		if (phase == NtLmChallenge) {
-> -			rc = decode_ntlmssp_challenge(bcc_ptr, blob_len, ses);
-> -			if (rc)
-> -				goto ssetup_exit;
-> -		}
-> -		bcc_ptr += blob_len;
-> -		bytes_remaining -= blob_len;
+> -#else /* ! CONFIG_CIFS_UPCALL */
+> -		cifs_dbg(VFS, "Kerberos negotiated but upcall support disabled!\n");
+> -		rc = -ENOSYS;
+> -		goto ssetup_exit;
+> -#endif /* CONFIG_CIFS_UPCALL */
+> -	} else if (type == RawNTLMSSP) {
+> +	if (type == RawNTLMSSP) {
+>  		if ((pSMB->req.hdr.Flags2 & SMBFLG2_UNICODE) == 0) {
+>  			cifs_dbg(VFS, "NTLMSSP requires Unicode support\n");
+>  			rc = -ENOSYS;
+> @@ -1278,10 +1373,6 @@ ssetup_ntlmssp_authenticate:
 >  	}
-> +	bcc_ptr += blob_len;
-> +	bytes_remaining -= blob_len;
 >  
->  	/* BB check if Unicode and decode strings */
->  	if (bytes_remaining == 0) {
+>  ssetup_exit:
+> -	if (spnego_key) {
+> -		key_invalidate(spnego_key);
+> -		key_put(spnego_key);
+> -	}
+>  	kfree(str_area);
+>  	kfree(ntlmsspblob);
+>  	ntlmsspblob = NULL;
 
-I like it.
 
 Reviewed-by: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
