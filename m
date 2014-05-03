@@ -1,65 +1,23 @@
-From: Jeff Layton <jlayton@poochiereds.net>
-Subject: Re: [PATCH 1/2] cifs: Use min_t() when comparing "size_t" and
- "unsigned long"
-Date: Fri, 2 May 2014 15:55:25 -0400
-Message-ID: <20140502155525.02dde4de@tlielax.poochiereds.net>
-References: <1397414783-28098-1-git-send-email-geert@linux-m68k.org>
+From: "Gva Abogados" <Molly.Mee-vW9NlH6ck7JYTrM/R70HSA@public.gmane.org>
+Subject: Please Acknowledge My Proposal
+Date: Sat, 3 May 2014 12:20:40 -0000
+Message-ID: <281f66fefbbe04055c78ea619c75c388.squirrel__6245.81700326434$1399124345$gmane$org@162.222.106.162>
+Reply-To: jdomingosanchez-CZK690njTpI@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Alexander Viro
- <viro@zeniv.linux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, Steve
- French <sfrench@samba.org>, linux-cifs@vger.kernel.org, Hugh Dickins
- <hughd@google.com>, linux-mm@kvack.org, linux-kernel@vger.kernel.org
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <1397414783-28098-1-git-send-email-geert@linux-m68k.org>
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+To: unlisted-recipients:; (no To-header on input)
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 13 Apr 2014 20:46:21 +0200
-Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+Please Acknowledge My Proposal!!
 
-> On 32 bit, size_t is "unsigned int", not "unsigned long", causing the
-> following warning when comparing with PAGE_SIZE, which is always "unsigned
-> long":
->=20
-> fs/cifs/file.c: In function =E2=80=98cifs_readdata_to_iov=E2=80=99:
-> fs/cifs/file.c:2757: warning: comparison of distinct pointer types lacks =
-a cast
->=20
-> Introduced by commit 7f25bba819a38ab7310024a9350655f374707e20
-> ("cifs_iovec_read: keep iov_iter between the calls of
-> cifs_readdata_to_iov()"), which changed the signedness of "remaining"
-> and the code from min_t() to min().
->=20
-> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> ---
-> PAGE_SIZE should really be size_t, but that would require lots of changes
-> all over the place.
->=20
->  fs/cifs/file.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 8807442c94dd..8add25538a3b 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -2754,7 +2754,7 @@ cifs_readdata_to_iov(struct cifs_readdata *rdata, s=
-truct iov_iter *iter)
-> =20
->  	for (i =3D 0; i < rdata->nr_pages; i++) {
->  		struct page *page =3D rdata->pages[i];
-> -		size_t copy =3D min(remaining, PAGE_SIZE);
-> +		size_t copy =3D min_t(size_t, remaining, PAGE_SIZE);
->  		size_t written =3D copy_page_to_iter(page, 0, copy, iter);
->  		remaining -=3D written;
->  		if (written < copy && iov_iter_count(iter) > 0)
+My name is Mr. Juan Martin Domingo a lawyer resident in Spain. I am
+writing to let you know I have some FUNDS I want to transfer and am
+seeking if you can be a beneficiary...Do not hesitate to Contact me for
+more information if interested: gva_abogados-CZK690njTpI@public.gmane.org
 
-Reviewed-by: Jeff Layton <jlayton@poochiereds.net>
-
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+Sincerely
+Juan Martin Domingo.
+Domijdo-CZK690njTpI@public.gmane.org
