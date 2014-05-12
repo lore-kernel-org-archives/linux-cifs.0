@@ -1,16 +1,14 @@
-From: Alexander Bokovoy <ab@samba.org>
-Subject: Re: [PATCH] cifs: call strtobool instead of custom implementation
-Date: Mon, 12 May 2014 17:59:10 +0300
-Message-ID: <20140512145910.GB31367@leiri.espoo.7ia.org>
-References: <1398783193-13741-1-git-send-email-andriy.shevchenko@linux.intel.com> <20140512044114.GA19939@leiri.espoo.7ia.org> <20140512064100.5ba419a8@tlielax.poochiereds.net>
-	<20140512132203.GA31367@leiri.espoo.7ia.org> <1399903195.3703.12.camel@smile.fi.intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org, Jeff Layton <jlayton@poochiereds.net>, samba-technical@lists.samba.org
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v2] cifs: call print_hex_dump instead of custom implementation
+Date: Mon, 12 May 2014 18:15:20 +0300
+Message-ID: <1399907720-18622-1-git-send-email-andriy.shevchenko@linux.intel.com>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Alexander Bokovoy <ab@samba.org>,
+	Jeff Layton <jlayton@poochiereds.net>,
+	Steve French <sfrench@samba.org>,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
 Return-path: <samba-technical-bounces@lists.samba.org>
-Content-Disposition: inline
-In-Reply-To: <1399903195.3703.12.camel@smile.fi.intel.com>
 List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
 List-Archive: <http://lists.samba.org/pipermail/samba-technical>
 List-Post: <mailto:samba-technical@lists.samba.org>
@@ -20,44 +18,48 @@ Sender: samba-technical-bounces@lists.samba.org
 Errors-To: samba-technical-bounces@lists.samba.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Mon, May 12, 2014 at 04:59:55PM +0300, Andy Shevchenko wrote:
-> On Mon, 2014-05-12 at 16:22 +0300, Alexander Bokovoy wrote:
-> > On Mon, May 12, 2014 at 06:41:00AM -0400, Jeff Layton wrote:
-> > > > This changes the returned value of cifs_linux_ext_proc_write() to
-> > > > -EINVAL if strtobool() was not able to find a boolean value.
-> > > > Previously setting anything non-bool wouldn't cause this side-effect.
-> > > > 
-> > > > Steve, is it OK to you? This is certainly a visible change in that
-> > > > writing to a proc entry will cause user-space error where it was
-> > > > ignored before.
-> > > > 
-> > > 
-> > > I think returning an error there is the right thing to do. If someone
-> > > is writing to this file, they likely mean for it to have some sort of
-> > > an effect.
-> > > 
-> > > Honestly though, the *best* thing would be to (gradually) convert these
-> > > procfile switches into module options. The way it stands now, it's
-> > > really hard to set these at boot time. You have to:
-> > > 
-> > >     # modprobe cifs
-> > >     # echo N > /proc/fs/cifs/LinuxExtensionsEnabled
-> > >     # mount -t cifs ...
-> > > 
-> > > Making sure that gets done for anything in /etc/fstab is...tricky.
-> > > 
-> > > What would be best is to add module options that affect these
-> > > variables that could be set via /etc/modprobe.d.
-> > > 
-> > > Then, either add a warning printk when someone writes to these files
-> > > that they'll soon be deprecated (in 2-3 releases), or maybe turn them
-> > > into symlinks that point to the files under /sys/module/cifs/parameters.
-> > I agree.
-> > 
-> > I think strtobool() patches are fine (+ change to the commit message).
-> 
-> I will resend v2 soon. Could I add your Acked-by or Reviewed-by?
-Sure, you can add mine.
+This patch converts custom dumper to use native print_hex_dump() instead. The
+dump will have a given label and addresses per each line which differs it from
+the original code.
 
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ fs/cifs/cifs_debug.c | 21 ++-------------------
+ 1 file changed, 2 insertions(+), 19 deletions(-)
+
+diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+index fa78b68..e7b87ce 100644
+--- a/fs/cifs/cifs_debug.c
++++ b/fs/cifs/cifs_debug.c
+@@ -34,27 +34,10 @@
+ void
+ cifs_dump_mem(char *label, void *data, int length)
+ {
+-	int i, j;
+-	int *intptr = data;
+-	char *charptr = data;
+-	char buf[10], line[80];
+-
+ 	printk(KERN_DEBUG "%s: dump of %d bytes of data at 0x%p\n",
+ 		label, length, data);
+-	for (i = 0; i < length; i += 16) {
+-		line[0] = 0;
+-		for (j = 0; (j < 4) && (i + j * 4 < length); j++) {
+-			sprintf(buf, " %08x", intptr[i / 4 + j]);
+-			strcat(line, buf);
+-		}
+-		buf[0] = ' ';
+-		buf[2] = 0;
+-		for (j = 0; (j < 16) && (i + j < length); j++) {
+-			buf[1] = isprint(charptr[i + j]) ? charptr[i + j] : '.';
+-			strcat(line, buf);
+-		}
+-		printk(KERN_DEBUG "%s\n", line);
+-	}
++	print_hex_dump(KERN_DEBUG, label, DUMP_PREFIX_ADDRESS, 16, 4,
++		       data, length, true);
+ }
+ 
+ #ifdef CONFIG_CIFS_DEBUG
 -- 
-/ Alexander Bokovoy
+2.0.0.rc2
