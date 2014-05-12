@@ -1,36 +1,40 @@
-From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: STATUS_USER_SESSION_DELETED: auth problems when downgrading from
- vers=3.0 to vers=2.0/2.1
-Date: Thu, 08 May 2014 11:51:06 +0100
-Message-ID: <1399546266.2850.16.camel@sachin-laptop>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [GIT] CIFS Fix
+Date: Sun, 11 May 2014 22:02:54 -0500
+Message-ID: <CAH2r5mvf8LV6TBG8FQiUYi-P2dbd27OnhNxcWCG275YWcuGrYg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=UTF-8
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-I just finished installing a copy of Windows 2012 and was testing
-version 3 when I came across this particular problem.
+Small cifs fix for metadata caching
 
-To reproduce
-1) First mount a share using vers=3.0
-# mount -t cifs -o username=user1,password=pass1,vers=3.0 //vm140-54/exports /mnt
-This is successful.
-2) Now unmount this share and attempt to mount with vers=2.0 to 2.1
-# mount -t cifs -o username=user1,password=pass1,vers=2.1 //vm140-54/exports /mnt
-mount error(5): Input/output error
-Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
+The following changes since commit 76429f1dedbc1815d875c9b68eefd30c95cb8fa9:
 
-/var/log/messages shows
-kernel: [ 2730.843939] Status code returned 0xc0000203 STATUS_USER_SESSION_DELETED
-kernel: [ 2730.846883] CIFS VFS: Send error in SessSetup = -5
-kernel: [ 2730.849247] CIFS VFS: cifs_mount failed w/return code = -5
+  Merge tag 'regulator-v3.15-rc2' of
+git://git.kernel.org/pub/scm/linux/kernel/git/broonie/regulator
+(2014-04-24 12:01:58 -0700)
 
-I can then mount using vers=3.0 and vers=1.0 but not 2.0 or 2.1.
+are available in the git repository at:
 
-I am attempting to debug this but was wondering if anyone had
-encountered this before.
 
-Sachin Prabhu
+  git://git.samba.org/sfrench/cifs-2.6.git for-linus
+
+for you to fetch changes up to a87c9ad956676d84d459739fc14ec5a3c3565717:
+
+  cifs: fix actimeo=0 corner case when cifs_i->time == jiffies
+(2014-04-24 22:37:03 -0500)
+
+----------------------------------------------------------------
+Jeff Layton (1):
+      cifs: fix actimeo=0 corner case when cifs_i->time == jiffies
+
+ fs/cifs/inode.c | 3 +++
+ 1 file changed, 3 insertions(+)
+-- 
+Thanks,
+
+Steve
