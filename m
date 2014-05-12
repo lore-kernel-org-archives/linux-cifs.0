@@ -1,201 +1,57 @@
-From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+From: Alexander Bokovoy <ab-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Subject: Re: [PATCH] cifs: call strtobool instead of custom implementation
-Date: Mon, 12 May 2014 06:41:00 -0400
-Message-ID: <20140512064100.5ba419a8@tlielax.poochiereds.net>
+Date: Mon, 12 May 2014 16:22:03 +0300
+Message-ID: <20140512132203.GA31367@leiri.espoo.7ia.org>
 References: <1398783193-13741-1-git-send-email-andriy.shevchenko@linux.intel.com>
-	<20140512044114.GA19939@leiri.espoo.7ia.org>
+ <20140512044114.GA19939@leiri.espoo.7ia.org>
+ <20140512064100.5ba419a8@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: Andy Shevchenko <andriy.shevchenko-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>,
 	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
 	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-To: Alexander Bokovoy <ab-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20140512044114.GA19939-d+H2oAP8R5zifVmeSVo1ZkB+6BGkLq7r@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20140512064100.5ba419a8-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 12 May 2014 07:41:14 +0300
-Alexander Bokovoy <ab-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-
-> On Tue, Apr 29, 2014 at 05:53:13PM +0300, Andy Shevchenko wrote:
-> > Signed-off-by: Andy Shevchenko <andriy.shevchenko-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
-> > ---
-> >  fs/cifs/cifs_debug.c | 51 +++++++++++++++++++++++++++++----------------------
-> >  1 file changed, 29 insertions(+), 22 deletions(-)
+On Mon, May 12, 2014 at 06:41:00AM -0400, Jeff Layton wrote:
+> > This changes the returned value of cifs_linux_ext_proc_write() to
+> > -EINVAL if strtobool() was not able to find a boolean value.
+> > Previously setting anything non-bool wouldn't cause this side-effect.
 > > 
-> > diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-> > index f3ac415..fa78b68 100644
-> > --- a/fs/cifs/cifs_debug.c
-> > +++ b/fs/cifs/cifs_debug.c
-> > @@ -274,6 +274,7 @@ static ssize_t cifs_stats_proc_write(struct file *file,
-> >  		const char __user *buffer, size_t count, loff_t *ppos)
-> >  {
-> >  	char c;
-> > +	bool bv;
-> >  	int rc;
-> >  	struct list_head *tmp1, *tmp2, *tmp3;
-> >  	struct TCP_Server_Info *server;
-> > @@ -284,7 +285,7 @@ static ssize_t cifs_stats_proc_write(struct file *file,
-> >  	if (rc)
-> >  		return rc;
-> >  
-> > -	if (c == '1' || c == 'y' || c == 'Y' || c == '0') {
-> > +	if (strtobool(&c, &bv) == 0) {
-> >  #ifdef CONFIG_CIFS_STATS2
-> >  		atomic_set(&totBufAllocCount, 0);
-> >  		atomic_set(&totSmBufAllocCount, 0);
-> > @@ -451,15 +452,14 @@ static ssize_t cifsFYI_proc_write(struct file *file, const char __user *buffer,
-> >  		size_t count, loff_t *ppos)
-> >  {
-> >  	char c;
-> > +	bool bv;
-> >  	int rc;
-> >  
-> >  	rc = get_user(c, buffer);
-> >  	if (rc)
-> >  		return rc;
-> > -	if (c == '0' || c == 'n' || c == 'N')
-> > -		cifsFYI = 0;
-> > -	else if (c == '1' || c == 'y' || c == 'Y')
-> > -		cifsFYI = 1;
-> > +	if (strtobool(&c, &bv) == 0)
-> > +		cifsFYI = bv;
-> >  	else if ((c > '1') && (c <= '9'))
-> >  		cifsFYI = (int) (c - '0'); /* see cifs_debug.h for meanings */
-> >  
-> > @@ -490,15 +490,18 @@ static ssize_t cifs_linux_ext_proc_write(struct file *file,
-> >  		const char __user *buffer, size_t count, loff_t *ppos)
-> >  {
-> >  	char c;
-> > +	bool bv;
-> >  	int rc;
-> >  
-> >  	rc = get_user(c, buffer);
-> >  	if (rc)
-> >  		return rc;
-> > -	if (c == '0' || c == 'n' || c == 'N')
-> > -		linuxExtEnabled = 0;
-> > -	else if (c == '1' || c == 'y' || c == 'Y')
-> > -		linuxExtEnabled = 1;
-> > +
-> > +	rc = strtobool(&c, &bv);
-> > +	if (rc)
-> > +		return rc;
-> > +
-> > +	linuxExtEnabled = bv;
-> >  
-> >  	return count;
-> >  }
-> This changes the returned value of cifs_linux_ext_proc_write() to
-> -EINVAL if strtobool() was not able to find a boolean value.
-> Previously setting anything non-bool wouldn't cause this side-effect.
-> 
-> Steve, is it OK to you? This is certainly a visible change in that
-> writing to a proc entry will cause user-space error where it was
-> ignored before.
-> 
-
-I think returning an error there is the right thing to do. If someone
-is writing to this file, they likely mean for it to have some sort of
-an effect.
-
-Honestly though, the *best* thing would be to (gradually) convert these
-procfile switches into module options. The way it stands now, it's
-really hard to set these at boot time. You have to:
-
-    # modprobe cifs
-    # echo N > /proc/fs/cifs/LinuxExtensionsEnabled
-    # mount -t cifs ...
-
-Making sure that gets done for anything in /etc/fstab is...tricky.
-
-What would be best is to add module options that affect these
-variables that could be set via /etc/modprobe.d.
-
-Then, either add a warning printk when someone writes to these files
-that they'll soon be deprecated (in 2-3 releases), or maybe turn them
-into symlinks that point to the files under /sys/module/cifs/parameters.
-
-
-> > @@ -527,15 +530,18 @@ static ssize_t cifs_lookup_cache_proc_write(struct file *file,
-> >  		const char __user *buffer, size_t count, loff_t *ppos)
-> >  {
-> >  	char c;
-> > +	bool bv;
-> >  	int rc;
-> >  
-> >  	rc = get_user(c, buffer);
-> >  	if (rc)
-> >  		return rc;
-> > -	if (c == '0' || c == 'n' || c == 'N')
-> > -		lookupCacheEnabled = 0;
-> > -	else if (c == '1' || c == 'y' || c == 'Y')
-> > -		lookupCacheEnabled = 1;
-> > +
-> > +	rc = strtobool(&c, &bv);
-> > +	if (rc)
-> > +		return rc;
-> > +
-> > +	lookupCacheEnabled = bv;
-> >  
-> >  	return count;
-> >  }
-> Same here.
-> 
-> > @@ -564,15 +570,18 @@ static ssize_t traceSMB_proc_write(struct file *file, const char __user *buffer,
-> >  		size_t count, loff_t *ppos)
-> >  {
-> >  	char c;
-> > +	bool bv;
-> >  	int rc;
-> >  
-> >  	rc = get_user(c, buffer);
-> >  	if (rc)
-> >  		return rc;
-> > -	if (c == '0' || c == 'n' || c == 'N')
-> > -		traceSMB = 0;
-> > -	else if (c == '1' || c == 'y' || c == 'Y')
-> > -		traceSMB = 1;
-> > +
-> > +	rc = strtobool(&c, &bv);
-> > +	if (rc)
-> > +		return rc;
-> > +
-> > +	traceSMB = bv;
-> >  
-> >  	return count;
-> >  }
-> same here.
-> 
-> > @@ -630,6 +639,7 @@ static ssize_t cifs_security_flags_proc_write(struct file *file,
-> >  	unsigned int flags;
-> >  	char flags_string[12];
-> >  	char c;
-> > +	bool bv;
-> >  
-> >  	if ((count < 1) || (count > 11))
-> >  		return -EINVAL;
-> > @@ -642,11 +652,8 @@ static ssize_t cifs_security_flags_proc_write(struct file *file,
-> >  	if (count < 3) {
-> >  		/* single char or single char followed by null */
-> >  		c = flags_string[0];
-> > -		if (c == '0' || c == 'n' || c == 'N') {
-> > -			global_secflags = CIFSSEC_DEF; /* default */
-> > -			return count;
-> > -		} else if (c == '1' || c == 'y' || c == 'Y') {
-> > -			global_secflags = CIFSSEC_MAX;
-> > +		if (strtobool(&c, &bv) == 0) {
-> > +			global_secflags = bv ? CIFSSEC_MAX : CIFSSEC_DEF;
-> >  			return count;
-> >  		} else if (!isdigit(c)) {
-> >  			cifs_dbg(VFS, "Invalid SecurityFlags: %s\n",
-> > -- 
-> > 1.9.2
+> > Steve, is it OK to you? This is certainly a visible change in that
+> > writing to a proc entry will cause user-space error where it was
+> > ignored before.
 > > 
 > 
+> I think returning an error there is the right thing to do. If someone
+> is writing to this file, they likely mean for it to have some sort of
+> an effect.
+> 
+> Honestly though, the *best* thing would be to (gradually) convert these
+> procfile switches into module options. The way it stands now, it's
+> really hard to set these at boot time. You have to:
+> 
+>     # modprobe cifs
+>     # echo N > /proc/fs/cifs/LinuxExtensionsEnabled
+>     # mount -t cifs ...
+> 
+> Making sure that gets done for anything in /etc/fstab is...tricky.
+> 
+> What would be best is to add module options that affect these
+> variables that could be set via /etc/modprobe.d.
+> 
+> Then, either add a warning printk when someone writes to these files
+> that they'll soon be deprecated (in 2-3 releases), or maybe turn them
+> into symlinks that point to the files under /sys/module/cifs/parameters.
+I agree.
 
+I think strtobool() patches are fine (+ change to the commit message).
+The change to module options should certainly be done in a separate
+patchset.
 
 -- 
-Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+/ Alexander Bokovoy
