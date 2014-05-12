@@ -1,22 +1,23 @@
-From: Alexander Bokovoy <ab-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
 Subject: Re: [PATCH v2] cifs: call print_hex_dump instead of custom
  implementation
-Date: Mon, 12 May 2014 18:41:34 +0300
-Message-ID: <20140512154134.GA2319@leiri.espoo.7ia.org>
+Date: Mon, 12 May 2014 11:42:47 -0400
+Message-ID: <20140512114247.0c96ad58@tlielax.poochiereds.net>
 References: <1399907720-18622-1-git-send-email-andriy.shevchenko@linux.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Alexander Bokovoy <ab-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
 To: Andy Shevchenko <andriy.shevchenko-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
 In-Reply-To: <1399907720-18622-1-git-send-email-andriy.shevchenko-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, May 12, 2014 at 06:15:20PM +0300, Andy Shevchenko wrote:
+On Mon, 12 May 2014 18:15:20 +0300
+Andy Shevchenko <andriy.shevchenko-VuQAYsv1563Yd54FQh9/CA@public.gmane.org> wrote:
+
 > This patch converts custom dumper to use native print_hex_dump() instead. The
 > dump will have a given label and addresses per each line which differs it from
 > the original code.
@@ -57,10 +58,14 @@ On Mon, May 12, 2014 at 06:15:20PM +0300, Andy Shevchenko wrote:
 > -	}
 > +	print_hex_dump(KERN_DEBUG, label, DUMP_PREFIX_ADDRESS, 16, 4,
 > +		       data, length, true);
+
+I'm not sure we want "label" as the prefix_str as it'll go on every
+line. Maybe just use "" in place of "label" there?
+
 >  }
 >  
 >  #ifdef CONFIG_CIFS_DEBUG
-Looks good, thanks for this. You can add my Reviewed-By.
 
--- 
-/ Alexander Bokovoy
+Otherwise, this looks good.
+
+Acked-by: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
