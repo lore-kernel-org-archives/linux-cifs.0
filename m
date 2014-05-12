@@ -1,50 +1,56 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] fs: cifs: new helper: file_inode(file)
-Date: Sun, 11 May 2014 23:08:50 -0500
-Message-ID: <CAH2r5muO1YetatwEWW+e+z+jc7TUv9jLn8Dr1dsz0Sqg1ZU-VA@mail.gmail.com>
-References: <52A7D5C3.6010300@huawei.com>
+Subject: Re: [PATCH v2 0/4] cifs: cache invalidation fixes when cache=loose
+Date: Sun, 11 May 2014 23:09:07 -0500
+Message-ID: <CAH2r5mvzhDc-Ndh5AMHHk0n=r2g80v+7mFVOYYf8Wr58mzN_aA@mail.gmail.com>
+References: <1398864708-18185-1-git-send-email-jlayton@poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Li Zefan <lizefan-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
-To: Libo Chen <clbchenlibo.chen-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Tetsuo Handa <penguin-kernel-1yMVhJb1mP/7nzcFbJAaVXf5DAMn2ifp@public.gmane.org>
+To: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <52A7D5C3.6010300-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1398864708-18185-1-git-send-email-jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-merged into cifs-2.6.git for-next
+series merged into cifs-2.6.git for-next
 
-On Tue, Dec 10, 2013 at 9:02 PM, Libo Chen <clbchenlibo.chen-hv44wF8Li93QT0dZR+AlfA@public.gmane.org> wrote:
+On Wed, Apr 30, 2014 at 8:31 AM, Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org> wrote:
+> This is the second posting of this patchset. The end result of this set
+> should be indentical to the v1 set, but this fixes some problems in the
+> intermediate changes that would have introduced bugs for someone doing
+> a bisect.
 >
-> Signed-off-by: Libo Chen <clbchenlibo.chen-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/ioctl.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> This patchset fixes up some cache invalidation problems that can occur
+> when cache=loose. The main point is to ensure that we revalidate the
+> cache prior to satisfying a read.
 >
-> diff --git a/fs/cifs/ioctl.c b/fs/cifs/ioctl.c
-> index 7749230..45cb59b 100644
-> --- a/fs/cifs/ioctl.c
-> +++ b/fs/cifs/ioctl.c
-> @@ -85,7 +85,7 @@ static long cifs_ioctl_clone(unsigned int xid, struct file *dst_file,
->                 goto out_fput;
->         }
+> At the same time, I added a fix for a potential problem that cropped up
+> with NFS a while back, and to which CIFS is also vulnerable.
 >
-> -       src_inode = src_file.file->f_dentry->d_inode;
-> +       src_inode = file_inode(src_file.file);
+> This was originally reported by Tetsuo Handa, and as far as I can tell
+> this fixes his testcase, assuming that you also ensure that kernel
+> oplocks are enabled.
 >
->         /*
->          * Note: cifs case is easier than btrfs since server responsible for
+> Given that we're late in the cycle, I'd like to see these merged for
+> v3.16 but getting them into -next soon would be good.
+>
+> Jeff Layton (4):
+>   cifs: convert booleans in cifsInodeInfo to a flags field
+>   cifs: new helper function: cifs_revalidate_mapping
+>   cifs: fix potential races in cifs_revalidate_mapping
+>   cifs: revalidate mapping prior to satisfying aio_read request
+>
+>  fs/cifs/cifsfs.c   | 24 ++++++++++++------
+>  fs/cifs/cifsfs.h   |  2 ++
+>  fs/cifs/cifsglob.h |  7 +++---
+>  fs/cifs/file.c     | 16 ++++++------
+>  fs/cifs/inode.c    | 71 ++++++++++++++++++++++++++++++++++++++++++------------
+>  5 files changed, 86 insertions(+), 34 deletions(-)
+>
 > --
-> 1.8.2.2
+> 1.9.0
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 
