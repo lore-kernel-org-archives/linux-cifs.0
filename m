@@ -1,55 +1,162 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v2 0/4] cifs: cache invalidation fixes when cache=loose
-Date: Sun, 11 May 2014 23:09:07 -0500
-Message-ID: <CAH2r5mvzhDc-Ndh5AMHHk0n=r2g80v+7mFVOYYf8Wr58mzN_aA@mail.gmail.com>
-References: <1398864708-18185-1-git-send-email-jlayton@poochiereds.net>
+Subject: Re: [PATCH] cifs: call strtobool instead of custom implementation
+Date: Sun, 11 May 2014 23:12:01 -0500
+Message-ID: <CAH2r5mv_NSfqKH46iRJLQJkXygQAb7M1gF4vo=Bi99MVQaHeeg@mail.gmail.com>
+References: <1398783193-13741-1-git-send-email-andriy.shevchenko@linux.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Tetsuo Handa <penguin-kernel-1yMVhJb1mP/7nzcFbJAaVXf5DAMn2ifp@public.gmane.org>
-To: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: Andy Shevchenko <andriy.shevchenko-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1398864708-18185-1-git-send-email-jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+In-Reply-To: <1398783193-13741-1-git-send-email-andriy.shevchenko-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-series merged into cifs-2.6.git for-next
+I don't have a strong opinion on whether this change makes it more or
+less readable.  Any other opinions?
 
-On Wed, Apr 30, 2014 at 8:31 AM, Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org> wrote:
-> This is the second posting of this patchset. The end result of this set
-> should be indentical to the v1 set, but this fixes some problems in the
-> intermediate changes that would have introduced bugs for someone doing
-> a bisect.
+On Tue, Apr 29, 2014 at 9:53 AM, Andy Shevchenko
+<andriy.shevchenko-VuQAYsv1563Yd54FQh9/CA@public.gmane.org> wrote:
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+> ---
+>  fs/cifs/cifs_debug.c | 51 +++++++++++++++++++++++++++++----------------------
+>  1 file changed, 29 insertions(+), 22 deletions(-)
 >
-> This patchset fixes up some cache invalidation problems that can occur
-> when cache=loose. The main point is to ensure that we revalidate the
-> cache prior to satisfying a read.
+> diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+> index f3ac415..fa78b68 100644
+> --- a/fs/cifs/cifs_debug.c
+> +++ b/fs/cifs/cifs_debug.c
+> @@ -274,6 +274,7 @@ static ssize_t cifs_stats_proc_write(struct file *file,
+>                 const char __user *buffer, size_t count, loff_t *ppos)
+>  {
+>         char c;
+> +       bool bv;
+>         int rc;
+>         struct list_head *tmp1, *tmp2, *tmp3;
+>         struct TCP_Server_Info *server;
+> @@ -284,7 +285,7 @@ static ssize_t cifs_stats_proc_write(struct file *file,
+>         if (rc)
+>                 return rc;
 >
-> At the same time, I added a fix for a potential problem that cropped up
-> with NFS a while back, and to which CIFS is also vulnerable.
+> -       if (c == '1' || c == 'y' || c == 'Y' || c == '0') {
+> +       if (strtobool(&c, &bv) == 0) {
+>  #ifdef CONFIG_CIFS_STATS2
+>                 atomic_set(&totBufAllocCount, 0);
+>                 atomic_set(&totSmBufAllocCount, 0);
+> @@ -451,15 +452,14 @@ static ssize_t cifsFYI_proc_write(struct file *file, const char __user *buffer,
+>                 size_t count, loff_t *ppos)
+>  {
+>         char c;
+> +       bool bv;
+>         int rc;
 >
-> This was originally reported by Tetsuo Handa, and as far as I can tell
-> this fixes his testcase, assuming that you also ensure that kernel
-> oplocks are enabled.
+>         rc = get_user(c, buffer);
+>         if (rc)
+>                 return rc;
+> -       if (c == '0' || c == 'n' || c == 'N')
+> -               cifsFYI = 0;
+> -       else if (c == '1' || c == 'y' || c == 'Y')
+> -               cifsFYI = 1;
+> +       if (strtobool(&c, &bv) == 0)
+> +               cifsFYI = bv;
+>         else if ((c > '1') && (c <= '9'))
+>                 cifsFYI = (int) (c - '0'); /* see cifs_debug.h for meanings */
 >
-> Given that we're late in the cycle, I'd like to see these merged for
-> v3.16 but getting them into -next soon would be good.
+> @@ -490,15 +490,18 @@ static ssize_t cifs_linux_ext_proc_write(struct file *file,
+>                 const char __user *buffer, size_t count, loff_t *ppos)
+>  {
+>         char c;
+> +       bool bv;
+>         int rc;
 >
-> Jeff Layton (4):
->   cifs: convert booleans in cifsInodeInfo to a flags field
->   cifs: new helper function: cifs_revalidate_mapping
->   cifs: fix potential races in cifs_revalidate_mapping
->   cifs: revalidate mapping prior to satisfying aio_read request
+>         rc = get_user(c, buffer);
+>         if (rc)
+>                 return rc;
+> -       if (c == '0' || c == 'n' || c == 'N')
+> -               linuxExtEnabled = 0;
+> -       else if (c == '1' || c == 'y' || c == 'Y')
+> -               linuxExtEnabled = 1;
+> +
+> +       rc = strtobool(&c, &bv);
+> +       if (rc)
+> +               return rc;
+> +
+> +       linuxExtEnabled = bv;
 >
->  fs/cifs/cifsfs.c   | 24 ++++++++++++------
->  fs/cifs/cifsfs.h   |  2 ++
->  fs/cifs/cifsglob.h |  7 +++---
->  fs/cifs/file.c     | 16 ++++++------
->  fs/cifs/inode.c    | 71 ++++++++++++++++++++++++++++++++++++++++++------------
->  5 files changed, 86 insertions(+), 34 deletions(-)
+>         return count;
+>  }
+> @@ -527,15 +530,18 @@ static ssize_t cifs_lookup_cache_proc_write(struct file *file,
+>                 const char __user *buffer, size_t count, loff_t *ppos)
+>  {
+>         char c;
+> +       bool bv;
+>         int rc;
 >
+>         rc = get_user(c, buffer);
+>         if (rc)
+>                 return rc;
+> -       if (c == '0' || c == 'n' || c == 'N')
+> -               lookupCacheEnabled = 0;
+> -       else if (c == '1' || c == 'y' || c == 'Y')
+> -               lookupCacheEnabled = 1;
+> +
+> +       rc = strtobool(&c, &bv);
+> +       if (rc)
+> +               return rc;
+> +
+> +       lookupCacheEnabled = bv;
+>
+>         return count;
+>  }
+> @@ -564,15 +570,18 @@ static ssize_t traceSMB_proc_write(struct file *file, const char __user *buffer,
+>                 size_t count, loff_t *ppos)
+>  {
+>         char c;
+> +       bool bv;
+>         int rc;
+>
+>         rc = get_user(c, buffer);
+>         if (rc)
+>                 return rc;
+> -       if (c == '0' || c == 'n' || c == 'N')
+> -               traceSMB = 0;
+> -       else if (c == '1' || c == 'y' || c == 'Y')
+> -               traceSMB = 1;
+> +
+> +       rc = strtobool(&c, &bv);
+> +       if (rc)
+> +               return rc;
+> +
+> +       traceSMB = bv;
+>
+>         return count;
+>  }
+> @@ -630,6 +639,7 @@ static ssize_t cifs_security_flags_proc_write(struct file *file,
+>         unsigned int flags;
+>         char flags_string[12];
+>         char c;
+> +       bool bv;
+>
+>         if ((count < 1) || (count > 11))
+>                 return -EINVAL;
+> @@ -642,11 +652,8 @@ static ssize_t cifs_security_flags_proc_write(struct file *file,
+>         if (count < 3) {
+>                 /* single char or single char followed by null */
+>                 c = flags_string[0];
+> -               if (c == '0' || c == 'n' || c == 'N') {
+> -                       global_secflags = CIFSSEC_DEF; /* default */
+> -                       return count;
+> -               } else if (c == '1' || c == 'y' || c == 'Y') {
+> -                       global_secflags = CIFSSEC_MAX;
+> +               if (strtobool(&c, &bv) == 0) {
+> +                       global_secflags = bv ? CIFSSEC_MAX : CIFSSEC_DEF;
+>                         return count;
+>                 } else if (!isdigit(c)) {
+>                         cifs_dbg(VFS, "Invalid SecurityFlags: %s\n",
 > --
-> 1.9.0
+> 1.9.2
 >
 
 
