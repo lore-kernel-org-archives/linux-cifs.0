@@ -1,51 +1,95 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH][CIFS] Do not send non-zero ClientGUID on SMB2.02 dialect
- negotiate protocol request
-Date: Tue, 13 May 2014 22:50:45 +0200
-Message-ID: <CAH2r5msHgOcCtP-Qkat7kUNnjYU+QUufuMBJW0krfW1qdh_bog@mail.gmail.com>
+Subject: [CIFS][PATCH] Clarify SMB2/SMB3 create context and add missing ones
+Date: Wed, 14 May 2014 14:38:35 +0200
+Message-ID: <CAH2r5msf8eC=a3RDNb9DRwPaCj56K0bZw2rUjOctM=3HNb+0dA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
+To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
->From ac9334f68ece14fa3f6ee23a5966702fdadbe182 Mon Sep 17 00:00:00 2001
+>From 0042cf22e164f9f38934e994a2811c35251e88c0 Mon Sep 17 00:00:00 2001
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Date: Tue, 13 May 2014 13:37:45 -0700
-Subject: [PATCH] [CIFS] Do not send ClientGUID on SMB2.02 dialect
+Date: Wed, 14 May 2014 05:29:40 -0700
+Subject: [PATCH] [CIFS] Clarify SMB2/SMB3 create context and add missing ones
 
-ClientGUID must be zero for SMB2.02 dialect.  See section 2.2.3
-of MS-SMB2. For SMB2.1 and later it must be non-zero.
+Clarify comments for create contexts which we do send,
+and fix typo in one create context definition and add
+newer SMB3 create contexts to the list.
 
 Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-CC: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ fs/cifs/smb2ops.c |    2 ++
+ fs/cifs/smb2pdu.c |    2 ++
+ fs/cifs/smb2pdu.h |    6 +++++-
+ 3 files changed, 9 insertions(+), 1 deletions(-)
 
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 35ddc3e..787844b 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -1047,6 +1047,7 @@ smb2_create_lease_buf(u8 *lease_key, u8 oplock)
+  buf->ccontext.NameOffset = cpu_to_le16(offsetof
+  (struct create_lease, Name));
+  buf->ccontext.NameLength = cpu_to_le16(4);
++ /* SMB2_CREATE_REQUEST_LEASE is "RqLs" */
+  buf->Name[0] = 'R';
+  buf->Name[1] = 'q';
+  buf->Name[2] = 'L';
+@@ -1073,6 +1074,7 @@ smb3_create_lease_buf(u8 *lease_key, u8 oplock)
+  buf->ccontext.NameOffset = cpu_to_le16(offsetof
+  (struct create_lease_v2, Name));
+  buf->ccontext.NameLength = cpu_to_le16(4);
++ /* SMB2_CREATE_REQUEST_LEASE is "RqLs" */
+  buf->Name[0] = 'R';
+  buf->Name[1] = 'q';
+  buf->Name[2] = 'L';
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index dc44610..e8b2550 100644
+index 0feb743..b0037b6 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -375,7 +375,12 @@ SMB2_negotiate(const unsigned int xid, struct
-cifs_ses *ses)
+@@ -972,6 +972,7 @@ create_durable_buf(void)
+  buf->ccontext.NameOffset = cpu_to_le16(offsetof
+  (struct create_durable, Name));
+  buf->ccontext.NameLength = cpu_to_le16(4);
++ /* SMB2_CREATE_DURABLE_HANDLE_REQUEST is "DHnQ" */
+  buf->Name[0] = 'D';
+  buf->Name[1] = 'H';
+  buf->Name[2] = 'n';
+@@ -996,6 +997,7 @@ create_reconnect_durable_buf(struct cifs_fid *fid)
+  buf->ccontext.NameLength = cpu_to_le16(4);
+  buf->Data.Fid.PersistentFileId = fid->persistent_fid;
+  buf->Data.Fid.VolatileFileId = fid->volatile_fid;
++ /* SMB2_CREATE_DURABLE_HANDLE_RECONNECT is "DHnC" */
+  buf->Name[0] = 'D';
+  buf->Name[1] = 'H';
+  buf->Name[2] = 'n';
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index 743e11e..69f3595 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -435,11 +435,15 @@ struct smb2_tree_disconnect_rsp {
+ #define SMB2_CREATE_SD_BUFFER "SecD" /* security descriptor */
+ #define SMB2_CREATE_DURABLE_HANDLE_REQUEST "DHnQ"
+ #define SMB2_CREATE_DURABLE_HANDLE_RECONNECT "DHnC"
+-#define SMB2_CREATE_ALLOCATION_SIZE "AlSi"
++#define SMB2_CREATE_ALLOCATION_SIZE "AISi"
+ #define SMB2_CREATE_QUERY_MAXIMAL_ACCESS_REQUEST "MxAc"
+ #define SMB2_CREATE_TIMEWARP_REQUEST "TWrp"
+ #define SMB2_CREATE_QUERY_ON_DISK_ID "QFid"
+ #define SMB2_CREATE_REQUEST_LEASE "RqLs"
++#define SMB2_CREATE_DURABLE_HANDLE_REQUEST_V2 "DH2Q"
++#define SMB2_CREATE_DURABLE_HANDLE_RECONNECT_V2 "DH2C"
++#define SMB2_CREATE_APP_INSTANCE_ID 0x45BCA66AEFA7F74A9008FA462E144D74
++#define SVHDX_OPEN_DEVICE_CONTEXT 0x83CE6F1AD851E0986E34401CC9BCFCE9
 
-  req->Capabilities = cpu_to_le32(ses->server->vals->req_capabilities);
-
-- memcpy(req->ClientGUID, server->client_guid, SMB2_CLIENT_GUID_SIZE);
-+ /* ClientGUID must be zero for SMB2.02 dialect */
-+ if (ses->server->vals->protocol_id == SMB20_PROT_ID)
-+ memset(req->ClientGUID, 0, SMB2_CLIENT_GUID_SIZE);
-+ else
-+ memcpy(req->ClientGUID, server->client_guid,
-+ SMB2_CLIENT_GUID_SIZE);
-
-  iov[0].iov_base = (char *)req;
-  /* 4 for rfc1002 length field */
+ struct smb2_create_req {
+  struct smb2_hdr hdr;
 -- 
-1.9.1
+1.7.0.4
+
 
 
 -- 
