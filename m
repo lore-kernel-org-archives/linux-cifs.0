@@ -1,195 +1,185 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Set client guid on per connection basis
-Date: Thu, 15 May 2014 10:12:12 +0200
-Message-ID: <CAH2r5mvWu18oiVzzwC+jYozLiAtKSJusRsky9P_Ew+c01KcS6g@mail.gmail.com>
-References: <1399546266.2850.16.camel@sachin-laptop> <1399938492-20577-1-git-send-email-sprabhu@redhat.com>
- <CAH2r5mvVoa-ns7CnpMuscYyF=EQxzB2E3TDh+xbAZeZFqfBZdw@mail.gmail.com> <38fc6261ec74445bb234134fc82d9cc9@BLUPR03MB328.namprd03.prod.outlook.com>
+From: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Subject: RE: [PATCH] cifs: Set client guid on per connection basis
+Date: Thu, 15 May 2014 08:35:03 +0000
+Message-ID: <ae4e482c25c44648a631e8f78ae5bc5a@BLUPR03MB328.namprd03.prod.outlook.com>
+References: <1399546266.2850.16.camel@sachin-laptop>
+ <1399938492-20577-1-git-send-email-sprabhu@redhat.com>
+ <CAH2r5mvVoa-ns7CnpMuscYyF=EQxzB2E3TDh+xbAZeZFqfBZdw@mail.gmail.com>
+ <38fc6261ec74445bb234134fc82d9cc9@BLUPR03MB328.namprd03.prod.outlook.com>
+ <CAH2r5mvWu18oiVzzwC+jYozLiAtKSJusRsky9P_Ew+c01KcS6g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Cc: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
 	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <38fc6261ec74445bb234134fc82d9cc9-GeMU99GfrruUGfbpEvpFbeO6mTEJWrR4XA4E9RH9d+qIuWR1G4zioA@public.gmane.org>
+In-Reply-To: <CAH2r5mvWu18oiVzzwC+jYozLiAtKSJusRsky9P_Ew+c01KcS6g-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Would multichannel require a new negotiate protocol? We are only
-generating it in get_tcp_session - and would probably not go through
-that path when connecting another socket to the original parent
-struct.   Currently the model where tcons hang off smb sessions which
-hang off tcp sessions looks strange when you consider multiple tcp
-connections but have to distinguish the code which connects the first
-tcp session for a machine and sets up the parent structure that all
-the others (tcons and smb sessions) hang off, from the code which
-connects subsequent tcp sessions for multichannel
-
-On Thu, May 15, 2014 at 8:36 AM, Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org> wrote:
-> Won't this need to be undone for multichannel support? The client GUID needs to be the same when connecting multiple channels, a different one will break cross-channel replay detection.
->
-> It's definitely true that if you intend to negotiate a different dialect, then the client  GUID should not be reused.
->
->> -----Original Message-----
->> From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [mailto:linux-cifs-
->> owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org] On Behalf Of Steve French
->> Sent: Tuesday, May 13, 2014 10:49 PM
->> To: Sachin Prabhu
->> Cc: linux-cifs
->> Subject: Re: [PATCH] cifs: Set client guid on per connection basis
->>
->> merged into cifs-2.6.git for-next
->>
->> but added an additional patch to fix the problem where we are sending a
->> non-zero ClientGUID for SMB2.02 dialect (where it MUST be zero according
->> to MS-SMB2, it is non-zero starting in SMB2.1)
->>
->> On Tue, May 13, 2014 at 1:48 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->> wrote:
->> > When mounting from a Windows 2012R2 server, we hit the following
->> > problem:
->> > 1) Mount with any of the following versions - 2.0, 2.1 or 3.0
->> > 2) unmount
->> > 3) Attempt a mount again using a different SMB version >= 2.0.
->> >
->> > You end up with the following failure:
->> > Status code returned 0xc0000203 STATUS_USER_SESSION_DELETED CIFS
->> VFS:
->> > Send error in SessSetup = -5 CIFS VFS: cifs_mount failed w/return code
->> > = -5
->> >
->> > I cannot reproduce this issue using a Windows 2008 R2 server.
->> >
->> > This appears to be caused because we use the same client guid for the
->> > connection on first mount which we then disconnect and attempt to
->> > mount again using a different protocol version. By generating a new
->> > guid each time a new connection is Negotiated, we avoid hitting this
->> problem.
->> >
->> > Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->> > ---
->> >  fs/cifs/cifsfs.c   | 8 --------
->> >  fs/cifs/cifsglob.h | 1 +
->> >  fs/cifs/connect.c  | 3 +++
->> >  fs/cifs/smb2pdu.c  | 5 +++--
->> >  fs/cifs/smb2pdu.h  | 2 --
->> >  5 files changed, 7 insertions(+), 12 deletions(-)
->> >
->> > diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c index
->> > 5be1f99..c80aa5a 100644
->> > --- a/fs/cifs/cifsfs.c
->> > +++ b/fs/cifs/cifsfs.c
->> > @@ -87,10 +87,6 @@ extern mempool_t *cifs_mid_poolp;
->> >
->> >  struct workqueue_struct        *cifsiod_wq;
->> >
->> > -#ifdef CONFIG_CIFS_SMB2
->> > -__u8 cifs_client_guid[SMB2_CLIENT_GUID_SIZE];
->> > -#endif
->> > -
->> >  /*
->> >   * Bumps refcount for cifs super block.
->> >   * Note that it should be only called if a referece to VFS super
->> > block is @@ -1192,10 +1188,6 @@ init_cifs(void)
->> >         spin_lock_init(&cifs_file_list_lock);
->> >         spin_lock_init(&GlobalMid_Lock);
->> >
->> > -#ifdef CONFIG_CIFS_SMB2
->> > -       get_random_bytes(cifs_client_guid, SMB2_CLIENT_GUID_SIZE);
->> > -#endif
->> > -
->> >         if (cifs_max_pending < 2) {
->> >                 cifs_max_pending = 2;
->> >                 cifs_dbg(FYI, "cifs_max_pending set to min of 2\n");
->> > diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h index
->> > 30f6e92..f74edd2 100644
->> > --- a/fs/cifs/cifsglob.h
->> > +++ b/fs/cifs/cifsglob.h
->> > @@ -559,6 +559,7 @@ struct TCP_Server_Info {
->> >         int echo_credits;  /* echo reserved slots */
->> >         int oplock_credits;  /* oplock break reserved slots */
->> >         bool echoes:1; /* enable echoes */
->> > +       __u8 client_guid[SMB2_CLIENT_GUID_SIZE]; /* Client GUID */
->> >  #endif
->> >         u16 dialect; /* dialect index that server chose */
->> >         bool oplocks:1; /* enable oplocks */ diff --git
->> > a/fs/cifs/connect.c b/fs/cifs/connect.c index 8813ff7..8b8fe9b 100644
->> > --- a/fs/cifs/connect.c
->> > +++ b/fs/cifs/connect.c
->> > @@ -2144,6 +2144,9 @@ cifs_get_tcp_session(struct smb_vol
->> *volume_info)
->> >                sizeof(tcp_ses->srcaddr));
->> >         memcpy(&tcp_ses->dstaddr, &volume_info->dstaddr,
->> >                 sizeof(tcp_ses->dstaddr));
->> > +#ifdef CONFIG_CIFS_SMB2
->> > +       get_random_bytes(tcp_ses->client_guid, SMB2_CLIENT_GUID_SIZE);
->> > +#endif
->> >         /*
->> >          * at this point we are the only ones with the pointer
->> >          * to the struct since the kernel thread not created yet diff
->> > --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c index 3802f8c..dc44610
->> > 100644
->> > --- a/fs/cifs/smb2pdu.c
->> > +++ b/fs/cifs/smb2pdu.c
->> > @@ -375,7 +375,7 @@ SMB2_negotiate(const unsigned int xid, struct
->> > cifs_ses *ses)
->> >
->> >         req->Capabilities =
->> > cpu_to_le32(ses->server->vals->req_capabilities);
->> >
->> > -       memcpy(req->ClientGUID, cifs_client_guid,
->> SMB2_CLIENT_GUID_SIZE);
->> > +       memcpy(req->ClientGUID, server->client_guid,
->> > + SMB2_CLIENT_GUID_SIZE);
->> >
->> >         iov[0].iov_base = (char *)req;
->> >         /* 4 for rfc1002 length field */ @@ -478,7 +478,8 @@ int
->> > smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon
->> > *tcon)
->> >
->> >         vneg_inbuf.Capabilities =
->> >                         cpu_to_le32(tcon->ses->server->vals->req_capabilities);
->> > -       memcpy(vneg_inbuf.Guid, cifs_client_guid,
->> SMB2_CLIENT_GUID_SIZE);
->> > +       memcpy(vneg_inbuf.Guid, tcon->ses->server->client_guid,
->> > +                                       SMB2_CLIENT_GUID_SIZE);
->> >
->> >         if (tcon->ses->sign)
->> >                 vneg_inbuf.SecurityMode = diff --git
->> > a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h index 2022c54..743e11e 100644
->> > --- a/fs/cifs/smb2pdu.h
->> > +++ b/fs/cifs/smb2pdu.h
->> > @@ -183,8 +183,6 @@ struct smb2_symlink_err_rsp {
->> >
->> >  #define SMB2_CLIENT_GUID_SIZE 16
->> >
->> > -extern __u8 cifs_client_guid[SMB2_CLIENT_GUID_SIZE];
->> > -
->> >  struct smb2_negotiate_req {
->> >         struct smb2_hdr hdr;
->> >         __le16 StructureSize; /* Must be 36 */
->> > --
->> > 1.8.4.2
->> >
->> > --
->> > To unsubscribe from this list: send the line "unsubscribe linux-cifs"
->> > in the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org More
->> majordomo
->> > info at  http://vger.kernel.org/majordomo-info.html
->>
->>
->>
->> --
->> Thanks,
->>
->> Steve
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in the
->> body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org More majordomo info at
->> http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Thanks,
-
-Steve
+PiBXb3VsZCBtdWx0aWNoYW5uZWwgcmVxdWlyZSBhIG5ldyBuZWdvdGlhdGUgcHJvdG9jb2w/DQoN
+CkEgbmV3IGNvbm5lY3Rpb24gYWx3YXlzIHJlcXVpcmVzIGEgbmVnb3RpYXRlLCBtdWx0aWNoYW5u
+ZWwgaXMgbm8gZXhjZXB0aW9uLiBXaGF0J3MgZGlmZmVyZW50IGlzIHRoYXQgdG8gbWFrZSBhIG11
+bHRpY2hhbm5lbCBhc3NvY2lhdGlvbiwgdGhlIGNsaWVudCBzaG91bGQgcHJvdmlkZSB0aGUgb3Jp
+Z2luYWwgQ2xpZW50R1VJRCwgYW5kIGVzdGFibGlzaCB0aGUgc2FtZSBkaWFsZWN0IGFuZCBjYXBh
+YmlsaXRpZXMgYXMgdGhlIG9yaWdpbmFsIGNvbm5lY3Rpb24uIFRoZSBzZXNzaW9uIGJpbmQgbmVl
+ZHMgdGhlc2UgaW4gb3JkZXIgam9pbiBhcHByb3ByaWF0ZWx5IG9uIHRoZSBuZXcgbXVsdGljaGFu
+bmVsLg0KDQpUaGUgQ2xpZW50R1VJRCBpcyBtb3N0bHkgZm9yIHN1cHBvcnRpbmcgbGVhc2VzLCBh
+bmQgaWYgeW91IHN3aXp6bGUgaXQgcGVyLWNvbm5lY3Rpb24gdGhlbiBjbGllbnRzIHdpbGwgc3Rh
+cnQgYnJlYWtpbmcgdGhlaXIgb3duIGxlYXNlcyB3aGVuIHVzaW5nIG11bHRpY2hhbm5lbC4gVGhl
+cmUgaXMgYWxzbyBzb21lIGVuZm9yY2VtZW50IGF0IHNlc3Npb24gc2V0dXAvYmluZCB0aW1lLCBh
+cyBkb2N1bWVudGVkIGluIE1TLVNNQjIgMy4zLjUuMy4zOg0KDQoiVGhlIHNlcnZlciBNVVNUIGxv
+b2sgdXAgYWxsIGV4aXN0aW5nIGNvbm5lY3Rpb25zIGZyb20gdGhlIGNsaWVudCBpbiB0aGUgZ2xv
+YmFsIENvbm5lY3Rpb25MaXN0IHdoZXJlIENvbm5lY3Rpb24uQ2xpZW50R3VpZCBtYXRjaGVzIFNl
+c3Npb24uQ29ubmVjdGlvbi5DbGllbnRHdWlkLiBGb3IgYW55IG1hdGNoaW5nIENvbm5lY3Rpb24s
+IGlmIENvbm5lY3Rpb24uRGlhbGVjdCBpcyBub3QgdGhlIHNhbWUgYXMgU2Vzc2lvbi5Db25uZWN0
+aW9uLkRpYWxlY3QsIHRoZSBzZXJ2ZXIgU0hPVUxEPDIyOD4gY2xvc2UgdGhlIG5ld2x5IGNyZWF0
+ZWQgU2Vzc2lvbiwgYXMgc3BlY2lmaWVkIGluIHNlY3Rpb24gMy4zLjQuMTIsIGJ5IHByb3ZpZGlu
+ZyBTZXNzaW9uLlNlc3Npb25HbG9iYWxJZCBhcyB0aGUgaW5wdXQgcGFyYW1ldGVyLCBhbmQgZmFp
+bCB0aGUgc2Vzc2lvbiBzZXR1cCByZXF1ZXN0IHdpdGggU1RBVFVTX1VTRVJfU0VTU0lPTl9ERUxF
+VEVELiINCg0KDQpJIGd1ZXNzIGlmIHlvdSBvbmx5IGNhbGwgZ2V0X3RjcF9zZXNzaW9uIG9uY2Us
+IHRoZW4geW91IG1pZ2h0IGJlIG9rICh0aGF0J3MgeW91ciBjYWxsKS4gSSB3YXMganVzdCBwb2lu
+dGluZyBvdXQgdGhhdCBhIG5ldyBDbGllbnRHVUlEIHBlci0qY29ubmVjdGlvbiogd2lsbCBnZXQg
+aW4gdGhlIHdheSBmb3IgeW91IGxhdGVyLCBiZWNhdXNlIG11bHRpY2hhbm5lbCByZXVzZXMgc2Vz
+c2lvbnMgb24gbWFueSBjb25uZWN0aW9ucy4gTm9ybWFsbHkgdGhlIHByb3RvY29sIHNwZWNpZmll
+cyBhIHNpbmdsZSBDbGllbnRHVUlEIHdoaWNoIGlzIHVzZWQgZm9yIGFsbCBjb25uZWN0aW9ucyBm
+cm9tIGEgZ2l2ZW4gY2xpZW50Lg0KDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4g
+RnJvbTogU3RldmUgRnJlbmNoIFttYWlsdG86c21mcmVuY2hAZ21haWwuY29tXQ0KPiBTZW50OiBU
+aHVyc2RheSwgTWF5IDE1LCAyMDE0IDEwOjEyIEFNDQo+IFRvOiBUb20gVGFscGV5DQo+IENjOiBT
+YWNoaW4gUHJhYmh1OyBsaW51eC1jaWZzDQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0hdIGNpZnM6IFNl
+dCBjbGllbnQgZ3VpZCBvbiBwZXIgY29ubmVjdGlvbiBiYXNpcw0KPiANCj4gV291bGQgbXVsdGlj
+aGFubmVsIHJlcXVpcmUgYSBuZXcgbmVnb3RpYXRlIHByb3RvY29sPyBXZSBhcmUgb25seQ0KPiBn
+ZW5lcmF0aW5nIGl0IGluIGdldF90Y3Bfc2Vzc2lvbiAtIGFuZCB3b3VsZCBwcm9iYWJseSBub3Qg
+Z28gdGhyb3VnaCB0aGF0DQo+IHBhdGggd2hlbiBjb25uZWN0aW5nIGFub3RoZXIgc29ja2V0IHRv
+IHRoZSBvcmlnaW5hbCBwYXJlbnQNCj4gc3RydWN0LiAgIEN1cnJlbnRseSB0aGUgbW9kZWwgd2hl
+cmUgdGNvbnMgaGFuZyBvZmYgc21iIHNlc3Npb25zIHdoaWNoDQo+IGhhbmcgb2ZmIHRjcCBzZXNz
+aW9ucyBsb29rcyBzdHJhbmdlIHdoZW4geW91IGNvbnNpZGVyIG11bHRpcGxlIHRjcA0KPiBjb25u
+ZWN0aW9ucyBidXQgaGF2ZSB0byBkaXN0aW5ndWlzaCB0aGUgY29kZSB3aGljaCBjb25uZWN0cyB0
+aGUgZmlyc3QgdGNwDQo+IHNlc3Npb24gZm9yIGEgbWFjaGluZSBhbmQgc2V0cyB1cCB0aGUgcGFy
+ZW50IHN0cnVjdHVyZSB0aGF0IGFsbCB0aGUgb3RoZXJzDQo+ICh0Y29ucyBhbmQgc21iIHNlc3Np
+b25zKSBoYW5nIG9mZiwgZnJvbSB0aGUgY29kZSB3aGljaCBjb25uZWN0cw0KPiBzdWJzZXF1ZW50
+IHRjcCBzZXNzaW9ucyBmb3IgbXVsdGljaGFubmVsDQo+IA0KPiBPbiBUaHUsIE1heSAxNSwgMjAx
+NCBhdCA4OjM2IEFNLCBUb20gVGFscGV5IDx0dGFscGV5QG1pY3Jvc29mdC5jb20+DQo+IHdyb3Rl
+Og0KPiA+IFdvbid0IHRoaXMgbmVlZCB0byBiZSB1bmRvbmUgZm9yIG11bHRpY2hhbm5lbCBzdXBw
+b3J0PyBUaGUgY2xpZW50IEdVSUQNCj4gbmVlZHMgdG8gYmUgdGhlIHNhbWUgd2hlbiBjb25uZWN0
+aW5nIG11bHRpcGxlIGNoYW5uZWxzLCBhIGRpZmZlcmVudCBvbmUNCj4gd2lsbCBicmVhayBjcm9z
+cy1jaGFubmVsIHJlcGxheSBkZXRlY3Rpb24uDQo+ID4NCj4gPiBJdCdzIGRlZmluaXRlbHkgdHJ1
+ZSB0aGF0IGlmIHlvdSBpbnRlbmQgdG8gbmVnb3RpYXRlIGEgZGlmZmVyZW50IGRpYWxlY3QsIHRo
+ZW4NCj4gdGhlIGNsaWVudCAgR1VJRCBzaG91bGQgbm90IGJlIHJldXNlZC4NCj4gPg0KPiA+PiAt
+LS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+PiBGcm9tOiBsaW51eC1jaWZzLW93bmVyQHZn
+ZXIua2VybmVsLm9yZyBbbWFpbHRvOmxpbnV4LWNpZnMtDQo+ID4+IG93bmVyQHZnZXIua2VybmVs
+Lm9yZ10gT24gQmVoYWxmIE9mIFN0ZXZlIEZyZW5jaA0KPiA+PiBTZW50OiBUdWVzZGF5LCBNYXkg
+MTMsIDIwMTQgMTA6NDkgUE0NCj4gPj4gVG86IFNhY2hpbiBQcmFiaHUNCj4gPj4gQ2M6IGxpbnV4
+LWNpZnMNCj4gPj4gU3ViamVjdDogUmU6IFtQQVRDSF0gY2lmczogU2V0IGNsaWVudCBndWlkIG9u
+IHBlciBjb25uZWN0aW9uIGJhc2lzDQo+ID4+DQo+ID4+IG1lcmdlZCBpbnRvIGNpZnMtMi42Lmdp
+dCBmb3ItbmV4dA0KPiA+Pg0KPiA+PiBidXQgYWRkZWQgYW4gYWRkaXRpb25hbCBwYXRjaCB0byBm
+aXggdGhlIHByb2JsZW0gd2hlcmUgd2UgYXJlIHNlbmRpbmcNCj4gPj4gYSBub24temVybyBDbGll
+bnRHVUlEIGZvciBTTUIyLjAyIGRpYWxlY3QgKHdoZXJlIGl0IE1VU1QgYmUgemVybw0KPiA+PiBh
+Y2NvcmRpbmcgdG8gTVMtU01CMiwgaXQgaXMgbm9uLXplcm8gc3RhcnRpbmcgaW4gU01CMi4xKQ0K
+PiA+Pg0KPiA+PiBPbiBUdWUsIE1heSAxMywgMjAxNCBhdCAxOjQ4IEFNLCBTYWNoaW4gUHJhYmh1
+IDxzcHJhYmh1QHJlZGhhdC5jb20+DQo+ID4+IHdyb3RlOg0KPiA+PiA+IFdoZW4gbW91bnRpbmcg
+ZnJvbSBhIFdpbmRvd3MgMjAxMlIyIHNlcnZlciwgd2UgaGl0IHRoZSBmb2xsb3dpbmcNCj4gPj4g
+PiBwcm9ibGVtOg0KPiA+PiA+IDEpIE1vdW50IHdpdGggYW55IG9mIHRoZSBmb2xsb3dpbmcgdmVy
+c2lvbnMgLSAyLjAsIDIuMSBvciAzLjANCj4gPj4gPiAyKSB1bm1vdW50DQo+ID4+ID4gMykgQXR0
+ZW1wdCBhIG1vdW50IGFnYWluIHVzaW5nIGEgZGlmZmVyZW50IFNNQiB2ZXJzaW9uID49IDIuMC4N
+Cj4gPj4gPg0KPiA+PiA+IFlvdSBlbmQgdXAgd2l0aCB0aGUgZm9sbG93aW5nIGZhaWx1cmU6DQo+
+ID4+ID4gU3RhdHVzIGNvZGUgcmV0dXJuZWQgMHhjMDAwMDIwMyBTVEFUVVNfVVNFUl9TRVNTSU9O
+X0RFTEVURUQgQ0lGUw0KPiA+PiBWRlM6DQo+ID4+ID4gU2VuZCBlcnJvciBpbiBTZXNzU2V0dXAg
+PSAtNSBDSUZTIFZGUzogY2lmc19tb3VudCBmYWlsZWQgdy9yZXR1cm4NCj4gPj4gPiBjb2RlID0g
+LTUNCj4gPj4gPg0KPiA+PiA+IEkgY2Fubm90IHJlcHJvZHVjZSB0aGlzIGlzc3VlIHVzaW5nIGEg
+V2luZG93cyAyMDA4IFIyIHNlcnZlci4NCj4gPj4gPg0KPiA+PiA+IFRoaXMgYXBwZWFycyB0byBi
+ZSBjYXVzZWQgYmVjYXVzZSB3ZSB1c2UgdGhlIHNhbWUgY2xpZW50IGd1aWQgZm9yDQo+ID4+ID4g
+dGhlIGNvbm5lY3Rpb24gb24gZmlyc3QgbW91bnQgd2hpY2ggd2UgdGhlbiBkaXNjb25uZWN0IGFu
+ZCBhdHRlbXB0DQo+ID4+ID4gdG8gbW91bnQgYWdhaW4gdXNpbmcgYSBkaWZmZXJlbnQgcHJvdG9j
+b2wgdmVyc2lvbi4gQnkgZ2VuZXJhdGluZyBhDQo+ID4+ID4gbmV3IGd1aWQgZWFjaCB0aW1lIGEg
+bmV3IGNvbm5lY3Rpb24gaXMgTmVnb3RpYXRlZCwgd2UgYXZvaWQgaGl0dGluZw0KPiA+PiA+IHRo
+aXMNCj4gPj4gcHJvYmxlbS4NCj4gPj4gPg0KPiA+PiA+IFNpZ25lZC1vZmYtYnk6IFNhY2hpbiBQ
+cmFiaHUgPHNwcmFiaHVAcmVkaGF0LmNvbT4NCj4gPj4gPiAtLS0NCj4gPj4gPiAgZnMvY2lmcy9j
+aWZzZnMuYyAgIHwgOCAtLS0tLS0tLQ0KPiA+PiA+ICBmcy9jaWZzL2NpZnNnbG9iLmggfCAxICsN
+Cj4gPj4gPiAgZnMvY2lmcy9jb25uZWN0LmMgIHwgMyArKysNCj4gPj4gPiAgZnMvY2lmcy9zbWIy
+cGR1LmMgIHwgNSArKystLQ0KPiA+PiA+ICBmcy9jaWZzL3NtYjJwZHUuaCAgfCAyIC0tDQo+ID4+
+ID4gIDUgZmlsZXMgY2hhbmdlZCwgNyBpbnNlcnRpb25zKCspLCAxMiBkZWxldGlvbnMoLSkNCj4g
+Pj4gPg0KPiA+PiA+IGRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNmcy5jIGIvZnMvY2lmcy9jaWZz
+ZnMuYyBpbmRleA0KPiA+PiA+IDViZTFmOTkuLmM4MGFhNWEgMTAwNjQ0DQo+ID4+ID4gLS0tIGEv
+ZnMvY2lmcy9jaWZzZnMuYw0KPiA+PiA+ICsrKyBiL2ZzL2NpZnMvY2lmc2ZzLmMNCj4gPj4gPiBA
+QCAtODcsMTAgKzg3LDYgQEAgZXh0ZXJuIG1lbXBvb2xfdCAqY2lmc19taWRfcG9vbHA7DQo+ID4+
+ID4NCj4gPj4gPiAgc3RydWN0IHdvcmtxdWV1ZV9zdHJ1Y3QgICAgICAgICpjaWZzaW9kX3dxOw0K
+PiA+PiA+DQo+ID4+ID4gLSNpZmRlZiBDT05GSUdfQ0lGU19TTUIyDQo+ID4+ID4gLV9fdTggY2lm
+c19jbGllbnRfZ3VpZFtTTUIyX0NMSUVOVF9HVUlEX1NJWkVdOw0KPiA+PiA+IC0jZW5kaWYNCj4g
+Pj4gPiAtDQo+ID4+ID4gIC8qDQo+ID4+ID4gICAqIEJ1bXBzIHJlZmNvdW50IGZvciBjaWZzIHN1
+cGVyIGJsb2NrLg0KPiA+PiA+ICAgKiBOb3RlIHRoYXQgaXQgc2hvdWxkIGJlIG9ubHkgY2FsbGVk
+IGlmIGEgcmVmZXJlY2UgdG8gVkZTIHN1cGVyDQo+ID4+ID4gYmxvY2sgaXMgQEAgLTExOTIsMTAg
+KzExODgsNiBAQCBpbml0X2NpZnModm9pZCkNCj4gPj4gPiAgICAgICAgIHNwaW5fbG9ja19pbml0
+KCZjaWZzX2ZpbGVfbGlzdF9sb2NrKTsNCj4gPj4gPiAgICAgICAgIHNwaW5fbG9ja19pbml0KCZH
+bG9iYWxNaWRfTG9jayk7DQo+ID4+ID4NCj4gPj4gPiAtI2lmZGVmIENPTkZJR19DSUZTX1NNQjIN
+Cj4gPj4gPiAtICAgICAgIGdldF9yYW5kb21fYnl0ZXMoY2lmc19jbGllbnRfZ3VpZCwgU01CMl9D
+TElFTlRfR1VJRF9TSVpFKTsNCj4gPj4gPiAtI2VuZGlmDQo+ID4+ID4gLQ0KPiA+PiA+ICAgICAg
+ICAgaWYgKGNpZnNfbWF4X3BlbmRpbmcgPCAyKSB7DQo+ID4+ID4gICAgICAgICAgICAgICAgIGNp
+ZnNfbWF4X3BlbmRpbmcgPSAyOw0KPiA+PiA+ICAgICAgICAgICAgICAgICBjaWZzX2RiZyhGWUks
+ICJjaWZzX21heF9wZW5kaW5nIHNldCB0byBtaW4gb2YNCj4gPj4gPiAyXG4iKTsgZGlmZiAtLWdp
+dCBhL2ZzL2NpZnMvY2lmc2dsb2IuaCBiL2ZzL2NpZnMvY2lmc2dsb2IuaCBpbmRleA0KPiA+PiA+
+IDMwZjZlOTIuLmY3NGVkZDIgMTAwNjQ0DQo+ID4+ID4gLS0tIGEvZnMvY2lmcy9jaWZzZ2xvYi5o
+DQo+ID4+ID4gKysrIGIvZnMvY2lmcy9jaWZzZ2xvYi5oDQo+ID4+ID4gQEAgLTU1OSw2ICs1NTks
+NyBAQCBzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvIHsNCj4gPj4gPiAgICAgICAgIGludCBlY2hvX2Ny
+ZWRpdHM7ICAvKiBlY2hvIHJlc2VydmVkIHNsb3RzICovDQo+ID4+ID4gICAgICAgICBpbnQgb3Bs
+b2NrX2NyZWRpdHM7ICAvKiBvcGxvY2sgYnJlYWsgcmVzZXJ2ZWQgc2xvdHMgKi8NCj4gPj4gPiAg
+ICAgICAgIGJvb2wgZWNob2VzOjE7IC8qIGVuYWJsZSBlY2hvZXMgKi8NCj4gPj4gPiArICAgICAg
+IF9fdTggY2xpZW50X2d1aWRbU01CMl9DTElFTlRfR1VJRF9TSVpFXTsgLyogQ2xpZW50IEdVSUQg
+Ki8NCj4gPj4gPiAgI2VuZGlmDQo+ID4+ID4gICAgICAgICB1MTYgZGlhbGVjdDsgLyogZGlhbGVj
+dCBpbmRleCB0aGF0IHNlcnZlciBjaG9zZSAqLw0KPiA+PiA+ICAgICAgICAgYm9vbCBvcGxvY2tz
+OjE7IC8qIGVuYWJsZSBvcGxvY2tzICovIGRpZmYgLS1naXQNCj4gPj4gPiBhL2ZzL2NpZnMvY29u
+bmVjdC5jIGIvZnMvY2lmcy9jb25uZWN0LmMgaW5kZXggODgxM2ZmNy4uOGI4ZmU5Yg0KPiA+PiA+
+IDEwMDY0NA0KPiA+PiA+IC0tLSBhL2ZzL2NpZnMvY29ubmVjdC5jDQo+ID4+ID4gKysrIGIvZnMv
+Y2lmcy9jb25uZWN0LmMNCj4gPj4gPiBAQCAtMjE0NCw2ICsyMTQ0LDkgQEAgY2lmc19nZXRfdGNw
+X3Nlc3Npb24oc3RydWN0IHNtYl92b2wNCj4gPj4gKnZvbHVtZV9pbmZvKQ0KPiA+PiA+ICAgICAg
+ICAgICAgICAgIHNpemVvZih0Y3Bfc2VzLT5zcmNhZGRyKSk7DQo+ID4+ID4gICAgICAgICBtZW1j
+cHkoJnRjcF9zZXMtPmRzdGFkZHIsICZ2b2x1bWVfaW5mby0+ZHN0YWRkciwNCj4gPj4gPiAgICAg
+ICAgICAgICAgICAgc2l6ZW9mKHRjcF9zZXMtPmRzdGFkZHIpKTsNCj4gPj4gPiArI2lmZGVmIENP
+TkZJR19DSUZTX1NNQjINCj4gPj4gPiArICAgICAgIGdldF9yYW5kb21fYnl0ZXModGNwX3Nlcy0+
+Y2xpZW50X2d1aWQsDQo+ID4+ID4gK1NNQjJfQ0xJRU5UX0dVSURfU0laRSk7ICNlbmRpZg0KPiA+
+PiA+ICAgICAgICAgLyoNCj4gPj4gPiAgICAgICAgICAqIGF0IHRoaXMgcG9pbnQgd2UgYXJlIHRo
+ZSBvbmx5IG9uZXMgd2l0aCB0aGUgcG9pbnRlcg0KPiA+PiA+ICAgICAgICAgICogdG8gdGhlIHN0
+cnVjdCBzaW5jZSB0aGUga2VybmVsIHRocmVhZCBub3QgY3JlYXRlZCB5ZXQNCj4gPj4gPiBkaWZm
+IC0tZ2l0IGEvZnMvY2lmcy9zbWIycGR1LmMgYi9mcy9jaWZzL3NtYjJwZHUuYyBpbmRleA0KPiA+
+PiA+IDM4MDJmOGMuLmRjNDQ2MTANCj4gPj4gPiAxMDA2NDQNCj4gPj4gPiAtLS0gYS9mcy9jaWZz
+L3NtYjJwZHUuYw0KPiA+PiA+ICsrKyBiL2ZzL2NpZnMvc21iMnBkdS5jDQo+ID4+ID4gQEAgLTM3
+NSw3ICszNzUsNyBAQCBTTUIyX25lZ290aWF0ZShjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1
+Y3QNCj4gPj4gPiBjaWZzX3NlcyAqc2VzKQ0KPiA+PiA+DQo+ID4+ID4gICAgICAgICByZXEtPkNh
+cGFiaWxpdGllcyA9DQo+ID4+ID4gY3B1X3RvX2xlMzIoc2VzLT5zZXJ2ZXItPnZhbHMtPnJlcV9j
+YXBhYmlsaXRpZXMpOw0KPiA+PiA+DQo+ID4+ID4gLSAgICAgICBtZW1jcHkocmVxLT5DbGllbnRH
+VUlELCBjaWZzX2NsaWVudF9ndWlkLA0KPiA+PiBTTUIyX0NMSUVOVF9HVUlEX1NJWkUpOw0KPiA+
+PiA+ICsgICAgICAgbWVtY3B5KHJlcS0+Q2xpZW50R1VJRCwgc2VydmVyLT5jbGllbnRfZ3VpZCwN
+Cj4gPj4gPiArIFNNQjJfQ0xJRU5UX0dVSURfU0laRSk7DQo+ID4+ID4NCj4gPj4gPiAgICAgICAg
+IGlvdlswXS5pb3ZfYmFzZSA9IChjaGFyICopcmVxOw0KPiA+PiA+ICAgICAgICAgLyogNCBmb3Ig
+cmZjMTAwMiBsZW5ndGggZmllbGQgKi8gQEAgLTQ3OCw3ICs0NzgsOCBAQCBpbnQNCj4gPj4gPiBz
+bWIzX3ZhbGlkYXRlX25lZ290aWF0ZShjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1Y3QgY2lm
+c190Y29uDQo+ID4+ID4gKnRjb24pDQo+ID4+ID4NCj4gPj4gPiAgICAgICAgIHZuZWdfaW5idWYu
+Q2FwYWJpbGl0aWVzID0NCj4gPj4gPiAgICAgICAgICAgICAgICAgICAgICAgICBjcHVfdG9fbGUz
+Mih0Y29uLT5zZXMtPnNlcnZlci0+dmFscy0+cmVxX2NhcGFiaWxpdGllcyk7DQo+ID4+ID4gLSAg
+ICAgICBtZW1jcHkodm5lZ19pbmJ1Zi5HdWlkLCBjaWZzX2NsaWVudF9ndWlkLA0KPiA+PiBTTUIy
+X0NMSUVOVF9HVUlEX1NJWkUpOw0KPiA+PiA+ICsgICAgICAgbWVtY3B5KHZuZWdfaW5idWYuR3Vp
+ZCwgdGNvbi0+c2VzLT5zZXJ2ZXItPmNsaWVudF9ndWlkLA0KPiA+PiA+ICsgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBTTUIyX0NMSUVOVF9HVUlEX1NJWkUpOw0KPiA+PiA+
+DQo+ID4+ID4gICAgICAgICBpZiAodGNvbi0+c2VzLT5zaWduKQ0KPiA+PiA+ICAgICAgICAgICAg
+ICAgICB2bmVnX2luYnVmLlNlY3VyaXR5TW9kZSA9IGRpZmYgLS1naXQNCj4gPj4gPiBhL2ZzL2Np
+ZnMvc21iMnBkdS5oIGIvZnMvY2lmcy9zbWIycGR1LmggaW5kZXggMjAyMmM1NC4uNzQzZTExZQ0K
+PiA+PiA+IDEwMDY0NA0KPiA+PiA+IC0tLSBhL2ZzL2NpZnMvc21iMnBkdS5oDQo+ID4+ID4gKysr
+IGIvZnMvY2lmcy9zbWIycGR1LmgNCj4gPj4gPiBAQCAtMTgzLDggKzE4Myw2IEBAIHN0cnVjdCBz
+bWIyX3N5bWxpbmtfZXJyX3JzcCB7DQo+ID4+ID4NCj4gPj4gPiAgI2RlZmluZSBTTUIyX0NMSUVO
+VF9HVUlEX1NJWkUgMTYNCj4gPj4gPg0KPiA+PiA+IC1leHRlcm4gX191OCBjaWZzX2NsaWVudF9n
+dWlkW1NNQjJfQ0xJRU5UX0dVSURfU0laRV07DQo+ID4+ID4gLQ0KPiA+PiA+ICBzdHJ1Y3Qgc21i
+Ml9uZWdvdGlhdGVfcmVxIHsNCj4gPj4gPiAgICAgICAgIHN0cnVjdCBzbWIyX2hkciBoZHI7DQo+
+ID4+ID4gICAgICAgICBfX2xlMTYgU3RydWN0dXJlU2l6ZTsgLyogTXVzdCBiZSAzNiAqLw0KPiA+
+PiA+IC0tDQo+ID4+ID4gMS44LjQuMg0KPiA+PiA+DQo+ID4+ID4gLS0NCj4gPj4gPiBUbyB1bnN1
+YnNjcmliZSBmcm9tIHRoaXMgbGlzdDogc2VuZCB0aGUgbGluZSAidW5zdWJzY3JpYmUgbGludXgt
+Y2lmcyINCj4gPj4gPiBpbiB0aGUgYm9keSBvZiBhIG1lc3NhZ2UgdG8gbWFqb3Jkb21vQHZnZXIu
+a2VybmVsLm9yZyBNb3JlDQo+ID4+IG1ham9yZG9tbw0KPiA+PiA+IGluZm8gYXQgIGh0dHA6Ly92
+Z2VyLmtlcm5lbC5vcmcvbWFqb3Jkb21vLWluZm8uaHRtbA0KPiA+Pg0KPiA+Pg0KPiA+Pg0KPiA+
+PiAtLQ0KPiA+PiBUaGFua3MsDQo+ID4+DQo+ID4+IFN0ZXZlDQo+ID4+IC0tDQo+ID4+IFRvIHVu
+c3Vic2NyaWJlIGZyb20gdGhpcyBsaXN0OiBzZW5kIHRoZSBsaW5lICJ1bnN1YnNjcmliZSBsaW51
+eC1jaWZzIg0KPiA+PiBpbiB0aGUgYm9keSBvZiBhIG1lc3NhZ2UgdG8gbWFqb3Jkb21vQHZnZXIu
+a2VybmVsLm9yZyBNb3JlDQo+IG1ham9yZG9tbw0KPiA+PiBpbmZvIGF0IGh0dHA6Ly92Z2VyLmtl
+cm5lbC5vcmcvbWFqb3Jkb21vLWluZm8uaHRtbA0KPiANCj4gDQo+IA0KPiAtLQ0KPiBUaGFua3Ms
+DQo+IA0KPiBTdGV2ZQ0K
