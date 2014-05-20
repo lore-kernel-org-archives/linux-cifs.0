@@ -1,49 +1,31 @@
-From: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
-Subject: re: cifs: sanitize username handling
-Date: Mon, 19 May 2014 23:33:33 +0300
-Message-ID: <20140519203333.GA5671@mwanda>
+From: Steve French <smfrench@gmail.com>
+Subject: cifs kernel updates by release posted
+Date: Mon, 19 May 2014 23:11:58 -0500
+Message-ID: <CAH2r5murKXCeXDnBnfgZ7k2KiHY0LG10v8ktGnAxwzgx9Ek-0Q@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+To: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+	samba-technical <samba-technical@lists.samba.org>
+Return-path: <samba-technical-bounces@lists.samba.org>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Sender: samba-technical-bounces@lists.samba.org
+Errors-To: samba-technical-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-Hello Jeff Layton,
+FYI - wiki updated with cifs kernel updates by kernel release
 
-The patch 04febabcf55b: "cifs: sanitize username handling" from Jan
-17, 2012, leads to the following static checker warning:
+https://wiki.samba.org/index.php/LinuxCIFSKernel
 
-	fs/cifs/connect.c:2231 match_session()
-	error: we previously assumed 'vol->username' could be null (see line 2228)
+and
 
-fs/cifs/connect.c
-  2219                  /* NULL username means anonymous session */
-  2220                  if (ses->user_name == NULL) {
-  2221                          if (!vol->nullauth)
-  2222                                  return 0;
-  2223                          break;
-  2224                  }
-  2225  
-  2226                  /* anything else takes username/password */
-  2227                  if (strncmp(ses->user_name,
-  2228                              vol->username ? vol->username : "",
-                                    ^^^^^^^^^^^^^
-We added this check for vol->username here.
+parent page is at https://wiki.samba.org/index.php/LinuxCIFS
 
-  2229                              CIFS_MAX_USERNAME_LEN))
-  2230                          return 0;
-  2231                  if (strlen(vol->username) != 0 &&
-                                   ^^^^^^^^^^^^^
-But this dereference is not checked.
 
-  2232                      ses->password != NULL &&
-  2233                      strncmp(ses->password,
-  2234                              vol->password ? vol->password : "",
-  2235                              CIFS_MAX_PASSWORD_LEN))
-  2236                          return 0;
+-- 
+Thanks,
 
-regards,
-dan carpenter
+Steve
