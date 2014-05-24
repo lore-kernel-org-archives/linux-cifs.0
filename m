@@ -1,32 +1,59 @@
-From: Jeremy Allison <jra@samba.org>
-Subject: Re: GSoC 2014: Welcome Pavel!
-Date: Fri, 23 May 2014 13:45:15 -0700
-Message-ID: <20140523204515.GC2773@samba2>
-References: <20140523122604.33f691fd@plati.site>
-Reply-To: Jeremy Allison <jra@samba.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>, "samba-technical@samba.org" <samba-technical@samba.org>
-To: David Disseldorp <ddiss@suse.de>
-Return-path: <samba-technical-bounces@lists.samba.org>
-Content-Disposition: inline
-In-Reply-To: <20140523122604.33f691fd@plati.site>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
+From: Pavel Shilovsky <pshilovsky@samba.org>
+Subject: [PATCH] CIFS: Fix memory leaks in SMB2_open
+Date: Sat, 24 May 2014 16:42:02 +0400
+Message-ID: <1400935322-5157-1-git-send-email-pshilovsky@samba.org>
+Cc: stable@vger.kernel.org
+To: linux-cifs@vger.kernel.org
+Return-path: <stable-owner@vger.kernel.org>
+Sender: stable-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Fri, May 23, 2014 at 12:26:04PM +0200, David Disseldorp wrote:
-> For those who aren't aware, Pavel is joining us again for Google Summer
-> of Code 2014. He'll be working on cifs.ko SMB3 multicredit support and
-> a test build verification system.
-> 
-> Welcome Pavel!
+Cc: <stable@vger.kernel.org> # v3.12+
+Signed-off-by: Pavel Shilovsky <pshilovsky@samba.org>
+---
+ fs/cifs/smb2pdu.c |    7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Great news ! Welcome Pavel and thanks for helping us !
-
-Jeremy.
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index b0037b6..b0b260d 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1097,6 +1097,7 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
+ 	int rc = 0;
+ 	unsigned int num_iovecs = 2;
+ 	__u32 file_attributes = 0;
++	char *dhc_buf = NULL, *lc_buf = NULL;
+ 
+ 	cifs_dbg(FYI, "create/open\n");
+ 
+@@ -1163,6 +1164,7 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
+ 			kfree(copy_path);
+ 			return rc;
+ 		}
++		lc_buf = iov[num_iovecs-1].iov_base;
+ 	}
+ 
+ 	if (*oplock == SMB2_OPLOCK_LEVEL_BATCH) {
+@@ -1177,9 +1179,10 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
+ 		if (rc) {
+ 			cifs_small_buf_release(req);
+ 			kfree(copy_path);
+-			kfree(iov[num_iovecs-1].iov_base);
++			kfree(lc_buf);
+ 			return rc;
+ 		}
++		dhc_buf = iov[num_iovecs-1].iov_base;
+ 	}
+ 
+ 	rc = SendReceive2(xid, ses, iov, num_iovecs, &resp_buftype, 0);
+@@ -1211,6 +1214,8 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
+ 		*oplock = rsp->OplockLevel;
+ creat_exit:
+ 	kfree(copy_path);
++	kfree(lc_buf);
++	kfree(dhc_buf);
+ 	free_rsp_buf(resp_buftype, rsp);
+ 	return rc;
+ }
+-- 
+1.7.10.4
