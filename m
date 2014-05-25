@@ -1,59 +1,48 @@
-From: Pavel Shilovsky <pshilovsky@samba.org>
-Subject: [PATCH] CIFS: Fix memory leaks in SMB2_open
-Date: Sat, 24 May 2014 16:42:02 +0400
-Message-ID: <1400935322-5157-1-git-send-email-pshilovsky@samba.org>
-Cc: stable@vger.kernel.org
-To: linux-cifs@vger.kernel.org
-Return-path: <stable-owner@vger.kernel.org>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: HUSAM AL SAYED <husamal60-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Your Urgent reply.
+Date: Sun, 25 May 2014 22:30:24 +0400
+Message-ID: <CAP1pScjUozBKbT6S8bBKW7KWc3Vy1K-iGb+dSAjuThgAMyUV6A__26080.1842822277$1401042636$gmane$org@mail.gmail.com>
+Reply-To: Husamalsayed-NQqDYL4TTn4@public.gmane.org
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+To: undisclosed-recipients:;
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Cc: <stable@vger.kernel.org> # v3.12+
-Signed-off-by: Pavel Shilovsky <pshilovsky@samba.org>
----
- fs/cifs/smb2pdu.c |    7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+Dear Friend,
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index b0037b6..b0b260d 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -1097,6 +1097,7 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
- 	int rc = 0;
- 	unsigned int num_iovecs = 2;
- 	__u32 file_attributes = 0;
-+	char *dhc_buf = NULL, *lc_buf = NULL;
- 
- 	cifs_dbg(FYI, "create/open\n");
- 
-@@ -1163,6 +1164,7 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
- 			kfree(copy_path);
- 			return rc;
- 		}
-+		lc_buf = iov[num_iovecs-1].iov_base;
- 	}
- 
- 	if (*oplock == SMB2_OPLOCK_LEVEL_BATCH) {
-@@ -1177,9 +1179,10 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
- 		if (rc) {
- 			cifs_small_buf_release(req);
- 			kfree(copy_path);
--			kfree(iov[num_iovecs-1].iov_base);
-+			kfree(lc_buf);
- 			return rc;
- 		}
-+		dhc_buf = iov[num_iovecs-1].iov_base;
- 	}
- 
- 	rc = SendReceive2(xid, ses, iov, num_iovecs, &resp_buftype, 0);
-@@ -1211,6 +1214,8 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
- 		*oplock = rsp->OplockLevel;
- creat_exit:
- 	kfree(copy_path);
-+	kfree(lc_buf);
-+	kfree(dhc_buf);
- 	free_rsp_buf(resp_buftype, rsp);
- 	return rc;
- }
--- 
-1.7.10.4
+
+
+Compliments of the day.This mail May be a surprise to you Because you
+did not give me the permission to do so and Neither do you know me but
+before I tell you about myself I want you to please forgive me for
+sending this mail without your permission I have been in search of
+someone with this last name so when I saw you online, I was pushed to
+contact you and see how best we can assist each other. I am Mr. Husam
+Al Sayed, a Bank Officer here in U.A.E. I believe it is the wish of
+God for me to come across you now. I am having an important business
+discussion I wish to share with you which I  believe will interest
+you, because it is in connection with your last name and you are going
+to benefit from it.
+
+One Late peter who was among the death victims in the May 27 2006
+Earthquake disaster in Java, Indonesia that killed over 5,000 people.
+He was in Indonesia on a business trip and that was how he met his
+end. My bank management is yet to know about his death, I knew about
+it because he was my friend and I am his account officer.he did not
+mention any Next of Kin/ Heir when the account was opened, and he was
+not married and no children. Last week my Bank Management requested
+that he should give instructions on what to do about his funds,I know
+this will happen and that is why I have been looking for a means to
+handle the situation,
+
+If you are interested send me your private Email Address so that i can
+send you more details of the transaction,
+Thanks for your understanding
+
+I am waiting for your reply.
+
+Best regards,
+
+Mr. Husam Al Sayed
