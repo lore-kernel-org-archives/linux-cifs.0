@@ -1,71 +1,62 @@
-From: cora93576-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: Re: Guaranteed Top 10 Google Placements mail-archive.com In 100 Days
-Date: Tue, 3 Jun 2014 23:41:58 -0700
-Message-ID: <538e0ff4.43bd440a.5d59.646b@mx.google.com>
-Reply-To: reveille48519-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>
+Subject: Re: [RFC 00/32] making inode time stamps y2038 ready
+Date: Wed, 4 Jun 2014 07:38:02 +1000
+Message-ID: <20140603213802.GH14410@dastard>
+References: <1401480116-1973111-1-git-send-email-arnd@arndb.de>
+ <7175692.dpgYFMbTaP@wuerfel>
+ <538CF346.2070504@zytor.com>
+ <5011138.W0gbOc20Qp@wuerfel>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=us-ascii
+Cc: "H. Peter Anvin" <hpa-YMNOUZJC4hwAvxtiuMwx3w@public.gmane.org>,
+	"Joseph S. Myers" <joseph-qD8j1LwMmJjtCj0u4l0SBw@public.gmane.org>,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-arch-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	john.stultz-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org, tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org,
+	geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org, lftan-EIB2kfCEclfQT0dZR+AlfA@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, coda-ETDLCGt7PQU3uPMLIKxrzw@public.gmane.org,
+	codalist-ySnCqBnJi5yMVn35/9/JlcWGCVk0P7UB@public.gmane.org,
+	fuse-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	linux-btrfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-f2fs-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
+	linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-ntfs-dev-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, linux-scsi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	logfs-PCqxUs/MD9bYtjvyW6yDsg@public.gmane.org, ocfs2-devel-N0ozoZBvEnrZJqsBc5GL+g@public.gmane.org,
+	reiserfs-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org
+To: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <5011138.W0gbOc20Qp@wuerfel>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-=46ree SEO Evaluation!
+On Tue, Jun 03, 2014 at 04:22:19PM +0200, Arnd Bergmann wrote:
+> On Monday 02 June 2014 14:57:26 H. Peter Anvin wrote:
+> > On 06/02/2014 12:55 PM, Arnd Bergmann wrote:
+> The possible uses I can see for non-ktime_t types in the kernel are:
+> * inodes need 96 bit timestamps to represent the full range of values
+>   that can be stored in a file system, you made a convincing argument
+>   for that. Almost everything else can fit into 64 bit on a 32-bit
+>   kernel, in theory also on a 64-bit kernel if we want that.
 
-Most business developers do not realize that every website has two kind=
- of audiences:
-a)      People who read the website, click, and take in the look and fe=
-el of the site
-b)      Search engines that crawl, index, and evaluate the site.
+Just ot be pedantic, inodes don't *need* 96 bit timestamps - some
+filesystems can *support up to* 96 bit timestamps. If the kernel
+only supports 64 bit timestamps and that's all the kernel can
+represent, then the upper bits of the 96 bit on-disk inode
+timestamps simply remain zero.
 
-Our free SEO evaluation pack looks at your website from a search engine=
-=92s perspective and will tell you what all we need to do to make it mo=
-re Google friendly. We will explain you in detail that how your website=
- is doing in terms of SEO and what are your strengths and weaknesses.
+If you move the filesystem between kernels with different time
+ranges, then the filesystem needs to be able to tell the kernel what
+it's supported range is.  This is where having the VFS limit the
+range of supported timestamps is important: the limit is the
+min(kernel range, filesystem range). This allows the filesystems
+to be indepenent of the kernel time representation, and the kernel
+to be independent of the physical filesystem time encoding....
 
+Cheers,
 
-Why Local SEO matters?
-
-Tell us one thing when was the last time you used the yellow pages? In =
-today=92s scenario when consumers let their fingers do the walking, it =
-means keying in Google search. So the visibility on web is very importa=
-nt for every business, not only this but being on first page is of utmo=
-st importance to drive traffic. Having a good website is not enough to =
-be found on web, you need to opt for an effective SEO strategy to achie=
-ve visibility on web.
-
-According to the statistics
-
-To find local businesses 68% of the local consumers uses search engines
- Total number of local searches grew by 65% in last 2 years
-Local MAP listings get 10 times more clicks than organic listings
-only 10%-12% of businesses have claimed their Google Places local listi=
-ngs
-
-Here we offer a complete and proven Search Engine Placement strategy to=
- generate more traffic, more leads and  grow your business. Each day ma=
-ny people search for your product or your services online, but poor ran=
-kings on search engines is keeping them away from dealing with you.
-
-We offer Local SEO (Search engine optimization) packages that fit in ev=
-ery pocket. Our main goal is to understand your needs and requirements =
-and make you reach the consumers who are looking for the product or ser=
-vices that you offer.  Presently we are offering Local SEO to more than=
- 500 websites and all rank page 1 for their related keywords.
-Please send us your website for free evaluation. Looking ahead working =
-with you.
-
-
-Regards
-Miss Lara kaur
-SEO Manager : T.O.B
-7 B Green Avenue, Amritsar Punjab
-
------------------------------------------------------------------------=
------------------------------------------
-
-
-Our email above is not intended to waste your time or fill your inbox w=
-ith spam. If you would not like to hear from us, email us back with NOT=
- INTERESTED. We will never email you again.
+Dave.
+-- 
+Dave Chinner
+david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org
