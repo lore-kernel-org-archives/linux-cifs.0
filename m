@@ -1,78 +1,115 @@
-From: Brendan Nelson <estatistica-opADqmyLwHrdnys6gewWnQ@public.gmane.org>
-Subject: Nachricht von Brendan Nelson
-Date: Tue, 3 Jun 2014 09:14:55 -0300 (BRT)
-Message-ID: <614465718.31665.1401797695553.JavaMail.root@detran.ma.gov.br>
-Reply-To: Brendan Nelson <bostocknathan.rbs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
+Subject: Re: [RFC 00/32] making inode time stamps y2038 ready
+Date: Tue, 03 Jun 2014 16:22:19 +0200
+Message-ID: <5011138.W0gbOc20Qp@wuerfel>
+References: <1401480116-1973111-1-git-send-email-arnd@arndb.de>
+	<7175692.dpgYFMbTaP@wuerfel> <538CF346.2070504@zytor.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: unlisted-recipients:; (no To-header on input)
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org, linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, logfs-PCqxUs/MD9bYtjvyW6yDsg@public.gmane.org,
+	linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, "Joseph S. Myers" <joseph-qD8j1LwMmJjtCj0u4l0SBw@public.gmane.org>,
+	linux-arch-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-scsi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, coda-ETDLCGt7PQU3uPMLIKxrzw@public.gmane.org, geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org,
+	linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, codalist-ySnCqBnJi5yMVn35/9/JlcWGCVk0P7UB@public.gmane.org,
+	fuse-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, reiserfs-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org, john.stultz-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-ntfs-dev-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-f2fs-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
+	ocfs2-devel-N0ozoZBvEnrZJqsBc5GL+g@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	lftan-EIB2kfCEclfQT0dZR+AlfA@public.gmane.org, linux-btrfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: "H. Peter Anvin" <hpa-YMNOUZJC4hwAvxtiuMwx3w@public.gmane.org>
+Return-path: <fuse-devel-bounces-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org>
+In-Reply-To: <538CF346.2070504-YMNOUZJC4hwAvxtiuMwx3w@public.gmane.org>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/fuse-devel>,
+	<mailto:fuse-devel-request-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=fuse-devel>
+List-Post: <mailto:fuse-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org>
+List-Help: <mailto:fuse-devel-request-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/fuse-devel>,
+	<mailto:fuse-devel-request-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org?subject=subscribe>
+Errors-To: fuse-devel-bounces-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
- Hallo Freund,
+On Monday 02 June 2014 14:57:26 H. Peter Anvin wrote:
+> On 06/02/2014 12:55 PM, Arnd Bergmann wrote:
+> >>
+> >> The bit that is really going to hurt is every single ioctl that uses a
+> >> timespec.
+> >>
+> >> Honestly, though, I really don't understand the point with "struct
+> >> inode_time".  It seems like the zeroeth-order thing is to change the
+> >> kernel internal version of struct timespec to have a 64-bit time... it
+> >> isn't just about inodes.  We then should be explicit about the external
+> >> uses of time, and use accessors.
+> > 
+> > I picked these because they are fairly isolated from all other uses,
+> > in particular since inode times are the only things where we really
+> > care about times in the distant past or future (decades away as opposed
+> > to things that happened between boot and shutdown).
+> > 
+> 
+> If nothing else, I would expect to be able to set the system time to
+> weird values for testing.  So I'm not so sure I agree with that...
 
-Ich bin Herr Brendan Nelson Chairman des Group Audit Committee der Roya=
-l Bank of Scotland Plc. London Piccadilly Circus, hier in England. Ich =
-schreibe Ihnen =C3=BCber ein Unternehmen Vorschlag, dass der immense un=
-d gegenseitigen Nutzen f=C3=BCr uns beide sein wird . Vielleicht intere=
-ssiert es Sie zu wissen, dass in meiner Abteilung entdeckte ich eine Su=
-mme von =C2=A3 18,5 Millionen ( achtzehn Millionen f=C3=BCnfhunderttaus=
-end britische Pfund Sterling) in einem Konto, das zu einem unserer ausl=
-=C3=A4ndischen Kunden geh=C3=B6rt sp=C3=A4t : Mr. John Lambert, eine US=
--amerikanische Business- Mogul , der Opfer eines Flugzeugabsturzes war =
-im Jahr 2012, ihn und seine Familie zu t=C3=B6ten. John Lambert 44, Spr=
-ingfield und Robin Melton , 46 von Ozark, starb, als der SR22 2002 Cirr=
-us st=C3=BCrzte in einem Feld in der N=C3=A4he der Kreuzung der Landstr=
-a=C3=9Fe 81 und Missouri 123 . Auch in der Ebene zu dem Zeitpunkt des A=
-bsturzes waren Lambert drei Kinder - McKinley 15; Grayson und Josua 16 =
-10; wir bedauern den gro=C3=9Fen Verlust .
+I think John Stultz and Thomas Gleixner have already started looking
+at how the timekeeping code can be updated. Once that is done, we should
+be able to add a functional 64-bit gettimeofday/settimeofday syscall
+pair. While I definitely agree this is one of the most basic things to
+have, it's also not an area of the kernel that is easy to change.
 
-Allerdings ist die Wahl der Kontaktaufnahme mit Ihnen aus der geographi=
-schen Natur, wo Sie leben erweckt , insbesondere aufgrund der Sensibili=
-t=C3=A4t der Transaktion und die Vertraulichkeit hier . Jetzt ist unser=
-e Bank hat f=C3=BCr keine der Verwandten gewartet zu kommen -up f=C3=BC=
-r die Behauptung, ohne Erfolg =C3=BCber die Jahre . Ich pers=C3=B6nlich=
- habe schon in der Suche die Verwandten erfolglos ; Ich suche Ihre Zust=
-immung an Sie als n=C3=A4chsten Angeh=C3=B6rigen / Wird Zuschussempf=C3=
-=A4ngers mit dem Verstorbenen zu pr=C3=A4sentieren , so dass die Erl=C3=
-=B6se aus diesem Konto bei =C2=A3 18,5 Millionen britische Pfund Sterli=
-ng gesch=C3=A4tzt bezahlt werden k=C3=B6nnen / an Sie als n=C3=A4chsten=
- Angeh=C3=B6rigen benannt / Empf=C3=A4nger =C3=BCbertragen .
+> > For other kernel-internal uses, we may be better off migrating to
+> > a completely different representation, such as nanoseconds since
+> > boot or the architecture specific ktime_t, but this is really something
+> > to decide for each subsystem.
+> 
+> Having a bunch of different time representations in the kernel seems
+> like a real headache...
 
-Dies wird ausgezahlt oder in diese Prozents=C3=A4tze , 60 % f=C3=BCr mi=
-ch und 40% f=C3=BCr Sie freigegeben werden. Ich habe alle notwendigen r=
-echtlichen Dokumente , die verwendet werden k=C3=B6nnen, um diese Behau=
-ptung gesichert. Ich brauche nur in Ihrem Namen zu den Dokumenten zu f=C3=
-=BCllen und zu legalisieren es in den Hof hier, um Sie als berechtigten=
- Empf=C3=A4nger nachweisen . Alles, was ich jetzt verlangen, ist Ihre e=
-hrliche Zusammenarbeit, Verschwiegenheit und Vertrauen , damit wir sehe=
-n diese Verhandlung durch . Ich garantiere Ihnen, dass dies unter den K=
-reuzg=C3=A4ngen des Gesetzes und unter einer legitimen Anordnung sicher=
- , dass Sie aus einer Verletzung des Gesetzes sch=C3=BCtzt ausgef=C3=BC=
-hrt wird.
+We already have time_t, ktime_t, timeval, timespec, compat_timespec,
+clock_t, cputime_t, cputime64_t, tm, nanoseconds, jiffies, jiffies64,
+and lots of driver or file system specific representations. I'm all for
+removing a bunch of these from the kernel, but my feeling is that this is
+one of the cases where we first have to add new ones in order to remove
+those that are already there.
+To complicate things further, we also have various times bases
+(realtime/utc, realtime/tai, monotonic, monotonic_raw, boottime, ...),
+and at least for the timespec values we pass around, it's not always
+obvious which one is used, of if that's the right one.
 
-Bitte , geben Sie mir die folgenden , wie wir sieben (7) Tage , dies zu=
- durchlaufen . Dies ist sehr URGENT PLEASE .
+We probably don't want to add a lot of new representations, and it's
+possible that we can change most of the internal code we have to
+ktime_t and then convert that to whatever user space wants at the
+interfaces.
 
-=2E 1 Vollst=C3=A4ndiger Name:
-=2E 2 Ihre Direct Mobile Number :
-  3.Ihre Kontakt-Adresse. :
-=2E 4 Beruf:
-=2E 5 Alter:
-=2E 6 Geschlecht:
-=2E 7 Nationalit=C3=A4t:
+The possible uses I can see for non-ktime_t types in the kernel are:
+* inodes need 96 bit timestamps to represent the full range of values
+  that can be stored in a file system, you made a convincing argument
+  for that. Almost everything else can fit into 64 bit on a 32-bit
+  kernel, in theory also on a 64-bit kernel if we want that.
+* A number of interfaces pass relative timespecs: nanosleep(), poll(),
+  select(), sigtimedwait(), alarm(), futex() and probably more. There is
+  nothing wrong with the use of timespec here, and it may be good to
+  annotate that by using a new type (e.g. struct timeout) that is defined
+  as compatible with the current timespec.
+* For new user interfaces, we need a new type such as the
+  __kernel_timespec64 I introduced, so it doesn't clash with the normal
+  user timespec that may be smaller, depending on the libc.
+* A lot of drivers will need new ioctl commands, and for drivers that
+  just need time stamps (audio, v4l, sockets, ...) it may be more
+  efficient and more correct to use a new timestamp_t (e.g. boot time
+  64-bit nanoseconds) than __kernel_timespec64, which is not normally
+  monotonic and requires a normalization step. If we end up introducing
+  such a type in the user interface, we can also start using it in the
+  kernel.
 
-Nachdem durch eine methodische Suche gegangen , entschied ich mich , Si=
-e zu kontaktieren hoffen, dass Sie diesen Vorschlag interessant finden =
-=2E Bitte auf Ihrer Best=C3=A4tigung dieser Nachricht und geben Sie Ihr=
- Interesse werde ich Ihnen weitere Informationen liefern .
+	Arnd
 
-Endeavor , lassen Sie mich wissen, Ihre Entscheidung zu halten, anstatt=
- mich warten .
-
-Ich danke Ihnen im Voraus f=C3=BCr Ihre positive und positive Antwort.
-
-Mit besten Gr=C3=BC=C3=9Fen,
-Herr Brendan Nelson.
+------------------------------------------------------------------------------
+Learn Graph Databases - Download FREE O'Reilly Book
+"Graph Databases" is the definitive new guide to graph databases and their 
+applications. Written by three acclaimed leaders in the field, 
+this first edition is now available. Download your free book today!
+http://p.sf.net/sfu/NeoTech
