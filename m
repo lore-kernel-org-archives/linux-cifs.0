@@ -1,54 +1,71 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [RFC 00/32] making inode time stamps y2038 ready
-Date: Tue, 03 Jun 2014 16:37:46 +0200
-Message-ID: <18158267.ZX0ZMPkVDT@wuerfel>
-References: <1401480116-1973111-1-git-send-email-arnd@arndb.de>
-	<5011138.W0gbOc20Qp@wuerfel>
-	<Pine.LNX.4.64.1406031427130.12421@digraph.polyomino.org.uk>
+From: cora93576-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: Re: Guaranteed Top 10 Google Placements mail-archive.com In 100 Days
+Date: Tue, 3 Jun 2014 23:41:58 -0700
+Message-ID: <538e0ff4.43bd440a.5d59.646b@mx.google.com>
+Reply-To: reveille48519-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-mtd@lists.infradead.org, "H. Peter Anvin" <hpa@zytor.com>,
-        logfs@logfs.org, linux-afs@lists.infradead.org,
-        linux-arch@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-scsi@vger.kernel.org, ceph-devel@vger.kernel.org,
-        cluster-devel@redhat.com, coda@cs.cmu.edu, geert@linux-m68k.org,
-        linux-ext4@vger.kernel.org, codalist@telemann.coda.cs.cmu.edu,
-        fuse-devel@lists.sourceforge.net, reiserfs-devel@vger.kernel.org,
-        xfs@oss.sgi.com, john.stultz@linaro.org, tglx@linutronix.de,
-        linux-nfs@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, ocfs2-devel@oss.oracle.com,
-        linux-fsdevel@vger.kernel.org, lftan@altera.com,
-        linux-btrfs@vger.kernel.org
-To: "Joseph S. Myers" <joseph@codesourcery.com>
-Return-path: <cluster-devel-bounces@redhat.com>
-In-Reply-To: <Pine.LNX.4.64.1406031427130.12421@digraph.polyomino.org.uk>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/cluster-devel>,
-	<mailto:cluster-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/cluster-devel>
-List-Post: <mailto:cluster-devel@redhat.com>
-List-Help: <mailto:cluster-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/cluster-devel>,
-	<mailto:cluster-devel-request@redhat.com?subject=subscribe>
-Sender: cluster-devel-bounces@redhat.com
-Errors-To: cluster-devel-bounces@redhat.com
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Tuesday 03 June 2014 14:33:10 Joseph S. Myers wrote:
-> On Tue, 3 Jun 2014, Arnd Bergmann wrote:
-> 
-> > I think John Stultz and Thomas Gleixner have already started looking
-> > at how the timekeeping code can be updated. Once that is done, we should
-> > be able to add a functional 64-bit gettimeofday/settimeofday syscall
-> > pair. While I definitely agree this is one of the most basic things to
-> > have, it's also not an area of the kernel that is easy to change.
-> 
-> 64-bit clock_gettime / clock_settime instead of gettimeofday / 
-> settimeofday should avoid the need for the kernel to have a 64-bit version 
-> of struct timeval.  (Userspace 64-bit gettimeofday / settimeofday would 
-> need to use a combination of the syscalls if the tz pointer is non-NULL.)
+=46ree SEO Evaluation!
 
-Yes, that's what I meant.
+Most business developers do not realize that every website has two kind=
+ of audiences:
+a)      People who read the website, click, and take in the look and fe=
+el of the site
+b)      Search engines that crawl, index, and evaluate the site.
 
-	Arnd
+Our free SEO evaluation pack looks at your website from a search engine=
+=92s perspective and will tell you what all we need to do to make it mo=
+re Google friendly. We will explain you in detail that how your website=
+ is doing in terms of SEO and what are your strengths and weaknesses.
+
+
+Why Local SEO matters?
+
+Tell us one thing when was the last time you used the yellow pages? In =
+today=92s scenario when consumers let their fingers do the walking, it =
+means keying in Google search. So the visibility on web is very importa=
+nt for every business, not only this but being on first page is of utmo=
+st importance to drive traffic. Having a good website is not enough to =
+be found on web, you need to opt for an effective SEO strategy to achie=
+ve visibility on web.
+
+According to the statistics
+
+To find local businesses 68% of the local consumers uses search engines
+ Total number of local searches grew by 65% in last 2 years
+Local MAP listings get 10 times more clicks than organic listings
+only 10%-12% of businesses have claimed their Google Places local listi=
+ngs
+
+Here we offer a complete and proven Search Engine Placement strategy to=
+ generate more traffic, more leads and  grow your business. Each day ma=
+ny people search for your product or your services online, but poor ran=
+kings on search engines is keeping them away from dealing with you.
+
+We offer Local SEO (Search engine optimization) packages that fit in ev=
+ery pocket. Our main goal is to understand your needs and requirements =
+and make you reach the consumers who are looking for the product or ser=
+vices that you offer.  Presently we are offering Local SEO to more than=
+ 500 websites and all rank page 1 for their related keywords.
+Please send us your website for free evaluation. Looking ahead working =
+with you.
+
+
+Regards
+Miss Lara kaur
+SEO Manager : T.O.B
+7 B Green Avenue, Amritsar Punjab
+
+-----------------------------------------------------------------------=
+-----------------------------------------
+
+
+Our email above is not intended to waste your time or fill your inbox w=
+ith spam. If you would not like to hear from us, email us back with NOT=
+ INTERESTED. We will never email you again.
