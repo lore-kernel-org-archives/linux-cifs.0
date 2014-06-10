@@ -1,45 +1,54 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [Samba] Read offline attribute
-Date: Tue, 10 Jun 2014 12:26:44 -0400
-Message-ID: <CAH2r5mvoE8-Pu+Bx0sAN9eweodfun1x2bXDEme9gaYqLY3Umww@mail.gmail.com>
-References: <53971D84.1020806@whywouldwe.com> <53971ECD.4070301@whywouldwe.com>
- <20140610173250.1769b200@plati.site>
+Subject: Re: Mount cifs using SMB2 - Invalid argument
+Date: Tue, 10 Jun 2014 12:30:48 -0400
+Message-ID: <CAH2r5muFDagMCdb41F7gf2UwsLO3=xyj9nXYQyyr+M2siig_YQ@mail.gmail.com>
+References: <A612847CFE53224C91B23E3A5B48BAC7A7A2BE7F5E@xmail3.se.axis.com>
+ <CADT32eKz57t-HSadM26EQQtO0u=H02vY9MktMhyu5X+93Vn9FQ@mail.gmail.com>
+ <A612847CFE53224C91B23E3A5B48BAC7A7A2BE80A8@xmail3.se.axis.com>
+ <CADT32e+eSjr88xoFDSV7cXs+fJdNkXwgPM5CDE4Fj_UUt+Ld3g@mail.gmail.com>
+ <A612847CFE53224C91B23E3A5B48BAC7A7A2BE82F0@xmail3.se.axis.com>
+ <CAH2r5mtoaKrvG5j_B-eVdCc=MpeZKDH87nT6-N19zN9v0nTafA@mail.gmail.com> <A612847CFE53224C91B23E3A5B48BAC7A7A2BE848E@xmail3.se.axis.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Peter Flood <info-O17Z5ZPWbgxgJw1g6a66pQ@public.gmane.org>, samba-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Karin Hedlund <karin.hedlund-VrBV9hrLPhE@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20140610173250.1769b200-k1XZOR0ctBLN0uC3ymp8PA@public.gmane.org>
+In-Reply-To: <A612847CFE53224C91B23E3A5B48BAC7A7A2BE848E-qSO7W+xaCpBHog8JR6emWdBPR1lH4CV8@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This would be VERY trivial to add - the intent was to allow a query of
-the CIFS/SMB3 specific inode metatada via a user xattr (the attribute
-was defined as user.DosAttrib).   Probably less than 10 lines of code
-to finishup below the following in fs/cifs/xattr.c
+On Tue, Jun 10, 2014 at 8:12 AM, Karin Hedlund <karin.hedlund-VrBV9hrLPhE@public.gmane.org> wrote:
+> On Jun 10, 2014 12:45, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>>
+>>On Jun 10, 2014 3:19 AM, "Karin Hedlund" <karin.hedlund-VrBV9hrLPhE@public.gmane.org> wrote:
+>>>
+>>> On Mon, Jun 9, 2014 at 4:42 PM, Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>>>> vers=2.0 does not work?
+>>
+>>> Well, actually vers=2.0 does work fine! Thanks for the suggestion! :) I did try it earlier, but probably did not have all the other things in place by then, because I know it didn't work then, but it does now.
+>>> I wonder why nothing above vers=2.0 works though, any ideas?
+>>
+>>The obvious reason would be samba 3.6 on the server instead of samba 4 or later
+>
+> Ah, ok, I see. I thought the client and server would sort of 'autonegotiate' and agree on the highest version they both support, but I guess that's not the case when using the 'vers' mount.cifs option then? In that case what I'm seeing is very much expected, so I'm very happy now. Thanks for all the support!
 
-if (strncmp(ea_name, CIFS_XATTR_DOS_ATTRIB, 14) == 0) {
-cifs_dbg(FYI, "attempt to query cifs inode metadata\n");
-/* revalidate/getattr then populate from inode */
+We don't autonegotiate smb2 vs. smb2.1 vs. smb3 vs. smb3.02 (yet) -
+specify specific dialect on mount.  Not clear if this should be
+handled in user space or kernel either (if at all).    On the other
+hand, looks like the server does not support smb3 (thus my guess that
+you are running an SMB3.6 based, rather than Samba 4.x based filer).
 
-On Tue, Jun 10, 2014 at 11:32 AM, David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org> wrote:
-> Hi Peter,
->
-> On Tue, 10 Jun 2014 16:05:49 +0100, Peter Flood wrote:
->
->> I want to read the 'offline' extended attribute on files on a windows
->> share mounted on a linux host, is it possible to get this info?
->
-> The Linux CIFS client doesn't currently offer such support. However,
-> the offline attribute can be checked using smbclient via the allinfo
-> command. Offline files will carry an 'O' in the attributes field.
->
-> Cheers, David
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Any news on the upgrade of the default SMB version of the in-kernel cifs module, by the way?
+
+1) MultiCredit support (faster large file copy) needs to be added
+(Pavel is looking at this)
+
+2) Unix extensions (I have a prototype small patch which requests such
+support on open, but no server support yet)
+
+>  I found the SDC2013 "SMB3.02 And Linux: A Status Update" presentation (http://www.snia.org/sites/default/files2/SDC2013/presentations/Revisions/StevenFrench_SMB3_Meets_Linux_ver3_revision.pdf), but since it's almost already old by now and I'm curious, I thought I'd ask. :)
 
 
 
