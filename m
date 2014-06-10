@@ -1,101 +1,75 @@
-From: Karin Hedlund <karin.hedlund-VrBV9hrLPhE@public.gmane.org>
-Subject: RE: Mount cifs using SMB2 - Invalid argument
-Date: Tue, 10 Jun 2014 10:17:53 +0200
-Message-ID: <A612847CFE53224C91B23E3A5B48BAC7A7A2BE82F0@xmail3.se.axis.com>
-References: <A612847CFE53224C91B23E3A5B48BAC7A7A2BE7F5E@xmail3.se.axis.com>
-	<CADT32eKz57t-HSadM26EQQtO0u=H02vY9MktMhyu5X+93Vn9FQ@mail.gmail.com>
-	<A612847CFE53224C91B23E3A5B48BAC7A7A2BE80A8@xmail3.se.axis.com>
- <CADT32e+eSjr88xoFDSV7cXs+fJdNkXwgPM5CDE4Fj_UUt+Ld3g@mail.gmail.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [RFC 00/32] making inode time stamps y2038 ready
+Date: Tue, 10 Jun 2014 11:54:14 +0200
+Message-ID: <10173877.4plnjUiyX8@wuerfel>
+References: <1401480116-1973111-1-git-send-email-arnd@arndb.de>
+	<8770583.6XeZxCxOY8@wuerfel> <538FB570.8000502@zytor.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32e+eSjr88xoFDSV7cXs+fJdNkXwgPM5CDE4Fj_UUt+Ld3g-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Content-Language: en-US
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Nicolas Pitre <nicolas.pitre@linaro.org>,
+        Dave Chinner <david@fromorbit.com>, linux-mtd@lists.infradead.org,
+        linux-f2fs-devel@lists.sourceforge.net, ceph-devel@vger.kernel.org,
+        "Joseph S. Myers" <joseph@codesourcery.com>,
+        linux-arch@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-afs@lists.infradead.org,
+        cluster-devel@redhat.com, coda@cs.cmu.edu, geert@linux-m68k.org,
+        linux-ext4@vger.kernel.org, codalist@telemann.coda.cs.cmu.edu,
+        fuse-devel@lists.sourceforge.net, reiserfs-devel@vger.kernel.org,
+        xfs@oss.sgi.com, john.stultz@linaro.org, tglx@linutronix.de,
+        linux-nfs@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+        logfs@logfs.org, linux-btrfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.
+To: "H. Peter Anvin" <hpa@zytor.com>
+Return-path: <cluster-devel-bounces@redhat.com>
+In-Reply-To: <538FB570.8000502@zytor.com>
+List-Unsubscribe: <https://www.redhat.com/mailman/options/cluster-devel>,
+	<mailto:cluster-devel-request@redhat.com?subject=unsubscribe>
+List-Archive: <https://www.redhat.com/archives/cluster-devel>
+List-Post: <mailto:cluster-devel@redhat.com>
+List-Help: <mailto:cluster-devel-request@redhat.com?subject=help>
+List-Subscribe: <https://www.redhat.com/mailman/listinfo/cluster-devel>,
+	<mailto:cluster-devel-request@redhat.com?subject=subscribe>
+Sender: cluster-devel-bounces@redhat.com
+Errors-To: cluster-devel-bounces@redhat.com
+List-Id: linux-cifs.vger.kernel.org
 
-T24gTW9uLCBKdW4gOSwgMjAxNCBhdCA0OjQyIFBNLCBTaGlyaXNoIFBhcmdhb25rYXIgPHNoaXJp
-c2hwYXJnYW9ua2FyQGdtYWlsLmNvbT4gd3JvdGU6DQo+dmVycz0yLjAgZG9lcyBub3Qgd29yaz8N
-Cg0KV2VsbCwgYWN0dWFsbHkgdmVycz0yLjAgZG9lcyB3b3JrIGZpbmUhIFRoYW5rcyBmb3IgdGhl
-IHN1Z2dlc3Rpb24hIDopIEkgZGlkIHRyeSBpdCBlYXJsaWVyLCBidXQgcHJvYmFibHkgZGlkIG5v
-dCBoYXZlIGFsbCB0aGUgb3RoZXIgdGhpbmdzIGluIHBsYWNlIGJ5IHRoZW4sIGJlY2F1c2UgSSBr
-bm93IGl0IGRpZG4ndCB3b3JrIHRoZW4sIGJ1dCBpdCBkb2VzIG5vdy4NCkkgd29uZGVyIHdoeSBu
-b3RoaW5nIGFib3ZlIHZlcnM9Mi4wIHdvcmtzIHRob3VnaCwgYW55IGlkZWFzPw0KDQo+T24gTW9u
-LCBKdW4gOSwgMjAxNCBhdCA4OjI0IEFNLCBLYXJpbiBIZWRsdW5kIDxrYXJpbi5oZWRsdW5kQGF4
-aXMuY29tPiB3cm90ZToNCj4+IFdoYXQgSSBzYWlkIGFib3V0IHdpcmVzaGFyayB3YXMgYWxsIHdy
-b25nISBTbyBzb3JyeSwgbXkgYmFkIQ0KPj4oSSBoYWQgYW5vdGhlciBkZXZpY2UgY29ubmVjdGVk
-IGFsc28sIGFuZCBpdCB3YXMgdGhhdCBkZXZpY2UncyBTTUIgcHJvdG9jb2wgbmVnb3RpYXRpb24g
-SSBzYXcgbm93IHRoYXQgSSBsb29rIGF0IGl0IGFnYWluKS4NCj4+DQo+PkZvciB0aGlzIHNwZWNp
-ZmljIHByb2JsZW0gYW5kIGRldmljZSBJIGdldCBvbmx5IG9uZSByZXF1ZXN0IGFuZCBvbmUgDQo+
-PiByZXNwb25zZSwgYW5kIHllcywgaXQncyBpbmRlZWQgU01CIHByb3RvY29sIHZlcnNpb24gMiB0
-aGV5J3JlIHRyeWluZyB0byBuZWdvdGlhdGUuIEJ1dCBJIGdldCBOZWdvdGlhdGVQcm9jb3RvbCBS
-ZXNwb25zZSwgRXJyb3I6IFNUQVRVU19JTlZBTElEX1BBUkFNRVRFUi4NCj4+DQo+PiBPbiBNb24s
-IEp1biA5LCAyMDE0IGF0IDI6MTggUE0sIFNoaXJpc2ggUGFyZ2FvbmthciA8c2hpcmlzaHBhcmdh
-b25rYXJAZ21haWwuY29tPiB3cm90ZToNCj4+PklzIGl0IHBvc3NpYmxlIHRvIGF0dGFjaCB3aXJl
-c2hhcmsgdHJhY2UgaGVyZT8NCj4+Pg0KPj4+UmVnYXJkcywNCj4+Pg0KPj4+U2hpcmlzaA0KPj4N
-Cj4+IE5vLCB1bmZvcnR1bmF0ZWx5IEkgY2FuJ3QgcG9zdCB0aGUgd2lyZXNoYXJrIHRyYWNlLiBT
-b3JyeSBhYm91dCB0aGF0LiBJJ3ZlIGF0dGFjaGVkIHdpcmVzaGFyayBzY3JlZW5zaG90cyBmb3Ig
-dGhlIFNNQiByZXF1ZXN0IGFuZCByZXNwb25zZSBwYWNrZXRzIHRob3VnaCwgaG9wZWZ1bGx5IGl0
-J3MgYmV0dGVyIHRoYW4gbm90aGluZy4NCj4+DQo+Pj5PbiBNb24sIEp1biA5LCAyMDE0IGF0IDQ6
-NTAgQU0sIEthcmluIEhlZGx1bmQgPGthcmluLmhlZGx1bmRAYXhpcy5jb20+IHdyb3RlOg0KPj4+
-PiBGcm9tIGFuIGVtYmVkZGVkIGRldmljZSwgSSdtIHRyeWluZyB0byBtb3VudCBhIHNhbWJhIHNo
-YXJlIHVzaW5nIFNNQjIsIHdpdGggdGhlICd2ZXJzPTIuMScgbW91bnQgb3B0aW9uLCBidXQgSSBk
-b24ndCBzZWVtIHRvIGdldCBpdCB0byB3b3JrLCBzbyBJIHdhcyBob3Bpbmcgc29tZWJvZHkgY291
-bGQgbWF5YmUgc2hlZCBzb21lIGxpZ2h0Lg0KPj4+Pg0KPj4+PiBtb3VudCAtdCBjaWZzIC8vMTky
-LjE2OC4wLjEvbmV0d29ya3NoYXJlIC90bXAvbmFzIC1vIA0KPj4+PiB1c2VybmFtZT0scGFzc3dv
-cmQ9LHZlcnM9Mi4xLG5vdW5peCxub3NlcnZlcmlubyx1aWQ9MTIzLGdpZD0xMjMsbm9icg0KPj4+
-PiBsLA0KPj4+PiBmaWxlX21vZGU9MDc3MCxkaXJfbW9kZT0wNzcwLGlvY2hhcnNldD11dGY4DQo+
-Pj4+IG1vdW50OiBtb3VudGluZyAvLzE5Mi4xNjguMC4xL25ldHdvcmtzaGFyZSBvbiAvdG1wL25h
-cyBmYWlsZWQ6IA0KPj4+PiBJbnZhbGlkIGFyZ3VtZW50DQo+Pj4+DQo+Pj4+Q2xpZW50OiBFbWJl
-ZGRlZCBkZXZpY2Ugd2l0aCBMaW51eCAzLjE0IGtlcm5lbCwgQnVzeUJveCB2ZXJzaW9uDQo+Pj4+
-IHYxLjIwLjJwMyBJIGhhdmUgZW5hYmxlZCBhbmQgYnVpbHQgdGhlIGVtYmVkZGVkIGRldmljZSdz
-IGtlcm5lbCB3aXRoIENPTkZJR19DSUZTX1NNQjIuDQo+Pj4+IC9wcm9jL2ZzL2NpZnMvRGVidWdE
-YXRhOg0KPj4+PiBDSUZTIFZlcnNpb24gMi4wMg0KPj4+PiBGZWF0dXJlczoNCj4+Pj4gQWN0aXZl
-IFZGUyBSZXF1ZXN0czogMA0KPj4+PiBTZXJ2ZXJzOg0KPj4+Pg0KPj4+PiBkbWVzZzoNCj4+Pj4g
-PDc+WyAzOTM3LjQ3MDAwMF0gZnMvY2lmcy9jaWZzZnMuYzogRGV2bmFtZToNCj4+Pj4gLy8xOTIu
-MTY4LjAuMS9uZXR3b3Jrc2hhcmUgZmxhZ3M6IDMyNzY4IDw3PlsgMzkzNy40NzAwMDBdDQo+Pj4+
-IGZzL2NpZnMvY29ubmVjdC5jOiBpb2NoYXJzZXQgc2V0IHRvIHV0ZjggPDc+WyAzOTM3LjQ3MDAw
-MF0NCj4+Pj4gZnMvY2lmcy9jb25uZWN0LmM6IEFub255bW91cyBsb2dpbiA8Nz5bIDM5MzcuNDcw
-MDAwXQ0KPj4+PiBmcy9jaWZzL2Nvbm5lY3QuYzogZmlsZSBtb2RlOiAweDFmOCAgZGlyIG1vZGU6
-IDB4MWY4IDw3PlsgDQo+Pj4+IDM5MzcuNDcwMDAwXQ0KPj4+PiBmcy9jaWZzL2Nvbm5lY3QuYzog
-Q0lGUyBWRlM6IGluIGNpZnNfbW91bnQgYXMgWGlkOiAyIHdpdGggdWlkOiAwIA0KPj4+PiA8Nz5b
-IDM5MzcuNDcwMDAwXSBmcy9jaWZzL2Nvbm5lY3QuYzogVU5DOiBcXDE5Mi4xNjguMC4xXG5ldHdv
-cmtzaGFyZSANCj4+Pj4gPDc+WyAzOTM3LjQ3MDAwMF0gZnMvY2lmcy9jb25uZWN0LmM6IFNvY2tl
-dCBjcmVhdGVkIDw3PlsgDQo+Pj4+IDM5MzcuNDcwMDAwXQ0KPj4+PiBmcy9jaWZzL2Nvbm5lY3Qu
-Yzogc25kYnVmIDE2Mzg0IHJjdmJ1ZiA4NzM4MCByY3Z0aW1lbyAweDJiYyA8Nz5bIA0KPj4+PiAz
-OTM3LjQ3MDAwMF0gZnMvY2lmcy9jb25uZWN0LmM6IENJRlMgVkZTOiBpbiBjaWZzX2dldF9zbWJf
-c2VzIGFzIFhpZDoNCj4+Pj4gMyB3aXRoIHVpZDogMCA8Nz5bIDM5MzcuNDcwMDAwXSBmcy9jaWZz
-L2Nvbm5lY3QuYzogRXhpc3Rpbmcgc21iIHNlc3MgDQo+Pj4+IG5vdCBmb3VuZCA8Nz5bIDM5Mzcu
-NDcwMDAwXSBmcy9jaWZzL3NtYjJwZHUuYzogTmVnb3RpYXRlIHByb3RvY29sIA0KPj4+PiA8Nz5b
-IDM5MzcuNDcwMDAwXSBmcy9jaWZzL3RyYW5zcG9ydC5jOiBTZW5kaW5nIHNtYjogc21iX2xlbj0x
-MDIgPDc+WyANCj4+Pj4gMzkzNy40NzAwMDBdIGZzL2NpZnMvY29ubmVjdC5jOiBEZW11bHRpcGxl
-eCBQSUQ6IDMzNTkgPDc+WyANCj4+Pj4gMzkzNy40ODAwMDBdIGZzL2NpZnMvY29ubmVjdC5jOiBS
-RkMxMDAyIGhlYWRlciAweDQ5IDw3PlsgDQo+Pj4+IDM5MzcuNDgwMDAwXQ0KPj4+PiBmcy9jaWZz
-L3NtYjJtaXNjLmM6IHNtYjJfY2hlY2tfbWVzc2FnZSBsZW5ndGg6IDB4NGQsIHNtYl9idWZfbGVu
-Z3RoOg0KPj4+PiAweDQ5IDw3PlsgMzkzNy40ODAwMDBdIGZzL2NpZnMvc21iMm1pc2MuYzogU01C
-MiBkYXRhIGxlbmd0aCAwIG9mZnNldCANCj4+Pj4gMCA8Nz5bIDM5MzcuNDgwMDAwXSBmcy9jaWZz
-L3NtYjJtaXNjLmM6IFNNQjIgbGVuIDc3IDw3PlsgDQo+Pj4+IDM5MzcuNDgwMDAwXQ0KPj4+PiBm
-cy9jaWZzL3RyYW5zcG9ydC5jOiBjaWZzX3N5bmNfbWlkX3Jlc3VsdDogY21kPTAgbWlkPTAgc3Rh
-dGU9NCA8Nz5bIA0KPj4+PiAzOTM3LjQ4MDAwMF0gZnMvY2lmcy9zbWIybWFwZXJyb3IuYzogTWFw
-cGluZyBTTUIyIHN0YXR1cyBjb2RlDQo+Pj4+IC0xMDczNzQxODExIHRvIFBPU0lYIGVyciAtMjIg
-PDc+WyAzOTM3LjQ4MDAwMF0gZnMvY2lmcy9taXNjLmM6IE51bGwgDQo+Pj4+IGJ1ZmZlciBwYXNz
-ZWQgdG8gY2lmc19zbWFsbF9idWZfcmVsZWFzZSA8Nz5bIDM5MzcuNDgwMDAwXQ0KPj4+PiBmcy9j
-aWZzL2Nvbm5lY3QuYzogQ0lGUyBWRlM6IGxlYXZpbmcgY2lmc19nZXRfc21iX3NlcyAoeGlkID0g
-MykgcmMgPQ0KPj4+PiAtMjIgPDc+WyAzOTM3LjQ4MDAwMF0gZnMvY2lmcy9jb25uZWN0LmM6IENJ
-RlMgVkZTOiBsZWF2aW5nIA0KPj4+PiBjaWZzX21vdW50ICh4aWQgPSAyKSByYyA9IC0yMg0KPj4+
-Pg0KPj4+PiBTZXJ2ZXI6IFNhbWJhIDMuNi42IG9uIERlYmlhbiBXaGVlenkgSSBkbyBoYXZlIHRo
-ZSBtYXggcHJvdG9jb2wgPSANCj4+Pj4gU01CMiB1bmRlciBteSBbZ2xvYmFsXSBzZWN0aW9uIGlu
-IG15IHNhbWJhLmNvbmYsIGFuZCBoYXZlIHJlc3RhcnRlZCBzYW1iYS4NCj4+Pj4NCj4+Pj4gSSd2
-ZSBhbHNvIHRyaWVkIHRvIGxvb2sgYXQgdGhlIGNvbW11bmljYXRpb24gb3ZlciB3aXJlc2hhcmss
-IGFuZCBJIGRvIHNlZSBzZXZlcmFsIFNNQiBOZWdvdGlhdGUgUHJvdG9jb2wgcmVxdWVzdHMgYW5k
-IHJlc3BvbnNlcywgYnV0IGluIGFsbCBvZiB0aGUgcmVxdWVzdHMgdGhlcmUncyBqdXN0ICJSZXF1
-ZXN0ZWQgRGlhbGVjdHM6IERpYWxlY3Q6IE5UIExNIDAuMTIsIGFuZCBpbiBhbGwgdGhlIHJlc3Bv
-bnNlcyBzYW1lIHRoaW5nLCBEaWFsZWN0IEluZGV4OjAgTlQgTE0gMC4xMiAtIHdoaWNoLCBhcyBm
-YXIgYXMgSSBrbm93IGNvcnJlc3BvbmRzIHRvIFNNQiB2ZXJzaW9uIDEgKD8pLCBub3QgdGhlIDIu
-MSB2ZXJzaW9uIEkgd2FzIGhvcGluZyBmb3IuLi4NCj4+Pj4NCj4+Pj4gSSdtIGxvc3QgaGVyZS4g
-SSB0aG91Z2h0IHRoaXMgd2FzIGFsbCBvbmUgbmVlZGVkIHRvIGRvLiBTbywgYW55IHRob3VnaHRz
-LCBpbnNpZ2h0cyBvciBpZGVhcyB3b3VsZCBtYWtlIG1lIHZlcnkgaGFwcHkuIFRoYW5rcyB5b3Ug
-Z3V5cyENCj4+Pj4NCj4+Pj4gS2luZCByZWdhcmRzLA0KPj4+PiBLYXJpbg0K
+On Wednesday 04 June 2014 17:10:24 H. Peter Anvin wrote:
+> On 06/04/2014 12:24 PM, Arnd Bergmann wrote:
+> > 
+> > For other timekeeping stuff in the kernel, I agree that using some
+> > 64-bit representation (nanoseconds, 32/32 unsigned seconds/nanoseconds,
+> > ...) has advantages, that's exactly the point I was making earlier
+> > against simply extending the internal time_t/timespec to 64-bit
+> > seconds for everything.
+> > 
+> 
+> How much of a performance issue is it to make time_t 64 bits, and for
+> the bits there are, how hard are they to fix?
+
+Probably very little overhead for most uses, it's more the regression
+potential in the less common parts of the kernel I'm worried about.
+
+There is a significant but not overwhelming number of uses of the
+main problematic types in the kernel:
+
+arnd@wuerfel:~/arm-soc$ git grep -wl time_t | wc
+    188     188    5566
+arnd@wuerfel:~/arm-soc$ git grep -wl timeval | wc
+    320     320   10353
+arnd@wuerfel:~/arm-soc$ git grep -wl timespec | wc
+    406     406   10886
+
+I believe we have to audit all of them anyway if we want to change
+the kernel to less problematic types and introduce new user
+interfaces.
+
+IMHO this work is helped if we change the uses to a new type
+as we find the problems. This lets us do the work one subsystem
+at a time and avoid accidental ABI changes. I don't care much what
+type that will be, and having a 96-bit type will certainly work
+well in a lot of cases, but I don't see a strong reason to use
+that over other types, especially when they can be more efficient.
+
+	Arnd
