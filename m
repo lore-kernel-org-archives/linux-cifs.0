@@ -1,46 +1,46 @@
-From: =?UTF-8?q?Bj=C3=B6rn=20Baumbach?= <bb@sernet.de>
-Subject: [PATCH] fs/cifs: fix regression in cifs_create_mf_symlink()
-Date: Tue, 10 Jun 2014 12:03:26 +0200
-Message-ID: <1402394606-7910-1-git-send-email-bb@sernet.de>
+From: Karin Hedlund <karin.hedlund-VrBV9hrLPhE@public.gmane.org>
+Subject: RE: Mount cifs using SMB2 - Invalid argument
+Date: Tue, 10 Jun 2014 14:12:11 +0200
+Message-ID: <A612847CFE53224C91B23E3A5B48BAC7A7A2BE848E@xmail3.se.axis.com>
+References: <A612847CFE53224C91B23E3A5B48BAC7A7A2BE7F5E@xmail3.se.axis.com>
+	<CADT32eKz57t-HSadM26EQQtO0u=H02vY9MktMhyu5X+93Vn9FQ@mail.gmail.com>
+	<A612847CFE53224C91B23E3A5B48BAC7A7A2BE80A8@xmail3.se.axis.com>
+	<CADT32e+eSjr88xoFDSV7cXs+fJdNkXwgPM5CDE4Fj_UUt+Ld3g@mail.gmail.com>
+	<A612847CFE53224C91B23E3A5B48BAC7A7A2BE82F0@xmail3.se.axis.com>
+ <CAH2r5mtoaKrvG5j_B-eVdCc=MpeZKDH87nT6-N19zN9v0nTafA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Pavel Shilovsky <piastry@etersoft.ru>, stable@vger.kernel.org,
-	=?UTF-8?q?Bj=C3=B6rn=20Baumbach?= <bb@sernet.de>,
-	Stefan Metzmacher <metze@samba.org>
-To: Steve French <sfrench@samba.org>
-Return-path: <stable-owner@vger.kernel.org>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAH2r5mtoaKrvG5j_B-eVdCc=MpeZKDH87nT6-N19zN9v0nTafA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Language: en-US
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-commit d81b8a40e2ece0a9ab57b1fe1798e291e75bf8fc
-("CIFS: Cleanup cifs open codepath")
-changed disposition to FILE_OPEN.
-
-Signed-off-by: Bj=C3=B6rn Baumbach <bb@sernet.de>
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
-Reviewed-by: Stefan Metzmacher <metze@samba.org>
-Cc: <stable@vger.kernel.org> # v3.14+
-Cc: Pavel Shilovsky <piastry@etersoft.ru>
-Cc: Steve French <sfrench@samba.org>
----
- fs/cifs/link.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/fs/cifs/link.c b/fs/cifs/link.c
-index 264ece7..68559fd 100644
---- a/fs/cifs/link.c
-+++ b/fs/cifs/link.c
-@@ -374,7 +374,7 @@ cifs_create_mf_symlink(unsigned int xid, struct cif=
-s_tcon *tcon,
- 	oparms.cifs_sb =3D cifs_sb;
- 	oparms.desired_access =3D GENERIC_WRITE;
- 	oparms.create_options =3D create_options;
--	oparms.disposition =3D FILE_OPEN;
-+	oparms.disposition =3D FILE_CREATE;
- 	oparms.path =3D path;
- 	oparms.fid =3D &fid;
- 	oparms.reconnect =3D false;
---=20
-1.7.9.5
+T24gSnVuIDEwLCAyMDE0IDEyOjQ1LCBTdGV2ZSBGcmVuY2ggPHNtZnJlbmNoQGdtYWlsLmNvbT4g
+d3JvdGU6DQo+DQo+T24gSnVuIDEwLCAyMDE0IDM6MTkgQU0sICJLYXJpbiBIZWRsdW5kIiA8a2Fy
+aW4uaGVkbHVuZEBheGlzLmNvbT4gd3JvdGU6DQo+Pg0KPj4gT24gTW9uLCBKdW4gOSwgMjAxNCBh
+dCA0OjQyIFBNLCBTaGlyaXNoIFBhcmdhb25rYXIgPHNoaXJpc2hwYXJnYW9ua2FyQGdtYWlsLmNv
+bT4gd3JvdGU6DQo+Pj4gdmVycz0yLjAgZG9lcyBub3Qgd29yaz8NCj4NCj4+IFdlbGwsIGFjdHVh
+bGx5IHZlcnM9Mi4wIGRvZXMgd29yayBmaW5lISBUaGFua3MgZm9yIHRoZSBzdWdnZXN0aW9uISA6
+KSBJIGRpZCB0cnkgaXQgZWFybGllciwgYnV0IHByb2JhYmx5IGRpZCBub3QgaGF2ZSBhbGwgdGhl
+IG90aGVyIHRoaW5ncyBpbiBwbGFjZSBieSB0aGVuLCBiZWNhdXNlIEkga25vdyBpdCBkaWRuJ3Qg
+d29yayB0aGVuLCBidXQgaXQgZG9lcyBub3cuDQo+PiBJIHdvbmRlciB3aHkgbm90aGluZyBhYm92
+ZSB2ZXJzPTIuMCB3b3JrcyB0aG91Z2gsIGFueSBpZGVhcz8NCj4NCj5UaGUgb2J2aW91cyByZWFz
+b24gd291bGQgYmUgc2FtYmEgMy42IG9uIHRoZSBzZXJ2ZXIgaW5zdGVhZCBvZiBzYW1iYSA0IG9y
+IGxhdGVyDQoNCkFoLCBvaywgSSBzZWUuIEkgdGhvdWdodCB0aGUgY2xpZW50IGFuZCBzZXJ2ZXIg
+d291bGQgc29ydCBvZiAnYXV0b25lZ290aWF0ZScgYW5kIGFncmVlIG9uIHRoZSBoaWdoZXN0IHZl
+cnNpb24gdGhleSBib3RoIHN1cHBvcnQsIGJ1dCBJIGd1ZXNzIHRoYXQncyBub3QgdGhlIGNhc2Ug
+d2hlbiB1c2luZyB0aGUgJ3ZlcnMnIG1vdW50LmNpZnMgb3B0aW9uIHRoZW4/IEluIHRoYXQgY2Fz
+ZSB3aGF0IEknbSBzZWVpbmcgaXMgdmVyeSBtdWNoIGV4cGVjdGVkLCBzbyBJJ20gdmVyeSBoYXBw
+eSBub3cuIFRoYW5rcyBmb3IgYWxsIHRoZSBzdXBwb3J0IQ0KDQpBbnkgbmV3cyBvbiB0aGUgdXBn
+cmFkZSBvZiB0aGUgZGVmYXVsdCBTTUIgdmVyc2lvbiBvZiB0aGUgaW4ta2VybmVsIGNpZnMgbW9k
+dWxlLCBieSB0aGUgd2F5Pw0KIEkgZm91bmQgdGhlIFNEQzIwMTMgIlNNQjMuMDIgQW5kIExpbnV4
+OiBBIFN0YXR1cyBVcGRhdGUiIHByZXNlbnRhdGlvbiAoaHR0cDovL3d3dy5zbmlhLm9yZy9zaXRl
+cy9kZWZhdWx0L2ZpbGVzMi9TREMyMDEzL3ByZXNlbnRhdGlvbnMvUmV2aXNpb25zL1N0ZXZlbkZy
+ZW5jaF9TTUIzX01lZXRzX0xpbnV4X3ZlcjNfcmV2aXNpb24ucGRmKSwgYnV0IHNpbmNlIGl0J3Mg
+YWxtb3N0IGFscmVhZHkgb2xkIGJ5IG5vdyBhbmQgSSdtIGN1cmlvdXMsIEkgdGhvdWdodCBJJ2Qg
+YXNrLiA6KQ0K
