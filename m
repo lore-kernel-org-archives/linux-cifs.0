@@ -1,49 +1,29 @@
-From: Peter Flood <info-O17Z5ZPWbgxgJw1g6a66pQ@public.gmane.org>
-Subject: Re: [Samba] Read offline attribute
-Date: Wed, 11 Jun 2014 12:33:25 +0100
-Message-ID: <53983E85.5010403@whywouldwe.com>
-References: <53971D84.1020806@whywouldwe.com> <53971ECD.4070301@whywouldwe.com> <20140610173250.1769b200@plati.site> <CAH2r5mvoE8-Pu+Bx0sAN9eweodfun1x2bXDEme9gaYqLY3Umww@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: samba-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>
+From: David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>
+Subject: [PATCH 0/2] xfstests: add cifs.ko server-side copy helper
+Date: Wed, 11 Jun 2014 16:05:42 +0200
+Message-ID: <1402495544-12865-1-git-send-email-ddiss@suse.de>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-btrfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: fstests-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mvoE8-Pu+Bx0sAN9eweodfun1x2bXDEme9gaYqLY3Umww-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi Steve
+In preparation for adding cifs.ko support to xfstests, this patch series
+extends the cloner binary to support SMB2 server-side copies via
+CIFS_IOC_COPYCHUNK_FILE, in addition to the existing Btrfs COW clone
+functionality.
 
-Trivial is great, it would be a useful addition.
+This could be split into a separate binary if deemed necessary, but
+given the code overlap, I though it suitable to share the same source.
 
+Feedback appreciated.
 
-On 10/06/2014 17:26, Steve French wrote:
-> This would be VERY trivial to add - the intent was to allow a query of
-> the CIFS/SMB3 specific inode metatada via a user xattr (the attribute
-> was defined as user.DosAttrib).   Probably less than 10 lines of code
-> to finishup below the following in fs/cifs/xattr.c
->
-> if (strncmp(ea_name, CIFS_XATTR_DOS_ATTRIB, 14) == 0) {
-> cifs_dbg(FYI, "attempt to query cifs inode metadata\n");
-> /* revalidate/getattr then populate from inode */
->
-> On Tue, Jun 10, 2014 at 11:32 AM, David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org> wrote:
->> Hi Peter,
->>
->> On Tue, 10 Jun 2014 16:05:49 +0100, Peter Flood wrote:
->>
->>> I want to read the 'offline' extended attribute on files on a windows
->>> share mounted on a linux host, is it possible to get this info?
->> The Linux CIFS client doesn't currently offer such support. However,
->> the offline attribute can be checked using smbclient via the allinfo
->> command. Offline files will carry an 'O' in the attributes field.
->>
->> Cheers, David
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
+--
+
+David Disseldorp (2):
+      src/cloner: check filesystem type
+      src/cloner: add CIFS_IOC_COPYCHUNK_FILE support
+
+ configure.ac |   1 +
+ src/cloner.c | 123 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++----------
+ 2 files changed, 114 insertions(+), 10 deletions(-)
