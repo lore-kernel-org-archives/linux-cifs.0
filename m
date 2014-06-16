@@ -1,94 +1,78 @@
-From: Timothy Davenport <warrickguy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: cifs case insensitivity
-Date: Sun, 15 Jun 2014 16:31:06 -0400
-Message-ID: <CAPO=4gABJ15KMyDbM68qHEM15O385Yp7P2AMT-qTrt19ABDBzQ@mail.gmail.com>
-References: <CAPO=4gDhsduZ24Ah3rGKVEWY6CPHeFPnr+QbSoXkoZCiuvRGUg@mail.gmail.com>
-	<CAH2r5muHk5_bQz1jBTaGtEQ8yPBUHN_uD8O0twoEA9Qe0gHo=g@mail.gmail.com>
+From: "Stefan (metze) Metzmacher" <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] fs/cifs: fix regression in cifs_create_mf_symlink()
+Date: Mon, 16 Jun 2014 15:49:49 +0200
+Message-ID: <539EF5FD.5000307@samba.org>
+References: <1402394606-7910-1-git-send-email-bb@sernet.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="QbxoLR5KvvS2XQrJOoAOfRa5p7cjHO6jH"
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: =?UTF-8?B?QmrDtnJuIEJhdW1iYWNo?= <bb-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5muHk5_bQz1jBTaGtEQ8yPBUHN_uD8O0twoEA9Qe0gHo=g@mail.gmail.com>
+In-Reply-To: <1402394606-7910-1-git-send-email-bb-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Steve:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--QbxoLR5KvvS2XQrJOoAOfRa5p7cjHO6jH
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-The NAS's (servers) run linux but are managed through a web interface
-and have no root access.
+Hi Steve,
 
-I added,   unix extensions = yes   to /etc/samba/smb.conf [global] on
-my client (debian) machine but it didn't help.
+any comments on this? How can we get this fixed upstream?
 
-I added it to /usr/share/samba/smb.conf also for good measure even
-though I don't think it's used
+Thanks!
+metze
 
-I retired from IBM in 2010
-
-
-
-On Sun, Jun 15, 2014 at 3:31 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> Are Unix extensions enabled in the smb.conf on your server?
->
-> The default on the server is unix extensions = yes   but I wonder if
-> unix extensions are getting turned off somehow on client or server
->
-> On Sun, Jun 15, 2014 at 2:23 PM, Timothy Davenport <warrickguy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> I've noticed a problem with case insensitivity on my cifs mounts.  I
->> ran into it when upgrading from Linux Mint 13 to 17.  I've since
->> determined that the problem also exists on debian testing.
->> The shares on my NAS boxes (Buffalo and ZyXEL) are case sensitive with
->> Mint 13 and debian stable (wheezy).  They are case insensitive on Mint
->> 17 and debian testing (jessie).  I do a lot of file renaming
->> (upper/lower casing) and the insensitivity poses a real problem.
->>
->> Here is an example from fstab for one of my shares and the mount command used.
->>
->> //10.2.76.31/android    /mnt/ls-pro-android    cifs
->> users,noauto,credentials=/home/trdavenport/sambapw,iocharset=utf8    0
->>    0
->>
->> mount     /mnt/ls-pro-android
->>
->> As a test I first installed a new instance of debian stable (Linux
->> 3.2.0-4-amd64 #1 SMP Debian 3.2.57-3+deb7u2)(cifs.ko v.1.76),
->> installed cifs-utils (2:5.5-1) and configured everything to access my
->> shares.  This resulted in case sensitive access to all my shares.
->>
->> Without making any other changes I installed a backported kernel
->> (Linux 3.12-0.bpo.1-amd64 #1 SMP Debian 3.12.9-1~bpo70+1)(cifs.ko
->> v.2.02) and with that all my shares are case insensitive.  Using grub
->> I can switch back and forth between the two kernels and the results
->> are consistent.
->>
->> Have I missed an option or configuration that would address this?  I
->> think the nocase option is supposed to turn off sensitivity, but can't
->> find anything to turn it on.
->>
->> Could this fix ( http;//article.gmane.org/gmane.linux.kernel.cifs/8832
->> )  from 2013-09-12 have something to do with it?
->>
->> If I use fuse/gvfs, all the shares are case sensitive on debian stable
->> and testing as well as Mint 13 and 17.
->>
->>  --
->> Tim Davenport
->> Gatlinburg, Tennessee  USA
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
-> --
-> Thanks,
->
-> Steve
+Am 10.06.2014 12:03, schrieb Bj=C3=B6rn Baumbach:
+> commit d81b8a40e2ece0a9ab57b1fe1798e291e75bf8fc
+> ("CIFS: Cleanup cifs open codepath")
+> changed disposition to FILE_OPEN.
+>=20
+> Signed-off-by: Bj=C3=B6rn Baumbach <bb-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org>
+> Signed-off-by: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> Reviewed-by: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> Cc: <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org> # v3.14+
+> Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+> Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> ---
+>  fs/cifs/link.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/fs/cifs/link.c b/fs/cifs/link.c
+> index 264ece7..68559fd 100644
+> --- a/fs/cifs/link.c
+> +++ b/fs/cifs/link.c
+> @@ -374,7 +374,7 @@ cifs_create_mf_symlink(unsigned int xid, struct cif=
+s_tcon *tcon,
+>  	oparms.cifs_sb =3D cifs_sb;
+>  	oparms.desired_access =3D GENERIC_WRITE;
+>  	oparms.create_options =3D create_options;
+> -	oparms.disposition =3D FILE_OPEN;
+> +	oparms.disposition =3D FILE_CREATE;
+>  	oparms.path =3D path;
+>  	oparms.fid =3D &fid;
+>  	oparms.reconnect =3D false;
+>=20
 
 
+--QbxoLR5KvvS2XQrJOoAOfRa5p7cjHO6jH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--- 
-Tim Davenport
-Gatlinburg, Tennessee  USA
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iEYEARECAAYFAlOe9gYACgkQm70gjA5TCD89XQCfR05JcjbtnGAs3mpQXQXS1CGx
+cLYAnjWQBwzYg7zJROjwbKmvp2gXjZcK
+=686d
+-----END PGP SIGNATURE-----
+
+--QbxoLR5KvvS2XQrJOoAOfRa5p7cjHO6jH--
