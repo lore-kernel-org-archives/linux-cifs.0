@@ -1,78 +1,61 @@
-From: "Stefan (metze) Metzmacher" <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] fs/cifs: fix regression in cifs_create_mf_symlink()
-Date: Mon, 16 Jun 2014 15:49:49 +0200
-Message-ID: <539EF5FD.5000307@samba.org>
-References: <1402394606-7910-1-git-send-email-bb@sernet.de>
-Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="QbxoLR5KvvS2XQrJOoAOfRa5p7cjHO6jH"
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: =?UTF-8?B?QmrDtnJuIEJhdW1iYWNo?= <bb-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH 0/5 v4] Split CIFS_SessSetup()
+Date: Mon, 16 Jun 2014 15:35:23 +0100
+Message-ID: <1402929328-12866-1-git-send-email-sprabhu@redhat.com>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1402394606-7910-1-git-send-email-bb-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---QbxoLR5KvvS2XQrJOoAOfRa5p7cjHO6jH
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+I am investigating the possibility of adding support for gss-proxy in the
+cifs client module. As part of that investigation, I was looking at the
+CIFS_SessSetup() function. This is a long function which handles multiple auths
+using if conditions and switch statements. The code struction makes it
+difficult to modify or add support for new authentication mechanisms.
 
-Hi Steve,
+The proposal is to split the various authentication code into its own separate
+functions. This increases the lines of code but will simplify maintenance and
+addition of new auth methods.
 
-any comments on this? How can we get this fixed upstream?
+The short term goal is to add gss-proxy support for kerberos authentication.
+This will require to and fro communication with the gss-proxy module over a
+unix socket.
 
-Thanks!
-metze
+Further long term goals are 
+1) Add support for NTLMSSP using SPNEGO,
+2) Allow clients to negotiate which authentication mechanism to use using SPNEGO.
 
-Am 10.06.2014 12:03, schrieb Bj=C3=B6rn Baumbach:
-> commit d81b8a40e2ece0a9ab57b1fe1798e291e75bf8fc
-> ("CIFS: Cleanup cifs open codepath")
-> changed disposition to FILE_OPEN.
->=20
-> Signed-off-by: Bj=C3=B6rn Baumbach <bb-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org>
-> Signed-off-by: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> Reviewed-by: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> Cc: <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org> # v3.14+
-> Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> ---
->  fs/cifs/link.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/fs/cifs/link.c b/fs/cifs/link.c
-> index 264ece7..68559fd 100644
-> --- a/fs/cifs/link.c
-> +++ b/fs/cifs/link.c
-> @@ -374,7 +374,7 @@ cifs_create_mf_symlink(unsigned int xid, struct cif=
-s_tcon *tcon,
->  	oparms.cifs_sb =3D cifs_sb;
->  	oparms.desired_access =3D GENERIC_WRITE;
->  	oparms.create_options =3D create_options;
-> -	oparms.disposition =3D FILE_OPEN;
-> +	oparms.disposition =3D FILE_CREATE;
->  	oparms.path =3D path;
->  	oparms.fid =3D &fid;
->  	oparms.reconnect =3D false;
->=20
+V2:
+- Ensure that sess_data allocated on intermediate patches are freed.
+- Remove ifdef-endif blocks from the switch statement in CIFS_SessSetup().
 
+V3:
+- Fix whitespace errors in some patches.
+- Change sess_establish_session to return errors. Call this function only in
+  case of successful establish session calls to the server.
+- Delete an incorrect comment in case of rawntlmssp authentication.
+- Delete an if statement before kfree(ntlmssp) in rawntlmssp authentication.
 
---QbxoLR5KvvS2XQrJOoAOfRa5p7cjHO6jH
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+v4:
+- reordered elements of struct sess_data as asked by jlayton
+- Use free_rsp_buf() to clean buffer.
+- Clean up the rawntlmssp case further and break the calls into separate
+  functions.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Sachin Prabhu (5):
+  cifs: replace code with free_rsp_buf()
+  cifs: Split lanman auth from CIFS_SessSetup()
+  cifs: Split ntlm and ntlmv2 authentication methods off
+    CIFS_SessSetup()
+  cifs: Split Kerberos authentication off CIFS_SessSetup()
+  cifs: Separate rawntlmssp auth from CIFS_SessSetup()
 
-iEYEARECAAYFAlOe9gYACgkQm70gjA5TCD89XQCfR05JcjbtnGAs3mpQXQXS1CGx
-cLYAnjWQBwzYg7zJROjwbKmvp2gXjZcK
-=686d
------END PGP SIGNATURE-----
+ fs/cifs/cifsproto.h |    1 +
+ fs/cifs/cifssmb.c   |   20 +-
+ fs/cifs/misc.c      |    9 +
+ fs/cifs/sess.c      | 1192 ++++++++++++++++++++++++++++++++++++---------------
+ fs/cifs/smb2pdu.c   |   10 -
+ 5 files changed, 854 insertions(+), 378 deletions(-)
 
---QbxoLR5KvvS2XQrJOoAOfRa5p7cjHO6jH--
+-- 
+1.9.3
