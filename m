@@ -1,105 +1,61 @@
-From: Timothy Davenport <warrickguy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: cifs case insensitivity
-Date: Thu, 19 Jun 2014 09:57:41 -0400
-Message-ID: <CAPO=4gCjgx6traKVZ45c7Jg_xudAsXeEkyNZHoY_1Xm4BdRyKA@mail.gmail.com>
-References: <CAPO=4gDhsduZ24Ah3rGKVEWY6CPHeFPnr+QbSoXkoZCiuvRGUg@mail.gmail.com>
-	<CAH2r5muHk5_bQz1jBTaGtEQ8yPBUHN_uD8O0twoEA9Qe0gHo=g@mail.gmail.com>
-	<CAPO=4gABJ15KMyDbM68qHEM15O385Yp7P2AMT-qTrt19ABDBzQ@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: smb2 unix extensions
+Date: Thu, 19 Jun 2014 09:13:42 -0700
+Message-ID: <CAH2r5muP55e-neuG8so_0oiqSedoRxh5wSFo4_EMSvYO-xi+YA@mail.gmail.com>
+References: <E1WXtQF-00AjyQ-OL@intern.SerNet.DE> <20140409185259.GE14143@samba2>
+ <E1WxISY-004maB-TA@intern.SerNet.DE>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, samba-technical-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: "Volker.Lendecke-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org" <Volker.Lendecke-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAPO=4gABJ15KMyDbM68qHEM15O385Yp7P2AMT-qTrt19ABDBzQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <E1WxISY-004maB-TA-dqLtpHMqGvUyWpdLl23E4A@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Any other suggestions on this?
+I generally like this, although I prefer simple one request field, and
+the response field to simply match the data we populate in the struct
+inode that doesn't already come back in the Windows info (the set of
+fields you return is close to what is needed now), and I think that
+for the stat case (open file with query of file info returned in unix
+context on open response) we don't actually need multiple info levels
+(at least for the Linux case) as symlinks can be done any of three
+other ways.
 
-
-
-On Sun, Jun 15, 2014 at 4:31 PM, Timothy Davenport <warrickguy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> Steve:
+On Wed, Jun 18, 2014 at 11:11 AM, Volker Lendecke
+<Volker.Lendecke-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org> wrote:
+> On Wed, Apr 09, 2014 at 11:52:59AM -0700, Jeremy Allison wrote:
 >
-> The NAS's (servers) run linux but are managed through a web interface
-> and have no root access.
+>> > https://git.samba.org/?p=3Dvl/samba.git/.git;a=3Dshortlog;h=3Drefs=
+/heads/smb2-unix
 >
-> I added,   unix extensions = yes   to /etc/samba/smb.conf [global] on
-> my client (debian) machine but it didn't help.
+>> W00t! Working code always trumps everything :-).
 >
-> I added it to /usr/share/samba/smb.conf also for good measure even
-> though I don't think it's used
+> The branch contains some updates. A "chown file 1" now ends
+> up server-side in a debug message saying
 >
-> I retired from IBM in 2010
+> [2014/06/18 14:46:46.344109, 10, pid=3D19107, effective(502, 502), re=
+al(502, 502)]
+> ../source3/smbd/smb2_create.c:1183(smbd_smb2_create_send)
+>   smbd_smb2_create_send: Setting uid to 1
 >
+> Next step is to actually do the chown server-side :-)
 >
+> Comments?
 >
-> On Sun, Jun 15, 2014 at 3:31 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> Are Unix extensions enabled in the smb.conf on your server?
->>
->> The default on the server is unix extensions = yes   but I wonder if
->> unix extensions are getting turned off somehow on client or server
->>
->> On Sun, Jun 15, 2014 at 2:23 PM, Timothy Davenport <warrickguy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->>> I've noticed a problem with case insensitivity on my cifs mounts.  I
->>> ran into it when upgrading from Linux Mint 13 to 17.  I've since
->>> determined that the problem also exists on debian testing.
->>> The shares on my NAS boxes (Buffalo and ZyXEL) are case sensitive with
->>> Mint 13 and debian stable (wheezy).  They are case insensitive on Mint
->>> 17 and debian testing (jessie).  I do a lot of file renaming
->>> (upper/lower casing) and the insensitivity poses a real problem.
->>>
->>> Here is an example from fstab for one of my shares and the mount command used.
->>>
->>> //10.2.76.31/android    /mnt/ls-pro-android    cifs
->>> users,noauto,credentials=/home/trdavenport/sambapw,iocharset=utf8    0
->>>    0
->>>
->>> mount     /mnt/ls-pro-android
->>>
->>> As a test I first installed a new instance of debian stable (Linux
->>> 3.2.0-4-amd64 #1 SMP Debian 3.2.57-3+deb7u2)(cifs.ko v.1.76),
->>> installed cifs-utils (2:5.5-1) and configured everything to access my
->>> shares.  This resulted in case sensitive access to all my shares.
->>>
->>> Without making any other changes I installed a backported kernel
->>> (Linux 3.12-0.bpo.1-amd64 #1 SMP Debian 3.12.9-1~bpo70+1)(cifs.ko
->>> v.2.02) and with that all my shares are case insensitive.  Using grub
->>> I can switch back and forth between the two kernels and the results
->>> are consistent.
->>>
->>> Have I missed an option or configuration that would address this?  I
->>> think the nocase option is supposed to turn off sensitivity, but can't
->>> find anything to turn it on.
->>>
->>> Could this fix ( http;//article.gmane.org/gmane.linux.kernel.cifs/8832
->>> )  from 2013-09-12 have something to do with it?
->>>
->>> If I use fuse/gvfs, all the shares are case sensitive on debian stable
->>> and testing as well as Mint 13 and 17.
->>>
->>>  --
->>> Tim Davenport
->>> Gatlinburg, Tennessee  USA
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->>
->>
->> --
->> Thanks,
->>
->> Steve
->
->
+> Volker
 >
 > --
-> Tim Davenport
-> Gatlinburg, Tennessee  USA
+> SerNet GmbH, Bahnhofsallee 1b, 37081 G=C3=B6ttingen
+> phone: +49-551-370000-0, fax: +49-551-370000-9
+> AG G=C3=B6ttingen, HRB 2816, GF: Dr. Johannes Loxen
+> http://www.sernet.de, mailto:kontakt-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org
 
 
 
--- 
-Tim Davenport
-Gatlinburg, Tennessee  USA
+--=20
+Thanks,
+
+Steve
