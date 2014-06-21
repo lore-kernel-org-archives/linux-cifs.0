@@ -1,130 +1,58 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: cifs case insensitivity
-Date: Sat, 21 Jun 2014 14:52:39 -0500
-Message-ID: <CADT32e+WP9akNbcfhNfe8s0ZZsX_C2=v7tJLKizzP1QWzS-_+g@mail.gmail.com>
-References: <CAPO=4gDhsduZ24Ah3rGKVEWY6CPHeFPnr+QbSoXkoZCiuvRGUg@mail.gmail.com>
-	<CAH2r5muHk5_bQz1jBTaGtEQ8yPBUHN_uD8O0twoEA9Qe0gHo=g@mail.gmail.com>
-	<CAPO=4gABJ15KMyDbM68qHEM15O385Yp7P2AMT-qTrt19ABDBzQ@mail.gmail.com>
-	<CAPO=4gCjgx6traKVZ45c7Jg_xudAsXeEkyNZHoY_1Xm4BdRyKA@mail.gmail.com>
+Subject: Re: [patch] cifs: fix error code in cifs_match_super()
+Date: Sat, 21 Jun 2014 15:06:30 -0500
+Message-ID: <CADT32eKhAiTzdargVxyzWNgY-BWn1KAL5m=532j0TcyT1-XrUg@mail.gmail.com>
+References: <20140620192205.GC19824@mwanda>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Timothy Davenport <warrickguy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
+To: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAPO=4gCjgx6traKVZ45c7Jg_xudAsXeEkyNZHoY_1Xm4BdRyKA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20140620192205.GC19824@mwanda>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This is a bug in current cifs client code, may be.
-I checked in 1.74 version and it does not happen there but does in 2.02
-For cifs client 2.02, samba initially determines it to be cifsfs
-ra_type but (I think)
-sometimes during negotiate protocol reply itself, it decides that the
-client is now
-vista and so case insensitive.
+I do not think his is correct. cifs_match_super return code is used as
+a test by sb_get,
+so if there is any error/mismatch within cifs_match_super, it should
+return 0. 'if (test)' in sb_get() will succeed with PTR_ERR(tlink) which
+would be incorrect.
 
-conn->case_sensitive 1 in case of cifs client 1.74
-conn->case_sensitive 0 in case of cifs client 2.02
-
-Not sure what makes samba server decide so.  Except in case 2.02,
-smb header flag2 has bit  (4000) set indicating Error codes are NT error codes
-but that should make a difference.
-
-
-
-
-On Thu, Jun 19, 2014 at 8:57 AM, Timothy Davenport <warrickguy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> Any other suggestions on this?
+On Fri, Jun 20, 2014 at 2:22 PM, Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org> wrote:
+> It looks like there is a typo here where return "rc" which is "success"
+> instead of PTR_ERR(tlink) which is a negative error code.
 >
+> I have also removed the unneeded initialization so that GCC has a chance
+> to warn about this sort of thing next time.
 >
+> Fixes: 25c7f41e9234 ('CIFS: Migrate to shared superblock model')
+> Signed-off-by: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+> ---
+> This is a static checker warning and I'm not certain this is the correct
+> fix.  Please review this one carefully.
 >
-> On Sun, Jun 15, 2014 at 4:31 PM, Timothy Davenport <warrickguy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> Steve:
->>
->> The NAS's (servers) run linux but are managed through a web interface
->> and have no root access.
->>
->> I added,   unix extensions = yes   to /etc/samba/smb.conf [global] on
->> my client (debian) machine but it didn't help.
->>
->> I added it to /usr/share/samba/smb.conf also for good measure even
->> though I don't think it's used
->>
->> I retired from IBM in 2010
->>
->>
->>
->> On Sun, Jun 15, 2014 at 3:31 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->>> Are Unix extensions enabled in the smb.conf on your server?
->>>
->>> The default on the server is unix extensions = yes   but I wonder if
->>> unix extensions are getting turned off somehow on client or server
->>>
->>> On Sun, Jun 15, 2014 at 2:23 PM, Timothy Davenport <warrickguy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->>>> I've noticed a problem with case insensitivity on my cifs mounts.  I
->>>> ran into it when upgrading from Linux Mint 13 to 17.  I've since
->>>> determined that the problem also exists on debian testing.
->>>> The shares on my NAS boxes (Buffalo and ZyXEL) are case sensitive with
->>>> Mint 13 and debian stable (wheezy).  They are case insensitive on Mint
->>>> 17 and debian testing (jessie).  I do a lot of file renaming
->>>> (upper/lower casing) and the insensitivity poses a real problem.
->>>>
->>>> Here is an example from fstab for one of my shares and the mount command used.
->>>>
->>>> //10.2.76.31/android    /mnt/ls-pro-android    cifs
->>>> users,noauto,credentials=/home/trdavenport/sambapw,iocharset=utf8    0
->>>>    0
->>>>
->>>> mount     /mnt/ls-pro-android
->>>>
->>>> As a test I first installed a new instance of debian stable (Linux
->>>> 3.2.0-4-amd64 #1 SMP Debian 3.2.57-3+deb7u2)(cifs.ko v.1.76),
->>>> installed cifs-utils (2:5.5-1) and configured everything to access my
->>>> shares.  This resulted in case sensitive access to all my shares.
->>>>
->>>> Without making any other changes I installed a backported kernel
->>>> (Linux 3.12-0.bpo.1-amd64 #1 SMP Debian 3.12.9-1~bpo70+1)(cifs.ko
->>>> v.2.02) and with that all my shares are case insensitive.  Using grub
->>>> I can switch back and forth between the two kernels and the results
->>>> are consistent.
->>>>
->>>> Have I missed an option or configuration that would address this?  I
->>>> think the nocase option is supposed to turn off sensitivity, but can't
->>>> find anything to turn it on.
->>>>
->>>> Could this fix ( http;//article.gmane.org/gmane.linux.kernel.cifs/8832
->>>> )  from 2013-09-12 have something to do with it?
->>>>
->>>> If I use fuse/gvfs, all the shares are case sensitive on debian stable
->>>> and testing as well as Mint 13 and 17.
->>>>
->>>>  --
->>>> Tim Davenport
->>>> Gatlinburg, Tennessee  USA
->>>> --
->>>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->>>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>
->>>
->>>
->>> --
->>> Thanks,
->>>
->>> Steve
->>
->>
->>
->> --
->> Tim Davenport
->> Gatlinburg, Tennessee  USA
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 20d75b8..a5704e1 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -2730,14 +2730,14 @@ cifs_match_super(struct super_block *sb, void *data)
+>         struct cifs_ses *ses;
+>         struct cifs_tcon *tcon;
+>         struct tcon_link *tlink;
+> -       int rc = 0;
+> +       int rc;
 >
->
->
-> --
-> Tim Davenport
-> Gatlinburg, Tennessee  USA
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>         spin_lock(&cifs_tcp_ses_lock);
+>         cifs_sb = CIFS_SB(sb);
+>         tlink = cifs_get_tlink(cifs_sb_master_tlink(cifs_sb));
+>         if (IS_ERR(tlink)) {
+>                 spin_unlock(&cifs_tcp_ses_lock);
+> -               return rc;
+> +               return PTR_ERR(tlink);
+>         }
+>         tcon = tlink_tcon(tlink);
+>         ses = tcon->ses;
