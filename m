@@ -1,82 +1,43 @@
-From: Kyle Harrigan <kwharrigan-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Seemingly random loss of permissions to krb5i multiuser mounts
-Date: Sun, 22 Jun 2014 11:55:55 -0400
-Message-ID: <CAFknXfDUNPpha-do8rXswkMfJzZeDeL4p3La-V4CuA2vQD=nwA@mail.gmail.com>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: fix wsize patch
+Date: Sun, 22 Jun 2014 20:46:18 +0400
+Message-ID: <CAKywueQ1Np0ZUEUzYofNjtfhSfvXcEWn0Y0+pPfK+hMThL4S9g@mail.gmail.com>
+References: <CAH2r5mvKO7J_zD2vBH=Jmp-OU3=bNm4PLN+KVBHGnrobr8m-Gg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAH2r5mvKO7J_zD2vBH=Jmp-OU3=bNm4PLN+KVBHGnrobr8m-Gg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Greetings,
+2014-06-22 3:21 GMT+04:00 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+> Pavel,
+> Does this patch of yours, which fixes the problem if server shrinks
+> negotiated wsize on rsmb2/smb3 econnect, need to go in this merge
+> window?
+>
+> http://git.altlinux.org/people/piastry/public/?p=cifs-2.6.git;a=commit;h=4c88ec0bc8275898fb6111171e7c0428294e6b78
+>
+> --
+> Thanks,
+>
+> Steve
 
-I've got a small set (12) of RHEL 6.5 boxes connecting to a WS2008
-share using mount.cifs, krb5i, multiuser.
+I have another smaller version of this patch
+(http://git.altlinux.org/people/piastry/public/?p=cifs-2.6.git;a=commitdiff;h=c4a91bd069bd0cf176544398b8815adf429f7989;hp=d0e0c3c471acda3f96196ac54632748946471f0a),
+but as the previous one it applies on top of another changes in my
+branch (http://git.altlinux.org/people/piastry/public/?p=cifs-2.6.git;a=shortlog;h=refs/heads/smb2-dev-5).
 
-I don't have my specific fstab in front of me, but to recollection it is:
+Anyway I think it's too risky to apply it during this stage because
+this problem is also addressed by "CIFS: Fix cifs_writev_requeue when
+wsize changes" and "CIFS: Fix wsize usage in iovec write" patches that
+more complicated.
 
-//server.name/share /share cifs sec=krb5i,multiuser,user=MACHINE$ 0 0
-for each machine.
-
-Packet signing was required-- would not mount without krb5i.
-
-/etc/request-key.conf contains the appropriate cifs upcall commands as
-described in the man page.
-
-The machines are joined to the AD domain, and each machine has a good
-/etc/krb5.keytab and good Kerberos operation.
-
-First, the good:
-
-All machines, upon bootup, achieve a good multiuser mount.  Users can
-login, obtain appropriate kerberos tickets, and access the share
-without issue.  Permissions enforcement is correct.  I can tell it is
-working right because multiple users can create files which are owned
-by them.  Users cannot access folders they should not be able to based
-on MSAD permissions setup.  kdestroy causes loss of access to the
-mount as expected... etc.  Smells like victory.
-
-The bad:
-
-Users are experiencing what seem like fairly random loss of
-permissions accessing the share.  After some period of time, users
-begin obtaining "Permission denied" errors when accessing the share.
-It does not happen on all machines.  Some machines seem to stay
-working for a week, while others may go down after only a few hours.
-The only solution once this happens is to mount is to umount and mount
-the share, at which points it immediately works again.  Reboot also
-solves the problem.  The kerberos tickets still appear to be valid, so
-I do not think that is the problem.  In addition, any subsequent
-kdestroy and kinit do not fix it.  So do not believe related to
-Kerberos expiration though have not ruled it out entirely.
-
-The only lead I have right now is I am still seeing some "CIFS VFS:
-Server requires packet signing to be enabled" messages in dmesg even
-though I am mounting as krb5i.  I noticed the default in
-/proc/fs/cifs/SecurityFlags was 0x7 (may use NTLMv2,may use packet
-signing, may use NTLM) , so I attempted to modify to 0x9009 which I
-thought might solve the problem.  My math (hopefully correct :-> )
-there was:
-
-   must use packet signing                         0x01001
-+ must use Kerberos                                 0x08008
----------------------------------------------------------
-
-                                                  0x09009
-
-I probably owe you version numbers of the module and some more
-specific debug information.  But was hoping to get the thread started
-with a few of the smart guys to see if we can't get the obvious things
-out of the way.
-
-Should I continue to attempt to hunt and resolve any packet signing
-error messages?  Could they somehow be eventually causing the
-permissions errors?  What specific log messages would be helpful?
-I've turned on cifsFYI and looked over DebugData but there is
-obviously a lot there and nothing stuck out.
-
-Any help or guidance would be appreciated.
+I am going to give the mentioned branch a little more testing and post
+to the list in a short time.
 
 -- 
--Kyle
+Best regards,
+Pavel Shilovsky.
