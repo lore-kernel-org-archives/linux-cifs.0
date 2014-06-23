@@ -1,88 +1,88 @@
-From: Timothy Davenport <warrickguy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: cifs case insensitivity
-Date: Mon, 23 Jun 2014 08:38:40 -0400
-Message-ID: <CAPO=4gCsJx3vmbANsGwpw4mTOJBe9iARseF3uXM-un1XbnfqrA@mail.gmail.com>
-References: <CAPO=4gDhsduZ24Ah3rGKVEWY6CPHeFPnr+QbSoXkoZCiuvRGUg@mail.gmail.com>
-	<CADT32e+gSSayhjKdHS6HWOn3SHoaMX7yEX2-r6YGn7fYQ_+nhQ@mail.gmail.com>
+From: Steven Whitehouse <swhiteho-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 0/2] Update wait_on_bit functions
+Date: Mon, 23 Jun 2014 13:45:03 +0100
+Message-ID: <53A8214F.8050505@redhat.com>
+References: <20140623004945.21714.26253.stgit@notabene.brown>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Oleg Nesterov <oleg-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: NeilBrown <neilb-l3A5Bk7waGM@public.gmane.org>, Peter Zijlstra <peterz-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+	Ingo Molnar <mingo-X9Un+BFzKDI@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32e+gSSayhjKdHS6HWOn3SHoaMX7yEX2-r6YGn7fYQ_+nhQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20140623004945.21714.26253.stgit-wvvUuzkyo1EYVZTmpyfIwg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Shirish:
-     I added sec=ntlmv2 to each line in fstab and tested on debian
-stable with (Linux 3.12-0.bpo.1-amd64 #1 SMP Debian
-3.12.9-1~bpo70+1)(cifs.ko v.2.02) and that solved the case sensitivity
-problem for me.  I also tested it on debian stable with (Linux
-3.2.0-4-amd64 #1 SMP Debian 3.2.57-3+deb7u2)(cifs.ko v.1.76) which had
-always worked and there were no problems using the new parameter.
-I'll try it later on Mint 17 but have no reason to think it will be
-any issues there either.
-     Thank you for helping me.  I was getting ready to learn how to
-compile a kernel so I could apply the patch.  This solution was a
-whole lot easier.
+Hi,
 
-Tim
+On 23/06/14 01:52, NeilBrown wrote:
+> These patches were in 'tip' for a while, but caused conflicts
+> with other changes - both NFS and CIFS added new uses of
+> wait_on_bit functions.
+>
+> So here they are again against 3.16-rc2.  Hopefully no new users will
+> be added before -rc3 or -rc4...
+>
+> (I hoped to submit this in the rc1 -> rc2 window, but that happened
+> while I was on leave...)
+>
+> Thanks,
+> NeilBrown
+Acked-by: Steven Whitehouse <swhiteho-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
-On Sun, Jun 22, 2014 at 10:42 PM, Shirish Pargaonkar
-<shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> I posted a patch but may not be right one.  I think easiest workaround would be
-> to use either sec=ntlmv2 or sec=ntlm as one of the mount options
-> (default one, sec=ntlmssp is what is broken) against this server.
+Steve.
+
+> ---
+>
+> NeilBrown (2):
+>        SCHED: remove proliferation of wait_on_bit action functions.
+>        SCHED: allow wait_on_bit_action functions to support a timeout.
 >
 >
-> On Sun, Jun 15, 2014 at 2:23 PM, Timothy Davenport <warrickguy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> I've noticed a problem with case insensitivity on my cifs mounts.  I
->> ran into it when upgrading from Linux Mint 13 to 17.  I've since
->> determined that the problem also exists on debian testing.
->> The shares on my NAS boxes (Buffalo and ZyXEL) are case sensitive with
->> Mint 13 and debian stable (wheezy).  They are case insensitive on Mint
->> 17 and debian testing (jessie).  I do a lot of file renaming
->> (upper/lower casing) and the insensitivity poses a real problem.
->>
->> Here is an example from fstab for one of my shares and the mount command used.
->>
->> //10.2.76.31/android    /mnt/ls-pro-android    cifs
->> users,noauto,credentials=/home/trdavenport/sambapw,iocharset=utf8    0
->>    0
->>
->> mount     /mnt/ls-pro-android
->>
->> As a test I first installed a new instance of debian stable (Linux
->> 3.2.0-4-amd64 #1 SMP Debian 3.2.57-3+deb7u2)(cifs.ko v.1.76),
->> installed cifs-utils (2:5.5-1) and configured everything to access my
->> shares.  This resulted in case sensitive access to all my shares.
->>
->> Without making any other changes I installed a backported kernel
->> (Linux 3.12-0.bpo.1-amd64 #1 SMP Debian 3.12.9-1~bpo70+1)(cifs.ko
->> v.2.02) and with that all my shares are case insensitive.  Using grub
->> I can switch back and forth between the two kernels and the results
->> are consistent.
->>
->> Have I missed an option or configuration that would address this?  I
->> think the nocase option is supposed to turn off sensitivity, but can't
->> find anything to turn it on.
->>
->> Could this fix ( http;//article.gmane.org/gmane.linux.kernel.cifs/8832
->> )  from 2013-09-12 have something to do with it?
->>
->> If I use fuse/gvfs, all the shares are case sensitive on debian stable
->> and testing as well as Mint 13 and 17.
->>
->>  --
->> Tim Davenport
->> Gatlinburg, Tennessee  USA
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Tim Davenport
-Gatlinburg, Tennessee  USA
+>   Documentation/filesystems/caching/operations.txt |    2
+>   drivers/md/dm-bufio.c                            |   41 ++-----
+>   drivers/md/dm-snap.c                             |   10 --
+>   drivers/media/usb/dvb-usb-v2/dvb_usb_core.c      |   12 --
+>   fs/btrfs/extent_io.c                             |   10 --
+>   fs/buffer.c                                      |   11 --
+>   fs/cifs/connect.c                                |   10 --
+>   fs/cifs/file.c                                   |    9 --
+>   fs/cifs/inode.c                                  |    6 +
+>   fs/cifs/misc.c                                   |    2
+>   fs/fs-writeback.c                                |    3 -
+>   fs/fscache/cookie.c                              |    7 +
+>   fs/fscache/internal.h                            |    2
+>   fs/fscache/main.c                                |   18 ---
+>   fs/fscache/page.c                                |    4 -
+>   fs/gfs2/glock.c                                  |   25 ----
+>   fs/gfs2/lock_dlm.c                               |    8 -
+>   fs/gfs2/ops_fstype.c                             |   11 --
+>   fs/gfs2/recovery.c                               |    8 -
+>   fs/gfs2/super.c                                  |    8 -
+>   fs/inode.c                                       |    7 -
+>   fs/jbd2/transaction.c                            |   10 --
+>   fs/nfs/file.c                                    |    4 -
+>   fs/nfs/filelayout/filelayoutdev.c                |    4 -
+>   fs/nfs/inode.c                                   |    6 +
+>   fs/nfs/internal.h                                |    2
+>   fs/nfs/nfs4state.c                               |    4 -
+>   fs/nfs/pagelist.c                                |   14 +-
+>   fs/nfs/pnfs.c                                    |    2
+>   fs/nfs/write.c                                   |    4 -
+>   include/linux/sunrpc/sched.h                     |    2
+>   include/linux/wait.h                             |  125 +++++++++++++++++++++-
+>   include/linux/writeback.h                        |    3 -
+>   kernel/ptrace.c                                  |    8 -
+>   kernel/sched/wait.c                              |   30 ++++-
+>   mm/filemap.c                                     |   20 +---
+>   mm/ksm.c                                         |    8 -
+>   net/bluetooth/hci_core.c                         |    8 -
+>   net/sunrpc/sched.c                               |    4 -
+>   security/keys/gc.c                               |   11 --
+>   security/keys/request_key.c                      |   23 ----
+>   41 files changed, 214 insertions(+), 292 deletions(-)
+>
