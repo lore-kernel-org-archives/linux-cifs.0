@@ -1,435 +1,397 @@
-From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 9/9] CIFS: Use multicredits for writes
-Date: Mon, 23 Jun 2014 18:58:37 +0400
-Message-ID: <1403535517-8301-10-git-send-email-pshilovsky@samba.org>
-References: <1403535517-8301-1-git-send-email-pshilovsky@samba.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 2/5] cifs: Split lanman auth from CIFS_SessSetup()
+Date: Mon, 23 Jun 2014 16:21:22 -0500
+Message-ID: <CADT32e+dw=uOrNtm-wO=5z6AYMjwmPFfCn4_jwsK4qXp_j7fiA@mail.gmail.com>
+References: <1402929328-12866-1-git-send-email-sprabhu@redhat.com>
+	<1402929328-12866-3-git-send-email-sprabhu@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1403535517-8301-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <1402929328-12866-3-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-If we negotiate SMB2.1 and higher version of the protocol and
-a server supports large write buffer size, we need to consume 1
-credit per 65536 bytes. So, we need to know how many credits
-we have and obtain the required number of them before constructing
-a writedata structure in writepages and iovec write.
+Looks correct.
 
-Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- fs/cifs/cifsglob.h      |   15 ++++++++++++++
- fs/cifs/cifsproto.h     |    3 +++
- fs/cifs/file.c          |   34 +++++++++++++++++++++++++++----
- fs/cifs/smb1ops.c       |    1 +
- fs/cifs/smb2ops.c       |   52 +++++++++++++++++++++++++++++++++++++++++++++--
- fs/cifs/smb2pdu.c       |   24 ++++++++++++++++++----
- fs/cifs/smb2transport.c |    5 +++++
- fs/cifs/transport.c     |   25 ++++++++++++++++-------
- 8 files changed, 142 insertions(+), 17 deletions(-)
+Reviewed-by:  Shirish Pargaonkar <spargaonkar-IBi9RG/b67k@public.gmane.org>
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 8c53f20..95d6867 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -406,6 +406,9 @@ struct smb_version_operations {
- 			int);
- 	/* writepages retry size */
- 	unsigned int (*wp_retry_size)(struct inode *);
-+	/* get mtu credits */
-+	int (*wait_mtu_credits)(struct TCP_Server_Info *, unsigned int,
-+				unsigned int *, unsigned int *);
- };
- 
- struct smb_version_values {
-@@ -642,6 +645,16 @@ add_credits(struct TCP_Server_Info *server, const unsigned int add,
- }
- 
- static inline void
-+add_credits_and_wake(struct TCP_Server_Info *server, const unsigned int add,
-+		     const int optype)
-+{
-+	if (add) {
-+		server->ops->add_credits(server, add, optype);
-+		wake_up(&server->request_q);
-+	}
-+}
-+
-+static inline void
- set_credits(struct TCP_Server_Info *server, const int val)
- {
- 	server->ops->set_credits(server, val);
-@@ -1075,6 +1088,7 @@ struct cifs_writedata {
- 	int				result;
- 	unsigned int			pagesz;
- 	unsigned int			tailsz;
-+	unsigned int			credits;
- 	unsigned int			nr_pages;
- 	struct page			*pages[];
- };
-@@ -1400,6 +1414,7 @@ static inline void free_dfs_info_array(struct dfs_info3_param *param,
- #define   CIFS_OBREAK_OP   0x0100    /* oplock break request */
- #define   CIFS_NEG_OP      0x0200    /* negotiate request */
- #define   CIFS_OP_MASK     0x0380    /* mask request type */
-+#define   CIFS_HAS_CREDITS 0x0400    /* already has credits */
- 
- /* Security Flags: indicate type of session setup needed */
- #define   CIFSSEC_MAY_SIGN	0x00001
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index ca7980a..009e5cb 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -89,6 +89,9 @@ extern struct mid_q_entry *cifs_setup_async_request(struct TCP_Server_Info *,
- 						struct smb_rqst *);
- extern int cifs_check_receive(struct mid_q_entry *mid,
- 			struct TCP_Server_Info *server, bool log_error);
-+extern int cifs_wait_mtu_credits(struct TCP_Server_Info *server,
-+				 unsigned int size, unsigned int *num,
-+				 unsigned int *credits);
- extern int SendReceive2(const unsigned int /* xid */ , struct cifs_ses *,
- 			struct kvec *, int /* nvec to send */,
- 			int * /* type of buf returned */ , const int flags);
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 4ba59cd..d8ff8b6 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -2046,6 +2046,7 @@ static int cifs_writepages(struct address_space *mapping,
- 			   struct writeback_control *wbc)
- {
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(mapping->host->i_sb);
-+	struct TCP_Server_Info *server;
- 	bool done = false, scanned = false, range_whole = false;
- 	pgoff_t end, index;
- 	struct cifs_writedata *wdata;
-@@ -2068,23 +2069,30 @@ static int cifs_writepages(struct address_space *mapping,
- 			range_whole = true;
- 		scanned = true;
- 	}
-+	server = cifs_sb_master_tcon(cifs_sb)->ses->server;
- retry:
- 	while (!done && index <= end) {
--		unsigned int nr_pages, found_pages;
-+		unsigned int nr_pages, found_pages, wsize, credits;
- 		pgoff_t next = 0, tofind, saved_index = index;
- 
--		tofind = min((cifs_sb->wsize / PAGE_CACHE_SIZE) - 1,
--				end - index) + 1;
-+		rc = server->ops->wait_mtu_credits(server, cifs_sb->wsize,
-+						   &wsize, &credits);
-+		if (rc)
-+			break;
-+
-+		tofind = min((wsize / PAGE_CACHE_SIZE) - 1, end - index) + 1;
- 
- 		wdata = wdata_alloc_and_fillpages(tofind, mapping, end, &index,
- 						  &found_pages);
- 		if (!wdata) {
- 			rc = -ENOMEM;
-+			add_credits_and_wake(server, credits, 0);
- 			break;
- 		}
- 
- 		if (found_pages == 0) {
- 			kref_put(&wdata->refcount, cifs_writedata_release);
-+			add_credits_and_wake(server, credits, 0);
- 			break;
- 		}
- 
-@@ -2094,10 +2102,16 @@ retry:
- 		/* nothing to write? */
- 		if (nr_pages == 0) {
- 			kref_put(&wdata->refcount, cifs_writedata_release);
-+			add_credits_and_wake(server, credits, 0);
- 			continue;
- 		}
- 
-+		wdata->credits = credits;
-+
- 		rc = wdata_send_pages(wdata, nr_pages, mapping, wbc);
-+		if (rc)
-+			add_credits_and_wake(server, wdata->credits, 0);
-+
- 		kref_put(&wdata->refcount, cifs_writedata_release);
- 
- 		if (wbc->sync_mode == WB_SYNC_ALL && rc == -EAGAIN) {
-@@ -2473,17 +2487,26 @@ cifs_write_from_iovec(loff_t offset, size_t len, const struct iovec *iov,
- 
- 	iov_iter_init(&it, iov, nr_segs, len, written);
- 	do {
--		nr_pages = get_numpages(cifs_sb->wsize, len, &cur_len);
-+		unsigned int wsize, credits;
-+
-+		rc = server->ops->wait_mtu_credits(server, cifs_sb->wsize,
-+						   &wsize, &credits);
-+		if (rc)
-+			break;
-+
-+		nr_pages = get_numpages(wsize, len, &cur_len);
- 		wdata = cifs_writedata_alloc(nr_pages,
- 					     cifs_uncached_writev_complete);
- 		if (!wdata) {
- 			rc = -ENOMEM;
-+			add_credits_and_wake(server, credits, 0);
- 			break;
- 		}
- 
- 		rc = cifs_write_allocate_pages(wdata->pages, nr_pages);
- 		if (rc) {
- 			kfree(wdata);
-+			add_credits_and_wake(server, credits, 0);
- 			break;
- 		}
- 
-@@ -2492,6 +2515,7 @@ cifs_write_from_iovec(loff_t offset, size_t len, const struct iovec *iov,
- 			for (i = 0; i < nr_pages; i++)
- 				put_page(wdata->pages[i]);
- 			kfree(wdata);
-+			add_credits_and_wake(server, credits, 0);
- 			break;
- 		}
- 
-@@ -2503,12 +2527,14 @@ cifs_write_from_iovec(loff_t offset, size_t len, const struct iovec *iov,
- 		wdata->bytes = cur_len;
- 		wdata->pagesz = PAGE_SIZE;
- 		wdata->tailsz = cur_len - ((nr_pages - 1) * PAGE_SIZE);
-+		wdata->credits = credits;
- 
- 		if (!wdata->cfile->invalidHandle ||
- 		    !cifs_reopen_file(wdata->cfile, false))
- 			rc = server->ops->async_writev(wdata,
- 					cifs_uncached_writedata_release);
- 		if (rc) {
-+			add_credits_and_wake(server, wdata->credits, 0);
- 			kref_put(&wdata->refcount,
- 				 cifs_uncached_writedata_release);
- 			if (rc == -EAGAIN) {
-diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index 8a96342..5e8c22d 100644
---- a/fs/cifs/smb1ops.c
-+++ b/fs/cifs/smb1ops.c
-@@ -1025,6 +1025,7 @@ struct smb_version_operations smb1_operations = {
- 	.set_credits = cifs_set_credits,
- 	.get_credits_field = cifs_get_credits_field,
- 	.get_credits = cifs_get_credits,
-+	.wait_mtu_credits = cifs_wait_mtu_credits,
- 	.get_next_mid = cifs_get_next_mid,
- 	.read_data_offset = cifs_read_data_offset,
- 	.read_data_length = cifs_read_data_length,
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index e35ce5b..fecc2de 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -112,6 +112,53 @@ smb2_get_credits(struct mid_q_entry *mid)
- 	return le16_to_cpu(((struct smb2_hdr *)mid->resp_buf)->CreditRequest);
- }
- 
-+static int
-+smb2_wait_mtu_credits(struct TCP_Server_Info *server, unsigned int size,
-+		      unsigned int *num, unsigned int *credits)
-+{
-+	int rc = 0;
-+	unsigned int scredits;
-+
-+	spin_lock(&server->req_lock);
-+	while (1) {
-+		if (server->credits <= 0) {
-+			spin_unlock(&server->req_lock);
-+			cifs_num_waiters_inc(server);
-+			rc = wait_event_killable(server->request_q,
-+					has_credits(server, &server->credits));
-+			cifs_num_waiters_dec(server);
-+			if (rc)
-+				return rc;
-+			spin_lock(&server->req_lock);
-+		} else {
-+			if (server->tcpStatus == CifsExiting) {
-+				spin_unlock(&server->req_lock);
-+				return -ENOENT;
-+			}
-+
-+			scredits = server->credits;
-+			/* can deadlock with reopen */
-+			if (scredits == 1) {
-+				*num = SMB2_MAX_BUFFER_SIZE;
-+				*credits = 0;
-+				break;
-+			}
-+
-+			/* leave one credit for a possible reopen */
-+			scredits--;
-+			*num = min_t(unsigned int, size,
-+				     scredits * SMB2_MAX_BUFFER_SIZE);
-+
-+			*credits = DIV_ROUND_UP(*num, SMB2_MAX_BUFFER_SIZE);
-+			server->credits -= *credits;
-+			server->in_flight++;
-+			break;
-+		}
-+	}
-+	spin_unlock(&server->req_lock);
-+	return rc;
-+}
-+
- static __u64
- smb2_get_next_mid(struct TCP_Server_Info *server)
- {
-@@ -182,8 +229,6 @@ smb2_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
- 	/* start with specified wsize, or default */
- 	wsize = volume_info->wsize ? volume_info->wsize : CIFS_DEFAULT_IOSIZE;
- 	wsize = min_t(unsigned int, wsize, server->max_write);
--	/* set it to the maximum buffer size value we can send with 1 credit */
--	wsize = min_t(unsigned int, wsize, SMB2_MAX_BUFFER_SIZE);
- 
- 	return wsize;
- }
-@@ -1120,6 +1165,7 @@ struct smb_version_operations smb20_operations = {
- 	.set_credits = smb2_set_credits,
- 	.get_credits_field = smb2_get_credits_field,
- 	.get_credits = smb2_get_credits,
-+	.wait_mtu_credits = cifs_wait_mtu_credits,
- 	.get_next_mid = smb2_get_next_mid,
- 	.read_data_offset = smb2_read_data_offset,
- 	.read_data_length = smb2_read_data_length,
-@@ -1196,6 +1242,7 @@ struct smb_version_operations smb21_operations = {
- 	.set_credits = smb2_set_credits,
- 	.get_credits_field = smb2_get_credits_field,
- 	.get_credits = smb2_get_credits,
-+	.wait_mtu_credits = smb2_wait_mtu_credits,
- 	.get_next_mid = smb2_get_next_mid,
- 	.read_data_offset = smb2_read_data_offset,
- 	.read_data_length = smb2_read_data_length,
-@@ -1272,6 +1319,7 @@ struct smb_version_operations smb30_operations = {
- 	.set_credits = smb2_set_credits,
- 	.get_credits_field = smb2_get_credits_field,
- 	.get_credits = smb2_get_credits,
-+	.wait_mtu_credits = smb2_wait_mtu_credits,
- 	.get_next_mid = smb2_get_next_mid,
- 	.read_data_offset = smb2_read_data_offset,
- 	.read_data_length = smb2_read_data_length,
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index b0b260d..56bf028 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -1906,15 +1906,20 @@ int
- smb2_async_writev(struct cifs_writedata *wdata,
- 		  void (*release)(struct kref *kref))
- {
--	int rc = -EACCES;
-+	int rc = -EACCES, flags = 0;
- 	struct smb2_write_req *req = NULL;
- 	struct cifs_tcon *tcon = tlink_tcon(wdata->cfile->tlink);
-+	struct TCP_Server_Info *server = tcon->ses->server;
- 	struct kvec iov;
- 	struct smb_rqst rqst;
- 
- 	rc = small_smb2_init(SMB2_WRITE, tcon, (void **) &req);
--	if (rc)
-+	if (rc) {
-+		if (rc == -EAGAIN && wdata->credits)
-+			/* credits was reseted by reconnect */
-+			wdata->credits = 0;
- 		goto async_writev_out;
-+	}
- 
- 	req->hdr.ProcessId = cpu_to_le32(wdata->cfile->pid);
- 
-@@ -1947,9 +1952,20 @@ smb2_async_writev(struct cifs_writedata *wdata,
- 
- 	inc_rfc1001_len(&req->hdr, wdata->bytes - 1 /* Buffer */);
- 
-+	if (wdata->credits) {
-+		req->hdr.CreditCharge = cpu_to_le16(DIV_ROUND_UP(wdata->bytes,
-+						    SMB2_MAX_BUFFER_SIZE));
-+		spin_lock(&server->req_lock);
-+		server->credits += wdata->credits -
-+					le16_to_cpu(req->hdr.CreditCharge);
-+		spin_unlock(&server->req_lock);
-+		wake_up(&server->request_q);
-+		flags = CIFS_HAS_CREDITS;
-+	}
-+
- 	kref_get(&wdata->refcount);
--	rc = cifs_call_async(tcon->ses->server, &rqst, NULL,
--				smb2_writev_callback, wdata, 0);
-+	rc = cifs_call_async(server, &rqst, NULL, smb2_writev_callback, wdata,
-+			     flags);
- 
- 	if (rc) {
- 		kref_put(&wdata->refcount, release);
-diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-index 59c748c..5111e72 100644
---- a/fs/cifs/smb2transport.c
-+++ b/fs/cifs/smb2transport.c
-@@ -466,7 +466,12 @@ smb2_verify_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
- static inline void
- smb2_seq_num_into_buf(struct TCP_Server_Info *server, struct smb2_hdr *hdr)
- {
-+	unsigned int i, num = le16_to_cpu(hdr->CreditCharge);
-+
- 	hdr->MessageId = get_next_mid64(server);
-+	/* skip message numbers according to CreditCharge field */
-+	for (i = 1; i < num; i++)
-+		get_next_mid(server);
- }
- 
- static struct mid_q_entry *
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 18cd565..0b5d5fc 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -448,6 +448,15 @@ wait_for_free_request(struct TCP_Server_Info *server, const int timeout,
- 	return wait_for_free_credits(server, timeout, val);
- }
- 
-+int
-+cifs_wait_mtu_credits(struct TCP_Server_Info *server, unsigned int size,
-+		      unsigned int *num, unsigned int *credits)
-+{
-+	*num = size;
-+	*credits = 0;
-+	return 0;
-+}
-+
- static int allocate_mid(struct cifs_ses *ses, struct smb_hdr *in_buf,
- 			struct mid_q_entry **ppmidQ)
- {
-@@ -531,20 +540,23 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
- {
- 	int rc, timeout, optype;
- 	struct mid_q_entry *mid;
-+	unsigned int credits = 0;
- 
- 	timeout = flags & CIFS_TIMEOUT_MASK;
- 	optype = flags & CIFS_OP_MASK;
- 
--	rc = wait_for_free_request(server, timeout, optype);
--	if (rc)
--		return rc;
-+	if ((flags & CIFS_HAS_CREDITS) == 0) {
-+		rc = wait_for_free_request(server, timeout, optype);
-+		if (rc)
-+			return rc;
-+		credits = 1;
-+	}
- 
- 	mutex_lock(&server->srv_mutex);
- 	mid = server->ops->setup_async_request(server, rqst);
- 	if (IS_ERR(mid)) {
- 		mutex_unlock(&server->srv_mutex);
--		add_credits(server, 1, optype);
--		wake_up(&server->request_q);
-+		add_credits_and_wake(server, credits, optype);
- 		return PTR_ERR(mid);
- 	}
- 
-@@ -572,8 +584,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
- 		return 0;
- 
- 	cifs_delete_mid(mid);
--	add_credits(server, 1, optype);
--	wake_up(&server->request_q);
-+	add_credits_and_wake(server, credits, optype);
- 	return rc;
- }
- 
--- 
-1.7.10.4
+On Mon, Jun 16, 2014 at 9:35 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> In preparation for splitting CIFS_SessSetup() into smaller more
+> manageable chunks, we first add helper functions.
+>
+> We then proceed to split out lanman auth out of CIFS_SessSetup()
+>
+> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/sess.c | 303 ++++++++++++++++++++++++++++++++++++++++++++++++---------
+>  1 file changed, 258 insertions(+), 45 deletions(-)
+>
+> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+> index e87387d..36d0b90 100644
+> --- a/fs/cifs/sess.c
+> +++ b/fs/cifs/sess.c
+> @@ -520,6 +520,240 @@ select_sectype(struct TCP_Server_Info *server, enum securityEnum requested)
+>         }
+>  }
+>
+> +struct sess_data {
+> +       unsigned int xid;
+> +       struct cifs_ses *ses;
+> +       struct nls_table *nls_cp;
+> +       void (*func)(struct sess_data *);
+> +       int result;
+> +
+> +       /* we will send the SMB in three pieces:
+> +        * a fixed length beginning part, an optional
+> +        * SPNEGO blob (which can be zero length), and a
+> +        * last part which will include the strings
+> +        * and rest of bcc area. This allows us to avoid
+> +        * a large buffer 17K allocation
+> +        */
+> +       int buf0_type;
+> +       struct kvec iov[3];
+> +};
+> +
+> +static int
+> +sess_alloc_buffer(struct sess_data *sess_data, int wct)
+> +{
+> +       int rc;
+> +       struct cifs_ses *ses = sess_data->ses;
+> +       struct smb_hdr *smb_buf;
+> +
+> +       rc = small_smb_init_no_tc(SMB_COM_SESSION_SETUP_ANDX, wct, ses,
+> +                                 (void **)&smb_buf);
+> +
+> +       if (rc)
+> +               return rc;
+> +
+> +       sess_data->iov[0].iov_base = (char *)smb_buf;
+> +       sess_data->iov[0].iov_len = be32_to_cpu(smb_buf->smb_buf_length) + 4;
+> +       /*
+> +        * This variable will be used to clear the buffer
+> +        * allocated above in case of any error in the calling function.
+> +        */
+> +       sess_data->buf0_type = CIFS_SMALL_BUFFER;
+> +
+> +       /* 2000 big enough to fit max user, domain, NOS name etc. */
+> +       sess_data->iov[2].iov_base = kmalloc(2000, GFP_KERNEL);
+> +       if (!sess_data->iov[2].iov_base) {
+> +               rc = -ENOMEM;
+> +               goto out_free_smb_buf;
+> +       }
+> +
+> +       return 0;
+> +
+> +out_free_smb_buf:
+> +       kfree(smb_buf);
+> +       sess_data->iov[0].iov_base = NULL;
+> +       sess_data->iov[0].iov_len = 0;
+> +       sess_data->buf0_type = CIFS_NO_BUFFER;
+> +       return rc;
+> +}
+> +
+> +static void
+> +sess_free_buffer(struct sess_data *sess_data)
+> +{
+> +
+> +       free_rsp_buf(sess_data->buf0_type, sess_data->iov[0].iov_base);
+> +       sess_data->buf0_type = CIFS_NO_BUFFER;
+> +       kfree(sess_data->iov[2].iov_base);
+> +}
+> +
+> +static int
+> +sess_establish_session(struct sess_data *sess_data)
+> +{
+> +       struct cifs_ses *ses = sess_data->ses;
+> +
+> +       mutex_lock(&ses->server->srv_mutex);
+> +       if (!ses->server->session_estab) {
+> +               if (ses->server->sign) {
+> +                       ses->server->session_key.response =
+> +                               kmemdup(ses->auth_key.response,
+> +                               ses->auth_key.len, GFP_KERNEL);
+> +                       if (!ses->server->session_key.response) {
+> +                               mutex_unlock(&ses->server->srv_mutex);
+> +                               return -ENOMEM;
+> +                       }
+> +                       ses->server->session_key.len =
+> +                                               ses->auth_key.len;
+> +               }
+> +               ses->server->sequence_number = 0x2;
+> +               ses->server->session_estab = true;
+> +       }
+> +       mutex_unlock(&ses->server->srv_mutex);
+> +
+> +       cifs_dbg(FYI, "CIFS session established successfully\n");
+> +       spin_lock(&GlobalMid_Lock);
+> +       ses->status = CifsGood;
+> +       ses->need_reconnect = false;
+> +       spin_unlock(&GlobalMid_Lock);
+> +
+> +       return 0;
+> +}
+> +
+> +static int
+> +sess_sendreceive(struct sess_data *sess_data)
+> +{
+> +       int rc;
+> +       struct smb_hdr *smb_buf = (struct smb_hdr *) sess_data->iov[0].iov_base;
+> +       __u16 count;
+> +
+> +       count = sess_data->iov[1].iov_len + sess_data->iov[2].iov_len;
+> +       smb_buf->smb_buf_length =
+> +               cpu_to_be32(be32_to_cpu(smb_buf->smb_buf_length) + count);
+> +       put_bcc(count, smb_buf);
+> +
+> +       rc = SendReceive2(sess_data->xid, sess_data->ses,
+> +                         sess_data->iov, 3 /* num_iovecs */,
+> +                         &sess_data->buf0_type,
+> +                         CIFS_LOG_ERROR);
+> +
+> +       return rc;
+> +}
+> +
+> +/*
+> + * LANMAN and plaintext are less secure and off by default.
+> + * So we make this explicitly be turned on in kconfig (in the
+> + * build) and turned on at runtime (changed from the default)
+> + * in proc/fs/cifs or via mount parm.  Unfortunately this is
+> + * needed for old Win (e.g. Win95), some obscure NAS and OS/2
+> + */
+> +#ifdef CONFIG_CIFS_WEAK_PW_HASH
+> +static void
+> +sess_auth_lanman(struct sess_data *sess_data)
+> +{
+> +       int rc = 0;
+> +       struct smb_hdr *smb_buf;
+> +       SESSION_SETUP_ANDX *pSMB;
+> +       char *bcc_ptr;
+> +       struct cifs_ses *ses = sess_data->ses;
+> +       char lnm_session_key[CIFS_AUTH_RESP_SIZE];
+> +       __u32 capabilities;
+> +       __u16 bytes_remaining;
+> +
+> +       /* lanman 2 style sessionsetup */
+> +       /* wct = 10 */
+> +       rc = sess_alloc_buffer(sess_data, 10);
+> +       if (rc)
+> +               goto out;
+> +
+> +       pSMB = (SESSION_SETUP_ANDX *)sess_data->iov[0].iov_base;
+> +       bcc_ptr = sess_data->iov[2].iov_base;
+> +       capabilities = cifs_ssetup_hdr(ses, pSMB);
+> +
+> +       pSMB->req.hdr.Flags2 &= ~SMBFLG2_UNICODE;
+> +
+> +       /* no capabilities flags in old lanman negotiation */
+> +       pSMB->old_req.PasswordLength = cpu_to_le16(CIFS_AUTH_RESP_SIZE);
+> +
+> +       /* Calculate hash with password and copy into bcc_ptr.
+> +        * Encryption Key (stored as in cryptkey) gets used if the
+> +        * security mode bit in Negottiate Protocol response states
+> +        * to use challenge/response method (i.e. Password bit is 1).
+> +        */
+> +       rc = calc_lanman_hash(ses->password, ses->server->cryptkey,
+> +                             ses->server->sec_mode & SECMODE_PW_ENCRYPT ?
+> +                             true : false, lnm_session_key);
+> +
+> +       memcpy(bcc_ptr, (char *)lnm_session_key, CIFS_AUTH_RESP_SIZE);
+> +       bcc_ptr += CIFS_AUTH_RESP_SIZE;
+> +
+> +       /*
+> +        * can not sign if LANMAN negotiated so no need
+> +        * to calculate signing key? but what if server
+> +        * changed to do higher than lanman dialect and
+> +        * we reconnected would we ever calc signing_key?
+> +        */
+> +
+> +       cifs_dbg(FYI, "Negotiating LANMAN setting up strings\n");
+> +       /* Unicode not allowed for LANMAN dialects */
+> +       ascii_ssetup_strings(&bcc_ptr, ses, sess_data->nls_cp);
+> +
+> +       sess_data->iov[2].iov_len = (long) bcc_ptr -
+> +                       (long) sess_data->iov[2].iov_base;
+> +
+> +       rc = sess_sendreceive(sess_data);
+> +       if (rc)
+> +               goto out;
+> +
+> +       pSMB = (SESSION_SETUP_ANDX *)sess_data->iov[0].iov_base;
+> +       smb_buf = (struct smb_hdr *)sess_data->iov[0].iov_base;
+> +
+> +       /* lanman response has a word count of 3 */
+> +       if (smb_buf->WordCount != 3) {
+> +               rc = -EIO;
+> +               cifs_dbg(VFS, "bad word count %d\n", smb_buf->WordCount);
+> +               goto out;
+> +       }
+> +
+> +       if (le16_to_cpu(pSMB->resp.Action) & GUEST_LOGIN)
+> +               cifs_dbg(FYI, "Guest login\n"); /* BB mark SesInfo struct? */
+> +
+> +       ses->Suid = smb_buf->Uid;   /* UID left in wire format (le) */
+> +       cifs_dbg(FYI, "UID = %llu\n", ses->Suid);
+> +
+> +       bytes_remaining = get_bcc(smb_buf);
+> +       bcc_ptr = pByteArea(smb_buf);
+> +
+> +       /* BB check if Unicode and decode strings */
+> +       if (bytes_remaining == 0) {
+> +               /* no string area to decode, do nothing */
+> +       } else if (smb_buf->Flags2 & SMBFLG2_UNICODE) {
+> +               /* unicode string area must be word-aligned */
+> +               if (((unsigned long) bcc_ptr - (unsigned long) smb_buf) % 2) {
+> +                       ++bcc_ptr;
+> +                       --bytes_remaining;
+> +               }
+> +               decode_unicode_ssetup(&bcc_ptr, bytes_remaining, ses,
+> +                                     sess_data->nls_cp);
+> +       } else {
+> +               decode_ascii_ssetup(&bcc_ptr, bytes_remaining, ses,
+> +                                   sess_data->nls_cp);
+> +       }
+> +
+> +       rc = sess_establish_session(sess_data);
+> +out:
+> +       sess_data->result = rc;
+> +       sess_data->func = NULL;
+> +       sess_free_buffer(sess_data);
+> +}
+> +
+> +#else
+> +
+> +static void
+> +sess_auth_lanman(struct sess_data *sess_data)
+> +{
+> +       sess_data->result = -EOPNOTSUPP;
+> +       sess_data->func = NULL;
+> +}
+> +#endif
+> +
+>  int
+>  CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
+>                const struct nls_table *nls_cp)
+> @@ -540,12 +774,21 @@ CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
+>         __le32 phase = NtLmNegotiate; /* NTLMSSP, if needed, is multistage */
+>         u16 blob_len;
+>         char *ntlmsspblob = NULL;
+> +       struct sess_data *sess_data;
+>
+>         if (ses == NULL) {
+>                 WARN(1, "%s: ses == NULL!", __func__);
+>                 return -EINVAL;
+>         }
+>
+> +       sess_data = kzalloc(sizeof(struct sess_data), GFP_KERNEL);
+> +       if (!sess_data)
+> +               return -ENOMEM;
+> +       sess_data->xid = xid;
+> +       sess_data->ses = ses;
+> +       sess_data->buf0_type = CIFS_NO_BUFFER;
+> +       sess_data->nls_cp = (struct nls_table *) nls_cp;
+> +
+>         type = select_sectype(ses->server, ses->sectype);
+>         cifs_dbg(FYI, "sess setup type %d\n", type);
+>         if (type == Unspecified) {
+> @@ -554,6 +797,14 @@ CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
+>                 return -EINVAL;
+>         }
+>
+> +       switch (type) {
+> +       case LANMAN:
+> +               sess_auth_lanman(sess_data);
+> +               goto out;
+> +       default:
+> +               cifs_dbg(FYI, "Continuing with CIFS_SessSetup\n");
+> +       }
+> +
+>         if (type == RawNTLMSSP) {
+>                 /* if memory allocation is successful, caller of this function
+>                  * frees it.
+> @@ -569,17 +820,7 @@ ssetup_ntlmssp_authenticate:
+>         if (phase == NtLmChallenge)
+>                 phase = NtLmAuthenticate; /* if ntlmssp, now final phase */
+>
+> -       if (type == LANMAN) {
+> -#ifndef CONFIG_CIFS_WEAK_PW_HASH
+> -               /* LANMAN and plaintext are less secure and off by default.
+> -               So we make this explicitly be turned on in kconfig (in the
+> -               build) and turned on at runtime (changed from the default)
+> -               in proc/fs/cifs or via mount parm.  Unfortunately this is
+> -               needed for old Win (e.g. Win95), some obscure NAS and OS/2 */
+> -               return -EOPNOTSUPP;
+> -#endif
+> -               wct = 10; /* lanman 2 style sessionsetup */
+> -       } else if ((type == NTLM) || (type == NTLMv2)) {
+> +       if ((type == NTLM) || (type == NTLMv2)) {
+>                 /* For NTLMv2 failures eventually may need to retry NTLM */
+>                 wct = 13; /* old style NTLM sessionsetup */
+>         } else /* same size: negotiate or auth, NTLMSSP or extended security */
+> @@ -618,39 +859,7 @@ ssetup_ntlmssp_authenticate:
+>         iov[1].iov_base = NULL;
+>         iov[1].iov_len = 0;
+>
+> -       if (type == LANMAN) {
+> -#ifdef CONFIG_CIFS_WEAK_PW_HASH
+> -               char lnm_session_key[CIFS_AUTH_RESP_SIZE];
+> -
+> -               pSMB->req.hdr.Flags2 &= ~SMBFLG2_UNICODE;
+> -
+> -               /* no capabilities flags in old lanman negotiation */
+> -
+> -               pSMB->old_req.PasswordLength = cpu_to_le16(CIFS_AUTH_RESP_SIZE);
+> -
+> -               /* Calculate hash with password and copy into bcc_ptr.
+> -                * Encryption Key (stored as in cryptkey) gets used if the
+> -                * security mode bit in Negottiate Protocol response states
+> -                * to use challenge/response method (i.e. Password bit is 1).
+> -                */
+> -
+> -               rc = calc_lanman_hash(ses->password, ses->server->cryptkey,
+> -                                ses->server->sec_mode & SECMODE_PW_ENCRYPT ?
+> -                                       true : false, lnm_session_key);
+> -
+> -               memcpy(bcc_ptr, (char *)lnm_session_key, CIFS_AUTH_RESP_SIZE);
+> -               bcc_ptr += CIFS_AUTH_RESP_SIZE;
+> -
+> -               /* can not sign if LANMAN negotiated so no need
+> -               to calculate signing key? but what if server
+> -               changed to do higher than lanman dialect and
+> -               we reconnected would we ever calc signing_key? */
+> -
+> -               cifs_dbg(FYI, "Negotiating LANMAN setting up strings\n");
+> -               /* Unicode not allowed for LANMAN dialects */
+> -               ascii_ssetup_strings(&bcc_ptr, ses, nls_cp);
+> -#endif
+> -       } else if (type == NTLM) {
+> +       if (type == NTLM) {
+>                 pSMB->req_no_secext.Capabilities = cpu_to_le32(capabilities);
+>                 pSMB->req_no_secext.CaseInsensitivePasswordLength =
+>                         cpu_to_le16(CIFS_AUTH_RESP_SIZE);
+> @@ -889,7 +1098,6 @@ ssetup_ntlmssp_authenticate:
+>                 }
+>                 if (phase == NtLmChallenge) {
+>                         rc = decode_ntlmssp_challenge(bcc_ptr, blob_len, ses);
+> -                       /* now goto beginning for ntlmssp authenticate phase */
+>                         if (rc)
+>                                 goto ssetup_exit;
+>                 }
+> @@ -962,4 +1170,9 @@ keycp_exit:
+>         kfree(ses->ntlmssp);
+>
+>         return rc;
+> +
+> +out:
+> +       rc = sess_data->result;
+> +       kfree(sess_data);
+> +       return rc;
+>  }
+> --
+> 1.9.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
