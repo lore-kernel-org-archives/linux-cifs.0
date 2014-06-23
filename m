@@ -1,47 +1,37 @@
-From: Osmond Sun <osmond.sun@gmail.com>
-Subject: [PATCH] cifs: set null to username and iocharset after being freed
-Date: Thu, 19 Jun 2014 15:09:24 +0800
-Message-ID: <CABJ8ys9OB_gUScf65hnDLNYURq+nvCAc=AgBzVdobO391QdU5g@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
-To: sfrench@samba.org
-Return-path: <samba-technical-bounces@lists.samba.org>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH 0/9] SMB2.1 multicredit requests for writing
+Date: Mon, 23 Jun 2014 18:58:28 +0400
+Message-ID: <1403535517-8301-1-git-send-email-pshilovsky@samba.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-In function 'expand_dfs_referral' the volume_info->iocharset and
-volume_info->username was used after being freed by calling
-cleanup_volume_info_contents. Set null to username and iocharset
-after being freed.
+The goal of this patchset is to add large MTU/multicredits support for writing from the CIFS client to servers that support SMB 2.1 and higher versions of the protocol.
 
-Signed-off-by: Osmond Sun <osmond.sun@gmail.com>
----
- fs/cifs/connect.c | 2 ++
- 1 file changed, 2 insertions(+)
+First three patches simplify the writepages code. Patches #4 and #5 both fix the problem in writepages when a server changes wsize value after reconnects from the client. Patches #6 and #7 simplify the iovec write code, #8 fixes the wsize changing problem there. Finally, patch #9 introduces multicredits support for writing.
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 20d75b8..2586a34 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -3251,10 +3251,12 @@ static void
- cleanup_volume_info_contents(struct smb_vol *volume_info)
- {
-  kfree(volume_info->username);
-+ volume_info->username = NULL;
-  kzfree(volume_info->password);
-  kfree(volume_info->UNC);
-  kfree(volume_info->domainname);
-  kfree(volume_info->iocharset);
-+ volume_info->iocharset = NULL;
-  kfree(volume_info->prepath);
- }
+Pavel Shilovsky (9):
+  CIFS: Separate page processing from writepages
+  CIFS: Separate page sending from writepages
+  CIFS: Separate pages initialization from writepages
+  CIFS: Fix wsize usage in writepages
+  CIFS: Fix cifs_writev_requeue when wsize changes
+  CIFS: Separate filling pages from iovec write
+  CIFS: Separate writing from iovec write
+  CIFS: Fix wsize usage in iovec write
+  CIFS: Use multicredits for writes
+
+ fs/cifs/cifsglob.h      |   17 ++
+ fs/cifs/cifsproto.h     |    3 +
+ fs/cifs/cifssmb.c       |   84 ++++++--
+ fs/cifs/file.c          |  540 ++++++++++++++++++++++++++++-------------------
+ fs/cifs/smb1ops.c       |    8 +
+ fs/cifs/smb2ops.c       |   62 +++++-
+ fs/cifs/smb2pdu.c       |   24 ++-
+ fs/cifs/smb2transport.c |    5 +
+ fs/cifs/transport.c     |   25 ++-
+ 9 files changed, 517 insertions(+), 251 deletions(-)
 
 -- 
-1.9.0
+1.7.10.4
