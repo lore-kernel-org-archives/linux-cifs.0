@@ -1,35 +1,51 @@
-From: Rickard Strandqvist <rickard_strandqvist@spectrumdigital.se>
-Subject: [PATCH] fs: cifs: cifsencrypt.c:  Cleaning up missing null-terminate in conjunction with strncpy
-Date: Wed, 25 Jun 2014 12:42:34 +0200
-Message-ID: <1403692954-18881-1-git-send-email-rickard_strandqvist@spectrumdigital.se>
-Cc: Rickard Strandqvist <rickard_strandqvist@spectrumdigital.se>,
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
-To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [GIT] CIFS Fixes
+Date: Wed, 25 Jun 2014 23:39:28 -0500
+Message-ID: <CAH2r5msZfYuuaS_+WEY6RG-vA_3ZH1cggLrRtmYSneBQ-ovY-Q@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Because the string is zeroed before, it's better to just copy one character less, instead of using strlcpy in this case.
+Small set of misc cifs/smb3 fixes
 
-This was found using a static code analysis program called cppcheck.
+The following changes since commit 7171511eaec5bf23fb06078f59784a3a0626=
+b38f:
 
-Signed-off-by: Rickard Strandqvist <rickard_strandqvist@spectrumdigital.se>
----
- fs/cifs/cifsencrypt.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+  Linux 3.16-rc1 (2014-06-15 17:45:28 -1000)
 
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index 4934347..dcca8b3 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -307,7 +307,7 @@ int calc_lanman_hash(const char *password, const char *cryptkey, bool encrypt,
- 
- 	memset(password_with_pad, 0, CIFS_ENCPWD_SIZE);
- 	if (password)
--		strncpy(password_with_pad, password, CIFS_ENCPWD_SIZE);
-+		strncpy(password_with_pad, password, CIFS_ENCPWD_SIZE - 1);
- 
- 	if (!encrypt && global_secflags & CIFSSEC_MAY_PLNTXT) {
- 		memcpy(lnm_session_key, password_with_pad,
--- 
-1.7.10.4
+are available in the git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git for-next
+
+for you to fetch changes up to ce36d9ab3bab06b7b5522f5c8b68fac231b76ffb=
+:
+
+  [CIFS] fix mount failure with broken pathnames when smb3 mount with
+mapchars option (2014-06-24 08:10:24 -0500)
+
+----------------------------------------------------------------
+Bj=C3=B6rn Baumbach (1):
+      fs/cifs: fix regression in cifs_create_mf_symlink()
+
+Jeff Layton (1):
+      cifs: revalidate mapping prior to satisfying read_iter request
+with cache=3Dloose
+
+Steve French (1):
+      [CIFS] fix mount failure with broken pathnames when smb3 mount
+with mapchars option
+
+ fs/cifs/cifs_unicode.c |  7 ++++---
+ fs/cifs/cifsfs.c       | 17 +++++++++++++++--
+ fs/cifs/link.c         |  2 +-
+ 3 files changed, 20 insertions(+), 6 deletions(-)
+
+--=20
+Thanks,
+
+Steve
