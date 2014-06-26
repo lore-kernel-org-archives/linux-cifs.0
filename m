@@ -1,161 +1,32 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 1/5] cifs: replace code with free_rsp_buf()
-Date: Thu, 26 Jun 2014 01:12:32 -0500
-Message-ID: <CAH2r5mvPHEjn99KCgko6gx3t6QK3HbBW+=wasjjamr7OgfiUhA@mail.gmail.com>
-References: <1402929328-12866-1-git-send-email-sprabhu@redhat.com>
- <1402929328-12866-2-git-send-email-sprabhu@redhat.com> <CADT32eJ40ZDx+jCW1LF=Y2pPVNsJacRwgtLYQ6wi_W-5MmsLiw@mail.gmail.com>
+From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH 6/9] CIFS: Separate filling pages from iovec write
+Date: Thu, 26 Jun 2014 13:33:13 +0400
+Message-ID: <CAKywueQao8-Oqi_OwM8yKu63LcYUL8jCd4h7kTt6y8_ZJ7YPwQ@mail.gmail.com>
+References: <1403535517-8301-1-git-send-email-pshilovsky@samba.org>
+	<1403535517-8301-7-git-send-email-pshilovsky@samba.org>
+	<CAH2r5mvK-co524mw8yEsA3-EbzpeRG2rO+FurGJ5CThbwQdLYg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32eJ40ZDx+jCW1LF=Y2pPVNsJacRwgtLYQ6wi_W-5MmsLiw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CAH2r5mvK-co524mw8yEsA3-EbzpeRG2rO+FurGJ5CThbwQdLYg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-merged into cifs-2.6.git
-
-nice little cleanup
-
-On Tue, Jun 17, 2014 at 11:33 PM, Shirish Pargaonkar
-<shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> Looks correct.
+2014-06-26 9:46 GMT+04:00 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+> FYI - merge conflict in current cifs-2.6.git for-next (and current
+> mainline kernel) due to Al Viro's read_iter and write_iter changes.
 >
-> Reviewed-by: Shirish Pargaonkar <spargaonkar-IBi9RG/b67k@public.gmane.org>
+> Presumably due to changeset
+> https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/fs/cifs?id=16b9057804c02e2d351e9c8f606e909b43cbd9e7
 >
-> On Mon, Jun 16, 2014 at 9:35 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->> The functionality provided by free_rsp_buf() is duplicated in a number
->> of places. Replace these instances with a call to free_rsp_buf().
->>
->> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->> ---
->>  fs/cifs/cifsproto.h |  1 +
->>  fs/cifs/cifssmb.c   | 20 ++++----------------
->>  fs/cifs/misc.c      |  9 +++++++++
->>  fs/cifs/smb2pdu.c   | 10 ----------
->>  4 files changed, 14 insertions(+), 26 deletions(-)
->>
->> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
->> index ca7980a..de49d7a 100644
->> --- a/fs/cifs/cifsproto.h
->> +++ b/fs/cifs/cifsproto.h
->> @@ -36,6 +36,7 @@ extern struct smb_hdr *cifs_buf_get(void);
->>  extern void cifs_buf_release(void *);
->>  extern struct smb_hdr *cifs_small_buf_get(void);
->>  extern void cifs_small_buf_release(void *);
->> +extern void free_rsp_buf(int, void *);
->>  extern void cifs_rqst_page_to_kvec(struct smb_rqst *rqst, unsigned int idx,
->>                                         struct kvec *iov);
->>  extern int smb_send(struct TCP_Server_Info *, struct smb_hdr *,
->> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
->> index 6ce4e09..b7e5b65 100644
->> --- a/fs/cifs/cifssmb.c
->> +++ b/fs/cifs/cifssmb.c
->> @@ -1734,10 +1734,7 @@ CIFSSMBRead(const unsigned int xid, struct cifs_io_parms *io_parms,
->>
->>  /*     cifs_small_buf_release(pSMB); */ /* Freed earlier now in SendReceive2 */
->>         if (*buf) {
->> -               if (resp_buf_type == CIFS_SMALL_BUFFER)
->> -                       cifs_small_buf_release(iov[0].iov_base);
->> -               else if (resp_buf_type == CIFS_LARGE_BUFFER)
->> -                       cifs_buf_release(iov[0].iov_base);
->> +               free_rsp_buf(resp_buf_type, iov[0].iov_base);
->>         } else if (resp_buf_type != CIFS_NO_BUFFER) {
->>                 /* return buffer to caller to free */
->>                 *buf = iov[0].iov_base;
->> @@ -2203,10 +2200,7 @@ CIFSSMBWrite2(const unsigned int xid, struct cifs_io_parms *io_parms,
->>         }
->>
->>  /*     cifs_small_buf_release(pSMB); */ /* Freed earlier now in SendReceive2 */
->> -       if (resp_buf_type == CIFS_SMALL_BUFFER)
->> -               cifs_small_buf_release(iov[0].iov_base);
->> -       else if (resp_buf_type == CIFS_LARGE_BUFFER)
->> -               cifs_buf_release(iov[0].iov_base);
->> +       free_rsp_buf(resp_buf_type, iov[0].iov_base);
->>
->>         /* Note: On -EAGAIN error only caller can retry on handle based calls
->>                 since file handle passed in no longer valid */
->> @@ -2451,10 +2445,7 @@ plk_err_exit:
->>         if (pSMB)
->>                 cifs_small_buf_release(pSMB);
->>
->> -       if (resp_buf_type == CIFS_SMALL_BUFFER)
->> -               cifs_small_buf_release(iov[0].iov_base);
->> -       else if (resp_buf_type == CIFS_LARGE_BUFFER)
->> -               cifs_buf_release(iov[0].iov_base);
->> +       free_rsp_buf(resp_buf_type, iov[0].iov_base);
->>
->>         /* Note: On -EAGAIN error only caller can retry on handle based calls
->>            since file handle passed in no longer valid */
->> @@ -3838,10 +3829,7 @@ CIFSSMBGetCIFSACL(const unsigned int xid, struct cifs_tcon *tcon, __u16 fid,
->>                 }
->>         }
->>  qsec_out:
->> -       if (buf_type == CIFS_SMALL_BUFFER)
->> -               cifs_small_buf_release(iov[0].iov_base);
->> -       else if (buf_type == CIFS_LARGE_BUFFER)
->> -               cifs_buf_release(iov[0].iov_base);
->> +       free_rsp_buf(buf_type, iov[0].iov_base);
->>  /*     cifs_small_buf_release(pSMB); */ /* Freed earlier now in SendReceive2 */
->>         return rc;
->>  }
->> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
->> index 3b0c62e..64997a0 100644
->> --- a/fs/cifs/misc.c
->> +++ b/fs/cifs/misc.c
->> @@ -226,6 +226,15 @@ cifs_small_buf_release(void *buf_to_free)
->>         return;
->>  }
->>
->> +void
->> +free_rsp_buf(int resp_buftype, void *rsp)
->> +{
->> +       if (resp_buftype == CIFS_SMALL_BUFFER)
->> +               cifs_small_buf_release(rsp);
->> +       else if (resp_buftype == CIFS_LARGE_BUFFER)
->> +               cifs_buf_release(rsp);
->> +}
->> +
->>  /* NB: MID can not be set if treeCon not passed in, in that
->>     case it is responsbility of caller to set the mid */
->>  void
->> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
->> index b0b260d..0158104 100644
->> --- a/fs/cifs/smb2pdu.c
->> +++ b/fs/cifs/smb2pdu.c
->> @@ -309,16 +309,6 @@ small_smb2_init(__le16 smb2_command, struct cifs_tcon *tcon,
->>         return rc;
->>  }
->>
->> -static void
->> -free_rsp_buf(int resp_buftype, void *rsp)
->> -{
->> -       if (resp_buftype == CIFS_SMALL_BUFFER)
->> -               cifs_small_buf_release(rsp);
->> -       else if (resp_buftype == CIFS_LARGE_BUFFER)
->> -               cifs_buf_release(rsp);
->> -}
->> -
->> -
->>  /*
->>   *
->>   *     SMB2 Worker functions follow:
->> --
->> 1.9.3
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Would you rebase on current cifs-2.6.git or current mainline from this patch on?
 
-
+Yes, I started to do it but noticed that the existing code (without my
+patches) has data coherency problem on reconnect during reading when
+mounting with cache=none. Now, I am investigating this.
 
 -- 
-Thanks,
-
-Steve
+Best regards,
+Pavel Shilovsky.
