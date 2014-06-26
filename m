@@ -1,50 +1,93 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 0/9] SMB2.1 multicredit requests for writing
-Date: Thu, 26 Jun 2014 00:52:27 -0500
-Message-ID: <CAH2r5mtcMmybX9O_bwYAm1rOQ4p5TMbMkKqOp_HOajKKoztfpQ@mail.gmail.com>
-References: <1403535517-8301-1-git-send-email-pshilovsky@samba.org>
+Subject: Re: [PATCH 0/5 v4] Split CIFS_SessSetup()
+Date: Thu, 26 Jun 2014 01:11:01 -0500
+Message-ID: <CAH2r5muSiapN0OZNTt-74WwY1peL1y6Lg=WvzTDzyt8QnuGFkQ@mail.gmail.com>
+References: <1402929328-12866-1-git-send-email-sprabhu@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1403535517-8301-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <1402929328-12866-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Partially merged (first 5 ie those which merged cleanly) into
-cifs-2.6.git for-next (for further testing).
+FYI - Two trivial checkpatch warnings.  Any obvious way to get rid of
+at least the first warning?
 
-On Mon, Jun 23, 2014 at 9:58 AM, Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> The goal of this patchset is to add large MTU/multicredits support for writing from the CIFS client to servers that support SMB 2.1 and higher versions of the protocol.
+WARNING: Missing a blank line after declarations
+#30: FILE: fs/cifs/sess.c:527:
++    struct nls_table *nls_cp;
++    void (*func)(struct sess_data *);
+
+total: 0 errors, 1 warnings, 349 lines checked
+
+0002-cifs-Split-lanman-auth-from-CIFS_SessSetup.patch has style
+problems, please review.
+
+
+WARNING: Prefer kcalloc over kzalloc with multiply
+#358: FILE: fs/cifs/sess.c:1282:
++    ntlmsspblob = kzalloc(5*sizeof(struct _AUTHENTICATE_MESSAGE),
+
+total: 0 errors, 1 warnings, 565 lines checked
+
+0005-cifs-Separate-rawntlmssp-auth-from-CIFS_SessSetup.patch has style
+problems, please review.
+
+On Mon, Jun 16, 2014 at 9:35 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> I am investigating the possibility of adding support for gss-proxy in the
+> cifs client module. As part of that investigation, I was looking at the
+> CIFS_SessSetup() function. This is a long function which handles multiple auths
+> using if conditions and switch statements. The code struction makes it
+> difficult to modify or add support for new authentication mechanisms.
 >
-> First three patches simplify the writepages code. Patches #4 and #5 both fix the problem in writepages when a server changes wsize value after reconnects from the client. Patches #6 and #7 simplify the iovec write code, #8 fixes the wsize changing problem there. Finally, patch #9 introduces multicredits support for writing.
+> The proposal is to split the various authentication code into its own separate
+> functions. This increases the lines of code but will simplify maintenance and
+> addition of new auth methods.
 >
-> Pavel Shilovsky (9):
->   CIFS: Separate page processing from writepages
->   CIFS: Separate page sending from writepages
->   CIFS: Separate pages initialization from writepages
->   CIFS: Fix wsize usage in writepages
->   CIFS: Fix cifs_writev_requeue when wsize changes
->   CIFS: Separate filling pages from iovec write
->   CIFS: Separate writing from iovec write
->   CIFS: Fix wsize usage in iovec write
->   CIFS: Use multicredits for writes
+> The short term goal is to add gss-proxy support for kerberos authentication.
+> This will require to and fro communication with the gss-proxy module over a
+> unix socket.
 >
->  fs/cifs/cifsglob.h      |   17 ++
->  fs/cifs/cifsproto.h     |    3 +
->  fs/cifs/cifssmb.c       |   84 ++++++--
->  fs/cifs/file.c          |  540 ++++++++++++++++++++++++++++-------------------
->  fs/cifs/smb1ops.c       |    8 +
->  fs/cifs/smb2ops.c       |   62 +++++-
->  fs/cifs/smb2pdu.c       |   24 ++-
->  fs/cifs/smb2transport.c |    5 +
->  fs/cifs/transport.c     |   25 ++-
->  9 files changed, 517 insertions(+), 251 deletions(-)
+> Further long term goals are
+> 1) Add support for NTLMSSP using SPNEGO,
+> 2) Allow clients to negotiate which authentication mechanism to use using SPNEGO.
+>
+> V2:
+> - Ensure that sess_data allocated on intermediate patches are freed.
+> - Remove ifdef-endif blocks from the switch statement in CIFS_SessSetup().
+>
+> V3:
+> - Fix whitespace errors in some patches.
+> - Change sess_establish_session to return errors. Call this function only in
+>   case of successful establish session calls to the server.
+> - Delete an incorrect comment in case of rawntlmssp authentication.
+> - Delete an if statement before kfree(ntlmssp) in rawntlmssp authentication.
+>
+> v4:
+> - reordered elements of struct sess_data as asked by jlayton
+> - Use free_rsp_buf() to clean buffer.
+> - Clean up the rawntlmssp case further and break the calls into separate
+>   functions.
+>
+> Sachin Prabhu (5):
+>   cifs: replace code with free_rsp_buf()
+>   cifs: Split lanman auth from CIFS_SessSetup()
+>   cifs: Split ntlm and ntlmv2 authentication methods off
+>     CIFS_SessSetup()
+>   cifs: Split Kerberos authentication off CIFS_SessSetup()
+>   cifs: Separate rawntlmssp auth from CIFS_SessSetup()
+>
+>  fs/cifs/cifsproto.h |    1 +
+>  fs/cifs/cifssmb.c   |   20 +-
+>  fs/cifs/misc.c      |    9 +
+>  fs/cifs/sess.c      | 1192 ++++++++++++++++++++++++++++++++++++---------------
+>  fs/cifs/smb2pdu.c   |   10 -
+>  5 files changed, 854 insertions(+), 378 deletions(-)
 >
 > --
-> 1.7.10.4
+> 1.9.3
 >
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
