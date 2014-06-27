@@ -1,55 +1,150 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v2 01/16] CIFS: Fix async reading on reconnects
-Date: Fri, 27 Jun 2014 13:57:38 +0400
-Message-ID: <1403863073-19526-2-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH v2 03/16] CIFS: Separate page sending from writepages
+Date: Fri, 27 Jun 2014 13:57:40 +0400
+Message-ID: <1403863073-19526-4-git-send-email-pshilovsky@samba.org>
 References: <1403863073-19526-1-git-send-email-pshilovsky@samba.org>
-Cc: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <1403863073-19526-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-If we get into read_into_pages() from cifs_readv_receive() and then
-loose a network, we issue cifs_reconnect that moves all mids to
-a private list and issue their callbacks. The callback of the async
-read request sets a mid to retry, frees it and wakes up a process
-that waits on the rdata completion.
-
-After the connection is established we return from read_into_pages()
-with a short read, use the mid that was freed before and try to read
-the remaining data from the a newly created socket. Both actions are
-not what we want to do. In reconnect cases (-EAGAIN) we should not
-mask off the error with a short read but should return the error
-code instead.
-
-Cc: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/file.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ fs/cifs/file.c | 100 +++++++++++++++++++++++++++++++--------------------------
+ 1 file changed, 54 insertions(+), 46 deletions(-)
 
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index e90a1e9..6b6df30 100644
+index 69d1763..306c3df 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -2823,7 +2823,7 @@ cifs_uncached_read_into_pages(struct TCP_Server_Info *server,
- 		total_read += result;
- 	}
- 
--	return total_read > 0 ? total_read : result;
-+	return total_read > 0 && result != -EAGAIN ? total_read : result;
+@@ -1958,6 +1958,58 @@ wdata_prepare_pages(struct cifs_writedata *wdata, unsigned int found_pages,
+ 	return nr_pages;
  }
  
- ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to)
-@@ -3231,7 +3231,7 @@ cifs_readpages_read_into_pages(struct TCP_Server_Info *server,
- 		total_read += result;
++static int
++wdata_send_pages(struct cifs_writedata *wdata, unsigned int nr_pages,
++		 struct address_space *mapping, struct writeback_control *wbc)
++{
++	int rc = 0;
++	struct TCP_Server_Info *server;
++	unsigned int i;
++
++	wdata->sync_mode = wbc->sync_mode;
++	wdata->nr_pages = nr_pages;
++	wdata->offset = page_offset(wdata->pages[0]);
++	wdata->pagesz = PAGE_CACHE_SIZE;
++	wdata->tailsz = min(i_size_read(mapping->host) -
++			page_offset(wdata->pages[nr_pages - 1]),
++			(loff_t)PAGE_CACHE_SIZE);
++	wdata->bytes = ((nr_pages - 1) * PAGE_CACHE_SIZE) + wdata->tailsz;
++
++	do {
++		if (wdata->cfile != NULL)
++			cifsFileInfo_put(wdata->cfile);
++		wdata->cfile = find_writable_file(CIFS_I(mapping->host), false);
++		if (!wdata->cfile) {
++			cifs_dbg(VFS, "No writable handles for inode\n");
++			rc = -EBADF;
++			break;
++		}
++		wdata->pid = wdata->cfile->pid;
++		server = tlink_tcon(wdata->cfile->tlink)->ses->server;
++		rc = server->ops->async_writev(wdata, cifs_writedata_release);
++	} while (wbc->sync_mode == WB_SYNC_ALL && rc == -EAGAIN);
++
++	for (i = 0; i < nr_pages; ++i)
++		unlock_page(wdata->pages[i]);
++
++	if (!rc)
++		return rc;
++
++	/* send failure -- clean up the mess */
++	for (i = 0; i < nr_pages; ++i) {
++		if (rc == -EAGAIN)
++			redirty_page_for_writepage(wbc, wdata->pages[i]);
++		else
++			SetPageError(wdata->pages[i]);
++		end_page_writeback(wdata->pages[i]);
++		page_cache_release(wdata->pages[i]);
++	}
++	if (rc != -EAGAIN)
++		mapping_set_error(mapping, rc);
++
++	return rc;
++}
++
+ static int cifs_writepages(struct address_space *mapping,
+ 			   struct writeback_control *wbc)
+ {
+@@ -1965,7 +2017,6 @@ static int cifs_writepages(struct address_space *mapping,
+ 	bool done = false, scanned = false, range_whole = false;
+ 	pgoff_t end, index;
+ 	struct cifs_writedata *wdata;
+-	struct TCP_Server_Info *server;
+ 	int rc = 0;
+ 
+ 	/*
+@@ -1987,7 +2038,7 @@ static int cifs_writepages(struct address_space *mapping,
  	}
+ retry:
+ 	while (!done && index <= end) {
+-		unsigned int i, nr_pages, found_pages;
++		unsigned int nr_pages, found_pages;
+ 		pgoff_t next = 0, tofind;
+ 		struct page **pages;
  
--	return total_read > 0 ? total_read : result;
-+	return total_read > 0 && result != -EAGAIN ? total_read : result;
- }
+@@ -2032,50 +2083,7 @@ retry:
+ 			continue;
+ 		}
  
- static int cifs_readpages(struct file *file, struct address_space *mapping,
+-		wdata->sync_mode = wbc->sync_mode;
+-		wdata->nr_pages = nr_pages;
+-		wdata->offset = page_offset(wdata->pages[0]);
+-		wdata->pagesz = PAGE_CACHE_SIZE;
+-		wdata->tailsz =
+-			min(i_size_read(mapping->host) -
+-			    page_offset(wdata->pages[nr_pages - 1]),
+-			    (loff_t)PAGE_CACHE_SIZE);
+-		wdata->bytes = ((nr_pages - 1) * PAGE_CACHE_SIZE) +
+-					wdata->tailsz;
+-
+-		do {
+-			if (wdata->cfile != NULL)
+-				cifsFileInfo_put(wdata->cfile);
+-			wdata->cfile = find_writable_file(CIFS_I(mapping->host),
+-							  false);
+-			if (!wdata->cfile) {
+-				cifs_dbg(VFS, "No writable handles for inode\n");
+-				rc = -EBADF;
+-				break;
+-			}
+-			wdata->pid = wdata->cfile->pid;
+-			server = tlink_tcon(wdata->cfile->tlink)->ses->server;
+-			rc = server->ops->async_writev(wdata,
+-							cifs_writedata_release);
+-		} while (wbc->sync_mode == WB_SYNC_ALL && rc == -EAGAIN);
+-
+-		for (i = 0; i < nr_pages; ++i)
+-			unlock_page(wdata->pages[i]);
+-
+-		/* send failure -- clean up the mess */
+-		if (rc != 0) {
+-			for (i = 0; i < nr_pages; ++i) {
+-				if (rc == -EAGAIN)
+-					redirty_page_for_writepage(wbc,
+-							   wdata->pages[i]);
+-				else
+-					SetPageError(wdata->pages[i]);
+-				end_page_writeback(wdata->pages[i]);
+-				page_cache_release(wdata->pages[i]);
+-			}
+-			if (rc != -EAGAIN)
+-				mapping_set_error(mapping, rc);
+-		}
++		rc = wdata_send_pages(wdata, nr_pages, mapping, wbc);
+ 		kref_put(&wdata->refcount, cifs_writedata_release);
+ 
+ 		wbc->nr_to_write -= nr_pages;
 -- 
 1.8.1.2
