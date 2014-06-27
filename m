@@ -1,150 +1,49 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v2 03/16] CIFS: Separate page sending from writepages
-Date: Fri, 27 Jun 2014 13:57:40 +0400
-Message-ID: <1403863073-19526-4-git-send-email-pshilovsky@samba.org>
-References: <1403863073-19526-1-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH v2 00/16] SMB 2.1/3 multicredit requests for reading/writing
+Date: Fri, 27 Jun 2014 13:57:37 +0400
+Message-ID: <1403863073-19526-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1403863073-19526-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- fs/cifs/file.c | 100 +++++++++++++++++++++++++++++++--------------------------
- 1 file changed, 54 insertions(+), 46 deletions(-)
+The goal of this patchset is to add large MTU/multicredits support for reading and writing from the CIFS client to servers that support SMB 2.1 and higher versions of the protocol.
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 69d1763..306c3df 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -1958,6 +1958,58 @@ wdata_prepare_pages(struct cifs_writedata *wdata, unsigned int found_pages,
- 	return nr_pages;
- }
- 
-+static int
-+wdata_send_pages(struct cifs_writedata *wdata, unsigned int nr_pages,
-+		 struct address_space *mapping, struct writeback_control *wbc)
-+{
-+	int rc = 0;
-+	struct TCP_Server_Info *server;
-+	unsigned int i;
-+
-+	wdata->sync_mode = wbc->sync_mode;
-+	wdata->nr_pages = nr_pages;
-+	wdata->offset = page_offset(wdata->pages[0]);
-+	wdata->pagesz = PAGE_CACHE_SIZE;
-+	wdata->tailsz = min(i_size_read(mapping->host) -
-+			page_offset(wdata->pages[nr_pages - 1]),
-+			(loff_t)PAGE_CACHE_SIZE);
-+	wdata->bytes = ((nr_pages - 1) * PAGE_CACHE_SIZE) + wdata->tailsz;
-+
-+	do {
-+		if (wdata->cfile != NULL)
-+			cifsFileInfo_put(wdata->cfile);
-+		wdata->cfile = find_writable_file(CIFS_I(mapping->host), false);
-+		if (!wdata->cfile) {
-+			cifs_dbg(VFS, "No writable handles for inode\n");
-+			rc = -EBADF;
-+			break;
-+		}
-+		wdata->pid = wdata->cfile->pid;
-+		server = tlink_tcon(wdata->cfile->tlink)->ses->server;
-+		rc = server->ops->async_writev(wdata, cifs_writedata_release);
-+	} while (wbc->sync_mode == WB_SYNC_ALL && rc == -EAGAIN);
-+
-+	for (i = 0; i < nr_pages; ++i)
-+		unlock_page(wdata->pages[i]);
-+
-+	if (!rc)
-+		return rc;
-+
-+	/* send failure -- clean up the mess */
-+	for (i = 0; i < nr_pages; ++i) {
-+		if (rc == -EAGAIN)
-+			redirty_page_for_writepage(wbc, wdata->pages[i]);
-+		else
-+			SetPageError(wdata->pages[i]);
-+		end_page_writeback(wdata->pages[i]);
-+		page_cache_release(wdata->pages[i]);
-+	}
-+	if (rc != -EAGAIN)
-+		mapping_set_error(mapping, rc);
-+
-+	return rc;
-+}
-+
- static int cifs_writepages(struct address_space *mapping,
- 			   struct writeback_control *wbc)
- {
-@@ -1965,7 +2017,6 @@ static int cifs_writepages(struct address_space *mapping,
- 	bool done = false, scanned = false, range_whole = false;
- 	pgoff_t end, index;
- 	struct cifs_writedata *wdata;
--	struct TCP_Server_Info *server;
- 	int rc = 0;
- 
- 	/*
-@@ -1987,7 +2038,7 @@ static int cifs_writepages(struct address_space *mapping,
- 	}
- retry:
- 	while (!done && index <= end) {
--		unsigned int i, nr_pages, found_pages;
-+		unsigned int nr_pages, found_pages;
- 		pgoff_t next = 0, tofind;
- 		struct page **pages;
- 
-@@ -2032,50 +2083,7 @@ retry:
- 			continue;
- 		}
- 
--		wdata->sync_mode = wbc->sync_mode;
--		wdata->nr_pages = nr_pages;
--		wdata->offset = page_offset(wdata->pages[0]);
--		wdata->pagesz = PAGE_CACHE_SIZE;
--		wdata->tailsz =
--			min(i_size_read(mapping->host) -
--			    page_offset(wdata->pages[nr_pages - 1]),
--			    (loff_t)PAGE_CACHE_SIZE);
--		wdata->bytes = ((nr_pages - 1) * PAGE_CACHE_SIZE) +
--					wdata->tailsz;
--
--		do {
--			if (wdata->cfile != NULL)
--				cifsFileInfo_put(wdata->cfile);
--			wdata->cfile = find_writable_file(CIFS_I(mapping->host),
--							  false);
--			if (!wdata->cfile) {
--				cifs_dbg(VFS, "No writable handles for inode\n");
--				rc = -EBADF;
--				break;
--			}
--			wdata->pid = wdata->cfile->pid;
--			server = tlink_tcon(wdata->cfile->tlink)->ses->server;
--			rc = server->ops->async_writev(wdata,
--							cifs_writedata_release);
--		} while (wbc->sync_mode == WB_SYNC_ALL && rc == -EAGAIN);
--
--		for (i = 0; i < nr_pages; ++i)
--			unlock_page(wdata->pages[i]);
--
--		/* send failure -- clean up the mess */
--		if (rc != 0) {
--			for (i = 0; i < nr_pages; ++i) {
--				if (rc == -EAGAIN)
--					redirty_page_for_writepage(wbc,
--							   wdata->pages[i]);
--				else
--					SetPageError(wdata->pages[i]);
--				end_page_writeback(wdata->pages[i]);
--				page_cache_release(wdata->pages[i]);
--			}
--			if (rc != -EAGAIN)
--				mapping_set_error(mapping, rc);
--		}
-+		rc = wdata_send_pages(wdata, nr_pages, mapping, wbc);
- 		kref_put(&wdata->refcount, cifs_writedata_release);
- 
- 		wbc->nr_to_write -= nr_pages;
+The first patch fixes a reconnect bug in reading code. Other patches simplify the read/write code (2-4,7,8,11,13), fix rsize/wsize usage bug on reconnects (5,6,9,12,14,15) and introduce multicredits support (10,16).
+
+Changes since v1:
+1) read part is added;
+2) several reconnects bug (related to the patchset and not) is fixed;
+3) overall patch simplification/refactoring is done.
+
+Pavel Shilovsky (16):
+  CIFS: Fix async reading on reconnects
+  CIFS: Separate page processing from writepages
+  CIFS: Separate page sending from writepages
+  CIFS: Separate pages initialization from writepages
+  CIFS: Fix wsize usage in writepages
+  CIFS: Fix cifs_writev_requeue when wsize changes
+  CIFS: Separate filling pages from iovec write
+  CIFS: Separate writing from iovec write
+  CIFS: Fix wsize usage in iovec write
+  CIFS: Use multicredits for SMB 2.1/3 writes
+  CIFS: Separate page search from readpages
+  CIFS: Fix rsize usage in readpages
+  CIFS: Separate page reading from user read
+  CIFS: Fix rsize usage in user read
+  CIFS: Fix rsize usage for sync read
+  CIFS: Use multicredits for SMB 2.1/3 reads
+
+ fs/cifs/cifsglob.h      |  18 ++
+ fs/cifs/cifsproto.h     |   3 +
+ fs/cifs/cifssmb.c       |  88 +++--
+ fs/cifs/file.c          | 846 +++++++++++++++++++++++++++++-------------------
+ fs/cifs/smb1ops.c       |   8 +
+ fs/cifs/smb2ops.c       |  64 +++-
+ fs/cifs/smb2pdu.c       |  63 +++-
+ fs/cifs/smb2transport.c |   5 +
+ fs/cifs/transport.c     |  25 +-
+ 9 files changed, 738 insertions(+), 382 deletions(-)
+
 -- 
 1.8.1.2
