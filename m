@@ -1,49 +1,101 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v2 00/16] SMB 2.1/3 multicredit requests for reading/writing
-Date: Fri, 27 Jun 2014 13:57:37 +0400
-Message-ID: <1403863073-19526-1-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH v2 04/16] CIFS: Separate pages initialization from writepages
+Date: Fri, 27 Jun 2014 13:57:41 +0400
+Message-ID: <1403863073-19526-5-git-send-email-pshilovsky@samba.org>
+References: <1403863073-19526-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1403863073-19526-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The goal of this patchset is to add large MTU/multicredits support for reading and writing from the CIFS client to servers that support SMB 2.1 and higher versions of the protocol.
+Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ fs/cifs/file.c | 56 ++++++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 36 insertions(+), 20 deletions(-)
 
-The first patch fixes a reconnect bug in reading code. Other patches simplify the read/write code (2-4,7,8,11,13), fix rsize/wsize usage bug on reconnects (5,6,9,12,14,15) and introduce multicredits support (10,16).
-
-Changes since v1:
-1) read part is added;
-2) several reconnects bug (related to the patchset and not) is fixed;
-3) overall patch simplification/refactoring is done.
-
-Pavel Shilovsky (16):
-  CIFS: Fix async reading on reconnects
-  CIFS: Separate page processing from writepages
-  CIFS: Separate page sending from writepages
-  CIFS: Separate pages initialization from writepages
-  CIFS: Fix wsize usage in writepages
-  CIFS: Fix cifs_writev_requeue when wsize changes
-  CIFS: Separate filling pages from iovec write
-  CIFS: Separate writing from iovec write
-  CIFS: Fix wsize usage in iovec write
-  CIFS: Use multicredits for SMB 2.1/3 writes
-  CIFS: Separate page search from readpages
-  CIFS: Fix rsize usage in readpages
-  CIFS: Separate page reading from user read
-  CIFS: Fix rsize usage in user read
-  CIFS: Fix rsize usage for sync read
-  CIFS: Use multicredits for SMB 2.1/3 reads
-
- fs/cifs/cifsglob.h      |  18 ++
- fs/cifs/cifsproto.h     |   3 +
- fs/cifs/cifssmb.c       |  88 +++--
- fs/cifs/file.c          | 846 +++++++++++++++++++++++++++++-------------------
- fs/cifs/smb1ops.c       |   8 +
- fs/cifs/smb2ops.c       |  64 +++-
- fs/cifs/smb2pdu.c       |  63 +++-
- fs/cifs/smb2transport.c |   5 +
- fs/cifs/transport.c     |  25 +-
- 9 files changed, 738 insertions(+), 382 deletions(-)
-
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 306c3df..4117da0 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1878,6 +1878,40 @@ static int cifs_partialpagewrite(struct page *page, unsigned from, unsigned to)
+ 	return rc;
+ }
+ 
++static struct cifs_writedata *
++wdata_alloc_and_fillpages(pgoff_t tofind, struct address_space *mapping,
++			  pgoff_t end, pgoff_t *index,
++			  unsigned int *found_pages)
++{
++	unsigned int nr_pages;
++	struct page **pages;
++	struct cifs_writedata *wdata;
++
++	wdata = cifs_writedata_alloc((unsigned int)tofind,
++				     cifs_writev_complete);
++	if (!wdata)
++		return NULL;
++
++	/*
++	 * find_get_pages_tag seems to return a max of 256 on each
++	 * iteration, so we must call it several times in order to
++	 * fill the array or the wsize is effectively limited to
++	 * 256 * PAGE_CACHE_SIZE.
++	 */
++	*found_pages = 0;
++	pages = wdata->pages;
++	do {
++		nr_pages = find_get_pages_tag(mapping, index,
++					      PAGECACHE_TAG_DIRTY, tofind,
++					      pages);
++		*found_pages += nr_pages;
++		tofind -= nr_pages;
++		pages += nr_pages;
++	} while (nr_pages && tofind && *index <= end);
++
++	return wdata;
++}
++
+ static unsigned int
+ wdata_prepare_pages(struct cifs_writedata *wdata, unsigned int found_pages,
+ 		    struct address_space *mapping,
+@@ -2040,35 +2074,17 @@ retry:
+ 	while (!done && index <= end) {
+ 		unsigned int nr_pages, found_pages;
+ 		pgoff_t next = 0, tofind;
+-		struct page **pages;
+ 
+ 		tofind = min((cifs_sb->wsize / PAGE_CACHE_SIZE) - 1,
+ 				end - index) + 1;
+ 
+-		wdata = cifs_writedata_alloc((unsigned int)tofind,
+-					     cifs_writev_complete);
++		wdata = wdata_alloc_and_fillpages(tofind, mapping, end, &index,
++						  &found_pages);
+ 		if (!wdata) {
+ 			rc = -ENOMEM;
+ 			break;
+ 		}
+ 
+-		/*
+-		 * find_get_pages_tag seems to return a max of 256 on each
+-		 * iteration, so we must call it several times in order to
+-		 * fill the array or the wsize is effectively limited to
+-		 * 256 * PAGE_CACHE_SIZE.
+-		 */
+-		found_pages = 0;
+-		pages = wdata->pages;
+-		do {
+-			nr_pages = find_get_pages_tag(mapping, &index,
+-							PAGECACHE_TAG_DIRTY,
+-							tofind, pages);
+-			found_pages += nr_pages;
+-			tofind -= nr_pages;
+-			pages += nr_pages;
+-		} while (nr_pages && tofind && index <= end);
+-
+ 		if (found_pages == 0) {
+ 			kref_put(&wdata->refcount, cifs_writedata_release);
+ 			break;
 -- 
 1.8.1.2
