@@ -1,90 +1,79 @@
-From: Arturo Puente <arturo.puente-duWF5KbFyrWv22wSYJUg5QC/G2K4zDHf@public.gmane.org>
-Subject: [Problem with mount.cifs version 6.3 in Centos 6.5]
-Date: Fri, 27 Jun 2014 09:57:07 -0430
-Message-ID: <53AD7F3B.3050208@arturo-puente.com>
-Reply-To: arturo.puente-duWF5KbFyrWv22wSYJUg5QC/G2K4zDHf@public.gmane.org
+From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH v2 01/16] CIFS: Fix async reading on reconnects
+Date: Fri, 27 Jun 2014 20:06:48 +0400
+Message-ID: <CAKywueSpPjEpyQYLvrSixf4tasxd5v4a51EBKhBboaTXcs5O1A@mail.gmail.com>
+References: <1403863073-19526-1-git-send-email-pshilovsky@samba.org>
+	<1403863073-19526-2-git-send-email-pshilovsky@samba.org>
+	<20140627065222.434cd5ea@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20140627065222.434cd5ea-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-  I have a CentOS Release 6.5 (Final) (2.6.32-431.17.1.el6.x86_64) machine.
-  I downloaded cifs-utils-6.3.tar.bz2, and did
+2014-06-27 14:52 GMT+04:00 Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>:
+> On Fri, 27 Jun 2014 13:57:38 +0400
+> Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+>
+>> If we get into read_into_pages() from cifs_readv_receive() and then
+>> loose a network, we issue cifs_reconnect that moves all mids to
+>> a private list and issue their callbacks. The callback of the async
+>> read request sets a mid to retry, frees it and wakes up a process
+>> that waits on the rdata completion.
+>>
+>> After the connection is established we return from read_into_pages()
+>> with a short read, use the mid that was freed before and try to read
+>> the remaining data from the a newly created socket. Both actions are
+>> not what we want to do. In reconnect cases (-EAGAIN) we should not
+>> mask off the error with a short read but should return the error
+>> code instead.
+>>
+>
+> I'm not sure I understand what problem this solves. Why is returning a
+> short read wrong here?
+>
 
-  1 - #tar -xjvf cifs-utils-6.3.tar.bz2
-  2 - #cd cifs-utils-6.3
-  3 - #./configure --prefix=/usr
-  4 - #make
-  5 - #make install
-  6 - # mount.cifs -V
-      mount.cifs version: 6.3
+This patch solves several problems in cifs_readv_receive() when
+read_into_pages() call ended up with cifs_reconnect inside it:
 
-  After that, I am trying to mount an AZURE Share with
+1) prevents use-after-free and a possible double free for "mid"
+variable; this can cause kernel oopses.
 
-  mount.cifs //storage  /home/data/ -o 
-vers=2.1,credentials=credentials-file,dir_mode=0777,file_mode=0777
-  with //storage here instead of the true share storage name and
-       credentials-file instead of the true location of the credentials 
-file,
+2) prevents updating rdata->bytes with a short read length that causes
+the cifs_async_readv() caller to retry write request with a shorten
+wrong length; this can cause data coherency problems.
 
-  And I got the following message
+3) prevents reading an actual data from a newly created socket through
+cifs_readv_discard() -- this data can be a part of a negotiate
+response received from the server; this can cause the client to retry
+negotiate or hang.
 
-  mount error(112): Host is down
-  Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
+Oopses from the 1st scenario was not observed since
+cifs_readv_discard() returns negative value while trying to get a
+remaining data. The 2nd and 3rd one were caught during testing: issue
+reading with "dd", then switch off network on the server, wait 120 sec
+and switch on network. The bug is caught when we are lucky enough to
+stop the link while the client is in read_into_pages().
 
-  In this machine
-  #cat /boot/config-2.6.32-431.17.1.el6.x86_64 | grep CIFS
+The patch fixes all these problems for me. It stays on the following
+logic if a reconnect has happened:
+1) all mids are already marked to retry and their callbacks are issued
+- we shouldn't do anything with our mid/rdata since the requests will
+be retried anyway.
+2) the socket is newly created - we shouldn't try to get any remaining
+data of the previous connection.
 
-  CONFIG_CIFS=m
-  CONFIG_CIFS_STATS=y
-  # CONFIG_CIFS_STATS2 is not set
-  CONFIG_CIFS_WEAK_PW_HASH=y
-  CONFIG_CIFS_UPCALL=y
-  CONFIG_CIFS_XATTR=y
-  CONFIG_CIFS_POSIX=y
-  # CONFIG_CIFS_DEBUG2 is not set
-  CONFIG_CIFS_DFS_UPCALL=y
-  CONFIG_CIFS_ACL=y
-  # CONFIG_CIFS_FSCACHE is not set
+While -EAGAIN error code will be able to indicate something else in
+possible future patches I prefer to leave it that way since the patch
+is small and easy to apply that is critical for stable series. More
+accurate way is to add a flag that is passed through
+cifs_readv_from_socket() and switched on if cifs_reconnect() was
+issued (like Steve suggested).
 
-
-  Using a machine with Ubuntu 14.04 LTS (3.13.0-29-generic) that has 
-preloaded cifs
-  # mount.cifs -V
-  mount.cifs version: 6.0
-
-  Using the same command to mount the share, I didn't get the error message
-  and the share is mounted without any trouble.
-
-  In this machine
-  # cat /boot/config-3.13.0-29-generic | grep CIFS
-
-  CONFIG_CIFS=m
-  CONFIG_CIFS_STATS=y
-  # CONFIG_CIFS_STATS2 is not set
-  CONFIG_CIFS_WEAK_PW_HASH=y
-  CONFIG_CIFS_UPCALL=y
-  CONFIG_CIFS_XATTR=y
-  CONFIG_CIFS_POSIX=y
-  # CONFIG_CIFS_DEBUG2 is not set
-  CONFIG_CIFS_DFS_UPCALL=y
-  CONFIG_CIFS_ACL=y
-  CONFIG_CIFS_FSCACHE=y
-  CONFIG_CIFS_DEBUG=y
-  CONFIG_CIFS_SMB2=y
-
-  Both machines are inside the same pool of virtual machines for my 
-account inside Azure
-
-  Does anyone knows why I am getting the message
-
-  mount error(112): Host is down
-
-  In the machine with CentOS 6.5.?
-
-  Thank you in advance for your Help with this matter.
-
-  Arturo Puente
+-- 
+Best regards,
+Pavel Shilovsky.
