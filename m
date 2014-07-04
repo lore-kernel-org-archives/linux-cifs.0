@@ -1,85 +1,61 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Preliminary Performance Results from Pavel's SMB3 Multicredit (large
- i/o) patches
-Date: Thu, 3 Jul 2014 20:31:21 -0500
-Message-ID: <CAH2r5msLrenaH+BB48ZpCZfRAivgHL9i6VJJeXekkoYaWBZT2w@mail.gmail.com>
+From: Christian Lutz <christian.lutz-EnyPcy3oyxIb1SvskN2V4Q@public.gmane.org>
+Subject: Question on Active Directory Authentication
+Date: Fri, 04 Jul 2014 14:54:05 +0200
+Message-ID: <53B6A3ED.9060805@muenchen.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-15;
+	format=flowed
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Pavel has been working on a patch series to improve performance of
-large i/o from cifs.ko when mounted with the more modern SMB3
-protocol.
+Hi everybody,
 
-My initial informal performance comparisons with and without his
-patches looks very promising.
+just one simple question regarding the authentication of users in the=20
+mount options: Is it possible to authenticate a user with his=20
+userPrincipalName attribute and a password or are there any more=20
+dependencies to get this to work (i. e. krb5 or other security options)=
+?
 
-For comparison purposes among protocols etc. the default rsize that
-will be negotiated is:
-- for cifs mounts to Samba server (Unix Extensions enabled by default):  1MB
-- for cifs mounts to servers that don't support the CIFS protocol Unix
-Extensions: 61440
-- for smb2/smb2.1/smb3 mounts prior to Pavel's patch series: 64K
-- for smb2.1/smb3 mounts with his patch set: 1MB (write size also
-increased from 64K to 1MB).
+Example: mount -t cifs //server/share /mnt -o=20
+username=3Dmy.upn.prefix-d7gQ9grfmP4pBLzJVN3leg@public.gmane.org,password=3DPASSWORD
 
-Note that protocol versions prior to SMB2.1 supported a maximum write
-size of 64K (127K does work in some cases for cifs although rarely
-used), except for the special case of cifs with Unix extensions.
+The only working solution was with the default sAMAccountName Attribute=
+=2E
 
-Initial performance results are promising.   Using a 1GB source file
-on the server and copying it ala dd if=/mnt/sample of=/mnt/target
-bs=20M
-
-(Source and target are virtual machines on the same laptop -
-performance gains would likely be more impressive on real hardware.
-Target system was Samba server version 4.1.9 on Fedora 20. Client
-system was current mainline 3.16.0-rc3 on Ubuntu)
-With SMB3 mounts without Pavel's patches (current mainline kernel 3.16.0-rc3)
-46MB/s
-With his patches:
-91MB/s  (about a 2x improvement in large file copy performance)
-
-(With cifs protocol instead of smb3 the performance was in between,
-averaging about 65MB/s)
-
-With my first set of iozone runs, I 2x to 4x improvement in read
-performance with Pavel's patch set, and significant, although less
-dramatic improvements in write performance.  See below:
-
-File size set to 512000 KB
-Record Size 1024 KB
-Include close in write timing
-Command line used: iozone -s 500m -r 1m -c
-Output is in Kbytes/sec
-Time Resolution = 0.000001 seconds.
-Processor cache size set to 1024 Kbytes.
-Processor cache line size set to 32 bytes.
-File stride size set to 17 * record size.
-
-New module, smb3 mounts:
-                                                            random
-random    bkwd   record   stride
-              KB  reclen   write rewrite    read    reread    read
-write    read  rewrite     read   fwrite frewrite   fread  freread
-          512000    1024  102225  118000   272040   276514  228472
-184573  226345   112443   230808   187307   185719  279627   278387
-          512000    1024  140464  111514   268999   277897  225019
-139465  238265   125377   230924   112630   111014  275391   278125
-
-Old module, prior to Pavel's paches, smb3 mounts:
-          512000    1024   99480  100647    76163    76199   78331
-108361   74927   108555    77629   100585   100621   76882    77539
-          512000    1024   97903  142542    72895    75871   79708
-108268   76519   105839    78979   122057   107614   75624    73454
+Background:
+We are building a new fileservice for Windows and Linux Clients. The=20
+users are stored in Active Directory. The username (sAMAccountName) is =
+a=20
+random string created by the Server itself. The only login attribute th=
+e=20
+user knows is his UPN (which is also the mailaddress in our case).
 
 
--- 
-Thanks,
+Thanks in advance
+Christian
 
-Steve
+--=20
+
+Christian Lutz
+
+Landeshauptstadt Muenchen
+it@M - Dienstleister fuer Informations- und Telekommunikationstechnik
+Gesch=E4ftsbereich Werkzeuge und Infrastruktur
+Servicebereich Security und Netzwerkinfrastruktur
+Serviceteam ID-Management
+Komponentenverantwortlicher Active Directory
+
+Buero: Herzog-Wilhelm-Stra=DFe 22, M=FCnchen
+Postanschrift: Herzogspitalstr. 24, 80331 M=FCnchen
+
+Telefon: +49 89 233-25596
+=46ax.: +49 89 233-98925596
+E-Mail:	christian.lutz-EnyPcy3oyxIb1SvskN2V4Q@public.gmane.org
+
+--------------------------------------------------------------------
+Elektronische Kommunikation mit der Landeshauptstadt Muenchen - siehe:
+http://www.muenchen.de/ekomm
+--------------------------------------------------------------------
