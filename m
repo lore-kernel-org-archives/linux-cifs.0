@@ -1,8 +1,8 @@
 From: NeilBrown <neilb@suse.de>
-Subject: [PATCH 1/2] SCHED: remove proliferation of wait_on_bit action
- functions.
+Subject: [PATCH 2/2] SCHED: allow wait_on_bit_action functions to support a
+ timeout.
 Date: Mon, 07 Jul 2014 15:16:04 +1000
-Message-ID: <20140707051603.28027.72349.stgit@notabene.brown>
+Message-ID: <20140707051604.28027.41257.stgit@notabene.brown>
 References: <20140707051530.28027.48411.stgit@notabene.brown>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -20,1282 +20,291 @@ In-Reply-To: <20140707051530.28027.48411.stgit@notabene.brown>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-The current "wait_on_bit" interface requires an 'action' function
-to be provided which does the actual waiting.
-There are over 20 such functions, many of them identical.
-Most cases can be satisfied by one of just two functions, one
-which uses io_schedule() and one which just uses schedule().
+It is currently not possible for various wait_on_bit functions to
+implement a timeout.
+While the "action" function that is called to do the waiting could
+certainly use schedule_timeout(), there is no way to carry forward the
+remaining timeout after a false wake-up.
+As false-wakeups a clearly possible at least due to possible
+hash collisions in bit_waitqueue(), this is a real problem.
 
-So:
- Rename wait_on_bit and        wait_on_bit_lock to
-        wait_on_bit_action and wait_on_bit_lock_action
- to make it explicit that they need an action function.
+The 'action' function is currently passed a pointer to the word
+containing the bit being waited on.  No current action functions use
+this pointer.  So changing it to something else will be a little noisy
+but will have no immediate effect.
 
- Introduce new wait_on_bit{,_lock} and wait_on_bit{,_lock}_io
- which are *not* given an action function but implicitly use
- a standard one.
- The decision to error-out if a signal is pending is now made
- based on the 'mode' argument rather than being encoded in the action
- function.
+This patch changes the 'action' function to take a pointer to the
+"struct wait_bit_key", which contains a pointer to the word
+containing the bit so nothing is really lost.
 
+It also adds a 'private' field to "struct wait_bit_key", which is
+initialized to zero.
 
- All instances of the old wait_on_bit and wait_on_bit_lock which
- can use the new version have been changed accordingly and their
- action functions have been discarded.
- wait_on_bit{_lock} does not return any specific error code in the
- event of a signal so the caller must check for non-zero and
- interpolate their own error code as appropriate.
+An action function can now implement a timeout with something like
 
-The wait_on_bit() call in __fscache_wait_on_invalidate() was ambiguous
-as it specified TASK_UNINTERRUPTIBLE but used
-fscache_wait_bit_interruptible as an action function.
-David Howells confirms this should be uniformly "uninterruptible"
+static int timed_out_waiter(struct wait_bit_key *key)
+{
+	unsigned long waited;
+	if (key->private == 0) {
+		key->private = jiffies;
+		if (key->private == 0)
+			key->private -= 1;
+	}
+	waited = jiffies - key->private;
+	if (waited > 10 * HZ)
+		return -EAGAIN;
+	schedule_timeout(waited - 10 * HZ);
+	return 0;
+}
 
-The main remaining user of wait_on_bit{,_lock}_action is NFS which
-needs to use a freezer-aware schedule() call.
+If any other need for context in a waiter were found it would be easy
+to use ->private for some other purpose, or even extend "struct
+wait_bit_key".
 
-A comment in fs/gfs2/glock.c notes that having multiple 'action'
-functions is useful as they display differently in the 'wchan' field
-of 'ps'. (and /proc/$PID/wchan).
-As the new bit_wait{,_io} functions are tagged "__sched", they will
-not show up at all, but something higher in the stack.  So the
-distinction will still be visible, only with different function names
-(gds2_glock_wait versus gfs2_glock_dq_wait in the gfs2/glock.c case).
+My particular need is to support timeouts in nfs_release_page() to
+avoid deadlocks with loopback mounted NFS.
 
-Since first version of this patch (against 3.15) two new action
-functions appeared, on in NFS and one in CIFS.  CIFS also now uses
-an action function that makes the same freezer aware schedule call
-as NFS.
-
+While wait_on_bit_timeout() would be a cleaner interface, it will not
+meet my need.  I need the timeout to be sensitive to the state of
+the connection with the server, which could change.  So I need to
+use an 'action' interface.
 
 Signed-off-by: NeilBrown <neilb@suse.de>
-Cc: Oleg Nesterov <oleg@redhat.com>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Acked-by: David Howells <dhowells@redhat.com> (fscache, keys)
-Acked-by: Steven Whitehouse <swhiteho@redhat.com> (gfs2)
 ---
- Documentation/filesystems/caching/operations.txt |    2 
- drivers/md/dm-bufio.c                            |   41 +++-----
- drivers/md/dm-snap.c                             |   10 --
- drivers/media/usb/dvb-usb-v2/dvb_usb_core.c      |   12 --
- fs/btrfs/extent_io.c                             |   10 --
- fs/buffer.c                                      |   11 --
- fs/cifs/connect.c                                |   10 --
- fs/cifs/file.c                                   |    9 --
- fs/cifs/inode.c                                  |    4 -
- fs/cifs/misc.c                                   |    2 
- fs/fs-writeback.c                                |    3 -
- fs/fscache/cookie.c                              |    7 +
- fs/fscache/internal.h                            |    2 
- fs/fscache/main.c                                |   18 ---
- fs/fscache/page.c                                |    4 -
- fs/gfs2/glock.c                                  |   25 -----
- fs/gfs2/lock_dlm.c                               |    8 --
- fs/gfs2/ops_fstype.c                             |   11 --
- fs/gfs2/recovery.c                               |    8 --
- fs/gfs2/super.c                                  |    8 --
- fs/inode.c                                       |    7 -
- fs/jbd2/transaction.c                            |   10 --
- fs/nfs/file.c                                    |    4 -
- fs/nfs/filelayout/filelayoutdev.c                |    4 -
- fs/nfs/inode.c                                   |    4 -
- fs/nfs/nfs4state.c                               |    4 -
- fs/nfs/pagelist.c                                |   12 --
- fs/nfs/pnfs.c                                    |    2 
- fs/nfs/write.c                                   |    4 -
- include/linux/wait.h                             |  115 +++++++++++++++++++++-
- include/linux/writeback.h                        |    3 -
- kernel/ptrace.c                                  |    8 --
- kernel/sched/wait.c                              |   18 +++
- mm/filemap.c                                     |   20 +---
- mm/ksm.c                                         |    8 --
- net/bluetooth/hci_core.c                         |    8 --
- security/keys/gc.c                               |   11 --
- security/keys/request_key.c                      |   23 ----
- 38 files changed, 195 insertions(+), 275 deletions(-)
+ fs/cifs/inode.c              |    2 +-
+ fs/nfs/inode.c               |    2 +-
+ fs/nfs/internal.h            |    2 +-
+ fs/nfs/pagelist.c            |    2 +-
+ include/linux/sunrpc/sched.h |    2 +-
+ include/linux/wait.h         |   18 ++++++++++--------
+ kernel/sched/wait.c          |   16 ++++++++--------
+ net/sunrpc/sched.c           |    4 ++--
+ 8 files changed, 25 insertions(+), 23 deletions(-)
 
-diff --git a/Documentation/filesystems/caching/operations.txt b/Documentation/filesystems/caching/operations.txt
-index bee2a5f93d60..a1c052cbba35 100644
---- a/Documentation/filesystems/caching/operations.txt
-+++ b/Documentation/filesystems/caching/operations.txt
-@@ -90,7 +90,7 @@ operations:
-      to be cleared before proceeding:
- 
- 		wait_on_bit(&op->flags, FSCACHE_OP_WAITING,
--			    fscache_wait_bit, TASK_UNINTERRUPTIBLE);
-+			    TASK_UNINTERRUPTIBLE);
- 
- 
-  (2) The operation may be fast asynchronous (FSCACHE_OP_FAST), in which case it
-diff --git a/drivers/md/dm-bufio.c b/drivers/md/dm-bufio.c
-index 4e84095833db..96c92b75452f 100644
---- a/drivers/md/dm-bufio.c
-+++ b/drivers/md/dm-bufio.c
-@@ -615,16 +615,6 @@ static void write_endio(struct bio *bio, int error)
- }
- 
- /*
-- * This function is called when wait_on_bit is actually waiting.
-- */
--static int do_io_schedule(void *word)
--{
--	io_schedule();
--
--	return 0;
--}
--
--/*
-  * Initiate a write on a dirty buffer, but don't wait for it.
-  *
-  * - If the buffer is not dirty, exit.
-@@ -640,8 +630,7 @@ static void __write_dirty_buffer(struct dm_buffer *b,
- 		return;
- 
- 	clear_bit(B_DIRTY, &b->state);
--	wait_on_bit_lock(&b->state, B_WRITING,
--			 do_io_schedule, TASK_UNINTERRUPTIBLE);
-+	wait_on_bit_lock_io(&b->state, B_WRITING, TASK_UNINTERRUPTIBLE);
- 
- 	if (!write_list)
- 		submit_io(b, WRITE, b->block, write_endio);
-@@ -675,9 +664,9 @@ static void __make_buffer_clean(struct dm_buffer *b)
- 	if (!b->state)	/* fast case */
- 		return;
- 
--	wait_on_bit(&b->state, B_READING, do_io_schedule, TASK_UNINTERRUPTIBLE);
-+	wait_on_bit_io(&b->state, B_READING, TASK_UNINTERRUPTIBLE);
- 	__write_dirty_buffer(b, NULL);
--	wait_on_bit(&b->state, B_WRITING, do_io_schedule, TASK_UNINTERRUPTIBLE);
-+	wait_on_bit_io(&b->state, B_WRITING, TASK_UNINTERRUPTIBLE);
- }
- 
- /*
-@@ -1030,7 +1019,7 @@ static void *new_read(struct dm_bufio_client *c, sector_t block,
- 	if (need_submit)
- 		submit_io(b, READ, b->block, read_endio);
- 
--	wait_on_bit(&b->state, B_READING, do_io_schedule, TASK_UNINTERRUPTIBLE);
-+	wait_on_bit_io(&b->state, B_READING, TASK_UNINTERRUPTIBLE);
- 
- 	if (b->read_error) {
- 		int error = b->read_error;
-@@ -1209,15 +1198,13 @@ again:
- 				dropped_lock = 1;
- 				b->hold_count++;
- 				dm_bufio_unlock(c);
--				wait_on_bit(&b->state, B_WRITING,
--					    do_io_schedule,
--					    TASK_UNINTERRUPTIBLE);
-+				wait_on_bit_io(&b->state, B_WRITING,
-+					       TASK_UNINTERRUPTIBLE);
- 				dm_bufio_lock(c);
- 				b->hold_count--;
- 			} else
--				wait_on_bit(&b->state, B_WRITING,
--					    do_io_schedule,
--					    TASK_UNINTERRUPTIBLE);
-+				wait_on_bit_io(&b->state, B_WRITING,
-+					       TASK_UNINTERRUPTIBLE);
- 		}
- 
- 		if (!test_bit(B_DIRTY, &b->state) &&
-@@ -1321,15 +1308,15 @@ retry:
- 
- 	__write_dirty_buffer(b, NULL);
- 	if (b->hold_count == 1) {
--		wait_on_bit(&b->state, B_WRITING,
--			    do_io_schedule, TASK_UNINTERRUPTIBLE);
-+		wait_on_bit_io(&b->state, B_WRITING,
-+			       TASK_UNINTERRUPTIBLE);
- 		set_bit(B_DIRTY, &b->state);
- 		__unlink_buffer(b);
- 		__link_buffer(b, new_block, LIST_DIRTY);
- 	} else {
- 		sector_t old_block;
--		wait_on_bit_lock(&b->state, B_WRITING,
--				 do_io_schedule, TASK_UNINTERRUPTIBLE);
-+		wait_on_bit_lock_io(&b->state, B_WRITING,
-+				    TASK_UNINTERRUPTIBLE);
- 		/*
- 		 * Relink buffer to "new_block" so that write_callback
- 		 * sees "new_block" as a block number.
-@@ -1341,8 +1328,8 @@ retry:
- 		__unlink_buffer(b);
- 		__link_buffer(b, new_block, b->list_mode);
- 		submit_io(b, WRITE, new_block, write_endio);
--		wait_on_bit(&b->state, B_WRITING,
--			    do_io_schedule, TASK_UNINTERRUPTIBLE);
-+		wait_on_bit_io(&b->state, B_WRITING,
-+			       TASK_UNINTERRUPTIBLE);
- 		__unlink_buffer(b);
- 		__link_buffer(b, old_block, b->list_mode);
- 	}
-diff --git a/drivers/md/dm-snap.c b/drivers/md/dm-snap.c
-index 5bd2290cfb1e..864b03f47727 100644
---- a/drivers/md/dm-snap.c
-+++ b/drivers/md/dm-snap.c
-@@ -1032,21 +1032,13 @@ static void start_merge(struct dm_snapshot *s)
- 		snapshot_merge_next_chunks(s);
- }
- 
--static int wait_schedule(void *ptr)
--{
--	schedule();
--
--	return 0;
--}
--
- /*
-  * Stop the merging process and wait until it finishes.
-  */
- static void stop_merge(struct dm_snapshot *s)
- {
- 	set_bit(SHUTDOWN_MERGE, &s->state_bits);
--	wait_on_bit(&s->state_bits, RUNNING_MERGE, wait_schedule,
--		    TASK_UNINTERRUPTIBLE);
-+	wait_on_bit(&s->state_bits, RUNNING_MERGE, TASK_UNINTERRUPTIBLE);
- 	clear_bit(SHUTDOWN_MERGE, &s->state_bits);
- }
- 
-diff --git a/drivers/media/usb/dvb-usb-v2/dvb_usb_core.c b/drivers/media/usb/dvb-usb-v2/dvb_usb_core.c
-index e35580618936..f296394bb7c5 100644
---- a/drivers/media/usb/dvb-usb-v2/dvb_usb_core.c
-+++ b/drivers/media/usb/dvb-usb-v2/dvb_usb_core.c
-@@ -253,13 +253,6 @@ static int dvb_usbv2_adapter_stream_exit(struct dvb_usb_adapter *adap)
- 	return usb_urb_exitv2(&adap->stream);
- }
- 
--static int wait_schedule(void *ptr)
--{
--	schedule();
--
--	return 0;
--}
--
- static int dvb_usb_start_feed(struct dvb_demux_feed *dvbdmxfeed)
- {
- 	struct dvb_usb_adapter *adap = dvbdmxfeed->demux->priv;
-@@ -273,8 +266,7 @@ static int dvb_usb_start_feed(struct dvb_demux_feed *dvbdmxfeed)
- 			dvbdmxfeed->pid, dvbdmxfeed->index);
- 
- 	/* wait init is done */
--	wait_on_bit(&adap->state_bits, ADAP_INIT, wait_schedule,
--			TASK_UNINTERRUPTIBLE);
-+	wait_on_bit(&adap->state_bits, ADAP_INIT, TASK_UNINTERRUPTIBLE);
- 
- 	if (adap->active_fe == -1)
- 		return -EINVAL;
-@@ -568,7 +560,7 @@ static int dvb_usb_fe_sleep(struct dvb_frontend *fe)
- 
- 	if (!adap->suspend_resume_active) {
- 		set_bit(ADAP_SLEEP, &adap->state_bits);
--		wait_on_bit(&adap->state_bits, ADAP_STREAMING, wait_schedule,
-+		wait_on_bit(&adap->state_bits, ADAP_STREAMING,
- 				TASK_UNINTERRUPTIBLE);
- 	}
- 
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index a389820d158b..3e11aab9f391 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -3437,16 +3437,10 @@ done_unlocked:
- 	return 0;
- }
- 
--static int eb_wait(void *word)
--{
--	io_schedule();
--	return 0;
--}
--
- void wait_on_extent_buffer_writeback(struct extent_buffer *eb)
- {
--	wait_on_bit(&eb->bflags, EXTENT_BUFFER_WRITEBACK, eb_wait,
--		    TASK_UNINTERRUPTIBLE);
-+	wait_on_bit_io(&eb->bflags, EXTENT_BUFFER_WRITEBACK,
-+		       TASK_UNINTERRUPTIBLE);
- }
- 
- static noinline_for_stack int
-diff --git a/fs/buffer.c b/fs/buffer.c
-index eba6e4f621ce..8f05111bbb8b 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -61,16 +61,9 @@ inline void touch_buffer(struct buffer_head *bh)
- }
- EXPORT_SYMBOL(touch_buffer);
- 
--static int sleep_on_buffer(void *word)
--{
--	io_schedule();
--	return 0;
--}
--
- void __lock_buffer(struct buffer_head *bh)
- {
--	wait_on_bit_lock(&bh->b_state, BH_Lock, sleep_on_buffer,
--							TASK_UNINTERRUPTIBLE);
-+	wait_on_bit_lock_io(&bh->b_state, BH_Lock, TASK_UNINTERRUPTIBLE);
- }
- EXPORT_SYMBOL(__lock_buffer);
- 
-@@ -123,7 +116,7 @@ EXPORT_SYMBOL(buffer_check_dirty_writeback);
-  */
- void __wait_on_buffer(struct buffer_head * bh)
- {
--	wait_on_bit(&bh->b_state, BH_Lock, sleep_on_buffer, TASK_UNINTERRUPTIBLE);
-+	wait_on_bit_io(&bh->b_state, BH_Lock, TASK_UNINTERRUPTIBLE);
- }
- EXPORT_SYMBOL(__wait_on_buffer);
- 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 20d75b8ddb26..b98366f21f9e 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -3934,13 +3934,6 @@ cifs_sb_master_tcon(struct cifs_sb_info *cifs_sb)
- 	return tlink_tcon(cifs_sb_master_tlink(cifs_sb));
- }
- 
--static int
--cifs_sb_tcon_pending_wait(void *unused)
--{
--	schedule();
--	return signal_pending(current) ? -ERESTARTSYS : 0;
--}
--
- /* find and return a tlink with given uid */
- static struct tcon_link *
- tlink_rb_search(struct rb_root *root, kuid_t uid)
-@@ -4039,11 +4032,10 @@ cifs_sb_tlink(struct cifs_sb_info *cifs_sb)
- 	} else {
- wait_for_construction:
- 		ret = wait_on_bit(&tlink->tl_flags, TCON_LINK_PENDING,
--				  cifs_sb_tcon_pending_wait,
- 				  TASK_INTERRUPTIBLE);
- 		if (ret) {
- 			cifs_put_tlink(tlink);
--			return ERR_PTR(ret);
-+			return ERR_PTR(-ERESTARTSYS);
- 		}
- 
- 		/* if it's good, return it */
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index e90a1e9aa627..b88b1ade4d3d 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -3618,13 +3618,6 @@ static int cifs_launder_page(struct page *page)
- 	return rc;
- }
- 
--static int
--cifs_pending_writers_wait(void *unused)
--{
--	schedule();
--	return 0;
--}
--
- void cifs_oplock_break(struct work_struct *work)
- {
- 	struct cifsFileInfo *cfile = container_of(work, struct cifsFileInfo,
-@@ -3636,7 +3629,7 @@ void cifs_oplock_break(struct work_struct *work)
- 	int rc = 0;
- 
- 	wait_on_bit(&cinode->flags, CIFS_INODE_PENDING_WRITERS,
--			cifs_pending_writers_wait, TASK_UNINTERRUPTIBLE);
-+			TASK_UNINTERRUPTIBLE);
- 
- 	server->ops->downgrade_oplock(server, cinode,
- 		test_bit(CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2, &cinode->flags));
 diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index a174605f6afa..213c4580b4e3 100644
+index 213c4580b4e3..41de3935caa0 100644
 --- a/fs/cifs/inode.c
 +++ b/fs/cifs/inode.c
-@@ -1794,8 +1794,8 @@ cifs_revalidate_mapping(struct inode *inode)
- 	int rc;
- 	unsigned long *flags = &CIFS_I(inode)->flags;
- 
--	rc = wait_on_bit_lock(flags, CIFS_INO_LOCK, cifs_wait_bit_killable,
--				TASK_KILLABLE);
-+	rc = wait_on_bit_lock_action(flags, CIFS_INO_LOCK, cifs_wait_bit_killable,
-+				     TASK_KILLABLE);
- 	if (rc)
- 		return rc;
- 
-diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-index 3b0c62e622da..6bf55d0ed494 100644
---- a/fs/cifs/misc.c
-+++ b/fs/cifs/misc.c
-@@ -582,7 +582,7 @@ int cifs_get_writer(struct cifsInodeInfo *cinode)
- 
- start:
- 	rc = wait_on_bit(&cinode->flags, CIFS_INODE_PENDING_OPLOCK_BREAK,
--				   cifs_oplock_break_wait, TASK_KILLABLE);
-+			 TASK_KILLABLE);
- 	if (rc)
- 		return rc;
- 
-diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
-index be568b7311d6..ef9bef118342 100644
---- a/fs/fs-writeback.c
-+++ b/fs/fs-writeback.c
-@@ -342,7 +342,8 @@ static void __inode_wait_for_writeback(struct inode *inode)
- 	wqh = bit_waitqueue(&inode->i_state, __I_SYNC);
- 	while (inode->i_state & I_SYNC) {
- 		spin_unlock(&inode->i_lock);
--		__wait_on_bit(wqh, &wq, inode_wait, TASK_UNINTERRUPTIBLE);
-+		__wait_on_bit(wqh, &wq, bit_wait,
-+			      TASK_UNINTERRUPTIBLE);
- 		spin_lock(&inode->i_lock);
- 	}
- }
-diff --git a/fs/fscache/cookie.c b/fs/fscache/cookie.c
-index aec01be91b0a..89acec742e0b 100644
---- a/fs/fscache/cookie.c
-+++ b/fs/fscache/cookie.c
-@@ -160,7 +160,7 @@ void __fscache_enable_cookie(struct fscache_cookie *cookie,
- 	_enter("%p", cookie);
- 
- 	wait_on_bit_lock(&cookie->flags, FSCACHE_COOKIE_ENABLEMENT_LOCK,
--			 fscache_wait_bit, TASK_UNINTERRUPTIBLE);
-+			 TASK_UNINTERRUPTIBLE);
- 
- 	if (test_bit(FSCACHE_COOKIE_ENABLED, &cookie->flags))
- 		goto out_unlock;
-@@ -255,7 +255,7 @@ static int fscache_acquire_non_index_cookie(struct fscache_cookie *cookie)
- 	if (!fscache_defer_lookup) {
- 		_debug("non-deferred lookup %p", &cookie->flags);
- 		wait_on_bit(&cookie->flags, FSCACHE_COOKIE_LOOKING_UP,
--			    fscache_wait_bit, TASK_UNINTERRUPTIBLE);
-+			    TASK_UNINTERRUPTIBLE);
- 		_debug("complete");
- 		if (test_bit(FSCACHE_COOKIE_UNAVAILABLE, &cookie->flags))
- 			goto unavailable;
-@@ -463,7 +463,6 @@ void __fscache_wait_on_invalidate(struct fscache_cookie *cookie)
- 	_enter("%p", cookie);
- 
- 	wait_on_bit(&cookie->flags, FSCACHE_COOKIE_INVALIDATING,
--		    fscache_wait_bit_interruptible,
- 		    TASK_UNINTERRUPTIBLE);
- 
- 	_leave("");
-@@ -525,7 +524,7 @@ void __fscache_disable_cookie(struct fscache_cookie *cookie, bool invalidate)
- 	}
- 
- 	wait_on_bit_lock(&cookie->flags, FSCACHE_COOKIE_ENABLEMENT_LOCK,
--			 fscache_wait_bit, TASK_UNINTERRUPTIBLE);
-+			 TASK_UNINTERRUPTIBLE);
- 	if (!test_and_clear_bit(FSCACHE_COOKIE_ENABLED, &cookie->flags))
- 		goto out_unlock_enable;
- 
-diff --git a/fs/fscache/internal.h b/fs/fscache/internal.h
-index bc6c08fcfddd..7872a62ef30c 100644
---- a/fs/fscache/internal.h
-+++ b/fs/fscache/internal.h
-@@ -97,8 +97,6 @@ static inline bool fscache_object_congested(void)
- 	return workqueue_congested(WORK_CPU_UNBOUND, fscache_object_wq);
- }
- 
--extern int fscache_wait_bit(void *);
--extern int fscache_wait_bit_interruptible(void *);
- extern int fscache_wait_atomic_t(atomic_t *);
- 
- /*
-diff --git a/fs/fscache/main.c b/fs/fscache/main.c
-index 63f868e869b9..a31b83c5cbd9 100644
---- a/fs/fscache/main.c
-+++ b/fs/fscache/main.c
-@@ -197,24 +197,6 @@ static void __exit fscache_exit(void)
- module_exit(fscache_exit);
- 
- /*
-- * wait_on_bit() sleep function for uninterruptible waiting
-- */
--int fscache_wait_bit(void *flags)
--{
--	schedule();
--	return 0;
--}
--
--/*
-- * wait_on_bit() sleep function for interruptible waiting
-- */
--int fscache_wait_bit_interruptible(void *flags)
--{
--	schedule();
--	return signal_pending(current);
--}
--
--/*
-  * wait_on_atomic_t() sleep function for uninterruptible waiting
+@@ -1780,7 +1780,7 @@ cifs_invalidate_mapping(struct inode *inode)
+  * @word: long word containing the bit lock
   */
- int fscache_wait_atomic_t(atomic_t *p)
-diff --git a/fs/fscache/page.c b/fs/fscache/page.c
-index ed70714503fa..85332b9d19d1 100644
---- a/fs/fscache/page.c
-+++ b/fs/fscache/page.c
-@@ -298,7 +298,6 @@ int fscache_wait_for_deferred_lookup(struct fscache_cookie *cookie)
- 
- 	jif = jiffies;
- 	if (wait_on_bit(&cookie->flags, FSCACHE_COOKIE_LOOKING_UP,
--			fscache_wait_bit_interruptible,
- 			TASK_INTERRUPTIBLE) != 0) {
- 		fscache_stat(&fscache_n_retrievals_intr);
- 		_leave(" = -ERESTARTSYS");
-@@ -342,7 +341,6 @@ int fscache_wait_for_operation_activation(struct fscache_object *object,
- 	if (stat_op_waits)
- 		fscache_stat(stat_op_waits);
- 	if (wait_on_bit(&op->flags, FSCACHE_OP_WAITING,
--			fscache_wait_bit_interruptible,
- 			TASK_INTERRUPTIBLE) != 0) {
- 		ret = fscache_cancel_op(op, do_cancel);
- 		if (ret == 0)
-@@ -351,7 +349,7 @@ int fscache_wait_for_operation_activation(struct fscache_object *object,
- 		/* it's been removed from the pending queue by another party,
- 		 * so we should get to run shortly */
- 		wait_on_bit(&op->flags, FSCACHE_OP_WAITING,
--			    fscache_wait_bit, TASK_UNINTERRUPTIBLE);
-+			    TASK_UNINTERRUPTIBLE);
- 	}
- 	_debug("<<< GO");
- 
-diff --git a/fs/gfs2/glock.c b/fs/gfs2/glock.c
-index c355f7320e44..770e16716d81 100644
---- a/fs/gfs2/glock.c
-+++ b/fs/gfs2/glock.c
-@@ -856,27 +856,6 @@ void gfs2_holder_uninit(struct gfs2_holder *gh)
- }
- 
- /**
-- * gfs2_glock_holder_wait
-- * @word: unused
-- *
-- * This function and gfs2_glock_demote_wait both show up in the WCHAN
-- * field. Thus I've separated these otherwise identical functions in
-- * order to be more informative to the user.
-- */
--
--static int gfs2_glock_holder_wait(void *word)
--{
--        schedule();
--        return 0;
--}
--
--static int gfs2_glock_demote_wait(void *word)
--{
--	schedule();
--	return 0;
--}
--
--/**
-  * gfs2_glock_wait - wait on a glock acquisition
-  * @gh: the glock holder
-  *
-@@ -888,7 +867,7 @@ int gfs2_glock_wait(struct gfs2_holder *gh)
- 	unsigned long time1 = jiffies;
- 
- 	might_sleep();
--	wait_on_bit(&gh->gh_iflags, HIF_WAIT, gfs2_glock_holder_wait, TASK_UNINTERRUPTIBLE);
-+	wait_on_bit(&gh->gh_iflags, HIF_WAIT, TASK_UNINTERRUPTIBLE);
- 	if (time_after(jiffies, time1 + HZ)) /* have we waited > a second? */
- 		/* Lengthen the minimum hold time. */
- 		gh->gh_gl->gl_hold_time = min(gh->gh_gl->gl_hold_time +
-@@ -1128,7 +1107,7 @@ void gfs2_glock_dq_wait(struct gfs2_holder *gh)
- 	struct gfs2_glock *gl = gh->gh_gl;
- 	gfs2_glock_dq(gh);
- 	might_sleep();
--	wait_on_bit(&gl->gl_flags, GLF_DEMOTE, gfs2_glock_demote_wait, TASK_UNINTERRUPTIBLE);
-+	wait_on_bit(&gl->gl_flags, GLF_DEMOTE, TASK_UNINTERRUPTIBLE);
- }
- 
- /**
-diff --git a/fs/gfs2/lock_dlm.c b/fs/gfs2/lock_dlm.c
-index 91f274de1246..992ca5b1e045 100644
---- a/fs/gfs2/lock_dlm.c
-+++ b/fs/gfs2/lock_dlm.c
-@@ -936,12 +936,6 @@ fail:
- 	return error;
- }
- 
--static int dlm_recovery_wait(void *word)
--{
--	schedule();
--	return 0;
--}
--
- static int control_first_done(struct gfs2_sbd *sdp)
+ static int
+-cifs_wait_bit_killable(void *word)
++cifs_wait_bit_killable(struct wait_bit_key *key)
  {
- 	struct lm_lockstruct *ls = &sdp->sd_lockstruct;
-@@ -976,7 +970,7 @@ restart:
- 		fs_info(sdp, "control_first_done wait gen %u\n", start_gen);
- 
- 		wait_on_bit(&ls->ls_recover_flags, DFL_DLM_RECOVERY,
--			    dlm_recovery_wait, TASK_UNINTERRUPTIBLE);
-+			    TASK_UNINTERRUPTIBLE);
- 		goto restart;
- 	}
- 
-diff --git a/fs/gfs2/ops_fstype.c b/fs/gfs2/ops_fstype.c
-index bc564c0d6d16..d3eae244076e 100644
---- a/fs/gfs2/ops_fstype.c
-+++ b/fs/gfs2/ops_fstype.c
-@@ -1024,20 +1024,13 @@ void gfs2_lm_unmount(struct gfs2_sbd *sdp)
- 		lm->lm_unmount(sdp);
- }
- 
--static int gfs2_journalid_wait(void *word)
--{
--	if (signal_pending(current))
--		return -EINTR;
--	schedule();
--	return 0;
--}
--
- static int wait_on_journal(struct gfs2_sbd *sdp)
- {
- 	if (sdp->sd_lockstruct.ls_ops->lm_mount == NULL)
- 		return 0;
- 
--	return wait_on_bit(&sdp->sd_flags, SDF_NOJOURNALID, gfs2_journalid_wait, TASK_INTERRUPTIBLE);
-+	return wait_on_bit(&sdp->sd_flags, SDF_NOJOURNALID, TASK_INTERRUPTIBLE)
-+		? -EINTR : 0;
- }
- 
- void gfs2_online_uevent(struct gfs2_sbd *sdp)
-diff --git a/fs/gfs2/recovery.c b/fs/gfs2/recovery.c
-index 94555d4c5698..573bd3b758fa 100644
---- a/fs/gfs2/recovery.c
-+++ b/fs/gfs2/recovery.c
-@@ -591,12 +591,6 @@ done:
- 	wake_up_bit(&jd->jd_flags, JDF_RECOVERY);
- }
- 
--static int gfs2_recovery_wait(void *word)
--{
--	schedule();
--	return 0;
--}
--
- int gfs2_recover_journal(struct gfs2_jdesc *jd, bool wait)
- {
- 	int rv;
-@@ -609,7 +603,7 @@ int gfs2_recover_journal(struct gfs2_jdesc *jd, bool wait)
- 	BUG_ON(!rv);
- 
- 	if (wait)
--		wait_on_bit(&jd->jd_flags, JDF_RECOVERY, gfs2_recovery_wait,
-+		wait_on_bit(&jd->jd_flags, JDF_RECOVERY,
- 			    TASK_UNINTERRUPTIBLE);
- 
- 	return wait ? jd->jd_recover_error : 0;
-diff --git a/fs/gfs2/super.c b/fs/gfs2/super.c
-index 1319b5c4ec68..2607ff13d486 100644
---- a/fs/gfs2/super.c
-+++ b/fs/gfs2/super.c
-@@ -864,12 +864,6 @@ static int gfs2_make_fs_ro(struct gfs2_sbd *sdp)
- 	return error;
- }
- 
--static int gfs2_umount_recovery_wait(void *word)
--{
--	schedule();
--	return 0;
--}
--
- /**
-  * gfs2_put_super - Unmount the filesystem
-  * @sb: The VFS superblock
-@@ -894,7 +888,7 @@ restart:
- 			continue;
- 		spin_unlock(&sdp->sd_jindex_spin);
- 		wait_on_bit(&jd->jd_flags, JDF_RECOVERY,
--			    gfs2_umount_recovery_wait, TASK_UNINTERRUPTIBLE);
-+			    TASK_UNINTERRUPTIBLE);
- 		goto restart;
- 	}
- 	spin_unlock(&sdp->sd_jindex_spin);
-diff --git a/fs/inode.c b/fs/inode.c
-index 6eecb7ff0b9a..5938f3928944 100644
---- a/fs/inode.c
-+++ b/fs/inode.c
-@@ -1695,13 +1695,6 @@ int inode_needs_sync(struct inode *inode)
- }
- EXPORT_SYMBOL(inode_needs_sync);
- 
--int inode_wait(void *word)
--{
--	schedule();
--	return 0;
--}
--EXPORT_SYMBOL(inode_wait);
--
- /*
-  * If we try to find an inode in the inode hash while it is being
-  * deleted, we have to wait until the filesystem completes its
-diff --git a/fs/jbd2/transaction.c b/fs/jbd2/transaction.c
-index 38cfcf5f6fce..44ab297cecba 100644
---- a/fs/jbd2/transaction.c
-+++ b/fs/jbd2/transaction.c
-@@ -763,12 +763,6 @@ static void warn_dirty_buffer(struct buffer_head *bh)
- 	       bdevname(bh->b_bdev, b), (unsigned long long)bh->b_blocknr);
- }
- 
--static int sleep_on_shadow_bh(void *word)
--{
--	io_schedule();
--	return 0;
--}
--
- /*
-  * If the buffer is already part of the current transaction, then there
-  * is nothing we need to do.  If it is already part of a prior
-@@ -906,8 +900,8 @@ repeat:
- 		if (buffer_shadow(bh)) {
- 			JBUFFER_TRACE(jh, "on shadow: sleep");
- 			jbd_unlock_bh_state(bh);
--			wait_on_bit(&bh->b_state, BH_Shadow,
--				    sleep_on_shadow_bh, TASK_UNINTERRUPTIBLE);
-+			wait_on_bit_io(&bh->b_state, BH_Shadow,
-+				       TASK_UNINTERRUPTIBLE);
- 			goto repeat;
- 		}
- 
-diff --git a/fs/nfs/file.c b/fs/nfs/file.c
-index 4042ff58fe3f..524dd80d1898 100644
---- a/fs/nfs/file.c
-+++ b/fs/nfs/file.c
-@@ -361,8 +361,8 @@ start:
- 	 * Prevent starvation issues if someone is doing a consistency
- 	 * sync-to-disk
- 	 */
--	ret = wait_on_bit(&NFS_I(mapping->host)->flags, NFS_INO_FLUSHING,
--			nfs_wait_bit_killable, TASK_KILLABLE);
-+	ret = wait_on_bit_action(&NFS_I(mapping->host)->flags, NFS_INO_FLUSHING,
-+				 nfs_wait_bit_killable, TASK_KILLABLE);
- 	if (ret)
- 		return ret;
- 
-diff --git a/fs/nfs/filelayout/filelayoutdev.c b/fs/nfs/filelayout/filelayoutdev.c
-index 44bf0140a4c7..e2a0361e24c6 100644
---- a/fs/nfs/filelayout/filelayoutdev.c
-+++ b/fs/nfs/filelayout/filelayoutdev.c
-@@ -783,8 +783,8 @@ nfs4_fl_select_ds_fh(struct pnfs_layout_segment *lseg, u32 j)
- static void nfs4_wait_ds_connect(struct nfs4_pnfs_ds *ds)
- {
- 	might_sleep();
--	wait_on_bit(&ds->ds_state, NFS4DS_CONNECTING,
--			nfs_wait_bit_killable, TASK_KILLABLE);
-+	wait_on_bit_action(&ds->ds_state, NFS4DS_CONNECTING,
-+			   nfs_wait_bit_killable, TASK_KILLABLE);
- }
- 
- static void nfs4_clear_ds_conn_bit(struct nfs4_pnfs_ds *ds)
+ 	if (fatal_signal_pending(current))
+ 		return -ERESTARTSYS;
 diff --git a/fs/nfs/inode.c b/fs/nfs/inode.c
-index 9927913c97c2..b7b710e7d08e 100644
+index b7b710e7d08e..abd37a380535 100644
 --- a/fs/nfs/inode.c
 +++ b/fs/nfs/inode.c
-@@ -1074,8 +1074,8 @@ int nfs_revalidate_mapping(struct inode *inode, struct address_space *mapping)
- 	 * the bit lock here if it looks like we're going to be doing that.
- 	 */
- 	for (;;) {
--		ret = wait_on_bit(bitlock, NFS_INO_INVALIDATING,
--				  nfs_wait_bit_killable, TASK_KILLABLE);
-+		ret = wait_on_bit_action(bitlock, NFS_INO_INVALIDATING,
-+					 nfs_wait_bit_killable, TASK_KILLABLE);
- 		if (ret)
- 			goto out;
- 		spin_lock(&inode->i_lock);
-diff --git a/fs/nfs/nfs4state.c b/fs/nfs/nfs4state.c
-index 848f6853c59e..42f121182167 100644
---- a/fs/nfs/nfs4state.c
-+++ b/fs/nfs/nfs4state.c
-@@ -1251,8 +1251,8 @@ int nfs4_wait_clnt_recover(struct nfs_client *clp)
- 	might_sleep();
+@@ -75,7 +75,7 @@ nfs_fattr_to_ino_t(struct nfs_fattr *fattr)
+  * nfs_wait_bit_killable - helper for functions that are sleeping on bit locks
+  * @word: long word containing the bit lock
+  */
+-int nfs_wait_bit_killable(void *word)
++int nfs_wait_bit_killable(struct wait_bit_key *key)
+ {
+ 	if (fatal_signal_pending(current))
+ 		return -ERESTARTSYS;
+diff --git a/fs/nfs/internal.h b/fs/nfs/internal.h
+index 82ddbf46660e..e0193d63630c 100644
+--- a/fs/nfs/internal.h
++++ b/fs/nfs/internal.h
+@@ -347,7 +347,7 @@ extern int nfs_drop_inode(struct inode *);
+ extern void nfs_clear_inode(struct inode *);
+ extern void nfs_evict_inode(struct inode *);
+ void nfs_zap_acl_cache(struct inode *inode);
+-extern int nfs_wait_bit_killable(void *word);
++extern int nfs_wait_bit_killable(struct wait_bit_key *key);
  
- 	atomic_inc(&clp->cl_count);
--	res = wait_on_bit(&clp->cl_state, NFS4CLNT_MANAGER_RUNNING,
--			nfs_wait_bit_killable, TASK_KILLABLE);
-+	res = wait_on_bit_action(&clp->cl_state, NFS4CLNT_MANAGER_RUNNING,
-+				 nfs_wait_bit_killable, TASK_KILLABLE);
- 	if (res)
- 		goto out;
- 	if (clp->cl_cons_state < 0)
+ /* super.c */
+ extern const struct super_operations nfs_sops;
 diff --git a/fs/nfs/pagelist.c b/fs/nfs/pagelist.c
-index b6ee3a6ee96d..6104d3500b49 100644
+index 6104d3500b49..745a612dbe22 100644
 --- a/fs/nfs/pagelist.c
 +++ b/fs/nfs/pagelist.c
-@@ -138,12 +138,6 @@ nfs_iocounter_wait(struct nfs_io_counter *c)
- 	return __nfs_iocounter_wait(c);
- }
- 
--static int nfs_wait_bit_uninterruptible(void *word)
--{
--	io_schedule();
--	return 0;
--}
--
- /*
-  * nfs_page_group_lock - lock the head of the page group
-  * @req - request in group that is to be locked
-@@ -158,7 +152,6 @@ nfs_page_group_lock(struct nfs_page *req)
- 	WARN_ON_ONCE(head != head->wb_head);
- 
- 	wait_on_bit_lock(&head->wb_flags, PG_HEADLOCK,
--			nfs_wait_bit_uninterruptible,
- 			TASK_UNINTERRUPTIBLE);
- }
- 
-@@ -425,9 +418,8 @@ void nfs_release_request(struct nfs_page *req)
- int
- nfs_wait_on_request(struct nfs_page *req)
- {
--	return wait_on_bit(&req->wb_flags, PG_BUSY,
--			nfs_wait_bit_uninterruptible,
--			TASK_UNINTERRUPTIBLE);
-+	return wait_on_bit_io(&req->wb_flags, PG_BUSY,
-+			      TASK_UNINTERRUPTIBLE);
- }
- 
- /*
-diff --git a/fs/nfs/pnfs.c b/fs/nfs/pnfs.c
-index 6fdcd233d6f7..a8914b335617 100644
---- a/fs/nfs/pnfs.c
-+++ b/fs/nfs/pnfs.c
-@@ -1885,7 +1885,7 @@ pnfs_layoutcommit_inode(struct inode *inode, bool sync)
- 	if (test_and_set_bit(NFS_INO_LAYOUTCOMMITTING, &nfsi->flags)) {
- 		if (!sync)
- 			goto out;
--		status = wait_on_bit_lock(&nfsi->flags,
-+		status = wait_on_bit_lock_action(&nfsi->flags,
- 				NFS_INO_LAYOUTCOMMITTING,
- 				nfs_wait_bit_killable,
- 				TASK_KILLABLE);
-diff --git a/fs/nfs/write.c b/fs/nfs/write.c
-index 98ff061ccaf3..f05f321f9d3d 100644
---- a/fs/nfs/write.c
-+++ b/fs/nfs/write.c
-@@ -397,7 +397,7 @@ int nfs_writepages(struct address_space *mapping, struct writeback_control *wbc)
- 	int err;
- 
- 	/* Stop dirtying of new pages while we sync */
--	err = wait_on_bit_lock(bitlock, NFS_INO_FLUSHING,
-+	err = wait_on_bit_lock_action(bitlock, NFS_INO_FLUSHING,
- 			nfs_wait_bit_killable, TASK_KILLABLE);
- 	if (err)
- 		goto out_err;
-@@ -1475,7 +1475,7 @@ int nfs_commit_inode(struct inode *inode, int how)
- 			return error;
- 		if (!may_wait)
- 			goto out_mark_dirty;
--		error = wait_on_bit(&NFS_I(inode)->flags,
-+		error = wait_on_bit_action(&NFS_I(inode)->flags,
- 				NFS_INO_COMMIT,
- 				nfs_wait_bit_killable,
- 				TASK_KILLABLE);
+@@ -117,7 +117,7 @@ __nfs_iocounter_wait(struct nfs_io_counter *c)
+ 		set_bit(NFS_IO_INPROGRESS, &c->flags);
+ 		if (atomic_read(&c->io_count) == 0)
+ 			break;
+-		ret = nfs_wait_bit_killable(&c->flags);
++		ret = nfs_wait_bit_killable(&q.key);
+ 	} while (atomic_read(&c->io_count) != 0);
+ 	finish_wait(wq, &q.wait);
+ 	return ret;
+diff --git a/include/linux/sunrpc/sched.h b/include/linux/sunrpc/sched.h
+index ad7dbe2cfecd..1a8959944c5f 100644
+--- a/include/linux/sunrpc/sched.h
++++ b/include/linux/sunrpc/sched.h
+@@ -236,7 +236,7 @@ void *		rpc_malloc(struct rpc_task *, size_t);
+ void		rpc_free(void *);
+ int		rpciod_up(void);
+ void		rpciod_down(void);
+-int		__rpc_wait_for_completion_task(struct rpc_task *task, int (*)(void *));
++int		__rpc_wait_for_completion_task(struct rpc_task *task, wait_bit_action_f *);
+ #ifdef RPC_DEBUG
+ struct net;
+ void		rpc_show_tasks(struct net *);
 diff --git a/include/linux/wait.h b/include/linux/wait.h
-index bd68819f0815..73960ff09e56 100644
+index 73960ff09e56..6fb1ba5f9b2f 100644
 --- a/include/linux/wait.h
 +++ b/include/linux/wait.h
-@@ -854,11 +854,14 @@ int wake_bit_function(wait_queue_t *wait, unsigned mode, int sync, void *key);
- 		(wait)->flags = 0;					\
+@@ -25,6 +25,7 @@ struct wait_bit_key {
+ 	void			*flags;
+ 	int			bit_nr;
+ #define WAIT_ATOMIC_T_BIT_NR	-1
++	unsigned long		private;
+ };
+ 
+ struct wait_bit_queue {
+@@ -141,18 +142,19 @@ __remove_wait_queue(wait_queue_head_t *head, wait_queue_t *old)
+ 	list_del(&old->task_list);
+ }
+ 
++typedef int wait_bit_action_f(struct wait_bit_key *);
+ void __wake_up(wait_queue_head_t *q, unsigned int mode, int nr, void *key);
+ void __wake_up_locked_key(wait_queue_head_t *q, unsigned int mode, void *key);
+ void __wake_up_sync_key(wait_queue_head_t *q, unsigned int mode, int nr, void *key);
+ void __wake_up_locked(wait_queue_head_t *q, unsigned int mode, int nr);
+ void __wake_up_sync(wait_queue_head_t *q, unsigned int mode, int nr);
+ void __wake_up_bit(wait_queue_head_t *, void *, int);
+-int __wait_on_bit(wait_queue_head_t *, struct wait_bit_queue *, int (*)(void *), unsigned);
+-int __wait_on_bit_lock(wait_queue_head_t *, struct wait_bit_queue *, int (*)(void *), unsigned);
++int __wait_on_bit(wait_queue_head_t *, struct wait_bit_queue *, wait_bit_action_f *, unsigned);
++int __wait_on_bit_lock(wait_queue_head_t *, struct wait_bit_queue *, wait_bit_action_f *, unsigned);
+ void wake_up_bit(void *, int);
+ void wake_up_atomic_t(atomic_t *);
+-int out_of_line_wait_on_bit(void *, int, int (*)(void *), unsigned);
+-int out_of_line_wait_on_bit_lock(void *, int, int (*)(void *), unsigned);
++int out_of_line_wait_on_bit(void *, int, wait_bit_action_f *, unsigned);
++int out_of_line_wait_on_bit_lock(void *, int, wait_bit_action_f *, unsigned);
+ int out_of_line_wait_on_atomic_t(atomic_t *, int (*)(atomic_t *), unsigned);
+ wait_queue_head_t *bit_waitqueue(void *, int);
+ 
+@@ -855,8 +857,8 @@ int wake_bit_function(wait_queue_t *wait, unsigned mode, int sync, void *key);
  	} while (0)
  
-+
-+extern int bit_wait(void *);
-+extern int bit_wait_io(void *);
-+
+ 
+-extern int bit_wait(void *);
+-extern int bit_wait_io(void *);
++extern int bit_wait(struct wait_bit_key *);
++extern int bit_wait_io(struct wait_bit_key *);
+ 
  /**
   * wait_on_bit - wait for a bit to be cleared
-  * @word: the word being waited on, a kernel virtual address
-  * @bit: the bit of the word being waited on
-- * @action: the function used to sleep, which may take special actions
-  * @mode: the task state to sleep in
-  *
-  * There is a standard hashed waitqueue table for generic use. This
-@@ -867,9 +870,62 @@ int wake_bit_function(wait_queue_t *wait, unsigned mode, int sync, void *key);
-  * call wait_on_bit() in threads waiting for the bit to clear.
-  * One uses wait_on_bit() where one is waiting for the bit to clear,
-  * but has no intention of setting it.
-+ * Returned value will be zero if the bit was cleared, or non-zero
-+ * if the process received a signal and the mode permitted wakeup
-+ * on that signal.
-+ */
-+static inline int
-+wait_on_bit(void *word, int bit, unsigned mode)
-+{
-+	if (!test_bit(bit, word))
-+		return 0;
-+	return out_of_line_wait_on_bit(word, bit,
-+				       bit_wait,
-+				       mode);
-+}
-+
-+/**
-+ * wait_on_bit_io - wait for a bit to be cleared
-+ * @word: the word being waited on, a kernel virtual address
-+ * @bit: the bit of the word being waited on
-+ * @mode: the task state to sleep in
-+ *
-+ * Use the standard hashed waitqueue table to wait for a bit
-+ * to be cleared.  This is similar to wait_on_bit(), but calls
-+ * io_schedule() instead of schedule() for the actual waiting.
-+ *
-+ * Returned value will be zero if the bit was cleared, or non-zero
-+ * if the process received a signal and the mode permitted wakeup
-+ * on that signal.
-+ */
-+static inline int
-+wait_on_bit_io(void *word, int bit, unsigned mode)
-+{
-+	if (!test_bit(bit, word))
-+		return 0;
-+	return out_of_line_wait_on_bit(word, bit,
-+				       bit_wait_io,
-+				       mode);
-+}
-+
-+/**
-+ * wait_on_bit_action - wait for a bit to be cleared
-+ * @word: the word being waited on, a kernel virtual address
-+ * @bit: the bit of the word being waited on
-+ * @action: the function used to sleep, which may take special actions
-+ * @mode: the task state to sleep in
-+ *
-+ * Use the standard hashed waitqueue table to wait for a bit
-+ * to be cleared, and allow the waiting action to be specified.
-+ * This is like wait_on_bit() but allows fine control of how the waiting
-+ * is done.
-+ *
-+ * Returned value will be zero if the bit was cleared, or non-zero
-+ * if the process received a signal and the mode permitted wakeup
-+ * on that signal.
+@@ -925,7 +927,7 @@ wait_on_bit_io(void *word, int bit, unsigned mode)
+  * on that signal.
   */
  static inline int
--wait_on_bit(void *word, int bit, int (*action)(void *), unsigned mode)
-+wait_on_bit_action(void *word, int bit, int (*action)(void *), unsigned mode)
+-wait_on_bit_action(void *word, int bit, int (*action)(void *), unsigned mode)
++wait_on_bit_action(void *word, int bit, wait_bit_action_f *action, unsigned mode)
  {
  	if (!test_bit(bit, word))
  		return 0;
-@@ -880,7 +936,6 @@ wait_on_bit(void *word, int bit, int (*action)(void *), unsigned mode)
-  * wait_on_bit_lock - wait for a bit to be cleared, when wanting to set it
-  * @word: the word being waited on, a kernel virtual address
-  * @bit: the bit of the word being waited on
-- * @action: the function used to sleep, which may take special actions
-  * @mode: the task state to sleep in
-  *
-  * There is a standard hashed waitqueue table for generic use. This
-@@ -891,9 +946,61 @@ wait_on_bit(void *word, int bit, int (*action)(void *), unsigned mode)
-  * wait_on_bit() in threads waiting to be able to set the bit.
-  * One uses wait_on_bit_lock() where one is waiting for the bit to
-  * clear with the intention of setting it, and when done, clearing it.
-+ *
-+ * Returns zero if the bit was (eventually) found to be clear and was
-+ * set.  Returns non-zero if a signal was delivered to the process and
-+ * the @mode allows that signal to wake the process.
-+ */
-+static inline int
-+wait_on_bit_lock(void *word, int bit, unsigned mode)
-+{
-+	if (!test_and_set_bit(bit, word))
-+		return 0;
-+	return out_of_line_wait_on_bit_lock(word, bit, bit_wait, mode);
-+}
-+
-+/**
-+ * wait_on_bit_lock_io - wait for a bit to be cleared, when wanting to set it
-+ * @word: the word being waited on, a kernel virtual address
-+ * @bit: the bit of the word being waited on
-+ * @mode: the task state to sleep in
-+ *
-+ * Use the standard hashed waitqueue table to wait for a bit
-+ * to be cleared and then to atomically set it.  This is similar
-+ * to wait_on_bit(), but calls io_schedule() instead of schedule()
-+ * for the actual waiting.
-+ *
-+ * Returns zero if the bit was (eventually) found to be clear and was
-+ * set.  Returns non-zero if a signal was delivered to the process and
-+ * the @mode allows that signal to wake the process.
-+ */
-+static inline int
-+wait_on_bit_lock_io(void *word, int bit, unsigned mode)
-+{
-+	if (!test_and_set_bit(bit, word))
-+		return 0;
-+	return out_of_line_wait_on_bit_lock(word, bit, bit_wait_io, mode);
-+}
-+
-+/**
-+ * wait_on_bit_lock_action - wait for a bit to be cleared, when wanting to set it
-+ * @word: the word being waited on, a kernel virtual address
-+ * @bit: the bit of the word being waited on
-+ * @action: the function used to sleep, which may take special actions
-+ * @mode: the task state to sleep in
-+ *
-+ * Use the standard hashed waitqueue table to wait for a bit
-+ * to be cleared and then to set it, and allow the waiting action
-+ * to be specified.
-+ * This is like wait_on_bit() but allows fine control of how the waiting
-+ * is done.
-+ *
-+ * Returns zero if the bit was (eventually) found to be clear and was
-+ * set.  Returns non-zero if a signal was delivered to the process and
-+ * the @mode allows that signal to wake the process.
+@@ -1000,7 +1002,7 @@ wait_on_bit_lock_io(void *word, int bit, unsigned mode)
+  * the @mode allows that signal to wake the process.
   */
  static inline int
--wait_on_bit_lock(void *word, int bit, int (*action)(void *), unsigned mode)
-+wait_on_bit_lock_action(void *word, int bit, int (*action)(void *), unsigned mode)
+-wait_on_bit_lock_action(void *word, int bit, int (*action)(void *), unsigned mode)
++wait_on_bit_lock_action(void *word, int bit, wait_bit_action_f *action, unsigned mode)
  {
  	if (!test_and_set_bit(bit, word))
  		return 0;
-diff --git a/include/linux/writeback.h b/include/linux/writeback.h
-index 5777c13849ba..a219be961c0a 100644
---- a/include/linux/writeback.h
-+++ b/include/linux/writeback.h
-@@ -90,7 +90,6 @@ struct writeback_control {
-  * fs/fs-writeback.c
-  */	
- struct bdi_writeback;
--int inode_wait(void *);
- void writeback_inodes_sb(struct super_block *, enum wb_reason reason);
- void writeback_inodes_sb_nr(struct super_block *, unsigned long nr,
- 							enum wb_reason reason);
-@@ -105,7 +104,7 @@ void inode_wait_for_writeback(struct inode *inode);
- static inline void wait_on_inode(struct inode *inode)
- {
- 	might_sleep();
--	wait_on_bit(&inode->i_state, __I_NEW, inode_wait, TASK_UNINTERRUPTIBLE);
-+	wait_on_bit(&inode->i_state, __I_NEW, TASK_UNINTERRUPTIBLE);
- }
- 
- /*
-diff --git a/kernel/ptrace.c b/kernel/ptrace.c
-index adf98622cb32..54e75226c2c4 100644
---- a/kernel/ptrace.c
-+++ b/kernel/ptrace.c
-@@ -28,12 +28,6 @@
- #include <linux/compat.h>
- 
- 
--static int ptrace_trapping_sleep_fn(void *flags)
--{
--	schedule();
--	return 0;
--}
--
- /*
-  * ptrace a task: make the debugger its new parent and
-  * move it to the ptrace list.
-@@ -371,7 +365,7 @@ unlock_creds:
- out:
- 	if (!retval) {
- 		wait_on_bit(&task->jobctl, JOBCTL_TRAPPING_BIT,
--			    ptrace_trapping_sleep_fn, TASK_UNINTERRUPTIBLE);
-+			    TASK_UNINTERRUPTIBLE);
- 		proc_ptrace_connector(task, PTRACE_ATTACH);
- 	}
- 
 diff --git a/kernel/sched/wait.c b/kernel/sched/wait.c
-index 0ffa20ae657b..a104879e88f2 100644
+index a104879e88f2..15cab1a4f84e 100644
 --- a/kernel/sched/wait.c
 +++ b/kernel/sched/wait.c
-@@ -502,3 +502,21 @@ void wake_up_atomic_t(atomic_t *p)
- 	__wake_up_bit(atomic_t_waitqueue(p), p, WAIT_ATOMIC_T_BIT_NR);
- }
- EXPORT_SYMBOL(wake_up_atomic_t);
-+
-+__sched int bit_wait(void *word)
-+{
-+	if (signal_pending_state(current->state, current))
-+		return 1;
-+	schedule();
-+	return 0;
-+}
-+EXPORT_SYMBOL(bit_wait);
-+
-+__sched int bit_wait_io(void *word)
-+{
-+	if (signal_pending_state(current->state, current))
-+		return 1;
-+	io_schedule();
-+	return 0;
-+}
-+EXPORT_SYMBOL(bit_wait_io);
-diff --git a/mm/filemap.c b/mm/filemap.c
-index dafb06f70a09..d175917e2411 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -241,18 +241,6 @@ void delete_from_page_cache(struct page *page)
- }
- EXPORT_SYMBOL(delete_from_page_cache);
- 
--static int sleep_on_page(void *word)
--{
--	io_schedule();
--	return 0;
--}
--
--static int sleep_on_page_killable(void *word)
--{
--	sleep_on_page(word);
--	return fatal_signal_pending(current) ? -EINTR : 0;
--}
--
- static int filemap_check_errors(struct address_space *mapping)
+@@ -319,14 +319,14 @@ EXPORT_SYMBOL(wake_bit_function);
+  */
+ int __sched
+ __wait_on_bit(wait_queue_head_t *wq, struct wait_bit_queue *q,
+-			int (*action)(void *), unsigned mode)
++	      wait_bit_action_f *action, unsigned mode)
  {
  	int ret = 0;
-@@ -692,7 +680,7 @@ void wait_on_page_bit(struct page *page, int bit_nr)
- 	DEFINE_WAIT_BIT(wait, &page->flags, bit_nr);
  
- 	if (test_bit(bit_nr, &page->flags))
--		__wait_on_bit(page_waitqueue(page), &wait, sleep_on_page,
-+		__wait_on_bit(page_waitqueue(page), &wait, bit_wait_io,
- 							TASK_UNINTERRUPTIBLE);
- }
- EXPORT_SYMBOL(wait_on_page_bit);
-@@ -705,7 +693,7 @@ int wait_on_page_bit_killable(struct page *page, int bit_nr)
- 		return 0;
+ 	do {
+ 		prepare_to_wait(wq, &q->wait, mode);
+ 		if (test_bit(q->key.bit_nr, q->key.flags))
+-			ret = (*action)(q->key.flags);
++			ret = (*action)(&q->key);
+ 	} while (test_bit(q->key.bit_nr, q->key.flags) && !ret);
+ 	finish_wait(wq, &q->wait);
+ 	return ret;
+@@ -334,7 +334,7 @@ __wait_on_bit(wait_queue_head_t *wq, struct wait_bit_queue *q,
+ EXPORT_SYMBOL(__wait_on_bit);
  
- 	return __wait_on_bit(page_waitqueue(page), &wait,
--			     sleep_on_page_killable, TASK_KILLABLE);
-+			     bit_wait_io, TASK_KILLABLE);
- }
- 
- /**
-@@ -806,7 +794,7 @@ void __lock_page(struct page *page)
+ int __sched out_of_line_wait_on_bit(void *word, int bit,
+-					int (*action)(void *), unsigned mode)
++				    wait_bit_action_f *action, unsigned mode)
  {
- 	DEFINE_WAIT_BIT(wait, &page->flags, PG_locked);
+ 	wait_queue_head_t *wq = bit_waitqueue(word, bit);
+ 	DEFINE_WAIT_BIT(wait, word, bit);
+@@ -345,7 +345,7 @@ EXPORT_SYMBOL(out_of_line_wait_on_bit);
  
--	__wait_on_bit_lock(page_waitqueue(page), &wait, sleep_on_page,
-+	__wait_on_bit_lock(page_waitqueue(page), &wait, bit_wait_io,
- 							TASK_UNINTERRUPTIBLE);
- }
- EXPORT_SYMBOL(__lock_page);
-@@ -816,7 +804,7 @@ int __lock_page_killable(struct page *page)
- 	DEFINE_WAIT_BIT(wait, &page->flags, PG_locked);
- 
- 	return __wait_on_bit_lock(page_waitqueue(page), &wait,
--					sleep_on_page_killable, TASK_KILLABLE);
-+					bit_wait_io, TASK_KILLABLE);
- }
- EXPORT_SYMBOL_GPL(__lock_page_killable);
- 
-diff --git a/mm/ksm.c b/mm/ksm.c
-index 346ddc9e4c0d..fb7590222706 100644
---- a/mm/ksm.c
-+++ b/mm/ksm.c
-@@ -1978,18 +1978,12 @@ void ksm_migrate_page(struct page *newpage, struct page *oldpage)
- #endif /* CONFIG_MIGRATION */
- 
- #ifdef CONFIG_MEMORY_HOTREMOVE
--static int just_wait(void *word)
--{
--	schedule();
--	return 0;
--}
--
- static void wait_while_offlining(void)
+ int __sched
+ __wait_on_bit_lock(wait_queue_head_t *wq, struct wait_bit_queue *q,
+-			int (*action)(void *), unsigned mode)
++			wait_bit_action_f *action, unsigned mode)
  {
- 	while (ksm_run & KSM_RUN_OFFLINE) {
- 		mutex_unlock(&ksm_thread_mutex);
- 		wait_on_bit(&ksm_run, ilog2(KSM_RUN_OFFLINE),
--				just_wait, TASK_UNINTERRUPTIBLE);
-+			    TASK_UNINTERRUPTIBLE);
- 		mutex_lock(&ksm_thread_mutex);
- 	}
- }
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 0a43cce9a914..e090bffe1bf8 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2186,12 +2186,6 @@ static void hci_inq_req(struct hci_request *req, unsigned long opt)
- 	hci_req_add(req, HCI_OP_INQUIRY, sizeof(cp), &cp);
- }
+ 	do {
+ 		int ret;
+@@ -353,7 +353,7 @@ __wait_on_bit_lock(wait_queue_head_t *wq, struct wait_bit_queue *q,
+ 		prepare_to_wait_exclusive(wq, &q->wait, mode);
+ 		if (!test_bit(q->key.bit_nr, q->key.flags))
+ 			continue;
+-		ret = action(q->key.flags);
++		ret = action(&q->key);
+ 		if (!ret)
+ 			continue;
+ 		abort_exclusive_wait(wq, &q->wait, mode, &q->key);
+@@ -365,7 +365,7 @@ __wait_on_bit_lock(wait_queue_head_t *wq, struct wait_bit_queue *q,
+ EXPORT_SYMBOL(__wait_on_bit_lock);
  
--static int wait_inquiry(void *word)
--{
--	schedule();
--	return signal_pending(current);
--}
--
- int hci_inquiry(void __user *arg)
+ int __sched out_of_line_wait_on_bit_lock(void *word, int bit,
+-					int (*action)(void *), unsigned mode)
++					 wait_bit_action_f *action, unsigned mode)
  {
- 	__u8 __user *ptr = arg;
-@@ -2242,7 +2236,7 @@ int hci_inquiry(void __user *arg)
- 		/* Wait until Inquiry procedure finishes (HCI_INQUIRY flag is
- 		 * cleared). If it is interrupted by a signal, return -EINTR.
- 		 */
--		if (wait_on_bit(&hdev->flags, HCI_INQUIRY, wait_inquiry,
-+		if (wait_on_bit(&hdev->flags, HCI_INQUIRY,
- 				TASK_INTERRUPTIBLE))
- 			return -EINTR;
- 	}
-diff --git a/security/keys/gc.c b/security/keys/gc.c
-index d3222b6d7d59..9609a7f0faea 100644
---- a/security/keys/gc.c
-+++ b/security/keys/gc.c
-@@ -92,15 +92,6 @@ static void key_gc_timer_func(unsigned long data)
+ 	wait_queue_head_t *wq = bit_waitqueue(word, bit);
+ 	DEFINE_WAIT_BIT(wait, word, bit);
+@@ -503,7 +503,7 @@ void wake_up_atomic_t(atomic_t *p)
  }
+ EXPORT_SYMBOL(wake_up_atomic_t);
  
- /*
-- * wait_on_bit() sleep function for uninterruptible waiting
-- */
--static int key_gc_wait_bit(void *flags)
--{
--	schedule();
--	return 0;
--}
--
--/*
-  * Reap keys of dead type.
-  *
-  * We use three flags to make sure we see three complete cycles of the garbage
-@@ -123,7 +114,7 @@ void key_gc_keytype(struct key_type *ktype)
- 	schedule_work(&key_gc_work);
+-__sched int bit_wait(void *word)
++__sched int bit_wait(struct wait_bit_key *word)
+ {
+ 	if (signal_pending_state(current->state, current))
+ 		return 1;
+@@ -512,7 +512,7 @@ __sched int bit_wait(void *word)
+ }
+ EXPORT_SYMBOL(bit_wait);
  
- 	kdebug("sleep");
--	wait_on_bit(&key_gc_flags, KEY_GC_REAPING_KEYTYPE, key_gc_wait_bit,
-+	wait_on_bit(&key_gc_flags, KEY_GC_REAPING_KEYTYPE,
- 		    TASK_UNINTERRUPTIBLE);
+-__sched int bit_wait_io(void *word)
++__sched int bit_wait_io(struct wait_bit_key *word)
+ {
+ 	if (signal_pending_state(current->state, current))
+ 		return 1;
+diff --git a/net/sunrpc/sched.c b/net/sunrpc/sched.c
+index c0365c14b858..9358c79fd589 100644
+--- a/net/sunrpc/sched.c
++++ b/net/sunrpc/sched.c
+@@ -250,7 +250,7 @@ void rpc_destroy_wait_queue(struct rpc_wait_queue *queue)
+ }
+ EXPORT_SYMBOL_GPL(rpc_destroy_wait_queue);
  
- 	key_gc_dead_keytype = NULL;
-diff --git a/security/keys/request_key.c b/security/keys/request_key.c
-index 381411941cc1..26a94f18af94 100644
---- a/security/keys/request_key.c
-+++ b/security/keys/request_key.c
-@@ -21,24 +21,6 @@
- 
- #define key_negative_timeout	60	/* default timeout on a negative key's existence */
- 
--/*
-- * wait_on_bit() sleep function for uninterruptible waiting
-- */
--static int key_wait_bit(void *flags)
--{
--	schedule();
--	return 0;
--}
--
--/*
-- * wait_on_bit() sleep function for interruptible waiting
-- */
--static int key_wait_bit_intr(void *flags)
--{
--	schedule();
--	return signal_pending(current) ? -ERESTARTSYS : 0;
--}
--
- /**
-  * complete_request_key - Complete the construction of a key.
-  * @cons: The key construction record.
-@@ -592,10 +574,9 @@ int wait_for_key_construction(struct key *key, bool intr)
- 	int ret;
- 
- 	ret = wait_on_bit(&key->flags, KEY_FLAG_USER_CONSTRUCT,
--			  intr ? key_wait_bit_intr : key_wait_bit,
- 			  intr ? TASK_INTERRUPTIBLE : TASK_UNINTERRUPTIBLE);
--	if (ret < 0)
--		return ret;
-+	if (ret)
-+		return -ERESTARTSYS;
- 	if (test_bit(KEY_FLAG_NEGATIVE, &key->flags)) {
- 		smp_rmb();
- 		return key->type_data.reject_error;
+-static int rpc_wait_bit_killable(void *word)
++static int rpc_wait_bit_killable(struct wait_bit_key *key)
+ {
+ 	if (fatal_signal_pending(current))
+ 		return -ERESTARTSYS;
+@@ -309,7 +309,7 @@ static int rpc_complete_task(struct rpc_task *task)
+  * to enforce taking of the wq->lock and hence avoid races with
+  * rpc_complete_task().
+  */
+-int __rpc_wait_for_completion_task(struct rpc_task *task, int (*action)(void *))
++int __rpc_wait_for_completion_task(struct rpc_task *task, wait_bit_action_f *action)
+ {
+ 	if (action == NULL)
+ 		action = rpc_wait_bit_killable;
