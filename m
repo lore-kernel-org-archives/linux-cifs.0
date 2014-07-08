@@ -1,310 +1,78 @@
-From: NeilBrown <neilb@suse.de>
-Subject: [PATCH 2/2] SCHED: allow wait_on_bit_action functions to support a
- timeout.
-Date: Mon, 07 Jul 2014 15:16:04 +1000
-Message-ID: <20140707051604.28027.41257.stgit@notabene.brown>
-References: <20140707051530.28027.48411.stgit@notabene.brown>
+From: =?iso-8859-1?Q?Tobias_Doerffel?= <tobias.doerffel-2LT3hlbiLj/X2ID+q72mRQ@public.gmane.org>
+Subject: =?iso-8859-1?Q?AW=3A_Question_on_Active_Directory_Authentication?=
+Date: Tue, 8 Jul 2014 13:04:42 +0200
+Message-ID: <zarafa.53bbd04a.78cf.1d5ae9d4134672c1@zarafa.ed-chemnitz.de>
+References: <53B6A3ED.9060805@muenchen.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-	Peter Zijlstra <peterz@infradead.org>,
-	Oleg Nesterov <oleg@redhat.com>, linux-kernel@vger.kernel.org,
-	Steve French <sfrench@samba.org>,
-	David Howells <dhowells@redhat.com>,
-	Ingo Molnar <mingo@elte.hu>,
-	Steven Whitehouse <swhiteho@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20140707051530.28027.48411.stgit@notabene.brown>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: =?iso-8859-1?Q?Christian_Lutz?= <christian.lutz-EnyPcy3oyxIb1SvskN2V4Q@public.gmane.org>,
+	=?iso-8859-1?Q?linux-cifs=40vger=2Ekernel=2Eorg?=
+	<linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <53B6A3ED.9060805-EnyPcy3oyxIb1SvskN2V4Q@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-It is currently not possible for various wait_on_bit functions to
-implement a timeout.
-While the "action" function that is called to do the waiting could
-certainly use schedule_timeout(), there is no way to carry forward the
-remaining timeout after a false wake-up.
-As false-wakeups a clearly possible at least due to possible
-hash collisions in bit_waitqueue(), this is a real problem.
+Hi Christian,
 
-The 'action' function is currently passed a pointer to the word
-containing the bit being waited on.  No current action functions use
-this pointer.  So changing it to something else will be a little noisy
-but will have no immediate effect.
+you could indeed use krb5 authentication (and possibly in combination w=
+ith the multiuser option) so you can build whatever mechanism you like =
+for getting the required kerberos ticket for the user.  Once you have t=
+he ticket you should be able to access the shares independent of the ac=
+count name specifications. You have to configure your AD server such th=
+at it provides credentials for the UPN. Advantage: you don't have to de=
+al with possible limitations in the CIFS implementation on the client s=
+ide.
 
-This patch changes the 'action' function to take a pointer to the
-"struct wait_bit_key", which contains a pointer to the word
-containing the bit so nothing is really lost.
+Best regards
 
-It also adds a 'private' field to "struct wait_bit_key", which is
-initialized to zero.
+Tobias Doerffel
 
-An action function can now implement a timeout with something like
 
-static int timed_out_waiter(struct wait_bit_key *key)
-{
-	unsigned long waited;
-	if (key->private == 0) {
-		key->private = jiffies;
-		if (key->private == 0)
-			key->private -= 1;
-	}
-	waited = jiffies - key->private;
-	if (waited > 10 * HZ)
-		return -EAGAIN;
-	schedule_timeout(waited - 10 * HZ);
-	return 0;
-}
+-----Urspr=FCngliche Nachricht-----
 
-If any other need for context in a waiter were found it would be easy
-to use ->private for some other purpose, or even extend "struct
-wait_bit_key".
+Hi everybody,
 
-My particular need is to support timeouts in nfs_release_page() to
-avoid deadlocks with loopback mounted NFS.
+just one simple question regarding the authentication of users in the m=
+ount options: Is it possible to authenticate a user with his userPrinci=
+palName attribute and a password or are there any more dependencies to =
+get this to work (i. e. krb5 or other security options)?
 
-While wait_on_bit_timeout() would be a cleaner interface, it will not
-meet my need.  I need the timeout to be sensitive to the state of
-the connection with the server, which could change.  So I need to
-use an 'action' interface.
+Example: mount -t cifs //server/share /mnt -o username=3Dmy.upn.prefix@=
+domain.name.tld,password=3DPASSWORD
 
-Signed-off-by: NeilBrown <neilb@suse.de>
----
- fs/cifs/inode.c              |    2 +-
- fs/nfs/inode.c               |    2 +-
- fs/nfs/internal.h            |    2 +-
- fs/nfs/pagelist.c            |    2 +-
- include/linux/sunrpc/sched.h |    2 +-
- include/linux/wait.h         |   18 ++++++++++--------
- kernel/sched/wait.c          |   16 ++++++++--------
- net/sunrpc/sched.c           |    4 ++--
- 8 files changed, 25 insertions(+), 23 deletions(-)
+The only working solution was with the default sAMAccountName Attribute=
+=2E
 
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 213c4580b4e3..41de3935caa0 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -1780,7 +1780,7 @@ cifs_invalidate_mapping(struct inode *inode)
-  * @word: long word containing the bit lock
-  */
- static int
--cifs_wait_bit_killable(void *word)
-+cifs_wait_bit_killable(struct wait_bit_key *key)
- {
- 	if (fatal_signal_pending(current))
- 		return -ERESTARTSYS;
-diff --git a/fs/nfs/inode.c b/fs/nfs/inode.c
-index b7b710e7d08e..abd37a380535 100644
---- a/fs/nfs/inode.c
-+++ b/fs/nfs/inode.c
-@@ -75,7 +75,7 @@ nfs_fattr_to_ino_t(struct nfs_fattr *fattr)
-  * nfs_wait_bit_killable - helper for functions that are sleeping on bit locks
-  * @word: long word containing the bit lock
-  */
--int nfs_wait_bit_killable(void *word)
-+int nfs_wait_bit_killable(struct wait_bit_key *key)
- {
- 	if (fatal_signal_pending(current))
- 		return -ERESTARTSYS;
-diff --git a/fs/nfs/internal.h b/fs/nfs/internal.h
-index 82ddbf46660e..e0193d63630c 100644
---- a/fs/nfs/internal.h
-+++ b/fs/nfs/internal.h
-@@ -347,7 +347,7 @@ extern int nfs_drop_inode(struct inode *);
- extern void nfs_clear_inode(struct inode *);
- extern void nfs_evict_inode(struct inode *);
- void nfs_zap_acl_cache(struct inode *inode);
--extern int nfs_wait_bit_killable(void *word);
-+extern int nfs_wait_bit_killable(struct wait_bit_key *key);
- 
- /* super.c */
- extern const struct super_operations nfs_sops;
-diff --git a/fs/nfs/pagelist.c b/fs/nfs/pagelist.c
-index 6104d3500b49..745a612dbe22 100644
---- a/fs/nfs/pagelist.c
-+++ b/fs/nfs/pagelist.c
-@@ -117,7 +117,7 @@ __nfs_iocounter_wait(struct nfs_io_counter *c)
- 		set_bit(NFS_IO_INPROGRESS, &c->flags);
- 		if (atomic_read(&c->io_count) == 0)
- 			break;
--		ret = nfs_wait_bit_killable(&c->flags);
-+		ret = nfs_wait_bit_killable(&q.key);
- 	} while (atomic_read(&c->io_count) != 0);
- 	finish_wait(wq, &q.wait);
- 	return ret;
-diff --git a/include/linux/sunrpc/sched.h b/include/linux/sunrpc/sched.h
-index ad7dbe2cfecd..1a8959944c5f 100644
---- a/include/linux/sunrpc/sched.h
-+++ b/include/linux/sunrpc/sched.h
-@@ -236,7 +236,7 @@ void *		rpc_malloc(struct rpc_task *, size_t);
- void		rpc_free(void *);
- int		rpciod_up(void);
- void		rpciod_down(void);
--int		__rpc_wait_for_completion_task(struct rpc_task *task, int (*)(void *));
-+int		__rpc_wait_for_completion_task(struct rpc_task *task, wait_bit_action_f *);
- #ifdef RPC_DEBUG
- struct net;
- void		rpc_show_tasks(struct net *);
-diff --git a/include/linux/wait.h b/include/linux/wait.h
-index 73960ff09e56..6fb1ba5f9b2f 100644
---- a/include/linux/wait.h
-+++ b/include/linux/wait.h
-@@ -25,6 +25,7 @@ struct wait_bit_key {
- 	void			*flags;
- 	int			bit_nr;
- #define WAIT_ATOMIC_T_BIT_NR	-1
-+	unsigned long		private;
- };
- 
- struct wait_bit_queue {
-@@ -141,18 +142,19 @@ __remove_wait_queue(wait_queue_head_t *head, wait_queue_t *old)
- 	list_del(&old->task_list);
- }
- 
-+typedef int wait_bit_action_f(struct wait_bit_key *);
- void __wake_up(wait_queue_head_t *q, unsigned int mode, int nr, void *key);
- void __wake_up_locked_key(wait_queue_head_t *q, unsigned int mode, void *key);
- void __wake_up_sync_key(wait_queue_head_t *q, unsigned int mode, int nr, void *key);
- void __wake_up_locked(wait_queue_head_t *q, unsigned int mode, int nr);
- void __wake_up_sync(wait_queue_head_t *q, unsigned int mode, int nr);
- void __wake_up_bit(wait_queue_head_t *, void *, int);
--int __wait_on_bit(wait_queue_head_t *, struct wait_bit_queue *, int (*)(void *), unsigned);
--int __wait_on_bit_lock(wait_queue_head_t *, struct wait_bit_queue *, int (*)(void *), unsigned);
-+int __wait_on_bit(wait_queue_head_t *, struct wait_bit_queue *, wait_bit_action_f *, unsigned);
-+int __wait_on_bit_lock(wait_queue_head_t *, struct wait_bit_queue *, wait_bit_action_f *, unsigned);
- void wake_up_bit(void *, int);
- void wake_up_atomic_t(atomic_t *);
--int out_of_line_wait_on_bit(void *, int, int (*)(void *), unsigned);
--int out_of_line_wait_on_bit_lock(void *, int, int (*)(void *), unsigned);
-+int out_of_line_wait_on_bit(void *, int, wait_bit_action_f *, unsigned);
-+int out_of_line_wait_on_bit_lock(void *, int, wait_bit_action_f *, unsigned);
- int out_of_line_wait_on_atomic_t(atomic_t *, int (*)(atomic_t *), unsigned);
- wait_queue_head_t *bit_waitqueue(void *, int);
- 
-@@ -855,8 +857,8 @@ int wake_bit_function(wait_queue_t *wait, unsigned mode, int sync, void *key);
- 	} while (0)
- 
- 
--extern int bit_wait(void *);
--extern int bit_wait_io(void *);
-+extern int bit_wait(struct wait_bit_key *);
-+extern int bit_wait_io(struct wait_bit_key *);
- 
- /**
-  * wait_on_bit - wait for a bit to be cleared
-@@ -925,7 +927,7 @@ wait_on_bit_io(void *word, int bit, unsigned mode)
-  * on that signal.
-  */
- static inline int
--wait_on_bit_action(void *word, int bit, int (*action)(void *), unsigned mode)
-+wait_on_bit_action(void *word, int bit, wait_bit_action_f *action, unsigned mode)
- {
- 	if (!test_bit(bit, word))
- 		return 0;
-@@ -1000,7 +1002,7 @@ wait_on_bit_lock_io(void *word, int bit, unsigned mode)
-  * the @mode allows that signal to wake the process.
-  */
- static inline int
--wait_on_bit_lock_action(void *word, int bit, int (*action)(void *), unsigned mode)
-+wait_on_bit_lock_action(void *word, int bit, wait_bit_action_f *action, unsigned mode)
- {
- 	if (!test_and_set_bit(bit, word))
- 		return 0;
-diff --git a/kernel/sched/wait.c b/kernel/sched/wait.c
-index a104879e88f2..15cab1a4f84e 100644
---- a/kernel/sched/wait.c
-+++ b/kernel/sched/wait.c
-@@ -319,14 +319,14 @@ EXPORT_SYMBOL(wake_bit_function);
-  */
- int __sched
- __wait_on_bit(wait_queue_head_t *wq, struct wait_bit_queue *q,
--			int (*action)(void *), unsigned mode)
-+	      wait_bit_action_f *action, unsigned mode)
- {
- 	int ret = 0;
- 
- 	do {
- 		prepare_to_wait(wq, &q->wait, mode);
- 		if (test_bit(q->key.bit_nr, q->key.flags))
--			ret = (*action)(q->key.flags);
-+			ret = (*action)(&q->key);
- 	} while (test_bit(q->key.bit_nr, q->key.flags) && !ret);
- 	finish_wait(wq, &q->wait);
- 	return ret;
-@@ -334,7 +334,7 @@ __wait_on_bit(wait_queue_head_t *wq, struct wait_bit_queue *q,
- EXPORT_SYMBOL(__wait_on_bit);
- 
- int __sched out_of_line_wait_on_bit(void *word, int bit,
--					int (*action)(void *), unsigned mode)
-+				    wait_bit_action_f *action, unsigned mode)
- {
- 	wait_queue_head_t *wq = bit_waitqueue(word, bit);
- 	DEFINE_WAIT_BIT(wait, word, bit);
-@@ -345,7 +345,7 @@ EXPORT_SYMBOL(out_of_line_wait_on_bit);
- 
- int __sched
- __wait_on_bit_lock(wait_queue_head_t *wq, struct wait_bit_queue *q,
--			int (*action)(void *), unsigned mode)
-+			wait_bit_action_f *action, unsigned mode)
- {
- 	do {
- 		int ret;
-@@ -353,7 +353,7 @@ __wait_on_bit_lock(wait_queue_head_t *wq, struct wait_bit_queue *q,
- 		prepare_to_wait_exclusive(wq, &q->wait, mode);
- 		if (!test_bit(q->key.bit_nr, q->key.flags))
- 			continue;
--		ret = action(q->key.flags);
-+		ret = action(&q->key);
- 		if (!ret)
- 			continue;
- 		abort_exclusive_wait(wq, &q->wait, mode, &q->key);
-@@ -365,7 +365,7 @@ __wait_on_bit_lock(wait_queue_head_t *wq, struct wait_bit_queue *q,
- EXPORT_SYMBOL(__wait_on_bit_lock);
- 
- int __sched out_of_line_wait_on_bit_lock(void *word, int bit,
--					int (*action)(void *), unsigned mode)
-+					 wait_bit_action_f *action, unsigned mode)
- {
- 	wait_queue_head_t *wq = bit_waitqueue(word, bit);
- 	DEFINE_WAIT_BIT(wait, word, bit);
-@@ -503,7 +503,7 @@ void wake_up_atomic_t(atomic_t *p)
- }
- EXPORT_SYMBOL(wake_up_atomic_t);
- 
--__sched int bit_wait(void *word)
-+__sched int bit_wait(struct wait_bit_key *word)
- {
- 	if (signal_pending_state(current->state, current))
- 		return 1;
-@@ -512,7 +512,7 @@ __sched int bit_wait(void *word)
- }
- EXPORT_SYMBOL(bit_wait);
- 
--__sched int bit_wait_io(void *word)
-+__sched int bit_wait_io(struct wait_bit_key *word)
- {
- 	if (signal_pending_state(current->state, current))
- 		return 1;
-diff --git a/net/sunrpc/sched.c b/net/sunrpc/sched.c
-index c0365c14b858..9358c79fd589 100644
---- a/net/sunrpc/sched.c
-+++ b/net/sunrpc/sched.c
-@@ -250,7 +250,7 @@ void rpc_destroy_wait_queue(struct rpc_wait_queue *queue)
- }
- EXPORT_SYMBOL_GPL(rpc_destroy_wait_queue);
- 
--static int rpc_wait_bit_killable(void *word)
-+static int rpc_wait_bit_killable(struct wait_bit_key *key)
- {
- 	if (fatal_signal_pending(current))
- 		return -ERESTARTSYS;
-@@ -309,7 +309,7 @@ static int rpc_complete_task(struct rpc_task *task)
-  * to enforce taking of the wq->lock and hence avoid races with
-  * rpc_complete_task().
-  */
--int __rpc_wait_for_completion_task(struct rpc_task *task, int (*action)(void *))
-+int __rpc_wait_for_completion_task(struct rpc_task *task, wait_bit_action_f *action)
- {
- 	if (action == NULL)
- 		action = rpc_wait_bit_killable;
+Background:
+We are building a new fileservice for Windows and Linux Clients. The us=
+ers are stored in Active Directory. The username (sAMAccountName) is a =
+random string created by the Server itself. The only login attribute th=
+e user knows is his UPN (which is also the mailaddress in our case).
+
+
+Thanks in advance
+Christian
+
+---------------------------------
+
+
+
+--
+Dipl.-Inf. Tobias Doerffel
+
+-----------------------------------------------
+EDC Electronic Design Chemnitz GmbH
+Technologie-Campus 4, 09126 Chemnitz
+
+Gesch=E4ftsf=FChrer: Dr.-Ing. Steffen Heinz
+                 Dipl.-Ing. Andr=E9 Lange
+Tel.:            +49 371 52 45 90
+=46ax.:            +49 371 52 45 910
+E-Mail:          info-2LT3hlbiLj/X2ID+q72mRQ@public.gmane.org
+
+Sitz der Gesellschaft: Chemnitz
+HRB 23986, Amtsgericht Chemnitz
+USTID: DE258181725
+-----------------------------------------------
