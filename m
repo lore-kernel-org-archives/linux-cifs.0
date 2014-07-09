@@ -1,158 +1,92 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH v2 03/16] CIFS: Separate page sending from writepages
-Date: Wed, 9 Jul 2014 09:08:23 -0400
-Message-ID: <20140709090823.08bbd37b@tlielax.poochiereds.net>
-References: <1403863073-19526-1-git-send-email-pshilovsky@samba.org>
-	<1403863073-19526-4-git-send-email-pshilovsky@samba.org>
+From: Kyle Harrigan <kwharrigan-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: Seemingly random loss of permissions to krb5i multiuser mounts
+Date: Wed, 9 Jul 2014 17:04:24 -0400
+Message-ID: <CAFknXfCGLi7w63_+kDPt+vq20-4qftaLLX=CBkRpWkaQWS0=WQ@mail.gmail.com>
+References: <CAFknXfDUNPpha-do8rXswkMfJzZeDeL4p3La-V4CuA2vQD=nwA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1403863073-19526-4-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <CAFknXfDUNPpha-do8rXswkMfJzZeDeL4p3La-V4CuA2vQD=nwA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 27 Jun 2014 13:57:40 +0400
-Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+On Sun, Jun 22, 2014 at 11:55 AM, Kyle Harrigan <kwharrigan-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> Greetings,
+>
+> I've got a small set (12) of RHEL 6.5 boxes connecting to a WS2008
+> share using mount.cifs, krb5i, multiuser.
+>
+> I don't have my specific fstab in front of me, but to recollection it is:
+>
+> //server.name/share /share cifs sec=krb5i,multiuser,user=MACHINE$ 0 0
+> for each machine.
+>
+> Packet signing was required-- would not mount without krb5i.
+>
+> /etc/request-key.conf contains the appropriate cifs upcall commands as
+> described in the man page.
+>
+> The machines are joined to the AD domain, and each machine has a good
+> /etc/krb5.keytab and good Kerberos operation.
+>
+> First, the good:
+>
+> All machines, upon bootup, achieve a good multiuser mount.  Users can
+> login, obtain appropriate kerberos tickets, and access the share
+> without issue.  Permissions enforcement is correct.  I can tell it is
+> working right because multiple users can create files which are owned
+> by them.  Users cannot access folders they should not be able to based
+> on MSAD permissions setup.  kdestroy causes loss of access to the
+> mount as expected... etc.  Smells like victory.
+>
+> The bad:
+>
+> Users are experiencing what seem like fairly random loss of
+> permissions accessing the share.  After some period of time, users
+> begin obtaining "Permission denied" errors when accessing the share.
+> It does not happen on all machines.  Some machines seem to stay
+> working for a week, while others may go down after only a few hours.
+> The only solution once this happens is to mount is to umount and mount
+> the share, at which points it immediately works again.  Reboot also
+> solves the problem.  The kerberos tickets still appear to be valid, so
+> I do not think that is the problem.  In addition, any subsequent
+> kdestroy and kinit do not fix it.  So do not believe related to
+> Kerberos expiration though have not ruled it out entirely.
+>
+> The only lead I have right now is I am still seeing some "CIFS VFS:
+> Server requires packet signing to be enabled" messages in dmesg even
+> though I am mounting as krb5i.  I noticed the default in
+> /proc/fs/cifs/SecurityFlags was 0x7 (may use NTLMv2,may use packet
+> signing, may use NTLM) , so I attempted to modify to 0x9009 which I
+> thought might solve the problem.  My math (hopefully correct :-> )
+> there was:
+>
+>    must use packet signing                         0x01001
+> + must use Kerberos                                 0x08008
+> ---------------------------------------------------------
+>
+>                                                   0x09009
+>
+> I probably owe you version numbers of the module and some more
+> specific debug information.  But was hoping to get the thread started
+> with a few of the smart guys to see if we can't get the obvious things
+> out of the way.
+>
+> Should I continue to attempt to hunt and resolve any packet signing
+> error messages?  Could they somehow be eventually causing the
+> permissions errors?  What specific log messages would be helpful?
+> I've turned on cifsFYI and looked over DebugData but there is
+> obviously a lot there and nothing stuck out.
+>
+> Any help or guidance would be appreciated.
+>
+> --
+> -Kyle
 
-> Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> ---
->  fs/cifs/file.c | 100 +++++++++++++++++++++++++++++++--------------------------
->  1 file changed, 54 insertions(+), 46 deletions(-)
-> 
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 69d1763..306c3df 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -1958,6 +1958,58 @@ wdata_prepare_pages(struct cifs_writedata *wdata, unsigned int found_pages,
->  	return nr_pages;
->  }
->  
-> +static int
-> +wdata_send_pages(struct cifs_writedata *wdata, unsigned int nr_pages,
-> +		 struct address_space *mapping, struct writeback_control *wbc)
-> +{
-> +	int rc = 0;
-> +	struct TCP_Server_Info *server;
-> +	unsigned int i;
-> +
-> +	wdata->sync_mode = wbc->sync_mode;
-> +	wdata->nr_pages = nr_pages;
-> +	wdata->offset = page_offset(wdata->pages[0]);
-> +	wdata->pagesz = PAGE_CACHE_SIZE;
-> +	wdata->tailsz = min(i_size_read(mapping->host) -
-> +			page_offset(wdata->pages[nr_pages - 1]),
-> +			(loff_t)PAGE_CACHE_SIZE);
-> +	wdata->bytes = ((nr_pages - 1) * PAGE_CACHE_SIZE) + wdata->tailsz;
-> +
-> +	do {
-> +		if (wdata->cfile != NULL)
-> +			cifsFileInfo_put(wdata->cfile);
-> +		wdata->cfile = find_writable_file(CIFS_I(mapping->host), false);
-> +		if (!wdata->cfile) {
-> +			cifs_dbg(VFS, "No writable handles for inode\n");
-> +			rc = -EBADF;
-> +			break;
-> +		}
-> +		wdata->pid = wdata->cfile->pid;
-> +		server = tlink_tcon(wdata->cfile->tlink)->ses->server;
-> +		rc = server->ops->async_writev(wdata, cifs_writedata_release);
-> +	} while (wbc->sync_mode == WB_SYNC_ALL && rc == -EAGAIN);
-> +
-> +	for (i = 0; i < nr_pages; ++i)
-> +		unlock_page(wdata->pages[i]);
-> +
-> +	if (!rc)
-> +		return rc;
-> +
-> +	/* send failure -- clean up the mess */
-> +	for (i = 0; i < nr_pages; ++i) {
-> +		if (rc == -EAGAIN)
-> +			redirty_page_for_writepage(wbc, wdata->pages[i]);
-> +		else
-> +			SetPageError(wdata->pages[i]);
-> +		end_page_writeback(wdata->pages[i]);
-> +		page_cache_release(wdata->pages[i]);
-> +	}
-> +	if (rc != -EAGAIN)
-> +		mapping_set_error(mapping, rc);
-> +
-> +	return rc;
-> +}
-> +
->  static int cifs_writepages(struct address_space *mapping,
->  			   struct writeback_control *wbc)
->  {
-> @@ -1965,7 +2017,6 @@ static int cifs_writepages(struct address_space *mapping,
->  	bool done = false, scanned = false, range_whole = false;
->  	pgoff_t end, index;
->  	struct cifs_writedata *wdata;
-> -	struct TCP_Server_Info *server;
->  	int rc = 0;
->  
->  	/*
-> @@ -1987,7 +2038,7 @@ static int cifs_writepages(struct address_space *mapping,
->  	}
->  retry:
->  	while (!done && index <= end) {
-> -		unsigned int i, nr_pages, found_pages;
-> +		unsigned int nr_pages, found_pages;
->  		pgoff_t next = 0, tofind;
->  		struct page **pages;
->  
-> @@ -2032,50 +2083,7 @@ retry:
->  			continue;
->  		}
->  
-> -		wdata->sync_mode = wbc->sync_mode;
-> -		wdata->nr_pages = nr_pages;
-> -		wdata->offset = page_offset(wdata->pages[0]);
-> -		wdata->pagesz = PAGE_CACHE_SIZE;
-> -		wdata->tailsz =
-> -			min(i_size_read(mapping->host) -
-> -			    page_offset(wdata->pages[nr_pages - 1]),
-> -			    (loff_t)PAGE_CACHE_SIZE);
-> -		wdata->bytes = ((nr_pages - 1) * PAGE_CACHE_SIZE) +
-> -					wdata->tailsz;
-> -
-> -		do {
-> -			if (wdata->cfile != NULL)
-> -				cifsFileInfo_put(wdata->cfile);
-> -			wdata->cfile = find_writable_file(CIFS_I(mapping->host),
-> -							  false);
-> -			if (!wdata->cfile) {
-> -				cifs_dbg(VFS, "No writable handles for inode\n");
-> -				rc = -EBADF;
-> -				break;
-> -			}
-> -			wdata->pid = wdata->cfile->pid;
-> -			server = tlink_tcon(wdata->cfile->tlink)->ses->server;
-> -			rc = server->ops->async_writev(wdata,
-> -							cifs_writedata_release);
-> -		} while (wbc->sync_mode == WB_SYNC_ALL && rc == -EAGAIN);
-> -
-> -		for (i = 0; i < nr_pages; ++i)
-> -			unlock_page(wdata->pages[i]);
-> -
-> -		/* send failure -- clean up the mess */
-> -		if (rc != 0) {
-> -			for (i = 0; i < nr_pages; ++i) {
-> -				if (rc == -EAGAIN)
-> -					redirty_page_for_writepage(wbc,
-> -							   wdata->pages[i]);
-> -				else
-> -					SetPageError(wdata->pages[i]);
-> -				end_page_writeback(wdata->pages[i]);
-> -				page_cache_release(wdata->pages[i]);
-> -			}
-> -			if (rc != -EAGAIN)
-> -				mapping_set_error(mapping, rc);
-> -		}
-> +		rc = wdata_send_pages(wdata, nr_pages, mapping, wbc);
->  		kref_put(&wdata->refcount, cifs_writedata_release);
->  
->  		wbc->nr_to_write -= nr_pages;
+It has been a little while, so I'm bumping this.
 
-Reviewed-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+I am still experiencing this issue.
+
+-- 
+-Kyle
