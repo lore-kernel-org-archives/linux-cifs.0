@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 5/7] CIFS: Improve indentation in cifs_user_read()
-Date: Thu, 10 Jul 2014 13:30:45 +0400
-Message-ID: <1404984647-8710-6-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH 6/7] CIFS: Optimize cifs_user_read() in a short read case on reconnects
+Date: Thu, 10 Jul 2014 13:30:46 +0400
+Message-ID: <1404984647-8710-7-git-send-email-pshilovsky@samba.org>
 References: <1404984647-8710-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,56 +9,51 @@ In-Reply-To: <1404984647-8710-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+by filling the output buffer with a data got from a partially received
+response and requesting the remaining data from the server.
+
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/file.c | 27 +++++++++++++--------------
- 1 file changed, 13 insertions(+), 14 deletions(-)
+ fs/cifs/file.c | 23 ++++++++++++++++++++---
+ 1 file changed, 20 insertions(+), 3 deletions(-)
 
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 2927f02..6896cb5 100644
+index 6896cb5..d7246cb 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -3026,28 +3026,27 @@ again:
- 			rc = wait_for_completion_killable(&rdata->done);
- 			if (rc)
- 				rc = -EINTR;
--			else if (rdata->result) {
--				rc = rdata->result;
-+			else if (rdata->result == -EAGAIN) {
+@@ -3029,13 +3029,30 @@ again:
+ 			else if (rdata->result == -EAGAIN) {
  				/* resend call if it's a retryable error */
--				if (rc == -EAGAIN) {
--					struct list_head tmp_list;
-+				struct list_head tmp_list;
+ 				struct list_head tmp_list;
++				unsigned int got_bytes = rdata->got_bytes;
  
--					list_del_init(&rdata->list);
--					INIT_LIST_HEAD(&tmp_list);
-+				list_del_init(&rdata->list);
-+				INIT_LIST_HEAD(&tmp_list);
+ 				list_del_init(&rdata->list);
+ 				INIT_LIST_HEAD(&tmp_list);
  
--					rc = cifs_send_async_read(rdata->offset,
-+				rc = cifs_send_async_read(rdata->offset,
- 						rdata->bytes, rdata->cfile,
- 						cifs_sb, &tmp_list);
- 
--					list_splice(&tmp_list, &rdata_list);
-+				list_splice(&tmp_list, &rdata_list);
- 
--					kref_put(&rdata->refcount,
--						cifs_uncached_readdata_release);
--					goto again;
--				}
--			} else {
-+				kref_put(&rdata->refcount,
-+					 cifs_uncached_readdata_release);
-+				goto again;
-+			} else if (rdata->result)
-+				rc = rdata->result;
-+			else
- 				rc = cifs_readdata_to_iov(rdata, to);
--			}
+-				rc = cifs_send_async_read(rdata->offset,
+-						rdata->bytes, rdata->cfile,
+-						cifs_sb, &tmp_list);
++				/*
++				 * Got a part of data and then reconnect has
++				 * happened -- discard anything left and return
++				 * a short read.
++				 */
++				if (got_bytes && got_bytes < rdata->bytes) {
++					rc = cifs_readdata_to_iov(rdata, to);
++					if (rc) {
++						kref_put(&rdata->refcount,
++						cifs_uncached_readdata_release);
++						continue;
++					}
++				}
 +
- 			/* if there was a short read -- discard anything left */
- 			if (rdata->got_bytes && rdata->got_bytes < rdata->bytes)
- 				rc = -ENODATA;
++				rc = cifs_send_async_read(
++						rdata->offset + got_bytes,
++						rdata->bytes - got_bytes,
++						rdata->cfile, cifs_sb,
++						&tmp_list);
+ 
+ 				list_splice(&tmp_list, &rdata_list);
+ 
 -- 
 1.8.1.2
