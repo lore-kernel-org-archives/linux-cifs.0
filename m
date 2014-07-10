@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 1/7] CIFS: Indicate reconnect with ECONNABORTED error code
-Date: Thu, 10 Jul 2014 13:30:41 +0400
-Message-ID: <1404984647-8710-2-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH 4/7] CIFS: Fix possible buffer corruption in direct read
+Date: Thu, 10 Jul 2014 13:30:44 +0400
+Message-ID: <1404984647-8710-5-git-send-email-pshilovsky@samba.org>
 References: <1404984647-8710-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,75 +9,28 @@ In-Reply-To: <1404984647-8710-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-that let us not mix it with EAGAIN.
+If there was a short read in the middle of the rdata list,
+we can end up with a corrupt output buffer.
 
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/connect.c | 8 ++++----
- fs/cifs/file.c    | 4 ++--
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ fs/cifs/file.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 20d75b8..b0427f6 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -557,7 +557,7 @@ cifs_readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
- 		try_to_freeze();
- 
- 		if (server_unresponsive(server)) {
--			total_read = -EAGAIN;
-+			total_read = -ECONNABORTED;
- 			break;
- 		}
- 
-@@ -571,7 +571,7 @@ cifs_readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
- 			break;
- 		} else if (server->tcpStatus == CifsNeedReconnect) {
- 			cifs_reconnect(server);
--			total_read = -EAGAIN;
-+			total_read = -ECONNABORTED;
- 			break;
- 		} else if (length == -ERESTARTSYS ||
- 			   length == -EAGAIN ||
-@@ -588,7 +588,7 @@ cifs_readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
- 			cifs_dbg(FYI, "Received no data or error: expecting %d\n"
- 				 "got %d", to_read, length);
- 			cifs_reconnect(server);
--			total_read = -EAGAIN;
-+			total_read = -ECONNABORTED;
- 			break;
- 		}
- 	}
-@@ -786,7 +786,7 @@ standard_receive3(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 		cifs_dbg(VFS, "SMB response too long (%u bytes)\n", pdu_length);
- 		cifs_reconnect(server);
- 		wake_up(&server->response_q);
--		return -EAGAIN;
-+		return -ECONNABORTED;
- 	}
- 
- 	/* switch to large buffer if too big for a small one */
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index d5f66ba..0974dd2 100644
+index f6cb765..2927f02 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -2908,7 +2908,7 @@ cifs_uncached_read_into_pages(struct TCP_Server_Info *server,
- 		total_read += result;
- 	}
- 
--	return total_read > 0 && result != -EAGAIN ? total_read : result;
-+	return total_read > 0 && result != -ECONNABORTED ? total_read : result;
- }
- 
- static int
-@@ -3358,7 +3358,7 @@ cifs_readpages_read_into_pages(struct TCP_Server_Info *server,
- 		total_read += result;
- 	}
- 
--	return total_read > 0 && result != -EAGAIN ? total_read : result;
-+	return total_read > 0 && result != -ECONNABORTED ? total_read : result;
- }
- 
- static int
+@@ -3048,7 +3048,9 @@ again:
+ 			} else {
+ 				rc = cifs_readdata_to_iov(rdata, to);
+ 			}
+-
++			/* if there was a short read -- discard anything left */
++			if (rdata->got_bytes && rdata->got_bytes < rdata->bytes)
++				rc = -ENODATA;
+ 		}
+ 		list_del_init(&rdata->list);
+ 		kref_put(&rdata->refcount, cifs_uncached_readdata_release);
 -- 
 1.8.1.2
