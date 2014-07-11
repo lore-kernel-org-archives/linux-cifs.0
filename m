@@ -1,124 +1,100 @@
-From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 6/7] CIFS: Optimize cifs_user_read() in a short read case
- on reconnects
-Date: Fri, 11 Jul 2014 13:47:28 +0400
-Message-ID: <CAKywueTc6b21zCf+Df5tF2KfkLVFVca9xdYwMHk9J+X6SEdJEg@mail.gmail.com>
-References: <1404984647-8710-1-git-send-email-pshilovsky@samba.org>
-	<1404984647-8710-7-git-send-email-pshilovsky@samba.org>
-	<CAKywueT4sVFiQ8sgEDEVDEteC2BY7AejWgYoeJhSO71pE=mM2w@mail.gmail.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: ANNOUNCE: cifs-utils release 6.4 ready for download
+Date: Fri, 11 Jul 2014 11:31:55 -0400
+Message-ID: <20140711113155.1aae0ff4@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: base64
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueT4sVFiQ8sgEDEVDEteC2BY7AejWgYoeJhSO71pE=mM2w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2014-07-10 13:40 GMT+04:00 Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
-> 2014-07-10 13:30 GMT+04:00 Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
->> by filling the output buffer with a data got from a partially received
->> response and requesting the remaining data from the server.
->>
->> Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
->> ---
->>  fs/cifs/file.c | 23 ++++++++++++++++++++---
->>  1 file changed, 20 insertions(+), 3 deletions(-)
->>
->> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
->> index 6896cb5..d7246cb 100644
->> --- a/fs/cifs/file.c
->> +++ b/fs/cifs/file.c
->> @@ -3029,13 +3029,30 @@ again:
->>                         else if (rdata->result == -EAGAIN) {
->>                                 /* resend call if it's a retryable error */
->>                                 struct list_head tmp_list;
->> +                               unsigned int got_bytes = rdata->got_bytes;
->>
->>                                 list_del_init(&rdata->list);
->>                                 INIT_LIST_HEAD(&tmp_list);
->>
->> -                               rc = cifs_send_async_read(rdata->offset,
->> -                                               rdata->bytes, rdata->cfile,
->> -                                               cifs_sb, &tmp_list);
->> +                               /*
->> +                                * Got a part of data and then reconnect has
->> +                                * happened -- discard anything left and return
->> +                                * a short read.
->> +                                */
->                                      ^^^
-> Ah, wrong version of the comment is posted. Sorry. The right one:
-> +                               /*
-> +                                * Got a part of data and then reconnect has
-> +                                * happened -- fill the buffer and continue
-> +                                * reading.
-> +                                */
->
-> will repost this after a feedback.
->
->> +                               if (got_bytes && got_bytes < rdata->bytes) {
->> +                                       rc = cifs_readdata_to_iov(rdata, to);
->> +                                       if (rc) {
->> +                                               kref_put(&rdata->refcount,
->> +                                               cifs_uncached_readdata_release);
->> +                                               continue;
->> +                                       }
->> +                               }
->> +
->> +                               rc = cifs_send_async_read(
->> +                                               rdata->offset + got_bytes,
->> +                                               rdata->bytes - got_bytes,
->> +                                               rdata->cfile, cifs_sb,
->> +                                               &tmp_list);
->>
->>                                 list_splice(&tmp_list, &rdata_list);
->>
-
-Also realized that the patch doesn't aware about signed connections
-and doesn't take into account that we should update stats in "EAGAIN
-&& got_bytes" case. So, this diff should be appended to the patch as
-well:
-
----
-
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 9f13b62..7d4361f 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -1561,6 +1561,12 @@ cifs_readv_callback(struct mid_q_entry *mid)
-        case MID_REQUEST_SUBMITTED:
-        case MID_RETRY_NEEDED:
-                rdata->result = -EAGAIN;
-+               if (server->sign && rdata->got_bytes)
-+                       /* reset bytes number since we can not check a sign */
-+                       rdata->got_bytes = 0;
-+               /* FIXME: should this be counted toward the initiating task? */
-+               task_io_account_read(rdata->got_bytes);
-+               cifs_stats_bytes_read(tcon, rdata->got_bytes);
-                break;
-        default:
-                rdata->result = -EIO;
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 17c0c31..768cddb 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -1730,6 +1730,12 @@ smb2_readv_callback(struct mid_q_entry *mid)
-        case MID_REQUEST_SUBMITTED:
-        case MID_RETRY_NEEDED:
-                rdata->result = -EAGAIN;
-+               if (server->sign && rdata->got_bytes)
-+                       /* reset bytes number since we can not check a sign */
-+                       rdata->got_bytes = 0;
-+               /* FIXME: should this be counted toward the initiating task? */
-+               task_io_account_read(rdata->got_bytes);
-+               cifs_stats_bytes_read(tcon, rdata->got_bytes);
-                break;
-        default:
-                if (rdata->result != -ENODATA)
-
----
-
-Thoughts?
-
--- 
-Best regards,
-Pavel Shilovsky.
+LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpXb3csIGFi
+b3V0IDYgbW9udGhzIHNpbmNlIGxhc3QgY2lmcy11dGlscyByZWxlYXNlLiBIb3cgdGltZSBmbGll
+cy4gV2l0aA0KR3VlbnRlcidzIGZpeCBmb3IgdGhlIHVwcGVyY2FzaW5nIG9mIGRldmljZSBuYW1l
+cyBsYXN0IHdlZWssIGl0J3MNCnByb2JhYmx5IGEgZ29vZCB0aW1lIHRvIGdvIGFoZWFkIG1ha2Ug
+YSBuZXcgb25lLg0KDQpUaGVyZSdzIG5vdCBtdWNoIGFjdGl2aXR5IHRoaXMgY3ljbGUgc28gdGhp
+cyBpcyBtb3N0bHkgYnVnZml4ZXMsIHRob3VnaA0KdGhlcmUgaXMgYSBuZXcgYXV0b2NvbmYgb3B0
+aW9uIHRvIGFsbG93IHlvdSB0byBjb25maWd1cmUgdGhlIFBBTQ0KaW5zdGFsbGF0aW9uIGRpcmVj
+dG9yeSBmcm9tIExhcnMuDQoNCkdvIGZvcnRoIGFuZCBkb3dubG9hZCENCg0Kd2VicGFnZTogICAg
+aHR0cHM6Ly93aWtpLnNhbWJhLm9yZy9pbmRleC5waHAvTGludXhDSUZTX3V0aWxzDQp0YXJiYWxs
+OiAgICBmdHA6Ly9mdHAuc2FtYmEub3JnL3B1Yi9saW51eC1jaWZzL2NpZnMtdXRpbHMvDQpnaXQ6
+ICAgICAgICBnaXQ6Ly9naXQuc2FtYmEub3JnL2NpZnMtdXRpbHMuZ2l0DQpnaXR3ZWI6ICAgICBo
+dHRwOi8vZ2l0LnNhbWJhLm9yZy8/cD1jaWZzLXV0aWxzLmdpdDthPXN1bW1hcnkNCg0KRGV0YWls
+ZWQgbGlzdCBvZiBjaGFuZ2VzIHNpbmNlIDYuNCB3YXMgcmVsZWFzZWQ6DQoNCmNvbW1pdCA1OTRm
+MDNhNWMwNTNkMmE1MzlmZmI4ZTI4ODk4MzI4MjllZTU0MmVlDQpBdXRob3I6IEplZmYgTGF5dG9u
+IDxqbGF5dG9uQHNhbWJhLm9yZz4NCkRhdGU6ICAgV2VkIEFwciAyIDEwOjIxOjEwIDIwMTQgLTA0
+MDANCg0KICAgIGF1dG9jb25mOiBzZXQgdmVyc2lvbiB0byA2LjMuMSBmb3IgaW50ZXJpbSBidWls
+ZHMNCiAgICANCiAgICBTaWduZWQtb2ZmLWJ5OiBKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5v
+cmc+DQoNCmNvbW1pdCAwMGExY2VlODY5ZmNlNWI2YWE3OTY4M2RhMTlhMjUyOWMyY2ZkNjkwDQpB
+dXRob3I6IExhcnMgTfxsbGVyIDxsYXJzQHNhbWJhLm9yZz4NCkRhdGU6ICAgTW9uIEFwciA3IDE0
+OjM1OjEwIDIwMTQgLTA0MDANCg0KICAgIGF1dG9jb25mOiBhbGxvdyBQQU0gc2VjdXJpdHkgaW5z
+dGFsbCBkaXJlY3RvcnkgdG8gYmUgY29uZmlndXJhYmxlDQogICAgDQogICAgQWxsb3cgdGhlIHBh
+bSBtb2R1bGUgaW5zdGFsbCBkaXJlY3RvcnkgdG8gYmUgc2V0IGF0IGJ1aWxkIHRpbWUuDQogICAg
+DQogICAgU2lnbmVkLW9mZi1ieTogSmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPg0KDQpj
+b21taXQgYTAxNmUxODk2OWQxMGUzYzc3N2YzNWZlMjFiMWMxZjhjMWQ3MDg4MA0KQXV0aG9yOiBK
+ZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+DQpEYXRlOiAgIE1vbiBBcHIgNyAxNDozNTox
+NyAyMDE0IC0wNDAwDQoNCiAgICBjaWZzOiB1c2Uga3JiNV9rdF9kZWZhdWx0KCkgdG8gZGV0ZXJt
+aW5lIGRlZmF1bHQga2V5dGFiIGxvY2F0aW9uDQogICAgDQogICAgLi4uZG9uJ3QgYXNzdW1lIHRo
+YXQgaXQncyBpbiAvZXRjL2tyYjUua2V5dGFiLg0KICAgIA0KICAgIFJlcG9ydGVkLWJ5OiBLb25z
+dGFudGluIExlcGlraG92IDxrbGVwaWtob0ByZWRoYXQuY29tPg0KICAgIFNpZ25lZC1vZmYtYnk6
+IEplZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJhLm9yZz4NCg0KY29tbWl0IDBjNTIxZDUwNjAwMzVk
+YTY1NTEwNzAwMTM3NGUwODg3M2FjNWRkZTgNCkF1dGhvcjogU2ViYXN0aWFuIEtyYWhtZXIgPGty
+YWhtZXJAc3VzZS5kZT4NCkRhdGU6ICAgTW9uIEFwciAxNCAxMTozOTo0MSAyMDE0ICswMjAwDQoN
+CiAgICBjaWZza2V5OiBiZXR0ZXIgdXNlIHNucHJpbnRmKCkNCiAgICANCiAgICBQcmVmZXIgc25w
+cmludGYoKSBvdmVyIHNwcmludGYoKSBpbiBjaWZza2V5LmMNCiAgICBQcm9qZWN0cyB0aGF0IGZv
+cmsgdGhlIGNvZGUgKHBhbV9jaWZzY3JlZHMpIGNhbid0IHJlbHkgb24NCiAgICB0aGUgbWF4LXNp
+emUgcGFyYW1ldGVycy4NCiAgICANCiAgICBbamxheXRvbjogcmVtb3ZlZCB1bm5lZWRlZCBpbml0
+aWFsaXphdGlvbiBvZiAibGVuIiBpbiBrZXlfYWRkXQ0KICAgIA0KICAgIFNpZ25lZC1vZmYtYnk6
+IFNlYmFzdGlhbiBLcmFobWVyIDxrcmFobWVyQHN1c2UuZGU+DQoNCmNvbW1pdCAzZGE0YzQzYjU3
+NTQ5OGJlODZjODdhMmFjM2YzMTQyZTNjYWIxYzU5DQpBdXRob3I6IEplZmYgTGF5dG9uIDxqbGF5
+dG9uQHNhbWJhLm9yZz4NCkRhdGU6ICAgU3VuIEFwciAyMCAyMDo0MTowNSAyMDE0IC0wNDAwDQoN
+CiAgICBjaWZzY3JlZHM6IGJldHRlciBlcnJvciBoYW5kbGluZyB3aGVuIGtleV9zZWFyY2ggZmFp
+bHMNCiAgICANCiAgICBJZiB3ZSBlbmRlZCB1cCBnZXR0aW5nIGEgYm9ndXMgc3RyaW5nIHRoYXQg
+d291bGQgaGF2ZSBvdmVyZmxvd2VkLCB0aGVuDQogICAgbWFrZSBrZXlfc2VhcmNoIHNldCBlcnJu
+byB0byBFSU5WQUwgYmVmb3JlIHJldHVybmluZy4gVGhlIGNhbGxlcnMgY2FuDQogICAgdGhlbiB0
+ZXN0IHRvIHNlZSBpZiB0aGUgcmV0dXJuZWQgZXJyb3IgaXMgd2hhdCB3YXMgZXhwZWN0ZWQgb3Ig
+c29tZXRoaW5nDQogICAgZWxzZSBhbmQgaGFuZGxlIGl0IGFwcHJvcHJpYXRlbHkuDQogICAgDQog
+ICAgQ2M6IFNlYmFzdGlhbiBLcmFobWVyIDxrcmFobWVyQHN1c2UuZGU+DQogICAgU2lnbmVkLW9m
+Zi1ieTogSmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPg0KDQpjb21taXQgMzgyZWM2Mzc1
+N2MxZDhkNGQzOTlkMTdjY2M5MjdjNDg5N2Q0Y2ZjOQ0KQXV0aG9yOiBKZWZmIExheXRvbiA8amxh
+eXRvbkBzYW1iYS5vcmc+DQpEYXRlOiAgIFN1biBBcHIgMjAgMjA6NDE6MDUgMjAxNCAtMDQwMA0K
+DQogICAgY2lmc2NyZWRzOiBiZXR0ZXIgZXJyb3IgaGFuZGxpbmcgZm9yIGtleV9hZGQNCiAgICAN
+CiAgICBJZiB0aGUgc3RyaW5nIGJ1ZmZlcnMgd291bGQgaGF2ZSBiZWVuIG92ZXJydW4sIHNldCBl
+cnJubyB0byBFSU5WQUwNCiAgICBiZWZvcmUgcmV0dXJuaW5nLiBUaGVuLCBoYXZlIHRoZSBjYWxs
+ZXJzIHJlcG9ydCB0aGUgZXJyb3JzIHRvDQogICAgc3RkZXJyIG9yIHN5c2xvZyBhcyBhcHByb3By
+aWF0ZS4NCiAgICANCiAgICBDYzogU2ViYXN0aWFuIEtyYWhtZXIgPGtyYWhtZXJAc3VzZS5kZT4N
+CiAgICBTaWduZWQtb2ZmLWJ5OiBKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+DQoNCmNv
+bW1pdCA0M2ZkNjViYTBmY2E4NWE4NmE3OWU4NGJiMmJjNDJiNTMxZDg1OGU2DQpBdXRob3I6IEd1
+ZW50ZXIgS3Vra3VrayA8a3Vra3NAc2FtYmEub3JnPg0KRGF0ZTogICBUdWUgSnVsIDEgMTc6NDM6
+NTUgMjAxNCArMDIwMA0KDQogICAgbW91bnQuY2lmczogb24gMm5kIHRyeSBtb3VudC5jaWZzIG11
+c3QgYWxzbyB1cHBlcmNhc2UgIm9yaWdfZGV2Ig0KICAgIA0KICAgIFJlY2VudCBrZXJuZWxzIG5v
+dyBpZ25vcmUgInVuYz0uLi4iIG1vdW50IG9wdGlvbi4gbW91bnQuY2lmcywgd2hlbg0KICAgIGdl
+dHRpbmcgZXJybm89RU5YSU8sIHJldHJpZXMgdGhlIG1vdW50IHdpdGggdXBwZXJjYXNlZCBob3N0
+bmFtZSwNCiAgICBzaGFyZW5hbWUgYW5kIHByZWZpeHBhdGggaW4gdGhlICJ1bmM9Li4uIiBtb3Vu
+dCBvcHRpb24sIHdoaWNoIGlzIGlnbm9yZWQNCiAgICBub3cgaW4gdGhlIGtlcm5lbC4gVXNlZCBl
+LmcuIGR1cmluZyBPUy8yIG1vdW50cywgd2hpY2ggZmFpbCBub3cuDQogICAgDQogICAgQWxzbyB1
+cHBlcmNhc2UgdGhlIG5vdyB1c2VkICJvcmlnX2RldiIgcGFyYW1ldGVyLg0KICAgIA0KICAgIFNp
+Z25lZC1vZmYtYnk6IEd1ZW50ZXIgS3Vra3VrayA8a3Vra3NAc2FtYmEub3JnPg0KDQpjb21taXQg
+NDg3ZjQ2ZGE3MzcyOTE4Nzc4NjdjYmQzYWNiNDBmZWEwODdkMzg2Mw0KQXV0aG9yOiBKZWZmIExh
+eXRvbiA8amxheXRvbkBzYW1iYS5vcmc+DQpEYXRlOiAgIEZyaSBKdWwgMTEgMTE6MTQ6MDYgMjAx
+NCAtMDQwMA0KDQogICAgYXV0b2NvbmY6IHNldCB2ZXJzaW9uIHRvIDYuNA0KICAgIA0KICAgIFNp
+Z25lZC1vZmYtYnk6IEplZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJhLm9yZz4NCg0KLSAtLSANCkpl
+ZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJhLm9yZz4NCi0tLS0tQkVHSU4gUEdQIFNJR05BVFVSRS0t
+LS0tDQpWZXJzaW9uOiBHbnVQRyB2Mg0KDQppUUljQkFFQkFnQUdCUUpUd0FOckFBb0pFQUFPYUVF
+WlZvSVYxVU1RQUtoMHNkZitvSHFBZjBmNDVocXZGL29UDQpEd2JnZGZFQ0lGcFhTQ1hiSm9sUnFH
+aUdvMlA3MnRXcy9ocjlZM3hBaGR1bzRjdnk1Z2pqZFlGeHkxa3RqUmxVDQp3eXRuaXJhUldQTDJj
+NFVuZEpMaUptbFNUU3Q4L3RmZnFHWWN1YUZaY1pnbzhTM0EvdEFoSWtTSEZvNjN0VjhSDQorVCs4
+TDI1c0VoRE8xUGlhNVlidCtQK015NE9kSnRPWHpSMkl3ZXQxOTVkMVExMEhtNFpkYzhTaExJTzU4
+WG1ZDQpYMmRJV0t6UVhEakVCVzBTNGEzWUxibEhaTzhVN3BLV29UaDIvVW9GNzJ4Q3NaUkZyVS9G
+aDEyTzhuV1lzYXdRDQp4R3NiL3NQdHBMNzdXZXVRTlhjMFB0SG5yU0xzYkoza01oL1VObmczaUVD
+bHRVT3R3RG0vWjhPNFYxRVVjQnZFDQpURnVYS3R4UGpkeTBxbzZnRnpmUEZZTUVLNnBlenRHWGRN
+MW5rcFMvWlhhWHNZZ2FXalFxR05ydHhKMENHZTJUDQpVVkNYTmd3N3UwL25DNlJlbFdMaTdMbUtu
+T2FKOW1PRHRmZmR2SVc5TEZ3czAvUHdIYWQ4NGVla2NkMGJUMVFIDQpqeDRad3Y2UW9nZ0JjWkRj
+aGZ6bmpIK0VMVVpra01JSjIvZU11ckJEV0lUU2RRK2ZCeE56bzJZdFBwWnE2THBUDQoyWDRTaERF
+L0VjYU9pQXQ2ZVllTGgxMHFYNEhUbzBoRTFoVlIxeEU1TUJUZTF0RVZhc211eGlWOVZCRmxrRlJz
+DQozNmdRTjRtM1Raay84YmZ0UzNLc2FyeXNGTGtYa040UGhPc0xLcDJ6VitlcjB1WmtJeU9mbmgv
+eWI0b0x2Y1E3DQpiWncwMy96OXUxNWszVzNkOEZSRg0KPTFxSzENCi0tLS0tRU5EIFBHUCBTSUdO
+QVRVUkUtLS0tLQ0K
