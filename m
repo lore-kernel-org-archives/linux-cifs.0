@@ -1,145 +1,124 @@
-From: Ashish Sangwan <a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
-Subject: Re: Re: connecting to windows server with SMB2
-Date: Fri, 11 Jul 2014 05:47:48 +0000 (GMT)
-Message-ID: <81.62.22787.48A7FB35@epcpsbgx2.samsung.com>
-Reply-To: a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org
+From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH 6/7] CIFS: Optimize cifs_user_read() in a short read case
+ on reconnects
+Date: Fri, 11 Jul 2014 13:47:28 +0400
+Message-ID: <CAKywueTc6b21zCf+Df5tF2KfkLVFVca9xdYwMHk9J+X6SEdJEg@mail.gmail.com>
+References: <1404984647-8710-1-git-send-email-pshilovsky@samba.org>
+	<1404984647-8710-7-git-send-email-pshilovsky@samba.org>
+	<CAKywueT4sVFiQ8sgEDEVDEteC2BY7AejWgYoeJhSO71pE=mM2w@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="----=SAMSUNG_mySingle_MIME_MULTIPART_BOUNDARY"
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAKywueT4sVFiQ8sgEDEVDEteC2BY7AejWgYoeJhSO71pE=mM2w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+2014-07-10 13:40 GMT+04:00 Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
+> 2014-07-10 13:30 GMT+04:00 Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
+>> by filling the output buffer with a data got from a partially received
+>> response and requesting the remaining data from the server.
+>>
+>> Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+>> ---
+>>  fs/cifs/file.c | 23 ++++++++++++++++++++---
+>>  1 file changed, 20 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+>> index 6896cb5..d7246cb 100644
+>> --- a/fs/cifs/file.c
+>> +++ b/fs/cifs/file.c
+>> @@ -3029,13 +3029,30 @@ again:
+>>                         else if (rdata->result == -EAGAIN) {
+>>                                 /* resend call if it's a retryable error */
+>>                                 struct list_head tmp_list;
+>> +                               unsigned int got_bytes = rdata->got_bytes;
+>>
+>>                                 list_del_init(&rdata->list);
+>>                                 INIT_LIST_HEAD(&tmp_list);
+>>
+>> -                               rc = cifs_send_async_read(rdata->offset,
+>> -                                               rdata->bytes, rdata->cfile,
+>> -                                               cifs_sb, &tmp_list);
+>> +                               /*
+>> +                                * Got a part of data and then reconnect has
+>> +                                * happened -- discard anything left and return
+>> +                                * a short read.
+>> +                                */
+>                                      ^^^
+> Ah, wrong version of the comment is posted. Sorry. The right one:
+> +                               /*
+> +                                * Got a part of data and then reconnect has
+> +                                * happened -- fill the buffer and continue
+> +                                * reading.
+> +                                */
+>
+> will repost this after a feedback.
+>
+>> +                               if (got_bytes && got_bytes < rdata->bytes) {
+>> +                                       rc = cifs_readdata_to_iov(rdata, to);
+>> +                                       if (rc) {
+>> +                                               kref_put(&rdata->refcount,
+>> +                                               cifs_uncached_readdata_release);
+>> +                                               continue;
+>> +                                       }
+>> +                               }
+>> +
+>> +                               rc = cifs_send_async_read(
+>> +                                               rdata->offset + got_bytes,
+>> +                                               rdata->bytes - got_bytes,
+>> +                                               rdata->cfile, cifs_sb,
+>> +                                               &tmp_list);
+>>
+>>                                 list_splice(&tmp_list, &rdata_list);
+>>
 
-------=SAMSUNG_mySingle_MIME_MULTIPART_BOUNDARY
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="windows-1252"
-MIME-Version: 1.0
-Message-ID: <32155002.16891405057667795.JavaMail.weblogic@epml25>
+Also realized that the patch doesn't aware about signed connections
+and doesn't take into account that we should update stats in "EAGAIN
+&& got_bytes" case. So, this diff should be appended to the patch as
+well:
 
-PiBJbiBvcmRlciB0byBzZWM9bnRsbXYyIHN1Y2NlZWQsIHlvdSB3aWxsIG5lZWQgdGhpcyBwYXRj
-aCBvbiB0aGUgV2luZG93cyA3IGJveC4NCj4gaHR0cDovL3N1cHBvcnQubWljcm9zb2Z0LmNvbS9r
-Yi85NTc0NDEvZW4tdXMNCj4gDQo+IEZvciBzbWIyICh2ZXJzPTIuMCksIHNlYz1udGxtc3NwICh3
-aGljaCBpcyB0aGUgZGVmYXVsdCkgc2hvdWxkIHN1Y2NlZWQgYWdhaW5zdA0KPiBhIFdpbmRvd3Mg
-NyBib3guDQo+IA0KPiBXb3VsZCBpdCBiZSBwb3NzaWJsZSB0byBhdHRhY2ggYSB3aXJlc2hhcmsg
-dHJhY2Ugb2YgdGhlIGV4Y2hhbmdlPw0KUEZBDQoNClJlZ2FyZHMsDQpBc2hpc2g=
+---
 
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 9f13b62..7d4361f 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -1561,6 +1561,12 @@ cifs_readv_callback(struct mid_q_entry *mid)
+        case MID_REQUEST_SUBMITTED:
+        case MID_RETRY_NEEDED:
+                rdata->result = -EAGAIN;
++               if (server->sign && rdata->got_bytes)
++                       /* reset bytes number since we can not check a sign */
++                       rdata->got_bytes = 0;
++               /* FIXME: should this be counted toward the initiating task? */
++               task_io_account_read(rdata->got_bytes);
++               cifs_stats_bytes_read(tcon, rdata->got_bytes);
+                break;
+        default:
+                rdata->result = -EIO;
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 17c0c31..768cddb 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1730,6 +1730,12 @@ smb2_readv_callback(struct mid_q_entry *mid)
+        case MID_REQUEST_SUBMITTED:
+        case MID_RETRY_NEEDED:
+                rdata->result = -EAGAIN;
++               if (server->sign && rdata->got_bytes)
++                       /* reset bytes number since we can not check a sign */
++                       rdata->got_bytes = 0;
++               /* FIXME: should this be counted toward the initiating task? */
++               task_io_account_read(rdata->got_bytes);
++               cifs_stats_bytes_read(tcon, rdata->got_bytes);
+                break;
+        default:
+                if (rdata->result != -ENODATA)
 
-------=SAMSUNG_mySingle_MIME_MULTIPART_BOUNDARY
-Content-Type: application/octet-stream;
- name="packets.pcapng"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="packets.pcapng"
+---
 
+Thoughts?
 
-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
-
-
-------=SAMSUNG_mySingle_MIME_MULTIPART_BOUNDARY--
+-- 
+Best regards,
+Pavel Shilovsky.
