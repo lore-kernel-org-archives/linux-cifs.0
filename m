@@ -1,64 +1,60 @@
-From: piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: Re: Patch series reviews
-Date: Sun, 13 Jul 2014 17:39:57 +0400
-Message-ID: <D805D0FB-B31D-48C5-96C8-18811BDD2176@gmail.com>
-References: <CAH2r5muVJjqdnPnw--LsOim5ximr=uTS_7avBP2i8kLdx4agAQ@mail.gmail.com> <CAH2r5mtOGn02nU9FVgGB0eUt+o7+=XuR1VjMPiHEi0m7P-cyhQ@mail.gmail.com>
-Mime-Version: 1.0 (1.0)
-Content-Type: text/plain; charset=koi8-r
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Additional performance data on Pavel's smb3 multi credit patch series
+Date: Sun, 13 Jul 2014 14:23:14 -0500
+Message-ID: <CAH2r5muwjdPopeGCOi8a7OxAm=8cFsFKsEBywz5N1NQWotni6Q@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mtOGn02nU9FVgGB0eUt+o7+=XuR1VjMPiHEi0m7P-cyhQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-13.07.2014, =D7 5:18, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> =CE=C1=D0=C9=D3=
-=C1=CC(=C1):
+Performance of Pavel's multicredit i/o SMB3 patches continues to look
+good.  Additional informal performance results below comparing cifs
+mounts with smb3 mounts (vers=3.0) with and without Pavel's patch set.
+I plan to do additional testing with large rsize/wsize (default with
+Pavel's code is 1MB).
 
-> I have temporarily merged most (all but the last two) of your smb3
+3.16-rc4 (Ubuntu) on client.  Server is Windows 8.1.  Both VMs on same
+host (host disk is fairly fast SSD).
 
-Good. Thanks!
+Copy to server performance increased about 20% percent
+dd if=/dev/zero of=/mnt/targetfile bs=80M count=25
+got similar results with or without conv=fdatasync
 
-The last two patches are not prepared yet. I was gong to merge both or =
-only the first to the patch 6/7 of the last series. What is more prefer=
-red now: to merge them to this patch and repost or keep them as a separ=
-ate patch?
+1st run copying to empty directory, 2nd run copying over targetfile,
+(pattern repeated multiple times) averaging results
 
+New code (with Pavel's patches)
+---------------------------------------------
+CIFS 167MB/s
+SMB3 200MB/s
 
-> multicredit series into cifs-2.6.git for-next, but I don't see signed
-> off/reviewed-by/acked-by for your series for any patches beyond these
-> in the series (which were acked by Jeff).  Are there others with
-> reviewed-by feedback that you would like me to include.
+Existing code (without his patches)
+------------------------------------------------
+SMB3 166MB/s
+CIFS 164.5MB/s
 
+For large file reading SMB3 performance with Pavel's patches increased
+76% over existing SMB3 code
+dd of=/dev/null if=/mnt/targetfile bs=80M count=25
+(mounting and unmounting between attempts to avoid caching effects on
+the client)
 
-No, I don't have any other reviewed-by feedback.
+New code (with Pavel's patches)
+---------------------------------------------
+CIFS 114MB/s
+SMB3 216MB/s
 
->=20
-> commit 8f57fd1cea32316b3ae41ee520b938089bee761b
-> Author: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> Date:   Thu Jun 19 15:28:37 2014 +0400
->=20
->    CIFS: Separate page sending from writepages
->=20
->    Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
->    Reviewed-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
->    Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->=20
-> commit fecd99690172bfec337c489687842e29906b2575
-> Author: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> Date:   Thu Jun 19 15:01:03 2014 +0400
->=20
->    CIFS: Separate page processing from writepages
->=20
->    Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
->    Reviewed-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
->    Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->=20
->=20
->=20
->=20
-> --=20
-> Thanks,
->=20
-> Steve
+Existing code (without his patches)
+------------------------------------------------
+SMB3 123MB/s
+CIFS 110MB/s
+
+-- 
+Thanks,
+
+Steve
