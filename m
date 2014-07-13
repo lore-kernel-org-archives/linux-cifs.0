@@ -1,27 +1,23 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: ronnie sahlberg <ronniesahlberg@gmail.com>
 Subject: Re: Additional performance data on Pavel's smb3 multi credit patch series
-Date: Sun, 13 Jul 2014 18:17:25 -0500
-Message-ID: <CAH2r5mtz0NJETUimTPrtdzfN23Wx7G82xGFa9NT_pLM-mCPezg@mail.gmail.com>
+Date: Sun, 13 Jul 2014 16:21:40 -0700
+Message-ID: <CAN05THTTXU_=8rboaJfePmNDU6rNK9suMPTyXrvvnmd9CQF3Rw@mail.gmail.com>
 References: <CAH2r5muwjdPopeGCOi8a7OxAm=8cFsFKsEBywz5N1NQWotni6Q@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5muwjdPopeGCOi8a7OxAm=8cFsFKsEBywz5N1NQWotni6Q-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+	samba-technical <samba-technical@lists.samba.org>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>
+To: Steve French <smfrench@gmail.com>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <CAH2r5muwjdPopeGCOi8a7OxAm=8cFsFKsEBywz5N1NQWotni6Q@mail.gmail.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Repeating these large file copy tests with SMB3 mounts with Pavel's
-patches and trying larger wsize and rsize of 4MB (and later 5MB) did
-not seem to help performance much (over his default with the new
-patchset, 1MB).   I want to repeat these with real network adapters
-(rather than in vmware or kvm) to compare though (to see if the larger
-wsize and rsize help)
+Impressive!
 
-On Sun, Jul 13, 2014 at 2:23 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Sun, Jul 13, 2014 at 12:23 PM, Steve French <smfrench@gmail.com> wrote:
 > Performance of Pavel's multicredit i/o SMB3 patches continues to look
 > good.  Additional informal performance results below comparing cifs
 > mounts with smb3 mounts (vers=3.0) with and without Pavel's patch set.
@@ -68,10 +64,3 @@ On Sun, Jul 13, 2014 at 2:23 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@p
 > Thanks,
 >
 > Steve
-
-
-
--- 
-Thanks,
-
-Steve
