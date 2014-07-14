@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v2 1/7] CIFS: Indicate reconnect with ECONNABORTED error code
-Date: Mon, 14 Jul 2014 13:01:11 +0400
-Message-ID: <1405328477-13484-2-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH v2 3/7] CIFS: Count got bytes in read_into_pages()
+Date: Mon, 14 Jul 2014 13:01:13 +0400
+Message-ID: <1405328477-13484-4-git-send-email-pshilovsky@samba.org>
 References: <1405328477-13484-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,73 +9,86 @@ In-Reply-To: <1405328477-13484-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDs
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-that let us not mix it with EAGAIN.
+that let us know how many bytes we have already got before reconnect.
 
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/connect.c | 8 ++++----
- fs/cifs/file.c    | 4 ++--
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ fs/cifs/cifssmb.c |  1 -
+ fs/cifs/file.c    | 16 ++++++++++------
+ 2 files changed, 10 insertions(+), 7 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 20d75b8..b0427f6 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -557,7 +557,7 @@ cifs_readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
- 		try_to_freeze();
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index a3e424d..5d6768f 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -1513,7 +1513,6 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+ 		return length;
  
- 		if (server_unresponsive(server)) {
--			total_read = -EAGAIN;
-+			total_read = -ECONNABORTED;
- 			break;
- 		}
+ 	server->total_read += length;
+-	rdata->got_bytes = length;
  
-@@ -571,7 +571,7 @@ cifs_readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
- 			break;
- 		} else if (server->tcpStatus == CifsNeedReconnect) {
- 			cifs_reconnect(server);
--			total_read = -EAGAIN;
-+			total_read = -ECONNABORTED;
- 			break;
- 		} else if (length == -ERESTARTSYS ||
- 			   length == -EAGAIN ||
-@@ -588,7 +588,7 @@ cifs_readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
- 			cifs_dbg(FYI, "Received no data or error: expecting %d\n"
- 				 "got %d", to_read, length);
- 			cifs_reconnect(server);
--			total_read = -EAGAIN;
-+			total_read = -ECONNABORTED;
- 			break;
- 		}
- 	}
-@@ -786,7 +786,7 @@ standard_receive3(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 		cifs_dbg(VFS, "SMB response too long (%u bytes)\n", pdu_length);
- 		cifs_reconnect(server);
- 		wake_up(&server->response_q);
--		return -EAGAIN;
-+		return -ECONNABORTED;
- 	}
- 
- 	/* switch to large buffer if too big for a small one */
+ 	cifs_dbg(FYI, "total_read=%u buflen=%u remaining=%u\n",
+ 		 server->total_read, buflen, data_len);
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index d5f66ba..0974dd2 100644
+index 7fc9bdc..f6cb765 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -2908,7 +2908,7 @@ cifs_uncached_read_into_pages(struct TCP_Server_Info *server,
- 		total_read += result;
+@@ -2867,11 +2867,12 @@ static int
+ cifs_uncached_read_into_pages(struct TCP_Server_Info *server,
+ 			struct cifs_readdata *rdata, unsigned int len)
+ {
+-	int total_read = 0, result = 0;
++	int result = 0;
+ 	unsigned int i;
+ 	unsigned int nr_pages = rdata->nr_pages;
+ 	struct kvec iov;
+ 
++	rdata->got_bytes = 0;
+ 	rdata->tailsz = PAGE_SIZE;
+ 	for (i = 0; i < nr_pages; i++) {
+ 		struct page *page = rdata->pages[i];
+@@ -2905,10 +2906,11 @@ cifs_uncached_read_into_pages(struct TCP_Server_Info *server,
+ 		if (result < 0)
+ 			break;
+ 
+-		total_read += result;
++		rdata->got_bytes += result;
  	}
  
--	return total_read > 0 && result != -EAGAIN ? total_read : result;
-+	return total_read > 0 && result != -ECONNABORTED ? total_read : result;
+-	return total_read > 0 && result != -ECONNABORTED ? total_read : result;
++	return rdata->got_bytes > 0 && result != -ECONNABORTED ?
++						rdata->got_bytes : result;
  }
  
  static int
-@@ -3358,7 +3358,7 @@ cifs_readpages_read_into_pages(struct TCP_Server_Info *server,
- 		total_read += result;
+@@ -3289,7 +3291,7 @@ static int
+ cifs_readpages_read_into_pages(struct TCP_Server_Info *server,
+ 			struct cifs_readdata *rdata, unsigned int len)
+ {
+-	int total_read = 0, result = 0;
++	int result = 0;
+ 	unsigned int i;
+ 	u64 eof;
+ 	pgoff_t eof_index;
+@@ -3301,6 +3303,7 @@ cifs_readpages_read_into_pages(struct TCP_Server_Info *server,
+ 	eof_index = eof ? (eof - 1) >> PAGE_CACHE_SHIFT : 0;
+ 	cifs_dbg(FYI, "eof=%llu eof_index=%lu\n", eof, eof_index);
+ 
++	rdata->got_bytes = 0;
+ 	rdata->tailsz = PAGE_CACHE_SIZE;
+ 	for (i = 0; i < nr_pages; i++) {
+ 		struct page *page = rdata->pages[i];
+@@ -3355,10 +3358,11 @@ cifs_readpages_read_into_pages(struct TCP_Server_Info *server,
+ 		if (result < 0)
+ 			break;
+ 
+-		total_read += result;
++		rdata->got_bytes += result;
  	}
  
--	return total_read > 0 && result != -EAGAIN ? total_read : result;
-+	return total_read > 0 && result != -ECONNABORTED ? total_read : result;
+-	return total_read > 0 && result != -ECONNABORTED ? total_read : result;
++	return rdata->got_bytes > 0 && result != -ECONNABORTED ?
++						rdata->got_bytes : result;
  }
  
  static int
