@@ -1,59 +1,58 @@
-From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v2 7/7] CIFS: Optimize readpages in a short read case on reconnects
-Date: Mon, 14 Jul 2014 13:01:17 +0400
-Message-ID: <1405328477-13484-8-git-send-email-pshilovsky@samba.org>
-References: <1405328477-13484-1-git-send-email-pshilovsky@samba.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Thierry Reding <thierry.reding-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] fs/cifs: Fix build warnings
+Date: Mon, 14 Jul 2014 12:38:49 +0200
+Message-ID: <1405334329-25271-1-git-send-email-thierry.reding@gmail.com>
+Cc: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1405328477-13484-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-by marking pages with a data from a partially received response up-to-date.
-This is suitable for non-signed connections.
+From: Thierry Reding <treding-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
 
-Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+The sess_alloc_buffer(), sess_free_buffer(), sess_establish_session()
+and sess_sendreceive() functions are only used by sess_auth_lanman(),
+therefore should be guarded by the same #ifdef to prevent the following
+compiler warnings:
+
+	fs/cifs/sess.c:542:1: warning: 'sess_alloc_buffer' defined but not used [-Wunused-function]
+	 sess_alloc_buffer(struct sess_data *sess_data, int wct)
+	 ^
+	fs/cifs/sess.c:580:1: warning: 'sess_free_buffer' defined but not used [-Wunused-function]
+	 sess_free_buffer(struct sess_data *sess_data)
+	 ^
+	fs/cifs/sess.c:589:1: warning: 'sess_establish_session' defined but not used [-Wunused-function]
+	 sess_establish_session(struct sess_data *sess_data)
+	 ^
+	fs/cifs/sess.c:621:1: warning: 'sess_sendreceive' defined but not used [-Wunused-function]
+	 sess_sendreceive(struct sess_data *sess_data)
+	 ^
+
+Signed-off-by: Thierry Reding <treding-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/file.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ fs/cifs/sess.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index e42d26d..4b83d72 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -3280,25 +3280,30 @@ int cifs_file_mmap(struct file *file, struct vm_area_struct *vma)
- static void
- cifs_readv_complete(struct work_struct *work)
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index db6ecdf0974c..5fb7606b81ef 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -538,6 +538,7 @@ struct sess_data {
+ 	struct kvec iov[3];
+ };
+ 
++#ifdef CONFIG_CIFS_WEAK_PW_HASH
+ static int
+ sess_alloc_buffer(struct sess_data *sess_data, int wct)
  {
--	unsigned int i;
-+	unsigned int i, got_bytes;
- 	struct cifs_readdata *rdata = container_of(work,
- 						struct cifs_readdata, work);
- 
-+	got_bytes = rdata->got_bytes;
- 	for (i = 0; i < rdata->nr_pages; i++) {
- 		struct page *page = rdata->pages[i];
- 
- 		lru_cache_add_file(page);
- 
--		if (rdata->result == 0) {
-+		if (rdata->result == 0 ||
-+		    (rdata->result == -EAGAIN && got_bytes)) {
- 			flush_dcache_page(page);
- 			SetPageUptodate(page);
- 		}
- 
- 		unlock_page(page);
- 
--		if (rdata->result == 0)
-+		if (rdata->result == 0 ||
-+		    (rdata->result == -EAGAIN && got_bytes))
- 			cifs_readpage_to_fscache(rdata->mapping->host, page);
- 
-+		got_bytes -= min_t(unsigned int, PAGE_CACHE_SIZE, got_bytes);
-+
- 		page_cache_release(page);
- 		rdata->pages[i] = NULL;
- 	}
+@@ -644,7 +645,6 @@ sess_sendreceive(struct sess_data *sess_data)
+  * in proc/fs/cifs or via mount parm.  Unfortunately this is
+  * needed for old Win (e.g. Win95), some obscure NAS and OS/2
+  */
+-#ifdef CONFIG_CIFS_WEAK_PW_HASH
+ static void
+ sess_auth_lanman(struct sess_data *sess_data)
+ {
 -- 
-1.8.1.2
+2.0.1
