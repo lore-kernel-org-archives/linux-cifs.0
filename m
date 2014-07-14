@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v2 2/7] CIFS: Use separate var for the number of bytes got in async read
-Date: Mon, 14 Jul 2014 13:01:12 +0400
-Message-ID: <1405328477-13484-3-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH v2 6/7] CIFS: Optimize cifs_user_read() in a short read case on reconnects
+Date: Mon, 14 Jul 2014 13:01:16 +0400
+Message-ID: <1405328477-13484-7-git-send-email-pshilovsky@samba.org>
 References: <1405328477-13484-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,79 +9,88 @@ In-Reply-To: <1405328477-13484-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDs
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-and don't mix it with the number of bytes that was requested.
+by filling the output buffer with a data got from a partially received
+response and requesting the remaining data from the server. This is
+suitable for non-signed connections.
 
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/cifsglob.h | 1 +
- fs/cifs/cifssmb.c  | 6 +++---
- fs/cifs/file.c     | 2 +-
- fs/cifs/smb2pdu.c  | 4 ++--
- 4 files changed, 7 insertions(+), 6 deletions(-)
+ fs/cifs/cifssmb.c |  6 ++++++
+ fs/cifs/file.c    | 23 ++++++++++++++++++++---
+ fs/cifs/smb2pdu.c |  6 ++++++
+ 3 files changed, 32 insertions(+), 3 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index f33ff4c..0012e1e 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -1059,6 +1059,7 @@ struct cifs_readdata {
- 	struct address_space		*mapping;
- 	__u64				offset;
- 	unsigned int			bytes;
-+	unsigned int			got_bytes;
- 	pid_t				pid;
- 	int				result;
- 	struct work_struct		work;
 diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 6ded59d..a3e424d 100644
+index 5d6768f..2f7b43a 100644
 --- a/fs/cifs/cifssmb.c
 +++ b/fs/cifs/cifssmb.c
-@@ -1513,7 +1513,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 		return length;
- 
- 	server->total_read += length;
--	rdata->bytes = length;
-+	rdata->got_bytes = length;
- 
- 	cifs_dbg(FYI, "total_read=%u buflen=%u remaining=%u\n",
- 		 server->total_read, buflen, data_len);
-@@ -1556,8 +1556,8 @@ cifs_readv_callback(struct mid_q_entry *mid)
- 					 rc);
- 		}
- 		/* FIXME: should this be counted toward the initiating task? */
--		task_io_account_read(rdata->bytes);
--		cifs_stats_bytes_read(tcon, rdata->bytes);
+@@ -1561,6 +1561,12 @@ cifs_readv_callback(struct mid_q_entry *mid)
+ 	case MID_REQUEST_SUBMITTED:
+ 	case MID_RETRY_NEEDED:
+ 		rdata->result = -EAGAIN;
++		if (server->sign && rdata->got_bytes)
++			/* reset bytes number since we can not check a sign */
++			rdata->got_bytes = 0;
++		/* FIXME: should this be counted toward the initiating task? */
 +		task_io_account_read(rdata->got_bytes);
 +		cifs_stats_bytes_read(tcon, rdata->got_bytes);
  		break;
- 	case MID_REQUEST_SUBMITTED:
- 	case MID_RETRY_NEEDED:
+ 	default:
+ 		rdata->result = -EIO;
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 0974dd2..7fc9bdc 100644
+index 6896cb5..e42d26d 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -2839,7 +2839,7 @@ cifs_uncached_readdata_release(struct kref *refcount)
- static int
- cifs_readdata_to_iov(struct cifs_readdata *rdata, struct iov_iter *iter)
- {
--	size_t remaining = rdata->bytes;
-+	size_t remaining = rdata->got_bytes;
- 	unsigned int i;
+@@ -3029,13 +3029,30 @@ again:
+ 			else if (rdata->result == -EAGAIN) {
+ 				/* resend call if it's a retryable error */
+ 				struct list_head tmp_list;
++				unsigned int got_bytes = rdata->got_bytes;
  
- 	for (i = 0; i < rdata->nr_pages; i++) {
+ 				list_del_init(&rdata->list);
+ 				INIT_LIST_HEAD(&tmp_list);
+ 
+-				rc = cifs_send_async_read(rdata->offset,
+-						rdata->bytes, rdata->cfile,
+-						cifs_sb, &tmp_list);
++				/*
++				 * Got a part of data and then reconnect has
++				 * happened -- fill the buffer and continue
++				 * reading.
++				 */
++				if (got_bytes && got_bytes < rdata->bytes) {
++					rc = cifs_readdata_to_iov(rdata, to);
++					if (rc) {
++						kref_put(&rdata->refcount,
++						cifs_uncached_readdata_release);
++						continue;
++					}
++				}
++
++				rc = cifs_send_async_read(
++						rdata->offset + got_bytes,
++						rdata->bytes - got_bytes,
++						rdata->cfile, cifs_sb,
++						&tmp_list);
+ 
+ 				list_splice(&tmp_list, &rdata_list);
+ 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 26624ee..0aabd7c 100644
+index 0aabd7c..9b38cd7 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -1734,8 +1734,8 @@ smb2_readv_callback(struct mid_q_entry *mid)
- 					 rc);
- 		}
- 		/* FIXME: should this be counted toward the initiating task? */
--		task_io_account_read(rdata->bytes);
--		cifs_stats_bytes_read(tcon, rdata->bytes);
+@@ -1740,6 +1740,12 @@ smb2_readv_callback(struct mid_q_entry *mid)
+ 	case MID_REQUEST_SUBMITTED:
+ 	case MID_RETRY_NEEDED:
+ 		rdata->result = -EAGAIN;
++		if (server->sign && rdata->got_bytes)
++			/* reset bytes number since we can not check a sign */
++			rdata->got_bytes = 0;
++		/* FIXME: should this be counted toward the initiating task? */
 +		task_io_account_read(rdata->got_bytes);
 +		cifs_stats_bytes_read(tcon, rdata->got_bytes);
  		break;
- 	case MID_REQUEST_SUBMITTED:
- 	case MID_RETRY_NEEDED:
+ 	default:
+ 		if (rdata->result != -ENODATA)
 -- 
 1.8.1.2
