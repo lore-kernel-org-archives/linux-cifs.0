@@ -1,66 +1,35 @@
-From: ronnie sahlberg <ronniesahlberg@gmail.com>
-Subject: Re: Additional performance data on Pavel's smb3 multi credit patch series
-Date: Sun, 13 Jul 2014 16:21:40 -0700
-Message-ID: <CAN05THTTXU_=8rboaJfePmNDU6rNK9suMPTyXrvvnmd9CQF3Rw@mail.gmail.com>
-References: <CAH2r5muwjdPopeGCOi8a7OxAm=8cFsFKsEBywz5N1NQWotni6Q@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-	samba-technical <samba-technical@lists.samba.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>
-To: Steve French <smfrench@gmail.com>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <CAH2r5muwjdPopeGCOi8a7OxAm=8cFsFKsEBywz5N1NQWotni6Q@mail.gmail.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH v2 0/7] Optimize reading in a short read case on reconnects
+Date: Mon, 14 Jul 2014 13:01:10 +0400
+Message-ID: <1405328477-13484-1-git-send-email-pshilovsky@samba.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Impressive!
+This is the second version of the patchset that is going to make CIFS module behave according to POSIX -- return a short read if a reconnect happens during the reading.
 
-On Sun, Jul 13, 2014 at 12:23 PM, Steve French <smfrench@gmail.com> wrote:
-> Performance of Pavel's multicredit i/o SMB3 patches continues to look
-> good.  Additional informal performance results below comparing cifs
-> mounts with smb3 mounts (vers=3.0) with and without Pavel's patch set.
-> I plan to do additional testing with large rsize/wsize (default with
-> Pavel's code is 1MB).
->
-> 3.16-rc4 (Ubuntu) on client.  Server is Windows 8.1.  Both VMs on same
-> host (host disk is fairly fast SSD).
->
-> Copy to server performance increased about 20% percent
-> dd if=/dev/zero of=/mnt/targetfile bs=80M count=25
-> got similar results with or without conv=fdatasync
->
-> 1st run copying to empty directory, 2nd run copying over targetfile,
-> (pattern repeated multiple times) averaging results
->
-> New code (with Pavel's patches)
-> ---------------------------------------------
-> CIFS 167MB/s
-> SMB3 200MB/s
->
-> Existing code (without his patches)
-> ------------------------------------------------
-> SMB3 166MB/s
-> CIFS 164.5MB/s
->
-> For large file reading SMB3 performance with Pavel's patches increased
-> 76% over existing SMB3 code
-> dd of=/dev/null if=/mnt/targetfile bs=80M count=25
-> (mounting and unmounting between attempts to avoid caching effects on
-> the client)
->
-> New code (with Pavel's patches)
-> ---------------------------------------------
-> CIFS 114MB/s
-> SMB3 216MB/s
->
-> Existing code (without his patches)
-> ------------------------------------------------
-> SMB3 123MB/s
-> CIFS 110MB/s
->
-> --
-> Thanks,
->
-> Steve
+These patches are rebased on top of the series "SMB 2.1/3 multicredit requests for reading/writing" of 16 patches.
+
+Changes since v1:
+1) fixed missed update of statistics;
+2) disable short reads during reconnet on signed connections.
+
+Pavel Shilovsky (7):
+  CIFS: Indicate reconnect with ECONNABORTED error code
+  CIFS: Use separate var for the number of bytes got in async read
+  CIFS: Count got bytes in read_into_pages()
+  CIFS: Fix possible buffer corruption in cifs_user_read()
+  CIFS: Improve indentation in cifs_user_read()
+  CIFS: Optimize cifs_user_read() in a short read case on reconnects
+  CIFS: Optimize readpages in a short read case on reconnects
+
+ fs/cifs/cifsglob.h |  1 +
+ fs/cifs/cifssmb.c  | 11 +++++---
+ fs/cifs/connect.c  |  8 +++---
+ fs/cifs/file.c     | 79 ++++++++++++++++++++++++++++++++++++------------------
+ fs/cifs/smb2pdu.c  | 10 +++++--
+ 5 files changed, 74 insertions(+), 35 deletions(-)
+
+-- 
+1.8.1.2
