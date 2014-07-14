@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v2 5/7] CIFS: Improve indentation in cifs_user_read()
-Date: Mon, 14 Jul 2014 13:01:15 +0400
-Message-ID: <1405328477-13484-6-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH v2 7/7] CIFS: Optimize readpages in a short read case on reconnects
+Date: Mon, 14 Jul 2014 13:01:17 +0400
+Message-ID: <1405328477-13484-8-git-send-email-pshilovsky@samba.org>
 References: <1405328477-13484-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,56 +9,51 @@ In-Reply-To: <1405328477-13484-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDs
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+by marking pages with a data from a partially received response up-to-date.
+This is suitable for non-signed connections.
+
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/file.c | 27 +++++++++++++--------------
- 1 file changed, 13 insertions(+), 14 deletions(-)
+ fs/cifs/file.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 2927f02..6896cb5 100644
+index e42d26d..4b83d72 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -3026,28 +3026,27 @@ again:
- 			rc = wait_for_completion_killable(&rdata->done);
- 			if (rc)
- 				rc = -EINTR;
--			else if (rdata->result) {
--				rc = rdata->result;
-+			else if (rdata->result == -EAGAIN) {
- 				/* resend call if it's a retryable error */
--				if (rc == -EAGAIN) {
--					struct list_head tmp_list;
-+				struct list_head tmp_list;
+@@ -3280,25 +3280,30 @@ int cifs_file_mmap(struct file *file, struct vm_area_struct *vma)
+ static void
+ cifs_readv_complete(struct work_struct *work)
+ {
+-	unsigned int i;
++	unsigned int i, got_bytes;
+ 	struct cifs_readdata *rdata = container_of(work,
+ 						struct cifs_readdata, work);
  
--					list_del_init(&rdata->list);
--					INIT_LIST_HEAD(&tmp_list);
-+				list_del_init(&rdata->list);
-+				INIT_LIST_HEAD(&tmp_list);
++	got_bytes = rdata->got_bytes;
+ 	for (i = 0; i < rdata->nr_pages; i++) {
+ 		struct page *page = rdata->pages[i];
  
--					rc = cifs_send_async_read(rdata->offset,
-+				rc = cifs_send_async_read(rdata->offset,
- 						rdata->bytes, rdata->cfile,
- 						cifs_sb, &tmp_list);
+ 		lru_cache_add_file(page);
  
--					list_splice(&tmp_list, &rdata_list);
-+				list_splice(&tmp_list, &rdata_list);
+-		if (rdata->result == 0) {
++		if (rdata->result == 0 ||
++		    (rdata->result == -EAGAIN && got_bytes)) {
+ 			flush_dcache_page(page);
+ 			SetPageUptodate(page);
+ 		}
  
--					kref_put(&rdata->refcount,
--						cifs_uncached_readdata_release);
--					goto again;
--				}
--			} else {
-+				kref_put(&rdata->refcount,
-+					 cifs_uncached_readdata_release);
-+				goto again;
-+			} else if (rdata->result)
-+				rc = rdata->result;
-+			else
- 				rc = cifs_readdata_to_iov(rdata, to);
--			}
+ 		unlock_page(page);
+ 
+-		if (rdata->result == 0)
++		if (rdata->result == 0 ||
++		    (rdata->result == -EAGAIN && got_bytes))
+ 			cifs_readpage_to_fscache(rdata->mapping->host, page);
+ 
++		got_bytes -= min_t(unsigned int, PAGE_CACHE_SIZE, got_bytes);
 +
- 			/* if there was a short read -- discard anything left */
- 			if (rdata->got_bytes && rdata->got_bytes < rdata->bytes)
- 				rc = -ENODATA;
+ 		page_cache_release(page);
+ 		rdata->pages[i] = NULL;
+ 	}
 -- 
 1.8.1.2
