@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v2 3/7] CIFS: Count got bytes in read_into_pages()
-Date: Mon, 14 Jul 2014 13:01:13 +0400
-Message-ID: <1405328477-13484-4-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH v2 2/7] CIFS: Use separate var for the number of bytes got in async read
+Date: Mon, 14 Jul 2014 13:01:12 +0400
+Message-ID: <1405328477-13484-3-git-send-email-pshilovsky@samba.org>
 References: <1405328477-13484-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,88 +9,79 @@ In-Reply-To: <1405328477-13484-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDs
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-that let us know how many bytes we have already got before reconnect.
+and don't mix it with the number of bytes that was requested.
 
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/cifssmb.c |  1 -
- fs/cifs/file.c    | 16 ++++++++++------
- 2 files changed, 10 insertions(+), 7 deletions(-)
+ fs/cifs/cifsglob.h | 1 +
+ fs/cifs/cifssmb.c  | 6 +++---
+ fs/cifs/file.c     | 2 +-
+ fs/cifs/smb2pdu.c  | 4 ++--
+ 4 files changed, 7 insertions(+), 6 deletions(-)
 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index f33ff4c..0012e1e 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -1059,6 +1059,7 @@ struct cifs_readdata {
+ 	struct address_space		*mapping;
+ 	__u64				offset;
+ 	unsigned int			bytes;
++	unsigned int			got_bytes;
+ 	pid_t				pid;
+ 	int				result;
+ 	struct work_struct		work;
 diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index a3e424d..5d6768f 100644
+index 6ded59d..a3e424d 100644
 --- a/fs/cifs/cifssmb.c
 +++ b/fs/cifs/cifssmb.c
-@@ -1513,7 +1513,6 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+@@ -1513,7 +1513,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
  		return length;
  
  	server->total_read += length;
--	rdata->got_bytes = length;
+-	rdata->bytes = length;
++	rdata->got_bytes = length;
  
  	cifs_dbg(FYI, "total_read=%u buflen=%u remaining=%u\n",
  		 server->total_read, buflen, data_len);
+@@ -1556,8 +1556,8 @@ cifs_readv_callback(struct mid_q_entry *mid)
+ 					 rc);
+ 		}
+ 		/* FIXME: should this be counted toward the initiating task? */
+-		task_io_account_read(rdata->bytes);
+-		cifs_stats_bytes_read(tcon, rdata->bytes);
++		task_io_account_read(rdata->got_bytes);
++		cifs_stats_bytes_read(tcon, rdata->got_bytes);
+ 		break;
+ 	case MID_REQUEST_SUBMITTED:
+ 	case MID_RETRY_NEEDED:
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 7fc9bdc..f6cb765 100644
+index 0974dd2..7fc9bdc 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -2867,11 +2867,12 @@ static int
- cifs_uncached_read_into_pages(struct TCP_Server_Info *server,
- 			struct cifs_readdata *rdata, unsigned int len)
- {
--	int total_read = 0, result = 0;
-+	int result = 0;
- 	unsigned int i;
- 	unsigned int nr_pages = rdata->nr_pages;
- 	struct kvec iov;
- 
-+	rdata->got_bytes = 0;
- 	rdata->tailsz = PAGE_SIZE;
- 	for (i = 0; i < nr_pages; i++) {
- 		struct page *page = rdata->pages[i];
-@@ -2905,10 +2906,11 @@ cifs_uncached_read_into_pages(struct TCP_Server_Info *server,
- 		if (result < 0)
- 			break;
- 
--		total_read += result;
-+		rdata->got_bytes += result;
- 	}
- 
--	return total_read > 0 && result != -ECONNABORTED ? total_read : result;
-+	return rdata->got_bytes > 0 && result != -ECONNABORTED ?
-+						rdata->got_bytes : result;
- }
- 
+@@ -2839,7 +2839,7 @@ cifs_uncached_readdata_release(struct kref *refcount)
  static int
-@@ -3289,7 +3291,7 @@ static int
- cifs_readpages_read_into_pages(struct TCP_Server_Info *server,
- 			struct cifs_readdata *rdata, unsigned int len)
+ cifs_readdata_to_iov(struct cifs_readdata *rdata, struct iov_iter *iter)
  {
--	int total_read = 0, result = 0;
-+	int result = 0;
+-	size_t remaining = rdata->bytes;
++	size_t remaining = rdata->got_bytes;
  	unsigned int i;
- 	u64 eof;
- 	pgoff_t eof_index;
-@@ -3301,6 +3303,7 @@ cifs_readpages_read_into_pages(struct TCP_Server_Info *server,
- 	eof_index = eof ? (eof - 1) >> PAGE_CACHE_SHIFT : 0;
- 	cifs_dbg(FYI, "eof=%llu eof_index=%lu\n", eof, eof_index);
  
-+	rdata->got_bytes = 0;
- 	rdata->tailsz = PAGE_CACHE_SIZE;
- 	for (i = 0; i < nr_pages; i++) {
- 		struct page *page = rdata->pages[i];
-@@ -3355,10 +3358,11 @@ cifs_readpages_read_into_pages(struct TCP_Server_Info *server,
- 		if (result < 0)
- 			break;
- 
--		total_read += result;
-+		rdata->got_bytes += result;
- 	}
- 
--	return total_read > 0 && result != -ECONNABORTED ? total_read : result;
-+	return rdata->got_bytes > 0 && result != -ECONNABORTED ?
-+						rdata->got_bytes : result;
- }
- 
- static int
+ 	for (i = 0; i < rdata->nr_pages; i++) {
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 26624ee..0aabd7c 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1734,8 +1734,8 @@ smb2_readv_callback(struct mid_q_entry *mid)
+ 					 rc);
+ 		}
+ 		/* FIXME: should this be counted toward the initiating task? */
+-		task_io_account_read(rdata->bytes);
+-		cifs_stats_bytes_read(tcon, rdata->bytes);
++		task_io_account_read(rdata->got_bytes);
++		cifs_stats_bytes_read(tcon, rdata->got_bytes);
+ 		break;
+ 	case MID_REQUEST_SUBMITTED:
+ 	case MID_RETRY_NEEDED:
 -- 
 1.8.1.2
