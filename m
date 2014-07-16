@@ -1,35 +1,49 @@
-From: Ashish Sangwan <a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: Re: connecting to windows server with SMB2
-Date: Wed, 16 Jul 2014 04:08:00 +0000 (GMT)
-Message-ID: <1613860881.159901405483680198.JavaMail.weblogic@epmlwas01d>
-Reply-To: a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org
+Date: Tue, 15 Jul 2014 23:09:41 -0500
+Message-ID: <CADT32eLaBieB6driDX7OAX8GBe38BSrNgW6KRWKk6rboZ5V4OA@mail.gmail.com>
+References: <1613860881.159901405483680198.JavaMail.weblogic@epmlwas01d>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
 	Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-MIME-version: 1.0
+In-Reply-To: <1613860881.159901405483680198.JavaMail.weblogic@epmlwas01d>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-SGkgU2hpcmlzaCwNCg0KTE1Db21wYXRpYmlsaXR5TGV2ZWwgaXMgc2V0IGF0IDINCg0KUmVnYXJk
-cywNCkFzaGlzaA0KLS0tLS0tLSBPcmlnaW5hbCBNZXNzYWdlIC0tLS0tLS0NClNlbmRlciA6IFNo
-aXJpc2ggUGFyZ2FvbmthcjxzaGlyaXNocGFyZ2FvbmthckBnbWFpbC5jb20+DQpEYXRlIDogSnVs
-IDEyLCAyMDE0IDAyOjM1IChHTVQrMDU6MzApDQpUaXRsZSA6IFJlOiBjb25uZWN0aW5nIHRvIHdp
-bmRvd3Mgc2VydmVyIHdpdGggU01CMg0KDQpDYW4geW91IGNoZWNrIHRoZSB2YWx1ZSBvZiB0aGUg
-cmVnaXN0cnkgc2V0dGluZyBvbiB0aGUgc2VydmVyPw0KDQpIS0VZX0xPQ0FMX01BQ0hJTkVcU3lz
-dGVtXEN1cnJlbnRDb250cm9sU2V0XENvbnRyb2xcTFNBXExNQ29tcGF0aWJpbGl0eUxldmVsDQoN
-Ck9uIFRodSwgSnVsIDEwLCAyMDE0IGF0IDU6MjYgQU0sIEFzaGlzaCBTYW5nd2FuIHdyb3RlOg0K
-PiBJIGFtIHVzaW5nIGtlcm5lbCB2ZXJzaW9uIDMuOC4xMyBhbmQgd2luZG93cyA3Lg0KPg0KPiBU
-aGUgYmVsb3cgY29tbWFuZCB3b3JrcyBzdWNjZXNzZnVsbHk6DQo+IExpbnV4Iz4gbW91bnQgLXQg
-Y2lmcyAvLzEwNy4xMDkuMjI0LjE0Ny9zaGFyZWZvbGRlciAvbW50IC1vIHVzZXI9YS5zYW5nd2Fu
-IC1vIHBhc3M9eHh4eCAtbyB2ZXJzPTEuMCAtbyBzZWM9bnRsbQ0KPg0KPiBPdGhlciB0aGFuIDEu
-MCwgYWxsIGFyZSBmYWlsOg0KPiBMaW51eCM+IG1vdW50IC10IGNpZnMgLy8xMDcuMTA5LjIyNC4x
-NDcvc2hhcmVmb2xkZXIgL21udCAtbyB1c2VyPWEuc2FuZ3dhbiAtbyBwYXNzPXh4eHggLW8gdmVy
-cz0yLjAgLW8gc2VjPW50bG0NCj4gWyAwXVsgICA2NC4yNzYwMDBdIFN0YXR1cyBjb2RlIHJldHVy
-bmVkIDB4YzAwMDAwNmQgU1RBVFVTX0xPR09OX0ZBSUxVUkUNCj4gWyAwXVsgICA2NC4yODQwMDBd
-IENJRlMgVkZTOiBTZW5kIGVycm9yIGluIFNlc3NTZXR1cCA9IC0xMw0KPg0KPiBUcmllZCB3aXRo
-IHNlYz1udGxtdjIvbm9uZS9sYW5tYW4va3JiNSwgbm9uZSBvZiB0aGVtIHdvcmtlZC4NCj4gSGVs
-cCBwbGVhc2UhIQ==
+Can you change it to 3 (or higher upto 5), I think then ntlmv2 will
+start working.
+
+
+
+On Tue, Jul 15, 2014 at 11:08 PM, Ashish Sangwan <a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org> wrote:
+> Hi Shirish,
+>
+> LMCompatibilityLevel is set at 2
+>
+> Regards,
+> Ashish
+> ------- Original Message -------
+> Sender : Shirish Pargaonkar<shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Date : Jul 12, 2014 02:35 (GMT+05:30)
+> Title : Re: connecting to windows server with SMB2
+>
+> Can you check the value of the registry setting on the server?
+>
+> HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\LSA\LMCompatibilityLevel
+>
+> On Thu, Jul 10, 2014 at 5:26 AM, Ashish Sangwan wrote:
+>> I am using kernel version 3.8.13 and windows 7.
+>>
+>> The below command works successfully:
+>> Linux#> mount -t cifs //107.109.224.147/sharefolder /mnt -o user=a.sangwan -o pass=xxxx -o vers=1.0 -o sec=ntlm
+>>
+>> Other than 1.0, all are fail:
+>> Linux#> mount -t cifs //107.109.224.147/sharefolder /mnt -o user=a.sangwan -o pass=xxxx -o vers=2.0 -o sec=ntlm
+>> [ 0][   64.276000] Status code returned 0xc000006d STATUS_LOGON_FAILURE
+>> [ 0][   64.284000] CIFS VFS: Send error in SessSetup = -13
+>>
+>> Tried with sec=ntlmv2/none/lanman/krb5, none of them worked.
+>> Help please!!
