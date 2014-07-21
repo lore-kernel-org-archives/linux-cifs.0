@@ -1,169 +1,140 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH v2 07/16] CIFS: Separate filling pages from iovec write
-Date: Mon, 21 Jul 2014 10:48:25 +0400
-Message-ID: <CAKywueTLJKhHOL6WoyRha8+M3g4bLiv5+swQpoFPB+AjkGtM3A@mail.gmail.com>
+Subject: Re: [PATCH v2 08/16] CIFS: Separate writing from iovec write
+Date: Mon, 21 Jul 2014 10:56:12 +0400
+Message-ID: <CAKywueQpOYCXOawXcj1hbgCzLG0veAbFEwqsxDMU8+tgyA+oew@mail.gmail.com>
 References: <1403863073-19526-1-git-send-email-pshilovsky@samba.org>
-	<1403863073-19526-8-git-send-email-pshilovsky@samba.org>
-	<CADT32e+RhpebBn-2k-GrNomJ_=uY8v12KmWHFbd+NozNSi1t9w@mail.gmail.com>
+	<1403863073-19526-9-git-send-email-pshilovsky@samba.org>
+	<CADT32e+2Z_ryfg8JznJoFt9=4mSU1bVYmeR-+nguXUq1vQVMMg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32e+RhpebBn-2k-GrNomJ_=uY8v12KmWHFbd+NozNSi1t9w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CADT32e+2Z_ryfg8JznJoFt9=4mSU1bVYmeR-+nguXUq1vQVMMg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2014-07-21 7:59 GMT+04:00 Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> Like put_page() for rc = 0 unused pages was moved to wdata_fill_from_iovec(),
-> probably move put_page in case of -EFAULT also to wdata_fill_from_iovec()?
-> So just kfree and break if(rc)?
-> Also, wdata_fill_from_iovec() does not need rc, it can just return 0
-> in case of no error?
-
-Yes, or may be move the last loop from wdata_fill_from_iovec() to the caller.
-
->
->
+2014-07-21 9:05 GMT+04:00 Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
 > On Fri, Jun 27, 2014 at 4:57 AM, Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 >> Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 >> ---
->>  fs/cifs/file.c | 85 +++++++++++++++++++++++++++++++++-------------------------
->>  1 file changed, 48 insertions(+), 37 deletions(-)
+>>  fs/cifs/file.c | 79 ++++++++++++++++++++++++++++++++++------------------------
+>>  1 file changed, 47 insertions(+), 32 deletions(-)
 >>
 >> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
->> index 21f9be0..e2a735a 100644
+>> index e2a735a..06080e0 100644
 >> --- a/fs/cifs/file.c
 >> +++ b/fs/cifs/file.c
->> @@ -2423,11 +2423,56 @@ cifs_uncached_retry_writev(struct cifs_writedata *wdata)
+>> @@ -2468,41 +2468,17 @@ wdata_fill_from_iovec(struct cifs_writedata *wdata, struct iov_iter *from,
 >>         return rc;
 >>  }
 >>
+>> -static ssize_t
+>> -cifs_iovec_write(struct file *file, struct iov_iter *from, loff_t *poffset)
 >> +static int
->> +wdata_fill_from_iovec(struct cifs_writedata *wdata, struct iov_iter *from,
->> +                     size_t *len, unsigned long nr_pages)
->> +{
+>> +cifs_write_from_iter(loff_t offset, size_t len, struct iov_iter *from,
+>> +                    struct cifsFileInfo *open_file,
+>> +                    struct cifs_sb_info *cifs_sb, struct list_head *wdata_list)
+>>  {
 >> +       int rc = 0;
->> +       size_t save_len, copied, bytes, cur_len = *len;
->> +       unsigned long i;
->> +
->> +       save_len = cur_len;
->> +       for (i = 0; i < nr_pages; i++) {
->> +               bytes = min_t(const size_t, cur_len, PAGE_SIZE);
->> +               copied = copy_page_from_iter(wdata->pages[i], 0, bytes, from);
->> +               cur_len -= copied;
->> +               /*
->> +                * If we didn't copy as much as we expected, then that
->> +                * may mean we trod into an unmapped area. Stop copying
->> +                * at that point. On the next pass through the big
->> +                * loop, we'll likely end up getting a zero-length
->> +                * write and bailing out of it.
->> +                */
->> +               if (copied < bytes)
->> +                       break;
->> +       }
->> +       cur_len = save_len - cur_len;
->> +       *len = cur_len;
->> +
->> +       /*
->> +        * If we have no data to send, then that probably means that
->> +        * the copy above failed altogether. That's most likely because
->> +        * the address in the iovec was bogus. Return -EFAULT and let
->> +        * the caller free anything we allocated and bail out.
->> +        */
->> +       if (!cur_len)
->> +               return -EFAULT;
->> +
->> +       /*
->> +        * i + 1 now represents the number of pages we actually used in
->> +        * the copy phase above. Bring nr_pages down to that, and free
->> +        * any pages that we didn't use.
->> +        */
->> +       for ( ; nr_pages > i + 1; nr_pages--)
->> +               put_page(wdata->pages[nr_pages - 1]);
+>> +       size_t cur_len;
+>>         unsigned long nr_pages, i;
+>> -       size_t len, cur_len;
+>> -       ssize_t total_written = 0;
+>> -       loff_t offset;
+>> -       struct cifsFileInfo *open_file;
+>> -       struct cifs_tcon *tcon;
+>> -       struct cifs_sb_info *cifs_sb;
+>> -       struct cifs_writedata *wdata, *tmp;
+>> -       struct list_head wdata_list;
+>> -       int rc;
+>> +       struct cifs_writedata *wdata;
+>>         pid_t pid;
+>>
+>> -       len = iov_iter_count(from);
+>> -       rc = generic_write_checks(file, poffset, &len, 0);
+>> -       if (rc)
+>> -               return rc;
+>> -
+>> -       if (!len)
+>> -               return 0;
+>> -
+>> -       iov_iter_truncate(from, len);
+>> -
+>> -       INIT_LIST_HEAD(&wdata_list);
+>> -       cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
+>> -       open_file = file->private_data;
+>> -       tcon = tlink_tcon(open_file->tlink);
+>> -
+>> -       if (!tcon->ses->server->ops->async_writev)
+>> -               return -ENOSYS;
+>> -
+>> -       offset = *poffset;
+>> -
+>>         if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
+>>                 pid = open_file->pid;
+>>         else
+>> @@ -2546,11 +2522,50 @@ cifs_iovec_write(struct file *file, struct iov_iter *from, loff_t *poffset)
+>>                         break;
+>>                 }
+>>
+>> -               list_add_tail(&wdata->list, &wdata_list);
+>> +               list_add_tail(&wdata->list, wdata_list);
+>>                 offset += cur_len;
+>>                 len -= cur_len;
+>>         } while (len > 0);
+>>
 >> +       return rc;
 >> +}
-
-Ah, nr_pages is updated here but we don't return it to the caller!
-That should be fixed at first.
-
 >> +
->>  static ssize_t
->>  cifs_iovec_write(struct file *file, struct iov_iter *from, loff_t *poffset)
->>  {
->>         unsigned long nr_pages, i;
->> -       size_t bytes, copied, len, cur_len;
->> +       size_t len, cur_len;
->>         ssize_t total_written = 0;
->>         loff_t offset;
->>         struct cifsFileInfo *open_file;
->> @@ -2464,8 +2509,6 @@ cifs_iovec_write(struct file *file, struct iov_iter *from, loff_t *poffset)
->>                 pid = current->tgid;
->>
->>         do {
->> -               size_t save_len;
->> -
->>                 nr_pages = get_numpages(cifs_sb->wsize, len, &cur_len);
->>                 wdata = cifs_writedata_alloc(nr_pages,
->>                                              cifs_uncached_writev_complete);
->> @@ -2480,46 +2523,14 @@ cifs_iovec_write(struct file *file, struct iov_iter *from, loff_t *poffset)
->>                         break;
->>                 }
->>
->> -               save_len = cur_len;
->> -               for (i = 0; i < nr_pages; i++) {
->> -                       bytes = min_t(size_t, cur_len, PAGE_SIZE);
->> -                       copied = copy_page_from_iter(wdata->pages[i], 0, bytes,
->> -                                                    from);
->> -                       cur_len -= copied;
->> -                       /*
->> -                        * If we didn't copy as much as we expected, then that
->> -                        * may mean we trod into an unmapped area. Stop copying
->> -                        * at that point. On the next pass through the big
->> -                        * loop, we'll likely end up getting a zero-length
->> -                        * write and bailing out of it.
->> -                        */
->> -                       if (copied < bytes)
->> -                               break;
->> -               }
->> -               cur_len = save_len - cur_len;
->> -
->> -               /*
->> -                * If we have no data to send, then that probably means that
->> -                * the copy above failed altogether. That's most likely because
->> -                * the address in the iovec was bogus. Set the rc to -EFAULT,
->> -                * free anything we allocated and bail out.
->> -                */
->> -               if (!cur_len) {
->> +               rc = wdata_fill_from_iovec(wdata, from, &cur_len, nr_pages);
->> +               if (rc) {
->>                         for (i = 0; i < nr_pages; i++)
->>                                 put_page(wdata->pages[i]);
->>                         kfree(wdata);
->> -                       rc = -EFAULT;
->>                         break;
->>                 }
->>
->> -               /*
->> -                * i + 1 now represents the number of pages we actually used in
->> -                * the copy phase above. Bring nr_pages down to that, and free
->> -                * any pages that we didn't use.
->> -                */
->> -               for ( ; nr_pages > i + 1; nr_pages--)
->> -                       put_page(wdata->pages[nr_pages - 1]);
->> -
->>                 wdata->sync_mode = WB_SYNC_ALL;
->>                 wdata->nr_pages = nr_pages;
->>                 wdata->offset = (__u64)offset;
->> --
->> 1.8.1.2
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> +static ssize_t
+>> +cifs_iovec_write(struct file *file, struct iov_iter *from, loff_t *poffset)
+>> +{
+>> +       size_t len;
+>> +       ssize_t total_written = 0;
+>> +       loff_t offset;
+>> +       struct cifsFileInfo *open_file;
+>> +       struct cifs_tcon *tcon;
+>> +       struct cifs_sb_info *cifs_sb;
+>> +       struct cifs_writedata *wdata, *tmp;
+>> +       struct list_head wdata_list;
+>> +       int rc;
+>> +
+>> +       len = iov_iter_count(from);
+>> +       rc = generic_write_checks(file, poffset, &len, 0);
+>> +       if (rc)
+>> +               return rc;
+>> +
+>> +       if (!len)
+>> +               return 0;
+>> +
+>> +       iov_iter_truncate(from, len);
+>> +
+>> +       INIT_LIST_HEAD(&wdata_list);
+>> +       cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
+>> +       open_file = file->private_data;
+>> +       tcon = tlink_tcon(open_file->tlink);
+>> +
+>> +       if (!tcon->ses->server->ops->async_writev)
+>> +               return -ENOSYS;
+>> +
+>> +       offset = *poffset;
+>
+> we do not use offset in this function after assignment
 
+Yes!
 
+>
+>> +
+>> +       rc = cifs_write_from_iter(*poffset, len, from, open_file, cifs_sb,
+>> +                                 &wdata_list);
+>
+> and do not act on the value of rc (if ENOMEM) here.
+>
+
+This patch doesn't change the logic of the function: if at least one
+write succeeds, we return a short write regardless of any error from
+other writes.
 
 -- 
 Best regards,
