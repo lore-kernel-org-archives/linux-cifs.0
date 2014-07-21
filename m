@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v3 07/16] CIFS: Separate filling pages from iovec write
-Date: Mon, 21 Jul 2014 19:45:49 +0400
-Message-ID: <1405957558-18476-8-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH v3 12/16] CIFS: Fix rsize usage in readpages
+Date: Mon, 21 Jul 2014 19:45:54 +0400
+Message-ID: <1405957558-18476-13-git-send-email-pshilovsky@samba.org>
 References: <1405957558-18476-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,130 +9,105 @@ In-Reply-To: <1405957558-18476-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDs
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+If a server changes maximum buffer size for read (rsize) requests
+on reconnect we can fail on repeating with a big size buffer on
+-EAGAIN error in readpages. Fix this by checking rsize all the
+time before repeating requests.
+
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/file.c | 84 ++++++++++++++++++++++++++++++++++------------------------
- 1 file changed, 50 insertions(+), 34 deletions(-)
+ fs/cifs/file.c | 41 ++++++++++++++++++++++++++---------------
+ 1 file changed, 26 insertions(+), 15 deletions(-)
 
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index ff4a9c3..f96f61c 100644
+index bec48f1..d627918 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -2423,11 +2423,53 @@ cifs_uncached_retry_writev(struct cifs_writedata *wdata)
- 	return rc;
- }
+@@ -3349,6 +3349,8 @@ readpages_get_pages(struct address_space *mapping, struct list_head *page_list,
+ 	unsigned int expected_index;
+ 	int rc;
  
-+static int
-+wdata_fill_from_iovec(struct cifs_writedata *wdata, struct iov_iter *from,
-+		      size_t *len, unsigned long *num_pages)
-+{
-+	size_t save_len, copied, bytes, cur_len = *len;
-+	unsigned long i, nr_pages = *num_pages;
++	INIT_LIST_HEAD(tmplist);
 +
-+	save_len = cur_len;
-+	for (i = 0; i < nr_pages; i++) {
-+		bytes = min_t(const size_t, cur_len, PAGE_SIZE);
-+		copied = copy_page_from_iter(wdata->pages[i], 0, bytes, from);
-+		cur_len -= copied;
-+		/*
-+		 * If we didn't copy as much as we expected, then that
-+		 * may mean we trod into an unmapped area. Stop copying
-+		 * at that point. On the next pass through the big
-+		 * loop, we'll likely end up getting a zero-length
-+		 * write and bailing out of it.
-+		 */
-+		if (copied < bytes)
-+			break;
-+	}
-+	cur_len = save_len - cur_len;
-+	*len = cur_len;
-+
-+	/*
-+	 * If we have no data to send, then that probably means that
-+	 * the copy above failed altogether. That's most likely because
-+	 * the address in the iovec was bogus. Return -EFAULT and let
-+	 * the caller free anything we allocated and bail out.
-+	 */
-+	if (!cur_len)
-+		return -EFAULT;
-+
-+	/*
-+	 * i + 1 now represents the number of pages we actually used in
-+	 * the copy phase above.
-+	 */
-+	*num_pages = i + 1;
-+	return 0;
-+}
-+
- static ssize_t
- cifs_iovec_write(struct file *file, struct iov_iter *from, loff_t *poffset)
- {
--	unsigned long nr_pages, i;
--	size_t bytes, copied, len, cur_len;
-+	unsigned long nr_pages, num_pages, i;
-+	size_t len, cur_len;
- 	ssize_t total_written = 0;
- 	loff_t offset;
- 	struct cifsFileInfo *open_file;
-@@ -2464,8 +2506,6 @@ cifs_iovec_write(struct file *file, struct iov_iter *from, loff_t *poffset)
+ 	page = list_entry(page_list->prev, struct page, lru);
+ 
+ 	/*
+@@ -3404,19 +3406,10 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
+ 	struct list_head tmplist;
+ 	struct cifsFileInfo *open_file = file->private_data;
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
+-	unsigned int rsize = cifs_sb->rsize;
++	struct TCP_Server_Info *server;
+ 	pid_t pid;
+ 
+ 	/*
+-	 * Give up immediately if rsize is too small to read an entire page.
+-	 * The VFS will fall back to readpage. We should never reach this
+-	 * point however since we set ra_pages to 0 when the rsize is smaller
+-	 * than a cache page.
+-	 */
+-	if (unlikely(rsize < PAGE_CACHE_SIZE))
+-		return 0;
+-
+-	/*
+ 	 * Reads as many pages as possible from fscache. Returns -ENOBUFS
+ 	 * immediately if the cookie is negative
+ 	 *
+@@ -3434,7 +3427,7 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
  		pid = current->tgid;
  
- 	do {
--		size_t save_len;
--
- 		nr_pages = get_numpages(cifs_sb->wsize, len, &cur_len);
- 		wdata = cifs_writedata_alloc(nr_pages,
- 					     cifs_uncached_writev_complete);
-@@ -2480,44 +2520,20 @@ cifs_iovec_write(struct file *file, struct iov_iter *from, loff_t *poffset)
+ 	rc = 0;
+-	INIT_LIST_HEAD(&tmplist);
++	server = tlink_tcon(open_file->tlink)->ses->server;
+ 
+ 	cifs_dbg(FYI, "%s: file=%p mapping=%p num_pages=%u\n",
+ 		 __func__, file, mapping, num_pages);
+@@ -3456,8 +3449,17 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
+ 		struct page *page, *tpage;
+ 		struct cifs_readdata *rdata;
+ 
+-		rc = readpages_get_pages(mapping, page_list, rsize, &tmplist,
+-					 &nr_pages, &offset, &bytes);
++		/*
++		 * Give up immediately if rsize is too small to read an entire
++		 * page. The VFS will fall back to readpage. We should never
++		 * reach this point however since we set ra_pages to 0 when the
++		 * rsize is smaller than a cache page.
++		 */
++		if (unlikely(cifs_sb->rsize < PAGE_CACHE_SIZE))
++			return 0;
++
++		rc = readpages_get_pages(mapping, page_list, cifs_sb->rsize,
++					 &tmplist, &nr_pages, &offset, &bytes);
+ 		if (rc)
  			break;
+ 
+@@ -3487,15 +3489,24 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
+ 			rdata->pages[rdata->nr_pages++] = page;
  		}
  
--		save_len = cur_len;
--		for (i = 0; i < nr_pages; i++) {
--			bytes = min_t(size_t, cur_len, PAGE_SIZE);
--			copied = copy_page_from_iter(wdata->pages[i], 0, bytes,
--						     from);
--			cur_len -= copied;
--			/*
--			 * If we didn't copy as much as we expected, then that
--			 * may mean we trod into an unmapped area. Stop copying
--			 * at that point. On the next pass through the big
--			 * loop, we'll likely end up getting a zero-length
--			 * write and bailing out of it.
--			 */
--			if (copied < bytes)
--				break;
--		}
--		cur_len = save_len - cur_len;
--
--		/*
--		 * If we have no data to send, then that probably means that
--		 * the copy above failed altogether. That's most likely because
--		 * the address in the iovec was bogus. Set the rc to -EFAULT,
--		 * free anything we allocated and bail out.
--		 */
--		if (!cur_len) {
-+		num_pages = nr_pages;
-+		rc = wdata_fill_from_iovec(wdata, from, &cur_len, &num_pages);
+-		rc = cifs_retry_async_readv(rdata);
+-		if (rc != 0) {
++		if (!rdata->cfile->invalidHandle ||
++		    !cifs_reopen_file(rdata->cfile, true))
++			rc = server->ops->async_readv(rdata);
 +		if (rc) {
- 			for (i = 0; i < nr_pages; i++)
- 				put_page(wdata->pages[i]);
- 			kfree(wdata);
--			rc = -EFAULT;
+ 			for (i = 0; i < rdata->nr_pages; i++) {
+ 				page = rdata->pages[i];
+ 				lru_cache_add_file(page);
+ 				unlock_page(page);
+ 				page_cache_release(page);
++				if (rc == -EAGAIN)
++					list_add_tail(&page->lru, &tmplist);
+ 			}
+ 			kref_put(&rdata->refcount, cifs_readdata_release);
++			if (rc == -EAGAIN) {
++				/* Re-add pages to the page_list and retry */
++				list_splice(&tmplist, page_list);
++				continue;
++			}
  			break;
  		}
  
- 		/*
--		 * i + 1 now represents the number of pages we actually used in
--		 * the copy phase above. Bring nr_pages down to that, and free
--		 * any pages that we didn't use.
-+		 * Bring nr_pages down to the number of pages we actually used,
-+		 * and free any pages that we didn't use.
- 		 */
--		for ( ; nr_pages > i + 1; nr_pages--)
-+		for ( ; nr_pages > num_pages; nr_pages--)
- 			put_page(wdata->pages[nr_pages - 1]);
- 
- 		wdata->sync_mode = WB_SYNC_ALL;
 -- 
 1.8.1.2
