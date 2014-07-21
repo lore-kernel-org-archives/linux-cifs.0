@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v3 04/16] CIFS: Separate pages initialization from writepages
-Date: Mon, 21 Jul 2014 19:45:46 +0400
-Message-ID: <1405957558-18476-5-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH v3 05/16] CIFS: Fix wsize usage in writepages
+Date: Mon, 21 Jul 2014 19:45:47 +0400
+Message-ID: <1405957558-18476-6-git-send-email-pshilovsky@samba.org>
 References: <1405957558-18476-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,94 +9,68 @@ In-Reply-To: <1405957558-18476-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDs
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Reviewed-by: Shirish Pargaonkar <spargaonkar-IBi9RG/b67k@public.gmane.org>
+If a server change maximum buffer size for write (wsize) requests
+on reconnect we can fail on repeating with a big size buffer on
+-EAGAIN error in writepages. Fix this by checking wsize all the
+time before repeating request in writepages.
+
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/file.c | 56 ++++++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 36 insertions(+), 20 deletions(-)
+ fs/cifs/file.c | 25 ++++++++++++++-----------
+ 1 file changed, 14 insertions(+), 11 deletions(-)
 
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index e76581f..0064d38f 100644
+index 0064d38f..ff4a9c3 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -1878,6 +1878,40 @@ static int cifs_partialpagewrite(struct page *page, unsigned from, unsigned to)
- 	return rc;
- }
+@@ -2009,19 +2009,17 @@ wdata_send_pages(struct cifs_writedata *wdata, unsigned int nr_pages,
+ 			(loff_t)PAGE_CACHE_SIZE);
+ 	wdata->bytes = ((nr_pages - 1) * PAGE_CACHE_SIZE) + wdata->tailsz;
  
-+static struct cifs_writedata *
-+wdata_alloc_and_fillpages(pgoff_t tofind, struct address_space *mapping,
-+			  pgoff_t end, pgoff_t *index,
-+			  unsigned int *found_pages)
-+{
-+	unsigned int nr_pages;
-+	struct page **pages;
-+	struct cifs_writedata *wdata;
-+
-+	wdata = cifs_writedata_alloc((unsigned int)tofind,
-+				     cifs_writev_complete);
-+	if (!wdata)
-+		return NULL;
-+
-+	/*
-+	 * find_get_pages_tag seems to return a max of 256 on each
-+	 * iteration, so we must call it several times in order to
-+	 * fill the array or the wsize is effectively limited to
-+	 * 256 * PAGE_CACHE_SIZE.
-+	 */
-+	*found_pages = 0;
-+	pages = wdata->pages;
-+	do {
-+		nr_pages = find_get_pages_tag(mapping, index,
-+					      PAGECACHE_TAG_DIRTY, tofind,
-+					      pages);
-+		*found_pages += nr_pages;
-+		tofind -= nr_pages;
-+		pages += nr_pages;
-+	} while (nr_pages && tofind && *index <= end);
-+
-+	return wdata;
-+}
-+
- static unsigned int
- wdata_prepare_pages(struct cifs_writedata *wdata, unsigned int found_pages,
- 		    struct address_space *mapping,
-@@ -2025,35 +2059,17 @@ retry:
+-	do {
+-		if (wdata->cfile != NULL)
+-			cifsFileInfo_put(wdata->cfile);
+-		wdata->cfile = find_writable_file(CIFS_I(mapping->host), false);
+-		if (!wdata->cfile) {
+-			cifs_dbg(VFS, "No writable handles for inode\n");
+-			rc = -EBADF;
+-			break;
+-		}
++	if (wdata->cfile != NULL)
++		cifsFileInfo_put(wdata->cfile);
++	wdata->cfile = find_writable_file(CIFS_I(mapping->host), false);
++	if (!wdata->cfile) {
++		cifs_dbg(VFS, "No writable handles for inode\n");
++		rc = -EBADF;
++	} else {
+ 		wdata->pid = wdata->cfile->pid;
+ 		server = tlink_tcon(wdata->cfile->tlink)->ses->server;
+ 		rc = server->ops->async_writev(wdata, cifs_writedata_release);
+-	} while (wbc->sync_mode == WB_SYNC_ALL && rc == -EAGAIN);
++	}
+ 
+ 	for (i = 0; i < nr_pages; ++i)
+ 		unlock_page(wdata->pages[i]);
+@@ -2058,7 +2056,7 @@ static int cifs_writepages(struct address_space *mapping,
+ retry:
  	while (!done && index <= end) {
  		unsigned int i, nr_pages, found_pages;
- 		pgoff_t next = 0, tofind;
--		struct page **pages;
+-		pgoff_t next = 0, tofind;
++		pgoff_t next = 0, tofind, saved_index = index;
  
  		tofind = min((cifs_sb->wsize / PAGE_CACHE_SIZE) - 1,
  				end - index) + 1;
- 
--		wdata = cifs_writedata_alloc((unsigned int)tofind,
--					     cifs_writev_complete);
-+		wdata = wdata_alloc_and_fillpages(tofind, mapping, end, &index,
-+						  &found_pages);
- 		if (!wdata) {
- 			rc = -ENOMEM;
- 			break;
+@@ -2102,6 +2100,11 @@ retry:
  		}
+ 		kref_put(&wdata->refcount, cifs_writedata_release);
  
--		/*
--		 * find_get_pages_tag seems to return a max of 256 on each
--		 * iteration, so we must call it several times in order to
--		 * fill the array or the wsize is effectively limited to
--		 * 256 * PAGE_CACHE_SIZE.
--		 */
--		found_pages = 0;
--		pages = wdata->pages;
--		do {
--			nr_pages = find_get_pages_tag(mapping, &index,
--							PAGECACHE_TAG_DIRTY,
--							tofind, pages);
--			found_pages += nr_pages;
--			tofind -= nr_pages;
--			pages += nr_pages;
--		} while (nr_pages && tofind && index <= end);
--
- 		if (found_pages == 0) {
- 			kref_put(&wdata->refcount, cifs_writedata_release);
- 			break;
++		if (wbc->sync_mode == WB_SYNC_ALL && rc == -EAGAIN) {
++			index = saved_index;
++			continue;
++		}
++
+ 		wbc->nr_to_write -= nr_pages;
+ 		if (wbc->nr_to_write <= 0)
+ 			done = true;
 -- 
 1.8.1.2
