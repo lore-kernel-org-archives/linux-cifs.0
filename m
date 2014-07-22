@@ -1,149 +1,128 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v3 07/16] CIFS: Separate filling pages from iovec write
-Date: Mon, 21 Jul 2014 21:40:15 -0500
-Message-ID: <CADT32eJiRAyAzdm37o5rrwFtm9H+LMbOUDUwLKd9qwUQmEtdEQ@mail.gmail.com>
+Subject: Re: [PATCH v3 08/16] CIFS: Separate writing from iovec write
+Date: Mon, 21 Jul 2014 21:42:50 -0500
+Message-ID: <CADT32eK=pR6ZXoRe47JttdmYf_-oxZXanY3bnqBfEhrnPWTEDA@mail.gmail.com>
 References: <1405957558-18476-1-git-send-email-pshilovsky@samba.org>
-	<1405957558-18476-8-git-send-email-pshilovsky@samba.org>
+	<1405957558-18476-9-git-send-email-pshilovsky@samba.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 To: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1405957558-18476-8-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <1405957558-18476-9-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
-
-Looks correct (fixing the return value from the function
-wdata_fill_from_iovec())
 
 Reviewed-by: Shirish Pargaonkar <spargaonkar-IBi9RG/b67k@public.gmane.org>
 
 On Mon, Jul 21, 2014 at 10:45 AM, Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 > Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 > ---
->  fs/cifs/file.c | 84 ++++++++++++++++++++++++++++++++++------------------------
->  1 file changed, 50 insertions(+), 34 deletions(-)
+>  fs/cifs/file.c | 76 +++++++++++++++++++++++++++++++++-------------------------
+>  1 file changed, 44 insertions(+), 32 deletions(-)
 >
 > diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index ff4a9c3..f96f61c 100644
+> index f96f61c..6660698 100644
 > --- a/fs/cifs/file.c
 > +++ b/fs/cifs/file.c
-> @@ -2423,11 +2423,53 @@ cifs_uncached_retry_writev(struct cifs_writedata *wdata)
->         return rc;
+> @@ -2465,41 +2465,17 @@ wdata_fill_from_iovec(struct cifs_writedata *wdata, struct iov_iter *from,
+>         return 0;
 >  }
 >
+> -static ssize_t
+> -cifs_iovec_write(struct file *file, struct iov_iter *from, loff_t *poffset)
 > +static int
-> +wdata_fill_from_iovec(struct cifs_writedata *wdata, struct iov_iter *from,
-> +                     size_t *len, unsigned long *num_pages)
-> +{
-> +       size_t save_len, copied, bytes, cur_len = *len;
-> +       unsigned long i, nr_pages = *num_pages;
-> +
-> +       save_len = cur_len;
-> +       for (i = 0; i < nr_pages; i++) {
-> +               bytes = min_t(const size_t, cur_len, PAGE_SIZE);
-> +               copied = copy_page_from_iter(wdata->pages[i], 0, bytes, from);
-> +               cur_len -= copied;
-> +               /*
-> +                * If we didn't copy as much as we expected, then that
-> +                * may mean we trod into an unmapped area. Stop copying
-> +                * at that point. On the next pass through the big
-> +                * loop, we'll likely end up getting a zero-length
-> +                * write and bailing out of it.
-> +                */
-> +               if (copied < bytes)
-> +                       break;
-> +       }
-> +       cur_len = save_len - cur_len;
-> +       *len = cur_len;
-> +
-> +       /*
-> +        * If we have no data to send, then that probably means that
-> +        * the copy above failed altogether. That's most likely because
-> +        * the address in the iovec was bogus. Return -EFAULT and let
-> +        * the caller free anything we allocated and bail out.
-> +        */
-> +       if (!cur_len)
-> +               return -EFAULT;
-> +
-> +       /*
-> +        * i + 1 now represents the number of pages we actually used in
-> +        * the copy phase above.
-> +        */
-> +       *num_pages = i + 1;
-> +       return 0;
+> +cifs_write_from_iter(loff_t offset, size_t len, struct iov_iter *from,
+> +                    struct cifsFileInfo *open_file,
+> +                    struct cifs_sb_info *cifs_sb, struct list_head *wdata_list)
+>  {
+> +       int rc = 0;
+> +       size_t cur_len;
+>         unsigned long nr_pages, num_pages, i;
+> -       size_t len, cur_len;
+> -       ssize_t total_written = 0;
+> -       loff_t offset;
+> -       struct cifsFileInfo *open_file;
+> -       struct cifs_tcon *tcon;
+> -       struct cifs_sb_info *cifs_sb;
+> -       struct cifs_writedata *wdata, *tmp;
+> -       struct list_head wdata_list;
+> -       int rc;
+> +       struct cifs_writedata *wdata;
+>         pid_t pid;
+>
+> -       len = iov_iter_count(from);
+> -       rc = generic_write_checks(file, poffset, &len, 0);
+> -       if (rc)
+> -               return rc;
+> -
+> -       if (!len)
+> -               return 0;
+> -
+> -       iov_iter_truncate(from, len);
+> -
+> -       INIT_LIST_HEAD(&wdata_list);
+> -       cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
+> -       open_file = file->private_data;
+> -       tcon = tlink_tcon(open_file->tlink);
+> -
+> -       if (!tcon->ses->server->ops->async_writev)
+> -               return -ENOSYS;
+> -
+> -       offset = *poffset;
+> -
+>         if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
+>                 pid = open_file->pid;
+>         else
+> @@ -2551,11 +2527,47 @@ cifs_iovec_write(struct file *file, struct iov_iter *from, loff_t *poffset)
+>                         break;
+>                 }
+>
+> -               list_add_tail(&wdata->list, &wdata_list);
+> +               list_add_tail(&wdata->list, wdata_list);
+>                 offset += cur_len;
+>                 len -= cur_len;
+>         } while (len > 0);
+>
+> +       return rc;
 > +}
 > +
->  static ssize_t
->  cifs_iovec_write(struct file *file, struct iov_iter *from, loff_t *poffset)
->  {
-> -       unsigned long nr_pages, i;
-> -       size_t bytes, copied, len, cur_len;
-> +       unsigned long nr_pages, num_pages, i;
-> +       size_t len, cur_len;
->         ssize_t total_written = 0;
->         loff_t offset;
->         struct cifsFileInfo *open_file;
-> @@ -2464,8 +2506,6 @@ cifs_iovec_write(struct file *file, struct iov_iter *from, loff_t *poffset)
->                 pid = current->tgid;
->
->         do {
-> -               size_t save_len;
-> -
->                 nr_pages = get_numpages(cifs_sb->wsize, len, &cur_len);
->                 wdata = cifs_writedata_alloc(nr_pages,
->                                              cifs_uncached_writev_complete);
-> @@ -2480,44 +2520,20 @@ cifs_iovec_write(struct file *file, struct iov_iter *from, loff_t *poffset)
->                         break;
->                 }
->
-> -               save_len = cur_len;
-> -               for (i = 0; i < nr_pages; i++) {
-> -                       bytes = min_t(size_t, cur_len, PAGE_SIZE);
-> -                       copied = copy_page_from_iter(wdata->pages[i], 0, bytes,
-> -                                                    from);
-> -                       cur_len -= copied;
-> -                       /*
-> -                        * If we didn't copy as much as we expected, then that
-> -                        * may mean we trod into an unmapped area. Stop copying
-> -                        * at that point. On the next pass through the big
-> -                        * loop, we'll likely end up getting a zero-length
-> -                        * write and bailing out of it.
-> -                        */
-> -                       if (copied < bytes)
-> -                               break;
-> -               }
-> -               cur_len = save_len - cur_len;
-> -
-> -               /*
-> -                * If we have no data to send, then that probably means that
-> -                * the copy above failed altogether. That's most likely because
-> -                * the address in the iovec was bogus. Set the rc to -EFAULT,
-> -                * free anything we allocated and bail out.
-> -                */
-> -               if (!cur_len) {
-> +               num_pages = nr_pages;
-> +               rc = wdata_fill_from_iovec(wdata, from, &cur_len, &num_pages);
-> +               if (rc) {
->                         for (i = 0; i < nr_pages; i++)
->                                 put_page(wdata->pages[i]);
->                         kfree(wdata);
-> -                       rc = -EFAULT;
->                         break;
->                 }
->
->                 /*
-> -                * i + 1 now represents the number of pages we actually used in
-> -                * the copy phase above. Bring nr_pages down to that, and free
-> -                * any pages that we didn't use.
-> +                * Bring nr_pages down to the number of pages we actually used,
-> +                * and free any pages that we didn't use.
->                  */
-> -               for ( ; nr_pages > i + 1; nr_pages--)
-> +               for ( ; nr_pages > num_pages; nr_pages--)
->                         put_page(wdata->pages[nr_pages - 1]);
->
->                 wdata->sync_mode = WB_SYNC_ALL;
+> +static ssize_t
+> +cifs_iovec_write(struct file *file, struct iov_iter *from, loff_t *poffset)
+> +{
+> +       size_t len;
+> +       ssize_t total_written = 0;
+> +       struct cifsFileInfo *open_file;
+> +       struct cifs_tcon *tcon;
+> +       struct cifs_sb_info *cifs_sb;
+> +       struct cifs_writedata *wdata, *tmp;
+> +       struct list_head wdata_list;
+> +       int rc;
+> +
+> +       len = iov_iter_count(from);
+> +       rc = generic_write_checks(file, poffset, &len, 0);
+> +       if (rc)
+> +               return rc;
+> +
+> +       if (!len)
+> +               return 0;
+> +
+> +       iov_iter_truncate(from, len);
+> +
+> +       INIT_LIST_HEAD(&wdata_list);
+> +       cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
+> +       open_file = file->private_data;
+> +       tcon = tlink_tcon(open_file->tlink);
+> +
+> +       if (!tcon->ses->server->ops->async_writev)
+> +               return -ENOSYS;
+> +
+> +       rc = cifs_write_from_iter(*poffset, len, from, open_file, cifs_sb,
+> +                                 &wdata_list);
+> +
+>         /*
+>          * If at least one write was successfully sent, then discard any rc
+>          * value from the later writes. If the other write succeeds, then
 > --
 > 1.8.1.2
 >
