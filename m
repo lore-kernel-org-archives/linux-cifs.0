@@ -1,470 +1,159 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v3 10/16] CIFS: Use multicredits for SMB 2.1/3 writes
-Date: Thu, 24 Jul 2014 20:06:09 -0500
-Message-ID: <CADT32e+E5C6gh2+qAt6K6D3NEOx7fZFrWn2sN4Ovs5evQjuW5w@mail.gmail.com>
+Subject: Re: [PATCH v3 11/16] CIFS: Separate page search from readpages
+Date: Sat, 26 Jul 2014 11:40:19 -0500
+Message-ID: <CADT32e+_wwbnXFDAp_Sv22yn1-Y-jqccBqUfUiSjkbXRPATTOQ@mail.gmail.com>
 References: <1405957558-18476-1-git-send-email-pshilovsky@samba.org>
-	<1405957558-18476-11-git-send-email-pshilovsky@samba.org>
+	<1405957558-18476-12-git-send-email-pshilovsky@samba.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 To: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1405957558-18476-11-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <1405957558-18476-12-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Looks correct.
-
-Reviewed-by: Shirish Pargaonkar <spargaonkar-IBi9RG/b67k@public.gmane.org>
-
-
-Only  comment would be, wish there was a mnemonic/define for
-a regular op  when calling add_credits_and_wake_if() for optype
-such as CIFS_ECHO_OP or CIFS_OPBREAK_OP instead of 0.
-
-Oh and super nitpick...  s/reseted/reset/.
-
-
 On Mon, Jul 21, 2014 at 10:45 AM, Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> If we negotiate SMB 2.1 and higher version of the protocol and
-> a server supports large write buffer size, we need to consume 1
-> credit per 65536 bytes. So, we need to know how many credits
-> we have and obtain the required number of them before constructing
-> a writedata structure in writepages and iovec write.
->
 > Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 > ---
->  fs/cifs/cifsglob.h      | 15 ++++++++++++++
->  fs/cifs/cifsproto.h     |  3 +++
->  fs/cifs/file.c          | 36 ++++++++++++++++++++++++++++------
->  fs/cifs/smb1ops.c       |  1 +
->  fs/cifs/smb2ops.c       | 52 +++++++++++++++++++++++++++++++++++++++++++++++--
->  fs/cifs/smb2pdu.c       | 29 +++++++++++++++++++++++----
->  fs/cifs/smb2transport.c |  5 +++++
->  fs/cifs/transport.c     | 25 +++++++++++++++++-------
->  8 files changed, 147 insertions(+), 19 deletions(-)
+>  fs/cifs/file.c | 107 ++++++++++++++++++++++++++++++++-------------------------
+>  1 file changed, 61 insertions(+), 46 deletions(-)
 >
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 8c53f20..54ca2b9 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -406,6 +406,9 @@ struct smb_version_operations {
->                         int);
->         /* writepages retry size */
->         unsigned int (*wp_retry_size)(struct inode *);
-> +       /* get mtu credits */
-> +       int (*wait_mtu_credits)(struct TCP_Server_Info *, unsigned int,
-> +                               unsigned int *, unsigned int *);
->  };
->
->  struct smb_version_values {
-> @@ -642,6 +645,16 @@ add_credits(struct TCP_Server_Info *server, const unsigned int add,
->  }
->
->  static inline void
-> +add_credits_and_wake_if(struct TCP_Server_Info *server, const unsigned int add,
-> +                       const int optype)
-> +{
-> +       if (add) {
-> +               server->ops->add_credits(server, add, optype);
-> +               wake_up(&server->request_q);
-> +       }
-> +}
-> +
-> +static inline void
->  set_credits(struct TCP_Server_Info *server, const int val)
->  {
->         server->ops->set_credits(server, val);
-> @@ -1075,6 +1088,7 @@ struct cifs_writedata {
->         int                             result;
->         unsigned int                    pagesz;
->         unsigned int                    tailsz;
-> +       unsigned int                    credits;
->         unsigned int                    nr_pages;
->         struct page                     *pages[];
->  };
-> @@ -1400,6 +1414,7 @@ static inline void free_dfs_info_array(struct dfs_info3_param *param,
->  #define   CIFS_OBREAK_OP   0x0100    /* oplock break request */
->  #define   CIFS_NEG_OP      0x0200    /* negotiate request */
->  #define   CIFS_OP_MASK     0x0380    /* mask request type */
-> +#define   CIFS_HAS_CREDITS 0x0400    /* already has credits */
->
->  /* Security Flags: indicate type of session setup needed */
->  #define   CIFSSEC_MAY_SIGN     0x00001
-> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index ca7980a..009e5cb 100644
-> --- a/fs/cifs/cifsproto.h
-> +++ b/fs/cifs/cifsproto.h
-> @@ -89,6 +89,9 @@ extern struct mid_q_entry *cifs_setup_async_request(struct TCP_Server_Info *,
->                                                 struct smb_rqst *);
->  extern int cifs_check_receive(struct mid_q_entry *mid,
->                         struct TCP_Server_Info *server, bool log_error);
-> +extern int cifs_wait_mtu_credits(struct TCP_Server_Info *server,
-> +                                unsigned int size, unsigned int *num,
-> +                                unsigned int *credits);
->  extern int SendReceive2(const unsigned int /* xid */ , struct cifs_ses *,
->                         struct kvec *, int /* nvec to send */,
->                         int * /* type of buf returned */ , const int flags);
 > diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index c9c4f5a..c79bdf3 100644
+> index c79bdf3..bec48f1 100644
 > --- a/fs/cifs/file.c
 > +++ b/fs/cifs/file.c
-> @@ -1670,8 +1670,8 @@ cifs_write(struct cifsFileInfo *open_file, __u32 pid, const char *write_data,
->                                         break;
->                         }
->
-> -                       len = min((size_t)cifs_sb->wsize,
-> -                                 write_size - total_written);
-> +                       len = min(server->ops->wp_retry_size(dentry->d_inode),
-> +                                 (unsigned int)write_size - total_written);
->                         /* iov[0] is reserved for smb header */
->                         iov[1].iov_base = (char *)write_data + total_written;
->                         iov[1].iov_len = len;
-> @@ -2031,6 +2031,7 @@ static int cifs_writepages(struct address_space *mapping,
->                            struct writeback_control *wbc)
->  {
->         struct cifs_sb_info *cifs_sb = CIFS_SB(mapping->host->i_sb);
-> +       struct TCP_Server_Info *server;
->         bool done = false, scanned = false, range_whole = false;
->         pgoff_t end, index;
->         struct cifs_writedata *wdata;
-> @@ -2053,23 +2054,30 @@ static int cifs_writepages(struct address_space *mapping,
->                         range_whole = true;
->                 scanned = true;
->         }
-> +       server = cifs_sb_master_tcon(cifs_sb)->ses->server;
->  retry:
->         while (!done && index <= end) {
-> -               unsigned int i, nr_pages, found_pages;
-> +               unsigned int i, nr_pages, found_pages, wsize, credits;
->                 pgoff_t next = 0, tofind, saved_index = index;
->
-> -               tofind = min((cifs_sb->wsize / PAGE_CACHE_SIZE) - 1,
-> -                               end - index) + 1;
-> +               rc = server->ops->wait_mtu_credits(server, cifs_sb->wsize,
-> +                                                  &wsize, &credits);
-> +               if (rc)
-> +                       break;
-> +
-> +               tofind = min((wsize / PAGE_CACHE_SIZE) - 1, end - index) + 1;
->
->                 wdata = wdata_alloc_and_fillpages(tofind, mapping, end, &index,
->                                                   &found_pages);
->                 if (!wdata) {
->                         rc = -ENOMEM;
-> +                       add_credits_and_wake_if(server, credits, 0);
->                         break;
->                 }
->
->                 if (found_pages == 0) {
->                         kref_put(&wdata->refcount, cifs_writedata_release);
-> +                       add_credits_and_wake_if(server, credits, 0);
->                         break;
->                 }
->
-> @@ -2079,13 +2087,17 @@ retry:
->                 /* nothing to write? */
->                 if (nr_pages == 0) {
->                         kref_put(&wdata->refcount, cifs_writedata_release);
-> +                       add_credits_and_wake_if(server, credits, 0);
->                         continue;
->                 }
->
-> +               wdata->credits = credits;
-> +
->                 rc = wdata_send_pages(wdata, nr_pages, mapping, wbc);
->
->                 /* send failure -- clean up the mess */
->                 if (rc != 0) {
-> +                       add_credits_and_wake_if(server, wdata->credits, 0);
->                         for (i = 0; i < nr_pages; ++i) {
->                                 if (rc == -EAGAIN)
->                                         redirty_page_for_writepage(wbc,
-> @@ -2466,17 +2478,26 @@ cifs_write_from_iter(loff_t offset, size_t len, struct iov_iter *from,
->         memcpy(&saved_from, from, sizeof(struct iov_iter));
->
->         do {
-> -               nr_pages = get_numpages(cifs_sb->wsize, len, &cur_len);
-> +               unsigned int wsize, credits;
-> +
-> +               rc = server->ops->wait_mtu_credits(server, cifs_sb->wsize,
-> +                                                  &wsize, &credits);
-> +               if (rc)
-> +                       break;
-> +
-> +               nr_pages = get_numpages(wsize, len, &cur_len);
->                 wdata = cifs_writedata_alloc(nr_pages,
->                                              cifs_uncached_writev_complete);
->                 if (!wdata) {
->                         rc = -ENOMEM;
-> +                       add_credits_and_wake_if(server, credits, 0);
->                         break;
->                 }
->
->                 rc = cifs_write_allocate_pages(wdata->pages, nr_pages);
->                 if (rc) {
->                         kfree(wdata);
-> +                       add_credits_and_wake_if(server, credits, 0);
->                         break;
->                 }
->
-> @@ -2486,6 +2507,7 @@ cifs_write_from_iter(loff_t offset, size_t len, struct iov_iter *from,
->                         for (i = 0; i < nr_pages; i++)
->                                 put_page(wdata->pages[i]);
->                         kfree(wdata);
-> +                       add_credits_and_wake_if(server, credits, 0);
->                         break;
->                 }
->
-> @@ -2504,12 +2526,14 @@ cifs_write_from_iter(loff_t offset, size_t len, struct iov_iter *from,
->                 wdata->bytes = cur_len;
->                 wdata->pagesz = PAGE_SIZE;
->                 wdata->tailsz = cur_len - ((nr_pages - 1) * PAGE_SIZE);
-> +               wdata->credits = credits;
->
->                 if (!wdata->cfile->invalidHandle ||
->                     !cifs_reopen_file(wdata->cfile, false))
->                         rc = server->ops->async_writev(wdata,
->                                         cifs_uncached_writedata_release);
->                 if (rc) {
-> +                       add_credits_and_wake_if(server, wdata->credits, 0);
->                         kref_put(&wdata->refcount,
->                                  cifs_uncached_writedata_release);
->                         if (rc == -EAGAIN) {
-> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-> index 8a96342..5e8c22d 100644
-> --- a/fs/cifs/smb1ops.c
-> +++ b/fs/cifs/smb1ops.c
-> @@ -1025,6 +1025,7 @@ struct smb_version_operations smb1_operations = {
->         .set_credits = cifs_set_credits,
->         .get_credits_field = cifs_get_credits_field,
->         .get_credits = cifs_get_credits,
-> +       .wait_mtu_credits = cifs_wait_mtu_credits,
->         .get_next_mid = cifs_get_next_mid,
->         .read_data_offset = cifs_read_data_offset,
->         .read_data_length = cifs_read_data_length,
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index e35ce5b..fecc2de 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -112,6 +112,53 @@ smb2_get_credits(struct mid_q_entry *mid)
->         return le16_to_cpu(((struct smb2_hdr *)mid->resp_buf)->CreditRequest);
+> @@ -3340,6 +3340,63 @@ cifs_readpages_read_into_pages(struct TCP_Server_Info *server,
+>         return total_read > 0 && result != -EAGAIN ? total_read : result;
 >  }
 >
 > +static int
-> +smb2_wait_mtu_credits(struct TCP_Server_Info *server, unsigned int size,
-> +                     unsigned int *num, unsigned int *credits)
+> +readpages_get_pages(struct address_space *mapping, struct list_head *page_list,
+> +                   unsigned int rsize, struct list_head *tmplist,
+> +                   unsigned int *nr_pages, loff_t *offset, unsigned int *bytes)
 > +{
-> +       int rc = 0;
-> +       unsigned int scredits;
+> +       struct page *page, *tpage;
+> +       unsigned int expected_index;
+> +       int rc;
 > +
-> +       spin_lock(&server->req_lock);
-> +       while (1) {
-> +               if (server->credits <= 0) {
-> +                       spin_unlock(&server->req_lock);
-> +                       cifs_num_waiters_inc(server);
-> +                       rc = wait_event_killable(server->request_q,
-> +                                       has_credits(server, &server->credits));
-> +                       cifs_num_waiters_dec(server);
-> +                       if (rc)
-> +                               return rc;
-> +                       spin_lock(&server->req_lock);
-> +               } else {
-> +                       if (server->tcpStatus == CifsExiting) {
-> +                               spin_unlock(&server->req_lock);
-> +                               return -ENOENT;
-> +                       }
+> +       page = list_entry(page_list->prev, struct page, lru);
 > +
-> +                       scredits = server->credits;
-> +                       /* can deadlock with reopen */
-> +                       if (scredits == 1) {
-> +                               *num = SMB2_MAX_BUFFER_SIZE;
-> +                               *credits = 0;
-> +                               break;
-> +                       }
+> +       /*
+> +        * Lock the page and put it in the cache. Since no one else
+> +        * should have access to this page, we're safe to simply set
+> +        * PG_locked without checking it first.
+> +        */
+> +       __set_page_locked(page);
+> +       rc = add_to_page_cache_locked(page, mapping,
+> +                                     page->index, GFP_KERNEL);
 > +
-> +                       /* leave one credit for a possible reopen */
-> +                       scredits--;
-> +                       *num = min_t(unsigned int, size,
-> +                                    scredits * SMB2_MAX_BUFFER_SIZE);
+> +       /* give up if we can't stick it in the cache */
+> +       if (rc) {
+> +               __clear_page_locked(page);
+> +               return rc;
+> +       }
 > +
-> +                       *credits = DIV_ROUND_UP(*num, SMB2_MAX_BUFFER_SIZE);
-> +                       server->credits -= *credits;
-> +                       server->in_flight++;
+> +       /* move first page to the tmplist */
+> +       *offset = (loff_t)page->index << PAGE_CACHE_SHIFT;
+> +       *bytes = PAGE_CACHE_SIZE;
+> +       *nr_pages = 1;
+> +       list_move_tail(&page->lru, tmplist);
+> +
+> +       /* now try and add more pages onto the request */
+> +       expected_index = page->index + 1;
+> +       list_for_each_entry_safe_reverse(page, tpage, page_list, lru) {
+> +               /* discontinuity ? */
+> +               if (page->index != expected_index)
+> +                       break;
+> +
+> +               /* would this page push the read over the rsize? */
+> +               if (*bytes + PAGE_CACHE_SIZE > rsize)
+> +                       break;
+> +
+> +               __set_page_locked(page);
+> +               if (add_to_page_cache_locked(page, mapping, page->index,
+> +                                                               GFP_KERNEL)) {
+> +                       __clear_page_locked(page);
 > +                       break;
 > +               }
+> +               list_move_tail(&page->lru, tmplist);
+> +               (*bytes) += PAGE_CACHE_SIZE;
+> +               expected_index++;
+> +               (*nr_pages)++;
 > +       }
-> +       spin_unlock(&server->req_lock);
 > +       return rc;
 > +}
 > +
->  static __u64
->  smb2_get_next_mid(struct TCP_Server_Info *server)
+>  static int cifs_readpages(struct file *file, struct address_space *mapping,
+>         struct list_head *page_list, unsigned num_pages)
 >  {
-> @@ -182,8 +229,6 @@ smb2_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
->         /* start with specified wsize, or default */
->         wsize = volume_info->wsize ? volume_info->wsize : CIFS_DEFAULT_IOSIZE;
->         wsize = min_t(unsigned int, wsize, server->max_write);
-> -       /* set it to the maximum buffer size value we can send with 1 credit */
-> -       wsize = min_t(unsigned int, wsize, SMB2_MAX_BUFFER_SIZE);
+> @@ -3394,57 +3451,15 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
+>          * the rdata->pages, then we want them in increasing order.
+>          */
+>         while (!list_empty(page_list)) {
+> -               unsigned int i;
+> -               unsigned int bytes = PAGE_CACHE_SIZE;
+> -               unsigned int expected_index;
+> -               unsigned int nr_pages = 1;
+> +               unsigned int i, nr_pages, bytes;
+>                 loff_t offset;
+>                 struct page *page, *tpage;
+
+Looks correct except we do not need these two variables here now.
+
+Reviewed-by: Shirish Pargaonkar <spargaonkar-IBi9RG/b67k@public.gmane.org>
+
+>                 struct cifs_readdata *rdata;
 >
->         return wsize;
->  }
-> @@ -1120,6 +1165,7 @@ struct smb_version_operations smb20_operations = {
->         .set_credits = smb2_set_credits,
->         .get_credits_field = smb2_get_credits_field,
->         .get_credits = smb2_get_credits,
-> +       .wait_mtu_credits = cifs_wait_mtu_credits,
->         .get_next_mid = smb2_get_next_mid,
->         .read_data_offset = smb2_read_data_offset,
->         .read_data_length = smb2_read_data_length,
-> @@ -1196,6 +1242,7 @@ struct smb_version_operations smb21_operations = {
->         .set_credits = smb2_set_credits,
->         .get_credits_field = smb2_get_credits_field,
->         .get_credits = smb2_get_credits,
-> +       .wait_mtu_credits = smb2_wait_mtu_credits,
->         .get_next_mid = smb2_get_next_mid,
->         .read_data_offset = smb2_read_data_offset,
->         .read_data_length = smb2_read_data_length,
-> @@ -1272,6 +1319,7 @@ struct smb_version_operations smb30_operations = {
->         .set_credits = smb2_set_credits,
->         .get_credits_field = smb2_get_credits_field,
->         .get_credits = smb2_get_credits,
-> +       .wait_mtu_credits = smb2_wait_mtu_credits,
->         .get_next_mid = smb2_get_next_mid,
->         .read_data_offset = smb2_read_data_offset,
->         .read_data_length = smb2_read_data_length,
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 8f5754a..a1d89b7 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -1902,15 +1902,25 @@ int
->  smb2_async_writev(struct cifs_writedata *wdata,
->                   void (*release)(struct kref *kref))
->  {
-> -       int rc = -EACCES;
-> +       int rc = -EACCES, flags = 0;
->         struct smb2_write_req *req = NULL;
->         struct cifs_tcon *tcon = tlink_tcon(wdata->cfile->tlink);
-> +       struct TCP_Server_Info *server = tcon->ses->server;
->         struct kvec iov;
->         struct smb_rqst rqst;
->
->         rc = small_smb2_init(SMB2_WRITE, tcon, (void **) &req);
-> -       if (rc)
-> +       if (rc) {
-> +               if (rc == -EAGAIN && wdata->credits) {
-> +                       /* credits was reseted by reconnect */
-> +                       wdata->credits = 0;
-> +                       /* reduce in_flight value since we won't send the req */
-> +                       spin_lock(&server->req_lock);
-> +                       server->in_flight--;
-> +                       spin_unlock(&server->req_lock);
-> +               }
->                 goto async_writev_out;
-> +       }
->
->         req->hdr.ProcessId = cpu_to_le32(wdata->cfile->pid);
->
-> @@ -1943,9 +1953,20 @@ smb2_async_writev(struct cifs_writedata *wdata,
->
->         inc_rfc1001_len(&req->hdr, wdata->bytes - 1 /* Buffer */);
->
-> +       if (wdata->credits) {
-> +               req->hdr.CreditCharge = cpu_to_le16(DIV_ROUND_UP(wdata->bytes,
-> +                                                   SMB2_MAX_BUFFER_SIZE));
-> +               spin_lock(&server->req_lock);
-> +               server->credits += wdata->credits -
-> +                                       le16_to_cpu(req->hdr.CreditCharge);
-> +               spin_unlock(&server->req_lock);
-> +               wake_up(&server->request_q);
-> +               flags = CIFS_HAS_CREDITS;
-> +       }
-> +
->         kref_get(&wdata->refcount);
-> -       rc = cifs_call_async(tcon->ses->server, &rqst, NULL,
-> -                               smb2_writev_callback, wdata, 0);
-> +       rc = cifs_call_async(server, &rqst, NULL, smb2_writev_callback, wdata,
-> +                            flags);
->
->         if (rc) {
->                 kref_put(&wdata->refcount, release);
-> diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-> index 59c748c..5111e72 100644
-> --- a/fs/cifs/smb2transport.c
-> +++ b/fs/cifs/smb2transport.c
-> @@ -466,7 +466,12 @@ smb2_verify_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
->  static inline void
->  smb2_seq_num_into_buf(struct TCP_Server_Info *server, struct smb2_hdr *hdr)
->  {
-> +       unsigned int i, num = le16_to_cpu(hdr->CreditCharge);
-> +
->         hdr->MessageId = get_next_mid64(server);
-> +       /* skip message numbers according to CreditCharge field */
-> +       for (i = 1; i < num; i++)
-> +               get_next_mid(server);
->  }
->
->  static struct mid_q_entry *
-> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> index 18cd565..9d087f4 100644
-> --- a/fs/cifs/transport.c
-> +++ b/fs/cifs/transport.c
-> @@ -448,6 +448,15 @@ wait_for_free_request(struct TCP_Server_Info *server, const int timeout,
->         return wait_for_free_credits(server, timeout, val);
->  }
->
-> +int
-> +cifs_wait_mtu_credits(struct TCP_Server_Info *server, unsigned int size,
-> +                     unsigned int *num, unsigned int *credits)
-> +{
-> +       *num = size;
-> +       *credits = 0;
-> +       return 0;
-> +}
-> +
->  static int allocate_mid(struct cifs_ses *ses, struct smb_hdr *in_buf,
->                         struct mid_q_entry **ppmidQ)
->  {
-> @@ -531,20 +540,23 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
->  {
->         int rc, timeout, optype;
->         struct mid_q_entry *mid;
-> +       unsigned int credits = 0;
->
->         timeout = flags & CIFS_TIMEOUT_MASK;
->         optype = flags & CIFS_OP_MASK;
->
-> -       rc = wait_for_free_request(server, timeout, optype);
-> -       if (rc)
-> -               return rc;
-> +       if ((flags & CIFS_HAS_CREDITS) == 0) {
-> +               rc = wait_for_free_request(server, timeout, optype);
+> -               page = list_entry(page_list->prev, struct page, lru);
+> -
+> -               /*
+> -                * Lock the page and put it in the cache. Since no one else
+> -                * should have access to this page, we're safe to simply set
+> -                * PG_locked without checking it first.
+> -                */
+> -               __set_page_locked(page);
+> -               rc = add_to_page_cache_locked(page, mapping,
+> -                                             page->index, GFP_KERNEL);
+> -
+> -               /* give up if we can't stick it in the cache */
+> -               if (rc) {
+> -                       __clear_page_locked(page);
+> +               rc = readpages_get_pages(mapping, page_list, rsize, &tmplist,
+> +                                        &nr_pages, &offset, &bytes);
 > +               if (rc)
-> +                       return rc;
-> +               credits = 1;
-> +       }
+>                         break;
+> -               }
+> -
+> -               /* move first page to the tmplist */
+> -               offset = (loff_t)page->index << PAGE_CACHE_SHIFT;
+> -               list_move_tail(&page->lru, &tmplist);
+> -
+> -               /* now try and add more pages onto the request */
+> -               expected_index = page->index + 1;
+> -               list_for_each_entry_safe_reverse(page, tpage, page_list, lru) {
+> -                       /* discontinuity ? */
+> -                       if (page->index != expected_index)
+> -                               break;
+> -
+> -                       /* would this page push the read over the rsize? */
+> -                       if (bytes + PAGE_CACHE_SIZE > rsize)
+> -                               break;
+> -
+> -                       __set_page_locked(page);
+> -                       if (add_to_page_cache_locked(page, mapping,
+> -                                               page->index, GFP_KERNEL)) {
+> -                               __clear_page_locked(page);
+> -                               break;
+> -                       }
+> -                       list_move_tail(&page->lru, &tmplist);
+> -                       bytes += PAGE_CACHE_SIZE;
+> -                       expected_index++;
+> -                       nr_pages++;
+> -               }
 >
->         mutex_lock(&server->srv_mutex);
->         mid = server->ops->setup_async_request(server, rqst);
->         if (IS_ERR(mid)) {
->                 mutex_unlock(&server->srv_mutex);
-> -               add_credits(server, 1, optype);
-> -               wake_up(&server->request_q);
-> +               add_credits_and_wake_if(server, credits, optype);
->                 return PTR_ERR(mid);
->         }
->
-> @@ -572,8 +584,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
->                 return 0;
->
->         cifs_delete_mid(mid);
-> -       add_credits(server, 1, optype);
-> -       wake_up(&server->request_q);
-> +       add_credits_and_wake_if(server, credits, optype);
->         return rc;
->  }
->
+>                 rdata = cifs_readdata_alloc(nr_pages, cifs_readv_complete);
+>                 if (!rdata) {
 > --
 > 1.8.1.2
 >
