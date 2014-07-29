@@ -1,87 +1,96 @@
-From: "Stefan (metze) Metzmacher" <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH v3 00/16] SMB 2.1/3 multicredit requests for reading/writing
-Date: Tue, 29 Jul 2014 09:40:03 +0200
-Message-ID: <53D74FD3.4050004@samba.org>
-References: <1405957558-18476-1-git-send-email-pshilovsky@samba.org>	<53D6AF1E.4030804@samba.org> <CAKywueRBDjsDVz_uR39xAGbp6VQD40erCvWGX5bWLpFOUJqYtw@mail.gmail.com>
+From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH v3 10/16] CIFS: Use multicredits for SMB 2.1/3 writes
+Date: Tue, 29 Jul 2014 11:56:29 +0400
+Message-ID: <CAKywueRfzhBFV7MV1SCLW6R+coxbmJFPNjc9inki+WXYkM-81g@mail.gmail.com>
+References: <1405957558-18476-1-git-send-email-pshilovsky@samba.org>
+	<1405957558-18476-11-git-send-email-pshilovsky@samba.org>
+	<CADT32e+E5C6gh2+qAt6K6D3NEOx7fZFrWn2sN4Ovs5evQjuW5w@mail.gmail.com>
+	<CAKywueQa8toYf=-XAu_tM12ZSkUiSnc4Pke_sDMpbBP5mXkMEg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="4sn3CGjH3bSehA5bSI4V09Jess63vn0kQ"
+Content-Type: text/plain; charset=UTF-8
 Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueRBDjsDVz_uR39xAGbp6VQD40erCvWGX5bWLpFOUJqYtw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CAKywueQa8toYf=-XAu_tM12ZSkUiSnc4Pke_sDMpbBP5mXkMEg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4sn3CGjH3bSehA5bSI4V09Jess63vn0kQ
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-Hi Pavel,
-
-> 2014-07-29 0:14 GMT+04:00 Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
->> Hi Pavel,
+2014-07-28 11:36 GMT+04:00 Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
+> 2014-07-25 5:06 GMT+04:00 Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+>> Looks correct.
 >>
->>> The goal of this patchset is to add large MTU/multicredits support fo=
-r reading and writing from the CIFS client to servers > that support SMB =
-2.1 and higher versions of the protocol.
->>
->> Are looking at the returned capabilities from the server or just the
->> dialect?
->> The answer should really be the capability, it's wrong to rely on the
->> dialect...
->>
->> metze
->=20
-> Hi Stefan,
->=20
-> The code of the patchset is looking at the returned
-> MaxReadSize/MaxWriteSize values from the server. If they are greater
-> than 64K, the module uses multicredit requests. Also it only works for
-> SMB 2.1 and higher versions and is disabled for SMB2.0.
->=20
-> The spec says (http://msdn.microsoft.com/en-us/library/cc246768.aspx):
->=20
-> "If the common dialect is SMB 2.1 or 3.x dialect family and the
-> underlying connection is either TCP port 445 or RDMA,
-> Connection.SupportsMultiCreditMUST be set to TRUE; otherwise, it MUST
-> be set to FALSE."
->=20
-> So, it seems like the server must should multicredit requests if
-> negotiating SMB 2.1 or 3.x protocols.
->=20
-> Anyway, if the server sets MaxRead(Write)Size value to more than 64K
-> and does not support multicredit requests, this server looks like a
-> broken one.
->=20
-> I can add a check for MTU capability bit for SMB 2.1 and 3.x protocols
-> before the check of MaxRead(Write)Size value and let the code fall
-> back to the 64K per request if this bit is missed.
+>> Reviewed-by: Shirish Pargaonkar <spargaonkar-IBi9RG/b67k@public.gmane.org>
+>
+> Thank you for reviewing the series!
+>
+>> Only  comment would be, wish there was a mnemonic/define for
+>> a regular op  when calling add_credits_and_wake_if() for optype
+>> such as CIFS_ECHO_OP or CIFS_OPBREAK_OP instead of 0.
+>
+> Yes, it can make sense but should be in another patch/series.
+>
+>> Oh and super nitpick...  s/reseted/reset/.
+>
+> Ok, will fix it in my smb2-dev branch on git.altlinux.org.
+>
+> --
+> Best regards,
+> Pavel Shilovsky.
 
-I'd prefer to have this extra check, you never know if some vendors are
-crazy
-enough to run Samba 4.0.0alpha* release. Samba got SMB2.1 support in
-September 2011
-and multi-credit support in February 2012.
+Shirish,
 
-metze
+I am going to add a check (as well as removing an unnecessary comment)
+to write part:
 
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 081529f..0dbd1de 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -230,6 +230,9 @@ smb2_negotiate_wsize(struct cifs_tcon *tcon,
+struct smb_vol *volume_info)
+        wsize = volume_info->wsize ? volume_info->wsize : CIFS_DEFAULT_IOSIZE;
+        wsize = min_t(unsigned int, wsize, server->max_write);
 
++       if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
++               wsize = min_t(unsigned int, wsize, SMB2_MAX_BUFFER_SIZE);
++
+        return wsize;
+ }
 
---4sn3CGjH3bSehA5bSI4V09Jess63vn0kQ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 3acef4b..5a6842c 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -108,7 +108,6 @@ smb2_hdr_assemble(struct smb2_hdr *hdr, __le16
+smb2_cmd /* command */ ,
+        if (!tcon)
+                goto out;
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+-       /* BB FIXME when we do write > 64K add +1 for every 64K in req or rsp */
+        /* GLOBAL_CAP_LARGE_MTU will only be set if dialect > SMB2.02 */
+        /* See sections 2.2.4 and 3.2.4.1.5 of MS-SMB2 */
+        if ((tcon->ses) &&
 
-iEYEARECAAYFAlPXT9YACgkQm70gjA5TCD/JDACdGU6Zwelrw78WHsmxb20tl7zt
-5FcAoK/BeDHrTvKOfE7ohgPIRWoh1N+y
-=i5ir
------END PGP SIGNATURE-----
+and the same check to read part:
 
---4sn3CGjH3bSehA5bSI4V09Jess63vn0kQ--
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 0dbd1de..d0210a8 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -246,6 +246,9 @@ smb2_negotiate_rsize(struct cifs_tcon *tcon,
+struct smb_vol *volume_info)
+        rsize = volume_info->rsize ? volume_info->rsize : CIFS_DEFAULT_IOSIZE;
+        rsize = min_t(unsigned int, rsize, server->max_read);
+
++       if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
++               rsize = min_t(unsigned int, rsize, SMB2_MAX_BUFFER_SIZE);
++
+        return rsize;
+ }
+
+If you are ok with the changes I will update 10/16 and 16/16 patches
+and leave your Reviewed-by tags in my git tree. Thoughts?
+
+-- 
+Best regards,
+Pavel Shilovsky.
