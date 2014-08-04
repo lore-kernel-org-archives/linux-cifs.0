@@ -1,50 +1,60 @@
-From: =?UTF-8?B?SmF2aWVyIE1hcnTDrSBNb25mb3J0ZQ==?= <marti_javmon-S9K+yDyl5s4@public.gmane.org>
-Subject: Re: Mount fileshare with prefixpath [mount error(2): No such file
- or directory]
-Date: Mon, 04 Aug 2014 11:32:14 +0200
-Message-ID: <53DF531E.7020200@gva.es>
-References: <53DB5310.5060701@gva.es> <004e01cfadaa$0d82b870$28882950$@balsover.com>
+From: "Bob Balsover" <cifs-MPfZBXey4klWk0Htik3J/w@public.gmane.org>
+Subject: RE: Mount fileshare with prefixpath [mount error(2): No such file or directory]
+Date: Mon, 4 Aug 2014 10:09:52 -0700
+Message-ID: <006101cfb006$e8414e00$b8c3ea00$@balsover.com>
+References: <53DB5310.5060701@gva.es> <004e01cfadaa$0d82b870$28882950$@balsover.com> <53DF531E.7020200@gva.es>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8;
-	format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: "=?utf-8?Q?'Javier_Mart=C3=AD_Monforte'?=" <marti_javmon-S9K+yDyl5s4@public.gmane.org>,
+	<linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <004e01cfadaa$0d82b870$28882950$@balsover.com>
+In-Reply-To: <53DF531E.7020200-S9K+yDyl5s4@public.gmane.org>
+Content-Language: en-us
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
+
+I do not believe that you understood what I said.  Since this is DFS it=
+ points to at least one share on a different machine, possibly more.  Y=
+ou need to check permissions on *all* shares that this namespace points=
+ to, not just the one normal share on this one machine.
+
+-----Original Message-----
+=46rom: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [mailto:linux-cifs-owner@vger.=
+kernel.org] On Behalf Of Javier Mart=C3=AD Monforte
+Sent: Monday, August 04, 2014 2:32 AM
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Subject: Re: Mount fileshare with prefixpath [mount error(2): No such f=
+ile or directory]
 
 Hi and thank you to answer,
 
 in effect is a DFS in a MS Server, and the log I have attached is for a=
-=20
-machine, If I try to mount directly to the DFS sometimes does not work=20
-and it has paused with the message:
+ machine, If I try to mount directly to the DFS sometimes does not work=
+ and it has paused with the message:
 
-# sudo mount -t cifs \\\\domain.local\\data\\13908 mountPoint -o=20
-"username=3DmyUser,uid=3D489689328,gid=3D489685505,nounix,noserverino" =
---verbose
-Password for myUser@\\domain.local\data\13908:
+# sudo mount -t cifs \\\\domain.local\\data\\13908 mountPoint -o "usern=
+ame=3DmyUser,uid=3D489689328,gid=3D489685505,nounix,noserverino" --verb=
+ose Password for myUser@\\domain.local\data\13908:
 mount.cifs kernel mount options:=20
 ip=3D172.27.194.67,unc=3D\\domain.local\data,nounix,noserverino,uid=3D4=
 89689328,gid=3D489685505,user=3DmyUser,prefixpath=3D13908,pass=3D******=
 **
-mount error(115): Operation now in progress
-Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
+mount error(115): Operation now in progress Refer to the mount.cifs(8) =
+manual page (e.g. man mount.cifs)
 
 and sometimes it says:
 
 
-# sudo mount -t cifs \\\\domain.local\\data\\13908 mountPoint -o=20
-"username=3DmyUser,uid=3D489689328,gid=3D489685505,nounix,noserverino" =
---verbose
-Password for myUser@\\domain.local\data\13908:
+# sudo mount -t cifs \\\\domain.local\\data\\13908 mountPoint -o "usern=
+ame=3DmyUser,uid=3D489689328,gid=3D489685505,nounix,noserverino" --verb=
+ose Password for myUser@\\domain.local\data\13908:
 mount.cifs kernel mount options:=20
 ip=3D172.27.194.132,unc=3D\\domain.local\data,nounix,noserverino,uid=3D=
 489689328,gid=3D489685505,user=3DmyUser,prefixpath=3D13908,pass=3D*****=
 ***
-mount error(2): No such file or directory
-Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
+mount error(2): No such file or directory Refer to the mount.cifs(8) ma=
+nual page (e.g. man mount.cifs)
 
 with the log
 
@@ -52,7 +62,7 @@ with the log
 [244388.448854] /build/buildd/linux-3.2.0/fs/cifs/cifsfs.c: Devname:=20
 \\domain.local\data\13908 flags: 0
 [244388.448871] /build/buildd/linux-3.2.0/fs/cifs/connect.c: prefix pat=
-h=20
+h
 /13908
 [244388.448875] /build/buildd/linux-3.2.0/fs/cifs/connect.c: Username:=20
 myUser
@@ -64,108 +74,92 @@ in cifs_mount as Xid: 2274 with uid: 0
 [244388.448958] /build/buildd/linux-3.2.0/fs/cifs/connect.c: UNC:=20
 \\domain.local\data ip: 172.27.194.132
 [244388.448977] /build/buildd/linux-3.2.0/fs/cifs/connect.c: Socket cre=
-ated
-[244388.448981] /build/buildd/linux-3.2.0/fs/cifs/connect.c: sndbuf=20
+ated [244388.448981] /build/buildd/linux-3.2.0/fs/cifs/connect.c: sndbu=
+f
 16384 rcvbuf 87380 rcvtimeo 0x6d6
 [244388.450494] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
-in cifs_get_smb_ses as Xid: 2275 with uid: 0
-[244388.450499] /build/buildd/linux-3.2.0/fs/cifs/connect.c: Demultiple=
-x=20
+in cifs_get_smb_ses as Xid: 2275 with uid: 0 [244388.450499] /build/bui=
+ldd/linux-3.2.0/fs/cifs/connect.c: Demultiplex
 PID: 14419
-[244388.450504] /build/buildd/linux-3.2.0/fs/cifs/connect.c: Existing=20
-smb sess not found
-[244388.450512] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: secFlags 0=
-x7
-[244388.450517] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
-smb_command 114
-[244388.450521] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending=20
+[244388.450504] /build/buildd/linux-3.2.0/fs/cifs/connect.c: Existing s=
+mb sess not found [244388.450512] /build/buildd/linux-3.2.0/fs/cifs/cif=
+ssmb.c: secFlags 0x7 [244388.450517] /build/buildd/linux-3.2.0/fs/cifs/=
+transport.c: For smb_command 114 [244388.450521] /build/buildd/linux-3.=
+2.0/fs/cifs/transport.c: Sending
 smb:  total_len 82
-[244388.451274] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002=20
-header 0x79
-[244388.451297] /build/buildd/linux-3.2.0/fs/cifs/transport.c:=20
-cifs_sync_mid_result: cmd=3D114 mid=3D1 state=3D4
-[244388.451302] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: Dialect: 2
-[244388.451305] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: negprot rc=
- 0
-[244388.451309] /build/buildd/linux-3.2.0/fs/cifs/connect.c: Security=20
-Mode: 0xf Capabilities: 0x1f3fd TimeAdjust: -7200
-[244388.451313] /build/buildd/linux-3.2.0/fs/cifs/sess.c: sess setup ty=
-pe 1
-[244388.451341] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
-smb_command 115
-[244388.451344] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending=20
+[244388.451274] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 he=
+ader 0x79 [244388.451297] /build/buildd/linux-3.2.0/fs/cifs/transport.c=
+:=20
+cifs_sync_mid_result: cmd=3D114 mid=3D1 state=3D4 [244388.451302] /buil=
+d/buildd/linux-3.2.0/fs/cifs/cifssmb.c: Dialect: 2 [244388.451305] /bui=
+ld/buildd/linux-3.2.0/fs/cifs/cifssmb.c: negprot rc 0 [244388.451309] /=
+build/buildd/linux-3.2.0/fs/cifs/connect.c: Security
+Mode: 0xf Capabilities: 0x1f3fd TimeAdjust: -7200 [244388.451313] /buil=
+d/buildd/linux-3.2.0/fs/cifs/sess.c: sess setup type 1 [244388.451341] =
+/build/buildd/linux-3.2.0/fs/cifs/transport.c: For smb_command 115 [244=
+388.451344] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending
 smb:  total_len 252
-[244388.453454] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002=20
-header 0xcd
-[244388.453477] /build/buildd/linux-3.2.0/fs/cifs/transport.c:=20
-cifs_sync_mid_result: cmd=3D115 mid=3D2 state=3D4
-[244388.453482] /build/buildd/linux-3.2.0/fs/cifs/misc.c: Null buffer=20
-passed to cifs_small_buf_release
-[244388.453485] /build/buildd/linux-3.2.0/fs/cifs/sess.c: UID =3D 2048
-[244388.453488] /build/buildd/linux-3.2.0/fs/cifs/sess.c: bleft 163
-[244388.453494] /build/buildd/linux-3.2.0/fs/cifs/sess.c:=20
-serverOS=3DWindows Server 2003 R2 3790 Service Pack 2
-[244388.453498] /build/buildd/linux-3.2.0/fs/cifs/sess.c:=20
+[244388.453454] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 he=
+ader 0xcd [244388.453477] /build/buildd/linux-3.2.0/fs/cifs/transport.c=
+:=20
+cifs_sync_mid_result: cmd=3D115 mid=3D2 state=3D4 [244388.453482] /buil=
+d/buildd/linux-3.2.0/fs/cifs/misc.c: Null buffer passed to cifs_small_b=
+uf_release [244388.453485] /build/buildd/linux-3.2.0/fs/cifs/sess.c: UI=
+D =3D 2048 [244388.453488] /build/buildd/linux-3.2.0/fs/cifs/sess.c: bl=
+eft 163 [244388.453494] /build/buildd/linux-3.2.0/fs/cifs/sess.c:=20
+serverOS=3DWindows Server 2003 R2 3790 Service Pack 2 [244388.453498] /=
+build/buildd/linux-3.2.0/fs/cifs/sess.c:=20
 serverNOS=3DWindows Server 2003 R2 5.2
 [244388.453502] /build/buildd/linux-3.2.0/fs/cifs/sess.c:=20
 serverDomain=3DDOMAIN
 [244388.453506] /build/buildd/linux-3.2.0/fs/cifs/sess.c: ssetup freein=
-g=20
-small buf ffff8800a538ca80
-[244388.453509] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS=20
-Session Established successfully
-[244388.453513] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
-leaving cifs_get_smb_ses (xid =3D 2275) rc =3D 0
-[244388.453518] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
-in cifs_get_tcon as Xid: 2276 with uid: 0
-[244388.453523] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
-smb_command 117
-[244388.453528] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending=20
+g small buf ffff8800a538ca80 [244388.453509] /build/buildd/linux-3.2.0/=
+fs/cifs/connect.c: CIFS Session Established successfully [244388.453513=
+] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
+leaving cifs_get_smb_ses (xid =3D 2275) rc =3D 0 [244388.453518] /build=
+/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
+in cifs_get_tcon as Xid: 2276 with uid: 0 [244388.453523] /build/buildd=
+/linux-3.2.0/fs/cifs/transport.c: For smb_command 117 [244388.453528] /=
+build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending
 smb:  total_len 108
-[244388.454392] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002=20
-header 0x23
-[244388.454404] /build/buildd/linux-3.2.0/fs/cifs/transport.c:=20
-cifs_sync_mid_result: cmd=3D117 mid=3D3 state=3D4
-[244388.454412] Status code returned 0xc0000257 NT_STATUS_PATH_NOT_COVE=
-RED
-[244388.454417] /build/buildd/linux-3.2.0/fs/cifs/netmisc.c: Mapping sm=
-b=20
-error code 0xc0000257 to POSIX err -66
-[244388.454421] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
-leaving cifs_get_tcon (xid =3D 2276) rc =3D -66
-[244388.454425] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS Tcon=20
-rc =3D -66
-[244388.454429] /build/buildd/linux-3.2.0/fs/cifs/connect.c:=20
+[244388.454392] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 he=
+ader 0x23 [244388.454404] /build/buildd/linux-3.2.0/fs/cifs/transport.c=
+:=20
+cifs_sync_mid_result: cmd=3D117 mid=3D3 state=3D4 [244388.454412] Statu=
+s code returned 0xc0000257 NT_STATUS_PATH_NOT_COVERED [244388.454417] /=
+build/buildd/linux-3.2.0/fs/cifs/netmisc.c: Mapping smb error code 0xc0=
+000257 to POSIX err -66 [244388.454421] /build/buildd/linux-3.2.0/fs/ci=
+fs/connect.c: CIFS VFS:=20
+leaving cifs_get_tcon (xid =3D 2276) rc =3D -66 [244388.454425] /build/=
+buildd/linux-3.2.0/fs/cifs/connect.c: CIFS Tcon rc =3D -66 [244388.4544=
+29] /build/buildd/linux-3.2.0/fs/cifs/connect.c:=20
 build_unc_path_to_root: full_path=3D\\domain.local\data\13908
-[244388.454435] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
-smb_command 117
-[244388.454439] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending=20
+[244388.454435] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For smb_=
+command 117 [244388.454439] /build/buildd/linux-3.2.0/fs/cifs/transport=
+=2Ec: Sending
 smb:  total_len 98
-[244388.455251] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002=20
-header 0x38
-[244388.455272] /build/buildd/linux-3.2.0/fs/cifs/transport.c:=20
-cifs_sync_mid_result: cmd=3D117 mid=3D4 state=3D4
-[244388.455278] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS Tcon=20
-rc =3D 0 ipc_tid =3D 38912
-[244388.455281] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In=20
-GetDFSRefer the path \domain.local\data
-[244388.455286] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
-smb_command 50
-[244388.455290] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending=20
+[244388.455251] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 he=
+ader 0x38 [244388.455272] /build/buildd/linux-3.2.0/fs/cifs/transport.c=
+:=20
+cifs_sync_mid_result: cmd=3D117 mid=3D4 state=3D4 [244388.455278] /buil=
+d/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS Tcon rc =3D 0 ipc_tid =3D =
+38912 [244388.455281] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In G=
+etDFSRefer the path \domain.local\data [244388.455286] /build/buildd/li=
+nux-3.2.0/fs/cifs/transport.c: For smb_command 50 [244388.455290] /buil=
+d/buildd/linux-3.2.0/fs/cifs/transport.c: Sending
 smb:  total_len 126
-[244388.456159] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002=20
-header 0x134
-[244388.456170] /build/buildd/linux-3.2.0/fs/cifs/transport.c:=20
-cifs_sync_mid_result: cmd=3D50 mid=3D5 state=3D4
-[244388.456178] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: Decoding=20
-GetDFSRefer response BCC: 253  Offset 56
-[244388.456183] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c:=20
+[244388.456159] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 he=
+ader 0x134 [244388.456170] /build/buildd/linux-3.2.0/fs/cifs/transport.=
+c:=20
+cifs_sync_mid_result: cmd=3D50 mid=3D5 state=3D4 [244388.456178] /build=
+/buildd/linux-3.2.0/fs/cifs/cifssmb.c: Decoding GetDFSRefer response BC=
+C: 253  Offset 56 [244388.456183] /build/buildd/linux-3.2.0/fs/cifs/cif=
+ssmb.c:=20
 num_referrals: 2 dfs flags: 0x3 ...
 [244388.456185]
 [244388.456202] /build/buildd/linux-3.2.0/fs/cifs/dns_resolve.c:=20
-dns_resolve_server_name_to_ip: resolved: SIIS073522 to 172.27.194.65
-[244388.456221] /build/buildd/linux-3.2.0/fs/cifs/connect.c: prefix pat=
-h=20
+dns_resolve_server_name_to_ip: resolved: SIIS073522 to 172.27.194.65 [2=
+44388.456221] /build/buildd/linux-3.2.0/fs/cifs/connect.c: prefix path
 /\13908
 [244388.456225] /build/buildd/linux-3.2.0/fs/cifs/connect.c: Username:=20
 myUser
@@ -173,168 +167,144 @@ myUser
 cifs_put_smb_ses: ses_count=3D1
 [244388.456232]
 [244388.456235] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
-in cifs_put_smb_ses as Xid: 2277 with uid: 0
-[244388.456240] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In=20
-SMBLogoff for session disconnect
-[244388.456245] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
-smb_command 116
-[244388.456249] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending=20
+in cifs_put_smb_ses as Xid: 2277 with uid: 0 [244388.456240] /build/bui=
+ldd/linux-3.2.0/fs/cifs/cifssmb.c: In SMBLogoff for session disconnect =
+[244388.456245] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For smb_=
+command 116 [244388.456249] /build/buildd/linux-3.2.0/fs/cifs/transport=
+=2Ec: Sending
 smb:  total_len 43
-[244388.457139] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002=20
-header 0x27
-[244388.457160] /build/buildd/linux-3.2.0/fs/cifs/transport.c:=20
-cifs_sync_mid_result: cmd=3D116 mid=3D6 state=3D4
-[244388.457176] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
-leaving cifs_mount (xid =3D 2274) rc =3D -66
-[244388.457180] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
+[244388.457139] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 he=
+ader 0x27 [244388.457160] /build/buildd/linux-3.2.0/fs/cifs/transport.c=
+:=20
+cifs_sync_mid_result: cmd=3D116 mid=3D6 state=3D4 [244388.457176] /buil=
+d/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
+leaving cifs_mount (xid =3D 2274) rc =3D -66 [244388.457180] /build/bui=
+ldd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
 in cifs_mount as Xid: 2278 with uid: 0
 [244388.457184] /build/buildd/linux-3.2.0/fs/cifs/connect.c: UNC:=20
 \\SIIS073522\data ip: 172.27.194.65
 [244388.457195] /build/buildd/linux-3.2.0/fs/cifs/connect.c: Socket cre=
-ated
-[244388.457199] /build/buildd/linux-3.2.0/fs/cifs/connect.c: sndbuf=20
+ated [244388.457199] /build/buildd/linux-3.2.0/fs/cifs/connect.c: sndbu=
+f
 16384 rcvbuf 87380 rcvtimeo 0x6d6
 [244388.458594] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
-in cifs_get_smb_ses as Xid: 2279 with uid: 0
-[244388.458598] /build/buildd/linux-3.2.0/fs/cifs/connect.c: Demultiple=
-x=20
+in cifs_get_smb_ses as Xid: 2279 with uid: 0 [244388.458598] /build/bui=
+ldd/linux-3.2.0/fs/cifs/connect.c: Demultiplex
 PID: 14420
-[244388.458602] /build/buildd/linux-3.2.0/fs/cifs/connect.c: Existing=20
-smb sess not found
-[244388.458608] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: secFlags 0=
-x7
-[244388.458611] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
-smb_command 114
-[244388.458614] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending=20
+[244388.458602] /build/buildd/linux-3.2.0/fs/cifs/connect.c: Existing s=
+mb sess not found [244388.458608] /build/buildd/linux-3.2.0/fs/cifs/cif=
+ssmb.c: secFlags 0x7 [244388.458611] /build/buildd/linux-3.2.0/fs/cifs/=
+transport.c: For smb_command 114 [244388.458614] /build/buildd/linux-3.=
+2.0/fs/cifs/transport.c: Sending
 smb:  total_len 82
-[244388.459483] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002=20
-header 0x7b
-[244388.459495] /build/buildd/linux-3.2.0/fs/cifs/transport.c:=20
-cifs_sync_mid_result: cmd=3D114 mid=3D1 state=3D4
-[244388.459499] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: Dialect: 2
-[244388.459502] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: negprot rc=
- 0
-[244388.459506] /build/buildd/linux-3.2.0/fs/cifs/connect.c: Security=20
-Mode: 0xf Capabilities: 0x1f3fd TimeAdjust: -7200
-[244388.459509] /build/buildd/linux-3.2.0/fs/cifs/sess.c: sess setup ty=
-pe 1
-[244388.459530] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
-smb_command 115
-[244388.459533] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending=20
+[244388.459483] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 he=
+ader 0x7b [244388.459495] /build/buildd/linux-3.2.0/fs/cifs/transport.c=
+:=20
+cifs_sync_mid_result: cmd=3D114 mid=3D1 state=3D4 [244388.459499] /buil=
+d/buildd/linux-3.2.0/fs/cifs/cifssmb.c: Dialect: 2 [244388.459502] /bui=
+ld/buildd/linux-3.2.0/fs/cifs/cifssmb.c: negprot rc 0 [244388.459506] /=
+build/buildd/linux-3.2.0/fs/cifs/connect.c: Security
+Mode: 0xf Capabilities: 0x1f3fd TimeAdjust: -7200 [244388.459509] /buil=
+d/buildd/linux-3.2.0/fs/cifs/sess.c: sess setup type 1 [244388.459530] =
+/build/buildd/linux-3.2.0/fs/cifs/transport.c: For smb_command 115 [244=
+388.459533] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending
 smb:  total_len 252
-[244388.462417] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002=20
-header 0xcd
-[244388.462451] /build/buildd/linux-3.2.0/fs/cifs/transport.c:=20
-cifs_sync_mid_result: cmd=3D115 mid=3D2 state=3D4
-[244388.462455] /build/buildd/linux-3.2.0/fs/cifs/misc.c: Null buffer=20
-passed to cifs_small_buf_release
-[244388.462459] /build/buildd/linux-3.2.0/fs/cifs/sess.c: UID =3D 20482
-[244388.462462] /build/buildd/linux-3.2.0/fs/cifs/sess.c: bleft 163
-[244388.462468] /build/buildd/linux-3.2.0/fs/cifs/sess.c:=20
-serverOS=3DWindows Server 2003 R2 3790 Service Pack 2
-[244388.462473] /build/buildd/linux-3.2.0/fs/cifs/sess.c:=20
+[244388.462417] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 he=
+ader 0xcd [244388.462451] /build/buildd/linux-3.2.0/fs/cifs/transport.c=
+:=20
+cifs_sync_mid_result: cmd=3D115 mid=3D2 state=3D4 [244388.462455] /buil=
+d/buildd/linux-3.2.0/fs/cifs/misc.c: Null buffer passed to cifs_small_b=
+uf_release [244388.462459] /build/buildd/linux-3.2.0/fs/cifs/sess.c: UI=
+D =3D 20482 [244388.462462] /build/buildd/linux-3.2.0/fs/cifs/sess.c: b=
+left 163 [244388.462468] /build/buildd/linux-3.2.0/fs/cifs/sess.c:=20
+serverOS=3DWindows Server 2003 R2 3790 Service Pack 2 [244388.462473] /=
+build/buildd/linux-3.2.0/fs/cifs/sess.c:=20
 serverNOS=3DWindows Server 2003 R2 5.2
 [244388.462477] /build/buildd/linux-3.2.0/fs/cifs/sess.c:=20
 serverDomain=3DDOMAIN
 [244388.462481] /build/buildd/linux-3.2.0/fs/cifs/sess.c: ssetup freein=
-g=20
-small buf ffff8800a64f9c00
-[244388.462484] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS=20
-Session Established successfully
-[244388.462488] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
-leaving cifs_get_smb_ses (xid =3D 2279) rc =3D 0
-[244388.462493] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
-in cifs_get_tcon as Xid: 2280 with uid: 0
-[244388.462501] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
-smb_command 117
-[244388.462507] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending=20
+g small buf ffff8800a64f9c00 [244388.462484] /build/buildd/linux-3.2.0/=
+fs/cifs/connect.c: CIFS Session Established successfully [244388.462488=
+] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
+leaving cifs_get_smb_ses (xid =3D 2279) rc =3D 0 [244388.462493] /build=
+/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
+in cifs_get_tcon as Xid: 2280 with uid: 0 [244388.462501] /build/buildd=
+/linux-3.2.0/fs/cifs/transport.c: For smb_command 117 [244388.462507] /=
+build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending
 smb:  total_len 92
-[244388.463490] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002=20
-header 0x3e
-[244388.463501] /build/buildd/linux-3.2.0/fs/cifs/transport.c:=20
-cifs_sync_mid_result: cmd=3D117 mid=3D3 state=3D4
-[244388.463507] /build/buildd/linux-3.2.0/fs/cifs/connect.c: disk share=
-=20
-connection
-[244388.463511] /build/buildd/linux-3.2.0/fs/cifs/connect.c:=20
+[244388.463490] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 he=
+ader 0x3e [244388.463501] /build/buildd/linux-3.2.0/fs/cifs/transport.c=
+:=20
+cifs_sync_mid_result: cmd=3D117 mid=3D3 state=3D4 [244388.463507] /buil=
+d/buildd/linux-3.2.0/fs/cifs/connect.c: disk share connection [244388.4=
+63511] /build/buildd/linux-3.2.0/fs/cifs/connect.c:=20
 nativeFileSystem=3DNTFS
 [244388.463514] /build/buildd/linux-3.2.0/fs/cifs/connect.c: Tcon flags=
 :=20
 0x3
 [244388.463517] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
-leaving cifs_get_tcon (xid =3D 2280) rc =3D 0
-[244388.463520] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS Tcon=20
-rc =3D 0
-[244388.463524] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In=20
-QFSDeviceInfo
-[244388.463528] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
-smb_command 50
-[244388.463532] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending=20
+leaving cifs_get_tcon (xid =3D 2280) rc =3D 0 [244388.463520] /build/bu=
+ildd/linux-3.2.0/fs/cifs/connect.c: CIFS Tcon rc =3D 0 [244388.463524] =
+/build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In QFSDeviceInfo [244388.4=
+63528] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For smb_command 5=
+0 [244388.463532] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sendin=
+g
 smb:  total_len 72
-[244388.464887] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002=20
-header 0x40
-[244388.464898] /build/buildd/linux-3.2.0/fs/cifs/transport.c:=20
-cifs_sync_mid_result: cmd=3D50 mid=3D4 state=3D4
-[244388.464905] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In=20
-QFSAttributeInfo
-[244388.464909] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
-smb_command 50
-[244388.464913] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending=20
+[244388.464887] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 he=
+ader 0x40 [244388.464898] /build/buildd/linux-3.2.0/fs/cifs/transport.c=
+:=20
+cifs_sync_mid_result: cmd=3D50 mid=3D4 state=3D4 [244388.464905] /build=
+/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In QFSAttributeInfo [244388.4649=
+09] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For smb_command 50 [=
+244388.464913] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending
 smb:  total_len 72
-[244388.465616] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002=20
-header 0x4c
-[244388.465626] /build/buildd/linux-3.2.0/fs/cifs/transport.c:=20
-cifs_sync_mid_result: cmd=3D50 mid=3D5 state=3D4
-[244388.465636] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
-smb_command 50
-[244388.465640] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending=20
+[244388.465616] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 he=
+ader 0x4c [244388.465626] /build/buildd/linux-3.2.0/fs/cifs/transport.c=
+:=20
+cifs_sync_mid_result: cmd=3D50 mid=3D5 state=3D4 [244388.465636] /build=
+/buildd/linux-3.2.0/fs/cifs/transport.c: For smb_command 50 [244388.465=
+640] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending
 smb:  total_len 128
-[244388.466502] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002=20
-header 0x23
-[244388.466507] /build/buildd/linux-3.2.0/fs/cifs/connect.c: invalid=20
+[244388.466502] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 he=
+ader 0x23 [244388.466507] /build/buildd/linux-3.2.0/fs/cifs/connect.c: =
+invalid
 transact2 word count
 [244388.466514] /build/buildd/linux-3.2.0/fs/cifs/transport.c:=20
-cifs_sync_mid_result: cmd=3D50 mid=3D6 state=3D4
-[244388.466522] Status code returned 0xc0000257 NT_STATUS_PATH_NOT_COVE=
-RED
-[244388.466526] /build/buildd/linux-3.2.0/fs/cifs/netmisc.c: Mapping sm=
-b=20
-error code 0xc0000257 to POSIX err -66
-[244388.466530] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: Send error=
-=20
-in QPathInfo =3D -66
-[244388.466534] /build/buildd/linux-3.2.0/fs/cifs/connect.c:=20
+cifs_sync_mid_result: cmd=3D50 mid=3D6 state=3D4 [244388.466522] Status=
+ code returned 0xc0000257 NT_STATUS_PATH_NOT_COVERED [244388.466526] /b=
+uild/buildd/linux-3.2.0/fs/cifs/netmisc.c: Mapping smb error code 0xc00=
+00257 to POSIX err -66 [244388.466530] /build/buildd/linux-3.2.0/fs/cif=
+s/cifssmb.c: Send error in QPathInfo =3D -66 [244388.466534] /build/bui=
+ldd/linux-3.2.0/fs/cifs/connect.c:=20
 build_unc_path_to_root: full_path=3D\\SIIS073522\data\\13908
-[244388.466539] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
-smb_command 117
-[244388.466543] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending=20
+[244388.466539] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For smb_=
+command 117 [244388.466543] /build/buildd/linux-3.2.0/fs/cifs/transport=
+=2Ec: Sending
 smb:  total_len 96
-[244388.467249] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002=20
-header 0x38
-[244388.467259] /build/buildd/linux-3.2.0/fs/cifs/transport.c:=20
-cifs_sync_mid_result: cmd=3D117 mid=3D7 state=3D4
-[244388.467265] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS Tcon=20
-rc =3D 0 ipc_tid =3D 12289
-[244388.467269] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In=20
-GetDFSRefer the path \SIIS073522\data\\13908
-[244388.467273] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
-smb_command 50
-[244388.467277] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending=20
+[244388.467249] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 he=
+ader 0x38 [244388.467259] /build/buildd/linux-3.2.0/fs/cifs/transport.c=
+:=20
+cifs_sync_mid_result: cmd=3D117 mid=3D7 state=3D4 [244388.467265] /buil=
+d/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS Tcon rc =3D 0 ipc_tid =3D =
+12289 [244388.467269] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In G=
+etDFSRefer the path \SIIS073522\data\\13908 [244388.467273] /build/buil=
+dd/linux-3.2.0/fs/cifs/transport.c: For smb_command 50 [244388.467277] =
+/build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending
 smb:  total_len 124
-[244388.468784] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002=20
-header 0x11c
-[244388.468797] /build/buildd/linux-3.2.0/fs/cifs/transport.c:=20
-cifs_sync_mid_result: cmd=3D50 mid=3D8 state=3D4
-[244388.468805] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: Decoding=20
-GetDFSRefer response BCC: 229  Offset 56
-[244388.468809] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c:=20
+[244388.468784] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 he=
+ader 0x11c [244388.468797] /build/buildd/linux-3.2.0/fs/cifs/transport.=
+c:=20
+cifs_sync_mid_result: cmd=3D50 mid=3D8 state=3D4 [244388.468805] /build=
+/buildd/linux-3.2.0/fs/cifs/cifssmb.c: Decoding GetDFSRefer response BC=
+C: 229  Offset 56 [244388.468809] /build/buildd/linux-3.2.0/fs/cifs/cif=
+ssmb.c:=20
 num_referrals: 1 dfs flags: 0x2 ...
 [244388.468811]
 [244388.468827] /build/buildd/linux-3.2.0/fs/cifs/dns_resolve.c:=20
-dns_resolve_server_name_to_ip: resolved: machine1.domain.local to=20
+dns_resolve_server_name_to_ip: resolved: machine1.domain.local to
 172.27.194.152
 [244388.468849] /build/buildd/linux-3.2.0/fs/cifs/connect.c: prefix pat=
-h=20
+h
 /13908
 [244388.468852] /build/buildd/linux-3.2.0/fs/cifs/connect.c: Username:=20
 myUser
@@ -342,137 +312,120 @@ myUser
 cifs_put_tcon: tc_count=3D1
 [244388.468858]
 [244388.468861] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
-in cifs_put_tcon as Xid: 2281 with uid: 0
-[244388.468864] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In tree=20
-disconnect
-[244388.468868] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
-smb_command 113
-[244388.468872] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending=20
+in cifs_put_tcon as Xid: 2281 with uid: 0 [244388.468864] /build/buildd=
+/linux-3.2.0/fs/cifs/cifssmb.c: In tree disconnect [244388.468868] /bui=
+ld/buildd/linux-3.2.0/fs/cifs/transport.c: For smb_command 113 [244388.=
+468872] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending
 smb:  total_len 39
-[244388.469694] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002=20
-header 0x23
-[244388.469704] /build/buildd/linux-3.2.0/fs/cifs/transport.c:=20
-cifs_sync_mid_result: cmd=3D113 mid=3D9 state=3D4
-[244388.469710] /build/buildd/linux-3.2.0/fs/cifs/connect.c:=20
+[244388.469694] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 he=
+ader 0x23 [244388.469704] /build/buildd/linux-3.2.0/fs/cifs/transport.c=
+:=20
+cifs_sync_mid_result: cmd=3D113 mid=3D9 state=3D4 [244388.469710] /buil=
+d/buildd/linux-3.2.0/fs/cifs/connect.c:=20
 cifs_put_smb_ses: ses_count=3D1
 [244388.469712]
 [244388.469715] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
-in cifs_put_smb_ses as Xid: 2282 with uid: 0
-[244388.469718] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In=20
-SMBLogoff for session disconnect
-[244388.469722] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
-smb_command 116
-[244388.469726] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending=20
+in cifs_put_smb_ses as Xid: 2282 with uid: 0 [244388.469718] /build/bui=
+ldd/linux-3.2.0/fs/cifs/cifssmb.c: In SMBLogoff for session disconnect =
+[244388.469722] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For smb_=
+command 116 [244388.469726] /build/buildd/linux-3.2.0/fs/cifs/transport=
+=2Ec: Sending
 smb:  total_len 43
-[244388.470707] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002=20
-header 0x27
-[244388.470717] /build/buildd/linux-3.2.0/fs/cifs/transport.c:=20
-cifs_sync_mid_result: cmd=3D116 mid=3D10 state=3D4
-[244388.470732] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
+[244388.470707] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 he=
+ader 0x27 [244388.470717] /build/buildd/linux-3.2.0/fs/cifs/transport.c=
+:=20
+cifs_sync_mid_result: cmd=3D116 mid=3D10 state=3D4 [244388.470732] /bui=
+ld/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
 leaving cifs_mount (xid =3D 2278) rc =3D 0
 [244388.470736] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
 in cifs_mount as Xid: 2283 with uid: 0
 [244388.470739] /build/buildd/linux-3.2.0/fs/cifs/connect.c: UNC:=20
 \\domain.local\data ip: 172.27.194.152
-[244388.470744] /build/buildd/linux-3.2.0/fs/cifs/connect.c: Existing=20
-tcp session with server found
-[244388.470748] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
-in cifs_get_smb_ses as Xid: 2284 with uid: 0
-[244388.470752] /build/buildd/linux-3.2.0/fs/cifs/connect.c: Existing=20
-smb sess found (status=3D1)
-[244388.470756] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
-leaving cifs_get_smb_ses (xid =3D 2284) rc =3D 0
-[244388.470759] /build/buildd/linux-3.2.0/fs/cifs/connect.c: Found matc=
-h=20
-on UNC path
-[244388.470762] /build/buildd/linux-3.2.0/fs/cifs/connect.c:=20
+[244388.470744] /build/buildd/linux-3.2.0/fs/cifs/connect.c: Existing t=
+cp session with server found [244388.470748] /build/buildd/linux-3.2.0/=
+fs/cifs/connect.c: CIFS VFS:=20
+in cifs_get_smb_ses as Xid: 2284 with uid: 0 [244388.470752] /build/bui=
+ldd/linux-3.2.0/fs/cifs/connect.c: Existing smb sess found (status=3D1)=
+ [244388.470756] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=
+=20
+leaving cifs_get_smb_ses (xid =3D 2284) rc =3D 0 [244388.470759] /build=
+/buildd/linux-3.2.0/fs/cifs/connect.c: Found match on UNC path [244388.=
+470762] /build/buildd/linux-3.2.0/fs/cifs/connect.c:=20
 cifs_put_smb_ses: ses_count=3D2
 [244388.470764]
-[244388.470766] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In=20
-QFSDeviceInfo
-[244388.470770] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
-smb_command 50
-[244388.470774] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending=20
+[244388.470766] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In QFSDevi=
+ceInfo [244388.470770] /build/buildd/linux-3.2.0/fs/cifs/transport.c: F=
+or smb_command 50 [244388.470774] /build/buildd/linux-3.2.0/fs/cifs/tra=
+nsport.c: Sending
 smb:  total_len 72
-[244388.471570] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002=20
-header 0x4a
-[244388.471594] /build/buildd/linux-3.2.0/fs/cifs/transport.c:=20
-cifs_sync_mid_result: cmd=3D50 mid=3D3684 state=3D4
-[244388.471601] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In=20
-QFSAttributeInfo
-[244388.471605] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
-smb_command 50
-[244388.471608] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending=20
+[244388.471570] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 he=
+ader 0x4a [244388.471594] /build/buildd/linux-3.2.0/fs/cifs/transport.c=
+:=20
+cifs_sync_mid_result: cmd=3D50 mid=3D3684 state=3D4 [244388.471601] /bu=
+ild/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In QFSAttributeInfo [244388.4=
+71605] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For smb_command 5=
+0 [244388.471608] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sendin=
+g
 smb:  total_len 72
-[244388.472495] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002=20
-header 0x4c
-[244388.472510] /build/buildd/linux-3.2.0/fs/cifs/transport.c:=20
-cifs_sync_mid_result: cmd=3D50 mid=3D3685 state=3D4
-[244388.472519] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
-smb_command 50
-[244388.472523] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending=20
+[244388.472495] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 he=
+ader 0x4c [244388.472510] /build/buildd/linux-3.2.0/fs/cifs/transport.c=
+:=20
+cifs_sync_mid_result: cmd=3D50 mid=3D3685 state=3D4 [244388.472519] /bu=
+ild/buildd/linux-3.2.0/fs/cifs/transport.c: For smb_command 50 [244388.=
+472523] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending
 smb:  total_len 164
-[244388.473273] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002=20
-header 0xdc
-[244388.473807] /build/buildd/linux-3.2.0/fs/cifs/transport.c:=20
-cifs_sync_mid_result: cmd=3D50 mid=3D3686 state=3D4
-[244388.473814] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
+[244388.473273] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 he=
+ader 0xdc [244388.473807] /build/buildd/linux-3.2.0/fs/cifs/transport.c=
+:=20
+cifs_sync_mid_result: cmd=3D50 mid=3D3686 state=3D4 [244388.473814] /bu=
+ild/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=20
 leaving cifs_mount (xid =3D 2283) rc =3D 0
 [244388.473822] /build/buildd/linux-3.2.0/fs/cifs/cifsfs.c: Use existin=
-g=20
-superblock
-[244388.473828] /build/buildd/linux-3.2.0/fs/cifs/connect.c:=20
+g superblock [244388.473828] /build/buildd/linux-3.2.0/fs/cifs/connect.=
+c:=20
 cifs_put_tcon: tc_count=3D2
 [244388.473830]
-[244388.473929] /build/buildd/linux-3.2.0/fs/cifs/cifsfs.c: Get root=20
-dentry for \\machine1.domain.local\data\13908
-[244388.473939] /build/buildd/linux-3.2.0/fs/cifs/dir.c: CIFS VFS: in=20
-cifs_lookup as Xid: 2285 with uid: 0
-[244388.473944] /build/buildd/linux-3.2.0/fs/cifs/dir.c: parent inode =3D=
-=20
-0xffff88006c498070 name is: machine1.domain.local and dentry =3D=20
+[244388.473929] /build/buildd/linux-3.2.0/fs/cifs/cifsfs.c: Get root de=
+ntry for \\machine1.domain.local\data\13908
+[244388.473939] /build/buildd/linux-3.2.0/fs/cifs/dir.c: CIFS VFS: in c=
+ifs_lookup as Xid: 2285 with uid: 0 [244388.473944] /build/buildd/linux=
+-3.2.0/fs/cifs/dir.c: parent inode =3D
+0xffff88006c498070 name is: machine1.domain.local and dentry =3D
 0xffff8800566ae000
-[244388.473949] /build/buildd/linux-3.2.0/fs/cifs/dir.c: NULL inode in=20
-lookup
-[244388.473952] /build/buildd/linux-3.2.0/fs/cifs/dir.c: Full path:=20
+[244388.473949] /build/buildd/linux-3.2.0/fs/cifs/dir.c: NULL inode in =
+lookup [244388.473952] /build/buildd/linux-3.2.0/fs/cifs/dir.c: Full pa=
+th:=20
 \\machine1.domain.local\data\machine1.domain.local inode =3D 0x        =
  =20
 (null)
 [244388.473957] /build/buildd/linux-3.2.0/fs/cifs/inode.c: Getting info=
-=20
-on \\machine1.domain.local\data\machine1.domain.local
-[244388.473964] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
-smb_command 50
-[244388.473967] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending=20
+ on \\machine1.domain.local\data\machine1.domain.local
+[244388.473964] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For smb_=
+command 50 [244388.473967] /build/buildd/linux-3.2.0/fs/cifs/transport.=
+c: Sending
 smb:  total_len 212
-[244388.474865] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002=20
-header 0x23
-[244388.474872] /build/buildd/linux-3.2.0/fs/cifs/connect.c: invalid=20
+[244388.474865] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 he=
+ader 0x23 [244388.474872] /build/buildd/linux-3.2.0/fs/cifs/connect.c: =
+invalid
 transact2 word count
 [244388.474884] /build/buildd/linux-3.2.0/fs/cifs/transport.c:=20
-cifs_sync_mid_result: cmd=3D50 mid=3D3687 state=3D4
-[244388.474888] Status code returned 0xc0000034=20
-NT_STATUS_OBJECT_NAME_NOT_FOUND
-[244388.474894] /build/buildd/linux-3.2.0/fs/cifs/netmisc.c: Mapping sm=
-b=20
-error code 0xc0000034 to POSIX err -2
-[244388.474898] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: Send error=
-=20
-in QPathInfo =3D -2
-[244388.474903] /build/buildd/linux-3.2.0/fs/cifs/dir.c: CIFS VFS:=20
+cifs_sync_mid_result: cmd=3D50 mid=3D3687 state=3D4 [244388.474888] Sta=
+tus code returned 0xc0000034 NT_STATUS_OBJECT_NAME_NOT_FOUND [244388.47=
+4894] /build/buildd/linux-3.2.0/fs/cifs/netmisc.c: Mapping smb error co=
+de 0xc0000034 to POSIX err -2 [244388.474898] /build/buildd/linux-3.2.0=
+/fs/cifs/cifssmb.c: Send error in QPathInfo =3D -2 [244388.474903] /bui=
+ld/buildd/linux-3.2.0/fs/cifs/dir.c: CIFS VFS:=20
 leaving cifs_lookup (xid =3D 2285) rc =3D 0
 
 
 
 The folder \\domain.local\data exists with permissions for the user and=
-=20
-the folder \\domain.local\data\13908 also with permissions, in fact if =
-I=20
+ the folder \\domain.local\data\13908 also with permissions, in fact if=
+ I
 use:
 
-# sudo mount -t cifs \\\\domain.local\\data mountPoint -o=20
-"username=3DmyUser,uid=3D489689328,gid=3D489685505,nounix,noserverino" =
---verbose
+# sudo mount -t cifs \\\\domain.local\\data mountPoint -o "username=3Dm=
+yUser,uid=3D489689328,gid=3D489685505,nounix,noserverino" --verbose
 
 It works and I can navigate to mountpoint/13908 without problems.
 
@@ -512,18 +465,22 @@ ly can't see the subdirectory but that is just a guess.
 > -Bob
 >
 > -----Original Message-----
-> From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [mailto:linux-cifs-owner@vger.=
-kernel.org] On Behalf Of Javier Mart=C3=AD Monforte
+> From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org=20
+> [mailto:linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org] On Behalf Of Javier Mart=C3=
+=AD=20
+> Monforte
 > Sent: Friday, August 01, 2014 1:43 AM
 > To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 > Subject: Mount fileshare with prefixpath [mount error(2): No such fil=
-e or directory]
+e=20
+> or directory]
 >
 > Hello list,
 >
-> I have a problem with mounting a cifs share with prefix path, I run u=
-buntu 12.04 Precise Pangolin and I have updated mount.cifs package to c=
-ifs-utils Version: 2:6.0-1ubuntu2
+> I have a problem with mounting a cifs share with prefix path, I run=20
+> ubuntu 12.04 Precise Pangolin and I have updated mount.cifs package t=
+o=20
+> cifs-utils Version: 2:6.0-1ubuntu2
 >
 > The command:
 > # sudo mount -t cifs \\\\machine.server.es\\datos\\13908
@@ -533,9 +490,10 @@ ifs-utils Version: 2:6.0-1ubuntu2
 >
 > mount.cifs kernel mount options:
 > ip=3D172.27.194.152,unc=3D\\machine.server.es\datos,uid=3D489689328,g=
-id=3D489685505,user=3Dd24399776l,prefixpath=3D13908,pass=3D********
-> mount error(2): No such file or directory Refer to the mount.cifs(8) =
-manual page (e.g. man mount.cifs)
+id=3D4896
+> 85505,user=3Dd24399776l,prefixpath=3D13908,pass=3D********
+> mount error(2): No such file or directory Refer to the mount.cifs(8)=20
+> manual page (e.g. man mount.cifs)
 >
 >
 > The results:
@@ -549,8 +507,8 @@ manual page (e.g. man mount.cifs)
 > And a dmesg with debugging activated:
 >
 > [72758.230822] /build/buildd/linux-3.2.0/fs/cifs/cifsfs.c: Devname:
-> \\machine.server.es\datos\13908 flags: 0 [72758.230835] /build/buildd=
-/linux-3.2.0/fs/cifs/connect.c: prefix path
+> \\machine.server.es\datos\13908 flags: 0 [72758.230835]=20
+> /build/buildd/linux-3.2.0/fs/cifs/connect.c: prefix path
 > /13908
 > [72758.230839] /build/buildd/linux-3.2.0/fs/cifs/connect.c: Username:
 > d24399776l
@@ -572,18 +530,19 @@ d/buildd/linux-3.2.0/fs/cifs/connect.c: Found match on UNC path [72758.=
 230947] /build/buildd/linux-3.2.0/fs/cifs/connect.c:
 > cifs_put_smb_ses: ses_count=3D2
 > [72758.230949]
-> [72758.230951] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In QFSDev=
-iceInfo [72758.230958] /build/buildd/linux-3.2.0/fs/cifs/transport.c: F=
-or smb_command 50 [72758.230962] /build/buildd/linux-3.2.0/fs/cifs/tran=
-sport.c: Sending
+> [72758.230951] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In=20
+> QFSDeviceInfo [72758.230958]=20
+> /build/buildd/linux-3.2.0/fs/cifs/transport.c: For smb_command 50=20
+> [72758.230962] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending
 > smb:  total_len 72
 > [72758.231651] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 h=
 eader 0x4a [72758.231682] /build/buildd/linux-3.2.0/fs/cifs/transport.c=
 :
-> cifs_sync_mid_result: cmd=3D50 mid=3D137 state=3D4 [72758.231688] /bu=
-ild/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In QFSAttributeInfo [72758.23=
-1692] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For smb_command 50=
- [72758.231696] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending
+> cifs_sync_mid_result: cmd=3D50 mid=3D137 state=3D4 [72758.231688]=20
+> /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In QFSAttributeInfo=20
+> [72758.231692] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
+> smb_command 50 [72758.231696]=20
+> /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending
 > smb:  total_len 72
 > [72758.232463] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 h=
 eader 0x4c [72758.232485] /build/buildd/linux-3.2.0/fs/cifs/transport.c=
@@ -591,10 +550,10 @@ eader 0x4c [72758.232485] /build/buildd/linux-3.2.0/fs/cifs/transport.c=
 > cifs_sync_mid_result: cmd=3D50 mid=3D138 state=3D4 [72758.232492] /bu=
 ild/buildd/linux-3.2.0/fs/cifs/connect.c:
 > build_unc_path_to_root: full_path=3D\\machine.server.es\datos\13908
-> [72758.232520] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In GetDFS=
-Refer the path \machine.server.es\datos [72758.232527] /build/buildd/li=
-nux-3.2.0/fs/cifs/transport.c: For smb_command 50 [72758.232530] /build=
-/buildd/linux-3.2.0/fs/cifs/transport.c: Sending
+> [72758.232520] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In=20
+> GetDFSRefer the path \machine.server.es\datos [72758.232527]=20
+> /build/buildd/linux-3.2.0/fs/cifs/transport.c: For smb_command 50=20
+> [72758.232530] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending
 > smb:  total_len 148
 > [72758.233686] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 h=
 eader 0x140 [72758.233709] /build/buildd/linux-3.2.0/fs/cifs/transport.=
@@ -606,9 +565,9 @@ ifssmb.c:
 > num_referrals: 1 dfs flags: 0x3 ...
 > [72758.233720]
 > [72758.233736] /build/buildd/linux-3.2.0/fs/cifs/dns_resolve.c:
-> dns_resolve_server_name_to_ip: resolved: machine.server.es to 172.27.=
-194.152 [72758.233752] /build/buildd/linux-3.2.0/fs/cifs/connect.c: pre=
-fix path
+> dns_resolve_server_name_to_ip: resolved: machine.server.es to=20
+> 172.27.194.152 [72758.233752]=20
+> /build/buildd/linux-3.2.0/fs/cifs/connect.c: prefix path
 > /\13908
 > [72758.233755] /build/buildd/linux-3.2.0/fs/cifs/connect.c: Username:
 > d24399776l
@@ -616,10 +575,10 @@ fix path
 > cifs_put_tcon: tc_count=3D2
 > [72758.233760]
 > [72758.233763] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:
-> leaving cifs_mount (xid =3D 2668) rc =3D 0
-> [72758.233767] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:=
- in cifs_mount as Xid: 2670 with uid: 0 [72758.233770] /build/buildd/li=
-nux-3.2.0/fs/cifs/connect.c: UNC:
+> leaving cifs_mount (xid =3D 2668) rc =3D 0 [72758.233767]=20
+> /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS: in cifs_mount =
+as Xid: 2670 with uid: 0 [72758.233770] /build/buildd/linux-3.2.0/fs/ci=
+fs/connect.c: UNC:
 > \\machine.server.es\datos ip: 172.27.194.152 [72758.233774] /build/bu=
 ildd/linux-3.2.0/fs/cifs/connect.c: Existing tcp session with server fo=
 und [72758.233778] /build/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VF=
@@ -632,50 +591,53 @@ d/buildd/linux-3.2.0/fs/cifs/connect.c: Found match on UNC path [72758.=
 233791] /build/buildd/linux-3.2.0/fs/cifs/connect.c:
 > cifs_put_smb_ses: ses_count=3D2
 > [72758.233793]
-> [72758.233795] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In QFSDev=
-iceInfo [72758.233799] /build/buildd/linux-3.2.0/fs/cifs/transport.c: F=
-or smb_command 50 [72758.233802] /build/buildd/linux-3.2.0/fs/cifs/tran=
-sport.c: Sending
+> [72758.233795] /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In=20
+> QFSDeviceInfo [72758.233799]=20
+> /build/buildd/linux-3.2.0/fs/cifs/transport.c: For smb_command 50=20
+> [72758.233802] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending
 > smb:  total_len 72
 > [72758.234429] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 h=
 eader 0x4a [72758.234443] /build/buildd/linux-3.2.0/fs/cifs/transport.c=
 :
-> cifs_sync_mid_result: cmd=3D50 mid=3D140 state=3D4 [72758.234448] /bu=
-ild/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In QFSAttributeInfo [72758.23=
-4452] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For smb_command 50=
- [72758.234455] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending
+> cifs_sync_mid_result: cmd=3D50 mid=3D140 state=3D4 [72758.234448]=20
+> /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In QFSAttributeInfo=20
+> [72758.234452] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
+> smb_command 50 [72758.234455]=20
+> /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending
 > smb:  total_len 72
 > [72758.235508] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 h=
 eader 0x4c [72758.235521] /build/buildd/linux-3.2.0/fs/cifs/transport.c=
 :
-> cifs_sync_mid_result: cmd=3D50 mid=3D141 state=3D4 [72758.235528] /bu=
-ild/buildd/linux-3.2.0/fs/cifs/transport.c: For smb_command 50 [72758.2=
-35532] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending
+> cifs_sync_mid_result: cmd=3D50 mid=3D141 state=3D4 [72758.235528]=20
+> /build/buildd/linux-3.2.0/fs/cifs/transport.c: For smb_command 50=20
+> [72758.235532] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending
 > smb:  total_len 166
 > [72758.236337] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 h=
 eader 0xde [72758.236358] /build/buildd/linux-3.2.0/fs/cifs/transport.c=
 :
 > cifs_sync_mid_result: cmd=3D50 mid=3D142 state=3D4 [72758.236366] /bu=
 ild/buildd/linux-3.2.0/fs/cifs/connect.c: CIFS VFS:
-> leaving cifs_mount (xid =3D 2670) rc =3D 0
-> [72758.236382] /build/buildd/linux-3.2.0/fs/cifs/inode.c: CIFS VFS: i=
-n cifs_root_iget as Xid: 2672 with uid: 0 [72758.236385] /build/buildd/=
-linux-3.2.0/fs/cifs/inode.c: Getting info on [72758.236389] /build/buil=
-dd/linux-3.2.0/fs/cifs/transport.c: For smb_command 50 [72758.236392] /=
-build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending
+> leaving cifs_mount (xid =3D 2670) rc =3D 0 [72758.236382]=20
+> /build/buildd/linux-3.2.0/fs/cifs/inode.c: CIFS VFS: in cifs_root_ige=
+t=20
+> as Xid: 2672 with uid: 0 [72758.236385]=20
+> /build/buildd/linux-3.2.0/fs/cifs/inode.c: Getting info on=20
+> [72758.236389] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
+> smb_command 50 [72758.236392]=20
+> /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending
 > smb:  total_len 78
 > [72758.237078] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 h=
 eader 0x86 [72758.237092] /build/buildd/linux-3.2.0/fs/cifs/transport.c=
 :
-> cifs_sync_mid_result: cmd=3D50 mid=3D143 state=3D4 [72758.237098] /bu=
-ild/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In GetSrvInodeNum for [72758.=
-237102] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For smb_command =
-50 [72758.237105] /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sendin=
-g
+> cifs_sync_mid_result: cmd=3D50 mid=3D143 state=3D4 [72758.237098]=20
+> /build/buildd/linux-3.2.0/fs/cifs/cifssmb.c: In GetSrvInodeNum for=20
+> [72758.237102] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
+> smb_command 50 [72758.237105]=20
+> /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending
 > smb:  total_len 78
-> [72758.237773] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 h=
-eader 0x23 [72758.237778] /build/buildd/linux-3.2.0/fs/cifs/connect.c: =
-invalid
+> [72758.237773] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002=20
+> header 0x23 [72758.237778]=20
+> /build/buildd/linux-3.2.0/fs/cifs/connect.c: invalid
 > transact2 word count
 > [72758.237789] /build/buildd/linux-3.2.0/fs/cifs/transport.c:
 > cifs_sync_mid_result: cmd=3D50 mid=3D144 state=3D4 [72758.237792] Sta=
@@ -693,28 +655,30 @@ no" option to silence this message.
 > [72758.237821] /build/buildd/linux-3.2.0/fs/cifs/inode.c:
 > cifs_revalidate_cache: revalidating inode 7310 [72758.237824] /build/=
 buildd/linux-3.2.0/fs/cifs/inode.c:
-> cifs_revalidate_cache: inode 7310 is new [72758.237828] /build/buildd=
-/linux-3.2.0/fs/cifs/inode.c: inode
-> 0xffff880072b4ad10 old_time=3D0 new_time=3D4313081855 [72758.237834] =
-/build/buildd/linux-3.2.0/fs/cifs/cifsfs.c: Get root dentry for \\machi=
-ne.server.es\datos\\13908 [72758.237840] /build/buildd/linux-3.2.0/fs/c=
-ifs/dir.c: CIFS VFS: in cifs_lookup as Xid: 2673 with uid: 0 [72758.237=
-844] /build/buildd/linux-3.2.0/fs/cifs/dir.c: parent inode =3D
+> cifs_revalidate_cache: inode 7310 is new [72758.237828]=20
+> /build/buildd/linux-3.2.0/fs/cifs/inode.c: inode
+> 0xffff880072b4ad10 old_time=3D0 new_time=3D4313081855 [72758.237834]=20
+> /build/buildd/linux-3.2.0/fs/cifs/cifsfs.c: Get root dentry for=20
+> \\machine.server.es\datos\\13908 [72758.237840]=20
+> /build/buildd/linux-3.2.0/fs/cifs/dir.c: CIFS VFS: in cifs_lookup as=20
+> Xid: 2673 with uid: 0 [72758.237844]=20
+> /build/buildd/linux-3.2.0/fs/cifs/dir.c: parent inode =3D
 > 0xffff880072b4ad10 name is: machine.server.es and dentry =3D
 > 0xffff8800a3f59900
 > [72758.237849] /build/buildd/linux-3.2.0/fs/cifs/dir.c: NULL inode in=
  lookup [72758.237853] /build/buildd/linux-3.2.0/fs/cifs/dir.c: Full pa=
 th:
-> \\machine.server.es\datos\machine.server.es inode =3D 0x (null) [7275=
-8.237857] /build/buildd/linux-3.2.0/fs/cifs/inode.c: Getting info on \\=
-machine.server.es\datos\machine.server.es
-> [72758.237863] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For smb=
-_command 50 [72758.237866] /build/buildd/linux-3.2.0/fs/cifs/transport.=
-c: Sending
+> \\machine.server.es\datos\machine.server.es inode =3D 0x (null)=20
+> [72758.237857] /build/buildd/linux-3.2.0/fs/cifs/inode.c: Getting inf=
+o=20
+> on \\machine.server.es\datos\machine.server.es
+> [72758.237863] /build/buildd/linux-3.2.0/fs/cifs/transport.c: For=20
+> smb_command 50 [72758.237866]=20
+> /build/buildd/linux-3.2.0/fs/cifs/transport.c: Sending
 > smb:  total_len 212
-> [72758.238723] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002 h=
-eader 0x23 [72758.238728] /build/buildd/linux-3.2.0/fs/cifs/connect.c: =
-invalid
+> [72758.238723] /build/buildd/linux-3.2.0/fs/cifs/connect.c: RFC1002=20
+> header 0x23 [72758.238728]=20
+> /build/buildd/linux-3.2.0/fs/cifs/connect.c: invalid
 > transact2 word count
 > [72758.238738] /build/buildd/linux-3.2.0/fs/cifs/transport.c:
 > cifs_sync_mid_result: cmd=3D50 mid=3D145 state=3D4 [72758.238742] Sta=
@@ -723,8 +687,8 @@ tus code returned 0xc0000034 NT_STATUS_OBJECT_NAME_NOT_FOUND [72758.238=
 e 0xc0000034 to POSIX err -2 [72758.238751] /build/buildd/linux-3.2.0/f=
 s/cifs/cifssmb.c: Send error in QPathInfo =3D -2 [72758.238755] /build/=
 buildd/linux-3.2.0/fs/cifs/dir.c: CIFS VFS:
-> leaving cifs_lookup (xid =3D 2673) rc =3D 0
-> [72758.238844] /build/buildd/linux-3.2.0/fs/cifs/connect.c:
+> leaving cifs_lookup (xid =3D 2673) rc =3D 0 [72758.238844]=20
+> /build/buildd/linux-3.2.0/fs/cifs/connect.c:
 > cifs_put_tcon: tc_count=3D2
 > [72758.238846]
 >
@@ -733,11 +697,19 @@ buildd/linux-3.2.0/fs/cifs/dir.c: CIFS VFS:
 > Thank you
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org More majordomo i=
-nfo at  http://vger.kernel.org/majordomo-info.html
+=20
+> in the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org More majordomo=20
+> info at  http://vger.kernel.org/majordomo-info.html
 >
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+=20
+> in the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org More majordomo=20
+> info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-cifs" i=
+n the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org More majordomo inf=
+o at  http://vger.kernel.org/majordomo-info.html
