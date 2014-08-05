@@ -1,41 +1,35 @@
-From: "McCall, Andy \(IT.PFMS\)" <Andy.McCall-JGeVbDYbwmjRZ1oM81ef8Q@public.gmane.org>
-Subject: RE: DFS root namespace mounting problem...
-Date: Tue, 5 Aug 2014 16:22:41 +0100
-Message-ID: <44E091A70C02494A806AD35E6F93AB1A32B89D@HOSMAIL2B.ho.pfgroup.provfin.com>
-References: <44E091A70C02494A806AD35E6F93AB1A32B89B@HOSMAIL2B.ho.pfgroup.provfin.com> <1407248098.1426.7.camel@hh16.hh3.site> <44E091A70C02494A806AD35E6F93AB1A32B89C@HOSMAIL2B.ho.pfgroup.provfin.com> <1407251579.2941.8.camel@hh16.hh3.site>
+From: steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org>
+Subject: Re: DFS root namespace mounting problem...
+Date: Tue, 05 Aug 2014 18:16:00 +0200
+Message-ID: <1407255360.4226.1.camel@hh16.hh3.site>
+References: <44E091A70C02494A806AD35E6F93AB1A32B89B@HOSMAIL2B.ho.pfgroup.provfin.com>
+	 <1407248098.1426.7.camel@hh16.hh3.site>
+	 <44E091A70C02494A806AD35E6F93AB1A32B89C@HOSMAIL2B.ho.pfgroup.provfin.com>
+	 <1407251579.2941.8.camel@hh16.hh3.site>
+	 <44E091A70C02494A806AD35E6F93AB1A32B89D@HOSMAIL2B.ho.pfgroup.provfin.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: "steve" <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: "McCall, Andy (IT.PFMS)" <Andy.McCall-JGeVbDYbwmjRZ1oM81ef8Q@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-class: urn:content-classes:message
-In-Reply-To: <1407251579.2941.8.camel-HkULYb+WTT7YCGPCin2YbQ@public.gmane.org>
+In-Reply-To: <44E091A70C02494A806AD35E6F93AB1A32B89D-44HqyMtr/CW7efwRAOVE6/PBkhW9OzgPksZubNBzXmQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Pj4gSSd2ZSBqdXN0IHN3YXBwZWQgL3Vzci9zYmluL2NpZnMudXBjYWxsIG91dCBmb3IgYSBzY3Jp
-cHQgdGhhdCBlY2hvJ3MgDQo+PiB0ZXN0IHRvIC90bXAvdGV4dC50eHQgYW5kIGNpZnMudXBjYWxs
-IGlzbid0IGFjdHVhbGx5IGJlaW5nIGNhbGxlZCBhdCBhbGwgaW4gbXkgY2FzZS4NCj4NCj5Zb3Ug
-bWF5IGFscmVhZHkgaGF2ZSBhIHRpY2tldC4NCg0KSXQgbWlnaHQgYmUgdGhhdCB0aGUgdGVzdCBv
-ZiBzd2FwcGluZyBvdXQgY2lmcy51cGNhbGwgZm9yIGEgc2NyaXB0IHdvbid0IHdvcmssIGJ1dA0K
-SSB0cmllZCBpdCBvbiBhIHNlY29uZCBpZGVudGljYWwgYnVpbGQgc2VydmVyIG9uIHRoZSBmYXJt
-IHRoYXQgaGFzbid0IGJlZW4gdG91Y2hlZA0KeWV0IGFuZCB0aGF0IGFsc28gZGlkbid0IHByb2R1
-Y2UgL3RtcC90ZXh0LnR4dCwgc28gZWl0aGVyIHRoZSB0ZXN0IGlzIGludmFsaWQgb3INCmNpZnMu
-dXBjYWxsIGlzbid0IGdldHRpbmcgY2FsbGVkLg0KRElTQ0xBSU1FUi4gVGhlIGNvbnRlbnRzIG9m
-IHRoaXMgZW1haWwgYW5kIGl0cyBhdHRhY2htZW50cyBhcmUgaW50ZW5kZWQgc29sZWx5IGZvciB0
-aGUgb3JpZ2luYWwgcmVjaXBpZW50cyBhbmQgZXhwcmVzcyB0aGUgdmlld3Mgb2YgdGhlIGF1dGhv
-cnMgYW5kIG5vdCBuZWNlc3NhcmlseSB0aGUgQ29tcGFueS4gSWYgeW91IGFyZSBub3QgdGhlIGlu
-dGVuZGVkIHJlY2lwaWVudCBwbGVhc2UgZGVsZXRlIHdpdGhvdXQgY29weWluZyBvciBmb3J3YXJk
-aW5nIGFuZCBpbmZvcm0gdGhlIHNlbmRlciB0aGF0IHlvdSByZWNlaXZlZCBpdCBpbiBlcnJvci4g
-DQpQcm92aWRlbnQgRmluYW5jaWFsIE1hbmFnZW1lbnQgU2VydmljZXMgTHRkLCBSZWdpc3RlcmVk
-IGluIEVuZ2xhbmQsIENvbXBhbnkgTnVtYmVyIDMyODkzMy4gSW50ZXJpbSBQZXJtaXNzaW9ucyBS
-ZWZlcmVuY2UgTnVtYmVyOiAxMTkyMTkNClByb3ZpZGVudCBQZXJzb25hbCBDcmVkaXQgTHRkLCBS
-ZWdpc3RlcmVkIGluIEVuZ2xhbmQsIENvbXBhbnkgTnVtYmVyIDE0NjA5MS4gSW50ZXJpbSBQZXJt
-aXNzaW9ucyBSZWZlcmVuY2UgTnVtYmVyOiAwMDI1MjkNCkJvdGggUHJvdmlkZW50IEZpbmFuY2lh
-bCBNYW5hZ2VtZW50IFNlcnZpY2VzIEx0ZCBhbmQgUHJvdmlkZW50IFBlcnNvbmFsIENyZWRpdCBM
-dGQgYXJlIGF1dGhvcmlzZWQgYW5kIHJlZ3VsYXRlZCBieSB0aGUgRmluYW5jaWFsIENvbmR1Y3Qg
-QXV0aG9yaXR5LCBzZWUgSW50ZXJpbSBQZXJtaXNzaW9ucyBudW1iZXJzIGFib3ZlLiBSZWdpc3Rl
-cmVkIE9mZmljZTogTm8uMSBHb2R3aW4gU3RyZWV0LCBCcmFkZm9yZCwgV2VzdCBZb3Jrc2hpcmUg
-QkQxIDJTVSwgVW5pdGVkIEtpbmdkb20uDQogDQpQbGVhc2Ugc2F2ZSBwYXBlciAtIGRvbid0IHBy
-aW50IHRoaXMgZW1haWwgdW5sZXNzIG5lY2Vzc2FyeQo=
+On Tue, 2014-08-05 at 16:22 +0100, McCall, Andy (IT.PFMS) wrote:
+> >> I've just swapped /usr/sbin/cifs.upcall out for a script that echo's 
+> >> test to /tmp/text.txt and cifs.upcall isn't actually being called at all in my case.
+> >
+> >You may already have a ticket.
+> 
+> It might be that the test of swapping out cifs.upcall for a script won't work, but
+> I tried it on a second identical build server on the farm that hasn't been touched
+> yet and that also didn't produce /tmp/text.txt, so either the test is invalid or
+> cifs.upcall isn't getting called.
+
+Is this the problem:
+//fqdn/share
+mounts OK, but
+//domain/share
+doesn't.
