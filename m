@@ -1,86 +1,128 @@
-From: "McCall, Andy \(IT.PFMS\)" <Andy.McCall-JGeVbDYbwmjRZ1oM81ef8Q@public.gmane.org>
-Subject: RE: DFS root namespace mounting problem...
-Date: Tue, 5 Aug 2014 15:26:16 +0100
-Message-ID: <44E091A70C02494A806AD35E6F93AB1A32B89C@HOSMAIL2B.ho.pfgroup.provfin.com>
-References: <44E091A70C02494A806AD35E6F93AB1A32B89B@HOSMAIL2B.ho.pfgroup.provfin.com> <1407248098.1426.7.camel@hh16.hh3.site>
+From: steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org>
+Subject: Re: DFS root namespace mounting problem...
+Date: Tue, 05 Aug 2014 17:12:59 +0200
+Message-ID: <1407251579.2941.8.camel@hh16.hh3.site>
+References: <44E091A70C02494A806AD35E6F93AB1A32B89B@HOSMAIL2B.ho.pfgroup.provfin.com>
+	 <1407248098.1426.7.camel@hh16.hh3.site>
+	 <44E091A70C02494A806AD35E6F93AB1A32B89C@HOSMAIL2B.ho.pfgroup.provfin.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: "steve" <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: "McCall, Andy (IT.PFMS)" <Andy.McCall-JGeVbDYbwmjRZ1oM81ef8Q@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-class: urn:content-classes:message
-In-Reply-To: <1407248098.1426.7.camel-HkULYb+WTT7YCGPCin2YbQ@public.gmane.org>
+In-Reply-To: <44E091A70C02494A806AD35E6F93AB1A32B89C-44HqyMtr/CW7efwRAOVE6/PBkhW9OzgPksZubNBzXmQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Pj4gSSd2ZSBiZWVuIGZvbGxvd2luZyBzb21lIGd1aWRlcyBmb3IgbW91bnRpbmcgYSBERlMgcm9v
-dCBuYW1lc3BhY2UgdGhhdCANCj4+IGlzIGtub3duIHRvIHdvcmsgb24gV2luZG93cyBib3hlcyBv
-biBhIGZyZXNoIHVwZGF0ZWQgUkhFTDYuNSBpbnN0YWxsLg0KPj4NCj4+IEkgY2FuIG1vdW50IHRo
-ZSBzaGFyZXMgZGlyZWN0bHkgZnJvbSBlYWNoIG5vZGUgd2l0aGluIHRoZSBERlMgY2x1c3RlciAN
-Cj4+IHdpdGggbm8gaXNzdWVzOg0KPj4gDQo+PiAgIFtyb290QG15c2VydmVyIH5dIyBtb3VudCAt
-dCBjaWZzIC12IC8vbm9kZTEubXkuZG9tYWluLmNvbS9teXJvb3QvIA0KPj4gL3NoYXJlIC1vIHVz
-ZXJuYW1lPW15ZG9tYWluYWNjb3VudA0KPj4gICBQYXNzd29yZDoNCj4+ICAgbW91bnQuY2lmcyBr
-ZXJuZWwgbW91bnQgb3B0aW9uczoNCj4+IGlwPTE5Mi4xNjguMTAuMSx1bmM9XFxub2RlMS5teS5k
-b21haW4uY29tXHNoYXJlLCx2ZXI9MSx1c2VyPW15ZG9tYWluYWMNCj4+IGNvDQo+PiB1bnQscGFz
-cz0qKioqKioqKg0KPj4gDQo+PiAgIFtyb290QG15c2VydmVyIH5dIyBtb3VudCB8IGdyZXAgc2hh
-cmUgLy9ub2RlMS5teS5kb21haW4uY29tL3NoYXJlLyANCj4+IG9uIC9zaGFyZSB0eXBlIGNpZnMg
-KHJ3KQ0KPj4gDQo+PiBCdXQgaWYgSSB0cnkgYW5kIG1vdW50IGFnYWluc3QgdGhlIERGUyByb290
-IG5hbWVzcGFjZSBpdCBmYWlsczoNCj4+IA0KPj4gICBtb3VudCAtdCBjaWZzIC12IC8vbXkuZG9t
-YWluLmNvbS9teXJvb3QgL3NoYXJlIC1vIHVzZXJuYW1lPSANCj4+IG15ZG9tYWluYWNjb3VudCxk
-b21haW49bXkuZG9tYWluLmNvbQ0KPj4gICBQYXNzd29yZDoNCj4+ICAgbW91bnQuY2lmcyBrZXJu
-ZWwgbW91bnQgb3B0aW9uczoNCj4+IGlwPTE5Mi4xNjguMS4xLHVuYz1cXG15LmRvbWFpbi5jb21c
-bXlyb290LCx2ZXI9MSx1c2VyPW15ZG9tYWluYWNjb3VudCwNCj4+IGRvDQo+PiBtYWluPW15LmRv
-bWFpbi5jb20scGFzcz0qKioqKioqKg0KPj4gICBtb3VudC5jaWZzIGtlcm5lbCBtb3VudCBvcHRp
-b25zOiBpcD0xOTIuMTY4LjEuMix1bmM9XFxteS5kb21haW4uY29tDQo+PiBcbXlyb290LCx2ZXI9
-MSx1c2VyPW15ZG9tYWluYWNjb3VudCxkb21haW49bXkuZG9tYWluLmNvbSxwYXNzPSoqKioqKioq
-DQo+PiAgIFVuYWJsZSB0byBmaW5kIHN1aXRhYmxlIGFkZHJlc3MuDQo+PiANCj4+IFRoZSBJUCBh
-ZGRyZXNzZXMgMTkyLjE2OC4xLjEsIDE5Mi4xNjguMS4xIGFyZSB0aGUgRE5TIC8gZG9tYWluIA0K
-Pj4gc2VydmVycywgbm90IHRoZSBERlMgbm9kZSBzZXJ2ZXJzLCBsZWFkaW5nIG1lIHRvIGJlbGll
-dmUgSSdtIG5vdCANCj4+IGdldHRpbmcgcmVmZXJyYWxzIHRvIHRoZSB1bmRlcmx5aW5nIG5vZGVz
-LiAgQSB0Y3BkdW1wIGhvc3QgYWdhaW5zdCBteSANCj4+IG5vZGVzIHdoaWxlIHRyeWluZyB0byBt
-b3VudCB0aGUgc2hhcmUgY29uZmlybXMgdGhpcywgaW5kaWNhdGluZyBpdHMgDQo+PiB0cnlpbmcg
-dG8gbW91bnQgL3NoYXJlIGZyb20gdGhlIGRvbWFpbiBzZXJ2ZXJzIC0gd2hpY2ggaXMgd2h5IGl0
-IGZhaWxzLg0KPj4gDQo+PiBJJ3ZlIGZvbGxvd2VkIGFsbCB0aGUgZ3VpZGVzIGFuZCBhcyBmYXIg
-YXMgSSBjYW4gdGVsbCwgdGhpcyBzaG91bGQgYmUgDQo+PiBmYWlybHkgZWFzeSBieSBjb25maWd1
-cmluZyByZXF1ZXN0LWtleS5kIGZpbGVzOg0KPj4gDQo+PiAgIFtyb290QG15c2VydmVyIHJlcXVl
-c3Qta2V5LmRdIyBjYXQNCj4+IC9ldGMvcmVxdWVzdC1rZXkuZC9kbnNfcmVzb2x2ZXIuY29uZg0K
-Pj4gICBjcmVhdGUgZG5zX3Jlc29sdmVyICogKiAvdXNyL3NiaW4vY2lmcy51cGNhbGwgJWsNCj4+
-IA0KPj4gICBbcm9vdEBteXNlcnZlciByZXF1ZXN0LWtleS5kXSMgY2F0IC9ldGMvcmVxdWVzdC1r
-ZXkuZC9jaWZzLnNwbmVnby5jb25mDQo+PiAgIGNyZWF0ZSBjaWZzLnNwbmVnbyAqICogL3Vzci9z
-YmluL2NpZnMudXBjYWxsIC10ICVrDQo+PiANCj4+IENhbiBzb21lb25lIGdpdmUgbWUgc29tZSBw
-b2ludGVycyBhcyB0byB3aGVyZSB0aGluZ3MgY291bGQgYmUgZ29pbmcgDQo+PiB3cm9uZz8gIEkn
-bSBubyBleHBlcnQgYXQgREZTLCBidXQgSSdkIGxpa2UgdG8ga25vdyBJJ20gYXQgbGVhc3QgDQo+
-PiBsb29raW5nIGluIHRoZSBjb3JyZWN0IHBsYWNlLg0KDQo+IFRoZSBjaWZzIHVwY2FsbCBsb29r
-cyBmb3IgdGhlIHVzZXJuYW1lIChtYXliZSAndXNlcicgd2lsbCB3b3JrKSBpbiB0aGUga2V5dGFi
-Lg0KPiBIb3dldmVyIHdlIGRvIG5vdCBzZWVtIHRvIGhhdmUgYW55IHdheSB0byB0ZWxsIGNpZnMg
-dGhhdCB0aGF0IHRoZSB1bmMgeW91IGhhdmUNCj4gc3BlY2lmaWVkIGlzIHBhcnQgb2YgREZTIGFu
-ZCBzbyBpdCB0cmVhdHMgdGhlIGRvbWFpbiBwYXJ0IG9mIHRoZSB1bmMgYXMgdGhlIGhvc3QNCj4g
-d2hlcmUgdGhlIHNoYXJlIGlzIHN0b3JlZCwgd2hpY2ggb2YgY291cnNlIGl0IHRoZW4gY2FuJ3Qg
-ZmluZC4NCj4NCj4gRldJVywgd2UgZ2F2ZSB1cCBvbiB0aGlzIGEgZmV3IHdlZWtzIGFnbyBhbmQg
-c2V0IHVwIGEgcmVhbCBjbHVzdGVyIHdpdGggQ1REQi4gQQ0KPiBsb3QgbW9yZSBlZmZvcnQgYnV0
-IGl0IHNvbHZlZCBvdXIgZmlsZSBzZXJ2ZXIgcHJvYmxlbXMuDQo+DQo+IEkgaG9wZSB5b3UnbGwg
-YmUgYWJsZSB0byBwcm92ZSB1cyB3cm9uZyBhbmQgdGhhdCBhbGwgb3VyIHdvcmsgaGFzIGJlZW4g
-Zm9yIG5vdGhpbmcNCj4gYW5kIHRoYXQgZG9tYWluIERGUyB3b3JrcyBmaW5lLiBXZSB3ZXJlIHVu
-YWJsZSB0byBnZXQgaXQgdG8gd29yay4NCg0KSSd2ZSBqdXN0IHN3YXBwZWQgL3Vzci9zYmluL2Np
-ZnMudXBjYWxsIG91dCBmb3IgYSBzY3JpcHQgdGhhdCBlY2hvJ3MgdGVzdCB0byAvdG1wL3RleHQu
-dHh0DQphbmQgY2lmcy51cGNhbGwgaXNuJ3QgYWN0dWFsbHkgYmVpbmcgY2FsbGVkIGF0IGFsbCBp
-biBteSBjYXNlLg0KDQpPdGhlciBwZW9wbGUgc2VlbSB0byBiZSBhYmxlIHRvIG1vdW50IHJvb3Qg
-bmFtZXNwYWNlcyB3aXRoIG5vIGlzc3Vlcz8gIElzIHRoaXMgYSBSSEVMIGJ1Zz8NCg0KVGhhbmtz
-LA0KDQpBTQ0KRElTQ0xBSU1FUi4gVGhlIGNvbnRlbnRzIG9mIHRoaXMgZW1haWwgYW5kIGl0cyBh
-dHRhY2htZW50cyBhcmUgaW50ZW5kZWQgc29sZWx5IGZvciB0aGUgb3JpZ2luYWwgcmVjaXBpZW50
-cyBhbmQgZXhwcmVzcyB0aGUgdmlld3Mgb2YgdGhlIGF1dGhvcnMgYW5kIG5vdCBuZWNlc3Nhcmls
-eSB0aGUgQ29tcGFueS4gSWYgeW91IGFyZSBub3QgdGhlIGludGVuZGVkIHJlY2lwaWVudCBwbGVh
-c2UgZGVsZXRlIHdpdGhvdXQgY29weWluZyBvciBmb3J3YXJkaW5nIGFuZCBpbmZvcm0gdGhlIHNl
-bmRlciB0aGF0IHlvdSByZWNlaXZlZCBpdCBpbiBlcnJvci4gDQpQcm92aWRlbnQgRmluYW5jaWFs
-IE1hbmFnZW1lbnQgU2VydmljZXMgTHRkLCBSZWdpc3RlcmVkIGluIEVuZ2xhbmQsIENvbXBhbnkg
-TnVtYmVyIDMyODkzMy4gSW50ZXJpbSBQZXJtaXNzaW9ucyBSZWZlcmVuY2UgTnVtYmVyOiAxMTky
-MTkNClByb3ZpZGVudCBQZXJzb25hbCBDcmVkaXQgTHRkLCBSZWdpc3RlcmVkIGluIEVuZ2xhbmQs
-IENvbXBhbnkgTnVtYmVyIDE0NjA5MS4gSW50ZXJpbSBQZXJtaXNzaW9ucyBSZWZlcmVuY2UgTnVt
-YmVyOiAwMDI1MjkNCkJvdGggUHJvdmlkZW50IEZpbmFuY2lhbCBNYW5hZ2VtZW50IFNlcnZpY2Vz
-IEx0ZCBhbmQgUHJvdmlkZW50IFBlcnNvbmFsIENyZWRpdCBMdGQgYXJlIGF1dGhvcmlzZWQgYW5k
-IHJlZ3VsYXRlZCBieSB0aGUgRmluYW5jaWFsIENvbmR1Y3QgQXV0aG9yaXR5LCBzZWUgSW50ZXJp
-bSBQZXJtaXNzaW9ucyBudW1iZXJzIGFib3ZlLiBSZWdpc3RlcmVkIE9mZmljZTogTm8uMSBHb2R3
-aW4gU3RyZWV0LCBCcmFkZm9yZCwgV2VzdCBZb3Jrc2hpcmUgQkQxIDJTVSwgVW5pdGVkIEtpbmdk
-b20uDQogDQpQbGVhc2Ugc2F2ZSBwYXBlciAtIGRvbid0IHByaW50IHRoaXMgZW1haWwgdW5sZXNz
-IG5lY2Vzc2FyeQo=
+On Tue, 2014-08-05 at 15:26 +0100, McCall, Andy (IT.PFMS) wrote:
+> >> I've been following some guides for mounting a DFS root namespace =
+that=20
+> >> is known to work on Windows boxes on a fresh updated RHEL6.5 insta=
+ll.
+> >>
+> >> I can mount the shares directly from each node within the DFS clus=
+ter=20
+> >> with no issues:
+> >>=20
+> >>   [root@myserver ~]# mount -t cifs -v //node1.my.domain.com/myroot=
+/=20
+> >> /share -o username=3Dmydomainaccount
+> >>   Password:
+> >>   mount.cifs kernel mount options:
+> >> ip=3D192.168.10.1,unc=3D\\node1.my.domain.com\share,,ver=3D1,user=3D=
+mydomainac
+> >> co
+> >> unt,pass=3D********
+> >>=20
+> >>   [root@myserver ~]# mount | grep share //node1.my.domain.com/shar=
+e/=20
+> >> on /share type cifs (rw)
+> >>=20
+> >> But if I try and mount against the DFS root namespace it fails:
+> >>=20
+> >>   mount -t cifs -v //my.domain.com/myroot /share -o username=3D=20
+> >> mydomainaccount,domain=3Dmy.domain.com
+> >>   Password:
+> >>   mount.cifs kernel mount options:
+> >> ip=3D192.168.1.1,unc=3D\\my.domain.com\myroot,,ver=3D1,user=3Dmydo=
+mainaccount,
+> >> do
+> >> main=3Dmy.domain.com,pass=3D********
+> >>   mount.cifs kernel mount options: ip=3D192.168.1.2,unc=3D\\my.dom=
+ain.com
+> >> \myroot,,ver=3D1,user=3Dmydomainaccount,domain=3Dmy.domain.com,pas=
+s=3D********
+> >>   Unable to find suitable address.
+> >>=20
+> >> The IP addresses 192.168.1.1, 192.168.1.1 are the DNS / domain=20
+> >> servers, not the DFS node servers, leading me to believe I'm not=20
+> >> getting referrals to the underlying nodes.  A tcpdump host against=
+ my=20
+> >> nodes while trying to mount the share confirms this, indicating it=
+s=20
+> >> trying to mount /share from the domain servers - which is why it f=
+ails.
+> >>=20
+> >> I've followed all the guides and as far as I can tell, this should=
+ be=20
+> >> fairly easy by configuring request-key.d files:
+> >>=20
+> >>   [root@myserver request-key.d]# cat
+> >> /etc/request-key.d/dns_resolver.conf
+> >>   create dns_resolver * * /usr/sbin/cifs.upcall %k
+> >>=20
+> >>   [root@myserver request-key.d]# cat /etc/request-key.d/cifs.spneg=
+o.conf
+> >>   create cifs.spnego * * /usr/sbin/cifs.upcall -t %k
+> >>=20
+> >> Can someone give me some pointers as to where things could be goin=
+g=20
+> >> wrong?  I'm no expert at DFS, but I'd like to know I'm at least=20
+> >> looking in the correct place.
+>=20
+> > The cifs upcall looks for the username (maybe 'user' will work) in =
+the keytab.
+> > However we do not seem to have any way to tell cifs that that the u=
+nc you have
+> > specified is part of DFS and so it treats the domain part of the un=
+c as the host
+> > where the share is stored, which of course it then can't find.
+> >
+> > FWIW, we gave up on this a few weeks ago and set up a real cluster =
+with CTDB. A
+> > lot more effort but it solved our file server problems.
+> >
+> > I hope you'll be able to prove us wrong and that all our work has b=
+een for nothing
+> > and that domain DFS works fine. We were unable to get it to work.
+>=20
+> I've just swapped /usr/sbin/cifs.upcall out for a script that echo's =
+test to /tmp/text.txt
+> and cifs.upcall isn't actually being called at all in my case.
+
+You may already have a ticket.
+>=20
+> Other people seem to be able to mount root namespaces with no issues?=
+  Is this a RHEL bug?
+>=20
+> Thanks,
+>=20
+> AM
+> DISCLAIMER. The contents of this email and its attachments are intend=
+ed solely for the original recipients and express the views of the auth=
+ors and not necessarily the Company. If you are not the intended recipi=
+ent please delete without copying or forwarding and inform the sender t=
+hat you received it in error.=20
+> Provident Financial Management Services Ltd, Registered in England, C=
+ompany Number 328933. Interim Permissions Reference Number: 119219
+> Provident Personal Credit Ltd, Registered in England, Company Number =
+146091. Interim Permissions Reference Number: 002529
+> Both Provident Financial Management Services Ltd and Provident Person=
+al Credit Ltd are authorised and regulated by the Financial Conduct Aut=
+hority, see Interim Permissions numbers above. Registered Office: No.1 =
+Godwin Street, Bradford, West Yorkshire BD1 2SU, United Kingdom.
+> =20
+> Please save paper - don't print this email unless necessary
+> NrybX=C7=A7v^)=DE=BA{.n+{r'{ay=1D=CA=87=DA=99,j=07fhz=1Ew=0Cj:+vwjm=07=
+zZ+=DD=A2j"!
