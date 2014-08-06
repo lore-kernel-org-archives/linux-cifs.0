@@ -1,51 +1,41 @@
-From: "McCall, Andy \(IT.PFMS\)" <Andy.McCall-JGeVbDYbwmjRZ1oM81ef8Q@public.gmane.org>
-Subject: RE: DFS root namespace mounting problem...
-Date: Wed, 6 Aug 2014 10:09:24 +0100
-Message-ID: <44E091A70C02494A806AD35E6F93AB1A32B89E@HOSMAIL2B.ho.pfgroup.provfin.com>
-References: <44E091A70C02494A806AD35E6F93AB1A32B89B@HOSMAIL2B.ho.pfgroup.provfin.com> <1407248098.1426.7.camel@hh16.hh3.site> <44E091A70C02494A806AD35E6F93AB1A32B89C@HOSMAIL2B.ho.pfgroup.provfin.com> <1407251579.2941.8.camel@hh16.hh3.site> <44E091A70C02494A806AD35E6F93AB1A32B89D@HOSMAIL2B.ho.pfgroup.provfin.com> <1407255360.4226.1.camel@hh16.hh3.site>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: "steve" <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org>
+From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH] CIFS: Update CreationTime on every query info request
+Date: Wed,  6 Aug 2014 15:15:43 +0400
+Message-ID: <1407323743-12381-1-git-send-email-pshilovsky@samba.org>
+Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-class: urn:content-classes:message
-In-Reply-To: <1407255360.4226.1.camel-HkULYb+WTT7YCGPCin2YbQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Pj4gPj4gSSd2ZSBqdXN0IHN3YXBwZWQgL3Vzci9zYmluL2NpZnMudXBjYWxsIG91dCBmb3IgYSBz
-Y3JpcHQgdGhhdCANCj4+ID4+IGVjaG8ncyB0ZXN0IHRvIC90bXAvdGV4dC50eHQgYW5kIGNpZnMu
-dXBjYWxsIGlzbid0IGFjdHVhbGx5IGJlaW5nIGNhbGxlZCBhdCBhbGwgaW4gbXkgY2FzZS4NCj4+
-ID4NCj4+ID5Zb3UgbWF5IGFscmVhZHkgaGF2ZSBhIHRpY2tldC4NCj4+IA0KPj4gSXQgbWlnaHQg
-YmUgdGhhdCB0aGUgdGVzdCBvZiBzd2FwcGluZyBvdXQgY2lmcy51cGNhbGwgZm9yIGEgc2NyaXB0
-IA0KPj4gd29uJ3Qgd29yaywgYnV0IEkgdHJpZWQgaXQgb24gYSBzZWNvbmQgaWRlbnRpY2FsIGJ1
-aWxkIHNlcnZlciBvbiB0aGUgDQo+PiBmYXJtIHRoYXQgaGFzbid0IGJlZW4gdG91Y2hlZCB5ZXQg
-YW5kIHRoYXQgYWxzbyBkaWRuJ3QgcHJvZHVjZSANCj4+IC90bXAvdGV4dC50eHQsIHNvIGVpdGhl
-ciB0aGUgdGVzdCBpcyBpbnZhbGlkIG9yIGNpZnMudXBjYWxsIGlzbid0IGdldHRpbmcgY2FsbGVk
-Lg0KPg0KPiBJcyB0aGlzIHRoZSBwcm9ibGVtOg0KPiAvL2ZxZG4vc2hhcmUNCj4gbW91bnRzIE9L
-LCBidXQNCj4gLy9kb21haW4vc2hhcmUNCj4gZG9lc24ndC4NCg0KSGkgU3RldmUsDQoNCk5vdCBz
-dXJlIHdoYXQgdGltZXpvbmUgeW91IGFyZSBpbiwgYnV0IEkgbGVmdCB3b3JrIHNvIHNvcnJ5IGZv
-ciB0aGUgZGVsYXllZCByZXBseS4NCg0KVGhlIHByb2JsZW0gaXM6DQoNCi8vY2x1c3Rlcm5vZGUu
-bXkud2luZG93c2RvbWFpbi5jb20vc2hhcmUgbW91bnRzIG9rYXkNCg0KLy9teS53aW5kb3dzZG9t
-YWluLmNvbS9zaGFyZSBkb2Vzbid0IG1vdW50IGJlY2F1c2UgdGhlIExpbnV4IHNlcnZlciBpcyBy
-ZXNvbHZpbmcgdGhlIG15LndpbmRvd3Nkb21haW4uY29tIGFzDQphIEZRRE4gc2VydmVyIGFkZHJl
-c3MgYW5kIGF0dGVtcHRzIHRvIG1vdW50IHRoZSBzaGFyZSBmcm9tIHRoZSBGUUROIHNlcnZlciBh
-ZGRyZXNzIHJhdGhlciB0aGFuIGFza2luZyBmb3IgYQ0KcmVmZXJyYWwgdG8gYSBjbHVzdGVybm9k
-ZSB3aGVyZSB0aGUgc2hhcmUgYWN0dWFsbHkgZXhpc3RzLg0KDQpBTS4NCg0KDQpESVNDTEFJTUVS
-LiBUaGUgY29udGVudHMgb2YgdGhpcyBlbWFpbCBhbmQgaXRzIGF0dGFjaG1lbnRzIGFyZSBpbnRl
-bmRlZCBzb2xlbHkgZm9yIHRoZSBvcmlnaW5hbCByZWNpcGllbnRzIGFuZCBleHByZXNzIHRoZSB2
-aWV3cyBvZiB0aGUgYXV0aG9ycyBhbmQgbm90IG5lY2Vzc2FyaWx5IHRoZSBDb21wYW55LiBJZiB5
-b3UgYXJlIG5vdCB0aGUgaW50ZW5kZWQgcmVjaXBpZW50IHBsZWFzZSBkZWxldGUgd2l0aG91dCBj
-b3B5aW5nIG9yIGZvcndhcmRpbmcgYW5kIGluZm9ybSB0aGUgc2VuZGVyIHRoYXQgeW91IHJlY2Vp
-dmVkIGl0IGluIGVycm9yLiANClByb3ZpZGVudCBGaW5hbmNpYWwgTWFuYWdlbWVudCBTZXJ2aWNl
-cyBMdGQsIFJlZ2lzdGVyZWQgaW4gRW5nbGFuZCwgQ29tcGFueSBOdW1iZXIgMzI4OTMzLiBJbnRl
-cmltIFBlcm1pc3Npb25zIFJlZmVyZW5jZSBOdW1iZXI6IDExOTIxOQ0KUHJvdmlkZW50IFBlcnNv
-bmFsIENyZWRpdCBMdGQsIFJlZ2lzdGVyZWQgaW4gRW5nbGFuZCwgQ29tcGFueSBOdW1iZXIgMTQ2
-MDkxLiBJbnRlcmltIFBlcm1pc3Npb25zIFJlZmVyZW5jZSBOdW1iZXI6IDAwMjUyOQ0KQm90aCBQ
-cm92aWRlbnQgRmluYW5jaWFsIE1hbmFnZW1lbnQgU2VydmljZXMgTHRkIGFuZCBQcm92aWRlbnQg
-UGVyc29uYWwgQ3JlZGl0IEx0ZCBhcmUgYXV0aG9yaXNlZCBhbmQgcmVndWxhdGVkIGJ5IHRoZSBG
-aW5hbmNpYWwgQ29uZHVjdCBBdXRob3JpdHksIHNlZSBJbnRlcmltIFBlcm1pc3Npb25zIG51bWJl
-cnMgYWJvdmUuIFJlZ2lzdGVyZWQgT2ZmaWNlOiBOby4xIEdvZHdpbiBTdHJlZXQsIEJyYWRmb3Jk
-LCBXZXN0IFlvcmtzaGlyZSBCRDEgMlNVLCBVbml0ZWQgS2luZ2RvbS4NCiANClBsZWFzZSBzYXZl
-IHBhcGVyIC0gZG9uJ3QgcHJpbnQgdGhpcyBlbWFpbCB1bmxlc3MgbmVjZXNzYXJ5Cg==
+Samba server can change a creation time of an inode in the default
+configuration. The client sets this value during the inode initialization
+only and uses it the inode search. In this case harlinked dentries may
+link to different inodes. As the results the Cthon basic test #7 fails
+on nounix Samba mounts.
+
+Fix this by making the client update the creation time on every
+query info request.
+
+Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ fs/cifs/inode.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index a174605..2029e7c 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -173,6 +173,9 @@ cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr)
+ 
+ 	cifs_i->cifsAttrs = fattr->cf_cifsattrs;
+ 
++	/* Samba server changes this value in the default configuration */
++	cifs_i->createtime = fattr->cf_createtime;
++
+ 	if (fattr->cf_flags & CIFS_FATTR_NEED_REVAL)
+ 		cifs_i->time = 0;
+ 	else
+-- 
+1.8.1.2
