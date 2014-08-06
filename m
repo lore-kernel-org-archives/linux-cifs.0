@@ -1,71 +1,110 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 3/5] Add capability to test SMB 2.0 and higher verions
-Date: Wed,  6 Aug 2014 16:01:10 +0400
-Message-ID: <1407326472-13853-4-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH 5/5] special: fix op_unlk and op_ren tests output
+Date: Wed,  6 Aug 2014 16:01:12 +0400
+Message-ID: <1407326472-13853-6-git-send-email-pshilovsky@samba.org>
 References: <1407326472-13853-1-git-send-email-pshilovsky@samba.org>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 To: Steve Dickson <SteveD-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <1407326472-13853-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- lock/runtests        | 5 +++--
- special/runtests.wrk | 9 +++++++--
- 2 files changed, 10 insertions(+), 4 deletions(-)
+ special/op_ren.c  | 16 +++++++++++++---
+ special/op_unlk.c |  8 +++++---
+ 2 files changed, 18 insertions(+), 6 deletions(-)
 
-diff --git a/lock/runtests b/lock/runtests
-index 006742e..21b09a5 100644
---- a/lock/runtests
-+++ b/lock/runtests
-@@ -36,7 +36,7 @@ case $TESTARG in
- 	-t)	TESTARGS="-r"	;;
- esac
+diff --git a/special/op_ren.c b/special/op_ren.c
+index 348b4f9..93b02c5 100644
+--- a/special/op_ren.c
++++ b/special/op_ren.c
+@@ -32,6 +32,8 @@
  
--if echo "$mntopts" | grep vers=2 > /dev/null
-+if [ "$CIFS" != "yes" ] && echo "$mntopts" | grep vers=2 > /dev/null
- then
- 	TESTARGS="-v 2 $TESTARGS"
- fi
-@@ -52,7 +52,8 @@ do
- 		tlock)		echo 'Testing native pre-LFS locking';;
- 		tlocklfs)	echo 'Testing native post-LFS locking';;
- 		tlock64)
--			if echo "$mntopts" | grep vers=2 > /dev/null
-+			if [ "$CIFS" != "yes" ] &&
-+			   echo "$mntopts" | grep vers=2 > /dev/null
- 			then
- 			echo "64-bit locking not supported with NFS v2"
- 				echo " "
-diff --git a/special/runtests.wrk b/special/runtests.wrk
-index a941d33..8f099fa 100644
---- a/special/runtests.wrk
-+++ b/special/runtests.wrk
-@@ -25,7 +25,12 @@ TMPDIR= ./op_unlk
+ #define TBUFSIZ 100
+ static char wbuf[TBUFSIZ], rbuf[TBUFSIZ];
++static char bufa[BUFSIZ];
++static char bufb[BUFSIZ];
+ #define TMSG "This is a test message written to the target file\n"
  
- echo ""
- echo "check for proper open/rename operation"
--TMPDIR= ./op_ren
-+if [ "$CIFS" = "yes" ] && echo $MNTOPTIONS | grep -E "vers=2|vers=3" > /dev/null
-+then
-+	echo "skipping test; not supported by SMB 2.0 and higher versions"
-+else
-+	TMPDIR= ./op_ren
-+fi
+ static void
+@@ -120,13 +122,19 @@ main(argc, argv)
+ #endif /* O_RDWR */
  
- echo ""
- echo "check for proper open/chmod 0 operation"
-@@ -93,7 +98,7 @@ echo "write/read" $size "MB file"
+ 	printf("nfsjunk files before rename:\n  ");
+-	system("ls -al .nfs*");
++	sprintf(bufa, "ls -al %s", taname);
++	sprintf(bufb, "ls -al %s", tbname);
++	system(bufa);
++	printf("  ");
++	system(bufb);
+ 	ret = rename(taname, tbname);
+ 	printf("%s open; rename ret = %d\n", tbname, ret);
+ 	if (ret)
+ 		xxit(" unlink");
+ 	printf("nfsjunk files after rename:\n  ");
+-	system("ls -al .nfs*");
++	system(bufa);
++	printf("  ");
++	system(bufb);
+ 	strcpy(wbuf, TMSG);
+ 	if ((ret = write(fd, wbuf, TBUFSIZ)) != TBUFSIZ) {
+ 		fprintf(stderr, "write ret %d; expected %d\n", ret, TBUFSIZ);
+@@ -165,7 +173,9 @@ main(argc, argv)
+ 	}
  
- echo ""
- echo "write/read at 2GB, 4GB edges"
--if echo $MNTOPTIONS | grep vers=2 > /dev/null
-+if [ "$CIFS" != "yes" ] && echo $MNTOPTIONS | grep vers=2 > /dev/null
- then
- 	echo "skipping test; not supported with v2"
- else
+ 	printf("nfsjunk files after close:\n  ");
+-	system("ls -al .nfs*");
++	system(bufa);
++	printf("  ");
++	system(bufb);
+ 
+ 	if ((ret = close(fd)) == 0) {
+ 		errcount++;
+diff --git a/special/op_unlk.c b/special/op_unlk.c
+index 93a09b0..d92aa22 100644
+--- a/special/op_unlk.c
++++ b/special/op_unlk.c
+@@ -33,6 +33,7 @@
+ 
+ #define TBUFSIZ 100
+ static char wbuf[TBUFSIZ], rbuf[TBUFSIZ];
++static char buf[BUFSIZ];
+ #define TMSG "This is a test message written to the unlinked file\n"
+ 
+ static void
+@@ -78,13 +79,14 @@ main(argc, argv)
+ #ifndef WIN32
+ 	/* For WIN you can not delete the file if it is open */
+ 	printf("nfsjunk files before unlink:\n  ");
+-	system("ls -al .nfs*");
++	sprintf(buf, "ls -al %s", tname);
++	system(buf);
+ 	ret = unlink(tname);
+ 	printf("%s open; unlink ret = %d\n", tname, ret);
+ 	if (ret)
+ 		xxit(" unlink");
+ 	printf("nfsjunk files after unlink:\n  ");
+-	system("ls -al .nfs*");
++	system(buf);
+ #endif
+ 	strcpy(wbuf, TMSG);
+ 	if ((ret = write(fd, wbuf, TBUFSIZ)) != TBUFSIZ) {
+@@ -137,7 +139,7 @@ main(argc, argv)
+ 
+ #ifndef WIN32
+ 	printf("nfsjunk files after close:\n  ");
+-	system("ls -al .nfs*");
++	system(buf);
+ #endif
+ 
+ 	if ((ret = close(fd)) == 0) {
 -- 
 1.8.1.2
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
