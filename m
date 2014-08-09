@@ -1,36 +1,34 @@
-From: Jeff Layton <jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
-Subject: [PATCH] cifs: handle lease F_UNLCK requests properly
-Date: Sat,  9 Aug 2014 10:16:44 -0400
-Message-ID: <1407593804-28053-1-git-send-email-jlayton@primarydata.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Subject: Re: [GIT] CIFS Updates
+Date: Sat, 9 Aug 2014 11:07:59 -0700
+Message-ID: <CA+55aFw=75zZgovgadaOV5=VG4EpJtU134zr2j32qo0u+EDTSQ@mail.gmail.com>
+References: <CAH2r5mtzhoaePY9MQEMnfywY7Lwxg_nG9yhzH9pHuhg14O5u=A@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAH2r5mtzhoaePY9MQEMnfywY7Lwxg_nG9yhzH9pHuhg14O5u=A@mail.gmail.com>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Currently any F_UNLCK request for a lease just gets back -EAGAIN. Allow
-them to go immediately to generic_setlease instead.
+On Wed, Aug 6, 2014 at 7:56 AM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>
+> Most visible change in this set is the additional of multi-credit
+> support [...]
 
-Signed-off-by: Jeff Layton <jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
----
- fs/cifs/cifsfs.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+a purely administrative comment: please change your scripts to use
+"[GIT PULL]" in your subject line, or have a "please pull" in the
+body.
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 2c90d07c0b3a..f1a93d2b108d 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -799,8 +799,9 @@ static int cifs_setlease(struct file *file, long arg, struct file_lock **lease)
- 	if (!(S_ISREG(inode->i_mode)))
- 		return -EINVAL;
- 
--	/* check if file is oplocked */
--	if (((arg == F_RDLCK) && CIFS_CACHE_READ(CIFS_I(inode))) ||
-+	/* Check if file is oplocked if this is request for new lease */
-+	if (arg == F_UNLCK ||
-+	    ((arg == F_RDLCK) && CIFS_CACHE_READ(CIFS_I(inode))) ||
- 	    ((arg == F_WRLCK) && CIFS_CACHE_WRITE(CIFS_I(inode))))
- 		return generic_setlease(file, arg, lease);
- 	else if (tlink_tcon(cfile->tlink)->local_lease &&
--- 
-1.9.3
+My email sorting logic looks for "git" and "pull" to find pull
+requests. As a result, yours doesn't show up when I look for pending
+pull requests, which in turn means that if I have a lot of mail (which
+is pretty much "always"), you are less likely to be noticed,
+particularly when I'm in "go through emails and pull updates" mode as
+opposed to "ok, let's see if there is anything else" mode.
+
+I've obviously found this email, but just to avoid future problems,
+please make it easier for me to pick up on your pull requests.
+
+               Linus
