@@ -1,80 +1,56 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH linux-next] cifs: remove unused function cifs_oplock_break_wait
-Date: Sun, 10 Aug 2014 14:11:10 -0500
-Message-ID: <CAH2r5muS3xz3naupKAVtx3ob+3OUON1uu+QifRLKW4C=mS9mNw@mail.gmail.com>
-References: <1405979256-8921-1-git-send-email-vincent.stehle@laposte.net>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH 1/2] cifs: Remove unused sess_auth_lanman() for !CONFIG_CIFS_WEAK_PW_HASH case
+Date: Sun, 10 Aug 2014 22:51:48 +0200
+Message-ID: <1407703909-24350-1-git-send-email-geert@linux-m68k.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Cc: Steve French <sfrench@samba.org>, "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>, linux-next@vger.kernel.org, samba-technical <samba-technical@lists.samba.org>,
-	LKML <linux-kernel@vger.kernel.org>
-To: =?UTF-8?Q?Vincent_Stehl=C3=A9?= <vincent.stehle@laposte.net>
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <1405979256-8921-1-git-send-email-vincent.stehle@laposte.net>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Geert Uytterhoeven <geert@linux-m68k.org>
+To: Steve French <sfrench@samba.org>,
+	Sachin Prabhu <sprabhu@redhat.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-merged into cifs-2.6.git for-next
+If CONFIG_CIFS_WEAK_PW_HASH is not set:
 
-On Mon, Jul 21, 2014 at 4:47 PM, Vincent Stehl=C3=A9
-<vincent.stehle@laposte.net> wrote:
-> Commit 743162013d40 ("sched: Remove proliferation of wait_on_bit() action
-> functions") has removed the call to cifs_oplock_break_wait, making this
-> function unused; remove it.
->
-> This fixes the following compilation warning:
->
->   fs/cifs/misc.c:578:1: warning: =E2=80=98cifs_oplock_break_wait=E2=80=99=
- defined but not used [-Wunused-function]
->
-> Signed-off-by: Vincent Stehl=C3=A9 <vincent.stehle@laposte.net>
-> Cc: Steve French <sfrench@samba.org>
-> ---
->
-> Hi,
->
-> This can be seen with e.g. linux next-20140721 and arm allmodconfig.
->
-> Best regards,
->
-> V.
->
->  fs/cifs/misc.c | 7 -------
->  1 file changed, 7 deletions(-)
->
-> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-> index 9a70792..65c2682 100644
-> --- a/fs/cifs/misc.c
-> +++ b/fs/cifs/misc.c
-> @@ -574,13 +574,6 @@ void cifs_set_oplock_level(struct cifsInodeInfo *cin=
-ode, __u32 oplock)
->                 cinode->oplock =3D 0;
->  }
->
-> -static int
-> -cifs_oplock_break_wait(void *unused)
-> -{
-> -       schedule();
-> -       return signal_pending(current) ? -ERESTARTSYS : 0;
-> -}
-> -
->  /*
->   * We wait for oplock breaks to be processed before we attempt to perfor=
-m
->   * writes.
-> --
-> 2.0.1
->
+fs/cifs/sess.c:751: warning: =E2=80=98sess_auth_lanman=E2=80=99 defined=
+ but not used
 
+Commit cc87c47d9d7ac25554aa81cd8ded56e75f79c198 ("cifs: Separate
+rawntlmssp auth from CIFS_SessSetup()") removed the sole user of the
+dummy version of sess_auth_lanman() in the non-CONFIG_CIFS_WEAK_PW_HASH
+case, but forgot to remove the actual function definition.
 
+Remove the dummy version to fix this.
 
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+---
+ fs/cifs/sess.c | 11 +----------
+ 1 file changed, 1 insertion(+), 10 deletions(-)
+
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index 39ee32688eac..8090ad3c5ea5 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -743,16 +743,7 @@ out:
+ 	sess_data->func =3D NULL;
+ 	sess_free_buffer(sess_data);
+ }
+-
+-#else
+-
+-static void
+-sess_auth_lanman(struct sess_data *sess_data)
+-{
+-	sess_data->result =3D -EOPNOTSUPP;
+-	sess_data->func =3D NULL;
+-}
+-#endif
++#endif /* CONFIG_CIFS_WEAK_PW_HASH */
+=20
+ static void
+ sess_auth_ntlm(struct sess_data *sess_data)
 --=20
-Thanks,
-
-Steve
+1.9.1
