@@ -1,56 +1,57 @@
-From: Steve Dickson <SteveD-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 0/5] SMB/CIFS nounix support for Connectathon test suite
-Date: Tue, 12 Aug 2014 06:57:53 -0400
-Message-ID: <53E9F331.6020302@RedHat.com>
-References: <1407326472-13853-1-git-send-email-pshilovsky@samba.org> <CAKywueQjWzfUCw0r=Nnx2ehaOOv++76iRV2HZwFKZZYr=SD84g@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH][CIFS] Add missing definitions for CIFS File System Attributes
+Date: Tue, 12 Aug 2014 09:10:03 -0500
+Message-ID: <CAH2r5mu6y8Kq1KDZ+WTL1-ra66o03EPj_rNJGV8YqGvOFFYfaQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Linux NFS Mailing list <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-To: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueQjWzfUCw0r=Nnx2ehaOOv++76iRV2HZwFKZZYr=SD84g-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+Add missing definitions for CIFS File System Attributes
 
+Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/cifspdu.h | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-On 08/12/2014 03:20 AM, Pavel Shilovsky wrote:
-> 2014-08-06 16:01 GMT+04:00 Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
->> The goal of the series is to add support of testing various versions of SMB/CIFS protocol without Unix extensions. Also there are two patches that fixes problems in special and tlock tests.
->>
->> With the patchset applied nounix SMB/CIFS servers and clients can be tested with "server -C" command.
->>
->> Jeff Layton (2):
->>   tlock: munmap missed before close
->>   Add SMB/CIFS mounts support
->>
->> Pavel Shilovsky (3):
->>   Add capability to test SMB 2.0 and higher verions
->>   Add SMB/CIFS section in tests.init
->>   special: fix op_unlk and op_ren tests output
->>
->>  basic/runtests       |  8 +++++---
->>  lock/runtests        |  9 +++++++--
->>  lock/tlock.c         | 11 +++++++++--
->>  server               |  5 +++--
->>  special/op_ren.c     | 16 +++++++++++++---
->>  special/op_unlk.c    |  8 +++++---
->>  special/runtests.wrk | 11 ++++++++---
->>  tests.init           |  4 ++++
->>  8 files changed, 54 insertions(+), 18 deletions(-)
->>
->> --
->> 1.8.1.2
->>
-> 
-> Any comments on this series?
-> 
-Yes... I took a look... They look fine... 
-Its on my TODO list... 
+diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
+index 33df36e..0337445 100644
+--- a/fs/cifs/cifspdu.h
++++ b/fs/cifs/cifspdu.h
+@@ -2253,6 +2253,29 @@ typedef struct {
+ /* minimum includes first three fields, and empty FS Name */
+ #define MIN_FS_ATTR_INFO_SIZE 12
 
-thanks!
++
++/* List of FileSystemAttributes - see 2.5.1 of MS-FSCC */
++#define FILE_SUPPORT_INTEGRITY_STREAMS    0x04000000
++#define FILE_SUPPORTS_USN_JOURNAL    0x02000000
++#define FILE_SUPPORTS_OPEN_BY_FILE_ID    0x01000000
++#define FILE_SUPPORTS_EXTENDED_ATTRIBUTES 0x00800000
++#define FILE_SUPPORTS_HARD_LINKS    0x00400000
++#define FILE_SUPPORTS_TRANSACTIONS    0x00200000
++#define FILE_SEQUENTIAL_WRITE_ONCE    0x00100000
++#define FILE_READ_ONLY_VOLUME        0x00080000
++#define FILE_NAMED_STREAMS        0x00040000
++#define FILE_SUPPORTS_ENCRYPTION    0x00020000
++#define FILE_SUPPORTS_OBJECT_IDS    0x00010000
++#define FILE_VOLUME_IS_COMPRESSED    0x00008000
++#define FILE_SUPPORTS_REMOTE_STORAGE    0x00000100
++#define FILE_SUPPORTS_REPARSE_POINTS    0x00000080
++#define FILE_SUPPORTS_SPARSE_FILES    0x00000040
++#define FILE_VOLUME_QUOTAS        0x00000020
++#define FILE_FILE_COMPRESSION         0x00000010
++#define FILE_PERSISTENT_ACLS        0x00000008
++#define FILE_UNICODE_ON_DISK        0x00000004
++#define FILE_CASE_PRESERVED_NAMES    0x00000002
++#define FILE_CASE_SENSITIVE_SEARCH    0x00000001
+ typedef struct {
+     __le32 Attributes;
+     __le32 MaxPathNameComponentLength;
 
-steved.
+-- 
+Thanks,
+
+Steve
