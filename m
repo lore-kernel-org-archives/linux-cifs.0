@@ -1,125 +1,49 @@
-From: Steve French <smfrench@gmail.com>
-Subject: [PATCH] [CIFS] Add sparse file support to SMB2/SMB3 mounts
-Date: Tue, 12 Aug 2014 09:13:43 -0500
-Message-ID: <CAH2r5mvt=S1eAs3BKhkim+=PPO9GrJ3jsXqYD8O1rxN2=eg-3A@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH][CIFS] Workaround MacOS server problem with SMB2.1 write response
+Date: Tue, 12 Aug 2014 09:19:42 -0500
+Message-ID: <CAH2r5msWAcy41S85b5eN5QBZSqwXDnQU07yHS0gnKE+zaaXw4A@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-To: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-	samba-technical <samba-technical@lists.samba.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Many Linux filesystems make a file "sparse" when extending
-a file with ftruncate. This does work for CIFS to Samba
-(only) but not for SMB2/SMB3 (to Samba or Windows) since
-there is a "set sparse" fsctl which is supposed to be
-sent to mark a file as sparse.
+Writes fail to Mac servers with SMB2.1 mounts (works with cifs though) due
+to them sending an incorrect RFC1001 length. Workaround this problem.
+MacOS server sends a write response with 3 bytes of pad beyond the end
+of the SMB itself.  The RFC1001 length is 3 bytes more than
+the sum of the SMB2.1 header length + the write reponse.
 
-This patch marks a file as sparse by sending this simple
-set sparse fsctl if it is extended more than 2 pages.
-It has been tested to Windows 8.1, Samba and various
-SMB2/SMB3 servers which do support setting sparse (and
-MacOS which does not appear to support the fsctl yet).
-If a server share does not support setting a file
-as sparse, then we do not retry setting sparse on that
-share.
+Since we have seen a few other examples where servers have
+padded responses strangely (oplock break and create),
+allow servers to send a padded SMB2/SMB3 response to allow
+for rounding (up to 15 bytes).
 
-The disk space savings for sparse files can be quite
-large (even more significant on Windows servers than Samba).
-
-Signed-off-by: Steve French <smfrench@gmail.com>
+Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/cifsglob.h |  1 +
- fs/cifs/smb2ops.c  | 43 +++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2pdu.c  |  4 +++-
- 3 files changed, 47 insertions(+), 1 deletion(-)
+ fs/cifs/smb2misc.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 0012e1e..bc20a6e 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -883,6 +883,7 @@ struct cifs_tcon {
-                 for this mount even if server would support */
-     bool local_lease:1; /* check leases (only) on local system not remote */
-     bool broken_posix_open; /* e.g. Samba server versions < 3.3.2, 3.2.9 */
-+    bool broken_sparse_sup; /* if server or share does not support sparse */
-     bool need_reconnect:1; /* connection reset, tid now invalid */
- #ifdef CONFIG_CIFS_SMB2
-     bool print:1;        /* set if connection to printer share */
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 77f8aeb..7463436 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -736,6 +736,49 @@ smb2_set_file_size(const unsigned int xid, struct
-cifs_tcon *tcon,
-            struct cifsFileInfo *cfile, __u64 size, bool set_alloc)
- {
-     __le64 eof = cpu_to_le64(size);
-+    struct inode *inode;
+diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
+index f2e6ac2..da05beb 100644
+--- a/fs/cifs/smb2misc.c
++++ b/fs/cifs/smb2misc.c
+@@ -181,6 +181,12 @@ smb2_check_message(char *buf, unsigned int length)
+         /* server can return one byte more */
+         if (clc_len == 4 + len + 1)
+             return 0;
 +
-+    /*
-+     * If extending file more than one page make sparse. Many Linux fs
-+     * make files sparse by default when extending via ftruncate
-+     */
-+    inode = cfile->dentry->d_inode;
++        /* MacOS server pads after SMB2.1 write response with 3 bytes */
++        /* of junk. Allow server to pad up to 15 bytes of junk at end */
++        if ((clc_len < 4 + len) && (clc_len > 4 + len - 16))
++            return 0;
 +
-+    if (!set_alloc && (size > inode->i_size + 8192)) {
-+        struct cifsInodeInfo *cifsi;
-+        __u8 set_sparse = 1;
-+        int rc;
-+
-+        cifsi = CIFS_I(inode);
-+
-+        /* if file already sparse or no server support don't bother */
-+        if (cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE)
-+            goto smb2_set_eof;
-+
-+        /*
-+         * Can't check for sparse support on share the usual way via the
-+         * FS attribute info (FILE_SUPPORTS_SPARSE_FILES) on the share
-+         * since Samba server doesn't set the flag on the share, yet
-+         * supports the set sparse FSCTL and returns sparse correctly
-+         * in the file attributes. If we fail setting sparse though we
-+         * mark that server does not support sparse files for this share
-+         * to avoid repeatedly sending the unsupported fsctl to server
-+         * if the file is repeatedly extended.
-+         */
-+        if (tcon->broken_sparse_sup)
-+            goto smb2_set_eof;
-+
-+        rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
-+                cfile->fid.volatile_fid, FSCTL_SET_SPARSE,
-+                true /* is_fctl */, &set_sparse, 1, NULL, NULL);
-+        if (rc) {
-+            tcon->broken_sparse_sup = true;
-+            cifs_dbg(FYI, "set sparse rc = %d\n", rc);
-+        } else
-+            cifsi->cifsAttrs |= FILE_ATTRIBUTE_SPARSE_FILE;
-+    }
-+
-+smb2_set_eof:
-     return SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
-                 cfile->fid.volatile_fid, cfile->pid, &eof, false);
- }
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 42ebc1a..74440af 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -1224,7 +1224,9 @@ SMB2_ioctl(const unsigned int xid, struct
-cifs_tcon *tcon, u64 persistent_fid,
-
-     cifs_dbg(FYI, "SMB2 IOCTL\n");
-
--    *out_data = NULL;
-+    if (out_data != NULL)
-+        *out_data = NULL;
-+
-     /* zero out returned data len, in case of error */
-     if (plen)
-         *plen = 0;
-
+         return 1;
+     }
+     return 0;
 
 -- 
 Thanks,
