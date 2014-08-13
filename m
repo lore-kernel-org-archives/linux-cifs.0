@@ -1,126 +1,137 @@
-From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: Add per-version guid
-Date: Wed, 13 Aug 2014 16:49:34 +0100
-Message-ID: <1407944975-20653-1-git-send-email-sprabhu@redhat.com>
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Shirish Pargaonkar <shirishpargaonkar@gmail.com>
+Subject: Re: [PATCH] [CIFS] Add sparse file support to SMB2/SMB3 mounts
+Date: Wed, 13 Aug 2014 16:25:13 -0500
+Message-ID: <CADT32eJFq-5iBXbNmb-16f-zS3DVtaU11eMmd=AG=trma70g_A@mail.gmail.com>
+References: <CAH2r5mvt=S1eAs3BKhkim+=PPO9GrJ3jsXqYD8O1rxN2=eg-3A@mail.gmail.com>
+	<CADT32eJzPz1dKUm0jxOpmBJG3EYG7xmG_hA24Dz5uHATKYhM0Q@mail.gmail.com>
+	<CAH2r5mtd2C7peYhQPzVTYcx=Yc2VfstO_yVWY1c-YFTM-wNZAA@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+	samba-technical <samba-technical@lists.samba.org>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>
+To: Steve French <smfrench@gmail.com>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <CAH2r5mtd2C7peYhQPzVTYcx=Yc2VfstO_yVWY1c-YFTM-wNZAA@mail.gmail.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Commit
-39552ea8120a699dbd0360848c4d949f9f0e6deb
-changes guid on per connection basis. This can cause problems in the
-future when making multichannel associations. The problem is described
-by Tom Talpey at
-https://www.mail-archive.com/linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org/msg09396.html
+Reviewed-by: Shirish Pargaonkar <spargaonkar@suse.com>
 
-We try and work around this problem by assigning a client guid for each
-smb2 dialect and use these GUIDs with their corresponding dialects.
-
-Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/cifsfs.c   | 15 +++++++++++++++
- fs/cifs/cifsglob.h |  2 +-
- fs/cifs/connect.c  |  3 ---
- fs/cifs/smb2pdu.c  | 10 +++-------
- 4 files changed, 19 insertions(+), 11 deletions(-)
-
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 8883980..fa8a1a4 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -1162,6 +1162,16 @@ cifs_destroy_mids(void)
- 	kmem_cache_destroy(cifs_mid_cachep);
- }
- 
-+static void init_guids(void)
-+{
-+	/* We do not sent a client GUID for SMB2.02 dialect */
-+	memset(&smb20_values.client_guid, 0, SMB2_CLIENT_GUID_SIZE);
-+
-+	get_random_bytes(&smb21_values.client_guid, SMB2_CLIENT_GUID_SIZE);
-+	get_random_bytes(&smb30_values.client_guid, SMB2_CLIENT_GUID_SIZE);
-+	get_random_bytes(&smb302_values.client_guid, SMB2_CLIENT_GUID_SIZE);
-+}
-+
- static int __init
- init_cifs(void)
- {
-@@ -1196,6 +1206,11 @@ init_cifs(void)
- 	spin_lock_init(&cifs_file_list_lock);
- 	spin_lock_init(&GlobalMid_Lock);
- 
-+
-+#ifdef CONFIG_CIFS_SMB2
-+	init_guids();
-+#endif
-+
- 	if (cifs_max_pending < 2) {
- 		cifs_max_pending = 2;
- 		cifs_dbg(FYI, "cifs_max_pending set to min of 2\n");
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 0012e1e..1c044f4 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -429,6 +429,7 @@ struct smb_version_values {
- 	__u16		signing_enabled;
- 	__u16		signing_required;
- 	size_t		create_lease_size;
-+	__u8		client_guid[SMB2_CLIENT_GUID_SIZE];
- };
- 
- #define HEADER_SIZE(server) (server->vals->header_size)
-@@ -564,7 +565,6 @@ struct TCP_Server_Info {
- 	int echo_credits;  /* echo reserved slots */
- 	int oplock_credits;  /* oplock break reserved slots */
- 	bool echoes:1; /* enable echoes */
--	__u8 client_guid[SMB2_CLIENT_GUID_SIZE]; /* Client GUID */
- #endif
- 	u16 dialect; /* dialect index that server chose */
- 	bool oplocks:1; /* enable oplocks */
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 03ed8a0..2b8dd80 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -2144,9 +2144,6 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 	       sizeof(tcp_ses->srcaddr));
- 	memcpy(&tcp_ses->dstaddr, &volume_info->dstaddr,
- 		sizeof(tcp_ses->dstaddr));
--#ifdef CONFIG_CIFS_SMB2
--	get_random_bytes(tcp_ses->client_guid, SMB2_CLIENT_GUID_SIZE);
--#endif
- 	/*
- 	 * at this point we are the only ones with the pointer
- 	 * to the struct since the kernel thread not created yet
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 42ebc1a..694638c 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -360,12 +360,8 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
- 
- 	req->Capabilities = cpu_to_le32(ses->server->vals->req_capabilities);
- 
--	/* ClientGUID must be zero for SMB2.02 dialect */
--	if (ses->server->vals->protocol_id == SMB20_PROT_ID)
--		memset(req->ClientGUID, 0, SMB2_CLIENT_GUID_SIZE);
--	else
--		memcpy(req->ClientGUID, server->client_guid,
--			SMB2_CLIENT_GUID_SIZE);
-+	memcpy(req->ClientGUID, &server->vals->client_guid,
-+						SMB2_CLIENT_GUID_SIZE);
- 
- 	iov[0].iov_base = (char *)req;
- 	/* 4 for rfc1002 length field */
-@@ -468,7 +464,7 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
- 
- 	vneg_inbuf.Capabilities =
- 			cpu_to_le32(tcon->ses->server->vals->req_capabilities);
--	memcpy(vneg_inbuf.Guid, tcon->ses->server->client_guid,
-+	memcpy(vneg_inbuf.Guid, &tcon->ses->server->vals->client_guid,
- 					SMB2_CLIENT_GUID_SIZE);
- 
- 	if (tcon->ses->sign)
--- 
-1.9.3
+On Wed, Aug 13, 2014 at 12:11 AM, Steve French <smfrench@gmail.com> wrote:
+> On Tue, Aug 12, 2014 at 11:34 PM, Shirish Pargaonkar
+> <shirishpargaonkar@gmail.com> wrote:
+>> On Tue, Aug 12, 2014 at 9:13 AM, Steve French <smfrench@gmail.com> wrote:
+>>> Many Linux filesystems make a file "sparse" when extending
+>>> a file with ftruncate. This does work for CIFS to Samba
+>>> (only) but not for SMB2/SMB3 (to Samba or Windows) since
+>>> there is a "set sparse" fsctl which is supposed to be
+>>> sent to mark a file as sparse.
+>>>
+>>> This patch marks a file as sparse by sending this simple
+>>> set sparse fsctl if it is extended more than 2 pages.
+>>> It has been tested to Windows 8.1, Samba and various
+>>> SMB2/SMB3 servers which do support setting sparse (and
+>>> MacOS which does not appear to support the fsctl yet).
+>>> If a server share does not support setting a file
+>>> as sparse, then we do not retry setting sparse on that
+>>> share.
+>>>
+>>> The disk space savings for sparse files can be quite
+>>> large (even more significant on Windows servers than Samba).
+>>>
+>>> Signed-off-by: Steve French <smfrench@gmail.com>
+>>> ---
+>>>  fs/cifs/cifsglob.h |  1 +
+>>>  fs/cifs/smb2ops.c  | 43 +++++++++++++++++++++++++++++++++++++++++++
+>>>  fs/cifs/smb2pdu.c  |  4 +++-
+>>>  3 files changed, 47 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+>>> index 0012e1e..bc20a6e 100644
+>>> --- a/fs/cifs/cifsglob.h
+>>> +++ b/fs/cifs/cifsglob.h
+>>> @@ -883,6 +883,7 @@ struct cifs_tcon {
+>>>                  for this mount even if server would support */
+>>>      bool local_lease:1; /* check leases (only) on local system not remote */
+>>>      bool broken_posix_open; /* e.g. Samba server versions < 3.3.2, 3.2.9 */
+>>> +    bool broken_sparse_sup; /* if server or share does not support sparse */
+>>>      bool need_reconnect:1; /* connection reset, tid now invalid */
+>>>  #ifdef CONFIG_CIFS_SMB2
+>>>      bool print:1;        /* set if connection to printer share */
+>>> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+>>> index 77f8aeb..7463436 100644
+>>> --- a/fs/cifs/smb2ops.c
+>>> +++ b/fs/cifs/smb2ops.c
+>>> @@ -736,6 +736,49 @@ smb2_set_file_size(const unsigned int xid, struct
+>>> cifs_tcon *tcon,
+>>>             struct cifsFileInfo *cfile, __u64 size, bool set_alloc)
+>>>  {
+>>>      __le64 eof = cpu_to_le64(size);
+>>> +    struct inode *inode;
+>>> +
+>>> +    /*
+>>> +     * If extending file more than one page make sparse. Many Linux fs
+>>> +     * make files sparse by default when extending via ftruncate
+>>> +     */
+>>> +    inode = cfile->dentry->d_inode;
+>>> +
+>>> +    if (!set_alloc && (size > inode->i_size + 8192)) {
+>>> +        struct cifsInodeInfo *cifsi;
+>>> +        __u8 set_sparse = 1;
+>>> +        int rc;
+>>> +
+>>> +        cifsi = CIFS_I(inode);
+>>> +
+>>> +        /* if file already sparse or no server support don't bother */
+>>> +        if (cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE)
+>>> +            goto smb2_set_eof;
+>>
+>> Is this check always valid?  Is it possible that the file is not
+>> sparse anymore at the server?
+>
+> If someone unsparsed the file that is fine.  The ftruncate to
+> extend the file will still work fine as it did before this patch
+> (it just will take up more disk space than it would
+> if the file were sparse).  When the actimeo (1 second) expires,
+> and we next refresh the inode attributes from the server
+> we will notice the file is not sparse and and future
+> ftruncate/extends will mark the file sparse.
+>
+>>
+>>> +
+>>> +        /*
+>>> +         * Can't check for sparse support on share the usual way via the
+>>> +         * FS attribute info (FILE_SUPPORTS_SPARSE_FILES) on the share
+>>> +         * since Samba server doesn't set the flag on the share, yet
+>>> +         * supports the set sparse FSCTL and returns sparse correctly
+>>> +         * in the file attributes. If we fail setting sparse though we
+>>> +         * mark that server does not support sparse files for this share
+>>> +         * to avoid repeatedly sending the unsupported fsctl to server
+>>> +         * if the file is repeatedly extended.
+>>> +         */
+>>> +        if (tcon->broken_sparse_sup)
+>>> +            goto smb2_set_eof;
+>>> +
+>>> +        rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
+>>> +                cfile->fid.volatile_fid, FSCTL_SET_SPARSE,
+>>> +                true /* is_fctl */, &set_sparse, 1, NULL, NULL);
+>>> +        if (rc) {
+>>> +            tcon->broken_sparse_sup = true;
+>>> +            cifs_dbg(FYI, "set sparse rc = %d\n", rc);
+>>> +        } else
+>>> +            cifsi->cifsAttrs |= FILE_ATTRIBUTE_SPARSE_FILE;
+>>> +    }
+>>> +
+>>> +smb2_set_eof:
+>>>      return SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
+>>>                  cfile->fid.volatile_fid, cfile->pid, &eof, false);
+>>>  }
+>
+>
+>
+>
+> --
+> Thanks,
+>
+> Steve
