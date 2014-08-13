@@ -1,135 +1,67 @@
-From: Shirish Pargaonkar <shirishpargaonkar@gmail.com>
-Subject: Re: [PATCH] [CIFS] Add sparse file support to SMB2/SMB3 mounts
-Date: Tue, 12 Aug 2014 23:34:35 -0500
-Message-ID: <CADT32eJzPz1dKUm0jxOpmBJG3EYG7xmG_hA24Dz5uHATKYhM0Q@mail.gmail.com>
-References: <CAH2r5mvt=S1eAs3BKhkim+=PPO9GrJ3jsXqYD8O1rxN2=eg-3A@mail.gmail.com>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH][CIFS] Add missing definitions for CIFS File System Attributes
+Date: Tue, 12 Aug 2014 23:42:16 -0500
+Message-ID: <CADT32eKZA4j9sQXpppTOK1iWrfBVdoWXkPe1MJGPgzb4Lv8EwQ@mail.gmail.com>
+References: <CAH2r5mu6y8Kq1KDZ+WTL1-ra66o03EPj_rNJGV8YqGvOFFYfaQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-	samba-technical <samba-technical@lists.samba.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>
-To: Steve French <smfrench@gmail.com>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <CAH2r5mvt=S1eAs3BKhkim+=PPO9GrJ3jsXqYD8O1rxN2=eg-3A@mail.gmail.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAH2r5mu6y8Kq1KDZ+WTL1-ra66o03EPj_rNJGV8YqGvOFFYfaQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Aug 12, 2014 at 9:13 AM, Steve French <smfrench@gmail.com> wrote:
-> Many Linux filesystems make a file "sparse" when extending
-> a file with ftruncate. This does work for CIFS to Samba
-> (only) but not for SMB2/SMB3 (to Samba or Windows) since
-> there is a "set sparse" fsctl which is supposed to be
-> sent to mark a file as sparse.
+Acked-by: Shirish Pargaonkar <spargaonkar-IBi9RG/b67k@public.gmane.org>
+
+On Tue, Aug 12, 2014 at 9:10 AM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> Add missing definitions for CIFS File System Attributes
 >
-> This patch marks a file as sparse by sending this simple
-> set sparse fsctl if it is extended more than 2 pages.
-> It has been tested to Windows 8.1, Samba and various
-> SMB2/SMB3 servers which do support setting sparse (and
-> MacOS which does not appear to support the fsctl yet).
-> If a server share does not support setting a file
-> as sparse, then we do not retry setting sparse on that
-> share.
->
-> The disk space savings for sparse files can be quite
-> large (even more significant on Windows servers than Samba).
->
-> Signed-off-by: Steve French <smfrench@gmail.com>
+> Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 > ---
->  fs/cifs/cifsglob.h |  1 +
->  fs/cifs/smb2ops.c  | 43 +++++++++++++++++++++++++++++++++++++++++++
->  fs/cifs/smb2pdu.c  |  4 +++-
->  3 files changed, 47 insertions(+), 1 deletion(-)
+>  fs/cifs/cifspdu.h | 23 +++++++++++++++++++++++
+>  1 file changed, 23 insertions(+)
 >
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 0012e1e..bc20a6e 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -883,6 +883,7 @@ struct cifs_tcon {
->                  for this mount even if server would support */
->      bool local_lease:1; /* check leases (only) on local system not remote */
->      bool broken_posix_open; /* e.g. Samba server versions < 3.3.2, 3.2.9 */
-> +    bool broken_sparse_sup; /* if server or share does not support sparse */
->      bool need_reconnect:1; /* connection reset, tid now invalid */
->  #ifdef CONFIG_CIFS_SMB2
->      bool print:1;        /* set if connection to printer share */
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 77f8aeb..7463436 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -736,6 +736,49 @@ smb2_set_file_size(const unsigned int xid, struct
-> cifs_tcon *tcon,
->             struct cifsFileInfo *cfile, __u64 size, bool set_alloc)
->  {
->      __le64 eof = cpu_to_le64(size);
-> +    struct inode *inode;
-> +
-> +    /*
-> +     * If extending file more than one page make sparse. Many Linux fs
-> +     * make files sparse by default when extending via ftruncate
-> +     */
-> +    inode = cfile->dentry->d_inode;
-> +
-> +    if (!set_alloc && (size > inode->i_size + 8192)) {
-> +        struct cifsInodeInfo *cifsi;
-> +        __u8 set_sparse = 1;
-> +        int rc;
-> +
-> +        cifsi = CIFS_I(inode);
-> +
-> +        /* if file already sparse or no server support don't bother */
-> +        if (cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE)
-> +            goto smb2_set_eof;
-
-Is this check always valid?  Is it possible that the file is not
-sparse anymore at the server?
-
-> +
-> +        /*
-> +         * Can't check for sparse support on share the usual way via the
-> +         * FS attribute info (FILE_SUPPORTS_SPARSE_FILES) on the share
-> +         * since Samba server doesn't set the flag on the share, yet
-> +         * supports the set sparse FSCTL and returns sparse correctly
-> +         * in the file attributes. If we fail setting sparse though we
-> +         * mark that server does not support sparse files for this share
-> +         * to avoid repeatedly sending the unsupported fsctl to server
-> +         * if the file is repeatedly extended.
-> +         */
-> +        if (tcon->broken_sparse_sup)
-> +            goto smb2_set_eof;
-> +
-> +        rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
-> +                cfile->fid.volatile_fid, FSCTL_SET_SPARSE,
-> +                true /* is_fctl */, &set_sparse, 1, NULL, NULL);
-> +        if (rc) {
-> +            tcon->broken_sparse_sup = true;
-> +            cifs_dbg(FYI, "set sparse rc = %d\n", rc);
-> +        } else
-> +            cifsi->cifsAttrs |= FILE_ATTRIBUTE_SPARSE_FILE;
-> +    }
-> +
-> +smb2_set_eof:
->      return SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
->                  cfile->fid.volatile_fid, cfile->pid, &eof, false);
->  }
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 42ebc1a..74440af 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -1224,7 +1224,9 @@ SMB2_ioctl(const unsigned int xid, struct
-> cifs_tcon *tcon, u64 persistent_fid,
+> diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
+> index 33df36e..0337445 100644
+> --- a/fs/cifs/cifspdu.h
+> +++ b/fs/cifs/cifspdu.h
+> @@ -2253,6 +2253,29 @@ typedef struct {
+>  /* minimum includes first three fields, and empty FS Name */
+>  #define MIN_FS_ATTR_INFO_SIZE 12
 >
->      cifs_dbg(FYI, "SMB2 IOCTL\n");
->
-> -    *out_data = NULL;
-> +    if (out_data != NULL)
-> +        *out_data = NULL;
 > +
->      /* zero out returned data len, in case of error */
->      if (plen)
->          *plen = 0;
->
+> +/* List of FileSystemAttributes - see 2.5.1 of MS-FSCC */
+> +#define FILE_SUPPORT_INTEGRITY_STREAMS    0x04000000
+> +#define FILE_SUPPORTS_USN_JOURNAL    0x02000000
+> +#define FILE_SUPPORTS_OPEN_BY_FILE_ID    0x01000000
+> +#define FILE_SUPPORTS_EXTENDED_ATTRIBUTES 0x00800000
+> +#define FILE_SUPPORTS_HARD_LINKS    0x00400000
+> +#define FILE_SUPPORTS_TRANSACTIONS    0x00200000
+> +#define FILE_SEQUENTIAL_WRITE_ONCE    0x00100000
+> +#define FILE_READ_ONLY_VOLUME        0x00080000
+> +#define FILE_NAMED_STREAMS        0x00040000
+> +#define FILE_SUPPORTS_ENCRYPTION    0x00020000
+> +#define FILE_SUPPORTS_OBJECT_IDS    0x00010000
+> +#define FILE_VOLUME_IS_COMPRESSED    0x00008000
+> +#define FILE_SUPPORTS_REMOTE_STORAGE    0x00000100
+> +#define FILE_SUPPORTS_REPARSE_POINTS    0x00000080
+> +#define FILE_SUPPORTS_SPARSE_FILES    0x00000040
+> +#define FILE_VOLUME_QUOTAS        0x00000020
+> +#define FILE_FILE_COMPRESSION         0x00000010
+> +#define FILE_PERSISTENT_ACLS        0x00000008
+> +#define FILE_UNICODE_ON_DISK        0x00000004
+> +#define FILE_CASE_PRESERVED_NAMES    0x00000002
+> +#define FILE_CASE_SENSITIVE_SEARCH    0x00000001
+>  typedef struct {
+>      __le32 Attributes;
+>      __le32 MaxPathNameComponentLength;
 >
 > --
 > Thanks,
 >
 > Steve
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
