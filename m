@@ -1,133 +1,37 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] [CIFS] Add sparse file support to SMB2/SMB3 mounts
-Date: Wed, 13 Aug 2014 00:11:40 -0500
-Message-ID: <CAH2r5mtd2C7peYhQPzVTYcx=Yc2VfstO_yVWY1c-YFTM-wNZAA@mail.gmail.com>
-References: <CAH2r5mvt=S1eAs3BKhkim+=PPO9GrJ3jsXqYD8O1rxN2=eg-3A@mail.gmail.com>
- <CADT32eJzPz1dKUm0jxOpmBJG3EYG7xmG_hA24Dz5uHATKYhM0Q@mail.gmail.com>
+From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH 5/5] special: fix op_unlk and op_ren tests output
+Date: Wed, 13 Aug 2014 11:45:45 +0400
+Message-ID: <CAKywueR2u+RFGP7_2FX427H5Z8Q_0i4LQJAZqTUZG4p=wMMz9g@mail.gmail.com>
+References: <1407326472-13853-1-git-send-email-pshilovsky@samba.org>
+	<1407326472-13853-6-git-send-email-pshilovsky@samba.org>
+	<53EA4450.1060900@RedHat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32eJzPz1dKUm0jxOpmBJG3EYG7xmG_hA24Dz5uHATKYhM0Q-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Linux NFS Mailing list <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: Steve Dickson <SteveD-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <53EA4450.1060900-AfCzQyP5zfLQT0dZR+AlfA@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Tue, Aug 12, 2014 at 11:34 PM, Shirish Pargaonkar
-<shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> On Tue, Aug 12, 2014 at 9:13 AM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> Many Linux filesystems make a file "sparse" when extending
->> a file with ftruncate. This does work for CIFS to Samba
->> (only) but not for SMB2/SMB3 (to Samba or Windows) since
->> there is a "set sparse" fsctl which is supposed to be
->> sent to mark a file as sparse.
->>
->> This patch marks a file as sparse by sending this simple
->> set sparse fsctl if it is extended more than 2 pages.
->> It has been tested to Windows 8.1, Samba and various
->> SMB2/SMB3 servers which do support setting sparse (and
->> MacOS which does not appear to support the fsctl yet).
->> If a server share does not support setting a file
->> as sparse, then we do not retry setting sparse on that
->> share.
->>
->> The disk space savings for sparse files can be quite
->> large (even more significant on Windows servers than Samba).
->>
->> Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->> ---
->>  fs/cifs/cifsglob.h |  1 +
->>  fs/cifs/smb2ops.c  | 43 +++++++++++++++++++++++++++++++++++++++++++
->>  fs/cifs/smb2pdu.c  |  4 +++-
->>  3 files changed, 47 insertions(+), 1 deletion(-)
->>
->> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
->> index 0012e1e..bc20a6e 100644
->> --- a/fs/cifs/cifsglob.h
->> +++ b/fs/cifs/cifsglob.h
->> @@ -883,6 +883,7 @@ struct cifs_tcon {
->>                  for this mount even if server would support */
->>      bool local_lease:1; /* check leases (only) on local system not remote */
->>      bool broken_posix_open; /* e.g. Samba server versions < 3.3.2, 3.2.9 */
->> +    bool broken_sparse_sup; /* if server or share does not support sparse */
->>      bool need_reconnect:1; /* connection reset, tid now invalid */
->>  #ifdef CONFIG_CIFS_SMB2
->>      bool print:1;        /* set if connection to printer share */
->> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
->> index 77f8aeb..7463436 100644
->> --- a/fs/cifs/smb2ops.c
->> +++ b/fs/cifs/smb2ops.c
->> @@ -736,6 +736,49 @@ smb2_set_file_size(const unsigned int xid, struct
->> cifs_tcon *tcon,
->>             struct cifsFileInfo *cfile, __u64 size, bool set_alloc)
->>  {
->>      __le64 eof = cpu_to_le64(size);
->> +    struct inode *inode;
->> +
->> +    /*
->> +     * If extending file more than one page make sparse. Many Linux fs
->> +     * make files sparse by default when extending via ftruncate
->> +     */
->> +    inode = cfile->dentry->d_inode;
->> +
->> +    if (!set_alloc && (size > inode->i_size + 8192)) {
->> +        struct cifsInodeInfo *cifsi;
->> +        __u8 set_sparse = 1;
->> +        int rc;
->> +
->> +        cifsi = CIFS_I(inode);
->> +
->> +        /* if file already sparse or no server support don't bother */
->> +        if (cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE)
->> +            goto smb2_set_eof;
+2014-08-12 20:44 GMT+04:00 Steve Dickson <SteveD-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> Hello,
 >
-> Is this check always valid?  Is it possible that the file is not
-> sparse anymore at the server?
+> Just curious... what is wrong with the output of these
+> two tests?
 
-If someone unsparsed the file that is fine.  The ftruncate to
-extend the file will still work fine as it did before this patch
-(it just will take up more disk space than it would
-if the file were sparse).  When the actimeo (1 second) expires,
-and we next refresh the inode attributes from the server
-we will notice the file is not sparse and and future
-ftruncate/extends will mark the file sparse.
-
->
->> +
->> +        /*
->> +         * Can't check for sparse support on share the usual way via the
->> +         * FS attribute info (FILE_SUPPORTS_SPARSE_FILES) on the share
->> +         * since Samba server doesn't set the flag on the share, yet
->> +         * supports the set sparse FSCTL and returns sparse correctly
->> +         * in the file attributes. If we fail setting sparse though we
->> +         * mark that server does not support sparse files for this share
->> +         * to avoid repeatedly sending the unsupported fsctl to server
->> +         * if the file is repeatedly extended.
->> +         */
->> +        if (tcon->broken_sparse_sup)
->> +            goto smb2_set_eof;
->> +
->> +        rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
->> +                cfile->fid.volatile_fid, FSCTL_SET_SPARSE,
->> +                true /* is_fctl */, &set_sparse, 1, NULL, NULL);
->> +        if (rc) {
->> +            tcon->broken_sparse_sup = true;
->> +            cifs_dbg(FYI, "set sparse rc = %d\n", rc);
->> +        } else
->> +            cifsi->cifsAttrs |= FILE_ATTRIBUTE_SPARSE_FILE;
->> +    }
->> +
->> +smb2_set_eof:
->>      return SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
->>                  cfile->fid.volatile_fid, cfile->pid, &eof, false);
->>  }
-
-
-
+These tests call 'ls' command for the path names that doesn't exists -
+".nfs*". Previously we create file names through "tempnam(".",
+"nfsa")" command and have "nfs*" style file names (without the first
+dot symbol). So, the proposed patch fixes the output in the way we
+already have in op_chmod.c.
 
 -- 
-Thanks,
-
-Steve
+Best regards,
+Pavel Shilovsky.
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
