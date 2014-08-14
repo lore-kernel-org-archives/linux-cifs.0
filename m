@@ -1,137 +1,71 @@
-From: Shirish Pargaonkar <shirishpargaonkar@gmail.com>
-Subject: Re: [PATCH] [CIFS] Add sparse file support to SMB2/SMB3 mounts
-Date: Wed, 13 Aug 2014 16:25:13 -0500
-Message-ID: <CADT32eJFq-5iBXbNmb-16f-zS3DVtaU11eMmd=AG=trma70g_A@mail.gmail.com>
-References: <CAH2r5mvt=S1eAs3BKhkim+=PPO9GrJ3jsXqYD8O1rxN2=eg-3A@mail.gmail.com>
-	<CADT32eJzPz1dKUm0jxOpmBJG3EYG7xmG_hA24Dz5uHATKYhM0Q@mail.gmail.com>
-	<CAH2r5mtd2C7peYhQPzVTYcx=Yc2VfstO_yVWY1c-YFTM-wNZAA@mail.gmail.com>
+From: Jeff Layton <jeff.layton@primarydata.com>
+Subject: Re: [PATCH][CIFS] Workaround MacOS server problem with SMB2.1 write
+ response
+Date: Thu, 14 Aug 2014 15:30:15 -0400
+Message-ID: <20140814153015.030657f7@tlielax.poochiereds.net>
+References: <CAH2r5msWAcy41S85b5eN5QBZSqwXDnQU07yHS0gnKE+zaaXw4A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Cc: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-	samba-technical <samba-technical@lists.samba.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	samba-technical <samba-technical@lists.samba.org>
 To: Steve French <smfrench@gmail.com>
 Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <CAH2r5mtd2C7peYhQPzVTYcx=Yc2VfstO_yVWY1c-YFTM-wNZAA@mail.gmail.com>
+In-Reply-To: <CAH2r5msWAcy41S85b5eN5QBZSqwXDnQU07yHS0gnKE+zaaXw4A@mail.gmail.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Reviewed-by: Shirish Pargaonkar <spargaonkar@suse.com>
+On Tue, 12 Aug 2014 09:19:42 -0500
+Steve French <smfrench@gmail.com> wrote:
 
-On Wed, Aug 13, 2014 at 12:11 AM, Steve French <smfrench@gmail.com> wrote:
-> On Tue, Aug 12, 2014 at 11:34 PM, Shirish Pargaonkar
-> <shirishpargaonkar@gmail.com> wrote:
->> On Tue, Aug 12, 2014 at 9:13 AM, Steve French <smfrench@gmail.com> wrote:
->>> Many Linux filesystems make a file "sparse" when extending
->>> a file with ftruncate. This does work for CIFS to Samba
->>> (only) but not for SMB2/SMB3 (to Samba or Windows) since
->>> there is a "set sparse" fsctl which is supposed to be
->>> sent to mark a file as sparse.
->>>
->>> This patch marks a file as sparse by sending this simple
->>> set sparse fsctl if it is extended more than 2 pages.
->>> It has been tested to Windows 8.1, Samba and various
->>> SMB2/SMB3 servers which do support setting sparse (and
->>> MacOS which does not appear to support the fsctl yet).
->>> If a server share does not support setting a file
->>> as sparse, then we do not retry setting sparse on that
->>> share.
->>>
->>> The disk space savings for sparse files can be quite
->>> large (even more significant on Windows servers than Samba).
->>>
->>> Signed-off-by: Steve French <smfrench@gmail.com>
->>> ---
->>>  fs/cifs/cifsglob.h |  1 +
->>>  fs/cifs/smb2ops.c  | 43 +++++++++++++++++++++++++++++++++++++++++++
->>>  fs/cifs/smb2pdu.c  |  4 +++-
->>>  3 files changed, 47 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
->>> index 0012e1e..bc20a6e 100644
->>> --- a/fs/cifs/cifsglob.h
->>> +++ b/fs/cifs/cifsglob.h
->>> @@ -883,6 +883,7 @@ struct cifs_tcon {
->>>                  for this mount even if server would support */
->>>      bool local_lease:1; /* check leases (only) on local system not remote */
->>>      bool broken_posix_open; /* e.g. Samba server versions < 3.3.2, 3.2.9 */
->>> +    bool broken_sparse_sup; /* if server or share does not support sparse */
->>>      bool need_reconnect:1; /* connection reset, tid now invalid */
->>>  #ifdef CONFIG_CIFS_SMB2
->>>      bool print:1;        /* set if connection to printer share */
->>> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
->>> index 77f8aeb..7463436 100644
->>> --- a/fs/cifs/smb2ops.c
->>> +++ b/fs/cifs/smb2ops.c
->>> @@ -736,6 +736,49 @@ smb2_set_file_size(const unsigned int xid, struct
->>> cifs_tcon *tcon,
->>>             struct cifsFileInfo *cfile, __u64 size, bool set_alloc)
->>>  {
->>>      __le64 eof = cpu_to_le64(size);
->>> +    struct inode *inode;
->>> +
->>> +    /*
->>> +     * If extending file more than one page make sparse. Many Linux fs
->>> +     * make files sparse by default when extending via ftruncate
->>> +     */
->>> +    inode = cfile->dentry->d_inode;
->>> +
->>> +    if (!set_alloc && (size > inode->i_size + 8192)) {
->>> +        struct cifsInodeInfo *cifsi;
->>> +        __u8 set_sparse = 1;
->>> +        int rc;
->>> +
->>> +        cifsi = CIFS_I(inode);
->>> +
->>> +        /* if file already sparse or no server support don't bother */
->>> +        if (cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE)
->>> +            goto smb2_set_eof;
->>
->> Is this check always valid?  Is it possible that the file is not
->> sparse anymore at the server?
->
-> If someone unsparsed the file that is fine.  The ftruncate to
-> extend the file will still work fine as it did before this patch
-> (it just will take up more disk space than it would
-> if the file were sparse).  When the actimeo (1 second) expires,
-> and we next refresh the inode attributes from the server
-> we will notice the file is not sparse and and future
-> ftruncate/extends will mark the file sparse.
->
->>
->>> +
->>> +        /*
->>> +         * Can't check for sparse support on share the usual way via the
->>> +         * FS attribute info (FILE_SUPPORTS_SPARSE_FILES) on the share
->>> +         * since Samba server doesn't set the flag on the share, yet
->>> +         * supports the set sparse FSCTL and returns sparse correctly
->>> +         * in the file attributes. If we fail setting sparse though we
->>> +         * mark that server does not support sparse files for this share
->>> +         * to avoid repeatedly sending the unsupported fsctl to server
->>> +         * if the file is repeatedly extended.
->>> +         */
->>> +        if (tcon->broken_sparse_sup)
->>> +            goto smb2_set_eof;
->>> +
->>> +        rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
->>> +                cfile->fid.volatile_fid, FSCTL_SET_SPARSE,
->>> +                true /* is_fctl */, &set_sparse, 1, NULL, NULL);
->>> +        if (rc) {
->>> +            tcon->broken_sparse_sup = true;
->>> +            cifs_dbg(FYI, "set sparse rc = %d\n", rc);
->>> +        } else
->>> +            cifsi->cifsAttrs |= FILE_ATTRIBUTE_SPARSE_FILE;
->>> +    }
->>> +
->>> +smb2_set_eof:
->>>      return SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
->>>                  cfile->fid.volatile_fid, cfile->pid, &eof, false);
->>>  }
->
->
->
->
-> --
-> Thanks,
->
-> Steve
+> Writes fail to Mac servers with SMB2.1 mounts (works with cifs though) due
+> to them sending an incorrect RFC1001 length. Workaround this problem.
+> MacOS server sends a write response with 3 bytes of pad beyond the end
+> of the SMB itself.  The RFC1001 length is 3 bytes more than
+> the sum of the SMB2.1 header length + the write reponse.
+> 
+> Since we have seen a few other examples where servers have
+> padded responses strangely (oplock break and create),
+> allow servers to send a padded SMB2/SMB3 response to allow
+> for rounding (up to 15 bytes).
+> 
+> Signed-off-by: Steve French <smfrench@gmail.com>
+> ---
+>  fs/cifs/smb2misc.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
+> index f2e6ac2..da05beb 100644
+> --- a/fs/cifs/smb2misc.c
+> +++ b/fs/cifs/smb2misc.c
+> @@ -181,6 +181,12 @@ smb2_check_message(char *buf, unsigned int length)
+>          /* server can return one byte more */
+>          if (clc_len == 4 + len + 1)
+>              return 0;
+
+Not directly related to this patch, but...
+
+What's the story behind the check above? Allowing the server to overrun
+the rfc1001 length by one byte seems dangerous...
+
+> +
+> +        /* MacOS server pads after SMB2.1 write response with 3 bytes */
+> +        /* of junk. Allow server to pad up to 15 bytes of junk at end */
+> +        if ((clc_len < 4 + len) && (clc_len > 4 + len - 16))
+> +            return 0;
+> +
+
+I don't understand the rationale for the arbitrary 15 byte limit. At
+this point, you've already received the data. If there's extra junk at
+the end, do you really care? I'd just ensure that clc_len fits within
+the rfc1001 len and leave it at that.
+
+>          return 1;
+>      }
+>      return 0;
+> 
+
+
+-- 
+Jeff Layton <jlayton@primarydata.com>
