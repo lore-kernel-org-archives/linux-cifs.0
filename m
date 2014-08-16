@@ -1,51 +1,62 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: handle lease F_UNLCK requests properly
-Date: Fri, 15 Aug 2014 23:05:57 -0500
-Message-ID: <CAH2r5ms6arPJ7_-rhknvkSWnO7rNQmxNDGp_3MiPVTCZiZ8E4Q@mail.gmail.com>
-References: <1407593804-28053-1-git-send-email-jlayton@primarydata.com>
+Subject: [PATCHv2][CIFS] Workaround MacOS server problem with SMB2.1 write response
+Date: Fri, 15 Aug 2014 23:54:55 -0500
+Message-ID: <CAH2r5ms1kt=Rb7LAGt8zGiWUjCk-6e0fFqqNwFJztf++Q9kVog@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Jeff Layton <jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1407593804-28053-1-git-send-email-jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Merged into cifs-2.6.git
+Writes fail to Mac servers with SMB2.1 mounts (works with cifs though) due
+to them sending an incorrect RFC1001 length for the SMB2.1 Write response.
+Workaround this problem. MacOS server sends a write response with 3 bytes
+of pad beyond the end of the SMB itself.  The RFC1001 length is 3 bytes
+more than the sum of the SMB2.1 header length + the write reponse.
 
-Did you find this with a test case or by inspection?
+Incorporate feedback from Jeff and JRA to allow servers to send
+a tcp frame that is even more than three bytes too long
+(ie much longer than the SMB2/SMB3 request that it contains) but
+we do log it once now. In the earlier version of the patch I had
+limited how far off the length field could be before we fail the request.
 
-On Sat, Aug 9, 2014 at 9:16 AM, Jeff Layton <jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org> wrote:
-> Currently any F_UNLCK request for a lease just gets back -EAGAIN. Allow
-> them to go immediately to generic_setlease instead.
->
-> Signed-off-by: Jeff Layton <jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
-> ---
->  fs/cifs/cifsfs.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index 2c90d07c0b3a..f1a93d2b108d 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -799,8 +799,9 @@ static int cifs_setlease(struct file *file, long arg, struct file_lock **lease)
->         if (!(S_ISREG(inode->i_mode)))
->                 return -EINVAL;
->
-> -       /* check if file is oplocked */
-> -       if (((arg == F_RDLCK) && CIFS_CACHE_READ(CIFS_I(inode))) ||
-> +       /* Check if file is oplocked if this is request for new lease */
-> +       if (arg == F_UNLCK ||
-> +           ((arg == F_RDLCK) && CIFS_CACHE_READ(CIFS_I(inode))) ||
->             ((arg == F_WRLCK) && CIFS_CACHE_WRITE(CIFS_I(inode))))
->                 return generic_setlease(file, arg, lease);
->         else if (tlink_tcon(cfile->tlink)->local_lease &&
-> --
-> 1.9.3
->
+Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/smb2misc.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-
+diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
+index f2e6ac2..4aa7a0f 100644
+--- a/fs/cifs/smb2misc.c
++++ b/fs/cifs/smb2misc.c
+@@ -178,9 +178,24 @@ smb2_check_message(char *buf, unsigned int length)
+         /* Windows 7 server returns 24 bytes more */
+         if (clc_len + 20 == len && command == SMB2_OPLOCK_BREAK_HE)
+             return 0;
+-        /* server can return one byte more */
++        /* server can return one byte more due to implied bcc[0] */
+         if (clc_len == 4 + len + 1)
+             return 0;
++
++        /*
++         * MacOS server pads after SMB2.1 write response with 3 bytes
++         * of junk. Other servers match RFC1001 len to actual
++         * SMB2/SMB3 frame length (header + smb2 response specific data)
++         * Log the server error (once), but allow it and continue
++         * since the frame is parseable.
++         */
++        if (clc_len < 4 /* RFC1001 header size */ + len) {
++            printk_once(KERN_WARNING
++                "SMB2 server sent bad RFC1001 len %d not %d\n",
++                len, clc_len - 4);
++            return 0;
++        }
++
+         return 1;
+     }
+     return 0;
 
 -- 
 Thanks,
