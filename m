@@ -1,70 +1,49 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH][SMB3] Cleanup sparse file support by creating worker
- function for it
-Date: Fri, 15 Aug 2014 23:04:24 -0500
-Message-ID: <CAH2r5mvEKDsP+svDMQq4UdS-+Og744s3suYbUWFLf7eU4yZT1w@mail.gmail.com>
-References: <CAH2r5msUgxmikvOmirUfceCubUek8+AaCv6RcJoU6mcrJ9j=sg@mail.gmail.com>
- <20140815115152.6e20e542@f163.suse.de>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: handle lease F_UNLCK requests properly
+Date: Fri, 15 Aug 2014 23:05:57 -0500
+Message-ID: <CAH2r5ms6arPJ7_-rhknvkSWnO7rNQmxNDGp_3MiPVTCZiZ8E4Q@mail.gmail.com>
+References: <1407593804-28053-1-git-send-email-jlayton@primarydata.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>, samba-technical <samba-technical@lists.samba.org>
-To: David Disseldorp <ddiss@suse.de>
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <20140815115152.6e20e542@f163.suse.de>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Jeff Layton <jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1407593804-28053-1-git-send-email-jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Cleaned up and merged into cifs-2.6.git - thx
+Merged into cifs-2.6.git
 
-On Fri, Aug 15, 2014 at 4:51 AM, David Disseldorp <ddiss@suse.de> wrote:
-> On Thu, 14 Aug 2014 16:44:15 -0500, Steve French wrote:
+Did you find this with a test case or by inspection?
+
+On Sat, Aug 9, 2014 at 9:16 AM, Jeff Layton <jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org> wrote:
+> Currently any F_UNLCK request for a lease just gets back -EAGAIN. Allow
+> them to go immediately to generic_setlease instead.
 >
->> Simply move code to new function (for clarity).  The new function
->> sets or clears the sparse file attribute flag.
->>
->> Signed-off-by: Steve French <smfrench@gmail.com>
->> ---
->>  fs/cifs/smb2ops.c | 82 ++++++++++++++++++++++++++++++++++---------------------
->>  1 file changed, 51 insertions(+), 31 deletions(-)
->>
->> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
->> index 7463436..04a86cc 100644
->> --- a/fs/cifs/smb2ops.c
->> +++ b/fs/cifs/smb2ops.c
->> @@ -731,6 +731,54 @@ smb2_sync_write(const unsigned int xid, struct
->> cifsFileInfo *cfile,
->>      return SMB2_write(xid, parms, written, iov, nr_segs);
->>  }
->>
->> +/* Set or clear the SPARSE_FILE attribute based on value passed in setsparse */
->> +static bool smb2_set_sparse(const unsigned int xid, struct cifs_tcon *tcon,
->> +        struct cifsFileInfo *cfile, struct inode *inode, __u8 setsparse)
->> +{
->> +    struct cifsInodeInfo *cifsi;
->> +    int rc;
->> +
->> +    cifsi = CIFS_I(inode);
->> +
->> +    /* if file already sparse don't bother setting sparse again */
->> +    if ((cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE) && setsparse)
->> +        return true; /* already sparse */
->> +
->> +    if (!(cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE) && !setsparse)
->> +        return true; /* already not sparse */
->> +
->> +
+> Signed-off-by: Jeff Layton <jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+> ---
+>  fs/cifs/cifsfs.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 >
-> Drop one of the empty lines above. Looks good otherwise.
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index 2c90d07c0b3a..f1a93d2b108d 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -799,8 +799,9 @@ static int cifs_setlease(struct file *file, long arg, struct file_lock **lease)
+>         if (!(S_ISREG(inode->i_mode)))
+>                 return -EINVAL;
 >
-> Reviewed-by: David Disseldorp <ddiss@samba.org>
+> -       /* check if file is oplocked */
+> -       if (((arg == F_RDLCK) && CIFS_CACHE_READ(CIFS_I(inode))) ||
+> +       /* Check if file is oplocked if this is request for new lease */
+> +       if (arg == F_UNLCK ||
+> +           ((arg == F_RDLCK) && CIFS_CACHE_READ(CIFS_I(inode))) ||
+>             ((arg == F_WRLCK) && CIFS_CACHE_WRITE(CIFS_I(inode))))
+>                 return generic_setlease(file, arg, lease);
+>         else if (tlink_tcon(cfile->tlink)->local_lease &&
+> --
+> 1.9.3
 >
-> Cheers, David
 
 
 
