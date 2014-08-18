@@ -1,39 +1,39 @@
-From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: CIFS module build verification system
-Date: Mon, 18 Aug 2014 21:46:44 +0400
-Message-ID: <CAKywueRrd4ivRgyqkkYFVL47D-B4FwxyALg2xraQkybucVyeog@mail.gmail.com>
+From: Raphael Geissert <geissert-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org>
+Subject: [PATCH] [CIFS] Remove unneeded check for tcon in SMB2_flush
+Date: Mon, 18 Aug 2014 22:23:37 +0200
+Message-ID: <2036698.Wh45l6gMXh@eee>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi,
+While poking at the code I found what looks like a leftover check for
+tcon in SMB2_flush.
 
-During the second part of the GSoC program of this year I has been
-working on build verification system for CIFS kernel module.
+SMB2_flush dereferences tcon->ses at the beginning of the function, but
+later one it checks for ((rc != 0) && tcon).
+All the code in between appears to properly check tcon for NULLness,
+but the only caller I found via ops->flush also dereferences tcon on
+its own.
+---
+ fs/cifs/smb2pdu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Now, I got the system ready to test module with Cthon and XFS test
-suites. Both suites has some tests (that are not working with CIFS)
-disabled. I was trying to make it easier to add new test suites
-further.
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 240c627..c149385 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1629,7 +1629,7 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
 
-The system is based on bash scripts that can be run from cron. The
-scripts automatically pull the recent changes from the predefined git
-repository, build the module and run tests against it.
+        rc = SendReceive2(xid, ses, iov, 1, &resp_buftype, 0);
 
-The git repo for build verification system scripts:
-http://git.altlinux.org/people/piastry/public/?p=cifs-tests.git;a=summary
+-       if ((rc != 0) && tcon)
++       if (rc != 0)
+                cifs_stats_fail_inc(tcon, SMB2_FLUSH_HE);
 
-The git repo for patched Cthon tests (merged by Steve Dickson into his tree):
-http://git.altlinux.org/people/piastry/public/?p=cthon04.git;a=summary
-
-The git repo for patched XFS tests:
-http://git.altlinux.org/people/piastry/public/?p=xfstests.git;a=summary
-
+        free_rsp_buf(resp_buftype, iov[0].iov_base);
 -- 
-Best regards,
-Pavel Shilovsky.
+1.9.1
