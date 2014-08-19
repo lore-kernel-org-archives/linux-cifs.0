@@ -1,39 +1,44 @@
-From: Raphael Geissert <geissert-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org>
-Subject: [PATCH] [CIFS] Remove unneeded check for tcon in SMB2_flush
-Date: Mon, 18 Aug 2014 22:23:37 +0200
-Message-ID: <2036698.Wh45l6gMXh@eee>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] [CIFS] Incorrect error returned on setting file compressed on SMB2
+Date: Mon, 18 Aug 2014 22:33:06 -0500
+Message-ID: <CAH2r5muLY2X17Gdg-VyMX=3X-Dg-xtQ_LozMDrsvWFqPYQ+jZg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=UTF-8
+Cc: David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>
+To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-While poking at the code I found what looks like a leftover check for
-tcon in SMB2_flush.
+When the server (for an SMB2 or SMB3 mount) doesn't support
+an ioctl (such as setting the compressed flag
+on a file) we were incorrectly returning EIO instead
+of EOPNOTSUPP, this is confusing e.g. doing chattr +c to a file
+on a non-btrfs Samba partition, now the error returned is more
+intuitive to the user.
 
-SMB2_flush dereferences tcon->ses at the beginning of the function, but
-later one it checks for ((rc != 0) && tcon).
-All the code in between appears to properly check tcon for NULLness,
-but the only caller I found via ops->flush also dereferences tcon on
-its own.
+Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c | 2 +-
+ fs/cifs/smb2maperror.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 240c627..c149385 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -1629,7 +1629,7 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+diff --git a/fs/cifs/smb2maperror.c b/fs/cifs/smb2maperror.c
+index a689514..af59d03 100644
+--- a/fs/cifs/smb2maperror.c
++++ b/fs/cifs/smb2maperror.c
+@@ -298,7 +298,7 @@ static const struct status_to_posix_error
+smb2_error_map_table[] = {
+     {STATUS_INVALID_PARAMETER, -EINVAL, "STATUS_INVALID_PARAMETER"},
+     {STATUS_NO_SUCH_DEVICE, -ENODEV, "STATUS_NO_SUCH_DEVICE"},
+     {STATUS_NO_SUCH_FILE, -ENOENT, "STATUS_NO_SUCH_FILE"},
+-    {STATUS_INVALID_DEVICE_REQUEST, -EIO, "STATUS_INVALID_DEVICE_REQUEST"},
++    {STATUS_INVALID_DEVICE_REQUEST, -EOPNOTSUPP,
+"STATUS_INVALID_DEVICE_REQUEST"},
+     {STATUS_END_OF_FILE, -ENODATA, "STATUS_END_OF_FILE"},
+     {STATUS_WRONG_VOLUME, -EIO, "STATUS_WRONG_VOLUME"},
+     {STATUS_NO_MEDIA_IN_DEVICE, -EIO, "STATUS_NO_MEDIA_IN_DEVICE"},
 
-        rc = SendReceive2(xid, ses, iov, 1, &resp_buftype, 0);
-
--       if ((rc != 0) && tcon)
-+       if (rc != 0)
-                cifs_stats_fail_inc(tcon, SMB2_FLUSH_HE);
-
-        free_rsp_buf(resp_buftype, iov[0].iov_base);
 -- 
-1.9.1
+Thanks,
+
+Steve
