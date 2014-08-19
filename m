@@ -1,42 +1,58 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH] [CIFS] Incorrect error returned on setting file compressed on SMB2
-Date: Mon, 18 Aug 2014 22:33:06 -0500
-Message-ID: <CAH2r5muLY2X17Gdg-VyMX=3X-Dg-xtQ_LozMDrsvWFqPYQ+jZg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] CIFS: Fix wrong directory attributes after rename
+Date: Mon, 18 Aug 2014 22:34:20 -0500
+Message-ID: <CAH2r5muGkPPvuqLFhnkWnv447ZpLaie3KGO9ihXvt_3Nfvr4OA@mail.gmail.com>
+References: <1408380598-11737-1-git-send-email-pshilovsky@samba.org> <1408380598-11737-2-git-send-email-pshilovsky@samba.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>
-To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1408380598-11737-2-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-When the server (for an SMB2 or SMB3 mount) doesn't support
-an ioctl (such as setting the compressed flag
-on a file) we were incorrectly returning EIO instead
-of EOPNOTSUPP, this is confusing e.g. doing chattr +c to a file
-on a non-btrfs Samba partition, now the error returned is more
-intuitive to the user.
+The two patches have been merged into cifs-2.6.git for-next
 
-Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- fs/cifs/smb2maperror.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Mon, Aug 18, 2014 at 11:49 AM, Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> When we requests rename we also need to update attributes
+> of both source and target parent directories. Not doing it
+> causes generic/309 xfstest to fail on SMB2 mounts. Fix this
+> by marking these directories for force revalidating.
+>
+> Cc: <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+> Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> ---
+>  fs/cifs/inode.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+> index 2029e7c..cf69c95 100644
+> --- a/fs/cifs/inode.c
+> +++ b/fs/cifs/inode.c
+> @@ -1720,6 +1720,12 @@ unlink_target:
+>                                     target_dentry, to_name);
+>         }
+>
+> +       /* force revalidate to go get info when needed */
+> +       CIFS_I(source_dir)->time = CIFS_I(target_dir)->time = 0;
+> +
+> +       source_dir->i_ctime = source_dir->i_mtime = target_dir->i_ctime =
+> +               target_dir->i_mtime = current_fs_time(source_dir->i_sb);
+> +
+>  cifs_rename_exit:
+>         kfree(info_buf_source);
+>         kfree(from_name);
+> --
+> 1.8.3.2
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-diff --git a/fs/cifs/smb2maperror.c b/fs/cifs/smb2maperror.c
-index a689514..af59d03 100644
---- a/fs/cifs/smb2maperror.c
-+++ b/fs/cifs/smb2maperror.c
-@@ -298,7 +298,7 @@ static const struct status_to_posix_error
-smb2_error_map_table[] = {
-     {STATUS_INVALID_PARAMETER, -EINVAL, "STATUS_INVALID_PARAMETER"},
-     {STATUS_NO_SUCH_DEVICE, -ENODEV, "STATUS_NO_SUCH_DEVICE"},
-     {STATUS_NO_SUCH_FILE, -ENOENT, "STATUS_NO_SUCH_FILE"},
--    {STATUS_INVALID_DEVICE_REQUEST, -EIO, "STATUS_INVALID_DEVICE_REQUEST"},
-+    {STATUS_INVALID_DEVICE_REQUEST, -EOPNOTSUPP,
-"STATUS_INVALID_DEVICE_REQUEST"},
-     {STATUS_END_OF_FILE, -ENODATA, "STATUS_END_OF_FILE"},
-     {STATUS_WRONG_VOLUME, -EIO, "STATUS_WRONG_VOLUME"},
-     {STATUS_NO_MEDIA_IN_DEVICE, -EIO, "STATUS_NO_MEDIA_IN_DEVICE"},
+
 
 -- 
 Thanks,
