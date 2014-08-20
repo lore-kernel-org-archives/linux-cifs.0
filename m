@@ -1,52 +1,92 @@
-From: David Disseldorp <ddiss@suse.de>
-Subject: Re: CIFS module build verification system
-Date: Wed, 20 Aug 2014 11:20:04 +0200
-Message-ID: <20140820112004.66b760fc@plati.site>
-References: <CAKywueRrd4ivRgyqkkYFVL47D-B4FwxyALg2xraQkybucVyeog@mail.gmail.com>
-	<CAKywueTMGq3tmf5fo5aWPUA888TgiKWHyRH=hQxHjRQ3in5gUQ@mail.gmail.com>
+From: Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+Subject: [PATCH 1/7] cifs: Bypass windows extended security for ntlmv2 negotiate
+Date: Wed, 20 Aug 2014 19:39:01 +0900
+Message-ID: <003401cfbc62$f505f920$df11eb60$@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs <linux-cifs@vger.kernel.org>, samba-technical <samba-technical@lists.samba.org>, Steve French <smfrench@gmail.com>
-To: Pavel Shilovsky <pshilovsky@samba.org>
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <CAKywueTMGq3tmf5fo5aWPUA888TgiKWHyRH=hQxHjRQ3in5gUQ@mail.gmail.com>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: 'Shirish Pargaonkar' <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	'Pavel Shilovsky' <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Ashish Sangwan <a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+To: 'Steve French' <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-language: ko
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 20 Aug 2014 11:32:59 +0400, Pavel Shilovsky wrote:
+Windows machine has extended security feature which refuse to allow
+authentication when there is time difference between server time and
+client time when ntlmv2 negotiation is used. This problem is prevalent
+in embedded enviornment where system time is set to default 1970.
 
-...
-> > The git repo for build verification system scripts:
-> > http://git.altlinux.org/people/piastry/public/?p=cifs-tests.git;a=summary
-> >
-> > The git repo for patched Cthon tests (merged by Steve Dickson into his tree):
-> > http://git.altlinux.org/people/piastry/public/?p=cthon04.git;a=summary
-> >
-> > The git repo for patched XFS tests:
-> > http://git.altlinux.org/people/piastry/public/?p=xfstests.git;a=summary
-> 
-> Hi Steve, David,
-> 
-> Thank you for your notes and suggestions!
-> 
-> Do you understand right that I can squash David's commit (started with
-> "SQUASH") into my patch?
+We don't know yet the exact threshold for the time difference at which
+the connection is refused but one comment in cifs code suggest that it
+is around 5 minutes.
 
-Sure, go for it.
+This patch tries to solve this problem by sending the received server
+time during negotiate process as the current client time.
 
-> Not sure about group file. CIFS (as NFS) doesn't have it's own tests
-> now. Do you mean to add "test/cifs" directory with an empty (except a
-> commented header) group file inside (to let us add cifs specific tests
-> in future)?
+Signed-off-by: Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+Signed-off-by: Ashish Sangwan <a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+---
+ fs/cifs/cifsencrypt.c |    4 ++--
+ fs/cifs/cifsglob.h    |    2 ++
+ fs/cifs/cifssmb.c     |    2 ++
+ fs/cifs/smb2pdu.c     |    1 +
+ 4 files changed, 7 insertions(+), 2 deletions(-)
 
-My mistake, I thought the generic tests could be regrouped
-per-filesystem. An empty template would be fine.
-
-Cheers, David
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 4934347..d5cec81 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -671,8 +671,8 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ 			(ses->auth_key.response + CIFS_SESS_KEY_SIZE);
+ 	ntlmv2->blob_signature = cpu_to_le32(0x00000101);
+ 	ntlmv2->reserved = 0;
+-	/* Must be within 5 minutes of the server */
+-	ntlmv2->time = cpu_to_le64(cifs_UnixTimeToNT(CURRENT_TIME));
++	/* Hack to get around windows extended security */
++	ntlmv2->time = cpu_to_le64(ses->serverTime);
+ 	get_random_bytes(&ntlmv2->client_chal, sizeof(ntlmv2->client_chal));
+ 	ntlmv2->reserved2 = 0;
+ 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index ce24c1f..9344c94 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -796,6 +796,8 @@ struct cifs_ses {
+ 	enum securityEnum sectype; /* what security flavor was specified? */
+ 	bool sign;		/* is signing required? */
+ 	bool need_reconnect:1; /* connection reset, uid now invalid */
++	__u64   serverTime;	/* Keeps a track of server time sent by server
++				   during negotiate response */
+ #ifdef CONFIG_CIFS_SMB2
+ 	__u16 session_flags;
+ 	char smb3signingkey[SMB3_SIGN_KEY_SIZE]; /* for signing smb3 packets */
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 86a2aa5..ead2da0 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -584,6 +584,8 @@ CIFSSMBNegotiate(const unsigned int xid, struct cifs_ses *ses)
+ 	if (rc != 0)
+ 		goto neg_err_exit;
+ 
++	ses->serverTime = le32_to_cpu(pSMBr->SystemTimeLow);
++	ses->serverTime |= ((__u64)le32_to_cpu(pSMBr->SystemTimeHigh) << 32);
+ 	server->dialect = le16_to_cpu(pSMBr->DialectIndex);
+ 	cifs_dbg(FYI, "Dialect: %d\n", server->dialect);
+ 	/* Check wct = 1 error case */
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index ed42234..a40f492 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -381,6 +381,7 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
+ 	if (rc != 0)
+ 		goto neg_exit;
+ 
++	ses->serverTime = le64_to_cpu(rsp->SystemTime);
+ 	cifs_dbg(FYI, "mode 0x%x\n", rsp->SecurityMode);
+ 
+ 	/* BB we may eventually want to match the negotiated vs. requested
+-- 
+1.7.7
