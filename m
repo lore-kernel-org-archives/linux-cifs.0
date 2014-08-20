@@ -1,56 +1,53 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: cthon failure
-Date: Wed, 20 Aug 2014 10:23:36 +0400
-Message-ID: <CAKywueQAbPsgKEU4=1hzRyFNOz0gZnNXTyywi5pyc2ZShayQ+Q@mail.gmail.com>
-References: <CAH2r5mtN1cHocFcVPsDC9kVq5c9DyxazmTBFQp_wUVCPNsvV7Q@mail.gmail.com>
-	<CAKywueTzRheGbgKPijF9Wk5LiTx9LL3BHm4zgfMSB7-FzSLpUw@mail.gmail.com>
+From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: CIFS module build verification system
+Date: Wed, 20 Aug 2014 11:32:59 +0400
+Message-ID: <CAKywueTMGq3tmf5fo5aWPUA888TgiKWHyRH=hQxHjRQ3in5gUQ@mail.gmail.com>
+References: <CAKywueRrd4ivRgyqkkYFVL47D-B4FwxyALg2xraQkybucVyeog@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
 	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueTzRheGbgKPijF9Wk5LiTx9LL3BHm4zgfMSB7-FzSLpUw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CAKywueRrd4ivRgyqkkYFVL47D-B4FwxyALg2xraQkybucVyeog-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2014-08-20 10:05 GMT+04:00 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> 2014-08-20 6:33 GMT+04:00 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
->> Noticed that even with Unix Extensions on cifs mount that Samba
->> refuses to delete a file in this scenario (locally and presumably over
->> nfs it still works since it is in cthon suite).  This causes
->> connectathon special tests to fail
->>
->> touch newfile
->> chmod 0000 newfile
->> rm newfile
->>
->> (works locally but samba rejects)
->>
->> Samba 4.1 rejects posix unlink (set path info) STATUS_CANNOT_DELETE
->> then client falls back to SMB unlink which fails.  STATUS_CANNOT_DELETE
->> then client falls back to a set path info of file info basic which
->> also fails STATUS_ACCESS_DENIED
->>
->> Will do quick test with Samba master when build completes - but does
->> this server unlink bug look familiar (or am I missing an smb.conf that
->> I have forgotten about)?
+2014-08-18 21:46 GMT+04:00 Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
+> Hi,
 >
+> During the second part of the GSoC program of this year I has been
+> working on build verification system for CIFS kernel module.
 >
-> Steve,
+> Now, I got the system ready to test module with Cthon and XFS test
+> suites. Both suites has some tests (that are not working with CIFS)
+> disabled. I was trying to make it easier to add new test suites
+> further.
 >
-> I faced with exactly the same problem during my testing.
+> The system is based on bash scripts that can be run from cron. The
+> scripts automatically pull the recent changes from the predefined git
+> repository, build the module and run tests against it.
 >
-> This behavior appears after setting
+> The git repo for build verification system scripts:
+> http://git.altlinux.org/people/piastry/public/?p=cifs-tests.git;a=summary
 >
-> "store dos attributes = Yes"
+> The git repo for patched Cthon tests (merged by Steve Dickson into his tree):
+> http://git.altlinux.org/people/piastry/public/?p=cthon04.git;a=summary
 >
-> in smb.conf. Without this option all Cthon tests passes fine.
->
-> I am using Samba 4.1.7 version (Ubuntu version from Jelmer's ppa
-> https://launchpad.net/~jelmer/+archive/ubuntu/samba-backports).
+> The git repo for patched XFS tests:
+> http://git.altlinux.org/people/piastry/public/?p=xfstests.git;a=summary
 
-Samba-3.6.18 doesn't have the problem.
+Hi Steve, David,
+
+Thank you for your notes and suggestions!
+
+Do you understand right that I can squash David's commit (started with
+"SQUASH") into my patch?
+
+Not sure about group file. CIFS (as NFS) doesn't have it's own tests
+now. Do you mean to add "test/cifs" directory with an empty (except a
+commented header) group file inside (to let us add cifs specific tests
+in future)?
 
 -- 
 Best regards,
