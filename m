@@ -1,7 +1,7 @@
 From: Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
-Subject: [PATCH 2/7] cifs: Allow directIO read/write during cache=strict
-Date: Wed, 20 Aug 2014 19:39:11 +0900
-Message-ID: <003501cfbc62$fac9f4b0$f05dde10$@samsung.com>
+Subject: [PATCH 3/7] cifs: No need to send SIGKILL to demux_thread during umount
+Date: Wed, 20 Aug 2014 19:39:17 +0900
+Message-ID: <003601cfbc62$fe88d170$fb9a7450$@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
@@ -14,47 +14,69 @@ Content-language: ko
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Currently cifs have all or nothing approach for directIO operations.
-cache=strict mode does not allow directIO while cache=none mode performs
-all the operations as directIO even when user does not specify O_DIRECT
-flag. This patch enables strict cache mode to honour directIO semantics.
+There is no need to explicitly send SIGKILL to cifs_demultiplex_thread
+as it is calling module_put_and_exit to exit cleanly.
+
+socket sk_rcvtimeo is set to 7 HZ so the thread will wake up in 7 seconds and
+clean itself.
 
 Signed-off-by: Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
 Signed-off-by: Ashish Sangwan <a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
 ---
- fs/cifs/dir.c  |    4 ++++
- fs/cifs/file.c |    4 ++++
- 2 files changed, 8 insertions(+), 0 deletions(-)
+ fs/cifs/connect.c |   19 -------------------
+ 1 files changed, 0 insertions(+), 19 deletions(-)
 
-diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index 3db0c5f..30e377c 100644
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@ -497,6 +497,10 @@ cifs_atomic_open(struct inode *inode, struct dentry *direntry,
- 		goto out;
- 	}
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 03ed8a0..b4b6d10 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -837,7 +837,6 @@ cifs_demultiplex_thread(void *p)
+ 	struct TCP_Server_Info *server = p;
+ 	unsigned int pdu_length;
+ 	char *buf = NULL;
+-	struct task_struct *task_to_wake = NULL;
+ 	struct mid_q_entry *mid_entry;
  
-+	if (file->f_flags & O_DIRECT &&
-+	    CIFS_SB(inode->i_sb)->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO)
-+		file->f_op = &cifs_file_direct_ops;
-+
- 	file_info = cifs_new_fileinfo(&fid, file, tlink, oplock);
- 	if (file_info == NULL) {
- 		if (server->ops->close)
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index bee733e..0d07740 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -467,6 +467,10 @@ int cifs_open(struct inode *inode, struct file *file)
- 	cifs_dbg(FYI, "inode = 0x%p file flags are 0x%x for %s\n",
- 		 inode, file->f_flags, full_path);
+ 	current->flags |= PF_MEMALLOC;
+@@ -928,19 +927,7 @@ cifs_demultiplex_thread(void *p)
+ 	if (server->smallbuf) /* no sense logging a debug message if NULL */
+ 		cifs_small_buf_release(server->smallbuf);
  
-+	if (file->f_flags & O_DIRECT &&
-+	    cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO)
-+		file->f_op = &cifs_file_direct_ops;
-+
- 	if (server->oplocks)
- 		oplock = REQ_OPLOCK;
- 	else
+-	task_to_wake = xchg(&server->tsk, NULL);
+ 	clean_demultiplex_info(server);
+-
+-	/* if server->tsk was NULL then wait for a signal before exiting */
+-	if (!task_to_wake) {
+-		set_current_state(TASK_INTERRUPTIBLE);
+-		while (!signal_pending(current)) {
+-			schedule();
+-			set_current_state(TASK_INTERRUPTIBLE);
+-		}
+-		set_current_state(TASK_RUNNING);
+-	}
+-
+ 	module_put_and_exit(0);
+ }
+ 
+@@ -2061,8 +2048,6 @@ cifs_find_tcp_session(struct smb_vol *vol)
+ static void
+ cifs_put_tcp_session(struct TCP_Server_Info *server)
+ {
+-	struct task_struct *task;
+-
+ 	spin_lock(&cifs_tcp_ses_lock);
+ 	if (--server->srv_count > 0) {
+ 		spin_unlock(&cifs_tcp_ses_lock);
+@@ -2086,10 +2071,6 @@ cifs_put_tcp_session(struct TCP_Server_Info *server)
+ 	kfree(server->session_key.response);
+ 	server->session_key.response = NULL;
+ 	server->session_key.len = 0;
+-
+-	task = xchg(&server->tsk, NULL);
+-	if (task)
+-		force_sig(SIGKILL, task);
+ }
+ 
+ static struct TCP_Server_Info *
 -- 
 1.7.7
