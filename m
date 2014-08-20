@@ -1,8 +1,8 @@
 From: Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
-Subject: [PATCH 5/7] cifs: fix memory leak when password is supplied multiple
- times
-Date: Wed, 20 Aug 2014 19:39:34 +0900
-Message-ID: <003801cfbc63$08767980$19636c80$@samsung.com>
+Subject: [PATCH 7/7] cifs: remove unneeded check of null checking in if
+ condition
+Date: Wed, 20 Aug 2014 19:39:59 +0900
+Message-ID: <003a01cfbc63$178d63c0$46a82b40$@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
@@ -15,34 +15,25 @@ Content-language: ko
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Unlikely but possible. When password is supplied multiple times, we have
-to free the previous allocation.
-
 Signed-off-by: Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
 Signed-off-by: Ashish Sangwan <a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
 ---
- fs/cifs/connect.c |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+ fs/cifs/smb2pdu.c |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index b4b6d10..91512fd 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1583,6 +1583,7 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
- 			 * Check if this is a case where the  password
- 			 * starts with a delimiter
- 			 */
-+			kfree(vol->password);
- 			tmp_end = strchr(data, '=');
- 			tmp_end++;
- 			if (!(tmp_end < end && tmp_end[1] == delim)) {
-@@ -1624,6 +1625,7 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
- 					options = end;
- 			}
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index ab366e5..844c651 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1404,8 +1404,7 @@ SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
+ 	rsp = (struct smb2_close_rsp *)iov[0].iov_base;
  
-+			kfree(vol->password);
- 			/* Now build new password string */
- 			temp_len = strlen(value);
- 			vol->password = kzalloc(temp_len+1, GFP_KERNEL);
+ 	if (rc != 0) {
+-		if (tcon)
+-			cifs_stats_fail_inc(tcon, SMB2_CLOSE_HE);
++		cifs_stats_fail_inc(tcon, SMB2_CLOSE_HE);
+ 		goto close_exit;
+ 	}
+ 
 -- 
 1.7.7
