@@ -1,52 +1,68 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 2/7] cifs: Allow directIO read/write during cache=strict
-Date: Thu, 21 Aug 2014 11:56:08 -0400
-Message-ID: <20140821115608.494fb1f9@tlielax.poochiereds.net>
-References: <003501cfbc62$fac9f4b0$f05dde10$@samsung.com>
-	<20140821072656.372e613c@tlielax.poochiereds.net>
-	<CAH2r5mu6LH1YLqWhi4-1dgJH0BQ2CS5Lbym1mGP9EuvgtCP1Wg@mail.gmail.com>
-	<20140821110254.4f2dcc95@tlielax.poochiereds.net>
-	<CAH2r5mvAhxXXzG-Rgt2BD4a8EYsdGRcfUeEZC=AF5XTNO6ZXeg@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH v2] cifs: fix memory leak when password is supplied
+ multiple times
+Date: Thu, 21 Aug 2014 12:14:46 -0500
+Message-ID: <CAH2r5mvE0KJOvWLDRdR80n3JKCcLVgfrt8wN1eZ6mPBFig_E3Q@mail.gmail.com>
+References: <002c01cfbd28$41411700$c3c34500$@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+Content-Type: text/plain; charset=UTF-8
+Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
 	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
 	Ashish Sangwan <a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mvAhxXXzG-Rgt2BD4a8EYsdGRcfUeEZC=AF5XTNO6ZXeg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <002c01cfbd28$41411700$c3c34500$@samsung.com>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 21 Aug 2014 10:18:37 -0500
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+merged into cifs-2.6.git
 
-> On Thu, Aug 21, 2014 at 10:02 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> > On Thu, 21 Aug 2014 08:24:35 -0500
-> > Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> >
-> >> If you are opening O_DIRECT why wouldn't you use oplock, ie still
-> >> request oplock, simply to minimize metadata traffic (you don't have to
-> >> send stat across the wire).  The reads and writes aren't cached but
-> >> the inode metadata would be.
-> >>
-> >
-> > What updates the i_size if a DIO write extends the file?
-> 
-> Doesn't direct writes call cifs_user_writev which calls
-> cifs_iovec_write which calls cifs_write_from_iter which calls
-> cifs_uncached_writev_complete
-> 
-> so looks like i_size should get set
-> 
-> 
+Of the 7 patch series, only the ntlmv2 security fix has not been
+merged (would like additional information/thoughts on this - perhaps
+some experiments with windows to see what the time threshold is)
 
-Ok, fair enough then. I still think it's a little silly to request an
-oplock that you won't really be using, but I suppose there's no reason
-to specifically forbid it.
+On Thu, Aug 21, 2014 at 5:11 AM, Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org> wrote:
+> Unlikely but possible. When password is supplied multiple times, we have
+> to free the previous allocation.
+>
+> Signed-off-by: Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+> Signed-off-by: Ashish Sangwan <a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+> ---
+> Changelog
+>  v2:
+>   - fix a possible double free reported by kbuild.
+>
+>  fs/cifs/connect.c |    2 ++
+>  1 files changed, 2 insertions(+), 0 deletions(-)
+>
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index b4b6d10..8a9fded 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -1587,6 +1587,7 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+>                         tmp_end++;
+>                         if (!(tmp_end < end && tmp_end[1] == delim)) {
+>                                 /* No it is not. Set the password to NULL */
+> +                               kfree(vol->password);
+>                                 vol->password = NULL;
+>                                 break;
+>                         }
+> @@ -1624,6 +1625,7 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+>                                         options = end;
+>                         }
+>
+> +                       kfree(vol->password);
+>                         /* Now build new password string */
+>                         temp_len = strlen(value);
+>                         vol->password = kzalloc(temp_len+1, GFP_KERNEL);
+> --
+> 1.7.7
+>
+
+
 
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Thanks,
+
+Steve
