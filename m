@@ -1,7 +1,7 @@
 From: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Subject: Re: cthon failure
-Date: Thu, 21 Aug 2014 11:55:13 -0700
-Message-ID: <20140821185513.GA17035@samba2>
+Date: Thu, 21 Aug 2014 14:13:38 -0700
+Message-ID: <20140821211338.GC17035@samba2>
 References: <CAH2r5mtN1cHocFcVPsDC9kVq5c9DyxazmTBFQp_wUVCPNsvV7Q@mail.gmail.com>
 Reply-To: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Mime-Version: 1.0
@@ -37,9 +37,9 @@ On Tue, Aug 19, 2014 at 09:33:12PM -0500, Steve French wrote:
 > this server unlink bug look familiar (or am I missing an smb.conf that
 > I have forgotten about)?
 
-Can you send me the debug level 10 log from your 4.1.x tests (and
-also tell me *what* 4.1.x version you're running :-).
+Can't reproduce this on current v4-1-test
+git branch.
 
-Thanks,
+Can you give me details please ?
 
 Jeremy.
