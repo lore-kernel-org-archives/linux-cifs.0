@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 1/3] CIFS: Fix directory rename error
-Date: Fri, 22 Aug 2014 13:32:09 +0400
-Message-ID: <1408699931-22515-2-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH 2/3] CIFS: Fix wrong restart readdir for SMB1
+Date: Fri, 22 Aug 2014 13:32:10 +0400
+Message-ID: <1408699931-22515-3-git-send-email-pshilovsky@samba.org>
 References: <1408699931-22515-1-git-send-email-pshilovsky@samba.org>
 Cc: <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -10,41 +10,28 @@ In-Reply-To: <1408699931-22515-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDs
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-CIFS servers process nlink counts differently for files and directories.
-In cifs_rename() if we the request fails on the existing target, we
-try to remove it through cifs_unlink() but this is not what we want
-to do for directories. As the result the following sequence of commands
+The existing code calls server->ops->close() that is not
+right. This causes XFS test generic/310 to fail. Fix this
+by using server->ops->closedir() function.
 
-mkdir {1,2}; mv -T 1 2; rmdir {1,2}; mkdir {1,2}; echo foo > 2/bar
-
-and XFS test generic/023 fail with -ENOENT error. That's why the second
-mkdir reuses the existing inode (target inode of the mv -T command) with
-S_DEAD flag.
-
-Fix this by checking whether the target is directory or not and
-calling cifs_rmdir() rather than cifs_unlink() for directories.
-
-Cc: <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org> # v3.7+
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/inode.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ fs/cifs/readdir.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 949ec90..7899a40 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -1720,7 +1720,10 @@ cifs_rename2(struct inode *source_dir, struct dentry *source_dentry,
- unlink_target:
- 	/* Try unlinking the target dentry if it's not negative */
- 	if (target_dentry->d_inode && (rc == -EACCES || rc == -EEXIST)) {
--		tmprc = cifs_unlink(target_dir, target_dentry);
-+		if (d_is_dir(target_dentry))
-+			tmprc = cifs_rmdir(target_dir, target_dentry);
-+		else
-+			tmprc = cifs_unlink(target_dir, target_dentry);
- 		if (tmprc)
- 			goto cifs_rename_exit;
- 		rc = cifs_do_rename(xid, source_dentry, from_name,
+diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+index 798c80a..58e413c 100644
+--- a/fs/cifs/readdir.c
++++ b/fs/cifs/readdir.c
+@@ -597,7 +597,7 @@ find_cifs_entry(const unsigned int xid, struct cifs_tcon *tcon, loff_t pos,
+ 			cfile->invalidHandle = true;
+ 			spin_unlock(&cifs_file_list_lock);
+ 			if (server->ops->close)
+-				server->ops->close(xid, tcon, &cfile->fid);
++				server->ops->close_dir(xid, tcon, &cfile->fid);
+ 		} else
+ 			spin_unlock(&cifs_file_list_lock);
+ 		if (cfile->srch_inf.ntwrk_buf_start) {
 -- 
 1.9.1
