@@ -1,104 +1,144 @@
-From: shirishpargaonkar@gmail.com
-Subject: [PATCH 4/5] cifs: shared-superblock - create a dentry as a disconnected root
-Date: Fri, 22 Aug 2014 17:21:28 -0500
-Message-ID: <1408746088-10261-1-git-send-email-spargaonkar@suse.com>
-Cc: linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	shirish <shirishpargaonkar@gmail.com>,
-	Shirish Pargaonkar <spargaonkar@suse.com>
-To: smfrench@gmail.com
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH 5/5] cifs: shared-superblock - splice disconnected dentry
+Date: Fri, 22 Aug 2014 17:21:43 -0500
+Message-ID: <1408746103-10300-1-git-send-email-spargaonkar@suse.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	shirish <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Shirish Pargaonkar <spargaonkar-IBi9RG/b67k@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-From: shirish <shirishpargaonkar@gmail.com>
+From: shirish <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
+splice the dentry during lookup.  In case of servers who do not provide
+uniqueids, look in the linked list off of superblock before sending
+out a query on the wire and also do a dentry search before splicing
+and free the entry in the linked list.
 
-Create a disconnected root dentry if to an authenticated user, the leaf
-directory of a mount is accessible but one or more intermediate paths are not.
-In case a server does not provide uniqueid, insert an element for the
-disconnected root dentry in a linked list off of superblock.
-
-
-Signed-off-by: Shirish Pargaonkar <spargaonkar@suse.com>
+Signed-off-by: Shirish Pargaonkar <spargaonkar-IBi9RG/b67k@public.gmane.org>
 ---
- fs/cifs/cifsfs.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 47 insertions(+), 2 deletions(-)
+ fs/cifs/dir.c | 68 +++++++++++++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 57 insertions(+), 11 deletions(-)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 4e759f6..0942622 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -602,6 +602,46 @@ cifs_alloc_rdelem(char *full_path, struct dentry *rdentry,
- 	return rdelem;
+diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+index d835ae2..b6ebb8c 100644
+--- a/fs/cifs/dir.c
++++ b/fs/cifs/dir.c
+@@ -691,7 +691,7 @@ mknod_out:
+ 	return rc;
  }
  
-+static struct dentry *
-+create_root_dis_dentry(struct super_block *sb, struct inode *rinode,
-+			char *fpath)
-+{
-+	int rc;
-+	unsigned int xid;
-+	struct dentry *dentry = NULL;
-+	struct cifs_rdelem *rdelem = NULL;
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
-+	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
-+
-+	xid = get_xid();
-+	if (tcon->unix_ext)
-+		rc = cifs_get_inode_info_unix(&rinode, fpath, sb, xid);
-+	else
-+		rc = cifs_get_inode_info(&rinode, fpath, NULL, sb, xid, NULL);
-+	free_xid(xid);
-+
-+	if ((rc == 0) && (rinode != NULL)) {
-+		dentry = d_obtain_alias(rinode);
-+		if (IS_ERR(dentry)) {
-+			iput(rinode);
-+			goto rdelem_ret;
-+		}
-+		if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM)) {
-+			rdelem =
-+				cifs_alloc_rdelem(fpath, dentry, rinode);
-+			if (IS_ERR(rdelem))
-+				goto rdelem_ret;
-+			spin_lock(&cifs_sb->rtdislock);
-+			list_add(&rdelem->rdlist, &cifs_sb->rtdislist);
-+			spin_unlock(&cifs_sb->rtdislock);
-+		}
-+		return dentry;
-+	}
-+
-+rdelem_ret:
-+	return ERR_PTR(-EACCES);
-+}
-+
- /*
-  * Get root dentry from superblock according to prefix path mount option.
-  * Return dentry with refcount + 1 on success and NULL otherwise.
-@@ -614,9 +654,10 @@ cifs_get_root(struct smb_vol *vol, struct super_block *sb)
+-struct cifs_rdelem *
++static struct cifs_rdelem *
+ find_rdelem_by_inode(struct inode *rdinode, struct cifs_sb_info * cifs_sb)
+ {
+ 	struct cifs_rdelem *rdelem;
+@@ -726,7 +726,7 @@ find_rdelem_by_dentry(const struct dentry *rdentry,
+ 	return NULL;
+ }
+ 
+-void
++static void
+ find_rdelem_by_path(char *full_path, struct inode **newInode,
+ 			struct cifs_sb_info * cifs_sb)
+ {
+@@ -754,6 +754,9 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
+ 	struct cifs_tcon *pTcon;
+ 	struct inode *newInode = NULL;
  	char *full_path = NULL;
- 	char *s, *p;
- 	char sep;
-+	struct inode *rinode = NULL;
-+	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
++	struct dentry *ret = NULL;
++	struct cifs_rdelem *rdelem;
++	struct qstr dname;
  
--	full_path = cifs_build_path_to_root(vol, cifs_sb,
--					    cifs_sb_master_tcon(cifs_sb));
-+	full_path = cifs_build_path_to_root(vol, cifs_sb, tcon);
- 	if (full_path == NULL)
- 		return ERR_PTR(-ENOMEM);
+ 	xid = get_xid();
  
-@@ -657,6 +698,10 @@ cifs_get_root(struct smb_vol *vol, struct super_block *sb)
- 		dput(dentry);
- 		dentry = child;
- 	} while (!IS_ERR(dentry));
+@@ -791,20 +794,62 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
+ 	cifs_dbg(FYI, "Full path: %s inode = 0x%p\n",
+ 		 full_path, direntry->d_inode);
+ 
+-	if (pTcon->unix_ext) {
+-		rc = cifs_get_inode_info_unix(&newInode, full_path,
+-					      parent_dir_inode->i_sb, xid);
+-	} else {
+-		rc = cifs_get_inode_info(&newInode, full_path, NULL,
+-				parent_dir_inode->i_sb, xid, NULL);
++	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM)) {
++		/*
++		 * Looking for an existing disconnected root dentry if any,
++		 * before sending out a lookup on the wire.
++		 */
++		find_rdelem_by_path(full_path, &newInode, cifs_sb);
+ 	}
+ 
++	if (!newInode) {
++		if (pTcon->unix_ext) {
++			rc = cifs_get_inode_info_unix(&newInode, full_path,
++					parent_dir_inode->i_sb, xid);
++		} else
++			rc = cifs_get_inode_info(&newInode, full_path, NULL,
++					parent_dir_inode->i_sb, xid, NULL);
++	}
++	/* else, found an anonymous root dentry with an inode */
 +
-+	if (IS_ERR(dentry) && (PTR_ERR(dentry) == -EACCES) && *s)
-+		dentry = create_root_dis_dentry(sb, rinode, full_path);
-+
+ 	if ((rc == 0) && (newInode != NULL)) {
+-		d_add(direntry, newInode);
+ 		/* since paths are not looked up by component - the parent
+ 		   directories are presumed to be good here */
+-		renew_parental_timestamps(direntry);
++		if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM)) {
++			dname.name = direntry->d_name.name;
++			dname.len = strlen(direntry->d_name.name) + 1;
++			/*
++			 * Perhaps another lookup beat us to this.
++			 */
++			spin_lock(&cifs_sb->rtdislock);
++			ret = d_lookup(direntry->d_parent, &dname);
++			if (ret && !IS_ERR(ret)) {
++				dput(ret);
++				spin_unlock(&cifs_sb->rtdislock);
++				goto lookup_out;
++			} else
++				ret = d_splice_alias(newInode, direntry);
++			spin_unlock(&cifs_sb->rtdislock);
++		} else
++			ret = d_splice_alias(newInode, direntry);
+ 
++		if (!ret)
++			renew_parental_timestamps(direntry);
++		else {
++			if (!IS_ERR(ret)) {
++				if (!(cifs_sb->mnt_cifs_flags &
++						CIFS_MOUNT_SERVER_INUM)) {
++					rdelem =
++					find_rdelem_by_inode(newInode, cifs_sb);
++					if (rdelem)
++						cifs_free_rdelem(rdelem);
++				}
++				renew_parental_timestamps(ret);
++				dput(ret);
++				goto lookup_out;
++			} else
++				rc = PTR_ERR(ret);
++		}
+ 	} else if (rc == -ENOENT) {
+ 		rc = 0;
+ 		direntry->d_time = jiffies;
+@@ -816,12 +861,13 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
+ 		/* We special case check for Access Denied - since that
+ 		is a common return code */
+ 	}
++	ret = ERR_PTR(rc);
+ 
+ lookup_out:
  	kfree(full_path);
- 	return dentry;
+ 	cifs_put_tlink(tlink);
+ 	free_xid(xid);
+-	return ERR_PTR(rc);
++	return ret;
  }
+ 
+ static void
 -- 
 1.8.4.5
-
