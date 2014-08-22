@@ -1,51 +1,79 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 0/3] Bugfixes for v3.17-rc
-Date: Fri, 22 Aug 2014 11:08:39 -0500
-Message-ID: <CAH2r5muMBBYwJZ7tbM9RTNwqsxvaDAXXCnp69as8QDovUmQwuQ@mail.gmail.com>
-References: <1408699931-22515-1-git-send-email-pshilovsky@samba.org>
+Subject: Re: [PATCH v2] cifs: Allow directIO read/write during cache=strict
+Date: Fri, 22 Aug 2014 11:13:37 -0500
+Message-ID: <CAH2r5mvy0ctR60QS1XFTrLS3tsA8UcQYQ8RKEAt=p1LQ0hSTCg@mail.gmail.com>
+References: <000001cfbdc9$1ea5eb20$5bf1c160$@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Ashish Sangwan <a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+To: Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1408699931-22515-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <000001cfbdc9$1ea5eb20$5bf1c160$@samsung.com>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Merged into cifs-2.6.git for-next
+merged into cifs-2.6.git
 
-This is fantastic that xfstests have already been so useful.  This
-will help a lot.
-
-And I also saw that the cthon test improvements were merged into Steve
-D's tree.  We need to update the (Samba? and xfstest?) wikis with
-information on how to run these.
-
-On Fri, Aug 22, 2014 at 4:32 AM, Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> Here is the set of bugfixes that was found during XFS testing (as a part of cifs-tests).
-> The patches are targeted for v3.17-rc and for stable as well.
+On Fri, Aug 22, 2014 at 12:22 AM, Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org> wrote:
+> Currently cifs have all or nothing approach for directIO operations.
+> cache=strict mode does not allow directIO while cache=none mode performs
+> all the operations as directIO even when user does not specify O_DIRECT
+> flag. This patch enables strict cache mode to honour directIO semantics.
 >
-> Pavel Shilovsky (3):
->   CIFS: Fix directory rename error
->   CIFS: Fix wrong restart readdir for SMB1
->   CIFS: Fix wrong filename length for SMB2
+> Signed-off-by: Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+> Signed-off-by: Ashish Sangwan <a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+> ---
+> *Changelog
+>  v2:
+>   - Also consider CIFS_MOUNT_NO_BRL flag.
 >
->  fs/cifs/cifsglob.h  | 5 -----
->  fs/cifs/inode.c     | 5 ++++-
->  fs/cifs/readdir.c   | 2 +-
->  fs/cifs/smb2file.c  | 2 +-
->  fs/cifs/smb2inode.c | 2 +-
->  fs/cifs/smb2ops.c   | 2 +-
->  fs/cifs/smb2pdu.c   | 2 +-
->  7 files changed, 9 insertions(+), 11 deletions(-)
+>  fs/cifs/dir.c  |    8 ++++++++
+>  fs/cifs/file.c |    8 ++++++++
+>  2 files changed, 16 insertions(+), 0 deletions(-)
 >
+> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+> index 3db0c5f..6cbd9c6 100644
+> --- a/fs/cifs/dir.c
+> +++ b/fs/cifs/dir.c
+> @@ -497,6 +497,14 @@ cifs_atomic_open(struct inode *inode, struct dentry *direntry,
+>                 goto out;
+>         }
+>
+> +       if (file->f_flags & O_DIRECT &&
+> +           CIFS_SB(inode->i_sb)->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO) {
+> +               if (CIFS_SB(inode->i_sb)->mnt_cifs_flags & CIFS_MOUNT_NO_BRL)
+> +                       file->f_op = &cifs_file_direct_nobrl_ops;
+> +               else
+> +                       file->f_op = &cifs_file_direct_ops;
+> +               }
+> +
+>         file_info = cifs_new_fileinfo(&fid, file, tlink, oplock);
+>         if (file_info == NULL) {
+>                 if (server->ops->close)
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index bee733e..2e3720f 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -467,6 +467,14 @@ int cifs_open(struct inode *inode, struct file *file)
+>         cifs_dbg(FYI, "inode = 0x%p file flags are 0x%x for %s\n",
+>                  inode, file->f_flags, full_path);
+>
+> +       if (file->f_flags & O_DIRECT &&
+> +           cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO) {
+> +               if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_BRL)
+> +                       file->f_op = &cifs_file_direct_nobrl_ops;
+> +               else
+> +                       file->f_op = &cifs_file_direct_ops;
+> +       }
+> +
+>         if (server->oplocks)
+>                 oplock = REQ_OPLOCK;
+>         else
 > --
-> 1.9.1
+> 1.7.7
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 
