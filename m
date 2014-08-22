@@ -1,71 +1,37 @@
 From: Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
-Subject: [PATCH v2] cifs: Allow directIO read/write during cache=strict
-Date: Fri, 22 Aug 2014 14:22:51 +0900
-Message-ID: <000001cfbdc9$1ea5eb20$5bf1c160$@samsung.com>
+Subject: RE: [PATCH 1/7] cifs: Bypass windows extended security for ntlmv2
+ negotiate
+Date: Fri, 22 Aug 2014 16:07:29 +0900
+Message-ID: <004601cfbdd7$bca015e0$35e041a0$@samsung.com>
+References: <003401cfbc62$f505f920$df11eb60$@samsung.com>
+ <1408681626.11134.20.camel@pico.ipa.ssimo.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, 'Jeff Layton' <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Ashish Sangwan <a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: 'Steve French' <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	'Shirish Pargaonkar' <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	'Pavel Shilovsky' <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	'Ashish Sangwan' <a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+To: 'Simo' <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-reply-to: <1408681626.11134.20.camel-fj0lwfvWodpMy5p6ylGyhR2eb7JE58TQ@public.gmane.org>
 Content-language: ko
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Currently cifs have all or nothing approach for directIO operations.
-cache=strict mode does not allow directIO while cache=none mode performs
-all the operations as directIO even when user does not specify O_DIRECT
-flag. This patch enables strict cache mode to honour directIO semantics.
 
-Signed-off-by: Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
-Signed-off-by: Ashish Sangwan <a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
----
-*Changelog
- v2:
-  - Also consider CIFS_MOUNT_NO_BRL flag.
+> This patch is not addressing the problem in the correct way.
+> The server should send the time in the challenge message targetinfo data
+> (see MS-NLMP and search for MsvAvTimestamp in 2.2.2.1 and 3..5.1.2),
+> only if it is not available the currentime should be used (if you have
+> to pick the current time I guess you can employ tricks to try to get one
+> as close as possible to the server time by other means).
+> 
+> It is not clear to me whether the code parses the challenge messages's
+> targetinfo field, if it doesn't it should.
+Okay, I will check your point.
 
- fs/cifs/dir.c  |    8 ++++++++
- fs/cifs/file.c |    8 ++++++++
- 2 files changed, 16 insertions(+), 0 deletions(-)
-
-diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index 3db0c5f..6cbd9c6 100644
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@ -497,6 +497,14 @@ cifs_atomic_open(struct inode *inode, struct dentry *direntry,
- 		goto out;
- 	}
- 
-+	if (file->f_flags & O_DIRECT &&
-+	    CIFS_SB(inode->i_sb)->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO) {
-+		if (CIFS_SB(inode->i_sb)->mnt_cifs_flags & CIFS_MOUNT_NO_BRL)
-+			file->f_op = &cifs_file_direct_nobrl_ops;
-+		else
-+			file->f_op = &cifs_file_direct_ops;
-+		}
-+
- 	file_info = cifs_new_fileinfo(&fid, file, tlink, oplock);
- 	if (file_info == NULL) {
- 		if (server->ops->close)
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index bee733e..2e3720f 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -467,6 +467,14 @@ int cifs_open(struct inode *inode, struct file *file)
- 	cifs_dbg(FYI, "inode = 0x%p file flags are 0x%x for %s\n",
- 		 inode, file->f_flags, full_path);
- 
-+	if (file->f_flags & O_DIRECT &&
-+	    cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO) {
-+		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_BRL)
-+			file->f_op = &cifs_file_direct_nobrl_ops;
-+		else
-+			file->f_op = &cifs_file_direct_ops;
-+	}
-+
- 	if (server->oplocks)
- 		oplock = REQ_OPLOCK;
- 	else
--- 
-1.7.7
+Thanks for your reply :)
+> 
+> Simo.
