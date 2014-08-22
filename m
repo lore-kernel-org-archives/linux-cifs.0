@@ -1,167 +1,104 @@
-From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH 3/5] cifs: shared-superblock - various routines to search disconnected root dentry
-Date: Fri, 22 Aug 2014 17:21:14 -0500
-Message-ID: <1408746074-10223-1-git-send-email-spargaonkar@suse.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	shirish <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Shirish Pargaonkar <spargaonkar-IBi9RG/b67k@public.gmane.org>
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: shirishpargaonkar@gmail.com
+Subject: [PATCH 4/5] cifs: shared-superblock - create a dentry as a disconnected root
+Date: Fri, 22 Aug 2014 17:21:28 -0500
+Message-ID: <1408746088-10261-1-git-send-email-spargaonkar@suse.com>
+Cc: linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	shirish <shirishpargaonkar@gmail.com>,
+	Shirish Pargaonkar <spargaonkar@suse.com>
+To: smfrench@gmail.com
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-From: shirish <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: shirish <shirishpargaonkar@gmail.com>
 
-The disconnected root dentries in a linked list off of superblock
-from servers that do not provide uniqueids can be searched by dentries,
-inodes, and full paths when time comes to search them for either splicing
-(during lookup) or freeing.
 
-Signed-off-by: Shirish Pargaonkar <spargaonkar-IBi9RG/b67k@public.gmane.org>
+Create a disconnected root dentry if to an authenticated user, the leaf
+directory of a mount is accessible but one or more intermediate paths are not.
+In case a server does not provide uniqueid, insert an element for the
+disconnected root dentry in a linked list off of superblock.
+
+
+Signed-off-by: Shirish Pargaonkar <spargaonkar@suse.com>
 ---
- fs/cifs/cifsproto.h |  1 +
- fs/cifs/dir.c       | 95 +++++++++++++++++++++++++++++++++++++++++++++++------
- 2 files changed, 86 insertions(+), 10 deletions(-)
+ fs/cifs/cifsfs.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 47 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index c31ce98..c1047e2 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -205,6 +205,7 @@ extern void cifs_add_pending_open_locked(struct cifs_fid *fid,
- 					 struct tcon_link *tlink,
- 					 struct cifs_pending_open *open);
- extern void cifs_del_pending_open(struct cifs_pending_open *open);
-+extern void cifs_free_rdelem(struct cifs_rdelem *);
- 
- #if IS_ENABLED(CONFIG_CIFS_DFS_UPCALL)
- extern void cifs_dfs_release_automount_timer(void);
-diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index 3db0c5f..d835ae2 100644
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@ -691,6 +691,58 @@ mknod_out:
- 	return rc;
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 4e759f6..0942622 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -602,6 +602,46 @@ cifs_alloc_rdelem(char *full_path, struct dentry *rdentry,
+ 	return rdelem;
  }
  
-+struct cifs_rdelem *
-+find_rdelem_by_inode(struct inode *rdinode, struct cifs_sb_info * cifs_sb)
++static struct dentry *
++create_root_dis_dentry(struct super_block *sb, struct inode *rinode,
++			char *fpath)
 +{
-+	struct cifs_rdelem *rdelem;
++	int rc;
++	unsigned int xid;
++	struct dentry *dentry = NULL;
++	struct cifs_rdelem *rdelem = NULL;
++	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
++	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
 +
-+	spin_lock(&cifs_sb->rtdislock);
-+	list_for_each_entry(rdelem, &cifs_sb->rtdislist, rdlist) {
-+		if (rdelem->rdinode == rdinode) {
-+			list_del(&rdelem->rdlist);
++	xid = get_xid();
++	if (tcon->unix_ext)
++		rc = cifs_get_inode_info_unix(&rinode, fpath, sb, xid);
++	else
++		rc = cifs_get_inode_info(&rinode, fpath, NULL, sb, xid, NULL);
++	free_xid(xid);
++
++	if ((rc == 0) && (rinode != NULL)) {
++		dentry = d_obtain_alias(rinode);
++		if (IS_ERR(dentry)) {
++			iput(rinode);
++			goto rdelem_ret;
++		}
++		if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM)) {
++			rdelem =
++				cifs_alloc_rdelem(fpath, dentry, rinode);
++			if (IS_ERR(rdelem))
++				goto rdelem_ret;
++			spin_lock(&cifs_sb->rtdislock);
++			list_add(&rdelem->rdlist, &cifs_sb->rtdislist);
 +			spin_unlock(&cifs_sb->rtdislock);
-+			return rdelem;
 +		}
++		return dentry;
 +	}
-+	spin_unlock(&cifs_sb->rtdislock);
-+	return NULL;
++
++rdelem_ret:
++	return ERR_PTR(-EACCES);
 +}
 +
-+static struct cifs_rdelem *
-+find_rdelem_by_dentry(const struct dentry *rdentry,
-+			struct cifs_sb_info * cifs_sb)
-+{
-+	struct cifs_rdelem *rdelem;
+ /*
+  * Get root dentry from superblock according to prefix path mount option.
+  * Return dentry with refcount + 1 on success and NULL otherwise.
+@@ -614,9 +654,10 @@ cifs_get_root(struct smb_vol *vol, struct super_block *sb)
+ 	char *full_path = NULL;
+ 	char *s, *p;
+ 	char sep;
++	struct inode *rinode = NULL;
++	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
+ 
+-	full_path = cifs_build_path_to_root(vol, cifs_sb,
+-					    cifs_sb_master_tcon(cifs_sb));
++	full_path = cifs_build_path_to_root(vol, cifs_sb, tcon);
+ 	if (full_path == NULL)
+ 		return ERR_PTR(-ENOMEM);
+ 
+@@ -657,6 +698,10 @@ cifs_get_root(struct smb_vol *vol, struct super_block *sb)
+ 		dput(dentry);
+ 		dentry = child;
+ 	} while (!IS_ERR(dentry));
 +
-+	spin_lock(&cifs_sb->rtdislock);
-+	list_for_each_entry(rdelem, &cifs_sb->rtdislist, rdlist) {
-+		if (rdelem->rdentry == rdentry) {
-+			list_del(&rdelem->rdlist);
-+			spin_unlock(&cifs_sb->rtdislock);
-+			return rdelem;
-+		}
-+	}
-+	spin_unlock(&cifs_sb->rtdislock);
-+	return NULL;
-+}
++	if (IS_ERR(dentry) && (PTR_ERR(dentry) == -EACCES) && *s)
++		dentry = create_root_dis_dentry(sb, rinode, full_path);
 +
-+void
-+find_rdelem_by_path(char *full_path, struct inode **newInode,
-+			struct cifs_sb_info * cifs_sb)
-+{
-+	struct cifs_rdelem *rdelem;
-+
-+	spin_lock(&cifs_sb->rtdislock);
-+	list_for_each_entry(rdelem, &cifs_sb->rtdislist, rdlist) {
-+		if (!strcmp(rdelem->rdname, full_path)) {
-+			*newInode = ilookup(rdelem->rdinode->i_sb,
-+						rdelem->rdinode->i_ino);
-+			break;
-+		}
-+	}
-+	spin_unlock(&cifs_sb->rtdislock);
-+}
-+
- struct dentry *
- cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
- 	    unsigned int flags)
-@@ -772,6 +824,35 @@ lookup_out:
- 	return ERR_PTR(rc);
+ 	kfree(full_path);
+ 	return dentry;
  }
- 
-+static void
-+cifs_d_common_releasedelete(const struct dentry *dentry)
-+{
-+	struct cifs_rdelem *rdelem;
-+	struct cifs_sb_info *cifs_sb;
-+
-+	cifs_sb = CIFS_SB(dentry->d_sb);
-+
-+	/* disconnected root dentries that did not get spliced */
-+	if (IS_ROOT(dentry) && dentry->d_flags & DCACHE_DISCONNECTED) {
-+		rdelem = find_rdelem_by_dentry(dentry, cifs_sb);
-+		if (rdelem)
-+			cifs_free_rdelem(rdelem);
-+	}
-+}
-+
-+static int
-+cifs_d_delete(const struct dentry *dentry)
-+{
-+	cifs_d_common_releasedelete(dentry);
-+	return 0;
-+}
-+
-+static void
-+cifs_d_release(struct dentry *dentry)
-+{
-+	cifs_d_common_releasedelete(dentry);
-+}
-+
- static int
- cifs_d_revalidate(struct dentry *direntry, unsigned int flags)
- {
-@@ -821,19 +902,11 @@ cifs_d_revalidate(struct dentry *direntry, unsigned int flags)
- 	return 1;
- }
- 
--/* static int cifs_d_delete(struct dentry *direntry)
--{
--	int rc = 0;
--
--	cifs_dbg(FYI, "In cifs d_delete, name = %s\n", direntry->d_name.name);
--
--	return rc;
--}     */
--
- const struct dentry_operations cifs_dentry_ops = {
- 	.d_revalidate = cifs_d_revalidate,
- 	.d_automount = cifs_dfs_d_automount,
--/* d_delete:       cifs_d_delete,      */ /* not needed except for debugging */
-+	.d_delete = cifs_d_delete,
-+	.d_release = cifs_d_release,
- };
- 
- static int cifs_ci_hash(const struct dentry *dentry, struct qstr *q)
-@@ -908,4 +981,6 @@ const struct dentry_operations cifs_ci_dentry_ops = {
- 	.d_hash = cifs_ci_hash,
- 	.d_compare = cifs_ci_compare,
- 	.d_automount = cifs_dfs_d_automount,
-+	.d_delete = cifs_d_delete,
-+	.d_release = cifs_d_release,
- };
 -- 
 1.8.4.5
+
