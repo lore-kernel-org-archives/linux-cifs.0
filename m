@@ -1,248 +1,123 @@
-From: Jeff Layton <jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
-Subject: [PATCH 09/10] locks: move freeing of leases outside of i_lock
-Date: Sat, 23 Aug 2014 10:41:17 -0400
-Message-ID: <1408804878-1331-10-git-send-email-jlayton@primarydata.com>
+From: Jeff Layton <jlayton@primarydata.com>
+Subject: [PATCH 08/10] locks: move i_lock acquisition into generic_*_lease handlers
+Date: Sat, 23 Aug 2014 10:41:16 -0400
+Message-ID: <1408804878-1331-9-git-send-email-jlayton@primarydata.com>
 References: <1408804878-1331-1-git-send-email-jlayton@primarydata.com>
-Cc: bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org, hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org, cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1408804878-1331-1-git-send-email-jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: bfields@fieldses.org, hch@infradead.org, cluster-devel@redhat.com,
+	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org
+To: linux-fsdevel@vger.kernel.org
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <1408804878-1331-1-git-send-email-jlayton@primarydata.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-There was only one place where we still could free a file_lock while
-holding the i_lock -- lease_modify. Add a new list_head argument to the
-lm_change operation, pass in a private list when calling it, and fix
-those callers to dispose of the list once the lock has been dropped.
+Now that we have a saner internal API for managing leases, we no longer
+need to mandate that the inode->i_lock be held over most of the lease
+code. Push it down into generic_add_lease and generic_delete_lease.
 
-Signed-off-by: Jeff Layton <jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+With this change ->setlease calls can now block, which is a necessary
+(but not sufficient!) step toward allowing leases to work with
+distributed filesystems.
+
+Signed-off-by: Jeff Layton <jlayton@primarydata.com>
 ---
- fs/locks.c          | 35 ++++++++++++++++++++++-------------
- fs/nfsd/nfs4state.c |  6 +++---
- include/linux/fs.h  |  7 ++++---
- 3 files changed, 29 insertions(+), 19 deletions(-)
+ fs/locks.c | 29 +++++++++++++++--------------
+ 1 file changed, 15 insertions(+), 14 deletions(-)
 
 diff --git a/fs/locks.c b/fs/locks.c
-index 49210d5cbf41..98907cecaa44 100644
+index b35b706c05fe..49210d5cbf41 100644
 --- a/fs/locks.c
 +++ b/fs/locks.c
-@@ -1297,7 +1297,7 @@ static void lease_clear_pending(struct file_lock *fl, int arg)
- }
- 
- /* We already had a lease on this file; just change its type */
--int lease_modify(struct file_lock **before, int arg)
-+int lease_modify(struct file_lock **before, int arg, struct list_head *dispose)
- {
- 	struct file_lock *fl = *before;
- 	int error = assign_type(fl, arg);
-@@ -1316,7 +1316,7 @@ int lease_modify(struct file_lock **before, int arg)
- 			printk(KERN_ERR "locks_delete_lock: fasync == %p\n", fl->fl_fasync);
- 			fl->fl_fasync = NULL;
- 		}
--		locks_delete_lock(before, NULL);
-+		locks_delete_lock(before, dispose);
- 	}
- 	return 0;
- }
-@@ -1330,7 +1330,7 @@ static bool past_time(unsigned long then)
- 	return time_after(jiffies, then);
- }
- 
--static void time_out_leases(struct inode *inode)
-+static void time_out_leases(struct inode *inode, struct list_head *dispose)
- {
+@@ -1335,6 +1335,8 @@ static void time_out_leases(struct inode *inode)
  	struct file_lock **before;
  	struct file_lock *fl;
-@@ -1341,9 +1341,9 @@ static void time_out_leases(struct inode *inode)
+ 
++	lockdep_assert_held(&inode->i_lock);
++
+ 	before = &inode->i_flock;
  	while ((fl = *before) && IS_LEASE(fl) && lease_breaking(fl)) {
  		trace_time_out_leases(inode, fl);
- 		if (past_time(fl->fl_downgrade_time))
--			lease_modify(before, F_RDLCK);
-+			lease_modify(before, F_RDLCK, dispose);
- 		if (past_time(fl->fl_break_time))
--			lease_modify(before, F_UNLCK);
-+			lease_modify(before, F_UNLCK, dispose);
- 		if (fl == *before)	/* lease_modify may have freed fl */
- 			before = &fl->fl_next;
- 	}
-@@ -1378,6 +1378,7 @@ int __break_lease(struct inode *inode, unsigned int mode, unsigned int type)
- 	int i_have_this_lease = 0;
- 	bool lease_conflict = false;
- 	int want_write = (mode & O_ACCMODE) != O_RDONLY;
-+	LIST_HEAD(dispose);
- 
- 	new_fl = lease_alloc(NULL, want_write ? F_WRLCK : F_RDLCK);
- 	if (IS_ERR(new_fl))
-@@ -1386,7 +1387,7 @@ int __break_lease(struct inode *inode, unsigned int mode, unsigned int type)
- 
- 	spin_lock(&inode->i_lock);
- 
--	time_out_leases(inode);
-+	time_out_leases(inode, &dispose);
- 
- 	flock = inode->i_flock;
- 	if ((flock == NULL) || !IS_LEASE(flock))
-@@ -1441,6 +1442,7 @@ restart:
- 	locks_insert_block(flock, new_fl);
- 	trace_break_lease_block(inode, new_fl);
- 	spin_unlock(&inode->i_lock);
-+	locks_dispose_list(&dispose);
- 	error = wait_event_interruptible_timeout(new_fl->fl_wait,
- 						!new_fl->fl_next, break_time);
- 	spin_lock(&inode->i_lock);
-@@ -1448,7 +1450,7 @@ restart:
- 	locks_delete_block(new_fl);
- 	if (error >= 0) {
- 		if (error == 0)
--			time_out_leases(inode);
-+			time_out_leases(inode, &dispose);
- 		/*
- 		 * Wait for the next conflicting lease that has not been
- 		 * broken yet
-@@ -1463,6 +1465,7 @@ restart:
- 
- out:
- 	spin_unlock(&inode->i_lock);
-+	locks_dispose_list(&dispose);
- 	locks_free_lock(new_fl);
- 	return error;
- }
-@@ -1527,9 +1530,10 @@ int fcntl_getlease(struct file *filp)
- 	struct file_lock *fl;
- 	struct inode *inode = file_inode(filp);
- 	int type = F_UNLCK;
-+	LIST_HEAD(dispose);
- 
- 	spin_lock(&inode->i_lock);
--	time_out_leases(file_inode(filp));
-+	time_out_leases(file_inode(filp), &dispose);
- 	for (fl = file_inode(filp)->i_flock; fl && IS_LEASE(fl);
- 			fl = fl->fl_next) {
- 		if (fl->fl_file == filp) {
-@@ -1538,6 +1542,7 @@ int fcntl_getlease(struct file *filp)
- 		}
- 	}
- 	spin_unlock(&inode->i_lock);
-+	locks_dispose_list(&dispose);
- 	return type;
- }
- 
-@@ -1575,6 +1580,7 @@ generic_add_lease(struct file *filp, long arg, struct file_lock **flp, void **au
- 	struct inode *inode = dentry->d_inode;
- 	bool is_deleg = (*flp)->fl_flags & FL_DELEG;
- 	int error;
-+	LIST_HEAD(dispose);
- 
- 	lease = *flp;
- 	trace_generic_add_lease(inode, lease);
-@@ -1598,7 +1604,7 @@ generic_add_lease(struct file *filp, long arg, struct file_lock **flp, void **au
+@@ -1595,6 +1597,9 @@ generic_add_lease(struct file *filp, long arg, struct file_lock **flp, void **au
+ 		return -EINVAL;
  	}
  
- 	spin_lock(&inode->i_lock);
--	time_out_leases(inode);
-+	time_out_leases(inode, &dispose);
- 
++	spin_lock(&inode->i_lock);
++	time_out_leases(inode);
++
  	error = check_conflicting_open(dentry, arg);
  	if (error)
-@@ -1636,7 +1642,7 @@ generic_add_lease(struct file *filp, long arg, struct file_lock **flp, void **au
- 
- 	if (my_before != NULL) {
- 		lease = *my_before;
--		error = lease->fl_lmops->lm_change(my_before, arg);
-+		error = lease->fl_lmops->lm_change(my_before, arg, &dispose);
- 		if (error)
- 			goto out;
- 		goto out_setup;
-@@ -1666,6 +1672,7 @@ out_setup:
+ 		goto out;
+@@ -1660,6 +1665,7 @@ out_setup:
+ 	if (lease->fl_lmops->lm_setup)
  		lease->fl_lmops->lm_setup(lease, aux);
  out:
- 	spin_unlock(&inode->i_lock);
-+	locks_dispose_list(&dispose);
++	spin_unlock(&inode->i_lock);
  	if (is_deleg)
  		mutex_unlock(&inode->i_mutex);
  	if (!error && !my_before)
-@@ -1682,17 +1689,19 @@ static int generic_delete_lease(struct file *filp)
+@@ -1672,18 +1678,22 @@ out_unlink:
+ 
+ static int generic_delete_lease(struct file *filp)
+ {
++	int error = -EAGAIN;
  	struct file_lock *fl, **before;
  	struct dentry *dentry = filp->f_path.dentry;
  	struct inode *inode = dentry->d_inode;
-+	LIST_HEAD(dispose);
  
- 	spin_lock(&inode->i_lock);
--	time_out_leases(inode);
-+	time_out_leases(inode, &dispose);
++	spin_lock(&inode->i_lock);
++	time_out_leases(inode);
  	for (before = &inode->i_flock;
  			((fl = *before) != NULL) && IS_LEASE(fl);
  			before = &fl->fl_next) {
  		if (fl->fl_file != filp)
  			continue;
--		error = fl->fl_lmops->lm_change(before, F_UNLCK);
-+		error = fl->fl_lmops->lm_change(before, F_UNLCK, &dispose);
+-		return fl->fl_lmops->lm_change(before, F_UNLCK);
++		error = fl->fl_lmops->lm_change(before, F_UNLCK);
  	}
- 	spin_unlock(&inode->i_lock);
-+	locks_dispose_list(&dispose);
- 	return error;
+-	return -EAGAIN;
++	spin_unlock(&inode->i_lock);
++	return error;
  }
  
-@@ -2388,7 +2397,7 @@ void locks_remove_file(struct file *filp)
- 	while ((fl = *before) != NULL) {
- 		if (fl->fl_file == filp) {
- 			if (IS_LEASE(fl)) {
--				lease_modify(before, F_UNLCK);
-+				lease_modify(before, F_UNLCK, &dispose);
- 				continue;
- 			}
- 
-diff --git a/fs/nfsd/nfs4state.c b/fs/nfsd/nfs4state.c
-index 6af5d0890373..623576301e38 100644
---- a/fs/nfsd/nfs4state.c
-+++ b/fs/nfsd/nfs4state.c
-@@ -3423,11 +3423,11 @@ static void nfsd_break_deleg_cb(struct file_lock *fl)
- 	spin_unlock(&fp->fi_lock);
- }
- 
--static
--int nfsd_change_deleg_cb(struct file_lock **onlist, int arg)
-+static int
-+nfsd_change_deleg_cb(struct file_lock **onlist, int arg, struct list_head *dispose)
+ /**
+@@ -1702,8 +1712,7 @@ static int generic_delete_lease(struct file *filp)
+ int generic_setlease(struct file *filp, long arg, struct file_lock **flp,
+ 			void **aux)
  {
- 	if (arg & F_UNLCK)
--		return lease_modify(onlist, arg);
-+		return lease_modify(onlist, arg, dispose);
+-	struct dentry *dentry = filp->f_path.dentry;
+-	struct inode *inode = dentry->d_inode;
++	struct inode *inode = file_inode(filp);
+ 	int error;
+ 
+ 	if ((!uid_eq(current_fsuid(), inode->i_uid)) && !capable(CAP_LEASE))
+@@ -1714,8 +1723,6 @@ int generic_setlease(struct file *filp, long arg, struct file_lock **flp,
+ 	if (error)
+ 		return error;
+ 
+-	time_out_leases(inode);
+-
+ 	switch (arg) {
+ 	case F_UNLCK:
+ 		return generic_delete_lease(filp);
+@@ -1759,16 +1766,10 @@ EXPORT_SYMBOL(generic_setlease);
+ int
+ vfs_setlease(struct file *filp, long arg, struct file_lock **lease, void **aux)
+ {
+-	struct inode *inode = file_inode(filp);
+-	int error;
+-
+-	spin_lock(&inode->i_lock);
+ 	if (filp->f_op->setlease)
+-		error = filp->f_op->setlease(filp, arg, lease, aux);
++		return filp->f_op->setlease(filp, arg, lease, aux);
  	else
- 		return -EAGAIN;
+-		error = generic_setlease(filp, arg, lease, aux);
+-	spin_unlock(&inode->i_lock);
+-	return error;
++		return generic_setlease(filp, arg, lease, aux);
  }
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 70d22c12924f..e3dbcf269cd2 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -873,7 +873,7 @@ struct lock_manager_operations {
- 	void (*lm_notify)(struct file_lock *);	/* unblock callback */
- 	int (*lm_grant)(struct file_lock *, int);
- 	void (*lm_break)(struct file_lock *);
--	int (*lm_change)(struct file_lock **, int);
-+	int (*lm_change)(struct file_lock **, int, struct list_head *);
- 	void (*lm_setup)(struct file_lock *, void **);
- };
+ EXPORT_SYMBOL_GPL(vfs_setlease);
  
-@@ -985,7 +985,7 @@ extern int __break_lease(struct inode *inode, unsigned int flags, unsigned int t
- extern void lease_get_mtime(struct inode *, struct timespec *time);
- extern int generic_setlease(struct file *, long, struct file_lock **, void **aux);
- extern int vfs_setlease(struct file *, long, struct file_lock **, void **aux);
--extern int lease_modify(struct file_lock **, int);
-+extern int lease_modify(struct file_lock **, int, struct list_head *);
- #else /* !CONFIG_FILE_LOCKING */
- static inline int fcntl_getlk(struct file *file, unsigned int cmd,
- 			      struct flock __user *user)
-@@ -1112,7 +1112,8 @@ static inline int vfs_setlease(struct file *filp, long arg,
- 	return -EINVAL;
- }
- 
--static inline int lease_modify(struct file_lock **before, int arg)
-+static inline int lease_modify(struct file_lock **before, int arg,
-+			       struct list_head *dispose)
- {
- 	return -EINVAL;
- }
 -- 
 1.9.3
+
