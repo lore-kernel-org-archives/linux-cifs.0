@@ -1,96 +1,62 @@
-From: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
-Subject: Re: [PATCH 1/2] common: add cifs support
-Date: Sat, 23 Aug 2014 04:56:06 -0700
-Message-ID: <20140823115606.GA29808@infradead.org>
-References: <1408781763-30127-1-git-send-email-pshilovsky@samba.org>
- <1408781763-30127-2-git-send-email-pshilovsky@samba.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: fstests-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>,
-	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <1408781763-30127-2-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Jeff Layton <jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+Subject: [PATCH 00/10] locks/nfsd: internal lease API overhaul
+Date: Sat, 23 Aug 2014 10:41:08 -0400
+Message-ID: <1408804878-1331-1-git-send-email-jlayton@primarydata.com>
+Cc: bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org, hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org, cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Sat, Aug 23, 2014 at 12:16:02PM +0400, Pavel Shilovsky wrote:
-> Pass -cifs argument from command line to enable cifs testing.
+The internal "API" for handling leases has a lot of problems. The main
+one is that on success it can return a pointer to a lease that sits on
+the inode's i_flock list. That pointer is only guaranteed to be valid
+until the i_lock is dropped, which makes it a bit dangerous to use.
 
-Looks mostly fine, but a few nitpicks below:
+Also, the i_lock is held over much too much of the code, which
+precludes any hope of ever adding proper support for leases to
+distributed filesystems.
 
->  _mount_opts()
->  {
-> +
->  	case $FSTYP in
+This patchset is a cleanup and overhaul of the internal lease API. It
+fixes a number of problems in that code and makes an attempt at making
+that API more sane to use.
 
-Remove this spurious new empty line, please.
+The only real consumer of that API is knfsd, but this should make it
+easier for others to do so, reduce and clarify the spinlocking involved
+in handling leases, and get us a step closer toward allowing lease
+implementations that can block.
 
-> -	echo $TEST_DEV | grep -q ":" > /dev/null 2>&1
-> +	echo $TEST_DEV | grep -qE ":|//" > /dev/null 2>&1
->  	if [ ! -b "$TEST_DEV" -a "$?" != "0" ]; then
-> -		echo "common/config: Error: \$TEST_DEV ($TEST_DEV) is not a block device or a NFS filesystem"
-> +		echo "common/config: Error: \$TEST_DEV ($TEST_DEV) is not a block device or a NFS or CIFS filesystem"
->  		exit 1
->  	fi
+I'm targeting this work for v3.18. Review would be welcome...
 
-I'd just generalize this to ".. is not a block device or network
-filesystem"
+Jeff Layton (10):
+  locks: close potential race in lease_get_mtime
+  nfsd: fix potential lease memory leak in nfs4_setlease
+  locks: generic_delete_lease doesn't need a file_lock at all
+  locks: clean up vfs_setlease kerneldoc comments
+  nfsd: don't keep a pointer to the lease in nfs4_file
+  locks: plumb an "aux" pointer into the setlease routines
+  locks: define a lm_setup handler for leases
+  locks: move i_lock acquisition into generic_*_lease handlers
+  locks: move freeing of leases outside of i_lock
+  locks: update Documentation/filesystems with lease API changes
 
-> -	echo $SCRATCH_DEV | grep -q ":" > /dev/null 2>&1
-> +	echo $SCRATCH_DEV | grep -qE ":|//" > /dev/null 2>&1
->  	if [ ! -z "$SCRATCH_DEV" -a ! -b "$SCRATCH_DEV" -a "$?" != "0" ]; then
-> -		echo "common/config: Error: \$SCRATCH_DEV ($SCRATCH_DEV) is not a block device or a NFS filesystem"
-> +		echo "common/config: Error: \$SCRATCH_DEV ($SCRATCH_DEV) is not a block device or a NFS or CIFS filesystem"
->  		exit 1
->  	fi
+ Documentation/filesystems/Locking |  21 ++--
+ Documentation/filesystems/vfs.txt |   7 +-
+ fs/cifs/cifsfs.c                  |   7 +-
+ fs/gfs2/file.c                    |   3 +-
+ fs/locks.c                        | 237 +++++++++++++++++++++-----------------
+ fs/nfs/file.c                     |   2 +-
+ fs/nfs/internal.h                 |   2 +-
+ fs/nfsd/nfs4state.c               |  24 ++--
+ fs/nfsd/state.h                   |   1 -
+ include/linux/fs.h                |  18 +--
+ 10 files changed, 172 insertions(+), 150 deletions(-)
 
-Same here.
+-- 
+1.9.3
 
->  
->  # make sure we have a standard umask
-> @@ -148,6 +150,11 @@ _test_options()
->      type=$1
->      TEST_OPTIONS=""
->  
-> +    if [ "$FSTYP" = "cifs" ]; then
-> +        TEST_OPTIONS="$MOUNT_OPTIONS"
-> +        return
-> +    fi
-
-What's this for?  This doesn't really make sense to me as this function adds
-mkfs/mount options to the already normally specified ones.
-
-> +	cifs)
-> +		echo $TEST_DEV | grep -q "//" > /dev/null 2>&1
-> +		if [ -z "$TEST_DEV" -o "$?" != "0" ];
-> +		then
-> +			_notrun "this test requires a valid \$TEST_DEV"
-> +		fi
-> +		if [ ! -d "$TEST_DIR" ];
-> +		then
-> +		     _notrun "this test requires a valid \$TEST_DIR"
-> +		fi
-> +		;;
-
-Please put the then on the same line as the if for new code.
-
-> diff --git a/tests/generic/013 b/tests/generic/013
-> index 93d9904..ae57c67 100755
-> --- a/tests/generic/013
-> +++ b/tests/generic/013
-> @@ -35,7 +35,12 @@ _cleanup()
->  {
->      cd /
->      # we might get here with a RO FS
-> -    mount -o remount,rw $TEST_DEV >/dev/null 2>&1
-> +    REMOUNT_OPTIONS="remount,rw"
-> +    if [ "$FSTYP" = "cifs" ];
-> +    then
-> +        REMOUNT_OPTIONS="$REMOUNT_OPTIONS,$MOUNT_OPTIONS"
-> +    fi
-> +    mount -o $REMOUNT_OPTIONS $TEST_DEV >/dev/null 2>&1
-
-This looks wrong and will need an explanation.
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
