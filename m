@@ -1,49 +1,39 @@
-From: Jeff Layton <jeff.layton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
-Subject: Re: [PATCH 03/10] locks: generic_delete_lease doesn't need a
- file_lock at all
-Date: Sun, 24 Aug 2014 06:09:31 -0400
-Message-ID: <20140824060931.30501a5b@synchrony.poochiereds.net>
-References: <1408804878-1331-1-git-send-email-jlayton@primarydata.com>
-	<1408804878-1331-4-git-send-email-jlayton@primarydata.com>
-	<20140824012757.GA21609@infradead.org>
+From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH 0/2] CIFS support for XFS test suite
+Date: Sun, 24 Aug 2014 14:41:27 +0400
+Message-ID: <CAKywueT-cYeotYBo1CGk1u2+bLN28OUjm5hpfo5xgQ=DFFV42g@mail.gmail.com>
+References: <1408781763-30127-1-git-send-email-pshilovsky@samba.org>
+	<20140823114950.GB24896@infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org,
-	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=UTF-8
+Cc: fstests-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>,
+	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20140824012757.GA21609-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20140823114950.GB24896-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, 23 Aug 2014 18:27:57 -0700
-Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org> wrote:
+2014-08-23 15:49 GMT+04:00 Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>:
+> On Sat, Aug 23, 2014 at 12:16:01PM +0400, Pavel Shilovsky wrote:
+>> These are two patches that adds CIFS support to XFS tests.
+>>
+>> The first patch adds "-cifs" command line argument and CIFS specific variables. The second patch setups a directory tree for possible CIFS specific tests.
+>>
+>> With these patches applied, most of generic/shared $TEST_DEV tests pass for the recent kernel cifs module.
+>
+> That's against an smb1 server with posix extentions?  don't you need
+> various new _require_foo checks for things not support on normal
+> SMB1/2/3?
 
-> On Sat, Aug 23, 2014 at 10:41:11AM -0400, Jeff Layton wrote:
-> > +static int generic_delete_lease(struct file *filp)
-> >  {
-> >  	struct file_lock *fl, **before;
-> >  	struct dentry *dentry = filp->f_path.dentry;
-> >  	struct inode *inode = dentry->d_inode;
-> >  
-> > -	trace_generic_delete_lease(inode, *flp);
-> > -
-> 
-> Can you keep the tracepoint and modify it to not need the file_lock
-> pointer?  It really helped me with some debugging lately.
-> 
-> Otherwise looks fine,
-> 
-> Reviewed-by: Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>
+It was tested in posix and non-posix modes.The difference is in tests
+005, 023, 024, 131 that are fail on non-posix.
 
-Doh! Yes, I meant to put that back. Will do on the next respin.
+We can add _require_posix() that checks if the mounted filesystem is
+cifs and nounix (for example through cat /proc/mounts | grep $TEST_DEV
+| grep cifs | grep nounix) and disable the above tests for this case.
 
-Thanks,
 -- 
-Jeff Layton <jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Best regards,
+Pavel Shilovsky.
