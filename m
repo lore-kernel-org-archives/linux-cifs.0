@@ -1,44 +1,33 @@
-From: Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH 04/10] locks: clean up vfs_setlease kerneldoc comments
-Date: Sun, 24 Aug 2014 08:51:17 -0700
-Message-ID: <20140824155117.GC15908@infradead.org>
+From: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Subject: Re: [PATCH 05/10] nfsd: don't keep a pointer to the lease in
+ nfs4_file
+Date: Sun, 24 Aug 2014 08:51:32 -0700
+Message-ID: <20140824155132.GD15908@infradead.org>
 References: <1408804878-1331-1-git-send-email-jlayton@primarydata.com>
- <1408804878-1331-5-git-send-email-jlayton@primarydata.com>
+ <1408804878-1331-6-git-send-email-jlayton@primarydata.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-fsdevel@vger.kernel.org, bfields@fieldses.org,
-	hch@infradead.org, cluster-devel@redhat.com,
-	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org
-To: Jeff Layton <jlayton@primarydata.com>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
+Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org,
+	hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org, cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <1408804878-1331-5-git-send-email-jlayton@primarydata.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+In-Reply-To: <1408804878-1331-6-git-send-email-jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, Aug 23, 2014 at 10:41:12AM -0400, Jeff Layton wrote:
-> Some of the latter paragraphs seem ambiguous and just plain wrong.
-> In particular the break_lease comment makes no sense. We call
-> break_lease (and break_deleg) from all sorts of vfs-layer functions,
-> so there is clearly such a method.
+On Sat, Aug 23, 2014 at 10:41:13AM -0400, Jeff Layton wrote:
+> Now that we don't need to pass in an actual lease pointer to
+> vfs_setlease on unlock, we can stop tracking a pointer to the lease in
+> the nfs4_file.
 > 
-> Also, we are close to being able to allow for "real" filesystem
-> setlease methods so remove the final comment about it not being a
-> full implementation yet.
+> Switch all of the places that check the fi_lease to check fi_deleg_file
+> instead. We always set that at the same time so it will have the same
+> semantics.
+> 
+> Signed-off-by: Jeff Layton <jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
 
-I'd remove even more:
+Looks good,
 
-> + *
-> + * This will call the filesystem's setlease file method, if defined. Note that
-> + * there is no getlease method; instead, the filesystem setlease method should
-> + * call back to generic_setlease() to add a lease to the inode's lease list,
-> + * where fcntl_getlease() can find it.  Since fcntl_getlease() only reports
-> + * whether the current task holds a lease, a cluster filesystem need only do
-> + * this for leases held by processes on this node.
->   */
-
-If we'd ever want a full implementation I think we'd absolutely need
-the getlease method.  But instead of hypothetizing about future
-implementation I'd rather leave it to those actually implementing such
-support, if that ever happens.
-
+Reviewed-by: Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>
