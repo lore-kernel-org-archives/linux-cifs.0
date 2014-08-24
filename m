@@ -1,9 +1,8 @@
 From: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
-Subject: Re: [PATCH 09/10] locks: move freeing of leases outside of i_lock
-Date: Sun, 24 Aug 2014 09:08:04 -0700
-Message-ID: <20140824160804.GH15908@infradead.org>
+Subject: Re: [PATCH 00/10] locks/nfsd: internal lease API overhaul
+Date: Sun, 24 Aug 2014 09:10:46 -0700
+Message-ID: <20140824161046.GI15908@infradead.org>
 References: <1408804878-1331-1-git-send-email-jlayton@primarydata.com>
- <1408804878-1331-10-git-send-email-jlayton@primarydata.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org,
@@ -12,14 +11,19 @@ Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, bfields-uC3wQj2KruNg9
 To: Jeff Layton <jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <1408804878-1331-10-git-send-email-jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+In-Reply-To: <1408804878-1331-1-git-send-email-jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, Aug 23, 2014 at 10:41:17AM -0400, Jeff Layton wrote:
-> There was only one place where we still could free a file_lock while
-> holding the i_lock -- lease_modify. Add a new list_head argument to the
-> lm_change operation, pass in a private list when calling it, and fix
-> those callers to dispose of the list once the lock has been dropped.
+One more wishlist item in addition to the one mentioned in the patches:
 
-Why do we care about locks held when simply freeing a piece of memory?
+ - add a return value to lm_break so that the lock manager can tell the
+   core code "you can delete this lease right now".  That gets rid of
+   the games with the timeout which require all kinds of race avoidance
+   code in the users.
+
+And a big one that doesn't seem easily addressable, but I'll drop it in
+anyway:
+
+ - calling ->lm_break without i_lock would make everyones life a heck
+   lot easier..
