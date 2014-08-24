@@ -1,129 +1,68 @@
-From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 1/2] common: add cifs support
-Date: Sun, 24 Aug 2014 11:54:50 +0400
-Message-ID: <CAKywueS=X4fyVYhy8_LGzwN5YO=E5Z8rS7MGG-fS8_GQ86LdOA@mail.gmail.com>
-References: <1408781763-30127-1-git-send-email-pshilovsky@samba.org>
-	<1408781763-30127-2-git-send-email-pshilovsky@samba.org>
-	<20140823115606.GA29808@infradead.org>
+From: Jeff Layton <jeff.layton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+Subject: Re: [PATCH 06/10] locks: plumb an "aux" pointer into the setlease
+ routines
+Date: Sun, 24 Aug 2014 06:08:01 -0400
+Message-ID: <20140824060801.5402880c@synchrony.poochiereds.net>
+References: <1408804878-1331-1-git-send-email-jlayton@primarydata.com>
+ <1408804878-1331-7-git-send-email-jlayton@primarydata.com>
+ <20140824013305.GB21609@infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: fstests-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>,
-	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org,
+	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20140823115606.GA29808-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+In-Reply-To: <20140824013305.GB21609-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2014-08-23 15:56 GMT+04:00 Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>:
-> On Sat, Aug 23, 2014 at 12:16:02PM +0400, Pavel Shilovsky wrote:
->> Pass -cifs argument from command line to enable cifs testing.
->
-> Looks mostly fine, but a few nitpicks below:
+On Sat, 23 Aug 2014 18:33:05 -0700
+Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org> wrote:
 
-Thank you for reviewing this.
+> On Sat, Aug 23, 2014 at 10:41:14AM -0400, Jeff Layton wrote:
+> > In later patches, we're going to add a new lock_manager_operation to
+> > finish setting up the lease while still holding the i_lock.  To do
+> > this, we'll need to pass a little bit of info in the fcntl setlease
+> > case (primarily an fasync structure). Plumb the extra pointer into
+> > there in advance of that.
+> > 
+> > We declare this pointer as a void ** to make it clear that this is
+> > auxillary info, and that the caller isn't required to set this unless
+> > the lm_setup specifically requires it.
+> 
+> Can you just return -EEXIST if reusing an existing one and make it a
+> normal private pointer a we use elsewhere?
+> 
 
->
->>  _mount_opts()
->>  {
->> +
->>       case $FSTYP in
->
-> Remove this spurious new empty line, please.
+That sounds a little confusing...
 
-This was added by mistake - will remove.
+We have two pointers we pass down to generic_setlease: the file_lock
+itself and with this patch, the "aux" pointer. We can end up using
+either, neither or both during a call to generic_setlease.
 
->
->> -     echo $TEST_DEV | grep -q ":" > /dev/null 2>&1
->> +     echo $TEST_DEV | grep -qE ":|//" > /dev/null 2>&1
->>       if [ ! -b "$TEST_DEV" -a "$?" != "0" ]; then
->> -             echo "common/config: Error: \$TEST_DEV ($TEST_DEV) is not a block device or a NFS filesystem"
->> +             echo "common/config: Error: \$TEST_DEV ($TEST_DEV) is not a block device or a NFS or CIFS filesystem"
->>               exit 1
->>       fi
->
-> I'd just generalize this to ".. is not a block device or network
-> filesystem"
+A simple error code can't properly indicate which of the two pointers
+got used. It might be clearer to turn the file_lock into a normal
+pointer and return -EEXIST if we reused it, but leave aux as a double
+pointer.
 
-Agree.
 
->
->> -     echo $SCRATCH_DEV | grep -q ":" > /dev/null 2>&1
->> +     echo $SCRATCH_DEV | grep -qE ":|//" > /dev/null 2>&1
->>       if [ ! -z "$SCRATCH_DEV" -a ! -b "$SCRATCH_DEV" -a "$?" != "0" ]; then
->> -             echo "common/config: Error: \$SCRATCH_DEV ($SCRATCH_DEV) is not a block device or a NFS filesystem"
->> +             echo "common/config: Error: \$SCRATCH_DEV ($SCRATCH_DEV) is not a block device or a NFS or CIFS filesystem"
->>               exit 1
->>       fi
->
-> Same here.
->
->>
->>  # make sure we have a standard umask
->> @@ -148,6 +150,11 @@ _test_options()
->>      type=$1
->>      TEST_OPTIONS=""
->>
->> +    if [ "$FSTYP" = "cifs" ]; then
->> +        TEST_OPTIONS="$MOUNT_OPTIONS"
->> +        return
->> +    fi
->
-> What's this for?  This doesn't really make sense to me as this function adds
-> mkfs/mount options to the already normally specified ones.
+> Btw, two things I came up with to make the lease filesystem API nicer:
+> 
+>  - bypass vfs_setlease/->setlease for deletes and just call directly
+>    into the lease code.  no one does anything special for it (except
+>    cifs, which forgets about it), and then rename the method to
+>    ->add_lease.
+>  - provide a no_add_lease for nfs/gfs to centralize the no-op version
+>    in a single place (similar no no_lseek).
+> 
+> Otherwise this looks really nice.
 
-1) We included common/rc -- init_rc() is called.
-2) init_rc() checks if $TEST_DEV is mounted and if not -- calls _test_mount().
-3) _test_mount() calls _test_options() that:
-  a) initializes TEST_OPTIONS=''
-  b) adds rtdev,logdev options to TEST_OPTIONS for XFS; for others
-filesystems it simply returns leaving TEST_OPTIONS as empty string.
 
-That's why we need to initialize TEST_OPTIONS as MOUN_OPTIONS for CIFS
-because we can't mount a remote share without specifying a username,
-password, etc.
+Both of those sound good. I'll plan to roll those changes in with the
+next iteration.
 
->> +     cifs)
->> +             echo $TEST_DEV | grep -q "//" > /dev/null 2>&1
->> +             if [ -z "$TEST_DEV" -o "$?" != "0" ];
->> +             then
->> +                     _notrun "this test requires a valid \$TEST_DEV"
->> +             fi
->> +             if [ ! -d "$TEST_DIR" ];
->> +             then
->> +                  _notrun "this test requires a valid \$TEST_DIR"
->> +             fi
->> +             ;;
->
-> Please put the then on the same line as the if for new code.
-
-Ok.
-
->
->> diff --git a/tests/generic/013 b/tests/generic/013
->> index 93d9904..ae57c67 100755
->> --- a/tests/generic/013
->> +++ b/tests/generic/013
->> @@ -35,7 +35,12 @@ _cleanup()
->>  {
->>      cd /
->>      # we might get here with a RO FS
->> -    mount -o remount,rw $TEST_DEV >/dev/null 2>&1
->> +    REMOUNT_OPTIONS="remount,rw"
->> +    if [ "$FSTYP" = "cifs" ];
->> +    then
->> +        REMOUNT_OPTIONS="$REMOUNT_OPTIONS,$MOUNT_OPTIONS"
->> +    fi
->> +    mount -o $REMOUNT_OPTIONS $TEST_DEV >/dev/null 2>&1
->
-> This looks wrong and will need an explanation.
-
-We can't remount the existing CIFS mount without specifying username
-and password. Also we need to keep others options as well since they
-are user-defined (e.g. nounix, noserverino, etc) while during
-remounting mount options are changed to the specified ones.
-
+Thanks!
 -- 
-Best regards,
-Pavel Shilovsky.
+Jeff Layton <jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
