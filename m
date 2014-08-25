@@ -1,35 +1,49 @@
-From: Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>
-Subject: Re: [PATCH 2/2] common: add a directory tree for cifs tests
-Date: Mon, 25 Aug 2014 10:56:59 +1000
-Message-ID: <20140825005659.GW26465@dastard>
-References: <1408781763-30127-1-git-send-email-pshilovsky@samba.org>
- <1408781763-30127-3-git-send-email-pshilovsky@samba.org>
+From: Jeff Layton <jeff.layton@primarydata.com>
+Subject: Re: [PATCH 07/10] locks: define a lm_setup handler for leases
+Date: Sun, 24 Aug 2014 21:19:53 -0400
+Message-ID: <20140824211953.1dfd7f77@synchrony.poochiereds.net>
+References: <1408804878-1331-1-git-send-email-jlayton@primarydata.com>
+	<1408804878-1331-8-git-send-email-jlayton@primarydata.com>
+	<20140824155858.GF15908@infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: fstests-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>,
-	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <1408781763-30127-3-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-fsdevel@vger.kernel.org, bfields@fieldses.org,
+	cluster-devel@redhat.com, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org
+To: Christoph Hellwig <hch@infradead.org>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <20140824155858.GF15908@infradead.org>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Sat, Aug 23, 2014 at 12:16:03PM +0400, Pavel Shilovsky wrote:
-> Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> ---
->  tests/cifs/Makefile | 14 ++++++++++++++
->  tests/cifs/group    |  5 +++++
->  2 files changed, 19 insertions(+)
->  create mode 100644 tests/cifs/Makefile
->  create mode 100644 tests/cifs/group
+On Sun, 24 Aug 2014 08:58:58 -0700
+Christoph Hellwig <hch@infradead.org> wrote:
 
-Add these when you add the first CIFS specific test.
+> I like this change a lot!  But one caveat:
+> 
+> > +	/*
+> > +	 * Despite the fact that it's an int return function, __f_setown never
+> > +	 * returns an error. Just ignore any error return here, but spew a
+> > +	 * WARN_ON_ONCE in case this ever changes.
+> > +	 */
+> > +	WARN_ON_ONCE(__f_setown(filp, task_pid(current), PIDTYPE_PID, 0));
+> 
+> I don't think this is a good idea.  The errors in __f_setown come from
+> the security modules, and they could change easily.  If you can convince
+> the LSM people to change their file_set_fowner routine to return void
+> we could change __f_setown to return void as well and be done with it,
+> but without that this looks too dangerous.
+> 
 
-Cheers,
+Understood. I figured that this might not be acceptable. I can make
+this propagate the error back up, but cleaning up the mess may not be
+easy. I'll see what I can do.
 
-Dave.
+Note that the error handling in the existing code looks wrong to me
+too. The lease gets added to the list (or updated), the fasync handler
+gets set up. Then, if __f_setown returns an error, the code just
+returns that error without unwinding anything.
+
 -- 
-Dave Chinner
-david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org
+Jeff Layton <jlayton@primarydata.com>
