@@ -1,49 +1,42 @@
-From: Jeff Layton <jeff.layton@primarydata.com>
-Subject: Re: [PATCH 07/10] locks: define a lm_setup handler for leases
-Date: Sun, 24 Aug 2014 21:19:53 -0400
-Message-ID: <20140824211953.1dfd7f77@synchrony.poochiereds.net>
+From: Jeff Layton <jeff.layton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+Subject: Re: [PATCH 09/10] locks: move freeing of leases outside of i_lock
+Date: Sun, 24 Aug 2014 21:35:02 -0400
+Message-ID: <20140824213502.4cab1ba3@synchrony.poochiereds.net>
 References: <1408804878-1331-1-git-send-email-jlayton@primarydata.com>
-	<1408804878-1331-8-git-send-email-jlayton@primarydata.com>
-	<20140824155858.GF15908@infradead.org>
+	<1408804878-1331-10-git-send-email-jlayton@primarydata.com>
+	<20140824160804.GH15908@infradead.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-fsdevel@vger.kernel.org, bfields@fieldses.org,
-	cluster-devel@redhat.com, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org
-To: Christoph Hellwig <hch@infradead.org>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <20140824155858.GF15908@infradead.org>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org,
+	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20140824160804.GH15908-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 24 Aug 2014 08:58:58 -0700
-Christoph Hellwig <hch@infradead.org> wrote:
+On Sun, 24 Aug 2014 09:08:04 -0700
+Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org> wrote:
 
-> I like this change a lot!  But one caveat:
+> On Sat, Aug 23, 2014 at 10:41:17AM -0400, Jeff Layton wrote:
+> > There was only one place where we still could free a file_lock while
+> > holding the i_lock -- lease_modify. Add a new list_head argument to the
+> > lm_change operation, pass in a private list when calling it, and fix
+> > those callers to dispose of the list once the lock has been dropped.
 > 
-> > +	/*
-> > +	 * Despite the fact that it's an int return function, __f_setown never
-> > +	 * returns an error. Just ignore any error return here, but spew a
-> > +	 * WARN_ON_ONCE in case this ever changes.
-> > +	 */
-> > +	WARN_ON_ONCE(__f_setown(filp, task_pid(current), PIDTYPE_PID, 0));
-> 
-> I don't think this is a good idea.  The errors in __f_setown come from
-> the security modules, and they could change easily.  If you can convince
-> the LSM people to change their file_set_fowner routine to return void
-> we could change __f_setown to return void as well and be done with it,
-> but without that this looks too dangerous.
+> Why do we care about locks held when simply freeing a piece of memory?
 > 
 
-Understood. I figured that this might not be acceptable. I can make
-this propagate the error back up, but cleaning up the mess may not be
-easy. I'll see what I can do.
+That's all that's done now, but locks_free_lock can call
+fl->fl_release_private. Currently, no filesystem sets that for leases,
+but while we're in here we might as well make it possible for that to
+block for all lock types since that's simpler than having different
+rules for them.
 
-Note that the error handling in the existing code looks wrong to me
-too. The lease gets added to the list (or updated), the fasync handler
-gets set up. Then, if __f_setown returns an error, the code just
-returns that error without unwinding anything.
+It doesn't really cost us anything other than a bit of list
+manipulation and reduces contention on the i_lock slightly.
 
 -- 
-Jeff Layton <jlayton@primarydata.com>
+Jeff Layton <jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
