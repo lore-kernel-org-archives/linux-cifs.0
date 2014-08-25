@@ -1,117 +1,100 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: set client time as MsvAvTimestamp from CHALLENGE_MESSAGE.TargetInfo
-Date: Mon, 25 Aug 2014 10:12:42 -0500
-Message-ID: <CADT32eKrh_ZGa3kEeGvz2MSm8qeY+F7VK0d94w2yazJtxk1x8w@mail.gmail.com>
-References: <001301cfc025$940767f0$bc1637d0$@samsung.com>
+From: "J. Bruce Fields" <bfields@fieldses.org>
+Subject: Re: [PATCH 01/10] locks: close potential race in lease_get_mtime
+Date: Mon, 25 Aug 2014 16:01:27 -0400
+Message-ID: <20140825200127.GB21957@fieldses.org>
+References: <1408804878-1331-1-git-send-email-jlayton@primarydata.com>
+ <1408804878-1331-2-git-send-email-jlayton@primarydata.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Simo <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Ashish Sangwan <a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
-To: Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <001301cfc025$940767f0$bc1637d0$@samsung.com>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-fsdevel@vger.kernel.org, hch@infradead.org,
+	cluster-devel@redhat.com, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org
+To: Jeff Layton <jlayton@primarydata.com>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1408804878-1331-2-git-send-email-jlayton@primarydata.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Mon, Aug 25, 2014 at 12:29 AM, Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org> wrote:
-> Windows machine has extended security feature which refuse to allow
-> authentication when there is time difference between server time and
-> client time when ntlmv2 negotiation is used. This problem is prevalent
-> in embedded enviornment where system time is set to default 1970.
->
-> Modern servers send the server timestamp in the TargetInfo Av_Pair
-> structure in the challenge message [see MS-NLMP 2.2.2.1]
-> In [MS-NLMP 3.1.5.1.2] it is explicitly mentioned that the client must
-> use the server provided timestamp if present OR current time if it is
-> not.
->
-> Cc: Simo <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> Signed-off-by: Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
-> Signed-off-by: Ashish Sangwan <a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+On Sat, Aug 23, 2014 at 10:41:09AM -0400, Jeff Layton wrote:
+> lease_get_mtime is called without the i_lock held, so there's no
+> guarantee about the stability of the list. Between the time when we
+> assign "flock" and then dereference it to check whether it's a lease
+> and for write, the lease could be freed.
+> 
+> Ensure that that doesn't occur by taking the i_lock before trying
+> to check the lease.
+
+ACK.
+
+Though I still wonder whether we shouldn't just axe lease_get_mtime.
+
+What it's doing is telling v2/v3 clients that the mtime of a
+write-leased file is always the current time, in order to force
+applications such as make to open the file and break the lease, thus
+forcing any cached writes to be flushed to the server.  Otherwise the
+worry was that they'd never find out about writes cached by Samba
+clients somewhere.
+
+Talking over NFS write delegation implementation with Trond, he
+convinced me that our least-worst option for handling the same problem
+there would be just to continue to depend on clients holding write
+leases to touch the file at appropriate times (like close and unlock).
+
+I don't know what sort of behavior Samba or its clients has here.  Even
+if they're not terribly good about keeping the mtime updated the lost of
+consistency might be less-worse than this faking up of the mtime.
+
+Looking at the git history, lease_get_mtime appears to have been part of
+the lease code from the time it was first merged in 2.4.0-test9pre6, so
+it may not have been added in response to an actual practical problem.
+
+Digging around, here's a reference to last time this came up, because
+somebody was irritated that make was constantly rebuilding things for no
+reason:
+
+	https://bugzilla.samba.org/show_bug.cgi?id=5103
+
+Anyway, that's all orthogonal to this patch, ACK to it for now.
+
+--b.
+
+> 
+> Cc: J. Bruce Fields <bfields@fieldses.org>
+> Signed-off-by: Jeff Layton <jlayton@primarydata.com>
 > ---
->  fs/cifs/cifsencrypt.c |    6 ++++--
->  fs/cifs/cifsglob.h    |    2 ++
->  fs/cifs/sess.c        |   21 +++++++++++++++++++++
->  3 files changed, 27 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-> index 4934347..3ec44f8 100644
-> --- a/fs/cifs/cifsencrypt.c
-> +++ b/fs/cifs/cifsencrypt.c
-> @@ -671,8 +671,10 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
->                         (ses->auth_key.response + CIFS_SESS_KEY_SIZE);
->         ntlmv2->blob_signature = cpu_to_le32(0x00000101);
->         ntlmv2->reserved = 0;
-> -       /* Must be within 5 minutes of the server */
-> -       ntlmv2->time = cpu_to_le64(cifs_UnixTimeToNT(CURRENT_TIME));
-> +       if (ses->serverTime)
-> +               ntlmv2->time = ses->serverTime;
-> +       else
-> +               ntlmv2->time = cpu_to_le64(cifs_UnixTimeToNT(CURRENT_TIME));
->         get_random_bytes(&ntlmv2->client_chal, sizeof(ntlmv2->client_chal));
->         ntlmv2->reserved2 = 0;
->
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index ce24c1f..1102822 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -796,6 +796,8 @@ struct cifs_ses {
->         enum securityEnum sectype; /* what security flavor was specified? */
->         bool sign;              /* is signing required? */
->         bool need_reconnect:1; /* connection reset, uid now invalid */
-> +       __u64   serverTime;     /* Keeps a track of server time sent by server
-> +                                  during NTLM challenge in little endian */
->  #ifdef CONFIG_CIFS_SMB2
->         __u16 session_flags;
->         char smb3signingkey[SMB3_SIGN_KEY_SIZE]; /* for signing smb3 packets */
-> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-> index 07fe97a..0762377 100644
-> --- a/fs/cifs/sess.c
-> +++ b/fs/cifs/sess.c
-> @@ -277,6 +277,26 @@ static void decode_ascii_ssetup(char **pbcc_area, __u16 bleft,
->         cifs_dbg(FYI, "ascii: bytes left %d\n", bleft);
->  }
->
-> +static void
-> +get_ntlmv2_server_time(struct cifs_ses *ses)
-> +{
-> +#define MsvAvEOL       0x0000
-> +#define MsvAvTimestamp 0x0007
-
-This patch looks correct but we have these defines in ntlmssp.h.
-
-> +       char *payload = ses->auth_key.response;
-> +       u16 AvId, AvLen;
-> +
-> +       do {
-> +               AvId = le16_to_cpu(*payload);
-> +               AvLen = le16_to_cpu(*(payload + sizeof(u16)));
-> +               payload += AvLen + (2 * sizeof(u16));
-> +       } while (AvId != MsvAvTimestamp && AvId != MsvAvEOL);
-> +
-> +       if (AvId == MsvAvTimestamp)
-> +               memcpy(&(ses->serverTime), (payload - AvLen), sizeof(__u64));
-> +       else
-> +               ses->serverTime = 0;
-> +}
-> +
->  int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
->                                     struct cifs_ses *ses)
+>  fs/locks.c | 14 ++++++++++++--
+>  1 file changed, 12 insertions(+), 2 deletions(-)
+> 
+> diff --git a/fs/locks.c b/fs/locks.c
+> index d7e15a256f8f..58ce8897f2e4 100644
+> --- a/fs/locks.c
+> +++ b/fs/locks.c
+> @@ -1456,8 +1456,18 @@ EXPORT_SYMBOL(__break_lease);
+>   */
+>  void lease_get_mtime(struct inode *inode, struct timespec *time)
 >  {
-> @@ -322,6 +342,7 @@ int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
->                         return -ENOMEM;
->                 }
->                 ses->auth_key.len = tilen;
-> +               get_ntlmv2_server_time(ses);
->         }
->
->         return 0;
+> -	struct file_lock *flock = inode->i_flock;
+> -	if (flock && IS_LEASE(flock) && (flock->fl_type == F_WRLCK))
+> +	bool has_lease = false;
+> +	struct file_lock *flock;
+> +
+> +	if (inode->i_flock) {
+> +		spin_lock(&inode->i_lock);
+> +		flock = inode->i_flock;
+> +		if (flock && IS_LEASE(flock) && (flock->fl_type == F_WRLCK))
+> +			has_lease = true;
+> +		spin_unlock(&inode->i_lock);
+> +	}
+> +
+> +	if (has_lease)
+>  		*time = current_fs_time(inode->i_sb);
+>  	else
+>  		*time = inode->i_mtime;
+> -- 
+> 1.9.3
+> 
 > --
-> 1.7.7
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+> the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
