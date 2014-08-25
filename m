@@ -1,45 +1,108 @@
-From: Jeff Layton <jeff.layton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
-Subject: Re: [PATCH 00/10] locks/nfsd: internal lease API overhaul
-Date: Sun, 24 Aug 2014 21:43:01 -0400
-Message-ID: <20140824214301.61019123@synchrony.poochiereds.net>
-References: <1408804878-1331-1-git-send-email-jlayton@primarydata.com>
-	<20140824161046.GI15908@infradead.org>
+From: Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+Subject: [PATCH] cifs: set client time as MsvAvTimestamp from
+ CHALLENGE_MESSAGE.TargetInfo
+Date: Mon, 25 Aug 2014 14:29:44 +0900
+Message-ID: <001301cfc025$940767f0$bc1637d0$@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org,
-	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Cc: Simo <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Ashish Sangwan <a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20140824161046.GI15908-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Content-language: ko
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 24 Aug 2014 09:10:46 -0700
-Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org> wrote:
+Windows machine has extended security feature which refuse to allow
+authentication when there is time difference between server time and
+client time when ntlmv2 negotiation is used. This problem is prevalent
+in embedded enviornment where system time is set to default 1970.
 
-> One more wishlist item in addition to the one mentioned in the patches:
-> 
->  - add a return value to lm_break so that the lock manager can tell the
->    core code "you can delete this lease right now".  That gets rid of
->    the games with the timeout which require all kinds of race avoidance
->    code in the users.
-> 
+Modern servers send the server timestamp in the TargetInfo Av_Pair
+structure in the challenge message [see MS-NLMP 2.2.2.1]
+In [MS-NLMP 3.1.5.1.2] it is explicitly mentioned that the client must
+use the server provided timestamp if present OR current time if it is
+not.
 
-I'm not sure I understand what you're suggesting here. Isn't it just as
-simple to have lm_break call lease_modify to just remove the lease?
+Cc: Simo <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Signed-off-by: Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+Signed-off-by: Ashish Sangwan <a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+---
+ fs/cifs/cifsencrypt.c |    6 ++++--
+ fs/cifs/cifsglob.h    |    2 ++
+ fs/cifs/sess.c        |   21 +++++++++++++++++++++
+ 3 files changed, 27 insertions(+), 2 deletions(-)
 
-> And a big one that doesn't seem easily addressable, but I'll drop it in
-> anyway:
-> 
->  - calling ->lm_break without i_lock would make everyones life a heck
->    lot easier..
-> 
-
-Indeed. I have some ideas for a larger cleanup of the file locking
-code. This series is really sort of prep work for that overhaul, and
-I'm hoping we'll be able to do something along those lines.
-
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 4934347..3ec44f8 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -671,8 +671,10 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ 			(ses->auth_key.response + CIFS_SESS_KEY_SIZE);
+ 	ntlmv2->blob_signature = cpu_to_le32(0x00000101);
+ 	ntlmv2->reserved = 0;
+-	/* Must be within 5 minutes of the server */
+-	ntlmv2->time = cpu_to_le64(cifs_UnixTimeToNT(CURRENT_TIME));
++	if (ses->serverTime)
++		ntlmv2->time = ses->serverTime;
++	else
++		ntlmv2->time = cpu_to_le64(cifs_UnixTimeToNT(CURRENT_TIME));
+ 	get_random_bytes(&ntlmv2->client_chal, sizeof(ntlmv2->client_chal));
+ 	ntlmv2->reserved2 = 0;
+ 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index ce24c1f..1102822 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -796,6 +796,8 @@ struct cifs_ses {
+ 	enum securityEnum sectype; /* what security flavor was specified? */
+ 	bool sign;		/* is signing required? */
+ 	bool need_reconnect:1; /* connection reset, uid now invalid */
++	__u64   serverTime;	/* Keeps a track of server time sent by server
++				   during NTLM challenge in little endian */
+ #ifdef CONFIG_CIFS_SMB2
+ 	__u16 session_flags;
+ 	char smb3signingkey[SMB3_SIGN_KEY_SIZE]; /* for signing smb3 packets */
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index 07fe97a..0762377 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -277,6 +277,26 @@ static void decode_ascii_ssetup(char **pbcc_area, __u16 bleft,
+ 	cifs_dbg(FYI, "ascii: bytes left %d\n", bleft);
+ }
+ 
++static void
++get_ntlmv2_server_time(struct cifs_ses *ses)
++{
++#define MsvAvEOL	0x0000
++#define MsvAvTimestamp	0x0007
++	char *payload = ses->auth_key.response;
++	u16 AvId, AvLen;
++
++	do {
++		AvId = le16_to_cpu(*payload);
++		AvLen = le16_to_cpu(*(payload + sizeof(u16)));
++		payload += AvLen + (2 * sizeof(u16));
++	} while (AvId != MsvAvTimestamp && AvId != MsvAvEOL);
++
++	if (AvId == MsvAvTimestamp)
++		memcpy(&(ses->serverTime), (payload - AvLen), sizeof(__u64));
++	else
++		ses->serverTime = 0;
++}
++
+ int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
+ 				    struct cifs_ses *ses)
+ {
+@@ -322,6 +342,7 @@ int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
+ 			return -ENOMEM;
+ 		}
+ 		ses->auth_key.len = tilen;
++		get_ntlmv2_server_time(ses);
+ 	}
+ 
+ 	return 0;
 -- 
-Jeff Layton <jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+1.7.7
