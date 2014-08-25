@@ -1,13 +1,12 @@
-From: Simo <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] cifs: set client time as MsvAvTimestamp from
- CHALLENGE_MESSAGE.TargetInfo
-Date: Mon, 25 Aug 2014 09:12:39 -0400
-Message-ID: <1408972359.11134.26.camel@pico.ipa.ssimo.org>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: set client time as MsvAvTimestamp from CHALLENGE_MESSAGE.TargetInfo
+Date: Mon, 25 Aug 2014 10:12:42 -0500
+Message-ID: <CADT32eKrh_ZGa3kEeGvz2MSm8qeY+F7VK0d94w2yazJtxk1x8w@mail.gmail.com>
 References: <001301cfc025$940767f0$bc1637d0$@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+Content-Type: text/plain; charset=UTF-8
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Simo <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
 	Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
 	Ashish Sangwan <a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
 To: Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
@@ -16,18 +15,18 @@ In-Reply-To: <001301cfc025$940767f0$bc1637d0$@samsung.com>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 2014-08-25 at 14:29 +0900, Namjae Jeon wrote:
+On Mon, Aug 25, 2014 at 12:29 AM, Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org> wrote:
 > Windows machine has extended security feature which refuse to allow
 > authentication when there is time difference between server time and
 > client time when ntlmv2 negotiation is used. This problem is prevalent
 > in embedded enviornment where system time is set to default 1970.
-> 
+>
 > Modern servers send the server timestamp in the TargetInfo Av_Pair
 > structure in the challenge message [see MS-NLMP 2.2.2.1]
 > In [MS-NLMP 3.1.5.1.2] it is explicitly mentioned that the client must
 > use the server provided timestamp if present OR current time if it is
 > not.
-> 
+>
 > Cc: Simo <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 > Signed-off-by: Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
 > Signed-off-by: Ashish Sangwan <a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
@@ -36,78 +35,83 @@ On Mon, 2014-08-25 at 14:29 +0900, Namjae Jeon wrote:
 >  fs/cifs/cifsglob.h    |    2 ++
 >  fs/cifs/sess.c        |   21 +++++++++++++++++++++
 >  3 files changed, 27 insertions(+), 2 deletions(-)
-> 
+>
 > diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
 > index 4934347..3ec44f8 100644
 > --- a/fs/cifs/cifsencrypt.c
 > +++ b/fs/cifs/cifsencrypt.c
 > @@ -671,8 +671,10 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
->  			(ses->auth_key.response + CIFS_SESS_KEY_SIZE);
->  	ntlmv2->blob_signature = cpu_to_le32(0x00000101);
->  	ntlmv2->reserved = 0;
-> -	/* Must be within 5 minutes of the server */
-> -	ntlmv2->time = cpu_to_le64(cifs_UnixTimeToNT(CURRENT_TIME));
-> +	if (ses->serverTime)
-> +		ntlmv2->time = ses->serverTime;
-> +	else
-> +		ntlmv2->time = cpu_to_le64(cifs_UnixTimeToNT(CURRENT_TIME));
->  	get_random_bytes(&ntlmv2->client_chal, sizeof(ntlmv2->client_chal));
->  	ntlmv2->reserved2 = 0;
->  
+>                         (ses->auth_key.response + CIFS_SESS_KEY_SIZE);
+>         ntlmv2->blob_signature = cpu_to_le32(0x00000101);
+>         ntlmv2->reserved = 0;
+> -       /* Must be within 5 minutes of the server */
+> -       ntlmv2->time = cpu_to_le64(cifs_UnixTimeToNT(CURRENT_TIME));
+> +       if (ses->serverTime)
+> +               ntlmv2->time = ses->serverTime;
+> +       else
+> +               ntlmv2->time = cpu_to_le64(cifs_UnixTimeToNT(CURRENT_TIME));
+>         get_random_bytes(&ntlmv2->client_chal, sizeof(ntlmv2->client_chal));
+>         ntlmv2->reserved2 = 0;
+>
 > diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
 > index ce24c1f..1102822 100644
 > --- a/fs/cifs/cifsglob.h
 > +++ b/fs/cifs/cifsglob.h
 > @@ -796,6 +796,8 @@ struct cifs_ses {
->  	enum securityEnum sectype; /* what security flavor was specified? */
->  	bool sign;		/* is signing required? */
->  	bool need_reconnect:1; /* connection reset, uid now invalid */
-> +	__u64   serverTime;	/* Keeps a track of server time sent by server
-> +				   during NTLM challenge in little endian */
+>         enum securityEnum sectype; /* what security flavor was specified? */
+>         bool sign;              /* is signing required? */
+>         bool need_reconnect:1; /* connection reset, uid now invalid */
+> +       __u64   serverTime;     /* Keeps a track of server time sent by server
+> +                                  during NTLM challenge in little endian */
 >  #ifdef CONFIG_CIFS_SMB2
->  	__u16 session_flags;
->  	char smb3signingkey[SMB3_SIGN_KEY_SIZE]; /* for signing smb3 packets */
+>         __u16 session_flags;
+>         char smb3signingkey[SMB3_SIGN_KEY_SIZE]; /* for signing smb3 packets */
 > diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
 > index 07fe97a..0762377 100644
 > --- a/fs/cifs/sess.c
 > +++ b/fs/cifs/sess.c
 > @@ -277,6 +277,26 @@ static void decode_ascii_ssetup(char **pbcc_area, __u16 bleft,
->  	cifs_dbg(FYI, "ascii: bytes left %d\n", bleft);
+>         cifs_dbg(FYI, "ascii: bytes left %d\n", bleft);
 >  }
->  
+>
 > +static void
 > +get_ntlmv2_server_time(struct cifs_ses *ses)
 > +{
-> +#define MsvAvEOL	0x0000
-> +#define MsvAvTimestamp	0x0007
-> +	char *payload = ses->auth_key.response;
-> +	u16 AvId, AvLen;
+> +#define MsvAvEOL       0x0000
+> +#define MsvAvTimestamp 0x0007
+
+This patch looks correct but we have these defines in ntlmssp.h.
+
+> +       char *payload = ses->auth_key.response;
+> +       u16 AvId, AvLen;
 > +
-> +	do {
-> +		AvId = le16_to_cpu(*payload);
-> +		AvLen = le16_to_cpu(*(payload + sizeof(u16)));
-> +		payload += AvLen + (2 * sizeof(u16));
-> +	} while (AvId != MsvAvTimestamp && AvId != MsvAvEOL);
+> +       do {
+> +               AvId = le16_to_cpu(*payload);
+> +               AvLen = le16_to_cpu(*(payload + sizeof(u16)));
+> +               payload += AvLen + (2 * sizeof(u16));
+> +       } while (AvId != MsvAvTimestamp && AvId != MsvAvEOL);
 > +
-> +	if (AvId == MsvAvTimestamp)
-> +		memcpy(&(ses->serverTime), (payload - AvLen), sizeof(__u64));
-> +	else
-> +		ses->serverTime = 0;
+> +       if (AvId == MsvAvTimestamp)
+> +               memcpy(&(ses->serverTime), (payload - AvLen), sizeof(__u64));
+> +       else
+> +               ses->serverTime = 0;
 > +}
 > +
 >  int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
->  				    struct cifs_ses *ses)
+>                                     struct cifs_ses *ses)
 >  {
 > @@ -322,6 +342,7 @@ int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
->  			return -ENOMEM;
->  		}
->  		ses->auth_key.len = tilen;
-> +		get_ntlmv2_server_time(ses);
->  	}
->  
->  	return 0;
-
-I'll let a cifs maintainer ack or nack the implementation, but from a
-logic pov it looks good.
-
-Simo.
+>                         return -ENOMEM;
+>                 }
+>                 ses->auth_key.len = tilen;
+> +               get_ntlmv2_server_time(ses);
+>         }
+>
+>         return 0;
+> --
+> 1.7.7
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
