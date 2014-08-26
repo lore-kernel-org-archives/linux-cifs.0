@@ -1,37 +1,57 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v2 0/3] CIFS support for XFS test suite
-Date: Wed, 27 Aug 2014 00:28:35 +0400
-Message-ID: <1409084918-17764-1-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH v2 1/3] generic/013: encapsulate remount during cleanup
+Date: Wed, 27 Aug 2014 00:28:36 +0400
+Message-ID: <1409084918-17764-2-git-send-email-pshilovsky@samba.org>
+References: <1409084918-17764-1-git-send-email-pshilovsky@samba.org>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
 	David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>,
 	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: fstests-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1409084918-17764-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-These are patches that adds CIFS support to XFS tests.
+The existing code calls remount for $TEST_DEV with constantly defined
+mount options. This can fail if a user specifies different mount options.
+Fix this by using new _test_remount() call that remounts $TEST_DEV.
 
-The first patch changes generic/013 test to use mount options provided for $TEST_DEV for remount. The second patch adds "-cifs" command line argument and CIFS specific variables. The third patch disables tests that need POSIX behavior from filesystem for unix cifs mounts.
+Reviewed-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ common/rc         | 6 ++++++
+ tests/generic/013 | 2 +-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
-With these patches applied, most of generic/shared $TEST_DEV tests pass for the recent kernel cifs module.
-
-Pavel Shilovsky (3):
-  generic/013: encapsulate remount during cleanup
-  common: add cifs support
-  cifs: skip tests that need POSIX support for nounix mounts
-
- README            |  5 +++--
- check             |  2 ++
- common/config     | 31 +++++++++++++++++++++++++++----
- common/rc         | 39 +++++++++++++++++++++++++++++++++++++++
- tests/generic/005 |  1 +
- tests/generic/013 |  2 +-
- tests/generic/023 |  1 +
- tests/generic/024 |  1 +
- tests/generic/025 |  1 +
- tests/generic/131 |  1 +
- 10 files changed, 77 insertions(+), 7 deletions(-)
-
+diff --git a/common/rc b/common/rc
+index 16da898..d9c9995 100644
+--- a/common/rc
++++ b/common/rc
+@@ -218,6 +218,12 @@ _test_mount()
+     _mount -t $FSTYP $TEST_OPTIONS $TEST_FS_MOUNT_OPTS $SELINUX_MOUNT_OPTIONS $* $TEST_DEV $TEST_DIR
+ }
+ 
++_test_remount()
++{
++    $UMOUNT_PROG $TEST_DEV
++    _test_mount
++}
++
+ _scratch_mkfs_options()
+ {
+     _scratch_options mkfs
+diff --git a/tests/generic/013 b/tests/generic/013
+index 93d9904..534c9f0 100755
+--- a/tests/generic/013
++++ b/tests/generic/013
+@@ -35,7 +35,7 @@ _cleanup()
+ {
+     cd /
+     # we might get here with a RO FS
+-    mount -o remount,rw $TEST_DEV >/dev/null 2>&1
++    _test_remount
+     # now remove fsstress directory.
+     # N.B. rm(1) on IRIX can find problems when building up a long pathname
+     # such that what it has is greater the 1024 chars and will
 -- 
 1.9.1
