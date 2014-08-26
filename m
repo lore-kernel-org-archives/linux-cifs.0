@@ -1,32 +1,38 @@
-From: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
-Subject: Re: [PATCH 00/10] locks/nfsd: internal lease API overhaul
-Date: Tue, 26 Aug 2014 06:59:20 -0700
-Message-ID: <20140826135920.GB18599@infradead.org>
-References: <1408804878-1331-1-git-send-email-jlayton@primarydata.com>
- <20140824161046.GI15908@infradead.org>
- <20140824214301.61019123@synchrony.poochiereds.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org,
-	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jeff.layton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH v2] CIFS: Fix wrong restart readdir for SMB1
+Date: Tue, 26 Aug 2014 19:04:44 +0400
+Message-ID: <1409065484-7438-1-git-send-email-pshilovsky@samba.org>
+Cc: <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20140824214301.61019123-08S845evdOaAjSkqwZiSMmfYqLom42DlXqFh9Ls21Oc@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, Aug 24, 2014 at 09:43:01PM -0400, Jeff Layton wrote:
-> >  - add a return value to lm_break so that the lock manager can tell the
-> >    core code "you can delete this lease right now".  That gets rid of
-> >    the games with the timeout which require all kinds of race avoidance
-> >    code in the users.
-> > 
-> 
-> I'm not sure I understand what you're suggesting here. Isn't it just as
-> simple to have lm_break call lease_modify to just remove the lease?
+The existing code calls server->ops->close() that is not
+right. This causes XFS test generic/310 to fail. Fix this
+by using server->ops->closedir() function.
 
-Unfortunately it's not.  lm_break gets a pointer to the file_lock,
-and lease_modify needs a pointer to the list position of the file_lock.
+Cc: <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org> # v3.7+
+Signed-off-by: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ fs/cifs/readdir.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+index 798c80a..b334a89 100644
+--- a/fs/cifs/readdir.c
++++ b/fs/cifs/readdir.c
+@@ -596,8 +596,8 @@ find_cifs_entry(const unsigned int xid, struct cifs_tcon *tcon, loff_t pos,
+ 		if (server->ops->dir_needs_close(cfile)) {
+ 			cfile->invalidHandle = true;
+ 			spin_unlock(&cifs_file_list_lock);
+-			if (server->ops->close)
+-				server->ops->close(xid, tcon, &cfile->fid);
++			if (server->ops->close_dir)
++				server->ops->close_dir(xid, tcon, &cfile->fid);
+ 		} else
+ 			spin_unlock(&cifs_file_list_lock);
+ 		if (cfile->srch_inf.ntwrk_buf_start) {
+-- 
+1.9.1
