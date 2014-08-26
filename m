@@ -1,30 +1,38 @@
-From: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [patch] cifs: update a check for NULL function pointer
-Date: Tue, 26 Aug 2014 15:25:16 +0300
-Message-ID: <20140826122516.GE5100@mwanda>
-References: <20140826073802.GA31076@mwanda>
- <CAKywueS8pjGrY=SkmxSazVTYVMmnj7zrNhcPCWYgf7NNrNZnYg@mail.gmail.com>
+From: Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH 07/10] locks: define a lm_setup handler for leases
+Date: Tue, 26 Aug 2014 06:58:21 -0700
+Message-ID: <20140826135821.GA18599@infradead.org>
+References: <1408804878-1331-1-git-send-email-jlayton@primarydata.com>
+ <1408804878-1331-8-git-send-email-jlayton@primarydata.com>
+ <20140824155858.GF15908@infradead.org>
+ <20140824211953.1dfd7f77@synchrony.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	linux-fsdevel@vger.kernel.org, bfields@fieldses.org,
+	cluster-devel@redhat.com, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org
+To: Jeff Layton <jeff.layton@primarydata.com>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CAKywueS8pjGrY=SkmxSazVTYVMmnj7zrNhcPCWYgf7NNrNZnYg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+In-Reply-To: <20140824211953.1dfd7f77@synchrony.poochiereds.net>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Tue, Aug 26, 2014 at 12:21:07PM +0400, Pavel Shilovsky wrote:
-> Dan, would you mind if I merge your code change as well as your
-> Signed-off-by line into the original patch "CIFS: Fix wrong restart
-> readdir for SMB1" since the latter hasn't been merged into the
-> mainline yet?
+On Sun, Aug 24, 2014 at 09:19:53PM -0400, Jeff Layton wrote:
+> > I don't think this is a good idea.  The errors in __f_setown come from
+> > the security modules, and they could change easily.  If you can convince
+> > the LSM people to change their file_set_fowner routine to return void
+> > we could change __f_setown to return void as well and be done with it,
+> > but without that this looks too dangerous.
+> > 
 > 
+> Understood. I figured that this might not be acceptable. I can make
+> this propagate the error back up, but cleaning up the mess may not be
+> easy. I'll see what I can do.
 
-Sure.  No problem.
+I'd say talk to the LSM people.  Right now they are only using it to
+set up private data pointers, so they might agree on turning it into
+a void return.  Or just be bold and do that work yourself, include it in
+this series and just Cc them.
 
-regards,
-dan carpenter
