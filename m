@@ -1,48 +1,37 @@
-From: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: cthon failure
-Date: Tue, 26 Aug 2014 09:12:46 -0700
-Message-ID: <20140826161246.GB5602@samba2>
-References: <CAH2r5mtN1cHocFcVPsDC9kVq5c9DyxazmTBFQp_wUVCPNsvV7Q@mail.gmail.com>
- <20140821211338.GC17035@samba2>
- <CAH2r5ms5=vV2XD2oP2NoaLavsZCo=x4w=w7vvshzNQRNJ1RkFw@mail.gmail.com>
- <20140826001033.GA7407@samba2>
- <CAH2r5mtdkx=iPmQBUq2RLf15zRfLnfFxZU6Y7bRLRtU09Cv1mw@mail.gmail.com>
-Reply-To: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH v2 0/3] CIFS support for XFS test suite
+Date: Wed, 27 Aug 2014 00:28:35 +0400
+Message-ID: <1409084918-17764-1-git-send-email-pshilovsky@samba.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
+	David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>,
+	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: fstests-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <CAH2r5mtdkx=iPmQBUq2RLf15zRfLnfFxZU6Y7bRLRtU09Cv1mw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Aug 25, 2014 at 09:04:21PM -0500, Steve French wrote:
-> I can create a bug but the problem is pretty straightforward
+These are patches that adds CIFS support to XFS tests.
 
-Why can't I reproduce it ?
+The first patch changes generic/013 test to use mount options provided for $TEST_DEV for remount. The second patch adds "-cifs" command line argument and CIFS specific variables. The third patch disables tests that need POSIX behavior from filesystem for unix cifs mounts.
 
-> [2014/08/25 14:12:33.849169,  1]
-> ../source3/smbd/file_access.c:191(can_set_delete_on_close)
->   can_set_delete_on_close: file newfile1 delete on close flag set but
-> file attribute is readonly.
+With these patches applied, most of generic/shared $TEST_DEV tests pass for the recent kernel cifs module.
 
-Who is setting the file attribute readonly ? Show
-me the entire trace please. Or alternatively, you
-could JUST GIVE ME WHAT I ASKED FOR !!!!!
+Pavel Shilovsky (3):
+  generic/013: encapsulate remount during cleanup
+  common: add cifs support
+  cifs: skip tests that need POSIX support for nounix mounts
 
-(I'm getting frustrated Steve, because your
-refusal to give me the data I'm asking for
-is delaying me fixing this - if it's a server
-bug).
+ README            |  5 +++--
+ check             |  2 ++
+ common/config     | 31 +++++++++++++++++++++++++++----
+ common/rc         | 39 +++++++++++++++++++++++++++++++++++++++
+ tests/generic/005 |  1 +
+ tests/generic/013 |  2 +-
+ tests/generic/023 |  1 +
+ tests/generic/024 |  1 +
+ tests/generic/025 |  1 +
+ tests/generic/131 |  1 +
+ 10 files changed, 77 insertions(+), 7 deletions(-)
 
-Is the client code doing it ? If so, then the bug is
-in the client - *don't do that*. When talking on a
-connection with UNIX extensions why are *any* DOS
-attributes getting set ?
-
-Jeremy.
+-- 
+1.9.1
