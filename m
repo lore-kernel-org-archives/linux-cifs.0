@@ -1,34 +1,48 @@
-From: Pavel Shilovsky <pshilovsky@samba.org>
-Subject: Re: [patch] cifs: update a check for NULL function pointer
-Date: Tue, 26 Aug 2014 19:35:38 +0400
-Message-ID: <CAKywueRAT56E4_o5j6nHRmiipov+rhL0b_Vjac6zYBgDGBf4tQ@mail.gmail.com>
-References: <20140826073802.GA31076@mwanda>
-	<CAKywueS8pjGrY=SkmxSazVTYVMmnj7zrNhcPCWYgf7NNrNZnYg@mail.gmail.com>
-	<20140826122516.GE5100@mwanda>
+From: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: cthon failure
+Date: Tue, 26 Aug 2014 09:12:46 -0700
+Message-ID: <20140826161246.GB5602@samba2>
+References: <CAH2r5mtN1cHocFcVPsDC9kVq5c9DyxazmTBFQp_wUVCPNsvV7Q@mail.gmail.com>
+ <20140821211338.GC17035@samba2>
+ <CAH2r5ms5=vV2XD2oP2NoaLavsZCo=x4w=w7vvshzNQRNJ1RkFw@mail.gmail.com>
+ <20140826001033.GA7407@samba2>
+ <CAH2r5mtdkx=iPmQBUq2RLf15zRfLnfFxZU6Y7bRLRtU09Cv1mw@mail.gmail.com>
+Reply-To: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Steve French <sfrench@samba.org>,
-	linux-cifs <linux-cifs@vger.kernel.org>,
-	samba-technical <samba-technical@lists.samba.org>,
-	kernel-janitors@vger.kernel.org
-To: Dan Carpenter <dan.carpenter@oracle.com>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
-In-Reply-To: <20140826122516.GE5100@mwanda>
-Sender: kernel-janitors-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <CAH2r5mtdkx=iPmQBUq2RLf15zRfLnfFxZU6Y7bRLRtU09Cv1mw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-2014-08-26 16:25 GMT+04:00 Dan Carpenter <dan.carpenter@oracle.com>:
-> On Tue, Aug 26, 2014 at 12:21:07PM +0400, Pavel Shilovsky wrote:
->> Dan, would you mind if I merge your code change as well as your
->> Signed-off-by line into the original patch "CIFS: Fix wrong restart
->> readdir for SMB1" since the latter hasn't been merged into the
->> mainline yet?
->>
->
-> Sure.  No problem.
+On Mon, Aug 25, 2014 at 09:04:21PM -0500, Steve French wrote:
+> I can create a bug but the problem is pretty straightforward
 
-Thanks. Posted the second version to the list.
+Why can't I reproduce it ?
 
--- 
-Best regards,
-Pavel Shilovsky.
+> [2014/08/25 14:12:33.849169,  1]
+> ../source3/smbd/file_access.c:191(can_set_delete_on_close)
+>   can_set_delete_on_close: file newfile1 delete on close flag set but
+> file attribute is readonly.
+
+Who is setting the file attribute readonly ? Show
+me the entire trace please. Or alternatively, you
+could JUST GIVE ME WHAT I ASKED FOR !!!!!
+
+(I'm getting frustrated Steve, because your
+refusal to give me the data I'm asking for
+is delaying me fixing this - if it's a server
+bug).
+
+Is the client code doing it ? If so, then the bug is
+in the client - *don't do that*. When talking on a
+connection with UNIX extensions why are *any* DOS
+attributes getting set ?
+
+Jeremy.
