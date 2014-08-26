@@ -1,38 +1,32 @@
-From: Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH 07/10] locks: define a lm_setup handler for leases
-Date: Tue, 26 Aug 2014 06:58:21 -0700
-Message-ID: <20140826135821.GA18599@infradead.org>
+From: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Subject: Re: [PATCH 00/10] locks/nfsd: internal lease API overhaul
+Date: Tue, 26 Aug 2014 06:59:20 -0700
+Message-ID: <20140826135920.GB18599@infradead.org>
 References: <1408804878-1331-1-git-send-email-jlayton@primarydata.com>
- <1408804878-1331-8-git-send-email-jlayton@primarydata.com>
- <20140824155858.GF15908@infradead.org>
- <20140824211953.1dfd7f77@synchrony.poochiereds.net>
+ <20140824161046.GI15908@infradead.org>
+ <20140824214301.61019123@synchrony.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Christoph Hellwig <hch@infradead.org>,
-	linux-fsdevel@vger.kernel.org, bfields@fieldses.org,
-	cluster-devel@redhat.com, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org
-To: Jeff Layton <jeff.layton@primarydata.com>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
+Cc: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org,
+	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jeff.layton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <20140824211953.1dfd7f77@synchrony.poochiereds.net>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+In-Reply-To: <20140824214301.61019123-08S845evdOaAjSkqwZiSMmfYqLom42DlXqFh9Ls21Oc@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, Aug 24, 2014 at 09:19:53PM -0400, Jeff Layton wrote:
-> > I don't think this is a good idea.  The errors in __f_setown come from
-> > the security modules, and they could change easily.  If you can convince
-> > the LSM people to change their file_set_fowner routine to return void
-> > we could change __f_setown to return void as well and be done with it,
-> > but without that this looks too dangerous.
+On Sun, Aug 24, 2014 at 09:43:01PM -0400, Jeff Layton wrote:
+> >  - add a return value to lm_break so that the lock manager can tell the
+> >    core code "you can delete this lease right now".  That gets rid of
+> >    the games with the timeout which require all kinds of race avoidance
+> >    code in the users.
 > > 
 > 
-> Understood. I figured that this might not be acceptable. I can make
-> this propagate the error back up, but cleaning up the mess may not be
-> easy. I'll see what I can do.
+> I'm not sure I understand what you're suggesting here. Isn't it just as
+> simple to have lm_break call lease_modify to just remove the lease?
 
-I'd say talk to the LSM people.  Right now they are only using it to
-set up private data pointers, so they might agree on turning it into
-a void return.  Or just be bold and do that work yourself, include it in
-this series and just Cc them.
-
+Unfortunately it's not.  lm_break gets a pointer to the file_lock,
+and lease_modify needs a pointer to the list position of the file_lock.
