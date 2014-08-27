@@ -1,110 +1,108 @@
-From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v2 3/3] cifs: skip tests that need POSIX support for nounix mounts
-Date: Wed, 27 Aug 2014 00:28:38 +0400
-Message-ID: <1409084918-17764-4-git-send-email-pshilovsky@samba.org>
-References: <1409084918-17764-1-git-send-email-pshilovsky@samba.org>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
-	David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>,
-	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: fstests-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+Subject: [PATCH v2] cifs: set client time as MsvAvTimestamp from
+ CHALLENGE_MESSAGE.TargetInfo
+Date: Wed, 27 Aug 2014 09:02:22 +0900
+Message-ID: <002501cfc18a$2d020b30$87062190$@samsung.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: Simo <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Ashish Sangwan <a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1409084918-17764-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-language: ko
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-CIFS/SMB protocol without POSIX extensions doesn't support operations
-with symbolic links and advisory byte-range locks from the same process.
-Add a check for nounix mounts and use it in generic tests that
-require such operations.
+Windows machine has extended security feature which refuse to allow
+authentication when there is time difference between server time and
+client time when ntlmv2 negotiation is used. This problem is prevalent
+in embedded enviornment where system time is set to default 1970.
 
-Reviewed-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Modern servers send the server timestamp in the TargetInfo Av_Pair
+structure in the challenge message [see MS-NLMP 2.2.2.1]
+In [MS-NLMP 3.1.5.1.2] it is explicitly mentioned that the client must
+use the server provided timestamp if present OR current time if it is
+not
+
+This behavior is so far only observed for windows server and does not
+effect samba server.
+
+Signed-off-by: Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+Signed-off-by: Ashish Sangwan <a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
 ---
- common/rc         | 7 +++++++
- tests/generic/005 | 1 +
- tests/generic/023 | 1 +
- tests/generic/024 | 1 +
- tests/generic/025 | 1 +
- tests/generic/131 | 1 +
- 6 files changed, 12 insertions(+)
+ fs/cifs/cifsencrypt.c |    6 ++++--
+ fs/cifs/cifsglob.h    |    2 ++
+ fs/cifs/sess.c        |   19 +++++++++++++++++++
+ 3 files changed, 25 insertions(+), 2 deletions(-)
 
-diff --git a/common/rc b/common/rc
-index 8b427fc..191f7ff 100644
---- a/common/rc
-+++ b/common/rc
-@@ -2374,6 +2374,13 @@ _require_btrfs_fs_feature()
- 		_notrun "Feature $feat not supported by the available btrfs version"
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 4934347..3ec44f8 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -671,8 +671,10 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ 			(ses->auth_key.response + CIFS_SESS_KEY_SIZE);
+ 	ntlmv2->blob_signature = cpu_to_le32(0x00000101);
+ 	ntlmv2->reserved = 0;
+-	/* Must be within 5 minutes of the server */
+-	ntlmv2->time = cpu_to_le64(cifs_UnixTimeToNT(CURRENT_TIME));
++	if (ses->serverTime)
++		ntlmv2->time = ses->serverTime;
++	else
++		ntlmv2->time = cpu_to_le64(cifs_UnixTimeToNT(CURRENT_TIME));
+ 	get_random_bytes(&ntlmv2->client_chal, sizeof(ntlmv2->client_chal));
+ 	ntlmv2->reserved2 = 0;
+ 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index ce24c1f..1102822 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -796,6 +796,8 @@ struct cifs_ses {
+ 	enum securityEnum sectype; /* what security flavor was specified? */
+ 	bool sign;		/* is signing required? */
+ 	bool need_reconnect:1; /* connection reset, uid now invalid */
++	__u64   serverTime;	/* Keeps a track of server time sent by server
++				   during NTLM challenge in little endian */
+ #ifdef CONFIG_CIFS_SMB2
+ 	__u16 session_flags;
+ 	char smb3signingkey[SMB3_SIGN_KEY_SIZE]; /* for signing smb3 packets */
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index 07fe97a..944750c 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -277,6 +277,24 @@ static void decode_ascii_ssetup(char **pbcc_area, __u16 bleft,
+ 	cifs_dbg(FYI, "ascii: bytes left %d\n", bleft);
  }
  
-+_require_test_posix_ext()
++static void
++get_ntlmv2_server_time(struct cifs_ses *ses)
 +{
-+	[ "$FSTYP" != "cifs" ] && return 0
-+	cat /proc/mounts | grep $TEST_DEV | grep cifs | grep -q nounix && \
-+		_notrun "Require POSIX extensions enabled"
++	char *payload = ses->auth_key.response;
++	u16 AvId, AvLen;
++
++	do {
++		AvId = le16_to_cpu(*payload);
++		AvLen = le16_to_cpu(*(payload + sizeof(u16)));
++		payload += AvLen + (2 * sizeof(u16));
++	} while (AvId != NTLMSSP_AV_TIMESTAMP && AvId != NTLMSSP_AV_EOL);
++
++	if (AvId == NTLMSSP_AV_TIMESTAMP)
++		memcpy(&(ses->serverTime), (payload - AvLen), sizeof(__u64));
++	else
++		ses->serverTime = 0;
 +}
 +
- _get_total_inode()
+ int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
+ 				    struct cifs_ses *ses)
  {
- 	if [ -z "$1" ]; then
-diff --git a/tests/generic/005 b/tests/generic/005
-index d78e43f..0c2b51f 100755
---- a/tests/generic/005
-+++ b/tests/generic/005
-@@ -67,6 +67,7 @@ _touch()
- # real QA test starts here
- _supported_fs generic
- _require_test
-+_require_test_posix_ext
+@@ -322,6 +340,7 @@ int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
+ 			return -ENOMEM;
+ 		}
+ 		ses->auth_key.len = tilen;
++		get_ntlmv2_server_time(ses);
+ 	}
  
- # IRIX UDF does not support symlinks
- if [ $FSTYP == 'udf' ]; then
-diff --git a/tests/generic/023 b/tests/generic/023
-index 114485c..91b8a37 100755
---- a/tests/generic/023
-+++ b/tests/generic/023
-@@ -45,6 +45,7 @@ _supported_os Linux
- 
- _require_test
- _requires_renameat2
-+_require_test_posix_ext
- 
- # real QA test starts here
- 
-diff --git a/tests/generic/024 b/tests/generic/024
-index 8945191..1248e78 100755
---- a/tests/generic/024
-+++ b/tests/generic/024
-@@ -45,6 +45,7 @@ _supported_os Linux
- 
- _require_test
- _requires_renameat2
-+_require_test_posix_ext
- 
- rename_dir=$TEST_DIR/$$
- mkdir $rename_dir
-diff --git a/tests/generic/025 b/tests/generic/025
-index 6b6c8ab..d06136c 100755
---- a/tests/generic/025
-+++ b/tests/generic/025
-@@ -45,6 +45,7 @@ _supported_os Linux
- 
- _require_test
- _requires_renameat2
-+_require_test_posix_ext
- 
- rename_dir=$TEST_DIR/$$
- mkdir $rename_dir
-diff --git a/tests/generic/131 b/tests/generic/131
-index b4e3ff0..9736963 100755
---- a/tests/generic/131
-+++ b/tests/generic/131
-@@ -45,6 +45,7 @@ _cleanup()
- _supported_fs generic
- _supported_os Linux
- _require_test
-+_require_test_posix_ext
- 
- TESTFILE=$TEST_DIR/lock_file
- 
+ 	return 0;
 -- 
-1.9.1
+1.7.7
