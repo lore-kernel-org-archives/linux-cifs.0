@@ -1,56 +1,41 @@
-From: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
-Subject: Re: Latest xfstest results
-Date: Fri, 29 Aug 2014 10:20:14 -0700
-Message-ID: <20140829172014.GA16006@infradead.org>
-References: <CAH2r5msh2j2qPsfNPsO2gMb8a_=snKUD=VpuAKhdMO_qopOsLw@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH v3 0/3] CIFS support for XFS test suite
+Date: Fri, 29 Aug 2014 23:42:17 +0400
+Message-ID: <1409341340-27031-1-git-send-email-pshilovsky@samba.org>
+Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>,
+	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: fstests-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <CAH2r5msh2j2qPsfNPsO2gMb8a_=snKUD=VpuAKhdMO_qopOsLw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Seems like most of your issues are time stamp updates, so you
-should look into that area a lot more.  Some that I know off head what
-the issues are:
+These are patches that adds CIFS support to XFS tests.
 
-On Fri, Aug 29, 2014 at 10:33:14AM -0500, Steve French wrote:
-> For 192 delta1 time should be 40 (this seems to work intermittently)
-> 
-> QA output created by 192
-> sleep for 40
-> test
-> delta1 - access time after sleep in-core: 0
-> delta2 - access time after sleep on-disk: 40
+The first patch changes generic/013 test to use mount options provided for $TEST_DEV for remount. The second patch adds "-cifs" command line argument and CIFS specific variables. The third patch disables tests that need POSIX behavior from filesystem for unix cifs mounts.
 
-atimes update not persisting an umount/remount.  Looks like cifs isn't
-properly dirtying the inode for it.
+With these patches applied, most of generic/shared $TEST_DEV tests pass for the recent kernel cifs module.
 
-> QA output created by 215
-> 
-> creating test file
-> 4096+0 records in
-> 4096+0 records out
-> 
-> writing via mmap
-> FAIL: mtime not update after mapped write
-> FAIL: ctime not update after mapped write
+Changes since v2:
+1) patch #3 uses separate _require_test_{feature} functions rather than generic _require_test_posix_ext
+2) patch #2 adds UDF notes to README
 
-missing file_update_time call in cifs_page_mkwrite.
+Pavel Shilovsky (3):
+  generic/013: encapsulate remount during cleanup
+  common: add cifs support
+  cifs: skip tests that need POSIX support for nounix mounts
 
-> QA output created by 313
-> Silence is golden
-> ctime not updated after truncate
-> mtime not updated after truncate
+ README            |  5 +++--
+ check             |  2 ++
+ common/config     | 31 +++++++++++++++++++++++++++----
+ common/rc         | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/generic/005 |  8 ++------
+ tests/generic/013 |  2 +-
+ tests/generic/023 |  1 +
+ tests/generic/024 |  1 +
+ tests/generic/025 |  1 +
+ tests/generic/131 |  1 +
+ 10 files changed, 94 insertions(+), 13 deletions(-)
 
-missing update of c/mtime for truncate.  The VFS is nasty in it's
-setattr calling conventions for this.  Check my 
-
-"[PATCH] nfs: update time staps on truncate"
-
-post on the nfs list for details.
+-- 
+1.9.1
