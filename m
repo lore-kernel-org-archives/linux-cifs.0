@@ -1,40 +1,65 @@
-From: Jeff Layton <jeff.layton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
-Subject: Re: [PATCH 08/10] locks: move i_lock acquisition into
- generic_*_lease handlers
-Date: Sun, 31 Aug 2014 10:51:21 -0400
-Message-ID: <20140831105121.65086ded@tlielax.poochiereds.net>
-References: <1408804878-1331-1-git-send-email-jlayton@primarydata.com>
-	<1408804878-1331-9-git-send-email-jlayton@primarydata.com>
-	<20140824160634.GG15908@infradead.org>
-	<20140824161134.GJ15908@infradead.org>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: cifs.ko fails to load
+Date: Mon, 1 Sep 2014 10:28:30 -0500
+Message-ID: <CADT32eLGqc3E8DCZFisNsZQyHYW+un+uFDxPx67kh3pv-2KWpQ@mail.gmail.com>
+References: <5401364D.6020906@bellsouth.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org,
-	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Richard Overstreet <bubbles455-Bdlq13kUjeyLZ21kGMrzwg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20140824161134.GJ15908-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+In-Reply-To: <5401364D.6020906-Bdlq13kUjeyLZ21kGMrzwg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 24 Aug 2014 09:11:34 -0700
-Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org> wrote:
+Is it possible to attach a wireshark trace obtained during the mount command?
 
-> On Sun, Aug 24, 2014 at 09:06:34AM -0700, Christoph Hellwig wrote:
-> > We really should split a lm_release from lm_change, the way it is
-> > used is highly confusing.  In addition I think a lot of code
-> > currently in lease_modify should move here instead, e.g. something like:
-> 
-> At this point the old lm_change actually becomes superflous if we
-> simply disallow changes for delegation.
-> 
-
-This sounds like a reasonable change, but I think it'll be easier to
-implement a little later once we've done some cleanup and change how
-file locks are handled. I'm going to leave this out of this current
-patchset, but I'll keep it in mind for a later cleanup.
-
--- 
-Jeff Layton <jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+On Fri, Aug 29, 2014 at 9:26 PM, Richard Overstreet
+<bubbles455-Bdlq13kUjeyLZ21kGMrzwg@public.gmane.org> wrote:
+> Hello All,
+>
+> I have been trying to get a samba share to mount and I think the error
+> is caused by the cifs.ko module not being loaded at boot. From my rc.log
+> file.
+>
+> * Setting system clock using the hardware clock [UTC] ...
+>  [ ok ]
+>  * Loading module cifs.ko ...
+>  * Failed to load cifs.ko
+>  [ !! ]
+>  * Autoloaded 0 module(s)
+>  * Checking local filesystems  ...
+>
+> This has happened with gentoo kernel versions 3.12.21 and 3.14.14. The
+> error I receive when trying to mount a share is.
+>
+>  sudo mount -t cifs //192.168.1.151/richard ./net -o username=richard
+> Password:
+> Password for richard@//192.168.1.151/richard:
+> mount error(13): Permission denied
+> Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
+>
+> I can manually load the cifs module with modprobe but I still receive
+> the same error. The share is accessible via smbclient -L so I really
+> don't know what is going on.
+>
+> smbclient -L 192.168.1.151
+> Enter richard's password:
+> Domain=[WORKGROUP] OS=[Unix] Server=[Samba 3.6.23]
+>
+>         Sharename       Type      Comment
+>         ---------       ----      -------
+>         IPC$            IPC       IPC Service (Samba 3.6.23)
+>         homes           Disk
+>         richard         Disk      Home directory of richard
+> Domain=[WORKGROUP] OS=[Unix] Server=[Samba 3.6.23]
+>
+>
+> Is there a way to send debugging arguments to cifs.ko during boot
+> something of the effect module_cifs_args="debug" in /etc/conf.d/modules?
+> Or are there some known kernel modules/options that conflict with the
+> cifs module? I am attaching my config file if someone could look it over.
+>
+> Thanks,
+>
+> Richard Overstreet
