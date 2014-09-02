@@ -1,65 +1,71 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: cifs.ko fails to load
-Date: Mon, 1 Sep 2014 10:28:30 -0500
-Message-ID: <CADT32eLGqc3E8DCZFisNsZQyHYW+un+uFDxPx67kh3pv-2KWpQ@mail.gmail.com>
-References: <5401364D.6020906@bellsouth.net>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: Latest xfstest results
+Date: Mon, 1 Sep 2014 22:05:22 -0500
+Message-ID: <CAH2r5msZsL_LcjAUshLTArTFaFs5M136izeBGnXXf1uitYJsDA@mail.gmail.com>
+References: <CAH2r5msh2j2qPsfNPsO2gMb8a_=snKUD=VpuAKhdMO_qopOsLw@mail.gmail.com>
+ <20140829172014.GA16006@infradead.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Richard Overstreet <bubbles455-Bdlq13kUjeyLZ21kGMrzwg@public.gmane.org>
+Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
+To: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <5401364D.6020906-Bdlq13kUjeyLZ21kGMrzwg@public.gmane.org>
+In-Reply-To: <20140829172014.GA16006-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Is it possible to attach a wireshark trace obtained during the mount command?
+These are good suggestions - working through 215 and 313 is turning
+out to be a little more complicated than I expected though.
 
-On Fri, Aug 29, 2014 at 9:26 PM, Richard Overstreet
-<bubbles455-Bdlq13kUjeyLZ21kGMrzwg@public.gmane.org> wrote:
-> Hello All,
+On Fri, Aug 29, 2014 at 12:20 PM, Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org> wrote:
+> Seems like most of your issues are time stamp updates, so you
+> should look into that area a lot more.  Some that I know off head what
+> the issues are:
 >
-> I have been trying to get a samba share to mount and I think the error
-> is caused by the cifs.ko module not being loaded at boot. From my rc.log
-> file.
+> On Fri, Aug 29, 2014 at 10:33:14AM -0500, Steve French wrote:
+>> QA output created by 215
+>>
+>> creating test file
+>> 4096+0 records in
+>> 4096+0 records out
+>>
+>> writing via mmap
+>> FAIL: mtime not update after mapped write
+>> FAIL: ctime not update after mapped write
 >
-> * Setting system clock using the hardware clock [UTC] ...
->  [ ok ]
->  * Loading module cifs.ko ...
->  * Failed to load cifs.ko
->  [ !! ]
->  * Autoloaded 0 module(s)
->  * Checking local filesystems  ...
+> missing file_update_time call in cifs_page_mkwrite.
+
+Just adding that didn't fix it - but will look further into it. Maybe
+server is delaying updating mtime and getting reset back to original
+time stamp during revalidate.  Need to debug further.
+
+>> QA output created by 313
+>> Silence is golden
+>> ctime not updated after truncate
+>> mtime not updated after truncate
 >
-> This has happened with gentoo kernel versions 3.12.21 and 3.14.14. The
-> error I receive when trying to mount a share is.
+> missing update of c/mtime for truncate.  The VFS is nasty in it's
+> setattr calling conventions for this.
+
+That is very true. This is turning out to be harder to decipher than I expected.
+
+>Check my
+> "[PATCH] nfs: update time staps on truncate"
 >
->  sudo mount -t cifs //192.168.1.151/richard ./net -o username=richard
-> Password:
-> Password for richard@//192.168.1.151/richard:
-> mount error(13): Permission denied
-> Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
->
-> I can manually load the cifs module with modprobe but I still receive
-> the same error. The share is accessible via smbclient -L so I really
-> don't know what is going on.
->
-> smbclient -L 192.168.1.151
-> Enter richard's password:
-> Domain=[WORKGROUP] OS=[Unix] Server=[Samba 3.6.23]
->
->         Sharename       Type      Comment
->         ---------       ----      -------
->         IPC$            IPC       IPC Service (Samba 3.6.23)
->         homes           Disk
->         richard         Disk      Home directory of richard
-> Domain=[WORKGROUP] OS=[Unix] Server=[Samba 3.6.23]
->
->
-> Is there a way to send debugging arguments to cifs.ko during boot
-> something of the effect module_cifs_args="debug" in /etc/conf.d/modules?
-> Or are there some known kernel modules/options that conflict with the
-> cifs module? I am attaching my config file if someone could look it over.
->
-> Thanks,
->
-> Richard Overstreet
+> post on the nfs list for details.
+
+My first pass at using the approach suggested in the NFS patch didn't
+work, and an alternative approach of skipping mtime update (set info
+of the timestamps to server) completely in the ATTR_SIZE case and
+simply forcing revalidate of all inode metadata from the server
+(setting cifsInode->time to zero forces revalidate) actually broke
+ftruncate not just truncate (reminded me of something IIRC JRA had
+said about delayed updates of mtime in NTFS - need to dig up that old
+note).
+
+
+-- 
+Thanks,
+
+Steve
