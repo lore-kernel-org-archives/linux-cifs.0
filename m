@@ -1,75 +1,62 @@
-From: Steve French <smfrench@gmail.com>
-Subject: A pair of negative time problems: cifs.ko and Samba
-Date: Mon, 8 Sep 2014 02:00:36 -0500
-Message-ID: <CAH2r5mumvJxzROhpcgTvXW7N_Ghquyx8jqzW1PsgR9XMbVgBVQ@mail.gmail.com>
+From: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
+Subject: [PATCH] cifs: remove dead code
+Date: Mon, 08 Sep 2014 17:20:56 +0200
+Message-ID: <3319326.1eJrmz0Vgc@wuerfel>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>
-To: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-	samba-technical <samba-technical@lists.samba.org>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-There are at least two unrelated problems uncovered by xfstest generic/258
+cifs provides two dummy functions 'sess_auth_lanman' and
+'sess_auth_kerberos' for the case in which the respective
+features are not defined. However, the caller is also under
+an #ifdef, so we just get warnings about unused code:
 
-Samba does not actually process set info requests for times prior to
-1970 (the set info does not return an error but doesn't update the
-time) although it will report the correct time if a file is created
-and set locally on ext4 (eg touch -t 196001010101 testfile)  to a time
-before 1970.  This works to Windows over CIFS and SMB3.  I opened
-Samba bug 10802 to track this.
+fs/cifs/sess.c:1109:1: warning: 'sess_auth_kerberos' defined but not used [-Wunused-function]
+ sess_auth_kerberos(struct sess_data *sess_data)
 
-In addition there is a bug in the cifs kernel client (and probably the
-same bug in NTFS on linux) in displaying file times before 1970.   The
-cifs kernel client (and Linux ntfs) assume the input to do_div is
-unsigned during time conversion.   Is there an alternative to do_div
-in kernel?
+Removing the dead functions gets rid of the warnings without
+any downsides that I can see.
 
-The following change fixes the problem but would be cleaner if there
-were a signed/unsigned aware equivalent of do_div
+Signed-off-by: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
 
-diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
-index 6834b9c..3e17e9b 100644
---- a/fs/cifs/netmisc.c
-+++ b/fs/cifs/netmisc.c
-@@ -925,11 +925,19 @@ cifs_NTtimeToUnix(__le64 ntutc)
-     /* BB what about the timezone? BB */
-
-     /* Subtract the NTFS time offset, then convert to 1s intervals. */
--    u64 t;
-+    s64 t;
-
-     t = le64_to_cpu(ntutc) - NTFS_TIME_OFFSET;
--    ts.tv_nsec = do_div(t, 10000000) * 100;
--    ts.tv_sec = t;
-+
-+    if (t < 0) {
-+        t = -t;
-+        ts.tv_nsec = -(do_div(t, 10000000) * 100);
-+        ts.tv_sec = -t;
-+    } else {
-+        ts.tv_nsec = do_div(t, 10000000) * 100;
-+        ts.tv_sec = t;
-+    }
-+
-     return ts;
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index 07fe97ac6b0c..ab0fda6e8e58 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -745,14 +745,6 @@ out:
+ 	sess_free_buffer(sess_data);
  }
-
-fs/ntfs/time.h seems to have the same bug in its equivalent function
-ie in  ntfs2utc()
-
-Is there a better function to call?  (In user space I thought that
-div/ldiv/lldiv handled negative numbers but presumably we don't have
-the equivalents in kernel).
-
-
-
-
-
-
-
--- 
-Thanks,
-
-Steve
+ 
+-#else
+-
+-static void
+-sess_auth_lanman(struct sess_data *sess_data)
+-{
+-	sess_data->result = -EOPNOTSUPP;
+-	sess_data->func = NULL;
+-}
+ #endif
+ 
+ static void
+@@ -1103,15 +1095,6 @@ out:
+ 	ses->auth_key.response = NULL;
+ }
+ 
+-#else
+-
+-static void
+-sess_auth_kerberos(struct sess_data *sess_data)
+-{
+-	cifs_dbg(VFS, "Kerberos negotiated but upcall support disabled!\n");
+-	sess_data->result = -ENOSYS;
+-	sess_data->func = NULL;
+-}
+ #endif /* ! CONFIG_CIFS_UPCALL */
+ 
+ /*
