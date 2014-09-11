@@ -1,62 +1,45 @@
-From: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
-Subject: [PATCH] cifs: remove dead code
-Date: Mon, 08 Sep 2014 17:20:56 +0200
-Message-ID: <3319326.1eJrmz0Vgc@wuerfel>
+From: "Wang, Yalin" <Yalin.Wang@sonymobile.com>
+Subject: [PATCH] cifs:fix build warnings
+Date: Thu, 11 Sep 2014 16:39:17 +0800
+Message-ID: <35FD53F367049845BC99AC72306C23D103CDBFBFB01C@CNBJMBX05.corpusers.net>
+References: <35FD53F367049845BC99AC72306C23D103CDBFBFB01B@CNBJMBX05.corpusers.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+To: "'torvalds@linux-foundation.org'" <torvalds@linux-foundation.org>,
+	"'sfrench@samba.org'" <sfrench@samba.org>,
+	"'linux-kernel@vger.kernel.org'" <linux-kernel@vger.kernel.org>,
+	"'linux@arm.linux.org.uk'" <linux@arm.linux.org.uk>,
+	"'linux-cifs@vger.kernel.org'" <linux-cifs@vger.kernel.org>,
+	"'samba-technical@lists.samba.org'" <samba-technical@lists.samba.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <35FD53F367049845BC99AC72306C23D103CDBFBFB01B@CNBJMBX05.corpusers.net>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-cifs provides two dummy functions 'sess_auth_lanman' and
-'sess_auth_kerberos' for the case in which the respective
-features are not defined. However, the caller is also under
-an #ifdef, so we just get warnings about unused code:
-
-fs/cifs/sess.c:1109:1: warning: 'sess_auth_kerberos' defined but not used [-Wunused-function]
- sess_auth_kerberos(struct sess_data *sess_data)
-
-Removing the dead functions gets rid of the warnings without
-any downsides that I can see.
-
-Signed-off-by: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
-
-diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index 07fe97ac6b0c..ab0fda6e8e58 100644
---- a/fs/cifs/sess.c
-+++ b/fs/cifs/sess.c
-@@ -745,14 +745,6 @@ out:
- 	sess_free_buffer(sess_data);
- }
- 
--#else
--
--static void
--sess_auth_lanman(struct sess_data *sess_data)
--{
--	sess_data->result = -EOPNOTSUPP;
--	sess_data->func = NULL;
--}
- #endif
- 
- static void
-@@ -1103,15 +1095,6 @@ out:
- 	ses->auth_key.response = NULL;
- }
- 
--#else
--
--static void
--sess_auth_kerberos(struct sess_data *sess_data)
--{
--	cifs_dbg(VFS, "Kerberos negotiated but upcall support disabled!\n");
--	sess_data->result = -ENOSYS;
--	sess_data->func = NULL;
--}
- #endif /* ! CONFIG_CIFS_UPCALL */
- 
- /*
+dGhpcyBmaXggdGhlIGZvbGxvd2luZyB3YXJuaW5nc++8mg0Ka2VybmVsLnRvcnZhbGRzLmdpdC9m
+cy9jaWZzL3Nlc3MuYzo3NTE6MTogd2FybmluZzogJ3Nlc3NfYXV0aF9sYW5tYW4nIGRlZmluZWQg
+YnV0IG5vdCB1c2VkIFstV3VudXNlZC1mdW5jdGlvbl0NCmtlcm5lbC50b3J2YWxkcy5naXQvZnMv
+Y2lmcy9zZXNzLmM6MTEwOToxOiB3YXJuaW5nOiAnc2Vzc19hdXRoX2tlcmJlcm9zJyBkZWZpbmVk
+IGJ1dCBub3QgdXNlZCBbLVd1bnVzZWQtZnVuY3Rpb25dDQoNClNpZ25lZC1vZmYtYnk6IFlhbGlu
+IFdhbmcgPHlhbGluLndhbmdAc29ueW1vYmlsZS5jb20+DQotLS0NCmZzL2NpZnMvc2Vzcy5jIHwg
+MTkgLS0tLS0tLS0tLS0tLS0tLS0tLQ0KMSBmaWxlIGNoYW5nZWQsIDE5IGRlbGV0aW9ucygtKQ0K
+DQpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9zZXNzLmMgYi9mcy9jaWZzL3Nlc3MuYw0KaW5kZXggM2E1
+ZTgzMy4uN2JjOWMwMyAxMDA2NDQNCi0tLSBhL2ZzL2NpZnMvc2Vzcy5jDQorKysgYi9mcy9jaWZz
+L3Nlc3MuYw0KQEAgLTc0NCwxNSArNzQ0LDYgQEAgb3V0Og0KwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoCBzZXNzX2RhdGEtPmZ1bmMgPSBOVUxMOw0KwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoCBzZXNzX2ZyZWVfYnVmZmVyKHNlc3NfZGF0YSk7DQp9DQotDQotI2Vsc2UNCi0NCi1zdGF0
+aWMgdm9pZA0KLXNlc3NfYXV0aF9sYW5tYW4oc3RydWN0IHNlc3NfZGF0YSAqc2Vzc19kYXRhKQ0K
+LXsNCi3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBzZXNzX2RhdGEtPnJlc3VsdCA9IC1FT1BO
+T1RTVVBQOw0KLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHNlc3NfZGF0YS0+ZnVuYyA9IE5V
+TEw7DQotfQ0KI2VuZGlmDQoNCsKgc3RhdGljIHZvaWQNCkBAIC0xMTAyLDE2ICsxMDkzLDYgQEAg
+b3V0Og0KwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBrZnJlZShzZXMtPmF1dGhfa2V5LnJl
+c3BvbnNlKTsNCsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgc2VzLT5hdXRoX2tleS5yZXNw
+b25zZSA9IE5VTEw7DQp9DQotDQotI2Vsc2UNCi0NCi1zdGF0aWMgdm9pZA0KLXNlc3NfYXV0aF9r
+ZXJiZXJvcyhzdHJ1Y3Qgc2Vzc19kYXRhICpzZXNzX2RhdGEpDQotew0KLcKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgIGNpZnNfZGJnKFZGUywgIktlcmJlcm9zIG5lZ290aWF0ZWQgYnV0IHVwY2Fs
+bCBzdXBwb3J0IGRpc2FibGVkIVxuIik7DQotwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgc2Vz
+c19kYXRhLT5yZXN1bHQgPSAtRU5PU1lTOw0KLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHNl
+c3NfZGF0YS0+ZnVuYyA9IE5VTEw7DQotfQ0KI2VuZGlmIC8qICEgQ09ORklHX0NJRlNfVVBDQUxM
+ICovDQoNCsKgLyoNCi0tIA0KMi4xLjANCg==
