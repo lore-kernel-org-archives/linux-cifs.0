@@ -1,45 +1,17 @@
-From: "Wang, Yalin" <Yalin.Wang@sonymobile.com>
-Subject: [PATCH] cifs:fix build warnings
-Date: Thu, 11 Sep 2014 16:39:17 +0800
-Message-ID: <35FD53F367049845BC99AC72306C23D103CDBFBFB01C@CNBJMBX05.corpusers.net>
-References: <35FD53F367049845BC99AC72306C23D103CDBFBFB01B@CNBJMBX05.corpusers.net>
+From: TR Reardon <thomas_reardon-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org>
+Subject: POSIX support for smb2/3
+Date: Fri, 12 Sep 2014 10:26:32 -0400
+Message-ID: <BAY406-EAS31424ED722C9D3FAA88724FFDCD0@phx.gbl>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: base64
-To: "'torvalds@linux-foundation.org'" <torvalds@linux-foundation.org>,
-	"'sfrench@samba.org'" <sfrench@samba.org>,
-	"'linux-kernel@vger.kernel.org'" <linux-kernel@vger.kernel.org>,
-	"'linux@arm.linux.org.uk'" <linux@arm.linux.org.uk>,
-	"'linux-cifs@vger.kernel.org'" <linux-cifs@vger.kernel.org>,
-	"'samba-technical@lists.samba.org'" <samba-technical@lists.samba.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <35FD53F367049845BC99AC72306C23D103CDBFBFB01B@CNBJMBX05.corpusers.net>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-dGhpcyBmaXggdGhlIGZvbGxvd2luZyB3YXJuaW5nc++8mg0Ka2VybmVsLnRvcnZhbGRzLmdpdC9m
-cy9jaWZzL3Nlc3MuYzo3NTE6MTogd2FybmluZzogJ3Nlc3NfYXV0aF9sYW5tYW4nIGRlZmluZWQg
-YnV0IG5vdCB1c2VkIFstV3VudXNlZC1mdW5jdGlvbl0NCmtlcm5lbC50b3J2YWxkcy5naXQvZnMv
-Y2lmcy9zZXNzLmM6MTEwOToxOiB3YXJuaW5nOiAnc2Vzc19hdXRoX2tlcmJlcm9zJyBkZWZpbmVk
-IGJ1dCBub3QgdXNlZCBbLVd1bnVzZWQtZnVuY3Rpb25dDQoNClNpZ25lZC1vZmYtYnk6IFlhbGlu
-IFdhbmcgPHlhbGluLndhbmdAc29ueW1vYmlsZS5jb20+DQotLS0NCmZzL2NpZnMvc2Vzcy5jIHwg
-MTkgLS0tLS0tLS0tLS0tLS0tLS0tLQ0KMSBmaWxlIGNoYW5nZWQsIDE5IGRlbGV0aW9ucygtKQ0K
-DQpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9zZXNzLmMgYi9mcy9jaWZzL3Nlc3MuYw0KaW5kZXggM2E1
-ZTgzMy4uN2JjOWMwMyAxMDA2NDQNCi0tLSBhL2ZzL2NpZnMvc2Vzcy5jDQorKysgYi9mcy9jaWZz
-L3Nlc3MuYw0KQEAgLTc0NCwxNSArNzQ0LDYgQEAgb3V0Og0KwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoCBzZXNzX2RhdGEtPmZ1bmMgPSBOVUxMOw0KwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoCBzZXNzX2ZyZWVfYnVmZmVyKHNlc3NfZGF0YSk7DQp9DQotDQotI2Vsc2UNCi0NCi1zdGF0
-aWMgdm9pZA0KLXNlc3NfYXV0aF9sYW5tYW4oc3RydWN0IHNlc3NfZGF0YSAqc2Vzc19kYXRhKQ0K
-LXsNCi3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBzZXNzX2RhdGEtPnJlc3VsdCA9IC1FT1BO
-T1RTVVBQOw0KLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHNlc3NfZGF0YS0+ZnVuYyA9IE5V
-TEw7DQotfQ0KI2VuZGlmDQoNCsKgc3RhdGljIHZvaWQNCkBAIC0xMTAyLDE2ICsxMDkzLDYgQEAg
-b3V0Og0KwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBrZnJlZShzZXMtPmF1dGhfa2V5LnJl
-c3BvbnNlKTsNCsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgc2VzLT5hdXRoX2tleS5yZXNw
-b25zZSA9IE5VTEw7DQp9DQotDQotI2Vsc2UNCi0NCi1zdGF0aWMgdm9pZA0KLXNlc3NfYXV0aF9r
-ZXJiZXJvcyhzdHJ1Y3Qgc2Vzc19kYXRhICpzZXNzX2RhdGEpDQotew0KLcKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgIGNpZnNfZGJnKFZGUywgIktlcmJlcm9zIG5lZ290aWF0ZWQgYnV0IHVwY2Fs
-bCBzdXBwb3J0IGRpc2FibGVkIVxuIik7DQotwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgc2Vz
-c19kYXRhLT5yZXN1bHQgPSAtRU5PU1lTOw0KLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHNl
-c3NfZGF0YS0+ZnVuYyA9IE5VTEw7DQotfQ0KI2VuZGlmIC8qICEgQ09ORklHX0NJRlNfVVBDQUxM
-ICovDQoNCsKgLyoNCi0tIA0KMi4xLjANCg==
+R3JlZXRpbmdzOiBJIHRyaWVkIHNraW1taW5nIHRoaXMgbGlzdCBmb3Igc29tZSBkaXNjdXNzaW9u
+IHJlZ2FyZGluZyB0aGUgUE9TSVggZXh0ZW5zaW9ucyB0byBzbWIyIGJ1dCBoYXZlbid0IHNlZW4g
+YW55dGhpbmcuICBPdGhlciB0aGFuIHNvbWUgcHJlc2VudGF0aW9ucyBmcm9tIDIwMTIsIGl0IGFw
+cGVhcnMgdGhpcyBpcyBub3QgdW5kZXIgYWN0aXZlIGRldmVsb3BtZW50LiAgSXMgdGhlcmUgYW55
+IHNwZWMgd29yayBvbmdvaW5nPw==
