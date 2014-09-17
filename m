@@ -1,76 +1,129 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: match_token weird behavior
-Date: Wed, 17 Sep 2014 13:20:28 -0500
-Message-ID: <CAH2r5mvTP1oGNoetuSkPdirBb1UDH6fiNCVjs_gJNKeJ1Dz5sA@mail.gmail.com>
+From: Steve French <smfrench@gmail.com>
+Subject: Re: [PATCH v4 2/3] cifs: convert to print_hex_dump() instead of
+ custom implementation
+Date: Wed, 17 Sep 2014 14:07:44 -0500
+Message-ID: <CAH2r5muAtFu9YT8etmTvoFs-SJpeANGLLUtdRQaoj3FN+yxozw@mail.gmail.com>
+References: <1409147384-20389-1-git-send-email-andriy.shevchenko@linux.intel.com>
+ <1409147384-20389-3-git-send-email-andriy.shevchenko@linux.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: Steve French <sfrench@samba.org>, "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>, Jeff Layton <jlayton@poochiereds.net>, Alexander Bokovoy <ab@samba.org>,
+	samba-technical <samba-technical@lists.samba.org>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Return-path: <samba-technical-bounces@lists.samba.org>
+In-Reply-To: <1409147384-20389-3-git-send-email-andriy.shevchenko@linux.intel.com>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Sender: samba-technical-bounces@lists.samba.org
+Errors-To: samba-technical-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-Noticing something very strange with match_token.   I had five strings
-I need to compare a version string (protocol dialect eg. "2.1" or
-"3.0") against, to find which it matches (if any), but adding one to
-the list (now checking for one of six strings instead of five) causes
-the error case to always default to element 3 (in my example looks as
-if it matched to the 2.1 string) instead of the error case.
+Do you have a sample for what the output change looks like?
 
-enum smb_version {
-    Smb_1 = 1,
-    Smb_20,
-    Smb_21,
-    Smb_30,
-    Smb_302,
-};
+On Wed, Aug 27, 2014 at 8:49 AM, Andy Shevchenko
+<andriy.shevchenko@linux.intel.com> wrote:
+> This patch converts custom dumper to use native print_hex_dump() instead. The
+> cifs_dump_mem() will have an offsets per each line which differs it from the
+> original code.
+>
+> In the dump_smb() we may use native print_hex_dump() as well. It will show
+> slightly different output in ASCII part when character is unprintable,
+> otherwise it keeps same structure.
+>
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> ---
+>  fs/cifs/cifs_debug.c | 21 ++-------------------
+>  fs/cifs/misc.c       | 32 ++------------------------------
+>  2 files changed, 4 insertions(+), 49 deletions(-)
+>
+> diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+> index 7c50bfa..14e082f 100644
+> --- a/fs/cifs/cifs_debug.c
+> +++ b/fs/cifs/cifs_debug.c
+> @@ -34,27 +34,10 @@
+>  void
+>  cifs_dump_mem(char *label, void *data, int length)
+>  {
+> -       int i, j;
+> -       int *intptr = data;
+> -       char *charptr = data;
+> -       char buf[10], line[80];
+> -
+>         printk(KERN_DEBUG "%s: dump of %d bytes of data at 0x%p\n",
+>                 label, length, data);
+> -       for (i = 0; i < length; i += 16) {
+> -               line[0] = 0;
+> -               for (j = 0; (j < 4) && (i + j * 4 < length); j++) {
+> -                       sprintf(buf, " %08x", intptr[i / 4 + j]);
+> -                       strcat(line, buf);
+> -               }
+> -               buf[0] = ' ';
+> -               buf[2] = 0;
+> -               for (j = 0; (j < 16) && (i + j < length); j++) {
+> -                       buf[1] = isprint(charptr[i + j]) ? charptr[i + j] : '.';
+> -                       strcat(line, buf);
+> -               }
+> -               printk(KERN_DEBUG "%s\n", line);
+> -       }
+> +       print_hex_dump(KERN_DEBUG, "", DUMP_PREFIX_OFFSET, 16, 4,
+> +                      data, length, true);
+>  }
+>
+>  #ifdef CONFIG_CIFS_DEBUG
+> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+> index b7415d5..3379463 100644
+> --- a/fs/cifs/misc.c
+> +++ b/fs/cifs/misc.c
+> @@ -513,39 +513,11 @@ is_valid_oplock_break(char *buffer, struct TCP_Server_Info *srv)
+>  void
+>  dump_smb(void *buf, int smb_buf_length)
+>  {
+> -       int i, j;
+> -       char debug_line[17];
+> -       unsigned char *buffer = buf;
+> -
+>         if (traceSMB == 0)
+>                 return;
+>
+> -       for (i = 0, j = 0; i < smb_buf_length; i++, j++) {
+> -               if (i % 8 == 0) {
+> -                       /* have reached the beginning of line */
+> -                       printk(KERN_DEBUG "| ");
+> -                       j = 0;
+> -               }
+> -               printk("%0#4x ", buffer[i]);
+> -               debug_line[2 * j] = ' ';
+> -               if (isprint(buffer[i]))
+> -                       debug_line[1 + (2 * j)] = buffer[i];
+> -               else
+> -                       debug_line[1 + (2 * j)] = '_';
+> -
+> -               if (i % 8 == 7) {
+> -                       /* reached end of line, time to print ascii */
+> -                       debug_line[16] = 0;
+> -                       printk(" | %s\n", debug_line);
+> -               }
+> -       }
+> -       for (; j < 8; j++) {
+> -               printk("     ");
+> -               debug_line[2 * j] = ' ';
+> -               debug_line[1 + (2 * j)] = ' ';
+> -       }
+> -       printk(" | %s\n", debug_line);
+> -       return;
+> +       print_hex_dump(KERN_DEBUG, "", DUMP_PREFIX_NONE, 8, 2, buf,
+> +                      smb_buf_length, true);
+>  }
+>
+>  void
+> --
+> 2.1.0
+>
 
-static const match_table_t cifs_smb_version_tokens = {
-    { Smb_1, SMB1_VERSION_STRING },
-    { Smb_20, SMB20_VERSION_STRING},
-    { Smb_21, SMB21_VERSION_STRING },
-    { Smb_30, SMB30_VERSION_STRING },
-    { Smb_302, SMB302_VERSION_STRING },
-};
 
-
-When I add one entry to the lists above (going from 5 to 6 elements),
-and then add one additional case for it to the switch statement, an
-attempt to provide an unrecognized string (e.g. if I specify an illegal
-dialect string like "9" instead of "3.0" or "2.1" etc) will now match the
-third element (Smb_21) instead of "default" in the code snippet below.
-Is match_token broken? Can match token only handle tables with 5
-elements or fewer? Is there a replacement for it for this kind of thing
-(matching a string versus which from among a list of valid strings)
-other than match_token?  Is match_token just broken?
-
-    substring_t args[MAX_OPT_ARGS];
-
-    switch (match_token(value, cifs_smb_version_tokens, args)) {
-    case Smb_1:
-        vol->ops = &smb1_operations;
-        vol->vals = &smb1_values;
-        break;
-    case Smb_20:
-        vol->ops = &smb20_operations;
-        vol->vals = &smb20_values;
-        break;
-    case Smb_21:
-        vol->ops = &smb21_operations;
-        vol->vals = &smb21_values;
-        break;
-    case Smb_30:
-        vol->ops = &smb30_operations;
-        vol->vals = &smb30_values;
-        break;
-    case Smb_302:
-        vol->ops = &smb30_operations; /* currently identical with 3.0 */
-        vol->vals = &smb302_values;
-        break;
-    default:
-        cifs_dbg(VFS, "Unknown vers= option specified: %s\n", value);
-        return 1;
 
 -- 
 Thanks,
