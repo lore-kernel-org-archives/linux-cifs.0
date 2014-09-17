@@ -1,39 +1,76 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [SMB3][PATCHv3 Add mfsymlinks support for SMB2.1/SMB3
-Date: Wed, 17 Sep 2014 10:48:06 -0700
-Message-ID: <CAH2r5muLEObKLLsEnrE4n2dfpS04Jk8DdVU7xgzJKOuryYNk4g@mail.gmail.com>
-References: <CAH2r5mvpBeoOuT59AzVpvHTzX1RxJM0X=3BO7UyCU1p4zarTcQ@mail.gmail.com>
- <CAKywueQBBHgk8Fk+SLsgBkXGk9V5CDcT_7+7RCQzjbSD1HDwvA@mail.gmail.com>
+Subject: match_token weird behavior
+Date: Wed, 17 Sep 2014 13:20:28 -0500
+Message-ID: <CAH2r5mvTP1oGNoetuSkPdirBb1UDH6fiNCVjs_gJNKeJ1Dz5sA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueQBBHgk8Fk+SLsgBkXGk9V5CDcT_7+7RCQzjbSD1HDwvA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-If you want I can add it to SMB2.0.  I was a little worried about
-whether the oplock flags were the same for the call to SMB2_open, but
-if so I can test it.
+Noticing something very strange with match_token.   I had five strings
+I need to compare a version string (protocol dialect eg. "2.1" or
+"3.0") against, to find which it matches (if any), but adding one to
+the list (now checking for one of six strings instead of five) causes
+the error case to always default to element 3 (in my example looks as
+if it matched to the 2.1 string) instead of the error case.
 
-On Wed, Sep 17, 2014 at 5:18 AM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> 2014-09-17 12:14 GMT+04:00 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
->> Updated version of the mfsymlinks patches are in cifs-2.6.git for-next
->> branch and have tested out fine at the SMB3 plugfest here this week
->>
->> http://git.samba.org/?p=sfrench/cifs-2.6.git;a=shortlog;h=refs/heads/for-next
->
-> What's about SMB2.0 protocol version?
->
->
-> --
-> Best regards,
-> Pavel Shilovsky.
+enum smb_version {
+    Smb_1 = 1,
+    Smb_20,
+    Smb_21,
+    Smb_30,
+    Smb_302,
+};
+
+static const match_table_t cifs_smb_version_tokens = {
+    { Smb_1, SMB1_VERSION_STRING },
+    { Smb_20, SMB20_VERSION_STRING},
+    { Smb_21, SMB21_VERSION_STRING },
+    { Smb_30, SMB30_VERSION_STRING },
+    { Smb_302, SMB302_VERSION_STRING },
+};
 
 
+When I add one entry to the lists above (going from 5 to 6 elements),
+and then add one additional case for it to the switch statement, an
+attempt to provide an unrecognized string (e.g. if I specify an illegal
+dialect string like "9" instead of "3.0" or "2.1" etc) will now match the
+third element (Smb_21) instead of "default" in the code snippet below.
+Is match_token broken? Can match token only handle tables with 5
+elements or fewer? Is there a replacement for it for this kind of thing
+(matching a string versus which from among a list of valid strings)
+other than match_token?  Is match_token just broken?
+
+    substring_t args[MAX_OPT_ARGS];
+
+    switch (match_token(value, cifs_smb_version_tokens, args)) {
+    case Smb_1:
+        vol->ops = &smb1_operations;
+        vol->vals = &smb1_values;
+        break;
+    case Smb_20:
+        vol->ops = &smb20_operations;
+        vol->vals = &smb20_values;
+        break;
+    case Smb_21:
+        vol->ops = &smb21_operations;
+        vol->vals = &smb21_values;
+        break;
+    case Smb_30:
+        vol->ops = &smb30_operations;
+        vol->vals = &smb30_values;
+        break;
+    case Smb_302:
+        vol->ops = &smb30_operations; /* currently identical with 3.0 */
+        vol->vals = &smb302_values;
+        break;
+    default:
+        cifs_dbg(VFS, "Unknown vers= option specified: %s\n", value);
+        return 1;
 
 -- 
 Thanks,
