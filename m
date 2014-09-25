@@ -1,65 +1,53 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [Regression]  cifs: sanity check length of data to send before
- sending
-Date: Tue, 23 Sep 2014 18:49:26 -0400
-Message-ID: <20140923184926.2fdbb6c6@tlielax.poochiereds.net>
-References: <5421C563.8070304@canonical.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: How mode bits are stored in NFS/NTFS/CIFS/SMB3 ACLs
+Date: Thu, 25 Sep 2014 01:04:37 -0500
+Message-ID: <CAH2r5mt70hDes3tHMuij3YkDY9N2aG+bL77mhkg7k2W1y6W-jQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Joseph Salisbury <joseph.salisbury-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <5421C563.8070304-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 23 Sep 2014 15:09:23 -0400
-Joseph Salisbury <joseph.salisbury-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org> wrote:
+Did some experiments today to see how mode bits are stored by the
+Windows NFS server in the RichACL (CIFS or NFS ACL).   mounted nfsv4.1
+to Windows from Linux then created a bunch of files and did chmod of
+various combinations of 07777 bits (including sticky, setuid etc.)
 
-> Hi Jeff,
-> 
-> A kernel bug report was opened against Ubuntu [0].  It was found that
-> reverting the following commit resolved this bug:
-> 
-> 
-> commit a26054d184763969a411e3939fe243516715ff59
-> Author: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> Date:   Fri Feb 14 07:21:00 2014 -0500
-> 
->     cifs: sanity check length of data to send before sending
-> 
->       
-> The regression was introduced as of v3.14-rc7.
-> 
-> It appears the patch may be doing what it is supposed to, since the
-> send_length != smb_buf_length:
-> send_length=72
-> and
-> smb_buf_length=2164260932
-> 
-> However, without this check and WARN/return of -EIO the samba
-> connections still work correctly.
-> 
-> I was hoping to get your feedback, since you are the patch author.  Do
-> you think gathering any additional data will help diagnose this issue,
-> or would it be best to submit a revert request?
->     
-> Thanks,
->     
-> Joe
-> 
-> [0] http://pad.lv/1372482
-> 
+Windows NFS server is storing the user owner bits with SID
+S-1-5-88-1 and using SID S-15-88-2 for group owner and S-1-5-88-4 for
+the ACE for "other" (this is easy to spot over CIFS/SMB3 etc because
+user owner and group owner map to these SIDs in the security
+descriptor returned over the wire).
 
-(I'm no longer with Red Hat, so the jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org address won't
-reach me any longer...)
+As expected, for each of the 3 ACEs, it is setting "GENERIC_READ" in
+the ACE for '4' (read) and GENERIC_WRITE for '2' (write) and
+GENERIC_EXECUTE for '1' (execute).  What is puzzling is where it
+stores the setuid and sticky bits (bits 07000) because they are not
+visible in the CIFS/NTFS ACL.
 
-It looks like you probably just need to merge
-dca1c8d17a2feae056f9e334ea75a462ae4cb52a into your kernel as well.
+Interesting that Windows's ACL management tool "cacls" doesn't display
+the human readable names of the three special SIDs (even when run
+locally on NTFS) although does display the ACE associated with the sid
+with its raw SID.
 
-Cheers,
+Trying it on a different server which also handles both NFS and
+CIFS/SMB3, the Mac, was also interesting.
+Strangely enough the Mac client didn't seem to recognize these ACEs (I
+thought they did) - and ls -l in Mac's bash always shows mode of 0700
+
+In addition the Mac server doesn't seem to support Query Security
+descriptor from cifs (Linux) or SMB2.1 (Windows 8.1) so I couldn't run
+"cacls" on the Windows mount to Mac server to view how the Mac handles
+chmod of the various permission bits (what it does to emulate them in
+the ACL).
+
+
+
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Thanks,
+
+Steve
