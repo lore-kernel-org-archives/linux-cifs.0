@@ -1,30 +1,23 @@
-From: "ADMINISTRATOR" <RASZIAH-lx3iid27Z0I2rQIKskaa6A@public.gmane.org>
-Subject: Sehr geehrter Nutzer
-Date: Tue, 14 Oct 2014 10:23:56 +0100
-Message-ID: <20141014092410.533E816BB52@webmail.cidb.gov.my>
-Reply-To: webmail_team-H32Fclmsjq1BDgjK7y7TUQ@public.gmane.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: (unknown)
+Date: Wed, 15 Oct 2014 10:01:49 -0500
+Message-ID: <CAH2r5mtMSzRaEwRz+TL3+Z1kcBoKq0y8nUHrG4Rf=rFYbz+r1Q@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=UTF-8
+To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Description: Mail message body
+Subject: 
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Sehr geehrter Nutzer=20
+smb3 also fails new xfstest generic/035 (as does nfs but for different
+reasons) although cifs works.
 
-  Ihre E-Mail wurde 2 GB erstellt vom Webmaster =FCberschritten, die Si=
-e derzeit auf 2.30GB ausgef=FChrt werden, die nicht senden oder neue Na=
-chricht erhalten innerhalb der n=E4chsten 24 Stunden, bis Sie =FCberpr=FC=
-fen, ob Sie eine E-Mail-Konto.=20
+Looks like need to implement a rename_pending_delete worker function
+for smb2/smb2.1/smb3 (as cifs has).
 
-Bitte geben Sie Ihre Daten ein, um Ihr Konto zu =FCberpr=FCfen:=20
+-- 
+Thanks,
 
-(1) E-mail:=20
-(2) Name:=20
-(3) Passwort:=20
-(4) Passwort best=E4tigen:=20
-
-danke=20
-System-Administrator.
+Steve
