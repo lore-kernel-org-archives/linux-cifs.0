@@ -1,71 +1,48 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT PULL] CIFS/SMB3 Fixes
-Date: Sat, 18 Oct 2014 15:25:00 -0500
-Message-ID: <CAH2r5mt7NYqJa9_3N97Qk+HpGmGJXTwqW+ZY-J5Egb8u3_qqkw@mail.gmail.com>
+From: Jurjen Bokma <j.bokma-39IHFo8E5E0@public.gmane.org>
+Subject: Re: Kerberized mount.cifs with SMB>1?
+Date: Sun, 19 Oct 2014 21:58:02 +0200
+Message-ID: <544417CA.3000609@rug.nl>
+References: <53F4ABCD.5040909@rug.nl> <1408545832.2071.6.camel@hh16.hh3.site> <53F4D7FC.8020405@rug.nl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <53F4D7FC.8020405-39IHFo8E5E0@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Improved SMB3 support (symlink and device emulation, and remapping by default
-the 7 reserved posix characters) and a workaround for cifs mounts to Mac
-(working around a commonly encountered Mac server bug)
+On 08/20/2014 07:16 PM, Jurjen Bokma wrote:
+> On 08/20/2014 04:43 PM, steve wrote:
+>> On Wed, 2014-08-20 at 16:08 +0200, Jurjen Bokma wrote:
+<snip>
+>> The upcall has nothing to go on. Get it working with cifs first:
+>>
+>> Who mounts the share? Add a domain user with a uid:gid key to the keytab
+>> and:
+<snip>
+>> mount.cifs //your/share /mnt -ousername=cifsuser,sec=krb5
+> This works, as it uses SMB1. SMB1 also works *with* all the frills. But
+> it fails with 2.0, 2.1 or 3.0:
+>
+> mount.cifs //your/share /mnt -ousername=cifsuser,sec=krb5,vers=3.0
+<snip>
 
-Please pull the following changes since commit
-0429fbc0bdc297d64188483ba029a23773ae07b0:
+No matter whether I use my own Samba server or a Windows (2012) server, 
+vers=2.0 or vers=3.0 fails with "permission denied", while 'vers=1.0' 
+works perfectly:
 
-  Merge branch 'for-3.18-consistent-ops' of
-git://git.kernel.org/pub/scm/linux/kernel/git/tj/percpu (2014-10-15
-07:48:18 +0200)
+mount.cifs //server.mydom.com/cnc  /mnt/cnc 
+-overs=1.0,sec=krb5,username=cifsuser,cruid=1234567,domain=MYDOM.COM
 
-are available in the git repository at:
+With SMB>1, no Kerberos traffic in Wireshark. If it is encapsulated, 
+that would explain a part. But the ticket still would have to be granted 
+by the Kerberos server, and I don't see that either. Also, request-key 
+is not being called with SMB>1. So I must conclude that Steve is right: 
+the upcall has nothing to go on. But how to tell it?
 
+Any hints as to why this fails with SMB>1 would be much appreciated.
 
-  git://git.samba.org/sfrench/cifs-2.6.git for-linus
-
-for you to fetch changes up to ff273cb879fbc6cd3c5d03a56cfc33f5830e2837:
-
-  [CIFS] Remove obsolete comment (2014-10-17 17:17:12 -0500)
-
-----------------------------------------------------------------
-Steve French (10):
-      add defines for two new file attributes
-      Allow mknod and mkfifo on SMB2/SMB3 mounts
-      Add mfsymlinks support for SMB2.1/SMB3. Part 1 create symlink
-      mfsymlinks support for SMB2.1/SMB3. Part 2 query symlink
-      Allow conversion of characters in Mac remap range. Part 1
-      Allow conversion of characters in Mac remap range (part 2)
-      Remap reserved posix characters by default (part 3/3)
-      Workaround Mac server problem
-      Check minimum response length on query_network_interface
-      [CIFS] Remove obsolete comment
-
- fs/cifs/cifs_fs_sb.h   |   1 +
- fs/cifs/cifs_unicode.c | 203 +++++++++++++++++++++++++++++++++++++------------
- fs/cifs/cifs_unicode.h |  31 +++++++-
- fs/cifs/cifsencrypt.c  |   2 +-
- fs/cifs/cifsglob.h     |   6 +-
- fs/cifs/cifssmb.c      |  16 ++--
- fs/cifs/connect.c      |  46 +++++++++--
- fs/cifs/dir.c          |  22 ++++--
- fs/cifs/file.c         |   6 +-
- fs/cifs/inode.c        |  57 ++++++++------
- fs/cifs/link.c         | 145 +++++++++++++++++++++++++++++++++--
- fs/cifs/readdir.c      |   8 +-
- fs/cifs/smb1ops.c      |  33 ++++----
- fs/cifs/smb2misc.c     |  12 ++-
- fs/cifs/smb2ops.c      |  27 ++++---
- fs/cifs/smb2pdu.c      |   2 +
- fs/cifs/smb2pdu.h      |   2 +
- fs/cifs/smb2proto.h    |   8 +-
- fs/cifs/smbencrypt.c   |   1 +
- fs/cifs/xattr.c        |  32 +++-----
- 20 files changed, 489 insertions(+), 171 deletions(-)
-
--- 
-Thanks,
-
-Steve
+Best Regards
+Jurjen
