@@ -1,84 +1,112 @@
-From: Jurjen Bokma <j.bokma-39IHFo8E5E0@public.gmane.org>
-Subject: Re: Kerberized mount.cifs with SMB>1?
-Date: Mon, 20 Oct 2014 19:19:55 +0200
-Message-ID: <5445443B.2090807@rug.nl>
-References: <53F4ABCD.5040909@rug.nl> <1408545832.2071.6.camel@hh16.hh3.site> <53F4D7FC.8020405@rug.nl> <544417CA.3000609@rug.nl> <54441E2A.6020809@steve-ss.com> <54441F79.7040804@rug.nl> <54442233.4090801@steve-ss.com> <54442399.5030100@rug.nl> <54453737.7040403@steve-ss.com> <54453A48.1050208@rug.nl> <CAH2r5msA2D8upKSYVUEC1ygULe9oGa2x0XR5tGeF59bSmjKa3g@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: Status of SMB3?
+Date: Mon, 20 Oct 2014 12:33:56 -0500
+Message-ID: <CAH2r5mvFN20Z_vRzcpFtJR5w3qwjZxfWSrpbRqoHsc9Lqr3NsQ@mail.gmail.com>
+References: <54453BD8.6040504@candelatech.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
+To: Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5msA2D8upKSYVUEC1ygULe9oGa2x0XR5tGeF59bSmjKa3g-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <54453BD8.6040504-my8/4N5VtI7c+919tysfdA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 10/20/2014 07:09 PM, Steve French wrote:
-> On Mon, Oct 20, 2014 at 11:37 AM, Jurjen Bokma <j.bokma-39IHFo8E5E0@public.gmane.org> wrote:
->> On 10/20/2014 06:24 PM, steve wrote:
->>> On 19/10/14 22:48, Jurjen Bokma wrote:
->>>> On 10/19/2014 10:42 PM, steve wrote:
->>>>> On 19/10/14 22:30, Jurjen Bokma wrote:
->>>>>
->>>>>> So I would very much like to use SMB3 to get to the Windows file
->>>>>> servers. Kerberized SMB1 worked like a charm. Speed/bandwidth is not
->>>>>> really the issue here.
->>>>>>
->>>>> Yeah, of course. Never knew there was any security involved. Worrying.
->>>> Did you ever have SMB3 working Kerberized? If I know it's supposed to
->>>> work, I'll give up less easily.
->>>>
->>> Hi
->>> We have everything default. We'd no idea that smb3 existed until this
->>> thread. Anyway, it doesn't work here either:
->>> CIFS VFS: cifs_mount failed w/return code = -128
->>> I think the Kerberos has worked because that codes means that the ticket
->>> has expired, except it hasn't because removing vers=3.0 mounts fine.
->>> But we don't know if our Samba4 file servers are capable of it anyway. I
->>> think we'd have to change something in smb.conf.
->> Maybe to serve SMB3. Max protocol comes to mind. But editing smb.conf is
->> not likely necessary to merely mount a share I presume? IME mount.cifs +
->> Kerberos will work once krb5.conf and request-key are properly
->> configured, regardless of the smb.conf on the client.
->> I did fiddle a bit with /proc/fs/cifs/* though.
->>
->>> Maybe the devs will look if you bugzilla it?
->> Will try. But first I'll take a look myself, lest I don't know what to ask.
-> 
-> It is doable, and probably easier since the cleanup/rewrite a year or so ago
-> of some of the auth code.
-> 
-> Note that for cifs dialect (in fs/cifs/cifssmb.c) the negotiate response calls
-> decode_negTokenInit to parse the asn1 to figure out if kerberos is
-> allowed (see around line 595 and following of fs/cifs/asn1.c) then compare
-> with the smb2/smb3 case in which we call decode_neg_token_init
-> in line 434 of fs/cifs/smb2pdu.c during the processing of the SMB2/SMB3
-> negotiate protocol response.  Note that this is ifdef out (CONFIG_SMB2_ASN1)
-> since this function has to be changed to match the new format
-> 
-> Perhaps simply changing
-> 
-> decode_neg_token_init(security_blob, blob_length, &server->sec_type)
-> to
-> decode_negTokenInit(security_blob, length, server);
-> 
-> would get you through negotiate protocol then the only change needed
-> would be to SMB2_sess_setup (see lines 526 and following of fs/cifs/smb2pdu.c)
-> to parse the asn1 in a similar way to what we do for cifs dialect
-> in fs/cifs/sess.c routine sess_auth_kerberos (see liones 543 and later).
-> 
-> It shouldn't be too bad to finish up.
-> 
-> Then once negprot and session setup are working with Kerberos then
-> the simple use cases (SMB2 and SMB2.1 with signing disabled) should work
-> and then for the other use cases will also have to check if SMB2.1/SMB3 signing
-> needs changing for krb5 (don't know, probably not) and if
-> smb3_validate_negotiate
-> needs any minor changes for the krb5 case.
-> 
-That was just the sort of intro I needed right now. Don't expect
-immediate results from me though. I must cram this in between other tasks.
+This is a great question to explore now that significant SMB3
+improvements have gone into 3.17.
 
-Thanks!
-Jurjen
+SMB3 stability is much improved recently, in part due to the focus on
+automated xfstesting over the past
+months.   In addition, it is much more posix compatible now.
+
+High level view:
+- SMB3 generally stable
+- SMB3 security is better than most alternatives (although finishing
+up krb5 support would help, and SMB3.1 looks like it will be better
+still when it is announced)
+- SMB3 (thanks to Pavel's improvements this summer) is faster for
+large file read/write than most alternatives.
+- SMB3 is getting better at full posix compliance/emulation but not as
+posix compliant as cifs dialect (with Unix extensions in the protocol)
+was to Samba, but about as compliant as cifs was to Windows.
+      - SMB3 can now do emulated symlinks (mfsymlinks) similar to
+Apple (the "Minshall-French" style symlinks)
+      - SMB3 now remaps the 7 reserved POSIX characters by default
+(similar to Windows "SFM" and Apple, no need to do "mapchars" unless
+you have legacy filenames created with this mount option which has :
+or ? or < > )
+      - SMB3 can do emulated fifo and device files (with "sfu" mount option)
+- SMB3 can not retrieve posix mode bits from the ACL (yet) so would
+love help finishing this off, Shirish was looking at it too) ala the
+"cifsacl" mount option (which only works on cifs mounts)
+- SMB3 can not do extended attributes (yet)
+
+
+Known problems:
+xfstests has about 10 failures (not counting a few server bugs we
+found) shown when run with SMB3 mounts:
+- 3 due to the wrong return code returned on rename of directory tree
+onto an existing directory tree (was looking at adding an
+"smb3_rename_pending_delete" helper function as cifs has to see if
+that would help any of those)
+- 2 or 3 relating to minor fix needed to fallocate support (to clear
+local copy of pages on zero page fallocate)
+- 2 due to timestamp caching
+- 2 due to lack of posix mode emulation (posix permissions not
+available until cifsacl mount option finished)
+
+Performance:
+- better than alternatives for large file i/o
+- SMB2.1 and SMB3 leases are better than cifs oplocks which helps in
+some long running i/o cases due to the improved caching
+- chattier and slower than cifs for stat and readdir (SMB3 does
+open/query/close instead of cifs's querypathinfo - 3 operations
+instead of one).  This could be improved with better operation
+compounding and some additional deferred close features.
+- The copy offload and even the set compression (chflags/chattr +C)
+can help - but the copy offload ioctl needs a little userspace copy
+util to call it (for fast server side copy offload when source and
+target are on the same server) as cifs.ko doesn't use the btrfs
+refcopy ioctl number for copy offload.
+- slower than cifs for most metadata heavy workloads - but could be
+improved to be much better than cifs (implementing SMB3 directory
+leases would be helpful)
+- finishing SMB3 multichannel (and RDMA) would be a big help for
+certain network constrained workloads
+- SMB3 packet signing should be pretty fast compared to alternatives
+
+SMB3 Unique Features
+--------------------------------
+Encrypted shares (would be useful to add and shouldn't be too hard)
+Durable handles (implemented), Persistent Handles (not implemented yet)
+Improved failover and Witness protocol would be very useful to add
+
+Overall - SMB3 could become the optimal file transfer mechanism for
+many more workloads with a few key improvements, but currently (3.17)
+is quite good for large i/o and reasonably stable, and more secure for
+some common use cases.
+
+On Mon, Oct 20, 2014 at 11:44 AM, Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org> wrote:
+> I notice at least some support for SMB3 in the 3.17 kernel.
+>
+> Any idea how complete SMB3 support is?
+>
+> Thanks,
+> Ben
+>
+> --
+> Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
+> Candela Technologies Inc  http://www.candelatech.com
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Thanks,
+
+Steve
