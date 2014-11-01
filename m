@@ -1,49 +1,37 @@
-From: Andy Shevchenko <andriy.shevchenko-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
-Subject: Re: [PATCH v4 0/3] cifs: small clean up series
-Date: Wed, 22 Oct 2014 17:03:52 +0300
-Message-ID: <1413986632.2396.38.camel@linux.intel.com>
-References: <1409147384-20389-1-git-send-email-andriy.shevchenko@linux.intel.com>
+From: Roger Brooks <r.s.brooks-EkmVulN54Sk@public.gmane.org>
+Subject: Unable to mount using credentials file
+Date: Sat, 1 Nov 2014 12:03:34 +0000 (UTC)
+Message-ID: <loom.20141101T124621-513@post.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>,
-	Alexander Bokovoy <ab-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1409147384-20389-1-git-send-email-andriy.shevchenko-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 2014-08-27 at 16:49 +0300, Andy Shevchenko wrote:
-> This is small clean up series against CIFS kernel module.
-> 
-
-Ping? Is there any comments?
-
-> Changes since v3:
-> - rebase on top of recent linux-next
-> 
-> Changes since v2:
-> - patch 1 got ACK and Reviwed-by tags
-> - patch 2 incorporates new piece of code similar that it used to have already,
->   thus tags were dropped for this round
-> - new patch 3
-> 
-> Andy Shevchenko (3):
->   cifs: call strtobool instead of custom implementation
->   cifs: convert to print_hex_dump() instead of custom implementation
->   cifs: convert printk(LEVEL...) to pr_<level>
-> 
->  fs/cifs/cifs_debug.c | 77 ++++++++++++++++++++++------------------------------
->  fs/cifs/cifs_debug.h |  7 ++---
->  fs/cifs/connect.c    | 51 ++++++++++++----------------------
->  fs/cifs/misc.c       | 32 ++--------------------
->  fs/cifs/transport.c  |  4 +--
->  5 files changed, 58 insertions(+), 113 deletions(-)
-> 
-
-
--- 
-Andy Shevchenko <andriy.shevchenko-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Intel Finland Oy
+I am attempting to mount Windows volumes on a Synology DS (running DSM 5.0,
+a Debian-based distribution).
+Command lines of the form:
+mount -t cifs -o username=<user>,password=<pass> //<IP address>/share/
+/mnt/<mountpoint>
+succeed.
+However, command lines of the form:
+mount -t cifs -o credentials=<filename> //<IP address>/share/ /mnt/<mountpoint>
+fail with the error "Invalid argument".
+For diagnostic purposes, I have attempted to mount the volumes directly
+using mount.cifs (v5.5).  
+Once again, commands of the form:
+mount.cifs //<IP address>/<share> /mnt/<mountpoint>/ -o
+username=<user>,password=<password>
+succeed.
+However, commands of the form:
+mount.cifs //<IP address>/<share> /mnt/<mountpoint>/ -o credentials=<file>
+fail with the error message:
+error -1 (Unknown error 4294967295) opening credential file <file>
+This is the case regardless of the location of the file (see
+http://samba.2283325.n4.nabble.com/Error-s-opening-credentials-file-td2518214.html)
+or its privileges.  The error persists, even when the command is executed
+from a root session and the credentials file has permissions 0777 and is in
+a subdirectory of /root.
+How can I get mount to work using a credentials file?
