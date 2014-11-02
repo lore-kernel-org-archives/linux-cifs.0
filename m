@@ -1,18 +1,22 @@
 From: "Roger Brooks" <r.s.brooks-EkmVulN54Sk@public.gmane.org>
 Subject: RE: Unable to mount using credentials file
-Date: Sun, 2 Nov 2014 08:44:47 +0100
-Message-ID: <000201cff670$e15d1e60$a4175b20$@ieee.org>
+Date: Sun, 2 Nov 2014 11:09:12 +0100
+Message-ID: <000001cff685$0d849630$288dc290$@ieee.org>
 References: <loom.20141101T124621-513@post.gmane.org> <CANzfOVLmYUWPoTD8zF7oDFJ-XR57sPTBH=yJQ4mzPd2zgapFog@mail.gmail.com> <00bc01cff5ef$e5361770$afa24650$@ieee.org> <CAH2r5mupp47fyNw7t_EEvdQSzk-oNPNm8C9vfdNSvbMqr6GcPA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain;
-	charset="UTF-8"
+	charset="utf-8"
 Content-Transfer-Encoding: 8BIT
 To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mupp47fyNw7t_EEvdQSzk-oNPNm8C9vfdNSvbMqr6GcPA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: 
 Content-Language: de-ch
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
+
+P.S. To answer my own question below, experimentation shows that mount and umount still fulfill their normal functions for volumes mounted directly with mount.cifs.
+So, much as it irritates me not to know why mount -o credentials doesn't work, I can live with using mount.cifs instead.
+Thanks to all who responded!
 
 Thanks for the tips, Steve!
 
@@ -29,7 +33,7 @@ Also, I have read that mount maintains /etc/mtab.
 Does that mean that mount will not list volumes which I mounted directly with mount.cifs, and that I cannot use umount to unmount volumes mounted directly with mount.cifs?
 
 -----Original Message-----
-From: Steve French [mailto:smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org] 
+From: Steve French [mailto:smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org]
 Sent: Saturday, November 1, 2014 5:24 PM
 To: Roger Brooks
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -95,7 +99,7 @@ On Sat, Nov 1, 2014 at 11:21 AM, Roger Brooks <r.s.brooks-EkmVulN54Sk@public.gma
 > However, commands of the form:
 > mount.cifs //<IP address>/<share> /mnt/<mountpoint>/ -o credentials=<file> fail with the error message:
 > error -1 (Unknown error 4294967295) opening credential file <file> 
-> This is the case regardless of the location of the file (see
+> This is the case regardless of the location of the file (see 
 > http://samba.2283325.n4.nabble.com/Error-s-opening-credentials-file-td
 > 2518214.html) or its privileges.  The error persists, even when the 
 > command is executed from a root session and the credentials file has permissions 0777 and is in a subdirectory of /root.
