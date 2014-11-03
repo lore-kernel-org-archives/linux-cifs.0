@@ -1,23 +1,56 @@
-From: =?UTF-8?B?R8O8bnRlciBLdWtrdWtr?= <linux-KQewbsS9MvBBDgjK7y7TUQ@public.gmane.org>
-Subject: Re: Unable to mount using credentials file
-Date: Mon, 03 Nov 2014 00:49:42 +0100
-Message-ID: <5456C316.90308@kukkukk.com>
-References: <loom.20141101T124621-513@post.gmane.org> <CANzfOVLmYUWPoTD8zF7oDFJ-XR57sPTBH=yJQ4mzPd2zgapFog@mail.gmail.com> <00bc01cff5ef$e5361770$afa24650$@ieee.org> <CAH2r5mupp47fyNw7t_EEvdQSzk-oNPNm8C9vfdNSvbMqr6GcPA@mail.gmail.com> <000001cff685$0d849630$288dc290$@ieee.org> <CAH2r5mur=q=nJhpYWRRK_6CQgxYF067pxpiCtnHWQ3y9NiXX5A@mail.gmail.com> <001501cff6bd$292e5d70$7b8b1850$@ieee.org>
+From: "Roger Brooks" <r.s.brooks-EkmVulN54Sk@public.gmane.org>
+Subject: RE: Unable to mount using credentials file
+Date: Mon, 3 Nov 2014 08:34:41 +0100
+Message-ID: <000c01cff738$a265e610$e731b230$@ieee.org>
+References: <loom.20141101T124621-513@post.gmane.org> <CANzfOVLmYUWPoTD8zF7oDFJ-XR57sPTBH=yJQ4mzPd2zgapFog@mail.gmail.com> <00bc01cff5ef$e5361770$afa24650$@ieee.org> <CAH2r5mupp47fyNw7t_EEvdQSzk-oNPNm8C9vfdNSvbMqr6GcPA@mail.gmail.com> <000001cff685$0d849630$288dc290$@ieee.org> <CAH2r5mur=q=nJhpYWRRK_6CQgxYF067pxpiCtnHWQ3y9NiXX5A@mail.gmail.com> <001501cff6bd$292e5d70$7b8b1850$@ieee.org> <5456C316.90308@kukkukk.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: Roger Brooks <r.s.brooks-EkmVulN54Sk@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <001501cff6bd$292e5d70$7b8b1850$@ieee.org>
+In-Reply-To: <5456C316.90308-KQewbsS9MvBBDgjK7y7TUQ@public.gmane.org>
+Content-Language: de-ch
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
+
+Sorry, Gunter, I don't have strace:
+
+-ash: strace: not found
+
+mount.cifs is located at:
+
+/usr/syno/bin/mount.cifs
+
+I suspect that the installed version of mount (from BusyBox 1.16) is to=
+o old to correctly handle "-o credentials=3D<file>".
+I will try installing a newer version (BusyBox 1.21) and report back la=
+ter.
+
+However, this no longer has a high priority for me, as I can live with =
+calling mount.cifs directly.
+
+@Steve,
+mount.cifs is only v5.5 in my installation, but since calling it direct=
+ly works fine, I presume that the problem lies with the BusyBox version=
+ of mount and not with mount.cifs.
+Since mount works with "-o username=3D<user>,password=3D<password>", I =
+presume that it is finding mount.cifs, but is not passing "-o credentia=
+ls=3D<file>" correctly.
+
+Thanks for all of your help!
+
+-----Original Message-----
+=46rom: G=C3=BCnter Kukkukk [mailto:linux-KQewbsS9MvBBDgjK7y7TUQ@public.gmane.org]=20
+Sent: Monday, November 3, 2014 12:50 AM
+To: Roger Brooks; linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Subject: Re: Unable to mount using credentials file
 
 Am 02.11.2014 um 17:50 schrieb Roger Brooks:
 > Here is the output from mount -t cifs --verbose -o ... for the failin=
 g case:
-> mount: mounting //<IP address>/<share> on /mnt/<mountpoint>/ failed: =
-Invalid argument
-> There is still no output when I add --verbose to the successful case.
+> mount: mounting //<IP address>/<share> on /mnt/<mountpoint>/ failed:=20
+> Invalid argument There is still no output when I add --verbose to the=
+ successful case.
 > There is no verbose option listed for mount --help.
 > Thanks for your help.
 
@@ -33,7 +66,7 @@ Cheers, G=C3=BCnter
 
 >=20
 > -----Original Message-----
-> From: Steve French [mailto:smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org]=20
+> From: Steve French [mailto:smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org]
 > Sent: Sunday, November 2, 2014 5:30 PM
 > To: Roger Brooks
 > Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -43,10 +76,12 @@ Cheers, G=C3=BCnter
 fy "mount -t cifs"
 >=20
 > You can specify --verbose before the -o (see
-> http://linux.die.net/man/8/mount.cifs) and it will show the mount opt=
-ions being passed in to the kernel syscall so it would be useful for de=
-bugging to compare the exact parameters being passed in to the kernel i=
-n the working vs. failing case by specifying --verbose before the -o
+> http://linux.die.net/man/8/mount.cifs) and it will show the mount=20
+> options being passed in to the kernel syscall so it would be useful=20
+> for debugging to compare the exact parameters being passed in to the=20
+> kernel in the working vs. failing case by specifying --verbose before=
+=20
+> the -o
 >=20
 > On Sun, Nov 2, 2014 at 4:09 AM, Roger Brooks <r.s.brooks-EkmVulN54Sk@public.gmane.org> wr=
 ote:
@@ -161,7 +196,8 @@ ctly using mount.cifs (v5.5).
 >>> error -1 (Unknown error 4294967295) opening credential file <file>=20
 >>> This is the case regardless of the location of the file (see=20
 >>> http://samba.2283325.n4.nabble.com/Error-s-opening-credentials-file=
--t
+-
+>>> t
 >>> d
 >>> 2518214.html) or its privileges.  The error persists, even when the=
 =20
@@ -209,9 +245,9 @@ o=20
 >=20
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+=20
+> in the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org More majordomo=20
+> info at  http://vger.kernel.org/majordomo-info.html
 >=20
 
 
