@@ -1,17 +1,25 @@
 From: "Roger Brooks" <r.s.brooks-EkmVulN54Sk@public.gmane.org>
 Subject: RE: Unable to mount using credentials file
-Date: Mon, 3 Nov 2014 08:34:41 +0100
-Message-ID: <000c01cff738$a265e610$e731b230$@ieee.org>
+Date: Mon, 3 Nov 2014 08:54:03 +0100
+Message-ID: <003101cff73b$57fa8240$07ef86c0$@ieee.org>
 References: <loom.20141101T124621-513@post.gmane.org> <CANzfOVLmYUWPoTD8zF7oDFJ-XR57sPTBH=yJQ4mzPd2zgapFog@mail.gmail.com> <00bc01cff5ef$e5361770$afa24650$@ieee.org> <CAH2r5mupp47fyNw7t_EEvdQSzk-oNPNm8C9vfdNSvbMqr6GcPA@mail.gmail.com> <000001cff685$0d849630$288dc290$@ieee.org> <CAH2r5mur=q=nJhpYWRRK_6CQgxYF067pxpiCtnHWQ3y9NiXX5A@mail.gmail.com> <001501cff6bd$292e5d70$7b8b1850$@ieee.org> <5456C316.90308@kukkukk.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <5456C316.90308-KQewbsS9MvBBDgjK7y7TUQ@public.gmane.org>
+In-Reply-To: 
 Content-Language: de-ch
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
+
+P.S.  mount in BusyBox v1.21.1 does list a verbose option (-v) in its h=
+elp, but its output (in both cases) is no different from that of mount =
+in BusyBox v1.16.
+Presumably I could fix this by installing a "real" mount command and br=
+eaking the link to BusyBox, but I don't find it worth the effort, since=
+ I can call mount.cifs directly.
+Thanks again for all of your help!
 
 Sorry, Gunter, I don't have strace:
 
@@ -40,7 +48,7 @@ ls=3D<file>" correctly.
 Thanks for all of your help!
 
 -----Original Message-----
-=46rom: G=C3=BCnter Kukkukk [mailto:linux-KQewbsS9MvBBDgjK7y7TUQ@public.gmane.org]=20
+=46rom: G=C3=BCnter Kukkukk [mailto:linux-KQewbsS9MvBBDgjK7y7TUQ@public.gmane.org]
 Sent: Monday, November 3, 2014 12:50 AM
 To: Roger Brooks; linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Subject: Re: Unable to mount using credentials file
@@ -194,7 +202,7 @@ ctly using mount.cifs (v5.5).
 >>> mount.cifs //<IP address>/<share> /mnt/<mountpoint>/ -o credentials=
 =3D<file> fail with the error message:
 >>> error -1 (Unknown error 4294967295) opening credential file <file>=20
->>> This is the case regardless of the location of the file (see=20
+>>> This is the case regardless of the location of the file (see
 >>> http://samba.2283325.n4.nabble.com/Error-s-opening-credentials-file=
 -
 >>> t
