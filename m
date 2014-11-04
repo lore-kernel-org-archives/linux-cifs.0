@@ -1,42 +1,63 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Unable to mount using credentials file
-Date: Mon, 3 Nov 2014 08:40:01 -0600
-Message-ID: <CAH2r5mvxygva+WL2ExeWNky5GdbF88hJwOdcQQshoxPTrTnZeA@mail.gmail.com>
-References: <loom.20141101T124621-513@post.gmane.org> <CANzfOVLmYUWPoTD8zF7oDFJ-XR57sPTBH=yJQ4mzPd2zgapFog@mail.gmail.com>
- <00bc01cff5ef$e5361770$afa24650$@ieee.org> <CAH2r5mupp47fyNw7t_EEvdQSzk-oNPNm8C9vfdNSvbMqr6GcPA@mail.gmail.com>
- <000001cff685$0d849630$288dc290$@ieee.org> <CAH2r5mur=q=nJhpYWRRK_6CQgxYF067pxpiCtnHWQ3y9NiXX5A@mail.gmail.com>
- <001501cff6bd$292e5d70$7b8b1850$@ieee.org> <5456C316.90308@kukkukk.com> <000c01cff738$a265e610$e731b230$@ieee.org>
+From: "Roger Brooks" <r.s.brooks-EkmVulN54Sk@public.gmane.org>
+Subject: RE: Unable to mount using credentials file
+Date: Tue, 4 Nov 2014 14:31:25 +0100
+Message-ID: <000601cff833$a28ec5c0$e7ac5140$@ieee.org>
+References: <loom.20141101T124621-513@post.gmane.org> <CANzfOVLmYUWPoTD8zF7oDFJ-XR57sPTBH=yJQ4mzPd2zgapFog@mail.gmail.com> <00bc01cff5ef$e5361770$afa24650$@ieee.org> <CAH2r5mupp47fyNw7t_EEvdQSzk-oNPNm8C9vfdNSvbMqr6GcPA@mail.gmail.com> <000001cff685$0d849630$288dc290$@ieee.org> <CAH2r5mur=q=nJhpYWRRK_6CQgxYF067pxpiCtnHWQ3y9NiXX5A@mail.gmail.com> <001501cff6bd$292e5d70$7b8b1850$@ieee.org> <5456C316.90308@kukkukk.com> <000c01cff738$a265e610$e731b230$@ieee.org> <CAH2r5mvxygva+WL2ExeWNky5GdbF88hJwOdcQQshoxPTrTnZeA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Roger Brooks <r.s.brooks-EkmVulN54Sk@public.gmane.org>
+To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <000c01cff738$a265e610$e731b230$@ieee.org>
+In-Reply-To: <CAH2r5mvxygva+WL2ExeWNky5GdbF88hJwOdcQQshoxPTrTnZeA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Language: de-ch
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Makes sense - it looks like it sis simply not finding mount.cifs so in
-your case you will want to call mount.cifs directly or move it into
-/sbin
+Actually neither mount nor mount.cifs could resolve the computer name u=
+ntil I added wins to /etc/nsswitch.conf.
+After I did so, neither had any difficulty mounting volumes by computer=
+ name instead of by IP address.
+Your prediction is correct, however, concerning mount commands without =
+credentials on the command line.
+In that case mount fails with "Invalid argument", whereas mount.cifs pr=
+ompts for a password.
+Unfortunately, mount does not seem to be looking for mount.cifs in /sbi=
+n.
+I was afraid of moving mount.cifs from where Synology puts it, so I add=
+ed a softlink (with privileges 777) in /sbin to /usr/syno/bin/mount.cif=
+s, but the behaviour of mount remains unchanged.
+Why would mount require a fixed location for mount.cifs?  Why wouldn't =
+it just search the PATH?
+IAC, I can just call mount.cifs directly.
 
-One way to think about this is that if you don't have mount.cifs (or
-if it is not in the path, usually /sbin/mount.cifs, where mount is
-looking for it) then the mount command will pass the mount options
-directly to the kernel (cifs.ko) without parsing them.  This is ok for
-something like:
-       mount -t cifs //192.168.0.101/sharename /mnt -o
-username=3Dmyuser,password=3Dmypassword
-but won't work when you pass in something which has to be resolved in
-userspace berfore getting to the kernel.  In particular it won't work
-if you have - a credential file (since mount.cifs has to open that),
-or if you mount using a tcp name of the server (instead of using the
-server's ip address) e.g. mount -t cifs //myserver/myshare /mnt
-instead of mount -t cifs //ip-address/myshare and will also fail if
-you don't specify the password (because mount won't prompt for a
+-----Original Message-----
+=46rom: Steve French [mailto:smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org]=20
+Sent: Monday, November 3, 2014 3:40 PM
+To: Roger Brooks
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Subject: Re: Unable to mount using credentials file
+
+Makes sense - it looks like it sis simply not finding mount.cifs so in =
+your case you will want to call mount.cifs directly or move it into /sb=
+in
+
+One way to think about this is that if you don't have mount.cifs (or if=
+ it is not in the path, usually /sbin/mount.cifs, where mount is lookin=
+g for it) then the mount command will pass the mount options directly t=
+o the kernel (cifs.ko) without parsing them.  This is ok for something =
+like:
+       mount -t cifs //192.168.0.101/sharename /mnt -o username=3Dmyuse=
+r,password=3Dmypassword
+but won't work when you pass in something which has to be resolved in u=
+serspace berfore getting to the kernel.  In particular it won't work if=
+ you have - a credential file (since mount.cifs has to open that), or i=
+f you mount using a tcp name of the server (instead of using the server=
+'s ip address) e.g. mount -t cifs //myserver/myshare /mnt instead of mo=
+unt -t cifs //ip-address/myshare and will also fail if you don't specif=
+y the password (because mount won't prompt for a
 password if missing).   Most of the work in mount is done in kernel
-(at least for the case of cifs) but opening credential files, looking
-up hostnames and prompting for the password are exceptions.
+(at least for the case of cifs) but opening credential files, looking u=
+p hostnames and prompting for the password are exceptions.
 
 
 
@@ -120,11 +141,12 @@ e successful case.
 ify "mount -t cifs"
 >>
 >> You can specify --verbose before the -o (see
->> http://linux.die.net/man/8/mount.cifs) and it will show the mount
->> options being passed in to the kernel syscall so it would be useful
->> for debugging to compare the exact parameters being passed in to the
+>> http://linux.die.net/man/8/mount.cifs) and it will show the mount=20
+>> options being passed in to the kernel syscall so it would be useful=20
+>> for debugging to compare the exact parameters being passed in to the=
+=20
 >> kernel in the working vs. failing case by specifying --verbose befor=
-e
+e=20
 >> the -o
 >>
 >> On Sun, Nov 2, 2014 at 4:09 AM, Roger Brooks <r.s.brooks-EkmVulN54Sk@public.gmane.org> w=
@@ -165,7 +187,7 @@ mounted directly with mount.cifs?
 >>> using /sbin/mount.cifs directly should be fine.   When you mount wi=
 th
 >>> verbose mount option does it show any useful differences between th=
-e
+e=20
 >>> two cases (working vs. failing)
 >>>
 >>> On Sat, Nov 1, 2014 at 11:21 AM, Roger Brooks <r.s.brooks-EkmVulN54Sk@public.gmane.org>=
@@ -231,20 +253,22 @@ nt/<mountpoint> fail with the error "Invalid argument".
 >>>> For diagnostic purposes, I have attempted to mount the volumes dir=
 ectly using mount.cifs (v5.5).
 >>>> Once again, commands of the form:
->>>> mount.cifs //<IP address>/<share> /mnt/<mountpoint>/ -o
+>>>> mount.cifs //<IP address>/<share> /mnt/<mountpoint>/ -o=20
 >>>> username=3D<user>,password=3D<password>
 >>>> succeed.
 >>>> However, commands of the form:
 >>>> mount.cifs //<IP address>/<share> /mnt/<mountpoint>/ -o credential=
 s=3D<file> fail with the error message:
->>>> error -1 (Unknown error 4294967295) opening credential file <file>
+>>>> error -1 (Unknown error 4294967295) opening credential file <file>=
+=20
 >>>> This is the case regardless of the location of the file (see
 >>>> http://samba.2283325.n4.nabble.com/Error-s-opening-credentials-fil=
-e-
+e
+>>>> -
 >>>> t
 >>>> d
 >>>> 2518214.html) or its privileges.  The error persists, even when th=
-e
+e=20
 >>>> command is executed from a root session and the credentials file h=
 as permissions 0777 and is in a subdirectory of /root.
 >>>> How can I get mount to work using a credentials file?
@@ -254,17 +278,15 @@ as permissions 0777 and is in a subdirectory of /root.
 >>>> --
 >>>> To unsubscribe from this list: send the line "unsubscribe linux-ci=
 fs"
->>>> in the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org More majordo=
-mo
->>>> info at  http://vger.kernel.org/majordomo-info.html
+>>>> in the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org More=20
+>>>> majordomo info at  http://vger.kernel.org/majordomo-info.html
 >>>>
 >>>>
 >>>> --
 >>>> To unsubscribe from this list: send the line "unsubscribe linux-ci=
 fs"
->>>> in the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org More majordo=
-mo
->>>> info at  http://vger.kernel.org/majordomo-info.html
+>>>> in the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org More=20
+>>>> majordomo info at  http://vger.kernel.org/majordomo-info.html
 >>>
 >>>
 >>>
@@ -277,7 +299,7 @@ mo
 >>> To unsubscribe from this list: send the line "unsubscribe linux-cif=
 s"
 >>> in the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org More majordom=
-o
+o=20
 >>> info at  http://vger.kernel.org/majordomo-info.html
 >>
 >>
@@ -290,7 +312,8 @@ o
 >> --
 >> To unsubscribe from this list: send the line "unsubscribe linux-cifs=
 "
->> in the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org More majordomo
+>> in the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org More majordomo=
+=20
 >> info at  http://vger.kernel.org/majordomo-info.html
 >>
 >
@@ -300,13 +323,13 @@ o
 >
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+=20
+> in the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org More majordomo=20
+> info at  http://vger.kernel.org/majordomo-info.html
 
 
 
---=20
+--
 Thanks,
 
 Steve
