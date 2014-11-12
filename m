@@ -1,101 +1,63 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v2 1/5] common: re-enable tests that require scratch dev
- on NFS
-Date: Wed, 12 Nov 2014 12:36:13 -0600
-Message-ID: <CAH2r5muuJRcC4YgFkwUeUcCeEntgY+4POF8-bwmox64wXykuTw@mail.gmail.com>
-References: <1414775040-4051-1-git-send-email-eguan@redhat.com> <1414775040-4051-2-git-send-email-eguan@redhat.com>
+Subject: Re: [PATCH] common: enable tests that require scratch device on CIFS
+Date: Wed, 12 Nov 2014 17:26:13 -0600
+Message-ID: <CAH2r5mtCPVt7+fyCjvDrLtOSzX1-+YQ_ZPhyU5gjFP7c1DJFKw@mail.gmail.com>
+References: <1415617191-17246-1-git-send-email-eguan@redhat.com>
+ <CAH2r5muXH7HSoM0TQUsPXq1RM-dLdZSfzuOKK1zZdKe0OANAhg@mail.gmail.com> <20141110160309.GI2863@dhcp-13-216.nay.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Cc: fstests-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	"linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	dros-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 To: Eryu Guan <eguan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1414775040-4051-2-git-send-email-eguan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <20141110160309.GI2863-Y5OA6DF/u0kMsqdw6vYspB/sF2h8X+2i0E9HWUfgJXw@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-There should be a check to make sure SCRATCH_MNT exists before you
-wipe the whole disk ....
+I get newly enabled test 294 passing on cifs mounts to Samba.
 
-+# remove all files in $SCRATCH_MNT, useful when testing on NFS/CIFS
-+_scratch_cleanup_files()
-+{
-+       _scratch_mount
-+       rm -rf $SCRATCH_MNT/*
-+       _scratch_unmount
-+}
-+
-so if no SCRATCH_MNT then this does rm -rf/*
-right ... (and wipes out your whole system ...)
+What is best way to get the mount options passed to the mount of
+scratch dev so it doesn't prompt for it?
 
-On Fri, Oct 31, 2014 at 12:03 PM, Eryu Guan <eguan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> This commit disables tests requires scratch dev running on NFS
+(seems to ignore the mount options in TEST_FS_MOUNT_OPTS so prompts
+multiple times for password of scratch mount)
+
+On Mon, Nov 10, 2014 at 10:03 AM, Eryu Guan <eguan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> On Mon, Nov 10, 2014 at 09:32:34AM -0600, Steve French wrote:
+>> Failures: generic/035 generic/074 generic/120 generic/184 generic/192
+>> generic/193 generic/215 generic/237 generic/258 generic/294
+>> generic/306 generic/307 generic/313 generic/317 generic/319
+>>
+>> Test 258 is a Samba server bug (and does work to Windows server).  074
+>> and 215 are passing for me for both CIFS and SMB3, 035 was only
+>> failing for SMB2/SMB3 (and NFS) for me, not CIFS
 >
-> c041421 xfstests: stop special casing nfs and udf
+> generic/074 is passing for me too now.
 >
-> Now re-enable them to get a larger test coverage on NFS.
+> generic/215 fails like:
+> --- tests/generic/215.out       2013-10-19 01:23:10.352848003 +0800
+> +++ /root/xfstests/results//generic/215.out.bad 2014-11-10 23:59:41.619045914 +0800
+> @@ -5,4 +5,6 @@
+>  4096+0 records out
 >
-> Signed-off-by: Eryu Guan <eguan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  common/rc | 22 +++++++++++++++++++---
->  1 file changed, 19 insertions(+), 3 deletions(-)
+>  writing via mmap
+> +FAIL: mtime not update after mapped write
+> +FAIL: ctime not update after mapped write
+>  *** done
 >
-> diff --git a/common/rc b/common/rc
-> index 747cf72..ae03712 100644
-> --- a/common/rc
-> +++ b/common/rc
-> @@ -551,6 +551,14 @@ _mkfs_dev()
->      rm -f $tmp_dir.mkfserr $tmp_dir.mkfsstd
->  }
+>> Test 184 passes to Samba, but requires "sfu" (mount.cifs mount option)
+>> if mounting with SMB2/SMB3 or mounting to Windows (in order to emulate
+>> FIFO and device files)
+>>
+>> 192 and 193 and 313 are time stamp related problems.
+>>
+>> Are you using at least 3.17 kernel?  We put various fixes in 3.17 to
+>> address problems fsx pointed out.
 >
-> +# remove all files in $SCRATCH_MNT, useful when testing on NFS/CIFS
-> +_scratch_cleanup_files()
-> +{
-> +       _scratch_mount
-> +       rm -rf $SCRATCH_MNT/*
-> +       _scratch_unmount
-> +}
-> +
->  _scratch_mkfs()
->  {
->      case $FSTYP in
-> @@ -558,7 +566,9 @@ _scratch_mkfs()
->          _scratch_mkfs_xfs $*
->         ;;
->      nfs*)
-> -       # do nothing for nfs
-> +       # unable to re-create NFS, just remove all files in $SCRATCH_MNT to
-> +       # avoid EEXIST caused by the leftover files created in previous runs
-> +        _scratch_cleanup_files
->         ;;
->      cifs)
->         # do nothing for cifs
-> @@ -1032,8 +1042,14 @@ _require_scratch_nocheck()
->  {
->      case "$FSTYP" in
->         nfs*)
-> -                 _notrun "requires a scratch device"
-> -                ;;
-> +               echo $SCRATCH_DEV | grep -q ":/" > /dev/null 2>&1
-> +               if [ -z "$SCRATCH_DEV" -o "$?" != "0" ]; then
-> +                       _notrun "this test requires a valid \$SCRATCH_DEV"
-> +               fi
-> +               if [ ! -d "$SCRATCH_MNT" ]; then
-> +                       _notrun "this test requires a valid \$SCRATCH_MNT"
-> +               fi
-> +               ;;
->         cifs)
->                 _notrun "requires a scratch device"
->                 ;;
-> --
-> 1.9.3
+> Yes, I'm using 3.18-rc2+ kernel.
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Thanks,
+> Eryu
 
 
 
