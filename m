@@ -1,59 +1,85 @@
-From: Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>
-Subject: Re: [PATCH] common: enable tests that require scratch device on CIFS
-Date: Thu, 13 Nov 2014 15:58:13 +1100
-Message-ID: <20141113045813.GG28565@dastard>
-References: <1415617191-17246-1-git-send-email-eguan@redhat.com>
- <CAH2r5muXH7HSoM0TQUsPXq1RM-dLdZSfzuOKK1zZdKe0OANAhg@mail.gmail.com>
- <20141110160309.GI2863@dhcp-13-216.nay.redhat.com>
- <CAH2r5mtCPVt7+fyCjvDrLtOSzX1-+YQ_ZPhyU5gjFP7c1DJFKw@mail.gmail.com>
- <20141113032824.GB28565@dastard>
- <CAH2r5mtEq0gyNn+8+_UzDc0KRskHnnzDHipa=hqeFOf8y1jH1A@mail.gmail.com>
- <20141113042756.GE28565@dastard>
- <CAH2r5mt_fvF1dvmbWPq=TBrXgTiyd-xmMgQjQA7+hqb3=1qWFQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Eryu Guan <eguan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, fstests-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <CAH2r5mt_fvF1dvmbWPq=TBrXgTiyd-xmMgQjQA7+hqb3=1qWFQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Pieter Smith <pieter@boesman.nl>
+Subject: [PATCH 14/56] fs/cifs: support compiling out splice
+Date: Thu, 13 Nov 2014 22:22:51 +0100
+Message-ID: <1415913813-362-15-git-send-email-pieter@boesman.nl>
+References: <pieter@boesman.nl>
+ <1415913813-362-1-git-send-email-pieter@boesman.nl>
+Cc: Josh Triplett <josh@joshtriplett.org>,
+	Steve French <sfrench@samba.org>,
+	linux-cifs@vger.kernel.org (open list:COMMON INTERNET F...),
+	samba-technical@lists.samba.org (moderated list:COMMON INTERNET F...),
+	linux-kernel@vger.kernel.org (open list)
+To: pieter@boesman.nl
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1415913813-362-1-git-send-email-pieter@boesman.nl>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Wed, Nov 12, 2014 at 10:40:35PM -0600, Steve French wrote:
-> On Wed, Nov 12, 2014 at 10:27 PM, Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org> wrote:
-> > On Wed, Nov 12, 2014 at 10:08:34PM -0600, Steve French wrote:
-> >> On Wed, Nov 12, 2014 at 9:28 PM, Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org> wrote:
-> >> > On Wed, Nov 12, 2014 at 05:26:13PM -0600, Steve French wrote:
-> >> >> I get newly enabled test 294 passing on cifs mounts to Samba.
-> >> >>
-> >> >> What is best way to get the mount options passed to the mount of
-> >> >> scratch dev so it doesn't prompt for it?
-> >> >
-> >> > # MOUNT_OPTIONS="-o ...." ./check -g auto
-> >>
-> >> much better - that worked - thanks
-> >>
-> >> I had been using TEST_FS_MOUNT_OPTS (so I could have multiple sections
-> >> in local.config) rather
-> >> than MOUNT_OPTIONS
-> >
-> > BTW, why aren't you using CIFS_MOUNT_OPTIONS to define the login
-> > creds for both the test and scratch devices? That's what it was
-> > added for....
-> 
-> When specifying multiple sections in local.config (a common case for us
-> is to have one section to run tests with cifs dialect, then run again with
-> smb2, then again with smb3 dialect etc.). Pavel had indicated that to do this
-> you must use TEST_FS_MOUNT_OPTS instead of CIFS_MOUNT_OPTIONS
-> if you have multiple sections.  I haven't found a way around this.
+Compile out splice support from cifs when the splice-family of syscalls is not
+supported by the system (i.e. CONFIG_SYSCALL_SPLICE is undefined).
 
-Adding CIFS_MOUNT_OPTIONS in each section that requires a
-different definition should just work. If it doesn't, then please
-fix get_next_config() so it does and post the patch....
+Signed-off-by: Pieter Smith <pieter@boesman.nl>
+---
+ fs/cifs/cifsfs.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
--Dave.
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index ac4f260..b2bd0a0 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -902,7 +902,7 @@ const struct file_operations cifs_file_ops = {
+ 	.fsync = cifs_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap  = cifs_file_mmap,
+-	.splice_read = generic_file_splice_read,
++	SPLICE_READ_INIT(generic_file_splice_read)
+ 	.llseek = cifs_llseek,
+ #ifdef CONFIG_CIFS_POSIX
+ 	.unlocked_ioctl	= cifs_ioctl,
+@@ -921,7 +921,7 @@ const struct file_operations cifs_file_strict_ops = {
+ 	.fsync = cifs_strict_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap = cifs_file_strict_mmap,
+-	.splice_read = generic_file_splice_read,
++	SPLICE_READ_INIT(generic_file_splice_read)
+ 	.llseek = cifs_llseek,
+ #ifdef CONFIG_CIFS_POSIX
+ 	.unlocked_ioctl	= cifs_ioctl,
+@@ -941,7 +941,7 @@ const struct file_operations cifs_file_direct_ops = {
+ 	.fsync = cifs_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap = cifs_file_mmap,
+-	.splice_read = generic_file_splice_read,
++	SPLICE_READ_INIT(generic_file_splice_read)
+ #ifdef CONFIG_CIFS_POSIX
+ 	.unlocked_ioctl  = cifs_ioctl,
+ #endif /* CONFIG_CIFS_POSIX */
+@@ -959,7 +959,7 @@ const struct file_operations cifs_file_nobrl_ops = {
+ 	.fsync = cifs_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap  = cifs_file_mmap,
+-	.splice_read = generic_file_splice_read,
++	SPLICE_READ_INIT(generic_file_splice_read)
+ 	.llseek = cifs_llseek,
+ #ifdef CONFIG_CIFS_POSIX
+ 	.unlocked_ioctl	= cifs_ioctl,
+@@ -977,7 +977,7 @@ const struct file_operations cifs_file_strict_nobrl_ops = {
+ 	.fsync = cifs_strict_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap = cifs_file_strict_mmap,
+-	.splice_read = generic_file_splice_read,
++	SPLICE_READ_INIT(generic_file_splice_read)
+ 	.llseek = cifs_llseek,
+ #ifdef CONFIG_CIFS_POSIX
+ 	.unlocked_ioctl	= cifs_ioctl,
+@@ -996,7 +996,7 @@ const struct file_operations cifs_file_direct_nobrl_ops = {
+ 	.fsync = cifs_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap = cifs_file_mmap,
+-	.splice_read = generic_file_splice_read,
++	SPLICE_READ_INIT(generic_file_splice_read)
+ #ifdef CONFIG_CIFS_POSIX
+ 	.unlocked_ioctl  = cifs_ioctl,
+ #endif /* CONFIG_CIFS_POSIX */
 -- 
-Dave Chinner
-david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org
+1.9.1
