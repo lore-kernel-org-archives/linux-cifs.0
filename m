@@ -1,69 +1,94 @@
-From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] Convert MessageID in smb2_hdr to LE
-Date: Fri, 14 Nov 2014 13:41:51 +0000
-Message-ID: <1415972511-3150-1-git-send-email-sprabhu@redhat.com>
-To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH v2 1/5] common: re-enable tests that require scratch dev
+ on NFS
+Date: Fri, 14 Nov 2014 11:02:50 -0600
+Message-ID: <CAH2r5msD-FDDvUL5Gt+7Fzt-tvduS93sxM-PG9dZjvk0ED53QA@mail.gmail.com>
+References: <1414775040-4051-1-git-send-email-eguan@redhat.com>
+ <1414775040-4051-2-git-send-email-eguan@redhat.com> <CAH2r5muuJRcC4YgFkwUeUcCeEntgY+4POF8-bwmox64wXykuTw@mail.gmail.com>
+ <20141113033317.GC28565@dastard>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: Eryu Guan <eguan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, fstests-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	"linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Weston Andros Adamson <dros-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+To: Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20141113033317.GC28565@dastard>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-We have encountered failures when When testing smb2 mounts on ppc64
-machines when using both Samba as well as Windows 2012.
+On Wed, Nov 12, 2014 at 9:33 PM, Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org> wrote:
+> On Wed, Nov 12, 2014 at 12:36:13PM -0600, Steve French wrote:
+>> On Fri, Oct 31, 2014 at 12:03 PM, Eryu Guan <eguan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+>> > This commit disables tests requires scratch dev running on NFS
+>> >
+>> > c041421 xfstests: stop special casing nfs and udf
+>> >
+>> > Now re-enable them to get a larger test coverage on NFS.
+>> >
+>> > Signed-off-by: Eryu Guan <eguan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>> > ---
+>> >  common/rc | 22 +++++++++++++++++++---
+>> >  1 file changed, 19 insertions(+), 3 deletions(-)
+>> >
+>> > diff --git a/common/rc b/common/rc
+>> > index 747cf72..ae03712 100644
+>> > --- a/common/rc
+>> > +++ b/common/rc
+>> > @@ -551,6 +551,14 @@ _mkfs_dev()
+>> >      rm -f $tmp_dir.mkfserr $tmp_dir.mkfsstd
+>> >  }
+>> >
+>> > +# remove all files in $SCRATCH_MNT, useful when testing on NFS/CIFS
+>> > +_scratch_cleanup_files()
+>> > +{
+>> > +       _scratch_mount
+>> > +       rm -rf $SCRATCH_MNT/*
+>> > +       _scratch_unmount
+>> > +}
+>>
+>> There should be a check to make sure SCRATCH_MNT exists before you
+>> wipe the whole disk ....
+>>
+>> so if no SCRATCH_MNT then this does rm -rf/*
+>> right ... (and wipes out your whole system ...)
+>
+> You can't get to that function until after all the checks that
+> SCRATCH_MNT exists. i.e. this happens during _scratch_mkfs, and that
+> is only called in tests after all the startup checks validate
+> devices and mounts exist. i.e. see common/config::get_next_config()
 
-On poking around, the problem was determined to be caused by the
-high endian MessageID passed in the header for smb2. On checking the
-corresponding MID for smb1 is converted to LE before being sent on the
-wire.
+Well, I reproduced it easily enough again today (after taking a
+snapshot of the VM)
+by simply running generic/120 against NFS with SCRATCH_MNT not
+specified in local.config
+Dros also ran into this problem.
 
-We have tested this using the RHEL 7 kernel where the patch fixes the
-issue.
+The patch below fixes it for me but it wasn't immediately obvious how to best
+return info to the user (ie print messages that make sense here -
+"echo" seems to be supressed
+in common/rc and notrun exits and logs it to a file but not to the
+screen in this case)
 
-Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/cifsglob.h | 10 ++++++++--
- fs/cifs/smb2pdu.h  |  2 +-
- 2 files changed, 9 insertions(+), 3 deletions(-)
-
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 02a33e5..279fee8 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -662,15 +662,21 @@ set_credits(struct TCP_Server_Info *server, const int val)
- }
- 
- static inline __u64
--get_next_mid64(struct TCP_Server_Info *server)
-+_get_next_mid64(struct TCP_Server_Info *server)
+sfrench@ubuntu:~/xfstests$ git diff -a
+diff --git a/common/rc b/common/rc
+index d5e3aff..866244b 100644
+--- a/common/rc
++++ b/common/rc
+@@ -555,6 +555,9 @@ _mkfs_dev()
+ _scratch_cleanup_files()
  {
- 	return server->ops->get_next_mid(server);
+        _scratch_mount
++       if ! [ "$SCRATCH_MNT" ]; then
++               _notrun "this test requires a \$SCRATCH_MNT to be specified"
++       fi
+        rm -rf $SCRATCH_MNT/*
+        _scratch_unmount
  }
- 
-+static inline __le64
-+get_next_mid64(struct TCP_Server_Info *server)
-+{
-+	return cpu_to_le64(_get_next_mid64(server));
-+}
-+
- static inline __le16
- get_next_mid(struct TCP_Server_Info *server)
- {
--	__u16 mid = get_next_mid64(server);
-+	__u16 mid = _get_next_mid64(server);
- 	/*
- 	 * The value in the SMB header should be little endian for easy
- 	 * on-the-wire decoding.
-diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index e3188ab..ac27eac 100644
---- a/fs/cifs/smb2pdu.h
-+++ b/fs/cifs/smb2pdu.h
-@@ -110,7 +110,7 @@ struct smb2_hdr {
- 	__le16 CreditRequest;  /* CreditResponse */
- 	__le32 Flags;
- 	__le32 NextCommand;
--	__u64  MessageId;	/* opaque - so can stay little endian */
-+	__u64  MessageId;
- 	__le32 ProcessId;
- 	__u32  TreeId;		/* opaque - so do not make little endian */
- 	__u64  SessionId;	/* opaque - so do not make little endian */
+
+
 -- 
-1.9.3
+Thanks,
+
+Steve
