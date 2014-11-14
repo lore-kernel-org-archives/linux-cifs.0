@@ -1,85 +1,69 @@
-From: Pieter Smith <pieter@boesman.nl>
-Subject: [PATCH 14/56] fs/cifs: support compiling out splice
-Date: Thu, 13 Nov 2014 22:22:51 +0100
-Message-ID: <1415913813-362-15-git-send-email-pieter@boesman.nl>
-References: <pieter@boesman.nl>
- <1415913813-362-1-git-send-email-pieter@boesman.nl>
-Cc: Josh Triplett <josh@joshtriplett.org>,
-	Steve French <sfrench@samba.org>,
-	linux-cifs@vger.kernel.org (open list:COMMON INTERNET F...),
-	samba-technical@lists.samba.org (moderated list:COMMON INTERNET F...),
-	linux-kernel@vger.kernel.org (open list)
-To: pieter@boesman.nl
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1415913813-362-1-git-send-email-pieter@boesman.nl>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] Convert MessageID in smb2_hdr to LE
+Date: Fri, 14 Nov 2014 13:41:51 +0000
+Message-ID: <1415972511-3150-1-git-send-email-sprabhu@redhat.com>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Compile out splice support from cifs when the splice-family of syscalls is not
-supported by the system (i.e. CONFIG_SYSCALL_SPLICE is undefined).
+We have encountered failures when When testing smb2 mounts on ppc64
+machines when using both Samba as well as Windows 2012.
 
-Signed-off-by: Pieter Smith <pieter@boesman.nl>
+On poking around, the problem was determined to be caused by the
+high endian MessageID passed in the header for smb2. On checking the
+corresponding MID for smb1 is converted to LE before being sent on the
+wire.
+
+We have tested this using the RHEL 7 kernel where the patch fixes the
+issue.
+
+Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsfs.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ fs/cifs/cifsglob.h | 10 ++++++++--
+ fs/cifs/smb2pdu.h  |  2 +-
+ 2 files changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index ac4f260..b2bd0a0 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -902,7 +902,7 @@ const struct file_operations cifs_file_ops = {
- 	.fsync = cifs_fsync,
- 	.flush = cifs_flush,
- 	.mmap  = cifs_file_mmap,
--	.splice_read = generic_file_splice_read,
-+	SPLICE_READ_INIT(generic_file_splice_read)
- 	.llseek = cifs_llseek,
- #ifdef CONFIG_CIFS_POSIX
- 	.unlocked_ioctl	= cifs_ioctl,
-@@ -921,7 +921,7 @@ const struct file_operations cifs_file_strict_ops = {
- 	.fsync = cifs_strict_fsync,
- 	.flush = cifs_flush,
- 	.mmap = cifs_file_strict_mmap,
--	.splice_read = generic_file_splice_read,
-+	SPLICE_READ_INIT(generic_file_splice_read)
- 	.llseek = cifs_llseek,
- #ifdef CONFIG_CIFS_POSIX
- 	.unlocked_ioctl	= cifs_ioctl,
-@@ -941,7 +941,7 @@ const struct file_operations cifs_file_direct_ops = {
- 	.fsync = cifs_fsync,
- 	.flush = cifs_flush,
- 	.mmap = cifs_file_mmap,
--	.splice_read = generic_file_splice_read,
-+	SPLICE_READ_INIT(generic_file_splice_read)
- #ifdef CONFIG_CIFS_POSIX
- 	.unlocked_ioctl  = cifs_ioctl,
- #endif /* CONFIG_CIFS_POSIX */
-@@ -959,7 +959,7 @@ const struct file_operations cifs_file_nobrl_ops = {
- 	.fsync = cifs_fsync,
- 	.flush = cifs_flush,
- 	.mmap  = cifs_file_mmap,
--	.splice_read = generic_file_splice_read,
-+	SPLICE_READ_INIT(generic_file_splice_read)
- 	.llseek = cifs_llseek,
- #ifdef CONFIG_CIFS_POSIX
- 	.unlocked_ioctl	= cifs_ioctl,
-@@ -977,7 +977,7 @@ const struct file_operations cifs_file_strict_nobrl_ops = {
- 	.fsync = cifs_strict_fsync,
- 	.flush = cifs_flush,
- 	.mmap = cifs_file_strict_mmap,
--	.splice_read = generic_file_splice_read,
-+	SPLICE_READ_INIT(generic_file_splice_read)
- 	.llseek = cifs_llseek,
- #ifdef CONFIG_CIFS_POSIX
- 	.unlocked_ioctl	= cifs_ioctl,
-@@ -996,7 +996,7 @@ const struct file_operations cifs_file_direct_nobrl_ops = {
- 	.fsync = cifs_fsync,
- 	.flush = cifs_flush,
- 	.mmap = cifs_file_mmap,
--	.splice_read = generic_file_splice_read,
-+	SPLICE_READ_INIT(generic_file_splice_read)
- #ifdef CONFIG_CIFS_POSIX
- 	.unlocked_ioctl  = cifs_ioctl,
- #endif /* CONFIG_CIFS_POSIX */
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 02a33e5..279fee8 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -662,15 +662,21 @@ set_credits(struct TCP_Server_Info *server, const int val)
+ }
+ 
+ static inline __u64
+-get_next_mid64(struct TCP_Server_Info *server)
++_get_next_mid64(struct TCP_Server_Info *server)
+ {
+ 	return server->ops->get_next_mid(server);
+ }
+ 
++static inline __le64
++get_next_mid64(struct TCP_Server_Info *server)
++{
++	return cpu_to_le64(_get_next_mid64(server));
++}
++
+ static inline __le16
+ get_next_mid(struct TCP_Server_Info *server)
+ {
+-	__u16 mid = get_next_mid64(server);
++	__u16 mid = _get_next_mid64(server);
+ 	/*
+ 	 * The value in the SMB header should be little endian for easy
+ 	 * on-the-wire decoding.
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index e3188ab..ac27eac 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -110,7 +110,7 @@ struct smb2_hdr {
+ 	__le16 CreditRequest;  /* CreditResponse */
+ 	__le32 Flags;
+ 	__le32 NextCommand;
+-	__u64  MessageId;	/* opaque - so can stay little endian */
++	__u64  MessageId;
+ 	__le32 ProcessId;
+ 	__u32  TreeId;		/* opaque - so do not make little endian */
+ 	__u64  SessionId;	/* opaque - so do not make little endian */
 -- 
-1.9.1
+1.9.3
