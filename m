@@ -1,8 +1,8 @@
-From: milke-Bd11Sj57+SE@public.gmane.org
-Subject: re:
-Date: Fri, 14 Nov 2014 12:56:24 -0600
-Message-ID: <auto-000010318103@shoes.irkutsk.ru>
-Reply-To: mrsalimqadri-9uewiaClKEY@public.gmane.org
+From: salim-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: Re:
+Date: Fri, 14 Nov 2014 14:49:48 -0600
+Message-ID: <SERVER6BSqEMDpCnJ7100003426@server.hofko.lan>
+Reply-To: mrsalimqadri-/E1597aS9LQGXtTpemXPTA@public.gmane.org
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7BIT
