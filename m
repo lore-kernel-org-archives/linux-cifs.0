@@ -1,114 +1,142 @@
-From: Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>
+From: Eryu Guan <eguan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Subject: Re: [PATCH v2 1/5] common: re-enable tests that require scratch dev
  on NFS
-Date: Mon, 17 Nov 2014 16:41:41 +1100
-Message-ID: <20141117054141.GK23575@dastard>
+Date: Mon, 17 Nov 2014 14:06:03 +0800
+Message-ID: <20141117060603.GO2863@dhcp-13-216.nay.redhat.com>
 References: <1414775040-4051-1-git-send-email-eguan@redhat.com>
  <1414775040-4051-2-git-send-email-eguan@redhat.com>
  <CAH2r5muuJRcC4YgFkwUeUcCeEntgY+4POF8-bwmox64wXykuTw@mail.gmail.com>
  <20141113033317.GC28565@dastard>
  <CAH2r5msD-FDDvUL5Gt+7Fzt-tvduS93sxM-PG9dZjvk0ED53QA@mail.gmail.com>
  <20141115053533.GK2863@dhcp-13-216.nay.redhat.com>
+ <20141117054141.GK23575@dastard>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, fstests-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	"linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
 	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
 	Weston Andros Adamson <dros-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
-To: Eryu Guan <eguan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <20141115053533.GK2863-Y5OA6DF/u0kMsqdw6vYspB/sF2h8X+2i0E9HWUfgJXw@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+In-Reply-To: <20141117054141.GK23575@dastard>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, Nov 15, 2014 at 01:35:33PM +0800, Eryu Guan wrote:
-> On Fri, Nov 14, 2014 at 11:02:50AM -0600, Steve French wrote:
-> > On Wed, Nov 12, 2014 at 9:33 PM, Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org> wrote:
-> > > On Wed, Nov 12, 2014 at 12:36:13PM -0600, Steve French wrote:
-> > >> On Fri, Oct 31, 2014 at 12:03 PM, Eryu Guan <eguan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> > >> > This commit disables tests requires scratch dev running on NFS
-> > >> >
-> > >> > c041421 xfstests: stop special casing nfs and udf
-> > >> >
-> > >> > Now re-enable them to get a larger test coverage on NFS.
-> > >> >
-> > >> > Signed-off-by: Eryu Guan <eguan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> > >> > ---
-> > >> >  common/rc | 22 +++++++++++++++++++---
-> > >> >  1 file changed, 19 insertions(+), 3 deletions(-)
-> > >> >
-> > >> > diff --git a/common/rc b/common/rc
-> > >> > index 747cf72..ae03712 100644
-> > >> > --- a/common/rc
-> > >> > +++ b/common/rc
-> > >> > @@ -551,6 +551,14 @@ _mkfs_dev()
-> > >> >      rm -f $tmp_dir.mkfserr $tmp_dir.mkfsstd
-> > >> >  }
-> > >> >
-> > >> > +# remove all files in $SCRATCH_MNT, useful when testing on NFS/CIFS
-> > >> > +_scratch_cleanup_files()
-> > >> > +{
-> > >> > +       _scratch_mount
-> > >> > +       rm -rf $SCRATCH_MNT/*
-> > >> > +       _scratch_unmount
-> > >> > +}
-> > >>
-> > >> There should be a check to make sure SCRATCH_MNT exists before you
-> > >> wipe the whole disk ....
-> > >>
-> > >> so if no SCRATCH_MNT then this does rm -rf/*
-> > >> right ... (and wipes out your whole system ...)
-> > >
-> > > You can't get to that function until after all the checks that
-> > > SCRATCH_MNT exists. i.e. this happens during _scratch_mkfs, and that
-> > > is only called in tests after all the startup checks validate
-> > > devices and mounts exist. i.e. see common/config::get_next_config()
+On Mon, Nov 17, 2014 at 04:41:41PM +1100, Dave Chinner wrote:
+> On Sat, Nov 15, 2014 at 01:35:33PM +0800, Eryu Guan wrote:
+> > On Fri, Nov 14, 2014 at 11:02:50AM -0600, Steve French wrote:
+> > > On Wed, Nov 12, 2014 at 9:33 PM, Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org> wrote:
+> > > > On Wed, Nov 12, 2014 at 12:36:13PM -0600, Steve French wrote:
+> > > >> On Fri, Oct 31, 2014 at 12:03 PM, Eryu Guan <eguan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> > > >> > This commit disables tests requires scratch dev running on NFS
+> > > >> >
+> > > >> > c041421 xfstests: stop special casing nfs and udf
+> > > >> >
+> > > >> > Now re-enable them to get a larger test coverage on NFS.
+> > > >> >
+> > > >> > Signed-off-by: Eryu Guan <eguan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> > > >> > ---
+> > > >> >  common/rc | 22 +++++++++++++++++++---
+> > > >> >  1 file changed, 19 insertions(+), 3 deletions(-)
+> > > >> >
+> > > >> > diff --git a/common/rc b/common/rc
+> > > >> > index 747cf72..ae03712 100644
+> > > >> > --- a/common/rc
+> > > >> > +++ b/common/rc
+> > > >> > @@ -551,6 +551,14 @@ _mkfs_dev()
+> > > >> >      rm -f $tmp_dir.mkfserr $tmp_dir.mkfsstd
+> > > >> >  }
+> > > >> >
+> > > >> > +# remove all files in $SCRATCH_MNT, useful when testing on NFS/CIFS
+> > > >> > +_scratch_cleanup_files()
+> > > >> > +{
+> > > >> > +       _scratch_mount
+> > > >> > +       rm -rf $SCRATCH_MNT/*
+> > > >> > +       _scratch_unmount
+> > > >> > +}
+> > > >>
+> > > >> There should be a check to make sure SCRATCH_MNT exists before you
+> > > >> wipe the whole disk ....
+> > > >>
+> > > >> so if no SCRATCH_MNT then this does rm -rf/*
+> > > >> right ... (and wipes out your whole system ...)
+> > > >
+> > > > You can't get to that function until after all the checks that
+> > > > SCRATCH_MNT exists. i.e. this happens during _scratch_mkfs, and that
+> > > > is only called in tests after all the startup checks validate
+> > > > devices and mounts exist. i.e. see common/config::get_next_config()
+> > > 
+> > > Well, I reproduced it easily enough again today (after taking a
+> > > snapshot of the VM)
+> > > by simply running generic/120 against NFS with SCRATCH_MNT not
+> > > specified in local.config
+> > > Dros also ran into this problem.
 > > 
-> > Well, I reproduced it easily enough again today (after taking a
-> > snapshot of the VM)
-> > by simply running generic/120 against NFS with SCRATCH_MNT not
-> > specified in local.config
-> > Dros also ran into this problem.
+> > You're right, I missed that _scratch_mkfs is also called by ./check,
+> > and if there's no SCRATCH_MNT set in local.config, only SCRATCH_DEV is
+> > set, _scratch_mkfs can be dangerous.
 > 
-> You're right, I missed that _scratch_mkfs is also called by ./check,
-> and if there's no SCRATCH_MNT set in local.config, only SCRATCH_DEV is
-> set, _scratch_mkfs can be dangerous.
+> As I asked earlier in this thread: why isn't get_next_config()
+> catching this?
 
-As I asked earlier in this thread: why isn't get_next_config()
-catching this?
+I think I see the problem, this patch catches the empty SCRATCH_MNT
+and works for me:
 
-> I propose this patch, which skips _scratch_cleanup_files if called by check
+eguan@dhcp-13-216:~/workspace/src/xfstests$ git diff
+diff --git a/common/config b/common/config
+index 1cb08c0..409f1b8 100644
+--- a/common/config
++++ b/common/config
+@@ -464,7 +464,7 @@ get_next_config() {
+                exit 1
+        fi
+ 
+-       if [ ! -z "$SCRATCH_MNT" -a ! -d "$SCRATCH_MNT" ]; then
++       if [ ! -z "$SCRATCH_MNT" -o ! -d "$SCRATCH_MNT" ]; then
+                echo "common/config: Error: \$SCRATCH_MNT ($SCRATCH_MNT) is not a directory"
+                exit 1
+        fi
+
+If it looks sane I will send out a patch.
+
 > 
-> [root@hp-dl388eg8-01 xfstests]# git diff
-> diff --git a/common/rc b/common/rc
-> index 435f74f..254fb66 100644
-> --- a/common/rc
-> +++ b/common/rc
-> @@ -554,6 +554,11 @@ _mkfs_dev()
->  # remove all files in $SCRATCH_MNT, useful when testing on NFS/CIFS
->  _scratch_cleanup_files()
->  {
-> +       # do nothing if called by check, variables are not fully valided yet
-> +       # SCRATCH_MNT can be empty, which is dangerous
-> +       if [ "$iam" == "check" ]; then
-> +               return
-> +       fi
+> > I propose this patch, which skips _scratch_cleanup_files if called by check
+> > 
+> > [root@hp-dl388eg8-01 xfstests]# git diff
+> > diff --git a/common/rc b/common/rc
+> > index 435f74f..254fb66 100644
+> > --- a/common/rc
+> > +++ b/common/rc
+> > @@ -554,6 +554,11 @@ _mkfs_dev()
+> >  # remove all files in $SCRATCH_MNT, useful when testing on NFS/CIFS
+> >  _scratch_cleanup_files()
+> >  {
+> > +       # do nothing if called by check, variables are not fully valided yet
+> > +       # SCRATCH_MNT can be empty, which is dangerous
+> > +       if [ "$iam" == "check" ]; then
+> > +               return
+> > +       fi
+> 
+> Again, this is the wrong place to try to fix this - we haven't fixed
+> the landmine that has left us running with an invalid config. IOWs,
+> by the time _scratch_mkfs is called from *anywhere* we should have
+> fully validated the environment to be correct and valid. Parsing and
+> validating the config we have loaded from the config file is the job
+> of get_next_config(), yes?
 
-Again, this is the wrong place to try to fix this - we haven't fixed
-the landmine that has left us running with an invalid config. IOWs,
-by the time _scratch_mkfs is called from *anywhere* we should have
-fully validated the environment to be correct and valid. Parsing and
-validating the config we have loaded from the config file is the job
-of get_next_config(), yes?
+Yes, that makes more sense, thanks for the explanation!
 
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Thanks,
+Eryu
+> 
+> Cheers,
+> 
+> Dave.
+> -- 
+> Dave Chinner
+> david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org
+> --
+> To unsubscribe from this list: send the line "unsubscribe fstests" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
