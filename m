@@ -1,44 +1,95 @@
-From: vamps53752-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: Fix Penguin Penalty 17th October2014 ( mail-archive.com )
-Date: Mon, 17 Nov 2014 13:29:49 +0530
-Message-ID: <5469aaf5.a284460a.4d27.01e7@mx.google.com>
-Reply-To: seo.expert388-/E1597aS9LQAvxtiuMwx3w@public.gmane.org
+From: Omer Zilberberg <omzg-/8YdC2HfS5554TAoqtyWWQ@public.gmane.org>
+Subject: Re: [PATCH v2 1/5] common: re-enable tests that require scratch dev
+ on NFS
+Date: Mon, 17 Nov 2014 16:53:50 +0200
+Message-ID: <546A0BFE.6080608@plexistor.com>
+References: <1414775040-4051-1-git-send-email-eguan@redhat.com> <1414775040-4051-2-git-send-email-eguan@redhat.com> <CAH2r5muuJRcC4YgFkwUeUcCeEntgY+4POF8-bwmox64wXykuTw@mail.gmail.com> <20141113033317.GC28565@dastard> <CAH2r5msD-FDDvUL5Gt+7Fzt-tvduS93sxM-PG9dZjvk0ED53QA@mail.gmail.com> <20141115053533.GK2863@dhcp-13-216.nay.redhat.com> <20141117054141.GK23575@dastard> <20141117060603.GO2863@dhcp-13-216.nay.redhat.com> <20141117065443.GL23575@dastard>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, fstests-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	"linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Weston Andros Adamson <dros-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+To: Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>, Eryu Guan <eguan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20141117065443.GL23575@dastard>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-Dear Sir
+> Another FYI: we can actually test any filesystem without a scratch
+> device configured:
+> 
+> $ sudo TEST_DEV=/dev/vda TEST_DIR=/mnt/test ./check generic/120
+> FSTYP         -- xfs (non-debug)
+> PLATFORM      -- Linux/x86_64 test2 3.18.0-rc2-dgc+
+> 
+> generic/120 16s ... [not run] this test requires a valid $SCRATCH_DEV
+> Not run: generic/120
+> Passed all 0 tests
+> $
 
-Did your website get hit by Google Penguin update on October 17th 2014?=
- What basically is Google Penguin Update? It is actually a code name fo=
-r Google algorithm which aims at decreasing your websites search engine=
- rankings that violate Google=92s guidelines by using black hat SEO tec=
-hniques to rank your webpage by giving number of spammy links to the pa=
-ge.
-=20
-We are one of those few SEO companies that can help you avoid penalties=
- from Google Updates like Penguin and Panda. Our clients have survived =
-all the previous and present updates with ease. They have never been hi=
-t because we use 100% white hat SEO techniques to rank Webpages.  Simpl=
-e thing that we do to keep websites away from any Penguin or Panda pena=
-lties is follow Google guidelines and we give Google users the best ans=
-wers to their queries.
+Please note that since commit 83ef157d, that is no longer true, because _require_test calls _is_block_dev with empty parameter, which prints usage:
+$ sudo TEST_DEV=/dev/sda TEST_DIR=/mnt/dev0  ./check generic/001
+FSTYP         -- ext4
+PLATFORM      -- Linux/x86_64 testvm 3.17.0
 
-If you are looking to increase the quality of your websites and to get =
-more targeted traffic or save your websites from these Google penalties=
- email us back with your interest.=20
+generic/001 7s ... - output mismatch (see /opt/xfstests/results//generic/001.out.bad)
+    --- tests/generic/001.out   2014-09-10 11:04:44.249185592 +0300
+    +++ /opt/xfstests/results//generic/001.out.bad      2014-11-17 15:14:12.380061760 +0200
+    @@ -1,4 +1,5 @@
+     QA output created by 001
+    +Usage: _is_block_dev dev
+     cleanup
+     setup ....................................
+     iter 1 chain ... check ....................................
+    ...
+    (Run 'diff -u tests/generic/001.out /opt/xfstests/results//generic/001.out.bad'  to see the entire diff)
+Ran: generic/001
+Failures: generic/001
+Failed 1 of 1 tests
 
-We will be glad to serve you and help you grow your business.
+Here's a patch to fix that:
+----
+Subject: [PATCH] _required_test: removed unneeded test for scratch_dev
 
-Regards
+testing for scratch_dev in _required_test is unnecessary, since it is
+not required for these tests. Furthermore, if a scratch_dev is not given,
+all tests which are supposed to pass on test_dev fail, because
+_is_block_dev is given an empty string as scratch_dev, and prints usage.
 
-Vince G
+Signed-off-by: Omer Zilberberg <omzg-/8YdC2HfS5554TAoqtyWWQ@public.gmane.org>
+---
+ common/rc | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-SEO Manager ( TOB )
-B7 Green Avenue, Amritsar 143001 Punjab
-____________________________
-NO CLICK in the subject to STOP EMAILS
+diff --git a/common/rc b/common/rc
+index d5e3aff..b863808 100644
+--- a/common/rc
++++ b/common/rc
+@@ -1104,7 +1104,7 @@ _require_scratch()
+ }
+ 
+ 
+-# this test needs a test partition - check we're ok & unmount it
++# this test needs a test partition - check we're ok & mount if necessary
+ #
+ _require_test()
+ {
+@@ -1138,10 +1138,6 @@ _require_test()
+                 then
+                     _notrun "this test requires a valid \$TEST_DEV"
+                 fi
+-                if [ "`_is_block_dev $SCRATCH_DEV`" = "`_is_block_dev $TEST_DEV`" ]
+-                then
+-                    _notrun "this test requires a valid \$TEST_DEV"
+-                fi
+                if [ ! -d "$TEST_DIR" ]
+                then
+                     _notrun "this test requires a valid \$TEST_DIR"
+-- 
+1.9.3
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
