@@ -1,66 +1,159 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: xfstest generic/035 and rename
-Date: Mon, 17 Nov 2014 16:06:46 -0600
-Message-ID: <CAH2r5muERU4zTCV0ZP+m38mHgynr90iktr5_pJMBVgRaDQON0w@mail.gmail.com>
+From: Omer Zilberberg <omzg-/8YdC2HfS5554TAoqtyWWQ@public.gmane.org>
+Subject: Re: [PATCH v2 1/5] common: re-enable tests that require scratch dev
+ on NFS
+Date: Tue, 18 Nov 2014 18:16:28 +0200
+Message-ID: <546B70DC.2060502@plexistor.com>
+References: <1414775040-4051-1-git-send-email-eguan@redhat.com> <1414775040-4051-2-git-send-email-eguan@redhat.com> <CAH2r5muuJRcC4YgFkwUeUcCeEntgY+4POF8-bwmox64wXykuTw@mail.gmail.com> <20141113033317.GC28565@dastard> <CAH2r5msD-FDDvUL5Gt+7Fzt-tvduS93sxM-PG9dZjvk0ED53QA@mail.gmail.com> <20141115053533.GK2863@dhcp-13-216.nay.redhat.com> <20141117054141.GK23575@dastard> <20141117060603.GO2863@dhcp-13-216.nay.redhat.com> <20141117065443.GL23575@dastard> <546A0BFE.6080608@plexistor.com> <20141117202207.GN23575@dastard>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: fstests-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: Eryu Guan <eguan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	fstests-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	"linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Weston Andros Adamson <dros-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+To: Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>
 Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20141117202207.GN23575@dastard>
 Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
-xfstest generic/035 fails on nfs (various ways) and cifs and smb3
-(differently) and brings up interesting problems with how fstat works.
+On 11/17/2014 10:22 PM, Dave Chinner wrote:
+> On Mon, Nov 17, 2014 at 04:53:50PM +0200, Omer Zilberberg wrote:
+>>> Another FYI: we can actually test any filesystem without a scratch
+>>> device configured:
+>>>
+>>> $ sudo TEST_DEV=/dev/vda TEST_DIR=/mnt/test ./check generic/120
+>>> FSTYP         -- xfs (non-debug)
+>>> PLATFORM      -- Linux/x86_64 test2 3.18.0-rc2-dgc+
+>>>
+>>> generic/120 16s ... [not run] this test requires a valid $SCRATCH_DEV
+>>> Not run: generic/120
+>>> Passed all 0 tests
+>>> $
+>>
+>> Please note that since commit 83ef157d, that is no longer true, because _require_test calls _is_block_dev with empty parameter, which prints usage:
+>> $ sudo TEST_DEV=/dev/sda TEST_DIR=/mnt/dev0  ./check generic/001
+>> FSTYP         -- ext4
+>> PLATFORM      -- Linux/x86_64 testvm 3.17.0
+>>
+>> generic/001 7s ... - output mismatch (see /opt/xfstests/results//generic/001.out.bad)
+>>     --- tests/generic/001.out   2014-09-10 11:04:44.249185592 +0300
+>>     +++ /opt/xfstests/results//generic/001.out.bad      2014-11-17 15:14:12.380061760 +0200
+>>     @@ -1,4 +1,5 @@
+>>      QA output created by 001
+>>     +Usage: _is_block_dev dev
+>>      cleanup
+>>      setup ....................................
+>>      iter 1 chain ... check ....................................
+>>     ...
+>>     (Run 'diff -u tests/generic/001.out /opt/xfstests/results//generic/001.out.bad'  to see the entire diff)
+>> Ran: generic/001
+>> Failures: generic/001
+>> Failed 1 of 1 tests
+>>
+>> Here's a patch to fix that:
+>> ----
+>> Subject: [PATCH] _required_test: removed unneeded test for scratch_dev
+>>
+>> testing for scratch_dev in _required_test is unnecessary, since it is
+>> not required for these tests. Furthermore, if a scratch_dev is not given,
+>> all tests which are supposed to pass on test_dev fail, because
+>> _is_block_dev is given an empty string as scratch_dev, and prints usage.
+> 
+> I'm beginning to sound like a broken record. Why isn't this *invalid
+> config check* being done in the config parsing rather than on every
+> test that requires a scratch or test device?
+> 
+> i.e. removing the check is not the correct fix - checking it during
+> config parsing means none of these checks need to be done in
+> _require_test, nor in _require_scratch_nocheck.
+> 
+> i.e. in get_next_config() we already know the FSTYP, so we should
+> be checking that:
+> 
+> 	a) TEST_DEV is valid for fstyp
+> 	b) SCRATCH_DEV (if configured) is valid for fstyp
+> 	c) TEST_DEV != SCRATCH_DEV if they both exist and fstyp
+> 	   indicates they should be block devices
+> 
+> And then we can pretty much assume that they are valid everywhere
+> else, and _require_scratch_nocheck() simply needs to check for a
+> non-empty string...
+> 
+>> Signed-off-by: Omer Zilberberg <omzg-/8YdC2HfS5554TAoqtyWWQ@public.gmane.org>
+>> ---
+>>  common/rc | 6 +-----
+>>  1 file changed, 1 insertion(+), 5 deletions(-)
+>>
+>> diff --git a/common/rc b/common/rc
+>> index d5e3aff..b863808 100644
+>> --- a/common/rc
+>> +++ b/common/rc
+>> @@ -1104,7 +1104,7 @@ _require_scratch()
+>>  }
+>>  
+>>  
+>> -# this test needs a test partition - check we're ok & unmount it
+>> +# this test needs a test partition - check we're ok & mount if necessary
+>>  #
+>>  _require_test()
+>>  {
+>> @@ -1138,10 +1138,6 @@ _require_test()
+>>                  then
+>>                      _notrun "this test requires a valid \$TEST_DEV"
+>>                  fi
+>> -                if [ "`_is_block_dev $SCRATCH_DEV`" = "`_is_block_dev $TEST_DEV`" ]
+>> -                then
+>> -                    _notrun "this test requires a valid \$TEST_DEV"
+>> -                fi
+>>                 if [ ! -d "$TEST_DIR" ]
+>>                 then
+>>                      _notrun "this test requires a valid \$TEST_DIR"
+> 
+> The patch is whitespace damaged. Please read:
+> 
+> https://www.kernel.org/doc/Documentation/email-clients.txt
 
-The test case is quite simple, t_rename_overwrite is the key piece of
-code - which basically does open a directory, rename over it and fstat
-the now deleted directory (and checks that it has a link count of zero
-since it is going to be deleted as soon as it is closed)
+Here's the patch resent with whitespace fixed, at least as a temporary solution...
+----
+Subject: [PATCH] _required_test: removed unneeded test for scratch_dev
 
-fd = open(path2, O_RDONLY);
-if (fd == -1)
-err(1, "open(\"%s\")", path2);
+testing for scratch_dev in _required_test is unnecessary, since it is
+not required for these tests. Furthermore, if a scratch_dev is not given,
+all tests which are supposed to pass on test_dev fail, because
+_is_block_dev is given an empty string as scratch_dev, and prints usage.
 
-res = rename(path1, path2);
-if (res == -1)
-err(1, "rename(\"%s\", \"%s\")", path1, path2);
+Signed-off-by: Omer Zilberberg <omzg-/8YdC2HfS5554TAoqtyWWQ@public.gmane.org>
+---
+ common/rc | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-res = fstat(fd, &stbuf);
-if (res == -1)
-err(1, "fstat(%i)", fd);
+diff --git a/common/rc b/common/rc
+index d5e3aff..b863808 100644
+--- a/common/rc
++++ b/common/rc
+@@ -1104,7 +1104,7 @@ _require_scratch()
+ }
+ 
+ 
+-# this test needs a test partition - check we're ok & unmount it
++# this test needs a test partition - check we're ok & mount if necessary
+ #
+ _require_test()
+ {
+@@ -1138,10 +1138,6 @@ _require_test()
+ 		 then
+ 		     _notrun "this test requires a valid \$TEST_DEV"
+ 		 fi
+-		 if [ "`_is_block_dev $SCRATCH_DEV`" = "`_is_block_dev $TEST_DEV`" ]
+-		 then
+-		     _notrun "this test requires a valid \$TEST_DEV"
+-		 fi
+ 		if [ ! -d "$TEST_DIR" ]
+ 		then
+ 		     _notrun "this test requires a valid \$TEST_DIR"
 
-if (stbuf.st_nlink != 0) {
-fprintf(stderr, "nlink of %s to %s is %lu, should be 0\n", path1,
-path2, stbuf.st_nlink);
-return 1;
-}
-
-Local file systems work whether source and target are files or
-directories. NFS fails with "stale file handle" when you pass in a
-directory and with an invalid link count (1 instead of 0) when you
-pass in a file.    CIFS and SMB3 return the link count as two for the
-directory case because fstat calls getattr (which ends up as a path
-based call which gets a dentry) and so we end up looking up the wrong
-thing (the newly renamed file, instead of the still open target which
-has been deleted).   This works for cifs for the file case (renaming a
-file over a file) but not for smb3 (since we don't fallback code to
-handle access denied on rename - at least not yet, it needs to be
-added).
-
-But it brings up obvious questions:
-- why does getattr use a dentry rather than a file handle when called
-from fstat?
-- is NFS posix compliant by returning "stale file handle" (seems
-reasonable to me) on a getattr of an overwritten directory?
-- should NFS fix the case where the target is a file and has the wrong
-link count?
--- 
-Thanks,
-
-Steve
 --
 To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
 the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
