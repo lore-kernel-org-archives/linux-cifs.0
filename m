@@ -1,160 +1,268 @@
-From: Omer Zilberberg <omzg-/8YdC2HfS5554TAoqtyWWQ@public.gmane.org>
-Subject: Re: [PATCH v2 1/5] common: re-enable tests that require scratch dev
- on NFS
-Date: Tue, 18 Nov 2014 18:16:28 +0200
-Message-ID: <546B70DC.2060502@plexistor.com>
-References: <1414775040-4051-1-git-send-email-eguan@redhat.com> <1414775040-4051-2-git-send-email-eguan@redhat.com> <CAH2r5muuJRcC4YgFkwUeUcCeEntgY+4POF8-bwmox64wXykuTw@mail.gmail.com> <20141113033317.GC28565@dastard> <CAH2r5msD-FDDvUL5Gt+7Fzt-tvduS93sxM-PG9dZjvk0ED53QA@mail.gmail.com> <20141115053533.GK2863@dhcp-13-216.nay.redhat.com> <20141117054141.GK23575@dastard> <20141117060603.GO2863@dhcp-13-216.nay.redhat.com> <20141117065443.GL23575@dastard> <546A0BFE.6080608@plexistor.com> <20141117202207.GN23575@dastard>
+From: Kerrigan Joseph <kerrigan-unDuD2xQE4RCRbd0KW1xqSWTkRzJkiQl@public.gmane.org>
+Subject: Unexpected folder mode when unix extensions are enabled
+Date: Thu, 20 Nov 2014 10:45:03 -0600
+Message-ID: <546E1A8F.3060104@naturescapelawncare.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: Eryu Guan <eguan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	fstests-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	"linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Weston Andros Adamson <dros-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
-To: Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20141117202207.GN23575@dastard>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=windows-1252;
+	format=flowed
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On 11/17/2014 10:22 PM, Dave Chinner wrote:
-> On Mon, Nov 17, 2014 at 04:53:50PM +0200, Omer Zilberberg wrote:
->>> Another FYI: we can actually test any filesystem without a scratch
->>> device configured:
->>>
->>> $ sudo TEST_DEV=/dev/vda TEST_DIR=/mnt/test ./check generic/120
->>> FSTYP         -- xfs (non-debug)
->>> PLATFORM      -- Linux/x86_64 test2 3.18.0-rc2-dgc+
->>>
->>> generic/120 16s ... [not run] this test requires a valid $SCRATCH_DEV
->>> Not run: generic/120
->>> Passed all 0 tests
->>> $
->>
->> Please note that since commit 83ef157d, that is no longer true, because _require_test calls _is_block_dev with empty parameter, which prints usage:
->> $ sudo TEST_DEV=/dev/sda TEST_DIR=/mnt/dev0  ./check generic/001
->> FSTYP         -- ext4
->> PLATFORM      -- Linux/x86_64 testvm 3.17.0
->>
->> generic/001 7s ... - output mismatch (see /opt/xfstests/results//generic/001.out.bad)
->>     --- tests/generic/001.out   2014-09-10 11:04:44.249185592 +0300
->>     +++ /opt/xfstests/results//generic/001.out.bad      2014-11-17 15:14:12.380061760 +0200
->>     @@ -1,4 +1,5 @@
->>      QA output created by 001
->>     +Usage: _is_block_dev dev
->>      cleanup
->>      setup ....................................
->>      iter 1 chain ... check ....................................
->>     ...
->>     (Run 'diff -u tests/generic/001.out /opt/xfstests/results//generic/001.out.bad'  to see the entire diff)
->> Ran: generic/001
->> Failures: generic/001
->> Failed 1 of 1 tests
->>
->> Here's a patch to fix that:
->> ----
->> Subject: [PATCH] _required_test: removed unneeded test for scratch_dev
->>
->> testing for scratch_dev in _required_test is unnecessary, since it is
->> not required for these tests. Furthermore, if a scratch_dev is not given,
->> all tests which are supposed to pass on test_dev fail, because
->> _is_block_dev is given an empty string as scratch_dev, and prints usage.
-> 
-> I'm beginning to sound like a broken record. Why isn't this *invalid
-> config check* being done in the config parsing rather than on every
-> test that requires a scratch or test device?
-> 
-> i.e. removing the check is not the correct fix - checking it during
-> config parsing means none of these checks need to be done in
-> _require_test, nor in _require_scratch_nocheck.
-> 
-> i.e. in get_next_config() we already know the FSTYP, so we should
-> be checking that:
-> 
-> 	a) TEST_DEV is valid for fstyp
-> 	b) SCRATCH_DEV (if configured) is valid for fstyp
-> 	c) TEST_DEV != SCRATCH_DEV if they both exist and fstyp
-> 	   indicates they should be block devices
-> 
-> And then we can pretty much assume that they are valid everywhere
-> else, and _require_scratch_nocheck() simply needs to check for a
-> non-empty string...
-> 
->> Signed-off-by: Omer Zilberberg <omzg-/8YdC2HfS5554TAoqtyWWQ@public.gmane.org>
->> ---
->>  common/rc | 6 +-----
->>  1 file changed, 1 insertion(+), 5 deletions(-)
->>
->> diff --git a/common/rc b/common/rc
->> index d5e3aff..b863808 100644
->> --- a/common/rc
->> +++ b/common/rc
->> @@ -1104,7 +1104,7 @@ _require_scratch()
->>  }
->>  
->>  
->> -# this test needs a test partition - check we're ok & unmount it
->> +# this test needs a test partition - check we're ok & mount if necessary
->>  #
->>  _require_test()
->>  {
->> @@ -1138,10 +1138,6 @@ _require_test()
->>                  then
->>                      _notrun "this test requires a valid \$TEST_DEV"
->>                  fi
->> -                if [ "`_is_block_dev $SCRATCH_DEV`" = "`_is_block_dev $TEST_DEV`" ]
->> -                then
->> -                    _notrun "this test requires a valid \$TEST_DEV"
->> -                fi
->>                 if [ ! -d "$TEST_DIR" ]
->>                 then
->>                      _notrun "this test requires a valid \$TEST_DIR"
-> 
-> The patch is whitespace damaged. Please read:
-> 
-> https://www.kernel.org/doc/Documentation/email-clients.txt
+Hello, first time on this mailing list, so any etiquette tips are=20
+appreciated!
 
-Here's the patch resent with whitespace fixed, at least as a temporary solution...
-----
-Subject: [PATCH] _required_test: removed unneeded test for scratch_dev
+I'm using Samba 3 on a file server at work, and I've noticed some appar=
+ent
+quirks in permissions handling for Linux clients. I've tried to isolate=
+ the
+issues to a small set of variables, and I'll describe this limited case=
+=20
+below.
 
-testing for scratch_dev in _required_test is unnecessary, since it is
-not required for these tests. Furthermore, if a scratch_dev is not given,
-all tests which are supposed to pass on test_dev fail, because
-_is_block_dev is given an empty string as scratch_dev, and prints usage.
+To summarize, when I use mount.cifs to access a share with
+1. unix extensions enabled on the server, and
+2. Samba mask/mode settings that should affect the first=20
+(setuid/setgid/sticky)
+octal bit,
+the mask/mode settings for the first octal bit are ignored for folders,=
+ but
+preserved for files.
 
-Signed-off-by: Omer Zilberberg <omzg-/8YdC2HfS5554TAoqtyWWQ@public.gmane.org>
----
- common/rc | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+In other words, if my Samba share has all of the *mask and *mode option=
+s set
+to 7777, and I mount that share with unix extensions enabled, files tha=
+t I
+create will be give a mode of 7777, but folders will be given a mode of=
+=20
+1777.
+This behavior is not present when I mount the share with the unix exten=
+sions
+disabled, or when I access the share using smbclient.
 
-diff --git a/common/rc b/common/rc
-index d5e3aff..b863808 100644
---- a/common/rc
-+++ b/common/rc
-@@ -1104,7 +1104,7 @@ _require_scratch()
- }
- 
- 
--# this test needs a test partition - check we're ok & unmount it
-+# this test needs a test partition - check we're ok & mount if necessary
- #
- _require_test()
- {
-@@ -1138,10 +1138,6 @@ _require_test()
- 		 then
- 		     _notrun "this test requires a valid \$TEST_DEV"
- 		 fi
--		 if [ "`_is_block_dev $SCRATCH_DEV`" = "`_is_block_dev $TEST_DEV`" ]
--		 then
--		     _notrun "this test requires a valid \$TEST_DEV"
--		 fi
- 		if [ ! -d "$TEST_DIR" ]
- 		then
- 		     _notrun "this test requires a valid \$TEST_DIR"
+I would much prefer to operate with the unix extensions enabled, as it=20
+allows
+the client to accurately reflect the permissions present on the server,=
+=20
+but I
+can't for the life of me figure out how to make the client obey the ser=
+ver's
+mode/mask directives!
 
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+It should go without saying, but I'm not actually trying to use these
+particular modes in production. I ran into this issue when trying to en=
+force
+more sane permissions, but my example that follows uses these modes to
+illustrate the issue I'm experiencing.
+
+Below you will find a (fairly) detailed example that I ran to illustrat=
+e=20
+this
+problem. I'm sorry it is so long, but I wanted to give as much detail i=
+n=20
+this
+first message as possible.
+
+Thanks!
+
+Kerrigan Joseph
+
+
+# where are we? #
+
+## server ##
+$ whoami
+jt
+
+$ hostname
+ws073
+
+$ uname -a
+Linux ws073 3.11.0-12-generic #19-Ubuntu SMP Wed Oct 9 16:20:46 UTC 201=
+3=20
+x86_64 x86_64 x86_64 GNU/Linux
+
+$ lsb_release -a
+No LSB modules are available.
+Distributor ID: LinuxMint
+Description: Linux Mint 16 Petra
+Release: 16
+Codename: petra
+
+$ smbd --version
+Version 3.6.18
+
+$ cat /etc/samba/smb.conf
+[global]
+workgroup =3D WORKGROUP
+server string =3D %h server (Samba, Linux Mint)
+dns proxy =3D no
+log file =3D /var/log/samba/log.%m
+max log size =3D 1000
+syslog =3D 0
+panic action =3D /usr/share/samba/panic-action %d
+encrypt passwords =3D true
+passdb backend =3D tdbsam
+obey pam restrictions =3D yes
+unix password sync =3D yes
+passwd program =3D /usr/bin/passwd %u
+passwd chat =3D *Enter\snew\s*\spassword:* %n\n=20
+*Retype\snew\s*\spassword:* %n\n *password\supdated\ssuccessfully* .
+pam password change =3D yes
+map to guest =3D bad user
+usershare allow guests =3D yes
+unix extensions =3D yes
+
+[test]
+comment =3D Test Share
+path =3D /home/jt/mnt/sambatest
+valid users =3D @jt
+public =3D no
+writable =3D yes
+browseable =3D no
+create mask =3D 7777
+force create mode =3D 7777
+security mask =3D 7777
+force security mode =3D 7777
+directory mask =3D 7777
+force directory mode =3D 7777
+directory security mask =3D 7777
+force directory security mode =3D 7777
+
+$ cd ~/mnt/sambatest && pwd
+/home/jt/mnt/sambatest
+
+$ stat .
+=46ile: =91.=92
+Size: 4096 Blocks: 8 IO Block: 4096 directory
+Device: 801h/2049d Inode: 5245516 Links: 2
+Access: (0777/drwxrwxrwx) Uid: ( 1000/ jt) Gid: ( 1000/ jt)
+Access: 2014-11-20 09:37:24.018014130 -0600
+Modify: 2014-11-20 09:37:23.458014110 -0600
+Change: 2014-11-20 09:37:23.458014110 -0600
+Birth: -
+
+$ sudo service smbd restart
+smbd stop/waiting
+smbd start/running, process 26535
+
+
+## client ##
+$ whoami
+kerrigan
+
+$ hostname
+ws093
+
+$ uname -a
+Linux ws093 3.11.0-12-generic #19-Ubuntu SMP Wed Oct 9 16:20:46 UTC 201=
+3=20
+x86_64 x86_64 x86_64 GNU/Linux
+
+$ lsb_release -a
+No LSB modules are available.
+Distributor ID: LinuxMint
+Description: Linux Mint 16 Petra
+Release: 16
+Codename: petra
+
+$ mount.cifs --version
+mount.cifs version: 6.0
+
+$ smbclient --version
+Version 3.6.18
+
+$ cd ~/sambatest && pwd
+/home/kerrigan/sambatest
+
+$ stat .
+=46ile: =91.=92
+Size: 4096 Blocks: 8 IO Block: 4096 directory
+Device: 801h/2049d Inode: 923915 Links: 2
+Access: (0755/drwxr-xr-x) Uid: ( 1000/kerrigan) Gid: ( 1000/kerrigan)
+Access: 2014-11-20 09:48:51.449875086 -0600
+Modify: 2014-11-20 09:48:51.449875086 -0600
+Change: 2014-11-20 09:48:51.449875086 -0600
+Birth: -
+
+
+# mount it on the client with the default of unix extensions enabled #
+$ cd ..
+$ sudo mount.cifs -o user=3Djt,uid=3Dkerrigan,gid=3Dkerrigan //ws073/te=
+st=20
+sambatest
+Password for jt@//ws073/test: <entered password>
+$ cd sambatest
+
+$ mount | grep ws073
+//ws073/test on /home/kerrigan/sambatest type cifs (rw)
+
+$ touch file1 && mkdir folder1 && ls -l
+
+$ stat file1 | grep Uid
+Access: (7777/-rwsrwsrwt) Uid: ( 1000/kerrigan) Gid: ( 1000/kerrigan)
+
+$ stat folder1 | grep Uid # look at octal mode!
+Access: (1777/drwxrwxrwt) Uid: ( 1000/kerrigan) Gid: ( 1000/kerrigan)
+
+
+# look at the files on the server #
+$ pwd
+/home/jt/mnt/sambatest
+
+$ ls -l
+total 4
+-rwsrwsrwt 1 jt jt 0 Nov 20 09:59 file1
+drwxrwxrwt 2 jt jt 4096 Nov 20 09:58 folder1
+
+$ stat file1 | grep Uid
+Access: (7777/-rwsrwsrwt) Uid: ( 1000/ jt) Gid: ( 1000/ jt)
+
+$ stat folder1 | grep Uid # look at the octal mode
+Access: (1777/drwxrwxrwt) Uid: ( 1000/ jt) Gid: ( 1000/ jt)
+
+
+# mount on the client with nounix disabling unix extensions #
+$ cd ..
+$ sudo umount sambatest
+$ sudo mount.cifs -o user=3Djt,uid=3Dkerrigan,gid=3Dkerrigan,nounix=20
+//ws073/test sambatest
+Password for jt@//ws073/test: <entered password>
+$ cd sambatest
+
+$ ls -l
+total 0
+-rwxr-xr-x 0 kerrigan kerrigan 0 Nov 20 09:59 file1
+drwxr-xr-x 0 kerrigan kerrigan 0 Nov 20 09:58 folder1
+
+$ touch file2 && mkdir folder2 && ls -l
+total 0
+-rwxr-xr-x 0 kerrigan kerrigan 0 Nov 20 09:59 file1
+-rwxr-xr-x 0 kerrigan kerrigan 0 Nov 20 10:06 file2
+drwxr-xr-x 0 kerrigan kerrigan 0 Nov 20 09:58 folder1
+drwxr-xr-x 0 kerrigan kerrigan 0 Nov 20 10:05 folder2
+
+
+# look at files on the server #
+$ stat file2 | grep Uid
+Access: (7777/-rwsrwsrwt) Uid: ( 1000/ jt) Gid: ( 1000/ jt)
+
+$ stat folder2 | grep Uid # look at the octal mode now
+Access: (7777/drwsrwsrwt) Uid: ( 1000/ jt) Gid: ( 1000/ jt)
+
+
+# make a directory on the client using smbclient #
+$ cd .. && sudo umount sambatest
+
+$ smbclient //ws073/test --user=3Djt
+Enter jt's password: <entered password>
+Domain=3D[WORKGROUP] OS=3D[Unix] Server=3D[Samba 3.6.18]
+smb: \> mkdir folder3
+smb: \> exit
+
+
+# on the server #
+$ stat folder3 | grep Uid # same octal mode as with nounix
+Access: (7777/drwsrwsrwt) Uid: ( 1000/ jt) Gid: ( 1000/ jt)
