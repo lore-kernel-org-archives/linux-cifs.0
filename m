@@ -1,93 +1,44 @@
-From: Andrew Martin <amartin-AQeFf1F/bRxBDgjK7y7TUQ@public.gmane.org>
-Subject: Configuring CIFS mount with cifsacl - STATUS_NONE_MAPPED
-Date: Mon, 24 Nov 2014 09:58:31 -0600 (CST)
-Message-ID: <982926402.71713.1416844711273.JavaMail.zimbra@xes-inc.com>
+From: groom16097-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: Fix Penguin Penalty 17th October2014 ( mail-archive.com )
+Date: Mon, 24 Nov 2014 23:36:23 +0530
+Message-ID: <547373a3.24d3440a.5580.654c@mx.google.com>
+Reply-To: julia.kites-/E1597aS9LQAvxtiuMwx3w@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: TEXT/PLAIN; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hello,
+Dear Sir
 
-I am attempting to mount a CIFS share (SMB 1.0) onto an Ubuntu 14.04 client. I
-would like to be able to map ACLs using the "cifsacl" mount option. The server
-is an OpenIndiana server using the smb/server CIFS server (with ZFS as the
-underlying filesystem).
+Did your website get hit by Google Penguin update on October 17th 2014?=
+ What basically is Google Penguin Update? It is actually a code name fo=
+r Google algorithm which aims at decreasing your websites search engine=
+ rankings that violate Google=92s guidelines by using black hat SEO tec=
+hniques to rank your webpage by giving number of spammy links to the pa=
+ge.
+=20
+We are one of those few SEO companies that can help you avoid penalties=
+ from Google Updates like Penguin and Panda. Our clients have survived =
+all the previous and present updates with ease. They have never been hi=
+t because we use 100% white hat SEO techniques to rank Webpages.  Simpl=
+e thing that we do to keep websites away from any Penguin or Panda pena=
+lties is follow Google guidelines and we give Google users the best ans=
+wers to their queries.
 
-Client Kernel Version: 3.13.0-24-generic
+If you are looking to increase the quality of your websites and to get =
+more targeted traffic or save your websites from these Google penalties=
+ email us back with your interest.=20
 
-Client mount.cifs version: 6.0
+We will be glad to serve you and help you grow your business.
 
-I have verified that my kernel has been compiled with CIFS_XATTR and CIFS_ACL:
-$ grep CIFS /boot/config-3.13.0-24-generic 
-CONFIG_CIFS=m
-CONFIG_CIFS_STATS=y
-# CONFIG_CIFS_STATS2 is not set
-CONFIG_CIFS_WEAK_PW_HASH=y
-CONFIG_CIFS_UPCALL=y
-CONFIG_CIFS_XATTR=y
-CONFIG_CIFS_POSIX=y
-CONFIG_CIFS_ACL=y
-CONFIG_CIFS_DEBUG=y
-# CONFIG_CIFS_DEBUG2 is not set
-CONFIG_CIFS_DFS_UPCALL=y
-CONFIG_CIFS_SMB2=y
-CONFIG_CIFS_FSCACHE=y
+Regards
 
-I have already configured winbind (getent passwd works and I verified that 
-cifs.idmap is set up in /etc/request-key.d/cifs.idmap.conf. I am able to mount 
-the share successfully, however when I attempt to list the contents of a 
-directory, I receive output like this:
-ls: cannot access /mnt/Test/one: Input/output error
-ls: cannot access /mnt/Test/two: Input/output error
-ls: cannot access /mnt/Test/three: Input/output error
-total 0
-d????????? ? ?       ?            ?            ? one
-d????????? ? ?       ?            ?            ? two
-d????????? ? ?       ?            ?            ? three
+Julia kites
 
-Here are the ACLs I have set on these directories:
-A:d:OWNER@:rwaDdxtTnNcCoy
-A:fi:OWNER@:rwaDdtTnNcCoy
-A:dg:Domain Users-J0of1frlU80@public.gmane.org:rwaDdxtTnNcCoy
-A:fig:Domain Users-J0of1frlU80@public.gmane.org:rwaDdtTnNcCoy
-A:dg:GROUP@:rxtncy
-A:fig:GROUP@:rtncy
-D:d:EVERYONE@:rwaDxtTcCy
-
-Errors in dmesg:
-[Fri Nov 21 18:57:03 2014] CIFS VFS: cifs_acl_to_fattr: error -5 getting sec desc
-[Fri Nov 21 18:57:03 2014] CIFS VFS: cifs_acl_to_fattr: error -13 getting sec desc
-[Fri Nov 21 18:57:03 2014] CIFS VFS: cifs_acl_to_fattr: error -5 getting sec desc
-
-I also grabbed the contents /f proc/fs/cifs/DebugData:
-$ cat /proc/fs/cifs/DebugData 
-Display Internal CIFS Data Structures for Debugging
----------------------------------------------------
-CIFS Version 2.02
-Features: dfs fscache lanman posix spnego xattr acl
-Active VFS Requests: 0
-Servers:
-1) Name: 192.168.0.33  Domain: TEST Uses: 1 OS: Windows 2000
-        NOS: Windows 2000 LAN Manager        Capability: 0xf3fc
-        SMB session status: 1        TCP status: 1
-        Local Users To Server: 1 SecMode: 0x3 Req On Wire: 0
-        Shares:
-        1) \\test\Test Mounts: 1 Type: ZFS DevInfo: 0x20 Attributes: 0x4006e
-        PathComponentMax: 256 Status: 0x1 type: 9 
-
-        MIDs:
-
-
-I then enabled /proc/fs/cifs/cifsFYI and captured this sample debug:
-http://pastebin.com/Xy23ws7m
-
-I see the error is NT_STATUS_NONE_MAPPED, but it is unclear why this is 
-failing. What else can I try to debug this CIFS mount?
-
-Thanks,
-
-Andrew Martin
+SEO Manager ( TOB )
+B7 Green Avenue, Amritsar 143001 Punjab
+____________________________
+NO CLICK in the subject to STOP EMAILS
