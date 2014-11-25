@@ -1,44 +1,78 @@
-From: groom16097-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: Fix Penguin Penalty 17th October2014 ( mail-archive.com )
-Date: Mon, 24 Nov 2014 23:36:23 +0530
-Message-ID: <547373a3.24d3440a.5580.654c@mx.google.com>
-Reply-To: julia.kites-/E1597aS9LQAvxtiuMwx3w@public.gmane.org
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH v2] Convert MessageID in smb2_hdr to LE
+Date: Mon, 24 Nov 2014 20:36:06 -0600
+Message-ID: <CADT32eLC685oUD=ywJEYaeFjLYe7dgJx-CRbJiQ-=3arNaL2HQ@mail.gmail.com>
+References: <1416844438-22012-1-git-send-email-sprabhu@redhat.com>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1416844438-22012-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Dear Sir
+Acked-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-Did your website get hit by Google Penguin update on October 17th 2014?=
- What basically is Google Penguin Update? It is actually a code name fo=
-r Google algorithm which aims at decreasing your websites search engine=
- rankings that violate Google=92s guidelines by using black hat SEO tec=
-hniques to rank your webpage by giving number of spammy links to the pa=
-ge.
-=20
-We are one of those few SEO companies that can help you avoid penalties=
- from Google Updates like Penguin and Panda. Our clients have survived =
-all the previous and present updates with ease. They have never been hi=
-t because we use 100% white hat SEO techniques to rank Webpages.  Simpl=
-e thing that we do to keep websites away from any Penguin or Panda pena=
-lties is follow Google guidelines and we give Google users the best ans=
-wers to their queries.
-
-If you are looking to increase the quality of your websites and to get =
-more targeted traffic or save your websites from these Google penalties=
- email us back with your interest.=20
-
-We will be glad to serve you and help you grow your business.
-
-Regards
-
-Julia kites
-
-SEO Manager ( TOB )
-B7 Green Avenue, Amritsar 143001 Punjab
-____________________________
-NO CLICK in the subject to STOP EMAILS
+On Mon, Nov 24, 2014 at 9:53 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> We have encountered failures when When testing smb2 mounts on ppc64
+> machines when using both Samba as well as Windows 2012.
+>
+> On poking around, the problem was determined to be caused by the
+> high endian MessageID passed in the header for smb2. On checking the
+> corresponding MID for smb1 is converted to LE before being sent on the
+> wire.
+>
+> We have tested this using the RHEL 7 kernel where the patch fixes the
+> issue.
+>
+> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/cifsglob.h | 6 +++---
+>  fs/cifs/smb2pdu.h  | 2 +-
+>  2 files changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 02a33e5..41ec69d 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -661,16 +661,16 @@ set_credits(struct TCP_Server_Info *server, const int val)
+>         server->ops->set_credits(server, val);
+>  }
+>
+> -static inline __u64
+> +static inline __le64
+>  get_next_mid64(struct TCP_Server_Info *server)
+>  {
+> -       return server->ops->get_next_mid(server);
+> +       return cpu_to_le64(server->ops->get_next_mid(server));
+>  }
+>
+>  static inline __le16
+>  get_next_mid(struct TCP_Server_Info *server)
+>  {
+> -       __u16 mid = get_next_mid64(server);
+> +       __u16 mid = server->ops->get_next_mid(server);
+>         /*
+>          * The value in the SMB header should be little endian for easy
+>          * on-the-wire decoding.
+> diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+> index e3188ab..2d4914e 100644
+> --- a/fs/cifs/smb2pdu.h
+> +++ b/fs/cifs/smb2pdu.h
+> @@ -110,7 +110,7 @@ struct smb2_hdr {
+>         __le16 CreditRequest;  /* CreditResponse */
+>         __le32 Flags;
+>         __le32 NextCommand;
+> -       __u64  MessageId;       /* opaque - so can stay little endian */
+> +       __le64 MessageId;
+>         __le32 ProcessId;
+>         __u32  TreeId;          /* opaque - so do not make little endian */
+>         __u64  SessionId;       /* opaque - so do not make little endian */
+> --
+> 1.9.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
