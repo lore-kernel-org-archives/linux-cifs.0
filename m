@@ -1,67 +1,45 @@
-From: Julia Lawall <Julia.Lawall@lip6.fr>
-Subject: [PATCH 4/8 v2] cifs: replace memset by memzero_explicit
-Date: Sun, 30 Nov 2014 18:03:45 +0100
-Message-ID: <1417367029-32762-5-git-send-email-Julia.Lawall@lip6.fr>
-References: <1417367029-32762-1-git-send-email-Julia.Lawall@lip6.fr>
-Cc: kernel-janitors@vger.kernel.org, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
-To: Steve French <sfrench@samba.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1417367029-32762-1-git-send-email-Julia.Lawall@lip6.fr>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] Set UID in sess_auth_rawntlmssp_authenticate too
+Date: Wed,  3 Dec 2014 12:26:36 +0000
+Message-ID: <1417609596-23002-1-git-send-email-sprabhu@redhat.com>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-From: Julia Lawall <Julia.Lawall@lip6.fr>
+A user complained that they were unable to login to their cifs share
+after a kernel update. From the wiretrace we can see that the server
+returns different UIDs as response to NTLMSSP_NEGOTIATE and NTLMSSP_AUTH
+phases.
 
-Memset on a local variable may be removed when it is called just before the
-variable goes out of scope.  Using memzero_explicit defeats this
-optimization.  A simplified version of the semantic patch that makes this
-change is as follows: (http://coccinelle.lip6.fr/)
+With changes in the authentication code, we no longer set the
+cifs_sess->Suid returned in response to the NTLM_AUTH phase and continue
+to use the UID sent in response to the NTLMSSP_NEGOTIATE phase. This
+results in the server denying access to the user when the user attempts
+to do a tcon connect.
 
-// <smpl>
-@@
-identifier x;
-type T;
-@@
+A test kernel containing patch was tested successfully by the user.
 
-{
-... when any
-T x[...];
-... when any
-    when exists
-- memset
-+ memzero_explicit
-  (x,
--0,
-  ...)
-... when != x
-    when strict
-}
-// </smpl>
-
-This change was suggested by Daniel Borkmann <dborkman@redhat.com>
-
-Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
-
+Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
-Daniel Borkmann suggested that these patches could go through Herbert Xu's
-cryptodev tree.
+ fs/cifs/sess.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-v2: fixed email address
-
- fs/cifs/smbencrypt.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/fs/cifs/smbencrypt.c b/fs/cifs/smbencrypt.c
-index 6c15663..6512c19 100644
---- a/fs/cifs/smbencrypt.c
-+++ b/fs/cifs/smbencrypt.c
-@@ -221,7 +221,7 @@ E_md4hash(const unsigned char *passwd, unsigned char *p16,
- 	}
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index 57db63f..446cb7f 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -1303,6 +1303,11 @@ sess_auth_rawntlmssp_authenticate(struct sess_data *sess_data)
+ 	if (le16_to_cpu(pSMB->resp.Action) & GUEST_LOGIN)
+ 		cifs_dbg(FYI, "Guest login\n"); /* BB mark SesInfo struct? */
  
- 	rc = mdfour(p16, (unsigned char *) wpwd, len * sizeof(__le16));
--	memset(wpwd, 0, 129 * sizeof(__le16));
-+	memzero_explicit(wpwd, 129 * sizeof(__le16));
- 
- 	return rc;
- }
++	if (ses->Suid != smb_buf->Uid) {
++		ses->Suid = smb_buf->Uid;
++		cifs_dbg(FYI, "UID changed! new UID = %llu\n", ses->Suid);
++	}
++
+ 	bytes_remaining = get_bcc(smb_buf);
+ 	bcc_ptr = pByteArea(smb_buf);
+ 	blob_len = le16_to_cpu(pSMB->resp.SecurityBlobLength);
+-- 
+2.1.0
