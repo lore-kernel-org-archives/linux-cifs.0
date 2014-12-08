@@ -1,105 +1,58 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v2] Convert MessageID in smb2_hdr to LE
-Date: Sun, 7 Dec 2014 23:45:45 -0600
-Message-ID: <CAH2r5mvf8kHZq_9u=bvb1tphknNRnmFy4phZtNYUsB5_AU17hQ@mail.gmail.com>
-References: <1416844438-22012-1-git-send-email-sprabhu@redhat.com>
- <CADT32eLC685oUD=ywJEYaeFjLYe7dgJx-CRbJiQ-=3arNaL2HQ@mail.gmail.com> <CAH2r5mv1CLbUgx+1NHGgCREGECiTco_N2xqrWsU9iJdvaOfJaQ@mail.gmail.com>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] Set UID in sess_auth_rawntlmssp_authenticate too
+Date: Mon, 8 Dec 2014 06:42:37 -0600
+Message-ID: <CADT32e+FmUKE+JXe9CJFZ1kBudB+h4o_a3SZ+0x4K_q7+pCm_A@mail.gmail.com>
+References: <1417609596-23002-1-git-send-email-sprabhu@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mv1CLbUgx+1NHGgCREGECiTco_N2xqrWsU9iJdvaOfJaQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1417609596-23002-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-I backed this out temporarily - it generated various sparse endian warnings.
+Acked-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-On Sun, Dec 7, 2014 at 10:57 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> Merged into cifs-2.6.git for-next
+On Wed, Dec 3, 2014 at 6:26 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> A user complained that they were unable to login to their cifs share
+> after a kernel update. From the wiretrace we can see that the server
+> returns different UIDs as response to NTLMSSP_NEGOTIATE and NTLMSSP_AUTH
+> phases.
 >
-> On Mon, Nov 24, 2014 at 8:36 PM, Shirish Pargaonkar
-> <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> Acked-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->>
->> On Mon, Nov 24, 2014 at 9:53 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->>> We have encountered failures when When testing smb2 mounts on ppc64
->>> machines when using both Samba as well as Windows 2012.
->>>
->>> On poking around, the problem was determined to be caused by the
->>> high endian MessageID passed in the header for smb2. On checking the
->>> corresponding MID for smb1 is converted to LE before being sent on the
->>> wire.
->>>
->>> We have tested this using the RHEL 7 kernel where the patch fixes the
->>> issue.
->>>
->>> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->>> ---
->>>  fs/cifs/cifsglob.h | 6 +++---
->>>  fs/cifs/smb2pdu.h  | 2 +-
->>>  2 files changed, 4 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
->>> index 02a33e5..41ec69d 100644
->>> --- a/fs/cifs/cifsglob.h
->>> +++ b/fs/cifs/cifsglob.h
->>> @@ -661,16 +661,16 @@ set_credits(struct TCP_Server_Info *server, const int val)
->>>         server->ops->set_credits(server, val);
->>>  }
->>>
->>> -static inline __u64
->>> +static inline __le64
->>>  get_next_mid64(struct TCP_Server_Info *server)
->>>  {
->>> -       return server->ops->get_next_mid(server);
->>> +       return cpu_to_le64(server->ops->get_next_mid(server));
->>>  }
->>>
->>>  static inline __le16
->>>  get_next_mid(struct TCP_Server_Info *server)
->>>  {
->>> -       __u16 mid = get_next_mid64(server);
->>> +       __u16 mid = server->ops->get_next_mid(server);
->>>         /*
->>>          * The value in the SMB header should be little endian for easy
->>>          * on-the-wire decoding.
->>> diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
->>> index e3188ab..2d4914e 100644
->>> --- a/fs/cifs/smb2pdu.h
->>> +++ b/fs/cifs/smb2pdu.h
->>> @@ -110,7 +110,7 @@ struct smb2_hdr {
->>>         __le16 CreditRequest;  /* CreditResponse */
->>>         __le32 Flags;
->>>         __le32 NextCommand;
->>> -       __u64  MessageId;       /* opaque - so can stay little endian */
->>> +       __le64 MessageId;
->>>         __le32 ProcessId;
->>>         __u32  TreeId;          /* opaque - so do not make little endian */
->>>         __u64  SessionId;       /* opaque - so do not make little endian */
->>> --
->>> 1.9.3
->>>
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> With changes in the authentication code, we no longer set the
+> cifs_sess->Suid returned in response to the NTLM_AUTH phase and continue
+> to use the UID sent in response to the NTLMSSP_NEGOTIATE phase. This
+> results in the server denying access to the user when the user attempts
+> to do a tcon connect.
 >
+> A test kernel containing patch was tested successfully by the user.
 >
+> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/sess.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+> index 57db63f..446cb7f 100644
+> --- a/fs/cifs/sess.c
+> +++ b/fs/cifs/sess.c
+> @@ -1303,6 +1303,11 @@ sess_auth_rawntlmssp_authenticate(struct sess_data *sess_data)
+>         if (le16_to_cpu(pSMB->resp.Action) & GUEST_LOGIN)
+>                 cifs_dbg(FYI, "Guest login\n"); /* BB mark SesInfo struct? */
+>
+> +       if (ses->Suid != smb_buf->Uid) {
+> +               ses->Suid = smb_buf->Uid;
+> +               cifs_dbg(FYI, "UID changed! new UID = %llu\n", ses->Suid);
+> +       }
+> +
+>         bytes_remaining = get_bcc(smb_buf);
+>         bcc_ptr = pByteArea(smb_buf);
+>         blob_len = le16_to_cpu(pSMB->resp.SecurityBlobLength);
+> --
+> 2.1.0
 >
 > --
-> Thanks,
->
-> Steve
-
-
-
--- 
-Thanks,
-
-Steve
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
