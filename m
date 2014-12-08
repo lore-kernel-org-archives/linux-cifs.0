@@ -1,97 +1,94 @@
-From: Michael Kerscher <michael-h4kDu0VMPndVshqcic2dkxvVK+yQ3ZXh@public.gmane.org>
-Subject: incomplete FIND_FIRST2 response and resulting cifs behavior
-Date: Mon, 08 Dec 2014 01:59:26 +0100
-Message-ID: <5484F7EE.8070309@kerscher-michael.de>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH v2] Convert MessageID in smb2_hdr to LE
+Date: Sun, 7 Dec 2014 22:57:51 -0600
+Message-ID: <CAH2r5mv1CLbUgx+1NHGgCREGECiTco_N2xqrWsU9iJdvaOfJaQ@mail.gmail.com>
+References: <1416844438-22012-1-git-send-email-sprabhu@redhat.com> <CADT32eLC685oUD=ywJEYaeFjLYe7dgJx-CRbJiQ-=3arNaL2HQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="------------060302090406040606010809"
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Maximilian Engelhardt <maximilian.engelhardt-k8VSl6tcS6nF41mA0N3lWw@public.gmane.org>
-To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CADT32eLC685oUD=ywJEYaeFjLYe7dgJx-CRbJiQ-=3arNaL2HQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------060302090406040606010809
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Merged into cifs-2.6.git for-next
 
-Hello,
+On Mon, Nov 24, 2014 at 8:36 PM, Shirish Pargaonkar
+<shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> Acked-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>
+> On Mon, Nov 24, 2014 at 9:53 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+>> We have encountered failures when When testing smb2 mounts on ppc64
+>> machines when using both Samba as well as Windows 2012.
+>>
+>> On poking around, the problem was determined to be caused by the
+>> high endian MessageID passed in the header for smb2. On checking the
+>> corresponding MID for smb1 is converted to LE before being sent on the
+>> wire.
+>>
+>> We have tested this using the RHEL 7 kernel where the patch fixes the
+>> issue.
+>>
+>> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>> ---
+>>  fs/cifs/cifsglob.h | 6 +++---
+>>  fs/cifs/smb2pdu.h  | 2 +-
+>>  2 files changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+>> index 02a33e5..41ec69d 100644
+>> --- a/fs/cifs/cifsglob.h
+>> +++ b/fs/cifs/cifsglob.h
+>> @@ -661,16 +661,16 @@ set_credits(struct TCP_Server_Info *server, const int val)
+>>         server->ops->set_credits(server, val);
+>>  }
+>>
+>> -static inline __u64
+>> +static inline __le64
+>>  get_next_mid64(struct TCP_Server_Info *server)
+>>  {
+>> -       return server->ops->get_next_mid(server);
+>> +       return cpu_to_le64(server->ops->get_next_mid(server));
+>>  }
+>>
+>>  static inline __le16
+>>  get_next_mid(struct TCP_Server_Info *server)
+>>  {
+>> -       __u16 mid = get_next_mid64(server);
+>> +       __u16 mid = server->ops->get_next_mid(server);
+>>         /*
+>>          * The value in the SMB header should be little endian for easy
+>>          * on-the-wire decoding.
+>> diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+>> index e3188ab..2d4914e 100644
+>> --- a/fs/cifs/smb2pdu.h
+>> +++ b/fs/cifs/smb2pdu.h
+>> @@ -110,7 +110,7 @@ struct smb2_hdr {
+>>         __le16 CreditRequest;  /* CreditResponse */
+>>         __le32 Flags;
+>>         __le32 NextCommand;
+>> -       __u64  MessageId;       /* opaque - so can stay little endian */
+>> +       __le64 MessageId;
+>>         __le32 ProcessId;
+>>         __u32  TreeId;          /* opaque - so do not make little endian */
+>>         __u64  SessionId;       /* opaque - so do not make little endian */
+>> --
+>> 1.9.3
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-we found an issue which might be sourced in the cifs module and might
-only be triggered in a special case.
 
-Our current situation:
-We run a samba-4.1.13 (debian jessie) and in our share are some files
-with an iso 8859-1 encoding (e.g. test_ä_foo). There are some errors in
-the samba log like
 
-[2014/12/07 20:00:52.353146,  0]
-../lib/util/charset/convert_string.c:438(convert_string_talloc_handle)
-  Conversion error: Illegal multibyte sequence(ä_foo)
+-- 
+Thanks,
 
-This is an issue I will also look into but the problem is, that samba
-responds to the FIND_FIRST2 request with an incomplete response. I
-attached a pcap with an example which I logged on my client. The
-requested directory (public/mytest) contained only a file named
-test_ä_foo (in iso 8859-1 encoding) so the response contained the . and
-.. directory entries and a file entry which is missing the file name
-field at the end of the packet. It just stops at the num links field.
-
-A windows client just shows an empty filename in the explorer.
-
-If mounted on linux with cifs then I see either random characters, some
-directory/file names of the parent directory (or other directories) or
-ls: reading directory /mnt/tmp/public/mytest: Invalid argument
-On repeated calls of ls the filename changes to some other folder names.
-
-E.g if my directory looks like
--> public
-   - test_file
-   - test_foo
-   -> mytest
-      - test_ä_foo
-then $ ls public/mytest might have the following outputs:
-$ ls public/mytest
-<some_random_chars>
-$ ls public/mytest
-test_file
-$ ls public/mytest
-test_file
-$ ls public/mytest
-test_foo
-
-which is not what I expected (test_ä_foo)
-
-In the attached pcap log you can see a request where there should be
-included the directory entries ".", ".." and a file named "test_ä_foo".
-
-If you need more details I'll be happy to provide them.
-
-regards,
-Michael
-
---------------060302090406040606010809
-Content-Type: application/octet-stream;
- name="example.pcapng"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="example.pcapng"
-
-Cg0NChwAAABNPCsaAQAAAP//////////HAAAAAEAAAAgAAAAAQAAAAAABAAJAAEABgAAAAAA
-AAAgAAAABgAAANgAAAAAAAAAlAkFAFqGLba2AAAAtgAAAAAYcdznAAAfO4tWQQgARQAAqFeu
-QABABkQgCpYJkwqWf8Po2wG9yl6WYQ4DrVyAGAWfAe8AAAEBCAoBZPnvCf37ugAAAHD/U01C
-MgAAAAAAAcAAAAAAAAAAAAAAAABBew4eXBi7Eg8uAAAACgAAQAAAAAAAAAAAAAAuAEIAAAAA
-AAEAAQAvAAAXAJYABgACAgAAAAAvAHAAdQBiAGwAaQBjAC8AbQB5AHQAZQBzAHQALwAqAAAA
-AADYAAAABgAAAPwBAAAAAAAAlAkFAImdLbbaAQAA2gEAAAAfO4tWQQAYcdznAAgARQABzL2Y
-QAA/Bt4RCpZ/wwqWCZMBvejbDgOtXMpeltWAGAD8wNkAAAEBCAoJ/fwuAWT57wAAAZT/U01C
-MgAAAACAA8gAAAAAAAAAAAAAAABBew4eXBi7EgoKAFABAAAKADgAAABQAUQAAAAAAF0BAP3/
-AwABAAAA5AAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD80uD6tEdABmPeDn60R0AE/NLg+
-rRHQASapRgQAAAAAJqlGBAAAAAABAAAACQAAAAAAAAAFAAAAAAAAAC9gyAEFCQAA7QEAAAAA
-AAACAAAAAAAAAC4AAAB0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/NLg+rRHQAVBMCZ+tEdAB
-PzS4Pq0R0AEmqUYEAAAAACapRgQAAAAAAQAAAAkAAAAAAAAABQAAAAAAAAB9IAIABQkAAO0B
-AAAAAAAABQAAAAAAAAAuAC4AAAAAAGwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD80uD6tEdAB
-lP7rY5cR0AFCuCwplhHQAVV8VAQAAAAAVXxUBAAAAAAAAAAACQAAAAAAAAAFAAAAAAAAAAhA
-mQMFCQAApAEAAAAAAAABAAAAAAAAAAAA/AEAAA==
---------------060302090406040606010809--
+Steve
