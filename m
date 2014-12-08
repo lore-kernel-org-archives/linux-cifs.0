@@ -1,59 +1,101 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v4 0/3] cifs: small clean up series
-Date: Sun, 7 Dec 2014 23:35:06 -0600
-Message-ID: <CAH2r5mtQZdHn5hPHJLpppgjBfDgqx5k7G62zqJtQsaN6OEwFgQ@mail.gmail.com>
-References: <1409147384-20389-1-git-send-email-andriy.shevchenko@linux.intel.com>
- <1413986632.2396.38.camel@linux.intel.com>
+Subject: Re: [PATCH v2] Convert MessageID in smb2_hdr to LE
+Date: Sun, 7 Dec 2014 23:45:45 -0600
+Message-ID: <CAH2r5mvf8kHZq_9u=bvb1tphknNRnmFy4phZtNYUsB5_AU17hQ@mail.gmail.com>
+References: <1416844438-22012-1-git-send-email-sprabhu@redhat.com>
+ <CADT32eLC685oUD=ywJEYaeFjLYe7dgJx-CRbJiQ-=3arNaL2HQ@mail.gmail.com> <CAH2r5mv1CLbUgx+1NHGgCREGECiTco_N2xqrWsU9iJdvaOfJaQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>,
-	Alexander Bokovoy <ab-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-To: Andy Shevchenko <andriy.shevchenko-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+Cc: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1413986632.2396.38.camel-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+In-Reply-To: <CAH2r5mv1CLbUgx+1NHGgCREGECiTco_N2xqrWsU9iJdvaOfJaQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-series merged into cifs-2.6.git
+I backed this out temporarily - it generated various sparse endian warnings.
 
-On Wed, Oct 22, 2014 at 9:03 AM, Andy Shevchenko
-<andriy.shevchenko-VuQAYsv1563Yd54FQh9/CA@public.gmane.org> wrote:
-> On Wed, 2014-08-27 at 16:49 +0300, Andy Shevchenko wrote:
->> This is small clean up series against CIFS kernel module.
->>
+On Sun, Dec 7, 2014 at 10:57 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> Merged into cifs-2.6.git for-next
 >
-> Ping? Is there any comments?
+> On Mon, Nov 24, 2014 at 8:36 PM, Shirish Pargaonkar
+> <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>> Acked-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>>
+>> On Mon, Nov 24, 2014 at 9:53 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+>>> We have encountered failures when When testing smb2 mounts on ppc64
+>>> machines when using both Samba as well as Windows 2012.
+>>>
+>>> On poking around, the problem was determined to be caused by the
+>>> high endian MessageID passed in the header for smb2. On checking the
+>>> corresponding MID for smb1 is converted to LE before being sent on the
+>>> wire.
+>>>
+>>> We have tested this using the RHEL 7 kernel where the patch fixes the
+>>> issue.
+>>>
+>>> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>>> ---
+>>>  fs/cifs/cifsglob.h | 6 +++---
+>>>  fs/cifs/smb2pdu.h  | 2 +-
+>>>  2 files changed, 4 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+>>> index 02a33e5..41ec69d 100644
+>>> --- a/fs/cifs/cifsglob.h
+>>> +++ b/fs/cifs/cifsglob.h
+>>> @@ -661,16 +661,16 @@ set_credits(struct TCP_Server_Info *server, const int val)
+>>>         server->ops->set_credits(server, val);
+>>>  }
+>>>
+>>> -static inline __u64
+>>> +static inline __le64
+>>>  get_next_mid64(struct TCP_Server_Info *server)
+>>>  {
+>>> -       return server->ops->get_next_mid(server);
+>>> +       return cpu_to_le64(server->ops->get_next_mid(server));
+>>>  }
+>>>
+>>>  static inline __le16
+>>>  get_next_mid(struct TCP_Server_Info *server)
+>>>  {
+>>> -       __u16 mid = get_next_mid64(server);
+>>> +       __u16 mid = server->ops->get_next_mid(server);
+>>>         /*
+>>>          * The value in the SMB header should be little endian for easy
+>>>          * on-the-wire decoding.
+>>> diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+>>> index e3188ab..2d4914e 100644
+>>> --- a/fs/cifs/smb2pdu.h
+>>> +++ b/fs/cifs/smb2pdu.h
+>>> @@ -110,7 +110,7 @@ struct smb2_hdr {
+>>>         __le16 CreditRequest;  /* CreditResponse */
+>>>         __le32 Flags;
+>>>         __le32 NextCommand;
+>>> -       __u64  MessageId;       /* opaque - so can stay little endian */
+>>> +       __le64 MessageId;
+>>>         __le32 ProcessId;
+>>>         __u32  TreeId;          /* opaque - so do not make little endian */
+>>>         __u64  SessionId;       /* opaque - so do not make little endian */
+>>> --
+>>> 1.9.3
+>>>
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+>>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
->> Changes since v3:
->> - rebase on top of recent linux-next
->>
->> Changes since v2:
->> - patch 1 got ACK and Reviwed-by tags
->> - patch 2 incorporates new piece of code similar that it used to have already,
->>   thus tags were dropped for this round
->> - new patch 3
->>
->> Andy Shevchenko (3):
->>   cifs: call strtobool instead of custom implementation
->>   cifs: convert to print_hex_dump() instead of custom implementation
->>   cifs: convert printk(LEVEL...) to pr_<level>
->>
->>  fs/cifs/cifs_debug.c | 77 ++++++++++++++++++++++------------------------------
->>  fs/cifs/cifs_debug.h |  7 ++---
->>  fs/cifs/connect.c    | 51 ++++++++++++----------------------
->>  fs/cifs/misc.c       | 32 ++--------------------
->>  fs/cifs/transport.c  |  4 +--
->>  5 files changed, 58 insertions(+), 113 deletions(-)
->>
 >
 >
 > --
-> Andy Shevchenko <andriy.shevchenko-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-> Intel Finland Oy
+> Thanks,
 >
+> Steve
 
 
 
