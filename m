@@ -1,258 +1,244 @@
-From: Malte Westerhoff <MWesterhoff-b1n3U3u3AEZwaa3ho+uhNwC/G2K4zDHf@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Subject: Re: Intermittent issue accessing shares (0xc0000034
  NT_STATUS_OBJECT_NAME_NOT_FOUND)
-Date: Fri, 2 Jan 2015 22:42:23 +0000
-Message-ID: <BA72EDFF-5BF2-421B-98ED-93BBC0B5220C@visageimaging.com>
+Date: Fri, 2 Jan 2015 17:45:58 -0500
+Message-ID: <20150102174558.2972221a@tlielax.poochiereds.net>
 References: <5CD28AE9-6FE9-47AA-8812-80D8264DAF83@visageimaging.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Malte Westerhoff <MWesterhoff-b1n3U3u3AEZwaa3ho+uhNwC/G2K4zDHf@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <5CD28AE9-6FE9-47AA-8812-80D8264DAF83-b1n3U3u3AEZwaa3ho+uhNwC/G2K4zDHf@public.gmane.org>
-Content-Language: en-US
-Content-ID: <759F6B46E4B37246A7D233D8363AD2A2-b1n3U3u3AEZwaa3ho+uhNwC/G2K4zDHf@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-QWRkaXRpb246DQpJbiBhbm90aGVyIG9jY3VycmVuY2Ugb2YgdGhlIHByb2JsZW0gd2UgYXJlIHNl
-ZWluZyBhIGRpZmZlcmVudCBlcnJvciBpbiANCnRoZSBsb2dzOg0KDQoxNzM0NTAxNSAyMDE1LTAx
-LTAyVDEwOjU1OjU4LjgyODE0Ni0wODowMCBkY3BsdnJzMDA1IGtlcm5lbDogDQpbODA3MjM0NS44
-MjQyNTFdIA0KL2hvbWUvYWJ1aWxkL3JwbWJ1aWxkL0JVSUxEL2tlcm5lbC1kZXNrdG9wLTMuMTEu
-MTAvbGludXgtMy4xMS9mcy9jaWZzL2NpZnNzDQptYi5jOiBJbiBRRlNBdHRyaWJ1dGVJbmZvDQox
-NzM0NTAxNiAyMDE1LTAxLTAyVDEwOjU1OjU4LjgyODE0Ny0wODowMCBkY3BsdnJzMDA1IGtlcm5l
-bDogDQpbODA3MjM0NS44MjQyNTNdIA0KL2hvbWUvYWJ1aWxkL3JwbWJ1aWxkL0JVSUxEL2tlcm5l
-bC1kZXNrdG9wLTMuMTEuMTAvbGludXgtMy4xMS9mcy9jaWZzL3RyYW5zDQpwb3J0LmM6IEZvciBz
-bWJfY29tbWFuZCA1MA0KMTczNDUwMTcgMjAxNS0wMS0wMlQxMDo1NTo1OC44MjgxNDgtMDg6MDAg
-ZGNwbHZyczAwNSBrZXJuZWw6IA0KWzgwNzIzNDUuODI0MjU1XSANCi9ob21lL2FidWlsZC9ycG1i
-dWlsZC9CVUlMRC9rZXJuZWwtZGVza3RvcC0zLjExLjEwL2xpbnV4LTMuMTEvZnMvY2lmcy90cmFu
-cw0KcG9ydC5jOiBTZW5kaW5nIHNtYjogc21iX2xlbj02OA0KMTczNDUwMTggMjAxNS0wMS0wMlQx
-MDo1NTo1OC44MjgxNDktMDg6MDAgZGNwbHZyczAwNSBrZXJuZWw6IA0KWzgwNzIzNDUuODI0MzQy
-XSANCi9ob21lL2FidWlsZC9ycG1idWlsZC9CVUlMRC9rZXJuZWwtZGVza3RvcC0zLjExLjEwL2xp
-bnV4LTMuMTEvZnMvY2lmcy9jb25uZQ0KY3QuYzogUkZDMTAwMiBoZWFkZXIgMHg0Yw0KMTczNDUw
-MTkgMjAxNS0wMS0wMlQxMDo1NTo1OC44MjgxNTEtMDg6MDAgZGNwbHZyczAwNSBrZXJuZWw6IA0K
-WzgwNzIzNDUuODI0MzQ2XSANCi9ob21lL2FidWlsZC9ycG1idWlsZC9CVUlMRC9rZXJuZWwtZGVz
-a3RvcC0zLjExLjEwL2xpbnV4LTMuMTEvZnMvY2lmcy9taXNjLg0KYzogY2hlY2tTTUIgTGVuZ3Ro
-OiAweDUwLCBzbWJfYnVmX2xlbmd0aDogMHg0Yw0KMTczNDUwMjAgMjAxNS0wMS0wMlQxMDo1NTo1
-OC44MjgxNTItMDg6MDAgZGNwbHZyczAwNSBrZXJuZWw6IA0KWzgwNzIzNDUuODI0MzY5XSANCi9o
-b21lL2FidWlsZC9ycG1idWlsZC9CVUlMRC9rZXJuZWwtZGVza3RvcC0zLjExLjEwL2xpbnV4LTMu
-MTEvZnMvY2lmcy90cmFucw0KcG9ydC5jOiBjaWZzX3N5bmNfbWlkX3Jlc3VsdDogY21kPTUwIG1p
-ZD02MDg5MiBzdGF0ZT00DQoxNzM0NTAyMSAyMDE1LTAxLTAyVDEwOjU1OjU4LjgyODE1My0wODow
-MCBkY3BsdnJzMDA1IGtlcm5lbDogDQpbODA3MjM0NS44MjQzNzZdIA0KL2hvbWUvYWJ1aWxkL3Jw
-bWJ1aWxkL0JVSUxEL2tlcm5lbC1kZXNrdG9wLTMuMTEuMTAvbGludXgtMy4xMS9mcy9jaWZzL2Nv
-bm5lDQpjdC5jOiBidWlsZF91bmNfcGF0aF90b19yb290OiBmdWxsX3BhdGg9XFwxNzIuMTYuMTA3
-LjEzNVxJbWFnZVJvb3Q1DQoxNzM0NTAyMiAyMDE1LTAxLTAyVDEwOjU1OjU4LjgyODE1NC0wODow
-MCBkY3BsdnJzMDA1IGtlcm5lbDogDQpbODA3MjM0NS44MjQzODBdIA0KL2hvbWUvYWJ1aWxkL3Jw
-bWJ1aWxkL0JVSUxEL2tlcm5lbC1kZXNrdG9wLTMuMTEuMTAvbGludXgtMy4xMS9mcy9jaWZzL2Np
-ZnNzDQptYi5jOiBJbiBHZXRERlNSZWZlciB0aGUgcGF0aCBcMTcyLjE2LjEwNy4xMzVcSW1hZ2VS
-b290NQ0KMTczNDUwMjMgMjAxNS0wMS0wMlQxMDo1NTo1OC44MjgxNTYtMDg6MDAgZGNwbHZyczAw
-NSBrZXJuZWw6IA0KWzgwNzIzNDUuODI0Mzg1XSANCi9ob21lL2FidWlsZC9ycG1idWlsZC9CVUlM
-RC9rZXJuZWwtZGVza3RvcC0zLjExLjEwL2xpbnV4LTMuMTEvZnMvY2lmcy90cmFucw0KcG9ydC5j
-OiBGb3Igc21iX2NvbW1hbmQgNTANCjE3MzQ1MDI0IDIwMTUtMDEtMDJUMTA6NTU6NTguODI4MTU3
-LTA4OjAwIGRjcGx2cnMwMDUga2VybmVsOiANCls4MDcyMzQ1LjgyNDM4OF0gDQovaG9tZS9hYnVp
-bGQvcnBtYnVpbGQvQlVJTEQva2VybmVsLWRlc2t0b3AtMy4xMS4xMC9saW51eC0zLjExL2ZzL2Np
-ZnMvdHJhbnMNCnBvcnQuYzogU2VuZGluZyBzbWI6IHNtYl9sZW49MTI0DQoxNzM0NTAyNSAyMDE1
-LTAxLTAyVDEwOjU1OjU4LjgyODE1OC0wODowMCBkY3BsdnJzMDA1IGtlcm5lbDogDQpbODA3MjM0
-NS44MjQ0NzddIA0KL2hvbWUvYWJ1aWxkL3JwbWJ1aWxkL0JVSUxEL2tlcm5lbC1kZXNrdG9wLTMu
-MTEuMTAvbGludXgtMy4xMS9mcy9jaWZzL2Nvbm5lDQpjdC5jOiBSRkMxMDAyIGhlYWRlciAweDIz
-DQoxNzM0NTAyNiAyMDE1LTAxLTAyVDEwOjU1OjU4LjgyODE1OS0wODowMCBkY3BsdnJzMDA1IGtl
-cm5lbDogDQpbODA3MjM0NS44MjQ0ODVdIA0KL2hvbWUvYWJ1aWxkL3JwbWJ1aWxkL0JVSUxEL2tl
-cm5lbC1kZXNrdG9wLTMuMTEuMTAvbGludXgtMy4xMS9mcy9jaWZzL21pc2MuDQpjOiBjaGVja1NN
-QiBMZW5ndGg6IDB4MjcsIHNtYl9idWZfbGVuZ3RoOiAweDIzDQoxNzM0NTAyNyAyMDE1LTAxLTAy
-VDEwOjU1OjU4LjgyODE1OS0wODowMCBkY3BsdnJzMDA1IGtlcm5lbDogDQpbODA3MjM0NS44MjQ0
-ODhdIA0KL2hvbWUvYWJ1aWxkL3JwbWJ1aWxkL0JVSUxEL2tlcm5lbC1kZXNrdG9wLTMuMTEuMTAv
-bGludXgtMy4xMS9mcy9jaWZzL3NtYjFvDQpwcy5jOiBpbnZhbGlkIHRyYW5zYWN0MiB3b3JkIGNv
-dW50DQoxNzM0NTAyOCAyMDE1LTAxLTAyVDEwOjU1OjU4LjgyODE2MC0wODowMCBkY3BsdnJzMDA1
-IGtlcm5lbDogDQpbODA3MjM0NS44MjQ0OTddIA0KL2hvbWUvYWJ1aWxkL3JwbWJ1aWxkL0JVSUxE
-L2tlcm5lbC1kZXNrdG9wLTMuMTEuMTAvbGludXgtMy4xMS9mcy9jaWZzL3RyYW5zDQpwb3J0LmM6
-IGNpZnNfc3luY19taWRfcmVzdWx0OiBjbWQ9NTAgbWlkPTYwODkzIHN0YXRlPTQNCjE3MzQ1MDI5
-IDIwMTUtMDEtMDJUMTA6NTU6NTguODI4MTYxLTA4OjAwIGRjcGx2cnMwMDUga2VybmVsOiANCls4
-MDcyMzQ1LjgyNDUwNl0gU3RhdHVzIGNvZGUgcmV0dXJuZWQgMHhjMDAwMDE5YyANCk5UX1NUQVRV
-U19GU19EUklWRVJfUkVRVUlSRUQNCjE3MzQ1MDMwIDIwMTUtMDEtMDJUMTA6NTU6NTguODI4MTc0
-LTA4OjAwIGRjcGx2cnMwMDUga2VybmVsOiANCls4MDcyMzQ1LjgyNDUxMl0gDQovaG9tZS9hYnVp
-bGQvcnBtYnVpbGQvQlVJTEQva2VybmVsLWRlc2t0b3AtMy4xMS4xMC9saW51eC0zLjExL2ZzL2Np
-ZnMvbmV0bWkNCnNjLmM6IE1hcHBpbmcgc21iIGVycm9yIGNvZGUgMHhjMDAwMDE5YyB0byBQT1NJ
-WCBlcnIgLTUNCjE3MzQ1MDMxIDIwMTUtMDEtMDJUMTA6NTU6NTguODI4MTc1LTA4OjAwIGRjcGx2
-cnMwMDUga2VybmVsOiANCls4MDcyMzQ1LjgyNDUxNl0gDQovaG9tZS9hYnVpbGQvcnBtYnVpbGQv
-QlVJTEQva2VybmVsLWRlc2t0b3AtMy4xMS4xMC9saW51eC0zLjExL2ZzL2NpZnMvY2lmc3MNCm1i
-LmM6IFNlbmQgZXJyb3IgaW4gR2V0REZTUmVmZXIgPSAtNQ0KMTczNDUwMzIgMjAxNS0wMS0wMlQx
-MDo1NTo1OC44MjgxNzYtMDg6MDAgZGNwbHZyczAwNSBrZXJuZWw6IA0KWzgwNzIzNDUuODI0NTIz
-XSANCi9ob21lL2FidWlsZC9ycG1idWlsZC9CVUlMRC9rZXJuZWwtZGVza3RvcC0zLjExLjEwL2xp
-bnV4LTMuMTEvZnMvY2lmcy90cmFucw0KcG9ydC5jOiBGb3Igc21iX2NvbW1hbmQgNTANCjE3MzQ1
-MDMzIDIwMTUtMDEtMDJUMTA6NTU6NTguODI4MTc3LTA4OjAwIGRjcGx2cnMwMDUga2VybmVsOiAN
-Cls4MDcyMzQ1LjgyNDUyNV0gDQovaG9tZS9hYnVpbGQvcnBtYnVpbGQvQlVJTEQva2VybmVsLWRl
-c2t0b3AtMy4xMS4xMC9saW51eC0zLjExL2ZzL2NpZnMvdHJhbnMNCnBvcnQuYzogU2VuZGluZyBz
-bWI6IHNtYl9sZW49NzQNCjE3MzQ1MDM0IDIwMTUtMDEtMDJUMTA6NTU6NTguODI4MTc4LTA4OjAw
-IGRjcGx2cnMwMDUga2VybmVsOiANCls4MDcyMzQ1LjgyNDY4MF0gDQovaG9tZS9hYnVpbGQvcnBt
-YnVpbGQvQlVJTEQva2VybmVsLWRlc2t0b3AtMy4xMS4xMC9saW51eC0zLjExL2ZzL2NpZnMvY29u
-bmUNCmN0LmM6IFJGQzEwMDIgaGVhZGVyIDB4OWMNCjE3MzQ1MDM1IDIwMTUtMDEtMDJUMTA6NTU6
-NTguODI4MTgwLTA4OjAwIGRjcGx2cnMwMDUga2VybmVsOiANCls4MDcyMzQ1LjgyNDY5MV0gDQov
-aG9tZS9hYnVpbGQvcnBtYnVpbGQvQlVJTEQva2VybmVsLWRlc2t0b3AtMy4xMS4xMC9saW51eC0z
-LjExL2ZzL2NpZnMvbWlzYy4NCmM6IGNoZWNrU01CIExlbmd0aDogMHhhMCwgc21iX2J1Zl9sZW5n
-dGg6IDB4OWMNCg0KDQoNCk1hbHRlDQoNCg0KDQoNCg0KDQoNCk9uIDAyLzAxLzE1IDE1OjM5LCAi
-TWFsdGUgV2VzdGVyaG9mZiIgPE1XZXN0ZXJob2ZmQHZpc2FnZWltYWdpbmcuY29tPiANCndyb3Rl
-Og0KDQo+SGksDQo+SSBob3BlIHRoYXQgdGhpcyBpcyB0aGUgcmlnaHQgbGlzdCB0byBwb3N0IHRo
-aXMgdG8uIEFwb2xvZ2llcyBpZiBub3Qg4oCTIA0KPmJ1dCANCj5hbnkgaGludHMgd291bGQgYmUg
-YXBwcmVjaWF0ZWQuDQo+DQo+V2UgYXJlIHNlZWluZyBpbnRlcm1pdHRlbnQgaXNzdWVzIGFjY2Vz
-c2luZyBzaGFyZXMgdGhhdCBhcmUgZXhwb3J0ZWQgYnkgYSANCj5XaW5kb3dzIDIwMDhSMiBzZXJ2
-ZXIgYW5kIG1vdW50ZWQgb24gYSBMaW51eCBjbGllbnQgT3BlblN1c2UgMTMuMSAoa2VybmVsIA0K
-PjMuMTEuMTAtMjEtZGVza3RvcCwgc2FtYmEtY2xpZW50LTQuMS4xMS0zLjI2LjEueDg2XzY0KS4N
-Cj5UaGUgYXBwbGljYXRpb24gbGV2ZWwgc3ltcHRvbSBpcyB0aGF0IGZpbGVzIGNhbiBuZWl0aGVy
-IGJlIHJlYWQgbm9yIA0KPndyaXR0ZW4gb24gYSBwYXJ0aWN1bGFyIHNoYXJlLiBXZSBoYXZlIHNl
-dCBjaWZzRllJPTMgYW5kIHdlIHNlZSBhIA0KPk5UX1NUQVRVU19PQkpFQ1RfTkFNRV9OT1RfRk9V
-TkQNCj5pbiAvdmFyL2xvZy9tZXNzYWdlcyB3aGVuIGl0IGhhcHBlbnMgKGV4Y2VycHQgYmVsb3cp
-Lg0KPk5vcm1hbGx5IHRoZSBpc3N1ZSBzZWxmLXJlcGFpcnMgd2l0aGluIG9uZSBtaW51dGUuDQo+
-V2UgaGF2ZSBzaXggbGludXggY2xpZW50cyBhY2Nlc3NpbmcgdGhlIHNhbWUgd2luZG93cyBzZXJ2
-ZXIg4oCTIGFuZCB3aGVuIA0KPm9uZSANCj5vZiB0aGVtIGhhcyB0aGUgaXNzdWUsIHRoZSBvdGhl
-cnMgZG8gbm90IOKAkyBzbyBpdCBsb29rcyBsaWtlIGEgY2xpZW50LXNpZGUgDQo+aXNzdWUuDQo+
-V2UgYXJlIHNlZWluZyB0aGlzIGlzc3VlIGluIHR3byBzZXBhcmF0ZSBkYXRhIGNlbnRlcnMgKHdp
-dGggaWRlbnRpY2FsIA0KPnNlcnZlciBjb25maWd1cmF0aW9uKSwgc28gaXQgaXMgbm90IGxpa2Vs
-eSB0byBiZSBoYXJkd2FyZSBvciBuZXR3b3JrLg0KPlRoZSBzZXJ2ZXIgZXhwb3J0cyBhcHByb3gg
-MjAgc2hhcmVzIOKAkyBhbmQgdHlwaWNhbGx5IG9ubHkgb25lIG9mIHRoZW0gaXMgDQo+YWZmZWN0
-ZWQgYXQgYSB0aW1lIChidXQgbm90IGFsd2F5cyB0aGUgc2FtZSBvbmUpLg0KPlRoZSBuZXR3b3Jr
-IGNvbm5lY3Rpb24gaXMgYSBsb2NhbCAxMEdCaXQgRXRoZXJuZXQgY29ubmVjdGlvbi4NCj5BY3Jv
-c3Mgc2l4IGNsaWVudHMsIGFjY2Vzc2luZyB+MjAgc2hhcmVzIChlYWNoKSwgdGhlIGlzc3VlIG9j
-Y3VycyANCj5hcHByb3hpbWF0ZWx5IDItNSB0aW1lcyBwZXIgMjQgaG91cnMgKHRvdGFsIGFjcm9z
-cyBhbGwgc2VydmVycyBhbmQgDQo+c2hhcmVzKS4gDQo+VGhlIHNoYXJlcyBhcmUgbW91bnRlZCB1
-c2luZyBhdXRvZnMsIGJ1dCB3ZSBoYXZlIHNlZW4gdGhlIHNhbWUgaXNzdWUgd2l0aCANCj5zdGF0
-aWMgbW91bnRzLg0KPg0KPkhlcmUgaXMgdGhlIG91dHB1dCBvZiBtb3VudCBmb3Igb25lIG9mIHRo
-ZW06DQo+Ly8xMC4xNjguMTcyLjUxL0ltYWdlUm9vdEZvbGRlcjEgb24gDQo+L1N0b3JhZ2UvV0lO
-U0VSVkVSMDAxL0ltYWdlUm9vdEZvbGRlcjEgDQo+dHlwZSBjaWZzIA0KPihydyxyZWxhdGltZSx2
-ZXJzPTEuMCxjYWNoZT1zdHJpY3QsdXNlcm5hbWU9eHh4X3VzZXJuYW1lLGRvbWFpbj0xMC4xNjgu
-MTcyDQo+Lg0KPjUxLHVpZD01MDAwMCxmb3JjZXVpZCxnaWQ9MTAwLGZvcmNlZ2lkLGFkZHI9MTAu
-MTY4LjE3Mi41MSxmaWxlX21vZGU9MDc1NSxkDQo+aQ0KPnJfbW9kZT0wNzcwLG5vdW5peCxzZXJ2
-ZXJpbm8scnNpemU9NjE0NDAsd3NpemU9NjU1MzYsYWN0aW1lbz0xKQ0KPg0KPldlIGhhdmUgYWRk
-ZWQgdGVzdCBjb2RlIHdoZXJlIHRoZSBjbGllbnRzIGF0dGVtcHQgdG8gd3JpdGUgYW5kIHRoZW4g
-cmVhZCANCj5hIA0KPnRlc3QgZmlsZSBvbnRvIGVhY2ggb2YgdGhlIHNoYXJlcyBvbmNlIHBlciBt
-aW51dGUuIElmIHRoYXQgZmFpbHMgdGhlIA0KPmNsaWVudHMgcmV0cnkgMjAgdGltZXMgd2l0aCAx
-MDBtcyBwYXVzZS4gV2UgZm91bmQgdGhhdCBpZiB0aGlzIGZhaWxzLA0KPiBpdCBjb250aW51ZXMg
-dG8gZmFpbCBhbGwgMjAgdGltZXMuDQo+DQo+QmVsb3cgaXMgL3Zhci9sb2cvbWVzc2FnZXMgZm9y
-IHR3byBzdWNoIGZhaWxlZCBhdHRlbXB0cyAoZmlsZSANCj5XUklURV8wNDIyLlRFU1QpICB3aGVu
-IHRoZSBwcm9ibGVtIG9jY3VycmVkOg0KPg0KPg0KPjIwMTUtMDEtMDJUMDM6MjA6MDkuMTI1NjY5
-LTA4OjAwIGxpbmNsbnQwMDMga2VybmVsOiBbMjY0OTMzNi4xMzQwOThdIA0KPi9ob21lL2FidWls
-ZC9ycG1idWlsZC9CVUlMRC9rZXJuZWwtZGVza3RvcC0zLjExLjEwL2xpbnV4LTMuMTEvZnMvY2lm
-cy9kaXIuDQo+Yw0KPjogbmFtZTogXFdSSVRFXzA0MjIuVEVTVA0KPjIwMTUtMDEtMDJUMDM6MjA6
-MDkuMTI1NjcxLTA4OjAwIGxpbmNsbnQwMDMga2VybmVsOiBbMjY0OTMzNi4xMzQxMDddIA0KPi9o
-b21lL2FidWlsZC9ycG1idWlsZC9CVUlMRC9rZXJuZWwtZGVza3RvcC0zLjExLjEwL2xpbnV4LTMu
-MTEvZnMvY2lmcy90cmFuDQo+cw0KPnBvcnQuYzogRm9yIHNtYl9jb21tYW5kDQo+IDYNCj4yMDE1
-LTAxLTAyVDAzOjIwOjA5LjEyNTY3Mi0wODowMCBsaW5jbG50MDAzIGtlcm5lbDogWzI2NDkzMzYu
-MTM0MTEwXSANCj4vaG9tZS9hYnVpbGQvcnBtYnVpbGQvQlVJTEQva2VybmVsLWRlc2t0b3AtMy4x
-MS4xMC9saW51eC0zLjExL2ZzL2NpZnMvdHJhbg0KPnMNCj5wb3J0LmM6IFNlbmRpbmcNCj4gc21i
-OiBzbWJfbGVuPTcyDQo+MjAxNS0wMS0wMlQwMzoyMDowOS4zMTcwMDEtMDg6MDAgbGluY2xudDAw
-MyBrZXJuZWw6IFsyNjQ5MzM2LjMyNTgyMF0gDQo+L2hvbWUvYWJ1aWxkL3JwbWJ1aWxkL0JVSUxE
-L2tlcm5lbC1kZXNrdG9wLTMuMTEuMTAvbGludXgtMy4xMS9mcy9jaWZzL2Nvbm4NCj5lDQo+Y3Qu
-YzogUkZDMTAwMg0KPiBoZWFkZXIgMHgyMw0KPjIwMTUtMDEtMDJUMDM6MjA6MDkuMzE3MDIwLTA4
-OjAwIGxpbmNsbnQwMDMga2VybmVsOiBbMjY0OTMzNi4zMjU4MzBdIA0KPi9ob21lL2FidWlsZC9y
-cG1idWlsZC9CVUlMRC9rZXJuZWwtZGVza3RvcC0zLjExLjEwL2xpbnV4LTMuMTEvZnMvY2lmcy9t
-aXNjDQo+Lg0KPmM6IGNoZWNrU01CIExlbmd0aDoNCj4gMHgyNywgc21iX2J1Zl9sZW5ndGg6IDB4
-MjMNCj4yMDE1LTAxLTAyVDAzOjIwOjA5LjMxNzAyNC0wODowMCBsaW5jbG50MDAzIGtlcm5lbDog
-WzI2NDkzMzYuMzI1ODgwXSANCj4vaG9tZS9hYnVpbGQvcnBtYnVpbGQvQlVJTEQva2VybmVsLWRl
-c2t0b3AtMy4xMS4xMC9saW51eC0zLjExL2ZzL2NpZnMvdHJhbg0KPnMNCj5wb3J0LmM6IGNpZnNf
-c3luY19taWRfcmVzdWx0Og0KPiBjbWQ9NiBtaWQ9NTAxNzEgc3RhdGU9NA0KPjIwMTUtMDEtMDJU
-MDM6MjA6MDkuMzE3MDI1LTA4OjAwIGxpbmNsbnQwMDMga2VybmVsOiBbMjY0OTMzNi4zMjU4ODld
-IA0KPlN0YXR1cyBjb2RlIHJldHVybmVkIDB4YzAwMDAwMzQgTlRfU1RBVFVTX09CSkVDVF9OQU1F
-X05PVF9GT1VORA0KPjIwMTUtMDEtMDJUMDM6MjA6MDkuMzE3MDI2LTA4OjAwIGxpbmNsbnQwMDMg
-a2VybmVsOiBbMjY0OTMzNi4zMjU4OTVdIA0KPi9ob21lL2FidWlsZC9ycG1idWlsZC9CVUlMRC9r
-ZXJuZWwtZGVza3RvcC0zLjExLjEwL2xpbnV4LTMuMTEvZnMvY2lmcy9uZXRtDQo+aQ0KPnNjLmM6
-IE1hcHBpbmcNCj4gc21iIGVycm9yIGNvZGUgMHhjMDAwMDAzNCB0byBQT1NJWCBlcnIgLTINCj4y
-MDE1LTAxLTAyVDAzOjIwOjA5LjMxNzAyOC0wODowMCBsaW5jbG50MDAzIGtlcm5lbDogWzI2NDkz
-MzYuMzI1OTAwXSANCj4vaG9tZS9hYnVpbGQvcnBtYnVpbGQvQlVJTEQva2VybmVsLWRlc2t0b3At
-My4xMS4xMC9saW51eC0zLjExL2ZzL2NpZnMvY2lmcw0KPnMNCj5tYi5jOiBFcnJvciBpbg0KPiBS
-TUZpbGUgPSAtMg0KPjIwMTUtMDEtMDJUMDM6MjA6MDkuMzE3MDI5LTA4OjAwIGxpbmNsbnQwMDMg
-a2VybmVsOiBbMjY0OTMzNi4zMjU5MDVdIA0KPi9ob21lL2FidWlsZC9ycG1idWlsZC9CVUlMRC9r
-ZXJuZWwtZGVza3RvcC0zLjExLjEwL2xpbnV4LTMuMTEvZnMvY2lmcy9pbm9kDQo+ZQ0KPi5jOiBD
-SUZTIFZGUzoNCj4gbGVhdmluZyBjaWZzX3VubGluayAoeGlkID0gMTI1NDYzOSkgcmMgPSAtMg0K
-PjIwMTUtMDEtMDJUMDM6MjA6MDkuNDE3NjQyLTA4OjAwIGxpbmNsbnQwMDMga2VybmVsOiBbMjY0
-OTMzNi40MjYyMjddIA0KPi9ob21lL2FidWlsZC9ycG1idWlsZC9CVUlMRC9rZXJuZWwtZGVza3Rv
-cC0zLjExLjEwL2xpbnV4LTMuMTEvZnMvY2lmcy9kaXIuDQo+Yw0KPjogQ0lGUyBWRlM6IGluDQo+
-IGNpZnNfbG9va3VwIGFzIFhpZDogMTI1NDY0MCB3aXRoIHVpZDogNTAwMDANCj4yMDE1LTAxLTAy
-VDAzOjIwOjA5LjQxNzY2MC0wODowMCBsaW5jbG50MDAzIGtlcm5lbDogWzI2NDkzMzYuNDI2MjM0
-XSANCj4vaG9tZS9hYnVpbGQvcnBtYnVpbGQvQlVJTEQva2VybmVsLWRlc2t0b3AtMy4xMS4xMC9s
-aW51eC0zLjExL2ZzL2NpZnMvZGlyLg0KPmMNCj46IHBhcmVudCBpbm9kZQ0KPiA9IDB4ZmZmZjg4
-MWZkZjU2ZmI4MCBuYW1lIGlzOiBXUklURV8wNDIyLlRFU1QgYW5kIGRlbnRyeSA9IA0KPjB4ZmZm
-Zjg4MWZhYTQwNjYwMA0KPjIwMTUtMDEtMDJUMDM6MjA6MDkuNDE3NjYyLTA4OjAwIGxpbmNsbnQw
-MDMga2VybmVsOiBbMjY0OTMzNi40MjYyMzldIA0KPi9ob21lL2FidWlsZC9ycG1idWlsZC9CVUlM
-RC9rZXJuZWwtZGVza3RvcC0zLjExLjEwL2xpbnV4LTMuMTEvZnMvY2lmcy9kaXIuDQo+Yw0KPjog
-bmFtZTogXFdSSVRFXzA0MjIuVEVTVA0KPjIwMTUtMDEtMDJUMDM6MjA6MDkuNDE3NjY0LTA4OjAw
-IGxpbmNsbnQwMDMga2VybmVsOiBbMjY0OTMzNi40MjYyNDJdIA0KPi9ob21lL2FidWlsZC9ycG1i
-dWlsZC9CVUlMRC9rZXJuZWwtZGVza3RvcC0zLjExLjEwL2xpbnV4LTMuMTEvZnMvY2lmcy9kaXIu
-DQo+Yw0KPjogTlVMTCBpbm9kZQ0KPiBpbiBsb29rdXANCj4yMDE1LTAxLTAyVDAzOjIwOjA5LjQx
-NzY2NS0wODowMCBsaW5jbG50MDAzIGtlcm5lbDogWzI2NDkzMzYuNDI2MjQ0XSANCj4vaG9tZS9h
-YnVpbGQvcnBtYnVpbGQvQlVJTEQva2VybmVsLWRlc2t0b3AtMy4xMS4xMC9saW51eC0zLjExL2Zz
-L2NpZnMvZGlyLg0KPmMNCj46IEZ1bGwgcGF0aDoNCj4gXFdSSVRFXzA0MjIuVEVTVCBpbm9kZSA9
-IDB4ICAgICAgICAgIChudWxsKQ0KPjIwMTUtMDEtMDJUMDM6MjA6MDkuNDE3NjY2LTA4OjAwIGxp
-bmNsbnQwMDMga2VybmVsOiBbMjY0OTMzNi40MjYyNDddIA0KPi9ob21lL2FidWlsZC9ycG1idWls
-ZC9CVUlMRC9rZXJuZWwtZGVza3RvcC0zLjExLjEwL2xpbnV4LTMuMTEvZnMvY2lmcy9pbm9kDQo+
-ZQ0KPi5jOiBHZXR0aW5nIGluZm8NCj4gb24gXFdSSVRFXzA0MjIuVEVTVA0KPjIwMTUtMDEtMDJU
-MDM6MjA6MDkuNDE3NjY4LTA4OjAwIGxpbmNsbnQwMDMga2VybmVsOiBbMjY0OTMzNi40MjYyNTRd
-IA0KPi9ob21lL2FidWlsZC9ycG1idWlsZC9CVUlMRC9rZXJuZWwtZGVza3RvcC0zLjExLjEwL2xp
-bnV4LTMuMTEvZnMvY2lmcy90cmFuDQo+cw0KPnBvcnQuYzogRm9yIHNtYl9jb21tYW5kDQo+IDUw
-DQo+MjAxNS0wMS0wMlQwMzoyMDowOS40MTc2NjktMDg6MDAgbGluY2xudDAwMyBrZXJuZWw6IFsy
-NjQ5MzM2LjQyNjI1N10gDQo+L2hvbWUvYWJ1aWxkL3JwbWJ1aWxkL0JVSUxEL2tlcm5lbC1kZXNr
-dG9wLTMuMTEuMTAvbGludXgtMy4xMS9mcy9jaWZzL3RyYW4NCj5zDQo+cG9ydC5jOiBTZW5kaW5n
-DQo+IHNtYjogc21iX2xlbj0xMDYNCj4yMDE1LTAxLTAyVDAzOjIwOjA5LjQxNzY3MC0wODowMCBs
-aW5jbG50MDAzIGtlcm5lbDogWzI2NDkzMzYuNDI2NjgzXSANCj4vaG9tZS9hYnVpbGQvcnBtYnVp
-bGQvQlVJTEQva2VybmVsLWRlc2t0b3AtMy4xMS4xMC9saW51eC0zLjExL2ZzL2NpZnMvY29ubg0K
-PmUNCj5jdC5jOiBSRkMxMDAyDQo+IGhlYWRlciAweDIzDQo+MjAxNS0wMS0wMlQwMzoyMDowOS40
-MTc2NzgtMDg6MDAgbGluY2xudDAwMyBrZXJuZWw6IFsyNjQ5MzM2LjQyNjcwNV0gDQo+L2hvbWUv
-YWJ1aWxkL3JwbWJ1aWxkL0JVSUxEL2tlcm5lbC1kZXNrdG9wLTMuMTEuMTAvbGludXgtMy4xMS9m
-cy9jaWZzL21pc2MNCj4uDQo+YzogY2hlY2tTTUIgTGVuZ3RoOg0KPiAweDI3LCBzbWJfYnVmX2xl
-bmd0aDogMHgyMw0KPjIwMTUtMDEtMDJUMDM6MjA6MDkuNDE3NjgwLTA4OjAwIGxpbmNsbnQwMDMg
-a2VybmVsOiBbMjY0OTMzNi40MjY3MDldIA0KPi9ob21lL2FidWlsZC9ycG1idWlsZC9CVUlMRC9r
-ZXJuZWwtZGVza3RvcC0zLjExLjEwL2xpbnV4LTMuMTEvZnMvY2lmcy9zbWIxDQo+bw0KPnBzLmM6
-IGludmFsaWQNCj4gdHJhbnNhY3QyIHdvcmQgY291bnQNCj4yMDE1LTAxLTAyVDAzOjIwOjA5LjQx
-ODY1NC0wODowMCBsaW5jbG50MDAzIGtlcm5lbDogWzI2NDkzMzYuNDI2NzYwXSANCj4vaG9tZS9h
-YnVpbGQvcnBtYnVpbGQvQlVJTEQva2VybmVsLWRlc2t0b3AtMy4xMS4xMC9saW51eC0zLjExL2Zz
-L2NpZnMvdHJhbg0KPnMNCj5wb3J0LmM6IGNpZnNfc3luY19taWRfcmVzdWx0Og0KPiBjbWQ9NTAg
-bWlkPTUwMTcyIHN0YXRlPTQNCj4yMDE1LTAxLTAyVDAzOjIwOjA5LjQxODY3My0wODowMCBsaW5j
-bG50MDAzIGtlcm5lbDogWzI2NDkzMzYuNDI2NzY4XSANCj5TdGF0dXMgY29kZSByZXR1cm5lZCAw
-eGMwMDAwMDM0IE5UX1NUQVRVU19PQkpFQ1RfTkFNRV9OT1RfRk9VTkQNCj4yMDE1LTAxLTAyVDAz
-OjIwOjA5LjQxODY3NS0wODowMCBsaW5jbG50MDAzIGtlcm5lbDogWzI2NDkzMzYuNDI2NzczXSAN
-Cj4vaG9tZS9hYnVpbGQvcnBtYnVpbGQvQlVJTEQva2VybmVsLWRlc2t0b3AtMy4xMS4xMC9saW51
-eC0zLjExL2ZzL2NpZnMvbmV0bQ0KPmkNCj5zYy5jOiBNYXBwaW5nDQo+IHNtYiBlcnJvciBjb2Rl
-IDB4YzAwMDAwMzQgdG8gUE9TSVggZXJyIC0yDQo+MjAxNS0wMS0wMlQwMzoyMDowOS40MTg2Nzct
-MDg6MDAgbGluY2xudDAwMyBrZXJuZWw6IFsyNjQ5MzM2LjQyNjc3OF0gDQo+L2hvbWUvYWJ1aWxk
-L3JwbWJ1aWxkL0JVSUxEL2tlcm5lbC1kZXNrdG9wLTMuMTEuMTAvbGludXgtMy4xMS9mcy9jaWZz
-L2NpZnMNCj5zDQo+bWIuYzogU2VuZCBlcnJvcg0KPiBpbiBRUGF0aEluZm8gPSAtMg0KPjIwMTUt
-MDEtMDJUMDM6MjA6MDkuNDE4Njc4LTA4OjAwIGxpbmNsbnQwMDMga2VybmVsOiBbMjY0OTMzNi40
-MjY3ODVdIA0KPi9ob21lL2FidWlsZC9ycG1idWlsZC9CVUlMRC9rZXJuZWwtZGVza3RvcC0zLjEx
-LjEwL2xpbnV4LTMuMTEvZnMvY2lmcy9kaXIuDQo+Yw0KPjogQ0lGUyBWRlM6IGxlYXZpbmcNCj4g
-Y2lmc19sb29rdXAgKHhpZCA9IDEyNTQ2NDApIHJjID0gMA0KPjIwMTUtMDEtMDJUMDM6MjA6MDku
-NTE4NjQxLTA4OjAwIGxpbmNsbnQwMDMga2VybmVsOiBbMjY0OTMzNi41MjcwNjddIA0KPi9ob21l
-L2FidWlsZC9ycG1idWlsZC9CVUlMRC9rZXJuZWwtZGVza3RvcC0zLjExLjEwL2xpbnV4LTMuMTEv
-ZnMvY2lmcy9kaXIuDQo+Yw0KPjogQ0lGUyBWRlM6IGluDQo+IGNpZnNfbG9va3VwIGFzIFhpZDog
-MTI1NDY0MSB3aXRoIHVpZDogNTAwMDANCj4yMDE1LTAxLTAyVDAzOjIwOjA5LjUxODY1OC0wODow
-MCBsaW5jbG50MDAzIGtlcm5lbDogWzI2NDkzMzYuNTI3MDczXSANCj4vaG9tZS9hYnVpbGQvcnBt
-YnVpbGQvQlVJTEQva2VybmVsLWRlc2t0b3AtMy4xMS4xMC9saW51eC0zLjExL2ZzL2NpZnMvZGly
-Lg0KPmMNCj46IHBhcmVudCBpbm9kZQ0KPiA9IDB4ZmZmZjg4MWZkZjU2ZmI4MCBuYW1lIGlzOiBX
-UklURV8wNDIyLlRFU1QgYW5kIGRlbnRyeSA9IA0KPjB4ZmZmZjg4MWVlMTJmNWMwMA0KPjIwMTUt
-MDEtMDJUMDM6MjA6MDkuNTE4NjYwLTA4OjAwIGxpbmNsbnQwMDMga2VybmVsOiBbMjY0OTMzNi41
-MjcwNzhdIA0KPi9ob21lL2FidWlsZC9ycG1idWlsZC9CVUlMRC9rZXJuZWwtZGVza3RvcC0zLjEx
-LjEwL2xpbnV4LTMuMTEvZnMvY2lmcy9kaXIuDQo+Yw0KPjogbmFtZTogXFdSSVRFXzA0MjIuVEVT
-VA0KPjIwMTUtMDEtMDJUMDM6MjA6MDkuNTE4NjYyLTA4OjAwIGxpbmNsbnQwMDMga2VybmVsOiBb
-MjY0OTMzNi41MjcwODBdIA0KPi9ob21lL2FidWlsZC9ycG1idWlsZC9CVUlMRC9rZXJuZWwtZGVz
-a3RvcC0zLjExLjEwL2xpbnV4LTMuMTEvZnMvY2lmcy9kaXIuDQo+Yw0KPjogTlVMTCBpbm9kZQ0K
-PiBpbiBsb29rdXANCj4yMDE1LTAxLTAyVDAzOjIwOjA5LjUxODY2NC0wODowMCBsaW5jbG50MDAz
-IGtlcm5lbDogWzI2NDkzMzYuNTI3MDgzXSANCj4vaG9tZS9hYnVpbGQvcnBtYnVpbGQvQlVJTEQv
-a2VybmVsLWRlc2t0b3AtMy4xMS4xMC9saW51eC0zLjExL2ZzL2NpZnMvZGlyLg0KPmMNCj46IEZ1
-bGwgcGF0aDoNCj4gXFdSSVRFXzA0MjIuVEVTVCBpbm9kZSA9IDB4ICAgICAgICAgIChudWxsKQ0K
-PjIwMTUtMDEtMDJUMDM6MjA6MDkuNTE4NjY1LTA4OjAwIGxpbmNsbnQwMDMga2VybmVsOiBbMjY0
-OTMzNi41MjcwODVdIA0KPi9ob21lL2FidWlsZC9ycG1idWlsZC9CVUlMRC9rZXJuZWwtZGVza3Rv
-cC0zLjExLjEwL2xpbnV4LTMuMTEvZnMvY2lmcy9pbm9kDQo+ZQ0KPi5jOiBHZXR0aW5nIGluZm8N
-Cj4gb24gXFdSSVRFXzA0MjIuVEVTVA0KPg0KPg0KPlRoZSByZXNwZWN0aXZlIHNlY3Rpb24gb2Yg
-Y2lmcy9EZWJ1Z0RhdGEgaXMgdGhpczoNCj4NCj5EaXNwbGF5IEludGVybmFsIENJRlMgRGF0YSBT
-dHJ1Y3R1cmVzIGZvciBEZWJ1Z2dpbmcNCj4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0NCj5DSUZTIFZlcnNpb24gMi4wMQ0KPkZlYXR1cmVzOiBkZnMg
-ZnNjYWNoZSBsYW5tYW4gcG9zaXggc3BuZWdvIHhhdHRyIGFjbA0KPkFjdGl2ZSBWRlMgUmVxdWVz
-dHM6IDANCj5TZXJ2ZXJzOg0KPjEpIGVudHJ5IGZvciAxNzIuMTYuMTA3LjEzNSBub3QgZnVsbHkg
-ZGlzcGxheWVkDQo+ICAgICAgICBUQ1Agc3RhdHVzOiAxDQo+ICAgICAgICBMb2NhbCBVc2VycyBU
-byBTZXJ2ZXI6IDEgU2VjTW9kZTogMHgzIFJlcSBPbiBXaXJlOiAwIEluIFNlbmQ6IDAgDQo+SW4g
-DQo+TWF4UmVxIFdhaXQ6IDANCj4gICAgICAgIFNoYXJlczoNCj4gICAgICAgIDEpIFxcMTcyLjE2
-LjEwNy4xMzVcRmlsZUludGVyZmFjZSBNb3VudHM6IDEgVHlwZTogTlRGUyBEZXZJbmZvOiANCj4w
-eDIwIEF0dHJpYnV0ZXM6IDB4YzUwMGVmDQo+ICAgICAgICBQYXRoQ29tcG9uZW50TWF4OiAyNTUg
-U3RhdHVzOiAweDEgdHlwZTogRElTSw0KPg0KPuKApg0KPiAgICAgICAgMTEpIFxcMTcyLjE2LjEw
-Ny4xMzVcSW1hZ2VSb290MSBNb3VudHM6IDEgVHlwZTogTlRGUyBEZXZJbmZvOiANCj4weDIwIA0K
-PkF0dHJpYnV0ZXM6IDB4YzUwMGZmDQo+ICAgICAgICBQYXRoQ29tcG9uZW50TWF4OiAyNTUgU3Rh
-dHVzOiAweDEgdHlwZTogRElTSw0KPg0KPuKApg0KPihzaGFyZSAxMSBpcyB0aGUgdGhlIG9uZSBo
-YXZpbmcgdGhlIGVycm9yIHRoaXMgdGltZSkuDQo+DQo+DQo+VGhhbmtzDQo+TWFsdGUNCj4NCj4N
-Cg==
+On Fri, 2 Jan 2015 15:39:32 +0000
+Malte Westerhoff <MWesterhoff-b1n3U3u3AEZwaa3ho+uhNwC/G2K4zDHf@public.gmane.org> wrote:
+
+> Hi,
+> I hope that this is the right list to post this to. Apologies if not ___ but 
+> any hints would be appreciated.
+> 
+> We are seeing intermittent issues accessing shares that are exported by a 
+> Windows 2008R2 server and mounted on a Linux client OpenSuse 13.1 (kernel 
+> 3.11.10-21-desktop, samba-client-4.1.11-3.26.1.x86_64).
+> The application level symptom is that files can neither be read nor 
+> written on a particular share. We have set cifsFYI=3 and we see a 
+> NT_STATUS_OBJECT_NAME_NOT_FOUND
+> in /var/log/messages when it happens (excerpt below).
+> Normally the issue self-repairs within one minute.
+> We have six linux clients accessing the same windows server ___ and when one 
+> of them has the issue, the others do not ___ so it looks like a client-side 
+> issue.
+> We are seeing this issue in two separate data centers (with identical 
+> server configuration), so it is not likely to be hardware or network.
+> The server exports approx 20 shares ___ and typically only one of them is 
+> affected at a time (but not always the same one).
+> The network connection is a local 10GBit Ethernet connection.
+> Across six clients, accessing ~20 shares (each), the issue occurs 
+> approximately 2-5 times per 24 hours (total across all servers and 
+> shares). 
+> The shares are mounted using autofs, but we have seen the same issue with 
+> static mounts.
+> 
+> Here is the output of mount for one of them:
+> //10.168.172.51/ImageRootFolder1 on /Storage/WINSERVER001/ImageRootFolder1 
+> type cifs 
+> (rw,relatime,vers=1.0,cache=strict,username=xxx_username,domain=10.168.172.
+> 51,uid=50000,forceuid,gid=100,forcegid,addr=10.168.172.51,file_mode=0755,di
+> r_mode=0770,nounix,serverino,rsize=61440,wsize=65536,actimeo=1)
+> 
+> We have added test code where the clients attempt to write and then read a 
+> test file onto each of the shares once per minute. If that fails the 
+> clients retry 20 times with 100ms pause. We found that if this fails,
+>  it continues to fail all 20 times.
+> 
+> Below is /var/log/messages for two such failed attempts (file 
+> WRITE_0422.TEST)  when the problem occurred:
+> 
+> 
+> 2015-01-02T03:20:09.125669-08:00 linclnt003 kernel: [2649336.134098] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/dir.c
+> : name: \WRITE_0422.TEST
+> 2015-01-02T03:20:09.125671-08:00 linclnt003 kernel: [2649336.134107] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/trans
+> port.c: For smb_command
+>  6
+> 2015-01-02T03:20:09.125672-08:00 linclnt003 kernel: [2649336.134110] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/trans
+> port.c: Sending
+>  smb: smb_len=72
+> 2015-01-02T03:20:09.317001-08:00 linclnt003 kernel: [2649336.325820] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/conne
+> ct.c: RFC1002
+>  header 0x23
+> 2015-01-02T03:20:09.317020-08:00 linclnt003 kernel: [2649336.325830] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/misc.
+> c: checkSMB Length:
+>  0x27, smb_buf_length: 0x23
+> 2015-01-02T03:20:09.317024-08:00 linclnt003 kernel: [2649336.325880] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/trans
+> port.c: cifs_sync_mid_result:
+>  cmd=6 mid=50171 state=4
+
+cmd 6 is SMB_COM_DELETE -- we're removing a file here.
+
+> 2015-01-02T03:20:09.317025-08:00 linclnt003 kernel: [2649336.325889] 
+> Status code returned 0xc0000034 NT_STATUS_OBJECT_NAME_NOT_FOUND
+
+That error is being returned by the server. It's basically equivalent
+to a -ENOENT in POSIX terms (which is why we translate it that way).
+What may be best is to get some captures and look for these errors, and
+see whether you can determine why they're being returned:
+
+    https://wiki.samba.org/index.php/LinuxCIFS_troubleshooting#Wire_Captures
+
+Can you ascertain whether the file is _actually_ present at the time
+that this occurs? Could another client is competing with this one to
+remove files? Perhaps the server is just insane and is returning that
+error when the file really exists? Maybe the client is sending bad
+filenames for some reason?
+
+There are tons of possibilities. You'll probably need to do some
+investigative work to determine the root cause.
+
+
+> 2015-01-02T03:20:09.317026-08:00 linclnt003 kernel: [2649336.325895] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/netmi
+> sc.c: Mapping
+>  smb error code 0xc0000034 to POSIX err -2
+> 2015-01-02T03:20:09.317028-08:00 linclnt003 kernel: [2649336.325900] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/cifss
+> mb.c: Error in
+>  RMFile = -2
+> 2015-01-02T03:20:09.317029-08:00 linclnt003 kernel: [2649336.325905] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/inode
+> .c: CIFS VFS:
+>  leaving cifs_unlink (xid = 1254639) rc = -2
+> 2015-01-02T03:20:09.417642-08:00 linclnt003 kernel: [2649336.426227] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/dir.c
+> : CIFS VFS: in
+>  cifs_lookup as Xid: 1254640 with uid: 50000
+> 2015-01-02T03:20:09.417660-08:00 linclnt003 kernel: [2649336.426234] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/dir.c
+> : parent inode
+>  = 0xffff881fdf56fb80 name is: WRITE_0422.TEST and dentry = 
+> 0xffff881faa406600
+> 2015-01-02T03:20:09.417662-08:00 linclnt003 kernel: [2649336.426239] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/dir.c
+> : name: \WRITE_0422.TEST
+> 2015-01-02T03:20:09.417664-08:00 linclnt003 kernel: [2649336.426242] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/dir.c
+> : NULL inode
+>  in lookup
+> 2015-01-02T03:20:09.417665-08:00 linclnt003 kernel: [2649336.426244] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/dir.c
+> : Full path:
+>  \WRITE_0422.TEST inode = 0x          (null)
+> 2015-01-02T03:20:09.417666-08:00 linclnt003 kernel: [2649336.426247] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/inode
+> .c: Getting info
+>  on \WRITE_0422.TEST
+> 2015-01-02T03:20:09.417668-08:00 linclnt003 kernel: [2649336.426254] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/trans
+> port.c: For smb_command
+>  50
+> 2015-01-02T03:20:09.417669-08:00 linclnt003 kernel: [2649336.426257] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/trans
+> port.c: Sending
+>  smb: smb_len=106
+> 2015-01-02T03:20:09.417670-08:00 linclnt003 kernel: [2649336.426683] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/conne
+> ct.c: RFC1002
+>  header 0x23
+> 2015-01-02T03:20:09.417678-08:00 linclnt003 kernel: [2649336.426705] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/misc.
+> c: checkSMB Length:
+>  0x27, smb_buf_length: 0x23
+> 2015-01-02T03:20:09.417680-08:00 linclnt003 kernel: [2649336.426709] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/smb1o
+> ps.c: invalid
+>  transact2 word count
+> 2015-01-02T03:20:09.418654-08:00 linclnt003 kernel: [2649336.426760] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/trans
+> port.c: cifs_sync_mid_result:
+>  cmd=50 mid=50172 state=4
+> 2015-01-02T03:20:09.418673-08:00 linclnt003 kernel: [2649336.426768] 
+> Status code returned 0xc0000034 NT_STATUS_OBJECT_NAME_NOT_FOUND
+> 2015-01-02T03:20:09.418675-08:00 linclnt003 kernel: [2649336.426773] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/netmi
+> sc.c: Mapping
+>  smb error code 0xc0000034 to POSIX err -2
+> 2015-01-02T03:20:09.418677-08:00 linclnt003 kernel: [2649336.426778] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/cifss
+> mb.c: Send error
+>  in QPathInfo = -2
+> 2015-01-02T03:20:09.418678-08:00 linclnt003 kernel: [2649336.426785] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/dir.c
+> : CIFS VFS: leaving
+>  cifs_lookup (xid = 1254640) rc = 0
+> 2015-01-02T03:20:09.518641-08:00 linclnt003 kernel: [2649336.527067] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/dir.c
+> : CIFS VFS: in
+>  cifs_lookup as Xid: 1254641 with uid: 50000
+> 2015-01-02T03:20:09.518658-08:00 linclnt003 kernel: [2649336.527073] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/dir.c
+> : parent inode
+>  = 0xffff881fdf56fb80 name is: WRITE_0422.TEST and dentry = 
+> 0xffff881ee12f5c00
+> 2015-01-02T03:20:09.518660-08:00 linclnt003 kernel: [2649336.527078] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/dir.c
+> : name: \WRITE_0422.TEST
+> 2015-01-02T03:20:09.518662-08:00 linclnt003 kernel: [2649336.527080] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/dir.c
+> : NULL inode
+>  in lookup
+> 2015-01-02T03:20:09.518664-08:00 linclnt003 kernel: [2649336.527083] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/dir.c
+> : Full path:
+>  \WRITE_0422.TEST inode = 0x          (null)
+> 2015-01-02T03:20:09.518665-08:00 linclnt003 kernel: [2649336.527085] 
+> /home/abuild/rpmbuild/BUILD/kernel-desktop-3.11.10/linux-3.11/fs/cifs/inode
+> .c: Getting info
+>  on \WRITE_0422.TEST
+> 
+> 
+> The respective section of cifs/DebugData is this:
+> 
+> Display Internal CIFS Data Structures for Debugging
+> ---------------------------------------------------
+> CIFS Version 2.01
+> Features: dfs fscache lanman posix spnego xattr acl
+> Active VFS Requests: 0
+> Servers:
+> 1) entry for 172.16.107.135 not fully displayed
+>         TCP status: 1
+>         Local Users To Server: 1 SecMode: 0x3 Req On Wire: 0 In Send: 0 In 
+> MaxReq Wait: 0
+>         Shares:
+>         1) \\172.16.107.135\FileInterface Mounts: 1 Type: NTFS DevInfo: 
+> 0x20 Attributes: 0xc500ef
+>         PathComponentMax: 255 Status: 0x1 type: DISK
+> 
+> ___
+>         11) \\172.16.107.135\ImageRoot1 Mounts: 1 Type: NTFS DevInfo: 0x20 
+> Attributes: 0xc500ff
+>         PathComponentMax: 255 Status: 0x1 type: DISK
+> 
+> ___
+> (share 11 is the the one having the error this time).
+> 
+> 
+> Thanks
+> Malte
+> 
+> 
+> N_____r__y____b_X____v_^_)__{.n_+____{_r'__{ay_
+_____,j__f___h___z_
+_w___
+___j:+v___w_j_m________zZ+_______j"__!
+
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
