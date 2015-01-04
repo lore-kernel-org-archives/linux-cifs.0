@@ -1,153 +1,78 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 2/2] cifs: don't add dot and dotdot entry by default at
- the start of cifs_readdir
-Date: Sun, 4 Jan 2015 00:25:44 -0600
-Message-ID: <CADT32eLwaHC5VhGSgW=ftcRR09mJcEDEc3f9ypAeDszjRvASMQ@mail.gmail.com>
-References: <001301d00884$cf8e0200$6eaa0600$@samsung.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Ashish Sangwan <a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
-To: Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <001301d00884$cf8e0200$6eaa0600$@samsung.com>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Giel van Schijndel <me@mortis.eu>
+Subject: [PATCH] Use memzero_explicit to clear local buffers
+Date: Sun,  4 Jan 2015 19:05:40 +0100
+Message-ID: <1420394744-20268-1-git-send-email-me@mortis.eu>
+Cc: Giel van Schijndel <me@mortis.eu>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	x86@kernel.org (maintainer:X86 ARCHITECTURE...),
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Steve French <sfrench@samba.org>,
+	Rahul Bedarkar <rahulbedarkar89@gmail.com>,
+	Thomas Pugliese <thomas.pugliese@gmail.com>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Julia Lawall <Julia.Lawall@lip6.fr>,
+	linux-crypto@vger.kernel.org (open list:CRYPTO API),
+	linux-usb@vger.kernel.org (open list:CERTIFIED WIRELES...),
+	linux-cifs@vger.kernel.org (open list:COMMON INTERNET F...),
+	samba-technical@lists.samba.org (moderated list:COMMON INTERNET F...)
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Looks reasonable.
+When leaving a function use memzero_explicit instead of memset(0) to
+clear locally allocated/owned buffers. memset(0) may be optimized away.
 
-Reviewed-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+All of the affected buffers contain sensitive data, key material or
+derivatives of one of those two.
+---
+ arch/x86/crypto/sha256_ssse3_glue.c | 2 +-
+ drivers/usb/wusbcore/security.c     | 2 +-
+ fs/cifs/smbencrypt.c                | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-On Tue, Nov 25, 2014 at 1:52 AM, Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org> wrote:
-> Currently, dot and dotdot are added by default at the start of cifs_readdir.
-> This works well for the servers which send dot and dotdot entries at the start
-> in readdir query response.
->
-> For servers which do not send these two entries at the beginning,
-> this behavior creates 2 problems.
-> 1) adding dot and dotdot increments ctx->pos by 2 hence the valid
->    first 2 entries are missed in readdir output at client side.
-> 2) Currently when we encounter dot or dotdot, the entry is simple skipped.
->
-> In case of smb2, if some buggy server sends only 1 entry in response per
-> cifs_query_dir_next request, and if that entry is happen to be dot OR dotdot,
-> getdents call return 0 bytes to user app making it falsely believe that there
-> are no more directory entries left.
->
-> This patch tries to solve the above issues by processing dot and dotdot entries
-> when they are encountered. This will have no effect on servers which already
-> sends these 2 entries at the start.
->
-> Signed-off-by: Namjae Jeon <namjae.jeon-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
-> Signed-off-by: Ashish Sangwan <a.sangwan-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
-> ---
->  fs/cifs/cifsglob.h |  2 ++
->  fs/cifs/cifssmb.c  |  4 ++--
->  fs/cifs/readdir.c  | 43 ++++++++++++++++++++++++++++++++++++++-----
->  3 files changed, 42 insertions(+), 7 deletions(-)
->
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 6e13911..864ea1a 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -987,6 +987,8 @@ struct cifs_search_info {
->         bool emptyDir:1;
->         bool unicode:1;
->         bool smallBuf:1; /* so we know which buf_release function to call */
-> +       bool gotdot:1;
-> +       bool gotdotdot:1;
->  };
->
->  struct cifs_open_parms {
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index fa13d5e..db49633 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -4475,8 +4475,8 @@ findFirstRetry:
->
->                         psrch_inf->entries_in_buffer =
->                                         le16_to_cpu(parms->SearchCount);
-> -                       psrch_inf->index_of_last_entry = 2 /* skip . and .. */ +
-> -                               psrch_inf->entries_in_buffer;
-> +                       psrch_inf->index_of_last_entry =
-> +                                       psrch_inf->entries_in_buffer;
->                         lnoff = le16_to_cpu(parms->LastNameOffset);
->                         if (CIFSMaxBufSize < lnoff) {
->                                 cifs_dbg(VFS, "ignoring corrupt resume name\n");
-> diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
-> index 8eaf20a..ab0639a 100644
-> --- a/fs/cifs/readdir.c
-> +++ b/fs/cifs/readdir.c
-> @@ -698,9 +698,26 @@ static int cifs_filldir(char *find_entry, struct file *file,
->                 return -EINVAL;
->         }
->
-> -       /* skip . and .. since we added them first */
-> -       if (cifs_entry_is_dot(&de, file_info->srch_inf.unicode))
-> +       if (cifs_entry_is_dot(&de, file_info->srch_inf.unicode) == 1) {
-> +               if (file_info->srch_inf.gotdot == true)
-> +                       return -EINVAL;
-> +               if (!dir_emit_dot(file, ctx)) {
-> +                       cifs_dbg(VFS, "Filldir for current dir failed\n");
-> +                       return -ENOMEM;
-> +               }
-> +               file_info->srch_inf.gotdot = true;
-> +               return 0;
-> +       }
-> +       if (cifs_entry_is_dot(&de, file_info->srch_inf.unicode) == 2) {
-> +               if (file_info->srch_inf.gotdotdot == true)
-> +                       return -EINVAL;
-> +               if (!dir_emit_dotdot(file, ctx)) {
-> +                       cifs_dbg(VFS, "Filldir for parent dir failed\n");
-> +                       return -ENOMEM;
-> +               }
-> +               file_info->srch_inf.gotdotdot = true;
->                 return 0;
-> +       }
->
->         if (file_info->srch_inf.unicode) {
->                 struct nls_table *nlt = cifs_sb->local_nls;
-> @@ -786,9 +803,6 @@ int cifs_readdir(struct file *file, struct dir_context *ctx)
->                         goto rddir2_exit;
->         }
->
-> -       if (!dir_emit_dots(file, ctx))
-> -               goto rddir2_exit;
-> -
->         /* 1) If search is active,
->                 is in current search buffer?
->                 if it before then restart search
-> @@ -864,6 +878,25 @@ int cifs_readdir(struct file *file, struct dir_context *ctx)
->         kfree(tmp_buf);
->
->  rddir2_exit:
-> +       if (cifsFile->srch_inf.endOfSearch) {
-> +               if (cifsFile->srch_inf.gotdot != true) {
-> +                       if (!dir_emit_dot(file, ctx)) {
-> +                               cifs_dbg(VFS,
-> +                                       "Filldir for current dir failed\n");
-> +                               rc = -ENOMEM;
-> +                       }
-> +                       ctx->pos++;
-> +               }
-> +
-> +               if (cifsFile->srch_inf.gotdotdot != true) {
-> +                       if (!dir_emit_dotdot(file, ctx)) {
-> +                               cifs_dbg(VFS,
-> +                                       "Filldir for parent dir failed\n");
-> +                               rc = -ENOMEM;
-> +                       }
-> +                       ctx->pos++;
-> +               }
-> +       }
->         free_xid(xid);
->         return rc;
->  }
-> --
-> 1.7.11-rc0
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
+index 8fad72f..b616e63 100644
+--- a/arch/x86/crypto/sha256_ssse3_glue.c
++++ b/arch/x86/crypto/sha256_ssse3_glue.c
+@@ -164,7 +164,7 @@ static int sha256_ssse3_final(struct shash_desc *desc, u8 *out)
+ 		dst[i] = cpu_to_be32(sctx->state[i]);
+ 
+ 	/* Wipe context */
+-	memset(sctx, 0, sizeof(*sctx));
++	memzero_explicit(sctx, sizeof(*sctx));
+ 
+ 	return 0;
+ }
+diff --git a/drivers/usb/wusbcore/security.c b/drivers/usb/wusbcore/security.c
+index b66faaf..a25f4fe 100644
+--- a/drivers/usb/wusbcore/security.c
++++ b/drivers/usb/wusbcore/security.c
+@@ -521,7 +521,7 @@ error_wusbhc_set_ptk:
+ error_hs3:
+ error_hs2:
+ error_hs1:
+-	memset(hs, 0, 3*sizeof(hs[0]));
++	memzero_explicit(hs, 3*sizeof(hs[0]));
+ 	memzero_explicit(&keydvt_out, sizeof(keydvt_out));
+ 	memzero_explicit(&keydvt_in, sizeof(keydvt_in));
+ 	memzero_explicit(&ccm_n, sizeof(ccm_n));
+diff --git a/fs/cifs/smbencrypt.c b/fs/cifs/smbencrypt.c
+index 6c15663..a4232ec 100644
+--- a/fs/cifs/smbencrypt.c
++++ b/fs/cifs/smbencrypt.c
+@@ -221,7 +221,7 @@ E_md4hash(const unsigned char *passwd, unsigned char *p16,
+ 	}
+ 
+ 	rc = mdfour(p16, (unsigned char *) wpwd, len * sizeof(__le16));
+-	memset(wpwd, 0, 129 * sizeof(__le16));
++	memzero_explicit(wpwd, sizeof(wpwd));
+ 
+ 	return rc;
+ }
+-- 
+2.1.4
