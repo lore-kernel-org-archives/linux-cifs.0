@@ -1,125 +1,78 @@
-From: Jeff Layton <jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
-Subject: [PATCH v2 09/10] locks: clean up the lm_change prototype
-Date: Thu,  8 Jan 2015 10:34:24 -0800
-Message-ID: <1420742065-28423-10-git-send-email-jlayton@primarydata.com>
+From: Jeff Layton <jlayton@primarydata.com>
+Subject: [PATCH v2 01/10] locks: add new struct list_head to struct file_lock
+Date: Thu,  8 Jan 2015 10:34:16 -0800
+Message-ID: <1420742065-28423-2-git-send-email-jlayton@primarydata.com>
 References: <1420742065-28423-1-git-send-email-jlayton@primarydata.com>
-Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org
-To: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1420742065-28423-1-git-send-email-jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+	hch@infradead.org
+To: linux-fsdevel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1420742065-28423-1-git-send-email-jlayton@primarydata.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Now that we use standard list_heads for tracking leases, we can have
-lm_change take a pointer to the lease to be modified instead of a
-double pointer.
+...that we can use to queue file_locks to per-ctx list_heads. Go ahead
+and convert locks_delete_lock and locks_dispose_list to use it instead
+of the fl_block list.
 
-Signed-off-by: Jeff Layton <jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton@primarydata.com>
 ---
- fs/locks.c          | 13 ++++++-------
- fs/nfsd/nfs4state.c |  2 +-
- include/linux/fs.h  |  6 +++---
- 3 files changed, 10 insertions(+), 11 deletions(-)
+ fs/locks.c         | 8 +++++---
+ include/linux/fs.h | 1 +
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/fs/locks.c b/fs/locks.c
-index 2cded21b99ac..4d8f8fe61823 100644
+index 735b8d3fa78c..fba8bc7af6d3 100644
 --- a/fs/locks.c
 +++ b/fs/locks.c
-@@ -1302,9 +1302,8 @@ static void lease_clear_pending(struct file_lock *fl, int arg)
- }
- 
- /* We already had a lease on this file; just change its type */
--int lease_modify(struct file_lock **before, int arg, struct list_head *dispose)
-+int lease_modify(struct file_lock *fl, int arg, struct list_head *dispose)
+@@ -207,6 +207,7 @@ static struct kmem_cache *filelock_cache __read_mostly;
+ static void locks_init_lock_heads(struct file_lock *fl)
  {
--	struct file_lock *fl = *before;
- 	int error = assign_type(fl, arg);
- 
- 	if (error)
-@@ -1345,9 +1344,9 @@ static void time_out_leases(struct inode *inode, struct list_head *dispose)
- 	list_for_each_entry_safe(fl, tmp, &ctx->flc_lease, fl_list) {
- 		trace_time_out_leases(inode, fl);
- 		if (past_time(fl->fl_downgrade_time))
--			lease_modify(&fl, F_RDLCK, dispose);
-+			lease_modify(fl, F_RDLCK, dispose);
- 		if (past_time(fl->fl_break_time))
--			lease_modify(&fl, F_UNLCK, dispose);
-+			lease_modify(fl, F_UNLCK, dispose);
- 	}
+ 	INIT_HLIST_NODE(&fl->fl_link);
++	INIT_LIST_HEAD(&fl->fl_list);
+ 	INIT_LIST_HEAD(&fl->fl_block);
+ 	init_waitqueue_head(&fl->fl_wait);
  }
- 
-@@ -1661,7 +1660,7 @@ generic_add_lease(struct file *filp, long arg, struct file_lock **flp, void **pr
- 	}
- 
- 	if (my_fl != NULL) {
--		error = lease->fl_lmops->lm_change(&my_fl, arg, &dispose);
-+		error = lease->fl_lmops->lm_change(my_fl, arg, &dispose);
- 		if (error)
- 			goto out;
- 		goto out_setup;
-@@ -1724,7 +1723,7 @@ static int generic_delete_lease(struct file *filp)
- 	}
- 	trace_generic_delete_lease(inode, fl);
- 	if (victim)
--		error = fl->fl_lmops->lm_change(&victim, F_UNLCK, &dispose);
-+		error = fl->fl_lmops->lm_change(victim, F_UNLCK, &dispose);
- 	spin_unlock(&ctx->flc_lock);
- 	locks_dispose_list(&dispose);
- 	return error;
-@@ -2417,7 +2416,7 @@ locks_remove_lease(struct file *filp)
- 
- 	spin_lock(&ctx->flc_lock);
- 	list_for_each_entry_safe(fl, tmp, &ctx->flc_lease, fl_list)
--		lease_modify(&fl, F_UNLCK, &dispose);
-+		lease_modify(fl, F_UNLCK, &dispose);
- 	spin_unlock(&ctx->flc_lock);
- 	locks_dispose_list(&dispose);
- }
-diff --git a/fs/nfsd/nfs4state.c b/fs/nfsd/nfs4state.c
-index 159a3a79df83..0386c8e16423 100644
---- a/fs/nfsd/nfs4state.c
-+++ b/fs/nfsd/nfs4state.c
-@@ -3477,7 +3477,7 @@ nfsd_break_deleg_cb(struct file_lock *fl)
- }
- 
- static int
--nfsd_change_deleg_cb(struct file_lock **onlist, int arg, struct list_head *dispose)
-+nfsd_change_deleg_cb(struct file_lock *onlist, int arg, struct list_head *dispose)
+@@ -243,6 +244,7 @@ EXPORT_SYMBOL_GPL(locks_release_private);
+ void locks_free_lock(struct file_lock *fl)
  {
- 	if (arg & F_UNLCK)
- 		return lease_modify(onlist, arg, dispose);
+ 	BUG_ON(waitqueue_active(&fl->fl_wait));
++	BUG_ON(!list_empty(&fl->fl_list));
+ 	BUG_ON(!list_empty(&fl->fl_block));
+ 	BUG_ON(!hlist_unhashed(&fl->fl_link));
+ 
+@@ -257,8 +259,8 @@ locks_dispose_list(struct list_head *dispose)
+ 	struct file_lock *fl;
+ 
+ 	while (!list_empty(dispose)) {
+-		fl = list_first_entry(dispose, struct file_lock, fl_block);
+-		list_del_init(&fl->fl_block);
++		fl = list_first_entry(dispose, struct file_lock, fl_list);
++		list_del_init(&fl->fl_list);
+ 		locks_free_lock(fl);
+ 	}
+ }
+@@ -691,7 +693,7 @@ static void locks_delete_lock(struct file_lock **thisfl_p,
+ 
+ 	locks_unlink_lock(thisfl_p);
+ 	if (dispose)
+-		list_add(&fl->fl_block, dispose);
++		list_add(&fl->fl_list, dispose);
+ 	else
+ 		locks_free_lock(fl);
+ }
 diff --git a/include/linux/fs.h b/include/linux/fs.h
-index cbf89d9085a5..696b77daa227 100644
+index f90c0282c114..9eee7200cfe3 100644
 --- a/include/linux/fs.h
 +++ b/include/linux/fs.h
-@@ -900,7 +900,7 @@ struct lock_manager_operations {
- 	void (*lm_notify)(struct file_lock *);	/* unblock callback */
- 	int (*lm_grant)(struct file_lock *, int);
- 	bool (*lm_break)(struct file_lock *);
--	int (*lm_change)(struct file_lock **, int, struct list_head *);
-+	int (*lm_change)(struct file_lock *, int, struct list_head *);
- 	void (*lm_setup)(struct file_lock *, void **);
- };
- 
-@@ -1021,7 +1021,7 @@ extern int __break_lease(struct inode *inode, unsigned int flags, unsigned int t
- extern void lease_get_mtime(struct inode *, struct timespec *time);
- extern int generic_setlease(struct file *, long, struct file_lock **, void **priv);
- extern int vfs_setlease(struct file *, long, struct file_lock **, void **);
--extern int lease_modify(struct file_lock **, int, struct list_head *);
-+extern int lease_modify(struct file_lock *, int, struct list_head *);
- #else /* !CONFIG_FILE_LOCKING */
- static inline int fcntl_getlk(struct file *file, unsigned int cmd,
- 			      struct flock __user *user)
-@@ -1154,7 +1154,7 @@ static inline int vfs_setlease(struct file *filp, long arg,
- 	return -EINVAL;
- }
- 
--static inline int lease_modify(struct file_lock **before, int arg,
-+static inline int lease_modify(struct file_lock *fl, int arg,
- 			       struct list_head *dispose)
- {
- 	return -EINVAL;
+@@ -934,6 +934,7 @@ int locks_in_grace(struct net *);
+  */
+ struct file_lock {
+ 	struct file_lock *fl_next;	/* singly linked list for this inode  */
++	struct list_head fl_list;	/* link into file_lock_context */
+ 	struct hlist_node fl_link;	/* node in global lists */
+ 	struct list_head fl_block;	/* circular list of blocked processes */
+ 	fl_owner_t fl_owner;
 -- 
 2.1.0
