@@ -1,36 +1,49 @@
-From: Daniel Borkmann <dborkman@redhat.com>
-Subject: Re: [PATCH] Use memzero_explicit to clear local buffers
-Date: Mon, 05 Jan 2015 18:36:48 +0100
-Message-ID: <54AACBB0.8090007@redhat.com>
-References: <1420394744-20268-1-git-send-email-me@mortis.eu> <20150104213538.GA19906@gondor.apana.org.au> <20150104224909.GB4806@salidar.dom.custoft.eu>
-	<20150104233637.GA20757@gondor.apana.org.au>
+From: Steve French <smfrench@gmail.com>
+Subject: Re: [PATCH RESEND] cifs: use memzero_explicit to clear stack buffer
+Date: Mon, 12 Jan 2015 18:12:57 -0600
+Message-ID: <CAH2r5muudE96Za2GHW0r=opq994UrWLoymvLri8fYz_Gcy0j7Q@mail.gmail.com>
+References: <1420394744-20268-1-git-send-email-me@mortis.eu>
+ <1420580220-6276-1-git-send-email-me@mortis.eu> <20150106225931.GA23281@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: "open list:COMMON INTERNET F..." <linux-cifs@vger.kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Giel van Schijndel <me@mortis.eu>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "maintainer:X86 ARCHITECTURE..." <x86@kernel.org>,
-	"moderated list:COMMON INTERNET F..." <samba-technical@lists.samba.org>, linux-kernel@vger.kernel.org, Steve French <sfrench@samba.org>,
-	Julia Lawall <Julia.Lawall@lip6.fr>, Thomas Pugliese <thomas.pugliese@gmail.com>, Ingo Molnar <mingo@redhat.com>, Rahul Bedarkar <rahulbedarkar89@gmail.com>,
-	CRYPTO API <linux-crypto@vger.kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>,
-	"open list:CERTIFIED WIRELES..." <linux-usb@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset=UTF-8
+Cc: Giel van Schijndel <me@mortis.eu>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Steve French <sfrench@samba.org>,
+	"open list:COMMON INTERNET F..." <linux-cifs@vger.kernel.org>,
+	"moderated list:COMMON INTERNET F..."
+	<samba-technical@lists.samba.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <20150104233637.GA20757@gondor.apana.org.au>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>, <mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20150106225931.GA23281@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On 01/05/2015 12:36 AM, Herbert Xu wrote:
-...
-> Daniel, we should add a comment so that people stop sending bogus
-> patches with memzero_explicit.
+merged into cifs-2.6.git for-next
 
-I'll send a patch adding a comment, sure.
+On Tue, Jan 6, 2015 at 4:59 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Tue, Jan 06, 2015 at 10:37:00PM +0100, Giel van Schijndel wrote:
+>> When leaving a function use memzero_explicit instead of memset(0) to
+>> clear stack allocated buffers. memset(0) may be optimized away.
+>>
+>> This particular buffer is highly likely to contain sensitive data which
+>> we shouldn't leak (it's named 'passwd' after all).
+>>
+>> Signed-off-by: Giel van Schijndel <me@mortis.eu>
+>> Reported-at: http://www.viva64.com/en/b/0299/
+>> Reported-by: Andrey Karpov
+>> Reported-by: Svyatoslav Razmyslov
+>
+> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+>
+> Thanks,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
+
+
+-- 
 Thanks,
-Daniel
+
+Steve
