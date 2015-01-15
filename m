@@ -1,49 +1,71 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH RESEND] cifs: use memzero_explicit to clear stack buffer
-Date: Mon, 12 Jan 2015 18:12:57 -0600
-Message-ID: <CAH2r5muudE96Za2GHW0r=opq994UrWLoymvLri8fYz_Gcy0j7Q@mail.gmail.com>
-References: <1420394744-20268-1-git-send-email-me@mortis.eu>
- <1420580220-6276-1-git-send-email-me@mortis.eu> <20150106225931.GA23281@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Giel van Schijndel <me@mortis.eu>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Steve French <sfrench@samba.org>,
-	"open list:COMMON INTERNET F..." <linux-cifs@vger.kernel.org>,
-	"moderated list:COMMON INTERNET F..."
-	<samba-technical@lists.samba.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20150106225931.GA23281@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] Complete oplock break jobs before closing file handle
+Date: Thu, 15 Jan 2015 12:22:04 +0000
+Message-ID: <1421324524-2524-1-git-send-email-sprabhu@redhat.com>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-merged into cifs-2.6.git for-next
+Commit
+c11f1df5003d534fd067f0168bfad7befffb3b5c
+requires writers to wait for any pending oplock break handler to
+complete before proceeding to write. This is done by waiting on bit
+CIFS_INODE_PENDING_OPLOCK_BREAK in cifsFileInfo->flags. This bit is
+cleared by the oplock break handler job queued on the workqueue once it
+has completed handling the oplock break allowing writers to proceed with
+writing to the file.
 
-On Tue, Jan 6, 2015 at 4:59 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Tue, Jan 06, 2015 at 10:37:00PM +0100, Giel van Schijndel wrote:
->> When leaving a function use memzero_explicit instead of memset(0) to
->> clear stack allocated buffers. memset(0) may be optimized away.
->>
->> This particular buffer is highly likely to contain sensitive data which
->> we shouldn't leak (it's named 'passwd' after all).
->>
->> Signed-off-by: Giel van Schijndel <me@mortis.eu>
->> Reported-at: http://www.viva64.com/en/b/0299/
->> Reported-by: Andrey Karpov
->> Reported-by: Svyatoslav Razmyslov
->
-> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
->
-> Thanks,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+While testing, it was noticed that the filehandle could be closed while
+there is a pending oplock break which results in the oplock break
+handler on the cifsiod workqueue being cancelled before it has had a
+chance to execute and clear the CIFS_INODE_PENDING_OPLOCK_BREAK bit.
+Any subsequent attempt to write to this file hangs waiting for the
+CIFS_INODE_PENDING_OPLOCK_BREAK bit to be cleared.
 
+We fix this by ensuring that we also clear the bit
+CIFS_INODE_PENDING_OPLOCK_BREAK when we remove the oplock break handler
+from the workqueue.
 
+The bug was found by Red Hat QA while testing using ltp's fsstress
+command.
 
+Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ fs/cifs/file.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 96b7e9b..74f1287 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -366,6 +366,7 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+ 	struct cifsLockInfo *li, *tmp;
+ 	struct cifs_fid fid;
+ 	struct cifs_pending_open open;
++	bool oplock_break_cancelled;
+ 
+ 	spin_lock(&cifs_file_list_lock);
+ 	if (--cifs_file->count > 0) {
+@@ -397,7 +398,7 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+ 	}
+ 	spin_unlock(&cifs_file_list_lock);
+ 
+-	cancel_work_sync(&cifs_file->oplock_break);
++	oplock_break_cancelled = cancel_work_sync(&cifs_file->oplock_break);
+ 
+ 	if (!tcon->need_reconnect && !cifs_file->invalidHandle) {
+ 		struct TCP_Server_Info *server = tcon->ses->server;
+@@ -409,6 +410,9 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+ 		_free_xid(xid);
+ 	}
+ 
++	if (oplock_break_cancelled)
++		cifs_done_oplock_break(cifsi);
++
+ 	cifs_del_pending_open(&open);
+ 
+ 	/*
 -- 
-Thanks,
-
-Steve
+2.1.0
