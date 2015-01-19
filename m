@@ -1,20 +1,23 @@
-From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Subject: Re: [PATCH] Complete oplock break jobs before closing file handle
-Date: Mon, 19 Jan 2015 09:55:58 +0000
-Message-ID: <1421661358.13255.2.camel@redhat.com>
+Date: Mon, 19 Jan 2015 07:02:09 -0500
+Message-ID: <20150119070209.0f83b94d@tlielax.poochiereds.net>
 References: <1421324524-2524-1-git-send-email-sprabhu@redhat.com>
-	 <CADT32eLUO-sSio5PRZWB0kBvGB4QhYgy=LKOBKKOo8-Ww8nASg@mail.gmail.com>
+	<CADT32eLUO-sSio5PRZWB0kBvGB4QhYgy=LKOBKKOo8-Ww8nASg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <CADT32eLUO-sSio5PRZWB0kBvGB4QhYgy=LKOBKKOo8-Ww8nASg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, 2015-01-17 at 07:45 -0600, Shirish Pargaonkar wrote:
+On Sat, 17 Jan 2015 07:45:13 -0600
+Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+
 > On Thu, Jan 15, 2015 at 6:22 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 > > Commit
 > > c11f1df5003d534fd067f0168bfad7befffb3b5c
@@ -87,14 +90,15 @@ On Sat, 2015-01-17 at 07:45 -0600, Shirish Pargaonkar wrote:
 > 
 > Does it matter what cancel_work_sync() returns?
 > Should cifs_done_oplock_break(cifsi); be called unconditionally?
+
+I guess the question is whether you can end up with another oplock
+break racing in between cancel_work_sync and the
+cifs_done_oplock_break. If that can't happen, then calling it
+unconditionally is fine.
+
 > Also, should this also to go stable?
 
-Sirish,
+Yes, probably. It can cause the client to hang.
 
-This is done so that we delay allowing other writers to write to this
-file before we call close on the file handle.
-
-Yes. I think it should also go to stable once it has been accepted by
-Steve.
-
-Sachin Prabhu
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
