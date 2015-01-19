@@ -1,7 +1,7 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH] Complete oplock break jobs before closing file handle
-Date: Mon, 19 Jan 2015 11:13:30 -0600
-Message-ID: <CAH2r5mvbrFuAHrhPENRZJJ8=2s4Pzpy9_s62dzNLfF23-zQTWw@mail.gmail.com>
+Date: Mon, 19 Jan 2015 16:15:38 -0600
+Message-ID: <CAH2r5mssmkhMHhnBrMnSamzmzhUCYopZ4iSMVXsi7toMYoKnnA@mail.gmail.com>
 References: <1421324524-2524-1-git-send-email-sprabhu@redhat.com>
  <CADT32eLUO-sSio5PRZWB0kBvGB4QhYgy=LKOBKKOo8-Ww8nASg@mail.gmail.com>
  <20150119070209.0f83b94d@tlielax.poochiereds.net> <1421684692.13255.8.camel@redhat.com>
@@ -121,23 +121,15 @@ On Mon, Jan 19, 2015 at 10:36 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@pu
 > end up with oplocks breaks for multiple open files attached to a single
 > inode. If that happens though, you just end up waiting on the first one
 > to finish (or be cancelled)?
->
-> Probably someone ought to go over this in detail and determine whether
-> the basic design makes sense...
 
-And whether it makes sense for both SMB2.1 (and later) vs. CIFS
-(ie SMB2.1 leases vs. SMB/CIFS oplocks)
+The oplock (in the inode flags) is downgraded immediately.  Getting
+multiple overlapping oplock breaks on different opens of the same inode
+should be harmless as long as the first break was processed.
 
-Thinking about some of the things mentioned in here:
+Doesn't look like the if (oplock_break_cancelled) ... matters one
+way or the other. I am ok with merging as is (will add the CC stable)
 
-http://blogs.msdn.com/b/openspecification/archive/2009/05/22/client-caching-features-oplock-vs-lease.aspx
-
->> > > Also, should this also to go stable?
->> >
->> > Yes, probably. It can cause the client to hang.
-
-yes
-
+Merged into cifs-2.6.git
 
 -- 
 Thanks,
