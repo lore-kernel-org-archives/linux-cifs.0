@@ -1,91 +1,87 @@
-From: Jeff Layton <jeff.layton@primarydata.com>
-Subject: [PATCH v3 04/13] ceph: move spinlocking into ceph_encode_locks_to_buffer and ceph_count_locks
-Date: Thu, 22 Jan 2015 09:27:48 -0500
-Message-ID: <1421936877-27529-5-git-send-email-jeff.layton@primarydata.com>
+From: Jeff Layton <jeff.layton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+Subject: [PATCH v3 13/13] locks: update comments that refer to inode->i_flock
+Date: Thu, 22 Jan 2015 09:27:57 -0500
+Message-ID: <1421936877-27529-14-git-send-email-jeff.layton@primarydata.com>
 References: <1421936877-27529-1-git-send-email-jeff.layton@primarydata.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Sasha Levin <sasha.levin@oracle.com>,
-	David Howells <dhowells@redhat.com>,
-	linux-kernel@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org
-To: linux-fsdevel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1421936877-27529-1-git-send-email-jeff.layton@primarydata.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Cc: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+	Sasha Levin <sasha.levin-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
+	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1421936877-27529-1-git-send-email-jeff.layton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
-From: Jeff Layton <jlayton@primarydata.com>
-
-There is only a single call site for each of these functions, and the
-caller takes the i_lock prior to calling them and drops it just
-afterward. Move the spinlocking into the functions instead.
-
-Signed-off-by: Jeff Layton <jlayton@primarydata.com>
-Acked-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jeff Layton <jlayton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
 ---
- fs/ceph/locks.c      | 4 ++++
- fs/ceph/mds_client.c | 4 ----
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ fs/locks.c         |  2 +-
+ include/linux/fs.h | 19 ++++++++++---------
+ 2 files changed, 11 insertions(+), 10 deletions(-)
 
-diff --git a/fs/ceph/locks.c b/fs/ceph/locks.c
-index c35c5c614e38..366dc2412605 100644
---- a/fs/ceph/locks.c
-+++ b/fs/ceph/locks.c
-@@ -251,12 +251,14 @@ void ceph_count_locks(struct inode *inode, int *fcntl_count, int *flock_count)
- 	*fcntl_count = 0;
- 	*flock_count = 0;
- 
-+	spin_lock(&inode->i_lock);
- 	for (lock = inode->i_flock; lock != NULL; lock = lock->fl_next) {
- 		if (lock->fl_flags & FL_POSIX)
- 			++(*fcntl_count);
- 		else if (lock->fl_flags & FL_FLOCK)
- 			++(*flock_count);
- 	}
-+	spin_unlock(&inode->i_lock);
- 	dout("counted %d flock locks and %d fcntl locks",
- 	     *flock_count, *fcntl_count);
- }
-@@ -279,6 +281,7 @@ int ceph_encode_locks_to_buffer(struct inode *inode,
- 	dout("encoding %d flock and %d fcntl locks", num_flock_locks,
- 	     num_fcntl_locks);
- 
-+	spin_lock(&inode->i_lock);
- 	for (lock = inode->i_flock; lock != NULL; lock = lock->fl_next) {
- 		if (lock->fl_flags & FL_POSIX) {
- 			++seen_fcntl;
-@@ -306,6 +309,7 @@ int ceph_encode_locks_to_buffer(struct inode *inode,
- 		}
- 	}
- fail:
-+	spin_unlock(&inode->i_lock);
- 	return err;
- }
- 
-diff --git a/fs/ceph/mds_client.c b/fs/ceph/mds_client.c
-index d2171f4a6980..5f62fb7a5d0a 100644
---- a/fs/ceph/mds_client.c
-+++ b/fs/ceph/mds_client.c
-@@ -2700,20 +2700,16 @@ static int encode_caps_cb(struct inode *inode, struct ceph_cap *cap,
- 		struct ceph_filelock *flocks;
- 
- encode_again:
--		spin_lock(&inode->i_lock);
- 		ceph_count_locks(inode, &num_fcntl_locks, &num_flock_locks);
--		spin_unlock(&inode->i_lock);
- 		flocks = kmalloc((num_fcntl_locks+num_flock_locks) *
- 				 sizeof(struct ceph_filelock), GFP_NOFS);
- 		if (!flocks) {
- 			err = -ENOMEM;
- 			goto out_free;
- 		}
--		spin_lock(&inode->i_lock);
- 		err = ceph_encode_locks_to_buffer(inode, flocks,
- 						  num_fcntl_locks,
- 						  num_flock_locks);
--		spin_unlock(&inode->i_lock);
- 		if (err) {
- 			kfree(flocks);
- 			if (err == -ENOSPC)
+diff --git a/fs/locks.c b/fs/locks.c
+index 2fc36b3772a0..4d0d41163a50 100644
+--- a/fs/locks.c
++++ b/fs/locks.c
+@@ -2212,7 +2212,7 @@ again:
+ 	 */
+ 	/*
+ 	 * we need that spin_lock here - it prevents reordering between
+-	 * update of inode->i_flock and check for it done in close().
++	 * update of i_flctx->flc_posix and check for it done in close().
+ 	 * rcu_read_lock() wouldn't do.
+ 	 */
+ 	spin_lock(&current->files->file_lock);
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index f87cb2f03103..ddd2fa7cefd3 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -925,12 +925,11 @@ int locks_in_grace(struct net *);
+  * FIXME: should we create a separate "struct lock_request" to help distinguish
+  * these two uses?
+  *
+- * The i_flock list is ordered by:
++ * The varous i_flctx lists are ordered by:
+  *
+- * 1) lock type -- FL_LEASEs first, then FL_FLOCK, and finally FL_POSIX
+- * 2) lock owner
+- * 3) lock range start
+- * 4) lock range end
++ * 1) lock owner
++ * 2) lock range start
++ * 3) lock range end
+  *
+  * Obviously, the last two criteria only matter for POSIX locks.
+  */
+@@ -1992,8 +1991,9 @@ static inline int break_lease(struct inode *inode, unsigned int mode)
+ {
+ 	/*
+ 	 * Since this check is lockless, we must ensure that any refcounts
+-	 * taken are done before checking inode->i_flock. Otherwise, we could
+-	 * end up racing with tasks trying to set a new lease on this file.
++	 * taken are done before checking i_flctx->flc_lease. Otherwise, we
++	 * could end up racing with tasks trying to set a new lease on this
++	 * file.
+ 	 */
+ 	smp_mb();
+ 	if (inode->i_flctx && !list_empty_careful(&inode->i_flctx->flc_lease))
+@@ -2005,8 +2005,9 @@ static inline int break_deleg(struct inode *inode, unsigned int mode)
+ {
+ 	/*
+ 	 * Since this check is lockless, we must ensure that any refcounts
+-	 * taken are done before checking inode->i_flock. Otherwise, we could
+-	 * end up racing with tasks trying to set a new lease on this file.
++	 * taken are done before checking i_flctx->flc_lease. Otherwise, we
++	 * could end up racing with tasks trying to set a new lease on this
++	 * file.
+ 	 */
+ 	smp_mb();
+ 	if (inode->i_flctx && !list_empty_careful(&inode->i_flctx->flc_lease))
 -- 
 2.1.0
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
