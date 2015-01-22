@@ -1,7 +1,8 @@
 From: Jeff Layton <jeff.layton@primarydata.com>
-Subject: [PATCH v3 00/13] locks: saner method for managing file locks
-Date: Thu, 22 Jan 2015 09:27:44 -0500
-Message-ID: <1421936877-27529-1-git-send-email-jeff.layton@primarydata.com>
+Subject: [PATCH v3 04/13] ceph: move spinlocking into ceph_encode_locks_to_buffer and ceph_count_locks
+Date: Thu, 22 Jan 2015 09:27:48 -0500
+Message-ID: <1421936877-27529-5-git-send-email-jeff.layton@primarydata.com>
+References: <1421936877-27529-1-git-send-email-jeff.layton@primarydata.com>
 Cc: Christoph Hellwig <hch@infradead.org>,
 	Sasha Levin <sasha.levin@oracle.com>,
 	David Howells <dhowells@redhat.com>,
@@ -9,124 +10,82 @@ Cc: Christoph Hellwig <hch@infradead.org>,
 	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org
 To: linux-fsdevel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1421936877-27529-1-git-send-email-jeff.layton@primarydata.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-v3:
-- break out a ceph locking cleanup patch into a separate one earlier
-  in the series
-- switch back to using the i_lock to protect assignment of i_flctx.
-  Using cmpxchg() was subject to races that I couldn't quite get a
-  grip on. Eventually I may switch it back, but it probably doesn't
-  provide much benefit.
-- add a patch to clean up some comments that refer to i_flock
-- use list_empty_careful in lockless checks rather than list_empty
+From: Jeff Layton <jlayton@primarydata.com>
 
-v2:
-- bugfix to the flc_posix list ordering that broke the split/merge code
-- don't use i_lock to manage the i_flctx pointer. Do so locklessly
-  via cmpxchg().
-- reordering of the patches to make the set bisectable. As a result
-  the new spinlock is not introduced until near the end of the set
-- some cleanup of the lm_change operation was added, made possible
-  by the move to standard list_heads for tracking locks
-- it takes greater pains to avoid spinlocking by checking when the
-  lists are empty in addition to whether the i_flctx pointer is NULL
-- a patch was added to keep count of the number of locks, so we can
-  avoid having to do count/alloc/populate in ceph and cifs
+There is only a single call site for each of these functions, and the
+caller takes the i_lock prior to calling them and drops it just
+afterward. Move the spinlocking into the functions instead.
 
-This is the third iteration of this patchset. The second was posted
-on January 8th, under the cover letter entitled:
+Signed-off-by: Jeff Layton <jlayton@primarydata.com>
+Acked-by: Christoph Hellwig <hch@lst.de>
+---
+ fs/ceph/locks.c      | 4 ++++
+ fs/ceph/mds_client.c | 4 ----
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-    [PATCH v2 00/10] locks: saner method for managing file locks
-
-The big change here is that it once again uses the i_lock to protect the
-i_flctx pointer assignment. In principle we should be able to use
-cmpxchg instead, but that seems leave open a race that causes
-locks_remove_file to miss recently-added locks. Given that is not a
-super latency-sensitive codepath, an extra spinlock shouldn't make much
-difference.
-
-Many thanks to Sasha Levin who helped me nail a race that would leave
-leftover locks on the i_flock list, and David Howells who convinced
-me to just go ahead back to using the i_lock to protect that field.
-
-There are some other minor changes, but overall it's pretty similar
-to the last set. I still plan to merge this for v3.20.
-
-------------------------[snip]-------------------------
-
-We currently manage all file_locks via a singly-linked list. This is
-problematic for a number of reasons:
-
-- we have to protect all file locks with the same spinlock (or
-  equivalent). Currently that uses the i_lock, but Christoph has voiced
-  objections due to the potential for contention with other i_lock
-  users. He'd like to see us move to using a different lock.
-
-- we have to walk through irrelevant file locks in order to get to the
-  ones we're interested in. For instance, POSIX locks are at the end
-  of the list, so we have to skip over all of the flock locks and
-  leases before we can work with them.
-
-- the singly-linked list is primitive and difficult to work with. We
-  have to keep track of the "before" pointer and it's easy to get that
-  wrong.
-
-Cleaning all of this up is complicated by the fact that no one really
-wants to grow struct inode in order to do so. We have a single pointer
-in the inode now and I don't think we want to use any more.
-
-One possibility that Trond raised was to move this to an hlist, but
-that doesn't do anything about the desire for a new spinlock.
-
-This patchset takes the approach of replacing the i_flock list with a
-new struct file_lock_context that is allocated when we intend to add a
-new file lock to an inode. The file_lock_context is only freed when we
-destroy the inode.
-
-Within that, we have separate (and standard!) lists for each lock type,
-and a dedicated spinlock for managing those lists. In principle we could
-even consider adding separate locks for each, but I didn't bother with
-that for now.
-
-For now, the code is still pretty "raw" and isn't bisectable. This is
-just a RFC for the basic approach. This is probably v3.19 material at
-best.
-
-Anyone have thoughts or comments on the basic approach?
-
-Jeff Layton (13):
-  locks: add new struct list_head to struct file_lock
-  locks: have locks_release_file use flock_lock_file to release generic
-    flock locks
-  locks: add a new struct file_locking_context pointer to struct inode
-  ceph: move spinlocking into ceph_encode_locks_to_buffer and
-    ceph_count_locks
-  locks: move flock locks to file_lock_context
-  locks: convert posix locks to file_lock_context
-  locks: convert lease handling to file_lock_context
-  locks: remove i_flock field from struct inode
-  locks: add a dedicated spinlock to protect i_flctx lists
-  locks: clean up the lm_change prototype
-  locks: keep a count of locks on the flctx lists
-  locks: consolidate NULL i_flctx checks in locks_remove_file
-  locks: update comments that refer to inode->i_flock
-
- fs/ceph/locks.c      |  64 +++---
- fs/ceph/mds_client.c |   4 -
- fs/cifs/file.c       |  34 +--
- fs/inode.c           |   3 +-
- fs/lockd/svcsubs.c   |  26 ++-
- fs/locks.c           | 569 +++++++++++++++++++++++++++------------------------
- fs/nfs/delegation.c  |  23 ++-
- fs/nfs/nfs4state.c   |  70 ++++---
- fs/nfs/pagelist.c    |   6 +-
- fs/nfs/write.c       |  41 +++-
- fs/nfsd/nfs4state.c  |  21 +-
- fs/read_write.c      |   2 +-
- include/linux/fs.h   |  52 +++--
- 13 files changed, 510 insertions(+), 405 deletions(-)
-
+diff --git a/fs/ceph/locks.c b/fs/ceph/locks.c
+index c35c5c614e38..366dc2412605 100644
+--- a/fs/ceph/locks.c
++++ b/fs/ceph/locks.c
+@@ -251,12 +251,14 @@ void ceph_count_locks(struct inode *inode, int *fcntl_count, int *flock_count)
+ 	*fcntl_count = 0;
+ 	*flock_count = 0;
+ 
++	spin_lock(&inode->i_lock);
+ 	for (lock = inode->i_flock; lock != NULL; lock = lock->fl_next) {
+ 		if (lock->fl_flags & FL_POSIX)
+ 			++(*fcntl_count);
+ 		else if (lock->fl_flags & FL_FLOCK)
+ 			++(*flock_count);
+ 	}
++	spin_unlock(&inode->i_lock);
+ 	dout("counted %d flock locks and %d fcntl locks",
+ 	     *flock_count, *fcntl_count);
+ }
+@@ -279,6 +281,7 @@ int ceph_encode_locks_to_buffer(struct inode *inode,
+ 	dout("encoding %d flock and %d fcntl locks", num_flock_locks,
+ 	     num_fcntl_locks);
+ 
++	spin_lock(&inode->i_lock);
+ 	for (lock = inode->i_flock; lock != NULL; lock = lock->fl_next) {
+ 		if (lock->fl_flags & FL_POSIX) {
+ 			++seen_fcntl;
+@@ -306,6 +309,7 @@ int ceph_encode_locks_to_buffer(struct inode *inode,
+ 		}
+ 	}
+ fail:
++	spin_unlock(&inode->i_lock);
+ 	return err;
+ }
+ 
+diff --git a/fs/ceph/mds_client.c b/fs/ceph/mds_client.c
+index d2171f4a6980..5f62fb7a5d0a 100644
+--- a/fs/ceph/mds_client.c
++++ b/fs/ceph/mds_client.c
+@@ -2700,20 +2700,16 @@ static int encode_caps_cb(struct inode *inode, struct ceph_cap *cap,
+ 		struct ceph_filelock *flocks;
+ 
+ encode_again:
+-		spin_lock(&inode->i_lock);
+ 		ceph_count_locks(inode, &num_fcntl_locks, &num_flock_locks);
+-		spin_unlock(&inode->i_lock);
+ 		flocks = kmalloc((num_fcntl_locks+num_flock_locks) *
+ 				 sizeof(struct ceph_filelock), GFP_NOFS);
+ 		if (!flocks) {
+ 			err = -ENOMEM;
+ 			goto out_free;
+ 		}
+-		spin_lock(&inode->i_lock);
+ 		err = ceph_encode_locks_to_buffer(inode, flocks,
+ 						  num_fcntl_locks,
+ 						  num_flock_locks);
+-		spin_unlock(&inode->i_lock);
+ 		if (err) {
+ 			kfree(flocks);
+ 			if (err == -ENOSPC)
 -- 
 2.1.0
