@@ -1,76 +1,37 @@
-From: Jeff Layton <jeff.layton@primarydata.com>
-Subject: [PATCH v3 12/13] locks: consolidate NULL i_flctx checks in locks_remove_file
-Date: Thu, 22 Jan 2015 09:27:56 -0500
-Message-ID: <1421936877-27529-13-git-send-email-jeff.layton@primarydata.com>
-References: <1421936877-27529-1-git-send-email-jeff.layton@primarydata.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Sasha Levin <sasha.levin@oracle.com>,
-	David Howells <dhowells@redhat.com>,
-	linux-kernel@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org
-To: linux-fsdevel@vger.kernel.org
-Return-path: <ceph-devel-owner@vger.kernel.org>
-In-Reply-To: <1421936877-27529-1-git-send-email-jeff.layton@primarydata.com>
-Sender: ceph-devel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: How to do nonblocking writes to CIFS networkshares?
+Date: Sun, 25 Jan 2015 21:13:36 -0600
+Message-ID: <CADT32eKo6zgS1oVxd6pSRRch5swnD1Y-_Oa_2z85+_nOJ3AODQ@mail.gmail.com>
+References: <54BFBCBC.9030706@axis.com>
+	<CADT32e+doVOzxo941dBx=mDftcMoFPow24fhMj=pP8gOtgcrFw@mail.gmail.com>
+	<54C54132.2010304@axis.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Sebastian Rasmussen <sebastian.rasmussen-VrBV9hrLPhE@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <54C54132.2010304-VrBV9hrLPhE@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-We have each of the locks_remove_* variants doing this individually.
-Have the caller do it instead, and have locks_remove_flock and
-locks_remove_lease just assume that it's a valid pointer.
+You can use man crash command. I use command  sudo crash vmlinux to analyze
+a live system.
 
-Signed-off-by: Jeff Layton <jlayton@primarydata.com>
----
- fs/locks.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/fs/locks.c b/fs/locks.c
-index bd578700342d..2fc36b3772a0 100644
---- a/fs/locks.c
-+++ b/fs/locks.c
-@@ -2400,6 +2400,7 @@ void locks_remove_posix(struct file *filp, fl_owner_t owner)
- 
- EXPORT_SYMBOL(locks_remove_posix);
- 
-+/* The i_flctx must be valid when calling into here */
- static void
- locks_remove_flock(struct file *filp)
- {
-@@ -2413,7 +2414,7 @@ locks_remove_flock(struct file *filp)
- 	};
- 	struct file_lock_context *flctx = file_inode(filp)->i_flctx;
- 
--	if (!flctx || list_empty(&flctx->flc_flock))
-+	if (list_empty(&flctx->flc_flock))
- 		return;
- 
- 	if (filp->f_op->flock)
-@@ -2425,6 +2426,7 @@ locks_remove_flock(struct file *filp)
- 		fl.fl_ops->fl_release_private(&fl);
- }
- 
-+/* The i_flctx must be valid when calling into here */
- static void
- locks_remove_lease(struct file *filp)
- {
-@@ -2433,7 +2435,7 @@ locks_remove_lease(struct file *filp)
- 	struct file_lock *fl, *tmp;
- 	LIST_HEAD(dispose);
- 
--	if (!ctx || list_empty(&ctx->flc_lease))
-+	if (list_empty(&ctx->flc_lease))
- 		return;
- 
- 	spin_lock(&ctx->flc_lock);
-@@ -2448,6 +2450,9 @@ locks_remove_lease(struct file *filp)
-  */
- void locks_remove_file(struct file *filp)
- {
-+	if (!file_inode(filp)->i_flctx)
-+		return;
-+
- 	/* remove any OFD locks */
- 	locks_remove_posix(filp, filp);
- 
--- 
-2.1.0
-
+On Sun, Jan 25, 2015 at 1:17 PM, Sebastian Rasmussen
+<sebastian.rasmussen-VrBV9hrLPhE@public.gmane.org> wrote:
+>> Not sure why your writes should be blocking, they should return as soon as
+>> they
+>> write data to page-cache.
+>
+>
+> I haven't checked, but I assume that my backed up writes have filled the
+> page cache (it is a pretty memory constrained embedded Linux system).
+>
+>> Can you run crash on this live system and see where this write
+>> call/process is blocked?
+>
+> I can try, but I don't know this tool. And "crash" was not most search
+> friendly term. ;) Do you mind helping out with a URL?
+>
+>  / Sebastian
+>
