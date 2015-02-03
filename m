@@ -1,215 +1,232 @@
-From: Nakajima Akira <nakajima.akira-o7dWnD6vFTHqq2nvvmkE/A@public.gmane.org>
-Subject: [PATCH] Fix that several functions handle incorrect value of mapchars
-Date: Tue, 3 Feb 2015 17:07:09 +0900
-Message-ID: <54D081AD.7010505@nttcom.co.jp>
+From: Mike Marshall <hubcap@omnibond.com>
+Subject: Re: [PATCH v3 00/13] locks: saner method for managing file locks
+Date: Tue, 3 Feb 2015 13:01:55 -0500
+Message-ID: <CAOg9mSTdtOdTgM5_ED59reRAXLhaPyaybxzbd3vYjwzn+tc5rw@mail.gmail.com>
+References: <1421936877-27529-1-git-send-email-jeff.layton@primarydata.com>
+	<CAOg9mSQSW68-aCh529BdJJ-G3xeWGY3NsNoizPu5wNdrZz88vA@mail.gmail.com>
+	<20150202154243.7023391f@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="------------060304090001040600070905"
-To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-fsdevel@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Sasha Levin <sasha.levin@oracle.com>,
+	David Howells <dhowells@redhat.com>,
+	linux-kernel@vger.kernel.org, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org
+To: Jeff Layton <jeff.layton@primarydata.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20150202154243.7023391f@tlielax.poochiereds.net>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
---------------060304090001040600070905
-Content-Type: text/plain; charset="iso-2022-jp"
-Content-Transfer-Encoding: 7bit
+Yes, 131 goes all the way through now... thanks for fixing my code in
+your thread <g>...
 
-https://bugzilla.kernel.org/show_bug.cgi?id=92401
-About above bug, I attached bug fix patch.
+int pvfs2_lock(struct file *filp, int cmd, struct file_lock *fl)
+{
+        int rc = 0;
 
-I have found 5 bugs about mapchars.
-I think this patch fixes these bugs of mapchars.
+        if (cmd == F_GETLK)
+                posix_test_lock(filp, fl);
+        else
+                rc = posix_lock_file(filp, fl, NULL);
 
+        return rc;
+}
 
-[BUG1] : several functions handle incorrect value of mapchars
--	cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
-+	cifs_remap(cifs_sb));
+-Mike
 
-
-[BUG2] : forget to convert '\'
-+	case '\\':
-+		dest_char = cpu_to_le16(SFM_SLASH);
-+		break;
-
-
-[BUG3] : forget to convert reserved chars when creating SymbolicLink.
--	CIFSUnixCreateSymLink() calls cifs_strtoUTF16
-+	CIFSUnixCreateSymLink() calls cifsConvertToUTF16() with remap
-
-
-[BUG4] : forget to convert reserved chars when getting SymbolicLink.
--	CIFSSMBUnixQuerySymLink() calls cifs_strtoUTF16
-+	CIFSSMBUnixQuerySymLink() calls cifsConvertToUTF16() with remap
-
-
-[BUG5] : /proc/mounts don't show "mapchars" when using mapposix mount option
--	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR)
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR ||
-+	    cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SFM_CHR)
- 		seq_puts(s, ",mapchars");
-
---------------060304090001040600070905
-Content-Type: text/plain; charset="Shift_JIS";
-	name="0001-Fix-that-several-functions-handle-incorrect-value-of.patch"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
-	filename*0="0001-Fix-that-several-functions-handle-incorrect-value-of.pa";
-	filename*1="tch"
-
-RnJvbSBmMTNiNzA0MTRhZjBkZDFjZThiYWIyMmM0MjZmYWMxMzQyNjc0NGRlIE1vbiBTZXAg
-MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBOYWthamltYSBBa2lyYSA8bmFrYWppbWEuYWtpcmFA
-bnR0Y29tLmNvLmpwPgpEYXRlOiBUdWUsIDMgRmViIDIwMTUgMTY6NTM6MzkgKzA5MDAKU3Vi
-amVjdDogW1BBVENIXSBGaXggdGhhdCBzZXZlcmFsIGZ1bmN0aW9ucyBoYW5kbGUgaW5jb3Jy
-ZWN0IHZhbHVlIG9mIG1hcGNoYXJzClNpZ25lZC1vZmYtYnk6IE5ha2FqaW1hIEFraXJhIDxu
-YWthamltYS5ha2lyYUBudHRjb20uY28uanA+CgotLS0KIGZzL2NpZnMvY2lmc19kZnNfcmVm
-LmMgfCAgICAzICsrLQogZnMvY2lmcy9jaWZzX3VuaWNvZGUuYyB8ICAgIDMgKysrCiBmcy9j
-aWZzL2NpZnNmcy5jICAgICAgIHwgICAgMyArKy0KIGZzL2NpZnMvY2lmc3Byb3RvLmggICAg
-fCAgICA0ICsrLS0KIGZzL2NpZnMvY2lmc3NtYi5jICAgICAgfCAgIDIxICsrKysrKysrKysr
-LS0tLS0tLS0tLQogZnMvY2lmcy9kaXIuYyAgICAgICAgICB8ICAgIDMgKy0tCiBmcy9jaWZz
-L2ZpbGUuYyAgICAgICAgIHwgICAgMyArLS0KIGZzL2NpZnMvaW5vZGUuYyAgICAgICAgfCAg
-ICA2ICsrLS0tLQogZnMvY2lmcy9saW5rLmMgICAgICAgICB8ICAgIDMgKystCiBmcy9jaWZz
-L3NtYjFvcHMuYyAgICAgIHwgICAgMyArKy0KIDEwIGZpbGVzIGNoYW5nZWQsIDI4IGluc2Vy
-dGlvbnMoKyksIDI0IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc19k
-ZnNfcmVmLmMgYi9mcy9jaWZzL2NpZnNfZGZzX3JlZi5jCmluZGV4IGI4NjAyZjEuLjdjM2Rk
-ZTkgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvY2lmc19kZnNfcmVmLmMKKysrIGIvZnMvY2lmcy9j
-aWZzX2Rmc19yZWYuYwpAQCAtMjQsNiArMjQsNyBAQAogI2luY2x1ZGUgImNpZnNmcy5oIgog
-I2luY2x1ZGUgImRuc19yZXNvbHZlLmgiCiAjaW5jbHVkZSAiY2lmc19kZWJ1Zy5oIgorI2lu
-Y2x1ZGUgImNpZnNfdW5pY29kZS5oIgogCiBzdGF0aWMgTElTVF9IRUFEKGNpZnNfZGZzX2F1
-dG9tb3VudF9saXN0KTsKIApAQCAtMzEyLDcgKzMxMyw3IEBAIHN0YXRpYyBzdHJ1Y3QgdmZz
-bW91bnQgKmNpZnNfZGZzX2RvX2F1dG9tb3VudChzdHJ1Y3QgZGVudHJ5ICptbnRwdCkKIAl4
-aWQgPSBnZXRfeGlkKCk7CiAJcmMgPSBnZXRfZGZzX3BhdGgoeGlkLCBzZXMsIGZ1bGxfcGF0
-aCArIDEsIGNpZnNfc2ItPmxvY2FsX25scywKIAkJJm51bV9yZWZlcnJhbHMsICZyZWZlcnJh
-bHMsCi0JCWNpZnNfc2ItPm1udF9jaWZzX2ZsYWdzICYgQ0lGU19NT1VOVF9NQVBfU1BFQ0lB
-TF9DSFIpOworCQljaWZzX3JlbWFwKGNpZnNfc2IpKTsKIAlmcmVlX3hpZCh4aWQpOwogCiAJ
-Y2lmc19wdXRfdGxpbmsodGxpbmspOwpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jaWZzX3VuaWNv
-ZGUuYyBiL2ZzL2NpZnMvY2lmc191bmljb2RlLmMKaW5kZXggMDMwM2M2Ny4uNWQ2NDdiMCAx
-MDA2NDQKLS0tIGEvZnMvY2lmcy9jaWZzX3VuaWNvZGUuYworKysgYi9mcy9jaWZzL2NpZnNf
-dW5pY29kZS5jCkBAIC0zODcsNiArMzg3LDkgQEAgc3RhdGljIF9fbGUxNiBjb252ZXJ0X3Rv
-X3NmbV9jaGFyKGNoYXIgc3JjX2NoYXIpCiAJY2FzZSAnfCc6CiAJCWRlc3RfY2hhciA9IGNw
-dV90b19sZTE2KFNGTV9QSVBFKTsKIAkJYnJlYWs7CisJY2FzZSAnXFwnOgorCQlkZXN0X2No
-YXIgPSBjcHVfdG9fbGUxNihTRk1fU0xBU0gpOworCQlicmVhazsKIAlkZWZhdWx0OgogCQlk
-ZXN0X2NoYXIgPSAwOwogCX0KZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc2ZzLmMgYi9mcy9j
-aWZzL2NpZnNmcy5jCmluZGV4IGQ3MmZlMzcuLjM4ZjcwZDAgMTAwNjQ0Ci0tLSBhL2ZzL2Np
-ZnMvY2lmc2ZzLmMKKysrIGIvZnMvY2lmcy9jaWZzZnMuYwpAQCAtNDY3LDcgKzQ2Nyw4IEBA
-IGNpZnNfc2hvd19vcHRpb25zKHN0cnVjdCBzZXFfZmlsZSAqcywgc3RydWN0IGRlbnRyeSAq
-cm9vdCkKIAkJc2VxX3B1dHMocywgIixmb3JjZW1hbmQiKTsKIAlpZiAoY2lmc19zYi0+bW50
-X2NpZnNfZmxhZ3MgJiBDSUZTX01PVU5UX05PX1hBVFRSKQogCQlzZXFfcHV0cyhzLCAiLG5v
-dXNlcl94YXR0ciIpOwotCWlmIChjaWZzX3NiLT5tbnRfY2lmc19mbGFncyAmIENJRlNfTU9V
-TlRfTUFQX1NQRUNJQUxfQ0hSKQorCWlmIChjaWZzX3NiLT5tbnRfY2lmc19mbGFncyAmIENJ
-RlNfTU9VTlRfTUFQX1NQRUNJQUxfQ0hSIHx8CisJICAgIGNpZnNfc2ItPm1udF9jaWZzX2Zs
-YWdzICYgQ0lGU19NT1VOVF9NQVBfU0ZNX0NIUikKIAkJc2VxX3B1dHMocywgIixtYXBjaGFy
-cyIpOwogCWlmIChjaWZzX3NiLT5tbnRfY2lmc19mbGFncyAmIENJRlNfTU9VTlRfVU5YX0VN
-VUwpCiAJCXNlcV9wdXRzKHMsICIsc2Z1Iik7CmRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNw
-cm90by5oIGIvZnMvY2lmcy9jaWZzcHJvdG8uaAppbmRleCBjMzFjZTk4Li5jNjNmZDFkIDEw
-MDY0NAotLS0gYS9mcy9jaWZzL2NpZnNwcm90by5oCisrKyBiL2ZzL2NpZnMvY2lmc3Byb3Rv
-LmgKQEAgLTM2MSwxMSArMzYxLDExIEBAIGV4dGVybiBpbnQgQ0lGU1VuaXhDcmVhdGVIYXJk
-TGluayhjb25zdCB1bnNpZ25lZCBpbnQgeGlkLAogZXh0ZXJuIGludCBDSUZTVW5peENyZWF0
-ZVN5bUxpbmsoY29uc3QgdW5zaWduZWQgaW50IHhpZCwKIAkJCXN0cnVjdCBjaWZzX3Rjb24g
-KnRjb24sCiAJCQljb25zdCBjaGFyICpmcm9tTmFtZSwgY29uc3QgY2hhciAqdG9OYW1lLAot
-CQkJY29uc3Qgc3RydWN0IG5sc190YWJsZSAqbmxzX2NvZGVwYWdlKTsKKwkJCWNvbnN0IHN0
-cnVjdCBubHNfdGFibGUgKm5sc19jb2RlcGFnZSwgaW50IHJlbWFwKTsKIGV4dGVybiBpbnQg
-Q0lGU1NNQlVuaXhRdWVyeVN5bUxpbmsoY29uc3QgdW5zaWduZWQgaW50IHhpZCwKIAkJCXN0
-cnVjdCBjaWZzX3Rjb24gKnRjb24sCiAJCQljb25zdCB1bnNpZ25lZCBjaGFyICpzZWFyY2hO
-YW1lLCBjaGFyICoqc3ltaW5mbywKLQkJCWNvbnN0IHN0cnVjdCBubHNfdGFibGUgKm5sc19j
-b2RlcGFnZSk7CisJCQljb25zdCBzdHJ1Y3QgbmxzX3RhYmxlICpubHNfY29kZXBhZ2UsIGlu
-dCByZW1hcCk7CiBleHRlcm4gaW50IENJRlNTTUJRdWVyeVN5bUxpbmsoY29uc3QgdW5zaWdu
-ZWQgaW50IHhpZCwgc3RydWN0IGNpZnNfdGNvbiAqdGNvbiwKIAkJCSAgICAgICBfX3UxNiBm
-aWQsIGNoYXIgKipzeW1saW5raW5mbywKIAkJCSAgICAgICBjb25zdCBzdHJ1Y3QgbmxzX3Rh
-YmxlICpubHNfY29kZXBhZ2UpOwpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jaWZzc21iLmMgYi9m
-cy9jaWZzL2NpZnNzbWIuYwppbmRleCBmYTEzZDVlLi40MGJkZTc3IDEwMDY0NAotLS0gYS9m
-cy9jaWZzL2NpZnNzbWIuYworKysgYi9mcy9jaWZzL2NpZnNzbWIuYwpAQCAtMjc4NCw3ICsy
-Nzg0LDcgQEAgY29weVJldHJ5OgogaW50CiBDSUZTVW5peENyZWF0ZVN5bUxpbmsoY29uc3Qg
-dW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGNpZnNfdGNvbiAqdGNvbiwKIAkJICAgICAgY29u
-c3QgY2hhciAqZnJvbU5hbWUsIGNvbnN0IGNoYXIgKnRvTmFtZSwKLQkJICAgICAgY29uc3Qg
-c3RydWN0IG5sc190YWJsZSAqbmxzX2NvZGVwYWdlKQorCQkgICAgICBjb25zdCBzdHJ1Y3Qg
-bmxzX3RhYmxlICpubHNfY29kZXBhZ2UsIGludCByZW1hcCkKIHsKIAlUUkFOU0FDVElPTjJf
-U1BJX1JFUSAqcFNNQiA9IE5VTEw7CiAJVFJBTlNBQ1RJT04yX1NQSV9SU1AgKnBTTUJyID0g
-TlVMTDsKQEAgLTI4MDQsOSArMjgwNCw5IEBAIGNyZWF0ZVN5bUxpbmtSZXRyeToKIAogCWlm
-IChwU01CLT5oZHIuRmxhZ3MyICYgU01CRkxHMl9VTklDT0RFKSB7CiAJCW5hbWVfbGVuID0K
-LQkJICAgIGNpZnNfc3RydG9VVEYxNigoX19sZTE2ICopIHBTTUItPkZpbGVOYW1lLCBmcm9t
-TmFtZSwKLQkJCQkgICAgLyogZmluZCBkZWZpbmUgZm9yIHRoaXMgbWF4cGF0aGNvbXBvbmVu
-dCAqLwotCQkJCSAgICBQQVRIX01BWCwgbmxzX2NvZGVwYWdlKTsKKwkJICAgIGNpZnNDb252
-ZXJ0VG9VVEYxNigoX19sZTE2ICopIHBTTUItPkZpbGVOYW1lLCBmcm9tTmFtZSwKKwkJCQkv
-KiBmaW5kIGRlZmluZSBmb3IgdGhpcyBtYXhwYXRoY29tcG9uZW50ICovCisJCQkJCVBBVEhf
-TUFYLCBubHNfY29kZXBhZ2UsIHJlbWFwKTsKIAkJbmFtZV9sZW4rKzsJLyogdHJhaWxpbmcg
-bnVsbCAqLwogCQluYW1lX2xlbiAqPSAyOwogCkBAIC0yODI4LDkgKzI4MjgsOSBAQCBjcmVh
-dGVTeW1MaW5rUmV0cnk6CiAJZGF0YV9vZmZzZXQgPSAoY2hhciAqKSAoJnBTTUItPmhkci5Q
-cm90b2NvbCkgKyBvZmZzZXQ7CiAJaWYgKHBTTUItPmhkci5GbGFnczIgJiBTTUJGTEcyX1VO
-SUNPREUpIHsKIAkJbmFtZV9sZW5fdGFyZ2V0ID0KLQkJICAgIGNpZnNfc3RydG9VVEYxNigo
-X19sZTE2ICopIGRhdGFfb2Zmc2V0LCB0b05hbWUsIFBBVEhfTUFYCi0JCQkJICAgIC8qIGZp
-bmQgZGVmaW5lIGZvciB0aGlzIG1heHBhdGhjb21wb25lbnQgKi8KLQkJCQkgICAgLCBubHNf
-Y29kZXBhZ2UpOworCQkgICAgY2lmc0NvbnZlcnRUb1VURjE2KChfX2xlMTYgKikgZGF0YV9v
-ZmZzZXQsIHRvTmFtZSwKKwkJCQkvKiBmaW5kIGRlZmluZSBmb3IgdGhpcyBtYXhwYXRoY29t
-cG9uZW50ICovCisJCQkJCVBBVEhfTUFYLCBubHNfY29kZXBhZ2UsIHJlbWFwKTsKIAkJbmFt
-ZV9sZW5fdGFyZ2V0Kys7CS8qIHRyYWlsaW5nIG51bGwgKi8KIAkJbmFtZV9sZW5fdGFyZ2V0
-ICo9IDI7CiAJfSBlbHNlIHsJLyogQkIgaW1wcm92ZSB0aGUgY2hlY2sgZm9yIGJ1ZmZlciBv
-dmVycnVucyBCQiAqLwpAQCAtMzAzNCw3ICszMDM0LDcgQEAgd2luQ3JlYXRlSGFyZExpbmtS
-ZXRyeToKIGludAogQ0lGU1NNQlVuaXhRdWVyeVN5bUxpbmsoY29uc3QgdW5zaWduZWQgaW50
-IHhpZCwgc3RydWN0IGNpZnNfdGNvbiAqdGNvbiwKIAkJCWNvbnN0IHVuc2lnbmVkIGNoYXIg
-KnNlYXJjaE5hbWUsIGNoYXIgKipzeW1saW5raW5mbywKLQkJCWNvbnN0IHN0cnVjdCBubHNf
-dGFibGUgKm5sc19jb2RlcGFnZSkKKwkJCWNvbnN0IHN0cnVjdCBubHNfdGFibGUgKm5sc19j
-b2RlcGFnZSwgaW50IHJlbWFwKQogewogLyogU01CX1FVRVJZX0ZJTEVfVU5JWF9MSU5LICov
-CiAJVFJBTlNBQ1RJT04yX1FQSV9SRVEgKnBTTUIgPSBOVUxMOwpAQCAtMzA1NSw4ICszMDU1
-LDkgQEAgcXVlcnlTeW1MaW5rUmV0cnk6CiAKIAlpZiAocFNNQi0+aGRyLkZsYWdzMiAmIFNN
-QkZMRzJfVU5JQ09ERSkgewogCQluYW1lX2xlbiA9Ci0JCQljaWZzX3N0cnRvVVRGMTYoKF9f
-bGUxNiAqKSBwU01CLT5GaWxlTmFtZSwgc2VhcmNoTmFtZSwKLQkJCQkJUEFUSF9NQVgsIG5s
-c19jb2RlcGFnZSk7CisJCQljaWZzQ29udmVydFRvVVRGMTYoKF9fbGUxNiAqKSBwU01CLT5G
-aWxlTmFtZSwKKwkJCQkJICAgc2VhcmNoTmFtZSwgUEFUSF9NQVgsIG5sc19jb2RlcGFnZSwK
-KwkJCQkJICAgcmVtYXApOwogCQluYW1lX2xlbisrOwkvKiB0cmFpbGluZyBudWxsICovCiAJ
-CW5hbWVfbGVuICo9IDI7CiAJfSBlbHNlIHsJLyogQkIgaW1wcm92ZSB0aGUgY2hlY2sgZm9y
-IGJ1ZmZlciBvdmVycnVucyBCQiAqLwpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9kaXIuYyBiL2Zz
-L2NpZnMvZGlyLmMKaW5kZXggYjcyYmMyOS4uZDBjYmRhMiAxMDA2NDQKLS0tIGEvZnMvY2lm
-cy9kaXIuYworKysgYi9mcy9jaWZzL2Rpci5jCkBAIC02MjAsOCArNjIwLDcgQEAgaW50IGNp
-ZnNfbWtub2Qoc3RydWN0IGlub2RlICppbm9kZSwgc3RydWN0IGRlbnRyeSAqZGlyZW50cnks
-IHVtb2RlX3QgbW9kZSwKIAkJfQogCQlyYyA9IENJRlNTTUJVbml4U2V0UGF0aEluZm8oeGlk
-LCB0Y29uLCBmdWxsX3BhdGgsICZhcmdzLAogCQkJCQkgICAgY2lmc19zYi0+bG9jYWxfbmxz
-LAotCQkJCQkgICAgY2lmc19zYi0+bW50X2NpZnNfZmxhZ3MgJgotCQkJCQkJQ0lGU19NT1VO
-VF9NQVBfU1BFQ0lBTF9DSFIpOworCQkJCQkgICAgY2lmc19yZW1hcChjaWZzX3NiKSk7CiAJ
-CWlmIChyYykKIAkJCWdvdG8gbWtub2Rfb3V0OwogCmRpZmYgLS1naXQgYS9mcy9jaWZzL2Zp
-bGUuYyBiL2ZzL2NpZnMvZmlsZS5jCmluZGV4IDk2YjdlOWIuLjUwMGJjMjcgMTAwNjQ0Ci0t
-LSBhL2ZzL2NpZnMvZmlsZS5jCisrKyBiL2ZzL2NpZnMvZmlsZS5jCkBAIC0xNDAsOCArMTQw
-LDcgQEAgaW50IGNpZnNfcG9zaXhfb3BlbihjaGFyICpmdWxsX3BhdGgsIHN0cnVjdCBpbm9k
-ZSAqKnBpbm9kZSwKIAlwb3NpeF9mbGFncyA9IGNpZnNfcG9zaXhfY29udmVydF9mbGFncyhm
-X2ZsYWdzKTsKIAlyYyA9IENJRlNQT1NJWENyZWF0ZSh4aWQsIHRjb24sIHBvc2l4X2ZsYWdz
-LCBtb2RlLCBwbmV0ZmlkLCBwcmVzcF9kYXRhLAogCQkJICAgICBwb3Bsb2NrLCBmdWxsX3Bh
-dGgsIGNpZnNfc2ItPmxvY2FsX25scywKLQkJCSAgICAgY2lmc19zYi0+bW50X2NpZnNfZmxh
-Z3MgJgotCQkJCQlDSUZTX01PVU5UX01BUF9TUEVDSUFMX0NIUik7CisJCQkgICAgIGNpZnNf
-cmVtYXAoY2lmc19zYikpOwogCWNpZnNfcHV0X3RsaW5rKHRsaW5rKTsKIAogCWlmIChyYykK
-ZGlmZiAtLWdpdCBhL2ZzL2NpZnMvaW5vZGUuYyBiL2ZzL2NpZnMvaW5vZGUuYwppbmRleCAw
-YzNjZTQ2Li43ZWVlM2QwIDEwMDY0NAotLS0gYS9mcy9jaWZzL2lub2RlLmMKKysrIGIvZnMv
-Y2lmcy9pbm9kZS5jCkBAIC0zNzMsOCArMzczLDcgQEAgaW50IGNpZnNfZ2V0X2lub2RlX2lu
-Zm9fdW5peChzdHJ1Y3QgaW5vZGUgKipwaW5vZGUsCiAKIAkvKiBjb3VsZCBoYXZlIGRvbmUg
-YSBmaW5kIGZpcnN0IGluc3RlYWQgYnV0IHRoaXMgcmV0dXJucyBtb3JlIGluZm8gKi8KIAly
-YyA9IENJRlNTTUJVbml4UVBhdGhJbmZvKHhpZCwgdGNvbiwgZnVsbF9wYXRoLCAmZmluZF9k
-YXRhLAotCQkJCSAgY2lmc19zYi0+bG9jYWxfbmxzLCBjaWZzX3NiLT5tbnRfY2lmc19mbGFn
-cyAmCi0JCQkJCUNJRlNfTU9VTlRfTUFQX1NQRUNJQUxfQ0hSKTsKKwkJCQkgIGNpZnNfc2It
-PmxvY2FsX25scywgY2lmc19yZW1hcChjaWZzX3NiKSk7CiAJY2lmc19wdXRfdGxpbmsodGxp
-bmspOwogCiAJaWYgKCFyYykgewpAQCAtMjIxNSw4ICsyMjE0LDcgQEAgY2lmc19zZXRhdHRy
-X3VuaXgoc3RydWN0IGRlbnRyeSAqZGlyZW50cnksIHN0cnVjdCBpYXR0ciAqYXR0cnMpCiAJ
-CXBUY29uID0gdGxpbmtfdGNvbih0bGluayk7CiAJCXJjID0gQ0lGU1NNQlVuaXhTZXRQYXRo
-SW5mbyh4aWQsIHBUY29uLCBmdWxsX3BhdGgsIGFyZ3MsCiAJCQkJICAgIGNpZnNfc2ItPmxv
-Y2FsX25scywKLQkJCQkgICAgY2lmc19zYi0+bW50X2NpZnNfZmxhZ3MgJgotCQkJCQlDSUZT
-X01PVU5UX01BUF9TUEVDSUFMX0NIUik7CisJCQkJICAgIGNpZnNfcmVtYXAoY2lmc19zYikp
-OwogCQljaWZzX3B1dF90bGluayh0bGluayk7CiAJfQogCmRpZmYgLS1naXQgYS9mcy9jaWZz
-L2xpbmsuYyBiL2ZzL2NpZnMvbGluay5jCmluZGV4IDJlYzYwMzcuLmZhODY0ZGQgMTAwNjQ0
-Ci0tLSBhL2ZzL2NpZnMvbGluay5jCisrKyBiL2ZzL2NpZnMvbGluay5jCkBAIC03MTcsNyAr
-NzE3LDggQEAgY2lmc19zeW1saW5rKHN0cnVjdCBpbm9kZSAqaW5vZGUsIHN0cnVjdCBkZW50
-cnkgKmRpcmVudHJ5LCBjb25zdCBjaGFyICpzeW1uYW1lKQogCQlyYyA9IGNyZWF0ZV9tZl9z
-eW1saW5rKHhpZCwgcFRjb24sIGNpZnNfc2IsIGZ1bGxfcGF0aCwgc3ltbmFtZSk7CiAJZWxz
-ZSBpZiAocFRjb24tPnVuaXhfZXh0KQogCQlyYyA9IENJRlNVbml4Q3JlYXRlU3ltTGluayh4
-aWQsIHBUY29uLCBmdWxsX3BhdGgsIHN5bW5hbWUsCi0JCQkJCSAgIGNpZnNfc2ItPmxvY2Fs
-X25scyk7CisJCQkJCSAgIGNpZnNfc2ItPmxvY2FsX25scywKKwkJCQkJICAgY2lmc19yZW1h
-cChjaWZzX3NiKSk7CiAJLyogZWxzZQogCSAgIHJjID0gQ0lGU0NyZWF0ZVJlcGFyc2VTeW1M
-aW5rKHhpZCwgcFRjb24sIGZyb21OYW1lLCB0b05hbWUsCiAJCQkJCWNpZnNfc2JfdGFyZ2V0
-LT5sb2NhbF9ubHMpOyAqLwpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9zbWIxb3BzLmMgYi9mcy9j
-aWZzL3NtYjFvcHMuYwppbmRleCBkMjk3OTAzLi4wMjBjOGRkIDEwMDY0NAotLS0gYS9mcy9j
-aWZzL3NtYjFvcHMuYworKysgYi9mcy9jaWZzL3NtYjFvcHMuYwpAQCAtOTYwLDcgKzk2MCw4
-IEBAIGNpZnNfcXVlcnlfc3ltbGluayhjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1Y3Qg
-Y2lmc190Y29uICp0Y29uLAogCS8qIENoZWNrIGZvciB1bml4IGV4dGVuc2lvbnMgKi8KIAlp
-ZiAoY2FwX3VuaXgodGNvbi0+c2VzKSkgewogCQlyYyA9IENJRlNTTUJVbml4UXVlcnlTeW1M
-aW5rKHhpZCwgdGNvbiwgZnVsbF9wYXRoLCB0YXJnZXRfcGF0aCwKLQkJCQkJICAgICBjaWZz
-X3NiLT5sb2NhbF9ubHMpOworCQkJCQkgICAgIGNpZnNfc2ItPmxvY2FsX25scywKKwkJCQkJ
-ICAgICBjaWZzX3JlbWFwKGNpZnNfc2IpKTsKIAkJaWYgKHJjID09IC1FUkVNT1RFKQogCQkJ
-cmMgPSBjaWZzX3VuaXhfZGZzX3JlYWRsaW5rKHhpZCwgdGNvbiwgZnVsbF9wYXRoLAogCQkJ
-CQkJICAgIHRhcmdldF9wYXRoLAotLSAKMS43LjEKCg==
---------------060304090001040600070905--
+On Mon, Feb 2, 2015 at 3:42 PM, Jeff Layton <jeff.layton@primarydata.com> wrote:
+> On Mon, 2 Feb 2015 15:29:33 -0500
+> Mike Marshall <hubcap@omnibond.com> wrote:
+>
+>> I applied Jeff's patch to my orangefs-3.19-rc5 tree. Orangefs
+>> doesn't yet support the lock callout for file_operations, but
+>> we have been experimenting with some ideas that would allow
+>> Orangefs to honor locks in our distributed environment: basically
+>> posix locks for each kernel client plus meta data in our userspace
+>> servers.
+>>
+>> Anyhow, the lock callout in the Orangefs patch I've posted
+>> just returns ENOSYS. I have added posix locks in a current
+>> test, so now I have:
+>>
+>> int pvfs2_lock(struct file *filp, int cmd, struct file_lock *fl)
+>> {
+>>         int rc;
+>>
+>>         rc = posix_lock_file(filp, fl, NULL);
+>>
+>>         return rc;
+>> }
+>>
+>> So... while this isn't safe for our real world distributed environment,
+>> it makes the kernel with this version of the Orangefs kernel client
+>> loaded on it think that locks work.
+>>
+>> Besides observing that locks seem to work by running some programs
+>> that need locks (like svn/sqlite) I also ran xfstest generic/131.
+>>
+>> Without Jeff's patch, xfstest generic/131 fails:
+>>
+>>   29:Verify that F_GETLK for F_WRLCK doesn't require that file be
+>>      opened for write
+>>
+>> Same with Jeff's patch.
+>>
+>> Jeff's patch applied painlessly, and my simple tests didn't uncover
+>> any problems with Jeff's implementation of separate lists for different
+>> lock types, so that's good.
+>>
+>> What surprised me, though, is that the posix lock code failed
+>> to get all the way through xfstest generic/131... maybe you
+>> all knew that already?
+>>
+>> -Mike
+>>
+>
+> Hmm... I haven't seen 131 fail like this, but your code above looks
+> wrong. You're ignoring the "cmd" argument, so even F_GETLK requests are
+> setting a lock.
+>
+> I think you might want to do something like:
+>
+> int pvfs2_lock(struct file *filp, int cmd, struct file_lock *fl)
+> {
+>         if (cmd == F_GETLK)
+>                 return posix_test_lock(filp, fl);
+>         return posix_lock_file(filp, fl, fl);
+> }
+>
+> ...untested of course, but you get the idea.
+>
+>
+>> On Thu, Jan 22, 2015 at 9:27 AM, Jeff Layton
+>> <jeff.layton@primarydata.com> wrote:
+>> > v3:
+>> > - break out a ceph locking cleanup patch into a separate one earlier
+>> >   in the series
+>> > - switch back to using the i_lock to protect assignment of i_flctx.
+>> >   Using cmpxchg() was subject to races that I couldn't quite get a
+>> >   grip on. Eventually I may switch it back, but it probably doesn't
+>> >   provide much benefit.
+>> > - add a patch to clean up some comments that refer to i_flock
+>> > - use list_empty_careful in lockless checks rather than list_empty
+>> >
+>> > v2:
+>> > - bugfix to the flc_posix list ordering that broke the split/merge code
+>> > - don't use i_lock to manage the i_flctx pointer. Do so locklessly
+>> >   via cmpxchg().
+>> > - reordering of the patches to make the set bisectable. As a result
+>> >   the new spinlock is not introduced until near the end of the set
+>> > - some cleanup of the lm_change operation was added, made possible
+>> >   by the move to standard list_heads for tracking locks
+>> > - it takes greater pains to avoid spinlocking by checking when the
+>> >   lists are empty in addition to whether the i_flctx pointer is NULL
+>> > - a patch was added to keep count of the number of locks, so we can
+>> >   avoid having to do count/alloc/populate in ceph and cifs
+>> >
+>> > This is the third iteration of this patchset. The second was posted
+>> > on January 8th, under the cover letter entitled:
+>> >
+>> >     [PATCH v2 00/10] locks: saner method for managing file locks
+>> >
+>> > The big change here is that it once again uses the i_lock to protect the
+>> > i_flctx pointer assignment. In principle we should be able to use
+>> > cmpxchg instead, but that seems leave open a race that causes
+>> > locks_remove_file to miss recently-added locks. Given that is not a
+>> > super latency-sensitive codepath, an extra spinlock shouldn't make much
+>> > difference.
+>> >
+>> > Many thanks to Sasha Levin who helped me nail a race that would leave
+>> > leftover locks on the i_flock list, and David Howells who convinced
+>> > me to just go ahead back to using the i_lock to protect that field.
+>> >
+>> > There are some other minor changes, but overall it's pretty similar
+>> > to the last set. I still plan to merge this for v3.20.
+>> >
+>> > ------------------------[snip]-------------------------
+>> >
+>> > We currently manage all file_locks via a singly-linked list. This is
+>> > problematic for a number of reasons:
+>> >
+>> > - we have to protect all file locks with the same spinlock (or
+>> >   equivalent). Currently that uses the i_lock, but Christoph has voiced
+>> >   objections due to the potential for contention with other i_lock
+>> >   users. He'd like to see us move to using a different lock.
+>> >
+>> > - we have to walk through irrelevant file locks in order to get to the
+>> >   ones we're interested in. For instance, POSIX locks are at the end
+>> >   of the list, so we have to skip over all of the flock locks and
+>> >   leases before we can work with them.
+>> >
+>> > - the singly-linked list is primitive and difficult to work with. We
+>> >   have to keep track of the "before" pointer and it's easy to get that
+>> >   wrong.
+>> >
+>> > Cleaning all of this up is complicated by the fact that no one really
+>> > wants to grow struct inode in order to do so. We have a single pointer
+>> > in the inode now and I don't think we want to use any more.
+>> >
+>> > One possibility that Trond raised was to move this to an hlist, but
+>> > that doesn't do anything about the desire for a new spinlock.
+>> >
+>> > This patchset takes the approach of replacing the i_flock list with a
+>> > new struct file_lock_context that is allocated when we intend to add a
+>> > new file lock to an inode. The file_lock_context is only freed when we
+>> > destroy the inode.
+>> >
+>> > Within that, we have separate (and standard!) lists for each lock type,
+>> > and a dedicated spinlock for managing those lists. In principle we could
+>> > even consider adding separate locks for each, but I didn't bother with
+>> > that for now.
+>> >
+>> > For now, the code is still pretty "raw" and isn't bisectable. This is
+>> > just a RFC for the basic approach. This is probably v3.19 material at
+>> > best.
+>> >
+>> > Anyone have thoughts or comments on the basic approach?
+>> >
+>> > Jeff Layton (13):
+>> >   locks: add new struct list_head to struct file_lock
+>> >   locks: have locks_release_file use flock_lock_file to release generic
+>> >     flock locks
+>> >   locks: add a new struct file_locking_context pointer to struct inode
+>> >   ceph: move spinlocking into ceph_encode_locks_to_buffer and
+>> >     ceph_count_locks
+>> >   locks: move flock locks to file_lock_context
+>> >   locks: convert posix locks to file_lock_context
+>> >   locks: convert lease handling to file_lock_context
+>> >   locks: remove i_flock field from struct inode
+>> >   locks: add a dedicated spinlock to protect i_flctx lists
+>> >   locks: clean up the lm_change prototype
+>> >   locks: keep a count of locks on the flctx lists
+>> >   locks: consolidate NULL i_flctx checks in locks_remove_file
+>> >   locks: update comments that refer to inode->i_flock
+>> >
+>> >  fs/ceph/locks.c      |  64 +++---
+>> >  fs/ceph/mds_client.c |   4 -
+>> >  fs/cifs/file.c       |  34 +--
+>> >  fs/inode.c           |   3 +-
+>> >  fs/lockd/svcsubs.c   |  26 ++-
+>> >  fs/locks.c           | 569 +++++++++++++++++++++++++++------------------------
+>> >  fs/nfs/delegation.c  |  23 ++-
+>> >  fs/nfs/nfs4state.c   |  70 ++++---
+>> >  fs/nfs/pagelist.c    |   6 +-
+>> >  fs/nfs/write.c       |  41 +++-
+>> >  fs/nfsd/nfs4state.c  |  21 +-
+>> >  fs/read_write.c      |   2 +-
+>> >  include/linux/fs.h   |  52 +++--
+>> >  13 files changed, 510 insertions(+), 405 deletions(-)
+>> >
+>> > --
+>> > 2.1.0
+>> >
+>> > --
+>> > To unsubscribe from this list: send the line "unsubscribe linux-fsdevel" in
+>> > the body of a message to majordomo@vger.kernel.org
+>> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+> --
+> Jeff Layton <jeff.layton@primarydata.com>
