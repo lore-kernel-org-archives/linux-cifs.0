@@ -1,60 +1,49 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: smb2_clone_range() - exit on unhandled error
-Date: Fri, 6 Feb 2015 00:05:34 -0600
-Message-ID: <CAH2r5muyAvy-Me52_oFmC4SZ8MtsYgjXMmCc9Xnyu=6=B0e2kw@mail.gmail.com>
-References: <1423055426-22242-1-git-send-email-sprabhu@redhat.com>
+From: David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>
+Subject: Re: New ioctl - FSCTL_DUPLICATE_EXTENTS_TO_FILE
+Date: Tue, 10 Feb 2015 00:51:20 +0100
+Message-ID: <20150210005120.6936991d@plati.site>
+References: <CAH2r5mu4zB08avnUSig5b-DGBekgOHVGoUYNNosOpvfAfOYBoA@mail.gmail.com>
+	<20150128192203.5dbb06ea@g21.suse.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+	David Disseldorp <ddiss-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1423055426-22242-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <20150128192203.5dbb06ea-TzLh5lQYVSQb1SvskN2V4Q@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Merged into cifs-2.6.git
+On Wed, 28 Jan 2015 19:22:03 +0100, David Disseldorp wrote:
 
-On Wed, Feb 4, 2015 at 7:10 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> While attempting to clone a file on a samba server, we receive a
-> STATUS_INVALID_DEVICE_REQUEST. This is mapped to -EOPNOTSUPP which
-> isn't handled in smb2_clone_range(). We end up looping in the while loop
-> making same call to the samba server over and over again.
->
-> The proposed fix is to exit and return the error value when encountered
-> with an unhandled error.
->
-> Cc: <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/smb2ops.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 96b5d40..eab05e1 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -684,7 +684,8 @@ smb2_clone_range(const unsigned int xid,
->
->                         /* No need to change MaxChunks since already set to 1 */
->                         chunk_sizes_updated = true;
-> -               }
-> +               } else
-> +                       goto cchunk_out;
->         }
->
->  cchunk_out:
-> --
-> 2.1.0
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> > "A new File System Control (FSCTL) has been added to support the ne=
+w
+> > FSCTL_DUPLICATE_EXTENTS_TO_FILE operation in [MS-FSA]." =20
+>=20
+> I haven't played with it yet, but from the [MS-FCC] 20150119 preview
+> doc it looks very similar to copy-chunk, with a few small differences=
+:
+> - It's only supported on ReFS, which may indicate that it's implement=
+ed
+>   using COW clones.
 
+The [MS-FSA] draft can be found at:
+http://download.microsoft.com/download/C/6/C/C6C3C6F1-E84A-44EF-82A9-49=
+BD3AAD8F58/Windows/%5BMS-FSA-Diff%5D.pdf
 
+It pretty much confirms that it's COW based:
+"The purpose of this operation is to make it look like a copy of a
+ region from the source stream to the target stream has occurred when
+ in reality no data is actually copied. This operation modifies the
+ target stream=E2=80=99s extent list such that, the same clusters are p=
+ointed
+ to by both the source and target streams=E2=80=99 extent lists for the=
+ region
+ being copied."
 
--- 
-Thanks,
+@Steve, it looks like the perfect candidate for cp --reflink mapping on
+the client side.
 
-Steve
+Cheers, David
