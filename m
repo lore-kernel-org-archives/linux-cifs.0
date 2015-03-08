@@ -1,88 +1,130 @@
-From: Saket Sinha <saket.sinha89@gmail.com>
-Subject: Re: GSOC 2015 Aspirant for Improving SMB3 protocol improvements
-Date: Fri, 6 Mar 2015 16:43:22 -0800
-Message-ID: <CAK25hWMk0JJwhPX=hNSgzwY_yf5Sk-OjMPU_GavYqiZgHrPPBg@mail.gmail.com>
-References: <CAK25hWMTkzSun5jD_8fLzBiROoD4h8oejZQPai9rwB8WqAENOA@mail.gmail.com>
-	<20150304133141.35b0d72c@plati.site>
+From: David Rientjes <rientjes-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>
+Subject: [patch] mm, mempool: do not allow atomic resizing
+Date: Sat, 7 Mar 2015 19:19:11 -0800 (PST)
+Message-ID: <alpine.DEB.2.10.1503071918080.8406@chino.kir.corp.google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Steve French <smfrench@gmail.com>, samba-technical@lists.samba.org,
-	linux-cifs@vger.kernel.org
-To: David Disseldorp <ddiss@suse.de>
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <20150304133141.35b0d72c@plati.site>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: Steffen Maier <maier-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
+	Martin Schwidefsky <schwidefsky-tA70FqPdS9bQT0dZR+AlfA@public.gmane.org>,
+	Heiko Carstens <heiko.carstens-tA70FqPdS9bQT0dZR+AlfA@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-s390-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Andrew Morton <akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Hi David,
+Allocating a large number of elements in atomic context could quickly
+deplete memory reserves, so just disallow atomic resizing entirely.
 
-        I have tried reaching out to linux-cifs mailing list and Steve
-French earlier even but haven't found much of a response form either one.
-I guess this mailing list is not that friendly to novice and only cater
-needs and discussions of frequent commiters and core samba developers.
+Nothing currently uses mempool_resize() with anything other than
+GFP_KERNEL, so convert existing callers to drop the gfp_mask.
 
-If I do not get a response here, is there any where else I can ask for help
-for getting started  ?
+Signed-off-by: David Rientjes <rientjes-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>
+---
+ drivers/s390/scsi/zfcp_erp.c | 4 ++--
+ fs/cifs/connect.c            | 6 ++----
+ include/linux/mempool.h      | 2 +-
+ mm/mempool.c                 | 9 +++++----
+ 4 files changed, 10 insertions(+), 11 deletions(-)
 
-Regards,
-Saket SInha
-
-
-
-
-
-
-
-Regards,
-Saket Sinha
-
-On Wed, Mar 4, 2015 at 4:31 AM, David Disseldorp <ddiss@suse.de> wrote:
-
-> Hi Saket Sinha,
->
-> Thanks for your interest...
->
-> On Wed, 4 Mar 2015 17:15:32 +0530, Saket Sinha wrote:
->
-> > Hi,
-> >
-> > I am looking forward to paticipate in GSOC 2015 with Samba community for
-> > Improving SMB3 protocol improvements.
-> >
-> > This is to discuss the idea further in order to build my understanding of
-> > the project.
-> >
-> > The TODOs listed here show the following -
-> >
-> >    1. Support for using multiple network interfaces at once under the
-> same
-> >    mount (SMB3 multichannel)
-> >    2. Improved directory and metadata caching ("directory oplocks")
-> >    3. Improved failover in clustering environments ("persistent file
-> >    handles" and more generally SMB3 "continuous availability" support)
-> >    4. File copy offload (there are multiple server side copy mechanisms
-> >    possible with SMB3, T10 copy offload, SMB2/SMB3 "copy chunk" as well
-> as an
-> >    older cifs mechanism "SMB Copy" that could be implemented, compared
-> and
-> >    optimized).
-> >    5. HA availability improvements on server and/or client (the SMB3
-> >    "Witness protocol")
-> >
-> >  I would like to be guided which one I should pick up to get started.
->
-> These tasks all relate to the Linux kernel CIFS/SMB client (cifs.ko), so
-> would be best answered on the cifs.ko mailing list (cc'ed). I'd suggest
-> only pursuing these tasks if you have a reasonably solid background in C
-> programming.
->
-> Cheers, David
->
+diff --git a/drivers/s390/scsi/zfcp_erp.c b/drivers/s390/scsi/zfcp_erp.c
+--- a/drivers/s390/scsi/zfcp_erp.c
++++ b/drivers/s390/scsi/zfcp_erp.c
+@@ -738,11 +738,11 @@ static int zfcp_erp_adapter_strategy_open_fsf(struct zfcp_erp_action *act)
+ 		return ZFCP_ERP_FAILED;
+ 
+ 	if (mempool_resize(act->adapter->pool.sr_data,
+-			   act->adapter->stat_read_buf_num, GFP_KERNEL))
++			   act->adapter->stat_read_buf_num))
+ 		return ZFCP_ERP_FAILED;
+ 
+ 	if (mempool_resize(act->adapter->pool.status_read_req,
+-			   act->adapter->stat_read_buf_num, GFP_KERNEL))
++			   act->adapter->stat_read_buf_num))
+ 		return ZFCP_ERP_FAILED;
+ 
+ 	atomic_set(&act->adapter->stat_miss, act->adapter->stat_read_buf_num);
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -773,8 +773,7 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
+ 
+ 	length = atomic_dec_return(&tcpSesAllocCount);
+ 	if (length > 0)
+-		mempool_resize(cifs_req_poolp, length + cifs_min_rcv,
+-				GFP_KERNEL);
++		mempool_resize(cifs_req_poolp, length + cifs_min_rcv);
+ }
+ 
+ static int
+@@ -848,8 +847,7 @@ cifs_demultiplex_thread(void *p)
+ 
+ 	length = atomic_inc_return(&tcpSesAllocCount);
+ 	if (length > 1)
+-		mempool_resize(cifs_req_poolp, length + cifs_min_rcv,
+-				GFP_KERNEL);
++		mempool_resize(cifs_req_poolp, length + cifs_min_rcv);
+ 
+ 	set_freezable();
+ 	while (server->tcpStatus != CifsExiting) {
+diff --git a/include/linux/mempool.h b/include/linux/mempool.h
+--- a/include/linux/mempool.h
++++ b/include/linux/mempool.h
+@@ -29,7 +29,7 @@ extern mempool_t *mempool_create_node(int min_nr, mempool_alloc_t *alloc_fn,
+ 			mempool_free_t *free_fn, void *pool_data,
+ 			gfp_t gfp_mask, int nid);
+ 
+-extern int mempool_resize(mempool_t *pool, int new_min_nr, gfp_t gfp_mask);
++extern int mempool_resize(mempool_t *pool, int new_min_nr);
+ extern void mempool_destroy(mempool_t *pool);
+ extern void * mempool_alloc(mempool_t *pool, gfp_t gfp_mask);
+ extern void mempool_free(void *element, mempool_t *pool);
+diff --git a/mm/mempool.c b/mm/mempool.c
+--- a/mm/mempool.c
++++ b/mm/mempool.c
+@@ -113,23 +113,24 @@ EXPORT_SYMBOL(mempool_create_node);
+  *              mempool_create().
+  * @new_min_nr: the new minimum number of elements guaranteed to be
+  *              allocated for this pool.
+- * @gfp_mask:   the usual allocation bitmask.
+  *
+  * This function shrinks/grows the pool. In the case of growing,
+  * it cannot be guaranteed that the pool will be grown to the new
+  * size immediately, but new mempool_free() calls will refill it.
++ * This function may sleep.
+  *
+  * Note, the caller must guarantee that no mempool_destroy is called
+  * while this function is running. mempool_alloc() & mempool_free()
+  * might be called (eg. from IRQ contexts) while this function executes.
+  */
+-int mempool_resize(mempool_t *pool, int new_min_nr, gfp_t gfp_mask)
++int mempool_resize(mempool_t *pool, int new_min_nr)
+ {
+ 	void *element;
+ 	void **new_elements;
+ 	unsigned long flags;
+ 
+ 	BUG_ON(new_min_nr <= 0);
++	might_sleep();
+ 
+ 	spin_lock_irqsave(&pool->lock, flags);
+ 	if (new_min_nr <= pool->min_nr) {
+@@ -145,7 +146,7 @@ int mempool_resize(mempool_t *pool, int new_min_nr, gfp_t gfp_mask)
+ 	spin_unlock_irqrestore(&pool->lock, flags);
+ 
+ 	/* Grow the pool */
+-	new_elements = kmalloc(new_min_nr * sizeof(*new_elements), gfp_mask);
++	new_elements = kmalloc(new_min_nr * sizeof(*new_elements), GFP_KERNEL);
+ 	if (!new_elements)
+ 		return -ENOMEM;
+ 
+@@ -164,7 +165,7 @@ int mempool_resize(mempool_t *pool, int new_min_nr, gfp_t gfp_mask)
+ 
+ 	while (pool->curr_nr < pool->min_nr) {
+ 		spin_unlock_irqrestore(&pool->lock, flags);
+-		element = pool->alloc(gfp_mask, pool->pool_data);
++		element = pool->alloc(GFP_KERNEL, pool->pool_data);
+ 		if (!element)
+ 			goto out;
+ 		spin_lock_irqsave(&pool->lock, flags);
