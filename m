@@ -1,33 +1,90 @@
-From: Franck Eyraud <franck+linux-cifs-ici3nDnK79kZQKRGMNo+Zg@public.gmane.org>
-Subject: Re: DFS referrals support ?
-Date: Fri, 13 Mar 2015 17:07:11 +0100
-Message-ID: <55030B2F.5090507@nospam.yrnm.net>
-References: <548AD6D5.7080901@nospam.yrnm.net> <dda8f4838ed40871acc3092c5440d396.squirrel@mail.balsover.com> <548C086C.8050102@nospam.yrnm.net> <CAH2r5mtOtmhEMgGOq22fy-RQa58c+u=JWwfGOvXh83MyZwb4og@mail.gmail.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] cifs: fix use-after-free bug in find_writable_file
+Date: Sat, 14 Mar 2015 08:45:23 -0400
+Message-ID: <20150314084523.7c615d42@tlielax.poochiereds.net>
+References: <1426252829-31444-1-git-send-email-ddiss@suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8;
-	format=flowed
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mtOtmhEMgGOq22fy-RQa58c+u=JWwfGOvXh83MyZwb4og-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1426252829-31444-1-git-send-email-ddiss-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Le 09/01/2015 20:51, Steve French a =C3=A9crit :
-> What did you find out about behavior of a more current kernel? (given=
-=20
-> that your kernel was more than 5 years old, there is a good chance=20
-> that the behavior has improved in more recent kernels)
-Sorry for long delay answer, but this issue was put aside as not=20
-critical (first choice to access the filer from Linux clients is NFS).=20
-Unfortunately we could not for technical/schedule reasons test other=20
-kernels.
-However, it seems that after a recent upgrade on the NetApp filer to=20
-OnTap 8.2.3 this behaviour disappeared from all our systems. So it seem=
-s=20
-a case of faulty server, and not linked to Linux CIFS client.
+On Fri, 13 Mar 2015 14:20:29 +0100
+David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org> wrote:
 
-Have a good day, and thanks for support.
+> Under intermittent network outages, find_writable_file() is susceptible
+> to the following race condition, which results in a user-after-free in
+> the cifs_writepages code-path:
+> 
+> Thread 1                                        Thread 2
+> ========                                        ========
+> 
+> inv_file = NULL
+> refind = 0
+> spin_lock(&cifs_file_list_lock)
+> 
+> // invalidHandle found on openFileList
+> 
+> inv_file = open_file
+> // inv_file->count currently 1
+> 
+> cifsFileInfo_get(inv_file)
+> // inv_file->count = 2
+> 
+> spin_unlock(&cifs_file_list_lock);
+> 
+> cifs_reopen_file()                            cifs_close()
+> // fails (rc != 0)                            ->cifsFileInfo_put()
+>                                        spin_lock(&cifs_file_list_lock)
+>                                        // inv_file->count = 1
+>                                        spin_unlock(&cifs_file_list_lock)
+> 
+> spin_lock(&cifs_file_list_lock);
+> list_move_tail(&inv_file->flist,
+>       &cifs_inode->openFileList);
+> spin_unlock(&cifs_file_list_lock);
+> 
+> cifsFileInfo_put(inv_file);
+> ->spin_lock(&cifs_file_list_lock)
+> 
+>   // inv_file->count = 0
+>   list_del(&cifs_file->flist);
+>   // cleanup!!
+>   kfree(cifs_file);
+> 
+>   spin_unlock(&cifs_file_list_lock);
+> 
+> spin_lock(&cifs_file_list_lock);
+> ++refind;
+> // refind = 1
+> goto refind_writable;
+> 
+> At this point we loop back through with an invalid inv_file pointer
+> and a refind value of 1. On second pass, inv_file is not overwritten on
+> openFileList traversal, and is subsequently dereferenced.
+> 
+> Signed-off-by: David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>
+> ---
+>  fs/cifs/file.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index a94b3e6..ca30c39 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -1823,6 +1823,7 @@ refind_writable:
+>  			cifsFileInfo_put(inv_file);
+>  			spin_lock(&cifs_file_list_lock);
+>  			++refind;
+> +			inv_file = NULL;
+>  			goto refind_writable;
+>  		}
+>  	}
 
-=46ranck
+Looks right. Probably also a stable candidate?
+
+Reviewed-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
