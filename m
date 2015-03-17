@@ -1,71 +1,168 @@
-From: Omar Sandoval <osandov@osandov.com>
-Subject: Re: [RFC PATCH 1/5] new helper: iov_iter_rw()
-Date: Tue, 17 Mar 2015 03:18:35 -0700
-Message-ID: <20150317101835.GA31649@mew>
-References: <cover.1426502566.git.osandov@osandov.com>
- <34dc78b262546e9343e0ed872232a97f5eaa5f15.1426502566.git.osandov@osandov.com>
- <20150316173605.GX29656@ZenIV.linux.org.uk>
- <20150317093151.GS20767@twin.jikos.cz>
+From: Federico Sauter <fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org>
+Subject: [PATCH] CIFS: Fix race condition on RFC1002_NEGATIVE_SESSION_RESPONSE
+Date: Tue, 17 Mar 2015 18:13:54 +0100
+Message-ID: <550860D2.5040207@innominate.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Al Viro <viro@ZenIV.linux.org.uk>, linux-fsdevel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-	linux-cifs@vger.kernel.org, osd-dev@open-osd.org,
-	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-	fuse-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-	jfs-discussion@lists.sourceforge.net, HPDD-discuss@ml01.01.org,
-	linux-nfs@vger.kernel.org, linux-nilfs@vger.kernel.org,
-	ocfs2-devel@oss.oracle.com, reiserfs-devel@vger.kernel.org,
-	v9fs-developer@lists.sourceforge.net, xfs@oss.sgi.com,
-	linux-kernel@vger.kernel.org
-To: David Sterba <dsterba@suse.cz>
-Return-path: <linux-ext4-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20150317093151.GS20767@twin.jikos.cz>
-Sender: linux-ext4-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: multipart/mixed;
+ boundary="------------040707020600060501040701"
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Mar 17, 2015 at 10:31:51AM +0100, David Sterba wrote:
-> On Mon, Mar 16, 2015 at 05:36:05PM +0000, Al Viro wrote:
-> > On Mon, Mar 16, 2015 at 04:33:49AM -0700, Omar Sandoval wrote:
-> > > Get either READ or WRITE out of iter->type.
-> > 
-> > Umm...  
-> > 
-> > > + * Get one of READ or WRITE out of iter->type without any other flags OR'd in
-> > > + * with it.
-> > > + */
-> > > +static inline int iov_iter_rw(const struct iov_iter *i)
-> > > +{
-> > > +	return i->type & RW_MASK;
-> > > +}
-> > 
-> > TBH, I would turn that into a macro.  Reason: indirect includes.
-> 
-> Agreed, but the proposed define is rather cryptic and I was not able to
-> understand the meaning on the first glance.
-> 
-> > #define iov_iter_rw(i) ((0 ? (struct iov_iter *)0 : (i))->type & RW_MASK)
-> 
-> This worked for me, does not compile with anything else than
-> 'struct iov_iter*' as i:
-> 
-> #define iov_iter_rw(i)	({			\
-> 	struct iov_iter __iter = *(i);		\
-> 	(i)->type & RW_MASK;			\
-> 	})
-> 
-> The assignment is optimized out.
+This is a multi-part message in MIME format.
+--------------040707020600060501040701
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-[-cc individual fs maintainers to avoid all of these email bounces,
-should've looked a bit closer at that get_maintainer.pl output...]
+Greetings,
 
-I agree that this is a bit more readable, but it evaluates i twice.
-That's an easy fix, just do __iter.type instead of (i)->type, but
-there's still the possibility of someone passing in something called
-__iter as i, and the fix for that tends to be "add more underscores". At
-the very least, Al's macro could probably use a comment explaining
-what's going on there, though.
 
+I have been running into an issue (kernel v3.10.40) when connecting to 
+an NT 3.51 Workstation host with a configuration missing the NetBIOS 
+name ('servern' option.) Under some conditions, the mount helper would 
+hang forever in an uninterruptible sleep state. The mount helper comes 
+from busybox. Under some other conditions the mount program would exit 
+with an error and not hang.
+
+I managed to create a setup where I could reliably reproduce both cases 
+(the "good case" where the program exits, and the "bad case" where the 
+program hangs forever.)
+
+The problem seems to be a race condition between the demux thread and 
+the "main"(?) thread over the srv_mutex. Here is the summary of the 
+functions calls that lead to this problem:
+
+* demux thread:
+cifs_demultiplex_thread()
+   is_smb_response()
+     [connect.c:626 -- case RFC1002_NEGATIVE_SESSION_RESPONSE]
+       cifs_reconnect()
+         [connect.c:380]
+         do {
+           mutex_lock(&server->srv_mutex);
+           generic_ip_connect(server);
+           // on error -> msleep(3000);
+           mutex_unlock(&server->srv_mutex);
+         } while (server->tcpStatus == CifsNeedReconnect);
+
+* "main" thread:
+cifs_negotiate()
+   CIFSSMBNegotiate()
+     SendReceive()
+       [transport.c:821 - thread hangs forever]
+       mutex_lock(&ses->server->srv_mutex);
+
+Another interesting piece of information is that in the good case at
+cifs_reconnect(), generic_ip_connect() returns -EINTR, whereas in the 
+bad case it returns -ECONNREFUSED. In the bad case it all leads to 
+generic_ip_connect() being called over and over again with the same 
+result, but never exiting the loop (thus: hanging.)
+
+The following patch works around the issue by not re-attempting the SMB 
+negotiation:
+
+---8<----------------------------------------------------------------------
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index 4885a40..863a2da 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -415,10 +415,12 @@ cifs_negotiate(const unsigned int xid, struct 
+cifs_ses *ses)
+         int rc;
+         rc = CIFSSMBNegotiate(xid, ses);
+         if (rc == -EAGAIN) {
++#if 0
+                 /* retry only once on 1st time connection */
+                 set_credits(ses->server, 1);
+                 rc = CIFSSMBNegotiate(xid, ses);
+                 if (rc == -EAGAIN)
++#endif
+                         rc = -EHOSTDOWN;
+         }
+         return rc;
+---------------------------------------------------------------------->8---
+
+I was able, however, to identify a (hopefully) better solution for the 
+issue (see the attached patch.)
+
+I would really appreciate your feedback on the attached patch. Please 
+let me know if the solution seems acceptable as well as 
+side-effects-free. We use CIFS to connect to older Windows systems and 
+we have been experiencing similar issues for a while now (which I hope 
+to solve with this patch.)
+
+Thanks a lot in advance! :-)
+
+
+Kind regards,
+
+
+Federico Sauter
+Senior Firmware Programmer
 -- 
-Omar
+Innominate Security Technologies AG
+Rudower Chaussee 13 | 12489 Berlin | Germany
+tel: +49 30 921028-210 | fax: +49 30 921028-020
+www.innominate.com | www.twitter.com/mGuardcom
+
+Register Court: AG Charlottenburg, HR B 81603
+Management Board: Dirk Seewald | Chairman of the Supervisory Board: 
+Christoph Leifer
+
+--------------040707020600060501040701
+Content-Type: text/x-patch;
+ name="0001-CIFS-Fix-race-condition-on-RFC1002_NEGATIVE_SESSION_.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename*0="0001-CIFS-Fix-race-condition-on-RFC1002_NEGATIVE_SESSION_.pa";
+ filename*1="tch"
+
+>From 54e3c95a4646c8666c6f08766250fd056b06e7f5 Mon Sep 17 00:00:00 2001
+From: Federico Sauter <fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org>
+Date: Tue, 17 Mar 2015 17:45:28 +0100
+Subject: [PATCH] CIFS: Fix race condition on
+ RFC1002_NEGATIVE_SESSION_RESPONSE
+
+This patch fixes a race condition that occurs when connecting
+to a NT 3.51 host without specifying a NetBIOS name.
+In that case a RFC1002_NEGATIVE_SESSION_RESPONSE is received
+and the SMB negotiation is reattempted, but under some conditions
+it leads SendReceive() to hang forever while waiting for srv_mutex.
+This, in turn, sets the calling process to an uninterruptible sleep
+state and makes it unkillable.
+
+The solution is to unlock the srv_mutex acquired in the demux
+thread *before* going to sleep (after the reconnect error) and
+before reattempting the connection.
+---
+ fs/cifs/connect.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index d05a300..a45e7fc 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -381,6 +381,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 		rc = generic_ip_connect(server);
+ 		if (rc) {
+ 			cifs_dbg(FYI, "reconnect error %d\n", rc);
++			mutex_unlock(&server->srv_mutex);
+ 			msleep(3000);
+ 		} else {
+ 			atomic_inc(&tcpSesReconnectCount);
+@@ -388,8 +389,8 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 			if (server->tcpStatus != CifsExiting)
+ 				server->tcpStatus = CifsNeedNegotiate;
+ 			spin_unlock(&GlobalMid_Lock);
++			mutex_unlock(&server->srv_mutex);
+ 		}
+-		mutex_unlock(&server->srv_mutex);
+ 	} while (server->tcpStatus == CifsNeedReconnect);
+ 
+ 	return rc;
+-- 
+1.7.10.4
+
+
+--------------040707020600060501040701--
