@@ -1,29 +1,26 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: cifs kernel client status wiki page
-Date: Wed, 25 Mar 2015 13:20:31 -0500
-Message-ID: <CAH2r5muB+Wqf-vHFj_W0oOvbTdMYqkjcUs+NSr4vR9Zx3KnhSQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Subject: [PATCH 0/4] Fix various coverity warnings in fs/cifs
+Date: Fri, 27 Mar 2015 00:27:58 -0500
+Message-ID: <1427434082-4299-1-git-send-email-smfrench@gmail.com>
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Have updated the wiki page with the cifs kernel changes/fixes by release
+Four small fixes to address warnings coverity analyzer displays
+for fs/cifs.
 
-https://wiki.samba.org/index.php/LinuxCIFSKernel
+Steve French (4):
+  [SMB3] Fix warning on uninitialized buftype
+  [CIFS] Don't ignore errors on encrypting password in SMBTcon
+  [SMB3] Fix dereference before null check warning
+  [SMB3] Fix coverity warning
 
-and made a start at an SMB3 implementation status page although it
-needs corrections/additions
-
-https://wiki.samba.org/index.php/SMB3_kernel_status
-
-Corrections/updates to those would be welcomed
+ fs/cifs/connect.c  |  6 ++++++
+ fs/cifs/smb2misc.c |  2 +-
+ fs/cifs/smb2pdu.c  | 15 +++++++++------
+ 3 files changed, 16 insertions(+), 7 deletions(-)
 
 -- 
-Thanks,
-
-Steve
+1.9.1
