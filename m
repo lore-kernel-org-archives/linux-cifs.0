@@ -1,55 +1,78 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 2/4] [CIFS] Don't ignore errors on encrypting password in SMBTcon
-Date: Sat, 28 Mar 2015 09:26:24 -0500
-Message-ID: <CADT32e+_Y35vKDzbXfMZDzx+P7XUUHT5+4mokgCwzqZd4dRY-A@mail.gmail.com>
+Subject: Re: [PATCH 3/4] [SMB3] Fix dereference before null check warning
+Date: Sat, 28 Mar 2015 09:27:27 -0500
+Message-ID: <CADT32eL_Gok5cODL0P1XwfAsWbzY-gtOFc26sAMHcmhFj70v1g@mail.gmail.com>
 References: <1427434082-4299-1-git-send-email-smfrench@gmail.com>
-	<1427434082-4299-3-git-send-email-smfrench@gmail.com>
+	<1427434082-4299-4-git-send-email-smfrench@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
 	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1427434082-4299-3-git-send-email-smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <1427434082-4299-4-git-send-email-smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Looks correct, although we could just goto a label at the end of this
-function which
-does the same.
+Looks correct.
 
 Acked-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-
 On Fri, Mar 27, 2015 at 12:28 AM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> Although unlikely to fail (and tree connect does not commonly send
-> a password since SECMODE_USER is the default for most servers)
-> do not ignore errors on SMBNTEncrypt in SMB Tree Connect.
+> null tcon is not likely in these paths in current
+> code, but obviously it does clarify the code to
+> check for null (if at all) before derefrencing
+> rather than after.
 >
-> Reported by Coverity (CID 1226853)
+> Reported by Coverity (CID 1042666)
 >
 > Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 > ---
->  fs/cifs/connect.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+>  fs/cifs/smb2pdu.c | 13 ++++++++-----
+>  1 file changed, 8 insertions(+), 5 deletions(-)
 >
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 4cb8450..cdb1aaf 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -3696,6 +3696,12 @@ CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
->  #endif /* CIFS_WEAK_PW_HASH */
->                 rc = SMBNTencrypt(tcon->password, ses->server->cryptkey,
->                                         bcc_ptr, nls_codepage);
-> +               if (rc) {
-> +                       cifs_dbg(FYI, "%s Can't generate NTLM rsp. Error: %d\n",
-> +                                __func__, rc);
-> +                       cifs_buf_release(smb_buffer);
-> +                       return rc;
-> +               }
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index 1b906de..78b329f 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -1218,7 +1218,7 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+>         struct smb2_ioctl_req *req;
+>         struct smb2_ioctl_rsp *rsp;
+>         struct TCP_Server_Info *server;
+> -       struct cifs_ses *ses = tcon->ses;
+> +       struct cifs_ses *ses;
+>         struct kvec iov[2];
+>         int resp_buftype;
+>         int num_iovecs;
+> @@ -1233,6 +1233,11 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+>         if (plen)
+>                 *plen = 0;
 >
->                 bcc_ptr += CIFS_AUTH_RESP_SIZE;
->                 if (ses->capabilities & CAP_UNICODE) {
+> +       if (tcon)
+> +               ses = tcon->ses;
+> +       else
+> +               return -EIO;
+> +
+>         if (ses && (ses->server))
+>                 server = ses->server;
+>         else
+> @@ -1296,14 +1301,12 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+>         rsp = (struct smb2_ioctl_rsp *)iov[0].iov_base;
+>
+>         if ((rc != 0) && (rc != -EINVAL)) {
+> -               if (tcon)
+> -                       cifs_stats_fail_inc(tcon, SMB2_IOCTL_HE);
+> +               cifs_stats_fail_inc(tcon, SMB2_IOCTL_HE);
+>                 goto ioctl_exit;
+>         } else if (rc == -EINVAL) {
+>                 if ((opcode != FSCTL_SRV_COPYCHUNK_WRITE) &&
+>                     (opcode != FSCTL_SRV_COPYCHUNK)) {
+> -                       if (tcon)
+> -                               cifs_stats_fail_inc(tcon, SMB2_IOCTL_HE);
+> +                       cifs_stats_fail_inc(tcon, SMB2_IOCTL_HE);
+>                         goto ioctl_exit;
+>                 }
+>         }
 > --
 > 1.9.1
 >
