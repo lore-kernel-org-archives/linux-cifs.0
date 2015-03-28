@@ -1,82 +1,53 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 3/4] [SMB3] Fix dereference before null check warning
-Date: Sat, 28 Mar 2015 09:27:27 -0500
-Message-ID: <CADT32eL_Gok5cODL0P1XwfAsWbzY-gtOFc26sAMHcmhFj70v1g@mail.gmail.com>
+From: Shirish Pargaonkar <shirishpargaonkar@gmail.com>
+Subject: Re: [PATCH 4/4] [SMB3] Fix coverity warning
+Date: Sat, 28 Mar 2015 10:05:41 -0500
+Message-ID: <CADT32eJx1eioc_EkH8H1nyjZNkxJSPyRApreU=Sg6X7_oKgbfQ@mail.gmail.com>
 References: <1427434082-4299-1-git-send-email-smfrench@gmail.com>
-	<1427434082-4299-4-git-send-email-smfrench@gmail.com>
+	<1427434082-4299-5-git-send-email-smfrench@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1427434082-4299-4-git-send-email-smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: linux-cifs <linux-cifs@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>
+To: Steve French <smfrench@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1427434082-4299-5-git-send-email-smfrench@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
 Looks correct.
 
-Acked-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Acked-by: Shirish Pargaonkar <shirishpargaonkar@gmail.com>
 
-On Fri, Mar 27, 2015 at 12:28 AM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> null tcon is not likely in these paths in current
-> code, but obviously it does clarify the code to
-> check for null (if at all) before derefrencing
-> rather than after.
+On Fri, Mar 27, 2015 at 12:28 AM, Steve French <smfrench@gmail.com> wrote:
+> Coverity reports a warning for referencing the beginning of the
+> SMB2/SMB3 frame using the ProtocolId field as an array. Although
+> it works the same either way, this patch should quiet the warning
+> and might be a little clearer.
 >
-> Reported by Coverity (CID 1042666)
+> Reported by Coverity (CID 741269)
 >
-> Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Signed-off-by: Steve French <smfrench@gmail.com>
 > ---
->  fs/cifs/smb2pdu.c | 13 ++++++++-----
->  1 file changed, 8 insertions(+), 5 deletions(-)
+>  fs/cifs/smb2misc.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 1b906de..78b329f 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -1218,7 +1218,7 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
->         struct smb2_ioctl_req *req;
->         struct smb2_ioctl_rsp *rsp;
->         struct TCP_Server_Info *server;
-> -       struct cifs_ses *ses = tcon->ses;
-> +       struct cifs_ses *ses;
->         struct kvec iov[2];
->         int resp_buftype;
->         int num_iovecs;
-> @@ -1233,6 +1233,11 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
->         if (plen)
->                 *plen = 0;
+> diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
+> index 689f035..22dfdf1 100644
+> --- a/fs/cifs/smb2misc.c
+> +++ b/fs/cifs/smb2misc.c
+> @@ -322,7 +322,7 @@ smb2_get_data_area_len(int *off, int *len, struct smb2_hdr *hdr)
 >
-> +       if (tcon)
-> +               ses = tcon->ses;
-> +       else
-> +               return -EIO;
-> +
->         if (ses && (ses->server))
->                 server = ses->server;
+>         /* return pointer to beginning of data area, ie offset from SMB start */
+>         if ((*off != 0) && (*len != 0))
+> -               return hdr->ProtocolId + *off;
+> +               return (char *)(&hdr->ProtocolId[0]) + *off;
 >         else
-> @@ -1296,14 +1301,12 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
->         rsp = (struct smb2_ioctl_rsp *)iov[0].iov_base;
->
->         if ((rc != 0) && (rc != -EINVAL)) {
-> -               if (tcon)
-> -                       cifs_stats_fail_inc(tcon, SMB2_IOCTL_HE);
-> +               cifs_stats_fail_inc(tcon, SMB2_IOCTL_HE);
->                 goto ioctl_exit;
->         } else if (rc == -EINVAL) {
->                 if ((opcode != FSCTL_SRV_COPYCHUNK_WRITE) &&
->                     (opcode != FSCTL_SRV_COPYCHUNK)) {
-> -                       if (tcon)
-> -                               cifs_stats_fail_inc(tcon, SMB2_IOCTL_HE);
-> +                       cifs_stats_fail_inc(tcon, SMB2_IOCTL_HE);
->                         goto ioctl_exit;
->                 }
->         }
+>                 return NULL;
+>  }
 > --
 > 1.9.1
 >
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
