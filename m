@@ -1,227 +1,81 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Fwd: [RFC 00/39] Richacls (2)
-Date: Mon, 30 Mar 2015 13:16:29 -0500
-Message-ID: <CAH2r5msH9j5+tSfh9H_2uuam4B-9GtoqDC20=nefnqttMouNog@mail.gmail.com>
-References: <cover.1427471526.git.agruenba@redhat.com>
+From: Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
+Subject: Re: Problem with mount.cifs in Fedora 19.
+Date: Mon, 30 Mar 2015 11:28:52 -0700
+Message-ID: <551995E4.1090601@candelatech.com>
+References: <551590DA.8040402@candelatech.com> <CAH2r5muXwqPT59Z7HDZ_3ua0yG2S50gHVdqtyXcC5LBQUOhtPw@mail.gmail.com> <5515A3C5.40902@candelatech.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	=?UTF-8?Q?Andreas_Gr=C3=BCnbacher?= <andreas.gruenbacher-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Transfer-Encoding: 7bit
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <cover.1427471526.git.agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <5515A3C5.40902-my8/4N5VtI7c+919tysfdA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Adding cc: to linux-cifs mailing list
+On 03/27/2015 11:39 AM, Ben Greear wrote:
+> On 03/27/2015 11:35 AM, Steve French wrote:
+>> There was the bug about SecurityFlags that Niklas Cassel's "fix MUST
+>> SecurityFlags filtering" patch addressed.  Does it work if you rename
+>> /sbin/mount.cifs to something else temporarily (so it goes straight to
+>> the kernel) and supply ip address on the mount instead of hostname (so
+>> you don't need the mount helper)
+> 
+> We are trying to set up a local system to reproduce the problem,
+> and will try this out there if we can.
+> 
+> Or, I'll try this on the customer system if we cannot reproduce it
+> locally.
+> 
+> Thanks for the suggestion.
 
-This will be useful for cifs to have a standard VFS mapping to get at
-our RichACL interfaces, currently only available via a cifs specific
-xattr.
+We tried testing with a guest account, but that does not reproduce the
+problem for us, and we cannot yet figure out how to configure
+the smb server with a normal user with no password.
 
+Do you happen to know how to do this, or if it can even be done in Linux?
 
----------- Forwarded message ----------
-From: Andreas Gruenbacher <andreas.gruenbacher-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Date: Fri, Mar 27, 2015 at 11:49 AM
-Subject: [RFC 00/39] Richacls (2)
-To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Would you expect the guest account approach to reproduce the problem?
 
+Thanks,
+Ben
 
-Hello,
-
-here is an update to the richacl patch queue.  The changes since the last
-posting (https://lwn.net/Articles/634870/) include:
-
-* The ACL4_ and ACE4_ prefixes used for various richacl flags were renamed
-  to RICHACL_ and RICHACE_.  The flag values are still identical with NFSv4
-  for flags that exist in NFSv4.
-
-* The code is now uid/gid namespace aware.
-
-* The nfs server now uses richacls as its internal acl representation;
-  struct nfs4_acl is gone.  On the underlying file system, it uses either POSIX
-  ACLs or richacls depending on what that file system supports.
-
-* The nfs client now exports NFSv4 acls as richacls in the "system.richacl"
-  attribute instead of the nfs-specific "system.nfs4_acl" attribute, just like
-  local file systems.
-
-Note that the richacl xattr format has changed from the previous version and is
-incompatible.
-
-
-The git version is available here:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/agruen/linux-richacl.git \
-        richacl-2015-03-27
-
-For comparison, the previous version is available here:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/agruen/linux-richacl.git \
-        richacl-2015-02-26
-
-
-Things still to be done, or which I'm not entirely happy with:
-
- * We may need to add back support for the "system.nfs4_acl" attribute
-   on nfs mounts for backwards compatible.  Is anyone actually using that
-   attribute?
-
- * While richacls do support Automatic Inheritance, the nfs client and server
-   don't because they don't support the NFSv4.1 "dacl" attribute yet (see RFC
-   5661).
-
- * The nfs server performs some access checking on its own before calling into
-   the vfs which is rersponsible for the actual access checking (see where it
-   calls inode_permission()).  With the additional MAY_ flags introduced in
-   this patch queue, the nfsd access checks may now be too restrictive in some
-   cases; I have yet to figure out how to deal with this.
-
- * It would make sense for CIFS to expose Windows ACLs as richacls as well.
-   Steve maybe?
-
- * The base_acl code is still rather ugly.
-
- * It would be nice if the MAY_DELETE_SELF flag could override the sticky
-   directory check as it did in the previous version of this patch queue.  I
-   couldn't come up with a clean way of achieving that, though.
-
-
-Andreas Gruenbacher (37):
-  vfs: Minor documentation fix
-  uapi: Remove kernel internal declaration
-  vfs: Shrink struct posix_acl
-  vfs: Add IS_ACL() and IS_RICHACL() tests
-  vfs: Add MAY_CREATE_FILE and MAY_CREATE_DIR permission flags
-  vfs: Add MAY_DELETE_SELF and MAY_DELETE_CHILD permission flags
-  vfs: Make the inode passed to inode_change_ok non-const
-  vfs: Add permission flags for setting file attributes
-  richacl: In-memory representation and helper functions
-  richacl: Permission mapping functions
-  richacl: Compute maximum file masks from an acl
-  richacl: Update the file masks in chmod()
-  richacl: Permission check algorithm
-  vfs: Cache base_acl objects in inodes
-  vfs: Cache richacl in struct inode
-  richacl: Create-time inheritance
-  richacl: Check if an acl is equivalent to a file mode
-  richacl: Automatic Inheritance
-  richacl: xattr mapping functions
-  vfs: Add richacl permission checking
-  richacl: acl editing helper functions
-  richacl: Move everyone@ aces down the acl
-  richacl: Propagate everyone@ permissions to other aces
-  richacl: Isolate the owner and group classes
-  richacl: Apply the file masks to a richacl
-  richacl: Create richacl from mode values
-  richacl: Create acl with masks applied in richacl_from_mode()
-  nfsd: Remove dead declarations
-  nfsd: Keep list of acls to dispose of in compoundargs
-  nfsd: Use richacls as internal acl representation
-  nfsd: Add richacl support
-  nfs/sunrpc: No more encode and decode function pointer casting
-  nfs/sunrpc: Return status code from encode functions
-  nfs3: Return posix acl encode errors
-  nfs: Remove unused xdr page offsets in getacl/setacl arguments
-  rpc: Allow to demand-allocate pages to encode into
-  nfs: Add richacl support
-
-Aneesh Kumar K.V (2):
-  ext4: Add richacl support
-  ext4: Add richacl feature flag
-
- Documentation/filesystems/porting               |   8 +-
- Documentation/filesystems/vfs.txt               |   3 +
- drivers/staging/lustre/lustre/llite/llite_lib.c |   2 +-
- fs/Kconfig                                      |   9 +
- fs/Makefile                                     |   3 +
- fs/attr.c                                       |  81 ++-
- fs/ext4/Kconfig                                 |  15 +
- fs/ext4/Makefile                                |   1 +
- fs/ext4/acl.c                                   |   7 +-
- fs/ext4/acl.h                                   |  12 +-
- fs/ext4/ext4.h                                  |   6 +-
- fs/ext4/file.c                                  |   6 +-
- fs/ext4/ialloc.c                                |   7 +-
- fs/ext4/inode.c                                 |  10 +-
- fs/ext4/namei.c                                 |  11 +-
- fs/ext4/richacl.c                               | 211 ++++++
- fs/ext4/richacl.h                               |  47 ++
- fs/ext4/super.c                                 |  41 +-
- fs/ext4/xattr.c                                 |   6 +
- fs/ext4/xattr.h                                 |   1 +
- fs/f2fs/acl.c                                   |   4 +-
- fs/inode.c                                      |  15 +-
- fs/lockd/clnt4xdr.c                             |  58 +-
- fs/lockd/clntxdr.c                              |  58 +-
- fs/lockd/mon.c                                  |  26 +-
- fs/namei.c                                      | 108 ++-
- fs/nfs/inode.c                                  |   2 +-
- fs/nfs/mount_clnt.c                             |  24 +-
- fs/nfs/nfs2xdr.c                                | 115 ++--
- fs/nfs/nfs3xdr.c                                | 225 ++++---
- fs/nfs/nfs4proc.c                               | 335 +++++-----
- fs/nfs/nfs4xdr.c                                | 699 ++++++++++++++------
- fs/nfs/super.c                                  |   4 +-
- fs/nfs_common/Makefile                          |   1 +
- fs/nfs_common/nfs4acl.c                         |  41 ++
- fs/nfsd/Kconfig                                 |   1 +
- fs/nfsd/acl.h                                   |  24 +-
- fs/nfsd/nfs4acl.c                               | 467 ++++++-------
- fs/nfsd/nfs4callback.c                          |  29 +-
- fs/nfsd/nfs4proc.c                              |  17 +-
- fs/nfsd/nfs4xdr.c                               | 103 +--
- fs/nfsd/xdr4.h                                  |  12 +-
- fs/posix_acl.c                                  |  31 +-
- fs/richacl_base.c                               | 549 ++++++++++++++++
- fs/richacl_compat.c                             | 835 ++++++++++++++++++++++++
- fs/richacl_inode.c                              | 195 ++++++
- fs/richacl_xattr.c                              | 210 ++++++
- fs/xattr.c                                      |  34 +-
- include/linux/fs.h                              |  47 +-
- include/linux/nfs4.h                            |  16 -
- include/linux/nfs4acl.h                         |   7 +
- include/linux/nfs_fs.h                          |   2 +-
- include/linux/nfs_fs_sb.h                       |   2 +
- include/linux/nfs_xdr.h                         |   8 +-
- include/linux/posix_acl.h                       |  12 +-
- include/linux/richacl.h                         | 330 ++++++++++
- include/linux/richacl_compat.h                  |  40 ++
- include/linux/richacl_xattr.h                   |  52 ++
- include/linux/sunrpc/xdr.h                      |   5 +-
- include/uapi/linux/fs.h                         |   3 +-
- include/uapi/linux/nfs4.h                       |   7 -
- include/uapi/linux/xattr.h                      |   2 +
- net/sunrpc/auth.c                               |   7 +-
- net/sunrpc/auth_gss/gss_rpc_upcall.c            |   4 +-
- net/sunrpc/auth_gss/gss_rpc_xdr.c               |  11 +-
- net/sunrpc/auth_gss/gss_rpc_xdr.h               |   8 +-
- net/sunrpc/clnt.c                               |   5 +-
- net/sunrpc/rpcb_clnt.c                          |  57 +-
- net/sunrpc/xdr.c                                |   8 +
- 69 files changed, 4283 insertions(+), 1059 deletions(-)
- create mode 100644 fs/ext4/richacl.c
- create mode 100644 fs/ext4/richacl.h
- create mode 100644 fs/nfs_common/nfs4acl.c
- create mode 100644 fs/richacl_base.c
- create mode 100644 fs/richacl_compat.c
- create mode 100644 fs/richacl_inode.c
- create mode 100644 fs/richacl_xattr.c
- create mode 100644 include/linux/nfs4acl.h
- create mode 100644 include/linux/richacl.h
- create mode 100644 include/linux/richacl_compat.h
- create mode 100644 include/linux/richacl_xattr.h
-
---
-2.1.0
-
+> 
+> Ben
+> 
+>>
+>> On Fri, Mar 27, 2015 at 12:18 PM, Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org> wrote:
+>>> Hello!
+>>>
+>>> A user of our CIFS test gear reported a problem when testing against
+>>> a filer that is not using a password.
+>>>
+>>> A Fedora-14 machine has a mount.cifs on it that just mounts fine and does
+>>> not ask for password.
+>>>
+>>> But, Fedora 19's mount.cifs will ask for password (and fail the mount anyway
+>>> if you enter a blank password).
+>>>
+>>> Any idea what might be the issue?
+>>>
+>>> Thanks,
+>>> Ben
+>>>
+>>> --
+>>> Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
+>>> Candela Technologies Inc  http://www.candelatech.com
+>>>
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+>>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>>
+>>
+> 
+> 
 
 
 -- 
-Thanks,
-
-Steve
+Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
+Candela Technologies Inc  http://www.candelatech.com
