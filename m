@@ -1,81 +1,56 @@
-From: Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
-Subject: Re: Problem with mount.cifs in Fedora 19.
-Date: Mon, 30 Mar 2015 11:28:52 -0700
-Message-ID: <551995E4.1090601@candelatech.com>
-References: <551590DA.8040402@candelatech.com> <CAH2r5muXwqPT59Z7HDZ_3ua0yG2S50gHVdqtyXcC5LBQUOhtPw@mail.gmail.com> <5515A3C5.40902@candelatech.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] CIFS: session servername can't be null
+Date: Mon, 30 Mar 2015 19:07:24 -0500
+Message-ID: <CAH2r5mvEfJLo_zM0bYfxoHo=MLoUZUvVce-4ShiqXKr9qWOf0g@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <5515A3C5.40902-my8/4N5VtI7c+919tysfdA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 03/27/2015 11:39 AM, Ben Greear wrote:
-> On 03/27/2015 11:35 AM, Steve French wrote:
->> There was the bug about SecurityFlags that Niklas Cassel's "fix MUST
->> SecurityFlags filtering" patch addressed.  Does it work if you rename
->> /sbin/mount.cifs to something else temporarily (so it goes straight to
->> the kernel) and supply ip address on the mount instead of hostname (so
->> you don't need the mount helper)
-> 
-> We are trying to set up a local system to reproduce the problem,
-> and will try this out there if we can.
-> 
-> Or, I'll try this on the customer system if we cannot reproduce it
-> locally.
-> 
-> Thanks for the suggestion.
+(updated incorporating a suggestion of Jeff's)
 
-We tried testing with a guest account, but that does not reproduce the
-problem for us, and we cannot yet figure out how to configure
-the smb server with a normal user with no password.
+remove impossible check
 
-Do you happen to know how to do this, or if it can even be done in Linux?
+Pointed out by Coverity (CID 115422)
 
-Would you expect the guest account approach to reproduce the problem?
+Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Reviewed-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ fs/cifs/cifsencrypt.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Thanks,
-Ben
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 4ac7445..aa0dc25 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -1,6 +1,9 @@
+ /*
+  *   fs/cifs/cifsencrypt.c
+  *
++ *   Encryption and hashing operations relating to NTLM, NTLMv2.  See MS-NLMP
++ *   for more detailed information
++ *
+  *   Copyright (C) International Business Machines  Corp., 2005,2013
+  *   Author(s): Steve French (sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org)
+  *
+@@ -515,7 +518,8 @@ static int calc_ntlmv2_hash(struct cifs_ses *ses,
+char *ntlmv2_hash,
+                  __func__);
+             return rc;
+         }
+-    } else if (ses->serverName) {
++    } else {
++        /* We use ses->serverName if no domain name available */
+         len = strlen(ses->serverName);
 
-> 
-> Ben
-> 
->>
->> On Fri, Mar 27, 2015 at 12:18 PM, Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org> wrote:
->>> Hello!
->>>
->>> A user of our CIFS test gear reported a problem when testing against
->>> a filer that is not using a password.
->>>
->>> A Fedora-14 machine has a mount.cifs on it that just mounts fine and does
->>> not ask for password.
->>>
->>> But, Fedora 19's mount.cifs will ask for password (and fail the mount anyway
->>> if you enter a blank password).
->>>
->>> Any idea what might be the issue?
->>>
->>> Thanks,
->>> Ben
->>>
->>> --
->>> Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
->>> Candela Technologies Inc  http://www.candelatech.com
->>>
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->>
->>
-> 
-> 
-
+         server = kmalloc(2 + (len * 2), GFP_KERNEL);
 
 -- 
-Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
-Candela Technologies Inc  http://www.candelatech.com
+Thanks,
+
+Steve
