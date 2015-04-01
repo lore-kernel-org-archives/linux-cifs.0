@@ -1,52 +1,46 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 2/4] [CIFS] Don't ignore errors on encrypting password
- in SMBTcon
-Date: Tue, 31 Mar 2015 20:37:26 -0400
-Message-ID: <20150331203726.2d58f6ab@synchrony.poochiereds.net>
+From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+Subject: Re: [PATCH 4/4] [SMB3] Fix coverity warning
+Date: Tue, 31 Mar 2015 20:38:51 -0400
+Message-ID: <20150331203851.26627614@synchrony.poochiereds.net>
 References: <1427434082-4299-1-git-send-email-smfrench@gmail.com>
-	<1427434082-4299-3-git-send-email-smfrench@gmail.com>
+	<1427434082-4299-5-git-send-email-smfrench@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1427434082-4299-3-git-send-email-smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <1427434082-4299-5-git-send-email-smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 27 Mar 2015 00:28:00 -0500
+On Fri, 27 Mar 2015 00:28:02 -0500
 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-> Although unlikely to fail (and tree connect does not commonly send
-> a password since SECMODE_USER is the default for most servers)
-> do not ignore errors on SMBNTEncrypt in SMB Tree Connect.
+> Coverity reports a warning for referencing the beginning of the
+> SMB2/SMB3 frame using the ProtocolId field as an array. Although
+> it works the same either way, this patch should quiet the warning
+> and might be a little clearer.
 > 
-> Reported by Coverity (CID 1226853)
+> Reported by Coverity (CID 741269)
 > 
 > Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 > ---
->  fs/cifs/connect.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+>  fs/cifs/smb2misc.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 4cb8450..cdb1aaf 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -3696,6 +3696,12 @@ CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
->  #endif /* CIFS_WEAK_PW_HASH */
->  		rc = SMBNTencrypt(tcon->password, ses->server->cryptkey,
->  					bcc_ptr, nls_codepage);
-> +		if (rc) {
-> +			cifs_dbg(FYI, "%s Can't generate NTLM rsp. Error: %d\n",
-> +				 __func__, rc);
-> +			cifs_buf_release(smb_buffer);
-> +			return rc;
-> +		}
+> diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
+> index 689f035..22dfdf1 100644
+> --- a/fs/cifs/smb2misc.c
+> +++ b/fs/cifs/smb2misc.c
+> @@ -322,7 +322,7 @@ smb2_get_data_area_len(int *off, int *len, struct smb2_hdr *hdr)
 >  
->  		bcc_ptr += CIFS_AUTH_RESP_SIZE;
->  		if (ses->capabilities & CAP_UNICODE) {
+>  	/* return pointer to beginning of data area, ie offset from SMB start */
+>  	if ((*off != 0) && (*len != 0))
+> -		return hdr->ProtocolId + *off;
+> +		return (char *)(&hdr->ProtocolId[0]) + *off;
+>  	else
+>  		return NULL;
+>  }
 
-Acked-by:
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Acked-by: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
