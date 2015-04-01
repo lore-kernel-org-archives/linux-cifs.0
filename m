@@ -1,42 +1,47 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH] [CIFS] Fix warning
-Date: Mon, 30 Mar 2015 22:10:02 -0500
-Message-ID: <CAH2r5mvUSDKF5bhM1VdjjuEp+CrqLKfgHC=Y+HjU+GZivYtTMQ@mail.gmail.com>
+From: Jeff Layton <jlayton@poochiereds.net>
+Subject: Re: [PATCH 1/4] [SMB3] Fix warning on uninitialized buftype
+Date: Tue, 31 Mar 2015 20:35:07 -0400
+Message-ID: <20150331203507.7b82e45f@synchrony.poochiereds.net>
+References: <1427434082-4299-1-git-send-email-smfrench@gmail.com>
+	<1427434082-4299-2-git-send-email-smfrench@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Steve French <smfrench@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1427434082-4299-2-git-send-email-smfrench@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Coverity reports a warning due to uninitialized attr structure in one
-code path.
+On Fri, 27 Mar 2015 00:27:59 -0500
+Steve French <smfrench@gmail.com> wrote:
 
-Reported by Coverity (CID 728535)
+> Pointed out by coverity analyzer.  resp_buftype is
+> not initialized in one path which can rarely log
+> a spurious warning (buf is null so there will
+> not be a problem with freeing data, but if buf_type
+> were randomly set to wrong value could log a warning)
+> 
+> Reported by Coverity (CID 1269144)
+> 
+> Signed-off-by: Steve French <smfrench@gmail.com>
+> ---
+>  fs/cifs/smb2pdu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index 3417340..1b906de 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -2114,7 +2114,7 @@ SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
+>  	struct kvec iov[2];
+>  	int rc = 0;
+>  	int len;
+> -	int resp_buftype;
+> +	int resp_buftype = CIFS_NO_BUFFER;
+>  	unsigned char *bufptr;
+>  	struct TCP_Server_Info *server;
+>  	struct cifs_ses *ses = tcon->ses;
 
-Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Reviewed-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- fs/cifs/inode.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 2d4f372..3e126d7 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -771,6 +771,8 @@ cifs_get_inode_info(struct inode **inode, const
-char *full_path,
-                 cifs_buf_release(srchinf->ntwrk_buf_start);
-             }
-             kfree(srchinf);
-+            if (rc)
-+                goto cgii_exit;
-     } else
-         goto cgii_exit;
-
-
--- 
-Thanks,
-
-Steve
+Reviewed-by: Jeff Layton <jlayton@poochiereds.net>
