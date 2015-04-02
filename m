@@ -1,119 +1,67 @@
-From: Jeff Layton <jlayton@samba.org>
-Subject: Re: [PATCH 3/4] [SMB3] Fix dereference before null check warning
-Date: Wed, 1 Apr 2015 07:07:00 -0400
-Message-ID: <20150401070700.268628b2@tlielax.poochiereds.net>
-References: <1427434082-4299-1-git-send-email-smfrench@gmail.com>
-	<1427434082-4299-4-git-send-email-smfrench@gmail.com>
-	<20150331204634.4d38c27e@synchrony.poochiereds.net>
-	<CAH2r5ms4p5FYcxW4E1FJ=1DCJstDgOdTDETPEWoW9bxWmJ2O_g@mail.gmail.com>
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: Don't replace dentries for dfs mounts
+Date: Thu,  2 Apr 2015 14:51:35 +0100
+Message-ID: <1427982695-29891-1-git-send-email-sprabhu@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>
-To: Steve French <smfrench@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAH2r5ms4p5FYcxW4E1FJ=1DCJstDgOdTDETPEWoW9bxWmJ2O_g@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 1 Apr 2015 00:00:57 -0500
-Steve French <smfrench@gmail.com> wrote:
+Doing a readdir on a dfs root can result in the dentries for directorie=
+s
+with a dfs share mounted  being replaced by new dentries for objects
+returned by the readdir call. These new dentries on shares mounted with
+unix extenstions show up as symlinks pointing to the dfs share.
 
-> On Tue, Mar 31, 2015 at 7:46 PM, Jeff Layton <jlayton@poochiereds.net> wrote:
-> > On Fri, 27 Mar 2015 00:28:01 -0500
-> > Steve French <smfrench@gmail.com> wrote:
-> >
-> >> null tcon is not likely in these paths in current
-> >> code, but obviously it does clarify the code to
-> >> check for null (if at all) before derefrencing
-> >> rather than after.
-> >>
-> >> Reported by Coverity (CID 1042666)
-> >>
-> >> Signed-off-by: Steve French <smfrench@gmail.com>
-> >
-> > I don't get it. Under what circumstances would the tcon ever be NULL
-> > here? If there aren't any then this is just confusing. It would be
-> > better to just remove the bogus checks for a NULL tcon instead.
-> 
-> I don't think it really matters much one way or another but I agree it
-> would be a bug to pass in a null tcon to SMB2_ioctl.
-> 
-> On the other hand ... if there are any paths where tcon might be null
-> (other than SessionSetup and NegProt and TCon itself) due to bug,
-> SMB2/SMB3 ioctl/fsctl would be the one since there are various strange
-> operations (such as security related calls such as validate negotiate
-> for example) that either call it now or will need to call it as
-> additional SMB2/SMB3 ioctls are added.  I didn't see any harm in
-> checking for null tcon, although clearly passing in a null tcon would
-> be a bug - this is one code path where I don't mind checking since
-> there are some counterintuitive things which SMB2 ioctl/fsctl protocol
-> operations do.
-> 
+ # mount -t cifs -o sec=3Dnone  //vm140-31/dfsroot cifs
+ # stat cifs/testlink/testfile; ls -l cifs
+  File: =E2=80=98cifs/testlink/testfile=E2=80=99
+  Size: 0         	Blocks: 0          IO Block: 16384  regular
+empty file
+Device: 27h/39d	Inode: 130120      Links: 1
+Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root=
+)
+Access: 2015-03-31 13:55:50.106018200 +0100
+Modify: 2015-03-31 13:55:50.106018200 +0100
+Change: 2015-03-31 13:55:50.106018200 +0100
+ Birth: -
+total 0
+drwxr-xr-x 2 root root  0 Mar 31 13:54 testdir
+lrwxrwxrwx 1 root root 19 Mar 24 14:25 testlink -> \vm140-31\test
 
-I guess my thinking was that an ioctl syscall requires that you have an
-open file, and that requires a fully-established tcon with cifs.ko. So
-I don't quite understand how you could get into SMB2_ioctl and not have
-a valid tcon.
+In the example above, the stat command mounts the dfs share at
+cifs/testlink. The subsequent ls on the dfsroot directory replaces the
+dentry for testlink with a symlink.
 
-Bogus NULL pointer checks like this may seem harmless, but they tend to
-lead toward the papering over of real bugs. My suggestion would be to
-get rid of any pretense that passing in a NULL tcon is OK here.
+In the earlier code, the d_invalidate command returned an -EBUSY error
+when attempting to invalidate directories. This stopped the code from
+replacing the directories with symlinks returned by the readdir call.
+Changes were recently made to the d_invalidate() command so
+that it no longer returns an error code. This results in the directory
+with the mounted dfs share being replaced by a symlink which denotes a
+dfs share.
 
-> 
-> >> ---
-> >>  fs/cifs/smb2pdu.c | 13 ++++++++-----
-> >>  1 file changed, 8 insertions(+), 5 deletions(-)
-> >>
-> >> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> >> index 1b906de..78b329f 100644
-> >> --- a/fs/cifs/smb2pdu.c
-> >> +++ b/fs/cifs/smb2pdu.c
-> >> @@ -1218,7 +1218,7 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
-> >>       struct smb2_ioctl_req *req;
-> >>       struct smb2_ioctl_rsp *rsp;
-> >>       struct TCP_Server_Info *server;
-> >> -     struct cifs_ses *ses = tcon->ses;
-> >> +     struct cifs_ses *ses;
-> >>       struct kvec iov[2];
-> >>       int resp_buftype;
-> >>       int num_iovecs;
-> >> @@ -1233,6 +1233,11 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
-> >>       if (plen)
-> >>               *plen = 0;
-> >>
-> >> +     if (tcon)
-> >> +             ses = tcon->ses;
-> >> +     else
-> >> +             return -EIO;
-> >> +
-> >>       if (ses && (ses->server))
-> >>               server = ses->server;
-> >>       else
-> >> @@ -1296,14 +1301,12 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
-> >>       rsp = (struct smb2_ioctl_rsp *)iov[0].iov_base;
-> >>
-> >>       if ((rc != 0) && (rc != -EINVAL)) {
-> >> -             if (tcon)
-> >> -                     cifs_stats_fail_inc(tcon, SMB2_IOCTL_HE);
-> >> +             cifs_stats_fail_inc(tcon, SMB2_IOCTL_HE);
-> >>               goto ioctl_exit;
-> >>       } else if (rc == -EINVAL) {
-> >>               if ((opcode != FSCTL_SRV_COPYCHUNK_WRITE) &&
-> >>                   (opcode != FSCTL_SRV_COPYCHUNK)) {
-> >> -                     if (tcon)
-> >> -                             cifs_stats_fail_inc(tcon, SMB2_IOCTL_HE);
-> >> +                     cifs_stats_fail_inc(tcon, SMB2_IOCTL_HE);
-> >>                       goto ioctl_exit;
-> >>               }
-> >>       }
-> >
-> >
-> 
-> 
-> 
+Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/readdir.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-
--- 
-Jeff Layton <jlayton@samba.org>
+diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+index c295338..b4bda47 100644
+--- a/fs/cifs/readdir.c
++++ b/fs/cifs/readdir.c
+@@ -90,6 +90,8 @@ cifs_prime_dcache(struct dentry *parent, struct qstr =
+*name,
+ 	if (dentry) {
+ 		inode =3D dentry->d_inode;
+ 		if (inode) {
++			if (d_mountpoint(dentry))
++				goto out;
+ 			/*
+ 			 * If we're generating inode numbers, then we don't
+ 			 * want to clobber the existing one with the one that
+--=20
+2.1.0
