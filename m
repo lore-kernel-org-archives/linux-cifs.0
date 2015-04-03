@@ -1,54 +1,81 @@
-From: Jeff Layton <jeff.layton@primarydata.com>
-Subject: Re: [PATCH 1/1] cifs: potential missing check for
- posix_lock_file_wait
-Date: Fri, 3 Apr 2015 08:11:25 -0400
-Message-ID: <20150403081125.7ad668b6@tlielax.poochiereds.net>
-References: <1427242729-11515-1-git-send-email-csong84@gatech.edu>
+From: Jeff Layton <jeff.layton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+Subject: Re: [PATCH] cifs: Don't replace dentries for dfs mounts
+Date: Fri, 3 Apr 2015 08:14:06 -0400
+Message-ID: <20150403081406.1f8323d1@tlielax.poochiereds.net>
+References: <1427982695-29891-1-git-send-email-sprabhu@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: sfrench@samba.org, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-	taesoo@gatech.edu, changwoo@gatech.edu, sanidhya@gatech.edu,
-	blee@gatech.edu, Pavel Shilovsky <piastryyy@gmail.com>
-To: Chengyu Song <csong84@gatech.edu>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1427242729-11515-1-git-send-email-csong84@gatech.edu>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1427982695-29891-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 24 Mar 2015 20:18:49 -0400
-Chengyu Song <csong84@gatech.edu> wrote:
+On Thu,  2 Apr 2015 14:51:35 +0100
+Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-> posix_lock_file_wait may fail under certain circumstances, and its result is
-> usually checked/returned. But given the complexity of cifs, I'm not sure if
-> the result is intentially left unchecked and always expected to succeed.
-> 
-> Signed-off-by: Chengyu Song <csong84@gatech.edu>
+> Doing a readdir on a dfs root can result in the dentries for director=
+ies
+> with a dfs share mounted  being replaced by new dentries for objects
+> returned by the readdir call. These new dentries on shares mounted wi=
+th
+> unix extenstions show up as symlinks pointing to the dfs share.
+>=20
+>  # mount -t cifs -o sec=3Dnone  //vm140-31/dfsroot cifs
+>  # stat cifs/testlink/testfile; ls -l cifs
+>   File: =E2=80=98cifs/testlink/testfile=E2=80=99
+>   Size: 0         	Blocks: 0          IO Block: 16384  regular
+> empty file
+> Device: 27h/39d	Inode: 130120      Links: 1
+> Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    ro=
+ot)
+> Access: 2015-03-31 13:55:50.106018200 +0100
+> Modify: 2015-03-31 13:55:50.106018200 +0100
+> Change: 2015-03-31 13:55:50.106018200 +0100
+>  Birth: -
+> total 0
+> drwxr-xr-x 2 root root  0 Mar 31 13:54 testdir
+> lrwxrwxrwx 1 root root 19 Mar 24 14:25 testlink -> \vm140-31\test
+>=20
+> In the example above, the stat command mounts the dfs share at
+> cifs/testlink. The subsequent ls on the dfsroot directory replaces th=
+e
+> dentry for testlink with a symlink.
+>=20
+> In the earlier code, the d_invalidate command returned an -EBUSY erro=
+r
+> when attempting to invalidate directories. This stopped the code from
+> replacing the directories with symlinks returned by the readdir call.
+> Changes were recently made to the d_invalidate() command so
+> that it no longer returns an error code. This results in the director=
+y
+> with the mounted dfs share being replaced by a symlink which denotes =
+a
+> dfs share.
+>=20
+> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > ---
->  fs/cifs/file.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index a94b3e6..beef67b 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -1553,8 +1553,8 @@ cifs_setlk(struct file *file, struct file_lock *flock, __u32 type,
->  		rc = server->ops->mand_unlock_range(cfile, flock, xid);
->  
->  out:
-> -	if (flock->fl_flags & FL_POSIX)
-> -		posix_lock_file_wait(file, flock);
-> +	if (flock->fl_flags & FL_POSIX && !rc)
-> +		rc = posix_lock_file_wait(file, flock);
->  	return rc;
->  }
->  
+>  fs/cifs/readdir.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>=20
+> diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+> index c295338..b4bda47 100644
+> --- a/fs/cifs/readdir.c
+> +++ b/fs/cifs/readdir.c
+> @@ -90,6 +90,8 @@ cifs_prime_dcache(struct dentry *parent, struct qst=
+r *name,
+>  	if (dentry) {
+>  		inode =3D dentry->d_inode;
+>  		if (inode) {
+> +			if (d_mountpoint(dentry))
+> +				goto out;
+>  			/*
+>  			 * If we're generating inode numbers, then we don't
+>  			 * want to clobber the existing one with the one that
 
-(cc'ing Pavel since he wrote a lot of this code)
 
-I think your patch looks correct -- if we (for instance) get a memory
-allocation failure while trying to set the local lock then I think we
-probably don't want to return success. So...
+Looks right.
 
-    Acked-by: Jeff Layton <jeff.layton@primarydata.com>
+Reviewed-by: Jeff Layton <jeff.layton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
