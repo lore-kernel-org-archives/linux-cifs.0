@@ -1,62 +1,105 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT PULL] CIFS Fixes
-Date: Thu, 2 Apr 2015 22:32:12 -0500
-Message-ID: <CAH2r5msrTxz=co472T2K+46-ounHDy1QTSTt_qZHrz+CjBXXYQ@mail.gmail.com>
+From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+Subject: Re: Problem with mount.cifs in Fedora 19.
+Date: Fri, 3 Apr 2015 07:59:25 -0400
+Message-ID: <20150403075925.0f9102c9@tlielax.poochiereds.net>
+References: <551590DA.8040402@candelatech.com>
+	<CAH2r5muXwqPT59Z7HDZ_3ua0yG2S50gHVdqtyXcC5LBQUOhtPw@mail.gmail.com>
+	<5515A3C5.40902@candelatech.com>
+	<551995E4.1090601@candelatech.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <551995E4.1090601-my8/4N5VtI7c+919tysfdA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-A set of small cifs fixes fixing a memory leak, kernel oops, and
-infinite loop (and some spotted by Coverity)
+On Mon, 30 Mar 2015 11:28:52 -0700
+Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org> wrote:
 
-The following changes since commit 90a5a895cc8b284ac522757a01de15e36710c2b9:
+> On 03/27/2015 11:39 AM, Ben Greear wrote:
+> > On 03/27/2015 11:35 AM, Steve French wrote:
+> >> There was the bug about SecurityFlags that Niklas Cassel's "fix MUST
+> >> SecurityFlags filtering" patch addressed.  Does it work if you rename
+> >> /sbin/mount.cifs to something else temporarily (so it goes straight to
+> >> the kernel) and supply ip address on the mount instead of hostname (so
+> >> you don't need the mount helper)
+> > 
+> > We are trying to set up a local system to reproduce the problem,
+> > and will try this out there if we can.
+> > 
+> > Or, I'll try this on the customer system if we cannot reproduce it
+> > locally.
+> > 
+> > Thanks for the suggestion.
+> 
+> We tried testing with a guest account, but that does not reproduce the
+> problem for us, and we cannot yet figure out how to configure
+> the smb server with a normal user with no password.
+> 
+> Do you happen to know how to do this, or if it can even be done in Linux?
+> 
+> Would you expect the guest account approach to reproduce the problem?
+> 
+> Thanks,
+> Ben
+> 
 
-  Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/net
-(2015-03-23 10:16:13 -0700)
 
-are available in the git repository at:
+There were a lot of authentication layer changes between those two
+fedora releases, IIRC.
+
+One thing you can do is simply use "sec=none" which will make
+mount.cifs skip prompting for a password. "guest" on the other hand
+makes it skip prompting for a password and also pass in a blank
+username -- that's probably not what you want.
+
+The big difference though might be that the more recent kernel is
+trying to use NTLMSSP auth instead of older NTLM auth. If you can get
+network captures of mount attempts from both clients, have a close
+look at the SESSION_SETUP calls and see whether that's the case.
 
 
-  git://git.samba.org/sfrench/cifs-2.6.git for-next
+> > 
+> > Ben
+> > 
+> >>
+> >> On Fri, Mar 27, 2015 at 12:18 PM, Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org> wrote:
+> >>> Hello!
+> >>>
+> >>> A user of our CIFS test gear reported a problem when testing against
+> >>> a filer that is not using a password.
+> >>>
+> >>> A Fedora-14 machine has a mount.cifs on it that just mounts fine and does
+> >>> not ask for password.
+> >>>
+> >>> But, Fedora 19's mount.cifs will ask for password (and fail the mount anyway
+> >>> if you enter a blank password).
+> >>>
+> >>> Any idea what might be the issue?
+> >>>
+> >>> Thanks,
+> >>> Ben
+> >>>
+> >>> --
+> >>> Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
+> >>> Candela Technologies Inc  http://www.candelatech.com
+> >>>
+> >>> --
+> >>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> >>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> >>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> >>
+> >>
+> >>
+> > 
+> > 
+> 
+> 
 
-for you to fetch changes up to 4c5930e8056127e9a89bb7836bfa34318a89ab14:
-
-  Fix warning (2015-04-01 00:01:47 -0500)
-
-----------------------------------------------------------------
-David Disseldorp (1):
-      cifs: fix use-after-free bug in find_writable_file
-
-Sachin Prabhu (1):
-      cifs: smb2_clone_range() - exit on unhandled error
-
-Steve French (8):
-      Fix warning on uninitialized buftype
-      Don't ignore errors on encrypting password in SMBTcon
-      Fix dereference before null check warning
-      Fix coverity warning
-      Fix warning on impossible comparison
-      CIFS: session servername can't be null
-      Fix another dereference before null check warning
-      Fix warning
-
-Taesoo Kim (1):
-      cifs: potential memory leaks when parsing mnt opts
-
- fs/cifs/cifsencrypt.c |  6 +++++-
- fs/cifs/connect.c     | 13 +++++++++++--
- fs/cifs/file.c        |  1 +
- fs/cifs/inode.c       |  2 ++
- fs/cifs/smb2misc.c    |  2 +-
- fs/cifs/smb2ops.c     |  3 ++-
- fs/cifs/smb2pdu.c     | 17 ++++++++++-------
- 7 files changed, 32 insertions(+), 12 deletions(-)
 
 -- 
-Thanks,
-
-Steve
+Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
