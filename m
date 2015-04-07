@@ -1,38 +1,91 @@
-From: Al Viro <viro-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
-Subject: Re: [RFC PATCH 0/5] Remove rw parameter from direct_IO()
-Date: Sun, 5 Apr 2015 17:27:59 +0100
-Message-ID: <20150405162758.GI889@ZenIV.linux.org.uk>
-References: <cover.1426502566.git.osandov@osandov.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] Fix to convert SURROGATE PAIR filename
+Date: Mon, 6 Apr 2015 21:20:11 -0500
+Message-ID: <CAH2r5ms-qB=MAxsk_CQAaLBcNK0a+c9VkDdZMV4wEXPvBBbQGA@mail.gmail.com>
+References: <54D1C8EE.2030900@nttcom.co.jp>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-btrfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	osd-dev-yNzVSZO3znNg9hUCZPvPmw@public.gmane.org, linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-f2fs-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
-	fuse-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-	jfs-discussion-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, HPDD-discuss-y27Ovi1pjclAfugRpC6u6w@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nilfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	ocfs2-devel-N0ozoZBvEnrZJqsBc5GL+g@public.gmane.org, reiserfs-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	v9fs-developer-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Chris Mason <clm-b10kYP2dOMg@public.gmane.org>,
-	Josef Bacik <jbacik-b10kYP2dOMg@public.gmane.org>, David Sterba <dsterba-AlSwsSmVLrQ@public.gmane.org>,
-	Yan Zheng <zyan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Sage Weil <sage-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Boaz Harrosh <ooo-rh7Tgz9RNieUD9Wbbkgo/g@public.gmane.org>,
-	Benny Halevy <bhalevy-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
-	Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>, Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>,
-	Andreas Dilger <adilger.kernel@dilger.
-To: Omar Sandoval <osandov-nWWhXC5lh1RBDgjK7y7TUQ@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Nakajima Akira <nakajima.akira-o7dWnD6vFTHqq2nvvmkE/A@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <cover.1426502566.git.osandov-nWWhXC5lh1RBDgjK7y7TUQ@public.gmane.org>
+In-Reply-To: <54D1C8EE.2030900-o7dWnD6vFTHqq2nvvmkE/A@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Mar 16, 2015 at 04:33:48AM -0700, Omar Sandoval wrote:
-> Hi,
-> 
-> Al, here's some cleanup that you mentioned back in December that I got
-> around to (https://lkml.org/lkml/2014/12/15/28).
+Note build warnings (when running normal sparse checks during compile)
+looks like need to resolve endian errors so that this is sure to work
+in big endian, not just little endian boxes
 
-Applied.  See #for-next
+e.g.
+
+make C=1 M=fs/cifs modules CF=-D__CHECK_ENDIAN__
+
+  CHECK   fs/cifs/cifs_unicode.c
+fs/cifs/cifs_unicode.c:508:34: warning: incorrect type in assignment
+(different base types)
+fs/cifs/cifs_unicode.c:508:34:    expected restricted __le16
+[assigned] [usertype] dst_char
+fs/cifs/cifs_unicode.c:508:34:    got unsigned short [unsigned]
+[short] [usertype] <noident>
+fs/cifs/cifs_unicode.c:517:42: warning: incorrect type in assignment
+(different base types)
+fs/cifs/cifs_unicode.c:517:42:    expected restricted __le16
+[assigned] [usertype] dst_char
+fs/cifs/cifs_unicode.c:517:42:    got unsigned short [unsigned]
+[short] [usertype] <noident>
+fs/cifs/cifs_unicode.c:523:42: warning: incorrect type in assignment
+(different base types)
+fs/cifs/cifs_unicode.c:523:42:    expected restricted __le16
+[assigned] [usertype] dst_char
+fs/cifs/cifs_unicode.c:523:42:    got unsigned short [unsigned]
+[short] [usertype] <noident>
+fs/cifs/cifs_unicode.c:526:42: warning: incorrect type in assignment
+(different base types)
+fs/cifs/cifs_unicode.c:526:42:    expected restricted __le16
+[assigned] [usertype] dst_char
+fs/cifs/cifs_unicode.c:526:42:    got unsigned short [unsigned]
+[short] [usertype] <noident>
+
+On Wed, Feb 4, 2015 at 1:23 AM, Nakajima Akira
+<nakajima.akira-o7dWnD6vFTHqq2nvvmkE/A@public.gmane.org> wrote:
+> Garbled characters happen by using surrogate pair for filename.
+>   (replace each 1 character to ??)
+>
+> This causes
+> -- inode number duplication (when ?? and ?? exist) .
+> -- can't remove file, directory.
+> -- can't operate under directory.
+> -- auto-remount with noserverino.
+>
+>
+> [Steps to Reproduce]
+> client# touch $(echo -e '\xf0\x9d\x9f\xa3')
+> client# touch $(echo -e '\xf0\x9d\x9f\xa4')
+> client# ls -li
+>   You see same inode number, same filename(=?? and ??) .
+>
+>
+>
+> [BUG description]
+> Some functions do not consider about surrogate pair (and IVS).
+>
+> cifs_utf16_bytes()
+> -- return incorrect length, because of not considering about surrogate pair.
+>    This causes problem about SymbolicLink with surrogate pair filename.
+>
+> cifs_mapchar()
+> -- not considering about surrogate pair.
+>
+> cifs_from_utf16()
+> -- not convert surrogate pair from SMB response (from UTF-16 to UTF-8)
+>    , then ls shows garbled characters.
+>
+> cifsConvertToUTF16()
+> -- not convert surrogate pair when mapchars(SFM/SFU).
+
+
+
+-- 
+Thanks,
+
+Steve
