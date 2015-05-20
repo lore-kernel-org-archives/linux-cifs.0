@@ -1,62 +1,114 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH 1/1] cifs: potential missing check for posix_lock_file_wait
-Date: Wed, 20 May 2015 13:16:21 -0500
-Message-ID: <CAH2r5mtWswgO0D63aJLuEOWaoBSy3=D0Cm0gvHwhErMg8OZ0OA@mail.gmail.com>
-References: <1427242729-11515-1-git-send-email-csong84@gatech.edu> <20150403081125.7ad668b6@tlielax.poochiereds.net>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] CIFS: Fix race condition on RFC1002_NEGATIVE_SESSION_RESPONSE
+Date: Wed, 20 May 2015 13:26:24 -0500
+Message-ID: <CAH2r5ms3ULF0GnBNPzf5T8HyYHprezn4EAGg0aXkk55zSGH2aA@mail.gmail.com>
+References: <550860D2.5040207@innominate.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Chengyu Song <csong84@gatech.edu>,
-	Steve French <sfrench@samba.org>,
-	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-	samba-technical <samba-technical@lists.samba.org>,
-	LKML <linux-kernel@vger.kernel.org>, taesoo@gatech.edu,
-	changwoo@gatech.edu, sanidhya@gatech.edu,
-	Byoungyoung Lee <blee@gatech.edu>,
-	Pavel Shilovsky <piastryyy@gmail.com>
-To: Jeff Layton <jeff.layton@primarydata.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20150403081125.7ad668b6@tlielax.poochiereds.net>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Federico Sauter <fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <550860D2.5040207-LVkJPw3T+odGBRGhe+f61g@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
 merged into cifs-2.6.git for-next
 
-On Fri, Apr 3, 2015 at 7:11 AM, Jeff Layton <jeff.layton@primarydata.com> wrote:
-> On Tue, 24 Mar 2015 20:18:49 -0400
-> Chengyu Song <csong84@gatech.edu> wrote:
+On Tue, Mar 17, 2015 at 12:13 PM, Federico Sauter
+<fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org> wrote:
+> Greetings,
 >
->> posix_lock_file_wait may fail under certain circumstances, and its result is
->> usually checked/returned. But given the complexity of cifs, I'm not sure if
->> the result is intentially left unchecked and always expected to succeed.
->>
->> Signed-off-by: Chengyu Song <csong84@gatech.edu>
->> ---
->>  fs/cifs/file.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
->> index a94b3e6..beef67b 100644
->> --- a/fs/cifs/file.c
->> +++ b/fs/cifs/file.c
->> @@ -1553,8 +1553,8 @@ cifs_setlk(struct file *file, struct file_lock *flock, __u32 type,
->>               rc = server->ops->mand_unlock_range(cfile, flock, xid);
->>
->>  out:
->> -     if (flock->fl_flags & FL_POSIX)
->> -             posix_lock_file_wait(file, flock);
->> +     if (flock->fl_flags & FL_POSIX && !rc)
->> +             rc = posix_lock_file_wait(file, flock);
->>       return rc;
->>  }
->>
 >
-> (cc'ing Pavel since he wrote a lot of this code)
+> I have been running into an issue (kernel v3.10.40) when connecting to an NT
+> 3.51 Workstation host with a configuration missing the NetBIOS name
+> ('servern' option.) Under some conditions, the mount helper would hang
+> forever in an uninterruptible sleep state. The mount helper comes from
+> busybox. Under some other conditions the mount program would exit with an
+> error and not hang.
 >
-> I think your patch looks correct -- if we (for instance) get a memory
-> allocation failure while trying to set the local lock then I think we
-> probably don't want to return success. So...
+> I managed to create a setup where I could reliably reproduce both cases (the
+> "good case" where the program exits, and the "bad case" where the program
+> hangs forever.)
 >
->     Acked-by: Jeff Layton <jeff.layton@primarydata.com>
+> The problem seems to be a race condition between the demux thread and the
+> "main"(?) thread over the srv_mutex. Here is the summary of the functions
+> calls that lead to this problem:
+>
+> * demux thread:
+> cifs_demultiplex_thread()
+>   is_smb_response()
+>     [connect.c:626 -- case RFC1002_NEGATIVE_SESSION_RESPONSE]
+>       cifs_reconnect()
+>         [connect.c:380]
+>         do {
+>           mutex_lock(&server->srv_mutex);
+>           generic_ip_connect(server);
+>           // on error -> msleep(3000);
+>           mutex_unlock(&server->srv_mutex);
+>         } while (server->tcpStatus == CifsNeedReconnect);
+>
+> * "main" thread:
+> cifs_negotiate()
+>   CIFSSMBNegotiate()
+>     SendReceive()
+>       [transport.c:821 - thread hangs forever]
+>       mutex_lock(&ses->server->srv_mutex);
+>
+> Another interesting piece of information is that in the good case at
+> cifs_reconnect(), generic_ip_connect() returns -EINTR, whereas in the bad
+> case it returns -ECONNREFUSED. In the bad case it all leads to
+> generic_ip_connect() being called over and over again with the same result,
+> but never exiting the loop (thus: hanging.)
+>
+> The following patch works around the issue by not re-attempting the SMB
+> negotiation:
+>
+> ---8<----------------------------------------------------------------------
+> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+> index 4885a40..863a2da 100644
+> --- a/fs/cifs/smb1ops.c
+> +++ b/fs/cifs/smb1ops.c
+> @@ -415,10 +415,12 @@ cifs_negotiate(const unsigned int xid, struct cifs_ses
+> *ses)
+>         int rc;
+>         rc = CIFSSMBNegotiate(xid, ses);
+>         if (rc == -EAGAIN) {
+> +#if 0
+>                 /* retry only once on 1st time connection */
+>                 set_credits(ses->server, 1);
+>                 rc = CIFSSMBNegotiate(xid, ses);
+>                 if (rc == -EAGAIN)
+> +#endif
+>                         rc = -EHOSTDOWN;
+>         }
+>         return rc;
+> ---------------------------------------------------------------------->8---
+>
+> I was able, however, to identify a (hopefully) better solution for the issue
+> (see the attached patch.)
+>
+> I would really appreciate your feedback on the attached patch. Please let me
+> know if the solution seems acceptable as well as side-effects-free. We use
+> CIFS to connect to older Windows systems and we have been experiencing
+> similar issues for a while now (which I hope to solve with this patch.)
+>
+> Thanks a lot in advance! :-)
+>
+>
+> Kind regards,
+>
+>
+> Federico Sauter
+> Senior Firmware Programmer
+> --
+> Innominate Security Technologies AG
+> Rudower Chaussee 13 | 12489 Berlin | Germany
+> tel: +49 30 921028-210 | fax: +49 30 921028-020
+> www.innominate.com | www.twitter.com/mGuardcom
+>
+> Register Court: AG Charlottenburg, HR B 81603
+> Management Board: Dirk Seewald | Chairman of the Supervisory Board:
+> Christoph Leifer
 
 
 
