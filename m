@@ -1,118 +1,73 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Fix race condition on RFC1002_NEGATIVE_SESSION_RESPONSE
-Date: Wed, 20 May 2015 13:26:24 -0500
-Message-ID: <CAH2r5ms3ULF0GnBNPzf5T8HyYHprezn4EAGg0aXkk55zSGH2aA@mail.gmail.com>
-References: <550860D2.5040207@innominate.com>
+From: Noel Power <nopower-IBi9RG/b67k@public.gmane.org>
+Subject: cifs client not forgiving enough when neg prot smb1 (with extended
+ security)
+Date: Wed, 27 May 2015 13:06:23 +0100
+Message-ID: <5565B33F.2020302@suse.com>
+Reply-To: noel.power-IBi9RG/b67k@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Federico Sauter <fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org>
+Content-Type: multipart/mixed;
+ boundary="------------040501090706050606000409"
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <550860D2.5040207-LVkJPw3T+odGBRGhe+f61g@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-merged into cifs-2.6.git for-next
+This is a multi-part message in MIME format.
+--------------040501090706050606000409
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 17, 2015 at 12:13 PM, Federico Sauter
-<fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org> wrote:
-> Greetings,
->
->
-> I have been running into an issue (kernel v3.10.40) when connecting to an NT
-> 3.51 Workstation host with a configuration missing the NetBIOS name
-> ('servern' option.) Under some conditions, the mount helper would hang
-> forever in an uninterruptible sleep state. The mount helper comes from
-> busybox. Under some other conditions the mount program would exit with an
-> error and not hang.
->
-> I managed to create a setup where I could reliably reproduce both cases (the
-> "good case" where the program exits, and the "bad case" where the program
-> hangs forever.)
->
-> The problem seems to be a race condition between the demux thread and the
-> "main"(?) thread over the srv_mutex. Here is the summary of the functions
-> calls that lead to this problem:
->
-> * demux thread:
-> cifs_demultiplex_thread()
->   is_smb_response()
->     [connect.c:626 -- case RFC1002_NEGATIVE_SESSION_RESPONSE]
->       cifs_reconnect()
->         [connect.c:380]
->         do {
->           mutex_lock(&server->srv_mutex);
->           generic_ip_connect(server);
->           // on error -> msleep(3000);
->           mutex_unlock(&server->srv_mutex);
->         } while (server->tcpStatus == CifsNeedReconnect);
->
-> * "main" thread:
-> cifs_negotiate()
->   CIFSSMBNegotiate()
->     SendReceive()
->       [transport.c:821 - thread hangs forever]
->       mutex_lock(&ses->server->srv_mutex);
->
-> Another interesting piece of information is that in the good case at
-> cifs_reconnect(), generic_ip_connect() returns -EINTR, whereas in the bad
-> case it returns -ECONNREFUSED. In the bad case it all leads to
-> generic_ip_connect() being called over and over again with the same result,
-> but never exiting the loop (thus: hanging.)
->
-> The following patch works around the issue by not re-attempting the SMB
-> negotiation:
->
-> ---8<----------------------------------------------------------------------
-> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-> index 4885a40..863a2da 100644
-> --- a/fs/cifs/smb1ops.c
-> +++ b/fs/cifs/smb1ops.c
-> @@ -415,10 +415,12 @@ cifs_negotiate(const unsigned int xid, struct cifs_ses
-> *ses)
->         int rc;
->         rc = CIFSSMBNegotiate(xid, ses);
->         if (rc == -EAGAIN) {
-> +#if 0
->                 /* retry only once on 1st time connection */
->                 set_credits(ses->server, 1);
->                 rc = CIFSSMBNegotiate(xid, ses);
->                 if (rc == -EAGAIN)
-> +#endif
->                         rc = -EHOSTDOWN;
->         }
->         return rc;
-> ---------------------------------------------------------------------->8---
->
-> I was able, however, to identify a (hopefully) better solution for the issue
-> (see the attached patch.)
->
-> I would really appreciate your feedback on the attached patch. Please let me
-> know if the solution seems acceptable as well as side-effects-free. We use
-> CIFS to connect to older Windows systems and we have been experiencing
-> similar issues for a while now (which I hope to solve with this patch.)
->
-> Thanks a lot in advance! :-)
->
->
-> Kind regards,
->
->
-> Federico Sauter
-> Senior Firmware Programmer
-> --
-> Innominate Security Technologies AG
-> Rudower Chaussee 13 | 12489 Berlin | Germany
-> tel: +49 30 921028-210 | fax: +49 30 921028-020
-> www.innominate.com | www.twitter.com/mGuardcom
->
-> Register Court: AG Charlottenburg, HR B 81603
-> Management Board: Dirk Seewald | Chairman of the Supervisory Board:
-> Christoph Leifer
+Hi Steve,
 
+Just came across a situation where cifs client was failing to mount a
+share with ntlmssp served by cifsd based server.
+The server is misbehaving in that is should have set the
+EncryptionKeyLength to zero (when offering extended security).
+Regardless though, a windows client will happily continue whereas the
+cifs client will return IO(5) error. Looking in the MS-SMB spec 
+(2.2.4.5.2.1) mentions
 
+"ChallengeLength (1 byte): When the CAP_EXTENDED_SECURITY bit is set,
+the server MUST set this value to zero and clients MUST ignore this value."
 
--- 
-Thanks,
+I attach a patch to cifs for this
 
-Steve
+thanks,
+
+Noel
+
+--------------040501090706050606000409
+Content-Type: text/plain; charset=UTF-8;
+ name="0001-client-MUST-ignore-EncryptionKeyLength-if-CAP_EXTEND.patch"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename*0="0001-client-MUST-ignore-EncryptionKeyLength-if-CAP_EXTEND.pa";
+ filename*1="tch"
+
+RnJvbSBjY2Q5OWE5MWYzYjczZTQyODFjYWJkOGRkODRiMGU0NmJmZjcxODY1IE1vbiBTZXAg
+MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBOb2VsIFBvd2VyIDxub2VsLnBvd2VyQHN1c2UuY29t
+PgpEYXRlOiBXZWQsIDI3IE1heSAyMDE1IDA5OjIyOjEwICswMTAwClN1YmplY3Q6IFtQQVRD
+SF0gY2xpZW50IE1VU1QgaWdub3JlIEVuY3J5cHRpb25LZXlMZW5ndGggaWYKIENBUF9FWFRF
+TkRFRF9TRUNVUklUWSBpcyBzZXQKCltNUy1TTUJdIDIuMi40LjUuMi4xIHN0YXRlczoKCiJD
+aGFsbGVuZ2VMZW5ndGggKDEgYnl0ZSk6IFdoZW4gdGhlIENBUF9FWFRFTkRFRF9TRUNVUklU
+WSBiaXQgaXMgc2V0LAogdGhlIHNlcnZlciBNVVNUIHNldCB0aGlzIHZhbHVlIHRvIHplcm8g
+YW5kIGNsaWVudHMgTVVTVCBpZ25vcmUgdGhpcwogdmFsdWUuIgoKU2lnbmVkLW9mZi1ieTog
+Tm9lbCBQb3dlciA8bm9lbC5wb3dlckBzdXNlLmNvbT4KLS0tCiBmcy9jaWZzL2NpZnNzbWIu
+YyB8IDUgKystLS0KIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyksIDMgZGVsZXRp
+b25zKC0pCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jaWZzc21iLmMgYi9mcy9jaWZzL2NpZnNz
+bWIuYwppbmRleCA1ZjFmMzI4Li5lYTkzOGE4IDEwMDY0NAotLS0gYS9mcy9jaWZzL2NpZnNz
+bWIuYworKysgYi9mcy9jaWZzL2NpZnNzbWIuYwpAQCAtNjI5LDkgKzYyOSw4IEBAIENJRlNT
+TUJOZWdvdGlhdGUoY29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGNpZnNfc2VzICpz
+ZXMpCiAJCXNlcnZlci0+bmVnZmxhdm9yID0gQ0lGU19ORUdGTEFWT1JfVU5FTkNBUDsKIAkJ
+bWVtY3B5KHNlcy0+c2VydmVyLT5jcnlwdGtleSwgcFNNQnItPnUuRW5jcnlwdGlvbktleSwK
+IAkJICAgICAgIENJRlNfQ1JZUFRPX0tFWV9TSVpFKTsKLQl9IGVsc2UgaWYgKChwU01Cci0+
+aGRyLkZsYWdzMiAmIFNNQkZMRzJfRVhUX1NFQyB8fAotCQkJc2VydmVyLT5jYXBhYmlsaXRp
+ZXMgJiBDQVBfRVhURU5ERURfU0VDVVJJVFkpICYmCi0JCQkJKHBTTUJyLT5FbmNyeXB0aW9u
+S2V5TGVuZ3RoID09IDApKSB7CisJfSBlbHNlIGlmIChwU01Cci0+aGRyLkZsYWdzMiAmIFNN
+QkZMRzJfRVhUX1NFQyB8fAorCQkJc2VydmVyLT5jYXBhYmlsaXRpZXMgJiBDQVBfRVhURU5E
+RURfU0VDVVJJVFkpIHsKIAkJc2VydmVyLT5uZWdmbGF2b3IgPSBDSUZTX05FR0ZMQVZPUl9F
+WFRFTkRFRDsKIAkJcmMgPSBkZWNvZGVfZXh0X3NlY19ibG9iKHNlcywgcFNNQnIpOwogCX0g
+ZWxzZSBpZiAoc2VydmVyLT5zZWNfbW9kZSAmIFNFQ01PREVfUFdfRU5DUllQVCkgewotLSAK
+MS44LjUuNgoK
+--------------040501090706050606000409--
