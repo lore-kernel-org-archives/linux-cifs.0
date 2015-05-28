@@ -1,67 +1,171 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Wed, 27 May 2015 15:18:26 -0500
-Message-ID: <CAH2r5ms2eiCTVpuO7h3Qb9Ww9j0vs0pdRY7Rf-GAdK72SMpMQA@mail.gmail.com>
+From: Federico Sauter <fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org>
+Subject: Flush issue with overwritten FID
+Date: Thu, 28 May 2015 18:56:34 +0200
+Message-ID: <556748C2.40202@innominate.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Content-Type: multipart/mixed;
+ boundary="------------000402060501010404030508"
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Back from SambaXP - now have 8 small CIFS bug fixes to merge.
-Please pull the following changes since commit
-030bbdbf4c833bc69f502eae58498bc5572db736:
+This is a multi-part message in MIME format.
+--------------000402060501010404030508
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-  Linux 4.1-rc3 (2015-05-10 15:12:29 -0700)
+Greetings,
 
-are available in the git repository at:
 
-  git://git.samba.org/sfrench/cifs-2.6.git for-next
+I am using a Linux device with kernel 3.10.40. The Windows host is using 
+XP PRO (32-bit,) but the problem has laso been observed with Windows 7 
+64-bit.
 
-for you to fetch changes up to 4afe260bab50290a05e5732570329a530ed023f3:
+When I directly connect the Linux device to the Windows host, a very 
+strange problem arises. First of all: by "directly connect" I mean 
+connecting the network cable from the device's NIC directly to the 
+host's NIC, without any switch in between.
 
-  CIFS: Fix race condition on RFC1002_NEGATIVE_SESSION_RESPONSE
-(2015-05-20 13:25:55 -0500)
+The device then mounts two shares on the host: a RO share, as well as a 
+RW share.
 
-----------------------------------------------------------------
-Chengyu Song (1):
-      cifs: potential missing check for posix_lock_file_wait
+The device opens a file (integrity-check-idx.tmp) for writing on the RW 
+share. Then (without closing it) it scans the contents of the RO share. 
+Afterwards, it writes some result on that file and flushes it before 
+closing it. Straightforward enough.
 
-Dan Carpenter (1):
-      CIFS: remove an unneeded NULL check
+In the described case where the NICs are directly connected *and* that 
+the Windows host finishes booting before the Linux device does, 
+something strange happens. The file opened for writing is opened on FID 
+0x4002, then, when opening another file on the RO share, the same FID 
+seems to be reused. That file is closed and FID 0x4002 is then invalid. 
+In the end, when FID 0x4002 is flushed, an error is returned.
 
-Federico Sauter (1):
-      CIFS: Fix race condition on RFC1002_NEGATIVE_SESSION_RESPONSE
+Attached you will find an abridged version of the Wireshark capture. 
+Here is the summary:
 
-Nakajima Akira (3):
-      Fix that several functions handle incorrect value of mapchars
-      Fix to check Unique id and FileType when client refer file directly.
-      Fix to convert SURROGATE PAIR
+SMB_COM_NT_CREATE_ANDX integrity-check-idx.tmp on FID 0x4002
+SMB_COM_READ_ANDX  FID 0x4002
+(...browse share...)
+SMB_COM_NT_CREATE_ANDX append.exe on FID 0x4002
+SMB_COM_READ_ANDX  FID 0x4002
+SMB_COM_CLOSE  FID 0x4002
+(...)
+SMB_COM_FLUSH  FID 0x4002
+Response: NT Status: STATUS_INVALID_HANDLE (0xc0000008)
 
-Sachin Prabhu (1):
-      cifs: Don't replace dentries for dfs mounts
+In the case where there is a switch between both NICs, this problem does 
+not happen. In that case, FID 0x4002 is used only once for the file 
+opened for writing (which was created first) and then other FIDs are 
+used for each file that is opened afterwards. Thus, all operations 
+succeed (which is the behavior that I would expect.)
 
-Steve French (1):
-      [cifs] fix null pointer check
+Do you have any idea on how to solve this?
 
- fs/cifs/cifs_dfs_ref.c |   3 +-
- fs/cifs/cifs_unicode.c | 182 ++++++++++++++++++++++++++++++++++++-------------
- fs/cifs/cifsfs.c       |   2 +
- fs/cifs/cifsproto.h    |   4 +-
- fs/cifs/cifssmb.c      |  23 ++++---
- fs/cifs/connect.c      |   3 +-
- fs/cifs/dir.c          |   3 +-
- fs/cifs/file.c         |   7 +-
- fs/cifs/inode.c        |  31 +++++++--
- fs/cifs/link.c         |   3 +-
- fs/cifs/readdir.c      |   2 +
- fs/cifs/smb1ops.c      |   3 +-
- fs/cifs/smb2pdu.c      |   2 +-
- 13 files changed, 194 insertions(+), 74 deletions(-)
+I am taking a deeper look at the kernel code, but so far it seems to me 
+like this was a Windows problem and not a problem in our implementation, 
+given that the FID is assigned by the Windows host. Could you please 
+confirm that this is correct so as to provide a workaround?
 
+Thank you in advance for your kind support!
+
+
+Federico Sauter
+Senior Firmware Programmer
 -- 
-Thanks,
+Innominate Security Technologies AG
+Rudower Chaussee 13 | 12489 Berlin | Germany
+tel: +49 30 921028-210 | fax: +49 30 921028-020
+www.innominate.com | www.twitter.com/mGuardcom
 
-Steve
+Register Court: AG Charlottenburg, HR B 81603
+Management Board: Dirk Seewald | Chairman of the Supervisory Board: 
+Christoph Leifer
+
+--------------000402060501010404030508
+Content-Type: application/vnd.tcpdump.pcap;
+ name="bug_14517.cap"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="bug_14517.cap"
+
+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
+jy52vnsDgxffsYAY+oja9wAAAQEICgAAFewAAN+LAAAAZ/9TTUKiAAAAAIABwAAAAAAAAAAA
+AAAAAAEIRg8BCAAYIv8AZwABAkABAAAArn+lG1eD0AFGW3NJVJnQAQCgoRAnnsgBsuJDCDuZ
+0AEgAAAAAEAAAAAAAADSMAAAAAAAAAAAAAAAAAAAAADQAAAABgAAAKQAAAAAAAAAJRcFAIhE
+M4aBAAAAgQAAAAARER+F7QAMvgQPXQgARQAAc5j8QABABhpywKgC/sCoAsiPLgG9gxffsXa+
+e26AGA6Ps58AAAEBCAoAAN+XAAAV7AAAADv/U01CLgAAAAAAAcAAAAAAAAAAAAAAAAABCEYP
+AQgAGQz/AAAAAkAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAKQAAAAGAAAANAQAAAAAAAAlFwUA
+ad4zhhMEAAATBAAAAAy+BA9dABERH4XtCABFAAQFEOBAAIAGXvzAqALIwKgC/gG9jy52vqiu
+gxff8IAY///i5wAAAQEICgAAFe0AAN+XAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANAQAAAYAAACQAAAAAAAAACUXBQBO6jOG
+bwAAAG8AAAAAEREfhe0ADL4ED10IAEUAAGGZAEAAQAYagMCoAv7AqALIjy4BvYMX3/B2vqx/
+gBgRY/OSAAABAQgKAADfoQAAFe0AAAAp/1NNQgQAAAAAAAHAAAAAAAAAAAAAAAAAAQhGDwEI
+ABoDAkD/////AAAAkAAAAAYAAACMAAAAAAAAACUXBQAJ6zOGaQAAAGkAAAAADL4ED10AEREf
+he0IAEUAAFsQ4UAAgAZipcCoAsjAqAL+Ab2PLna+rH+DF+AdgBj/0keEAAABAQgKAAAV7QAA
+36EAAAAj/1NNQgQAAAAAgAHAAAAAAAAAAAAAAAAAAQhGDwEIABoAAAAAAACMAAAABgAAAIwA
+AAAAAAAAJRcFAGNTX4ZrAAAAawAAAAARER+F7QAMvgQPXQgARQAAXfFLQABABsI4wKgC/sCo
+AsiPLwG9OCo/vinIdtmAGARabk4AAAEBCAoAAOJpAAAWCQAAACX/U01CBQAAAAAAAcAAAAAA
+AAAAAAAAAAAACEYPAAgARwECQAAAAIwAAAAGAAAAjAAAAAAAAAAlFwUAEVRfhmkAAABpAAAA
+AAy+BA9dABERH4XtCABFAABbJgVAAIAGTYHAqALIwKgC/gG9jy8pyHbZOCo/54AY/Xb1hQAA
+AQEICgAAFgkAAOJpAAAAI/9TTUIFCAAAwIABwAAAAAAAAAAAAAAAAAAIRg8ACABHAAAAAAAA
+jAAAAAYAAACQAAAAAAAAACUXBQBVol+GbwAAAG8AAAAAEREfhe0ADL4ED10IAEUAAGHxUUAA
+QAbCLsCoAv7AqALIjy8BvTgqR4UpyHg8gBgEWmQSAAABAQgKAADibgAAFgkAAAAp/1NNQgQA
+AAAAAAHAAAAAAAAAAAAAAAAAAAhGDwAIAEwDAkD/////AAAAkAAAAAYAAACMAAAAAAAAACUX
+BQBvo1+GaQAAAGkAAAAADL4ED10AEREfhe0IAEUAAFsmC0AAgAZNe8CoAsjAqAL+Ab2PLynI
+eDw4KkeygBj+dqxWAAABAQgKAAAWCQAA4m4AAAAj/1NNQgQAAAAAgAHAAAAAAAAAAAAAAAAA
+AAhGDwAIAEwAAAAAAACMAAAABQAAAGwAAAAAAAAAJRcFABA6joYBABwAQ291bnRlcnMgcHJv
+dmlkZWQgYnkgZHVtcGNhcAIACAAlFwUAkToDhgMACAAlFwUAEDqOhgQACAChGAAAAAAAAAUA
+CAAAAAAAAAAAAAAAAABsAAAA
+--------------000402060501010404030508--
