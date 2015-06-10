@@ -1,59 +1,93 @@
-From: Andrew Martin <amartin-AQeFf1F/bRxBDgjK7y7TUQ@public.gmane.org>
-Subject: Copy from CIFS mount blocks until straced
-Date: Tue, 2 Jun 2015 09:15:38 -0500 (CDT)
-Message-ID: <1610749440.24537.1433254538285.JavaMail.zimbra@xes-inc.com>
-References: <1518270014.24528.1433254527447.JavaMail.zimbra@xes-inc.com>
+From: Robert Euhus <euhus-liste1-RRsrufEBJWcjwdJHFrQ6C0zuTB+3w3uf@public.gmane.org>
+Subject: Can't mount domain share any more -> "mount error(112): Host is down"
+ ; smbclient works with '-m SMB3'
+Date: Wed, 10 Jun 2015 16:14:04 +0200
+Message-ID: <5578462C.6030104@rrzn.uni-hannover.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1518270014.24528.1433254527447.JavaMail.zimbra-AQeFf1F/bRxBDgjK7y7TUQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 Hello,
 
-I am running a server with cifs-utils 6.0 on Ubuntu 14.04 trusty with a CIFS
-mount as follows:
-//server/share /mnt/Share cifs rw,relatime,vers=1.0,cache=strict,username=myuser,domain=EXAMPLE,uid=0,noforceuid,gid=0,noforcegid,addr=192.168.0.8,unix,posixpaths,serverino,acl,rsize=1048576,wsize=65536,actimeo=1 0 0
+I have a strange problem: Suddenly I can not mount our domain shares any
+more, but browsing with smbclient works, if I specify '-m SMB3'.
 
-I am using perl's File::Copy function to copy several hundred files from the
-share to the local ext4 filesystem:
-cp($src, $dst, 32128);
+After an update to out domain controller (Windosw Server 2012) which
+also serves the shares, I can not mount the shares anymore. I am usually
+using Kerberos-Tickets to mount the shares.
 
-This works fine for almost all of the files, however the perl script always
-blocks in uninterruptable sleep on one file in particular. If I strace it, I see
-this result:
+If I do not use Kerberos-Authentification I was able to mount the shares
+explicitly specifying 'vers=2.0'.
 
-open("/mnt/Share/file.odt", O_RDONLY) = 7
-ioctl(7, SNDCTL_TMR_TIMEBASE or SNDRV_TIMER_IOCTL_NEXT_DEVICE or TCGETS, 0x7fff3cdd9f20) = -1 ENOTTY (Inappropriate ioctl for device)
-lseek(7, 0, SEEK_CUR)                   = 0
-fstat(7, {st_mode=S_IFREG|0644, st_size=131018, ...}) = 0
-fcntl(7, F_SETFD, FD_CLOEXEC)           = 0
-open("/usr/local/share/dest.odt", O_WRONLY|O_CREAT|O_TRUNC, 0666) = 8
-ioctl(8, SNDCTL_TMR_TIMEBASE or SNDRV_TIMER_IOCTL_NEXT_DEVICE or TCGETS, 0x7fff3cdd9f20) = -1 ENOTTY (Inappropriate ioctl for device)
-lseek(8, 0, SEEK_CUR)                   = 0
-fstat(8, {st_mode=S_IFREG|0644, st_size=0, ...}) = 0
-fcntl(8, F_SETFD, FD_CLOEXEC)           = 0
-read(7,
+I also had problems authenticating against the AD with Winbind, which
+went away when I specified the following in /etc/samba/smb.conf:
 
-Thus it appears to be blocking on the read(2) command. If I kill this strace, 
-the process then "wakes up" and continues processing. It seems that inspecting 
-the process causes it to return from its blocking I/O. This behavior is 
-reproducible on this one same file (one out of hundreds) from perl, however 
-running "cp" or "md5sum" from the command line always returns instantly on 
-said file.
+> client max protocol = smb3_00
 
-It is worth noting that perl's File::Copy function uses 2MB sized buffers when
-calling read(2); this does not appear to work over CIFS - it returns an
-Input/Output Error. However I have compensated for this by tuning the buffer
-size to 32k (as noted above). Could this issue be related (or is this expected
-behavior)?
+Even though from the man page this should be the default anyway.
 
-Do you have any ideas what is causing this behavior, or what is causing this
-read(2) to block?
 
-Thanks,
+Here is an overview over what works and what does not:
 
-Andrew Martin
+This does not work:
+
+> mount.cifs //mydom-dc1.mydom.intern/groups /mnt/groups -o sec=krb5i,multiuser
+> mount error(112): Host is down
+
+The same result without the 'multiuser' option.
+
+> mount.cifs //mydom-dc1.mydom.intern/groups /mnt/groups -o username=myuser
+> Password for myuser@//mydom-dc1.mydom.intern/groups:  ***********
+> mount error(112): Host is down
+
+But this works:
+
+> mount.cifs //mydom-dc1.mydom.intern/groups /mnt/groups -o username=myuser,vers=2.0
+> Password for myuser@//mydom-dc1.mydom.intern/groups:  ***********
+
+In short: mounting with Kerberos is completely broken, without Kerberos
+it can be made to work again. I really need the Kerberos multiuser mount.
+
+
+The same pattern with smbclient: if no max-protocol is specified, then
+the command fails:
+
+> smbclient -U myuser //mydom-dc1.mydom.intern/groups 
+> Enter myuser's password: 
+> protocol negotiation failed: NT_STATUS_CONNECTION_RESET
+
+But this works:
+
+> smbclient -U myuser //mydom-dc1.mydom.intern/groups -m SMB3
+> Enter myuser's password: 
+> Domain=[MYDOM] OS=[] Server=[]
+> smb: \> 
+
+The smbclient command works as well, if 'client max protocol = smb3' is
+specified in /etc/samba/smb.conf.
+
+Strangely specifying the '-m SMB3' before the share, as listed in the
+man page does not work:
+
+> smbclient -m SMB3 -U myuser //mydom-dc1.mydom.intern/groups
+> Enter myuser's password: 
+> session setup failed: NT_STATUS_LOGON_FAILURE
+
+We also had a problem with one OSX-client, which had explicitly
+specified to use SMB1 only, but this problem went away, after removing
+this non-default option.
+
+The problems mentioned above were occurred on a Debian Jessie and an
+Ubuntu 14.04 install. On a Debian-Squeeze I could not get Winbind to
+work again by specifying a 'client max protocol'.
+
+
+I would be grateful for any hint on what to look for, since I am
+completely out of ideas.
+
+Thanks a lot,
+Robert Euhus
