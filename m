@@ -1,93 +1,57 @@
-From: Robert Euhus <euhus-liste1-RRsrufEBJWcjwdJHFrQ6C0zuTB+3w3uf@public.gmane.org>
-Subject: Can't mount domain share any more -> "mount error(112): Host is down"
- ; smbclient works with '-m SMB3'
-Date: Wed, 10 Jun 2015 16:14:04 +0200
-Message-ID: <5578462C.6030104@rrzn.uni-hannover.de>
+From: Niels Basjes <Niels-WkKhAqUkEt5mR6Xm/wNWPw@public.gmane.org>
+Subject: Fwd: CentOS cifs client sees Windows 2012 deduplicated files as symlinks
+Date: Thu, 11 Jun 2015 13:53:25 +0200
+Message-ID: <CADoiZqqc1Opge73nADG=xPtzvAE2oyK5bf6w3nCZ6n8k6bcfag@mail.gmail.com>
+References: <CADoiZqqHT1eh7-BvxpbSg8a5S+kLqBmBi-CXWp562BeXooVLgA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CADoiZqqHT1eh7-BvxpbSg8a5S+kLqBmBi-CXWp562BeXooVLgA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hello,
+Hi,
 
-I have a strange problem: Suddenly I can not mount our domain shares any
-more, but browsing with smbclient works, if I specify '-m SMB3'.
+Last week I ran into a serious problem from my CentOS 7 system using
+the cifs client to mount a volume on a Windows 2012-R2 server.
+I posted this a problem on ServerFault (
+http://serverfault.com/q/697393 ) a few days ago but I thought that it
+is usefull to ask here too.
+I included some screenshots in the serverfault page so that may be
+useful to have a look at.
 
-After an update to out domain controller (Windosw Server 2012) which
-also serves the shares, I can not mount the shares anymore. I am usually
-using Kerberos-Tickets to mount the shares.
+The essence of my problem is that the local Windows sysadmin turned on
+a feature to deduplicate files on an existing Windows server volume.
+After that my Linux system started seeing all the files that were
+deduplicated as symlinks to what I can only describe as 'chinese
+letters'.
+Under Windows 7 everything works fine.
 
-If I do not use Kerberos-Authentification I was able to mount the shares
-explicitly specifying 'vers=2.0'.
+The way I currently look at this is that what is apparently some kind
+of 'copy-on-write hardlink' on the Windows server is interpreted as a
+softlink by the cifs client in my CentOS system.
 
-I also had problems authenticating against the AD with Winbind, which
-went away when I specified the following in /etc/samba/smb.conf:
+I have been experimenting with some mount settings but I have been
+unable to fix this problem (other than turning off the deduplication).
 
-> client max protocol = smb3_00
+My current (Client) setup:
+- CentOS 7.0
+- samba-client-4.1.1-38.el7_0.x86_64
+- samba-common-4.1.1-38.el7_0.x86_64
+- samba-libs-4.1.1-38.el7_0.x86_64
+- cifs-utils-6.2-7.el7.x86_64
 
-Even though from the man page this should be the default anyway.
+The command in my /etc/fstab
 
+\\xxxxxxxx\file\video /var/www/html/wp-content/uploads cifs
+nouser_xattr,nounix,iocharset=utf8,credentials=/etc/fstab.cifs.sa_video.credentials,_netdev,uid=apache,gid=apache,rw,auto
+0 0
 
-Here is an overview over what works and what does not:
-
-This does not work:
-
-> mount.cifs //mydom-dc1.mydom.intern/groups /mnt/groups -o sec=krb5i,multiuser
-> mount error(112): Host is down
-
-The same result without the 'multiuser' option.
-
-> mount.cifs //mydom-dc1.mydom.intern/groups /mnt/groups -o username=myuser
-> Password for myuser@//mydom-dc1.mydom.intern/groups:  ***********
-> mount error(112): Host is down
-
-But this works:
-
-> mount.cifs //mydom-dc1.mydom.intern/groups /mnt/groups -o username=myuser,vers=2.0
-> Password for myuser@//mydom-dc1.mydom.intern/groups:  ***********
-
-In short: mounting with Kerberos is completely broken, without Kerberos
-it can be made to work again. I really need the Kerberos multiuser mount.
+How do I get the Linux to see these files as files again?
 
 
-The same pattern with smbclient: if no max-protocol is specified, then
-the command fails:
+-- 
+Best regards / Met vriendelijke groeten,
 
-> smbclient -U myuser //mydom-dc1.mydom.intern/groups 
-> Enter myuser's password: 
-> protocol negotiation failed: NT_STATUS_CONNECTION_RESET
-
-But this works:
-
-> smbclient -U myuser //mydom-dc1.mydom.intern/groups -m SMB3
-> Enter myuser's password: 
-> Domain=[MYDOM] OS=[] Server=[]
-> smb: \> 
-
-The smbclient command works as well, if 'client max protocol = smb3' is
-specified in /etc/samba/smb.conf.
-
-Strangely specifying the '-m SMB3' before the share, as listed in the
-man page does not work:
-
-> smbclient -m SMB3 -U myuser //mydom-dc1.mydom.intern/groups
-> Enter myuser's password: 
-> session setup failed: NT_STATUS_LOGON_FAILURE
-
-We also had a problem with one OSX-client, which had explicitly
-specified to use SMB1 only, but this problem went away, after removing
-this non-default option.
-
-The problems mentioned above were occurred on a Debian Jessie and an
-Ubuntu 14.04 install. On a Debian-Squeeze I could not get Winbind to
-work again by specifying a 'client max protocol'.
-
-
-I would be grateful for any hint on what to look for, since I am
-completely out of ideas.
-
-Thanks a lot,
-Robert Euhus
+Niels Basjes
