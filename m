@@ -1,130 +1,149 @@
-From: Niels Basjes <Niels-WkKhAqUkEt5mR6Xm/wNWPw@public.gmane.org>
-Subject: Re: CentOS cifs client sees Windows 2012 deduplicated files as symlinks
-Date: Sun, 21 Jun 2015 21:43:55 +0200
-Message-ID: <CADoiZqr=NjgLMrt9o5WUL6zCnRz9bgtBmmcJBWhPd6XRmMkLNA@mail.gmail.com>
-References: <CADoiZqqHT1eh7-BvxpbSg8a5S+kLqBmBi-CXWp562BeXooVLgA@mail.gmail.com>
-	<CADoiZqqc1Opge73nADG=xPtzvAE2oyK5bf6w3nCZ6n8k6bcfag@mail.gmail.com>
-	<CAH2r5msRpHM7yCHEN5J=osLSnfp+PFepsM8tse8dbJ9FugTvHQ@mail.gmail.com>
-	<CADoiZqrt0z7f7zs7917e2tCzFb7UFTvN2kaeYRj-A+F4Nmc7LA@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: CIFS QPathInfo fallback to buggy servers
+Date: Tue, 23 Jun 2015 01:31:21 -0500
+Message-ID: <CAH2r5msRRdnLhWu8rUuF2GTainxkcVw-uwXJMSOkVfay=hQw5Q@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: multipart/mixed; boundary=001a11c3bb3e15515b0519298bca
+To: Gregor Beck <gbeck-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org>,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADoiZqrt0z7f7zs7917e2tCzFb7UFTvN2kaeYRj-A+F4Nmc7LA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Just to let you know:
+--001a11c3bb3e15515b0519298bca
+Content-Type: text/plain; charset=UTF-8
 
-I upgraded from CentOS 7.0 to 7.1 and even though the kernel is still
-3.10 the problem is now gone.
+In cleaning out old email found some older patches of yours that
+implemented a fall back on QueryPathInfo to older QueryInfo levels for
+mounts to NetApp CIFS servers.
 
-Thanks for all your help.
+I cleaned up (correcting some things Jeff Layton had pointed out on
+the mailing list)
+and combined patches 2 through 4 of your series which is attached but
+untested since I don't have a NetApp filer.  I did merge the first one
+of the series (which
+was harmless) but was holding off on the remaining till they were
+cleaned up and tested.
 
-Niels Basjes
-
-On Mon, Jun 15, 2015 at 12:38 PM, Niels Basjes <Niels-WkKhAqUkEt5mR6Xm/wNWPw@public.gmane.org> wrote:
-> I tried adding the option 'vers=2.1' to the mount but that gave an error:
->      mount error(38): Function not implemented
->
-> I do not understand why I saw the files as 'chinese letters' before.
-> After my tests and experiments I have been unable to see them this
-> way.
-> Right now I always see them as a symlink to an empty directory (as you
-> indicated).
->
-> A few days ago someone posted on serverfault that in fact this is a
-> known bug that has been fixed (in kernel 3.13), yet the CentOS 7
-> distribution has not yet picked up on this problem because it is
-> running kernel 3.10.
->
-> See:
-> https://bugs.centos.org/view.php?id=7897
-> http://serverfault.com/questions/697393/centos-cifs-client-sees-windows-2012-deduplicated-files-as-symlinks
->
-> Right now I'm considering to install something like this
-> http://elrepo.org/tiki/kernel-ml and run on Linux Kernel 4.x which
-> should no longer have this problem.
->
-> Niels Basjes
->
->
-> On Thu, Jun 11, 2015 at 6:17 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> Out of curiosity what happens when you mount with smb2 or later (e.g.
->> vers=2.1 on mount) - I expect that they will be recognized
->> differently.
->>
->> Copy on write symlinks are reparse points but I would expect them to
->> look like empty directories.
->>
->> On Thu, Jun 11, 2015 at 6:53 AM, Niels Basjes <Niels-WkKhAqUkEt5mR6Xm/wNWPw@public.gmane.org> wrote:
->>> Hi,
->>>
->>> Last week I ran into a serious problem from my CentOS 7 system using
->>> the cifs client to mount a volume on a Windows 2012-R2 server.
->>> I posted this a problem on ServerFault (
->>> http://serverfault.com/q/697393 ) a few days ago but I thought that it
->>> is usefull to ask here too.
->>> I included some screenshots in the serverfault page so that may be
->>> useful to have a look at.
->>>
->>> The essence of my problem is that the local Windows sysadmin turned on
->>> a feature to deduplicate files on an existing Windows server volume.
->>> After that my Linux system started seeing all the files that were
->>> deduplicated as symlinks to what I can only describe as 'chinese
->>> letters'.
->>> Under Windows 7 everything works fine.
->>>
->>> The way I currently look at this is that what is apparently some kind
->>> of 'copy-on-write hardlink' on the Windows server is interpreted as a
->>> softlink by the cifs client in my CentOS system.
->>>
->>> I have been experimenting with some mount settings but I have been
->>> unable to fix this problem (other than turning off the deduplication).
->>>
->>> My current (Client) setup:
->>> - CentOS 7.0
->>> - samba-client-4.1.1-38.el7_0.x86_64
->>> - samba-common-4.1.1-38.el7_0.x86_64
->>> - samba-libs-4.1.1-38.el7_0.x86_64
->>> - cifs-utils-6.2-7.el7.x86_64
->>>
->>> The command in my /etc/fstab
->>>
->>> \\xxxxxxxx\file\video /var/www/html/wp-content/uploads cifs
->>> nouser_xattr,nounix,iocharset=utf8,credentials=/etc/fstab.cifs.sa_video.credentials,_netdev,uid=apache,gid=apache,rw,auto
->>> 0 0
->>>
->>> How do I get the Linux to see these files as files again?
->>>
->>>
->>> --
->>> Best regards / Met vriendelijke groeten,
->>>
->>> Niels Basjes
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->>
->>
->> --
->> Thanks,
->>
->> Steve
->
->
->
-> --
-> Best regards / Met vriendelijke groeten,
->
-> Niels Basjes
+If you still have access to test these, I can consider them.
 
 
 
 -- 
-Best regards / Met vriendelijke groeten,
+Thanks,
 
-Niels Basjes
+Steve
+
+--001a11c3bb3e15515b0519298bca
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-CIFS-add-functions-for-cifs-query-info-to-fall-back-.patch"
+Content-Disposition: attachment;
+	filename="0001-CIFS-add-functions-for-cifs-query-info-to-fall-back-.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_ib8ycw7h0
+
+RnJvbSBjMzJlNmYyZWUzODdjY2Y0YTdkYjM0MTI4NjYyYTg3MGU0MTNlZGFkIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHNtZnJlbmNoQGdtYWlsLmNvbT4KRGF0
+ZTogVHVlLCAyMyBKdW4gMjAxNSAwMToyNToxMiAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIFtDSUZT
+XSBhZGQgZnVuY3Rpb25zIGZvciBjaWZzIHF1ZXJ5IGluZm8gdG8gZmFsbCBiYWNrIHRvCgpTb21l
+IHNlcnZlcnMgc3VjaCBhcyBOZXRBcHAgZGlkbid0IHN1cHBvcnQgdGhlIG5vcm1hbCBpbmZvIGxl
+dmVscwoKU2lnbmVkLW9mZi1ieTogR3JlZ29yIEJlY2sgPGdiZWNrQHNlcm5ldC5kZT4KLS0tCiBm
+cy9jaWZzL2NpZnNwcm90by5oIHwgIDYgKysrKwogZnMvY2lmcy9jaWZzc21iLmMgICB8IDg3ICsr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tCiAyIGZp
+bGVzIGNoYW5nZWQsIDY2IGluc2VydGlvbnMoKyksIDI3IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdp
+dCBhL2ZzL2NpZnMvY2lmc3Byb3RvLmggYi9mcy9jaWZzL2NpZnNwcm90by5oCmluZGV4IGM2M2Zk
+MWQuLjUzNzIwNDYgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvY2lmc3Byb3RvLmgKKysrIGIvZnMvY2lm
+cy9jaWZzcHJvdG8uaApAQCAtMjQ5LDYgKzI0OSwxMiBAQCBleHRlcm4gaW50IENJRlNTTUJRUGF0
+aEluZm8oY29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGNpZnNfdGNvbiAqdGNvbiwKIAkJ
+CSAgICBjb25zdCBjaGFyICpzZWFyY2hfTmFtZSwgRklMRV9BTExfSU5GTyAqZGF0YSwKIAkJCSAg
+ICBpbnQgbGVnYWN5IC8qIHdoZXRoZXIgdG8gdXNlIG9sZCBpbmZvIGxldmVsICovLAogCQkJICAg
+IGNvbnN0IHN0cnVjdCBubHNfdGFibGUgKm5sc19jb2RlcGFnZSwgaW50IHJlbWFwKTsKK2V4dGVy
+biBpbnQgQ0lGU1NNQlFQYXRoSW5mb0Jhc2ljKGNvbnN0IHVuc2lnbmVkIGludCB4aWQsIHN0cnVj
+dCBjaWZzX3Rjb24gKnRjb24sCisJCQkJIGNvbnN0IGNoYXIgKnNlYXJjaF9uYW1lLCBGSUxFX0JB
+U0lDX0lORk8gKmRhdGEsCisJCQkJIGNvbnN0IHN0cnVjdCBubHNfdGFibGUgKm5sc19jb2RlcGFn
+ZSwgaW50IHJlbWFwKTsKK2V4dGVybiBpbnQgQ0lGU1NNQlFQYXRoSW5mb1N0YW5kYXJkKGNvbnN0
+IHVuc2lnbmVkIGludCB4aWQsIHN0cnVjdCBjaWZzX3Rjb24gKnRjb24sCisJCQkJICAgIGNvbnN0
+IGNoYXIgKnNlYXJjaF9uYW1lLCBGSUxFX1NUQU5EQVJEX0lORk8gKmRhdGEsCisJCQkJICAgIGNv
+bnN0IHN0cnVjdCBubHNfdGFibGUgKm5sc19jb2RlcGFnZSwgaW50IHJlbWFwKTsKIGV4dGVybiBp
+bnQgU01CUXVlcnlJbmZvcm1hdGlvbihjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1Y3QgY2lm
+c190Y29uICp0Y29uLAogCQkJICAgICAgIGNvbnN0IGNoYXIgKnNlYXJjaF9uYW1lLCBGSUxFX0FM
+TF9JTkZPICpkYXRhLAogCQkJICAgICAgIGNvbnN0IHN0cnVjdCBubHNfdGFibGUgKm5sc19jb2Rl
+cGFnZSwgaW50IHJlbWFwKTsKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc3NtYi5jIGIvZnMvY2lm
+cy9jaWZzc21iLmMKaW5kZXggNjcyZWYzNS4uZjg3ZTg1ZiAxMDA2NDQKLS0tIGEvZnMvY2lmcy9j
+aWZzc21iLmMKKysrIGIvZnMvY2lmcy9jaWZzc21iLmMKQEAgLTQwODksMTMgKzQwODksMTMgQEAg
+UUZpbGVJbmZvUmV0cnk6CiAJcmV0dXJuIHJjOwogfQogCi1pbnQKLUNJRlNTTUJRUGF0aEluZm8o
+Y29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGNpZnNfdGNvbiAqdGNvbiwKLQkJIGNvbnN0
+IGNoYXIgKnNlYXJjaF9uYW1lLCBGSUxFX0FMTF9JTkZPICpkYXRhLAotCQkgaW50IGxlZ2FjeSAv
+KiBvbGQgc3R5bGUgaW5mb2xldmVsICovLAotCQkgY29uc3Qgc3RydWN0IG5sc190YWJsZSAqbmxz
+X2NvZGVwYWdlLCBpbnQgcmVtYXApCitzdGF0aWMgaW50CitDSUZTU01CUVBhdGhJbmZvSW1wbChj
+b25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1Y3QgY2lmc190Y29uICp0Y29uLAorCQkgICAgIGNv
+bnN0IGNoYXIgKnNlYXJjaF9uYW1lLAorCQkgICAgIHZvaWQgKmRhdGEsIGludCBzaXplLAorCQkg
+ICAgIF9fdTE2IGxldmVsLCBfX3UxNiBiY2MsCisJCSAgICAgY29uc3Qgc3RydWN0IG5sc190YWJs
+ZSAqbmxzX2NvZGVwYWdlLCBpbnQgcmVtYXApCiB7Ci0JLyogbGV2ZWwgMjYzIFNNQl9RVUVSWV9G
+SUxFX0FMTF9JTkZPICovCiAJVFJBTlNBQ1RJT04yX1FQSV9SRVEgKnBTTUIgPSBOVUxMOwogCVRS
+QU5TQUNUSU9OMl9RUElfUlNQICpwU01CciA9IE5VTEw7CiAJaW50IHJjID0gMDsKQEAgLTQxMDMs
+NyArNDEwMyw3IEBAIENJRlNTTUJRUGF0aEluZm8oY29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3Ry
+dWN0IGNpZnNfdGNvbiAqdGNvbiwKIAlpbnQgbmFtZV9sZW47CiAJX191MTYgcGFyYW1zLCBieXRl
+X2NvdW50OwogCi0JLyogY2lmc19kYmcoRllJLCAiSW4gUVBhdGhJbmZvIHBhdGggJXNcbiIsIHNl
+YXJjaF9uYW1lKTsgKi8KKwljaWZzX2RiZyhGWUksICJJbiBRUGF0aEluZm8gbGV2ZWwgJXUgcGF0
+aCAlcyIsIGxldmVsLCBzZWFyY2hfbmFtZSk7CiBRUGF0aEluZm9SZXRyeToKIAlyYyA9IHNtYl9p
+bml0KFNNQl9DT01fVFJBTlNBQ1RJT04yLCAxNSwgdGNvbiwgKHZvaWQgKiopICZwU01CLAogCQkg
+ICAgICAodm9pZCAqKikgJnBTTUJyKTsKQEAgLTQxNDIsMTAgKzQxNDIsNyBAQCBRUGF0aEluZm9S
+ZXRyeToKIAlieXRlX2NvdW50ID0gcGFyYW1zICsgMSAvKiBwYWQgKi8gOwogCXBTTUItPlRvdGFs
+UGFyYW1ldGVyQ291bnQgPSBjcHVfdG9fbGUxNihwYXJhbXMpOwogCXBTTUItPlBhcmFtZXRlckNv
+dW50ID0gcFNNQi0+VG90YWxQYXJhbWV0ZXJDb3VudDsKLQlpZiAobGVnYWN5KQotCQlwU01CLT5J
+bmZvcm1hdGlvbkxldmVsID0gY3B1X3RvX2xlMTYoU01CX0lORk9fU1RBTkRBUkQpOwotCWVsc2UK
+LQkJcFNNQi0+SW5mb3JtYXRpb25MZXZlbCA9IGNwdV90b19sZTE2KFNNQl9RVUVSWV9GSUxFX0FM
+TF9JTkZPKTsKKwlwU01CLT5JbmZvcm1hdGlvbkxldmVsID0gY3B1X3RvX2xlMTYobGV2ZWwpOwog
+CXBTTUItPlJlc2VydmVkNCA9IDA7CiAJaW5jX3JmYzEwMDFfbGVuKHBTTUIsIGJ5dGVfY291bnQp
+OwogCXBTTUItPkJ5dGVDb3VudCA9IGNwdV90b19sZTE2KGJ5dGVfY291bnQpOwpAQCAtNDE1OSwy
+NSArNDE1NiwxMCBAQCBRUGF0aEluZm9SZXRyeToKIAogCQlpZiAocmMpIC8qIEJCIGFkZCBhdXRv
+IHJldHJ5IG9uIEVPUE5PVFNVUFA/ICovCiAJCQlyYyA9IC1FSU87Ci0JCWVsc2UgaWYgKCFsZWdh
+Y3kgJiYgZ2V0X2JjYygmcFNNQnItPmhkcikgPCA0MCkKKwkJZWxzZSBpZiAoZ2V0X2JjYygmcFNN
+QnItPmhkcikgPCBiY2MpCiAJCQlyYyA9IC1FSU87CS8qIGJhZCBzbWIgKi8KLQkJZWxzZSBpZiAo
+bGVnYWN5ICYmIGdldF9iY2MoJnBTTUJyLT5oZHIpIDwgMjQpCi0JCQlyYyA9IC1FSU87ICAvKiAy
+NCBvciAyNiBleHBlY3RlZCBidXQgd2UgZG8gbm90IHJlYWQKLQkJCQkJbGFzdCBmaWVsZCAqLwog
+CQllbHNlIGlmIChkYXRhKSB7Ci0JCQlpbnQgc2l6ZTsKIAkJCV9fdTE2IGRhdGFfb2Zmc2V0ID0g
+bGUxNl90b19jcHUocFNNQnItPnQyLkRhdGFPZmZzZXQpOwotCi0JCQkvKgotCQkJICogT24gbGVn
+YWN5IHJlc3BvbnNlcyB3ZSBkbyBub3QgcmVhZCB0aGUgbGFzdCBmaWVsZCwKLQkJCSAqIEVBc2l6
+ZSwgZm9ydHVuYXRlbHkgc2luY2UgaXQgdmFyaWVzIGJ5IHN1YmRpYWxlY3QgYW5kCi0JCQkgKiBh
+bHNvIG5vdGUgaXQgZGlmZmVycyBvbiBTZXQgdnMgR2V0LCBpZSB0d28gYnl0ZXMgb3IgNAotCQkJ
+ICogYnl0ZXMgZGVwZW5kaW5nIGJ1dCB3ZSBkb24ndCBjYXJlIGhlcmUuCi0JCQkgKi8KLQkJCWlm
+IChsZWdhY3kpCi0JCQkJc2l6ZSA9IHNpemVvZihGSUxFX0lORk9fU1RBTkRBUkQpOwotCQkJZWxz
+ZQotCQkJCXNpemUgPSBzaXplb2YoRklMRV9BTExfSU5GTyk7CiAJCQltZW1jcHkoKGNoYXIgKikg
+ZGF0YSwgKGNoYXIgKikgJnBTTUJyLT5oZHIuUHJvdG9jb2wgKwogCQkJICAgICAgIGRhdGFfb2Zm
+c2V0LCBzaXplKTsKIAkJfSBlbHNlCkBAIC00MTkxLDYgKzQxNzMsNTcgQEAgUVBhdGhJbmZvUmV0
+cnk6CiB9CiAKIGludAorQ0lGU1NNQlFQYXRoSW5mbyhjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBz
+dHJ1Y3QgY2lmc190Y29uICp0Y29uLAorCQkgY29uc3QgY2hhciAqc2VhcmNoX25hbWUsIEZJTEVf
+QUxMX0lORk8gKmRhdGEsCisJCSBpbnQgbGVnYWN5IC8qIG9sZCBzdHlsZSBpbmZvbGV2ZWwgKi8s
+CisJCSBjb25zdCBzdHJ1Y3QgbmxzX3RhYmxlICpubHNfY29kZXBhZ2UsIGludCByZW1hcCkKK3sK
+KwlpZiAobGVnYWN5KSB7CisJCS8qIAorCQkgKiAyNCBvciAyNiBleHBlY3RlZCBidXQgb24gbGVn
+YWN5IHJlc3BvbnNlcyB3ZSBkbyBub3QgcmVhZCB0aGUKKwkJICogbGFzdCBmaWVsZCwgRUFzaXpl
+LCBmb3J0dW5hdGVseSBzaW5jZSBpdCB2YXJpZXMgYnkgc3ViZGlhbGVjdAorCQkgKiBhbmQgYWxz
+byBub3RlIGl0IGRpZmZlcnMgb24gU2V0IHZzLiBHZXQsIGllIHR3byBieXRlcyBvciA0CisJCSAq
+IGJ5dGVzIGRlcGVuZGluZyBidXQgd2UgZG9uJ3QgY2FyZSBoZXJlCisJCSAqLworCQlyZXR1cm4g
+Q0lGU1NNQlFQYXRoSW5mb0ltcGwoeGlkLCB0Y29uLCBzZWFyY2hfbmFtZSwKKwkJCQkJICAgIGRh
+dGEsIHNpemVvZihGSUxFX0lORk9fU1RBTkRBUkQpLAorCQkJCQkgICAgU01CX0lORk9fU1RBTkRB
+UkQsCisJCQkJCSAgICBzaXplb2YoRklMRV9JTkZPX1NUQU5EQVJEKSwKKwkJCQkJICAgIG5sc19j
+b2RlcGFnZSwgcmVtYXApOworCX0gZWxzZSB7CisJCXJldHVybiBDSUZTU01CUVBhdGhJbmZvSW1w
+bCh4aWQsIHRjb24sIHNlYXJjaF9uYW1lLAorCQkJCQkgICAgZGF0YSwgc2l6ZW9mKEZJTEVfQUxM
+X0lORk8pLAorCQkJCQkgICAgU01CX1FVRVJZX0ZJTEVfQUxMX0lORk8sCisJCQkJCSAgICBzaXpl
+b2YoRklMRV9BTExfSU5GTyksCisJCQkJCSAgICBubHNfY29kZXBhZ2UsIHJlbWFwKTsKKwl9Cit9
+CisKK2ludAorQ0lGU1NNQlFQYXRoSW5mb0Jhc2ljKGNvbnN0IHVuc2lnbmVkIGludCB4aWQsIHN0
+cnVjdCBjaWZzX3Rjb24gKnRjb24sCisJCSAgICAgIGNvbnN0IGNoYXIgKnNlYXJjaF9uYW1lLCBG
+SUxFX0JBU0lDX0lORk8gKmRhdGEsCisJCSAgICAgIGNvbnN0IHN0cnVjdCBubHNfdGFibGUgKm5s
+c19jb2RlcGFnZSwgaW50IHJlbWFwKQoreworCXJldHVybiBDSUZTU01CUVBhdGhJbmZvSW1wbCh4
+aWQsIHRjb24sIHNlYXJjaF9uYW1lLAorCQkJCSAgICBkYXRhLCBzaXplb2YoRklMRV9CQVNJQ19J
+TkZPKSwKKwkJCQkgICAgU01CX1FVRVJZX0ZJTEVfQkFTSUNfSU5GTywKKwkJCQkgICAgc2l6ZW9m
+KEZJTEVfQkFTSUNfSU5GTyksCisJCQkJICAgIG5sc19jb2RlcGFnZSwgcmVtYXApOworfQorCitp
+bnQKK0NJRlNTTUJRUGF0aEluZm9TdGFuZGFyZChjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1
+Y3QgY2lmc190Y29uICp0Y29uLAorCQkJIGNvbnN0IGNoYXIgKnNlYXJjaF9uYW1lLCBGSUxFX1NU
+QU5EQVJEX0lORk8gKmRhdGEsCisJCQkgY29uc3Qgc3RydWN0IG5sc190YWJsZSAqbmxzX2NvZGVw
+YWdlLCBpbnQgcmVtYXApCit7CisJcmV0dXJuIENJRlNTTUJRUGF0aEluZm9JbXBsKHhpZCwgdGNv
+biwgc2VhcmNoX25hbWUsCisJCQkJICAgIGRhdGEsIHNpemVvZihGSUxFX1NUQU5EQVJEX0lORk8p
+LAorCQkJCSAgICBTTUJfUVVFUllfRklMRV9TVEFOREFSRF9JTkZPLAorCQkJCSAgICBzaXplb2Yo
+RklMRV9TVEFOREFSRF9JTkZPKSwKKwkJCQkgICAgbmxzX2NvZGVwYWdlLCByZW1hcCk7Cit9CisK
+K2ludAogQ0lGU1NNQlVuaXhRRmlsZUluZm8oY29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0
+IGNpZnNfdGNvbiAqdGNvbiwKIAkJIHUxNiBuZXRmaWQsIEZJTEVfVU5JWF9CQVNJQ19JTkZPICpw
+RmluZERhdGEpCiB7Ci0tIAoxLjkuMQoK
+--001a11c3bb3e15515b0519298bca--
