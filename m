@@ -1,161 +1,211 @@
-From: Steve French <smfrench@gmail.com>
-Subject: [PATCH 1/5] Add SMB3.11 mount option synonym for new dialect
-Date: Sun, 28 Jun 2015 18:36:06 -0500
-Message-ID: <1435534570-10864-1-git-send-email-steve.french@primarydata.com>
-Cc: linux-fsdevel@vger.kernel.org, Steve French <smfrench@gmail.com>,
-	Steve French <steve.french@primarydata.com>
-To: linux-cifs@vger.kernel.org
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH 2/5] Add reflink copy over SMB3.11 with new FSCTL_DUPLICATE_EXTENTS
+Date: Sun, 28 Jun 2015 18:36:07 -0500
+Message-ID: <1435534570-10864-2-git-send-email-steve.french@primarydata.com>
+References: <1435534570-10864-1-git-send-email-steve.french@primarydata.com>
+Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1435534570-10864-1-git-send-email-steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-From: Steve French <smfrench@gmail.com>
+ Getting fantastic copy performance with cp --reflink over SMB3.11
+ using the new FSCTL_DUPLICATE_EXTENTS.
 
-Most people think of SMB 3.1.1 as SMB version 3.11 so add synonym
-for "vers=3.1.1" of "vers=3.11" on mount.
+ This FSCTL was added in the SMB3.11 dialect (testing was
+ against REFS file system) so have put it as a 3.11 protocol
+ specific operation ("vers=3.1.1" on the mount).  Tested at
+ the SMB3 plugfest in Redmond.
 
-Also make sure that unlike SMB3.0 and 3.02 we don't send
-validate negotiate on mount (it is handled by negotiate contexts) -
-add list of SMB3.11 specific functions (distinct from 3.0 dialect).
+ It depends on the new FS Attribute (BLOCK_REFCOUNTING) which
+ is used to advertise support for the ability to do this ioctl
+ (if you can support multiple files pointing to the same block
+ than this refcounting ability or equivalent is needed to
+ support the new reflink-like duplicate extent SMB3 ioctl.
 
-Signed-off-by: Steve French <steve.french@primarydata.com>w
+Signed-off-by: Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
 ---
- fs/cifs/cifsglob.h |  3 +-
- fs/cifs/connect.c  |  3 +-
- fs/cifs/smb2ops.c  | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 90 insertions(+), 2 deletions(-)
+ fs/cifs/cifsglob.h |  3 +++
+ fs/cifs/cifspdu.h  |  2 ++
+ fs/cifs/ioctl.c    | 16 +++++++++++++---
+ fs/cifs/smb2ops.c  | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2pdu.h  |  8 ++++++++
+ fs/cifs/smbfsctl.h |  1 +
+ 6 files changed, 75 insertions(+), 3 deletions(-)
 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 71bf86e..a0212ec 100644
+index a0212ec..81194e6 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -1622,6 +1622,7 @@ extern struct smb_version_values smb30_values;
- /*extern struct smb_version_operations smb302_operations;*/ /* not needed yet */
- extern struct smb_version_values smb302_values;
- #define SMB311_VERSION_STRING	"3.1.1"
--/*extern struct smb_version_operations smb311_operations;*/ /* not needed yet */
-+#define ALT_SMB311_VERSION_STRING "3.11"
-+extern struct smb_version_operations smb311_operations;
- extern struct smb_version_values smb311_values;
- #endif	/* _CIFS_GLOB_H */
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 9300b98..247f4dd 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -282,6 +282,7 @@ static const match_table_t cifs_smb_version_tokens = {
- 	{ Smb_302, SMB302_VERSION_STRING },
- #ifdef CONFIG_CIFS_SMB311
- 	{ Smb_311, SMB311_VERSION_STRING },
-+	{ Smb_311, ALT_SMB311_VERSION_STRING },
- #endif /* SMB311 */
- 	{ Smb_version_err, NULL }
- };
-@@ -1139,7 +1140,7 @@ cifs_parse_smb_version(char *value, struct smb_vol *vol)
- 		break;
- #ifdef CONFIG_CIFS_SMB311
- 	case Smb_311:
--		vol->ops = &smb30_operations; /* currently identical with 3.0 */
-+		vol->ops = &smb311_operations;
- 		vol->vals = &smb311_values;
- 		break;
- #endif /* SMB311 */
+@@ -390,6 +390,9 @@ struct smb_version_operations {
+ 	int (*clone_range)(const unsigned int, struct cifsFileInfo *src_file,
+ 			struct cifsFileInfo *target_file, u64 src_off, u64 len,
+ 			u64 dest_off);
++	int (*duplicate_extents)(const unsigned int, struct cifsFileInfo *src,
++			struct cifsFileInfo *target_file, u64 src_off, u64 len,
++			u64 dest_off);
+ 	int (*validate_negotiate)(const unsigned int, struct cifs_tcon *);
+ 	ssize_t (*query_all_EAs)(const unsigned int, struct cifs_tcon *,
+ 			const unsigned char *, const unsigned char *, char *,
+diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
+index 998a66f..47b030d 100644
+--- a/fs/cifs/cifspdu.h
++++ b/fs/cifs/cifspdu.h
+@@ -2255,6 +2255,8 @@ typedef struct {
+ 
+ 
+ /* List of FileSystemAttributes - see 2.5.1 of MS-FSCC */
++#define FILE_SUPPORTS_SPARSE_VDL	0x10000000 /* faster nonsparse extend */
++#define FILE_SUPPORTS_BLOCK_REFCOUNTING	0x08000000 /* allow ioctl dup extents */
+ #define FILE_SUPPORT_INTEGRITY_STREAMS	0x04000000
+ #define FILE_SUPPORTS_USN_JOURNAL	0x02000000
+ #define FILE_SUPPORTS_OPEN_BY_FILE_ID	0x01000000
+diff --git a/fs/cifs/ioctl.c b/fs/cifs/ioctl.c
+index 8b7898b..7843b19 100644
+--- a/fs/cifs/ioctl.c
++++ b/fs/cifs/ioctl.c
+@@ -31,12 +31,14 @@
+ #include "cifsproto.h"
+ #include "cifs_debug.h"
+ #include "cifsfs.h"
++#include <linux/btrfs.h>
+ 
+ #define CIFS_IOCTL_MAGIC	0xCF
+ #define CIFS_IOC_COPYCHUNK_FILE	_IOW(CIFS_IOCTL_MAGIC, 3, int)
+ 
+ static long cifs_ioctl_clone(unsigned int xid, struct file *dst_file,
+-			unsigned long srcfd, u64 off, u64 len, u64 destoff)
++			unsigned long srcfd, u64 off, u64 len, u64 destoff,
++			bool dup_extents)
+ {
+ 	int rc;
+ 	struct cifsFileInfo *smb_file_target = dst_file->private_data;
+@@ -109,9 +111,14 @@ static long cifs_ioctl_clone(unsigned int xid, struct file *dst_file,
+ 	truncate_inode_pages_range(&target_inode->i_data, destoff,
+ 				   PAGE_CACHE_ALIGN(destoff + len)-1);
+ 
+-	if (target_tcon->ses->server->ops->clone_range)
++	if (dup_extents && target_tcon->ses->server->ops->duplicate_extents)
++		rc = target_tcon->ses->server->ops->duplicate_extents(xid,
++			smb_file_src, smb_file_target, off, len, destoff);
++	else if (!dup_extents && target_tcon->ses->server->ops->clone_range)
+ 		rc = target_tcon->ses->server->ops->clone_range(xid,
+ 			smb_file_src, smb_file_target, off, len, destoff);
++	else
++		rc = -EOPNOTSUPP;
+ 
+ 	/* force revalidate of size and timestamps of target file now
+ 	   that target is updated on the server */
+@@ -205,7 +212,10 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
+ 			}
+ 			break;
+ 		case CIFS_IOC_COPYCHUNK_FILE:
+-			rc = cifs_ioctl_clone(xid, filep, arg, 0, 0, 0);
++			rc = cifs_ioctl_clone(xid, filep, arg, 0, 0, 0, false);
++			break;
++		case BTRFS_IOC_CLONE:
++			rc = cifs_ioctl_clone(xid, filep, arg, 0, 0, 0, true);
+ 			break;
+ 		default:
+ 			cifs_dbg(FYI, "unsupported ioctl\n");
 diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index a7d520c..c7d228c 100644
+index c7d228c..d8a124c 100644
 --- a/fs/cifs/smb2ops.c
 +++ b/fs/cifs/smb2ops.c
-@@ -1635,6 +1635,92 @@ struct smb_version_operations smb30_operations = {
- 	.fallocate = smb3_fallocate,
- };
+@@ -806,6 +806,53 @@ smb2_set_file_size(const unsigned int xid, struct cifs_tcon *tcon,
+ 			    cfile->fid.volatile_fid, cfile->pid, &eof, false);
+ }
  
 +#ifdef CONFIG_CIFS_SMB311
-+struct smb_version_operations smb311_operations = {
-+	.compare_fids = smb2_compare_fids,
-+	.setup_request = smb2_setup_request,
-+	.setup_async_request = smb2_setup_async_request,
-+	.check_receive = smb2_check_receive,
-+	.add_credits = smb2_add_credits,
-+	.set_credits = smb2_set_credits,
-+	.get_credits_field = smb2_get_credits_field,
-+	.get_credits = smb2_get_credits,
-+	.wait_mtu_credits = smb2_wait_mtu_credits,
-+	.get_next_mid = smb2_get_next_mid,
-+	.read_data_offset = smb2_read_data_offset,
-+	.read_data_length = smb2_read_data_length,
-+	.map_error = map_smb2_to_linux_error,
-+	.find_mid = smb2_find_mid,
-+	.check_message = smb2_check_message,
-+	.dump_detail = smb2_dump_detail,
-+	.clear_stats = smb2_clear_stats,
-+	.print_stats = smb2_print_stats,
-+	.dump_share_caps = smb2_dump_share_caps,
-+	.is_oplock_break = smb2_is_valid_oplock_break,
-+	.downgrade_oplock = smb2_downgrade_oplock,
-+	.need_neg = smb2_need_neg,
-+	.negotiate = smb2_negotiate,
-+	.negotiate_wsize = smb2_negotiate_wsize,
-+	.negotiate_rsize = smb2_negotiate_rsize,
-+	.sess_setup = SMB2_sess_setup,
-+	.logoff = SMB2_logoff,
-+	.tree_connect = SMB2_tcon,
-+	.tree_disconnect = SMB2_tdis,
-+	.qfs_tcon = smb3_qfs_tcon,
-+	.is_path_accessible = smb2_is_path_accessible,
-+	.can_echo = smb2_can_echo,
-+	.echo = SMB2_echo,
-+	.query_path_info = smb2_query_path_info,
-+	.get_srv_inum = smb2_get_srv_inum,
-+	.query_file_info = smb2_query_file_info,
-+	.set_path_size = smb2_set_path_size,
-+	.set_file_size = smb2_set_file_size,
-+	.set_file_info = smb2_set_file_info,
-+	.set_compression = smb2_set_compression,
-+	.mkdir = smb2_mkdir,
-+	.mkdir_setinfo = smb2_mkdir_setinfo,
-+	.rmdir = smb2_rmdir,
-+	.unlink = smb2_unlink,
-+	.rename = smb2_rename_path,
-+	.create_hardlink = smb2_create_hardlink,
-+	.query_symlink = smb2_query_symlink,
-+	.query_mf_symlink = smb3_query_mf_symlink,
-+	.create_mf_symlink = smb3_create_mf_symlink,
-+	.open = smb2_open_file,
-+	.set_fid = smb2_set_fid,
-+	.close = smb2_close_file,
-+	.flush = smb2_flush_file,
-+	.async_readv = smb2_async_readv,
-+	.async_writev = smb2_async_writev,
-+	.sync_read = smb2_sync_read,
-+	.sync_write = smb2_sync_write,
-+	.query_dir_first = smb2_query_dir_first,
-+	.query_dir_next = smb2_query_dir_next,
-+	.close_dir = smb2_close_dir,
-+	.calc_smb_size = smb2_calc_size,
-+	.is_status_pending = smb2_is_status_pending,
-+	.oplock_response = smb2_oplock_response,
-+	.queryfs = smb2_queryfs,
-+	.mand_lock = smb2_mand_lock,
-+	.mand_unlock_range = smb2_unlock_range,
-+	.push_mand_locks = smb2_push_mandatory_locks,
-+	.get_lease_key = smb2_get_lease_key,
-+	.set_lease_key = smb2_set_lease_key,
-+	.new_lease_key = smb2_new_lease_key,
-+	.generate_signingkey = generate_smb3signingkey,
-+	.calc_signature = smb3_calc_signature,
-+	.is_read_op = smb21_is_read_op,
-+	.set_oplock_level = smb3_set_oplock_level,
-+	.create_lease_buf = smb3_create_lease_buf,
-+	.parse_lease_buf = smb3_parse_lease_buf,
-+	.clone_range = smb2_clone_range,
-+/*	.validate_negotiate = smb3_validate_negotiate, */ /* not used in 3.11 */
-+	.wp_retry_size = smb2_wp_retry_size,
-+	.dir_needs_close = smb2_dir_needs_close,
-+	.fallocate = smb3_fallocate,
-+};
-+#endif /* CIFS_SMB311 */
++static int
++smb2_duplicate_extents(const unsigned int xid,
++			struct cifsFileInfo *srcfile,
++			struct cifsFileInfo *trgtfile, u64 src_off,
++			u64 len, u64 dest_off)
++{
++	int rc;
++	unsigned int ret_data_len;
++	char *retbuf = NULL;
++	struct duplicate_extents_to_file dup_ext_buf;
++	struct cifs_tcon *tcon = tlink_tcon(trgtfile->tlink);
 +
- struct smb_version_values smb20_values = {
- 	.version_string = SMB20_VERSION_STRING,
- 	.protocol_id = SMB20_PROT_ID,
++	/* server fileays advertise duplicate extent support with this flag */
++	if ((le32_to_cpu(tcon->fsAttrInfo.Attributes) &
++	     FILE_SUPPORTS_BLOCK_REFCOUNTING) == 0)
++		return -EOPNOTSUPP;
++
++	dup_ext_buf.VolatileFileHandle = srcfile->fid.volatile_fid;
++	dup_ext_buf.PersistentFileHandle = srcfile->fid.persistent_fid;
++	dup_ext_buf.SourceFileOffset = cpu_to_le64(src_off);
++	dup_ext_buf.TargetFileOffset = cpu_to_le64(dest_off);
++	dup_ext_buf.ByteCount = cpu_to_le64(len);
++	cifs_dbg(FYI, "duplicate extents: src off %lld dst off %lld len %lld",
++		src_off, dest_off, len);
++
++	rc = smb2_set_file_size(xid, tcon, trgtfile, len, false);
++	if (rc)
++		goto duplicate_extents_out;
++
++	rc = SMB2_ioctl(xid, tcon, trgtfile->fid.persistent_fid,
++			trgtfile->fid.volatile_fid,
++			FSCTL_DUPLICATE_EXTENTS_TO_FILE,
++			true /* is_fsctl */, (char *)&dup_ext_buf,
++			sizeof(struct duplicate_extents_to_file),
++			(char **)&retbuf,
++			&ret_data_len);
++
++	if (ret_data_len > 0)
++		cifs_dbg(FYI, "non-zero response length in duplicate extents");
++
++duplicate_extents_out:
++	return rc;
++}
++#endif /* CONFIG_CIFS_SMB311 */
++
++
+ static int
+ smb2_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
+ 		   struct cifsFileInfo *cfile)
+@@ -1714,6 +1761,7 @@ struct smb_version_operations smb311_operations = {
+ 	.create_lease_buf = smb3_create_lease_buf,
+ 	.parse_lease_buf = smb3_parse_lease_buf,
+ 	.clone_range = smb2_clone_range,
++	.duplicate_extents = smb2_duplicate_extents,
+ /*	.validate_negotiate = smb3_validate_negotiate, */ /* not used in 3.11 */
+ 	.wp_retry_size = smb2_wp_retry_size,
+ 	.dir_needs_close = smb2_dir_needs_close,
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index 725283a..8e7bbe5 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -654,6 +654,14 @@ struct compress_ioctl {
+ 	__le16 CompressionState; /* See cifspdu.h for possible flag values */
+ } __packed;
+ 
++struct duplicate_extents_to_file {
++	__u64 PersistentFileHandle; /* source file handle, opaque endianness */
++	__u64 VolatileFileHandle;
++	__le64 SourceFileOffset;
++	__le64 TargetFileOffset;
++	__le64 ByteCount;  /* Bytes to be copied */
++} __packed;
++
+ struct smb2_ioctl_req {
+ 	struct smb2_hdr hdr;
+ 	__le16 StructureSize;	/* Must be 57 */
+diff --git a/fs/cifs/smbfsctl.h b/fs/cifs/smbfsctl.h
+index 83efa59..d098da6 100644
+--- a/fs/cifs/smbfsctl.h
++++ b/fs/cifs/smbfsctl.h
+@@ -78,6 +78,7 @@
+ #define FSCTL_QUERY_ALLOCATED_RANGES 0x000940CF /* BB add struct */
+ #define FSCTL_SET_DEFECT_MANAGEMENT  0x00098134 /* BB add struct */
+ #define FSCTL_FILE_LEVEL_TRIM        0x00098208 /* BB add struct */
++#define FSCTL_DUPLICATE_EXTENTS_TO_FILE 0x00098344
+ #define FSCTL_SIS_LINK_FILES         0x0009C104
+ #define FSCTL_PIPE_PEEK              0x0011400C /* BB add struct */
+ #define FSCTL_PIPE_TRANSCEIVE        0x0011C017 /* BB add struct */
 -- 
 2.1.4
-
