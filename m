@@ -1,35 +1,72 @@
-From: dark.star777-NKkJACngtoFBDgjK7y7TUQ@public.gmane.org
-Subject: permissions
-Date: Mon, 29 Jun 2015 16:49:07 +0200
-Message-ID: <0M8lr8-1ZLiNb0OaK-00CDlm@mail.gmx.com>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: Unset CIFS_MOUNT_POSIX_PATHS flag when following
+ dfs mounts
+Date: Mon, 29 Jun 2015 12:25:33 -0500
+Message-ID: <CAH2r5mvQ_wx5fXL53jEFQxaiHXEoJO6LJBmZFRCsSrObD3t9OQ@mail.gmail.com>
+References: <1434468977-25651-1-git-send-email-sprabhu@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1434468977-25651-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-hi
-i know this is a very hoary old chestnut and crops up all the time 
-but i am utterly stumped and cant find a solution.
+merged into cifs-2.6.git
+
+Let me know if any other patches that you want to review ASAP for merge=
+ window.
+
+On Tue, Jun 16, 2015 at 10:36 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wr=
+ote:
+> In a dfs setup where the client transitions from a server which suppo=
+rts
+> posix paths to a server which doesn't support posix paths, the flag
+> CIFS_MOUNT_POSIX_PATHS is not reset. This leads to the wrong director=
+y
+> separator being used causing smb commands to fail.
+>
+> Consider the following case where a dfs share on a samba server point=
+s
+> to a share on windows smb server.
+>  # mount -t cifs -o .. //vm140-31/dfsroot/testwin/
+>  # ls -l /mnt; touch /mnt/a
+>  total 0
+>  touch: cannot touch =E2=80=98/mnt/a=E2=80=99: No such file or direct=
+ory
+>
+> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/connect.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 8383d5e..a59370b 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -3461,6 +3461,8 @@ try_mount_again:
+>                 else if (ses)
+>                         cifs_put_smb_ses(ses);
+>
+> +               cifs_sb->mnt_cifs_flags &=3D ~CIFS_MOUNT_POSIX_PATHS;
+> +
+>                 free_xid(xid);
+>         }
+>  #endif
+> --
+> 2.4.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
-i've got small mobile device whic is a linio plextalk
-its running win ce to do its stuff
-it exports a samba/cifs share
-and i canmount it  but i cant access anything on it.
-read or write.
 
-  i went through the manwell and tried every combination of security user file modes groups and passwords i can find but its not haivng any of it.
-so its not the mount options.
+--=20
+Thanks,
 
-have trid it on a 2.6.33.5 and 3.0 and 3.4 kernel mount
-on vanilla linux/debian wheezy and bananian,same problem m so its not the cifs version.
-
-i treid dumping the tcp msgs and its sending the smb blocks ok but i cant get past the permissions problem.
-
-i can access it ok form win xp, service pack 2.
-ok its somethign to do with the way win ce does the permissions and how these are translated for linux
-any suggestions as to how to go about debugging this woudl be much appreciated.
-
-
-ta muchly
-neil foster
+Steve
