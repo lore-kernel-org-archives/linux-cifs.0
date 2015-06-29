@@ -1,19 +1,19 @@
 From: Steve French <steve.french@primarydata.com>
-Subject: Re: [PATCHv2] Add reflink copy over SMB3.11 with new
+Subject: Fwd: [PATCHv2] Add reflink copy over SMB3.11 with new
 	FSCTL_DUPLICATE_EXTENTS
-Date: Mon, 29 Jun 2015 16:49:01 -0500
-Message-ID: <CALSSpE6YTLmB6zQ6foRYXOMH+SyhhHGEvSNPo0iMqQWTs9hbDw@mail.gmail.com>
+Date: Mon, 29 Jun 2015 16:49:58 -0500
+Message-ID: <CALSSpE5PLpa00Aun-PyW67R_myOzyVAhVi7-18Pk-uaUmNHstw@mail.gmail.com>
 References: <1435544465-14133-1-git-send-email-steve.french@primarydata.com>
 	<20150629172704.GA10038@birch.djwong.org>
 	<CALSSpE5nuE_45PMCKsNBqrg_r9z=+cdCEkBvV1bx=gmiWnRSzw@mail.gmail.com>
 	<20150629213126.GB10038@birch.djwong.org>
+	<CALSSpE6YTLmB6zQ6foRYXOMH+SyhhHGEvSNPo0iMqQWTs9hbDw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/related; boundary=089e0160c154c9e4c00519af0e2a
-Cc: linux-fsdevel@vger.kernel.org, Steve French <smfrench@gmail.com>,
-	samba-technical@lists.samba.org, linux-cifs@vger.kernel.org
-To: "Darrick J. Wong" <darrick.wong@oracle.com>
+Content-Type: multipart/related; boundary=001a11349536396ddc0519af12ab
+To: linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	samba-technical@lists.samba.org
 Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <20150629213126.GB10038@birch.djwong.org>
+In-Reply-To: <CALSSpE6YTLmB6zQ6foRYXOMH+SyhhHGEvSNPo0iMqQWTs9hbDw@mail.gmail.com>
 List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
 	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
 List-Archive: <http://lists.samba.org/pipermail/samba-technical>
@@ -25,7 +25,7 @@ Sender: samba-technical-bounces@lists.samba.org
 Errors-To: samba-technical-bounces@lists.samba.org
 List-Id: linux-cifs.vger.kernel.org
 
---089e0160c154c9e4c00519af0e2a
+--001a11349536396ddc0519af12ab
 Content-Type: text/plain; charset=UTF-8
 
 On Mon, Jun 29, 2015 at 4:31 PM, Darrick J. Wong <darrick.wong@oracle.com>
@@ -238,7 +238,24 @@ www.primarydata.com
 
 [image: cid:E5DD7677-4C3D-4DB7-95DC-31E18398703A]
 
---089e0160c154c9e4c00519af0e2a
+
+
+
+-- 
+
+*Steve French*
+
+Principal Systems Engineer: Protocols
+
+W: 512-918-9276
+
+C:  512-501-9669
+
+www.primarydata.com
+
+[image: cid:E5DD7677-4C3D-4DB7-95DC-31E18398703A]
+
+--001a11349536396ddc0519af12ab
 Content-Type: image/png; name="image001.png"
 Content-Disposition: inline; filename="image001.png"
 Content-Transfer-Encoding: base64
@@ -338,4 +355,4 @@ D7xWxd/e7msuNTX9C+19+Ips3tnJXqaeSMb7yxpLbFdiGwyvpTbnda38QnFvsoVy7GFwJrwLIiiM
 ieIXhbnYhsAE8L58tsrZYLYz0/m2cl5jwI39howVE7SXXp4uxmvplk1XwOzpczhhU3PHr5VlrI5/
 1Z33CntxawPAXX8hvAfWwnzY4sS01l7ZqWye1cxvyu6Wyg+rxTUauyUujBnrUXCXePJvb+nNhI+D
 i9ktlbOJRwOfi9/apsGfYIuT/wMufVnvADFbgwAAAABJRU5ErkJggg==
---089e0160c154c9e4c00519af0e2a--
+--001a11349536396ddc0519af12ab--
