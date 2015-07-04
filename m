@@ -1,358 +1,188 @@
-From: Steve French <steve.french@primarydata.com>
-Subject: Fwd: [PATCHv2] Add reflink copy over SMB3.11 with new
-	FSCTL_DUPLICATE_EXTENTS
-Date: Mon, 29 Jun 2015 16:49:58 -0500
-Message-ID: <CALSSpE5PLpa00Aun-PyW67R_myOzyVAhVi7-18Pk-uaUmNHstw@mail.gmail.com>
-References: <1435544465-14133-1-git-send-email-steve.french@primarydata.com>
-	<20150629172704.GA10038@birch.djwong.org>
-	<CALSSpE5nuE_45PMCKsNBqrg_r9z=+cdCEkBvV1bx=gmiWnRSzw@mail.gmail.com>
-	<20150629213126.GB10038@birch.djwong.org>
-	<CALSSpE6YTLmB6zQ6foRYXOMH+SyhhHGEvSNPo0iMqQWTs9hbDw@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: multipart/related; boundary=001a11349536396ddc0519af12ab
-To: linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	samba-technical@lists.samba.org
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <CALSSpE6YTLmB6zQ6foRYXOMH+SyhhHGEvSNPo0iMqQWTs9hbDw@mail.gmail.com>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
+From: Steve French <smfrench@gmail.com>
+Subject: [PATCH 1/2] Add way to query server fs info for smb3
+Date: Sat,  4 Jul 2015 18:56:45 -0500
+Message-ID: <1436054205-27501-1-git-send-email-steve.french@primarydata.com>
+Cc: linux-fsdevel@vger.kernel.org,
+	Steve French <steve.french@primarydata.com>
+To: linux-cifs@vger.kernel.org
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
---001a11349536396ddc0519af12ab
-Content-Type: text/plain; charset=UTF-8
+The server exports information about the share and underlying
+device under an SMB3 export, including its attributes and
+capabilities, which is stored by cifs.ko when first connecting
+to the share.
 
-On Mon, Jun 29, 2015 at 4:31 PM, Darrick J. Wong <darrick.wong@oracle.com>
-wrote:
+Add ioctl to cifs.ko to allow user space smb3 helper utilities
+(in cifs-utils) to display this (e.g. via smb3util).
 
-> On Mon, Jun 29, 2015 at 02:33:56PM -0500, Steve French wrote:
-> > On Mon, Jun 29, 2015 at 12:27 PM, Darrick J. Wong
-> > <darrick.wong@oracle.com> wrote:
-> > >
-> > > On Sun, Jun 28, 2015 at 09:21:05PM -0500, Steve French wrote:
-> > > >  Update the patch to correct target file size.
-> > > >
-> > > >  Getting fantastic copy performance with cp --reflink over SMB3.11
-> > > >  using the new FSCTL_DUPLICATE_EXTENTS.
-> > > >
-> > > >  This FSCTL was added in the SMB3.11 dialect (testing was
-> > > >  against REFS file system) so have put it as a 3.11 protocol
-> > > >  specific operation ("vers=3.1.1" on the mount).  Tested at
-> > > >  the SMB3 plugfest in Redmond.
-> > > >
-> > > >  It depends on the new FS Attribute (BLOCK_REFCOUNTING) which
-> > > >  is used to advertise support for the ability to do this ioctl
-> > > >  (if you can support multiple files pointing to the same block
-> > > >  than this refcounting ability or equivalent is needed to
-> > > >  support the new reflink-like duplicate extent SMB3 ioctl.
-> > > >
-> > > > Signed-off-by: Steve French <steve.french@primarydata.com>
-> > > > ---
-> > > >  fs/cifs/cifsglob.h |  3 +++
-> > > >  fs/cifs/cifspdu.h  |  2 ++
-> > > >  fs/cifs/ioctl.c    | 16 +++++++++++++---
-> > > >  fs/cifs/smb2ops.c  | 48
-> ++++++++++++++++++++++++++++++++++++++++++++++++
-> > > >  fs/cifs/smb2pdu.h  |  8 ++++++++
-> > > >  fs/cifs/smbfsctl.h |  1 +
-> > > >  6 files changed, 75 insertions(+), 3 deletions(-)
-> > > >
-> > > > diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> > > > index a0212ec..81194e6 100644
-> > > > --- a/fs/cifs/cifsglob.h
-> > > > +++ b/fs/cifs/cifsglob.h
-> > > > @@ -390,6 +390,9 @@ struct smb_version_operations {
-> > > >       int (*clone_range)(const unsigned int, struct cifsFileInfo
-> *src_file,
-> > > >                       struct cifsFileInfo *target_file, u64 src_off,
-> u64 len,
-> > > >                       u64 dest_off);
-> > > > +     int (*duplicate_extents)(const unsigned int, struct
-> cifsFileInfo *src,
-> > > > +                     struct cifsFileInfo *target_file, u64 src_off,
-> u64 len,
-> > > > +                     u64 dest_off);
-> > > >       int (*validate_negotiate)(const unsigned int, struct cifs_tcon
-> *);
-> > > >       ssize_t (*query_all_EAs)(const unsigned int, struct cifs_tcon
-> *,
-> > > >                       const unsigned char *, const unsigned char *,
-> char *,
-> > > > diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
-> > > > index 998a66f..47b030d 100644
-> > > > --- a/fs/cifs/cifspdu.h
-> > > > +++ b/fs/cifs/cifspdu.h
-> > > > @@ -2255,6 +2255,8 @@ typedef struct {
-> > > >
-> > > >
-> > > >  /* List of FileSystemAttributes - see 2.5.1 of MS-FSCC */
-> > > > +#define FILE_SUPPORTS_SPARSE_VDL     0x10000000 /* faster nonsparse
-> extend */
-> > > > +#define FILE_SUPPORTS_BLOCK_REFCOUNTING      0x08000000 /* allow
-> ioctl dup extents */
-> > > >  #define FILE_SUPPORT_INTEGRITY_STREAMS       0x04000000
-> > > >  #define FILE_SUPPORTS_USN_JOURNAL    0x02000000
-> > > >  #define FILE_SUPPORTS_OPEN_BY_FILE_ID        0x01000000
-> > > > diff --git a/fs/cifs/ioctl.c b/fs/cifs/ioctl.c
-> > > > index 8b7898b..7843b19 100644
-> > > > --- a/fs/cifs/ioctl.c
-> > > > +++ b/fs/cifs/ioctl.c
-> > > > @@ -31,12 +31,14 @@
-> > > >  #include "cifsproto.h"
-> > > >  #include "cifs_debug.h"
-> > > >  #include "cifsfs.h"
-> > > > +#include <linux/btrfs.h>
-> > > >
-> > > >  #define CIFS_IOCTL_MAGIC     0xCF
-> > > >  #define CIFS_IOC_COPYCHUNK_FILE      _IOW(CIFS_IOCTL_MAGIC, 3, int)
-> > > >
-> > > >  static long cifs_ioctl_clone(unsigned int xid, struct file
-> *dst_file,
-> > > > -                     unsigned long srcfd, u64 off, u64 len, u64
-> destoff)
-> > > > +                     unsigned long srcfd, u64 off, u64 len, u64
-> destoff,
-> > > > +                     bool dup_extents)
-> > > >  {
-> > > >       int rc;
-> > > >       struct cifsFileInfo *smb_file_target = dst_file->private_data;
-> > > > @@ -109,9 +111,14 @@ static long cifs_ioctl_clone(unsigned int xid,
-> struct file *dst_file,
-> > > >       truncate_inode_pages_range(&target_inode->i_data, destoff,
-> > > >                                  PAGE_CACHE_ALIGN(destoff + len)-1);
-> > > >
-> > > > -     if (target_tcon->ses->server->ops->clone_range)
-> > > > +     if (dup_extents &&
-> target_tcon->ses->server->ops->duplicate_extents)
-> > > > +             rc =
-> target_tcon->ses->server->ops->duplicate_extents(xid,
-> > > > +                     smb_file_src, smb_file_target, off, len,
-> destoff);
-> > > > +     else if (!dup_extents &&
-> target_tcon->ses->server->ops->clone_range)
-> > > >               rc = target_tcon->ses->server->ops->clone_range(xid,
-> > > >                       smb_file_src, smb_file_target, off, len,
-> destoff);
-> > > > +     else
-> > > > +             rc = -EOPNOTSUPP;
-> > > >
-> > > >       /* force revalidate of size and timestamps of target file now
-> > > >          that target is updated on the server */
-> > > > @@ -205,7 +212,10 @@ long cifs_ioctl(struct file *filep, unsigned
-> int command, unsigned long arg)
-> > > >                       }
-> > > >                       break;
-> > > >               case CIFS_IOC_COPYCHUNK_FILE:
-> > > > -                     rc = cifs_ioctl_clone(xid, filep, arg, 0, 0,
-> 0);
-> > > > +                     rc = cifs_ioctl_clone(xid, filep, arg, 0, 0,
-> 0, false);
-> > > > +                     break;
-> > > > +             case BTRFS_IOC_CLONE:
-> > > > +                     rc = cifs_ioctl_clone(xid, filep, arg, 0, 0,
-> 0, true);
-> > >
-> > > Any interest in supporting BTRFS_IOC_CLONE_RANGE or
-> BTRFS_IOC_EXTENT_SAME?
-> > > It looks like you could easily support the former, and the latter would
-> > > enable things like duperemove.  I've been working on a pile of
-> xfstests to
-> > > exercise these three ioctls, will post them later today, I hope.
-> > >
-> > > --D
-> > >
-> >
-> > So far Samba (server) only uses three btrfs ioctls, but that includes
-> > clone range:
->
-> Oh, my question was mostly about support for CLONE_RANGE within
-> cifs.ko so that clients could ask for a reflink, which would then be
-> sent off to the server as FSCTL_DUPLICATE_EXTENTS.  That doesn't seem
-> too hard, but I didn't see it in ioctl.c and wondered why. :)
->
-> >
-> > ./source3/modules/vfs_btrfs.c:#define BTRFS_IOC_CLONE_RANGE ...
-> > ./source3/modules/vfs_btrfs.c:#define BTRFS_IOC_SNAP_DESTROY ...
-> > ./source3/modules/vfs_btrfs.c:#define BTRFS_IOC_SNAP_CREATE_V2 ...
-> >
-> > But btrfs clone range is only (optionally if present) used to handle
-> > the "CopyChunk" API (SMB3 and CIFS network protocol requests), and
-> > Samba server doesn't have code for the FSCTL_DUPLICATE_EXTENTS fsctl
-> > (SMB3 network protocol request) yet.  It looks trivial to map that to
-> > BTRFS_IOC_CLONE_RANGE in the Samba server.   Would need to add trivial
-> > parsing in smbd/smb2_ioctl_network_fs.c and a new VFS entry point in
-> > the Samba VFS and a small helper routine in
-> > source3/modules/vfs_btrfs.c
->
-> Sounds fairly straightforward on the server side.  I'm working on adding
-> the three ioctls I mentioned (CLONE, CLONE_RANGE, EXTENT_SAME) to XFS and
-> others are working on it for ext4; do you think it would be difficult to
-> adapt Samba server to talk to these three btrfs APIs even with a non-btrfs
-> backend?
->
-> (Or, maybe someday we might refactor all this into a common syscall or
-> something.)
->
-> I guess BTRFS_IOC_EXTENT_SAME would be harder since you'd want to compare
-> file contents on the server, and I'm not sure if SMB can actually do that.
->
->
+This information is also useful for debugging and for
+resolving configuration errors.
 
- cifs.ko with the recent patches, does support IOC_CLONE (ie
-BTRFS_IOC_CLONE) but I didn't add BTRFS_CLONE_RANGE which would be easy
-enough to add to cifs.ko (although would be a little better, and perhaps
-less confusing, if there were a system ioctl definition that was an exact
-equivalent of BTRFS_IOC_CLONE and BTRFS_IOC_CLONE_RANGE but didn't use the
-name BTRFS, but last I checked the cp command it only knows about
-BTRFS_IOC_CLONE so we are stuck using that ioctl number).
+Signed-off-by: Steve French <steve.french@primarydata.com>
+---
+ fs/cifs/cifs_ioctl.h | 42 ++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/cifspdu.h    | 14 ++++++++++++++
+ fs/cifs/ioctl.c      | 48 ++++++++++++++++++++++++++++++++++++++++++------
+ 3 files changed, 98 insertions(+), 6 deletions(-)
+ create mode 100644 fs/cifs/cifs_ioctl.h
 
-If you call CIFS_IOC_COPYCHUNK_FILE ioctl today in cifs.ko (even without
-the patches), for SMB3 mounts it will send a FSCTL_SRV_COPYCHUNK_WRITE SMB3
-request to the server which Samba will either emulate in user space as a
-somewhat faster file copy, or pass directly to btrfs if vfs_btrfs is loaded
-and the server will do a BTRFS_IOC_CLONE_RANGE.
-
-With the recent patch to cifs.ko it will be easier since for cifs --reflink
-we will only issue DUPLICATE_EXTENTS IOCTL over the wire (which Samba can
-convert to BRTFS_IOC_CLONE or BTRFS_IOC_CLONE_RANGE) if the server
-advertises the file system support for the corresponding attribute flag.
-
-
+diff --git a/fs/cifs/cifs_ioctl.h b/fs/cifs/cifs_ioctl.h
+new file mode 100644
+index 0000000..0065256
+--- /dev/null
++++ b/fs/cifs/cifs_ioctl.h
+@@ -0,0 +1,42 @@
++/*
++ *   fs/cifs/cifs_ioctl.h
++ *
++ *   Structure definitions for io control for cifs/smb3
++ *
++ *   Copyright (c) 2015 Steve French <steve.french@primarydata.com>
++ *
++ *   This library is free software; you can redistribute it and/or modify
++ *   it under the terms of the GNU Lesser General Public License as published
++ *   by the Free Software Foundation; either version 2.1 of the License, or
++ *   (at your option) any later version.
++ *
++ *   This library is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ *   the GNU Lesser General Public License for more details.
++ *
++ */
++
++struct smb_mnt_fs_info {
++	__u32	version; /* 0001 */
++	__u16	protocol_id;
++	__u16	tcon_flags;
++	__u32	vol_serial_number;
++	__u32	vol_create_time;
++	__u32	share_caps;
++	__u32	share_flags;
++	__u32	sector_flags;
++	__u32	optimal_sector_size;
++	__u32	max_bytes_chunk;
++	__u32	fs_attributes;
++	__u32	max_path_component;
++	__u32	device_type;
++	__u32	device_characteristics;
++	__u32	maximal_access;
++	__u64   cifs_posix_caps;
++} __packed;
++
++#define CIFS_IOCTL_MAGIC	0xCF
++#define CIFS_IOC_COPYCHUNK_FILE	_IOW(CIFS_IOCTL_MAGIC, 3, int)
++#define CIFS_IOC_SET_INTEGRITY  _IO(CIFS_IOCTL_MAGIC, 4)
++#define CIFS_IOC_GET_MNT_INFO _IOR(CIFS_IOCTL_MAGIC, 5, struct smb_mnt_fs_info)
+diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
+index 47b030d..f5b8730 100644
+--- a/fs/cifs/cifspdu.h
++++ b/fs/cifs/cifspdu.h
+@@ -2245,6 +2245,20 @@ typedef struct {
+ #define FILE_DEVICE_VIRTUAL_DISK        0x00000024
+ #define FILE_DEVICE_NETWORK_REDIRECTOR  0x00000028
+ 
++/* Device Characteristics */
++#define FILE_REMOVABLE_MEDIA			0x00000001
++#define FILE_READ_ONLY_DEVICE			0x00000002
++#define FILE_FLOPPY_DISKETTE			0x00000004
++#define FILE_WRITE_ONCE_MEDIA			0x00000008
++#define FILE_REMOTE_DEVICE			0x00000010
++#define FILE_DEVICE_IS_MOUNTED			0x00000020
++#define FILE_VIRTUAL_VOLUME			0x00000040
++#define FILE_DEVICE_SECURE_OPEN			0x00000100
++#define FILE_CHARACTERISTIC_TS_DEVICE		0x00001000
++#define FILE_CHARACTERISTIC_WEBDAV_DEVICE	0x00002000
++#define FILE_PORTABLE_DEVICE			0x00004000
++#define FILE_DEVICE_ALLOW_APPCONTAINER_TRAVERSAL 0x00020000
++
+ typedef struct {
+ 	__le32 DeviceType;
+ 	__le32 DeviceCharacteristics;
+diff --git a/fs/cifs/ioctl.c b/fs/cifs/ioctl.c
+index 49b8b6e..c63f522 100644
+--- a/fs/cifs/ioctl.c
++++ b/fs/cifs/ioctl.c
+@@ -31,12 +31,9 @@
+ #include "cifsproto.h"
+ #include "cifs_debug.h"
+ #include "cifsfs.h"
++#include "cifs_ioctl.h"
+ #include <linux/btrfs.h>
+ 
+-#define CIFS_IOCTL_MAGIC	0xCF
+-#define CIFS_IOC_COPYCHUNK_FILE	_IOW(CIFS_IOCTL_MAGIC, 3, int)
+-#define CIFS_IOC_SET_INTEGRITY  _IO(CIFS_IOCTL_MAGIC, 4)
+-
+ static long cifs_ioctl_clone(unsigned int xid, struct file *dst_file,
+ 			unsigned long srcfd, u64 off, u64 len, u64 destoff,
+ 			bool dup_extents)
+@@ -135,6 +132,43 @@ out_drop_write:
+ 	return rc;
+ }
+ 
++static long smb_mnt_get_fsinfo(unsigned int xid, struct cifs_tcon *tcon,
++				void __user *arg)
++{
++	int rc = 0;
++	struct smb_mnt_fs_info *fsinf;
++
++	fsinf = kzalloc(sizeof(struct smb_mnt_fs_info), GFP_KERNEL);
++	if (fsinf == NULL)
++		return -ENOMEM;
++
++	fsinf->version = 1;
++	fsinf->protocol_id = tcon->ses->server->vals->protocol_id;
++	fsinf->device_characteristics =
++			le32_to_cpu(tcon->fsDevInfo.DeviceCharacteristics);
++	fsinf->device_type = le32_to_cpu(tcon->fsDevInfo.DeviceType);
++	fsinf->fs_attributes = le32_to_cpu(tcon->fsAttrInfo.Attributes);
++	fsinf->max_path_component =
++		le32_to_cpu(tcon->fsAttrInfo.MaxPathNameComponentLength);
++#ifdef CONFIG_CIFS_SMB2
++	fsinf->vol_serial_number = tcon->vol_serial_number;
++	fsinf->vol_create_time = le64_to_cpu(tcon->vol_create_time);
++	fsinf->share_flags = tcon->share_flags;
++	fsinf->share_caps = le32_to_cpu(tcon->capabilities);
++	fsinf->sector_flags = tcon->ss_flags;
++	fsinf->optimal_sector_size = tcon->perf_sector_size;
++	fsinf->max_bytes_chunk = tcon->max_bytes_chunk;
++	fsinf->maximal_access = tcon->maximal_access;
++#endif /* SMB2 */
++	fsinf->cifs_posix_caps = le64_to_cpu(tcon->fsUnixInfo.Capability);
++
++	if (copy_to_user(arg, fsinf, sizeof(struct smb_mnt_fs_info)))
++		rc = -EFAULT;
++
++	kfree(fsinf);
++	return rc;
++}
++
+ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
+ {
+ 	struct inode *inode = file_inode(filep);
+@@ -148,8 +182,6 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
+ 
+ 	xid = get_xid();
+ 
+-	cifs_dbg(FYI, "ioctl file %p  cmd %u  arg %lu\n", filep, command, arg);
+-
+ 	cifs_sb = CIFS_SB(inode->i_sb);
+ 
+ 	switch (command) {
+@@ -228,6 +260,10 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
+ 			else
+ 				rc = -EOPNOTSUPP;
+ 			break;
++		case CIFS_IOC_GET_MNT_INFO:
++			tcon = tlink_tcon(pSMBFile->tlink);
++			rc = smb_mnt_get_fsinfo(xid, tcon, (void __user *)arg);
++			break;
+ 		default:
+ 			cifs_dbg(FYI, "unsupported ioctl\n");
+ 			break;
 -- 
+2.1.4
 
-*Steve French*
-
-Principal Systems Engineer: Protocols
-
-W: 512-918-9276
-
-C:  512-501-9669
-
-www.primarydata.com
-
-[image: cid:E5DD7677-4C3D-4DB7-95DC-31E18398703A]
-
-
-
-
--- 
-
-*Steve French*
-
-Principal Systems Engineer: Protocols
-
-W: 512-918-9276
-
-C:  512-501-9669
-
-www.primarydata.com
-
-[image: cid:E5DD7677-4C3D-4DB7-95DC-31E18398703A]
-
---001a11349536396ddc0519af12ab
-Content-Type: image/png; name="image001.png"
-Content-Disposition: inline; filename="image001.png"
-Content-Transfer-Encoding: base64
-Content-ID: <image001.png@01D04524.155251C0>
-X-Attachment-Id: e91162232469e4a6_0.1
-
-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
---001a11349536396ddc0519af12ab--
