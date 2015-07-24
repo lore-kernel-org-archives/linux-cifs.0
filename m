@@ -1,368 +1,198 @@
-From: Michal Hocko <mhocko@kernel.org>
-Subject: Re: [regression 4.2-rc3] loop: xfstests xfs/073 deadlocked in low
- memory conditions
-Date: Tue, 21 Jul 2015 10:58:59 +0200
-Message-ID: <20150721085859.GG11967@dhcp22.suse.cz>
-References: <20150721015934.GY7943@dastard>
+From: Noel Power <nopower-IBi9RG/b67k@public.gmane.org>
+Subject: Re: Kerberized mount.cifs with SMB>1?
+Date: Fri, 24 Jul 2015 11:09:11 +0100
+Message-ID: <55B20EC7.5040502@suse.com>
+Reply-To: noel.power-IBi9RG/b67k@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Ming Lei <ming.lei@canonical.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Theodore Ts'o <tytso@mit.edu>,
-	Andreas Dilger <andreas.dilger@intel.com>,
-	Oleg Drokin <oleg.drokin@intel.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christoph Hellwig <hch@lst.de>, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, xfs@oss.sgi.com, linux-nfs@vger.kernel.org,
-	linux-cifs@vger.kernel.org
-To: Dave Chinner <david@fromorbit.com>
-Return-path: <owner-linux-mm@kvack.org>
-Content-Disposition: inline
-In-Reply-To: <20150721015934.GY7943@dastard>
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: multipart/mixed;
+ boundary="------------050707050402040809010405"
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-[CCing more people from a potentially affected fs - the reference to the 
- email thread is: http://marc.info/?l=linux-mm&m=143744398020147&w=2]
+This is a multi-part message in MIME format.
+--------------050707050402040809010405
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Tue 21-07-15 11:59:34, Dave Chinner wrote:
-> Hi Ming,
-> 
-> With the recent merge of the loop device changes, I'm now seeing
-> XFS deadlock on my single CPU, 1GB RAM VM running xfs/073.
-> 
-> The deadlocked is as follows:
-> 
-> kloopd1: loop_queue_read_work
-> 	xfs_file_iter_read
-> 	lock XFS inode XFS_IOLOCK_SHARED (on image file)
-> 	page cache read (GFP_KERNEL)
-> 	radix tree alloc
-> 	memory reclaim
-> 	reclaim XFS inodes
-> 	log force to unpin inodes
-> 	<wait for log IO completion>
-> 
-> xfs-cil/loop1: <does log force IO work>
-> 	xlog_cil_push
-> 	xlog_write
-> 	<loop issuing log writes>
-> 		xlog_state_get_iclog_space()
-> 		<blocks due to all log buffers under write io>
-> 		<waits for IO completion>
-> 
-> kloopd1: loop_queue_write_work
-> 	xfs_file_write_iter
-> 	lock XFS inode XFS_IOLOCK_EXCL (on image file)
-> 	<wait for inode to be unlocked>
-> 
-> [The full stack traces are below].
-> 
-> i.e. the kloopd, with it's split read and write work queues, has
-> introduced a dependency through memory reclaim. i.e. that writes
-> need to be able to progress for reads make progress.
-> 
-> The problem, fundamentally, is that mpage_readpages() does a
-> GFP_KERNEL allocation, rather than paying attention to the inode's
-> mapping gfp mask, which is set to GFP_NOFS.
-> 
-> The didn't used to happen, because the loop device used to issue
-> reads through the splice path and that does:
-> 
-> 	error = add_to_page_cache_lru(page, mapping, index,
-> 			GFP_KERNEL & mapping_gfp_mask(mapping));
-> 
-> i.e. it pays attention to the allocation context placed on the
-> inode and so is doing GFP_NOFS allocations here and avoiding the
-> recursion problem.
-> 
-> [ CC'd Michal Hocko and the mm list because it's a clear exaple of
-> why ignoring the mapping gfp mask on any page cache allocation is
-> a landmine waiting to be tripped over. ]
+Hi Steve, *
 
-Thank you for CCing me. I haven't noticed this one when checking for
-other similar hardcoded GFP_KERNEL users (6afdb859b710 ("mm: do not
-ignore mapping_gfp_mask in page cache allocation paths")). And there
-seem to be more of them now that I am looking closer.
+I came across this thread
+http://thread.gmane.org/gmane.linux.kernel.cifs/10081/focus=10305 when
+investigating why mount.cifs wasn't working with smb2. I have tried to
+follow the information there and have created a patch. I have tested
+this successfully against SMB2.0, SMB2.1, SMB3.0, SMB3.02.
+Regarding the patch I followed as much as I could sess_auth_kerberos
+method in cifs.c[1]. Some things I didn't quite see how to handle as
+they don't seem relevant in SMB2 e.g. the unicode_oslm_strings,
+unicode_domain_string, ascii_ssetup_strings handling, also I only just
+noticed I missed the "bad security blob length" check (but not sure if
+it is needed for smb1+) Anyway be interested in a review of the patch :-)
 
-I am not sure what to do about fs/nfs/dir.c:nfs_symlink which doesn't
-require GFP_NOFS or mapping gfp mask for other allocations in the same
-context.
+thanks,
+Noel
 
-What do you think about this preliminary (and untested) patch? I cannot
-say I would be happy about sprinkling mapping_gfp_mask all over the place
-and it sounds like we should drop gfp_mask argument altogether and
-use it internally in __add_to_page_cache_locked that would require all
-the filesystems to use mapping gfp consistently which I am not sure is
-the case here. From a quick glance it seems that some file system use
-it all the time while others are selective.
----
->From 72e13282dfb117432332416b60bc4e4d2dad9153 Mon Sep 17 00:00:00 2001
-From: Michal Hocko <mhocko@suse.com>
-Date: Tue, 21 Jul 2015 10:06:13 +0200
-Subject: [PATCH] mm, fs: Obey gfp_mapping for add_to_page_cache
+[1] actually I followed CIFS_SessSetup of an older cifs version but then
+when rebasing glanced at the new 'sess_auth_kerberos'
 
-6afdb859b710 ("mm: do not ignore mapping_gfp_mask in page cache
-allocation paths) has caught some users of hardcoded GFP_KERNEL
-used in the page cache allocation paths. This, however, wasn't complete
-and there were others which went unnoticed.
+--------------050707050402040809010405
+Content-Type: application/mbox;
+ name="0001-kerberos-mount-for-SMB2-SMB3.patch"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="0001-kerberos-mount-for-SMB2-SMB3.patch"
 
-Dave Chinner has reported the following deadlock for xfs on loop device:
-: With the recent merge of the loop device changes, I'm now seeing
-: XFS deadlock on my single CPU, 1GB RAM VM running xfs/073.
-:
-: The deadlocked is as follows:
-:
-: kloopd1: loop_queue_read_work
-:       xfs_file_iter_read
-:       lock XFS inode XFS_IOLOCK_SHARED (on image file)
-:       page cache read (GFP_KERNEL)
-:       radix tree alloc
-:       memory reclaim
-:       reclaim XFS inodes
-:       log force to unpin inodes
-:       <wait for log IO completion>
-:
-: xfs-cil/loop1: <does log force IO work>
-:       xlog_cil_push
-:       xlog_write
-:       <loop issuing log writes>
-:               xlog_state_get_iclog_space()
-:               <blocks due to all log buffers under write io>
-:               <waits for IO completion>
-:
-: kloopd1: loop_queue_write_work
-:       xfs_file_write_iter
-:       lock XFS inode XFS_IOLOCK_EXCL (on image file)
-:       <wait for inode to be unlocked>
-:
-: i.e. the kloopd, with it's split read and write work queues, has
-: introduced a dependency through memory reclaim. i.e. that writes
-: need to be able to progress for reads make progress.
-:
-: The problem, fundamentally, is that mpage_readpages() does a
-: GFP_KERNEL allocation, rather than paying attention to the inode's
-: mapping gfp mask, which is set to GFP_NOFS.
-:
-: The didn't used to happen, because the loop device used to issue
-: reads through the splice path and that does:
-:
-:       error = add_to_page_cache_lru(page, mapping, index,
-:                       GFP_KERNEL & mapping_gfp_mask(mapping));
-
-This has changed by aa4d86163e4 (block: loop: switch to VFS ITER_BVEC).
-
-This patch changes mpage_readpage{s} to follow gfp mask set for the
-mapping. There are, however, other places which are doing basically the
-same.
-
-lustre:ll_dir_filler is doing GFP_KERNEL from the function which
-apparently uses GFP_NOFS for other allocations so let's make this
-consistent.
-
-cifs:readpages_get_pages is called from cifs_readpages and
-__cifs_readpages_from_fscache called from the same path obeys mapping
-gfp.
-
-ramfs_nommu_expand_for_mapping is hardcoding GFP_KERNEL as well
-regardless it uses mapping_gfp_mask for the page allocation.
-
-ext4_mpage_readpages is the called from the page cache allocation path
-same as read_pages and read_cache_pages
-
-Reported-by: Dave Chinner <david@fromorbit.com>
-Signed-off-by: Michal Hocko <mhocko@suse.com>
----
- drivers/staging/lustre/lustre/llite/dir.c |  2 +-
- fs/cifs/file.c                            |  5 +++--
- fs/ext4/readpage.c                        |  3 ++-
- fs/mpage.c                                | 14 +++++++++-----
- fs/ramfs/file-nommu.c                     |  5 +++--
- mm/readahead.c                            |  6 ++++--
- 6 files changed, 22 insertions(+), 13 deletions(-)
-
-diff --git a/drivers/staging/lustre/lustre/llite/dir.c b/drivers/staging/lustre/lustre/llite/dir.c
-index a5bc694dcb64..0a643b8b6deb 100644
---- a/drivers/staging/lustre/lustre/llite/dir.c
-+++ b/drivers/staging/lustre/lustre/llite/dir.c
-@@ -225,7 +225,7 @@ static int ll_dir_filler(void *_hash, struct page *page0)
- 
- 		prefetchw(&page->flags);
- 		ret = add_to_page_cache_lru(page, inode->i_mapping, offset,
--					    GFP_KERNEL);
-+					    GFP_NOFS);
- 		if (ret == 0) {
- 			unlock_page(page);
- 			if (ll_pagevec_add(&lru_pvec, page) == 0)
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 2ac2d8471393..72c162a1d56d 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -3380,6 +3380,7 @@ readpages_get_pages(struct address_space *mapping, struct list_head *page_list,
- 	struct page *page, *tpage;
- 	unsigned int expected_index;
- 	int rc;
-+	gfp_t gfp = GFP_KERNEL & mapping_gfp_mask(mapping);
- 
- 	INIT_LIST_HEAD(tmplist);
- 
-@@ -3392,7 +3393,7 @@ readpages_get_pages(struct address_space *mapping, struct list_head *page_list,
- 	 */
- 	__SetPageLocked(page);
- 	rc = add_to_page_cache_locked(page, mapping,
--				      page->index, GFP_KERNEL);
-+				      page->index, gfp);
- 
- 	/* give up if we can't stick it in the cache */
- 	if (rc) {
-@@ -3419,7 +3420,7 @@ readpages_get_pages(struct address_space *mapping, struct list_head *page_list,
- 
- 		__SetPageLocked(page);
- 		if (add_to_page_cache_locked(page, mapping, page->index,
--								GFP_KERNEL)) {
-+								gfp)) {
- 			__ClearPageLocked(page);
- 			break;
- 		}
-diff --git a/fs/ext4/readpage.c b/fs/ext4/readpage.c
-index 171b9ac4b45e..92eb970655bd 100644
---- a/fs/ext4/readpage.c
-+++ b/fs/ext4/readpage.c
-@@ -166,7 +166,8 @@ int ext4_mpage_readpages(struct address_space *mapping,
- 			page = list_entry(pages->prev, struct page, lru);
- 			list_del(&page->lru);
- 			if (add_to_page_cache_lru(page, mapping,
--						  page->index, GFP_KERNEL))
-+						  page->index,
-+						  GFP_KERNEL & mapping_gfp_mask(mapping)))
- 				goto next_page;
- 		}
- 
-diff --git a/fs/mpage.c b/fs/mpage.c
-index dde689d0759d..4a54bd13c9bd 100644
---- a/fs/mpage.c
-+++ b/fs/mpage.c
-@@ -139,7 +139,8 @@ map_buffer_to_page(struct page *page, struct buffer_head *bh, int page_block)
- static struct bio *
- do_mpage_readpage(struct bio *bio, struct page *page, unsigned nr_pages,
- 		sector_t *last_block_in_bio, struct buffer_head *map_bh,
--		unsigned long *first_logical_block, get_block_t get_block)
-+		unsigned long *first_logical_block, get_block_t get_block,
-+		gfp_t gfp)
- {
- 	struct inode *inode = page->mapping->host;
- 	const unsigned blkbits = inode->i_blkbits;
-@@ -278,7 +279,7 @@ do_mpage_readpage(struct bio *bio, struct page *page, unsigned nr_pages,
- 		}
- 		bio = mpage_alloc(bdev, blocks[0] << (blkbits - 9),
- 			  	min_t(int, nr_pages, bio_get_nr_vecs(bdev)),
--				GFP_KERNEL);
-+				gfp);
- 		if (bio == NULL)
- 			goto confused;
- 	}
-@@ -361,6 +362,7 @@ mpage_readpages(struct address_space *mapping, struct list_head *pages,
- 	sector_t last_block_in_bio = 0;
- 	struct buffer_head map_bh;
- 	unsigned long first_logical_block = 0;
-+	gfp_t gfp = GFP_KERNEL & mapping_gfp_mask(mapping);
- 
- 	map_bh.b_state = 0;
- 	map_bh.b_size = 0;
-@@ -370,12 +372,13 @@ mpage_readpages(struct address_space *mapping, struct list_head *pages,
- 		prefetchw(&page->flags);
- 		list_del(&page->lru);
- 		if (!add_to_page_cache_lru(page, mapping,
--					page->index, GFP_KERNEL)) {
-+					page->index,
-+					gfp)) {
- 			bio = do_mpage_readpage(bio, page,
- 					nr_pages - page_idx,
- 					&last_block_in_bio, &map_bh,
- 					&first_logical_block,
--					get_block);
-+					get_block, gfp);
- 		}
- 		page_cache_release(page);
- 	}
-@@ -395,11 +398,12 @@ int mpage_readpage(struct page *page, get_block_t get_block)
- 	sector_t last_block_in_bio = 0;
- 	struct buffer_head map_bh;
- 	unsigned long first_logical_block = 0;
-+	gfp_t gfp = mapping_gfp_mask(page->mapping);
- 
- 	map_bh.b_state = 0;
- 	map_bh.b_size = 0;
- 	bio = do_mpage_readpage(bio, page, 1, &last_block_in_bio,
--			&map_bh, &first_logical_block, get_block);
-+			&map_bh, &first_logical_block, get_block, gfp);
- 	if (bio)
- 		mpage_bio_submit(READ, bio);
- 	return 0;
-diff --git a/fs/ramfs/file-nommu.c b/fs/ramfs/file-nommu.c
-index ba1323a94924..a586467f6ff6 100644
---- a/fs/ramfs/file-nommu.c
-+++ b/fs/ramfs/file-nommu.c
-@@ -70,6 +70,7 @@ int ramfs_nommu_expand_for_mapping(struct inode *inode, size_t newsize)
- 	unsigned order;
- 	void *data;
- 	int ret;
-+	gfp_t gfp = mapping_gfp_mask(inode->i_mapping);
- 
- 	/* make various checks */
- 	order = get_order(newsize);
-@@ -84,7 +85,7 @@ int ramfs_nommu_expand_for_mapping(struct inode *inode, size_t newsize)
- 
- 	/* allocate enough contiguous pages to be able to satisfy the
- 	 * request */
--	pages = alloc_pages(mapping_gfp_mask(inode->i_mapping), order);
-+	pages = alloc_pages(gfp, order);
- 	if (!pages)
- 		return -ENOMEM;
- 
-@@ -108,7 +109,7 @@ int ramfs_nommu_expand_for_mapping(struct inode *inode, size_t newsize)
- 		struct page *page = pages + loop;
- 
- 		ret = add_to_page_cache_lru(page, inode->i_mapping, loop,
--					GFP_KERNEL);
-+					gfp);
- 		if (ret < 0)
- 			goto add_error;
- 
-diff --git a/mm/readahead.c b/mm/readahead.c
-index 60cd846a9a44..b9b99597dc77 100644
---- a/mm/readahead.c
-+++ b/mm/readahead.c
-@@ -90,7 +90,8 @@ int read_cache_pages(struct address_space *mapping, struct list_head *pages,
- 		page = list_to_page(pages);
- 		list_del(&page->lru);
- 		if (add_to_page_cache_lru(page, mapping,
--					page->index, GFP_KERNEL)) {
-+					page->index,
-+					GFP_KERNEL & mapping_gfp_mask(mapping))) {
- 			read_cache_pages_invalidate_page(mapping, page);
- 			continue;
- 		}
-@@ -128,7 +129,8 @@ static int read_pages(struct address_space *mapping, struct file *filp,
- 		struct page *page = list_to_page(pages);
- 		list_del(&page->lru);
- 		if (!add_to_page_cache_lru(page, mapping,
--					page->index, GFP_KERNEL)) {
-+					page->index,
-+					GFP_KERNEL & mapping_gfp_mask(mapping))) {
- 			mapping->a_ops->readpage(filp, page);
- 		}
- 		page_cache_release(page);
--- 
-2.1.4
-
-
--- 
-Michal Hocko
-SUSE Labs
-
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+RnJvbSBjOTI3MGVkNzIwODY1ZDhmYTc0OGFkZjY5MDhiY2I5YzgwNzRjNzg1IE1vbiBTZXAg
+MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBOb2VsIFBvd2VyIDxub2VsLnBvd2VyQHN1c2UuY29t
+PgpEYXRlOiBNb24sIDIwIEp1bCAyMDE1IDEyOjA2OjA3ICswMTAwClN1YmplY3Q6IFtQQVRD
+SF0ga2VyYmVyb3MgbW91bnQgZm9yIFNNQjIsIFNNQjMKClBhdGNoIGJhc2VkIG9uIHRoZSBp
+bmZvcm1hdGlvbiBkZXRhaWxlZCBpbgpodHRwOi8vdGhyZWFkLmdtYW5lLm9yZy9nbWFuZS5s
+aW51eC5rZXJuZWwuY2lmcy8xMDA4MS9mb2N1cz0xMDMwNwp0byBlbmFibGUgU01CMi9TTUIz
+IGtlcmJlcm96aWVkLgoKYSkgU01CMl9uZWdvdGlhdGU6IGVuYWJsZS91c2UgZGVjb2RlX25l
+Z1Rva2VuSW5pdCBpbiBTTUIyX25lZ290aWF0ZQpiKSBTTUIyX3Nlc3Nfc2V0dXA6IGhhbmRs
+ZSBLZXJiZXJvcyBzZWN0eXBlIGFuZCByZXBsaWNhdGUgS2VyYmVyb3MKICAgU01CMSBwcm9j
+ZXNzaW5nIGRvbmUgaW4gc2Vzc19hdXRoX2tlcmJlcm9zCgpTaWduZWQtb2ZmLWJ5OiBOb2Vs
+IFBvd2VyIDxub2VsLnBvd2VyQHN1c2UuY29tPgotLS0KIGZzL2NpZnMvc21iMnBkdS5jIHwg
+MTUzICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0t
+LS0tLQogMSBmaWxlIGNoYW5nZWQsIDEwMCBpbnNlcnRpb25zKCspLCA1MyBkZWxldGlvbnMo
+LSkKCmRpZmYgLS1naXQgYS9mcy9jaWZzL3NtYjJwZHUuYyBiL2ZzL2NpZnMvc21iMnBkdS5j
+CmluZGV4IGI4YjRmMDguLjg4MzM3ODMgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvc21iMnBkdS5j
+CisrKyBiL2ZzL2NpZnMvc21iMnBkdS5jCkBAIC00Niw2ICs0Niw3IEBACiAjaW5jbHVkZSAi
+c21iMnN0YXR1cy5oIgogI2luY2x1ZGUgInNtYjJnbG9iLmgiCiAjaW5jbHVkZSAiY2lmc3Bk
+dS5oIgorI2luY2x1ZGUgImNpZnNfc3BuZWdvLmgiCiAKIC8qCiAgKiAgVGhlIGZvbGxvd2lu
+ZyB0YWJsZSBkZWZpbmVzIHRoZSBleHBlY3RlZCAiU3RydWN0dXJlU2l6ZSIgb2YgU01CMiBy
+ZXF1ZXN0cwpAQCAtNDg2LDcgKzQ4Nyw2IEBAIFNNQjJfbmVnb3RpYXRlKGNvbnN0IHVuc2ln
+bmVkIGludCB4aWQsIHN0cnVjdCBjaWZzX3NlcyAqc2VzKQogCQljaWZzX2RiZyhGWUksICJt
+aXNzaW5nIHNlY3VyaXR5IGJsb2Igb24gbmVncHJvdFxuIik7CiAKIAlyYyA9IGNpZnNfZW5h
+YmxlX3NpZ25pbmcoc2VydmVyLCBzZXMtPnNpZ24pOwotI2lmZGVmIENPTkZJR19TTUIyX0FT
+TjEgIC8qIEJCIFJFTU9WRU1FIHdoZW4gdXBkYXRlZCBhc24xLmMgcmVhZHkgKi8KIAlpZiAo
+cmMpCiAJCWdvdG8gbmVnX2V4aXQ7CiAJaWYgKGJsb2JfbGVuZ3RoKQpAQCAtNDk3LDcgKzQ5
+Nyw2IEBAIFNNQjJfbmVnb3RpYXRlKGNvbnN0IHVuc2lnbmVkIGludCB4aWQsIHN0cnVjdCBj
+aWZzX3NlcyAqc2VzKQogCQlyYyA9IC1FSU87CiAJCWdvdG8gbmVnX2V4aXQ7CiAJfQotI2Vu
+ZGlmCiAKIG5lZ19leGl0OgogCWZyZWVfcnNwX2J1ZihyZXNwX2J1ZnR5cGUsIHJzcCk7CkBA
+IC01OTIsOSArNTkxLDEwIEBAIFNNQjJfc2Vzc19zZXR1cChjb25zdCB1bnNpZ25lZCBpbnQg
+eGlkLCBzdHJ1Y3QgY2lmc19zZXMgKnNlcywKIAlfX2xlMzIgcGhhc2UgPSBOdExtTmVnb3Rp
+YXRlOyAvKiBOVExNU1NQLCBpZiBuZWVkZWQsIGlzIG11bHRpc3RhZ2UgKi8KIAlzdHJ1Y3Qg
+VENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIgPSBzZXMtPnNlcnZlcjsKIAl1MTYgYmxvYl9sZW5n
+dGggPSAwOwotCWNoYXIgKnNlY3VyaXR5X2Jsb2I7CisJY2hhciAqc2VjdXJpdHlfYmxvYiA9
+IE5VTEw7CiAJY2hhciAqbnRsbXNzcF9ibG9iID0gTlVMTDsKIAlib29sIHVzZV9zcG5lZ28g
+PSBmYWxzZTsgLyogZWxzZSB1c2UgcmF3IG50bG1zc3AgKi8KKwlzdHJ1Y3Qga2V5ICpzcG5l
+Z29fa2V5ID0gTlVMTDsKIAogCWNpZnNfZGJnKEZZSSwgIlNlc3Npb24gU2V0dXBcbiIpOwog
+CkBAIC02MjAsNyArNjIwLDggQEAgU01CMl9zZXNzX3NldHVwKGNvbnN0IHVuc2lnbmVkIGlu
+dCB4aWQsIHN0cnVjdCBjaWZzX3NlcyAqc2VzLAogCXNlcy0+bnRsbXNzcC0+c2Vzc2tleV9w
+ZXJfc21ic2VzcyA9IHRydWU7CiAKIAkvKiBGSVhNRTogYWxsb3cgZm9yIG90aGVyIGF1dGgg
+dHlwZXMgYmVzaWRlcyBOVExNU1NQIChlLmcuIGtyYjUpICovCi0Jc2VzLT5zZWN0eXBlID0g
+UmF3TlRMTVNTUDsKKwlpZiAoc2VzLT5zZWN0eXBlICE9IEtlcmJlcm9zICYmIHNlcy0+c2Vj
+dHlwZSAhPSBSYXdOVExNU1NQKQorCQlzZXMtPnNlY3R5cGUgPSBSYXdOVExNU1NQOwogCiBz
+c2V0dXBfbnRsbXNzcF9hdXRoZW50aWNhdGU6CiAJaWYgKHBoYXNlID09IE50TG1DaGFsbGVu
+Z2UpCkBAIC02NDksNjAgKzY1MCwxMDQgQEAgc3NldHVwX250bG1zc3BfYXV0aGVudGljYXRl
+OgogCWlvdlswXS5pb3ZfYmFzZSA9IChjaGFyICopcmVxOwogCS8qIDQgZm9yIHJmYzEwMDIg
+bGVuZ3RoIGZpZWxkIGFuZCAxIGZvciBwYWQgKi8KIAlpb3ZbMF0uaW92X2xlbiA9IGdldF9y
+ZmMxMDAyX2xlbmd0aChyZXEpICsgNCAtIDE7Ci0JaWYgKHBoYXNlID09IE50TG1OZWdvdGlh
+dGUpIHsKLQkJbnRsbXNzcF9ibG9iID0ga21hbGxvYyhzaXplb2Yoc3RydWN0IF9ORUdPVElB
+VEVfTUVTU0FHRSksCi0JCQkJICAgICAgIEdGUF9LRVJORUwpOwotCQlpZiAobnRsbXNzcF9i
+bG9iID09IE5VTEwpIHsKLQkJCXJjID0gLUVOT01FTTsKKworCWlmIChzZXMtPnNlY3R5cGUg
+PT0gUmF3TlRMTVNTUCkgeworCQlpZiAocGhhc2UgPT0gTnRMbU5lZ290aWF0ZSkgeworCQkJ
+bnRsbXNzcF9ibG9iID0KKwkJCQlrbWFsbG9jKHNpemVvZihzdHJ1Y3QgX05FR09USUFURV9N
+RVNTQUdFKSwKKwkJCQkJICAgICAgIEdGUF9LRVJORUwpOworCQkJaWYgKG50bG1zc3BfYmxv
+YiA9PSBOVUxMKSB7CisJCQkJcmMgPSAtRU5PTUVNOworCQkJCWdvdG8gc3NldHVwX2V4aXQ7
+CisJCQl9CisJCQlidWlsZF9udGxtc3NwX25lZ290aWF0ZV9ibG9iKG50bG1zc3BfYmxvYiwg
+c2VzKTsKKwkJCWlmICh1c2Vfc3BuZWdvKSB7CisJCQkJLyogYmxvYl9sZW5ndGggPSBidWls
+ZF9zcG5lZ29fbnRsbXNzcF9ibG9iKAorCQkJCQkJJnNlY3VyaXR5X2Jsb2IsCisJCQkJCQlz
+aXplb2Yoc3RydWN0IF9ORUdPVElBVEVfTUVTU0FHRSksCisJCQkJCQludGxtc3NwX2Jsb2Ip
+OyAqLworCQkJCS8qIEJCIGV2ZW50dWFsbHkgbmVlZCB0byBhZGQgdGhpcyAqLworCQkJCWNp
+ZnNfZGJnKFZGUywKKwkJCQkJInNwbmVnbyBub3Qgc3VwcG9ydGVkIGZvciBTTUIyIHlldFxu
+Iik7CisJCQkJcmMgPSAtRU9QTk9UU1VQUDsKKwkJCQlrZnJlZShudGxtc3NwX2Jsb2IpOwor
+CQkJCWdvdG8gc3NldHVwX2V4aXQ7CisJCQl9IGVsc2UgeworCQkJCWJsb2JfbGVuZ3RoID0g
+c2l6ZW9mKHN0cnVjdCBfTkVHT1RJQVRFX01FU1NBR0UpOworCQkJCS8qIHdpdGggcmF3IE5U
+TE1TU1Agd2UgZG9uJ3QgZW5jYXBzdWxhdGUgaW4gU1BORUdPICovCisJCQkJc2VjdXJpdHlf
+YmxvYiA9IG50bG1zc3BfYmxvYjsKKwkJCX0KKwkJfSBlbHNlIGlmIChwaGFzZSA9PSBOdExt
+QXV0aGVudGljYXRlKSB7CisJCQlyZXEtPmhkci5TZXNzaW9uSWQgPSBzZXMtPlN1aWQ7CisJ
+CQludGxtc3NwX2Jsb2IgPQorCQkJCWt6YWxsb2Moc2l6ZW9mKHN0cnVjdCBfTkVHT1RJQVRF
+X01FU1NBR0UpICsgNTAwLAorCQkJCQkgICAgICAgR0ZQX0tFUk5FTCk7CisJCQlpZiAobnRs
+bXNzcF9ibG9iID09IE5VTEwpIHsKKwkJCQlyYyA9IC1FTk9NRU07CisJCQkJZ290byBzc2V0
+dXBfZXhpdDsKKwkJCX0KKwkJCXJjID0gYnVpbGRfbnRsbXNzcF9hdXRoX2Jsb2IobnRsbXNz
+cF9ibG9iLCAmYmxvYl9sZW5ndGgsCisJCQkJCQkgICAgIHNlcywgbmxzX2NwKTsKKwkJCWlm
+IChyYykgeworCQkJCWNpZnNfZGJnKEZZSSwKKwkJCQkJICJidWlsZF9udGxtc3NwX2F1dGhf
+YmxvYiBmYWlsZWQgJWRcbiIsCisJCQkJCSByYyk7CisJCQkJZ290byBzc2V0dXBfZXhpdDsg
+LyogQkIgZG91YmxlIGNoZWNrIGVycm9yIGhhbmRsaW5nICovCisJCQl9CisJCQlpZiAodXNl
+X3NwbmVnbykgeworCQkJCS8qIGJsb2JfbGVuZ3RoID0gYnVpbGRfc3BuZWdvX250bG1zc3Bf
+YmxvYigKKwkJCQkJCQkJJnNlY3VyaXR5X2Jsb2IsCisJCQkJCQkJCWJsb2JfbGVuZ3RoLAor
+CQkJCQkJCQludGxtc3NwX2Jsb2IpOyAqLworCQkJCWNpZnNfZGJnKFZGUywKKwkJCQkJICJz
+cG5lZ28gbm90IHN1cHBvcnRlZCBmb3IgU01CMiB5ZXRcbiIpOworCQkJCXJjID0gLUVPUE5P
+VFNVUFA7CisJCQkJa2ZyZWUobnRsbXNzcF9ibG9iKTsKKwkJCQlnb3RvIHNzZXR1cF9leGl0
+OworCQkJfSBlbHNlIHsKKwkJCQlzZWN1cml0eV9ibG9iID0gbnRsbXNzcF9ibG9iOworCQkJ
+fQorCQl9IGVsc2UgeworCQkJY2lmc19kYmcoVkZTLCAiaWxsZWdhbCBudGxtc3NwIHBoYXNl
+XG4iKTsKKwkJCXJjID0gLUVJTzsKIAkJCWdvdG8gc3NldHVwX2V4aXQ7CiAJCX0KLQkJYnVp
+bGRfbnRsbXNzcF9uZWdvdGlhdGVfYmxvYihudGxtc3NwX2Jsb2IsIHNlcyk7Ci0JCWlmICh1
+c2Vfc3BuZWdvKSB7Ci0JCQkvKiBibG9iX2xlbmd0aCA9IGJ1aWxkX3NwbmVnb19udGxtc3Nw
+X2Jsb2IoCi0JCQkJCSZzZWN1cml0eV9ibG9iLAotCQkJCQlzaXplb2Yoc3RydWN0IF9ORUdP
+VElBVEVfTUVTU0FHRSksCi0JCQkJCW50bG1zc3BfYmxvYik7ICovCi0JCQkvKiBCQiBldmVu
+dHVhbGx5IG5lZWQgdG8gYWRkIHRoaXMgKi8KLQkJCWNpZnNfZGJnKFZGUywgInNwbmVnbyBu
+b3Qgc3VwcG9ydGVkIGZvciBTTUIyIHlldFxuIik7Ci0JCQlyYyA9IC1FT1BOT1RTVVBQOwot
+CQkJa2ZyZWUobnRsbXNzcF9ibG9iKTsKKwkJaW92WzFdLmlvdl9iYXNlID0gc2VjdXJpdHlf
+YmxvYjsKKwkJaW92WzFdLmlvdl9sZW4gPSBibG9iX2xlbmd0aDsKKwl9IGVsc2UgaWYgKHNl
+cy0+c2VjdHlwZSA9PSBLZXJiZXJvcykgeworCQlzdHJ1Y3QgY2lmc19zcG5lZ29fbXNnICpt
+c2c7CisKKwkJc3BuZWdvX2tleSA9IGNpZnNfZ2V0X3NwbmVnb19rZXkoc2VzKTsKKwkJaWYg
+KElTX0VSUihzcG5lZ29fa2V5KSkgeworCQkJcmMgPSBQVFJfRVJSKHNwbmVnb19rZXkpOwor
+CQkJc3BuZWdvX2tleSA9IE5VTEw7CiAJCQlnb3RvIHNzZXR1cF9leGl0OwotCQl9IGVsc2Ug
+ewotCQkJYmxvYl9sZW5ndGggPSBzaXplb2Yoc3RydWN0IF9ORUdPVElBVEVfTUVTU0FHRSk7
+Ci0JCQkvKiB3aXRoIHJhdyBOVExNU1NQIHdlIGRvbid0IGVuY2Fwc3VsYXRlIGluIFNQTkVH
+TyAqLwotCQkJc2VjdXJpdHlfYmxvYiA9IG50bG1zc3BfYmxvYjsKIAkJfQotCX0gZWxzZSBp
+ZiAocGhhc2UgPT0gTnRMbUF1dGhlbnRpY2F0ZSkgewotCQlyZXEtPmhkci5TZXNzaW9uSWQg
+PSBzZXMtPlN1aWQ7Ci0JCW50bG1zc3BfYmxvYiA9IGt6YWxsb2Moc2l6ZW9mKHN0cnVjdCBf
+TkVHT1RJQVRFX01FU1NBR0UpICsgNTAwLAotCQkJCSAgICAgICBHRlBfS0VSTkVMKTsKLQkJ
+aWYgKG50bG1zc3BfYmxvYiA9PSBOVUxMKSB7Ci0JCQlyYyA9IC1FTk9NRU07CisKKwkJbXNn
+ID0gc3BuZWdvX2tleS0+cGF5bG9hZC5kYXRhOworCQkvKiBjaGVjayB2ZXJzaW9uIGZpZWxk
+IHRvIG1ha2Ugc3VyZSB0aGF0IGNpZnMudXBjYWxsIGlzCisJCSAgIHNlbmRpbmcgdXMgYSBy
+ZXNwb25zZSBpbiBhbiBleHBlY3RlZCBmb3JtICovCisJCWlmIChtc2ctPnZlcnNpb24gIT0g
+Q0lGU19TUE5FR09fVVBDQUxMX1ZFUlNJT04pIHsKKwkJCWNpZnNfZGJnKFZGUywgImluY29y
+cmVjdCB2ZXJzaW9uIG9mIGNpZnMudXBjYWxsICIKKwkJCQkgICAiZXhwZWN0ZWQgJWQgYnV0
+IGdvdCAlZCkiLAorCQkJCSAgIENJRlNfU1BORUdPX1VQQ0FMTF9WRVJTSU9OLCBtc2ctPnZl
+cnNpb24pOworCQkJcmMgPSAtRUtFWVJFSkVDVEVEOwogCQkJZ290byBzc2V0dXBfZXhpdDsK
+IAkJfQotCQlyYyA9IGJ1aWxkX250bG1zc3BfYXV0aF9ibG9iKG50bG1zc3BfYmxvYiwgJmJs
+b2JfbGVuZ3RoLCBzZXMsCi0JCQkJCSAgICAgbmxzX2NwKTsKLQkJaWYgKHJjKSB7Ci0JCQlj
+aWZzX2RiZyhGWUksICJidWlsZF9udGxtc3NwX2F1dGhfYmxvYiBmYWlsZWQgJWRcbiIsCi0J
+CQkJIHJjKTsKLQkJCWdvdG8gc3NldHVwX2V4aXQ7IC8qIEJCIGRvdWJsZSBjaGVjayBlcnJv
+ciBoYW5kbGluZyAqLwotCQl9Ci0JCWlmICh1c2Vfc3BuZWdvKSB7Ci0JCQkvKiBibG9iX2xl
+bmd0aCA9IGJ1aWxkX3NwbmVnb19udGxtc3NwX2Jsb2IoCi0JCQkJCQkJJnNlY3VyaXR5X2Js
+b2IsCi0JCQkJCQkJYmxvYl9sZW5ndGgsCi0JCQkJCQkJbnRsbXNzcF9ibG9iKTsgKi8KLQkJ
+CWNpZnNfZGJnKFZGUywgInNwbmVnbyBub3Qgc3VwcG9ydGVkIGZvciBTTUIyIHlldFxuIik7
+Ci0JCQlyYyA9IC1FT1BOT1RTVVBQOwotCQkJa2ZyZWUobnRsbXNzcF9ibG9iKTsKKworCQlz
+ZXMtPmF1dGhfa2V5LnJlc3BvbnNlID0ga21lbWR1cChtc2ctPmRhdGEsIG1zZy0+c2Vzc2tl
+eV9sZW4sCisJCQkJCQkgR0ZQX0tFUk5FTCk7CisJCWlmICghc2VzLT5hdXRoX2tleS5yZXNw
+b25zZSkgeworCQkJY2lmc19kYmcoVkZTLAorCQkJCSJLZXJiZXJvcyBjYW4ndCBhbGxvY2F0
+ZSAoJXUgYnl0ZXMpIG1lbW9yeSIsCisJCQkJbXNnLT5zZXNza2V5X2xlbik7CisJCQlyYyA9
+IC1FTk9NRU07CiAJCQlnb3RvIHNzZXR1cF9leGl0OwotCQl9IGVsc2UgewotCQkJc2VjdXJp
+dHlfYmxvYiA9IG50bG1zc3BfYmxvYjsKIAkJfQotCX0gZWxzZSB7Ci0JCWNpZnNfZGJnKFZG
+UywgImlsbGVnYWwgbnRsbXNzcCBwaGFzZVxuIik7Ci0JCXJjID0gLUVJTzsKLQkJZ290byBz
+c2V0dXBfZXhpdDsKKwkJc2VzLT5hdXRoX2tleS5sZW4gPSBtc2ctPnNlc3NrZXlfbGVuOwor
+CQlibG9iX2xlbmd0aCA9IG1zZy0+c2VjYmxvYl9sZW47CisJCWlvdlsxXS5pb3ZfYmFzZSA9
+IG1zZy0+ZGF0YSArIG1zZy0+c2Vzc2tleV9sZW47OworCQlpb3ZbMV0uaW92X2xlbiA9IGJs
+b2JfbGVuZ3RoOwogCX0KIAogCS8qIFRlc3Rpbmcgc2hvd3MgdGhhdCBidWZmZXIgb2Zmc2V0
+IG11c3QgYmUgYXQgbG9jYXRpb24gb2YgQnVmZmVyWzBdICovCkBAIC03MTAsOCArNzU1LDYg
+QEAgc3NldHVwX250bG1zc3BfYXV0aGVudGljYXRlOgogCQkJCWNwdV90b19sZTE2KHNpemVv
+ZihzdHJ1Y3Qgc21iMl9zZXNzX3NldHVwX3JlcSkgLQogCQkJCQkgICAgMSAvKiBwYWQgKi8g
+LSA0IC8qIHJmYzEwMDEgbGVuICovKTsKIAlyZXEtPlNlY3VyaXR5QnVmZmVyTGVuZ3RoID0g
+Y3B1X3RvX2xlMTYoYmxvYl9sZW5ndGgpOwotCWlvdlsxXS5pb3ZfYmFzZSA9IHNlY3VyaXR5
+X2Jsb2I7Ci0JaW92WzFdLmlvdl9sZW4gPSBibG9iX2xlbmd0aDsKIAogCWluY19yZmMxMDAx
+X2xlbihyZXEsIGJsb2JfbGVuZ3RoIC0gMSAvKiBwYWQgKi8pOwogCkBAIC03MjIsNiArNzY1
+LDcgQEAgc3NldHVwX250bG1zc3BfYXV0aGVudGljYXRlOgogCiAJa2ZyZWUoc2VjdXJpdHlf
+YmxvYik7CiAJcnNwID0gKHN0cnVjdCBzbWIyX3Nlc3Nfc2V0dXBfcnNwICopaW92WzBdLmlv
+dl9iYXNlOworCXNlcy0+U3VpZCA9IHJzcC0+aGRyLlNlc3Npb25JZDsKIAlpZiAocmVzcF9i
+dWZ0eXBlICE9IENJRlNfTk9fQlVGRkVSICYmCiAJICAgIHJzcC0+aGRyLlN0YXR1cyA9PSBT
+VEFUVVNfTU9SRV9QUk9DRVNTSU5HX1JFUVVJUkVEKSB7CiAJCWlmIChwaGFzZSAhPSBOdExt
+TmVnb3RpYXRlKSB7CkBAIC03MzksNyArNzgzLDYgQEAgc3NldHVwX250bG1zc3BfYXV0aGVu
+dGljYXRlOgogCQkvKiBOVExNU1NQIE5lZ290aWF0ZSBzZW50IG5vdyBwcm9jZXNzaW5nIGNo
+YWxsZW5nZSAocmVzcG9uc2UpICovCiAJCXBoYXNlID0gTnRMbUNoYWxsZW5nZTsgLyogcHJv
+Y2VzcyBudGxtc3NwIGNoYWxsZW5nZSAqLwogCQlyYyA9IDA7IC8qIE1PUkVfUFJPQ0VTU0lO
+RyBpcyBub3QgYW4gZXJyb3IgaGVyZSBidXQgZXhwZWN0ZWQgKi8KLQkJc2VzLT5TdWlkID0g
+cnNwLT5oZHIuU2Vzc2lvbklkOwogCQlyYyA9IGRlY29kZV9udGxtc3NwX2NoYWxsZW5nZShy
+c3AtPkJ1ZmZlciwKIAkJCQlsZTE2X3RvX2NwdShyc3AtPlNlY3VyaXR5QnVmZmVyTGVuZ3Ro
+KSwgc2VzKTsKIAl9CkBAIC03OTYsNiArODM5LDEwIEBAIGtleWdlbl9leGl0OgogCQlrZnJl
+ZShzZXMtPmF1dGhfa2V5LnJlc3BvbnNlKTsKIAkJc2VzLT5hdXRoX2tleS5yZXNwb25zZSA9
+IE5VTEw7CiAJfQorCWlmIChzcG5lZ29fa2V5KSB7CisJCWtleV9pbnZhbGlkYXRlKHNwbmVn
+b19rZXkpOworCQlrZXlfcHV0KHNwbmVnb19rZXkpOworCX0KIAlrZnJlZShzZXMtPm50bG1z
+c3ApOwogCiAJcmV0dXJuIHJjOwotLSAKMS44LjUuNgoK
+--------------050707050402040809010405--
