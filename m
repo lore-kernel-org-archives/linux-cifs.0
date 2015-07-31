@@ -1,71 +1,182 @@
-From: Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>
-Subject: Re: [regression 4.2-rc3] loop: xfstests xfs/073 deadlocked in low
- memory conditions
-Date: Thu, 30 Jul 2015 08:13:56 +1000
-Message-ID: <20150729221356.GC16638@dastard>
-References: <20150721015934.GY7943@dastard>
- <20150721085859.GG11967@dhcp22.suse.cz>
- <20150729115411.GF15801@dhcp22.suse.cz>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Ming Lei <ming.lei-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>,
-	Andrew Morton <akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
-	Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>,
-	Andreas Dilger <andreas.dilger-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	Oleg Drokin <oleg.drokin-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
-	Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-mm-Bw31MaZKKs3YtjvyW6yDsg@public.gmane.org, xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Michal Hocko <mhocko-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20150729115411.GF15801-2MMpYkNvuYDjFM9bn6wA6Q@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Viresh Kumar <viresh.kumar@linaro.org>
+Subject: [PATCH 12/15] fs: Drop unlikely before IS_ERR(_OR_NULL)
+Date: Fri, 31 Jul 2015 14:08:32 +0530
+Message-ID: <4fd8dd8ed76901a89d6cd17e50ac585ea929f1fb.1438331416.git.viresh.kumar@linaro.org>
+References: <cover.1438331416.git.viresh.kumar@linaro.org>
+Cc: linaro-kernel@lists.linaro.org, linux-kernel@vger.kernel.org,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Anna Schumaker <anna.schumaker@netapp.com>,
+	Boaz Harrosh <ooo@electrozaur.com>,
+	Christoph Hellwig <hch@lst.de>,
+	David Howells <dhowells@redhat.com>,
+	ecryptfs@vger.kernel.org (open list:ECRYPT FILE SYSTEM),
+	"Eric W. Biederman" <ebiederm@xmission.com>,
+	Fabian Frederick <fabf@skynet.be>,
+	Joe Perches <joe@perches.com>,
+	linux-cifs@vger.kernel.org (open list:COMMON INTERNET FILE SYSTEM
+	(CIFS)), linux-ext4@vger.kernel.org (open list:EXT4 FILE SYSTEM),
+	linux-fsdevel@vger.kernel.org (open list:FILESYSTEMS (VFS and
+	infrastructure)),
+	linux-nfs@vger.kernel.org (open list:NFS, SUNRPC, AND LOCKD CLIENTS),
+	Peng Tao <tao.peng@primarydata.com>,
+	Petr Vandrovec <petr@vandrovec.name>,
+	samba-technical@
+To: akpm@linux-foundation.org
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <cover.1438331416.git.viresh.kumar@linaro.org>
+In-Reply-To: <cover.1438331416.git.viresh.kumar@linaro.org>
+References: <cover.1438331416.git.viresh.kumar@linaro.org>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Wed, Jul 29, 2015 at 01:54:12PM +0200, Michal Hocko wrote:
-> On Tue 21-07-15 10:58:59, Michal Hocko wrote:
-> > [CCing more people from a potentially affected fs - the reference to the 
-> >  email thread is: http://marc.info/?l=linux-mm&m=143744398020147&w=2]
-...
-> > > The didn't used to happen, because the loop device used to issue
-> > > reads through the splice path and that does:
-> > > 
-> > > 	error = add_to_page_cache_lru(page, mapping, index,
-> > > 			GFP_KERNEL & mapping_gfp_mask(mapping));
-> > > 
-> > > i.e. it pays attention to the allocation context placed on the
-> > > inode and so is doing GFP_NOFS allocations here and avoiding the
-> > > recursion problem.
-> > > 
-> > > [ CC'd Michal Hocko and the mm list because it's a clear exaple of
-> > > why ignoring the mapping gfp mask on any page cache allocation is
-> > > a landmine waiting to be tripped over. ]
-> > 
-> > Thank you for CCing me. I haven't noticed this one when checking for
-> > other similar hardcoded GFP_KERNEL users (6afdb859b710 ("mm: do not
-> > ignore mapping_gfp_mask in page cache allocation paths")). And there
-> > seem to be more of them now that I am looking closer.
-> > 
-> > I am not sure what to do about fs/nfs/dir.c:nfs_symlink which doesn't
-> > require GFP_NOFS or mapping gfp mask for other allocations in the same
-> > context.
-> > 
-> > What do you think about this preliminary (and untested) patch?
-> 
-> Dave, did you have chance to test the patch in your environment? Is the
-> patch good to go or we want a larger refactoring?
+IS_ERR(_OR_NULL) already contain an 'unlikely' compiler flag and there
+is no need to do that again from its callers. Drop it.
 
-No, I haven't had a chance to test it yet. I'll try to get somethign
-done by the end of the week, but I'm not able to reliably
-reproduce the hang I saw (i.e. the analysis I did was from the first
-deadlock and I've only seen it once since) so testing is likely to
-be inconclusive, anyway....
+Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
+---
+ fs/cifs/readdir.c            | 2 +-
+ fs/ecryptfs/inode.c          | 2 +-
+ fs/ext4/extents.c            | 6 +++---
+ fs/ext4/namei.c              | 2 +-
+ fs/namei.c                   | 4 ++--
+ fs/ncpfs/dir.c               | 2 +-
+ fs/nfs/objlayout/objio_osd.c | 2 +-
+ fs/proc/proc_sysctl.c        | 2 +-
+ 8 files changed, 11 insertions(+), 11 deletions(-)
 
-Cheers,
-
-Dave.
+diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+index b1eede3678a9..0557c45e9c33 100644
+--- a/fs/cifs/readdir.c
++++ b/fs/cifs/readdir.c
+@@ -84,7 +84,7 @@ cifs_prime_dcache(struct dentry *parent, struct qstr *name,
+ 	cifs_dbg(FYI, "%s: for %s\n", __func__, name->name);
+ 
+ 	dentry = d_hash_and_lookup(parent, name);
+-	if (unlikely(IS_ERR(dentry)))
++	if (IS_ERR(dentry))
+ 		return;
+ 
+ 	if (dentry) {
+diff --git a/fs/ecryptfs/inode.c b/fs/ecryptfs/inode.c
+index 3c4db1172d22..e2e47ba5d313 100644
+--- a/fs/ecryptfs/inode.c
++++ b/fs/ecryptfs/inode.c
+@@ -270,7 +270,7 @@ ecryptfs_create(struct inode *directory_inode, struct dentry *ecryptfs_dentry,
+ 
+ 	ecryptfs_inode = ecryptfs_do_create(directory_inode, ecryptfs_dentry,
+ 					    mode);
+-	if (unlikely(IS_ERR(ecryptfs_inode))) {
++	if (IS_ERR(ecryptfs_inode)) {
+ 		ecryptfs_printk(KERN_WARNING, "Failed to create file in"
+ 				"lower filesystem\n");
+ 		rc = PTR_ERR(ecryptfs_inode);
+diff --git a/fs/ext4/extents.c b/fs/ext4/extents.c
+index 2553aa8b608d..799f01714767 100644
+--- a/fs/ext4/extents.c
++++ b/fs/ext4/extents.c
+@@ -899,7 +899,7 @@ ext4_find_extent(struct inode *inode, ext4_lblk_t block,
+ 
+ 		bh = read_extent_tree_block(inode, path[ppos].p_block, --i,
+ 					    flags);
+-		if (unlikely(IS_ERR(bh))) {
++		if (IS_ERR(bh)) {
+ 			ret = PTR_ERR(bh);
+ 			goto err;
+ 		}
+@@ -5792,7 +5792,7 @@ ext4_swap_extents(handle_t *handle, struct inode *inode1,
+ 		int split = 0;
+ 
+ 		path1 = ext4_find_extent(inode1, lblk1, NULL, EXT4_EX_NOCACHE);
+-		if (unlikely(IS_ERR(path1))) {
++		if (IS_ERR(path1)) {
+ 			*erp = PTR_ERR(path1);
+ 			path1 = NULL;
+ 		finish:
+@@ -5800,7 +5800,7 @@ ext4_swap_extents(handle_t *handle, struct inode *inode1,
+ 			goto repeat;
+ 		}
+ 		path2 = ext4_find_extent(inode2, lblk2, NULL, EXT4_EX_NOCACHE);
+-		if (unlikely(IS_ERR(path2))) {
++		if (IS_ERR(path2)) {
+ 			*erp = PTR_ERR(path2);
+ 			path2 = NULL;
+ 			goto finish;
+diff --git a/fs/ext4/namei.c b/fs/ext4/namei.c
+index 011dcfb5cce3..0554e4be1fb8 100644
+--- a/fs/ext4/namei.c
++++ b/fs/ext4/namei.c
+@@ -1429,7 +1429,7 @@ static struct buffer_head * ext4_find_entry (struct inode *dir,
+ 				}
+ 				num++;
+ 				bh = ext4_getblk(NULL, dir, b++, 0);
+-				if (unlikely(IS_ERR(bh))) {
++				if (IS_ERR(bh)) {
+ 					if (ra_max == 0) {
+ 						ret = bh;
+ 						goto cleanup_and_exit;
+diff --git a/fs/namei.c b/fs/namei.c
+index ae4e4c18b2ac..04fdec230c45 100644
+--- a/fs/namei.c
++++ b/fs/namei.c
+@@ -1942,7 +1942,7 @@ static int link_path_walk(const char *name, struct nameidata *nd)
+ 		if (err) {
+ 			const char *s = get_link(nd);
+ 
+-			if (unlikely(IS_ERR(s)))
++			if (IS_ERR(s))
+ 				return PTR_ERR(s);
+ 			err = 0;
+ 			if (unlikely(!s)) {
+@@ -3351,7 +3351,7 @@ struct file *do_file_open_root(struct dentry *dentry, struct vfsmount *mnt,
+ 		return ERR_PTR(-ELOOP);
+ 
+ 	filename = getname_kernel(name);
+-	if (unlikely(IS_ERR(filename)))
++	if (IS_ERR(filename))
+ 		return ERR_CAST(filename);
+ 
+ 	set_nameidata(&nd, -1, filename);
+diff --git a/fs/ncpfs/dir.c b/fs/ncpfs/dir.c
+index 93575e91a7aa..356816e7bc90 100644
+--- a/fs/ncpfs/dir.c
++++ b/fs/ncpfs/dir.c
+@@ -597,7 +597,7 @@ ncp_fill_cache(struct file *file, struct dir_context *ctx,
+ 	qname.name = __name;
+ 
+ 	newdent = d_hash_and_lookup(dentry, &qname);
+-	if (unlikely(IS_ERR(newdent)))
++	if (IS_ERR(newdent))
+ 		goto end_advance;
+ 	if (!newdent) {
+ 		newdent = d_alloc(dentry, &qname);
+diff --git a/fs/nfs/objlayout/objio_osd.c b/fs/nfs/objlayout/objio_osd.c
+index 5aaed363556a..5c0c6b58157f 100644
+--- a/fs/nfs/objlayout/objio_osd.c
++++ b/fs/nfs/objlayout/objio_osd.c
+@@ -124,7 +124,7 @@ objio_alloc_deviceid_node(struct nfs_server *server, struct pnfs_device *pdev,
+ 
+ retry_lookup:
+ 	od = osduld_info_lookup(&odi);
+-	if (unlikely(IS_ERR(od))) {
++	if (IS_ERR(od)) {
+ 		err = PTR_ERR(od);
+ 		dprintk("%s: osduld_info_lookup => %d\n", __func__, err);
+ 		if (err == -ENODEV && retry_flag) {
+diff --git a/fs/proc/proc_sysctl.c b/fs/proc/proc_sysctl.c
+index fdda62e6115e..fe5b6e6c4671 100644
+--- a/fs/proc/proc_sysctl.c
++++ b/fs/proc/proc_sysctl.c
+@@ -948,7 +948,7 @@ static struct ctl_dir *get_subdir(struct ctl_dir *dir,
+ found:
+ 	subdir->header.nreg++;
+ failed:
+-	if (unlikely(IS_ERR(subdir))) {
++	if (IS_ERR(subdir)) {
+ 		pr_err("sysctl could not get directory: ");
+ 		sysctl_print_dir(dir);
+ 		pr_cont("/%*.*s %ld\n",
 -- 
-Dave Chinner
-david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org
+2.4.0
+
