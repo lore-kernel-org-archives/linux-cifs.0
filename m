@@ -1,137 +1,83 @@
-From: Andreas Gruenbacher <andreas.gruenbacher@gmail.com>
-Subject: [RFC v6 01/40] vfs: Add IS_ACL() and IS_RICHACL() tests
-Date: Tue,  4 Aug 2015 13:52:59 +0200
-Message-ID: <1438689218-6921-2-git-send-email-agruenba@redhat.com>
-References: <1438689218-6921-1-git-send-email-agruenba@redhat.com>
-Cc: linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
-	linux-api@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	Andreas Gruenbacher <agruenba@redhat.com>
-To: linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1438689218-6921-1-git-send-email-agruenba@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: "L. A. Walsh" <linux-cifs-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org>
+Subject: permissions on win-symlinks?
+Date: Thu, 06 Aug 2015 13:00:20 -0700
+Message-ID: <55C3BCD4.1030507@tlinx.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-The vfs does not apply the umask for file systems that support acls. The
-test used for this used to be called IS_POSIXACL(). Switch to a new
-IS_ACL() test to check for either posix acls or richacls instead. Add a new
-MS_RICHACL flag and IS_RICHACL() test for richacls alone. The IS_POSIXACL()
-test is still needed by file systems that specifically support POSIX ACLs,
-like nfsd.
+I noticed that most of the symlinks I see through cifs
+now work (providing it is a "follow-able" path).
 
-Signed-off-by: Andreas Gruenbacher <agruenba@redhat.com>
----
- fs/Kconfig              |  3 +++
- fs/namei.c              |  8 ++++----
- include/linux/fs.h      | 12 ++++++++++++
- include/uapi/linux/fs.h |  3 ++-
- 4 files changed, 21 insertions(+), 5 deletions(-)
 
-diff --git a/fs/Kconfig b/fs/Kconfig
-index 011f433..3e09c06 100644
---- a/fs/Kconfig
-+++ b/fs/Kconfig
-@@ -59,6 +59,9 @@ endif # BLOCK
- config FS_POSIX_ACL
- 	def_bool n
- 
-+config FS_RICHACL
-+	def_bool n
-+
- config EXPORTFS
- 	tristate
- 
-diff --git a/fs/namei.c b/fs/namei.c
-index fbbcf09..8f3db24 100644
---- a/fs/namei.c
-+++ b/fs/namei.c
-@@ -2771,7 +2771,7 @@ static int atomic_open(struct nameidata *nd, struct dentry *dentry,
- 	}
- 
- 	mode = op->mode;
--	if ((open_flag & O_CREAT) && !IS_POSIXACL(dir))
-+	if ((open_flag & O_CREAT) && !IS_ACL(dir))
- 		mode &= ~current_umask();
- 
- 	excl = (open_flag & (O_EXCL | O_CREAT)) == (O_EXCL | O_CREAT);
-@@ -2955,7 +2955,7 @@ static int lookup_open(struct nameidata *nd, struct path *path,
- 	/* Negative dentry, just create the file */
- 	if (!dentry->d_inode && (op->open_flag & O_CREAT)) {
- 		umode_t mode = op->mode;
--		if (!IS_POSIXACL(dir->d_inode))
-+		if (!IS_ACL(dir->d_inode))
- 			mode &= ~current_umask();
- 		/*
- 		 * This write is needed to ensure that a
-@@ -3526,7 +3526,7 @@ retry:
- 	if (IS_ERR(dentry))
- 		return PTR_ERR(dentry);
- 
--	if (!IS_POSIXACL(path.dentry->d_inode))
-+	if (!IS_ACL(path.dentry->d_inode))
- 		mode &= ~current_umask();
- 	error = security_path_mknod(&path, dentry, mode, dev);
- 	if (error)
-@@ -3595,7 +3595,7 @@ retry:
- 	if (IS_ERR(dentry))
- 		return PTR_ERR(dentry);
- 
--	if (!IS_POSIXACL(path.dentry->d_inode))
-+	if (!IS_ACL(path.dentry->d_inode))
- 		mode &= ~current_umask();
- 	error = security_path_mkdir(&path, dentry, mode);
- 	if (!error)
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index cc008c3..44e696e 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -1770,6 +1770,12 @@ struct super_operations {
- #define IS_IMMUTABLE(inode)	((inode)->i_flags & S_IMMUTABLE)
- #define IS_POSIXACL(inode)	__IS_FLG(inode, MS_POSIXACL)
- 
-+#ifdef CONFIG_FS_RICHACL
-+#define IS_RICHACL(inode)	__IS_FLG(inode, MS_RICHACL)
-+#else
-+#define IS_RICHACL(inode)	0
-+#endif
-+
- #define IS_DEADDIR(inode)	((inode)->i_flags & S_DEAD)
- #define IS_NOCMTIME(inode)	((inode)->i_flags & S_NOCMTIME)
- #define IS_SWAPFILE(inode)	((inode)->i_flags & S_SWAPFILE)
-@@ -1783,6 +1789,12 @@ struct super_operations {
- 				 (inode)->i_rdev == WHITEOUT_DEV)
- 
- /*
-+ * IS_ACL() tells the VFS to not apply the umask
-+ * and use check_acl for acl permission checks when defined.
-+ */
-+#define IS_ACL(inode)		__IS_FLG(inode, MS_POSIXACL | MS_RICHACL)
-+
-+/*
-  * Inode state bits.  Protected by inode->i_lock
-  *
-  * Three bits determine the dirty state of the inode, I_DIRTY_SYNC,
-diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-index 9b964a5..6ac6bc9 100644
---- a/include/uapi/linux/fs.h
-+++ b/include/uapi/linux/fs.h
-@@ -81,7 +81,7 @@ struct inodes_stat_t {
- #define MS_VERBOSE	32768	/* War is peace. Verbosity is silence.
- 				   MS_VERBOSE is deprecated. */
- #define MS_SILENT	32768
--#define MS_POSIXACL	(1<<16)	/* VFS does not apply the umask */
-+#define MS_POSIXACL	(1<<16)	/* Supports POSIX ACLs */
- #define MS_UNBINDABLE	(1<<17)	/* change to unbindable */
- #define MS_PRIVATE	(1<<18)	/* change to private */
- #define MS_SLAVE	(1<<19)	/* change to slave */
-@@ -91,6 +91,7 @@ struct inodes_stat_t {
- #define MS_I_VERSION	(1<<23) /* Update inode I_version field */
- #define MS_STRICTATIME	(1<<24) /* Always perform atime updates */
- #define MS_LAZYTIME	(1<<25) /* Update the on-disk [acm]times lazily */
-+#define MS_RICHACL	(1<<26) /* Supports richacls */
- 
- /* These sb flags are internal to the kernel */
- #define MS_NOSEC	(1<<28)
--- 
-2.5.0
+ 56K -rwxr-xr-x 1  53K Dec  4  2011 Cygwin-Terminal.ico*
+ 512 -rwxr-xr-x 1   51 Dec 10  2009 Cygwin.bat*
+156K -rwxr-xr-x 1 154K Dec  4  2011 Cygwin.ico*
+   0 l--------- 1    0 Jul 16  2013 D -> /??/UNC/Ishtar/Documents/
+   0 l--------- 1    0 Feb 28 16:38 M -> /??/UNC/Bliss/Music/
+   0 l--------- 1    0 Feb 28 16:10 P -> /??/UNC/Bliss/Pictures/
+   0 drwxr-xr-x 2    0 Sep 18  2014 PortableApps/
+   0 drwxr-xr-x 2    0 Aug  5 17:49 Program Files/
+   0 drwxr-xr-x 2    0 Aug  5 17:58 Program Files (x86)/
+   0 drwxr-xr-x 2    0 Jul 31 12:40 ProgramData/
+   0 drwxr-xr-x 2    0 Aug 28  2013 Python27/
+   0 drwxr-xr-x 2    0 Feb  5 20:36 Recovery/
+   0 drwxr-xr-x 2    0 Jul 15 19:39 Recycled/
+   0 l--------- 1    0 Mar 28  2013 Share -> /??/UNC/Bliss/Share/
+   0 drwxr-xr-x 2    0 Jun  2 19:17 Users/
+   0 drwxr-xr-x 2    0 Aug  4 23:12 Windows/
+   0 l--------- 1    0 Mar 21  2014 bin -> 
+/??/C:/windows/system32/cygwin/bin/
+ 512 -rwxr-xr-x 1   27 Apr 19  2011 boot*
+   0 drwxr-xr-x 2    0 Jul  2  2010 boot.d/
+ 512 -rwxr-xr-x 1   90 Apr 19  2011 boot.ini*
+   0 drwxr-xr-x 2    0 Apr 27 12:31 cygwin/
+   0 drwxr-xr-x 2    0 May 14 19:01 cygwin64/
+   0 drwxr-xr-x 2    0 May 14 06:08 dev/
+   0 l--------- 1    0 Feb 28 15:34 etc -> 
+/??/C:/Windows/System32/cygwin/etc/
+204K -rwxr-xr-x 1 204K Feb 17  2009 grldr*
+   0 l--------- 1    0 Mar  5 14:32 lib -> 
+/??/C:/Windows/System32/cygwin/lib/
+   0 drwxr-xr-x 2    0 Jun 21 02:51 oemfiles/
+   0 l--------- 1    0 May 14 07:15 opt -> 
+/??/C:/Windows/System32/cygwin/opt/
+ 96G -rwxr-xr-x 1  96G Aug  5 23:58 pagefile.sys*
+   0 drwxr-xr-x 2    0 Jan 23  2014 proc/
+   0 l--------- 1    0 Apr 21  2013 prog64 -> Program Files/
+   0 l--------- 1    0 Mar  5 14:33 sbin -> 
+/??/C:/Windows/System32/cygwin/sbin/
+   0 l--------- 1    0 Jan 12  2014 temp -> tmp/
+   0 drwxr-xr-x 2    0 Aug  6 12:29 tmp/
+   0 l--------- 1    0 Mar  5 14:35 usr -> 
+/??/C:/Windows/System32/cygwin/usr/
+   0 l--------- 1    0 Mar  5 14:35 var -> 
+/??/C:/Windows/System32/cygwin/var/
+   0 drwxr-xr-x 2    0 Aug 28  2013 windowsearch/
+----
+
+my fstab looks like (working entry first, fails commented out afterwards:
+
+//Athenae/C/  /athenae/ cifs  
+user,noauto,rw,uid=law,gid=Administrators,nocase,serverino,credentials=/home/law/.ssh/athenae,setuids,noauto 
+0 0
+tried: 
+  (tried multiuser but didn't make progress -- never saw any auths 
+requests to the server either...now sure what I did wrong...(?))
+
+#//BLISS/ATHENAE/C$/  /athenae/ cifs  
+user,noauto,rw,netbiosname=Athenae,domain=BLISS,username=Bliss/law,sfu,multiuser,nocase,serverino,setuids,noauto 
+0 0
+
+Wanted to setup a script on my end to answer multi-user ID 
+requiests...but that
+didn't seem to work sell either (I can mount, but all files are owned by 
+root.root where I don't have access to most).
+
+Any ideas?
+
+BTW -- I thought the resolving of the symlinks to be 'cool'....
