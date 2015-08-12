@@ -1,40 +1,41 @@
-From: Viresh Kumar <viresh.kumar@linaro.org>
-Subject: [PATCH V1 Resend 08/11] fs: Drop unlikely before IS_ERR(_OR_NULL)
-Date: Mon, 10 Aug 2015 11:42:30 +0530
-Message-ID: <02a94664a8586b70cb12406eba0276c7b80c3dd9.1439187003.git.viresh.kumar@linaro.org>
-References: <cover.1439187003.git.viresh.kumar@linaro.org>
-Cc: linaro-kernel@lists.linaro.org, linux-kernel@vger.kernel.org,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	David Howells <dhowells@redhat.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Anna Schumaker <anna.schumaker@netapp.com>,
-	Boaz Harrosh <ooo@electrozaur.com>,
-	Christoph Hellwig <hch@lst.de>,
-	ecryptfs@vger.kernel.org (open list:ECRYPT FILE SYSTEM),
-	"Eric W. Biederman" <ebiederm@xmission.com>,
-	Fabian Frederick <fabf@skynet.be>,
-	linux-cifs@vger.kernel.org (open list:COMMON INTERNET FILE SYSTEM
-	(CIFS)), linux-ext4@vger.kernel.org (open list:EXT4 FILE SYSTEM),
-	linux-fsdevel@vger.kernel.org (open list:FILESYSTEMS (VFS and
+From: Viresh Kumar <viresh.kumar-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: [PATCH V1 Resend 07/10] fs: Drop unlikely before IS_ERR(_OR_NULL)
+Date: Wed, 12 Aug 2015 15:59:44 +0530
+Message-ID: <2efb962cb72884f625116cba24fc4fb203c6621f.1439375087.git.viresh.kumar@linaro.org>
+References: <cover.1439375087.git.viresh.kumar@linaro.org>
+Cc: linaro-kernel-cunTk1MwBs8s++Sfvej+rw@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Viresh Kumar <viresh.kumar-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
+	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
+	Andreas Dilger <adilger.kernel-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>,
+	Andrew Morton <akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
+	Anna Schumaker <anna.schumaker-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
+	Boaz Harrosh <ooo-rh7Tgz9RNieUD9Wbbkgo/g@public.gmane.org>,
+	Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>,
+	ecryptfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org (open list:ECRYPT FILE SYSTEM),
+	"Eric W. Biederman" <ebiederm-aS9lmoZGLiVWk0Htik3J/w@public.gmane.org>,
+	Fabian Frederick <fabf-AgBVmzD5pcezQB+pC5nmwQ@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org (open list:COMMON INTERNET FILE SYSTEM
+	(CIFS)), linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org (open list:EXT4 FILE SYSTEM),
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org (open list:FILESYSTEMS (VFS and
 	infrastructure)),
-	linux-nfs@vger.kernel.org (open list:NFS, SUNRPC, AND LOCKD CLIENTS),
-	Peng Tao <tao.peng@primarydata.com>,
-	Petr Vandrovec <petr@vandrovec.name>,
-	samba-technical@lists.samba.org (moderated list:
-To: akpm@linux-foundation.org
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <cover.1439187003.git.viresh.kumar@linaro.org>
-In-Reply-To: <cover.1439187003.git.viresh.kumar@linaro.org>
-References: <cover.1439187003.git.viresh.kumar@linaro.org>
-Sender: linux-fsdevel-owner@vger.kernel.org
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org (open list:NFS, SUNRPC, AND LOCKD CLIENTS),
+	Peng Tao <tao.peng-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
+	Petr Vandrovec <petr-vPk2MGR0e28uaRcfnNAh7A@public.gmane.org>,
+	samb
+To: trivial-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <cover.1439375087.git.viresh.kumar-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+In-Reply-To: <cover.1439375087.git.viresh.kumar-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+References: <cover.1439375087.git.viresh.kumar-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
 IS_ERR(_OR_NULL) already contain an 'unlikely' compiler flag and there
 is no need to do that again from its callers. Drop it.
 
-Reviewed-by: David Howells <dhowells@redhat.com>
-Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
+Reviewed-by: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Viresh Kumar <viresh.kumar-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 ---
  fs/cifs/readdir.c            | 2 +-
  fs/ecryptfs/inode.c          | 2 +-
@@ -180,3 +181,7 @@ index fdda62e6115e..fe5b6e6c4671 100644
 -- 
 2.4.0
 
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
