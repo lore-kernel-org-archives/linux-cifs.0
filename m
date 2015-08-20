@@ -1,63 +1,46 @@
-From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
-Subject: Re: strange bottleneck with SMB 2.0
-Date: Thu, 20 Aug 2015 08:57:01 -0400
-Message-ID: <20150820085701.46611da1@tlielax.poochiereds.net>
-References: <CALQF7Zw5ET+uhgskMDMar31q1uo98nkSd9dusX4gQpS47-zKig@mail.gmail.com>
+From: Kristian Rink <kawazu428-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Linux CIFS client, Windows 2012 CIFS file server => files not found?
+Date: Thu, 20 Aug 2015 15:32:47 +0200
+Message-ID: <55D5D6FF.1070207@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Yale Zhang <yzhang1985-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CALQF7Zw5ET+uhgskMDMar31q1uo98nkSd9dusX4gQpS47-zKig-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 19 Aug 2015 04:11:31 -0700
-Yale Zhang <yzhang1985-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+Folks;
 
-> SMB developers/users,
-> 
-> I'm experiencing a strange bottleneck when my files are mounted as SMB
-> 2.0. When I launch  multiple processes in parallel for benchmarking,
-> only the 1st one starts, and the rest won't start until the 1st one
-> finishes:
-> 
-> ---------------------------------------test
-> programs--------------------------------
-> #!/bin/sh
-> ./a.out&
-> ./a.out&
-> ./a.out&
-> wait
-> 
-> a.out is just a C program like this:
-> 
-> int main()
-> {
->   printf("greetings\n");
->   while (true);
->   return 0;
-> }
-> 
-> Apparently, this only affects SMB 2.0. I tried it with SMB 2.1, SMB
-> 3.0, & SMB 3.02, and everything starts in parallel as expected.
-> 
-> I'm assuming SMB 3 and especially SMB 2.1 would share a common
-> implementation. How could 2.0 have the problem but not 3? It almost
-> seems the bottleneck is a feature instead of a bug?  8(
-> 
-> Can it still be fixed?
-> 
-> -Yale
+the last few years we've been locally serving files using a NetApp 
+storage system exposing CIFS and several (Windows, Linux) clients 
+mounting these shares in order to host data and run an internal business 
+application.
 
-Probably. It'd be interesting to see what the other tasks are blocking
-on. After firing up the second one can you run:
+The application itself (binaries, libraries, resources, a bunch of ksh 
+scripts) entirely lives on the CIFS share. So far (having NetApp CIFS 
+mounted), this worked on all machines.
 
-    # cat /proc/<pid of second a.out>/stack
+Now, these CIFS shares are to be provided by a Windows 2012 Storage 
+Server. Outcome: Linux machines can't run this application anymore. 
+Having mounted the W2012 CIFS share, the application won't start 
+complaining that some resources (scripts and libraries) are missing, 
+even while they are obviously around and also, permission-wise, accessible.
 
-...and paste the stack trace here? That should tell us what those other
-processes are doing.
+It's difficult to really figure out what happens here. Basically, 
+looking at strace output, it seems the application does stat64() one of 
+these files which in both cases seems to provide a valid outcome...
 
--- 
-Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+stat64("/opt/.../file.oeb", {st_mode=S_IFREG|0755, st_size=36405, ...}) = 0
+
+... but while mounting the share off the NetApp the application works as 
+desired, mounting the share off the W2012 server the application will 
+terminate here complaining about this particular resource missing.
+
+Vague as it is, does anyone have any idea what could be causing this? 
+I've been playing with various parameters of mount.cifs so far, but I'm 
+not deep enough into either NetApps nor Windows 2012s understanding of 
+CIFS to have an idea what might have changed here...
+
+TIA,
+Kristian
