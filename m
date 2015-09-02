@@ -1,47 +1,54 @@
-From: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: "J. Bruce Fields" <bfields@fieldses.org>
 Subject: Re: [RFC v6 02/40] vfs: Add MAY_CREATE_FILE and MAY_CREATE_DIR
  permission flags
-Date: Wed, 2 Sep 2015 21:06:32 +0200
-Message-ID: <CAHc6FU62LQ8xnEbjsBprnud36AURg_ggifFoHOVM51-9vRJeDg@mail.gmail.com>
+Date: Wed, 2 Sep 2015 15:20:08 -0400
+Message-ID: <20150902192008.GB3319@fieldses.org>
 References: <1438689218-6921-1-git-send-email-agruenba@redhat.com>
-	<1438689218-6921-3-git-send-email-agruenba@redhat.com>
-	<20150902185300.GA3319@fieldses.org>
+ <1438689218-6921-3-git-send-email-agruenba@redhat.com>
+ <20150902185300.GA3319@fieldses.org>
+ <CAHc6FU62LQ8xnEbjsBprnud36AURg_ggifFoHOVM51-9vRJeDg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Andreas Gruenbacher <andreas.gruenbacher-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20150902185300.GA3319-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Andreas Gruenbacher <andreas.gruenbacher@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	linux-nfs@vger.kernel.org, linux-api@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-security-module@vger.kernel.org
+To: Andreas Gruenbacher <agruenba@redhat.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <CAHc6FU62LQ8xnEbjsBprnud36AURg_ggifFoHOVM51-9vRJeDg@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-2015-09-02 20:53 GMT+02:00 J. Bruce Fields <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>:
->> @@ -453,7 +453,8 @@ static int sb_permission(struct super_block *sb, struct inode *inode, int mask)
->>   * this, letting us set arbitrary permissions for filesystem access without
->>   * changing the "normal" UIDs which are used for other things.
->>   *
->> - * When checking for MAY_APPEND, MAY_WRITE must also be set in @mask.
->> + * When checking for MAY_APPEND, MAY_CREATE_FILE, MAY_CREATE_DIR,
->> + * MAY_WRITE must also be set in @mask.
->
-> Why?
+On Wed, Sep 02, 2015 at 09:06:32PM +0200, Andreas Gruenbacher wrote:
+> 2015-09-02 20:53 GMT+02:00 J. Bruce Fields <bfields@fieldses.org>:
+> >> @@ -453,7 +453,8 @@ static int sb_permission(struct super_block *sb, struct inode *inode, int mask)
+> >>   * this, letting us set arbitrary permissions for filesystem access without
+> >>   * changing the "normal" UIDs which are used for other things.
+> >>   *
+> >> - * When checking for MAY_APPEND, MAY_WRITE must also be set in @mask.
+> >> + * When checking for MAY_APPEND, MAY_CREATE_FILE, MAY_CREATE_DIR,
+> >> + * MAY_WRITE must also be set in @mask.
+> >
+> > Why?
+> 
+> So that file systems that don't support MAY_APPEND can ignore the flag
+> and will then automatically check for MAY_WRITE instead.
 
-So that file systems that don't support MAY_APPEND can ignore the flag
-and will then automatically check for MAY_WRITE instead.
+Got it.  And maybe it should be obvious, but it might be worth a
+sentence in the changelog if it's not already explained elsewhere.--b.
 
-> (Also: written as a simple list like that, it's a ambiguous how to
-> parse that comment: I think you mean that MAY_WRITE must be set whenever
-> MAY_APPEND, MAY_CREATE_FILE, or MAY_CREATE_DIR are set.)
-
-Yes, that's better.
-
-Thanks,
-Andreas
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> > (Also: written as a simple list like that, it's a ambiguous how to
+> > parse that comment: I think you mean that MAY_WRITE must be set whenever
+> > MAY_APPEND, MAY_CREATE_FILE, or MAY_CREATE_DIR are set.)
+> 
+> Yes, that's better.
+> 
+> Thanks,
+> Andreas
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
