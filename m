@@ -1,78 +1,190 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: noserverino option
-Date: Thu, 3 Sep 2015 20:19:13 -0500
-Message-ID: <CAH2r5msGGTFORwqs5OsP07FrQu23kV2un3cEEDK0NDXg2y6EHQ@mail.gmail.com>
-References: <CAPhxvqOMBJ+2Ph1HT8ggTzacogna15kWQCpsOYVU9JCQD9BhVg@mail.gmail.com>
- <CAH2r5mvj5KWAeKKAud9FcrktGhDvO5CWogc=M4XYgQTxAmeYtA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: John Jackson <john.michael.jackson1-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mvj5KWAeKKAud9FcrktGhDvO5CWogc=M4XYgQTxAmeYtA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [RFC v7 00/41] Richacls
+Date: Sat,  5 Sep 2015 12:26:55 +0200
+Message-ID: <1441448856-13478-1-git-send-email-agruenba@redhat.com>
+To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-Sorry about the typo ("date" instead of "data")
+Hello,
 
-Running without server inode numbers can cause problems when
-hardlinked files are common (since the client thinks they are
-different files and they are actually the same
-file data).
+here's another update of the richacl patch queue.  Changes since the last
+posting (https://lwn.net/Articles/653459/):
 
-On Thu, Sep 3, 2015 at 3:11 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> On Thu, Sep 3, 2015 at 10:06 AM, John Jackson
-> <john.michael.jackson1-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> Hi Everyone,
->>
->> How does the noserverino operation behave when mounting a CIFS share,
->> what does it do?
->
-> noserverino mount option is designed to handle cases where the server
-> can not generate a unique inode number (or equivalent) for each file.
-> In CIFS and SMB2/SMB3 files are almost always accessed (opened) by
-> name, and it is not required that a file system be able to preserve a
-> persistent identifier for each file (other than its name), and some
-> popular non-Unix/non-Linux file systems, like FAT, don't really have
-> inode numbers (or other unique numeric identifiers) although most can
-> generate one.  Some buggy servers also will fill 0 in (incorrectly) as
-> the inode number making it impossible to distinguish hardlinked files.
->
-> In general, for most modern servers they should be able to work fine
-> with the default (server inode numbers enabled) which allows the
-> client to detect hardlinks.  The cifs client will turn off using the
-> server's inode numbers if the server starts returning 0 as inode
-> number so we can catch most buggy servers early enough.
->
-> Since the caching of files is dependent on (oplocks/leases granted
-> when) opening the file by path name, whether or not you use server
-> inode numbers should not be a factor.   Running without server inode
-> numbers can cause problems when hardlinked files are common (since the
-> client thinks they are different files and they are actually the same
-> file date).
->
->> I know the man page says, Client generates inode numbers itself rather
->> than using the actual ones from the server,  but how does using the
->> noserverino option affecting caching of a linux client mounting a
->> share with cifs from a NAS.
->>
->>
->> I was recently facing a problem where I had a windows7  machine and a
->> linux(2.6.32) machine concurrently reading/writing files on a synology
->> nas box, And the files were mismatched by 4k, one linux page size on
->> the linux machine. I found that upgrading the kernel to 3.10 or 3.18
->> and using the noserverino option, my problem had gone away. However, I
->> am worried I may have taken a performance hit. .
->
->
-> --
-> Thanks,
->
-> Steve
+ * The owner argument of richacl_compute_max_masks() has been
+   removed; the maximum file masks are computed independent of
+   the current file owner; with the previous version, the group mask
+   could have ended up being too restrictive after an owner change.
 
+ * Function richace_clear_inheritance_flags() has been replaced
+   by the RICHACE_INHERITANCE_FLAGS define.
 
+ * Definitions common to the kernel and to user space have been
+    moved into uapi header files.
+
+ * A few other minor fixes and clarifications.
+
+In addition, the user-space utilitites now include a man page describing how
+richacls work:
+
+  https://github.com/andreas-gruenbacher/richacl/blob/master/man/richacl.7
+
+The complete patch queue is available here:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/agruen/linux-richacl.git \
+        richacl-2015-09-xx
+
+Open issues:
+
+ * nfs: When a user or group name cannot be mapped, nfs's idmapper
+   always maps it to nobody. That's good enough for mapping the file
+   owner and owning group, but not for identifiers in acls. For now, to get
+   the nfs richacl support somewhat working, I'm explicitly checking if
+   mapping has resulted in uid/gid 99 in the kernel.
+
+ * nfs: When the nfs server replies with NFS4ERR_BADNAME for any
+   user or group name lookup, the client will stop sending numeric uids
+   and gids to the server even when the lookup wasn't numeric.
+   From then on, the client will translate uids and gids that have no
+   mapping to the string "nobody", and the server will reject them.
+   This problem is not specific to acls.
+
+ * nfsd could implement creating a file without applying a file mode;
+   this would make Automatic Inheritance work as intended. Right
+   now, when no mode is specified, the file permission bits are set
+   to 0.
+
+ * It would be nice if the MAY_DELETE_SELF flag could override the
+   sticky directory check as it did in the previous version of this patch
+   queue.  I couldn't come up with a clean way of achieving that.
+
+Thanks,
+Andreas
+
+Andreas Gruenbacher (39):
+  vfs: Add IS_ACL() and IS_RICHACL() tests
+  vfs: Add MAY_CREATE_FILE and MAY_CREATE_DIR permission flags
+  vfs: Add MAY_DELETE_SELF and MAY_DELETE_CHILD permission flags
+  vfs: Make the inode passed to inode_change_ok non-const
+  vfs: Add permission flags for setting file attributes
+  richacl: In-memory representation and helper functions
+  richacl: Permission mapping functions
+  richacl: Compute maximum file masks from an acl
+  richacl: Update the file masks in chmod()
+  richacl: Permission check algorithm
+  vfs: Cache base_acl objects in inodes
+  vfs: Cache richacl in struct inode
+  richacl: Check if an acl is equivalent to a file mode
+  richacl: Create-time inheritance
+  richacl: Automatic Inheritance
+  richacl: xattr mapping functions
+  vfs: Add richacl permission checking
+  richacl: acl editing helper functions
+  richacl: Move everyone@ aces down the acl
+  richacl: Propagate everyone@ permissions to other aces
+  richacl: Set the owner permissions to the owner mask
+  richacl: Set the other permissions to the other mask
+  richacl: Isolate the owner and group classes
+  richacl: Apply the file masks to a richacl
+  richacl: Create richacl from mode values
+  nfsd: Keep list of acls to dispose of in compoundargs
+  nfsd: Use richacls as internal acl representation
+  nfsd: Add richacl support
+  nfsd: Add support for the v4.1 dacl attribute
+  nfsd: Add support for the MAY_CREATE_{FILE,DIR} permissions
+  richacl: Add support for unmapped identifiers
+  ext4: Don't allow unmapped identifiers in richacls
+  sunrpc: Allow to demand-allocate pages to encode into
+  sunrpc: Add xdr_init_encode_pages
+  nfs: Fix GETATTR bitmap verification
+  nfs: Remove unused xdr page offsets in getacl/setacl arguments
+  nfs: Add richacl support
+  nfs: Add support for the v4.1 dacl attribute
+  richacl: uapi header split
+
+Aneesh Kumar K.V (2):
+  ext4: Add richacl support
+  ext4: Add richacl feature flag
+
+ drivers/staging/lustre/lustre/llite/llite_lib.c |   2 +-
+ fs/Kconfig                                      |   9 +
+ fs/Makefile                                     |   3 +
+ fs/attr.c                                       |  81 ++-
+ fs/ext4/Kconfig                                 |  15 +
+ fs/ext4/Makefile                                |   1 +
+ fs/ext4/acl.c                                   |   6 +-
+ fs/ext4/acl.h                                   |  12 +-
+ fs/ext4/ext4.h                                  |   6 +-
+ fs/ext4/file.c                                  |   6 +-
+ fs/ext4/ialloc.c                                |   7 +-
+ fs/ext4/inode.c                                 |  10 +-
+ fs/ext4/namei.c                                 |  11 +-
+ fs/ext4/richacl.c                               | 218 ++++++
+ fs/ext4/richacl.h                               |  47 ++
+ fs/ext4/super.c                                 |  42 +-
+ fs/ext4/xattr.c                                 |   6 +
+ fs/ext4/xattr.h                                 |   1 +
+ fs/f2fs/acl.c                                   |   4 +-
+ fs/inode.c                                      |  15 +-
+ fs/jffs2/acl.c                                  |   6 +-
+ fs/namei.c                                      | 109 ++-
+ fs/nfs/inode.c                                  |   3 -
+ fs/nfs/nfs4proc.c                               | 701 +++++++++++++-----
+ fs/nfs/nfs4xdr.c                                | 257 ++++++-
+ fs/nfs/super.c                                  |   4 +-
+ fs/nfs_common/Makefile                          |   1 +
+ fs/nfs_common/nfs4acl.c                         |  44 ++
+ fs/nfsd/Kconfig                                 |   1 +
+ fs/nfsd/acl.h                                   |  23 +-
+ fs/nfsd/nfs4acl.c                               | 481 ++++++------
+ fs/nfsd/nfs4proc.c                              |  24 +-
+ fs/nfsd/nfs4xdr.c                               | 268 ++++---
+ fs/nfsd/nfsd.h                                  |   6 +-
+ fs/nfsd/nfsfh.c                                 |   8 +-
+ fs/nfsd/vfs.c                                   |  28 +-
+ fs/nfsd/vfs.h                                   |  17 +-
+ fs/nfsd/xdr4.h                                  |  12 +-
+ fs/posix_acl.c                                  |  26 +-
+ fs/richacl_base.c                               | 683 +++++++++++++++++
+ fs/richacl_compat.c                             | 928 ++++++++++++++++++++++++
+ fs/richacl_inode.c                              | 296 ++++++++
+ fs/richacl_xattr.c                              | 267 +++++++
+ fs/xattr.c                                      |  34 +-
+ include/linux/fs.h                              |  50 +-
+ include/linux/nfs4.h                            |  24 +-
+ include/linux/nfs4acl.h                         |   7 +
+ include/linux/nfs_fs.h                          |   1 -
+ include/linux/nfs_fs_sb.h                       |   2 +
+ include/linux/nfs_xdr.h                         |  13 +-
+ include/linux/posix_acl.h                       |  12 +-
+ include/linux/richacl.h                         | 275 +++++++
+ include/linux/richacl_compat.h                  |  40 +
+ include/linux/richacl_xattr.h                   |  47 ++
+ include/linux/sunrpc/xdr.h                      |   2 +
+ include/uapi/linux/Kbuild                       |   2 +
+ include/uapi/linux/fs.h                         |   3 +-
+ include/uapi/linux/nfs4.h                       |   3 +-
+ include/uapi/linux/richacl.h                    | 111 +++
+ include/uapi/linux/richacl_xattr.h              |  43 ++
+ include/uapi/linux/xattr.h                      |   2 +
+ net/sunrpc/xdr.c                                |  34 +
+ 62 files changed, 4672 insertions(+), 728 deletions(-)
+ create mode 100644 fs/ext4/richacl.c
+ create mode 100644 fs/ext4/richacl.h
+ create mode 100644 fs/nfs_common/nfs4acl.c
+ create mode 100644 fs/richacl_base.c
+ create mode 100644 fs/richacl_compat.c
+ create mode 100644 fs/richacl_inode.c
+ create mode 100644 fs/richacl_xattr.c
+ create mode 100644 include/linux/nfs4acl.h
+ create mode 100644 include/linux/richacl.h
+ create mode 100644 include/linux/richacl_compat.h
+ create mode 100644 include/linux/richacl_xattr.h
+ create mode 100644 include/uapi/linux/richacl.h
+ create mode 100644 include/uapi/linux/richacl_xattr.h
 
 -- 
-Thanks,
-
-Steve
+2.4.3
