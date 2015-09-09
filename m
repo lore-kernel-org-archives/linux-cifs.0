@@ -1,97 +1,51 @@
-From: Andreas Gruenbacher <agruenba@redhat.com>
-Subject: [PATCH] vfs: Add MAY_DELETE_SELF and MAY_DELETE_CHILD permission flags
-Date: Sun,  6 Sep 2015 10:14:06 +0200
-Message-ID: <1441527246-18189-1-git-send-email-agruenba@redhat.com>
-References: <1441448856-13478-4-git-send-email-agruenba@redhat.com>
-To: linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-nfs@vger.kernel.org, linux-api@vger.kernel.org,
-	linux-cifs@vger.kernel.org, linux-security-module@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1441448856-13478-4-git-send-email-agruenba@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [GiT] CIFS Fixes
+Date: Tue, 8 Sep 2015 23:22:25 -0500
+Message-ID: <CAH2r5mvkcq1S8iLEZDNmvZiFpiEJT5fBo_g2zg_VQ2KRMLtrhA@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-[This replaces v7 of this patch; MAY_DELETE_SELF now properly overrides the
-sticky check.]
+Small cifs fix and a patch for improved debugging.
+Please pull the following changes since commit
+1b647a166f07dcf08709c8606470f4b17a4aa11d:
 
-Normally, deleting a file requires MAY_WRITE access to the parent
-directory.  With richacls, a file may be deleted with MAY_DELETE_CHILD access
-to the parent directory or with MAY_DELETE_SELF access to the file.
+  Merge tag 'dmaengine-fix-4.2-rc8' of
+git://git.infradead.org/users/vkoul/slave-dma (2015-08-18 12:17:36
+-0700)
 
-To support that, pass the MAY_DELETE_CHILD mask flag to inode_permission()
-when checking for delete access inside a directory, and MAY_DELETE_SELF
-when checking for delete access to a file itelf.
+are available in the git repository at:
 
-The MAY_DELETE_SELF permission overrides the sticky directory check.
 
-Signed-off-by: Andreas Gruenbacher <agruenba@redhat.com>
----
- fs/namei.c         | 21 ++++++++++++---------
- include/linux/fs.h |  2 ++
- 2 files changed, 14 insertions(+), 9 deletions(-)
+  git://git.samba.org/sfrench/cifs-2.6.git for-next
 
-diff --git a/fs/namei.c b/fs/namei.c
-index 428b4a6..1a3f0d8 100644
---- a/fs/namei.c
-+++ b/fs/namei.c
-@@ -453,9 +453,9 @@ static int sb_permission(struct super_block *sb, struct inode *inode, int mask)
-  * this, letting us set arbitrary permissions for filesystem access without
-  * changing the "normal" UIDs which are used for other things.
-  *
-- * MAY_WRITE must be set in @mask whenever MAY_APPEND, MAY_CREATE_FILE, or
-- * MAY_CREATE_DIR are set.  That way, file systems that don't support these
-- * permissions will check for MAY_WRITE instead.
-+ * MAY_WRITE must be set in @mask whenever MAY_APPEND, MAY_CREATE_FILE,
-+ * MAY_CREATE_DIR, or MAY_DELETE_CHILD are set.  That way, file systems that
-+ * don't support these permissions will check for MAY_WRITE instead.
-  */
- int inode_permission(struct inode *inode, int mask)
- {
-@@ -2528,7 +2528,7 @@ static int may_delete(struct inode *dir, struct dentry *victim,
- 		      bool isdir, bool replace)
- {
- 	struct inode *inode = d_backing_inode(victim);
--	int error, mask = MAY_WRITE | MAY_EXEC;
-+	int error, mask = MAY_EXEC;
- 
- 	if (d_is_negative(victim))
- 		return -ENOENT;
-@@ -2538,15 +2538,18 @@ static int may_delete(struct inode *dir, struct dentry *victim,
- 	audit_inode_child(dir, victim, AUDIT_TYPE_CHILD_DELETE);
- 
- 	if (replace)
--		mask |= isdir ? MAY_CREATE_DIR : MAY_CREATE_FILE;
--	error = inode_permission(dir, mask);
-+		mask |= MAY_WRITE | (isdir ? MAY_CREATE_DIR : MAY_CREATE_FILE);
-+	error = inode_permission(dir, mask | MAY_WRITE | MAY_DELETE_CHILD);
-+	if (!error && check_sticky(dir, inode))
-+		error = -EPERM;
-+	if (error && IS_RICHACL(inode) &&
-+	    inode_permission(inode, MAY_DELETE_SELF) == 0)
-+		error = 0;
- 	if (error)
- 		return error;
- 	if (IS_APPEND(dir))
- 		return -EPERM;
--
--	if (check_sticky(dir, inode) || IS_APPEND(inode) ||
--	    IS_IMMUTABLE(inode) || IS_SWAPFILE(inode))
-+	if (IS_APPEND(inode) || IS_IMMUTABLE(inode) || IS_SWAPFILE(inode))
- 		return -EPERM;
- 	if (isdir) {
- 		if (!d_is_dir(victim))
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index b2f1b1b..99c95d1 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -84,6 +84,8 @@ typedef void (dax_iodone_t)(struct buffer_head *bh_map, int uptodate);
- #define MAY_NOT_BLOCK		0x00000080
- #define MAY_CREATE_FILE		0x00000100
- #define MAY_CREATE_DIR		0x00000200
-+#define MAY_DELETE_CHILD	0x00000400
-+#define MAY_DELETE_SELF		0x00000800
- 
- /*
-  * flags in file.f_mode.  Note that FMODE_READ and FMODE_WRITE must correspond
+for you to fetch changes up to 5fb4e288a025af1abc5c67ecebf30fbf6b3edad1:
+
+  cifs: Fix use-after-free on mid_q_entry (2015-08-20 10:19:25 -0500)
+
+----------------------------------------------------------------
+Christopher Oo (1):
+      cifs: Fix use-after-free on mid_q_entry
+
+Steve French (2):
+      Add way to query server fs info for smb3
+      Update cifs version number
+
+ fs/cifs/cifs_ioctl.h | 42 ++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/cifsfs.h     |  2 +-
+ fs/cifs/cifspdu.h    | 14 ++++++++++++++
+ fs/cifs/cifssmb.c    |  7 +++++++
+ fs/cifs/ioctl.c      | 48 ++++++++++++++++++++++++++++++++++++++++++------
+ fs/cifs/smb2pdu.c    |  7 +++++++
+ fs/cifs/transport.c  |  2 ++
+ 7 files changed, 115 insertions(+), 7 deletions(-)
+ create mode 100644 fs/cifs/cifs_ioctl.h
+
 -- 
-2.4.3
+Thanks,
+
+Steve
