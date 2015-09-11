@@ -1,44 +1,26 @@
 From: Ross Lagerwall <ross.lagerwall-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-Subject: Two inodes with the same inode number
-Date: Fri, 11 Sep 2015 10:02:32 +0100
-Message-ID: <55F298A8.3020509@citrix.com>
+Subject: Re: Two inodes with the same inode number
+Date: Fri, 11 Sep 2015 13:19:59 +0100
+Message-ID: <55F2C6EF.1000301@citrix.com>
+References: <55F298A8.3020509@citrix.com>
+ <OF92BF934E.57059FCD-ON85257EBD.003EE076-85257EBD.003EF852@notes.teradyne.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: <john.jackson-hxIV5DHgdjlWk0Htik3J/w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <OF92BF934E.57059FCD-ON85257EBD.003EE076-85257EBD.003EF852-zEFU6UmHGhYZPXhiTVDvSdBPR1lH4CV8@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-I have a setup with two hosts, A and B, both using a CIFS SMB 3.0 mount 
-where the following operations take place (using 4.1 kernels):
+On 09/11/2015 12:27 PM, john.jackson-hxIV5DHgdjlWk0Htik3J/w@public.gmane.org wrote:
+> Peter,  reading this person complaint regarding cifs further leads me to
+> believe that the synology server may have problems managing inode numbers.
+>
 
-A                  B
-open X
-close X
-                    mv X Y
-                    touch X
-open X
-open Y
-
-After this, host A will have two dentries pointing to the same inode (or 
-at least with the same inode number), which results in some 
-'interesting' behavior.
-
-I've seen at least two failure modes:
-1) Above, both open calls will try to use the same lease key, causing 
-the server to fail the second open with STATUS_INVALID_PARAMETER. (the 
-server was Windows Server 2012 R2)
-
-2) The reported file size will be different depending on which filename 
-was last used to refresh the inode attributes.
-
-
-Although cifs_d_revalidate updates attributes such as the file size, it 
-doesn't ever update the inode number. I tried making it return 0 to drop 
-the cached inode if the inode number had changed but even still, opens 
-failed occasionally with STATUS_INVALID_PARAMETER. Is there an alternate 
-fix for this?
+Just to be clear, my problem is on the client side since unmounting and 
+remounting the share fixes the issue.
 
 Thanks,
 -- 
