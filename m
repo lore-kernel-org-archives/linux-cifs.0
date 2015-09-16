@@ -1,56 +1,75 @@
-From: Andrzej Hajda <a.hajda@samsung.com>
-Subject: Re: [PATCH 20/31] fs/cifs: use kmemdup rather than duplicating its
- implementation
-Date: Wed, 16 Sep 2015 12:03:28 +0200
-Message-ID: <55F93E70.6070900@samsung.com>
-References: <1438934377-4922-1-git-send-email-a.hajda@samsung.com>
- <1438934377-4922-21-git-send-email-a.hajda@samsung.com>
+From: aye coder <acoder1999-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: cifs mount with krb5: Required key not available
+Date: Wed, 16 Sep 2015 12:10:06 -0400
+Message-ID: <CAJXajaXCM1Ba-eG6RoUb6Da2Nes1zkjSSx2b1O7m_ZkW1WDtFg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	linux-kernel@vger.kernel.org, linux-cifs@vger.kernel.org
-To: Steve French <sfrench@samba.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-reply-to: <1438934377-4922-21-git-send-email-a.hajda@samsung.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Ping.
+Good afternoon,
 
-Regards
-Andrzej
+When attempting to cifs mount (with kerboros security mode) an Isilon
+volume from RHEL 7 I get the following error.
 
-On 08/07/2015 09:59 AM, Andrzej Hajda wrote:
-> The patch was generated using fixed coccinelle semantic patch
-> scripts/coccinelle/api/memdup.cocci [1].
->
-> [1]: http://permalink.gmane.org/gmane.linux.kernel/2014320
->
-> Signed-off-by: Andrzej Hajda <a.hajda@samsung.com>
-> ---
->  fs/cifs/smb2pdu.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
->
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 070fb2a..2d6b72f 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -1394,14 +1394,13 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
->  		goto ioctl_exit;
->  	}
->  
-> -	*out_data = kmalloc(*plen, GFP_KERNEL);
-> +	*out_data = kmemdup(rsp->hdr.ProtocolId + le32_to_cpu(rsp->OutputOffset),
-> +			    *plen, GFP_KERNEL);
->  	if (*out_data == NULL) {
->  		rc = -ENOMEM;
->  		goto ioctl_exit;
->  	}
->  
-> -	memcpy(*out_data, rsp->hdr.ProtocolId + le32_to_cpu(rsp->OutputOffset),
-> -	       *plen);
->  ioctl_exit:
->  	free_rsp_buf(resp_buftype, rsp);
->  	return rc;
+-----------
+    [user@clientbox ~]# mount -t cifs
+//isilon.abc.example.com/share123/files /mnt/share123/files -o
+username=acoder,password=XXXXXX,sec=krb5
+
+    mount error(126): Required key not available
+-----------
+
+First, here's my /etc/krb5.conf file:
+
+-----------
+[libdefaults]
+default_realm = EXAMPLE.COM
+dns_lookup_realm = false
+dns_lookup_kdc = false
+ticket_lifetime = 24h
+renew_lifetime = 7d
+forwardable = true
+
+[realms]
+EXAMPLE.COM = {
+kdc = eu.example.com
+admin_server = eu.example.com
+}
+
+[domain_realm]
+.example.com = EXAMPLE.COM
+example.com = EXAMPLE.COM
+
+[logging]
+ default = FILE:/var/log/krb5libs.log
+ kdc = FILE:/var/log/krb5kdc.log
+ admin_server = FILE:/var/log/kadmind.log
+-----------
+
+where eu.example.com is my organization's AD server.
+
+Next, I show there are no current tickets stored on the client:
+
+-----------
+[user@mybox ~]# klist
+klist: No credentials cache found (ticket cache FILE:/tmp/krb5cc_0)
+-----------
+
+Finally, I try to obtain a ticket using kinit:
+
+-----------
+[user@mybox ~]# kinit acoder
+kinit: Cannot contact any KDC for realm 'EXAMPLE.COM' while getting
+initial credentials
+-----------
+
+I'm not showing any additional information in /var/log/messages or
+/var/log/krb5libs.log
+
+1) Am I heading in the right direction?
+
+2) If so, am I missing something from my krb5.conf file? What else do
+I need to check?
