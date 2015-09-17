@@ -1,67 +1,83 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 20/31] fs/cifs: use kmemdup rather than duplicating its implementation
-Date: Thu, 17 Sep 2015 00:00:18 -0500
-Message-ID: <CAH2r5mua5sqEuD38y+q_3eM_EDBMjWNpWyCzBcWu5OofELXfQw@mail.gmail.com>
-References: <1438934377-4922-1-git-send-email-a.hajda@samsung.com> <1438934377-4922-21-git-send-email-a.hajda@samsung.com>
+From: "J. Bruce Fields" <bfields@fieldses.org>
+Subject: Re: [RFC v7 10/41] richacl: Permission check algorithm
+Date: Thu, 17 Sep 2015 13:30:51 -0400
+Message-ID: <20150917173051.GC13048@fieldses.org>
+References: <1441448856-13478-1-git-send-email-agruenba@redhat.com>
+ <1441448856-13478-11-git-send-email-agruenba@redhat.com>
+ <20150911211617.GF11677@fieldses.org>
+ <CAHpGcMJofUKKumcUe=6LOFZrVcJRM5APchbCQpfQzbMK7N1FYg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Bartlomiej Zolnierkiewicz <b.zolnierkie-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>,
-	Marek Szyprowski <m.szyprowski-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Andrzej Hajda <a.hajda-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1438934377-4922-21-git-send-email-a.hajda-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Andreas Gruenbacher <agruenba@redhat.com>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>,
+	Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+	Linux API Mailing List <linux-api@vger.kernel.org>,
+	linux-cifs@vger.kernel.org,
+	LSM List <linux-security-module@vger.kernel.org>
+To: Andreas =?utf-8?Q?Gr=C3=BCnbacher?=
+	<andreas.gruenbacher@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <CAHpGcMJofUKKumcUe=6LOFZrVcJRM5APchbCQpfQzbMK7N1FYg@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-loooks reasonable to me - isn't this part of a larger patch series
-though? Did you want it merged distinctly into cifs-2.6.git?
+On Sat, Sep 12, 2015 at 12:12:16AM +0200, Andreas Gr=C3=BCnbacher wrote=
+:
+> 2015-09-11 23:16 GMT+02:00 J. Bruce Fields <bfields@fieldses.org>:
+> > On Sat, Sep 05, 2015 at 12:27:05PM +0200, Andreas Gruenbacher wrote=
+:
+> >> +             /*
+> >> +              * Apply the group file mask to entries other than o=
+wner@ and
+> >> +              * everyone@ or user entries matching the owner.  Th=
+is ensures
+> >> +              * that we grant the same permissions as the acl com=
+puted by
+> >> +              * richacl_apply_masks().
+> >> +              *
+> >> +              * Without this restriction, the following richacl w=
+ould grant
+> >> +              * rw access to processes which are both the owner a=
+nd in the
+> >> +              * owning group, but not to other users in the ownin=
+g group,
+> >> +              * which could not be represented without masks:
+> >> +              *
+> >> +              *  owner:rw::mask
+> >> +              *  group@:rw::allow
+> >> +              */
+> >> +             if ((acl->a_flags & RICHACL_MASKED) && richace_is_al=
+low(ace))
+> >> +                     ace_mask &=3D acl->a_group_mask;
+> >
+> > I'm having trouble understanding this.  I think the problem is that=
+ I
+> > don't really understand the notation in your example.  Is a_group_m=
+ask
+> > zero in that example?  I think it must be, in which case, OK I thin=
+k I
+> > get it.
+>=20
+> Yes. I'm not sure if the example becomes easier to understand when th=
+e
+> empty group mask and perhaps also the other mask is included.
 
-On Fri, Aug 7, 2015 at 2:59 AM, Andrzej Hajda <a.hajda-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org> wrote:
-> The patch was generated using fixed coccinelle semantic patch
-> scripts/coccinelle/api/memdup.cocci [1].
->
-> [1]: http://permalink.gmane.org/gmane.linux.kernel/2014320
->
-> Signed-off-by: Andrzej Hajda <a.hajda-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
-> ---
->  fs/cifs/smb2pdu.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
->
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 070fb2a..2d6b72f 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -1394,14 +1394,13 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
->                 goto ioctl_exit;
->         }
->
-> -       *out_data = kmalloc(*plen, GFP_KERNEL);
-> +       *out_data = kmemdup(rsp->hdr.ProtocolId + le32_to_cpu(rsp->OutputOffset),
-> +                           *plen, GFP_KERNEL);
->         if (*out_data == NULL) {
->                 rc = -ENOMEM;
->                 goto ioctl_exit;
->         }
->
-> -       memcpy(*out_data, rsp->hdr.ProtocolId + le32_to_cpu(rsp->OutputOffset),
-> -              *plen);
->  ioctl_exit:
->         free_rsp_buf(resp_buftype, rsp);
->         return rc;
-> --
-> 1.9.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+I think it would have been for me.
 
+In general I find it confusing to present the mask bits as additional
+ACEs--they're really pretty different.
 
+> > (Though I still have to think about it a little more to convince my=
+self
+> > that richacl_apply_masks() always gets the same result.)
+>=20
+> I have tried to break the algorithm into digestible pieces. Do you se=
+e
+> another way to make things easier to understand?
 
--- 
-Thanks,
+I just haven't reread those carefully enough yet, working on it....
 
-Steve
+--b.
