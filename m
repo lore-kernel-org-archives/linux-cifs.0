@@ -1,175 +1,112 @@
-From: bfields@fieldses.org (J. Bruce Fields)
-Subject: Re: [RFC v7 13/41] richacl: Check if an acl is equivalent to a file
- mode
-Date: Thu, 17 Sep 2015 14:37:22 -0400
-Message-ID: <20150917183722.GC13825@fieldses.org>
-References: <1441448856-13478-1-git-send-email-agruenba@redhat.com>
- <1441448856-13478-14-git-send-email-agruenba@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-nfs@vger.kernel.org, linux-api@vger.kernel.org,
-	linux-cifs@vger.kernel.org, linux-security-module@vger.kernel.org
-To: Andreas Gruenbacher <agruenba@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1441448856-13478-14-git-send-email-agruenba@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Peter Seiderer <ps.report-hi6Y0CQ0nG0@public.gmane.org>
+Subject: [PATCH v1] cifs: use server timestamp for ntlmv2 authentication
+Date: Thu, 17 Sep 2015 21:40:12 +0200
+Message-ID: <1442518812-30494-1-git-send-email-ps.report@gmx.net>
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, Sep 05, 2015 at 12:27:08PM +0200, Andreas Gruenbacher wrote:
-> ACLs are considered equivalent to file modes if they only consist of
-> owner@, group@, and everyone@ entries, the owner@ permissions do not
-> depend on whether the owner is a member in the owning group, and no
-> inheritance flags are set.  This test is used to avoid storing richacls
-> if the acl can be computed from the file permission bits.
-> 
-> Signed-off-by: Andreas Gruenbacher <agruenba@redhat.com>
-> ---
->  fs/richacl_base.c       | 104 ++++++++++++++++++++++++++++++++++++++++++++++++
->  include/linux/richacl.h |   1 +
->  2 files changed, 105 insertions(+)
-> 
-> diff --git a/fs/richacl_base.c b/fs/richacl_base.c
-> index 3163152..106e988 100644
-> --- a/fs/richacl_base.c
-> +++ b/fs/richacl_base.c
-> @@ -379,3 +379,107 @@ richacl_chmod(struct richacl *acl, mode_t mode)
->  	return clone;
->  }
->  EXPORT_SYMBOL_GPL(richacl_chmod);
-> +
-> +/**
-> + * richacl_equiv_mode  -  compute the mode equivalent of @acl
-> + *
-> + * An acl is considered equivalent to a file mode if it only consists of
-> + * owner@, group@, and everyone@ entries and the owner@ permissions do not
-> + * depend on whether the owner is a member in the owning group.
-> + */
-> +int
-> +richacl_equiv_mode(const struct richacl *acl, mode_t *mode_p)
-> +{
-> +	mode_t mode = *mode_p;
-> +
-> +	/*
-> +	 * The RICHACE_DELETE_CHILD flag is meaningless for non-directories, so
-> +	 * we ignore it.
-> +	 */
-> +	unsigned int x = S_ISDIR(mode) ? 0 : RICHACE_DELETE_CHILD;
-> +	struct {
-> +		unsigned int allowed;
-> +		unsigned int defined;  /* allowed or denied */
-> +	} owner = {
-> +		.defined = RICHACE_POSIX_ALWAYS_ALLOWED |
-> +			   RICHACE_POSIX_OWNER_ALLOWED  | x,
-> +	}, group = {
-> +		.defined = RICHACE_POSIX_ALWAYS_ALLOWED | x,
-> +	}, everyone = {
-> +		.defined = RICHACE_POSIX_ALWAYS_ALLOWED | x,
-> +	};
-> +	const struct richace *ace;
-> +
-> +	if (acl->a_flags & ~(RICHACL_WRITE_THROUGH | RICHACL_MASKED))
-> +		return -1;
-> +
-> +	richacl_for_each_entry(ace, acl) {
-> +		if (ace->e_flags & ~RICHACE_SPECIAL_WHO)
-> +			return -1;
+Linux cifs mount with ntlmssp against an Mac OS X (Yosemite
+10.10.5) share fails in case the clocks differ more than +/-2h:
 
-Couldn't this just be
+digest-service: digest-request: od failed with 2 proto=ntlmv2
+digest-service: digest-request: kdc failed with -1561745592 proto=ntlmv2
 
-		if (ace->e_flags != RICHACE_SPECIAL_WHO)
-			return -1
+Fix this by (re-)using the given server timestamp for the
+ntlmv2 authentication (as Windows 7 does).
 
-I guess the only difference is that you're letting the named-user case
-through to get caught by the final "else" clause below.... Still, the !=
-test seems possibly simpler to me.
+Signed-off-by: Peter Seiderer <ps.report-hi6Y0CQ0nG0@public.gmane.org>
+---
+ fs/cifs/cifsencrypt.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 51 insertions(+), 2 deletions(-)
 
---b.
-
-> +
-> +		if (richace_is_owner(ace) || richace_is_everyone(ace)) {
-> +			x = ace->e_mask & ~owner.defined;
-> +			if (richace_is_allow(ace)) {
-> +				unsigned int group_denied =
-> +					group.defined & ~group.allowed;
-> +
-> +				if (x & group_denied)
-> +					return -1;
-> +				owner.allowed |= x;
-> +			} else /* if (richace_is_deny(ace)) */ {
-> +				if (x & group.allowed)
-> +					return -1;
-> +			}
-> +			owner.defined |= x;
-> +
-> +			if (richace_is_everyone(ace)) {
-> +				x = ace->e_mask;
-> +				if (richace_is_allow(ace)) {
-> +					group.allowed |=
-> +						x & ~group.defined;
-> +					everyone.allowed |=
-> +						x & ~everyone.defined;
-> +				}
-> +				group.defined |= x;
-> +				everyone.defined |= x;
-> +			}
-> +		} else if (richace_is_group(ace)) {
-> +			x = ace->e_mask & ~group.defined;
-> +			if (richace_is_allow(ace))
-> +				group.allowed |= x;
-> +			group.defined |= x;
-> +		} else
-> +			return -1;
-> +	}
-> +
-> +	if (group.allowed & ~owner.defined)
-> +		return -1;
-> +
-> +	if (acl->a_flags & RICHACL_MASKED) {
-> +		if (acl->a_flags & RICHACL_WRITE_THROUGH) {
-> +			owner.allowed = acl->a_owner_mask;
-> +			everyone.allowed = acl->a_other_mask;
-> +		} else {
-> +			owner.allowed &= acl->a_owner_mask;
-> +			everyone.allowed &= acl->a_other_mask;
-> +		}
-> +		group.allowed &= acl->a_group_mask;
-> +	}
-> +
-> +	mode = (mode & ~S_IRWXUGO) |
-> +	       (richacl_mask_to_mode(owner.allowed) << 6) |
-> +	       (richacl_mask_to_mode(group.allowed) << 3) |
-> +		richacl_mask_to_mode(everyone.allowed);
-> +
-> +	/* Mask flags we can ignore */
-> +	x = S_ISDIR(mode) ? 0 : RICHACE_DELETE_CHILD;
-> +
-> +	if (((richacl_mode_to_mask(mode >> 6) ^ owner.allowed)    & ~x) ||
-> +	    ((richacl_mode_to_mask(mode >> 3) ^ group.allowed)    & ~x) ||
-> +	    ((richacl_mode_to_mask(mode)      ^ everyone.allowed) & ~x))
-> +		return -1;
-> +
-> +	*mode_p = mode;
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(richacl_equiv_mode);
-> diff --git a/include/linux/richacl.h b/include/linux/richacl.h
-> index d4a576c..6535ce5 100644
-> --- a/include/linux/richacl.h
-> +++ b/include/linux/richacl.h
-> @@ -304,6 +304,7 @@ extern unsigned int richacl_mode_to_mask(mode_t);
->  extern unsigned int richacl_want_to_mask(unsigned int);
->  extern void richacl_compute_max_masks(struct richacl *);
->  extern struct richacl *richacl_chmod(struct richacl *, mode_t);
-> +extern int richacl_equiv_mode(const struct richacl *, mode_t *);
->  
->  /* richacl_inode.c */
->  extern int richacl_permission(struct inode *, const struct richacl *, int);
-> -- 
-> 2.4.3
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index aa0dc25..e6bfa92 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -444,6 +444,48 @@ find_domain_name(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ 	return 0;
+ }
+ 
++/* Server has provided av pairs/target info in the type 2 challenge
++ * packet and we have plucked it and stored within smb session.
++ * We parse that blob here to find the server given timestamp
++ * as part of ntlmv2 authentication (or local current time as
++ * default in case of failure)
++ */
++static u64
++find_timestamp(struct cifs_ses *ses)
++{
++	unsigned int attrsize;
++	unsigned int type;
++	unsigned int onesize = sizeof(struct ntlmssp2_name);
++	unsigned char *blobptr;
++	unsigned char *blobend;
++	struct ntlmssp2_name *attrptr;
++
++	if (!ses->auth_key.len || !ses->auth_key.response)
++		return 0;
++
++	blobptr = ses->auth_key.response;
++	blobend = blobptr + ses->auth_key.len;
++
++	while (blobptr + onesize < blobend) {
++		attrptr = (struct ntlmssp2_name *) blobptr;
++		type = le16_to_cpu(attrptr->type);
++		if (type == NTLMSSP_AV_EOL)
++			break;
++		blobptr += 2; /* advance attr type */
++		attrsize = le16_to_cpu(attrptr->length);
++		blobptr += 2; /* advance attr size */
++		if (blobptr + attrsize > blobend)
++			break;
++		if (type == NTLMSSP_AV_TIMESTAMP) {
++			if (attrsize == sizeof(u64))
++				return *((u64 *)blobptr);
++		}
++		blobptr += attrsize; /* advance attr value */
++	}
++
++	return cpu_to_le64(cifs_UnixTimeToNT(CURRENT_TIME));
++}
++
+ static int calc_ntlmv2_hash(struct cifs_ses *ses, char *ntlmv2_hash,
+ 			    const struct nls_table *nls_cp)
+ {
+@@ -641,6 +683,7 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ 	struct ntlmv2_resp *ntlmv2;
+ 	char ntlmv2_hash[16];
+ 	unsigned char *tiblob = NULL; /* target info blob */
++	u64 rsp_timestamp;
+ 
+ 	if (ses->server->negflavor == CIFS_NEGFLAVOR_EXTENDED) {
+ 		if (!ses->domainName) {
+@@ -659,6 +702,12 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ 		}
+ 	}
+ 
++	/* Must be within 5 minutes of the server (or in range +/-2h
++	 * in case of Mac OS X), so simply carry over server timestamp
++	 * (as Windows 7 does)
++	 */
++	rsp_timestamp = find_timestamp(ses);
++
+ 	baselen = CIFS_SESS_KEY_SIZE + sizeof(struct ntlmv2_resp);
+ 	tilen = ses->auth_key.len;
+ 	tiblob = ses->auth_key.response;
+@@ -675,8 +724,8 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ 			(ses->auth_key.response + CIFS_SESS_KEY_SIZE);
+ 	ntlmv2->blob_signature = cpu_to_le32(0x00000101);
+ 	ntlmv2->reserved = 0;
+-	/* Must be within 5 minutes of the server */
+-	ntlmv2->time = cpu_to_le64(cifs_UnixTimeToNT(CURRENT_TIME));
++	ntlmv2->time = rsp_timestamp;
++
+ 	get_random_bytes(&ntlmv2->client_chal, sizeof(ntlmv2->client_chal));
+ 	ntlmv2->reserved2 = 0;
+ 
+-- 
+2.1.4
