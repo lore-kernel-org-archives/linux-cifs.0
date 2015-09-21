@@ -1,267 +1,293 @@
-From: bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org (J. Bruce Fields)
-Subject: Re: [RFC v7 22/41] richacl: Propagate everyone@ permissions to other
- aces
-Date: Fri, 18 Sep 2015 17:56:11 -0400
-Message-ID: <20150918215611.GD22671@fieldses.org>
+From: Austin S Hemmelgarn <ahferroin7-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [RFC v7 13/41] richacl: Check if an acl is equivalent to a file
+ mode
+Date: Mon, 21 Sep 2015 09:59:07 -0400
+Message-ID: <56000D2B.6000705@gmail.com>
 References: <1441448856-13478-1-git-send-email-agruenba@redhat.com>
- <1441448856-13478-23-git-send-email-agruenba@redhat.com>
+ <1441448856-13478-14-git-send-email-agruenba@redhat.com>
+ <20150917182219.GB13825@fieldses.org> <20150918005607.GB16699@fieldses.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-512; boundary="------------ms090601060905010007050009"
 Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Andreas Gruenbacher <agruen-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-To: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <1441448856-13478-23-git-send-email-agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
+	Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20150918005607.GB16699-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, Sep 05, 2015 at 12:27:17PM +0200, Andreas Gruenbacher wrote:
-> The trailing everyone@ allow ace can grant permissions to all file
-> classes including the owner and group class.  Before we can apply the
-> other mask to this entry to turn it into an "other class" entry, we need
-> to ensure that members of the owner or group class will not lose any
-> permissions from that ace.
-> 
-> Conceptually, we do this by inserting additional <who>:<allow>::allow
-> entries before the trailing everyone@ allow ace with the same
-> permissions as the trailing everyone@ allow ace for owner@, group@, and
-> all explicitly mentioned users and groups.  (In practice, we will rarely
-> need to insert any additional aces in this step.)
-> 
-> Signed-off-by: Andreas Gruenbacher <agruen-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-> ---
->  fs/richacl_compat.c | 195 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 195 insertions(+)
-> 
-> diff --git a/fs/richacl_compat.c b/fs/richacl_compat.c
-> index 4f0acf5..9b76fc0 100644
-> --- a/fs/richacl_compat.c
-> +++ b/fs/richacl_compat.c
-> @@ -218,3 +218,198 @@ richacl_move_everyone_aces_down(struct richacl_alloc *alloc)
->  	}
->  	return 0;
->  }
-> +
-> +/**
-> + * __richacl_propagate_everyone  -  propagate everyone@ permissions up for @who
-> + * @alloc:	acl and number of allocated entries
-> + * @who:	identifier to propagate permissions for
-> + * @allow:	permissions to propagate up
-> + *
-> + * Propagate the permissions in @allow up from the end of the acl to the start
-> + * for the specified principal @who.
-> + *
-> + * The simplest possible approach to achieve this would be to insert a
-> + * "<who>:<allow>::allow" ace before the final everyone@ allow ace.  Since this
-> + * would often result in aces which are not needed or which could be merged
-> + * with an existing ace, we make the following optimizations:
-> + *
-> + *   - We go through the acl and determine which permissions are already
-> + *     allowed or denied to @who, and we remove those permissions from
-> + *     @allow.
-> + *
-> + *   - If the acl contains an allow ace for @who and no aces after this entry
-> + *     deny permissions in @allow, we add the permissions in @allow to this
-> + *     ace.  (Propagating permissions across a deny ace which can match the
-> + *     process can elevate permissions.)
-> + *
-> + * This transformation does not alter the permissions that the acl grants.
-> + */
-> +static int
-> +__richacl_propagate_everyone(struct richacl_alloc *alloc, struct richace *who,
-> +			     unsigned int allow)
-> +{
-> +	struct richace *allow_last = NULL, *ace;
-> +	struct richacl *acl = alloc->acl;
-> +
-> +	/*
-> +	 * Remove the permissions from allow that are already determined for
-> +	 * this who value, and figure out if there is an allow entry for
-> +	 * this who value that is "reachable" from the trailing everyone@
-> +	 * allow ace.
-> +	 */
-> +	richacl_for_each_entry(ace, acl) {
-> +		if (richace_is_inherit_only(ace))
-> +			continue;
-> +		if (richace_is_allow(ace)) {
-> +			if (richace_is_same_identifier(ace, who)) {
-> +				allow &= ~ace->e_mask;
-> +				allow_last = ace;
-> +			}
-> +		} else if (richace_is_deny(ace)) {
-> +			if (richace_is_same_identifier(ace, who))
-> +				allow &= ~ace->e_mask;
-> +			else if (allow & ace->e_mask)
-> +				allow_last = NULL;
-> +		}
-> +	}
-> +	ace--;
-> +
-> +	/*
-> +	 * If for group class entries, all the remaining permissions will
-> +	 * remain granted by the trailing everyone@ ace, no additional entry is
-> +	 * needed.
-> +	 */
-> +	if (!richace_is_owner(who) &&
-> +	    richace_is_everyone(ace) && richace_is_allow(ace) &&
-> +	    !(allow & ~(ace->e_mask & acl->a_other_mask)))
-> +		allow = 0;
-> +
-> +	if (allow) {
-> +		if (allow_last)
-> +			return richace_change_mask(alloc, &allow_last,
-> +						   allow_last->e_mask | allow);
-> +		else {
-> +			struct richace who_copy;
-> +
-> +			richace_copy(&who_copy, who);
-> +			ace = acl->a_entries + acl->a_count - 1;
-> +			if (richacl_insert_entry(alloc, &ace))
-> +				return -1;
-> +			richace_copy(ace, &who_copy);
-> +			ace->e_type = RICHACE_ACCESS_ALLOWED_ACE_TYPE;
-> +			ace->e_flags &= ~RICHACE_INHERITANCE_FLAGS;
-> +			ace->e_mask = allow;
-> +		}
-> +	}
-> +	return 0;
-> +}
-> +
-> +/**
-> + * richacl_propagate_everyone  -  propagate everyone@ permissions up the acl
-> + * @alloc:	acl and number of allocated entries
-> + *
-> + * Make sure that group@ and all other users and groups mentioned in the acl
-> + * will not lose any permissions when finally applying the other mask to the
-> + * everyone@ allow ace at the end of the acl.  We modify the permissions of
-> + * existing entries or add new entries before the final everyone@ allow ace to
-> + * achieve that.
-> + *
-> + * For example, the following acl implicitly grants everyone rwpx access:
-> + *
-> + *    joe:r::allow
-> + *    everyone@:rwpx::allow
-> + *
-> + * When applying mode 0660 to this acl, group@ would lose rwp access, and joe
-> + * would lose wp access even though the mode does not exclude those
-> + * permissions.  After propagating the everyone@ permissions, the result for
-> + * applying mode 0660 becomes:
-> + *
-> + *    owner@:rwp::allow
-> + *    joe:rwp::allow
-> + *    group@:rwp::allow
-> + *
-> + * Deny aces complicate the matter.  For example, the following acl grants
-> + * everyone but joe write access:
-> + *
-> + *    joe:wp::deny
-> + *    everyone@:rwpx::allow
-> + *
-> + * When applying mode 0660 to this acl, group@ would lose rwp access, and joe
-> + * would lose r access.  After propagating the everyone@ permissions, the
-> + * result for applying mode 0660 becomes:
-> + *
-> + *    owner@:rwp::allow
-> + *    joe:w::deny
-> + *    group@:rwp::allow
-> + *    joe:r::allow
-> + */
-> +static int
-> +richacl_propagate_everyone(struct richacl_alloc *alloc)
-> +{
-> +	struct richace who = { .e_flags = RICHACE_SPECIAL_WHO };
-> +	struct richacl *acl = alloc->acl;
-> +	struct richace *ace;
-> +	unsigned int owner_allow, group_allow;
-> +
-> +	/*
-> +	 * If the owner mask contains permissions which are not in the group
-> +	 * mask, the group mask contains permissions which are not in the other
-> +	 * mask, or the owner class contains permissions which are not in the
+This is a cryptographically signed message in MIME format.
 
-s/owner class/owner mask?
+--------------ms090601060905010007050009
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-> +	 * other mask, we may need to propagate permissions up from the
-> +	 * everyone@ allow ace.  The third condition is implied by the first
-> +	 * two.
-> +	 */
-> +	if (!((acl->a_owner_mask & ~acl->a_group_mask) ||
-> +	      (acl->a_group_mask & ~acl->a_other_mask)))
-> +		return 0;
+On 2015-09-17 20:56, J. Bruce Fields wrote:
+> On Thu, Sep 17, 2015 at 02:22:19PM -0400, bfields wrote:
+>> On Sat, Sep 05, 2015 at 12:27:08PM +0200, Andreas Gruenbacher wrote:
+>>> ACLs are considered equivalent to file modes if they only consist of
+>>> owner@, group@, and everyone@ entries, the owner@ permissions do not
+>>> depend on whether the owner is a member in the owning group, and no
+>>> inheritance flags are set.  This test is used to avoid storing richac=
+ls
+>>> if the acl can be computed from the file permission bits.
+>>
+>> We're assuming here that it's OK for us to silently rearrange an ACL a=
+s
+>> long as the result is still equivalent (in the sense that the permissi=
+on
+>> algorithm would always produce the same result).
+>>
+>> I guess that's OK by me, but it might violate user expectations in som=
+e
+>> simple common cases, so may be worth mentioning in documentation
+>> someplace if we don't already.
+>
+> Also your notion of mode-equivalence here is interesting, it's actually=
 
-The code looks right, but I don't understand the preceding comment.
+> a strict subset of the ACLs that produce the same permission results as=
 
-For example, 
+> a mode.  (For example, everyone:rwx,bfields:rwx is equivalent to 0777
+> but won't be considered mode-equivalent by this algorithm.)
+Although it could also be equivalent to 0707, or (if bfields is the=20
+group name also) 0077, or even (if bfields isn't the group or owner of=20
+the file) 0007.  Mode equivalence get's even trickier when you throw in=20
+permissions just beyond rwx (for example, by Windows standards, the=20
+usage of the execute bit on directories is weird (they have a separate=20
+permission in their ACE's for directory listing), or by VMS standards,=20
+write permission on a directory doesn't mean that you can delete things=20
+in it (VMS actually had a separate bit for the delete permission, and=20
+even had separate permissions for system access)).
+>
+> I think the choices you've made probably make the most sense, they just=
 
-	owner mask: rw
-	group mask:  wx
-	other mask: rw
+> wouldn't have been obvious to me.  Anyway, so, OK by me:
+>
+> 	Reviewed-by: J. Bruce Fields <bfields-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>
+> --b.
+>
+>>
+>> --b.
+>>
+>>>
+>>> Signed-off-by: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>>> ---
+>>>   fs/richacl_base.c       | 104 +++++++++++++++++++++++++++++++++++++=
++++++++++++
+>>>   include/linux/richacl.h |   1 +
+>>>   2 files changed, 105 insertions(+)
+>>>
+>>> diff --git a/fs/richacl_base.c b/fs/richacl_base.c
+>>> index 3163152..106e988 100644
+>>> --- a/fs/richacl_base.c
+>>> +++ b/fs/richacl_base.c
+>>> @@ -379,3 +379,107 @@ richacl_chmod(struct richacl *acl, mode_t mode)=
 
-satisfies the first two conditions, but not the third.
+>>>   	return clone;
+>>>   }
+>>>   EXPORT_SYMBOL_GPL(richacl_chmod);
+>>> +
+>>> +/**
+>>> + * richacl_equiv_mode  -  compute the mode equivalent of @acl
+>>> + *
+>>> + * An acl is considered equivalent to a file mode if it only consist=
+s of
+>>> + * owner@, group@, and everyone@ entries and the owner@ permissions =
+do not
+>>> + * depend on whether the owner is a member in the owning group.
+>>> + */
+>>> +int
+>>> +richacl_equiv_mode(const struct richacl *acl, mode_t *mode_p)
+>>> +{
+>>> +	mode_t mode =3D *mode_p;
+>>> +
+>>> +	/*
+>>> +	 * The RICHACE_DELETE_CHILD flag is meaningless for non-directories=
+, so
+>>> +	 * we ignore it.
+>>> +	 */
+>>> +	unsigned int x =3D S_ISDIR(mode) ? 0 : RICHACE_DELETE_CHILD;
+>>> +	struct {
+>>> +		unsigned int allowed;
+>>> +		unsigned int defined;  /* allowed or denied */
+>>> +	} owner =3D {
+>>> +		.defined =3D RICHACE_POSIX_ALWAYS_ALLOWED |
+>>> +			   RICHACE_POSIX_OWNER_ALLOWED  | x,
+>>> +	}, group =3D {
+>>> +		.defined =3D RICHACE_POSIX_ALWAYS_ALLOWED | x,
+>>> +	}, everyone =3D {
+>>> +		.defined =3D RICHACE_POSIX_ALWAYS_ALLOWED | x,
+>>> +	};
+>>> +	const struct richace *ace;
+>>> +
+>>> +	if (acl->a_flags & ~(RICHACL_WRITE_THROUGH | RICHACL_MASKED))
+>>> +		return -1;
+>>> +
+>>> +	richacl_for_each_entry(ace, acl) {
+>>> +		if (ace->e_flags & ~RICHACE_SPECIAL_WHO)
+>>> +			return -1;
+>>> +
+>>> +		if (richace_is_owner(ace) || richace_is_everyone(ace)) {
+>>> +			x =3D ace->e_mask & ~owner.defined;
+>>> +			if (richace_is_allow(ace)) {
+>>> +				unsigned int group_denied =3D
+>>> +					group.defined & ~group.allowed;
+>>> +
+>>> +				if (x & group_denied)
+>>> +					return -1;
+>>> +				owner.allowed |=3D x;
+>>> +			} else /* if (richace_is_deny(ace)) */ {
+>>> +				if (x & group.allowed)
+>>> +					return -1;
+>>> +			}
+>>> +			owner.defined |=3D x;
+>>> +
+>>> +			if (richace_is_everyone(ace)) {
+>>> +				x =3D ace->e_mask;
+>>> +				if (richace_is_allow(ace)) {
+>>> +					group.allowed |=3D
+>>> +						x & ~group.defined;
+>>> +					everyone.allowed |=3D
+>>> +						x & ~everyone.defined;
+>>> +				}
+>>> +				group.defined |=3D x;
+>>> +				everyone.defined |=3D x;
+>>> +			}
+>>> +		} else if (richace_is_group(ace)) {
+>>> +			x =3D ace->e_mask & ~group.defined;
+>>> +			if (richace_is_allow(ace))
+>>> +				group.allowed |=3D x;
+>>> +			group.defined |=3D x;
+>>> +		} else
+>>> +			return -1;
+>>> +	}
+>>> +
+>>> +	if (group.allowed & ~owner.defined)
+>>> +		return -1;
+>>> +
+>>> +	if (acl->a_flags & RICHACL_MASKED) {
+>>> +		if (acl->a_flags & RICHACL_WRITE_THROUGH) {
+>>> +			owner.allowed =3D acl->a_owner_mask;
+>>> +			everyone.allowed =3D acl->a_other_mask;
+>>> +		} else {
+>>> +			owner.allowed &=3D acl->a_owner_mask;
+>>> +			everyone.allowed &=3D acl->a_other_mask;
+>>> +		}
+>>> +		group.allowed &=3D acl->a_group_mask;
+>>> +	}
+>>> +
+>>> +	mode =3D (mode & ~S_IRWXUGO) |
+>>> +	       (richacl_mask_to_mode(owner.allowed) << 6) |
+>>> +	       (richacl_mask_to_mode(group.allowed) << 3) |
+>>> +		richacl_mask_to_mode(everyone.allowed);
+>>> +
+>>> +	/* Mask flags we can ignore */
+>>> +	x =3D S_ISDIR(mode) ? 0 : RICHACE_DELETE_CHILD;
+>>> +
+>>> +	if (((richacl_mode_to_mask(mode >> 6) ^ owner.allowed)    & ~x) ||
+>>> +	    ((richacl_mode_to_mask(mode >> 3) ^ group.allowed)    & ~x) ||
+>>> +	    ((richacl_mode_to_mask(mode)      ^ everyone.allowed) & ~x))
+>>> +		return -1;
+>>> +
+>>> +	*mode_p =3D mode;
+>>> +	return 0;
+>>> +}
+>>> +EXPORT_SYMBOL_GPL(richacl_equiv_mode);
+>>> diff --git a/include/linux/richacl.h b/include/linux/richacl.h
+>>> index d4a576c..6535ce5 100644
+>>> --- a/include/linux/richacl.h
+>>> +++ b/include/linux/richacl.h
+>>> @@ -304,6 +304,7 @@ extern unsigned int richacl_mode_to_mask(mode_t);=
 
-Also, I don't understand why the first condition would imply that we
-might need to propagate permissions.
-
---b.
-
-> +	if (!acl->a_count)
-> +		return 0;
-> +	ace = acl->a_entries + acl->a_count - 1;
-> +	if (richace_is_inherit_only(ace) || !richace_is_everyone(ace))
-> +		return 0;
-> +
-> +	owner_allow = ace->e_mask & acl->a_owner_mask;
-> +	group_allow = ace->e_mask & acl->a_group_mask;
-> +
-> +	if (owner_allow & ~(acl->a_group_mask & acl->a_other_mask)) {
-> +		/* Propagate everyone@ permissions through to owner@. */
-> +		who.e_id.special = RICHACE_OWNER_SPECIAL_ID;
-> +		if (__richacl_propagate_everyone(alloc, &who, owner_allow))
-> +			return -1;
-> +		acl = alloc->acl;
-> +	}
-> +
-> +	if (group_allow & ~acl->a_other_mask) {
-> +		int n;
-> +
-> +		/* Propagate everyone@ permissions through to group@. */
-> +		who.e_id.special = RICHACE_GROUP_SPECIAL_ID;
-> +		if (__richacl_propagate_everyone(alloc, &who, group_allow))
-> +			return -1;
-> +		acl = alloc->acl;
-> +
-> +		/*
-> +		 * Start from the entry before the trailing everyone@ allow
-> +		 * entry. We will not hit everyone@ entries in the loop.
-> +		 */
-> +		for (n = acl->a_count - 2; n != -1; n--) {
-> +			ace = acl->a_entries + n;
-> +
-> +			if (richace_is_inherit_only(ace) ||
-> +			    richace_is_owner(ace) ||
-> +			    richace_is_group(ace))
-> +				continue;
-> +			if (richace_is_allow(ace) || richace_is_deny(ace)) {
-> +				/*
-> +				 * Any inserted entry will end up below the
-> +				 * current entry
-> +				 */
-> +				if (__richacl_propagate_everyone(alloc, ace,
-> +								 group_allow))
-> +					return -1;
-> +				acl = alloc->acl;
-> +			}
-> +		}
-> +	}
-> +	return 0;
-> +}
-> -- 
-> 2.4.3
-> 
+>>>   extern unsigned int richacl_want_to_mask(unsigned int);
+>>>   extern void richacl_compute_max_masks(struct richacl *);
+>>>   extern struct richacl *richacl_chmod(struct richacl *, mode_t);
+>>> +extern int richacl_equiv_mode(const struct richacl *, mode_t *);
+>>>
+>>>   /* richacl_inode.c */
+>>>   extern int richacl_permission(struct inode *, const struct richacl =
+*, int);
+>>> --
+>>> 2.4.3
+>>>
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-nfs" =
+in
+>>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel"=
+ in
 > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
+>
+
+
+
+--------------ms090601060905010007050009
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+cnQub3JnMSIwIAYDVQQDExlDQSBDZXJ0IFNpZ25pbmcgQXV0aG9yaXR5MSEwHwYJKoZIhvcN
+AQkBFhJzdXBwb3J0QGNhY2VydC5vcmcCAxEt+DANBglghkgBZQMEAgMFAKCCAiEwGAYJKoZI
+hvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTUwOTIxMTM1OTA3WjBPBgkq
+hkiG9w0BCQQxQgRAW/B3ajXgyRvnFT4kmSND5dcq10iKWoBupezWoaca57Gd3ANUeVpmDGMO
+Jyg2EHMdDiyJd2sVVJVnTZmGmnsuYDBsBgkqhkiG9w0BCQ8xXzBdMAsGCWCGSAFlAwQBKjAL
+BglghkgBZQMEAQIwCgYIKoZIhvcNAwcwDgYIKoZIhvcNAwICAgCAMA0GCCqGSIb3DQMCAgFA
+MAcGBSsOAwIHMA0GCCqGSIb3DQMCAgEoMIGRBgkrBgEEAYI3EAQxgYMwgYAweTEQMA4GA1UE
+ChMHUm9vdCBDQTEeMBwGA1UECxMVaHR0cDovL3d3dy5jYWNlcnQub3JnMSIwIAYDVQQDExlD
+QSBDZXJ0IFNpZ25pbmcgQXV0aG9yaXR5MSEwHwYJKoZIhvcNAQkBFhJzdXBwb3J0QGNhY2Vy
+dC5vcmcCAxEt+DCBkwYLKoZIhvcNAQkQAgsxgYOggYAweTEQMA4GA1UEChMHUm9vdCBDQTEe
+MBwGA1UECxMVaHR0cDovL3d3dy5jYWNlcnQub3JnMSIwIAYDVQQDExlDQSBDZXJ0IFNpZ25p
+bmcgQXV0aG9yaXR5MSEwHwYJKoZIhvcNAQkBFhJzdXBwb3J0QGNhY2VydC5vcmcCAxEt+DAN
+BgkqhkiG9w0BAQEFAASCAgB4UZT3nGdIAHuREprTLmRHK47TI0JMk52aVWj2pb6r1t0j8QCP
+3EQ5WBLIFIWteshEFDy4Ao32NlOLCEg2y+vyisgg8zHS/p39Ac2qw6SXN6CXEcXk5KxarmeX
+h0lO9ww6TKU9n8ORmJCbD+Wv7ztwzoEL6celBNTZ/sc2kN8l2rk0/aDVpGJav6xYS5erx66K
+BYdUqlJtjEIlI5JaCCCynYDzLx6VGmA3mz/3i00KZ/XxxJWTN6ux5U5+yfbXXPUXL1cbO7Uf
+C0SGEkjD+Xd/4jmwM/HoDkAZE5HXYn1rth7KG4cpqebE5XBM81M7RQb9bM7Q+yp/kXFlgZ6k
+tVay4FWyixTWKCCjyFDmWY0UfneNQltHyTCVxHNjNC6UO1mpRoz28N41VGkyzq4E4Jxmkkc+
+OBlaHR0A+GV1Yvq8xrncDIt1RMdZ4+t6gisBQG80FG+DbfMbnYdOEGy0w2wXMZX+6EuejyCr
+UI5HUXIpRUwrFJfxa1+etLE4HmiwABu2pFXQz5gFb3qtC4hO2JaLR/m+iAPdGnuLGtPt2s45
+16Ko8dBsyhXK4+uQhCm9yeggjNH2BzCWIdDaqqvWodOPBtxvuwoIBQLB1JiEAlQA8C5JwXe1
+t3C0IKB46/VNBJ8B7HCH+TFT8p0oCDLHTAqXPGGQHnP/hvStUkDWm2Q8dgAAAAAAAA==
+--------------ms090601060905010007050009--
