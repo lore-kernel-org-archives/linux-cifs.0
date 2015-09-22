@@ -1,20 +1,20 @@
-From: bfields@fieldses.org (J. Bruce Fields)
+From: bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org (J. Bruce Fields)
 Subject: Re: [RFC v7 26/41] richacl: Apply the file masks to a richacl
-Date: Tue, 22 Sep 2015 15:11:08 -0400
-Message-ID: <20150922191108.GC19127@fieldses.org>
+Date: Tue, 22 Sep 2015 16:50:36 -0400
+Message-ID: <20150922205036.GD19127@fieldses.org>
 References: <1441448856-13478-1-git-send-email-agruenba@redhat.com>
  <1441448856-13478-27-git-send-email-agruenba@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-nfs@vger.kernel.org, linux-api@vger.kernel.org,
-	linux-cifs@vger.kernel.org, linux-security-module@vger.kernel.org,
-	Andreas Gruenbacher <agruen@kernel.org>
-To: Andreas Gruenbacher <agruenba@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Andreas Gruenbacher <agruen-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+To: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <1441448856-13478-27-git-send-email-agruenba@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <1441448856-13478-27-git-send-email-agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
 On Sat, Sep 05, 2015 at 12:27:21PM +0200, Andreas Gruenbacher wrote:
@@ -22,7 +22,7 @@ On Sat, Sep 05, 2015 at 12:27:21PM +0200, Andreas Gruenbacher wrote:
 > computing a richacl which has the file masks "applied" so that the
 > standard nfsv4 access check algorithm can be used on the richacl.
 > 
-> Signed-off-by: Andreas Gruenbacher <agruen@kernel.org>
+> Signed-off-by: Andreas Gruenbacher <agruen-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
 > ---
 >  fs/richacl_compat.c     | 110 ++++++++++++++++++++++++++++++++++++++++++++++++
 >  include/linux/richacl.h |   3 ++
@@ -61,12 +61,6 @@ On Sat, Sep 05, 2015 at 12:27:21PM +0200, Andreas Gruenbacher wrote:
 > +		if (richace_is_owner(ace) ||
 > +		    (richace_is_unix_user(ace) && uid_eq(owner, ace->e_id.uid)))
 > +			mask = alloc->acl->a_owner_mask;
-
-Is treating matching user aces like owner aces what you intended to do,
-and if so, why?
-
---b.
-
 > +		else if (richace_is_everyone(ace))
 > +			mask = alloc->acl->a_other_mask;
 > +		else
@@ -118,10 +112,27 @@ and if so, why?
 > + * richacl_permission() so that the group mask is always applied to group class
 > + * aces.  With this fix, the owner would not have any access (beyond the
 > + * implicit permissions always granted to owners).
+
+That's a confusing way to put it: you say the algorithm isn't exact,
+then say, actually, no, it *is* exact, because of a change we made to
+richacls.
+
+Better to just say from the start "the algorithm is exact", and then
+explain why.  (Actually, the term "exact" isn't really defined here:
+maybe say what you mean, something like "the resulting ACL will always
+grant the same permissions that the original ACL would".)
+
 > + *
 > + * NOTE: Depending on the acl and file masks, this algorithm can increase the
 > + * number of aces by almost a factor of three in the worst case. This may make
 > + * the acl too large for some purposes.
+
+We should maybe give some guidelines (e.g., "this won't happen if you
+always use modes that grant more to group than user, and more to other
+than group (if that's true)).
+
+--b.
+
 > + */
 > +int
 > +richacl_apply_masks(struct richacl **acl, kuid_t owner)
@@ -169,5 +180,5 @@ and if so, why?
 > 
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-> the body of a message to majordomo@vger.kernel.org
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
