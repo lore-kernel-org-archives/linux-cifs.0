@@ -1,20 +1,20 @@
-From: bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org (J. Bruce Fields)
+From: bfields@fieldses.org (J. Bruce Fields)
 Subject: Re: [RFC v7 25/41] richacl: Isolate the owner and group classes
-Date: Tue, 22 Sep 2015 12:06:37 -0400
-Message-ID: <20150922160637.GC15838@fieldses.org>
+Date: Tue, 22 Sep 2015 15:02:24 -0400
+Message-ID: <20150922190224.GA19127@fieldses.org>
 References: <1441448856-13478-1-git-send-email-agruenba@redhat.com>
  <1441448856-13478-26-git-send-email-agruenba@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Andreas Gruenbacher <agruen-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-To: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-nfs@vger.kernel.org, linux-api@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-security-module@vger.kernel.org,
+	Andreas Gruenbacher <agruen@kernel.org>
+To: Andreas Gruenbacher <agruenba@redhat.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1441448856-13478-26-git-send-email-agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+In-Reply-To: <1441448856-13478-26-git-send-email-agruenba@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
 On Sat, Sep 05, 2015 at 12:27:20PM +0200, Andreas Gruenbacher wrote:
@@ -47,7 +47,7 @@ On Sat, Sep 05, 2015 at 12:27:20PM +0200, Andreas Gruenbacher wrote:
 >    group@:w::deny
 >    everyone@:rw::allow
 > 
-> Signed-off-by: Andreas Gruenbacher <agruen-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+> Signed-off-by: Andreas Gruenbacher <agruen@kernel.org>
 > ---
 >  fs/richacl_compat.c | 236 ++++++++++++++++++++++++++++++++++++++++++++++++++++
 >  1 file changed, 236 insertions(+)
@@ -104,14 +104,6 @@ On Sat, Sep 05, 2015 at 12:27:20PM +0200, Andreas Gruenbacher wrote:
 > + *
 > + *    owner@:r::allow
 > + *    everyone@:rw::allow
-
-Are you sure?  I didn't think richacl_apply_masks actually creates an
-owner@ entry in this case.  Which is OK, just delete the owner@ ace from
-here and the following example and it still makes sense, I think.
-
-(But: thanks in general for the examples in these comments, they're
-extremely helpful.)
-
 > + *
 > + * This acl still grants the owner rw access through the everyone@ allow ace.
 > + * To fix this, we must deny the owner w access:
@@ -159,35 +151,6 @@ extremely helpful.)
 > +		}
 > +	}
 > +	return 0;
-
-Makes sense, though personally I'd find it simpler to follow without the
-a_entries + a_count condition, maybe something like this (untested):
-
-		richacl_for_each_entry(ace, alloc->acl) {
-			if (richace_is_inherit_only(ace))
-				continue;
-			if (richace_is_allow(ace))
-				break;
-			if (richace_is_owner(ace))
-				goto found;
-		}
-		/* Insert an owner@ deny entry at the front. */
-		ace = alloc->acl->a_entries;
-		if (richacl_insert_entry(alloc, &ace))
-			return -1;
-		ace->e_type = RICHACE_ACCESS_DENIED_ACE_TYPE;
-		ace->e_flags = RICHACE_SPECIAL_WHO;
-		ace->e_mask = allowed & ~alloc->acl->a_owner_mask;
-		ace->e_id.special = RICHACE_OWNER_SPECIAL_ID;
-		return 0;
-	found:
-		if (richace_change_mask(alloc, &ace, ace->e_mask |
-					(allowed & ~alloc->acl->a_owner_mask)))
-			return -1;
-		return 0;
-
---b.
-
 > +}
 > +
 > +/**
@@ -207,6 +170,10 @@ a_entries + a_count condition, maybe something like this (untested):
 > +	int n;
 > +	/*
 > +	 * Compute the permissions already denied to @who.
+
+I'm not sure, but may be worth commenting on the lack of everyone denies
+here as you do in a couple places below.
+
 > +	 */
 > +	richacl_for_each_entry(ace, acl) {
 > +		if (richace_is_inherit_only(ace))
@@ -254,6 +221,9 @@ a_entries + a_count condition, maybe something like this (untested):
 > +		ace->e_flags &= ~RICHACE_INHERITANCE_FLAGS;
 > +		ace->e_mask = deny;
 > +	}
+
+As in the owner case, I think a goto would simplify the logic a little.
+
 > +	return 0;
 > +}
 > +
@@ -318,6 +288,11 @@ a_entries + a_count condition, maybe something like this (untested):
 > +		/*
 > +		 * Start from the entry before the trailing everyone@ allow
 > +		 * entry.  We will not hit everyone@ entries in the loop.
+
+May as well skip the check below, in that case?
+
+--b.
+
 > +		 */
 > +		for (n = alloc->acl->a_count - 2; n != -1; n--) {
 > +			ace = alloc->acl->a_entries + n;
@@ -338,5 +313,5 @@ a_entries + a_count condition, maybe something like this (untested):
 > 
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
