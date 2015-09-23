@@ -1,147 +1,164 @@
-From: "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
-Subject: Re: [RFC v7 19/41] ext4: Add richacl feature flag
-Date: Wed, 23 Sep 2015 08:01:49 +0530
-Message-ID: <87io71hnmy.fsf@linux.vnet.ibm.com>
-References: <1441448856-13478-1-git-send-email-agruenba@redhat.com> <1441448856-13478-20-git-send-email-agruenba@redhat.com>
+From: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [RFC v7 25/41] richacl: Isolate the owner and group classes
+Date: Wed, 23 Sep 2015 15:11:45 +0200
+Message-ID: <CAHc6FU6gnPK5vdJynv0ze=mNju6V_1WuR99oXWC4Fdh2GFMVgA@mail.gmail.com>
+References: <1441448856-13478-1-git-send-email-agruenba@redhat.com>
+	<1441448856-13478-26-git-send-email-agruenba@redhat.com>
+	<20150922160637.GC15838@fieldses.org>
 Mime-Version: 1.0
-Content-Type: text/plain
-To: Andreas Gruenbacher <agruenba@redhat.com>,
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-nfs@vger.kernel.org, linux-api@vger.kernel.org,
-	linux-cifs@vger.kernel.org, linux-security-module@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1441448856-13478-20-git-send-email-agruenba@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Andreas Gruenbacher <agruen-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+To: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20150922160637.GC15838-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
-Andreas Gruenbacher <agruenba@redhat.com> writes:
+2015-09-22 18:06 GMT+02:00 J. Bruce Fields <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>:
+> On Sat, Sep 05, 2015 at 12:27:20PM +0200, Andreas Gruenbacher wrote:
+>> When applying the file masks to an acl, we need to ensure that no
+>> process gets more permissions than allowed by its file mask.
+>>
+>> This may require inserting an owner@ deny ace to ensure this if the
+>> owner mask contains fewer permissions than the group or other mask.  For
+>> example, when applying mode 0466 to the following acl:
+>>
+>>    everyone@:rw::allow
+>>
+>> A deny ace needs to be inserted so that the owner won't get elevated
+>> write access:
+>>
+>>    owner@:w::deny
+>>    everyone@:rw::allow
+>>
+>> Likewise, we may need to insert group class deny aces if the group mask
+>> contains fewer permissions than the other mask.  For example, when
+>> applying mode 0646 to the following acl:
+>>
+>>    owner@:rw::allow
+>>    everyone@:rw::allow
+>>
+>> A deny ace needs to be inserted so that the owning group won't get
+>> elevated write access:
+>>
+>>    owner@:rw::allow
+>>    group@:w::deny
+>>    everyone@:rw::allow
+>>
+>> Signed-off-by: Andreas Gruenbacher <agruen-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+>> ---
+>>  fs/richacl_compat.c | 236 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 236 insertions(+)
+>>
+>> diff --git a/fs/richacl_compat.c b/fs/richacl_compat.c
+>> index 30bdc95..412844c 100644
+>> --- a/fs/richacl_compat.c
+>> +++ b/fs/richacl_compat.c
+>> @@ -494,3 +494,239 @@ richacl_set_other_permissions(struct richacl_alloc *alloc)
+>>               richace_change_mask(alloc, &ace, other_mask);
+>>       return 0;
+>>  }
+>> +
+>> +/**
+>> + * richacl_max_allowed  -  maximum permissions that anybody is allowed
+>> + */
+>> +static unsigned int
+>> +richacl_max_allowed(struct richacl *acl)
+>> +{
+>> +     struct richace *ace;
+>> +     unsigned int allowed = 0;
+>> +
+>> +     richacl_for_each_entry_reverse(ace, acl) {
+>> +             if (richace_is_inherit_only(ace))
+>> +                     continue;
+>> +             if (richace_is_allow(ace))
+>> +                     allowed |= ace->e_mask;
+>> +             else if (richace_is_deny(ace)) {
+>> +                     if (richace_is_everyone(ace))
+>> +                             allowed &= ~ace->e_mask;
+>> +             }
+>> +     }
+>> +     return allowed;
+>> +}
+>> +
+>> +/**
+>> + * richacl_isolate_owner_class  -  limit the owner class to the owner file mask
+>> + * @alloc:   acl and number of allocated entries
+>> + *
+>> + * POSIX requires that after a chmod, the owner class is granted no more
+>> + * permissions than the owner file permission bits.  For richacls, this
+>> + * means that the owner class must not be granted any permissions that the
+>> + * owner mask does not include.
+>> + *
+>> + * When we apply file masks to an acl which grant more permissions to the group
+>> + * or other class than to the owner class, we may end up in a situation where
+>> + * the owner is granted additional permissions from other aces.  For example,
+>> + * given this acl:
+>> + *
+>> + *    everyone:rwx::allow
+>> + *
+>> + * when file masks corresponding to mode 0466 are applied, after
+>> + * richacl_propagate_everyone() and __richacl_apply_masks(), we end up with:
+>> + *
+>> + *    owner@:r::allow
+>> + *    everyone@:rw::allow
+>
+> Are you sure?  I didn't think richacl_apply_masks actually creates an
+> owner@ entry in this case.  Which is OK, just delete the owner@ ace from
+> here and the following example and it still makes sense, I think.
 
-> From: "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
->
-> This feature flag selects richacl instead of posix acl support on the
-> file system. In addition, the "acl" mount option is needed for enabling
-> either of the two kinds of acls.
->
-> Signed-off-by: Andreas Gruenbacher <agruenba@redhat.com>
+Hmm, the example can be fixed by applying more 0406 here instead of 0466.
 
- Signed-off-by: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
+> (But: thanks in general for the examples in these comments, they're
+> extremely helpful.)
 
-> ---
->  fs/ext4/ext4.h  |  6 ++++--
->  fs/ext4/super.c | 42 +++++++++++++++++++++++++++++++++---------
->  2 files changed, 37 insertions(+), 11 deletions(-)
+Yes, I think without them, the code cannot be reviewed properly.
+
+> I'd find it simpler to follow without the  a_entries + a_count condition,
+> maybe something like this (untested):
 >
-> diff --git a/fs/ext4/ext4.h b/fs/ext4/ext4.h
-> index f5e9f04..e69c8ea 100644
-> --- a/fs/ext4/ext4.h
-> +++ b/fs/ext4/ext4.h
-> @@ -991,7 +991,7 @@ struct ext4_inode_info {
->  #define EXT4_MOUNT_UPDATE_JOURNAL	0x01000	/* Update the journal format */
->  #define EXT4_MOUNT_NO_UID32		0x02000  /* Disable 32-bit UIDs */
->  #define EXT4_MOUNT_XATTR_USER		0x04000	/* Extended user attributes */
-> -#define EXT4_MOUNT_POSIX_ACL		0x08000	/* POSIX Access Control Lists */
-> +#define EXT4_MOUNT_ACL			0x08000	/* Access Control Lists */
->  #define EXT4_MOUNT_NO_AUTO_DA_ALLOC	0x10000	/* No auto delalloc mapping */
->  #define EXT4_MOUNT_BARRIER		0x20000 /* Use block barriers */
->  #define EXT4_MOUNT_QUOTA		0x80000 /* Some quota option set */
-> @@ -1582,6 +1582,7 @@ static inline int ext4_encrypted_inode(struct inode *inode)
->  #define EXT4_FEATURE_INCOMPAT_LARGEDIR		0x4000 /* >2GB or 3-lvl htree */
->  #define EXT4_FEATURE_INCOMPAT_INLINE_DATA	0x8000 /* data in inode */
->  #define EXT4_FEATURE_INCOMPAT_ENCRYPT		0x10000
-> +#define EXT4_FEATURE_INCOMPAT_RICHACL		0x20000
->
->  #define EXT2_FEATURE_COMPAT_SUPP	EXT4_FEATURE_COMPAT_EXT_ATTR
->  #define EXT2_FEATURE_INCOMPAT_SUPP	(EXT4_FEATURE_INCOMPAT_FILETYPE| \
-> @@ -1607,7 +1608,8 @@ static inline int ext4_encrypted_inode(struct inode *inode)
->  					 EXT4_FEATURE_INCOMPAT_FLEX_BG| \
->  					 EXT4_FEATURE_INCOMPAT_MMP | \
->  					 EXT4_FEATURE_INCOMPAT_INLINE_DATA | \
-> -					 EXT4_FEATURE_INCOMPAT_ENCRYPT)
-> +					 EXT4_FEATURE_INCOMPAT_ENCRYPT | \
-> +					 EXT4_FEATURE_INCOMPAT_RICHACL)
->  #define EXT4_FEATURE_RO_COMPAT_SUPP	(EXT4_FEATURE_RO_COMPAT_SPARSE_SUPER| \
->  					 EXT4_FEATURE_RO_COMPAT_LARGE_FILE| \
->  					 EXT4_FEATURE_RO_COMPAT_GDT_CSUM| \
-> diff --git a/fs/ext4/super.c b/fs/ext4/super.c
-> index 58987b5..05d6537 100644
-> --- a/fs/ext4/super.c
-> +++ b/fs/ext4/super.c
-> @@ -1257,6 +1257,28 @@ static ext4_fsblk_t get_sb_block(void **data)
->  	return sb_block;
->  }
->
-> +static int enable_acl(struct super_block *sb)
-> +{
-> +	sb->s_flags &= ~(MS_POSIXACL | MS_RICHACL);
-> +	if (test_opt(sb, ACL)) {
-> +		if (EXT4_HAS_INCOMPAT_FEATURE(sb,
-> +					      EXT4_FEATURE_INCOMPAT_RICHACL)) {
-> +#ifdef CONFIG_EXT4_FS_RICHACL
-> +			sb->s_flags |= MS_RICHACL;
-> +#else
-> +			return -EOPNOTSUPP;
-> +#endif
-> +		} else {
-> +#ifdef CONFIG_EXT4_FS_POSIX_ACL
-> +			sb->s_flags |= MS_POSIXACL;
-> +#else
-> +			return -EOPNOTSUPP;
-> +#endif
-> +		}
-> +	}
-> +	return 0;
-> +}
-> +
->  #define DEFAULT_JOURNAL_IOPRIO (IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, 3))
->  static char deprecated_msg[] = "Mount option \"%s\" will be removed by %s\n"
->  	"Contact linux-ext4@vger.kernel.org if you think we should keep it.\n";
-> @@ -1403,9 +1425,9 @@ static const struct mount_opts {
->  	 MOPT_NO_EXT2 | MOPT_DATAJ},
->  	{Opt_user_xattr, EXT4_MOUNT_XATTR_USER, MOPT_SET},
->  	{Opt_nouser_xattr, EXT4_MOUNT_XATTR_USER, MOPT_CLEAR},
-> -#ifdef CONFIG_EXT4_FS_POSIX_ACL
-> -	{Opt_acl, EXT4_MOUNT_POSIX_ACL, MOPT_SET},
-> -	{Opt_noacl, EXT4_MOUNT_POSIX_ACL, MOPT_CLEAR},
-> +#if defined(CONFIG_EXT4_FS_POSIX_ACL) || defined(CONFIG_EXT4_FS_RICHACL)
-> +	{Opt_acl, EXT4_MOUNT_ACL, MOPT_SET},
-> +	{Opt_noacl, EXT4_MOUNT_ACL, MOPT_CLEAR},
->  #else
->  	{Opt_acl, 0, MOPT_NOSUPPORT},
->  	{Opt_noacl, 0, MOPT_NOSUPPORT},
-> @@ -3563,8 +3585,8 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
->  		set_opt(sb, NO_UID32);
->  	/* xattr user namespace & acls are now defaulted on */
->  	set_opt(sb, XATTR_USER);
-> -#ifdef CONFIG_EXT4_FS_POSIX_ACL
-> -	set_opt(sb, POSIX_ACL);
-> +#if defined(CONFIG_EXT4_FS_POSIX_ACL) || defined(CONFIG_EXT4_FS_RICHACL)
-> +	set_opt(sb, ACL);
->  #endif
->  	/* don't forget to enable journal_csum when metadata_csum is enabled. */
->  	if (ext4_has_metadata_csum(sb))
-> @@ -3645,8 +3667,9 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
->  			clear_opt(sb, DELALLOC);
->  	}
->
-> -	sb->s_flags = (sb->s_flags & ~MS_POSIXACL) |
-> -		(test_opt(sb, POSIX_ACL) ? MS_POSIXACL : 0);
-> +	err = enable_acl(sb);
-> +	if (err)
-> +		goto failed_mount;
->
->  	if (le32_to_cpu(es->s_rev_level) == EXT4_GOOD_OLD_REV &&
->  	    (EXT4_HAS_COMPAT_FEATURE(sb, ~0U) ||
-> @@ -4960,8 +4983,9 @@ static int ext4_remount(struct super_block *sb, int *flags, char *data)
->  	if (sbi->s_mount_flags & EXT4_MF_FS_ABORTED)
->  		ext4_abort(sb, "Abort forced by user");
->
-> -	sb->s_flags = (sb->s_flags & ~MS_POSIXACL) |
-> -		(test_opt(sb, POSIX_ACL) ? MS_POSIXACL : 0);
-> +	err = enable_acl(sb);
-> +	if (err)
-> +		goto restore_opts;
->
->  	es = sbi->s_es;
->
-> -- 
-> 2.4.3
+> [...]
+
+Great, let me further simplify this to:
+
+static int
+richacl_isolate_owner_class(struct richacl_alloc *alloc)
+{
+        struct richacl *acl = alloc->acl;
+        unsigned int deny = richacl_max_allowed(acl) & ~acl->a_owner_mask;
+
+        if (deny) {
+                struct richace *ace;
+
+                /*
+                 * Figure out if we can update an existig OWNER@ DENY entry.
+                 */
+                richacl_for_each_entry(ace, acl) {
+                        if (richace_is_inherit_only(ace))
+                                continue;
+                        if (richace_is_allow(ace))
+                                break;
+                        if (richace_is_owner(ace)) {
+                                return richace_change_mask(alloc, &ace,
+                                                           ace->e_mask | deny);
+                        }
+                }
+
+                /* Insert an owner@ deny entry at the front. */
+                ace = acl->a_entries;
+                if (richacl_insert_entry(alloc, &ace))
+                        return -1;
+                ace->e_type = RICHACE_ACCESS_DENIED_ACE_TYPE;
+                ace->e_flags = RICHACE_SPECIAL_WHO;
+                ace->e_mask = deny;
+                ace->e_id.special = RICHACE_OWNER_SPECIAL_ID;
+        }
+        return 0;
+}
+
+Thanks,
+Andreas
