@@ -1,49 +1,180 @@
-From: =?UTF-8?Q?Andreas_Gr=C3=BCnbacher?= <andreas.gruenbacher-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [RFC v7 24/41] richacl: Set the other permissions to the other mask
-Date: Wed, 23 Sep 2015 16:12:42 +0200
-Message-ID: <CAHpGcMJMgtqGDsxUYFXqVmenaLxdJHL3VO8byV0GtSkdrQMggw@mail.gmail.com>
-References: <1441448856-13478-1-git-send-email-agruenba@redhat.com>
-	<1441448856-13478-25-git-send-email-agruenba@redhat.com>
-	<20150923140307.GB27083@fieldses.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Linux Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Linux FS-devel Mailing List <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Linux NFS Mailing List <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Linux API Mailing List <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	LSM List <linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20150923140307.GB27083-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] [SMB3] Fix sec=krb5 on smb3 mounts
+Date: Wed, 23 Sep 2015 13:58:24 -0500
+Message-ID: <1443034704-6536-1-git-send-email-smfrench@gmail.com>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Noel Power <noel.power-IBi9RG/b67k@public.gmane.org>,
+	Jim McDonough <jmcd-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-2015-09-23 16:03 GMT+02:00 J. Bruce Fields <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>:
-> On Sat, Sep 05, 2015 at 12:27:19PM +0200, Andreas Gruenbacher wrote:
->> +static int
->> +richacl_set_other_permissions(struct richacl_alloc *alloc)
->> +{
->> +     struct richacl *acl = alloc->acl;
->> +     unsigned int x = RICHACE_POSIX_ALWAYS_ALLOWED;
->> +     unsigned int other_mask = acl->a_other_mask & ~x;
->> +     struct richace *ace = acl->a_entries + acl->a_count - 1;
->> +
->> +     if (!(other_mask &&
->> +           (acl->a_flags & RICHACL_WRITE_THROUGH) &&
->> +           (acl->a_flags & RICHACL_MASKED)))
->> +             return 0;
->
-> By the way, I think this is only called after checking MASKED--so the
-> MASKED check here could be a WARN_ON, or could just be dropped.  Ditto
-> for the following patch.
+Kerberos, which is very important for security, was only enabled for
+CIFS not SMB2/SMB3 mounts (e.g. vers=3.0)
 
-Hmm, yes. I'll drop that.
+Patch based on the information detailed in
+http://thread.gmane.org/gmane.linux.kernel.cifs/10081/focus=10307
+to enable Kerberized SMB2/SMB3
 
-Thanks,
-Andreas
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+a) SMB2_negotiate: enable/use decode_negTokenInit in SMB2_negotiate
+b) SMB2_sess_setup: handle Kerberos sectype and replicate Kerberos
+   SMB1 processing done in sess_auth_kerberos
+
+Signed-off-by: Noel Power <noel.power-IBi9RG/b67k@public.gmane.org>
+Signed-off-by: Jim McDonough <jmcd-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Signed-off-by: Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+---
+ fs/cifs/smb2pdu.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 51 insertions(+), 8 deletions(-)
+
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 070fb2a..4d3f499 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -46,6 +46,7 @@
+ #include "smb2status.h"
+ #include "smb2glob.h"
+ #include "cifspdu.h"
++#include "cifs_spnego.h"
+ 
+ /*
+  *  The following table defines the expected "StructureSize" of SMB2 requests
+@@ -486,7 +487,6 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
+ 		cifs_dbg(FYI, "missing security blob on negprot\n");
+ 
+ 	rc = cifs_enable_signing(server, ses->sign);
+-#ifdef CONFIG_SMB2_ASN1  /* BB REMOVEME when updated asn1.c ready */
+ 	if (rc)
+ 		goto neg_exit;
+ 	if (blob_length)
+@@ -497,7 +497,6 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
+ 		rc = -EIO;
+ 		goto neg_exit;
+ 	}
+-#endif
+ 
+ neg_exit:
+ 	free_rsp_buf(resp_buftype, rsp);
+@@ -592,7 +591,8 @@ SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
+ 	__le32 phase = NtLmNegotiate; /* NTLMSSP, if needed, is multistage */
+ 	struct TCP_Server_Info *server = ses->server;
+ 	u16 blob_length = 0;
+-	char *security_blob;
++	struct key *spnego_key = NULL;
++	char *security_blob = NULL;
+ 	char *ntlmssp_blob = NULL;
+ 	bool use_spnego = false; /* else use raw ntlmssp */
+ 
+@@ -620,7 +620,8 @@ SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
+ 	ses->ntlmssp->sesskey_per_smbsess = true;
+ 
+ 	/* FIXME: allow for other auth types besides NTLMSSP (e.g. krb5) */
+-	ses->sectype = RawNTLMSSP;
++	if (ses->sectype != Kerberos && ses->sectype != RawNTLMSSP)
++		ses->sectype = RawNTLMSSP;
+ 
+ ssetup_ntlmssp_authenticate:
+ 	if (phase == NtLmChallenge)
+@@ -649,7 +650,43 @@ ssetup_ntlmssp_authenticate:
+ 	iov[0].iov_base = (char *)req;
+ 	/* 4 for rfc1002 length field and 1 for pad */
+ 	iov[0].iov_len = get_rfc1002_length(req) + 4 - 1;
+-	if (phase == NtLmNegotiate) {
++
++	if (ses->sectype == Kerberos) {
++		struct cifs_spnego_msg *msg;
++
++		spnego_key = cifs_get_spnego_key(ses);
++		if (IS_ERR(spnego_key)) {
++			rc = PTR_ERR(spnego_key);
++			spnego_key = NULL;
++			goto ssetup_exit;
++		}
++
++		msg = spnego_key->payload.data;
++		/*
++		 * check version field to make sure that cifs.upcall is
++		 * sending us a response in an expected form
++		 */
++		if (msg->version != CIFS_SPNEGO_UPCALL_VERSION) {
++			cifs_dbg(VFS,
++				  "bad cifs.upcall version. Expected %d got %d",
++				  CIFS_SPNEGO_UPCALL_VERSION, msg->version);
++			rc = -EKEYREJECTED;
++			goto ssetup_exit;
++		}
++
++		ses->auth_key.response = kmemdup(msg->data, msg->sesskey_len,
++						 GFP_KERNEL);
++		if (!ses->auth_key.response) {
++			cifs_dbg(VFS,
++				"Kerberos can't allocate (%u bytes) memory",
++				msg->sesskey_len);
++			rc = -ENOMEM;
++			goto ssetup_exit;
++		}
++		ses->auth_key.len = msg->sesskey_len;
++		blob_length = msg->secblob_len;
++		iov[1].iov_base = msg->data + msg->sesskey_len;
++	} else if (phase == NtLmNegotiate) { /* if not krb5 must be ntlmssp */
+ 		ntlmssp_blob = kmalloc(sizeof(struct _NEGOTIATE_MESSAGE),
+ 				       GFP_KERNEL);
+ 		if (ntlmssp_blob == NULL) {
+@@ -672,6 +709,8 @@ ssetup_ntlmssp_authenticate:
+ 			/* with raw NTLMSSP we don't encapsulate in SPNEGO */
+ 			security_blob = ntlmssp_blob;
+ 		}
++		iov[1].iov_base = security_blob;
++		iov[1].iov_len = blob_length;
+ 	} else if (phase == NtLmAuthenticate) {
+ 		req->hdr.SessionId = ses->Suid;
+ 		ntlmssp_blob = kzalloc(sizeof(struct _NEGOTIATE_MESSAGE) + 500,
+@@ -699,6 +738,8 @@ ssetup_ntlmssp_authenticate:
+ 		} else {
+ 			security_blob = ntlmssp_blob;
+ 		}
++		iov[1].iov_base = security_blob;
++		iov[1].iov_len = blob_length;
+ 	} else {
+ 		cifs_dbg(VFS, "illegal ntlmssp phase\n");
+ 		rc = -EIO;
+@@ -710,8 +751,6 @@ ssetup_ntlmssp_authenticate:
+ 				cpu_to_le16(sizeof(struct smb2_sess_setup_req) -
+ 					    1 /* pad */ - 4 /* rfc1001 len */);
+ 	req->SecurityBufferLength = cpu_to_le16(blob_length);
+-	iov[1].iov_base = security_blob;
+-	iov[1].iov_len = blob_length;
+ 
+ 	inc_rfc1001_len(req, blob_length - 1 /* pad */);
+ 
+@@ -722,6 +761,7 @@ ssetup_ntlmssp_authenticate:
+ 
+ 	kfree(security_blob);
+ 	rsp = (struct smb2_sess_setup_rsp *)iov[0].iov_base;
++	ses->Suid = rsp->hdr.SessionId;
+ 	if (resp_buftype != CIFS_NO_BUFFER &&
+ 	    rsp->hdr.Status == STATUS_MORE_PROCESSING_REQUIRED) {
+ 		if (phase != NtLmNegotiate) {
+@@ -739,7 +779,6 @@ ssetup_ntlmssp_authenticate:
+ 		/* NTLMSSP Negotiate sent now processing challenge (response) */
+ 		phase = NtLmChallenge; /* process ntlmssp challenge */
+ 		rc = 0; /* MORE_PROCESSING is not an error here but expected */
+-		ses->Suid = rsp->hdr.SessionId;
+ 		rc = decode_ntlmssp_challenge(rsp->Buffer,
+ 				le16_to_cpu(rsp->SecurityBufferLength), ses);
+ 	}
+@@ -796,6 +835,10 @@ keygen_exit:
+ 		kfree(ses->auth_key.response);
+ 		ses->auth_key.response = NULL;
+ 	}
++	if (spnego_key) {
++		key_invalidate(spnego_key);
++		key_put(spnego_key);
++	}
+ 	kfree(ses->ntlmssp);
+ 
+ 	return rc;
+-- 
+1.9.1
