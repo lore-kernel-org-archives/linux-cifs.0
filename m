@@ -1,180 +1,192 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH] [SMB3] Fix sec=krb5 on smb3 mounts
-Date: Wed, 23 Sep 2015 13:58:24 -0500
-Message-ID: <1443034704-6536-1-git-send-email-smfrench@gmail.com>
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Noel Power <noel.power-IBi9RG/b67k@public.gmane.org>,
-	Jim McDonough <jmcd-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
+Subject: Re: [RFC v7 26/41] richacl: Apply the file masks to a richacl
+Date: Wed, 23 Sep 2015 15:18:32 -0400
+Message-ID: <20150923191832.GA29577@fieldses.org>
+References: <1441448856-13478-1-git-send-email-agruenba@redhat.com>
+ <1441448856-13478-27-git-send-email-agruenba@redhat.com>
+ <20150922191108.GC19127@fieldses.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Andreas Gruenbacher <agruen-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+To: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20150922191108.GC19127-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Kerberos, which is very important for security, was only enabled for
-CIFS not SMB2/SMB3 mounts (e.g. vers=3.0)
+On Tue, Sep 22, 2015 at 03:11:08PM -0400, bfields wrote:
+> On Sat, Sep 05, 2015 at 12:27:21PM +0200, Andreas Gruenbacher wrote:
+> > Put all the pieces of the acl transformation puzzle together for
+> > computing a richacl which has the file masks "applied" so that the
+> > standard nfsv4 access check algorithm can be used on the richacl.
+> > 
+> > Signed-off-by: Andreas Gruenbacher <agruen-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+> > ---
+> >  fs/richacl_compat.c     | 110 ++++++++++++++++++++++++++++++++++++++++++++++++
+> >  include/linux/richacl.h |   3 ++
+> >  2 files changed, 113 insertions(+)
+> > 
+> > diff --git a/fs/richacl_compat.c b/fs/richacl_compat.c
+> > index 412844c..9681efe 100644
+> > --- a/fs/richacl_compat.c
+> > +++ b/fs/richacl_compat.c
+> > @@ -730,3 +730,113 @@ richacl_isolate_group_class(struct richacl_alloc *alloc)
+> >  	}
+> >  	return 0;
+> >  }
+> > +
+> > +/**
+> > + * __richacl_apply_masks  -  apply the file masks to all aces
+> > + * @alloc:	acl and number of allocated entries
+> > + *
+> > + * Apply the owner mask to owner@ aces, the other mask to
+> > + * everyone@ aces, and the group mask to all other aces.
+> > + *
+> > + * The previous transformations have brought the acl into a
+> > + * form in which applying the masks will not lead to the
+> > + * accidental loss of permissions anymore.
+> > + */
+> > +static int
+> > +__richacl_apply_masks(struct richacl_alloc *alloc, kuid_t owner)
+> > +{
+> > +	struct richace *ace;
+> > +
+> > +	richacl_for_each_entry(ace, alloc->acl) {
+> > +		unsigned int mask;
+> > +
+> > +		if (richace_is_inherit_only(ace) || !richace_is_allow(ace))
+> > +			continue;
+> > +		if (richace_is_owner(ace) ||
+> > +		    (richace_is_unix_user(ace) && uid_eq(owner, ace->e_id.uid)))
+> > +			mask = alloc->acl->a_owner_mask;
+> 
+> Is treating matching user aces like owner aces what you intended to do,
+> and if so, why?
 
-Patch based on the information detailed in
-http://thread.gmane.org/gmane.linux.kernel.cifs/10081/focus=10307
-to enable Kerberized SMB2/SMB3
+That does look wrong to me; in an example like:
 
-a) SMB2_negotiate: enable/use decode_negTokenInit in SMB2_negotiate
-b) SMB2_sess_setup: handle Kerberos sectype and replicate Kerberos
-   SMB1 processing done in sess_auth_kerberos
+	file owner bfields
+	mask 0700, not WRITE_THROUGH
+	bfields:rwx::allow
 
-Signed-off-by: Noel Power <noel.power-IBi9RG/b67k@public.gmane.org>
-Signed-off-by: Jim McDonough <jmcd-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Signed-off-by: Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
----
- fs/cifs/smb2pdu.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 51 insertions(+), 8 deletions(-)
+The permission algorithm grants nothing to anyone, but it looks to me
+like richacl_apply_masks just leaves this as
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 070fb2a..4d3f499 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -46,6 +46,7 @@
- #include "smb2status.h"
- #include "smb2glob.h"
- #include "cifspdu.h"
-+#include "cifs_spnego.h"
- 
- /*
-  *  The following table defines the expected "StructureSize" of SMB2 requests
-@@ -486,7 +487,6 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
- 		cifs_dbg(FYI, "missing security blob on negprot\n");
- 
- 	rc = cifs_enable_signing(server, ses->sign);
--#ifdef CONFIG_SMB2_ASN1  /* BB REMOVEME when updated asn1.c ready */
- 	if (rc)
- 		goto neg_exit;
- 	if (blob_length)
-@@ -497,7 +497,6 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
- 		rc = -EIO;
- 		goto neg_exit;
- 	}
--#endif
- 
- neg_exit:
- 	free_rsp_buf(resp_buftype, rsp);
-@@ -592,7 +591,8 @@ SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
- 	__le32 phase = NtLmNegotiate; /* NTLMSSP, if needed, is multistage */
- 	struct TCP_Server_Info *server = ses->server;
- 	u16 blob_length = 0;
--	char *security_blob;
-+	struct key *spnego_key = NULL;
-+	char *security_blob = NULL;
- 	char *ntlmssp_blob = NULL;
- 	bool use_spnego = false; /* else use raw ntlmssp */
- 
-@@ -620,7 +620,8 @@ SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
- 	ses->ntlmssp->sesskey_per_smbsess = true;
- 
- 	/* FIXME: allow for other auth types besides NTLMSSP (e.g. krb5) */
--	ses->sectype = RawNTLMSSP;
-+	if (ses->sectype != Kerberos && ses->sectype != RawNTLMSSP)
-+		ses->sectype = RawNTLMSSP;
- 
- ssetup_ntlmssp_authenticate:
- 	if (phase == NtLmChallenge)
-@@ -649,7 +650,43 @@ ssetup_ntlmssp_authenticate:
- 	iov[0].iov_base = (char *)req;
- 	/* 4 for rfc1002 length field and 1 for pad */
- 	iov[0].iov_len = get_rfc1002_length(req) + 4 - 1;
--	if (phase == NtLmNegotiate) {
-+
-+	if (ses->sectype == Kerberos) {
-+		struct cifs_spnego_msg *msg;
-+
-+		spnego_key = cifs_get_spnego_key(ses);
-+		if (IS_ERR(spnego_key)) {
-+			rc = PTR_ERR(spnego_key);
-+			spnego_key = NULL;
-+			goto ssetup_exit;
-+		}
-+
-+		msg = spnego_key->payload.data;
-+		/*
-+		 * check version field to make sure that cifs.upcall is
-+		 * sending us a response in an expected form
-+		 */
-+		if (msg->version != CIFS_SPNEGO_UPCALL_VERSION) {
-+			cifs_dbg(VFS,
-+				  "bad cifs.upcall version. Expected %d got %d",
-+				  CIFS_SPNEGO_UPCALL_VERSION, msg->version);
-+			rc = -EKEYREJECTED;
-+			goto ssetup_exit;
-+		}
-+
-+		ses->auth_key.response = kmemdup(msg->data, msg->sesskey_len,
-+						 GFP_KERNEL);
-+		if (!ses->auth_key.response) {
-+			cifs_dbg(VFS,
-+				"Kerberos can't allocate (%u bytes) memory",
-+				msg->sesskey_len);
-+			rc = -ENOMEM;
-+			goto ssetup_exit;
-+		}
-+		ses->auth_key.len = msg->sesskey_len;
-+		blob_length = msg->secblob_len;
-+		iov[1].iov_base = msg->data + msg->sesskey_len;
-+	} else if (phase == NtLmNegotiate) { /* if not krb5 must be ntlmssp */
- 		ntlmssp_blob = kmalloc(sizeof(struct _NEGOTIATE_MESSAGE),
- 				       GFP_KERNEL);
- 		if (ntlmssp_blob == NULL) {
-@@ -672,6 +709,8 @@ ssetup_ntlmssp_authenticate:
- 			/* with raw NTLMSSP we don't encapsulate in SPNEGO */
- 			security_blob = ntlmssp_blob;
- 		}
-+		iov[1].iov_base = security_blob;
-+		iov[1].iov_len = blob_length;
- 	} else if (phase == NtLmAuthenticate) {
- 		req->hdr.SessionId = ses->Suid;
- 		ntlmssp_blob = kzalloc(sizeof(struct _NEGOTIATE_MESSAGE) + 500,
-@@ -699,6 +738,8 @@ ssetup_ntlmssp_authenticate:
- 		} else {
- 			security_blob = ntlmssp_blob;
- 		}
-+		iov[1].iov_base = security_blob;
-+		iov[1].iov_len = blob_length;
- 	} else {
- 		cifs_dbg(VFS, "illegal ntlmssp phase\n");
- 		rc = -EIO;
-@@ -710,8 +751,6 @@ ssetup_ntlmssp_authenticate:
- 				cpu_to_le16(sizeof(struct smb2_sess_setup_req) -
- 					    1 /* pad */ - 4 /* rfc1001 len */);
- 	req->SecurityBufferLength = cpu_to_le16(blob_length);
--	iov[1].iov_base = security_blob;
--	iov[1].iov_len = blob_length;
- 
- 	inc_rfc1001_len(req, blob_length - 1 /* pad */);
- 
-@@ -722,6 +761,7 @@ ssetup_ntlmssp_authenticate:
- 
- 	kfree(security_blob);
- 	rsp = (struct smb2_sess_setup_rsp *)iov[0].iov_base;
-+	ses->Suid = rsp->hdr.SessionId;
- 	if (resp_buftype != CIFS_NO_BUFFER &&
- 	    rsp->hdr.Status == STATUS_MORE_PROCESSING_REQUIRED) {
- 		if (phase != NtLmNegotiate) {
-@@ -739,7 +779,6 @@ ssetup_ntlmssp_authenticate:
- 		/* NTLMSSP Negotiate sent now processing challenge (response) */
- 		phase = NtLmChallenge; /* process ntlmssp challenge */
- 		rc = 0; /* MORE_PROCESSING is not an error here but expected */
--		ses->Suid = rsp->hdr.SessionId;
- 		rc = decode_ntlmssp_challenge(rsp->Buffer,
- 				le16_to_cpu(rsp->SecurityBufferLength), ses);
- 	}
-@@ -796,6 +835,10 @@ keygen_exit:
- 		kfree(ses->auth_key.response);
- 		ses->auth_key.response = NULL;
- 	}
-+	if (spnego_key) {
-+		key_invalidate(spnego_key);
-+		key_put(spnego_key);
-+	}
- 	kfree(ses->ntlmssp);
- 
- 	return rc;
--- 
-1.9.1
+	bfields:rwx::allow
+
+but it would give the right result (an empty/deny-all ACL) if it weren't
+for this odd case here.
+
+--b.
+
+> 
+> --b.
+> 
+> > +		else if (richace_is_everyone(ace))
+> > +			mask = alloc->acl->a_other_mask;
+> > +		else
+> > +			mask = alloc->acl->a_group_mask;
+> > +		if (richace_change_mask(alloc, &ace, ace->e_mask & mask))
+> > +			return -1;
+> > +	}
+> > +	return 0;
+> > +}
+> > +
+> > +/**
+> > + * richacl_apply_masks  -  apply the masks to the acl
+> > + *
+> > + * Transform @acl so that the standard NFSv4 permission check algorithm (which
+> > + * is not aware of file masks) will compute the same access decisions as the
+> > + * richacl permission check algorithm (which looks at the acl and the file
+> > + * masks).
+> > + *
+> > + * This algorithm is split into several steps:
+> > + *
+> > + *   - Move everyone@ aces to the end of the acl.  This simplifies the other
+> > + *     transformations, and allows the everyone@ allow ace at the end of the
+> > + *     acl to eventually allow permissions to the other class only.
+> > + *
+> > + *   - Propagate everyone@ permissions up the acl.  This transformation makes
+> > + *     sure that the owner and group class aces won't lose any permissions when
+> > + *     we apply the other mask to the everyone@ allow ace at the end of the acl.
+> > + *
+> > + *   - Apply the file masks to all aces.
+> > + *
+> > + *   - Make sure the owner is granted the owner mask permissions.
+> > + *
+> > + *   - Make sure everyone is granted the other mask permissions.
+> > + *
+> > + *   - Make sure that the owner is not granted any permissions beyond the owner
+> > + *     mask from group class aces or from everyone@.
+> > + *
+> > + *   - Make sure that the group class is not granted any permissions from
+> > + *     everyone@.
+> > + *
+> > + * The algorithm is exact except for richacls which cannot be represented as an
+> > + * acl alone: for example, given this acl:
+> > + *
+> > + *    group@:rw::allow
+> > + *
+> > + * when file masks corresponding to mode 0600 are applied, the owner would only
+> > + * get rw access if he is a member of the owning group.  This algorithm would
+> > + * produce an empty acl in this case.  We fix this case by modifying
+> > + * richacl_permission() so that the group mask is always applied to group class
+> > + * aces.  With this fix, the owner would not have any access (beyond the
+> > + * implicit permissions always granted to owners).
+> > + *
+> > + * NOTE: Depending on the acl and file masks, this algorithm can increase the
+> > + * number of aces by almost a factor of three in the worst case. This may make
+> > + * the acl too large for some purposes.
+> > + */
+> > +int
+> > +richacl_apply_masks(struct richacl **acl, kuid_t owner)
+> > +{
+> > +	if ((*acl)->a_flags & RICHACL_MASKED) {
+> > +		struct richacl_alloc alloc = {
+> > +			.acl = richacl_clone(*acl, GFP_KERNEL),
+> > +			.count = (*acl)->a_count,
+> > +		};
+> > +		if (!alloc.acl)
+> > +			return -ENOMEM;
+> > +
+> > +		if (richacl_move_everyone_aces_down(&alloc) ||
+> > +		    richacl_propagate_everyone(&alloc) ||
+> > +		    __richacl_apply_masks(&alloc, owner) ||
+> > +		    richacl_set_owner_permissions(&alloc) ||
+> > +		    richacl_set_other_permissions(&alloc) ||
+> > +		    richacl_isolate_owner_class(&alloc) ||
+> > +		    richacl_isolate_group_class(&alloc)) {
+> > +			richacl_put(alloc.acl);
+> > +			return -ENOMEM;
+> > +		}
+> > +
+> > +		alloc.acl->a_flags &= ~(RICHACL_WRITE_THROUGH | RICHACL_MASKED);
+> > +		richacl_put(*acl);
+> > +		*acl = alloc.acl;
+> > +	}
+> > +	return 0;
+> > +}
+> > +EXPORT_SYMBOL_GPL(richacl_apply_masks);
+> > diff --git a/include/linux/richacl.h b/include/linux/richacl.h
+> > index 832b06c..a945f3c 100644
+> > --- a/include/linux/richacl.h
+> > +++ b/include/linux/richacl.h
+> > @@ -332,4 +332,7 @@ extern struct richacl *richacl_inherit(const struct richacl *, int);
+> >  extern int richacl_permission(struct inode *, const struct richacl *, int);
+> >  extern struct richacl *richacl_create(struct inode *, struct inode *);
+> >  
+> > +/* richacl_compat.c */
+> > +extern int richacl_apply_masks(struct richacl **, kuid_t);
+> > +
+> >  #endif /* __RICHACL_H */
+> > -- 
+> > 2.4.3
+> > 
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
