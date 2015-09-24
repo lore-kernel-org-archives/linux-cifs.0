@@ -1,7 +1,7 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH 1/2] Fix sec=krb5 on smb3 mounts
-Date: Wed, 23 Sep 2015 20:05:02 -0500
-Message-ID: <1443056702-38137-1-git-send-email-smfrench@gmail.com>
+Subject: [PATCHv3] [SMB3] Fix sec=krb5 on smb3 mounts
+Date: Thu, 24 Sep 2015 00:55:49 -0500
+Message-ID: <1443074149-52830-1-git-send-email-smfrench@gmail.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
 	Noel Power <noel.power-IBi9RG/b67k@public.gmane.org>,
 	Jim McDonough <jmcd-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
@@ -12,10 +12,10 @@ Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+Third version of the patch (update to handle raw ntlmssp when server doesn't send spnego)
+
 Kerberos, which is very important for security, was only enabled for
 CIFS not SMB2/SMB3 mounts (e.g. vers=3.0)
-
-(Updated, version two of the patch after Jim's testing at SMB3 plugfest)
 
 Patch based on the information detailed in
 http://thread.gmane.org/gmane.linux.kernel.cifs/10081/focus=10307
@@ -30,11 +30,11 @@ Signed-off-by: Jim McDonough <jmcd-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 CC: Stable <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Signed-off-by: Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 56 insertions(+), 8 deletions(-)
+ fs/cifs/smb2pdu.c | 76 ++++++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 61 insertions(+), 15 deletions(-)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 070fb2a..ac82804 100644
+index 070fb2a..e543431 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
 @@ -46,6 +46,7 @@
@@ -45,23 +45,32 @@ index 070fb2a..ac82804 100644
  
  /*
   *  The following table defines the expected "StructureSize" of SMB2 requests
-@@ -486,7 +487,6 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
+@@ -486,19 +487,15 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
  		cifs_dbg(FYI, "missing security blob on negprot\n");
  
  	rc = cifs_enable_signing(server, ses->sign);
 -#ifdef CONFIG_SMB2_ASN1  /* BB REMOVEME when updated asn1.c ready */
  	if (rc)
  		goto neg_exit;
- 	if (blob_length)
-@@ -497,7 +497,6 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
- 		rc = -EIO;
- 		goto neg_exit;
+-	if (blob_length)
++	if (blob_length) {
+ 		rc = decode_negTokenInit(security_blob, blob_length, server);
+-	if (rc == 1)
+-		rc = 0;
+-	else if (rc == 0) {
+-		rc = -EIO;
+-		goto neg_exit;
++		if (rc == 1)
++			rc = 0;
++		else if (rc == 0)
++			rc = -EIO;
  	}
 -#endif
- 
+-
  neg_exit:
  	free_rsp_buf(resp_buftype, rsp);
-@@ -592,7 +591,8 @@ SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
+ 	return rc;
+@@ -592,7 +589,8 @@ SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
  	__le32 phase = NtLmNegotiate; /* NTLMSSP, if needed, is multistage */
  	struct TCP_Server_Info *server = ses->server;
  	u16 blob_length = 0;
@@ -71,7 +80,7 @@ index 070fb2a..ac82804 100644
  	char *ntlmssp_blob = NULL;
  	bool use_spnego = false; /* else use raw ntlmssp */
  
-@@ -620,7 +620,8 @@ SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
+@@ -620,7 +618,8 @@ SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
  	ses->ntlmssp->sesskey_per_smbsess = true;
  
  	/* FIXME: allow for other auth types besides NTLMSSP (e.g. krb5) */
@@ -81,7 +90,7 @@ index 070fb2a..ac82804 100644
  
  ssetup_ntlmssp_authenticate:
  	if (phase == NtLmChallenge)
-@@ -649,7 +650,48 @@ ssetup_ntlmssp_authenticate:
+@@ -649,7 +648,48 @@ ssetup_ntlmssp_authenticate:
  	iov[0].iov_base = (char *)req;
  	/* 4 for rfc1002 length field and 1 for pad */
  	iov[0].iov_len = get_rfc1002_length(req) + 4 - 1;
@@ -131,7 +140,7 @@ index 070fb2a..ac82804 100644
  		ntlmssp_blob = kmalloc(sizeof(struct _NEGOTIATE_MESSAGE),
  				       GFP_KERNEL);
  		if (ntlmssp_blob == NULL) {
-@@ -672,6 +714,8 @@ ssetup_ntlmssp_authenticate:
+@@ -672,6 +712,8 @@ ssetup_ntlmssp_authenticate:
  			/* with raw NTLMSSP we don't encapsulate in SPNEGO */
  			security_blob = ntlmssp_blob;
  		}
@@ -140,7 +149,7 @@ index 070fb2a..ac82804 100644
  	} else if (phase == NtLmAuthenticate) {
  		req->hdr.SessionId = ses->Suid;
  		ntlmssp_blob = kzalloc(sizeof(struct _NEGOTIATE_MESSAGE) + 500,
-@@ -699,6 +743,8 @@ ssetup_ntlmssp_authenticate:
+@@ -699,6 +741,8 @@ ssetup_ntlmssp_authenticate:
  		} else {
  			security_blob = ntlmssp_blob;
  		}
@@ -149,7 +158,7 @@ index 070fb2a..ac82804 100644
  	} else {
  		cifs_dbg(VFS, "illegal ntlmssp phase\n");
  		rc = -EIO;
-@@ -710,8 +756,6 @@ ssetup_ntlmssp_authenticate:
+@@ -710,8 +754,6 @@ ssetup_ntlmssp_authenticate:
  				cpu_to_le16(sizeof(struct smb2_sess_setup_req) -
  					    1 /* pad */ - 4 /* rfc1001 len */);
  	req->SecurityBufferLength = cpu_to_le16(blob_length);
@@ -158,7 +167,7 @@ index 070fb2a..ac82804 100644
  
  	inc_rfc1001_len(req, blob_length - 1 /* pad */);
  
-@@ -722,6 +766,7 @@ ssetup_ntlmssp_authenticate:
+@@ -722,6 +764,7 @@ ssetup_ntlmssp_authenticate:
  
  	kfree(security_blob);
  	rsp = (struct smb2_sess_setup_rsp *)iov[0].iov_base;
@@ -166,7 +175,7 @@ index 070fb2a..ac82804 100644
  	if (resp_buftype != CIFS_NO_BUFFER &&
  	    rsp->hdr.Status == STATUS_MORE_PROCESSING_REQUIRED) {
  		if (phase != NtLmNegotiate) {
-@@ -739,7 +784,6 @@ ssetup_ntlmssp_authenticate:
+@@ -739,7 +782,6 @@ ssetup_ntlmssp_authenticate:
  		/* NTLMSSP Negotiate sent now processing challenge (response) */
  		phase = NtLmChallenge; /* process ntlmssp challenge */
  		rc = 0; /* MORE_PROCESSING is not an error here but expected */
@@ -174,7 +183,7 @@ index 070fb2a..ac82804 100644
  		rc = decode_ntlmssp_challenge(rsp->Buffer,
  				le16_to_cpu(rsp->SecurityBufferLength), ses);
  	}
-@@ -796,6 +840,10 @@ keygen_exit:
+@@ -796,6 +838,10 @@ keygen_exit:
  		kfree(ses->auth_key.response);
  		ses->auth_key.response = NULL;
  	}
