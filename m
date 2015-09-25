@@ -1,293 +1,187 @@
-From: mhocko-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
-Subject: [PATCH] mm, fs: Obey gfp_mapping for add_to_page_cache
-Date: Fri, 25 Sep 2015 17:04:21 +0200
-Message-ID: <1443193461-31402-1-git-send-email-mhocko@kernel.org>
-Cc: Andrew Morton <akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
-	Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>,
-	"Theodore Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>, Ming Lei <ming.lei-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>,
-	Andreas Dilger <andreas.dilger-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	Oleg Drokin <oleg.drokin-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
-	Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Michal Hocko <mhocko-IBi9RG/b67k@public.gmane.org>
-To: <linux-mm-Bw31MaZKKs3YtjvyW6yDsg@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] richacl: Possible other write-through fix
+Date: Fri, 25 Sep 2015 18:21:13 +0200
+Message-ID: <1443198073-2344-1-git-send-email-agruenba@redhat.com>
+References: <20150924183310.GE3823@fieldses.org>
+Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org (J. Bruce Fields)
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20150924183310.GE3823-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
-From: Michal Hocko <mhocko-IBi9RG/b67k@public.gmane.org>
+2015-09-24 20:33 GMT+02:00 J. Bruce Fields <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>:
+> On Sat, Sep 05, 2015 at 12:27:21PM +0200, Andreas Gruenbacher wrote:
+>> +int
+>> +richacl_apply_masks(struct richacl **acl, kuid_t owner)
+>> +{
+>> +     if ((*acl)->a_flags & RICHACL_MASKED) {
+>> +             struct richacl_alloc alloc = {
+>> +                     .acl = richacl_clone(*acl, GFP_KERNEL),
+>> +                     .count = (*acl)->a_count,
+>> +             };
+>> +             if (!alloc.acl)
+>> +                     return -ENOMEM;
+>> +
+>> +             if (richacl_move_everyone_aces_down(&alloc) ||
+>> +                 richacl_propagate_everyone(&alloc) ||
+>> +                 __richacl_apply_masks(&alloc, owner) ||
+>> +                 richacl_set_owner_permissions(&alloc) ||
+>> +                 richacl_set_other_permissions(&alloc) ||
+>
+> Hm, I'm a little unsure about this step: it seems like the one step that
+> can actually change the permissions (making them more permissive, in
+> this case), whereas the others are neutral.
+>
+> The following two steps should fix that, but I'm not sure they do.
+>
+> E.g. if I have an ACL like
+>
+>         mask 0777, WRITE_THROUGH
+>         GROUP@:r--::allow
+>
+> I think it should result in
+>
+>         OWNER@:   rwx::allow
+>         GROUP@:   -wx::deny
+>         GROUP@:   r--::allow
+>         EVERYONE@:rwx::allow
+>
+> But does the GROUP@ deny actually get in there?  It looks to me like the
+> denies inserted by richacl_isolate_group_class only take into account
+> the group mask, not the actual permissions granted to any group class
+> user.
+>
+> I may be mising something.
 
-6afdb859b710 ("mm: do not ignore mapping_gfp_mask in page cache
-allocation paths) has caught some users of hardcoded GFP_KERNEL
-used in the page cache allocation paths. This, however, wasn't complete
-and there were others which went unnoticed.
+Thanks for the test case and analysis. The group@ deny ace that should be
+inserted here actually doesn't get inserted. I'm attaching a fix.
 
-Dave Chinner has reported the following deadlock for xfs on loop device:
-: With the recent merge of the loop device changes, I'm now seeing
-: XFS deadlock on my single CPU, 1GB RAM VM running xfs/073.
-:
-: The deadlocked is as follows:
-:
-: kloopd1: loop_queue_read_work
-:       xfs_file_iter_read
-:       lock XFS inode XFS_IOLOCK_SHARED (on image file)
-:       page cache read (GFP_KERNEL)
-:       radix tree alloc
-:       memory reclaim
-:       reclaim XFS inodes
-:       log force to unpin inodes
-:       <wait for log IO completion>
-:
-: xfs-cil/loop1: <does log force IO work>
-:       xlog_cil_push
-:       xlog_write
-:       <loop issuing log writes>
-:               xlog_state_get_iclog_space()
-:               <blocks due to all log buffers under write io>
-:               <waits for IO completion>
-:
-: kloopd1: loop_queue_write_work
-:       xfs_file_write_iter
-:       lock XFS inode XFS_IOLOCK_EXCL (on image file)
-:       <wait for inode to be unlocked>
-:
-: i.e. the kloopd, with it's split read and write work queues, has
-: introduced a dependency through memory reclaim. i.e. that writes
-: need to be able to progress for reads make progress.
-:
-: The problem, fundamentally, is that mpage_readpages() does a
-: GFP_KERNEL allocation, rather than paying attention to the inode's
-: mapping gfp mask, which is set to GFP_NOFS.
-:
-: The didn't used to happen, because the loop device used to issue
-: reads through the splice path and that does:
-:
-:       error = add_to_page_cache_lru(page, mapping, index,
-:                       GFP_KERNEL & mapping_gfp_mask(mapping));
-
-This has changed by aa4d86163e4 (block: loop: switch to VFS ITER_BVEC).
-
-This patch changes mpage_readpage{s} to follow gfp mask set for the
-mapping. There are, however, other places which are doing basically the
-same.
-
-lustre:ll_dir_filler is doing GFP_KERNEL from the function which
-apparently uses GFP_NOFS for other allocations so let's make this
-consistent.
-
-cifs:readpages_get_pages is called from cifs_readpages and
-__cifs_readpages_from_fscache called from the same path obeys mapping
-gfp.
-
-ramfs_nommu_expand_for_mapping is hardcoding GFP_KERNEL as well
-regardless it uses mapping_gfp_mask for the page allocation.
-
-ext4_mpage_readpages is the called from the page cache allocation path
-same as read_pages and read_cache_pages
-
-Reported-by: Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>
-Signed-off-by: Michal Hocko <mhocko-IBi9RG/b67k@public.gmane.org>
 ---
 
-Hi,
-this is a rebase on top of the current mmotm
-(2015-09-22-15-28) of the patch previously posted
-http://lkml.kernel.org/r/20150721085859.GG11967%40dhcp22.suse.cz
-There were no changes since then.
+By the way, all those scenarios can easily be tries out using the test
+suite in the user-space richacl package, even without a richacl enabled
+kernel. In this case, without the fix, we get:
 
-As I've noticed in my previous post I cannot say I would be happy about
-sprinkling mapping_gfp_mask all over the place and it sounds like we
-should drop gfp_mask argument altogether and use it internally in
-__add_to_page_cache_locked that would require all the filesystems to use
-mapping gfp consistently which I am not sure is the case here. From a
-quick glance it seems that some file system use it all the time while
-others are selective.
+  $ make tests/richacl-apply-masks
+  $ tests/richacl-apply-masks -m 777 group@:r::allow
+  group@:r::allow
+  everyone@:rwpx::allow
 
- drivers/staging/lustre/lustre/llite/dir.c |  2 +-
- fs/cifs/file.c                            |  5 +++--
- fs/ext4/readpage.c                        |  3 ++-
- fs/mpage.c                                | 14 +++++++++-----
- fs/ramfs/file-nommu.c                     |  5 +++--
- mm/readahead.c                            |  6 ++++--
- 6 files changed, 22 insertions(+), 13 deletions(-)
+With the fix, we are now getting:
 
-diff --git a/drivers/staging/lustre/lustre/llite/dir.c b/drivers/staging/lustre/lustre/llite/dir.c
-index 3d746a94f92e..d746d354ce20 100644
---- a/drivers/staging/lustre/lustre/llite/dir.c
-+++ b/drivers/staging/lustre/lustre/llite/dir.c
-@@ -225,7 +225,7 @@ static int ll_dir_filler(void *_hash, struct page *page0)
+  $ tests/richacl-apply-masks -m 777 group@:r::allow
+  owner@:rwpx::allow
+  group@:r::allow
+  group@:wpx::deny
+  everyone@:rwpx::allow
+
+Thanks,
+Andreas
+
+diff --git a/fs/richacl_compat.c b/fs/richacl_compat.c
+index 726d796..bc0bcfe 100644
+--- a/fs/richacl_compat.c
++++ b/fs/richacl_compat.c
+@@ -463,23 +463,28 @@ richacl_set_owner_permissions(struct richacl_alloc *alloc)
  
- 		prefetchw(&page->flags);
- 		ret = add_to_page_cache_lru(page, inode->i_mapping, offset,
--					    GFP_KERNEL);
-+					    GFP_NOFS);
- 		if (ret == 0) {
- 			unlock_page(page);
- 			if (ll_pagevec_add(&lru_pvec, page) == 0)
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 94f81962368c..55ea7a49121b 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -3380,6 +3380,7 @@ readpages_get_pages(struct address_space *mapping, struct list_head *page_list,
- 	struct page *page, *tpage;
- 	unsigned int expected_index;
- 	int rc;
-+	gfp_t gfp = GFP_KERNEL & mapping_gfp_mask(mapping);
- 
- 	INIT_LIST_HEAD(tmplist);
- 
-@@ -3392,7 +3393,7 @@ readpages_get_pages(struct address_space *mapping, struct list_head *page_list,
- 	 */
- 	__SetPageLocked(page);
- 	rc = add_to_page_cache_locked(page, mapping,
--				      page->index, GFP_KERNEL);
-+				      page->index, gfp);
- 
- 	/* give up if we can't stick it in the cache */
- 	if (rc) {
-@@ -3419,7 +3420,7 @@ readpages_get_pages(struct address_space *mapping, struct list_head *page_list,
- 
- 		__SetPageLocked(page);
- 		if (add_to_page_cache_locked(page, mapping, page->index,
--								GFP_KERNEL)) {
-+								gfp)) {
- 			__ClearPageLocked(page);
- 			break;
- 		}
-diff --git a/fs/ext4/readpage.c b/fs/ext4/readpage.c
-index ec3ef93a52db..ef724bf82e87 100644
---- a/fs/ext4/readpage.c
-+++ b/fs/ext4/readpage.c
-@@ -166,7 +166,8 @@ int ext4_mpage_readpages(struct address_space *mapping,
- 			page = list_entry(pages->prev, struct page, lru);
- 			list_del(&page->lru);
- 			if (add_to_page_cache_lru(page, mapping,
--						  page->index, GFP_KERNEL))
-+						  page->index,
-+						  GFP_KERNEL & mapping_gfp_mask(mapping)))
- 				goto next_page;
- 		}
- 
-diff --git a/fs/mpage.c b/fs/mpage.c
-index dde689d0759d..4a54bd13c9bd 100644
---- a/fs/mpage.c
-+++ b/fs/mpage.c
-@@ -139,7 +139,8 @@ map_buffer_to_page(struct page *page, struct buffer_head *bh, int page_block)
- static struct bio *
- do_mpage_readpage(struct bio *bio, struct page *page, unsigned nr_pages,
- 		sector_t *last_block_in_bio, struct buffer_head *map_bh,
--		unsigned long *first_logical_block, get_block_t get_block)
-+		unsigned long *first_logical_block, get_block_t get_block,
-+		gfp_t gfp)
+ /**
+  * richacl_set_other_permissions  -  set the other permissions to the other mask
++ * @alloc:	acl and number of allocated entries
++ * @added:	permissions added for everyone@
+  *
+  * Change the acl so that everyone@ is granted the permissions set in the other
+  * mask.  This leaves at most one efective everyone@ allow entry at the end of
+- * the acl.
++ * the acl.  If everyone@ end up being granted additional permissions, these
++ * permissions are returned in @added.
+  */
+ static int
+-richacl_set_other_permissions(struct richacl_alloc *alloc)
++richacl_set_other_permissions(struct richacl_alloc *alloc, unsigned int *added)
  {
- 	struct inode *inode = page->mapping->host;
- 	const unsigned blkbits = inode->i_blkbits;
-@@ -278,7 +279,7 @@ do_mpage_readpage(struct bio *bio, struct page *page, unsigned nr_pages,
- 		}
- 		bio = mpage_alloc(bdev, blocks[0] << (blkbits - 9),
- 			  	min_t(int, nr_pages, bio_get_nr_vecs(bdev)),
--				GFP_KERNEL);
-+				gfp);
- 		if (bio == NULL)
- 			goto confused;
- 	}
-@@ -361,6 +362,7 @@ mpage_readpages(struct address_space *mapping, struct list_head *pages,
- 	sector_t last_block_in_bio = 0;
- 	struct buffer_head map_bh;
- 	unsigned long first_logical_block = 0;
-+	gfp_t gfp = GFP_KERNEL & mapping_gfp_mask(mapping);
+ 	struct richacl *acl = alloc->acl;
+ 	unsigned int x = RICHACE_POSIX_ALWAYS_ALLOWED;
+ 	unsigned int other_mask = acl->a_other_mask & ~x;
+-	struct richace *ace = acl->a_entries + acl->a_count - 1;
++	struct richace *ace;
  
- 	map_bh.b_state = 0;
- 	map_bh.b_size = 0;
-@@ -370,12 +372,13 @@ mpage_readpages(struct address_space *mapping, struct list_head *pages,
- 		prefetchw(&page->flags);
- 		list_del(&page->lru);
- 		if (!add_to_page_cache_lru(page, mapping,
--					page->index, GFP_KERNEL)) {
-+					page->index,
-+					gfp)) {
- 			bio = do_mpage_readpage(bio, page,
- 					nr_pages - page_idx,
- 					&last_block_in_bio, &map_bh,
- 					&first_logical_block,
--					get_block);
-+					get_block, gfp);
- 		}
- 		page_cache_release(page);
- 	}
-@@ -395,11 +398,12 @@ int mpage_readpage(struct page *page, get_block_t get_block)
- 	sector_t last_block_in_bio = 0;
- 	struct buffer_head map_bh;
- 	unsigned long first_logical_block = 0;
-+	gfp_t gfp = mapping_gfp_mask(page->mapping);
+ 	if (!(other_mask &&
+ 	      (acl->a_flags & RICHACL_WRITE_THROUGH)))
+ 		return 0;
  
- 	map_bh.b_state = 0;
- 	map_bh.b_size = 0;
- 	bio = do_mpage_readpage(bio, page, 1, &last_block_in_bio,
--			&map_bh, &first_logical_block, get_block);
-+			&map_bh, &first_logical_block, get_block, gfp);
- 	if (bio)
- 		mpage_bio_submit(READ, bio);
++	*added = other_mask;
++	ace = acl->a_entries + acl->a_count - 1;
+ 	if (acl->a_count == 0 ||
+ 	    !richace_is_everyone(ace) ||
+ 	    richace_is_inherit_only(ace)) {
+@@ -490,8 +495,10 @@ richacl_set_other_permissions(struct richacl_alloc *alloc)
+ 		ace->e_flags = RICHACE_SPECIAL_WHO;
+ 		ace->e_mask = other_mask;
+ 		ace->e_id.special = RICHACE_EVERYONE_SPECIAL_ID;
+-	} else
++	} else {
++		*added &= ~ace->e_mask;
+ 		richace_change_mask(alloc, &ace, other_mask);
++	}
  	return 0;
-diff --git a/fs/ramfs/file-nommu.c b/fs/ramfs/file-nommu.c
-index ba1323a94924..a586467f6ff6 100644
---- a/fs/ramfs/file-nommu.c
-+++ b/fs/ramfs/file-nommu.c
-@@ -70,6 +70,7 @@ int ramfs_nommu_expand_for_mapping(struct inode *inode, size_t newsize)
- 	unsigned order;
- 	void *data;
- 	int ret;
-+	gfp_t gfp = mapping_gfp_mask(inode->i_mapping);
+ }
  
- 	/* make various checks */
- 	order = get_order(newsize);
-@@ -84,7 +85,7 @@ int ramfs_nommu_expand_for_mapping(struct inode *inode, size_t newsize)
+@@ -645,6 +652,7 @@ __richacl_isolate_who(struct richacl_alloc *alloc, struct richace *who,
+ /**
+  * richacl_isolate_group_class  -  limit the group class to the group file mask
+  * @alloc:	acl and number of allocated entries
++ * @deny:	additional permissions to deny
+  *
+  * POSIX requires that after a chmod, the group class is granted no more
+  * permissions than the group file permission bits.  For richacls, this
+@@ -679,21 +687,20 @@ __richacl_isolate_who(struct richacl_alloc *alloc, struct richace *who,
+  *    everyone@:rw::allow
+  */
+ static int
+-richacl_isolate_group_class(struct richacl_alloc *alloc)
++richacl_isolate_group_class(struct richacl_alloc *alloc, unsigned int deny)
+ {
+ 	struct richace who = {
+ 		.e_flags = RICHACE_SPECIAL_WHO,
+ 		.e_id.special = RICHACE_GROUP_SPECIAL_ID,
+ 	};
+ 	struct richace *ace;
+-	unsigned int deny;
  
- 	/* allocate enough contiguous pages to be able to satisfy the
- 	 * request */
--	pages = alloc_pages(mapping_gfp_mask(inode->i_mapping), order);
-+	pages = alloc_pages(gfp, order);
- 	if (!pages)
- 		return -ENOMEM;
+ 	if (!alloc->acl->a_count)
+ 		return 0;
+ 	ace = alloc->acl->a_entries + alloc->acl->a_count - 1;
+ 	if (richace_is_inherit_only(ace) || !richace_is_everyone(ace))
+ 		return 0;
+-	deny = ace->e_mask & ~alloc->acl->a_group_mask;
++	deny |= ace->e_mask & ~alloc->acl->a_group_mask;
  
-@@ -108,7 +109,7 @@ int ramfs_nommu_expand_for_mapping(struct inode *inode, size_t newsize)
- 		struct page *page = pages + loop;
- 
- 		ret = add_to_page_cache_lru(page, inode->i_mapping, loop,
--					GFP_KERNEL);
-+					gfp);
- 		if (ret < 0)
- 			goto add_error;
- 
-diff --git a/mm/readahead.c b/mm/readahead.c
-index b4937a6bfcd6..1ede8c0d3702 100644
---- a/mm/readahead.c
-+++ b/mm/readahead.c
-@@ -90,7 +90,8 @@ int read_cache_pages(struct address_space *mapping, struct list_head *pages,
- 		page = list_to_page(pages);
- 		list_del(&page->lru);
- 		if (add_to_page_cache_lru(page, mapping,
--					page->index, GFP_KERNEL)) {
-+					page->index,
-+					GFP_KERNEL & mapping_gfp_mask(mapping))) {
- 			read_cache_pages_invalidate_page(mapping, page);
- 			continue;
+ 	if (deny) {
+ 		unsigned int n;
+@@ -806,16 +813,17 @@ richacl_apply_masks(struct richacl **acl, kuid_t owner)
+ 			.acl = richacl_clone(*acl, GFP_KERNEL),
+ 			.count = (*acl)->a_count,
+ 		};
++		unsigned int added = 0;
++
+ 		if (!alloc.acl)
+ 			return -ENOMEM;
+-
+ 		if (richacl_move_everyone_aces_down(&alloc) ||
+ 		    richacl_propagate_everyone(&alloc) ||
+ 		    __richacl_apply_masks(&alloc, owner) ||
++		    richacl_set_other_permissions(&alloc, &added) ||
++		    richacl_isolate_group_class(&alloc, added) ||
+ 		    richacl_set_owner_permissions(&alloc) ||
+-		    richacl_set_other_permissions(&alloc) ||
+-		    richacl_isolate_owner_class(&alloc) ||
+-		    richacl_isolate_group_class(&alloc)) {
++		    richacl_isolate_owner_class(&alloc)) {
+ 			richacl_put(alloc.acl);
+ 			return -ENOMEM;
  		}
-@@ -128,7 +129,8 @@ static int read_pages(struct address_space *mapping, struct file *filp,
- 		struct page *page = list_to_page(pages);
- 		list_del(&page->lru);
- 		if (!add_to_page_cache_lru(page, mapping,
--					page->index, GFP_KERNEL)) {
-+					page->index,
-+					GFP_KERNEL & mapping_gfp_mask(mapping))) {
- 			mapping->a_ops->readpage(filp, page);
- 		}
- 		page_cache_release(page);
 -- 
-2.5.1
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+2.4.3
