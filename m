@@ -1,61 +1,36 @@
-From: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-Subject: Re: [RFC v7 25/41] richacl: Isolate the owner and group classes
-Date: Fri, 25 Sep 2015 16:17:20 -0400
-Message-ID: <20150925201720.GA15359@fieldses.org>
-References: <1441448856-13478-1-git-send-email-agruenba@redhat.com>
- <1441448856-13478-26-git-send-email-agruenba@redhat.com>
- <20150922190224.GA19127@fieldses.org>
- <CAHc6FU7_+fbyG0mEu3pUkfaV72AM0DzJnBES=b--koXJgo0a2g@mail.gmail.com>
- <1443180341-22911-1-git-send-email-agruenba@redhat.com>
+From: "PaX Team" <pageexec-Y8qEzhMunLyT9ig0jae3mg@public.gmane.org>
+Subject: question about potential integer truncation in cifs_set_file_size
+Date: Sat, 26 Sep 2015 16:31:19 +0200
+Message-ID: <5606AC37.16935.51F2ED39@pageexec.freemail.hu>
+Reply-To: pageexec-Y8qEzhMunLyT9ig0jae3mg@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Linux NFS Mailing List <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Linux API Mailing List <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	LSM List <linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, re.emese-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+	spender-JNS0hek0TMl4qEwOxq4T+Q@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <1443180341-22911-1-git-send-email-agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-description: Mail message body
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, Sep 25, 2015 at 01:25:41PM +0200, Andreas Gruenbacher wrote:
-> Here is another minor improvement that produces deny aces with fewer
-> permissions in them and avoids creating unnecessary deny aces in some
-> cases.
+hi all,
 
-Looks good.--b.
+fs/cifs/inode.c:cifs_set_file_size can truncate iattr.ia_size from loff_t
+(long long) to unsigned int here:
 
-> 
-> Andreas
-> 
-> ---
->  fs/richacl_compat.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/fs/richacl_compat.c b/fs/richacl_compat.c
-> index 2f53394..bc0bcfe 100644
-> --- a/fs/richacl_compat.c
-> +++ b/fs/richacl_compat.c
-> @@ -605,14 +605,13 @@ __richacl_isolate_who(struct richacl_alloc *alloc, struct richace *who,
->  	int n;
->  
->  	/*
-> -	 * Compute the permissions already denied to @who.  There are no
-> +	 * Compute the permissions already defined for @who.  There are no
->  	 * everyone@ deny aces left in the acl at this stage.
->  	 */
->  	richacl_for_each_entry(ace, acl) {
->  		if (richace_is_inherit_only(ace))
->  			continue;
-> -		if (richace_is_same_identifier(acl, ace, who) &&
-> -		    richace_is_deny(ace))
-> +		if (richace_is_same_identifier(acl, ace, who))
->  			deny &= ~ace->e_mask;
->  	}
->  	if (!deny)
-> -- 
-> 2.4.3
+	io_parms.length = attrs->ia_size;
+
+and i'm wondering if this is intentional. based on a quick read of the code,
+it seems that ia_size can at this point have a value over 4G (e.g., via a
+call to truncate) and the ->set_file_size callback will transmit the full
+64 bit value however in case of specific failures a (fallback?) call to
+CIFSSMBWrite would be made with the truncated size.
+
+FTR, this issue was detected with the upcoming version of the size overflow
+plugin we have in PaX/grsecurity and there're a handful of similar cases in
+the tree where potentially unwanted or unnecessary integer truncations occur,
+this being one of these. any opinion/help is welcome!
+
+cheers,
+  PaX Team
