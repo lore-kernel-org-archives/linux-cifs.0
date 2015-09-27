@@ -1,36 +1,51 @@
-From: "PaX Team" <pageexec-Y8qEzhMunLyT9ig0jae3mg@public.gmane.org>
-Subject: question about potential integer truncation in cifs_set_file_size
-Date: Sat, 26 Sep 2015 16:31:19 +0200
-Message-ID: <5606AC37.16935.51F2ED39@pageexec.freemail.hu>
-Reply-To: pageexec-Y8qEzhMunLyT9ig0jae3mg@public.gmane.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [GIT] CIFS Fixes
+Date: Sat, 26 Sep 2015 22:32:30 -0500
+Message-ID: <CAH2r5mut2makH7q0coedc3w56ovFuAqjh9eyLUN_cu5BcsE3XQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, re.emese-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	spender-JNS0hek0TMl4qEwOxq4T+Q@public.gmane.org
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=UTF-8
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-description: Mail message body
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-hi all,
+4 fixes from testing at the recent SMB3 Plugfest including two
+important authentication ones (one fixes authentication problems to
+some popular servers when clock times differ more than two hours
+between systems, the other fixes Kerberos authentication for SMB3).
 
-fs/cifs/inode.c:cifs_set_file_size can truncate iattr.ia_size from loff_t
-(long long) to unsigned int here:
+Please pull the following changes since commit
+bcee19f424a0d8c26ecf2607b73c690802658b29:
 
-	io_parms.length = attrs->ia_size;
+  Merge branch 'for-4.3-fixes' of
+git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup (2015-09-21
+18:26:54 -0700)
 
-and i'm wondering if this is intentional. based on a quick read of the code,
-it seems that ia_size can at this point have a value over 4G (e.g., via a
-call to truncate) and the ->set_file_size callback will transmit the full
-64 bit value however in case of specific failures a (fallback?) call to
-CIFSSMBWrite would be made with the truncated size.
+are available in the git repository at:
 
-FTR, this issue was detected with the upcoming version of the size overflow
-plugin we have in PaX/grsecurity and there're a handful of similar cases in
-the tree where potentially unwanted or unnecessary integer truncations occur,
-this being one of these. any opinion/help is welcome!
 
-cheers,
-  PaX Team
+  git://git.samba.org/sfrench/cifs-2.6.git for-next
+
+for you to fetch changes up to 88627148400e37b4bff197285d348fc05c9de013:
+
+  fix encryption error checks on mount (2015-09-24 00:53:31 -0500)
+
+----------------------------------------------------------------
+Peter Seiderer (1):
+      cifs: use server timestamp for ntlmv2 authentication
+
+Steve French (3):
+      disabling oplocks/leases via module parm enable_oplocks broken for SMB3
+      [SMB3] Fix sec=krb5 on smb3 mounts
+      fix encryption error checks on mount
+
+ fs/cifs/cifsencrypt.c | 53 ++++++++++++++++++++++++++++++--
+ fs/cifs/smb2ops.c     |  8 +++--
+ fs/cifs/smb2pdu.c     | 84 ++++++++++++++++++++++++++++++++++++++++++---------
+ 3 files changed, 126 insertions(+), 19 deletions(-)
+
+-- 
+Thanks,
+
+Steve
