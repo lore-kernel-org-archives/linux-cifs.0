@@ -1,51 +1,65 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Sat, 26 Sep 2015 22:32:30 -0500
-Message-ID: <CAH2r5mut2makH7q0coedc3w56ovFuAqjh9eyLUN_cu5BcsE3XQ@mail.gmail.com>
+From: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+Subject: re: fix encryption error checks on mount
+Date: Mon, 28 Sep 2015 13:01:57 +0300
+Message-ID: <20150928100157.GC11367@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-4 fixes from testing at the recent SMB3 Plugfest including two
-important authentication ones (one fixes authentication problems to
-some popular servers when clock times differ more than two hours
-between systems, the other fixes Kerberos authentication for SMB3).
+Hello Steve French,
 
-Please pull the following changes since commit
-bcee19f424a0d8c26ecf2607b73c690802658b29:
+This is a semi-automatic email about new static checker warnings.
 
-  Merge branch 'for-4.3-fixes' of
-git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup (2015-09-21
-18:26:54 -0700)
+The patch 88627148400e: "fix encryption error checks on mount" from 
+Sep 22, 2015, leads to the following Smatch complaint:
 
-are available in the git repository at:
+fs/cifs/smb2pdu.c:948 SMB2_tcon()
+	 warn: variable dereferenced before check 'tcon' (see line 926)
 
+fs/cifs/smb2pdu.c
+   922          if (tcon && tcon->bad_network_name)
+                    ^^^^
+Old code assumes "tcon" can be NULL.
 
-  git://git.samba.org/sfrench/cifs-2.6.git for-next
+   923                  return -ENOENT;
+   924  
+   925		if ((tcon->seal) &&
+                     ^^^^^^^^^^
+Patch adds unchecked dereference.
 
-for you to fetch changes up to 88627148400e37b4bff197285d348fc05c9de013:
+   926		    ((ses->server->capabilities & SMB2_GLOBAL_CAP_ENCRYPTION) == 0)) {
+   927			cifs_dbg(VFS, "encryption requested but no server support");
+   928			return -EOPNOTSUPP;
+   929		}
+   930	
+   931		unc_path = kmalloc(MAX_SHARENAME_LENGTH * 2, GFP_KERNEL);
+   932		if (unc_path == NULL)
+   933			return -ENOMEM;
+   934	
+   935		unc_path_len = cifs_strtoUTF16(unc_path, tree, strlen(tree), cp) + 1;
+   936		unc_path_len *= 2;
+   937		if (unc_path_len < 2) {
+   938			kfree(unc_path);
+   939			return -EINVAL;
+   940		}
+   941	
+   942		rc = small_smb2_init(SMB2_TREE_CONNECT, tcon, (void **) &req);
+   943		if (rc) {
+   944			kfree(unc_path);
+   945			return rc;
+   946		}
+   947	
+   948		if (tcon == NULL) {
+                    ^^^^^^^^^^^^
+Another check for NULL.
 
-  fix encryption error checks on mount (2015-09-24 00:53:31 -0500)
+   949			/* since no tcon, smb2_init can not do this, so do here */
+   950			req->hdr.SessionId = ses->Suid;
 
-----------------------------------------------------------------
-Peter Seiderer (1):
-      cifs: use server timestamp for ntlmv2 authentication
-
-Steve French (3):
-      disabling oplocks/leases via module parm enable_oplocks broken for SMB3
-      [SMB3] Fix sec=krb5 on smb3 mounts
-      fix encryption error checks on mount
-
- fs/cifs/cifsencrypt.c | 53 ++++++++++++++++++++++++++++++--
- fs/cifs/smb2ops.c     |  8 +++--
- fs/cifs/smb2pdu.c     | 84 ++++++++++++++++++++++++++++++++++++++++++---------
- 3 files changed, 126 insertions(+), 19 deletions(-)
-
--- 
-Thanks,
-
-Steve
+regards,
+dan carpenter
