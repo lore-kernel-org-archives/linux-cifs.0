@@ -1,106 +1,38 @@
-From: Steve French <smfrench@gmail.com>
-Subject: [PATCH 2/2] [SMB3] Do not fall back to SMBWriteX in set_file_size error cases
-Date: Mon, 28 Sep 2015 18:01:56 -0500
-Message-ID: <1443481316-8484-1-git-send-email-smfrench@gmail.com>
-Cc: Steve French <smfrench@gmail.com>,
-	Steve French <steve.french@primarydata.com>,
-	<re.emese@gmail.com>, <spender@grsecurity.net>,
-	Stable <stable@vger.kernel.org>
-To: linux-cifs@vger.kernel.org
-Return-path: <stable-owner@vger.kernel.org>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Andrew Martin <amartin-AQeFf1F/bRxBDgjK7y7TUQ@public.gmane.org>
+Subject: "CIFS VFS: SMB response too short (9 bytes)" when copying data from
+ CIFS mount
+Date: Mon, 28 Sep 2015 17:39:29 -0500 (CDT)
+Message-ID: <1731839987.81462.1443479968995.JavaMail.zimbra@xes-inc.com>
+References: <1936200018.81178.1443479619664.JavaMail.zimbra@xes-inc.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1936200018.81178.1443479619664.JavaMail.zimbra-AQeFf1F/bRxBDgjK7y7TUQ@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-The error paths in set_file_size for cifs and smb3 are incorrect.
+Hello,
 
-In the unlikely event that a server did not support set file info
-of the file size, the code incorrectly falls back to trying SMBWriteX
-(note that only the original core SMB Write, used for example by DOS,
-can set the file size this way - this actually  does not work for the more
-recent SMBWriteX).  The idea was since the old DOS SMB Write could set
-the file size if you write zero bytes at that offset then use that if
-server rejects the normal set file info call.
+I have tested this setup on Ubuntu 14.04 using 3.13.0-32-generic and
+3.19.0-28-generic with the same results (cifs-utils 6.0 in both cases). I have a
+CIFS mountpoint set up on the server with the following options:
+ro,relatime,vers=1.0,cache=strict,username=myusername,domain=EXAMPLE,uid=0,noforceuid,gid=0,noforcegid,addr=192.168.1.4,unix,posixpaths,serverino,acl,rsize=1048576,wsize=65536,actimeo=1 0 0
 
-Fortunately the SMBWriteX will never be sent on the wire (except when
-file size is zero) since the length and offset fields were reversed
-in the two places in this function that call SMBWriteX causing
-the fall back path to return an error. It is also important to never call
-an SMB request from an SMB2/sMB3 session (which theoretically would
-be possible, and can cause a brief session drop, although the client
-recovers) so this should be fixed.  In practice this path does not happen
-with modern servers but the error fall back to SMBWriteX is clearly wrong.
+I am then using rsync to sync data from the mountpoint to a local directory. 
+Shortly after starting rsync, I see dmesg fill up with this message repeated 
+hundreds of times:
+CIFS VFS: SMB response too short (9 bytes)
 
-Removing the calls to SMBWriteX in the error paths in cifs_set_file_size
+At this point, if I watch the df output I see that no new data is being synced 
+locally. If I strace the rsync process, this sometimes makes rsync continue 
+syncing data for a minute or two, but eventually it stops again. Note that I 
+encountered this same issue a few months ago using perl:
+http://permalink.gmane.org/gmane.linux.kernel.cifs/10640
 
-Pointed out by PaX/grsecurity team
+What can I do to debug this? Is there a bug in the CIFS kernel driver?
 
-Signed-off-by: Steve French <steve.french@primarydata.com>
-CC: <re.emese@gmail.com>
-CC: <spender@grsecurity.net>
-CC: Stable <stable@vger.kernel.org>
----
- fs/cifs/inode.c | 34 ----------------------------------
- 1 file changed, 34 deletions(-)
+Thanks,
 
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index f621b44..6b66dd5 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -2034,7 +2034,6 @@ cifs_set_file_size(struct inode *inode, struct iattr *attrs,
- 	struct tcon_link *tlink = NULL;
- 	struct cifs_tcon *tcon = NULL;
- 	struct TCP_Server_Info *server;
--	struct cifs_io_parms io_parms;
- 
- 	/*
- 	 * To avoid spurious oplock breaks from server, in the case of
-@@ -2056,18 +2055,6 @@ cifs_set_file_size(struct inode *inode, struct iattr *attrs,
- 			rc = -ENOSYS;
- 		cifsFileInfo_put(open_file);
- 		cifs_dbg(FYI, "SetFSize for attrs rc = %d\n", rc);
--		if ((rc == -EINVAL) || (rc == -EOPNOTSUPP)) {
--			unsigned int bytes_written;
--
--			io_parms.netfid = open_file->fid.netfid;
--			io_parms.pid = open_file->pid;
--			io_parms.tcon = tcon;
--			io_parms.offset = 0;
--			io_parms.length = attrs->ia_size;
--			rc = CIFSSMBWrite(xid, &io_parms, &bytes_written,
--					  NULL, NULL, 1);
--			cifs_dbg(FYI, "Wrt seteof rc %d\n", rc);
--		}
- 	} else
- 		rc = -EINVAL;
- 
-@@ -2093,28 +2080,7 @@ cifs_set_file_size(struct inode *inode, struct iattr *attrs,
- 	else
- 		rc = -ENOSYS;
- 	cifs_dbg(FYI, "SetEOF by path (setattrs) rc = %d\n", rc);
--	if ((rc == -EINVAL) || (rc == -EOPNOTSUPP)) {
--		__u16 netfid;
--		int oplock = 0;
- 
--		rc = SMBLegacyOpen(xid, tcon, full_path, FILE_OPEN,
--				   GENERIC_WRITE, CREATE_NOT_DIR, &netfid,
--				   &oplock, NULL, cifs_sb->local_nls,
--				   cifs_remap(cifs_sb));
--		if (rc == 0) {
--			unsigned int bytes_written;
--
--			io_parms.netfid = netfid;
--			io_parms.pid = current->tgid;
--			io_parms.tcon = tcon;
--			io_parms.offset = 0;
--			io_parms.length = attrs->ia_size;
--			rc = CIFSSMBWrite(xid, &io_parms, &bytes_written, NULL,
--					  NULL,  1);
--			cifs_dbg(FYI, "wrt seteof rc %d\n", rc);
--			CIFSSMBClose(xid, tcon, netfid);
--		}
--	}
- 	if (tlink)
- 		cifs_put_tlink(tlink);
- 
--- 
-1.9.1
+Andrew Martin
