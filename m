@@ -1,46 +1,41 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Samba symlinks and dcache collisions
-Date: Mon, 28 Sep 2015 21:48:06 -0500
-Message-ID: <CAH2r5mutOeX--Z1Vq+VhDuHf1d38aqYhRQxA=Eetaeqt8qHGkA@mail.gmail.com>
+From: "PaX Team" <pageexec-Y8qEzhMunLyT9ig0jae3mg@public.gmane.org>
+Subject: Re: question about potential integer truncation in cifs_set_file_size
+Date: Tue, 29 Sep 2015 13:02:35 +0200
+Message-ID: <560A6FCB.6228.60A6C7EA@pageexec.freemail.hu>
+References: <5606AC37.16935.51F2ED39@pageexec.freemail.hu>, <CAH2r5mvWtbsru8HAphsGhukP-YHNSF+99D9v1BbBbNMeiaeCAw@mail.gmail.com>
+Reply-To: pageexec-Y8qEzhMunLyT9ig0jae3mg@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, re.emese-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+	spender-JNS0hek0TMl4qEwOxq4T+Q@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-reply-to: <CAH2r5mvWtbsru8HAphsGhukP-YHNSF+99D9v1BbBbNMeiaeCAw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-description: Mail message body
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-directory listings of large directories on smb2/smb3 mounts to Samba
-sometimes shows the
+On 28 Sep 2015 at 15:57, Steve French wrote:
 
-"Autodisabling the use of server inode numbers ..." message in dmesg.
+> > FTR, this issue was detected with the upcoming version of the size overflow
+> > plugin we have in PaX/grsecurity and there're a handful of similar cases in
+> > the tree where potentially unwanted or unnecessary integer truncations occur,
+> > this being one of these. any opinion/help is welcome!
+> 
+> If you find others let me know (other than the identical bug in the
+> error path immediately below the one you just pointed out).
 
-I have narrowed it down to cases where Samba is displaying symlink
-source and target with the same inode number (the client does not know
-they are symlinks since Samba does not set that file type when Unix
-Extensions are not available).  Interestingly small directories with
-either symlinks or hardlinks in them don't cause the client to detect
-the inode number collision (which causes the server inode message to
-be displayed).
+sure, i will, though the current (very specific) analysis found only
+those questionable cases that i reported (here and some other lists).
+if you (or anyone else) have ideas for more specific analysis (checking
+invariants, API use, etc), we can take a look though gcc plugins have
+very limited view on the source code, so only those properties can be
+checked that are still visible in the middle end (we found the above
+case exactly because the underlying code looks the same whether the
+integer truncation is intentional or not, so we had to exclude them
+as false positives in our instrumentation but still wanted to manually
+verify them).
 
-cifs_find_inode in fs/cifs/inode.c has the following check (after
-making sure that the inode numbers and mode of the two are the same
-and that they are not directories and that their creation time is the
-same)
-
-    /* if it's not a directory or has no dentries, then flag it */
-    if (S_ISDIR(inode->i_mode) && !hlist_empty(&inode->i_dentry))
-        fattr->cf_flags |= CIFS_FATTR_INO_COLLISION;
-
-Not sure what causes the collision in the case of a larger directory
-but not a smaller one.  It is puzzling because the source and target
-look (to the SMB3 client) similar to hardlinks with the same metadata
-except for file name (Samba server does not emulate symlinks as SMB3
-symlink reparse points or apple style symlinks so they look more like
-hardlinks to the client)
-
-Any ideas?
--- 
-Thanks,
-
-Steve
+PS: it seems that you didn't CC me on the actual patch ;)
