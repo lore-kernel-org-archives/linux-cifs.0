@@ -1,66 +1,106 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: "CIFS VFS: SMB response too short (9 bytes)" when copying data
- from CIFS mount
-Date: Mon, 28 Sep 2015 18:32:51 -0500
-Message-ID: <CAH2r5mvsZJ3Nn45Fqjhc8nd-PZZ_KYJxsPg19v7DCpkuMb1OLg@mail.gmail.com>
-References: <1936200018.81178.1443479619664.JavaMail.zimbra@xes-inc.com> <1731839987.81462.1443479968995.JavaMail.zimbra@xes-inc.com>
+From: Yale Zhang <yzhang1985-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: strange bottleneck with SMB 2.0
+Date: Mon, 28 Sep 2015 17:09:36 -0700
+Message-ID: <CALQF7Zz63RFF6C4YW8C0-spwHju=BTCDcyKtvAUh_0Lhe=Xseg@mail.gmail.com>
+References: <CALQF7Zw5ET+uhgskMDMar31q1uo98nkSd9dusX4gQpS47-zKig@mail.gmail.com>
+	<20150820085701.46611da1@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Andrew Martin <amartin-AQeFf1F/bRxBDgjK7y7TUQ@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1731839987.81462.1443479968995.JavaMail.zimbra-AQeFf1F/bRxBDgjK7y7TUQ@public.gmane.org>
+In-Reply-To: <20150820085701.46611da1-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-It is possible that it is a cifs client bug or a server bug but hard
-to tell without seeing the trace.  Obviously the client message
-indicates that the SMB response from the server was invalid (malformed
-due to server bug) but hard to prove that without looking at a network
-trace.  See the mention of wireshark at
+Sorry about the delay. I haven't been spending time on this issue
+because I can just use SMB 3. But for anyone else who is stuck, here's
+my diagnosis:
 
-https://wiki.samba.org/index.php/LinuxCIFS_troubleshooting
+I also found that the 2nd & 3rd instances of a.out doesn't always need
+to wait for the 1st one to finish before starting. They consistently
+start 35.5s after the 1st one.
+
+Here are my observations after the 1st program launches and the 2nd &
+3rd are prevented from starting:
+
+1. the 1st a.out is in the running state R+
+2. the 2nd a.out still hasn't started. Bash has forked itself to call
+exec("a.out"), but ps still shows the forked process as Bash, not
+a.out. The process is in the D+ state, meaning it's inside the kernel.
+I tried getting the kernel stack trace as Jeff suggested, but "cat
+/proc/3718/stack" hangs!
+Eventually when a.out starts 35.5s after the 1st one, I see this:
+
+[<ffffffff81113a35>] __alloc_pages_nodemask+0x1a5/0x990
+[<ffffffff811b9aaa>] load_elf_binary+0xda/0xeb0
+[<ffffffff811375a2>] __vma_link_rb+0x62/0xb0
+[<ffffffff81150cb8>] alloc_pages_vma+0x158/0x210
+[<ffffffff813623e5>] cpumask_any_but+0x25/0x40
+[<ffffffff8104c8a2>] flush_tlb_page+0x32/0x90
+[<ffffffff8113c932>] page_add_new_anon_rmap+0x72/0xe0
+[<ffffffff8112ffbf>] wp_page_copy+0x31f/0x450
+[<ffffffff81159885>] cache_alloc_refill+0x85/0x340
+[<ffffffff8115a06f>] kmem_cache_alloc+0x14f/0x1b0
+[<ffffffff81070dc0>] prepare_creds+0x20/0xd0
+[<ffffffff81167f45>] SyS_faccessat+0x65/0x270
+[<ffffffff81045f23>] __do_page_fault+0x253/0x4c0
+[<ffffffff817558d7>] system_call_fastpath+0x12/0x6a
+[<ffffffffffffffff>] 0xffffffffffffffff
+
+But that trace is probably irrelevant, because it's now in the running state.
+
+Absolutely bizarre. And appalling since it's like you're hurt and
+can't even yell for help (view the kernel stack)
 
 
-Also it may be better for many use cases to mount with SMB3
-("vers=3.0") rather than the ancient cifs dialect (unless the server
-is Samba where there are "posix extensions" that the client can take
-advantage of).
 
-What is the server version?
-
-On Mon, Sep 28, 2015 at 5:39 PM, Andrew Martin <amartin-AQeFf1F/bRxBDgjK7y7TUQ@public.gmane.org> wrote:
-> Hello,
+On Thu, Aug 20, 2015 at 5:57 AM, Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org> wrote:
+> On Wed, 19 Aug 2015 04:11:31 -0700
+> Yale Zhang <yzhang1985-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 >
-> I have tested this setup on Ubuntu 14.04 using 3.13.0-32-generic and
-> 3.19.0-28-generic with the same results (cifs-utils 6.0 in both cases). I have a
-> CIFS mountpoint set up on the server with the following options:
-> ro,relatime,vers=1.0,cache=strict,username=myusername,domain=EXAMPLE,uid=0,noforceuid,gid=0,noforcegid,addr=192.168.1.4,unix,posixpaths,serverino,acl,rsize=1048576,wsize=65536,actimeo=1 0 0
+>> SMB developers/users,
+>>
+>> I'm experiencing a strange bottleneck when my files are mounted as SMB
+>> 2.0. When I launch  multiple processes in parallel for benchmarking,
+>> only the 1st one starts, and the rest won't start until the 1st one
+>> finishes:
+>>
+>> ---------------------------------------test
+>> programs--------------------------------
+>> #!/bin/sh
+>> ./a.out&
+>> ./a.out&
+>> ./a.out&
+>> wait
+>>
+>> a.out is just a C program like this:
+>>
+>> int main()
+>> {
+>>   printf("greetings\n");
+>>   while (true);
+>>   return 0;
+>> }
+>>
+>> Apparently, this only affects SMB 2.0. I tried it with SMB 2.1, SMB
+>> 3.0, & SMB 3.02, and everything starts in parallel as expected.
+>>
+>> I'm assuming SMB 3 and especially SMB 2.1 would share a common
+>> implementation. How could 2.0 have the problem but not 3? It almost
+>> seems the bottleneck is a feature instead of a bug?  8(
+>>
+>> Can it still be fixed?
+>>
+>> -Yale
 >
-> I am then using rsync to sync data from the mountpoint to a local directory.
-> Shortly after starting rsync, I see dmesg fill up with this message repeated
-> hundreds of times:
-> CIFS VFS: SMB response too short (9 bytes)
+> Probably. It'd be interesting to see what the other tasks are blocking
+> on. After firing up the second one can you run:
 >
-> At this point, if I watch the df output I see that no new data is being synced
-> locally. If I strace the rsync process, this sometimes makes rsync continue
-> syncing data for a minute or two, but eventually it stops again. Note that I
-> encountered this same issue a few months ago using perl:
-> http://permalink.gmane.org/gmane.linux.kernel.cifs/10640
+>     # cat /proc/<pid of second a.out>/stack
 >
-> What can I do to debug this? Is there a bug in the CIFS kernel driver?
+> ...and paste the stack trace here? That should tell us what those other
+> processes are doing.
 >
-> Thanks,
->
-> Andrew Martin
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Thanks,
-
-Steve
+> Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
