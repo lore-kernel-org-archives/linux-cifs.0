@@ -1,60 +1,114 @@
-From: Andrew Martin <amartin-AQeFf1F/bRxBDgjK7y7TUQ@public.gmane.org>
-Subject: Re: "CIFS VFS: SMB response too short (9 bytes)" when copying data
- from CIFS mount
-Date: Wed, 30 Sep 2015 17:03:31 -0500 (CDT)
-Message-ID: <944083651.87203.1443650611671.JavaMail.zimbra@xes-inc.com>
-References: <1936200018.81178.1443479619664.JavaMail.zimbra@xes-inc.com> <1731839987.81462.1443479968995.JavaMail.zimbra@xes-inc.com> <CAH2r5mvsZJ3Nn45Fqjhc8nd-PZZ_KYJxsPg19v7DCpkuMb1OLg@mail.gmail.com> <1744736878.52548.1443542655076.JavaMail.zimbra@xes-inc.com> <CAH2r5ms0bbkhy_D4tRXqwN2nH5vyBH9Q0OrCTV7cm93=P3fgRw@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] [SMB3] Enable checking for continuous availability and persistent handle support
+Date: Wed, 30 Sep 2015 21:00:10 -0500
+Message-ID: <1443664810-21751-1-git-send-email-smfrench@gmail.com>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5ms0bbkhy_D4tRXqwN2nH5vyBH9Q0OrCTV7cm93=P3fgRw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+Validate "persistenthandles" and "nopersistenthandles" mount options against
+the support the server claims in negotiate and tree connect SMB3 responses.
 
+Signed-off-by: Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+---
+ fs/cifs/cifsglob.h |  1 +
+ fs/cifs/connect.c  | 30 ++++++++++++++++++++++++++++++
+ fs/cifs/smb2ops.c  |  6 +++---
+ 3 files changed, 34 insertions(+), 3 deletions(-)
 
------ Original Message -----
-> From: "Steve French" <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> To: "Andrew Martin" <amartin-AQeFf1F/bRxBDgjK7y7TUQ@public.gmane.org>
-> Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, "samba-technical" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
-> Sent: Tuesday, September 29, 2015 11:21:25 AM
-> Subject: Re: "CIFS VFS: SMB response too short (9 bytes)" when copying data from CIFS mount
-> 
-> It sounds pretty straightforward if both wireshark and the Linux
-> kernel client agree and say that this old Samba server sent a
-> malformed response (presumably a CIFS ReadX response).  Note that this
-> is an old version of Samba server - Samba 3.6 was released more than 4
-> years ago.
-> 
-> Try turning off unix extensions on the mount and/or setting rsize
-> smaller (which might change the behavior of the Samba server read
-> response).  So try
-> 1) adding something like "rsize=60000" to the options you pass to the
-> mount command
-> 2) and as a different experiment try mounting with "nounix" to disable
-> CIFS unix extensions which would also have the affect of reducing the
-> maximum read size
-> 3) another option to try is to set max protocols in the server's
-> smb.conf to enable SMB2.0 support and try "vers=2.0" on mount
-> 
-> My guess is that the bug is related to large CIFS read processing in
-> this old version of Samba.
-> 
-> I also want to --- strongly --- encourage upgrade from Samba 3.6.3 to
-> at least Samba 4.1 (I use Samba 4.3).  The additional security
-> features and capabilities which SMB2.1 and SMB3 bring (not just the
-> new protocol features and improved performance) are VERY helpful and
-> very important for security.
-> 
-Steve,
-
-It looks like using either "nounix" or "rsize=60000" fixes the read error!
-I will also look into upgrading to Samba 4.1 ASAP - I would like to take
-advantage of the security and performance improvement of a more modern
-SMB protocol. Thanks again!
-
-Andrew
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 221ccfa..51353bb 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -901,6 +901,7 @@ struct cifs_tcon {
+ 	bool broken_posix_open; /* e.g. Samba server versions < 3.3.2, 3.2.9 */
+ 	bool broken_sparse_sup; /* if server or share does not support sparse */
+ 	bool need_reconnect:1; /* connection reset, tid now invalid */
++	bool use_persistent:1; /* use persistent instead of durable handles */
+ #ifdef CONFIG_CIFS_SMB2
+ 	bool print:1;		/* set if connection to printer share */
+ 	bool bad_network_name:1; /* set if ret status STATUS_BAD_NETWORK_NAME */
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index a16f2f0..f3512d4 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -2673,6 +2673,30 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
+ 		cifs_dbg(FYI, "DFS disabled (%d)\n", tcon->Flags);
+ 	}
+ 	tcon->seal = volume_info->seal;
++
++	/* check if SMB2 or later, CIFS does not support persistent handles */
++	if (volume_info->persistent) {
++		if (ses->server->vals->protocol_id == 0) {
++			cifs_dbg(VFS,
++			     "SMB3 or later required for persistent handles\n");
++			rc = -EOPNOTSUPP;
++			goto out_fail;
++		} else if (ses->server->capabilities &
++			   SMB2_GLOBAL_CAP_PERSISTENT_HANDLES)
++			tcon->use_persistent = true;
++		else /* persistent handles requested but not supported */ {
++			cifs_dbg(VFS,
++				"Persistent handles not supported on share\n");
++			rc = -EOPNOTSUPP;
++			goto out_fail;
++		}
++	} else if ((tcon->capabilities & SMB2_SHARE_CAP_CONTINUOUS_AVAILABILITY)
++	     && (ses->server->capabilities & SMB2_GLOBAL_CAP_PERSISTENT_HANDLES)
++	     && (volume_info->nopersistent == false)) {
++		cifs_dbg(VFS, "enabling persistent handles\n");
++		tcon->use_persistent = true;
++	}
++
+ 	/*
+ 	 * We can have only one retry value for a connection to a share so for
+ 	 * resources mounted more than once to the same server share the last
+@@ -3521,6 +3545,12 @@ try_mount_again:
+ 		goto mount_fail_check;
+ 	}
+ 
++	if ((volume_info->persistent == true) && ((ses->server->capabilities &
++		SMB2_GLOBAL_CAP_PERSISTENT_HANDLES) == 0)) {
++		cifs_dbg(VFS, "persistent handles not supported by server\n");
++		rc = -EOPNOTSUPP;
++		goto mount_fail_check;
++	}
+ 	/* search for existing tcon to this server share */
+ 	tcon = cifs_get_tcon(ses, volume_info);
+ 	if (IS_ERR(tcon)) {
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index d41fb56..ddc7cef 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -1845,7 +1845,7 @@ struct smb_version_values smb21_values = {
+ struct smb_version_values smb30_values = {
+ 	.version_string = SMB30_VERSION_STRING,
+ 	.protocol_id = SMB30_PROT_ID,
+-	.req_capabilities = SMB2_GLOBAL_CAP_DFS | SMB2_GLOBAL_CAP_LEASING | SMB2_GLOBAL_CAP_LARGE_MTU | SMB2_GLOBAL_CAP_ENCRYPTION,
++	.req_capabilities = SMB2_GLOBAL_CAP_DFS | SMB2_GLOBAL_CAP_LEASING | SMB2_GLOBAL_CAP_LARGE_MTU | SMB2_GLOBAL_CAP_ENCRYPTION | SMB2_GLOBAL_CAP_PERSISTENT_HANDLES,
+ 	.large_lock_type = 0,
+ 	.exclusive_lock_type = SMB2_LOCKFLAG_EXCLUSIVE_LOCK,
+ 	.shared_lock_type = SMB2_LOCKFLAG_SHARED_LOCK,
+@@ -1865,7 +1865,7 @@ struct smb_version_values smb30_values = {
+ struct smb_version_values smb302_values = {
+ 	.version_string = SMB302_VERSION_STRING,
+ 	.protocol_id = SMB302_PROT_ID,
+-	.req_capabilities = SMB2_GLOBAL_CAP_DFS | SMB2_GLOBAL_CAP_LEASING | SMB2_GLOBAL_CAP_LARGE_MTU,
++	.req_capabilities = SMB2_GLOBAL_CAP_DFS | SMB2_GLOBAL_CAP_LEASING | SMB2_GLOBAL_CAP_LARGE_MTU | SMB2_GLOBAL_CAP_PERSISTENT_HANDLES,
+ 	.large_lock_type = 0,
+ 	.exclusive_lock_type = SMB2_LOCKFLAG_EXCLUSIVE_LOCK,
+ 	.shared_lock_type = SMB2_LOCKFLAG_SHARED_LOCK,
+@@ -1886,7 +1886,7 @@ struct smb_version_values smb302_values = {
+ struct smb_version_values smb311_values = {
+ 	.version_string = SMB311_VERSION_STRING,
+ 	.protocol_id = SMB311_PROT_ID,
+-	.req_capabilities = SMB2_GLOBAL_CAP_DFS | SMB2_GLOBAL_CAP_LEASING | SMB2_GLOBAL_CAP_LARGE_MTU,
++	.req_capabilities = SMB2_GLOBAL_CAP_DFS | SMB2_GLOBAL_CAP_LEASING | SMB2_GLOBAL_CAP_LARGE_MTU | SMB2_GLOBAL_CAP_PERSISTENT_HANDLES,
+ 	.large_lock_type = 0,
+ 	.exclusive_lock_type = SMB2_LOCKFLAG_EXCLUSIVE_LOCK,
+ 	.shared_lock_type = SMB2_LOCKFLAG_SHARED_LOCK,
+-- 
+1.9.1
