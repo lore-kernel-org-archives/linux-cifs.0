@@ -1,212 +1,142 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH] [SMB3] Send durable handle v2 contexts when use of persistent handles required
-Date: Thu,  1 Oct 2015 13:17:15 -0500
-Message-ID: <1443723435-32484-1-git-send-email-smfrench@gmail.com>
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+From: Florian Bruhin <me-J2duszcpOy900TDglC2tyg@public.gmane.org>
+Subject: Hangs when accessing cifs mounts since Windows Server upgrade
+Date: Fri, 2 Oct 2015 09:24:54 +0200
+Message-ID: <20151002072454.GL22874@tonks>
+Mime-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256; protocol="application/pgp-signature"; boundary="=_mehl.schokokeks.org-6575-1443770696-0001-2"
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Signed-off-by: Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
----
- fs/cifs/cifsglob.h |   1 +
- fs/cifs/smb2pdu.c  | 114 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
- fs/cifs/smb2pdu.h  |  30 ++++++++++++++
- 3 files changed, 144 insertions(+), 1 deletion(-)
+This is a MIME-formatted message.  If you see this text it means that your
+E-mail software does not support MIME-formatted messages.
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 51353bb..ec31a03 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -1022,6 +1022,7 @@ struct cifs_fid {
- 	__u64 persistent_fid;	/* persist file id for smb2 */
- 	__u64 volatile_fid;	/* volatile file id for smb2 */
- 	__u8 lease_key[SMB2_LEASE_KEY_SIZE];	/* lease key for smb2 */
-+	__u8 create_guid[16];
- #endif
- 	struct cifs_pending_open *pending_open;
- 	unsigned int epoch;
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index c744b57..6b899bf 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -1100,6 +1100,68 @@ create_reconnect_durable_buf(struct cifs_fid *fid)
- 	return buf;
- }
- 
-+static struct create_durable_v2 *
-+create_durable_v2_buf(struct cifs_fid *pfid)
-+{
-+	struct create_durable_v2 *buf;
-+
-+	buf = kzalloc(sizeof(struct create_durable), GFP_KERNEL);
-+	if (!buf)
-+		return NULL;
-+
-+	buf->ccontext.DataOffset = cpu_to_le16(offsetof
-+					(struct create_durable_v2, dcontext));
-+	buf->ccontext.DataLength = cpu_to_le32(sizeof(struct durable_context_v2));
-+	buf->ccontext.NameOffset = cpu_to_le16(offsetof
-+				(struct create_durable_v2, Name));
-+	buf->ccontext.NameLength = cpu_to_le16(4);
-+
-+	buf->dcontext.Timeout = 0; /* Should this be configurable by workload */
-+	buf->dcontext.Flags = cpu_to_le32(SMB2_DHANDLE_FLAG_PERSISTENT);
-+	get_random_bytes(buf->dcontext.CreateGuid, 16);
-+	memcpy(pfid->create_guid, buf->dcontext.CreateGuid, 16);
-+
-+	/* SMB2_CREATE_DURABLE_HANDLE_REQUEST is "DH2Q" */
-+	buf->Name[0] = 'D';
-+	buf->Name[1] = 'H';
-+	buf->Name[2] = '2';
-+	buf->Name[3] = 'Q';
-+	return buf;
-+}
-+
-+static struct create_durable_handle_reconnect_v2 *
-+create_reconnect_durable_v2_buf(struct cifs_fid *fid)
-+{
-+	struct create_durable_handle_reconnect_v2 *buf;
-+
-+	buf = kzalloc(sizeof(struct create_durable_handle_reconnect_v2),
-+			GFP_KERNEL);
-+	if (!buf)
-+		return NULL;
-+
-+	buf->ccontext.DataOffset =
-+		cpu_to_le16(offsetof(struct create_durable_handle_reconnect_v2,
-+				     dcontext));
-+	buf->ccontext.DataLength =
-+		cpu_to_le32(sizeof(struct durable_reconnect_context_v2));
-+	buf->ccontext.NameOffset =
-+		cpu_to_le16(offsetof(struct create_durable_handle_reconnect_v2,
-+			    Name));
-+	buf->ccontext.NameLength = cpu_to_le16(4);
-+
-+	buf->dcontext.Fid.PersistentFileId = fid->persistent_fid;
-+	buf->dcontext.Fid.VolatileFileId = fid->volatile_fid;
-+	buf->dcontext.Flags = cpu_to_le32(SMB2_DHANDLE_FLAG_PERSISTENT);
-+	memcpy(buf->dcontext.CreateGuid, fid->create_guid, 16);
-+
-+	/* SMB2_CREATE_DURABLE_HANDLE_RECONNECT_V2 is "DH2C" */
-+	buf->Name[0] = 'D';
-+	buf->Name[1] = 'H';
-+	buf->Name[2] = '2';
-+	buf->Name[3] = 'C';
-+	return buf;
-+}
-+
- static __u8
- parse_lease_state(struct TCP_Server_Info *server, struct smb2_create_rsp *rsp,
- 		  unsigned int *epoch)
-@@ -1174,6 +1236,48 @@ add_durable_context(struct kvec *iov, unsigned int *num_iovec,
- 	return 0;
- }
- 
-+static int
-+add_durable_v2_context(struct kvec *iov, unsigned int *num_iovec,
-+		    struct cifs_open_parms *oparms)
-+{
-+	struct smb2_create_req *req = iov[0].iov_base;
-+	unsigned int num = *num_iovec;
-+
-+	iov[num].iov_base = create_durable_v2_buf(oparms->fid);
-+	if (iov[num].iov_base == NULL)
-+		return -ENOMEM;
-+	iov[num].iov_len = sizeof(struct create_durable_v2);
-+	if (!req->CreateContextsOffset)
-+		req->CreateContextsOffset =
-+			cpu_to_le32(sizeof(struct smb2_create_req) - 4 +
-+								iov[1].iov_len);
-+	le32_add_cpu(&req->CreateContextsLength, sizeof(struct create_durable_v2));
-+	inc_rfc1001_len(&req->hdr, sizeof(struct create_durable_v2));
-+	*num_iovec = num + 1;
-+	return 0;
-+}
-+
-+static int
-+add_durable_reconnect_v2_context(struct kvec *iov, unsigned int *num_iovec,
-+		    struct cifs_open_parms *oparms)
-+{
-+	struct smb2_create_req *req = iov[0].iov_base;
-+	unsigned int num = *num_iovec;
-+
-+	iov[num].iov_base = create_reconnect_durable_v2_buf(oparms->fid);
-+	if (iov[num].iov_base == NULL)
-+		return -ENOMEM;
-+	iov[num].iov_len = sizeof(struct create_durable_handle_reconnect_v2);
-+	if (!req->CreateContextsOffset)
-+		req->CreateContextsOffset =
-+			cpu_to_le32(sizeof(struct smb2_create_req) - 4 +
-+								iov[1].iov_len);
-+	le32_add_cpu(&req->CreateContextsLength, sizeof(struct create_durable_handle_reconnect_v2));
-+	inc_rfc1001_len(&req->hdr, sizeof(struct create_durable_handle_reconnect_v2));
-+	*num_iovec = num + 1;
-+	return 0;
-+}
-+
- int
- SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
- 	  __u8 *oplock, struct smb2_file_all_info *buf,
-@@ -1272,7 +1376,15 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
- 			ccontext->Next =
- 				cpu_to_le32(server->vals->create_lease_size);
- 		}
--		rc = add_durable_context(iov, &num_iovecs, oparms);
-+		if (tcon->use_persistent) {
-+			if (oparms->reconnect)
-+				rc = add_durable_reconnect_v2_context(iov,
-+							&num_iovecs, oparms);
-+			else
-+				rc = add_durable_v2_context(iov, &num_iovecs,
-+							oparms);
-+		} else
-+			rc = add_durable_context(iov, &num_iovecs, oparms);
- 		if (rc) {
- 			cifs_small_buf_release(req);
- 			kfree(copy_path);
-diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index b26da75..a939526 100644
---- a/fs/cifs/smb2pdu.h
-+++ b/fs/cifs/smb2pdu.h
-@@ -590,6 +590,36 @@ struct create_durable {
- 	} Data;
- } __packed;
- 
-+/* Flags */
-+#define SMB2_DHANDLE_FLAG_PERSISTENT	0x00000002
-+struct durable_context_v2 {
-+	__le32 Timeout;
-+	__le32 Flags;
-+	__u64 Reserved;
-+	__u8 CreateGuid[16];
-+} __packed;
-+
-+struct create_durable_v2 {
-+	struct create_context ccontext;
-+	__u8   Name[8];
-+	struct durable_context_v2 dcontext;
-+} __packed;
-+
-+struct durable_reconnect_context_v2 {
-+	struct {
-+		__u64 PersistentFileId;
-+		__u64 VolatileFileId;
-+	} Fid;
-+	__u8 CreateGuid[16];
-+	__le32 Flags; /* see above DHANDLE_FLAG_PERSISTENT */
-+} __packed;
-+
-+struct create_durable_handle_reconnect_v2 {
-+	struct create_context ccontext;
-+	__u8   Name[8];
-+	struct durable_reconnect_context_v2 dcontext;
-+} __packed;
-+
- #define COPY_CHUNK_RES_KEY_SIZE	24
- struct resume_key_req {
- 	char ResumeKey[COPY_CHUNK_RES_KEY_SIZE];
--- 
-1.9.1
+--=_mehl.schokokeks.org-6575-1443770696-0001-2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Hi!
+
+Since my workplace updated their file share from Windows server 2003
+to 2012, I'm getting frequent hangs of utilities trying to access the
+share. I have two shares mounted (from the same server):
+
+    //<servername>/data /i  cifs    credentials=3D/etc/cifspass,uid=3D1000 =
+ 0   0
+    //<servername>/user/<username> /j  cifs    credentials=3D/etc/cifspass,=
+uid=3D1000  0   0
+
+Sometimes, I can't access either of them. Sometimes I can access one
+but not the other. "Can't access" means any userspace tool I'm trying
+to use to access e.g. /j hangs. This also affects tab completion in
+zsh, vim, etc. (I think because they try to access / which also hangs
+because of my unorthodox mountpoints).
+
+When this happens, I see this in my dmesg:
+
+    INFO: task ls:11158 blocked for more than 120 seconds.
+          Tainted: G           O  3.16.0-4-amd64 #1
+    "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messag=
+e.
+    ls              D ffff8800c570cff8     0 11158   9390 0x00000004
+     ffff8800c570cba0 0000000000000082 0000000000012f00 ffff88031e997fd8
+     0000000000012f00 ffff8800c570cba0 ffff88031de74420 ffff88031e997b70
+     ffff88031de74424 ffff8800c570cba0 00000000ffffffff ffff88031de74428
+    Call Trace:
+     [<ffffffff8150e225>] ? schedule_preempt_disabled+0x25/0x70
+     [<ffffffff8150fcd3>] ? __mutex_lock_slowpath+0xd3/0x1c0
+     [<ffffffff8150fddb>] ? mutex_lock+0x1b/0x2a
+     [<ffffffffa0655dd3>] ? cifs_reconnect_tcon+0x153/0x2e0 [cifs]
+     [<ffffffff810a7624>] ? __wake_up+0x34/0x50
+     [<ffffffffa0655ff5>] ? smb_init+0x25/0x80 [cifs]
+     [<ffffffffa065be3c>] ? CIFSSMBQPathInfo+0x5c/0x260 [cifs]
+     [<ffffffffa067ef53>] ? cifs_query_path_info+0x63/0x180 [cifs]
+     [<ffffffff811b2ea1>] ? link_path_walk+0x71/0x8c0
+     [<ffffffff811b1dca>] ? lookup_fast+0xaa/0x2b0
+     [<ffffffffa0671360>] ? cifs_get_inode_info+0x230/0x6c0 [cifs]
+     [<ffffffffa0666e3e>] ? build_path_from_dentry+0xae/0x290 [cifs]
+     [<ffffffffa0673198>] ? cifs_revalidate_dentry_attr+0xf8/0x1c0 [cifs]
+     [<ffffffff810eb57e>] ? from_kgid_munged+0xe/0x20
+     [<ffffffff811ace3a>] ? cp_new_stat+0x13a/0x160
+     [<ffffffffa067330f>] ? cifs_getattr+0x4f/0x120 [cifs]
+     [<ffffffff811ac9f7>] ? vfs_fstatat+0x57/0x90
+     [<ffffffff811acebd>] ? SYSC_newlstat+0x1d/0x40
+     [<ffffffff8151164d>] ? system_call_fast_compare_end+0x10/0x15
+
+This is on a Debian Jessie, with a 3.16.0-4-amd64 kernel and
+mount.cifs 6.4.
+
+The contents of /proc/fs/cifs/DebugData:
+
+    Display Internal CIFS Data Structures for Debugging
+    ---------------------------------------------------
+    CIFS Version 2.03
+    Features: dfs fscache lanman posix spnego xattr acl
+    Active VFS Requests: 5
+    Servers:
+    1) entry for <ip> not fully displayed
+        TCP status: 4
+        Local Users To Server: 1 SecMode: 0x3 Req On Wire: 1
+        Shares:
+        1) \\<servername>\data Mounts: 1 Type: NTFS DevInfo: 0x60020 Attrib=
+utes: 0xc700ff
+        PathComponentMax: 255 Status: 0x1 type: DISK    DISCONNECTED=20
+
+        MIDs:
+        State: 2 com: 114 pid: 11094 cbdata: ffff8800c640a2d0 mid 30
+
+    2) entry for <ip> not fully displayed
+        TCP status: 1
+        Local Users To Server: 1 SecMode: 0x3 Req On Wire: 0
+        Shares:
+        1) \\<servername>\user Mounts: 1 Type: NTFS DevInfo: 0x60020 Attrib=
+utes: 0xc700ff
+        PathComponentMax: 255 Status: 0x1 type: DISK=20
+
+        MIDs:
+
+After a process hung for ~10 minutes, it seems some kind of timeout
+happened. One of the shares got unmounted (without anything in dmesg),
+the process continued, and it's not listed in DebugData anymore.
+
+With Windows Server 2003 this worked like a charm, and I don't see any
+problems when accessing the share from Windows 7.
+
+If there's any other information you need, please let me know!
+
+Thanks,
+
+Florian
+
+--=20
+http://www.the-compiler.org | me-J2duszcpOy900TDglC2tyg@public.gmane.org (Mail/XMPP)
+   GPG: 916E B0C8 FD55 A072 | http://the-compiler.org/pubkey.asc
+         I love long mails! | http://email.is-not-s.ms/
+
+--=_mehl.schokokeks.org-6575-1443770696-0001-2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Transfer-Encoding: 7bit
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJWDjFGAAoJEJFusMj9VaBy6TYP/2kLk9YlOGos2QGrI0sEngtJ
+UnlULBAy2N1LBhpW653bwM169lypPqmuTNbsVbzNm9+R/Jj9Cc8wS6ymns3n7x/j
+FpbrbqW4puxC2UGwqyrjnrpjUM/z9P8Fwv2UL4XP/TGcz3AkXOxIRiT1q9vjbwVU
+1hYxLS3p416V/v7X+jgcq5S6KUmaSpJGtkfPhCETQY0LBbfKJUw1agES03Z/LIoM
+YGNbzBAKMP/VsOXviDkgrCc/EEC7/tEgIvy36ahv5GOty0RQhlk7VBCcsTjT+EsX
+lvH2TpYwWF2Uqdin6jEdPXoYXVyMpebAP2+p2681s9qTUPwyue9a87ZrJ/UI1x02
+s1lmrSOpEoNzNt4MRJumBX97uV7C9zNzE/giIZ+vzWaI8Ja3Oc9gE3qwyLMEmys6
+zpgaZGuMYsJpUbL4R4SKmRsU+EpYYkn3bQgzkKale1Wd3qrcBXZmPyjVOPHjNIGO
+wEbdYpH6shpjieT+KSfW83A9242OCWXuCIBxbLkwcHpdvo3NVh09ZAGR2iiCuuF/
+YZy3RipLJrvt6ZZLx5zaPxUtclLpXzTsiG3jorrOgPzsRf2tqzXhyttx4gYBlxEv
+anRRcEpVsi0WQvu6mMRuhpBXBPnmUZFxEVN8Jvs+qOmpQi3EeZEDZl1EkLum/2Dv
+Da7Q4uaA8+74rBpT9ZeW
+=uYWv
+-----END PGP SIGNATURE-----
+
+--=_mehl.schokokeks.org-6575-1443770696-0001-2--
