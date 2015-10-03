@@ -1,85 +1,116 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH 1/4] Add parsing for new mount option controlling persistent handles
-Date: Sat,  3 Oct 2015 18:53:59 -0500
-Message-ID: <1443916442-42466-1-git-send-email-smfrench@gmail.com>
+Subject: [PATCH 2/4] Enable checking for continuous availability and persistent handle support
+Date: Sat,  3 Oct 2015 18:54:00 -0500
+Message-ID: <1443916442-42466-2-git-send-email-smfrench@gmail.com>
+References: <1443916442-42466-1-git-send-email-smfrench@gmail.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
 	Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1443916442-42466-1-git-send-email-smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-"nopersistenthandles" and "persistenthandles" mount options added.
-The former will not request persistent handles on open even when
-SMB3 negotiated and Continuous Availability share.  The latter
-will request persistent handles (as long as server notes the
-capability in protocol negotiation) even if share is not Continuous
-Availability share.
+Validate "persistenthandles" and "nopersistenthandles" mount options against
+the support the server claims in negotiate and tree connect SMB3 responses.
 
 Signed-off-by: Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
 ---
- fs/cifs/cifsglob.h |  4 +++-
- fs/cifs/connect.c  | 19 +++++++++++++++++++
- 2 files changed, 22 insertions(+), 1 deletion(-)
+ fs/cifs/cifsglob.h |  1 +
+ fs/cifs/connect.c  | 30 ++++++++++++++++++++++++++++++
+ fs/cifs/smb2ops.c  |  6 +++---
+ 3 files changed, 34 insertions(+), 3 deletions(-)
 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index a79e484..221ccfa 100644
+index 221ccfa..51353bb 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -493,7 +493,9 @@ struct smb_vol {
- 	bool mfsymlinks:1; /* use Minshall+French Symlinks */
- 	bool multiuser:1;
- 	bool rwpidforward:1; /* pid forward for read/write operations */
--	bool nosharesock;
-+	bool nosharesock:1;
-+	bool persistent:1;
-+	bool nopersistent:1;
- 	unsigned int rsize;
- 	unsigned int wsize;
- 	bool sockopt_tcp_nodelay:1;
+@@ -901,6 +901,7 @@ struct cifs_tcon {
+ 	bool broken_posix_open; /* e.g. Samba server versions < 3.3.2, 3.2.9 */
+ 	bool broken_sparse_sup; /* if server or share does not support sparse */
+ 	bool need_reconnect:1; /* connection reset, tid now invalid */
++	bool use_persistent:1; /* use persistent instead of durable handles */
+ #ifdef CONFIG_CIFS_SMB2
+ 	bool print:1;		/* set if connection to printer share */
+ 	bool bad_network_name:1; /* set if ret status STATUS_BAD_NETWORK_NAME */
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 011f4d8..a16f2f0 100644
+index a16f2f0..9e44532 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -87,6 +87,7 @@ enum {
- 	Opt_sign, Opt_seal, Opt_noac,
- 	Opt_fsc, Opt_mfsymlinks,
- 	Opt_multiuser, Opt_sloppy, Opt_nosharesock,
-+	Opt_persistent, Opt_nopersistent,
+@@ -2673,6 +2673,30 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
+ 		cifs_dbg(FYI, "DFS disabled (%d)\n", tcon->Flags);
+ 	}
+ 	tcon->seal = volume_info->seal;
++	tcon->use_persistent = false;
++	/* check if SMB2 or later, CIFS does not support persistent handles */
++	if (volume_info->persistent) {
++		if (ses->server->vals->protocol_id == 0) {
++			cifs_dbg(VFS,
++			     "SMB3 or later required for persistent handles\n");
++			rc = -EOPNOTSUPP;
++			goto out_fail;
++		} else if (ses->server->capabilities &
++			   SMB2_GLOBAL_CAP_PERSISTENT_HANDLES)
++			tcon->use_persistent = true;
++		else /* persistent handles requested but not supported */ {
++			cifs_dbg(VFS,
++				"Persistent handles not supported on share\n");
++			rc = -EOPNOTSUPP;
++			goto out_fail;
++		}
++	} else if ((tcon->capabilities & SMB2_SHARE_CAP_CONTINUOUS_AVAILABILITY)
++	     && (ses->server->capabilities & SMB2_GLOBAL_CAP_PERSISTENT_HANDLES)
++	     && (volume_info->nopersistent == false)) {
++		cifs_dbg(FYI, "enabling persistent handles\n");
++		tcon->use_persistent = true;
++	}
++
+ 	/*
+ 	 * We can have only one retry value for a connection to a share so for
+ 	 * resources mounted more than once to the same server share the last
+@@ -3521,6 +3545,12 @@ try_mount_again:
+ 		goto mount_fail_check;
+ 	}
  
- 	/* Mount options which take numeric value */
- 	Opt_backupuid, Opt_backupgid, Opt_uid,
-@@ -169,6 +170,8 @@ static const match_table_t cifs_mount_option_tokens = {
- 	{ Opt_multiuser, "multiuser" },
- 	{ Opt_sloppy, "sloppy" },
- 	{ Opt_nosharesock, "nosharesock" },
-+	{ Opt_persistent, "persistenthandles"},
-+	{ Opt_nopersistent, "nopersistenthandles"},
- 
- 	{ Opt_backupuid, "backupuid=%s" },
- 	{ Opt_backupgid, "backupgid=%s" },
-@@ -1497,6 +1500,22 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
- 		case Opt_nosharesock:
- 			vol->nosharesock = true;
- 			break;
-+		case Opt_nopersistent:
-+			vol->nopersistent = true;
-+			if (vol->persistent) {
-+				cifs_dbg(VFS,
-+				  "persistenthandles mount options conflict\n");
-+				goto cifs_parse_mount_err;
-+			}
-+			break;
-+		case Opt_persistent:
-+			vol->persistent = true;
-+			if (vol->nopersistent) {
-+				cifs_dbg(VFS,
-+				  "persistenthandles mount options conflict\n");
-+				goto cifs_parse_mount_err;
-+			}
-+			break;
- 
- 		/* Numeric Values */
- 		case Opt_backupuid:
++	if ((volume_info->persistent == true) && ((ses->server->capabilities &
++		SMB2_GLOBAL_CAP_PERSISTENT_HANDLES) == 0)) {
++		cifs_dbg(VFS, "persistent handles not supported by server\n");
++		rc = -EOPNOTSUPP;
++		goto mount_fail_check;
++	}
+ 	/* search for existing tcon to this server share */
+ 	tcon = cifs_get_tcon(ses, volume_info);
+ 	if (IS_ERR(tcon)) {
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index a464008..3c7b6d6 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -1843,7 +1843,7 @@ struct smb_version_values smb21_values = {
+ struct smb_version_values smb30_values = {
+ 	.version_string = SMB30_VERSION_STRING,
+ 	.protocol_id = SMB30_PROT_ID,
+-	.req_capabilities = SMB2_GLOBAL_CAP_DFS | SMB2_GLOBAL_CAP_LEASING | SMB2_GLOBAL_CAP_LARGE_MTU | SMB2_GLOBAL_CAP_ENCRYPTION,
++	.req_capabilities = SMB2_GLOBAL_CAP_DFS | SMB2_GLOBAL_CAP_LEASING | SMB2_GLOBAL_CAP_LARGE_MTU | SMB2_GLOBAL_CAP_ENCRYPTION | SMB2_GLOBAL_CAP_PERSISTENT_HANDLES,
+ 	.large_lock_type = 0,
+ 	.exclusive_lock_type = SMB2_LOCKFLAG_EXCLUSIVE_LOCK,
+ 	.shared_lock_type = SMB2_LOCKFLAG_SHARED_LOCK,
+@@ -1863,7 +1863,7 @@ struct smb_version_values smb30_values = {
+ struct smb_version_values smb302_values = {
+ 	.version_string = SMB302_VERSION_STRING,
+ 	.protocol_id = SMB302_PROT_ID,
+-	.req_capabilities = SMB2_GLOBAL_CAP_DFS | SMB2_GLOBAL_CAP_LEASING | SMB2_GLOBAL_CAP_LARGE_MTU,
++	.req_capabilities = SMB2_GLOBAL_CAP_DFS | SMB2_GLOBAL_CAP_LEASING | SMB2_GLOBAL_CAP_LARGE_MTU | SMB2_GLOBAL_CAP_PERSISTENT_HANDLES,
+ 	.large_lock_type = 0,
+ 	.exclusive_lock_type = SMB2_LOCKFLAG_EXCLUSIVE_LOCK,
+ 	.shared_lock_type = SMB2_LOCKFLAG_SHARED_LOCK,
+@@ -1884,7 +1884,7 @@ struct smb_version_values smb302_values = {
+ struct smb_version_values smb311_values = {
+ 	.version_string = SMB311_VERSION_STRING,
+ 	.protocol_id = SMB311_PROT_ID,
+-	.req_capabilities = SMB2_GLOBAL_CAP_DFS | SMB2_GLOBAL_CAP_LEASING | SMB2_GLOBAL_CAP_LARGE_MTU,
++	.req_capabilities = SMB2_GLOBAL_CAP_DFS | SMB2_GLOBAL_CAP_LEASING | SMB2_GLOBAL_CAP_LARGE_MTU | SMB2_GLOBAL_CAP_PERSISTENT_HANDLES,
+ 	.large_lock_type = 0,
+ 	.exclusive_lock_type = SMB2_LOCKFLAG_EXCLUSIVE_LOCK,
+ 	.shared_lock_type = SMB2_LOCKFLAG_SHARED_LOCK,
 -- 
 1.9.1
