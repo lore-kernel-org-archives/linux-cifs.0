@@ -1,255 +1,140 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] [SMB3] Send durable handle v2 contexts when use of
- persistent handles required
-Date: Sun, 4 Oct 2015 00:03:23 -0500
-Message-ID: <CAH2r5msFv=mbnOkaUpnt6GxFBqymzt5fpFMBCMM9jiTwnD-vpw@mail.gmail.com>
-References: <1443723435-32484-1-git-send-email-smfrench@gmail.com> <CAKywueTcLJ0__8mSaD5LGG6rVp2PiNnJhC0br1NcyHc6rTQrwQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] [SMB3] Add parsing for resilienthandles mount parm
+Date: Sat,  3 Oct 2015 19:29:33 -0500
+Message-ID: <1443918573-44613-1-git-send-email-smfrench@gmail.com>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueTcLJ0__8mSaD5LGG6rVp2PiNnJhC0br1NcyHc6rTQrwQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Updated and resent the 4 patch series onto linux-cifs and also pushed
-to cifs-2.6.git experimental branch.
+Since many servers (Windows clients, and non-clustered servers) do not
+support persistent handles but do support resilient handles, allow
+the user to specify a mount option "resilienthandles" in order
+to get more reliable connections and less chance of data loss
+(at least when SMB2.1 or later)
 
-I don't know if channel sequence number in the SMB3 request would also
-need to be incremented on disconnect though (the documentation is
-confusing on that in MS-SMB2) in the case where we only have one
-channel.
+Signed-off-by: Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
 
-Also wondering if I should add a mount option for resilient handles to
-allow us to force better reliability of connections to non-clustered
-servers (and presumably could work even to Windows 8 and 8.1 and
-Windows 10 servers) when the application would prefer that (to the
-less strict guarantees of durable handles)
+Signed-off-by: Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+---
+ fs/cifs/cifsfs.c   |  2 ++
+ fs/cifs/cifsglob.h |  2 ++
+ fs/cifs/connect.c  | 24 +++++++++++++++++++++++-
+ fs/cifs/smb2file.c |  6 ++++++
+ 4 files changed, 33 insertions(+), 1 deletion(-)
 
-On Sat, Oct 3, 2015 at 2:41 AM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> 2015-10-01 21:17 GMT+03:00 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
->> Signed-off-by: Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
->> ---
->>  fs/cifs/cifsglob.h |   1 +
->>  fs/cifs/smb2pdu.c  | 114 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
->>  fs/cifs/smb2pdu.h  |  30 ++++++++++++++
->>  3 files changed, 144 insertions(+), 1 deletion(-)
->>
->> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
->> index 51353bb..ec31a03 100644
->> --- a/fs/cifs/cifsglob.h
->> +++ b/fs/cifs/cifsglob.h
->> @@ -1022,6 +1022,7 @@ struct cifs_fid {
->>         __u64 persistent_fid;   /* persist file id for smb2 */
->>         __u64 volatile_fid;     /* volatile file id for smb2 */
->>         __u8 lease_key[SMB2_LEASE_KEY_SIZE];    /* lease key for smb2 */
->> +       __u8 create_guid[16];
->>  #endif
->>         struct cifs_pending_open *pending_open;
->>         unsigned int epoch;
->> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
->> index c744b57..6b899bf 100644
->> --- a/fs/cifs/smb2pdu.c
->> +++ b/fs/cifs/smb2pdu.c
->> @@ -1100,6 +1100,68 @@ create_reconnect_durable_buf(struct cifs_fid *fid)
->>         return buf;
->>  }
->>
->> +static struct create_durable_v2 *
->> +create_durable_v2_buf(struct cifs_fid *pfid)
->> +{
->> +       struct create_durable_v2 *buf;
->> +
->> +       buf = kzalloc(sizeof(struct create_durable), GFP_KERNEL);
->> +       if (!buf)
->> +               return NULL;
->> +
->> +       buf->ccontext.DataOffset = cpu_to_le16(offsetof
->> +                                       (struct create_durable_v2, dcontext));
->> +       buf->ccontext.DataLength = cpu_to_le32(sizeof(struct durable_context_v2));
->> +       buf->ccontext.NameOffset = cpu_to_le16(offsetof
->> +                               (struct create_durable_v2, Name));
->> +       buf->ccontext.NameLength = cpu_to_le16(4);
->> +
->> +       buf->dcontext.Timeout = 0; /* Should this be configurable by workload */
->> +       buf->dcontext.Flags = cpu_to_le32(SMB2_DHANDLE_FLAG_PERSISTENT);
->> +       get_random_bytes(buf->dcontext.CreateGuid, 16);
->> +       memcpy(pfid->create_guid, buf->dcontext.CreateGuid, 16);
->> +
->> +       /* SMB2_CREATE_DURABLE_HANDLE_REQUEST is "DH2Q" */
->> +       buf->Name[0] = 'D';
->> +       buf->Name[1] = 'H';
->> +       buf->Name[2] = '2';
->> +       buf->Name[3] = 'Q';
->> +       return buf;
->> +}
->> +
->> +static struct create_durable_handle_reconnect_v2 *
->> +create_reconnect_durable_v2_buf(struct cifs_fid *fid)
->> +{
->> +       struct create_durable_handle_reconnect_v2 *buf;
->> +
->> +       buf = kzalloc(sizeof(struct create_durable_handle_reconnect_v2),
->> +                       GFP_KERNEL);
->> +       if (!buf)
->> +               return NULL;
->> +
->> +       buf->ccontext.DataOffset =
->> +               cpu_to_le16(offsetof(struct create_durable_handle_reconnect_v2,
->> +                                    dcontext));
->> +       buf->ccontext.DataLength =
->> +               cpu_to_le32(sizeof(struct durable_reconnect_context_v2));
->> +       buf->ccontext.NameOffset =
->> +               cpu_to_le16(offsetof(struct create_durable_handle_reconnect_v2,
->> +                           Name));
->> +       buf->ccontext.NameLength = cpu_to_le16(4);
->> +
->> +       buf->dcontext.Fid.PersistentFileId = fid->persistent_fid;
->> +       buf->dcontext.Fid.VolatileFileId = fid->volatile_fid;
->> +       buf->dcontext.Flags = cpu_to_le32(SMB2_DHANDLE_FLAG_PERSISTENT);
->> +       memcpy(buf->dcontext.CreateGuid, fid->create_guid, 16);
->> +
->> +       /* SMB2_CREATE_DURABLE_HANDLE_RECONNECT_V2 is "DH2C" */
->> +       buf->Name[0] = 'D';
->> +       buf->Name[1] = 'H';
->> +       buf->Name[2] = '2';
->> +       buf->Name[3] = 'C';
->> +       return buf;
->> +}
->> +
->>  static __u8
->>  parse_lease_state(struct TCP_Server_Info *server, struct smb2_create_rsp *rsp,
->>                   unsigned int *epoch)
->> @@ -1174,6 +1236,48 @@ add_durable_context(struct kvec *iov, unsigned int *num_iovec,
->>         return 0;
->>  }
->>
->> +static int
->> +add_durable_v2_context(struct kvec *iov, unsigned int *num_iovec,
->> +                   struct cifs_open_parms *oparms)
->> +{
->> +       struct smb2_create_req *req = iov[0].iov_base;
->> +       unsigned int num = *num_iovec;
->> +
->> +       iov[num].iov_base = create_durable_v2_buf(oparms->fid);
->> +       if (iov[num].iov_base == NULL)
->> +               return -ENOMEM;
->> +       iov[num].iov_len = sizeof(struct create_durable_v2);
->> +       if (!req->CreateContextsOffset)
->> +               req->CreateContextsOffset =
->> +                       cpu_to_le32(sizeof(struct smb2_create_req) - 4 +
->> +                                                               iov[1].iov_len);
->> +       le32_add_cpu(&req->CreateContextsLength, sizeof(struct create_durable_v2));
->> +       inc_rfc1001_len(&req->hdr, sizeof(struct create_durable_v2));
->> +       *num_iovec = num + 1;
->> +       return 0;
->> +}
->> +
->> +static int
->> +add_durable_reconnect_v2_context(struct kvec *iov, unsigned int *num_iovec,
->> +                   struct cifs_open_parms *oparms)
->> +{
->> +       struct smb2_create_req *req = iov[0].iov_base;
->> +       unsigned int num = *num_iovec;
->> +
->> +       iov[num].iov_base = create_reconnect_durable_v2_buf(oparms->fid);
->> +       if (iov[num].iov_base == NULL)
->> +               return -ENOMEM;
->> +       iov[num].iov_len = sizeof(struct create_durable_handle_reconnect_v2);
->> +       if (!req->CreateContextsOffset)
->> +               req->CreateContextsOffset =
->> +                       cpu_to_le32(sizeof(struct smb2_create_req) - 4 +
->> +                                                               iov[1].iov_len);
->> +       le32_add_cpu(&req->CreateContextsLength, sizeof(struct create_durable_handle_reconnect_v2));
->> +       inc_rfc1001_len(&req->hdr, sizeof(struct create_durable_handle_reconnect_v2));
->> +       *num_iovec = num + 1;
->> +       return 0;
->> +}
->> +
->>  int
->>  SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
->>           __u8 *oplock, struct smb2_file_all_info *buf,
->> @@ -1272,7 +1376,15 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
->>                         ccontext->Next =
->>                                 cpu_to_le32(server->vals->create_lease_size);
->>                 }
->> -               rc = add_durable_context(iov, &num_iovecs, oparms);
->> +               if (tcon->use_persistent) {
->> +                       if (oparms->reconnect)
->> +                               rc = add_durable_reconnect_v2_context(iov,
->> +                                                       &num_iovecs, oparms);
->> +                       else
->> +                               rc = add_durable_v2_context(iov, &num_iovecs,
->> +                                                       oparms);
->> +               } else
->> +                       rc = add_durable_context(iov, &num_iovecs, oparms);
->
-> I think it will be better to incapsulate this if statements into
-> add_durable_context() function to leave SMB2_open() code more generic.
->
->>                 if (rc) {
->>                         cifs_small_buf_release(req);
->>                         kfree(copy_path);
->> diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
->> index b26da75..a939526 100644
->> --- a/fs/cifs/smb2pdu.h
->> +++ b/fs/cifs/smb2pdu.h
->> @@ -590,6 +590,36 @@ struct create_durable {
->>         } Data;
->>  } __packed;
->>
->> +/* Flags */
->> +#define SMB2_DHANDLE_FLAG_PERSISTENT   0x00000002
->> +struct durable_context_v2 {
->> +       __le32 Timeout;
->> +       __le32 Flags;
->> +       __u64 Reserved;
->> +       __u8 CreateGuid[16];
->> +} __packed;
->> +
->> +struct create_durable_v2 {
->> +       struct create_context ccontext;
->> +       __u8   Name[8];
->> +       struct durable_context_v2 dcontext;
->> +} __packed;
->> +
->> +struct durable_reconnect_context_v2 {
->> +       struct {
->> +               __u64 PersistentFileId;
->> +               __u64 VolatileFileId;
->> +       } Fid;
->> +       __u8 CreateGuid[16];
->> +       __le32 Flags; /* see above DHANDLE_FLAG_PERSISTENT */
->> +} __packed;
->> +
->> +struct create_durable_handle_reconnect_v2 {
->> +       struct create_context ccontext;
->> +       __u8   Name[8];
->> +       struct durable_reconnect_context_v2 dcontext;
->> +} __packed;
->> +
->>  #define COPY_CHUNK_RES_KEY_SIZE        24
->>  struct resume_key_req {
->>         char ResumeKey[COPY_CHUNK_RES_KEY_SIZE];
->> --
->> 1.9.1
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-> Other than the note above the patch looks good.
->
-> --
-> Best regards,
-> Pavel Shilovsky.
-
-
-
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 13302e9..f578ef9 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -456,6 +456,8 @@ cifs_show_options(struct seq_file *s, struct dentry *root)
+ 		seq_puts(s, ",hard");
+ 	if (tcon->use_persistent)
+ 		seq_puts(s, ",persistenthandles");
++	else if (tcon->use_resilient)
++		seq_puts(s, ",resilienthandles");
+ 	if (tcon->unix_ext)
+ 		seq_puts(s, ",unix");
+ 	else
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index ec31a03..472daeb 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -496,6 +496,7 @@ struct smb_vol {
+ 	bool nosharesock:1;
+ 	bool persistent:1;
+ 	bool nopersistent:1;
++	bool resilient:1; /* noresilient not required since not fored for CA */
+ 	unsigned int rsize;
+ 	unsigned int wsize;
+ 	bool sockopt_tcp_nodelay:1;
+@@ -901,6 +902,7 @@ struct cifs_tcon {
+ 	bool broken_posix_open; /* e.g. Samba server versions < 3.3.2, 3.2.9 */
+ 	bool broken_sparse_sup; /* if server or share does not support sparse */
+ 	bool need_reconnect:1; /* connection reset, tid now invalid */
++	bool use_resilient:1; /* use resilient instead of durable handles */
+ 	bool use_persistent:1; /* use persistent instead of durable handles */
+ #ifdef CONFIG_CIFS_SMB2
+ 	bool print:1;		/* set if connection to printer share */
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 9e44532..1e7840a 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -88,6 +88,7 @@ enum {
+ 	Opt_fsc, Opt_mfsymlinks,
+ 	Opt_multiuser, Opt_sloppy, Opt_nosharesock,
+ 	Opt_persistent, Opt_nopersistent,
++	Opt_resilient, Opt_noresilient,
+ 
+ 	/* Mount options which take numeric value */
+ 	Opt_backupuid, Opt_backupgid, Opt_uid,
+@@ -172,6 +173,8 @@ static const match_table_t cifs_mount_option_tokens = {
+ 	{ Opt_nosharesock, "nosharesock" },
+ 	{ Opt_persistent, "persistenthandles"},
+ 	{ Opt_nopersistent, "nopersistenthandles"},
++	{ Opt_resilient, "resilienthandles"},
++	{ Opt_noresilient, "noresilienthandles"},
+ 
+ 	{ Opt_backupuid, "backupuid=%s" },
+ 	{ Opt_backupgid, "backupgid=%s" },
+@@ -1510,12 +1513,23 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+ 			break;
+ 		case Opt_persistent:
+ 			vol->persistent = true;
+-			if (vol->nopersistent) {
++			if ((vol->nopersistent) || (vol->resilient)) {
+ 				cifs_dbg(VFS,
+ 				  "persistenthandles mount options conflict\n");
+ 				goto cifs_parse_mount_err;
+ 			}
+ 			break;
++		case Opt_resilient:
++			vol->resilient = true;
++			if (vol->persistent) {
++				cifs_dbg(VFS,
++				  "persistenthandles mount options conflict\n");
++				goto cifs_parse_mount_err;
++			}
++			break;
++		case Opt_noresilient:
++			vol->resilient = false; /* this is already the default */
++			break;
+ 
+ 		/* Numeric Values */
+ 		case Opt_backupuid:
+@@ -2695,6 +2709,14 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
+ 	     && (volume_info->nopersistent == false)) {
+ 		cifs_dbg(FYI, "enabling persistent handles\n");
+ 		tcon->use_persistent = true;
++	} else if (volume_info->resilient) {
++		if (ses->server->vals->protocol_id == 0) {
++			cifs_dbg(VFS,
++			     "SMB2.1 or later required for resilient handles\n");
++			rc = -EOPNOTSUPP;
++			goto out_fail;
++		}
++		tcon->use_resilient = true;
+ 	}
+ 
+ 	/*
+diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
+index 2ab297d..04f2af0 100644
+--- a/fs/cifs/smb2file.c
++++ b/fs/cifs/smb2file.c
+@@ -67,6 +67,12 @@ smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms,
+ 	if (rc)
+ 		goto out;
+ 
++	/*
++	 * FIXME: Add
++	 * 	if (tcon->use_resilient)
++	 *		SMB2_ioctl(xid, ... FSCTL_LMR_REQUEST_RESILIENCY, true);
++	 */
++
+ 	if (buf) {
+ 		/* open response does not have IndexNumber field - get it */
+ 		rc = SMB2_get_srv_num(xid, oparms->tcon, fid->persistent_fid,
 -- 
-Thanks,
-
-Steve
+1.9.1
