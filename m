@@ -1,53 +1,45 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Channel Sequence handling - was RE: [PATCH] [SMB3] Send durable
- handle v2 contexts when use of persistent handles required
-Date: Mon, 5 Oct 2015 14:50:51 -0500
-Message-ID: <CAH2r5msW2+Mbui=jR3r2TaFspEUJFvLZYSQ5AXwGZ7qK2N5fkA@mail.gmail.com>
-References: <BN3PR03MB15107EF8D31A9F3B463FD753A0480@BN3PR03MB1510.namprd03.prod.outlook.com>
+Subject: [GIT] CIFS Fixes
+Date: Mon, 5 Oct 2015 15:54:42 -0500
+Message-ID: <CAH2r5mtH9W+3PWBZzSCPwuwN-uaVKwx2KuX8g2p=sW009CAyhg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
-To: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <BN3PR03MB15107EF8D31A9F3B463FD753A0480-TOgqXkWMcuxshltC/NOAfWP7xZHs9kq/vxpqHgZTriW3zl9H0oFU5g@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Oct 5, 2015 at 9:44 AM, Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org> wrote:
->> -----Original Message-----
->> From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [mailto:linux-cifs-
->> owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org] On Behalf Of Steve French
->> Sent: Saturday, October 3, 2015 10:03 PM
->> ...
->> I don't know if channel sequence number in the SMB3 request would also
->> need to be incremented on disconnect though (the documentation is
->> confusing on that in MS-SMB2) in the case where we only have one
->> channel.
->
-> There's nothing special about replay on one channel, after any disconnect you should increment the channel sequence so the server's replay detection can work properly.
->
-> Can you point me to the MS-SMB2 text that you find confusing? We can address it.
+Two fixes for problems pointed out by automated tools.
+
+Thanks PaX/grsecurity team and Dan Carpenter (and the Smatch tool)
+
+Please pull the following changes since commit
+e3be4266d3488cbbaddf7fcc661f4473db341e46:
+
+  Merge branch 'perf-urgent-for-linus' of
+git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip (2015-09-27
+12:51:39 -0400)
+
+are available in the git repository at:
 
 
-(the doc text in 3.2.4.1 and 3.2.7.1 of MS-SMB2 seems to
-conflict)
+  git://git.samba.org/sfrench/cifs-2.6.git for-next
 
-On disconnect "If Connection.Dialect belongs to the SMB 3.x dialect
-family, and if the Session has more than one channel in
-Session.ChannelList, the client MUST perform the following actions:
+for you to fetch changes up to 616a5399b8f11a526cedcbaeb68bc0a1b08a3f43:
 
-"Session.ChannelSequence MUST be incremented by 1."
+  [CIFS] Update cifs version number (2015-10-03 16:54:17 -0500)
 
-but 3.2.4.1 indicates that it is not just for multichannel but also
-for PersistentHandle that it must be incremented (see below)
+----------------------------------------------------------------
+Steve French (3):
+      [SMB3] Missing null tcon check
+      [SMB3] Do not fall back to SMBWriteX in set_file_size error cases
+      [CIFS] Update cifs version number
 
-"If Connection.Dialect belongs to the SMB 3.x dialect family and if
-Connection.SupportsMultiChannel or
-Connection.SupportsPersistentHandles is TRUE, the
-client MUST set ChannelSequence in the SMB2 header to Session.ChannelSequence."
-
+ fs/cifs/cifsfs.h  |  2 +-
+ fs/cifs/inode.c   | 34 ----------------------------------
+ fs/cifs/smb2pdu.c |  2 +-
+ 3 files changed, 2 insertions(+), 36 deletions(-)
 
 -- 
 Thanks,
