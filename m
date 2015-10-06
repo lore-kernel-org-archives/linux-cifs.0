@@ -1,162 +1,43 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH] [SMB3] Add resilienthandles mount parm
-Date: Tue,  6 Oct 2015 05:47:54 -0500
-Message-ID: <1444128474-67439-1-git-send-email-smfrench@gmail.com>
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+From: Etienne Desautels <etienne.desautels-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Move file from one share to an other share, all under the same DFS
+Date: Tue, 6 Oct 2015 14:12:30 -0400
+Message-ID: <CAMFcbfoBZ4d8C8uiFD-7x+XAk8UZ9uO4sd3TwvL3ouXiXNoM7Q@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Version 2 of patch (adds resiliency ioctl).
+Hi,
 
-Since many servers (Windows clients, and non-clustered servers) do not
-support persistent handles but do support resilient handles, allow
-the user to specify a mount option "resilienthandles" in order
-to get more reliable connections and less chance of data loss
-(at least when SMB2.1 or later).  Default resilient handle
-timeout (120 seconds to recent Windows server) is used.
+On a Linux server where a DFS server is mounted I'm trying to move a
+file from one share to an other share. Both shares are in the same DFS
+and on the same SAN. It works but the file is copied and the original
+is deleted, instead of doing a real move where only the reference to
+the file is updated. This copy can take a long time for large files
+(our case).
 
-Reviewed-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Signed-off-by: Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
----
- fs/cifs/cifsfs.c   |  2 ++
- fs/cifs/cifsglob.h |  2 ++
- fs/cifs/connect.c  | 24 +++++++++++++++++++++++-
- fs/cifs/smb2file.c | 19 +++++++++++++++++++
- 4 files changed, 46 insertions(+), 1 deletion(-)
+If I try the same thing on a Windows computer, the file is only moved,
+so it's really fast.
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 13302e9..f578ef9 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -456,6 +456,8 @@ cifs_show_options(struct seq_file *s, struct dentry *root)
- 		seq_puts(s, ",hard");
- 	if (tcon->use_persistent)
- 		seq_puts(s, ",persistenthandles");
-+	else if (tcon->use_resilient)
-+		seq_puts(s, ",resilienthandles");
- 	if (tcon->unix_ext)
- 		seq_puts(s, ",unix");
- 	else
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index ec31a03..472daeb 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -496,6 +496,7 @@ struct smb_vol {
- 	bool nosharesock:1;
- 	bool persistent:1;
- 	bool nopersistent:1;
-+	bool resilient:1; /* noresilient not required since not fored for CA */
- 	unsigned int rsize;
- 	unsigned int wsize;
- 	bool sockopt_tcp_nodelay:1;
-@@ -901,6 +902,7 @@ struct cifs_tcon {
- 	bool broken_posix_open; /* e.g. Samba server versions < 3.3.2, 3.2.9 */
- 	bool broken_sparse_sup; /* if server or share does not support sparse */
- 	bool need_reconnect:1; /* connection reset, tid now invalid */
-+	bool use_resilient:1; /* use resilient instead of durable handles */
- 	bool use_persistent:1; /* use persistent instead of durable handles */
- #ifdef CONFIG_CIFS_SMB2
- 	bool print:1;		/* set if connection to printer share */
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 9e44532..1e7840a 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -88,6 +88,7 @@ enum {
- 	Opt_fsc, Opt_mfsymlinks,
- 	Opt_multiuser, Opt_sloppy, Opt_nosharesock,
- 	Opt_persistent, Opt_nopersistent,
-+	Opt_resilient, Opt_noresilient,
- 
- 	/* Mount options which take numeric value */
- 	Opt_backupuid, Opt_backupgid, Opt_uid,
-@@ -172,6 +173,8 @@ static const match_table_t cifs_mount_option_tokens = {
- 	{ Opt_nosharesock, "nosharesock" },
- 	{ Opt_persistent, "persistenthandles"},
- 	{ Opt_nopersistent, "nopersistenthandles"},
-+	{ Opt_resilient, "resilienthandles"},
-+	{ Opt_noresilient, "noresilienthandles"},
- 
- 	{ Opt_backupuid, "backupuid=%s" },
- 	{ Opt_backupgid, "backupgid=%s" },
-@@ -1510,12 +1513,23 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
- 			break;
- 		case Opt_persistent:
- 			vol->persistent = true;
--			if (vol->nopersistent) {
-+			if ((vol->nopersistent) || (vol->resilient)) {
- 				cifs_dbg(VFS,
- 				  "persistenthandles mount options conflict\n");
- 				goto cifs_parse_mount_err;
- 			}
- 			break;
-+		case Opt_resilient:
-+			vol->resilient = true;
-+			if (vol->persistent) {
-+				cifs_dbg(VFS,
-+				  "persistenthandles mount options conflict\n");
-+				goto cifs_parse_mount_err;
-+			}
-+			break;
-+		case Opt_noresilient:
-+			vol->resilient = false; /* this is already the default */
-+			break;
- 
- 		/* Numeric Values */
- 		case Opt_backupuid:
-@@ -2695,6 +2709,14 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
- 	     && (volume_info->nopersistent == false)) {
- 		cifs_dbg(FYI, "enabling persistent handles\n");
- 		tcon->use_persistent = true;
-+	} else if (volume_info->resilient) {
-+		if (ses->server->vals->protocol_id == 0) {
-+			cifs_dbg(VFS,
-+			     "SMB2.1 or later required for resilient handles\n");
-+			rc = -EOPNOTSUPP;
-+			goto out_fail;
-+		}
-+		tcon->use_resilient = true;
- 	}
- 
- 	/*
-diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
-index 2ab297d..f9e766f 100644
---- a/fs/cifs/smb2file.c
-+++ b/fs/cifs/smb2file.c
-@@ -43,6 +43,7 @@ smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms,
- 	struct smb2_file_all_info *smb2_data = NULL;
- 	__u8 smb2_oplock[17];
- 	struct cifs_fid *fid = oparms->fid;
-+	struct network_resiliency_req nr_ioctl_req;
- 
- 	smb2_path = cifs_convert_path_to_utf16(oparms->path, oparms->cifs_sb);
- 	if (smb2_path == NULL) {
-@@ -67,6 +68,24 @@ smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms,
- 	if (rc)
- 		goto out;
- 
-+
-+	 if (oparms->tcon->use_resilient) {
-+		nr_ioctl_req.Timeout = 0; /* use server default (120 seconds) */
-+		nr_ioctl_req.Reserved = 0;
-+		rc = SMB2_ioctl(xid, oparms->tcon, fid->persistent_fid,
-+			fid->volatile_fid, FSCTL_LMR_REQUEST_RESILIENCY, true,
-+			(char *)&nr_ioctl_req, sizeof(nr_ioctl_req),
-+			NULL, NULL /* no return info */);
-+		if (rc == -EOPNOTSUPP) {
-+			cifs_dbg(VFS,
-+			     "resiliency not supported by server, disabling\n");
-+			oparms->tcon->use_resilient = false;
-+		} else if (rc)
-+			cifs_dbg(FYI, "error %d setting resiliency\n", rc);
-+
-+		rc = 0;
-+	}
-+
- 	if (buf) {
- 		/* open response does not have IndexNumber field - get it */
- 		rc = SMB2_get_srv_num(xid, oparms->tcon, fid->persistent_fid,
--- 
-1.9.1
+Is it possible to really move the file from the Linux server? If yes,
+how? What I'm doing wrong?
+
+I'm mounting the DFS with this fstab line:
+//interne.windowsserver.org/shares     /mnt/shares     cifs
+credentials=/etc/cifs.credentials,domain=interne,iocharset=utf8,uid=1003,gid
+=1003,rw,noexec,nosuid  0 0
+
+shares is like this:
+/mnt/shares/share1/
+/mnt/shares/share2/
+
+I'm trying to move a file from share1 to share2.
+
+My Linux server run Ubuntu 10.04 (pretty old, I know).
+Linux servername 2.6.32-51-server #113-Ubuntu SMP Wed Aug 21 20:01:09
+UTC 2013 x86_64 GNU/Linux
+
+Regards,
+Etienne Desautels
