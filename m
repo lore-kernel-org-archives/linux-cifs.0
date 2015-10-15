@@ -1,179 +1,99 @@
-From: Austin S Hemmelgarn <ahferroin7-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v10 24/46] xfs: Add richacl support
-Date: Tue, 13 Oct 2015 15:21:50 -0400
-Message-ID: <561D59CE.9050507@gmail.com>
-References: <1444604337-17651-1-git-send-email-andreas.gruenbacher@gmail.com>
- <1444604337-17651-25-git-send-email-andreas.gruenbacher@gmail.com>
- <20151012001033.GA27164@dastard>
- <CAHpGcMKeJHDegs2cYKaJdX4Tw43Jp30Nv_2WoSNZfBzGJKu=BQ@mail.gmail.com>
- <20151012040545.GC27164@dastard>
- <CAHc6FU55eOK4gWH1bhKvoujQ1zkT+we0xcfPUOeWrF_X0XHXZg@mail.gmail.com>
+From: Michael Adam <obnox-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: Channel Sequence handling - was RE: [PATCH] [SMB3] Send durable
+ handle v2 contexts when use of persistent handles required
+Date: Thu, 15 Oct 2015 13:15:21 +0200
+Message-ID: <20151015111520.GA5143@samba.org>
+References: <BN3PR03MB15107EF8D31A9F3B463FD753A0480@BN3PR03MB1510.namprd03.prod.outlook.com>
+ <CAH2r5msW2+Mbui=jR3r2TaFspEUJFvLZYSQ5AXwGZ7qK2N5fkA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-512; boundary="------------ms060304030105080606030309"
-Cc: =?UTF-8?Q?Andreas_Gr=c3=bcnbacher?= <andreas.gruenbacher-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
-	Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>,
-	Andreas Dilger <adilger.kernel-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>,
-	"J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
-	Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>,
-	Trond Myklebust <trond.myklebust-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
-	Anna Schumaker <anna.schumaker-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
-	linux-ext4 <linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org,
-	Linux Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Linux FS-devel Mailing List <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Linux NFS Mailing List <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Linux API Mailing List <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="FCuugMFkClbJLl1L"
+Cc: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAHc6FU55eOK4gWH1bhKvoujQ1zkT+we0xcfPUOeWrF_X0XHXZg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <CAH2r5msW2+Mbui=jR3r2TaFspEUJFvLZYSQ5AXwGZ7qK2N5fkA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This is a cryptographically signed message in MIME format.
 
---------------ms060304030105080606030309
-Content-Type: text/plain; charset=utf-8; format=flowed
+--FCuugMFkClbJLl1L
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 2015-10-12 01:57, Andreas Gruenbacher wrote:
-> On Mon, Oct 12, 2015 at 6:05 AM, Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org> wro=
-te:
->> On Mon, Oct 12, 2015 at 03:51:15AM +0200, Andreas Gr=C3=BCnbacher wrot=
-e:
->>> 2015-10-12 2:10 GMT+02:00 Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>:
->>>> On Mon, Oct 12, 2015 at 12:58:35AM +0200, Andreas Gruenbacher wrote:=
+On 2015-10-05 at 14:50 -0500, Steve French wrote:
+> On Mon, Oct 5, 2015 at 9:44 AM, Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org> wrote:
+> >> -----Original Message-----
+> >> From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [mailto:linux-cifs-
+> >> owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org] On Behalf Of Steve French
+> >> Sent: Saturday, October 3, 2015 10:03 PM
+> >> ...
+> >> I don't know if channel sequence number in the SMB3 request would also
+> >> need to be incremented on disconnect though (the documentation is
+> >> confusing on that in MS-SMB2) in the case where we only have one
+> >> channel.
+> >
+> > There's nothing special about replay on one channel, after any disconne=
+ct you should increment the channel sequence so the server's replay detecti=
+on can work properly.
+> >
+> > Can you point me to the MS-SMB2 text that you find confusing? We can ad=
+dress it.
+>=20
+>=20
+> (the doc text in 3.2.4.1 and 3.2.7.1 of MS-SMB2 seems to
+> conflict)
+>=20
+> On disconnect "If Connection.Dialect belongs to the SMB 3.x dialect
+> family, and if the Session has more than one channel in
+> Session.ChannelList, the client MUST perform the following actions:
+>=20
+> "Session.ChannelSequence MUST be incremented by 1."
+>=20
+> but 3.2.4.1 indicates that it is not just for multichannel but also
+> for PersistentHandle that it must be incremented (see below)
+>=20
+> "If Connection.Dialect belongs to the SMB 3.x dialect family and if
+> Connection.SupportsMultiChannel or
+> Connection.SupportsPersistentHandles is TRUE, the
+> client MUST set ChannelSequence in the SMB2 header to Session.ChannelSequ=
+ence."
 
->>>>> diff --git a/fs/xfs/libxfs/xfs_format.h b/fs/xfs/libxfs/xfs_format.=
-h
->>>>> index 9590a06..8c6da45 100644
->>>>> --- a/fs/xfs/libxfs/xfs_format.h
->>>>> +++ b/fs/xfs/libxfs/xfs_format.h
->>>>> @@ -461,10 +461,18 @@ xfs_sb_has_ro_compat_feature(
->>>>>   #define XFS_SB_FEAT_INCOMPAT_FTYPE   (1 << 0)        /* filetype =
-in dirent */
->>>>>   #define XFS_SB_FEAT_INCOMPAT_SPINODES        (1 << 1)        /* s=
-parse inode chunks */
->>>>>   #define XFS_SB_FEAT_INCOMPAT_META_UUID       (1 << 2)        /* m=
-etadata UUID */
->>>>> +
->>>>> +#ifdef CONFIG_XFS_RICHACL
->>>>> +#define XFS_SB_FEAT_INCOMPAT_RICHACL (1 << 3)        /* richacls *=
-/
->>>>> +#else
->>>>> +#define XFS_SB_FEAT_INCOMPAT_RICHACL 0
->>>>> +#endif
->>>>> +
->>>>
->>>> Regardless of whether we build in richacl support, this is wrong.
->>>> Feature bits are on-disk format definitions, so it will always have
->>>> this value whether or not the kernel supports the feature.
->>>
->>> This is so that xfs_mount_validate_sb() will complain when mounting a=
+I don't see a contradiction / conflict here:
 
->>> richacl filesystem on a kernel which doesn't have richacl suport
->>> compiled in. The same effect can be had with extra code there of
->>> course.
->>
->> If the kernel doesn't know about a feature, then it will report
->> "unknown feature". However, as of this patch set, the kernel will
->> know about the richacl feature, and so the correct error message
->> is to say "Rich ACLs not supported by this kernel".
->>
->> Also, from a disk format perspective, this is a this is a read-only
->> compat feature, as kernels that don't have richacl support are still
->> able to mount and walk the filesystem without errors occurring. It's
->> only when allowing modifications are made that problems will arise,
->> so why did you make it an incompat feature?
->
-> As a read-only compat flag, kernels that cannot enforce richacls would
-> still be able to mount richacl file systems read-only. That's a
-> problem when acls are used to forbid read/execute access.
-It's also an irrelevant problem, anyone with a minimal knowledge of the=20
-filesystem's on-disk layout can unset the feature bit by hand and force=20
-it to be mounted anyway, thus bypassing the ACL's (this is the case for=20
-any filesystem, not just XFS).  If someone has access to the hardware,=20
-they have access to the data stored on it, period, irrespective of what=20
-the data says about how it should be accessed.
+- 3.2.7.1 tells when to bump the seqnum.
+- 3.2.4.1 tells when to send it to the server
+  (this makes no statement about the value)
 
-The 3 most common cases for trying to mount a filesystem with this on a=20
-kernel that doesn't support it are:
-a. Someone is trying to recover data on their own system using something =
+So the document seems to indicate this:
 
-like SystemRescueCD.
-b. Someone is trying to recover data from a non-functional system that=20
-they own or have been authorized to access for this purpose by=20
-connecting the disk to another system.
-c. Someone is trying to bisect a kernel bug or track down what config=20
-option is causing them issues.
-All three of these cases _need_ to keep working properly without needing =
+Bumping the channel sequence number is only done
+by the Windows client upon connection loss on a
+multi-channel session (i.e. a real one, with
+more than one channel) and not for a single channel
+session (also not on a formerly multi-channel
+session, when the last channel goes down).
 
-to manually twiddle with compat bits, otherwise it _will_ cause a lot of =
+A new smbtorture test case that I am currently reviewing
+indicates that the windows server is OK with this
+client behaviour (i.e. not bumping when the last
+channel of a session goes down).
 
-people to advocate not using richacls.
+Cheers - Michael
 
+--FCuugMFkClbJLl1L
+Content-Type: application/pgp-signature; name="signature.asc"
 
---------------ms060304030105080606030309
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+Comment: comment
 
-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
-cnQub3JnMSIwIAYDVQQDExlDQSBDZXJ0IFNpZ25pbmcgQXV0aG9yaXR5MSEwHwYJKoZIhvcN
-AQkBFhJzdXBwb3J0QGNhY2VydC5vcmcCAxEt+DANBglghkgBZQMEAgMFAKCCAiEwGAYJKoZI
-hvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTUxMDEzMTkyMTUwWjBPBgkq
-hkiG9w0BCQQxQgRArBUGWWZFAbD+leqoCnJ+cAxw8j8yXpMSUbB7bw1UqItWlH/9270Nf4Od
-pdqL+vVSWt31hcG6ZZ4aH4BBrsvPjTBsBgkqhkiG9w0BCQ8xXzBdMAsGCWCGSAFlAwQBKjAL
-BglghkgBZQMEAQIwCgYIKoZIhvcNAwcwDgYIKoZIhvcNAwICAgCAMA0GCCqGSIb3DQMCAgFA
-MAcGBSsOAwIHMA0GCCqGSIb3DQMCAgEoMIGRBgkrBgEEAYI3EAQxgYMwgYAweTEQMA4GA1UE
-ChMHUm9vdCBDQTEeMBwGA1UECxMVaHR0cDovL3d3dy5jYWNlcnQub3JnMSIwIAYDVQQDExlD
-QSBDZXJ0IFNpZ25pbmcgQXV0aG9yaXR5MSEwHwYJKoZIhvcNAQkBFhJzdXBwb3J0QGNhY2Vy
-dC5vcmcCAxEt+DCBkwYLKoZIhvcNAQkQAgsxgYOggYAweTEQMA4GA1UEChMHUm9vdCBDQTEe
-MBwGA1UECxMVaHR0cDovL3d3dy5jYWNlcnQub3JnMSIwIAYDVQQDExlDQSBDZXJ0IFNpZ25p
-bmcgQXV0aG9yaXR5MSEwHwYJKoZIhvcNAQkBFhJzdXBwb3J0QGNhY2VydC5vcmcCAxEt+DAN
-BgkqhkiG9w0BAQEFAASCAgBPWhX/SgfqmlcepEGctHnqt44hjsUxHb8h4h9fFAfSEfJqcXqB
-29yhvZZzxCC7wr8SRrc6TfvBz8Sm5c4/kBItQJf7BJ9+GaDRm6JOFeQOE0U3edSydnBhyyPd
-U2olvc89DsRzOiwH68dV01oRYlXCTDo1qxi84JS4X0HTIc+cvNF2AoMckaGGaNymtl0Noj5t
-n0lYj63Wz9qO3HiFWFlsHNB+Q4Fr/pwPsK/wHrZlqbzVK4jkXeqpLmryrlfR8aSMZCmkDSzr
-9IcNkbmQ3yzQZ5q5N1Q6C6NvwyhIZlKa8Jh/uAmWEeSNESbaB8CSJoCbeegnROGKVA+xOoG9
-1xczV04oQZCyEhCjsF26/I2FVZHLoFMYj1QjIr4iYlBKP73hhPZa0Q3jaEQdZU3mvjJSTzz3
-X+FaB3d+5Zp2ASP4u3BBUdR/AUMELyusUtIpd6H0hvVHhD7DB1mkrzp4weP4Z9BR7IDTkQLY
-YHKt7nG95/J/iS4mqTJsHDRKZuv6CldVREHKua5fTQ3Q6DpJtpkeox/6zOV9elTynTMsLsn8
-UdIiMFpNNIDIcD29CAy0csWlxQzBi5llrE/dOmvciiiVfb0I9MbOoKYsE4r3bzqvs1OwIlDe
-zwFwNa2mLtjcDEcI1zpdMaL4lY/Kgk+9Ad5nLyT/EjN1MFw1CFn6gucXOQAAAAAAAA==
---------------ms060304030105080606030309--
+iEYEARECAAYFAlYfisgACgkQyU9JOBhPkDST8wCff//tYumpGp2R2wKPo4+dLN9W
+bVoAnjJzAh7cx70tMRRFIBt+VLxG1SVE
+=pwze
+-----END PGP SIGNATURE-----
+
+--FCuugMFkClbJLl1L--
