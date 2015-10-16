@@ -1,118 +1,216 @@
-From: Tom Talpey <ttalpey@microsoft.com>
-Subject: RE: Channel Sequence handling - was RE: [PATCH] [SMB3] Send durable
- handle v2 contexts when use of persistent handles required
-Date: Thu, 15 Oct 2015 13:25:06 +0000
-Message-ID: <BN3PR03MB15109A4408412CE39C8540CFA03E0@BN3PR03MB1510.namprd03.prod.outlook.com>
-References: <BN3PR03MB15107EF8D31A9F3B463FD753A0480@BN3PR03MB1510.namprd03.prod.outlook.com>
- <CAH2r5msW2+Mbui=jR3r2TaFspEUJFvLZYSQ5AXwGZ7qK2N5fkA@mail.gmail.com>
- <20151015111520.GA5143@samba.org>
+From: Andreas Gruenbacher <agruenba@redhat.com>
+Subject: [PATCH v11 00/48] Richacls
+Date: Fri, 16 Oct 2015 17:17:38 +0200
+Message-ID: <1445008706-15115-1-git-send-email-agruenba@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Cc: linux-cifs <linux-cifs@vger.kernel.org>,
- samba-technical <samba-technical@lists.samba.org>
-To: Michael Adam <obnox@samba.org>, Steve French <smfrench@gmail.com>
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <20151015111520.GA5143@samba.org>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
- <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical/>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
- <mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Errors-To: samba-technical-bounces@lists.samba.org
-Sender: "samba-technical" <samba-technical-bounces@lists.samba.org>
+Content-Transfer-Encoding: 7bit
+To: Alexander Viro <viro@zeniv.linux.org.uk>, "Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	"J. Bruce Fields" <bfields@fieldses.org>,
+	Jeff Layton <jlayton@poochiereds.net>,
+	Trond Myklebust <trond.myklebust@primarydata.com>,
+	Anna Schumaker <anna.schumaker@netapp.com>,
+	Dave Chinner <david@fromorbit.com>, linux-ext4@vger.kernel.org,
+	xfs@oss.sgi.com, linux-kernel@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-api@vger.kernel.org
+Return-path: <xfs-bounces@oss.sgi.com>
+List-Unsubscribe: <http://oss.sgi.com/mailman/options/xfs>,
+	<mailto:xfs-request@oss.sgi.com?subject=unsubscribe>
+List-Archive: <http://oss.sgi.com/pipermail/xfs>
+List-Post: <mailto:xfs@oss.sgi.com>
+List-Help: <mailto:xfs-request@oss.sgi.com?subject=help>
+List-Subscribe: <http://oss.sgi.com/mailman/listinfo/xfs>,
+	<mailto:xfs-request@oss.sgi.com?subject=subscribe>
+Errors-To: xfs-bounces@oss.sgi.com
+Sender: xfs-bounces@oss.sgi.com
 List-Id: linux-cifs.vger.kernel.org
 
-> -----Original Message-----
-> From: Michael Adam [mailto:obnox@samba.org]
-> Sent: Thursday, October 15, 2015 7:15 AM
-> To: Steve French <smfrench@gmail.com>
-> Cc: Tom Talpey <ttalpey@microsoft.com>; linux-cifs <linux-
-> cifs@vger.kernel.org>; samba-technical <samba-technical@lists.samba.org>
-> Subject: Re: Channel Sequence handling - was RE: [PATCH] [SMB3] Send
-> durable handle v2 contexts when use of persistent handles required
->=20
-> On 2015-10-05 at 14:50 -0500, Steve French wrote:
-> > On Mon, Oct 5, 2015 at 9:44 AM, Tom Talpey <ttalpey@microsoft.com>
-> wrote:
-> > >> -----Original Message-----
-> > >> From: linux-cifs-owner@vger.kernel.org [mailto:linux-cifs-
-> > >> owner@vger.kernel.org] On Behalf Of Steve French
-> > >> Sent: Saturday, October 3, 2015 10:03 PM
-> > >> ...
-> > >> I don't know if channel sequence number in the SMB3 request would
-> also
-> > >> need to be incremented on disconnect though (the documentation is
-> > >> confusing on that in MS-SMB2) in the case where we only have one
-> > >> channel.
-> > >
-> > > There's nothing special about replay on one channel, after any discon=
-nect
-> you should increment the channel sequence so the server's replay detectio=
-n
-> can work properly.
-> > >
-> > > Can you point me to the MS-SMB2 text that you find confusing? We can
-> address it.
-> >
-> >
-> > (the doc text in 3.2.4.1 and 3.2.7.1 of MS-SMB2 seems to
-> > conflict)
-> >
-> > On disconnect "If Connection.Dialect belongs to the SMB 3.x dialect
-> > family, and if the Session has more than one channel in
-> > Session.ChannelList, the client MUST perform the following actions:
-> >
-> > "Session.ChannelSequence MUST be incremented by 1."
-> >
-> > but 3.2.4.1 indicates that it is not just for multichannel but also
-> > for PersistentHandle that it must be incremented (see below)
-> >
-> > "If Connection.Dialect belongs to the SMB 3.x dialect family and if
-> > Connection.SupportsMultiChannel or
-> > Connection.SupportsPersistentHandles is TRUE, the
-> > client MUST set ChannelSequence in the SMB2 header to
-> Session.ChannelSequence."
->=20
-> I don't see a contradiction / conflict here:
->=20
-> - 3.2.7.1 tells when to bump the seqnum.
-> - 3.2.4.1 tells when to send it to the server
->   (this makes no statement about the value)
+Here is another update of the richacl patch queue.  I would like to ask for
+feedback so that the core and local filesystem code (patches 1-24) can be
+merged in the 4.4 merge window.
 
-Correct. These are two distinct requirements.
+Changes since the last posting (http://lwn.net/Articles/660392/):
 
-> So the document seems to indicate this:
->=20
-> Bumping the channel sequence number is only done
-> by the Windows client upon connection loss on a
-> multi-channel session (i.e. a real one, with
-> more than one channel) and not for a single channel
-> session (also not on a formerly multi-channel
-> session, when the last channel goes down).
+ * The kernel nfs client can now distinguish between users and
+   groups which have no ID mapping and the nobody user/group.
+   This requires an extension to the nfsidmap user-space helper
+   from the nfs-utils package [2].  When the kernel detects
+   that nfsidmap doesn't support the new mapping, it falls
+   back to the old one.
 
-The document indicates this, but the text is incomplete. Channel sequence m=
-anagement is not limited to this case. We're looking into this (section 3.2=
-.7.1) and I hope to clarify it soon. There are some improvements in flight.
+ * Minor bugs with unmapped user and group names in nfs and nfsd
+   have been fixed.  Some functions have been split to be easier
+   to understand.
 
->=20
-> A new smbtorture test case that I am currently reviewing
-> indicates that the windows server is OK with this
-> client behaviour (i.e. not bumping when the last
-> channel of a session goes down).
+ * The ext4 and xfs filesystem code has been simplified based on
+   feedback from Dave Chinner.  On xfs, richacls can no longer
+   be compiled out (but they will only be effective on file
+   systems with the richacl feature set).
 
-Not sure what you mean by "server is OK with this". The server uses the cha=
-nnel sequence number to detect whether the client experienced a disconnect.=
- Remember, the connection can break on one side before the other. If the se=
-quence doesn't change, there is no end-to-end detection, so it becomes a pr=
-obabilistic issue whether the orphaned operations replay properly. With pro=
-per channel sequence management, this behavior is guaranteed.
 
-Bottom line, bump the channel sequence on any disconnect when the server in=
-dicated it inspects the field, i.e. has set SMB2_GLOBAL_CAP_MULTI_CHANNEL a=
-nd/or SMB2_GLOBAL_CAP_PERSISTENT_HANDLES at negotiate time.
+The complete patch queue is available in git form at [1].  The richacl
+user-space utilitites and test suite are available at [3].  Please see the
+richacl homepage [4] for more information.
 
-Tom.
+[1] git://git.kernel.org/pub/scm/linux/kernel/git/agruen/linux-richacl.git \
+	richacl-2015-10-16
+[2] https://github.com/andreas-gruenbacher/nfs-utils
+[3] https://github.com/andreas-gruenbacher/richacl/
+[4] http://www.bestbits.at/richacl/
+
+
+Thanks,
+Andreas
+
+
+Andreas Gruenbacher (46):
+  vfs: Add IS_ACL() and IS_RICHACL() tests
+  vfs: Add MAY_CREATE_FILE and MAY_CREATE_DIR permission flags
+  vfs: Add MAY_DELETE_SELF and MAY_DELETE_CHILD permission flags
+  vfs: Make the inode passed to inode_change_ok non-const
+  vfs: Add permission flags for setting file attributes
+  richacl: In-memory representation and helper functions
+  richacl: Permission mapping functions
+  richacl: Compute maximum file masks from an acl
+  richacl: Permission check algorithm
+  vfs: Cache base_acl objects in inodes
+  vfs: Add get_richacl and set_richacl inode operations
+  vfs: Cache richacl in struct inode
+  richacl: Update the file masks in chmod()
+  richacl: Check if an acl is equivalent to a file mode
+  richacl: Create-time inheritance
+  richacl: Automatic Inheritance
+  richacl: xattr mapping functions
+  richacl: Add richacl xattr handler
+  vfs: Add richacl permission checking
+  xfs: Fix error path in xfs_get_acl
+  xfs: Make xfs_set_mode non-static
+  xfs: Add richacl support
+  richacl: acl editing helper functions
+  richacl: Move everyone@ aces down the acl
+  richacl: Propagate everyone@ permissions to other aces
+  richacl: Set the owner permissions to the owner mask
+  richacl: Set the other permissions to the other mask
+  richacl: Isolate the owner and group classes
+  richacl: Apply the file masks to a richacl
+  richacl: Create richacl from mode values
+  nfsd: Keep list of acls to dispose of in compoundargs
+  nfsd: Use richacls as internal acl representation
+  nfsd: Add richacl support
+  nfsd: Add support for the v4.1 dacl attribute
+  nfsd: Add support for the MAY_CREATE_{FILE,DIR} permissions
+  richacl: Add support for unmapped identifiers
+  nfsd: Add support for unmapped richace identifiers
+  ext4: Don't allow unmapped identifiers in richacls
+  xfs: Don't allow unmapped identifiers in richacls
+  sunrpc: Allow to demand-allocate pages to encode into
+  sunrpc: Add xdr_init_encode_pages
+  nfs: Fix GETATTR bitmap verification
+  nfs: Remove unused xdr page offsets in getacl/setacl arguments
+  nfs: Distinguish missing users and groups from nobody
+  nfs: Add richacl support
+  nfs: Add support for the v4.1 dacl attribute
+
+Aneesh Kumar K.V (2):
+  ext4: Add richacl support
+  ext4: Add richacl feature flag
+
+ drivers/staging/lustre/lustre/llite/llite_lib.c |   2 +-
+ fs/Kconfig                                      |   9 +
+ fs/Makefile                                     |   3 +
+ fs/attr.c                                       |  81 ++-
+ fs/ext4/Kconfig                                 |  11 +
+ fs/ext4/Makefile                                |   1 +
+ fs/ext4/ext4.h                                  |   6 +-
+ fs/ext4/file.c                                  |   3 +
+ fs/ext4/ialloc.c                                |  11 +-
+ fs/ext4/inode.c                                 |  12 +-
+ fs/ext4/namei.c                                 |   5 +
+ fs/ext4/richacl.c                               | 145 ++++
+ fs/ext4/richacl.h                               |  40 ++
+ fs/ext4/super.c                                 |  42 +-
+ fs/ext4/xattr.c                                 |   7 +
+ fs/f2fs/acl.c                                   |   4 +-
+ fs/inode.c                                      |  15 +-
+ fs/jffs2/acl.c                                  |   6 +-
+ fs/namei.c                                      | 111 ++-
+ fs/nfs/inode.c                                  |   3 -
+ fs/nfs/nfs4idmap.c                              |  57 +-
+ fs/nfs/nfs4proc.c                               | 734 ++++++++++++++-----
+ fs/nfs/nfs4xdr.c                                | 261 ++++++-
+ fs/nfs/super.c                                  |   4 +-
+ fs/nfs_common/Makefile                          |   1 +
+ fs/nfs_common/nfs4acl.c                         |  44 ++
+ fs/nfsd/Kconfig                                 |   1 +
+ fs/nfsd/acl.h                                   |  23 +-
+ fs/nfsd/nfs4acl.c                               | 487 +++++++------
+ fs/nfsd/nfs4proc.c                              |  25 +-
+ fs/nfsd/nfs4xdr.c                               | 268 ++++---
+ fs/nfsd/nfsd.h                                  |   6 +-
+ fs/nfsd/nfsfh.c                                 |   8 +-
+ fs/nfsd/vfs.c                                   |  28 +-
+ fs/nfsd/vfs.h                                   |  17 +-
+ fs/nfsd/xdr4.h                                  |  12 +-
+ fs/posix_acl.c                                  |  26 +-
+ fs/richacl_base.c                               | 685 ++++++++++++++++++
+ fs/richacl_compat.c                             | 915 ++++++++++++++++++++++++
+ fs/richacl_inode.c                              | 333 +++++++++
+ fs/richacl_xattr.c                              | 345 +++++++++
+ fs/xattr.c                                      |  34 +-
+ fs/xfs/Kconfig                                  |   1 +
+ fs/xfs/Makefile                                 |   1 +
+ fs/xfs/libxfs/xfs_format.h                      |  11 +-
+ fs/xfs/xfs_acl.c                                |  19 +-
+ fs/xfs/xfs_acl.h                                |   1 -
+ fs/xfs/xfs_inode.c                              |  24 +
+ fs/xfs/xfs_inode.h                              |   2 +
+ fs/xfs/xfs_iops.c                               |  44 +-
+ fs/xfs/xfs_richacl.c                            | 106 +++
+ fs/xfs/xfs_richacl.h                            |  23 +
+ fs/xfs/xfs_super.c                              |   6 +-
+ fs/xfs/xfs_super.h                              |   4 +
+ fs/xfs/xfs_xattr.c                              |   2 +
+ include/linux/fs.h                              |  51 +-
+ include/linux/nfs4.h                            |  24 +-
+ include/linux/nfs4acl.h                         |   7 +
+ include/linux/nfs_fs.h                          |   1 -
+ include/linux/nfs_fs_sb.h                       |   3 +
+ include/linux/nfs_xdr.h                         |  13 +-
+ include/linux/posix_acl.h                       |  12 +-
+ include/linux/richacl.h                         | 276 +++++++
+ include/linux/richacl_compat.h                  |  40 ++
+ include/linux/richacl_xattr.h                   |  44 ++
+ include/linux/sunrpc/xdr.h                      |   2 +
+ include/uapi/linux/Kbuild                       |   2 +
+ include/uapi/linux/fs.h                         |   3 +-
+ include/uapi/linux/nfs4.h                       |   3 +-
+ include/uapi/linux/richacl.h                    | 111 +++
+ include/uapi/linux/richacl_xattr.h              |  44 ++
+ include/uapi/linux/xattr.h                      |   2 +
+ net/sunrpc/xdr.c                                |  34 +
+ 73 files changed, 4985 insertions(+), 762 deletions(-)
+ create mode 100644 fs/ext4/richacl.c
+ create mode 100644 fs/ext4/richacl.h
+ create mode 100644 fs/nfs_common/nfs4acl.c
+ create mode 100644 fs/richacl_base.c
+ create mode 100644 fs/richacl_compat.c
+ create mode 100644 fs/richacl_inode.c
+ create mode 100644 fs/richacl_xattr.c
+ create mode 100644 fs/xfs/xfs_richacl.c
+ create mode 100644 fs/xfs/xfs_richacl.h
+ create mode 100644 include/linux/nfs4acl.h
+ create mode 100644 include/linux/richacl.h
+ create mode 100644 include/linux/richacl_compat.h
+ create mode 100644 include/linux/richacl_xattr.h
+ create mode 100644 include/uapi/linux/richacl.h
+ create mode 100644 include/uapi/linux/richacl_xattr.h
+
+-- 
+2.5.0
+
+_______________________________________________
+xfs mailing list
+xfs@oss.sgi.com
+http://oss.sgi.com/mailman/listinfo/xfs
