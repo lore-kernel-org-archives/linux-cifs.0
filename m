@@ -1,185 +1,251 @@
-From: Austin S Hemmelgarn <ahferroin7-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v11 21/48] ext4: Add richacl feature flag
-Date: Mon, 19 Oct 2015 12:19:56 -0400
-Message-ID: <5625182C.3050007@gmail.com>
-References: <1445008706-15115-1-git-send-email-agruenba@redhat.com>
- <1445008706-15115-22-git-send-email-agruenba@redhat.com>
- <5621346E.5000500@gmail.com>
- <CAHc6FU7sR2zN-K3un74wCv+1NPnrqJ=LYiWo+YQ_2X0kopyoTQ@mail.gmail.com>
- <5624ED40.7040206@gmail.com>
- <CAHc6FU4CVQAn6TCQzC8r9m9URmqD_eHQBwhDK2o_o4eb3myW=A@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 2/2] cifs: Drop cached dentry if its metadata changed
+Date: Mon, 19 Oct 2015 11:21:25 -0500
+Message-ID: <CAH2r5mvsfV07CGQj61hExObi9CJWvZEpQvuC5UjxHax80LNS7g@mail.gmail.com>
+References: <1445260986-1886-1-git-send-email-ross.lagerwall@citrix.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-512; boundary="------------ms070003050802000306030105"
-Cc: Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
-	Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>,
-	Andreas Dilger <adilger.kernel-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>,
-	"J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
-	Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>,
-	Trond Myklebust <trond.myklebust-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
-	Anna Schumaker <anna.schumaker-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
-	Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>,
-	linux-ext4 <linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Linux NFS Mailing List <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Linux API <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"Aneesh Kumar K.V" <aneesh.kumar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>
-To: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAHc6FU4CVQAn6TCQzC8r9m9URmqD_eHQBwhDK2o_o4eb3myW=A@mail.gmail.com>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: Ross Lagerwall <ross.lagerwall-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1445260986-1886-1-git-send-email-ross.lagerwall-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-This is a cryptographically signed message in MIME format.
+Could you verify this over SMB2 (vers=3.0) as well?  It looks like it
+should fail because cifs_all_info_to_fattr doesn't see the inode
+attribute change and fill in the new inode number  (IndexNuber).  I am
+suspicious that your patch is overkill (sends an extra request on
+revalidate, doubling the traffic) in the SMB2/SMB3 case since we are
+already doing a query file with FILE_ALL_INFO requested which already
+returned IndexNumber (so should have already gotten the inode number)
+- probably more important to use the IndexNumber we got back rather
+than request it twice.
 
---------------ms070003050802000306030105
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-
-On 2015-10-19 11:34, Andreas Gruenbacher wrote:
-> On Mon, Oct 19, 2015 at 3:16 PM, Austin S Hemmelgarn
-> <ahferroin7-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> On 2015-10-16 13:41, Andreas Gruenbacher wrote:
->>>
->>> On Fri, Oct 16, 2015 at 7:31 PM, Austin S Hemmelgarn
->>> <ahferroin7-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->>>>
->>>> I would like to re-iterate, on both XFS and ext4, I _really_ think t=
-his
->>>> should be a ro_compat flag, and not an incompat one.  If a person ha=
-s the
->>>> ability to mount the FS (even if it's a read-only mount), then they =
-by
->>>> definition have read access to the file or partition that the filesy=
-stem
->>>> is contained in, which means that any ACL's stored on the filesystem=
- are
->>>> functionally irrelevant,
->>>
->>> It is unfortunately not safe to make such a file system accessible to=
-
->>> other users, so the feature is not strictly read-only compatible.
->>>
->> OK, seeing as I wasn't particularly clear as to why I object to this i=
-n my
->> other e-mail, let's try this again.
->>
->> Can you please explain exactly why it isn't safe to make such a filesy=
-stem
->> accessible to other users?
+On Mon, Oct 19, 2015 at 8:23 AM, Ross Lagerwall
+<ross.lagerwall-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org> wrote:
+> If a dentry's inode changes, drop the cached dentry to force a full
+> lookup. This fixes a problem similar to that fixed by
+> commit 9e6d722f3d91 ("cifs: make new inode cache when file type is
+> different") where, after a file is renamed on the server, the client
+> ends up with two dentries (for different files) pointing to the same
+> inode.
 >
-> See here: http://www.spinics.net/lists/linux-ext4/msg49541.html
-OK, so to clarify, this isn't 'safe' because:
-1. The richacls that exist on the filesystem won't be enforced.
-2. Newly created files will have no ACL's set.
+> Signed-off-by: Ross Lagerwall <ross.lagerwall-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/cifsfs.h    |  2 +-
+>  fs/cifs/cifsproto.h |  3 ++-
+>  fs/cifs/dir.c       |  9 +++++----
+>  fs/cifs/file.c      |  4 ++--
+>  fs/cifs/inode.c     | 36 +++++++++++++++++++++++++++---------
+>  fs/cifs/link.c      |  2 +-
+>  6 files changed, 38 insertions(+), 18 deletions(-)
+>
+> diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
+> index c3cc160..2c28e43 100644
+> --- a/fs/cifs/cifsfs.h
+> +++ b/fs/cifs/cifsfs.h
+> @@ -71,7 +71,7 @@ extern int cifs_rmdir(struct inode *, struct dentry *);
+>  extern int cifs_rename2(struct inode *, struct dentry *, struct inode *,
+>                         struct dentry *, unsigned int);
+>  extern int cifs_revalidate_file_attr(struct file *filp);
+> -extern int cifs_revalidate_dentry_attr(struct dentry *);
+> +extern int cifs_revalidate_dentry_attr(struct dentry *, bool check_inode_no);
+>  extern int cifs_revalidate_file(struct file *filp);
+>  extern int cifs_revalidate_dentry(struct dentry *);
+>  extern int cifs_invalidate_mapping(struct inode *inode);
+> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> index c63fd1d..9410656 100644
+> --- a/fs/cifs/cifsproto.h
+> +++ b/fs/cifs/cifsproto.h
+> @@ -158,7 +158,8 @@ extern struct inode *cifs_iget(struct super_block *sb,
+>
+>  extern int cifs_get_inode_info(struct inode **inode, const char *full_path,
+>                                FILE_ALL_INFO *data, struct super_block *sb,
+> -                              int xid, const struct cifs_fid *fid);
+> +                              int xid, const struct cifs_fid *fid,
+> +                              bool check_inode_no);
+>  extern int cifs_get_inode_info_unix(struct inode **pinode,
+>                         const unsigned char *search_path,
+>                         struct super_block *sb, unsigned int xid);
+> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+> index c3eb998..d326f04 100644
+> --- a/fs/cifs/dir.c
+> +++ b/fs/cifs/dir.c
+> @@ -378,7 +378,7 @@ cifs_create_get_file_info:
+>                                               xid);
+>         else {
+>                 rc = cifs_get_inode_info(&newinode, full_path, buf, inode->i_sb,
+> -                                        xid, fid);
+> +                                        xid, fid, false);
+>                 if (newinode) {
+>                         if (server->ops->set_lease_key)
+>                                 server->ops->set_lease_key(newinode, fid);
+> @@ -757,7 +757,7 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
+>                                               parent_dir_inode->i_sb, xid);
+>         } else {
+>                 rc = cifs_get_inode_info(&newInode, full_path, NULL,
+> -                               parent_dir_inode->i_sb, xid, NULL);
+> +                               parent_dir_inode->i_sb, xid, NULL, false);
+>         }
+>
+>         if ((rc == 0) && (newInode != NULL)) {
+> @@ -792,9 +792,10 @@ cifs_d_revalidate(struct dentry *direntry, unsigned int flags)
+>                 return -ECHILD;
+>
+>         if (d_really_is_positive(direntry)) {
+> -               if (cifs_revalidate_dentry(direntry))
+> +               if (cifs_revalidate_dentry(direntry)) {
+> +                       d_drop(direntry);
+>                         return 0;
+> -               else {
+> +               } else {
+>                         /*
+>                          * If the inode wasn't known to be a dfs entry when
+>                          * the dentry was instantiated, such as when created
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index 62203c3..cfa3772 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -243,7 +243,7 @@ cifs_nt_open(char *full_path, struct inode *inode, struct cifs_sb_info *cifs_sb,
+>                                               xid);
+>         else
+>                 rc = cifs_get_inode_info(&inode, full_path, buf, inode->i_sb,
+> -                                        xid, fid);
+> +                                        xid, fid, false);
+>
+>  out:
+>         kfree(buf);
+> @@ -723,7 +723,7 @@ reopen_success:
+>                                                       inode->i_sb, xid);
+>                 else
+>                         rc = cifs_get_inode_info(&inode, full_path, NULL,
+> -                                                inode->i_sb, xid, NULL);
+> +                                                inode->i_sb, xid, NULL, false);
+>         }
+>         /*
+>          * Else we are writing out data to server already and could deadlock if
+> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+> index 6b66dd5..dc7c9c2 100644
+> --- a/fs/cifs/inode.c
+> +++ b/fs/cifs/inode.c
+> @@ -704,7 +704,7 @@ cgfi_exit:
+>  int
+>  cifs_get_inode_info(struct inode **inode, const char *full_path,
+>                     FILE_ALL_INFO *data, struct super_block *sb, int xid,
+> -                   const struct cifs_fid *fid)
+> +                   const struct cifs_fid *fid, bool check_inode_no)
+>  {
+>         bool validinum = false;
+>         __u16 srchflgs;
+> @@ -814,8 +814,26 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+>                         }
+>                 } else
+>                         fattr.cf_uniqueid = iunique(sb, ROOT_I);
+> -       } else
+> -               fattr.cf_uniqueid = CIFS_I(*inode)->uniqueid;
+> +       } else {
+> +               if (check_inode_no &&
+> +                   (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) &&
+> +                   server->ops->get_srv_inum) {
+> +                       tmprc = server->ops->get_srv_inum(xid,
+> +                               tcon, cifs_sb, full_path,
+> +                               &fattr.cf_uniqueid, data);
+> +                       if (tmprc) {
+> +                               cifs_dbg(FYI, "GetSrvInodeNum rc %d\n",
+> +                                        tmprc);
+> +                               fattr.cf_uniqueid = iunique(sb, ROOT_I);
+> +                               cifs_autodisable_serverino(cifs_sb);
+> +                       } else if (CIFS_I(*inode)->uniqueid !=
+> +                                       fattr.cf_uniqueid) {
+> +                               rc = -ESTALE;
+> +                               goto cgii_exit;
+> +                       }
+> +               } else
+> +                       fattr.cf_uniqueid = CIFS_I(*inode)->uniqueid;
+> +       }
+>
+>         /* query for SFU type info if supported and needed */
+>         if (fattr.cf_cifsattrs & ATTR_SYSTEM &&
+> @@ -993,7 +1011,7 @@ struct inode *cifs_root_iget(struct super_block *sb)
+>                 tcon->unix_ext = false;
+>         }
+>
+> -       rc = cifs_get_inode_info(&inode, "", NULL, sb, xid, NULL);
+> +       rc = cifs_get_inode_info(&inode, "", NULL, sb, xid, NULL, false);
+>
+>  iget_no_retry:
+>         if (!inode) {
+> @@ -1349,7 +1367,7 @@ cifs_mkdir_qinfo(struct inode *parent, struct dentry *dentry, umode_t mode,
+>                                               xid);
+>         else
+>                 rc = cifs_get_inode_info(&inode, full_path, NULL, parent->i_sb,
+> -                                        xid, NULL);
+> +                                        xid, NULL, false);
+>
+>         if (rc)
+>                 return rc;
+> @@ -1887,7 +1905,7 @@ int cifs_revalidate_file_attr(struct file *filp)
+>         return rc;
+>  }
+>
+> -int cifs_revalidate_dentry_attr(struct dentry *dentry)
+> +int cifs_revalidate_dentry_attr(struct dentry *dentry, bool check_inode_no)
+>  {
+>         unsigned int xid;
+>         int rc = 0;
+> @@ -1919,7 +1937,7 @@ int cifs_revalidate_dentry_attr(struct dentry *dentry)
+>                 rc = cifs_get_inode_info_unix(&inode, full_path, sb, xid);
+>         else
+>                 rc = cifs_get_inode_info(&inode, full_path, NULL, sb,
+> -                                        xid, NULL);
+> +                                        xid, NULL, check_inode_no);
+>
+>  out:
+>         kfree(full_path);
+> @@ -1945,7 +1963,7 @@ int cifs_revalidate_dentry(struct dentry *dentry)
+>         int rc;
+>         struct inode *inode = d_inode(dentry);
+>
+> -       rc = cifs_revalidate_dentry_attr(dentry);
+> +       rc = cifs_revalidate_dentry_attr(dentry, true);
+>         if (rc)
+>                 return rc;
+>
+> @@ -1973,7 +1991,7 @@ int cifs_getattr(struct vfsmount *mnt, struct dentry *dentry,
+>                 }
+>         }
+>
+> -       rc = cifs_revalidate_dentry_attr(dentry);
+> +       rc = cifs_revalidate_dentry_attr(dentry, false);
+>         if (rc)
+>                 return rc;
+>
+> diff --git a/fs/cifs/link.c b/fs/cifs/link.c
+> index e3548f7..e915ba7 100644
+> --- a/fs/cifs/link.c
+> +++ b/fs/cifs/link.c
+> @@ -727,7 +727,7 @@ cifs_symlink(struct inode *inode, struct dentry *direntry, const char *symname)
+>                                                       inode->i_sb, xid);
+>                 else
+>                         rc = cifs_get_inode_info(&newinode, full_path, NULL,
+> -                                                inode->i_sb, xid, NULL);
+> +                                                inode->i_sb, xid, NULL, false);
+>
+>                 if (rc != 0) {
+>                         cifs_dbg(FYI, "Create symlink ok, getinodeinfo fail rc = %d\n",
+> --
+> 2.4.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-It is worth noting that these are also issues with any kind of access=20
-control mechanism.  Using your logic, all LSM's need to set separate=20
-incompat feature flags in filesystems they are being used on, as should=20
-POSIX ACLs, and for that matter so should Samba in many circumstances,=20
-and any NFS system not using idmapping or synchronized/centralized user=20
-databases.  Now, if the SELinux (or SMACK, or TOMOYO) people had taken=20
-this approach, then I might be inclined to not complain (at least not to =
-
-you, I'd be complaining to them about this rather poor design choice),=20
-but that is not the case, because (I assume) they realized that all this =
-
-provides is a false sense of security.
-
-Issue 1, as I have said before, is functionally irrelevant for anyone=20
-who actually knows what they are doing; all you need for ext* is one of=20
-the myriad of programs for un-deleting files on such a filesystem (such=20
-as ext4magic or extundelete, and good luck convincing them to not allow=20
-being used when this flag is set), for BTRFS you just need the regular=20
-filesystem administration utilities ('btrfs restore' works wonders, and=20
-that one will _never_ honor any kind of permissions, because it's for=20
-disaster recovery), and while I don't know of any way to do this with=20
-XFS, that is only because I don't use XFS myself and have not had the=20
-need to provide tech support for anyone who does.  If somebody=20
-absolutely _needs_ a guarantee that the acls will be enforced, they need =
-
-to be using whole disk encryption, not just acls, and even that can't=20
-provide such a guarantee.
-
-As for issue 2, that can be solved by making it a read-only compatible=20
-flag, which is what I was suggesting be done in the first place.  The=20
-only situation I can think of that this would cause an issue for is if=20
-the filesystem was not cleanly unmounted, and the log-replay doesn't set =
-
-the ACL's, but mounting an uncleanly unmounted filesystem that has=20
-richacls on a kernel without support should fall into one of the=20
-following 2 cases more than 99% of the time:
-1. The system crashed hard, and the regular kernel is un-bootable for=20
-some reason, in this case you're at the point of disaster recovery,=20
-should not be exposing _anything_ to a multi-user environment, and=20
-probably care a lot more about being able to get the system running=20
-again than about not accidentally creating a file with a missing ACL.
-2. The filesystem was maliciously stolen in some way (either the=20
-hardware was acquired, or more likely, someone got an image of a still=20
-mounted filesystem), in which case all of my statements above regarding=20
-issue 1 apply.
 
 
---------------ms070003050802000306030105
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+-- 
+Thanks,
 
-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
-cnQub3JnMSIwIAYDVQQDExlDQSBDZXJ0IFNpZ25pbmcgQXV0aG9yaXR5MSEwHwYJKoZIhvcN
-AQkBFhJzdXBwb3J0QGNhY2VydC5vcmcCAxEt+DANBglghkgBZQMEAgMFAKCCAiEwGAYJKoZI
-hvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTUxMDE5MTYxOTU2WjBPBgkq
-hkiG9w0BCQQxQgRAfC+gD4JHtSqkBVo4Uo2fM9IhhiB/VP79yU7hftrGucAlQ8sWak5Fc75t
-foKee/4RQUokGo2Rhum3jYMn9QUxuDBsBgkqhkiG9w0BCQ8xXzBdMAsGCWCGSAFlAwQBKjAL
-BglghkgBZQMEAQIwCgYIKoZIhvcNAwcwDgYIKoZIhvcNAwICAgCAMA0GCCqGSIb3DQMCAgFA
-MAcGBSsOAwIHMA0GCCqGSIb3DQMCAgEoMIGRBgkrBgEEAYI3EAQxgYMwgYAweTEQMA4GA1UE
-ChMHUm9vdCBDQTEeMBwGA1UECxMVaHR0cDovL3d3dy5jYWNlcnQub3JnMSIwIAYDVQQDExlD
-QSBDZXJ0IFNpZ25pbmcgQXV0aG9yaXR5MSEwHwYJKoZIhvcNAQkBFhJzdXBwb3J0QGNhY2Vy
-dC5vcmcCAxEt+DCBkwYLKoZIhvcNAQkQAgsxgYOggYAweTEQMA4GA1UEChMHUm9vdCBDQTEe
-MBwGA1UECxMVaHR0cDovL3d3dy5jYWNlcnQub3JnMSIwIAYDVQQDExlDQSBDZXJ0IFNpZ25p
-bmcgQXV0aG9yaXR5MSEwHwYJKoZIhvcNAQkBFhJzdXBwb3J0QGNhY2VydC5vcmcCAxEt+DAN
-BgkqhkiG9w0BAQEFAASCAgBR0bu7sMjL43EBbSzC72JYWjlFdYJJ61yr/YlC9Ot5dASTKiPd
-YSFBqhutOQHvWZ17Q84t9cig/XxSX4KX9VSckl6MRU9Fo/y7A0q7xbfSl90N3jcUhhE/flRX
-29BIoQbRuDigPgTJaQoIhW3hfoA5ZscfUCDHlBGXmnAZ+kWwqGWzMZL3IOPl1ZUKqfY6NfYQ
-YSjJ65aizDJjIqpgnRQIUNXVJ14hg/GBEM/6n2H3sFEDGtVM+fw2ehICKT99LyYueB/fB+iG
-vYWeSOzc18HwIAUu2c3SVi9mPRWNHtXES8ajqkS4eQsNGPpQfMq8ZbOMPizz2r0chYe74tXc
-VxguvDf2kFUFTFzCDV7PNMS+TlVL8By22g3R7ifrNcBW7SP77FI2UMsm53/BfaMOSDp3VDrG
-12LAuyk4rACHrCp4YUxwfwzfhX8HmfZbbJS4vRXeBIuXT+S8BDAe34rmIEvUb566Ixaxzrh7
-ttWEtfn6a2xPQvkBNNcANgNVRWsTC4Qj/e5UFuhTsVAq+0yfcSglZOuo6g6jyp2iU+PRQNt9
-qO5pxFUDgJvGgSTIGJzQ97DNPo3GlDKZBvzyooDAZAcutyxKpvBeYsjw+63bpGU0Xk70MZrG
-b8qPTEhBxhWlklqYcd+kiuX8SulzlvyDKmSGJSGHJVH0KFTqWV3gcuYx3wAAAAAAAA==
---------------ms070003050802000306030105--
+Steve
