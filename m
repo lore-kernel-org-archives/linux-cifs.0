@@ -1,251 +1,144 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 2/2] cifs: Drop cached dentry if its metadata changed
-Date: Mon, 19 Oct 2015 11:21:25 -0500
-Message-ID: <CAH2r5mvsfV07CGQj61hExObi9CJWvZEpQvuC5UjxHax80LNS7g@mail.gmail.com>
-References: <1445260986-1886-1-git-send-email-ross.lagerwall@citrix.com>
+From: Andreas Gruenbacher <agruenba@redhat.com>
+Subject: Re: [PATCH v11 21/48] ext4: Add richacl feature flag
+Date: Mon, 19 Oct 2015 19:33:19 +0200
+Message-ID: <CAHc6FU75GXGeav1ho-QraPS_F8fpOXnoDyv17+b=koiF=9YE5A@mail.gmail.com>
+References: <1445008706-15115-1-git-send-email-agruenba@redhat.com>
+	<1445008706-15115-22-git-send-email-agruenba@redhat.com>
+	<5621346E.5000500@gmail.com>
+	<CAHc6FU7sR2zN-K3un74wCv+1NPnrqJ=LYiWo+YQ_2X0kopyoTQ@mail.gmail.com>
+	<5624ED40.7040206@gmail.com>
+	<CAHc6FU4CVQAn6TCQzC8r9m9URmqD_eHQBwhDK2o_o4eb3myW=A@mail.gmail.com>
+	<5625182C.3050007@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-To: Ross Lagerwall <ross.lagerwall-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1445260986-1886-1-git-send-email-ross.lagerwall-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	"Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	"J. Bruce Fields" <bfields@fieldses.org>,
+	Jeff Layton <jlayton@poochiereds.net>,
+	Trond Myklebust <trond.myklebust@primarydata.com>,
+	Anna Schumaker <anna.schumaker@netapp.com>,
+	Dave Chinner <david@fromorbit.com>,
+	linux-ext4 <linux-ext4@vger.kernel.org>, xfs@oss.sgi.com,
+	LKML <linux-kernel@vger.kernel.org>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+	linux-cifs@vger.kernel.org, Linux API <linux-api@vger.kernel.org>,
+	"Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
+To: Austin S Hemmelgarn <ahferroin7@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <5625182C.3050007@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Could you verify this over SMB2 (vers=3.0) as well?  It looks like it
-should fail because cifs_all_info_to_fattr doesn't see the inode
-attribute change and fill in the new inode number  (IndexNuber).  I am
-suspicious that your patch is overkill (sends an extra request on
-revalidate, doubling the traffic) in the SMB2/SMB3 case since we are
-already doing a query file with FILE_ALL_INFO requested which already
-returned IndexNumber (so should have already gotten the inode number)
-- probably more important to use the IndexNumber we got back rather
-than request it twice.
+On Mon, Oct 19, 2015 at 6:19 PM, Austin S Hemmelgarn
+<ahferroin7@gmail.com> wrote:
+> On 2015-10-19 11:34, Andreas Gruenbacher wrote:
+>>
+>> On Mon, Oct 19, 2015 at 3:16 PM, Austin S Hemmelgarn
+>> <ahferroin7@gmail.com> wrote:
+>>>
+>>> On 2015-10-16 13:41, Andreas Gruenbacher wrote:
+>>>>
+>>>>
+>>>> On Fri, Oct 16, 2015 at 7:31 PM, Austin S Hemmelgarn
+>>>> <ahferroin7@gmail.com> wrote:
+>>>>>
+>>>>>
+>>>>> I would like to re-iterate, on both XFS and ext4, I _really_ think this
+>>>>> should be a ro_compat flag, and not an incompat one.  If a person has
+>>>>> the
+>>>>> ability to mount the FS (even if it's a read-only mount), then they by
+>>>>> definition have read access to the file or partition that the
+>>>>> filesystem
+>>>>> is contained in, which means that any ACL's stored on the filesystem
+>>>>> are
+>>>>> functionally irrelevant,
+>>>>
+>>>>
+>>>> It is unfortunately not safe to make such a file system accessible to
+>>>> other users, so the feature is not strictly read-only compatible.
+>>>>
+>>> OK, seeing as I wasn't particularly clear as to why I object to this in
+>>> my
+>>> other e-mail, let's try this again.
+>>>
+>>> Can you please explain exactly why it isn't safe to make such a
+>>> filesystem
+>>> accessible to other users?
+>>
+>>
+>> See here: http://www.spinics.net/lists/linux-ext4/msg49541.html
+>
+> OK, so to clarify, this isn't 'safe' because:
+> 1. The richacls that exist on the filesystem won't be enforced.
+> 2. Newly created files will have no ACL's set.
+>
+> It is worth noting that these are also issues with any kind of access
+> control mechanism.  Using your logic, all LSM's need to set separate
+> incompat feature flags in filesystems they are being used on, as should
+> POSIX ACLs, and for that matter so should Samba in many circumstances, and
+> any NFS system not using idmapping or synchronized/centralized user
+> databases.  Now, if the SELinux (or SMACK, or TOMOYO) people had taken this
+> approach, then I might be inclined to not complain (at least not to you, I'd
+> be complaining to them about this rather poor design choice), but that is
+> not the case, because (I assume) they realized that all this provides is a
+> false sense of security.
 
-On Mon, Oct 19, 2015 at 8:23 AM, Ross Lagerwall
-<ross.lagerwall-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org> wrote:
-> If a dentry's inode changes, drop the cached dentry to force a full
-> lookup. This fixes a problem similar to that fixed by
-> commit 9e6d722f3d91 ("cifs: make new inode cache when file type is
-> different") where, after a file is renamed on the server, the client
-> ends up with two dentries (for different files) pointing to the same
-> inode.
->
-> Signed-off-by: Ross Lagerwall <ross.lagerwall-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/cifsfs.h    |  2 +-
->  fs/cifs/cifsproto.h |  3 ++-
->  fs/cifs/dir.c       |  9 +++++----
->  fs/cifs/file.c      |  4 ++--
->  fs/cifs/inode.c     | 36 +++++++++++++++++++++++++++---------
->  fs/cifs/link.c      |  2 +-
->  6 files changed, 38 insertions(+), 18 deletions(-)
->
-> diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
-> index c3cc160..2c28e43 100644
-> --- a/fs/cifs/cifsfs.h
-> +++ b/fs/cifs/cifsfs.h
-> @@ -71,7 +71,7 @@ extern int cifs_rmdir(struct inode *, struct dentry *);
->  extern int cifs_rename2(struct inode *, struct dentry *, struct inode *,
->                         struct dentry *, unsigned int);
->  extern int cifs_revalidate_file_attr(struct file *filp);
-> -extern int cifs_revalidate_dentry_attr(struct dentry *);
-> +extern int cifs_revalidate_dentry_attr(struct dentry *, bool check_inode_no);
->  extern int cifs_revalidate_file(struct file *filp);
->  extern int cifs_revalidate_dentry(struct dentry *);
->  extern int cifs_invalidate_mapping(struct inode *inode);
-> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index c63fd1d..9410656 100644
-> --- a/fs/cifs/cifsproto.h
-> +++ b/fs/cifs/cifsproto.h
-> @@ -158,7 +158,8 @@ extern struct inode *cifs_iget(struct super_block *sb,
->
->  extern int cifs_get_inode_info(struct inode **inode, const char *full_path,
->                                FILE_ALL_INFO *data, struct super_block *sb,
-> -                              int xid, const struct cifs_fid *fid);
-> +                              int xid, const struct cifs_fid *fid,
-> +                              bool check_inode_no);
->  extern int cifs_get_inode_info_unix(struct inode **pinode,
->                         const unsigned char *search_path,
->                         struct super_block *sb, unsigned int xid);
-> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-> index c3eb998..d326f04 100644
-> --- a/fs/cifs/dir.c
-> +++ b/fs/cifs/dir.c
-> @@ -378,7 +378,7 @@ cifs_create_get_file_info:
->                                               xid);
->         else {
->                 rc = cifs_get_inode_info(&newinode, full_path, buf, inode->i_sb,
-> -                                        xid, fid);
-> +                                        xid, fid, false);
->                 if (newinode) {
->                         if (server->ops->set_lease_key)
->                                 server->ops->set_lease_key(newinode, fid);
-> @@ -757,7 +757,7 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
->                                               parent_dir_inode->i_sb, xid);
->         } else {
->                 rc = cifs_get_inode_info(&newInode, full_path, NULL,
-> -                               parent_dir_inode->i_sb, xid, NULL);
-> +                               parent_dir_inode->i_sb, xid, NULL, false);
->         }
->
->         if ((rc == 0) && (newInode != NULL)) {
-> @@ -792,9 +792,10 @@ cifs_d_revalidate(struct dentry *direntry, unsigned int flags)
->                 return -ECHILD;
->
->         if (d_really_is_positive(direntry)) {
-> -               if (cifs_revalidate_dentry(direntry))
-> +               if (cifs_revalidate_dentry(direntry)) {
-> +                       d_drop(direntry);
->                         return 0;
-> -               else {
-> +               } else {
->                         /*
->                          * If the inode wasn't known to be a dfs entry when
->                          * the dentry was instantiated, such as when created
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 62203c3..cfa3772 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -243,7 +243,7 @@ cifs_nt_open(char *full_path, struct inode *inode, struct cifs_sb_info *cifs_sb,
->                                               xid);
->         else
->                 rc = cifs_get_inode_info(&inode, full_path, buf, inode->i_sb,
-> -                                        xid, fid);
-> +                                        xid, fid, false);
->
->  out:
->         kfree(buf);
-> @@ -723,7 +723,7 @@ reopen_success:
->                                                       inode->i_sb, xid);
->                 else
->                         rc = cifs_get_inode_info(&inode, full_path, NULL,
-> -                                                inode->i_sb, xid, NULL);
-> +                                                inode->i_sb, xid, NULL, false);
->         }
->         /*
->          * Else we are writing out data to server already and could deadlock if
-> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> index 6b66dd5..dc7c9c2 100644
-> --- a/fs/cifs/inode.c
-> +++ b/fs/cifs/inode.c
-> @@ -704,7 +704,7 @@ cgfi_exit:
->  int
->  cifs_get_inode_info(struct inode **inode, const char *full_path,
->                     FILE_ALL_INFO *data, struct super_block *sb, int xid,
-> -                   const struct cifs_fid *fid)
-> +                   const struct cifs_fid *fid, bool check_inode_no)
->  {
->         bool validinum = false;
->         __u16 srchflgs;
-> @@ -814,8 +814,26 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
->                         }
->                 } else
->                         fattr.cf_uniqueid = iunique(sb, ROOT_I);
-> -       } else
-> -               fattr.cf_uniqueid = CIFS_I(*inode)->uniqueid;
-> +       } else {
-> +               if (check_inode_no &&
-> +                   (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) &&
-> +                   server->ops->get_srv_inum) {
-> +                       tmprc = server->ops->get_srv_inum(xid,
-> +                               tcon, cifs_sb, full_path,
-> +                               &fattr.cf_uniqueid, data);
-> +                       if (tmprc) {
-> +                               cifs_dbg(FYI, "GetSrvInodeNum rc %d\n",
-> +                                        tmprc);
-> +                               fattr.cf_uniqueid = iunique(sb, ROOT_I);
-> +                               cifs_autodisable_serverino(cifs_sb);
-> +                       } else if (CIFS_I(*inode)->uniqueid !=
-> +                                       fattr.cf_uniqueid) {
-> +                               rc = -ESTALE;
-> +                               goto cgii_exit;
-> +                       }
-> +               } else
-> +                       fattr.cf_uniqueid = CIFS_I(*inode)->uniqueid;
-> +       }
->
->         /* query for SFU type info if supported and needed */
->         if (fattr.cf_cifsattrs & ATTR_SYSTEM &&
-> @@ -993,7 +1011,7 @@ struct inode *cifs_root_iget(struct super_block *sb)
->                 tcon->unix_ext = false;
->         }
->
-> -       rc = cifs_get_inode_info(&inode, "", NULL, sb, xid, NULL);
-> +       rc = cifs_get_inode_info(&inode, "", NULL, sb, xid, NULL, false);
->
->  iget_no_retry:
->         if (!inode) {
-> @@ -1349,7 +1367,7 @@ cifs_mkdir_qinfo(struct inode *parent, struct dentry *dentry, umode_t mode,
->                                               xid);
->         else
->                 rc = cifs_get_inode_info(&inode, full_path, NULL, parent->i_sb,
-> -                                        xid, NULL);
-> +                                        xid, NULL, false);
->
->         if (rc)
->                 return rc;
-> @@ -1887,7 +1905,7 @@ int cifs_revalidate_file_attr(struct file *filp)
->         return rc;
->  }
->
-> -int cifs_revalidate_dentry_attr(struct dentry *dentry)
-> +int cifs_revalidate_dentry_attr(struct dentry *dentry, bool check_inode_no)
->  {
->         unsigned int xid;
->         int rc = 0;
-> @@ -1919,7 +1937,7 @@ int cifs_revalidate_dentry_attr(struct dentry *dentry)
->                 rc = cifs_get_inode_info_unix(&inode, full_path, sb, xid);
->         else
->                 rc = cifs_get_inode_info(&inode, full_path, NULL, sb,
-> -                                        xid, NULL);
-> +                                        xid, NULL, check_inode_no);
->
->  out:
->         kfree(full_path);
-> @@ -1945,7 +1963,7 @@ int cifs_revalidate_dentry(struct dentry *dentry)
->         int rc;
->         struct inode *inode = d_inode(dentry);
->
-> -       rc = cifs_revalidate_dentry_attr(dentry);
-> +       rc = cifs_revalidate_dentry_attr(dentry, true);
->         if (rc)
->                 return rc;
->
-> @@ -1973,7 +1991,7 @@ int cifs_getattr(struct vfsmount *mnt, struct dentry *dentry,
->                 }
->         }
->
-> -       rc = cifs_revalidate_dentry_attr(dentry);
-> +       rc = cifs_revalidate_dentry_attr(dentry, false);
->         if (rc)
->                 return rc;
->
-> diff --git a/fs/cifs/link.c b/fs/cifs/link.c
-> index e3548f7..e915ba7 100644
-> --- a/fs/cifs/link.c
-> +++ b/fs/cifs/link.c
-> @@ -727,7 +727,7 @@ cifs_symlink(struct inode *inode, struct dentry *direntry, const char *symname)
->                                                       inode->i_sb, xid);
->                 else
->                         rc = cifs_get_inode_info(&newinode, full_path, NULL,
-> -                                                inode->i_sb, xid, NULL);
-> +                                                inode->i_sb, xid, NULL, false);
->
->                 if (rc != 0) {
->                         cifs_dbg(FYI, "Create symlink ok, getinodeinfo fail rc = %d\n",
-> --
-> 2.4.3
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+LSMs reside above the filesystem level. Let's take SELinux as an
+example. It has its own consistency check mechanism (relabeling). Fsck
+could check the syntax of SELinux labels, but it couldn't do anything
+sensible about corrupted labels, and syntactically correct labels also
+don't mean much. A relabeling run to verify or restory the appropriate
+policy would still be necessary to verify that labels are semantically
+correct, and for that, the filesystem needs to be mounted in the right
+place in the filesystem hierarchy.
 
+TOMOYO and AppArmor are not based on inode labels at all.
 
+LSMs usually also just provide an extra layer of security; when turned
+off, the basic security mechanisms still in effect will make sure that
+the system works just like before. (There are configurations like MLS
+where that is not the case, but those are uncommon.)
 
--- 
-Thanks,
+ACLs are quite different from that. They can be checked statically by
+fsck. They are a basic security concept, and when turned off, there is
+no guarantee that the system will still be safe.
 
-Steve
+> Issue 1, as I have said before, is functionally irrelevant for anyone who
+> actually knows what they are doing; all you need for ext* is one of the
+> myriad of programs for un-deleting files on such a filesystem (such as
+> ext4magic or extundelete, and good luck convincing them to not allow being
+> used when this flag is set), for BTRFS you just need the regular filesystem
+> administration utilities ('btrfs restore' works wonders, and that one will
+> _never_ honor any kind of permissions, because it's for disaster recovery),
+> and while I don't know of any way to do this with XFS, that is only because
+> I don't use XFS myself and have not had the need to provide tech support for
+> anyone who does.  If somebody absolutely _needs_ a guarantee that the acls
+> will be enforced, they need to be using whole disk encryption, not just
+> acls, and even that can't provide such a guarantee.
+>
+> As for issue 2, that can be solved by making it a read-only compatible flag,
+> which is what I was suggesting be done in the first place.  The only
+> situation I can think of that this would cause an issue for is if the
+> filesystem was not cleanly unmounted, and the log-replay doesn't set the
+> ACL's, but mounting an uncleanly unmounted filesystem that has richacls on a
+> kernel without support should fall into one of the following 2 cases more
+> than 99% of the time:
+> 1. The system crashed hard, and the regular kernel is un-bootable for some
+> reason, in this case you're at the point of disaster recovery, should not be
+> exposing _anything_ to a multi-user environment, and probably care a lot
+> more about being able to get the system running again than about not
+> accidentally creating a file with a missing ACL.
+> 2. The filesystem was maliciously stolen in some way (either the hardware
+> was acquired, or more likely, someone got an image of a still mounted
+> filesystem), in which case all of my statements above regarding issue 1
+> apply.
+
+Please spare me with all that nonsense. Compared to mount options,
+filesystem feature flags in this case simplify things (you don't have
+to specify whether a filesystem contains POSIX ACLs or richacls), and
+they prevent administrator errors: when a filesystem mounts, it is
+safe to use; when it doesn't, it is not. That's all there is to it.
+
+Andreas
