@@ -1,74 +1,158 @@
-From: Peng Tao <tao.peng-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
-Subject: [PATCH 0/9] vfs: move btrfs clone ioctls to common code
-Date: Sun, 25 Oct 2015 07:17:07 +0800
-Message-ID: <1445728636-10109-1-git-send-email-tao.peng@primarydata.com>
-Cc: Trond Myklebust <trond.myklebust-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
-	Anna Schumaker <anna.schumaker-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
-	Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-	Zach Brown <zab-ugsP4Wv/S6ZeoWH0uzbU5w@public.gmane.org>,
-	Darren Hart <dvhart-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>,
-	Jeff Layton <jeff.layton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
-	bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org, "Darrick J. Wong" <darrick.wong-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
-	viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-btrfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
-	Peng Tao <tao.peng-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
-To: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Peng Tao <tao.peng@primarydata.com>
+Subject: [PATCH 3/9] nfs42: add .copy_file_range file operation
+Date: Sun, 25 Oct 2015 07:17:10 +0800
+Message-ID: <1445728636-10109-4-git-send-email-tao.peng@primarydata.com>
+References: <1445728636-10109-1-git-send-email-tao.peng@primarydata.com>
+Cc: Trond Myklebust <trond.myklebust@primarydata.com>,
+	Anna Schumaker <anna.schumaker@netapp.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	Zach Brown <zab@zabbo.net>,
+	Darren Hart <dvhart@linux.intel.com>,
+	Jeff Layton <jeff.layton@primarydata.com>,
+	bfields@fieldses.org, "Darrick J. Wong" <darrick.wong@oracle.com>,
+	viro@zeniv.linux.org.uk, linux-nfs@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+	Steve French <steve.french@primarydata.com>,
+	Peng Tao <tao.peng@primarydata.com>
+To: linux-fsdevel@vger.kernel.org
+Return-path: <linux-btrfs-owner@vger.kernel.org>
+In-Reply-To: <1445728636-10109-1-git-send-email-tao.peng@primarydata.com>
+Sender: linux-btrfs-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Hi all,
+Signed-off-by: Peng Tao <tao.peng@primarydata.com>
+---
+ fs/nfs/nfs4file.c | 95 ++++++++++++++++++++++++++++++-------------------------
+ 1 file changed, 52 insertions(+), 43 deletions(-)
 
-This patchset moves BTRFS_IOC_CLONE/BTRFS_IOC_CLONE_RANGE to common vfs
-layer and adds NFS42 CLONE support to knfsd.
-
-It is based on top of Trond's linux-next branch (a85240d254) and Anna's latest
-sys_copy_file_range work (v7).
-
-With this, btrfs/cifs/nfs all handle CLONE/CLONE_RANGE ioctls through the
-.copy_file_range method instead of each implementing them in the private
-ioctl handlers.
-
-Cheers,
-Tao
-
-Anna Schumaker (2):
-  nfsd: Pass filehandle to nfs4_preprocess_stateid_op()
-  NFSD: Implement the CLONE call
-
-Peng Tao (7):
-  vfs: add COPY_FILE_CLONE_ONLY flag
-  cifs: add .copy_file_range file operation
-  nfs42: add .copy_file_range file operation
-  vfs: pull btrfs clone API to vfs layer
-  btrfs: remove btrfs_ioctl_clone(_range)
-  cifs: remove private handler of BTRFS_IOC_CLONE
-  nfs42: remove private clone ioctl handler
-
- fs/btrfs/ioctl.c        |  49 ------------------
- fs/cifs/cifsfs.c        |  22 ++++++++
- fs/cifs/cifsfs.h        |   4 +-
- fs/cifs/ioctl.c         | 103 ++++++++++++++++++++-----------------
- fs/ioctl.c              |  40 +++++++++++++++
- fs/nfs/nfs4file.c       | 133 +++++++++---------------------------------------
- fs/nfsd/nfs4proc.c      |  96 +++++++++++++++++++++++++++++++---
- fs/nfsd/nfs4state.c     |   6 +--
- fs/nfsd/nfs4xdr.c       |  21 ++++++++
- fs/nfsd/state.h         |   5 +-
- fs/nfsd/vfs.c           |  12 +++++
- fs/nfsd/vfs.h           |   1 +
- fs/nfsd/xdr4.h          |  10 ++++
- fs/read_write.c         |   9 ++--
- include/linux/fs.h      |   3 ++
- include/linux/nfs4.h    |   4 +-
- include/uapi/linux/fs.h |   9 ++++
- 17 files changed, 303 insertions(+), 224 deletions(-)
-
+diff --git a/fs/nfs/nfs4file.c b/fs/nfs/nfs4file.c
+index 4aa5719..f1924d8 100644
+--- a/fs/nfs/nfs4file.c
++++ b/fs/nfs/nfs4file.c
+@@ -194,15 +194,60 @@ static long nfs42_fallocate(struct file *filep, int mode, loff_t offset, loff_t
+ 	return nfs42_proc_allocate(filep, offset, len);
+ }
+ 
++static ssize_t nfs42_copy_file_range(struct file *file_in, loff_t pos_in,
++				     struct file *file_out, loff_t pos_out,
++				     size_t len, unsigned int flags)
++{
++	struct inode *src_inode = file_inode(file_in);
++	struct inode *dst_inode = file_inode(file_out);
++	struct nfs_server *server = NFS_SERVER(src_inode);
++	unsigned int bs = server->clone_blksize;
++	int ret;
++
++	/* check alignment w.r.t. clone_blksize */
++	ret = -EINVAL;
++	if (bs) {
++		if (!IS_ALIGNED(pos_in, bs) || !IS_ALIGNED(pos_out, bs) ||
++		    (!IS_ALIGNED(len, bs) &&
++		     i_size_read(src_inode) != (pos_in + len)))
++			goto out;
++	}
++
++	/* XXX: do we lock at all? what if server needs CB_RECALL_LAYOUT? */
++	lock_two_nondirectories(src_inode, dst_inode);
++
++	/* flush all pending writes on both src and dst so that server
++	 * has the latest data
++	 */
++	ret = nfs_sync_inode(src_inode);
++	if (ret)
++		goto out_unlock;
++	ret = nfs_sync_inode(dst_inode);
++	if (ret)
++		goto out_unlock;
++
++	ret = nfs42_proc_clone(file_in, file_out, pos_in, pos_out, len);
++
++	/* truncate inode page cache of the dst range so that future
++	 * reads can fetch new data from server
++	 */
++	if (!ret)
++		truncate_inode_pages_range(&dst_inode->i_data, pos_out,
++					   pos_out + len - 1);
++
++out_unlock:
++	unlock_two_nondirectories(src_inode, dst_inode);
++out:
++	return ret < 0 ? ret : len;
++}
++
+ static noinline long
+ nfs42_ioctl_clone(struct file *dst_file, unsigned long srcfd,
+ 		  u64 src_off, u64 dst_off, u64 count)
+ {
+ 	struct inode *dst_inode = file_inode(dst_file);
+-	struct nfs_server *server = NFS_SERVER(dst_inode);
+ 	struct fd src_file;
+ 	struct inode *src_inode;
+-	unsigned int bs = server->clone_blksize;
+ 	int ret;
+ 
+ 	/* dst file must be opened for writing */
+@@ -240,48 +285,11 @@ nfs42_ioctl_clone(struct file *dst_file, unsigned long srcfd,
+ 	    src_inode->i_sb != dst_inode->i_sb)
+ 		goto out_fput;
+ 
+-	/* check alignment w.r.t. clone_blksize */
+-	ret = -EINVAL;
+-	if (bs) {
+-		if (!IS_ALIGNED(src_off, bs) || !IS_ALIGNED(dst_off, bs))
+-			goto out_fput;
+-		if (!IS_ALIGNED(count, bs) && i_size_read(src_inode) != (src_off + count))
+-			goto out_fput;
+-	}
+-
+-	/* XXX: do we lock at all? what if server needs CB_RECALL_LAYOUT? */
+-	if (dst_inode < src_inode) {
+-		mutex_lock_nested(&dst_inode->i_mutex, I_MUTEX_PARENT);
+-		mutex_lock_nested(&src_inode->i_mutex, I_MUTEX_CHILD);
+-	} else {
+-		mutex_lock_nested(&src_inode->i_mutex, I_MUTEX_PARENT);
+-		mutex_lock_nested(&dst_inode->i_mutex, I_MUTEX_CHILD);
+-	}
+-
+-	/* flush all pending writes on both src and dst so that server
+-	 * has the latest data */
+-	ret = nfs_sync_inode(src_inode);
+-	if (ret)
+-		goto out_unlock;
+-	ret = nfs_sync_inode(dst_inode);
+-	if (ret)
+-		goto out_unlock;
+-
+-	ret = nfs42_proc_clone(src_file.file, dst_file, src_off, dst_off, count);
+-
+-	/* truncate inode page cache of the dst range so that future reads can fetch
+-	 * new data from server */
+-	if (!ret)
+-		truncate_inode_pages_range(&dst_inode->i_data, dst_off, dst_off + count - 1);
++	ret = nfs42_copy_file_range(src_file.file, src_off, dst_file,
++				    dst_off, count, 0);
++	if (ret > 0)
++		ret = 0;
+ 
+-out_unlock:
+-	if (dst_inode < src_inode) {
+-		mutex_unlock(&src_inode->i_mutex);
+-		mutex_unlock(&dst_inode->i_mutex);
+-	} else {
+-		mutex_unlock(&dst_inode->i_mutex);
+-		mutex_unlock(&src_inode->i_mutex);
+-	}
+ out_fput:
+ 	fdput(src_file);
+ out_drop_write:
+@@ -344,6 +352,7 @@ const struct file_operations nfs4_file_operations = {
+ 	.splice_write	= iter_file_splice_write,
+ #ifdef CONFIG_NFS_V4_2
+ 	.fallocate	= nfs42_fallocate,
++	.copy_file_range = nfs42_copy_file_range,
+ #endif /* CONFIG_NFS_V4_2 */
+ 	.check_flags	= nfs_check_flags,
+ 	.setlease	= simple_nosetlease,
 -- 
 1.8.3.1
 
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
