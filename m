@@ -1,7 +1,7 @@
 From: Peng Tao <tao.peng@primarydata.com>
-Subject: [PATCH 3/9] nfs42: add .copy_file_range file operation
-Date: Sun, 25 Oct 2015 07:17:10 +0800
-Message-ID: <1445728636-10109-4-git-send-email-tao.peng@primarydata.com>
+Subject: [PATCH 7/9] nfs42: remove private clone ioctl handler
+Date: Sun, 25 Oct 2015 07:17:14 +0800
+Message-ID: <1445728636-10109-8-git-send-email-tao.peng@primarydata.com>
 References: <1445728636-10109-1-git-send-email-tao.peng@primarydata.com>
 Cc: Trond Myklebust <trond.myklebust@primarydata.com>,
 	Anna Schumaker <anna.schumaker@netapp.com>,
@@ -20,139 +20,129 @@ In-Reply-To: <1445728636-10109-1-git-send-email-tao.peng@primarydata.com>
 Sender: linux-btrfs-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
+BTRFS_IOC_CLONE/BTRFS_IOC_CLONE_RANGE is now handled
+by generic layer and goes through the .copy_file_range
+method.
+
 Signed-off-by: Peng Tao <tao.peng@primarydata.com>
 ---
- fs/nfs/nfs4file.c | 95 ++++++++++++++++++++++++++++++-------------------------
- 1 file changed, 52 insertions(+), 43 deletions(-)
+ fs/nfs/nfs4file.c | 96 -------------------------------------------------------
+ 1 file changed, 96 deletions(-)
 
 diff --git a/fs/nfs/nfs4file.c b/fs/nfs/nfs4file.c
-index 4aa5719..f1924d8 100644
+index f1924d8..181b67b 100644
 --- a/fs/nfs/nfs4file.c
 +++ b/fs/nfs/nfs4file.c
-@@ -194,15 +194,60 @@ static long nfs42_fallocate(struct file *filep, int mode, loff_t offset, loff_t
- 	return nfs42_proc_allocate(filep, offset, len);
+@@ -240,99 +240,8 @@ out_unlock:
+ out:
+ 	return ret < 0 ? ret : len;
  }
- 
-+static ssize_t nfs42_copy_file_range(struct file *file_in, loff_t pos_in,
-+				     struct file *file_out, loff_t pos_out,
-+				     size_t len, unsigned int flags)
-+{
-+	struct inode *src_inode = file_inode(file_in);
-+	struct inode *dst_inode = file_inode(file_out);
-+	struct nfs_server *server = NFS_SERVER(src_inode);
-+	unsigned int bs = server->clone_blksize;
-+	int ret;
-+
-+	/* check alignment w.r.t. clone_blksize */
-+	ret = -EINVAL;
-+	if (bs) {
-+		if (!IS_ALIGNED(pos_in, bs) || !IS_ALIGNED(pos_out, bs) ||
-+		    (!IS_ALIGNED(len, bs) &&
-+		     i_size_read(src_inode) != (pos_in + len)))
-+			goto out;
-+	}
-+
-+	/* XXX: do we lock at all? what if server needs CB_RECALL_LAYOUT? */
-+	lock_two_nondirectories(src_inode, dst_inode);
-+
-+	/* flush all pending writes on both src and dst so that server
-+	 * has the latest data
-+	 */
-+	ret = nfs_sync_inode(src_inode);
-+	if (ret)
-+		goto out_unlock;
-+	ret = nfs_sync_inode(dst_inode);
-+	if (ret)
-+		goto out_unlock;
-+
-+	ret = nfs42_proc_clone(file_in, file_out, pos_in, pos_out, len);
-+
-+	/* truncate inode page cache of the dst range so that future
-+	 * reads can fetch new data from server
-+	 */
-+	if (!ret)
-+		truncate_inode_pages_range(&dst_inode->i_data, pos_out,
-+					   pos_out + len - 1);
-+
-+out_unlock:
-+	unlock_two_nondirectories(src_inode, dst_inode);
-+out:
-+	return ret < 0 ? ret : len;
-+}
-+
- static noinline long
- nfs42_ioctl_clone(struct file *dst_file, unsigned long srcfd,
- 		  u64 src_off, u64 dst_off, u64 count)
- {
- 	struct inode *dst_inode = file_inode(dst_file);
--	struct nfs_server *server = NFS_SERVER(dst_inode);
- 	struct fd src_file;
- 	struct inode *src_inode;
--	unsigned int bs = server->clone_blksize;
- 	int ret;
- 
- 	/* dst file must be opened for writing */
-@@ -240,48 +285,11 @@ nfs42_ioctl_clone(struct file *dst_file, unsigned long srcfd,
- 	    src_inode->i_sb != dst_inode->i_sb)
- 		goto out_fput;
- 
--	/* check alignment w.r.t. clone_blksize */
+-
+-static noinline long
+-nfs42_ioctl_clone(struct file *dst_file, unsigned long srcfd,
+-		  u64 src_off, u64 dst_off, u64 count)
+-{
+-	struct inode *dst_inode = file_inode(dst_file);
+-	struct fd src_file;
+-	struct inode *src_inode;
+-	int ret;
+-
+-	/* dst file must be opened for writing */
+-	if (!(dst_file->f_mode & FMODE_WRITE))
+-		return -EINVAL;
+-
+-	ret = mnt_want_write_file(dst_file);
+-	if (ret)
+-		return ret;
+-
+-	src_file = fdget(srcfd);
+-	if (!src_file.file) {
+-		ret = -EBADF;
+-		goto out_drop_write;
+-	}
+-
+-	src_inode = file_inode(src_file.file);
+-
+-	/* src and dst must be different files */
 -	ret = -EINVAL;
--	if (bs) {
--		if (!IS_ALIGNED(src_off, bs) || !IS_ALIGNED(dst_off, bs))
--			goto out_fput;
--		if (!IS_ALIGNED(count, bs) && i_size_read(src_inode) != (src_off + count))
--			goto out_fput;
--	}
+-	if (src_inode == dst_inode)
+-		goto out_fput;
 -
--	/* XXX: do we lock at all? what if server needs CB_RECALL_LAYOUT? */
--	if (dst_inode < src_inode) {
--		mutex_lock_nested(&dst_inode->i_mutex, I_MUTEX_PARENT);
--		mutex_lock_nested(&src_inode->i_mutex, I_MUTEX_CHILD);
--	} else {
--		mutex_lock_nested(&src_inode->i_mutex, I_MUTEX_PARENT);
--		mutex_lock_nested(&dst_inode->i_mutex, I_MUTEX_CHILD);
--	}
+-	/* src file must be opened for reading */
+-	if (!(src_file.file->f_mode & FMODE_READ))
+-		goto out_fput;
 -
--	/* flush all pending writes on both src and dst so that server
--	 * has the latest data */
--	ret = nfs_sync_inode(src_inode);
--	if (ret)
--		goto out_unlock;
--	ret = nfs_sync_inode(dst_inode);
--	if (ret)
--		goto out_unlock;
+-	/* src and dst must be regular files */
+-	ret = -EISDIR;
+-	if (!S_ISREG(src_inode->i_mode) || !S_ISREG(dst_inode->i_mode))
+-		goto out_fput;
 -
--	ret = nfs42_proc_clone(src_file.file, dst_file, src_off, dst_off, count);
+-	ret = -EXDEV;
+-	if (src_file.file->f_path.mnt != dst_file->f_path.mnt ||
+-	    src_inode->i_sb != dst_inode->i_sb)
+-		goto out_fput;
 -
--	/* truncate inode page cache of the dst range so that future reads can fetch
--	 * new data from server */
--	if (!ret)
--		truncate_inode_pages_range(&dst_inode->i_data, dst_off, dst_off + count - 1);
-+	ret = nfs42_copy_file_range(src_file.file, src_off, dst_file,
-+				    dst_off, count, 0);
-+	if (ret > 0)
-+		ret = 0;
+-	ret = nfs42_copy_file_range(src_file.file, src_off, dst_file,
+-				    dst_off, count, 0);
+-	if (ret > 0)
+-		ret = 0;
+-
+-out_fput:
+-	fdput(src_file);
+-out_drop_write:
+-	mnt_drop_write_file(dst_file);
+-	return ret;
+-}
+-
+-static long nfs42_ioctl_clone_range(struct file *dst_file, void __user *argp)
+-{
+-	struct nfs_ioctl_clone_range_args args;
+-
+-	if (copy_from_user(&args, argp, sizeof(args)))
+-		return -EFAULT;
+-
+-	return nfs42_ioctl_clone(dst_file, args.src_fd, args.src_off, args.dst_off, args.count);
+-}
+-#else
+-static long nfs42_ioctl_clone(struct file *dst_file, unsigned long srcfd,
+-		u64 src_off, u64 dst_off, u64 count)
+-{
+-	return -ENOTTY;
+-}
+-
+-static long nfs42_ioctl_clone_range(struct file *dst_file, void __user *argp)
+-{
+-	return -ENOTTY;
+-}
+ #endif /* CONFIG_NFS_V4_2 */
  
--out_unlock:
--	if (dst_inode < src_inode) {
--		mutex_unlock(&src_inode->i_mutex);
--		mutex_unlock(&dst_inode->i_mutex);
--	} else {
--		mutex_unlock(&dst_inode->i_mutex);
--		mutex_unlock(&src_inode->i_mutex);
+-long nfs4_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+-{
+-	void __user *argp = (void __user *)arg;
+-
+-	switch (cmd) {
+-	case NFS_IOC_CLONE:
+-		return nfs42_ioctl_clone(file, arg, 0, 0, 0);
+-	case NFS_IOC_CLONE_RANGE:
+-		return nfs42_ioctl_clone_range(file, argp);
 -	}
- out_fput:
- 	fdput(src_file);
- out_drop_write:
-@@ -344,6 +352,7 @@ const struct file_operations nfs4_file_operations = {
- 	.splice_write	= iter_file_splice_write,
+-
+-	return -ENOTTY;
+-}
+-
+ const struct file_operations nfs4_file_operations = {
  #ifdef CONFIG_NFS_V4_2
- 	.fallocate	= nfs42_fallocate,
-+	.copy_file_range = nfs42_copy_file_range,
+ 	.llseek		= nfs4_file_llseek,
+@@ -356,9 +265,4 @@ const struct file_operations nfs4_file_operations = {
  #endif /* CONFIG_NFS_V4_2 */
  	.check_flags	= nfs_check_flags,
  	.setlease	= simple_nosetlease,
+-#ifdef CONFIG_COMPAT
+-	.unlocked_ioctl = nfs4_ioctl,
+-#else
+-	.compat_ioctl	= nfs4_ioctl,
+-#endif /* CONFIG_COMPAT */
+ };
 -- 
 1.8.3.1
 
