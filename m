@@ -1,84 +1,173 @@
-From: =?UTF-8?B?QXVyw6lsaWVu?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: Re: cifs unable to access shares with read restricted at root level
- (bso#8950)
-Date: Tue, 27 Oct 2015 10:59:05 +0100
-Message-ID: <20151027105905.0644daf2@aaptelpc>
-References: <20151026131817.3a8a3ded@aaptelpc>
-	<CADT32eJgrjigh_ezCAJK-ivO-t_yygPEhgwoHKsE-8EdVxKP+Q@mail.gmail.com>
+From: Steve French <smfrench@gmail.com>
+Subject: Re: [PATCH 2/9] cifs: add .copy_file_range file operation
+Date: Tue, 27 Oct 2015 12:13:52 -0500
+Message-ID: <CAH2r5mt1e5LigOh4Xyj5NCFUrSjTOajKjeYZsR2mE1rHE93uKg@mail.gmail.com>
+References: <1445728636-10109-1-git-send-email-tao.peng@primarydata.com> <1445728636-10109-3-git-send-email-tao.peng@primarydata.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- boundary="Sig_/h7EGnSa_o2fzgBH/aOATwcG"; protocol="application/pgp-signature"
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32eJgrjigh_ezCAJK-ivO-t_yygPEhgwoHKsE-8EdVxKP+Q-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
-
---Sig_/h7EGnSa_o2fzgBH/aOATwcG
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	Trond Myklebust <trond.myklebust@primarydata.com>,
+	Anna Schumaker <anna.schumaker@netapp.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	Zach Brown <zab@zabbo.net>,
+	Darren Hart <dvhart@linux.intel.com>,
+	Jeff Layton <jeff.layton@primarydata.com>,
+	"J. Bruce Fields" <bfields@fieldses.org>,
+	"Darrick J. Wong" <darrick.wong@oracle.com>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	"linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
+	linux-btrfs@vger.kernel.org,
+	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+	Steve French <steve.french@primarydata.com>,
+	samba-technical <samba-technical@lists.samba.org>
+To: Peng Tao <tao.peng@primarydata.com>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <1445728636-10109-3-git-send-email-tao.peng@primarydata.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Hi Shirish,
+Patch looks fine, but it points out a Kconfig problem with cifs.ko.
+Need to remove the
 
-On Mon, 26 Oct 2015 22:04:28 -0500 Shirish Pargaonkar
-<shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> They are stored in a linked list of struct cifs_rdelem off of
-> superblock where each element of this linked list points to a
-> disconnected dentry.
+         #ifdef CONFIG_CIFS_POSIX
 
-This list is only used use when we mount with noserverino. It doesn't
-work in both case anyway.
-=20
-> > * How do you allocate a new dentry?
-> > * What do d_obtain_alias() and d_splice_dentry() actually do? I've
-> > read the doc strings several times but I still have a hard time
-> > wrapping my head around it.
->=20
-> I think the simplistic answer is d_obtain_alias creates a dentry
-> without a parent and d_splice_dentry connects a disconnected dentry
-> to a parent. So let us say you have a a filesystem like /a/b/c/d/e/f
-> where c is not accessible, we would create a disconnected for d (and
-> for all the entries starting d such as e and f)
-> Then when c is accessible and we are trying to reach f, while
-> traversing, for each dentry we would look whether it is disconnected
-> or not and if found (by any of three search routines), splice dentry
-> with c.
->=20
-> What kind of setup do you have where the patchset is not working?
+around the statements like:
 
-Everything is explained on the link I provided. It's the same setup you
-used I think.
+         .unlocked_ioctl = cifs_ioctl,
+         .copy_file_range = cifs_file_copy_range,
 
-  http://diobla.info/doc/suse-todo#bnc799133
+Copy offload does not require support for the old CIFS POSIX
+extensions (or even cifs at all) - it works fine over SMB3.
+Alternatively you can move the copy_file_range to the end of the
+struct file_operations in your patch, and I can remove the
+CONFIG_CIFS_POSIX around cifs_ioctl in a different patch that I put in
+my tree - whichever you prefer.
 
---=20
-Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Linux GmbH, Maxfeldstra=C3=9Fe 5, 90409 N=C3=BCrnberg, Germany
-GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton, HRB 21284 (AG
-N=C3=BCrnberg)
+Originally the first ioctl that cifs supported did require the CIFS
+POSIX extensions because it used an info level defined in the CIFS
+UNIX/POSIX extensions.  With later additions to cifs_ioctl that
+restriction is now obsolete.  Later ioctls have been added that work
+over SMB3, and do not require the CIFS POSIX extensions (such as copy
+offload).   The patch that originally introduced the CIFS_POSIX ifdef
+around this ioctl was
 
---Sig_/h7EGnSa_o2fzgBH/aOATwcG
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+commit c67593a03129967eae8939c4899767182eb6d6cd
+Author: Steve French <smfrench@austin.rr.com>
+Date:   Thu Apr 28 22:41:04 2005 -0700
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+    [PATCH] cifs: Enable ioctl support in POSIX extensions to handle lsattr
 
-iQIcBAEBAgAGBQJWL0rqAAoJEDIGO5Hchq/8JQkP/i+CHORJXw7GsDpXmrZgZlxE
-4BRaPpS5LMVCDP3VDqMMcLzSgU2QetMM8yBiV5haAKTg6Utp0z0vwTS3Pi1r9m4e
-LAQ5PujN4C1fQyymHAsO5MtupzoZXCs2SQ/ylWy3fgk3ziNBJK106gHHgd7EF6ts
-Egzz6BRQgFpROjZias9f2/TnCoyyDdu52w+Y9/nAgzll3XHOv/qN45ZlzonlEE1N
-gpimVbtsWdhaK5m7HcnDAzOw6DWegRd2FRZuGTiVLxGSpgowVLaFZ38c/VJg5EH7
-QVxUHlyBM/ZVT6SP4o8cPzQ+cyGetYS6knCGieGfYdV0HA/HvwBopuMjwjr4qzYQ
-Kp6LLUU5vTlO7LX1hwwDhPPzO8Q8wd/hyhFEC2EyfkXTjcWwgfXXV7uwh6HpvrFv
-bFdDQPBJo7ill+fC9tnc/SvbmrIlxACDh8BzBVimgsbOVYDhEdi82J0AQaTG0pd6
-HWaJF4lh9O17ew/nMPC8s+jXEzHYwcd13o0ONcRfxsWVpMaNZcE8nLOmTNyU0cpw
-IGiq/KpgyPhAHfzjUSsn3lfyryvBZc2FegRgf4MarELOkIiFVs8+CG1Xl/iAltaO
-2lhHIVYgDIJ1T1H7LJ/jz+zUWEfqZeOQKm6iHgFl0dADnVBXRF0UXLxmzYQWr5BN
-+0Y52PyDjIqxMW0crLF6
-=BttG
------END PGP SIGNATURE-----
+but obviously now we don't need the CONFIG_CIFS_POSIX ifdef around the
+ioctl functions.
 
---Sig_/h7EGnSa_o2fzgBH/aOATwcG--
+On Sat, Oct 24, 2015 at 6:17 PM, Peng Tao <tao.peng@primarydata.com> wrote:
+> Signed-off-by: Peng Tao <tao.peng@primarydata.com>
+> ---
+>  fs/cifs/cifsfs.c |  22 ++++++++++++
+>  fs/cifs/cifsfs.h |   4 ++-
+>  fs/cifs/ioctl.c  | 100 +++++++++++++++++++++++++++++++------------------------
+>  3 files changed, 82 insertions(+), 44 deletions(-)
+>
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index e739950..6ef7c3c 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -910,6 +910,22 @@ const struct inode_operations cifs_symlink_inode_ops = {
+>  #endif
+>  };
+>
+> +#ifdef CONFIG_CIFS_POSIX
+> +ssize_t cifs_file_copy_range(struct file *file_in, loff_t pos_in,
+> +                            struct file *file_out, loff_t pos_out,
+> +                            size_t len, unsigned int flags)
+> +{
+> +       unsigned int xid;
+> +       int rc;
+> +
+> +       xid = get_xid();
+> +       rc = cifs_file_clone_range(xid, file_in, file_out, pos_in,
+> +                                  len, pos_out, true);
+> +       free_xid(xid);
+> +       return rc < 0 ? rc : len;
+> +}
+> +#endif
+> +
+>  const struct file_operations cifs_file_ops = {
+>         .read_iter = cifs_loose_read_iter,
+>         .write_iter = cifs_file_write_iter,
+> @@ -923,6 +939,7 @@ const struct file_operations cifs_file_ops = {
+>         .llseek = cifs_llseek,
+>  #ifdef CONFIG_CIFS_POSIX
+>         .unlocked_ioctl = cifs_ioctl,
+> +       .copy_file_range = cifs_file_copy_range,
+>  #endif /* CONFIG_CIFS_POSIX */
+>         .setlease = cifs_setlease,
+>         .fallocate = cifs_fallocate,
+> @@ -941,6 +958,7 @@ const struct file_operations cifs_file_strict_ops = {
+>         .llseek = cifs_llseek,
+>  #ifdef CONFIG_CIFS_POSIX
+>         .unlocked_ioctl = cifs_ioctl,
+> +       .copy_file_range = cifs_file_copy_range,
+>  #endif /* CONFIG_CIFS_POSIX */
+>         .setlease = cifs_setlease,
+>         .fallocate = cifs_fallocate,
+> @@ -959,6 +977,7 @@ const struct file_operations cifs_file_direct_ops = {
+>         .splice_read = generic_file_splice_read,
+>  #ifdef CONFIG_CIFS_POSIX
+>         .unlocked_ioctl  = cifs_ioctl,
+> +       .copy_file_range = cifs_file_copy_range,
+>  #endif /* CONFIG_CIFS_POSIX */
+>         .llseek = cifs_llseek,
+>         .setlease = cifs_setlease,
+> @@ -977,6 +996,7 @@ const struct file_operations cifs_file_nobrl_ops = {
+>         .llseek = cifs_llseek,
+>  #ifdef CONFIG_CIFS_POSIX
+>         .unlocked_ioctl = cifs_ioctl,
+> +       .copy_file_range = cifs_file_copy_range,
+>  #endif /* CONFIG_CIFS_POSIX */
+>         .setlease = cifs_setlease,
+>         .fallocate = cifs_fallocate,
+> @@ -994,6 +1014,7 @@ const struct file_operations cifs_file_strict_nobrl_ops = {
+>         .llseek = cifs_llseek,
+>  #ifdef CONFIG_CIFS_POSIX
+>         .unlocked_ioctl = cifs_ioctl,
+> +       .copy_file_range = cifs_file_copy_range,
+>  #endif /* CONFIG_CIFS_POSIX */
+>         .setlease = cifs_setlease,
+>         .fallocate = cifs_fallocate,
+> @@ -1011,6 +1032,7 @@ const struct file_operations cifs_file_direct_nobrl_ops = {
+>         .splice_read = generic_file_splice_read,
+>  #ifdef CONFIG_CIFS_POSIX
+>         .unlocked_ioctl  = cifs_ioctl,
+> +       .copy_file_range = cifs_file_copy_range,
+>  #endif /* CONFIG_CIFS_POSIX */
+>         .llseek = cifs_llseek,
+>         .setlease = cifs_setlease,
+
+
+Patch looks fine, but it points out a Kconfig problem with cifs.ko.
+Need to remove the
+
+#ifdef CONFIG_CIFS_POSIX
+
+around the
+
+         .unlocked_ioctl = cifs_ioctl,
+         .copy_file_range = cifs_file_copy_range,
+
+statements.  Alternatively you can move the copy_file_range to the end
+of the struct file_operations in your patch, and I can remove the
+CONFIG_CIFS_POSIX around cifs_ioctl in a different patch that I put in
+my tree - whichever you prefer.
+
+Originally the first ioctl that cifs supported did require the CIFS
+POSIX extensions because it used an info level defined in the CIFS
+UNIX/POSIX extensions.  With later additions to cifs_ioctl that
+restriction is now obsolete.  Later ioctls have been added that work
+over SMB3, and do not require the CIFS POSIX extensions (such as copy
+offload).  See patch
+
+-- 
+Thanks,
+
+Steve
