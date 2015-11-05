@@ -1,53 +1,68 @@
-From: Andreas Gruenbacher <agruenba@redhat.com>
-Subject: Re: [PATCH v13 12/51] vfs: Cache richacl in struct inode
-Date: Wed, 4 Nov 2015 23:10:43 +0100
-Message-ID: <CAHc6FU7+UpYGA991zPLyzG2L5pDgkD93L7BXak-TDJT_E_E2YA@mail.gmail.com>
+From: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH v13 45/51] sunrpc: Allow to demand-allocate pages to
+ encode into
+Date: Thu, 5 Nov 2015 12:07:05 +0100
+Message-ID: <CAHc6FU5xkjWJeGFR5mO8+OAEMwwU6yWK7H8CV1fn5dk-LS23-g@mail.gmail.com>
 References: <1446563847-14005-1-git-send-email-agruenba@redhat.com>
-	<1446563847-14005-13-git-send-email-agruenba@redhat.com>
-	<713E53A4-D073-4745-B57D-77AD07E89957@dilger.ca>
+	<1446563847-14005-46-git-send-email-agruenba@redhat.com>
+	<CAHQdGtScoRb-722ES168O8tkp-Rbvwe6bZ=70WwgiXpCC3vsHw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	"Theodore Ts'o" <tytso@mit.edu>,
-	"J. Bruce Fields" <bfields@fieldses.org>,
-	Jeff Layton <jlayton@poochiereds.net>,
-	Trond Myklebust <trond.myklebust@primarydata.com>,
-	Anna Schumaker <anna.schumaker@netapp.com>,
-	Dave Chinner <david@fromorbit.com>,
-	linux-ext4 <linux-ext4@vger.kernel.org>,
-	XFS Developers <xfs@oss.sgi.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-	linux-cifs@vger.kernel.org, Linux API <linux-api@vger.kernel.org>
-To: Andreas Dilger <adilger@dilger.ca>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <713E53A4-D073-4745-B57D-77AD07E89957@dilger.ca>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
+	"Theodore Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,
+	Andreas Dilger <adilger.kernel-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>,
+	"J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
+	Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>,
+	Anna Schumaker <anna.schumaker-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
+	Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>,
+	linux-ext4 <linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	XFS Developers <xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org>,
+	Linux Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Linux FS-devel Mailing List <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Linux NFS Mailing List <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Linux API Mailing List <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Trond Myklebust <trond.myklebust-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAHQdGtScoRb-722ES168O8tkp-Rbvwe6bZ=70WwgiXpCC3vsHw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Andreas,
+Trond,
 
-On Wed, Nov 4, 2015 at 3:03 AM, Andreas Dilger <adilger@dilger.ca> wrote:
->> @@ -33,7 +33,7 @@ richacl_alloc(int count, gfp_t gfp)
->>       struct richacl *acl = kzalloc(size, gfp);
->>
->>       if (acl) {
->> -             atomic_set(&acl->a_refcount, 1);
->> +             atomic_set(&acl->a_base.ba_refcount, 1);
->>               acl->a_count = count;
->>       }
->>       return acl;
->> @@ -52,7 +52,7 @@ richacl_clone(const struct richacl *acl, gfp_t gfp)
->>
->>       if (dup) {
->>               memcpy(dup, acl, size);
->> -             atomic_set(&dup->a_refcount, 1);
->> +             atomic_set(&dup->a_base.ba_refcount, 1);
+On Tue, Nov 3, 2015 at 5:25 PM, Trond Myklebust
+<trond.myklebust-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org> wrote:
+> On Tue, Nov 3, 2015 at 10:17 AM, Andreas Gruenbacher
+> <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+>> When encoding large, variable-length objects such as acls into xdr_bufs,
+>> it is easier to allocate buffer pages on demand rather than precomputing
+>> the required buffer size.
 >
-> These two calls should be base_acl_init().
+> NACK. We're not doing allocations from inside the XDR encoders. This
+> can and should be done before calling into the SUNRPC layer.
 
-Yes. This should all be fixed in the next snapshot.
+an XDR-encoded ACL can be up to 64k (16 pages) in size. In practice,
+large ACLs like that will almost never occur and almost all ACLs will
+fit into a single page though.
+
+The XDR-encoded ACL contains strings for the user and group names
+which need to be looked up when the idmapper is used. Those lookups
+are somewhat expensive; in addition, the lookup results can change
+over time. When precomputing the size, allocating space, and then
+encoding the ACL, we could run out of space when encoding.
+
+So we could always allocate the maximum 16 pages, encode the acl, and
+free the unused pages. This would be rather wasteful though.
+
+Given how simple it is to allocate pages as we go, this seems the
+better choice here. This doesn't break any existing code either; NULL
+page pointers would have oopsed in xdr_get_next_encode_buffer before.
+
+>From the memory management point of view, there is no difference in
+preallocating GFP_NOFS pages and allocating them on demand; the pages
+are allocated in the same task and locking context in both cases.
+
+So could you please explain why you object to this change?
 
 Thanks,
 Andreas
