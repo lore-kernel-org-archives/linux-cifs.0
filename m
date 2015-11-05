@@ -1,427 +1,670 @@
-From: Andreas Gruenbacher <agruenba@redhat.com>
-Subject: [PATCH v14 21/22] ext4: Add richacl support
-Date: Thu,  5 Nov 2015 12:39:39 +0100
-Message-ID: <1446723580-3747-22-git-send-email-agruenba@redhat.com>
-References: <1446723580-3747-1-git-send-email-agruenba@redhat.com>
-Cc: "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>,
-	Andreas Gruenbacher <agruenba@redhat.com>
-To: Alexander Viro <viro@zeniv.linux.org.uk>,
-	"Theodore Ts'o" <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	"J. Bruce Fields" <bfields@fieldses.org>,
-	Jeff Layton <jlayton@poochiereds.net>,
-	Trond Myklebust <trond.myklebust@primarydata.com>,
-	Anna Schumaker <anna.schumaker@netapp.com>,
-	Dave Chinner <david@fromorbit.com>, linux-ext4@vger.kernel.org,
-	xfs@oss.sgi.com, linux-kernel@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
-	linux-cifs@vger.kernel.org, linux-api@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1446723580-3747-1-git-send-email-agruenba@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: =?UTF-8?B?QXVyw6lsaWVu?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+Subject: [PATCH v1] cifs: make shares unaccessible at root level mountable
+Date: Thu, 5 Nov 2015 15:48:36 +0100
+Message-ID: <20151105154836.1851c30c@aaptelpc>
+Mime-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ boundary="Sig_/AGp9SoFVFIwfVOcwuGSetma"; protocol="application/pgp-signature"
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-From: "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
+--Sig_/AGp9SoFVFIwfVOcwuGSetma
+Content-Type: multipart/mixed; boundary="MP_/G1LHl6bIMtsJrG/3yLLqQ.Y"
 
-Support the richacl permission model in ext4.  The richacls are stored
-in "system.richacl" xattrs.  Richacls need to be enabled by tune2fs or
-at file system create time.
+--MP_/G1LHl6bIMtsJrG/3yLLqQ.Y
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Signed-off-by: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
-Signed-off-by: Andreas Gruenbacher <agruenba@redhat.com>
-Reviewed-by: Andreas Dilger <adilger@dilger.ca>
+Hi,
+
+I've been working on solving this bug [1] for some time now. You can
+find some of my research notes here [2]. I was recently able to
+finally make it work.
+
+The patch is based on Shirish's patch (available at [1]) to which I've
+made the following modification:
+
+- create disconnected root when any intermediary path are "not
+  found" (ENOENT). Previously it was only done for EACCES errors.
+
+- fix build_path_from_dentry() to correctly prefix dentry that are
+  children of a disconnected root with the disconnected root actual
+  path. This path is only avaible when using the struct rdelem linked
+  list stored in the cifs superblock i.e. when we mount with
+  noserverino.
+
+So basically if you have the bug described in [1] you can solve it by
+applying this patch and mounting with -o noserverino. I would like to
+get rid this restriction (noserverino) and unconditionnaly use the
+rdelem linked list but I don't know how feasible/safe that is (I'm still
+new to all this stuff, this is my first kernel patch).
+
+Shirish, I'd like to hear your comments if you have any. I've noticed
+your find_rdelem_by_dentry() removes the dentry from the rdelem list
+and I'm not sure I understand why. I've added and used
+find_rdelem_by_dentry_no_del() to do the same thing without removing it.
+
+1: https://bugzilla.samba.org/show_bug.cgi?id=3D8950
+2: http://diobla.info/doc/suse-todo#bnc799133
+
+--=20
+Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Linux GmbH, Maxfeldstra=C3=9Fe 5, 90409 N=C3=BCrnberg, Germany
+GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton, HRB 21284 (AG
+N=C3=BCrnberg)
+
+--MP_/G1LHl6bIMtsJrG/3yLLqQ.Y
+Content-Type: text/x-patch
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment;
+ filename=0001-cifs-make-shares-unaccessible-at-root-level-mountabl.patch
+
+=46rom 92520bbeef256957c150df01f946ad8890140a78 Mon Sep 17 00:00:00 2001
+From: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+Date: Thu, 5 Nov 2015 15:24:20 +0100
+Subject: [PATCH] cifs: make shares unaccessible at root level mountable
+
+Based on Shirish Pargaonkar's disconnected root patch [1].
+
+The initial patch was modified to create a disconnected root when any
+intermediary path is unaccessible (EACCESS) but *also* when "not
+found" (ENOENT).
+
+The other change was to modify build_path_from_dentry() in dir.c so that
+if it has to build a path for a dentry that uses a disconnected root, it
+prefixes that path with the disconnected root actual path.
+
+Previously, when called with a dentry that had a disconnected root,
+build_path_path() would stop when it reached that disconnected root,
+which is not the same as the root of the share, resulting in a wrong
+output path.
+
+1: https://bugzilla.samba.org/show_bug.cgi?id=3D8950
+
+Signed-off-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
 ---
- fs/ext4/Kconfig   |  11 +++++
- fs/ext4/Makefile  |   1 +
- fs/ext4/file.c    |   3 ++
- fs/ext4/ialloc.c  |  11 ++++-
- fs/ext4/inode.c   |  12 ++++-
- fs/ext4/namei.c   |   5 ++
- fs/ext4/richacl.c | 142 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/ext4/richacl.h |  40 +++++++++++++++
- fs/ext4/xattr.c   |   7 +++
- 9 files changed, 229 insertions(+), 3 deletions(-)
- create mode 100644 fs/ext4/richacl.c
- create mode 100644 fs/ext4/richacl.h
+ fs/cifs/cifs_fs_sb.h |  10 +++
+ fs/cifs/cifsfs.c     |  84 +++++++++++++++++++-
+ fs/cifs/cifsproto.h  |   1 +
+ fs/cifs/connect.c    |   3 +
+ fs/cifs/dir.c        | 217 ++++++++++++++++++++++++++++++++++++++++++++++-=
+----
+ fs/cifs/inode.c      |  36 ++++++++-
+ 6 files changed, 325 insertions(+), 26 deletions(-)
 
-diff --git a/fs/ext4/Kconfig b/fs/ext4/Kconfig
-index b46e9fc..65c5230 100644
---- a/fs/ext4/Kconfig
-+++ b/fs/ext4/Kconfig
-@@ -22,6 +22,17 @@ config EXT3_FS_POSIX_ACL
- 	  This config option is here only for backward compatibility. ext3
- 	  filesystem is now handled by the ext4 driver.
- 
-+config EXT4_FS_RICHACL
-+	bool "Ext4 Rich Access Control Lists (EXPERIMENTAL)"
-+	depends on EXT4_FS
-+	select FS_RICHACL
-+	help
-+	  Richacls are an implementation of NFSv4 ACLs, extended by file masks
-+	  to cleanly integrate into the POSIX file permission model.  To learn
-+	  more about them, see http://www.bestbits.at/richacl/.
+diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+index 3182273..b2b65f6 100644
+--- a/fs/cifs/cifs_fs_sb.h
++++ b/fs/cifs/cifs_fs_sb.h
+@@ -67,5 +67,15 @@ struct cifs_sb_info {
+ 	struct backing_dev_info bdi;
+ 	struct delayed_work prune_tlinks;
+ 	struct rcu_head rcu;
++	struct list_head rtdislist; /* list of disconnected root dentries */
++	spinlock_t rtdislock; /* lock for disconnected root dentry list */
++};
 +
-+	  If you don't know what Richacls are, say N.
-+
- config EXT3_FS_SECURITY
- 	bool "Ext3 Security Labels"
- 	depends on EXT3_FS
-diff --git a/fs/ext4/Makefile b/fs/ext4/Makefile
-index 75285ea..ea0d539 100644
---- a/fs/ext4/Makefile
-+++ b/fs/ext4/Makefile
-@@ -14,3 +14,4 @@ ext4-$(CONFIG_EXT4_FS_POSIX_ACL)	+= acl.o
- ext4-$(CONFIG_EXT4_FS_SECURITY)		+= xattr_security.o
- ext4-$(CONFIG_EXT4_FS_ENCRYPTION)	+= crypto_policy.o crypto.o \
- 		crypto_key.o crypto_fname.o
-+ext4-$(CONFIG_EXT4_FS_RICHACL) 		+= richacl.o
-diff --git a/fs/ext4/file.c b/fs/ext4/file.c
-index 113837e..a03b4a5 100644
---- a/fs/ext4/file.c
-+++ b/fs/ext4/file.c
-@@ -30,6 +30,7 @@
- #include "ext4_jbd2.h"
- #include "xattr.h"
- #include "acl.h"
-+#include "richacl.h"
- 
- /*
-  * Called when an inode is released. Note that this is different
-@@ -719,6 +720,8 @@ const struct inode_operations ext4_file_inode_operations = {
- 	.removexattr	= generic_removexattr,
- 	.get_acl	= ext4_get_acl,
- 	.set_acl	= ext4_set_acl,
-+	.get_richacl	= ext4_get_richacl,
-+	.set_richacl	= ext4_set_richacl,
- 	.fiemap		= ext4_fiemap,
++struct cifs_rdelem {
++	int                     rdcount;
++	struct list_head        rdlist;
++	char *                  rdname;
++	struct dentry *		rdentry;
++	struct inode *          rdinode;
  };
- 
-diff --git a/fs/ext4/ialloc.c b/fs/ext4/ialloc.c
-index 619bfc1..9657b3a 100644
---- a/fs/ext4/ialloc.c
-+++ b/fs/ext4/ialloc.c
-@@ -27,6 +27,7 @@
- #include "ext4_jbd2.h"
- #include "xattr.h"
- #include "acl.h"
-+#include "richacl.h"
- 
- #include <trace/events/ext4.h>
- 
-@@ -697,6 +698,14 @@ out:
- 	return ret;
- }
- 
-+static inline int
-+ext4_new_acl(handle_t *handle, struct inode *inode, struct inode *dir)
-+{
-+	if (IS_RICHACL(dir))
-+		return ext4_init_richacl(handle, inode, dir);
-+	return ext4_init_acl(handle, inode, dir);
-+}
-+
- /*
-  * There are two policies for allocating an inode.  If the new inode is
-  * a directory, then a forward search is made for a block group with both
-@@ -1052,7 +1061,7 @@ got:
- 	if (err)
- 		goto fail_drop;
- 
--	err = ext4_init_acl(handle, inode, dir);
-+	err = ext4_new_acl(handle, inode, dir);
- 	if (err)
- 		goto fail_free_drop;
- 
-diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
-index 612fbcf..647f3c3 100644
---- a/fs/ext4/inode.c
-+++ b/fs/ext4/inode.c
-@@ -42,6 +42,7 @@
- #include "xattr.h"
- #include "acl.h"
- #include "truncate.h"
-+#include "richacl.h"
- 
- #include <trace/events/ext4.h>
- 
-@@ -4638,6 +4639,14 @@ static void ext4_wait_for_tail_page_commit(struct inode *inode)
- 	}
- }
- 
-+static inline int
-+ext4_acl_chmod(struct inode *inode, umode_t mode)
-+{
-+	if (IS_RICHACL(inode))
-+		return richacl_chmod(inode, inode->i_mode);
-+	return posix_acl_chmod(inode, inode->i_mode);
-+}
-+
- /*
-  * ext4_setattr()
-  *
-@@ -4806,8 +4815,7 @@ int ext4_setattr(struct dentry *dentry, struct iattr *attr)
- 		ext4_orphan_del(NULL, inode);
- 
- 	if (!rc && (ia_valid & ATTR_MODE))
--		rc = posix_acl_chmod(inode, inode->i_mode);
--
-+		rc = ext4_acl_chmod(inode, inode->i_mode);
- err_out:
- 	ext4_std_error(inode->i_sb, error);
- 	if (!error)
-diff --git a/fs/ext4/namei.c b/fs/ext4/namei.c
-index 9f61e76..9b6e8b9 100644
---- a/fs/ext4/namei.c
-+++ b/fs/ext4/namei.c
-@@ -38,6 +38,7 @@
- 
- #include "xattr.h"
- #include "acl.h"
-+#include "richacl.h"
- 
- #include <trace/events/ext4.h>
- /*
-@@ -3854,6 +3855,8 @@ const struct inode_operations ext4_dir_inode_operations = {
- 	.removexattr	= generic_removexattr,
- 	.get_acl	= ext4_get_acl,
- 	.set_acl	= ext4_set_acl,
-+	.get_richacl	= ext4_get_richacl,
-+	.set_richacl	= ext4_set_richacl,
- 	.fiemap         = ext4_fiemap,
+ #endif				/* _CIFS_FS_SB_H */
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 6a1119e..55160df 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -584,6 +584,80 @@ static const struct super_operations cifs_super_ops =
+=3D {
+ #endif
  };
- 
-@@ -3865,4 +3868,6 @@ const struct inode_operations ext4_special_inode_operations = {
- 	.removexattr	= generic_removexattr,
- 	.get_acl	= ext4_get_acl,
- 	.set_acl	= ext4_set_acl,
-+	.get_richacl	= ext4_get_richacl,
-+	.set_richacl	= ext4_set_richacl,
- };
-diff --git a/fs/ext4/richacl.c b/fs/ext4/richacl.c
-new file mode 100644
-index 0000000..d581be4
---- /dev/null
-+++ b/fs/ext4/richacl.c
-@@ -0,0 +1,142 @@
-+/*
-+ * Copyright IBM Corporation, 2010
-+ * Copyright (C) 2015  Red Hat, Inc.
-+ * Author: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>,
-+ * 	   Andreas Gruenbacher <agruenba@redhat.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of version 2.1 of the GNU Lesser General Public License
-+ * as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it would be useful, but
-+ * WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-+ *
-+ */
-+
-+#include <linux/kernel.h>
-+#include <linux/fs.h>
-+#include <linux/richacl_xattr.h>
-+
-+#include "ext4.h"
-+#include "ext4_jbd2.h"
-+#include "xattr.h"
-+#include "acl.h"
-+#include "richacl.h"
-+
-+struct richacl *
-+ext4_get_richacl(struct inode *inode)
+=20
++void
++cifs_free_rdelem(struct cifs_rdelem *rdelem)
 +{
-+	const int name_index = EXT4_XATTR_INDEX_RICHACL;
-+	void *value = NULL;
-+	struct richacl *acl = NULL;
-+	int retval;
-+
-+	retval = ext4_xattr_get(inode, name_index, "", NULL, 0);
-+	if (retval > 0) {
-+		value = kmalloc(retval, GFP_NOFS);
-+		if (!value)
-+			return ERR_PTR(-ENOMEM);
-+		retval = ext4_xattr_get(inode, name_index, "", value, retval);
-+	}
-+	if (retval > 0) {
-+		acl = richacl_from_xattr(&init_user_ns, value, retval);
-+		if (acl == ERR_PTR(-EINVAL))
-+			acl = ERR_PTR(-EIO);
-+	} else if (retval != -ENODATA && retval != -ENOSYS) {
-+		acl = ERR_PTR(retval);
-+	}
-+	kfree(value);
-+
-+	if (!IS_ERR(acl))
-+		set_cached_richacl(inode, acl);
-+
-+	return acl;
++	kfree(rdelem->rdname);
++	kfree(rdelem);
 +}
 +
-+static int
-+__ext4_remove_richacl(handle_t *handle, struct inode *inode)
++struct cifs_rdelem *
++cifs_alloc_rdelem(char *full_path, struct dentry *rdentry,
++				struct inode *rdinode)
 +{
-+	const int name_index = EXT4_XATTR_INDEX_RICHACL;
-+	int retval;
-+
-+	retval = ext4_xattr_set_handle(handle, inode, name_index, "",
-+				       NULL, 0, 0);
-+	if (!retval)
-+		set_cached_richacl(inode, NULL);
-+	return retval;
-+}
-+
-+static int
-+__ext4_set_richacl(handle_t *handle, struct inode *inode, struct richacl *acl)
-+{
-+	const int name_index = EXT4_XATTR_INDEX_RICHACL;
-+	umode_t mode = inode->i_mode;
-+	int retval, size;
-+	void *value;
-+
-+	if (richacl_equiv_mode(acl, &mode) == 0) {
-+		inode->i_ctime = ext4_current_time(inode);
-+		inode->i_mode = mode;
-+		ext4_mark_inode_dirty(handle, inode);
-+		return __ext4_remove_richacl(handle, inode);
++	struct cifs_rdelem *rdelem;
++	rdelem =3D kmalloc(sizeof(struct cifs_rdelem), GFP_KERNEL);
++	if (!rdelem) {
++		cifs_dbg(FYI, "%s Can't allocate root dentry\n", __func__);
++		return ERR_PTR(-ENOMEM);
 +	}
 +
-+	mode &= ~S_IRWXUGO;
-+	mode |= richacl_masks_to_mode(acl);
++	rdelem->rdname =3D kstrdup(full_path, GFP_KERNEL);
 +
-+	size = richacl_xattr_size(acl);
-+	value = kmalloc(size, GFP_NOFS);
-+	if (!value)
-+		return -ENOMEM;
-+	richacl_to_xattr(&init_user_ns, acl, value, size);
-+	inode->i_mode = mode;
-+	retval = ext4_xattr_set_handle(handle, inode, name_index, "",
-+				       value, size, 0);
-+	kfree(value);
-+	if (retval)
-+		return retval;
++	if (!rdelem->rdname) {
++		cifs_dbg(FYI, "%s Can't allocate root dentry name\n", __func__);
++		kfree(rdelem);
++		return ERR_PTR(-ENOMEM);
++	}
 +
-+	set_cached_richacl(inode, acl);
++	rdelem->rdinode =3D rdinode;
++	rdelem->rdentry =3D rdentry;
 +
-+	return 0;
++	return rdelem;
 +}
 +
-+int
-+ext4_set_richacl(struct inode *inode, struct richacl *acl)
++static struct dentry *
++create_root_dis_dentry(struct super_block *sb, struct inode *rinode,
++			char *fpath)
 +{
-+	handle_t *handle;
-+	int retval, retries = 0;
++	int rc;
++	unsigned int xid;
++	struct dentry *dentry =3D NULL;
++	struct cifs_rdelem *rdelem =3D NULL;
++	struct cifs_sb_info *cifs_sb =3D CIFS_SB(sb);
++	struct cifs_tcon *tcon =3D cifs_sb_master_tcon(cifs_sb);
 +
-+retry:
-+	handle = ext4_journal_start(inode, EXT4_HT_XATTR,
-+				    ext4_jbd2_credits_xattr(inode));
-+	if (IS_ERR(handle))
-+		return PTR_ERR(handle);
-+
-+	if (acl)
-+		retval = __ext4_set_richacl(handle, inode, acl);
++	xid =3D get_xid();
++	if (tcon->unix_ext)
++		rc =3D cifs_get_inode_info_unix(&rinode, fpath, sb, xid);
 +	else
-+		retval = __ext4_remove_richacl(handle, inode);
++		rc =3D cifs_get_inode_info(&rinode, fpath, NULL, sb, xid, NULL);
++	free_xid(xid);
 +
-+	ext4_journal_stop(handle);
-+	if (retval == -ENOSPC && ext4_should_retry_alloc(inode->i_sb, &retries))
-+		goto retry;
-+	return retval;
-+}
++	if ((rc =3D=3D 0) && (rinode !=3D NULL)) {
++		dentry =3D d_obtain_alias(rinode);
++		if (IS_ERR(dentry)) {
++			iput(rinode);
++			goto rdelem_ret;
++		}
 +
-+int
-+ext4_init_richacl(handle_t *handle, struct inode *inode, struct inode *dir)
-+{
-+	struct richacl *acl = richacl_create(&inode->i_mode, dir);
-+	int error;
++		if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM)) {
 +
-+	error = PTR_ERR(acl);
-+	if (IS_ERR(acl))
-+		return error;
-+	if (acl) {
-+		error = __ext4_set_richacl(handle, inode, acl);
-+		richacl_put(acl);
++			rdelem =3D
++				cifs_alloc_rdelem(fpath, dentry, rinode);
++			if (IS_ERR(rdelem))
++				goto rdelem_ret;
++			spin_lock(&cifs_sb->rtdislock);
++			list_add(&rdelem->rdlist, &cifs_sb->rtdislist);
++			spin_unlock(&cifs_sb->rtdislock);
++		}
++		return dentry;
 +	}
-+	return error;
++
++rdelem_ret:
++	return ERR_PTR(-EACCES);
 +}
-diff --git a/fs/ext4/richacl.h b/fs/ext4/richacl.h
-new file mode 100644
-index 0000000..6fe9a92
---- /dev/null
-+++ b/fs/ext4/richacl.h
-@@ -0,0 +1,40 @@
-+/*
-+ * Copyright IBM Corporation, 2010
-+ * Copyright (C)  2015 Red Hat, Inc.
-+ * Author Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of version 2.1 of the GNU Lesser General Public License
-+ * as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it would be useful, but
-+ * WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-+ *
-+ */
 +
-+#ifndef __FS_EXT4_RICHACL_H
-+#define __FS_EXT4_RICHACL_H
+ /*
+  * Get root dentry from superblock according to prefix path mount option.
+  * Return dentry with refcount + 1 on success and NULL otherwise.
+@@ -596,9 +670,10 @@ cifs_get_root(struct smb_vol *vol, struct super_block =
+*sb)
+ 	char *full_path =3D NULL;
+ 	char *s, *p;
+ 	char sep;
++	struct inode *rinode =3D NULL;
++	struct cifs_tcon *tcon =3D cifs_sb_master_tcon(cifs_sb);
+=20
+-	full_path =3D cifs_build_path_to_root(vol, cifs_sb,
+-					    cifs_sb_master_tcon(cifs_sb));
++	full_path =3D cifs_build_path_to_root(vol, cifs_sb, tcon);
+ 	if (full_path =3D=3D NULL)
+ 		return ERR_PTR(-ENOMEM);
+=20
+@@ -639,6 +714,11 @@ cifs_get_root(struct smb_vol *vol, struct super_block =
+*sb)
+ 		dput(dentry);
+ 		dentry =3D child;
+ 	} while (!IS_ERR(dentry));
 +
-+#include <linux/richacl.h>
++	if (IS_ERR(dentry) && (PTR_ERR(dentry) =3D=3D -EACCES || PTR_ERR(dentry) =
+=3D=3D -ENOENT) && *s) {
++		dentry =3D create_root_dis_dentry(sb, rinode, full_path);
++	}
 +
-+#ifdef CONFIG_EXT4_FS_RICHACL
+ 	kfree(full_path);
+ 	return dentry;
+ }
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index c63fd1d..b0a813f 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -205,6 +205,7 @@ extern void cifs_add_pending_open_locked(struct cifs_fi=
+d *fid,
+ 					 struct tcon_link *tlink,
+ 					 struct cifs_pending_open *open);
+ extern void cifs_del_pending_open(struct cifs_pending_open *open);
++extern void cifs_free_rdelem(struct cifs_rdelem *);
+=20
+ #if IS_ENABLED(CONFIG_CIFS_DFS_UPCALL)
+ extern void cifs_dfs_release_automount_timer(void);
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 773f4dc..018c156 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -3190,6 +3190,9 @@ void cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
+ 	spin_lock_init(&cifs_sb->tlink_tree_lock);
+ 	cifs_sb->tlink_tree =3D RB_ROOT;
+=20
++	spin_lock_init(&cifs_sb->rtdislock);
++	INIT_LIST_HEAD(&cifs_sb->rtdislist);
 +
-+extern struct richacl *ext4_get_richacl(struct inode *);
-+extern int ext4_set_richacl(struct inode *, struct richacl *);
+ 	/*
+ 	 * Temporarily set r/wsize for matching superblock. If we end up using
+ 	 * new sb then client will later negotiate it downward if needed.
+diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+index c3eb998..bc02265 100644
+--- a/fs/cifs/dir.c
++++ b/fs/cifs/dir.c
+@@ -77,6 +77,9 @@ cifs_build_path_to_root(struct smb_vol *vol, struct cifs_=
+sb_info *cifs_sb,
+ 	return full_path;
+ }
+=20
++static struct cifs_rdelem * find_rdelem_by_dentry_no_del(const struct dent=
+ry *rdentry,
++							 struct cifs_sb_info * cifs_sb);
 +
-+extern int ext4_init_richacl(handle_t *, struct inode *, struct inode *);
+ /* Note: caller must free return buffer */
+ char *
+ build_path_from_dentry(struct dentry *direntry)
+@@ -89,6 +92,25 @@ build_path_from_dentry(struct dentry *direntry)
+ 	struct cifs_sb_info *cifs_sb =3D CIFS_SB(direntry->d_sb);
+ 	struct cifs_tcon *tcon =3D cifs_sb_master_tcon(cifs_sb);
+ 	unsigned seq;
++	struct cifs_rdelem *dis_root =3D NULL;
++	size_t dis_root_len =3D 0;
 +
-+#else  /* CONFIG_EXT4_FS_RICHACL */
++	/*
++	 * First look if the dentry has a disconnected root in its
++	 * parent hierarchy. If that's the case we must append that
++	 * root path as a prefix.
++	 */
 +
-+#define ext4_get_richacl NULL
-+#define ext4_set_richacl NULL
++	rcu_read_lock();
++	for (temp =3D direntry; temp && !IS_ROOT(temp); temp =3D temp->d_parent);
++	if (temp && (dis_root =3D find_rdelem_by_dentry_no_del(temp, cifs_sb)))
++		dis_root_len =3D strlen(dis_root->rdname);
++	rcu_read_unlock();
 +
-+static inline int
-+ext4_init_richacl(handle_t *handle, struct inode *inode, struct inode *dir)
++	/*
++	 * Now let's compute the length of the path so that we can
++	 * allocate the right size
++	 */
+=20
+ 	dirsep =3D CIFS_DIR_SEP(cifs_sb);
+ 	if (tcon->Flags & SMB_SHARE_IS_IN_DFS)
+@@ -108,8 +130,19 @@ cifs_bp_rename_retry:
+ 			return NULL;
+ 		}
+ 	}
++	if (dis_root && temp =3D=3D dis_root->rdentry) {
++		/*
++		 *  Account for the disconnected root prefix
++		 *  Note: leading dir separator already in the length
++		 */
++		namelen +=3D dis_root_len;
++	}
+ 	rcu_read_unlock();
+=20
++	/*
++	 * Next step is to actually fill the full_path string
++	 */
++
+ 	full_path =3D kmalloc(namelen+1, GFP_KERNEL);
+ 	if (full_path =3D=3D NULL)
+ 		return full_path;
+@@ -136,7 +169,12 @@ cifs_bp_rename_retry:
+ 			return NULL;
+ 		}
+ 	}
++	if (dis_root && temp =3D=3D dis_root->rdentry) {
++		namelen -=3D dis_root_len;
++		strncpy(full_path + namelen, dis_root->rdname, dis_root_len);
++	}
+ 	rcu_read_unlock();
++
+ 	if (namelen !=3D dfsplen || read_seqretry(&rename_lock, seq)) {
+ 		cifs_dbg(FYI, "did not end path lookup where expected. namelen=3D%ddfspl=
+en=3D%d\n",
+ 			 namelen, dfsplen);
+@@ -704,6 +742,73 @@ mknod_out:
+ 	return rc;
+ }
+=20
++static struct cifs_rdelem *
++find_rdelem_by_inode(struct inode *rdinode, struct cifs_sb_info * cifs_sb)
 +{
++	struct cifs_rdelem *rdelem;
++	spin_lock(&cifs_sb->rtdislock);
++	list_for_each_entry(rdelem, &cifs_sb->rtdislist, rdlist) {
++		if (rdelem->rdinode =3D=3D rdinode) {
++			list_del(&rdelem->rdlist);
++			spin_unlock(&cifs_sb->rtdislock);
++			return rdelem;
++		}
++	}
++	spin_unlock(&cifs_sb->rtdislock);
++	return NULL;
++}
++
++static struct cifs_rdelem *
++find_rdelem_by_dentry(const struct dentry *rdentry,
++			struct cifs_sb_info * cifs_sb)
++{
++	struct cifs_rdelem *rdelem;
++	spin_lock(&cifs_sb->rtdislock);
++	list_for_each_entry(rdelem, &cifs_sb->rtdislist, rdlist) {
++		if (rdelem->rdentry =3D=3D rdentry) {
++			list_del(&rdelem->rdlist);
++			spin_unlock(&cifs_sb->rtdislock);
++			return rdelem;
++		}
++	}
++	spin_unlock(&cifs_sb->rtdislock);
++	return NULL;
++}
++
++static struct cifs_rdelem *
++find_rdelem_by_dentry_no_del(const struct dentry *rdentry,
++			struct cifs_sb_info * cifs_sb)
++{
++	struct cifs_rdelem *rdelem;
++	struct cifs_rdelem *found =3D NULL;
++	spin_lock(&cifs_sb->rtdislock);
++	list_for_each_entry(rdelem, &cifs_sb->rtdislist, rdlist) {
++		if (rdelem->rdentry =3D=3D rdentry) {
++			found =3D rdelem;
++			break;
++		}
++	}
++	spin_unlock(&cifs_sb->rtdislock);
++	return found;
++}
++
++
++static void
++find_rdelem_by_path(char *full_path, struct inode **newInode,
++			struct cifs_sb_info * cifs_sb)
++{
++	struct cifs_rdelem *rdelem;
++	spin_lock(&cifs_sb->rtdislock);
++	list_for_each_entry(rdelem, &cifs_sb->rtdislist, rdlist) {
++		if (!strcmp(rdelem->rdname, full_path)) {
++			*newInode =3D ilookup(rdelem->rdinode->i_sb,
++					    rdelem->rdinode->i_ino);
++			break;
++		}
++	}
++	spin_unlock(&cifs_sb->rtdislock);
++}
++
+ struct dentry *
+ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
+ 	    unsigned int flags)
+@@ -715,6 +820,9 @@ cifs_lookup(struct inode *parent_dir_inode, struct dent=
+ry *direntry,
+ 	struct cifs_tcon *pTcon;
+ 	struct inode *newInode =3D NULL;
+ 	char *full_path =3D NULL;
++	struct dentry *ret =3D NULL;
++	struct cifs_rdelem *rdelem;
++	struct qstr dname;
+=20
+ 	xid =3D get_xid();
+=20
+@@ -751,20 +859,66 @@ cifs_lookup(struct inode *parent_dir_inode, struct de=
+ntry *direntry,
+ 	}
+ 	cifs_dbg(FYI, "Full path: %s inode =3D 0x%p\n",
+ 		 full_path, d_inode(direntry));
++	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM)) {
++		/*
++		 * Looking for an existing disconnected root dentry if any,
++		 * before sending out a lookup on the wire.
++		 */
++		find_rdelem_by_path(full_path, &newInode, cifs_sb);
++	}
+=20
+-	if (pTcon->unix_ext) {
+-		rc =3D cifs_get_inode_info_unix(&newInode, full_path,
+-					      parent_dir_inode->i_sb, xid);
+-	} else {
+-		rc =3D cifs_get_inode_info(&newInode, full_path, NULL,
+-				parent_dir_inode->i_sb, xid, NULL);
++	if (!newInode) {
++		if (pTcon->unix_ext) {
++			rc =3D cifs_get_inode_info_unix(&newInode, full_path,
++					parent_dir_inode->i_sb, xid);
++		} else
++			rc =3D cifs_get_inode_info(&newInode, full_path, NULL,
++					parent_dir_inode->i_sb, xid, NULL);
+ 	}
++	/* else, found an anonymous root dentry with an inode */
++
++
+=20
+ 	if ((rc =3D=3D 0) && (newInode !=3D NULL)) {
+-		d_add(direntry, newInode);
++
+ 		/* since paths are not looked up by component - the parent
+ 		   directories are presumed to be good here */
+-		renew_parental_timestamps(direntry);
++		if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM)) {
++			dname.name =3D direntry->d_name.name;
++			dname.len =3D strlen(direntry->d_name.name) + 1;
++			/*
++			 * Perhaps another lookup beat us to this.
++			 */
++			spin_lock(&cifs_sb->rtdislock);
++			ret =3D d_lookup(direntry->d_parent, &dname);
++			if (ret && !IS_ERR(ret)) {
++				dput(ret);
++				spin_unlock(&cifs_sb->rtdislock);
++				goto lookup_out;
++			} else
++				ret =3D d_splice_alias(newInode, direntry);
++			spin_unlock(&cifs_sb->rtdislock);
++		} else
++			ret =3D d_splice_alias(newInode, direntry);
++		if (!ret)
++			renew_parental_timestamps(direntry);
++
++		else {
++			if (!IS_ERR(ret)) {
++				if (!(cifs_sb->mnt_cifs_flags &
++						CIFS_MOUNT_SERVER_INUM)) {
++					rdelem =3D
++					find_rdelem_by_inode(newInode, cifs_sb);
++					if (rdelem)
++						cifs_free_rdelem(rdelem);
++				}
++				renew_parental_timestamps(ret);
++				dput(ret);
++				goto lookup_out;
++			} else
++				rc =3D PTR_ERR(ret);
++		}
++
+=20
+ 	} else if (rc =3D=3D -ENOENT) {
+ 		rc =3D 0;
+@@ -777,12 +931,41 @@ cifs_lookup(struct inode *parent_dir_inode, struct de=
+ntry *direntry,
+ 		/* We special case check for Access Denied - since that
+ 		is a common return code */
+ 	}
+-
++	ret =3D ERR_PTR(rc);
+ lookup_out:
+ 	kfree(full_path);
+ 	cifs_put_tlink(tlink);
+ 	free_xid(xid);
+-	return ERR_PTR(rc);
++	return ret;
++}
++
++static void
++cifs_d_common_releasedelete(const struct dentry *dentry)
++{
++	struct cifs_rdelem *rdelem;
++	struct cifs_sb_info *cifs_sb;
++
++	cifs_sb =3D CIFS_SB(dentry->d_sb);
++
++	/* disconnected root dentries that did not get spliced */
++	if (IS_ROOT(dentry) && dentry->d_flags & DCACHE_DISCONNECTED) {
++		rdelem =3D find_rdelem_by_dentry(dentry, cifs_sb);
++		if (rdelem)
++			cifs_free_rdelem(rdelem);
++	}
++}
++
++static int
++cifs_d_delete(const struct dentry *dentry)
++{
++	cifs_d_common_releasedelete(dentry);
 +	return 0;
 +}
 +
-+#endif  /* CONFIG_EXT4_FS_RICHACL */
-+#endif  /* __FS_EXT4_RICHACL_H */
-diff --git a/fs/ext4/xattr.c b/fs/ext4/xattr.c
-index 16e28c0..4d79adb 100644
---- a/fs/ext4/xattr.c
-+++ b/fs/ext4/xattr.c
-@@ -55,6 +55,7 @@
- #include <linux/slab.h>
- #include <linux/mbcache.h>
- #include <linux/quotaops.h>
-+#include <linux/richacl_xattr.h>
- #include "ext4_jbd2.h"
- #include "ext4.h"
- #include "xattr.h"
-@@ -99,6 +100,9 @@ static const struct xattr_handler *ext4_xattr_handler_map[] = {
- #ifdef CONFIG_EXT4_FS_SECURITY
- 	[EXT4_XATTR_INDEX_SECURITY]	     = &ext4_xattr_security_handler,
- #endif
-+#ifdef CONFIG_EXT4_FS_RICHACL
-+	[EXT4_XATTR_INDEX_RICHACL]           = &richacl_xattr_handler,
-+#endif
++static void
++cifs_d_release(struct dentry *dentry)
++{
++	cifs_d_common_releasedelete(dentry);
+ }
+=20
+ static int
+@@ -834,19 +1017,11 @@ cifs_d_revalidate(struct dentry *direntry, unsigned =
+int flags)
+ 	return 1;
+ }
+=20
+-/* static int cifs_d_delete(struct dentry *direntry)
+-{
+-	int rc =3D 0;
+-
+-	cifs_dbg(FYI, "In cifs d_delete, name =3D %pd\n", direntry);
+-
+-	return rc;
+-}     */
+-
+ const struct dentry_operations cifs_dentry_ops =3D {
+ 	.d_revalidate =3D cifs_d_revalidate,
+ 	.d_automount =3D cifs_dfs_d_automount,
+-/* d_delete:       cifs_d_delete,      */ /* not needed except for debuggi=
+ng */
++	.d_delete =3D cifs_d_delete,
++	.d_release =3D cifs_d_release,
  };
- 
- const struct xattr_handler *ext4_xattr_handlers[] = {
-@@ -111,6 +115,9 @@ const struct xattr_handler *ext4_xattr_handlers[] = {
- #ifdef CONFIG_EXT4_FS_SECURITY
- 	&ext4_xattr_security_handler,
- #endif
-+#ifdef CONFIG_EXT4_FS_RICHACL
-+	&richacl_xattr_handler,
-+#endif
- 	NULL
+=20
+ static int cifs_ci_hash(const struct dentry *dentry, struct qstr *q)
+@@ -921,4 +1096,6 @@ const struct dentry_operations cifs_ci_dentry_ops =3D {
+ 	.d_hash =3D cifs_ci_hash,
+ 	.d_compare =3D cifs_ci_compare,
+ 	.d_automount =3D cifs_dfs_d_automount,
++	.d_delete =3D cifs_d_delete,
++	.d_release =3D cifs_d_release,
  };
- 
--- 
-2.5.0
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index f621b44..7d17911 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -923,8 +923,10 @@ inode_has_hashed_dentries(struct inode *inode)
+ 	spin_lock(&inode->i_lock);
+ 	hlist_for_each_entry(dentry, &inode->i_dentry, d_u.d_alias) {
+ 		if (!d_unhashed(dentry) || IS_ROOT(dentry)) {
+-			spin_unlock(&inode->i_lock);
+-			return true;
++			if (!(dentry->d_flags & DCACHE_DISCONNECTED)) {
++				spin_unlock(&inode->i_lock);
++				return true;
++			}
+ 		}
+ 	}
+ 	spin_unlock(&inode->i_lock);
+@@ -974,6 +976,23 @@ retry_iget5_locked:
+ 	return inode;
+ }
+=20
++void
++fill_phfattr(struct cifs_fattr *cf, struct super_block *sb)
++{
++
++	struct cifs_sb_info *cifs_sb =3D CIFS_SB(sb);
++
++	memset(cf, 0, sizeof(*cf));
++	cf->cf_uniqueid =3D ROOT_I;
++	cf->cf_nlink =3D 1;
++	cf->cf_atime =3D CURRENT_TIME;
++	cf->cf_ctime =3D CURRENT_TIME;
++	cf->cf_mtime =3D CURRENT_TIME;
++	cf->cf_mode =3D S_IFDIR | S_IXUGO | S_IRWXU;
++	cf->cf_uid =3D cifs_sb->mnt_uid;
++	cf->cf_gid =3D cifs_sb->mnt_gid;
++}
++
+ /* gets root inode */
+ struct inode *cifs_root_iget(struct super_block *sb)
+ {
+@@ -982,6 +1001,7 @@ struct inode *cifs_root_iget(struct super_block *sb)
+ 	struct inode *inode =3D NULL;
+ 	long rc;
+ 	struct cifs_tcon *tcon =3D cifs_sb_master_tcon(cifs_sb);
++	struct cifs_fattr phfattr;
+=20
+ 	xid =3D get_xid();
+ 	if (tcon->unix_ext) {
+@@ -997,8 +1017,16 @@ struct inode *cifs_root_iget(struct super_block *sb)
+=20
+ iget_no_retry:
+ 	if (!inode) {
+-		inode =3D ERR_PTR(rc);
+-		goto out;
++		if (rc =3D=3D -EACCES) {
++			fill_phfattr(&phfattr, sb);
++			inode =3D cifs_iget(sb, &phfattr);
++			if (inode)
++				rc =3D 0;
++		}
++		if (rc) {
++			inode =3D ERR_PTR(rc);
++			goto out;
++		}
+ 	}
+=20
+ #ifdef CONFIG_CIFS_FSCACHE
+--=20
+2.1.4
+
+
+--MP_/G1LHl6bIMtsJrG/3yLLqQ.Y--
+
+--Sig_/AGp9SoFVFIwfVOcwuGSetma
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBAgAGBQJWO2xGAAoJEDIGO5Hchq/8F+MP/26StfgnxzRZCwkUKkyKwwVh
+X+xZZhFhG35Te1OubTW/vrAVftgmpcsuBEbmv+Wuu536LSa9rPaCkioir1KxMV5G
+qGoPtn92VeuRjan95OM5SCJD9SW8ZEWHnWzpI20kqKc1S7GUgbWVE4L+IlEMT9Yq
+F90hawwJgzQLVcBQO2GVrjkYQxrFULVlIgwwvzGKzgP2RxSC455tj3kVwn5JjamC
+2poIEGb85e1BugRzT960rdMT4BegiBrNbFtGIgocmsWZ4qvUSeqJRREAH2GRa9L1
+oLhusgVCfEy/NgJxNckBgOwMyarLoF8q1prKhzit7jPhGp89O7Ir9/gEYTmFsm4e
+lyQhLwXudg3rHSwi2oVrlEPKw7824v0vEErZMtK0s0CpUs9HM5kl0A0MBjDKPmEi
+xOWPm83p0dcVFL3fL6s0Pq5lOva7C4TtcB6ZX8G2yFZp2TGmjbInS8bJAYoJLJMW
+RAn/ISS3rGSmLSmVAK6yKLFQbAdJI/UUCxonrhkFn2GMsTZn4GtPowVbwZVOOLvS
+EEjY4qIHHr8o/K3cxkllEvvlwRIriJ655vmZMRNpjnypUxpsdoGrga7SNStOwfos
+CHInJONfATnh8jVfgbjV8AYRNg7jw8f0z144hgwFJylsBAjmGQZ7HNd58D2r8cBp
+UZ+SUlEUa/0U6uzbM/sl
+=IWtf
+-----END PGP SIGNATURE-----
+
+--Sig_/AGp9SoFVFIwfVOcwuGSetma--
