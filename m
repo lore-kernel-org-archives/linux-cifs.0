@@ -1,127 +1,67 @@
-From: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v13 45/51] sunrpc: Allow to demand-allocate pages to
- encode into
-Date: Sun, 8 Nov 2015 23:19:35 +0100
-Message-ID: <CAHc6FU6mmJj0N6Jq1_fp59kv5h3XeuLUamfNg3iNo64=+rTYCA@mail.gmail.com>
-References: <1446563847-14005-1-git-send-email-agruenba@redhat.com>
-	<1446563847-14005-46-git-send-email-agruenba@redhat.com>
-	<CAHQdGtScoRb-722ES168O8tkp-Rbvwe6bZ=70WwgiXpCC3vsHw@mail.gmail.com>
-	<CAHc6FU5xkjWJeGFR5mO8+OAEMwwU6yWK7H8CV1fn5dk-LS23-g@mail.gmail.com>
-	<CAHQdGtQitLZq9fKHhzZbqS5ESRYNgNpw=M+y715mWMjFi-cgNQ@mail.gmail.com>
+From: Steve French <smfrench@gmail.com>
+Subject: Samba server bug: CopyChunk from one share to a different share on
+ same server
+Date: Sun, 8 Nov 2015 20:52:16 -0600
+Message-ID: <CAH2r5mvf87XmR_VwiHa6B0LV0WDRb8Ro=cRzQbUDV-9yHAjW3A@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
-	"Theodore Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,
-	Andreas Dilger <adilger.kernel-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>,
-	"J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
-	Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>,
-	Anna Schumaker <anna.schumaker-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
-	Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>,
-	linux-ext4 <linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	XFS Developers <xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org>,
-	Linux Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Linux FS-devel Mailing List <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Linux NFS Mailing List <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Linux API Mailing List <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Trond Myklebust <trond.myklebust-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAHQdGtQitLZq9fKHhzZbqS5ESRYNgNpw=M+y715mWMjFi-cgNQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: Mohammad Samian Yusuf <s.yusuf91@hotmail.com>,
+ David Disseldorp <ddiss@samba.org>
+To: samba-technical <samba-technical@lists.samba.org>,
+ "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+Return-path: <samba-technical-bounces@lists.samba.org>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
+ <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical/>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
+ <mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Errors-To: samba-technical-bounces@lists.samba.org
+Sender: "samba-technical" <samba-technical-bounces@lists.samba.org>
 List-Id: linux-cifs.vger.kernel.org
 
-On Thu, Nov 5, 2015 at 4:57 PM, Trond Myklebust
-<trond.myklebust-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org> wrote:
-> On Thu, Nov 5, 2015 at 6:07 AM, Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->> Trond,
->>
->> On Tue, Nov 3, 2015 at 5:25 PM, Trond Myklebust
->> <trond.myklebust-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org> wrote:
->>> On Tue, Nov 3, 2015 at 10:17 AM, Andreas Gruenbacher
->>> <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->>>> When encoding large, variable-length objects such as acls into xdr_bufs,
->>>> it is easier to allocate buffer pages on demand rather than precomputing
->>>> the required buffer size.
->>>
->>> NACK. We're not doing allocations from inside the XDR encoders. This
->>> can and should be done before calling into the SUNRPC layer.
->>
->> an XDR-encoded ACL can be up to 64k (16 pages) in size. In practice,
->> large ACLs like that will almost never occur and almost all ACLs will
->> fit into a single page though.
->>
->> The XDR-encoded ACL contains strings for the user and group names
->> which need to be looked up when the idmapper is used. Those lookups
->> are somewhat expensive; in addition, the lookup results can change
->> over time. When precomputing the size, allocating space, and then
->> encoding the ACL, we could run out of space when encoding.
->>
->> So we could always allocate the maximum 16 pages, encode the acl, and
->> free the unused pages. This would be rather wasteful though.
->>
->> Given how simple it is to allocate pages as we go, this seems the
->> better choice here. This doesn't break any existing code either; NULL
->> page pointers would have oopsed in xdr_get_next_encode_buffer before.
->>
->> From the memory management point of view, there is no difference in
->> preallocating GFP_NOFS pages and allocating them on demand; the pages
->> are allocated in the same task and locking context in both cases.
->>
->> So could you please explain why you object to this change?
->
-> Allocating memory deep in the bowels of the RPC code with the
-> expectation that it will be freed by the caller of the RPC request is
-> a layering violation of the ugliest sort.
+Tried a quick experiment using cloner (David's tool - xfstests/src/cloner)
+to copy a file from share1 to share2 on the same target server (using
+CopyChunk and SMB3).  Works fine for Windows (tried Windows 8.1) but failed
+for Samba 4.2.
 
-Ah, there we have it, Godwin's Law for software discussions.
+This is one of the more important cases to support (copying a file from one
+share to another)
 
-What happens here is the following: the caller sets up an xdr_stream
-that contains an array of NULL page pointers (__nfs4_proc_set_acl ->
-nfs4_encode_acl -> xdr_init_encode_pages). It does so on purpose to
-tell the XDR layer to allocate pages for it as needed, and it knows it
-is responsible for later freeing those pages.
+Samba returns STATUS_OBJECT_NAME_NOT_FOUND on FSCTL_SRV_COPYCHUNK_WRITE
+unless source and target are on the same share.  I didn't try it with
+vfs_btrfs (the test system was running ext4, and both exports are on the
+same volume on the server).
 
-Without this patch, the XDR layer would immediately Oops when hitting
-a NULL page pointer. This tells us that the XDR layer is so far not
-prepared to handle NULL page pointers, and that we can assign a
-meaning to NULL page pointers without affecting existing callers.
+Was testing the change below where I relax the copy offload check as
+follows (to allow cross share copy chunk as Windows does)
 
-Using the existing XDR layer for XDR-encoding ACLs makes sense because
-the XDR layer already knows how to align things, encode into multiple
-pages, handle strings that wrap across pages, etc. I really don't want
-to duplicate all that for ACLs.
+diff --git a/fs/cifs/ioctl.c b/fs/cifs/ioctl.c
+index 28a77bf..35cf990 100644
+--- a/fs/cifs/ioctl.c
++++ b/fs/cifs/ioctl.c
+@@ -85,9 +85,14 @@ static long cifs_ioctl_clone(unsigned int xid, struct
+file *dst_file,
+     src_tcon = tlink_tcon(smb_file_src->tlink);
+     target_tcon = tlink_tcon(smb_file_target->tlink);
 
-> How is anyone who is
-> unfamiliar with the code going to be able to understand what is going
-> on without tracing through 1000 lines of code to spot where the
-> allocation is happening?
+-    /* check if source and target are on same tree connection */
+-    if (src_tcon != target_tcon) {
+-        cifs_dbg(VFS, "file copy src and target on different volume\n");
++    /* check source and target on same server (or volume if dup_extents) */
++    if (dup_extents && (src_tcon != target_tcon)) {
++        cifs_dbg(VFS, "source and target of copy not on same share\n");
++        goto out_fput;
++    }
++
++    if (!dup_extents && (src_tcon->ses != target_tcon->ses)) {
++        cifs_dbg(VFS, "source and target of copy not on same server\n");
+         goto out_fput;
+     }
 
-Somebody unfamiliar with the existing code will not understand it
-without putting some effort in, either. What do you expect? Besides,
-the caller doesn't care where the allocation is happening, it just
-cares that it is happening when it should.
 
-> Aside from that, we do not want any non-critical blocking while
-> holding the RPC socket lock. Your allocation request will block all
-> further traffic to the server until it is satisfied. That includes
-> blocking page writeback, which might actually free up memory to
-> satisfy the allocation.
->
-> As I said above, there is no reason whatsoever to have to do all this
-> inside encode_setacl(). The entire ACL encoding into pages can be done
-> before even calling into the RPC layer, just like we do today.
-
-You have pointed that out before, and as a consequence, it was fixed
-in the July 22 snapshot (https://lwn.net/Articles/652058/):
-
-    * Changes to the nfs patches: acls are now encoded above the sunrpc
-      layer. This means we can no longer encode small acls directly into the
-      scratch area of an xdr_buf, we always have to allocate extra memory.
-      But we also don't need to touch the nfs sunrpc code, which Trond objected
-      to.
-
-Since then, the ACL encoding happens in __nfs4_proc_set_acl, before
-calling into the RPC layer.
-
+-- 
 Thanks,
-Andreas
+
+Steve
