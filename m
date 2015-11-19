@@ -1,77 +1,52 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v1] cifs: make shares unaccessible at root level mountable
-Date: Mon, 16 Nov 2015 23:20:09 -0600
-Message-ID: <CADT32eJ_uLj4_sEhWc+O=xjOMMfNhGGH9XhiJmdDQyrL6Dzp3A@mail.gmail.com>
-References: <20151105154836.1851c30c@aaptelpc>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>
+From: Uri Simchoni <urisimchoni-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] manpage: clarify use of backupuid and backupgid in mount.cifs.8
+Date: Thu, 19 Nov 2015 21:48:15 +0200
+Message-ID: <1447962495-14738-2-git-send-email-uri@samba.org>
+References: <1447962495-14738-1-git-send-email-uri@samba.org>
+Cc: samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, Uri Simchoni <uri-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20151105154836.1851c30c@aaptelpc>
+In-Reply-To: <1447962495-14738-1-git-send-email-uri-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-I do not understand why you need to entertain error ENOENT on an
-intermediate path.
-If a server is returning that error, there does not exist such an entry=
-=2E
-In such a case, does Query Path Info on the full path return any error?
+Assert that backup intent shall only be attempted if the user matches
+the backupuid or backupgid parameter.
 
-I still do not understand why noserverino is in picture. Only the
-disconnected root dentry
-has an inode generated with an id by the cifs client.  Once this
-disconnected root denty
-gets spliced, the inode is filled with correct inode (fileid)
-available from the server
-(since that intermediate path is now accessible hence splicable).
-You have fileid/inode available for all eligible/accessible file
-objects under the disconnected
-root entry.
+Signed-off-by: Uri Simchoni <uri-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ mount.cifs.8 | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-
-On Thu, Nov 5, 2015 at 8:48 AM, Aur=C3=A9lien Aptel <aaptel-IBi9RG/b67k@public.gmane.org> w=
-rote:
-> Hi,
->
-> I've been working on solving this bug [1] for some time now. You can
-> find some of my research notes here [2]. I was recently able to
-> finally make it work.
->
-> The patch is based on Shirish's patch (available at [1]) to which I'v=
-e
-> made the following modification:
->
-> - create disconnected root when any intermediary path are "not
->   found" (ENOENT). Previously it was only done for EACCES errors.
->
-> - fix build_path_from_dentry() to correctly prefix dentry that are
->   children of a disconnected root with the disconnected root actual
->   path. This path is only avaible when using the struct rdelem linked
->   list stored in the cifs superblock i.e. when we mount with
->   noserverino.
->
-> So basically if you have the bug described in [1] you can solve it by
-> applying this patch and mounting with -o noserverino. I would like to
-> get rid this restriction (noserverino) and unconditionnaly use the
-> rdelem linked list but I don't know how feasible/safe that is (I'm st=
-ill
-> new to all this stuff, this is my first kernel patch).
->
-> Shirish, I'd like to hear your comments if you have any. I've noticed
-> your find_rdelem_by_dentry() removes the dentry from the rdelem list
-> and I'm not sure I understand why. I've added and used
-> find_rdelem_by_dentry_no_del() to do the same thing without removing =
-it.
->
-> 1: https://bugzilla.samba.org/show_bug.cgi?id=3D8950
-> 2: http://diobla.info/doc/suse-todo#bnc799133
->
-> --
-> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-> SUSE Linux GmbH, Maxfeldstra=C3=9Fe 5, 90409 N=C3=BCrnberg, Germany
-> GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton, HRB 21284 (=
-AG
-> N=C3=BCrnberg)
+diff --git a/mount.cifs.8 b/mount.cifs.8
+index 2643145..af6b097 100644
+--- a/mount.cifs.8
++++ b/mount.cifs.8
+@@ -310,14 +310,14 @@ for more information\&.
+ .PP
+ backupuid=\fIarg\fR
+ .RS 4
+-Restrict access to files with the backup intent to a user. Either a name or an id must be provided as an argument, there are no default values.
++File access by this user shall be done with the backup intent flag set. Either a name or an id must be provided as an argument, there are no default values.
+ .sp
+ See section \fIACCESSING FILES WITH BACKUP INTENT\fR for more details
+ .RE
+ .PP
+ backupgid=\fIarg\fR
+ .RS 4
+-Restrict access to files with the backup intent to a group. Either a name or an id must be provided as an argument, there are no default values.
++File access by users who are members of this group shall be done with the backup intent flag set. Either a name or an id must be provided as an argument, there are no default values.
+ .sp
+ See section \fIACCESSING FILES WITH BACKUP INTENT\fR for more details
+ .RE
+@@ -767,7 +767,7 @@ But the user testuser, if it becomes part of the group Backup Operators, can ope
+ Any user on the client side who can authenticate as such a user on the server,
+ can access the files with the backup intent. But it is desirable and preferable for security reasons amongst many, to restrict this special right.
+ 
+-The mount option backupuid is used to restrict this special right to a user which is specified by either a name or an id. The mount option backupgid is used to restrict this special right to the users in a group which is specified by either a name or an id. These two mount options can be used together.
++The mount option backupuid is used to restrict this special right to a user which is specified by either a name or an id. The mount option backupgid is used to restrict this special right to the users in a group which is specified by either a name or an id. Only users maching either backupuid or backupgid shall attempt to access files with backup intent. These two mount options can be used together.
+ .SH "FILE AND DIRECTORY OWNERSHIP AND PERMISSIONS"
+ .PP
+ The core CIFS protocol does not provide unix ownership information or mode for files and directories\&. Because of this, files and directories will generally appear to be owned by whatever values the uid= or gid= options are set, and will have permissions set to the default file_mode and dir_mode for the mount\&. Attempting to change these values via chmod/chown will return success but have no effect\&.
+-- 
+2.4.3
