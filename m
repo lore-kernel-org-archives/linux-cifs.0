@@ -1,276 +1,439 @@
-From: Andreas Dilger <adilger@dilger.ca>
-Subject: Re: [RFC][PATCH 00/12] Enhanced file stat system call
-Date: Tue, 24 Nov 2015 09:28:26 -0700
-Message-ID: <05671A95-75FC-4A57-8477-8FFA0BC2FC08@dilger.ca>
-References: <20151120145422.18930.72662.stgit@warthog.procyon.org.uk> <564F4F4E.8060603@schaufler-ca.com>
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Content-Type: multipart/signed; boundary="Apple-Mail=_B3073CE5-8B8D-451D-8FF9-185642D38F51"; protocol="application/pgp-signature"; micalg=pgp-sha256
-Cc: David Howells <dhowells@redhat.com>, arnd@arndb.de,
-	linux-afs@vger.kernel.org, linux-nfs@vger.kernel.org,
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-ext4@vger.kernel.org
-To: Casey Schaufler <casey@schaufler-ca.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <564F4F4E.8060603@schaufler-ca.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Steve French <smfrench@gmail.com>
+Subject: Re: [PATCH 07/12] statx: CIFS: Return enhanced attributes
+Date: Tue, 24 Nov 2015 11:33:53 -0600
+Message-ID: <CAH2r5muw4_8gVgeJ_LuAe4+27wXt8uwSQCyv+dt7gLiBs2a2hw@mail.gmail.com>
+References: <20151120145422.18930.72662.stgit@warthog.procyon.org.uk>
+ <20151120145548.18930.11614.stgit@warthog.procyon.org.uk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-afs@vger.kernel.org,
+ "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
+ Arnd Bergmann <arnd@arndb.de>,
+ "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+ samba-technical <samba-technical@lists.samba.org>,
+ LKML <linux-kernel@vger.kernel.org>,
+ linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+ "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>
+To: David Howells <dhowells@redhat.com>
+Return-path: <samba-technical-bounces@lists.samba.org>
+In-Reply-To: <20151120145548.18930.11614.stgit@warthog.procyon.org.uk>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
+ <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical/>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
+ <mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Errors-To: samba-technical-bounces@lists.samba.org
+Sender: "samba-technical" <samba-technical-bounces@lists.samba.org>
 List-Id: linux-cifs.vger.kernel.org
 
+Is it worth storing the same creation time twice (in slightly different
+formats, struct timespec and u64 DCE time) in cifsInodeInfo?
 
---Apple-Mail=_B3073CE5-8B8D-451D-8FF9-185642D38F51
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=us-ascii
+On Fri, Nov 20, 2015 at 8:55 AM, David Howells <dhowells@redhat.com> wrote:
 
-On Nov 20, 2015, at 9:50 AM, Casey Schaufler <casey@schaufler-ca.com> =
-wrote:
-> On 11/20/2015 6:54 AM, David Howells wrote:
->> Implement new system calls to provide enhanced file stats and =
-enhanced
->> filesystem stats.  The patches can be found here:
->>=20
->> 	=
-http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=3D=
-xstat
->>=20
->>=20
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->> DESCRIPTION
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>=20
->> The third patch provides this new system call:
->>=20
->> 	long ret =3D statx(int dfd,
->> 			 const char *filename,
->> 			 unsigned atflag,
->> 			 unsigned mask,
->> 			 struct statx *buffer);
->>=20
->> This is an enhanced file stat function that provides a number of =
-useful
->> features, in summary:
->>=20
->>  (1) More information: creation time, data version number,
->>      flags/attributes.  A subset of these is available through a =
-number of
->>      filesystems (such as CIFS, NFS, AFS, Ext4 and BTRFS).
->>=20
->>  (2) Lightweight stat (AT_NO_ATTR_SYNC): Ask for just those details =
-of
->>      interest, and allow a network fs to approximate anything not of
->>      interest, without going to the server.
->>=20
->>  (3) Heavyweight stat (AT_FORCE_ATTR_SYNC): Force a network fs to =
-flush
->>      buffers and go to the server, even if it thinks its cached =
-attributes
->>      are up to date.
->>=20
->>  (4) Allow the filesystem to indicate what it can/cannot provide: A
->>      filesystem can now say it doesn't support a standard stat =
-feature if
->>      that isn't available.
->>=20
->>  (5) Make the fields a consistent size on all arches, and make them =
-large.
->>=20
->>  (6) Can be extended by using more request flags and using up the =
-padding
->>      space in the statx struct.
->=20
-> How about relevant xattrs? SELinux context, ACL, that sort of thing.
-> The fact that these are optional should be taken care of by (4).
-
-Given that there are a wide variety of xattrs that different apps might =
-be
-interested in, this would probably be better served by an enhancement to
-getxattr() or listxattr() to be able to retrieve a whole list of xattrs
-at once, possibly with some wildcard support (e.g. "security.*") instead
-of returning all or a specific subset of xattrs with statx() (which is
-geared toward fixed-size attributes).
-
-Cheers, Andreas
-
-
->> Note that no lstat() equivalent is required as that can be =
-implemented
->> through statx() with atflag =3D=3D 0.  There is also no fstat() =
-equivalent as
->> that can be implemented through statx() with filename =3D=3D NULL and =
-the
->> relevant fd passed as dfd.
->>=20
->>=20
->> The seventh patch provides another new system call:
->>=20
->> 	long ret =3D fsinfo(int dfd,
->> 			  const char *filename,
->> 			  unsigned atflag,
->> 			  unsigned request,
->> 			  void *buffer);
->>=20
->> This is an enhanced filesystem stat and information retrieval =
-function that
->> provides more information, in summary:
->>=20
->>  (1) All the information provided by statfs() and more.  The fields =
-are
->>      made large.
->>=20
->>  (2) Provides information about timestamp range and resolution to
->>      complement statx().
->>=20
->>  (3) Provides information about IOC flags supported in statx()'s =
-return.
->>=20
->>  (4) Provides volume binary IDs and UUIDs.
->>=20
->>  (5) Provides the filesystem name according to the kernel as a string
->>      (eg. "ext4" or "nfs3") in addition to the magic number.
->>=20
->>  (6) Provides information obtained from network filesystems, such as =
-volume
->>      and domain names.
->>=20
->>  (7) Has lots of spare space that can be used for future extenstions =
-and a
->>      bit mask indicating what was provided.
->>=20
->> Note that I've added a 'request' identifier.  This is to select the =
-set of
->> data to be returned.  The idea is that 'buffer' points to a =
-fixed-size
->> struct selected by request.  Currently only 0 is available and this =
-refers
->> to 'struct fsinfo'.  However, I could split up the buffer into say 3:
->>=20
->>  (0) statfs-type information
->>=20
->>  (1) Timestamp and IOC flags info.
->>=20
->>  (2) Network fs strings.
->>=20
->> However, some of this might be better retrieved through getxattr().
->>=20
->>=20
->> =3D=3D=3D=3D=3D=3D=3D
->> TESTING
->> =3D=3D=3D=3D=3D=3D=3D
->>=20
->> Test programs are added into samples/statx/ by the appropriate =
-patches.
->>=20
->> David
->> ---
->> David Howells (12):
->>       Ext4: Fix extended timestamp encoding and decoding
->>       statx: Provide IOC flags for Windows fs attributes
->>       statx: Add a system call to make enhanced file info available
->>       statx: AFS: Return enhanced file attributes
->>       statx: Ext4: Return enhanced file attributes
->>       statx: NFS: Return enhanced file attributes
->>       statx: CIFS: Return enhanced attributes
->>       fsinfo: Add a system call to make enhanced filesystem info =
-available
->>       fsinfo: Ext4: Return information through the filesystem info =
-syscall
->>       fsinfo: AFS: Return information through the filesystem info =
-syscall
->>       fsinfo: NFS: Return information through the filesystem info =
-syscall
->>       fsinfo: CIFS: Return information through the filesystem info =
-syscall
->>=20
->>=20
->>  arch/x86/entry/syscalls/syscall_32.tbl |    2
->>  arch/x86/entry/syscalls/syscall_64.tbl |    2
->>  fs/afs/inode.c                         |   23 ++
->>  fs/afs/super.c                         |   39 ++++
->>  fs/cifs/cifsfs.c                       |   25 +++
->>  fs/cifs/cifsfs.h                       |    4
->>  fs/cifs/cifsglob.h                     |    8 +
->>  fs/cifs/dir.c                          |    2
->>  fs/cifs/inode.c                        |  124 ++++++++++---
->>  fs/cifs/netmisc.c                      |    4
->>  fs/exportfs/expfs.c                    |    4
->>  fs/ext4/ext4.h                         |   24 ++-
->>  fs/ext4/file.c                         |    2
->>  fs/ext4/inode.c                        |   31 +++
->>  fs/ext4/namei.c                        |    2
->>  fs/ext4/super.c                        |   39 ++++
->>  fs/ext4/symlink.c                      |    2
->>  fs/nfs/inode.c                         |   45 ++++-
->>  fs/nfs/internal.h                      |    1
->>  fs/nfs/nfs4super.c                     |    1
->>  fs/nfs/super.c                         |   58 ++++++
->>  fs/ntfs/time.h                         |    2
->>  fs/stat.c                              |  305 =
-+++++++++++++++++++++++++++++---
->>  fs/statfs.c                            |  218 =
-+++++++++++++++++++++++
->>  include/linux/fs.h                     |    7 +
->>  include/linux/stat.h                   |   14 +
->>  include/linux/syscalls.h               |    6 +
->>  include/linux/time64.h                 |    2
->>  include/uapi/linux/fcntl.h             |    2
->>  include/uapi/linux/fs.h                |    7 +
->>  include/uapi/linux/stat.h              |  185 +++++++++++++++++++
->>  samples/Makefile                       |    3
->>  samples/statx/Makefile                 |   13 +
->>  samples/statx/test-fsinfo.c            |  179 +++++++++++++++++++
->>  samples/statx/test-statx.c             |  273 =
-+++++++++++++++++++++++++++++
->>  35 files changed, 1558 insertions(+), 100 deletions(-)
->>  create mode 100644 samples/statx/Makefile
->>  create mode 100644 samples/statx/test-fsinfo.c
->>  create mode 100644 samples/statx/test-statx.c
->>=20
->> --
->> To unsubscribe from this list: send the line "unsubscribe =
-linux-kernel" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->> Please read the FAQ at  http://www.tux.org/lkml/
->>=20
->=20
+> Return enhanced attributes from the CIFS filesystem.  This includes the
+> following:
+>
+>  (1) Return the file creation time as btime.  We assume that the creation
+>      time won't change over the life of the inode.
+>
+>  (2) Set STATX_INFO_AUTOMOUNT on referral/submount directories.
+>
+>  (3) Unset STATX_INO if we made up the inode number and didn't get it from
+>      the server.
+>
+>  (4) Unset STATX_[UG]ID if we are either returning values passed to mount
+>      and/or the server doesn't return them.
+>
+>  (5) Set STATX_IOC_FLAGS and map various Windows file attributes to
+>      FS_xxx_FL flags in st_ioc_flags, fetching them from the server if we
+>      don't have them yet or don't have a current copy.  This includes the
+>      following:
+>
+>         ATTR_READONLY   -> FS_IMMUTABLE_FL
+>         ATTR_COMPRESSED -> FS_COMPR_FL
+>         ATTR_HIDDEN     -> FS_HIDDEN_FL
+>         ATTR_SYSTEM     -> FS_SYSTEM_FL
+>         ATTR_ARCHIVE    -> FS_ARCHIVE_FL
+>
+>  (6) Set certain STATX_INFO_xxx to reflect other Windows file attributes:
+>
+>         ATTR_TEMPORARY  -> STATX_INFO_TEMPORARY;
+>         ATTR_REPARSE    -> STATX_INFO_REPARSE_POINT;
+>         ATTR_OFFLINE    -> STATX_INFO_OFFLINE;
+>         ATTR_ENCRYPTED  -> STATX_INFO_ENCRYPTED;
+>
+>  (7) Set STATX_INFO_REMOTE on all files fetched by CIFS.
+>
+>  (8) Set STATX_INFO_NONSYSTEM_OWNERSHIP on all files as they all have
+>      Windows ownership details too.
+>
+> Furthermore, what cifs_getattr() does can be controlled as follows:
+>
+>  (1) If AT_NO_ATTR_SYNC is indicated then this will suppress the flushing
+>      of outstanding writes and the rereading of the inode's attributes with
+>      the server as detailed below.
+>
+>  (2) Otherwise:
+>
+>      (a) If AT_FORCE_ATTR_SYNC is indicated, or mtime, ctime or size are
+>          requested then the outstanding writes will be written to the
+>          server first.
+>
+>      (b) The inode's attributes will be reread from the server:
+>
+>          (i) if AT_FORCE_ATTR_SYNC is indicated;
+>
+>         (ii) if the cached attributes have expired;
+>
+>        (iii) extra attributes are requested that aren't normally stored.
+>
+> If the inode isn't synchronised, then the cached attributes will be used -
+> even if expired - without reference to the server.  Some attributes may be
+> unavailable that would otherwise be provided.
+>
+> Note that cifs_revalidate_dentry() will issue an extra operation to get the
+> FILE_ALL_INFO in addition to the FILE_UNIX_BASIC_INFO if it needs to
+> collect creation time and attributes on behalf of cifs_getattr().
+>
+> [NOTE: THIS PATCH IS UNTESTED!]
+>
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> ---
+>
+>  fs/cifs/cifsfs.h   |    4 +-
+>  fs/cifs/cifsglob.h |    8 +++
+>  fs/cifs/dir.c      |    2 -
+>  fs/cifs/inode.c    |  124
+> +++++++++++++++++++++++++++++++++++++++++-----------
+>  4 files changed, 108 insertions(+), 30 deletions(-)
+>
+> diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
+> index c3cc1609025f..fb38d47d84de 100644
+> --- a/fs/cifs/cifsfs.h
+> +++ b/fs/cifs/cifsfs.h
+> @@ -71,9 +71,9 @@ extern int cifs_rmdir(struct inode *, struct dentry *);
+>  extern int cifs_rename2(struct inode *, struct dentry *, struct inode *,
+>                         struct dentry *, unsigned int);
+>  extern int cifs_revalidate_file_attr(struct file *filp);
+> -extern int cifs_revalidate_dentry_attr(struct dentry *);
+> +extern int cifs_revalidate_dentry_attr(struct dentry *, bool, bool);
+>  extern int cifs_revalidate_file(struct file *filp);
+> -extern int cifs_revalidate_dentry(struct dentry *);
+> +extern int cifs_revalidate_dentry(struct dentry *, bool, bool);
+>  extern int cifs_invalidate_mapping(struct inode *inode);
+>  extern int cifs_revalidate_mapping(struct inode *inode);
+>  extern int cifs_zap_mapping(struct inode *inode);
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index b406a32deb1f..493e40a15b86 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -1152,7 +1152,11 @@ struct cifsInodeInfo {
+>         unsigned long flags;
+>         spinlock_t writers_lock;
+>         unsigned int writers;           /* Number of writers on this inode
+> */
+> +       bool btime_valid:1;             /* stored creation time is valid */
+> +       bool uid_faked:1;               /* true if i_uid is faked */
+> +       bool gid_faked:1;               /* true if i_gid is faked */
+>         unsigned long time;             /* jiffies of last update of inode
+> */
+> +       struct timespec btime;          /* creation time */
+>         u64  server_eof;                /* current file size on server --
+> protected by i_lock */
+>         u64  uniqueid;                  /* server inode number */
+>         u64  createtime;                /* creation time on server */
+> @@ -1365,6 +1369,9 @@ struct dfs_info3_param {
+>  #define CIFS_FATTR_NEED_REVAL          0x4
+>  #define CIFS_FATTR_INO_COLLISION       0x8
+>  #define CIFS_FATTR_UNKNOWN_NLINK       0x10
+> +#define CIFS_FATTR_WINATTRS_VALID      0x20    /* T if cf_btime and
+> cf_cifsattrs valid */
+> +#define CIFS_FATTR_UID_FAKED           0x40    /* T if cf_uid is faked */
+> +#define CIFS_FATTR_GID_FAKED           0x80    /* T if cf_gid is faked */
+>
+>  struct cifs_fattr {
+>         u32             cf_flags;
+> @@ -1382,6 +1389,7 @@ struct cifs_fattr {
+>         struct timespec cf_atime;
+>         struct timespec cf_mtime;
+>         struct timespec cf_ctime;
+> +       struct timespec cf_btime;
+>  };
+>
+>  static inline void free_dfs_info_param(struct dfs_info3_param *param)
+> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+> index c3eb998a99bd..4984f04b0677 100644
+> --- a/fs/cifs/dir.c
+> +++ b/fs/cifs/dir.c
+> @@ -792,7 +792,7 @@ cifs_d_revalidate(struct dentry *direntry, unsigned
+> int flags)
+>                 return -ECHILD;
+>
+>         if (d_really_is_positive(direntry)) {
+> -               if (cifs_revalidate_dentry(direntry))
+> +               if (cifs_revalidate_dentry(direntry, false, false))
+>                         return 0;
+>                 else {
+>                         /*
+> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+> index 6b66dd5d1540..fcb024efbd4b 100644
+> --- a/fs/cifs/inode.c
+> +++ b/fs/cifs/inode.c
+> @@ -166,13 +166,21 @@ cifs_fattr_to_inode(struct inode *inode, struct
+> cifs_fattr *fattr)
+>         cifs_nlink_fattr_to_inode(inode, fattr);
+>         inode->i_uid = fattr->cf_uid;
+>         inode->i_gid = fattr->cf_gid;
+> +       if (fattr->cf_flags & CIFS_FATTR_UID_FAKED)
+> +               cifs_i->uid_faked = true;
+> +       if (fattr->cf_flags & CIFS_FATTR_GID_FAKED)
+> +               cifs_i->gid_faked = true;
+>
+>         /* if dynperm is set, don't clobber existing mode */
+>         if (inode->i_state & I_NEW ||
+>             !(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_DYNPERM))
+>                 inode->i_mode = fattr->cf_mode;
+>
+> -       cifs_i->cifsAttrs = fattr->cf_cifsattrs;
+> +       if (fattr->cf_flags & CIFS_FATTR_WINATTRS_VALID) {
+> +               cifs_i->cifsAttrs = fattr->cf_cifsattrs;
+> +               cifs_i->btime = fattr->cf_btime;
+> +               cifs_i->btime_valid = true;
+> +       }
+>
+>         if (fattr->cf_flags & CIFS_FATTR_NEED_REVAL)
+>                 cifs_i->time = 0;
+> @@ -284,18 +292,22 @@ cifs_unix_basic_to_fattr(struct cifs_fattr *fattr,
+> FILE_UNIX_BASIC_INFO *info,
+>                 u64 id = le64_to_cpu(info->Uid);
+>                 if (id < ((uid_t)-1)) {
+>                         kuid_t uid = make_kuid(&init_user_ns, id);
+> -                       if (uid_valid(uid))
+> +                       if (uid_valid(uid)) {
+>                                 fattr->cf_uid = uid;
+> +                               fattr->cf_flags |= CIFS_FATTR_UID_FAKED;
+> +                       }
+>                 }
+>         }
+> -
+> +
+>         fattr->cf_gid = cifs_sb->mnt_gid;
+>         if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_OVERR_GID)) {
+>                 u64 id = le64_to_cpu(info->Gid);
+>                 if (id < ((gid_t)-1)) {
+>                         kgid_t gid = make_kgid(&init_user_ns, id);
+> -                       if (gid_valid(gid))
+> +                       if (gid_valid(gid)) {
+>                                 fattr->cf_gid = gid;
+> +                               fattr->cf_flags |= CIFS_FATTR_GID_FAKED;
+> +                       }
+>                 }
+>         }
+>
+> @@ -324,7 +336,8 @@ cifs_create_dfs_fattr(struct cifs_fattr *fattr, struct
+> super_block *sb)
+>         fattr->cf_ctime = CURRENT_TIME;
+>         fattr->cf_mtime = CURRENT_TIME;
+>         fattr->cf_nlink = 2;
+> -       fattr->cf_flags |= CIFS_FATTR_DFS_REFERRAL;
+> +       fattr->cf_flags |= CIFS_FATTR_DFS_REFERRAL |
+> +               CIFS_FATTR_UID_FAKED | CIFS_FATTR_GID_FAKED;
+>  }
+>
+>  static int
+> @@ -590,6 +603,7 @@ cifs_all_info_to_fattr(struct cifs_fattr *fattr,
+> FILE_ALL_INFO *info,
+>         struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
+>
+>         memset(fattr, 0, sizeof(*fattr));
+> +       fattr->cf_flags = CIFS_FATTR_WINATTRS_VALID;
+>         fattr->cf_cifsattrs = le32_to_cpu(info->Attributes);
+>         if (info->DeletePending)
+>                 fattr->cf_flags |= CIFS_FATTR_DELETE_PENDING;
+> @@ -601,6 +615,7 @@ cifs_all_info_to_fattr(struct cifs_fattr *fattr,
+> FILE_ALL_INFO *info,
+>
+>         fattr->cf_ctime = cifs_NTtimeToUnix(info->ChangeTime);
+>         fattr->cf_mtime = cifs_NTtimeToUnix(info->LastWriteTime);
+> +       fattr->cf_btime = cifs_NTtimeToUnix(info->CreationTime);
+>
+>         if (adjust_tz) {
+>                 fattr->cf_ctime.tv_sec += tcon->ses->server->timeAdj;
+> @@ -1887,7 +1902,8 @@ int cifs_revalidate_file_attr(struct file *filp)
+>         return rc;
+>  }
+>
+> -int cifs_revalidate_dentry_attr(struct dentry *dentry)
+> +int cifs_revalidate_dentry_attr(struct dentry *dentry,
+> +                               bool want_extra_bits, bool force)
+>  {
+>         unsigned int xid;
+>         int rc = 0;
+> @@ -1898,7 +1914,7 @@ int cifs_revalidate_dentry_attr(struct dentry
+> *dentry)
+>         if (inode == NULL)
+>                 return -ENOENT;
+>
+> -       if (!cifs_inode_needs_reval(inode))
+> +       if (!force && !cifs_inode_needs_reval(inode))
+>                 return rc;
+>
+>         xid = get_xid();
+> @@ -1915,9 +1931,12 @@ int cifs_revalidate_dentry_attr(struct dentry
+> *dentry)
+>                  full_path, inode, inode->i_count.counter,
+>                  dentry, dentry->d_time, jiffies);
+>
+> -       if (cifs_sb_master_tcon(CIFS_SB(sb))->unix_ext)
+> +       if (cifs_sb_master_tcon(CIFS_SB(sb))->unix_ext) {
+>                 rc = cifs_get_inode_info_unix(&inode, full_path, sb, xid);
+> -       else
+> +               if (rc != 0)
+> +                       goto out;
+> +       }
+> +       if (!cifs_sb_master_tcon(CIFS_SB(sb))->unix_ext || want_extra_bits)
+>                 rc = cifs_get_inode_info(&inode, full_path, NULL, sb,
+>                                          xid, NULL);
+>
+> @@ -1940,12 +1959,13 @@ int cifs_revalidate_file(struct file *filp)
+>  }
+>
+>  /* revalidate a dentry's inode attributes */
+> -int cifs_revalidate_dentry(struct dentry *dentry)
+> +int cifs_revalidate_dentry(struct dentry *dentry,
+> +                          bool want_extra_bits, bool force)
+>  {
+>         int rc;
+>         struct inode *inode = d_inode(dentry);
+>
+> -       rc = cifs_revalidate_dentry_attr(dentry);
+> +       rc = cifs_revalidate_dentry_attr(dentry, want_extra_bits, force);
+>         if (rc)
+>                 return rc;
+>
+> @@ -1958,28 +1978,62 @@ int cifs_getattr(struct vfsmount *mnt, struct
+> dentry *dentry,
+>         struct cifs_sb_info *cifs_sb = CIFS_SB(dentry->d_sb);
+>         struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
+>         struct inode *inode = d_inode(dentry);
+> +       struct cifsInodeInfo *cifs_i = CIFS_I(inode);
+> +       bool force = stat->query_flags & AT_FORCE_ATTR_SYNC;
+> +       bool want_extra_bits = false;
+> +       u32 info, ioc = 0;
+> +       u32 attrs;
+>         int rc;
+>
+> -       /*
+> -        * We need to be sure that all dirty pages are written and the
+> server
+> -        * has actual ctime, mtime and file length.
+> -        */
+> -       if (!CIFS_CACHE_READ(CIFS_I(inode)) && inode->i_mapping &&
+> -           inode->i_mapping->nrpages != 0) {
+> -               rc = filemap_fdatawait(inode->i_mapping);
+> -               if (rc) {
+> -                       mapping_set_error(inode->i_mapping, rc);
+> -                       return rc;
+> +       if (cifs_i->uid_faked)
+> +               stat->request_mask &= ~STATX_UID;
+> +       if (cifs_i->gid_faked)
+> +               stat->request_mask &= ~STATX_GID;
+> +
+> +       if ((stat->request_mask & STATX_BTIME && !cifs_i->btime_valid) ||
+> +           stat->request_mask & STATX_IOC_FLAGS)
+> +               want_extra_bits = force = true;
+> +
+> +       if (!(stat->query_flags & AT_NO_ATTR_SYNC)) {
+> +               /* Unless we're explicitly told not to sync, we need to be
+> sure
+> +                * that all dirty pages are written and the server has
+> actual
+> +                * ctime, mtime and file length.
+> +                */
+> +               bool flush = force;
+> +
+> +               if (stat->request_mask &
+> +                   (STATX_CTIME | STATX_MTIME | STATX_SIZE))
+> +                       flush = true;
+> +
+> +               if (flush &&
+> +                   !CIFS_CACHE_READ(CIFS_I(inode)) && inode->i_mapping &&
+> +                   inode->i_mapping->nrpages != 0) {
+> +                       rc = filemap_fdatawait(inode->i_mapping);
+> +                       if (rc) {
+> +                               mapping_set_error(inode->i_mapping, rc);
+> +                               return rc;
+> +                       }
+>                 }
+> -       }
+>
+> -       rc = cifs_revalidate_dentry_attr(dentry);
+> -       if (rc)
+> -               return rc;
+> +               rc = cifs_revalidate_dentry(dentry, want_extra_bits,
+> force);
+> +               if (rc)
+> +                       return rc;
+> +       }
+>
+>         generic_fillattr(inode, stat);
+>         stat->blksize = CIFS_MAX_MSGSIZE;
+> -       stat->ino = CIFS_I(inode)->uniqueid;
+> +
+> +       info = STATX_INFO_REMOTE | STATX_INFO_NONSYSTEM_OWNERSHIP;
+> +
+> +       if (cifs_i->btime_valid) {
+> +               stat->btime = cifs_i->btime;
+> +               stat->result_mask |= STATX_BTIME;
+> +       }
+> +
+> +       /* We don't promise an inode number if we made one up */
+> +       stat->ino = cifs_i->uniqueid;
+> +       if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM))
+> +               stat->result_mask &= ~STATX_INO;
+>
+>         /*
+>          * If on a multiuser mount without unix extensions or cifsacl being
+> @@ -1993,8 +2047,24 @@ int cifs_getattr(struct vfsmount *mnt, struct
+> dentry *dentry,
+>                         stat->uid = current_fsuid();
+>                 if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_OVERR_GID))
+>                         stat->gid = current_fsgid();
+> +               stat->result_mask &= ~(STATX_UID | STATX_GID);
+>         }
+> -       return rc;
+> +
+> +       attrs = cifs_i->cifsAttrs;
+> +       if (attrs & ATTR_TEMPORARY)     info |= STATX_INFO_TEMPORARY;
+> +       if (attrs & ATTR_REPARSE)       info |= STATX_INFO_REPARSE_POINT;
+> +       if (attrs & ATTR_OFFLINE)       info |= STATX_INFO_OFFLINE;
+> +       if (attrs & ATTR_ENCRYPTED)     info |= STATX_INFO_ENCRYPTED;
+> +       stat->information |= info;
+> +
+> +       if (attrs & ATTR_READONLY)      ioc |= FS_IMMUTABLE_FL;
+> +       if (attrs & ATTR_COMPRESSED)    ioc |= FS_COMPR_FL;
+> +       if (attrs & ATTR_HIDDEN)        ioc |= FS_HIDDEN_FL;
+> +       if (attrs & ATTR_SYSTEM)        ioc |= FS_SYSTEM_FL;
+> +       if (attrs & ATTR_ARCHIVE)       ioc |= FS_ARCHIVE_FL;
+> +       stat->ioc_flags |= ioc;
+> +
+> +       return 0;
+>  }
+>
+>  static int cifs_truncate_page(struct address_space *mapping, loff_t from)
+>
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-ext4" =
-in
+> To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
 > the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-Cheers, Andreas
-
+>
 
 
 
+-- 
+Thanks,
 
-
---Apple-Mail=_B3073CE5-8B8D-451D-8FF9-185642D38F51
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP using GPGMail
-
------BEGIN PGP SIGNATURE-----
-Comment: GPGTools - http://gpgtools.org
-
-iQIVAwUBVlSQK3Kl2rkXzB/gAQgcyw//WEgt5hF3pkZrmJkTEwDoPdkVR2WuQnJr
-Ht9gdG7VVEKK90TinDafuN0qvUYCnoGn4SGBE0kIGrpr1LuQ4LQv2reIwzyhEPuu
-y4mxqfnU5a0Ej/K3RwDgNyYEdhdQxPhraBfchrDgKeRFtzwmYdFq2YMjxJ3Ri8Ct
-LDp4RH9KOWkHK0SFxqAQ71xENdM4FyqJ54v/JOsYzk15flz5LbUpyMXOyC24no1u
-k7Tc/ATH4yJBGPdHz/5xJL5xq+5j6/mOW+2vF7hTwg6pq4uECisK9Qdg0Eaac3OD
-TKncgTmlJtDrKUvpKGCjilFMVkDOAD/RuIW4amVl8Q8EQogX72cHyKIXjEG3Mo2S
-J1BE8UWrCwwo4NcBGq+sIs1frBrcExFsh0e+kGAwJXFNmo2MPjQeMcf+Qt8ULbLt
-RvD2K4lqtdYW2BJQA+e2XiVbEdvQXauQ84Xh3Bn0xyJgxk5SP/t3gj0Rny+KUY0u
-jqb50/oeQAXR8eCcP8TMQVbeCmpbJ6cN1kIDdn3hNo2uBMgioJqjh+n3UdRqseRL
-tPrZM5OqZnJ1mSKB9kmN5fXqPnOghgcmeKa3GrXb5okKIjNrrRaLF1U51TyAog1l
-E4k0SGFHCe1xFMneGV/Cp9KmLW1ZsJ2U9R+K578XqbBheJTA3fqvctfm0+JS344S
-ZQGPldAA8Es=
-=BBGZ
------END PGP SIGNATURE-----
-
---Apple-Mail=_B3073CE5-8B8D-451D-8FF9-185642D38F51--
+Steve
