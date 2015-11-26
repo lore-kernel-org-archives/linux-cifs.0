@@ -1,118 +1,117 @@
-From: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 4/5] nfsd: Pass filehandle to nfs4_preprocess_stateid_op()
-Date: Thu, 26 Nov 2015 19:50:58 +0100
-Message-ID: <1448563859-21922-5-git-send-email-hch@lst.de>
-References: <1448563859-21922-1-git-send-email-hch@lst.de>
-Cc: tao.peng@primarydata.com, jeff.layton@primarydata.com,
-	linux-fsdevel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-	Anna Schumaker <Anna.Schumaker@netapp.com>,
-	Anna Schumaker <Anna.Schumaker@Netapp.com>
-To: viro@zeniv.linux.org.uk
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <1448563859-21922-1-git-send-email-hch@lst.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
+From: Andreas Dilger <adilger@dilger.ca>
+Subject: Re: [RFC][PATCH 00/12] Enhanced file stat system call
+Date: Thu, 26 Nov 2015 15:06:19 -0700
+Message-ID: <46109C88-01C8-40A1-B44B-B76BF8C119C7@dilger.ca>
+References: <20151124081149.GA8840@infradead.org> <20151120145422.18930.72662.stgit@warthog.procyon.org.uk> <7342.1448551183@warthog.procyon.org.uk>
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
+Content-Type: multipart/signed; boundary="Apple-Mail=_0D35D9D1-1072-40EB-A0C2-891C4163E436"; protocol="application/pgp-signature"; micalg=pgp-sha256
+Cc: Christoph Hellwig <hch@infradead.org>, arnd@arndb.de,
+	linux-afs@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-ext4@vger.kernel.org
+To: David Howells <dhowells@redhat.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <7342.1448551183@warthog.procyon.org.uk>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-From: Anna Schumaker <Anna.Schumaker@netapp.com>
 
-This will be needed so COPY can look up the saved_fh in addition to the
-current_fh.
+--Apple-Mail=_0D35D9D1-1072-40EB-A0C2-891C4163E436
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=us-ascii
 
-Signed-off-by: Anna Schumaker <Anna.Schumaker@Netapp.com>
----
- fs/nfsd/nfs4proc.c  | 16 +++++++++-------
- fs/nfsd/nfs4state.c |  5 ++---
- fs/nfsd/state.h     |  4 ++--
- 3 files changed, 13 insertions(+), 12 deletions(-)
+On Nov 26, 2015, at 8:19 AM, David Howells <dhowells@redhat.com> wrote:
+>=20
+> Christoph Hellwig <hch@infradead.org> wrote:
+>=20
+>> from a quick look the statx bits looks fine in general.  I think Ted
+>> last time had a problem with the IOC flag allocation, so you might
+>> want to ping him.
+>=20
+> Yeah - he commented on that.
+>=20
+>> But fsinfo with the multiplexer and the void pointer is just =
+horrible.
+>> What were you thinking there?
+>=20
+> I think the fsinfo data struct probably wants splitting up.
 
-diff --git a/fs/nfsd/nfs4proc.c b/fs/nfsd/nfs4proc.c
-index a9f096c..3ba10a3 100644
---- a/fs/nfsd/nfs4proc.c
-+++ b/fs/nfsd/nfs4proc.c
-@@ -774,8 +774,9 @@ nfsd4_read(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate,
- 		clear_bit(RQ_SPLICE_OK, &rqstp->rq_flags);
- 
- 	/* check stateid */
--	status = nfs4_preprocess_stateid_op(rqstp, cstate, &read->rd_stateid,
--			RD_STATE, &read->rd_filp, &read->rd_tmp_file);
-+	status = nfs4_preprocess_stateid_op(rqstp, cstate, &cstate->current_fh,
-+					&read->rd_stateid, RD_STATE,
-+					&read->rd_filp, &read->rd_tmp_file);
- 	if (status) {
- 		dprintk("NFSD: nfsd4_read: couldn't process stateid!\n");
- 		goto out;
-@@ -921,7 +922,8 @@ nfsd4_setattr(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate,
- 
- 	if (setattr->sa_iattr.ia_valid & ATTR_SIZE) {
- 		status = nfs4_preprocess_stateid_op(rqstp, cstate,
--			&setattr->sa_stateid, WR_STATE, NULL, NULL);
-+				&cstate->current_fh, &setattr->sa_stateid,
-+				WR_STATE, NULL, NULL);
- 		if (status) {
- 			dprintk("NFSD: nfsd4_setattr: couldn't process stateid!\n");
- 			return status;
-@@ -985,8 +987,8 @@ nfsd4_write(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate,
- 	if (write->wr_offset >= OFFSET_MAX)
- 		return nfserr_inval;
- 
--	status = nfs4_preprocess_stateid_op(rqstp, cstate, stateid, WR_STATE,
--			&filp, NULL);
-+	status = nfs4_preprocess_stateid_op(rqstp, cstate, &cstate->current_fh,
-+						stateid, WR_STATE, &filp, NULL);
- 	if (status) {
- 		dprintk("NFSD: nfsd4_write: couldn't process stateid!\n");
- 		return status;
-@@ -1016,7 +1018,7 @@ nfsd4_fallocate(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate,
- 	__be32 status = nfserr_notsupp;
- 	struct file *file;
- 
--	status = nfs4_preprocess_stateid_op(rqstp, cstate,
-+	status = nfs4_preprocess_stateid_op(rqstp, cstate, &cstate->current_fh,
- 					    &fallocate->falloc_stateid,
- 					    WR_STATE, &file, NULL);
- 	if (status != nfs_ok) {
-@@ -1055,7 +1057,7 @@ nfsd4_seek(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate,
- 	__be32 status;
- 	struct file *file;
- 
--	status = nfs4_preprocess_stateid_op(rqstp, cstate,
-+	status = nfs4_preprocess_stateid_op(rqstp, cstate, &cstate->current_fh,
- 					    &seek->seek_stateid,
- 					    RD_STATE, &file, NULL);
- 	if (status) {
-diff --git a/fs/nfsd/nfs4state.c b/fs/nfsd/nfs4state.c
-index 6b800b5..df5dba6 100644
---- a/fs/nfsd/nfs4state.c
-+++ b/fs/nfsd/nfs4state.c
-@@ -4797,10 +4797,9 @@ nfs4_check_file(struct svc_rqst *rqstp, struct svc_fh *fhp, struct nfs4_stid *s,
-  */
- __be32
- nfs4_preprocess_stateid_op(struct svc_rqst *rqstp,
--		struct nfsd4_compound_state *cstate, stateid_t *stateid,
--		int flags, struct file **filpp, bool *tmp_file)
-+		struct nfsd4_compound_state *cstate, struct svc_fh *fhp,
-+		stateid_t *stateid, int flags, struct file **filpp, bool *tmp_file)
- {
--	struct svc_fh *fhp = &cstate->current_fh;
- 	struct inode *ino = d_inode(fhp->fh_dentry);
- 	struct net *net = SVC_NET(rqstp);
- 	struct nfsd_net *nn = net_generic(net, nfsd_net_id);
-diff --git a/fs/nfsd/state.h b/fs/nfsd/state.h
-index 77fdf4d..99432b7 100644
---- a/fs/nfsd/state.h
-+++ b/fs/nfsd/state.h
-@@ -578,8 +578,8 @@ struct nfsd4_compound_state;
- struct nfsd_net;
- 
- extern __be32 nfs4_preprocess_stateid_op(struct svc_rqst *rqstp,
--		struct nfsd4_compound_state *cstate, stateid_t *stateid,
--		int flags, struct file **filp, bool *tmp_file);
-+		struct nfsd4_compound_state *cstate, struct svc_fh *fhp,
-+		stateid_t *stateid, int flags, struct file **filp, bool *tmp_file);
- __be32 nfsd4_lookup_stateid(struct nfsd4_compound_state *cstate,
- 		     stateid_t *stateid, unsigned char typemask,
- 		     struct nfs4_stid **s, struct nfsd_net *nn);
--- 
-1.9.1
+Could we separate the statx() and fsinfo() submissions so that this =
+doesn't
+block statx() landing indefinitely?  I think people are generally in =
+support
+of statx() as it is today, and it's been _sooo_ long in coming that I'd =
+hate
+to see it delayed further.  The statx() syscall definitely has value =
+without
+fsinfo() to improve the life of network filesystems.
 
+Cheers, Andreas
+
+>  Now this could be
+> done in a number of ways, including:
+>=20
+> (1) By adding multiple syscalls (statfsx, fsinfo, netfsinfo, ...) but =
+each
+>     one needs a bit in the kernel to handle the basics (path/fd =
+lookup,
+>     security check, buffer allocation and freeing, ...) which could =
+all be in
+>     common - hence the mux method.
+>=20
+> (2) Adding an argument to the fsinfo syscall since it has at least one
+>     syscall argument spare.
+>=20
+> (3) Offloading some of the bits to standardised xattr calls.  The =
+large
+>     string fields (domain name, volume name, ...) would seem to be =
+obvious
+>     candidates for this.
+>=20
+> Given that the core VFS gets to manage the contents of the buffer, it
+> shouldn't be as controversial as pioctl().
+>=20
+> David
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-ext4" =
+in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+Cheers, Andreas
+
+
+
+
+
+
+--Apple-Mail=_0D35D9D1-1072-40EB-A0C2-891C4163E436
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP using GPGMail
+
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - http://gpgtools.org
+
+iQIVAwUBVleCXXKl2rkXzB/gAQjJbA//cBhy5Ew7OJ1xn4MLdvpzbE8AKUbG7RmY
+fopEv+iiYM4GhHSAApH+/G++Q4DVhXc6EgCpdkMJmoPavNTgr5LSMNyzd7HUhFPh
+iaGsgB90GagjLazR8B5X8ESQfxxgJrV8ytugrz/OC08Myz/0DW5qrd1E3/Q6oYok
+iX2WctbZJN6OfrBGbxLVqz0iGmyTu9ky5Zgwt1FTVHKlgf4aUf7I8TKMPV6WxsGh
+Z18ZJZ0V7a30ANILncW5PdU+hB09KLhxyIaauCsLeqJhc/ncWBL9ZB73+TlNGyr1
+i9BELLXdMSvNPPpY0PzV1cuBRuErcTIEiBSgElLz3KZUuQZ0YReowCN9juqNUUTG
+CdDq/TkCob3tMKxerb359GHpr+Uuk/cRMZf2d/SYHHv+TQh6WeaUS61wXq96lf8x
+rrHReu+hTuWgtFQj07Onzs8SPYYd7KlgteCtzPNdV214glFOayVAGpizYIhxF0sY
+cTaoT/MDThrXHy7NwOAE3Aun39D9uqEeVn0RKmNiCenfpIy6W4D8GZLIG9rre2YQ
+44UElWKofhz9Z+rD2TYyG0GzIYaxhiG0cdBqMiidkplyoWBfpr188hwcd/U/Na9r
+3hmqc87SPplcTxIUnpFVvnTc8oIt9eeI/cCdCM7jncw9LdjyWlPAPjCUa4/hmXUY
+AtST8EW4QZU=
+=Z4o0
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_0D35D9D1-1072-40EB-A0C2-891C4163E436--
