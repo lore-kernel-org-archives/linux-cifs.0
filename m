@@ -1,48 +1,31 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [RFC][PATCH 00/12] Enhanced file stat system call
-Date: Thu, 26 Nov 2015 15:19:43 +0000
-Message-ID: <7342.1448551183@warthog.procyon.org.uk>
-References: <20151124081149.GA8840@infradead.org> <20151120145422.18930.72662.stgit@warthog.procyon.org.uk>
+From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 01/12] Ext4: Fix extended timestamp encoding and decoding
+Date: Thu, 26 Nov 2015 15:28:36 +0000
+Message-ID: <7814.1448551716@warthog.procyon.org.uk>
+References: <20151124193646.GA3482@thunk.org> <20151120145422.18930.72662.stgit@warthog.procyon.org.uk> <20151120145434.18930.89755.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Cc: dhowells@redhat.com, arnd@arndb.de, linux-afs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org
-To: Christoph Hellwig <hch@infradead.org>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <20151124081149.GA8840@infradead.org>
-Content-ID: <7341.1448551183.1@warthog.procyon.org.uk>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, arnd-r2nGTMty4D4@public.gmane.org, linux-afs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: "Theodore Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20151124193646.GA3482-AKGzg7BKzIDYtjvyW6yDsg@public.gmane.org>
+Content-ID: <7813.1448551716.1-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Christoph Hellwig <hch@infradead.org> wrote:
+Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org> wrote:
 
-> from a quick look the statx bits looks fine in general.  I think Ted
-> last time had a problem with the IOC flag allocation, so you might
-> want to ping him.
+> This is the patch I would prefer to use (and in fact which I have
+> added to the ext4 tree):
+> 
+> There are issues with 32-bit vs 64-bit encoding of times before
+> January 1, 1970, which are handled with this patch which is not
+> handled with what you have in your patch series.  So I'd prefer if you
+> drop this patch, and I'll get this sent to Linus as a bug fix for 4.4.
 
-Yeah - he commented on that.
+Fine by me.
 
-> But fsinfo with the multiplexer and the void pointer is just horrible.
-> What were you thinking there?
-
-I think the fsinfo data struct probably wants splitting up.  Now this could be
-done in a number of ways, including:
-
- (1) By adding multiple syscalls (statfsx, fsinfo, netfsinfo, ...) but each
-     one needs a bit in the kernel to handle the basics (path/fd lookup,
-     security check, buffer allocation and freeing, ...) which could all be in
-     common - hence the mux method.
-
- (2) Adding an argument to the fsinfo syscall since it has at least one
-     syscall argument spare.
-
- (3) Offloading some of the bits to standardised xattr calls.  The large
-     string fields (domain name, volume name, ...) would seem to be obvious
-     candidates for this.
-
-Given that the core VFS gets to manage the contents of the buffer, it
-shouldn't be as controversial as pioctl().
-
-David
+Acked-by: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
