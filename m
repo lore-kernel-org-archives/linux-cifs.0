@@ -1,80 +1,110 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Ratelimit kernel log messages
-Date: Sun, 29 Nov 2015 22:07:01 -0600
-Message-ID: <CAH2r5muynQt7iCq=mVpjWq1EWq-z_pdKjiZntEWEXaxLsR6JjQ@mail.gmail.com>
-References: <7094bd3a2ef3c030463aa04fbce8369bfb33be9c.1446897962.git.jamie.bainbridge@gmail.com>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH v1] cifs: make shares unaccessible at root level mountable
+Date: Mon, 30 Nov 2015 00:54:49 -0600
+Message-ID: <CADT32eLN2gSpGR9g99j6ka8NHo_ozXdKmSnjtJP=SCtc2ca4VQ@mail.gmail.com>
+References: <20151105154836.1851c30c@aaptelpc>
+	<CADT32eJ_uLj4_sEhWc+O=xjOMMfNhGGH9XhiJmdDQyrL6Dzp3A@mail.gmail.com>
+	<20151126140915.11349031@aaptelpc>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Jamie Bainbridge <jamie.bainbridge-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <7094bd3a2ef3c030463aa04fbce8369bfb33be9c.1446897962.git.jamie.bainbridge-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <20151126140915.11349031@aaptelpc>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-repushed to cifs-2.6.git (after finding out that the kbuild test robot
-warning messages for ARCH=mn10300 is likely not a real problem.
+On Thu, Nov 26, 2015 at 7:09 AM, Aur=C3=A9lien Aptel <aaptel-IBi9RG/b67k@public.gmane.org> =
+wrote:
+> On Mon, 16 Nov 2015 23:20:09 -0600 Shirish Pargaonkar
+> <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>> I do not understand why you need to entertain error ENOENT on an
+>> intermediate path.
+>
+> In cifs_get_root() @ fs/cifs/cifsfs.c when one of the intermediary pa=
+th
+> component access is restricted I get a NULL direntry->d_inode. Which =
+is
+> translated to ENOENT.
+>
+>                 struct inode *dir =3D d_inode(dentry);
+>                 struct dentry *child;
+>
+>                 if (!dir) {
+>                         dput(dentry);
+>                         dentry =3D ERR_PTR(-ENOENT);
+>                         break;
+>                 }
+>
+>
 
-On Sat, Nov 7, 2015 at 6:13 AM, Jamie Bainbridge
-<jamie.bainbridge-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> Under some conditions, CIFS can repeatedly call the cifs_dbg() logging
-> wrapper. If done rapidly enough, the console framebuffer can softlockup
-> or "rcu_sched self-detected stall". Apply the built-in log ratelimiters
-> to prevent such hangs.
+So only time you will have NULL dir (inode) is when lookup_one_len()
+in cifs_get_root() returned a negative dentry. If we call
+create_root_dis_dentry()
+for a path object which already has a negative dentry, we will create a=
+nother
+dentry (disconnected) for the same path object.  So for the same path o=
+bject, we
+could possibly have two (or more) dentries in the dentry cache, one
+negative and one
+(or more) disconnected.  So I think if we are going to call
+create_root_dis_dentry()
+in case error is ENONET, we should delete the (negative) dentry before =
+the call.
+
+>> I still do not understand why noserverino is in picture. Only the
+>> disconnected root dentry
+>> has an inode generated with an id by the cifs client.  Once this
+>> disconnected root denty
+>> gets spliced, the inode is filled with correct inode (fileid)
+>> available from the server
+>> (since that intermediate path is now accessible hence splicable).
+>> You have fileid/inode available for all eligible/accessible file
+>> objects under the disconnected
+>> root entry.
 >
-> Signed-off-by: Jamie Bainbridge <jamie.bainbridge-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> ---
->  fs/cifs/cifs_debug.c | 2 +-
->  fs/cifs/cifs_debug.h | 9 ++++-----
->  2 files changed, 5 insertions(+), 6 deletions(-)
+> Again, the only function that adds disconneted roots
+> to the linked list in the superblock is cifs_alloc_rdelem() which is
+> *only called* with noserverino. This is from your patch.
 >
-> diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-> index 7febcf2475c5ab675c04dfd2fddaa3ed574522a0..50b268483302922ee63d205a2fa560ec27676eed 100644
-> --- a/fs/cifs/cifs_debug.c
-> +++ b/fs/cifs/cifs_debug.c
-> @@ -50,7 +50,7 @@ void cifs_vfs_err(const char *fmt, ...)
->         vaf.fmt = fmt;
->         vaf.va = &args;
+> % grep -R cifs_alloc_rdelem fs/cifs/*.c
+> fs/cifs/cifsfs.c-}
+> fs/cifs/cifsfs.c-
+> fs/cifs/cifsfs.c-struct cifs_rdelem *
+> fs/cifs/cifsfs.c:cifs_alloc_rdelem(char *full_path, struct dentry *rd=
+entry,
+> fs/cifs/cifsfs.c-                               struct inode *rdinode=
+)
+> fs/cifs/cifsfs.c-{
+> fs/cifs/cifsfs.c-       struct cifs_rdelem *rdelem;
+> --
+> fs/cifs/cifsfs.c-               if (!(cifs_sb->mnt_cifs_flags & CIFS_=
+MOUNT_SERVER_INUM)) {
+> fs/cifs/cifsfs.c-
+> fs/cifs/cifsfs.c-                       rdelem =3D
+> fs/cifs/cifsfs.c:                               cifs_alloc_rdelem(fpa=
+th, dentry, rinode);
+> fs/cifs/cifsfs.c-                       if (IS_ERR(rdelem))
+> fs/cifs/cifsfs.c-                               goto rdelem_ret;
+> fs/cifs/cifsfs.c-                       spin_lock(&cifs_sb->rtdislock=
+);
 >
-> -       pr_err("CIFS VFS: %pV", &vaf);
-> +       pr_err_ratelimited("CIFS VFS: %pV", &vaf);
+> To properly build a path from a child dentry of a disconnected root y=
+ou need to know the path of the disconnected root and use it as a prefi=
+x. This prefix is only stored in the rdelem struct which is only used w=
+ith noserverino. See above.
 >
->         va_end(args);
->  }
-> diff --git a/fs/cifs/cifs_debug.h b/fs/cifs/cifs_debug.h
-> index f40fbaca1b2a2c1d7457d71bd1a5e7dd4b477859..66cf0f9fff8984cb12eed1c89d91bc9c6ccc6a9d 100644
-> --- a/fs/cifs/cifs_debug.h
-> +++ b/fs/cifs/cifs_debug.h
-> @@ -51,14 +51,13 @@ __printf(1, 2) void cifs_vfs_err(const char *fmt, ...);
->  /* information message: e.g., configuration, major event */
->  #define cifs_dbg(type, fmt, ...)                                       \
->  do {                                                                   \
-> -       if (type == FYI) {                                              \
-> -               if (cifsFYI & CIFS_INFO) {                              \
-> -                       pr_debug("%s: " fmt, __FILE__, ##__VA_ARGS__);  \
-> -               }                                                       \
-> +       if (type == FYI && cifsFYI & CIFS_INFO) {                       \
-> +               pr_debug_ratelimited("%s: "                             \
-> +                           fmt, __FILE__, ##__VA_ARGS__);              \
->         } else if (type == VFS) {                                       \
->                 cifs_vfs_err(fmt, ##__VA_ARGS__);                       \
->         } else if (type == NOISY && type != 0) {                        \
-> -               pr_debug(fmt, ##__VA_ARGS__);                           \
-> +               pr_debug_ratelimited(fmt, ##__VA_ARGS__);               \
->         }                                                               \
->  } while (0)
+> My patch was able to fix several SUSE customers problems and people c=
+ontacted me off-list to tell me it also fixed his problem. I cannot rep=
+roduce the issue you're describing.
+>
+> We can talk on irc if you want, I'm aaptel on freenode.
 >
 > --
-> 1.9.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Thanks,
-
-Steve
+> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+> SUSE Linux GmbH, Maxfeldstra=C3=9Fe 5, 90409 N=C3=BCrnberg, Germany
+> GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton, HRB 21284 (=
+AG
+> N=C3=BCrnberg)
