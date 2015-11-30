@@ -1,49 +1,164 @@
-From: Elmar Stellnberger <estellnb@elstel.org>
-Subject: Re: [PATCH 01/12] Ext4: Fix extended timestamp encoding and decoding
-Date: Mon, 30 Nov 2015 15:46:06 +0100
-Message-ID: <565C612E.70804@elstel.org>
-References: <20151120145422.18930.72662.stgit@warthog.procyon.org.uk>
- <3495329.crWmoA5ACn@wuerfel> <20151129024555.GA31968@thunk.org>
- <2872067.shHdUXoF07@wuerfel> <20151130141605.GA4316@thunk.org>
+From: bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org (J. Bruce Fields)
+Subject: Re: [PATCH 2/5] locks: new locks_mandatory_area calling convention
+Date: Mon, 30 Nov 2015 17:38:30 -0500
+Message-ID: <20151130223830.GB31564@fieldses.org>
+References: <1448563859-21922-1-git-send-email-hch@lst.de>
+ <1448563859-21922-3-git-send-email-hch@lst.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-To: Theodore Ts'o <tytso@mit.edu>, Arnd Bergmann <arnd@arndb.de>,
-	David Howells <dhowells@redhat.com>, linux-afs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-	Deepa Dinamani <deepa.kernel@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20151130141605.GA4316@thunk.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, tao.peng-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org,
+	jeff.layton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-btrfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <1448563859-21922-3-git-send-email-hch-jcswGhMUV9g@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
+On Thu, Nov 26, 2015 at 07:50:56PM +0100, Christoph Hellwig wrote:
+> Pass a loff_t end for the last byte instead of the 32-bit count
+> parameter to allow full file clones even on 32-bit architectures.
+> While we're at it also drop the pointless inode argument and simplify
+> the read/write selection.
+> 
+> Signed-off-by: Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>
+> ---
+>  fs/locks.c         | 22 +++++++++-------------
+>  fs/read_write.c    |  5 ++---
+>  include/linux/fs.h | 28 +++++++++++++---------------
+>  3 files changed, 24 insertions(+), 31 deletions(-)
+> 
+> diff --git a/fs/locks.c b/fs/locks.c
+> index 0d2b326..d503669 100644
+> --- a/fs/locks.c
+> +++ b/fs/locks.c
+> @@ -1227,21 +1227,17 @@ int locks_mandatory_locked(struct file *file)
+>  
+>  /**
+>   * locks_mandatory_area - Check for a conflicting lock
+> - * @read_write: %FLOCK_VERIFY_WRITE for exclusive access, %FLOCK_VERIFY_READ
+> - *		for shared
+> - * @inode:      the file to check
+>   * @filp:       how the file was opened (if it was)
+> - * @offset:     start of area to check
+> - * @count:      length of area to check
+> + * @start:	first byte in the file to check
+> + * @end:	lastbyte in the file to check
+> + * @write:	%true if checking for write access
+>   *
+>   * Searches the inode's list of locks to find any POSIX locks which conflict.
+> - * This function is called from rw_verify_area() and
+> - * locks_verify_truncate().
+>   */
+> -int locks_mandatory_area(int read_write, struct inode *inode,
+> -			 struct file *filp, loff_t offset,
+> -			 size_t count)
+> +int locks_mandatory_area(struct file *filp, loff_t start, loff_t end,
+> +		bool write)
+>  {
+> +	struct inode *inode = file_inode(filp);
+>  	struct file_lock fl;
+>  	int error;
+>  	bool sleep = false;
+> @@ -1252,9 +1248,9 @@ int locks_mandatory_area(int read_write, struct inode *inode,
+>  	fl.fl_flags = FL_POSIX | FL_ACCESS;
+>  	if (filp && !(filp->f_flags & O_NONBLOCK))
+>  		sleep = true;
+> -	fl.fl_type = (read_write == FLOCK_VERIFY_WRITE) ? F_WRLCK : F_RDLCK;
+> -	fl.fl_start = offset;
+> -	fl.fl_end = offset + count - 1;
+> +	fl.fl_type = write ? F_WRLCK : F_RDLCK;
+> +	fl.fl_start = start;
+> +	fl.fl_end = end;
+>  
+>  	for (;;) {
+>  		if (filp) {
+> diff --git a/fs/read_write.c b/fs/read_write.c
+> index c81ef39..48157dd 100644
+> --- a/fs/read_write.c
+> +++ b/fs/read_write.c
+> @@ -396,9 +396,8 @@ int rw_verify_area(int read_write, struct file *file, const loff_t *ppos, size_t
+>  	}
+>  
+>  	if (unlikely(inode->i_flctx && mandatory_lock(inode))) {
+> -		retval = locks_mandatory_area(
+> -			read_write == READ ? FLOCK_VERIFY_READ : FLOCK_VERIFY_WRITE,
+> -			inode, file, pos, count);
+> +		retval = locks_mandatory_area(file, pos, pos + count - 1,
+> +				read_write == READ ? false : true);
+>  		if (retval < 0)
+>  			return retval;
+>  	}
+> diff --git a/include/linux/fs.h b/include/linux/fs.h
+> index 870a76e..e640f791 100644
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -2030,12 +2030,9 @@ extern struct kobject *fs_kobj;
+>  
+>  #define MAX_RW_COUNT (INT_MAX & PAGE_CACHE_MASK)
+>  
+> -#define FLOCK_VERIFY_READ  1
+> -#define FLOCK_VERIFY_WRITE 2
+> -
+>  #ifdef CONFIG_FILE_LOCKING
+>  extern int locks_mandatory_locked(struct file *);
+> -extern int locks_mandatory_area(int, struct inode *, struct file *, loff_t, size_t);
+> +extern int locks_mandatory_area(struct file *, loff_t, loff_t, bool);
+>  
+>  /*
+>   * Candidates for mandatory locking have the setgid bit set
+> @@ -2068,14 +2065,16 @@ static inline int locks_verify_truncate(struct inode *inode,
+>  				    struct file *filp,
+>  				    loff_t size)
+>  {
+> -	if (inode->i_flctx && mandatory_lock(inode))
+> -		return locks_mandatory_area(
+> -			FLOCK_VERIFY_WRITE, inode, filp,
+> -			size < inode->i_size ? size : inode->i_size,
+> -			(size < inode->i_size ? inode->i_size - size
+> -			 : size - inode->i_size)
+> -		);
+> -	return 0;
+> +	if (!inode->i_flctx || !mandatory_lock(inode))
+> +		return 0;
+> +
+> +	if (size < inode->i_size) {
+> +		return locks_mandatory_area(filp, size, inode->i_size - 1,
+> +				true);
+> +	} else {
+> +		return locks_mandatory_area(filp, inode->i_size, size - 1,
+> +				true);
 
+I feel like these callers would be just slightly more self-documenting
+if that last parameter was F_WRLCK instead of true.
 
-On 30.11.2015 15:16, Theodore Ts'o wrote:
-> On Sun, Nov 29, 2015 at 10:30:39PM +0100, Arnd Bergmann wrote:
->> The other large missing piece is the system call implementation. I have
->> posted a series earlier this year before my parental leave, and it's
->> currently lacking review from libc folks, and blocked on me to update
->> the series and post it again.
->
-> I assume that this also means there hasn't been much thought about
-> userspace support above libc?  i.e., how to take a 64-bit time64_t (or
-> changing the size of time_t) and translating that to a string using
-> some kind of version of ctime() and asctime(), and how to parse a
-> post-2038 date string and turning it into a 64-bit time_t on a 32-bit
-> platform?
->
+But I could live with it either way, patch looks like an
+improvement--ACK.
 
-   Arnd, I would just like to tell you how much I welcome your decision 
-for a new __kernel_time64_t!
-   As a time[64]_t is basically well defined counting artificial seconds 
-since the epoch (1970-01-01 00:00) where every year divisible by four is 
-a leap year that is for the meanwhile already sufficient to make use of 
-your new type. I just think about the Mayan calendar application which I 
-have implemented last year (Though I have not brought it to a 
-publishable state yet). A single typedef should be sufficient to let it 
-make use of time64_t (it directly uses this type as well as long long 
-internally for its calculations rather than the glibc time format 
-functions).
+--b.
+
+> +	}
+>  }
+>  
+>  static inline int break_lease(struct inode *inode, unsigned int mode)
+> @@ -2144,9 +2143,8 @@ static inline int locks_mandatory_locked(struct file *file)
+>  	return 0;
+>  }
+>  
+> -static inline int locks_mandatory_area(int rw, struct inode *inode,
+> -				       struct file *filp, loff_t offset,
+> -				       size_t count)
+> +static inline int locks_mandatory_area(struct file *filp, loff_t start,
+> +		loff_t end, bool write)
+>  {
+>  	return 0;
+>  }
+> -- 
+> 1.9.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
