@@ -1,33 +1,47 @@
-From: Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>
-Subject: Re: [PATCH 1/5] cifs: implement clone_file_range operation
-Date: Mon, 30 Nov 2015 10:02:34 +0100
-Message-ID: <20151130090234.GB31810@lst.de>
-References: <1448563859-21922-1-git-send-email-hch@lst.de> <1448563859-21922-2-git-send-email-hch@lst.de> <20151127114232.5b367b7b@g21.suse.de>
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH 01/12] Ext4: Fix extended timestamp encoding and decoding
+Date: Mon, 30 Nov 2015 09:16:05 -0500
+Message-ID: <20151130141605.GA4316@thunk.org>
+References: <20151120145422.18930.72662.stgit@warthog.procyon.org.uk>
+ <3495329.crWmoA5ACn@wuerfel>
+ <20151129024555.GA31968@thunk.org>
+ <2872067.shHdUXoF07@wuerfel>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>, viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org,
-	tao.peng-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org, jeff.layton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: David Howells <dhowells@redhat.com>, linux-afs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+	Deepa Dinamani <deepa.kernel@gmail.com>
+To: Arnd Bergmann <arnd@arndb.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20151127114232.5b367b7b-TzLh5lQYVSQb1SvskN2V4Q@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+In-Reply-To: <2872067.shHdUXoF07@wuerfel>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Fri, Nov 27, 2015 at 11:42:32AM +0100, David Disseldorp wrote:
-> I think that's about as close as we're going to get to clone semantics
-> for cifs. It's also dispatched as a single request covering the full
-> file - chunking only occurs for CIFS_IOC_COPYCHUNK_FILE based requests,
-> which are implemented using FSCTL_SRV_COPYCHUNK_WRITE, and not (always)
-> handled by the server as a COW clone.
+On Sun, Nov 29, 2015 at 10:30:39PM +0100, Arnd Bergmann wrote:
+> The other large missing piece is the system call implementation. I have
+> posted a series earlier this year before my parental leave, and it's
+> currently lacking review from libc folks, and blocked on me to update
+> the series and post it again.
 
-Oh, I misread cifs_ioctl_clone - it does two entirely different things
-based on the dup_extents parameter.  It looked like it did both
-of them in the dup_extents case.  Re-reading the code it seems close
-enough, although the client side samping of the file size seems a little
-dangerous.
+I assume that this also means there hasn't been much thought about
+userspace support above libc?  i.e., how to take a 64-bit time64_t (or
+changing the size of time_t) and translating that to a string using
+some kind of version of ctime() and asctime(), and how to parse a
+post-2038 date string and turning it into a 64-bit time_t on a 32-bit
+platform?
 
-I'll wire it up for clone_file_range for the next respin, but I'm still
-a little worried.
+The reason why I'm asking is because I'm thinking about how to add the
+appropriate regression test support to e2fsprogs for 32-bit platforms.
+I'm probably going to just skip the tests on architectures where
+sizeof(time_t) == 4 for now, since with a 32-bit time_t adding support
+for post-2038 in a e2fsprogs-specific way is (a) something I don't
+have time for, and (b) probably a waste of time since presumably we
+will either need to have a more general solution, or simply decide to
+give up on 32-bit platforms by 2038....
+
+Cheers,
+
+   	       	     	    	      	 - Ted
