@@ -1,63 +1,80 @@
-From: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
-Subject: Re: [PATCH 01/12] Ext4: Fix extended timestamp encoding and decoding
-Date: Sun, 29 Nov 2015 22:30:39 +0100
-Message-ID: <2872067.shHdUXoF07@wuerfel>
-References: <20151120145422.18930.72662.stgit@warthog.procyon.org.uk> <3495329.crWmoA5ACn@wuerfel> <20151129024555.GA31968@thunk.org>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: Ratelimit kernel log messages
+Date: Sun, 29 Nov 2015 22:07:01 -0600
+Message-ID: <CAH2r5muynQt7iCq=mVpjWq1EWq-z_pdKjiZntEWEXaxLsR6JjQ@mail.gmail.com>
+References: <7094bd3a2ef3c030463aa04fbce8369bfb33be9c.1446897962.git.jamie.bainbridge@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-afs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Deepa Dinamani <deepa.kernel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Jamie Bainbridge <jamie.bainbridge-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20151129024555.GA31968-AKGzg7BKzIDYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <7094bd3a2ef3c030463aa04fbce8369bfb33be9c.1446897962.git.jamie.bainbridge-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Saturday 28 November 2015 21:45:55 Theodore Ts'o wrote:
-> On Tue, Nov 24, 2015 at 09:10:53PM +0100, Arnd Bergmann wrote:
-> > On Tuesday 24 November 2015 14:36:46 Theodore Ts'o wrote:
-> > > This is the patch I would prefer to use (and in fact which I have
-> > > added to the ext4 tree):
-> > > 
-> > > There are issues with 32-bit vs 64-bit encoding of times before
-> > > January 1, 1970, which are handled with this patch which is not
-> > > handled with what you have in your patch series.  So I'd prefer if you
-> > > drop this patch, and I'll get this sent to Linus as a bug fix for 4.4.
-> > 
-> > I'm happy with either one. Apparently both Davids have arrived with
-> > almost the same algorithm and implementation, with the exception of
-> > the pre-1970 handling you mention there.
-> 
-> I was doing some testing on x86, which leads me to ask --- what's the
-> current thinking about post y2038 on 32-bit platforms such as x86?  I
-> see that there was some talk about using struct timespec64, but we
-> haven't made the transition in the VFS interfaces yet, despite a
-> comment in an LWN article from 2014 stating that "the first steps have
-> been taken; hopefully the rest will follow before too long".
+repushed to cifs-2.6.git (after finding out that the kbuild test robot
+warning messages for ARCH=mn10300 is likely not a real problem.
 
-The approach in my initial VFS series was to introduce 'struct inode_time',
-but I have basically abandoned that idea now, after we decided to introduce
-'timespec64' inside of the kernel and use that for other subsystems.
-The rought plan is now to have separate time64_t and u32 seconds/nanoseconds
-values in 'struct inode', 'struct iattr' and 'struct kstat' and use
-inline functions or macros to extract or set them as time64_t or timespec64
-in file system code, but that code is not written yet.
+On Sat, Nov 7, 2015 at 6:13 AM, Jamie Bainbridge
+<jamie.bainbridge-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> Under some conditions, CIFS can repeatedly call the cifs_dbg() logging
+> wrapper. If done rapidly enough, the console framebuffer can softlockup
+> or "rcu_sched self-detected stall". Apply the built-in log ratelimiters
+> to prevent such hangs.
+>
+> Signed-off-by: Jamie Bainbridge <jamie.bainbridge-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/cifs_debug.c | 2 +-
+>  fs/cifs/cifs_debug.h | 9 ++++-----
+>  2 files changed, 5 insertions(+), 6 deletions(-)
+>
+> diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+> index 7febcf2475c5ab675c04dfd2fddaa3ed574522a0..50b268483302922ee63d205a2fa560ec27676eed 100644
+> --- a/fs/cifs/cifs_debug.c
+> +++ b/fs/cifs/cifs_debug.c
+> @@ -50,7 +50,7 @@ void cifs_vfs_err(const char *fmt, ...)
+>         vaf.fmt = fmt;
+>         vaf.va = &args;
+>
+> -       pr_err("CIFS VFS: %pV", &vaf);
+> +       pr_err_ratelimited("CIFS VFS: %pV", &vaf);
+>
+>         va_end(args);
+>  }
+> diff --git a/fs/cifs/cifs_debug.h b/fs/cifs/cifs_debug.h
+> index f40fbaca1b2a2c1d7457d71bd1a5e7dd4b477859..66cf0f9fff8984cb12eed1c89d91bc9c6ccc6a9d 100644
+> --- a/fs/cifs/cifs_debug.h
+> +++ b/fs/cifs/cifs_debug.h
+> @@ -51,14 +51,13 @@ __printf(1, 2) void cifs_vfs_err(const char *fmt, ...);
+>  /* information message: e.g., configuration, major event */
+>  #define cifs_dbg(type, fmt, ...)                                       \
+>  do {                                                                   \
+> -       if (type == FYI) {                                              \
+> -               if (cifsFYI & CIFS_INFO) {                              \
+> -                       pr_debug("%s: " fmt, __FILE__, ##__VA_ARGS__);  \
+> -               }                                                       \
+> +       if (type == FYI && cifsFYI & CIFS_INFO) {                       \
+> +               pr_debug_ratelimited("%s: "                             \
+> +                           fmt, __FILE__, ##__VA_ARGS__);              \
+>         } else if (type == VFS) {                                       \
+>                 cifs_vfs_err(fmt, ##__VA_ARGS__);                       \
+>         } else if (type == NOISY && type != 0) {                        \
+> -               pr_debug(fmt, ##__VA_ARGS__);                           \
+> +               pr_debug_ratelimited(fmt, ##__VA_ARGS__);               \
+>         }                                                               \
+>  } while (0)
+>
+> --
+> 1.9.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-I'm mostly coordinating the y2038 work at the moment, but that means that
-a lot of the work is going into individual drivers that a single person
-can easily handle. We've had a couple of people who tried looking at VFS,
-but none of them followed through, so it got delayed a bit. However,
-Deepa Dinamani is now looking y2038 for VFS and individual file systems
-as part of her Outreachy internship and I'm optimistic that we'll soon
-be making progress again here with her work.
 
-The other large missing piece is the system call implementation. I have
-posted a series earlier this year before my parental leave, and it's
-currently lacking review from libc folks, and blocked on me to update
-the series and post it again.
 
-	Arnd
+-- 
+Thanks,
+
+Steve
