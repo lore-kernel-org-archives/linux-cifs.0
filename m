@@ -1,44 +1,57 @@
 From: Ross Lagerwall <ross.lagerwall-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 2/2] cifs: Drop cached dentry if its metadata changed
-Date: Wed, 2 Dec 2015 14:45:44 +0000
-Message-ID: <565F0418.70102@citrix.com>
-References: <1445260986-1886-1-git-send-email-ross.lagerwall@citrix.com>
- <CAH2r5mvsfV07CGQj61hExObi9CJWvZEpQvuC5UjxHax80LNS7g@mail.gmail.com>
- <5626019F.7020606@citrix.com>
- <CAH2r5mvPaFAD2mE=AfQUwh6B0324Gwf16kRnp4-=JodqvSxQyA@mail.gmail.com>
+Subject: [PATCH v2 1/2] cifs: Allow using O_DIRECT with cache=loose
+Date: Wed, 2 Dec 2015 14:46:07 +0000
+Message-ID: <1449067568-23038-1-git-send-email-ross.lagerwall@citrix.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Ross Lagerwall <ross.lagerwall-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mvPaFAD2mE=AfQUwh6B0324Gwf16kRnp4-=JodqvSxQyA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 10/20/2015 06:22 PM, Steve French wrote:
-> On Tue, Oct 20, 2015 at 3:55 AM, Ross Lagerwall
-> <ross.lagerwall-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org> wrote:
->> On 10/19/2015 05:21 PM, Steve French wrote:
->>>
->>> Could you verify this over SMB2 (vers=3.0) as well?  It looks like it
->>> should fail because cifs_all_info_to_fattr doesn't see the inode
->>> attribute change and fill in the new inode number  (IndexNuber).  I am
->>> suspicious that your patch is overkill (sends an extra request on
->>> revalidate, doubling the traffic) in the SMB2/SMB3 case since we are
->>> already doing a query file with FILE_ALL_INFO requested which already
->>> returned IndexNumber (so should have already gotten the inode number)
->>> - probably more important to use the IndexNumber we got back rather
->>> than request it twice.
->>
->>
+Currently O_DIRECT is supported with cache=none and cache=strict, but
+not cache=loose. Add support for using O_DIRECT when mounted with
+cache=loose.
 
-I've found commit 7196ac113a4f ("Fix to check Unique id and FileType 
-when client refer file directly."), which fixes the same problem for 
-when UNIX extensions are enabled. I will submit the same fix for SMB2+ 
-(since you've already got the uniqueid without needing to issue an extra 
-network request).
+Signed-off-by: Ross Lagerwall <ross.lagerwall-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifsfs.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index cbc0f4b..e6e7013 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -752,6 +752,9 @@ cifs_loose_read_iter(struct kiocb *iocb, struct iov_iter *iter)
+ 	ssize_t rc;
+ 	struct inode *inode = file_inode(iocb->ki_filp);
+ 
++	if (iocb->ki_filp->f_flags & O_DIRECT)
++		return cifs_user_readv(iocb, iter);
++
+ 	rc = cifs_revalidate_mapping(inode);
+ 	if (rc)
+ 		return rc;
+@@ -766,6 +769,18 @@ static ssize_t cifs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 	ssize_t written;
+ 	int rc;
+ 
++	if (iocb->ki_filp->f_flags & O_DIRECT) {
++		written = cifs_user_writev(iocb, from);
++		if (written > 0 && CIFS_CACHE_READ(cinode)) {
++			cifs_zap_mapping(inode);
++			cifs_dbg(FYI,
++				 "Set no oplock for inode=%p after a write operation\n",
++				 inode);
++			cinode->oplock = 0;
++		}
++		return written;
++	}
++
+ 	written = cifs_get_writer(cinode);
+ 	if (written)
+ 		return written;
 -- 
-Ross Lagerwall
+2.4.3
