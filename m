@@ -1,57 +1,73 @@
 From: Ross Lagerwall <ross.lagerwall-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v2 1/2] cifs: Allow using O_DIRECT with cache=loose
-Date: Wed, 2 Dec 2015 14:46:07 +0000
-Message-ID: <1449067568-23038-1-git-send-email-ross.lagerwall@citrix.com>
+Subject: [PATCH v2 2/2] cifs: Check uniqueid for SMB2+ and return -ESTALE if necessary
+Date: Wed, 2 Dec 2015 14:46:08 +0000
+Message-ID: <1449067568-23038-2-git-send-email-ross.lagerwall@citrix.com>
+References: <1449067568-23038-1-git-send-email-ross.lagerwall@citrix.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
 	Ross Lagerwall <ross.lagerwall-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
 To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1449067568-23038-1-git-send-email-ross.lagerwall-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Currently O_DIRECT is supported with cache=none and cache=strict, but
-not cache=loose. Add support for using O_DIRECT when mounted with
-cache=loose.
+Commit 7196ac113a4f ("Fix to check Unique id and FileType when client
+refer file directly.") checks whether the uniqueid of an inode has
+changed when getting the inode info, but only when using the UNIX
+extensions. Add a similar check for SMB2+, since this can be done
+without an extra network roundtrip.
 
 Signed-off-by: Ross Lagerwall <ross.lagerwall-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsfs.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+v2:
+Changed to not do an extra network roundtrip to get the uniqueid.
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index cbc0f4b..e6e7013 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -752,6 +752,9 @@ cifs_loose_read_iter(struct kiocb *iocb, struct iov_iter *iter)
- 	ssize_t rc;
- 	struct inode *inode = file_inode(iocb->ki_filp);
- 
-+	if (iocb->ki_filp->f_flags & O_DIRECT)
-+		return cifs_user_readv(iocb, iter);
-+
- 	rc = cifs_revalidate_mapping(inode);
- 	if (rc)
- 		return rc;
-@@ -766,6 +769,18 @@ static ssize_t cifs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	ssize_t written;
- 	int rc;
- 
-+	if (iocb->ki_filp->f_flags & O_DIRECT) {
-+		written = cifs_user_writev(iocb, from);
-+		if (written > 0 && CIFS_CACHE_READ(cinode)) {
-+			cifs_zap_mapping(inode);
-+			cifs_dbg(FYI,
-+				 "Set no oplock for inode=%p after a write operation\n",
-+				 inode);
-+			cinode->oplock = 0;
-+		}
-+		return written;
+ fs/cifs/inode.c | 24 ++++++++++++++++++++++--
+ 1 file changed, 22 insertions(+), 2 deletions(-)
+
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 6b66dd5..d14c05b 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -814,8 +814,21 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+ 			}
+ 		} else
+ 			fattr.cf_uniqueid = iunique(sb, ROOT_I);
+-	} else
+-		fattr.cf_uniqueid = CIFS_I(*inode)->uniqueid;
++	} else {
++		if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) &&
++		    validinum == false && server->ops->get_srv_inum) {
++			/*
++			 * Pass a NULL tcon to ensure we don't make a round
++			 * trip to the server. This only works for SMB2+.
++			 */
++			tmprc = server->ops->get_srv_inum(xid,
++				NULL, cifs_sb, full_path,
++				&fattr.cf_uniqueid, data);
++			if (tmprc)
++				fattr.cf_uniqueid = CIFS_I(*inode)->uniqueid;
++		} else
++			fattr.cf_uniqueid = CIFS_I(*inode)->uniqueid;
 +	}
+ 
+ 	/* query for SFU type info if supported and needed */
+ 	if (fattr.cf_cifsattrs & ATTR_SYSTEM &&
+@@ -856,6 +869,13 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+ 	} else {
+ 		/* we already have inode, update it */
+ 
++		/* if uniqueid is different, return error */
++		if (unlikely(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM &&
++		    CIFS_I(*inode)->uniqueid != fattr.cf_uniqueid)) {
++			rc = -ESTALE;
++			goto cgii_exit;
++		}
 +
- 	written = cifs_get_writer(cinode);
- 	if (written)
- 		return written;
+ 		/* if filetype is different, return error */
+ 		if (unlikely(((*inode)->i_mode & S_IFMT) !=
+ 		    (fattr.cf_mode & S_IFMT))) {
 -- 
 2.4.3
