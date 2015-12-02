@@ -1,73 +1,73 @@
-From: Ross Lagerwall <ross.lagerwall-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v2 2/2] cifs: Check uniqueid for SMB2+ and return -ESTALE if necessary
-Date: Wed, 2 Dec 2015 14:46:08 +0000
-Message-ID: <1449067568-23038-2-git-send-email-ross.lagerwall@citrix.com>
-References: <1449067568-23038-1-git-send-email-ross.lagerwall@citrix.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: vfs: move btrfs clone ioctls to common code
+Date: Wed, 2 Dec 2015 11:40:13 -0600
+Message-ID: <CAH2r5msWk+oA=teWnLrpJhp48PEToMoWiN8H8+ptdvEko+GNbA@mail.gmail.com>
+References: <1448563859-21922-1-git-send-email-hch@lst.de> <CAH2r5muW6=v6tx3BwXSYMgn7EZgzVANniebsxfwpdq9Y=0VcuA@mail.gmail.com>
+ <20151202072757.GB15839@lst.de>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Ross Lagerwall <ross.lagerwall-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
+	Peng Tao <tao.peng-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
+	Jeffrey Layton <jeff.layton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
+	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-btrfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	"linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1449067568-23038-1-git-send-email-ross.lagerwall-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <20151202072757.GB15839-jcswGhMUV9g@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Commit 7196ac113a4f ("Fix to check Unique id and FileType when client
-refer file directly.") checks whether the uniqueid of an inode has
-changed when getting the inode info, but only when using the UNIX
-extensions. Add a similar check for SMB2+, since this can be done
-without an extra network roundtrip.
+On Wed, Dec 2, 2015 at 1:27 AM, Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org> wrote:
+> Hi Steve,
+>
+> we have two APIs in Linux:
+>
+>  - the copy_file_range syscall which just is a "do a copy by any means"
+>  - the btrfs clone ioctls which have stricter semantics that very much
+>    expect a reflink-like operation
 
-Signed-off-by: Ross Lagerwall <ross.lagerwall-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
----
-v2:
-Changed to not do an extra network roundtrip to get the uniqueid.
+If the copy_file_range is allowed to use any offload mechanism then
+cifs.ko could be changed as follows, to fallback among the three
+possible mechanisms depending on what the target supports.
 
- fs/cifs/inode.c | 24 ++++++++++++++++++++++--
- 1 file changed, 22 insertions(+), 2 deletions(-)
+- send the fastest one of the three choices,
+ the "reflink-like") FSCTL_DUPLICATE_EXTENTS (there is a
+server fs capability that we check at mount time that indicates whether
+it is supported).   If it is not supported or if the source and target are on
+different shares (exports) then fallback to
+- send the ODX style copy offload (when implemented).  This is the only
+one that could in theory support cross-server copies (rather than require copy
+from a source and target on the same server)
+- (if the above aren't supported) send the FSCTL_COPYCHUNK (currently
+called via CIFS_IOC_COPYCHUNK_FILE)
 
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 6b66dd5..d14c05b 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -814,8 +814,21 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
- 			}
- 		} else
- 			fattr.cf_uniqueid = iunique(sb, ROOT_I);
--	} else
--		fattr.cf_uniqueid = CIFS_I(*inode)->uniqueid;
-+	} else {
-+		if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) &&
-+		    validinum == false && server->ops->get_srv_inum) {
-+			/*
-+			 * Pass a NULL tcon to ensure we don't make a round
-+			 * trip to the server. This only works for SMB2+.
-+			 */
-+			tmprc = server->ops->get_srv_inum(xid,
-+				NULL, cifs_sb, full_path,
-+				&fattr.cf_uniqueid, data);
-+			if (tmprc)
-+				fattr.cf_uniqueid = CIFS_I(*inode)->uniqueid;
-+		} else
-+			fattr.cf_uniqueid = CIFS_I(*inode)->uniqueid;
-+	}
- 
- 	/* query for SFU type info if supported and needed */
- 	if (fattr.cf_cifsattrs & ATTR_SYSTEM &&
-@@ -856,6 +869,13 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
- 	} else {
- 		/* we already have inode, update it */
- 
-+		/* if uniqueid is different, return error */
-+		if (unlikely(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM &&
-+		    CIFS_I(*inode)->uniqueid != fattr.cf_uniqueid)) {
-+			rc = -ESTALE;
-+			goto cgii_exit;
-+		}
-+
- 		/* if filetype is different, return error */
- 		if (unlikely(((*inode)->i_mode & S_IFMT) !=
- 		    (fattr.cf_mode & S_IFMT))) {
+For the btrfs_ioc_clone_range (or similar ", FSCTL_DUPLICATE_EXTENTS could
+probably stay the same since it is the only one of the three that
+guarantees using reflinks.
+
+If we want to for Linux->Samba, we could probably add a whole file
+clone (similar to hardlinks
+on the wire) to Samba and cifs.ko if that is useful (as opposed to the
+three mechanisms
+above which are copy ranges)
+
+In addition, I noticed that the cp command has added various
+optimizations for sparse
+file enablement.  I need to test those on cifs.ko and update the
+ioctls for retrieving sparse
+ranges o make sure that they work over SMB3 mounts, for optimizing
+the case where the source file is sparse, and mostly empty.
+
+> I plan to also wire up copy_file_range to try the clone_file_range method
+> first if available to make life easier for file systems, but as there isn't
+> any test coverage for that I don't dare to actually submit it yet.  I'll
+> send a compile tested only RFC for it when resending this series.
+
+
+
 -- 
-2.4.3
+Thanks,
+
+Steve
