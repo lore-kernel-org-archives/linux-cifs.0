@@ -1,37 +1,58 @@
-From: Andreas Gruenbacher <agruenba@redhat.com>
-Subject: Re: [PATCH v16 00/22] Richacls (Core and Ext4)
-Date: Thu, 3 Dec 2015 23:17:13 +0100
-Message-ID: <CAHc6FU6U3TXfacHWNeY=ihw_EwEVRWU-hAmR7rYNN+duqfa_Ww@mail.gmail.com>
-References: <1449090088-9281-1-git-send-email-agruenba@redhat.com>
+From: Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>
+Subject: Re: [PATCH 03/12] statx: Add a system call to make enhanced file
+ info available
+Date: Fri, 4 Dec 2015 13:06:33 +0100
+Message-ID: <20151204120633.GI14427@amd>
+References: <20151120145422.18930.72662.stgit@warthog.procyon.org.uk>
+ <20151120145457.18930.79678.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Andreas Gruenbacher <agruenba@redhat.com>
-To: Alexander Viro <viro@zeniv.linux.org.uk>,
-	"Theodore Ts'o" <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	"J. Bruce Fields" <bfields@fieldses.org>,
-	Jeff Layton <jlayton@poochiereds.net>,
-	Trond Myklebust <trond.myklebust@primarydata.com>,
-	Anna Schumaker <anna.schumaker@netapp.com>,
-	Dave Chinner <david@fromorbit.com>,
-	linux-ext4 <linux-ext4@vger.kernel.org>,
-	XFS Developers <xfs@oss.sgi.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-	linux-cifs@vger.kernel.org, Linux API <linux-api@vger.kernel.org>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <1449090088-9281-1-git-send-email-agruenba@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: arnd-r2nGTMty4D4@public.gmane.org, linux-afs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20151120145457.18930.79678.stgit-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Wed, Dec 2, 2015 at 10:01 PM, Andreas Gruenbacher
-<agruenba@redhat.com> wrote:
-> The complete patch queue is available in git form here:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/agruen/linux-richacl.git \
->         richacl-2015-11-09
+Hi!
 
-This should have been richacl-2015-12-02, sorry.
+> ===============
+> NEW SYSTEM CALL
+> ===============
+> 
+> The new system call is:
+> 
+> 	int ret = statx(int dfd,
+> 			const char *filename,
+> 			unsigned int flags,
+> 			unsigned int mask,
+> 			struct statx *buffer);
 
-Andreas
+Should this be called stat5, so that when new, even more improved stat
+comes, it does not have to be called statxx?
+
+> The dfd, filename and flags parameters indicate the file to query.  There
+> is no equivalent of lstat() as that can be emulated with statx() by passing
+> AT_SYMLINK_NOFOLLOW in flags.  There is also no equivalent of fstat() as
+> that can be emulated by passing a NULL filename to statx() with the fd of
+> interest in dfd.
+
+Dunno. Of course you can multiplex everything.
+
+But fstat() is really different operation to stat() -- tell me about
+my file descriptor vs. tell me about this filename, and ptrace (and
+some "security" solutions) might want to allow one but disallow the
+second. I'd not group them together..
+
+									Pavel
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
