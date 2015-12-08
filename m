@@ -1,44 +1,36 @@
-From: "Darrick J. Wong" <darrick.wong-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 2/4] vfs: pull btrfs clone API to vfs layer
-Date: Mon, 7 Dec 2015 17:54:53 -0800
-Message-ID: <20151208015453.GD28038@birch.djwong.org>
+From: Al Viro <viro@ZenIV.linux.org.uk>
+Subject: Re: [PATCH 1/4] locks: new locks_mandatory_area calling convention
+Date: Tue, 8 Dec 2015 04:05:04 +0000
+Message-ID: <20151208040504.GA2791@ZenIV.linux.org.uk>
 References: <1449143992-7415-1-git-send-email-hch@lst.de>
- <1449143992-7415-3-git-send-email-hch@lst.de>
- <20151207005331.GA10582@birch.djwong.org>
- <20151207151319.GA2472@lst.de>
+ <1449143992-7415-2-git-send-email-hch@lst.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, tao.peng-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org,
-	jeff.layton-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org, bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-btrfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: tao.peng@primarydata.com, jeff.layton@primarydata.com,
+	bfields@fieldses.org, linux-fsdevel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-cifs@vger.kernel.org
+To: Christoph Hellwig <hch@lst.de>
+Return-path: <linux-btrfs-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20151207151319.GA2472-jcswGhMUV9g@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+In-Reply-To: <1449143992-7415-2-git-send-email-hch@lst.de>
+Sender: linux-btrfs-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Mon, Dec 07, 2015 at 04:13:19PM +0100, Christoph Hellwig wrote:
-> On Sun, Dec 06, 2015 at 04:53:31PM -0800, Darrick J. Wong wrote:
-> > > +	if (S_ISDIR(inode_in->i_mode) || S_ISDIR(inode_out->i_mode))
-> > > +		return -EISDIR;
-> > > +	if (!S_ISREG(inode_in->i_mode) || !S_ISREG(inode_out->i_mode))
-> > > +		return -EOPNOTSUPP;
-> > 
-> > I thought we were moving to -EINVAL for wrong file types?
-> > 
-> > Though, perhaps "I've also prepared a btrfs patch for this and clone" from the
-> > earlier thread about generic/157 wasn't referring to /this/ patch. :)
-> > 
-> > In any case, I'm ok with EINVAL, and I haven't heard any objections to
-> > changing -EOPNOTSUPP -> -EINVAL when trying to reflink/dedupe/whatever
-> > non-file non-dir fds.
-> 
-> I'm fine with with EINVAL - not sure why I ended up with EOPNOTSUP,
-> probably because 157 is already failing as in general the errors for
-> something in the VFS vs a specific ioctl handler are just too different.
+On Thu, Dec 03, 2015 at 12:59:49PM +0100, Christoph Hellwig wrote:
+> Pass a loff_t end for the last byte instead of the 32-bit count
+> parameter to allow full file clones even on 32-bit architectures.
+> While we're at it also drop the pointless inode argument and simplify
+> the read/write selection.
 
-Ok, will have respun fixes for 157/158 soon.
+locks_mandatory_area() contains this:
+        if (filp && !(filp->f_flags & O_NONBLOCK))
+                sleep = true;
+which is a strong hint that filp might be NULL.  And indeed it might -
+        error = locks_verify_truncate(inode, NULL, length);
+in vfs_truncate() and
+        host_err = locks_verify_truncate(inode, NULL, iap->ia_size);
+in nfsd_get_write_access().  Both are broken by that commit.
 
---D
+Where the hell would truncate(2) get struct file, anyway?  IOW, the inode
+argument is _not_ pointless; re-added.
