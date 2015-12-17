@@ -1,7 +1,7 @@
 From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] [v2]cifs: Make echo interval tunable
-Date: Thu, 17 Dec 2015 17:29:46 +0530
-Message-ID: <1450353586-23102-1-git-send-email-sprabhu@redhat.com>
+Subject: [PATCH] [v3]cifs: Make echo interval tunable
+Date: Thu, 17 Dec 2015 18:57:53 +0530
+Message-ID: <1450358873-32490-1-git-send-email-sprabhu@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -17,12 +17,15 @@ Making this setting a tunable allows users to control the echo interval
 times as well as control the time after which the connecting to an
 unresponsive server times out.
 
+v2: Change MIN and MAX timeout values
+v3: Remove incorrect comment in cifs_get_tcp_session
+
 Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
  fs/cifs/cifsfs.c   |  2 ++
  fs/cifs/cifsglob.h |  8 ++++++--
- fs/cifs/connect.c  | 33 +++++++++++++++++++++++++++------
- 3 files changed, 35 insertions(+), 8 deletions(-)
+ fs/cifs/connect.c  | 32 ++++++++++++++++++++++++++------
+ 3 files changed, 34 insertions(+), 8 deletions(-)
 
 diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
 index cbc0f4b..eab2de6 100644
@@ -71,7 +74,7 @@ index 2b510c5..9d14926 100644
  
  static inline unsigned int
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index ecb0803..3b44e9e 100644
+index ecb0803..dc405db 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
 @@ -95,6 +95,7 @@ enum {
@@ -154,11 +157,10 @@ index ecb0803..3b44e9e 100644
  	return 1;
  }
  
-@@ -2208,6 +2222,13 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+@@ -2208,6 +2222,12 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
  	tcp_ses->tcpStatus = CifsNew;
  	++tcp_ses->srv_count;
  
-+	/* echo interval should be between 10 and 120 secs */
 +	if (volume_info->echo_interval > SMB_ECHO_INTERVAL_MIN ||
 +		volume_info->echo_interval < SMB_ECHO_INTERVAL_MAX)
 +		tcp_ses->echo_interval = volume_info->echo_interval * HZ;
@@ -168,7 +170,7 @@ index ecb0803..3b44e9e 100644
  	rc = ip_connect(tcp_ses);
  	if (rc < 0) {
  		cifs_dbg(VFS, "Error connecting to socket. Aborting operation.\n");
-@@ -2237,7 +2258,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+@@ -2237,7 +2257,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
  	cifs_fscache_get_client_cookie(tcp_ses);
  
  	/* queue echo request delayed work */
