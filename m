@@ -1,44 +1,20 @@
-From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Make echo interval tunable.
-Date: Thu, 17 Dec 2015 01:10:17 -0600
-Message-ID: <CAFB9KM3u4+88inSVPfdj0hAezwvKRqtx52q1qWJe=GfoZ1+_Xg@mail.gmail.com>
-References: <1450097226-20815-1-git-send-email-sprabhu@redhat.com>
-	<CAH2r5mu1xKmd+cg33ti7UtBWpj9XCt5SL0B=7QnV4LDxw-79vw@mail.gmail.com>
+From: Michael-FRN3bSZE4v/5NTPwaLTJmkNGhIIjRCmT@public.gmane.org,
+	"J.Tynan <f.digeronimo"@federconsumatori.abruzzo.it
+Subject: Review & Reply
+Date: Thu, 17 Dec 2015 07:55:35 +0700
+Message-ID: <20151217005626.624DE89D5DD1__7156.44228407672$1450343074$gmane$org@mail.microamerica.com.pe>
+Reply-To: michaeljtynan8-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+To: Recipients <f.digeronimo-OEd0YSEqKZmNIHX6aw5/uifbKdxUEgilNRkNT7W+5VM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mu1xKmd+cg33ti7UtBWpj9XCt5SL0B=7QnV4LDxw-79vw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Description: Mail message body
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, Dec 16, 2015 at 10:37 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> Why restrict the echo interval to such a narrow range?  If tunable
-> might as well allow a larger range, maybe 1 to 600 (ten minutes)?  I
-> am not certain of the range of possible future uses - maybe a
-> pseudo-real type workload connected to a really fast server wants
-> something really low (a few seconds?) and maybe very poor network
-> connections want something longer?  Not a strong objection, but seems
-> like we could allow a broader range without confusing the user.
->
-> Many years ago, Windows and OS/2 had an oplock break time (which also
-> controlled how long to wait for acks to come back from the server) -
-> and it ranged from 34 to 127 seconds for acks and 35 to 640 for oplock
-> break timeouts.     Don't see any reason to limit it less than that
-> (that was really old and networks vary a lot in performance now).
->
-> Thoughts?
-
-For context, were those timeouts for when broadcasts and signaling
-were over three protocols (IPX, IP, and NetBEUI?  I can't recall, but
-Chris H. was telling tales of yore last month at a dinner and IIRC the
-propagation for SMB was over three protocols because usually at least
-one would eventually reach remote hosts under most conditions)?  I
-have no issue with long timeouts, but what was the historical context
-of the 10 minute oplock breaks?  Forgive me if I'm recalling
-incorrectly, but I thought that the extended timeouts were for
-much-less-than-optimal conditions over multiple protocols attached to
-hubs.
+Greetings,
+My name is Mr.Michael J. Tynan, I am a banker with Bank Of America. It is true that we have not meet each other in person, but I strongly believe in trust and friendship in every business. I have a Lebanese deceased customer's abandoned fund, which I am his personal financial adviser before his accidental death, that being the main reason why I alone working in the bank here, know much about the existence of this fund and the secrets surrounding this money. But before I disclose the full details to you, I will like to know your interest and willingness to assist me. You can call me as soon you receive my message, so that i will send to you full details about the transaction.
+My best regards,
+Mr.Michael J. Tynan
+MOBILE: +1 347 269 3740
