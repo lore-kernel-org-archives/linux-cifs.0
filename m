@@ -1,22 +1,29 @@
-From: "Dr. David White" <OC-/iNpniN15w9HfZP73Gtkiw@public.gmane.org>
-Subject: Dear Friend,
-Date: Mon, 21 Dec 2015 00:29:10 +0900 (JST)
-Message-ID: <448455749.101102686.1450625350831.JavaMail.root__40841.7791630656$1450626870$gmane$org@key.ocn.ne.jp>
-Reply-To: "Dr. David White" <dr.david_white-1ViLX0X+lBJBDgjK7y7TUQ@public.gmane.org>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH 03/12] statx: Add a system call to make enhanced file info available
+Date: Mon, 21 Dec 2015 23:21:24 +0000
+Message-ID: <4234.1450740084@warthog.procyon.org.uk>
+References: <20151204120633.GI14427@amd> <20151120145422.18930.72662.stgit@warthog.procyon.org.uk> <20151120145457.18930.79678.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-2022-JP
-Content-Transfer-Encoding: 7bit
-To: unlisted-recipients:; (no To-header on input)
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Cc: dhowells@redhat.com, arnd@arndb.de, linux-afs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org
+To: Pavel Machek <pavel@ucw.cz>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20151204120633.GI14427@amd>
+Content-ID: <6178.1449249670.1@warthog.procyon.org.uk>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
+Pavel Machek <pavel@ucw.cz> wrote:
 
+> But fstat() is really different operation to stat() -- tell me about
+> my file descriptor vs. tell me about this filename, and ptrace (and
+> some "security" solutions) might want to allow one but disallow the
+> second. I'd not group them together..
 
-Dear Friend,
+You can argue it either way.  I think Linus came down on the side of combining
+them.
 
-With due respect to your person and much sincerity of purpose . I have a business proposal which I will like to handle with you. $35 million USD is involves. But be rest assured that everything is legal and risk free as I have concluded all the arrangements and the legal papers that will back the transaction up. Kindly indicate your interest to enable me tell you more detail of the proposal.
-
-Waiting for your urgent response.
-Yours Faithfully,
-Dr David White
+David
