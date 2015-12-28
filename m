@@ -1,22 +1,30 @@
-From: lcdaccessory-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: linux-cifs antiblue protect eye for distributor
-Date: Sat, 26 Dec 2015 01:37:55 +0800
-Message-ID: <418-2201512525173755916@ericpc>
+From: "Jeff Skoll" <verna.viajar-6jlb+pvLGhfpy9IuCEGcwoQuADTiUCJX@public.gmane.org>
+Subject: Charity Donation
+Date: Mon, 28 Dec 2015 17:43:36 -0500
+Message-ID: <auto-000005400250@mailadmin.uni-kassel.de>
+Reply-To: jeff.skoll-aj9EiHWJibxFWb1O811qSg@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=136
-Content-Transfer-Encoding: 8BIT
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: Me <verna.viajar-6jlb+pvLGhfpy9IuCEGcwoQuADTiUCJX@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Description: Mail message body
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Dear linux-cifs  MD,
+Hi,
+My name is Jeffrey Skoll, a philanthropist and the founder of one of th=
+e largest private foundations in the world. I believe strongly in =E2=80=
+=98giving while living.=E2=80=99 I had one idea that never changed in m=
+y mind =E2=80=94 that you should use your wealth to help people and I h=
+ave decided to secretly give USD2.498 Million to a randomly selected in=
+dividual. On receipt of this email, you should count yourself as the in=
+dividual. Kindly get back to me at your earliest convenience, so I know=
+ your email address is valid.
 
-New LCD/LED TV defender blocker for year 2016.
-huge profits reserve for first distributor there, a lots request from end-users especial for antiblue protector.
-New and hottest model refer to  http://www.emetal.tw/protect/p1-blue.htm 
+Visit the web page to know more about me: http://www.theglobeandmail.co=
+m/news/national/meet-the-canadian-billionaire-whos-giving-it-all-away/a=
+rticle4209888/ or you can read an article of me on Wikipedia.
 
-inquire email to Eric from eMetal Technology
-www.lcdaccessory.com info-SW53ou7ZHnsCMcJQe/j3Cw@public.gmane.org 
-
- 7459
+Regards,
+Jeffrey Skoll.
