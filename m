@@ -1,7 +1,7 @@
 From: "Jeff Skoll" <verna.viajar-6jlb+pvLGhfpy9IuCEGcwoQuADTiUCJX@public.gmane.org>
 Subject: Charity Donation
-Date: Mon, 28 Dec 2015 17:43:36 -0500
-Message-ID: <auto-000005400250@mailadmin.uni-kassel.de>
+Date: Mon, 28 Dec 2015 19:34:14 -0500
+Message-ID: <auto-000005522766@mailadmin.uni-kassel.de>
 Reply-To: jeff.skoll-aj9EiHWJibxFWb1O811qSg@public.gmane.org
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
