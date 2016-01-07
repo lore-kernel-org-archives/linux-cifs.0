@@ -1,30 +1,43 @@
-From: "Skoll, Jeff" <uk038853-oe7qfRrRQfe4KM+pgAFg7o4/OD0De0NW@public.gmane.org>
-Subject: Charity/Donation
-Date: Mon, 04 Jan 2016 21:40:01 -0500
-Message-ID: <auto-000000074659__10831.3487879515$1451962361$gmane$org@mailadmin.uni-kassel.de>
-Reply-To: jeff.skoll-aj9EiHWJibxFWb1O811qSg@public.gmane.org
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: Me <uk038853-oe7qfRrRQfe4KM+pgAFg7o4/OD0De0NW@public.gmane.org>
+From: Karel Zak <kzak-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] mount.cifs: ignore x-* mount options
+Date: Thu,  7 Jan 2016 11:02:49 +0100
+Message-ID: <1452160969-16970-1-git-send-email-kzak@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Karel Zak <kzak-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Jeffrey Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Description: Mail message body
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi,
-My name is Jeffrey Skoll, a philanthropist and the founder of one of th=
-e largest private foundations in the world. I believe strongly in =E2=80=
-=98giving while living.=E2=80=99 I had one idea that never changed in m=
-y mind =E2=80=94 that you should use your wealth to help people and I h=
-ave decided to secretly give USD2.498 Million to a randomly selected in=
-dividual. On receipt of this email, you should count yourself as the in=
-dividual. Kindly get back to me at your earliest convenience, so I know=
- your email address is valid.
+x-* prefix is used for userspace mount options and it's pretty
+commonly used to extend fstab configuration in systemd world (e.g.
+x-systemd.automount). These options is necessary to ignored.
 
-Visit the web page to know more about me: http://www.theglobeandmail.co=
-m/news/national/meet-the-canadian-billionaire-whos-giving-it-all-away/a=
-rticle4209888/ or you can read an article of me on Wikipedia.
+The command mount(8) does not pass x-* mount options to mount.<type>
+helpers, but in some use-cases it's possible that the cifs helper reads
+mount options from fstab or users directly call mount.cifs and copy & past
+mount options, etc.
 
-Regards,
-Jeffrey Skoll.
+This patch marks all options prefixed by "x-" as OPT_IGNORE to make
+things more robust for end-users. We already uses the same concept for
+_netdev.
+
+Signed-off-by: Karel Zak <kzak-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ mount.cifs.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/mount.cifs.c b/mount.cifs.c
+index 3535096..5c5734f 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -756,6 +756,8 @@ static int parse_opt_token(const char *token)
+ 		return OPT_BKUPGID;
+ 	if (strncmp(token, "nofail", 6) == 0)
+ 		return OPT_NOFAIL;
++	if (strncmp(token, "x-", 2) == 0)
++		return OPT_IGNORE;
+ 
+ 	return OPT_ERROR;
+ }
+-- 
+2.4.3
