@@ -1,44 +1,144 @@
-From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] autoconf: Use $(DEFS) when building idmapwb.so and pam_cifscreds.so
-Date: Fri,  8 Jan 2016 17:54:39 +0530
-Message-ID: <1452255879-2180-1-git-send-email-sprabhu@redhat.com>
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Andreas Gruenbacher <agruenba@redhat.com>
+Subject: [PATCH v17 00/22] Richacls (Core and Ext4)
+Date: Mon, 11 Jan 2016 16:21:31 +0100
+Message-ID: <1452525713-11348-1-git-send-email-agruenba@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: "J. Bruce Fields" <bfields@fieldses.org>, linux-nfs@vger.kernel.org,
+	Theodore Ts'o <tytso@mit.edu>, Andreas Gruenbacher <agruenba@redhat.com>,
+	linux-cifs@vger.kernel.org, linux-api@vger.kernel.org,
+	Trond Myklebust <trond.myklebust@primarydata.com>,
+	linux-kernel@vger.kernel.org, xfs@oss.sgi.com,
+	Christoph Hellwig <hch@infradead.org>,
+	Andreas Dilger <adilger.kernel@dilger.ca>, linux-fsdevel@vger.kernel.org,
+	Jeff Layton <jlayton@poochiereds.net>, linux-ext4@vger.kernel.org,
+	Anna Schumaker <anna.schumaker@netapp.com>
+To: Alexander Viro <viro@zeniv.linux.org.uk>
+Return-path: <xfs-bounces@oss.sgi.com>
+List-Unsubscribe: <http://oss.sgi.com/mailman/options/xfs>,
+	<mailto:xfs-request@oss.sgi.com?subject=unsubscribe>
+List-Archive: <http://oss.sgi.com/pipermail/xfs>
+List-Post: <mailto:xfs@oss.sgi.com>
+List-Help: <mailto:xfs-request@oss.sgi.com?subject=help>
+List-Subscribe: <http://oss.sgi.com/mailman/listinfo/xfs>,
+	<mailto:xfs-request@oss.sgi.com?subject=subscribe>
+Errors-To: xfs-bounces@oss.sgi.com
+Sender: xfs-bounces@oss.sgi.com
+List-Id: linux-cifs.vger.kernel.org
 
-We should pass the macros defined in $(DEFS) when building idmapwb.so
-and pam_cifscreds.so. The autoconf process sets the macro HAVE_CONFIG_H
-using the $(DEFS) variable. This macro has to be defined to allow the
-source files to include config.h
+Al,
 
-Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- Makefile.am | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+could you please merge the current richacl patch queue, up to and including
+the ext4 support?  The patches apply on top of your current xattr.work
+branch.
 
-diff --git a/Makefile.am b/Makefile.am
-index 92da8b1..2e99e60 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -84,7 +84,7 @@ plugin_PROGRAMS = idmapwb.so
- man_MANS += idmapwb.8
- 
- idmapwb.so: idmapwb.c
--	$(CC) $(CFLAGS) $(AM_CFLAGS) $(WBCLIENT_CFLAGS) $(LDFLAGS) -shared -fpic -o $@ $+ $(WBCLIENT_LIBS)
-+	$(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) $(WBCLIENT_CFLAGS) $(LDFLAGS) -shared -fpic -o $@ $+ $(WBCLIENT_LIBS)
- 
- idmapwb.8: idmapwb.8.in
- 	$(SED) 's,[@]pluginpath@,$(pluginpath),' $(srcdir)/$@.in > $@-t && mv $@-t $@
-@@ -95,7 +95,7 @@ if CONFIG_PAM
- pam_PROGRAMS = pam_cifscreds.so
- 
- pam_cifscreds.so: pam_cifscreds.c cifskey.c resolve_host.c util.c
--	$(CC) $(CFLAGS) $(AM_CFLAGS) $(LDFLAGS) -shared -fpic -o $@ $+ -lpam -lkeyutils
-+	$(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) $(LDFLAGS) -shared -fpic -o $@ $+ -lpam -lkeyutils
- man_MANS += pam_cifscreds.8
- endif
- 
+Other than rebasing onto xattr.work, the patches haven't changed since
+November 9, 2015.  Previous posting: https://lwn.net/Articles/666596/.
+
+
+The complete patch queue is available here:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/agruen/linux-richacl.git \
+        richacl-2015-12-15
+
+
+The richacl user-space utilitites, man pages, and test suite are available
+here:
+
+  https://github.com/andreas-gruenbacher/richacl
+
+
+Changes to other user-space packages for richacl:
+
+  https://github.com/andreas-gruenbacher/coreutils
+  https://github.com/andreas-gruenbacher/e2fsprogs
+  https://github.com/andreas-gruenbacher/xfsprogs-dev
+  https://github.com/andreas-gruenbacher/nfs-utils
+
+
+Please see the richacl homepage for more information:
+
+  http://www.bestbits.at/richacl/
+
+
+Thanks,
+Andreas
+
+Andreas Gruenbacher (20):
+  vfs: Add IS_ACL() and IS_RICHACL() tests
+  vfs: Add MAY_CREATE_FILE and MAY_CREATE_DIR permission flags
+  vfs: Add MAY_DELETE_SELF and MAY_DELETE_CHILD permission flags
+  vfs: Make the inode passed to inode_change_ok non-const
+  vfs: Add permission flags for setting file attributes
+  richacl: In-memory representation and helper functions
+  richacl: Permission mapping functions
+  richacl: Compute maximum file masks from an acl
+  richacl: Permission check algorithm
+  posix_acl: Unexport acl_by_type and make it static
+  vfs: Cache base_acl objects in inodes
+  vfs: Add get_richacl and set_richacl inode operations
+  vfs: Cache richacl in struct inode
+  richacl: Update the file masks in chmod()
+  richacl: Check if an acl is equivalent to a file mode
+  richacl: Create-time inheritance
+  richacl: Automatic Inheritance
+  richacl: xattr mapping functions
+  richacl: Add richacl xattr handler
+  vfs: Add richacl permission checking
+
+Aneesh Kumar K.V (2):
+  ext4: Add richacl support
+  ext4: Add richacl feature flag
+
+ drivers/staging/lustre/lustre/llite/llite_lib.c |   2 +-
+ fs/Kconfig                                      |   3 +
+ fs/Makefile                                     |   2 +
+ fs/attr.c                                       |  81 +++-
+ fs/ext4/Kconfig                                 |  11 +
+ fs/ext4/Makefile                                |   1 +
+ fs/ext4/ext4.h                                  |   6 +-
+ fs/ext4/file.c                                  |   3 +
+ fs/ext4/ialloc.c                                |  11 +-
+ fs/ext4/inode.c                                 |  12 +-
+ fs/ext4/namei.c                                 |   5 +
+ fs/ext4/richacl.c                               | 142 ++++++
+ fs/ext4/richacl.h                               |  40 ++
+ fs/ext4/super.c                                 |  49 +-
+ fs/ext4/xattr.c                                 |   7 +
+ fs/f2fs/acl.c                                   |   4 +-
+ fs/inode.c                                      |  15 +-
+ fs/jffs2/acl.c                                  |  10 +-
+ fs/namei.c                                      | 118 +++--
+ fs/posix_acl.c                                  |  50 +--
+ fs/richacl_base.c                               | 564 ++++++++++++++++++++++++
+ fs/richacl_inode.c                              | 333 ++++++++++++++
+ fs/richacl_xattr.c                              | 298 +++++++++++++
+ fs/xattr.c                                      |  34 +-
+ include/linux/fs.h                              |  60 ++-
+ include/linux/posix_acl.h                       |  13 +-
+ include/linux/richacl.h                         | 208 +++++++++
+ include/linux/richacl_xattr.h                   |  44 ++
+ include/uapi/linux/Kbuild                       |   2 +
+ include/uapi/linux/fs.h                         |   3 +-
+ include/uapi/linux/richacl.h                    | 152 +++++++
+ include/uapi/linux/richacl_xattr.h              |  44 ++
+ include/uapi/linux/xattr.h                      |   2 +
+ 33 files changed, 2222 insertions(+), 107 deletions(-)
+ create mode 100644 fs/ext4/richacl.c
+ create mode 100644 fs/ext4/richacl.h
+ create mode 100644 fs/richacl_base.c
+ create mode 100644 fs/richacl_inode.c
+ create mode 100644 fs/richacl_xattr.c
+ create mode 100644 include/linux/richacl.h
+ create mode 100644 include/linux/richacl_xattr.h
+ create mode 100644 include/uapi/linux/richacl.h
+ create mode 100644 include/uapi/linux/richacl_xattr.h
+
 -- 
 2.5.0
+
+_______________________________________________
+xfs mailing list
+xfs@oss.sgi.com
+http://oss.sgi.com/mailman/listinfo/xfs
