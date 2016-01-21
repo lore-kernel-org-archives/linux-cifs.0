@@ -1,57 +1,58 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs_dbg() outputs an uninitialized buffer in cifs_readdir()
-Date: Thu, 14 Jan 2016 15:04:21 -0600
-Message-ID: <CAH2r5muEGLku_nSRtw=2hGaKf6fr0EQzbvVVw+0bme8V+8DCNA@mail.gmail.com>
-References: <56977B4A.3070002@virtuozzo.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] autoconf: Use $(DEFS) when building idmapwb.so and
+ pam_cifscreds.so
+Date: Wed, 20 Jan 2016 22:13:41 -0500
+Message-ID: <20160120221341.3e3f3e25@synchrony.poochiereds.net>
+References: <1452255879-2180-1-git-send-email-sprabhu@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
-To: Vasily Averin <vvs-5HdwGun5lf+gSpxsJD1C4w@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <56977B4A.3070002-5HdwGun5lf+gSpxsJD1C4w@public.gmane.org>
+In-Reply-To: <1452255879-2180-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-merged into cifs-2.6.git and added cc:stable
+On Fri,  8 Jan 2016 17:54:39 +0530
+Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-Let me know if other cifs/smb3 patches planned for 4.5
-
-On Thu, Jan 14, 2016 at 4:41 AM, Vasily Averin <vvs-5HdwGun5lf+gSpxsJD1C4w@public.gmane.org> wrote:
-> In some cases tmp_bug can be not filled in cifs_filldir and stay uninitialized,
-> therefore its printk with "%s" modifier can leak content of kernelspace memory.
-> If old content of this buffer does not contain '\0' access bejond end of
-> allocated object can crash the host.
->
-> Signed-off-by: Vasily Averin <vvs-5HdwGun5lf+gSpxsJD1C4w@public.gmane.org>
+> We should pass the macros defined in $(DEFS) when building idmapwb.so
+> and pam_cifscreds.so. The autoconf process sets the macro HAVE_CONFIG_H
+> using the $(DEFS) variable. This macro has to be defined to allow the
+> source files to include config.h
+> 
+> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > ---
->  fs/cifs/readdir.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
-> index 0557c45..b30a4a6 100644
-> --- a/fs/cifs/readdir.c
-> +++ b/fs/cifs/readdir.c
-> @@ -847,6 +847,7 @@ int cifs_readdir(struct file *file, struct dir_context *ctx)
->                  * if buggy server returns . and .. late do we want to
->                  * check for that here?
->                  */
-> +               *tmp_buf = 0;
->                 rc = cifs_filldir(current_entry, file, ctx,
->                                   tmp_buf, max_len);
->                 if (rc) {
-> --
-> 1.9.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>  Makefile.am | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/Makefile.am b/Makefile.am
+> index 92da8b1..2e99e60 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -84,7 +84,7 @@ plugin_PROGRAMS = idmapwb.so
+>  man_MANS += idmapwb.8
+>  
+>  idmapwb.so: idmapwb.c
+> -	$(CC) $(CFLAGS) $(AM_CFLAGS) $(WBCLIENT_CFLAGS) $(LDFLAGS) -shared -fpic -o $@ $+ $(WBCLIENT_LIBS)
+> +	$(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) $(WBCLIENT_CFLAGS) $(LDFLAGS) -shared -fpic -o $@ $+ $(WBCLIENT_LIBS)
+>  
+>  idmapwb.8: idmapwb.8.in
+>  	$(SED) 's,[@]pluginpath@,$(pluginpath),' $(srcdir)/$@.in > $@-t && mv $@-t $@
+> @@ -95,7 +95,7 @@ if CONFIG_PAM
+>  pam_PROGRAMS = pam_cifscreds.so
+>  
+>  pam_cifscreds.so: pam_cifscreds.c cifskey.c resolve_host.c util.c
+> -	$(CC) $(CFLAGS) $(AM_CFLAGS) $(LDFLAGS) -shared -fpic -o $@ $+ -lpam -lkeyutils
+> +	$(CC) $(DEFS) $(CFLAGS) $(AM_CFLAGS) $(LDFLAGS) -shared -fpic -o $@ $+ -lpam -lkeyutils
+>  man_MANS += pam_cifscreds.8
+>  endif
+>  
 
+Merged.
 
-
--- 
 Thanks,
-
-Steve
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
