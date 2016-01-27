@@ -1,59 +1,37 @@
-From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH] lib: fix callers of strtobool to use char array
-Date: Wed, 27 Jan 2016 17:03:23 -0800
-Message-ID: <CAGXu5jKhTDX_JcEgO=kVfb-LRdPAfoRtiYXTHJLT_ABTt3MY6g@mail.gmail.com>
-References: <20160128004542.GA15247@www.outflux.net>
-	<1453942708.10099.41.camel@perches.com>
+From: Markus Greger <Markus.Greger-hi6Y0CQ0nG0@public.gmane.org>
+Subject: Is there a way to enumerate Alternate Data Streams?
+Date: Wed, 27 Jan 2016 23:17:39 +0100
+Message-ID: <56A94203.3060807@gmx.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Amitkumar Karwar <akarwar@marvell.com>,
-	Nishant Sarmukadam <nishants@marvell.com>,
-	Kalle Valo <kvalo@codeaurora.org>,
-	Steve French <sfrench@samba.org>,
-	linux-wireless <linux-wireless@vger.kernel.org>,
-	Network Development <netdev@vger.kernel.org>,
-	linux-cifs@vger.kernel.org
-To: Joe Perches <joe@perches.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1453942708.10099.41.camel@perches.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, Jan 27, 2016 at 4:58 PM, Joe Perches <joe@perches.com> wrote:
-> On Wed, 2016-01-27 at 16:45 -0800, Kees Cook wrote:
->> Some callers of strtobool were passing a pointer to unterminated strings.
->> This fixes the issue and consolidates some logic in cifs.
->
-> This may be incomplete as it duplicates the behavior for
-> the old number of characters, but this is not a solution
-> for the entry of a bool that is "on" or "off".
+I'm looking for a way to enumerate Alternate Data Streams from linux,
+specifically from a filesystem mounted via cifs.
 
-As in, the on/off patch is missing? Yes, that's been sent separately,
-but I wanted to make sure these changes weren't upsetting to the two
-users.
+Mounting a windows share via cifs allows me to read, write and delete
+alternate data streams from linux (like indicated at
+http://article.gmane.org/gmane.linux.kernel.cifs/7228/match=alternate+data+streams).
 
->> diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-> []
->> @@ -290,7 +305,8 @@ static ssize_t cifs_stats_proc_write(struct file *file,
->>                       }
->>               }
->>               spin_unlock(&cifs_tcp_ses_lock);
->> -     }
->> +     } else
->> +             return rc;
->
-> Likely better to reverse the test and unindent the
-> preceding block.
->
-> Otherwise, please make sure to use the general brace
-> form of when one branch needs braces, the other branch
-> should have them too.
+However I couldn't find a way to actually query if there are alternate
+data streams and / or enumerate them. Even when mounting with
+"user_xattr" option and using getfattr there was no information about
+alternate streams.
 
-Okay, sure, I'll rework this and send it together with the on/off patch.
+A very similiar if not identical question was asked quite some time ago
+at
+http://linux-cifs.vger.kernel.narkive.com/W8aaTElO/alternate-data-streams but
+I couldn't manage to really find an answer.
 
--Kees
+A quick glimpse through kernel source gave references in comments to
+"proc/fs/cifs/streamstoxattr" but this seems not yet implemented - at
+least searches yield nothing about how to set "proc/fs/cifs/streamstoxattr".
 
--- 
-Kees Cook
-Chrome OS & Brillo Security
+So is there any ioctl, option/configuration or "well known" attribute
+name to get a list of alternate data streams?
+
+Markus
