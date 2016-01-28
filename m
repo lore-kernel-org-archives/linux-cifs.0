@@ -1,171 +1,287 @@
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: Re: [PATCH 17/26] mac802154: Use skcipher
-Date: Tue, 26 Jan 2016 17:55:02 +0100
-Message-ID: <56A7A4E6.4090409@osg.samsung.com>
-References: <20160124131021.GA31153@gondor.apana.org.au>
- <E1aNKZ8-0008EN-PU@gondolin.me.apana.org.au>
+From: Kees Cook <keescook-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>
+Subject: [PATCH] lib: fix callers of strtobool to use char array
+Date: Wed, 27 Jan 2016 16:45:42 -0800
+Message-ID: <20160128004542.GA15247@www.outflux.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
-To: Herbert Xu <herbert@gondor.apana.org.au>,
- Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- netdev@vger.kernel.org, devel@driverdev.osuosl.org, dm-devel@redhat.com,
- linux-wireless@vger.kernel.org, linux-cifs@vger.kernel.org,
- ecryptfs@vger.kernel.org, linux-ext4@vger.kernel.org,
- linux-f2fs-devel@lists.sourceforge.net, linux-nfs@vger.kernel.org,
- keyrings@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- ceph-devel@vger.kernel.org, linux-wpan@vger.kernel.org,
- linux-afs@lists.infradead.org, drbd-dev@lists.linbit.com,
- open-iscsi@googlegroups.com
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <E1aNKZ8-0008EN-PU@gondolin.me.apana.org.au>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Amitkumar Karwar <akarwar-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
+	Nishant Sarmukadam <nishants-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
+	Kalle Valo <kvalo-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Hello.
+Some callers of strtobool were passing a pointer to unterminated strings.
+This fixes the issue and consolidates some logic in cifs.
 
-On 24/01/16 14:18, Herbert Xu wrote:
-> This patch replaces uses of blkcipher with skcipher.
->     
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> ---
->
->   net/mac802154/llsec.c |   41 +++++++++++++++++++++++------------------
->   net/mac802154/llsec.h |    3 +--
->   2 files changed, 24 insertions(+), 20 deletions(-)
->
-> diff --git a/net/mac802154/llsec.c b/net/mac802154/llsec.c
-> index a13d02b..6a3e1c2 100644
-> --- a/net/mac802154/llsec.c
-> +++ b/net/mac802154/llsec.c
-> @@ -17,9 +17,9 @@
->   #include <linux/err.h>
->   #include <linux/bug.h>
->   #include <linux/completion.h>
-> -#include <linux/crypto.h>
->   #include <linux/ieee802154.h>
->   #include <crypto/aead.h>
-> +#include <crypto/skcipher.h>
->   
->   #include "ieee802154_i.h"
->   #include "llsec.h"
-> @@ -144,18 +144,18 @@ llsec_key_alloc(const struct ieee802154_llsec_key *template)
->   			goto err_tfm;
->   	}
->   
-> -	key->tfm0 = crypto_alloc_blkcipher("ctr(aes)", 0, CRYPTO_ALG_ASYNC);
-> +	key->tfm0 = crypto_alloc_skcipher("ctr(aes)", 0, CRYPTO_ALG_ASYNC);
->   	if (IS_ERR(key->tfm0))
->   		goto err_tfm;
->   
-> -	if (crypto_blkcipher_setkey(key->tfm0, template->key,
-> -				    IEEE802154_LLSEC_KEY_SIZE))
-> +	if (crypto_skcipher_setkey(key->tfm0, template->key,
-> +				   IEEE802154_LLSEC_KEY_SIZE))
->   		goto err_tfm0;
->   
->   	return key;
->   
->   err_tfm0:
-> -	crypto_free_blkcipher(key->tfm0);
-> +	crypto_free_skcipher(key->tfm0);
->   err_tfm:
->   	for (i = 0; i < ARRAY_SIZE(key->tfm); i++)
->   		if (key->tfm[i])
-> @@ -175,7 +175,7 @@ static void llsec_key_release(struct kref *ref)
->   	for (i = 0; i < ARRAY_SIZE(key->tfm); i++)
->   		crypto_free_aead(key->tfm[i]);
->   
-> -	crypto_free_blkcipher(key->tfm0);
-> +	crypto_free_skcipher(key->tfm0);
->   	kzfree(key);
->   }
->   
-> @@ -620,15 +620,17 @@ llsec_do_encrypt_unauth(struct sk_buff *skb, const struct mac802154_llsec *sec,
->   {
->   	u8 iv[16];
->   	struct scatterlist src;
-> -	struct blkcipher_desc req = {
-> -		.tfm = key->tfm0,
-> -		.info = iv,
-> -		.flags = 0,
-> -	};
-> +	SKCIPHER_REQUEST_ON_STACK(req, key->tfm0);
-> +	int err;
->   
->   	llsec_geniv(iv, sec->params.hwaddr, &hdr->sec);
->   	sg_init_one(&src, skb->data, skb->len);
-> -	return crypto_blkcipher_encrypt_iv(&req, &src, &src, skb->len);
-> +	skcipher_request_set_tfm(req, key->tfm0);
-> +	skcipher_request_set_callback(req, 0, NULL, NULL);
-> +	skcipher_request_set_crypt(req, &src, &src, skb->len, iv);
-> +	err = crypto_skcipher_encrypt(req);
-> +	skcipher_request_zero(req);
-> +	return err;
->   }
->   
->   static struct crypto_aead*
-> @@ -830,11 +832,8 @@ llsec_do_decrypt_unauth(struct sk_buff *skb, const struct mac802154_llsec *sec,
->   	unsigned char *data;
->   	int datalen;
->   	struct scatterlist src;
-> -	struct blkcipher_desc req = {
-> -		.tfm = key->tfm0,
-> -		.info = iv,
-> -		.flags = 0,
-> -	};
-> +	SKCIPHER_REQUEST_ON_STACK(req, key->tfm0);
-> +	int err;
->   
->   	llsec_geniv(iv, dev_addr, &hdr->sec);
->   	data = skb_mac_header(skb) + skb->mac_len;
-> @@ -842,7 +841,13 @@ llsec_do_decrypt_unauth(struct sk_buff *skb, const struct mac802154_llsec *sec,
->   
->   	sg_init_one(&src, data, datalen);
->   
-> -	return crypto_blkcipher_decrypt_iv(&req, &src, &src, datalen);
-> +	skcipher_request_set_tfm(req, key->tfm0);
-> +	skcipher_request_set_callback(req, 0, NULL, NULL);
-> +	skcipher_request_set_crypt(req, &src, &src, datalen, iv);
-> +
-> +	err = crypto_skcipher_decrypt(req);
-> +	skcipher_request_zero(req);
-> +	return err;
->   }
->   
->   static int
-> diff --git a/net/mac802154/llsec.h b/net/mac802154/llsec.h
-> index 950578e..6f3b658 100644
-> --- a/net/mac802154/llsec.h
-> +++ b/net/mac802154/llsec.h
-> @@ -19,7 +19,6 @@
->   
->   #include <linux/slab.h>
->   #include <linux/hashtable.h>
-> -#include <linux/crypto.h>
->   #include <linux/kref.h>
->   #include <linux/spinlock.h>
->   #include <net/af_ieee802154.h>
-> @@ -30,7 +29,7 @@ struct mac802154_llsec_key {
->   
->   	/* one tfm for each authsize (4/8/16) */
->   	struct crypto_aead *tfm[3];
-> -	struct crypto_blkcipher *tfm0;
-> +	struct crypto_skcipher *tfm0;
->   
->   	struct kref ref;
->   };
+Signed-off-by: Kees Cook <keescook-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>
+Cc: Amitkumar Karwar <akarwar-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>
+Cc: Nishant Sarmukadam <nishants-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>
+Cc: Kalle Valo <kvalo-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+---
+This is preparation for adding "on"/"off" support to strtobool(), and I
+want to make sure the solution isn't upsetting to the two callers. :)
+---
+ drivers/net/wireless/marvell/mwifiex/debugfs.c |  6 +-
+ fs/cifs/cifs_debug.c                           | 78 ++++++++++++--------------
+ fs/cifs/cifs_debug.h                           |  2 +-
+ fs/cifs/cifsfs.c                               |  6 +-
+ fs/cifs/cifsglob.h                             |  4 +-
+ 5 files changed, 44 insertions(+), 52 deletions(-)
 
-Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
+diff --git a/drivers/net/wireless/marvell/mwifiex/debugfs.c b/drivers/net/wireless/marvell/mwifiex/debugfs.c
+index 0b9c580af988..76af60899c69 100644
+--- a/drivers/net/wireless/marvell/mwifiex/debugfs.c
++++ b/drivers/net/wireless/marvell/mwifiex/debugfs.c
+@@ -880,13 +880,13 @@ mwifiex_reset_write(struct file *file,
+ {
+ 	struct mwifiex_private *priv = file->private_data;
+ 	struct mwifiex_adapter *adapter = priv->adapter;
+-	char cmd;
++	char cmd[2] = { '\0' };
+ 	bool result;
+ 
+-	if (copy_from_user(&cmd, ubuf, sizeof(cmd)))
++	if (copy_from_user(cmd, ubuf, sizeof(char)))
+ 		return -EFAULT;
+ 
+-	if (strtobool(&cmd, &result))
++	if (strtobool(cmd, &result))
+ 		return -EINVAL;
+ 
+ 	if (!result)
+diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+index 50b268483302..cafe464fa1b7 100644
+--- a/fs/cifs/cifs_debug.c
++++ b/fs/cifs/cifs_debug.c
+@@ -251,11 +251,29 @@ static const struct file_operations cifs_debug_data_proc_fops = {
+ 	.release	= single_release,
+ };
+ 
++static int get_user_bool(const char __user *buffer, bool *store)
++{
++	char c[2] = { '\0' };
++	bool bv;
++	int rc;
++
++	rc = get_user(c[0], buffer);
++	if (rc)
++		return rc;
++
++	rc = strtobool(c, &bv);
++	if (rc)
++		return rc;
++
++	*store = bv;
++
++	return 0;
++}
++
+ #ifdef CONFIG_CIFS_STATS
+ static ssize_t cifs_stats_proc_write(struct file *file,
+ 		const char __user *buffer, size_t count, loff_t *ppos)
+ {
+-	char c;
+ 	bool bv;
+ 	int rc;
+ 	struct list_head *tmp1, *tmp2, *tmp3;
+@@ -263,11 +281,8 @@ static ssize_t cifs_stats_proc_write(struct file *file,
+ 	struct cifs_ses *ses;
+ 	struct cifs_tcon *tcon;
+ 
+-	rc = get_user(c, buffer);
+-	if (rc)
+-		return rc;
+-
+-	if (strtobool(&c, &bv) == 0) {
++	rc = get_user_bool(buffer, &bv);
++	if (rc == 0) {
+ #ifdef CONFIG_CIFS_STATS2
+ 		atomic_set(&totBufAllocCount, 0);
+ 		atomic_set(&totSmBufAllocCount, 0);
+@@ -290,7 +305,8 @@ static ssize_t cifs_stats_proc_write(struct file *file,
+ 			}
+ 		}
+ 		spin_unlock(&cifs_tcp_ses_lock);
+-	}
++	} else
++		return rc;
+ 
+ 	return count;
+ }
+@@ -433,17 +449,17 @@ static int cifsFYI_proc_open(struct inode *inode, struct file *file)
+ static ssize_t cifsFYI_proc_write(struct file *file, const char __user *buffer,
+ 		size_t count, loff_t *ppos)
+ {
+-	char c;
++	char c[2] = { '\0' };
+ 	bool bv;
+ 	int rc;
+ 
+-	rc = get_user(c, buffer);
++	rc = get_user(c[0], buffer);
+ 	if (rc)
+ 		return rc;
+-	if (strtobool(&c, &bv) == 0)
++	if (strtobool(c, &bv) == 0)
+ 		cifsFYI = bv;
+-	else if ((c > '1') && (c <= '9'))
+-		cifsFYI = (int) (c - '0'); /* see cifs_debug.h for meanings */
++	else if ((c[0] > '1') && (c[0] <= '9'))
++		cifsFYI = (int) (c[0] - '0'); /* see cifs_debug.h for meanings */
+ 
+ 	return count;
+ }
+@@ -471,20 +487,12 @@ static int cifs_linux_ext_proc_open(struct inode *inode, struct file *file)
+ static ssize_t cifs_linux_ext_proc_write(struct file *file,
+ 		const char __user *buffer, size_t count, loff_t *ppos)
+ {
+-	char c;
+-	bool bv;
+ 	int rc;
+ 
+-	rc = get_user(c, buffer);
++	rc = get_user_bool(buffer, &linuxExtEnabled);
+ 	if (rc)
+ 		return rc;
+ 
+-	rc = strtobool(&c, &bv);
+-	if (rc)
+-		return rc;
+-
+-	linuxExtEnabled = bv;
+-
+ 	return count;
+ }
+ 
+@@ -511,20 +519,12 @@ static int cifs_lookup_cache_proc_open(struct inode *inode, struct file *file)
+ static ssize_t cifs_lookup_cache_proc_write(struct file *file,
+ 		const char __user *buffer, size_t count, loff_t *ppos)
+ {
+-	char c;
+-	bool bv;
+ 	int rc;
+ 
+-	rc = get_user(c, buffer);
++	rc = get_user_bool(buffer, &lookupCacheEnabled);
+ 	if (rc)
+ 		return rc;
+ 
+-	rc = strtobool(&c, &bv);
+-	if (rc)
+-		return rc;
+-
+-	lookupCacheEnabled = bv;
+-
+ 	return count;
+ }
+ 
+@@ -551,20 +551,12 @@ static int traceSMB_proc_open(struct inode *inode, struct file *file)
+ static ssize_t traceSMB_proc_write(struct file *file, const char __user *buffer,
+ 		size_t count, loff_t *ppos)
+ {
+-	char c;
+-	bool bv;
+ 	int rc;
+ 
+-	rc = get_user(c, buffer);
++	rc = get_user_bool(buffer, &traceSMB);
+ 	if (rc)
+ 		return rc;
+ 
+-	rc = strtobool(&c, &bv);
+-	if (rc)
+-		return rc;
+-
+-	traceSMB = bv;
+-
+ 	return count;
+ }
+ 
+@@ -622,7 +614,7 @@ static ssize_t cifs_security_flags_proc_write(struct file *file,
+ 	int rc;
+ 	unsigned int flags;
+ 	char flags_string[12];
+-	char c;
++	char c[2] = { '\0' };
+ 	bool bv;
+ 
+ 	if ((count < 1) || (count > 11))
+@@ -635,11 +627,11 @@ static ssize_t cifs_security_flags_proc_write(struct file *file,
+ 
+ 	if (count < 3) {
+ 		/* single char or single char followed by null */
+-		c = flags_string[0];
+-		if (strtobool(&c, &bv) == 0) {
++		c[0] = flags_string[0];
++		if (strtobool(c, &bv) == 0) {
+ 			global_secflags = bv ? CIFSSEC_MAX : CIFSSEC_DEF;
+ 			return count;
+-		} else if (!isdigit(c)) {
++		} else if (!isdigit(c[0])) {
+ 			cifs_dbg(VFS, "Invalid SecurityFlags: %s\n",
+ 					flags_string);
+ 			return -EINVAL;
+diff --git a/fs/cifs/cifs_debug.h b/fs/cifs/cifs_debug.h
+index 66cf0f9fff89..c611ca2339d7 100644
+--- a/fs/cifs/cifs_debug.h
++++ b/fs/cifs/cifs_debug.h
+@@ -25,7 +25,7 @@
+ void cifs_dump_mem(char *label, void *data, int length);
+ void cifs_dump_detail(void *);
+ void cifs_dump_mids(struct TCP_Server_Info *);
+-extern int traceSMB;		/* flag which enables the function below */
++extern bool traceSMB;		/* flag which enables the function below */
+ void dump_smb(void *, int);
+ #define CIFS_INFO	0x01
+ #define CIFS_RC		0x02
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index c48ca13673e3..931b446f2a44 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -54,10 +54,10 @@
+ #endif
+ 
+ int cifsFYI = 0;
+-int traceSMB = 0;
++bool traceSMB;
+ bool enable_oplocks = true;
+-unsigned int linuxExtEnabled = 1;
+-unsigned int lookupCacheEnabled = 1;
++bool linuxExtEnabled = true;
++bool lookupCacheEnabled = true;
+ unsigned int global_secflags = CIFSSEC_DEF;
+ /* unsigned int ntlmv2_support = 0; */
+ unsigned int sign_CIFS_PDUs = 1;
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index a25b2513f146..d21da9f05bae 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -1596,11 +1596,11 @@ GLOBAL_EXTERN atomic_t midCount;
+ 
+ /* Misc globals */
+ GLOBAL_EXTERN bool enable_oplocks; /* enable or disable oplocks */
+-GLOBAL_EXTERN unsigned int lookupCacheEnabled;
++GLOBAL_EXTERN bool lookupCacheEnabled;
+ GLOBAL_EXTERN unsigned int global_secflags;	/* if on, session setup sent
+ 				with more secure ntlmssp2 challenge/resp */
+ GLOBAL_EXTERN unsigned int sign_CIFS_PDUs;  /* enable smb packet signing */
+-GLOBAL_EXTERN unsigned int linuxExtEnabled;/*enable Linux/Unix CIFS extensions*/
++GLOBAL_EXTERN bool linuxExtEnabled;/*enable Linux/Unix CIFS extensions*/
+ GLOBAL_EXTERN unsigned int CIFSMaxBufSize;  /* max size not including hdr */
+ GLOBAL_EXTERN unsigned int cifs_min_rcv;    /* min size of big ntwrk buf pool */
+ GLOBAL_EXTERN unsigned int cifs_min_small;  /* min size of small buf pool */
+-- 
+2.6.3
 
-regards
-Stefan Schmidt
+
+-- 
+Kees Cook
+Chrome OS & Brillo Security
