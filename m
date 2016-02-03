@@ -1,56 +1,68 @@
 From: Deepa Dinamani <deepa.kernel@gmail.com>
-Subject: [PATCH 04/10] fs: cifs: Replace CURRENT_TIME with
-	ktime_get_real_ts()
-Date: Tue,  2 Feb 2016 22:07:44 -0800
-Message-ID: <1454479670-8204-5-git-send-email-deepa.kernel@gmail.com>
+Subject: [PATCH 05/10] fs: cifs: Replace CURRENT_TIME by get_seconds
+Date: Tue,  2 Feb 2016 22:07:45 -0800
+Message-ID: <1454479670-8204-6-git-send-email-deepa.kernel@gmail.com>
 References: <1454479670-8204-1-git-send-email-deepa.kernel@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: linux-cifs@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>,
- Arnd Bergmann <arnd@arndb.de>, samba-technical@lists.samba.org,
- Dave Chinner <david@fromorbit.com>, linux-kernel@vger.kernel.org,
- Steve French <sfrench@samba.org>
-To: linux-fsdevel@vger.kernel.org,
-	y2038@lists.linaro.org
-Return-path: <y2038-bounces@lists.linaro.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, Dave Chinner <david@fromorbit.com>,
+	"Theodore Ts'o" <tytso@mit.edu>, linux-kernel@vger.kernel.org,
+	Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+To: linux-fsdevel@vger.kernel.org, y2038@lists.linaro.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1454479670-8204-1-git-send-email-deepa.kernel@gmail.com>
-List-Unsubscribe: <https://lists.linaro.org/mailman/options/y2038>,
- <mailto:y2038-request@lists.linaro.org?subject=unsubscribe>
-List-Archive: <http://lists.linaro.org/pipermail/y2038/>
-List-Post: <mailto:y2038@lists.linaro.org>
-List-Help: <mailto:y2038-request@lists.linaro.org?subject=help>
-List-Subscribe: <https://lists.linaro.org/mailman/listinfo/y2038>,
- <mailto:y2038-request@lists.linaro.org?subject=subscribe>
-Errors-To: y2038-bounces@lists.linaro.org
-Sender: "Y2038" <y2038-bounces@lists.linaro.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-VGhpcyBpcyBpbiBwcmVwYXJhdGlvbiBmb3IgdGhlIHNlcmllcyB0aGF0IHRyYW5zaXRpb25zCmZp
-bGVzeXN0ZW0gdGltZXN0YW1wcyB0byB1c2UgNjQgYml0IHRpbWUgYW5kIGhlbmNlIG1ha2UKdGhl
-bSB5MjAzOCBzYWZlLgoKQ1VSUkVOVF9USU1FIG1hY3JvIHdpbGwgYmUgZGVsZXRlZCBiZWZvcmUg
-bWVyZ2luZyB0aGUKYWZvcmVtZW50aW9uZWQgc2VyaWVzLgoKRmlsZXN5c3RlbSB0aW1lcyB3aWxs
-IHVzZSBjdXJyZW50X2ZzX3RpbWUoKSBpbnN0ZWFkIG9mCkNVUlJFTlRfVElNRS4KVXNlIGt0aW1l
-X2dldF9yZWFsX3RzKCkgaGVyZSBhcyB0aGlzIGlzIG5vdCBmaWxlc3lzdGVtIHRpbWUuCmt0aW1l
-X2dldF9yZWFsX3RzKCkgcmV0dXJucyB0aGUgdGltZXN0YW1wIGluIG5zIHdoaWNoIGNhbgpiZSB1
-c2VkIHRvIGNhbGN1bGF0ZSBuZXR3b3JrIHRpbWUgZm9yIE5UTE12MiBhdXRoZW50aWNhdGlvbgp0
-aW1lc3RhbXAuCgpTaWduZWQtb2ZmLWJ5OiBEZWVwYSBEaW5hbWFuaSA8ZGVlcGEua2VybmVsQGdt
-YWlsLmNvbT4KQ2M6IFN0ZXZlIEZyZW5jaCA8c2ZyZW5jaEBzYW1iYS5vcmc+CkNjOiBsaW51eC1j
-aWZzQHZnZXIua2VybmVsLm9yZwpDYzogc2FtYmEtdGVjaG5pY2FsQGxpc3RzLnNhbWJhLm9yZwot
-LS0KIGZzL2NpZnMvY2lmc2VuY3J5cHQuYyB8IDQgKysrLQogMSBmaWxlIGNoYW5nZWQsIDMgaW5z
-ZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc2VuY3J5
-cHQuYyBiL2ZzL2NpZnMvY2lmc2VuY3J5cHQuYwppbmRleCBkNDExNjU0Li5mODZlMDdkIDEwMDY0
-NAotLS0gYS9mcy9jaWZzL2NpZnNlbmNyeXB0LmMKKysrIGIvZnMvY2lmcy9jaWZzZW5jcnlwdC5j
-CkBAIC00NjAsNiArNDYwLDcgQEAgZmluZF90aW1lc3RhbXAoc3RydWN0IGNpZnNfc2VzICpzZXMp
-CiAJdW5zaWduZWQgY2hhciAqYmxvYnB0cjsKIAl1bnNpZ25lZCBjaGFyICpibG9iZW5kOwogCXN0
-cnVjdCBudGxtc3NwMl9uYW1lICphdHRycHRyOworCXN0cnVjdCB0aW1lc3BlYyB0czsKIAogCWlm
-ICghc2VzLT5hdXRoX2tleS5sZW4gfHwgIXNlcy0+YXV0aF9rZXkucmVzcG9uc2UpCiAJCXJldHVy
-biAwOwpAQCAtNDg0LDcgKzQ4NSw4IEBAIGZpbmRfdGltZXN0YW1wKHN0cnVjdCBjaWZzX3NlcyAq
-c2VzKQogCQlibG9icHRyICs9IGF0dHJzaXplOyAvKiBhZHZhbmNlIGF0dHIgdmFsdWUgKi8KIAl9
-CiAKLQlyZXR1cm4gY3B1X3RvX2xlNjQoY2lmc19Vbml4VGltZVRvTlQoQ1VSUkVOVF9USU1FKSk7
-CisJa3RpbWVfZ2V0X3JlYWxfdHMoJnRzKTsKKwlyZXR1cm4gY3B1X3RvX2xlNjQoY2lmc19Vbml4
-VGltZVRvTlQodHMpKTsKIH0KIAogc3RhdGljIGludCBjYWxjX250bG12Ml9oYXNoKHN0cnVjdCBj
-aWZzX3NlcyAqc2VzLCBjaGFyICpudGxtdjJfaGFzaCwKLS0gCjEuOS4xCgpfX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpZMjAzOCBtYWlsaW5nIGxpc3QKWTIw
-MzhAbGlzdHMubGluYXJvLm9yZwpodHRwczovL2xpc3RzLmxpbmFyby5vcmcvbWFpbG1hbi9saXN0
-aW5mby95MjAzOAo=
+This is in preparation for the series that transitions
+filesystem timestamps to use 64 bit time and hence make
+them y2038 safe.
+
+CURRENT_TIME macro will be deleted before merging the
+aforementioned series.
+
+Filesystems will use current_fs_time() instead of
+CURRENT_TIME.
+Use get_seconds() here as this is not filesystem time.
+Only the seconds portion of the timestamp is necessary for
+timezone calculation using server time.
+
+Assume that the difference between server and client times
+lie in the range INT_MIN..INT_MAX. This is valid because
+this is the difference between current times between server
+and client, and the largest timezone difference is in the
+range of one day.
+
+Signed-off-by: Deepa Dinamani <deepa.kernel@gmail.com>
+Cc: Steve French <sfrench@samba.org>
+Cc: linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org
+---
+ fs/cifs/cifssmb.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 90b4f9f..1a9e43d 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -478,14 +478,14 @@ decode_lanman_negprot_rsp(struct TCP_Server_Info *server, NEGOTIATE_RSP *pSMBr)
+ 		 * this requirement.
+ 		 */
+ 		int val, seconds, remain, result;
+-		struct timespec ts, utc;
+-		utc = CURRENT_TIME;
++		struct timespec ts;
++		unsigned long utc = get_seconds();
+ 		ts = cnvrtDosUnixTm(rsp->SrvTime.Date,
+ 				    rsp->SrvTime.Time, 0);
+ 		cifs_dbg(FYI, "SrvTime %d sec since 1970 (utc: %d) diff: %d\n",
+-			 (int)ts.tv_sec, (int)utc.tv_sec,
+-			 (int)(utc.tv_sec - ts.tv_sec));
+-		val = (int)(utc.tv_sec - ts.tv_sec);
++			 (int)ts.tv_sec, (int)utc,
++			 (int)(utc - ts.tv_sec));
++		val = (int)(utc - ts.tv_sec);
+ 		seconds = abs(val);
+ 		result = (seconds / MIN_TZ_ADJ) * MIN_TZ_ADJ;
+ 		remain = seconds % MIN_TZ_ADJ;
+-- 
+1.9.1
