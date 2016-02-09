@@ -1,73 +1,106 @@
-From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: remove any preceding delimiter from prefix_path
-Date: Mon,  8 Feb 2016 13:44:01 +0530
-Message-ID: <1454919241-28048-1-git-send-email-sprabhu@redhat.com>
-To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+From: Justin Maggard <jmaggard10-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] cifs: fix out-of-bounds access in lease parsing
+Date: Tue,  9 Feb 2016 15:52:08 -0800
+Message-ID: <1455061928-5266-1-git-send-email-jmaggard@netgear.com>
+Cc: Justin Maggard <jmaggard-mhqmbKKevNRBDgjK7y7TUQ@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-We currently do not check if any delimiter exists before the prefix
-path in cifs_compose_mount_options(). Consequently when building the
-devname using cifs_build_devname() we can end up with multiple
-delimiters separating the UNC and the prefix path.
+When opening a file, SMB2_open() attempts to parse the lease state from the
+SMB2 CREATE Response.  However, the parsing code was not careful to ensure
+that the create contexts are not empty or invalid, which can lead to out-
+of-bounds memory access.  This can be seen easily by trying
+to read a file from a OSX 10.11 SMB3 server.  Here is sample crash output:
 
-An issue was reported by the customer mounting a folder within a DFS
-share from a Netapp server which uses McAfee antivirus. We have
-narrowed down the cause to the use of double backslashes in the file
-name used to open the file. This was determined to be caused because of
-additional delimiters as a result of the bug.
+BUG: unable to handle kernel paging request at ffff8800a1a77cc6
+IP: [<ffffffff8828a734>] SMB2_open+0x804/0x960
+PGD 8f77067 PUD 0
+Oops: 0000 [#1] SMP
+Modules linked in:
+CPU: 3 PID: 2876 Comm: cp Not tainted 4.5.0-rc3.x86_64.1+ #14
+Hardware name: NETGEAR ReadyNAS 314          /ReadyNAS 314          , BIOS 4.6.5 10/11/2012
+task: ffff880073cdc080 ti: ffff88005b31c000 task.ti: ffff88005b31c000
+RIP: 0010:[<ffffffff8828a734>]  [<ffffffff8828a734>] SMB2_open+0x804/0x960
+RSP: 0018:ffff88005b31fa08  EFLAGS: 00010282
+RAX: 0000000000000015 RBX: 0000000000000000 RCX: 0000000000000006
+RDX: 0000000000000000 RSI: 0000000000000246 RDI: ffff88007eb8c8b0
+RBP: ffff88005b31fad8 R08: 666666203d206363 R09: 6131613030383866
+R10: 3030383866666666 R11: 00000000000002b0 R12: ffff8800660fd800
+R13: ffff8800a1a77cc2 R14: 00000000424d53fe R15: ffff88005f5a28c0
+FS:  00007f7c8a2897c0(0000) GS:ffff88007eb80000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 000000008005003b
+CR2: ffff8800a1a77cc6 CR3: 000000005b281000 CR4: 00000000000006e0
+Stack:
+ ffff88005b31fa70 ffffffff88278789 00000000000001d3 ffff88005f5a2a80
+ ffffffff00000003 ffff88005d029d00 ffff88006fde05a0 0000000000000000
+ ffff88005b31fc78 ffff88006fde0780 ffff88005b31fb2f 0000000100000fe0
+Call Trace:
+ [<ffffffff88278789>] ? cifsConvertToUTF16+0x159/0x2d0
+ [<ffffffff8828cf68>] smb2_open_file+0x98/0x210
+ [<ffffffff8811e80c>] ? __kmalloc+0x1c/0xe0
+ [<ffffffff882685f4>] cifs_open+0x2a4/0x720
+ [<ffffffff88122cef>] do_dentry_open+0x1ff/0x310
+ [<ffffffff88268350>] ? cifsFileInfo_get+0x30/0x30
+ [<ffffffff88123d92>] vfs_open+0x52/0x60
+ [<ffffffff88131dd0>] path_openat+0x170/0xf70
+ [<ffffffff88097d48>] ? remove_wait_queue+0x48/0x50
+ [<ffffffff88133a29>] do_filp_open+0x79/0xd0
+ [<ffffffff8813f2ca>] ? __alloc_fd+0x3a/0x170
+ [<ffffffff881240c4>] do_sys_open+0x114/0x1e0
+ [<ffffffff881241a9>] SyS_open+0x19/0x20
+ [<ffffffff8896e257>] entry_SYSCALL_64_fastpath+0x12/0x6a
+Code: 4d 8d 6c 07 04 31 c0 4c 89 ee e8 47 6f e5 ff 31 c9 41 89 ce 44 89 f1 48 c7 c7 28 b1 bd 88 31 c0 49 01 cd 4c 89 ee e8 2b 6f e5 ff <45> 0f b7 75 04 48 c7 c7 31 b1 bd 88 31 c0 4d 01 ee 4c 89 f6 e8
+RIP  [<ffffffff8828a734>] SMB2_open+0x804/0x960
+ RSP <ffff88005b31fa08>
+CR2: ffff8800a1a77cc6
+---[ end trace d9f69ba64feee469 ]---
 
-In addition to changes in cifs_build_devname(), we also fix
-cifs_parse_devname() to ignore any preceding delimiter for the prefix
-path.
-
-The problem was originally reported on RHEL 6 in RHEL bz 1252721. This
-is the upstream version of the fix. The fix was confirmed by looking at
-the packet capture of a DFS mount.
-
-Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Justin Maggard <jmaggard-mhqmbKKevNRBDgjK7y7TUQ@public.gmane.org>
 ---
- fs/cifs/cifs_dfs_ref.c | 6 +++++-
- fs/cifs/connect.c      | 8 ++++++--
- 2 files changed, 11 insertions(+), 3 deletions(-)
+ fs/cifs/smb2pdu.c | 24 ++++++++++++++----------
+ 1 file changed, 14 insertions(+), 10 deletions(-)
 
-diff --git a/fs/cifs/cifs_dfs_ref.c b/fs/cifs/cifs_dfs_ref.c
-index 7dc886c..10db1fe 100644
---- a/fs/cifs/cifs_dfs_ref.c
-+++ b/fs/cifs/cifs_dfs_ref.c
-@@ -151,8 +151,12 @@ char *cifs_compose_mount_options(const char *sb_mountdata,
- 	if (sb_mountdata == NULL)
- 		return ERR_PTR(-EINVAL);
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 10f8d5c..42e1f44 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1106,21 +1106,25 @@ parse_lease_state(struct TCP_Server_Info *server, struct smb2_create_rsp *rsp,
+ {
+ 	char *data_offset;
+ 	struct create_context *cc;
+-	unsigned int next = 0;
++	unsigned int next;
++	unsigned int remaining;
+ 	char *name;
  
--	if (strlen(fullpath) - ref->path_consumed)
-+	if (strlen(fullpath) - ref->path_consumed) {
- 		prepath = fullpath + ref->path_consumed;
-+		/* skip initial delimiter */
-+		if (*prepath == '/' || *prepath == '\\')
-+			prepath++;
+ 	data_offset = (char *)rsp + 4 + le32_to_cpu(rsp->CreateContextsOffset);
++	remaining = le32_to_cpu(rsp->CreateContextsLength);
+ 	cc = (struct create_context *)data_offset;
+-	do {
+-		cc = (struct create_context *)((char *)cc + next);
++	while (remaining >= sizeof(struct create_context)) {
+ 		name = le16_to_cpu(cc->NameOffset) + (char *)cc;
+-		if (le16_to_cpu(cc->NameLength) != 4 ||
+-		    strncmp(name, "RqLs", 4)) {
+-			next = le32_to_cpu(cc->Next);
+-			continue;
+-		}
+-		return server->ops->parse_lease_buf(cc, epoch);
+-	} while (next != 0);
++		if (le16_to_cpu(cc->NameLength) == 4 &&
++		    strncmp(name, "RqLs", 4) == 0)
++			return server->ops->parse_lease_buf(cc, epoch);
++
++		next = le32_to_cpu(cc->Next);
++		if (!next)
++			break;
++		remaining -= next;
++		cc = (struct create_context *)((char *)cc + next);
 +	}
  
- 	*devname = cifs_build_devname(ref->node_name, prepath);
- 	if (IS_ERR(*devname)) {
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 4fbd92d..2acb4bb 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1196,8 +1196,12 @@ cifs_parse_devname(const char *devname, struct smb_vol *vol)
- 
- 	convert_delimiter(vol->UNC, '\\');
- 
--	/* If pos is NULL, or is a bogus trailing delimiter then no prepath */
--	if (!*pos++ || !*pos)
-+	/* skip any delimiter */
-+	if (*pos == '/' || *pos == '\\')
-+		pos++;
-+
-+	/* If pos is NULL then no prepath */
-+	if (!*pos)
- 		return 0;
- 
- 	vol->prepath = kstrdup(pos, GFP_KERNEL);
+ 	return 0;
+ }
 -- 
-2.5.0
+2.7.1
