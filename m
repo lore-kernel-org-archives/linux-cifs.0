@@ -1,65 +1,92 @@
-From: Anton Protopopov <a.s.protopopov@gmail.com>
-Subject: Re: [PATCH] cifs: fix erroneous return value
-Date: Wed, 10 Feb 2016 13:53:07 -0500
-Message-ID: <CAG0P6payBGQO97ZqyJGKaxdjfj6181LcY2kzq_UpEBFPnOhYkQ@mail.gmail.com>
-References: <1455126621-28052-1-git-send-email-a.s.protopopov@gmail.com>
-	<1455127186.3333.44.camel@perches.com>
+From: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
+Subject: Re: richacl(7) man page review comments
+Date: Wed, 10 Feb 2016 14:34:04 -0500
+Message-ID: <20160210193404.GA13989@fieldses.org>
+References: <56B770B6.7040803@gmail.com>
+ <56B77262.7090107@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Joe Perches <joe@perches.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1455127186.3333.44.camel@perches.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org,
+	lkml <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Linux API <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>,
+	Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+	Anna Schumaker <anna.schumaker-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
+	Trond Myklebust <trond.myklebust-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
+	Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>,
+	Andreas Dilger <adilger-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>
+To: "Michael Kerrisk (man-pages)" <mtk.manpages-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <56B77262.7090107-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-2016-02-10 12:59 GMT-05:00 Joe Perches <joe@perches.com>:
-> On Wed, 2016-02-10 at 12:50 -0500, Anton Protopopov wrote:
->> The setup_ntlmv2_rsp() function may return positive value ENOMEM instead
->> of -ENOMEM in case of kmalloc failure.
->
-> How have you verified this change is correct?
+On Sun, Feb 07, 2016 at 05:35:46PM +0100, Michael Kerrisk (man-pages) wrote:
+> > This permission is always implicitly granted.
+> > .HP
+> > .B write_attributes
+> > .RB ( A ):
+> > Change the times associated with a file or directory to an arbitrary value.
+> > This permission is always implicitly granted to the file owner.
+> > .HP
+> > .B read_acl
+> > .RB ( c ):
+> > Read the ACL of a file or directory. This permission is always
+> > implicitly granted.
+> > .HP
+> > .B write_acl
+> > .RB ( C ):
+> > Change the ACL or file mode of a file or directory.
+> > .HP
+> > .B write_owner
+> > .RB ( o ):
+> > Take ownership of a file or directory.  Change the owning group of a file or
+> > directory to a group of which the calling process is a member.
+> > .HP
+> > .B read_named_attrs
+> > .RB ( R ),
+> > .B write_named_attrs
+> > .RB ( W ),
+> > .B synchronize
+> > .RB ( S ),
+> > .B write_retention
+> > .RB ( e ),
+> > .B write_retention_hold
+> > .RB ( E ):
+> > These permissions can be stored, but do not have a local meaning.
+> 
+> So, I thenk that a sentence here should explain why these permissions
+> exist. Is if for future extension, because they are meaningful in NFS,
+> or something else?
 
-Yes, this is the only case in which the setup_ntlmv2_rsp() function
-returns positive error value. In all other error cases it returns the
-negative error number.
+Yeah, "synchronize" is something only Windows clients care about, as I
+understand it.  The others are for NFS features that nobody has tried to
+implement yet.  It's useful to store those bits but they don't do
+anything at this point.  We could provie FC references, I guess, but
+it's probably not worth going into much detail about.
 
->
-> Have you checked that the callers of this function in
-> fs/cifs/sess.c do the appropriate things with with a
-> negative return value?
->
-> The return value is now set into a struct member variable
-> as a positive value,
->
->         sess_data->result = rc;
+> > Automatic Inheritance allows permission changes to propagate from a directory
+> > to files and subdirectories inside that directory, recursively.  Carrying out
+> > this propagation of permissions is the responsibility of the process changing
+> > the directory permissions (usually, setrichacl(1)).
+> 
+> I'm confused by the previous sentence. the feature is labeled "Automatic
+> Inheritance", implying that the user/process need do nothing. The next
+> sentence says "propagation ... is the responsibility of the process".
+> These two points seem contradictory. I think something more needs to be
+> said here.
 
-As far as I can see, this member variable always contains a negative
-error value which, in the end, is returned by the CIFS_SessSetup()
-function (this function can also return -EINVAL, -ENOMEM, -EOPNOTSUPP,
-etc.).
+Yeah, the "automatic" name is probably misleading, but I think we're
+stuck with that name and just need to make the point a bit more
+forcefully.
 
-> Have you checked all the users of this member variable?
->
-> If you have, you should say so in the commit message.
->
->> Signed-off-by: Anton Protopopov <a.s.protopopov@gmail.com>
->> ---
->>  fs/cifs/cifsencrypt.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
->> index afa09fc..e682b36 100644
->> --- a/fs/cifs/cifsencrypt.c
->> +++ b/fs/cifs/cifsencrypt.c
->> @@ -714,7 +714,7 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
->>
->>       ses->auth_key.response = kmalloc(baselen + tilen, GFP_KERNEL);
->>       if (!ses->auth_key.response) {
->> -             rc = ENOMEM;
->> +             rc = -ENOMEM;
->>               ses->auth_key.len = 0;
->>               goto setup_ntlmv2_rsp_ret;
->>       }
->
+Userland utilities take responsibility for the actual recursive
+propagation of changes, all the kernel does is provide a few bits which
+help to do it correctly (e.g. to distinguish between ACEs that ewre
+inherited inherited (and can be blown away by propagation) and those
+that were added locally).
+
+--b.
