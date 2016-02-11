@@ -1,49 +1,60 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: fix potential overflow in cifs_compose_mount_options
-Date: Wed, 10 Feb 2016 18:14:21 -0600
-Message-ID: <CAH2r5ms7VdmYcwfT-D1xxYAA-ECkqX3oZnn=0DkwONH=VWRb3w@mail.gmail.com>
-References: <1454344498-16835-1-git-send-email-wuninsu@gmail.com>
+Subject: Re: [PATCH] cifs: remove redundant check for null string pointer
+Date: Wed, 10 Feb 2016 18:15:15 -0600
+Message-ID: <CAH2r5msnkXSp3QGFqghWBfkg8xcYMt79Lf5=qz9ZBaa6ZzJ35g@mail.gmail.com>
+References: <1453739154-23796-1-git-send-email-colin.king@canonical.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
 	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
 	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, taesoo-/4noJB3qBVQ3uPMLIKxrzw@public.gmane.org,
-	yeongjin.jang-/4noJB3qBVQ3uPMLIKxrzw@public.gmane.org, insu-/4noJB3qBVQ3uPMLIKxrzw@public.gmane.org, changwoo-/4noJB3qBVQ3uPMLIKxrzw@public.gmane.org
-To: Insu Yun <wuninsu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Colin King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1454344498-16835-1-git-send-email-wuninsu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <1453739154-23796-1-git-send-email-colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Feb 1, 2016 at 10:34 AM, Insu Yun <wuninsu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> In worst case, "ip=" + sb_mountdata + ipv6 can be copied into mountdata.
-> Therefore, for safe, it is better to add more size when allocating memory.
+merged into cifs-2.6.git for-next
+
+On Mon, Jan 25, 2016 at 10:25 AM, Colin King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org> wrote:
+> From: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
 >
-> Signed-off-by: Insu Yun <wuninsu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> server_RFC1001_name is declared as a RFC1001_NAME_LEN_WITH_NULL sized
+> char array in struct TCP_Server_Info so the null pointer check on
+> server_RFC1001_name is redundant and can be removed.  Detected with
+> smatch:
+>
+> fs/cifs/connect.c:2982 ip_rfc1001_connect() warn: this array is probably
+>   non-NULL. 'server->server_RFC1001_name'
+>
+> Signed-off-by: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
 > ---
->  fs/cifs/cifs_dfs_ref.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  fs/cifs/connect.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 >
-> diff --git a/fs/cifs/cifs_dfs_ref.c b/fs/cifs/cifs_dfs_ref.c
-> index 7dc886c..e956cba 100644
-> --- a/fs/cifs/cifs_dfs_ref.c
-> +++ b/fs/cifs/cifs_dfs_ref.c
-> @@ -175,7 +175,7 @@ char *cifs_compose_mount_options(const char *sb_mountdata,
->          * string to the length of the original string to allow for worst case.
->          */
->         md_len = strlen(sb_mountdata) + INET6_ADDRSTRLEN;
-> -       mountdata = kzalloc(md_len + 1, GFP_KERNEL);
-> +       mountdata = kzalloc(md_len + sizeof("ip=") + 1, GFP_KERNEL);
->         if (mountdata == NULL) {
->                 rc = -ENOMEM;
->                 goto compose_mount_options_err;
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 4fbd92d..a763cd3 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -2999,8 +2999,7 @@ ip_rfc1001_connect(struct TCP_Server_Info *server)
+>         if (ses_init_buf) {
+>                 ses_init_buf->trailer.session_req.called_len = 32;
+>
+> -               if (server->server_RFC1001_name &&
+> -                   server->server_RFC1001_name[0] != 0)
+> +               if (server->server_RFC1001_name[0] != 0)
+>                         rfc1002mangle(ses_init_buf->trailer.
+>                                       session_req.called_name,
+>                                       server->server_RFC1001_name,
+> --
+> 2.7.0.rc3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Not likely to be reproducible in practice (since ip= is already in the
-sb_mountdata) but in case mount.cifs was missing and ip= was missing from
-the original mount string, might as well add it.
-
-Merged into cifs-2.6.git
 
 
 -- 
