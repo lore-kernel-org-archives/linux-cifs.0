@@ -1,193 +1,1187 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: CIFS hang
-Date: Sun, 21 Feb 2016 22:36:47 -0600
-Message-ID: <CADT32eLCELt9gO_6jW5iB+uTZZdCjULa=5BPsOx3OVZTZjDz9g@mail.gmail.com>
-References: <56C9EF36.7010301@gmx.net>
-	<56CA0ADB.5070303@gmx.net>
+From: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: richacl(7) man page review comments
+Date: Mon, 22 Feb 2016 15:46:41 +0100
+Message-ID: <CAHc6FU46vO8NM3cvFH7b8X7U9R+m6wcYj8EQKVnSQkiY3Q051A@mail.gmail.com>
+References: <56B770B6.7040803@gmail.com>
+	<56B77262.7090107@gmail.com>
+	<CAHc6FU5__xbKm4mg8+fK_ZW5ZYsDoQcYBBvQg573Eq4ERDsROw@mail.gmail.com>
+	<56C0F23C.7030902@gmail.com>
+	<CAHc6FU4CCrcrA6=oCiq2A5rGd9CCGELaTZq6tGpmd2jcV_Zp4A@mail.gmail.com>
+	<56CA2EEB.9080504@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Markus Greger <Markus.Greger-hi6Y0CQ0nG0@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <56CA0ADB.5070303-hi6Y0CQ0nG0@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
+	linux-ext4 <linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	XFS Developers <xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org>,
+	lkml <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Linux NFS Mailing List <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Linux API <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>,
+	Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+	Anna Schumaker <anna.schumaker-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
+	Trond Myklebust <trond.myklebust-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
+	Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>,
+	Andreas Dilger <adilger-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>
+To: "Michael Kerrisk (man-pages)" <mtk.manpages-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <56CA2EEB.9080504-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-There may be some kind of deadlock, that is why soft mount option is
-not responding,
-otherwise you would seen something like "host is down"
-All of the shares show DISCONNECTED in file DebugData.
-Can you use crash utility and see the stack trace of the ls command that hangs?
-What if you mounted from just one share/server (1.1.1.22 e.g.), do you
-see the same problem?
+Hi Michael,
 
+On Sun, Feb 21, 2016 at 10:40 PM, Michael Kerrisk (man-pages)
+<mtk.manpages-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> I've once more pulled from the latest git; here's some more comments.
 
-On Sun, Feb 21, 2016 at 1:07 PM, Markus Greger <Markus.Greger-hi6Y0CQ0nG0@public.gmane.org> wrote:
-> Hi,
+thanks again. I've updated the repo with your changes.
+
+>> .\"
+>> .\" RichACL Manual Pages
+>> .\"
+>> .\" Copyright (C) 2015,2016  Red Hat, Inc.
+>> .\" Written by Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>> .\" This is free documentation; you can redistribute it and/or
+>> .\" modify it under the terms of the GNU General Public License as
+>> .\" published by the Free Software Foundation; either version 2 of
+>> .\" the License, or (at your option) any later version.
+>> .\"
+>> .\" The GNU General Public License's references to "object code"
+>> .\" and "executables" are to be interpreted as the output of any
+>> .\" document formatting or typesetting system, including
+>> .\" intermediate and printed output.
+>> .\"
+>> .\" This manual is distributed in the hope that it will be useful,
+>> .\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> .\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>> .\" GNU General Public License for more details.
+>> .\"
+>> .\" You should have received a copy of the GNU General Public
+>> .\" License along with this manual.  If not, see
+>> .\" <http://www.gnu.org/licenses/>.
+>> .\"
+>> .de URL
+>> \\$2 \(laURL: \\$1 \(ra\\$3
+>> ..
+>> .if \n[.g] .mso www.tmac
+>> .TH RICHACL 7 2015-09-01 "Linux" "Rich Access Control Lists"
+>> .SH NAME
+>> richacl \- Rich Access Control Lists
+>> .SH DESCRIPTION
+>> Rich Access Control Lists (RichACLs) are an extension of the POSIX f=
+ile
+>> permission model (see
+>> .BR acl (5))
+>> to support
+>> .URL https://tools.ietf.org/rfc/rfc5661.txt "NFSv4 Access Control Li=
+sts"
+>> on local and remote-mounted filesystems.
+>>
+>> A RichACL can always be translated into an equivalent NFSv4 ACL whic=
+h grants
+>> the same permissions.
+>>
+>> RichACLs can be enabled on supported local filesystems (currently, e=
+xt4 and
+>> XFS).  This disables POSIX Access Control Lists; the two ACL models =
+cannot
+>> coexist on the same filesystem.
+>>
+>> The in-kernel NFSv4 server and client also include RichACL support.
 >
-> I've mounted two nas boxes via cifs on a 3.18.25 kernel client. After
-> some time these get unavailable from the client and this impacts the
-> system greatly (for example dialogs to save files hang as well). The
-> hang is not limited to 60s or 300s but seems to hang infinitely (already
->> 100 minutes).
+> Rewrite the preceding two paras in a better logical split and order:
 >
-> Here is some more information I can provide:
+> [[
+> RichACLs can be enabled on supported local filesystems (currently, ex=
+t4 and
+> XFS).  The in-kernel NFSv4 server and client also include RichACL sup=
+port.
 >
->   * mount options
+> Enabling RichACLs disables POSIX Access Control Lists;
+> the two ACL models cannot coexist on the same filesystem.
+> ]]
 >
->     noauto,user,soft,iocharset=utf8,cache=none,username=Name,sec=ntlmv2
+>>
+>> When used on a filesystem that does not support RichACLs, the
+>> .BR getrichacl (1)
+>> and
+>> .BR setrichacl (1)
+>> utilities will operate on the file permission bits instead:
+>> .BR getrichacl (1)
+>> will display the file permission bits as a RichACL; when a RichACL
+>> is set with
+>> .BR setrichacl (1)
+>> which can be represented exactly by the file permission bits,
+>> .BR setrichacl (1)
+>> will set the file permission bits instead.  An attempt to set a Rich=
+ACL that
+>> cannot be represented exactly by the file permission bits results in=
+ an error.
+>>
+>> .SS Structure of RichACLs
+>>
+>> RichACLs consist of a number of ACL entries, three file masks, and s=
+ome flags
 >
->   * ps for hanging process
+> s/some flags/a set of flags/
 >
->     ps -lp 20510
->     F S   UID   PID  PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
->     0 D     0 20510 20386  0  80   0 -  4936 cifs_r pts/7    00:00:00 ls
+>> specifying attributes of the ACL as whole (by contrast with the per-=
+ACL-entry
 >
->   * cat /proc/fs/cifs/DebugData
+> s/whole/a whole/
 >
->     cat  /proc/fs/cifs/DebugData
->     Display Internal CIFS Data Structures for Debugging
->     ---------------------------------------------------
->     CIFS Version 2.05
->     Features: dfs lanman posix spnego xattr acl
->     Active VFS Requests: 4
->     Servers:
->     1) Name: 1.1.1.22  Domain: STORM Uses: 1 OS: Unix
->             NOS: Samba 3.0.32       Capability: 0x80f3fd
->             SMB session status: 1   TCP status: 4
->             Local Users To Server: 1 SecMode: 0x3 Req On Wire: 0 In
->     Send: 0 In MaxReq Wait: 0
->             Shares:
->             1) \\nas-box2\share Mounts: 1 Type: NTFS DevInfo: 0x0
->     Attributes: 0x2f
->             PathComponentMax: 255 Status: 1 type: 0         DISCONNECTED
+>> flags described below).
+>>
+>> Each of the ACL entries allows or denies some permissions to a parti=
+cular user,
+>> group, or special identifier. An ACL entry consists of four fields:
+>>
+>> .IP \(bu 4
 >
->             MIDs:
+> s/4/2/
 >
->     2) Name: 1.1.1.120  Domain: STORM Uses: 2 OS: Unix
->             NOS: Samba 4.1.18-3.33.2-3407-SUSE-oS13.1-x86_64
->     Capability: 0x80f3fd
->             SMB session status: 1   TCP status: 1
->             Local Users To Server: 1 SecMode: 0x3 Req On Wire: 0 In
->     Send: 0 In MaxReq Wait: 0
->             Shares:
->             1) \\server\share1 Mounts: 1 Type: NTFS DevInfo: 0x20
->     Attributes: 0x1002f
->             PathComponentMax: 255 Status: 1 type: DISK      DISCONNECTED
+>> A tag which specifies the user, group, or special identifier the ent=
+ry applies
+>> to.  Special identifiers can be the file owner, the owning group, or=
+ everyone.
 >
->             2) \\server\share2 Mounts: 1 Type: NTFS DevInfo: 0x20
->     Attributes: 0x1002f
->             PathComponentMax: 255 Status: 1 type: DISK
+> =3D=3D>
+> Special identifiers correspond to one of three file masks for the fil=
+e owner
+> .RB ( owner@ ),
+> the owning group
+> .RB ( group@ ),
+> or everyone
+> .RB ( everyone@ ).
+
+No, owner@, group@, and everyone@ entries do not correspond to the
+file masks in that way.
+
+>> .IP \(bu
+>> A set of permissions the entry allows or denies.
+>> .IP \(bu
+>> A set of flags that indicate whether the user or group identifier is=
+ mapped or
+>> unmapped, and whether the entry has been and can be inherited.
+>> .IP \(bu 4
 >
->             MIDs:
+> s/ 4//
 >
->     3) Name: 1.1.1.25  Domain: STORM Uses: 3 OS: Unix
->             NOS: Samba 3.0.32       Capability: 0x80f3fd
->             SMB session status: 1   TCP status: 3
->             Local Users To Server: 1 SecMode: 0x3 Req On Wire: 1 In
->     Send: 0 In MaxReq Wait: 0
->             Shares:
->             1) \\nas-box1\share1 Mounts: 1 Type: NTFS DevInfo: 0x0
->     Attributes: 0x2f
->             PathComponentMax: 255 Status: 1 type: 0         DISCONNECTED
+>> A type field indicating whether the entry allows or denies access.
 >
->             2) \\nas-box1\share2 Mounts: 1 Type: NTFS DevInfo: 0x0
->     Attributes: 0x2f
->             PathComponentMax: 255 Status: 1 type: 0         DISCONNECTED
+> s/access/the permissions specified in the second field/
 >
->             3) \\nas-box1\share3 Mounts: 1 Type: NTFS DevInfo: 0x0
->     Attributes: 0x2f
->             PathComponentMax: 255 Status: 1 type: 0         DISCONNECTED
+>> .PP
+>> The owner, group, and other file masks further control which permiss=
+ions the
+>> ACL grants, subject to the
+>> .BR masked "\ (" m )
+>> and
+>> .BR write_through "\ (" w )
+>> ACL flags: when the permissions of a file or directory are changed w=
+ith
+>> .BR chmod (2),
+>> the file masks are set based on the new file mode, and the
+>> .B masked
+>> and
+>> .B write_through
+>> ACL flags are set. Likewise, when a new file or directory inherits a=
+n ACL from
+>> its parent directory, the file masks are set to the intersection bet=
+ween the
+>> permissions granted by the inherited ACL and the
+>> .I mode
+>> parameter as given to
+>> .BR open "(2), " mkdir (2),
+>> and similar, and the
+>> .B masked
+>> ACL flag is set. In both cases, the file masks limit the permissions=
+ that the
+>> ACL will grant.
+>>
+>> The advantage of this approach over directly modifying the ACL entri=
+es is that
+>> permissions defined in ACL entries are not lot when the file masks a=
+re later
 >
->             MIDs:
+> s/lot/lost/
 >
->   * messages
+>> set to be less restrictive.
 >
->     2016-02-21T16:49:21.432423+01:00 client kernel: [549835.920336]
->     INFO: task ls:20510 blocked for more than 10 seconds.
->     2016-02-21T16:49:21.432424+01:00 client kernel:
->     [549835.920337]       Tainted: G        W      3.18.25-desktop #4
->     2016-02-21T16:49:21.432425+01:00 client kernel: [549835.920338]
->     "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this
->     message.
->     2016-02-21T16:49:21.432426+01:00 client kernel: [549835.920340]
->     ls              D ffff8801bfc12f00     0 20510  20386 0x00000000
->     2016-02-21T16:49:21.432427+01:00 client kernel: [549835.920342]
->     ffff88012f48fa98 0000000000000086 ffff8801b4f24150 ffff88012f48ffd8
->     2016-02-21T16:49:21.432428+01:00 client kernel: [549835.920344]
->     0000000000012f00 0000000000012f00 ffff88015ced2710 ffff8801b4f24150
->     2016-02-21T16:49:21.432429+01:00 client kernel: [549835.920346]
->     0000000000000000 ffff88005d65ca20 ffff88005d65ca24 ffff8801b4f24150
->     2016-02-21T16:49:21.432430+01:00 client kernel: [549835.920349] Call
->     Trace:
->     2016-02-21T16:49:21.432431+01:00 client kernel: [549835.920352]
->     [<ffffffff816ae43c>] schedule_preempt_disabled+0x2c/0x80
->     2016-02-21T16:49:21.432433+01:00 client kernel: [549835.920355]
->     [<ffffffff816afd55>] __mutex_lock_slowpath+0xc5/0x130
->     2016-02-21T16:49:21.432434+01:00 client kernel: [549835.920357]
->     [<ffffffff816afdd6>] mutex_lock+0x16/0x2a
->     2016-02-21T16:49:21.432435+01:00 client kernel: [549835.920362]
->     [<ffffffffc0cb3feb>] cifs_reconnect_tcon+0x15b/0x2e0 [cifs]
->     2016-02-21T16:49:21.432436+01:00 client kernel: [549835.920366]
->     [<ffffffff81093f45>] ? set_next_entity+0x95/0xb0
->     2016-02-21T16:49:21.432437+01:00 client kernel: [549835.920370]
->     [<ffffffffc0cb4219>] smb_init+0x29/0x50 [cifs]
->     2016-02-21T16:49:21.432438+01:00 client kernel: [549835.920375]
->     [<ffffffffc0cba50a>] CIFSSMBUnixQPathInfo+0x6a/0x2b0 [cifs]
->     2016-02-21T16:49:21.432439+01:00 client kernel: [549835.920382]
->     [<ffffffffc0ccfe47>] cifs_get_inode_info_unix+0x77/0x1c0 [cifs]
->     2016-02-21T16:49:21.432440+01:00 client kernel: [549835.920385]
->     [<ffffffff811b52f6>] ? path_lookupat+0x66/0x740
->     2016-02-21T16:49:21.432441+01:00 client kernel: [549835.920391]
->     [<ffffffffc0cc53e1>] ? build_path_from_dentry+0xb1/0x2b0 [cifs]
->     2016-02-21T16:49:21.432442+01:00 client kernel: [549835.920397]
->     [<ffffffffc0cc5473>] ? build_path_from_dentry+0x143/0x2b0 [cifs]
->     2016-02-21T16:49:21.432443+01:00 client kernel: [549835.920404]
->     [<ffffffffc0cd21c8>] cifs_revalidate_dentry_attr+0xa8/0x1a0 [cifs]
->     2016-02-21T16:49:21.432444+01:00 client kernel: [549835.920411]
->     [<ffffffffc0cd2372>] cifs_getattr+0x52/0x130 [cifs]
->     2016-02-21T16:49:21.432445+01:00 client kernel: [549835.920414]
->     [<ffffffff810586ac>] ? __do_page_fault+0x22c/0x580
->     2016-02-21T16:49:21.432446+01:00 client kernel: [549835.920416]
->     [<ffffffff811ad5b7>] vfs_getattr_nosec+0x27/0x40
->     2016-02-21T16:49:21.432447+01:00 client kernel: [549835.920419]
->     [<ffffffff811ad668>] vfs_getattr+0x28/0x30
->     2016-02-21T16:49:21.432448+01:00 client kernel: [549835.920421]
->     [<ffffffff811ad72d>] vfs_fstatat+0x5d/0xa0
->     2016-02-21T16:49:21.432449+01:00 client kernel: [549835.920424]
->     [<ffffffff811adb62>] SYSC_newlstat+0x22/0x40
->     2016-02-21T16:49:21.432450+01:00 client kernel: [549835.920426]
->     [<ffffffff81058a22>] ? do_page_fault+0x22/0x30
->     2016-02-21T16:49:21.432451+01:00 client kernel: [549835.920429]
->     [<ffffffff816b4398>] ? page_fault+0x28/0x30
->     2016-02-21T16:49:21.432452+01:00 client kernel: [549835.920432]
->     [<ffffffff811add69>] SyS_newlstat+0x9/0x10
->     2016-02-21T16:49:21.432453+01:00 client kernel: [549835.920434]
->     [<ffffffff816b234d>] system_call_fastpath+0x16/0x1b
+> (I think) I know what you are trying to say in the previous paragraph=
+,
+> but "this approach" and "directly modifying the ACL entries" is a lit=
+tle
+> vague.  Masks are about solving the hysteresis problem, right? So, ho=
+w
+> about some text along the following lines (I'm sure you can improve):
 >
->   * wireshark didn't show any traffic from client to nas-box1 - only
->     some membership broadcasts, name queries and other broadcast
->     messages. Specifically there was no SMB (ECHO) message from the
->     client to the nas-box1.
+> [[
+> The purpose of the file masks is to allow applications that are unawa=
+re
+> of RichACLs to place limits on the permissions granted by various
+> classes of RichACL in a manner that corresponds to the traditional
+> user/group/other semantics, without modifying the ACL entries in thos=
+e
+> classes.  Without the file masks, the only alternative would be for t=
+he
+> kernel to directly modify the ACL entries in those classes. However,
+> this latter approach could have a "hysteresis effect", whereby
+> a RichACL-unaware application that performs a transition from one fil=
+e
+> mode to another file mode and then back to the original file mode
+> could cause destruction of the permission information in ACL entries.
+> ]]
+
+Let's try it this way:
+
+"The  purpose of the file masks is to allow traditional POSIX applicati=
+ons which
+are unaware of RichACLs to place limits  on  the  permissions  granted =
+ by  the
+RichACL without causing the ACL entries to be modified.  Without the fi=
+le mask,
+the only alternative would be  for  the  kernel  to  directly  modify  =
+the  ACL
+entries.   However,  this  latter  approach  could  have a "hysteresis =
+effect",
+whereby a RichACL-unaware application that performs a transition from o=
+ne  file
+mode  to  another file mode and then back to the original file mode cou=
+ld cause
+destruction of the permission information in ACL entries.  When creatin=
+g  files
+or  directories,  the  mode  parameter  to open(2), mkdir(2), and simil=
+ar would
+cause the same effect."
+
+>>
+>> Note that entries with the identifier
+>> .B everyone@
+>> apply to all processes, whereas the \(lqother\(rq file permissions a=
+nd
+>> \(lqother\(rq entries in POSIX ACLs apply to all processes which are=
+ not the
 >
-> My questions are:
+> I'd be inclined to use (or add) \fBACL_OTHER\fP instead of "other"
+> in the preceding line.  Things makes things IMO a little clearer when
+> you try to distinguish from "other" file permissions.
+
+This man page is explaining things in terms of the RichACL text form,
+that's why I've chose to use the POSIX ACL text form here as well.
+
+>> owner, are not in the owning group, and do not match a user or group=
+ mentioned
+>> in the ACL.
+>>
+>> Unlike POSIX ACLs, RichACLs do not have separate \(lqaccess\(rq ACLs=
+ that
+>> define the access permissions and \(lqdefault\(rq ACLs that define t=
+he
+>> inheritable permissions.  Instead, flags on each ACL entry determine=
+ whether
+>> the entry is effective during access checks and/or inheritable.
+>>
+>>
+>> .SS ACL flags
+>>
+>> The following flags on ACLs are defined:
 >
->   * Why did the "soft" option not result in my processes (like ls)
->     returning errors? (strace on ls showed nothing at all, kill -9 won't
->     work)
->   * What could cause this state?
->     I've got the feeling dns sometimes "forgets" about these boxes, at
->     least nslookup won't return any ip. The boxes are ok however and can
->     be pinged successfully, too.
->   * Is it possible to reactivate these "dead" connections, or do I have
->     to umount them (e.g. via umount -a -f -t cifs) and then remount?
+> s/flags on ACLs/ACL flags/
 >
-> Thanks,
+>>
+>> .TP
+>> .BR masked "\ (" m )
+>> When set, the file masks define upper limits on the permissions the =
+ACL may
+>> grant.  When not set, the file masks are ignored.
+>> .TP
+>> .BR write_through "\ (" w )
+>> When this flag and the
+>> .B masked
+>> flag are both set, the owner and other file masks define the actual =
+permissions
+>> granted to the file owner and to others instead of defining an upper=
+ limit.
+>> When the
+>> .B masked
+>> flag is not set, the write_through flag has no effect.
 >
-> Markus
+> Use .BR write_through for preceding line
 >
+>> .TP
+>> .BR auto_inherit "\ (" a )
+>> Automatic Inheritance is enabled.  See
+>> .IR "Automatic Inheritance" .
+>> .TP
+>> .BR protected "\ (" p )
+>> The ACL is protected from modification by Automatic
+>> Inheritance.
+>> .TP
+>> .BR defaulted "\ (" d )
+>> Indicates that the ACL has been assigned in an application-dependent=
+ way when
+>> the file or directory was created; it has neither been inherited nor=
+ set
+>> explicitly. ACLs of files created on Linux will never have the
+>> .B defaulted
+>> flag set.
+
+"ACLs of files created on Linux will never have the defaulted flag set,=
+ but the
+flag may be set on files created on or copied over from other operating
+systems."
+
+> The preceding sentence immediately triggers an obvious question for t=
+he
+> reader.  So, do we need a sentence here to say when/where the "defaul=
+ted"
+> flag is set?
+>>           When this flag is set for an ACL, Automatic Inheritance wi=
+ll
+>> completely replace the ACL.
+>>
+>> .SS ACL entry flags
+>>
+>> The following flags on ACL entries are defined:
+>>
+>> .TP
+>> .BR file_inherit "\ (" f )
+>> When this flag appears in the ACL entry of a directory, then:
+>> .RS
+>> .IP \(bu 4
+>> That entry is inherited by new files created in the directory such t=
+hat the
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> s/4/2/
+>
+>> permissions of the entry apply to the file (the inheritance flags of=
+ the
+>> inherited entry are cleared).
+>> .IP \(bu 4
+>> The entry is is inherited by new subdirectories created in the direc=
+tory such
+>
+> s/ 4//
+>
+>> that the permissions of the entry will apply to new files created in=
+ the
+>> subdirectory.
+>> .RE
+>> .TP
+>> .BR dir_inherit "\ (" d )
+>> When this flag appears in the ACL entry of a directory, then that en=
+try is
+>> inherited by new subdirectories created in the directory such that t=
+he
+>> permissions of the entry apply to the subdirectory (the
+>> .B inherit_only
+>> flag is cleared).
+>> .TP
+>> .BR no_propagate "\ (" n )
+>> Inheritance stops at the next subdirectory level.  When a file or di=
+rectory
+>> inherits an entry that has this flag set, the
+>> .BR file_inherit ", " dir_inherit ", " no_propagate ", and " inherit=
+_only
+>> flags are cleared.
+>> .TP
+>> .BR inherit_only "\ (" i )
+>> The entry defines inheritable permissions only and is ignored for ac=
+cess
+>> checking.  When a file or directory inherits an entry that has this =
+flag set,
+>> the flag is cleared.
+>> .TP
+>> .BR inherited "\ (" a )
+>> The entry has been automatically inherited from the parent directory=
+; the
+>> ACL's
+>> .B auto_inherit
+>> flag should be on.
+>
+> Why "should be" in the previous sentence? I think a little explanatio=
+n
+> is needed here...
+
+I've removed the second part of the sentence instead.
+
+>> .TP
+>> .BR unmapped "\ (" u )
+>> The user or group identifier is a textual string and is not mapped t=
+o a numeric
+>> user or group identifier.  ACLs with unmapped identifiers can occur =
+on NFSv4
+>> mounted filesystems when the client cannot determine numeric user or=
+ group
+>> identifiers for some of the NFSv4 user@domain or group@domain who va=
+lues.  They
+>> cannot be assigned to local files or directories.
+>>
+>> .SS Permissions
+>>
+>> The following permissions are defined for RichACL entries and for th=
+e three
+>> file masks:
+>>
+>> .TP
+>> .BR read_data " / " list_directory "\ (" r )
+>> For a file: read the data of the file.
+>> For a directory: list the contents of the directory.
+>> .TP
+>> .BR write_data " / " add_file "\ (" w )
+>> For a file: modify the data of the file; does not include opening th=
+e file in
+>> append mode.
+>> For a directory: add a new file in the directory.
+>> .TP
+>> .BR append_data " / " add_subdirectory "\ (" p )
+>> For a file: open the file in append mode.
+>> For a directory: create a subdirectory in the directory.
+>> .TP
+>> .BR execute "\ (" x )
+>> For a file: execute the file.
+>> For a directory: traverse / search the directory.
+>
+> s%traverse / search%traverse (search)%
+>> .TP
+>> .BR delete_child "\ (" d )
+>> Delete a file or directory within a directory.  This permission is m=
+eaningless
+>> for non-directories.
+>
+> =3D=3D> "This permission is meanungful only for directories."
+>
+>> .TP
+>> .BR delete "\ (" D )
+>> Delete the file or directory.
+>> .TP
+>> .BR read_attributes "\ (" a )
+>> Read basic attributes of a file or directory (see
+>> .BR stat (2)).
+>> This permission is defined by NFSv4.  It is stored, but ignored.  Re=
+ading basic
+>> attributes of files and directories is always allowed on Linux.
+>> .TP
+>> .BR write_attributes "\ (" A )
+>> Change the times associated with a file or directory to an arbitrary=
+ value.
+>> This permission is always implicitly granted to the file owner.
+>> .TP
+>> .BR read_acl "\ (" c )
+>> Read the ACL of a file or directory. This permission is always
+>> implicitly granted.
+>
+> So, I think a sentence explaining why "read_acl" exists would be
+> helpful, since the reader is left a little puzzled about its purpose =
+if
+> it is always implicitly granted.
+
+"Like reading the basic file attributes (the read_attributes permission=
+),
+reading ACLs is always allowed in Linux."
+
+>> .TP
+>> .BR write_acl "\ (" C )
+>> Change the ACL or file mode of a file or directory.
+>> .TP
+>> .BR write_owner "\ (" o )
+>> Take ownership of a file or directory.  Change the owning group of a=
+ file or
+>> directory to a group of which the calling process is a member.
+>> .TP
+>
+> Formatting tweak: add ".ad l" before the following line amd ".ad" aft=
+er
+> the line.
+>
+>> .BR read_named_attrs "\ (" R "), " write_named_attrs "\ (" W "), " s=
+ynchronize "\ (" S "), " write_retention "\ (" e "), " write_retention_=
+hold "\ (" E )
+>> These permissions are defined by NFSv4 / NFSv4.1.  They are stored, =
+but ignored.
+>
+> s%/%and%
+>
+>> .PP
+>> For the
+>> .BR r ", " w ", and " p
+>> permissions which have different long forms for files and directorie=
+s, the
+>
+> s/permissions/permissions,/
+>
+>> .BR getrichacl (1)
+>> utility will output the appropriate form(s) depending on the context=
+=2E
+>> The
+>> .BR setrichacl (1)
+>> utility will accept either form for any file type.
+>>
+>> .SS Text form
+>> The common textual representation of a RichACL consists of the colon=
+-separated
+>> fields of the ACL flags, file masks, and ACL entries in the followin=
+g
+>> format:
+>> .TP
+>> \fBflags:\fR\fIacl_flags\fR
+>> The ACL flags.
+>> .TP
+>> \fBowner:\fR\fIperm\fR\fB::mask\fR, \fBgroup:\fR\fIperm\fR\fB::mask\=
+fR, \fBother:\fR\fIperm\fR\fB::mask\fR
+>> The file masks and their permissions.
+>> .TP
+>> \fIwho\fR\fB:\fR\fIperm\fR\fB:\fR\fIflags\fR\fB:allow\fR, \fIwho\fR\=
+fB:\fR\fIperm\fR\fB:\fR\fIflags\fR\fB:deny\fR
+>> For each ACL entry, who the entry applies to, the permissions of the=
+ entry, the
+>> entry flags, and the entry type. The who field is one of the followi=
+ng:
+>
+> s/who/\\fIwho\\fP/
+>
+>> .RS
+>> .IP \(bu 4
+>
+> s/4/2/
+>
+>> One of the special identifiers:
+>> .BR owner@ ", " group@ ", or " everyone@ ,
+>> .IP \(bu
+>> A
+>> .BR user: " or " u:
+>> prefix followed by a user name or user ID that designates a specific=
+ user,
+>> .IP \(bu
+>> A
+>> .BR group: " or " g:
+>> prefix followed by a group name or group ID that designates a specif=
+ic group.
+>> .RE
+>> .PP
+>> The entries are comma, whitespace, or newline separated.
+>>
+>> Flags and permissions have single-letter as well as long forms, as l=
+isted under
+>> .IR "ACL flags" ,
+>> .IR "ACL entry flags" ,
+>> and
+>> .IR Permissions .
+>> When the single-letter forms are used, the flags or permissions are
+>> concatenated. When the long forms are used, the flags or permissions=
+ are
+>> separated by slashes.  To align permissions or flags vertically, das=
+hes can be
+>> used for padding.
+>>
+>> .SS Setting and modifying file permissions
+>> The access permissions for a file can either be set by assigning an =
+Access
+>> Control List
+>> .RB ( setrichacl (1))
+>> or by changing the file mode permission bits
+>> .RB ( chmod (1)).
+>> In addition, a file can inherit an ACL from its parent directory at =
+creation
+>> time as described under
+>> .IR "Permissions at file-creation time" .
+>>
+>> .SS Assigning an Access Control List
+>> When assigning an ACL to a file, unless explicitly specified, the ow=
+ner, group,
+>> and other file masks will be computed from the ACL entries as descri=
+bed in
+>> the section
+>> .IR "Computing the maximum file masks" .
+>> The owner, group, and other file mode permission bits are then each =
+set from
+>> the owner, group, and other file mask as follows:
+>> .IP \(bu 4
+>
+> s/4/2/
+>
+>> If the file mask includes the
+>> .B r
+>> permission, the read
+>> file mode permission bit will be set.
+>> .IP \(bu
+>> If the file mask includes the
+>> .B w
+>> or
+>> .B p
+>> permission, the write file mode permission bit will be set.
+>> .IP \(bu
+>> If the file mask includes the
+>> .B x
+>> permission, the execute file mode permission bit will be set.
+>> .PP
+>> If the ACL can be represented exactly by the file mode
+>> permission bits, the file permission bits are set to match the ACL a=
+nd the ACL
+>> is not stored.
+>
+> Maybe better: "...and no ACL is stored"
+>
+>>                (When the ACL of a file is requested which doesn't ha=
+ve an ACL,
+>> the file mode permission bits are converted into an equivalent ACL.)
+>>
+>> .SS Changing the file mode permission bits
+>> When changing the file mode permission bits with
+>> .BR chmod (1),
+>> the owner, group, and other file permission bits are set to the perm=
+ission bits
+>> in the new mode, and the owner, group, and other file masks are set =
+based on
+>> the new mode bits as follows:
+>> .IP \(bu 4
+>
+> s/4/2/
+>
+>> If the read bit in a set of permissions is set, the
+>> .B r
+>> permission in the corresponding file mask will be set.
+>> .IP \(bu
+>> If the write bit in a set of permissions is set, the
+>> .B w
+>> and
+>> .B p
+>> permissions in the corresponding file mask will be set.
+>> .IP \(bu
+>> If the execute bit in a set of permissions is set, the
+>> .B x
+>> permission in the corresponding file mask will be set.
+>> .PP
+>> In addition, the
+>> .B masked
+>> and
+>> .B write_through
+>> ACL flags are set. This has the
+>> effect of limiting the permissions granted by the ACL to the file mo=
+de
+>> permission bits; in addition, the owner is granted the owner mode bi=
+ts and
+>> others are granted the other mode bits. If the
+>> .B auto_inherit
+>> flag is set, the
+>> .B protected
+>> flag is also set to prevent the Automatic Inheritance algorithm from=
+ modifying
+>> the ACL.
+>>
+>> .SS Permissions at file-creation time
+>> When a directory has inheritable ACL entries, the following
+>
+> s/has/has an/
+>
+>> happens when a file or directory is created inside that directory:
+>> .RS 4
+>> .IP 1. 4
+>> A file created inside that directory will inherit all of the ACL ent=
+ries that
+>> have the
+>> .B file_inherit
+>> flag set, and all inheritance-related flags in the inherited entries=
+ flag will
+>> be cleared.
+>>
+>> A subdirectory created inside that directory will inherit all of the=
+ ACL
+>> entries that either have the
+>> .B dir_inherit
+>> flag set, or the
+>> .B file_inherit
+>> flag set and the
+>> .B no_propagate
+>> flag not set.  Entries whose
+>> .B dir_inherit
+>> flag is set will have their
+>> .B inherit_only
+>> flag cleared, and entries whose
+>> .B dir_inherit
+>> flag is not set will have their
+>> .B inherit_only
+>> flag set.  Finally, entries whose
+>> .B no_propagate
+>> flag is set will have all inheritance-related flags cleared.
+>> .IP 2.
+>> If the parent directory's ACL has the
+>> .B auto_inherit
+>> flag set, the inherited ACL will have its
+>> .B auto_inherit
+>> flag set, and all entries will have their
+>> .B inherited
+>> flag set.  Otherwise, the
+>> .B auto_inherit
+>> and
+>> .B inherited
+>> flags are cleared.
+>> .IP 3.
+>> The three file masks are computed from the inherited ACL as describe=
+d in
+>> the section
+>> .IR "Computing the maximum file masks" .
+>> .IP 4.
+>> The three sets of permissions for the owner, the group, and for othe=
+rs in
+>> the \fImode\fR parameter as given to
+>> .BR open (2),
+>> .BR mkdir (2),
+>> and similar are converted into sets of RichACL permissions. The corr=
+espondence
+>> between mask flags and RichACL permission bits is described in the s=
+ection
+>> .IR "Changing the file mode permission bits" .
+>> Any RichACL permissions not included in those sets are
+>> removed from the owner, group, and other file masks. The file mode p=
+ermission
+>> bits are then computed from the file masks as described in the secti=
+on
+>> .IR "Assigning an Access Control List" .
+>> The process umask (see
+>> .BR umask (2))
+>> is ignored.
+>> .IP 5.
+>> The
+>> .B masked
+>> ACL flag is set. The
+>> .B write_through
+>> ACL flag remains cleared. In addition, if the
+>> .B auto_inherit
+>> flag of the inherited ACL is set, the
+>> .B protected
+>> flag is also set to prevent the Automatic Inheritance algorithm from=
+ modifying
+>> the ACL.
+>> .RE
+>> .PP
+>> When a directory does not have inheritable ACL entries, files and di=
+rectories
+>> created inside that directory will not be assigned Access Control Li=
+sts and the
+>> file mode permission bits will be set to (\fImode\fR\ &\ ~\fIumask\f=
+R) where
+>> \fImode\fR is the mode argument of the relevant system call and \fIu=
+mask\fR is
+>> the process umask (see
+>> .BR umask (2)).
+>>
+>> .SS Automatic Inheritance
+>> Automatic Inheritance is a mechanism that allows permission changes =
+to
+>> propagate from a directory to files and subdirectories inside that d=
+irectory,
+>> recursively.  Propagation is carried out by the process changing the=
+ directory
+>> permissions (usually,
+>> .BR setrichacl (1));
+>> it happens without user intervention albeit not entirely automatical=
+ly.
+>>
+>> A significant limitation is that this mechanism works only as long a=
+s files
+>> are created without explicitly specifying the file permissions to us=
+e. The
+>> standard system calls for creating files and directories
+>> .RB ( creat (2),
+>> .BR open (2),
+>> .BR mkdir (2),
+>> .BR mknod (2))
+>> all have mandatory mode parameters which define the maximum allowed =
+permissions
+>> of the new files. To take account of this restriction, the
+>> .B protected
+>> ACL flag must be set if the
+>> .B inherited
+>> flag is set. This effectively disables Automatic Inheritance for tha=
+t
+>> particular file.
+>>
+>
+> Add the following at the start of the next paragraph:
+>
+> "Motwithstanding the aforementioned limitation,"
+>> Automatic Inheritance still remains useful for network protocols lik=
+e NFSv4 and
+>> SMB, which both support creating files and directories without defin=
+ing their
+>> permissions: they can implement those operations by using the standa=
+rd system
+>
+> s/: they/. These protocols/
+> (To avoid an excessively long sentence.)
+>
+>> calls and by then undoing the effect of applying the mode parameters=
+=2E
+>>
+>> When the ACL of a directory is changed, the following happens for ea=
+ch entry
+>> (\(lqchild\(rq) inside that directory:
+>> .IP 1. 4
+>> If the entry is a symblic link, skip the child.
+>
+> s/symblic/symbolic/
+>
+>> .IP 2.
+>> If the
+>> .B auto_inherit
+>> flag of the entry's ACL is not set or the
+>> .B protected
+>> flag is set, skip the child.
+>> .IP 3.
+>> With the child's ACL:
+>> .RS 4
+>> .IP a) 4
+>> If the
+>> .B defaulted
+>> flag is set, replace the ACL with an empty ACL
+>> with the
+>> .B auto_inherit
+>> flag set.
+>> .IP b)
+>> Delete all entries which have the
+>> .B inherited
+>> flag set.
+>> .IP c)
+>> Append all entries inherited from the parent directory according to =
+step 1 of
+>> the algorithm described under
+>> .IR "Permissions at file-creation time".
+>> Set the
+>> .B inherited
+>> flag of each of these entries.
+>> .IP d)
+>> Recompute the file masks.
+>> .RE
+>> .IP 4.
+>> If the child is a directory, recursively apply this algorithm.
+>>
+>> .SS Access check algorithm
+>>
+>> When a process requests a particular kind of access (expressed as a =
+set of
+>> RichACL permissions) to a file, the following algorithm determines w=
+hether the
+>> access is granted or denied:
+>>
+>> .IP 1. 4
+>> If the
+>> .B masked
+>> ACL flag is set, then:
+>> .RS 4
+>> .IP a) 4
+>> If the
+>> .B write_through
+>> ACL flag is set, then:
+>> .RS 4
+>
+> s/4/2/
+>
+>> .IP \(bu 4
+>
+> s/4/2/
+>
+>> If the requesting process is the file owner, then access is granted =
+if the
+>> owner mask includes the requested permissions, and is otherwise deni=
+ed.
+>> .IP \(bu
+>> If the requesting process is not the file owner, is not in the ownin=
+g group,
+>> and no ACL entries other than
+>> .B everyone@
+>> match the process, then access is granted if the other mask includes=
+ the
+>> requested permissions, and is otherwise denied.
+>
+> So, in the above subcases, the following does not seem to be covered:
+>         (1) "masked" ACL flag is set AND
+>         (2) requesting process *is* in owning group *or* an ACL other
+>             than "everyone@"matches the process.
+>
+> What happens in this case? I suspect that somehow we are supposed to
+> fall through to part "b)" below (and possibly into clause "2."?), but
+> the logical structure of the clauses does not reflect this.
+
+Yes. I've added this bullet point between the existing two now:
+
+"If the requesting process is not the file owner and it is in the ownin=
+g group
+or matches any ACL entries other than everyone@, proceed to step b)."
+
+>> .RE
+>> .IP b)
+>> If any of the following is true:
+>> .RS 4
+>
+> s/4/2/
+>
+>> .IP \(bu 4
+>
+> s/4/2/
+>
+>> the requesting process is the file owner and the owner mask does not=
+ include all
+>> requested permissions,
+>> .IP \(bu 4
+>
+> s/ 4//
+>
+>> the requesting process is not the file owner and it is in the owning=
+ group or
+>> matches any ACL entries other than
+>> .BR everyone@ ,
+>> and the group mask does not include all requested permissions,
+>> .IP \(bu 4
+>
+> s/ 4//
+>
+>> the requesting process is not the file owner, not in the owning grou=
+p, it
+>> matches no ACL entries other than
+>> .BR everyone@ ,
+>> and the other mask does not include all requested permissions,
+>> .PP
+>> then access is denied.
+>> .RE
+>> .RE
+>
+> At some point, perhaps in the next paragraph, I think that it needs t=
+o
+> be clarified that unlike POSIX ACLs, a process can gain the permissio=
+ns
+> it requires by accumulating them from multiple RichACL enties. (That'=
+s
+> correct, is it not?)
+
+Yes. I've added the following at the end of the section:
+
+"In this algorithm, a process can gain the permissions it requires by
+accumulating them from multiple RichACL entries.  This is in contrast w=
+ith
+POSIX ACLs, where access is only granted if an ACL entry exists that ma=
+tches
+the requesting process and includes all the requested permissions."
+
+>> .IP 2.
+>> Set the remaining permissions to the requested permissions.  Go thro=
+ugh all ACL
+>> entries. For each entry:
+>
+> So, perhaps replace the preceding two lines with something like:
+>
+> [[
+> Upon reaching this point, the determination of whether or not access =
+is
+> granted is made by scanning all ACL entries to see if one or more
+> applicable entries together grant a cumulative set of permissions tha=
+t
+> matches the requested permissions or there is an applicable entry tha=
+t
+> explicitly denies one or more of the requested permissions.
+> The scan of all ACL entries begins by
+> first initializing the set of remaining permissions (i.e., those that=
+ have
+> not yet been satisfied during the scan) to be the set of requested
+> permissions. Then the ACL entries are scanned
+> .IR "in order" ,
+> and for each entry:
+> ]]
+
+ok
+
+>> .RS 4
+>> .IP a) 4
+>> If the
+>> .B inherit_only
+>> or
+>> .B unmapped
+>> flags are set, continue with the next ACL entry.
+>> .IP b)
+>> If any of the following is true:
+>> .RS 4
+>
+> s/4/2/
+>
+>> .IP \(bu 4
+>
+> s/4/2/
+>
+>> the entry's identifier is
+>> .B owner@
+>> and the requesting process is the file owner,
+>> .IP \(bu
+>> the entry's identifier is
+>> .B group@
+>> and the requesting process is in the owning group,
+>> .IP \(bu
+>> the entry's identifier is a user and the requesting process is owned=
+ by that
+>> user,
+>> .IP \(bu
+>> the entry's identifier is a group and the requesting process is a me=
+mber in
+>> that group,
+>> .IP \(bu
+>> the entry's identifier is
+>> .BR everyone@ ,
+>> .PP
+>> then the entry matches the process; proceed to the next step. Otherw=
+ise,
+>> continue with the next ACL entry.
+>> .RE
+>> .IP c)
+>> If the entry denies any of the remaining permissions, access is deni=
+ed.
+>> .IP d)
+>> If the entry allows any of the remaining permissions, then:
+>> .RS 4
+>
+> s/4/2/
+>
+>> .IP \(bu 4
+>
+> s/4/2/
+>
+>> If the
+>> .B masked
+>> ACL flag is set and the entry's identifier is not
+>> .B owner@
+>> or
+>> .BR everyone@
+>> or is a user entry matching the file owner, remove all permissions f=
+rom the
+>> remaining permissions which are both allowed by the entry and includ=
+ed in the
+>> group mask,
+>> .IP \(bu
+>> Otherwise, remove all permissions from the remaining permissions wic=
+h are
+>
+> s/wich/which
+>
+>> allowed by the entry.
+>> .RE
+>> .RE
+>> .IP 3.
+>> If there are no more remaining permissions, access is allowed. Other=
+wise,
+>> access is denied.
+>>
+>> .SS Computing the maximum file masks
+>> When setting an ACL and no file masks have been explicitly specified=
+ and when
+>> inheriting an ACL from the parent directory, the following algorithm=
+ is used
+>> for computing the file masks:
+>>
+>> .IP 1. 4
+>> Clear the owner, group, and other file masks. Remember which permiss=
+ions have
+>> already been processed (initially, the empty set).
+>> .IP 2.
+>> For each ACL entry:
+>> .RS 4
+>
+> s/4/2/
+>
+>> .IP \(bu 4
+>
+> s/4/2/
+>
+>> If the
+>> .B inherit_only
+>> flag is set, skip the entry.
+>> .IP \(bu 4
+>
+> s/ 4//
+>
+>> Otherwise, compute which permissions the entry allows or denies that=
+ have not
+>> been processed yet (the remaining permissions).
+>> .IP \(bu
+>> If the entry is an
+>> .B owner@
+>> entry, add the remaining permissions to the owner mask for
+>> .B allow
+>> entries, and remove the remaining permissions from the owner mask fo=
+r
+>> .B deny
+>> entries.
+>> .IP \(bu
+>> Otherwise, if the entry is an
+>> .B everyone@
+>> entry, proceed as with
+>> .B owner@
+>> entries but add or remove the remaining permissions from the owner, =
+group, and
+>> other file masks.
+>> .IP \(bu
+>> Otherwise, proceed as with
+>> .B owner@
+>> entries but add or remove the remaining permissions from the owner a=
+nd group
+>> file masks.
+>> .IP \(bu
+>> Add the entry's permissions to the processed permissions.
+>> .RE
+>> .PP
+>> The resulting file masks represent the ACL as closely as possible. W=
+ith these
+>> file masks, if the
+>> .B masked
+>> ACL flag is set, the effective permissions still stay the same.
+>
+> The meaing of "will stay the same" is not quite clear "will stay the
+> same *as what*"?). I suspect I know what you mean, but it needs to be
+> made more obvious.
+
+"With these file masks, the effective permissions that the ACL grants
+will be the same when the masked flag is set as when it is not set."
+
+>>
+>> .\" .SH BUGS
+>> .SH AUTHOR
+>> Written by Andreas Gr=C3=BCnbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>.
+>>
+>> Please send your bug reports, suggested features and comments to the=
+ above address.
+>>
+>
+> I'm going to play the broken record :-)
+>
+> Could we start with just a few simple examples already, and build up
+> over future iterations of this page?
+
+Yes, as soon as I'll get to it :)
+
+>> .SH CONFORMING TO
+>> Rich Access Control Lists are Linux-specific.
+>> .SH SEE ALSO
+>> .BR acl (5),
+>
+> Move this entry to the point XXX below.
+>
+>> .BR chmod (1),
+>> .BR getrichacl (1),
+>> .BR ls (1),
+>> .BR setrichacl (1)
+>> .BR stat (2),
+>> .BR umask (2)
+>> .\" librichacl
+>
+> XXX
+>
+> By the way, are there already man pages for the librichacl functions?
+
+Not yet, no.
+
+Cheers,
+Andreas
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
