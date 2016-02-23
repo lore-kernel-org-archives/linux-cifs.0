@@ -1,50 +1,85 @@
-From: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: Interop Issue: SMB2+ async replies, and the kernel, Samba side
- fix enclosed.
-Date: Tue, 23 Feb 2016 08:54:12 -0800
-Message-ID: <20160223165412.GD39067@jra3>
-References: <CAAPGDwLnp90t7wiRb_tw-Md0jv-8w0Ye66jNcsRNioganVe2xg@mail.gmail.com>
-Reply-To: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: richacl(7) man page review comments
+Date: Tue, 23 Feb 2016 20:01:20 +0100
+Message-ID: <CAHc6FU4FR577X=sZAPUXhCL4SUfrRYTHw9_byehZqwYyBOhQiA@mail.gmail.com>
+References: <56B770B6.7040803@gmail.com>
+	<56B77262.7090107@gmail.com>
+	<CAHc6FU5__xbKm4mg8+fK_ZW5ZYsDoQcYBBvQg573Eq4ERDsROw@mail.gmail.com>
+	<56C0F23C.7030902@gmail.com>
+	<CAHc6FU4CCrcrA6=oCiq2A5rGd9CCGELaTZq6tGpmd2jcV_Zp4A@mail.gmail.com>
+	<56CA2EEB.9080504@gmail.com>
+	<CAHc6FU46vO8NM3cvFH7b8X7U9R+m6wcYj8EQKVnSQkiY3Q051A@mail.gmail.com>
+	<56CC3B4A.7070204@gmail.com>
+	<CAHc6FU67LnV7-roofFe1y_uTfvgwonRZimyu7Wn1CDRzwHZJSw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Samba Technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, sfrench <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-To: Ira Cooper <ira-mA6sH8tAw6XR7s880joybQ@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <CAAPGDwLnp90t7wiRb_tw-Md0jv-8w0Ye66jNcsRNioganVe2xg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
+	linux-ext4 <linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	XFS Developers <xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org>,
+	lkml <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Linux NFS Mailing List <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Linux API <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>,
+	Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+	Anna Schumaker <anna.schumaker-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
+	Trond Myklebust <trond.myklebust-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
+	Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>,
+	Andreas Dilger <adilger-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>
+To: "Michael Kerrisk (man-pages)" <mtk.manpages-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAHc6FU67LnV7-roofFe1y_uTfvgwonRZimyu7Wn1CDRzwHZJSw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Tue, Feb 23, 2016 at 07:55:59AM -0500, Ira Cooper wrote:
-> If the server sends an interim response, then the real response, the real
-> response, is handled by standard_receive3() in the kernel, instead of the
-> proper function, and this causes a disconnect.  If there isn't a
-> disconnect, I believe the reply will just be discarded if I understand the
-> code correctly.  (That is a big if here ;) )
-> 
-> I've written a patch for Samba to stop sending interim replies on SMB2_READ
-> and SMB2_WRITE, when non-compounded to stop the impact of this issue.  We
-> may want to add SMB2_CREATE to the list of ops we don't send async replies
-> for non-compounded, but I'm not sold either way, I know we CAN go async
-> there!  I want some opinions here.
-> 
-> This is not hidden behind a flag because compatibility issues that don't
-> impact protocol correctness usually aren't.
-> 
-> Setting req->async_te = talloc_new(NULL); is just ugly, though it works.
-> If you have a cleaner approach, I welcome it.
-> 
-> I request you please ASK me before pushing this one, yes, that means you
-> jra!
+On Tue, Feb 23, 2016 at 4:09 PM, Andreas Gruenbacher
+<agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> Hi Michael,
+>
+> On Tue, Feb 23, 2016 at 11:58 AM, Michael Kerrisk (man-pages)
+> <mtk.manpages-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>> On 02/22/2016 03:46 PM, Andreas Gruenbacher wrote:
+>>> On Sun, Feb 21, 2016 at 10:40 PM, Michael Kerrisk (man-pages) <mtk.manpages-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>>>> I've once more pulled from the latest git; here's some more comments.
+>>>
+>>> thanks again. I've updated the repo with your changes.
+>>
+>> Next round :-). Just a few quick comments while I'm on a train ride.
+>
+> applied, thanks.
 
-Actually I wasn't planning on pushing at all :-).
+I've fixed the following additional problems:
 
-I don't think we should stop sending interim replies on SMB2_READ
-or SMB2_WRITE, those replies have effects on the client timers
-on properly functioning clients.
+> diff --git a/man/richacl.7 b/man/richacl.7
+> index acdff31..1c82644 100644
+> --- a/man/richacl.7
+> +++ b/man/richacl.7
+> @@ -30,10 +30,8 @@
+>  .SH NAME
+>  richacl \- Rich Access Control Lists
+>  .SH DESCRIPTION
+> -Rich Access Control Lists (RichACLs) are an extension of the POSIX file
+> -permission model (see
+> -.BR acl (5))
+> -to support
+> +Rich Access Control Lists (RichACLs) are an extension of the traditional POSIX
+> +file permission model to support
+>  .URL https://tools.ietf.org/rfc/rfc5661.txt "NFSv4 Access Control Lists"
+>  on local and remote-mounted filesystems.
 
-Linux client needs fixing here I'm afraid (and I know that's
-not fun, sorry :-( ).
+RichACLs are an extension of the traditional POSIX file permission
+model, not of the POSIX ACL model.
 
-Jeremy.
+Unfortunately, there doesn't seem to be a man-page covering POSIX File
+Access Permissions as in Appendix A of
+http://www.bestbits.at/richacl/draft-gruenbacher-nfsv4-acls-in-posix-00.html.
+
+A lot of the gaps between paragraphs were wrong when rendered for printing.
+
+The modification dates were outdated.
+
+Andreas
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
