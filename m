@@ -1,85 +1,99 @@
-From: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: richacl(7) man page review comments
-Date: Tue, 23 Feb 2016 20:01:20 +0100
-Message-ID: <CAHc6FU4FR577X=sZAPUXhCL4SUfrRYTHw9_byehZqwYyBOhQiA@mail.gmail.com>
-References: <56B770B6.7040803@gmail.com>
-	<56B77262.7090107@gmail.com>
-	<CAHc6FU5__xbKm4mg8+fK_ZW5ZYsDoQcYBBvQg573Eq4ERDsROw@mail.gmail.com>
-	<56C0F23C.7030902@gmail.com>
-	<CAHc6FU4CCrcrA6=oCiq2A5rGd9CCGELaTZq6tGpmd2jcV_Zp4A@mail.gmail.com>
-	<56CA2EEB.9080504@gmail.com>
-	<CAHc6FU46vO8NM3cvFH7b8X7U9R+m6wcYj8EQKVnSQkiY3Q051A@mail.gmail.com>
-	<56CC3B4A.7070204@gmail.com>
-	<CAHc6FU67LnV7-roofFe1y_uTfvgwonRZimyu7Wn1CDRzwHZJSw@mail.gmail.com>
+From: Ira Cooper <ira@wakeful.net>
+Subject: Re: Interop Issue: SMB2+ async replies, and the kernel, Samba side
+ fix enclosed.
+Date: Tue, 23 Feb 2016 23:41:34 -0500
+Message-ID: <CAAPGDwL-VsVmPzFFEM5nOAgFCz68a2KHWGAy9KH6ED5PD0vx_Q@mail.gmail.com>
+References: <CAAPGDwLnp90t7wiRb_tw-Md0jv-8w0Ye66jNcsRNioganVe2xg@mail.gmail.com>
+ <56CC591F.30205@samba.org> <1D07D524-6243-4DF5-BBEB-13EE3A2B62AE@samba.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
-	linux-ext4 <linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	XFS Developers <xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org>,
-	lkml <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Linux NFS Mailing List <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Linux API <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>,
-	Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-	Anna Schumaker <anna.schumaker-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
-	Trond Myklebust <trond.myklebust-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
-	Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>,
-	Andreas Dilger <adilger-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>
-To: "Michael Kerrisk (man-pages)" <mtk.manpages-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAHc6FU67LnV7-roofFe1y_uTfvgwonRZimyu7Wn1CDRzwHZJSw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Transfer-Encoding: quoted-printable
+Cc: Stefan Metzmacher <metze@samba.org>, linux-cifs@vger.kernel.org,
+ Samba Technical <samba-technical@lists.samba.org>
+To: Steven French <sfrench@samba.org>
+Return-path: <samba-technical-bounces@lists.samba.org>
+In-Reply-To: <1D07D524-6243-4DF5-BBEB-13EE3A2B62AE@samba.org>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
+ <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical/>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
+ <mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Errors-To: samba-technical-bounces@lists.samba.org
+Sender: "samba-technical" <samba-technical-bounces@lists.samba.org>
 List-Id: linux-cifs.vger.kernel.org
 
-On Tue, Feb 23, 2016 at 4:09 PM, Andreas Gruenbacher
-<agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> Hi Michael,
+You'll find it easy to reproduce if you:
+
+Set  aio read size =3D 1 in smb.conf.
+
+And modify line 101 in smb2_read.c or close by to be:
+
+    return smbd_smb2_request_pending_queue(req, subreq, 1);
+
+Writing a 1 GB file, umounting the share, and mounting the share again,
+then using dd to read it back with rsize and wsize set to 1MB, should do it=
+.
+
+We can reproduce it as is with Gluster, I suspect that may be enough to do
+it with XFS or other filesystems.
+
+Does anyone know what the windows timeout for sending the interim reply
+is?  Barring this bug, sending it when we don't have to is wasteful.
+
+Thanks,
+
+-Ira
+
+On Tue, Feb 23, 2016 at 11:11 PM, Steven French <sfrench@samba.org> wrote:
+
+> Do we have a reproduction scenario?  I don=E2=80=99t remember this one an=
+d it
+> doesn=E2=80=99t send familiar at all - I use smb3 kernel client to Samba =
+every day.
 >
-> On Tue, Feb 23, 2016 at 11:58 AM, Michael Kerrisk (man-pages)
-> <mtk.manpages-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> On 02/22/2016 03:46 PM, Andreas Gruenbacher wrote:
->>> On Sun, Feb 21, 2016 at 10:40 PM, Michael Kerrisk (man-pages) <mtk.manpages-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->>>> I've once more pulled from the latest git; here's some more comments.
->>>
->>> thanks again. I've updated the repo with your changes.
->>
->> Next round :-). Just a few quick comments while I'm on a train ride.
+> And yes - if we have a bug in the kernel client here let=E2=80=99s fix it=
+.
 >
-> applied, thanks.
-
-I've fixed the following additional problems:
-
-> diff --git a/man/richacl.7 b/man/richacl.7
-> index acdff31..1c82644 100644
-> --- a/man/richacl.7
-> +++ b/man/richacl.7
-> @@ -30,10 +30,8 @@
->  .SH NAME
->  richacl \- Rich Access Control Lists
->  .SH DESCRIPTION
-> -Rich Access Control Lists (RichACLs) are an extension of the POSIX file
-> -permission model (see
-> -.BR acl (5))
-> -to support
-> +Rich Access Control Lists (RichACLs) are an extension of the traditional POSIX
-> +file permission model to support
->  .URL https://tools.ietf.org/rfc/rfc5661.txt "NFSv4 Access Control Lists"
->  on local and remote-mounted filesystems.
-
-RichACLs are an extension of the traditional POSIX file permission
-model, not of the POSIX ACL model.
-
-Unfortunately, there doesn't seem to be a man-page covering POSIX File
-Access Permissions as in Appendix A of
-http://www.bestbits.at/richacl/draft-gruenbacher-nfsv4-acls-in-posix-00.html.
-
-A lot of the gaps between paragraphs were wrong when rendered for printing.
-
-The modification dates were outdated.
-
-Andreas
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+> On Feb 23, 2016, at 7:05 AM, Stefan Metzmacher <metze@samba.org> wrote:
+>
+> Hi Ira,
+>
+> If the server sends an interim response, then the real response, the real
+> response, is handled by standard_receive3() in the kernel, instead of the
+> proper function, and this causes a disconnect.  If there isn't a
+> disconnect, I believe the reply will just be discarded if I understand th=
+e
+> code correctly.  (That is a big if here ;) )
+>
+> I've written a patch for Samba to stop sending interim replies on SMB2_RE=
+AD
+> and SMB2_WRITE, when non-compounded to stop the impact of this issue.  We
+> may want to add SMB2_CREATE to the list of ops we don't send async replie=
+s
+> for non-compounded, but I'm not sold either way, I know we CAN go async
+> there!  I want some opinions here.
+>
+> This is not hidden behind a flag because compatibility issues that don't
+> impact protocol correctness usually aren't.
+>
+> Setting req->async_te =3D talloc_new(NULL); is just ugly, though it works=
+.
+> If you have a cleaner approach, I welcome it.
+>
+>
+> Fix the broken kernel client!
+>
+> I think this is nothing we should work around in the server.
+> The situation might be different if Windows clients would be unhappy,
+> but the linux client is more or less under our control and can be fixed.
+>
+> People hitting this can just use SMB1 until it's fixed.
+>
+> metze
+>
+>
+>
