@@ -1,12 +1,12 @@
-From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: Interop Issue: SMB2+ async replies, and the kernel, Samba side
  fix enclosed.
-Date: Sat, 27 Feb 2016 12:26:33 +0300
-Message-ID: <CAKywueT52EeF58tRiEKFqqm5D2uMuMqWXJyr7FPUa8p5mjMMtA@mail.gmail.com>
+Date: Sat, 27 Feb 2016 12:31:21 +0300
+Message-ID: <CAKywueRePEMq7d2bYDZN48_esZrx0P2FofrDDxJ62RtQtX1Xww@mail.gmail.com>
 References: <CAAPGDwLnp90t7wiRb_tw-Md0jv-8w0Ye66jNcsRNioganVe2xg@mail.gmail.com>
 	<CAKywueSMFrvreB8JMtwj8kt1BY1Yyq-Guy3Q3=wZFzuLCCOjZA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary=001a11380a16f2d4f7052cbd0249
+Content-Type: multipart/mixed; boundary=001a113776821b3762052cbd144b
 Cc: Samba Technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
 	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
 	sfrench <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
@@ -16,11 +16,10 @@ In-Reply-To: <CAKywueSMFrvreB8JMtwj8kt1BY1Yyq-Guy3Q3=wZFzuLCCOjZA-JsoAwUIsXosN+B
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
---001a11380a16f2d4f7052cbd0249
+--001a113776821b3762052cbd144b
 Content-Type: text/plain; charset=UTF-8
 
 2016-02-27 12:11 GMT+03:00 Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
->
 > 2016-02-23 15:55 GMT+03:00 Ira Cooper <ira-mA6sH8tAw6XR7s880joybQ@public.gmane.org>:
 >>
 >> If the server sends an interim response, then the real response, the real
@@ -29,7 +28,8 @@ Content-Type: text/plain; charset=UTF-8
 >> disconnect, I believe the reply will just be discarded if I understand the
 >> code correctly.  (That is a big if here ;) )
 >>
->> I've written a patch for Samba to stop sending interim replies on SMB2_READ
+>> I've written a patch for Samba to stop sending interim replies on
+>> SMB2_READ
 >> and SMB2_WRITE, when non-compounded to stop the impact of this issue.  We
 >> may want to add SMB2_CREATE to the list of ops we don't send async replies
 >> for non-compounded, but I'm not sold either way, I know we CAN go async
@@ -56,7 +56,8 @@ Content-Type: text/plain; charset=UTF-8
 >
 > Thank you for catching this!
 >
-> It is the issue in the kernel client - a check for interim responses is missed for SMB2_READ command. I created a patch that should fix the problem.
+> It is the issue in the kernel client - a check for interim responses is
+> missed for SMB2_READ command. I created a patch that should fix the problem.
 >
 > Could you please test it?
 >
@@ -64,7 +65,7 @@ Content-Type: text/plain; charset=UTF-8
 > Best regards,
 > Pavel Shilovsky
 
-CC'ing @samba-technical (my original email was rejected by the server).
+CC'ing @samba-technical.
 
 Sorry for the spam.
 
@@ -72,13 +73,13 @@ Sorry for the spam.
 Best regards,
 Pavel Shilovsky
 
---001a11380a16f2d4f7052cbd0249
+--001a113776821b3762052cbd144b
 Content-Type: text/x-patch; charset=US-ASCII;
 	name="0001-CIFS-Fix-SMB2-interim-response-processing-for-read-r.patch"
 Content-Disposition: attachment;
 	filename="0001-CIFS-Fix-SMB2-interim-response-processing-for-read-r.patch"
 Content-Transfer-Encoding: base64
-X-Attachment-Id: f_il4x25ex1
+X-Attachment-Id: f_il4xe12t1
 
 RnJvbSAwOTkwNGJmMGM2YTFlY2M3ZjYxZDQ3NTVkYjMzYjc2MmI1MzE3NmQ2IE1vbiBTZXAgMTcg
 MDA6MDA6MDAgMjAwMQpGcm9tOiBQYXZlbCBTaGlsb3Zza3kgPHBzaGlsb3Zza3lAc2FtYmEub3Jn
@@ -117,4 +118,4 @@ LCBzZXJ2ZXIsIDApKSB7CisJCWRpc2NhcmRfcmVtYWluaW5nX2RhdGEoc2VydmVyKTsKKwkJcmV0
 dXJuIC0xOworCX0KKwogCS8qIFdhcyB0aGUgU01CIHJlYWQgc3VjY2Vzc2Z1bD8gKi8KIAlyZGF0
 YS0+cmVzdWx0ID0gc2VydmVyLT5vcHMtPm1hcF9lcnJvcihidWYsIGZhbHNlKTsKIAlpZiAocmRh
 dGEtPnJlc3VsdCAhPSAwKSB7Ci0tIAoyLjEuNAoK
---001a11380a16f2d4f7052cbd0249--
+--001a113776821b3762052cbd144b--
