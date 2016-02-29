@@ -1,52 +1,117 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] s390x: fix condition to choose correct function
-Date: Sun, 28 Feb 2016 22:17:32 -0600
-Message-ID: <CAH2r5mtACstEhNif+_-0afz_0ddp5dqTKU8mALZtjvawrsZARw@mail.gmail.com>
-References: <1456296347-9665-1-git-send-email-ydfan@suse.com>
+Subject: Re: [PATCH] cifs: fix out-of-bounds access in lease parsing
+Date: Sun, 28 Feb 2016 22:18:00 -0600
+Message-ID: <CAH2r5mvQeZet1jSrnHft6-yvRnvWRiuYaGmVY8_T9iUboPUp5w@mail.gmail.com>
+References: <1455061928-5266-1-git-send-email-jmaggard@netgear.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	martin.schwidefsky-tA70FqPdS9bQT0dZR+AlfA@public.gmane.org
-To: Yadan Fan <ydfan-IBi9RG/b67k@public.gmane.org>
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Justin Maggard <jmaggard-mhqmbKKevNRBDgjK7y7TUQ@public.gmane.org>
+To: Justin Maggard <jmaggard10-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1456296347-9665-1-git-send-email-ydfan-IBi9RG/b67k@public.gmane.org>
+In-Reply-To: <1455061928-5266-1-git-send-email-jmaggard-mhqmbKKevNRBDgjK7y7TUQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 merged into cifs-2.6.git
 
-Looks like alpha has a similar problem though
-
-On Wed, Feb 24, 2016 at 12:45 AM, Yadan Fan <ydfan-IBi9RG/b67k@public.gmane.org> wrote:
-> This issue is involved from commit 02323db17e3a7 ("cifs: fix
-> cifs_uniqueid_to_ino_t not to ever return 0"), when BITS_PER_LONG
-> is 64 on s390x, the corresponding cifs_uniqueid_to_ino_t()
-> function will cast 64-bit fileid to 32-bit by using (ino_t)fileid,
-> because ino_t (typdefed __kernel_ino_t) is int type.
+On Tue, Feb 9, 2016 at 5:52 PM, Justin Maggard <jmaggard10-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> When opening a file, SMB2_open() attempts to parse the lease state from the
+> SMB2 CREATE Response.  However, the parsing code was not careful to ensure
+> that the create contexts are not empty or invalid, which can lead to out-
+> of-bounds memory access.  This can be seen easily by trying
+> to read a file from a OSX 10.11 SMB3 server.  Here is sample crash output:
 >
-> Signed-off-by: Yadan Fan <ydfan-IBi9RG/b67k@public.gmane.org>
+> BUG: unable to handle kernel paging request at ffff8800a1a77cc6
+> IP: [<ffffffff8828a734>] SMB2_open+0x804/0x960
+> PGD 8f77067 PUD 0
+> Oops: 0000 [#1] SMP
+> Modules linked in:
+> CPU: 3 PID: 2876 Comm: cp Not tainted 4.5.0-rc3.x86_64.1+ #14
+> Hardware name: NETGEAR ReadyNAS 314          /ReadyNAS 314          , BIOS 4.6.5 10/11/2012
+> task: ffff880073cdc080 ti: ffff88005b31c000 task.ti: ffff88005b31c000
+> RIP: 0010:[<ffffffff8828a734>]  [<ffffffff8828a734>] SMB2_open+0x804/0x960
+> RSP: 0018:ffff88005b31fa08  EFLAGS: 00010282
+> RAX: 0000000000000015 RBX: 0000000000000000 RCX: 0000000000000006
+> RDX: 0000000000000000 RSI: 0000000000000246 RDI: ffff88007eb8c8b0
+> RBP: ffff88005b31fad8 R08: 666666203d206363 R09: 6131613030383866
+> R10: 3030383866666666 R11: 00000000000002b0 R12: ffff8800660fd800
+> R13: ffff8800a1a77cc2 R14: 00000000424d53fe R15: ffff88005f5a28c0
+> FS:  00007f7c8a2897c0(0000) GS:ffff88007eb80000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 000000008005003b
+> CR2: ffff8800a1a77cc6 CR3: 000000005b281000 CR4: 00000000000006e0
+> Stack:
+>  ffff88005b31fa70 ffffffff88278789 00000000000001d3 ffff88005f5a2a80
+>  ffffffff00000003 ffff88005d029d00 ffff88006fde05a0 0000000000000000
+>  ffff88005b31fc78 ffff88006fde0780 ffff88005b31fb2f 0000000100000fe0
+> Call Trace:
+>  [<ffffffff88278789>] ? cifsConvertToUTF16+0x159/0x2d0
+>  [<ffffffff8828cf68>] smb2_open_file+0x98/0x210
+>  [<ffffffff8811e80c>] ? __kmalloc+0x1c/0xe0
+>  [<ffffffff882685f4>] cifs_open+0x2a4/0x720
+>  [<ffffffff88122cef>] do_dentry_open+0x1ff/0x310
+>  [<ffffffff88268350>] ? cifsFileInfo_get+0x30/0x30
+>  [<ffffffff88123d92>] vfs_open+0x52/0x60
+>  [<ffffffff88131dd0>] path_openat+0x170/0xf70
+>  [<ffffffff88097d48>] ? remove_wait_queue+0x48/0x50
+>  [<ffffffff88133a29>] do_filp_open+0x79/0xd0
+>  [<ffffffff8813f2ca>] ? __alloc_fd+0x3a/0x170
+>  [<ffffffff881240c4>] do_sys_open+0x114/0x1e0
+>  [<ffffffff881241a9>] SyS_open+0x19/0x20
+>  [<ffffffff8896e257>] entry_SYSCALL_64_fastpath+0x12/0x6a
+> Code: 4d 8d 6c 07 04 31 c0 4c 89 ee e8 47 6f e5 ff 31 c9 41 89 ce 44 89 f1 48 c7 c7 28 b1 bd 88 31 c0 49 01 cd 4c 89 ee e8 2b 6f e5 ff <45> 0f b7 75 04 48 c7 c7 31 b1 bd 88 31 c0 4d 01 ee 4c 89 f6 e8
+> RIP  [<ffffffff8828a734>] SMB2_open+0x804/0x960
+>  RSP <ffff88005b31fa08>
+> CR2: ffff8800a1a77cc6
+> ---[ end trace d9f69ba64feee469 ]---
+>
+> Signed-off-by: Justin Maggard <jmaggard-mhqmbKKevNRBDgjK7y7TUQ@public.gmane.org>
 > ---
->  fs/cifs/cifsfs.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  fs/cifs/smb2pdu.c | 24 ++++++++++++++----------
+>  1 file changed, 14 insertions(+), 10 deletions(-)
 >
-> diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
-> index 68c4547..02dcbe1 100644
-> --- a/fs/cifs/cifsfs.h
-> +++ b/fs/cifs/cifsfs.h
-> @@ -31,7 +31,7 @@
->   * so that it will fit. We use hash_64 to convert the value to 31 bits, and
->   * then add 1, to ensure that we don't end up with a 0 as the value.
->   */
-> -#if BITS_PER_LONG == 64
-> +#if BITS_PER_LONG == 64 && !defined(CONFIG_S390)
->  static inline ino_t
->  cifs_uniqueid_to_ino_t(u64 fileid)
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index 10f8d5c..42e1f44 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -1106,21 +1106,25 @@ parse_lease_state(struct TCP_Server_Info *server, struct smb2_create_rsp *rsp,
 >  {
+>         char *data_offset;
+>         struct create_context *cc;
+> -       unsigned int next = 0;
+> +       unsigned int next;
+> +       unsigned int remaining;
+>         char *name;
+>
+>         data_offset = (char *)rsp + 4 + le32_to_cpu(rsp->CreateContextsOffset);
+> +       remaining = le32_to_cpu(rsp->CreateContextsLength);
+>         cc = (struct create_context *)data_offset;
+> -       do {
+> -               cc = (struct create_context *)((char *)cc + next);
+> +       while (remaining >= sizeof(struct create_context)) {
+>                 name = le16_to_cpu(cc->NameOffset) + (char *)cc;
+> -               if (le16_to_cpu(cc->NameLength) != 4 ||
+> -                   strncmp(name, "RqLs", 4)) {
+> -                       next = le32_to_cpu(cc->Next);
+> -                       continue;
+> -               }
+> -               return server->ops->parse_lease_buf(cc, epoch);
+> -       } while (next != 0);
+> +               if (le16_to_cpu(cc->NameLength) == 4 &&
+> +                   strncmp(name, "RqLs", 4) == 0)
+> +                       return server->ops->parse_lease_buf(cc, epoch);
+> +
+> +               next = le32_to_cpu(cc->Next);
+> +               if (!next)
+> +                       break;
+> +               remaining -= next;
+> +               cc = (struct create_context *)((char *)cc + next);
+> +       }
+>
+>         return 0;
+>  }
 > --
-> 2.6.2
+> 2.7.1
 >
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
