@@ -1,57 +1,56 @@
-From: mrs alice <mrs1alice2020-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: PLEASE I NEED YOUR RESPONSE
-Date: Tue, 1 Mar 2016 15:37:26 +0000
-Message-ID: <CAD0rw0rW6tyT2WF4gtFT2UXPeuPqQXnKVLSGDM1szsrwC7NXYQ@mail.gmail.com>
-Reply-To: mrs1alice216-KK7TH6PgNEI@public.gmane.org
+From: Christian Ambach <ambi-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: Interop Issue: SMB2+ async replies, and the kernel, Samba side
+ fix enclosed.
+Date: Tue, 1 Mar 2016 21:10:34 +0100
+Message-ID: <56D5F73A.6020005@samba.org>
+References: <CAAPGDwLnp90t7wiRb_tw-Md0jv-8w0Ye66jNcsRNioganVe2xg@mail.gmail.com>
+ <56CC591F.30205@samba.org> <1D07D524-6243-4DF5-BBEB-13EE3A2B62AE@samba.org>
+ <CAAPGDwL-VsVmPzFFEM5nOAgFCz68a2KHWGAy9KH6ED5PD0vx_Q@mail.gmail.com>
+ <20160224190408.GC16429@jra3> <20160301134039.GA21826@sernet.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: undisclosed-recipients:;
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Steven French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Ira Cooper <ira-mA6sH8tAw6XR7s880joybQ@public.gmane.org>,
+	Samba Technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Volker.Lendecke-PS7XAnAlDA+VvDNblw4Uiw@public.gmane.org, Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20160301134039.GA21826-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-FROM MRS ALICE HAMANIN.
+Am 01.03.16 um 14:40 schrieb Volker Lendecke:
+> On Wed, Feb 24, 2016 at 11:04:08AM -0800, Jeremy Allison wrote:
+>> Hmmm. We can only test this by causing a Windows read to
+>> take a long time. Any idea how to test this ? Does Win32
+>> have named pipes in the fs we could use for that ? If not
+>> we could test using a program that creates a \\pipe\named_pipe
+>> and then responds slowly... But I don't know if the
+>> timeout replies on np's are the same as in the filesystem.
+>
+> Just use a USB2 stick.
+>
+[MS-SMB2] gives some hints when Windows will send out interim replies:
+<296> Section 3.3.5.12: Windows SMB2 servers send an interim response to 
+the client and handle the read asynchronously if the read is not 
+finished in 0.5 milliseconds.
+<297> Section 3.3.5.12: Windows-based servers handle the following
+commands asynchronously: SMB2 Create (section 2.2.13) when this create would
+result in an oplock break, SMB2 IOCTL Request (section 2.2.31) for
+FSCTL_PIPE_TRANSCEIVE if it blocks for more than 1 millisecond, SMB2 IOCTL
+Request for FSCTL_SRV_COPYCHUNK or FSCTL_SRV_COPYCHUNK_WRITE (section 
+2.2.31)
+when oplock break happens, SMB2 Change_Notify Request (section 2.2.35) if
+it blocks for more than 0.5 milliseconds, SMB2 Read request (section 2.2.19)
+for named pipes if it blocks for more than 0.5 milliseconds,
+SMB2 Write request (section 2.2.21) for named pipes if it blocks for more
+than 0.5 milliseconds, SMB2 Write Request (section 2.2.21) for large 
+file write,
+SMB2 lock request (section 2.2.26) if the LOCKFLAG_FAIL_IMMEDIATELY flag 
+is not set,
+and SMB2 FLUSH Request (section 2.2.17) for named pipes.
 
-FROM ( I MRS ALICE HAMANIN.) Staff of Bank Of Africa in Burkina Faso.
-I would like you to indicate your interest to receive the transfer of
-(15.5 Million Dollars) I will like you to stand as the next of kin to
-my late client whose account is presently dormant for claims. if you
-are interested,indicate and i will intimate you with the method of
-application and how you can apply to the bank.
-
-But before i send to you the text of application form,I will like you
-to send me the following informations,
-
-please reply through this email (mrsalice94-Qt13gs6zZMY@public.gmane.org)
-
-1.NAME IN FULL:.........................
-
-.....
-2.ADDRESS:.......................................
-3.NATIONALITY:.................................. .
-4.AGE:.............................................
-5.SEX..............................................
-6.OCCUPATION:......................................
-7.MARITAL STATUS:..................................
-8.PRIAVTE PHONE NO.................................
-9.PRIVATE FAX NO:..........................
-10.ATTACH COPY OF YOUR IDENTIFICATION......
-
-Now my questions are:
-1) Can you handle this project?
-2) Can I give you this trust?
-
-so i will like you to send to me those informations for easy and
-effective communication.Upon receipt of your reply, I will send to you
-by fax or email the text of the application form.I will not fail to
-bring to your notice that this transaction is hitch-free and that you
-should not entertain any atom of fear as all required arrangements
-have been made for the transfer. You should contact me immediately as
-soon as you receive this letter,if only you are intrested and ready to
-help. On this Email Address (mrsalice94-Qt13gs6zZMY@public.gmane.org) Trusting to hear
-from you immediately.
-Do keep this a top secret for security reasons.
-
-
-Yours faithfully,
-( I MRS ALICE HAMANIN.)
+Cheers,
+Christian
