@@ -1,39 +1,43 @@
-From: "Mr. DOUGLAS" <douglascontact6048-EMRzualFZlQ@public.gmane.org>
-Subject: =?utf-8?q?INFORMA=C3=87=C3=83O_IMPORTANTE__RE=3A_Consultoria_de_Investime?=
- =?utf-8?q?nto_em_sua_Localidade=2E?=
-Date: Sun, 28 Feb 2016 04:45:12 -0800
-Message-ID: <20160228134408.037118F6F76__13911.7564693608$1456767431$gmane$org@webmail.cefet-rj.br>
-Reply-To: johnsondouglas8738-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: Recipients <douglascontact6048-EMRzualFZlQ@public.gmane.org>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH 1/3] s390x: fix condition to choose correct function
+Date: Mon, 29 Feb 2016 18:04:12 -0600
+Message-ID: <1456790652-92638-1-git-send-email-smfrench@gmail.com>
+References: <smfrench@gmail.com>
+Cc: Yadan Fan <ydfan-IBi9RG/b67k@public.gmane.org>, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	stable <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Description: Mail message body
+In-Reply-To: <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Oi,
+From: Yadan Fan <ydfan-IBi9RG/b67k@public.gmane.org>
 
-Temos planejado investir alguns fundos no seu pa=EDs.
+This issue is involved from commit 02323db17e3a7 ("cifs: fix
+cifs_uniqueid_to_ino_t not to ever return 0"), when BITS_PER_LONG
+is 64 on s390x, the corresponding cifs_uniqueid_to_ino_t()
+function will cast 64-bit fileid to 32-bit by using (ino_t)fileid,
+because ino_t (typdefed __kernel_ino_t) is int type.
 
-Responder se voc=EA estiver interessado.
+Signed-off-by: Yadan Fan <ydfan-IBi9RG/b67k@public.gmane.org>
+Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+CC: stable <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+---
+ fs/cifs/cifsfs.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Sauda=E7=F5es,
-Sir Henry Neville Lindley Keswick
-Presidente da Jardine Matheson Holdings Ltd
-https://en.wikipedia.org/wiki/Keswick_family
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
-
-Hi friend,
-
-Our family is interested in investing funds in your locality.
-
-More information for you interest .
-
-Greetings,
-Sir Henry Neville Lindley Keswick
-Chairman of Jardine Matheson Holdings Ltd
-https://en.wikipedia.org/wiki/Keswick_family
+diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
+index 68c4547..02dcbe1 100644
+--- a/fs/cifs/cifsfs.h
++++ b/fs/cifs/cifsfs.h
+@@ -31,7 +31,7 @@
+  * so that it will fit. We use hash_64 to convert the value to 31 bits, and
+  * then add 1, to ensure that we don't end up with a 0 as the value.
+  */
+-#if BITS_PER_LONG == 64
++#if BITS_PER_LONG == 64 && !defined(CONFIG_S390)
+ static inline ino_t
+ cifs_uniqueid_to_ino_t(u64 fileid)
+ {
+-- 
+1.9.1
