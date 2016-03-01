@@ -1,29 +1,49 @@
-From: Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>
-Subject: Re: [PATCH 2/2] CIFS: Fix duplicate line introduced by
-	clone_file_range patch
-Date: Tue, 1 Mar 2016 07:50:50 +0100
-Message-ID: <20160301065050.GD31969@lst.de>
-References: <smfrench@gmail.com> <1456791058-92940-1-git-send-email-smfrench@gmail.com>
+From: Volker Lendecke <Volker.Lendecke@SerNet.DE>
+Subject: Re: Interop Issue: SMB2+ async replies, and the kernel, Samba side
+ fix enclosed.
+Date: Tue, 1 Mar 2016 14:40:39 +0100
+Message-ID: <20160301134039.GA21826@sernet.de>
+References: <CAAPGDwLnp90t7wiRb_tw-Md0jv-8w0Ye66jNcsRNioganVe2xg@mail.gmail.com>
+ <56CC591F.30205@samba.org>
+ <1D07D524-6243-4DF5-BBEB-13EE3A2B62AE@samba.org>
+ <CAAPGDwL-VsVmPzFFEM5nOAgFCz68a2KHWGAy9KH6ED5PD0vx_Q@mail.gmail.com>
+ <20160224190408.GC16429@jra3>
+Reply-To: Volker.Lendecke@SerNet.DE
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
-	Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: Steven French <sfrench@samba.org>, Stefan Metzmacher <metze@samba.org>,
+ Ira Cooper <ira@wakeful.net>,
+ Samba Technical <samba-technical@lists.samba.org>, linux-cifs@vger.kernel.org
+To: Jeremy Allison <jra@samba.org>
+Return-path: <samba-technical-bounces@lists.samba.org>
 Content-Disposition: inline
-In-Reply-To: <1456791058-92940-1-git-send-email-smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+In-Reply-To: <20160224190408.GC16429@jra3>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
+ <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical/>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
+ <mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Errors-To: samba-technical-bounces@lists.samba.org
+Sender: "samba-technical" <samba-technical-bounces@lists.samba.org>
+List-Id: linux-cifs.vger.kernel.org
 
-On Mon, Feb 29, 2016 at 06:10:58PM -0600, Steve French wrote:
-> Commit 04b38d601239b4 ("vfs: pull btrfs clone API to vfs layer")
-> added a duplicated line (in cifsfs.c) which causes a sparse compile
-> warning.
-> 
-> Signed-off-by: Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
-> CC: Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>
+On Wed, Feb 24, 2016 at 11:04:08AM -0800, Jeremy Allison wrote:
+> Hmmm. We can only test this by causing a Windows read to
+> take a long time. Any idea how to test this ? Does Win32
+> have named pipes in the fs we could use for that ? If not
+> we could test using a program that creates a \\pipe\named_pipe
+> and then responds slowly... But I don't know if the
+> timeout replies on np's are the same as in the filesystem.
 
-Oops.  The fix looks fine to me:
+Just use a USB2 stick.
 
-Reviewed-by: Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>
+Volker
+
+-- 
+SerNet GmbH, Bahnhofsallee 1b, 37081 Göttingen
+phone: +49-551-370000-0, fax: +49-551-370000-9
+AG Göttingen, HRB 2816, GF: Dr. Johannes Loxen
+http://www.sernet.de, mailto:kontakt@sernet.de
