@@ -1,49 +1,57 @@
-From: Volker Lendecke <Volker.Lendecke@SerNet.DE>
-Subject: Re: Interop Issue: SMB2+ async replies, and the kernel, Samba side
- fix enclosed.
-Date: Tue, 1 Mar 2016 14:40:39 +0100
-Message-ID: <20160301134039.GA21826@sernet.de>
-References: <CAAPGDwLnp90t7wiRb_tw-Md0jv-8w0Ye66jNcsRNioganVe2xg@mail.gmail.com>
- <56CC591F.30205@samba.org>
- <1D07D524-6243-4DF5-BBEB-13EE3A2B62AE@samba.org>
- <CAAPGDwL-VsVmPzFFEM5nOAgFCz68a2KHWGAy9KH6ED5PD0vx_Q@mail.gmail.com>
- <20160224190408.GC16429@jra3>
-Reply-To: Volker.Lendecke@SerNet.DE
+From: mrs alice <mrs1alice2020-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: PLEASE I NEED YOUR RESPONSE
+Date: Tue, 1 Mar 2016 15:37:26 +0000
+Message-ID: <CAD0rw0rW6tyT2WF4gtFT2UXPeuPqQXnKVLSGDM1szsrwC7NXYQ@mail.gmail.com>
+Reply-To: mrs1alice216-KK7TH6PgNEI@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: Steven French <sfrench@samba.org>, Stefan Metzmacher <metze@samba.org>,
- Ira Cooper <ira@wakeful.net>,
- Samba Technical <samba-technical@lists.samba.org>, linux-cifs@vger.kernel.org
-To: Jeremy Allison <jra@samba.org>
-Return-path: <samba-technical-bounces@lists.samba.org>
-Content-Disposition: inline
-In-Reply-To: <20160224190408.GC16429@jra3>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
- <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical/>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
- <mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Errors-To: samba-technical-bounces@lists.samba.org
-Sender: "samba-technical" <samba-technical-bounces@lists.samba.org>
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+To: undisclosed-recipients:;
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, Feb 24, 2016 at 11:04:08AM -0800, Jeremy Allison wrote:
-> Hmmm. We can only test this by causing a Windows read to
-> take a long time. Any idea how to test this ? Does Win32
-> have named pipes in the fs we could use for that ? If not
-> we could test using a program that creates a \\pipe\named_pipe
-> and then responds slowly... But I don't know if the
-> timeout replies on np's are the same as in the filesystem.
+FROM MRS ALICE HAMANIN.
 
-Just use a USB2 stick.
+FROM ( I MRS ALICE HAMANIN.) Staff of Bank Of Africa in Burkina Faso.
+I would like you to indicate your interest to receive the transfer of
+(15.5 Million Dollars) I will like you to stand as the next of kin to
+my late client whose account is presently dormant for claims. if you
+are interested,indicate and i will intimate you with the method of
+application and how you can apply to the bank.
 
-Volker
+But before i send to you the text of application form,I will like you
+to send me the following informations,
 
--- 
-SerNet GmbH, Bahnhofsallee 1b, 37081 Göttingen
-phone: +49-551-370000-0, fax: +49-551-370000-9
-AG Göttingen, HRB 2816, GF: Dr. Johannes Loxen
-http://www.sernet.de, mailto:kontakt@sernet.de
+please reply through this email (mrsalice94-Qt13gs6zZMY@public.gmane.org)
+
+1.NAME IN FULL:.........................
+
+.....
+2.ADDRESS:.......................................
+3.NATIONALITY:.................................. .
+4.AGE:.............................................
+5.SEX..............................................
+6.OCCUPATION:......................................
+7.MARITAL STATUS:..................................
+8.PRIAVTE PHONE NO.................................
+9.PRIVATE FAX NO:..........................
+10.ATTACH COPY OF YOUR IDENTIFICATION......
+
+Now my questions are:
+1) Can you handle this project?
+2) Can I give you this trust?
+
+so i will like you to send to me those informations for easy and
+effective communication.Upon receipt of your reply, I will send to you
+by fax or email the text of the application form.I will not fail to
+bring to your notice that this transaction is hitch-free and that you
+should not entertain any atom of fear as all required arrangements
+have been made for the transfer. You should contact me immediately as
+soon as you receive this letter,if only you are intrested and ready to
+help. On this Email Address (mrsalice94-Qt13gs6zZMY@public.gmane.org) Trusting to hear
+from you immediately.
+Do keep this a top secret for security reasons.
+
+
+Yours faithfully,
+( I MRS ALICE HAMANIN.)
