@@ -1,57 +1,55 @@
-From: Laison Computech Inc <7sales-mT95+eBjLkWwyptSkfDYNlaTQe2KTcn/@public.gmane.org>
-Subject: CISCO AND AVAYA IP Phones
-Date: Wed, 02 Mar 2016 03:10:34 +0700
-Message-ID: <20160301210941.D8278574BAE__19033.5782398053$1456877693$gmane$org@srv-mta.gcmillenium.com.br>
-Reply-To: sales-mT95+eBjLkWwyptSkfDYNlaTQe2KTcn/@public.gmane.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [GIT] CIFS Fixes
+Date: Wed, 2 Mar 2016 08:27:49 -0600
+Message-ID: <CAH2r5mu43Xa4WbPLYxRN1+Rv2HzL48sfZbeJU+FL+fw6Hh=0=Q@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: Recipients <7sales-mT95+eBjLkWwyptSkfDYNlaTQe2KTcn/@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
+To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Description: Mail message body
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi,
+Various small CIFS/SMB3 fixes for stable.   Fixes address
+oops that can occur when accessing Macs with SMB3, and
+another problem found to Samba when read responses queued
+(e.g. with gluster under Samba)
 
-Clean tested working pulls CPUs and QTYs in stock.
+Please pull the following changes since commit
+fc77dbd34c5c99bce46d40a2491937c3bcbd10af:
 
-115 X X5650
-65 X E5410
-75 X X5660
-145 X E5530
-100 X E5645
-40 X X5680
-75 X X5690
+  Linux 4.5-rc6 (2016-02-28 08:41:20 -0800)
 
-Brand new sealed IP phones and QTYs in stock.
+are available in the git repository at:
 
-55 x CP-7937G
-77 x CP-7942G
-54 x CP-7945G
-75 x CP-7962G
-=2E.....
-45 x Avaya 9630
-65 x Avaya 9641
-55 x Avaya 9640=20
+  git://git.samba.org/sfrench/cifs-2.6.git for-next
 
-USED IT HARDWARE FROM:
+for you to fetch changes up to 9589995e46d89c70c6fa4723c5f3e5ec04c3c3e3:
 
-=46UJITSU       IBM         SUN        HP
-QUANTUM   DELL       HDS        STK
-NETAPP      SGI         Oracle      EMC=B2
+  CIFS: Fix duplicate line introduced by clone_file_range patch
+(2016-03-01 09:38:00 -0600)
 
-3Com, ADVA, Alcatel, Brocade, Cisco,
-Cabletron, Enterasys, Extreme Networks,
-Huawei, Marconi, Nortel, Qlogic, Avaya
+----------------------------------------------------------------
+Justin Maggard (1):
+      cifs: fix out-of-bounds access in lease parsing
 
-Let me know if you're interested. We are very open to offers and willin=
-g to work with you to make sure that we have a deal.
+Pavel Shilovsky (1):
+      CIFS: Fix SMB2+ interim response processing for read requests
 
-Sincerely
-Barbara Johnson
-Laison Computech Inc
-Tel: +1-657-205-7860
-=46ax: +1-347-214-0478
-Email: sales-mT95+eBjLkWwyptSkfDYNlaTQe2KTcn/@public.gmane.org
-Web: www.laisoncomputech.com
+Steve French (1):
+      CIFS: Fix duplicate line introduced by clone_file_range patch
+
+Yadan Fan (1):
+      Fix cifs_uniqueid_to_ino_t() function for s390x
+
+ fs/cifs/cifsfs.c  |  1 -
+ fs/cifs/cifsfs.h  | 12 ++++--------
+ fs/cifs/cifssmb.c | 21 ++++++++++++++++++---
+ fs/cifs/smb2pdu.c | 24 ++++++++++++++----------
+ 4 files changed, 36 insertions(+), 22 deletions(-)
+
+-- 
+Thanks,
+
+Steve
