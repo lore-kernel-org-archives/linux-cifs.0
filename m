@@ -1,103 +1,85 @@
-From: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
-Subject: Re: [PATCH v18 21/22] ext4: Add richacl support
-Date: Fri, 11 Mar 2016 06:27:19 -0800
-Message-ID: <20160311142719.GG14808@infradead.org>
+From: Andreas Gruenbacher <agruenba@redhat.com>
+Subject: Re: [PATCH v18 00/22] Richacls (Core and Ext4)
+Date: Fri, 11 Mar 2016 17:11:51 +0100
+Message-ID: <CAHc6FU4t3yisCM=MXrHRmCja_A8eZOpVa1smJ0gUhv+vuUAuXA@mail.gmail.com>
 References: <1456733847-17982-1-git-send-email-agruenba@redhat.com>
- <1456733847-17982-22-git-send-email-agruenba@redhat.com>
+	<20160311140134.GA14808@infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
-	"Aneesh Kumar K.V" <aneesh.kumar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
-	"J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Trond Myklebust <trond.myklebust-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org,
-	Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-	Andreas Dilger <adilger.kernel-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>,
-	linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Anna Schumaker <anna.schumaker-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>
-To: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <1456733847-17982-22-git-send-email-agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=UTF-8
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	"J. Bruce Fields" <bfields@fieldses.org>,
+	Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+	"Theodore Ts'o" <tytso@mit.edu>, linux-cifs@vger.kernel.org,
+	Linux API <linux-api@vger.kernel.org>,
+	Trond Myklebust <trond.myklebust@primarydata.com>,
+	LKML <linux-kernel@vger.kernel.org>,
+	XFS Developers <xfs@oss.sgi.com>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	Jeff Layton <jlayton@poochiereds.net>,
+	linux-ext4 <linux-ext4@vger.kernel.org>,
+	Anna Schumaker <anna.schumaker@netapp.com>
+To: Christoph Hellwig <hch@infradead.org>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <20160311140134.GA14808@infradead.org>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-> +static inline int
-> +ext4_acl_chmod(struct inode *inode, umode_t mode)
-> +{
-> +	if (IS_RICHACL(inode))
-> +		return richacl_chmod(inode, inode->i_mode);
-> +	return posix_acl_chmod(inode, inode->i_mode);
-> +}
+On Fri, Mar 11, 2016 at 3:01 PM, Christoph Hellwig <hch@infradead.org> wrote:
+> On Mon, Feb 29, 2016 at 09:17:05AM +0100, Andreas Gruenbacher wrote:
+>> Al,
+>>
+>> could you please make sure you are happy with the current version of the
+>> richacl patch queue for the next merge window?
+>
+> I'm still not happy.
+>
+> For one I still see no reason to merge this broken ACL model at all.
+> It provides our actualy Linux users no benefit at all,
 
-Thi isn't ext4-specific and potentially duplicated in every caller.
-Please provide this as a common helper.
+This permission model is useful in mixed environments that involve
+UNIX and Windows machines. Think of NAS boxes with Linux and Windows
+clients, for example. It also fits the NFSv4 ACL model very well. If
+you're not a user dealing with such environments, then the model
+likely won't provide any benefits to *you*, and you're better off with
+a less complicated permission model. That doesn't say anything about
+other users, though.
 
-Also while we're at it, the mode argument is ignore and the function
-always uses inode->i_mode instead.
+> while breaking a lot of assumptions,
 
-> +ext4_get_richacl(struct inode *inode)
-> +{
-> +	const int name_index = EXT4_XATTR_INDEX_RICHACL;
-> +	void *value = NULL;
-> +	struct richacl *acl = NULL;
-> +	int retval;
-> +
-> +	retval = ext4_xattr_get(inode, name_index, "", NULL, 0);
-> +	if (retval > 0) {
-> +		value = kmalloc(retval, GFP_NOFS);
-> +		if (!value)
-> +			return ERR_PTR(-ENOMEM);
-> +		retval = ext4_xattr_get(inode, name_index, "", value, retval);
-> +	}
-> +	if (retval > 0) {
-> +		acl = richacl_from_xattr(&init_user_ns, value, retval);
-> +		if (acl == ERR_PTR(-EINVAL))
-> +			acl = ERR_PTR(-EIO);
+The model is designed specifically to be compliant with the POSIX
+permission model. What assumptions are you talking about?
 
-Shouldn't richacl_from_xattr return the error pointer that ->get_richacl
-callers expect?
+> especially by adding allow and deny ACE at the same time.
 
-> +static int
-> +__ext4_set_richacl(handle_t *handle, struct inode *inode, struct richacl *acl)
-> +{
-> +	const int name_index = EXT4_XATTR_INDEX_RICHACL;
-> +	umode_t mode = inode->i_mode;
-> +	int retval, size;
-> +	void *value;
-> +
-> +	if (richacl_equiv_mode(acl, &mode) == 0) {
-> +		inode->i_ctime = ext4_current_time(inode);
-> +		inode->i_mode = mode;
-> +		ext4_mark_inode_dirty(handle, inode);
-> +		return __ext4_remove_richacl(handle, inode);
-> +	}
+I remember from past discussions that a permission model like the
+POSIX ACL model that doesn't have DENY ACEs would be more to your
+liking. This argument is dead from the start though: NFSv4 ACLs
+without DENY ACEs cannot represent basic file permissions like 0604
+where the owning group has fewer permissions than others, for example
+(see the richaclex(7) man page). We would end up with a permission
+model that isn't even compatible with the traditional POSIX file
+permission model, one which nobody else implements or cares about.
 
-Should this check for a NULL acl instead of special casing that
-in ext4_set_richacl?
+> It also doesn't help with the issue that the main thing it's trying
+> to be compatible with (Windows) actually uses a fundamentally different
+> identifier to apply the ACLs to - as long as you're still limited
+> to users and groups and not guids we'll still have that mapping problem
+> anyway.
 
-> +int
-> +ext4_init_richacl(handle_t *handle, struct inode *inode, struct inode *dir)
-> +{
-> +	struct richacl *acl = richacl_create(&inode->i_mode, dir);
-> +	int error;
-> +
-> +	error = PTR_ERR(acl);
-> +	if (IS_ERR(acl))
-> +		return error;
+Samba has been dealing with mapping between SIDs and UIDs/GIDs for a
+long time, and it's working acceptably well.
 
-	if (IS_ERR(acl))
-		return PTR_ERR(acl);
+We could store SIDs in ACEs, but that wouldn't make the actual
+problems go away: Files on Linux have an owner and an owning group
+which are identitifed by UID/GID, whereas a file is owned by a SID
+which can be either a user or a group in a SID world. Also, processes
+on Linux have an owner and a list of groups which are identified by
+UID/GID, so any SIDs stored in filesystems would never match a
+process, anyway.
 
-> +	if (acl) {
-> +		error = __ext4_set_richacl(handle, inode, acl);
-> +		richacl_put(acl);
-> +	}
+(NFSv4 refers to users and groups as opposed to SIDs, and so it
+doesn't have this problem.)
 
-Shouldn't richacl_create return NULL if the ACL is equivalent to the
-mode bits instead of letting every filesystem figure that out on it's
-own?
+Thanks,
+Andreas
