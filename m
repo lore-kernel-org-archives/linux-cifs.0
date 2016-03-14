@@ -1,103 +1,75 @@
-From: Andreas Gruenbacher <agruenba@redhat.com>
-Subject: Re: [PATCH v18 21/22] ext4: Add richacl support
-Date: Mon, 14 Mar 2016 00:49:57 +0100
-Message-ID: <CAHc6FU4trGRagkjJBA9Hf_fGfCrwhRRDkUbozRxk4E1O-CbXgw@mail.gmail.com>
+From: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH v18 00/22] Richacls (Core and Ext4)
+Date: Sun, 13 Mar 2016 20:54:24 -0700
+Message-ID: <20160314035424.GA7131@jeremy-HP>
 References: <1456733847-17982-1-git-send-email-agruenba@redhat.com>
-	<1456733847-17982-22-git-send-email-agruenba@redhat.com>
-	<20160311142719.GG14808@infradead.org>
+ <20160311140134.GA14808@infradead.org>
+ <CAHc6FU4t3yisCM=MXrHRmCja_A8eZOpVa1smJ0gUhv+vuUAuXA@mail.gmail.com>
+ <CAH2r5mv3OTmPOQBV7xc-uZmB0gWxykXOCEVOcybx3tbHiViTZg@mail.gmail.com>
+ <20160311230254.GG2792@jra3>
+ <CAHc6FU5Bq9afVdNogc9DQYyyXwLfUopXW5ZnSuct3N+NvKW4Rg@mail.gmail.com>
+Reply-To: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs@vger.kernel.org,
-	Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-	Theodore Ts'o <tytso@mit.edu>, Linux API <linux-api@vger.kernel.org>,
-	Trond Myklebust <trond.myklebust@primarydata.com>,
-	LKML <linux-kernel@vger.kernel.org>, XFS Developers <xfs@oss.sgi.com>,
-	"J. Bruce Fields" <bfields@fieldses.org>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	Jeff Layton <jlayton@poochiereds.net>,
-	linux-ext4 <linux-ext4@vger.kernel.org>,
-	Anna Schumaker <anna.schumaker@netapp.com>,
-	"Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
-To: Christoph Hellwig <hch@infradead.org>
-Return-path: <xfs-bounces@oss.sgi.com>
-In-Reply-To: <20160311142719.GG14808@infradead.org>
-List-Unsubscribe: <http://oss.sgi.com/mailman/options/xfs>,
-	<mailto:xfs-request@oss.sgi.com?subject=unsubscribe>
-List-Archive: <http://oss.sgi.com/pipermail/xfs>
-List-Post: <mailto:xfs@oss.sgi.com>
-List-Help: <mailto:xfs-request@oss.sgi.com?subject=help>
-List-Subscribe: <http://oss.sgi.com/mailman/listinfo/xfs>,
-	<mailto:xfs-request@oss.sgi.com?subject=subscribe>
-Errors-To: xfs-bounces@oss.sgi.com
-Sender: xfs-bounces@oss.sgi.com
+Content-Type: text/plain; charset=us-ascii
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+	Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
+	"J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
+	Linux NFS Mailing List <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Linux API <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Trond Myklebust <trond.myklebust-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
+	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	XFS Developers <xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org>,
+	Andreas Dilger <adilger.kernel-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>,
+	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>,
+	linux-ext4 <linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Anna Schumaker <anna.schumaker-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>
+To: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <CAHc6FU5Bq9afVdNogc9DQYyyXwLfUopXW5ZnSuct3N+NvKW4Rg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Fri, Mar 11, 2016 at 3:27 PM, Christoph Hellwig <hch@infradead.org> wrote:
->> +static int
->> +__ext4_set_richacl(handle_t *handle, struct inode *inode, struct richacl *acl)
->> +{
->> +     const int name_index = EXT4_XATTR_INDEX_RICHACL;
->> +     umode_t mode = inode->i_mode;
->> +     int retval, size;
->> +     void *value;
->> +
->> +     if (richacl_equiv_mode(acl, &mode) == 0) {
->> +             inode->i_ctime = ext4_current_time(inode);
->> +             inode->i_mode = mode;
->> +             ext4_mark_inode_dirty(handle, inode);
->> +             return __ext4_remove_richacl(handle, inode);
->> +     }
->
-> Should this check for a NULL acl instead of special casing that
-> in ext4_set_richacl?
+On Mon, Mar 14, 2016 at 12:02:13AM +0100, Andreas Gruenbacher wrote:
+> On Sat, Mar 12, 2016 at 12:02 AM, Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> > On Fri, Mar 11, 2016 at 02:05:16PM -0600, Steve French wrote:
+> >> Sounds like I need to quickly rework the SMB3 ACL helper functions
+> >> for cifs.ko
+> >>
+> >> Also do you know where is the current version of the corresponding
+> >> vfs_richacl for
+> >> Samba which works with the current RichACL format?
+> >
+> > I have a patch for a new vfs_richacl somewhere. I remember
+> > sending it to Andreas for testing...
+> 
+> Ah, the patch was for testing, not resting ... how could I get that mixed up.
 
-I'm not sure I understand what you mean. When iop->set_richacl is
-called with a richacl that is mode-equivalent, the file permission
-bits need to be updated and any existing acl needs to be removed.
-Doing this at the vfs level would result in two calls, iop->setattr
-and iop->set_richacl, which can cause problems. To remove an existing
-acl without setting the mode, set_richacl is called with a NULL
-richacl.
+:-).
 
-__ext4_set_richacl() was split into __ext4_set_richacl() and
-__ext4_remove_richacl() to align with the xfs code due to the
-following comment from Dave Chinner:
-  http://oss.sgi.com/archives/xfs/2015-10/msg00354.html
+> I've applied your patch to the latest master branch, made it compile
+> again, and fixed a few obvious problems. The results I get with
+> smbcacls look reasonable now.
+> 
+> The code is here:
+>   https://github.com/andreas-gruenbacher/samba richacl
+> 
+> I've used the following smb.conf:
+>   [richacl]
+>   comment = Richacl directory
+>   path = /mnt/ext4
+>   vfs objects = richacl
+>   writeable = yes
+>   browseable = yes
 
-Diff here:
-  https://git.kernel.org/cgit/linux/kernel/git/agruen/linux-richacl.git/diff/fs/ext4/richacl.c?id=richacl-2015-10-16&id2=richacl-2015-10-12
+Great ! Once richacls gets into the kernel I'll submit
+this into the Samba master branch.
 
->> +int
->> +ext4_init_richacl(handle_t *handle, struct inode *inode, struct inode *dir)
->> +{
->> +     struct richacl *acl = richacl_create(&inode->i_mode, dir);
->> +     int error;
->> +
->> +     error = PTR_ERR(acl);
->> +     if (IS_ERR(acl))
->> +             return error;
->
->         if (IS_ERR(acl))
->                 return PTR_ERR(acl);
->
->> +     if (acl) {
->> +             error = __ext4_set_richacl(handle, inode, acl);
->> +             richacl_put(acl);
->> +     }
->
-> Shouldn't richacl_create return NULL if the ACL is equivalent to the
-> mode bits instead of letting every filesystem figure that out on it's
-> own?
+> Is there a particular reason why you didn't make vfs_richacl a
+> dynamically loadable module?
 
-Hm, that's what it does?
-
-Thanks,
-Andreas
-
-_______________________________________________
-xfs mailing list
-xfs@oss.sgi.com
-http://oss.sgi.com/mailman/listinfo/xfs
+Probably sheer lazyness :-).
