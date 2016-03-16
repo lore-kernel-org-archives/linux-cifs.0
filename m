@@ -1,28 +1,32 @@
-From: "J. Bruce Fields" <bfields@fieldses.org>
-Subject: Re: [PATCH v18 19/22] richacl: Add richacl xattr handler
-Date: Tue, 15 Mar 2016 17:05:26 -0400
-Message-ID: <20160315210526.GC3658@fieldses.org>
+From: Steve French <smfrench@gmail.com>
+Subject: Re: [PATCH v18 00/22] Richacls (Core and Ext4)
+Date: Tue, 15 Mar 2016 22:28:44 -0500
+Message-ID: <CAH2r5mt1SBnxnu=c8JGA1dmUUcHXG+wYXfWFQCcbC1tZT0BHpQ@mail.gmail.com>
 References: <1456733847-17982-1-git-send-email-agruenba@redhat.com>
-	<1456733847-17982-20-git-send-email-agruenba@redhat.com>
-	<20160311141735.GF14808@infradead.org>
-	<20160311141905.GC13178@fieldses.org>
-	<20160315071014.GB19747@infradead.org>
+	<20160311140134.GA14808@infradead.org>
+	<CAHc6FU4t3yisCM=MXrHRmCja_A8eZOpVa1smJ0gUhv+vuUAuXA@mail.gmail.com>
+	<20160315071103.GC19747@infradead.org> <20160315154514.GB39038@jra3>
+	<20160315201700.GA22945@sernet.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+Cc: "J. Bruce Fields" <bfields@fieldses.org>,
+	Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
 	Theodore Ts'o <tytso@mit.edu>, Andreas Gruenbacher <agruenba@redhat.com>,
-	linux-api@vger.kernel.org,
+	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+	Linux API <linux-api@vger.kernel.org>,
 	Trond Myklebust <trond.myklebust@primarydata.com>,
-	linux-kernel@vger.kernel.org, xfs@oss.sgi.com,
+	LKML <linux-kernel@vger.kernel.org>, XFS Developers <xfs@oss.sgi.com>,
+	Cristoph Hellwig <hch@infradead.org>,
 	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Alexander Viro <viro@zeniv.linux.org.uk>, linux-fsdevel@vger.kernel.org,
-	Jeff Layton <jlayton@poochiereds.net>, linux-ext4@vger.kernel.org,
-	Anna Schumaker <anna.schumaker@netapp.com>
-To: Christoph Hellwig <hch@infradead.org>
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	Jeff Layton <jlayton@poochiereds.net>,
+	linux-ext4 <linux-ext4@vger.kernel.org>,
+	Anna Schumaker <anna.schumaker@netapp.com>, Jeremy Allison <jra@samba.org>
+To: "Volker.Lendecke@sernet.de" <Volker.Lendecke@sernet.de>
 Return-path: <xfs-bounces@oss.sgi.com>
-Content-Disposition: inline
-In-Reply-To: <20160315071014.GB19747@infradead.org>
+In-Reply-To: <20160315201700.GA22945@sernet.de>
 List-Unsubscribe: <http://oss.sgi.com/mailman/options/xfs>,
 	<mailto:xfs-request@oss.sgi.com?subject=unsubscribe>
 List-Archive: <http://oss.sgi.com/pipermail/xfs>
@@ -34,26 +38,29 @@ Errors-To: xfs-bounces@oss.sgi.com
 Sender: xfs-bounces@oss.sgi.com
 List-Id: linux-cifs.vger.kernel.org
 
-On Tue, Mar 15, 2016 at 12:10:14AM -0700, Christoph Hellwig wrote:
-> On Fri, Mar 11, 2016 at 09:19:05AM -0500, J. Bruce Fields wrote:
-> > On Fri, Mar 11, 2016 at 06:17:35AM -0800, Christoph Hellwig wrote:
-> > > On Mon, Feb 29, 2016 at 09:17:24AM +0100, Andreas Gruenbacher wrote:
-> > > > Add richacl xattr handler implementing the xattr operations based on the
-> > > > get_richacl and set_richacl inode operations.
-> > > 
-> > > Given all the issues with Posix ACLs and selinux attributes these really
-> > > should be proper syscalls instead of abusing the xattr interface.
-> > 
-> > What are those problems exactly?
-> 
-> That people get confused between the attr used by the xattr syscall
-> interface and the attr used to store things on disk or the protocol.
-> This has happened every time we have non-native support, e.g. XFS, NFS,
-> CIFS, ntfs, etc.  And it's only going to become worse.
+On Tue, Mar 15, 2016 at 3:17 PM, Volker Lendecke
+<Volker.Lendecke@sernet.de> wrote:
+> On Tue, Mar 15, 2016 at 08:45:14AM -0700, Jeremy Allison wrote:
+>> On Tue, Mar 15, 2016 at 12:11:03AM -0700, Christoph Hellwig wrote:
+>> > People have long learned that we only have 'alloc' permissions.  Any
+>> > model that mixes allow and deny ACE is a mistake.
+>>
+>> People can also learn and change though :-). One of the
+>> biggest complaints people deploying Samba on Linux have is the
+>> incompatible ACL models.
+>
+> Just to confirm: I see this a lot in the field. NFSv4 ACLs, while not a
+> perfect match for NTFS ACLs are a lot closer much more usable to people
+> who want to serve Windows clients.
 
-How has that confusion caused problems in practice?
+Yes (and presumably Macs as well)
 
---b.
+
+
+-- 
+Thanks,
+
+Steve
 
 _______________________________________________
 xfs mailing list
