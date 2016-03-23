@@ -1,99 +1,82 @@
-From: Michael Adam <obnox-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH v18 00/22] Richacls (Core and Ext4)
-Date: Mon, 21 Mar 2016 19:20:57 +0100
-Message-ID: <20160321182057.GF1044@samba.org>
-References: <1456733847-17982-1-git-send-email-agruenba@redhat.com>
- <20160311140134.GA14808@infradead.org>
- <CAHc6FU4t3yisCM=MXrHRmCja_A8eZOpVa1smJ0gUhv+vuUAuXA@mail.gmail.com>
- <20160315071103.GC19747@infradead.org>
- <20160315154514.GB39038@jra3>
- <20160315201700.GA22945@sernet.de>
+From: Laison-2WGxrPcL6/av+0K4mfL3GVAUjnlXr6A1@public.gmane.org, Computech-2WGxrPcL6/av+0K4mfL3GVAUjnlXr6A1@public.gmane.org,
+	"Inc <support"@ensuretech.com
+Subject: CISCO IP PHONES AND CPU's
+Date: Thu, 24 Mar 2016 01:45:20 +0700
+Message-ID: <20160323200919.E7ED4A68C6__11265.6784746379$1458765587$gmane$org@seymour.toledo.br>
+Reply-To: sales-69Ibs8hIYaLnzTGioTClidREWwmQVq3b@public.gmane.org
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="NklN7DEeGtkPCoo3"
-Cc: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
-	"J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
-	Linux NFS Mailing List <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Linux API <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Trond Myklebust <trond.myklebust-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	XFS Developers <xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org>,
-	Andreas Dilger <adilger.kernel-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>,
-	linux-ext4 <linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Anna Schumaker <anna.schumaker-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>
-To: Volker Lendecke <Volker.Lendecke-PS7XAnAlDA+VvDNblw4Uiw@public.gmane.org>,
-	Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+To: Recipients <support-lhT63EwJ3xcqDJ6do+/SaQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20160315201700.GA22945-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org>
+Content-Description: Mail message body
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+Hi,
 
---NklN7DEeGtkPCoo3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Our Stock list.
 
-On 2016-03-15 at 21:17 +0100, Volker Lendecke wrote:
-> On Tue, Mar 15, 2016 at 08:45:14AM -0700, Jeremy Allison wrote:
-> > On Tue, Mar 15, 2016 at 12:11:03AM -0700, Christoph Hellwig wrote:
-> > > People have long learned that we only have 'alloc' permissions.  Any
-> > > model that mixes allow and deny ACE is a mistake.
-> >=20
-> > People can also learn and change though :-). One of the
-> > biggest complaints people deploying Samba on Linux have is the
-> > incompatible ACL models.
->=20
-> Just to confirm: I see this a lot in the field. NFSv4 ACLs, while not a
-> perfect match for NTFS ACLs are a lot closer much more usable to people
-> who want to serve Windows clients.
->=20
-> Also in the pure linux world there is a lot that you can not express
-> with just rwx, sgid, sticky bits and friends. If you want the additional
-> functionality of the richacl bits, I would call it a big mistake to
-> omit negative aces, if just for the reason not to create yet another
-> ACLs flavor.
->=20
-> > Whilst I have sympathy with your intense dislike of the
-> > Windows ACL model, this comes down to the core of "who
-> > do we serve ?"
->=20
-> The world has enough confusion around ACL semanics, please do not add
-> more to it by creating your own model of the day.
+Brand NEW
+96 x Cisco 7900 IP Phone
+87 x Unified IP Phone 6900
+12 x Unified IP Phone 8900
+76 x Unified IP Phone 9900
+55 x Unified IP Phone 8800
+67 x Cisco 1921
+67 x Cisco 1941
+56 x Cisco CP-7961G 7961G
+34 x Cisco CP-7971G-GE 7971G
+19 x Cisco Unified IP Conference Station 7937G Model: 7937 CP-7937G
+20 x Cisco CP-7975G 7975G
 
-Exacty: Like it or not, Windows ACLs are a fact. And the
-approximation by the NFSv4 ACLs is getting closer and closer
-with each iteration... ;-) So it is not only that Windows world
-looking into this.
+Brand New Sealed :
 
-As Volker and Jeremy have pointed out, the lack of ACL semantics
-is one of things the users of Samba complain about most bitterly.
-While Samba can work around it when it is acting exclusively on
-the files, this is not an option when NFS or other protocols are
-to access the data concurrently. In that case we need more
-precision down in the file system. So because they make use of
-*existing* formats and semantics, I think Andreas' richacls are
-just the way to go, as alien as they may seem from the pure linux
-filesystem point of view at first.
+23 x  CISCO1921-SEC/K9
+Conditions: Brand New Sealed
+Description: CISCO 1921 Security Bundle w/SEC license PAK
 
-Cheers - Michael
+45 x CISCO1921/K9
+Conditions: Brand New Sealed
+Description: CISCO 1921 Modular Router, 2 GE, 2 EHWIC slots, 512DRAM, IP Base
 
---NklN7DEeGtkPCoo3
-Content-Type: application/pgp-signature; name="signature.asc"
+(1)  WS-C4500X-16SFP+
+Serial number:  JAE183501L3
+US&#36;2600
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-Comment: comment
+(1)  WS-C3850-48PW-S
+Serial number:  FCW1823C0EW
+US&#36;2650
 
-iEYEARECAAYFAlbwO4kACgkQyU9JOBhPkDSbLgCgg014joqbBszyQNQOfv6cNSVX
-GSIAoJHvKMybjmmMy0l/xqCBjTDuVjzS
-=vumV
------END PGP SIGNATURE-----
+(1)  WS-X6908-10G-2T
+Serial number:  SAL1620CKUB
+US&#36;3650
 
---NklN7DEeGtkPCoo3--
+(1)  ASR1000-ESP10
+Serial number:  JAE181306C3
+US&#36;3800
+
+(1)  AIR-CT5508-250-K9   (this is new but box is open!)
+Serial number:  FCW1521L038
+US&#36;4000
+
+CPUs part number below
+
+89 x  X5650
+
+975 x  X5660
+
+150 x  X5680
+
+265 x  X5690
+
+Kindly make your price offers.
+
+Sincerely
+Barbara Johnson
+Laison Computech
+210 N Scoring Ave,
+Rialto California, 92376
+Tel: +1-657-232-7047
+Fax: +1-347-214-0478
+Email: sales-69Ibs8hIYaLnzTGioTClidREWwmQVq3b@public.gmane.org
