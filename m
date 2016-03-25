@@ -1,145 +1,156 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: "Dey, John F" <jfdey-rEd9KcVInK8dYYaOPf09RA@public.gmane.org>
 Subject: Re: questions cifs.upcall.c
-Date: Thu, 24 Mar 2016 12:50:57 -0400
-Message-ID: <20160324125057.59d34f5b@synchrony.poochiereds.net>
+Date: Fri, 25 Mar 2016 22:11:54 +0000
+Message-ID: <A8994554-2D81-4D87-A767-EF9408C1C86E@fhcrc.org>
 References: <B6CF10CD-10A5-4A30-93D8-E89FE6ED0697@fhcrc.org>
-	<20160324112427.46b0ad33@synchrony.poochiereds.net>
-	<E338E595-7E4A-4738-A69F-6235203605A0@fhcrc.org>
+ <20160324112427.46b0ad33@synchrony.poochiereds.net>
+ <E338E595-7E4A-4738-A69F-6235203605A0@fhcrc.org>
+ <20160324125057.59d34f5b@synchrony.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: multipart/mixed;
+	boundary="_002_A89945542D814D87A767EF9408C1C86Efhcrcorg_"
 Cc: "jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
 	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: "Dey, John F" <jfdey-rEd9KcVInK8dYYaOPf09RA@public.gmane.org>
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <E338E595-7E4A-4738-A69F-6235203605A0-q9hIisBwmLrYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <20160324125057.59d34f5b-08S845evdOaAjSkqwZiSMmfYqLom42DlXqFh9Ls21Oc@public.gmane.org>
+Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 24 Mar 2016 15:46:30 +0000
-"Dey, John F" <jfdey-rEd9KcVInK8dYYaOPf09RA@public.gmane.org> wrote:
+--_002_A89945542D814D87A767EF9408C1C86Efhcrcorg_
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F15E26DABC884647B5A7356D9EF20CE5-Lp/cVzEoVyZxNkQZW8AQUR2eb7JE58TQ@public.gmane.org>
+Content-Transfer-Encoding: base64
 
-> thanks for your reply. I=E2=80=99ve already written the code and it s=
-eems to work fine at our shop. I will request a pull request for the 6.=
-5 release. below is a summary of what I=E2=80=99ve implemented.  I only=
- check the krb5.conf if no credentials are found in /run and /tmp locat=
-ions.
->=20
-> #define CIFS_DEFAULT_KRB5_KEYTAB "/etc/krb5.keytab"
-> #define CIFS_DEFAULT_KRB5_CONF   "/etc/krb5.conf"
-> #define CIFS_CCACHE_CONF         "default_ccache_name"
->=20
->=20
+cGF0Y2ggYXR0YWNoZWQuICBCYXNlZCBvbiBjaWZzLXV0aWwtNi40IA0KDQpGZWF0dXJlOiAgQ2hl
+Y2sgL2V0Yy9rcmI1LmNvbmYgZm9yIGRlZmF1bHRfY2NhY2hlX25hbWUuIFRoaXMgcGF0Y2ggd2ls
+bCBhbGxvdyB1c2VycyB0byBzdG9yZSBLZXJiZXJvcyB0aWNrZXRzIG9uIGEgc2hhcmVkIGRyaXZl
+LiBIUEMgY2x1c3RlcnMgcnVuIGpvYnMgb24gYmVoYWxmIG9mIHVzZXJzLiBUaGUgY2x1c3RlciBl
+ZmZlY3RpdmVseSBmdW5jdGlvbnMgYXMgYSBzaW5nbGUgY29tcHV0ZSByZXNvdXJjZS4gSm9icyB0
+aGF0IHJlcXVpcmUgS2VyYmVyb3Mga2V5cyB3aWxsIGJlIGFibGUgdG8gYWNjZXNzIGtleXMgZnJv
+bSBhIGNvbW1vbiBzaGFyZWQgZHJpdmUgZGVmaW5lZCBieSBrcmI1LmNvbmYuDQogDQoNCg0KDQpP
+biAzLzI0LzE2LCA5OjUwIEFNLCAiSmVmZiBMYXl0b24iIDxqbGF5dG9uQHNhbWJhLm9yZz4gd3Jv
+dGU6DQoNCj5PbiBUaHUsIDI0IE1hciAyMDE2IDE1OjQ2OjMwICswMDAwDQo+IkRleSwgSm9obiBG
+IiA8amZkZXlAZnJlZGh1dGNoLm9yZz4gd3JvdGU6DQo+DQo+PiB0aGFua3MgZm9yIHlvdXIgcmVw
+bHkuIEnigJl2ZSBhbHJlYWR5IHdyaXR0ZW4gdGhlIGNvZGUgYW5kIGl0IHNlZW1zIHRvIHdvcmsg
+ZmluZSBhdCBvdXIgc2hvcC4gSSB3aWxsIHJlcXVlc3QgYSBwdWxsIHJlcXVlc3QgZm9yIHRoZSA2
+LjUgcmVsZWFzZS4gYmVsb3cgaXMgYSBzdW1tYXJ5IG9mIHdoYXQgSeKAmXZlIGltcGxlbWVudGVk
+LiAgSSBvbmx5IGNoZWNrIHRoZSBrcmI1LmNvbmYgaWYgbm8gY3JlZGVudGlhbHMgYXJlIGZvdW5k
+IGluIC9ydW4gYW5kIC90bXAgbG9jYXRpb25zLg0KPj4gDQo+PiAjZGVmaW5lIENJRlNfREVGQVVM
+VF9LUkI1X0tFWVRBQiAiL2V0Yy9rcmI1LmtleXRhYiINCj4+ICNkZWZpbmUgQ0lGU19ERUZBVUxU
+X0tSQjVfQ09ORiAgICIvZXRjL2tyYjUuY29uZiINCj4+ICNkZWZpbmUgQ0lGU19DQ0FDSEVfQ09O
+RiAgICAgICAgICJkZWZhdWx0X2NjYWNoZV9uYW1lIg0KPj4gDQo+PiANCj4NCj5HcmVhdCEgUGxl
+YXNlIHNlbmQgcGF0Y2hlcyBpbnN0ZWFkIG9mIGEgcHVsbCByZXF1ZXN0LCBhbmQgY2MgdGhlDQo+
+bGludXgtY2lmcyBtYWlsaW5nIGxpc3QuIE90aGVycyBtYXkgd2FudCB0byByZXZpZXcgdGhlbSBh
+cyB3ZWxsLg0KPg0KPlRoYW5rcywNCj5KZWZmDQo+DQo+PiANCj4+IC8qDQo+PiAgKiByZWFkIC9l
+dGMva3JiNS5jb25mIGFuZCANCj4+ICAqICBpZiBmb3VuZCByZXR1cm4gZGVmYXVsdF9jY2FjaGVf
+bmFtZQ0KPj4gICogZWxzZSByZXR1cm4gTlVMTA0KPj4gICovDQo+PiBzdGF0aWMgY2hhcioga3Ji
+NWNvbmZfY2NfbmFtZV9wYXRoKGNoYXIqIGtyYjVfY29uZl9maWxlKTsNCj4+IA0KPj4gbWFpbigp
+DQo+PiB7DQo+PiAuLi4NCj4+ICAgICAgICAgY2NkaXIgPSByZXNvbHZlX2tyYjVfZGlyKENJRlNf
+REVGQVVMVF9LUkI1X1VTRVJfRElSLCB1aWQpOw0KPj4gCWlmIChjY2RpciAhPSBOVUxMKQ0KPj4g
+CQlmaW5kX2tyYjVfY2MoY2NkaXIsIHVpZCwgJmJlc3RfY2FjaGUsICZiZXN0X3RpbWUpOw0KPj4g
+CWNjbmFtZSA9IGZpbmRfa3JiNV9jYyhDSUZTX0RFRkFVTFRfS1JCNV9ESVIsIHVpZCwgJmJlc3Rf
+Y2FjaGUsICZiZXN0X3RpbWUpOw0KPj4gCWlmIChjY25hbWUgPT0gTlVMTCkgew0KPj4gCQljY2Rp
+ciA9IGtyYjVjb25mX2NjX25hbWVfcGF0aChDSUZTX0tSQjVfQ09ORik7DQo+PiAJCWNjbmFtZSA9
+IGZpbmRfa3JiNV9jYyhjY2RpciwgdWlkLCAmYmVzdF9jYWNoZSwgJmJlc3RfdGltZSk7DQo+PiAJ
+fQ0KPj4gLi4uDQo+PiB9DQo+PiANCj4+IA0KPj4gDQo+PiANCj4+IA0KPj4gDQo+PiANCj4+IE9u
+IDMvMjQvMTYsIDg6MjQgQU0sICJKZWZmIExheXRvbiIgPGpsYXl0b25Ac2FtYmEub3JnPiB3cm90
+ZToNCj4+IA0KPj4gPk9uIE1vbiwgMjEgTWFyIDIwMTYgMTc6Mzc6MzUgKzAwMDANCj4+ID4iRGV5
+LCBKb2huIEYiIDxqZmRleUBmcmVkaHV0Y2gub3JnPiB3cm90ZToNCj4+ID4gIA0KPj4gPj4gSmVm
+ZiwNCj4+ID4+IA0KPj4gPj4gSSBhbSBzZXR0aW5nIGtyYjUuY29uZiBkZWZhdWx0X2NjYWNoZV9u
+YW1lID0gKHNoYXJlZCBtb3VudCBwb2ludCkuICBUaGUgTUlUIGtyYjUgcm91dGluZXMgd29yayBm
+aW5lIHdpdGggdGhlIHNoYXJlZCBkcml2ZSwgYnV0IGNpZnMudXBjYWxsIGlzIG5vdCByZWFkaW5n
+IHRoZSAvZXRjL2tyYjUuY29uZiBmaWxlIHRvIGZpbmQgdGhlIG5ldyBsb2NhdGlvbi4gIERlZmF1
+bHQgc2VhcmNoIGxvY2F0aW9ucyBzZWVtIHRvIGJlIGhhcmQtY29kZWQgaW50byBjaWZzLnVwY2Fs
+bC4NCj4+ID4+IA0KPj4gPj4gSSBhbSB1c2luZyBVYnVudHUgMTQuMDQgIGNpZnMtdXRpbHMgNi4w
+LiAgSSBoYXZlIGFsc28gY2hlY2sgVWJ1bnR1IDE2LjA0IHdpdGggY2lmcy11dGlsIDYuNS4NCj4+
+ID4+IA0KPj4gPj4gSW4gMjAwOSB5b3UgaGFkIGEgcGF0Y2ggdG8gcmVhZCB0aGUga3JiNUNDTkFN
+RSBlbnZpcm9ubWVudCB2YXJpYWJsZSwgdGhpcyBwYXRjaCBoYXMgc2luY2UgYmVlbiByZW1vdmVk
+LiAgU2V0dGluZyB0aGUgZGVmYXVsdCBwYXRoIGluIGtyYjUuY29uZiBzZWVtcyB0byBzb2x2ZSBh
+IGxvdCBvZiBwcm9ibGVtcyBidXQgY2lmcy51cGNhbGwgaXMgbm90IGNoZWNraW5nIHRoYXQgbG9j
+YXRpb24uIElzIHRoZXJlIGEgcmVhc29uIHdoeSB0aGUga3JiNS5jb25mIGlzIG5vdCBjaGVja2Vk
+Pw0KPj4gPj4gDQo+PiA+PiBXSFkgYXJlIHdlIGRvaW5nIHRoaXM/ICBXZSBydW4gYSBsYXJnZSBs
+aW51eCBjbHVzdGVyLiAgVXNlcnMgaW50ZXJhY3Qgd2l0aCBhIHNldCBvZiBoZWFkIG5vZGVzLiAg
+V2hlbiB1c2VycyBsb2dpbiB0byB0aGUgaGVhZG5vdGVzIHRoZWlyIGtyYjUgdGlja2V0IGlzIHVw
+ZGF0ZWQuICBGcm9tIGhlYWQgbm9kZXMgdXNlcnMgY2FuIHJ1biBqb2JzIG9uIHRoZSBMaW51eCBj
+bHVzdGVyLiAgVGhlIGNsdXN0ZXIgbm9kZXMgZG8gbm90IGhhdmUgdXBkYXRlZCB0aWNrZXRzIHNv
+IHVzZXJzIGpvYnMgZmFpbC4gIFNvIHdlIHdvdWxkIGxpa2UgdG8gdXNlIGEgc2hhcmVkIGRyaXZl
+IGZvciB0aGUgdGlja2V0cyBzbyB0aGF0IGFsbCB0aGUgY2x1c3RlciBub2RlcyBoYXZlIGFuIHVw
+ZGF0ZWQgdGlja2V0Lg0KPj4gPj4gDQo+PiA+PiBUaGFua3MNCj4+ID4+IA0KPj4gPj4gSm9obiBE
+ZXkNCj4+ID4+IEppZGV5QGZyZWRodXRjaC5vcmcNCj4+ID4+IEpvaG5AZnV6emRvZy5jb20NCj4+
+ID4+IA0KPj4gPj4gDQo+PiA+PiAgIA0KPj4gPg0KPj4gPihjYydpbmcgbGludXgtY2lmcyBtYWls
+aW5nIGxpc3QpDQo+PiA+DQo+PiA+SG1tLCBpdCdzIGJlZW4gc28gbG9uZyBzaW5jZSBJIGxvb2tl
+ZCBhdCB0aGF0IGNvZGUsIEkndmUgZm9yZ290dGVuIGhvdw0KPj4gPml0IHdvcmtzLiBMZXQncyBz
+ZWUuLi4NCj4+ID4NCj4+ID4gICAgICAgIGNjZGlyID0gcmVzb2x2ZV9rcmI1X2RpcihDSUZTX0RF
+RkFVTFRfS1JCNV9VU0VSX0RJUiwgdWlkKTsgICAgICAgICAgICAgIA0KPj4gPiAgICAgICAgaWYg
+KGNjZGlyICE9IE5VTEwpICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgDQo+PiA+ICAgICAgICAgICAgICAgIGZpbmRfa3JiNV9jYyhjY2RpciwgdWlk
+LCAmYmVzdF9jYWNoZSwgJmJlc3RfdGltZSk7ICAgICAgICAgICAgICANCj4+ID4gICAgICAgIGNj
+bmFtZSA9IGZpbmRfa3JiNV9jYyhDSUZTX0RFRkFVTFRfS1JCNV9ESVIsIHVpZCwgJmJlc3RfY2Fj
+aGUsICAgICAgICAgIA0KPj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICZiZXN0X3Rp
+bWUpOyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KPj4gPg0KPj4gPg0KPj4gPi4uLmFu
+ZCB0aG9zZSBDSUZTX0RFRkFVTFRfKiBtYWNyb3MgYXJlOg0KPj4gPg0KPj4gPiNkZWZpbmUgQ0lG
+U19ERUZBVUxUX0tSQjVfRElSICAgICAgICAgICAiL3RtcCIgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgDQo+PiA+I2RlZmluZSBDSUZTX0RFRkFVTFRfS1JCNV9VU0VSX0RJUiAgICAg
+ICIvcnVuL3VzZXIvJVUiDQo+PiA+DQo+PiA+U28geWVhaCwgaXQgZG9lcyBzZWVtIHRvIGJlIGhh
+cmRjb2RlZC4gV2h5IHdhcyBpdCB3cml0dGVuIHRoYXQgd2F5Pw0KPj4gPklTVFIgdGhhdCBvbGRl
+ciB2ZXJzaW9ucyBvZiBrcmI1IGxpYnMgbWFkZSBpdCBoYXJkIHRvIGdldCB0byB0aGF0DQo+PiA+
+dmFyaWFibGUgZnJvbSB0aGUgY29uZmlnIGZpbGUsIGJ1dCBtYXliZSBJJ20gcmVtZW1iZXJpbmcg
+d3JvbmcuDQo+PiA+DQo+PiA+SXQgcHJvYmFibHkgd291bGRuJ3QgYmUgdG9vIGhhcmQgdG8gZml4
+LCBidXQgeW91J2QgaGF2ZSB0byBkaWcgaW50byB0aGUNCj4+ID5rcmI1IGxpYnJhcnkgQVBJLiBJ
+IGRvdWJ0IEknbGwgaGF2ZSB0aW1lIHRvIGRvIHRoYXQgYW55dGltZSBzb29uLiBJZg0KPj4gPnlv
+dSBvciB5b3VyIE9TIHZlbmRvciB3YW50cyB0byBwcm9wb3NlIHNvbWUgcGF0Y2hlcyBob3dldmVy
+LCBJJ2QgYmUNCj4+ID5oYXBweSB0byByZXZpZXcgKGFuZCBldmVudHVhbGx5KSBtZXJnZSB0aGVt
+Lg0KPj4gPg0KPj4gPkNoZWVycywNCj4+ID4tLSANCj4+ID5KZWZmIExheXRvbiA8amxheXRvbkBz
+YW1iYS5vcmc+ICANCj4NCj4NCj4tLSANCj5KZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+
+DQo=
 
-Great! Please send patches instead of a pull request, and cc the
-linux-cifs mailing list. Others may want to review them as well.
+--_002_A89945542D814D87A767EF9408C1C86Efhcrcorg_
+Content-Type: application/octet-stream; name="cifs.upcall.patch"
+Content-Description: cifs.upcall.patch
+Content-Disposition: attachment; filename="cifs.upcall.patch"; size=2079;
+	creation-date="Fri, 25 Mar 2016 22:11:54 GMT";
+	modification-date="Fri, 25 Mar 2016 22:11:54 GMT"
+Content-ID: <F83CE4B64948984AADBAF1BB8FA2364C-Lp/cVzEoVyZxNkQZW8AQUR2eb7JE58TQ@public.gmane.org>
+Content-Transfer-Encoding: base64
 
-Thanks,
-Jeff
+NDhhNDkKPiAjaW5jbHVkZSA8ZmNudGwuaD4KNTdhNTksNjEKPiAjZGVmaW5lIENJRlNfREVGQVVM
+VF9LUkI1X0NPTkYgICAgICAgICAgIi9ldGMva3JiNS5jb25mIgo+ICNkZWZpbmUgQ0lGU19DQ0FD
+SEVfQ09ORiAgICAgICAgICAgICAgICAiZGVmYXVsdF9jY2FjaGVfbmFtZSIKPiAjZGVmaW5lIENJ
+RlNfQ0NBQ0hFX0NPTkZfTEVOICAgICAgICAgICAgMTkKMjk3YTMwMiwzNTIKPiAvKgo+ICAqIHJl
+YWQgL2V0Yy9rcmI1LmNvbmYKPiAgKiAgaWYgZm91bmQgcmV0dXJuIGRlZmF1bHRfY2NhY2hlX25h
+bWUKPiAgKiAgZWxzZSByZXR1cm4gTlVMTAo+ICAqLwo+IHN0YXRpYyBjaGFyKgo+IGtyYjVjb25m
+X2NjX25hbWVfcGF0aChjaGFyKiBrcmI1Y29uZl9maWxlKQo+IHsKPiAgICBjaGFyIGJ1Zls0MDk2
+XSwgbmFtZVtNQVhfQ0NOQU1FX0xFTl07Cj4gICAgY2hhciAqcywgKnQ7Cj4gICAgaW50IGZkLCBs
+ZWZ0Owo+ICAgIHNzaXplX3QgbGVuOwo+IAo+ICAgIGZkID0gb3BlbihrcmI1Y29uZl9maWxlLCBP
+X1JET05MWSk7Cj4gICAgaWYgKGZkIDwgMCkgewo+ICAgICAgICBzeXNsb2coTE9HX0RFQlVHLCAi
+JXM6IHVuYWJsZSB0byBvcGVuICVzOiAlZCIsIF9fZnVuY19fLCBidWYsIGVycm5vKTsKPiAgICAg
+ICAgcmV0dXJuIE5VTEw7Cj4gICAgfQo+ICAgIG5hbWVbMF0gPSAnXDAnOwo+ICAgIHMgPSBidWY7
+Cj4gICAgd2hpbGUoKGxlbiA9IHJlYWQoZmQsYnVmLDQwOTYpKSA+IDApIHsKPiAgICAgICBsZWZ0
+ID0gKGludClsZW47Cj4gICAgICAgd2hpbGUgKCBsZWZ0ID4gMCApIHsKPiAgICAgICAgICAgd2hp
+bGUoICpzICYmIGlzc3BhY2UoKnMpICYmIGxlZnQgKSB7ICBzKys7IGxlZnQtLTsgfSAgLyogc2tp
+cCBsZWFkaW5nIHdoaXRlIHNwYWNlICovCj4gICAgICAgICAgIGlmICggc3RybmNtcChzLCBDSUZT
+X0NDQUNIRV9DT05GLCBDSUZTX0NDQUNIRV9DT05GX0xFTikgPT0gMCkgewo+ICAgICAgICAgICAg
+ICBzID0gcyArIENJRlNfQ0NBQ0hFX0NPTkZfTEVOOwo+ICAgICAgICAgICAgICBsZWZ0IC09IENJ
+RlNfQ0NBQ0hFX0NPTkZfTEVOOwo+ICAgICAgICAgICAgICB3aGlsZSggbGVmdCA+IDAgJiYgKGlz
+c3BhY2UoKnMpIHx8ICpzID09ICc9JykgKSB7ICBzKys7IGxlZnQtLTsgfSAgLyogc2tpcCAnID0g
+JyAqLwo+ICAgICAgICAgICAgICB0ID0gbmFtZTsKPiAgICAgICAgICAgICAgd2hpbGUoICpzICYm
+ICFpc3NwYWNlKCpzKSkgewo+ICAgICAgICAgICAgICAgICAqdCA9ICpzOwo+ICAgICAgICAgICAg
+ICAgICBzKys7Cj4gICAgICAgICAgICAgICAgIHQrKzsKPiAgICAgICAgICAgICAgfQo+ICAgICAg
+ICAgICAgICBicmVhazsKPiAgICAgICAgICAgfQo+ICAgICAgICAgICB3aGlsZSggKnMgJiYgKnMg
+IT0gJ1xuJyAmJiBsZWZ0KSB7IHMrKzsgbGVmdC0tOyB9IC8qIHNraXAgdG8gZW5kIG9mIGxpbmUg
+Ki8KPiAgICAgICB9Cj4gICAgfQo+ICAgIGNsb3NlKGZkKTsKPiAgICBpZiAoIG5hbWVbMF0gPT0g
+J1wwJykKPiAgICAgICByZXR1cm4gTlVMTDsKPiAgICBpZiAoc3RybmNtcChuYW1lLCAiRklMRToi
+LCA1KSA9PSAwKSB7ICAvKiByZXR1cm4gZGlyZWN0b3J5IHBhcnQgb2YgY2NhY2hlIHR5cGUgPEZJ
+TEU+ICovCj4gICAgICAgICAgIHMgPSBuYW1lICsgNTsKPiAgICAgICAgICAgdCA9IHJpbmRleChz
+LCAnLycpOwo+ICAgICAgICAgICAqdCA9ICdcMCc7Cj4gICAgICAgICAgIHJldHVybiBzdHJuZHVw
+KHMsIE1BWF9DQ05BTUVfTEVOIC0gNSk7Cj4gICAgfQo+ICAgIHJldHVybiBzdHJuZHVwKG5hbWUs
+IE1BWF9DQ05BTUVfTEVOKTsKPiB9Cj4gCjk2MWExMDE3LDEwMjIKPiAgICAgICAgIGlmIChjY25h
+bWUgPT0gTlVMTCkgewo+ICAgICAgICAgICAgIGNjZGlyID0ga3JiNWNvbmZfY2NfbmFtZV9wYXRo
+KENJRlNfREVGQVVMVF9LUkI1X0NPTkYpOwo+ICAgICAgICAgICAgIGNjbmFtZSA9IGZpbmRfa3Ji
+NV9jYyhjY2RpciwgdWlkLCAmYmVzdF9jYWNoZSwgJmJlc3RfdGltZSk7Cj4gICAgICAgICB9Cj4g
+ICAgICAgICBzeXNsb2coTE9HX0RFQlVHLCAiY2NuYW1lOiAlcyBhcmcudXNlcm5hbWU6ICVzIiwg
+Y2NuYW1lLCBhcmcudXNlcm5hbWUgKTsKPiAK
 
->=20
-> /*
->  * read /etc/krb5.conf and=20
->  *  if found return default_ccache_name
->  * else return NULL
->  */
-> static char* krb5conf_cc_name_path(char* krb5_conf_file);
->=20
-> main()
-> {
-> ...
->         ccdir =3D resolve_krb5_dir(CIFS_DEFAULT_KRB5_USER_DIR, uid);
-> 	if (ccdir !=3D NULL)
-> 		find_krb5_cc(ccdir, uid, &best_cache, &best_time);
-> 	ccname =3D find_krb5_cc(CIFS_DEFAULT_KRB5_DIR, uid, &best_cache, &be=
-st_time);
-> 	if (ccname =3D=3D NULL) {
-> 		ccdir =3D krb5conf_cc_name_path(CIFS_KRB5_CONF);
-> 		ccname =3D find_krb5_cc(ccdir, uid, &best_cache, &best_time);
-> 	}
-> ...
-> }
->=20
->=20
->=20
->=20
->=20
->=20
->=20
-> On 3/24/16, 8:24 AM, "Jeff Layton" <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
->=20
-> >On Mon, 21 Mar 2016 17:37:35 +0000
-> >"Dey, John F" <jfdey-rEd9KcVInK8dYYaOPf09RA@public.gmane.org> wrote:
-> > =20
-> >> Jeff,
-> >>=20
-> >> I am setting krb5.conf default_ccache_name =3D (shared mount point=
-).  The MIT krb5 routines work fine with the shared drive, but cifs.upc=
-all is not reading the /etc/krb5.conf file to find the new location.  D=
-efault search locations seem to be hard-coded into cifs.upcall.
-> >>=20
-> >> I am using Ubuntu 14.04  cifs-utils 6.0.  I have also check Ubuntu=
- 16.04 with cifs-util 6.5.
-> >>=20
-> >> In 2009 you had a patch to read the krb5CCNAME environment variabl=
-e, this patch has since been removed.  Setting the default path in krb5=
-=2Econf seems to solve a lot of problems but cifs.upcall is not checkin=
-g that location. Is there a reason why the krb5.conf is not checked?
-> >>=20
-> >> WHY are we doing this?  We run a large linux cluster.  Users inter=
-act with a set of head nodes.  When users login to the headnotes their =
-krb5 ticket is updated.  From head nodes users can run jobs on the Linu=
-x cluster.  The cluster nodes do not have updated tickets so users jobs=
- fail.  So we would like to use a shared drive for the tickets so that =
-all the cluster nodes have an updated ticket.
-> >>=20
-> >> Thanks
-> >>=20
-> >> John Dey
-> >> Jidey-rEd9KcVInK8dYYaOPf09RA@public.gmane.org
-> >> John-pGYbrA4uTiZBDgjK7y7TUQ@public.gmane.org
-> >>=20
-> >>=20
-> >>  =20
-> >
-> >(cc'ing linux-cifs mailing list)
-> >
-> >Hmm, it's been so long since I looked at that code, I've forgotten h=
-ow
-> >it works. Let's see...
-> >
-> >        ccdir =3D resolve_krb5_dir(CIFS_DEFAULT_KRB5_USER_DIR, uid);=
-             =20
-> >        if (ccdir !=3D NULL)                                        =
-             =20
-> >                find_krb5_cc(ccdir, uid, &best_cache, &best_time);  =
-           =20
-> >        ccname =3D find_krb5_cc(CIFS_DEFAULT_KRB5_DIR, uid, &best_ca=
-che,         =20
-> >                              &best_time);                          =
-   =20
-> >
-> >
-> >...and those CIFS_DEFAULT_* macros are:
-> >
-> >#define CIFS_DEFAULT_KRB5_DIR           "/tmp"                      =
-           =20
-> >#define CIFS_DEFAULT_KRB5_USER_DIR      "/run/user/%U"
-> >
-> >So yeah, it does seem to be hardcoded. Why was it written that way?
-> >ISTR that older versions of krb5 libs made it hard to get to that
-> >variable from the config file, but maybe I'm remembering wrong.
-> >
-> >It probably wouldn't be too hard to fix, but you'd have to dig into =
-the
-> >krb5 library API. I doubt I'll have time to do that anytime soon. If
-> >you or your OS vendor wants to propose some patches however, I'd be
-> >happy to review (and eventually) merge them.
-> >
-> >Cheers,
-> >--=20
-> >Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> =20
-
-
---=20
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+--_002_A89945542D814D87A767EF9408C1C86Efhcrcorg_--
