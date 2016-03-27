@@ -1,113 +1,104 @@
 From: =?UTF-8?B?RMSBdmlzIE1vc8SBbnM=?= <davispuh-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: CIFS hang
-Date: Sun, 27 Mar 2016 05:03:44 +0300
-Message-ID: <CAOE4rSzGegs_ttUsNcd7KPPRcpeZLPCBPMYO9hjuZ2FA+AQUEg@mail.gmail.com>
+Date: Sun, 27 Mar 2016 05:34:25 +0300
+Message-ID: <CAOE4rSzU9+D94ZcOfyQNkgEKbtfj=JtxxSsrkDBOdrDma3=ybg@mail.gmail.com>
 References: <CAOE4rSwtpUqzLUkUytNBJgTfe5kSKqZeKFgrhAP_TD4ms3wyVA@mail.gmail.com>
 	<CAH2r5mshFG2FGaRhXnQ4nVKGd_V+1-eQj1K1JPMBBptdvOJL1Q@mail.gmail.com>
+	<CAOE4rSzGegs_ttUsNcd7KPPRcpeZLPCBPMYO9hjuZ2FA+AQUEg@mail.gmail.com>
+	<CAH2r5mtPHB=c-9Ds5JV2gXPLawS3HR+FMYDP1bzE=8otgkhEFw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mshFG2FGaRhXnQ4nVKGd_V+1-eQj1K1JPMBBptdvOJL1Q-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CAH2r5mtPHB=c-9Ds5JV2gXPLawS3HR+FMYDP1bzE=8otgkhEFw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2016-03-27 4:30 GMT+03:00 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> It sounds like you have three machine scenario involving Windows, cifs
-> client and Samba server.  Can you describe who is the client to what
-> and what the relationship is between Samba server and Windows in your
-> scenario.
+2016-03-27 5:10 GMT+03:00 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+> How reproducible is it?
+
+Currently it happens randomly and I've no idea what or how it's caused
+so I can't reproduce only wait when it happens. But it have happened
+like once every few days.
+
+> Do you see a timeout occurring (ie if you look at /proc/fs/cifs/Stats
+> and /proc/fs/cifs/DebugData you may see session disconnect)?
 >
-> Are you using default mount options?
+
+After it did hung and then restarting smbd, right now everything is working
+and it shows
+
+$ cat /proc/fs/cifs/Stats
+Resources in use
+CIFS Session: 1
+Share (unique mount targets): 1
+SMB Request/Response Buffer: 1 Pool size: 5
+SMB Small Req/Resp Buffer: 1 Pool size: 30
+Operations (MIDs): 0
+
+523 session 5 share reconnects
+Total vfs operations: 280 maximum at one time: 3
+
+1) \\192.168.1.2\Data$
+SMBs: 30
+Negotiates: 0 sent 0 failed
+SessionSetups: 0 sent 0 failed
+Logoffs: 0 sent 0 failed
+TreeConnects: 0 sent 0 failed
+TreeDisconnects: 0 sent 0 failed
+Creates: 0 sent 2 failed
+Closes: 0 sent 0 failed
+Flushes: 0 sent 0 failed
+Reads: 0 sent 0 failed
+Writes: 0 sent 0 failed
+Locks: 0 sent 0 failed
+IOCTLs: 0 sent 0 failed
+Cancels: 0 sent 0 failed
+Echos: 0 sent 0 failed
+QueryDirectories: 0 sent 2 failed
+ChangeNotifies: 0 sent 0 failed
+QueryInfos: 0 sent 0 failed
+SetInfos: 0 sent 0 failed
+OplockBreaks: 0 sent 0 failed
+
+
+$ cat /proc/fs/cifs/DebugData
+Display Internal CIFS Data Structures for Debugging
+---------------------------------------------------
+CIFS Version 2.08
+Features: dfs fscache lanman posix spnego xattr acl
+Active VFS Requests: 0
+Servers:
+1) entry for 192.168.1.2 not fully displayed
+        TCP status: 1
+        Local Users To Server: 1 SecMode: 0x1 Req On Wire: 0
+        Shares:
+        1) \\192.168.1.2\Data$ Mounts: 1 DevInfo: 0x60020 Attributes: 0xc700ff
+        PathComponentMax: 255 Status: 1 type: DISK
+        Share Capabilities: None Aligned, Partition Aligned,    Share
+Flags: 0x0        Optimal sector size: 0x1000
+
+        MIDs:
+
+
+> If the scenario can be narrowed to something small - can you capture a
+> network trace and send it to me
 >
+> https://wiki.samba.org/index.php/Capture_Packets
+>
+> or another page describing how to do this:
+>
+> https://wiki.samba.org/index.php/LinuxCIFS_troubleshooting
+>
+> (the 2nd link also includes information on how to make a more detailed
+> trace of dmesg, the kernel messages which also would be useful)
 
-There's 2 machines, Windows 10 (192.168.1.2 and 192.168.1.3
-it have 2 Ethernet ports) with share Data$
-And Arch Linux which mounts that share and who also have nmbd,
-winbindd and smbd running with several shares
-
-[global]
-        server string = Server
-        workgroup = WORK
-        domain master = Yes
-        preferred master = Yes
-        log file = /var/log/samba/%m.log
-        max log size = 2000
-        printcap name = /etc/printcap
-        name resolve order = host lmhosts wins bcast
-        time server = Yes
-        unix extensions = No
-        security = USER
-        dns proxy = No
-        idmap config * : backend = tdb
-        store dos attributes = Yes
-        map acl inherit = Yes
-        hosts allow = 192.168.0. 192.168.1. 127.
-        inherit acls = Yes
-        inherit permissions = Yes
-        vfs objects = streams_xattr
-
-[Share$]
-        comment = Share
-        path = /mnt/Share
-        wide links = Yes
-        create mask = 0760
-        directory mask = 0750
-        read only = No
-        valid users = @Share
-
-and so on similar shares.
-
-In Windows 10 then these shares are mapped as drive letters.
-So basically both PCs does access and use each other shares in same
-time.
-There actually are other Windows machines too which also use
-these shares and that Windows 10 share but I don't consider them
-important for this issue.
+I'll try to when it happens, but because I don't know how to reproduce it
+will have to wait when it happens again. Also after hang there might not
+be any cifs/samba network traffic at all... So I guess first should
+find out how to
+reproduce it but I've no idea even how... It might be related so some specific
+file access pattern, timing or some other event.
 
 
-Another backtrace is a bit different, but still looks about same:
-
-[47525.047644] INFO: task ls:11662 blocked for more than 120 seconds.
-[47525.047649]       Tainted: P           O    4.5.0-ARCH-dirty #1
-[47525.047651] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-disables this message.
-[47525.047653] ls              D ffff8803d0cdb968     0 11662   8840 0x00000004
-[47525.047658]  ffff8803d0cdb968 0000000000000000 ffff880612f2d580
-ffff88029f8c8000
-[47525.047662]  ffff8803d0cdc000 ffff88020d7e9424 ffff88029f8c8000
-00000000ffffffff
-[47525.047664]  ffff88020d7e9428 ffff8803d0cdb980 ffffffff815947ac
-ffff88020d7e9420
-[47525.047667] Call Trace:
-[47525.047675]  [<ffffffff815947ac>] schedule+0x3c/0x90
-[47525.047678]  [<ffffffff81594b85>] schedule_preempt_disabled+0x15/0x20
-[47525.047681]  [<ffffffff8159603e>] __mutex_lock_slowpath+0xce/0x140
-[47525.047684]  [<ffffffff815960c7>] mutex_lock+0x17/0x30
-[47525.047695]  [<ffffffffa144684c>] small_smb2_init+0x18c/0x3f0 [cifs]
-[47525.047700]  [<ffffffff811c50ee>] ? kmem_cache_alloc_trace+0x1de/0x200
-[47525.047707]  [<ffffffffa14479b9>] SMB2_open+0x79/0x8f0 [cifs]
-[47525.047714]  [<ffffffffa1439e56>] ? cifsConvertToUTF16+0x156/0x2f0 [cifs]
-[47525.047723]  [<ffffffffa143a0b1>] ? cifs_strndup_to_utf16+0xc1/0x110 [cifs]
-[47525.047729]  [<ffffffffa1449ebd>] smb2_open_op_close+0xad/0x1e0 [cifs]
-[47525.047732]  [<ffffffff811b9a0c>] ? alloc_pages_current+0x8c/0x110
-[47525.047736]  [<ffffffff8116a209>] ? alloc_kmem_pages+0x19/0x90
-[47525.047739]  [<ffffffff8118a16e>] ? kmalloc_order_trace+0x2e/0x100
-[47525.047746]  [<ffffffffa144a0f5>] smb2_query_path_info+0x85/0x180 [cifs]
-[47525.047754]  [<ffffffffa1432f98>] cifs_get_inode_info+0x368/0x660 [cifs]
-[47525.047757]  [<ffffffff811f6504>] ? putname+0x54/0x60
-[47525.047760]  [<ffffffff811c48be>] ? __kmalloc+0x2e/0x250
-[47525.047762]  [<ffffffff811f68e6>] ? filename_lookup+0xc6/0x140
-[47525.047770]  [<ffffffffa1429976>] ? build_path_from_dentry+0xb6/0x210 [cifs]
-[47525.047777]  [<ffffffffa14299e9>] ? build_path_from_dentry+0x129/0x210 [cifs]
-[47525.047785]  [<ffffffffa14349aa>]
-cifs_revalidate_dentry_attr+0xda/0xf0 [cifs]
-[47525.047793]  [<ffffffffa1434a71>] cifs_getattr+0x51/0x110 [cifs]
-[47525.047796]  [<ffffffff811ec2d9>] vfs_getattr_nosec+0x29/0x40
-[47525.047798]  [<ffffffff811ec4f6>] vfs_getattr+0x26/0x30
-[47525.047801]  [<ffffffff811ec5d8>] vfs_fstatat+0x78/0xc0
-[47525.047804]  [<ffffffff811ecb26>] SyS_newlstat+0x36/0x70
-[47525.047807]  [<ffffffff811f120e>] ? path_put+0x1e/0x30
-[47525.047809]  [<ffffffff8120bd41>] ? path_getxattr+0x71/0xb0
-[47525.047813]  [<ffffffff8159832e>] entry_SYSCALL_64_fastpath+0x12/0x6d
+Anyway thanks! And hope we'll be able to figure out this one.
