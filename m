@@ -1,168 +1,27 @@
-From: Hannes Frederic Sowa <hannes-tFNcAqjVMyqKXQKiL6tip0B+6BGkLq7r@public.gmane.org>
-Subject: [PATCH net-next] sock: tigthen lockdep checks for sock_owned_by_user
-Date: Fri,  8 Apr 2016 15:11:27 +0200
-Message-ID: <1460121087-2859-1-git-send-email-hannes@stressinduktion.org>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: AKINWUMI <urr-/Yhyw5NYHaO8M6O89LB0+IOsJ71xGSVV@public.gmane.org>
+Subject: FROM: MR. OLIVER SENO!!
+Date: Fri, 8 Apr 2016 11:53:02 -0700
+Message-ID: <SN1PR17MB0494AACCE6E60924D3B2BEEBD0910@SN1PR17MB0494.namprd17.prod.outlook.com>
+Reply-To: <officeosenol-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+To: Recipients <urr-/Yhyw5NYHaO8M6O89LB0+IOsJ71xGSVV@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Description: Mail message body
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-sock_owned_by_user should not be used without socket lock held. It seems
-to be a common practice to check .owned before lock reclassification, so
-provide a little help to abstract this check away.
+Dear Sir.
 
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Cc: linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Cc: linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Signed-off-by: Hannes Frederic Sowa <hannes-tFNcAqjVMyqKXQKiL6tip0B+6BGkLq7r@public.gmane.org>
----
- fs/cifs/connect.c            |  4 ++--
- include/net/sock.h           | 44 +++++++++++++++++++++++++++++---------------
- net/bluetooth/af_bluetooth.c |  2 +-
- net/llc/llc_proc.c           |  2 +-
- net/sunrpc/svcsock.c         |  3 +--
- net/sunrpc/xprtsock.c        |  3 +--
- 6 files changed, 35 insertions(+), 23 deletions(-)
+I bring you greetings. My name is Mr.Oliver Seno Lim, I am a staff of Abbey National Plc. London and heading our regional office in West Africa. Our late customer named Engr.Ben W.westland, made a fixed deposit amount of US$7Million.He did not declare any next of kin in any of his paper work, I want you as a foreigner to stand as the beneficiary to transfer this funds out of my bank into your account, after the successful transfer, we shall share in the ratio of 30% for you, 70%for me. Should you be interested please send me your information:
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index a763cd3d9e7c80..3e37e52639394b 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -2918,7 +2918,7 @@ static inline void
- cifs_reclassify_socket4(struct socket *sock)
- {
- 	struct sock *sk = sock->sk;
--	BUG_ON(sock_owned_by_user(sk));
-+	BUG_ON(!sock_allow_reclassification(sk));
- 	sock_lock_init_class_and_name(sk, "slock-AF_INET-CIFS",
- 		&cifs_slock_key[0], "sk_lock-AF_INET-CIFS", &cifs_key[0]);
- }
-@@ -2927,7 +2927,7 @@ static inline void
- cifs_reclassify_socket6(struct socket *sock)
- {
- 	struct sock *sk = sock->sk;
--	BUG_ON(sock_owned_by_user(sk));
-+	BUG_ON(!sock_allow_reclassification(sk));
- 	sock_lock_init_class_and_name(sk, "slock-AF_INET6-CIFS",
- 		&cifs_slock_key[1], "sk_lock-AF_INET6-CIFS", &cifs_key[1]);
- }
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 81d6fecec0a2c0..baba58770ac593 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -1316,21 +1316,6 @@ static inline void sk_wmem_free_skb(struct sock *sk, struct sk_buff *skb)
- 	__kfree_skb(skb);
- }
+1,Full names.
+2,current residential address.
+3,Tele/Fax numbers./your work.
  
--/* Used by processes to "lock" a socket state, so that
-- * interrupts and bottom half handlers won't change it
-- * from under us. It essentially blocks any incoming
-- * packets, so that we won't get any new data or any
-- * packets that change the state of the socket.
-- *
-- * While locked, BH processing will add new packets to
-- * the backlog queue.  This queue is processed by the
-- * owner of the socket lock right before it is released.
-- *
-- * Since ~2.3.5 it is also exclusive sleep lock serializing
-- * accesses from user process context.
-- */
--#define sock_owned_by_user(sk)	((sk)->sk_lock.owned)
--
- static inline void sock_release_ownership(struct sock *sk)
- {
- 	if (sk->sk_lock.owned) {
-@@ -1403,6 +1388,35 @@ static inline void unlock_sock_fast(struct sock *sk, bool slow)
- 		spin_unlock_bh(&sk->sk_lock.slock);
- }
- 
-+/* Used by processes to "lock" a socket state, so that
-+ * interrupts and bottom half handlers won't change it
-+ * from under us. It essentially blocks any incoming
-+ * packets, so that we won't get any new data or any
-+ * packets that change the state of the socket.
-+ *
-+ * While locked, BH processing will add new packets to
-+ * the backlog queue.  This queue is processed by the
-+ * owner of the socket lock right before it is released.
-+ *
-+ * Since ~2.3.5 it is also exclusive sleep lock serializing
-+ * accesses from user process context.
-+ */
-+
-+static inline bool sock_owned_by_user(const struct sock *sk)
-+{
-+#ifdef CONFIG_LOCKDEP
-+	WARN_ON(!lockdep_sock_is_held(sk));
-+#endif
-+	return sk->sk_lock.owned;
-+}
-+
-+/* no reclassification while locks are held */
-+static inline bool sock_allow_reclassification(const struct sock *csk)
-+{
-+	struct sock *sk = (struct sock *)csk;
-+
-+	return !sk->sk_lock.owned && !spin_is_locked(&sk->sk_lock.slock);
-+}
- 
- struct sock *sk_alloc(struct net *net, int family, gfp_t priority,
- 		      struct proto *prot, int kern);
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 955eda93e66f32..3df7aefb766335 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -65,7 +65,7 @@ static const char *const bt_slock_key_strings[BT_MAX_PROTO] = {
- void bt_sock_reclassify_lock(struct sock *sk, int proto)
- {
- 	BUG_ON(!sk);
--	BUG_ON(sock_owned_by_user(sk));
-+	BUG_ON(!sock_allow_reclassification(sk));
- 
- 	sock_lock_init_class_and_name(sk,
- 			bt_slock_key_strings[proto], &bt_slock_key[proto],
-diff --git a/net/llc/llc_proc.c b/net/llc/llc_proc.c
-index 1a3c7e0f5d0de3..29c509c54bb22d 100644
---- a/net/llc/llc_proc.c
-+++ b/net/llc/llc_proc.c
-@@ -195,7 +195,7 @@ static int llc_seq_core_show(struct seq_file *seq, void *v)
- 		   timer_pending(&llc->pf_cycle_timer.timer),
- 		   timer_pending(&llc->rej_sent_timer.timer),
- 		   timer_pending(&llc->busy_state_timer.timer),
--		   !!sk->sk_backlog.tail, !!sock_owned_by_user(sk));
-+		   !!sk->sk_backlog.tail, !!sk->sk_lock.owned);
- out:
- 	return 0;
- }
-diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index 1413cdcc131c4a..bfe0a06530f6aa 100644
---- a/net/sunrpc/svcsock.c
-+++ b/net/sunrpc/svcsock.c
-@@ -85,8 +85,7 @@ static void svc_reclassify_socket(struct socket *sock)
- {
- 	struct sock *sk = sock->sk;
- 
--	WARN_ON_ONCE(sock_owned_by_user(sk));
--	if (sock_owned_by_user(sk))
-+	if (WARN_ON_ONCE(!sock_allow_reclassification(sk)))
- 		return;
- 
- 	switch (sk->sk_family) {
-diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
-index 65e759569e4873..b7d6b76dede095 100644
---- a/net/sunrpc/xprtsock.c
-+++ b/net/sunrpc/xprtsock.c
-@@ -1881,8 +1881,7 @@ static inline void xs_reclassify_socket6(struct socket *sock)
- 
- static inline void xs_reclassify_socket(int family, struct socket *sock)
- {
--	WARN_ON_ONCE(sock_owned_by_user(sock->sk));
--	if (sock_owned_by_user(sock->sk))
-+	if (WARN_ON_ONCE(!sock_allow_reclassification(sock->sk)))
- 		return;
- 
- 	switch (family) {
--- 
-2.5.5
+   
+All I need from you is your readiness, trustworthiness and edication. Please email me directly on my private email address: officeosenol-/E1597aS9LQAvxtiuMwx3w@public.gmane.org) so we can begin arrangements and I would give you more information on how we would handle this venture and once i hear from you i will give you information of the bank for the transferring funds on your name.
+
+Regards,
+Mr.Oliver Seno Lim 
