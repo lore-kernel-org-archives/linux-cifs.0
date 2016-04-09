@@ -1,7 +1,8 @@
 From: Al Viro <viro-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
-Subject: [PATCH 3/6] cifs: quit playing games with draining iovecs
-Date: Sat, 9 Apr 2016 21:51:29 +0100
-Message-ID: <20160409205129.GI25498@ZenIV.linux.org.uk>
+Subject: [PATCH 4/6] cifs: no need to wank with copying and advancing iovec
+ on recvmsg side either
+Date: Sat, 9 Apr 2016 21:52:10 +0100
+Message-ID: <20160409205210.GJ25498@ZenIV.linux.org.uk>
 References: <20160409204301.GF25498@ZenIV.linux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -13,238 +14,139 @@ In-Reply-To: <20160409204301.GF25498-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gma
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-... and use ITER_BVEC for the page part of request to send
-
 Signed-off-by: Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
 ---
- fs/cifs/cifsproto.h |   2 -
- fs/cifs/transport.c | 141 +++++++++++++++-------------------------------------
- 2 files changed, 41 insertions(+), 102 deletions(-)
+ fs/cifs/cifsglob.h |  2 --
+ fs/cifs/connect.c  | 72 ++++--------------------------------------------------
+ 2 files changed, 5 insertions(+), 69 deletions(-)
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index d9b4f44..7d5f53a 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -37,8 +37,6 @@ extern void cifs_buf_release(void *);
- extern struct smb_hdr *cifs_small_buf_get(void);
- extern void cifs_small_buf_release(void *);
- extern void free_rsp_buf(int, void *);
--extern void cifs_rqst_page_to_kvec(struct smb_rqst *rqst, unsigned int idx,
--					struct kvec *iov);
- extern int smb_send(struct TCP_Server_Info *, struct smb_hdr *,
- 			unsigned int /* length */);
- extern unsigned int _get_xid(void);
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 87abe8e..206a597 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -124,41 +124,32 @@ cifs_delete_mid(struct mid_q_entry *mid)
- /*
-  * smb_send_kvec - send an array of kvecs to the server
-  * @server:	Server to send the data to
-- * @iov:	Pointer to array of kvecs
-- * @n_vec:	length of kvec array
-+ * @smb_msg:	Message to send
-  * @sent:	amount of data sent on socket is stored here
-  *
-  * Our basic "send data to server" function. Should be called with srv_mutex
-  * held. The caller is responsible for handling the results.
-  */
- static int
--smb_send_kvec(struct TCP_Server_Info *server, struct kvec *iov, size_t n_vec,
--		size_t *sent)
-+smb_send_kvec(struct TCP_Server_Info *server, struct msghdr *smb_msg,
-+	      size_t *sent)
- {
- 	int rc = 0;
--	int i = 0;
--	struct msghdr smb_msg;
--	unsigned int remaining;
--	size_t first_vec = 0;
-+	int retries = 0;
- 	struct socket *ssocket = server->ssocket;
- 
- 	*sent = 0;
- 
--	smb_msg.msg_name = (struct sockaddr *) &server->dstaddr;
--	smb_msg.msg_namelen = sizeof(struct sockaddr);
--	smb_msg.msg_control = NULL;
--	smb_msg.msg_controllen = 0;
-+	smb_msg->msg_name = (struct sockaddr *) &server->dstaddr;
-+	smb_msg->msg_namelen = sizeof(struct sockaddr);
-+	smb_msg->msg_control = NULL;
-+	smb_msg->msg_controllen = 0;
- 	if (server->noblocksnd)
--		smb_msg.msg_flags = MSG_DONTWAIT + MSG_NOSIGNAL;
-+		smb_msg->msg_flags = MSG_DONTWAIT + MSG_NOSIGNAL;
- 	else
--		smb_msg.msg_flags = MSG_NOSIGNAL;
--
--	remaining = 0;
--	for (i = 0; i < n_vec; i++)
--		remaining += iov[i].iov_len;
-+		smb_msg->msg_flags = MSG_NOSIGNAL;
- 
--	i = 0;
--	while (remaining) {
-+	while (msg_data_left(smb_msg)) {
- 		/*
- 		 * If blocking send, we try 3 times, since each can block
- 		 * for 5 seconds. For nonblocking  we have to try more
-@@ -177,35 +168,21 @@ smb_send_kvec(struct TCP_Server_Info *server, struct kvec *iov, size_t n_vec,
- 		 * after the retries we will kill the socket and
- 		 * reconnect which may clear the network problem.
- 		 */
--		rc = kernel_sendmsg(ssocket, &smb_msg, &iov[first_vec],
--				    n_vec - first_vec, remaining);
-+		rc = sock_sendmsg(ssocket, smb_msg);
- 		if (rc == -EAGAIN) {
--			i++;
--			if (i >= 14 || (!server->noblocksnd && (i > 2))) {
-+			retries++;
-+			if (retries >= 14 ||
-+			    (!server->noblocksnd && (retries > 2))) {
- 				cifs_dbg(VFS, "sends on sock %p stuck for 15 seconds\n",
- 					 ssocket);
--				rc = -EAGAIN;
--				break;
-+				return -EAGAIN;
- 			}
--			msleep(1 << i);
-+			msleep(1 << retries);
- 			continue;
- 		}
- 
- 		if (rc < 0)
--			break;
--
--		/* send was at least partially successful */
--		*sent += rc;
--
--		if (rc == remaining) {
--			remaining = 0;
--			break;
--		}
--
--		if (rc > remaining) {
--			cifs_dbg(VFS, "sent %d requested %d\n", rc, remaining);
--			break;
--		}
-+			return rc;
- 
- 		if (rc == 0) {
- 			/* should never happen, letting socket clear before
-@@ -215,59 +192,11 @@ smb_send_kvec(struct TCP_Server_Info *server, struct kvec *iov, size_t n_vec,
- 			continue;
- 		}
- 
--		remaining -= rc;
--
--		/* the line below resets i */
--		for (i = first_vec; i < n_vec; i++) {
--			if (iov[i].iov_len) {
--				if (rc > iov[i].iov_len) {
--					rc -= iov[i].iov_len;
--					iov[i].iov_len = 0;
--				} else {
--					iov[i].iov_base += rc;
--					iov[i].iov_len -= rc;
--					first_vec = i;
--					break;
--				}
--			}
--		}
--
--		i = 0; /* in case we get ENOSPC on the next send */
--		rc = 0;
-+		/* send was at least partially successful */
-+		*sent += rc;
-+		retries = 0; /* in case we get ENOSPC on the next send */
- 	}
--	return rc;
--}
--
--/**
-- * rqst_page_to_kvec - Turn a slot in the smb_rqst page array into a kvec
-- * @rqst: pointer to smb_rqst
-- * @idx: index into the array of the page
-- * @iov: pointer to struct kvec that will hold the result
-- *
-- * Helper function to convert a slot in the rqst->rq_pages array into a kvec.
-- * The page will be kmapped and the address placed into iov_base. The length
-- * will then be adjusted according to the ptailoff.
-- */
--void
--cifs_rqst_page_to_kvec(struct smb_rqst *rqst, unsigned int idx,
--			struct kvec *iov)
--{
--	/*
--	 * FIXME: We could avoid this kmap altogether if we used
--	 * kernel_sendpage instead of kernel_sendmsg. That will only
--	 * work if signing is disabled though as sendpage inlines the
--	 * page directly into the fraglist. If userspace modifies the
--	 * page after we calculate the signature, then the server will
--	 * reject it and may break the connection. kernel_sendmsg does
--	 * an extra copy of the data and avoids that issue.
--	 */
--	iov->iov_base = kmap(rqst->rq_pages[idx]);
--
--	/* if last page, don't send beyond this offset into page */
--	if (idx == (rqst->rq_npages - 1))
--		iov->iov_len = rqst->rq_tailsz;
--	else
--		iov->iov_len = rqst->rq_pagesz;
-+	return 0;
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index d21da9f..df03c5e 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -615,8 +615,6 @@ struct TCP_Server_Info {
+ 	bool	sec_mskerberos;		/* supports legacy MS Kerberos */
+ 	bool	large_buf;		/* is current buffer large? */
+ 	struct delayed_work	echo; /* echo ping workqueue job */
+-	struct kvec *iov;	/* reusable kvec array for receives */
+-	unsigned int nr_iov;	/* number of kvecs in array */
+ 	char	*smallbuf;	/* pointer to current "small" buffer */
+ 	char	*bigbuf;	/* pointer to current "big" buffer */
+ 	unsigned int total_read; /* total amount of data read in this pass */
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index a763cd3..eb42665 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -501,77 +501,20 @@ server_unresponsive(struct TCP_Server_Info *server)
+ 	return false;
  }
  
- static unsigned long
-@@ -299,8 +228,9 @@ smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
- 	unsigned int smb_buf_length = get_rfc1002_length(iov[0].iov_base);
- 	unsigned long send_length;
- 	unsigned int i;
--	size_t total_len = 0, sent;
-+	size_t total_len = 0, sent, size;
- 	struct socket *ssocket = server->ssocket;
-+	struct msghdr smb_msg;
- 	int val = 1;
- 
- 	if (ssocket == NULL)
-@@ -321,7 +251,13 @@ smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
- 	kernel_setsockopt(ssocket, SOL_TCP, TCP_CORK,
- 				(char *)&val, sizeof(val));
- 
--	rc = smb_send_kvec(server, iov, n_vec, &sent);
-+	size = 0;
-+	for (i = 0; i < n_vec; i++)
-+		size += iov[i].iov_len;
-+
-+	iov_iter_kvec(&smb_msg.msg_iter, WRITE | ITER_KVEC, iov, n_vec, size);
-+
-+	rc = smb_send_kvec(server, &smb_msg, &sent);
- 	if (rc < 0)
- 		goto uncork;
- 
-@@ -329,11 +265,16 @@ smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
- 
- 	/* now walk the page array and send each page in it */
- 	for (i = 0; i < rqst->rq_npages; i++) {
--		struct kvec p_iov;
+-/*
+- * kvec_array_init - clone a kvec array, and advance into it
+- * @new:	pointer to memory for cloned array
+- * @iov:	pointer to original array
+- * @nr_segs:	number of members in original array
+- * @bytes:	number of bytes to advance into the cloned array
+- *
+- * This function will copy the array provided in iov to a section of memory
+- * and advance the specified number of bytes into the new array. It returns
+- * the number of segments in the new array. "new" must be at least as big as
+- * the original iov array.
+- */
+-static unsigned int
+-kvec_array_init(struct kvec *new, struct kvec *iov, unsigned int nr_segs,
+-		size_t bytes)
+-{
+-	size_t base = 0;
 -
--		cifs_rqst_page_to_kvec(rqst, i, &p_iov);
--		rc = smb_send_kvec(server, &p_iov, 1, &sent);
--		kunmap(rqst->rq_pages[i]);
-+		size_t len = i == rqst->rq_npages - 1
-+				? rqst->rq_tailsz
-+				: rqst->rq_pagesz;
-+		struct bio_vec bvec = {
-+			.bv_page = rqst->rq_pages[i],
-+			.bv_len = len
-+		};
-+		iov_iter_bvec(&smb_msg.msg_iter, WRITE | ITER_BVEC,
-+			      &bvec, 1, len);
-+		rc = smb_send_kvec(server, &smb_msg, &sent);
- 		if (rc < 0)
- 			break;
+-	while (bytes || !iov->iov_len) {
+-		int copy = min(bytes, iov->iov_len);
+-
+-		bytes -= copy;
+-		base += copy;
+-		if (iov->iov_len == base) {
+-			iov++;
+-			nr_segs--;
+-			base = 0;
+-		}
+-	}
+-	memcpy(new, iov, sizeof(*iov) * nr_segs);
+-	new->iov_base += base;
+-	new->iov_len -= base;
+-	return nr_segs;
+-}
+-
+-static struct kvec *
+-get_server_iovec(struct TCP_Server_Info *server, unsigned int nr_segs)
+-{
+-	struct kvec *new_iov;
+-
+-	if (server->iov && nr_segs <= server->nr_iov)
+-		return server->iov;
+-
+-	/* not big enough -- allocate a new one and release the old */
+-	new_iov = kmalloc(sizeof(*new_iov) * nr_segs, GFP_NOFS);
+-	if (new_iov) {
+-		kfree(server->iov);
+-		server->iov = new_iov;
+-		server->nr_iov = nr_segs;
+-	}
+-	return new_iov;
+-}
+-
+ int
+ cifs_readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
+ 		       unsigned int nr_segs, unsigned int to_read)
+ {
+ 	int length = 0;
+ 	int total_read;
+-	unsigned int segs;
+ 	struct msghdr smb_msg;
+-	struct kvec *iov;
+-
+-	iov = get_server_iovec(server, nr_segs);
+-	if (!iov)
+-		return -ENOMEM;
  
+ 	smb_msg.msg_control = NULL;
+ 	smb_msg.msg_controllen = 0;
++	iov_iter_kvec(&smb_msg.msg_iter, READ | ITER_KVEC,
++		      iov_orig, nr_segs, to_read);
+ 
+-	for (total_read = 0; to_read; total_read += length, to_read -= length) {
++	for (total_read = 0; msg_data_left(&smb_msg); total_read += length) {
+ 		try_to_freeze();
+ 
+ 		if (server_unresponsive(server)) {
+@@ -579,10 +522,7 @@ cifs_readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
+ 			break;
+ 		}
+ 
+-		segs = kvec_array_init(iov, iov_orig, nr_segs, total_read);
+-
+-		length = kernel_recvmsg(server->ssocket, &smb_msg,
+-					iov, segs, to_read, 0);
++		length = sock_recvmsg(server->ssocket, &smb_msg, 0);
+ 
+ 		if (server->tcpStatus == CifsExiting) {
+ 			total_read = -ESHUTDOWN;
+@@ -603,8 +543,7 @@ cifs_readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
+ 			length = 0;
+ 			continue;
+ 		} else if (length <= 0) {
+-			cifs_dbg(FYI, "Received no data or error: expecting %d\n"
+-				 "got %d", to_read, length);
++			cifs_dbg(FYI, "Received no data or error: %d\n", length);
+ 			cifs_reconnect(server);
+ 			total_read = -ECONNABORTED;
+ 			break;
+@@ -783,7 +722,6 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
+ 	}
+ 
+ 	kfree(server->hostname);
+-	kfree(server->iov);
+ 	kfree(server);
+ 
+ 	length = atomic_dec_return(&tcpSesAllocCount);
 -- 
 2.8.0.rc3
