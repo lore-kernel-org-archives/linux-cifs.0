@@ -1,15 +1,29 @@
-From: darlehen-eshH1AjLspA@public.gmane.org
-Subject: LOAN
-Date: Sat, 09 Apr 2016 03:31:47 +0530
-Message-ID: <20160408215949.F218E3B6B81__1841.6898012676$1460203207$gmane$org@bescomm.terengganu.my>
-Reply-To: legacyassetgrougp-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org
+From: "Jeff Allen" <jinjerdinss-ytc+IHgoah0@public.gmane.org>
+Subject: need customers?
+Date: Sat, 09 Apr 2016 11:05:50 +0200
+Message-ID: <46de100608260aa807175f53e9888383@lindyfishingtackle.com>
+Reply-To: hanmeimei10-Dw/NWeUnuQfQT0dZR+AlfA@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-To: Recipients <darlehen-eshH1AjLspA@public.gmane.org>
+Content-Type: text/plain; format=flowed; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Description: Mail message body
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Brauchen Sie einen Kredit? Wir bieten Darlehen in 2% gelten heute Kontakt mit uns auf: legacyassetgrougp-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org
+Hey,
+
+Greeting!!
+
+Do you need to increase your sales?
+Do you need more clients leads?
+Do you need our marketing services?
+
+No matter you are selling products or services, we can generate you new
+leads from our marketing service.
+
+If you need more information please contact us today.
+
+Thanks,
+Jeff Allen
+Contact: xxianyus-k+cT0dCbe1g@public.gmane.org
