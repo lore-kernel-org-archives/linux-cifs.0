@@ -1,137 +1,325 @@
-From: Al Viro <viro-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
-Subject: [PATCH 1/6] [net] drop 'size' argument of sock_recvmsg()
-Date: Sat, 9 Apr 2016 21:50:29 +0100
-Message-ID: <20160409205029.GG25498@ZenIV.linux.org.uk>
+From: Al Viro <viro@ZenIV.linux.org.uk>
+Subject: [PATCH 2/6] cifs: merge the hash calculation helpers
+Date: Sat, 9 Apr 2016 21:50:57 +0100
+Message-ID: <20160409205056.GH25498@ZenIV.linux.org.uk>
 References: <20160409204301.GF25498@ZenIV.linux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: linux-kernel@vger.kernel.org
+To: linux-cifs@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20160409204301.GF25498-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+In-Reply-To: <20160409204301.GF25498@ZenIV.linux.org.uk>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-all callers have it equal to msg_data_left(msg).
+three practically identical copies...
 
-Signed-off-by: Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
+Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
 ---
- drivers/target/iscsi/iscsi_target_util.c |  5 ++---
- include/linux/net.h                      |  3 +--
- net/socket.c                             | 23 ++++++++++-------------
- 3 files changed, 13 insertions(+), 18 deletions(-)
+ fs/cifs/cifsencrypt.c   |  97 ++++++++++++++++++++++++-------------------
+ fs/cifs/cifsproto.h     |   3 ++
+ fs/cifs/smb2transport.c | 107 +++++-------------------------------------------
+ 3 files changed, 67 insertions(+), 140 deletions(-)
 
-diff --git a/drivers/target/iscsi/iscsi_target_util.c b/drivers/target/iscsi/iscsi_target_util.c
-index 428b0d9..5772038 100644
---- a/drivers/target/iscsi/iscsi_target_util.c
-+++ b/drivers/target/iscsi/iscsi_target_util.c
-@@ -1283,9 +1283,8 @@ static int iscsit_do_rx_data(
- 	iov_iter_kvec(&msg.msg_iter, READ | ITER_KVEC,
- 		      count->iov, count->iov_count, data);
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 4897dac..6aeb8d4 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -66,45 +66,15 @@ cifs_crypto_shash_md5_allocate(struct TCP_Server_Info *server)
+ 	return 0;
+ }
  
--	while (total_rx < data) {
--		rx_loop = sock_recvmsg(conn->sock, &msg,
--				      (data - total_rx), MSG_WAITALL);
-+	while (msg_data_left(&msg)) {
-+		rx_loop = sock_recvmsg(conn->sock, &msg, MSG_WAITALL);
- 		if (rx_loop <= 0) {
- 			pr_debug("rx_loop: %d total_rx: %d\n",
- 				rx_loop, total_rx);
-diff --git a/include/linux/net.h b/include/linux/net.h
-index 49175e4..72c1e06 100644
---- a/include/linux/net.h
-+++ b/include/linux/net.h
-@@ -218,8 +218,7 @@ int sock_create_lite(int family, int type, int proto, struct socket **res);
- struct socket *sock_alloc(void);
- void sock_release(struct socket *sock);
- int sock_sendmsg(struct socket *sock, struct msghdr *msg);
--int sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t size,
--		 int flags);
-+int sock_recvmsg(struct socket *sock, struct msghdr *msg, int flags);
- struct file *sock_alloc_file(struct socket *sock, int flags, const char *dname);
- struct socket *sockfd_lookup(int fd, int *err);
- struct socket *sock_from_file(struct file *file, int *err);
-diff --git a/net/socket.c b/net/socket.c
-index 5f77a8e..956426e3 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -709,17 +709,16 @@ void __sock_recv_ts_and_drops(struct msghdr *msg, struct sock *sk,
- EXPORT_SYMBOL_GPL(__sock_recv_ts_and_drops);
- 
- static inline int sock_recvmsg_nosec(struct socket *sock, struct msghdr *msg,
--				     size_t size, int flags)
-+				     int flags)
+-/*
+- * Calculate and return the CIFS signature based on the mac key and SMB PDU.
+- * The 16 byte signature must be allocated by the caller. Note we only use the
+- * 1st eight bytes and that the smb header signature field on input contains
+- * the sequence number before this function is called. Also, this function
+- * should be called with the server->srv_mutex held.
+- */
+-static int cifs_calc_signature(struct smb_rqst *rqst,
+-			struct TCP_Server_Info *server, char *signature)
++int __cifs_calc_signature(struct smb_rqst *rqst,
++			struct TCP_Server_Info *server, char *signature,
++			struct shash_desc *shash)
  {
--	return sock->ops->recvmsg(sock, msg, size, flags);
-+	return sock->ops->recvmsg(sock, msg, msg_data_left(msg), flags);
+ 	int i;
+ 	int rc;
+ 	struct kvec *iov = rqst->rq_iov;
+ 	int n_vec = rqst->rq_nvec;
+ 
+-	if (iov == NULL || signature == NULL || server == NULL)
+-		return -EINVAL;
+-
+-	if (!server->secmech.sdescmd5) {
+-		rc = cifs_crypto_shash_md5_allocate(server);
+-		if (rc) {
+-			cifs_dbg(VFS, "%s: Can't alloc md5 crypto\n", __func__);
+-			return -1;
+-		}
+-	}
+-
+-	rc = crypto_shash_init(&server->secmech.sdescmd5->shash);
+-	if (rc) {
+-		cifs_dbg(VFS, "%s: Could not init md5\n", __func__);
+-		return rc;
+-	}
+-
+-	rc = crypto_shash_update(&server->secmech.sdescmd5->shash,
+-		server->session_key.response, server->session_key.len);
+-	if (rc) {
+-		cifs_dbg(VFS, "%s: Could not update with response\n", __func__);
+-		return rc;
+-	}
+-
+ 	for (i = 0; i < n_vec; i++) {
+ 		if (iov[i].iov_len == 0)
+ 			continue;
+@@ -117,12 +87,10 @@ static int cifs_calc_signature(struct smb_rqst *rqst,
+ 		if (i == 0) {
+ 			if (iov[0].iov_len <= 8) /* cmd field at offset 9 */
+ 				break; /* nothing to sign or corrupt header */
+-			rc =
+-			crypto_shash_update(&server->secmech.sdescmd5->shash,
++			rc = crypto_shash_update(shash,
+ 				iov[i].iov_base + 4, iov[i].iov_len - 4);
+ 		} else {
+-			rc =
+-			crypto_shash_update(&server->secmech.sdescmd5->shash,
++			rc = crypto_shash_update(shash,
+ 				iov[i].iov_base, iov[i].iov_len);
+ 		}
+ 		if (rc) {
+@@ -134,21 +102,64 @@ static int cifs_calc_signature(struct smb_rqst *rqst,
+ 
+ 	/* now hash over the rq_pages array */
+ 	for (i = 0; i < rqst->rq_npages; i++) {
+-		struct kvec p_iov;
++		void *kaddr = kmap(rqst->rq_pages[i]);
++		size_t len = rqst->rq_pagesz;
++
++		if (i == rqst->rq_npages - 1)
++			len = rqst->rq_tailsz;
++
++		crypto_shash_update(shash, kaddr, len);
+ 
+-		cifs_rqst_page_to_kvec(rqst, i, &p_iov);
+-		crypto_shash_update(&server->secmech.sdescmd5->shash,
+-					p_iov.iov_base, p_iov.iov_len);
+ 		kunmap(rqst->rq_pages[i]);
+ 	}
+ 
+-	rc = crypto_shash_final(&server->secmech.sdescmd5->shash, signature);
++	rc = crypto_shash_final(shash, signature);
+ 	if (rc)
+-		cifs_dbg(VFS, "%s: Could not generate md5 hash\n", __func__);
++		cifs_dbg(VFS, "%s: Could not generate hash\n", __func__);
+ 
+ 	return rc;
  }
  
--int sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t size,
--		 int flags)
-+int sock_recvmsg(struct socket *sock, struct msghdr *msg, int flags)
++/*
++ * Calculate and return the CIFS signature based on the mac key and SMB PDU.
++ * The 16 byte signature must be allocated by the caller. Note we only use the
++ * 1st eight bytes and that the smb header signature field on input contains
++ * the sequence number before this function is called. Also, this function
++ * should be called with the server->srv_mutex held.
++ */
++static int cifs_calc_signature(struct smb_rqst *rqst,
++			struct TCP_Server_Info *server, char *signature)
++{
++	int rc;
++
++	if (!rqst->rq_iov || !signature || !server)
++		return -EINVAL;
++
++	if (!server->secmech.sdescmd5) {
++		rc = cifs_crypto_shash_md5_allocate(server);
++		if (rc) {
++			cifs_dbg(VFS, "%s: Can't alloc md5 crypto\n", __func__);
++			return -1;
++		}
++	}
++
++	rc = crypto_shash_init(&server->secmech.sdescmd5->shash);
++	if (rc) {
++		cifs_dbg(VFS, "%s: Could not init md5\n", __func__);
++		return rc;
++	}
++
++	rc = crypto_shash_update(&server->secmech.sdescmd5->shash,
++		server->session_key.response, server->session_key.len);
++	if (rc) {
++		cifs_dbg(VFS, "%s: Could not update with response\n", __func__);
++		return rc;
++	}
++
++	return __cifs_calc_signature(rqst, server, signature,
++				     &server->secmech.sdescmd5->shash);
++}
++
+ /* must be called with server->srv_mutex held */
+ int cifs_sign_rqst(struct smb_rqst *rqst, struct TCP_Server_Info *server,
+ 		   __u32 *pexpected_response_sequence_number)
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index eed7ff5..d9b4f44 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -512,4 +512,7 @@ int cifs_create_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+ 			   struct cifs_sb_info *cifs_sb,
+ 			   const unsigned char *path, char *pbuf,
+ 			   unsigned int *pbytes_written);
++int __cifs_calc_signature(struct smb_rqst *rqst,
++			struct TCP_Server_Info *server, char *signature,
++			struct shash_desc *shash);
+ #endif			/* _CIFSPROTO_H */
+diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+index 8732a43..bc9a7b6 100644
+--- a/fs/cifs/smb2transport.c
++++ b/fs/cifs/smb2transport.c
+@@ -135,11 +135,10 @@ smb2_find_smb_ses(struct smb2_hdr *smb2hdr, struct TCP_Server_Info *server)
+ int
+ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
  {
--	int err = security_socket_recvmsg(sock, msg, size, flags);
-+	int err = security_socket_recvmsg(sock, msg, msg_data_left(msg), flags);
+-	int i, rc;
++	int rc;
+ 	unsigned char smb2_signature[SMB2_HMACSHA256_SIZE];
+ 	unsigned char *sigptr = smb2_signature;
+ 	struct kvec *iov = rqst->rq_iov;
+-	int n_vec = rqst->rq_nvec;
+ 	struct smb2_hdr *smb2_pdu = (struct smb2_hdr *)iov[0].iov_base;
+ 	struct cifs_ses *ses;
  
--	return err ?: sock_recvmsg_nosec(sock, msg, size, flags);
-+	return err ?: sock_recvmsg_nosec(sock, msg, flags);
+@@ -171,53 +170,11 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+ 		return rc;
+ 	}
+ 
+-	for (i = 0; i < n_vec; i++) {
+-		if (iov[i].iov_len == 0)
+-			continue;
+-		if (iov[i].iov_base == NULL) {
+-			cifs_dbg(VFS, "null iovec entry\n");
+-			return -EIO;
+-		}
+-		/*
+-		 * The first entry includes a length field (which does not get
+-		 * signed that occupies the first 4 bytes before the header).
+-		 */
+-		if (i == 0) {
+-			if (iov[0].iov_len <= 8) /* cmd field at offset 9 */
+-				break; /* nothing to sign or corrupt header */
+-			rc =
+-			crypto_shash_update(
+-				&server->secmech.sdeschmacsha256->shash,
+-				iov[i].iov_base + 4, iov[i].iov_len - 4);
+-		} else {
+-			rc =
+-			crypto_shash_update(
+-				&server->secmech.sdeschmacsha256->shash,
+-				iov[i].iov_base, iov[i].iov_len);
+-		}
+-		if (rc) {
+-			cifs_dbg(VFS, "%s: Could not update with payload\n",
+-				 __func__);
+-			return rc;
+-		}
+-	}
+-
+-	/* now hash over the rq_pages array */
+-	for (i = 0; i < rqst->rq_npages; i++) {
+-		struct kvec p_iov;
+-
+-		cifs_rqst_page_to_kvec(rqst, i, &p_iov);
+-		crypto_shash_update(&server->secmech.sdeschmacsha256->shash,
+-					p_iov.iov_base, p_iov.iov_len);
+-		kunmap(rqst->rq_pages[i]);
+-	}
+-
+-	rc = crypto_shash_final(&server->secmech.sdeschmacsha256->shash,
+-				sigptr);
+-	if (rc)
+-		cifs_dbg(VFS, "%s: Could not generate sha256 hash\n", __func__);
++	rc = __cifs_calc_signature(rqst, server, sigptr,
++		&server->secmech.sdeschmacsha256->shash);
+ 
+-	memcpy(smb2_pdu->Signature, sigptr, SMB2_SIGNATURE_SIZE);
++	if (!rc)
++		memcpy(smb2_pdu->Signature, sigptr, SMB2_SIGNATURE_SIZE);
+ 
+ 	return rc;
  }
- EXPORT_SYMBOL(sock_recvmsg);
+@@ -395,12 +352,10 @@ generate_smb311signingkey(struct cifs_ses *ses)
+ int
+ smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+ {
+-	int i;
+ 	int rc = 0;
+ 	unsigned char smb3_signature[SMB2_CMACAES_SIZE];
+ 	unsigned char *sigptr = smb3_signature;
+ 	struct kvec *iov = rqst->rq_iov;
+-	int n_vec = rqst->rq_nvec;
+ 	struct smb2_hdr *smb2_pdu = (struct smb2_hdr *)iov[0].iov_base;
+ 	struct cifs_ses *ses;
  
-@@ -746,7 +745,7 @@ int kernel_recvmsg(struct socket *sock, struct msghdr *msg,
+@@ -431,54 +386,12 @@ smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+ 		cifs_dbg(VFS, "%s: Could not init cmac aes\n", __func__);
+ 		return rc;
+ 	}
++	
++	rc = __cifs_calc_signature(rqst, server, sigptr,
++				   &server->secmech.sdesccmacaes->shash);
  
- 	iov_iter_kvec(&msg->msg_iter, READ | ITER_KVEC, vec, num, size);
- 	set_fs(KERNEL_DS);
--	result = sock_recvmsg(sock, msg, size, flags);
-+	result = sock_recvmsg(sock, msg, flags);
- 	set_fs(oldfs);
- 	return result;
+-	for (i = 0; i < n_vec; i++) {
+-		if (iov[i].iov_len == 0)
+-			continue;
+-		if (iov[i].iov_base == NULL) {
+-			cifs_dbg(VFS, "null iovec entry");
+-			return -EIO;
+-		}
+-		/*
+-		 * The first entry includes a length field (which does not get
+-		 * signed that occupies the first 4 bytes before the header).
+-		 */
+-		if (i == 0) {
+-			if (iov[0].iov_len <= 8) /* cmd field at offset 9 */
+-				break; /* nothing to sign or corrupt header */
+-			rc =
+-			crypto_shash_update(
+-				&server->secmech.sdesccmacaes->shash,
+-				iov[i].iov_base + 4, iov[i].iov_len - 4);
+-		} else {
+-			rc =
+-			crypto_shash_update(
+-				&server->secmech.sdesccmacaes->shash,
+-				iov[i].iov_base, iov[i].iov_len);
+-		}
+-		if (rc) {
+-			cifs_dbg(VFS, "%s: Couldn't update cmac aes with payload\n",
+-							__func__);
+-			return rc;
+-		}
+-	}
+-
+-	/* now hash over the rq_pages array */
+-	for (i = 0; i < rqst->rq_npages; i++) {
+-		struct kvec p_iov;
+-
+-		cifs_rqst_page_to_kvec(rqst, i, &p_iov);
+-		crypto_shash_update(&server->secmech.sdesccmacaes->shash,
+-					p_iov.iov_base, p_iov.iov_len);
+-		kunmap(rqst->rq_pages[i]);
+-	}
+-
+-	rc = crypto_shash_final(&server->secmech.sdesccmacaes->shash,
+-						sigptr);
+-	if (rc)
+-		cifs_dbg(VFS, "%s: Could not generate cmac aes\n", __func__);
+-
+-	memcpy(smb2_pdu->Signature, sigptr, SMB2_SIGNATURE_SIZE);
++	if (!rc)
++		memcpy(smb2_pdu->Signature, sigptr, SMB2_SIGNATURE_SIZE);
+ 
+ 	return rc;
  }
-@@ -796,7 +795,7 @@ static ssize_t sock_read_iter(struct kiocb *iocb, struct iov_iter *to)
- 	if (!iov_iter_count(to))	/* Match SYS5 behaviour */
- 		return 0;
- 
--	res = sock_recvmsg(sock, &msg, iov_iter_count(to), msg.msg_flags);
-+	res = sock_recvmsg(sock, &msg, msg.msg_flags);
- 	*to = msg.msg_iter;
- 	return res;
- }
-@@ -1696,7 +1695,7 @@ SYSCALL_DEFINE6(recvfrom, int, fd, void __user *, ubuf, size_t, size,
- 	msg.msg_iocb = NULL;
- 	if (sock->file->f_flags & O_NONBLOCK)
- 		flags |= MSG_DONTWAIT;
--	err = sock_recvmsg(sock, &msg, iov_iter_count(&msg.msg_iter), flags);
-+	err = sock_recvmsg(sock, &msg, flags);
- 
- 	if (err >= 0 && addr != NULL) {
- 		err2 = move_addr_to_user(&address,
-@@ -2073,7 +2072,7 @@ static int ___sys_recvmsg(struct socket *sock, struct user_msghdr __user *msg,
- 	struct iovec iovstack[UIO_FASTIOV];
- 	struct iovec *iov = iovstack;
- 	unsigned long cmsg_ptr;
--	int total_len, len;
-+	int len;
- 	ssize_t err;
- 
- 	/* kernel mode address */
-@@ -2091,7 +2090,6 @@ static int ___sys_recvmsg(struct socket *sock, struct user_msghdr __user *msg,
- 		err = copy_msghdr_from_user(msg_sys, msg, &uaddr, &iov);
- 	if (err < 0)
- 		return err;
--	total_len = iov_iter_count(&msg_sys->msg_iter);
- 
- 	cmsg_ptr = (unsigned long)msg_sys->msg_control;
- 	msg_sys->msg_flags = flags & (MSG_CMSG_CLOEXEC|MSG_CMSG_COMPAT);
-@@ -2101,8 +2099,7 @@ static int ___sys_recvmsg(struct socket *sock, struct user_msghdr __user *msg,
- 
- 	if (sock->file->f_flags & O_NONBLOCK)
- 		flags |= MSG_DONTWAIT;
--	err = (nosec ? sock_recvmsg_nosec : sock_recvmsg)(sock, msg_sys,
--							  total_len, flags);
-+	err = (nosec ? sock_recvmsg_nosec : sock_recvmsg)(sock, msg_sys, flags);
- 	if (err < 0)
- 		goto out_freeiov;
- 	len = err;
 -- 
 2.8.0.rc3
