@@ -1,7 +1,7 @@
 From: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 3/8] cifs: Fix removexattr for os2.* xattrs
-Date: Thu, 14 Apr 2016 00:27:41 +0200
-Message-ID: <1460586466-5518-4-git-send-email-agruenba@redhat.com>
+Subject: [PATCH 2/8] cifs: Check for equality with ACL_TYPE_ACCESS and ACL_TYPE_DEFAULT
+Date: Thu, 14 Apr 2016 00:27:40 +0200
+Message-ID: <1460586466-5518-3-git-send-email-agruenba@redhat.com>
 References: <1460586466-5518-1-git-send-email-agruenba@redhat.com>
 Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
@@ -13,57 +13,36 @@ References: <20160413182026.GR25498-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gman
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-If cifs_removexattr finds a "user." or "os2." xattr name prefix, it
-skips 5 bytes, one byte too many for "os2.".
+The two values ACL_TYPE_ACCESS and ACL_TYPE_DEFAULT are meant to be
+enumerations, not bits in a bit mask.  Use '==' instead of '&' to check
+for these values.
 
 Signed-off-by: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/xattr.c | 26 +++++++++++++++++---------
- 1 file changed, 17 insertions(+), 9 deletions(-)
+ fs/cifs/cifssmb.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/xattr.c b/fs/cifs/xattr.c
-index 6e73ba9..721c6db 100644
---- a/fs/cifs/xattr.c
-+++ b/fs/cifs/xattr.c
-@@ -61,15 +61,7 @@ int cifs_removexattr(struct dentry *direntry, const char *ea_name)
- 	}
- 	if (ea_name == NULL) {
- 		cifs_dbg(FYI, "Null xattr names not supported\n");
--	} else if (strncmp(ea_name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LEN)
--		&& (strncmp(ea_name, XATTR_OS2_PREFIX, XATTR_OS2_PREFIX_LEN))) {
--		cifs_dbg(FYI,
--			 "illegal xattr request %s (only user namespace supported)\n",
--			 ea_name);
--		/* BB what if no namespace prefix? */
--		/* Should we just pass them to server, except for
--		system and perhaps security prefixes? */
--	} else {
-+	} else if (!strncmp(ea_name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LEN)) {
- 		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_XATTR)
- 			goto remove_ea_exit;
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 76fcb50..f24a89c 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -3366,7 +3366,7 @@ static int cifs_copy_posix_acl(char *trgt, char *src, const int buflen,
+ 	if (le16_to_cpu(cifs_acl->version) != CIFS_ACL_VERSION)
+ 		return -EOPNOTSUPP;
  
-@@ -78,6 +70,22 @@ int cifs_removexattr(struct dentry *direntry, const char *ea_name)
- 			rc = pTcon->ses->server->ops->set_EA(xid, pTcon,
- 				full_path, ea_name, NULL, (__u16)0,
- 				cifs_sb->local_nls, cifs_remap(cifs_sb));
-+	} else if (!strncmp(ea_name, XATTR_OS2_PREFIX, XATTR_OS2_PREFIX_LEN)) {
-+		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_XATTR)
-+			goto remove_ea_exit;
-+
-+		ea_name += XATTR_OS2_PREFIX_LEN; /* skip past os2. prefix */
-+		if (pTcon->ses->server->ops->set_EA)
-+			rc = pTcon->ses->server->ops->set_EA(xid, pTcon,
-+				full_path, ea_name, NULL, (__u16)0,
-+				cifs_sb->local_nls, cifs_remap(cifs_sb));
-+	} else {
-+		cifs_dbg(FYI,
-+			 "illegal xattr request %s (only user namespace supported)\n",
-+			 ea_name);
-+		/* BB what if no namespace prefix? */
-+		/* Should we just pass them to server, except for
-+		system and perhaps security prefixes? */
- 	}
- remove_ea_exit:
- 	kfree(full_path);
+-	if (acl_type & ACL_TYPE_ACCESS) {
++	if (acl_type == ACL_TYPE_ACCESS) {
+ 		count = le16_to_cpu(cifs_acl->access_entry_count);
+ 		pACE = &cifs_acl->ace_array[0];
+ 		size = sizeof(struct cifs_posix_acl);
+@@ -3377,7 +3377,7 @@ static int cifs_copy_posix_acl(char *trgt, char *src, const int buflen,
+ 				 size_of_data_area, size);
+ 			return -EINVAL;
+ 		}
+-	} else if (acl_type & ACL_TYPE_DEFAULT) {
++	} else if (acl_type == ACL_TYPE_DEFAULT) {
+ 		count = le16_to_cpu(cifs_acl->access_entry_count);
+ 		size = sizeof(struct cifs_posix_acl);
+ 		size += sizeof(struct cifs_posix_ace) * count;
 -- 
 2.4.11
