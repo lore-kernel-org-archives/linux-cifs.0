@@ -1,60 +1,338 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [RFC][PATCHSET] reduce messing with iovecs in cifs
-Date: Sun, 10 Apr 2016 21:43:35 -0500
-Message-ID: <CADT32eL2iKXSiYKtD1FCtoN_8eS=Dqt_cZV8duyhGsyJs-dviQ@mail.gmail.com>
+Subject: Re: [PATCH 2/6] cifs: merge the hash calculation helpers
+Date: Wed, 13 Apr 2016 00:07:28 -0500
+Message-ID: <CADT32e+b8Shp8+SprXEZm8ZEC3KYYQHyd4m+7ahU2Xbnx3Lf4g@mail.gmail.com>
 References: <20160409204301.GF25498@ZenIV.linux.org.uk>
+	<20160409205056.GH25498@ZenIV.linux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
 	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 To: Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20160409204301.GF25498-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
+In-Reply-To: <20160409205056.GH25498-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Looking at the series. I briefly looked at 2/6 and looks correct but
-would add tested-by once I test that patch
-against a SMB server.
+Looks correct.
+Tested with -o vers=1.0, -o vers=2.0, and -o vers=2.1.
+Will test using mount option vers=3.0 as soon as I find a server.
 
-On Sat, Apr 9, 2016 at 3:43 PM, Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org> wrote:
->         Now that sendmsg/recvmsg do not mangle iovecs and are capable of
-> handling bvec-based ->msg_iter, we can seriously reduce the amount of PITA
-> in cifs.  The series below is completely untested, and I would appreciate
-> comments/review/testing/etc.
+Reviewed-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Tested-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+
+On Sat, Apr 9, 2016 at 3:50 PM, Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org> wrote:
+> three practically identical copies...
 >
-> I'll post the individual patches in followups; for those who prefer to use
-> git it can be found in
-> git://git.kernel.org/pub/scm/linux/kernel/git/viro/vfs.git sendmsg.cifs
+> Signed-off-by: Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
+> ---
+>  fs/cifs/cifsencrypt.c   |  97 ++++++++++++++++++++++++-------------------
+>  fs/cifs/cifsproto.h     |   3 ++
+>  fs/cifs/smb2transport.c | 107 +++++-------------------------------------------
+>  3 files changed, 67 insertions(+), 140 deletions(-)
 >
-> 1/6: [net] drop 'size' argument of sock_recvmsg()
->         should go via net-next; does what it says.
+> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+> index 4897dac..6aeb8d4 100644
+> --- a/fs/cifs/cifsencrypt.c
+> +++ b/fs/cifs/cifsencrypt.c
+> @@ -66,45 +66,15 @@ cifs_crypto_shash_md5_allocate(struct TCP_Server_Info *server)
+>         return 0;
+>  }
 >
-> 2/6: cifs: merge the hash calculation helpers
->         takes the common parts of {cifs,smb2,smb3}_calc_signature() into a
-> common helper.
+> -/*
+> - * Calculate and return the CIFS signature based on the mac key and SMB PDU.
+> - * The 16 byte signature must be allocated by the caller. Note we only use the
+> - * 1st eight bytes and that the smb header signature field on input contains
+> - * the sequence number before this function is called. Also, this function
+> - * should be called with the server->srv_mutex held.
+> - */
+> -static int cifs_calc_signature(struct smb_rqst *rqst,
+> -                       struct TCP_Server_Info *server, char *signature)
+> +int __cifs_calc_signature(struct smb_rqst *rqst,
+> +                       struct TCP_Server_Info *server, char *signature,
+> +                       struct shash_desc *shash)
+>  {
+>         int i;
+>         int rc;
+>         struct kvec *iov = rqst->rq_iov;
+>         int n_vec = rqst->rq_nvec;
 >
-> 3/6: cifs: quit playing games with draining iovecs
->         Switch smb_send_kvec() to passing msghdr (and thus iov_iter) and
-> make it use sock_sendmsg() - that allows to avoid draining iovecs, since
-> ->msg_iter will be advanced properly and all we need is to keep it around
-> between the calls of sock_sendmsg(), rather than reinitializing it on each
-> loop iteration.  The same thing allows to get rid of messing with kmap()
-> when sending the stuff in ->rq_pages[] - ITER_BVEC will do the right thing.
+> -       if (iov == NULL || signature == NULL || server == NULL)
+> -               return -EINVAL;
+> -
+> -       if (!server->secmech.sdescmd5) {
+> -               rc = cifs_crypto_shash_md5_allocate(server);
+> -               if (rc) {
+> -                       cifs_dbg(VFS, "%s: Can't alloc md5 crypto\n", __func__);
+> -                       return -1;
+> -               }
+> -       }
+> -
+> -       rc = crypto_shash_init(&server->secmech.sdescmd5->shash);
+> -       if (rc) {
+> -               cifs_dbg(VFS, "%s: Could not init md5\n", __func__);
+> -               return rc;
+> -       }
+> -
+> -       rc = crypto_shash_update(&server->secmech.sdescmd5->shash,
+> -               server->session_key.response, server->session_key.len);
+> -       if (rc) {
+> -               cifs_dbg(VFS, "%s: Could not update with response\n", __func__);
+> -               return rc;
+> -       }
+> -
+>         for (i = 0; i < n_vec; i++) {
+>                 if (iov[i].iov_len == 0)
+>                         continue;
+> @@ -117,12 +87,10 @@ static int cifs_calc_signature(struct smb_rqst *rqst,
+>                 if (i == 0) {
+>                         if (iov[0].iov_len <= 8) /* cmd field at offset 9 */
+>                                 break; /* nothing to sign or corrupt header */
+> -                       rc =
+> -                       crypto_shash_update(&server->secmech.sdescmd5->shash,
+> +                       rc = crypto_shash_update(shash,
+>                                 iov[i].iov_base + 4, iov[i].iov_len - 4);
+>                 } else {
+> -                       rc =
+> -                       crypto_shash_update(&server->secmech.sdescmd5->shash,
+> +                       rc = crypto_shash_update(shash,
+>                                 iov[i].iov_base, iov[i].iov_len);
+>                 }
+>                 if (rc) {
+> @@ -134,21 +102,64 @@ static int cifs_calc_signature(struct smb_rqst *rqst,
 >
-> 4/6: cifs: no need to wank with copying and advancing iovec on recvmsg side either
->         Similar to the previous - use sock_recvmsg() in cifs_readv_from_socket()
-> and there's no need to modify iovecs, or allocate a copy especially for
-> such modifications, etc.
+>         /* now hash over the rq_pages array */
+>         for (i = 0; i < rqst->rq_npages; i++) {
+> -               struct kvec p_iov;
+> +               void *kaddr = kmap(rqst->rq_pages[i]);
+> +               size_t len = rqst->rq_pagesz;
+> +
+> +               if (i == rqst->rq_npages - 1)
+> +                       len = rqst->rq_tailsz;
+> +
+> +               crypto_shash_update(shash, kaddr, len);
 >
-> 5/6: cifs_readv_receive: use cifs_read_from_socket()
->         building a 1-element iovec array for cifs_readv_from_socket() is
-> an overkill - simple cifs_read_from_socket() will do just fine.
+> -               cifs_rqst_page_to_kvec(rqst, i, &p_iov);
+> -               crypto_shash_update(&server->secmech.sdescmd5->shash,
+> -                                       p_iov.iov_base, p_iov.iov_len);
+>                 kunmap(rqst->rq_pages[i]);
+>         }
 >
-> 6/6: cifs: don't bother with kmap on read_pages side
->         Similar to the other half of 3/6: we can use ITER_BVEC for
-> read-into-page case.  Just make cifs_readv_from_socket() take msghdr from
-> caller and use a helper that would feed it a bvec-backed ->msg_iter.
+> -       rc = crypto_shash_final(&server->secmech.sdescmd5->shash, signature);
+> +       rc = crypto_shash_final(shash, signature);
+>         if (rc)
+> -               cifs_dbg(VFS, "%s: Could not generate md5 hash\n", __func__);
+> +               cifs_dbg(VFS, "%s: Could not generate hash\n", __func__);
+>
+>         return rc;
+>  }
+>
+> +/*
+> + * Calculate and return the CIFS signature based on the mac key and SMB PDU.
+> + * The 16 byte signature must be allocated by the caller. Note we only use the
+> + * 1st eight bytes and that the smb header signature field on input contains
+> + * the sequence number before this function is called. Also, this function
+> + * should be called with the server->srv_mutex held.
+> + */
+> +static int cifs_calc_signature(struct smb_rqst *rqst,
+> +                       struct TCP_Server_Info *server, char *signature)
+> +{
+> +       int rc;
+> +
+> +       if (!rqst->rq_iov || !signature || !server)
+> +               return -EINVAL;
+> +
+> +       if (!server->secmech.sdescmd5) {
+> +               rc = cifs_crypto_shash_md5_allocate(server);
+> +               if (rc) {
+> +                       cifs_dbg(VFS, "%s: Can't alloc md5 crypto\n", __func__);
+> +                       return -1;
+> +               }
+> +       }
+> +
+> +       rc = crypto_shash_init(&server->secmech.sdescmd5->shash);
+> +       if (rc) {
+> +               cifs_dbg(VFS, "%s: Could not init md5\n", __func__);
+> +               return rc;
+> +       }
+> +
+> +       rc = crypto_shash_update(&server->secmech.sdescmd5->shash,
+> +               server->session_key.response, server->session_key.len);
+> +       if (rc) {
+> +               cifs_dbg(VFS, "%s: Could not update with response\n", __func__);
+> +               return rc;
+> +       }
+> +
+> +       return __cifs_calc_signature(rqst, server, signature,
+> +                                    &server->secmech.sdescmd5->shash);
+> +}
+> +
+>  /* must be called with server->srv_mutex held */
+>  int cifs_sign_rqst(struct smb_rqst *rqst, struct TCP_Server_Info *server,
+>                    __u32 *pexpected_response_sequence_number)
+> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> index eed7ff5..d9b4f44 100644
+> --- a/fs/cifs/cifsproto.h
+> +++ b/fs/cifs/cifsproto.h
+> @@ -512,4 +512,7 @@ int cifs_create_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+>                            struct cifs_sb_info *cifs_sb,
+>                            const unsigned char *path, char *pbuf,
+>                            unsigned int *pbytes_written);
+> +int __cifs_calc_signature(struct smb_rqst *rqst,
+> +                       struct TCP_Server_Info *server, char *signature,
+> +                       struct shash_desc *shash);
+>  #endif                 /* _CIFSPROTO_H */
+> diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+> index 8732a43..bc9a7b6 100644
+> --- a/fs/cifs/smb2transport.c
+> +++ b/fs/cifs/smb2transport.c
+> @@ -135,11 +135,10 @@ smb2_find_smb_ses(struct smb2_hdr *smb2hdr, struct TCP_Server_Info *server)
+>  int
+>  smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+>  {
+> -       int i, rc;
+> +       int rc;
+>         unsigned char smb2_signature[SMB2_HMACSHA256_SIZE];
+>         unsigned char *sigptr = smb2_signature;
+>         struct kvec *iov = rqst->rq_iov;
+> -       int n_vec = rqst->rq_nvec;
+>         struct smb2_hdr *smb2_pdu = (struct smb2_hdr *)iov[0].iov_base;
+>         struct cifs_ses *ses;
+>
+> @@ -171,53 +170,11 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+>                 return rc;
+>         }
+>
+> -       for (i = 0; i < n_vec; i++) {
+> -               if (iov[i].iov_len == 0)
+> -                       continue;
+> -               if (iov[i].iov_base == NULL) {
+> -                       cifs_dbg(VFS, "null iovec entry\n");
+> -                       return -EIO;
+> -               }
+> -               /*
+> -                * The first entry includes a length field (which does not get
+> -                * signed that occupies the first 4 bytes before the header).
+> -                */
+> -               if (i == 0) {
+> -                       if (iov[0].iov_len <= 8) /* cmd field at offset 9 */
+> -                               break; /* nothing to sign or corrupt header */
+> -                       rc =
+> -                       crypto_shash_update(
+> -                               &server->secmech.sdeschmacsha256->shash,
+> -                               iov[i].iov_base + 4, iov[i].iov_len - 4);
+> -               } else {
+> -                       rc =
+> -                       crypto_shash_update(
+> -                               &server->secmech.sdeschmacsha256->shash,
+> -                               iov[i].iov_base, iov[i].iov_len);
+> -               }
+> -               if (rc) {
+> -                       cifs_dbg(VFS, "%s: Could not update with payload\n",
+> -                                __func__);
+> -                       return rc;
+> -               }
+> -       }
+> -
+> -       /* now hash over the rq_pages array */
+> -       for (i = 0; i < rqst->rq_npages; i++) {
+> -               struct kvec p_iov;
+> -
+> -               cifs_rqst_page_to_kvec(rqst, i, &p_iov);
+> -               crypto_shash_update(&server->secmech.sdeschmacsha256->shash,
+> -                                       p_iov.iov_base, p_iov.iov_len);
+> -               kunmap(rqst->rq_pages[i]);
+> -       }
+> -
+> -       rc = crypto_shash_final(&server->secmech.sdeschmacsha256->shash,
+> -                               sigptr);
+> -       if (rc)
+> -               cifs_dbg(VFS, "%s: Could not generate sha256 hash\n", __func__);
+> +       rc = __cifs_calc_signature(rqst, server, sigptr,
+> +               &server->secmech.sdeschmacsha256->shash);
+>
+> -       memcpy(smb2_pdu->Signature, sigptr, SMB2_SIGNATURE_SIZE);
+> +       if (!rc)
+> +               memcpy(smb2_pdu->Signature, sigptr, SMB2_SIGNATURE_SIZE);
+>
+>         return rc;
+>  }
+> @@ -395,12 +352,10 @@ generate_smb311signingkey(struct cifs_ses *ses)
+>  int
+>  smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+>  {
+> -       int i;
+>         int rc = 0;
+>         unsigned char smb3_signature[SMB2_CMACAES_SIZE];
+>         unsigned char *sigptr = smb3_signature;
+>         struct kvec *iov = rqst->rq_iov;
+> -       int n_vec = rqst->rq_nvec;
+>         struct smb2_hdr *smb2_pdu = (struct smb2_hdr *)iov[0].iov_base;
+>         struct cifs_ses *ses;
+>
+> @@ -431,54 +386,12 @@ smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+>                 cifs_dbg(VFS, "%s: Could not init cmac aes\n", __func__);
+>                 return rc;
+>         }
+> +
+> +       rc = __cifs_calc_signature(rqst, server, sigptr,
+> +                                  &server->secmech.sdesccmacaes->shash);
+>
+> -       for (i = 0; i < n_vec; i++) {
+> -               if (iov[i].iov_len == 0)
+> -                       continue;
+> -               if (iov[i].iov_base == NULL) {
+> -                       cifs_dbg(VFS, "null iovec entry");
+> -                       return -EIO;
+> -               }
+> -               /*
+> -                * The first entry includes a length field (which does not get
+> -                * signed that occupies the first 4 bytes before the header).
+> -                */
+> -               if (i == 0) {
+> -                       if (iov[0].iov_len <= 8) /* cmd field at offset 9 */
+> -                               break; /* nothing to sign or corrupt header */
+> -                       rc =
+> -                       crypto_shash_update(
+> -                               &server->secmech.sdesccmacaes->shash,
+> -                               iov[i].iov_base + 4, iov[i].iov_len - 4);
+> -               } else {
+> -                       rc =
+> -                       crypto_shash_update(
+> -                               &server->secmech.sdesccmacaes->shash,
+> -                               iov[i].iov_base, iov[i].iov_len);
+> -               }
+> -               if (rc) {
+> -                       cifs_dbg(VFS, "%s: Couldn't update cmac aes with payload\n",
+> -                                                       __func__);
+> -                       return rc;
+> -               }
+> -       }
+> -
+> -       /* now hash over the rq_pages array */
+> -       for (i = 0; i < rqst->rq_npages; i++) {
+> -               struct kvec p_iov;
+> -
+> -               cifs_rqst_page_to_kvec(rqst, i, &p_iov);
+> -               crypto_shash_update(&server->secmech.sdesccmacaes->shash,
+> -                                       p_iov.iov_base, p_iov.iov_len);
+> -               kunmap(rqst->rq_pages[i]);
+> -       }
+> -
+> -       rc = crypto_shash_final(&server->secmech.sdesccmacaes->shash,
+> -                                               sigptr);
+> -       if (rc)
+> -               cifs_dbg(VFS, "%s: Could not generate cmac aes\n", __func__);
+> -
+> -       memcpy(smb2_pdu->Signature, sigptr, SMB2_SIGNATURE_SIZE);
+> +       if (!rc)
+> +               memcpy(smb2_pdu->Signature, sigptr, SMB2_SIGNATURE_SIZE);
+>
+>         return rc;
+>  }
+> --
+> 2.8.0.rc3
+>
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
 > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
