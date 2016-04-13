@@ -1,235 +1,173 @@
-From: Andreas Gruenbacher <agruenba@redhat.com>
-Subject: [PATCH 4/8] ceph: Get rid of d_find_alias in ceph_set_acl
-Date: Thu, 14 Apr 2016 00:27:42 +0200
-Message-ID: <1460586466-5518-5-git-send-email-agruenba@redhat.com>
+From: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH 6/8] ceph: kill __ceph_removexattr()
+Date: Thu, 14 Apr 2016 00:27:44 +0200
+Message-ID: <1460586466-5518-7-git-send-email-agruenba@redhat.com>
 References: <1460586466-5518-1-git-send-email-agruenba@redhat.com>
-Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-	ceph-devel@vger.kernel.org, cluster-devel@redhat.com,
-	"Yan, Zheng" <zyan@redhat.com>
+Cc: "Yan, Zheng" <zyan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
 To: unlisted-recipients:; (no To-header on input)
-Return-path: <ceph-devel-owner@vger.kernel.org>
-In-Reply-To: <1460586466-5518-1-git-send-email-agruenba@redhat.com>
-In-Reply-To: <20160413182026.GR25498@ZenIV.linux.org.uk>
-References: <20160413182026.GR25498@ZenIV.linux.org.uk>
-Sender: ceph-devel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1460586466-5518-1-git-send-email-agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <20160413182026.GR25498-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
+References: <20160413182026.GR25498-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Create a variant of ceph_setattr that takes an inode instead of a
-dentry.  Change __ceph_setxattr (and also __ceph_removexattr) to take an
-inode instead of a dentry.  Use those in ceph_set_acl so that we no
-longer need a dentry there.
+From: "Yan, Zheng" <zyan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
-Signed-off-by: Andreas Gruenbacher <agruenba@redhat.com>
-Signed-off-by: "Yan, Zheng" <zyan@redhat.com>
+when removing a xattr, generic_removexattr() calls __ceph_setxattr()
+with NULL value and XATTR_REPLACE flag. __ceph_removexattr() is not
+used any more.
+
+Signed-off-by: "Yan, Zheng" <zyan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/ceph/acl.c   | 14 +++++---------
- fs/ceph/inode.c | 16 ++++++++++------
- fs/ceph/super.h |  4 ++--
- fs/ceph/xattr.c | 28 ++++++++++++----------------
- 4 files changed, 29 insertions(+), 33 deletions(-)
+ fs/ceph/xattr.c | 126 --------------------------------------------------------
+ 1 file changed, 126 deletions(-)
 
-diff --git a/fs/ceph/acl.c b/fs/ceph/acl.c
-index 5457f216..4f67227 100644
---- a/fs/ceph/acl.c
-+++ b/fs/ceph/acl.c
-@@ -90,7 +90,6 @@ int ceph_set_acl(struct inode *inode, struct posix_acl *acl, int type)
- 	char *value = NULL;
- 	struct iattr newattrs;
- 	umode_t new_mode = inode->i_mode, old_mode = inode->i_mode;
--	struct dentry *dentry;
- 
- 	switch (type) {
- 	case ACL_TYPE_ACCESS:
-@@ -128,29 +127,26 @@ int ceph_set_acl(struct inode *inode, struct posix_acl *acl, int type)
- 			goto out_free;
- 	}
- 
--	dentry = d_find_alias(inode);
- 	if (new_mode != old_mode) {
- 		newattrs.ia_mode = new_mode;
- 		newattrs.ia_valid = ATTR_MODE;
--		ret = ceph_setattr(dentry, &newattrs);
-+		ret = __ceph_setattr(inode, &newattrs);
- 		if (ret)
--			goto out_dput;
-+			goto out_free;
- 	}
- 
--	ret = __ceph_setxattr(dentry, name, value, size, 0);
-+	ret = __ceph_setxattr(inode, name, value, size, 0);
- 	if (ret) {
- 		if (new_mode != old_mode) {
- 			newattrs.ia_mode = old_mode;
- 			newattrs.ia_valid = ATTR_MODE;
--			ceph_setattr(dentry, &newattrs);
-+			__ceph_setattr(inode, &newattrs);
- 		}
--		goto out_dput;
-+		goto out_free;
- 	}
- 
- 	ceph_set_cached_acl(inode, type, acl);
- 
--out_dput:
--	dput(dentry);
- out_free:
- 	kfree(value);
- out:
-diff --git a/fs/ceph/inode.c b/fs/ceph/inode.c
-index ed58b16..cadb6ae 100644
---- a/fs/ceph/inode.c
-+++ b/fs/ceph/inode.c
-@@ -1776,16 +1776,12 @@ static const struct inode_operations ceph_symlink_iops = {
- 	.removexattr = ceph_removexattr,
- };
- 
--/*
-- * setattr
-- */
--int ceph_setattr(struct dentry *dentry, struct iattr *attr)
-+int __ceph_setattr(struct inode *inode, struct iattr *attr)
- {
--	struct inode *inode = d_inode(dentry);
- 	struct ceph_inode_info *ci = ceph_inode(inode);
- 	const unsigned int ia_valid = attr->ia_valid;
- 	struct ceph_mds_request *req;
--	struct ceph_mds_client *mdsc = ceph_sb_to_client(dentry->d_sb)->mdsc;
-+	struct ceph_mds_client *mdsc = ceph_sb_to_client(inode->i_sb)->mdsc;
- 	struct ceph_cap_flush *prealloc_cf;
- 	int issued;
- 	int release = 0, dirtied = 0;
-@@ -2010,6 +2006,14 @@ out_put:
- }
- 
- /*
-+ * setattr
-+ */
-+int ceph_setattr(struct dentry *dentry, struct iattr *attr)
-+{
-+	return __ceph_setattr(d_inode(dentry), attr);
-+}
-+
-+/*
-  * Verify that we have a lease on the given mask.  If not,
-  * do a getattr against an mds.
-  */
-diff --git a/fs/ceph/super.h b/fs/ceph/super.h
-index beb893b..1e41bc2 100644
---- a/fs/ceph/super.h
-+++ b/fs/ceph/super.h
-@@ -785,6 +785,7 @@ static inline int ceph_do_getattr(struct inode *inode, int mask, bool force)
- 	return __ceph_do_getattr(inode, NULL, mask, force);
- }
- extern int ceph_permission(struct inode *inode, int mask);
-+extern int __ceph_setattr(struct inode *inode, struct iattr *attr);
- extern int ceph_setattr(struct dentry *dentry, struct iattr *attr);
- extern int ceph_getattr(struct vfsmount *mnt, struct dentry *dentry,
- 			struct kstat *stat);
-@@ -792,9 +793,8 @@ extern int ceph_getattr(struct vfsmount *mnt, struct dentry *dentry,
- /* xattr.c */
- extern int ceph_setxattr(struct dentry *, const char *, const void *,
- 			 size_t, int);
--int __ceph_setxattr(struct dentry *, const char *, const void *, size_t, int);
-+int __ceph_setxattr(struct inode *, const char *, const void *, size_t, int);
- ssize_t __ceph_getxattr(struct inode *, const char *, void *, size_t);
--int __ceph_removexattr(struct dentry *, const char *);
- extern ssize_t ceph_getxattr(struct dentry *, struct inode *, const char *, void *, size_t);
- extern ssize_t ceph_listxattr(struct dentry *, char *, size_t);
- extern int ceph_removexattr(struct dentry *, const char *);
 diff --git a/fs/ceph/xattr.c b/fs/ceph/xattr.c
-index c6e917d..248e32e3 100644
+index 8966e9d..0d66722 100644
 --- a/fs/ceph/xattr.c
 +++ b/fs/ceph/xattr.c
-@@ -877,11 +877,10 @@ out:
+@@ -498,19 +498,6 @@ static int __remove_xattr(struct ceph_inode_info *ci,
+ 	return 0;
+ }
+ 
+-static int __remove_xattr_by_name(struct ceph_inode_info *ci,
+-			   const char *name)
+-{
+-	struct rb_node **p;
+-	struct ceph_inode_xattr *xattr;
+-	int err;
+-
+-	p = &ci->i_xattrs.index.rb_node;
+-	xattr = __get_xattr(ci, name);
+-	err = __remove_xattr(ci, xattr);
+-	return err;
+-}
+-
+ static char *__copy_xattr_names(struct ceph_inode_info *ci,
+ 				char *dest)
+ {
+@@ -1054,119 +1041,6 @@ out:
  	return err;
  }
  
--static int ceph_sync_setxattr(struct dentry *dentry, const char *name,
-+static int ceph_sync_setxattr(struct inode *inode, const char *name,
- 			      const char *value, size_t size, int flags)
- {
--	struct ceph_fs_client *fsc = ceph_sb_to_client(dentry->d_sb);
--	struct inode *inode = d_inode(dentry);
-+	struct ceph_fs_client *fsc = ceph_sb_to_client(inode->i_sb);
- 	struct ceph_inode_info *ci = ceph_inode(inode);
- 	struct ceph_mds_request *req;
- 	struct ceph_mds_client *mdsc = fsc->mdsc;
-@@ -939,13 +938,12 @@ out:
- 	return err;
- }
- 
--int __ceph_setxattr(struct dentry *dentry, const char *name,
-+int __ceph_setxattr(struct inode *inode, const char *name,
- 			const void *value, size_t size, int flags)
- {
--	struct inode *inode = d_inode(dentry);
- 	struct ceph_vxattr *vxattr;
- 	struct ceph_inode_info *ci = ceph_inode(inode);
--	struct ceph_mds_client *mdsc = ceph_sb_to_client(dentry->d_sb)->mdsc;
-+	struct ceph_mds_client *mdsc = ceph_sb_to_client(inode->i_sb)->mdsc;
- 	struct ceph_cap_flush *prealloc_cf = NULL;
- 	int issued;
- 	int err;
-@@ -1056,7 +1054,7 @@ do_sync_unlocked:
- 				    "during filling trace\n", inode);
- 		err = -EBUSY;
- 	} else {
--		err = ceph_sync_setxattr(dentry, name, value, size, flags);
-+		err = ceph_sync_setxattr(inode, name, value, size, flags);
- 	}
- out:
- 	ceph_free_cap_flush(prealloc_cf);
-@@ -1078,14 +1076,13 @@ int ceph_setxattr(struct dentry *dentry, const char *name,
- 	if (size == 0)
- 		value = "";  /* empty EA, do not remove */
- 
--	return __ceph_setxattr(dentry, name, value, size, flags);
-+	return __ceph_setxattr(d_inode(dentry), name, value, size, flags);
- }
- 
--static int ceph_send_removexattr(struct dentry *dentry, const char *name)
-+static int ceph_send_removexattr(struct inode *inode, const char *name)
- {
--	struct ceph_fs_client *fsc = ceph_sb_to_client(dentry->d_sb);
-+	struct ceph_fs_client *fsc = ceph_sb_to_client(inode->i_sb);
- 	struct ceph_mds_client *mdsc = fsc->mdsc;
--	struct inode *inode = d_inode(dentry);
- 	struct ceph_mds_request *req;
- 	int err;
- 
-@@ -1106,12 +1103,11 @@ static int ceph_send_removexattr(struct dentry *dentry, const char *name)
- 	return err;
- }
- 
--int __ceph_removexattr(struct dentry *dentry, const char *name)
-+static int __ceph_removexattr(struct inode *inode, const char *name)
- {
--	struct inode *inode = d_inode(dentry);
- 	struct ceph_vxattr *vxattr;
- 	struct ceph_inode_info *ci = ceph_inode(inode);
--	struct ceph_mds_client *mdsc = ceph_sb_to_client(dentry->d_sb)->mdsc;
-+	struct ceph_mds_client *mdsc = ceph_sb_to_client(inode->i_sb)->mdsc;
- 	struct ceph_cap_flush *prealloc_cf = NULL;
- 	int issued;
- 	int err;
-@@ -1192,7 +1188,7 @@ do_sync_unlocked:
- 	if (lock_snap_rwsem)
- 		up_read(&mdsc->snap_rwsem);
- 	ceph_free_cap_flush(prealloc_cf);
--	err = ceph_send_removexattr(dentry, name);
-+	err = ceph_send_removexattr(inode, name);
- 	return err;
- }
- 
-@@ -1204,7 +1200,7 @@ int ceph_removexattr(struct dentry *dentry, const char *name)
- 	if (!strncmp(name, XATTR_SYSTEM_PREFIX, XATTR_SYSTEM_PREFIX_LEN))
- 		return generic_removexattr(dentry, name);
- 
--	return __ceph_removexattr(dentry, name);
-+	return __ceph_removexattr(d_inode(dentry), name);
- }
- 
- #ifdef CONFIG_SECURITY
+-static int ceph_send_removexattr(struct inode *inode, const char *name)
+-{
+-	struct ceph_fs_client *fsc = ceph_sb_to_client(inode->i_sb);
+-	struct ceph_mds_client *mdsc = fsc->mdsc;
+-	struct ceph_mds_request *req;
+-	int err;
+-
+-	req = ceph_mdsc_create_request(mdsc, CEPH_MDS_OP_RMXATTR,
+-				       USE_AUTH_MDS);
+-	if (IS_ERR(req))
+-		return PTR_ERR(req);
+-	req->r_path2 = kstrdup(name, GFP_NOFS);
+-	if (!req->r_path2)
+-		return -ENOMEM;
+-
+-	req->r_inode = inode;
+-	ihold(inode);
+-	req->r_num_caps = 1;
+-	req->r_inode_drop = CEPH_CAP_XATTR_SHARED;
+-	err = ceph_mdsc_do_request(mdsc, NULL, req);
+-	ceph_mdsc_put_request(req);
+-	return err;
+-}
+-
+-static int __ceph_removexattr(struct inode *inode, const char *name)
+-{
+-	struct ceph_vxattr *vxattr;
+-	struct ceph_inode_info *ci = ceph_inode(inode);
+-	struct ceph_mds_client *mdsc = ceph_sb_to_client(inode->i_sb)->mdsc;
+-	struct ceph_cap_flush *prealloc_cf = NULL;
+-	int issued;
+-	int err;
+-	int required_blob_size;
+-	int dirty;
+-	bool lock_snap_rwsem = false;
+-
+-	if (ceph_snap(inode) != CEPH_NOSNAP)
+-		return -EROFS;
+-
+-	vxattr = ceph_match_vxattr(inode, name);
+-	if (vxattr && vxattr->readonly)
+-		return -EOPNOTSUPP;
+-
+-	/* pass any unhandled ceph.* xattrs through to the MDS */
+-	if (!strncmp(name, XATTR_CEPH_PREFIX, XATTR_CEPH_PREFIX_LEN))
+-		goto do_sync_unlocked;
+-
+-	prealloc_cf = ceph_alloc_cap_flush();
+-	if (!prealloc_cf)
+-		return -ENOMEM;
+-
+-	err = -ENOMEM;
+-	spin_lock(&ci->i_ceph_lock);
+-retry:
+-	issued = __ceph_caps_issued(ci, NULL);
+-	if (ci->i_xattrs.version == 0 || !(issued & CEPH_CAP_XATTR_EXCL))
+-		goto do_sync;
+-
+-	if (!lock_snap_rwsem && !ci->i_head_snapc) {
+-		lock_snap_rwsem = true;
+-		if (!down_read_trylock(&mdsc->snap_rwsem)) {
+-			spin_unlock(&ci->i_ceph_lock);
+-			down_read(&mdsc->snap_rwsem);
+-			spin_lock(&ci->i_ceph_lock);
+-			goto retry;
+-		}
+-	}
+-
+-	dout("removexattr %p issued %s\n", inode, ceph_cap_string(issued));
+-
+-	__build_xattrs(inode);
+-
+-	required_blob_size = __get_required_blob_size(ci, 0, 0);
+-
+-	if (!ci->i_xattrs.prealloc_blob ||
+-	    required_blob_size > ci->i_xattrs.prealloc_blob->alloc_len) {
+-		struct ceph_buffer *blob;
+-
+-		spin_unlock(&ci->i_ceph_lock);
+-		dout(" preaallocating new blob size=%d\n", required_blob_size);
+-		blob = ceph_buffer_new(required_blob_size, GFP_NOFS);
+-		if (!blob)
+-			goto do_sync_unlocked;
+-		spin_lock(&ci->i_ceph_lock);
+-		if (ci->i_xattrs.prealloc_blob)
+-			ceph_buffer_put(ci->i_xattrs.prealloc_blob);
+-		ci->i_xattrs.prealloc_blob = blob;
+-		goto retry;
+-	}
+-
+-	err = __remove_xattr_by_name(ceph_inode(inode), name);
+-
+-	dirty = __ceph_mark_dirty_caps(ci, CEPH_CAP_XATTR_EXCL,
+-				       &prealloc_cf);
+-	ci->i_xattrs.dirty = true;
+-	inode->i_ctime = current_fs_time(inode->i_sb);
+-	spin_unlock(&ci->i_ceph_lock);
+-	if (lock_snap_rwsem)
+-		up_read(&mdsc->snap_rwsem);
+-	if (dirty)
+-		__mark_inode_dirty(inode, dirty);
+-	ceph_free_cap_flush(prealloc_cf);
+-	return err;
+-do_sync:
+-	spin_unlock(&ci->i_ceph_lock);
+-do_sync_unlocked:
+-	if (lock_snap_rwsem)
+-		up_read(&mdsc->snap_rwsem);
+-	ceph_free_cap_flush(prealloc_cf);
+-	err = ceph_send_removexattr(inode, name);
+-	return err;
+-}
+-
+ static int ceph_get_xattr_handler(const struct xattr_handler *handler,
+ 				  struct dentry *dentry, struct inode *inode,
+ 				  const char *name, void *value, size_t size)
 -- 
 2.4.11
-
