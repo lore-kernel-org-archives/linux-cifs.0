@@ -1,339 +1,53 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 2/6] cifs: merge the hash calculation helpers
-Date: Wed, 13 Apr 2016 00:07:28 -0500
-Message-ID: <CADT32e+b8Shp8+SprXEZm8ZEC3KYYQHyd4m+7ahU2Xbnx3Lf4g@mail.gmail.com>
-References: <20160409204301.GF25498@ZenIV.linux.org.uk>
-	<20160409205056.GH25498@ZenIV.linux.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
+From: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] xattr: Export xattr_resolve_name
+Date: Thu, 14 Apr 2016 00:27:38 +0200
+Message-ID: <1460586466-5518-1-git-send-email-agruenba@redhat.com>
+References: <20160413182026.GR25498@ZenIV.linux.org.uk>
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20160409205056.GH25498-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
+In-Reply-To: <20160413182026.GR25498-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Looks correct.
-Tested with -o vers=1.0, -o vers=2.0, and -o vers=2.1.
-Will test using mount option vers=3.0 as soon as I find a server.
+On Wed, Apr 13, 2016 at 8:20 PM, Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org> wrote:
+> On Wed, Apr 13, 2016 at 05:40:34PM +0200, Andreas Gruenbacher wrote:
+>> Export xattr_resolve_name and make it easier to use by filesystems.
+>> Use it to remove reiserfs's own copy of the same functionality.
+>
+> Nah - I've switched that sucker to generic_*xattr() already.  See
+> #work.xattr for the current state (commit 79a628d14 in there, should
+> propagate in a few).  Sorry, should've pushed that last week...
 
-Reviewed-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Tested-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Okay, here are some more xattr-related patches.
 
-On Sat, Apr 9, 2016 at 3:50 PM, Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org> wrote:
-> three practically identical copies...
->
-> Signed-off-by: Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
-> ---
->  fs/cifs/cifsencrypt.c   |  97 ++++++++++++++++++++++++-------------------
->  fs/cifs/cifsproto.h     |   3 ++
->  fs/cifs/smb2transport.c | 107 +++++-------------------------------------------
->  3 files changed, 67 insertions(+), 140 deletions(-)
->
-> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-> index 4897dac..6aeb8d4 100644
-> --- a/fs/cifs/cifsencrypt.c
-> +++ b/fs/cifs/cifsencrypt.c
-> @@ -66,45 +66,15 @@ cifs_crypto_shash_md5_allocate(struct TCP_Server_Info *server)
->         return 0;
->  }
->
-> -/*
-> - * Calculate and return the CIFS signature based on the mac key and SMB PDU.
-> - * The 16 byte signature must be allocated by the caller. Note we only use the
-> - * 1st eight bytes and that the smb header signature field on input contains
-> - * the sequence number before this function is called. Also, this function
-> - * should be called with the server->srv_mutex held.
-> - */
-> -static int cifs_calc_signature(struct smb_rqst *rqst,
-> -                       struct TCP_Server_Info *server, char *signature)
-> +int __cifs_calc_signature(struct smb_rqst *rqst,
-> +                       struct TCP_Server_Info *server, char *signature,
-> +                       struct shash_desc *shash)
->  {
->         int i;
->         int rc;
->         struct kvec *iov = rqst->rq_iov;
->         int n_vec = rqst->rq_nvec;
->
-> -       if (iov == NULL || signature == NULL || server == NULL)
-> -               return -EINVAL;
-> -
-> -       if (!server->secmech.sdescmd5) {
-> -               rc = cifs_crypto_shash_md5_allocate(server);
-> -               if (rc) {
-> -                       cifs_dbg(VFS, "%s: Can't alloc md5 crypto\n", __func__);
-> -                       return -1;
-> -               }
-> -       }
-> -
-> -       rc = crypto_shash_init(&server->secmech.sdescmd5->shash);
-> -       if (rc) {
-> -               cifs_dbg(VFS, "%s: Could not init md5\n", __func__);
-> -               return rc;
-> -       }
-> -
-> -       rc = crypto_shash_update(&server->secmech.sdescmd5->shash,
-> -               server->session_key.response, server->session_key.len);
-> -       if (rc) {
-> -               cifs_dbg(VFS, "%s: Could not update with response\n", __func__);
-> -               return rc;
-> -       }
-> -
->         for (i = 0; i < n_vec; i++) {
->                 if (iov[i].iov_len == 0)
->                         continue;
-> @@ -117,12 +87,10 @@ static int cifs_calc_signature(struct smb_rqst *rqst,
->                 if (i == 0) {
->                         if (iov[0].iov_len <= 8) /* cmd field at offset 9 */
->                                 break; /* nothing to sign or corrupt header */
-> -                       rc =
-> -                       crypto_shash_update(&server->secmech.sdescmd5->shash,
-> +                       rc = crypto_shash_update(shash,
->                                 iov[i].iov_base + 4, iov[i].iov_len - 4);
->                 } else {
-> -                       rc =
-> -                       crypto_shash_update(&server->secmech.sdescmd5->shash,
-> +                       rc = crypto_shash_update(shash,
->                                 iov[i].iov_base, iov[i].iov_len);
->                 }
->                 if (rc) {
-> @@ -134,21 +102,64 @@ static int cifs_calc_signature(struct smb_rqst *rqst,
->
->         /* now hash over the rq_pages array */
->         for (i = 0; i < rqst->rq_npages; i++) {
-> -               struct kvec p_iov;
-> +               void *kaddr = kmap(rqst->rq_pages[i]);
-> +               size_t len = rqst->rq_pagesz;
-> +
-> +               if (i == rqst->rq_npages - 1)
-> +                       len = rqst->rq_tailsz;
-> +
-> +               crypto_shash_update(shash, kaddr, len);
->
-> -               cifs_rqst_page_to_kvec(rqst, i, &p_iov);
-> -               crypto_shash_update(&server->secmech.sdescmd5->shash,
-> -                                       p_iov.iov_base, p_iov.iov_len);
->                 kunmap(rqst->rq_pages[i]);
->         }
->
-> -       rc = crypto_shash_final(&server->secmech.sdescmd5->shash, signature);
-> +       rc = crypto_shash_final(shash, signature);
->         if (rc)
-> -               cifs_dbg(VFS, "%s: Could not generate md5 hash\n", __func__);
-> +               cifs_dbg(VFS, "%s: Could not generate hash\n", __func__);
->
->         return rc;
->  }
->
-> +/*
-> + * Calculate and return the CIFS signature based on the mac key and SMB PDU.
-> + * The 16 byte signature must be allocated by the caller. Note we only use the
-> + * 1st eight bytes and that the smb header signature field on input contains
-> + * the sequence number before this function is called. Also, this function
-> + * should be called with the server->srv_mutex held.
-> + */
-> +static int cifs_calc_signature(struct smb_rqst *rqst,
-> +                       struct TCP_Server_Info *server, char *signature)
-> +{
-> +       int rc;
-> +
-> +       if (!rqst->rq_iov || !signature || !server)
-> +               return -EINVAL;
-> +
-> +       if (!server->secmech.sdescmd5) {
-> +               rc = cifs_crypto_shash_md5_allocate(server);
-> +               if (rc) {
-> +                       cifs_dbg(VFS, "%s: Can't alloc md5 crypto\n", __func__);
-> +                       return -1;
-> +               }
-> +       }
-> +
-> +       rc = crypto_shash_init(&server->secmech.sdescmd5->shash);
-> +       if (rc) {
-> +               cifs_dbg(VFS, "%s: Could not init md5\n", __func__);
-> +               return rc;
-> +       }
-> +
-> +       rc = crypto_shash_update(&server->secmech.sdescmd5->shash,
-> +               server->session_key.response, server->session_key.len);
-> +       if (rc) {
-> +               cifs_dbg(VFS, "%s: Could not update with response\n", __func__);
-> +               return rc;
-> +       }
-> +
-> +       return __cifs_calc_signature(rqst, server, signature,
-> +                                    &server->secmech.sdescmd5->shash);
-> +}
-> +
->  /* must be called with server->srv_mutex held */
->  int cifs_sign_rqst(struct smb_rqst *rqst, struct TCP_Server_Info *server,
->                    __u32 *pexpected_response_sequence_number)
-> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index eed7ff5..d9b4f44 100644
-> --- a/fs/cifs/cifsproto.h
-> +++ b/fs/cifs/cifsproto.h
-> @@ -512,4 +512,7 @@ int cifs_create_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
->                            struct cifs_sb_info *cifs_sb,
->                            const unsigned char *path, char *pbuf,
->                            unsigned int *pbytes_written);
-> +int __cifs_calc_signature(struct smb_rqst *rqst,
-> +                       struct TCP_Server_Info *server, char *signature,
-> +                       struct shash_desc *shash);
->  #endif                 /* _CIFSPROTO_H */
-> diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-> index 8732a43..bc9a7b6 100644
-> --- a/fs/cifs/smb2transport.c
-> +++ b/fs/cifs/smb2transport.c
-> @@ -135,11 +135,10 @@ smb2_find_smb_ses(struct smb2_hdr *smb2hdr, struct TCP_Server_Info *server)
->  int
->  smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
->  {
-> -       int i, rc;
-> +       int rc;
->         unsigned char smb2_signature[SMB2_HMACSHA256_SIZE];
->         unsigned char *sigptr = smb2_signature;
->         struct kvec *iov = rqst->rq_iov;
-> -       int n_vec = rqst->rq_nvec;
->         struct smb2_hdr *smb2_pdu = (struct smb2_hdr *)iov[0].iov_base;
->         struct cifs_ses *ses;
->
-> @@ -171,53 +170,11 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
->                 return rc;
->         }
->
-> -       for (i = 0; i < n_vec; i++) {
-> -               if (iov[i].iov_len == 0)
-> -                       continue;
-> -               if (iov[i].iov_base == NULL) {
-> -                       cifs_dbg(VFS, "null iovec entry\n");
-> -                       return -EIO;
-> -               }
-> -               /*
-> -                * The first entry includes a length field (which does not get
-> -                * signed that occupies the first 4 bytes before the header).
-> -                */
-> -               if (i == 0) {
-> -                       if (iov[0].iov_len <= 8) /* cmd field at offset 9 */
-> -                               break; /* nothing to sign or corrupt header */
-> -                       rc =
-> -                       crypto_shash_update(
-> -                               &server->secmech.sdeschmacsha256->shash,
-> -                               iov[i].iov_base + 4, iov[i].iov_len - 4);
-> -               } else {
-> -                       rc =
-> -                       crypto_shash_update(
-> -                               &server->secmech.sdeschmacsha256->shash,
-> -                               iov[i].iov_base, iov[i].iov_len);
-> -               }
-> -               if (rc) {
-> -                       cifs_dbg(VFS, "%s: Could not update with payload\n",
-> -                                __func__);
-> -                       return rc;
-> -               }
-> -       }
-> -
-> -       /* now hash over the rq_pages array */
-> -       for (i = 0; i < rqst->rq_npages; i++) {
-> -               struct kvec p_iov;
-> -
-> -               cifs_rqst_page_to_kvec(rqst, i, &p_iov);
-> -               crypto_shash_update(&server->secmech.sdeschmacsha256->shash,
-> -                                       p_iov.iov_base, p_iov.iov_len);
-> -               kunmap(rqst->rq_pages[i]);
-> -       }
-> -
-> -       rc = crypto_shash_final(&server->secmech.sdeschmacsha256->shash,
-> -                               sigptr);
-> -       if (rc)
-> -               cifs_dbg(VFS, "%s: Could not generate sha256 hash\n", __func__);
-> +       rc = __cifs_calc_signature(rqst, server, sigptr,
-> +               &server->secmech.sdeschmacsha256->shash);
->
-> -       memcpy(smb2_pdu->Signature, sigptr, SMB2_SIGNATURE_SIZE);
-> +       if (!rc)
-> +               memcpy(smb2_pdu->Signature, sigptr, SMB2_SIGNATURE_SIZE);
->
->         return rc;
->  }
-> @@ -395,12 +352,10 @@ generate_smb311signingkey(struct cifs_ses *ses)
->  int
->  smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
->  {
-> -       int i;
->         int rc = 0;
->         unsigned char smb3_signature[SMB2_CMACAES_SIZE];
->         unsigned char *sigptr = smb3_signature;
->         struct kvec *iov = rqst->rq_iov;
-> -       int n_vec = rqst->rq_nvec;
->         struct smb2_hdr *smb2_pdu = (struct smb2_hdr *)iov[0].iov_base;
->         struct cifs_ses *ses;
->
-> @@ -431,54 +386,12 @@ smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
->                 cifs_dbg(VFS, "%s: Could not init cmac aes\n", __func__);
->                 return rc;
->         }
-> +
-> +       rc = __cifs_calc_signature(rqst, server, sigptr,
-> +                                  &server->secmech.sdesccmacaes->shash);
->
-> -       for (i = 0; i < n_vec; i++) {
-> -               if (iov[i].iov_len == 0)
-> -                       continue;
-> -               if (iov[i].iov_base == NULL) {
-> -                       cifs_dbg(VFS, "null iovec entry");
-> -                       return -EIO;
-> -               }
-> -               /*
-> -                * The first entry includes a length field (which does not get
-> -                * signed that occupies the first 4 bytes before the header).
-> -                */
-> -               if (i == 0) {
-> -                       if (iov[0].iov_len <= 8) /* cmd field at offset 9 */
-> -                               break; /* nothing to sign or corrupt header */
-> -                       rc =
-> -                       crypto_shash_update(
-> -                               &server->secmech.sdesccmacaes->shash,
-> -                               iov[i].iov_base + 4, iov[i].iov_len - 4);
-> -               } else {
-> -                       rc =
-> -                       crypto_shash_update(
-> -                               &server->secmech.sdesccmacaes->shash,
-> -                               iov[i].iov_base, iov[i].iov_len);
-> -               }
-> -               if (rc) {
-> -                       cifs_dbg(VFS, "%s: Couldn't update cmac aes with payload\n",
-> -                                                       __func__);
-> -                       return rc;
-> -               }
-> -       }
-> -
-> -       /* now hash over the rq_pages array */
-> -       for (i = 0; i < rqst->rq_npages; i++) {
-> -               struct kvec p_iov;
-> -
-> -               cifs_rqst_page_to_kvec(rqst, i, &p_iov);
-> -               crypto_shash_update(&server->secmech.sdesccmacaes->shash,
-> -                                       p_iov.iov_base, p_iov.iov_len);
-> -               kunmap(rqst->rq_pages[i]);
-> -       }
-> -
-> -       rc = crypto_shash_final(&server->secmech.sdesccmacaes->shash,
-> -                                               sigptr);
-> -       if (rc)
-> -               cifs_dbg(VFS, "%s: Could not generate cmac aes\n", __func__);
-> -
-> -       memcpy(smb2_pdu->Signature, sigptr, SMB2_SIGNATURE_SIZE);
-> +       if (!rc)
-> +               memcpy(smb2_pdu->Signature, sigptr, SMB2_SIGNATURE_SIZE);
->
->         return rc;
->  }
-> --
-> 2.8.0.rc3
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Andreas
+
+Andreas Gruenbacher (7):
+  cifs: Fix xattr name checks
+  cifs: Check for equality with ACL_TYPE_ACCESS and ACL_TYPE_DEFAULT
+  cifs: Fix removexattr for os2.* xattrs
+  ceph: Get rid of d_find_alias in ceph_set_acl
+  ceph: Switch to generic xattr handlers
+  posix acls: Export xattr_handler functions
+  gfs2: Switch to generic xattr handlers
+
+Yan, Zheng (1):
+  ceph: kill __ceph_removexattr()
+
+ fs/ceph/acl.c                   |  14 ++-
+ fs/ceph/dir.c                   |   7 +-
+ fs/ceph/inode.c                 |  29 +++---
+ fs/ceph/super.h                 |   8 +-
+ fs/ceph/xattr.c                 | 192 ++++++----------------------------------
+ fs/cifs/cifssmb.c               |   4 +-
+ fs/cifs/xattr.c                 |  50 +++++------
+ fs/gfs2/inode.c                 |  78 ++--------------
+ fs/gfs2/xattr.c                 | 108 ++++++++++++++++++++--
+ fs/posix_acl.c                  |   9 +-
+ include/linux/posix_acl_xattr.h |   8 ++
+ 11 files changed, 203 insertions(+), 304 deletions(-)
+
+-- 
+2.4.11
