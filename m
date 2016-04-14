@@ -1,31 +1,106 @@
-From: Al Viro <viro-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
+From: Steve French <smfrench@gmail.com>
 Subject: Re: [PATCH 1/8] cifs: Fix xattr name checks
-Date: Thu, 14 Apr 2016 05:37:18 +0100
-Message-ID: <20160414043718.GS25498@ZenIV.linux.org.uk>
-References: <20160413182026.GR25498@ZenIV.linux.org.uk>
- <1460586620-5717-1-git-send-email-agruenba@redhat.com>
- <1460586620-5717-2-git-send-email-agruenba@redhat.com>
- <CAH2r5mumJ22+Q0bASFcXp5fK39Ubh+sznfOpVUtSJ94_c5gkxA@mail.gmail.com>
+Date: Wed, 13 Apr 2016 23:43:19 -0500
+Message-ID: <CAH2r5ms6USEO3a_EPUpgsnvTZgSHB2QqJnUnCSCQdFmvV0yPDg@mail.gmail.com>
+References: <20160413182026.GR25498@ZenIV.linux.org.uk> <1460586620-5717-1-git-send-email-agruenba@redhat.com>
+ <1460586620-5717-2-git-send-email-agruenba@redhat.com> <CAH2r5mumJ22+Q0bASFcXp5fK39Ubh+sznfOpVUtSJ94_c5gkxA@mail.gmail.com>
+ <20160414043718.GS25498@ZenIV.linux.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <CAH2r5mumJ22+Q0bASFcXp5fK39Ubh+sznfOpVUtSJ94_c5gkxA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: multipart/mixed; boundary=001a113ed130bc9e6e05306a89e2
+Cc: Andreas Gruenbacher <agruenba@redhat.com>,
+	Steve French <sfrench@samba.org>,
+	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+	ceph-devel@vger.kernel.org, cluster-devel@redhat.com
+To: Al Viro <viro@zeniv.linux.org.uk>
+Return-path: <ceph-devel-owner@vger.kernel.org>
+In-Reply-To: <20160414043718.GS25498@ZenIV.linux.org.uk>
+Sender: ceph-devel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Wed, Apr 13, 2016 at 11:26:24PM -0500, Steve French wrote:
-> Thanks for spotting this - merged into cifs-2.6.git.   checkpatch
-> spotted and old indentation issue so I cleaned that up in a followon
-> patch that I will send.
+--001a113ed130bc9e6e05306a89e2
+Content-Type: text/plain; charset=UTF-8
 
-*ugh*
+If you are planning to merge it in next few weeks (they fix bugs, and
+are safe so why not),  I can simply just back out my changes from
+cifs-2.6.git for-next branch and let you merge the trivial checkpatch
+cleanup attached.
 
-And in the meanwhile I'd picked those into my queue...  Could you put that
-stuff on a separate branch so that both cifs-2.6.git and vfs.git could
-merge it?
+On Wed, Apr 13, 2016 at 11:37 PM, Al Viro <viro@zeniv.linux.org.uk> wrote:
+> On Wed, Apr 13, 2016 at 11:26:24PM -0500, Steve French wrote:
+>> Thanks for spotting this - merged into cifs-2.6.git.   checkpatch
+>> spotted and old indentation issue so I cleaned that up in a followon
+>> patch that I will send.
+>
+> *ugh*
+>
+> And in the meanwhile I'd picked those into my queue...  Could you put that
+> stuff on a separate branch so that both cifs-2.6.git and vfs.git could
+> merge it?
+
+
+
+-- 
+Thanks,
+
+Steve
+
+--001a113ed130bc9e6e05306a89e2
+Content-Type: application/mbox;
+	name="0001-CIFS-Fix-formatting-issues-on-previous-patches-spott.patch"
+Content-Disposition: attachment;
+	filename="0001-CIFS-Fix-formatting-issues-on-previous-patches-spott.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_imzsvu7f0
+
+RnJvbSA0M2I3NWM0NDczYzI0YTM3MTM0MDAxMTFiNWI3MDZiMTQ4YWY1YjBiIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHNtZnJlbmNoQGdtYWlsLmNvbT4KRGF0
+ZTogV2VkLCAxMyBBcHIgMjAxNiAyMzoxODo0NSAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIENJRlM6
+IEZpeCBmb3JtYXR0aW5nIGlzc3VlcyBvbiBwcmV2aW91cyBwYXRjaGVzIHNwb3R0ZWQgYnkKIGNo
+ZWNrcGF0Y2gKClRyaXZpYWwgY2hhbmdlLgoKT25lIGJsb2NrIGNvbW1lbnQgZnJvbSBwcmV2aW91
+cyBwYXRjaCBoYWQgd3JvbmcgZm9ybWF0LCBhbmQgZXhpc3RpbmcKeGF0dHIgY29kZSBoYWQgaW5j
+b3JyZWN0IGluZGVudGF0aW9uIGluIG9uZSBmdW5jdGlvbiAtIHRoZSBjaGVja3BhdGNoCm9uIHRo
+ZSByZWNlbnQgcGF0Y2hlcyBmcm9tIEFuZHJlYXMgc3BvdHRlZCBpdC4gIE1ha2UgY2hlY2twYXRj
+aApoYXBweS4KClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3RldmUuZnJlbmNoQHByaW1h
+cnlkYXRhLmNvbT4KQ0M6IEFuZHJlYXMgR3J1ZW5iYWNoZXIgPGFncnVlbmJhQHJlZGhhdC5jb20+
+Ci0tLQogZnMvY2lmcy94YXR0ci5jIHwgNTIgKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLQogMSBmaWxlIGNoYW5nZWQsIDI3IGluc2VydGlvbnMoKyks
+IDI1IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMveGF0dHIuYyBiL2ZzL2NpZnMv
+eGF0dHIuYwppbmRleCBhZjJiNWJlLi5iNmU0NjhjIDEwMDY0NAotLS0gYS9mcy9jaWZzL3hhdHRy
+LmMKKysrIGIvZnMvY2lmcy94YXR0ci5jCkBAIC0yMjEsOSArMjIxLDExIEBAIGludCBjaWZzX3Nl
+dHhhdHRyKHN0cnVjdCBkZW50cnkgKmRpcmVudHJ5LCBjb25zdCBjaGFyICplYV9uYW1lLAogCQl9
+IGVsc2UgewogCQkJY2lmc19kYmcoRllJLCAiaWxsZWdhbCB4YXR0ciByZXF1ZXN0ICVzIChvbmx5
+IHVzZXIgbmFtZXNwYWNlIHN1cHBvcnRlZClcbiIsCiAJCQkJIGVhX25hbWUpOwotCQkgIC8qIEJC
+IHdoYXQgaWYgbm8gbmFtZXNwYWNlIHByZWZpeD8gKi8KLQkJICAvKiBTaG91bGQgd2UganVzdCBw
+YXNzIHRoZW0gdG8gc2VydmVyLCBleGNlcHQgZm9yCi0JCSAgc3lzdGVtIGFuZCBwZXJoYXBzIHNl
+Y3VyaXR5IHByZWZpeGVzPyAqLworCQkJLyoKKwkJCSAqIEJCIHdoYXQgaWYgbm8gbmFtZXNwYWNl
+IHByZWZpeD8KKwkJCSAqIFNob3VsZCB3ZSBqdXN0IHBhc3MgdGhlbSB0byBzZXJ2ZXIsIGV4Y2Vw
+dCBmb3IKKwkJCSAqIHN5c3RlbSBhbmQgcGVyaGFwcyBzZWN1cml0eSBwcmVmaXhlcz8KKwkJCSAq
+LwogCQl9CiAJfQogCkBAIC0zMTcsMzAgKzMxOSwzMCBAQCBzc2l6ZV90IGNpZnNfZ2V0eGF0dHIo
+c3RydWN0IGRlbnRyeSAqZGlyZW50cnksIGNvbnN0IGNoYXIgKmVhX25hbWUsCiAjZW5kaWYgLyog
+Q09ORklHX0NJRlNfUE9TSVggKi8KIAl9IGVsc2UgaWYgKHN0cmNtcChlYV9uYW1lLCBDSUZTX1hB
+VFRSX0NJRlNfQUNMKSA9PSAwKSB7CiAjaWZkZWYgQ09ORklHX0NJRlNfQUNMCi0JCQl1MzIgYWNs
+bGVuOwotCQkJc3RydWN0IGNpZnNfbnRzZCAqcGFjbDsKLQotCQkJaWYgKHBUY29uLT5zZXMtPnNl
+cnZlci0+b3BzLT5nZXRfYWNsID09IE5VTEwpCi0JCQkJZ290byBnZXRfZWFfZXhpdDsgLyogcmMg
+YWxyZWFkeSBFT1BOT1RTVVBQICovCi0KLQkJCXBhY2wgPSBwVGNvbi0+c2VzLT5zZXJ2ZXItPm9w
+cy0+Z2V0X2FjbChjaWZzX3NiLAotCQkJCQlkX2lub2RlKGRpcmVudHJ5KSwgZnVsbF9wYXRoLCAm
+YWNsbGVuKTsKLQkJCWlmIChJU19FUlIocGFjbCkpIHsKLQkJCQlyYyA9IFBUUl9FUlIocGFjbCk7
+Ci0JCQkJY2lmc19kYmcoVkZTLCAiJXM6IGVycm9yICV6ZCBnZXR0aW5nIHNlYyBkZXNjXG4iLAot
+CQkJCQkgX19mdW5jX18sIHJjKTsKLQkJCX0gZWxzZSB7Ci0JCQkJaWYgKGVhX3ZhbHVlKSB7Ci0J
+CQkJCWlmIChhY2xsZW4gPiBidWZfc2l6ZSkKLQkJCQkJCWFjbGxlbiA9IC1FUkFOR0U7Ci0JCQkJ
+CWVsc2UKLQkJCQkJCW1lbWNweShlYV92YWx1ZSwgcGFjbCwgYWNsbGVuKTsKLQkJCQl9Ci0JCQkJ
+cmMgPSBhY2xsZW47Ci0JCQkJa2ZyZWUocGFjbCk7CisJCXUzMiBhY2xsZW47CisJCXN0cnVjdCBj
+aWZzX250c2QgKnBhY2w7CisKKwkJaWYgKHBUY29uLT5zZXMtPnNlcnZlci0+b3BzLT5nZXRfYWNs
+ID09IE5VTEwpCisJCQlnb3RvIGdldF9lYV9leGl0OyAvKiByYyBhbHJlYWR5IEVPUE5PVFNVUFAg
+Ki8KKworCQlwYWNsID0gcFRjb24tPnNlcy0+c2VydmVyLT5vcHMtPmdldF9hY2woY2lmc19zYiwK
+KwkJCQlkX2lub2RlKGRpcmVudHJ5KSwgZnVsbF9wYXRoLCAmYWNsbGVuKTsKKwkJaWYgKElTX0VS
+UihwYWNsKSkgeworCQkJcmMgPSBQVFJfRVJSKHBhY2wpOworCQkJY2lmc19kYmcoVkZTLCAiJXM6
+IGVycm9yICV6ZCBnZXR0aW5nIHNlYyBkZXNjXG4iLAorCQkJCSBfX2Z1bmNfXywgcmMpOworCQl9
+IGVsc2UgeworCQkJaWYgKGVhX3ZhbHVlKSB7CisJCQkJaWYgKGFjbGxlbiA+IGJ1Zl9zaXplKQor
+CQkJCQlhY2xsZW4gPSAtRVJBTkdFOworCQkJCWVsc2UKKwkJCQkJbWVtY3B5KGVhX3ZhbHVlLCBw
+YWNsLCBhY2xsZW4pOwogCQkJfQorCQkJcmMgPSBhY2xsZW47CisJCQlrZnJlZShwYWNsKTsKKwkJ
+fQogI2Vsc2UKLQkJCWNpZnNfZGJnKEZZSSwgIlF1ZXJ5IENJRlMgQUNMIG5vdCBzdXBwb3J0ZWQg
+eWV0XG4iKTsKKwkJY2lmc19kYmcoRllJLCAiUXVlcnkgQ0lGUyBBQ0wgbm90IHN1cHBvcnRlZCB5
+ZXRcbiIpOwogI2VuZGlmIC8qIENPTkZJR19DSUZTX0FDTCAqLwogCX0gZWxzZSBpZiAoc3RybmNt
+cChlYV9uYW1lLAogCQkgIFhBVFRSX1RSVVNURURfUFJFRklYLCBYQVRUUl9UUlVTVEVEX1BSRUZJ
+WF9MRU4pID09IDApIHsKLS0gCjEuOS4xCgo=
+--001a113ed130bc9e6e05306a89e2--
