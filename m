@@ -1,32 +1,65 @@
-From: <verifelaw-KK0ffGbhmjU@public.gmane.org>
-Subject: IMPORTANT MAIL TO YOU
-Date: Mon, 18 Apr 2016 13:09:41 +0200
-Message-ID: <613fad89-f8e9-4340-bd2b-935a5631973f__33375.1943464906$1460977886$gmane$org@GSCADMINS22.gsc.org.uk>
-Reply-To: <lawrencetyman-KK0ffGbhmjU@public.gmane.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="Windows-1251"
-Content-Transfer-Encoding: 7bit
-To: Undisclosed recipients:;
+From: Goldwyn Rodrigues <rgoldwyn-l3A5Bk7waGM@public.gmane.org>
+Subject: [PATCH] cifs: Use file_dentry()
+Date: Mon, 18 Apr 2016 06:41:52 -0500
+Message-ID: <1460979712-2581-1-git-send-email-rgoldwyn@suse.de>
+Cc: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, miklos-sUDqSbJrdHQHWmgEVkV9KA@public.gmane.org,
+	Goldwyn Rodrigues <rgoldwyn-IBi9RG/b67k@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-I am Capt. Lawrence Tyman, an officer in US Army,and also a West Point
-Graduate, serving in the Military with the 82nd Air Borne Division
-Peace keeping force deployed from Afganistan to Syria.  
-We were moved to Syria from Iraq as the last batch just left,and i
-really need your help in assisting me with the safe keeping of 1 military
-trunk box contain funds amount of $10.2M which i secured on a raiding we carried out in 
-January in one of the chief Syrian IsIs base which i headed the squard as the 
-Captain.  With every possible arrangement to lift this box out, is intended to arrive 
-Belgium from there a diplomat will deliver it to your designated location
-I hope you can be trusted? You will be rewarded handsomely if you could help
-me secure the funds until I conclude my service here in 3 month to meet you while we can 
-plan head to head on a good and profitable business or company i can invest my funds in your country.
-If you can be trusted and willing to support me in securing this safely kindly indicate 
-by Letting me know this (1) Your name (2) Your address (3) Age (4) Occupation and 
-i will explain further when i get a response from you
-kindly contact me in this my private email address below: lawrencetyman-KK0ffGbhmjU@public.gmane.org
+From: Goldwyn Rodrigues <rgoldwyn-IBi9RG/b67k@public.gmane.org>
 
-Regards,
-Capt. Lawrence Tyman
+CIFS may be used as lower layer of overlayfs and accessing f_path.dentry can
+lead to a crash.
+
+Fix by replacing direct access of file->f_path.dentry with the
+file_dentry() accessor, which will always return a native object.
+
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn-IBi9RG/b67k@public.gmane.org>
+
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index c03d074..489ddc7 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -271,7 +271,7 @@ struct cifsFileInfo *
+ cifs_new_fileinfo(struct cifs_fid *fid, struct file *file,
+ 		  struct tcon_link *tlink, __u32 oplock)
+ {
+-	struct dentry *dentry = file->f_path.dentry;
++	struct dentry *dentry = file_dentry(file);
+ 	struct inode *inode = d_inode(dentry);
+ 	struct cifsInodeInfo *cinode = CIFS_I(inode);
+ 	struct cifsFileInfo *cfile;
+@@ -461,7 +461,7 @@ int cifs_open(struct inode *inode, struct file *file)
+ 	tcon = tlink_tcon(tlink);
+ 	server = tcon->ses->server;
+ 
+-	full_path = build_path_from_dentry(file->f_path.dentry);
++	full_path = build_path_from_dentry(file_dentry(file));
+ 	if (full_path == NULL) {
+ 		rc = -ENOMEM;
+ 		goto out;
+diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+index b30a4a6..8806584 100644
+--- a/fs/cifs/readdir.c
++++ b/fs/cifs/readdir.c
+@@ -300,7 +300,7 @@ initiate_cifs_search(const unsigned int xid, struct file *file)
+ 	cifsFile->invalidHandle = true;
+ 	cifsFile->srch_inf.endOfSearch = false;
+ 
+-	full_path = build_path_from_dentry(file->f_path.dentry);
++	full_path = build_path_from_dentry(file_dentry(file));
+ 	if (full_path == NULL) {
+ 		rc = -ENOMEM;
+ 		goto error_exit;
+@@ -759,7 +759,7 @@ static int cifs_filldir(char *find_entry, struct file *file,
+ 		 */
+ 		fattr.cf_flags |= CIFS_FATTR_NEED_REVAL;
+ 
+-	cifs_prime_dcache(file->f_path.dentry, &name, &fattr);
++	cifs_prime_dcache(file_dentry(file), &name, &fattr);
+ 
+ 	ino = cifs_uniqueid_to_ino_t(fattr.cf_uniqueid);
+ 	return !dir_emit(ctx, name.name, name.len, ino, fattr.cf_dtype);
