@@ -1,604 +1,174 @@
-From: Andreas Gruenbacher <agruenba@redhat.com>
-Subject: [PATCH] cifs: Switch to generic xattr handlers
-Date: Fri, 22 Apr 2016 12:11:38 +0200
-Message-ID: <1461319898-28926-1-git-send-email-agruenba@redhat.com>
-Cc: Andreas Gruenbacher <agruenba@redhat.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-To: Steve French <sfrench@samba.org>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: Create dedicated keyring for spnego operations
+Date: Fri, 22 Apr 2016 15:58:33 -0400
+Message-ID: <1461355113-30510-1-git-send-email-sprabhu@redhat.com>
+Cc: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Scott Mayhew <smayhew-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Use xattr handlers for resolving attribute names.  The amount of setup
-code required on cifs is nontrivial, so use the same get and set
-functions for all handlers, with switch statements for the different
-types of attributes in them.
+The session key is the default keyring set for request_key operations.
+This session key is revoked when the user owning the session logs out.
+Any long running daemon processes started by this session ends up with
+revoked session keyring which prevents these processes from using the
+request_key mechanism from obtaining the krb5 keys.
 
-The set_EA handler can handle NULL values, so we don't need a separate
-removexattr function anymore.  Remove the cifs_dbg statements related to
-xattr name resolution; they don't add much.  Don't build xattr.o when
-CONFIG_CIFS_XATTR is not defined.
+The problem has been reported by a large number of autofs users. The
+problem is also seen with multiuser mounts where the share may be used
+by processes run by a user who has since logged out. A reproducer using
+automount is available on the Red Hat bz.
 
-Signed-off-by: Andreas Gruenbacher <agruenba@redhat.com>
+The patch creates a new keyring which is used to cache cifs spnego
+upcalls.
+
+Red Hat bz: 1267754
+
+Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Reported-by: Scott Mayhew <smayhew-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/Makefile |   3 +-
- fs/cifs/cifsfs.c |  26 ++---
- fs/cifs/cifsfs.h |  12 +-
- fs/cifs/xattr.c  | 342 +++++++++++++++++++++++--------------------------------
- 4 files changed, 165 insertions(+), 218 deletions(-)
+ fs/cifs/cifs_spnego.c | 67 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/cifsfs.c      |  4 +--
+ fs/cifs/cifsproto.h   |  2 ++
+ 3 files changed, 71 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/Makefile b/fs/cifs/Makefile
-index 1964d21..eed7eb0 100644
---- a/fs/cifs/Makefile
-+++ b/fs/cifs/Makefile
-@@ -5,9 +5,10 @@ obj-$(CONFIG_CIFS) += cifs.o
+diff --git a/fs/cifs/cifs_spnego.c b/fs/cifs/cifs_spnego.c
+index 6908080..248ab43 100644
+--- a/fs/cifs/cifs_spnego.c
++++ b/fs/cifs/cifs_spnego.c
+@@ -24,11 +24,14 @@
+ #include <linux/string.h>
+ #include <keys/user-type.h>
+ #include <linux/key-type.h>
++#include <linux/keyctl.h>
+ #include <linux/inet.h>
+ #include "cifsglob.h"
+ #include "cifs_spnego.h"
+ #include "cifs_debug.h"
  
- cifs-y := cifsfs.o cifssmb.o cifs_debug.o connect.o dir.o file.o inode.o \
- 	  link.o misc.o netmisc.o smbencrypt.o transport.o asn1.o \
--	  cifs_unicode.o nterr.o xattr.o cifsencrypt.o \
-+	  cifs_unicode.o nterr.o cifsencrypt.o \
- 	  readdir.o ioctl.o sess.o export.o smb1ops.o winucase.o
++static const struct cred *spnego_cred;
++
+ /* create a new cifs key */
+ static int
+ cifs_spnego_key_instantiate(struct key *key, struct key_preparsed_payload *prep)
+@@ -102,6 +105,7 @@ cifs_get_spnego_key(struct cifs_ses *sesInfo)
+ 	size_t desc_len;
+ 	struct key *spnego_key;
+ 	const char *hostname = server->hostname;
++	const struct cred *saved_cred;
  
-+cifs-$(CONFIG_CIFS_XATTR) += xattr.o
- cifs-$(CONFIG_CIFS_ACL) += cifsacl.o
+ 	/* length of fields (with semicolons): ver=0xyz ip4=ipaddress
+ 	   host=hostname sec=mechanism uid=0xFF user=username */
+@@ -163,7 +167,9 @@ cifs_get_spnego_key(struct cifs_ses *sesInfo)
+ 	sprintf(dp, ";pid=0x%x", current->pid);
  
- cifs-$(CONFIG_CIFS_UPCALL) += cifs_spnego.o
+ 	cifs_dbg(FYI, "key description = %s\n", description);
++	saved_cred = override_creds(spnego_cred);
+ 	spnego_key = request_key(&cifs_spnego_key_type, description, "");
++	revert_creds(saved_cred);
+ 
+ #ifdef CONFIG_CIFS_DEBUG2
+ 	if (cifsFYI && !IS_ERR(spnego_key)) {
+@@ -177,3 +183,64 @@ out:
+ 	kfree(description);
+ 	return spnego_key;
+ }
++
++int
++init_cifs_spnego(void)
++{
++	struct cred *cred;
++	struct key *keyring;
++	int ret;
++
++	cifs_dbg(FYI, "Registering the %s key type\n",
++		 cifs_spnego_key_type.name);
++
++	/*
++	 * Create an override credential set with special thread keyring for
++	 * spnego upcalls.
++	 */
++
++	cred = prepare_kernel_cred(NULL);
++	if (!cred)
++		return -ENOMEM;
++
++	keyring = keyring_alloc(".cifs_spnego",
++				GLOBAL_ROOT_UID, GLOBAL_ROOT_GID, cred,
++				(KEY_POS_ALL & ~KEY_POS_SETATTR) |
++				KEY_USR_VIEW | KEY_USR_READ,
++				KEY_ALLOC_NOT_IN_QUOTA, NULL);
++	if (IS_ERR(keyring)) {
++		ret = PTR_ERR(keyring);
++		goto failed_put_cred;
++	}
++
++	ret = register_key_type(&cifs_spnego_key_type);
++	if (ret < 0)
++		goto failed_put_key;
++
++	/*
++	 * instruct request_key() to use this special keyring as a cache for
++	 * the results it looks up
++	 */
++	set_bit(KEY_FLAG_ROOT_CAN_CLEAR, &keyring->flags);
++	cred->thread_keyring = keyring;
++	cred->jit_keyring = KEY_REQKEY_DEFL_THREAD_KEYRING;
++	spnego_cred = cred;
++
++	cifs_dbg(FYI, "cifs spnego keyring: %d\n", key_serial(keyring));
++	return 0;
++
++failed_put_key:
++	key_put(keyring);
++failed_put_cred:
++	put_cred(cred);
++	return ret;
++}
++
++void
++exit_cifs_spnego(void)
++{
++	key_revoke(spnego_cred->thread_keyring);
++	unregister_key_type(&cifs_spnego_key_type);
++	put_cred(spnego_cred);
++	cifs_dbg(FYI, "Unregistered %s key type\n", cifs_spnego_key_type.name);
++}
 diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 1d86fc6..43cc522b 100644
+index 8920156..9852044 100644
 --- a/fs/cifs/cifsfs.c
 +++ b/fs/cifs/cifsfs.c
-@@ -37,6 +37,7 @@
- #include <linux/freezer.h>
- #include <linux/namei.h>
- #include <linux/random.h>
-+#include <linux/xattr.h>
- #include <net/ipv6.h>
- #include "cifsfs.h"
- #include "cifspdu.h"
-@@ -135,6 +136,7 @@ cifs_read_super(struct super_block *sb)
+@@ -1307,7 +1307,7 @@ init_cifs(void)
+ 		goto out_destroy_mids;
  
- 	sb->s_magic = CIFS_MAGIC_NUMBER;
- 	sb->s_op = &cifs_super_ops;
-+	sb->s_xattr = cifs_xattr_handlers;
- 	sb->s_bdi = &cifs_sb->bdi;
- 	sb->s_blocksize = CIFS_MAX_MSGSIZE;
- 	sb->s_blocksize_bits = 14;	/* default 2**14 = CIFS_MAX_MSGSIZE */
-@@ -892,12 +894,10 @@ const struct inode_operations cifs_dir_inode_ops = {
- 	.setattr = cifs_setattr,
- 	.symlink = cifs_symlink,
- 	.mknod   = cifs_mknod,
--#ifdef CONFIG_CIFS_XATTR
--	.setxattr = cifs_setxattr,
--	.getxattr = cifs_getxattr,
-+	.setxattr = generic_setxattr,
-+	.getxattr = generic_getxattr,
- 	.listxattr = cifs_listxattr,
--	.removexattr = cifs_removexattr,
--#endif
-+	.removexattr = generic_removexattr,
- };
- 
- const struct inode_operations cifs_file_inode_ops = {
-@@ -905,12 +905,10 @@ const struct inode_operations cifs_file_inode_ops = {
- 	.setattr = cifs_setattr,
- 	.getattr = cifs_getattr, /* do we need this anymore? */
- 	.permission = cifs_permission,
--#ifdef CONFIG_CIFS_XATTR
--	.setxattr = cifs_setxattr,
--	.getxattr = cifs_getxattr,
-+	.setxattr = generic_setxattr,
-+	.getxattr = generic_getxattr,
- 	.listxattr = cifs_listxattr,
--	.removexattr = cifs_removexattr,
--#endif
-+	.removexattr = generic_removexattr,
- };
- 
- const struct inode_operations cifs_symlink_inode_ops = {
-@@ -920,12 +918,10 @@ const struct inode_operations cifs_symlink_inode_ops = {
- 	/* BB add the following two eventually */
- 	/* revalidate: cifs_revalidate,
- 	   setattr:    cifs_notify_change, *//* BB do we need notify change */
--#ifdef CONFIG_CIFS_XATTR
--	.setxattr = cifs_setxattr,
--	.getxattr = cifs_getxattr,
-+	.setxattr = generic_setxattr,
-+	.getxattr = generic_getxattr,
- 	.listxattr = cifs_listxattr,
--	.removexattr = cifs_removexattr,
--#endif
-+	.removexattr = generic_removexattr,
- };
- 
- static int cifs_clone_file_range(struct file *src_file, loff_t off,
-diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
-index c89ecd7..c1e749a 100644
---- a/fs/cifs/cifsfs.h
-+++ b/fs/cifs/cifsfs.h
-@@ -120,11 +120,15 @@ extern const char *cifs_get_link(struct dentry *, struct inode *,
- 			struct delayed_call *);
- extern int cifs_symlink(struct inode *inode, struct dentry *direntry,
- 			const char *symname);
--extern int	cifs_removexattr(struct dentry *, const char *);
--extern int	cifs_setxattr(struct dentry *, const char *, const void *,
--			size_t, int);
--extern ssize_t	cifs_getxattr(struct dentry *, struct inode *, const char *, void *, size_t);
-+
-+#ifdef CONFIG_CIFS_XATTR
-+extern const struct xattr_handler *cifs_xattr_handlers[];
- extern ssize_t	cifs_listxattr(struct dentry *, char *, size_t);
-+#else
-+# define cifs_xattr_handlers NULL
-+# define cifs_listxattr NULL
-+#endif
-+
- extern long cifs_ioctl(struct file *filep, unsigned int cmd, unsigned long arg);
- #ifdef CONFIG_CIFS_NFSD_EXPORT
- extern const struct export_operations cifs_export_ops;
-diff --git a/fs/cifs/xattr.c b/fs/cifs/xattr.c
-index 721c6db..c8b77aa 100644
---- a/fs/cifs/xattr.c
-+++ b/fs/cifs/xattr.c
-@@ -32,76 +32,19 @@
- #include "cifs_unicode.h"
- 
- #define MAX_EA_VALUE_SIZE 65535
--#define CIFS_XATTR_DOS_ATTRIB "user.DosAttrib"
- #define CIFS_XATTR_CIFS_ACL "system.cifs_acl"
- 
- /* BB need to add server (Samba e.g) support for security and trusted prefix */
- 
--int cifs_removexattr(struct dentry *direntry, const char *ea_name)
--{
--	int rc = -EOPNOTSUPP;
--#ifdef CONFIG_CIFS_XATTR
--	unsigned int xid;
--	struct cifs_sb_info *cifs_sb = CIFS_SB(direntry->d_sb);
--	struct tcon_link *tlink;
--	struct cifs_tcon *pTcon;
--	char *full_path = NULL;
--
--	tlink = cifs_sb_tlink(cifs_sb);
--	if (IS_ERR(tlink))
--		return PTR_ERR(tlink);
--	pTcon = tlink_tcon(tlink);
-+enum { XATTR_USER, XATTR_CIFS_ACL, XATTR_ACL_ACCESS, XATTR_ACL_DEFAULT };
- 
--	xid = get_xid();
--
--	full_path = build_path_from_dentry(direntry);
--	if (full_path == NULL) {
--		rc = -ENOMEM;
--		goto remove_ea_exit;
--	}
--	if (ea_name == NULL) {
--		cifs_dbg(FYI, "Null xattr names not supported\n");
--	} else if (!strncmp(ea_name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LEN)) {
--		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_XATTR)
--			goto remove_ea_exit;
--
--		ea_name += XATTR_USER_PREFIX_LEN; /* skip past user. prefix */
--		if (pTcon->ses->server->ops->set_EA)
--			rc = pTcon->ses->server->ops->set_EA(xid, pTcon,
--				full_path, ea_name, NULL, (__u16)0,
--				cifs_sb->local_nls, cifs_remap(cifs_sb));
--	} else if (!strncmp(ea_name, XATTR_OS2_PREFIX, XATTR_OS2_PREFIX_LEN)) {
--		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_XATTR)
--			goto remove_ea_exit;
--
--		ea_name += XATTR_OS2_PREFIX_LEN; /* skip past os2. prefix */
--		if (pTcon->ses->server->ops->set_EA)
--			rc = pTcon->ses->server->ops->set_EA(xid, pTcon,
--				full_path, ea_name, NULL, (__u16)0,
--				cifs_sb->local_nls, cifs_remap(cifs_sb));
--	} else {
--		cifs_dbg(FYI,
--			 "illegal xattr request %s (only user namespace supported)\n",
--			 ea_name);
--		/* BB what if no namespace prefix? */
--		/* Should we just pass them to server, except for
--		system and perhaps security prefixes? */
--	}
--remove_ea_exit:
--	kfree(full_path);
--	free_xid(xid);
--	cifs_put_tlink(tlink);
--#endif
--	return rc;
--}
--
--int cifs_setxattr(struct dentry *direntry, const char *ea_name,
--		  const void *ea_value, size_t value_size, int flags)
-+static int cifs_xattr_set(const struct xattr_handler *handler,
-+			  struct dentry *dentry, const char *name,
-+			  const void *value, size_t size, int flags)
- {
- 	int rc = -EOPNOTSUPP;
--#ifdef CONFIG_CIFS_XATTR
- 	unsigned int xid;
--	struct super_block *sb = direntry->d_sb;
-+	struct super_block *sb = dentry->d_sb;
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
- 	struct tcon_link *tlink;
- 	struct cifs_tcon *pTcon;
-@@ -114,10 +57,10 @@ int cifs_setxattr(struct dentry *direntry, const char *ea_name,
- 
- 	xid = get_xid();
- 
--	full_path = build_path_from_dentry(direntry);
-+	full_path = build_path_from_dentry(dentry);
- 	if (full_path == NULL) {
- 		rc = -ENOMEM;
--		goto set_ea_exit;
-+		goto out;
- 	}
- 	/* return dos attributes as pseudo xattr */
- 	/* return alt name if available as pseudo attr */
-@@ -125,104 +68,88 @@ int cifs_setxattr(struct dentry *direntry, const char *ea_name,
- 	/* if proc/fs/cifs/streamstoxattr is set then
- 		search server for EAs or streams to
- 		returns as xattrs */
--	if (value_size > MAX_EA_VALUE_SIZE) {
-+	if (size > MAX_EA_VALUE_SIZE) {
- 		cifs_dbg(FYI, "size of EA value too large\n");
- 		rc = -EOPNOTSUPP;
--		goto set_ea_exit;
-+		goto out;
- 	}
- 
--	if (ea_name == NULL) {
--		cifs_dbg(FYI, "Null xattr names not supported\n");
--	} else if (strncmp(ea_name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LEN)
--		   == 0) {
-+	switch (handler->flags) {
-+	case XATTR_USER:
- 		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_XATTR)
--			goto set_ea_exit;
--		if (strcmp(ea_name, CIFS_XATTR_DOS_ATTRIB) == 0)
--			cifs_dbg(FYI, "attempt to set cifs inode metadata\n");
-+			goto out;
- 
--		ea_name += XATTR_USER_PREFIX_LEN; /* skip past user. prefix */
- 		if (pTcon->ses->server->ops->set_EA)
- 			rc = pTcon->ses->server->ops->set_EA(xid, pTcon,
--				full_path, ea_name, ea_value, (__u16)value_size,
-+				full_path, name, value, (__u16)size,
- 				cifs_sb->local_nls, cifs_remap(cifs_sb));
--	} else if (strncmp(ea_name, XATTR_OS2_PREFIX, XATTR_OS2_PREFIX_LEN)
--		   == 0) {
--		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_XATTR)
--			goto set_ea_exit;
-+		break;
- 
--		ea_name += XATTR_OS2_PREFIX_LEN; /* skip past os2. prefix */
--		if (pTcon->ses->server->ops->set_EA)
--			rc = pTcon->ses->server->ops->set_EA(xid, pTcon,
--				full_path, ea_name, ea_value, (__u16)value_size,
--				cifs_sb->local_nls, cifs_remap(cifs_sb));
--	} else if (strcmp(ea_name, CIFS_XATTR_CIFS_ACL) == 0) {
-+	case XATTR_CIFS_ACL: {
- #ifdef CONFIG_CIFS_ACL
- 		struct cifs_ntsd *pacl;
--		pacl = kmalloc(value_size, GFP_KERNEL);
-+
-+		if (!value)
-+			goto out;
-+		pacl = kmalloc(size, GFP_KERNEL);
- 		if (!pacl) {
- 			rc = -ENOMEM;
- 		} else {
--			memcpy(pacl, ea_value, value_size);
--			if (pTcon->ses->server->ops->set_acl)
-+			memcpy(pacl, value, size);
-+			if (value &&
-+			    pTcon->ses->server->ops->set_acl)
- 				rc = pTcon->ses->server->ops->set_acl(pacl,
--						value_size, d_inode(direntry),
-+						size, d_inode(dentry),
- 						full_path, CIFS_ACL_DACL);
- 			else
- 				rc = -EOPNOTSUPP;
- 			if (rc == 0) /* force revalidate of the inode */
--				CIFS_I(d_inode(direntry))->time = 0;
-+				CIFS_I(d_inode(dentry))->time = 0;
- 			kfree(pacl);
- 		}
--#else
--		cifs_dbg(FYI, "Set CIFS ACL not supported yet\n");
- #endif /* CONFIG_CIFS_ACL */
--	} else {
--		if (strcmp(ea_name, XATTR_NAME_POSIX_ACL_ACCESS) == 0) {
-+		break;
-+	}
-+
-+	case XATTR_ACL_ACCESS:
- #ifdef CONFIG_CIFS_POSIX
--			if (sb->s_flags & MS_POSIXACL)
--				rc = CIFSSMBSetPosixACL(xid, pTcon, full_path,
--					ea_value, (const int)value_size,
--					ACL_TYPE_ACCESS, cifs_sb->local_nls,
--					cifs_remap(cifs_sb));
--			cifs_dbg(FYI, "set POSIX ACL rc %d\n", rc);
--#else
--			cifs_dbg(FYI, "set POSIX ACL not supported\n");
--#endif
--		} else if (strcmp(ea_name, XATTR_NAME_POSIX_ACL_DEFAULT) == 0) {
-+		if (!value)
-+			goto out;
-+		if (sb->s_flags & MS_POSIXACL)
-+			rc = CIFSSMBSetPosixACL(xid, pTcon, full_path,
-+				value, (const int)size,
-+				ACL_TYPE_ACCESS, cifs_sb->local_nls,
-+				cifs_remap(cifs_sb));
-+#endif  /* CONFIG_CIFS_POSIX */
-+		break;
-+
-+	case XATTR_ACL_DEFAULT:
- #ifdef CONFIG_CIFS_POSIX
--			if (sb->s_flags & MS_POSIXACL)
--				rc = CIFSSMBSetPosixACL(xid, pTcon, full_path,
--					ea_value, (const int)value_size,
--					ACL_TYPE_DEFAULT, cifs_sb->local_nls,
--					cifs_remap(cifs_sb));
--			cifs_dbg(FYI, "set POSIX default ACL rc %d\n", rc);
--#else
--			cifs_dbg(FYI, "set default POSIX ACL not supported\n");
--#endif
--		} else {
--			cifs_dbg(FYI, "illegal xattr request %s (only user namespace supported)\n",
--				 ea_name);
--		  /* BB what if no namespace prefix? */
--		  /* Should we just pass them to server, except for
--		  system and perhaps security prefixes? */
--		}
-+		if (!value)
-+			goto out;
-+		if (sb->s_flags & MS_POSIXACL)
-+			rc = CIFSSMBSetPosixACL(xid, pTcon, full_path,
-+				value, (const int)size,
-+				ACL_TYPE_DEFAULT, cifs_sb->local_nls,
-+				cifs_remap(cifs_sb));
-+#endif  /* CONFIG_CIFS_POSIX */
-+		break;
- 	}
- 
--set_ea_exit:
-+out:
- 	kfree(full_path);
- 	free_xid(xid);
- 	cifs_put_tlink(tlink);
--#endif
- 	return rc;
- }
- 
--ssize_t cifs_getxattr(struct dentry *direntry, struct inode *inode,
--	const char *ea_name, void *ea_value, size_t buf_size)
-+static int cifs_xattr_get(const struct xattr_handler *handler,
-+			  struct dentry *dentry, struct inode *inode,
-+			  const char *name, void *value, size_t size)
- {
- 	ssize_t rc = -EOPNOTSUPP;
--#ifdef CONFIG_CIFS_XATTR
- 	unsigned int xid;
--	struct super_block *sb = direntry->d_sb;
-+	struct super_block *sb = dentry->d_sb;
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
- 	struct tcon_link *tlink;
- 	struct cifs_tcon *pTcon;
-@@ -235,95 +162,72 @@ ssize_t cifs_getxattr(struct dentry *direntry, struct inode *inode,
- 
- 	xid = get_xid();
- 
--	full_path = build_path_from_dentry(direntry);
-+	full_path = build_path_from_dentry(dentry);
- 	if (full_path == NULL) {
- 		rc = -ENOMEM;
--		goto get_ea_exit;
-+		goto out;
- 	}
- 	/* return dos attributes as pseudo xattr */
- 	/* return alt name if available as pseudo attr */
--	if (ea_name == NULL) {
--		cifs_dbg(FYI, "Null xattr names not supported\n");
--	} else if (strncmp(ea_name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LEN)
--		   == 0) {
-+	switch (handler->flags) {
-+	case XATTR_USER:
- 		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_XATTR)
--			goto get_ea_exit;
-+			goto out;
- 
--		if (strcmp(ea_name, CIFS_XATTR_DOS_ATTRIB) == 0) {
--			cifs_dbg(FYI, "attempt to query cifs inode metadata\n");
--			/* revalidate/getattr then populate from inode */
--		} /* BB add else when above is implemented */
--		ea_name += XATTR_USER_PREFIX_LEN; /* skip past user. prefix */
- 		if (pTcon->ses->server->ops->query_all_EAs)
- 			rc = pTcon->ses->server->ops->query_all_EAs(xid, pTcon,
--				full_path, ea_name, ea_value, buf_size,
-+				full_path, name, value, size,
- 				cifs_sb->local_nls, cifs_remap(cifs_sb));
--	} else if (strncmp(ea_name, XATTR_OS2_PREFIX, XATTR_OS2_PREFIX_LEN) == 0) {
--		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_XATTR)
--			goto get_ea_exit;
-+		break;
- 
--		ea_name += XATTR_OS2_PREFIX_LEN; /* skip past os2. prefix */
--		if (pTcon->ses->server->ops->query_all_EAs)
--			rc = pTcon->ses->server->ops->query_all_EAs(xid, pTcon,
--				full_path, ea_name, ea_value, buf_size,
--				cifs_sb->local_nls, cifs_remap(cifs_sb));
--	} else if (strcmp(ea_name, XATTR_NAME_POSIX_ACL_ACCESS) == 0) {
-+	case XATTR_CIFS_ACL: {
-+#ifdef CONFIG_CIFS_ACL
-+		u32 acllen;
-+		struct cifs_ntsd *pacl;
-+
-+		if (pTcon->ses->server->ops->get_acl == NULL)
-+			goto out; /* rc already EOPNOTSUPP */
-+
-+		pacl = pTcon->ses->server->ops->get_acl(cifs_sb,
-+				inode, full_path, &acllen);
-+		if (IS_ERR(pacl)) {
-+			rc = PTR_ERR(pacl);
-+			cifs_dbg(VFS, "%s: error %zd getting sec desc\n",
-+				 __func__, rc);
-+		} else {
-+			if (value) {
-+				if (acllen > size)
-+					acllen = -ERANGE;
-+				else
-+					memcpy(value, pacl, acllen);
-+			}
-+			rc = acllen;
-+			kfree(pacl);
-+		}
-+#endif  /* CONFIG_CIFS_ACL */
-+		break;
-+	}
-+
-+	case XATTR_ACL_ACCESS:
- #ifdef CONFIG_CIFS_POSIX
- 		if (sb->s_flags & MS_POSIXACL)
- 			rc = CIFSSMBGetPosixACL(xid, pTcon, full_path,
--				ea_value, buf_size, ACL_TYPE_ACCESS,
-+				value, size, ACL_TYPE_ACCESS,
- 				cifs_sb->local_nls,
- 				cifs_remap(cifs_sb));
--#else
--		cifs_dbg(FYI, "Query POSIX ACL not supported yet\n");
--#endif /* CONFIG_CIFS_POSIX */
--	} else if (strcmp(ea_name, XATTR_NAME_POSIX_ACL_DEFAULT) == 0) {
-+#endif  /* CONFIG_CIFS_POSIX */
-+		break;
-+
-+	case XATTR_ACL_DEFAULT:
- #ifdef CONFIG_CIFS_POSIX
- 		if (sb->s_flags & MS_POSIXACL)
- 			rc = CIFSSMBGetPosixACL(xid, pTcon, full_path,
--				ea_value, buf_size, ACL_TYPE_DEFAULT,
-+				value, size, ACL_TYPE_DEFAULT,
- 				cifs_sb->local_nls,
- 				cifs_remap(cifs_sb));
--#else
--		cifs_dbg(FYI, "Query POSIX default ACL not supported yet\n");
--#endif /* CONFIG_CIFS_POSIX */
--	} else if (strcmp(ea_name, CIFS_XATTR_CIFS_ACL) == 0) {
--#ifdef CONFIG_CIFS_ACL
--			u32 acllen;
--			struct cifs_ntsd *pacl;
--
--			if (pTcon->ses->server->ops->get_acl == NULL)
--				goto get_ea_exit; /* rc already EOPNOTSUPP */
--
--			pacl = pTcon->ses->server->ops->get_acl(cifs_sb,
--					inode, full_path, &acllen);
--			if (IS_ERR(pacl)) {
--				rc = PTR_ERR(pacl);
--				cifs_dbg(VFS, "%s: error %zd getting sec desc\n",
--					 __func__, rc);
--			} else {
--				if (ea_value) {
--					if (acllen > buf_size)
--						acllen = -ERANGE;
--					else
--						memcpy(ea_value, pacl, acllen);
--				}
--				rc = acllen;
--				kfree(pacl);
--			}
--#else
--			cifs_dbg(FYI, "Query CIFS ACL not supported yet\n");
--#endif /* CONFIG_CIFS_ACL */
--	} else if (strncmp(ea_name,
--		  XATTR_TRUSTED_PREFIX, XATTR_TRUSTED_PREFIX_LEN) == 0) {
--		cifs_dbg(FYI, "Trusted xattr namespace not supported yet\n");
--	} else if (strncmp(ea_name,
--		  XATTR_SECURITY_PREFIX, XATTR_SECURITY_PREFIX_LEN) == 0) {
--		cifs_dbg(FYI, "Security xattr namespace not supported yet\n");
--	} else
--		cifs_dbg(FYI,
--			 "illegal xattr request %s (only user namespace supported)\n",
--			 ea_name);
-+#endif  /* CONFIG_CIFS_POSIX */
-+		break;
-+	}
- 
- 	/* We could add an additional check for streams ie
- 	    if proc/fs/cifs/streamstoxattr is set then
-@@ -333,18 +237,16 @@ ssize_t cifs_getxattr(struct dentry *direntry, struct inode *inode,
- 	if (rc == -EINVAL)
- 		rc = -EOPNOTSUPP;
- 
--get_ea_exit:
-+out:
- 	kfree(full_path);
- 	free_xid(xid);
- 	cifs_put_tlink(tlink);
--#endif
- 	return rc;
- }
- 
- ssize_t cifs_listxattr(struct dentry *direntry, char *data, size_t buf_size)
- {
- 	ssize_t rc = -EOPNOTSUPP;
--#ifdef CONFIG_CIFS_XATTR
- 	unsigned int xid;
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(direntry->d_sb);
- 	struct tcon_link *tlink;
-@@ -381,6 +283,50 @@ list_ea_exit:
- 	kfree(full_path);
- 	free_xid(xid);
- 	cifs_put_tlink(tlink);
--#endif
- 	return rc;
- }
-+
-+static const struct xattr_handler cifs_user_xattr_handler = {
-+	.prefix = XATTR_USER_PREFIX,
-+	.flags = XATTR_USER,
-+	.get = cifs_xattr_get,
-+	.set = cifs_xattr_set,
-+};
-+
-+/* os2.* attributes are treated like user.* attributes */
-+static const struct xattr_handler cifs_os2_xattr_handler = {
-+	.prefix = XATTR_OS2_PREFIX,
-+	.flags = XATTR_USER,
-+	.get = cifs_xattr_get,
-+	.set = cifs_xattr_set,
-+};
-+
-+static const struct xattr_handler cifs_cifs_acl_xattr_handler = {
-+	.name = CIFS_XATTR_CIFS_ACL,
-+	.flags = XATTR_CIFS_ACL,
-+	.get = cifs_xattr_get,
-+	.set = cifs_xattr_set,
-+};
-+
-+static const struct xattr_handler cifs_posix_acl_access_xattr_handler = {
-+	.name = XATTR_NAME_POSIX_ACL_ACCESS,
-+	.flags = XATTR_ACL_ACCESS,
-+	.get = cifs_xattr_get,
-+	.set = cifs_xattr_set,
-+};
-+
-+static const struct xattr_handler cifs_posix_acl_default_xattr_handler = {
-+	.name = XATTR_NAME_POSIX_ACL_DEFAULT,
-+	.flags = XATTR_ACL_DEFAULT,
-+	.get = cifs_xattr_get,
-+	.set = cifs_xattr_set,
-+};
-+
-+const struct xattr_handler *cifs_xattr_handlers[] = {
-+	&cifs_user_xattr_handler,
-+	&cifs_os2_xattr_handler,
-+	&cifs_cifs_acl_xattr_handler,
-+	&cifs_posix_acl_access_xattr_handler,
-+	&cifs_posix_acl_default_xattr_handler,
-+	NULL
-+};
+ #ifdef CONFIG_CIFS_UPCALL
+-	rc = register_key_type(&cifs_spnego_key_type);
++	rc = init_cifs_spnego();
+ 	if (rc)
+ 		goto out_destroy_request_bufs;
+ #endif /* CONFIG_CIFS_UPCALL */
+@@ -1330,7 +1330,7 @@ out_init_cifs_idmap:
+ out_register_key_type:
+ #endif
+ #ifdef CONFIG_CIFS_UPCALL
+-	unregister_key_type(&cifs_spnego_key_type);
++	exit_cifs_spnego();
+ out_destroy_request_bufs:
+ #endif
+ 	cifs_destroy_request_bufs();
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index eed7ff5..ca618b0 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -60,6 +60,8 @@ do {								\
+ } while (0)
+ extern int init_cifs_idmap(void);
+ extern void exit_cifs_idmap(void);
++extern int init_cifs_spnego(void);
++extern int exit_cifs_spnego(void);
+ extern char *build_path_from_dentry(struct dentry *);
+ extern char *cifs_build_path_to_root(struct smb_vol *vol,
+ 				     struct cifs_sb_info *cifs_sb,
 -- 
 2.5.5
-
