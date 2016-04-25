@@ -1,62 +1,85 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [RFC][PATCHSET] reduce messing with iovecs in cifs
-Date: Sun, 24 Apr 2016 22:22:34 -0500
-Message-ID: <CAH2r5msj7oxce-XJXk-ntQM6tv4aBcQGhyJYb=21Z3AhSq3QcQ@mail.gmail.com>
-References: <20160409204301.GF25498@ZenIV.linux.org.uk>
+Subject: Re: [PATCH] cifs: remove any preceding delimiter from prefix_path
+Date: Sun, 24 Apr 2016 22:30:16 -0500
+Message-ID: <CAH2r5mvaPCwKOa-w-=M9sKwgO4O1uJ0aunYKUwwDVVo7fHp+oQ@mail.gmail.com>
+References: <1454919241-28048-1-git-send-email-sprabhu@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20160409204301.GF25498-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
+In-Reply-To: <1454919241-28048-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Reviewed-by: Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+Merged into cifs-2.6.git
 
-Let me know if you want any of them to go in via the cifs tree or
-prefer going in through your tree (other than patch 1 which could go
-in the net-next tree are you indicated)
-
-On Sat, Apr 9, 2016 at 3:43 PM, Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org> wrote:
->         Now that sendmsg/recvmsg do not mangle iovecs and are capable of
-> handling bvec-based ->msg_iter, we can seriously reduce the amount of PITA
-> in cifs.  The series below is completely untested, and I would appreciate
-> comments/review/testing/etc.
+On Mon, Feb 8, 2016 at 2:14 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> We currently do not check if any delimiter exists before the prefix
+> path in cifs_compose_mount_options(). Consequently when building the
+> devname using cifs_build_devname() we can end up with multiple
+> delimiters separating the UNC and the prefix path.
 >
-> I'll post the individual patches in followups; for those who prefer to use
-> git it can be found in
-> git://git.kernel.org/pub/scm/linux/kernel/git/viro/vfs.git sendmsg.cifs
+> An issue was reported by the customer mounting a folder within a DFS
+> share from a Netapp server which uses McAfee antivirus. We have
+> narrowed down the cause to the use of double backslashes in the file
+> name used to open the file. This was determined to be caused because of
+> additional delimiters as a result of the bug.
 >
-> 1/6: [net] drop 'size' argument of sock_recvmsg()
->         should go via net-next; does what it says.
+> In addition to changes in cifs_build_devname(), we also fix
+> cifs_parse_devname() to ignore any preceding delimiter for the prefix
+> path.
 >
-> 2/6: cifs: merge the hash calculation helpers
->         takes the common parts of {cifs,smb2,smb3}_calc_signature() into a
-> common helper.
+> The problem was originally reported on RHEL 6 in RHEL bz 1252721. This
+> is the upstream version of the fix. The fix was confirmed by looking at
+> the packet capture of a DFS mount.
 >
-> 3/6: cifs: quit playing games with draining iovecs
->         Switch smb_send_kvec() to passing msghdr (and thus iov_iter) and
-> make it use sock_sendmsg() - that allows to avoid draining iovecs, since
-> ->msg_iter will be advanced properly and all we need is to keep it around
-> between the calls of sock_sendmsg(), rather than reinitializing it on each
-> loop iteration.  The same thing allows to get rid of messing with kmap()
-> when sending the stuff in ->rq_pages[] - ITER_BVEC will do the right thing.
+> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/cifs_dfs_ref.c | 6 +++++-
+>  fs/cifs/connect.c      | 8 ++++++--
+>  2 files changed, 11 insertions(+), 3 deletions(-)
 >
-> 4/6: cifs: no need to wank with copying and advancing iovec on recvmsg side either
->         Similar to the previous - use sock_recvmsg() in cifs_readv_from_socket()
-> and there's no need to modify iovecs, or allocate a copy especially for
-> such modifications, etc.
+> diff --git a/fs/cifs/cifs_dfs_ref.c b/fs/cifs/cifs_dfs_ref.c
+> index 7dc886c..10db1fe 100644
+> --- a/fs/cifs/cifs_dfs_ref.c
+> +++ b/fs/cifs/cifs_dfs_ref.c
+> @@ -151,8 +151,12 @@ char *cifs_compose_mount_options(const char *sb_mountdata,
+>         if (sb_mountdata == NULL)
+>                 return ERR_PTR(-EINVAL);
 >
-> 5/6: cifs_readv_receive: use cifs_read_from_socket()
->         building a 1-element iovec array for cifs_readv_from_socket() is
-> an overkill - simple cifs_read_from_socket() will do just fine.
+> -       if (strlen(fullpath) - ref->path_consumed)
+> +       if (strlen(fullpath) - ref->path_consumed) {
+>                 prepath = fullpath + ref->path_consumed;
+> +               /* skip initial delimiter */
+> +               if (*prepath == '/' || *prepath == '\\')
+> +                       prepath++;
+> +       }
 >
-> 6/6: cifs: don't bother with kmap on read_pages side
->         Similar to the other half of 3/6: we can use ITER_BVEC for
-> read-into-page case.  Just make cifs_readv_from_socket() take msghdr from
-> caller and use a helper that would feed it a bvec-backed ->msg_iter.
+>         *devname = cifs_build_devname(ref->node_name, prepath);
+>         if (IS_ERR(*devname)) {
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 4fbd92d..2acb4bb 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -1196,8 +1196,12 @@ cifs_parse_devname(const char *devname, struct smb_vol *vol)
+>
+>         convert_delimiter(vol->UNC, '\\');
+>
+> -       /* If pos is NULL, or is a bogus trailing delimiter then no prepath */
+> -       if (!*pos++ || !*pos)
+> +       /* skip any delimiter */
+> +       if (*pos == '/' || *pos == '\\')
+> +               pos++;
+> +
+> +       /* If pos is NULL then no prepath */
+> +       if (!*pos)
+>                 return 0;
+>
+>         vol->prepath = kstrdup(pos, GFP_KERNEL);
+> --
+> 2.5.0
+>
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
 > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
