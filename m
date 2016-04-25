@@ -1,89 +1,32 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: remove any preceding delimiter from prefix_path
-Date: Sun, 24 Apr 2016 22:30:16 -0500
-Message-ID: <CAH2r5mvaPCwKOa-w-=M9sKwgO4O1uJ0aunYKUwwDVVo7fHp+oQ@mail.gmail.com>
-References: <1454919241-28048-1-git-send-email-sprabhu@redhat.com>
+Subject: Re: Design of fsnotify for FUSE, nfs and cifs: when/how to send a watch.
+Date: Sun, 24 Apr 2016 22:32:44 -0500
+Message-ID: <CAH2r5mvahP1Vkp+=84O3BntjwNvu4k498S1CjxZ2mhKu8GhDKg@mail.gmail.com>
+References: <CANXojcz-U4YzgUhDRgvoVX=n756oVg4nvvvwpimmpBJyLkkmoQ@mail.gmail.com>
+ <CANXojcwF1ePzsLjpVbPZNdQTO6wG3xh2GQe6fPNJ5H4sZur-mA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"fuse-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org" <fuse-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org>
+To: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1454919241-28048-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <CANXojcwF1ePzsLjpVbPZNdQTO6wG3xh2GQe6fPNJ5H4sZur-mA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Merged into cifs-2.6.git
+It is an interesting idea to enable fsnotify on the mount level.  Do
+you have any data on performance impact of fsnotify in your testing
+with fuse?
 
-On Mon, Feb 8, 2016 at 2:14 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> We currently do not check if any delimiter exists before the prefix
-> path in cifs_compose_mount_options(). Consequently when building the
-> devname using cifs_build_devname() we can end up with multiple
-> delimiters separating the UNC and the prefix path.
+On Thu, Apr 21, 2016 at 2:26 AM, Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> Hi,
 >
-> An issue was reported by the customer mounting a folder within a DFS
-> share from a Netapp server which uses McAfee antivirus. We have
-> narrowed down the cause to the use of double backslashes in the file
-> name used to open the file. This was determined to be caused because of
-> additional delimiters as a result of the bug.
+> the links does not work. The trailing dot causes this. Goto the wiki
+> and select the right page:
 >
-> In addition to changes in cifs_build_devname(), we also fix
-> cifs_parse_devname() to ignore any preceding delimiter for the prefix
-> path.
+> https://github.com/libfuse/libfuse/wiki
 >
-> The problem was originally reported on RHEL 6 in RHEL bz 1252721. This
-> is the upstream version of the fix. The fix was confirmed by looking at
-> the packet capture of a DFS mount.
->
-> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/cifs_dfs_ref.c | 6 +++++-
->  fs/cifs/connect.c      | 8 ++++++--
->  2 files changed, 11 insertions(+), 3 deletions(-)
->
-> diff --git a/fs/cifs/cifs_dfs_ref.c b/fs/cifs/cifs_dfs_ref.c
-> index 7dc886c..10db1fe 100644
-> --- a/fs/cifs/cifs_dfs_ref.c
-> +++ b/fs/cifs/cifs_dfs_ref.c
-> @@ -151,8 +151,12 @@ char *cifs_compose_mount_options(const char *sb_mountdata,
->         if (sb_mountdata == NULL)
->                 return ERR_PTR(-EINVAL);
->
-> -       if (strlen(fullpath) - ref->path_consumed)
-> +       if (strlen(fullpath) - ref->path_consumed) {
->                 prepath = fullpath + ref->path_consumed;
-> +               /* skip initial delimiter */
-> +               if (*prepath == '/' || *prepath == '\\')
-> +                       prepath++;
-> +       }
->
->         *devname = cifs_build_devname(ref->node_name, prepath);
->         if (IS_ERR(*devname)) {
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 4fbd92d..2acb4bb 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -1196,8 +1196,12 @@ cifs_parse_devname(const char *devname, struct smb_vol *vol)
->
->         convert_delimiter(vol->UNC, '\\');
->
-> -       /* If pos is NULL, or is a bogus trailing delimiter then no prepath */
-> -       if (!*pos++ || !*pos)
-> +       /* skip any delimiter */
-> +       if (*pos == '/' || *pos == '\\')
-> +               pos++;
-> +
-> +       /* If pos is NULL then no prepath */
-> +       if (!*pos)
->                 return 0;
->
->         vol->prepath = kstrdup(pos, GFP_KERNEL);
-> --
-> 2.5.0
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Stef
 
 
 
