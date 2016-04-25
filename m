@@ -1,88 +1,62 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Use file_dentry()
-Date: Sun, 24 Apr 2016 21:15:32 -0500
-Message-ID: <CAH2r5msk7Bq2VsW_J6eM0RZpku0mrDgRfoAvN0ijiQ0WFxBoTw@mail.gmail.com>
-References: <1460979712-2581-1-git-send-email-rgoldwyn@suse.de> <CADT32eK7N7L1pWjgTejg8Vo8dukX_mhmqz3NDPwG+M3_mcp8YQ@mail.gmail.com>
+Subject: Re: [RFC][PATCHSET] reduce messing with iovecs in cifs
+Date: Sun, 24 Apr 2016 22:22:34 -0500
+Message-ID: <CAH2r5msj7oxce-XJXk-ntQM6tv4aBcQGhyJYb=21Z3AhSq3QcQ@mail.gmail.com>
+References: <20160409204301.GF25498@ZenIV.linux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Goldwyn Rodrigues <rgoldwyn-l3A5Bk7waGM@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Miklos Szeredi <miklos-sUDqSbJrdHQHWmgEVkV9KA@public.gmane.org>,
-	Goldwyn Rodrigues <rgoldwyn-IBi9RG/b67k@public.gmane.org>
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32eK7N7L1pWjgTejg8Vo8dukX_mhmqz3NDPwG+M3_mcp8YQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20160409204301.GF25498-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-merged into cifs-2.6.git
+Reviewed-by: Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
 
-On Wed, Apr 20, 2016 at 11:21 PM, Shirish Pargaonkar
-<shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> Looks correct.
+Let me know if you want any of them to go in via the cifs tree or
+prefer going in through your tree (other than patch 1 which could go
+in the net-next tree are you indicated)
+
+On Sat, Apr 9, 2016 at 3:43 PM, Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org> wrote:
+>         Now that sendmsg/recvmsg do not mangle iovecs and are capable of
+> handling bvec-based ->msg_iter, we can seriously reduce the amount of PITA
+> in cifs.  The series below is completely untested, and I would appreciate
+> comments/review/testing/etc.
 >
-> Acked-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> I'll post the individual patches in followups; for those who prefer to use
+> git it can be found in
+> git://git.kernel.org/pub/scm/linux/kernel/git/viro/vfs.git sendmsg.cifs
 >
-> On Mon, Apr 18, 2016 at 6:41 AM, Goldwyn Rodrigues <rgoldwyn-l3A5Bk7waGM@public.gmane.org> wrote:
->> From: Goldwyn Rodrigues <rgoldwyn-IBi9RG/b67k@public.gmane.org>
->>
->> CIFS may be used as lower layer of overlayfs and accessing f_path.dentry can
->> lead to a crash.
->>
->> Fix by replacing direct access of file->f_path.dentry with the
->> file_dentry() accessor, which will always return a native object.
->>
->> Signed-off-by: Goldwyn Rodrigues <rgoldwyn-IBi9RG/b67k@public.gmane.org>
->>
->> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
->> index c03d074..489ddc7 100644
->> --- a/fs/cifs/file.c
->> +++ b/fs/cifs/file.c
->> @@ -271,7 +271,7 @@ struct cifsFileInfo *
->>  cifs_new_fileinfo(struct cifs_fid *fid, struct file *file,
->>                   struct tcon_link *tlink, __u32 oplock)
->>  {
->> -       struct dentry *dentry = file->f_path.dentry;
->> +       struct dentry *dentry = file_dentry(file);
->>         struct inode *inode = d_inode(dentry);
->>         struct cifsInodeInfo *cinode = CIFS_I(inode);
->>         struct cifsFileInfo *cfile;
->> @@ -461,7 +461,7 @@ int cifs_open(struct inode *inode, struct file *file)
->>         tcon = tlink_tcon(tlink);
->>         server = tcon->ses->server;
->>
->> -       full_path = build_path_from_dentry(file->f_path.dentry);
->> +       full_path = build_path_from_dentry(file_dentry(file));
->>         if (full_path == NULL) {
->>                 rc = -ENOMEM;
->>                 goto out;
->> diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
->> index b30a4a6..8806584 100644
->> --- a/fs/cifs/readdir.c
->> +++ b/fs/cifs/readdir.c
->> @@ -300,7 +300,7 @@ initiate_cifs_search(const unsigned int xid, struct file *file)
->>         cifsFile->invalidHandle = true;
->>         cifsFile->srch_inf.endOfSearch = false;
->>
->> -       full_path = build_path_from_dentry(file->f_path.dentry);
->> +       full_path = build_path_from_dentry(file_dentry(file));
->>         if (full_path == NULL) {
->>                 rc = -ENOMEM;
->>                 goto error_exit;
->> @@ -759,7 +759,7 @@ static int cifs_filldir(char *find_entry, struct file *file,
->>                  */
->>                 fattr.cf_flags |= CIFS_FATTR_NEED_REVAL;
->>
->> -       cifs_prime_dcache(file->f_path.dentry, &name, &fattr);
->> +       cifs_prime_dcache(file_dentry(file), &name, &fattr);
->>
->>         ino = cifs_uniqueid_to_ino_t(fattr.cf_uniqueid);
->>         return !dir_emit(ctx, name.name, name.len, ino, fattr.cf_dtype);
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 1/6: [net] drop 'size' argument of sock_recvmsg()
+>         should go via net-next; does what it says.
+>
+> 2/6: cifs: merge the hash calculation helpers
+>         takes the common parts of {cifs,smb2,smb3}_calc_signature() into a
+> common helper.
+>
+> 3/6: cifs: quit playing games with draining iovecs
+>         Switch smb_send_kvec() to passing msghdr (and thus iov_iter) and
+> make it use sock_sendmsg() - that allows to avoid draining iovecs, since
+> ->msg_iter will be advanced properly and all we need is to keep it around
+> between the calls of sock_sendmsg(), rather than reinitializing it on each
+> loop iteration.  The same thing allows to get rid of messing with kmap()
+> when sending the stuff in ->rq_pages[] - ITER_BVEC will do the right thing.
+>
+> 4/6: cifs: no need to wank with copying and advancing iovec on recvmsg side either
+>         Similar to the previous - use sock_recvmsg() in cifs_readv_from_socket()
+> and there's no need to modify iovecs, or allocate a copy especially for
+> such modifications, etc.
+>
+> 5/6: cifs_readv_receive: use cifs_read_from_socket()
+>         building a 1-element iovec array for cifs_readv_from_socket() is
+> an overkill - simple cifs_read_from_socket() will do just fine.
+>
+> 6/6: cifs: don't bother with kmap on read_pages side
+>         Similar to the other half of 3/6: we can use ITER_BVEC for
+> read-into-page case.  Just make cifs_readv_from_socket() take msghdr from
+> caller and use a helper that would feed it a bvec-backed ->msg_iter.
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
 > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
