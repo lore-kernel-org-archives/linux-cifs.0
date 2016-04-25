@@ -1,189 +1,121 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Create dedicated keyring for spnego operations
-Date: Sat, 23 Apr 2016 17:58:21 -0500
-Message-ID: <CADT32e+Z71K=mjB_Ff2NQ-jQLPAZ3cVz0xuQ_kFouDDC_5tRUw@mail.gmail.com>
-References: <1461355113-30510-1-git-send-email-sprabhu@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Scott Mayhew <smayhew-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1461355113-30510-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Eric Engestrom <eric@engestrom.ch>
+Subject: [PATCH 25/41] Documentation: filesystems: fix spelling mistakes
+Date: Mon, 25 Apr 2016 01:24:22 +0100
+Message-ID: <1461543878-3639-26-git-send-email-eric@engestrom.ch>
+References: <1461543878-3639-1-git-send-email-eric@engestrom.ch>
+Cc: Eric Engestrom <eric@engestrom.ch>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Steve French <sfrench@samba.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Michal Hocko <mhocko@suse.com>,
+	Hugh Dickins <hughd@google.com>,
+	Konstantin Khlebnikov <koct9i@gmail.com>,
+	Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>,
+	Chen Hanxiao <chenhanxiao@cn.fujitsu.com>,
+	Minchan Kim <minchan@kernel.org>,
+	John Stultz <john.stultz@linaro.org>,
+	Ross Zwisler <ross.zwisler@linux.intel.com>,
+	Jerome Marchand <jmarchan@redhat.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	Thomas de Beauchene <thomas.chauvot-de-beauchene@epitech.eu>,
+	linux-doc@vger.kernel.org, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-doc-owner@vger.kernel.org>
+In-Reply-To: <1461543878-3639-1-git-send-email-eric@engestrom.ch>
+Sender: linux-doc-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Looks correct. May be init functions for idmap and spnego could be merged..
+Signed-off-by: Eric Engestrom <eric@engestrom.ch>
+---
+ Documentation/filesystems/autofs4.txt  | 6 +++---
+ Documentation/filesystems/cifs/CHANGES | 2 +-
+ Documentation/filesystems/proc.txt     | 4 ++--
+ Documentation/filesystems/vfs.txt      | 2 +-
+ 4 files changed, 7 insertions(+), 7 deletions(-)
 
-Reviewed-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+diff --git a/Documentation/filesystems/autofs4.txt b/Documentation/filesystems/autofs4.txt
+index 39d02e1..25fe9db 100644
+--- a/Documentation/filesystems/autofs4.txt
++++ b/Documentation/filesystems/autofs4.txt
+@@ -225,7 +225,7 @@ unmount any filesystems mounted on the autofs filesystem or remove any
+ symbolic links or empty directories any time it likes.  If the unmount
+ or removal is successful the filesystem will be returned to the state
+ it was before the mount or creation, so that any access of the name
+-will trigger normal auto-mount processing.  In particlar, `rmdir` and
++will trigger normal auto-mount processing.  In particular, `rmdir` and
+ `unlink` do not leave negative entries in the dcache as a normal
+ filesystem would, so an attempt to access a recently-removed object is
+ passed to autofs for handling.
+@@ -242,7 +242,7 @@ time stamp on each directory or symlink.  For symlinks it genuinely
+ does record the last time the symlink was "used" or followed to find
+ out where it points to.  For directories the field is a slight
+ misnomer.  It actually records the last time that autofs checked if
+-the directory or one of its descendents was busy and found that it
++the directory or one of its descendants was busy and found that it
+ was.  This is just as useful and doesn't require updating the field so
+ often.
+ 
+@@ -255,7 +255,7 @@ up.
+ 
+ There is an option with indirect mounts to consider each of the leaves
+ that has been mounted on instead of considering the top-level names.
+-This is intended for compatability with version 4 of autofs and should
++This is intended for compatibility with version 4 of autofs and should
+ be considered as deprecated.
+ 
+ When autofs considers a directory it checks the `last_used` time and
+diff --git a/Documentation/filesystems/cifs/CHANGES b/Documentation/filesystems/cifs/CHANGES
+index bc0025c..fe8f1ed 100644
+--- a/Documentation/filesystems/cifs/CHANGES
++++ b/Documentation/filesystems/cifs/CHANGES
+@@ -455,7 +455,7 @@ Fix internationalization problem in cifs readdir with filenames that map to
+ longer UTF-8 strings than the string on the wire was in Unicode.  Add workaround
+ for readdir to netapp servers. Fix search rewind (seek into readdir to return 
+ non-consecutive entries).  Do not do readdir when server negotiates 
+-buffer size to small to fit filename. Add support for reading POSIX ACLs from
++buffer size too small to fit filename. Add support for reading POSIX ACLs from
+ the server (add also acl and noacl mount options).
+ 
+ Version 1.24
+diff --git a/Documentation/filesystems/proc.txt b/Documentation/filesystems/proc.txt
+index 7f5607a..03b6019 100644
+--- a/Documentation/filesystems/proc.txt
++++ b/Documentation/filesystems/proc.txt
+@@ -462,7 +462,7 @@ accessed.
+ "Anonymous" shows the amount of memory that does not belong to any file.  Even
+ a mapping associated with a file may contain anonymous pages: when MAP_PRIVATE
+ and a page is modified, the file page is replaced by a private anonymous copy.
+-"AnonHugePages" shows the ammount of memory backed by transparent hugepage.
++"AnonHugePages" shows the amount of memory backed by transparent hugepage.
+ "Shared_Hugetlb" and "Private_Hugetlb" show the ammounts of memory backed by
+ hugetlbfs page which is *not* counted in "RSS" or "PSS" field for historical
+ reasons. And these are not included in {Shared,Private}_{Clean,Dirty} field.
+@@ -1899,7 +1899,7 @@ hidepid=1 means users may not access any /proc/<pid>/ directories but their
+ own.  Sensitive files like cmdline, sched*, status are now protected against
+ other users.  This makes it impossible to learn whether any user runs
+ specific program (given the program doesn't reveal itself by its behaviour).
+-As an additional bonus, as /proc/<pid>/cmdline is unaccessible for other users,
++As an additional bonus, as /proc/<pid>/cmdline is inaccessible for other users,
+ poorly written programs passing sensitive information via program arguments are
+ now protected against local eavesdroppers.
+ 
+diff --git a/Documentation/filesystems/vfs.txt b/Documentation/filesystems/vfs.txt
+index 4164bd6..ec67866 100644
+--- a/Documentation/filesystems/vfs.txt
++++ b/Documentation/filesystems/vfs.txt
+@@ -1014,7 +1014,7 @@ struct dentry_operations {
+ 	Useful for some pseudo filesystems (sockfs, pipefs, ...) to delay
+ 	pathname generation. (Instead of doing it when dentry is created,
+ 	it's done only when the path is needed.). Real filesystems probably
+-	dont want to use it, because their dentries are present in global
++	don't want to use it, because their dentries are present in global
+ 	dcache hash, so their hash should be an invariant. As no lock is
+ 	held, d_dname() should not try to modify the dentry itself, unless
+ 	appropriate SMP safety is used. CAUTION : d_path() logic is quite
+-- 
+2.8.0
 
-On Fri, Apr 22, 2016 at 2:58 PM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> The session key is the default keyring set for request_key operations.
-> This session key is revoked when the user owning the session logs out.
-> Any long running daemon processes started by this session ends up with
-> revoked session keyring which prevents these processes from using the
-> request_key mechanism from obtaining the krb5 keys.
->
-> The problem has been reported by a large number of autofs users. The
-> problem is also seen with multiuser mounts where the share may be used
-> by processes run by a user who has since logged out. A reproducer using
-> automount is available on the Red Hat bz.
->
-> The patch creates a new keyring which is used to cache cifs spnego
-> upcalls.
->
-> Red Hat bz: 1267754
->
-> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> Reported-by: Scott Mayhew <smayhew-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/cifs_spnego.c | 67 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  fs/cifs/cifsfs.c      |  4 +--
->  fs/cifs/cifsproto.h   |  2 ++
->  3 files changed, 71 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/cifs/cifs_spnego.c b/fs/cifs/cifs_spnego.c
-> index 6908080..248ab43 100644
-> --- a/fs/cifs/cifs_spnego.c
-> +++ b/fs/cifs/cifs_spnego.c
-> @@ -24,11 +24,14 @@
->  #include <linux/string.h>
->  #include <keys/user-type.h>
->  #include <linux/key-type.h>
-> +#include <linux/keyctl.h>
->  #include <linux/inet.h>
->  #include "cifsglob.h"
->  #include "cifs_spnego.h"
->  #include "cifs_debug.h"
->
-> +static const struct cred *spnego_cred;
-> +
->  /* create a new cifs key */
->  static int
->  cifs_spnego_key_instantiate(struct key *key, struct key_preparsed_payload *prep)
-> @@ -102,6 +105,7 @@ cifs_get_spnego_key(struct cifs_ses *sesInfo)
->         size_t desc_len;
->         struct key *spnego_key;
->         const char *hostname = server->hostname;
-> +       const struct cred *saved_cred;
->
->         /* length of fields (with semicolons): ver=0xyz ip4=ipaddress
->            host=hostname sec=mechanism uid=0xFF user=username */
-> @@ -163,7 +167,9 @@ cifs_get_spnego_key(struct cifs_ses *sesInfo)
->         sprintf(dp, ";pid=0x%x", current->pid);
->
->         cifs_dbg(FYI, "key description = %s\n", description);
-> +       saved_cred = override_creds(spnego_cred);
->         spnego_key = request_key(&cifs_spnego_key_type, description, "");
-> +       revert_creds(saved_cred);
->
->  #ifdef CONFIG_CIFS_DEBUG2
->         if (cifsFYI && !IS_ERR(spnego_key)) {
-> @@ -177,3 +183,64 @@ out:
->         kfree(description);
->         return spnego_key;
->  }
-> +
-> +int
-> +init_cifs_spnego(void)
-> +{
-> +       struct cred *cred;
-> +       struct key *keyring;
-> +       int ret;
-> +
-> +       cifs_dbg(FYI, "Registering the %s key type\n",
-> +                cifs_spnego_key_type.name);
-> +
-> +       /*
-> +        * Create an override credential set with special thread keyring for
-> +        * spnego upcalls.
-> +        */
-> +
-> +       cred = prepare_kernel_cred(NULL);
-> +       if (!cred)
-> +               return -ENOMEM;
-> +
-> +       keyring = keyring_alloc(".cifs_spnego",
-> +                               GLOBAL_ROOT_UID, GLOBAL_ROOT_GID, cred,
-> +                               (KEY_POS_ALL & ~KEY_POS_SETATTR) |
-> +                               KEY_USR_VIEW | KEY_USR_READ,
-> +                               KEY_ALLOC_NOT_IN_QUOTA, NULL);
-> +       if (IS_ERR(keyring)) {
-> +               ret = PTR_ERR(keyring);
-> +               goto failed_put_cred;
-> +       }
-> +
-> +       ret = register_key_type(&cifs_spnego_key_type);
-> +       if (ret < 0)
-> +               goto failed_put_key;
-> +
-> +       /*
-> +        * instruct request_key() to use this special keyring as a cache for
-> +        * the results it looks up
-> +        */
-> +       set_bit(KEY_FLAG_ROOT_CAN_CLEAR, &keyring->flags);
-> +       cred->thread_keyring = keyring;
-> +       cred->jit_keyring = KEY_REQKEY_DEFL_THREAD_KEYRING;
-> +       spnego_cred = cred;
-> +
-> +       cifs_dbg(FYI, "cifs spnego keyring: %d\n", key_serial(keyring));
-> +       return 0;
-> +
-> +failed_put_key:
-> +       key_put(keyring);
-> +failed_put_cred:
-> +       put_cred(cred);
-> +       return ret;
-> +}
-> +
-> +void
-> +exit_cifs_spnego(void)
-> +{
-> +       key_revoke(spnego_cred->thread_keyring);
-> +       unregister_key_type(&cifs_spnego_key_type);
-> +       put_cred(spnego_cred);
-> +       cifs_dbg(FYI, "Unregistered %s key type\n", cifs_spnego_key_type.name);
-> +}
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index 8920156..9852044 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -1307,7 +1307,7 @@ init_cifs(void)
->                 goto out_destroy_mids;
->
->  #ifdef CONFIG_CIFS_UPCALL
-> -       rc = register_key_type(&cifs_spnego_key_type);
-> +       rc = init_cifs_spnego();
->         if (rc)
->                 goto out_destroy_request_bufs;
->  #endif /* CONFIG_CIFS_UPCALL */
-> @@ -1330,7 +1330,7 @@ out_init_cifs_idmap:
->  out_register_key_type:
->  #endif
->  #ifdef CONFIG_CIFS_UPCALL
-> -       unregister_key_type(&cifs_spnego_key_type);
-> +       exit_cifs_spnego();
->  out_destroy_request_bufs:
->  #endif
->         cifs_destroy_request_bufs();
-> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index eed7ff5..ca618b0 100644
-> --- a/fs/cifs/cifsproto.h
-> +++ b/fs/cifs/cifsproto.h
-> @@ -60,6 +60,8 @@ do {                                                          \
->  } while (0)
->  extern int init_cifs_idmap(void);
->  extern void exit_cifs_idmap(void);
-> +extern int init_cifs_spnego(void);
-> +extern int exit_cifs_spnego(void);
->  extern char *build_path_from_dentry(struct dentry *);
->  extern char *cifs_build_path_to_root(struct smb_vol *vol,
->                                      struct cifs_sb_info *cifs_sb,
-> --
-> 2.5.5
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
