@@ -1,54 +1,110 @@
-From: <jorg-LoD0CNSF3ned4c43X4ZxXw@public.gmane.org>
-Subject: (unknown)
-Date: Sat, 15 May 2016 06:00:51 0000
-Message-ID: <000101d1ae6f$22b009b0$c0a80001@vsnl.net.in>
-Mime-Version: 1.0
-Content-Type: application/zip; name="EMAIL_333473029_linux-cifs.zip"
-Content-Transfer-Encoding: base64
-To: "linux-cifs" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Subject: 
-Content-Disposition: attachment
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Steve French <smfrench@gmail.com>
+Subject: [PATCH] [SMB3] remove directory incorrectly tries to set delete on close on non-empty directories
+Date: Thu, 12 May 2016 21:30:32 -0500
+Message-ID: <1463106632-88753-1-git-send-email-smfrench@gmail.com>
+Cc: Steve French <smfrench@gmail.com>,
+	Steve French <steve.french@primarydata.com>,
+	Stable <stable@vger.kernel.org>
+To: linux-cifs@vger.kernel.org
+Return-path: <stable-owner@vger.kernel.org>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
+For SMB3 (unlike for cifs), we attempt to delete a directory by
+set of delete on close flag on the open. Windows clients set
+this flag via a set info (SET_FILE_DISPOSITION to set this flag)
+which properly checks if the directory is empty.
 
+With this patch on smb3 mounts we correctly return
+ "DIRECTORY NOT EMPTY"
+on attempts to remove a non-empty directory.
 
-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
-AAAAAQABAFYAAADiBwAAAAA=
+Signed-off-by: Steve French <steve.french@primarydata.com>
+CC: Stable <stable@vger.kernel.org>
+---
+ fs/cifs/smb2glob.h  |  1 +
+ fs/cifs/smb2inode.c |  8 ++++++--
+ fs/cifs/smb2pdu.c   | 16 ++++++++++++++++
+ fs/cifs/smb2proto.h |  2 ++
+ 4 files changed, 25 insertions(+), 2 deletions(-)
+
+diff --git a/fs/cifs/smb2glob.h b/fs/cifs/smb2glob.h
+index bc0bb9c..0ffa180 100644
+--- a/fs/cifs/smb2glob.h
++++ b/fs/cifs/smb2glob.h
+@@ -44,6 +44,7 @@
+ #define SMB2_OP_DELETE 7
+ #define SMB2_OP_HARDLINK 8
+ #define SMB2_OP_SET_EOF 9
++#define SMB2_OP_RMDIR 10
+ 
+ /* Used when constructing chained read requests. */
+ #define CHAINED_REQUEST 1
+diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+index 899bbc8..4f0231e 100644
+--- a/fs/cifs/smb2inode.c
++++ b/fs/cifs/smb2inode.c
+@@ -80,6 +80,10 @@ smb2_open_op_close(const unsigned int xid, struct cifs_tcon *tcon,
+ 		 * SMB2_open() call.
+ 		 */
+ 		break;
++	case SMB2_OP_RMDIR:
++		tmprc = SMB2_rmdir(xid, tcon, fid.persistent_fid,
++				   fid.volatile_fid);
++		break;
+ 	case SMB2_OP_RENAME:
+ 		tmprc = SMB2_rename(xid, tcon, fid.persistent_fid,
+ 				    fid.volatile_fid, (__le16 *)data);
+@@ -191,8 +195,8 @@ smb2_rmdir(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
+ 	   struct cifs_sb_info *cifs_sb)
+ {
+ 	return smb2_open_op_close(xid, tcon, cifs_sb, name, DELETE, FILE_OPEN,
+-				  CREATE_NOT_FILE | CREATE_DELETE_ON_CLOSE,
+-				  NULL, SMB2_OP_DELETE);
++				  CREATE_NOT_FILE,
++				  NULL, SMB2_OP_RMDIR);
+ }
+ 
+ int
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 42e1f44..8f38e33 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -2575,6 +2575,22 @@ SMB2_rename(const unsigned int xid, struct cifs_tcon *tcon,
+ }
+ 
+ int
++SMB2_rmdir(const unsigned int xid, struct cifs_tcon *tcon,
++		  u64 persistent_fid, u64 volatile_fid)
++{
++	__u8 delete_pending = 1;
++	void *data;
++	unsigned int size;
++
++	data = &delete_pending;
++	size = 1; /* sizeof __u8 */
++
++	return send_set_info(xid, tcon, persistent_fid, volatile_fid,
++			current->tgid, FILE_DISPOSITION_INFORMATION, 1, &data,
++			&size);
++}
++
++int
+ SMB2_set_hardlink(const unsigned int xid, struct cifs_tcon *tcon,
+ 		  u64 persistent_fid, u64 volatile_fid, __le16 *target_file)
+ {
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index 4f07dc9..eb2cde2 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -141,6 +141,8 @@ extern int SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
+ extern int SMB2_rename(const unsigned int xid, struct cifs_tcon *tcon,
+ 		       u64 persistent_fid, u64 volatile_fid,
+ 		       __le16 *target_file);
++extern int SMB2_rmdir(const unsigned int xid, struct cifs_tcon *tcon,
++		      u64 persistent_fid, u64 volatile_fid);
+ extern int SMB2_set_hardlink(const unsigned int xid, struct cifs_tcon *tcon,
+ 			     u64 persistent_fid, u64 volatile_fid,
+ 			     __le16 *target_file);
+-- 
+1.9.1
