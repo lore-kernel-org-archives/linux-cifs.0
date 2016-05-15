@@ -1,61 +1,54 @@
-From: "Frank Filz" <ffilzlnx@mindspring.com>
-Subject: RE: [PATCH v21 00/22] Richacls
-Date: Tue, 10 May 2016 08:55:19 -0700
-Message-ID: <002001d1aad4$5c3bd9f0$14b38dd0$@mindspring.com>
-References: <1462831375-23017-1-git-send-email-agruenba@redhat.com>
-	<20160510041809.GB1079@sernet.de>
-	<20160510081150.GA3411@jeremy-ThinkPad-T430s>
+From: <jorg-LoD0CNSF3ned4c43X4ZxXw@public.gmane.org>
+Subject: (unknown)
+Date: Sat, 15 May 2016 06:00:51 0000
+Message-ID: <000101d1ae6f$22b009b0$c0a80001@vsnl.net.in>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: "'J. Bruce Fields'" <bfields@fieldses.org>, linux-nfs@vger.kernel.org,
-	'Theodore Ts'o' <tytso@mit.edu>,
-	'Andreas Gruenbacher' <agruenba@redhat.com>,
-	linux-cifs@vger.kernel.org, linux-api@vger.kernel.org,
-	'Trond Myklebust' <trond.myklebust@primarydata.com>,
-	linux-kernel@vger.kernel.org, xfs@oss.sgi.com,
-	'Christoph Hellwig' <hch@infradead.org>,
-	'Andreas Dilger' <adilger.kernel@dilger.ca>,
-	'Alexander Viro' <viro@zeniv.linux.org.uk>, linux-fsdevel@vger.kernel.org,
-	'Jeff Layton' <jlayton@poochiereds.net>, linux-ext4@vger.kernel.org,
-	'Anna Schumaker' <anna.schumaker@netapp.com>
-To: "'Jeremy Allison'" <jra@samba.org>,
-	"'Volker Lendecke'" <Volker.Lendecke@SerNet.DE>
-Return-path: <xfs-bounces@oss.sgi.com>
-In-Reply-To: <20160510081150.GA3411@jeremy-ThinkPad-T430s>
-Content-Language: en-us
-List-Unsubscribe: <http://oss.sgi.com/mailman/options/xfs>,
-	<mailto:xfs-request@oss.sgi.com?subject=unsubscribe>
-List-Archive: <http://oss.sgi.com/pipermail/xfs>
-List-Post: <mailto:xfs@oss.sgi.com>
-List-Help: <mailto:xfs-request@oss.sgi.com?subject=help>
-List-Subscribe: <http://oss.sgi.com/mailman/listinfo/xfs>,
-	<mailto:xfs-request@oss.sgi.com?subject=subscribe>
-Errors-To: xfs-bounces@oss.sgi.com
-Sender: xfs-bounces@oss.sgi.com
-List-Id: linux-cifs.vger.kernel.org
-
-> On Tue, May 10, 2016 at 06:18:10AM +0200, Volker Lendecke wrote:
-> > On Tue, May 10, 2016 at 12:02:33AM +0200, Andreas Gruenbacher wrote:
-> > > What more can I do to finally get this merged?
-> >
-> > While I am not the one to comment on kernel specifics, from a pure
-> > Samba user space perspective let me say: We need this. NOW.
-> 
-> +1 from me. This is something that many vendors need
-> and have needed for a very long time. Getting this in will allow *large*
-> amounts of existing storage to be migrated to Linux.
-
-+1 from me also. Once this is in Ganesha will integrate with it also.
-
-Frank
+Content-Type: application/zip; name="EMAIL_333473029_linux-cifs.zip"
+Content-Transfer-Encoding: base64
+To: "linux-cifs" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Subject: 
+Content-Disposition: attachment
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
 
----
-This email has been checked for viruses by Avast antivirus software.
-https://www.avast.com/antivirus
 
-_______________________________________________
-xfs mailing list
-xfs@oss.sgi.com
-http://oss.sgi.com/mailman/listinfo/xfs
+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
+AAAAAQABAFYAAADiBwAAAAA=
