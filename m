@@ -1,48 +1,38 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Fri, 20 May 2016 19:07:48 -0500
-Message-ID: <CAH2r5mtJgL+fSGQ6aKR05rAjgr3T+RQOsu56UQSfLC6egcAOtw@mail.gmail.com>
+From: "James Johnston" <johnstonj.public-Kk+ApOtKMVJWk0Htik3J/w@public.gmane.org>
+Subject: Re: [PATCH v21 00/22] Richacls
+Date: Mon, 23 May 2016 01:20:15 -0000
+Message-ID: <036701d1b491$44b3b2a0$ce1b17e0$@codenest.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+To: <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	<linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	<linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "'Jeremy Allison'" <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	"'Volker Lendecke'" <Volker.Lendecke-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org>,
+	"'Andreas Gruenbacher'" <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	"'Christoph Hellwig'" <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Language: en-us
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Two small cifs fixes, including one spnego upcall cifs security fix for stable
+> On Tue, May 10, 2016 at 06:18:10AM +0200, Volker Lendecke wrote:
+> > On Tue, May 10, 2016 at 12:02:33AM +0200, Andreas Gruenbacher wrote:
+> > > What more can I do to finally get this merged?
+> > 
+> > While I am not the one to comment on kernel specifics, from a pure Samba
+> > user space perspective let me say: We need this. NOW.
+>
+> +1 from me. This is something that many vendors need
+> and have needed for a very long time. Getting this
+> in will allow *large* amounts of existing storage to
+> be migrated to Linux.
 
-Please pull the following changes since commit
-03b979dd0323ace8e29a0561cd5232f73a060c09:
+As a "mere" end-user of SAMBA, +1 from me also...  It's my understanding
+that this patch set would help eliminate the need for hacks like
+vfs_acl_xattr that store ACLs in extended attributes that only SAMBA
+understands.  If the file system itself can respect the ACLs that seems
+like a lot cleaner solution.
 
-  Merge tag 'please-pull-misc-4.7' of
-git://git.kernel.org/pub/scm/linux/kernel/git/aegl/linux (2016-05-19
-18:14:49 -0700)
-
-are available in the git repository at:
-
-
-  git://git.samba.org/sfrench/cifs-2.6.git for-next
-
-for you to fetch changes up to 48a77aa7e20557319205f9bd4cc02d4b67b5f761:
-
-  CIFS: Remove some obsolete comments (2016-05-19 21:56:34 -0500)
-
-----------------------------------------------------------------
-Sachin Prabhu (1):
-      cifs: Create dedicated keyring for spnego operations
-
-Steve French (1):
-      CIFS: Remove some obsolete comments
-
- fs/cifs/cifs_spnego.c | 67 +++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/cifsfs.c      | 11 +++------
- fs/cifs/cifsproto.h   |  2 ++
- 3 files changed, 72 insertions(+), 8 deletions(-)
-
--- 
-Thanks,
-
-Steve
+James
