@@ -1,8 +1,9 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH 2/2] cifs: dynamic allocation of ntlmssp blob
-Date: Thu, 26 May 2016 13:30:11 -0500
-Message-ID: <CAH2r5mtCoqUWfRz9CF5jg6QdFy_sFgd5-2ZomLs_xaDDC_uydg@mail.gmail.com>
-References: <1464256345-26131-1-git-send-email-jmarchan@redhat.com> <1464256345-26131-2-git-send-email-jmarchan@redhat.com>
+Date: Thu, 26 May 2016 13:31:32 -0500
+Message-ID: <CAH2r5muwMTbCycvfjzZ4_b_=naqZWNxssZTUNfEHdfeapEf4fQ@mail.gmail.com>
+References: <1464256345-26131-1-git-send-email-jmarchan@redhat.com>
+ <1464256345-26131-2-git-send-email-jmarchan@redhat.com> <CAH2r5mtCoqUWfRz9CF5jg6QdFy_sFgd5-2ZomLs_xaDDC_uydg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
@@ -11,254 +12,265 @@ Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
 	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 To: Jerome Marchand <jmarchan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1464256345-26131-2-git-send-email-jmarchan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <CAH2r5mtCoqUWfRz9CF5jg6QdFy_sFgd5-2ZomLs_xaDDC_uydg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Your patch makes code a little clearer, so I don't mind merging it,
-but the two values are the same so this patch should have no effect.
+Sorry about the previous note, what I meant was that your first patch
+makes the code a little clearer (this patch obviously fixes a bug).
 
-On Thu, May 26, 2016 at 4:52 AM, Jerome Marchand <jmarchan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> In sess_auth_rawntlmssp_authenticate(), the ntlmssp blob is allocated
-> statically and its size is an "empirical" 5*sizeof(struct
-> _AUTHENTICATE_MESSAGE) (320B on x86_64). I don't know where this value
-> comes from or if it was ever appropriate, but it is currently
-> insufficient: the user and domain name in UTF16 could take 1kB by
-> themselves. Because of that, build_ntlmssp_auth_blob() might corrupt
-> memory (out-of-bounds write). The size of ntlmssp_blob in
-> SMB2_sess_setup() is too small too (sizeof(struct _NEGOTIATE_MESSAGE)
-> + 500).
+On Thu, May 26, 2016 at 1:30 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> Your patch makes code a little clearer, so I don't mind merging it,
+> but the two values are the same so this patch should have no effect.
 >
-> This patch allocates the blob dynamically in
-> build_ntlmssp_auth_blob().
+> On Thu, May 26, 2016 at 4:52 AM, Jerome Marchand <jmarchan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+>> In sess_auth_rawntlmssp_authenticate(), the ntlmssp blob is allocated
+>> statically and its size is an "empirical" 5*sizeof(struct
+>> _AUTHENTICATE_MESSAGE) (320B on x86_64). I don't know where this value
+>> comes from or if it was ever appropriate, but it is currently
+>> insufficient: the user and domain name in UTF16 could take 1kB by
+>> themselves. Because of that, build_ntlmssp_auth_blob() might corrupt
+>> memory (out-of-bounds write). The size of ntlmssp_blob in
+>> SMB2_sess_setup() is too small too (sizeof(struct _NEGOTIATE_MESSAGE)
+>> + 500).
+>>
+>> This patch allocates the blob dynamically in
+>> build_ntlmssp_auth_blob().
+>>
+>> Signed-off-by: Jerome Marchand <jmarchan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>> ---
+>>  fs/cifs/ntlmssp.h |  2 +-
+>>  fs/cifs/sess.c    | 76 ++++++++++++++++++++++++++++++-------------------------
+>>  fs/cifs/smb2pdu.c | 10 ++------
+>>  3 files changed, 45 insertions(+), 43 deletions(-)
+>>
+>> diff --git a/fs/cifs/ntlmssp.h b/fs/cifs/ntlmssp.h
+>> index 848249f..3079b38 100644
+>> --- a/fs/cifs/ntlmssp.h
+>> +++ b/fs/cifs/ntlmssp.h
+>> @@ -133,6 +133,6 @@ typedef struct _AUTHENTICATE_MESSAGE {
+>>
+>>  int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len, struct cifs_ses *ses);
+>>  void build_ntlmssp_negotiate_blob(unsigned char *pbuffer, struct cifs_ses *ses);
+>> -int build_ntlmssp_auth_blob(unsigned char *pbuffer, u16 *buflen,
+>> +int build_ntlmssp_auth_blob(unsigned char **pbuffer, u16 *buflen,
+>>                         struct cifs_ses *ses,
+>>                         const struct nls_table *nls_cp);
+>> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+>> index c3d086e..463bed7 100644
+>> --- a/fs/cifs/sess.c
+>> +++ b/fs/cifs/sess.c
+>> @@ -364,19 +364,43 @@ void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
+>>         sec_blob->DomainName.MaximumLength = 0;
+>>  }
+>>
+>> -/* We do not malloc the blob, it is passed in pbuffer, because its
+>> -   maximum possible size is fixed and small, making this approach cleaner.
+>> -   This function returns the length of the data in the blob */
+>> -int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+>> +int size_of_ntlmssp_blob(struct cifs_ses *ses)
+>> +{
+>> +       int sz = sizeof(AUTHENTICATE_MESSAGE) + ses->auth_key.len
+>> +               - CIFS_SESS_KEY_SIZE + CIFS_CPHTXT_SIZE + 2;
+>> +
+>> +       if (ses->domainName)
+>> +               sz += 2 * strnlen(ses->domainName, CIFS_MAX_DOMAINNAME_LEN);
+>> +       else
+>> +               sz += 2;
+>> +
+>> +       if (ses->user_name)
+>> +               sz += 2 * strnlen(ses->user_name, CIFS_MAX_USERNAME_LEN);
+>> +       else
+>> +               sz += 2;
+>> +
+>> +       return sz;
+>> +}
+>> +
+>> +int build_ntlmssp_auth_blob(unsigned char **pbuffer,
+>>                                         u16 *buflen,
+>>                                    struct cifs_ses *ses,
+>>                                    const struct nls_table *nls_cp)
+>>  {
+>>         int rc;
+>> -       AUTHENTICATE_MESSAGE *sec_blob = (AUTHENTICATE_MESSAGE *)pbuffer;
+>> +       AUTHENTICATE_MESSAGE *sec_blob;
+>>         __u32 flags;
+>>         unsigned char *tmp;
+>>
+>> +       rc = setup_ntlmv2_rsp(ses, nls_cp);
+>> +       if (rc) {
+>> +               cifs_dbg(VFS, "Error %d during NTLMSSP authentication\n", rc);
+>> +               *buflen = 0;
+>> +               goto setup_ntlmv2_ret;
+>> +       }
+>> +       *pbuffer = kmalloc(size_of_ntlmssp_blob(ses), GFP_KERNEL);
+>> +       sec_blob = (AUTHENTICATE_MESSAGE *)*pbuffer;
+>> +
+>>         memcpy(sec_blob->Signature, NTLMSSP_SIGNATURE, 8);
+>>         sec_blob->MessageType = NtLmAuthenticate;
+>>
+>> @@ -391,7 +415,7 @@ int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+>>                         flags |= NTLMSSP_NEGOTIATE_KEY_XCH;
+>>         }
+>>
+>> -       tmp = pbuffer + sizeof(AUTHENTICATE_MESSAGE);
+>> +       tmp = *pbuffer + sizeof(AUTHENTICATE_MESSAGE);
+>>         sec_blob->NegotiateFlags = cpu_to_le32(flags);
+>>
+>>         sec_blob->LmChallengeResponse.BufferOffset =
+>> @@ -399,13 +423,9 @@ int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+>>         sec_blob->LmChallengeResponse.Length = 0;
+>>         sec_blob->LmChallengeResponse.MaximumLength = 0;
+>>
+>> -       sec_blob->NtChallengeResponse.BufferOffset = cpu_to_le32(tmp - pbuffer);
+>> +       sec_blob->NtChallengeResponse.BufferOffset =
+>> +                               cpu_to_le32(tmp - *pbuffer);
+>>         if (ses->user_name != NULL) {
+>> -               rc = setup_ntlmv2_rsp(ses, nls_cp);
+>> -               if (rc) {
+>> -                       cifs_dbg(VFS, "Error %d during NTLMSSP authentication\n", rc);
+>> -                       goto setup_ntlmv2_ret;
+>> -               }
+>>                 memcpy(tmp, ses->auth_key.response + CIFS_SESS_KEY_SIZE,
+>>                                 ses->auth_key.len - CIFS_SESS_KEY_SIZE);
+>>                 tmp += ses->auth_key.len - CIFS_SESS_KEY_SIZE;
+>> @@ -423,7 +443,7 @@ int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+>>         }
+>>
+>>         if (ses->domainName == NULL) {
+>> -               sec_blob->DomainName.BufferOffset = cpu_to_le32(tmp - pbuffer);
+>> +               sec_blob->DomainName.BufferOffset = cpu_to_le32(tmp - *pbuffer);
+>>                 sec_blob->DomainName.Length = 0;
+>>                 sec_blob->DomainName.MaximumLength = 0;
+>>                 tmp += 2;
+>> @@ -432,14 +452,14 @@ int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+>>                 len = cifs_strtoUTF16((__le16 *)tmp, ses->domainName,
+>>                                       CIFS_MAX_DOMAINNAME_LEN, nls_cp);
+>>                 len *= 2; /* unicode is 2 bytes each */
+>> -               sec_blob->DomainName.BufferOffset = cpu_to_le32(tmp - pbuffer);
+>> +               sec_blob->DomainName.BufferOffset = cpu_to_le32(tmp - *pbuffer);
+>>                 sec_blob->DomainName.Length = cpu_to_le16(len);
+>>                 sec_blob->DomainName.MaximumLength = cpu_to_le16(len);
+>>                 tmp += len;
+>>         }
+>>
+>>         if (ses->user_name == NULL) {
+>> -               sec_blob->UserName.BufferOffset = cpu_to_le32(tmp - pbuffer);
+>> +               sec_blob->UserName.BufferOffset = cpu_to_le32(tmp - *pbuffer);
+>>                 sec_blob->UserName.Length = 0;
+>>                 sec_blob->UserName.MaximumLength = 0;
+>>                 tmp += 2;
+>> @@ -448,13 +468,13 @@ int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+>>                 len = cifs_strtoUTF16((__le16 *)tmp, ses->user_name,
+>>                                       CIFS_MAX_USERNAME_LEN, nls_cp);
+>>                 len *= 2; /* unicode is 2 bytes each */
+>> -               sec_blob->UserName.BufferOffset = cpu_to_le32(tmp - pbuffer);
+>> +               sec_blob->UserName.BufferOffset = cpu_to_le32(tmp - *pbuffer);
+>>                 sec_blob->UserName.Length = cpu_to_le16(len);
+>>                 sec_blob->UserName.MaximumLength = cpu_to_le16(len);
+>>                 tmp += len;
+>>         }
+>>
+>> -       sec_blob->WorkstationName.BufferOffset = cpu_to_le32(tmp - pbuffer);
+>> +       sec_blob->WorkstationName.BufferOffset = cpu_to_le32(tmp - *pbuffer);
+>>         sec_blob->WorkstationName.Length = 0;
+>>         sec_blob->WorkstationName.MaximumLength = 0;
+>>         tmp += 2;
+>> @@ -463,19 +483,19 @@ int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+>>                 (ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_EXTENDED_SEC))
+>>                         && !calc_seckey(ses)) {
+>>                 memcpy(tmp, ses->ntlmssp->ciphertext, CIFS_CPHTXT_SIZE);
+>> -               sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - pbuffer);
+>> +               sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - *pbuffer);
+>>                 sec_blob->SessionKey.Length = cpu_to_le16(CIFS_CPHTXT_SIZE);
+>>                 sec_blob->SessionKey.MaximumLength =
+>>                                 cpu_to_le16(CIFS_CPHTXT_SIZE);
+>>                 tmp += CIFS_CPHTXT_SIZE;
+>>         } else {
+>> -               sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - pbuffer);
+>> +               sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - *pbuffer);
+>>                 sec_blob->SessionKey.Length = 0;
+>>                 sec_blob->SessionKey.MaximumLength = 0;
+>>         }
+>>
+>> +       *buflen = tmp - *pbuffer;
+>>  setup_ntlmv2_ret:
+>> -       *buflen = tmp - pbuffer;
+>>         return rc;
+>>  }
+>>
+>> @@ -1266,7 +1286,7 @@ sess_auth_rawntlmssp_authenticate(struct sess_data *sess_data)
+>>         struct cifs_ses *ses = sess_data->ses;
+>>         __u16 bytes_remaining;
+>>         char *bcc_ptr;
+>> -       char *ntlmsspblob = NULL;
+>> +       unsigned char *ntlmsspblob = NULL;
+>>         u16 blob_len;
+>>
+>>         cifs_dbg(FYI, "rawntlmssp session setup authenticate phase\n");
+>> @@ -1279,19 +1299,7 @@ sess_auth_rawntlmssp_authenticate(struct sess_data *sess_data)
+>>         /* Build security blob before we assemble the request */
+>>         pSMB = (SESSION_SETUP_ANDX *)sess_data->iov[0].iov_base;
+>>         smb_buf = (struct smb_hdr *)pSMB;
+>> -       /*
+>> -        * 5 is an empirical value, large enough to hold
+>> -        * authenticate message plus max 10 of av paris,
+>> -        * domain, user, workstation names, flags, etc.
+>> -        */
+>> -       ntlmsspblob = kzalloc(5*sizeof(struct _AUTHENTICATE_MESSAGE),
+>> -                               GFP_KERNEL);
+>> -       if (!ntlmsspblob) {
+>> -               rc = -ENOMEM;
+>> -               goto out;
+>> -       }
+>> -
+>> -       rc = build_ntlmssp_auth_blob(ntlmsspblob,
+>> +       rc = build_ntlmssp_auth_blob(&ntlmsspblob,
+>>                                         &blob_len, ses, sess_data->nls_cp);
+>>         if (rc)
+>>                 goto out_free_ntlmsspblob;
+>> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+>> index 8f38e33..c3e61a7 100644
+>> --- a/fs/cifs/smb2pdu.c
+>> +++ b/fs/cifs/smb2pdu.c
+>> @@ -588,7 +588,7 @@ SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
+>>         u16 blob_length = 0;
+>>         struct key *spnego_key = NULL;
+>>         char *security_blob = NULL;
+>> -       char *ntlmssp_blob = NULL;
+>> +       unsigned char *ntlmssp_blob = NULL;
+>>         bool use_spnego = false; /* else use raw ntlmssp */
+>>
+>>         cifs_dbg(FYI, "Session Setup\n");
+>> @@ -713,13 +713,7 @@ ssetup_ntlmssp_authenticate:
+>>                 iov[1].iov_len = blob_length;
+>>         } else if (phase == NtLmAuthenticate) {
+>>                 req->hdr.SessionId = ses->Suid;
+>> -               ntlmssp_blob = kzalloc(sizeof(struct _NEGOTIATE_MESSAGE) + 500,
+>> -                                      GFP_KERNEL);
+>> -               if (ntlmssp_blob == NULL) {
+>> -                       rc = -ENOMEM;
+>> -                       goto ssetup_exit;
+>> -               }
+>> -               rc = build_ntlmssp_auth_blob(ntlmssp_blob, &blob_length, ses,
+>> +               rc = build_ntlmssp_auth_blob(&ntlmssp_blob, &blob_length, ses,
+>>                                              nls_cp);
+>>                 if (rc) {
+>>                         cifs_dbg(FYI, "build_ntlmssp_auth_blob failed %d\n",
+>> --
+>> 2.5.5
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
-> Signed-off-by: Jerome Marchand <jmarchan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/ntlmssp.h |  2 +-
->  fs/cifs/sess.c    | 76 ++++++++++++++++++++++++++++++-------------------------
->  fs/cifs/smb2pdu.c | 10 ++------
->  3 files changed, 45 insertions(+), 43 deletions(-)
 >
-> diff --git a/fs/cifs/ntlmssp.h b/fs/cifs/ntlmssp.h
-> index 848249f..3079b38 100644
-> --- a/fs/cifs/ntlmssp.h
-> +++ b/fs/cifs/ntlmssp.h
-> @@ -133,6 +133,6 @@ typedef struct _AUTHENTICATE_MESSAGE {
 >
->  int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len, struct cifs_ses *ses);
->  void build_ntlmssp_negotiate_blob(unsigned char *pbuffer, struct cifs_ses *ses);
-> -int build_ntlmssp_auth_blob(unsigned char *pbuffer, u16 *buflen,
-> +int build_ntlmssp_auth_blob(unsigned char **pbuffer, u16 *buflen,
->                         struct cifs_ses *ses,
->                         const struct nls_table *nls_cp);
-> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-> index c3d086e..463bed7 100644
-> --- a/fs/cifs/sess.c
-> +++ b/fs/cifs/sess.c
-> @@ -364,19 +364,43 @@ void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
->         sec_blob->DomainName.MaximumLength = 0;
->  }
->
-> -/* We do not malloc the blob, it is passed in pbuffer, because its
-> -   maximum possible size is fixed and small, making this approach cleaner.
-> -   This function returns the length of the data in the blob */
-> -int build_ntlmssp_auth_blob(unsigned char *pbuffer,
-> +int size_of_ntlmssp_blob(struct cifs_ses *ses)
-> +{
-> +       int sz = sizeof(AUTHENTICATE_MESSAGE) + ses->auth_key.len
-> +               - CIFS_SESS_KEY_SIZE + CIFS_CPHTXT_SIZE + 2;
-> +
-> +       if (ses->domainName)
-> +               sz += 2 * strnlen(ses->domainName, CIFS_MAX_DOMAINNAME_LEN);
-> +       else
-> +               sz += 2;
-> +
-> +       if (ses->user_name)
-> +               sz += 2 * strnlen(ses->user_name, CIFS_MAX_USERNAME_LEN);
-> +       else
-> +               sz += 2;
-> +
-> +       return sz;
-> +}
-> +
-> +int build_ntlmssp_auth_blob(unsigned char **pbuffer,
->                                         u16 *buflen,
->                                    struct cifs_ses *ses,
->                                    const struct nls_table *nls_cp)
->  {
->         int rc;
-> -       AUTHENTICATE_MESSAGE *sec_blob = (AUTHENTICATE_MESSAGE *)pbuffer;
-> +       AUTHENTICATE_MESSAGE *sec_blob;
->         __u32 flags;
->         unsigned char *tmp;
->
-> +       rc = setup_ntlmv2_rsp(ses, nls_cp);
-> +       if (rc) {
-> +               cifs_dbg(VFS, "Error %d during NTLMSSP authentication\n", rc);
-> +               *buflen = 0;
-> +               goto setup_ntlmv2_ret;
-> +       }
-> +       *pbuffer = kmalloc(size_of_ntlmssp_blob(ses), GFP_KERNEL);
-> +       sec_blob = (AUTHENTICATE_MESSAGE *)*pbuffer;
-> +
->         memcpy(sec_blob->Signature, NTLMSSP_SIGNATURE, 8);
->         sec_blob->MessageType = NtLmAuthenticate;
->
-> @@ -391,7 +415,7 @@ int build_ntlmssp_auth_blob(unsigned char *pbuffer,
->                         flags |= NTLMSSP_NEGOTIATE_KEY_XCH;
->         }
->
-> -       tmp = pbuffer + sizeof(AUTHENTICATE_MESSAGE);
-> +       tmp = *pbuffer + sizeof(AUTHENTICATE_MESSAGE);
->         sec_blob->NegotiateFlags = cpu_to_le32(flags);
->
->         sec_blob->LmChallengeResponse.BufferOffset =
-> @@ -399,13 +423,9 @@ int build_ntlmssp_auth_blob(unsigned char *pbuffer,
->         sec_blob->LmChallengeResponse.Length = 0;
->         sec_blob->LmChallengeResponse.MaximumLength = 0;
->
-> -       sec_blob->NtChallengeResponse.BufferOffset = cpu_to_le32(tmp - pbuffer);
-> +       sec_blob->NtChallengeResponse.BufferOffset =
-> +                               cpu_to_le32(tmp - *pbuffer);
->         if (ses->user_name != NULL) {
-> -               rc = setup_ntlmv2_rsp(ses, nls_cp);
-> -               if (rc) {
-> -                       cifs_dbg(VFS, "Error %d during NTLMSSP authentication\n", rc);
-> -                       goto setup_ntlmv2_ret;
-> -               }
->                 memcpy(tmp, ses->auth_key.response + CIFS_SESS_KEY_SIZE,
->                                 ses->auth_key.len - CIFS_SESS_KEY_SIZE);
->                 tmp += ses->auth_key.len - CIFS_SESS_KEY_SIZE;
-> @@ -423,7 +443,7 @@ int build_ntlmssp_auth_blob(unsigned char *pbuffer,
->         }
->
->         if (ses->domainName == NULL) {
-> -               sec_blob->DomainName.BufferOffset = cpu_to_le32(tmp - pbuffer);
-> +               sec_blob->DomainName.BufferOffset = cpu_to_le32(tmp - *pbuffer);
->                 sec_blob->DomainName.Length = 0;
->                 sec_blob->DomainName.MaximumLength = 0;
->                 tmp += 2;
-> @@ -432,14 +452,14 @@ int build_ntlmssp_auth_blob(unsigned char *pbuffer,
->                 len = cifs_strtoUTF16((__le16 *)tmp, ses->domainName,
->                                       CIFS_MAX_DOMAINNAME_LEN, nls_cp);
->                 len *= 2; /* unicode is 2 bytes each */
-> -               sec_blob->DomainName.BufferOffset = cpu_to_le32(tmp - pbuffer);
-> +               sec_blob->DomainName.BufferOffset = cpu_to_le32(tmp - *pbuffer);
->                 sec_blob->DomainName.Length = cpu_to_le16(len);
->                 sec_blob->DomainName.MaximumLength = cpu_to_le16(len);
->                 tmp += len;
->         }
->
->         if (ses->user_name == NULL) {
-> -               sec_blob->UserName.BufferOffset = cpu_to_le32(tmp - pbuffer);
-> +               sec_blob->UserName.BufferOffset = cpu_to_le32(tmp - *pbuffer);
->                 sec_blob->UserName.Length = 0;
->                 sec_blob->UserName.MaximumLength = 0;
->                 tmp += 2;
-> @@ -448,13 +468,13 @@ int build_ntlmssp_auth_blob(unsigned char *pbuffer,
->                 len = cifs_strtoUTF16((__le16 *)tmp, ses->user_name,
->                                       CIFS_MAX_USERNAME_LEN, nls_cp);
->                 len *= 2; /* unicode is 2 bytes each */
-> -               sec_blob->UserName.BufferOffset = cpu_to_le32(tmp - pbuffer);
-> +               sec_blob->UserName.BufferOffset = cpu_to_le32(tmp - *pbuffer);
->                 sec_blob->UserName.Length = cpu_to_le16(len);
->                 sec_blob->UserName.MaximumLength = cpu_to_le16(len);
->                 tmp += len;
->         }
->
-> -       sec_blob->WorkstationName.BufferOffset = cpu_to_le32(tmp - pbuffer);
-> +       sec_blob->WorkstationName.BufferOffset = cpu_to_le32(tmp - *pbuffer);
->         sec_blob->WorkstationName.Length = 0;
->         sec_blob->WorkstationName.MaximumLength = 0;
->         tmp += 2;
-> @@ -463,19 +483,19 @@ int build_ntlmssp_auth_blob(unsigned char *pbuffer,
->                 (ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_EXTENDED_SEC))
->                         && !calc_seckey(ses)) {
->                 memcpy(tmp, ses->ntlmssp->ciphertext, CIFS_CPHTXT_SIZE);
-> -               sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - pbuffer);
-> +               sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - *pbuffer);
->                 sec_blob->SessionKey.Length = cpu_to_le16(CIFS_CPHTXT_SIZE);
->                 sec_blob->SessionKey.MaximumLength =
->                                 cpu_to_le16(CIFS_CPHTXT_SIZE);
->                 tmp += CIFS_CPHTXT_SIZE;
->         } else {
-> -               sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - pbuffer);
-> +               sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - *pbuffer);
->                 sec_blob->SessionKey.Length = 0;
->                 sec_blob->SessionKey.MaximumLength = 0;
->         }
->
-> +       *buflen = tmp - *pbuffer;
->  setup_ntlmv2_ret:
-> -       *buflen = tmp - pbuffer;
->         return rc;
->  }
->
-> @@ -1266,7 +1286,7 @@ sess_auth_rawntlmssp_authenticate(struct sess_data *sess_data)
->         struct cifs_ses *ses = sess_data->ses;
->         __u16 bytes_remaining;
->         char *bcc_ptr;
-> -       char *ntlmsspblob = NULL;
-> +       unsigned char *ntlmsspblob = NULL;
->         u16 blob_len;
->
->         cifs_dbg(FYI, "rawntlmssp session setup authenticate phase\n");
-> @@ -1279,19 +1299,7 @@ sess_auth_rawntlmssp_authenticate(struct sess_data *sess_data)
->         /* Build security blob before we assemble the request */
->         pSMB = (SESSION_SETUP_ANDX *)sess_data->iov[0].iov_base;
->         smb_buf = (struct smb_hdr *)pSMB;
-> -       /*
-> -        * 5 is an empirical value, large enough to hold
-> -        * authenticate message plus max 10 of av paris,
-> -        * domain, user, workstation names, flags, etc.
-> -        */
-> -       ntlmsspblob = kzalloc(5*sizeof(struct _AUTHENTICATE_MESSAGE),
-> -                               GFP_KERNEL);
-> -       if (!ntlmsspblob) {
-> -               rc = -ENOMEM;
-> -               goto out;
-> -       }
-> -
-> -       rc = build_ntlmssp_auth_blob(ntlmsspblob,
-> +       rc = build_ntlmssp_auth_blob(&ntlmsspblob,
->                                         &blob_len, ses, sess_data->nls_cp);
->         if (rc)
->                 goto out_free_ntlmsspblob;
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 8f38e33..c3e61a7 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -588,7 +588,7 @@ SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
->         u16 blob_length = 0;
->         struct key *spnego_key = NULL;
->         char *security_blob = NULL;
-> -       char *ntlmssp_blob = NULL;
-> +       unsigned char *ntlmssp_blob = NULL;
->         bool use_spnego = false; /* else use raw ntlmssp */
->
->         cifs_dbg(FYI, "Session Setup\n");
-> @@ -713,13 +713,7 @@ ssetup_ntlmssp_authenticate:
->                 iov[1].iov_len = blob_length;
->         } else if (phase == NtLmAuthenticate) {
->                 req->hdr.SessionId = ses->Suid;
-> -               ntlmssp_blob = kzalloc(sizeof(struct _NEGOTIATE_MESSAGE) + 500,
-> -                                      GFP_KERNEL);
-> -               if (ntlmssp_blob == NULL) {
-> -                       rc = -ENOMEM;
-> -                       goto ssetup_exit;
-> -               }
-> -               rc = build_ntlmssp_auth_blob(ntlmssp_blob, &blob_length, ses,
-> +               rc = build_ntlmssp_auth_blob(&ntlmssp_blob, &blob_length, ses,
->                                              nls_cp);
->                 if (rc) {
->                         cifs_dbg(FYI, "build_ntlmssp_auth_blob failed %d\n",
 > --
-> 2.5.5
+> Thanks,
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Steve
 
 
 
