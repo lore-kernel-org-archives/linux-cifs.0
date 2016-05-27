@@ -1,280 +1,236 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 2/2] cifs: dynamic allocation of ntlmssp blob
-Date: Thu, 26 May 2016 13:31:32 -0500
-Message-ID: <CAH2r5muwMTbCycvfjzZ4_b_=naqZWNxssZTUNfEHdfeapEf4fQ@mail.gmail.com>
-References: <1464256345-26131-1-git-send-email-jmarchan@redhat.com>
- <1464256345-26131-2-git-send-email-jmarchan@redhat.com> <CAH2r5mtCoqUWfRz9CF5jg6QdFy_sFgd5-2ZomLs_xaDDC_uydg@mail.gmail.com>
+From: =?UTF-8?B?QXVyw6lsaWVu?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+Subject: [PATCH] Making shares unaccessible at root level mountable (aka
+ solving bsc#8950 ...again)
+Date: Fri, 27 May 2016 19:43:46 +0200
+Message-ID: <20160527194346.08416d79@aaptelpc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Jerome Marchand <jmarchan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ boundary="Sig_/l8.oHqAElhSqHcJFU.DBEGD"; protocol="application/pgp-signature"
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Marcus Hoffmann <marcus.hoffmann-j/7cz5qe3tpn68oJJulU0Q@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mtCoqUWfRz9CF5jg6QdFy_sFgd5-2ZomLs_xaDDC_uydg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Sorry about the previous note, what I meant was that your first patch
-makes the code a little clearer (this patch obviously fixes a bug).
+--Sig_/l8.oHqAElhSqHcJFU.DBEGD
+Content-Type: multipart/mixed; boundary="MP_/ZMuO4d3nwmQ8_KxI.Bxmxnm"
 
-On Thu, May 26, 2016 at 1:30 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> Your patch makes code a little clearer, so I don't mind merging it,
-> but the two values are the same so this patch should have no effect.
->
-> On Thu, May 26, 2016 at 4:52 AM, Jerome Marchand <jmarchan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->> In sess_auth_rawntlmssp_authenticate(), the ntlmssp blob is allocated
->> statically and its size is an "empirical" 5*sizeof(struct
->> _AUTHENTICATE_MESSAGE) (320B on x86_64). I don't know where this value
->> comes from or if it was ever appropriate, but it is currently
->> insufficient: the user and domain name in UTF16 could take 1kB by
->> themselves. Because of that, build_ntlmssp_auth_blob() might corrupt
->> memory (out-of-bounds write). The size of ntlmssp_blob in
->> SMB2_sess_setup() is too small too (sizeof(struct _NEGOTIATE_MESSAGE)
->> + 500).
->>
->> This patch allocates the blob dynamically in
->> build_ntlmssp_auth_blob().
->>
->> Signed-off-by: Jerome Marchand <jmarchan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->> ---
->>  fs/cifs/ntlmssp.h |  2 +-
->>  fs/cifs/sess.c    | 76 ++++++++++++++++++++++++++++++-------------------------
->>  fs/cifs/smb2pdu.c | 10 ++------
->>  3 files changed, 45 insertions(+), 43 deletions(-)
->>
->> diff --git a/fs/cifs/ntlmssp.h b/fs/cifs/ntlmssp.h
->> index 848249f..3079b38 100644
->> --- a/fs/cifs/ntlmssp.h
->> +++ b/fs/cifs/ntlmssp.h
->> @@ -133,6 +133,6 @@ typedef struct _AUTHENTICATE_MESSAGE {
->>
->>  int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len, struct cifs_ses *ses);
->>  void build_ntlmssp_negotiate_blob(unsigned char *pbuffer, struct cifs_ses *ses);
->> -int build_ntlmssp_auth_blob(unsigned char *pbuffer, u16 *buflen,
->> +int build_ntlmssp_auth_blob(unsigned char **pbuffer, u16 *buflen,
->>                         struct cifs_ses *ses,
->>                         const struct nls_table *nls_cp);
->> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
->> index c3d086e..463bed7 100644
->> --- a/fs/cifs/sess.c
->> +++ b/fs/cifs/sess.c
->> @@ -364,19 +364,43 @@ void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
->>         sec_blob->DomainName.MaximumLength = 0;
->>  }
->>
->> -/* We do not malloc the blob, it is passed in pbuffer, because its
->> -   maximum possible size is fixed and small, making this approach cleaner.
->> -   This function returns the length of the data in the blob */
->> -int build_ntlmssp_auth_blob(unsigned char *pbuffer,
->> +int size_of_ntlmssp_blob(struct cifs_ses *ses)
->> +{
->> +       int sz = sizeof(AUTHENTICATE_MESSAGE) + ses->auth_key.len
->> +               - CIFS_SESS_KEY_SIZE + CIFS_CPHTXT_SIZE + 2;
->> +
->> +       if (ses->domainName)
->> +               sz += 2 * strnlen(ses->domainName, CIFS_MAX_DOMAINNAME_LEN);
->> +       else
->> +               sz += 2;
->> +
->> +       if (ses->user_name)
->> +               sz += 2 * strnlen(ses->user_name, CIFS_MAX_USERNAME_LEN);
->> +       else
->> +               sz += 2;
->> +
->> +       return sz;
->> +}
->> +
->> +int build_ntlmssp_auth_blob(unsigned char **pbuffer,
->>                                         u16 *buflen,
->>                                    struct cifs_ses *ses,
->>                                    const struct nls_table *nls_cp)
->>  {
->>         int rc;
->> -       AUTHENTICATE_MESSAGE *sec_blob = (AUTHENTICATE_MESSAGE *)pbuffer;
->> +       AUTHENTICATE_MESSAGE *sec_blob;
->>         __u32 flags;
->>         unsigned char *tmp;
->>
->> +       rc = setup_ntlmv2_rsp(ses, nls_cp);
->> +       if (rc) {
->> +               cifs_dbg(VFS, "Error %d during NTLMSSP authentication\n", rc);
->> +               *buflen = 0;
->> +               goto setup_ntlmv2_ret;
->> +       }
->> +       *pbuffer = kmalloc(size_of_ntlmssp_blob(ses), GFP_KERNEL);
->> +       sec_blob = (AUTHENTICATE_MESSAGE *)*pbuffer;
->> +
->>         memcpy(sec_blob->Signature, NTLMSSP_SIGNATURE, 8);
->>         sec_blob->MessageType = NtLmAuthenticate;
->>
->> @@ -391,7 +415,7 @@ int build_ntlmssp_auth_blob(unsigned char *pbuffer,
->>                         flags |= NTLMSSP_NEGOTIATE_KEY_XCH;
->>         }
->>
->> -       tmp = pbuffer + sizeof(AUTHENTICATE_MESSAGE);
->> +       tmp = *pbuffer + sizeof(AUTHENTICATE_MESSAGE);
->>         sec_blob->NegotiateFlags = cpu_to_le32(flags);
->>
->>         sec_blob->LmChallengeResponse.BufferOffset =
->> @@ -399,13 +423,9 @@ int build_ntlmssp_auth_blob(unsigned char *pbuffer,
->>         sec_blob->LmChallengeResponse.Length = 0;
->>         sec_blob->LmChallengeResponse.MaximumLength = 0;
->>
->> -       sec_blob->NtChallengeResponse.BufferOffset = cpu_to_le32(tmp - pbuffer);
->> +       sec_blob->NtChallengeResponse.BufferOffset =
->> +                               cpu_to_le32(tmp - *pbuffer);
->>         if (ses->user_name != NULL) {
->> -               rc = setup_ntlmv2_rsp(ses, nls_cp);
->> -               if (rc) {
->> -                       cifs_dbg(VFS, "Error %d during NTLMSSP authentication\n", rc);
->> -                       goto setup_ntlmv2_ret;
->> -               }
->>                 memcpy(tmp, ses->auth_key.response + CIFS_SESS_KEY_SIZE,
->>                                 ses->auth_key.len - CIFS_SESS_KEY_SIZE);
->>                 tmp += ses->auth_key.len - CIFS_SESS_KEY_SIZE;
->> @@ -423,7 +443,7 @@ int build_ntlmssp_auth_blob(unsigned char *pbuffer,
->>         }
->>
->>         if (ses->domainName == NULL) {
->> -               sec_blob->DomainName.BufferOffset = cpu_to_le32(tmp - pbuffer);
->> +               sec_blob->DomainName.BufferOffset = cpu_to_le32(tmp - *pbuffer);
->>                 sec_blob->DomainName.Length = 0;
->>                 sec_blob->DomainName.MaximumLength = 0;
->>                 tmp += 2;
->> @@ -432,14 +452,14 @@ int build_ntlmssp_auth_blob(unsigned char *pbuffer,
->>                 len = cifs_strtoUTF16((__le16 *)tmp, ses->domainName,
->>                                       CIFS_MAX_DOMAINNAME_LEN, nls_cp);
->>                 len *= 2; /* unicode is 2 bytes each */
->> -               sec_blob->DomainName.BufferOffset = cpu_to_le32(tmp - pbuffer);
->> +               sec_blob->DomainName.BufferOffset = cpu_to_le32(tmp - *pbuffer);
->>                 sec_blob->DomainName.Length = cpu_to_le16(len);
->>                 sec_blob->DomainName.MaximumLength = cpu_to_le16(len);
->>                 tmp += len;
->>         }
->>
->>         if (ses->user_name == NULL) {
->> -               sec_blob->UserName.BufferOffset = cpu_to_le32(tmp - pbuffer);
->> +               sec_blob->UserName.BufferOffset = cpu_to_le32(tmp - *pbuffer);
->>                 sec_blob->UserName.Length = 0;
->>                 sec_blob->UserName.MaximumLength = 0;
->>                 tmp += 2;
->> @@ -448,13 +468,13 @@ int build_ntlmssp_auth_blob(unsigned char *pbuffer,
->>                 len = cifs_strtoUTF16((__le16 *)tmp, ses->user_name,
->>                                       CIFS_MAX_USERNAME_LEN, nls_cp);
->>                 len *= 2; /* unicode is 2 bytes each */
->> -               sec_blob->UserName.BufferOffset = cpu_to_le32(tmp - pbuffer);
->> +               sec_blob->UserName.BufferOffset = cpu_to_le32(tmp - *pbuffer);
->>                 sec_blob->UserName.Length = cpu_to_le16(len);
->>                 sec_blob->UserName.MaximumLength = cpu_to_le16(len);
->>                 tmp += len;
->>         }
->>
->> -       sec_blob->WorkstationName.BufferOffset = cpu_to_le32(tmp - pbuffer);
->> +       sec_blob->WorkstationName.BufferOffset = cpu_to_le32(tmp - *pbuffer);
->>         sec_blob->WorkstationName.Length = 0;
->>         sec_blob->WorkstationName.MaximumLength = 0;
->>         tmp += 2;
->> @@ -463,19 +483,19 @@ int build_ntlmssp_auth_blob(unsigned char *pbuffer,
->>                 (ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_EXTENDED_SEC))
->>                         && !calc_seckey(ses)) {
->>                 memcpy(tmp, ses->ntlmssp->ciphertext, CIFS_CPHTXT_SIZE);
->> -               sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - pbuffer);
->> +               sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - *pbuffer);
->>                 sec_blob->SessionKey.Length = cpu_to_le16(CIFS_CPHTXT_SIZE);
->>                 sec_blob->SessionKey.MaximumLength =
->>                                 cpu_to_le16(CIFS_CPHTXT_SIZE);
->>                 tmp += CIFS_CPHTXT_SIZE;
->>         } else {
->> -               sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - pbuffer);
->> +               sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - *pbuffer);
->>                 sec_blob->SessionKey.Length = 0;
->>                 sec_blob->SessionKey.MaximumLength = 0;
->>         }
->>
->> +       *buflen = tmp - *pbuffer;
->>  setup_ntlmv2_ret:
->> -       *buflen = tmp - pbuffer;
->>         return rc;
->>  }
->>
->> @@ -1266,7 +1286,7 @@ sess_auth_rawntlmssp_authenticate(struct sess_data *sess_data)
->>         struct cifs_ses *ses = sess_data->ses;
->>         __u16 bytes_remaining;
->>         char *bcc_ptr;
->> -       char *ntlmsspblob = NULL;
->> +       unsigned char *ntlmsspblob = NULL;
->>         u16 blob_len;
->>
->>         cifs_dbg(FYI, "rawntlmssp session setup authenticate phase\n");
->> @@ -1279,19 +1299,7 @@ sess_auth_rawntlmssp_authenticate(struct sess_data *sess_data)
->>         /* Build security blob before we assemble the request */
->>         pSMB = (SESSION_SETUP_ANDX *)sess_data->iov[0].iov_base;
->>         smb_buf = (struct smb_hdr *)pSMB;
->> -       /*
->> -        * 5 is an empirical value, large enough to hold
->> -        * authenticate message plus max 10 of av paris,
->> -        * domain, user, workstation names, flags, etc.
->> -        */
->> -       ntlmsspblob = kzalloc(5*sizeof(struct _AUTHENTICATE_MESSAGE),
->> -                               GFP_KERNEL);
->> -       if (!ntlmsspblob) {
->> -               rc = -ENOMEM;
->> -               goto out;
->> -       }
->> -
->> -       rc = build_ntlmssp_auth_blob(ntlmsspblob,
->> +       rc = build_ntlmssp_auth_blob(&ntlmsspblob,
->>                                         &blob_len, ses, sess_data->nls_cp);
->>         if (rc)
->>                 goto out_free_ntlmsspblob;
->> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
->> index 8f38e33..c3e61a7 100644
->> --- a/fs/cifs/smb2pdu.c
->> +++ b/fs/cifs/smb2pdu.c
->> @@ -588,7 +588,7 @@ SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
->>         u16 blob_length = 0;
->>         struct key *spnego_key = NULL;
->>         char *security_blob = NULL;
->> -       char *ntlmssp_blob = NULL;
->> +       unsigned char *ntlmssp_blob = NULL;
->>         bool use_spnego = false; /* else use raw ntlmssp */
->>
->>         cifs_dbg(FYI, "Session Setup\n");
->> @@ -713,13 +713,7 @@ ssetup_ntlmssp_authenticate:
->>                 iov[1].iov_len = blob_length;
->>         } else if (phase == NtLmAuthenticate) {
->>                 req->hdr.SessionId = ses->Suid;
->> -               ntlmssp_blob = kzalloc(sizeof(struct _NEGOTIATE_MESSAGE) + 500,
->> -                                      GFP_KERNEL);
->> -               if (ntlmssp_blob == NULL) {
->> -                       rc = -ENOMEM;
->> -                       goto ssetup_exit;
->> -               }
->> -               rc = build_ntlmssp_auth_blob(ntlmssp_blob, &blob_length, ses,
->> +               rc = build_ntlmssp_auth_blob(&ntlmssp_blob, &blob_length, ses,
->>                                              nls_cp);
->>                 if (rc) {
->>                         cifs_dbg(FYI, "build_ntlmssp_auth_blob failed %d\n",
->> --
->> 2.5.5
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
-> --
-> Thanks,
->
-> Steve
+--MP_/ZMuO4d3nwmQ8_KxI.Bxmxnm
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Hi all,
+
+I've come up with a new solution for the problem (attached). Between
+the long, old and irrelevant comments on the bug report and the various
+mailing-list threads it was getting hard to understand. So I've written
+a summary which explains the problem in details and the 2 proposed
+solutions.
+
+http://diobla.info/stuff/bugs/bsc799133/
+
+The new solution is basically switching to the old prefixpath system
+when the normal method of querying intermediary path fails. It's much
+more simpler.
+
+*Any* feedback would be nice. I haven't noticed any problems so far but
+I haven't run the xfs test suite (I still have to figure out how
+to make it play nice with cifs...). I'm sending to samba-tech too in
+hopes of reviews/comments.
+
+--=20
+Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Linux GmbH, Maxfeldstra=C3=9Fe 5, 90409 N=C3=BCrnberg, Germany
+GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton, HRB 21284 (AG
+N=C3=BCrnberg)
+
+--MP_/ZMuO4d3nwmQ8_KxI.Bxmxnm
+Content-Type: text/x-patch
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment;
+ filename=0001-fs-cifs-make-share-unaccessible-at-root-level-mounta.patch
+
+=46rom 3e9af75bea055bf88a4700fced50a7ba38b39b6f Mon Sep 17 00:00:00 2001
+From: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+Date: Wed, 25 May 2016 19:59:09 +0200
+Subject: [PATCH] fs/cifs: make share unaccessible at root level mountable
+
+if, when mounting //HOST/share/sub/dir/foo we can query /sub/dir/foo but
+not any of the path components above:
+
+- store the /sub/dir/foo prefix in the cifs super_block info
+- in the superblock, set root dentry to the subpath dentry (instead of
+  the share root)
+- set a flag in the superblock to remember it
+- use prefixpath when building path from a dentry
+
+fixes bso#8950
+
+Signed-off-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+---
+ fs/cifs/cifs_fs_sb.h |  2 ++
+ fs/cifs/cifsfs.c     | 19 +++++++++++++++++++
+ fs/cifs/connect.c    |  3 +++
+ fs/cifs/dir.c        | 19 +++++++++++++++++--
+ 4 files changed, 41 insertions(+), 2 deletions(-)
+
+diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+index 3182273..02b9ac3 100644
+--- a/fs/cifs/cifs_fs_sb.h
++++ b/fs/cifs/cifs_fs_sb.h
+@@ -46,6 +46,7 @@
+ #define CIFS_MOUNT_CIFS_BACKUPUID 0x200000 /* backup intent bit for a user=
+ */
+ #define CIFS_MOUNT_CIFS_BACKUPGID 0x400000 /* backup intent bit for a grou=
+p */
+ #define CIFS_MOUNT_MAP_SFM_CHR	0x800000 /* SFM/MAC mapping for illegal cha=
+rs */
++#define CIFS_MOUNT_USE_PREFIX_PATH 0x1000000 /* make subpath with unaccess=
+ible root mountable */
+=20
+ struct cifs_sb_info {
+ 	struct rb_root tlink_tree;
+@@ -67,5 +68,6 @@ struct cifs_sb_info {
+ 	struct backing_dev_info bdi;
+ 	struct delayed_work prune_tlinks;
+ 	struct rcu_head rcu;
++	char *prepath;
+ };
+ #endif				/* _CIFS_FS_SB_H */
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 5d8b7ed..d1fc593 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -649,6 +649,17 @@ cifs_get_root(struct smb_vol *vol, struct super_block =
+*sb)
+ 		dentry =3D child;
+ 	} while (!IS_ERR(dentry));
+ 	kfree(full_path);
++
++	if (IS_ERR(dentry) /* && path accessible */) {
++		/* we know the path is accessible (it is tested
++		 * earlier in cifs_do_mount()) so there must be a perm
++		 * problem */
++		cifs_dbg(VFS, "cannot query directories between root and final path, "
++			 "enabling CIFS_MOUNT_USE_PREFIX_PATH\n");
++		cifs_sb->mnt_cifs_flags |=3D CIFS_MOUNT_USE_PREFIX_PATH;
++		dentry =3D dget(sb->s_root);
++	}
++
+ 	return dentry;
+ }
+=20
+@@ -688,6 +699,14 @@ cifs_do_mount(struct file_system_type *fs_type,
+ 		goto out_cifs_sb;
+ 	}
+=20
++	if (volume_info->prepath) {
++		cifs_sb->prepath =3D kstrdup(volume_info->prepath, GFP_KERNEL);
++		if (cifs_sb->prepath =3D=3D NULL) {
++			root =3D ERR_PTR(-ENOMEM);
++			goto out_cifs_sb;
++		}
++	}
++
+ 	cifs_setup_cifs_sb(volume_info, cifs_sb);
+=20
+ 	rc =3D cifs_mount(cifs_sb, volume_info);
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 66736f5..90e57ee 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -3887,6 +3887,9 @@ cifs_umount(struct cifs_sb_info *cifs_sb)
+=20
+ 	bdi_destroy(&cifs_sb->bdi);
+ 	kfree(cifs_sb->mountdata);
++	if (cifs_sb->prepath) {
++		kfree(cifs_sb->prepath);
++	}
+ 	call_rcu(&cifs_sb->rcu, delayed_free);
+ }
+=20
+diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+index c3eb998..5374253 100644
+--- a/fs/cifs/dir.c
++++ b/fs/cifs/dir.c
+@@ -84,6 +84,7 @@ build_path_from_dentry(struct dentry *direntry)
+ 	struct dentry *temp;
+ 	int namelen;
+ 	int dfsplen;
++	int pplen =3D 0;
+ 	char *full_path;
+ 	char dirsep;
+ 	struct cifs_sb_info *cifs_sb =3D CIFS_SB(direntry->d_sb);
+@@ -95,8 +96,12 @@ build_path_from_dentry(struct dentry *direntry)
+ 		dfsplen =3D strnlen(tcon->treeName, MAX_TREE_SIZE + 1);
+ 	else
+ 		dfsplen =3D 0;
++
++	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_USE_PREFIX_PATH)
++		pplen =3D cifs_sb->prepath ? strlen(cifs_sb->prepath) + 1 : 0;
++
+ cifs_bp_rename_retry:
+-	namelen =3D dfsplen;
++	namelen =3D dfsplen + pplen;
+ 	seq =3D read_seqbegin(&rename_lock);
+ 	rcu_read_lock();
+ 	for (temp =3D direntry; !IS_ROOT(temp);) {
+@@ -137,7 +142,7 @@ cifs_bp_rename_retry:
+ 		}
+ 	}
+ 	rcu_read_unlock();
+-	if (namelen !=3D dfsplen || read_seqretry(&rename_lock, seq)) {
++	if (namelen !=3D dfsplen + pplen || read_seqretry(&rename_lock, seq)) {
+ 		cifs_dbg(FYI, "did not end path lookup where expected. namelen=3D%ddfspl=
+en=3D%d\n",
+ 			 namelen, dfsplen);
+ 		/* presumably this is only possible if racing with a rename
+@@ -153,6 +158,16 @@ cifs_bp_rename_retry:
+ 	   those safely to '/' if any are found in the middle of the prepath */
+ 	/* BB test paths to Windows with '/' in the midst of prepath */
+=20
++	if (pplen) {
++		int i;
++		cifs_dbg(FYI, "using cifs_sb prepath <%s>\n", cifs_sb->prepath);
++		memcpy(full_path+dfsplen+1, cifs_sb->prepath, pplen-1);
++		full_path[dfsplen] =3D '\\';
++		for (i =3D 0; i < pplen-1; i++)
++			if (full_path[dfsplen+1+i] =3D=3D '/')
++				full_path[dfsplen+1+i] =3D CIFS_DIR_SEP(cifs_sb);
++	}
++
+ 	if (dfsplen) {
+ 		strncpy(full_path, tcon->treeName, dfsplen);
+ 		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS) {
+--=20
+2.1.4
 
 
+--MP_/ZMuO4d3nwmQ8_KxI.Bxmxnm--
 
--- 
-Thanks,
+--Sig_/l8.oHqAElhSqHcJFU.DBEGD
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-Steve
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBAgAGBQJXSIdUAAoJEDIGO5Hchq/8yvoP/2BbRspk5TEUPgwE5JDe+96E
++dxB3PidP1LqA9oCr2XkBoXMjGDyL7Ll4KYyoqN4rvnlsirGaLHQfGnuevo55YKv
+rIEWtXo4DLRQRLYQ+TNO0wwLYOYb1DSw0hPwiUjaOII1D88K/tcgMdDk25x5I2Nf
+Tn5STrM9jwIOrGlIYUDqDSnHOhEkNQSA2HI/eQKtJ2DPC3ULBmm03egeKRVr/Fr6
+RqA8gBluUO5qaxwOdqgSpIIhj4X8ZbVwpYUR6fd/tsAOEsRvXnm6He2p7Ey88FM0
+JaTesMf7MsvUJIuo3egCrlGu1J+fg4Ucf0TjaM3gNU9aqEJlUpiUAkciL2KpDzJD
+LW6NtRwxloZ/Rk/KLX961u2IC45Hwlk9H+A+fFJZm9Wk6voIOWqnLhCAbqXXbB4X
+zBgsJaRcqmSb8sID5ioOooYWKTvAEbY/Vd3qAyhKYq/tpZbGMG/bISd1E3tSQdJa
+sQhSASS3ifpD6ka0paUXKilyQbqh+C6Ex/YzSi8HAyIkFAmpL1Z5pbspGxbbYUUI
+K3Mq+jNqCb7pWetmvKSA89Zv7yY883SrO8onGqRYxMu8knmxi6ryVCgw0s6tdQxf
+qwIQCQIhCij6CygOuiVA5MngtPVT5ALjxs7pqXvK98z4Cvw7yy+wuLhsdv6Ooz9k
+OSNnqjOFMKkM/OL4mzpu
+=TY2p
+-----END PGP SIGNATURE-----
+
+--Sig_/l8.oHqAElhSqHcJFU.DBEGD--
