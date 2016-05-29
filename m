@@ -1,56 +1,16 @@
-From: ebiederm@xmission.com (Eric W. Biederman)
-Subject: Re: [PATCH] posix acls: Move namespace conversion into filesystem / xattr handlers
-Date: Fri, 27 May 2016 13:26:10 -0500
-Message-ID: <87y46vfjct.fsf@x220.int.ebiederm.org>
-References: <1464008989-3812-1-git-send-email-agruenba@redhat.com>
-	<20160524153949.GA2830@dztty.fritz.box>
-	<CAHc6FU5mTAM6cCP9S5CxrJ7PhZ-_3SxQeOLty1UgtVCu3ZVshw@mail.gmail.com>
-	<87h9dllnq2.fsf@x220.int.ebiederm.org>
-	<CAHc6FU60UYKDYe03x=EPRnbuZqy+pZNUe5x-F7pvMwbWyXNkBw@mail.gmail.com>
-	<87bn3ridde.fsf@x220.int.ebiederm.org>
+From: program12-cpgL+PMETWIk+I/owrrOrA@public.gmane.org
+Subject: Hello
+Date: Sun, 29 May 2016 00:44:09 +0000
+Message-ID: <742734.7733.bm@smtp113.mail.ne1.yahoo.com>
+Reply-To: cplkristibakar-1ViLX0X+lBJBDgjK7y7TUQ@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Djalal Harouni <tixxdz@gmail.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Oleg Drokin <oleg.drokin@intel.com>,
-	Andreas Dilger <andreas.dilger@intel.com>,
-	Steve French <sfrench@samba.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	Lustre Developement <lustre-devel@lists.lustre.org>,
-	linux-cifs@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>,
-	"Serge E. Hallyn" <serge@hallyn.com>
-To: Andreas Gruenbacher <agruenba@redhat.com>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <87bn3ridde.fsf@x220.int.ebiederm.org> (Eric W. Biederman's
-	message of "Fri, 27 May 2016 13:07:09 -0500")
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+To: Recipients <program12-cpgL+PMETWIk+I/owrrOrA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Description: Mail message body
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-ebiederm@xmission.com (Eric W. Biederman) writes:
->>
->> No. Just like with this patch, that mapping really needs to go into the
->> appropriate xattr handler. Again, where's that code, please?
->
-> I will start looking at what is in Linus's tree.  But unless it happens
-> to address my concerns, I am not even going to consider the notion that
-> things should be in an ``xattr handler''.
->
-> There are very good reasons why that conversion does not, nor should not
-> happen inside of filesystem specific code.
-
-Ok.  I have looked.
-
-The cleanups in Linus' tree seem worthwhile.  The notion that mapping
-needs to go into a non-generic xattr handler is broken.
-
-If everything can always use a single set of acl handlers for posix acls
-then I will be happy to consider something like your patch.
-
-Fundamentally for vfs and security module supported attributes what a user
-writes in setxattr needs to be disconnected from what actually gets
-written to disk.
-
-Things evolve and userspace breaks if we don't handle the compatibility
-between old and new in the kernel.
-
-Eric
+Hi,
+I am Kristi and i saw your contact through google page of your country which impress me and i feel we can be friends to share ideals and reason together for good,if not bad then let us know more about each other and i hope there will be no problem for us to be friend with no bad intention.You can also reply me through email(cplkristibakar-1ViLX0X+lBJBDgjK7y7TUQ@public.gmane.org) so that i can share details about myself, i will be waiting to hear from you soon. 
