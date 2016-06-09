@@ -1,66 +1,65 @@
-From: Deepa Dinamani <deepa.kernel@gmail.com>
-Subject: [PATCH 09/21] fs: cifs: Replace CURRENT_TIME by get_seconds
-Date: Wed,  8 Jun 2016 22:04:53 -0700
-Message-ID: <1465448705-25055-10-git-send-email-deepa.kernel@gmail.com>
+From: David Sterba <dsterba@suse.cz>
+Subject: Re: [PATCH 04/21] fs: Replace CURRENT_TIME with current_fs_time()
+ for inode timestamps
+Date: Thu, 9 Jun 2016 09:55:39 +0200
+Message-ID: <20160609075539.GF3905@suse.cz>
 References: <1465448705-25055-1-git-send-email-deepa.kernel@gmail.com>
+ <1465448705-25055-5-git-send-email-deepa.kernel@gmail.com>
+Reply-To: dsterba@suse.cz
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: linux-cifs@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
- y2038@lists.linaro.org, samba-technical@lists.samba.org,
- Steve French <sfrench@samba.org>, Al Viro <viro@zeniv.linux.org.uk>,
- Thomas Gleixner <tglx@linutronix.de>,
- Linus Torvalds <torvalds@linux-foundation.org>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Return-path: <y2038-bounces@lists.linaro.org>
-In-Reply-To: <1465448705-25055-1-git-send-email-deepa.kernel@gmail.com>
-List-Unsubscribe: <https://lists.linaro.org/mailman/options/y2038>,
- <mailto:y2038-request@lists.linaro.org?subject=unsubscribe>
-List-Archive: <http://lists.linaro.org/pipermail/y2038/>
-List-Post: <mailto:y2038@lists.linaro.org>
-List-Help: <mailto:y2038-request@lists.linaro.org?subject=help>
-List-Subscribe: <https://lists.linaro.org/mailman/listinfo/y2038>,
- <mailto:y2038-request@lists.linaro.org?subject=subscribe>
-Errors-To: y2038-bounces@lists.linaro.org
-Sender: "Y2038" <y2038-bounces@lists.linaro.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>,
+	Colin Cross <ccross@android.com>, Arnd Bergmann <arnd@arndb.de>,
+	pvfs2-developers@beowulf-underground.org,
+	Kees Cook <keescook@chromium.org>,
+	Matt Fleming <matt@codeblueprint.co.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Boaz Harrosh <ooo@electrozaur.com>,
+	Anton Vorontsov <anton@enomsg.org>,
+	Joel Becker <jlbec@evilplan.org>, Chris Mason <clm@fb.com>,
+	Josef Bacik <jbacik@fb.com>,
+	"J. Bruce Fields" <bfields@fieldses.org>,
+	Eric Van Hensbergen <ericvh@gmail.com>,
+	Firo Yang <firogm@gmail.com>,
+	Hal Rosenstock <hal.rosenstock@gmail.com>,
+	Konstantin Khlebnikov <koct9i@gmail.com>,
+	Prasad Joshi <prasadjoshi.linux@gmail.com>,
+	Hugh Dickins <hughd@google.com>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Nadia Yvette Chambers <nyc@holomorphy.com>,
+	Peter Hurley <peter@hurleysof
+To: Deepa Dinamani <deepa.kernel@gmail.com>
+Return-path: <owner-linux-mm@kvack.org>
+Content-Disposition: inline
+In-Reply-To: <1465448705-25055-5-git-send-email-deepa.kernel@gmail.com>
+Sender: owner-linux-mm@kvack.org
 List-Id: linux-cifs.vger.kernel.org
 
-VGhpcyBpcyBpbiBwcmVwYXJhdGlvbiBmb3IgdGhlIGNoYW5nZSB0aGF0IHRyYW5zaXRpb25zCmZp
-bGVzeXN0ZW0gdGltZXN0YW1wcyB0byB1c2UgNjQgYml0IHRpbWUgYW5kIGhlbmNlIG1ha2UKdGhl
-bSB5MjAzOCBzYWZlLgoKQ1VSUkVOVF9USU1FIG1hY3JvIHdpbGwgYmUgZGVsZXRlZCBiZWZvcmUg
-bWVyZ2luZyB0aGUKYWZvcmVtZW50aW9uZWQgcGF0Y2guCgpGaWxlc3lzdGVtcyB3aWxsIHVzZSBj
-dXJyZW50X2ZzX3RpbWUoKSBpbnN0ZWFkIG9mCkNVUlJFTlRfVElNRS4KVXNlIGdldF9zZWNvbmRz
-KCkgaGVyZSBhcyB0aGlzIGlzIG5vdCBmaWxlc3lzdGVtIHRpbWUuCk9ubHkgdGhlIHNlY29uZHMg
-cG9ydGlvbiBvZiB0aGUgdGltZXN0YW1wIGlzIG5lY2Vzc2FyeSBmb3IKdGltZXpvbmUgY2FsY3Vs
-YXRpb24gdXNpbmcgc2VydmVyIHRpbWUuCgpBc3N1bWUgdGhhdCB0aGUgZGlmZmVyZW5jZSBiZXR3
-ZWVuIHNlcnZlciBhbmQgY2xpZW50IHRpbWVzCmxpZSBpbiB0aGUgcmFuZ2UgSU5UX01JTi4uSU5U
-X01BWC4gVGhpcyBpcyB2YWxpZCBiZWNhdXNlCnRoaXMgaXMgdGhlIGRpZmZlcmVuY2UgYmV0d2Vl
-biBjdXJyZW50IHRpbWVzIGJldHdlZW4gc2VydmVyCmFuZCBjbGllbnQsIGFuZCB0aGUgbGFyZ2Vz
-dCB0aW1lem9uZSBkaWZmZXJlbmNlIGlzIGluIHRoZQpyYW5nZSBvZiBvbmUgZGF5LgoKQWxsIGNp
-ZnMgdGltZXN0YW1wcyBjdXJyZW50bHkgdXNlIHRpbWVzcGVjIGludGVybmFsbHkuClRoaXMgdGlt
-ZXN0YW1wIGNhbiBhbHNvIGJlIHRyYW5zaXRpb25lZCBpbnRvIHVzaW5nCnRpbWVzcGVjNjQgd2hl
-biBhbGwgb3RoZXIgdGltZXN0YW1wcyBmb3IgY2lmcyBpcyB0cmFuc2l0aW9uZWQKdG8gdXNlIHRp
-bWVzcGVjNjQuCgpTaWduZWQtb2ZmLWJ5OiBEZWVwYSBEaW5hbWFuaSA8ZGVlcGEua2VybmVsQGdt
-YWlsLmNvbT4KQ2M6IFN0ZXZlIEZyZW5jaCA8c2ZyZW5jaEBzYW1iYS5vcmc+CkNjOiBsaW51eC1j
-aWZzQHZnZXIua2VybmVsLm9yZwpDYzogc2FtYmEtdGVjaG5pY2FsQGxpc3RzLnNhbWJhLm9yZwot
-LS0KIGZzL2NpZnMvY2lmc3NtYi5jIHwgMTAgKysrKystLS0tLQogMSBmaWxlIGNoYW5nZWQsIDUg
-aW5zZXJ0aW9ucygrKSwgNSBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNz
-bWIuYyBiL2ZzL2NpZnMvY2lmc3NtYi5jCmluZGV4IGQ0NzE5N2UuLmFlYWU2YTAgMTAwNjQ0Ci0t
-LSBhL2ZzL2NpZnMvY2lmc3NtYi5jCisrKyBiL2ZzL2NpZnMvY2lmc3NtYi5jCkBAIC00NzgsMTQg
-KzQ3OCwxNCBAQCBkZWNvZGVfbGFubWFuX25lZ3Byb3RfcnNwKHN0cnVjdCBUQ1BfU2VydmVyX0lu
-Zm8gKnNlcnZlciwgTkVHT1RJQVRFX1JTUCAqcFNNQnIpCiAJCSAqIHRoaXMgcmVxdWlyZW1lbnQu
-CiAJCSAqLwogCQlpbnQgdmFsLCBzZWNvbmRzLCByZW1haW4sIHJlc3VsdDsKLQkJc3RydWN0IHRp
-bWVzcGVjIHRzLCB1dGM7Ci0JCXV0YyA9IENVUlJFTlRfVElNRTsKKwkJc3RydWN0IHRpbWVzcGVj
-IHRzOworCQl1bnNpZ25lZCBsb25nIHV0YyA9IGdldF9zZWNvbmRzKCk7CiAJCXRzID0gY252cnRE
-b3NVbml4VG0ocnNwLT5TcnZUaW1lLkRhdGUsCiAJCQkJICAgIHJzcC0+U3J2VGltZS5UaW1lLCAw
-KTsKIAkJY2lmc19kYmcoRllJLCAiU3J2VGltZSAlZCBzZWMgc2luY2UgMTk3MCAodXRjOiAlZCkg
-ZGlmZjogJWRcbiIsCi0JCQkgKGludCl0cy50dl9zZWMsIChpbnQpdXRjLnR2X3NlYywKLQkJCSAo
-aW50KSh1dGMudHZfc2VjIC0gdHMudHZfc2VjKSk7Ci0JCXZhbCA9IChpbnQpKHV0Yy50dl9zZWMg
-LSB0cy50dl9zZWMpOworCQkJIChpbnQpdHMudHZfc2VjLCAoaW50KXV0YywKKwkJCSAoaW50KSh1
-dGMgLSB0cy50dl9zZWMpKTsKKwkJdmFsID0gKGludCkodXRjIC0gdHMudHZfc2VjKTsKIAkJc2Vj
-b25kcyA9IGFicyh2YWwpOwogCQlyZXN1bHQgPSAoc2Vjb25kcyAvIE1JTl9UWl9BREopICogTUlO
-X1RaX0FESjsKIAkJcmVtYWluID0gc2Vjb25kcyAlIE1JTl9UWl9BREo7Ci0tIAoxLjkuMQoKX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KWTIwMzggbWFpbGlu
-ZyBsaXN0ClkyMDM4QGxpc3RzLmxpbmFyby5vcmcKaHR0cHM6Ly9saXN0cy5saW5hcm8ub3JnL21h
-aWxtYW4vbGlzdGluZm8veTIwMzgK
+On Wed, Jun 08, 2016 at 10:04:48PM -0700, Deepa Dinamani wrote:
+> CURRENT_TIME macro is not appropriate for filesystems as it
+> doesn't use the right granularity for filesystem timestamps.
+> Use current_fs_time() instead.
+> 
+> CURRENT_TIME is also not y2038 safe.
+> 
+> This is also in preparation for the patch that transitions
+> vfs timestamps to use 64 bit time and hence make them
+> y2038 safe. As part of the effort current_fs_time() will be
+> extended to do range checks. Hence, it is necessary for all
+> file system timestamps to use current_fs_time(). Also,
+> current_fs_time() will be transitioned along with vfs to be
+> y2038 safe.
+> 
+> Signed-off-by: Deepa Dinamani <deepa.kernel@gmail.com>
+> Cc: David Sterba <dsterba@suse.com>
+
+for the btrfs bits
+
+Reviewed-by: David Sterba <dsterba@suse.com>
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
