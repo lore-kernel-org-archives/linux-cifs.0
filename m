@@ -1,78 +1,57 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH 04/21] fs: Replace CURRENT_TIME with
-	current_fs_time() for inode timestamps
-Date: Sat, 11 Jun 2016 00:23:39 +0200
-Message-ID: <3828814.bejVmX1kJo@wuerfel>
-References: <1465448705-25055-1-git-send-email-deepa.kernel@gmail.com>
-	<1465448705-25055-5-git-send-email-deepa.kernel@gmail.com>
+From: Marcus Hoffmann <marcus.hoffmann-j/7cz5qe3tpn68oJJulU0Q@public.gmane.org>
+Subject: Re: [PATCH] Making shares unaccessible at root level mountable (aka
+ solving bsc#8950 ...again)
+Date: Sun, 12 Jun 2016 20:01:44 +0200
+Message-ID: <575DA388.5030002@fu-berlin.de>
+References: <20160527194346.08416d79@aaptelpc>
+ <20160609185027.7349f260@aaptelpc> <5759C326.5040508@fu-berlin.de>
+ <20160610171649.3e12b95c@aaptelpc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Latchesar Ionkov <lucho@ionkov.net>, Dave Kleikamp <shaggy@kernel.org>,
-        jfs-discussion@lists.sourceforge.net, Michal Hocko <mhocko@suse.com>,
-        Matt Fleming <matt@codeblueprint.co.uk>, Firo Yang <firogm@gmail.com>,
-        Trond Myklebust <trond.myklebust@primarydata.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        David Howells <dhowells@redhat.com>, linux-efi@vger.kernel.org,
-        selinux@tycho.nsa.gov, Eric Paris <eparis@parisplace.org>,
-        Matthew Garrett <matthew.garrett@nebula.com>,
-        Jeff Layton <jlayton@poochiereds.net>,
-        linux-f2fs-devel@lists.sourceforge.net,
-        Sean Hefty <sean.hefty@intel.com>, Ian Kent <raven@themaw.net>,
-        linux-cifs@vger.kernel.org, Paul Moore <paul@paul-moore.com>,
-        "David S. Miller" <davem@davemloft.net>, y2038@lists.linaro.org,
-        Anton Vorontsov <anton@enomsg.org>, Hugh Dickins <hu
-To: Deepa Dinamani <deepa.kernel@gmail.com>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Nadia Yvette Chambers <nyc@holomorphy.com>,
-        Chao Yu <chao2.yu@samsung.com>, linux-nilfs@vger.kernel.org
-Return-path: <cluster-devel-bounces@redhat.com>
-In-Reply-To: <1465448705-25055-5-git-send-email-deepa.kernel@gmail.com>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/cluster-devel>,
-	<mailto:cluster-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/cluster-devel>
-List-Post: <mailto:cluster-devel@redhat.com>
-List-Help: <mailto:cluster-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/cluster-devel>,
-	<mailto:cluster-devel-request@redhat.com?subject=subscribe>
-Sender: cluster-devel-bounces@redhat.com
-Errors-To: cluster-devel-bounces@redhat.com
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20160610171649.3e12b95c@aaptelpc>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Wednesday, June 8, 2016 10:04:48 PM CEST Deepa Dinamani wrote:
-> 
-> Signed-off-by: Deepa Dinamani <deepa.kernel@gmail.com>
-> Cc: Steve French <sfrench@samba.org>
-> Cc: linux-cifs@vger.kernel.org
-> Cc: samba-technical@lists.samba.org
-> Cc: Joern Engel <joern@logfs.org>
-> Cc: Prasad Joshi <prasadjoshi.linux@gmail.com>
-> Cc: logfs@logfs.org
-> Cc: Andrew Morton <akpm@linux-foundation.org>
-> Cc: Julia Lawall <Julia.Lawall@lip6.fr>
-> Cc: David Howells <dhowells@redhat.com>
-> Cc: Firo Yang <firogm@gmail.com>
-> Cc: Jaegeuk Kim <jaegeuk@kernel.org>
-> Cc: Changman Lee <cm224.lee@samsung.com>
-> ...
+On 06/10/2016 05:16 PM, Aur=C3=A9lien Aptel wrote:
+> On Thu, 9 Jun 2016 21:27:34 +0200 Marcus Hoffmann
+> <marcus.hoffmann-j/7cz5qe3tpn68oJJulU0Q@public.gmane.org> wrote:
+>> Hey Aur=C3=A9lien,
+>> with your script I can reproduce the bug locally now.
+>=20
+> Good.
+>=20
+>> I can mount the share (which is on a Windows 8.1 vm) with a Windows =
+7
+>> PC with the restricted user account. (Even in hard mode.)
+>> I can mount the share from Linux-cifs using the admin user but not t=
+he
+>> restricted user.
+>=20
+> I've moved some things around. All of the prefix path components are
+> now checked for accessibility in cifs_do_mount(). This is more
+> robust and it lets us set the CIFS_MOUNT_USE_PREFIX_PATH flag earlier=
+=2E
+>=20
+> I've updated the cifs_root_iget() to use the prefix path when necessa=
+ry
+> which should take care of the last case (hard mode).
+>=20
+> Please test my latest patch (attached).
 
+I can confirm it works with our setup now.
+Any chance in getting this merged?
 
-Hi Deepa,
+>=20
+>> (I noticed though that no user has access to the file in the shared
+>> dir. But this doesn't really matter for the test.)
+>=20
+> Indeed.
+>=20
 
-
-Just FYI, the vger.kernel.org list server and some others
-intentionally reject mails with more than 1024 characters in the
-Cc header, to stop people from cross-posting to too many folks.
-
-I realize that you merged the patch after Linus' comment about
-doing things in fewer steps for the simple conversion, which is
-fine, but then the patch should be obvious enough that you
-don't need to Cc every single maintainer and mailing list.
-
-I've had some cases like this, and I usually remove the people
-that are less likely to reply, leaving one per subsystem.
-Leaving out the cleartext names is another trick you can use
-if you think that you really need to Cc more people than
-allowed ;-)
-
-	Arnd
+Thanks for your work on this,
+Marcus
