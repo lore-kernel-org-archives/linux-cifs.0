@@ -1,61 +1,149 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Mon, 27 Jun 2016 13:06:12 -0500
-Message-ID: <CAH2r5munp2gEW+Fc=6XiQH0NJ=hGB7pFAXQgMPqG+jDetjBbeg@mail.gmail.com>
+From: Andreas Gruenbacher <agruenba@redhat.com>
+Subject: [PATCH v23 00/22] Richacls (Core and Ext4)
+Date: Thu, 30 Jun 2016 15:46:51 +0200
+Message-ID: <1467294433-3222-1-git-send-email-agruenba@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: "J. Bruce Fields" <bfields@fieldses.org>, linux-nfs@vger.kernel.org,
+	Theodore Ts'o <tytso@mit.edu>, Andreas Gruenbacher <agruenba@redhat.com>,
+	linux-cifs@vger.kernel.org, linux-api@vger.kernel.org,
+	Trond Myklebust <trond.myklebust@primarydata.com>,
+	linux-kernel@vger.kernel.org, xfs@oss.sgi.com,
+	Christoph Hellwig <hch@infradead.org>,
+	Andreas Dilger <adilger.kernel@dilger.ca>, linux-fsdevel@vger.kernel.org,
+	Jeff Layton <jlayton@poochiereds.net>, linux-ext4@vger.kernel.org,
+	Anna Schumaker <anna.schumaker@netapp.com>
+To: Alexander Viro <viro@zeniv.linux.org.uk>
+Return-path: <xfs-bounces@oss.sgi.com>
+List-Unsubscribe: <http://oss.sgi.com/mailman/options/xfs>,
+	<mailto:xfs-request@oss.sgi.com?subject=unsubscribe>
+List-Archive: <http://oss.sgi.com/pipermail/xfs>
+List-Post: <mailto:xfs@oss.sgi.com>
+List-Help: <mailto:xfs-request@oss.sgi.com?subject=help>
+List-Subscribe: <http://oss.sgi.com/mailman/listinfo/xfs>,
+	<mailto:xfs-request@oss.sgi.com?subject=subscribe>
+Errors-To: xfs-bounces@oss.sgi.com
+Sender: xfs-bounces@oss.sgi.com
+List-Id: linux-cifs.vger.kernel.org
 
-Various small cifs/smb3 fixes, include some for stable, and some from
-the recent SMB3 test event.
+Here is another update of the richacl patches.  Changes since the last posting
+(https://lwn.net/Articles/689151/):
 
-Please pull the following changes since commit
-da01e18a37a57f360222d3a123b8f6994aa1ad14:
+ * Rebase on top of 4.7-rc5+ because of commit 999653786d "nfsd: check
+   permissions when setting ACLs".
 
-  x86: avoid avoid passing around 'thread_info' in stack dumping code
-(2016-06-23 12:20:01 -0700)
+ * Introduce set_richacl() similar to set_posix_acl() and use it in nfsd
+   to avoid going through the richacl xattr representation.
 
-are available in the git repository at:
 
-  git://git.samba.org/sfrench/cifs-2.6.git for-next
+The complete patch queue is available here:
 
-for you to fetch changes up to 45e8a2583d97ca758a55c608f78c4cef562644d1:
+  git://git.kernel.org/pub/scm/linux/kernel/git/agruen/linux-richacl.git \
+	richacl-2016-06-30
 
-  File names with trailing period or space need special case
-conversion (2016-06-24 12:05:52 -0500)
 
-----------------------------------------------------------------
-Jeff Layton (1):
-      cifs: stuff the fl_owner into "pid" field in the lock request
+The richacl user-space utilitites, man pages, and test suite are available
+here:
 
-Jerome Marchand (2):
-      cifs: use CIFS_MAX_DOMAINNAME_LEN when converting the domain name
-      cifs: dynamic allocation of ntlmssp blob
+  https://github.com/andreas-gruenbacher/richacl
 
-Luis de Bethencourt (1):
-      cifs: check hash calculating succeeded
 
-Steve French (2):
-      Fix reconnect to not defer smb3 session reconnect long after
-socket reconnect
-      File names with trailing period or space need special case conversion
+Changes to other user-space packages for richacl:
 
- fs/cifs/cifs_unicode.c | 33 ++++++++++++++++++---
- fs/cifs/cifs_unicode.h |  2 ++
- fs/cifs/cifsfs.c       |  3 ++
- fs/cifs/cifsglob.h     |  1 +
- fs/cifs/connect.c      |  4 ++-
- fs/cifs/file.c         | 14 +++++++--
- fs/cifs/ntlmssp.h      |  2 +-
- fs/cifs/sess.c         | 80 ++++++++++++++++++++++++++++----------------------
- fs/cifs/smb2pdu.c      | 37 ++++++++++++++++++-----
- 9 files changed, 124 insertions(+), 52 deletions(-)
+  https://github.com/andreas-gruenbacher/coreutils
+  https://github.com/andreas-gruenbacher/e2fsprogs
+  https://github.com/andreas-gruenbacher/samba
+  https://github.com/andreas-gruenbacher/xfsprogs-dev
+  https://github.com/andreas-gruenbacher/nfs-utils
+
+
+Please see the richacl homepage for more information:
+
+  http://www.bestbits.at/richacl/
+
+
+What more needs to be done to get this initial set of patches merged?
+
+Thanks,
+Andreas
+
+Andreas Gruenbacher (20):
+  vfs: Add IS_ACL() and IS_RICHACL() tests
+  vfs: Add MAY_CREATE_FILE and MAY_CREATE_DIR permission flags
+  vfs: Add MAY_DELETE_SELF and MAY_DELETE_CHILD permission flags
+  vfs: Make the inode passed to inode_change_ok non-const
+  vfs: Add permission flags for setting file attributes
+  richacl: In-memory representation and helper functions
+  richacl: Permission mapping functions
+  richacl: Compute maximum file masks from an acl
+  richacl: Permission check algorithm
+  posix_acl: Improve xattr fixup code
+  vfs: Cache base_acl objects in inodes
+  vfs: Add get_richacl and set_richacl inode operations
+  vfs: Cache richacl in struct inode
+  richacl: Update the file masks in chmod()
+  richacl: Check if an acl is equivalent to a file mode
+  richacl: Create-time inheritance
+  richacl: Automatic Inheritance
+  richacl: xattr mapping functions
+  richacl: Add richacl xattr handler
+  vfs: Add richacl permission checking
+
+Aneesh Kumar K.V (2):
+  ext4: Add richacl support
+  ext4: Add richacl feature flag
+
+ drivers/staging/lustre/lustre/llite/llite_lib.c |   2 +-
+ fs/9p/acl.c                                     |   8 +-
+ fs/Kconfig                                      |   3 +
+ fs/Makefile                                     |   1 +
+ fs/attr.c                                       |  81 ++-
+ fs/ext4/Kconfig                                 |  11 +
+ fs/ext4/Makefile                                |   1 +
+ fs/ext4/ext4.h                                  |   6 +-
+ fs/ext4/file.c                                  |   3 +
+ fs/ext4/ialloc.c                                |  11 +-
+ fs/ext4/inode.c                                 |   5 +-
+ fs/ext4/namei.c                                 |   5 +
+ fs/ext4/richacl.c                               | 134 ++++
+ fs/ext4/richacl.h                               |  40 ++
+ fs/ext4/super.c                                 |  49 +-
+ fs/ext4/xattr.c                                 |   7 +
+ fs/f2fs/acl.c                                   |   4 +-
+ fs/inode.c                                      |  43 +-
+ fs/jffs2/acl.c                                  |   6 +-
+ fs/namei.c                                      | 152 +++-
+ fs/nfs/nfs3acl.c                                |  14 +-
+ fs/posix_acl.c                                  |  69 +-
+ fs/richacl.c                                    | 915 ++++++++++++++++++++++++
+ fs/richacl_xattr.c                              | 222 ++++++
+ fs/xattr.c                                      |  29 +-
+ include/linux/acl.h                             |  15 +
+ include/linux/fs.h                              |  67 +-
+ include/linux/posix_acl.h                       |  21 +-
+ include/linux/richacl.h                         | 211 ++++++
+ include/linux/richacl_xattr.h                   |  31 +
+ include/uapi/linux/Kbuild                       |   2 +
+ include/uapi/linux/fs.h                         |   3 +-
+ include/uapi/linux/richacl.h                    | 152 ++++
+ include/uapi/linux/richacl_xattr.h              |  44 ++
+ include/uapi/linux/xattr.h                      |   2 +
+ 35 files changed, 2209 insertions(+), 160 deletions(-)
+ create mode 100644 fs/ext4/richacl.c
+ create mode 100644 fs/ext4/richacl.h
+ create mode 100644 fs/richacl.c
+ create mode 100644 fs/richacl_xattr.c
+ create mode 100644 include/linux/acl.h
+ create mode 100644 include/linux/richacl.h
+ create mode 100644 include/linux/richacl_xattr.h
+ create mode 100644 include/uapi/linux/richacl.h
+ create mode 100644 include/uapi/linux/richacl_xattr.h
 
 -- 
-Thanks,
+2.5.5
 
-Steve
+_______________________________________________
+xfs mailing list
+xfs@oss.sgi.com
+http://oss.sgi.com/mailman/listinfo/xfs
