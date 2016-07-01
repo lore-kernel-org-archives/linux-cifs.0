@@ -1,49 +1,54 @@
-From: Volker Lendecke <Volker.Lendecke@SerNet.DE>
-Subject: Re: [PATCH v23 00/22] Richacls (Core and Ext4)
-Date: Thu, 30 Jun 2016 16:11:28 +0200
-Message-ID: <20160630141128.GB17201@sernet.de>
-References: <1467294433-3222-1-git-send-email-agruenba@redhat.com>
-Reply-To: Volker.Lendecke@SerNet.DE
+From: Marcus Hoffmann <marcus.hoffmann-j/7cz5qe3tpn68oJJulU0Q@public.gmane.org>
+Subject: Re: [PATCH] Making shares unaccessible at root level mountable (aka
+ solving bsc#8950 ...again)
+Date: Fri, 1 Jul 2016 17:44:03 +0200
+Message-ID: <57768FC3.7020102@fu-berlin.de>
+References: <20160527194346.08416d79@aaptelpc>
+ <20160609185027.7349f260@aaptelpc> <5759C326.5040508@fu-berlin.de>
+ <20160610171649.3e12b95c@aaptelpc>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: "J. Bruce Fields" <bfields@fieldses.org>, linux-nfs@vger.kernel.org,
-	Theodore Ts'o <tytso@mit.edu>, linux-cifs@vger.kernel.org,
-	linux-api@vger.kernel.org,
-	Trond Myklebust <trond.myklebust@primarydata.com>,
-	linux-kernel@vger.kernel.org, xfs@oss.sgi.com,
-	Christoph Hellwig <hch@infradead.org>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Alexander Viro <viro@zeniv.linux.org.uk>, linux-fsdevel@vger.kernel.org,
-	Jeff Layton <jlayton@poochiereds.net>, linux-ext4@vger.kernel.org,
-	Anna Schumaker <anna.schumaker@netapp.com>
-To: Andreas Gruenbacher <agruenba@redhat.com>
-Return-path: <xfs-bounces@oss.sgi.com>
-Content-Disposition: inline
-In-Reply-To: <1467294433-3222-1-git-send-email-agruenba@redhat.com>
-List-Unsubscribe: <http://oss.sgi.com/mailman/options/xfs>,
-	<mailto:xfs-request@oss.sgi.com?subject=unsubscribe>
-List-Archive: <http://oss.sgi.com/pipermail/xfs>
-List-Post: <mailto:xfs@oss.sgi.com>
-List-Help: <mailto:xfs-request@oss.sgi.com?subject=help>
-List-Subscribe: <http://oss.sgi.com/mailman/listinfo/xfs>,
-	<mailto:xfs-request@oss.sgi.com?subject=subscribe>
-Errors-To: xfs-bounces@oss.sgi.com
-Sender: xfs-bounces@oss.sgi.com
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20160610171649.3e12b95c@aaptelpc>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, Jun 30, 2016 at 03:46:51PM +0200, Andreas Gruenbacher wrote:
-> What more needs to be done to get this initial set of patches merged?
+On 06/10/2016 05:16 PM, Aur=C3=A9lien Aptel wrote:
+> On Thu, 9 Jun 2016 21:27:34 +0200 Marcus Hoffmann
+> <marcus.hoffmann-j/7cz5qe3tpn68oJJulU0Q@public.gmane.org> wrote:
+>> Hey Aur=C3=A9lien,
+>> with your script I can reproduce the bug locally now.
+>=20
+> Good.
+>=20
+>> I can mount the share (which is on a Windows 8.1 vm) with a Windows =
+7
+>> PC with the restricted user account. (Even in hard mode.)
+>> I can mount the share from Linux-cifs using the admin user but not t=
+he
+>> restricted user.
+>=20
+> I've moved some things around. All of the prefix path components are
+> now checked for accessibility in cifs_do_mount(). This is more
+> robust and it lets us set the CIFS_MOUNT_USE_PREFIX_PATH flag earlier=
+=2E
+>=20
+> I've updated the cifs_root_iget() to use the prefix path when necessa=
+ry
+> which should take care of the last case (hard mode).
+>=20
+> Please test my latest patch (attached).
+>=20
+I just wanted to ask what can be done to get this merged.
 
-Bind Christoph to some tree in the Harz hills, so that he can't reject
-them? :-)
+>> (I noticed though that no user has access to the file in the shared
+>> dir. But this doesn't really matter for the test.)
+>=20
+> Indeed.
+>=20
 
-Christoph, is there anything realistic that can be done to get over
-your concerns?
-
-Volker
-
-_______________________________________________
-xfs mailing list
-xfs@oss.sgi.com
-http://oss.sgi.com/mailman/listinfo/xfs
+Marcus
