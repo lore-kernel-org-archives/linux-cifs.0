@@ -1,265 +1,135 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v23 08/22] richacl: Compute maximum file masks from an
- acl
-Date: Tue, 05 Jul 2016 10:22:17 -0400
-Message-ID: <1467728537.3800.32.camel@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+Subject: Re: [PATCH v23 09/22] richacl: Permission check algorithm
+Date: Tue, 05 Jul 2016 10:59:07 -0400
+Message-ID: <1467730747.3800.34.camel@redhat.com>
 References: <1467294433-3222-1-git-send-email-agruenba@redhat.com>
-	 <1467294433-3222-9-git-send-email-agruenba@redhat.com>
+	<1467294433-3222-10-git-send-email-agruenba@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-	Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>,
-	Andreas Dilger <adilger.kernel-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>,
-	"J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
-	Trond Myklebust <trond.myklebust-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
-	Anna Schumaker <anna.schumaker-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
-	Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>, linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1467294433-3222-9-git-send-email-agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "J. Bruce Fields" <bfields@fieldses.org>, linux-nfs@vger.kernel.org,
+	Theodore Ts'o <tytso@mit.edu>, linux-cifs@vger.kernel.org,
+	linux-api@vger.kernel.org,
+	Trond Myklebust <trond.myklebust@primarydata.com>,
+	linux-kernel@vger.kernel.org, xfs@oss.sgi.com,
+	Christoph Hellwig <hch@infradead.org>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+	Anna Schumaker <anna.schumaker@netapp.com>
+To: Andreas Gruenbacher <agruenba@redhat.com>, Alexander Viro
+	<viro@zeniv.linux.org.uk>
+Return-path: <xfs-bounces@oss.sgi.com>
+In-Reply-To: <1467294433-3222-10-git-send-email-agruenba@redhat.com>
+List-Unsubscribe: <http://oss.sgi.com/mailman/options/xfs>,
+	<mailto:xfs-request@oss.sgi.com?subject=unsubscribe>
+List-Archive: <http://oss.sgi.com/pipermail/xfs>
+List-Post: <mailto:xfs@oss.sgi.com>
+List-Help: <mailto:xfs-request@oss.sgi.com?subject=help>
+List-Subscribe: <http://oss.sgi.com/mailman/listinfo/xfs>,
+	<mailto:xfs-request@oss.sgi.com?subject=subscribe>
+Errors-To: xfs-bounces@oss.sgi.com
+Sender: xfs-bounces@oss.sgi.com
 List-Id: linux-cifs.vger.kernel.org
 
-On Thu, 2016-06-30 at 15:46 +0200, Andreas Gruenbacher wrote:
-> Compute upper bound owner, group, and other file masks with as few
-> permissions as possible without denying any permissions that the NFSv=
-4
-> acl in a richacl grants.
->=20
-> This algorithm is used when a file inherits an acl at create time and
-> when an acl is set via a mechanism that does not provide file masks
-> (such as setting an acl via nfsd).=C2=A0=C2=A0When user-space sets an=
- acl via
-> setxattr, the extended attribute already includes the file masks.
->=20
-> Setting an acl also sets the file mode permission bits: they are
-> determined by the file masks; see richacl_masks_to_mode().
->=20
-> Signed-off-by: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> Reviewed-by: J. Bruce Fields <bfields-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
-> =C2=A0fs/richacl.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0| 157 ++++++++++++++++++++++++++++++++++++++++++++=
-++++
-> =C2=A0include/linux/richacl.h |=C2=A0=C2=A0=C2=A01 +
-> =C2=A02 files changed, 158 insertions(+)
->=20
-> diff --git a/fs/richacl.c b/fs/richacl.c
-> index d0a4135..056228f 100644
-> --- a/fs/richacl.c
-> +++ b/fs/richacl.c
-> @@ -181,3 +181,160 @@ richacl_want_to_mask(unsigned int want)
-> =C2=A0	return mask;
-> =C2=A0}
-> =C2=A0EXPORT_SYMBOL_GPL(richacl_want_to_mask);
-> +
-> +/*
-> + * Note: functions like richacl_allowed_to_who(), richacl_group_clas=
-s_allowed(),
-> + * and richacl_compute_max_masks() iterate through the entire acl in=
- reverse
-> + * order as an optimization.
-> + *
-> + * In the standard algorithm, aces are considered in forward order.=C2=
-=A0=C2=A0When a
-> + * process matches an ace, the permissions in the ace are either all=
-owed or
-> + * denied depending on the ace type.=C2=A0=C2=A0Once a permission ha=
-s been allowed or
-> + * denied, it is no longer considered in further aces.
-> + *
-> + * By iterating through the acl in reverse order, we can compute the=
- same
-> + * result without having to keep track of which permissions have bee=
-n allowed
-> + * and denied already.
-> + */
->=20
-
-Clever!
-
-
-> +
-> +/**
-> + * richacl_allowed_to_who=C2=A0=C2=A0-=C2=A0=C2=A0permissions allowe=
-d to a specific who value
-> + *
-> + * Compute the maximum mask values allowed to a specific who value, =
-taking
-> + * everyone@ aces into account.
-> + */
-> +static unsigned int richacl_allowed_to_who(struct richacl *acl,
-> +					=C2=A0=C2=A0=C2=A0struct richace *who)
-> +{
-> +	struct richace *ace;
-> +	unsigned int allowed =3D 0;
-> +
-> +	richacl_for_each_entry_reverse(ace, acl) {
-> +		if (richace_is_inherit_only(ace))
-> +			continue;
-> +		if (richace_is_same_identifier(ace, who) ||
-> +		=C2=A0=C2=A0=C2=A0=C2=A0richace_is_everyone(ace)) {
-> +			if (richace_is_allow(ace))
-> +				allowed |=3D ace->e_mask;
-> +			else if (richace_is_deny(ace))
-> +				allowed &=3D ~ace->e_mask;
-> +		}
-> +	}
-> +	return allowed;
-> +}
-> +
-> +/**
-> + * richacl_group_class_allowed=C2=A0=C2=A0-=C2=A0=C2=A0maximum permi=
-ssions of the group class
-> + *
-> + * Compute the maximum mask values allowed to a process in the group=
- class
-> + * (i.e., a process which is not the owner but is in the owning grou=
-p or
-> + * matches a user or group acl entry).=C2=A0=C2=A0This includes perm=
-issions granted or
-> + * denied by everyone@ aces.
-> + *
-> + * See richacl_compute_max_masks().
-> + */
-> +static unsigned int richacl_group_class_allowed(struct richacl *acl)
-> +{
-> +	struct richace *ace;
-> +	unsigned int everyone_allowed =3D 0, group_class_allowed =3D 0;
-> +	int had_group_ace =3D 0;
-> +
-> +	richacl_for_each_entry_reverse(ace, acl) {
-> +		if (richace_is_inherit_only(ace) ||
-> +		=C2=A0=C2=A0=C2=A0=C2=A0richace_is_owner(ace))
-> +			continue;
-> +
-> +		if (richace_is_everyone(ace)) {
-> +			if (richace_is_allow(ace))
-> +				everyone_allowed |=3D ace->e_mask;
-> +			else if (richace_is_deny(ace))
-> +				everyone_allowed &=3D ~ace->e_mask;
-> +		} else {
-> +			group_class_allowed |=3D
-> +				richacl_allowed_to_who(acl, ace);
-> +
-> +			if (richace_is_group(ace))
-> +				had_group_ace =3D 1;
-> +		}
-> +	}
-> +	/*
-> +	=C2=A0* If the acl doesn't contain any group@ aces, richacl_allowed=
-_to_who()
-> +	=C2=A0* wasn't called for the owning group.=C2=A0=C2=A0We could mak=
-e that call now, but
-> +	=C2=A0* we already know the result (everyone_allowed).
-> +	=C2=A0*/
-> +	if (!had_group_ace)
-> +		group_class_allowed |=3D everyone_allowed;
-> +	return group_class_allowed;
-> +}
-> +
-> +/**
-> + * richacl_compute_max_masks=C2=A0=C2=A0-=C2=A0=C2=A0compute upper b=
-ound masks
-> + *
-> + * Computes upper bound owner, group, and other masks so that none o=
-f the
-> + * permissions allowed by the acl are disabled.
-> + *
-> + * We don't make assumptions about who the owner is so that the owne=
-r can
-> + * change with no effect on the file masks or file mode permission b=
-its; this
-> + * means that we must assume that all entries can match the owner.
-> + */
-> +void richacl_compute_max_masks(struct richacl *acl)
-> +{
-> +	unsigned int gmask =3D ~0;
-> +	struct richace *ace;
-> +
-> +	/*
-> +	=C2=A0* @gmask contains all permissions which the group class is ev=
-er
-> +	=C2=A0* allowed.=C2=A0=C2=A0We use it to avoid adding permissions t=
-o the group mask
-> +	=C2=A0* from everyone@ allow aces which the group class is always d=
-enied
-> +	=C2=A0* through other aces.=C2=A0=C2=A0For example, the following a=
-cl would otherwise
-> +	=C2=A0* result in a group mask of rw:
-> +	=C2=A0*
-> +	=C2=A0*	group@:w::deny
-> +	=C2=A0*	everyone@:rw::allow
-> +	=C2=A0*
-> +	=C2=A0* Avoid computing @gmask for acls which do not include any gr=
-oup class
-> +	=C2=A0* deny aces: in such acls, the group class is never denied an=
-y
-> +	=C2=A0* permissions from everyone@ allow aces, and the group class =
-cannot
-> +	=C2=A0* have fewer permissions than the other class.
-> +	=C2=A0*/
-> +
-> +restart:
-> +	acl->a_owner_mask =3D 0;
-> +	acl->a_group_mask =3D 0;
-> +	acl->a_other_mask =3D 0;
-> +
-> +	richacl_for_each_entry_reverse(ace, acl) {
-> +		if (richace_is_inherit_only(ace))
-> +			continue;
-> +
-> +		if (richace_is_owner(ace)) {
-> +			if (richace_is_allow(ace))
-> +				acl->a_owner_mask |=3D ace->e_mask;
-> +			else if (richace_is_deny(ace))
-> +				acl->a_owner_mask &=3D ~ace->e_mask;
-> +		} else if (richace_is_everyone(ace)) {
-> +			if (richace_is_allow(ace)) {
-> +				acl->a_owner_mask |=3D ace->e_mask;
-> +				acl->a_group_mask |=3D ace->e_mask & gmask;
-> +				acl->a_other_mask |=3D ace->e_mask;
-> +			} else if (richace_is_deny(ace)) {
-> +				acl->a_owner_mask &=3D ~ace->e_mask;
-> +				acl->a_group_mask &=3D ~ace->e_mask;
-> +				acl->a_other_mask &=3D ~ace->e_mask;
-> +			}
-> +		} else {
-> +			if (richace_is_allow(ace)) {
-> +				acl->a_owner_mask |=3D ace->e_mask & gmask;
-> +				acl->a_group_mask |=3D ace->e_mask & gmask;
-> +			} else if (richace_is_deny(ace) && gmask =3D=3D ~0) {
-> +				gmask =3D richacl_group_class_allowed(acl);
-> +				if (likely(gmask !=3D ~0))
-> +					/* should always be true */
-> +					goto restart;
-> +			}
-> +		}
-> +	}
-> +
-> +	acl->a_flags &=3D ~(RICHACL_WRITE_THROUGH | RICHACL_MASKED);
-> +}
-> +EXPORT_SYMBOL_GPL(richacl_compute_max_masks);
-> diff --git a/include/linux/richacl.h b/include/linux/richacl.h
-> index 9102ef0..3559b2c 100644
-> --- a/include/linux/richacl.h
-> +++ b/include/linux/richacl.h
-> @@ -178,5 +178,6 @@ extern void richace_copy(struct richace *, const =
-struct richace *);
-> =C2=A0extern int richacl_masks_to_mode(const struct richacl *);
-> =C2=A0extern unsigned int richacl_mode_to_mask(umode_t);
-> =C2=A0extern unsigned int richacl_want_to_mask(unsigned int);
-> +extern void richacl_compute_max_masks(struct richacl *);
-> =C2=A0
-> =C2=A0#endif /* __RICHACL_H */
-
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+T24gVGh1LCAyMDE2LTA2LTMwIGF0IDE1OjQ3ICswMjAwLCBBbmRyZWFzIEdydWVuYmFjaGVyIHdy
+b3RlOgo+IEEgcmljaGFjbCByb3VnaGx5IGdyYW50cyBhIHJlcXVlc3RlZCBhY2Nlc3MgaWYgdGhl
+IE5GU3Y0IGFjbCBpbiB0aGUKPiByaWNoYWNsIGdyYW50cyB0aGUgcmVxdWVzdGVkIHBlcm1pc3Np
+b25zIGFjY29yZGluZyB0byB0aGUgTkZTdjQKPiBwZXJtaXNzaW9uIGNoZWNrIGFsZ29yaXRobSBh
+bmQgdGhlIGZpbGUgbWFzayB0aGF0IGFwcGxpZXMgdG8gdGhlIHByb2Nlc3MKPiBpbmNsdWRlcyB0
+aGUgcmVxdWVzdGVkIHBlcm1pc3Npb25zLgo+IAo+IFNpZ25lZC1vZmYtYnk6IEFuZHJlYXMgR3J1
+ZW5iYWNoZXIgPGFncnVlbmJhQHJlZGhhdC5jb20+Cj4gUmV2aWV3ZWQtYnk6IEouIEJydWNlIEZp
+ZWxkcyA8YmZpZWxkc0BmaWVsZHNlcy5vcmc+Cj4gLS0tCj4gwqBmcy9yaWNoYWNsLmPCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqB8IDEyOCArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysKPiDCoGluY2x1ZGUvbGludXgvcmljaGFjbC5oIHzCoMKgwqAxICsKPiDC
+oDIgZmlsZXMgY2hhbmdlZCwgMTI5IGluc2VydGlvbnMoKykKPiAKPiBkaWZmIC0tZ2l0IGEvZnMv
+cmljaGFjbC5jIGIvZnMvcmljaGFjbC5jCj4gaW5kZXggMDU2MjI4Zi4uY2IwZWYzZiAxMDA2NDQK
+PiAtLS0gYS9mcy9yaWNoYWNsLmMKPiArKysgYi9mcy9yaWNoYWNsLmMKPiBAQCAtMzM4LDMgKzMz
+OCwxMzEgQEAgcmVzdGFydDoKPiDCoAlhY2wtPmFfZmxhZ3MgJj0gfihSSUNIQUNMX1dSSVRFX1RI
+Uk9VR0ggfCBSSUNIQUNMX01BU0tFRCk7Cj4gwqB9Cj4gwqBFWFBPUlRfU1lNQk9MX0dQTChyaWNo
+YWNsX2NvbXB1dGVfbWF4X21hc2tzKTsKPiArCj4gKy8qKgo+ICsgKiByaWNoYWNsX3Blcm1pc3Np
+b27CoMKgLcKgwqByaWNoYWNsIHBlcm1pc3Npb24gY2hlY2sgYWxnb3JpdGhtCj4gKyAqIEBpbm9k
+ZToJaW5vZGUgdG8gY2hlY2sKPiArICogQGFjbDoJcmljaCBhY2wgb2YgdGhlIGlub2RlCj4gKyAq
+IEB3YW50OglyZXF1ZXN0ZWQgYWNjZXNzIChNQVlfKiBmbGFncykKPiArICoKPiArICogQ2hlY2tz
+IGlmIHRoZSBjdXJyZW50IHByb2Nlc3MgaXMgZ3JhbnRlZCBAbWFzayBmbGFncyBpbiBAYWNsLgo+
+ICsgKi8KCm5pdDogdGhlcmUgaXMgbm8gQG1hc2sgcGFybSBoZXJlLiBEbyB5b3UgbWVhbiBAd2Fu
+dCA/Cgo+ICtpbnQKPiArcmljaGFjbF9wZXJtaXNzaW9uKHN0cnVjdCBpbm9kZSAqaW5vZGUsIGNv
+bnN0IHN0cnVjdCByaWNoYWNsICphY2wsCj4gKwkJwqDCoMKgaW50IHdhbnQpCj4gK3sKPiArCWNv
+bnN0IHN0cnVjdCByaWNoYWNlICphY2U7Cj4gKwl1bnNpZ25lZCBpbnQgbWFzayA9IHJpY2hhY2xf
+d2FudF90b19tYXNrKHdhbnQpOwo+ICsJdW5zaWduZWQgaW50IHJlcXVlc3RlZCA9IG1hc2ssIGRl
+bmllZCA9IDA7Cj4gKwlpbnQgaW5fb3duaW5nX2dyb3VwID0gaW5fZ3JvdXBfcChpbm9kZS0+aV9n
+aWQpOwo+ICsJaW50IGluX293bmVyX29yX2dyb3VwX2NsYXNzID0gaW5fb3duaW5nX2dyb3VwOwo+
+ICsKPiArCS8qCj4gKwnCoCogQSBwcm9jZXNzIGlzCj4gKwnCoCrCoMKgwqAtIGluIHRoZSBvd25l
+ciBmaWxlIGNsYXNzIGlmIGl0IG93bnMgdGhlIGZpbGUsCj4gKwnCoCrCoMKgwqAtIGluIHRoZSBn
+cm91cCBmaWxlIGNsYXNzIGlmIGl0IGlzIGluIHRoZSBmaWxlJ3Mgb3duaW5nIGdyb3VwIG9yCj4g
+KwnCoCrCoMKgwqDCoMKgaXQgbWF0Y2hlcyBhbnkgb2YgdGhlIHVzZXIgb3IgZ3JvdXAgZW50cmll
+cywgYW5kCj4gKwnCoCrCoMKgwqAtIGluIHRoZSBvdGhlciBmaWxlIGNsYXNzIG90aGVyd2lzZS4K
+PiArCcKgKiBUaGUgZmlsZSBjbGFzcyBpcyBvbmx5IHJlbGV2YW50IGZvciBkZXRlcm1pbmluZyB3
+aGljaCBmaWxlIG1hc2sgdG8KPiArCcKgKiBhcHBseSwgd2hpY2ggb25seSBoYXBwZW5zIGZvciBt
+YXNrZWQgYWNscy4KPiArCcKgKi8KPiArCWlmIChhY2wtPmFfZmxhZ3MgJiBSSUNIQUNMX01BU0tF
+RCkgewo+ICsJCWlmICgoYWNsLT5hX2ZsYWdzICYgUklDSEFDTF9XUklURV9USFJPVUdIKSAmJgo+
+ICsJCcKgwqDCoMKgdWlkX2VxKGN1cnJlbnRfZnN1aWQoKSwgaW5vZGUtPmlfdWlkKSkgewo+ICsJ
+CQlkZW5pZWQgPSByZXF1ZXN0ZWQgJiB+YWNsLT5hX293bmVyX21hc2s7Cj4gKwkJCWdvdG8gb3V0
+Owo+ICsJCX0KPiArCX0gZWxzZSB7Cj4gKwkJLyoKPiArCQnCoCogV2hlbiB0aGUgYWNsIGlzIG5v
+dCBtYXNrZWQsIHRoZXJlIGlzIG5vIG5lZWQgdG8gZGV0ZXJtaW5lIGlmCj4gKwkJwqAqIHRoZSBw
+cm9jZXNzIGlzIGluIHRoZSBncm91cCBjbGFzcyBhbmQgd2UgY2FuIGJyZWFrIG91dAo+ICsJCcKg
+KiBlYXJsaWVyIG9mIHRoZSBsb29wIGJlbG93Lgo+ICsJCcKgKi8KPiArCQlpbl9vd25lcl9vcl9n
+cm91cF9jbGFzcyA9IDE7Cj4gKwl9Cj4gKwo+ICsJLyoKPiArCcKgKiBDaGVjayBpZiB0aGUgYWNs
+IGdyYW50cyB0aGUgcmVxdWVzdGVkIGFjY2VzcyBhbmQgZGV0ZXJtaW5lIHdoaWNoCj4gKwnCoCog
+ZmlsZSBjbGFzcyB0aGUgcHJvY2VzcyBpcyBpbi4KPiArCcKgKi8KPiArCXJpY2hhY2xfZm9yX2Vh
+Y2hfZW50cnkoYWNlLCBhY2wpIHsKPiArCQl1bnNpZ25lZCBpbnQgYWNlX21hc2sgPSBhY2UtPmVf
+bWFzazsKPiArCj4gKwkJaWYgKHJpY2hhY2VfaXNfaW5oZXJpdF9vbmx5KGFjZSkpCj4gKwkJCWNv
+bnRpbnVlOwo+ICsJCWlmIChyaWNoYWNlX2lzX293bmVyKGFjZSkpIHsKPiArCQkJaWYgKCF1aWRf
+ZXEoY3VycmVudF9mc3VpZCgpLCBpbm9kZS0+aV91aWQpKQo+ICsJCQkJY29udGludWU7Cj4gKwkJ
+CWdvdG8gZW50cnlfbWF0Y2hlc19vd25lcjsKPiArCQl9IGVsc2UgaWYgKHJpY2hhY2VfaXNfZ3Jv
+dXAoYWNlKSkgewo+ICsJCQlpZiAoIWluX293bmluZ19ncm91cCkKPiArCQkJCWNvbnRpbnVlOwo+
+ICsJCX0gZWxzZSBpZiAocmljaGFjZV9pc191bml4X3VzZXIoYWNlKSkgewo+ICsJCQlpZiAoIXVp
+ZF9lcShjdXJyZW50X2ZzdWlkKCksIGFjZS0+ZV9pZC51aWQpKQo+ICsJCQkJY29udGludWU7Cj4g
+KwkJCWlmICh1aWRfZXEoY3VycmVudF9mc3VpZCgpLCBpbm9kZS0+aV91aWQpKQo+ICsJCQkJZ290
+byBlbnRyeV9tYXRjaGVzX293bmVyOwo+ICsJCX0gZWxzZSBpZiAocmljaGFjZV9pc191bml4X2dy
+b3VwKGFjZSkpIHsKPiArCQkJaWYgKCFpbl9ncm91cF9wKGFjZS0+ZV9pZC5naWQpKQo+ICsJCQkJ
+Y29udGludWU7Cj4gKwkJfSBlbHNlCj4gKwkJCWdvdG8gZW50cnlfbWF0Y2hlc19ldmVyeW9uZTsK
+PiArCj4gKwkJLyoKPiArCQnCoCogQXBwbHkgdGhlIGdyb3VwIGZpbGUgbWFzayB0byBlbnRyaWVz
+IG90aGVyIHRoYW4gb3duZXJAIGFuZAo+ICsJCcKgKiBldmVyeW9uZUAgb3IgdXNlciBlbnRyaWVz
+IG1hdGNoaW5nIHRoZSBvd25lci7CoMKgVGhpcyBlbnN1cmVzCj4gKwkJwqAqIHRoYXQgd2UgZ3Jh
+bnQgdGhlIHNhbWUgcGVybWlzc2lvbnMgYXMgdGhlIGFjbCBjb21wdXRlZCBieQo+ICsJCcKgKiBy
+aWNoYWNsX2FwcGx5X21hc2tzKCkuCj4gKwkJwqAqCj4gKwkJwqAqIFdpdGhvdXQgdGhpcyByZXN0
+cmljdGlvbiwgdGhlIGZvbGxvd2luZyByaWNoYWNsIHdvdWxkIGdyYW50Cj4gKwkJwqAqIHJ3IGFj
+Y2VzcyB0byBwcm9jZXNzZXMgd2hpY2ggYXJlIGJvdGggdGhlIG93bmVyIGFuZCBpbiB0aGUKPiAr
+CQnCoCogb3duaW5nIGdyb3VwLCBidXQgbm90IHRvIG90aGVyIHVzZXJzIGluIHRoZSBvd25pbmcg
+Z3JvdXAsCj4gKwkJwqAqIHdoaWNoIGNvdWxkIG5vdCBiZSByZXByZXNlbnRlZCB3aXRob3V0IG1h
+c2tzOgo+ICsJCcKgKgo+ICsJCcKgKsKgwqBvd25lcjpydzo6bWFzawo+ICsJCcKgKsKgwqBncm91
+cEA6cnc6OmFsbG93Cj4gKwkJwqAqLwo+ICsJCWlmICgoYWNsLT5hX2ZsYWdzICYgUklDSEFDTF9N
+QVNLRUQpICYmIHJpY2hhY2VfaXNfYWxsb3coYWNlKSkKPiArCQkJYWNlX21hc2sgJj0gYWNsLT5h
+X2dyb3VwX21hc2s7Cj4gKwo+ICtlbnRyeV9tYXRjaGVzX293bmVyOgo+ICsJCS8qIFRoZSBwcm9j
+ZXNzIGlzIGluIHRoZSBvd25lciBvciBncm91cCBmaWxlIGNsYXNzLiAqLwo+ICsJCWluX293bmVy
+X29yX2dyb3VwX2NsYXNzID0gMTsKPiArCj4gK2VudHJ5X21hdGNoZXNfZXZlcnlvbmU6Cj4gKwkJ
+LyogQ2hlY2sgd2hpY2ggbWFzayBmbGFncyB0aGUgQUNFIGFsbG93cyBvciBkZW5pZXMuICovCj4g
+KwkJaWYgKHJpY2hhY2VfaXNfZGVueShhY2UpKQo+ICsJCQlkZW5pZWQgfD0gYWNlX21hc2sgJiBt
+YXNrOwo+ICsJCW1hc2sgJj0gfmFjZV9tYXNrOwo+ICsKPiArCQkvKgo+ICsJCcKgKiBLZWVwIGdv
+aW5nIHVudGlsIHdlIGtub3cgd2hpY2ggZmlsZSBjbGFzcwo+ICsJCcKgKiB0aGUgcHJvY2VzcyBp
+cyBpbi4KPiArCQnCoCovCj4gKwkJaWYgKCFtYXNrICYmIGluX293bmVyX29yX2dyb3VwX2NsYXNz
+KQo+ICsJCQlicmVhazsKPiArCX0KPiArCWRlbmllZCB8PSBtYXNrOwo+ICsKPiArCWlmIChhY2wt
+PmFfZmxhZ3MgJiBSSUNIQUNMX01BU0tFRCkgewo+ICsJCS8qCj4gKwkJwqAqIFRoZSBmaWxlIGNs
+YXNzIGEgcHJvY2VzcyBpcyBpbiBkZXRlcm1pbmVzIHdoaWNoIGZpbGUgbWFzawo+ICsJCcKgKiBh
+cHBsaWVzLsKgwqBDaGVjayBpZiB0aGF0IGZpbGUgbWFzayBhbHNvIGdyYW50cyB0aGUgcmVxdWVz
+dGVkCj4gKwkJwqAqIGFjY2Vzcy4KPiArCQnCoCovCj4gKwkJaWYgKHVpZF9lcShjdXJyZW50X2Zz
+dWlkKCksIGlub2RlLT5pX3VpZCkpCj4gKwkJCWRlbmllZCB8PSByZXF1ZXN0ZWQgJiB+YWNsLT5h
+X293bmVyX21hc2s7Cj4gKwkJZWxzZSBpZiAoaW5fb3duZXJfb3JfZ3JvdXBfY2xhc3MpCj4gKwkJ
+CWRlbmllZCB8PSByZXF1ZXN0ZWQgJiB+YWNsLT5hX2dyb3VwX21hc2s7Cj4gKwkJZWxzZSB7Cj4g
+KwkJCWlmIChhY2wtPmFfZmxhZ3MgJiBSSUNIQUNMX1dSSVRFX1RIUk9VR0gpCj4gKwkJCQlkZW5p
+ZWQgPSByZXF1ZXN0ZWQgJiB+YWNsLT5hX290aGVyX21hc2s7Cj4gKwkJCWVsc2UKPiArCQkJCWRl
+bmllZCB8PSByZXF1ZXN0ZWQgJiB+YWNsLT5hX290aGVyX21hc2s7Cj4gKwkJfQo+ICsJfQo+ICsK
+PiArb3V0Ogo+ICsJcmV0dXJuIGRlbmllZCA/IC1FQUNDRVMgOiAwOwo+ICt9Cj4gK0VYUE9SVF9T
+WU1CT0xfR1BMKHJpY2hhY2xfcGVybWlzc2lvbik7Cj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvbGlu
+dXgvcmljaGFjbC5oIGIvaW5jbHVkZS9saW51eC9yaWNoYWNsLmgKPiBpbmRleCAzNTU5YjJjLi5i
+ZTlmYjY1IDEwMDY0NAo+IC0tLSBhL2luY2x1ZGUvbGludXgvcmljaGFjbC5oCj4gKysrIGIvaW5j
+bHVkZS9saW51eC9yaWNoYWNsLmgKPiBAQCAtMTc5LDUgKzE3OSw2IEBAIGV4dGVybiBpbnQgcmlj
+aGFjbF9tYXNrc190b19tb2RlKGNvbnN0IHN0cnVjdCByaWNoYWNsICopOwo+IMKgZXh0ZXJuIHVu
+c2lnbmVkIGludCByaWNoYWNsX21vZGVfdG9fbWFzayh1bW9kZV90KTsKPiDCoGV4dGVybiB1bnNp
+Z25lZCBpbnQgcmljaGFjbF93YW50X3RvX21hc2sodW5zaWduZWQgaW50KTsKPiDCoGV4dGVybiB2
+b2lkIHJpY2hhY2xfY29tcHV0ZV9tYXhfbWFza3Moc3RydWN0IHJpY2hhY2wgKik7Cj4gK2V4dGVy
+biBpbnQgcmljaGFjbF9wZXJtaXNzaW9uKHN0cnVjdCBpbm9kZSAqLCBjb25zdCBzdHJ1Y3Qgcmlj
+aGFjbCAqLCBpbnQpOwo+IMKgCj4gwqAjZW5kaWYgLyogX19SSUNIQUNMX0ggKi8KClJldmlld2Vk
+LWJ5OiBKZWZmIExheXRvbiA8amxheXRvbkByZWRoYXQuY29tPgoKX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX18KeGZzIG1haWxpbmcgbGlzdAp4ZnNAb3NzLnNn
+aS5jb20KaHR0cDovL29zcy5zZ2kuY29tL21haWxtYW4vbGlzdGluZm8veGZzCg==
