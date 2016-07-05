@@ -1,135 +1,114 @@
-From: Jeff Layton <jlayton@redhat.com>
-Subject: Re: [PATCH v23 09/22] richacl: Permission check algorithm
-Date: Tue, 05 Jul 2016 10:59:07 -0400
-Message-ID: <1467730747.3800.34.camel@redhat.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH v23 10/22] posix_acl: Improve xattr fixup code
+Date: Tue, 05 Jul 2016 11:38:50 -0400
+Message-ID: <1467733130.3800.36.camel@redhat.com>
 References: <1467294433-3222-1-git-send-email-agruenba@redhat.com>
-	<1467294433-3222-10-git-send-email-agruenba@redhat.com>
+	 <1467294433-3222-11-git-send-email-agruenba@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "J. Bruce Fields" <bfields@fieldses.org>, linux-nfs@vger.kernel.org,
-	Theodore Ts'o <tytso@mit.edu>, linux-cifs@vger.kernel.org,
-	linux-api@vger.kernel.org,
-	Trond Myklebust <trond.myklebust@primarydata.com>,
-	linux-kernel@vger.kernel.org, xfs@oss.sgi.com,
-	Christoph Hellwig <hch@infradead.org>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-	Anna Schumaker <anna.schumaker@netapp.com>
-To: Andreas Gruenbacher <agruenba@redhat.com>, Alexander Viro
-	<viro@zeniv.linux.org.uk>
-Return-path: <xfs-bounces@oss.sgi.com>
-In-Reply-To: <1467294433-3222-10-git-send-email-agruenba@redhat.com>
-List-Unsubscribe: <http://oss.sgi.com/mailman/options/xfs>,
-	<mailto:xfs-request@oss.sgi.com?subject=unsubscribe>
-List-Archive: <http://oss.sgi.com/pipermail/xfs>
-List-Post: <mailto:xfs@oss.sgi.com>
-List-Help: <mailto:xfs-request@oss.sgi.com?subject=help>
-List-Subscribe: <http://oss.sgi.com/mailman/listinfo/xfs>,
-	<mailto:xfs-request@oss.sgi.com?subject=subscribe>
-Errors-To: xfs-bounces@oss.sgi.com
-Sender: xfs-bounces@oss.sgi.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+	Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>,
+	Andreas Dilger <adilger.kernel-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>,
+	"J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
+	Trond Myklebust <trond.myklebust-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
+	Anna Schumaker <anna.schumaker-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
+	Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>, linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1467294433-3222-11-git-send-email-agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
-T24gVGh1LCAyMDE2LTA2LTMwIGF0IDE1OjQ3ICswMjAwLCBBbmRyZWFzIEdydWVuYmFjaGVyIHdy
-b3RlOgo+IEEgcmljaGFjbCByb3VnaGx5IGdyYW50cyBhIHJlcXVlc3RlZCBhY2Nlc3MgaWYgdGhl
-IE5GU3Y0IGFjbCBpbiB0aGUKPiByaWNoYWNsIGdyYW50cyB0aGUgcmVxdWVzdGVkIHBlcm1pc3Np
-b25zIGFjY29yZGluZyB0byB0aGUgTkZTdjQKPiBwZXJtaXNzaW9uIGNoZWNrIGFsZ29yaXRobSBh
-bmQgdGhlIGZpbGUgbWFzayB0aGF0IGFwcGxpZXMgdG8gdGhlIHByb2Nlc3MKPiBpbmNsdWRlcyB0
-aGUgcmVxdWVzdGVkIHBlcm1pc3Npb25zLgo+IAo+IFNpZ25lZC1vZmYtYnk6IEFuZHJlYXMgR3J1
-ZW5iYWNoZXIgPGFncnVlbmJhQHJlZGhhdC5jb20+Cj4gUmV2aWV3ZWQtYnk6IEouIEJydWNlIEZp
-ZWxkcyA8YmZpZWxkc0BmaWVsZHNlcy5vcmc+Cj4gLS0tCj4gwqBmcy9yaWNoYWNsLmPCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqB8IDEyOCArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysKPiDCoGluY2x1ZGUvbGludXgvcmljaGFjbC5oIHzCoMKgwqAxICsKPiDC
-oDIgZmlsZXMgY2hhbmdlZCwgMTI5IGluc2VydGlvbnMoKykKPiAKPiBkaWZmIC0tZ2l0IGEvZnMv
-cmljaGFjbC5jIGIvZnMvcmljaGFjbC5jCj4gaW5kZXggMDU2MjI4Zi4uY2IwZWYzZiAxMDA2NDQK
-PiAtLS0gYS9mcy9yaWNoYWNsLmMKPiArKysgYi9mcy9yaWNoYWNsLmMKPiBAQCAtMzM4LDMgKzMz
-OCwxMzEgQEAgcmVzdGFydDoKPiDCoAlhY2wtPmFfZmxhZ3MgJj0gfihSSUNIQUNMX1dSSVRFX1RI
-Uk9VR0ggfCBSSUNIQUNMX01BU0tFRCk7Cj4gwqB9Cj4gwqBFWFBPUlRfU1lNQk9MX0dQTChyaWNo
-YWNsX2NvbXB1dGVfbWF4X21hc2tzKTsKPiArCj4gKy8qKgo+ICsgKiByaWNoYWNsX3Blcm1pc3Np
-b27CoMKgLcKgwqByaWNoYWNsIHBlcm1pc3Npb24gY2hlY2sgYWxnb3JpdGhtCj4gKyAqIEBpbm9k
-ZToJaW5vZGUgdG8gY2hlY2sKPiArICogQGFjbDoJcmljaCBhY2wgb2YgdGhlIGlub2RlCj4gKyAq
-IEB3YW50OglyZXF1ZXN0ZWQgYWNjZXNzIChNQVlfKiBmbGFncykKPiArICoKPiArICogQ2hlY2tz
-IGlmIHRoZSBjdXJyZW50IHByb2Nlc3MgaXMgZ3JhbnRlZCBAbWFzayBmbGFncyBpbiBAYWNsLgo+
-ICsgKi8KCm5pdDogdGhlcmUgaXMgbm8gQG1hc2sgcGFybSBoZXJlLiBEbyB5b3UgbWVhbiBAd2Fu
-dCA/Cgo+ICtpbnQKPiArcmljaGFjbF9wZXJtaXNzaW9uKHN0cnVjdCBpbm9kZSAqaW5vZGUsIGNv
-bnN0IHN0cnVjdCByaWNoYWNsICphY2wsCj4gKwkJwqDCoMKgaW50IHdhbnQpCj4gK3sKPiArCWNv
-bnN0IHN0cnVjdCByaWNoYWNlICphY2U7Cj4gKwl1bnNpZ25lZCBpbnQgbWFzayA9IHJpY2hhY2xf
-d2FudF90b19tYXNrKHdhbnQpOwo+ICsJdW5zaWduZWQgaW50IHJlcXVlc3RlZCA9IG1hc2ssIGRl
-bmllZCA9IDA7Cj4gKwlpbnQgaW5fb3duaW5nX2dyb3VwID0gaW5fZ3JvdXBfcChpbm9kZS0+aV9n
-aWQpOwo+ICsJaW50IGluX293bmVyX29yX2dyb3VwX2NsYXNzID0gaW5fb3duaW5nX2dyb3VwOwo+
-ICsKPiArCS8qCj4gKwnCoCogQSBwcm9jZXNzIGlzCj4gKwnCoCrCoMKgwqAtIGluIHRoZSBvd25l
-ciBmaWxlIGNsYXNzIGlmIGl0IG93bnMgdGhlIGZpbGUsCj4gKwnCoCrCoMKgwqAtIGluIHRoZSBn
-cm91cCBmaWxlIGNsYXNzIGlmIGl0IGlzIGluIHRoZSBmaWxlJ3Mgb3duaW5nIGdyb3VwIG9yCj4g
-KwnCoCrCoMKgwqDCoMKgaXQgbWF0Y2hlcyBhbnkgb2YgdGhlIHVzZXIgb3IgZ3JvdXAgZW50cmll
-cywgYW5kCj4gKwnCoCrCoMKgwqAtIGluIHRoZSBvdGhlciBmaWxlIGNsYXNzIG90aGVyd2lzZS4K
-PiArCcKgKiBUaGUgZmlsZSBjbGFzcyBpcyBvbmx5IHJlbGV2YW50IGZvciBkZXRlcm1pbmluZyB3
-aGljaCBmaWxlIG1hc2sgdG8KPiArCcKgKiBhcHBseSwgd2hpY2ggb25seSBoYXBwZW5zIGZvciBt
-YXNrZWQgYWNscy4KPiArCcKgKi8KPiArCWlmIChhY2wtPmFfZmxhZ3MgJiBSSUNIQUNMX01BU0tF
-RCkgewo+ICsJCWlmICgoYWNsLT5hX2ZsYWdzICYgUklDSEFDTF9XUklURV9USFJPVUdIKSAmJgo+
-ICsJCcKgwqDCoMKgdWlkX2VxKGN1cnJlbnRfZnN1aWQoKSwgaW5vZGUtPmlfdWlkKSkgewo+ICsJ
-CQlkZW5pZWQgPSByZXF1ZXN0ZWQgJiB+YWNsLT5hX293bmVyX21hc2s7Cj4gKwkJCWdvdG8gb3V0
-Owo+ICsJCX0KPiArCX0gZWxzZSB7Cj4gKwkJLyoKPiArCQnCoCogV2hlbiB0aGUgYWNsIGlzIG5v
-dCBtYXNrZWQsIHRoZXJlIGlzIG5vIG5lZWQgdG8gZGV0ZXJtaW5lIGlmCj4gKwkJwqAqIHRoZSBw
-cm9jZXNzIGlzIGluIHRoZSBncm91cCBjbGFzcyBhbmQgd2UgY2FuIGJyZWFrIG91dAo+ICsJCcKg
-KiBlYXJsaWVyIG9mIHRoZSBsb29wIGJlbG93Lgo+ICsJCcKgKi8KPiArCQlpbl9vd25lcl9vcl9n
-cm91cF9jbGFzcyA9IDE7Cj4gKwl9Cj4gKwo+ICsJLyoKPiArCcKgKiBDaGVjayBpZiB0aGUgYWNs
-IGdyYW50cyB0aGUgcmVxdWVzdGVkIGFjY2VzcyBhbmQgZGV0ZXJtaW5lIHdoaWNoCj4gKwnCoCog
-ZmlsZSBjbGFzcyB0aGUgcHJvY2VzcyBpcyBpbi4KPiArCcKgKi8KPiArCXJpY2hhY2xfZm9yX2Vh
-Y2hfZW50cnkoYWNlLCBhY2wpIHsKPiArCQl1bnNpZ25lZCBpbnQgYWNlX21hc2sgPSBhY2UtPmVf
-bWFzazsKPiArCj4gKwkJaWYgKHJpY2hhY2VfaXNfaW5oZXJpdF9vbmx5KGFjZSkpCj4gKwkJCWNv
-bnRpbnVlOwo+ICsJCWlmIChyaWNoYWNlX2lzX293bmVyKGFjZSkpIHsKPiArCQkJaWYgKCF1aWRf
-ZXEoY3VycmVudF9mc3VpZCgpLCBpbm9kZS0+aV91aWQpKQo+ICsJCQkJY29udGludWU7Cj4gKwkJ
-CWdvdG8gZW50cnlfbWF0Y2hlc19vd25lcjsKPiArCQl9IGVsc2UgaWYgKHJpY2hhY2VfaXNfZ3Jv
-dXAoYWNlKSkgewo+ICsJCQlpZiAoIWluX293bmluZ19ncm91cCkKPiArCQkJCWNvbnRpbnVlOwo+
-ICsJCX0gZWxzZSBpZiAocmljaGFjZV9pc191bml4X3VzZXIoYWNlKSkgewo+ICsJCQlpZiAoIXVp
-ZF9lcShjdXJyZW50X2ZzdWlkKCksIGFjZS0+ZV9pZC51aWQpKQo+ICsJCQkJY29udGludWU7Cj4g
-KwkJCWlmICh1aWRfZXEoY3VycmVudF9mc3VpZCgpLCBpbm9kZS0+aV91aWQpKQo+ICsJCQkJZ290
-byBlbnRyeV9tYXRjaGVzX293bmVyOwo+ICsJCX0gZWxzZSBpZiAocmljaGFjZV9pc191bml4X2dy
-b3VwKGFjZSkpIHsKPiArCQkJaWYgKCFpbl9ncm91cF9wKGFjZS0+ZV9pZC5naWQpKQo+ICsJCQkJ
-Y29udGludWU7Cj4gKwkJfSBlbHNlCj4gKwkJCWdvdG8gZW50cnlfbWF0Y2hlc19ldmVyeW9uZTsK
-PiArCj4gKwkJLyoKPiArCQnCoCogQXBwbHkgdGhlIGdyb3VwIGZpbGUgbWFzayB0byBlbnRyaWVz
-IG90aGVyIHRoYW4gb3duZXJAIGFuZAo+ICsJCcKgKiBldmVyeW9uZUAgb3IgdXNlciBlbnRyaWVz
-IG1hdGNoaW5nIHRoZSBvd25lci7CoMKgVGhpcyBlbnN1cmVzCj4gKwkJwqAqIHRoYXQgd2UgZ3Jh
-bnQgdGhlIHNhbWUgcGVybWlzc2lvbnMgYXMgdGhlIGFjbCBjb21wdXRlZCBieQo+ICsJCcKgKiBy
-aWNoYWNsX2FwcGx5X21hc2tzKCkuCj4gKwkJwqAqCj4gKwkJwqAqIFdpdGhvdXQgdGhpcyByZXN0
-cmljdGlvbiwgdGhlIGZvbGxvd2luZyByaWNoYWNsIHdvdWxkIGdyYW50Cj4gKwkJwqAqIHJ3IGFj
-Y2VzcyB0byBwcm9jZXNzZXMgd2hpY2ggYXJlIGJvdGggdGhlIG93bmVyIGFuZCBpbiB0aGUKPiAr
-CQnCoCogb3duaW5nIGdyb3VwLCBidXQgbm90IHRvIG90aGVyIHVzZXJzIGluIHRoZSBvd25pbmcg
-Z3JvdXAsCj4gKwkJwqAqIHdoaWNoIGNvdWxkIG5vdCBiZSByZXByZXNlbnRlZCB3aXRob3V0IG1h
-c2tzOgo+ICsJCcKgKgo+ICsJCcKgKsKgwqBvd25lcjpydzo6bWFzawo+ICsJCcKgKsKgwqBncm91
-cEA6cnc6OmFsbG93Cj4gKwkJwqAqLwo+ICsJCWlmICgoYWNsLT5hX2ZsYWdzICYgUklDSEFDTF9N
-QVNLRUQpICYmIHJpY2hhY2VfaXNfYWxsb3coYWNlKSkKPiArCQkJYWNlX21hc2sgJj0gYWNsLT5h
-X2dyb3VwX21hc2s7Cj4gKwo+ICtlbnRyeV9tYXRjaGVzX293bmVyOgo+ICsJCS8qIFRoZSBwcm9j
-ZXNzIGlzIGluIHRoZSBvd25lciBvciBncm91cCBmaWxlIGNsYXNzLiAqLwo+ICsJCWluX293bmVy
-X29yX2dyb3VwX2NsYXNzID0gMTsKPiArCj4gK2VudHJ5X21hdGNoZXNfZXZlcnlvbmU6Cj4gKwkJ
-LyogQ2hlY2sgd2hpY2ggbWFzayBmbGFncyB0aGUgQUNFIGFsbG93cyBvciBkZW5pZXMuICovCj4g
-KwkJaWYgKHJpY2hhY2VfaXNfZGVueShhY2UpKQo+ICsJCQlkZW5pZWQgfD0gYWNlX21hc2sgJiBt
-YXNrOwo+ICsJCW1hc2sgJj0gfmFjZV9tYXNrOwo+ICsKPiArCQkvKgo+ICsJCcKgKiBLZWVwIGdv
-aW5nIHVudGlsIHdlIGtub3cgd2hpY2ggZmlsZSBjbGFzcwo+ICsJCcKgKiB0aGUgcHJvY2VzcyBp
-cyBpbi4KPiArCQnCoCovCj4gKwkJaWYgKCFtYXNrICYmIGluX293bmVyX29yX2dyb3VwX2NsYXNz
-KQo+ICsJCQlicmVhazsKPiArCX0KPiArCWRlbmllZCB8PSBtYXNrOwo+ICsKPiArCWlmIChhY2wt
-PmFfZmxhZ3MgJiBSSUNIQUNMX01BU0tFRCkgewo+ICsJCS8qCj4gKwkJwqAqIFRoZSBmaWxlIGNs
-YXNzIGEgcHJvY2VzcyBpcyBpbiBkZXRlcm1pbmVzIHdoaWNoIGZpbGUgbWFzawo+ICsJCcKgKiBh
-cHBsaWVzLsKgwqBDaGVjayBpZiB0aGF0IGZpbGUgbWFzayBhbHNvIGdyYW50cyB0aGUgcmVxdWVz
-dGVkCj4gKwkJwqAqIGFjY2Vzcy4KPiArCQnCoCovCj4gKwkJaWYgKHVpZF9lcShjdXJyZW50X2Zz
-dWlkKCksIGlub2RlLT5pX3VpZCkpCj4gKwkJCWRlbmllZCB8PSByZXF1ZXN0ZWQgJiB+YWNsLT5h
-X293bmVyX21hc2s7Cj4gKwkJZWxzZSBpZiAoaW5fb3duZXJfb3JfZ3JvdXBfY2xhc3MpCj4gKwkJ
-CWRlbmllZCB8PSByZXF1ZXN0ZWQgJiB+YWNsLT5hX2dyb3VwX21hc2s7Cj4gKwkJZWxzZSB7Cj4g
-KwkJCWlmIChhY2wtPmFfZmxhZ3MgJiBSSUNIQUNMX1dSSVRFX1RIUk9VR0gpCj4gKwkJCQlkZW5p
-ZWQgPSByZXF1ZXN0ZWQgJiB+YWNsLT5hX290aGVyX21hc2s7Cj4gKwkJCWVsc2UKPiArCQkJCWRl
-bmllZCB8PSByZXF1ZXN0ZWQgJiB+YWNsLT5hX290aGVyX21hc2s7Cj4gKwkJfQo+ICsJfQo+ICsK
-PiArb3V0Ogo+ICsJcmV0dXJuIGRlbmllZCA/IC1FQUNDRVMgOiAwOwo+ICt9Cj4gK0VYUE9SVF9T
-WU1CT0xfR1BMKHJpY2hhY2xfcGVybWlzc2lvbik7Cj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvbGlu
-dXgvcmljaGFjbC5oIGIvaW5jbHVkZS9saW51eC9yaWNoYWNsLmgKPiBpbmRleCAzNTU5YjJjLi5i
-ZTlmYjY1IDEwMDY0NAo+IC0tLSBhL2luY2x1ZGUvbGludXgvcmljaGFjbC5oCj4gKysrIGIvaW5j
-bHVkZS9saW51eC9yaWNoYWNsLmgKPiBAQCAtMTc5LDUgKzE3OSw2IEBAIGV4dGVybiBpbnQgcmlj
-aGFjbF9tYXNrc190b19tb2RlKGNvbnN0IHN0cnVjdCByaWNoYWNsICopOwo+IMKgZXh0ZXJuIHVu
-c2lnbmVkIGludCByaWNoYWNsX21vZGVfdG9fbWFzayh1bW9kZV90KTsKPiDCoGV4dGVybiB1bnNp
-Z25lZCBpbnQgcmljaGFjbF93YW50X3RvX21hc2sodW5zaWduZWQgaW50KTsKPiDCoGV4dGVybiB2
-b2lkIHJpY2hhY2xfY29tcHV0ZV9tYXhfbWFza3Moc3RydWN0IHJpY2hhY2wgKik7Cj4gK2V4dGVy
-biBpbnQgcmljaGFjbF9wZXJtaXNzaW9uKHN0cnVjdCBpbm9kZSAqLCBjb25zdCBzdHJ1Y3Qgcmlj
-aGFjbCAqLCBpbnQpOwo+IMKgCj4gwqAjZW5kaWYgLyogX19SSUNIQUNMX0ggKi8KClJldmlld2Vk
-LWJ5OiBKZWZmIExheXRvbiA8amxheXRvbkByZWRoYXQuY29tPgoKX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX18KeGZzIG1haWxpbmcgbGlzdAp4ZnNAb3NzLnNn
-aS5jb20KaHR0cDovL29zcy5zZ2kuY29tL21haWxtYW4vbGlzdGluZm8veGZzCg==
+On Thu, 2016-06-30 at 15:47 +0200, Andreas Gruenbacher wrote:
+> Both XATTR_NAME_POSIX_ACL_ACCESS and XATTR_NAME_POSIX_ACL_DEFAULT hav=
+e
+> the same XATTR_SYSTEM_PREFIX prefix; don't check for the same prefix
+> repeatedly.
+>=20
+> Signed-off-by: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> Reviewed-by: Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+> ---
+> =C2=A0fs/xattr.c | 29 +++++++++++++++++++++++------
+> =C2=A01 file changed, 23 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/fs/xattr.c b/fs/xattr.c
+> index 4beafc4..61ac218 100644
+> --- a/fs/xattr.c
+> +++ b/fs/xattr.c
+> @@ -295,6 +295,16 @@ out:
+> =C2=A0}
+> =C2=A0EXPORT_SYMBOL_GPL(vfs_removexattr);
+> =C2=A0
+> +static void
+> +fix_xattr_from_user(const char *kname, void *kvalue, size_t size)
+> +{
+> +	if (strncmp(kname, XATTR_SYSTEM_PREFIX, XATTR_SYSTEM_PREFIX_LEN))
+> +		return;
+> +	kname +=3D XATTR_SYSTEM_PREFIX_LEN;
+> +	if (!strcmp(kname, XATTR_POSIX_ACL_ACCESS) ||
+> +	=C2=A0=C2=A0=C2=A0=C2=A0!strcmp(kname, XATTR_POSIX_ACL_DEFAULT))
+> +		posix_acl_fix_xattr_from_user(kvalue, size);
+> +}
+> =C2=A0
+> =C2=A0/*
+> =C2=A0 * Extended attribute SET operations
+> @@ -329,9 +339,7 @@ setxattr(struct dentry *d, const char __user *nam=
+e, const void __user *value,
+> =C2=A0			error =3D -EFAULT;
+> =C2=A0			goto out;
+> =C2=A0		}
+> -		if ((strcmp(kname, XATTR_NAME_POSIX_ACL_ACCESS) =3D=3D 0) ||
+> -		=C2=A0=C2=A0=C2=A0=C2=A0(strcmp(kname, XATTR_NAME_POSIX_ACL_DEFAUL=
+T) =3D=3D 0))
+> -			posix_acl_fix_xattr_from_user(kvalue, size);
+> +		fix_xattr_from_user(kname, kvalue, size);
+> =C2=A0	}
+> =C2=A0
+> =C2=A0	error =3D vfs_setxattr(d, kname, kvalue, size, flags);
+> @@ -396,6 +404,17 @@ SYSCALL_DEFINE5(fsetxattr, int, fd, const char _=
+_user *, name,
+> =C2=A0	return error;
+> =C2=A0}
+> =C2=A0
+> +static void
+> +fix_xattr_to_user(const char *kname, void *kvalue, size_t size)
+> +{
+> +	if (strncmp(kname, XATTR_SYSTEM_PREFIX, XATTR_SYSTEM_PREFIX_LEN))
+> +		return;
+> +	kname +=3D XATTR_SYSTEM_PREFIX_LEN;
+> +	if (!strcmp(kname, XATTR_POSIX_ACL_ACCESS) ||
+> +	=C2=A0=C2=A0=C2=A0=C2=A0!strcmp(kname, XATTR_POSIX_ACL_DEFAULT))
+> +		posix_acl_fix_xattr_to_user(kvalue, size);
+> +}
+> +
+> =C2=A0/*
+> =C2=A0 * Extended attribute GET operations
+> =C2=A0 */
+> @@ -426,9 +445,7 @@ getxattr(struct dentry *d, const char __user *nam=
+e, void __user *value,
+> =C2=A0
+> =C2=A0	error =3D vfs_getxattr(d, kname, kvalue, size);
+> =C2=A0	if (error > 0) {
+> -		if ((strcmp(kname, XATTR_NAME_POSIX_ACL_ACCESS) =3D=3D 0) ||
+> -		=C2=A0=C2=A0=C2=A0=C2=A0(strcmp(kname, XATTR_NAME_POSIX_ACL_DEFAUL=
+T) =3D=3D 0))
+> -			posix_acl_fix_xattr_to_user(kvalue, size);
+> +		fix_xattr_to_user(kname, kvalue, size);
+> =C2=A0		if (size && copy_to_user(value, kvalue, error))
+> =C2=A0			error =3D -EFAULT;
+> =C2=A0	} else if (error =3D=3D -ERANGE && size >=3D XATTR_SIZE_MAX) {
+
+Might be nice to move this one to the head of the queue. I don't see it
+as being a controversial change, and it could go in before the rest of
+the patches.
+
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
