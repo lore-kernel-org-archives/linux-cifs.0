@@ -1,238 +1,68 @@
-From: "Frank Filz" <ffilzlnx@mindspring.com>
-Subject: RE: [PATCH v23 08/22] richacl: Compute maximum file masks from an acl
-Date: Tue, 5 Jul 2016 10:08:37 -0700
-Message-ID: <014101d1d6df$e059fd20$a10df760$@mindspring.com>
-References: <1467294433-3222-1-git-send-email-agruenba@redhat.com>	 <1467294433-3222-9-git-send-email-agruenba@redhat.com> <1467728537.3800.32.camel@redhat.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH v23 12/22] vfs: Add get_richacl and set_richacl inode
+ operations
+Date: Wed, 06 Jul 2016 14:31:13 -0400
+Message-ID: <1467829873.2908.1.camel@redhat.com>
+References: <1467294433-3222-1-git-send-email-agruenba@redhat.com>
+	 <1467294433-3222-13-git-send-email-agruenba@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: 8BIT
-Cc: "'Christoph Hellwig'" <hch@infradead.org>,
-	"'Theodore Ts'o'" <tytso@mit.edu>,
-	"'Andreas Dilger'" <adilger.kernel@dilger.ca>,
-	"'J. Bruce Fields'" <bfields@fieldses.org>,
-	"'Trond Myklebust'" <trond.myklebust@primarydata.com>,
-	"'Anna Schumaker'" <anna.schumaker@netapp.com>,
-	"'Dave Chinner'" <david@fromorbit.com>,
-	<linux-ext4@vger.kernel.org>, <xfs@oss.sgi.com>,
-	<linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-	<linux-nfs@vger.kernel.org>, <linux-cifs@vger.kernel.org>,
-	<linux-api@vger.kernel.org>
-To: "'Jeff Layton'" <jlayton@redhat.com>,
-	"'Andreas Gruenbacher'" <agruenba@redhat.com>,
-	"'Alexander Viro'" <viro@zeniv.linux.org.uk>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <1467728537.3800.32.camel@redhat.com>
-Content-Language: en-us
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+	Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>,
+	Andreas Dilger <adilger.kernel-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>,
+	"J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
+	Trond Myklebust <trond.myklebust-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
+	Anna Schumaker <anna.schumaker-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
+	Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>, linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1467294433-3222-13-git-send-email-agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-> > + * Note: functions like richacl_allowed_to_who(),
-> > +richacl_group_class_allowed(),
-> > + * and richacl_compute_max_masks() iterate through the entire acl in
-> > +reverse
-> > + * order as an optimization.
-> > + *
-> > + * In the standard algorithm, aces are considered in forward order.
-> > +When a
-> > + * process matches an ace, the permissions in the ace are either
-> > +allowed or
-> > + * denied depending on the ace type.  Once a permission has been
-> > +allowed or
-> > + * denied, it is no longer considered in further aces.
-> > + *
-> > + * By iterating through the acl in reverse order, we can compute the
-> > +same
-> > + * result without having to keep track of which permissions have been
-> > +allowed
-> > + * and denied already.
-> > + */
-> >
-> 
-> Clever!
+On Thu, 2016-06-30 at 15:47 +0200, Andreas Gruenbacher wrote:
+> These operations are similar to the get_acl and set_acl operations fo=
+r
+> POSIX ACLs.=C2=A0=C2=A0The distinction between access and default ACL=
+s doesn't exist
+> for richacls.
+>=20
+> Signed-off-by: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> Reviewed-by: Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
+> ---
+> =C2=A0include/linux/fs.h | 2 ++
+> =C2=A01 file changed, 2 insertions(+)
+>=20
+> diff --git a/include/linux/fs.h b/include/linux/fs.h
+> index 06a30b0..ac96bda 100644
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -1726,6 +1726,7 @@ struct inode_operations {
+> =C2=A0	const char * (*get_link) (struct dentry *, struct inode *, str=
+uct delayed_call *);
+> =C2=A0	int (*permission) (struct inode *, int);
+> =C2=A0	struct posix_acl * (*get_acl)(struct inode *, int);
+> +	struct richacl * (*get_richacl)(struct inode *);
+> =C2=A0
+> =C2=A0	int (*readlink) (struct dentry *, char __user *,int);
+> =C2=A0
+> @@ -1756,6 +1757,7 @@ struct inode_operations {
+> =C2=A0			=C2=A0=C2=A0=C2=A0umode_t create_mode, int *opened);
+> =C2=A0	int (*tmpfile) (struct inode *, struct dentry *, umode_t);
+> =C2=A0	int (*set_acl)(struct inode *, struct posix_acl *, int);
+> +	int (*set_richacl)(struct inode *, struct richacl *);
+> =C2=A0} ____cacheline_aligned;
+> =C2=A0
+> =C2=A0ssize_t rw_copy_check_uvector(int type, const struct iovec __us=
+er * uvector,
 
-Hmm, but does that result in examining the whole ACL for most access checks, at least for files where most of the accesses are by the owner, or a member of a specific group (with perhaps a ton of special case users added on the end)?
+Looks OK, though it's hard to review something like this without some
+context. Maybe this patch should be folded in with the patch that
+actually adds the calls for these operations?
 
-Frank
-
-> > +
-> > +/**
-> > + * richacl_allowed_to_who  -  permissions allowed to a specific who
-> > +value
-> > + *
-> > + * Compute the maximum mask values allowed to a specific who value,
-> > +taking
-> > + * everyone@ aces into account.
-> > + */
-> > +static unsigned int richacl_allowed_to_who(struct richacl *acl,
-> > +					   struct richace *who)
-> > +{
-> > +	struct richace *ace;
-> > +	unsigned int allowed = 0;
-> > +
-> > +	richacl_for_each_entry_reverse(ace, acl) {
-> > +		if (richace_is_inherit_only(ace))
-> > +			continue;
-> > +		if (richace_is_same_identifier(ace, who) ||
-> > +		    richace_is_everyone(ace)) {
-> > +			if (richace_is_allow(ace))
-> > +				allowed |= ace->e_mask;
-> > +			else if (richace_is_deny(ace))
-> > +				allowed &= ~ace->e_mask;
-> > +		}
-> > +	}
-> > +	return allowed;
-> > +}
-> > +
-> > +/**
-> > + * richacl_group_class_allowed  -  maximum permissions of the group
-> > +class
-> > + *
-> > + * Compute the maximum mask values allowed to a process in the group
-> > +class
-> > + * (i.e., a process which is not the owner but is in the owning group
-> > +or
-> > + * matches a user or group acl entry).  This includes permissions
-> > +granted or
-> > + * denied by everyone@ aces.
-> > + *
-> > + * See richacl_compute_max_masks().
-> > + */
-> > +static unsigned int richacl_group_class_allowed(struct richacl *acl)
-> > +{
-> > +	struct richace *ace;
-> > +	unsigned int everyone_allowed = 0, group_class_allowed = 0;
-> > +	int had_group_ace = 0;
-> > +
-> > +	richacl_for_each_entry_reverse(ace, acl) {
-> > +		if (richace_is_inherit_only(ace) ||
-> > +		    richace_is_owner(ace))
-> > +			continue;
-> > +
-> > +		if (richace_is_everyone(ace)) {
-> > +			if (richace_is_allow(ace))
-> > +				everyone_allowed |= ace->e_mask;
-> > +			else if (richace_is_deny(ace))
-> > +				everyone_allowed &= ~ace->e_mask;
-> > +		} else {
-> > +			group_class_allowed |=
-> > +				richacl_allowed_to_who(acl, ace);
-> > +
-> > +			if (richace_is_group(ace))
-> > +				had_group_ace = 1;
-> > +		}
-> > +	}
-> > +	/*
-> > +	 * If the acl doesn't contain any group@ aces,
-> richacl_allowed_to_who()
-> > +	 * wasn't called for the owning group.  We could make that call now,
-> but
-> > +	 * we already know the result (everyone_allowed).
-> > +	 */
-> > +	if (!had_group_ace)
-> > +		group_class_allowed |= everyone_allowed;
-> > +	return group_class_allowed;
-> > +}
-> > +
-> > +/**
-> > + * richacl_compute_max_masks  -  compute upper bound masks
-> > + *
-> > + * Computes upper bound owner, group, and other masks so that none of
-> > +the
-> > + * permissions allowed by the acl are disabled.
-> > + *
-> > + * We don't make assumptions about who the owner is so that the owner
-> > +can
-> > + * change with no effect on the file masks or file mode permission
-> > +bits; this
-> > + * means that we must assume that all entries can match the owner.
-> > + */
-> > +void richacl_compute_max_masks(struct richacl *acl) {
-> > +	unsigned int gmask = ~0;
-> > +	struct richace *ace;
-> > +
-> > +	/*
-> > +	 * @gmask contains all permissions which the group class is ever
-> > +	 * allowed.  We use it to avoid adding permissions to the group mask
-> > +	 * from everyone@ allow aces which the group class is always denied
-> > +	 * through other aces.  For example, the following acl would
-> otherwise
-> > +	 * result in a group mask of rw:
-> > +	 *
-> > +	 *	group@:w::deny
-> > +	 *	everyone@:rw::allow
-> > +	 *
-> > +	 * Avoid computing @gmask for acls which do not include any group
-> class
-> > +	 * deny aces: in such acls, the group class is never denied any
-> > +	 * permissions from everyone@ allow aces, and the group class
-> cannot
-> > +	 * have fewer permissions than the other class.
-> > +	 */
-> > +
-> > +restart:
-> > +	acl->a_owner_mask = 0;
-> > +	acl->a_group_mask = 0;
-> > +	acl->a_other_mask = 0;
-> > +
-> > +	richacl_for_each_entry_reverse(ace, acl) {
-> > +		if (richace_is_inherit_only(ace))
-> > +			continue;
-> > +
-> > +		if (richace_is_owner(ace)) {
-> > +			if (richace_is_allow(ace))
-> > +				acl->a_owner_mask |= ace->e_mask;
-> > +			else if (richace_is_deny(ace))
-> > +				acl->a_owner_mask &= ~ace->e_mask;
-> > +		} else if (richace_is_everyone(ace)) {
-> > +			if (richace_is_allow(ace)) {
-> > +				acl->a_owner_mask |= ace->e_mask;
-> > +				acl->a_group_mask |= ace->e_mask &
-> gmask;
-> > +				acl->a_other_mask |= ace->e_mask;
-> > +			} else if (richace_is_deny(ace)) {
-> > +				acl->a_owner_mask &= ~ace->e_mask;
-> > +				acl->a_group_mask &= ~ace->e_mask;
-> > +				acl->a_other_mask &= ~ace->e_mask;
-> > +			}
-> > +		} else {
-> > +			if (richace_is_allow(ace)) {
-> > +				acl->a_owner_mask |= ace->e_mask &
-> gmask;
-> > +				acl->a_group_mask |= ace->e_mask &
-> gmask;
-> > +			} else if (richace_is_deny(ace) && gmask == ~0) {
-> > +				gmask = richacl_group_class_allowed(acl);
-> > +				if (likely(gmask != ~0))
-> > +					/* should always be true */
-> > +					goto restart;
-> > +			}
-> > +		}
-> > +	}
-> > +
-> > +	acl->a_flags &= ~(RICHACL_WRITE_THROUGH | RICHACL_MASKED); }
-> > +EXPORT_SYMBOL_GPL(richacl_compute_max_masks);
-> > diff --git a/include/linux/richacl.h b/include/linux/richacl.h index
-> > 9102ef0..3559b2c 100644
-> > --- a/include/linux/richacl.h
-> > +++ b/include/linux/richacl.h
-> > @@ -178,5 +178,6 @@ extern void richace_copy(struct richace *, const
-> > struct richace *);
-> >  extern int richacl_masks_to_mode(const struct richacl *);
-> >  extern unsigned int richacl_mode_to_mask(umode_t);
-> >  extern unsigned int richacl_want_to_mask(unsigned int);
-> > +extern void richacl_compute_max_masks(struct richacl *);
-> >
-> >  #endif /* __RICHACL_H */
-> 
-> Reviewed-by: Jeff Layton <jlayton@redhat.com>
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-fsdevel" in the
-> body of a message to majordomo@vger.kernel.org More majordomo info at
-> http://vger.kernel.org/majordomo-info.html
-
-
----
-This email has been checked for viruses by Avast antivirus software.
-https://www.avast.com/antivirus
-
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
