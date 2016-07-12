@@ -1,48 +1,41 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] Add MF-Symlinks support for SMB 2.0
-Date: Tue, 12 Jul 2016 07:14:37 -0500
-Message-ID: <CAH2r5mu0tLqhAhZ2Ke=VdzxGJ4WMmjzgVOVLLPtt5R6W_90S7w@mail.gmail.com>
-References: <1468252400-6814-1-git-send-email-sprabhu@redhat.com>
+From: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+Subject: [bug report] CIFS: Implement follow_link for SMB2
+Date: Tue, 12 Jul 2016 16:55:07 +0300
+Message-ID: <20160712135507.GA30732@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1468252400-6814-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Disposition: inline
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-merged into cifs-2.6.git
+Hello Pavel Shilovsky,
 
-On Mon, Jul 11, 2016 at 10:53 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> We should be able to use the same helper functions used for SMB 2.1 and
-> later versions.
->
-> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/smb2ops.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 3525ed7..527d1ac 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -1515,6 +1515,8 @@ struct smb_version_operations smb20_operations = {
->         .rename = smb2_rename_path,
->         .create_hardlink = smb2_create_hardlink,
->         .query_symlink = smb2_query_symlink,
-> +       .query_mf_symlink = smb3_query_mf_symlink,
-> +       .create_mf_symlink = smb3_create_mf_symlink,
->         .open = smb2_open_file,
->         .set_fid = smb2_set_fid,
->         .close = smb2_close_file,
-> --
-> 2.5.5
->
+The patch b42bf88828cd: "CIFS: Implement follow_link for SMB2" from
+Aug 14, 2013, leads to the following static checker warning:
 
+	fs/cifs/smb2pdu.c:1408 SMB2_open()
+	warn: potentially allocating too little.  77 vs 4
 
+fs/cifs/smb2pdu.c
+  1402          rc = SendReceive2(xid, ses, iov, num_iovecs, &resp_buftype, 0);
+  1403          rsp = (struct smb2_create_rsp *)iov[0].iov_base;
+  1404  
+  1405          if (rc != 0) {
+  1406                  cifs_stats_fail_inc(tcon, SMB2_CREATE_HE);
+  1407                  if (err_buf)
+  1408                          *err_buf = kmemdup(rsp, get_rfc1002_length(rsp) + 4,
 
--- 
-Thanks,
+I'm not an expert, but these look like it might be controlled from user
+space.  How do we know that get_rfc1002_length() returns something large
+enough?
 
-Steve
+  1409                                             GFP_KERNEL);
+  1410                  goto creat_exit;
+  1411          }
+  1412  
+
+regards,
+dan carpenter
