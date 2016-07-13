@@ -1,50 +1,75 @@
-From: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v23 17/22] richacl: Automatic Inheritance
-Date: Tue, 12 Jul 2016 22:28:15 +0200
-Message-ID: <CAHc6FU6k+eZ1Ozc8wofDBNOAHZzvXXWMAs1NJNTbd9Ntbqqsqw@mail.gmail.com>
+From: Andreas Gruenbacher <agruenba@redhat.com>
+Subject: Re: [PATCH v23 08/22] richacl: Compute maximum file masks from an acl
+Date: Wed, 13 Jul 2016 14:34:31 +0200
+Message-ID: <CAHc6FU5oeaCxgZPFeNSHDfSjnVKe9km14R4s5RoBhJXPaL7ymQ@mail.gmail.com>
 References: <1467294433-3222-1-git-send-email-agruenba@redhat.com>
- <1467294433-3222-18-git-send-email-agruenba@redhat.com> <1468324560.7798.14.camel@redhat.com>
- <20160712191142.GE449@fieldses.org>
+	<1467294433-3222-9-git-send-email-agruenba@redhat.com>
+	<1467728537.3800.32.camel@redhat.com>
+	<014101d1d6df$e059fd20$a10df760$@mindspring.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
-	Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-	"Theodore Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,
-	Andreas Dilger <adilger.kernel-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>,
-	Trond Myklebust <trond.myklebust-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
-	Anna Schumaker <anna.schumaker-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
-	Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>,
-	linux-ext4 <linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	XFS Developers <xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org>,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Linux NFS Mailing List <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Linux API <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20160712191142.GE449-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: "J. Bruce Fields" <bfields@fieldses.org>,
+	Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+	Theodore Ts'o <tytso@mit.edu>, Jeff Layton <jlayton@redhat.com>,
+	linux-cifs@vger.kernel.org, Linux API <linux-api@vger.kernel.org>,
+	Trond Myklebust <trond.myklebust@primarydata.com>,
+	LKML <linux-kernel@vger.kernel.org>, XFS Developers <xfs@oss.sgi.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	linux-ext4 <linux-ext4@vger.kernel.org>,
+	Anna Schumaker <anna.schumaker@netapp.com>
+To: Frank Filz <ffilzlnx@mindspring.com>
+Return-path: <xfs-bounces@oss.sgi.com>
+In-Reply-To: <014101d1d6df$e059fd20$a10df760$@mindspring.com>
+List-Unsubscribe: <http://oss.sgi.com/mailman/options/xfs>,
+	<mailto:xfs-request@oss.sgi.com?subject=unsubscribe>
+List-Archive: <http://oss.sgi.com/pipermail/xfs>
+List-Post: <mailto:xfs@oss.sgi.com>
+List-Help: <mailto:xfs-request@oss.sgi.com?subject=help>
+List-Subscribe: <http://oss.sgi.com/mailman/listinfo/xfs>,
+	<mailto:xfs-request@oss.sgi.com?subject=subscribe>
+Errors-To: xfs-bounces@oss.sgi.com
+Sender: xfs-bounces@oss.sgi.com
 List-Id: linux-cifs.vger.kernel.org
 
-On Tue, Jul 12, 2016 at 9:11 PM, J. Bruce Fields <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org> wrote:
-> On Tue, Jul 12, 2016 at 07:56:00AM -0400, Jeff Layton wrote:
->> Barf. AI seems like a trainwreck waiting to happen. What are the
->> chances that userland is going to get this right?
->
-> This is just taken from Windows, so presumably Samba should do the right
-> thing (with one workaround required--see the discussion of PROTECTED in
-> the changelog).
->
->> Still, I do applaud the fact that you're just doing the bare minimum in
->> kernel to support userland apps that want this. Thanks for not trying
->> to push the propagation of the changed ACEs into the kernel.
->
-> Agreed.  But, again, this is just what Windows does.  (I wonder whether
-> there's an OS that's actually tried do any sort of atomic propagation.)
+Frank,
 
-NetWare's NSS filesystem did have automatic propagation, but I think
-that was implemented by composing the permissions along the path to a
-file at access time.
+On Tue, Jul 5, 2016 at 7:08 PM, Frank Filz <ffilzlnx@mindspring.com> wrote:
+>> > + * Note: functions like richacl_allowed_to_who(),
+>> > +richacl_group_class_allowed(),
+>> > + * and richacl_compute_max_masks() iterate through the entire acl in
+>> > +reverse
+>> > + * order as an optimization.
+>> > + *
+>> > + * In the standard algorithm, aces are considered in forward order.
+>> > +When a
+>> > + * process matches an ace, the permissions in the ace are either
+>> > +allowed or
+>> > + * denied depending on the ace type.  Once a permission has been
+>> > +allowed or
+>> > + * denied, it is no longer considered in further aces.
+>> > + *
+>> > + * By iterating through the acl in reverse order, we can compute the
+>> > +same
+>> > + * result without having to keep track of which permissions have been
+>> > +allowed
+>> > + * and denied already.
+>> > + */
+>> >
+>>
+>> Clever!
+>
+> Hmm, but does that result in examining the whole ACL for most access checks, at least for files where most of the accesses are by the owner, or a member of a specific group (with perhaps a ton of special case users added on the end)?
 
+I don't understand -- what does this algorithm have to do with access checks?
+
+Thanks,
 Andreas
+
+_______________________________________________
+xfs mailing list
+xfs@oss.sgi.com
+http://oss.sgi.com/mailman/listinfo/xfs
