@@ -1,78 +1,49 @@
-From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] cifs: unbreak TCP session reuse
-Date: Tue, 19 Jul 2016 22:14:02 +0300
-Message-ID: <CAKywueS2Avvh4g04FvMa4pLYJ11rRCtNpN2+8_gzd5c40Azevw@mail.gmail.com>
-References: <1468913145-23353-1-git-send-email-rabin.vincent@axis.com>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] Making shares unaccessible at root level mountable (aka
+ solving bsc#8950 ...again)
+Date: Tue, 19 Jul 2016 22:21:26 +0300
+Message-ID: <CAKywueRFMu9nvwi_01Yz0HpOqhrK2yZVaLT2JMqw4622irQzNw@mail.gmail.com>
+References: <20160527194346.08416d79@aaptelpc> <20160609185027.7349f260@aaptelpc>
+ <5759C326.5040508@fu-berlin.de> <20160610171649.3e12b95c@aaptelpc>
+ <CAKywueRMvJ4B6ojqA1TduS4nGFTr5m4wLO2=0M_EVv=vw2T1pw@mail.gmail.com> <20160718163847.68ea0d86@aaptelpc>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Marcus Hoffmann <marcus.hoffmann-j/7cz5qe3tpn68oJJulU0Q@public.gmane.org>,
 	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
-To: Rabin Vincent <rabin.vincent-VrBV9hrLPhE@public.gmane.org>
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1468913145-23353-1-git-send-email-rabin.vincent-VrBV9hrLPhE@public.gmane.org>
+In-Reply-To: <20160718163847.68ea0d86@aaptelpc>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2016-07-19 10:25 GMT+03:00 Rabin Vincent <rabin.vincent-VrBV9hrLPhE@public.gmane.org>:
-> From: Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
+2016-07-18 17:38 GMT+03:00 Aur=C3=A9lien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>:
+> On Sat, 2 Jul 2016 10:02:36 +0300 Pavel Shilovsky
+> <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+>> Please remove this unnecessary change - probably it will go to stabl=
+e
+>> some day and may cause extra conflicts.
 >
-> adfeb3e0 ("cifs: Make echo interval tunable") added a comparison of
-> vol->echo_interval to server->echo_interval as a criterium to
-> match_server(), but:
+>> The above code should check for possible memory allocation failure.
 >
->  (1) A default value is set for server->echo_interval but not for
->  vol->echo_interval, meaning these can never match if the echo_interval
->  option is not specified.
->
->  (2) vol->echo_interval is in seconds but server->echo_interval is in
->  jiffies, meaning these can never match even if the echo_interval option
->  is specified.
->
-> This broke TCP session reuse since match_server() can never return 1.
-> Fix it.
->
-> Fixes: adfeb3e0 ("cifs: Make echo interval tunable")
-> Signed-off-by: Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
-> ---
->  fs/cifs/connect.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 7d2b15c..eb24653 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -1228,6 +1228,8 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
->         vol->ops = &smb1_operations;
->         vol->vals = &smb1_values;
->
-> +       vol->echo_interval = SMB_ECHO_INTERVAL_DEFAULT;
-> +
->         if (!mountdata)
->                 goto cifs_parse_mount_err;
->
-> @@ -2049,7 +2051,7 @@ static int match_server(struct TCP_Server_Info *server, struct smb_vol *vol)
->         if (!match_security(server, vol))
->                 return 0;
->
-> -       if (server->echo_interval != vol->echo_interval)
-> +       if (server->echo_interval != vol->echo_interval * HZ)
->                 return 0;
->
->         return 1;
-> --
-> 2.1.4
+> I've added (new patch attached) NULL checks and removed the gratuitou=
+s
+> empty line.
 >
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+> SUSE Linux GmbH, Maxfeldstra=C3=9Fe 5, 90409 N=C3=BCrnberg, Germany
+> GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton, HRB 21284 (=
+AG
+> N=C3=BCrnberg)
 
-Looks good. I applied it and it works as expected.
+I suggest you to run scripts/checkpatch.pl against your patch - it has
+several warnings like {} braces for single statement blocks. Also the
+patch from the attachment still has an empty line in fs/cifs/cifsfs.c.
 
-Reviewed-and-Tested-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-
--- 
+--=20
 Best regards,
 Pavel Shilovsky
