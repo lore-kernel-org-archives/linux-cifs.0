@@ -1,42 +1,93 @@
-From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [bug report] CIFS: Implement follow_link for SMB2
-Date: Tue, 19 Jul 2016 22:27:38 +0300
-Message-ID: <CAKywueR7pGqL-HqqJH60XxPJ8fr1Mf3H7BZsSp2ePfXkdvH5sQ@mail.gmail.com>
-References: <20160712135507.GA30732@mwanda>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Fwd: [PATCH] cifs: unbreak TCP session reuse
+Date: Wed, 20 Jul 2016 01:13:32 -0500
+Message-ID: <CAH2r5muOyhVODwGuxGMcFyfujUp5EOX490tU4JAoxLnC2YY2NQ@mail.gmail.com>
+References: <1468913145-23353-1-git-send-email-rabin.vincent@axis.com>
+ <1468931617.4942.17.camel@redhat.com> <CAH2r5mtJo4frMK8zb+x9c_27ijryB7zKgVA08C+C5dehme5RsA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20160712135507.GA30732@mwanda>
+In-Reply-To: <CAH2r5mtJo4frMK8zb+x9c_27ijryB7zKgVA08C+C5dehme5RsA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2016-07-12 16:55 GMT+03:00 Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>:
-> Hello Pavel Shilovsky,
->
-> The patch b42bf88828cd: "CIFS: Implement follow_link for SMB2" from
-> Aug 14, 2013, leads to the following static checker warning:
->
->         fs/cifs/smb2pdu.c:1408 SMB2_open()
->         warn: potentially allocating too little.  77 vs 4
->
-> fs/cifs/smb2pdu.c
->   1402          rc = SendReceive2(xid, ses, iov, num_iovecs, &resp_buftype, 0);
->   1403          rsp = (struct smb2_create_rsp *)iov[0].iov_base;
->   1404
->   1405          if (rc != 0) {
->   1406                  cifs_stats_fail_inc(tcon, SMB2_CREATE_HE);
->   1407                  if (err_buf)
->   1408                          *err_buf = kmemdup(rsp, get_rfc1002_length(rsp) + 4,
->
-> I'm not an expert, but these look like it might be controlled from user
-> space.  How do we know that get_rfc1002_length() returns something large
-> enough?
+merged into cifs-2.6.git and added cc: stable
 
-Good catch. err_buf is used by smb2_query_symlink() without any checks
-for a buffer size. Thanks!
+On Tue, Jul 19, 2016 at 7:33 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+>
+> On Tue, 2016-07-19 at 09:25 +0200, Rabin Vincent wrote:
+> > From: Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
+> >
+> > adfeb3e0 ("cifs: Make echo interval tunable") added a comparison of
+> > vol->echo_interval to server->echo_interval as a criterium to
+> > match_server(), but:
+> >
+> >  (1) A default value is set for server->echo_interval but not for
+> >  vol->echo_interval, meaning these can never match if the
+> > echo_interval
+> >  option is not specified.
+> >
+> >  (2) vol->echo_interval is in seconds but server->echo_interval is in
+> >  jiffies, meaning these can never match even if the echo_interval
+> > option
+> >  is specified.
+> >
+> > This broke TCP session reuse since match_server() can never return 1.
+> > Fix it.
+> >
+> > Fixes: adfeb3e0 ("cifs: Make echo interval tunable")
+> > Signed-off-by: Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
+>
+> Nice catch
+>
+> Acked-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>
+> > ---
+> >  fs/cifs/connect.c | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> > index 7d2b15c..eb24653 100644
+> > --- a/fs/cifs/connect.c
+> > +++ b/fs/cifs/connect.c
+> > @@ -1228,6 +1228,8 @@ cifs_parse_mount_options(const char *mountdata,
+> > const char *devname,
+> >       vol->ops = &smb1_operations;
+> >       vol->vals = &smb1_values;
+> >
+> > +     vol->echo_interval = SMB_ECHO_INTERVAL_DEFAULT;
+> > +
+> >       if (!mountdata)
+> >               goto cifs_parse_mount_err;
+> >
+> > @@ -2049,7 +2051,7 @@ static int match_server(struct TCP_Server_Info
+> > *server, struct smb_vol *vol)
+> >       if (!match_security(server, vol))
+> >               return 0;
+> >
+> > -     if (server->echo_interval != vol->echo_interval)
+> > +     if (server->echo_interval != vol->echo_interval * HZ)
+> >               return 0;
+> >
+> >       return 1;
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 
 -- 
-Best regards,
-Pavel Shilovsky
+Thanks,
+
+Steve
+
+
+
+-- 
+Thanks,
+
+Steve
