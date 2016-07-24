@@ -1,159 +1,86 @@
-From: Rabin Vincent <rabin.vincent-VrBV9hrLPhE@public.gmane.org>
-Subject: Re: [PATCH] cifs: fix crash due to race in hmac(md5) handling
-Date: Thu, 21 Jul 2016 09:30:53 +0200
-Message-ID: <20160721073053.GA31832@axis.com>
-References: <1468913181-28163-1-git-send-email-rabin.vincent@axis.com>
- <1469023049.4942.21.camel@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: Pavel Shilovsky <piastry-u2l5PoMzF/Vg9hUCZPvPmw@public.gmane.org>
+Subject: [PATCH] CIFS: Fix a possible invalid memory access in smb2_query_symlink()
+Date: Sun, 24 Jul 2016 10:37:38 +0300
+Message-ID: <1469345858-5571-1-git-send-email-piastry@altlinux.org>
+Cc: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <1469023049.4942.21.camel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, Jul 20, 2016 at 02:57:29PM +0100, Sachin Prabhu wrote:
-> Rabin, do you have a reliable reproducer for this case? If yes, can you
-> please point me to it.
+From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 
-I have only seen one report of the oops in real testing, so I don't have
-a case that would reproduce easily on an unmodified kernel, but while
-investigating this I made a debug patch which forces the faulty sequence
-to occur and provides a 100% reliable reproducer.
+During following a symbolic link we received err_buf from SMB2_open().
+While the validity of SMB2 error response is checked previously
+in smb2_check_message() a symbolic link payload is not checked at all.
+Fix it by adding such checks.
 
-The below patched forces the race condition by making two mount.cifs
-processes wait for each other in the appropriate places.
+Cc: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ fs/cifs/smb2ops.c | 30 +++++++++++++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
 
-With the force-race patch applied and without this fix, the crash occurs
-every time when the following sequence of commands is run.  Tested in a
-KVM guest on latest mainline with my "unbreak TCP session reuse" patch
-applied.
-
-With the force-race patch applied and with this fix, the mount processes
-hang since the race condition can never be satisfied.
-
- cp /sbin/mount.cifs /sbin/cifs1
- cp /sbin/mount.cifs /sbin/cifs2
- mkdir -p cifs cifs2
- cifs1 //192.168.1.1/test cifs -o credentials=/creds &
- sleep 2
- cifs2 //192.168.1.1/test2 cifs2 -o credentials=/creds
-
-8<-------------------------
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index 8347c90..1ed6dfd 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -35,6 +35,32 @@
- #include <linux/highmem.h>
- #include <crypto/skcipher.h>
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 527d1ac..9ec025c 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -1044,6 +1044,9 @@ smb2_new_lease_key(struct cifs_fid *fid)
+ 	get_random_bytes(fid->lease_key, SMB2_LEASE_KEY_SIZE);
+ }
  
-+static struct completion completions[100];
-+
-+void hack_set_state(int newstate)
-+{
-+	printk("%s: caller %pF sets state to %d\n", current->comm, (void *)_RET_IP_, newstate);
-+	complete(&completions[newstate]);
-+}
-+
-+void hack_wait_for_state(int state)
-+{
-+	printk("%s caller %pF wants state %d\n", current->comm, (void *)_RET_IP_, state);
-+	wait_for_completion(&completions[state]);
-+	printk("%s caller %pF got state %d\n", current->comm, (void *)_RET_IP_, state);
-+}
-+
-+static int hack_init(void)
-+{
-+       int i;
-+
-+       for (i = 0; i < ARRAY_SIZE(completions); i++)
-+               init_completion(&completions[i]);
-+
-+       return 0;
-+}
-+late_initcall(hack_init);
++#define SMB2_SYMLINK_STRUCT_SIZE \
++	(sizeof(struct smb2_err_rsp) - 1 + sizeof(struct smb2_symlink_err_rsp))
 +
  static int
- cifs_crypto_shash_md5_allocate(struct TCP_Server_Info *server)
- {
-@@ -54,6 +80,7 @@ cifs_crypto_shash_md5_allocate(struct TCP_Server_Info *server)
+ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
+ 		   const char *full_path, char **target_path,
+@@ -1056,7 +1059,10 @@ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
+ 	struct cifs_fid fid;
+ 	struct smb2_err_rsp *err_buf = NULL;
+ 	struct smb2_symlink_err_rsp *symlink;
+-	unsigned int sub_len, sub_offset;
++	unsigned int sub_len;
++	unsigned int sub_offset;
++	unsigned int print_len;
++	unsigned int print_offset;
  
- 	size = sizeof(struct shash_desc) +
- 			crypto_shash_descsize(server->secmech.md5);
-+
- 	server->secmech.sdescmd5 = kmalloc(size, GFP_KERNEL);
- 	if (!server->secmech.sdescmd5) {
- 		crypto_free_shash(server->secmech.md5);
-@@ -661,8 +688,10 @@ static int crypto_hmacmd5_alloc(struct TCP_Server_Info *server)
- 	unsigned int size;
+ 	cifs_dbg(FYI, "%s: path: %s\n", __func__, full_path);
  
- 	/* check if already allocated */
--	if (server->secmech.sdeschmacmd5)
-+	if (server->secmech.sdeschmacmd5) {
-+		printk("%s: server %p already allocated\n", __func__, server);
- 		return 0;
-+	}
- 
- 	server->secmech.hmacmd5 = crypto_alloc_shash("hmac(md5)", 0, 0);
- 	if (IS_ERR(server->secmech.hmacmd5)) {
-@@ -674,12 +703,28 @@ static int crypto_hmacmd5_alloc(struct TCP_Server_Info *server)
- 
- 	size = sizeof(struct shash_desc) +
- 			crypto_shash_descsize(server->secmech.hmacmd5);
-+
-+	if (!strcmp(current->comm, "cifs1")) {
-+		hack_wait_for_state(10);
-+	}
-+	if (!strcmp(current->comm, "cifs2")) {
-+		hack_set_state(10);
-+		hack_wait_for_state(20);
-+	}
-+
- 	server->secmech.sdeschmacmd5 = kmalloc(size, GFP_KERNEL);
-+	printk("%s: %s: server %p alloc sdeschmacmd5=%p\n", __func__, current->comm, server, server->secmech.sdeschmacmd5);
- 	if (!server->secmech.sdeschmacmd5) {
- 		crypto_free_shash(server->secmech.hmacmd5);
- 		server->secmech.hmacmd5 = NULL;
- 		return -ENOMEM;
+@@ -1077,11 +1083,33 @@ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
+ 		kfree(utf16_path);
+ 		return -ENOENT;
  	}
 +
-+	if (!strcmp(current->comm, "cifs2")) {
-+		hack_set_state(30);
-+		hack_wait_for_state(40);
++	if (err_buf->ByteCount < sizeof(struct smb2_symlink_err_rsp) ||
++	    get_rfc1002_length(err_buf) + 4 < SMB2_SYMLINK_STRUCT_SIZE) {
++		kfree(utf16_path);
++		return -ENOENT;
 +	}
 +
- 	server->secmech.sdeschmacmd5->shash.tfm = server->secmech.hmacmd5;
- 	server->secmech.sdeschmacmd5->shash.flags = 0x0;
- 
-@@ -745,6 +790,7 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
- 
- 	mutex_lock(&ses->server->srv_mutex);
- 
-+	printk("%s: ses %p ses->server %p\n", __func__, ses, ses->server);
- 	rc = crypto_hmacmd5_alloc(ses->server);
- 	if (rc) {
- 		cifs_dbg(VFS, "could not crypto alloc hmacmd5 rc %d\n", rc);
-@@ -780,6 +826,11 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
- 		goto unlock;
- 	}
- 
-+	if (!strcmp(current->comm, "cifs1")) {
-+		hack_set_state(20);
-+		hack_wait_for_state(30);
+ 	/* open must fail on symlink - reset rc */
+ 	rc = 0;
+ 	symlink = (struct smb2_symlink_err_rsp *)err_buf->ErrorData;
+ 	sub_len = le16_to_cpu(symlink->SubstituteNameLength);
+ 	sub_offset = le16_to_cpu(symlink->SubstituteNameOffset);
++	print_len = le16_to_cpu(symlink->PrintNameLength);
++	print_offset = le16_to_cpu(symlink->PrintNameOffset);
++
++	if (get_rfc1002_length(err_buf) + 4 <
++			SMB2_SYMLINK_STRUCT_SIZE + sub_offset + sub_len) {
++		kfree(utf16_path);
++		return -ENOENT;
 +	}
 +
- 	rc = crypto_shash_update(&ses->server->secmech.sdeschmacmd5->shash,
- 		ntlmv2->ntlmv2_hash,
- 		CIFS_HMAC_MD5_HASH_SIZE);
-@@ -788,6 +839,8 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
- 		goto unlock;
- 	}
- 
-+	hack_set_state(40);
++	if (get_rfc1002_length(err_buf) + 4 <
++			SMB2_SYMLINK_STRUCT_SIZE + print_offset + print_len) {
++		kfree(utf16_path);
++		return -ENOENT;
++	}
 +
- 	rc = crypto_shash_final(&ses->server->secmech.sdeschmacmd5->shash,
- 		ses->auth_key.response);
- 	if (rc)
+ 	*target_path = cifs_strndup_from_utf16(
+ 				(char *)symlink->PathBuffer + sub_offset,
+ 				sub_len, true, cifs_sb->local_nls);
+-- 
+2.1.4
