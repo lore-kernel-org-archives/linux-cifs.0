@@ -1,194 +1,156 @@
-From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: fix crash due to race in hmac(md5) handling
-Date: Mon, 25 Jul 2016 10:51:30 +0100
-Message-ID: <1469440290.8377.6.camel@redhat.com>
-References: <1468913181-28163-1-git-send-email-rabin.vincent@axis.com>
-	 <1469023049.4942.21.camel@redhat.com> <20160721073053.GA31832@axis.com>
+From: Andreas Gruenbacher <agruenba@redhat.com>
+Subject: [PATCH v24 00/22] Richacls (Core and Ext4)
+Date: Mon, 25 Jul 2016 16:08:57 +0200
+Message-ID: <1469455759-6141-1-git-send-email-agruenba@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Rabin Vincent <rabin.vincent-VrBV9hrLPhE@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20160721073053.GA31832-VrBV9hrLPhE@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: "J. Bruce Fields" <bfields@fieldses.org>, linux-nfs@vger.kernel.org,
+	Theodore Ts'o <tytso@mit.edu>, Andreas Gruenbacher <agruenba@redhat.com>,
+	linux-cifs@vger.kernel.org, linux-api@vger.kernel.org,
+	Trond Myklebust <trond.myklebust@primarydata.com>,
+	linux-kernel@vger.kernel.org, xfs@oss.sgi.com,
+	Christoph Hellwig <hch@infradead.org>,
+	Andreas Dilger <adilger.kernel@dilger.ca>, linux-fsdevel@vger.kernel.org,
+	Jeff Layton <jlayton@poochiereds.net>, linux-ext4@vger.kernel.org,
+	Anna Schumaker <anna.schumaker@netapp.com>
+To: Alexander Viro <viro@zeniv.linux.org.uk>
+Return-path: <xfs-bounces@oss.sgi.com>
+List-Unsubscribe: <http://oss.sgi.com/mailman/options/xfs>,
+	<mailto:xfs-request@oss.sgi.com?subject=unsubscribe>
+List-Archive: <http://oss.sgi.com/pipermail/xfs>
+List-Post: <mailto:xfs@oss.sgi.com>
+List-Help: <mailto:xfs-request@oss.sgi.com?subject=help>
+List-Subscribe: <http://oss.sgi.com/mailman/listinfo/xfs>,
+	<mailto:xfs-request@oss.sgi.com?subject=subscribe>
+Errors-To: xfs-bounces@oss.sgi.com
+Sender: xfs-bounces@oss.sgi.com
+List-Id: linux-cifs.vger.kernel.org
 
-On Thu, 2016-07-21 at 09:30 +0200, Rabin Vincent wrote:
-> On Wed, Jul 20, 2016 at 02:57:29PM +0100, Sachin Prabhu wrote:
-> >=20
-> > Rabin, do you have a reliable reproducer for this case? If yes, can
-> > you
-> > please point me to it.
-> I have only seen one report of the oops in real testing, so I don't
-> have
-> a case that would reproduce easily on an unmodified kernel, but while
-> investigating this I made a debug patch which forces the faulty
-> sequence
-> to occur and provides a 100% reliable reproducer.
->=20
-> The below patched forces the race condition by making two mount.cifs
-> processes wait for each other in the appropriate places.
->=20
-> With the force-race patch applied and without this fix, the crash
-> occurs
-> every time when the following sequence of commands is run.=C2=A0=C2=A0=
-Tested in
-> a
-> KVM guest on latest mainline with my "unbreak TCP session reuse"
-> patch
-> applied.
->=20
-> With the force-race patch applied and with this fix, the mount
-> processes
-> hang since the race condition can never be satisfied.
+Here is another update of the richacl patches.  Changes since the last posting
+(https://lwn.net/Articles/693099/):
+
+ * Rebase on top of the 4.7 kernel.
+
+ * De-union ba_refcount and ba_rcu in struct base_acl (analogous to mainline
+   commit 6d4e56ce9 from Jeff Layton).
+
+ * Functions check_richacl and check_posix_acl moved from fs/namei.c into
+   fs/richacl.c and fs/posix_acl.c to avoid #ifdefs in the code.
+
+ * nfs: Use PTR_ERR_OR_ZERO instead of open-coding it.
+
+ * Remove outdated comment for richacl_mode_to_mask.  Turn richacl_want_to_mask
+   into a static function.
+
+ * Patch "posix_acl: Improve xattr fixup code" has become unrelated to this
+   patch queue; move it out of the way.
 
 
-Thanks Rabin.
+As always, the complete patch queue is available here:
 
-Sachin Prabhu
+  git://git.kernel.org/pub/scm/linux/kernel/git/agruen/linux-richacl.git \
+	richacl-2016-07-25
 
->=20
-> =C2=A0cp /sbin/mount.cifs /sbin/cifs1
-> =C2=A0cp /sbin/mount.cifs /sbin/cifs2
-> =C2=A0mkdir -p cifs cifs2
-> =C2=A0cifs1 //192.168.1.1/test cifs -o credentials=3D/creds &
-> =C2=A0sleep 2
-> =C2=A0cifs2 //192.168.1.1/test2 cifs2 -o credentials=3D/creds
->=20
-> 8<-------------------------
-> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-> index 8347c90..1ed6dfd 100644
-> --- a/fs/cifs/cifsencrypt.c
-> +++ b/fs/cifs/cifsencrypt.c
-> @@ -35,6 +35,32 @@
-> =C2=A0#include <linux/highmem.h>
-> =C2=A0#include <crypto/skcipher.h>
-> =C2=A0
-> +static struct completion completions[100];
-> +
-> +void hack_set_state(int newstate)
-> +{
-> +	printk("%s: caller %pF sets state to %d\n", current->comm,
-> (void *)_RET_IP_, newstate);
-> +	complete(&completions[newstate]);
-> +}
-> +
-> +void hack_wait_for_state(int state)
-> +{
-> +	printk("%s caller %pF wants state %d\n", current->comm,
-> (void *)_RET_IP_, state);
-> +	wait_for_completion(&completions[state]);
-> +	printk("%s caller %pF got state %d\n", current->comm, (void
-> *)_RET_IP_, state);
-> +}
-> +
-> +static int hack_init(void)
-> +{
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int i;
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0for (i =3D 0; i < ARRAY_SI=
-ZE(completions); i++)
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0init_completion(&completions[i]);
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return 0;
-> +}
-> +late_initcall(hack_init);
-> +
-> =C2=A0static int
-> =C2=A0cifs_crypto_shash_md5_allocate(struct TCP_Server_Info *server)
-> =C2=A0{
-> @@ -54,6 +80,7 @@ cifs_crypto_shash_md5_allocate(struct
-> TCP_Server_Info *server)
-> =C2=A0
-> =C2=A0	size =3D sizeof(struct shash_desc) +
-> =C2=A0			crypto_shash_descsize(server->secmech.md5);
-> +
-> =C2=A0	server->secmech.sdescmd5 =3D kmalloc(size, GFP_KERNEL);
-> =C2=A0	if (!server->secmech.sdescmd5) {
-> =C2=A0		crypto_free_shash(server->secmech.md5);
-> @@ -661,8 +688,10 @@ static int crypto_hmacmd5_alloc(struct
-> TCP_Server_Info *server)
-> =C2=A0	unsigned int size;
-> =C2=A0
-> =C2=A0	/* check if already allocated */
-> -	if (server->secmech.sdeschmacmd5)
-> +	if (server->secmech.sdeschmacmd5) {
-> +		printk("%s: server %p already allocated\n",
-> __func__, server);
-> =C2=A0		return 0;
-> +	}
-> =C2=A0
-> =C2=A0	server->secmech.hmacmd5 =3D crypto_alloc_shash("hmac(md5)", 0,
-> 0);
-> =C2=A0	if (IS_ERR(server->secmech.hmacmd5)) {
-> @@ -674,12 +703,28 @@ static int crypto_hmacmd5_alloc(struct
-> TCP_Server_Info *server)
-> =C2=A0
-> =C2=A0	size =3D sizeof(struct shash_desc) +
-> =C2=A0			crypto_shash_descsize(server-
-> >secmech.hmacmd5);
-> +
-> +	if (!strcmp(current->comm, "cifs1")) {
-> +		hack_wait_for_state(10);
-> +	}
-> +	if (!strcmp(current->comm, "cifs2")) {
-> +		hack_set_state(10);
-> +		hack_wait_for_state(20);
-> +	}
-> +
-> =C2=A0	server->secmech.sdeschmacmd5 =3D kmalloc(size, GFP_KERNEL);
-> +	printk("%s: %s: server %p alloc sdeschmacmd5=3D%p\n",
-> __func__, current->comm, server, server->secmech.sdeschmacmd5);
-> =C2=A0	if (!server->secmech.sdeschmacmd5) {
-> =C2=A0		crypto_free_shash(server->secmech.hmacmd5);
-> =C2=A0		server->secmech.hmacmd5 =3D NULL;
-> =C2=A0		return -ENOMEM;
-> =C2=A0	}
-> +
-> +	if (!strcmp(current->comm, "cifs2")) {
-> +		hack_set_state(30);
-> +		hack_wait_for_state(40);
-> +	}
-> +
-> =C2=A0	server->secmech.sdeschmacmd5->shash.tfm =3D server-
-> >secmech.hmacmd5;
-> =C2=A0	server->secmech.sdeschmacmd5->shash.flags =3D 0x0;
-> =C2=A0
-> @@ -745,6 +790,7 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const
-> struct nls_table *nls_cp)
-> =C2=A0
-> =C2=A0	mutex_lock(&ses->server->srv_mutex);
-> =C2=A0
-> +	printk("%s: ses %p ses->server %p\n", __func__, ses, ses-
-> >server);
-> =C2=A0	rc =3D crypto_hmacmd5_alloc(ses->server);
-> =C2=A0	if (rc) {
-> =C2=A0		cifs_dbg(VFS, "could not crypto alloc hmacmd5 rc
-> %d\n", rc);
-> @@ -780,6 +826,11 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const
-> struct nls_table *nls_cp)
-> =C2=A0		goto unlock;
-> =C2=A0	}
-> =C2=A0
-> +	if (!strcmp(current->comm, "cifs1")) {
-> +		hack_set_state(20);
-> +		hack_wait_for_state(30);
-> +	}
-> +
-> =C2=A0	rc =3D crypto_shash_update(&ses->server->secmech.sdeschmacmd5-
-> >shash,
-> =C2=A0		ntlmv2->ntlmv2_hash,
-> =C2=A0		CIFS_HMAC_MD5_HASH_SIZE);
-> @@ -788,6 +839,8 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const
-> struct nls_table *nls_cp)
-> =C2=A0		goto unlock;
-> =C2=A0	}
-> =C2=A0
-> +	hack_set_state(40);
-> +
-> =C2=A0	rc =3D crypto_shash_final(&ses->server->secmech.sdeschmacmd5-
-> >shash,
-> =C2=A0		ses->auth_key.response);
-> =C2=A0	if (rc)
+
+The richacl user-space utilitites, man pages, and test suite are available
+here:
+
+  https://github.com/andreas-gruenbacher/richacl
+
+
+Changes to other user-space packages for richacl:
+
+  https://github.com/andreas-gruenbacher/coreutils
+  https://github.com/andreas-gruenbacher/e2fsprogs
+  https://github.com/andreas-gruenbacher/samba
+  https://github.com/andreas-gruenbacher/xfsprogs-dev
+  https://github.com/andreas-gruenbacher/nfs-utils
+
+
+Please see the richacl homepage for more information:
+
+  http://www.bestbits.at/richacl/
+
+
+Thanks,
+Andreas
+
+Andreas Gruenbacher (20):
+  vfs: Add IS_ACL() and IS_RICHACL() tests
+  vfs: Add MAY_CREATE_FILE and MAY_CREATE_DIR permission flags
+  vfs: Add MAY_DELETE_SELF and MAY_DELETE_CHILD permission flags
+  vfs: Make the inode passed to inode_change_ok non-const
+  vfs: Add permission flags for setting file attributes
+  richacl: In-memory representation and helper functions
+  richacl: Permission mapping functions
+  richacl: Permission check algorithm
+  richacl: Compute maximum file masks from an acl
+  vfs: Cache base_acl objects in inodes
+  vfs: Add get_richacl and set_richacl inode operations
+  vfs: Cache richacl in struct inode
+  richacl: Update the file masks in chmod()
+  richacl: Check if an acl is equivalent to a file mode
+  richacl: Create-time inheritance
+  richacl: Automatic Inheritance
+  richacl: xattr mapping functions
+  richacl: Add richacl xattr handler
+  vfs: Add richacl permission checking
+  vfs: Move check_posix_acl and check_richacl out of fs/namei.c
+
+Aneesh Kumar K.V (2):
+  ext4: Add richacl support
+  ext4: Add richacl feature flag
+
+ drivers/staging/lustre/lustre/llite/llite_lib.c |   2 +-
+ fs/9p/acl.c                                     |   8 +-
+ fs/Kconfig                                      |   3 +
+ fs/Makefile                                     |   1 +
+ fs/attr.c                                       |  81 +-
+ fs/ext4/Kconfig                                 |  11 +
+ fs/ext4/Makefile                                |   1 +
+ fs/ext4/ext4.h                                  |   6 +-
+ fs/ext4/file.c                                  |   3 +
+ fs/ext4/ialloc.c                                |  11 +-
+ fs/ext4/inode.c                                 |   5 +-
+ fs/ext4/namei.c                                 |   5 +
+ fs/ext4/richacl.c                               | 134 ++++
+ fs/ext4/richacl.h                               |  40 +
+ fs/ext4/super.c                                 |  49 +-
+ fs/ext4/xattr.c                                 |   7 +
+ fs/f2fs/acl.c                                   |   4 +-
+ fs/inode.c                                      |  43 +-
+ fs/jffs2/acl.c                                  |   6 +-
+ fs/namei.c                                      | 114 +--
+ fs/nfs/nfs3acl.c                                |  14 +-
+ fs/posix_acl.c                                  |  97 ++-
+ fs/richacl.c                                    | 937 ++++++++++++++++++++++++
+ fs/richacl_xattr.c                              | 222 ++++++
+ include/linux/acl.h                             |  15 +
+ include/linux/fs.h                              |  65 +-
+ include/linux/posix_acl.h                       |  24 +-
+ include/linux/richacl.h                         | 218 ++++++
+ include/linux/richacl_xattr.h                   |  31 +
+ include/uapi/linux/Kbuild                       |   2 +
+ include/uapi/linux/fs.h                         |   3 +-
+ include/uapi/linux/richacl.h                    | 152 ++++
+ include/uapi/linux/richacl_xattr.h              |  44 ++
+ include/uapi/linux/xattr.h                      |   2 +
+ 34 files changed, 2196 insertions(+), 164 deletions(-)
+ create mode 100644 fs/ext4/richacl.c
+ create mode 100644 fs/ext4/richacl.h
+ create mode 100644 fs/richacl.c
+ create mode 100644 fs/richacl_xattr.c
+ create mode 100644 include/linux/acl.h
+ create mode 100644 include/linux/richacl.h
+ create mode 100644 include/linux/richacl_xattr.h
+ create mode 100644 include/uapi/linux/richacl.h
+ create mode 100644 include/uapi/linux/richacl_xattr.h
+
+-- 
+2.5.5
+
+_______________________________________________
+xfs mailing list
+xfs@oss.sgi.com
+http://oss.sgi.com/mailman/listinfo/xfs
