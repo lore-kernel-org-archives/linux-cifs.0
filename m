@@ -1,56 +1,106 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS/SMB3 Fixes
-Date: Thu, 28 Jul 2016 20:43:18 -0500
-Message-ID: <CAH2r5mvN1Yrj7hHtdHYsV6gHZ5V1XgAjsjbohLUju+2Qs7wV7A@mail.gmail.com>
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] Making shares unaccessible at root level mountable
+ (aka solving bsc#8950 ...again)
+Date: Fri, 29 Jul 2016 14:11:04 +0100
+Message-ID: <1469797864.14723.15.camel@redhat.com>
+References: <20160527194346.08416d79@aaptelpc>
+	 <20160609185027.7349f260@aaptelpc> <5759C326.5040508@fu-berlin.de>
+	 <20160610171649.3e12b95c@aaptelpc>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: =?ISO-8859-1?Q?Aur=E9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>,
+	Marcus Hoffmann <marcus.hoffmann-j/7cz5qe3tpn68oJJulU0Q@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20160610171649.3e12b95c@aaptelpc>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Various CIFS/SMB3 fixes, most for stable
+On Fri, 2016-06-10 at 17:16 +0200, Aur=C3=A9lien Aptel wrote:
+> On Thu, 9 Jun 2016 21:27:34 +0200 Marcus Hoffmann
+> <marcus.hoffmann-j/7cz5qe3tpn68oJJulU0Q@public.gmane.org> wrote:
+> >=20
+> > Hey Aur=C3=A9lien,
+> > with your script I can reproduce the bug locally now.
+> Good.
+>=20
+> >=20
+> > I can mount the share (which is on a Windows 8.1 vm) with a Windows
+> > 7
+> > PC with the restricted user account. (Even in hard mode.)
+> > I can mount the share from Linux-cifs using the admin user but not
+> > the
+> > restricted user.
+> I've moved some things around. All of the prefix path components are
+> now checked for accessibility in cifs_do_mount(). This is more
+> robust and it lets us set the CIFS_MOUNT_USE_PREFIX_PATH flag
+> earlier.
+>=20
+> I've updated the cifs_root_iget() to use the prefix path when
+> necessary
+> which should take care of the last case (hard mode).
+>=20
+> Please test my latest patch (attached).
+>=20
+> >=20
+> > (I noticed though that no user has access to the file in the shared
+> > dir. But this doesn't really matter for the test.)
+> Indeed.
+>=20
 
-Please pull the following changes since commit
-92d21ac74a9e3c09b0b01c764e530657e4c85c49:
 
-  Linux 4.7-rc7 (2016-07-10 20:24:59 -0700)
+Hello,
 
-are available in the git repository at:
+Sorry for the late reply but this has to be a NACK from me.
 
-  git://git.samba.org/sfrench/cifs-2.6.git for-next
+We need to check for=C2=A0CIFS_MOUNT_USE_PREFIX_PATH
+and if set, check cifs_sb->prepath for both old and new
+in=C2=A0cifs_match_super().
 
-for you to fetch changes up to 7893242e2465aea6f2cbc2639da8fa5ce96e8cc2:
+Else we have the following bug:
 
-  CIFS: Fix a possible invalid memory access in smb2_query_symlink()
-(2016-07-27 22:55:56 -0500)
+Consider 2 different mounts on a server where root access is limited. I
+used the reproducer for this case but simply created a separate folder
+in the root directory to which the user has access. I then attempt to
+mount the 2 separate folders in 2 different locations.
 
-----------------------------------------------------------------
-Aurelien Aptel (1):
-      fs/cifs: make share unaccessible at root level mountable
+# mount -t cifs -vvv -o username=3Dwintest1,password=3Dxxx //vm140-
+52/test2/sub/dir /mnt
+# mount -t cifs -vvv -o username=3Dwintest1,password=3Dxxx //vm140-
+52/test2/sub2/ /mnt2
 
-Pavel Shilovsky (1):
-      CIFS: Fix a possible invalid memory access in smb2_query_symlink()
+# grep mnt /proc/mounts
+//vm140-52/test2/sub/dir /mnt cifs
+rw,relatime,vers=3D1.0,cache=3Dstrict,username=3Dwintest1,domain=3DENG1=
+,uid=3D0,n
+oforceuid,gid=3D0,noforcegid,addr=3D192.168.140.52,file_mode=3D0755,dir=
+_mode=3D
+0755,nounix,serverino,mapposix,rsize=3D61440,wsize=3D16580,echo_interva=
+l=3D60
+,actimeo=3D1 0 0
+//vm140-52/test2/sub2/ /mnt2 cifs
+rw,relatime,vers=3D1.0,cache=3Dstrict,username=3Dwintest1,domain=3DENG1=
+,uid=3D0,n
+oforceuid,gid=3D0,noforcegid,addr=3D192.168.140.52,file_mode=3D0755,dir=
+_mode=3D
+0755,nounix,serverino,mapposix,rsize=3D61440,wsize=3D16580,echo_interva=
+l=3D60
+,actimeo=3D1 0 0
 
-Rabin Vincent (2):
-      cifs: unbreak TCP session reuse
-      cifs: fix crash due to race in hmac(md5) handling
+but since we do not compare the prepath, we end up with the same share
+mounted at both mount points. This is the share mounted first.
 
-Sachin Prabhu (2):
-      Add MF-Symlinks support for SMB 2.0
-      cifs: Check for existing directory when opening file with O_CREAT
+To confirm.
 
- fs/cifs/cifs_fs_sb.h  |  4 ++++
- fs/cifs/cifsencrypt.c | 16 ++++++++++------
- fs/cifs/cifsfs.c      | 14 +++++++++++++-
- fs/cifs/connect.c     | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- fs/cifs/dir.c         | 44 +++++++++++++++++++++++++++++++++++++-----
- fs/cifs/inode.c       | 22 +++++++++++++++++++--
- fs/cifs/smb2ops.c     | 32 ++++++++++++++++++++++++++++++-
- 7 files changed, 169 insertions(+), 16 deletions(-)
+# date >/mnt/test
+# cat /mnt/test /mnt2/test
+=46ri 29 Jul 14:05:19 BST 2016
+=46ri 29 Jul 14:05:19 BST 2016
 
--- 
-Thanks,
+Steve,=C2=A0
 
-Steve
+Can you recall the earlier patch or should I write a fix for this?
+
+Sachin Prabhu
