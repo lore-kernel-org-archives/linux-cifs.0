@@ -1,116 +1,51 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: nfs/cifs mountinfo differences (was: Re: [PATCH] libmount: Skip
- root comparison for cifs in mnt_table_is_fs_mounted())
-Date: Wed, 3 Aug 2016 15:32:20 -0500
-Message-ID: <CAH2r5mtV0YkWUypcOAeA9rVGMjKkBqBGdY2ht1hyXPG3JRWRiA@mail.gmail.com>
-References: <91d465d3-4f5b-6270-a6c5-38bd94695731@suse.cz> <5eb96b3e-d463-bf11-49de-f614247d6b29@suse.cz>
+Subject: Re: [PATCH 0/3] bug fixes and code cleanups for inaccessible root patch
+Date: Wed, 3 Aug 2016 16:54:55 -0500
+Message-ID: <CAH2r5msU-2EurcP-N_Fq6VMY=RTTMcpaqAbooR6+P_AiPOrJag@mail.gmail.com>
+References: <1469828301-9937-1-git-send-email-sprabhu@redhat.com> <20160803152555.35db9a78@aaptelpc>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8BIT
-To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <5eb96b3e-d463-bf11-49de-f614247d6b29-AlSwsSmVLrQ@public.gmane.org>
+In-Reply-To: <20160803152555.35db9a78@aaptelpc>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-patch looks reasonable to me.
+merged into cifs-2.6.git for-next
 
-On Wed, Aug 3, 2016 at 12:23 PM, Stanislav Brabec <sbrabec-AlSwsSmVLrQ@public.gmane.org> wrote:
-> Stanislav Brabec wrote:
+On Wed, Aug 3, 2016 at 8:25 AM, Aurélien Aptel <aaptel-IBi9RG/b67k@public.gmane.org> wrote:
+> On Fri, 29 Jul 2016 22:38:18 +0100 Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> wrote:
+>> The fix for unaccessible root with summary
+>> "fs/cifs: make share unaccessible at root level mountable"
+>> introduces a few bugs. This series of patches cleans up some parts of
+>> the code and also fixes a couple of bugs seen in the patch.
 >>
->> In mountinfo of cifs filesystem, root is filled with a relative path to
->> the root
->> of the exported volume. There is no reasonable way to compare it without
->> making
->> a network look-up.
->
->
-> This is an original problem of "mount -a", see How to reproduce below.
->
->> This causes false negative result in some cases.
+>> Sachin Prabhu (3):
+>>   Fix memory leaks in cifs_do_mount()
+>>   Compare prepaths when comparing superblocks
+>>   Move check for prefix path to within cifs_get_root()
 >>
->> Skipping root comparison in mnt_table_is_fs_mounted() makes things better,
->> however it still does not cover all possible setups.
->
->
-> I just compared behavior of cifs and nfs4 in this situation.
->
-> cifs and nfs4 provide different mountinfo. So maybe it is more an
-> inconsistency of procinfo root entry than problem of mount.
->
-> Sending mail also to linux-cifs to get an opinion.
->
-> When mounting subdirectory of exported nfs4 volume, 4th record (root)
-> remains "/".
->
-> When mounting subdirectory of exported cifs volume, 4th record (root) is the
-> "/subdir", and 9th record (source) contains fill path
-> "//server/volume/subdir".
->
-> And for comparison, when bind mounting cifs subdirectory out of volume
-> mount, 4th record is "/subdir" as well, but the string in 9th record
-> (source) does not contain trailing "/subdir", just "//server/volume".
->
-> And for completness, when bind mounting subdirectory of a btrfs subvolume,
-> 4th record (root) contains full path to the subdirectory relative to the
-> volume root (i. e. including subvolume path). Content of 9th record (source)
-> is not relevant for comparison, as it contains /dev/sd* node.
->
->> How to reproduce:
->> 1) Create and export a cifs volume (with guest allowed).
->> 2) Make a subdirectory in this volume.
->> 3) Mount this subdirectory using fstab:
->>    //server/volume/subdir /mnt cifs guest 0 0
->> 4) Call mount -a twice.
->>    Depending on a system running, you either get:
->>      mount error(16): Device or resource busy
->>      Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
->>    or you get a volume mounted twice.
+>>  fs/cifs/cifsfs.c    | 29 ++++++++++++-----------------
+>>  fs/cifs/cifsproto.h |  2 +-
+>>  fs/cifs/connect.c   | 31 +++++++++++++++++++++++++++++--
+>>  3 files changed, 42 insertions(+), 20 deletions(-)
 >>
->> Signed-off-by: Stanislav Brabec <sbrabec-AlSwsSmVLrQ@public.gmane.org>
->> ---
 >
+> I've tested it, I can confirm it works as the original patch intended.
 >
-> Here is the proposed patch for util-linux:
->
->>  libmount/src/tab.c | 5 ++++-
->>  1 file changed, 4 insertions(+), 1 deletion(-)
->>
->> diff --git a/libmount/src/tab.c b/libmount/src/tab.c
->> index 155c65e..aa9185a 100644
->> --- a/libmount/src/tab.c
->> +++ b/libmount/src/tab.c
->> @@ -1562,7 +1562,10 @@ int mnt_table_is_fs_mounted(struct libmnt_table
->> *tb, struct libmnt_fs *fstab_fs)
->>  #endif
->>                 }
->>
->> -               if (root) {
->> +               /* For cifs, root contains a relative path to the exported
->> volume,
->> +                * i. e. something we cannot compare.
->> +                */
->> +               if (root && strcmp(mnt_fs_get_fstype(fs), "cifs")) {
->>                         const char *r = mnt_fs_get_root(fs);
->>                         if (!r || strcmp(r, root) != 0)
->>                                 continue;
->>
+> Tested-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
 >
 > --
-> Best Regards / S pozdravem,
->
-> Stanislav Brabec
-> software developer
-> ---------------------------------------------------------------------
-> SUSE LINUX, s. r. o.                         e-mail: sbrabec-IBi9RG/b67k@public.gmane.org
-> Křižíkova 148/34 (Corso IIa)                  tel: +49 911 7405384547
-> 186 00 Praha 8-Karlín                          fax:  +420 284 084 001
-> Czech Republic                                    http://www.suse.cz/
-> PGP: 830B 40D5 9E05 35D8 5E27 6FA3 717C 209F A04F CD76
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Aurélien Aptel / SUSE Labs Samba Team
+> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+> SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
+> GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG
+> Nürnberg)
 
 
 
