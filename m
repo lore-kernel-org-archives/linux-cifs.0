@@ -1,74 +1,99 @@
-From: =?UTF-8?B?QXVyw6lsaWVu?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: Re: [PATCH 0/3] bug fixes and code cleanups for inaccessible root
- patch
-Date: Wed, 3 Aug 2016 15:25:55 +0200
-Message-ID: <20160803152555.35db9a78@aaptelpc>
-References: <1469828301-9937-1-git-send-email-sprabhu@redhat.com>
+From: Stanislav Brabec <sbrabec-AlSwsSmVLrQ@public.gmane.org>
+Subject: nfs/cifs mountinfo differences (was: Re: [PATCH] libmount: Skip root
+ comparison for cifs in mnt_table_is_fs_mounted())
+Date: Wed, 3 Aug 2016 19:23:06 +0200
+Message-ID: <5eb96b3e-d463-bf11-49de-f614247d6b29@suse.cz>
+References: <91d465d3-4f5b-6270-a6c5-38bd94695731@suse.cz>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- boundary="Sig_/yJIM5824q_XHVk6ixbPZGFJ"; protocol="application/pgp-signature"
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=iso-8859-2; format=flowed
+Content-Transfer-Encoding: 8bit
+To: util-linux <util-linux-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1469828301-9937-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <91d465d3-4f5b-6270-a6c5-38bd94695731-AlSwsSmVLrQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
---Sig_/yJIM5824q_XHVk6ixbPZGFJ
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Stanislav Brabec wrote:
+> In mountinfo of cifs filesystem, root is filled with a relative path to the root
+> of the exported volume. There is no reasonable way to compare it without making
+> a network look-up.
 
-On Fri, 29 Jul 2016 22:38:18 +0100 Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-wrote:
-> The fix for unaccessible root with summary
-> "fs/cifs: make share unaccessible at root level mountable"
-> introduces a few bugs. This series of patches cleans up some parts of
-> the code and also fixes a couple of bugs seen in the patch.
->=20
-> Sachin Prabhu (3):
->   Fix memory leaks in cifs_do_mount()
->   Compare prepaths when comparing superblocks
->   Move check for prefix path to within cifs_get_root()
->=20
->  fs/cifs/cifsfs.c    | 29 ++++++++++++-----------------
->  fs/cifs/cifsproto.h |  2 +-
->  fs/cifs/connect.c   | 31 +++++++++++++++++++++++++++++--
->  3 files changed, 42 insertions(+), 20 deletions(-)
->=20
+This is an original problem of "mount -a", see How to reproduce below.
 
-I've tested it, I can confirm it works as the original patch intended.
+> This causes false negative result in some cases.
+>
+> Skipping root comparison in mnt_table_is_fs_mounted() makes things better,
+> however it still does not cover all possible setups.
 
-Tested-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+I just compared behavior of cifs and nfs4 in this situation.
 
---=20
-Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Linux GmbH, Maxfeldstra=C3=9Fe 5, 90409 N=C3=BCrnberg, Germany
-GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton, HRB 21284 (AG
-N=C3=BCrnberg)
+cifs and nfs4 provide different mountinfo. So maybe it is more an 
+inconsistency of procinfo root entry than problem of mount.
 
---Sig_/yJIM5824q_XHVk6ixbPZGFJ
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Sending mail also to linux-cifs to get an opinion.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+When mounting subdirectory of exported nfs4 volume, 4th record (root) 
+remains "/".
 
-iQIcBAEBAgAGBQJXofDtAAoJEDIGO5Hchq/8EhUP/0rL8TyjB31gP6OXZ5My430N
-x/3DYyL9Y3txtbpYh6OJljQSMSZosANXRA4mw3yDaXspvYcn7o8y8uoJx2xR+yAF
-mvf6f3m9wB7K/4CMXAUrPg400k1WyScSIHBj4gp6V1JiU9jqE1xNIxLI3YQIhOIb
-cQuWd7CEsPIH1po2ehAPTUn7OWVy4DzJISIx9bLSCQLqHb7bwxOX+IJ9Ag2zrUdL
-HT5WkAkwyyLoO3CUwVQUlakWhJ0orA8O8B6/uatq5bEtZRJWLcSPAPCSHocuJ868
-fhMczQHd1P1lfNiE918o5dj0RSr1SRJTbyIhW03jNszf+dBGUyopmXBtt6f7X/e1
-lbxcoSBIm6dgPXII2TxLHVOq33m7Ut6C8hWIn+3lXwwJ5p49vyg3/an83089j7fs
-kmu2nvVwz35sI3pm7R6fG8Y+jsOAcsQjTmJx+D5CT5w9GlJMetzN7wT8u4Izo7ZJ
-DrZq4xtXj50u+UewvEeilnVIacGWFc8EJOUn+Dmksop2BFjtkO/gw1ks+1SSfIA6
-jVMymVch2fLmfR7/lsWYjkeOKNNFgemTcs+PCkvqDZNcxggVYEi+e6y07YrzUiz8
-f7+6kXnmn+tlJcu3H6WWeC9rLZOE43eUr/dgoM3x5args0A5MHvC3bMlT6N/YGBm
-U6907VN+GOtnQgei7yl+
-=MgyK
------END PGP SIGNATURE-----
+When mounting subdirectory of exported cifs volume, 4th record (root) is 
+the "/subdir", and 9th record (source) contains fill path 
+"//server/volume/subdir".
 
---Sig_/yJIM5824q_XHVk6ixbPZGFJ--
+And for comparison, when bind mounting cifs subdirectory out of volume 
+mount, 4th record is "/subdir" as well, but the string in 9th record 
+(source) does not contain trailing "/subdir", just "//server/volume".
+
+And for completness, when bind mounting subdirectory of a btrfs 
+subvolume, 4th record (root) contains full path to the subdirectory 
+relative to the volume root (i. e. including subvolume path). Content of 
+9th record (source) is not relevant for comparison, as it contains 
+/dev/sd* node.
+
+> How to reproduce:
+> 1) Create and export a cifs volume (with guest allowed).
+> 2) Make a subdirectory in this volume.
+> 3) Mount this subdirectory using fstab:
+>    //server/volume/subdir /mnt cifs guest 0 0
+> 4) Call mount -a twice.
+>    Depending on a system running, you either get:
+>      mount error(16): Device or resource busy
+>      Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
+>    or you get a volume mounted twice.
+>
+> Signed-off-by: Stanislav Brabec <sbrabec-AlSwsSmVLrQ@public.gmane.org>
+> ---
+
+Here is the proposed patch for util-linux:
+
+>  libmount/src/tab.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/libmount/src/tab.c b/libmount/src/tab.c
+> index 155c65e..aa9185a 100644
+> --- a/libmount/src/tab.c
+> +++ b/libmount/src/tab.c
+> @@ -1562,7 +1562,10 @@ int mnt_table_is_fs_mounted(struct libmnt_table *tb, struct libmnt_fs *fstab_fs)
+>  #endif
+>  		}
+>
+> -		if (root) {
+> +		/* For cifs, root contains a relative path to the exported volume,
+> +		 * i. e. something we cannot compare.
+> +		 */
+> +		if (root && strcmp(mnt_fs_get_fstype(fs), "cifs")) {
+>  			const char *r = mnt_fs_get_root(fs);
+>  			if (!r || strcmp(r, root) != 0)
+>  				continue;
+>
+
+-- 
+Best Regards / S pozdravem,
+
+Stanislav Brabec
+software developer
+---------------------------------------------------------------------
+SUSE LINUX, s. r. o.                         e-mail: sbrabec-IBi9RG/b67k@public.gmane.org
+Køi¾íkova 148/34 (Corso IIa)                  tel: +49 911 7405384547
+186 00 Praha 8-Karlín                          fax:  +420 284 084 001
+Czech Republic                                    http://www.suse.cz/
+PGP: 830B 40D5 9E05 35D8 5E27 6FA3 717C 209F A04F CD76
