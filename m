@@ -1,66 +1,130 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: filenames with special chars and posix path caps enabled - regression?
-Date: Mon, 15 Aug 2016 10:48:56 -0500
-Message-ID: <CAH2r5mtj0VBQkTrS5OQ5N5m5n7gjt_ottCShadtxR8tb-_JbqQ@mail.gmail.com>
-References: <20160720164341.1c3a518b@alice.paese.meraviglie>
- <CAH2r5mtR5u+3XtGPcL8MrXgQanB6YjCHDA9PmOo2w+sJgvpdJg@mail.gmail.com>
- <20160720173448.6d079f3c@alice.paese.meraviglie> <20160815104301.7d3ac8c9@alice.paese.meraviglie>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: a.biardi-IWqWACnzNjyonA0d6jMUrA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20160815104301.7d3ac8c9-73YhDmpz84Aw+Ft/lRvqTukuxxdDoHgO@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Andreas Gruenbacher <agruenba@redhat.com>
+Subject: [PATCH v25 00/22] Richacls (Core and Ext4)
+Date: Tue, 16 Aug 2016 13:02:41 +0200
+Message-ID: <1471345383-15334-1-git-send-email-agruenba@redhat.com>
+Cc: Andreas Gruenbacher <agruenba@redhat.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	"Theodore Ts'o" <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	"J. Bruce Fields" <bfields@fieldses.org>,
+	Jeff Layton <jlayton@poochiereds.net>,
+	Trond Myklebust <trond.myklebust@primarydata.com>,
+	Anna Schumaker <anna.schumaker@netapp.com>,
+	Dave Chinner <david@fromorbit.com>, linux-ext4@vger.kernel.org,
+	xfs@oss.sgi.com, linux-kernel@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-api@vger.kernel.org
+To: Alexander Viro <viro@zeniv.linux.org.uk>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-The issue seems to be that the mount options are different between the
-two.   Quick summary:
+Here is another update of the richacl patches.  Changes since the last posting
+(https://lwn.net/Articles/695289/):
 
-CIFS Unix/POSIX Extensions (which Samba and the Linux kernel support)
-includes support for all valid posix characters in path names
-(including those which Windows considers reserved ":"  and "\" and "?"
-and "*" for example).
-
-When mounting with newer dialects (vers=2.1 or vers=3 to get SMB2.1 or
-SMB3 support for example), or when mounting with CIFS to servers like
-Windows, the protocol dialect does not support these reserved
-characters, so by default we mount with posixpath mapping enabled to
-support mapping (posixpaths) of reserved characters to the SFM
-reserved range (same as Windows Services for Mac and the Mac itself
-does).  The result is that you can create and read the filenames
-remotely and they look fine but on the Samba server itself the
-reserved character will look strange since it is remapped.
-
-You could turn off posixpaths on mount (noposixpaths) on your cifs
-mount to see if this fixes it, but the key will be looking at the
-mount options that were passed in to the kernel so we can see if you
-are mounting with posixpath mapping (which would force posixpaths to
-be mapped even though the server would have supported them without
-mapping)
-
-On Mon, Aug 15, 2016 at 4:43 AM,  <a.biardi-IWqWACnzNjyonA0d6jMUrA@public.gmane.org> wrote:
->
-> On Wed, 20 Jul 2016 17:34:48 +0100, <a.biardi-IWqWACnzNjyonA0d6jMUrA@public.gmane.org> wrote:
->
->> Thanks for the quick response; on 4.0.9 I get:
->>
->> root@darkstar:~# grep cifs /proc/mounts
->> //localhost/shared /mnt cifs
->> rw,relatime,vers=1.0,cache=strict,username=user,domain=MYSERVER,uid=0,noforceuid,gid=0,noforcegid,addr=127.0.0.1,unix,posixpaths,serverino,acl,rsize=1048576,wsize=65536,actimeo=1
->> 0 0
->>
->> [...]
->
-> Resurrecting this thread from a few weeks ago.. I'm happy to start
-> working on a patch if somebody can confirm this is indeed a regression,
-> and perhaps points me in the right direction?
->
-> Andrea.
+ * Rebase on top of the 4.8-rc2 kernel.
 
 
+As always, the complete patch queue is available here:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/agruen/linux-richacl.git \
+        richacl-2016-08-16
+
+
+The richacl user-space utilitites, man pages, and test suite are available
+here:
+
+  https://github.com/andreas-gruenbacher/richacl
+
+
+Changes to other user-space packages for richacl:
+
+  https://github.com/andreas-gruenbacher/coreutils
+  https://github.com/andreas-gruenbacher/e2fsprogs
+  https://github.com/andreas-gruenbacher/samba
+  https://github.com/andreas-gruenbacher/xfsprogs-dev
+  https://github.com/andreas-gruenbacher/nfs-utils
+
+
+Please see the richacl homepage for more information:
+
+  http://www.bestbits.at/richacl/
+
+
+Thanks,
+Andreas
+
+
+Andreas Gruenbacher (20):
+  vfs: Add IS_ACL() and IS_RICHACL() tests
+  vfs: Add MAY_CREATE_FILE and MAY_CREATE_DIR permission flags
+  vfs: Add MAY_DELETE_SELF and MAY_DELETE_CHILD permission flags
+  vfs: Make the inode passed to inode_change_ok non-const
+  vfs: Add permission flags for setting file attributes
+  richacl: In-memory representation and helper functions
+  richacl: Permission mapping functions
+  richacl: Permission check algorithm
+  richacl: Compute maximum file masks from an acl
+  vfs: Cache base_acl objects in inodes
+  vfs: Add get_richacl and set_richacl inode operations
+  vfs: Cache richacl in struct inode
+  richacl: Update the file masks in chmod()
+  richacl: Check if an acl is equivalent to a file mode
+  richacl: Create-time inheritance
+  richacl: Automatic Inheritance
+  richacl: xattr mapping functions
+  richacl: Add richacl xattr handler
+  vfs: Add richacl permission checking
+  vfs: Move check_posix_acl and check_richacl out of fs/namei.c
+
+Aneesh Kumar K.V (2):
+  ext4: Add richacl support
+  ext4: Add richacl feature flag
+
+ drivers/staging/lustre/lustre/llite/llite_lib.c |   2 +-
+ fs/9p/acl.c                                     |   8 +-
+ fs/Kconfig                                      |   3 +
+ fs/Makefile                                     |   1 +
+ fs/attr.c                                       |  81 +-
+ fs/ext4/Kconfig                                 |  11 +
+ fs/ext4/Makefile                                |   1 +
+ fs/ext4/ext4.h                                  |   6 +-
+ fs/ext4/file.c                                  |   3 +
+ fs/ext4/ialloc.c                                |  11 +-
+ fs/ext4/inode.c                                 |   5 +-
+ fs/ext4/namei.c                                 |   5 +
+ fs/ext4/richacl.c                               | 134 ++++
+ fs/ext4/richacl.h                               |  40 +
+ fs/ext4/super.c                                 |  49 +-
+ fs/ext4/xattr.c                                 |   7 +
+ fs/f2fs/acl.c                                   |   4 +-
+ fs/inode.c                                      |  43 +-
+ fs/jffs2/acl.c                                  |   6 +-
+ fs/namei.c                                      | 114 +--
+ fs/nfs/nfs3acl.c                                |  14 +-
+ fs/posix_acl.c                                  |  97 ++-
+ fs/richacl.c                                    | 937 ++++++++++++++++++++++++
+ fs/richacl_xattr.c                              | 222 ++++++
+ include/linux/acl.h                             |  15 +
+ include/linux/fs.h                              |  65 +-
+ include/linux/posix_acl.h                       |  24 +-
+ include/linux/richacl.h                         | 218 ++++++
+ include/linux/richacl_xattr.h                   |  31 +
+ include/uapi/linux/Kbuild                       |   2 +
+ include/uapi/linux/fs.h                         |   3 +-
+ include/uapi/linux/richacl.h                    | 152 ++++
+ include/uapi/linux/richacl_xattr.h              |  44 ++
+ include/uapi/linux/xattr.h                      |   2 +
+ 34 files changed, 2197 insertions(+), 163 deletions(-)
+ create mode 100644 fs/ext4/richacl.c
+ create mode 100644 fs/ext4/richacl.h
+ create mode 100644 fs/richacl.c
+ create mode 100644 fs/richacl_xattr.c
+ create mode 100644 include/linux/acl.h
+ create mode 100644 include/linux/richacl.h
+ create mode 100644 include/linux/richacl_xattr.h
+ create mode 100644 include/uapi/linux/richacl.h
+ create mode 100644 include/uapi/linux/richacl_xattr.h
 
 -- 
-Thanks,
-
-Steve
+2.7.4
