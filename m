@@ -1,209 +1,168 @@
-From: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] Fix default behaviour for empty domains and add
- domainauto option
-Date: Fri, 16 Dec 2016 15:06:20 +0000
-Message-ID: <d7af3f88-6af4-e4a4-1b69-a6048a0e9b6f@citrix.com>
-References: <1480022439-27875-2-git-send-email-germano.percossi@citrix.com>
- <CAKywueQ3UcOj3iFue4nh8EJTyeGc2-wHqr1_1qfU_T5rCkfSUg@mail.gmail.com>
- <CAH2r5ms2SUkzOda7xVXFStKBGMvt7J5V+P1vVQOzafbwfMAwQQ@mail.gmail.com>
+From: "mivkupdo" <qq-xLwUJRzA8bgEVd8bySq3Wg@public.gmane.org>
+Subject: =?utf-8?B?VE86MDc1Ny04ODM4MjEzOC0zMzU=?=
+        =?utf-8?B?a3hmIOKYhTPmnIgxNC0xNuaXpeKYheOAkEpFQ+S4lueVjA==?=
+        =?utf-8?B?5aSN5ZCI5p2Q5paZ5bGV6KeI5Y+K5Lya6K6u44CRICDvvIhHeWQzL0wt?=
+        =?utf-8?B?bUXvvIkg?=
+Date: Thu, 18 Aug 2016 08:18:18 +0800
+Message-ID: <20161220180553303438@cpd.com.cn>
+Reply-To: <EmailQunFa-9Onoh4P/yGk@public.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain;
+        charset="utf-8"
+Content-Transfer-Encoding: base64
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5ms2SUkzOda7xVXFStKBGMvt7J5V+P1vVQOzafbwfMAwQQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Thank you guys.
-
-It was a silly patch but most of the work was about understanding
-what is the right default.
-
-I was going to give more details on this because we had an internal
-discussion about what is the expected behaviour for XenServer,
-so I continued my comparisons with different servers, different
-protocol versions, different authentication mechanism.
-
-I'm glad you are OK with that so I don't have to bother you with
-other details.
-
-As promised, I will update the documentation for mount.cifs accordingly.
-
-Let me know if you want the module documentation updated, too.
-
-Regards,
-Germano
-
-On 12/15/2016 06:35 AM, Steve French wrote:
-> merged into cifs-2.6.git
-> 
-> Germano,
-> Thanks for the research into this
-> 
-> On Wed, Dec 14, 2016 at 2:10 PM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> 2016-11-24 13:20 GMT-08:00 Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>:
->>> With commit 2b149f119 many things have been fixed/introduced.
->>> However, the default behaviour for RawNTLMSSP authentication
->>> seems to be wrong in case the domain is not passed on the command line.
->>>
->>> The main points (see below) of the patch are:
->>>  - It alignes behaviour with Windows clients
->>>  - It fixes backward compatibility
->>>  - It fixes UPN
->>>
->>> I compared this behavour with the one from a Windows 10 command line
->>> client. When no domains are specified on the command line, I traced
->>> the packets and observed that the client does send an empty
->>> domain to the server.
->>> In the linux kernel case, the empty domain is replaced by the
->>> primary domain communicated by the SMB server.
->>> This means that, if the credentials are valid against the local server
->>> but that server is part of a domain, then the kernel module will
->>> ask to authenticate against that domain and we will get LOGON failure.
->>>
->>> I compared the packet trace from the smbclient when no domain is passed
->>> and, in that case, a default domain from the client smb.conf is taken.
->>> Apparently, connection succeeds anyway, because when the domain passed
->>> is not valid (in my case WORKGROUP), then the local one is tried and
->>> authentication succeeds. I tried with any kind of invalid domain and
->>> the result was always a connection.
->>>
->>> So, trying to interpret what to do and picking a valid domain if none
->>> is passed, seems the wrong thing to do.
->>> To this end, a new option "domainauto" has been added in case the
->>> user wants a mechanism for guessing.
->>>
->>> Without this patch, backward compatibility also is broken.
->>> With kernel 3.10, the default auth mechanism was NTLM.
->>> One of our testing servers accepted NTLM and, because no
->>> domains are passed, authentication was local.
->>>
->>> Moving to RawNTLMSSP forced us to change our command line
->>> to add a fake domain to pass to prevent this mechanism to kick in.
->>>
->>> For the same reasons, UPN is broken because the domain is specified
->>> in the username.
->>> The SMB server will work out the domain from the UPN and authenticate
->>> against the right server.
->>> Without the patch, though, given the domain is empty, it gets replaced
->>> with another domain that could be the wrong one for the authentication.
->>>
->>> Signed-off-by: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
->>> ---
->>>  fs/cifs/cifsencrypt.c | 14 +++++++++-----
->>>  fs/cifs/cifsglob.h    |  2 ++
->>>  fs/cifs/connect.c     |  7 +++++++
->>>  3 files changed, 18 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
->>> index 5eb0412..66bd7fa 100644
->>> --- a/fs/cifs/cifsencrypt.c
->>> +++ b/fs/cifs/cifsencrypt.c
->>> @@ -699,11 +699,15 @@ static int crypto_hmacmd5_alloc(struct TCP_Server_Info *server)
->>>
->>>         if (ses->server->negflavor == CIFS_NEGFLAVOR_EXTENDED) {
->>>                 if (!ses->domainName) {
->>> -                       rc = find_domain_name(ses, nls_cp);
->>> -                       if (rc) {
->>> -                               cifs_dbg(VFS, "error %d finding domain name\n",
->>> -                                        rc);
->>> -                               goto setup_ntlmv2_rsp_ret;
->>> +                       if (ses->domainAuto) {
->>> +                               rc = find_domain_name(ses, nls_cp);
->>> +                               if (rc) {
->>> +                                       cifs_dbg(VFS, "error %d finding domain name\n",
->>> +                                                rc);
->>> +                                       goto setup_ntlmv2_rsp_ret;
->>> +                               }
->>> +                       } else {
->>> +                               ses->domainName = kstrdup("", GFP_KERNEL);
->>>                         }
->>>                 }
->>>         } else {
->>> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
->>> index 1f17f6b..4f0d5a1 100644
->>> --- a/fs/cifs/cifsglob.h
->>> +++ b/fs/cifs/cifsglob.h
->>> @@ -514,6 +514,7 @@ struct smb_vol {
->>>         bool persistent:1;
->>>         bool nopersistent:1;
->>>         bool resilient:1; /* noresilient not required since not fored for CA */
->>> +       bool domainauto:1;
->>>         unsigned int rsize;
->>>         unsigned int wsize;
->>>         bool sockopt_tcp_nodelay:1;
->>> @@ -827,6 +828,7 @@ struct cifs_ses {
->>>         enum securityEnum sectype; /* what security flavor was specified? */
->>>         bool sign;              /* is signing required? */
->>>         bool need_reconnect:1; /* connection reset, uid now invalid */
->>> +       bool domainAuto:1;
->>>  #ifdef CONFIG_CIFS_SMB2
->>>         __u16 session_flags;
->>>         __u8 smb3signingkey[SMB3_SIGN_KEY_SIZE];
->>> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
->>> index 4547aed..df7eed7 100644
->>> --- a/fs/cifs/connect.c
->>> +++ b/fs/cifs/connect.c
->>> @@ -88,6 +88,7 @@ enum {
->>>         Opt_multiuser, Opt_sloppy, Opt_nosharesock,
->>>         Opt_persistent, Opt_nopersistent,
->>>         Opt_resilient, Opt_noresilient,
->>> +       Opt_domainauto,
->>>
->>>         /* Mount options which take numeric value */
->>>         Opt_backupuid, Opt_backupgid, Opt_uid,
->>> @@ -176,6 +177,7 @@ enum {
->>>         { Opt_nopersistent, "nopersistenthandles"},
->>>         { Opt_resilient, "resilienthandles"},
->>>         { Opt_noresilient, "noresilienthandles"},
->>> +       { Opt_domainauto, "domainauto"},
->>>
->>>         { Opt_backupuid, "backupuid=%s" },
->>>         { Opt_backupgid, "backupgid=%s" },
->>> @@ -1499,6 +1501,9 @@ static int cifs_parse_security_flavors(char *value,
->>>                 case Opt_noresilient:
->>>                         vol->resilient = false; /* already the default */
->>>                         break;
->>> +               case Opt_domainauto:
->>> +                       vol->domainauto = true;
->>> +                       break;
->>>
->>>                 /* Numeric Values */
->>>                 case Opt_backupuid:
->>> @@ -2548,6 +2553,8 @@ static int match_session(struct cifs_ses *ses, struct smb_vol *vol)
->>>                 if (!ses->domainName)
->>>                         goto get_ses_fail;
->>>         }
->>> +       if (volume_info->domainauto)
->>> +               ses->domainAuto = volume_info->domainauto;
->>>         ses->cred_uid = volume_info->cred_uid;
->>>         ses->linux_uid = volume_info->linux_uid;
->>>
->>> --
->>> 1.9.1
->>>
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->> Looks right to me.
->>
->> Acked-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
->>
->> --
->> Best regards,
->> Pavel Shilovsky
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> 
-> 
+MDc1Ny04ODM4MjEzOC0zMzVreGYg4oCU4oCUIOWHreatpOmCruS7tuS8mOaDoDEwMDDlhYMv5YWs
+5Y+477yM6ZyA5Zue5L+h5LiT55So5o6l5pS26YKu566x4oCcMTI4MDkzOTVAcXEuY29t4oCd5oql
+5ZCN5Y+C5bGV772eDQrjgIDjgIANCuOAgOOAgA0KSkVDIHdvcmxkIENvbXBvc2l0ZXMgU2hvdyAm
+IENvbmZlcmVuY2VzIDIwMTcNCjIwMTfnrKw1MuWxikpFQ+S4lueVjOWkjeWQiOadkOaWmeWxlein
+iOWPiuS8muiurg0K44CA44CADQrigJTigJQg5Y+C5YqgSkVD5bGV5Lya5piv5LiA5Liq5aSN5ZCI
+5p2Q5paZ5Y+K5paw5p2Q5paZ5LyB5Lia6LWw5ZCR5Zu96ZmF5YyW55qE5qCH5b+X5ZKM6YCU5b6E
+DQrjgIDjgIANCuOAkOS4reaWh+WQjeensOOAkSAyMDE356ysNTLlsYrkuJbnlYxKRUPlpI3lkIjm
+nZDmlpnlsZXop4jlj4rkvJrorq7vvIjms5Xlm73lt7Tpu47vvIkNCuOAkOiLseaWh+WQjeensOOA
+kSBUaGUgNTJ0aCBKRUMgQ29tcG9zaXRlcyBTaG93ICYgQ29uZmVyZW5jZXMgMjAxNyBpbiBQYXJp
+cyBGcmFuY2Ug77yISkVDIHdvcmxkIDIwMTfvvIkNCuOAgOOAgA0K44CQ5bGV5Lya5pe26Ze044CR
+IDIwMTflubQwM+aciDE0LTE25pelDQrjgJDlsZXkvJrlnLDngrnjgJEg5rOV5Zu95be06buO5YyX
+57u05YuS54+t5bGV6KeI5Lit5b+DIO+8iFBhcmlzIE5vcmQgVmlsbGVwaW50ZSBFeGhpYml0aW9u
+IENlbnRlcu+8iQ0K44CA44CADQrjgJDlsZXkvJrlkajmnJ/jgJEg5LiA5bm05LiA5bGKIO+8iOac
+rOW5tOW6puS4uuesrDUy5bGK77yJDQrjgJDmiqXlkI3miKrmraLjgJEgMjAxNuW5tDEy5pyIMzDm
+l6UNCuOAgOOAgA0K44CQ5Li75Yqe5Y2V5L2N44CRIOazleWbvUpFQ+WkjeWQiOadkOaWmeWPkeWx
+leS/g+i/m+S8muOAgeazleWbvUpFQ+mbhuWbog0K44CQ57uE5Yqe5Y2V5L2N44CRIOS4reWbveWb
+vemZheWkjeWQiOadkOaWmeWNj+S8muOAgSDmmKDlvrflm73pmYXkvJrlsZXpm4blm6LkuK3lm73k
+u6PooajlpITjgIEg6aao5b635Lya5bGV5Lqn5Lia566h55CG5pyJ6ZmQ5YWs5Y+4DQrjgIDjgIAN
+CuOAkOWcqOe6v+WuouacjeOAkSDpgq7nrrEvIDEyODA5Mzk1I3FxLmNvbe+8myBRUS8gODI3NzU1
+MDfvvJsg5b6u5L+hLyB5b25kZXhwb++8myDlvq7ljZovIGh0dHA6Ly93ZWliby5jb20vamVjc2hv
+dyANCuOAkOWSqOivoueUteivneOAkSA0MDAwLTU4MC04NTDvvIjovaw4MTQ044CBNTIyMO+8ie+8
+myAxMzktMTAzMS04MTQ077ybIDAxMOKAlDg2OTktNzE1Ne+8mw0K44CA44CADQrjgIDjgIANCuOA
+kOW4guWcuuacuumBh+OAkQ0K44CA44CA5paw5p2Q5paZ5Li6MjHkuJbnuqrkuInlpKflhbHmgKfl
+hbPplK7mioDmnK/kuYvkuIDvvIzlt7LmiJDkuLrlhajnkIPnu4/mtY7ov4XpgJ/lop7plb/nmoTm
+upDliqjlipvlkozmj5DljYfmoLjlv4Pnq57kuonlipvnmoTmiJjnlaXnhKbngrnjgIINCuOAgOOA
+gOadkOaWmeS9nOS4uuWItumAoOS4mueahOWfuuehgO+8jOeJueWIq+aYr+aWsOadkOaWmeeglOep
+tuWSjOS6p+S4muWPkeWxleeahOawtOW5s+S4juinhOaooe+8jOW3sue7j+aIkOS4uuihoemHj+S4
+gOS4quWbveWutuenkeaKgOi/m+atpeWSjOe7vOWQiOWunuWKm+eahOmHjeimgeagh+W/l+OAgg0K
+44CA44CA5Zyo5paw5p2Q5paZ5Y+R5bGV5LiO5bqU55So5Lit77yM5aSN5ZCI5p2Q5paZ5Y2g5pyJ
+55u45b2T6YeN6KaB55qE5Zyw5L2N77yM54m55Yir5bm/5rOb55qE5bqU55So5Zyo5rG96L2m44CB
+5Lqk6YCa44CB6aOO6IO944CB6Iiq56m644CB6Iiq5aSp44CB5YW15Zmo44CB6Ii56Ii244CB5Zu9
+6Ziy44CB5py65qKw44CB55S15a2Q44CB5YyW5bel44CB5bu6562R44CB5Yac5Lia44CB5riU5Lia
+44CB57q657uH44CB6L+Q5Yqo5Zmo5p2Q562J6aKG5Z+f77yM5LiA55u05piv5LiW55WM5ZCE5Zu9
+5LyY5YWI5Y+R5bGV5ZKM56ue5LqJ5r+A54OI55qE6YeN6KaB6KGM5Lia44CCDQrjgIDjgIANCuOA
+gOOAgA0K44CQ5pys5bGV566A5LuL44CRDQrjgIDjgIDigJxKRUPkuJbnlYzlpI3lkIjmnZDmlpnl
+sZXop4jlj4rkvJrorq7igJ3vvIhKRUMgd29ybGQgQ29tcG9zaXRlcyBTaG93ICYgQ29uZmVyZW5j
+ZXPvvInliJvlip7kuo4xOTYz5bm077yM5q+P5bm05Li+5Yqe5LiA5bGK77yM6IezMjAxNuW5tOaA
+u+WFseS4vuWKnuS6hjUx5bGK77yM5Li75Yqe5Y2V5L2N5piv5rOV5Zu9SkVD5aSN5ZCI5p2Q5paZ
+5Y+R5bGV5L+D6L+b5LyaL0pFQ+mbhuWbou+8jOS4reWbveaAu+WxleWbouWxleWVhue7hOe7h+WN
+leS9jeS4uuaYoOW+t+S8muWxle+8iOS4reWbve+8ieaciemZkOWFrOWPuO+8jOWcqOWMl+S6rOOA
+geS4iua1t+etieWcsOiuvuacieWIhuaUr+acuuaehO+8jOi0n+i0o+ivpeWxleS8muWcqOS4reWb
+veeahOaOqOW5v+WSjOaLm+WVhuW3peS9nO+8iEpFQ+S4reWbveaAu+WxleWbouaKpeWQjeeDree6
+v++8mjQwMDAtNjgwLTg2MOi9rDgxNDTjgIE1MjIw77yJ44CCSkVD5aSN5ZCI5p2Q5paZ5bGV5bey
+5oiQ5Li65LiW55WM5LiK5Y6G5Y+y5pyA5oKg5LmF44CB6KeE5qih5pyA5aSn55qE5aSN5ZCI5p2Q
+5paZ6KGM5Lia5LiT5Lia5bGV6KeI5Lya77yM5bGV56S65ZKM5Y+N5pig5LqG5b2T5YmN5aSN5ZCI
+5p2Q5paZ6KGM5Lia55qE5pyA5paw5oqA5pyv5ZKM5bqU55So5oiQ5p6c44CCDQrjgIDjgIBKRUPl
+pI3lkIjmnZDmlpnlsZXop4jlj4rkvJrorq7ku6XmrKfmtLLkuLrln7rnoYDoh7Tlipvkuo7miZPp
+gKDkuIDkuKrlpI3lkIjmnZDmlpnkuqTmtYHjgIHotLjmmJPnmoTlubPlj7DjgILlnKjmnIDov5Hn
+moQxMOW5tOS4re+8jOS4k+S4muinguS8l+aVsOmHj+WinumVv+S6hjg2Je+8jOWFtuS4reinguS8
+l+adpea6kOacgOWkmueahOWbveWutuS+neasoeS4uuW+t+WbveOAgeiLseWbveOAgeaEj+Wkp+WI
+qeOAgeavlOWIqeaXtuOAgee+juWbveOAgeiNt+WFsOOAgeilv+ePreeJmeOAgeeRnuWjq+OAgeS/
+hOe9l+aWr+WSjOS4reWbveOAguWFs+azqOWkjeWQiOadkOaWmeacgOWkmueahOihjOS4muS4uuax
+vei9puWItumAoOOAgeiIquepuuWItumAoOWSjOW7uuetkeadkOaWmeOAguWPguWxleWxleWTgeW6
+lOeUqOmihuWfn+WkmuS4uuaxvei9puOAgeiIueiItua4uOiJh+OAgeiIquWkqeiIquepuuOAgeW7
+uuetkeadkOaWmeOAgei9qOmBk+S6pOmAmuOAgemjjuWKm+WPkeeUteOAgeS8kemXsuS6p+WTgeOA
+geeuoemBk+WSjOeUteWKm++8jOi+kOWwhOihjOS4muS5i+W5v+aYr+WFtuS7luWQjOexu+WxleS8
+muaXoOazleWMueaVjOeahOOAgkpFQ+WkjeWQiOadkOaWmeWxleiniOWPiuS8muiuruaYr+WUr+S4
+gOS4gOS4quWwhuWFqOeQg+WkjeWQiOadkOaWmeW3peS4muiBlOWQiOi1t+adpeeahOWxleiniOS8
+mu+8jOS5n+aYr+S4gOS4quWkjeWQiOadkOaWmeW6lOeUqOWVhuS4juS+m+W6lOWVhuOAgeebuOWF
+s+enkeeglOS6uuWRmOWPiuS4k+WutuW5v+azm+S6pOa1geeahOW5s+WPsO+8jOi/mOaYr+S4gOS4
+quS8geS4mui1sOWQkeWbvemZheWMlueahOagh+W/l+WSjOmAlOW+hOOAgg0K44CA44CAMjAxNeW5
+tDPmnIgxMC0xMuaXpeS4vuWKnueahOesrDUw5bGK5qyn5rSySkVD5aSN5ZCI5p2Q5paZ5bGV5Y+C
+5bGV5ZWG6LaF6L+HMjAwMOWutu+8jOS4k+S4muinguS8l+i2hei/hzM3NTAw5Lq677yM5bGV5Ye6
+6Z2i56ev6LaF6L+HNTY1MDDlubPmlrnnsbPvvIzlsZXnpLrkuobooYzkuJrkuK3nmoTmnIDmlrDm
+ioDmnK/jgIHmlrDmnZDmlpnjgIHmlrDlt6XoibrjgIHmlrDmlrnms5XvvIzlkIzmnJ/kuL7lip7m
+nInkuLDlr4znmoTlrabmnK/kuqTmtYHmtLvliqjvvIzlhajpnaLlkYjnjrDlvZPku4rlm73pmYXm
+nIDmlrDkuqfkuJrliqjmgIHlj4rlj5HlsZXotovlir/jgIINCuOAgOOAgOS4uuS6huWinui/m+Wb
+veWGheWkluWkjeWQiOadkOaWmeihjOS4mueahOS6pOa1geS4juWQiOS9nO+8jOWQjOaXtuWxleek
+uuaIkeWbveWkjeWQiOadkOaWmeS6p+S4mueahOWPkeWxleS4juaIkOWwse+8jOW4ruWKqeWig+WG
+heS8geS4muW8gOaLk+WbveWGheWkluW4guWcuu+8jOS4reWbveWbvemZheWkjeadkOWNj+S8muOA
+geaYoOW+t+WbvemZheS8muWxlembhuWbou+8iFlPTkQgRVhQT++8ieS4reWbveS7o+ihqOWkhOW3
+sui/keWNgeW5tOe7hOe7h+S4reWbveS8geS4muWPguS4juivpeWxleS8mu+8jOS4uuS4reWbveWk
+jeWQiOadkOaWmembhuWbouOAgeS4readkOenkeaKgOOAgeS4remSoumbhuWbouOAgeS4reWbveW7
+uuadkOmbhuWbouOAgeS4reWbveWVhumjnuOAgeWMl+S6rOeOu+mSoumZouOAgeS4iua1t+adsOS6
+i+adsOaWsOadkOaWmembhuWbouOAgemHjeW6huWbvemZheWkjeWQiOadkOaWmeOAgeS4reWNl+aO
+p+iCoembhuWbouOAgeenpueah+Wym+iAgOWNjueOu+eSg+mSouOAgeeDn+WPsOawqOe6tuOAgeWk
+qemprOmbhuWbouOAgeWNjuS4nOeQhuW3peWkp+WtpuOAgeWTiOWwlOa7qOW3peS4muWkp+WtpuOA
+geW3qOefs+mbhuWbouOAgeS4reWGtumbhuWbouOAgemHkeWFiembhuWbouOAgeaxn+iLj+aBkuel
+nue6pOe7tOadkOaWmeOAgemHjeW6huWkp+WtpuOAgeS4iua1t+eOu+eSg+mSoueglOeptumZouOA
+geS4reWNl+Wkp+WtpuOAgeWTiOWwlOa7qOeOu+eSg+mSoueglOeptumZouetieS8l+WkmuihjOS4
+muW3qOWktOWSjOefpeWQjeacuuaehOaPkOS+m+S6huS8mOi0qOmrmOaViOeahOWig+WkluWxlei0
+uOacjeWKoeOAgg0K44CA44CA4oCcSkVDIHdvcmxkIDIwMTcg56ysNTLlsYrkuJbnlYzlpI3lkIjm
+nZDmlpnlsZXop4jlj4rkvJrorq7igJ3lsIbkuo7igJwz5pyIMTQtMTbml6XigJ3lnKjigJzms5Xl
+m73lt7Tpu47ljJfnu7Tli5Lnj63lsZXop4jkuK3lv4PigJ3lho3luqbkuL7ooYzvvIzmiJHku6zo
+r5rpgoDlhajlm73lkITlnLDlpI3lkIjmnZDmlpnlj4rmlrDmnZDmlpnnm7jlhbPljZXkvY3kuI7k
+uJrnlYzkurrlo6vliqDlhaXlkrHku6znmoTkuK3lm73mgLvlsZXlm6LliY3lvoDlj4LlsZXlj4Lo
+p4LjgIJKRUPkuK3lm73mgLvlsZXlm6LmiqXlkI3ng63nur/vvJo0MDAwLTY4MC04NjDovaw4MTQ0
+44CBNTIyMOOAgg0K44CA44CADQrjgIDjgIANCuOAkOWOhuWxiuWbnumhvuOAkQ0K44CA44CAMjAw
+OOW5tOWPguWxleWVhui2hei/hzkwMOWutu+8jOS4k+S4muinguS8lzI1NTAw5Lq677yM5bGV5Ye6
+6Z2i56evMzY1MDDlubPmlrnnsbPjgIINCuOAgOOAgDIwMDnlubTlj4LlsZXllYbotoXov4cxMDAw
+5a6277yM5LiT5Lia6KeC5LyXMjczMzbkurrvvIzlsZXlh7rpnaLnp68zOTAwMOW5s+aWueexs+OA
+giANCuOAgOOAgDIwMTDlubTlj4LlsZXllYbmnIkxMDUz5a6277yM5LiT5Lia6KeC5LyXMzAwMDDk
+urrvvIzlsZXlh7rpnaLnp6/ovr40MzUwMOW5s+aWueexs+OAgg0K44CA44CAMjAxMeW5tOWPguWx
+leWVhuaciTExMjDlrrbvvIzkuJPkuJrop4LkvJczMjAwMOS6uu+8jOWxleWHuumdouenr+i+vjQ4
+NTAw5bmz5pa557Gz44CCDQrjgIDjgIAyMDE05bm05Y+C5bGV5ZWG6LaF6L+HMjAwMOWutu+8jOS4
+k+S4muinguS8l+i2hei/hzM3NTAw5Lq677yM5bGV5Ye66Z2i56ev6LaF6L+HNTY1MDDlubPmlrnn
+sbPjgIINCuOAgOOAgA0K44CA44CADQrjgJDlsZXlk4HojIPlm7TjgJENCuKXhiDmiJDlk4HlupTn
+lKjnsbvvvJog5bqU55So5LqO6L2m6L6G44CB6Ii56ImH44CB5Lqk6YCa44CB6aOO6IO944CB5bu6
+562R44CB6Iiq56m644CB6Iiq5aSp44CB5Zu96Ziy44CB5py65qKw44CB55S15a2Q44CB6Ziy6IWQ
+44CB5Yac5p6X44CB5riU5Lia44CB57q657uH44CB5pel5bi455Sf5rS7562J6aKG5Z+f55qE5aSN
+5ZCI5p2Q5paZL+eOu+eSg+mSouaWsOS6p+WTgeOAgeaWsOaKgOacr++8mw0K4peGIOWOn+adkOaW
+meexu++8miDnuqTnu7TnsbvvvIznjrvnkoPnuqTnu7TvvIznjrvnkoPpkqLvvIzloavmlpnvvIzn
+orPnuqTnu7TvvIznobznuqTnu7TvvIznorPljJbnoYXnuqTnu7TvvIzpmbbnk7fnuqTnu7TvvIzo
+gZrkuZnng6/nuqTnu7TvvIznn7Poi7Hmo4nvvIzogZrpha/njrvnuqTluIPvvIzogZrkuZnkuqTp
+ha/vvIzms6HmsqvnuqTnu7TvvIzohqjljJbnuqTnu7TvvIzlpKnnhLbnuqTnu7TvvIznn77lnJ/v
+vIznorPphbjpkpnvvIzlvq7nj6DkuI7lro/nj6DvvIzlvq7noYXnsonvvIznoYXngbDnn7Pnsonv
+vIzmoJHohILnsbvvvIznjq/msKfmoJHohILvvIzogZrphq/og7rvvIzogZrnorPphbjpha/vvIzl
+oavliqDliYLnsbvvvIzmipfmta7liYLvvIzohLHmqKHliYLvvIzmn5PmlpnvvIzpopzmlpnvvIzl
+op7loZHliYLvvIzmjKTloZHliYLvvIznu4fnianvvIzmr6HniYfnrYnvvJsgIA0K4peGIOWKoOW3
+peacuuaisOexu++8miDllrfog7bmnLrlmajvvIzmnLrlmajovrnmoYblkozpg6jku7bvvIzms6jl
+oZHmnLrvvIzlhrLljovmqKHloZHmnLrvvIzop6bljovmiJDlnovmnLrvvIznuqTnu7TnvKDnu5Xm
+nLrvvIzmoJHohILkvKDpgJLmiJDlnovmnLrvvIzogZrkuprlronpha/mnLrmorDvvIznjrvnkoPn
+uqTnu7TllrfmvIbmnLrvvIxTTUPlkoxUUkXliqDlt6XmnLrlmajvvIzmiJDlnovmsrnljovmnLrv
+vIzosIPmlbTlhrLmqKHnlKjljovlipvmnLrvvIzmi4nmjKTmiJDlnovmnLrmorDvvIzlgqzljJbl
+iYLphY3liYLlmajvvIzlvaLku7bliIbnprvmnLrlmajvvIzmqKHlhbfvvIzmqKHlhbfnu7TmiqTl
+kozmuIXmtIHvvIzmipvlhYnoho/vvIzotoXlo7Dms6LmjqLkvKTvvIzmsLTlsITmtYHliIflibLv
+vIzmv4DlhYnorr7lpIfvvIzmnLrmorDliqDlt6Xorr7lpIfvvIzmiJDlnovmqKHlhbforr7orqHl
+iqDlt6XmioDmnK/nrYnvvJsNCuKXhiDnlJ/kuqfnur/nsbvvvJog54Ot5Zu65oCn5aGR6IO25Yqg
+5bel77yM54Ot5aGR5oCn5Yqg5bel77yM6auY5L2O5Y6L5qih5YW355Sf5Lqn77yM5qih5Y6L5oiQ
+5Z6L77yM5qCR6ISC5Lyg6YCS5oiQ5Z6L77yM5rOo5aGR54SK5o6l77yM55yf56m65oiQ5Z6L77yM
+5ray5Y6L5oiQ5Z6L77yM57OK5oiQ5Z6L77yM5Za35bCE5oiQ5Z6L77yM57qk57u057yg57uV5oiQ
+5Z6L77yM5ouJ5oyk5oiQ5Z6L77yM54Ot5Y6L572Q5oiQ5Z6L77yM6ZqU6Iac5oiQ5Z6L77yM6L+B
+56e75oiQ5Z6L77yM5Y+N5bqU5rOo5bCE5oiQ5Z6L77yM6L2v6Iac6Iao6IOA5oiQ5Z6L77yM5Yay
+5Y6L5oiQ5Z6L77yM5omp5pWj54SK5o6l77yM57KJ5pyr5Ya26YeR77yM54Ot6L2n77yM54Ot5ouU
+77yM5Lqn5ZOB6LSo6YeP5qOA6aqM5oqA5pyv5Y+K6KOF5aSH77yM55Sf5Lqn6Ieq5Yqo5YyW5o6n
+5Yi25LiO6L2v5Lu277yM6LSo6YeP55uR5o6n5oqA5pyv77yM5peg5o2f5qOA5rWL5oqA5pyv5Y+K
+5Luq5Zmo562J44CCDQrjgIDjgIANCuOAgOOAgA0K44CQ5Y+C5bGV5b2i5byP44CRDQril4Yg5Y+C
+IOWxle+8miDnp5/otYHjgJDlsZXkvY3jgJHvvIzlsZXnpLrkvIHkuJrlvaLosaHlj4rkuqflk4Hv
+vIzkuLvopoHotLnnlKjmnInjgJDlsZXkvY3otLnjgJHjgJDov5DovpPotLnjgJHjgJDmkK3lu7ro
+tLnjgJHjgJDkurrlkZjotLnjgJHnrYnjgIINCuKXhiDlj4Ig6KeC77yaIOa0vumBo+OAkOS6uuWR
+mOOAke+8jOiOheS4tOWxleWcuuWPguinguWPiuiAg+Wvn++8jOS4u+imgei0ueeUqOacieOAkOaK
+peWQjei0ueOAkeOAkOazqOWGjOi0ueOAkeOAkOS6pOmAmui0ueOAkeOAkOmjn+Wuv+i0ueOAkeet
+ieOAgg0K44CA44CADQrjgIDjgIANCuOAkOWPguWxleiBlOezu+OAkQ0K5pyJ5YWz5Y+C5bGV5Y+C
+6KeC4oCcSkVD5LiW55WM5aSN5ZCI5p2Q5paZ5bGV4oCd5LqL5a6c77yM6K+36IGU57uc44CQ5Lit
+5Zu95oC75bGV5Zui44CR57uE5Yqe5pa577yaDQrlip7lhazlnLDlnYDvvJog5YyX5Lqs5biC5pyd
+6Ziz5Yy65YyX5LiJ546v5Lic6Lev5YWt5Y+35Lit5Zu95Zu96ZmF5bGV6KeI5Lit5b+D5Zub5bGC
+DQrlj4LlsZXpob7pl67vvJog546L5YWI55Sf44CBIOW8oOWFiOeUn+OAgSDlrZnlsI/lp5DjgIEg
+5ZC05bCP5aeQDQrlj4LlsZXng63nur/vvJogMTM5LTEwMzEtODE0NOOAgSAxMzEtMjY2Mi01MjA2
+77ybICAwMTDigJQgODY5OS0gNzE1NS4NCuWcqOe6v+Wuouacje+8miDpgq7nrrEvIDEyODA5Mzk1
+I3FxLmNvbe+8myBRUS8gODI3NzU1MDfvvJsg5b6u5L+hLyB5b25kZXhwb++8myDlvq7ljZovIGh0
+dHA6Ly93ZWliby5jb20veW9uZGV4cG8NCuWFqOWbvee7n+S4gOWuouacjeeDree6v++8miA0MDAw
+LSA1ODAtIDg1MC7vvIjliIbmnLo6ODg4OCAvODE0NCAvNTIyMCAvNTIwNu+8iQ0K5YWo5Zu957uf
+5LiA5oql5ZCN5LiT57q/77yaIDQwMDAtIDY4MC0gODYwLu+8iOWFvOS8oOecn++8iQ0K44CA44CA
+DQrjgIDjgIANCuOAgOOAgA0K44CQ5YWs5LyX5bmz5Y+w44CRDQrjgIDjgIANCuW+ruS/oe+8miDl
+j4LlsZXmtojmga8g77yISUTvvJpDYW5aaGFuWGlhb1hp77yJ4oCU4oCUIOWTgeeJjOaJqeW8oOea
+hOW5s+WPsOOAgOW4guWcuuW8gOaLk+eahOahpeaigQ0K5b6u5L+h77yaIOWxleWVhuS5i+WutiDv
+vIhJRO+8mlpoYW5TaGFuZ1poaUppYe+8ieKAlOKAlCDkuLrlsZXllYbmj5DkvpvmnIDkvbPokKXl
+nLDjgIDkuLrpmIHkuIvokKXpgKDlj4LlsZXku7flgLwNCuOAgOOAgA0K44CA44CADQrjgIDjgIAN
+CuOAgOOAgA0K44CA44CADQrnmb7kuIfnvqTlj5Hns7vnu5985Li65oKo5Y+R6YCBfOWmguS4jeW4
+jOacm+WGjeaUtuWIsOatpOihjOS4mui1hOiur3zor7flm57lpI3igJzpgIDorqIrSkVD4oCd6Iez
+6YKu566xMTA1NTgwMDgxMkBxcS5jb20NCg==
