@@ -1,61 +1,66 @@
-From: Stanislav Brabec <sbrabec-AlSwsSmVLrQ@public.gmane.org>
-Subject: Re: nfs/cifs mountinfo differences
-Date: Tue, 16 Aug 2016 19:44:47 +0200
-Message-ID: <7c2181d1-c7b5-df04-0640-ec23f5d78eab@suse.cz>
-References: <91d465d3-4f5b-6270-a6c5-38bd94695731@suse.cz>
- <5eb96b3e-d463-bf11-49de-f614247d6b29@suse.cz>
- <20160805192234.2c9d5b7d@aaptelpc>
+From: <a.biardi-IWqWACnzNjyonA0d6jMUrA@public.gmane.org>
+Subject: Re: filenames with special chars and posix path caps enabled -
+ regression?
+Date: Fri, 19 Aug 2016 11:03:14 +0000
+Message-ID: <20160819110314.24f6f1ae@alice.paese.meraviglie>
+References: <20160720164341.1c3a518b@alice.paese.meraviglie>
+        <CAH2r5mtR5u+3XtGPcL8MrXgQanB6YjCHDA9PmOo2w+sJgvpdJg@mail.gmail.com>
+        <20160720173448.6d079f3c@alice.paese.meraviglie>
+        <20160815104301.7d3ac8c9@alice.paese.meraviglie>
+        <CAH2r5mtj0VBQkTrS5OQ5N5m5n7gjt_ottCShadtxR8tb-_JbqQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Cc: util-linux <util-linux-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20160805192234.2c9d5b7d@aaptelpc>
+In-Reply-To: <CAH2r5mtj0VBQkTrS5OQ5N5m5n7gjt_ottCShadtxR8tb-_JbqQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Aurélien Aptel wrote on Aug 5, 2016 at 7:22 PM:
-> Now correct me if I'm wrong (I really am not sure) but I think 'mount
-> -a' assumes only bind-mounts should print a subdir path instead of "/".
+On Mon, 15 Aug 2016 10:48:56 -0500, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+wrote:
 
-Yes. It is the only indication that the mountinfo line describes a bind 
-mount.
+> When mounting with newer dialects (vers=2.1 or vers=3 to get SMB2.1 or
+> SMB3 support for example), or when mounting with CIFS to servers like
+> Windows, the protocol dialect does not support these reserved
+> characters, so by default we mount with posixpath mapping enabled to
+> support mapping (posixpaths) of reserved characters to the SFM
+> reserved range (same as Windows Services for Mac and the Mac itself
+> does).  The result is that you can create and read the filenames
+> remotely and they look fine but on the Samba server itself the
+> reserved character will look strange since it is remapped.
 
-> or (B) we consider the current kernel doc as the Truth:
->
-> - we make NFS do like CIFS
-> - leave CIFS unchanged [1]
-> - figure out what to do with mount utility (back to initial problem I
->   guess)
+Steve, thanks so much for your time and effort. And, you're right: in
+fact, if I mount a share and create a file on it with one of those
+reserved characters in the name, I can see that the actual filename on
+the linux server has some "funny" characters in it.
 
-The proposed patch does the thing.
+Now I also understand why ls works (shows filenames as reported by the
+server) while "cat" won't (client remaps characters, and server can't
+locate a file with the remapped name).
 
-> Personal opinion: the way the current doc is written and again, the fact
-> that linux lets you override the path on a per-filesystem basis makes me
-> think solution B is the way to go.
->
-> Also, I don't understand why
->
->
-> We can't we compare in this case? Isn't it just a matter of
-> concatenating the source with the subdir?
+> You could turn off posixpaths on mount (noposixpaths) on your cifs
+> mount to see if this fixes it [...]
 
-Well, it looks possible. The path component 1 is always the server name, 
-2 volume name, and the rest is path.
+Didn't work for me; however, looking at the kernel source I found that
+there is a "nomapposix" option that seems to do the trick. If I use
+this option, I can read and write filenames with reserved characters
+without any mapping.
 
-So cut components 3 and up, and remove it from the leading part of 4th 
-column. Then you will have a part that can be used for bind mount 
-processing.
+Reason why this escaped me in the first place is that "mapposix" is not
+documented in the mount.cifs manpage..
 
--- 
-Best Regards / S pozdravem,
+> [...] but the key will be looking at the mount options that were
+> passed in to the kernel so we can see if you are mounting with
+> posixpath mapping (which would force posixpaths to be mapped even
+> though the server would have supported them without mapping)
 
-Stanislav Brabec
-software developer
----------------------------------------------------------------------
-SUSE LINUX, s. r. o.                         e-mail: sbrabec-IBi9RG/b67k@public.gmane.org
-Křižíkova 148/34 (Corso IIa)                  tel: +49 911 7405384547
-186 00 Praha 8-Karlín                          fax:  +420 284 084 001
-Czech Republic                                    http://www.suse.cz/
-PGP: 830B 40D5 9E05 35D8 5E27 6FA3 717C 209F A04F CD76
+Googling around, I came across this post
+https://lists.samba.org/archive/samba-technical/2014-September/102671.html
+so now I'm a bit confused as to what the default behavior should be.. I
+thought my client/kernel would negotiate unix extensions by default
+with a samba server, therefore no mapping would occur by default, but
+apparently MAC-style mapping is now the default on linux too?
+
+Andrea.
