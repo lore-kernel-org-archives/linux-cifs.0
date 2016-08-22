@@ -1,66 +1,41 @@
-From: <a.biardi-IWqWACnzNjyonA0d6jMUrA@public.gmane.org>
-Subject: Re: filenames with special chars and posix path caps enabled -
- regression?
-Date: Fri, 19 Aug 2016 11:03:14 +0000
-Message-ID: <20160819110314.24f6f1ae@alice.paese.meraviglie>
-References: <20160720164341.1c3a518b@alice.paese.meraviglie>
-        <CAH2r5mtR5u+3XtGPcL8MrXgQanB6YjCHDA9PmOo2w+sJgvpdJg@mail.gmail.com>
-        <20160720173448.6d079f3c@alice.paese.meraviglie>
-        <20160815104301.7d3ac8c9@alice.paese.meraviglie>
-        <CAH2r5mtj0VBQkTrS5OQ5N5m5n7gjt_ottCShadtxR8tb-_JbqQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [cifs-utils PATCH 0/3] cifs-utils: overhaul of cifs.upcall krb5 handling
+Date: Mon, 22 Aug 2016 08:29:19 -0400
+Message-ID: <1471868962-7312-1-git-send-email-jlayton@samba.org>
+Cc: "Dey, John F" <jfdey-rEd9KcVInK8dYYaOPf09RA@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mtj0VBQkTrS5OQ5N5m5n7gjt_ottCShadtxR8tb-_JbqQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 15 Aug 2016 10:48:56 -0500, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-wrote:
+The handling of krb5 in cifs.upcall has always been pretty klunky. It
+rolls through /tmp, trying to find the latest credcache and has some
+hacks to allow it to use DIR: caches as well, but none of that really
+works for KEYRING:, which is pretty common these days.
 
-> When mounting with newer dialects (vers=2.1 or vers=3 to get SMB2.1 or
-> SMB3 support for example), or when mounting with CIFS to servers like
-> Windows, the protocol dialect does not support these reserved
-> characters, so by default we mount with posixpath mapping enabled to
-> support mapping (posixpaths) of reserved characters to the SFM
-> reserved range (same as Windows Services for Mac and the Mac itself
-> does).  The result is that you can create and read the filenames
-> remotely and they look fine but on the Samba server itself the
-> reserved character will look strange since it is remapped.
+In practice, I doubt anyone relies on that behavior. What most people
+want is for cifs.upcall to find the default credcache for a user given
+krb5.conf -- full stop.
 
-Steve, thanks so much for your time and effort. And, you're right: in
-fact, if I mount a share and create a file on it with one of those
-reserved characters in the name, I can see that the actual filename on
-the linux server has some "funny" characters in it.
+This patchset rips out most of the unneeded machinery in cifs.upcall,
+and just has it find the default credcache and verify that it has a
+valid TGT. If not then we'll try to init it from the keytab as before.
 
-Now I also understand why ls works (shows filenames as reported by the
-server) while "cat" won't (client remaps characters, and server can't
-locate a file with the remapped name).
+I think there's some more opportunity to clean up this code in the
+future as well. Currently we pass around strings that represent the
+credcache, and that could be made more efficient.  It might also be
+good to just reimplement the whole thing with gssapi calls instead.
 
-> You could turn off posixpaths on mount (noposixpaths) on your cifs
-> mount to see if this fixes it [...]
+Still, this is a good step in that direction I think.
 
-Didn't work for me; however, looking at the kernel source I found that
-there is a "nomapposix" option that seems to do the trick. If I use
-this option, I can read and write filenames with reserved characters
-without any mapping.
+Jeff Layton (3):
+  aclocal: fix typo in idmap.m4
+  cifs.upcall: use krb5 routines to get default ccname
+  cifs.upcall: make the krb5_context a static global variable
 
-Reason why this escaped me in the first place is that "mapposix" is not
-documented in the mount.cifs manpage..
+ aclocal/idmap.m4 |   2 +-
+ cifs.upcall.c    | 185 ++++++++++---------------------------------------------
+ 2 files changed, 32 insertions(+), 155 deletions(-)
 
-> [...] but the key will be looking at the mount options that were
-> passed in to the kernel so we can see if you are mounting with
-> posixpath mapping (which would force posixpaths to be mapped even
-> though the server would have supported them without mapping)
-
-Googling around, I came across this post
-https://lists.samba.org/archive/samba-technical/2014-September/102671.html
-so now I'm a bit confused as to what the default behavior should be.. I
-thought my client/kernel would negotiate unix extensions by default
-with a samba server, therefore no mapping would occur by default, but
-apparently MAC-style mapping is now the default on linux too?
-
-Andrea.
+-- 
+2.7.4
