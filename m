@@ -1,219 +1,48 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [cifs-utils PATCH 3/3] cifs.upcall: make the krb5_context a static global variable
-Date: Mon, 22 Aug 2016 08:29:22 -0400
-Message-ID: <1471868962-7312-4-git-send-email-jlayton@samba.org>
-References: <1471868962-7312-1-git-send-email-jlayton@samba.org>
-Cc: "Dey, John F" <jfdey-rEd9KcVInK8dYYaOPf09RA@public.gmane.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Stanislav Brabec <sbrabec-AlSwsSmVLrQ@public.gmane.org>
+Subject: Re: nfs/cifs mountinfo differences
+Date: Tue, 23 Aug 2016 19:23:33 +0200
+Message-ID: <c4f10081-4525-4ac0-0e6b-b364c7268200@suse.cz>
+References: <91d465d3-4f5b-6270-a6c5-38bd94695731@suse.cz>
+ <5eb96b3e-d463-bf11-49de-f614247d6b29@suse.cz>
+ <20160805192234.2c9d5b7d@aaptelpc>
+ <7c2181d1-c7b5-df04-0640-ec23f5d78eab@suse.cz>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Cc: util-linux <util-linux-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1471868962-7312-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <7c2181d1-c7b5-df04-0640-ec23f5d78eab-AlSwsSmVLrQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-There's no need to keep initing a new context for every function. Just
-do it once and reuse as needed.
+On Aug 16, 2016 at 07:44 PM Stanislav Brabec wrote:
+> Aurélien Aptel wrote on Aug 5, 2016 at 7:22 PM:
+>> We can't we compare in this case? Isn't it just a matter of
+>> concatenating the source with the subdir?
+>
+> Well, it looks possible. The path component 1 is always the server name,
+> 2 volume name, and the rest is path.
+>
+> So cut components 3 and up, and remove it from the leading part of 4th
+> column. Then you will have a part that can be used for bind mount
+> processing.
+>
+I did a new patch that searches the subdir part of the source and cuts
+it out from root for purpose of root comparison.
 
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- cifs.upcall.c | 61 ++++++++++++++++-------------------------------------------
- 1 file changed, 16 insertions(+), 45 deletions(-)
+Please review the algorithm of searching of the subdir component in the
+source string in the reply to this mail.
 
-diff --git a/cifs.upcall.c b/cifs.upcall.c
-index d0f6d089d8e1..8448d00f6061 100644
---- a/cifs.upcall.c
-+++ b/cifs.upcall.c
-@@ -52,7 +52,9 @@
- #include "spnego.h"
- #include "cifs_spnego.h"
- 
--static const char *prog = "cifs.upcall";
-+static krb5_context	context;
-+static const char	*prog = "cifs.upcall";
-+
- typedef enum _sectype {
- 	NONE = 0,
- 	KRB5,
-@@ -69,9 +71,7 @@ typedef enum _sectype {
-  * @return pointer to the realm
-  *
-  */
--
--static char *cifs_krb5_principal_get_realm(krb5_context context __attribute__ ((unused)),
--					   krb5_principal principal)
-+static char *cifs_krb5_principal_get_realm(krb5_principal principal)
- {
- #ifdef HAVE_KRB5_PRINCIPAL_GET_REALM	/* Heimdal */
- 	return krb5_principal_get_realm(context, principal);
-@@ -104,7 +104,6 @@ krb5_auth_con_getsendsubkey(krb5_context context,
- /* does the ccache have a valid TGT? */
- static time_t get_tgt_time(const char *ccname)
- {
--	krb5_context context;
- 	krb5_ccache ccache;
- 	krb5_cc_cursor cur;
- 	krb5_creds creds;
-@@ -112,11 +111,6 @@ static time_t get_tgt_time(const char *ccname)
- 	time_t credtime = 0;
- 	char *realm = NULL;
- 
--	if (krb5_init_context(&context)) {
--		syslog(LOG_DEBUG, "%s: unable to init krb5 context", __func__);
--		return 0;
--	}
--
- 	if (krb5_cc_resolve(context, ccname, &ccache)) {
- 		syslog(LOG_DEBUG, "%s: unable to resolve krb5 cache", __func__);
- 		goto err_cache;
-@@ -137,7 +131,7 @@ static time_t get_tgt_time(const char *ccname)
- 		goto err_ccstart;
- 	}
- 
--	if ((realm = cifs_krb5_principal_get_realm(context, principal)) == NULL) {
-+	if ((realm = cifs_krb5_principal_get_realm(principal)) == NULL) {
- 		syslog(LOG_DEBUG, "%s: unable to get realm", __func__);
- 		goto err_ccstart;
- 	}
-@@ -168,34 +162,23 @@ err_princ:
- #endif
- 	krb5_cc_close(context, ccache);
- err_cache:
--	krb5_free_context(context);
- 	return credtime;
- }
- 
- static char *
- get_default_cc(void)
- {
--	krb5_error_code ret;
- 	const char *ccname;
- 	char *rcc = NULL;
--	krb5_context context = NULL;
--
--	ret = krb5_init_context(&context);
--	if (ret) {
--		syslog(LOG_DEBUG, "krb5_init_context: %d", (int)ret);
--		return NULL;
--	}
- 
- 	ccname = krb5_cc_default_name(context);
- 	if (!ccname) {
- 		syslog(LOG_DEBUG, "krb5_cc_default returned NULL.");
--		goto out_free_context;
-+		return NULL;
- 	}
- 
- 	if (get_tgt_time(ccname))
- 		rcc = strdup(ccname);
--out_free_context:
--	krb5_free_context(context);
- 	return rcc;
- }
- 
-@@ -203,7 +186,6 @@ out_free_context:
- static char *
- init_cc_from_keytab(const char *keytab_name, const char *user)
- {
--	krb5_context context = NULL;
- 	krb5_error_code ret;
- 	krb5_creds my_creds;
- 	krb5_keytab keytab = NULL;
-@@ -213,12 +195,6 @@ init_cc_from_keytab(const char *keytab_name, const char *user)
- 
- 	memset((char *) &my_creds, 0, sizeof(my_creds));
- 
--	ret = krb5_init_context(&context);
--	if (ret) {
--		syslog(LOG_DEBUG, "krb5_init_context: %d", (int)ret);
--		goto icfk_cleanup;
--	}
--
- 	if (keytab_name)
- 		ret = krb5_kt_resolve(context, keytab_name, &keytab);
- 	else
-@@ -273,8 +249,6 @@ icfk_cleanup:
- 		krb5_cc_close(context, cc);
- 	if (keytab)
- 		krb5_kt_close(context, keytab);
--	if (context)
--		krb5_free_context(context);
- 	return ccname;
- }
- 
-@@ -284,7 +258,6 @@ cifs_krb5_get_req(const char *host, const char *ccname,
- {
- 	krb5_error_code ret;
- 	krb5_keyblock *tokb;
--	krb5_context context;
- 	krb5_ccache ccache;
- 	krb5_creds in_creds, *out_creds;
- 	krb5_data apreq_pkt, in_data;
-@@ -292,26 +265,19 @@ cifs_krb5_get_req(const char *host, const char *ccname,
- #if defined(HAVE_KRB5_AUTH_CON_SETADDRS) && defined(HAVE_KRB5_AUTH_CON_SET_REQ_CKSUMTYPE)
- 	static const uint8_t gss_cksum[24] = { 0x10, 0x00, /* ... */};
- #endif
--
--	ret = krb5_init_context(&context);
--	if (ret) {
--		syslog(LOG_DEBUG, "%s: unable to init krb5 context", __func__);
--		return ret;
--	}
--
- 	if (ccname) {
- 		ret = krb5_cc_resolve(context, ccname, &ccache);
- 		if (ret) {
- 			syslog(LOG_DEBUG, "%s: unable to resolve %s to ccache\n",
- 			       __func__, ccname);
--			goto out_free_context;
-+			return ret;
- 		}
- 	} else {
- 		ret = krb5_cc_default(context, &ccache);
- 		if (ret) {
- 			syslog(LOG_DEBUG, "%s: krb5_cc_default: %d",
- 				__func__, (int)ret);
--			goto out_free_context;
-+			return ret;
- 		}
- 	}
- 
-@@ -383,7 +349,6 @@ cifs_krb5_get_req(const char *host, const char *ccname,
- 	/* MIT krb5 < 1.7 is missing the prototype, but still has the symbol */
- #if !HAVE_DECL_KRB5_AUTH_CON_SET_REQ_CKSUMTYPE
- 	krb5_error_code krb5_auth_con_set_req_cksumtype(
--		krb5_context      context,
- 		krb5_auth_context auth_context,
- 		krb5_cksumtype    cksumtype);
- #endif
-@@ -427,8 +392,6 @@ out_free_ccache:
- 	krb5_cc_set_flags(context, ccache, KRB5_TC_OPENCLOSE);
- #endif
- 	krb5_cc_close(context, ccache);
--out_free_context:
--	krb5_free_context(context);
- 	return ret;
- }
- 
-@@ -866,6 +829,12 @@ int main(const int argc, char *const argv[])
- 		goto out;
- 	}
- 
-+	rc = krb5_init_context(&context);
-+	if (rc) {
-+		syslog(LOG_ERR, "unable to init krb5 context: %ld", rc);
-+		goto out;
-+	}
-+
- 	ccname = get_default_cc();
- 	/* Couldn't find credcache? Try to use keytab */
- 	if (ccname == NULL && arg.username != NULL)
-@@ -1006,6 +975,8 @@ out:
- 	}
- 	data_blob_free(&secblob);
- 	data_blob_free(&sess_key);
-+	if (context)
-+		krb5_free_context(context);
- 	SAFE_FREE(ccname);
- 	SAFE_FREE(arg.hostname);
- 	SAFE_FREE(arg.ip);
 -- 
-2.7.4
+Best Regards / S pozdravem,
+
+Stanislav Brabec
+software developer
+---------------------------------------------------------------------
+SUSE LINUX, s. r. o.                         e-mail: sbrabec-IBi9RG/b67k@public.gmane.org
+Křižíkova 148/34 (Corso IIa)                  tel: +49 911 7405384547
+186 00 Praha 8-Karlín                          fax:  +420 284 084 001
+Czech Republic                                    http://www.suse.cz/
+PGP: 830B 40D5 9E05 35D8 5E27 6FA3 717C 209F A04F CD76
