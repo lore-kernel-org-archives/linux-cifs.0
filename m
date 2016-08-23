@@ -1,132 +1,47 @@
-From: Stanislav Brabec <sbrabec-AlSwsSmVLrQ@public.gmane.org>
-Subject: [PATCH] libmount: Special handling of root comparison for cifs in
- mnt_table_is_fs_mounted()
-Date: Tue, 23 Aug 2016 19:25:46 +0200
-Message-ID: <eec8f575-eab2-34bb-882a-11fb8c33d9c0@suse.cz>
-References: <91d465d3-4f5b-6270-a6c5-38bd94695731@suse.cz>
- <5eb96b3e-d463-bf11-49de-f614247d6b29@suse.cz>
- <20160805192234.2c9d5b7d@aaptelpc>
- <7c2181d1-c7b5-df04-0640-ec23f5d78eab@suse.cz>
- <c4f10081-4525-4ac0-0e6b-b364c7268200@suse.cz>
+From: "Dey, John F" <jfdey-rEd9KcVInK8dYYaOPf09RA@public.gmane.org>
+Subject: Re: [cifs-utils PATCH 0/3] cifs-utils: overhaul of cifs.upcall krb5
+ handling
+Date: Tue, 23 Aug 2016 19:21:14 +0000
+Message-ID: <9A891926-AE7D-4916-AB71-A49D4A1588BC@fhcrc.org>
+References: <1471868962-7312-1-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: util-linux <util-linux-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <c4f10081-4525-4ac0-0e6b-b364c7268200-AlSwsSmVLrQ@public.gmane.org>
+In-Reply-To: <1471868962-7312-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Language: en-US
+Content-ID: <EA9453B04D94F44094C3782DD2400AC2-Lp/cVzEoVyZxNkQZW8AQUR2eb7JE58TQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-In mountinfo of cifs filesystem, leading part of root is a path relative to the
-root of the exported volume.
-
-Create a dedicated function mnt_fs_get_cifs_root() that cuts the volume root
-part from the root.
-
-How to reproduce:
-1) Create and export a volume on cifs (with guest allowed).
-2) Make a subdirectory in this volume.
-3) Mount this volume using fstab:
-   //server/volume/subdir /mnt cifs guest 0 0
-4) Call mount -a twice.
-   Depending on system running, you either get:
-     mount error(16): Device or resource busy
-     Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
-   or volume mounted twice.
-
-Signed-off-by: Stanislav Brabec <sbrabec-AlSwsSmVLrQ@public.gmane.org>
----
----
- libmount/src/tab.c | 49 ++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 48 insertions(+), 1 deletion(-)
-
-diff --git a/libmount/src/tab.c b/libmount/src/tab.c
-index 341e5e3..4488073 100644
---- a/libmount/src/tab.c
-+++ b/libmount/src/tab.c
-@@ -42,6 +42,7 @@
-  * will return the first entry (if UUID matches with the device).
-  */
- #include <blkid.h>
-+#include <stdbool.h>
- 
- #include "mountP.h"
- #include "strutils.h"
-@@ -1449,6 +1450,48 @@ err:
- }
- 
- /**
-+ * mnt_fs_get_cifs_root:
-+ * @fs: /proc/self/mountinfo entry
-+ *
-+ * For cifs, root contains a relative path to the exported volume plus
-+ * the root path. We have to cut volume path to get root.
-+ *
-+ * Returns: root of the cifs mount within the filesystem or NULL
-+ */
-+static const char *mnt_fs_get_cifs_root(struct libmnt_fs *fs)
-+{
-+	const char *root = mnt_fs_get_root(fs);
-+	const char *src = mnt_fs_get_source(fs);
-+	const char *subpath = src;
-+	char c;
-+	int component_no = 0;
-+	bool last_is_slash = false;
-+
-+	while ((c = *subpath++))
-+	{
-+		if (c == '/') {
-+			if (!last_is_slash) {
-+				component_no++;
-+				if (component_no == 3)
-+					break;
-+			}
-+			last_is_slash = true;
-+		} else
-+			last_is_slash = false;
-+	}
-+	if (component_no == 3) {
-+		int subpath_len = strlen(subpath);
-+		if (strncmp(root, subpath, subpath_len)) {
-+			if (*(root + subpath_len + 1) == 0)
-+				return "/";
-+			return root + subpath_len + 1;
-+		}
-+	}
-+	DBG(FS, ul_debugobj(fs, "cifs: leading part of root \"%s\" does not equal to mounted source subdir \"%s\"; should not happen", root, src));
-+	return root;
-+}
-+
-+/**
-  * mnt_table_is_fs_mounted:
-  * @tb: /proc/self/mountinfo file
-  * @fstab_fs: /etc/fstab entry
-@@ -1563,7 +1606,11 @@ int mnt_table_is_fs_mounted(struct libmnt_table *tb, struct libmnt_fs *fstab_fs)
- 		}
- 
- 		if (root) {
--			const char *r = mnt_fs_get_root(fs);
-+			const char *r;
-+			if (strcmp(mnt_fs_get_fstype(fs), "cifs"))
-+				r = mnt_fs_get_root(fs);
-+			else
-+				r = mnt_fs_get_cifs_root(fs);
- 			if (!r || strcmp(r, root) != 0)
- 				continue;
- 		}
--- 
-2.9.3
-
--- 
-Best Regards / S pozdravem,
-
-Stanislav Brabec
-software developer
----------------------------------------------------------------------
-SUSE LINUX, s. r. o.                         e-mail: sbrabec-IBi9RG/b67k@public.gmane.org
-Křižíkova 148/34 (Corso IIa)                  tel: +49 911 7405384547
-186 00 Praha 8-Karlín                          fax:  +420 284 084 001
-Czech Republic                                    http://www.suse.cz/
-PGP: 830B 40D5 9E05 35D8 5E27 6FA3 717C 209F A04F CD76
+SSBoYXZlIGEgbmV3ZXIgdmVyc2lvbiBvZiB0aGUgY2lmcy11cGNhbGwgcGF0Y2ggd2hpY2ggZm9s
+bG93cyB0aGUgbGludXggY29kaW5nIHN0YW5kYXJkcy4gIEkgaGF2ZSB0YWtlbiBhIGxvb2sgYXQg
+dGhlIHVzZSBvZiBrcmI1X2NvbnRleHQgdGhyb3VnaCBvdXQgYWxsIHRoZSBjb2RlIGFuZCByZWR1
+Y2VkIHRoZSB1c2FnZSBvZiBrcmI1X2NvbnRleHQgdG8gb25lIGNhbGwuDQogDQoNCkpvaG4gRGV5
+DQoNCg0KDQoNCg0KDQoNCk9uIDgvMjIvMTYsIDU6MjkgQU0sICJKZWZmIExheXRvbiIgPGpsYXl0
+b25Ac2FtYmEub3JnPiB3cm90ZToNCg0KPlRoZSBoYW5kbGluZyBvZiBrcmI1IGluIGNpZnMudXBj
+YWxsIGhhcyBhbHdheXMgYmVlbiBwcmV0dHkga2x1bmt5LiBJdA0KPnJvbGxzIHRocm91Z2ggL3Rt
+cCwgdHJ5aW5nIHRvIGZpbmQgdGhlIGxhdGVzdCBjcmVkY2FjaGUgYW5kIGhhcyBzb21lDQo+aGFj
+a3MgdG8gYWxsb3cgaXQgdG8gdXNlIERJUjogY2FjaGVzIGFzIHdlbGwsIGJ1dCBub25lIG9mIHRo
+YXQgcmVhbGx5DQo+d29ya3MgZm9yIEtFWVJJTkc6LCB3aGljaCBpcyBwcmV0dHkgY29tbW9uIHRo
+ZXNlIGRheXMuDQo+DQo+SW4gcHJhY3RpY2UsIEkgZG91YnQgYW55b25lIHJlbGllcyBvbiB0aGF0
+IGJlaGF2aW9yLiBXaGF0IG1vc3QgcGVvcGxlDQo+d2FudCBpcyBmb3IgY2lmcy51cGNhbGwgdG8g
+ZmluZCB0aGUgZGVmYXVsdCBjcmVkY2FjaGUgZm9yIGEgdXNlciBnaXZlbg0KPmtyYjUuY29uZiAt
+LSBmdWxsIHN0b3AuDQo+DQo+VGhpcyBwYXRjaHNldCByaXBzIG91dCBtb3N0IG9mIHRoZSB1bm5l
+ZWRlZCBtYWNoaW5lcnkgaW4gY2lmcy51cGNhbGwsDQo+YW5kIGp1c3QgaGFzIGl0IGZpbmQgdGhl
+IGRlZmF1bHQgY3JlZGNhY2hlIGFuZCB2ZXJpZnkgdGhhdCBpdCBoYXMgYQ0KPnZhbGlkIFRHVC4g
+SWYgbm90IHRoZW4gd2UnbGwgdHJ5IHRvIGluaXQgaXQgZnJvbSB0aGUga2V5dGFiIGFzIGJlZm9y
+ZS4NCj4NCj5JIHRoaW5rIHRoZXJlJ3Mgc29tZSBtb3JlIG9wcG9ydHVuaXR5IHRvIGNsZWFuIHVw
+IHRoaXMgY29kZSBpbiB0aGUNCj5mdXR1cmUgYXMgd2VsbC4gQ3VycmVudGx5IHdlIHBhc3MgYXJv
+dW5kIHN0cmluZ3MgdGhhdCByZXByZXNlbnQgdGhlDQo+Y3JlZGNhY2hlLCBhbmQgdGhhdCBjb3Vs
+ZCBiZSBtYWRlIG1vcmUgZWZmaWNpZW50LiAgSXQgbWlnaHQgYWxzbyBiZQ0KPmdvb2QgdG8ganVz
+dCByZWltcGxlbWVudCB0aGUgd2hvbGUgdGhpbmcgd2l0aCBnc3NhcGkgY2FsbHMgaW5zdGVhZC4N
+Cj4NCj5TdGlsbCwgdGhpcyBpcyBhIGdvb2Qgc3RlcCBpbiB0aGF0IGRpcmVjdGlvbiBJIHRoaW5r
+Lg0KPg0KPkplZmYgTGF5dG9uICgzKToNCj4gIGFjbG9jYWw6IGZpeCB0eXBvIGluIGlkbWFwLm00
+DQo+ICBjaWZzLnVwY2FsbDogdXNlIGtyYjUgcm91dGluZXMgdG8gZ2V0IGRlZmF1bHQgY2NuYW1l
+DQo+ICBjaWZzLnVwY2FsbDogbWFrZSB0aGUga3JiNV9jb250ZXh0IGEgc3RhdGljIGdsb2JhbCB2
+YXJpYWJsZQ0KPg0KPiBhY2xvY2FsL2lkbWFwLm00IHwgICAyICstDQo+IGNpZnMudXBjYWxsLmMg
+ICAgfCAxODUgKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLQ0KPiAyIGZpbGVzIGNoYW5nZWQsIDMyIGluc2VydGlvbnMoKyksIDE1NSBkZWxldGlv
+bnMoLSkNCj4NCj4tLSANCj4yLjcuNA0KPg0K
