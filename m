@@ -1,56 +1,41 @@
-From: Jeff Layton <jlayton@samba.org>
-Subject: [cifs-utils PATCHv2 4/6] cifs.upcall: remove KRB5_TC_OPENCLOSE
-Date: Thu, 25 Aug 2016 10:17:43 -0400
-Message-ID: <1472134665-4014-5-git-send-email-jlayton@samba.org>
-References: <1472134665-4014-1-git-send-email-jlayton@samba.org>
-Cc: jfdey@fredhutch.org, samba-technical@lists.samba.org
-To: linux-cifs@vger.kernel.org
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <1472134665-4014-1-git-send-email-jlayton@samba.org>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
- <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical/>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
- <mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Errors-To: samba-technical-bounces@lists.samba.org
-Sender: "samba-technical" <samba-technical-bounces@lists.samba.org>
-List-Id: linux-cifs.vger.kernel.org
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [cifs-utils PATCHv2 0/6] cifs.upcall: cleanup and overhaul of the cifs.upcall krb5 handling code
+Date: Thu, 25 Aug 2016 10:17:39 -0400
+Message-ID: <1472134665-4014-1-git-send-email-jlayton@samba.org>
+Cc: samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, jfdey-rEd9KcVInK8dYYaOPf09RA@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-The header file says that this is deprecated, and all of the info I've
-seen about it mentioned that it was for performance more than
-correctness. It dates back to the original code dump from Igor, so I
-think we're safe to just drop it at this point.
+This is an update of the patchset that I posted to linux-cifs mailing
+list last week, with the main change being a few extra cleanups to
+the code, to make it a bit more efficient. This also removes a large
+chunk of (largely unneeded) code from the program.
 
-Signed-off-by: Jeff Layton <jlayton@samba.org>
----
- cifs.upcall.c | 6 ------
- 1 file changed, 6 deletions(-)
+Only lightly tested so far, but it seems to do the right thing. The
+main assumption here is that no one actually relies on the code to
+scan /tmp for credcaches, and that we should just rely on krb5.conf to
+tell us where they are.
 
-diff --git a/cifs.upcall.c b/cifs.upcall.c
-index 8448d00f6061..a25833592440 100644
---- a/cifs.upcall.c
-+++ b/cifs.upcall.c
-@@ -157,9 +157,6 @@ err_endseq:
- err_ccstart:
- 	krb5_free_principal(context, principal);
- err_princ:
--#if defined(KRB5_TC_OPENCLOSE)
--	krb5_cc_set_flags(context, ccache, KRB5_TC_OPENCLOSE);
--#endif
- 	krb5_cc_close(context, ccache);
- err_cache:
- 	return credtime;
-@@ -388,9 +385,6 @@ out_free_creds:
- out_free_principal:
- 	krb5_free_principal(context, in_creds.client);
- out_free_ccache:
--#if defined(KRB5_TC_OPENCLOSE)
--	krb5_cc_set_flags(context, ccache, KRB5_TC_OPENCLOSE);
--#endif
- 	krb5_cc_close(context, ccache);
- 	return ret;
- }
+While this is a step in the right direction, what I think we might
+want to do longer-term is to make this use gss_init_sec_context
+instead of micromanaging it like we do now. The only part I'm a
+little unclear on is how to extract the session key in that case.
+
+Comments welcome!
+
+Jeff Layton (6):
+  aclocal: fix typo in idmap.m4
+  cifs.upcall: use krb5 routines to get default ccname
+  cifs.upcall: make the krb5_context a static global variable
+  cifs.upcall: remove KRB5_TC_OPENCLOSE
+  cifs.upcall: make get_tgt_time take a ccache arg
+  cifs.upcall: stop passing around ccache name strings
+
+ aclocal/idmap.m4 |   2 +-
+ cifs.upcall.c    | 266 +++++++++++++------------------------------------------
+ 2 files changed, 61 insertions(+), 207 deletions(-)
+
 -- 
 2.7.4
