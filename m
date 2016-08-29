@@ -1,8 +1,8 @@
 From: Cong Monkey <congzhangzh-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: Is that possible follow symbol link location which point with
  full location
-Date: Tue, 30 Aug 2016 00:38:32 +0800
-Message-ID: <CAOXDmPqGJt0JVJAnLXuuU-vhsao2ouS_VEk2Q3uzQNqrkx697w@mail.gmail.com>
+Date: Tue, 30 Aug 2016 01:19:45 +0800
+Message-ID: <CAOXDmPoihowyCFfR85G8DUo9JopcciXwnsD++MT0G-eaHFFp-Q@mail.gmail.com>
 References: <CAOXDmPr9tgNVQFJOpurtfH6+C3gRa5nej=uKpzXmvHY6m6d6hw@mail.gmail.com>
  <CAH2r5msULOWU0E3zL9zH+d_zhEngof5Htfn-D1JgDYa4PJsrsg@mail.gmail.com>
  <CAOXDmPrbukTqNi1aK6HM-DoEJB+fyNybibuUXr+JwHHH9JHrAg@mail.gmail.com>
@@ -23,7 +23,6 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Yes, I want Linux client to follow symbol link like windows client,
 even the symbol link point to an unc path, that's very convenient.
-
 
 On 8/30/16, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 > Do you want the Linux client to follow a DFS-like link in a Windows
