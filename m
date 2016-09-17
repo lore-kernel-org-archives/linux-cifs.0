@@ -1,43 +1,39 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Fri, 16 Sep 2016 19:06:58 -0500
-Message-ID: <CAH2r5mtTkbxfsh=H0OT4ABRZJF=RbqT1XLCfvwi08s1tJdyh2Q@mail.gmail.com>
+From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+Subject: Re: [PATCH v1 1/1] fs/cifs/dir.c: use correct path separators
+Date: Sat, 17 Sep 2016 09:54:38 +0200
+Message-ID: <mpswpibklkx.fsf@suse.com>
+References: <1473255952-27579-1-git-send-email-aaptel@suse.com> <1473705389.29354.20.camel@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1473705389.29354.20.camel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Please merge the following small set of cifs ixes.
+Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> writes:
+> We have an inline helper convert_delimiter() which already does this.
+> The block for dfsplen also seems to repeat the code. 
 
-The following changes since commit bd0b841fee49de421f615cc173ccff063303672f:
+Correct except for a small detail: the inline helper does the conversion
+until the end of the string. Here we need to stop in the middle.
 
-  nvme: make NVME_RDMA depend on BLOCK (2016-09-11 14:41:49 -0700)
+> Can we use the  helper for the complete patch instead when the
+> full_path variable is available?
 
-are available in the git repository at:
+We do not want to mess with unix path that might contain a valid
+backslash inside a path component.
 
-  git://git.samba.org/sfrench/cifs-2.6.git for-next
+> I think the code here for copying the treename and the prefixpath name
+> can also be cleaned to make it easier to read ie. move the treeName
+> copy before we copy over the prefix path.
 
-for you to fetch changes up to 348c1bfa84dfc47da1f1234b7f2bf09fa798edea:
-
-  Move check for prefix path to within cifs_get_root() (2016-09-09
-23:58:07 -0500)
-
-----------------------------------------------------------------
-Sachin Prabhu (3):
-      Fix memory leaks in cifs_do_mount()
-      Compare prepaths when comparing superblocks
-      Move check for prefix path to within cifs_get_root()
-
- fs/cifs/cifsfs.c    | 29 ++++++++++++-----------------
- fs/cifs/cifsproto.h |  2 +-
- fs/cifs/connect.c   | 31 +++++++++++++++++++++++++++++--
- 3 files changed, 42 insertions(+), 20 deletions(-)
+Agreed. Thanks for the feedback, Sachin.
+I'll send an updated patch for review.
 
 -- 
-Thanks,
-
-Steve
+Aurélien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
+GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
