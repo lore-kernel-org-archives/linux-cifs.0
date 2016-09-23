@@ -1,88 +1,61 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Recent CIFS/SMB3 fixes from the plugfest
-Date: Fri, 23 Sep 2016 02:24:22 -0500
-Message-ID: <CAH2r5msku=Y_k_p9fE6qyz-6ahBCamEetf=yvT0wXcxBmHf67A@mail.gmail.com>
+From: Seth Forshee <seth.forshee-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+Subject: Re: cifs mount regression in 4.8 and 4.4 stable
+Date: Fri, 23 Sep 2016 07:01:45 -0500
+Message-ID: <20160923120145.GA51563@ubuntu-hedt>
+References: <20160922150918.GA127053@ubuntu-hedt>
+ <1474557429.14139.10.camel@redhat.com>
+ <20160922152756.GB127053@ubuntu-hedt>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "David Goebel (AZURE)" <davidgoe-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Ross Lagerwall <ross.lagerwall-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>,
-        Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>,
-        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>
-To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>,
+        Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
+        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20160922152756.GB127053@ubuntu-hedt>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Thanks to Aurelien, Germano (and Ross) for help with recent cifs/smb3
-fixes and good progress at the SMB3 plugfest this week.   11 fixes
-checked in so far to cifs-2.6 for-next.  More review would be
-appreciated.  We are still working on improvements to ACL support
-(including being able to optionally emulate uid/gid ownership from
-special sids as JRA suggested), ways to query some additional metadata
-(via ioctls or xattrs), and hopefully encryption support and some
-performance optimizations.
+On Thu, Sep 22, 2016 at 10:27:56AM -0500, Seth Forshee wrote:
+> On Thu, Sep 22, 2016 at 04:17:09PM +0100, Sachin Prabhu wrote:
+> > On Thu, 2016-09-22 at 10:09 -0500, Seth Forshee wrote:
+> > > We've received reports from users of a cifs mount regression in our
+> > > 4.4-based kernel, e.g. [1]. It is fixed by reverting the follwing
+> > > commit
+> > > from 4.8 which was applied to 4.4 stable:
+> > > 
+> > >  a6b5058 fs/cifs: make share unaccessible at root level mountable
+> > > 
+> > > Testing against 4.8-rc7 shows that the problem is present there as
+> > > well.
+> > > 
+> > > Thanks,
+> > > Seth
+> > > 
+> > > [1] http://bugs.launchpad.net/bugs/1626112
+> > 
+> > Hello Seth, 
+> > 
+> > We have identified some regressions introduced by the mentioned patch
+> > These include
+> 
+> I saw those, but none of the ones already in Linus's tree fix the
+> problem.
+> 
+> > a) mounting of DFS shares breaks. The fix is included in Steve's tree
+> > at
+> > https://git.samba.org/?p=sfrench/cifs-2.6.git;a=commit;h=de5233745cd59c
+> > f5853d963ad216067788a87594
+> 
+> However this one isn't in Linus's tree yet.
+> 
+> I'm not certain what circumstances cause the failure, but based on what
+> I see in dmesg it looks likely that this one is the fix. I'll get some
+> testing with this applied.
 
-sfrench@ubuntu:~/cifs-2.6$ git log --pretty=short -11
-commit 659f6f19d31164de895ae3ed6b3914b1e6c162d6
-Author: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Looks like this is is the fix we need. Thanks for your help.
 
-    SMB3:  Add mount parameter to allow user to override max credits
-
-commit 162da7678426d5ec5c1bc6d0cde02be481a6ea1b
-Author: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-
-    fs/cifs: reopen persistent handles on reconnect
-
-commit ad5127848355e16243e04faae7e053ddb34c3dac
-Author: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-
-    [CIFS] Clarify locking of cifs file and tcon structures and make
-more granular
-
-commit de5233745cd59cf5853d963ad216067788a87594
-Author: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-
-    Fix regression which breaks DFS mounting
-
-commit 06dc82f1ce3d4d9da2571e6fa7c7ea8c18e0ca6f
-Author: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-
-    fs/cifs: keep guid when assigning fid to fileinfo
-
-commit 17476d9818d49dcda9c6dcbc80ef7e7f67ba5a3b
-Author: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-
-    SMB3: GUIDs should be constructed as random but valid uuids
-
-commit e1df6cab7969a89f41b3d99a944ea58837ec35e6
-Author: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-
-    Set previous session id correctly on SMB3 reconnect
-
-commit 44c57e921faf40aa4bca61c223147e458730166f
-Author: Ross Lagerwall <ross.lagerwall-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-
-    cifs: Limit the overall credit acquired
-
-commit ad97c0a245667982aac7a40cd91c5462e3d2a4e8
-Author: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-
-    [SMB3] Display number of credits available
-
-commit 12981ea922bae13b443a727126b183273bde3587
-Author: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-
-    [CIFS] Add way to query creation time of file via cifs xattr
-
-commit 7ad21be52ff3bbab09bc987d2491eed8088c63a1
-Author: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-
-    Add way to query file attributes via cifs xattr
-
-
--- 
-Thanks,
-
-Steve
+Seth
