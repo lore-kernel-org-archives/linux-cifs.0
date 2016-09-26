@@ -1,61 +1,57 @@
-From: Seth Forshee <seth.forshee-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
-Subject: Re: cifs mount regression in 4.8 and 4.4 stable
-Date: Fri, 23 Sep 2016 07:01:45 -0500
-Message-ID: <20160923120145.GA51563@ubuntu-hedt>
-References: <20160922150918.GA127053@ubuntu-hedt>
- <1474557429.14139.10.camel@redhat.com>
- <20160922152756.GB127053@ubuntu-hedt>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: []PATCH][SMB3] Do not send set_info request with no changed fields
+Date: Mon, 26 Sep 2016 15:30:45 -0500
+Message-ID: <CAH2r5mte=KZg4A0bhBnuYrM4uYD0OP_rc9er80W6gKVG2RO8sA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>,
-        Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
-        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: multipart/mixed; boundary=94eb2c058e74e7740a053d6f012e
+Cc: =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>
+To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20160922152756.GB127053@ubuntu-hedt>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, Sep 22, 2016 at 10:27:56AM -0500, Seth Forshee wrote:
-> On Thu, Sep 22, 2016 at 04:17:09PM +0100, Sachin Prabhu wrote:
-> > On Thu, 2016-09-22 at 10:09 -0500, Seth Forshee wrote:
-> > > We've received reports from users of a cifs mount regression in our
-> > > 4.4-based kernel, e.g. [1]. It is fixed by reverting the follwing
-> > > commit
-> > > from 4.8 which was applied to 4.4 stable:
-> > > 
-> > >  a6b5058 fs/cifs: make share unaccessible at root level mountable
-> > > 
-> > > Testing against 4.8-rc7 shows that the problem is present there as
-> > > well.
-> > > 
-> > > Thanks,
-> > > Seth
-> > > 
-> > > [1] http://bugs.launchpad.net/bugs/1626112
-> > 
-> > Hello Seth, 
-> > 
-> > We have identified some regressions introduced by the mentioned patch
-> > These include
-> 
-> I saw those, but none of the ones already in Linus's tree fix the
-> problem.
-> 
-> > a) mounting of DFS shares breaks. The fix is included in Steve's tree
-> > at
-> > https://git.samba.org/?p=sfrench/cifs-2.6.git;a=commit;h=de5233745cd59c
-> > f5853d963ad216067788a87594
-> 
-> However this one isn't in Linus's tree yet.
-> 
-> I'm not certain what circumstances cause the failure, but based on what
-> I see in dmesg it looks likely that this one is the fix. I'll get some
-> testing with this applied.
+--94eb2c058e74e7740a053d6f012e
+Content-Type: text/plain; charset=UTF-8
 
-Looks like this is is the fix we need. Thanks for your help.
+We had cases where all timestamp (and dos attribute) fields were
+marked 0 (do not change) - this is a no op, so don't send it to the
+server and waste the bandwidth.
 
-Seth
+
+
+-- 
+Thanks,
+
+Steve
+
+--94eb2c058e74e7740a053d6f012e
+Content-Type: application/mbox;
+	name="0001-SMB3-Do-not-send-SMB3-SET_INFO-request-if-nothing-is.patch"
+Content-Disposition: attachment;
+	filename="0001-SMB3-Do-not-send-SMB3-SET_INFO-request-if-nothing-is.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_itkg54l60
+
+RnJvbSBkNjMwNjNiYTdkOWU4MTM4NGE2YzM5NTBjODIxMTI4ZmZkYmFhMmE0IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHNtZnJlbmNoQGdtYWlsLmNvbT4KRGF0
+ZTogTW9uLCAyNiBTZXAgMjAxNiAxNDoyMzowOCAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIFtTTUIz
+XSBEbyBub3Qgc2VuZCBTTUIzIFNFVF9JTkZPIHJlcXVlc3QgaWYgbm90aGluZyBpcwogY2hhbmdp
+bmcKCldlIGhhZCBjYXNlcyB3aGVyZSB3ZSBzZW50IGEgU01CMi9TTUIzIHNldGluZm8gcmVxdWVz
+dCB3aXRoIGFsbAp0aW1lc3RhbXAgKGFuZCBET1MgYXR0cmlidXRlKSBmaWVsZHMgbWFya2VkIGFz
+IDAgKGllIGRvIG5vdCBjaGFuZ2UpCmUuZy4gb24gY2htb2Qgb3IgY2hvd24uCgpDQzogU3RhYmxl
+IDxzdGFibGVAdmdlci5rZXJuZWwub3JnPgotLS0KIGZzL2NpZnMvc21iMmlub2RlLmMgfCA2ICsr
+KysrKwogMSBmaWxlIGNoYW5nZWQsIDYgaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL2ZzL2Np
+ZnMvc21iMmlub2RlLmMgYi9mcy9jaWZzL3NtYjJpbm9kZS5jCmluZGV4IDRmMDIzMWUuLjEyMzhj
+ZDMgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvc21iMmlub2RlLmMKKysrIGIvZnMvY2lmcy9zbWIyaW5v
+ZGUuYwpAQCAtMjY2LDkgKzI2NiwxNSBAQCBzbWIyX3NldF9maWxlX2luZm8oc3RydWN0IGlub2Rl
+ICppbm9kZSwgY29uc3QgY2hhciAqZnVsbF9wYXRoLAogCXN0cnVjdCB0Y29uX2xpbmsgKnRsaW5r
+OwogCWludCByYzsKIAorCWlmICgoYnVmLT5DcmVhdGlvblRpbWUgPT0gMCkgJiYgKGJ1Zi0+TGFz
+dEFjY2Vzc1RpbWUgPT0gMCkgJiYKKwkgICAgKGJ1Zi0+TGFzdFdyaXRlVGltZSA9PSAwKSAmJiAo
+YnVmLT5DaGFuZ2VUaW1lKSAmJgorCSAgICAoYnVmLT5BdHRyaWJ1dGVzID09IDApKQorCQlyZXR1
+cm4gMDsgLyogd291bGQgYmUgYSBubyBvcCwgbm8gc2Vuc2Ugc2VuZGluZyB0aGlzICovCisKIAl0
+bGluayA9IGNpZnNfc2JfdGxpbmsoY2lmc19zYik7CiAJaWYgKElTX0VSUih0bGluaykpCiAJCXJl
+dHVybiBQVFJfRVJSKHRsaW5rKTsKKwogCXJjID0gc21iMl9vcGVuX29wX2Nsb3NlKHhpZCwgdGxp
+bmtfdGNvbih0bGluayksIGNpZnNfc2IsIGZ1bGxfcGF0aCwKIAkJCQlGSUxFX1dSSVRFX0FUVFJJ
+QlVURVMsIEZJTEVfT1BFTiwgMCwgYnVmLAogCQkJCVNNQjJfT1BfU0VUX0lORk8pOwotLSAKMS45
+LjEKCg==
+--94eb2c058e74e7740a053d6f012e--
