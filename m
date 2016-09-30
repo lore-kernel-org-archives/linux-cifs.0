@@ -1,44 +1,143 @@
-From: Karel Zak <kzak-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] libmount: Special handling of root comparison for cifs
- in mnt_table_is_fs_mounted()
-Date: Thu, 29 Sep 2016 11:55:53 +0200
-Message-ID: <20160929095553.2f6g4b2mutotqi2r@ws.net.home>
-References: <91d465d3-4f5b-6270-a6c5-38bd94695731@suse.cz>
- <5eb96b3e-d463-bf11-49de-f614247d6b29@suse.cz>
- <20160805192234.2c9d5b7d@aaptelpc>
- <7c2181d1-c7b5-df04-0640-ec23f5d78eab@suse.cz>
- <c4f10081-4525-4ac0-0e6b-b364c7268200@suse.cz>
- <eec8f575-eab2-34bb-882a-11fb8c33d9c0@suse.cz>
- <mpsbn06ruwv.fsf@suse.com>
+From: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
+Subject: Re: [PATCH v25 00/21] Richacls (Core and Ext4)
+Date: Fri, 30 Sep 2016 12:11:22 -0400
+Message-ID: <20160930161122.GA3857@fieldses.org>
+References: <1475105380-22837-1-git-send-email-agruenba@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: Stanislav Brabec <sbrabec-AlSwsSmVLrQ@public.gmane.org>,
-        util-linux <util-linux-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: =?iso-8859-1?Q?Aur=E9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
+        Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+        Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>,
+        Andreas Dilger <adilger.kernel-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>,
+        Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>,
+        Trond Myklebust <trond.myklebust-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
+        Anna Schumaker <anna.schumaker-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
+        Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>, linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <mpsbn06ruwv.fsf-IBi9RG/b67k@public.gmane.org>
+In-Reply-To: <1475105380-22837-1-git-send-email-agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, Sep 02, 2016 at 08:58:08PM +0200, Aurélien Aptel wrote:
-> I'm attaching a simpler patch that makes uses of streq_paths() in
-> lib/strutils.c (Note: streq_paths() and next_path_segment() have to be
-> backported for older versions of util-linux).
+Could we finally get this merged?  What more is this waiting on?
+
+--b.
+
+On Thu, Sep 29, 2016 at 01:29:19AM +0200, Andreas Gruenbacher wrote:
+> Here is another update of the richacl patches.  Changes since the last posting
+> (http://lwn.net/Articles/697320/):
 > 
->
-> From a29acba1a7c71cdbfc1cc98f2905bfaf19b97a29 Mon Sep 17 00:00:00 2001
-> From: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-> Date: Thu, 1 Sep 2016 13:57:42 +0200
-> Subject: [PATCH] libmount/src/tab.c: fix mount -a for cifs
-
- Applied, thanks!
-
-    Karel
-
-
--- 
- Karel Zak  <kzak-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
- http://karelzak.blogspot.com
+>  * Rebase on top of the VFS for-next branch
+>    (git://git.kernel.org/pub/scm/linux/kernel/git/viro/vfs.git for-next;
+>    hash 6731cb0f).
+> 
+>    (This patch queue does not conflict with the xattr inode operation removal
+>    patches.)
+>    
+>  * Adjust for the {inode_change_ok => setattr_prepare} rename.
+> 
+> The complete patch queue is available here:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/agruen/linux-richacl.git \
+> 	richacl-2016-09-29
+> 
+> 
+> The richacl user-space utilitites, man pages, and test suite are available
+> here:
+> 
+>   https://github.com/andreas-gruenbacher/richacl
+> 
+> 
+> Changes to other user-space packages for richacl:
+> 
+>   https://github.com/andreas-gruenbacher/coreutils
+>   https://github.com/andreas-gruenbacher/e2fsprogs
+>   https://github.com/andreas-gruenbacher/samba
+>   https://github.com/andreas-gruenbacher/xfsprogs-dev
+>   https://github.com/andreas-gruenbacher/nfs-utils
+> 
+> 
+> Please see the richacl homepage for more information:
+> 
+>   http://www.bestbits.at/richacl/
+> 
+> 
+> Thanks,
+> Andreas
+> 
+> Andreas Gruenbacher (19):
+>   vfs: Add IS_ACL() and IS_RICHACL() tests
+>   vfs: Add MAY_CREATE_FILE and MAY_CREATE_DIR permission flags
+>   vfs: Add MAY_DELETE_SELF and MAY_DELETE_CHILD permission flags
+>   vfs: Add permission flags for setting file attributes
+>   richacl: In-memory representation and helper functions
+>   richacl: Permission mapping functions
+>   richacl: Permission check algorithm
+>   richacl: Compute maximum file masks from an acl
+>   vfs: Cache base_acl objects in inodes
+>   vfs: Add get_richacl and set_richacl inode operations
+>   vfs: Cache richacl in struct inode
+>   richacl: Update the file masks in chmod()
+>   richacl: Check if an acl is equivalent to a file mode
+>   richacl: Create-time inheritance
+>   richacl: Automatic Inheritance
+>   richacl: xattr mapping functions
+>   richacl: Add richacl xattr handler
+>   vfs: Add richacl permission checking
+>   vfs: Move check_posix_acl and check_richacl out of fs/namei.c
+> 
+> Aneesh Kumar K.V (2):
+>   ext4: Add richacl support
+>   ext4: Add richacl feature flag
+> 
+>  drivers/staging/lustre/lustre/llite/llite_lib.c |   2 +-
+>  fs/9p/acl.c                                     |   8 +-
+>  fs/Kconfig                                      |   3 +
+>  fs/Makefile                                     |   1 +
+>  fs/attr.c                                       |  79 +-
+>  fs/ext4/Kconfig                                 |  11 +
+>  fs/ext4/Makefile                                |   1 +
+>  fs/ext4/ext4.h                                  |   6 +-
+>  fs/ext4/file.c                                  |   3 +
+>  fs/ext4/ialloc.c                                |  11 +-
+>  fs/ext4/inode.c                                 |   5 +-
+>  fs/ext4/namei.c                                 |   5 +
+>  fs/ext4/richacl.c                               | 134 ++++
+>  fs/ext4/richacl.h                               |  40 +
+>  fs/ext4/super.c                                 |  49 +-
+>  fs/ext4/xattr.c                                 |   7 +
+>  fs/f2fs/acl.c                                   |   4 +-
+>  fs/inode.c                                      |  43 +-
+>  fs/jffs2/acl.c                                  |   6 +-
+>  fs/namei.c                                      | 114 +--
+>  fs/nfs/nfs3acl.c                                |  14 +-
+>  fs/posix_acl.c                                  |  97 ++-
+>  fs/richacl.c                                    | 937 ++++++++++++++++++++++++
+>  fs/richacl_xattr.c                              | 222 ++++++
+>  include/linux/acl.h                             |  15 +
+>  include/linux/fs.h                              |  63 +-
+>  include/linux/posix_acl.h                       |  24 +-
+>  include/linux/richacl.h                         | 218 ++++++
+>  include/linux/richacl_xattr.h                   |  31 +
+>  include/uapi/linux/Kbuild                       |   2 +
+>  include/uapi/linux/fs.h                         |   3 +-
+>  include/uapi/linux/richacl.h                    | 152 ++++
+>  include/uapi/linux/richacl_xattr.h              |  44 ++
+>  include/uapi/linux/xattr.h                      |   2 +
+>  34 files changed, 2195 insertions(+), 161 deletions(-)
+>  create mode 100644 fs/ext4/richacl.c
+>  create mode 100644 fs/ext4/richacl.h
+>  create mode 100644 fs/richacl.c
+>  create mode 100644 fs/richacl_xattr.c
+>  create mode 100644 include/linux/acl.h
+>  create mode 100644 include/linux/richacl.h
+>  create mode 100644 include/linux/richacl_xattr.h
+>  create mode 100644 include/uapi/linux/richacl.h
+>  create mode 100644 include/uapi/linux/richacl_xattr.h
+> 
+> -- 
+> 2.7.4
