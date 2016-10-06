@@ -1,45 +1,32 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 0/2] Revamp SMB2 authentication code
-Date: Mon, 3 Oct 2016 12:45:56 -0500
-Message-ID: <CAH2r5msD+zWcZC9C39Y7Bcr1wK_QUsgd3F0b+JBBOCg2f1SE9g@mail.gmail.com>
-References: <1474553094-8884-1-git-send-email-sprabhu@redhat.com>
+From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+Subject: Re: [PATCH] cifs_get_root shouldn't use path with tree name
+Date: Thu, 06 Oct 2016 14:15:36 +0200
+Message-ID: <mpswphl3c7r.fsf@suse.com>
+References: <1473260003-5271-1-git-send-email-sprabhu@redhat.com> <mpsmvjir7hx.fsf@suse.com> <1473698409.29354.3.camel@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1474553094-8884-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1473698409.29354.3.camel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Any reviews of this?
+What is the status on this?
 
-On Thu, Sep 22, 2016 at 9:04 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> Revamp the authentication code for SMB2 to bring it in line with the code for
-> SMB1 authentication.
->
-> This also fixes a double free issue caused when we hit an error generating a
-> ntlmssp blob. One way to hit this is to enable FIPS mode which prevents the
-> module from using md5 for NTLMSSP authentication.
->
-> Sachin Prabhu (2):
->   SMB2: Separate Kerberos authentication from SMB2_sess_setup
->   SMB2: Seperate RawNTLMSSP authentication from SMB2_sess_setup
->
->  fs/cifs/smb2pdu.c | 557 ++++++++++++++++++++++++++++++++++--------------------
->  1 file changed, 352 insertions(+), 205 deletions(-)
->
-> --
-> 2.7.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+If we explicitely ask for a tree name prefix via the new parameter, we
+should always get it. It should not return an empty string if there is
+no prepath.
 
+Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> writes:
+> I suspect that is because the root of the share cannot be a DFS mount.
+> Maybe Steve can confirm it.
 
+So that means we can safely remove that early return, IIUC.
 
 -- 
-Thanks,
-
-Steve
+Aurélien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
+GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
