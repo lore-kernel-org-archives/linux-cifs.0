@@ -1,343 +1,57 @@
-From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 1/2] SMB2: Separate Kerberos authentication from SMB2_sess_setup
-Date: Fri,  7 Oct 2016 19:11:21 +0100
-Message-ID: <1475863882-7223-2-git-send-email-sprabhu@redhat.com>
-References: <1475863882-7223-1-git-send-email-sprabhu@redhat.com>
-To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+Subject: Re: [PATCH] cifs_get_root shouldn't use path with tree name
+Date: Tue, 11 Oct 2016 08:18:06 +0200
+Message-ID: <mpsk2df2yu9.fsf@suse.com>
+References: <1473260003-5271-1-git-send-email-sprabhu@redhat.com> <mpsmvjir7hx.fsf@suse.com> <1473698409.29354.3.camel@redhat.com> <mpswphl3c7r.fsf@suse.com> <1475756441.2493.4.camel@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1475863882-7223-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1475756441.2493.4.camel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Add helper functions and split Kerberos authentication off
-SMB2_sess_setup.
+Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> writes:
+> I think Steve had requested for a reproducer for this issue. The only
+> place I've encountered this was with Netapp servers. Do you have a
+> reproder which works with Samba or Windows servers?
 
-Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/smb2pdu.c | 276 +++++++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 230 insertions(+), 46 deletions(-)
+The reproducer was for Samba but the root cause was something different
+(later fixed by your last DFS fix). The thing I used to reproduce it
+doesn't reproduce it anymore.
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index d6a0456..386b512 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -593,6 +593,216 @@ vneg_out:
- 	return -EIO;
- }
- 
-+struct SMB2_sess_data {
-+	unsigned int xid;
-+	struct cifs_ses *ses;
-+	struct nls_table *nls_cp;
-+	void (*func)(struct SMB2_sess_data *);
-+	int result;
-+	u64 previous_session;
-+
-+	/* we will send the SMB in three pieces:
-+	 * a fixed length beginning part, an optional
-+	 * SPNEGO blob (which can be zero length), and a
-+	 * last part which will include the strings
-+	 * and rest of bcc area. This allows us to avoid
-+	 * a large buffer 17K allocation
-+	 */
-+	int buf0_type;
-+	struct kvec iov[2];
-+};
-+
-+static int
-+SMB2_sess_alloc_buffer(struct SMB2_sess_data *sess_data)
-+{
-+	int rc;
-+	struct cifs_ses *ses = sess_data->ses;
-+	struct smb2_sess_setup_req *req;
-+	struct TCP_Server_Info *server = ses->server;
-+
-+	rc = small_smb2_init(SMB2_SESSION_SETUP, NULL, (void **) &req);
-+	if (rc)
-+		return rc;
-+
-+	req->hdr.SessionId = 0; /* First session, not a reauthenticate */
-+
-+	/* if reconnect, we need to send previous sess id, otherwise it is 0 */
-+	req->PreviousSessionId = sess_data->previous_session;
-+
-+	req->Flags = 0; /* MBZ */
-+	/* to enable echos and oplocks */
-+	req->hdr.CreditRequest = cpu_to_le16(3);
-+
-+	/* only one of SMB2 signing flags may be set in SMB2 request */
-+	if (server->sign)
-+		req->SecurityMode = SMB2_NEGOTIATE_SIGNING_REQUIRED;
-+	else if (global_secflags & CIFSSEC_MAY_SIGN) /* one flag unlike MUST_ */
-+		req->SecurityMode = SMB2_NEGOTIATE_SIGNING_ENABLED;
-+	else
-+		req->SecurityMode = 0;
-+
-+	req->Capabilities = 0;
-+	req->Channel = 0; /* MBZ */
-+
-+	sess_data->iov[0].iov_base = (char *)req;
-+	/* 4 for rfc1002 length field and 1 for pad */
-+	sess_data->iov[0].iov_len = get_rfc1002_length(req) + 4 - 1;
-+	/*
-+	 * This variable will be used to clear the buffer
-+	 * allocated above in case of any error in the calling function.
-+	 */
-+	sess_data->buf0_type = CIFS_SMALL_BUFFER;
-+
-+	return 0;
-+}
-+
-+static void
-+SMB2_sess_free_buffer(struct SMB2_sess_data *sess_data)
-+{
-+	free_rsp_buf(sess_data->buf0_type, sess_data->iov[0].iov_base);
-+	sess_data->buf0_type = CIFS_NO_BUFFER;
-+}
-+
-+static int
-+SMB2_sess_sendreceive(struct SMB2_sess_data *sess_data)
-+{
-+	int rc;
-+	struct smb2_sess_setup_req *req = sess_data->iov[0].iov_base;
-+
-+	/* Testing shows that buffer offset must be at location of Buffer[0] */
-+	req->SecurityBufferOffset =
-+		cpu_to_le16(sizeof(struct smb2_sess_setup_req) -
-+			1 /* pad */ - 4 /* rfc1001 len */);
-+	req->SecurityBufferLength = cpu_to_le16(sess_data->iov[1].iov_len);
-+
-+	inc_rfc1001_len(req, sess_data->iov[1].iov_len - 1 /* pad */);
-+
-+	/* BB add code to build os and lm fields */
-+
-+	rc = SendReceive2(sess_data->xid, sess_data->ses,
-+				sess_data->iov, 2,
-+				&sess_data->buf0_type,
-+				CIFS_LOG_ERROR | CIFS_NEG_OP);
-+
-+	return rc;
-+}
-+
-+static int
-+SMB2_sess_establish_session(struct SMB2_sess_data *sess_data)
-+{
-+	int rc = 0;
-+	struct cifs_ses *ses = sess_data->ses;
-+
-+	mutex_lock(&ses->server->srv_mutex);
-+	if (ses->server->sign && ses->server->ops->generate_signingkey) {
-+		rc = ses->server->ops->generate_signingkey(ses);
-+		kfree(ses->auth_key.response);
-+		ses->auth_key.response = NULL;
-+		if (rc) {
-+			cifs_dbg(FYI,
-+				"SMB3 session key generation failed\n");
-+			mutex_unlock(&ses->server->srv_mutex);
-+			goto keygen_exit;
-+		}
-+	}
-+	if (!ses->server->session_estab) {
-+		ses->server->sequence_number = 0x2;
-+		ses->server->session_estab = true;
-+	}
-+	mutex_unlock(&ses->server->srv_mutex);
-+
-+	cifs_dbg(FYI, "SMB2/3 session established successfully\n");
-+	spin_lock(&GlobalMid_Lock);
-+	ses->status = CifsGood;
-+	ses->need_reconnect = false;
-+	spin_unlock(&GlobalMid_Lock);
-+
-+keygen_exit:
-+	if (!ses->server->sign) {
-+		kfree(ses->auth_key.response);
-+		ses->auth_key.response = NULL;
-+	}
-+	return rc;
-+}
-+
-+#ifdef CONFIG_CIFS_UPCALL
-+static void
-+SMB2_auth_kerberos(struct SMB2_sess_data *sess_data)
-+{
-+	int rc;
-+	struct cifs_ses *ses = sess_data->ses;
-+	struct cifs_spnego_msg *msg;
-+	struct key *spnego_key = NULL;
-+	struct smb2_sess_setup_rsp *rsp = NULL;
-+
-+	rc = SMB2_sess_alloc_buffer(sess_data);
-+	if (rc)
-+		goto out;
-+
-+	spnego_key = cifs_get_spnego_key(ses);
-+	if (IS_ERR(spnego_key)) {
-+		rc = PTR_ERR(spnego_key);
-+		spnego_key = NULL;
-+		goto out;
-+	}
-+
-+	msg = spnego_key->payload.data[0];
-+	/*
-+	 * check version field to make sure that cifs.upcall is
-+	 * sending us a response in an expected form
-+	 */
-+	if (msg->version != CIFS_SPNEGO_UPCALL_VERSION) {
-+		cifs_dbg(VFS,
-+			  "bad cifs.upcall version. Expected %d got %d",
-+			  CIFS_SPNEGO_UPCALL_VERSION, msg->version);
-+		rc = -EKEYREJECTED;
-+		goto out_put_spnego_key;
-+	}
-+
-+	ses->auth_key.response = kmemdup(msg->data, msg->sesskey_len,
-+					 GFP_KERNEL);
-+	if (!ses->auth_key.response) {
-+		cifs_dbg(VFS,
-+			"Kerberos can't allocate (%u bytes) memory",
-+			msg->sesskey_len);
-+		rc = -ENOMEM;
-+		goto out_put_spnego_key;
-+	}
-+	ses->auth_key.len = msg->sesskey_len;
-+
-+	sess_data->iov[1].iov_base = msg->data + msg->sesskey_len;
-+	sess_data->iov[1].iov_len = msg->secblob_len;
-+
-+	rc = SMB2_sess_sendreceive(sess_data);
-+	if (rc)
-+		goto out_put_spnego_key;
-+
-+	rsp = (struct smb2_sess_setup_rsp *)sess_data->iov[0].iov_base;
-+	ses->Suid = rsp->hdr.SessionId;
-+
-+	ses->session_flags = le16_to_cpu(rsp->SessionFlags);
-+	if (ses->session_flags & SMB2_SESSION_FLAG_ENCRYPT_DATA)
-+		cifs_dbg(VFS, "SMB3 encryption not supported yet\n");
-+
-+	rc = SMB2_sess_establish_session(sess_data);
-+out_put_spnego_key:
-+	key_invalidate(spnego_key);
-+	key_put(spnego_key);
-+out:
-+	sess_data->result = rc;
-+	sess_data->func = NULL;
-+	SMB2_sess_free_buffer(sess_data);
-+}
-+#else
-+static void
-+SMB2_auth_kerberos(struct SMB2_sess_data *sess_data)
-+{
-+	cifs_dbg(VFS, "Kerberos negotiated but upcall support disabled!\n");
-+	sess_data->result = -EOPNOTSUPP;
-+	sess_data->func = NULL;
-+}
-+#endif
-+
- int
- SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
- 		const struct nls_table *nls_cp)
-@@ -605,11 +815,11 @@ SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
- 	__le32 phase = NtLmNegotiate; /* NTLMSSP, if needed, is multistage */
- 	struct TCP_Server_Info *server = ses->server;
- 	u16 blob_length = 0;
--	struct key *spnego_key = NULL;
- 	char *security_blob = NULL;
- 	unsigned char *ntlmssp_blob = NULL;
- 	bool use_spnego = false; /* else use raw ntlmssp */
- 	u64 previous_session = ses->Suid;
-+	struct SMB2_sess_data *sess_data;
- 
- 	cifs_dbg(FYI, "Session Setup\n");
- 
-@@ -618,6 +828,20 @@ SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
- 		return -EIO;
- 	}
- 
-+	sess_data = kzalloc(sizeof(struct SMB2_sess_data), GFP_KERNEL);
-+	if (!sess_data)
-+		return -ENOMEM;
-+	sess_data->xid = xid;
-+	sess_data->ses = ses;
-+	sess_data->buf0_type = CIFS_NO_BUFFER;
-+	sess_data->nls_cp = (struct nls_table *) nls_cp;
-+	sess_data->previous_session = ses->Suid;
-+
-+	if (ses->sectype == Kerberos) {
-+		SMB2_auth_kerberos(sess_data);
-+		goto out;
-+	}
-+
- 	/*
- 	 * If we are here due to reconnect, free per-smb session key
- 	 * in case signing was required.
-@@ -670,47 +894,7 @@ ssetup_ntlmssp_authenticate:
- 	/* 4 for rfc1002 length field and 1 for pad */
- 	iov[0].iov_len = get_rfc1002_length(req) + 4 - 1;
- 
--	if (ses->sectype == Kerberos) {
--#ifdef CONFIG_CIFS_UPCALL
--		struct cifs_spnego_msg *msg;
--
--		spnego_key = cifs_get_spnego_key(ses);
--		if (IS_ERR(spnego_key)) {
--			rc = PTR_ERR(spnego_key);
--			spnego_key = NULL;
--			goto ssetup_exit;
--		}
--
--		msg = spnego_key->payload.data[0];
--		/*
--		 * check version field to make sure that cifs.upcall is
--		 * sending us a response in an expected form
--		 */
--		if (msg->version != CIFS_SPNEGO_UPCALL_VERSION) {
--			cifs_dbg(VFS,
--				  "bad cifs.upcall version. Expected %d got %d",
--				  CIFS_SPNEGO_UPCALL_VERSION, msg->version);
--			rc = -EKEYREJECTED;
--			goto ssetup_exit;
--		}
--		ses->auth_key.response = kmemdup(msg->data, msg->sesskey_len,
--						 GFP_KERNEL);
--		if (!ses->auth_key.response) {
--			cifs_dbg(VFS,
--				"Kerberos can't allocate (%u bytes) memory",
--				msg->sesskey_len);
--			rc = -ENOMEM;
--			goto ssetup_exit;
--		}
--		ses->auth_key.len = msg->sesskey_len;
--		blob_length = msg->secblob_len;
--		iov[1].iov_base = msg->data + msg->sesskey_len;
--		iov[1].iov_len = blob_length;
--#else
--		rc = -EOPNOTSUPP;
--		goto ssetup_exit;
--#endif /* CONFIG_CIFS_UPCALL */
--	} else if (phase == NtLmNegotiate) { /* if not krb5 must be ntlmssp */
-+	if (phase == NtLmNegotiate) {
- 		ntlmssp_blob = kmalloc(sizeof(struct _NEGOTIATE_MESSAGE),
- 				       GFP_KERNEL);
- 		if (ntlmssp_blob == NULL) {
-@@ -853,13 +1037,13 @@ keygen_exit:
- 		kfree(ses->auth_key.response);
- 		ses->auth_key.response = NULL;
- 	}
--	if (spnego_key) {
--		key_invalidate(spnego_key);
--		key_put(spnego_key);
--	}
- 	kfree(ses->ntlmssp);
- 
- 	return rc;
-+out:
-+	rc = sess_data->result;
-+	kfree(sess_data);
-+	return rc;
- }
- 
- int
+I have found that the tree name prefix is needed, at least when
+mounting. I guess Steve already knew this but it wasn't obvious for me
+so I'm sharing it.
+
+When mounting //server/dfsroot/target with 'target' linking to
+//server/dfstarget
+
+With tree name prefixed:
+
+=> Trans2 Request, QUERY_PATH_INFO, Query File All Info, Path: //10.160.64.222/dfsroot/target
+<= Trans2 Response, QUERY_PATH_INFO, Error: STATUS_PATH_NOT_COVERED
+
+Without tree name prefixed:
+
+=> Trans2 Request, QUERY_PATH_INFO, Query File All Info, Path: /target
+<= Trans2 Response, QUERY_PATH_INFO, Error: STATUS_OBJECT_NAME_NOT_FOUND
+
+PATH_NOT_COVERED is mapped to EREMOTE whereas OBJECT_NAME_NOT_FOUND is
+mapped to ENOENT.
+
+So *not* prefixing with the tree name actually breaks mounting a path
+containing a DFS link in its components. Which is the *opposite* of what
+I initially thought. I did not analyze the problem and traces enough,
+I'm sorry.
+
+So if we merge this patch, we have to be careful about when to not
+prefix the tree name.
+
 -- 
-2.7.4
+Aurélien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
+GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
