@@ -1,79 +1,109 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH 2/3] CIFS: Fix persistent handles re-opening on reconnect
-Date: Tue, 11 Oct 2016 15:34:06 -0700
-Message-ID: <1476225247-30177-2-git-send-email-piastryyy@gmail.com>
-References: <1476225247-30177-1-git-send-email-piastryyy@gmail.com>
+Subject: [PATCH 1/3] CIFS: Fix tcon and file locking
+Date: Tue, 11 Oct 2016 15:34:05 -0700
+Message-ID: <1476225247-30177-1-git-send-email-piastryyy@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1476225247-30177-1-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 From: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 
-openFileList of tcon can be changed while cifs_reopen_file() is called
-that can lead to an unexpected behavior when we return to the loop.
-Fix this by introducing a temp list for keeping all file handles that
-need to be reopen.
+This fix is supposed to be squashed into
+"Clarify locking of cifs file and tcon structures and make more granular".
 
 Signed-off-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 ---
- fs/cifs/cifsglob.h |  1 +
- fs/cifs/file.c     | 22 +++++++++++++++++-----
- 2 files changed, 18 insertions(+), 5 deletions(-)
+ fs/cifs/file.c | 21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 0eaed19..149ac16 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -1067,6 +1067,7 @@ struct cifsFileInfo {
- 	kuid_t uid;		/* allows finding which FileInfo structure */
- 	__u32 pid;		/* process id who opened file */
- 	struct cifs_fid fid;	/* file id from remote */
-+	struct list_head rlist; /* reconnect list */
- 	/* BB add lock scope info here if needed */ ;
- 	/* lock scope id (0 if none) */
- 	struct dentry *dentry;
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 20801dc..40b015b 100644
+index 1e7c625..20801dc 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -763,19 +763,31 @@ int cifs_close(struct inode *inode, struct file *file)
- void
- cifs_reopen_persistent_handles(struct cifs_tcon *tcon)
- {
--	struct cifsFileInfo *open_file = NULL;
-+	struct cifsFileInfo *open_file;
- 	struct list_head *tmp;
- 	struct list_head *tmp1;
-+	struct list_head tmp_list;
-+
-+	cifs_dbg(FYI, "Reopen persistent handles");
-+	INIT_LIST_HEAD(&tmp_list);
- 
- 	/* list all files open on tree connection, reopen resilient handles  */
- 	spin_lock(&tcon->open_file_lock);
--	list_for_each_safe(tmp, tmp1, &tcon->openFileList) {
-+	list_for_each(tmp, &tcon->openFileList) {
- 		open_file = list_entry(tmp, struct cifsFileInfo, tlist);
--		spin_unlock(&tcon->open_file_lock);
--		cifs_reopen_file(open_file, false /* do not flush */);
--		spin_lock(&tcon->open_file_lock);
-+		if (!open_file->invalidHandle)
-+			continue;
-+		cifsFileInfo_get(open_file);
-+		list_add_tail(&open_file->rlist, &tmp_list);
+@@ -318,14 +318,14 @@ cifs_new_fileinfo(struct cifs_fid *fid, struct file *file,
+ 		oplock = 0;
  	}
- 	spin_unlock(&tcon->open_file_lock);
-+
-+	list_for_each_safe(tmp, tmp1, &tmp_list) {
-+		open_file = list_entry(tmp, struct cifsFileInfo, rlist);
-+		cifs_reopen_file(open_file, false /* do not flush */);
-+		list_del_init(&open_file->rlist);
-+		cifsFileInfo_put(open_file);
-+	}
- }
  
- int cifs_closedir(struct inode *inode, struct file *file)
++	spin_lock(&tcon->open_file_lock);
+ 	if (fid->pending_open->oplock != CIFS_OPLOCK_NO_CHANGE && oplock)
+ 		oplock = fid->pending_open->oplock;
+-	cifs_del_pending_open(fid->pending_open);
++	list_del(&fid->pending_open->olist);
+ 
+ 	fid->purge_cache = false;
+ 	server->ops->set_fid(cfile, fid, oplock);
+ 
+-	spin_lock(&tcon->open_file_lock);
+ 	list_add(&cfile->tlist, &tcon->openFileList);
+ 
+ 	/* if readable file instance put first in list*/
+@@ -354,7 +354,7 @@ cifsFileInfo_get(struct cifsFileInfo *cifs_file)
+ /*
+  * Release a reference on the file private data. This may involve closing
+  * the filehandle out on the server. Must be called without holding
+- * cifs_file->file_info_lock.
++ * tcon->open_file_lock and cifs_file->file_info_lock.
+  */
+ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+ {
+@@ -369,11 +369,15 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+ 	struct cifs_pending_open open;
+ 	bool oplock_break_cancelled;
+ 
++	spin_lock(&tcon->open_file_lock);
++
+ 	spin_lock(&cifs_file->file_info_lock);
+ 	if (--cifs_file->count > 0) {
+ 		spin_unlock(&cifs_file->file_info_lock);
++		spin_unlock(&tcon->open_file_lock);
+ 		return;
+ 	}
++	spin_unlock(&cifs_file->file_info_lock);
+ 
+ 	if (server->ops->get_lease_key)
+ 		server->ops->get_lease_key(inode, &fid);
+@@ -397,7 +401,8 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+ 			set_bit(CIFS_INO_INVALID_MAPPING, &cifsi->flags);
+ 		cifs_set_oplock_level(cifsi, 0);
+ 	}
+-	spin_unlock(&cifs_file->file_info_lock);
++
++	spin_unlock(&tcon->open_file_lock);
+ 
+ 	oplock_break_cancelled = cancel_work_sync(&cifs_file->oplock_break);
+ 
+@@ -1765,7 +1770,7 @@ struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode,
+ 			if (!open_file->invalidHandle) {
+ 				/* found a good file */
+ 				/* lock it so it will not be closed on us */
+-				cifsFileInfo_get_locked(open_file);
++				cifsFileInfo_get(open_file);
+ 				spin_unlock(&tcon->open_file_lock);
+ 				return open_file;
+ 			} /* else might as well continue, and look for
+@@ -1819,7 +1824,7 @@ refind_writable:
+ 		if (OPEN_FMODE(open_file->f_flags) & FMODE_WRITE) {
+ 			if (!open_file->invalidHandle) {
+ 				/* found a good writable file */
+-				cifsFileInfo_get_locked(open_file);
++				cifsFileInfo_get(open_file);
+ 				spin_unlock(&tcon->open_file_lock);
+ 				return open_file;
+ 			} else {
+@@ -1836,9 +1841,7 @@ refind_writable:
+ 
+ 	if (inv_file) {
+ 		any_available = false;
+-		spin_lock(&inv_file->file_info_lock);
+-		cifsFileInfo_get_locked(inv_file);
+-		spin_unlock(&inv_file->file_info_lock);
++		cifsFileInfo_get(inv_file);
+ 	}
+ 
+ 	spin_unlock(&tcon->open_file_lock);
 -- 
 2.7.4
