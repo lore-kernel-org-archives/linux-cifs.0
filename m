@@ -1,111 +1,188 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 1/2] Add new mount option to set owner uid and gid from
- special sids in acl
-Date: Fri, 14 Oct 2016 12:09:40 -0700
-Message-ID: <CAKywueRCGEn35ttc5z-5cJ_jVBd1a93HDzDwc35RbWt3pkETzw@mail.gmail.com>
-References: <1476457807-22055-1-git-send-email-smfrench@gmail.com>
+Subject: Re: [PATCH 2/2] Retrieve uid and gid from special sid if enabled
+Date: Fri, 14 Oct 2016 12:12:42 -0700
+Message-ID: <CAKywueTJt+GG9TpxEfU464HREF=ia3wAs7Pf1D6g8aRt=KRQEA@mail.gmail.com>
+References: <1476457807-22055-1-git-send-email-smfrench@gmail.com> <1476457807-22055-2-git-send-email-smfrench@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
         Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
 To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1476457807-22055-1-git-send-email-smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <1476457807-22055-2-git-send-email-smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 2016-10-14 8:10 GMT-07:00 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> Add "idsfromsid" mount option to indicate to cifs.ko that it should
-> try to retrieve the uid and gid owner fields from special sids in the
-> ACL if present.  This first patch just adds the parsing for the mount
-> option.
+> New mount option "idsfromsid" indicates to cifs.ko that
+> it should try to retrieve the uid and gid owner fields
+> from special sids.  This patch adds the code to parse the owner
+> sids in the ACL to see if they match, and if so populate the
+> uid and/or gid from them.  This is faster than upcalling for
+> them and asking winbind, and is a fairly common case, and is
+> also helpful when cifs.upcall and idmapping is not configured.
 >
 > Signed-off-by: Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
 > Reviewed-by:  Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 > ---
->  fs/cifs/cifs_fs_sb.h | 1 +
->  fs/cifs/cifsfs.c     | 2 ++
->  fs/cifs/cifsglob.h   | 1 +
->  fs/cifs/connect.c    | 8 +++++++-
->  4 files changed, 11 insertions(+), 1 deletion(-)
+>  fs/cifs/cifsacl.c | 123 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 123 insertions(+)
 >
-> diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
-> index 1418daa..07ed81c 100644
-> --- a/fs/cifs/cifs_fs_sb.h
-> +++ b/fs/cifs/cifs_fs_sb.h
-> @@ -49,6 +49,7 @@
->  #define CIFS_MOUNT_USE_PREFIX_PATH 0x1000000 /* make subpath with unaccessible
->                                               * root mountable
->                                               */
-> +#define CIFS_MOUNT_UID_FROM_ACL 0x2000000 /* try to get UID via special SID */
+> diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+> index 71e8a56..15bac39 100644
+> --- a/fs/cifs/cifsacl.c
+> +++ b/fs/cifs/cifsacl.c
+> @@ -42,6 +42,35 @@
+>  /* group users */
+>  static const struct cifs_sid sid_user = {1, 2 , {0, 0, 0, 0, 0, 5}, {} };
 >
->  struct cifs_sb_info {
->         struct rb_root tlink_tree;
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index f963c88..15261ba 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -469,6 +469,8 @@ static void cifs_i_callback(struct rcu_head *head)
->                 seq_puts(s, ",posixpaths");
->         if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID)
->                 seq_puts(s, ",setuids");
-> +       if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_UID_FROM_ACL)
-> +               seq_puts(s, ",idsfromsid");
->         if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM)
->                 seq_puts(s, ",serverino");
->         if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 0c828d3..1f17f6b 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -478,6 +478,7 @@ struct smb_vol {
->         bool retry:1;
->         bool intr:1;
->         bool setuids:1;
-> +       bool setuidfromacl:1;
->         bool override_uid:1;
->         bool override_gid:1;
->         bool dynperm:1;
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 657369d..aab5227 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -75,7 +75,7 @@ enum {
->         Opt_noposixpaths, Opt_nounix,
->         Opt_nocase,
->         Opt_brl, Opt_nobrl,
-> -       Opt_forcemandatorylock, Opt_setuids,
-> +       Opt_forcemandatorylock, Opt_setuidfromacl, Opt_setuids,
->         Opt_nosetuids, Opt_dynperm, Opt_nodynperm,
->         Opt_nohard, Opt_nosoft,
->         Opt_nointr, Opt_intr,
-> @@ -147,6 +147,7 @@ enum {
->         { Opt_forcemandatorylock, "forcemand" },
->         { Opt_setuids, "setuids" },
->         { Opt_nosetuids, "nosetuids" },
-> +       { Opt_setuidfromacl, "idsfromsid" },
->         { Opt_dynperm, "dynperm" },
->         { Opt_nodynperm, "nodynperm" },
->         { Opt_nohard, "nohard" },
-> @@ -1376,6 +1377,9 @@ static int cifs_parse_security_flavors(char *value,
->                 case Opt_nosetuids:
->                         vol->setuids = 0;
->                         break;
-> +               case Opt_setuidfromacl:
-> +                       vol->setuidfromacl = 1;
-> +                       break;
->                 case Opt_dynperm:
->                         vol->dynperm = true;
->                         break;
-> @@ -3279,6 +3283,8 @@ int cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
->                 cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NO_PERM;
->         if (pvolume_info->setuids)
->                 cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_SET_UID;
-> +       if (pvolume_info->setuidfromacl)
-> +               cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_UID_FROM_ACL;
->         if (pvolume_info->server_ino)
->                 cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_SERVER_INUM;
->         if (pvolume_info->remap)
+> +/* S-1-22-1 Unmapped Unix users */
+> +static const struct cifs_sid sid_unix_users = {1, 1, {0, 0, 0, 0, 0, 22},
+> +               {cpu_to_le32(1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
+> +
+> +/* S-1-22-2 Unmapped Unix groups */
+> +static const struct cifs_sid sid_unix_groups = { 1, 1, {0, 0, 0, 0, 0, 22},
+> +               {cpu_to_le32(2), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
+> +
+> +/*
+> + * See http://technet.microsoft.com/en-us/library/hh509017(v=ws.10).aspx
+> + */
+> +
+> +/* S-1-5-88 MS NFS and Apple style UID/GID/mode */
+> +
+> +/* S-1-5-88-1 Unix uid */
+> +static const struct cifs_sid sid_unix_NFS_users = { 1, 2, {0, 0, 0, 0, 0, 5},
+> +       {cpu_to_le32(88),
+> +        cpu_to_le32(1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
+> +
+> +/* S-1-5-88-2 Unix gid */
+> +static const struct cifs_sid sid_unix_NFS_groups = { 1, 2, {0, 0, 0, 0, 0, 5},
+> +       {cpu_to_le32(88),
+> +        cpu_to_le32(2), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
+> +
+> +/* S-1-5-88-3 Unix mode */
+> +static const struct cifs_sid sid_unix_NFS_mode = { 1, 2, {0, 0, 0, 0, 0, 5},
+> +       {cpu_to_le32(88),
+> +        cpu_to_le32(3), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
+> +
+>  static const struct cred *root_cred;
+>
+>  static int
+> @@ -183,6 +212,62 @@
+>         return 0; /* sids compare/match */
+>  }
+>
+> +static bool
+> +is_well_known_sid(const struct cifs_sid *psid, uint32_t *puid, bool is_group)
+> +{
+> +       int i;
+> +       int num_subauth;
+> +       const struct cifs_sid *pwell_known_sid;
+> +
+> +       if (!psid || (puid == NULL))
+> +               return false;
+> +
+> +       num_subauth = psid->num_subauth;
+> +
+> +       /* check if Mac (or Windows NFS) vs. Samba format for Unix owner SID */
+> +       if (num_subauth == 2) {
+> +               if (is_group)
+> +                       pwell_known_sid = &sid_unix_groups;
+> +               else
+> +                       pwell_known_sid = &sid_unix_users;
+> +       } else if (num_subauth == 3) {
+> +               if (is_group)
+> +                       pwell_known_sid = &sid_unix_NFS_groups;
+> +               else
+> +                       pwell_known_sid = &sid_unix_NFS_users;
+> +       } else
+> +               return false;
+> +
+> +       /* compare the revision */
+> +       if (psid->revision != pwell_known_sid->revision)
+> +               return false;
+> +
+> +       /* compare all of the six auth values */
+> +       for (i = 0; i < NUM_AUTHS; ++i) {
+> +               if (psid->authority[i] != pwell_known_sid->authority[i]) {
+> +                       cifs_dbg(FYI, "auth %d did not match\n", i);
+> +                       return false;
+> +               }
+> +       }
+> +
+> +       if (num_subauth == 2) {
+> +               if (psid->sub_auth[0] != pwell_known_sid->sub_auth[0])
+> +                       return false;
+> +
+> +               *puid = le32_to_cpu(psid->sub_auth[1]);
+> +       } else /* 3 subauths, ie Windows/Mac style */ {
+> +               *puid = le32_to_cpu(psid->sub_auth[0]);
+> +               if ((psid->sub_auth[0] != pwell_known_sid->sub_auth[0]) ||
+> +                   (psid->sub_auth[1] != pwell_known_sid->sub_auth[1]))
+> +                       return false;
+> +
+> +               *puid = le32_to_cpu(psid->sub_auth[2]);
+> +       }
+> +
+> +       cifs_dbg(FYI, "Unix UID %d returned from SID\n", *puid);
+> +       return true; /* well known sid found, uid returned */
+> +}
+> +
+>  static void
+>  cifs_copy_sid(struct cifs_sid *dst, const struct cifs_sid *src)
+>  {
+> @@ -276,6 +361,43 @@
+>                 return -EIO;
+>         }
+>
+> +       if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_UID_FROM_ACL) {
+> +               uint32_t unix_id;
+> +               bool is_group;
+> +
+> +               if (sidtype != SIDOWNER)
+> +                       is_group = true;
+> +               else
+> +                       is_group = false;
+> +
+> +               if (is_well_known_sid(psid, &unix_id, is_group) == false)
+> +                       goto try_upcall_to_get_id;
+> +
+> +               if (is_group) {
+> +                       kgid_t gid;
+> +                       gid_t id;
+> +
+> +                       id = (gid_t)unix_id;
+> +                       gid = make_kgid(&init_user_ns, id);
+> +                       if (gid_valid(gid)) {
+> +                               fgid = gid;
+> +                               goto got_valid_id;
+> +                       }
+> +               } else {
+> +                       kuid_t uid;
+> +                       uid_t id;
+> +
+> +                       id = (uid_t)unix_id;
+> +                       uid = make_kuid(&init_user_ns, id);
+> +                       if (uid_valid(uid)) {
+> +                               fuid = uid;
+> +                               goto got_valid_id;
+> +                       }
+> +               }
+> +               /* If unable to find uid/gid easily from SID try via upcall */
+> +       }
+> +
+> +try_upcall_to_get_id:
+>         sidstr = sid_to_key_str(psid, sidtype);
+>         if (!sidstr)
+>                 return -ENOMEM;
+> @@ -329,6 +451,7 @@
+>          * Note that we return 0 here unconditionally. If the mapping
+>          * fails then we just fall back to using the mnt_uid/mnt_gid.
+>          */
+> +got_valid_id:
+>         if (sidtype == SIDOWNER)
+>                 fattr->cf_uid = fuid;
+>         else
 > --
 > 1.9.1
 >
@@ -113,6 +190,10 @@ List-ID: <linux-cifs.vger.kernel.org>
 > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
 > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+It seems like sid_unix_NFS_mode variable is not used.
+
+Other than the notice above, the patch looks good:
 
 Reviewed-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 
