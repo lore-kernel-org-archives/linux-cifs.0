@@ -1,190 +1,246 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 2/2] Retrieve uid and gid from special sid if enabled
-Date: Fri, 14 Oct 2016 14:26:10 -0400
-Message-ID: <1476469570.2727.0.camel@redhat.com>
-References: <1476457807-22055-1-git-send-email-smfrench@gmail.com>
-         <1476457807-22055-2-git-send-email-smfrench@gmail.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [cifs-utils PATCH 2/3] cifs.upcall: use krb5 routines to get
+ default ccname
+Date: Fri, 14 Oct 2016 14:31:57 -0400
+Message-ID: <1476469917.2727.3.camel@samba.org>
+References: <1471868962-7312-1-git-send-email-jlayton@samba.org>
+         <1471868962-7312-3-git-send-email-jlayton@samba.org>
+         <039A665D-75B4-4008-85F9-6CAE8BFB2E15@fhcrc.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: "Dey, John F" <jfdey-rEd9KcVInK8dYYaOPf09RA@public.gmane.org>,
+        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1476457807-22055-2-git-send-email-smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <039A665D-75B4-4008-85F9-6CAE8BFB2E15-q9hIisBwmLrYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 2016-10-14 at 10:10 -0500, Steve French wrote:
-> New mount option "idsfromsid" indicates to cifs.ko that
-> it should try to retrieve the uid and gid owner fields
-> from special sids.  This patch adds the code to parse the owner
-> sids in the ACL to see if they match, and if so populate the
-> uid and/or gid from them.  This is faster than upcalling for
-> them and asking winbind, and is a fairly common case, and is
-> also helpful when cifs.upcall and idmapping is not configured.
-> 
-> Signed-off-by: Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
-> Reviewed-by:  Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> ---
->  fs/cifs/cifsacl.c | 123 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 123 insertions(+)
-> 
-> diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
-> index 71e8a56..15bac39 100644
-> --- a/fs/cifs/cifsacl.c
-> +++ b/fs/cifs/cifsacl.c
-> @@ -42,6 +42,35 @@
->  /* group users */
->  static const struct cifs_sid sid_user = {1, 2 , {0, 0, 0, 0, 0, 5}, {} };
->  
-> +/* S-1-22-1 Unmapped Unix users */
-> +static const struct cifs_sid sid_unix_users = {1, 1, {0, 0, 0, 0, 0, 22},
-> +		{cpu_to_le32(1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
-> +
-> +/* S-1-22-2 Unmapped Unix groups */
-> +static const struct cifs_sid sid_unix_groups = { 1, 1, {0, 0, 0, 0, 0, 22},
-> +		{cpu_to_le32(2), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
-> +
-> +/*
-> + * See http://technet.microsoft.com/en-us/library/hh509017(v=ws.10).aspx
-> + */
-> +
-> +/* S-1-5-88 MS NFS and Apple style UID/GID/mode */
-> +
-> +/* S-1-5-88-1 Unix uid */
-> +static const struct cifs_sid sid_unix_NFS_users = { 1, 2, {0, 0, 0, 0, 0, 5},
-> +	{cpu_to_le32(88),
-> +	 cpu_to_le32(1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
-> +
-> +/* S-1-5-88-2 Unix gid */
-> +static const struct cifs_sid sid_unix_NFS_groups = { 1, 2, {0, 0, 0, 0, 0, 5},
-> +	{cpu_to_le32(88),
-> +	 cpu_to_le32(2), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
-> +
-> +/* S-1-5-88-3 Unix mode */
-> +static const struct cifs_sid sid_unix_NFS_mode = { 1, 2, {0, 0, 0, 0, 0, 5},
-> +	{cpu_to_le32(88),
-> +	 cpu_to_le32(3), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
-> +
->  static const struct cred *root_cred;
->  
->  static int
-> @@ -183,6 +212,62 @@
->  	return 0; /* sids compare/match */
->  }
->  
-> +static bool
-> +is_well_known_sid(const struct cifs_sid *psid, uint32_t *puid, bool is_group)
-> +{
-> +	int i;
-> +	int num_subauth;
-> +	const struct cifs_sid *pwell_known_sid;
-> +
-> +	if (!psid || (puid == NULL))
-> +		return false;
-> +
-> +	num_subauth = psid->num_subauth;
-> +
-> +	/* check if Mac (or Windows NFS) vs. Samba format for Unix owner SID */
-> +	if (num_subauth == 2) {
-> +		if (is_group)
-> +			pwell_known_sid = &sid_unix_groups;
-> +		else
-> +			pwell_known_sid = &sid_unix_users;
-> +	} else if (num_subauth == 3) {
-> +		if (is_group)
-> +			pwell_known_sid = &sid_unix_NFS_groups;
-> +		else
-> +			pwell_known_sid = &sid_unix_NFS_users;
-> +	} else
-> +		return false;
-> +
-> +	/* compare the revision */
-> +	if (psid->revision != pwell_known_sid->revision)
-> +		return false;
-> +
-> +	/* compare all of the six auth values */
-> +	for (i = 0; i < NUM_AUTHS; ++i) {
-> +		if (psid->authority[i] != pwell_known_sid->authority[i]) {
-> +			cifs_dbg(FYI, "auth %d did not match\n", i);
-> +			return false;
-> +		}
-> +	}
-> +
-> +	if (num_subauth == 2) {
-> +		if (psid->sub_auth[0] != pwell_known_sid->sub_auth[0])
-> +			return false;
-> +
-> +		*puid = le32_to_cpu(psid->sub_auth[1]);
-> +	} else /* 3 subauths, ie Windows/Mac style */ {
-> +		*puid = le32_to_cpu(psid->sub_auth[0]);
-> +		if ((psid->sub_auth[0] != pwell_known_sid->sub_auth[0]) ||
-> +		    (psid->sub_auth[1] != pwell_known_sid->sub_auth[1]))
-> +			return false;
-> +
-> +		*puid = le32_to_cpu(psid->sub_auth[2]);
-> +	}
-> +
-> +	cifs_dbg(FYI, "Unix UID %d returned from SID\n", *puid);
-> +	return true; /* well known sid found, uid returned */
-> +}
-> +
->  static void
->  cifs_copy_sid(struct cifs_sid *dst, const struct cifs_sid *src)
->  {
-> @@ -276,6 +361,43 @@
->  		return -EIO;
->  	}
->  
-> +	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_UID_FROM_ACL) {
-> +		uint32_t unix_id;
-> +		bool is_group;
-> +
-> +		if (sidtype != SIDOWNER)
-> +			is_group = true;
-> +		else
-> +			is_group = false;
-> +
-> +		if (is_well_known_sid(psid, &unix_id, is_group) == false)
-> +			goto try_upcall_to_get_id;
-> +
-> +		if (is_group) {
-> +			kgid_t gid;
-> +			gid_t id;
-> +
-> +			id = (gid_t)unix_id;
-> +			gid = make_kgid(&init_user_ns, id);
-> +			if (gid_valid(gid)) {
-> +				fgid = gid;
-> +				goto got_valid_id;
-> +			}
-> +		} else {
-> +			kuid_t uid;
-> +			uid_t id;
-> +
-> +			id = (uid_t)unix_id;
-> +			uid = make_kuid(&init_user_ns, id);
-> +			if (uid_valid(uid)) {
-> +				fuid = uid;
-> +				goto got_valid_id;
-> +			}
-> +		}
-> +		/* If unable to find uid/gid easily from SID try via upcall */
-> +	}
-> +
-> +try_upcall_to_get_id:
->  	sidstr = sid_to_key_str(psid, sidtype);
->  	if (!sidstr)
->  		return -ENOMEM;
-> @@ -329,6 +451,7 @@
->  	 * Note that we return 0 here unconditionally. If the mapping
->  	 * fails then we just fall back to using the mnt_uid/mnt_gid.
->  	 */
-> +got_valid_id:
->  	if (sidtype == SIDOWNER)
->  		fattr->cf_uid = fuid;
->  	else
+If you mean the set that I proposed in late August, then yes...that
+went into cifs-utils v6.6.
 
-Nice! Good idea:
+Thanks,
+Jeff
 
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+On Fri, 2016-10-14 at 18:09 +0000, Dey, John F wrote:
+> Are the default_ccache_name patches making it upstream? 
+> 
+> John Dey
+> 
+> 
+> 
+> 
+> 
+> 
+> On 8/22/16, 5:29 AM, "Jeff Layton" <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> 
+> > 
+> > Currently we end up groveling around in /tmp, trying to guess what the
+> > credcache will be. Instead, just get the default ccname for the user,
+> > and then see if it has a valid tgt. If it doesn't then we try to use
+> > the keytab to init the credcache before proceeding.
+> > 
+> > Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> > ---
+> > cifs.upcall.c | 148 +++++++++++-----------------------------------------------
+> > 1 file changed, 27 insertions(+), 121 deletions(-)
+> > 
+> > diff --git a/cifs.upcall.c b/cifs.upcall.c
+> > index e8544c2b68ad..d0f6d089d8e1 100644
+> > --- a/cifs.upcall.c
+> > +++ b/cifs.upcall.c
+> > @@ -52,12 +52,6 @@
+> > #include "spnego.h"
+> > #include "cifs_spnego.h"
+> > 
+> > -#define	CIFS_DEFAULT_KRB5_DIR		"/tmp"
+> > -#define	CIFS_DEFAULT_KRB5_USER_DIR	"/run/user/%U"
+> > -#define	CIFS_DEFAULT_KRB5_PREFIX	"krb5cc"
+> > -
+> > -#define	MAX_CCNAME_LEN			PATH_MAX + 5
+> > -
+> > static const char *prog = "cifs.upcall";
+> > typedef enum _sectype {
+> > 	NONE = 0,
+> > @@ -178,13 +172,34 @@ err_cache:
+> > 	return credtime;
+> > }
+> > 
+> > -static int krb5cc_filter(const struct dirent *dirent)
+> > +static char *
+> > +get_default_cc(void)
+> > {
+> > -	/* subtract 1 for the null terminator */
+> > -	return !strncmp(dirent->d_name, CIFS_DEFAULT_KRB5_PREFIX,
+> > -			sizeof(CIFS_DEFAULT_KRB5_PREFIX) - 1);
+> > +	krb5_error_code ret;
+> > +	const char *ccname;
+> > +	char *rcc = NULL;
+> > +	krb5_context context = NULL;
+> > +
+> > +	ret = krb5_init_context(&context);
+> > +	if (ret) {
+> > +		syslog(LOG_DEBUG, "krb5_init_context: %d", (int)ret);
+> > +		return NULL;
+> > +	}
+> > +
+> > +	ccname = krb5_cc_default_name(context);
+> > +	if (!ccname) {
+> > +		syslog(LOG_DEBUG, "krb5_cc_default returned NULL.");
+> > +		goto out_free_context;
+> > +	}
+> > +
+> > +	if (get_tgt_time(ccname))
+> > +		rcc = strdup(ccname);
+> > +out_free_context:
+> > +	krb5_free_context(context);
+> > +	return rcc;
+> > }
+> > 
+> > +
+> > static char *
+> > init_cc_from_keytab(const char *keytab_name, const char *user)
+> > {
+> > @@ -263,109 +278,6 @@ icfk_cleanup:
+> > 	return ccname;
+> > }
+> > 
+> > -/* resolve a pattern to an actual directory path */
+> > -static char *resolve_krb5_dir(const char *pattern, uid_t uid)
+> > -{
+> > -	char name[MAX_CCNAME_LEN];
+> > -	int i;
+> > -	size_t j;
+> > -	for (i = 0, j = 0; (pattern[i] != '\0') && (j < sizeof(name)); i++) {
+> > -		switch (pattern[i]) {
+> > -		case '%':
+> > -			switch (pattern[i + 1]) {
+> > -			case '%':
+> > -				name[j++] = pattern[i];
+> > -				i++;
+> > -				break;
+> > -			case 'U':
+> > -				j += snprintf(name + j, sizeof(name) - j,
+> > -					      "%lu", (unsigned long) uid);
+> > -				i++;
+> > -				break;
+> > -			}
+> > -			break;
+> > -		default:
+> > -			name[j++] = pattern[i];
+> > -			break;
+> > -		}
+> > -	}
+> > -	if ((j > 0) && (j < sizeof(name)))
+> > -		return strndup(name, MAX_CCNAME_LEN);
+> > -	else
+> > -		return NULL;
+> > -}
+> > -
+> > -/* search for a credcache that looks like a likely candidate */
+> > -static char *find_krb5_cc(const char *dirname, uid_t uid,
+> > -			  char **best_cache, time_t *best_time)
+> > -{
+> > -	struct dirent **namelist;
+> > -	struct stat sbuf;
+> > -	char ccname[MAX_CCNAME_LEN], *credpath;
+> > -	int i, n;
+> > -	time_t cred_time;
+> > -
+> > -	n = scandir(dirname, &namelist, krb5cc_filter, NULL);
+> > -	if (n < 0) {
+> > -		syslog(LOG_DEBUG, "%s: scandir error on directory '%s': %s",
+> > -		       __func__, dirname, strerror(errno));
+> > -		return NULL;
+> > -	}
+> > -
+> > -	for (i = 0; i < n; i++) {
+> > -		snprintf(ccname, sizeof(ccname), "FILE:%s/%s", dirname,
+> > -			 namelist[i]->d_name);
+> > -		credpath = ccname + 5;
+> > -		syslog(LOG_DEBUG, "%s: considering %s", __func__, credpath);
+> > -
+> > -		if (lstat(credpath, &sbuf)) {
+> > -			syslog(LOG_DEBUG, "%s: stat error on '%s': %s",
+> > -			       __func__, credpath, strerror(errno));
+> > -			free(namelist[i]);
+> > -			continue;
+> > -		}
+> > -		if (sbuf.st_uid != uid) {
+> > -			syslog(LOG_DEBUG, "%s: %s is owned by %u, not %u",
+> > -			       __func__, credpath, sbuf.st_uid, uid);
+> > -			free(namelist[i]);
+> > -			continue;
+> > -		}
+> > -		if (S_ISDIR(sbuf.st_mode)) {
+> > -			snprintf(ccname, sizeof(ccname), "DIR:%s/%s", dirname,
+> > -				 namelist[i]->d_name);
+> > -			credpath = ccname + 4;
+> > -		} else
+> > -		if (!S_ISREG(sbuf.st_mode)) {
+> > -			syslog(LOG_DEBUG, "%s: %s is not a regular file",
+> > -			       __func__, credpath);
+> > -			free(namelist[i]);
+> > -			continue;
+> > -		}
+> > -		if (!(cred_time = get_tgt_time(ccname))) {
+> > -			syslog(LOG_DEBUG, "%s: %s is not a valid credcache.",
+> > -			       __func__, ccname);
+> > -			free(namelist[i]);
+> > -			continue;
+> > -		}
+> > -
+> > -		if (cred_time <= *best_time) {
+> > -			syslog(LOG_DEBUG, "%s: %s expires sooner than current "
+> > -			       "best.", __func__, ccname);
+> > -			free(namelist[i]);
+> > -			continue;
+> > -		}
+> > -
+> > -		syslog(LOG_DEBUG, "%s: %s is valid ccache", __func__, ccname);
+> > -		free(*best_cache);
+> > -		*best_cache = strndup(ccname, MAX_CCNAME_LEN);
+> > -		*best_time = cred_time;
+> > -		free(namelist[i]);
+> > -	}
+> > -	free(namelist);
+> > -
+> > -	return *best_cache;
+> > -}
+> > -
+> > static int
+> > cifs_krb5_get_req(const char *host, const char *ccname,
+> > 		  DATA_BLOB * mechtoken, DATA_BLOB * sess_key)
+> > @@ -841,13 +753,12 @@ int main(const int argc, char *const argv[])
+> > 	unsigned int have;
+> > 	long rc = 1;
+> > 	int c, try_dns = 0, legacy_uid = 0;
+> > -	char *buf, *ccdir = NULL, *ccname = NULL, *best_cache = NULL;
+> > +	char *buf, *ccname = NULL;
+> > 	char hostbuf[NI_MAXHOST], *host;
+> > 	struct decoded_args arg;
+> > 	const char *oid;
+> > 	uid_t uid;
+> > 	char *keytab_name = NULL;
+> > -	time_t best_time = 0;
+> > 
+> > 	hostbuf[0] = '\0';
+> > 	memset(&arg, 0, sizeof(arg));
+> > @@ -954,13 +865,8 @@ int main(const int argc, char *const argv[])
+> > 		syslog(LOG_ERR, "setuid: %s", strerror(errno));
+> > 		goto out;
+> > 	}
+> > -	ccdir = resolve_krb5_dir(CIFS_DEFAULT_KRB5_USER_DIR, uid);
+> > -	if (ccdir != NULL)
+> > -		find_krb5_cc(ccdir, uid, &best_cache, &best_time);
+> > -	ccname = find_krb5_cc(CIFS_DEFAULT_KRB5_DIR, uid, &best_cache,
+> > -			      &best_time);
+> > -	SAFE_FREE(ccdir);
+> > 
+> > +	ccname = get_default_cc();
+> > 	/* Couldn't find credcache? Try to use keytab */
+> > 	if (ccname == NULL && arg.username != NULL)
+> > 		ccname = init_cc_from_keytab(keytab_name, arg.username);
+> > -- 
+> > 2.7.4
+> > 
