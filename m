@@ -1,212 +1,119 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 2/2] Retrieve uid and gid from special sid if enabled
-Date: Fri, 14 Oct 2016 14:15:41 -0500
-Message-ID: <CAH2r5muTjvX4gNB1_30_j7=x9N0GjQLo9NKcNUhmoc6WdQdqvg@mail.gmail.com>
-References: <1476457807-22055-1-git-send-email-smfrench@gmail.com>
- <1476457807-22055-2-git-send-email-smfrench@gmail.com> <CAKywueTJt+GG9TpxEfU464HREF=ia3wAs7Pf1D6g8aRt=KRQEA@mail.gmail.com>
+Subject: Re: [GIT] CIFS Fixes
+Date: Fri, 14 Oct 2016 17:52:41 -0500
+Message-ID: <CAH2r5mtBVZkMRaU2zJ8CewzXqeK03mwU0drC+muQG2OQ-fyMKQ@mail.gmail.com>
+References: <CAH2r5msU1BF5pL3H1or=JKLNzgeYxPEoXrQuJRwHGs996J2aQQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueTJt+GG9TpxEfU464HREF=ia3wAs7Pf1D6g8aRt=KRQEA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CAH2r5msU1BF5pL3H1or=JKLNzgeYxPEoXrQuJRwHGs996J2aQQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-I planned to use the NFS mode in the future (since apparently it can
-be set in ACL in Windows case - not sure about Mac) but I didn't have
-time to test it yet, and in any case want to get the SMB3 cifsacl
-enablement in first.
+Forgot to cc: mailing list
 
-On Fri, Oct 14, 2016 at 2:12 PM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> 2016-10-14 8:10 GMT-07:00 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
->> New mount option "idsfromsid" indicates to cifs.ko that
->> it should try to retrieve the uid and gid owner fields
->> from special sids.  This patch adds the code to parse the owner
->> sids in the ACL to see if they match, and if so populate the
->> uid and/or gid from them.  This is faster than upcalling for
->> them and asking winbind, and is a fairly common case, and is
->> also helpful when cifs.upcall and idmapping is not configured.
->>
->> Signed-off-by: Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
->> Reviewed-by:  Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->> ---
->>  fs/cifs/cifsacl.c | 123 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 123 insertions(+)
->>
->> diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
->> index 71e8a56..15bac39 100644
->> --- a/fs/cifs/cifsacl.c
->> +++ b/fs/cifs/cifsacl.c
->> @@ -42,6 +42,35 @@
->>  /* group users */
->>  static const struct cifs_sid sid_user = {1, 2 , {0, 0, 0, 0, 0, 5}, {} };
->>
->> +/* S-1-22-1 Unmapped Unix users */
->> +static const struct cifs_sid sid_unix_users = {1, 1, {0, 0, 0, 0, 0, 22},
->> +               {cpu_to_le32(1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
->> +
->> +/* S-1-22-2 Unmapped Unix groups */
->> +static const struct cifs_sid sid_unix_groups = { 1, 1, {0, 0, 0, 0, 0, 22},
->> +               {cpu_to_le32(2), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
->> +
->> +/*
->> + * See http://technet.microsoft.com/en-us/library/hh509017(v=ws.10).aspx
->> + */
->> +
->> +/* S-1-5-88 MS NFS and Apple style UID/GID/mode */
->> +
->> +/* S-1-5-88-1 Unix uid */
->> +static const struct cifs_sid sid_unix_NFS_users = { 1, 2, {0, 0, 0, 0, 0, 5},
->> +       {cpu_to_le32(88),
->> +        cpu_to_le32(1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
->> +
->> +/* S-1-5-88-2 Unix gid */
->> +static const struct cifs_sid sid_unix_NFS_groups = { 1, 2, {0, 0, 0, 0, 0, 5},
->> +       {cpu_to_le32(88),
->> +        cpu_to_le32(2), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
->> +
->> +/* S-1-5-88-3 Unix mode */
->> +static const struct cifs_sid sid_unix_NFS_mode = { 1, 2, {0, 0, 0, 0, 0, 5},
->> +       {cpu_to_le32(88),
->> +        cpu_to_le32(3), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
->> +
->>  static const struct cred *root_cred;
->>
->>  static int
->> @@ -183,6 +212,62 @@
->>         return 0; /* sids compare/match */
->>  }
->>
->> +static bool
->> +is_well_known_sid(const struct cifs_sid *psid, uint32_t *puid, bool is_group)
->> +{
->> +       int i;
->> +       int num_subauth;
->> +       const struct cifs_sid *pwell_known_sid;
->> +
->> +       if (!psid || (puid == NULL))
->> +               return false;
->> +
->> +       num_subauth = psid->num_subauth;
->> +
->> +       /* check if Mac (or Windows NFS) vs. Samba format for Unix owner SID */
->> +       if (num_subauth == 2) {
->> +               if (is_group)
->> +                       pwell_known_sid = &sid_unix_groups;
->> +               else
->> +                       pwell_known_sid = &sid_unix_users;
->> +       } else if (num_subauth == 3) {
->> +               if (is_group)
->> +                       pwell_known_sid = &sid_unix_NFS_groups;
->> +               else
->> +                       pwell_known_sid = &sid_unix_NFS_users;
->> +       } else
->> +               return false;
->> +
->> +       /* compare the revision */
->> +       if (psid->revision != pwell_known_sid->revision)
->> +               return false;
->> +
->> +       /* compare all of the six auth values */
->> +       for (i = 0; i < NUM_AUTHS; ++i) {
->> +               if (psid->authority[i] != pwell_known_sid->authority[i]) {
->> +                       cifs_dbg(FYI, "auth %d did not match\n", i);
->> +                       return false;
->> +               }
->> +       }
->> +
->> +       if (num_subauth == 2) {
->> +               if (psid->sub_auth[0] != pwell_known_sid->sub_auth[0])
->> +                       return false;
->> +
->> +               *puid = le32_to_cpu(psid->sub_auth[1]);
->> +       } else /* 3 subauths, ie Windows/Mac style */ {
->> +               *puid = le32_to_cpu(psid->sub_auth[0]);
->> +               if ((psid->sub_auth[0] != pwell_known_sid->sub_auth[0]) ||
->> +                   (psid->sub_auth[1] != pwell_known_sid->sub_auth[1]))
->> +                       return false;
->> +
->> +               *puid = le32_to_cpu(psid->sub_auth[2]);
->> +       }
->> +
->> +       cifs_dbg(FYI, "Unix UID %d returned from SID\n", *puid);
->> +       return true; /* well known sid found, uid returned */
->> +}
->> +
->>  static void
->>  cifs_copy_sid(struct cifs_sid *dst, const struct cifs_sid *src)
->>  {
->> @@ -276,6 +361,43 @@
->>                 return -EIO;
->>         }
->>
->> +       if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_UID_FROM_ACL) {
->> +               uint32_t unix_id;
->> +               bool is_group;
->> +
->> +               if (sidtype != SIDOWNER)
->> +                       is_group = true;
->> +               else
->> +                       is_group = false;
->> +
->> +               if (is_well_known_sid(psid, &unix_id, is_group) == false)
->> +                       goto try_upcall_to_get_id;
->> +
->> +               if (is_group) {
->> +                       kgid_t gid;
->> +                       gid_t id;
->> +
->> +                       id = (gid_t)unix_id;
->> +                       gid = make_kgid(&init_user_ns, id);
->> +                       if (gid_valid(gid)) {
->> +                               fgid = gid;
->> +                               goto got_valid_id;
->> +                       }
->> +               } else {
->> +                       kuid_t uid;
->> +                       uid_t id;
->> +
->> +                       id = (uid_t)unix_id;
->> +                       uid = make_kuid(&init_user_ns, id);
->> +                       if (uid_valid(uid)) {
->> +                               fuid = uid;
->> +                               goto got_valid_id;
->> +                       }
->> +               }
->> +               /* If unable to find uid/gid easily from SID try via upcall */
->> +       }
->> +
->> +try_upcall_to_get_id:
->>         sidstr = sid_to_key_str(psid, sidtype);
->>         if (!sidstr)
->>                 return -ENOMEM;
->> @@ -329,6 +451,7 @@
->>          * Note that we return 0 here unconditionally. If the mapping
->>          * fails then we just fall back to using the mnt_uid/mnt_gid.
->>          */
->> +got_valid_id:
->>         if (sidtype == SIDOWNER)
->>                 fattr->cf_uid = fuid;
->>         else
->> --
->> 1.9.1
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+On Fri, Oct 14, 2016 at 5:52 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> Please pull the following changes since commit
+> 1573d2caf713874cfe0d1336c823d0fb548d8bed:
 >
-> It seems like sid_unix_NFS_mode variable is not used.
+> Including:
+> - 9 bug fixes for stable.  Some of these we found at the recent two
+> weeks of SMB3 test events/plugfests.
+> - Significant improvements in reconnection (e.g. if server or network crashes)
+>   especially when mounted with "persistenthandles" or to server which advertises
+>   Continuous Availability on the share.
+> - a new mount option "idsfromsid" which improves POSIX compatibility
+> in some cases (when winbind not configured e.g.) by better (and
+> faster) fetching uid/gid from acl (when "cifsacl" mount option is
+> enabled).  NB: we are almost complete work on "cifsacl" (querying
+> mode/uid/gid from ACL) for SMB3, but SMB3 support for cifsacl is not
+> included in this set.
+> - improved handling for SMB3 "credits" (even if server is buggy)
 >
-> Other than the notice above, the patch looks good:
+> Still working on two sets of changes:
+> - cifsacl enablement for SMB3
+> - cleanup of RFC1001 length calculation (so we can handle encryption
+> and multichannel and RDMA)
 >
-> Reviewed-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+> And a couple of new bugs were reported recently (unrelated to above)
+> so will probably have another merge request next week.
+>
+>   Merge branch 'parisc-4.9-2' of
+> git://git.kernel.org/pub/scm/linux/kernel/git/deller/parisc-linux
+> (2016-10-11 23:59:07 -0700)
+>
+> are available in the git repository at:
+>
+>
+>   git://git.samba.org/sfrench/cifs-2.6.git for-next
+>
+> for you to fetch changes up to 3514de3fd5fab518520e393152d3f4e3d0441d8d:
+>
+>   CIFS: Retrieve uid and gid from special sid if enabled (2016-10-14
+> 14:22:16 -0500)
+>
+> ----------------------------------------------------------------
+> Aurelien Aptel (1):
+>       fs/cifs: keep guid when assigning fid to fileinfo
+>
+> Germano Percossi (1):
+>       Expose cifs module parameters in sysfs
+>
+> Pavel Shilovsky (2):
+>       CIFS: Fix persistent handles re-opening on reconnect
+>       CIFS: Reset read oplock to NONE if we have mandatory locks after reopen
+>
+> Ross Lagerwall (1):
+>       cifs: Limit the overall credit acquired
+>
+> Sachin Prabhu (3):
+>       Fix regression which breaks DFS mounting
+>       SMB2: Separate Kerberos authentication from SMB2_sess_setup
+>       SMB2: Separate RawNTLMSSP authentication from SMB2_sess_setup
+>
+> Steve French (13):
+>       Add way to query file attributes via cifs xattr
+>       Add way to query creation time of file via cifs xattr
+>       Display number of credits available
+>       Set previous session id correctly on SMB3 reconnect
+>       SMB3: GUIDs should be constructed as random but valid uuids
+>       Clarify locking of cifs file and tcon structures and make more granular
+>       fs/cifs: reopen persistent handles on reconnect
+>       SMB3: Add mount parameter to allow user to override max credits
+>       Do not send SMB3 SET_INFO request if nothing is changing
+>       Enable previous version support
+>       Cleanup missing frees on some ioctls
+>       CIFS: Add new mount option to set owner uid and gid from special
+> sids in acl
+>       CIFS: Retrieve uid and gid from special sid if enabled
+>
+>  fs/cifs/cifs_debug.c |   1 +
+>  fs/cifs/cifs_fs_sb.h |   1 +
+>  fs/cifs/cifs_ioctl.h |   8 +
+>  fs/cifs/cifsacl.c    | 123 +++++++++++
+>  fs/cifs/cifsfs.c     |  11 +-
+>  fs/cifs/cifsglob.h   |  50 +++--
+>  fs/cifs/cifsproto.h  |   2 +
+>  fs/cifs/cifssmb.c    |   4 +-
+>  fs/cifs/connect.c    |  43 +++-
+>  fs/cifs/file.c       | 105 ++++++---
+>  fs/cifs/ioctl.c      |  16 +-
+>  fs/cifs/misc.c       |  15 +-
+>  fs/cifs/readdir.c    |   6 +-
+>  fs/cifs/smb2inode.c  |   6 +
+>  fs/cifs/smb2misc.c   |  16 +-
+>  fs/cifs/smb2ops.c    |  62 +++++-
+>  fs/cifs/smb2pdu.c    | 587 +++++++++++++++++++++++++++++++++------------------
+>  fs/cifs/smb2pdu.h    |   2 +-
+>  fs/cifs/xattr.c      |  62 +++++-
+>  19 files changed, 824 insertions(+), 296 deletions(-)
 >
 > --
-> Best regards,
-> Pavel Shilovsky
+> Thanks,
+>
+> Steve
 
 
 
