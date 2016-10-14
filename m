@@ -1,184 +1,128 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH 2/2] Retrieve uid and gid from special sid if enabled
-Date: Fri, 14 Oct 2016 10:10:07 -0500
-Message-ID: <1476457807-22055-2-git-send-email-smfrench@gmail.com>
-References: <1476457807-22055-1-git-send-email-smfrench@gmail.com>
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: "Dey, John F" <jfdey-rEd9KcVInK8dYYaOPf09RA@public.gmane.org>
+Subject: Re: [cifs-utils PATCH 2/3] cifs.upcall: use krb5 routines to get
+ default ccname
+Date: Fri, 14 Oct 2016 18:09:13 +0000
+Message-ID: <039A665D-75B4-4008-85F9-6CAE8BFB2E15@fhcrc.org>
+References: <1471868962-7312-1-git-send-email-jlayton@samba.org>
+ <1471868962-7312-3-git-send-email-jlayton@samba.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1476457807-22055-1-git-send-email-smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <1471868962-7312-3-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Language: en-US
+Content-ID: <5454380E6765D94EBF6CD1976BDEC466-Lp/cVzEoVyZxNkQZW8AQUR2eb7JE58TQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-New mount option "idsfromsid" indicates to cifs.ko that
-it should try to retrieve the uid and gid owner fields
-from special sids.  This patch adds the code to parse the owner
-sids in the ACL to see if they match, and if so populate the
-uid and/or gid from them.  This is faster than upcalling for
-them and asking winbind, and is a fairly common case, and is
-also helpful when cifs.upcall and idmapping is not configured.
-
-Signed-off-by: Steve French <steve.french-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>
-Reviewed-by:  Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- fs/cifs/cifsacl.c | 123 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 123 insertions(+)
-
-diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
-index 71e8a56..15bac39 100644
---- a/fs/cifs/cifsacl.c
-+++ b/fs/cifs/cifsacl.c
-@@ -42,6 +42,35 @@
- /* group users */
- static const struct cifs_sid sid_user = {1, 2 , {0, 0, 0, 0, 0, 5}, {} };
- 
-+/* S-1-22-1 Unmapped Unix users */
-+static const struct cifs_sid sid_unix_users = {1, 1, {0, 0, 0, 0, 0, 22},
-+		{cpu_to_le32(1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
-+
-+/* S-1-22-2 Unmapped Unix groups */
-+static const struct cifs_sid sid_unix_groups = { 1, 1, {0, 0, 0, 0, 0, 22},
-+		{cpu_to_le32(2), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
-+
-+/*
-+ * See http://technet.microsoft.com/en-us/library/hh509017(v=ws.10).aspx
-+ */
-+
-+/* S-1-5-88 MS NFS and Apple style UID/GID/mode */
-+
-+/* S-1-5-88-1 Unix uid */
-+static const struct cifs_sid sid_unix_NFS_users = { 1, 2, {0, 0, 0, 0, 0, 5},
-+	{cpu_to_le32(88),
-+	 cpu_to_le32(1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
-+
-+/* S-1-5-88-2 Unix gid */
-+static const struct cifs_sid sid_unix_NFS_groups = { 1, 2, {0, 0, 0, 0, 0, 5},
-+	{cpu_to_le32(88),
-+	 cpu_to_le32(2), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
-+
-+/* S-1-5-88-3 Unix mode */
-+static const struct cifs_sid sid_unix_NFS_mode = { 1, 2, {0, 0, 0, 0, 0, 5},
-+	{cpu_to_le32(88),
-+	 cpu_to_le32(3), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
-+
- static const struct cred *root_cred;
- 
- static int
-@@ -183,6 +212,62 @@
- 	return 0; /* sids compare/match */
- }
- 
-+static bool
-+is_well_known_sid(const struct cifs_sid *psid, uint32_t *puid, bool is_group)
-+{
-+	int i;
-+	int num_subauth;
-+	const struct cifs_sid *pwell_known_sid;
-+
-+	if (!psid || (puid == NULL))
-+		return false;
-+
-+	num_subauth = psid->num_subauth;
-+
-+	/* check if Mac (or Windows NFS) vs. Samba format for Unix owner SID */
-+	if (num_subauth == 2) {
-+		if (is_group)
-+			pwell_known_sid = &sid_unix_groups;
-+		else
-+			pwell_known_sid = &sid_unix_users;
-+	} else if (num_subauth == 3) {
-+		if (is_group)
-+			pwell_known_sid = &sid_unix_NFS_groups;
-+		else
-+			pwell_known_sid = &sid_unix_NFS_users;
-+	} else
-+		return false;
-+
-+	/* compare the revision */
-+	if (psid->revision != pwell_known_sid->revision)
-+		return false;
-+
-+	/* compare all of the six auth values */
-+	for (i = 0; i < NUM_AUTHS; ++i) {
-+		if (psid->authority[i] != pwell_known_sid->authority[i]) {
-+			cifs_dbg(FYI, "auth %d did not match\n", i);
-+			return false;
-+		}
-+	}
-+
-+	if (num_subauth == 2) {
-+		if (psid->sub_auth[0] != pwell_known_sid->sub_auth[0])
-+			return false;
-+
-+		*puid = le32_to_cpu(psid->sub_auth[1]);
-+	} else /* 3 subauths, ie Windows/Mac style */ {
-+		*puid = le32_to_cpu(psid->sub_auth[0]);
-+		if ((psid->sub_auth[0] != pwell_known_sid->sub_auth[0]) ||
-+		    (psid->sub_auth[1] != pwell_known_sid->sub_auth[1]))
-+			return false;
-+
-+		*puid = le32_to_cpu(psid->sub_auth[2]);
-+	}
-+
-+	cifs_dbg(FYI, "Unix UID %d returned from SID\n", *puid);
-+	return true; /* well known sid found, uid returned */
-+}
-+
- static void
- cifs_copy_sid(struct cifs_sid *dst, const struct cifs_sid *src)
- {
-@@ -276,6 +361,43 @@
- 		return -EIO;
- 	}
- 
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_UID_FROM_ACL) {
-+		uint32_t unix_id;
-+		bool is_group;
-+
-+		if (sidtype != SIDOWNER)
-+			is_group = true;
-+		else
-+			is_group = false;
-+
-+		if (is_well_known_sid(psid, &unix_id, is_group) == false)
-+			goto try_upcall_to_get_id;
-+
-+		if (is_group) {
-+			kgid_t gid;
-+			gid_t id;
-+
-+			id = (gid_t)unix_id;
-+			gid = make_kgid(&init_user_ns, id);
-+			if (gid_valid(gid)) {
-+				fgid = gid;
-+				goto got_valid_id;
-+			}
-+		} else {
-+			kuid_t uid;
-+			uid_t id;
-+
-+			id = (uid_t)unix_id;
-+			uid = make_kuid(&init_user_ns, id);
-+			if (uid_valid(uid)) {
-+				fuid = uid;
-+				goto got_valid_id;
-+			}
-+		}
-+		/* If unable to find uid/gid easily from SID try via upcall */
-+	}
-+
-+try_upcall_to_get_id:
- 	sidstr = sid_to_key_str(psid, sidtype);
- 	if (!sidstr)
- 		return -ENOMEM;
-@@ -329,6 +451,7 @@
- 	 * Note that we return 0 here unconditionally. If the mapping
- 	 * fails then we just fall back to using the mnt_uid/mnt_gid.
- 	 */
-+got_valid_id:
- 	if (sidtype == SIDOWNER)
- 		fattr->cf_uid = fuid;
- 	else
--- 
-1.9.1
+QXJlIHRoZSBkZWZhdWx0X2NjYWNoZV9uYW1lIHBhdGNoZXMgbWFraW5nIGl0IHVwc3RyZWFtPyAN
+Cg0KSm9obiBEZXkNCg0KDQoNCg0KDQoNCk9uIDgvMjIvMTYsIDU6MjkgQU0sICJKZWZmIExheXRv
+biIgPGpsYXl0b25Ac2FtYmEub3JnPiB3cm90ZToNCg0KPkN1cnJlbnRseSB3ZSBlbmQgdXAgZ3Jv
+dmVsaW5nIGFyb3VuZCBpbiAvdG1wLCB0cnlpbmcgdG8gZ3Vlc3Mgd2hhdCB0aGUNCj5jcmVkY2Fj
+aGUgd2lsbCBiZS4gSW5zdGVhZCwganVzdCBnZXQgdGhlIGRlZmF1bHQgY2NuYW1lIGZvciB0aGUg
+dXNlciwNCj5hbmQgdGhlbiBzZWUgaWYgaXQgaGFzIGEgdmFsaWQgdGd0LiBJZiBpdCBkb2Vzbid0
+IHRoZW4gd2UgdHJ5IHRvIHVzZQ0KPnRoZSBrZXl0YWIgdG8gaW5pdCB0aGUgY3JlZGNhY2hlIGJl
+Zm9yZSBwcm9jZWVkaW5nLg0KPg0KPlNpZ25lZC1vZmYtYnk6IEplZmYgTGF5dG9uIDxqbGF5dG9u
+QHNhbWJhLm9yZz4NCj4tLS0NCj4gY2lmcy51cGNhbGwuYyB8IDE0OCArKysrKysrKysrKy0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+IDEgZmlsZSBjaGFu
+Z2VkLCAyNyBpbnNlcnRpb25zKCspLCAxMjEgZGVsZXRpb25zKC0pDQo+DQo+ZGlmZiAtLWdpdCBh
+L2NpZnMudXBjYWxsLmMgYi9jaWZzLnVwY2FsbC5jDQo+aW5kZXggZTg1NDRjMmI2OGFkLi5kMGY2
+ZDA4OWQ4ZTEgMTAwNjQ0DQo+LS0tIGEvY2lmcy51cGNhbGwuYw0KPisrKyBiL2NpZnMudXBjYWxs
+LmMNCj5AQCAtNTIsMTIgKzUyLDYgQEANCj4gI2luY2x1ZGUgInNwbmVnby5oIg0KPiAjaW5jbHVk
+ZSAiY2lmc19zcG5lZ28uaCINCj4gDQo+LSNkZWZpbmUJQ0lGU19ERUZBVUxUX0tSQjVfRElSCQki
+L3RtcCINCj4tI2RlZmluZQlDSUZTX0RFRkFVTFRfS1JCNV9VU0VSX0RJUgkiL3J1bi91c2VyLyVV
+Ig0KPi0jZGVmaW5lCUNJRlNfREVGQVVMVF9LUkI1X1BSRUZJWAkia3JiNWNjIg0KPi0NCj4tI2Rl
+ZmluZQlNQVhfQ0NOQU1FX0xFTgkJCVBBVEhfTUFYICsgNQ0KPi0NCj4gc3RhdGljIGNvbnN0IGNo
+YXIgKnByb2cgPSAiY2lmcy51cGNhbGwiOw0KPiB0eXBlZGVmIGVudW0gX3NlY3R5cGUgew0KPiAJ
+Tk9ORSA9IDAsDQo+QEAgLTE3OCwxMyArMTcyLDM0IEBAIGVycl9jYWNoZToNCj4gCXJldHVybiBj
+cmVkdGltZTsNCj4gfQ0KPiANCj4tc3RhdGljIGludCBrcmI1Y2NfZmlsdGVyKGNvbnN0IHN0cnVj
+dCBkaXJlbnQgKmRpcmVudCkNCj4rc3RhdGljIGNoYXIgKg0KPitnZXRfZGVmYXVsdF9jYyh2b2lk
+KQ0KPiB7DQo+LQkvKiBzdWJ0cmFjdCAxIGZvciB0aGUgbnVsbCB0ZXJtaW5hdG9yICovDQo+LQly
+ZXR1cm4gIXN0cm5jbXAoZGlyZW50LT5kX25hbWUsIENJRlNfREVGQVVMVF9LUkI1X1BSRUZJWCwN
+Cj4tCQkJc2l6ZW9mKENJRlNfREVGQVVMVF9LUkI1X1BSRUZJWCkgLSAxKTsNCj4rCWtyYjVfZXJy
+b3JfY29kZSByZXQ7DQo+Kwljb25zdCBjaGFyICpjY25hbWU7DQo+KwljaGFyICpyY2MgPSBOVUxM
+Ow0KPisJa3JiNV9jb250ZXh0IGNvbnRleHQgPSBOVUxMOw0KPisNCj4rCXJldCA9IGtyYjVfaW5p
+dF9jb250ZXh0KCZjb250ZXh0KTsNCj4rCWlmIChyZXQpIHsNCj4rCQlzeXNsb2coTE9HX0RFQlVH
+LCAia3JiNV9pbml0X2NvbnRleHQ6ICVkIiwgKGludClyZXQpOw0KPisJCXJldHVybiBOVUxMOw0K
+PisJfQ0KPisNCj4rCWNjbmFtZSA9IGtyYjVfY2NfZGVmYXVsdF9uYW1lKGNvbnRleHQpOw0KPisJ
+aWYgKCFjY25hbWUpIHsNCj4rCQlzeXNsb2coTE9HX0RFQlVHLCAia3JiNV9jY19kZWZhdWx0IHJl
+dHVybmVkIE5VTEwuIik7DQo+KwkJZ290byBvdXRfZnJlZV9jb250ZXh0Ow0KPisJfQ0KPisNCj4r
+CWlmIChnZXRfdGd0X3RpbWUoY2NuYW1lKSkNCj4rCQlyY2MgPSBzdHJkdXAoY2NuYW1lKTsNCj4r
+b3V0X2ZyZWVfY29udGV4dDoNCj4rCWtyYjVfZnJlZV9jb250ZXh0KGNvbnRleHQpOw0KPisJcmV0
+dXJuIHJjYzsNCj4gfQ0KPiANCj4rDQo+IHN0YXRpYyBjaGFyICoNCj4gaW5pdF9jY19mcm9tX2tl
+eXRhYihjb25zdCBjaGFyICprZXl0YWJfbmFtZSwgY29uc3QgY2hhciAqdXNlcikNCj4gew0KPkBA
+IC0yNjMsMTA5ICsyNzgsNiBAQCBpY2ZrX2NsZWFudXA6DQo+IAlyZXR1cm4gY2NuYW1lOw0KPiB9
+DQo+IA0KPi0vKiByZXNvbHZlIGEgcGF0dGVybiB0byBhbiBhY3R1YWwgZGlyZWN0b3J5IHBhdGgg
+Ki8NCj4tc3RhdGljIGNoYXIgKnJlc29sdmVfa3JiNV9kaXIoY29uc3QgY2hhciAqcGF0dGVybiwg
+dWlkX3QgdWlkKQ0KPi17DQo+LQljaGFyIG5hbWVbTUFYX0NDTkFNRV9MRU5dOw0KPi0JaW50IGk7
+DQo+LQlzaXplX3QgajsNCj4tCWZvciAoaSA9IDAsIGogPSAwOyAocGF0dGVybltpXSAhPSAnXDAn
+KSAmJiAoaiA8IHNpemVvZihuYW1lKSk7IGkrKykgew0KPi0JCXN3aXRjaCAocGF0dGVybltpXSkg
+ew0KPi0JCWNhc2UgJyUnOg0KPi0JCQlzd2l0Y2ggKHBhdHRlcm5baSArIDFdKSB7DQo+LQkJCWNh
+c2UgJyUnOg0KPi0JCQkJbmFtZVtqKytdID0gcGF0dGVybltpXTsNCj4tCQkJCWkrKzsNCj4tCQkJ
+CWJyZWFrOw0KPi0JCQljYXNlICdVJzoNCj4tCQkJCWogKz0gc25wcmludGYobmFtZSArIGosIHNp
+emVvZihuYW1lKSAtIGosDQo+LQkJCQkJICAgICAgIiVsdSIsICh1bnNpZ25lZCBsb25nKSB1aWQp
+Ow0KPi0JCQkJaSsrOw0KPi0JCQkJYnJlYWs7DQo+LQkJCX0NCj4tCQkJYnJlYWs7DQo+LQkJZGVm
+YXVsdDoNCj4tCQkJbmFtZVtqKytdID0gcGF0dGVybltpXTsNCj4tCQkJYnJlYWs7DQo+LQkJfQ0K
+Pi0JfQ0KPi0JaWYgKChqID4gMCkgJiYgKGogPCBzaXplb2YobmFtZSkpKQ0KPi0JCXJldHVybiBz
+dHJuZHVwKG5hbWUsIE1BWF9DQ05BTUVfTEVOKTsNCj4tCWVsc2UNCj4tCQlyZXR1cm4gTlVMTDsN
+Cj4tfQ0KPi0NCj4tLyogc2VhcmNoIGZvciBhIGNyZWRjYWNoZSB0aGF0IGxvb2tzIGxpa2UgYSBs
+aWtlbHkgY2FuZGlkYXRlICovDQo+LXN0YXRpYyBjaGFyICpmaW5kX2tyYjVfY2MoY29uc3QgY2hh
+ciAqZGlybmFtZSwgdWlkX3QgdWlkLA0KPi0JCQkgIGNoYXIgKipiZXN0X2NhY2hlLCB0aW1lX3Qg
+KmJlc3RfdGltZSkNCj4tew0KPi0Jc3RydWN0IGRpcmVudCAqKm5hbWVsaXN0Ow0KPi0Jc3RydWN0
+IHN0YXQgc2J1ZjsNCj4tCWNoYXIgY2NuYW1lW01BWF9DQ05BTUVfTEVOXSwgKmNyZWRwYXRoOw0K
+Pi0JaW50IGksIG47DQo+LQl0aW1lX3QgY3JlZF90aW1lOw0KPi0NCj4tCW4gPSBzY2FuZGlyKGRp
+cm5hbWUsICZuYW1lbGlzdCwga3JiNWNjX2ZpbHRlciwgTlVMTCk7DQo+LQlpZiAobiA8IDApIHsN
+Cj4tCQlzeXNsb2coTE9HX0RFQlVHLCAiJXM6IHNjYW5kaXIgZXJyb3Igb24gZGlyZWN0b3J5ICcl
+cyc6ICVzIiwNCj4tCQkgICAgICAgX19mdW5jX18sIGRpcm5hbWUsIHN0cmVycm9yKGVycm5vKSk7
+DQo+LQkJcmV0dXJuIE5VTEw7DQo+LQl9DQo+LQ0KPi0JZm9yIChpID0gMDsgaSA8IG47IGkrKykg
+ew0KPi0JCXNucHJpbnRmKGNjbmFtZSwgc2l6ZW9mKGNjbmFtZSksICJGSUxFOiVzLyVzIiwgZGly
+bmFtZSwNCj4tCQkJIG5hbWVsaXN0W2ldLT5kX25hbWUpOw0KPi0JCWNyZWRwYXRoID0gY2NuYW1l
+ICsgNTsNCj4tCQlzeXNsb2coTE9HX0RFQlVHLCAiJXM6IGNvbnNpZGVyaW5nICVzIiwgX19mdW5j
+X18sIGNyZWRwYXRoKTsNCj4tDQo+LQkJaWYgKGxzdGF0KGNyZWRwYXRoLCAmc2J1ZikpIHsNCj4t
+CQkJc3lzbG9nKExPR19ERUJVRywgIiVzOiBzdGF0IGVycm9yIG9uICclcyc6ICVzIiwNCj4tCQkJ
+ICAgICAgIF9fZnVuY19fLCBjcmVkcGF0aCwgc3RyZXJyb3IoZXJybm8pKTsNCj4tCQkJZnJlZShu
+YW1lbGlzdFtpXSk7DQo+LQkJCWNvbnRpbnVlOw0KPi0JCX0NCj4tCQlpZiAoc2J1Zi5zdF91aWQg
+IT0gdWlkKSB7DQo+LQkJCXN5c2xvZyhMT0dfREVCVUcsICIlczogJXMgaXMgb3duZWQgYnkgJXUs
+IG5vdCAldSIsDQo+LQkJCSAgICAgICBfX2Z1bmNfXywgY3JlZHBhdGgsIHNidWYuc3RfdWlkLCB1
+aWQpOw0KPi0JCQlmcmVlKG5hbWVsaXN0W2ldKTsNCj4tCQkJY29udGludWU7DQo+LQkJfQ0KPi0J
+CWlmIChTX0lTRElSKHNidWYuc3RfbW9kZSkpIHsNCj4tCQkJc25wcmludGYoY2NuYW1lLCBzaXpl
+b2YoY2NuYW1lKSwgIkRJUjolcy8lcyIsIGRpcm5hbWUsDQo+LQkJCQkgbmFtZWxpc3RbaV0tPmRf
+bmFtZSk7DQo+LQkJCWNyZWRwYXRoID0gY2NuYW1lICsgNDsNCj4tCQl9IGVsc2UNCj4tCQlpZiAo
+IVNfSVNSRUcoc2J1Zi5zdF9tb2RlKSkgew0KPi0JCQlzeXNsb2coTE9HX0RFQlVHLCAiJXM6ICVz
+IGlzIG5vdCBhIHJlZ3VsYXIgZmlsZSIsDQo+LQkJCSAgICAgICBfX2Z1bmNfXywgY3JlZHBhdGgp
+Ow0KPi0JCQlmcmVlKG5hbWVsaXN0W2ldKTsNCj4tCQkJY29udGludWU7DQo+LQkJfQ0KPi0JCWlm
+ICghKGNyZWRfdGltZSA9IGdldF90Z3RfdGltZShjY25hbWUpKSkgew0KPi0JCQlzeXNsb2coTE9H
+X0RFQlVHLCAiJXM6ICVzIGlzIG5vdCBhIHZhbGlkIGNyZWRjYWNoZS4iLA0KPi0JCQkgICAgICAg
+X19mdW5jX18sIGNjbmFtZSk7DQo+LQkJCWZyZWUobmFtZWxpc3RbaV0pOw0KPi0JCQljb250aW51
+ZTsNCj4tCQl9DQo+LQ0KPi0JCWlmIChjcmVkX3RpbWUgPD0gKmJlc3RfdGltZSkgew0KPi0JCQlz
+eXNsb2coTE9HX0RFQlVHLCAiJXM6ICVzIGV4cGlyZXMgc29vbmVyIHRoYW4gY3VycmVudCAiDQo+
+LQkJCSAgICAgICAiYmVzdC4iLCBfX2Z1bmNfXywgY2NuYW1lKTsNCj4tCQkJZnJlZShuYW1lbGlz
+dFtpXSk7DQo+LQkJCWNvbnRpbnVlOw0KPi0JCX0NCj4tDQo+LQkJc3lzbG9nKExPR19ERUJVRywg
+IiVzOiAlcyBpcyB2YWxpZCBjY2FjaGUiLCBfX2Z1bmNfXywgY2NuYW1lKTsNCj4tCQlmcmVlKCpi
+ZXN0X2NhY2hlKTsNCj4tCQkqYmVzdF9jYWNoZSA9IHN0cm5kdXAoY2NuYW1lLCBNQVhfQ0NOQU1F
+X0xFTik7DQo+LQkJKmJlc3RfdGltZSA9IGNyZWRfdGltZTsNCj4tCQlmcmVlKG5hbWVsaXN0W2ld
+KTsNCj4tCX0NCj4tCWZyZWUobmFtZWxpc3QpOw0KPi0NCj4tCXJldHVybiAqYmVzdF9jYWNoZTsN
+Cj4tfQ0KPi0NCj4gc3RhdGljIGludA0KPiBjaWZzX2tyYjVfZ2V0X3JlcShjb25zdCBjaGFyICpo
+b3N0LCBjb25zdCBjaGFyICpjY25hbWUsDQo+IAkJICBEQVRBX0JMT0IgKiBtZWNodG9rZW4sIERB
+VEFfQkxPQiAqIHNlc3Nfa2V5KQ0KPkBAIC04NDEsMTMgKzc1MywxMiBAQCBpbnQgbWFpbihjb25z
+dCBpbnQgYXJnYywgY2hhciAqY29uc3QgYXJndltdKQ0KPiAJdW5zaWduZWQgaW50IGhhdmU7DQo+
+IAlsb25nIHJjID0gMTsNCj4gCWludCBjLCB0cnlfZG5zID0gMCwgbGVnYWN5X3VpZCA9IDA7DQo+
+LQljaGFyICpidWYsICpjY2RpciA9IE5VTEwsICpjY25hbWUgPSBOVUxMLCAqYmVzdF9jYWNoZSA9
+IE5VTEw7DQo+KwljaGFyICpidWYsICpjY25hbWUgPSBOVUxMOw0KPiAJY2hhciBob3N0YnVmW05J
+X01BWEhPU1RdLCAqaG9zdDsNCj4gCXN0cnVjdCBkZWNvZGVkX2FyZ3MgYXJnOw0KPiAJY29uc3Qg
+Y2hhciAqb2lkOw0KPiAJdWlkX3QgdWlkOw0KPiAJY2hhciAqa2V5dGFiX25hbWUgPSBOVUxMOw0K
+Pi0JdGltZV90IGJlc3RfdGltZSA9IDA7DQo+IA0KPiAJaG9zdGJ1ZlswXSA9ICdcMCc7DQo+IAlt
+ZW1zZXQoJmFyZywgMCwgc2l6ZW9mKGFyZykpOw0KPkBAIC05NTQsMTMgKzg2NSw4IEBAIGludCBt
+YWluKGNvbnN0IGludCBhcmdjLCBjaGFyICpjb25zdCBhcmd2W10pDQo+IAkJc3lzbG9nKExPR19F
+UlIsICJzZXR1aWQ6ICVzIiwgc3RyZXJyb3IoZXJybm8pKTsNCj4gCQlnb3RvIG91dDsNCj4gCX0N
+Cj4tCWNjZGlyID0gcmVzb2x2ZV9rcmI1X2RpcihDSUZTX0RFRkFVTFRfS1JCNV9VU0VSX0RJUiwg
+dWlkKTsNCj4tCWlmIChjY2RpciAhPSBOVUxMKQ0KPi0JCWZpbmRfa3JiNV9jYyhjY2RpciwgdWlk
+LCAmYmVzdF9jYWNoZSwgJmJlc3RfdGltZSk7DQo+LQljY25hbWUgPSBmaW5kX2tyYjVfY2MoQ0lG
+U19ERUZBVUxUX0tSQjVfRElSLCB1aWQsICZiZXN0X2NhY2hlLA0KPi0JCQkgICAgICAmYmVzdF90
+aW1lKTsNCj4tCVNBRkVfRlJFRShjY2Rpcik7DQo+IA0KPisJY2NuYW1lID0gZ2V0X2RlZmF1bHRf
+Y2MoKTsNCj4gCS8qIENvdWxkbid0IGZpbmQgY3JlZGNhY2hlPyBUcnkgdG8gdXNlIGtleXRhYiAq
+Lw0KPiAJaWYgKGNjbmFtZSA9PSBOVUxMICYmIGFyZy51c2VybmFtZSAhPSBOVUxMKQ0KPiAJCWNj
+bmFtZSA9IGluaXRfY2NfZnJvbV9rZXl0YWIoa2V5dGFiX25hbWUsIGFyZy51c2VybmFtZSk7DQo+
+LS0gDQo+Mi43LjQNCj4NCg==
