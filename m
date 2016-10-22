@@ -1,113 +1,56 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v2] Call echo service immediately after socket reconnect
-Date: Thu, 20 Oct 2016 22:40:42 -0500
-Message-ID: <CAH2r5mtvoyxs8bZY=8szHvoUKL=TQ68FCg1s1m47XaopD61Ftg@mail.gmail.com>
-References: <1477007544-4656-1-git-send-email-sprabhu@redhat.com> <CAKywueST_Rk3J-L0nMTfZmxhjMa2xdorqT7=Rx5VS0_0wLtx-g@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Eryu Guan <guaneryu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] CIFS: iterate over posix acl xattr entry correctly in ACL_to_cifs_posix()
+Date: Sat, 22 Oct 2016 16:14:40 +0800
+Message-ID: <1477124080-27230-1-git-send-email-guaneryu@gmail.com>
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+        Eryu Guan <guaneryu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueST_Rk3J-L0nMTfZmxhjMa2xdorqT7=Rx5VS0_0wLtx-g-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-merged into cifs-2.6.git for-next
+Commit 2211d5ba5c6c ("posix_acl: xattr representation cleanups")
+removes the typedefs and the zero-length a_entries array in struct
+posix_acl_xattr_header, and uses bare struct posix_acl_xattr_header
+and struct posix_acl_xattr_entry directly.
 
-On Thu, Oct 20, 2016 at 8:33 PM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> 2016-10-20 16:52 GMT-07:00 Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
->> Commit 4fcd1813e640 ("Fix reconnect to not defer smb3 session reconnect
->> long after socket reconnect") changes the behaviour of the SMB2 echo
->> service and causes it to renegotiate after a socket reconnect. However
->> under default settings, the echo service could take up to 120 seconds to
->> be scheduled.
->>
->> The patch forces the echo service to be called immediately resulting a
->> negotiate call being made immediately on reconnect.
->>
->> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->> ---
->>  fs/cifs/connect.c | 25 ++++++++++++++++++-------
->>  1 file changed, 18 insertions(+), 7 deletions(-)
->>
->> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
->> index aab5227..4547aed 100644
->> --- a/fs/cifs/connect.c
->> +++ b/fs/cifs/connect.c
->> @@ -412,6 +412,9 @@ cifs_reconnect(struct TCP_Server_Info *server)
->>                 }
->>         } while (server->tcpStatus == CifsNeedReconnect);
->>
->> +       if (server->tcpStatus == CifsNeedNegotiate)
->> +               mod_delayed_work(cifsiod_wq, &server->echo, 0);
->> +
->>         return rc;
->>  }
->>
->> @@ -421,17 +424,25 @@ cifs_echo_request(struct work_struct *work)
->>         int rc;
->>         struct TCP_Server_Info *server = container_of(work,
->>                                         struct TCP_Server_Info, echo.work);
->> -       unsigned long echo_interval = server->echo_interval;
->> +       unsigned long echo_interval;
->> +
->> +       /*
->> +        * If we need to renegotiate, set echo interval to zero to
->> +        * immediately call echo service where we can renegotiate.
->> +        */
->> +       if (server->tcpStatus == CifsNeedNegotiate)
->> +               echo_interval = 0;
->> +       else
->> +               echo_interval = server->echo_interval;
->>
->>         /*
->> -        * We cannot send an echo if it is disabled or until the
->> -        * NEGOTIATE_PROTOCOL request is done, which is indicated by
->> -        * server->ops->need_neg() == true. Also, no need to ping if
->> -        * we got a response recently.
->> +        * We cannot send an echo if it is disabled.
->> +        * Also, no need to ping if we got a response recently.
->>          */
->>
->>         if (server->tcpStatus == CifsNeedReconnect ||
->> -           server->tcpStatus == CifsExiting || server->tcpStatus == CifsNew ||
->> +           server->tcpStatus == CifsExiting ||
->> +           server->tcpStatus == CifsNew ||
->>             (server->ops->can_echo && !server->ops->can_echo(server)) ||
->>             time_before(jiffies, server->lstrp + echo_interval - HZ))
->>                 goto requeue_echo;
->> @@ -442,7 +453,7 @@ cifs_echo_request(struct work_struct *work)
->>                          server->hostname);
->>
->>  requeue_echo:
->> -       queue_delayed_work(cifsiod_wq, &server->echo, echo_interval);
->> +       queue_delayed_work(cifsiod_wq, &server->echo, server->echo_interval);
->>  }
->>
->>  static bool
->> --
->> 2.7.4
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-> Reviewed-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
->
-> --
-> Best regards,
-> Pavel Shilovsky
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+But it failed to iterate over posix acl slots when converting posix
+acls to CIFS format, which results in several test failures in
+xfstests (generic/053 generic/105) when testing against a samba v1
+server, starting from v4.9-rc1 kernel. e.g.
 
+  [root@localhost xfstests]# diff -u tests/generic/105.out /root/xfstests/results//generic/105.out.bad
+  --- tests/generic/105.out       2016-09-19 16:33:28.577962575 +0800
+  +++ /root/xfstests/results//generic/105.out.bad 2016-10-22 15:41:15.201931110 +0800
+  @@ -1,3 +1,4 @@
+   QA output created by 105
+   -rw-r--r-- root
+  +setfacl: subdir: Invalid argument
+   -rw-r--r-- root
 
+Fix it by introducing a new "ace" var, like what
+cifs_copy_posix_acl() does, and iterating posix acl xattr entries
+over it in the for loop.
 
+Signed-off-by: Eryu Guan <guaneryu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/cifssmb.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 3f3185f..d04c21c 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -3453,8 +3453,8 @@ static __u16 ACL_to_cifs_posix(char *parm_data, const char *pACL,
+ 		return 0;
+ 	}
+ 	for (i = 0; i < count; i++) {
+-		rc = convert_ace_to_cifs_ace(&cifs_acl->ace_array[i],
+-			(struct posix_acl_xattr_entry *)(local_acl + 1));
++		struct posix_acl_xattr_entry *ace = (void *)(local_acl + 1);
++		rc = convert_ace_to_cifs_ace(&cifs_acl->ace_array[i], &ace[i]);
+ 		if (rc != 0) {
+ 			/* ACE not converted */
+ 			break;
 -- 
-Thanks,
-
-Steve
+2.7.4
