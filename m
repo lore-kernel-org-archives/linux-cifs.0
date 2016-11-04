@@ -1,66 +1,76 @@
-From: Eryu Guan <guaneryu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH v2] CIFS: iterate over posix acl xattr entry correctly in ACL_to_cifs_posix()
-Date: Mon, 24 Oct 2016 20:46:40 +0800
-Message-ID: <1477313200-26317-1-git-send-email-guaneryu@gmail.com>
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-        Eryu Guan <guaneryu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] cifs_get_root shouldn't use path with tree name
+Date: Fri, 04 Nov 2016 17:45:42 +0000
+Message-ID: <1478281542.6963.10.camel@redhat.com>
+References: <1473260003-5271-1-git-send-email-sprabhu@redhat.com>
+         <mpsmvjir7hx.fsf@suse.com> <1473698409.29354.3.camel@redhat.com>
+         <mpswphl3c7r.fsf@suse.com> <1475756441.2493.4.camel@redhat.com>
+         <mpsk2df2yu9.fsf@suse.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+To: =?ISO-8859-1?Q?Aur=E9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>,
+        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <mpsk2df2yu9.fsf-IBi9RG/b67k@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Commit 2211d5ba5c6c ("posix_acl: xattr representation cleanups")
-removes the typedefs and the zero-length a_entries array in struct
-posix_acl_xattr_header, and uses bare struct posix_acl_xattr_header
-and struct posix_acl_xattr_entry directly.
+On Tue, 2016-10-11 at 08:18 +0200, Aurélien Aptel wrote:
+> Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> writes:
+> > 
+> > I think Steve had requested for a reproducer for this issue. The
+> > only
+> > place I've encountered this was with Netapp servers. Do you have a
+> > reproder which works with Samba or Windows servers?
+> 
+> The reproducer was for Samba but the root cause was something
+> different
+> (later fixed by your last DFS fix). The thing I used to reproduce it
+> doesn't reproduce it anymore.
+> 
+> I have found that the tree name prefix is needed, at least when
+> mounting. I guess Steve already knew this but it wasn't obvious for
+> me
+> so I'm sharing it.
+> 
+> When mounting //server/dfsroot/target with 'target' linking to
+> //server/dfstarget
+> 
+> With tree name prefixed:
+> 
+> => Trans2 Request, QUERY_PATH_INFO, Query File All Info, Path:
+> //10.160.64.222/dfsroot/target
+> <= Trans2 Response, QUERY_PATH_INFO, Error: STATUS_PATH_NOT_COVERED
+> 
+> Without tree name prefixed:
+> 
+> => Trans2 Request, QUERY_PATH_INFO, Query File All Info, Path:
+> /target
+> <= Trans2 Response, QUERY_PATH_INFO, Error:
+> STATUS_OBJECT_NAME_NOT_FOUND
+> 
+> PATH_NOT_COVERED is mapped to EREMOTE whereas OBJECT_NAME_NOT_FOUND
+> is
+> mapped to ENOENT.
+> 
+> So *not* prefixing with the tree name actually breaks mounting a path
+> containing a DFS link in its components. Which is the *opposite* of
+> what
+> I initially thought. I did not analyze the problem and traces enough,
+> I'm sorry.
+> 
+> So if we merge this patch, we have to be careful about when to not
+> prefix the tree name.
+> 
 
-But it failed to iterate over posix acl slots when converting posix
-acls to CIFS format, which results in several test failures in
-xfstests (generic/053 generic/105) when testing against a samba v1
-server, starting from v4.9-rc1 kernel. e.g.
+Hello Aurelien,
 
-  [root@localhost xfstests]# diff -u tests/generic/105.out /root/xfstests/results//generic/105.out.bad
-  --- tests/generic/105.out       2016-09-19 16:33:28.577962575 +0800
-  +++ /root/xfstests/results//generic/105.out.bad 2016-10-22 15:41:15.201931110 +0800
-  @@ -1,3 +1,4 @@
-   QA output created by 105
-   -rw-r--r-- root
-  +setfacl: subdir: Invalid argument
-   -rw-r--r-- root
+The patch maintains current behaviour except for the call to
+cifs_build_path_to_root in cifs_get_root() where the logic expects the
+full path to the file/directory without the hostname as it iterates
+over each component of the path. This fixes a behaviour seen with
+Netapp where the tcon connect returns a SMB_SHARE_IS_IN_DFS even though
+there doesn't isn't a DFS share in the path.
 
-Fix it by introducing a new "ace" var, like what
-cifs_copy_posix_acl() does, and iterating posix acl xattr entries
-over it in the for loop.
-
-Signed-off-by: Eryu Guan <guaneryu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
-v2:
-- move "ace" definition outside for loop
-
- fs/cifs/cifssmb.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 3f3185f..e3fed92 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -3427,6 +3427,7 @@ static __u16 ACL_to_cifs_posix(char *parm_data, const char *pACL,
- 	__u16 rc = 0;
- 	struct cifs_posix_acl *cifs_acl = (struct cifs_posix_acl *)parm_data;
- 	struct posix_acl_xattr_header *local_acl = (void *)pACL;
-+	struct posix_acl_xattr_entry *ace = (void *)(local_acl + 1);
- 	int count;
- 	int i;
- 
-@@ -3453,8 +3454,7 @@ static __u16 ACL_to_cifs_posix(char *parm_data, const char *pACL,
- 		return 0;
- 	}
- 	for (i = 0; i < count; i++) {
--		rc = convert_ace_to_cifs_ace(&cifs_acl->ace_array[i],
--			(struct posix_acl_xattr_entry *)(local_acl + 1));
-+		rc = convert_ace_to_cifs_ace(&cifs_acl->ace_array[i], &ace[i]);
- 		if (rc != 0) {
- 			/* ACE not converted */
- 			break;
--- 
-2.7.4
+Sachin Prabhu
