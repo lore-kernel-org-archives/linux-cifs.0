@@ -1,76 +1,67 @@
-From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs_get_root shouldn't use path with tree name
-Date: Fri, 04 Nov 2016 17:45:42 +0000
-Message-ID: <1478281542.6963.10.camel@redhat.com>
-References: <1473260003-5271-1-git-send-email-sprabhu@redhat.com>
-         <mpsmvjir7hx.fsf@suse.com> <1473698409.29354.3.camel@redhat.com>
-         <mpswphl3c7r.fsf@suse.com> <1475756441.2493.4.camel@redhat.com>
-         <mpsk2df2yu9.fsf@suse.com>
+From: <indulge-HCInDj6vYHrk4FeknX8I/ZqQE7yCjDx5@public.gmane.org>
+Subject: 27921 linux-cifs
+Date: Mon, 07 Nov 2016 06:34:11 -0000
+Message-ID: <147850045194.2813.17995651080898012299@asianet.co.th>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-To: =?ISO-8859-1?Q?Aur=E9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>,
-        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: application/zip; name="EMAIL_6004380520_linux-cifs.zip"
+Content-Transfer-Encoding: base64
+To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <mpsk2df2yu9.fsf-IBi9RG/b67k@public.gmane.org>
+Content-Disposition: attachment
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 2016-10-11 at 08:18 +0200, Aurélien Aptel wrote:
-> Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> writes:
-> > 
-> > I think Steve had requested for a reproducer for this issue. The
-> > only
-> > place I've encountered this was with Netapp servers. Do you have a
-> > reproder which works with Samba or Windows servers?
-> 
-> The reproducer was for Samba but the root cause was something
-> different
-> (later fixed by your last DFS fix). The thing I used to reproduce it
-> doesn't reproduce it anymore.
-> 
-> I have found that the tree name prefix is needed, at least when
-> mounting. I guess Steve already knew this but it wasn't obvious for
-> me
-> so I'm sharing it.
-> 
-> When mounting //server/dfsroot/target with 'target' linking to
-> //server/dfstarget
-> 
-> With tree name prefixed:
-> 
-> => Trans2 Request, QUERY_PATH_INFO, Query File All Info, Path:
-> //10.160.64.222/dfsroot/target
-> <= Trans2 Response, QUERY_PATH_INFO, Error: STATUS_PATH_NOT_COVERED
-> 
-> Without tree name prefixed:
-> 
-> => Trans2 Request, QUERY_PATH_INFO, Query File All Info, Path:
-> /target
-> <= Trans2 Response, QUERY_PATH_INFO, Error:
-> STATUS_OBJECT_NAME_NOT_FOUND
-> 
-> PATH_NOT_COVERED is mapped to EREMOTE whereas OBJECT_NAME_NOT_FOUND
-> is
-> mapped to ENOENT.
-> 
-> So *not* prefixing with the tree name actually breaks mounting a path
-> containing a DFS link in its components. Which is the *opposite* of
-> what
-> I initially thought. I did not analyze the problem and traces enough,
-> I'm sorry.
-> 
-> So if we merge this patch, we have to be careful about when to not
-> prefix the tree name.
-> 
-
-Hello Aurelien,
-
-The patch maintains current behaviour except for the call to
-cifs_build_path_to_root in cifs_get_root() where the logic expects the
-full path to the file/directory without the hostname as it iterates
-over each component of the path. This fixes a behaviour seen with
-Netapp where the tcon connect returns a SMB_SHARE_IS_IN_DFS even though
-there doesn't isn't a DFS share in the path.
-
-Sachin Prabhu
+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
+AQBcAAAAZwsAAAAA
