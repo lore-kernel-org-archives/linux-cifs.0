@@ -1,15 +1,15 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH] CIFS: Fix a possible memory corruption during reconnect
-Date: Wed,  9 Nov 2016 17:07:56 -0800
-Message-ID: <1478740076-60526-1-git-send-email-pshilov@microsoft.com>
+Subject: [PATCH v2] CIFS: Fix a possible memory corruption during reconnect
+Date: Thu, 10 Nov 2016 15:31:23 -0800
+Message-ID: <1478820683-2954-1-git-send-email-pshilov@microsoft.com>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-We can not unlock/lock spinlock in the middle of the reconnect
-loop since it can corrupt list iterator pointers and a tcon
-structure can be released if we don't hold an extra reference.
+We can not unlock/lock cifs_tcp_ses_lock while walking through ses
+and tcon lists because it can corrupt list iterator pointers and
+a tcon structure can be released if we don't hold an extra reference.
 Fix it by moving a reconnect process to a separate delayed work
 and acquiring a reference to every tcon that needs to be reconnected.
 Also do not send an echo request on newly established connections.
@@ -19,10 +19,10 @@ Signed-off-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 ---
  fs/cifs/cifsglob.h  |  3 +++
  fs/cifs/cifsproto.h |  3 +++
- fs/cifs/connect.c   | 32 ++++++++++++++++++-----
- fs/cifs/smb2pdu.c   | 74 ++++++++++++++++++++++++++++++++++++-----------------
+ fs/cifs/connect.c   | 34 +++++++++++++++++++-----
+ fs/cifs/smb2pdu.c   | 75 ++++++++++++++++++++++++++++++++++++-----------------
  fs/cifs/smb2proto.h |  1 +
- 5 files changed, 82 insertions(+), 31 deletions(-)
+ 5 files changed, 85 insertions(+), 31 deletions(-)
 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
 index 1f17f6b..6dcefc8 100644
@@ -67,7 +67,7 @@ index ced0e42..cd8025a 100644
  #if IS_ENABLED(CONFIG_CIFS_DFS_UPCALL)
  extern void cifs_dfs_release_automount_timer(void);
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 4547aed..69452f7 100644
+index 4547aed..75503af 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
 @@ -52,6 +52,9 @@
@@ -91,10 +91,11 @@ index 4547aed..69452f7 100644
  {
  	struct task_struct *task;
  
-@@ -2118,6 +2121,17 @@ cifs_put_tcp_session(struct TCP_Server_Info *server)
+@@ -2118,6 +2121,19 @@ cifs_put_tcp_session(struct TCP_Server_Info *server)
  
  	cancel_delayed_work_sync(&server->echo);
  
++#ifdef CONFIG_CIFS_SMB2
 +	if (from_reconnect)
 +		/*
 +		 * Avoid deadlock here: reconnect work calls
@@ -105,11 +106,12 @@ index 4547aed..69452f7 100644
 +		cancel_delayed_work(&server->reconnect);
 +	else
 +		cancel_delayed_work_sync(&server->reconnect);
++#endif
 +
  	spin_lock(&GlobalMid_Lock);
  	server->tcpStatus = CifsExiting;
  	spin_unlock(&GlobalMid_Lock);
-@@ -2171,6 +2185,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+@@ -2171,6 +2187,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
  	init_waitqueue_head(&tcp_ses->request_q);
  	INIT_LIST_HEAD(&tcp_ses->pending_mid_q);
  	mutex_init(&tcp_ses->srv_mutex);
@@ -117,7 +119,7 @@ index 4547aed..69452f7 100644
  	memcpy(tcp_ses->workstation_RFC1001_name,
  		volume_info->source_rfc1001_name, RFC1001_NAME_LEN_WITH_NULL);
  	memcpy(tcp_ses->server_RFC1001_name,
-@@ -2182,6 +2197,9 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+@@ -2182,6 +2199,9 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
  	INIT_LIST_HEAD(&tcp_ses->tcp_ses_list);
  	INIT_LIST_HEAD(&tcp_ses->smb_ses_list);
  	INIT_DELAYED_WORK(&tcp_ses->echo, cifs_echo_request);
@@ -127,7 +129,7 @@ index 4547aed..69452f7 100644
  	memcpy(&tcp_ses->srcaddr, &volume_info->srcaddr,
  	       sizeof(tcp_ses->srcaddr));
  	memcpy(&tcp_ses->dstaddr, &volume_info->dstaddr,
-@@ -2340,7 +2358,7 @@ cifs_put_smb_ses(struct cifs_ses *ses)
+@@ -2340,7 +2360,7 @@ cifs_put_smb_ses(struct cifs_ses *ses)
  	spin_unlock(&cifs_tcp_ses_lock);
  
  	sesInfoFree(ses);
@@ -136,7 +138,7 @@ index 4547aed..69452f7 100644
  }
  
  #ifdef CONFIG_KEYS
-@@ -2514,7 +2532,7 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
+@@ -2514,7 +2534,7 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
  		mutex_unlock(&ses->session_mutex);
  
  		/* existing SMB ses has a server reference already */
@@ -145,7 +147,7 @@ index 4547aed..69452f7 100644
  		free_xid(xid);
  		return ses;
  	}
-@@ -2604,7 +2622,7 @@ cifs_find_tcon(struct cifs_ses *ses, const char *unc)
+@@ -2604,7 +2624,7 @@ cifs_find_tcon(struct cifs_ses *ses, const char *unc)
  	return NULL;
  }
  
@@ -154,7 +156,7 @@ index 4547aed..69452f7 100644
  cifs_put_tcon(struct cifs_tcon *tcon)
  {
  	unsigned int xid;
-@@ -3792,7 +3810,7 @@ cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *volume_info)
+@@ -3792,7 +3812,7 @@ cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *volume_info)
  		else if (ses)
  			cifs_put_smb_ses(ses);
  		else
@@ -163,7 +165,7 @@ index 4547aed..69452f7 100644
  		bdi_destroy(&cifs_sb->bdi);
  	}
  
-@@ -4103,7 +4121,7 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb, kuid_t fsuid)
+@@ -4103,7 +4123,7 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb, kuid_t fsuid)
  	ses = cifs_get_smb_ses(master_tcon->ses->server, vol_info);
  	if (IS_ERR(ses)) {
  		tcon = (struct cifs_tcon *)ses;
@@ -173,10 +175,10 @@ index 4547aed..69452f7 100644
  	}
  
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 5ca5ea46..af4545d 100644
+index 5ca5ea46..950dbf7 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -1972,6 +1972,53 @@ smb2_echo_callback(struct mid_q_entry *mid)
+@@ -1972,6 +1972,54 @@ smb2_echo_callback(struct mid_q_entry *mid)
  	add_credits(server, credits_received, CIFS_ECHO_OP);
  }
  
@@ -187,7 +189,7 @@ index 5ca5ea46..af4545d 100644
 +	struct cifs_ses *ses;
 +	struct cifs_tcon *tcon, *tcon2;
 +	struct list_head tmp_list;
-+	int ses_exist = false;
++	int tcon_exist = false;
 +
 +	/* Prevent simultaneous reconnects that can corrupt tcon->rlist list */
 +	mutex_lock(&server->reconnect_mutex);
@@ -197,11 +199,11 @@ index 5ca5ea46..af4545d 100644
 +
 +	spin_lock(&cifs_tcp_ses_lock);
 +	list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
-+		ses_exist = true;
 +		list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
 +			if (tcon && tcon->need_reconnect) {
 +				tcon->tc_count++;
 +				list_add_tail(&tcon->rlist, &tmp_list);
++				tcon_exist = true;
 +			}
 +		}
 +	}
@@ -209,7 +211,7 @@ index 5ca5ea46..af4545d 100644
 +	 * Get the reference to server struct to be sure that the last call of
 +	 * cifs_put_tcon() in the loop below won't release the server pointer.
 +	 */
-+	if (ses_exist)
++	if (tcon_exist)
 +		server->srv_count++;
 +
 +	spin_unlock(&cifs_tcp_ses_lock);
@@ -224,13 +226,14 @@ index 5ca5ea46..af4545d 100644
 +	mutex_unlock(&server->reconnect_mutex);
 +
 +	/* now we can safely release srv struct */
-+	cifs_put_tcp_session(server, 1);
++	if (tcon_exist)
++		cifs_put_tcp_session(server, 1);
 +}
 +
  int
  SMB2_echo(struct TCP_Server_Info *server)
  {
-@@ -1984,32 +2031,11 @@ SMB2_echo(struct TCP_Server_Info *server)
+@@ -1984,32 +2032,11 @@ SMB2_echo(struct TCP_Server_Info *server)
  	cifs_dbg(FYI, "In echo request\n");
  
  	if (server->tcpStatus == CifsNeedNegotiate) {
@@ -254,7 +257,7 @@ index 5ca5ea46..af4545d 100644
 -			}
 -		}
 -		spin_unlock(&cifs_tcp_ses_lock);
-+		/* No need to send echo an a newly established connections */
++		/* No need to send echo on newly established connections */
 +		mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
 +		return rc;
  	}
