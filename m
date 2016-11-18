@@ -1,98 +1,49 @@
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: cifs mount regression in 4.8 and 4.4 stable
-Date: Thu, 17 Nov 2016 11:31:00 +0100
-Message-ID: <20161117103100.GA3043@kroah.com>
-References: <20160922150918.GA127053@ubuntu-hedt>
- <1474557429.14139.10.camel@redhat.com>
- <20160922152756.GB127053@ubuntu-hedt>
- <20160923120145.GA51563@ubuntu-hedt>
- <20161117094725.GB2116@kroah.com>
- <1479377504.8725.6.camel@redhat.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH 0/4][cifs-utils] Improvement and fixes for command line
+ options
+Date: Fri, 18 Nov 2016 15:50:32 -0500
+Message-ID: <1479502232.5248.4.camel@samba.org>
+References: <1479495292-709-1-git-send-email-germano.percossi@citrix.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: Seth Forshee <seth.forshee@canonical.com>,
-        Steve French <sfrench@samba.org>,
-        Aurelien Aptel <aaptel@suse.com>, linux-cifs@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org
-To: Sachin Prabhu <sprabhu@redhat.com>
-Return-path: <stable-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1479377504.8725.6.camel@redhat.com>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>, sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1479495292-709-1-git-send-email-germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, Nov 17, 2016 at 03:41:44PM +0530, Sachin Prabhu wrote:
-> On Thu, 2016-11-17 at 10:47 +0100, Greg Kroah-Hartman wrote:
-> > On Fri, Sep 23, 2016 at 07:01:45AM -0500, Seth Forshee wrote:
-> > > 
-> > > On Thu, Sep 22, 2016 at 10:27:56AM -0500, Seth Forshee wrote:
-> > > > 
-> > > > On Thu, Sep 22, 2016 at 04:17:09PM +0100, Sachin Prabhu wrote:
-> > > > > 
-> > > > > On Thu, 2016-09-22 at 10:09 -0500, Seth Forshee wrote:
-> > > > > > 
-> > > > > > We've received reports from users of a cifs mount regression
-> > > > > > in our
-> > > > > > 4.4-based kernel, e.g. [1]. It is fixed by reverting the
-> > > > > > follwing
-> > > > > > commit
-> > > > > > from 4.8 which was applied to 4.4 stable:
-> > > > > > 
-> > > > > >  a6b5058 fs/cifs: make share unaccessible at root level
-> > > > > > mountable
-> > > > > > 
-> > > > > > Testing against 4.8-rc7 shows that the problem is present
-> > > > > > there as
-> > > > > > well.
-> > > > > > 
-> > > > > > Thanks,
-> > > > > > Seth
-> > > > > > 
-> > > > > > [1] http://bugs.launchpad.net/bugs/1626112
-> > > > > 
-> > > > > Hello Seth, 
-> > > > > 
-> > > > > We have identified some regressions introduced by the mentioned
-> > > > > patch
-> > > > > These include
-> > > > 
-> > > > I saw those, but none of the ones already in Linus's tree fix the
-> > > > problem.
-> > > > 
-> > > > > 
-> > > > > a) mounting of DFS shares breaks. The fix is included in
-> > > > > Steve's tree
-> > > > > at
-> > > > > https://git.samba.org/?p=sfrench/cifs-2.6.git;a=commit;h=de5233
-> > > > > 745cd59c
-> > > > > f5853d963ad216067788a87594
-> > > > 
-> > > > However this one isn't in Linus's tree yet.
-> > > > 
-> > > > I'm not certain what circumstances cause the failure, but based
-> > > > on what
-> > > > I see in dmesg it looks likely that this one is the fix. I'll get
-> > > > some
-> > > > testing with this applied.
-> > > 
-> > > Looks like this is is the fix we need. Thanks for your help.
-> > 
-> > What ever happened with this?  Did the patch end up in Linus's
-> > tree?  If
-> > so, what 
-> > was the git commit id?
-> > 
+On Fri, 2016-11-18 at 18:54 +0000, Germano Percossi wrote:
+> The way command line parsing for mount is done, is not aligned with the
+> corresponding kernel module.
 > 
-> Hello Greg,
+> Options checking is not strict, some options the cifs module accepts
+> are not honoured, others are accepted (and converted) even though
+> they are not documented nor otherwise accepted in the cifs module.
 > 
-> The upstream commit is
-> Fix regression which breaks DFS mounting
-> d171356ff11ab1825e456dfb979755e01b3c54a1
+> Moreover, it is not possible to send an empty domain without receiving an
+> error, while the cifs module treats the 2 cases slightly differently.
 > 
-> This was marked for stable and should have been sent for inclusion in
-> the stable trees.
+> The other 2 patches are trivial
+> 
+> Germano Percossi (4):
+>   [cifs-utils] Removed extra comma in front of domain
+>   [cifs-utils] Accept empty domains on the command line
+>   [cifs-utils] Fixed command line parsing and aligned with kernel
+>   [cifs-utils] Remove unneeded stdbool header in mount.cifs
+> 
+>  mount.cifs.c | 100 +++++++++++++++++++++++++++++++++++------------------------
+>  1 file changed, 60 insertions(+), 40 deletions(-)
+> 
 
-Ah, good, thanks for this, yes, it's already in the released kernels.
+Thanks. Patches 1, 3 and 4 look fine. I'm not quite sold yet on #2
+though since I'm a little unclear on when you'd want to do either.
 
-greg k-h
+Either way, it would also be nice to flesh out the domain= section of
+the mount.cifs manpage as well. It's a little thin...
+
+Thanks,
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
