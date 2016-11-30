@@ -1,36 +1,37 @@
 From: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: [PATCH 0/5] Stable fixes
-Date: Tue, 29 Nov 2016 16:56:51 -0800
-Message-ID: <1480467416-13636-1-git-send-email-pshilov@microsoft.com>
+Subject: [PATCH 3/5] CIFS: Fix a possible memory corruption in push locks
+Date: Tue, 29 Nov 2016 16:56:54 -0800
+Message-ID: <1480467416-13636-4-git-send-email-pshilov@microsoft.com>
+References: <1480467416-13636-1-git-send-email-pshilov@microsoft.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1480467416-13636-1-git-send-email-pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Here are a bunch of fixes targeted for stable. The first tree patches
-are small fixes. The patch #4 fixes the kernel crash due to a memory
-corruption bug during reconnect. The patch #5 fixes a possible stucking
-on the mutex which was already locked by the same process.
+If maxBuf is not 0 but less than a size of SMB2 lock structure
+we can end up with a memory corruption.
 
-Pavel Shilovsky (5):
-  CIFS: Decrease verbosity of ioctl call
-  CIFS: Fix missing nls unload in smb2_reconnect()
-  CIFS: Fix a possible memory corruption in push locks
-  CIFS: Fix a possible memory corruption during reconnect
-  CIFS: Fix a possible double locking of mutex during reconnect
+Cc: Stable <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Signed-off-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+---
+ fs/cifs/smb2file.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- fs/cifs/cifsglob.h  |  4 +++
- fs/cifs/cifsproto.h |  3 ++
- fs/cifs/connect.c   | 34 ++++++++++++++++-----
- fs/cifs/file.c      |  8 ++++-
- fs/cifs/ioctl.c     |  2 +-
- fs/cifs/smb2file.c  |  2 +-
- fs/cifs/smb2pdu.c   | 87 ++++++++++++++++++++++++++++++++++++-----------------
- fs/cifs/smb2pdu.h   |  2 ++
- fs/cifs/smb2proto.h |  1 +
- 9 files changed, 105 insertions(+), 38 deletions(-)
-
+diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
+index f9e766f..b2aff0c 100644
+--- a/fs/cifs/smb2file.c
++++ b/fs/cifs/smb2file.c
+@@ -260,7 +260,7 @@ smb2_push_mandatory_locks(struct cifsFileInfo *cfile)
+ 	 * and check it for zero before using.
+ 	 */
+ 	max_buf = tlink_tcon(cfile->tlink)->ses->server->maxBuf;
+-	if (!max_buf) {
++	if (max_buf < sizeof(struct smb2_lock_element)) {
+ 		free_xid(xid);
+ 		return -EINVAL;
+ 	}
 -- 
 2.7.4
