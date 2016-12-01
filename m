@@ -1,52 +1,61 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: linux-next: build failure after merge of the cifs tree
-Date: Thu, 1 Dec 2016 00:27:56 -0600
-Message-ID: <CAH2r5msUNuqY7ZRsJa2k4ssPusgOtg31=KDNM7ZS5he-Sx+btQ@mail.gmail.com>
-References: <20161130092742.0f1cc03b@canb.auug.org.au>
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH v2] CIFS: Fix a possible memory corruption during
+ reconnect
+Date: Thu, 01 Dec 2016 15:05:53 +0530
+Message-ID: <1480584953.3937.14.camel@redhat.com>
+References: <1478820683-2954-1-git-send-email-pshilov@microsoft.com>
+         <1480500055.3937.8.camel@redhat.com>
+         <CAKywueRP6BV3d=--yETisU=8u+jCmeuZyUcvnsrx-RCOqLGphw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: CIFS <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, linux-next-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20161130092742.0f1cc03b-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
+In-Reply-To: <CAKywueRP6BV3d=--yETisU=8u+jCmeuZyUcvnsrx-RCOqLGphw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Commit fixed to handle the ifdef CONFIG_CIFS_SMB2 disabled problem you
-noted, and repushed to my for-next branch. Thx for pointing this out.
+On Wed, 2016-11-30 at 11:24 -0800, Pavel Shilovsky wrote:
+> 
+> > Do you need the #ifdef CONFIG_CIFS_SMB2 here considering that there
+> > are
+> > no such macro definitions around the declarations around
+> > delayed_work
+> > reconnect in struct TCP_Server_Info. It would also lead to unused
+> > variable in case the kernel is compiled without CONFIG_CIFS_SMB2.
+> 
+> Thank you for reviewing this.
+> 
+> I posted the next version of the patch yesterday ([PATCH 4/5] CIFS:
+> Fix a possible memory corruption during reconnect) that addresses
+> this
+> problem by moving fields inside TCP_Server_Info to CONFIG_CIFS_SMB2.
+> 
 
-On Tue, Nov 29, 2016 at 4:27 PM, Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org> wrote:
-> Hi all,
->
-> After merging the cifs tree, today's linux-next build (powerpc
-> ppc64_defconfig) failed like this:
->
-> fs/cifs/connect.c: In function 'cifs_find_tcon':
-> fs/cifs/connect.c:2610:11: error: 'struct cifs_tcon' has no member named 'snapshot_time'
->    if (tcon->snapshot_time != volume_info->snapshot_time)
->            ^
-> fs/cifs/connect.c: In function 'cifs_get_tcon':
-> fs/cifs/connect.c:2681:8: error: 'struct cifs_tcon' has no member named 'snapshot_time'
->     tcon->snapshot_time = volume_info->snapshot_time;
->         ^
->
-> Caused by commit
->
->   36c659cf9241 ("SMB3: parsing for new snapshot timestamp mount parm")
->
-> CONFIG_CIFS_SMB2 is not set for this build ...
->
-> I have used the cifs tree from next-20161129 for today.
->
-> --
-> Cheers,
-> Stephen Rothwell
+Thanks. I'll review the patch separately.
 
 
+> > > +             /* No need to send echo on newly established
+> > > connections */
+> > > +             mod_delayed_work(cifsiod_wq, &server->reconnect,
+> > > 0);
+> > > +             return rc;
+> > 
+> > Shouldn't this be queue_work?
+> 
+> It is made it this way because of the following: if someone submitted
+> the work with a delay previously (now the code doesn't do it but it
+> is
+> possible in the future), we want to overwrite this delay to 0 since
+> we
+> need an immediate session/tcon reconnect here.
+> 
 
--- 
-Thanks,
+OK. It should work without any problem but I would have stuck to the
+expected functions and use mod_delayed_work() only when new code which
+queues the work separately has been added. It is strange to see only
+mod_delayed_work() when the work isn't queued anywhere else. Apart from
+that small concern, I am fine with it.
 
-Steve
+Sachin Prabhu
