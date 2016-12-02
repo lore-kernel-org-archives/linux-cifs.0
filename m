@@ -1,83 +1,103 @@
-From: Mark Syms <Mark.Syms-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-Subject: RE: [PATCH] CIFS: handle guest access errors to Windows shares
-Date: Fri, 2 Dec 2016 16:44:47 +0000
-Message-ID: <c3d52aaaf41d48a3a4f5ee2b655446cb@AMSPEX02CL02.citrite.net>
-References: <20161129113646.13360-2-mark.syms@citrix.com>
- <mpszikis34d.fsf@suse.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] CIFS: handle guest access errors to Windows shares
+Date: Fri, 2 Dec 2016 10:42:01 -0600
+Message-ID: <CAH2r5msRXHseV9A9o=RwDL69v5smXoQZWo_WeT1PEtudzpYiLw@mail.gmail.com>
+References: <20161129113646.13360-2-mark.syms@citrix.com> <mpszikis34d.fsf@suse.com>
  <0d4b27917f3e4a90a19342a7e27b5d9f@AMSPEX02CL02.citrite.net>
- <mpswpfkswko.fsf@suse.com>
- <856abc11c5864627bfcdea9ce0933465@AMSPEX02CL02.citrite.net>
- <CAH2r5msRXHseV9A9o=RwDL69v5smXoQZWo_WeT1PEtudzpYiLw@mail.gmail.com>
+ <mpswpfkswko.fsf@suse.com> <856abc11c5864627bfcdea9ce0933465@AMSPEX02CL02.citrite.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: =?utf-8?B?QXVyw6lsaWVuIEFwdGVs?= <aaptel-IBi9RG/b67k@public.gmane.org>,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Cc: =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>,
         "sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org" <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
         "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Mark Syms <Mark.Syms-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5msRXHseV9A9o=RwDL69v5smXoQZWo_WeT1PEtudzpYiLw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Content-Language: en-US
+In-Reply-To: <856abc11c5864627bfcdea9ce0933465-ZIyKOb66IhyzM76k4uAzvRgL0UkB//ZR@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-T0ssIEknbGwgc3BpbiB1cCBhIFdpbiAxMCBtYWNoaW5lIGFuZCBzZWUgaG93IHRoYXQgYmVoYXZl
-cyBhbmQgdGhlbiBhIFdTMjAxMlIyLg0KDQoJTWFyay4NCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdl
-LS0tLS0NCkZyb206IFN0ZXZlIEZyZW5jaCBbbWFpbHRvOnNtZnJlbmNoQGdtYWlsLmNvbV0gDQpT
-ZW50OiAwMiBEZWNlbWJlciAyMDE2IDE2OjQyDQpUbzogTWFyayBTeW1zIDxNYXJrLlN5bXNAY2l0
-cml4LmNvbT4NCkNjOiBBdXLDqWxpZW4gQXB0ZWwgPGFhcHRlbEBzdXNlLmNvbT47IHNmcmVuY2hA
-c2FtYmEub3JnOyBsaW51eC1jaWZzQHZnZXIua2VybmVsLm9yZw0KU3ViamVjdDogUmU6IFtQQVRD
-SF0gQ0lGUzogaGFuZGxlIGd1ZXN0IGFjY2VzcyBlcnJvcnMgdG8gV2luZG93cyBzaGFyZXMNCg0K
-Tm90ZSB0aGF0IHdlIGhhdmUgc2VlbiBuZWdvdGlhdGUgZGlmZmVyZW5jZXMgLSBzcG5lZ28gZW5j
-YXBzdWxhdGVkIG50bG1zc3AgdnMuIHJhdyBudGxtc3NwIC0gYmV0d2VlbiBzdGFuZGFsb25lIHNl
-cnZlcnMgKGFuZCBXaW5kb3dzIGNsaWVudHMgYWN0aW5nIGFzIGEgc2VydmVyKSBhbmQgV2luZG93
-cyBzZXJ2ZXJzIGFjdGluZyBhcyBhbiBBRCBEQy4NCg0KQWxzbyBub3RlIHRoYXQgY29tcGFyaW5n
-IHRoZSBzYW1lIG9zIGluIHRoZSBjbGllbnQgdnMgc2VydmVyIGNvbXBhcmlzb24gKFdpbmRvd3Mg
-MTAgdnMgV2luZG93cyAyMDE2KSBjb3VsZCBoZWxwIGRldGVybWluZSBpZiBzZXJ2ZXIgdnMuIGNs
-aWVudCBkaWZmZXJlbmNlIG9yIHZlcnNpb24gZGlmZmVyZW5jZS4NCg0KT24gRnJpLCBEZWMgMiwg
-MjAxNiBhdCAxMDoyNSBBTSwgTWFyayBTeW1zIDxNYXJrLlN5bXNAY2l0cml4LmNvbT4gd3JvdGU6
-DQo+IEhpLA0KPg0KPiBJJ3ZlIGp1c3QgdHJpZWQgYSBwbGFpbiB2YW5pbGxhIERlYmlhbiB0ZXN0
-aW5nIG1hY2hpbmUgd2l0aCB0aGUgdmVuZG9yIDQuOC4wIGtlcm5lbCBhbmQgdGhlIGlzc3VlIHJl
-cHJvZHVjZXMuDQo+DQo+IE5vdywgaW50ZXJlc3RpbmdseSwgaWYgSSBpc3N1ZSB0aGUgc2FtZSBt
-b3VudCBjb21tYW5kIHRvIGEgV1MyMDE2IG1hY2hpbmUgY29uZmlndXJlZCBpbiB0aGUgc2FtZSB3
-YXkgYXMgYSBXaW44LjEgbWFjaGluZSBpdCBmYWlscyB3aXRoIHBlcm1pc3Npb24gZGVuaWVkIGFz
-IHdlJ2QgZXhwZWN0IGFuZCBkb2Vzbid0IGdvIGludG8gdGhlIERGUyBjaGFzZSBwcm9jZXNzLiBT
-bywgdGhpcyBhcHBlYXJzIHRvIGJlIHNvbWV0aGluZyB0aGF0IGlzIHNwZWNpZmljIHRvIGNvbm5l
-Y3RpbmcgU01CIHRvIGNsaWVudCBncmFkZSBPUyBtYWNoaW5lcy4NCj4NCj4gICAgICAgICBNYXJr
-DQo+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IGxpbnV4LWNpZnMtb3du
-ZXJAdmdlci5rZXJuZWwub3JnIA0KPiBbbWFpbHRvOmxpbnV4LWNpZnMtb3duZXJAdmdlci5rZXJu
-ZWwub3JnXSBPbiBCZWhhbGYgT2YgQXVyw6lsaWVuIEFwdGVsDQo+IFNlbnQ6IDMwIE5vdmVtYmVy
-IDIwMTYgMTc6MzINCj4gVG86IE1hcmsgU3ltcyA8TWFyay5TeW1zQGNpdHJpeC5jb20+OyBzZnJl
-bmNoQHNhbWJhLm9yZzsgDQo+IGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6
-IFJFOiBbUEFUQ0hdIENJRlM6IGhhbmRsZSBndWVzdCBhY2Nlc3MgZXJyb3JzIHRvIFdpbmRvd3Mg
-DQo+IHNoYXJlcw0KPg0KPiBIaSBNYXJrLA0KPg0KPiBOZXcgc2V0dXANCj4NCj4gICBQUz4gbmV0
-IHVzZXIgZ3Vlc3QgL2FjdGl2YXRlOm5vDQo+ICAgUFM+IG1rZGlyIEM6XGd1ZXN0c2hhcmUNCj4g
-ICBQUz4gaWNhY2xzIEM6XGd1ZXN0c2hhcmUgL2dyYW50ICdFdmVyeW9uZTooT0kpKENJKUYnDQo+
-ICAgUFM+IG5ldy1zbWJzaGFyZSAtbmFtZSBndWVzdHNoYXJlIC1wYXRoIEM6XGd1ZXN0c2hhcmUg
-LWZ1bGxhY2Nlc3MgDQo+IEV2ZXJ5b25lDQo+DQo+IEkndmUgdGVzdGVkIHYzLjEwLCB2NC40LCBt
-YXN0ZXIsIG1hc3Rlcit5b3VyIHBhdGNoIHVzaW5nIGRlZmF1bHQgb3B0aW9ucyAoZW1wdHkgb3Ig
-bm8gdXNlciAiTlUiKSBhbmQgdXNlcj1hYmMgKFUpLg0KPg0KPiBOVF9MT0dPTl9GQUlMVVJFIGlu
-IHNlc3Npb24gc2V0dXA6IExGDQo+IFRoaXMgaXMgd2hhdCB5b3Ugc2VlbSB0byBoYXZlIGluIDMu
-MTAuDQo+DQo+IE5UX0FDQ0VTU19ERU5JRUQgaW4gdHJlZSBjb25uZWN0IHRvIHRoZSBzaGFyZTog
-QUQgVGhpcyBpcyB3aGF0IHlvdSBnZXQgYmVmb3JlIHlvdXIgaW5maW5pdGUgbG9vcC4NCj4NCj4g
-ICAgICAgICAgICAgIHwgICBOVSAgICAgICBVDQo+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tDQo+IDMuMTAgICAgICAgICB8ICAgTEYgICAgICAgTEYNCj4gNC40ICAgICAgICAgIHwg
-ICBMRiAgICAgICBMRg0KPiBtYXN0ZXIgICAgICAgfCAgIEFEICAgICAgIExGDQo+IG1hc3Rlcitw
-YXRjaCB8ICAgQUQgICAgICAgTEYNCj4NCj4gTm8gaW5maW5pdGUgREZTIGxvb3AgOigNCj4gQWxs
-IHRoZXNlIGlzc3VlcyByZXN1bHQgaW4gbW91bnQgZmFpbGluZyB2ZXJ5IGZhc3Qgd2l0aCBwZXJt
-aXNzaW9uIGRlbmllZC4NCj4NCj4gSSBndWVzcyBpdCBjb3VsZCBiZSBmcm9tIGVpdGhlciB0aGUg
-V2luZG93cyB2ZXJzaW9uIG9yIHRoZSBzaGFyZS9mb2xkZXIgQUNMLiBBIGRlZXBlciBhbmFseXNp
-cyBvZiB0aGUgcGFja2V0cyBtaWdodCByZXZlYWwgbW9yZS4NCj4NCj4gSW4gYW55IGNhc2UgSSBk
-aWQgbm90IG5vdGljZSBhbnkgaXNzdWVzIGZvciBvbiBhIGJhc2ljIERGUyBzZXR1cCB3aXRoIHRo
-ZSBwYXRjaCBzbyBJIGRvbid0IHRoaW5rIGl0IGludHJvZHVjZWQgYW55IHJlZ3Jlc3Npb25zLCB3
-aGljaCBpcyBwcm9iYWJseSBhbGwgdGhhdCBtYXR0ZXJzLiBJdCBzdGlsbCBib3RoZXJzIG1lIGEg
-bGl0dGxlIEkgY291bGRuJ3QgaGl0IHRoZSBidWcuDQo+DQo+IEkndmUgaW5jbHVkZWQga2VybmVs
-IG91dHB1dCB3LyBkZWJ1Z2dpbmcgb3V0cHV0IGFuZCBuZXR3b3JrIGNhcHR1cmUgb2YgbXkgdGVz
-dHMgaWYgYW55b25lIHdhbnQgdG8gaGF2ZSBhIGxvb2sgYXQgaXQuIChtYXN0ZXIrcGF0Y2ggPSBt
-bC1ndWVzdGZpeCkuDQo+DQo+IFJldmlld2VkLWJ5OiBBdXJlbGllbiBBcHRlbCA8YWFwdGVsQHN1
-c2UuY29tPg0KPiBUZXN0ZWQtYnk6IEF1cmVsaWVuIEFwdGVsIDxhYXB0ZWxAc3VzZS5jb20+DQo+
-DQo+IC0tDQo+IFRvIHVuc3Vic2NyaWJlIGZyb20gdGhpcyBsaXN0OiBzZW5kIHRoZSBsaW5lICJ1
-bnN1YnNjcmliZSBsaW51eC1jaWZzIiANCj4gaW4gdGhlIGJvZHkgb2YgYSBtZXNzYWdlIHRvIG1h
-am9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcgTW9yZSBtYWpvcmRvbW8gDQo+IGluZm8gYXQgIGh0dHA6
-Ly92Z2VyLmtlcm5lbC5vcmcvbWFqb3Jkb21vLWluZm8uaHRtbA0KDQoNCg0KLS0NClRoYW5rcywN
-Cg0KU3RldmUNCg==
+Note that we have seen negotiate differences - spnego encapsulated
+ntlmssp vs. raw ntlmssp - between standalone servers (and Windows
+clients acting as a server) and Windows servers acting as an AD DC.
+
+Also note that comparing the same os in the client vs server
+comparison (Windows 10 vs Windows 2016) could help determine if server
+vs. client difference or version difference.
+
+On Fri, Dec 2, 2016 at 10:25 AM, Mark Syms <Mark.Syms-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org> wrote:
+> Hi,
+>
+> I've just tried a plain vanilla Debian testing machine with the vendor 4.=
+8.0 kernel and the issue reproduces.
+>
+> Now, interestingly, if I issue the same mount command to a WS2016 machine=
+ configured in the same way as a Win8.1 machine it fails with permission de=
+nied as we'd expect and doesn't go into the DFS chase process. So, this app=
+ears to be something that is specific to connecting SMB to client grade OS =
+machines.
+>
+>         Mark
+>
+> -----Original Message-----
+> From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [mailto:linux-cifs-owner-u79uwXL29Tb/PtFMR13I2A@public.gmane.org=
+el.org] On Behalf Of Aur=C3=A9lien Aptel
+> Sent: 30 November 2016 17:32
+> To: Mark Syms <Mark.Syms-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>; sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org; linux-cifs@vger.=
+kernel.org
+> Subject: RE: [PATCH] CIFS: handle guest access errors to Windows shares
+>
+> Hi Mark,
+>
+> New setup
+>
+>   PS> net user guest /activate:no
+>   PS> mkdir C:\guestshare
+>   PS> icacls C:\guestshare /grant 'Everyone:(OI)(CI)F'
+>   PS> new-smbshare -name guestshare -path C:\guestshare -fullaccess Every=
+one
+>
+> I've tested v3.10, v4.4, master, master+your patch using default options =
+(empty or no user "NU") and user=3Dabc (U).
+>
+> NT_LOGON_FAILURE in session setup: LF
+> This is what you seem to have in 3.10.
+>
+> NT_ACCESS_DENIED in tree connect to the share: AD This is what you get be=
+fore your infinite loop.
+>
+>              |   NU       U
+> --------------------------------
+> 3.10         |   LF       LF
+> 4.4          |   LF       LF
+> master       |   AD       LF
+> master+patch |   AD       LF
+>
+> No infinite DFS loop :(
+> All these issues result in mount failing very fast with permission denied=
+.
+>
+> I guess it could be from either the Windows version or the share/folder A=
+CL. A deeper analysis of the packets might reveal more.
+>
+> In any case I did not notice any issues for on a basic DFS setup with the=
+ patch so I don't think it introduced any regressions, which is probably al=
+l that matters. It still bothers me a little I couldn't hit the bug.
+>
+> I've included kernel output w/ debugging output and network capture of my=
+ tests if anyone want to have a look at it. (master+patch =3D ml-guestfix).
+>
+> Reviewed-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+> Tested-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+--=20
+Thanks,
+
+Steve
