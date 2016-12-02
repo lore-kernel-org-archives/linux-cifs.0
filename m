@@ -1,160 +1,68 @@
-From: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] Fix default behaviour for empty domains and add
- domainauto option
-Date: Fri, 2 Dec 2016 14:04:18 +0000
-Message-ID: <89c58dfe-4e74-7659-2060-d69d92ac2137@citrix.com>
-References: <1480022439-27875-2-git-send-email-germano.percossi@citrix.com>
+From: Mark Syms <Mark.Syms-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+Subject: RE: [PATCH] CIFS: handle guest access errors to Windows shares
+Date: Fri, 2 Dec 2016 16:25:40 +0000
+Message-ID: <856abc11c5864627bfcdea9ce0933465@AMSPEX02CL02.citrite.net>
+References: <20161129113646.13360-2-mark.syms@citrix.com>
+ <mpszikis34d.fsf@suse.com>
+ <0d4b27917f3e4a90a19342a7e27b5d9f@AMSPEX02CL02.citrite.net>
+ <mpswpfkswko.fsf@suse.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Cc: <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+To: =?iso-8859-1?Q?Aur=E9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>,
+        "sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org" <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1480022439-27875-2-git-send-email-germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <mpswpfkswko.fsf-IBi9RG/b67k@public.gmane.org>
+Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Any feedback?
+Hi,
 
-Cheers,
-Germano
+I've just tried a plain vanilla Debian testing machine with the vendor 4.8.0 kernel and the issue reproduces.
 
-On 11/24/2016 09:20 PM, Germano Percossi wrote:
-> With commit 2b149f119 many things have been fixed/introduced.
-> However, the default behaviour for RawNTLMSSP authentication
-> seems to be wrong in case the domain is not passed on the command line.
-> 
-> The main points (see below) of the patch are:
->  - It alignes behaviour with Windows clients
->  - It fixes backward compatibility
->  - It fixes UPN
-> 
-> I compared this behavour with the one from a Windows 10 command line
-> client. When no domains are specified on the command line, I traced
-> the packets and observed that the client does send an empty
-> domain to the server.
-> In the linux kernel case, the empty domain is replaced by the
-> primary domain communicated by the SMB server.
-> This means that, if the credentials are valid against the local server
-> but that server is part of a domain, then the kernel module will
-> ask to authenticate against that domain and we will get LOGON failure.
-> 
-> I compared the packet trace from the smbclient when no domain is passed
-> and, in that case, a default domain from the client smb.conf is taken.
-> Apparently, connection succeeds anyway, because when the domain passed
-> is not valid (in my case WORKGROUP), then the local one is tried and
-> authentication succeeds. I tried with any kind of invalid domain and
-> the result was always a connection.
-> 
-> So, trying to interpret what to do and picking a valid domain if none
-> is passed, seems the wrong thing to do.
-> To this end, a new option "domainauto" has been added in case the
-> user wants a mechanism for guessing.
-> 
-> Without this patch, backward compatibility also is broken.
-> With kernel 3.10, the default auth mechanism was NTLM.
-> One of our testing servers accepted NTLM and, because no
-> domains are passed, authentication was local.
-> 
-> Moving to RawNTLMSSP forced us to change our command line
-> to add a fake domain to pass to prevent this mechanism to kick in.
-> 
-> For the same reasons, UPN is broken because the domain is specified
-> in the username.
-> The SMB server will work out the domain from the UPN and authenticate
-> against the right server.
-> Without the patch, though, given the domain is empty, it gets replaced
-> with another domain that could be the wrong one for the authentication.
-> 
-> Signed-off-by: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/cifsencrypt.c | 14 +++++++++-----
->  fs/cifs/cifsglob.h    |  2 ++
->  fs/cifs/connect.c     |  7 +++++++
->  3 files changed, 18 insertions(+), 5 deletions(-)
-> 
-> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-> index 5eb0412..66bd7fa 100644
-> --- a/fs/cifs/cifsencrypt.c
-> +++ b/fs/cifs/cifsencrypt.c
-> @@ -699,11 +699,15 @@ static int crypto_hmacmd5_alloc(struct TCP_Server_Info *server)
->  
->  	if (ses->server->negflavor == CIFS_NEGFLAVOR_EXTENDED) {
->  		if (!ses->domainName) {
-> -			rc = find_domain_name(ses, nls_cp);
-> -			if (rc) {
-> -				cifs_dbg(VFS, "error %d finding domain name\n",
-> -					 rc);
-> -				goto setup_ntlmv2_rsp_ret;
-> +			if (ses->domainAuto) {
-> +				rc = find_domain_name(ses, nls_cp);
-> +				if (rc) {
-> +					cifs_dbg(VFS, "error %d finding domain name\n",
-> +						 rc);
-> +					goto setup_ntlmv2_rsp_ret;
-> +				}
-> +			} else {
-> +				ses->domainName = kstrdup("", GFP_KERNEL);
->  			}
->  		}
->  	} else {
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 1f17f6b..4f0d5a1 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -514,6 +514,7 @@ struct smb_vol {
->  	bool persistent:1;
->  	bool nopersistent:1;
->  	bool resilient:1; /* noresilient not required since not fored for CA */
-> +	bool domainauto:1;
->  	unsigned int rsize;
->  	unsigned int wsize;
->  	bool sockopt_tcp_nodelay:1;
-> @@ -827,6 +828,7 @@ struct cifs_ses {
->  	enum securityEnum sectype; /* what security flavor was specified? */
->  	bool sign;		/* is signing required? */
->  	bool need_reconnect:1; /* connection reset, uid now invalid */
-> +	bool domainAuto:1;
->  #ifdef CONFIG_CIFS_SMB2
->  	__u16 session_flags;
->  	__u8 smb3signingkey[SMB3_SIGN_KEY_SIZE];
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 4547aed..df7eed7 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -88,6 +88,7 @@ enum {
->  	Opt_multiuser, Opt_sloppy, Opt_nosharesock,
->  	Opt_persistent, Opt_nopersistent,
->  	Opt_resilient, Opt_noresilient,
-> +	Opt_domainauto,
->  
->  	/* Mount options which take numeric value */
->  	Opt_backupuid, Opt_backupgid, Opt_uid,
-> @@ -176,6 +177,7 @@ enum {
->  	{ Opt_nopersistent, "nopersistenthandles"},
->  	{ Opt_resilient, "resilienthandles"},
->  	{ Opt_noresilient, "noresilienthandles"},
-> +	{ Opt_domainauto, "domainauto"},
->  
->  	{ Opt_backupuid, "backupuid=%s" },
->  	{ Opt_backupgid, "backupgid=%s" },
-> @@ -1499,6 +1501,9 @@ static int cifs_parse_security_flavors(char *value,
->  		case Opt_noresilient:
->  			vol->resilient = false; /* already the default */
->  			break;
-> +		case Opt_domainauto:
-> +			vol->domainauto = true;
-> +			break;
->  
->  		/* Numeric Values */
->  		case Opt_backupuid:
-> @@ -2548,6 +2553,8 @@ static int match_session(struct cifs_ses *ses, struct smb_vol *vol)
->  		if (!ses->domainName)
->  			goto get_ses_fail;
->  	}
-> +	if (volume_info->domainauto)
-> +		ses->domainAuto = volume_info->domainauto;
->  	ses->cred_uid = volume_info->cred_uid;
->  	ses->linux_uid = volume_info->linux_uid;
->  
-> 
+Now, interestingly, if I issue the same mount command to a WS2016 machine configured in the same way as a Win8.1 machine it fails with permission denied as we'd expect and doesn't go into the DFS chase process. So, this appears to be something that is specific to connecting SMB to client grade OS machines.
+
+	Mark
+
+-----Original Message-----
+From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [mailto:linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org] On Behalf Of Aurélien Aptel
+Sent: 30 November 2016 17:32
+To: Mark Syms <Mark.Syms-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>; sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org; linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Subject: RE: [PATCH] CIFS: handle guest access errors to Windows shares
+
+Hi Mark,
+
+New setup
+
+  PS> net user guest /activate:no
+  PS> mkdir C:\guestshare
+  PS> icacls C:\guestshare /grant 'Everyone:(OI)(CI)F'
+  PS> new-smbshare -name guestshare -path C:\guestshare -fullaccess Everyone
+
+I've tested v3.10, v4.4, master, master+your patch using default options (empty or no user "NU") and user=abc (U).
+
+NT_LOGON_FAILURE in session setup: LF
+This is what you seem to have in 3.10.
+
+NT_ACCESS_DENIED in tree connect to the share: AD This is what you get before your infinite loop.
+
+             |   NU       U
+-------------------------------- 
+3.10         |   LF       LF
+4.4          |   LF       LF
+master       |   AD       LF
+master+patch |   AD       LF
+
+No infinite DFS loop :(
+All these issues result in mount failing very fast with permission denied.
+
+I guess it could be from either the Windows version or the share/folder ACL. A deeper analysis of the packets might reveal more.
+
+In any case I did not notice any issues for on a basic DFS setup with the patch so I don't think it introduced any regressions, which is probably all that matters. It still bothers me a little I couldn't hit the bug.
+
+I've included kernel output w/ debugging output and network capture of my tests if anyone want to have a look at it. (master+patch = ml-guestfix).
+
+Reviewed-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+Tested-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
