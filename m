@@ -1,103 +1,97 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] CIFS: handle guest access errors to Windows shares
-Date: Fri, 2 Dec 2016 10:42:01 -0600
-Message-ID: <CAH2r5msRXHseV9A9o=RwDL69v5smXoQZWo_WeT1PEtudzpYiLw@mail.gmail.com>
-References: <20161129113646.13360-2-mark.syms@citrix.com> <mpszikis34d.fsf@suse.com>
+From: Mark Syms <Mark.Syms-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+Subject: RE: [PATCH] CIFS: handle guest access errors to Windows shares
+Date: Fri, 2 Dec 2016 17:26:52 +0000
+Message-ID: <53315b92ba504255bb1af0cb5af3d043@AMSPEX02CL02.citrite.net>
+References: <20161129113646.13360-2-mark.syms@citrix.com>
+ <mpszikis34d.fsf@suse.com>
  <0d4b27917f3e4a90a19342a7e27b5d9f@AMSPEX02CL02.citrite.net>
- <mpswpfkswko.fsf@suse.com> <856abc11c5864627bfcdea9ce0933465@AMSPEX02CL02.citrite.net>
+ <mpswpfkswko.fsf@suse.com>
+ <856abc11c5864627bfcdea9ce0933465@AMSPEX02CL02.citrite.net>
+ <CAH2r5msRXHseV9A9o=RwDL69v5smXoQZWo_WeT1PEtudzpYiLw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Cc: =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: =?utf-8?B?QXVyw6lsaWVuIEFwdGVs?= <aaptel-IBi9RG/b67k@public.gmane.org>,
         "sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org" <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
         "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Mark Syms <Mark.Syms-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <856abc11c5864627bfcdea9ce0933465-ZIyKOb66IhyzM76k4uAzvRgL0UkB//ZR@public.gmane.org>
+Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Note that we have seen negotiate differences - spnego encapsulated
-ntlmssp vs. raw ntlmssp - between standalone servers (and Windows
-clients acting as a server) and Windows servers acting as an AD DC.
-
-Also note that comparing the same os in the client vs server
-comparison (Windows 10 vs Windows 2016) could help determine if server
-vs. client difference or version difference.
-
-On Fri, Dec 2, 2016 at 10:25 AM, Mark Syms <Mark.Syms-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org> wrote:
-> Hi,
->
-> I've just tried a plain vanilla Debian testing machine with the vendor 4.=
-8.0 kernel and the issue reproduces.
->
-> Now, interestingly, if I issue the same mount command to a WS2016 machine=
- configured in the same way as a Win8.1 machine it fails with permission de=
-nied as we'd expect and doesn't go into the DFS chase process. So, this app=
-ears to be something that is specific to connecting SMB to client grade OS =
-machines.
->
->         Mark
->
-> -----Original Message-----
-> From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [mailto:linux-cifs-owner-u79uwXL29Tb/PtFMR13I2A@public.gmane.org=
-el.org] On Behalf Of Aur=C3=A9lien Aptel
-> Sent: 30 November 2016 17:32
-> To: Mark Syms <Mark.Syms-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>; sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org; linux-cifs@vger.=
-kernel.org
-> Subject: RE: [PATCH] CIFS: handle guest access errors to Windows shares
->
-> Hi Mark,
->
-> New setup
->
->   PS> net user guest /activate:no
->   PS> mkdir C:\guestshare
->   PS> icacls C:\guestshare /grant 'Everyone:(OI)(CI)F'
->   PS> new-smbshare -name guestshare -path C:\guestshare -fullaccess Every=
-one
->
-> I've tested v3.10, v4.4, master, master+your patch using default options =
-(empty or no user "NU") and user=3Dabc (U).
->
-> NT_LOGON_FAILURE in session setup: LF
-> This is what you seem to have in 3.10.
->
-> NT_ACCESS_DENIED in tree connect to the share: AD This is what you get be=
-fore your infinite loop.
->
->              |   NU       U
-> --------------------------------
-> 3.10         |   LF       LF
-> 4.4          |   LF       LF
-> master       |   AD       LF
-> master+patch |   AD       LF
->
-> No infinite DFS loop :(
-> All these issues result in mount failing very fast with permission denied=
-.
->
-> I guess it could be from either the Windows version or the share/folder A=
-CL. A deeper analysis of the packets might reveal more.
->
-> In any case I did not notice any issues for on a basic DFS setup with the=
- patch so I don't think it introduced any regressions, which is probably al=
-l that matters. It still bothers me a little I couldn't hit the bug.
->
-> I've included kernel output w/ debugging output and network capture of my=
- tests if anyone want to have a look at it. (master+patch =3D ml-guestfix).
->
-> Reviewed-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-> Tested-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
---=20
-Thanks,
-
-Steve
+RmlsbGluZyBvdXQgdGhlIHNldA0KDQpUZXN0ZWQgV2luMTAgMTYwNyBhbmQgdGhpcyBoYXMgdGhl
+IGxvb3AgYmVoYXZpb3VyDQpUZXN0ZWQgV1MyMDEyUjIgYW5kIHRoaXMgZmFpbHMgd2l0aCBwZXJt
+aXNzaW9uIGRlbmllZA0KDQpJIHRoaW5rIHRoaXMgaXMgc3VmZmljaWVudCB0byBzYXkgdGhhdCB0
+aGVyZSBpcyBzb21lIGRlZmluaXRpdmVseSBkaWZmZXJlbnQgYmVoYXZpb3VyIGJldHdlZW4gc2Vy
+dmVyIGFuZCBjbGllbnQgdmVyc2lvbnMgb2YgV2luZG93cyBpbiB0aGlzIGFyZWEuDQoNCkNvbXBs
+ZXRlIHNldA0KDQpXaW43IC0gZmFpbHMgd2l0aCBwZXJtaXNzaW9uIGRlbmllZCAoYnV0IGl0IHR1
+cm5zIG91dCB0aGlzIGlzIGJlY2F1c2UgdGhlIERGUyB3YXMgYXR0ZW1wdGVkIGFuZCBXaW43IGRv
+ZXNuJ3QgZGVhbCB3aXRoIHRoYXQpDQpXaW4gOC4xIC0gbG9vcHMgaW4gREZTIHJlZmVyDQpXaW4g
+MTAgLSBsb29wcyBpbiBERlMgcmVmZXINCldTMjAxMlIyIC0gZmFpbHMgd2l0aCBwZXJtaXNzaW9u
+IGRlbmllZA0KV1MyMDE2IC0gZmFpbHMgd2l0aCBwZXJtaXNzaW9uIGRlbmllZC4NCg0KVGhhbmtz
+LA0KDQoJTWFyay4NCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IE1hcmsgU3lt
+cyANClNlbnQ6IDAyIERlY2VtYmVyIDIwMTYgMTY6NDUNClRvOiAnU3RldmUgRnJlbmNoJyA8c21m
+cmVuY2hAZ21haWwuY29tPg0KQ2M6IEF1csOpbGllbiBBcHRlbCA8YWFwdGVsQHN1c2UuY29tPjsg
+c2ZyZW5jaEBzYW1iYS5vcmc7IGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnDQpTdWJqZWN0OiBS
+RTogW1BBVENIXSBDSUZTOiBoYW5kbGUgZ3Vlc3QgYWNjZXNzIGVycm9ycyB0byBXaW5kb3dzIHNo
+YXJlcw0KDQpPSywgSSdsbCBzcGluIHVwIGEgV2luIDEwIG1hY2hpbmUgYW5kIHNlZSBob3cgdGhh
+dCBiZWhhdmVzIGFuZCB0aGVuIGEgV1MyMDEyUjIuDQoNCglNYXJrLg0KDQotLS0tLU9yaWdpbmFs
+IE1lc3NhZ2UtLS0tLQ0KRnJvbTogU3RldmUgRnJlbmNoIFttYWlsdG86c21mcmVuY2hAZ21haWwu
+Y29tXQ0KU2VudDogMDIgRGVjZW1iZXIgMjAxNiAxNjo0Mg0KVG86IE1hcmsgU3ltcyA8TWFyay5T
+eW1zQGNpdHJpeC5jb20+DQpDYzogQXVyw6lsaWVuIEFwdGVsIDxhYXB0ZWxAc3VzZS5jb20+OyBz
+ZnJlbmNoQHNhbWJhLm9yZzsgbGludXgtY2lmc0B2Z2VyLmtlcm5lbC5vcmcNClN1YmplY3Q6IFJl
+OiBbUEFUQ0hdIENJRlM6IGhhbmRsZSBndWVzdCBhY2Nlc3MgZXJyb3JzIHRvIFdpbmRvd3Mgc2hh
+cmVzDQoNCk5vdGUgdGhhdCB3ZSBoYXZlIHNlZW4gbmVnb3RpYXRlIGRpZmZlcmVuY2VzIC0gc3Bu
+ZWdvIGVuY2Fwc3VsYXRlZCBudGxtc3NwIHZzLiByYXcgbnRsbXNzcCAtIGJldHdlZW4gc3RhbmRh
+bG9uZSBzZXJ2ZXJzIChhbmQgV2luZG93cyBjbGllbnRzIGFjdGluZyBhcyBhIHNlcnZlcikgYW5k
+IFdpbmRvd3Mgc2VydmVycyBhY3RpbmcgYXMgYW4gQUQgREMuDQoNCkFsc28gbm90ZSB0aGF0IGNv
+bXBhcmluZyB0aGUgc2FtZSBvcyBpbiB0aGUgY2xpZW50IHZzIHNlcnZlciBjb21wYXJpc29uIChX
+aW5kb3dzIDEwIHZzIFdpbmRvd3MgMjAxNikgY291bGQgaGVscCBkZXRlcm1pbmUgaWYgc2VydmVy
+IHZzLiBjbGllbnQgZGlmZmVyZW5jZSBvciB2ZXJzaW9uIGRpZmZlcmVuY2UuDQoNCk9uIEZyaSwg
+RGVjIDIsIDIwMTYgYXQgMTA6MjUgQU0sIE1hcmsgU3ltcyA8TWFyay5TeW1zQGNpdHJpeC5jb20+
+IHdyb3RlOg0KPiBIaSwNCj4NCj4gSSd2ZSBqdXN0IHRyaWVkIGEgcGxhaW4gdmFuaWxsYSBEZWJp
+YW4gdGVzdGluZyBtYWNoaW5lIHdpdGggdGhlIHZlbmRvciA0LjguMCBrZXJuZWwgYW5kIHRoZSBp
+c3N1ZSByZXByb2R1Y2VzLg0KPg0KPiBOb3csIGludGVyZXN0aW5nbHksIGlmIEkgaXNzdWUgdGhl
+IHNhbWUgbW91bnQgY29tbWFuZCB0byBhIFdTMjAxNiBtYWNoaW5lIGNvbmZpZ3VyZWQgaW4gdGhl
+IHNhbWUgd2F5IGFzIGEgV2luOC4xIG1hY2hpbmUgaXQgZmFpbHMgd2l0aCBwZXJtaXNzaW9uIGRl
+bmllZCBhcyB3ZSdkIGV4cGVjdCBhbmQgZG9lc24ndCBnbyBpbnRvIHRoZSBERlMgY2hhc2UgcHJv
+Y2Vzcy4gU28sIHRoaXMgYXBwZWFycyB0byBiZSBzb21ldGhpbmcgdGhhdCBpcyBzcGVjaWZpYyB0
+byBjb25uZWN0aW5nIFNNQiB0byBjbGllbnQgZ3JhZGUgT1MgbWFjaGluZXMuDQo+DQo+ICAgICAg
+ICAgTWFyaw0KPg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51eC1j
+aWZzLW93bmVyQHZnZXIua2VybmVsLm9yZyANCj4gW21haWx0bzpsaW51eC1jaWZzLW93bmVyQHZn
+ZXIua2VybmVsLm9yZ10gT24gQmVoYWxmIE9mIEF1csOpbGllbiBBcHRlbA0KPiBTZW50OiAzMCBO
+b3ZlbWJlciAyMDE2IDE3OjMyDQo+IFRvOiBNYXJrIFN5bXMgPE1hcmsuU3ltc0BjaXRyaXguY29t
+Pjsgc2ZyZW5jaEBzYW1iYS5vcmc7IA0KPiBsaW51eC1jaWZzQHZnZXIua2VybmVsLm9yZw0KPiBT
+dWJqZWN0OiBSRTogW1BBVENIXSBDSUZTOiBoYW5kbGUgZ3Vlc3QgYWNjZXNzIGVycm9ycyB0byBX
+aW5kb3dzIA0KPiBzaGFyZXMNCj4NCj4gSGkgTWFyaywNCj4NCj4gTmV3IHNldHVwDQo+DQo+ICAg
+UFM+IG5ldCB1c2VyIGd1ZXN0IC9hY3RpdmF0ZTpubw0KPiAgIFBTPiBta2RpciBDOlxndWVzdHNo
+YXJlDQo+ICAgUFM+IGljYWNscyBDOlxndWVzdHNoYXJlIC9ncmFudCAnRXZlcnlvbmU6KE9JKShD
+SSlGJw0KPiAgIFBTPiBuZXctc21ic2hhcmUgLW5hbWUgZ3Vlc3RzaGFyZSAtcGF0aCBDOlxndWVz
+dHNoYXJlIC1mdWxsYWNjZXNzIA0KPiBFdmVyeW9uZQ0KPg0KPiBJJ3ZlIHRlc3RlZCB2My4xMCwg
+djQuNCwgbWFzdGVyLCBtYXN0ZXIreW91ciBwYXRjaCB1c2luZyBkZWZhdWx0IG9wdGlvbnMgKGVt
+cHR5IG9yIG5vIHVzZXIgIk5VIikgYW5kIHVzZXI9YWJjIChVKS4NCj4NCj4gTlRfTE9HT05fRkFJ
+TFVSRSBpbiBzZXNzaW9uIHNldHVwOiBMRg0KPiBUaGlzIGlzIHdoYXQgeW91IHNlZW0gdG8gaGF2
+ZSBpbiAzLjEwLg0KPg0KPiBOVF9BQ0NFU1NfREVOSUVEIGluIHRyZWUgY29ubmVjdCB0byB0aGUg
+c2hhcmU6IEFEIFRoaXMgaXMgd2hhdCB5b3UgZ2V0IGJlZm9yZSB5b3VyIGluZmluaXRlIGxvb3Au
+DQo+DQo+ICAgICAgICAgICAgICB8ICAgTlUgICAgICAgVQ0KPiAtLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLQ0KPiAzLjEwICAgICAgICAgfCAgIExGICAgICAgIExGDQo+IDQuNCAgICAg
+ICAgICB8ICAgTEYgICAgICAgTEYNCj4gbWFzdGVyICAgICAgIHwgICBBRCAgICAgICBMRg0KPiBt
+YXN0ZXIrcGF0Y2ggfCAgIEFEICAgICAgIExGDQo+DQo+IE5vIGluZmluaXRlIERGUyBsb29wIDoo
+DQo+IEFsbCB0aGVzZSBpc3N1ZXMgcmVzdWx0IGluIG1vdW50IGZhaWxpbmcgdmVyeSBmYXN0IHdp
+dGggcGVybWlzc2lvbiBkZW5pZWQuDQo+DQo+IEkgZ3Vlc3MgaXQgY291bGQgYmUgZnJvbSBlaXRo
+ZXIgdGhlIFdpbmRvd3MgdmVyc2lvbiBvciB0aGUgc2hhcmUvZm9sZGVyIEFDTC4gQSBkZWVwZXIg
+YW5hbHlzaXMgb2YgdGhlIHBhY2tldHMgbWlnaHQgcmV2ZWFsIG1vcmUuDQo+DQo+IEluIGFueSBj
+YXNlIEkgZGlkIG5vdCBub3RpY2UgYW55IGlzc3VlcyBmb3Igb24gYSBiYXNpYyBERlMgc2V0dXAg
+d2l0aCB0aGUgcGF0Y2ggc28gSSBkb24ndCB0aGluayBpdCBpbnRyb2R1Y2VkIGFueSByZWdyZXNz
+aW9ucywgd2hpY2ggaXMgcHJvYmFibHkgYWxsIHRoYXQgbWF0dGVycy4gSXQgc3RpbGwgYm90aGVy
+cyBtZSBhIGxpdHRsZSBJIGNvdWxkbid0IGhpdCB0aGUgYnVnLg0KPg0KPiBJJ3ZlIGluY2x1ZGVk
+IGtlcm5lbCBvdXRwdXQgdy8gZGVidWdnaW5nIG91dHB1dCBhbmQgbmV0d29yayBjYXB0dXJlIG9m
+IG15IHRlc3RzIGlmIGFueW9uZSB3YW50IHRvIGhhdmUgYSBsb29rIGF0IGl0LiAobWFzdGVyK3Bh
+dGNoID0gbWwtZ3Vlc3RmaXgpLg0KPg0KPiBSZXZpZXdlZC1ieTogQXVyZWxpZW4gQXB0ZWwgPGFh
+cHRlbEBzdXNlLmNvbT4NCj4gVGVzdGVkLWJ5OiBBdXJlbGllbiBBcHRlbCA8YWFwdGVsQHN1c2Uu
+Y29tPg0KPg0KPiAtLQ0KPiBUbyB1bnN1YnNjcmliZSBmcm9tIHRoaXMgbGlzdDogc2VuZCB0aGUg
+bGluZSAidW5zdWJzY3JpYmUgbGludXgtY2lmcyIgDQo+IGluIHRoZSBib2R5IG9mIGEgbWVzc2Fn
+ZSB0byBtYWpvcmRvbW9Admdlci5rZXJuZWwub3JnIE1vcmUgbWFqb3Jkb21vIA0KPiBpbmZvIGF0
+ICBodHRwOi8vdmdlci5rZXJuZWwub3JnL21ham9yZG9tby1pbmZvLmh0bWwNCg0KDQoNCi0tDQpU
+aGFua3MsDQoNClN0ZXZlDQo=
