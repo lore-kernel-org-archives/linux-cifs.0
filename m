@@ -1,34 +1,36 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 2/5] CIFS: Fix missing nls unload in smb2_reconnect()
-Date: Mon, 5 Dec 2016 11:03:55 -0800
-Message-ID: <CAKywueROW-494MfgyAo_8OHc0UOZxX510dGjk9DEDG-Fx1K-hQ@mail.gmail.com>
-References: <1480467416-13636-1-git-send-email-pshilov@microsoft.com>
- <1480467416-13636-3-git-send-email-pshilov@microsoft.com> <1480920506.3464.3.camel@redhat.com>
- <CAH2r5msBN2Gh==g5BOC5Woe0WaNvXxug38tfvG4cGUvUo7MovA@mail.gmail.com>
+From: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Subject: [PATCH v2 1/5] CIFS: Decrease verbosity of ioctl call
+Date: Mon,  5 Dec 2016 13:11:07 -0800
+Message-ID: <1480972271-57692-2-git-send-email-pshilov@microsoft.com>
+References: <1480972271-57692-1-git-send-email-pshilov@microsoft.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5msBN2Gh==g5BOC5Woe0WaNvXxug38tfvG4cGUvUo7MovA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1480972271-57692-1-git-send-email-pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2016-12-05 0:02 GMT-08:00 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> Pavel,
-> I couldn't find the original for this patch.
->
-> Do you have a git tree I can pull them from?  I wanted to merge this
-> and your verbosity ioctl patch, and look to see if I had missed others
-> which are already reviewed and ready to merge into for-next
->
+Cc: Stable <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org> # v4.9+
+Reviewed-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+Acked-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+---
+ fs/cifs/ioctl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Steve,
-
-You can pull from https://github.com/piastry/linux/commits/stable-fixes.
-
+diff --git a/fs/cifs/ioctl.c b/fs/cifs/ioctl.c
+index 9f51b81..0015287 100644
+--- a/fs/cifs/ioctl.c
++++ b/fs/cifs/ioctl.c
+@@ -189,7 +189,7 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
+ 	xid = get_xid();
+ 
+ 	cifs_sb = CIFS_SB(inode->i_sb);
+-	cifs_dbg(VFS, "cifs ioctl 0x%x\n", command);
++	cifs_dbg(FYI, "cifs ioctl 0x%x\n", command);
+ 	switch (command) {
+ 		case FS_IOC_GETFLAGS:
+ 			if (pSMBFile == NULL)
 -- 
-Best regards,
-Pavel Shilovsky
+2.7.4
