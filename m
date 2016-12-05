@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: [PATCH v2 2/5] CIFS: Fix missing nls unload in smb2_reconnect()
-Date: Mon,  5 Dec 2016 13:11:08 -0800
-Message-ID: <1480972271-57692-3-git-send-email-pshilov@microsoft.com>
+Subject: [PATCH v2 3/5] CIFS: Fix a possible memory corruption in push locks
+Date: Mon,  5 Dec 2016 13:11:09 -0800
+Message-ID: <1480972271-57692-4-git-send-email-pshilov@microsoft.com>
 References: <1480972271-57692-1-git-send-email-pshilov@microsoft.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -11,25 +11,27 @@ In-Reply-To: <1480972271-57692-1-git-send-email-pshilov-0li6OtcxBFHby3iVrkZq2A@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+If maxBuf is not 0 but less than a size of SMB2 lock structure
+we can end up with a memory corruption.
+
 Cc: Stable <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Acked-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Signed-off-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c | 2 +-
+ fs/cifs/smb2file.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 5ca5ea46..730d57b 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -280,7 +280,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon)
- 	case SMB2_CHANGE_NOTIFY:
- 	case SMB2_QUERY_INFO:
- 	case SMB2_SET_INFO:
--		return -EAGAIN;
-+		rc = -EAGAIN;
+diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
+index f9e766f..b2aff0c 100644
+--- a/fs/cifs/smb2file.c
++++ b/fs/cifs/smb2file.c
+@@ -260,7 +260,7 @@ smb2_push_mandatory_locks(struct cifsFileInfo *cfile)
+ 	 * and check it for zero before using.
+ 	 */
+ 	max_buf = tlink_tcon(cfile->tlink)->ses->server->maxBuf;
+-	if (!max_buf) {
++	if (max_buf < sizeof(struct smb2_lock_element)) {
+ 		free_xid(xid);
+ 		return -EINVAL;
  	}
- 	unload_nls(nls_codepage);
- 	return rc;
 -- 
 2.7.4
