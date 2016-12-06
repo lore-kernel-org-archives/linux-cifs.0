@@ -1,67 +1,44 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v2] CIFS: Fix a possible memory corruption during reconnect
-Date: Mon, 5 Dec 2016 13:39:14 -0800
-Message-ID: <CAKywueTggpV8DD6Tbtnf=c+=Bef9mB89zVpB=8GG_F2fOP+bJw@mail.gmail.com>
-References: <1478820683-2954-1-git-send-email-pshilov@microsoft.com>
- <1480500055.3937.8.camel@redhat.com> <CAKywueRP6BV3d=--yETisU=8u+jCmeuZyUcvnsrx-RCOqLGphw@mail.gmail.com>
- <1480584953.3937.14.camel@redhat.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 2/5] CIFS: Fix missing nls unload in smb2_reconnect()
+Date: Mon, 5 Dec 2016 23:00:02 -0600
+Message-ID: <CAH2r5muDy+05WPEx3cj=nyk3ztB1xiViEwSwPZ6wHm6G5xHSpg@mail.gmail.com>
+References: <1480467416-13636-1-git-send-email-pshilov@microsoft.com>
+ <1480467416-13636-3-git-send-email-pshilov@microsoft.com> <1480920506.3464.3.camel@redhat.com>
+ <CAH2r5msBN2Gh==g5BOC5Woe0WaNvXxug38tfvG4cGUvUo7MovA@mail.gmail.com> <CAKywueROW-494MfgyAo_8OHc0UOZxX510dGjk9DEDG-Fx1K-hQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1480584953.3937.14.camel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <CAKywueROW-494MfgyAo_8OHc0UOZxX510dGjk9DEDG-Fx1K-hQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2016-12-01 1:35 GMT-08:00 Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> On Wed, 2016-11-30 at 11:24 -0800, Pavel Shilovsky wrote:
->>
->> > Do you need the #ifdef CONFIG_CIFS_SMB2 here considering that there
->> > are
->> > no such macro definitions around the declarations around
->> > delayed_work
->> > reconnect in struct TCP_Server_Info. It would also lead to unused
->> > variable in case the kernel is compiled without CONFIG_CIFS_SMB2.
->>
->> Thank you for reviewing this.
->>
->> I posted the next version of the patch yesterday ([PATCH 4/5] CIFS:
->> Fix a possible memory corruption during reconnect) that addresses
->> this
->> problem by moving fields inside TCP_Server_Info to CONFIG_CIFS_SMB2.
->>
->
-> Thanks. I'll review the patch separately.
->
->
->> > > +             /* No need to send echo on newly established
->> > > connections */
->> > > +             mod_delayed_work(cifsiod_wq, &server->reconnect,
->> > > 0);
->> > > +             return rc;
->> >
->> > Shouldn't this be queue_work?
->>
->> It is made it this way because of the following: if someone submitted
->> the work with a delay previously (now the code doesn't do it but it
->> is
->> possible in the future), we want to overwrite this delay to 0 since
->> we
->> need an immediate session/tcon reconnect here.
->>
->
-> OK. It should work without any problem but I would have stuck to the
-> expected functions and use mod_delayed_work() only when new code which
-> queues the work separately has been added. It is strange to see only
-> mod_delayed_work() when the work isn't queued anywhere else. Apart from
-> that small concern, I am fine with it.
->
-> Sachin Prabhu
+merged your stable series into cifs-2.6.git
 
-Ok, it makes sense. I have posted the next version (v2) of the
-patchset that addresses your suggestions to the list.
+On Mon, Dec 5, 2016 at 1:03 PM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> 2016-12-05 0:02 GMT-08:00 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+>> Pavel,
+>> I couldn't find the original for this patch.
+>>
+>> Do you have a git tree I can pull them from?  I wanted to merge this
+>> and your verbosity ioctl patch, and look to see if I had missed others
+>> which are already reviewed and ready to merge into for-next
+>>
+>
+> Steve,
+>
+> You can pull from https://github.com/piastry/linux/commits/stable-fixes.
+>
+> --
+> Best regards,
+> Pavel Shilovsky
+
+
 
 -- 
-Best regards,
-Pavel Shilovsky
+Thanks,
+
+Steve
