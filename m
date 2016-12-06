@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: [PATCH 12/15] CIFS: Add copy into pages callback for a read operation
-Date: Tue,  6 Dec 2016 14:02:35 -0800
-Message-ID: <1481061758-52020-13-git-send-email-pshilov@microsoft.com>
+Subject: [PATCH 10/15] CIFS: Add transform header handling callbacks
+Date: Tue,  6 Dec 2016 14:02:33 -0800
+Message-ID: <1481061758-52020-11-git-send-email-pshilov@microsoft.com>
 References: <1481061758-52020-1-git-send-email-pshilov@microsoft.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -11,142 +11,57 @@ In-Reply-To: <1481061758-52020-1-git-send-email-pshilov-0li6OtcxBFHby3iVrkZq2A@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Since we have two different types of reads (pagecache and direct)
-we need to process such responses differently after decryption of
-a packet. The change allows to specify a callback that copies a read
-payload data into preallocated pages.
+We need to recognize and parse transformed packets in demultiplex
+thread to find a corresponsing mid and process it further.
 
 Signed-off-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 ---
  fs/cifs/cifsglob.h |  3 +++
- fs/cifs/file.c     | 52 ++++++++++++++++++++++++++++++++++++++++++++++------
- 2 files changed, 49 insertions(+), 6 deletions(-)
+ fs/cifs/connect.c  | 17 ++++++++++++-----
+ 2 files changed, 15 insertions(+), 5 deletions(-)
 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index dc41ae4..fa56f47 100644
+index 9433a9b..1d1cdea 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -1127,6 +1127,9 @@ struct cifs_readdata {
- 	int (*read_into_pages)(struct TCP_Server_Info *server,
- 				struct cifs_readdata *rdata,
- 				unsigned int len);
-+	int (*copy_into_pages)(struct TCP_Server_Info *server,
-+				struct cifs_readdata *rdata,
-+				struct iov_iter *iter);
- 	struct kvec			iov[2];
- 	unsigned int			pagesz;
- 	unsigned int			tailsz;
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 18a1e1d..2586ba1 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -2903,8 +2903,9 @@ cifs_uncached_readv_complete(struct work_struct *work)
- }
+@@ -440,6 +440,9 @@ struct smb_version_operations {
+ 				 struct smb_rqst *);
+ 	/* free transform request */
+ 	void (*free_transform_rq)(struct smb_rqst *);
++	int (*is_transform_hdr)(void *buf);
++	int (*receive_transform)(struct TCP_Server_Info *,
++				 struct mid_q_entry **);
+ };
  
- static int
--cifs_uncached_read_into_pages(struct TCP_Server_Info *server,
--			struct cifs_readdata *rdata, unsigned int len)
-+uncached_fill_pages(struct TCP_Server_Info *server,
-+		    struct cifs_readdata *rdata, struct iov_iter *iter,
-+		    unsigned int len)
- {
- 	int result = 0;
- 	unsigned int i;
-@@ -2933,7 +2934,10 @@ cifs_uncached_read_into_pages(struct TCP_Server_Info *server,
- 			rdata->tailsz = len;
- 			len = 0;
- 		}
--		result = cifs_read_page_from_socket(server, page, n);
-+		if (iter)
-+			result = copy_page_from_iter(page, 0, n, iter);
-+		else
-+			result = cifs_read_page_from_socket(server, page, n);
- 		if (result < 0)
- 			break;
- 
-@@ -2945,6 +2949,21 @@ cifs_uncached_read_into_pages(struct TCP_Server_Info *server,
- }
- 
- static int
-+cifs_uncached_read_into_pages(struct TCP_Server_Info *server,
-+			      struct cifs_readdata *rdata, unsigned int len)
-+{
-+	return uncached_fill_pages(server, rdata, NULL, len);
-+}
-+
-+static int
-+cifs_uncached_copy_into_pages(struct TCP_Server_Info *server,
-+			      struct cifs_readdata *rdata,
-+			      struct iov_iter *iter)
-+{
-+	return uncached_fill_pages(server, rdata, iter, iter->count);
-+}
-+
-+static int
- cifs_send_async_read(loff_t offset, size_t len, struct cifsFileInfo *open_file,
- 		     struct cifs_sb_info *cifs_sb, struct list_head *rdata_list)
- {
-@@ -2991,6 +3010,7 @@ cifs_send_async_read(loff_t offset, size_t len, struct cifsFileInfo *open_file,
- 		rdata->pid = pid;
- 		rdata->pagesz = PAGE_SIZE;
- 		rdata->read_into_pages = cifs_uncached_read_into_pages;
-+		rdata->copy_into_pages = cifs_uncached_copy_into_pages;
- 		rdata->credits = credits;
- 
- 		if (!rdata->cfile->invalidHandle ||
-@@ -3341,8 +3361,9 @@ cifs_readv_complete(struct work_struct *work)
- }
- 
- static int
--cifs_readpages_read_into_pages(struct TCP_Server_Info *server,
--			struct cifs_readdata *rdata, unsigned int len)
-+readpages_fill_pages(struct TCP_Server_Info *server,
-+		     struct cifs_readdata *rdata, struct iov_iter *iter,
-+		     unsigned int len)
- {
- 	int result = 0;
- 	unsigned int i;
-@@ -3396,7 +3417,10 @@ cifs_readpages_read_into_pages(struct TCP_Server_Info *server,
+ struct smb_version_values {
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 46124a0..3a2183a 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -869,12 +869,19 @@ cifs_demultiplex_thread(void *p)
  			continue;
- 		}
+ 		server->total_read += length;
  
--		result = cifs_read_page_from_socket(server, page, n);
-+		if (iter)
-+			result = copy_page_from_iter(page, 0, n, iter);
-+		else
-+			result = cifs_read_page_from_socket(server, page, n);
- 		if (result < 0)
- 			break;
+-		mid_entry = server->ops->find_mid(server, buf);
++		if (server->ops->is_transform_hdr &&
++		    server->ops->receive_transform &&
++		    server->ops->is_transform_hdr(buf)) {
++			length = server->ops->receive_transform(server,
++								&mid_entry);
++		} else {
++			mid_entry = server->ops->find_mid(server, buf);
  
-@@ -3408,6 +3432,21 @@ cifs_readpages_read_into_pages(struct TCP_Server_Info *server,
- }
+-		if (!mid_entry || !mid_entry->receive)
+-			length = standard_receive3(server, mid_entry);
+-		else
+-			length = mid_entry->receive(server, mid_entry);
++			if (!mid_entry || !mid_entry->receive)
++				length = standard_receive3(server, mid_entry);
++			else
++				length = mid_entry->receive(server, mid_entry);
++		}
  
- static int
-+cifs_readpages_read_into_pages(struct TCP_Server_Info *server,
-+			       struct cifs_readdata *rdata, unsigned int len)
-+{
-+	return readpages_fill_pages(server, rdata, NULL, len);
-+}
-+
-+static int
-+cifs_readpages_copy_into_pages(struct TCP_Server_Info *server,
-+			       struct cifs_readdata *rdata,
-+			       struct iov_iter *iter)
-+{
-+	return readpages_fill_pages(server, rdata, iter, iter->count);
-+}
-+
-+static int
- readpages_get_pages(struct address_space *mapping, struct list_head *page_list,
- 		    unsigned int rsize, struct list_head *tmplist,
- 		    unsigned int *nr_pages, loff_t *offset, unsigned int *bytes)
-@@ -3561,6 +3600,7 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
- 		rdata->pid = pid;
- 		rdata->pagesz = PAGE_SIZE;
- 		rdata->read_into_pages = cifs_readpages_read_into_pages;
-+		rdata->copy_into_pages = cifs_readpages_copy_into_pages;
- 		rdata->credits = credits;
- 
- 		list_for_each_entry_safe(page, tpage, &tmplist, lru) {
+ 		if (length < 0)
+ 			continue;
 -- 
 2.7.4
