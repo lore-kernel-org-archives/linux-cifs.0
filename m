@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: [PATCH 11/15] CIFS: Add mid handle callback
-Date: Tue,  6 Dec 2016 14:02:34 -0800
-Message-ID: <1481061758-52020-12-git-send-email-pshilov@microsoft.com>
+Subject: [PATCH 15/15] CIFS: Allow to switch on encryption with seal mount option
+Date: Tue,  6 Dec 2016 14:02:38 -0800
+Message-ID: <1481061758-52020-16-git-send-email-pshilov@microsoft.com>
 References: <1481061758-52020-1-git-send-email-pshilov@microsoft.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -11,146 +11,201 @@ In-Reply-To: <1481061758-52020-1-git-send-email-pshilov-0li6OtcxBFHby3iVrkZq2A@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-We need to process read responses differently because the data
-should go directly into preallocated pages. This can be done
-by specifying a mid handle callback.
+This allows users to inforce encryption for SMB3 shares if a server
+supports it.
 
 Signed-off-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 ---
- fs/cifs/cifsglob.h  |  8 ++++++++
- fs/cifs/cifsproto.h |  2 +-
- fs/cifs/cifssmb.c   |  6 +++---
- fs/cifs/smb2pdu.c   | 10 +++++-----
- fs/cifs/transport.c |  5 +++--
- 5 files changed, 20 insertions(+), 11 deletions(-)
+ fs/cifs/connect.c | 41 ++++++++++++++++++++++++++++-------------
+ fs/cifs/smb2pdu.c | 33 +++++++++++++++------------------
+ 2 files changed, 43 insertions(+), 31 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 1d1cdea..dc41ae4 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -1310,6 +1310,13 @@ typedef int (mid_receive_t)(struct TCP_Server_Info *server,
-  */
- typedef void (mid_callback_t)(struct mid_q_entry *mid);
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index c41f496..872fc8a 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -2622,12 +2622,18 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
+ 	return ERR_PTR(rc);
+ }
  
-+/*
-+ * This is the protopyte for mid handle function. This is called once the mid
-+ * has been recognized after decryption of the message.
-+ */
-+typedef int (mid_handle_t)(struct TCP_Server_Info *server,
-+			    struct mid_q_entry *mid);
-+
- /* one of these for every pending CIFS request to the server */
- struct mid_q_entry {
- 	struct list_head qhead;	/* mids waiting on reply from this server */
-@@ -1324,6 +1331,7 @@ struct mid_q_entry {
- #endif
- 	mid_receive_t *receive; /* call receive callback */
- 	mid_callback_t *callback; /* call completion callback */
-+	mid_handle_t *handle; /* call handle mid callback */
- 	void *callback_data;	  /* general purpose pointer for callback */
- 	void *resp_buf;		/* pointer to received SMB header */
- 	int mid_state;	/* wish this were enum but can not pass to wait_event */
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 117d1df..fe874dc 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -77,7 +77,7 @@ extern void cifs_wake_up_task(struct mid_q_entry *mid);
- extern int cifs_call_async(struct TCP_Server_Info *server,
- 			struct smb_rqst *rqst,
- 			mid_receive_t *receive, mid_callback_t *callback,
--			void *cbdata, const int flags);
-+			mid_handle_t *handle, void *cbdata, const int flags);
- extern int cifs_send_recv(const unsigned int xid, struct cifs_ses *ses,
- 			  struct smb_rqst *rqst, int *resp_buf_type,
- 			  const int flags, struct kvec *resp_iov);
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index be261a3..8326212 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -731,7 +731,7 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
- 	iov[1].iov_len = get_rfc1002_length(smb);
- 	iov[1].iov_base = (char *)smb + 4;
+-static int match_tcon(struct cifs_tcon *tcon, const char *unc)
++static int match_tcon(struct cifs_tcon *tcon, struct smb_vol *volume_info)
+ {
+ 	if (tcon->tidStatus == CifsExiting)
+ 		return 0;
+-	if (strncmp(tcon->treeName, unc, MAX_TREE_SIZE))
++	if (strncmp(tcon->treeName, volume_info->UNC, MAX_TREE_SIZE))
+ 		return 0;
++	if (tcon->seal != volume_info->seal)
++		return 0;
++#ifdef CONFIG_CIFS_SMB2
++	if (tcon->snapshot_time != volume_info->snapshot_time)
++		return 0;
++#endif /* CONFIG_CIFS_SMB2 */
+ 	return 1;
+ }
  
--	rc = cifs_call_async(server, &rqst, NULL, cifs_echo_callback,
-+	rc = cifs_call_async(server, &rqst, NULL, cifs_echo_callback, NULL,
- 			     server, CIFS_ASYNC_OP | CIFS_ECHO_OP);
- 	if (rc)
- 		cifs_dbg(FYI, "Echo request failed: %d\n", rc);
-@@ -1654,7 +1654,7 @@ cifs_async_readv(struct cifs_readdata *rdata)
- 
- 	kref_get(&rdata->refcount);
- 	rc = cifs_call_async(tcon->ses->server, &rqst, cifs_readv_receive,
--			     cifs_readv_callback, rdata, 0);
-+			     cifs_readv_callback, NULL, rdata, 0);
- 
- 	if (rc == 0)
- 		cifs_stats_inc(&tcon->stats.cifs_stats.num_reads);
-@@ -2168,7 +2168,7 @@ cifs_async_writev(struct cifs_writedata *wdata,
- 
- 	kref_get(&wdata->refcount);
- 	rc = cifs_call_async(tcon->ses->server, &rqst, NULL,
--				cifs_writev_callback, wdata, 0);
-+				cifs_writev_callback, NULL, wdata, 0);
- 
- 	if (rc == 0)
- 		cifs_stats_inc(&tcon->stats.cifs_stats.num_writes);
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index b088c50..12dee85 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -2144,8 +2144,8 @@ SMB2_echo(struct TCP_Server_Info *server)
- 	iov[1].iov_len = get_rfc1002_length(req);
- 	iov[1].iov_base = (char *)req + 4;
- 
--	rc = cifs_call_async(server, &rqst, NULL, smb2_echo_callback, server,
--			     CIFS_ECHO_OP);
-+	rc = cifs_call_async(server, &rqst, NULL, smb2_echo_callback, NULL,
-+			     server, CIFS_ECHO_OP);
- 	if (rc)
- 		cifs_dbg(FYI, "Echo request failed: %d\n", rc);
- 
-@@ -2384,7 +2384,7 @@ smb2_async_readv(struct cifs_readdata *rdata)
- 	kref_get(&rdata->refcount);
- 	rc = cifs_call_async(io_parms.tcon->ses->server, &rqst,
- 			     cifs_readv_receive, smb2_readv_callback,
--			     rdata, flags);
-+			     NULL, rdata, flags);
- 	if (rc) {
- 		kref_put(&rdata->refcount, cifs_readdata_release);
- 		cifs_stats_fail_inc(io_parms.tcon, SMB2_READ_HE);
-@@ -2595,8 +2595,8 @@ smb2_async_writev(struct cifs_writedata *wdata,
+@@ -2640,14 +2646,8 @@ cifs_find_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
+ 	spin_lock(&cifs_tcp_ses_lock);
+ 	list_for_each(tmp, &ses->tcon_list) {
+ 		tcon = list_entry(tmp, struct cifs_tcon, tcon_list);
+-		if (!match_tcon(tcon, volume_info->UNC))
+-			continue;
+-
+-#ifdef CONFIG_CIFS_SMB2
+-		if (tcon->snapshot_time != volume_info->snapshot_time)
++		if (!match_tcon(tcon, volume_info))
+ 			continue;
+-#endif /* CONFIG_CIFS_SMB2 */
+-
+ 		++tcon->tc_count;
+ 		spin_unlock(&cifs_tcp_ses_lock);
+ 		return tcon;
+@@ -2693,8 +2693,6 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
+ 		cifs_dbg(FYI, "Found match on UNC path\n");
+ 		/* existing tcon already has a reference */
+ 		cifs_put_smb_ses(ses);
+-		if (tcon->seal != volume_info->seal)
+-			cifs_dbg(VFS, "transport encryption setting conflicts with existing tid\n");
+ 		return tcon;
  	}
  
- 	kref_get(&wdata->refcount);
--	rc = cifs_call_async(server, &rqst, NULL, smb2_writev_callback, wdata,
--			     flags);
-+	rc = cifs_call_async(server, &rqst, NULL, smb2_writev_callback, NULL,
-+			     wdata, flags);
+@@ -2750,7 +2748,6 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
+ 		tcon->Flags &= ~SMB_SHARE_IS_IN_DFS;
+ 		cifs_dbg(FYI, "DFS disabled (%d)\n", tcon->Flags);
+ 	}
+-	tcon->seal = volume_info->seal;
+ 	tcon->use_persistent = false;
+ 	/* check if SMB2 or later, CIFS does not support persistent handles */
+ 	if (volume_info->persistent) {
+@@ -2787,6 +2784,24 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
+ 		tcon->use_resilient = true;
+ 	}
  
- 	if (rc) {
- 		kref_put(&wdata->refcount, release);
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index bc5f55f..65060c5 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -503,8 +503,8 @@ cifs_setup_async_request(struct TCP_Server_Info *server, struct smb_rqst *rqst)
-  */
- int
- cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
--		mid_receive_t *receive, mid_callback_t *callback, void *cbdata,
--		const int flags)
-+		mid_receive_t *receive, mid_callback_t *callback,
-+		mid_handle_t *handle, void *cbdata, const int flags)
++	if (volume_info->seal) {
++		if (ses->server->vals->protocol_id == 0) {
++			cifs_dbg(VFS,
++				 "SMB3 or later required for encryption\n");
++			rc = -EOPNOTSUPP;
++			goto out_fail;
++#ifdef CONFIG_CIFS_SMB2
++		} else if (tcon->ses->server->capabilities &
++					SMB2_GLOBAL_CAP_ENCRYPTION)
++			tcon->seal = true;
++		else {
++			cifs_dbg(VFS, "Encryption is not supported on share\n");
++			rc = -EOPNOTSUPP;
++			goto out_fail;
++#endif /* CONFIG_CIFS_SMB2 */
++		}
++	}
++
+ 	/*
+ 	 * We can have only one retry value for a connection to a share so for
+ 	 * resources mounted more than once to the same server share the last
+@@ -2918,7 +2933,7 @@ cifs_match_super(struct super_block *sb, void *data)
+ 
+ 	if (!match_server(tcp_srv, volume_info) ||
+ 	    !match_session(ses, volume_info) ||
+-	    !match_tcon(tcon, volume_info->UNC) ||
++	    !match_tcon(tcon, volume_info) ||
+ 	    !match_prepath(sb, mnt_data)) {
+ 		rc = 0;
+ 		goto out;
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 0abeb5f..ad83b3d 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -79,9 +79,14 @@ static const int smb2_req_struct_sizes[NUMBER_OF_SMB2_COMMANDS] = {
+ 
+ static int encryption_required(const struct cifs_tcon *tcon)
  {
- 	int rc, timeout, optype;
- 	struct mid_q_entry *mid;
-@@ -531,6 +531,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
- 	mid->receive = receive;
- 	mid->callback = callback;
- 	mid->callback_data = cbdata;
-+	mid->handle = handle;
- 	mid->mid_state = MID_REQUEST_SUBMITTED;
++	if (!tcon)
++		return 0;
+ 	if ((tcon->ses->session_flags & SMB2_SESSION_FLAG_ENCRYPT_DATA) ||
+ 	    (tcon->share_flags & SHI1005_FLAGS_ENCRYPT_DATA))
+ 		return 1;
++	if (tcon->seal &&
++	    (tcon->ses->server->capabilities & SMB2_GLOBAL_CAP_ENCRYPTION))
++		return 1;
+ 	return 0;
+ }
  
- 	/* put it on the pending_mid_q */
+@@ -835,8 +840,6 @@ SMB2_auth_kerberos(struct SMB2_sess_data *sess_data)
+ 	ses->Suid = rsp->hdr.sync_hdr.SessionId;
+ 
+ 	ses->session_flags = le16_to_cpu(rsp->SessionFlags);
+-	if (ses->session_flags & SMB2_SESSION_FLAG_ENCRYPT_DATA)
+-		cifs_dbg(VFS, "SMB3 encryption not supported yet\n");
+ 
+ 	rc = SMB2_sess_establish_session(sess_data);
+ out_put_spnego_key:
+@@ -933,8 +936,6 @@ SMB2_sess_auth_rawntlmssp_negotiate(struct SMB2_sess_data *sess_data)
+ 
+ 	ses->Suid = rsp->hdr.sync_hdr.SessionId;
+ 	ses->session_flags = le16_to_cpu(rsp->SessionFlags);
+-	if (ses->session_flags & SMB2_SESSION_FLAG_ENCRYPT_DATA)
+-		cifs_dbg(VFS, "SMB3 encryption not supported yet\n");
+ 
+ out:
+ 	kfree(ntlmssp_blob);
+@@ -993,8 +994,6 @@ SMB2_sess_auth_rawntlmssp_authenticate(struct SMB2_sess_data *sess_data)
+ 
+ 	ses->Suid = rsp->hdr.sync_hdr.SessionId;
+ 	ses->session_flags = le16_to_cpu(rsp->SessionFlags);
+-	if (ses->session_flags & SMB2_SESSION_FLAG_ENCRYPT_DATA)
+-		cifs_dbg(VFS, "SMB3 encryption not supported yet\n");
+ 
+ 	rc = SMB2_sess_establish_session(sess_data);
+ out:
+@@ -1145,12 +1144,6 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+ 	if (tcon && tcon->bad_network_name)
+ 		return -ENOENT;
+ 
+-	if ((tcon && tcon->seal) &&
+-	    ((ses->server->capabilities & SMB2_GLOBAL_CAP_ENCRYPTION) == 0)) {
+-		cifs_dbg(VFS, "encryption requested but no server support");
+-		return -EOPNOTSUPP;
+-	}
+-
+ 	unc_path = kmalloc(MAX_SHARENAME_LENGTH * 2, GFP_KERNEL);
+ 	if (unc_path == NULL)
+ 		return -ENOMEM;
+@@ -1168,15 +1161,16 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+ 		return rc;
+ 	}
+ 
+-	if (ses->session_flags & SMB2_SESSION_FLAG_ENCRYPT_DATA)
+-		flags |= CIFS_TRANSFORM_REQ;
+-
+ 	if (tcon == NULL) {
++		if ((ses->session_flags & SMB2_SESSION_FLAG_ENCRYPT_DATA))
++			flags |= CIFS_TRANSFORM_REQ;
++
+ 		/* since no tcon, smb2_init can not do this, so do here */
+ 		req->hdr.sync_hdr.SessionId = ses->Suid;
+ 		/* if (ses->server->sec_mode & SECMODE_SIGN_REQUIRED)
+ 			req->hdr.Flags |= SMB2_FLAGS_SIGNED; */
+-	}
++	} else if (encryption_required(tcon))
++		flags |= CIFS_TRANSFORM_REQ;
+ 
+ 	iov[0].iov_base = (char *)req;
+ 	/* 4 for rfc1002 length field and 1 for pad */
+@@ -1233,9 +1227,12 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+ 	if ((rsp->Capabilities & SMB2_SHARE_CAP_DFS) &&
+ 	    ((tcon->share_flags & SHI1005_FLAGS_DFS) == 0))
+ 		cifs_dbg(VFS, "DFS capability contradicts DFS flag\n");
++
++	if (tcon->seal &&
++	    !(tcon->ses->server->capabilities & SMB2_GLOBAL_CAP_ENCRYPTION))
++		cifs_dbg(VFS, "Encryption is requested but not supported\n");
++
+ 	init_copy_chunk_defaults(tcon);
+-	if (tcon->share_flags & SHI1005_FLAGS_ENCRYPT_DATA)
+-		cifs_dbg(VFS, "Encrypted shares not supported");
+ 	if (tcon->ses->server->ops->validate_negotiate)
+ 		rc = tcon->ses->server->ops->validate_negotiate(xid, tcon);
+ tcon_exit:
 -- 
 2.7.4
