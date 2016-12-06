@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: [PATCH 14/15] CIFS: Add capability to decrypt big read responses
-Date: Tue,  6 Dec 2016 14:02:37 -0800
-Message-ID: <1481061758-52020-15-git-send-email-pshilov@microsoft.com>
+Subject: [PATCH 09/15] CIFS: Encrypt SMB3 requests before sending
+Date: Tue,  6 Dec 2016 14:02:32 -0800
+Message-ID: <1481061758-52020-10-git-send-email-pshilov@microsoft.com>
 References: <1481061758-52020-1-git-send-email-pshilov@microsoft.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -11,265 +11,518 @@ In-Reply-To: <1481061758-52020-1-git-send-email-pshilov-0li6OtcxBFHby3iVrkZq2A@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Allow to decrypt transformed packets that are bigger than the big
-buffer size. In particular it is used for read responses that can
-only exceed the big buffer size.
+This change allows to encrypt packets if it is required by a server
+for SMB sessions or tree connections.
 
 Signed-off-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 ---
- fs/cifs/cifsproto.h |   1 +
- fs/cifs/cifssmb.c   |   8 +--
- fs/cifs/smb2ops.c   | 164 +++++++++++++++++++++++++++++++++++++++++++++++++---
- 3 files changed, 160 insertions(+), 13 deletions(-)
+ fs/cifs/cifsencrypt.c   |  13 ++-
+ fs/cifs/cifsglob.h      |   2 +
+ fs/cifs/cifsproto.h     |   2 +-
+ fs/cifs/connect.c       |   4 +-
+ fs/cifs/smb2ops.c       | 257 ++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2pdu.h       |   5 +-
+ fs/cifs/smb2proto.h     |   3 +
+ fs/cifs/smb2transport.c |  41 +++++++-
+ 8 files changed, 317 insertions(+), 10 deletions(-)
 
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 3a0aaf0..96e8a75 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -34,6 +34,7 @@
+ #include <linux/random.h>
+ #include <linux/highmem.h>
+ #include <crypto/skcipher.h>
++#include <crypto/aead.h>
+ 
+ static int
+ cifs_crypto_shash_md5_allocate(struct TCP_Server_Info *server)
+@@ -870,7 +871,7 @@ calc_seckey(struct cifs_ses *ses)
+ }
+ 
+ void
+-cifs_crypto_shash_release(struct TCP_Server_Info *server)
++cifs_crypto_secmech_release(struct TCP_Server_Info *server)
+ {
+ 	if (server->secmech.cmacaes) {
+ 		crypto_free_shash(server->secmech.cmacaes);
+@@ -892,6 +893,16 @@ cifs_crypto_shash_release(struct TCP_Server_Info *server)
+ 		server->secmech.hmacmd5 = NULL;
+ 	}
+ 
++	if (server->secmech.ccmaesencrypt) {
++		crypto_free_aead(server->secmech.ccmaesencrypt);
++		server->secmech.ccmaesencrypt = NULL;
++	}
++
++	if (server->secmech.ccmaesdecrypt) {
++		crypto_free_aead(server->secmech.ccmaesdecrypt);
++		server->secmech.ccmaesdecrypt = NULL;
++	}
++
+ 	kfree(server->secmech.sdesccmacaes);
+ 	server->secmech.sdesccmacaes = NULL;
+ 	kfree(server->secmech.sdeschmacsha256);
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 8ec9e1a..9433a9b 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -136,6 +136,8 @@ struct cifs_secmech {
+ 	struct sdesc *sdescmd5; /* ctxt to generate cifs/smb signature */
+ 	struct sdesc *sdeschmacsha256;  /* ctxt to generate smb2 signature */
+ 	struct sdesc *sdesccmacaes;  /* ctxt to generate smb3 signature */
++	struct crypto_aead *ccmaesencrypt; /* smb3 encryption aead */
++	struct crypto_aead *ccmaesdecrypt; /* smb3 decryption aead */
+ };
+ 
+ /* per smb session structure/fields */
 diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 0eb35d2..0dbafc8 100644
+index f87d1d6..117d1df 100644
 --- a/fs/cifs/cifsproto.h
 +++ b/fs/cifs/cifsproto.h
-@@ -76,6 +76,7 @@ extern void cifs_delete_mid(struct mid_q_entry *mid);
- extern void cifs_wake_up_task(struct mid_q_entry *mid);
- extern int cifs_handle_standard(struct TCP_Server_Info *server,
- 				struct mid_q_entry *mid);
-+extern int cifs_discard_remaining_data(struct TCP_Server_Info *server);
- extern int cifs_call_async(struct TCP_Server_Info *server,
- 			struct smb_rqst *rqst,
- 			mid_receive_t *receive, mid_callback_t *callback,
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 8326212..5d9ad38 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -1399,8 +1399,8 @@ CIFS_open(const unsigned int xid, struct cifs_open_parms *oparms, int *oplock,
-  * Discard any remaining data in the current SMB. To do this, we borrow the
-  * current bigbuf.
-  */
--static int
--discard_remaining_data(struct TCP_Server_Info *server)
-+int
-+cifs_discard_remaining_data(struct TCP_Server_Info *server)
- {
- 	unsigned int rfclen = get_rfc1002_length(server->smallbuf);
- 	int remaining = rfclen + 4 - server->total_read;
-@@ -1426,7 +1426,7 @@ cifs_readv_discard(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 	int length;
- 	struct cifs_readdata *rdata = mid->callback_data;
+@@ -444,7 +444,7 @@ extern int SMBNTencrypt(unsigned char *, unsigned char *, unsigned char *,
+ 			const struct nls_table *);
+ extern int setup_ntlm_response(struct cifs_ses *, const struct nls_table *);
+ extern int setup_ntlmv2_rsp(struct cifs_ses *, const struct nls_table *);
+-extern void cifs_crypto_shash_release(struct TCP_Server_Info *);
++extern void cifs_crypto_secmech_release(struct TCP_Server_Info *server);
+ extern int calc_seckey(struct cifs_ses *);
+ extern int generate_smb30signingkey(struct cifs_ses *);
+ extern int generate_smb311signingkey(struct cifs_ses *);
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 5aaf7b1..46124a0 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -2148,7 +2148,7 @@ cifs_put_tcp_session(struct TCP_Server_Info *server, int from_reconnect)
+ 	server->tcpStatus = CifsExiting;
+ 	spin_unlock(&GlobalMid_Lock);
  
--	length = discard_remaining_data(server);
-+	length = cifs_discard_remaining_data(server);
- 	dequeue_mid(mid, rdata->result);
- 	return length;
- }
-@@ -1459,7 +1459,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+-	cifs_crypto_shash_release(server);
++	cifs_crypto_secmech_release(server);
+ 	cifs_fscache_release_client_cookie(server);
  
- 	if (server->ops->is_status_pending &&
- 	    server->ops->is_status_pending(buf, server, 0)) {
--		discard_remaining_data(server);
-+		cifs_discard_remaining_data(server);
- 		return -1;
- 	}
+ 	kfree(server->session_key.response);
+@@ -2267,7 +2267,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 	return tcp_ses;
+ 
+ out_err_crypto_release:
+-	cifs_crypto_shash_release(tcp_ses);
++	cifs_crypto_secmech_release(tcp_ses);
+ 
+ 	put_net(cifs_net_ns(tcp_ses));
  
 diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 627096c..a27a234 100644
+index ef8b2a8..eda9d4c 100644
 --- a/fs/cifs/smb2ops.c
 +++ b/fs/cifs/smb2ops.c
-@@ -1844,12 +1844,72 @@ decrypt_raw_data(struct TCP_Server_Info *server, char *buf,
+@@ -20,6 +20,8 @@
+ #include <linux/pagemap.h>
+ #include <linux/vfs.h>
+ #include <linux/falloc.h>
++#include <linux/scatterlist.h>
++#include <crypto/aead.h>
+ #include "cifsglob.h"
+ #include "smb2pdu.h"
+ #include "smb2proto.h"
+@@ -1547,6 +1549,256 @@ smb2_dir_needs_close(struct cifsFileInfo *cfile)
+ 	return !cfile->invalidHandle;
  }
  
- static int
-+read_data_into_pages(struct TCP_Server_Info *server, struct page **pages,
-+		     unsigned int npages, unsigned int len)
++static void
++fill_transform_hdr(struct smb2_transform_hdr *tr_hdr, struct smb_rqst *old_rq)
 +{
-+	int i;
-+	int length;
++	struct smb2_sync_hdr *shdr =
++			(struct smb2_sync_hdr *)old_rq->rq_iov[1].iov_base;
++	unsigned int orig_len = get_rfc1002_length(old_rq->rq_iov[0].iov_base);
 +
-+	for (i = 0; i < npages; i++) {
-+		struct page *page = pages[i];
-+		size_t n;
-+
-+		n = len;
-+		if (len >= PAGE_SIZE) {
-+			/* enough data to fill the page */
-+			n = PAGE_SIZE;
-+			len -= n;
-+		} else {
-+			zero_user(page, len, PAGE_SIZE - len);
-+			len = 0;
-+		}
-+		length = cifs_read_page_from_socket(server, page, n);
-+		if (length < 0)
-+			return length;
-+		server->total_read += length;
-+	}
-+
-+	return 0;
++	memset(tr_hdr, 0, sizeof(struct smb2_transform_hdr));
++	tr_hdr->ProtocolId = SMB2_TRANSFORM_PROTO_NUM;
++	tr_hdr->OriginalMessageSize = cpu_to_le32(orig_len);
++	tr_hdr->Flags = cpu_to_le16(0x01);
++	get_random_bytes(&tr_hdr->Nonce, SMB3_AES128CMM_NONCE);
++	memcpy(&tr_hdr->SessionId, &shdr->SessionId, 8);
++	inc_rfc1001_len(tr_hdr, sizeof(struct smb2_transform_hdr) - 4);
++	inc_rfc1001_len(tr_hdr, orig_len);
 +}
 +
-+static int
-+init_read_bvec(struct page **pages, unsigned int npages, unsigned int data_size,
-+	       unsigned int cur_off, struct bio_vec **page_vec)
++static struct scatterlist *
++init_sg(struct smb_rqst *rqst, u8 *sign)
 +{
-+	struct bio_vec *bvec;
-+	int i;
++	unsigned int sg_len = rqst->rq_nvec + rqst->rq_npages + 1;
++	unsigned int assoc_data_len = sizeof(struct smb2_transform_hdr) - 24;
++	struct scatterlist *sg;
++	unsigned int i;
++	unsigned int j;
 +
-+	bvec = kcalloc(npages, sizeof(struct bio_vec), GFP_KERNEL);
-+	if (!bvec)
-+		return -EIO;
++	sg = kmalloc_array(sg_len, sizeof(struct scatterlist), GFP_KERNEL);
++	if (!sg)
++		return NULL;
 +
-+	for (i = 0; i < npages; i++) {
-+		bvec[i].bv_page = pages[i];
-+		bvec[i].bv_offset = (i == 0) ? cur_off : 0;
-+		bvec[i].bv_len = min_t(unsigned int, PAGE_SIZE, data_size);
-+		data_size -= bvec[i].bv_len;
++	sg_init_table(sg, sg_len);
++	sg_set_buf(&sg[0], rqst->rq_iov[0].iov_base + 24, assoc_data_len);
++	for (i = 1; i < rqst->rq_nvec; i++)
++		sg_set_buf(&sg[i], rqst->rq_iov[i].iov_base,
++						rqst->rq_iov[i].iov_len);
++	for (j = 0; i < sg_len - 1; i++, j++) {
++		unsigned int len = (j < rqst->rq_npages - 1) ? rqst->rq_pagesz
++							: rqst->rq_tailsz;
++		sg_set_page(&sg[i], rqst->rq_pages[j], len, 0);
 +	}
-+
-+	if (data_size != 0) {
-+		cifs_dbg(VFS, "%s: something went wrong\n", __func__);
-+		kfree(bvec);
-+		return -EIO;
-+	}
-+
-+	*page_vec = bvec;
-+	return 0;
++	sg_set_buf(&sg[sg_len - 1], sign, SMB2_SIGNATURE_SIZE);
++	return sg;
 +}
 +
-+static int
- handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
- 		 char *buf, unsigned int buf_len, struct page **pages,
- 		 unsigned int npages, unsigned int page_data_size)
- {
- 	unsigned int data_offset;
- 	unsigned int data_len;
-+	unsigned int cur_off;
-+	unsigned int cur_page_idx;
-+	unsigned int pad_len;
- 	struct cifs_readdata *rdata = mid->callback_data;
- 	struct smb2_sync_hdr *shdr = get_sync_hdr(buf);
- 	struct bio_vec *bvec = NULL;
-@@ -1893,9 +1953,33 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
- 		return 0;
- 	}
- 
-+	pad_len = data_offset - server->vals->read_rsp_size;
++struct cifs_crypt_result {
++	int err;
++	struct completion completion;
++};
 +
- 	if (buf_len <= data_offset) {
- 		/* read response payload is in pages */
--		/* BB add code to init iter with pages */
-+		cur_page_idx = pad_len / PAGE_SIZE;
-+		cur_off = pad_len % PAGE_SIZE;
-+
-+		if (cur_page_idx != 0) {
-+			/* data offset is beyond the 1st page of response */
-+			cifs_dbg(FYI, "%s: data offset (%u) beyond 1st page of response\n",
-+				 __func__, data_offset);
-+			rdata->result = -EIO;
-+			return 0;
-+		}
-+
-+		if (data_len > page_data_size - pad_len) {
-+			/* data_len is corrupt -- discard frame */
-+			rdata->result = -EIO;
-+			return 0;
-+		}
-+
-+		rdata->result = init_read_bvec(pages, npages, page_data_size,
-+					       cur_off, &bvec);
-+		if (rdata->result != 0)
-+			return 0;
-+
-+		iov_iter_bvec(&iter, WRITE | ITER_BVEC, bvec, npages, data_len);
- 	} else if (buf_len >= data_offset + data_len) {
- 		/* read response payload is in buf */
- 		WARN_ONCE(npages > 0, "read data can be in buf of pages only");
-@@ -1929,6 +2013,74 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
- }
- 
- static int
-+receive_encrypted_read(struct TCP_Server_Info *server, struct mid_q_entry **mid)
++static void cifs_crypt_complete(struct crypto_async_request *req, int err)
 +{
-+	char *buf = server->smallbuf;
-+	struct smb2_transform_hdr *tr_hdr = (struct smb2_transform_hdr *)buf;
-+	unsigned int npages;
-+	struct page **pages;
-+	unsigned int len;
-+	unsigned int buflen = get_rfc1002_length(buf) + 4;
-+	int rc;
-+	int i;
++	struct cifs_crypt_result *res = req->data;
 +
-+	len = min_t(unsigned int, buflen, server->vals->read_rsp_size - 4 +
-+		sizeof(struct smb2_transform_hdr)) - HEADER_SIZE(server) + 1;
++	if (err == -EINPROGRESS)
++		return;
 +
-+	rc = cifs_read_from_socket(server, buf + HEADER_SIZE(server) - 1, len);
-+	if (rc < 0)
++	res->err = err;
++	complete(&res->completion);
++}
++
++/*
++ * Encrypt or decrypt @rqst message. @rqst has the following format:
++ * iov[0] - transform header (associate data),
++ * iov[1-N] and pages - data to encrypt.
++ * On success return encrypted data in iov[1-N] and pages, leave iov[0]
++ * untouched.
++ */
++static int
++crypt_message(struct TCP_Server_Info *server, struct smb_rqst *rqst, int enc)
++{
++	struct smb2_transform_hdr *tr_hdr =
++			(struct smb2_transform_hdr *)rqst->rq_iov[0].iov_base;
++	unsigned int assoc_data_len = sizeof(struct smb2_transform_hdr) - 24;
++	struct cifs_ses *ses;
++	int rc = 0;
++	struct scatterlist *sg;
++	u8 sign[SMB2_SIGNATURE_SIZE] = {};
++	struct aead_request *req;
++	char *iv;
++	unsigned int iv_len;
++	struct cifs_crypt_result result = {0, };
++	struct crypto_aead *tfm;
++	unsigned int crypt_len = le32_to_cpu(tr_hdr->OriginalMessageSize);
++
++	init_completion(&result.completion);
++
++	ses = smb2_find_smb_ses(server, tr_hdr->SessionId);
++	if (!ses) {
++		cifs_dbg(VFS, "%s: Could not find session\n", __func__);
++		return 0;
++	}
++
++	rc = smb3_crypto_aead_allocate(server);
++	if (rc) {
++		cifs_dbg(VFS, "%s: crypto alloc failed\n", __func__);
 +		return rc;
-+	server->total_read += rc;
++	}
 +
-+	len = le32_to_cpu(tr_hdr->OriginalMessageSize) + 4 -
-+						server->vals->read_rsp_size;
-+	npages = DIV_ROUND_UP(len, PAGE_SIZE);
++	tfm = enc ? server->secmech.ccmaesencrypt :
++						server->secmech.ccmaesdecrypt;
++	rc = crypto_aead_setkey(tfm, enc ? ses->smb3encryptionkey :
++				ses->smb3decryptionkey, SMB3_SIGN_KEY_SIZE);
++	if (rc) {
++		cifs_dbg(VFS, "%s: Failed to set aead key %d\n", __func__, rc);
++		return rc;
++	}
++
++	rc = crypto_aead_setauthsize(tfm, SMB2_SIGNATURE_SIZE);
++	if (rc) {
++		cifs_dbg(VFS, "%s: Failed to set authsize %d\n", __func__, rc);
++		return rc;
++	}
++
++	req = aead_request_alloc(tfm, GFP_KERNEL);
++	if (!req) {
++		cifs_dbg(VFS, "%s: Failed to alloc aead request", __func__);
++		return -ENOMEM;
++	}
++
++	if (!enc) {
++		memcpy(sign, &tr_hdr->Signature, SMB2_SIGNATURE_SIZE);
++		crypt_len += SMB2_SIGNATURE_SIZE;
++	}
++
++	sg = init_sg(rqst, sign);
++	if (!sg) {
++		cifs_dbg(VFS, "%s: Failed to init sg %d", __func__, rc);
++		goto free_req;
++	}
++
++	iv_len = crypto_aead_ivsize(tfm);
++	iv = kzalloc(iv_len, GFP_KERNEL);
++	if (!iv) {
++		cifs_dbg(VFS, "%s: Failed to alloc IV", __func__);
++		goto free_sg;
++	}
++	iv[0] = 3;
++	memcpy(iv + 1, (char *)tr_hdr->Nonce, SMB3_AES128CMM_NONCE);
++
++	aead_request_set_crypt(req, sg, sg, crypt_len, iv);
++	aead_request_set_ad(req, assoc_data_len);
++
++	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				  cifs_crypt_complete, &result);
++
++	rc = enc ? crypto_aead_encrypt(req) : crypto_aead_decrypt(req);
++
++	if (rc == -EINPROGRESS || rc == -EBUSY) {
++		wait_for_completion(&result.completion);
++		rc = result.err;
++	}
++
++	if (!rc && enc)
++		memcpy(&tr_hdr->Signature, sign, SMB2_SIGNATURE_SIZE);
++
++	kfree(iv);
++free_sg:
++	kfree(sg);
++free_req:
++	kfree(req);
++	return rc;
++}
++
++static int
++smb3_init_transform_rq(struct TCP_Server_Info *server, struct smb_rqst *new_rq,
++		       struct smb_rqst *old_rq)
++{
++	struct kvec *iov;
++	struct page **pages;
++	struct smb2_transform_hdr *tr_hdr;
++	unsigned int npages = old_rq->rq_npages;
++	int i;
++	int rc = -ENOMEM;
 +
 +	pages = kmalloc_array(npages, sizeof(struct page *), GFP_KERNEL);
 +	if (!pages)
-+		return -ENOMEM;
++		return rc;
++
++	new_rq->rq_pages = pages;
++	new_rq->rq_npages = old_rq->rq_npages;
++	new_rq->rq_pagesz = old_rq->rq_pagesz;
++	new_rq->rq_tailsz = old_rq->rq_tailsz;
 +
 +	for (i = 0; i < npages; i++) {
 +		pages[i] = alloc_page(GFP_KERNEL|__GFP_HIGHMEM);
-+		if (!pages[i]) {
-+			rc = -ENOMEM;
-+			goto free_pages;
-+		}
++		if (!pages[i])
++			goto err_free_pages;
 +	}
 +
-+	/* read read data into pages */
-+	rc = read_data_into_pages(server, pages, npages, len);
-+	if (rc)
-+		goto free_pages;
++	iov = kmalloc_array(old_rq->rq_nvec, sizeof(struct kvec), GFP_KERNEL);
++	if (!iov)
++		goto err_free_pages;
 +
-+	rc = cifs_discard_remaining_data(server);
-+	if (rc)
-+		goto free_pages;
++	/* copy all iovs from the old except the 1st one (rfc1002 length) */
++	memcpy(&iov[1], &old_rq->rq_iov[1],
++				sizeof(struct kvec) * (old_rq->rq_nvec - 1));
++	new_rq->rq_iov = iov;
++	new_rq->rq_nvec = old_rq->rq_nvec;
 +
-+	rc = decrypt_raw_data(server, buf, server->vals->read_rsp_size - 4,
-+			      pages, npages, len);
-+	if (rc)
-+		goto free_pages;
++	tr_hdr = kmalloc(sizeof(struct smb2_transform_hdr), GFP_KERNEL);
++	if (!tr_hdr)
++		goto err_free_iov;
 +
-+	*mid = smb2_find_mid(server, buf);
-+	if (*mid == NULL)
-+		cifs_dbg(FYI, "mid not found\n");
-+	else {
-+		cifs_dbg(FYI, "mid found\n");
-+		(*mid)->decrypted = true;
-+		rc = handle_read_data(server, *mid, buf,
-+				      server->vals->read_rsp_size,
-+				      pages, npages, len);
++	/* fill the 1st iov with a transform header */
++	fill_transform_hdr(tr_hdr, old_rq);
++	new_rq->rq_iov[0].iov_base = tr_hdr;
++	new_rq->rq_iov[0].iov_len = sizeof(struct smb2_transform_hdr);
++
++	/* copy pages form the old */
++	for (i = 0; i < npages; i++) {
++		char *dst = kmap(new_rq->rq_pages[i]);
++		char *src = kmap(old_rq->rq_pages[i]);
++		unsigned int len = (i < npages - 1) ? new_rq->rq_pagesz :
++							new_rq->rq_tailsz;
++		memcpy(dst, src, len);
++		kunmap(new_rq->rq_pages[i]);
++		kunmap(old_rq->rq_pages[i]);
 +	}
 +
-+free_pages:
++	rc = crypt_message(server, new_rq, 1);
++	cifs_dbg(FYI, "encrypt message returned %d", rc);
++	if (rc)
++		goto err_free_tr_hdr;
++
++	return rc;
++
++err_free_tr_hdr:
++	kfree(tr_hdr);
++err_free_iov:
++	kfree(iov);
++err_free_pages:
 +	for (i = i - 1; i >= 0; i--)
 +		put_page(pages[i]);
 +	kfree(pages);
 +	return rc;
 +}
 +
-+static int
- receive_encrypted_standard(struct TCP_Server_Info *server,
- 			   struct mid_q_entry **mid)
- {
-@@ -1997,14 +2149,8 @@ smb3_receive_transform(struct TCP_Server_Info *server, struct mid_q_entry **mid)
- 		return -ECONNABORTED;
- 	}
++static void
++smb3_free_transform_rq(struct smb_rqst *rqst)
++{
++	int i = rqst->rq_npages - 1;
++
++	for (; i >= 0; i--)
++		put_page(rqst->rq_pages[i]);
++	kfree(rqst->rq_pages);
++	/* free transform header */
++	kfree(rqst->rq_iov[0].iov_base);
++	kfree(rqst->rq_iov);
++}
++
+ struct smb_version_operations smb20_operations = {
+ 	.compare_fids = smb2_compare_fids,
+ 	.setup_request = smb2_setup_request,
+@@ -1793,6 +2045,8 @@ struct smb_version_operations smb30_operations = {
+ 	.dir_needs_close = smb2_dir_needs_close,
+ 	.fallocate = smb3_fallocate,
+ 	.enum_snapshots = smb3_enum_snapshots,
++	.init_transform_rq = smb3_init_transform_rq,
++	.free_transform_rq = smb3_free_transform_rq,
+ };
  
--	if (pdu_length + 4 > CIFSMaxBufSize + MAX_HEADER_SIZE(server)) {
--		cifs_dbg(VFS, "Decoding responses of big size (%u) is not supported\n",
--			 pdu_length);
--		/* BB add code to allocate and fill highmem pages here */
--		cifs_reconnect(server);
--		wake_up(&server->response_q);
--		return -ECONNABORTED;
--	}
-+	if (pdu_length + 4 > CIFSMaxBufSize + MAX_HEADER_SIZE(server))
-+		return receive_encrypted_read(server, mid);
+ #ifdef CONFIG_CIFS_SMB311
+@@ -1881,6 +2135,9 @@ struct smb_version_operations smb311_operations = {
+ 	.dir_needs_close = smb2_dir_needs_close,
+ 	.fallocate = smb3_fallocate,
+ 	.enum_snapshots = smb3_enum_snapshots,
++	.init_transform_rq = smb3_init_transform_rq,
++	.free_transform_rq = smb3_free_transform_rq,
++};
+ };
+ #endif /* CIFS_SMB311 */
  
- 	return receive_encrypted_standard(server, mid);
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index 35ff9fa..c03b252 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -134,11 +134,14 @@ struct smb2_pdu {
+ 	__le16 StructureSize2; /* size of wct area (varies, request specific) */
+ } __packed;
+ 
++#define SMB3_AES128CMM_NONCE 11
++#define SMB3_AES128GCM_NONCE 12
++
+ struct smb2_transform_hdr {
+ 	__be32 smb2_buf_length;	/* big endian on wire */
+ 				/* length is only two or three bytes - with
+ 				 one or two byte type preceding it that MBZ */
+-	__u8   ProtocolId[4];	/* 0xFD 'S' 'M' 'B' */
++	__le32 ProtocolId;	/* 0xFD 'S' 'M' 'B' */
+ 	__u8   Signature[16];
+ 	__u8   Nonce[16];
+ 	__le32 OriginalMessageSize;
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index f2d511a..7d30b75 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -56,6 +56,8 @@ extern void smb2_echo_request(struct work_struct *work);
+ extern __le32 smb2_get_lease_state(struct cifsInodeInfo *cinode);
+ extern bool smb2_is_valid_oplock_break(char *buffer,
+ 				       struct TCP_Server_Info *srv);
++extern struct cifs_ses *smb2_find_smb_ses(struct TCP_Server_Info *server,
++					  __u64 ses_id);
+ 
+ extern void move_smb2_info_to_cifs(FILE_ALL_INFO *dst,
+ 				   struct smb2_file_all_info *src);
+@@ -97,6 +99,7 @@ extern int smb2_unlock_range(struct cifsFileInfo *cfile,
+ 			     struct file_lock *flock, const unsigned int xid);
+ extern int smb2_push_mandatory_locks(struct cifsFileInfo *cfile);
+ extern void smb2_reconnect_server(struct work_struct *work);
++extern int smb3_crypto_aead_allocate(struct TCP_Server_Info *server);
+ 
+ /*
+  * SMB2 Worker functions - most of protocol specific implementation details
+diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+index 93b2775..3caa11d 100644
+--- a/fs/cifs/smb2transport.c
++++ b/fs/cifs/smb2transport.c
+@@ -31,6 +31,7 @@
+ #include <asm/processor.h>
+ #include <linux/mempool.h>
+ #include <linux/highmem.h>
++#include <crypto/aead.h>
+ #include "smb2pdu.h"
+ #include "cifsglob.h"
+ #include "cifsproto.h"
+@@ -114,14 +115,14 @@ smb3_crypto_shash_allocate(struct TCP_Server_Info *server)
+ 	return 0;
  }
+ 
+-static struct cifs_ses *
+-smb2_find_smb_ses(struct smb2_sync_hdr *shdr, struct TCP_Server_Info *server)
++struct cifs_ses *
++smb2_find_smb_ses(struct TCP_Server_Info *server, __u64 ses_id)
+ {
+ 	struct cifs_ses *ses;
+ 
+ 	spin_lock(&cifs_tcp_ses_lock);
+ 	list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
+-		if (ses->Suid != shdr->SessionId)
++		if (ses->Suid != ses_id)
+ 			continue;
+ 		spin_unlock(&cifs_tcp_ses_lock);
+ 		return ses;
+@@ -141,7 +142,7 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+ 	struct smb2_sync_hdr *shdr = (struct smb2_sync_hdr *)iov[1].iov_base;
+ 	struct cifs_ses *ses;
+ 
+-	ses = smb2_find_smb_ses(shdr, server);
++	ses = smb2_find_smb_ses(server, shdr->SessionId);
+ 	if (!ses) {
+ 		cifs_dbg(VFS, "%s: Could not find session\n", __func__);
+ 		return 0;
+@@ -358,7 +359,7 @@ smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+ 	struct smb2_sync_hdr *shdr = (struct smb2_sync_hdr *)iov[1].iov_base;
+ 	struct cifs_ses *ses;
+ 
+-	ses = smb2_find_smb_ses(shdr, server);
++	ses = smb2_find_smb_ses(server, shdr->SessionId);
+ 	if (!ses) {
+ 		cifs_dbg(VFS, "%s: Could not find session\n", __func__);
+ 		return 0;
+@@ -618,3 +619,33 @@ smb2_setup_async_request(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ 
+ 	return mid;
+ }
++
++int
++smb3_crypto_aead_allocate(struct TCP_Server_Info *server)
++{
++	struct crypto_aead *tfm;
++
++	if (!server->secmech.ccmaesencrypt) {
++		tfm = crypto_alloc_aead("ccm(aes)", 0, 0);
++		if (IS_ERR(tfm)) {
++			cifs_dbg(VFS, "%s: Failed to alloc encrypt aead\n",
++				 __func__);
++			return PTR_ERR(tfm);
++		}
++		server->secmech.ccmaesencrypt = tfm;
++	}
++
++	if (!server->secmech.ccmaesdecrypt) {
++		tfm = crypto_alloc_aead("ccm(aes)", 0, 0);
++		if (IS_ERR(tfm)) {
++			crypto_free_aead(server->secmech.ccmaesencrypt);
++			server->secmech.ccmaesencrypt = NULL;
++			cifs_dbg(VFS, "%s: Failed to alloc decrypt aead\n",
++				 __func__);
++			return PTR_ERR(tfm);
++		}
++		server->secmech.ccmaesdecrypt = tfm;
++	}
++
++	return 0;
++}
 -- 
 2.7.4
