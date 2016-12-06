@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: [PATCH 03/15] CIFS: Make send_cancel take rqst as argument
-Date: Tue,  6 Dec 2016 14:02:26 -0800
-Message-ID: <1481061758-52020-4-git-send-email-pshilov@microsoft.com>
+Subject: [PATCH 14/15] CIFS: Add capability to decrypt big read responses
+Date: Tue,  6 Dec 2016 14:02:37 -0800
+Message-ID: <1481061758-52020-15-git-send-email-pshilov@microsoft.com>
 References: <1481061758-52020-1-git-send-email-pshilov@microsoft.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -11,161 +11,265 @@ In-Reply-To: <1481061758-52020-1-git-send-email-pshilov-0li6OtcxBFHby3iVrkZq2A@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+Allow to decrypt transformed packets that are bigger than the big
+buffer size. In particular it is used for read responses that can
+only exceed the big buffer size.
+
 Signed-off-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 ---
- fs/cifs/cifsglob.h  |  2 +-
- fs/cifs/smb1ops.c   |  4 ++--
- fs/cifs/transport.c | 33 +++++++++++++++++++--------------
- 3 files changed, 22 insertions(+), 17 deletions(-)
+ fs/cifs/cifsproto.h |   1 +
+ fs/cifs/cifssmb.c   |   8 +--
+ fs/cifs/smb2ops.c   | 164 +++++++++++++++++++++++++++++++++++++++++++++++++---
+ 3 files changed, 160 insertions(+), 13 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 59ab5a2..4f4fffd 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -208,7 +208,7 @@ struct cifsInodeInfo;
- struct cifs_open_parms;
- 
- struct smb_version_operations {
--	int (*send_cancel)(struct TCP_Server_Info *, void *,
-+	int (*send_cancel)(struct TCP_Server_Info *, struct smb_rqst *,
- 			   struct mid_q_entry *);
- 	bool (*compare_fids)(struct cifsFileInfo *, struct cifsFileInfo *);
- 	/* setup request: allocate mid, sign message */
-diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index fc537c2..67a987e 100644
---- a/fs/cifs/smb1ops.c
-+++ b/fs/cifs/smb1ops.c
-@@ -36,11 +36,11 @@
-  * SMB_COM_NT_CANCEL request and then sends it.
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 0eb35d2..0dbafc8 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -76,6 +76,7 @@ extern void cifs_delete_mid(struct mid_q_entry *mid);
+ extern void cifs_wake_up_task(struct mid_q_entry *mid);
+ extern int cifs_handle_standard(struct TCP_Server_Info *server,
+ 				struct mid_q_entry *mid);
++extern int cifs_discard_remaining_data(struct TCP_Server_Info *server);
+ extern int cifs_call_async(struct TCP_Server_Info *server,
+ 			struct smb_rqst *rqst,
+ 			mid_receive_t *receive, mid_callback_t *callback,
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 8326212..5d9ad38 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -1399,8 +1399,8 @@ CIFS_open(const unsigned int xid, struct cifs_open_parms *oparms, int *oplock,
+  * Discard any remaining data in the current SMB. To do this, we borrow the
+  * current bigbuf.
   */
+-static int
+-discard_remaining_data(struct TCP_Server_Info *server)
++int
++cifs_discard_remaining_data(struct TCP_Server_Info *server)
+ {
+ 	unsigned int rfclen = get_rfc1002_length(server->smallbuf);
+ 	int remaining = rfclen + 4 - server->total_read;
+@@ -1426,7 +1426,7 @@ cifs_readv_discard(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+ 	int length;
+ 	struct cifs_readdata *rdata = mid->callback_data;
+ 
+-	length = discard_remaining_data(server);
++	length = cifs_discard_remaining_data(server);
+ 	dequeue_mid(mid, rdata->result);
+ 	return length;
+ }
+@@ -1459,7 +1459,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+ 
+ 	if (server->ops->is_status_pending &&
+ 	    server->ops->is_status_pending(buf, server, 0)) {
+-		discard_remaining_data(server);
++		cifs_discard_remaining_data(server);
+ 		return -1;
+ 	}
+ 
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 627096c..a27a234 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -1844,12 +1844,72 @@ decrypt_raw_data(struct TCP_Server_Info *server, char *buf,
+ }
+ 
  static int
--send_nt_cancel(struct TCP_Server_Info *server, void *buf,
-+send_nt_cancel(struct TCP_Server_Info *server, struct smb_rqst *rqst,
- 	       struct mid_q_entry *mid)
++read_data_into_pages(struct TCP_Server_Info *server, struct page **pages,
++		     unsigned int npages, unsigned int len)
++{
++	int i;
++	int length;
++
++	for (i = 0; i < npages; i++) {
++		struct page *page = pages[i];
++		size_t n;
++
++		n = len;
++		if (len >= PAGE_SIZE) {
++			/* enough data to fill the page */
++			n = PAGE_SIZE;
++			len -= n;
++		} else {
++			zero_user(page, len, PAGE_SIZE - len);
++			len = 0;
++		}
++		length = cifs_read_page_from_socket(server, page, n);
++		if (length < 0)
++			return length;
++		server->total_read += length;
++	}
++
++	return 0;
++}
++
++static int
++init_read_bvec(struct page **pages, unsigned int npages, unsigned int data_size,
++	       unsigned int cur_off, struct bio_vec **page_vec)
++{
++	struct bio_vec *bvec;
++	int i;
++
++	bvec = kcalloc(npages, sizeof(struct bio_vec), GFP_KERNEL);
++	if (!bvec)
++		return -EIO;
++
++	for (i = 0; i < npages; i++) {
++		bvec[i].bv_page = pages[i];
++		bvec[i].bv_offset = (i == 0) ? cur_off : 0;
++		bvec[i].bv_len = min_t(unsigned int, PAGE_SIZE, data_size);
++		data_size -= bvec[i].bv_len;
++	}
++
++	if (data_size != 0) {
++		cifs_dbg(VFS, "%s: something went wrong\n", __func__);
++		kfree(bvec);
++		return -EIO;
++	}
++
++	*page_vec = bvec;
++	return 0;
++}
++
++static int
+ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+ 		 char *buf, unsigned int buf_len, struct page **pages,
+ 		 unsigned int npages, unsigned int page_data_size)
  {
- 	int rc = 0;
--	struct smb_hdr *in_buf = (struct smb_hdr *)buf;
-+	struct smb_hdr *in_buf = (struct smb_hdr *)rqst->rq_iov[0].iov_base;
- 
- 	/* -4 for RFC1001 length and +2 for BCC field */
- 	in_buf->smb_buf_length = cpu_to_be32(sizeof(struct smb_hdr) - 4  + 2);
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index b9fad50..d59ebd0 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -595,10 +595,11 @@ cifs_sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *server)
- }
- 
- static inline int
--send_cancel(struct TCP_Server_Info *server, void *buf, struct mid_q_entry *mid)
-+send_cancel(struct TCP_Server_Info *server, struct smb_rqst *rqst,
-+	    struct mid_q_entry *mid)
- {
- 	return server->ops->send_cancel ?
--				server->ops->send_cancel(server, buf, mid) : 0;
-+				server->ops->send_cancel(server, rqst, mid) : 0;
- }
- 
- int
-@@ -718,7 +719,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
- 
- 	rc = wait_for_response(ses->server, midQ);
- 	if (rc != 0) {
--		send_cancel(ses->server, buf, midQ);
-+		send_cancel(ses->server, &rqst, midQ);
- 		spin_lock(&GlobalMid_Lock);
- 		if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
- 			midQ->callback = DeleteMidQEntry;
-@@ -771,6 +772,9 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- {
- 	int rc = 0;
- 	struct mid_q_entry *midQ;
-+	unsigned int len = be32_to_cpu(in_buf->smb_buf_length);
-+	struct kvec iov = { .iov_base = in_buf, .iov_len = len };
-+	struct smb_rqst rqst = { .rq_iov = &iov, .rq_nvec = 1 };
- 
- 	if (ses == NULL) {
- 		cifs_dbg(VFS, "Null smb session\n");
-@@ -788,10 +792,9 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 	   to the same server. We may make this configurable later or
- 	   use ses->maxReq */
- 
--	if (be32_to_cpu(in_buf->smb_buf_length) > CIFSMaxBufSize +
--			MAX_CIFS_HDR_SIZE - 4) {
-+	if (len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
- 		cifs_dbg(VFS, "Illegal length, greater than maximum frame, %d\n",
--			 be32_to_cpu(in_buf->smb_buf_length));
-+			 len);
- 		return -EIO;
+ 	unsigned int data_offset;
+ 	unsigned int data_len;
++	unsigned int cur_off;
++	unsigned int cur_page_idx;
++	unsigned int pad_len;
+ 	struct cifs_readdata *rdata = mid->callback_data;
+ 	struct smb2_sync_hdr *shdr = get_sync_hdr(buf);
+ 	struct bio_vec *bvec = NULL;
+@@ -1893,9 +1953,33 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+ 		return 0;
  	}
  
-@@ -822,7 +825,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 	midQ->mid_state = MID_REQUEST_SUBMITTED;
++	pad_len = data_offset - server->vals->read_rsp_size;
++
+ 	if (buf_len <= data_offset) {
+ 		/* read response payload is in pages */
+-		/* BB add code to init iter with pages */
++		cur_page_idx = pad_len / PAGE_SIZE;
++		cur_off = pad_len % PAGE_SIZE;
++
++		if (cur_page_idx != 0) {
++			/* data offset is beyond the 1st page of response */
++			cifs_dbg(FYI, "%s: data offset (%u) beyond 1st page of response\n",
++				 __func__, data_offset);
++			rdata->result = -EIO;
++			return 0;
++		}
++
++		if (data_len > page_data_size - pad_len) {
++			/* data_len is corrupt -- discard frame */
++			rdata->result = -EIO;
++			return 0;
++		}
++
++		rdata->result = init_read_bvec(pages, npages, page_data_size,
++					       cur_off, &bvec);
++		if (rdata->result != 0)
++			return 0;
++
++		iov_iter_bvec(&iter, WRITE | ITER_BVEC, bvec, npages, data_len);
+ 	} else if (buf_len >= data_offset + data_len) {
+ 		/* read response payload is in buf */
+ 		WARN_ONCE(npages > 0, "read data can be in buf of pages only");
+@@ -1929,6 +2013,74 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+ }
  
- 	cifs_in_send_inc(ses->server);
--	rc = smb_send(ses->server, in_buf, be32_to_cpu(in_buf->smb_buf_length));
-+	rc = smb_send(ses->server, in_buf, len);
- 	cifs_in_send_dec(ses->server);
- 	cifs_save_when_sent(midQ);
- 
-@@ -839,7 +842,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 
- 	rc = wait_for_response(ses->server, midQ);
- 	if (rc != 0) {
--		send_cancel(ses->server, in_buf, midQ);
-+		send_cancel(ses->server, &rqst, midQ);
- 		spin_lock(&GlobalMid_Lock);
- 		if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
- 			/* no longer considered to be "in-flight" */
-@@ -908,6 +911,9 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 	int rstart = 0;
- 	struct mid_q_entry *midQ;
- 	struct cifs_ses *ses;
-+	unsigned int len = be32_to_cpu(in_buf->smb_buf_length);
-+	struct kvec iov = { .iov_base = in_buf, .iov_len = len };
-+	struct smb_rqst rqst = { .rq_iov = &iov, .rq_nvec = 1 };
- 
- 	if (tcon == NULL || tcon->ses == NULL) {
- 		cifs_dbg(VFS, "Null smb session\n");
-@@ -927,10 +933,9 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 	   to the same server. We may make this configurable later or
- 	   use ses->maxReq */
- 
--	if (be32_to_cpu(in_buf->smb_buf_length) > CIFSMaxBufSize +
--			MAX_CIFS_HDR_SIZE - 4) {
-+	if (len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
- 		cifs_dbg(VFS, "Illegal length, greater than maximum frame, %d\n",
--			 be32_to_cpu(in_buf->smb_buf_length));
-+			 len);
- 		return -EIO;
+ static int
++receive_encrypted_read(struct TCP_Server_Info *server, struct mid_q_entry **mid)
++{
++	char *buf = server->smallbuf;
++	struct smb2_transform_hdr *tr_hdr = (struct smb2_transform_hdr *)buf;
++	unsigned int npages;
++	struct page **pages;
++	unsigned int len;
++	unsigned int buflen = get_rfc1002_length(buf) + 4;
++	int rc;
++	int i;
++
++	len = min_t(unsigned int, buflen, server->vals->read_rsp_size - 4 +
++		sizeof(struct smb2_transform_hdr)) - HEADER_SIZE(server) + 1;
++
++	rc = cifs_read_from_socket(server, buf + HEADER_SIZE(server) - 1, len);
++	if (rc < 0)
++		return rc;
++	server->total_read += rc;
++
++	len = le32_to_cpu(tr_hdr->OriginalMessageSize) + 4 -
++						server->vals->read_rsp_size;
++	npages = DIV_ROUND_UP(len, PAGE_SIZE);
++
++	pages = kmalloc_array(npages, sizeof(struct page *), GFP_KERNEL);
++	if (!pages)
++		return -ENOMEM;
++
++	for (i = 0; i < npages; i++) {
++		pages[i] = alloc_page(GFP_KERNEL|__GFP_HIGHMEM);
++		if (!pages[i]) {
++			rc = -ENOMEM;
++			goto free_pages;
++		}
++	}
++
++	/* read read data into pages */
++	rc = read_data_into_pages(server, pages, npages, len);
++	if (rc)
++		goto free_pages;
++
++	rc = cifs_discard_remaining_data(server);
++	if (rc)
++		goto free_pages;
++
++	rc = decrypt_raw_data(server, buf, server->vals->read_rsp_size - 4,
++			      pages, npages, len);
++	if (rc)
++		goto free_pages;
++
++	*mid = smb2_find_mid(server, buf);
++	if (*mid == NULL)
++		cifs_dbg(FYI, "mid not found\n");
++	else {
++		cifs_dbg(FYI, "mid found\n");
++		(*mid)->decrypted = true;
++		rc = handle_read_data(server, *mid, buf,
++				      server->vals->read_rsp_size,
++				      pages, npages, len);
++	}
++
++free_pages:
++	for (i = i - 1; i >= 0; i--)
++		put_page(pages[i]);
++	kfree(pages);
++	return rc;
++}
++
++static int
+ receive_encrypted_standard(struct TCP_Server_Info *server,
+ 			   struct mid_q_entry **mid)
+ {
+@@ -1997,14 +2149,8 @@ smb3_receive_transform(struct TCP_Server_Info *server, struct mid_q_entry **mid)
+ 		return -ECONNABORTED;
  	}
  
-@@ -959,7 +964,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
+-	if (pdu_length + 4 > CIFSMaxBufSize + MAX_HEADER_SIZE(server)) {
+-		cifs_dbg(VFS, "Decoding responses of big size (%u) is not supported\n",
+-			 pdu_length);
+-		/* BB add code to allocate and fill highmem pages here */
+-		cifs_reconnect(server);
+-		wake_up(&server->response_q);
+-		return -ECONNABORTED;
+-	}
++	if (pdu_length + 4 > CIFSMaxBufSize + MAX_HEADER_SIZE(server))
++		return receive_encrypted_read(server, mid);
  
- 	midQ->mid_state = MID_REQUEST_SUBMITTED;
- 	cifs_in_send_inc(ses->server);
--	rc = smb_send(ses->server, in_buf, be32_to_cpu(in_buf->smb_buf_length));
-+	rc = smb_send(ses->server, in_buf, len);
- 	cifs_in_send_dec(ses->server);
- 	cifs_save_when_sent(midQ);
- 
-@@ -988,7 +993,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 		if (in_buf->Command == SMB_COM_TRANSACTION2) {
- 			/* POSIX lock. We send a NT_CANCEL SMB to cause the
- 			   blocking lock to return. */
--			rc = send_cancel(ses->server, in_buf, midQ);
-+			rc = send_cancel(ses->server, &rqst, midQ);
- 			if (rc) {
- 				cifs_delete_mid(midQ);
- 				return rc;
-@@ -1009,7 +1014,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 
- 		rc = wait_for_response(ses->server, midQ);
- 		if (rc) {
--			send_cancel(ses->server, in_buf, midQ);
-+			send_cancel(ses->server, &rqst, midQ);
- 			spin_lock(&GlobalMid_Lock);
- 			if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
- 				/* no longer considered to be "in-flight" */
+ 	return receive_encrypted_standard(server, mid);
+ }
 -- 
 2.7.4
