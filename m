@@ -1,58 +1,104 @@
-From: Michal Hocko <mhocko@kernel.org>
-Subject: Re: LSF/MM 2017: Call for Proposals
-Date: Thu, 8 Dec 2016 16:37:40 +0100
-Message-ID: <20161208153740.GF26530@dhcp22.suse.cz>
-References: <1480601506.2511.7.camel@poochiereds.net>
- <1481122626.2354.14.camel@HansenPartnership.com>
- <20161208122619.GA26535@dhcp22.suse.cz>
- <1481211043.2361.1.camel@HansenPartnership.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Jeff Layton <jlayton@poochiereds.net>, linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, linux-nfs@vger.kernel.org,
-	linux-scsi@vger.kernel.org, "xfs@oss.sgi.com" <xfs@oss.sgi.com>,
-	ceph-devel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>
-To: James Bottomley <James.Bottomley@HansenPartnership.com>
-Return-path: <owner-linux-mm@kvack.org>
-Content-Disposition: inline
-In-Reply-To: <1481211043.2361.1.camel@HansenPartnership.com>
-Sender: owner-linux-mm@kvack.org
+From: Andy Lutomirski <luto@kernel.org>
+Subject: [PATCH] cifs: Fix smbencrypt() to stop pointing a scatterlist at the stack
+Date: Mon, 12 Dec 2016 12:54:37 -0800
+Message-ID: <308cdb484648f98f6f0ad9feefd8acb2fe003aaf.1481575835.git.luto@kernel.org>
+References: <8c273c9c41f51b34bb3115086f1d776895580637.1481575835.git.luto@kernel.org>
+Cc: Eric Biggers <ebiggers3@gmail.com>, linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Stephan Mueller <smueller@chronox.de>,
+        linux-cifs@vger.kernel.org, Andy Lutomirski <luto@kernel.org>
+To: linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+        sfrench@samba.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <8c273c9c41f51b34bb3115086f1d776895580637.1481575835.git.luto@kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Thu 08-12-16 07:30:43, James Bottomley wrote:
-> On Thu, 2016-12-08 at 13:26 +0100, Michal Hocko wrote:
-> > On Wed 07-12-16 06:57:06, James Bottomley wrote:
-> > [...]
-> > > Just on this point, since there seems to be a lot of confusion: lsf
-> > > -pc
-> > > is the list for contacting the programme committee, so you cannot
-> > > subscribe to it.
-> > > 
-> > > There is no -discuss equivalent, like kernel summit has, because we
-> > > expect you to cc the relevant existing mailing list and have the
-> > > discussion there instead rather than expecting people to subscribe
-> > > to a
-> > > new list.
-> > 
-> > There used to be lsf@lists.linux-foundation.org. Is it not active
-> > anymore?
-> 
-> Not until we get the list of invitees sorted out.  And then it's only
-> for stuff actually to do with lsf (like logistics, bof or session
-> requests or other meetups).  Any technical stuff should still be cc'd
-> to the relevant mailing list.
+smbencrypt() points a scatterlist to the stack, which is breaks if
+CONFIG_VMAP_STACK=y.
 
-OK, I tend to forget about that. Thanks for the clarification!
+Fix it by switching to crypto_cipher_encrypt_one().  The new code
+should be considerably faster as an added benefit.
+
+This code is nearly identical to some code that Eric Biggers
+suggested.
+
+Cc: stable@vger.kernel.org # 4.9 only
+Reported-by: Eric Biggers <ebiggers3@gmail.com>
+Signed-off-by: Andy Lutomirski <luto@kernel.org>
+---
+
+Compile-tested only.
+
+fs/cifs/smbencrypt.c | 40 ++++++++--------------------------------
+ 1 file changed, 8 insertions(+), 32 deletions(-)
+
+diff --git a/fs/cifs/smbencrypt.c b/fs/cifs/smbencrypt.c
+index 699b7868108f..c12bffefa3c9 100644
+--- a/fs/cifs/smbencrypt.c
++++ b/fs/cifs/smbencrypt.c
+@@ -23,7 +23,7 @@
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+ 
+-#include <crypto/skcipher.h>
++#include <linux/crypto.h>
+ #include <linux/module.h>
+ #include <linux/slab.h>
+ #include <linux/fs.h>
+@@ -69,46 +69,22 @@ str_to_key(unsigned char *str, unsigned char *key)
+ static int
+ smbhash(unsigned char *out, const unsigned char *in, unsigned char *key)
+ {
+-	int rc;
+ 	unsigned char key2[8];
+-	struct crypto_skcipher *tfm_des;
+-	struct scatterlist sgin, sgout;
+-	struct skcipher_request *req;
++	struct crypto_cipher *tfm_des;
+ 
+ 	str_to_key(key, key2);
+ 
+-	tfm_des = crypto_alloc_skcipher("ecb(des)", 0, CRYPTO_ALG_ASYNC);
++	tfm_des = crypto_alloc_cipher("des", 0, 0);
+ 	if (IS_ERR(tfm_des)) {
+-		rc = PTR_ERR(tfm_des);
+-		cifs_dbg(VFS, "could not allocate des crypto API\n");
+-		goto smbhash_err;
+-	}
+-
+-	req = skcipher_request_alloc(tfm_des, GFP_KERNEL);
+-	if (!req) {
+-		rc = -ENOMEM;
+ 		cifs_dbg(VFS, "could not allocate des crypto API\n");
+-		goto smbhash_free_skcipher;
++		return PTR_ERR(tfm_des);
+ 	}
+ 
+-	crypto_skcipher_setkey(tfm_des, key2, 8);
+-
+-	sg_init_one(&sgin, in, 8);
+-	sg_init_one(&sgout, out, 8);
++	crypto_cipher_setkey(tfm_des, key2, 8);
++	crypto_cipher_encrypt_one(tfm_des, out, in);
++	crypto_free_cipher(tfm_des);
+ 
+-	skcipher_request_set_callback(req, 0, NULL, NULL);
+-	skcipher_request_set_crypt(req, &sgin, &sgout, 8, NULL);
+-
+-	rc = crypto_skcipher_encrypt(req);
+-	if (rc)
+-		cifs_dbg(VFS, "could not encrypt crypt key rc: %d\n", rc);
+-
+-	skcipher_request_free(req);
+-
+-smbhash_free_skcipher:
+-	crypto_free_skcipher(tfm_des);
+-smbhash_err:
+-	return rc;
++	return 0;
+ }
+ 
+ static int
 -- 
-Michal Hocko
-SUSE Labs
-
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+2.9.3
