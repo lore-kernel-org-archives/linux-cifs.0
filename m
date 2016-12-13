@@ -1,26 +1,63 @@
-From: "Wang, Zhiye" <Zhiye.Wang-PfGy2FtcwjRWk0Htik3J/w@public.gmane.org>
-Subject: Access samba share which underlying storage is very slow
-Date: Tue, 13 Dec 2016 13:35:32 +0000
-Message-ID: <CY4PR10MB1591B4B85ED8A29DE16CA5D7E49B0@CY4PR10MB1591.namprd10.prod.outlook.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Fwd: Access samba share which underlying storage is very slow
+Date: Tue, 13 Dec 2016 11:23:07 -0600
+Message-ID: <CAH2r5ms08XDuGowmqySdwhg6PqeFm7ipKj9Za1QJTC41jUYQUg@mail.gmail.com>
+References: <CY4PR10MB1591B4B85ED8A29DE16CA5D7E49B0@CY4PR10MB1591.namprd10.prod.outlook.com>
+ <CAH2r5mszkDE9pEF3D-Qsv0ek=n1SkpBRsm9ZdipgyFqUA8n=4w@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Language: zh-CN
+In-Reply-To: <CAH2r5mszkDE9pEF3D-Qsv0ek=n1SkpBRsm9ZdipgyFqUA8n=4w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-RGVhciBhbGwsDQoNCkkgdXNlIFNhbWJhIHRvIHNoYXJlIEZVU0UgYmFzZWQgZmlsZSBzeXN0ZW0g
-d2hpY2ggdW5kZXJseWluZyBzdG9yYWdlIGlzIHZlcnkgc2xvdyBzb21ldGltZXMgKG5vdCBhbHdh
-eXMpLiBSZWFkL1dyaXRlL09wZW4gc29tZXRpbWVzIG1heSB0YWtlIHNldmVyYWwgbWludXRlcy4g
-QW5kIGVzcGVjaWFsbHksICJ3cml0ZSIgbXVzdCBiZSBpbiBzZXF1ZW50aWFsIG1hbm5lci4gQW5k
-ICJ3cml0ZSB0byBmaWxlIiBjYW5ub3QgYnJlYWsgaW4gdGhlIG1pZGRsZSBvZiBhIGZpbGUgKG11
-Y2ggbGlrZSB0YXBlKS4NCg0KQWxsIHRoYXQgYXJlIG9rIGZvciBTYW1iYSwgYnV0IGl0IHNlZW1z
-IHRvIGJlIGEgcHJvYmxlbSBmb3IgQ0lGUyBvbiBjbGllbnQgc2lkZS4gSXQgc2VlbXMgb3BlcmF0
-aW9ucyB0aW1lb3V0IGFyZSBhbGwgaGFyZGNvZGVkLCBhbmQgY2Fubm90IGJlIGFkanVzdGVkIGR1
-cmluZyBtb3VudC4gQWZ0ZXIgdGltZW91dCwgQ0lGUyBjbGllbnQgd2lsbCByZWNvbm5lY3QgYW5k
-IHRoZW4gcmVzdW1lICJ3cml0ZSIgZnJvbSB3aGVyZSBpcyBicm9rZW4gKGJ1dCB0aGlzIGlzIG5v
-dCBhY2NlcHRhYmxlIGZvciBteSBjYXNlKS4NCg0KSXMgdGhlcmUgYSB3YXkgdG8gbWFrZSBDSUZT
-IGNsaWVudCBibG9jayBhdCBzbG93IG9wZXJhdGlvbnMgd2l0aG91dCB0aW1lb3V0Pw0KDQoNClRo
-YW5rcw0KTWlrZQ0KDQoNCg==
+---------- Forwarded message ----------
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Date: Tue, Dec 13, 2016 at 11:20 AM
+Subject: Re: Access samba share which underlying storage is very slow
+To: "Wang, Zhiye" <Zhiye.Wang-gYDOmNCWHYlWk0Htik3J/w@public.gmane.org>
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+
+
+there is a "hard" mount option and the "echo" timeout can be adjusted on mo=
+unt
+
+On Tue, Dec 13, 2016 at 7:35 AM, Wang, Zhiye <Zhiye.Wang-gYDOmNCWHYlWk0Htik3J/w@public.gmane.org> wrot=
+e:
+>
+> Dear all,
+>
+> I use Samba to share FUSE based file system which underlying storage is v=
+ery slow sometimes (not always). Read/Write/Open sometimes may take several=
+ minutes. And especially, "write" must be in sequential manner. And "write =
+to file" cannot break in the middle of a file (much like tape).
+>
+> All that are ok for Samba, but it seems to be a problem for CIFS on clien=
+t side. It seems operations timeout are all hardcoded, and cannot be adjust=
+ed during mount. After timeout, CIFS client will reconnect and then resume =
+"write" from where is broken (but this is not acceptable for my case).
+>
+> Is there a way to make CIFS client block at slow operations without timeo=
+ut?
+>
+>
+> Thanks
+> Mike
+>
+>
+
+
+
+--=20
+Thanks,
+
+Steve
+
+
+
+--=20
+Thanks,
+
+Steve
