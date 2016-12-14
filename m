@@ -1,28 +1,48 @@
-From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aurelien.aptel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs_get_root shouldn't use path with tree name
-Date: Wed, 14 Dec 2016 10:55:45 +0100
-Message-ID: <mpsd1gusula.fsf@suse.com>
-References: <1473260003-5271-1-git-send-email-sprabhu@redhat.com> <1481632417.2630.13.camel@redhat.com> <1481634390.2630.16.camel@redhat.com>
+From: "Wang, Zhiye" <Zhiye.Wang-PfGy2FtcwjRWk0Htik3J/w@public.gmane.org>
+Subject: RE: Access samba share which underlying storage is very slow
+Date: Wed, 14 Dec 2016 14:05:58 +0000
+Message-ID: <CY4PR10MB159109A9F879DD7834B93FBEE49A0@CY4PR10MB1591.namprd10.prod.outlook.com>
+References: <CY4PR10MB1591B4B85ED8A29DE16CA5D7E49B0@CY4PR10MB1591.namprd10.prod.outlook.com>,<CAH2r5mszkDE9pEF3D-Qsv0ek=n1SkpBRsm9ZdipgyFqUA8n=4w@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1481634390.2630.16.camel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <CAH2r5mszkDE9pEF3D-Qsv0ek=n1SkpBRsm9ZdipgyFqUA8n=4w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Language: zh-CN
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> writes:
-> On Tue, 2016-12-13 at 07:33 -0500, Jeff Layton wrote:
-> I think is this a reasonable fix for now. That said, this whole Rube
-> Goldberg contraption could really use a serious re-think, IMO...
-
-Indeed. I find cifs_mount() in particular really hard to follow.
-
--- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
-GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+VGhhbmsgeW91IGZvciB0aGUgaW5mb3JtYXRpb24uDQoNCiJoYXJkIiBzZWVtcyBhIGdvb2Qgb3B0
+aW9uIGZvciBtZS4gSSB3aWxsIGRvIG1vcmUgdGVzdC4NCg0KQXMgdG8gImVjaG8iIHRpbWVvdXQs
+IGFyZSB5b3UgcmVmZXJyaW5nICJlY2hvX2ludGVydmFsIj8gSXQgc2VlbXMgdGhpcyBvcHRpb24g
+d2FzIGltcGxlbWVudGVkIHByZXR0eSBsYXRlLCBhbmQgb25seSBtb3N0IHJlY2VudCBMaW51eCBk
+aXN0cmlidXRpb25zIGluY2x1ZGUgaXRzIHN1cHBvcnQuDQoNCkJlc2lkZXMgdGhhdCwgSSBoYXZl
+IGFscmVhZHkgY29uZmlndXJlZCBzYW1iYSBzZXJ2ZXIgdG8gc2VydmUgImVjaG8iIHJlcXVlc3Qg
+aW4gc2VwYXJhdGVkIHByb2Nlc3MoImFzeW5jIHNtYiBlY2hvIGhhbmRsZXIgPSB5ZXMiLCBzbyAi
+ZWNobyIgc2VydmVyIHdpbGwgbm90IGJlIGJsb2NrZWQgYnkgIm9wZW4vcmVhZC93cml0ZSIgb3Bl
+cmF0aW9ucyksIGJ1dCBJIGNhbiBzdGlsbCBzZWUgd2FybmluZyBiZWxvdyBvbiBjbGllbnQgc2lk
+ZToNCg0KWzYyMDQyMi41NzAxMjhdIENJRlMgVkZTOiBTZXJ2ZXIgMTAuNTcuMzMuMTM0IGhhcyBu
+b3QgcmVzcG9uZGVkIGluIDEyMCBzZWNvbmRzLiBSZWNvbm5lY3RpbmcuLi4NCg0KDQpEbyB5b3Ug
+aGF2ZSBhbnkgc3VnZ2VzdGlvbiBvbiB0aGlzPw0KDQoNClRoYW5rcw0KTWlrZQ0KDQoNCg0KDQoN
+CuWPkeS7tuS6ujogU3RldmUgRnJlbmNoIDxzbWZyZW5jaEBnbWFpbC5jb20+DQrlj5HpgIHml7bp
+l7Q6IDIwMTblubQxMuaciDE05pelIDE6MjANCuaUtuS7tuS6ujogV2FuZywgWmhpeWUNCuaKhOmA
+gTogbGludXgtY2lmc0B2Z2VyLmtlcm5lbC5vcmcNCuS4u+mimDogUmU6IEFjY2VzcyBzYW1iYSBz
+aGFyZSB3aGljaCB1bmRlcmx5aW5nIHN0b3JhZ2UgaXMgdmVyeSBzbG93DQrCoCANCg0KdGhlcmUg
+aXMgYSAiaGFyZCIgbW91bnQgb3B0aW9uIGFuZCB0aGUgImVjaG8iIHRpbWVvdXQgY2FuIGJlIGFk
+anVzdGVkIG9uIG1vdW50DQoNCg0KT24gVHVlLCBEZWMgMTMsIDIwMTYgYXQgNzozNSBBTSwgV2Fu
+ZywgWmhpeWUgIDxaaGl5ZS5XYW5nQGFyY3NlcnZlLmNvbT4gd3JvdGU6DQogRGVhciBhbGwsDQoN
+CkkgdXNlIFNhbWJhIHRvIHNoYXJlIEZVU0UgYmFzZWQgZmlsZSBzeXN0ZW0gd2hpY2ggdW5kZXJs
+eWluZyBzdG9yYWdlIGlzIHZlcnkgc2xvdyBzb21ldGltZXMgKG5vdCBhbHdheXMpLiBSZWFkL1dy
+aXRlL09wZW4gc29tZXRpbWVzIG1heSB0YWtlIHNldmVyYWwgbWludXRlcy4gQW5kIGVzcGVjaWFs
+bHksICJ3cml0ZSIgbXVzdCBiZSBpbiBzZXF1ZW50aWFsIG1hbm5lci4gQW5kICJ3cml0ZSB0byBm
+aWxlIiBjYW5ub3QgYnJlYWsgaW4gdGhlIG1pZGRsZSAgb2YgYSBmaWxlIChtdWNoIGxpa2UgdGFw
+ZSkuDQoNCkFsbCB0aGF0IGFyZSBvayBmb3IgU2FtYmEsIGJ1dCBpdCBzZWVtcyB0byBiZSBhIHBy
+b2JsZW0gZm9yIENJRlMgb24gY2xpZW50IHNpZGUuIEl0IHNlZW1zIG9wZXJhdGlvbnMgdGltZW91
+dCBhcmUgYWxsIGhhcmRjb2RlZCwgYW5kIGNhbm5vdCBiZSBhZGp1c3RlZCBkdXJpbmcgbW91bnQu
+IEFmdGVyIHRpbWVvdXQsIENJRlMgY2xpZW50IHdpbGwgcmVjb25uZWN0IGFuZCB0aGVuIHJlc3Vt
+ZSAid3JpdGUiIGZyb20gd2hlcmUgaXMgYnJva2VuIChidXQgIHRoaXMgaXMgbm90IGFjY2VwdGFi
+bGUgZm9yIG15IGNhc2UpLg0KDQpJcyB0aGVyZSBhIHdheSB0byBtYWtlIENJRlMgY2xpZW50IGJs
+b2NrIGF0IHNsb3cgb3BlcmF0aW9ucyB3aXRob3V0IHRpbWVvdXQ/DQoNCg0KVGhhbmtzDQpNaWtl
+DQoNCg0KIA0KDQoNCg0KIC0tIA0KDQpUaGFua3MsDQoNClN0ZXZlICAgICA=
