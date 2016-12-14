@@ -1,63 +1,126 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Fwd: Access samba share which underlying storage is very slow
-Date: Tue, 13 Dec 2016 11:23:07 -0600
-Message-ID: <CAH2r5ms08XDuGowmqySdwhg6PqeFm7ipKj9Za1QJTC41jUYQUg@mail.gmail.com>
-References: <CY4PR10MB1591B4B85ED8A29DE16CA5D7E49B0@CY4PR10MB1591.namprd10.prod.outlook.com>
- <CAH2r5mszkDE9pEF3D-Qsv0ek=n1SkpBRsm9ZdipgyFqUA8n=4w@mail.gmail.com>
+Subject: Re: [PATCH] cifs: Fix smbencrypt() to stop pointing a scatterlist at
+ the stack
+Date: Wed, 14 Dec 2016 02:19:03 -0600
+Message-ID: <CAH2r5muqOnVQSm2br+aOURinLMJ9bqax5RCL_TYK2FXMSj-cZw@mail.gmail.com>
+References: <8c273c9c41f51b34bb3115086f1d776895580637.1481575835.git.luto@kernel.org>
+ <308cdb484648f98f6f0ad9feefd8acb2fe003aaf.1481575835.git.luto@kernel.org> <1481634464.2630.17.camel@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: Andy Lutomirski <luto-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>,
+        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mszkDE9pEF3D-Qsv0ek=n1SkpBRsm9ZdipgyFqUA8n=4w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1481634464.2630.17.camel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
----------- Forwarded message ----------
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Date: Tue, Dec 13, 2016 at 11:20 AM
-Subject: Re: Access samba share which underlying storage is very slow
-To: "Wang, Zhiye" <Zhiye.Wang-gYDOmNCWHYlWk0Htik3J/w@public.gmane.org>
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+merged into cifs-2.6.git for-next
 
-
-there is a "hard" mount option and the "echo" timeout can be adjusted on mo=
-unt
-
-On Tue, Dec 13, 2016 at 7:35 AM, Wang, Zhiye <Zhiye.Wang-gYDOmNCWHYlWk0Htik3J/w@public.gmane.org> wrot=
-e:
+On Tue, Dec 13, 2016 at 7:07 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> On Mon, 2016-12-12 at 12:54 -0800, Andy Lutomirski wrote:
+>> smbencrypt() points a scatterlist to the stack, which is breaks if
+>> CONFIG_VMAP_STACK=y.
+>>
+>> Fix it by switching to crypto_cipher_encrypt_one().  The new code
+>> should be considerably faster as an added benefit.
+>>
+>> This code is nearly identical to some code that Eric Biggers
+>> suggested.
+>>
+>> Cc: stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org # 4.9 only
+>> Reported-by: Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>> Signed-off-by: Andy Lutomirski <luto-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+>> ---
+>>
+>> Compile-tested only.
+>>
+>> fs/cifs/smbencrypt.c | 40 ++++++++--------------------------------
+>>  1 file changed, 8 insertions(+), 32 deletions(-)
+>>
+>> diff --git a/fs/cifs/smbencrypt.c b/fs/cifs/smbencrypt.c
+>> index 699b7868108f..c12bffefa3c9 100644
+>> --- a/fs/cifs/smbencrypt.c
+>> +++ b/fs/cifs/smbencrypt.c
+>> @@ -23,7 +23,7 @@
+>>     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+>>  */
+>>
+>> -#include <crypto/skcipher.h>
+>> +#include <linux/crypto.h>
+>>  #include <linux/module.h>
+>>  #include <linux/slab.h>
+>>  #include <linux/fs.h>
+>> @@ -69,46 +69,22 @@ str_to_key(unsigned char *str, unsigned char *key)
+>>  static int
+>>  smbhash(unsigned char *out, const unsigned char *in, unsigned char *key)
+>>  {
+>> -     int rc;
+>>       unsigned char key2[8];
+>> -     struct crypto_skcipher *tfm_des;
+>> -     struct scatterlist sgin, sgout;
+>> -     struct skcipher_request *req;
+>> +     struct crypto_cipher *tfm_des;
+>>
+>>       str_to_key(key, key2);
+>>
+>> -     tfm_des = crypto_alloc_skcipher("ecb(des)", 0, CRYPTO_ALG_ASYNC);
+>> +     tfm_des = crypto_alloc_cipher("des", 0, 0);
+>>       if (IS_ERR(tfm_des)) {
+>> -             rc = PTR_ERR(tfm_des);
+>> -             cifs_dbg(VFS, "could not allocate des crypto API\n");
+>> -             goto smbhash_err;
+>> -     }
+>> -
+>> -     req = skcipher_request_alloc(tfm_des, GFP_KERNEL);
+>> -     if (!req) {
+>> -             rc = -ENOMEM;
+>>               cifs_dbg(VFS, "could not allocate des crypto API\n");
+>> -             goto smbhash_free_skcipher;
+>> +             return PTR_ERR(tfm_des);
+>>       }
+>>
+>> -     crypto_skcipher_setkey(tfm_des, key2, 8);
+>> -
+>> -     sg_init_one(&sgin, in, 8);
+>> -     sg_init_one(&sgout, out, 8);
+>> +     crypto_cipher_setkey(tfm_des, key2, 8);
+>> +     crypto_cipher_encrypt_one(tfm_des, out, in);
+>> +     crypto_free_cipher(tfm_des);
+>>
+>> -     skcipher_request_set_callback(req, 0, NULL, NULL);
+>> -     skcipher_request_set_crypt(req, &sgin, &sgout, 8, NULL);
+>> -
+>> -     rc = crypto_skcipher_encrypt(req);
+>> -     if (rc)
+>> -             cifs_dbg(VFS, "could not encrypt crypt key rc: %d\n", rc);
+>> -
+>> -     skcipher_request_free(req);
+>> -
+>> -smbhash_free_skcipher:
+>> -     crypto_free_skcipher(tfm_des);
+>> -smbhash_err:
+>> -     return rc;
+>> +     return 0;
+>>  }
+>>
+>>  static int
 >
-> Dear all,
->
-> I use Samba to share FUSE based file system which underlying storage is v=
-ery slow sometimes (not always). Read/Write/Open sometimes may take several=
- minutes. And especially, "write" must be in sequential manner. And "write =
-to file" cannot break in the middle of a file (much like tape).
->
-> All that are ok for Samba, but it seems to be a problem for CIFS on clien=
-t side. It seems operations timeout are all hardcoded, and cannot be adjust=
-ed during mount. After timeout, CIFS client will reconnect and then resume =
-"write" from where is broken (but this is not acceptable for my case).
->
-> Is there a way to make CIFS client block at slow operations without timeo=
-ut?
->
->
-> Thanks
-> Mike
->
->
+> Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 
---=20
-Thanks,
-
-Steve
-
-
-
---=20
+-- 
 Thanks,
 
 Steve
