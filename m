@@ -1,48 +1,67 @@
-From: "Wang, Zhiye" <Zhiye.Wang-PfGy2FtcwjRWk0Htik3J/w@public.gmane.org>
-Subject: RE: Access samba share which underlying storage is very slow
-Date: Wed, 14 Dec 2016 14:05:58 +0000
-Message-ID: <CY4PR10MB159109A9F879DD7834B93FBEE49A0@CY4PR10MB1591.namprd10.prod.outlook.com>
-References: <CY4PR10MB1591B4B85ED8A29DE16CA5D7E49B0@CY4PR10MB1591.namprd10.prod.outlook.com>,<CAH2r5mszkDE9pEF3D-Qsv0ek=n1SkpBRsm9ZdipgyFqUA8n=4w@mail.gmail.com>
+From: Pavel Shilovsky <piastryyy@gmail.com>
+Subject: Re: [PATCH] cifs: use %16phN for formatting md5 sum
+Date: Wed, 14 Dec 2016 11:46:44 -0800
+Message-ID: <CAKywueSq_W0Ud2GXBanRK-F-kgaqh1b-+awUNt75ctwtwj3Bvg@mail.gmail.com>
+References: <1480545633-2675-1-git-send-email-linux@rasmusvillemoes.dk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mszkDE9pEF3D-Qsv0ek=n1SkpBRsm9ZdipgyFqUA8n=4w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Content-Language: zh-CN
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Steve French <sfrench@samba.org>, linux-cifs <linux-cifs@vger.kernel.org>,
+ samba-technical <samba-technical@lists.samba.org>,
+ Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Return-path: <samba-technical-bounces@lists.samba.org>
+In-Reply-To: <1480545633-2675-1-git-send-email-linux@rasmusvillemoes.dk>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
+ <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical/>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
+ <mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Errors-To: samba-technical-bounces@lists.samba.org
+Sender: "samba-technical" <samba-technical-bounces@lists.samba.org>
+List-Id: linux-cifs.vger.kernel.org
 
-VGhhbmsgeW91IGZvciB0aGUgaW5mb3JtYXRpb24uDQoNCiJoYXJkIiBzZWVtcyBhIGdvb2Qgb3B0
-aW9uIGZvciBtZS4gSSB3aWxsIGRvIG1vcmUgdGVzdC4NCg0KQXMgdG8gImVjaG8iIHRpbWVvdXQs
-IGFyZSB5b3UgcmVmZXJyaW5nICJlY2hvX2ludGVydmFsIj8gSXQgc2VlbXMgdGhpcyBvcHRpb24g
-d2FzIGltcGxlbWVudGVkIHByZXR0eSBsYXRlLCBhbmQgb25seSBtb3N0IHJlY2VudCBMaW51eCBk
-aXN0cmlidXRpb25zIGluY2x1ZGUgaXRzIHN1cHBvcnQuDQoNCkJlc2lkZXMgdGhhdCwgSSBoYXZl
-IGFscmVhZHkgY29uZmlndXJlZCBzYW1iYSBzZXJ2ZXIgdG8gc2VydmUgImVjaG8iIHJlcXVlc3Qg
-aW4gc2VwYXJhdGVkIHByb2Nlc3MoImFzeW5jIHNtYiBlY2hvIGhhbmRsZXIgPSB5ZXMiLCBzbyAi
-ZWNobyIgc2VydmVyIHdpbGwgbm90IGJlIGJsb2NrZWQgYnkgIm9wZW4vcmVhZC93cml0ZSIgb3Bl
-cmF0aW9ucyksIGJ1dCBJIGNhbiBzdGlsbCBzZWUgd2FybmluZyBiZWxvdyBvbiBjbGllbnQgc2lk
-ZToNCg0KWzYyMDQyMi41NzAxMjhdIENJRlMgVkZTOiBTZXJ2ZXIgMTAuNTcuMzMuMTM0IGhhcyBu
-b3QgcmVzcG9uZGVkIGluIDEyMCBzZWNvbmRzLiBSZWNvbm5lY3RpbmcuLi4NCg0KDQpEbyB5b3Ug
-aGF2ZSBhbnkgc3VnZ2VzdGlvbiBvbiB0aGlzPw0KDQoNClRoYW5rcw0KTWlrZQ0KDQoNCg0KDQoN
-CuWPkeS7tuS6ujogU3RldmUgRnJlbmNoIDxzbWZyZW5jaEBnbWFpbC5jb20+DQrlj5HpgIHml7bp
-l7Q6IDIwMTblubQxMuaciDE05pelIDE6MjANCuaUtuS7tuS6ujogV2FuZywgWmhpeWUNCuaKhOmA
-gTogbGludXgtY2lmc0B2Z2VyLmtlcm5lbC5vcmcNCuS4u+mimDogUmU6IEFjY2VzcyBzYW1iYSBz
-aGFyZSB3aGljaCB1bmRlcmx5aW5nIHN0b3JhZ2UgaXMgdmVyeSBzbG93DQrCoCANCg0KdGhlcmUg
-aXMgYSAiaGFyZCIgbW91bnQgb3B0aW9uIGFuZCB0aGUgImVjaG8iIHRpbWVvdXQgY2FuIGJlIGFk
-anVzdGVkIG9uIG1vdW50DQoNCg0KT24gVHVlLCBEZWMgMTMsIDIwMTYgYXQgNzozNSBBTSwgV2Fu
-ZywgWmhpeWUgIDxaaGl5ZS5XYW5nQGFyY3NlcnZlLmNvbT4gd3JvdGU6DQogRGVhciBhbGwsDQoN
-CkkgdXNlIFNhbWJhIHRvIHNoYXJlIEZVU0UgYmFzZWQgZmlsZSBzeXN0ZW0gd2hpY2ggdW5kZXJs
-eWluZyBzdG9yYWdlIGlzIHZlcnkgc2xvdyBzb21ldGltZXMgKG5vdCBhbHdheXMpLiBSZWFkL1dy
-aXRlL09wZW4gc29tZXRpbWVzIG1heSB0YWtlIHNldmVyYWwgbWludXRlcy4gQW5kIGVzcGVjaWFs
-bHksICJ3cml0ZSIgbXVzdCBiZSBpbiBzZXF1ZW50aWFsIG1hbm5lci4gQW5kICJ3cml0ZSB0byBm
-aWxlIiBjYW5ub3QgYnJlYWsgaW4gdGhlIG1pZGRsZSAgb2YgYSBmaWxlIChtdWNoIGxpa2UgdGFw
-ZSkuDQoNCkFsbCB0aGF0IGFyZSBvayBmb3IgU2FtYmEsIGJ1dCBpdCBzZWVtcyB0byBiZSBhIHBy
-b2JsZW0gZm9yIENJRlMgb24gY2xpZW50IHNpZGUuIEl0IHNlZW1zIG9wZXJhdGlvbnMgdGltZW91
-dCBhcmUgYWxsIGhhcmRjb2RlZCwgYW5kIGNhbm5vdCBiZSBhZGp1c3RlZCBkdXJpbmcgbW91bnQu
-IEFmdGVyIHRpbWVvdXQsIENJRlMgY2xpZW50IHdpbGwgcmVjb25uZWN0IGFuZCB0aGVuIHJlc3Vt
-ZSAid3JpdGUiIGZyb20gd2hlcmUgaXMgYnJva2VuIChidXQgIHRoaXMgaXMgbm90IGFjY2VwdGFi
-bGUgZm9yIG15IGNhc2UpLg0KDQpJcyB0aGVyZSBhIHdheSB0byBtYWtlIENJRlMgY2xpZW50IGJs
-b2NrIGF0IHNsb3cgb3BlcmF0aW9ucyB3aXRob3V0IHRpbWVvdXQ/DQoNCg0KVGhhbmtzDQpNaWtl
-DQoNCg0KIA0KDQoNCg0KIC0tIA0KDQpUaGFua3MsDQoNClN0ZXZlICAgICA=
+2016-11-30 14:40 GMT-08:00 Rasmus Villemoes <linux@rasmusvillemoes.dk>:
+> Passing a gazillion arguments takes a lot of code:
+>
+> add/remove: 0/0 grow/shrink: 0/2 up/down: 0/-253 (-253)
+>
+> Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+> ---
+>  fs/cifs/link.c | 9 ++-------
+>  1 file changed, 2 insertions(+), 7 deletions(-)
+>
+> diff --git a/fs/cifs/link.c b/fs/cifs/link.c
+> index d031af8d3d4d..c4d996f78e1c 100644
+> --- a/fs/cifs/link.c
+> +++ b/fs/cifs/link.c
+> @@ -45,13 +45,8 @@
+>         (CIFS_MF_SYMLINK_LINK_OFFSET + CIFS_MF_SYMLINK_LINK_MAXLEN)
+>
+>  #define CIFS_MF_SYMLINK_LEN_FORMAT "XSym\n%04u\n"
+> -#define CIFS_MF_SYMLINK_MD5_FORMAT \
+> -       "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x\n"
+> -#define CIFS_MF_SYMLINK_MD5_ARGS(md5_hash) \
+> -       md5_hash[0],  md5_hash[1],  md5_hash[2],  md5_hash[3], \
+> -       md5_hash[4],  md5_hash[5],  md5_hash[6],  md5_hash[7], \
+> -       md5_hash[8],  md5_hash[9],  md5_hash[10], md5_hash[11],\
+> -       md5_hash[12], md5_hash[13], md5_hash[14], md5_hash[15]
+> +#define CIFS_MF_SYMLINK_MD5_FORMAT "%16phN\n"
+> +#define CIFS_MF_SYMLINK_MD5_ARGS(md5_hash) md5_hash
+>
+>  static int
+>  symlink_hash(unsigned int link_len, const char *link_str, u8 *md5_hash)
+> --
+> 2.1.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+
+-- 
+Best regards,
+Pavel Shilovsky
