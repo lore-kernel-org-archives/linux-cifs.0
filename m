@@ -1,203 +1,209 @@
-From: Mikko Rasa <tdb-nLh9gj8vv8Q@public.gmane.org>
-Subject: Troubles with CIFS and suspend
-Date: Fri, 16 Dec 2016 14:45:01 +0200
-Message-ID: <f86aec8c-f34f-73eb-cd53-ec0da24b6df2@tdb.fi>
+From: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] Fix default behaviour for empty domains and add
+ domainauto option
+Date: Fri, 16 Dec 2016 15:06:20 +0000
+Message-ID: <d7af3f88-6af4-e4a4-1b69-a6048a0e9b6f@citrix.com>
+References: <1480022439-27875-2-git-send-email-germano.percossi@citrix.com>
+ <CAKywueQ3UcOj3iFue4nh8EJTyeGc2-wHqr1_1qfU_T5rCkfSUg@mail.gmail.com>
+ <CAH2r5ms2SUkzOda7xVXFStKBGMvt7J5V+P1vVQOzafbwfMAwQQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="------------431ABB24D6DFF7ECD3EA60AA"
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAH2r5ms2SUkzOda7xVXFStKBGMvt7J5V+P1vVQOzafbwfMAwQQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------431ABB24D6DFF7ECD3EA60AA
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Thank you guys.
 
-Hi,
+It was a silly patch but most of the work was about understanding
+what is the right default.
 
-I've been using CIFS for my home directory in my local network for a 
-while now.  The performance is good but there are some issues with 
-suspend which require me to do a full reboot more often than I'd like.
+I was going to give more details on this because we had an internal
+discussion about what is the expected behaviour for XenServer,
+so I continued my comparisons with different servers, different
+protocol versions, different authentication mechanism.
 
-My setup is samba 4.5.2 on the server and Linux 4.7.2 on the client. 
-Kerberos 5 is used for authentication.  The filesystem is mounted with 
-multiuser,sec=krb5,username=nobody,iocharset=utf8,soft.
+I'm glad you are OK with that so I don't have to bother you with
+other details.
 
-Typical use cases for suspend are putting the computer to sleep for the 
-night and hibernating before booting to Windows to play games.
+As promised, I will update the documentation for mount.cifs accordingly.
 
+Let me know if you want the module documentation updated, too.
 
-I've observed at least the following symptoms, in order from least to 
-most severe:
+Regards,
+Germano
 
-1. When starting a new terminal, this text appears before the command 
-prompt:
-
-shell-init: error retrieving current directory: getcwd: cannot access 
-parent directories: No such file or directory
-
-The message repeats if I try to do things like tab completion. 
-Inspecting /proc shows this:
-
-$ ls -l /proc/2055/cwd
-lrwxrwxrwx 1 tdb users 0 joulu 16 13:46 /proc/2055/cwd -> /home/tdb 
-(deleted)
-
-Apparently the FS gets remounted at some point and existing processes 
-lose their cwd?  A simple cd fixes the issue for that shell so this is 
-fairly benign.
-
-2. Long delays after resume before xscreensaver presents the password 
-prompt.  Sometimes it takes in excess of 10 minutes.  This hasn't 
-happened for a while though, so perhaps some update or another fixed it.
-
-3. User processes getting stuck after resume.  Some programs are more 
-vulnerable than others.  Most common are evince and icedove; I suspect 
-this has something to do with gvfs.  I've seen it affect opera, blender 
-and steam as well, but much less often.
-
-4. User processes becoming unkillable after resume.  A more severe case 
-of the above, sometimes the process gets stuck so hard it can't be 
-killed even with SIGKILL.  I try to close the common culprits before 
-suspending the system but sometimes I forget.
-
-Just now I have one process which claims to be in running state and eats 
-100% CPU time but it's still not possible to kill it.  Attaching to it 
-with strace to see what it's doing doesn't work either; strace gets 
-stuck as well (but can be killed).
-
-When I've inspected /proc/<pid>/syscall for such processes common 
-results are futex and getdents.
-
-See the attached traces.txt for typical dmesg output when attempting to 
-suspend the system in such a case.
-
-5. kswapd getting stuck after resume.  This spells imminent trouble and 
-the computer is likely to become unstable in various ways unless I 
-reboot immediately.  A clean reboot does not even go all the way, 
-hanging at a late stage and requiring the use of the physical reset button.
-
-
-I suspected the problems might have something to do with the kerberos 
-tickets expiring while the computer was suspended, but increasing ticket 
-lifetime to a week did not help.
-
-I tried adding a hook to /etc/pm/sleep.d to dump process states to a log 
-file in an effort to find out if they are in the stuck state immediately 
-after resume.  They aren't.  The suspend cycle leaves the filesystem in 
-a state in which processes get stuck when they try to perform particular 
-operations on it.
-
-I get this message from the kernel on boot when the filesystem is mounted:
-
-Dec 12 10:13:11 muskrat kernel: CIFS VFS: Autodisabling the use of 
-server inode numbers on \x5c\x5ccapybara.tdb.fi\x5chome. This server 
-doesn't seem to support them properly. Hardlinks will not be recognized 
-on this mount. Consider mounting with the "noserverino" option to 
-silence this message.
-
-Could it be related?  I can see how the lack of persistent inodes could 
-lead to the cwd disappearing at least.
-
-What could I do to resolve the issues or at least gain further insight 
-of what's causing them?  I could live with having to occasionally 
-restart single programs if an unrecoverable error occurs, but having to 
-close down everything for a reboot is annoying.
-
--- 
-Mikko
-
---------------431ABB24D6DFF7ECD3EA60AA
-Content-Type: text/plain; charset=UTF-8;
- name="traces.txt"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="traces.txt"
-
-RGVjICA4IDAzOjIxOjQ1IG11c2tyYXQga2VybmVsOiBGcmVlemluZyBvZiB0YXNrcyBmYWls
-ZWQgYWZ0ZXIgMjAuMDAxIHNlY29uZHMgKDEgdGFza3MgcmVmdXNpbmcgdG8gZnJlZXplLCB3
-cV9idXN5PTApOgpEZWMgIDggMDM6MjE6NDUgbXVza3JhdCBrZXJuZWw6IFNpbXBsZUNhY2hl
-V29yayBEIGZmZmY4ODA0NDE3NDNjMDggICAgIDAgIDI0MTEgICAgICAxIDB4MDAwMDAwMDQK
-RGVjICA4IDAzOjIxOjQ1IG11c2tyYXQga2VybmVsOiAgZmZmZjg4MDQ0MTc0M2MwOCAwMDAw
-MDg2MjVjOWNlNjAwIGZmZmY4ODA0NWE0NzA4MDAgZmZmZjg4MDQ0MTc0NDAwMApEZWMgIDgg
-MDM6MjE6NDUgbXVza3JhdCBrZXJuZWw6ICBmZmZmODgwNDZlY2QzZjgwIDdmZmZmZmZmZmZm
-ZmZmZmYgZmZmZmZmZmY4MTM2YmZmMCBmZmZmODgwNDQxNzQzZDI4CkRlYyAgOCAwMzoyMTo0
-NSBtdXNrcmF0IGtlcm5lbDogIGZmZmY4ODA0NDE3NDNjMjAgZmZmZmZmZmY4MTM2YjlkMCAw
-MDAwMDAwMDAwMDAwMDAwIGZmZmY4ODA0NDE3NDNjOTAKRGVjICA4IDAzOjIxOjQ1IG11c2ty
-YXQga2VybmVsOiBDYWxsIFRyYWNlOgpEZWMgIDggMDM6MjE6NDUgbXVza3JhdCBrZXJuZWw6
-ICBbPGZmZmZmZmZmODEzNmJmZjA+XSA/IGJpdF93YWl0KzB4NjAvMHg2MApEZWMgIDggMDM6
-MjE6NDUgbXVza3JhdCBrZXJuZWw6ICBbPGZmZmZmZmZmODEzNmI5ZDA+XSBzY2hlZHVsZSsw
-eDMwLzB4ODAKRGVjICA4IDAzOjIxOjQ1IG11c2tyYXQga2VybmVsOiAgWzxmZmZmZmZmZjgx
-MzZkZjc5Pl0gc2NoZWR1bGVfdGltZW91dCsweDE1OS8weDFhMApEZWMgIDggMDM6MjE6NDUg
-bXVza3JhdCBrZXJuZWw6ICBbPGZmZmZmZmZmODEwYTJkNmM+XSA/IGt0aW1lX2dldCsweDNj
-LzB4YjAKRGVjICA4IDAzOjIxOjQ1IG11c2tyYXQga2VybmVsOiAgWzxmZmZmZmZmZjgxMzZi
-ZmYwPl0gPyBiaXRfd2FpdCsweDYwLzB4NjAKRGVjICA4IDAzOjIxOjQ1IG11c2tyYXQga2Vy
-bmVsOiAgWzxmZmZmZmZmZjgxMzZiMzhmPl0gaW9fc2NoZWR1bGVfdGltZW91dCsweDlmLzB4
-MTEwCkRlYyAgOCAwMzoyMTo0NSBtdXNrcmF0IGtlcm5lbDogIFs8ZmZmZmZmZmY4MTM2YzAw
-Nj5dIGJpdF93YWl0X2lvKzB4MTYvMHg2MApEZWMgIDggMDM6MjE6NDUgbXVza3JhdCBrZXJu
-ZWw6ICBbPGZmZmZmZmZmODEzNmJjZjY+XSBfX3dhaXRfb25fYml0KzB4NTYvMHg4MApEZWMg
-IDggMDM6MjE6NDUgbXVza3JhdCBrZXJuZWw6ICBbPGZmZmZmZmZmODEwZGNmY2I+XSB3YWl0
-X29uX3BhZ2VfYml0X2tpbGxhYmxlKzB4YWIvMHhiMApEZWMgIDggMDM6MjE6NDUgbXVza3Jh
-dCBrZXJuZWw6ICBbPGZmZmZmZmZmODEwN2YzZTA+XSA/IGF1dG9yZW1vdmVfd2FrZV9mdW5j
-dGlvbisweDMwLzB4MzAKRGVjICA4IDAzOjIxOjQ1IG11c2tyYXQga2VybmVsOiAgWzxmZmZm
-ZmZmZjgxMGRkMGVmPl0gZ2VuZXJpY19maWxlX3JlYWRfaXRlcisweDExZi8weDc0MApEZWMg
-IDggMDM6MjE6NDUgbXVza3JhdCBrZXJuZWw6ICBbPGZmZmZmZmZmODEwNmM4Y2U+XSA/IHRy
-eV90b193YWtlX3VwKzB4MWFlLzB4MmIwCkRlYyAgOCAwMzoyMTo0NSBtdXNrcmF0IGtlcm5l
-bDogIFs8ZmZmZmZmZmY4MTA2Y2ExZD5dID8gd2FrZV91cF9xKzB4MmQvMHg3MApEZWMgIDgg
-MDM6MjE6NDUgbXVza3JhdCBrZXJuZWw6ICBbPGZmZmZmZmZmYTJiNzBjNjk+XSBjaWZzX3N0
-cmljdF9yZWFkdisweGM5LzB4MTAwIFtjaWZzXQpEZWMgIDggMDM6MjE6NDUgbXVza3JhdCBr
-ZXJuZWw6ICBbPGZmZmZmZmZmODExMjUyY2E+XSBfX3Zmc19yZWFkKzB4YmEvMHgxMTAKRGVj
-ICA4IDAzOjIxOjQ1IG11c2tyYXQga2VybmVsOiAgWzxmZmZmZmZmZjgxMTI1NWI4Pl0gdmZz
-X3JlYWQrMHg4OC8weDE1MApEZWMgIDggMDM6MjE6NDUgbXVza3JhdCBrZXJuZWw6ICBbPGZm
-ZmZmZmZmODExMjc1ODE+XSBTeVNfcHJlYWQ2NCsweDcxLzB4OTAKRGVjICA4IDAzOjIxOjQ1
-IG11c2tyYXQga2VybmVsOiAgWzxmZmZmZmZmZjgxMzZlYWRiPl0gZW50cnlfU1lTQ0FMTF82
-NF9mYXN0cGF0aCsweDEzLzB4OGYKCkRlYyAxNiAxNDowODo1MyBtdXNrcmF0IGtlcm5lbDog
-RnJlZXppbmcgb2YgdGFza3MgZmFpbGVkIGFmdGVyIDIwLjAwNSBzZWNvbmRzICgyIHRhc2tz
-IHJlZnVzaW5nIHRvIGZyZWV6ZSwgd3FfYnVzeT0wKToKRGVjIDE2IDE0OjA4OjUzIG11c2ty
-YXQga2VybmVsOiBQYXRoT2ZFeGlsZS5leGUgUiAgcnVubmluZyB0YXNrICAgICAgICAwIDI2
-MDIxICAgICAgMSAweDIwMDIwMDA0CkRlYyAxNiAxNDowODo1MyBtdXNrcmF0IGtlcm5lbDog
-IGZmZmZmZmZmODExMzlkYTQgMDAwMDAwMDAwMDAwMDAwMCAwMTAwMDAwMDAwMDAwMDAwIGZm
-ZmY4ODAxMzM1MTkyOTgKRGVjIDE2IDE0OjA4OjUzIG11c2tyYXQga2VybmVsOiAgMDAwMDAw
-MDAwMDAyMzg5NiBmZmZmODgwMTMzNTE5MjQwIGZmZmZmZmZmODExM2I0YjAgZmZmZjg4MDE4
-MGQ0YmU0OApEZWMgMTYgMTQ6MDg6NTMgbXVza3JhdCBrZXJuZWw6ICBmZmZmODgwMTMzNTE5
-MjQwIGZmZmY4ODAxODBkNGJlNTAgZmZmZjg4MDE4MGQ0YmU1MCAwMDAwMDAwMDAwMzNiY2Jj
-CkRlYyAxNiAxNDowODo1MyBtdXNrcmF0IGtlcm5lbDogQ2FsbCBUcmFjZToKRGVjIDE2IDE0
-OjA4OjUzIG11c2tyYXQga2VybmVsOiAgWzxmZmZmZmZmZjgxMTM5ZGE0Pl0gPyBkX3dhbGsr
-MHhiNC8weDI1MApEZWMgMTYgMTQ6MDg6NTMgbXVza3JhdCBrZXJuZWw6ICBbPGZmZmZmZmZm
-ODExM2I0YjA+XSA/IGRfbHJ1X2RlbCsweDkwLzB4OTAKRGVjIDE2IDE0OjA4OjUzIG11c2ty
-YXQga2VybmVsOiAgWzxmZmZmZmZmZjgxMTNiZjQyPl0gPyBzaHJpbmtfZGNhY2hlX3BhcmVu
-dCsweDUyLzB4NzAKRGVjIDE2IDE0OjA4OjUzIG11c2tyYXQga2VybmVsOiAgWzxmZmZmZmZm
-ZjgxMTMzZjNkPl0gPyB2ZnNfcm1kaXIrMHg1ZC8weDEyMApEZWMgMTYgMTQ6MDg6NTMgbXVz
-a3JhdCBrZXJuZWw6ICBbPGZmZmZmZmZmODExMzQ5YWI+XSA/IGRvX3JtZGlyKzB4MThiLzB4
-MjAwCkRlYyAxNiAxNDowODo1MyBtdXNrcmF0IGtlcm5lbDogIFs8ZmZmZmZmZmY4MTEzNTNm
-MT5dID8gU3lTX3JtZGlyKzB4MTEvMHgyMApEZWMgMTYgMTQ6MDg6NTMgbXVza3JhdCBrZXJu
-ZWw6ICBbPGZmZmZmZmZmODEwMDI2MTE+XSA/IGRvX2Zhc3Rfc3lzY2FsbF8zMisweDkxLzB4
-MTUwCkRlYyAxNiAxNDowODo1MyBtdXNrcmF0IGtlcm5lbDogIFs8ZmZmZmZmZmY4MTM3MDQ2
-Yz5dID8gZW50cnlfU1lTRU5URVJfY29tcGF0KzB4NGMvMHg1YgpEZWMgMTYgMTQ6MDg6NTMg
-bXVza3JhdCBrZXJuZWw6IHN0ZWFtICAgICAgICAgICBEIGZmZmY4ODA0MmQ1MzNkOTggICAg
-IDAgMjY1NjYgICAgICAxIDB4MjAwMjAwMDQKRGVjIDE2IDE0OjA4OjUzIG11c2tyYXQga2Vy
-bmVsOiAgZmZmZjg4MDQyZDUzM2Q5OCBmZmZmODgwNDVjMzBiMDIwIGZmZmY4ODAxMzUwZGM5
-MDAgZmZmZjg4MDQyZDUzNDAwMApEZWMgMTYgMTQ6MDg6NTMgbXVza3JhdCBrZXJuZWw6ICBm
-ZmZmODgwMDA0N2E3MmMwIGZmZmY4ODAwMDQ3YTcyYzAgMDAwMDAwMDBmZmZmZmZmZSBmZmZm
-ODgwNDJkNTMzZWMwCkRlYyAxNiAxNDowODo1MyBtdXNrcmF0IGtlcm5lbDogIGZmZmY4ODA0
-MmQ1MzNkYjAgZmZmZmZmZmY4MTM2YjlkMCBmZmZmODgwM2RmZTJiMjgwIGZmZmY4ODA0MmQ1
-MzNlMDgKRGVjIDE2IDE0OjA4OjUzIG11c2tyYXQga2VybmVsOiBDYWxsIFRyYWNlOgpEZWMg
-MTYgMTQ6MDg6NTMgbXVza3JhdCBrZXJuZWw6ICBbPGZmZmZmZmZmODEzNmI5ZDA+XSBzY2hl
-ZHVsZSsweDMwLzB4ODAKRGVjIDE2IDE0OjA4OjUzIG11c2tyYXQga2VybmVsOiAgWzxmZmZm
-ZmZmZjgxMzZkODhlPl0gcndzZW1fZG93bl9yZWFkX2ZhaWxlZCsweGJlLzB4MTAwCkRlYyAx
-NiAxNDowODo1MyBtdXNrcmF0IGtlcm5lbDogIFs8ZmZmZmZmZmZhMmMxZGUyMj5dID8gY2lm
-c19yZXZhbGlkYXRlX2RlbnRyeV9hdHRyKzB4MzIvMHhmMCBbY2lmc10KRGVjIDE2IDE0OjA4
-OjUzIG11c2tyYXQga2VybmVsOiAgWzxmZmZmZmZmZjgxMWRjMmY4Pl0gY2FsbF9yd3NlbV9k
-b3duX3JlYWRfZmFpbGVkKzB4MTgvMHgzMApEZWMgMTYgMTQ6MDg6NTMgbXVza3JhdCBrZXJu
-ZWw6ICBbPGZmZmZmZmZmODEzNmQxYmI+XSBkb3duX3JlYWQrMHgxYi8weDIwCkRlYyAxNiAx
-NDowODo1MyBtdXNrcmF0IGtlcm5lbDogIFs8ZmZmZmZmZmY4MTEzNzZlMD5dIGl0ZXJhdGVf
-ZGlyKzB4NDAvMHgxODAKRGVjIDE2IDE0OjA4OjUzIG11c2tyYXQga2VybmVsOiAgWzxmZmZm
-ZmZmZjgxMTZjZmEzPl0gY29tcGF0X1N5U19nZXRkZW50cysweDgzLzB4MTAwCkRlYyAxNiAx
-NDowODo1MyBtdXNrcmF0IGtlcm5lbDogIFs8ZmZmZmZmZmY4MTE2Yjc5MD5dID8gY29tcGF0
-X3NldF9mZF9zZXQrMHg4MC8weDgwCkRlYyAxNiAxNDowODo1MyBtdXNrcmF0IGtlcm5lbDog
-IFs8ZmZmZmZmZmY4MTAwMjYxMT5dIGRvX2Zhc3Rfc3lzY2FsbF8zMisweDkxLzB4MTUwCkRl
-YyAxNiAxNDowODo1MyBtdXNrcmF0IGtlcm5lbDogIFs8ZmZmZmZmZmY4MTM3MDQ2Yz5dIGVu
-dHJ5X1NZU0VOVEVSX2NvbXBhdCsweDRjLzB4NWIKCg==
---------------431ABB24D6DFF7ECD3EA60AA--
+On 12/15/2016 06:35 AM, Steve French wrote:
+> merged into cifs-2.6.git
+> 
+> Germano,
+> Thanks for the research into this
+> 
+> On Wed, Dec 14, 2016 at 2:10 PM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>> 2016-11-24 13:20 GMT-08:00 Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>:
+>>> With commit 2b149f119 many things have been fixed/introduced.
+>>> However, the default behaviour for RawNTLMSSP authentication
+>>> seems to be wrong in case the domain is not passed on the command line.
+>>>
+>>> The main points (see below) of the patch are:
+>>>  - It alignes behaviour with Windows clients
+>>>  - It fixes backward compatibility
+>>>  - It fixes UPN
+>>>
+>>> I compared this behavour with the one from a Windows 10 command line
+>>> client. When no domains are specified on the command line, I traced
+>>> the packets and observed that the client does send an empty
+>>> domain to the server.
+>>> In the linux kernel case, the empty domain is replaced by the
+>>> primary domain communicated by the SMB server.
+>>> This means that, if the credentials are valid against the local server
+>>> but that server is part of a domain, then the kernel module will
+>>> ask to authenticate against that domain and we will get LOGON failure.
+>>>
+>>> I compared the packet trace from the smbclient when no domain is passed
+>>> and, in that case, a default domain from the client smb.conf is taken.
+>>> Apparently, connection succeeds anyway, because when the domain passed
+>>> is not valid (in my case WORKGROUP), then the local one is tried and
+>>> authentication succeeds. I tried with any kind of invalid domain and
+>>> the result was always a connection.
+>>>
+>>> So, trying to interpret what to do and picking a valid domain if none
+>>> is passed, seems the wrong thing to do.
+>>> To this end, a new option "domainauto" has been added in case the
+>>> user wants a mechanism for guessing.
+>>>
+>>> Without this patch, backward compatibility also is broken.
+>>> With kernel 3.10, the default auth mechanism was NTLM.
+>>> One of our testing servers accepted NTLM and, because no
+>>> domains are passed, authentication was local.
+>>>
+>>> Moving to RawNTLMSSP forced us to change our command line
+>>> to add a fake domain to pass to prevent this mechanism to kick in.
+>>>
+>>> For the same reasons, UPN is broken because the domain is specified
+>>> in the username.
+>>> The SMB server will work out the domain from the UPN and authenticate
+>>> against the right server.
+>>> Without the patch, though, given the domain is empty, it gets replaced
+>>> with another domain that could be the wrong one for the authentication.
+>>>
+>>> Signed-off-by: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+>>> ---
+>>>  fs/cifs/cifsencrypt.c | 14 +++++++++-----
+>>>  fs/cifs/cifsglob.h    |  2 ++
+>>>  fs/cifs/connect.c     |  7 +++++++
+>>>  3 files changed, 18 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+>>> index 5eb0412..66bd7fa 100644
+>>> --- a/fs/cifs/cifsencrypt.c
+>>> +++ b/fs/cifs/cifsencrypt.c
+>>> @@ -699,11 +699,15 @@ static int crypto_hmacmd5_alloc(struct TCP_Server_Info *server)
+>>>
+>>>         if (ses->server->negflavor == CIFS_NEGFLAVOR_EXTENDED) {
+>>>                 if (!ses->domainName) {
+>>> -                       rc = find_domain_name(ses, nls_cp);
+>>> -                       if (rc) {
+>>> -                               cifs_dbg(VFS, "error %d finding domain name\n",
+>>> -                                        rc);
+>>> -                               goto setup_ntlmv2_rsp_ret;
+>>> +                       if (ses->domainAuto) {
+>>> +                               rc = find_domain_name(ses, nls_cp);
+>>> +                               if (rc) {
+>>> +                                       cifs_dbg(VFS, "error %d finding domain name\n",
+>>> +                                                rc);
+>>> +                                       goto setup_ntlmv2_rsp_ret;
+>>> +                               }
+>>> +                       } else {
+>>> +                               ses->domainName = kstrdup("", GFP_KERNEL);
+>>>                         }
+>>>                 }
+>>>         } else {
+>>> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+>>> index 1f17f6b..4f0d5a1 100644
+>>> --- a/fs/cifs/cifsglob.h
+>>> +++ b/fs/cifs/cifsglob.h
+>>> @@ -514,6 +514,7 @@ struct smb_vol {
+>>>         bool persistent:1;
+>>>         bool nopersistent:1;
+>>>         bool resilient:1; /* noresilient not required since not fored for CA */
+>>> +       bool domainauto:1;
+>>>         unsigned int rsize;
+>>>         unsigned int wsize;
+>>>         bool sockopt_tcp_nodelay:1;
+>>> @@ -827,6 +828,7 @@ struct cifs_ses {
+>>>         enum securityEnum sectype; /* what security flavor was specified? */
+>>>         bool sign;              /* is signing required? */
+>>>         bool need_reconnect:1; /* connection reset, uid now invalid */
+>>> +       bool domainAuto:1;
+>>>  #ifdef CONFIG_CIFS_SMB2
+>>>         __u16 session_flags;
+>>>         __u8 smb3signingkey[SMB3_SIGN_KEY_SIZE];
+>>> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+>>> index 4547aed..df7eed7 100644
+>>> --- a/fs/cifs/connect.c
+>>> +++ b/fs/cifs/connect.c
+>>> @@ -88,6 +88,7 @@ enum {
+>>>         Opt_multiuser, Opt_sloppy, Opt_nosharesock,
+>>>         Opt_persistent, Opt_nopersistent,
+>>>         Opt_resilient, Opt_noresilient,
+>>> +       Opt_domainauto,
+>>>
+>>>         /* Mount options which take numeric value */
+>>>         Opt_backupuid, Opt_backupgid, Opt_uid,
+>>> @@ -176,6 +177,7 @@ enum {
+>>>         { Opt_nopersistent, "nopersistenthandles"},
+>>>         { Opt_resilient, "resilienthandles"},
+>>>         { Opt_noresilient, "noresilienthandles"},
+>>> +       { Opt_domainauto, "domainauto"},
+>>>
+>>>         { Opt_backupuid, "backupuid=%s" },
+>>>         { Opt_backupgid, "backupgid=%s" },
+>>> @@ -1499,6 +1501,9 @@ static int cifs_parse_security_flavors(char *value,
+>>>                 case Opt_noresilient:
+>>>                         vol->resilient = false; /* already the default */
+>>>                         break;
+>>> +               case Opt_domainauto:
+>>> +                       vol->domainauto = true;
+>>> +                       break;
+>>>
+>>>                 /* Numeric Values */
+>>>                 case Opt_backupuid:
+>>> @@ -2548,6 +2553,8 @@ static int match_session(struct cifs_ses *ses, struct smb_vol *vol)
+>>>                 if (!ses->domainName)
+>>>                         goto get_ses_fail;
+>>>         }
+>>> +       if (volume_info->domainauto)
+>>> +               ses->domainAuto = volume_info->domainauto;
+>>>         ses->cred_uid = volume_info->cred_uid;
+>>>         ses->linux_uid = volume_info->linux_uid;
+>>>
+>>> --
+>>> 1.9.1
+>>>
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+>>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>> Looks right to me.
+>>
+>> Acked-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+>>
+>> --
+>> Best regards,
+>> Pavel Shilovsky
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> 
+> 
