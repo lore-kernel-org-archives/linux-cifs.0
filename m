@@ -1,92 +1,59 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [GIT] CIFS Fixes
-Date: Sat, 24 Dec 2016 14:04:33 -0600
-Message-ID: <CAH2r5mvOVdFb6HCMR4PuFXTVPQjd7qT4J6uC4VZ9Px6kVB6GDg@mail.gmail.com>
-References: <CAH2r5mvhe=P7okz2O6i962HjbVMdR+0XRjKCw6OsNqeVzrgDHQ@mail.gmail.com>
- <CA+55aFzEJ3ZJaojOZcanmkUigSJQeSZE+xLXikbUPD=6VAKavw@mail.gmail.com>
+From: Oliver Schonrock <oliver-wkKXU3v8bAel+tEH4sVNmg@public.gmane.org>
+Subject: learning lessons from mount.cifs for throughput of gvfs-smb and
+ kioclient-smb
+Date: Sat, 24 Dec 2016 20:39:34 +0000
+Message-ID: <7a5fcb31-3c22-de38-dfe2-5ab69f3ac09e@openbrackets.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CA+55aFzEJ3ZJaojOZcanmkUigSJQeSZE+xLXikbUPD=6VAKavw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Was my cut-and-paste error (left off last few lines), not "git
-request-pull's" fault.  Complete output below (including last few
-lines that weren't copied into the email).  Sorry about that
+Trying to get some help/advice to learn from throughput optimisations in
+mount.cifs.
 
+The major linux desktop projects gnome and KDE are both struggling with
+throughput performance of their VFS implementations against smb
+backends. This
+issue has been going on for a long time. Here are some recently updated
+bugs:
 
-The following changes since commit 43c4f67c966deb1478dc9acbf66ab547287d530f:
+Gnome:
+https://bugzilla.gnome.org/show_bug.cgi?id=776339
 
-  Merge branch 'akpm' (patches from Andrew) (2016-11-30 16:33:41 -0800)
+KDE:
+https://bugs.kde.org/show_bug.cgi?id=291835
 
-are available in the git repository at:
+The symptoms are that gvfs or kioclient access to smb resources achieves
+3 to
+20 times less throughput on a particular hardware/network setup than can be
+achieved by mounting the share using mount.cifs or by using smbclient.
+Typical
+throughput of gvfs-smb and kioclient over Gbit networks are only 5-30MB/s
+whereas mount/cifs and smbclient achieve close to wirespeed, ie > 100MB/s.
 
+Both projects use the libsmbclient API (smbc_read/write) , currently with
+buffer sizes of about 64kB (ref bugs above). The smbget utility also uses
+libsmbclent, with a default of 64000bytes buffer size. smbget exhibits the
+same throughput issues as the Desktop VFS implementations. If you pass "--
+buffersize=16MB" to smbget, you can get near wire speed (100MB/s).
 
-  git://git.samba.org/sfrench/cifs-2.6.git for-next
+So the discussions have been around increasing buffer sizes, however,
+understandably, no one is comfortable hard coding a 16MB buffer size.
 
-for you to fetch changes up to 374402a2a1dfbbee8ab1a5a32ec4887bf8c15d52:
+Some users have done tcpdump forensics:
+https://bugs.kde.org/show_bug.cgi?id=291835#c26
 
-  cifs_get_root shouldn't use path with tree name (2016-12-15 01:42:54 -0600)
+which appear to show that mount.cifs and smbclient do "clever" things like
+"request 2 x 64kB " and when it receives the first one, asks for the 3rd
+64kB
+block.... which helps keep the wire filled.
 
-----------------------------------------------------------------
-Andy Lutomirski (1):
-      cifs: Fix smbencrypt() to stop pointing a scatterlist at the stack
+Is this correct? Does anyone have any recommendations / advice for these
+2 desktop projects on which direction to go to improve throughput? Is
+the brute force approach with "huge ~16MB" buffers the only way given
+the API that libsmbclent presents, or is there a "smarter" way?
 
-Germano Percossi (1):
-      Fix default behaviour for empty domains and add domainauto option
-
-Pavel Shilovsky (5):
-      CIFS: Decrease verbosity of ioctl call
-      CIFS: Fix missing nls unload in smb2_reconnect()
-      CIFS: Fix a possible memory corruption in push locks
-      CIFS: Fix a possible memory corruption during reconnect
-      CIFS: Fix a possible double locking of mutex during reconnect
-
-Rasmus Villemoes (1):
-      cifs: use %16phN for formatting md5 sum
-
-Sachin Prabhu (1):
-      cifs_get_root shouldn't use path with tree name
-
-Steve French (1):
-      SMB3: parsing for new snapshot timestamp mount parm
-
- fs/cifs/cifsencrypt.c | 14 ++++++---
- fs/cifs/cifsfs.c      |  2 +-
- fs/cifs/cifsglob.h    |  8 +++++
- fs/cifs/cifsproto.h   |  6 +++-
- fs/cifs/connect.c     | 82 +++++++++++++++++++++++++++++++++++++++++-------
- fs/cifs/dir.c         |  4 +--
- fs/cifs/file.c        |  8 ++++-
- fs/cifs/ioctl.c       |  2 +-
- fs/cifs/link.c        |  9 ++----
- fs/cifs/smb2file.c    |  2 +-
- fs/cifs/smb2pdu.c     | 87 ++++++++++++++++++++++++++++++++++-----------------
- fs/cifs/smb2pdu.h     |  2 ++
- fs/cifs/smb2proto.h   |  1 +
- fs/cifs/smbencrypt.c  | 40 +++++------------------
- 14 files changed, 177 insertions(+), 90 deletions(-)
-
-On Sat, Dec 24, 2016 at 1:40 PM, Linus Torvalds
-<torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org> wrote:
-> On Sat, Dec 24, 2016 at 8:53 AM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->>
->> They are available in the git repository at:
->>
->>   git://git.samba.org/sfrench/cifs-2.6.git for-next
->
-> The diffstat does not match what I get. It looks like yours is truncated.
->
-> The shortlog matches, so I think it's ok, but please check your scripting.
->
->              Linus
-
-
-
--- 
-Thanks,
-
-Steve
+Thanks
