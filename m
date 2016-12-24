@@ -1,72 +1,67 @@
-From: "Wang, Zhiye" <Zhiye.Wang-PfGy2FtcwjRWk0Htik3J/w@public.gmane.org>
-Subject: RE: Access samba share which underlying storage is very slow
-Date: Wed, 21 Dec 2016 10:07:29 +0000
-Message-ID: <CY4PR10MB15918CA9CA8BB51103BDF1E8E4930@CY4PR10MB1591.namprd10.prod.outlook.com>
-References: <CY4PR10MB1591B4B85ED8A29DE16CA5D7E49B0@CY4PR10MB1591.namprd10.prod.outlook.com>
- <CAH2r5mszkDE9pEF3D-Qsv0ek=n1SkpBRsm9ZdipgyFqUA8n=4w@mail.gmail.com>
- <CY4PR10MB159109A9F879DD7834B93FBEE49A0@CY4PR10MB1591.namprd10.prod.outlook.com>
- <CAH2r5mu=ZxY2TfOEcopxuCJgEVbuo0i0mDCbzJ2yTzJi-=7tWg@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [GIT] CIFS Fixes
+Date: Sat, 24 Dec 2016 10:53:20 -0600
+Message-ID: <CAH2r5mvhe=P7okz2O6i962HjbVMdR+0XRjKCw6OsNqeVzrgDHQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mu=ZxY2TfOEcopxuCJgEVbuo0i0mDCbzJ2yTzJi-=7tWg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-VGhhbmsgeW91IGZvciB0aGUgc3VnZ2VzdGlvbnMuDQoNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdl
-LS0tLS0NCkZyb206IFN0ZXZlIEZyZW5jaCBbbWFpbHRvOnNtZnJlbmNoQGdtYWlsLmNvbV0gDQpT
-ZW50OiBUaHVyc2RheSwgRGVjZW1iZXIgMTUsIDIwMTYgNzoyOCBBTQ0KVG86IFdhbmcsIFpoaXll
-IDxaaGl5ZS5XYW5nQEFyY3NlcnZlLmNvbT4NCkNjOiBsaW51eC1jaWZzQHZnZXIua2VybmVsLm9y
-Zw0KU3ViamVjdDogUmU6IEFjY2VzcyBzYW1iYSBzaGFyZSB3aGljaCB1bmRlcmx5aW5nIHN0b3Jh
-Z2UgaXMgdmVyeSBzbG93DQoNClllcyAtIHlvdSBhcmUgcHJvYmFibHkgY29ycmVjdCBzaW5jZSBl
-Y2hvX2ludGVydmFsIHR1bmFibGUgd2FzIGFkZGVkIGluIHRoZSBsYXN0IHllYXIgb3Igc28uDQoN
-ClJlY29ubmVjdGlvbiBsb2dpYyBoYXMgYmVlbiBtdWNoIGltcHJvdmVkIG92ZXIgdGhlIHBhc3Qg
-dGhyZWUgeWVhcnMsIHNvIG1ha2Ugc3VyZSB5b3UgYXJlIG5vdCBydW5uaW5nIGEgdmVyeSBvbGQg
-a2VybmVsIChvciBhc2sgeW91ciBkaXN0cm8gdG8gYmFja3BvcnQgZml4ZXMpIC0gdGhlcmUgYXJl
-IGxvdHMgb2YgY29ybmVyIGNhc2VzIGluIHJlY29ubmVjdC4NCg0KTm90ZSB0aGF0IHZlcnkgb2xk
-IGNpZnMgaGFkIGFuICJlY2hvIHJldHJpZXMiIG1vZHVsZSBsb2FkIHBhcm0gKGZvcg0KY2lmcy5r
-bykgdGhhdCBjb3VsZCBiZSBpbmNyZWFzZWQgZnJvbSBpdHMgZGVmYXVsdCBvZiA1IChvciByZWNv
-bm5lY3QNCmNvdWxkIGJlIGRpc2FibGVkIGJ5IHNldHRpbmcgdG8gemVybykuICAgVGhlIGVjaG8g
-aW50ZXJ2YWwgd2FzIDYwDQpzZWNvbmRzLg0KDQpOb3RlIHRoYXQgZXZlbiB0aGlzIGZhciBiYWNr
-IGNpZnMua28gaW50ZW50aW9uYWxseSBkaWQgbm90IHRpbWVvdXQgb24gY2VydGFpbiAocG90ZW50
-aWFsbHkgdmVyeSBzbG93KSBvcGVyYXRpb25zICh3cml0ZXMgdGhhdCBhcmUgcGFzdCBlbmQgb2Yg
-ZmlsZSB3YXMgb25lIGV4YW1wbGUpDQoNCg0KT24gV2VkLCBEZWMgMTQsIDIwMTYgYXQgODowNSBB
-TSwgV2FuZywgWmhpeWUgPFpoaXllLldhbmdAYXJjc2VydmUuY29tPiB3cm90ZToNCj4gVGhhbmsg
-eW91IGZvciB0aGUgaW5mb3JtYXRpb24uDQo+DQo+ICJoYXJkIiBzZWVtcyBhIGdvb2Qgb3B0aW9u
-IGZvciBtZS4gSSB3aWxsIGRvIG1vcmUgdGVzdC4NCj4NCj4gQXMgdG8gImVjaG8iIHRpbWVvdXQs
-IGFyZSB5b3UgcmVmZXJyaW5nICJlY2hvX2ludGVydmFsIj8gSXQgc2VlbXMgdGhpcyBvcHRpb24g
-d2FzIGltcGxlbWVudGVkIHByZXR0eSBsYXRlLCBhbmQgb25seSBtb3N0IHJlY2VudCBMaW51eCBk
-aXN0cmlidXRpb25zIGluY2x1ZGUgaXRzIHN1cHBvcnQuDQo+DQo+IEJlc2lkZXMgdGhhdCwgSSBo
-YXZlIGFscmVhZHkgY29uZmlndXJlZCBzYW1iYSBzZXJ2ZXIgdG8gc2VydmUgImVjaG8iIHJlcXVl
-c3QgaW4gc2VwYXJhdGVkIHByb2Nlc3MoImFzeW5jIHNtYiBlY2hvIGhhbmRsZXIgPSB5ZXMiLCBz
-byAiZWNobyIgc2VydmVyIHdpbGwgbm90IGJlIGJsb2NrZWQgYnkgIm9wZW4vcmVhZC93cml0ZSIg
-b3BlcmF0aW9ucyksIGJ1dCBJIGNhbiBzdGlsbCBzZWUgd2FybmluZyBiZWxvdyBvbiBjbGllbnQg
-c2lkZToNCj4NCj4gWzYyMDQyMi41NzAxMjhdIENJRlMgVkZTOiBTZXJ2ZXIgMTAuNTcuMzMuMTM0
-IGhhcyBub3QgcmVzcG9uZGVkIGluIDEyMCBzZWNvbmRzLiBSZWNvbm5lY3RpbmcuLi4NCj4NCj4N
-Cj4gRG8geW91IGhhdmUgYW55IHN1Z2dlc3Rpb24gb24gdGhpcz8NCj4NCj4NCj4gVGhhbmtzDQo+
-IE1pa2UNCj4NCj4NCj4NCj4NCj4NCj4g5Y+R5Lu25Lq6OiBTdGV2ZSBGcmVuY2ggPHNtZnJlbmNo
-QGdtYWlsLmNvbT4NCj4g5Y+R6YCB5pe26Ze0OiAyMDE25bm0MTLmnIgxNOaXpSAxOjIwDQo+IOaU
-tuS7tuS6ujogV2FuZywgWmhpeWUNCj4g5oqE6YCBOiBsaW51eC1jaWZzQHZnZXIua2VybmVsLm9y
-Zw0KPiDkuLvpopg6IFJlOiBBY2Nlc3Mgc2FtYmEgc2hhcmUgd2hpY2ggdW5kZXJseWluZyBzdG9y
-YWdlIGlzIHZlcnkgc2xvdw0KPg0KPg0KPiB0aGVyZSBpcyBhICJoYXJkIiBtb3VudCBvcHRpb24g
-YW5kIHRoZSAiZWNobyIgdGltZW91dCBjYW4gYmUgYWRqdXN0ZWQgDQo+IG9uIG1vdW50DQo+DQo+
-DQo+IE9uIFR1ZSwgRGVjIDEzLCAyMDE2IGF0IDc6MzUgQU0sIFdhbmcsIFpoaXllICA8WmhpeWUu
-V2FuZ0BhcmNzZXJ2ZS5jb20+IHdyb3RlOg0KPiAgRGVhciBhbGwsDQo+DQo+IEkgdXNlIFNhbWJh
-IHRvIHNoYXJlIEZVU0UgYmFzZWQgZmlsZSBzeXN0ZW0gd2hpY2ggdW5kZXJseWluZyBzdG9yYWdl
-IGlzIHZlcnkgc2xvdyBzb21ldGltZXMgKG5vdCBhbHdheXMpLiBSZWFkL1dyaXRlL09wZW4gc29t
-ZXRpbWVzIG1heSB0YWtlIHNldmVyYWwgbWludXRlcy4gQW5kIGVzcGVjaWFsbHksICJ3cml0ZSIg
-bXVzdCBiZSBpbiBzZXF1ZW50aWFsIG1hbm5lci4gQW5kICJ3cml0ZSB0byBmaWxlIiBjYW5ub3Qg
-YnJlYWsgaW4gdGhlIG1pZGRsZSAgb2YgYSBmaWxlIChtdWNoIGxpa2UgdGFwZSkuDQo+DQo+IEFs
-bCB0aGF0IGFyZSBvayBmb3IgU2FtYmEsIGJ1dCBpdCBzZWVtcyB0byBiZSBhIHByb2JsZW0gZm9y
-IENJRlMgb24gY2xpZW50IHNpZGUuIEl0IHNlZW1zIG9wZXJhdGlvbnMgdGltZW91dCBhcmUgYWxs
-IGhhcmRjb2RlZCwgYW5kIGNhbm5vdCBiZSBhZGp1c3RlZCBkdXJpbmcgbW91bnQuIEFmdGVyIHRp
-bWVvdXQsIENJRlMgY2xpZW50IHdpbGwgcmVjb25uZWN0IGFuZCB0aGVuIHJlc3VtZSAid3JpdGUi
-IGZyb20gd2hlcmUgaXMgYnJva2VuIChidXQgIHRoaXMgaXMgbm90IGFjY2VwdGFibGUgZm9yIG15
-IGNhc2UpLg0KPg0KPiBJcyB0aGVyZSBhIHdheSB0byBtYWtlIENJRlMgY2xpZW50IGJsb2NrIGF0
-IHNsb3cgb3BlcmF0aW9ucyB3aXRob3V0IHRpbWVvdXQ/DQo+DQo+DQo+IFRoYW5rcw0KPiBNaWtl
-DQo+DQo+DQo+DQo+DQo+DQo+DQo+ICAtLQ0KPg0KPiBUaGFua3MsDQo+DQo+IFN0ZXZlDQoNCg0K
-DQotLQ0KVGhhbmtzLA0KDQpTdGV2ZQ0K
+Please pull the following changes since commit
+43c4f67c966deb1478dc9acbf66ab547287d530f:
+
+  Merge branch 'akpm' (patches from Andrew) (2016-11-30 16:33:41 -0800)
+
+Includes various cifs/smb3  bug fixes, mostly for stable as well.  In
+the next week I expect that Germano will have some reconnection fixes,
+and also I expect to have the remaining pieces of the snapshot
+enablement and SMB3 ACLs, but wanted to get this set of bug fixes in.
+
+
+They are available in the git repository at:
+
+
+  git://git.samba.org/sfrench/cifs-2.6.git for-next
+
+for you to fetch changes up to 374402a2a1dfbbee8ab1a5a32ec4887bf8c15d52:
+
+  cifs_get_root shouldn't use path with tree name (2016-12-15 01:42:54 -0600)
+
+----------------------------------------------------------------
+Andy Lutomirski (1):
+      cifs: Fix smbencrypt() to stop pointing a scatterlist at the stack
+
+Germano Percossi (1):
+      Fix default behaviour for empty domains and add domainauto option
+
+Pavel Shilovsky (5):
+      CIFS: Decrease verbosity of ioctl call
+      CIFS: Fix missing nls unload in smb2_reconnect()
+      CIFS: Fix a possible memory corruption in push locks
+      CIFS: Fix a possible memory corruption during reconnect
+      CIFS: Fix a possible double locking of mutex during reconnect
+
+Rasmus Villemoes (1):
+      cifs: use %16phN for formatting md5 sum
+
+Sachin Prabhu (1):
+      cifs_get_root shouldn't use path with tree name
+
+Steve French (1):
+      SMB3: parsing for new snapshot timestamp mount parm
+
+ fs/cifs/cifsencrypt.c | 14 ++++++---
+ fs/cifs/cifsfs.c      |  2 +-
+ fs/cifs/cifsglob.h    |  8 +++++
+ fs/cifs/cifsproto.h   |  6 +++-
+ fs/cifs/connect.c     | 82 +++++++++++++++++++++++++++++++++++++++++-------
+ fs/cifs/dir.c         |  4 +--
+ fs/cifs/file.c        |  8 ++++-
+
+-- 
+Thanks,
+
+Steve
