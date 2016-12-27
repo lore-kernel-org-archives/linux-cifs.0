@@ -1,170 +1,137 @@
-From: "Wang, Zhiye" <Zhiye.Wang-PfGy2FtcwjRWk0Htik3J/w@public.gmane.org>
-Subject: System freeze if mount cifs share with option "hard", and samba
- server is not available
-Date: Sun, 25 Dec 2016 12:12:00 +0000
-Message-ID: <CY4PR10MB1591A99B510375E25529A9C8E4970@CY4PR10MB1591.namprd10.prod.outlook.com>
-References: <CY4PR10MB1591E27B8B07F494332AFCA7E4970@CY4PR10MB1591.namprd10.prod.outlook.com>,<CY4PR10MB15917BB3A6E202AF22FD8D7FE4970@CY4PR10MB1591.namprd10.prod.outlook.com>
+From: Jeff Layton <jlayton@poochiereds.net>
+Subject: LSF/MM 2017: Call for Proposals
+Date: Tue, 27 Dec 2016 12:19:07 -0500
+Message-ID: <1482859147.2771.5.camel@poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
-To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CY4PR10MB15917BB3A6E202AF22FD8D7FE4970-871WlKnvxleuFQuCF5OPf4Ca9M1JiERdvxpqHgZTriW3zl9H0oFU5g@public.gmane.org>
-Content-Language: zh-CN
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Cc: "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>
+To: linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-ide@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ linux-nfs@vger.kernel.org,  linux-scsi@vger.kernel.org, "xfs@oss.sgi.com"
+ <xfs@oss.sgi.com>,  ceph-devel@vger.kernel.org,
+ linux-nvme@lists.infradead.org
+Return-path: <owner-linux-mm@kvack.org>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-cifs.vger.kernel.org
 
-SSBrbm93ICJoYXJkIiBtZWFucyBjb21tYW5kIHdpbGwgaGFuZyBpZiBuZXR3b3JrIGlzIGJyb2tl
-bi4gQnV0IGl0IHNlZW1zIHRoYXQncyBub3QgYWN0dWF0ZS4gSXQncyBDUFUgdGhhdCB3aWxsIGhh
-bmcuDQoNCg0KQWZmZWN0ZWQgc2NvcGU6DQoNCkkgdGVzdGVkIGl0IGFnYWluc3QgQ2VudE9TIDUv
-Ni83LCBpdCBjYW4gYmUgcmVwcm9kdWNlZCBvbiBhbGwgdGhlIHN5c3RlbXMuIHRoZSBkZWJ1ZyBs
-b2dzIGJlbG93IGFyZSBjYXB0dXJlZCBmcm9tIENlbnRPUyA3IChjaWZzLmtvIHYyLjA1KQ0KDQoN
-CkhvdyB0byByZXByb2R1Y2UgdGhpcyBwcm9ibGVtPw0KDQoNCjEuIG1vdW50IGEgY2lmcyBzaGFy
-ZSB3aXRoIG9wdGlvbiAiaGFyZCINCg0KMi4gc3RvcCBzYW1iYSBzZXJ2ZXINCg0KMy4gYWNjZXNz
-IHRoZSBtb3VudCBwb2ludCAoZS5nLiBscyAvbW50KQ0KDQoNCkFjdHVhbCByZXN1bHQ6DQoNCmNh
-c2UgIzE6IGlmIHN5c3RlbSBoYXMgb25seSBvbmUgQ1BVIChvbmUgY29yZSk6DQoNCigxKSBzeXN0
-ZW0gd2lsbCBnZXQgZnJlZXplIGFmdGVyIGFib3V0IDIwIHNlY29uZHMuIE5vIGNvbW1hbmQgY2Fu
-IGJlIHJ1biwgYnV0IEkgY2FuIHBpbmcgdGhlIHN5c3RlbSBmcm9tIGFub3RoZXIgbWFjaGluZTsN
-Cg0KKDIpIENQVSBnb2VzIHRvIDEwMCUgKHVzaW5nIFZNLCBJIGNhbiBtb25pdG9yIENQVSB1c2Fn
-ZSBmcm9tIGh5cGVydmlzb3IgbWFuYWdlbWVudCBjb25zb2xlLiApDQoNCigzKSBTeXN0ZW0gd2ls
-bCBub3QgYmUgYmFjayBldmVuIGFmdGVyIHNhbWJhIHNlcnZlciBpcyBzdGFydGVkIGFnYWluOw0K
-DQoNCmNhc2UgIzI6IGlmIHN5c3RlbSBoYXMgbW9yZSB0aGFuIG9uZSBDUFU6DQoNCigxKSB0aGUg
-Y29tbWFuZCB3aWxsIGhhbmcsIGJ1dCBzeXN0ZW0gaXMgc3RpbGwgcmVzcG9uc2l2ZSAoY2FuIHJ1
-biBvdGhlciBjb21tYW5kcykNCg0KKDIpIENQVSBnb2VzIGhpZ2gsIGJ1dCBub3QgMTAwJQ0KDQoo
-MykgdGhlIGNvbW1hbmQgY2FuIGV4aXQgYWZ0ZXIgc2FtYmEgc2VydmVyIGlzIHN0YXJ0ZWQgYWdh
-aW4NCg0KKDQpIG9ic2VydmUgdGhlIGZvbGxvd2luZyBsb2cgaW4gImRtZXNnIjoNCg0KRGVjIDI1
-IDA1OjM1OjU2IG1hY2hpbmUtaG9zdG5hbWUga2VybmVsOiBCVUc6IHNvZnQgbG9ja3VwIC0gQ1BV
-IzEgc3R1Y2sgZm9yIDIycyEgW2R1OjI2MDJdDQoNCkRlYyAyNSAwNTozNTo1NiBtYWNoaW5lLWhv
-c3RuYW1lIGtlcm5lbDogWzxmZmZmZmZmZjgxMGE2ODA2Pl0gcHJlcGFyZV90b193YWl0KzB4NTYv
-MHg5MA0KRGVjIDI1IDA1OjM1OjU2IG1hY2hpbmUtaG9zdG5hbWUga2VybmVsOiBbPGZmZmZmZmZm
-YTA0MDUyY2I+XSBjaWZzX3JlY29ubmVjdF90Y29uKzB4YmIvMHgyZjAgW2NpZnNdDQpEZWMgMjUg
-MDU6MzU6NTYgbWFjaGluZS1ob3N0bmFtZSBrZXJuZWw6IFs8ZmZmZmZmZmY4MTBhNmFlMD5dID8g
-d2FrZV91cF9hdG9taWNfdCsweDMwLzB4MzANCkRlYyAyNSAwNTozNTo1NiBtYWNoaW5lLWhvc3Ru
-YW1lIGtlcm5lbDogWzxmZmZmZmZmZmEwNDA1NWJhPl0gc21iX2luaXQrMHgyYS8weDUwIFtjaWZz
-XQ0KRGVjIDI1IDA1OjM1OjU2IG1hY2hpbmUtaG9zdG5hbWUga2VybmVsOiBbPGZmZmZmZmZmYTA0
-MGJkOGE+XSBDSUZTU01CVW5peFFQYXRoSW5mbysweDdhLzB4MmUwIFtjaWZzXQ0KRGVjIDI1IDA1
-OjM1OjU2IG1hY2hpbmUtaG9zdG5hbWUga2VybmVsOiBbPGZmZmZmZmZmYTA0MjIyNGI+XSBjaWZz
-X2dldF9pbm9kZV9pbmZvX3VuaXgrMHg4Yi8weDFlMCBbY2lmc10NCkRlYyAyNSAwNTozNTo1NiBt
-YWNoaW5lLWhvc3RuYW1lIGtlcm5lbDogWzxmZmZmZmZmZjgxMWU4YmEwPl0gPyBjb21wbGV0ZV93
-YWxrKzB4NjAvMHhlMA0KRGVjIDI1IDA1OjM1OjU2IG1hY2hpbmUtaG9zdG5hbWUga2VybmVsOiBb
-PGZmZmZmZmZmODExZWQ4MjM+XSA/IHBhdGhfbG9va3VwYXQrMHg4My8weDdhMA0KRGVjIDI1IDA1
-OjM1OjU2IG1hY2hpbmUtaG9zdG5hbWUga2VybmVsOiBbPGZmZmZmZmZmODExNmI4ZjU+XSA/IGZp
-bGVtYXBfZmF1bHQrMHgyMjUvMHg0MzANCkRlYyAyNSAwNTozNTo1NiBtYWNoaW5lLWhvc3RuYW1l
-IGtlcm5lbDogWzxmZmZmZmZmZmEwMjNlZDRjPl0gPyB4ZnNfaXVubG9jaysweDExYy8weDEzMCBb
-eGZzXQ0KRGVjIDI1IDA1OjM1OjU2IG1hY2hpbmUtaG9zdG5hbWUga2VybmVsOiBbPGZmZmZmZmZm
-ODExYzFkOTU+XSA/IF9fa21hbGxvYysweDU1LzB4MjMwDQpEZWMgMjUgMDU6MzU6NTYgbWFjaGlu
-ZS1ob3N0bmFtZSBrZXJuZWw6IFs8ZmZmZmZmZmZhMDQxNzIzZT5dID8gYnVpbGRfcGF0aF9mcm9t
-X2RlbnRyeSsweGFlLzB4MjkwIFtjaWZzXQ0KRGVjIDI1IDA1OjM1OjU2IG1hY2hpbmUtaG9zdG5h
-bWUga2VybmVsOiBbPGZmZmZmZmZmYTA0MTcyM2U+XSA/IGJ1aWxkX3BhdGhfZnJvbV9kZW50cnkr
-MHhhZS8weDI5MCBbY2lmc10NCkRlYyAyNSAwNTozNTo1NiBtYWNoaW5lLWhvc3RuYW1lIGtlcm5l
-bDogWzxmZmZmZmZmZmEwNDI0N2MwPl0gY2lmc19yZXZhbGlkYXRlX2RlbnRyeV9hdHRyKzB4ZDAv
-MHgxZTAgW2NpZnNdDQpEZWMgMjUgMDU6MzU6NTYgbWFjaGluZS1ob3N0bmFtZSBrZXJuZWw6IFs8
-ZmZmZmZmZmZhMDQyNDk4Nz5dIGNpZnNfZ2V0YXR0cisweDU3LzB4MTMwIFtjaWZzXQ0KRGVjIDI1
-IDA1OjM1OjU2IG1hY2hpbmUtaG9zdG5hbWUga2VybmVsOiBbPGZmZmZmZmZmODExZTM0YzY+XSB2
-ZnNfZ2V0YXR0cisweDQ2LzB4ODANCkRlYyAyNSAwNTozNTo1NiBtYWNoaW5lLWhvc3RuYW1lIGtl
-cm5lbDogWzxmZmZmZmZmZjgxMWUzNWY1Pl0gdmZzX2ZzdGF0YXQrMHg3NS8weGMwDQpEZWMgMjUg
-MDU6MzU6NTYgbWFjaGluZS1ob3N0bmFtZSBrZXJuZWw6IFs8ZmZmZmZmZmY4MTFlM2MwND5dIFNZ
-U0NfbmV3ZnN0YXRhdCsweDI0LzB4NjANCkRlYyAyNSAwNTozNTo1NiBtYWNoaW5lLWhvc3RuYW1l
-IGtlcm5lbDogWzxmZmZmZmZmZjgxNjQxMWIzPl0gPyB0cmFjZV9kb19wYWdlX2ZhdWx0KzB4NDMv
-MHgxMTANCkRlYyAyNSAwNTozNTo1NiBtYWNoaW5lLWhvc3RuYW1lIGtlcm5lbDogWzxmZmZmZmZm
-ZjgxNjQwOGQ5Pl0gPyBkb19hc3luY19wYWdlX2ZhdWx0KzB4MjkvMHhlMA0KRGVjIDI1IDA1OjM1
-OjU2IG1hY2hpbmUtaG9zdG5hbWUga2VybmVsOiBbPGZmZmZmZmZmODE2M2Q0Mzg+XSA/IGFzeW5j
-X3BhZ2VfZmF1bHQrMHgyOC8weDMwDQpEZWMgMjUgMDU6MzU6NTYgbWFjaGluZS1ob3N0bmFtZSBr
-ZXJuZWw6IFs8ZmZmZmZmZmY4MTFlM2U0ZT5dIFN5U19uZXdmc3RhdGF0KzB4ZS8weDEwDQpEZWMg
-MjUgMDU6MzU6NTYgbWFjaGluZS1ob3N0bmFtZSBrZXJuZWw6IFs8ZmZmZmZmZmY4MTY0NTkwOT5d
-IHN5c3RlbV9jYWxsX2Zhc3RwYXRoKzB4MTYvMHgxYg0KKDUpIGVuYWJsZSAiY2lmc0ZZSSIsIG9i
-c2VydmVkIGNpZnMua28ga2VlcHMgcHJpbnRpbmcgdGhlIGxvZ3MgYmVsb3c6DQoNClsgMzA1OC44
-MjA1MDRdIGZzL2NpZnMvZmlsZS5jOiA3OiBpb3ZfYmFzZT1mZmZmODgwMDEyOWU2MDAwIGlvdl9s
-ZW49NDA5Ng0KWyAzMDU4LjgyMDUwNl0gZnMvY2lmcy9maWxlLmM6IDg6IGlvdl9iYXNlPWZmZmY4
-ODAwM2Q0ZTMwMDAgaW92X2xlbj00MDk2DQpbIDMwNTguODIwNTA4XSBmcy9jaWZzL2ZpbGUuYzog
-OTogaW92X2Jhc2U9ZmZmZjg4MDAxMDljYjAwMCBpb3ZfbGVuPTQwOTYNClsgMzA1OC44MjA1MTBd
-IGZzL2NpZnMvZmlsZS5jOiAxMDogaW92X2Jhc2U9ZmZmZjg4MDAzYjU2YjAwMCBpb3ZfbGVuPTQw
-OTYNClsgMzA1OC44MjA1MTJdIGZzL2NpZnMvZmlsZS5jOiAxMTogaW92X2Jhc2U9ZmZmZjg4MDAx
-M2JkNjAwMCBpb3ZfbGVuPTQwOTYNClsgMzA1OC44MjA1MTVdIGZzL2NpZnMvY2lmc3NtYi5jOiB0
-b3RhbF9yZWFkPTQ5MjE2IGJ1Zmxlbj00OTIxNiByZW1haW5pbmc9NDkxNTINClsgMzA1OC44MjA1
-MjldIGZzL2NpZnMvY2lmc3NtYi5jOiBjaWZzX3JlYWR2X2NhbGxiYWNrOiBtaWQ9NjE0NTkgc3Rh
-dGU9NCByZXN1bHQ9MCBieXRlcz00OTE1Mg0KWyAzMDU4LjgyMDUzMV0gZnMvY2lmcy9taXNjLmM6
-IE51bGwgYnVmZmVyIHBhc3NlZCB0byBjaWZzX3NtYWxsX2J1Zl9yZWxlYXNlDQpbIDMwNTguODIw
-NTQ2XSBmcy9jaWZzL2NpZnNzbWIuYzogY2lmc19hc3luY19yZWFkdjogb2Zmc2V0PTExNjE3ODk0
-NCBieXRlcz0xNjM4NA0KWyAzMDU4LjgyMDU0N10gZnMvY2lmcy90cmFuc3BvcnQuYzogRm9yIHNt
-Yl9jb21tYW5kIDQ2DQpbIDMwNTguODIwNTQ4XSBmcy9jaWZzL3RyYW5zcG9ydC5jOiBTZW5kaW5n
-IHNtYjogc21iX2xlbj01OQ0KWyAzMDU4LjgyMDk2MV0gZnMvY2lmcy9jb25uZWN0LmM6IFJGQzEw
-MDIgaGVhZGVyIDB4NDAzYw0KWyAzMDU4LjgyMDk2M10gZnMvY2lmcy9jaWZzc21iLmM6IGNpZnNf
-cmVhZHZfcmVjZWl2ZTogbWlkPTYxNDYwIG9mZnNldD0xMTYxNzg5NDQgYnl0ZXM9MTYzODQNClsg
-MzA1OC44MjA5NjRdIGZzL2NpZnMvY2lmc3NtYi5jOiBjaWZzX3JlYWR2X3JlY2VpdmU6IHRvdGFs
-X3JlYWQ9NjMgZGF0YV9vZmZzZXQ9NjQNClsgMzA1OC44MjA5NjVdIGZzL2NpZnMvY2lmc3NtYi5j
-OiAwOiBpb3ZfYmFzZT1mZmZmODgwMDM2MjY3ZDQwIGlvdl9sZW49NjQNClsgMzA1OC44MjA5NjZd
-IGZzL2NpZnMvZmlsZS5jOiAwOiBpb3ZfYmFzZT1mZmZmODgwMDEzYmQ2MDAwIGlvdl9sZW49NDA5
-Ng0KWyAzMDU4LjgyMDk2OF0gZnMvY2lmcy9maWxlLmM6IDE6IGlvdl9iYXNlPWZmZmY4ODAwM2I1
-NmIwMDAgaW92X2xlbj00MDk2DQpbIDMwNTguODIwOTcwXSBmcy9jaWZzL2ZpbGUuYzogMjogaW92
-X2Jhc2U9ZmZmZjg4MDAxMDljYjAwMCBpb3ZfbGVuPTQwOTYNClsgMzA1OC44MjA5NzJdIGZzL2Np
-ZnMvZmlsZS5jOiAzOiBpb3ZfYmFzZT1mZmZmODgwMDNkNGUzMDAwIGlvdl9sZW49NDA5Ng0KWyAz
-MDU4LjgyMDk3NV0gZnMvY2lmcy9jaWZzc21iLmM6IHRvdGFsX3JlYWQ9MTY0NDggYnVmbGVuPTE2
-NDQ4IHJlbWFpbmluZz0xNjM4NA0KWyAzMDU4LjgyMDk3Nl0gZnMvY2lmcy9jaWZzc21iLmM6IGNp
-ZnNfcmVhZHZfY2FsbGJhY2s6IG1pZD02MTQ2MCBzdGF0ZT00IHJlc3VsdD0wIGJ5dGVzPTE2Mzg0
-DQpbIDMwNTguODIwOTc4XSBmcy9jaWZzL21pc2MuYzogTnVsbCBidWZmZXIgcGFzc2VkIHRvIGNp
-ZnNfc21hbGxfYnVmX3JlbGVhc2UNClsgMzA1OC44MjE2MDBdIGZzL2NpZnMvY2lmc3NtYi5jOiBj
-aWZzX2FzeW5jX3JlYWR2OiBvZmZzZXQ9MTE2MTk1MzI4IGJ5dGVzPTQ5MTUyDQpbIDMwNTguODIx
-NjAyXSBmcy9jaWZzL3RyYW5zcG9ydC5jOiBGb3Igc21iX2NvbW1hbmQgNDYNClsgMzA1OC44MjE2
-MDNdIGZzL2NpZnMvdHJhbnNwb3J0LmM6IFNlbmRpbmcgc21iOiBzbWJfbGVuPTU5DQpbIDMwNTgu
-ODIxOTgyXSBmcy9jaWZzL2Nvbm5lY3QuYzogUkZDMTAwMiBoZWFkZXIgMHhjMDNjDQpbIDMwNTgu
-ODIxOTg1XSBmcy9jaWZzL2NpZnNzbWIuYzogY2lmc19yZWFkdl9yZWNlaXZlOiBtaWQ9NjE0NjEg
-b2Zmc2V0PTExNjE5NTMyOCBieXRlcz00OTE1Mg0KWyAzMDU4LjgyMTk4Nl0gZnMvY2lmcy9jaWZz
-c21iLmM6IGNpZnNfcmVhZHZfcmVjZWl2ZTogdG90YWxfcmVhZD02MyBkYXRhX29mZnNldD02NA0K
-WyAzMDU4LjgyMTk4N10gZnMvY2lmcy9jaWZzc21iLmM6IDA6IGlvdl9iYXNlPWZmZmY4ODAwMzYy
-NjdkNDAgaW92X2xlbj02NA0KWyAzMDU4LjgyMTk4OF0gZnMvY2lmcy9maWxlLmM6IDA6IGlvdl9i
-YXNlPWZmZmY4ODAwMzY3OTcwMDAgaW92X2xlbj00MDk2DQpbIDMwNTguODIxOTkwXSBmcy9jaWZz
-L2ZpbGUuYzogMTogaW92X2Jhc2U9ZmZmZjg4MDAzNjdjYzAwMCBpb3ZfbGVuPTQwOTYNClsgMzA1
-OC44MjE5OTJdIGZzL2NpZnMvZmlsZS5jOiAyOiBpb3ZfYmFzZT1mZmZmODgwMDNkMDY5MDAwIGlv
-dl9sZW49NDA5Ng0KWyAzMDU4LjgyMTk5M10gZnMvY2lmcy9maWxlLmM6IDM6IGlvdl9iYXNlPWZm
-ZmY4ODAwMTU2YjgwMDAgaW92X2xlbj00MDk2DQpbIDMwNTguODIxOTk1XSBmcy9jaWZzL2ZpbGUu
-YzogNDogaW92X2Jhc2U9ZmZmZjg4MDAzZDA3YjAwMCBpb3ZfbGVuPTQwOTYNClsgMzA1OC44MjE5
-OTddIGZzL2NpZnMvZmlsZS5jOiA1OiBpb3ZfYmFzZT1mZmZmODgwMDE0ZjdiMDAwIGlvdl9sZW49
-NDA5Ng0KWyAzMDU4LjgyMTk5OV0gZnMvY2lmcy9maWxlLmM6IDY6IGlvdl9iYXNlPWZmZmY4ODAw
-M2I0NGQwMDAgaW92X2xlbj00MDk2DQpbIDMwNTguODIyMDAxXSBmcy9jaWZzL2ZpbGUuYzogNzog
-aW92X2Jhc2U9ZmZmZjg4MDAxM2FiYTAwMCBpb3ZfbGVuPTQwOTYNClsgMzA1OC44MjIwMTVdIGZz
-L2NpZnMvZmlsZS5jOiA4OiBpb3ZfYmFzZT1mZmZmODgwMDEzYWJiMDAwIGlvdl9sZW49NDA5Ng0K
-WyAzMDU4LjgyMjAxNl0gZnMvY2lmcy9maWxlLmM6IDk6IGlvdl9iYXNlPWZmZmY4ODAwMzY4NTYw
-MDAgaW92X2xlbj00MDk2DQpbIDMwNTguODIyMDE4XSBmcy9jaWZzL2ZpbGUuYzogMTA6IGlvdl9i
-YXNlPWZmZmY4ODAwMzY4NTcwMDAgaW92X2xlbj00MDk2DQpbIDMwNTguODIyMDIwXSBmcy9jaWZz
-L2ZpbGUuYzogMTE6IGlvdl9iYXNlPWZmZmY4ODAwMTBhOGUwMDAgaW92X2xlbj00MDk2DQpbIDMw
-NTguODIyMDIzXSBmcy9jaWZzL2NpZnNzbWIuYzogdG90YWxfcmVhZD00OTIxNiBidWZsZW49NDky
-MTYgcmVtYWluaW5nPTQ5MTUyDQpbIDMwNTguODIyMDI0XSBmcy9jaWZzL2NpZnNzbWIuYzogY2lm
-c19yZWFkdl9jYWxsYmFjazogbWlkPTYxNDYxIHN0YXRlPTQgcmVzdWx0PTAgYnl0ZXM9NDkxNTIN
-ClsgMzA1OC44MjIwMjZdIGZzL2NpZnMvbWlzYy5jOiBOdWxsIGJ1ZmZlciBwYXNzZWQgdG8gY2lm
-c19zbWFsbF9idWZfcmVsZWFzZQ0KWyAzMDU4LjgyMjA0MF0gZnMvY2lmcy9jaWZzc21iLmM6IGNp
-ZnNfYXN5bmNfcmVhZHY6IG9mZnNldD0xMTYyNDQ0ODAgYnl0ZXM9MTYzODQNClsgMzA1OC44MjIw
-NDFdIGZzL2NpZnMvdHJhbnNwb3J0LmM6IEZvciBzbWJfY29tbWFuZCA0Ng0KWyAzMDU4LjgyMjA0
-Ml0gZnMvY2lmcy90cmFuc3BvcnQuYzogU2VuZGluZyBzbWI6IHNtYl9sZW49NTkNClsgMzA1OC44
-MjI0MThdIGZzL2NpZnMvY29ubmVjdC5jOiBSRkMxMDAyIGhlYWRlciAweDQwM2MNClsgMzA1OC44
-MjI0MjBdIGZzL2NpZnMvY2lmc3NtYi5jOiBjaWZzX3JlYWR2X3JlY2VpdmU6IG1pZD02MTQ2MiBv
-ZmZzZXQ9MTE2MjQ0NDgwIGJ5dGVzPTE2Mzg0DQpbIDMwNTguODIyNDIyXSBmcy9jaWZzL2NpZnNz
-bWIuYzogY2lmc19yZWFkdl9yZWNlaXZlOiB0b3RhbF9yZWFkPTYzIGRhdGFfb2Zmc2V0PTY0DQpb
-IDMwNTguODIyNDIzXSBmcy9jaWZzL2NpZnNzbWIuYzogMDogaW92X2Jhc2U9ZmZmZjg4MDAzNjI2
-N2Q0MCBpb3ZfbGVuPTY0DQpbIDMwNTguODIyNDI0XSBmcy9jaWZzL2ZpbGUuYzogMDogaW92X2Jh
-c2U9ZmZmZjg4MDAxMGE4ZTAwMCBpb3ZfbGVuPTQwOTYNClsgMzA1OC44MjI0MjZdIGZzL2NpZnMv
-ZmlsZS5jOiAxOiBpb3ZfYmFzZT1mZmZmODgwMDM2ODU3MDAwIGlvdl9sZW49NDA5Ng0KWyAzMDU4
-LjgyMjQyOF0gZnMvY2lmcy9maWxlLmM6IDI6IGlvdl9iYXNlPWZmZmY4ODAwMzY4NTYwMDAgaW92
-X2xlbj00MDk2DQpbIDMwNTguODIyNDMwXSBmcy9jaWZzL2ZpbGUuYzogMzogaW92X2Jhc2U9ZmZm
-Zjg4MDAxM2FiYjAwMCBpb3ZfbGVuPTQwOTYNClsgMzA1OC44MjI0MzRdIGZzL2NpZnMvY2lmc3Nt
-Yi5jOiB0b3RhbF9yZWFkPTE2NDQ4IGJ1Zmxlbj0xNjQ0OCByZW1haW5pbmc9MTYzODQNClsgMzA1
-OC44MjI0MzVdIGZzL2NpZnMvY2lmc3NtYi5jOiBjaWZzX3JlYWR2X2NhbGxiYWNrOiBtaWQ9NjE0
-NjIgc3RhdGU9NCByZXN1bHQ9MCBieXRlcz0xNjM4NA0KWyAzMDU4LjgyMjQzN10gZnMvY2lmcy9t
-aXNjLmM6IE51bGwgYnVmZmVyIHBhc3NlZCB0byBjaWZzX3NtYWxsX2J1Zl9yZWxlYXNlDQpbIDMw
-NTguODIyOTY3XSBmcy9jaWZzL2NpZnNzbWIuYzogY2lmc19hc3luY19yZWFkdjogb2Zmc2V0PTEx
-NjI2MDg2NCBieXRlcz00OTE1Mg0KWyAzMDU4LjgyMjk2OV0gZnMvY2lmcy90cmFuc3BvcnQuYzog
-Rm9yIHNtYl9jb21tYW5kIDQ2DQpbIDMwNTguODIyOTcwXSBmcy9jaWZzL3RyYW5zcG9ydC5jOiBT
-ZW5kaW5nIHNtYjogc21iX2xlbj01OQ0KWyAzMDU4LjgzMzQxOV0gZnMvY2lmcy9jb25uZWN0LmM6
-IFJGQzEwMDIgaGVhZGVyIDB4YzAzYw0KWyAzMDU4LjgzMzQyM10gZnMvY2lmcy9jaWZzc21iLmM6
-IGNpZnNfcmVhZHZfcmVjZWl2ZTogbWlkPTYxNDYzIG9mZnNldD0xMTYyNjA4NjQgYnl0ZXM9NDkx
-NTINClsgMzA1OC44MzM0MjVdIGZzL2NpZnMvY2lmc3NtYi5jOiBjaWZzX3JlYWR2X3JlY2VpdmU6
-IHRvdGFsX3JlYWQ9NjMgZGF0YV9vZmZzZXQ9NjQNClsgMzA1OC44MzM0MzhdIGZzL2NpZnMvY2lm
-c3NtYi5jOiAwOiBpb3ZfYmFzZT1mZmZmODgwMDM2MjY3ZDQwIGlvdl9sZW49NjQNClsgMzA1OC44
-MzM0NDBdIGZzL2NpZnMvZmlsZS5jOiAwOiBpb3ZfYmFzZT1mZmZmODgwMDIwNmQ1MDAwIGlvdl9s
-ZW49NDA5Ng0KWyAzMDU4LjgzMzQ0MV0gZnMvY2lmcy9maWxlLmM6IDE6IGlvdl9iYXNlPWZmZmY4
-ODAwM2QxZDYwMDAgaW92X2xlbj00MDk2DQpbIDMwNTguODMzNDQ0XSBmcy9jaWZzL2ZpbGUuYzog
-MjogaW92X2Jhc2U9ZmZmZjg4MDAzNjdjZDAwMCBpb3ZfbGVuPTQwOTYNClsgMzA1OC44MzM0NDVd
-IGZzL2NpZnMvZmlsZS5jOiAzOiBpb3ZfYmFzZT1mZmZmODgwMDNhY2QyMDAwIGlvdl9sZW49NDA5
-Ng0KWyAzMDU4LjgzMzQ0N10gZnMvY2lmcy9maWxlLmM6IDQ6IGlvdl9iYXNlPWZmZmY4ODAwM2Fj
-ZDMwMDAgaW92X2xlbj00MDk2DQpbIDMwNTguODMzNDQ5XSBmcy9jaWZzL2ZpbGUuYzogNTogaW92
-X2Jhc2U9ZmZmZjg4MDAzZDEyODAwMCBpb3ZfbGVuPTQwOTYNCg0KDQoNClRoYW5rcw0KTWlrZQ==
+We initially sent this pretty early this year, so this is a resend in           
+case anyone missed the first posting. The call for topics and attendance        
+requests is open until January 15th, 2017.
+
+The original message follows:
+
+----------------------8<------------------------
+
+The annual Linux Storage, Filesystem and Memory Management (LSF/MM)
+Summit for 2017 will be held on March 20th and 21st at the Hyatt
+Cambridge, Cambridge, MA. LSF/MM is an invitation-only technical
+workshop to map out improvements to the Linux storage, filesystem and
+memory management subsystems that will make their way into the mainline
+kernel within the coming years.
+
+    http://events.linuxfoundation.org/events/linux-storage-filesystem-and-mm-summit
+
+Like last year, LSF/MM will be colocated with the Linux Foundation Vault
+conference which takes place on March 22nd and 23rd in the same Venue.
+For those that do not know, Vault is designed to be an event where open
+source storage and filesystem practitioners meet storage implementors
+and, as such, it would be of benefit for LSF/MM attendees to attend.
+
+Unlike past years, Vault admission is not free for LSF/MM attendees this
+year unless they're giving a talk. There is a discount for LSF/MM
+attendees, however we would also like to encourage folks to submit talk
+proposals to speak at the Vault conference.
+
+    http://events.linuxfoundation.org/events/vault
+
+On behalf of the committee I am issuing a call for agenda proposals that
+are suitable for cross-track discussion as well as technical subjects
+for the breakout sessions.
+
+If advance notice is required for visa applications then please point
+that out in your proposal or request to attend, and submit the topic
+as soon as possible.
+
+1) Proposals for agenda topics should be sent before January 15th, 2016
+to:
+
+    lsf-pc@lists.linux-foundation.org
+
+and cc the Linux list or lists that are relevant for the topic in
+question:
+
+    ATA:   linux-ide@vger.kernel.org
+    Block: linux-block@vger.kernel.org
+    FS:    linux-fsdevel@vger.kernel.org
+    MM:    linux-mm@kvack.org
+    SCSI:  linux-scsi@vger.kernel.org
+    NVMe:  linux-nvme@lists.infradead.org
+
+Please tag your proposal with [LSF/MM TOPIC] to make it easier to track.
+In addition, please make sure to start a new thread for each topic
+rather than following up to an existing one.  Agenda topics and
+attendees will be selected by the program committee, but the final
+agenda will be formed by consensus of the attendees on the day.
+
+2) Requests to attend the summit for those that are not proposing a
+topic should be sent to:
+
+    lsf-pc@lists.linux-foundation.org
+
+Please summarise what expertise you will bring to the meeting, and what
+you would like to discuss. Please also tag your email with [LSF/MM
+ATTEND] and send it as a new thread so there is less chance of it
+getting lost.
+
+We will try to cap attendance at around 25-30 per track to facilitate
+discussions although the final numbers will depend on the room sizes at
+the venue.
+
+Brief presentations are allowed to guide discussion, but are strongly
+discouraged. There will be no recording or audio bridge. However, we
+expect that written minutes will be published as we did in previous
+years:
+
+2016: https://lwn.net/Articles/lsfmm2016/
+
+2015: https://lwn.net/Articles/lsfmm2015/
+
+2014: http://lwn.net/Articles/LSFMM2014/
+
+2013: http://lwn.net/Articles/548089/
+
+3) If you have feedback on last year's meeting that we can use to
+improve this year's, please also send that to:
+
+    lsf-pc@lists.linux-foundation.org
+
+Thank you on behalf of the program committee:
+
+Storage:
+    James Bottomley
+    Martin K. Petersen (track chair)
+    Sagi Grimberg
+
+Filesystems:
+    Anna Schumaker
+    Chris Mason
+    Eric Sandeen
+    Jan Kara
+    Jeff Layton (summit chair)
+    Josef Bacik (track chair)
+    Trond Myklebust
+
+MM:
+    Johannes Weiner
+    Rik van Riel (track chair)
+-- 
+Jeff Layton <jlayton@poochiereds.net>
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
