@@ -1,7 +1,7 @@
-From: L A Walsh <law-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org>
+From: L A Walsh <cifs-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org>
 Subject: Re: SMB2: Enforce sec= mount option
-Date: Tue, 10 Jan 2017 15:11:57 -0800
-Message-ID: <58756A3D.6000705@tlinx.org>
+Date: Tue, 10 Jan 2017 15:30:08 -0800
+Message-ID: <58756E80.5000802@tlinx.org>
 References: <1481179577-15995-1-git-send-email-sprabhu@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8; format=flowed
@@ -25,7 +25,7 @@ haven't really thought through all of the ramifications.
 
 Is it possible to add a 'prefix' or 'suffix', like an
 "=" sign or a '+' -- to mean:
- 
+
 '=' = exactly this 'sec' level
 '+' = this 'sec'-level or greater
 '<' = less than or equal to this sec-level
