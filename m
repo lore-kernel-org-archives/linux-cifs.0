@@ -1,80 +1,77 @@
-From: David Mulder <dmulder-IBi9RG/b67k@public.gmane.org>
-Subject: Re: [PATCH 00/15] SMB3 encryption support
-Date: Wed, 11 Jan 2017 09:55:46 -0700
-Message-ID: <1484153746.25835.5.camel@suse.com>
-References: <1481061758-52020-1-git-send-email-pshilov@microsoft.com>
+From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] SMB2: Enforce sec= mount option
+Date: Wed, 11 Jan 2017 11:48:16 -0600
+Message-ID: <CAFB9KM0VVe+wjkiu=t1_JjFg6C+VcMHS-ubvgLQ-UyjzSKzmBQ@mail.gmail.com>
+References: <1481179577-15995-1-git-send-email-sprabhu@redhat.com>
+ <CAFB9KM0oPPm4bYyKd75Yjy-2kCZ=0UTpwn=ONCRo0g5waNa6AA@mail.gmail.com>
+ <1481187800.4195.19.camel@redhat.com> <c0748fb1-4161-ea0f-3f6d-b0705bb83a9d@citrix.com>
+ <1484137071.29387.9.camel@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-To: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Cc: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>,
+        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1481061758-52020-1-git-send-email-pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+In-Reply-To: <1484137071.29387.9.camel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-I've tested these patches using xfstests, with Steve French's cifs
-group patches: https://patchwork.kernel.org/patch/8844821/
-Some tests fail on a vanilla kernel master (expected), and other then
-those tests, the others pass with Pavel's smb3 encryption patches
-applied to Steve French's for-next branch.
+On Wed, Jan 11, 2017 at 6:17 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+[snip]
+> My own opinion is that when a mount option is explicitly passed, it is
+> expected the option provided be used and fail if it cannot be used. I
+> think replacing a explicitly requested mount option with another can
+> lead to unexpected results and may also affect things activities like
+> testing.
+>
+> There are other mount options like "vers=3D" where cifs doesn't attempt
+> to replace an invalid protocol version with another. This in my opinion
+> is the correct behaviour.
 
-On Tue, 2016-12-06 at 14:02 -0800, Pavel Shilovsky wrote:
-> This patchset adds encryption support when SMB3 version of the
-> protocol and higher is negotiated.
-> The encryption is done through the kernel crypto API (CCM(AES)).
-> 
-> The patchset has been successfully tested by xfstests and cthon test
-> suites with encrypted file shares on Samba.
-> 
-> Patches are split into several groups:
->  1) #1-#4: prepare transport infractructure to be able to send SMB3
-> transform header;
-> this is done primarily by separating RFC1001 length and SMB2 header
-> into different iovs.
->  2) #5-#6: simplify SMB2 header processing and cleaning up a read
-> codepath.
->  3) #7-#9: encrypt outcoming packets by transforming them before
-> sending.
->  4) #10-#14: decrypt incoming packets and pass ordinary SMB2 messages
-> for further usual processing.
->  5) #15: allow to use "seal" mount option to request the encryption
-> on a share.
-> 
-> Pavel Shilovsky (15):
->   CIFS: Separate SMB2 header structure
->   CIFS: Make SendReceive2() takes resp iov
->   CIFS: Make send_cancel take rqst as argument
->   CIFS: Send RFC1001 length in a separate iov
->   CIFS: Separate SMB2 sync header processing
->   CIFS: Separate RFC1001 length processing for SMB2 read
->   CIFS: Add capability to transform requests before sending
->   CIFS: Enable encryption during session setup phase
->   CIFS: Encrypt SMB3 requests before sending
->   CIFS: Add transform header handling callbacks
->   CIFS: Add mid handle callback
->   CIFS: Add copy into pages callback for a read operation
->   CIFS: Decrypt and process small encrypted packets
->   CIFS: Add capability to decrypt big read responses
->   CIFS: Allow to switch on encryption with seal mount option
-> 
->  fs/cifs/cifsencrypt.c   |  51 ++--
->  fs/cifs/cifsglob.h      |  28 ++-
->  fs/cifs/cifsproto.h     |  13 +-
->  fs/cifs/cifssmb.c       | 135 +++++-----
->  fs/cifs/connect.c       |  71 ++++--
->  fs/cifs/file.c          |  52 +++-
->  fs/cifs/sess.c          |  27 +-
->  fs/cifs/smb1ops.c       |   4 +-
->  fs/cifs/smb2glob.h      |   5 +
->  fs/cifs/smb2maperror.c  |   5 +-
->  fs/cifs/smb2misc.c      |  61 ++---
->  fs/cifs/smb2ops.c       | 651
-> +++++++++++++++++++++++++++++++++++++++++++++++-
->  fs/cifs/smb2pdu.c       | 575 +++++++++++++++++++++++++++-----------
-> ----
->  fs/cifs/smb2pdu.h       |  27 +-
->  fs/cifs/smb2proto.h     |   5 +
->  fs/cifs/smb2transport.c | 132 ++++++----
->  fs/cifs/transport.c     | 171 ++++++++-----
->  17 files changed, 1540 insertions(+), 473 deletions(-)
-> 
+Allow me to play Devil's advocate, but with a bridge we'll have to
+cross if we enact this behavior... Quoth The (current-ish) Fine Manual
+page for mount.cifs (quoted in full for historical mail list
+reference) :
+"
+    sec=3D
+           Security mode. Allowed values are:
+
+           =C2=B7   none - attempt to connection as a null user (no name)
+           =C2=B7   krb5 - Use Kerberos version 5 authentication
+           =C2=B7   krb5i - Use Kerberos authentication and forcibly enable
+packet signing
+           =C2=B7   ntlm - Use NTLM password hashing
+           =C2=B7   ntlmi - Use NTLM password hashing and force packet sign=
+ing
+           =C2=B7   ntlmv2 - Use NTLMv2 password hashing
+           =C2=B7   ntlmv2i - Use NTLMv2 password hashing and force packet =
+signing
+           =C2=B7   ntlmssp - Use NTLMv2 password hashing encapsulated in
+Raw NTLMSSP message
+           =C2=B7   ntlmsspi - Use NTLMv2 password hashing encapsulated in
+Raw NTLMSSP message, and force packet signing
+           The default in mainline kernel versions prior to v3.8 was
+sec=3Dntlm. In v3.8, the default was changed to sec=3Dntlmssp.
+
+           If the server requires signing during protocol negotiation,
+then it may be enabled automatically. Packet signing may also be
+enabled
+           automatically if it's enabled in /proc/fs/cifs/SecurityFlags.
+"
+
+What is the defined behavior if I specify that I'd like any of the
+more current NTLM variants kerberos-5, explicitly, without packet
+signing but the server requires packet signing?  Currently, we
+silently turn it on.  Is the defined behavior to now loudly fail
+rather than enable signing?  Especially since the default value
+changed in Linux-3.8.  I'd argue that we already somewhat treat the
+"sec" option as a preference rather than a requirement.  I would
+further argue, although not strongly, that if we want to go down this
+road, that we should accept multiple options and if NONE of them can
+be used, then we fail.  Does anyone have a better idea, or is the
+consensus that this isn't as large of an issue (both technologically
+and from a user perspective) as I perceive it to be?
+
+Steve, I'll defer to you as well with my objection above noted.
