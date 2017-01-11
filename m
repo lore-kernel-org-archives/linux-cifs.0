@@ -1,41 +1,64 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fix
-Date: Tue, 31 Jan 2017 09:43:11 -0600
-Message-ID: <CAH2r5mtunJJxiYcbLYVyv2jhZ0wsRurLCxdWsPgMsrWoT06d5g@mail.gmail.com>
+From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: SMB2: Enforce sec= mount option
+Date: Wed, 11 Jan 2017 15:02:22 -0600
+Message-ID: <CAFB9KM3S+p3sU26LKGwqaZ_3g4gkPPzEFzohwAFOa-PZPqZTAQ@mail.gmail.com>
+References: <1481179577-15995-1-git-send-email-sprabhu@redhat.com> <58756A3D.6000705@tlinx.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        robin-VrBV9hrLPhE@public.gmane.org
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: L A Walsh <law-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <58756A3D.6000705-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-A small cifs fix for stable
+On Tue, Jan 10, 2017 at 5:11 PM, L A Walsh <law-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org> wrote:
+> Sachin Prabhu wrote:
+>>
+>> If the security type specified using a mount option is not supported,
+>> the SMB2 session setup code changes the security type to RawNTLMSSP. We
+>> should instead fail the mount and return an error.
+>>
+>
+> ---
+> Saw the comment by Steve F, and it got me to thinking.
+> Please take this as a suggestion or idea...  I'm not
+> heavily committed to a single solution, at this point, as
+> haven't really thought through all of the ramifications.
+>
+> Is it possible to add a 'prefix' or 'suffix', like an
+> "=" sign or a '+' -- to mean:
+>
+> '=' = exactly this 'sec' level
+> '+' = this 'sec'-level or greater
+> '<' = less than or equal to this sec-level
+> ---
+> Using the symbols is a similar idea to some fields in
+> 'find' where +/- are used to indicate greater or less than
+> the stated number.
+>
+> I'm not sure about the symbols, exactly, but I know in samba I
+> ask for smb2 for the protocol and more often than not, only
+> get smb1, but I'd rather have it work than fail.
+>
+> Since I'm on a closed net, I'd have to say the same for
+> security options, but I'd like to have a choice to force it
+> if I wanted to...
+>
+> Anyway -- just an idea that might offer more flexibility than just
+> 'fail'...
+>
 
-Please pull the following changes since commit
-2eabb8b8d68bc9c7779ba8b04bec8d4f8baed0bc:
-
-  Merge tag 'nfsd-4.10-1' of git://linux-nfs.org/~bfields/linux
-(2017-01-16 09:34:37 -0800)
-
-are available in the git repository at:
-
-
-  git://git.samba.org/sfrench/cifs-2.6.git for-next
-
-for you to fetch changes up to 81ddd8c0c5e1cb41184d66567140cb48c53eb3d1:
-
-  cifs: initialize file_info_lock (2017-01-14 14:58:29 -0600)
-
-----------------------------------------------------------------
-Rabin Vincent (1):
-      cifs: initialize file_info_lock
-
- fs/cifs/readdir.c | 1 +
- 1 file changed, 1 insertion(+)
+It'd take a tiny bit of messing with the command line parser, but I'd
+be for that.  As a gesture of good faith, since I raised the issue,
+I'd be willing to submit the patch set for mount.cifs to support this
+if everyone is on board.  I'd suggest staying away from '<' and '>' as
+they're shell redirects though.  This would be a reasonable shorthand
+for a comma separated list (which also might take a bit of messing
+with the parser since we split on ',') - it could reasonably loop in
+the userland mount helper, mount.cifs, in much the same way Steve
+suggested that it should be handled in userland.
 
 -- 
-Thanks,
-
-Steve
+Peace and Blessings,
+-Scott.
