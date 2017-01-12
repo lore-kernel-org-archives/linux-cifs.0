@@ -1,127 +1,110 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Fwd: [PATCH] SMB2: Enforce sec= mount option
-Date: Wed, 11 Jan 2017 11:59:58 -0600
-Message-ID: <CAH2r5mtmwxAf61ES_JBYuZ5+wjAKftVfw=0N03ZtW-XhQ+7pyA@mail.gmail.com>
+Subject: Re: SMB2: Enforce sec= mount option
+Date: Wed, 11 Jan 2017 22:23:00 -0600
+Message-ID: <CAH2r5ms0Yk-zxoh6+H+tNzSQTUxTd3t577V8R0gn0Xt7_ouk-Q@mail.gmail.com>
 References: <1481179577-15995-1-git-send-email-sprabhu@redhat.com>
- <CAFB9KM0oPPm4bYyKd75Yjy-2kCZ=0UTpwn=ONCRo0g5waNa6AA@mail.gmail.com>
- <1481187800.4195.19.camel@redhat.com> <c0748fb1-4161-ea0f-3f6d-b0705bb83a9d@citrix.com>
- <1484137071.29387.9.camel@redhat.com> <CAFB9KM0VVe+wjkiu=t1_JjFg6C+VcMHS-ubvgLQ-UyjzSKzmBQ@mail.gmail.com>
- <CAH2r5mvU4_O_epw8tTPOHV3UVRyi9eNmE85cFPGVDGR8twQiZg@mail.gmail.com>
+ <58756A3D.6000705@tlinx.org> <CAFB9KM3S+p3sU26LKGwqaZ_3g4gkPPzEFzohwAFOa-PZPqZTAQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: L A Walsh <law-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org>, linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mvU4_O_epw8tTPOHV3UVRyi9eNmE85cFPGVDGR8twQiZg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CAFB9KM3S+p3sU26LKGwqaZ_3g4gkPPzEFzohwAFOa-PZPqZTAQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
----------- Forwarded message ----------
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Date: Wed, Jan 11, 2017 at 11:58 AM
-Subject: Re: [PATCH] SMB2: Enforce sec=3D mount option
-To: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Cc: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Germano Percossi
-<germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>, linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Some general thoughts:
+1) users shouldn't have to know about the details of protocol
+encapsulation, just security features that might matter to them
+2) focus should be on SMB2.1 or later (SMB3 or later ideally), we can
+leave cifs semantics alone.
+3) warning messages are best printed in user space by mount.cifs
+(since users don't often read kernel debug message logs)
+4) there are few choices relevant for SMB2 and later
+     a) krb5 vs. ntlmv2
+     b) signing optional vs mandatory
+              - and for SMB3.1.1 AES-CCM vs. AES-GCM (see
+https://jira.corp.primarydata.com/browse/PD-22499)
+5) sane defaults that make it easier for the user with the most common
+case (SMB3 or later supported by server) are preferred
+
+My preference would be:
+   a) change smb2 and later behavior only (even limiting changes to
+SMB3 or later is fine). No reason to change cifs and risk older
+RHEL/SLES/Ubuntu users (and servers where support for LANMAN or NTLM
+may have mattered)
+   b) allowing multiple dialects and/or multiple "sec=" is fine, but
+probably easier to limit changes to mount.cifs and this is pretty
+simple if we only have two real choices today.
+   c) changing default to allow no "sec=" to mean try ntlmv2 and krb5
+(not sure which should be the default) is fine, but may be better to
+do the retry in userspace
+   d) allow SMB3.1.1 choice for CCM vs. GCM when we have support for
+these in cifs.ko
+   e) On invalid sec= choices for SMB2 and later e.g. "sec=lanman" or
+"sec=ntlm" warn on these in userspace (in mount.cifs) - we can simply
+strip them out before calling the kernel.
+   f) "sec=ntlmv2" is fine to leave in since I don't see any harm in
+treating ntlmv2 and ntlmv2 in ntlmssp and ntlmv2 in ntlmssp in gssapi
+as synonyms for SMB2/SMB3 (the user shouldn't have to know how
+encapsulation of passwords is done) - and if we ever would have to
+retry in kernel to attempt the two encapsulation methods (ntlmv2 in
+ntlmssp vs. ntlmv2 in ntlmssp in gssapi) that is fine.
 
 
-There is a broader question here about signing (making sure we enforce
-it properly if signing is requested but not supported) but I think
-that ntlmv2 can map to ntlmssp/ntlmv2.  Given that ntlmv2 is the level
-of password hash used in our implementation of ntlmssp - I am fine
-with allowing ntlmv2 as a synonym (we wouldn't distinguish gssapi
-encapsulation of ntlmssp as a distinct sec version either - what
-matters is the level of security).
-
-On the question of signing:
-1) if the server requires signing we turn it on (without signing
-required on the client mount, we allow the server to choose)
-2) if the client requires signing and the server doesn't support it we
-should fail since the client expects signing
-
-I wouldn't mind adding mount option that forces signing to be off no
-matter what the server requested but doubt it would be needed.
-
-I do agree about accepting a list of sec=3D options and would take a
-kernel patch for that, but our earlier decision was that this could be
-done easier in user space (mount.cifs) - ie retry with different sec=3D
-options if the user specified more than.
-
-On Wed, Jan 11, 2017 at 11:48 AM, Scott Lovenberg
+On Wed, Jan 11, 2017 at 3:02 PM, Scott Lovenberg
 <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> On Tue, Jan 10, 2017 at 5:11 PM, L A Walsh <law-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org> wrote:
+>> Sachin Prabhu wrote:
+>>>
+>>> If the security type specified using a mount option is not supported,
+>>> the SMB2 session setup code changes the security type to RawNTLMSSP. We
+>>> should instead fail the mount and return an error.
+>>>
+>>
+>> ---
+>> Saw the comment by Steve F, and it got me to thinking.
+>> Please take this as a suggestion or idea...  I'm not
+>> heavily committed to a single solution, at this point, as
+>> haven't really thought through all of the ramifications.
+>>
+>> Is it possible to add a 'prefix' or 'suffix', like an
+>> "=" sign or a '+' -- to mean:
+>>
+>> '=' = exactly this 'sec' level
+>> '+' = this 'sec'-level or greater
+>> '<' = less than or equal to this sec-level
+>> ---
+>> Using the symbols is a similar idea to some fields in
+>> 'find' where +/- are used to indicate greater or less than
+>> the stated number.
+>>
+>> I'm not sure about the symbols, exactly, but I know in samba I
+>> ask for smb2 for the protocol and more often than not, only
+>> get smb1, but I'd rather have it work than fail.
+>>
+>> Since I'm on a closed net, I'd have to say the same for
+>> security options, but I'd like to have a choice to force it
+>> if I wanted to...
+>>
+>> Anyway -- just an idea that might offer more flexibility than just
+>> 'fail'...
+>>
 >
-> On Wed, Jan 11, 2017 at 6:17 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote=
-:
-> [snip]
-> > My own opinion is that when a mount option is explicitly passed, it is
-> > expected the option provided be used and fail if it cannot be used. I
-> > think replacing a explicitly requested mount option with another can
-> > lead to unexpected results and may also affect things activities like
-> > testing.
-> >
-> > There are other mount options like "vers=3D" where cifs doesn't attempt
-> > to replace an invalid protocol version with another. This in my opinion
-> > is the correct behaviour.
->
-> Allow me to play Devil's advocate, but with a bridge we'll have to
-> cross if we enact this behavior... Quoth The (current-ish) Fine Manual
-> page for mount.cifs (quoted in full for historical mail list
-> reference) :
-> "
->     sec=3D
->            Security mode. Allowed values are:
->
->            =C2=B7   none - attempt to connection as a null user (no name)
->            =C2=B7   krb5 - Use Kerberos version 5 authentication
->            =C2=B7   krb5i - Use Kerberos authentication and forcibly enab=
-le
-> packet signing
->            =C2=B7   ntlm - Use NTLM password hashing
->            =C2=B7   ntlmi - Use NTLM password hashing and force packet si=
-gning
->            =C2=B7   ntlmv2 - Use NTLMv2 password hashing
->            =C2=B7   ntlmv2i - Use NTLMv2 password hashing and force packe=
-t signing
->            =C2=B7   ntlmssp - Use NTLMv2 password hashing encapsulated in
-> Raw NTLMSSP message
->            =C2=B7   ntlmsspi - Use NTLMv2 password hashing encapsulated i=
-n
-> Raw NTLMSSP message, and force packet signing
->            The default in mainline kernel versions prior to v3.8 was
-> sec=3Dntlm. In v3.8, the default was changed to sec=3Dntlmssp.
->
->            If the server requires signing during protocol negotiation,
-> then it may be enabled automatically. Packet signing may also be
-> enabled
->            automatically if it's enabled in /proc/fs/cifs/SecurityFlags.
-> "
->
-> What is the defined behavior if I specify that I'd like any of the
-> more current NTLM variants kerberos-5, explicitly, without packet
-> signing but the server requires packet signing?  Currently, we
-> silently turn it on.  Is the defined behavior to now loudly fail
-> rather than enable signing?  Especially since the default value
-> changed in Linux-3.8.  I'd argue that we already somewhat treat the
-> "sec" option as a preference rather than a requirement.  I would
-> further argue, although not strongly, that if we want to go down this
-> road, that we should accept multiple options and if NONE of them can
-> be used, then we fail.  Does anyone have a better idea, or is the
-> consensus that this isn't as large of an issue (both technologically
-> and from a user perspective) as I perceive it to be?
->
-> Steve, I'll defer to you as well with my objection above noted.
+> It'd take a tiny bit of messing with the command line parser, but I'd
+> be for that.  As a gesture of good faith, since I raised the issue,
+> I'd be willing to submit the patch set for mount.cifs to support this
+> if everyone is on board.  I'd suggest staying away from '<' and '>' as
+> they're shell redirects though.  This would be a reasonable shorthand
+> for a comma separated list (which also might take a bit of messing
+> with the parser since we split on ',') - it could reasonably loop in
+> the userland mount helper, mount.cifs, in much the same way Steve
+> suggested that it should be handled in userland.
 
 
 
 
---=20
-Thanks,
-
-Steve
-
-
-
---=20
+-- 
 Thanks,
 
 Steve
