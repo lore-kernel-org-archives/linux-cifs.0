@@ -1,54 +1,56 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: weirdness with cifsd
-Date: Thu, 12 Jan 2017 17:58:03 -0600
-Message-ID: <CAH2r5msvqa1OOfr8fseU_PCv-Rz4-fyTrkEDRT+qDBJtXQ21Hg@mail.gmail.com>
-References: <587815F8.5050309@tlinx.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: L A Walsh <cifs-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org>
+From: Rabin Vincent <rabin.vincent-VrBV9hrLPhE@public.gmane.org>
+Subject: [PATCH] cifs: initialize file_info_lock
+Date: Fri, 13 Jan 2017 15:00:16 +0100
+Message-ID: <1484316016-15901-1-git-send-email-rabin.vincent@axis.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
+To: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <587815F8.5050309-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-You can see some information (i/o in flight e.g.) in
-/proc/fs/cifs/DebugData and /proc/fs/cifs/stats
+From: Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
 
-You can enable logging (dmesg ie the kernel log) "echo 7 >
-/proc/fs/cifs/cifsFYI")
+file_info_lock is not initalized in initiate_cifs_search(), leading to the
+following splat after a simple "mount.cifs ... dir && ls dir/":
 
-See https://wiki.samba.org/index.php/LinuxCIFS_troubleshooting
+ BUG: spinlock bad magic on CPU#0, ls/486
+  lock: 0xffff880009301110, .magic: 00000000, .owner: <none>/-1, .owner_cpu: 0
+ CPU: 0 PID: 486 Comm: ls Not tainted 4.9.0 #27
+ Hardware name: QEMU Standard PC (i440FX + PIIX, 1996)
+  ffffc900042f3db0 ffffffff81327533 0000000000000000 ffff880009301110
+  ffffc900042f3dd0 ffffffff810baf75 ffff880009301110 ffffffff817ae077
+  ffffc900042f3df0 ffffffff810baff6 ffff880009301110 ffff880008d69900
+ Call Trace:
+  [<ffffffff81327533>] dump_stack+0x65/0x92
+  [<ffffffff810baf75>] spin_dump+0x85/0xe0
+  [<ffffffff810baff6>] spin_bug+0x26/0x30
+  [<ffffffff810bb159>] do_raw_spin_lock+0xe9/0x130
+  [<ffffffff8159ad2f>] _raw_spin_lock+0x1f/0x30
+  [<ffffffff8127e50d>] cifs_closedir+0x4d/0x100
+  [<ffffffff81181cfd>] __fput+0x5d/0x160
+  [<ffffffff81181e3e>] ____fput+0xe/0x10
+  [<ffffffff8109410e>] task_work_run+0x7e/0xa0
+  [<ffffffff81002512>] exit_to_usermode_loop+0x92/0xa0
+  [<ffffffff810026f9>] syscall_return_slowpath+0x49/0x50
+  [<ffffffff8159b484>] entry_SYSCALL_64_fastpath+0xa7/0xa9
 
-On Thu, Jan 12, 2017 at 5:49 PM, L A Walsh <cifs-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org> wrote:
-> Just today, for the first time in a while, I have my Win machine
-> mounted on my linux machine.
->
-> But after a short while I'm seeing a large amount of read & write
-> network traffic between the two machines.
->
-> If I unmount the share (essentially my entire
-> Win disk), it stops.  But otherwise, I see cifsd getting
-> 100% of a cpu most of the time.
->
->
-> Is there a log like samba has to see what is being accessed?
->
-> I'm not sure at this point what is causing it...
->
-> (sorry for partial note before.  I swear I clicked on save, but must have
-> hit send... (lame!)...
->
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Fixes: 3afca265b5f53a0 ("Clarify locking of cifs file and tcon structures and make more granular")
+Signed-off-by: Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
+---
+ fs/cifs/readdir.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-
-
+diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+index 8f6a2a5..a27fc87 100644
+--- a/fs/cifs/readdir.c
++++ b/fs/cifs/readdir.c
+@@ -285,6 +285,7 @@ initiate_cifs_search(const unsigned int xid, struct file *file)
+ 			rc = -ENOMEM;
+ 			goto error_exit;
+ 		}
++		spin_lock_init(&cifsFile->file_info_lock);
+ 		file->private_data = cifsFile;
+ 		cifsFile->tlink = cifs_get_tlink(tlink);
+ 		tcon = tlink_tcon(tlink);
 -- 
-Thanks,
-
-Steve
+2.1.4
