@@ -1,217 +1,212 @@
-From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v2] smb2: Enforce sec= mount option
-Date: Wed, 18 Jan 2017 15:35:57 +0530
-Message-ID: <20170118100557.19668-1-sprabhu@redhat.com>
-To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+From: Valentin Hilbig <externer.dl.hilbig-EnyPcy3oyxIb1SvskN2V4Q@public.gmane.org>
+Subject: Linux CIFS client module: login rate limiting
+Date: Thu, 19 Jan 2017 08:48:09 +0100
+Message-ID: <58806F39.9010801@muenchen.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Content-Transfer-Encoding: 8BIT
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-If the security type specified using a mount option is not supported,
-the SMB2 session setup code changes the security type to RawNTLMSSP. We
-should instead fail the mount and return an error.
+Hello Linux Kernel CIFS-List,
 
-The patch changes the code for SMB2 to make it similar to the code used
-for SMB1. Like in SMB1, we now use the global security flags to select
-the security method to be used when no security method is specified and
-to return an error when the requested auth method is not available.
+please forgive me to ninja-register to the list and start my firstpost 
+right with the questions.  This is done in the hope to save your time. 
+The long background story is below in case you are interested:
 
-For SMB2, we also use ntlmv2 as a synonym for nltmssp.
+Q1) Is it possible on the CIFS client to implement caching for failed 
+CIFS/SMB authentication replies?  My wish is to cache those negative 
+replies just a second (HZ), as 3600 retries per hour to re-establish a 
+lost connection to a CIFS server seems enough.  Enough to succeed and 
+enough on semi-permanent failures.  I'd like to see this 1000ms cache as 
+a mount default, as it's not for the initial request, just for the 
+subsequent retries, but setting it to 0 (no cache) is ok for me, too, as 
+it then can be changed at mount-time.
 
-Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/cifsglob.h  |  3 +++
- fs/cifs/cifsproto.h |  2 ++
- fs/cifs/connect.c   |  3 ++-
- fs/cifs/sess.c      |  4 ++--
- fs/cifs/smb1ops.c   |  1 +
- fs/cifs/smb2ops.c   |  4 ++++
- fs/cifs/smb2pdu.c   | 37 +++++++++++++++++++++++++++++++++----
- fs/cifs/smb2proto.h |  2 ++
- 8 files changed, 49 insertions(+), 7 deletions(-)
+Q2) As an extension I also would like to see something like a maximum 
+retry counter, which declares a CIFS mount dead if we do not succeed 
+after N negative replies.  In my case N=40000 (around at least 11 hrs 
+for 1s cache time) sounds good.  However the rate-limiting is much more 
+important than deactivating a rogue CIFS mount.  Hence mount's default 
+should be N=0, which means, infinite retries (as it is today).
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 7ea8a33..417af3f 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -433,6 +433,9 @@ struct smb_version_operations {
- 	bool (*dir_needs_close)(struct cifsFileInfo *);
- 	long (*fallocate)(struct file *, struct cifs_tcon *, int, loff_t,
- 			  loff_t);
-+	enum securityEnum (*select_sectype)(struct TCP_Server_Info *,
-+			    enum securityEnum);
-+
- };
- 
- struct smb_version_values {
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index c7b3c84..88da716 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -519,4 +519,6 @@ int cifs_create_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
- int __cifs_calc_signature(struct smb_rqst *rqst,
- 			struct TCP_Server_Info *server, char *signature,
- 			struct shash_desc *shash);
-+enum securityEnum cifs_select_sectype(struct TCP_Server_Info *,
-+					enum securityEnum);
- #endif			/* _CIFSPROTO_H */
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 35ae49e..327a6cb 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -2057,7 +2057,8 @@ match_security(struct TCP_Server_Info *server, struct smb_vol *vol)
- 	 * that was specified, or "Unspecified" if that sectype was not
- 	 * compatible with the given NEGOTIATE request.
- 	 */
--	if (select_sectype(server, vol->sectype) == Unspecified)
-+	if (server->ops->select_sectype(server, vol->sectype)
-+	     == Unspecified)
- 		return false;
- 
- 	/*
-diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index 538d9b5..55c337d 100644
---- a/fs/cifs/sess.c
-+++ b/fs/cifs/sess.c
-@@ -500,7 +500,7 @@ int build_ntlmssp_auth_blob(unsigned char **pbuffer,
- }
- 
- enum securityEnum
--select_sectype(struct TCP_Server_Info *server, enum securityEnum requested)
-+cifs_select_sectype(struct TCP_Server_Info *server, enum securityEnum requested)
- {
- 	switch (server->negflavor) {
- 	case CIFS_NEGFLAVOR_EXTENDED:
-@@ -1390,7 +1390,7 @@ static int select_sec(struct cifs_ses *ses, struct sess_data *sess_data)
- {
- 	int type;
- 
--	type = select_sectype(ses->server, ses->sectype);
-+	type = cifs_select_sectype(ses->server, ses->sectype);
- 	cifs_dbg(FYI, "sess setup type %d\n", type);
- 	if (type == Unspecified) {
- 		cifs_dbg(VFS,
-diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index fc537c2..1399671 100644
---- a/fs/cifs/smb1ops.c
-+++ b/fs/cifs/smb1ops.c
-@@ -1087,6 +1087,7 @@ struct smb_version_operations smb1_operations = {
- 	.is_read_op = cifs_is_read_op,
- 	.wp_retry_size = cifs_wp_retry_size,
- 	.dir_needs_close = cifs_dir_needs_close,
-+	.select_sectype = cifs_select_sectype,
- #ifdef CONFIG_CIFS_XATTR
- 	.query_all_EAs = CIFSSMBQAllEAs,
- 	.set_EA = CIFSSMBSetEA,
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 5d456eb..8d9fda2 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -1623,6 +1623,7 @@ struct smb_version_operations smb20_operations = {
- 	.clone_range = smb2_clone_range,
- 	.wp_retry_size = smb2_wp_retry_size,
- 	.dir_needs_close = smb2_dir_needs_close,
-+	.select_sectype = smb2_select_sectype,
- };
- 
- struct smb_version_operations smb21_operations = {
-@@ -1704,6 +1705,7 @@ struct smb_version_operations smb21_operations = {
- 	.wp_retry_size = smb2_wp_retry_size,
- 	.dir_needs_close = smb2_dir_needs_close,
- 	.enum_snapshots = smb3_enum_snapshots,
-+	.select_sectype = smb2_select_sectype,
- };
- 
- struct smb_version_operations smb30_operations = {
-@@ -1791,6 +1793,7 @@ struct smb_version_operations smb30_operations = {
- 	.dir_needs_close = smb2_dir_needs_close,
- 	.fallocate = smb3_fallocate,
- 	.enum_snapshots = smb3_enum_snapshots,
-+	.select_sectype = smb2_select_sectype,
- };
- 
- #ifdef CONFIG_CIFS_SMB311
-@@ -1879,6 +1882,7 @@ struct smb_version_operations smb311_operations = {
- 	.dir_needs_close = smb2_dir_needs_close,
- 	.fallocate = smb3_fallocate,
- 	.enum_snapshots = smb3_enum_snapshots,
-+	.select_sectype = smb2_select_sectype,
- };
- #endif /* CIFS_SMB311 */
- 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 8745722..316045a 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -596,6 +596,28 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
- 	return -EIO;
- }
- 
-+enum securityEnum
-+smb2_select_sectype(struct TCP_Server_Info *server, enum securityEnum requested)
-+{
-+	switch (requested) {
-+	case Kerberos:
-+	case RawNTLMSSP:
-+		return requested;
-+	case NTLMv2:
-+		return RawNTLMSSP;
-+	case Unspecified:
-+		if (server->sec_ntlmssp &&
-+			(global_secflags & CIFSSEC_MAY_NTLMSSP))
-+			return RawNTLMSSP;
-+		if ((server->sec_kerberos || server->sec_mskerberos) &&
-+			(global_secflags & CIFSSEC_MAY_KRB5))
-+			return Kerberos;
-+		/* Fallthrough */
-+	default:
-+		return Unspecified;
-+	}
-+}
-+
- struct SMB2_sess_data {
- 	unsigned int xid;
- 	struct cifs_ses *ses;
-@@ -958,10 +980,17 @@ SMB2_sess_auth_rawntlmssp_authenticate(struct SMB2_sess_data *sess_data)
- static int
- SMB2_select_sec(struct cifs_ses *ses, struct SMB2_sess_data *sess_data)
- {
--	if (ses->sectype != Kerberos && ses->sectype != RawNTLMSSP)
--		ses->sectype = RawNTLMSSP;
-+	int type;
-+
-+	type = smb2_select_sectype(ses->server, ses->sectype);
-+	cifs_dbg(FYI, "sess setup type %d\n", type);
-+	if (type == Unspecified) {
-+		cifs_dbg(VFS,
-+			"Unable to select appropriate authentication method!");
-+		return -EINVAL;
-+	}
- 
--	switch (ses->sectype) {
-+	switch (type) {
- 	case Kerberos:
- 		sess_data->func = SMB2_auth_kerberos;
- 		break;
-@@ -969,7 +998,7 @@ SMB2_select_sec(struct cifs_ses *ses, struct SMB2_sess_data *sess_data)
- 		sess_data->func = SMB2_sess_auth_rawntlmssp_negotiate;
- 		break;
- 	default:
--		cifs_dbg(VFS, "secType %d not supported!\n", ses->sectype);
-+		cifs_dbg(VFS, "secType %d not supported!\n", type);
- 		return -EOPNOTSUPP;
- 	}
- 
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index f2d511a..2f0a5a2 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -175,4 +175,6 @@ extern int SMB2_lease_break(const unsigned int xid, struct cifs_tcon *tcon,
- 			    __u8 *lease_key, const __le32 lease_state);
- extern int smb3_validate_negotiate(const unsigned int, struct cifs_tcon *);
- 
-+extern enum securityEnum smb2_select_sectype(struct TCP_Server_Info *,
-+					enum securityEnum);
- #endif			/* _SMB2PROTO_H */
+Q3) According to 
+https://www.kernel.org/doc/readme/Documentation-filesystems-cifs-README 
+these features do not exist (yet).  Are such features planned for the 
+kernel CIFS client module?  If not, is there a chance for me to get 
+patches upstream in case that I provide them?  Is there more to think of 
+than to just follow the style guide (and provide kernel-grade code)?  Of 
+course I will extend the sysctl/proc interface to those new mount 
+options in a compatible way (or discuss this with the list before I 
+break heritage).  However my patches will be for "our" kernels used here 
+(3.13 and 4.4), so perhaps this needs some porting/upgrading for the 
+latest (I am not sure that I get permission to take the time to provide 
+patches to the current kernel as well).
+
+Sorry if some of those are FAQ, but as gmane.org is down/blank 
+currently, I do not have access to the archive of kernel.cifs.
+
+If you some better ideas, please feel free to criticize me ;)
+
+Thanks,
+-Tino
+PS: FYI full long (sorry!) details follow in case you are interested:
+
+(Sorry for missing logs and plain prose, I have no access to the test 
+installation ATM, because it belongs to another group.)
+
+Here at LiMux (Linux for Munich) in certain situations (for example the 
+user has changed the password in LDAP) we observe, that CIFS clients 
+might send 30 or more failing CIFS-setup-requests per second(!) to the 
+CIFS server for an existing (old) CIFS-mount.  Each of this requests 
+tries to (re-)authenticate against AD/LDAP but fails, because the 
+credentials are no more valid.  After a short while the brute force 
+protection of the AD kicks in and then blocks the AD-client (in this 
+case the CIFS server) from accessing AD (for a while).  Which means, 
+other clients are affected by the faulty CIFS-mounts and prohibited to 
+authenticate against the CIFS server.
+
+The CIFS-Server-people cannot help, as the CIFS' vendor (no, not 
+Microsoft) tells us to switch off brute-force-protection on AD-side, 
+which is something we do not want to do for obvious reasons.  The AD 
+shall continue to block IPs with too many wrong requests.  So the only 
+option we have is, to do something against the high rate of AD-requests 
+with a wrong password coming from CIFS clients.
+
+To observe the effect following must happen:
+
+- There is an old CIFS mount (for example a User's $HOME), which is 
+already successfully mounted and working.
+
+- The TCP session to the CIFS server breaks (like inactivity or some 
+short outage on the network.  I used "tcpkill" to simulate that), such 
+that the Kernel's CIFS module needs to re-establish a connection to the 
+CIFS server for the next access, which then triggers re-authenticating 
+with the stored credentials.
+
+- This re-authentication fails, due to a password change or locked 
+account on the AD side.  (If it succeeds there will be no problem, as 
+then the CIFS mount is back to fully functional.  The problem starts, 
+when this re-authentication does not work.)
+
+- And there also must be some culprit, in my case some user process (we 
+haven't identified it yet but think it's something like Thunderbird), 
+which tries to access the CIFS share in some looping fashion.  (I used 
+"while sleep 0.1; do touch /path/to/share/FILE; done" to test it.)
+
+Please note that there are too many possible user space applications out 
+there which could rapidly hammer a defunct CIFS mount, such that you 
+won't be able to fix them all.  Hence we need a fix on some other level.
+
+(BTW we use version=1 of the protocol, and we require it, upgrading 18k 
+of Linux workstations plus infrastructure against politics ain't easy.)
+
+The CIFS module just forwards the request(s) to the CIFS server, and, as 
+the TCP-connection is broken, tries to establish a new one.  This 
+triggers authentication, but the authentication fails.  So the 
+CIFS-client sees a negative reply like NT ACCOUNT LOCKED OUT, and 
+answers something like "permission denied" to the userspace.  So far, so 
+correct, everything works perfectly as it should!
+
+The problem starts when some userspace application starts to loop over 
+the fault, thereby accessing the CIFS share over and over again, several 
+times a second.  Then the CIFS module continues to do it's job, but it 
+does it much too perfect.  Each single userspace access will try to 
+re-open the session to the CIFS server, again and again, which means we 
+see a massive amount of authentication requests to the server which all 
+are doomed.  Even worse, the faster the server and the better the 
+network, the more such failing requests you will see, of course.  This 
+triggers the AD brute force protection even faster.
+
+However, if those few CIFS-clients, which "freak out", would be limited 
+to only send 1 request per second, then AD does not see too many failed 
+requests per timespan, so everything stays operable.
+
+But even if this is implemented, this is only half of the story (the 
+important half, but there is more to it):
+
+If we had rate-limiting in place the AD and CIFS server are out of the 
+loop.  But we still have the user account locked by the failing AD 
+requests.  Let's start over the case from the beginning under the 
+assumption, that we have failed authentication reply caching with a 1s 
+retry:
+
+- The user changes his password (perhaps using Windows, not Linux) but 
+does not log out afterwards (on Linux).
+
+- The TCP-session of the CIFS mount breaks for some reason.
+
+- Some userspace process tries to access this CIFS mount in the looping 
+fashion.
+
+- The Kernel's CIFS-module tries to re-establish the connection.
+
+- The requests fails due to old credential. (As above.  Windows has the 
+new password, but Linux not.)
+
+- After 5 such false retries (seen from the CIFS-Server) the AD locks 
+the account.  Now the Linux-Client sees NT ACCOUNT LOCKED (sp?).  This 
+takes 5 seconds.
+
+- If the user comes back to work the next day and tries to login, his 
+account is locked, of course.
+
+- He calls Help Desk to get his account unlocked.  They do it.
+
+- But 5s later his account is locked, again.  Thanks to 5 retries seen 
+from the old login on the Linux client.
+
+- Wash, rinse, repeat.
+
+Eventually the user finds out where he is still logged in and logs out, 
+such that (in our case) the (automated, yet no more working) user's 
+CIFS-mounts vanish, too.  This delays how long it takes until the user 
+can work normally, also it usually involves a lot of effort of other 
+people to solve the riddle where the login hides.
+
+This is why I asked Q2 which would allow us to configure, that after 11 
+hours (or so) the CIFS mount ceases to exist, such that the CIFS client 
+stops trying to re-establish the connection.  Which means, the next 
+business day, the CIFS mount very likely has invalidated (it still is 
+mounted, but quiet on the Linux side), such that the user can have his 
+password unlocked without trouble.
+
+This is a tripple-win situation, as it not only helps the Users and 
+takes the burden from Help Desk to diagnose a hard do diagnose 
+situation, it also conserves some wasted network bandwidth and 
+processing power due to all those fruitless authentication requests seen 
+today.  Sigh.
+
+I agree that all this is not the fault of the CIFS module.  However it 
+is better to start to be nice and polite to the infrastructure in case 
+something stupid happens, than to continue as usual and thereby wasting 
+resources and possibly impact others, even when you are rightfully doing 
+this.
+
+(This is a technical list, so I do not introduce myself, because I am 
+not important.  All you need to know is that I know Linux from 0.99 and 
+I am able to hack the kernel, but until now only for my very own needs. 
+  BTW, my private GitHub is https://github.com/hilbix/)
+
+Thanks for any help or comments,
+
+-Tino
+
 -- 
-2.9.3
+Mit freundlichen Grüßen
+Valentin Hilbig
+Externer Dienstleister
+
+IT@M - Dienstleister für Informations- und Telekommunikationstechnik der 
+Landeshauptstadt München
+Geschäftsbereich Werkzeuge und Infrastruktur
+Servicebereich Städtische Arbeitsplätze
+Serviceteam LiMux-Arbeitsplatz I23
+LiMux-Basisclient
+
+Raum A2.030, Agnes-Pockels-Bogen 21, 80992 München
+
+Tel.: +49 89 233-782273
+E-Mail: externer.dl.hilbig-EnyPcy3oyxIb1SvskN2V4Q@public.gmane.org
