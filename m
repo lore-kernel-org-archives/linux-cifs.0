@@ -1,49 +1,44 @@
-From: Jean Delvare <jdelvare-l3A5Bk7waGM@public.gmane.org>
-Subject: [PATCH 3/3] cifs: Add soft dependencies
-Date: Wed, 25 Jan 2017 16:09:10 +0100
-Message-ID: <20170125160910.12928e3c@endymion>
+From: Pavel Shilovsky <piastryyy@gmail.com>
+Subject: Re: [PATCH 0/3] cifs: Better dependencies
+Date: Wed, 25 Jan 2017 11:26:04 -0800
+Message-ID: <CAKywueQdAQ004cy2gGQTeDCeHwoT70Wug5LUgenANqGrmi9ziw@mail.gmail.com>
 References: <20170125160639.255cd58e@endymion>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <sfrench@samba.org>,
+        LKML <linux-kernel@vger.kernel.org>
+To: Jean Delvare <jdelvare@suse.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20170125160639.255cd58e@endymion>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-List soft dependencies of cifs so that mkinitrd and dracut can include
-the required helper modules.
+2017-01-25 7:06 GMT-08:00 Jean Delvare <jdelvare@suse.de>:
+> Hi all,
+>
+> This is my attempt to fix and improve the dependencies of cifs.
+>
+> [PATCH 1/3] cifs: Simplify SMB2 and SMB311 dependencies
+> [PATCH 2/3] cifs: Only select the required crypto modules
+> [PATCH 3/3] cifs: Add soft dependencies
+>
+> I already sent this patch series one year ago, but did not get any
+> reply, so I am trying again.
+>
+> Thanks,
+> --
+> Jean Delvare
+> SUSE L3 Support
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Signed-off-by: Jean Delvare <jdelvare-l3A5Bk7waGM@public.gmane.org>
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- fs/cifs/cifsfs.c |   12 ++++++++++++
- 1 file changed, 12 insertions(+)
+Looks good.
 
---- linux-4.10-rc5.orig/fs/cifs/cifsfs.c	2017-01-16 11:13:06.974673377 +0100
-+++ linux-4.10-rc5/fs/cifs/cifsfs.c	2017-01-25 14:57:06.724389810 +0100
-@@ -1365,5 +1365,17 @@ MODULE_DESCRIPTION
-     ("VFS to access servers complying with the SNIA CIFS Specification "
-      "e.g. Samba and Windows");
- MODULE_VERSION(CIFS_VERSION);
-+MODULE_SOFTDEP("pre: arc4");
-+MODULE_SOFTDEP("pre: des");
-+MODULE_SOFTDEP("pre: ecb");
-+MODULE_SOFTDEP("pre: hmac");
-+MODULE_SOFTDEP("pre: md4");
-+MODULE_SOFTDEP("pre: md5");
-+MODULE_SOFTDEP("pre: nls");
-+#ifdef CONFIG_CIFS_SMB2
-+MODULE_SOFTDEP("pre: aes");
-+MODULE_SOFTDEP("pre: cmac");
-+MODULE_SOFTDEP("pre: sha256");
-+#endif /* CONFIG_CIFS_SMB2 */
- module_init(init_cifs)
- module_exit(exit_cifs)
+Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
 
 -- 
-Jean Delvare
-SUSE L3 Support
+Best regards,
+Pavel Shilovsky
