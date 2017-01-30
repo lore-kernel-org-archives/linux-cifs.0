@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: [PATCH v2 05/15] CIFS: Separate SMB2 sync header processing
-Date: Mon, 30 Jan 2017 13:39:34 -0800
-Message-ID: <1485812384-28870-6-git-send-email-pshilov@microsoft.com>
+Subject: [PATCH v2 04/15] CIFS: Send RFC1001 length in a separate iov
+Date: Mon, 30 Jan 2017 13:39:33 -0800
+Message-ID: <1485812384-28870-5-git-send-email-pshilov@microsoft.com>
 References: <1485812384-28870-1-git-send-email-pshilov@microsoft.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -11,123 +11,653 @@ In-Reply-To: <1485812384-28870-1-git-send-email-pshilov-0li6OtcxBFHby3iVrkZq2A@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Do not process RFC1001 length in smb2_hdr_assemble() because
-it is not a part of SMB2 header. This allows to cleanup the code
-and adds a possibility combine several SMB2 packets into one
-for compounding.
+In order to simplify further encryption support we need to separate
+RFC1001 length and SMB2 header when sending a request. Put the length
+field in iov[0] and the rest of the packet into following iovs.
 
 Signed-off-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c | 50 ++++++++++++++++++++++++++++++--------------------
- fs/cifs/smb2pdu.h |  5 +++++
- 2 files changed, 35 insertions(+), 20 deletions(-)
+ fs/cifs/cifsencrypt.c   | 38 +++++++++++++---------
+ fs/cifs/cifsglob.h      |  2 +-
+ fs/cifs/cifssmb.c       | 51 +++++++++++++++++------------
+ fs/cifs/smb2pdu.c       | 64 ++++++++++++++++++++++--------------
+ fs/cifs/smb2transport.c | 28 +++++++++-------
+ fs/cifs/transport.c     | 86 +++++++++++++++++++++++++++++++++++++------------
+ 6 files changed, 174 insertions(+), 95 deletions(-)
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 438c4b1..f6ba2c0 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -79,25 +79,9 @@ static const int smb2_req_struct_sizes[NUMBER_OF_SMB2_COMMANDS] = {
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 5eb0412..3a0aaf0 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -75,24 +75,20 @@ int __cifs_calc_signature(struct smb_rqst *rqst,
+ 	struct kvec *iov = rqst->rq_iov;
+ 	int n_vec = rqst->rq_nvec;
  
+-	for (i = 0; i < n_vec; i++) {
++	if (n_vec < 2 || iov[0].iov_len != 4)
++		return -EIO;
++
++	for (i = 1; i < n_vec; i++) {
+ 		if (iov[i].iov_len == 0)
+ 			continue;
+ 		if (iov[i].iov_base == NULL) {
+ 			cifs_dbg(VFS, "null iovec entry\n");
+ 			return -EIO;
+ 		}
+-		/* The first entry includes a length field (which does not get
+-		   signed that occupies the first 4 bytes before the header */
+-		if (i == 0) {
+-			if (iov[0].iov_len <= 8) /* cmd field at offset 9 */
+-				break; /* nothing to sign or corrupt header */
+-			rc = crypto_shash_update(shash,
+-				iov[i].iov_base + 4, iov[i].iov_len - 4);
+-		} else {
+-			rc = crypto_shash_update(shash,
+-				iov[i].iov_base, iov[i].iov_len);
+-		}
++		if (i == 1 && iov[1].iov_len <= 4)
++			break; /* nothing to sign or corrupt header */
++		rc = crypto_shash_update(shash,
++					 iov[i].iov_base, iov[i].iov_len);
+ 		if (rc) {
+ 			cifs_dbg(VFS, "%s: Could not update with payload\n",
+ 				 __func__);
+@@ -168,6 +164,10 @@ int cifs_sign_rqst(struct smb_rqst *rqst, struct TCP_Server_Info *server,
+ 	char smb_signature[20];
+ 	struct smb_hdr *cifs_pdu = (struct smb_hdr *)rqst->rq_iov[0].iov_base;
  
- static void
--smb2_hdr_assemble(struct smb2_hdr *hdr, __le16 smb2_cmd /* command */ ,
-+smb2_hdr_assemble(struct smb2_sync_hdr *shdr, __le16 smb2_cmd,
- 		  const struct cifs_tcon *tcon)
++	if (rqst->rq_iov[0].iov_len != 4 ||
++	    rqst->rq_iov[0].iov_base + 4 != rqst->rq_iov[1].iov_base)
++		return -EIO;
++
+ 	if ((cifs_pdu == NULL) || (server == NULL))
+ 		return -EINVAL;
+ 
+@@ -209,12 +209,14 @@ int cifs_sign_smbv(struct kvec *iov, int n_vec, struct TCP_Server_Info *server,
+ int cifs_sign_smb(struct smb_hdr *cifs_pdu, struct TCP_Server_Info *server,
+ 		  __u32 *pexpected_response_sequence_number)
  {
--	struct smb2_pdu *pdu = (struct smb2_pdu *)hdr;
--	struct smb2_sync_hdr *shdr = get_sync_hdr(hdr);
--	char *temp = (char *)hdr;
--	/* lookup word count ie StructureSize from table */
--	__u16 parmsize = smb2_req_struct_sizes[le16_to_cpu(smb2_cmd)];
--
--	/*
--	 * smaller than SMALL_BUFFER_SIZE but bigger than fixed area of
--	 * largest operations (Create)
--	 */
--	memset(temp, 0, 256);
--
--	/* Note this is only network field converted to big endian */
--	hdr->smb2_buf_length =
--			cpu_to_be32(parmsize + sizeof(struct smb2_sync_hdr));
--
- 	shdr->ProtocolId = SMB2_PROTO_NUMBER;
- 	shdr->StructureSize = cpu_to_le16(64);
- 	shdr->Command = smb2_cmd;
-@@ -149,7 +133,6 @@ smb2_hdr_assemble(struct smb2_hdr *hdr, __le16 smb2_cmd /* command */ ,
- 	if (tcon->ses && tcon->ses->server && tcon->ses->server->sign)
- 		shdr->Flags |= SMB2_FLAGS_SIGNED;
- out:
--	pdu->StructureSize2 = cpu_to_le16(parmsize);
- 	return;
+-	struct kvec iov;
++	struct kvec iov[2];
+ 
+-	iov.iov_base = cifs_pdu;
+-	iov.iov_len = be32_to_cpu(cifs_pdu->smb_buf_length) + 4;
++	iov[0].iov_base = cifs_pdu;
++	iov[0].iov_len = 4;
++	iov[1].iov_base = (char *)cifs_pdu + 4;
++	iov[1].iov_len = be32_to_cpu(cifs_pdu->smb_buf_length);
+ 
+-	return cifs_sign_smbv(&iov, 1, server,
++	return cifs_sign_smbv(iov, 2, server,
+ 			      pexpected_response_sequence_number);
  }
  
-@@ -290,6 +273,26 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon)
+@@ -227,6 +229,10 @@ int cifs_verify_signature(struct smb_rqst *rqst,
+ 	char what_we_think_sig_should_be[20];
+ 	struct smb_hdr *cifs_pdu = (struct smb_hdr *)rqst->rq_iov[0].iov_base;
+ 
++	if (rqst->rq_iov[0].iov_len != 4 ||
++	    rqst->rq_iov[0].iov_base + 4 != rqst->rq_iov[1].iov_base)
++		return -EIO;
++
+ 	if (cifs_pdu == NULL || server == NULL)
+ 		return -EINVAL;
+ 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 4f4fffd..5a89875 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -1117,7 +1117,7 @@ struct cifs_readdata {
+ 	int (*read_into_pages)(struct TCP_Server_Info *server,
+ 				struct cifs_readdata *rdata,
+ 				unsigned int len);
+-	struct kvec			iov;
++	struct kvec			iov[2];
+ 	unsigned int			pagesz;
+ 	unsigned int			tailsz;
+ 	unsigned int			credits;
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index e2a790a..be261a3 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -708,9 +708,9 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
+ {
+ 	ECHO_REQ *smb;
+ 	int rc = 0;
+-	struct kvec iov;
+-	struct smb_rqst rqst = { .rq_iov = &iov,
+-				 .rq_nvec = 1 };
++	struct kvec iov[2];
++	struct smb_rqst rqst = { .rq_iov = iov,
++				 .rq_nvec = 2 };
+ 
+ 	cifs_dbg(FYI, "In echo request\n");
+ 
+@@ -725,8 +725,11 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
+ 	put_bcc(1, &smb->hdr);
+ 	smb->Data[0] = 'a';
+ 	inc_rfc1001_len(smb, 3);
+-	iov.iov_base = smb;
+-	iov.iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4;
++
++	iov[0].iov_len = 4;
++	iov[0].iov_base = smb;
++	iov[1].iov_len = get_rfc1002_length(smb);
++	iov[1].iov_base = (char *)smb + 4;
+ 
+ 	rc = cifs_call_async(server, &rqst, NULL, cifs_echo_callback,
+ 			     server, CIFS_ASYNC_OP | CIFS_ECHO_OP);
+@@ -1509,10 +1512,12 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+ 	}
+ 
+ 	/* set up first iov for signature check */
+-	rdata->iov.iov_base = buf;
+-	rdata->iov.iov_len = server->total_read;
+-	cifs_dbg(FYI, "0: iov_base=%p iov_len=%zu\n",
+-		 rdata->iov.iov_base, rdata->iov.iov_len);
++	rdata->iov[0].iov_base = buf;
++	rdata->iov[0].iov_len = 4;
++	rdata->iov[1].iov_base = buf + 4;
++	rdata->iov[1].iov_len = server->total_read - 4;
++	cifs_dbg(FYI, "0: iov_base=%p iov_len=%u\n",
++		 rdata->iov[0].iov_base, server->total_read);
+ 
+ 	/* how much data is in the response? */
+ 	data_len = server->ops->read_data_length(buf);
+@@ -1545,8 +1550,8 @@ cifs_readv_callback(struct mid_q_entry *mid)
+ 	struct cifs_readdata *rdata = mid->callback_data;
+ 	struct cifs_tcon *tcon = tlink_tcon(rdata->cfile->tlink);
+ 	struct TCP_Server_Info *server = tcon->ses->server;
+-	struct smb_rqst rqst = { .rq_iov = &rdata->iov,
+-				 .rq_nvec = 1,
++	struct smb_rqst rqst = { .rq_iov = rdata->iov,
++				 .rq_nvec = 2,
+ 				 .rq_pages = rdata->pages,
+ 				 .rq_npages = rdata->nr_pages,
+ 				 .rq_pagesz = rdata->pagesz,
+@@ -1601,8 +1606,8 @@ cifs_async_readv(struct cifs_readdata *rdata)
+ 	READ_REQ *smb = NULL;
+ 	int wct;
+ 	struct cifs_tcon *tcon = tlink_tcon(rdata->cfile->tlink);
+-	struct smb_rqst rqst = { .rq_iov = &rdata->iov,
+-				 .rq_nvec = 1 };
++	struct smb_rqst rqst = { .rq_iov = rdata->iov,
++				 .rq_nvec = 2 };
+ 
+ 	cifs_dbg(FYI, "%s: offset=%llu bytes=%u\n",
+ 		 __func__, rdata->offset, rdata->bytes);
+@@ -1642,8 +1647,10 @@ cifs_async_readv(struct cifs_readdata *rdata)
+ 	}
+ 
+ 	/* 4 for RFC1001 length + 1 for BCC */
+-	rdata->iov.iov_base = smb;
+-	rdata->iov.iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4;
++	rdata->iov[0].iov_base = smb;
++	rdata->iov[0].iov_len = 4;
++	rdata->iov[1].iov_base = (char *)smb + 4;
++	rdata->iov[1].iov_len = get_rfc1002_length(smb);
+ 
+ 	kref_get(&rdata->refcount);
+ 	rc = cifs_call_async(tcon->ses->server, &rqst, cifs_readv_receive,
+@@ -2096,7 +2103,7 @@ cifs_async_writev(struct cifs_writedata *wdata,
+ 	WRITE_REQ *smb = NULL;
+ 	int wct;
+ 	struct cifs_tcon *tcon = tlink_tcon(wdata->cfile->tlink);
+-	struct kvec iov;
++	struct kvec iov[2];
+ 	struct smb_rqst rqst = { };
+ 
+ 	if (tcon->ses->capabilities & CAP_LARGE_FILES) {
+@@ -2129,11 +2136,13 @@ cifs_async_writev(struct cifs_writedata *wdata,
+ 	    cpu_to_le16(offsetof(struct smb_com_write_req, Data) - 4);
+ 
+ 	/* 4 for RFC1001 length + 1 for BCC */
+-	iov.iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4 + 1;
+-	iov.iov_base = smb;
++	iov[0].iov_len = 4;
++	iov[0].iov_base = smb;
++	iov[1].iov_len = get_rfc1002_length(smb) + 1;
++	iov[1].iov_base = (char *)smb + 4;
+ 
+-	rqst.rq_iov = &iov;
+-	rqst.rq_nvec = 1;
++	rqst.rq_iov = iov;
++	rqst.rq_nvec = 2;
+ 	rqst.rq_pages = wdata->pages;
+ 	rqst.rq_npages = wdata->nr_pages;
+ 	rqst.rq_pagesz = wdata->pagesz;
+@@ -2154,7 +2163,7 @@ cifs_async_writev(struct cifs_writedata *wdata,
+ 				(struct smb_com_writex_req *)smb;
+ 		inc_rfc1001_len(&smbw->hdr, wdata->bytes + 5);
+ 		put_bcc(wdata->bytes + 5, &smbw->hdr);
+-		iov.iov_len += 4; /* pad bigger by four bytes */
++		iov[1].iov_len += 4; /* pad bigger by four bytes */
+ 	}
+ 
+ 	kref_get(&wdata->refcount);
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index fb6cf1b..438c4b1 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -2047,9 +2047,9 @@ SMB2_echo(struct TCP_Server_Info *server)
+ {
+ 	struct smb2_echo_req *req;
+ 	int rc = 0;
+-	struct kvec iov;
+-	struct smb_rqst rqst = { .rq_iov = &iov,
+-				 .rq_nvec = 1 };
++	struct kvec iov[2];
++	struct smb_rqst rqst = { .rq_iov = iov,
++				 .rq_nvec = 2 };
+ 
+ 	cifs_dbg(FYI, "In echo request\n");
+ 
+@@ -2065,9 +2065,11 @@ SMB2_echo(struct TCP_Server_Info *server)
+ 
+ 	req->hdr.sync_hdr.CreditRequest = cpu_to_le16(1);
+ 
+-	iov.iov_base = (char *)req;
+ 	/* 4 for rfc1002 length field */
+-	iov.iov_len = get_rfc1002_length(req) + 4;
++	iov[0].iov_len = 4;
++	iov[0].iov_base = (char *)req;
++	iov[1].iov_len = get_rfc1002_length(req);
++	iov[1].iov_base = (char *)req + 4;
+ 
+ 	rc = cifs_call_async(server, &rqst, NULL, smb2_echo_callback, server,
+ 			     CIFS_ECHO_OP);
+@@ -2123,8 +2125,9 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+  * have the end_of_chain boolean set to true.
+  */
+ static int
+-smb2_new_read_req(struct kvec *iov, struct cifs_io_parms *io_parms,
+-		  unsigned int remaining_bytes, int request_type)
++smb2_new_read_req(void **buf, unsigned int *total_len,
++		  struct cifs_io_parms *io_parms, unsigned int remaining_bytes,
++		  int request_type)
+ {
+ 	int rc = -EACCES;
+ 	struct smb2_read_req *req = NULL;
+@@ -2172,9 +2175,9 @@ smb2_new_read_req(struct kvec *iov, struct cifs_io_parms *io_parms,
+ 	else
+ 		req->RemainingBytes = 0;
+ 
+-	iov[0].iov_base = (char *)req;
++	*buf = req;
+ 	/* 4 for rfc1002 length field */
+-	iov[0].iov_len = get_rfc1002_length(req) + 4;
++	*total_len = get_rfc1002_length(req) + 4;
  	return rc;
  }
  
-+static void
-+fill_small_buf(__le16 smb2_command, struct cifs_tcon *tcon, void *buf,
-+	       unsigned int *total_len)
-+{
-+	struct smb2_sync_pdu *spdu = (struct smb2_sync_pdu *)buf;
-+	/* lookup word count ie StructureSize from table */
-+	__u16 parmsize = smb2_req_struct_sizes[le16_to_cpu(smb2_command)];
-+
-+	/*
-+	 * smaller than SMALL_BUFFER_SIZE but bigger than fixed area of
-+	 * largest operations (Create)
-+	 */
-+	memset(buf, 0, 256);
-+
-+	smb2_hdr_assemble(&spdu->sync_hdr, smb2_command, tcon);
-+	spdu->StructureSize2 = cpu_to_le16(parmsize);
-+
-+	*total_len = parmsize + sizeof(struct smb2_sync_hdr);
-+}
-+
- /*
-  * Allocate and return pointer to an SMB request hdr, and set basic
-  * SMB information in the SMB header. If the return code is zero, this
-@@ -299,7 +302,9 @@ static int
- small_smb2_init(__le16 smb2_command, struct cifs_tcon *tcon,
- 		void **request_buf)
- {
--	int rc = 0;
-+	int rc;
-+	unsigned int total_len;
-+	struct smb2_pdu *pdu;
+@@ -2184,10 +2187,11 @@ smb2_readv_callback(struct mid_q_entry *mid)
+ 	struct cifs_readdata *rdata = mid->callback_data;
+ 	struct cifs_tcon *tcon = tlink_tcon(rdata->cfile->tlink);
+ 	struct TCP_Server_Info *server = tcon->ses->server;
+-	struct smb2_sync_hdr *shdr = get_sync_hdr(rdata->iov.iov_base);
++	struct smb2_sync_hdr *shdr =
++				(struct smb2_sync_hdr *)rdata->iov[1].iov_base;
+ 	unsigned int credits_received = 1;
+-	struct smb_rqst rqst = { .rq_iov = &rdata->iov,
+-				 .rq_nvec = 1,
++	struct smb_rqst rqst = { .rq_iov = rdata->iov,
++				 .rq_nvec = 2,
+ 				 .rq_pages = rdata->pages,
+ 				 .rq_npages = rdata->nr_pages,
+ 				 .rq_pagesz = rdata->pagesz,
+@@ -2238,7 +2242,7 @@ smb2_readv_callback(struct mid_q_entry *mid)
+ 	add_credits(server, credits_received, 0);
+ }
  
- 	rc = smb2_reconnect(smb2_command, tcon);
- 	if (rc)
-@@ -312,7 +317,12 @@ small_smb2_init(__le16 smb2_command, struct cifs_tcon *tcon,
- 		return -ENOMEM;
+-/* smb2_async_readv - send an async write, and set up mid to handle result */
++/* smb2_async_readv - send an async read, and set up mid to handle result */
+ int
+ smb2_async_readv(struct cifs_readdata *rdata)
+ {
+@@ -2246,9 +2250,10 @@ smb2_async_readv(struct cifs_readdata *rdata)
+ 	char *buf;
+ 	struct smb2_sync_hdr *shdr;
+ 	struct cifs_io_parms io_parms;
+-	struct smb_rqst rqst = { .rq_iov = &rdata->iov,
+-				 .rq_nvec = 1 };
++	struct smb_rqst rqst = { .rq_iov = rdata->iov,
++				 .rq_nvec = 2 };
+ 	struct TCP_Server_Info *server;
++	unsigned int total_len;
+ 
+ 	cifs_dbg(FYI, "%s: offset=%llu bytes=%u\n",
+ 		 __func__, rdata->offset, rdata->bytes);
+@@ -2262,7 +2267,7 @@ smb2_async_readv(struct cifs_readdata *rdata)
+ 
+ 	server = io_parms.tcon->ses->server;
+ 
+-	rc = smb2_new_read_req(&rdata->iov, &io_parms, 0, 0);
++	rc = smb2_new_read_req((void **) &buf, &total_len, &io_parms, 0, 0);
+ 	if (rc) {
+ 		if (rc == -EAGAIN && rdata->credits) {
+ 			/* credits was reset by reconnect */
+@@ -2275,10 +2280,12 @@ smb2_async_readv(struct cifs_readdata *rdata)
+ 		return rc;
  	}
  
--	smb2_hdr_assemble((struct smb2_hdr *) *request_buf, smb2_command, tcon);
-+	pdu = (struct smb2_pdu *)(*request_buf);
-+
-+	fill_small_buf(smb2_command, tcon, get_sync_hdr(pdu), &total_len);
-+
-+	/* Note this is only network field converted to big endian */
-+	pdu->hdr.smb2_buf_length = cpu_to_be32(total_len);
+-	buf = rdata->iov.iov_base;
+ 	shdr = get_sync_hdr(buf);
+ 	/* 4 for rfc1002 length field */
+-	rdata->iov.iov_len = get_rfc1002_length(rdata->iov.iov_base) + 4;
++	rdata->iov[0].iov_len = 4;
++	rdata->iov[0].iov_base = buf;
++	rdata->iov[1].iov_len = total_len - 4;
++	rdata->iov[1].iov_base = buf + 4;
  
- 	if (tcon != NULL) {
- #ifdef CONFIG_CIFS_STATS2
-diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 8dd24b7..052342d 100644
---- a/fs/cifs/smb2pdu.h
-+++ b/fs/cifs/smb2pdu.h
-@@ -117,6 +117,11 @@ struct smb2_sync_hdr {
- 	__u8   Signature[16];
- } __packed;
+ 	if (rdata->credits) {
+ 		shdr->CreditCharge = cpu_to_le16(DIV_ROUND_UP(rdata->bytes,
+@@ -2314,12 +2321,17 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
+ 	struct smb2_sync_hdr *shdr;
+ 	struct kvec iov[1];
+ 	struct kvec rsp_iov;
++	unsigned int total_len;
++	char *req;
  
-+struct smb2_sync_pdu {
-+	struct smb2_sync_hdr sync_hdr;
-+	__le16 StructureSize2; /* size of wct area (varies, request specific) */
-+} __packed;
+ 	*nbytes = 0;
+-	rc = smb2_new_read_req(iov, io_parms, 0, 0);
++	rc = smb2_new_read_req((void **)&req, &total_len, io_parms, 0, 0);
+ 	if (rc)
+ 		return rc;
+ 
++	iov[0].iov_base = buf;
++	iov[0].iov_len = total_len;
 +
- struct smb2_hdr {
- 	__be32 smb2_buf_length;	/* big endian on wire */
- 				/* length is only two or three bytes - with */
+ 	rc = SendReceive2(xid, io_parms->tcon->ses, iov, 1,
+ 			  &resp_buftype, CIFS_LOG_ERROR, &rsp_iov);
+ 	cifs_small_buf_release(iov[0].iov_base);
+@@ -2424,8 +2436,8 @@ smb2_async_writev(struct cifs_writedata *wdata,
+ 	struct smb2_sync_hdr *shdr;
+ 	struct cifs_tcon *tcon = tlink_tcon(wdata->cfile->tlink);
+ 	struct TCP_Server_Info *server = tcon->ses->server;
+-	struct kvec iov;
+-	struct smb_rqst rqst;
++	struct kvec iov[2];
++	struct smb_rqst rqst = { };
+ 
+ 	rc = small_smb2_init(SMB2_WRITE, tcon, (void **) &req);
+ 	if (rc) {
+@@ -2455,11 +2467,13 @@ smb2_async_writev(struct cifs_writedata *wdata,
+ 	req->RemainingBytes = 0;
+ 
+ 	/* 4 for rfc1002 length field and 1 for Buffer */
+-	iov.iov_len = get_rfc1002_length(req) + 4 - 1;
+-	iov.iov_base = req;
++	iov[0].iov_len = 4;
++	iov[0].iov_base = req;
++	iov[1].iov_len = get_rfc1002_length(req) - 1;
++	iov[1].iov_base = (char *)req + 4;
+ 
+-	rqst.rq_iov = &iov;
+-	rqst.rq_nvec = 1;
++	rqst.rq_iov = iov;
++	rqst.rq_nvec = 2;
+ 	rqst.rq_pages = wdata->pages;
+ 	rqst.rq_npages = wdata->nr_pages;
+ 	rqst.rq_pagesz = wdata->pagesz;
+diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+index 52ff937..93b2775 100644
+--- a/fs/cifs/smb2transport.c
++++ b/fs/cifs/smb2transport.c
+@@ -138,7 +138,7 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+ 	unsigned char smb2_signature[SMB2_HMACSHA256_SIZE];
+ 	unsigned char *sigptr = smb2_signature;
+ 	struct kvec *iov = rqst->rq_iov;
+-	struct smb2_sync_hdr *shdr = get_sync_hdr(iov[0].iov_base);
++	struct smb2_sync_hdr *shdr = (struct smb2_sync_hdr *)iov[1].iov_base;
+ 	struct cifs_ses *ses;
+ 
+ 	ses = smb2_find_smb_ses(shdr, server);
+@@ -355,7 +355,7 @@ smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+ 	unsigned char smb3_signature[SMB2_CMACAES_SIZE];
+ 	unsigned char *sigptr = smb3_signature;
+ 	struct kvec *iov = rqst->rq_iov;
+-	struct smb2_sync_hdr *shdr = get_sync_hdr(iov[0].iov_base);
++	struct smb2_sync_hdr *shdr = (struct smb2_sync_hdr *)iov[1].iov_base;
+ 	struct cifs_ses *ses;
+ 
+ 	ses = smb2_find_smb_ses(shdr, server);
+@@ -400,7 +400,8 @@ static int
+ smb2_sign_rqst(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+ {
+ 	int rc = 0;
+-	struct smb2_sync_hdr *shdr = get_sync_hdr(rqst->rq_iov[0].iov_base);
++	struct smb2_sync_hdr *shdr =
++			(struct smb2_sync_hdr *)rqst->rq_iov[1].iov_base;
+ 
+ 	if (!(shdr->Flags & SMB2_FLAGS_SIGNED) ||
+ 	    server->tcpStatus == CifsNeedNegotiate)
+@@ -421,7 +422,8 @@ smb2_verify_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+ {
+ 	unsigned int rc;
+ 	char server_response_sig[16];
+-	struct smb2_sync_hdr *shdr = get_sync_hdr(rqst->rq_iov[0].iov_base);
++	struct smb2_sync_hdr *shdr =
++			(struct smb2_sync_hdr *)rqst->rq_iov[1].iov_base;
+ 
+ 	if ((shdr->Command == SMB2_NEGOTIATE) ||
+ 	    (shdr->Command == SMB2_SESSION_SETUP) ||
+@@ -550,12 +552,14 @@ smb2_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info *server,
+ 		   bool log_error)
+ {
+ 	unsigned int len = get_rfc1002_length(mid->resp_buf);
+-	struct kvec iov;
+-	struct smb_rqst rqst = { .rq_iov = &iov,
+-				 .rq_nvec = 1 };
++	struct kvec iov[2];
++	struct smb_rqst rqst = { .rq_iov = iov,
++				 .rq_nvec = 2 };
+ 
+-	iov.iov_base = (char *)mid->resp_buf;
+-	iov.iov_len = get_rfc1002_length(mid->resp_buf) + 4;
++	iov[0].iov_base = (char *)mid->resp_buf;
++	iov[0].iov_len = 4;
++	iov[1].iov_base = (char *)mid->resp_buf + 4;
++	iov[1].iov_len = len;
+ 
+ 	dump_smb(mid->resp_buf, min_t(u32, 80, len));
+ 	/* convert the length into a more usable form */
+@@ -575,7 +579,8 @@ struct mid_q_entry *
+ smb2_setup_request(struct cifs_ses *ses, struct smb_rqst *rqst)
+ {
+ 	int rc;
+-	struct smb2_sync_hdr *shdr = get_sync_hdr(rqst->rq_iov[0].iov_base);
++	struct smb2_sync_hdr *shdr =
++			(struct smb2_sync_hdr *)rqst->rq_iov[1].iov_base;
+ 	struct mid_q_entry *mid;
+ 
+ 	smb2_seq_num_into_buf(ses->server, shdr);
+@@ -595,7 +600,8 @@ struct mid_q_entry *
+ smb2_setup_async_request(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ {
+ 	int rc;
+-	struct smb2_sync_hdr *shdr = get_sync_hdr(rqst->rq_iov[0].iov_base);
++	struct smb2_sync_hdr *shdr =
++			(struct smb2_sync_hdr *)rqst->rq_iov[1].iov_base;
+ 	struct mid_q_entry *mid;
+ 
+ 	smb2_seq_num_into_buf(server, shdr);
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index d59ebd0..988f124 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -244,8 +244,12 @@ smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ 		return -EIO;
+ 	}
+ 
++	if (n_vec < 2)
++		return -EIO;
++
+ 	cifs_dbg(FYI, "Sending smb: smb_len=%u\n", smb_buf_length);
+ 	dump_smb(iov[0].iov_base, iov[0].iov_len);
++	dump_smb(iov[1].iov_base, iov[1].iov_len);
+ 
+ 	/* cork the socket */
+ 	kernel_setsockopt(ssocket, SOL_TCP, TCP_CORK,
+@@ -320,12 +324,14 @@ int
+ smb_send(struct TCP_Server_Info *server, struct smb_hdr *smb_buffer,
+ 	 unsigned int smb_buf_length)
+ {
+-	struct kvec iov;
++	struct kvec iov[2];
+ 
+-	iov.iov_base = smb_buffer;
+-	iov.iov_len = smb_buf_length + 4;
++	iov[0].iov_base = smb_buffer;
++	iov[0].iov_len = 4;
++	iov[1].iov_base = (char *)smb_buffer + 4;
++	iov[1].iov_len = smb_buf_length;
+ 
+-	return smb_sendv(server, &iov, 1);
++	return smb_sendv(server, iov, 2);
+ }
+ 
+ static int
+@@ -453,6 +459,10 @@ cifs_setup_async_request(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ 	struct smb_hdr *hdr = (struct smb_hdr *)rqst->rq_iov[0].iov_base;
+ 	struct mid_q_entry *mid;
+ 
++	if (rqst->rq_iov[0].iov_len != 4 ||
++	    rqst->rq_iov[0].iov_base + 4 != rqst->rq_iov[1].iov_base)
++		return ERR_PTR(-EIO);
++
+ 	/* enable signing if server requires it */
+ 	if (server->sign)
+ 		hdr->Flags2 |= SMBFLG2_SECURITY_SIGNATURE;
+@@ -476,8 +486,8 @@ cifs_setup_async_request(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+  */
+ int
+ cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
+-		mid_receive_t *receive, mid_callback_t *callback,
+-		void *cbdata, const int flags)
++		mid_receive_t *receive, mid_callback_t *callback, void *cbdata,
++		const int flags)
+ {
+ 	int rc, timeout, optype;
+ 	struct mid_q_entry *mid;
+@@ -612,13 +622,15 @@ cifs_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info *server,
+ 
+ 	/* convert the length into a more usable form */
+ 	if (server->sign) {
+-		struct kvec iov;
++		struct kvec iov[2];
+ 		int rc = 0;
+-		struct smb_rqst rqst = { .rq_iov = &iov,
+-					 .rq_nvec = 1 };
++		struct smb_rqst rqst = { .rq_iov = iov,
++					 .rq_nvec = 2 };
+ 
+-		iov.iov_base = mid->resp_buf;
+-		iov.iov_len = len;
++		iov[0].iov_base = mid->resp_buf;
++		iov[0].iov_len = 4;
++		iov[1].iov_base = (char *)mid->resp_buf + 4;
++		iov[1].iov_len = len - 4;
+ 		/* FIXME: add code to kill session */
+ 		rc = cifs_verify_signature(&rqst, server,
+ 					   mid->sequence_number);
+@@ -638,6 +650,10 @@ cifs_setup_request(struct cifs_ses *ses, struct smb_rqst *rqst)
+ 	struct smb_hdr *hdr = (struct smb_hdr *)rqst->rq_iov[0].iov_base;
+ 	struct mid_q_entry *mid;
+ 
++	if (rqst->rq_iov[0].iov_len != 4 ||
++	    rqst->rq_iov[0].iov_base + 4 != rqst->rq_iov[1].iov_base)
++		return ERR_PTR(-EIO);
++
+ 	rc = allocate_mid(ses, hdr, &mid);
+ 	if (rc)
+ 		return ERR_PTR(rc);
+@@ -649,18 +665,16 @@ cifs_setup_request(struct cifs_ses *ses, struct smb_rqst *rqst)
+ 	return mid;
+ }
+ 
+-int
+-SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+-	     struct kvec *iov, int n_vec, int *resp_buf_type /* ret */,
+-	     const int flags, struct kvec *resp_iov)
++static int
++cifs_send_recv(const unsigned int xid, struct cifs_ses *ses,
++	       struct smb_rqst *rqst, int *resp_buf_type, const int flags,
++	       struct kvec *resp_iov)
+ {
+ 	int rc = 0;
+ 	int timeout, optype;
+ 	struct mid_q_entry *midQ;
+-	char *buf = iov[0].iov_base;
+ 	unsigned int credits = 1;
+-	struct smb_rqst rqst = { .rq_iov = iov,
+-				 .rq_nvec = n_vec };
++	char *buf;
+ 
+ 	timeout = flags & CIFS_TIMEOUT_MASK;
+ 	optype = flags & CIFS_OP_MASK;
+@@ -693,7 +707,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+ 
+ 	mutex_lock(&ses->server->srv_mutex);
+ 
+-	midQ = ses->server->ops->setup_request(ses, &rqst);
++	midQ = ses->server->ops->setup_request(ses, rqst);
+ 	if (IS_ERR(midQ)) {
+ 		mutex_unlock(&ses->server->srv_mutex);
+ 		/* Update # of requests on wire to server */
+@@ -703,7 +717,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+ 
+ 	midQ->mid_state = MID_REQUEST_SUBMITTED;
+ 	cifs_in_send_inc(ses->server);
+-	rc = smb_sendv(ses->server, iov, n_vec);
++	rc = smb_send_rqst(ses->server, rqst);
+ 	cifs_in_send_dec(ses->server);
+ 	cifs_save_when_sent(midQ);
+ 
+@@ -719,7 +733,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+ 
+ 	rc = wait_for_response(ses->server, midQ);
+ 	if (rc != 0) {
+-		send_cancel(ses->server, &rqst, midQ);
++		send_cancel(ses->server, rqst, midQ);
+ 		spin_lock(&GlobalMid_Lock);
+ 		if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
+ 			midQ->callback = DeleteMidQEntry;
+@@ -766,6 +780,36 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+ }
+ 
+ int
++SendReceive2(const unsigned int xid, struct cifs_ses *ses,
++	     struct kvec *iov, int n_vec, int *resp_buf_type /* ret */,
++	     const int flags, struct kvec *resp_iov)
++{
++	struct smb_rqst rqst;
++	struct kvec *new_iov;
++	int rc;
++
++	new_iov = kmalloc(sizeof(struct kvec) * (n_vec + 1), GFP_KERNEL);
++	if (!new_iov)
++		return -ENOMEM;
++
++	/* 1st iov is a RFC1001 length followed by the rest of the packet */
++	memcpy(new_iov + 1, iov, (sizeof(struct kvec) * n_vec));
++
++	new_iov[0].iov_base = new_iov[1].iov_base;
++	new_iov[0].iov_len = 4;
++	new_iov[1].iov_base += 4;
++	new_iov[1].iov_len -= 4;
++
++	memset(&rqst, 0, sizeof(struct smb_rqst));
++	rqst.rq_iov = new_iov;
++	rqst.rq_nvec = n_vec + 1;
++
++	rc = cifs_send_recv(xid, ses, &rqst, resp_buf_type, flags, resp_iov);
++	kfree(new_iov);
++	return rc;
++}
++
++int
+ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+ 	    struct smb_hdr *in_buf, struct smb_hdr *out_buf,
+ 	    int *pbytes_returned, const int timeout)
 -- 
 2.7.4
