@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: [PATCH v2 03/15] CIFS: Make send_cancel take rqst as argument
-Date: Mon, 30 Jan 2017 13:39:32 -0800
-Message-ID: <1485812384-28870-4-git-send-email-pshilov@microsoft.com>
+Subject: [PATCH v2 05/15] CIFS: Separate SMB2 sync header processing
+Date: Mon, 30 Jan 2017 13:39:34 -0800
+Message-ID: <1485812384-28870-6-git-send-email-pshilov@microsoft.com>
 References: <1485812384-28870-1-git-send-email-pshilov@microsoft.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -11,161 +11,123 @@ In-Reply-To: <1485812384-28870-1-git-send-email-pshilov-0li6OtcxBFHby3iVrkZq2A@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+Do not process RFC1001 length in smb2_hdr_assemble() because
+it is not a part of SMB2 header. This allows to cleanup the code
+and adds a possibility combine several SMB2 packets into one
+for compounding.
+
 Signed-off-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 ---
- fs/cifs/cifsglob.h  |  2 +-
- fs/cifs/smb1ops.c   |  4 ++--
- fs/cifs/transport.c | 33 +++++++++++++++++++--------------
- 3 files changed, 22 insertions(+), 17 deletions(-)
+ fs/cifs/smb2pdu.c | 50 ++++++++++++++++++++++++++++++--------------------
+ fs/cifs/smb2pdu.h |  5 +++++
+ 2 files changed, 35 insertions(+), 20 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 59ab5a2..4f4fffd 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -208,7 +208,7 @@ struct cifsInodeInfo;
- struct cifs_open_parms;
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 438c4b1..f6ba2c0 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -79,25 +79,9 @@ static const int smb2_req_struct_sizes[NUMBER_OF_SMB2_COMMANDS] = {
  
- struct smb_version_operations {
--	int (*send_cancel)(struct TCP_Server_Info *, void *,
-+	int (*send_cancel)(struct TCP_Server_Info *, struct smb_rqst *,
- 			   struct mid_q_entry *);
- 	bool (*compare_fids)(struct cifsFileInfo *, struct cifsFileInfo *);
- 	/* setup request: allocate mid, sign message */
-diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index fc537c2..67a987e 100644
---- a/fs/cifs/smb1ops.c
-+++ b/fs/cifs/smb1ops.c
-@@ -36,11 +36,11 @@
-  * SMB_COM_NT_CANCEL request and then sends it.
-  */
- static int
--send_nt_cancel(struct TCP_Server_Info *server, void *buf,
-+send_nt_cancel(struct TCP_Server_Info *server, struct smb_rqst *rqst,
- 	       struct mid_q_entry *mid)
+ 
+ static void
+-smb2_hdr_assemble(struct smb2_hdr *hdr, __le16 smb2_cmd /* command */ ,
++smb2_hdr_assemble(struct smb2_sync_hdr *shdr, __le16 smb2_cmd,
+ 		  const struct cifs_tcon *tcon)
  {
- 	int rc = 0;
--	struct smb_hdr *in_buf = (struct smb_hdr *)buf;
-+	struct smb_hdr *in_buf = (struct smb_hdr *)rqst->rq_iov[0].iov_base;
- 
- 	/* -4 for RFC1001 length and +2 for BCC field */
- 	in_buf->smb_buf_length = cpu_to_be32(sizeof(struct smb_hdr) - 4  + 2);
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index b9fad50..d59ebd0 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -595,10 +595,11 @@ cifs_sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *server)
+-	struct smb2_pdu *pdu = (struct smb2_pdu *)hdr;
+-	struct smb2_sync_hdr *shdr = get_sync_hdr(hdr);
+-	char *temp = (char *)hdr;
+-	/* lookup word count ie StructureSize from table */
+-	__u16 parmsize = smb2_req_struct_sizes[le16_to_cpu(smb2_cmd)];
+-
+-	/*
+-	 * smaller than SMALL_BUFFER_SIZE but bigger than fixed area of
+-	 * largest operations (Create)
+-	 */
+-	memset(temp, 0, 256);
+-
+-	/* Note this is only network field converted to big endian */
+-	hdr->smb2_buf_length =
+-			cpu_to_be32(parmsize + sizeof(struct smb2_sync_hdr));
+-
+ 	shdr->ProtocolId = SMB2_PROTO_NUMBER;
+ 	shdr->StructureSize = cpu_to_le16(64);
+ 	shdr->Command = smb2_cmd;
+@@ -149,7 +133,6 @@ smb2_hdr_assemble(struct smb2_hdr *hdr, __le16 smb2_cmd /* command */ ,
+ 	if (tcon->ses && tcon->ses->server && tcon->ses->server->sign)
+ 		shdr->Flags |= SMB2_FLAGS_SIGNED;
+ out:
+-	pdu->StructureSize2 = cpu_to_le16(parmsize);
+ 	return;
  }
  
- static inline int
--send_cancel(struct TCP_Server_Info *server, void *buf, struct mid_q_entry *mid)
-+send_cancel(struct TCP_Server_Info *server, struct smb_rqst *rqst,
-+	    struct mid_q_entry *mid)
- {
- 	return server->ops->send_cancel ?
--				server->ops->send_cancel(server, buf, mid) : 0;
-+				server->ops->send_cancel(server, rqst, mid) : 0;
+@@ -290,6 +273,26 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon)
+ 	return rc;
  }
  
- int
-@@ -718,7 +719,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
- 
- 	rc = wait_for_response(ses->server, midQ);
- 	if (rc != 0) {
--		send_cancel(ses->server, buf, midQ);
-+		send_cancel(ses->server, &rqst, midQ);
- 		spin_lock(&GlobalMid_Lock);
- 		if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
- 			midQ->callback = DeleteMidQEntry;
-@@ -771,6 +772,9 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
++static void
++fill_small_buf(__le16 smb2_command, struct cifs_tcon *tcon, void *buf,
++	       unsigned int *total_len)
++{
++	struct smb2_sync_pdu *spdu = (struct smb2_sync_pdu *)buf;
++	/* lookup word count ie StructureSize from table */
++	__u16 parmsize = smb2_req_struct_sizes[le16_to_cpu(smb2_command)];
++
++	/*
++	 * smaller than SMALL_BUFFER_SIZE but bigger than fixed area of
++	 * largest operations (Create)
++	 */
++	memset(buf, 0, 256);
++
++	smb2_hdr_assemble(&spdu->sync_hdr, smb2_command, tcon);
++	spdu->StructureSize2 = cpu_to_le16(parmsize);
++
++	*total_len = parmsize + sizeof(struct smb2_sync_hdr);
++}
++
+ /*
+  * Allocate and return pointer to an SMB request hdr, and set basic
+  * SMB information in the SMB header. If the return code is zero, this
+@@ -299,7 +302,9 @@ static int
+ small_smb2_init(__le16 smb2_command, struct cifs_tcon *tcon,
+ 		void **request_buf)
  {
- 	int rc = 0;
- 	struct mid_q_entry *midQ;
-+	unsigned int len = be32_to_cpu(in_buf->smb_buf_length);
-+	struct kvec iov = { .iov_base = in_buf, .iov_len = len };
-+	struct smb_rqst rqst = { .rq_iov = &iov, .rq_nvec = 1 };
+-	int rc = 0;
++	int rc;
++	unsigned int total_len;
++	struct smb2_pdu *pdu;
  
- 	if (ses == NULL) {
- 		cifs_dbg(VFS, "Null smb session\n");
-@@ -788,10 +792,9 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 	   to the same server. We may make this configurable later or
- 	   use ses->maxReq */
- 
--	if (be32_to_cpu(in_buf->smb_buf_length) > CIFSMaxBufSize +
--			MAX_CIFS_HDR_SIZE - 4) {
-+	if (len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
- 		cifs_dbg(VFS, "Illegal length, greater than maximum frame, %d\n",
--			 be32_to_cpu(in_buf->smb_buf_length));
-+			 len);
- 		return -EIO;
+ 	rc = smb2_reconnect(smb2_command, tcon);
+ 	if (rc)
+@@ -312,7 +317,12 @@ small_smb2_init(__le16 smb2_command, struct cifs_tcon *tcon,
+ 		return -ENOMEM;
  	}
  
-@@ -822,7 +825,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 	midQ->mid_state = MID_REQUEST_SUBMITTED;
+-	smb2_hdr_assemble((struct smb2_hdr *) *request_buf, smb2_command, tcon);
++	pdu = (struct smb2_pdu *)(*request_buf);
++
++	fill_small_buf(smb2_command, tcon, get_sync_hdr(pdu), &total_len);
++
++	/* Note this is only network field converted to big endian */
++	pdu->hdr.smb2_buf_length = cpu_to_be32(total_len);
  
- 	cifs_in_send_inc(ses->server);
--	rc = smb_send(ses->server, in_buf, be32_to_cpu(in_buf->smb_buf_length));
-+	rc = smb_send(ses->server, in_buf, len);
- 	cifs_in_send_dec(ses->server);
- 	cifs_save_when_sent(midQ);
+ 	if (tcon != NULL) {
+ #ifdef CONFIG_CIFS_STATS2
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index 8dd24b7..052342d 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -117,6 +117,11 @@ struct smb2_sync_hdr {
+ 	__u8   Signature[16];
+ } __packed;
  
-@@ -839,7 +842,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 
- 	rc = wait_for_response(ses->server, midQ);
- 	if (rc != 0) {
--		send_cancel(ses->server, in_buf, midQ);
-+		send_cancel(ses->server, &rqst, midQ);
- 		spin_lock(&GlobalMid_Lock);
- 		if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
- 			/* no longer considered to be "in-flight" */
-@@ -908,6 +911,9 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 	int rstart = 0;
- 	struct mid_q_entry *midQ;
- 	struct cifs_ses *ses;
-+	unsigned int len = be32_to_cpu(in_buf->smb_buf_length);
-+	struct kvec iov = { .iov_base = in_buf, .iov_len = len };
-+	struct smb_rqst rqst = { .rq_iov = &iov, .rq_nvec = 1 };
- 
- 	if (tcon == NULL || tcon->ses == NULL) {
- 		cifs_dbg(VFS, "Null smb session\n");
-@@ -927,10 +933,9 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 	   to the same server. We may make this configurable later or
- 	   use ses->maxReq */
- 
--	if (be32_to_cpu(in_buf->smb_buf_length) > CIFSMaxBufSize +
--			MAX_CIFS_HDR_SIZE - 4) {
-+	if (len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
- 		cifs_dbg(VFS, "Illegal length, greater than maximum frame, %d\n",
--			 be32_to_cpu(in_buf->smb_buf_length));
-+			 len);
- 		return -EIO;
- 	}
- 
-@@ -959,7 +964,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 
- 	midQ->mid_state = MID_REQUEST_SUBMITTED;
- 	cifs_in_send_inc(ses->server);
--	rc = smb_send(ses->server, in_buf, be32_to_cpu(in_buf->smb_buf_length));
-+	rc = smb_send(ses->server, in_buf, len);
- 	cifs_in_send_dec(ses->server);
- 	cifs_save_when_sent(midQ);
- 
-@@ -988,7 +993,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 		if (in_buf->Command == SMB_COM_TRANSACTION2) {
- 			/* POSIX lock. We send a NT_CANCEL SMB to cause the
- 			   blocking lock to return. */
--			rc = send_cancel(ses->server, in_buf, midQ);
-+			rc = send_cancel(ses->server, &rqst, midQ);
- 			if (rc) {
- 				cifs_delete_mid(midQ);
- 				return rc;
-@@ -1009,7 +1014,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 
- 		rc = wait_for_response(ses->server, midQ);
- 		if (rc) {
--			send_cancel(ses->server, in_buf, midQ);
-+			send_cancel(ses->server, &rqst, midQ);
- 			spin_lock(&GlobalMid_Lock);
- 			if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
- 				/* no longer considered to be "in-flight" */
++struct smb2_sync_pdu {
++	struct smb2_sync_hdr sync_hdr;
++	__le16 StructureSize2; /* size of wct area (varies, request specific) */
++} __packed;
++
+ struct smb2_hdr {
+ 	__be32 smb2_buf_length;	/* big endian on wire */
+ 				/* length is only two or three bytes - with */
 -- 
 2.7.4
