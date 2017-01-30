@@ -1,67 +1,49 @@
 From: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: [PATCH v2 00/15] SMB3 encryption support
-Date: Mon, 30 Jan 2017 13:39:29 -0800
-Message-ID: <1485812384-28870-1-git-send-email-pshilov@microsoft.com>
+Subject: [PATCH] CIFS: Fix splice read for non-cached files
+Date: Mon, 30 Jan 2017 15:49:49 -0800
+Message-ID: <1485820189-11841-1-git-send-email-pshilov@microsoft.com>
 Mime-Version: 1.0
 Content-Type: text/plain
-To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This patchset adds encryption support when SMB3 version of the protocol and higher is negotiated. The encryption is done through the kernel crypto API (CCM(AES)).
+Currently we call copy_page_to_iter() for uncached reading into a pipe.
+This is wrong because it treats pages as VFS cache pages and copies references
+rather than actual data. When we are trying to read from the pipe we end up
+calling page_cache_pipe_buf_confirm() which returns -ENODATA. This error
+is translated into 0 which is returned to a user.
 
-The patchset has been successfully tested by xfstests and cthon test suites with encrypted file shares on Samba.
+This issue is reproduced by running xfs-tests suite (generic test #249)
+against mount points with "cache=none". Fix it by mapping pages manually
+and calling copy_to_iter() that copies data into the pipe.
 
-Patches are split into several groups:
- 1) #1-#4: prepare transport infractructure to be able to send SMB3 transform header; this is done primarily by separating RFC1001 length and SMB2 header into different iovs.
- 2) #5-#6: simplify SMB2 header processing and cleaning up a read codepath.
- 3) #7-#9: encrypt outcoming packets by transforming them before sending.
- 4) #10-#14: decrypt incoming packets and pass ordinary SMB2 messages for further usual processing.
- 5) #15: allow to use "seal" mount option to request the encryption on a share.
+Cc: Stable <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Signed-off-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+---
+ fs/cifs/file.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-Changes since v1:
- - module dependencies are fixed;
- - error path handling during message decryption is fixed;
- - other minor fixes.
-
-Pavel Shilovsky (15):
-  CIFS: Separate SMB2 header structure
-  CIFS: Make SendReceive2() takes resp iov
-  CIFS: Make send_cancel take rqst as argument
-  CIFS: Send RFC1001 length in a separate iov
-  CIFS: Separate SMB2 sync header processing
-  CIFS: Separate RFC1001 length processing for SMB2 read
-  CIFS: Add capability to transform requests before sending
-  CIFS: Enable encryption during session setup phase
-  CIFS: Encrypt SMB3 requests before sending
-  CIFS: Add transform header handling callbacks
-  CIFS: Add mid handle callback
-  CIFS: Add copy into pages callback for a read operation
-  CIFS: Decrypt and process small encrypted packets
-  CIFS: Add capability to decrypt big read responses
-  CIFS: Allow to switch on encryption with seal mount option
-
- fs/cifs/Kconfig         |   2 +
- fs/cifs/cifsencrypt.c   |  51 ++--
- fs/cifs/cifsfs.c        |   2 +
- fs/cifs/cifsglob.h      |  28 +-
- fs/cifs/cifsproto.h     |  13 +-
- fs/cifs/cifssmb.c       | 135 +++++-----
- fs/cifs/connect.c       |  71 ++++--
- fs/cifs/file.c          |  52 +++-
- fs/cifs/sess.c          |  27 +-
- fs/cifs/smb1ops.c       |   4 +-
- fs/cifs/smb2glob.h      |   5 +
- fs/cifs/smb2maperror.c  |   5 +-
- fs/cifs/smb2misc.c      |  61 +++--
- fs/cifs/smb2ops.c       | 663 +++++++++++++++++++++++++++++++++++++++++++++++-
- fs/cifs/smb2pdu.c       | 575 +++++++++++++++++++++++++++--------------
- fs/cifs/smb2pdu.h       |  27 +-
- fs/cifs/smb2proto.h     |   5 +
- fs/cifs/smb2transport.c | 132 ++++++----
- fs/cifs/transport.c     | 171 ++++++++-----
- 19 files changed, 1556 insertions(+), 473 deletions(-)
-
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 18a1e1d..7e23261 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -2884,7 +2884,14 @@ cifs_readdata_to_iov(struct cifs_readdata *rdata, struct iov_iter *iter)
+ 	for (i = 0; i < rdata->nr_pages; i++) {
+ 		struct page *page = rdata->pages[i];
+ 		size_t copy = min_t(size_t, remaining, PAGE_SIZE);
+-		size_t written = copy_page_to_iter(page, 0, copy, iter);
++		size_t written;
++
++		if (unlikely(iter->type & ITER_PIPE)) {
++			void *addr = kmap_atomic(page);
++			written = copy_to_iter(addr, copy, iter);
++			kunmap_atomic(addr);
++		} else
++			written = copy_page_to_iter(page, 0, copy, iter);
+ 		remaining -= written;
+ 		if (written < copy && iov_iter_count(iter) > 0)
+ 			break;
 -- 
 2.7.4
