@@ -1,80 +1,55 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 00/15] SMB3 encryption support
-Date: Wed, 1 Feb 2017 14:05:02 -0600
-Message-ID: <CAH2r5mtMUJTpskgFwY0q5o=mfK2v-USsgC1N-aFMe=9YRbFeZQ@mail.gmail.com>
-References: <1481061758-52020-1-git-send-email-pshilov@microsoft.com>
+Subject: Re: [PATCH 0/3] cifs: Better dependencies
+Date: Wed, 1 Feb 2017 14:01:58 -0600
+Message-ID: <CAH2r5mvjSOmfn+eFo8TzuJzttN6zGCUEJcF11pGmynNYtana9A@mail.gmail.com>
+References: <20170125160639.255cd58e@endymion> <CAKywueQdAQ004cy2gGQTeDCeHwoT70Wug5LUgenANqGrmi9ziw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Cc: Jean Delvare <jdelvare-l3A5Bk7waGM@public.gmane.org>,
+        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1481061758-52020-1-git-send-email-pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+In-Reply-To: <CAKywueQdAQ004cy2gGQTeDCeHwoT70Wug5LUgenANqGrmi9ziw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-merged current version (with minor formatting update to patch 4 in the
-series) into cifs-2.6.git for-next
+Merged into cifs-2.6.git for-next
+
+Thanks - this is helpful
 
 
-This is fantastic work - great news.  And thanks for those
-(David/Aurelien) who have tried these out and given feedback.
 
-Encryption support is very helpful, and the ongoing work to improve
-async read operations even more and compounding is very exciting.
-
-On Tue, Dec 6, 2016 at 4:02 PM, Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org> wrote:
-> This patchset adds encryption support when SMB3 version of the protocol and higher is negotiated.
-> The encryption is done through the kernel crypto API (CCM(AES)).
+On Wed, Jan 25, 2017 at 1:26 PM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> 2017-01-25 7:06 GMT-08:00 Jean Delvare <jdelvare-l3A5Bk7waGM@public.gmane.org>:
+>> Hi all,
+>>
+>> This is my attempt to fix and improve the dependencies of cifs.
+>>
+>> [PATCH 1/3] cifs: Simplify SMB2 and SMB311 dependencies
+>> [PATCH 2/3] cifs: Only select the required crypto modules
+>> [PATCH 3/3] cifs: Add soft dependencies
+>>
+>> I already sent this patch series one year ago, but did not get any
+>> reply, so I am trying again.
+>>
+>> Thanks,
+>> --
+>> Jean Delvare
+>> SUSE L3 Support
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
-> The patchset has been successfully tested by xfstests and cthon test suites with encrypted file shares on Samba.
+> Looks good.
 >
-> Patches are split into several groups:
->  1) #1-#4: prepare transport infractructure to be able to send SMB3 transform header;
-> this is done primarily by separating RFC1001 length and SMB2 header into different iovs.
->  2) #5-#6: simplify SMB2 header processing and cleaning up a read codepath.
->  3) #7-#9: encrypt outcoming packets by transforming them before sending.
->  4) #10-#14: decrypt incoming packets and pass ordinary SMB2 messages for further usual processing.
->  5) #15: allow to use "seal" mount option to request the encryption on a share.
->
-> Pavel Shilovsky (15):
->   CIFS: Separate SMB2 header structure
->   CIFS: Make SendReceive2() takes resp iov
->   CIFS: Make send_cancel take rqst as argument
->   CIFS: Send RFC1001 length in a separate iov
->   CIFS: Separate SMB2 sync header processing
->   CIFS: Separate RFC1001 length processing for SMB2 read
->   CIFS: Add capability to transform requests before sending
->   CIFS: Enable encryption during session setup phase
->   CIFS: Encrypt SMB3 requests before sending
->   CIFS: Add transform header handling callbacks
->   CIFS: Add mid handle callback
->   CIFS: Add copy into pages callback for a read operation
->   CIFS: Decrypt and process small encrypted packets
->   CIFS: Add capability to decrypt big read responses
->   CIFS: Allow to switch on encryption with seal mount option
->
->  fs/cifs/cifsencrypt.c   |  51 ++--
->  fs/cifs/cifsglob.h      |  28 ++-
->  fs/cifs/cifsproto.h     |  13 +-
->  fs/cifs/cifssmb.c       | 135 +++++-----
->  fs/cifs/connect.c       |  71 ++++--
->  fs/cifs/file.c          |  52 +++-
->  fs/cifs/sess.c          |  27 +-
->  fs/cifs/smb1ops.c       |   4 +-
->  fs/cifs/smb2glob.h      |   5 +
->  fs/cifs/smb2maperror.c  |   5 +-
->  fs/cifs/smb2misc.c      |  61 ++---
->  fs/cifs/smb2ops.c       | 651 +++++++++++++++++++++++++++++++++++++++++++++++-
->  fs/cifs/smb2pdu.c       | 575 +++++++++++++++++++++++++++---------------
->  fs/cifs/smb2pdu.h       |  27 +-
->  fs/cifs/smb2proto.h     |   5 +
->  fs/cifs/smb2transport.c | 132 ++++++----
->  fs/cifs/transport.c     | 171 ++++++++-----
->  17 files changed, 1540 insertions(+), 473 deletions(-)
+> Reviewed-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 >
 > --
-> 2.7.4
->
+> Best regards,
+> Pavel Shilovsky
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
 > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
