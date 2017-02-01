@@ -1,24 +1,32 @@
-From: Miss Marbell <spdr3re9-2R8lYcDU8824j2SEYnfh+A@public.gmane.org>
-Subject: =?utf-8?Q?Bitte_kontaktieren_Sie_mich_f=C3=BCr_weitere_Details!?=
-Date: Wed, 1 Feb 2017 17:10:43 +0900 (JST)
-Message-ID: <129786325.132169621.1485936643992.JavaMail.root@friend.ocn.ne.jp>
-Reply-To: Miss Marbell <brownson.m221-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: smbcmp: new tool to compare SMB traces
+Date: Wed, 01 Feb 2017 15:33:54 +0530
+Message-ID: <1485943434.11784.23.camel@redhat.com>
+References: <mpspoj3jrtv.fsf@aaptelpc.suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-To: unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+To: =?ISO-8859-1?Q?Aur=E9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>,
+        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <mpspoj3jrtv.fsf-zpEvHKhluMwYitT5tn2FcQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Sehr geehrte Damen und Herren,
+On Tue, 2017-01-31 at 14:13 +0100, Aurélien Aptel wrote:
+> Hi,
+> 
+> I've written a small utility to diff and compare SMB network
+> captures. It's a simple python script that uses tshark to filter and
+> dissect SMB packets, with a curses UI.
+> 
+> https://github.com/aaptel/smbcmp
+> 
+> There is a gif demo on there, if you're into that.
+> 
+> Enjoy,
+> 
 
-Ich brauche Ihre Unterstützung in Ihrem Land zu verlagern und zu investieren.Ich bitte Sie um Hilfe, weil ich nicht das Wissen über
-Geschäft und die Regeln, die Ihr Land für eine sichere Investition führen.
+Interesting. How easy is it to extend this for NFS?
 
-Werden Sie versprechen, mit mir aufrichtig zu sein?
-
-Bitte kontaktieren Sie mich für weitere Details!
-
-Mit freundlichen Grüßen,
-Fräulein Marbell.
+Sachin Prabhu
