@@ -1,170 +1,93 @@
-From: Liu Bo <bo.li.liu@oracle.com>
-Subject: Re: [PATCH 04/24] fs: Provide infrastructure for dynamic BDIs in
- filesystems
-Date: Thu, 2 Feb 2017 11:28:27 -0800
-Message-ID: <20170202192827.GF6550@localhost.localdomain>
-References: <20170202173422.3240-1-jack@suse.cz>
- <20170202173422.3240-5-jack@suse.cz>
-Reply-To: bo.li.liu@oracle.com
+From: L A Walsh <cifs-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org>
+Subject: Re: An odd behavior (win-junction vs. symlink): trying to find why,
+ & claim of no-symlinks valid?
+Date: Thu, 02 Feb 2017 13:44:03 -0800
+Message-ID: <5893A823.8070803@tlinx.org>
+References: <589274FE.5070002@tlinx.org> <CAH2r5mvXVX3XZB4kEV-x-sox=E8LmjZ5s00sR3QeE9U78OvHEw@mail.gmail.com> <589299B3.6040604@tlinx.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-block@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-nfs@vger.kernel.org, Petr Vandrovec <petr@vandrovec.name>,
-        linux-nilfs@vger.kernel.org, cluster-devel@redhat.com,
-        osd-dev@open-osd.org, codalist@TELEMANN.coda.cs.cmu.edu,
-        linux-afs@lists.infradead.org, ecryptfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        lustre-devel@lists.lustre.org
-To: Jan Kara <jack@suse.cz>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170202173422.3240-5-jack@suse.cz>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: unlisted-recipients:; (no To-header on input)
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <589299B3.6040604-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Hi,
+L A Walsh wrote:
+> Steve French wrote:
+>> Have you tried a relative symlink target path (ie ../Program Files)
+>> instead of an absolute path?
+>>     
+----
+    Relative links work if the windoes client uses a 'symlinkd', but
+but not, it seems, if it is a junction.  FWIW, the other junctions seem
+to be using absolute paths.
+>> I am puzzled how a junction could work (on Linux) ever - if the target
+>> path had C:\... in it or started with \  - on the other hand a target
+>> that was relative to the first directory (e.g. began with ..\) should
+>> be fine because Linux client could resolve the path.
+>>     
+----
+    The backslashes shown under windows seem to be converted to forward 
+slashes
+under cygwin and under linux+CIFS.  As for weird directory names (like 
+'C:')..
+linux supports those.  I have this under my root dir, (this being run on 
+linux+CIFS):
 
-On Thu, Feb 02, 2017 at 06:34:02PM +0100, Jan Kara wrote:
-> Provide helper functions for setting up dynamically allocated
-> backing_dev_info structures for filesystems and cleaning them up on
-> superblock destruction.
+>  tree /\?\?
+/??
+├── C: -> ../athenae
+├── D: -> /home/law/Documents
+├── M: -> /Share/Music
+└── UNC
+    ├── Bliss -> Ishtar
+    ├── Ishtar
+    │   ├── Documents -> /home/Bliss/Documents/law
+    │   ├── Music -> /Share/Music
+    │   ├── Pictures -> /home/law/Pictures
+    │   └── Share -> /Share
+    └── ishtar -> Ishtar
+-----
+    Windows stores volume-based mounts under it's device root, '??'. Then
+the drive-colon names are under that, as well as network names under a
+dir named UNC. 
 
-Just one concern, will this cause problems for multiple superblock cases
-like nfs with nosharecache?
+    FWIW -- I've always known that at the NT level, NT calls will accept
+forward or backward slash as a directory separator.  Most of the Win32 calls
+will accept forward slash as well but the newer 'cmd.exe' seems to be more
+picky about forward vs. backslash, also seems some of the newer 'NET' 
+assemblies
+are being more picky.  
 
-Thanks,
+    Given that linux+cifs sees those exported paths as having '/' I am
+wondering if the NT level really might be using '/' and it's really various
+layers on top of that kernel that switch it to a backslash.  It really 
+was a
+case of Gates wanting his MS-DOS to look sufficiently different from 
+CP/M when
+he presented it to IBM so they wouldn't wouldn't as easily recognize its
+intellectual, and perhaps, physical, antecedents, though NT was developed
+completely apart from MS-DOS, in Russia.  They might very well have used '/'
+if they developed NT in C, as appears to be the case, though NT uses
+N-strings (count+data) instead of Z-strings (or stringZ, w/null 
+termination)).
 
--liubo
+    That's why -- especially in the registry, you can have keys that regedit
+or the Win32 calls can't open -- they have embedded nulls in them 
+(Sysinternals
+used to (maybe still does?) distribute a tool to delete null-containing 
+reg-keys (forgive me for repeating things you may already know)...
 
-> 
-> CC: linux-mtd@lists.infradead.org
-> CC: linux-nfs@vger.kernel.org
-> CC: Petr Vandrovec <petr@vandrovec.name>
-> CC: linux-nilfs@vger.kernel.org
-> CC: cluster-devel@redhat.com
-> CC: osd-dev@open-osd.org
-> CC: codalist@coda.cs.cmu.edu
-> CC: linux-afs@lists.infradead.org
-> CC: ecryptfs@vger.kernel.org
-> CC: linux-cifs@vger.kernel.org
-> CC: ceph-devel@vger.kernel.org
-> CC: linux-btrfs@vger.kernel.org
-> CC: v9fs-developer@lists.sourceforge.net
-> CC: lustre-devel@lists.lustre.org
-> Signed-off-by: Jan Kara <jack@suse.cz>
-> ---
->  fs/super.c                       | 49 ++++++++++++++++++++++++++++++++++++++++
->  include/linux/backing-dev-defs.h |  2 +-
->  include/linux/fs.h               |  6 +++++
->  3 files changed, 56 insertions(+), 1 deletion(-)
-> 
-> diff --git a/fs/super.c b/fs/super.c
-> index ea662b0e5e78..31dc4c6450ef 100644
-> --- a/fs/super.c
-> +++ b/fs/super.c
-> @@ -446,6 +446,11 @@ void generic_shutdown_super(struct super_block *sb)
->  	hlist_del_init(&sb->s_instances);
->  	spin_unlock(&sb_lock);
->  	up_write(&sb->s_umount);
-> +	if (sb->s_iflags & SB_I_DYNBDI) {
-> +		bdi_put(sb->s_bdi);
-> +		sb->s_bdi = &noop_backing_dev_info;
-> +		sb->s_iflags &= ~SB_I_DYNBDI;
-> +	}
->  }
->  
->  EXPORT_SYMBOL(generic_shutdown_super);
-> @@ -1249,6 +1254,50 @@ mount_fs(struct file_system_type *type, int flags, const char *name, void *data)
->  }
->  
->  /*
-> + * Setup private BDI for given superblock. I gets automatically cleaned up
-> + * in generic_shutdown_super().
-> + */
-> +int super_setup_bdi_name(struct super_block *sb, char *fmt, ...)
-> +{
-> +	struct backing_dev_info *bdi;
-> +	int err;
-> +	va_list args;
-> +
-> +	bdi = bdi_alloc(GFP_KERNEL);
-> +	if (!bdi)
-> +		return -ENOMEM;
-> +
-> +	bdi->name = sb->s_type->name;
-> +
-> +	va_start(args, fmt);
-> +	err = bdi_register_va(bdi, NULL, fmt, args);
-> +	va_end(args);
-> +	if (err) {
-> +		bdi_put(bdi);
-> +		return err;
-> +	}
-> +	WARN_ON(sb->s_bdi != &noop_backing_dev_info);
-> +	sb->s_bdi = bdi;
-> +	sb->s_iflags |= SB_I_DYNBDI;
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL(super_setup_bdi_name);
-> +
-> +/*
-> + * Setup private BDI for given superblock. I gets automatically cleaned up
-> + * in generic_shutdown_super().
-> + */
-> +int super_setup_bdi(struct super_block *sb)
-> +{
-> +	static atomic_long_t bdi_seq = ATOMIC_LONG_INIT(0);
-> +
-> +	return super_setup_bdi_name(sb, "%.28s-%ld", sb->s_type->name,
-> +				    atomic_long_inc_return(&bdi_seq));
-> +}
-> +EXPORT_SYMBOL(super_setup_bdi);
-> +
-> +/*
->   * This is an internal function, please use sb_end_{write,pagefault,intwrite}
->   * instead.
->   */
-> diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
-> index 2ecafc8a2d06..70080b4217f4 100644
-> --- a/include/linux/backing-dev-defs.h
-> +++ b/include/linux/backing-dev-defs.h
-> @@ -143,7 +143,7 @@ struct backing_dev_info {
->  	congested_fn *congested_fn; /* Function pointer if device is md/dm */
->  	void *congested_data;	/* Pointer to aux data for congested func */
->  
-> -	char *name;
-> +	const char *name;
->  
->  	struct kref refcnt;	/* Reference counter for the structure */
->  	unsigned int registered:1;	/* Is bdi registered? */
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index c930cbc19342..8ed8b6d1bc54 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -1267,6 +1267,9 @@ struct mm_struct;
->  /* sb->s_iflags to limit user namespace mounts */
->  #define SB_I_USERNS_VISIBLE		0x00000010 /* fstype already mounted */
->  
-> +/* Temporary flag until all filesystems are converted to dynamic bdis */
-> +#define SB_I_DYNBDI	0x00000100
-> +
->  /* Possible states of 'frozen' field */
->  enum {
->  	SB_UNFROZEN = 0,		/* FS is unfrozen */
-> @@ -2103,6 +2106,9 @@ extern int vfs_ustat(dev_t, struct kstatfs *);
->  extern int freeze_super(struct super_block *super);
->  extern int thaw_super(struct super_block *super);
->  extern bool our_mnt(struct vfsmount *mnt);
-> +extern __printf(2, 3)
-> +int super_setup_bdi_name(struct super_block *sb, char *fmt, ...);
-> +extern int super_setup_bdi(struct super_block *sb);
->  
->  extern int current_umask(void);
->  
-> -- 
-> 2.10.2
-> 
+    Will have to get the trace to you later.  I also had several weird links
+on my Winbox to support separate Cywin32 and Cygwin64 installations that 
+would
+be auto-selected based on the #-of-bits of the calling program, same way
+Windows diverted 32-bit apps' references to /Windows/System32 to
+/Windows/SysWOW64 on 64-bit systems.  Had to eventually abandon that effort
+due to a cygwin bug they refused to fix (they treat some Windows mount 
+points as
+symlinks because they didn't want to have to deal with circular paths as one
+can get on linux).
