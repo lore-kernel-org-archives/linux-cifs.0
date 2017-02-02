@@ -1,118 +1,108 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [cifs:for-next 17/19] fs/cifs/smb2ops.c:1920:2: note: in
- expansion of macro 'cifs_dbg'
-Date: Wed, 1 Feb 2017 19:37:54 -0600
-Message-ID: <CAH2r5msnG0JTSqyXdW-48TTEto=cZd1AYkzsSLMJaqdo27dC-A@mail.gmail.com>
-References: <201702020732.x0thMW1T%fengguang.wu@intel.com>
+Subject: Re: An odd behavior (win-junction vs. symlink): trying to find why, &
+ claim of no-symlinks valid?
+Date: Wed, 1 Feb 2017 19:50:27 -0600
+Message-ID: <CAH2r5mvXVX3XZB4kEV-x-sox=E8LmjZ5s00sR3QeE9U78OvHEw@mail.gmail.com>
+References: <589274FE.5070002@tlinx.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>, kbuild-all-JC7UmRfGjtg@public.gmane.org,
-        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
-To: kbuild test robot <fengguang.wu-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: L A Walsh <cifs-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <201702020732.x0thMW1T%fengguang.wu-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <589274FE.5070002-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Pavel just fixed this - and I just repushed to cifs-2.6.git for-next
+Have you tried a relative symlink target path (ie ../Program Files)
+instead of an absolute path?
 
-Thx for spotting this.
+I am puzzled how a junction could work (on Linux) ever - if the target
+path had C:\... in it or started with \  - on the other hand a target
+that was relative to the first directory (e.g. began with ..\) should
+be fine because Linux client could resolve the path.
 
-On Wed, Feb 1, 2017 at 5:49 PM, kbuild test robot
-<fengguang.wu-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org> wrote:
-> tree:   git://git.samba.org/sfrench/cifs-2.6.git for-next
-> head:   f339620a6d00fdf92f68b37024fb447d3fcc474f
-> commit: c9d651a5a2fedac623853852ab2c3cd3b8fdf3bf [17/19] CIFS: Decrypt and process small encrypted packets
-> config: i386-allmodconfig (attached as .config)
-> compiler: gcc-6 (Debian 6.2.0-3) 6.2.0 20160901
-> reproduce:
->         git checkout c9d651a5a2fedac623853852ab2c3cd3b8fdf3bf
->         # save the attached .config to linux build tree
->         make ARCH=i386
+Offline if you could send me a wireshark trace (or netmon) - of just
+the stat or ls of the failing link - I could tell you more clearly
+what is going.
+
+On Wed, Feb 1, 2017 at 5:53 PM, L A Walsh <cifs-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org> wrote:
+> I'm trying to figure out a 'why' (I know how to get around it) one
+> junction is showing as a broken link when mounted on linux via cifs.
 >
-> All warnings (new ones prefixed by >>):
+> Background/context:
 >
->    In file included from include/linux/kernel.h:13:0,
->                     from include/asm-generic/bug.h:13,
->                     from arch/x86/include/asm/bug.h:35,
->                     from include/linux/bug.h:4,
->                     from include/linux/mmdebug.h:4,
->                     from include/linux/mm.h:8,
->                     from include/linux/pagemap.h:7,
->                     from fs/cifs/smb2ops.c:20:
->    fs/cifs/smb2ops.c: In function 'handle_read_data':
->>> fs/cifs/cifs_debug.h:55:24: warning: format '%lu' expects argument of type 'long unsigned int', but argument 5 has type 'size_t {aka unsigned int}' [-Wformat=]
->       pr_debug_ratelimited("%s: "    \
->                            ^
->    include/linux/printk.h:276:21: note: in definition of macro 'pr_fmt'
->     #define pr_fmt(fmt) fmt
->                         ^~~
->    fs/cifs/cifs_debug.h:55:3: note: in expansion of macro 'pr_debug_ratelimited'
->       pr_debug_ratelimited("%s: "    \
->       ^~~~~~~~~~~~~~~~~~~~
->>> fs/cifs/smb2ops.c:1920:2: note: in expansion of macro 'cifs_dbg'
->      cifs_dbg(FYI, "0: iov_base=%p iov_len=%lu\n",
->      ^~~~~~~~
->    In file included from fs/cifs/smb2ops.c:29:0:
->>> fs/cifs/smb2ops.c:1920:16: warning: format '%lu' expects argument of type 'long unsigned int', but argument 3 has type 'size_t {aka unsigned int}' [-Wformat=]
->      cifs_dbg(FYI, "0: iov_base=%p iov_len=%lu\n",
->                    ^
->    fs/cifs/cifs_debug.h:58:16: note: in definition of macro 'cifs_dbg'
->       cifs_vfs_err(fmt, ##__VA_ARGS__);   \
->                    ^~~
->    In file included from include/linux/kernel.h:13:0,
->                     from include/asm-generic/bug.h:13,
->                     from arch/x86/include/asm/bug.h:35,
->                     from include/linux/bug.h:4,
->                     from include/linux/mmdebug.h:4,
->                     from include/linux/mm.h:8,
->                     from include/linux/pagemap.h:7,
->                     from fs/cifs/smb2ops.c:20:
->    fs/cifs/smb2ops.c:1920:16: warning: format '%lu' expects argument of type 'long unsigned int', but argument 4 has type 'size_t {aka unsigned int}' [-Wformat=]
->      cifs_dbg(FYI, "0: iov_base=%p iov_len=%lu\n",
->                    ^
->    include/linux/printk.h:276:21: note: in definition of macro 'pr_fmt'
->     #define pr_fmt(fmt) fmt
->                         ^~~
->    fs/cifs/cifs_debug.h:60:3: note: in expansion of macro 'pr_debug_ratelimited'
->       pr_debug_ratelimited(fmt, ##__VA_ARGS__);  \
->       ^~~~~~~~~~~~~~~~~~~~
->>> fs/cifs/smb2ops.c:1920:2: note: in expansion of macro 'cifs_dbg'
->      cifs_dbg(FYI, "0: iov_base=%p iov_len=%lu\n",
->      ^~~~~~~~
+> I have a split system with my Desktop on Windows, but most of the
+> non-program
+> storage on a linux box.  I do most of my development on the linux system
+> and usually have one or more local tty-session "ssh'd" into it.
 >
-> vim +/cifs_dbg +1920 fs/cifs/smb2ops.c
+> I have the root folders of each system mounted on the other, with my
+> Windows desktop's C-drive mounted at /Athenae.
 >
->   1904                  iov.iov_base = buf + data_offset;
->   1905                  iov.iov_len = data_len;
->   1906                  iov_iter_kvec(&iter, WRITE | ITER_KVEC, &iov, 1, data_len);
->   1907          } else {
->   1908                  /* read response payload cannot be in both buf and pages */
->   1909                  WARN_ONCE(1, "buf can not contain only a part of read data");
->   1910                  rdata->result = -EIO;
->   1911                  dequeue_mid(mid, rdata->result);
->   1912                  return 0;
->   1913          }
->   1914
->   1915          /* set up first iov for signature check */
->   1916          rdata->iov[0].iov_base = buf;
->   1917          rdata->iov[0].iov_len = 4;
->   1918          rdata->iov[1].iov_base = buf + 4;
->   1919          rdata->iov[1].iov_len = server->vals->read_rsp_size - 4;
->> 1920          cifs_dbg(FYI, "0: iov_base=%p iov_len=%lu\n",
->   1921                   rdata->iov[0].iov_base, server->vals->read_rsp_size);
->   1922
->   1923          length = rdata->copy_into_pages(server, rdata, &iter);
->   1924
->   1925          kfree(bvec);
->   1926
->   1927          if (length < 0)
->   1928                  return length;
+> I have several links of one sort or another (symlink/symlinkd/junctions)
+> in the Winbox's root drive.
 >
-> ---
-> 0-DAY kernel test infrastructure                Open Source Technology Center
-> https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+> All except one are working from linux and it's the 'one' that I'm
+> trying to figure out the 'why' -- i.e. what is different about
+> this one 'symlink'. I put that in quotes, because it's actually
+> a junction, but other junctions on Athenae work (resolve, are
+> readable, etc...)
+>
+> FWIW, my linux server is also functioning as an NT4-style domain
+> (samba 3.6.22) named 'Bliss' (my idea of irony).  As a result,
+> I have 2 sets of creds on the Winbox (domain & local creds are
+> the same on a PDC (Primary Domain Controller).  On the Winbox,
+> any domain creds have 'Bliss\' prepended to them.
+>
+>
+> On linux for those junctions I see:
+>
+> ls: cannot read symbolic link '/Athenae/var': Operation not supported
+> drwxr-xr-x 2 law Administrators 0  /Athenae/Prog/
+> drwxr-xr-x 2 law Administrators 0  /Athenae/Symbols/
+> l--------- 1 law Administrators 0  /Athenae/var    ## shows as broken link
+>
+>
+> On Windows, using Windows's dir:
+>
+> 11/06/2014  07:45 PM    <JUNCTION>     Prog [C:\Program Files (x86)]
+> 02/09/2016  11:05 PM    <JUNCTION>     Symbols [\\Bliss\Share\Win7_Symbols]
+> 01/11/2017  04:17 PM    <JUNCTION>     var [C:\Windows\System32\cygwin\var]
+>
+> Also on winbox under cygwin:
+>
+> lrwxrwxrwx 1 Bliss\law lawgroup       20  /Prog -> /Program Files (x86)/
+> lrwxrwxrwx 1 Bliss\law Bliss\lawgroup 26  /Symbols ->
+> //Bliss/Share/Win7_Symbols/
+> lrwxrwxrwx 1 Bliss\law Bliss\lawgroup 28  /var ->
+> /Windows/System32/cygwin/var/
+>
+>
+> I was wondering if anyone had any ideas why the 1 junction is showing
+> as 'unreadable' (even though it is -- but showing as a broken link)
+> while the others work (and permissions don't ***seem*** to be at
+> issue).
+>
+> FWIW, any symlinks on my Winbox work just fine on Linux mounts using
+> CIFS. It _bothers_ me that I've seen in a few places that one is
+> not supposed to be able to read Windows symlinks via CIFS when I can.
+>
+> Is this true or is it that no one has been able to verify them working?
+> If it is the latter, my own experience is that it's a matter of making
+> sure the symlinks 'resolve'. Even the 'Symbols' link, above which
+> points back to the linux server, works -- though not very efficiently.
+>
+> Ideas on the 1 junction misbehaving & verification on symlinks working
+> or not would be appreciated -- though I'm already close to just "fixing it"
+> by using a symlinkd instead of a junction after writing this up... ;-)
+>
+>
+>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 
