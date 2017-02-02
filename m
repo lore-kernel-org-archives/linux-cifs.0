@@ -1,46 +1,59 @@
-From: Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>
-Subject: [PATCH 0/24 RFC] fs: Convert all embedded bdis into
-	separate ones
-Date: Thu,  2 Feb 2017 18:33:58 +0100
-Message-ID: <20170202173422.3240-1-jack@suse.cz>
+From: Pavel Shilovsky <piastryyy@gmail.com>
+Subject: Re: [PATCH] CIFS: use correct format string for size_t
+Date: Thu, 2 Feb 2017 10:03:42 -0800
+Message-ID: <CAKywueS4VGHymw94rX5FKid2hwQyaKPET4qB6vhPQB6kcnL5Pw@mail.gmail.com>
+References: <20170202122117.1404479-1-arnd@arndb.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-block-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-nilfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, ecryptfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	codalist-/uMB558Y47wP4a1z8dhFYw@public.gmane.org, Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
-	osd-dev-yNzVSZO3znNg9hUCZPvPmw@public.gmane.org, v9fs-developer-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
-	ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Petr Vandrovec <petr-vPk2MGR0e28uaRcfnNAh7A@public.gmane.org>,
-	linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-btrfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	lustre-devel-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org
-To: <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <lustre-devel-bounces-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org>
-List-Unsubscribe: <http://lists.lustre.org/options.cgi/lustre-devel-lustre.org>,
-	<mailto:lustre-devel-request-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.lustre.org/pipermail/lustre-devel-lustre.org/>
-List-Post: <mailto:lustre-devel-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org>
-List-Help: <mailto:lustre-devel-request-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org?subject=help>
-List-Subscribe: <http://lists.lustre.org/listinfo.cgi/lustre-devel-lustre.org>,
-	<mailto:lustre-devel-request-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org?subject=subscribe>
-Errors-To: lustre-devel-bounces-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org
-Sender: "lustre-devel" <lustre-devel-bounces-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Steve French <sfrench@samba.org>,
+        Pavel Shilovsky <pshilov@microsoft.com>,
+        Aurelien Aptel <aaptel@suse.com>,
+        Sachin Prabhu <sprabhu@redhat.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170202122117.1404479-1-arnd@arndb.de>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Hello,
+2017-02-02 4:21 GMT-08:00 Arnd Bergmann <arnd@arndb.de>:
+> This warning is harmless as size_t is always as wide as 'unsigned long':
+>
+> fs/cifs/smb2ops.c:2008:245: error: format '%lu' expects argument of type 'long unsigned int', but argument 5 has type 'size_t {aka unsigned int}' [-Werror=format=]
+>
+> Using %zu however is the correct format string that we don't get a warning for.
+>
+> Fixes: c9d651a5a2fe ("CIFS: Decrypt and process small encrypted packets")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  fs/cifs/smb2ops.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index 0764c32754b0..ac6e10adf000 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -2005,7 +2005,7 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+>         rdata->iov[0].iov_len = 4;
+>         rdata->iov[1].iov_base = buf + 4;
+>         rdata->iov[1].iov_len = server->vals->read_rsp_size - 4;
+> -       cifs_dbg(FYI, "0: iov_base=%p iov_len=%lu\n",
+> +       cifs_dbg(FYI, "0: iov_base=%p iov_len=%zu\n",
+>                  rdata->iov[0].iov_base, server->vals->read_rsp_size);
+>
+>         length = rdata->copy_into_pages(server, rdata, &iter);
+> --
+> 2.9.0
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-this patch series converts all embedded occurences of struct backing_dev_info
-to use standalone dynamically allocated structures. This makes bdi handling
-unified across all bdi users and generally removes some boilerplate code from
-filesystems setting up their own bdi. It also allows us to remove some code
-from generic bdi implementation.
+This issue have been already fixed in the Steve's for-next branch. Thanks.
 
-The patches were only compile-tested for most filesystems (I've tested
-mounting only for NFS & btrfs) so fs maintainers please have a look whether
-the changes look sound to you.
-
-This series is based on top of bdi fixes that were merged into linux-block
-git tree.
-
-								Honza
+-- 
+Best regards,
+Pavel Shilovsky
