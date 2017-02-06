@@ -1,68 +1,53 @@
-From: Liu Bo <bo.li.liu@oracle.com>
-Subject: Re: [PATCH 04/24] fs: Provide infrastructure for dynamic BDIs in
- filesystems
-Date: Fri, 3 Feb 2017 10:31:56 -0800
-Message-ID: <20170203183155.GA30842@localhost.localdomain>
-References: <20170202173422.3240-1-jack@suse.cz>
- <20170202173422.3240-5-jack@suse.cz>
- <20170202192827.GF6550@localhost.localdomain>
- <20170203135042.GB5844@quack2.suse.cz>
-Reply-To: bo.li.liu@oracle.com
+From: Sachin Prabhu <sprabhu@redhat.com>
+Subject: Re: [PATCH] CIFS: use correct format string for size_t
+Date: Mon, 06 Feb 2017 19:27:35 +0530
+Message-ID: <1486389455.2576.14.camel@redhat.com>
+References: <20170202122117.1404479-1-arnd@arndb.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: codalist@TELEMANN.coda.cs.cmu.edu, linux-block@vger.kernel.org,
- linux-nfs@vger.kernel.org, linux-nilfs@vger.kernel.org,
- linux-cifs@vger.kernel.org, ecryptfs@vger.kernel.org,
- Christoph Hellwig <hch@infradead.org>, cluster-devel@redhat.com,
- linux-mtd@lists.infradead.org, osd-dev@open-osd.org,
- linux-fsdevel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
- ceph-devel@vger.kernel.org, Petr Vandrovec <petr@vandrovec.name>,
- linux-afs@lists.infradead.org, linux-btrfs@vger.kernel.org,
- lustre-devel@lists.lustre.org
-To: Jan Kara <jack@suse.cz>
-Return-path: <linux-mtd-bounces+gldm-linux-mtd-36=gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <20170203135042.GB5844@quack2.suse.cz>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-mtd>,
- <mailto:linux-mtd-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-mtd/>
-List-Post: <mailto:linux-mtd@lists.infradead.org>
-List-Help: <mailto:linux-mtd-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-mtd>,
- <mailto:linux-mtd-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-mtd" <linux-mtd-bounces@lists.infradead.org>
-Errors-To: linux-mtd-bounces+gldm-linux-mtd-36=gmane.org@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Cc: Pavel Shilovsky <pshilov@microsoft.com>,
+        Aurelien Aptel <aaptel@suse.com>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>, Steve French <sfrench@samba.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170202122117.1404479-1-arnd@arndb.de>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Fri, Feb 03, 2017 at 02:50:42PM +0100, Jan Kara wrote:
-> On Thu 02-02-17 11:28:27, Liu Bo wrote:
-> > Hi,
-> > 
-> > On Thu, Feb 02, 2017 at 06:34:02PM +0100, Jan Kara wrote:
-> > > Provide helper functions for setting up dynamically allocated
-> > > backing_dev_info structures for filesystems and cleaning them up on
-> > > superblock destruction.
-> > 
-> > Just one concern, will this cause problems for multiple superblock cases
-> > like nfs with nosharecache?
+On Thu, 2017-02-02 at 13:21 +0100, Arnd Bergmann wrote:
+> This warning is harmless as size_t is always as wide as 'unsigned
+> long':
 > 
-> Can you ellaborate a bit? I've looked for a while what nfs with
-> nosharecache does but I didn't see how it would influence anything with
-> bdis...
+> fs/cifs/smb2ops.c:2008:245: error: format '%lu' expects argument of
+> type 'long unsigned int', but argument 5 has type 'size_t {aka
+> unsigned int}' [-Werror=format=]
+> 
+> Using %zu however is the correct format string that we don't get a
+> warning for.
+> 
+> Fixes: c9d651a5a2fe ("CIFS: Decrypt and process small encrypted
+> packets")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-Oh, I missed that bdi_seq was static, then it should be fine.
+Acked-by: Sachin Prabhu <sprabhu@redhat.com>
 
-(I was worried about that nfs with nosharecache would have multiple
-superblocks and if each superblock has a bdi using the same bdi name,
-nfs-xx.)
-
-Thanks for the reply.
-
-Thanks,
-
--liubo
-
-______________________________________________________
-Linux MTD discussion mailing list
-http://lists.infradead.org/mailman/listinfo/linux-mtd/
+> ---
+>  fs/cifs/smb2ops.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index 0764c32754b0..ac6e10adf000 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -2005,7 +2005,7 @@ handle_read_data(struct TCP_Server_Info
+> *server, struct mid_q_entry *mid,
+>  	rdata->iov[0].iov_len = 4;
+>  	rdata->iov[1].iov_base = buf + 4;
+>  	rdata->iov[1].iov_len = server->vals->read_rsp_size - 4;
+> -	cifs_dbg(FYI, "0: iov_base=%p iov_len=%lu\n",
+> +	cifs_dbg(FYI, "0: iov_base=%p iov_len=%zu\n",
+>  		 rdata->iov[0].iov_base, server->vals-
+> >read_rsp_size);
+>  
+>  	length = rdata->copy_into_pages(server, rdata, &iter);
