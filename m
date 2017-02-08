@@ -1,61 +1,74 @@
-From: Pavel Shilovsky <piastryyy@gmail.com>
-Subject: Re: [patch] CIFS: set *resp_buf_type to NO_BUFFER on error
-Date: Tue, 7 Feb 2017 17:00:17 -0800
-Message-ID: <CAKywueSLJJWNK2su4ux4ouz0Rz=fw9eY5vHN+iYFAO5Ek1s+=w@mail.gmail.com>
-References: <20170207131841.GC31552@mwanda>
+From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+Subject: Re: [PATCH] Introduce cifs_copy_file_range()
+Date: Wed, 08 Feb 2017 16:11:47 +0100
+Message-ID: <mpsfujoiuoc.fsf@aaptelpc.suse.de>
+References: <20170207113311.11474-1-sprabhu@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Steve French <sfrench@samba.org>, linux-cifs <linux-cifs@vger.kernel.org>,
- kernel-janitors@vger.kernel.org,
- samba-technical <samba-technical@lists.samba.org>,
- Pavel Shilovsky <pshilov@microsoft.com>
-To: Dan Carpenter <dan.carpenter@oracle.com>
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <20170207131841.GC31552@mwanda>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
- <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical/>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
- <mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Errors-To: samba-technical-bounces@lists.samba.org
-Sender: "samba-technical" <samba-technical-bounces@lists.samba.org>
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Cc: Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>
+To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20170207113311.11474-1-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-2017-02-07 5:18 GMT-08:00 Dan Carpenter <dan.carpenter@oracle.com>:
-> We recently shuffled this code around and introduced a new error path
-> before *resp_buf_type gets initialized.  It creates uninitialized
-> variable bugs in the callers.
->
->     fs/cifs/smb2pdu.c:579 SMB2_negotiate()
->     error: uninitialized symbol 'resp_buftype'.
->
-> Fixes: 738f9de5cdb9 ("CIFS: Send RFC1001 length in a separate iov")
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
->
-> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> index 526f0533cb4e..8fa5e058fb15 100644
-> --- a/fs/cifs/transport.c
-> +++ b/fs/cifs/transport.c
-> @@ -807,6 +807,8 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
->         struct kvec *new_iov;
->         int rc;
->
-> +       *resp_buf_type = CIFS_NO_BUFFER; /* no response buf yet */
-> +
->         new_iov = kmalloc(sizeof(struct kvec) * (n_vec + 1), GFP_KERNEL);
->         if (!new_iov)
->                 return -ENOMEM;
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Hi Sachin,
 
-Good catch, thanks!
+Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> writes:
+> The patch introduces the file_operations helper cifs_copy_file_range().
+>
+> The vfs helper vfs_copy_file_range() first calls clone_file_range
+> which for cifs uses
+> SMB2_ioctl(.., FSCTL_DUPLICATE_EXTENTS_TO_FILE, ..)
+> to do a server side copy of the file. This ioctl is only supported on
+> SMB3 and later versions.
+>
+> Once this call fails, vfs_copy_file_range() calls copy_file_range()
+> corresponding to the cifs filesystem which is introduced by this patch.
+> This calls the more widely available
+> SMB2_ioctl(.., FSCTL_SRV_COPYCHUNK_WRITE, ..)
 
-Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+Sounds good.
+
+> The upstream changes in this area was first made by the commit
+> 04b38d601239 ("vfs: pull btrfs clone API to vfs layer")
+> This commit also introduces the ioctls FICLONE and FICLONERANGE which
+
+IIUC it also allows the copy_file_range syscall defined in
+fs/read_write.c to take advantage of the dup extents fsctl, if
+available, nice!
+
+Now, I wonder if there is a way to implement the FIDEDUPERANGE ioctl in
+SMB3, which does the same thing as a clone but it exits early if the
+destination does not already match the source.
+
+> removes the need for separate cifs ioctls to perform server side copies
+> and hence can be removed.
+
+Isn't this breaking userspace? I understand it was a private ioctl only
+availaible in SMB3 so it's not a big issue but
+
+> @@ -250,9 +146,6 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
+>  				cifs_dbg(FYI, "set compress flag rc %d\n", rc);
+>  			}
+>  			break;
+> -		case CIFS_IOC_COPYCHUNK_FILE:
+> -			rc = cifs_ioctl_clone(xid, filep, arg);
+> -			break;
+>  		case CIFS_IOC_SET_INTEGRITY:
+>  			if (pSMBFile == NULL)
+>  				break;
+
+I believe the ioctl will return -ENOTTY now. I remember this story when
+an error code was changed: https://lkml.org/lkml/2012/12/23/75 *gulp*
+Maybe I'm overthinking this.
+
+Cheers,
 
 -- 
-Best regards,
-Pavel Shilovsky
+Aurélien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
+GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
