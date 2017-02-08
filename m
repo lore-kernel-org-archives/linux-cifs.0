@@ -1,74 +1,106 @@
-From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Subject: Re: [PATCH] Introduce cifs_copy_file_range()
-Date: Wed, 08 Feb 2017 16:11:47 +0100
-Message-ID: <mpsfujoiuoc.fsf@aaptelpc.suse.de>
+Date: Wed, 08 Feb 2017 22:20:42 +0530
+Message-ID: <1486572642.16541.11.camel@redhat.com>
 References: <20170207113311.11474-1-sprabhu@redhat.com>
+         <mpsfujoiuoc.fsf@aaptelpc.suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Cc: Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>
-To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+To: =?ISO-8859-1?Q?Aur=E9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>,
         linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170207113311.11474-1-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <mpsfujoiuoc.fsf-zpEvHKhluMwYitT5tn2FcQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi Sachin,
+On Wed, 2017-02-08 at 16:11 +0100, Aurélien Aptel wrote:
+> Hi Sachin,
+> 
+> Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> writes:
+> > The patch introduces the file_operations helper
+> > cifs_copy_file_range().
+> > 
+> > The vfs helper vfs_copy_file_range() first calls clone_file_range
+> > which for cifs uses
+> > SMB2_ioctl(.., FSCTL_DUPLICATE_EXTENTS_TO_FILE, ..)
+> > to do a server side copy of the file. This ioctl is only supported
+> > on
+> > SMB3 and later versions.
+> > 
+> > Once this call fails, vfs_copy_file_range() calls copy_file_range()
+> > corresponding to the cifs filesystem which is introduced by this
+> > patch.
+> > This calls the more widely available
+> > SMB2_ioctl(.., FSCTL_SRV_COPYCHUNK_WRITE, ..)
+> 
+> Sounds good.
+> 
+> > The upstream changes in this area was first made by the commit
+> > 04b38d601239 ("vfs: pull btrfs clone API to vfs layer")
+> > This commit also introduces the ioctls FICLONE and FICLONERANGE
+> > which
+> 
+> IIUC it also allows the copy_file_range syscall defined in
+> fs/read_write.c to take advantage of the dup extents fsctl, if
+> available, nice!
 
-Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> writes:
-> The patch introduces the file_operations helper cifs_copy_file_range().
->
-> The vfs helper vfs_copy_file_range() first calls clone_file_range
-> which for cifs uses
-> SMB2_ioctl(.., FSCTL_DUPLICATE_EXTENTS_TO_FILE, ..)
-> to do a server side copy of the file. This ioctl is only supported on
-> SMB3 and later versions.
->
-> Once this call fails, vfs_copy_file_range() calls copy_file_range()
-> corresponding to the cifs filesystem which is introduced by this patch.
-> This calls the more widely available
-> SMB2_ioctl(.., FSCTL_SRV_COPYCHUNK_WRITE, ..)
+This already works with duplicate extents ie. the feature is only
+implemented using the 
+FSCTL_DUPLICATE_EXTENTS_TO_FILE
+which at the moment only on Win 2016 with ReFs on SMB3+ versions.
 
-Sounds good.
+This patch uses FSCTL_SRV_COPYCHUNK_WRITE as fall back when duplicate
+extents is not available. This cifs ioctl is supported on SMB2+
+versions and is even used as a fall back for SMB3 when the backing
+filesystem support for duplicate extents is not available.
 
-> The upstream changes in this area was first made by the commit
-> 04b38d601239 ("vfs: pull btrfs clone API to vfs layer")
-> This commit also introduces the ioctls FICLONE and FICLONERANGE which
+> 
+> Now, I wonder if there is a way to implement the FIDEDUPERANGE ioctl
+> in
+> SMB3, which does the same thing as a clone but it exits early if the
+> destination does not already match the source.
 
-IIUC it also allows the copy_file_range syscall defined in
-fs/read_write.c to take advantage of the dup extents fsctl, if
-available, nice!
+I guess this is similar to the copy_on_share() flag COPY_FR_DEDUP
+https://lwn.net/Articles/659523/
+flags for copy_on_share() aren't implemented on the syscall yet. I
+guess that would be the way to go once those flags are used. We can use
+the ioctl method to implement it for the time being.
 
-Now, I wonder if there is a way to implement the FIDEDUPERANGE ioctl in
-SMB3, which does the same thing as a clone but it exits early if the
-destination does not already match the source.
+removes the need for separate cifs ioctls to perform server side
+copies
+> > and hence can be removed.
+> 
+> Isn't this breaking userspace? I understand it was a private ioctl
+> only
+> availaible in SMB3 so it's not a big issue but
 
-> removes the need for separate cifs ioctls to perform server side copies
-> and hence can be removed.
+Yes. This is removed since we can now use the syscall to do the same
+thing. I am not aware of any utility which uses this. I am not sure if
+we need to first deprecate it before we remove it outright. Steve, can
+you please provide some advice here. 
 
-Isn't this breaking userspace? I understand it was a private ioctl only
-availaible in SMB3 so it's not a big issue but
+> 
+> > @@ -250,9 +146,6 @@ long cifs_ioctl(struct file *filep, unsigned
+> > int command, unsigned long arg)
+> >  				cifs_dbg(FYI, "set compress flag
+> > rc %d\n", rc);
+> >  			}
+> >  			break;
+> > -		case CIFS_IOC_COPYCHUNK_FILE:
+> > -			rc = cifs_ioctl_clone(xid, filep, arg);
+> > -			break;
+> >  		case CIFS_IOC_SET_INTEGRITY:
+> >  			if (pSMBFile == NULL)
+> >  				break;
+> 
+> I believe the ioctl will return -ENOTTY now. I remember this story
+> when
+> an error code was changed: https://lkml.org/lkml/2012/12/23/75 *gulp*
+> Maybe I'm overthinking this.
+> 
+> Cheers,
+> 
 
-> @@ -250,9 +146,6 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
->  				cifs_dbg(FYI, "set compress flag rc %d\n", rc);
->  			}
->  			break;
-> -		case CIFS_IOC_COPYCHUNK_FILE:
-> -			rc = cifs_ioctl_clone(xid, filep, arg);
-> -			break;
->  		case CIFS_IOC_SET_INTEGRITY:
->  			if (pSMBFile == NULL)
->  				break;
-
-I believe the ioctl will return -ENOTTY now. I remember this story when
-an error code was changed: https://lkml.org/lkml/2012/12/23/75 *gulp*
-Maybe I'm overthinking this.
-
-Cheers,
-
--- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
-GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+Sachin Prabhu
