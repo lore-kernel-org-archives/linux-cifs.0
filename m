@@ -1,347 +1,164 @@
-From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 2/2] Introduce cifs_copy_file_range()
-Date: Fri, 10 Feb 2017 16:03:51 +0530
-Message-ID: <20170210103351.10163-3-sprabhu@redhat.com>
-References: <20170210103351.10163-1-sprabhu@redhat.com>
-To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+From: Jan-Marek Glogowski <glogow-iG8UcmBuX++ELgA04lAiVw@public.gmane.org>
+Subject: Fix SMB2_TREE_CONNECT requests with the wrong TreeId
+Date: Fri, 10 Feb 2017 18:44:14 +0100
+Message-ID: <25f3edd0-3abf-f541-d7f8-54ae1dbac081@fbihome.de>
+Mime-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="------------CFCDF53D57E538DEB27BA2AF"
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170210103351.10163-1-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The patch introduces the file_operations helper cifs_copy_file_range()
-which is used by the syscall copy_file_range. The new file operations
-helper allows us to perform server side copies for SMB2.0 and 2.1
-servers as well as SMB 3.0+ servers which do not support the ioctl
-FSCTL_DUPLICATE_EXTENTS_TO_FILE.
+This is a multi-part message in MIME format.
+--------------CFCDF53D57E538DEB27BA2AF
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-The new helper uses the ioctl FSCTL_SRV_COPYCHUNK_WRITE to perform
-server side copies. The helper is called by vfs_copy_file_range() only
-once an attempt to clone the file using the ioctl
-FSCTL_DUPLICATE_EXTENTS_TO_FILE has failed.
+Hi everyone,
 
-Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+I'm having problems with CIFS connections to our NAS. The vendor
+inspected the problem and claimed the Linux CIFS module doesn't follow
+the specifications, which causes the instabilities + shutdown problems
+with our LiMux clients in our SMB2+ tests.
+
+Quoting http://msdn.microsoft.com/en-us/library/cc246529.aspx:
+
+"TreeId (4 bytes): Uniquely identifies the tree connect for the
+command. This MUST be 0 for the SMB2 TREE_CONNECT Request."
+
+I applied the attached "warn" diff, which resulted in the (expected)
+following stack trace (albeit for an old Ubuntu kernel), but otherwise
+fixes the problem.
+
+[ 1815.635274] ------------[ cut here ]------------
+[ 1815.635294] WARNING: CPU: 1 PID: 65 at
+/tmp/cifs-3.13.0-100.147-patched/smb2pdu.c:164
+small_smb2_init+0x246/0x560 [cifs]()
+[ 1815.635295] smb2_reconnect: SMB2_TREE_CONNECT with tid != 0
+[ 1815.635296] Modules linked in: nls_iso8859_1 usb_storage arc4 md4
+nls_utf8 cifs(OX) fscache kav4fs_oas(OX) redirfs(OX) dm_crypt rfcomm
+bnep bluetooth x86_pkg_temp_thermal intel_powerclamp coretemp
+snd_hda_codec_hdmi snd_hda_codec_realtek kvm_intel kvm joydev
+snd_hda_intel snd_hda_codec snd_hwdep crc32_pclmul snd_pcm
+snd_page_alloc serio_raw snd_seq_midi snd_seq_midi_event lpc_ich ipmi_si
+snd_rawmidi snd_seq snd_seq_device snd_timer parport_pc ppdev snd shpchp
+lp mac_hid soundcore parport hid_generic usbhid hid i915 i2c_algo_bit
+drm_kms_helper ahci drm r8169 libahci psmouse mii wmi video
+[ 1815.635327] CPU: 1 PID: 65 Comm: kworker/1:2 Tainted: G        W  OX
+3.13.0-100-generic #147-Ubuntu
+[ 1815.635328] Hardware name: Acer Veriton M4630G/Veriton M4630G, BIOS
+P11-C1L                 04/10/2015
+[ 1815.635344] Workqueue: cifsiod cifs_writev_complete [cifs]
+[ 1815.635346]  00000286 00000286 f65edd68 c165dcd2 f65edda8 f8cd0f78
+f65edd98 c105798e
+[ 1815.635350]  f8cd102c f65eddc4 00000041 f8cd0f78 000000a4 f8cb1df6
+f8cb1df6 f4347800
+[ 1815.635353]  00000044 f4452c00 f65eddb0 c10579e3 00000009 f65edda8
+f8cd102c f65eddc4
+[ 1815.635357] Call Trace:
+[ 1815.635362]  [<c165dcd2>] dump_stack+0x58/0x72
+[ 1815.635366]  [<c105798e>] warn_slowpath_common+0x7e/0xa0
+[ 1815.635378]  [<f8cb1df6>] ? small_smb2_init+0x246/0x560 [cifs]
+[ 1815.635390]  [<f8cb1df6>] ? small_smb2_init+0x246/0x560 [cifs]
+[ 1815.635392]  [<c10579e3>] warn_slowpath_fmt+0x33/0x40
+[ 1815.635404]  [<f8cb1df6>] small_smb2_init+0x246/0x560 [cifs]
+[ 1815.635416]  [<f8ca1b80>] ? cifs_strtoUTF16+0xc0/0xf0 [cifs]
+[ 1815.635427]  [<f8cb17f9>] SMB2_tcon+0xb9/0x470 [cifs]
+[ 1815.635438]  [<f8cb2580>] ? SMB2_negotiate+0x470/0x470 [cifs]
+[ 1815.635449]  [<f8cb1fc5>] small_smb2_init+0x415/0x560 [cifs]
+[ 1815.635452]  [<c1092ca0>] ? prepare_to_wait_event+0xd0/0xd0
+[ 1815.635464]  [<f8cb45c4>] smb2_async_writev+0x34/0x1d0 [cifs]
+[ 1815.635475]  [<f8c7a8ae>] ? cifs_writedata_release+0x1e/0x30 [cifs]
+[ 1815.635478]  [<c112d547>] ? clear_page_dirty_for_io+0x57/0xe0
+[ 1815.635488]  [<f8c7de3a>] cifs_writev_complete+0x1aa/0x270 [cifs]
+[ 1815.635491]  [<c10702ba>] process_one_work+0x11a/0x3c0
+[ 1815.635493]  [<c1070f49>] worker_thread+0xf9/0x380
+[ 1815.635495]  [<c1070e50>] ? rescuer_thread+0x380/0x380
+[ 1815.635497]  [<c10767cb>] kthread+0x9b/0xb0
+[ 1815.635500]  [<c166c037>] ret_from_kernel_thread+0x1b/0x28
+[ 1815.635503]  [<c1076730>] ? kthread_create_on_node+0x140/0x140
+[ 1815.635504] ---[ end trace d45909fef64cdfda ]---
+[ 1815.655889] cifs_vfs_err: 2516 callbacks suppressed
+[ 1815.655893] CIFS VFS: cifs_invalidate_mapping: could not invalidate
+inode d92e3798
+
+I don't know if we want to zero tcon for new connections / reconnects.
+The "warn" diff was tested by a colleague and "works for him".
+
+Thanks,
+
+Jan-Marek
+
+P.S. The 2nd patch without the warning was just compile-tested.
+
+--------------CFCDF53D57E538DEB27BA2AF
+Content-Type: text/x-patch;
+ name="tree_connect_with_warn.diff"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="tree_connect_with_warn.diff"
+
+--- smb2pdu.c.orig	2017-01-20 19:58:34.581064153 +0100
++++ smb2pdu.c	2017-01-20 20:19:23.124772222 +0100
+@@ -172,7 +172,14 @@
+ 		return rc;
+ 
+ 	if (smb2_command == SMB2_TREE_CONNECT)
++	{
++		if (tcon->tid != 0)
++		{
++			WARN(1, "%s: SMB2_TREE_CONNECT with tid != 0\n", __func__);
++			tcon->tid = 0;
++		}
+ 		return rc;
++	}
+ 
+ 	if (tcon->tidStatus == CifsExiting) {
+ 		/*
+
+
+
+--------------CFCDF53D57E538DEB27BA2AF
+Content-Type: text/x-patch;
+ name="0001-Reset-TreeId-to-zero-on-SMB2_TREE_CONNECT.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="0001-Reset-TreeId-to-zero-on-SMB2_TREE_CONNECT.patch"
+
+>From 249ab089b1c83dfbe22a1a0b37395ccd394ae1ad Mon Sep 17 00:00:00 2001
+From: Jan-Marek Glogowski <glogow-iG8UcmBuX++ELgA04lAiVw@public.gmane.org>
+Date: Fri, 10 Feb 2017 16:43:46 +0100
+Subject: [PATCH] Reset TreeId to zero on SMB2_TREE_CONNECT
+
+Currently the cifs module breaks the CIFS specs as described in
+http://msdn.microsoft.com/en-us/library/cc246529.aspx:
+
+"TreeId (4 bytes): Uniquely identifies the tree connect for the
+command. This MUST be 0 for the SMB2 TREE_CONNECT Request."
+
+Signed-off-by: Jan-Marek Glogowski <glogow-iG8UcmBuX++ELgA04lAiVw@public.gmane.org>
 ---
- fs/cifs/cifsfs.c   | 87 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/cifsfs.h   |  5 ++++
- fs/cifs/cifsglob.h |  6 ++--
- fs/cifs/ioctl.c    | 60 ++-----------------------------------
- fs/cifs/smb2ops.c  | 20 ++++++++-----
- 5 files changed, 110 insertions(+), 68 deletions(-)
+ fs/cifs/smb2pdu.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 70f4e65..9e32988 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -972,6 +972,86 @@ static int cifs_clone_file_range(struct file *src_file, loff_t off,
- 	return rc;
- }
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 8745722..ad1b555 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -169,7 +169,10 @@
+ 		return rc;
  
-+ssize_t cifs_file_copychunk_range(unsigned int xid,
-+				struct file *src_file, loff_t off,
-+				struct file *dst_file, loff_t destoff,
-+				size_t len, unsigned int flags)
-+{
-+	struct inode *src_inode = file_inode(src_file);
-+	struct inode *target_inode = file_inode(dst_file);
-+	struct cifsFileInfo *smb_file_src;
-+	struct cifsFileInfo *smb_file_target;
-+	struct cifs_tcon *src_tcon;
-+	struct cifs_tcon *target_tcon;
-+	ssize_t rc;
-+
-+	cifs_dbg(FYI, "copychunk range\n");
-+
-+	if (src_inode == target_inode) {
-+		rc = -EINVAL;
-+		goto out;
+ 	if (smb2_command == SMB2_TREE_CONNECT)
++	{
++		tcon->tid = 0;
+ 		return rc;
 +	}
-+
-+	if (!src_file->private_data || !dst_file->private_data) {
-+		rc = -EBADF;
-+		cifs_dbg(VFS, "missing cifsFileInfo on copy range src file\n");
-+		goto out;
-+	}
-+
-+	rc = -EXDEV;
-+	smb_file_target = dst_file->private_data;
-+	smb_file_src = src_file->private_data;
-+	src_tcon = tlink_tcon(smb_file_src->tlink);
-+	target_tcon = tlink_tcon(smb_file_target->tlink);
-+
-+	if (src_tcon->ses != target_tcon->ses) {
-+		cifs_dbg(VFS, "source and target of copy not on same server\n");
-+		goto out;
-+	}
-+
-+	/*
-+	 * Note: cifs case is easier than btrfs since server responsible for
-+	 * checks for proper open modes and file type and if it wants
-+	 * server could even support copy of range where source = target
-+	 */
-+	lock_two_nondirectories(target_inode, src_inode);
-+
-+	cifs_dbg(FYI, "about to flush pages\n");
-+	/* should we flush first and last page first */
-+	truncate_inode_pages(&target_inode->i_data, 0);
-+
-+	if (target_tcon->ses->server->ops->copychunk_range)
-+		rc = target_tcon->ses->server->ops->copychunk_range(xid,
-+			smb_file_src, smb_file_target, off, len, destoff);
-+	else
-+		rc = -EOPNOTSUPP;
-+
-+	/* force revalidate of size and timestamps of target file now
-+	 * that target is updated on the server
-+	 */
-+	CIFS_I(target_inode)->time = 0;
-+	/* although unlocking in the reverse order from locking is not
-+	 * strictly necessary here it is a little cleaner to be consistent
-+	 */
-+	unlock_two_nondirectories(src_inode, target_inode);
-+
-+out:
-+	return rc;
-+}
-+
-+ssize_t cifs_copy_file_range(struct file *src_file, loff_t off,
-+				struct file *dst_file, loff_t destoff,
-+				size_t len, unsigned int flags)
-+{
-+	unsigned int xid = get_xid();
-+	ssize_t rc;
-+
-+	rc = cifs_file_copychunk_range(xid, src_file, off, dst_file, destoff,
-+					len, flags);
-+	free_xid(xid);
-+	return rc;
-+}
-+
- const struct file_operations cifs_file_ops = {
- 	.read_iter = cifs_loose_read_iter,
- 	.write_iter = cifs_file_write_iter,
-@@ -984,6 +1064,7 @@ const struct file_operations cifs_file_ops = {
- 	.splice_read = generic_file_splice_read,
- 	.llseek = cifs_llseek,
- 	.unlocked_ioctl	= cifs_ioctl,
-+	.copy_file_range = cifs_copy_file_range,
- 	.clone_file_range = cifs_clone_file_range,
- 	.setlease = cifs_setlease,
- 	.fallocate = cifs_fallocate,
-@@ -1001,6 +1082,7 @@ const struct file_operations cifs_file_strict_ops = {
- 	.splice_read = generic_file_splice_read,
- 	.llseek = cifs_llseek,
- 	.unlocked_ioctl	= cifs_ioctl,
-+	.copy_file_range = cifs_copy_file_range,
- 	.clone_file_range = cifs_clone_file_range,
- 	.setlease = cifs_setlease,
- 	.fallocate = cifs_fallocate,
-@@ -1018,6 +1100,7 @@ const struct file_operations cifs_file_direct_ops = {
- 	.mmap = cifs_file_mmap,
- 	.splice_read = generic_file_splice_read,
- 	.unlocked_ioctl  = cifs_ioctl,
-+	.copy_file_range = cifs_copy_file_range,
- 	.clone_file_range = cifs_clone_file_range,
- 	.llseek = cifs_llseek,
- 	.setlease = cifs_setlease,
-@@ -1035,6 +1118,7 @@ const struct file_operations cifs_file_nobrl_ops = {
- 	.splice_read = generic_file_splice_read,
- 	.llseek = cifs_llseek,
- 	.unlocked_ioctl	= cifs_ioctl,
-+	.copy_file_range = cifs_copy_file_range,
- 	.clone_file_range = cifs_clone_file_range,
- 	.setlease = cifs_setlease,
- 	.fallocate = cifs_fallocate,
-@@ -1051,6 +1135,7 @@ const struct file_operations cifs_file_strict_nobrl_ops = {
- 	.splice_read = generic_file_splice_read,
- 	.llseek = cifs_llseek,
- 	.unlocked_ioctl	= cifs_ioctl,
-+	.copy_file_range = cifs_copy_file_range,
- 	.clone_file_range = cifs_clone_file_range,
- 	.setlease = cifs_setlease,
- 	.fallocate = cifs_fallocate,
-@@ -1067,6 +1152,7 @@ const struct file_operations cifs_file_direct_nobrl_ops = {
- 	.mmap = cifs_file_mmap,
- 	.splice_read = generic_file_splice_read,
- 	.unlocked_ioctl  = cifs_ioctl,
-+	.copy_file_range = cifs_copy_file_range,
- 	.clone_file_range = cifs_clone_file_range,
- 	.llseek = cifs_llseek,
- 	.setlease = cifs_setlease,
-@@ -1078,6 +1164,7 @@ const struct file_operations cifs_dir_ops = {
- 	.release = cifs_closedir,
- 	.read    = generic_read_dir,
- 	.unlocked_ioctl  = cifs_ioctl,
-+	.copy_file_range = cifs_copy_file_range,
- 	.clone_file_range = cifs_clone_file_range,
- 	.llseek = generic_file_llseek,
- };
-diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
-index c9c00a8..6eb8174 100644
---- a/fs/cifs/cifsfs.h
-+++ b/fs/cifs/cifsfs.h
-@@ -139,6 +139,11 @@ extern ssize_t	cifs_listxattr(struct dentry *, char *, size_t);
- # define cifs_listxattr NULL
- #endif
  
-+extern ssize_t cifs_file_copychunk_range(unsigned int xid,
-+					struct file *src_file, loff_t off,
-+					struct file *dst_file, loff_t destoff,
-+					size_t len, unsigned int flags);
-+
- extern long cifs_ioctl(struct file *filep, unsigned int cmd, unsigned long arg);
- #ifdef CONFIG_CIFS_NFSD_EXPORT
- extern const struct export_operations cifs_export_ops;
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index f9376db..dda6d0b 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -405,10 +405,10 @@ struct smb_version_operations {
- 	char * (*create_lease_buf)(u8 *, u8);
- 	/* parse lease context buffer and return oplock/epoch info */
- 	__u8 (*parse_lease_buf)(void *, unsigned int *);
--	int (*copychunk_range)(const unsigned int,
-+	ssize_t (*copychunk_range)(const unsigned int,
- 			struct cifsFileInfo *src_file,
--			struct cifsFileInfo *target_file, u64 src_off, u64 len,
--			u64 dest_off);
-+			struct cifsFileInfo *target_file,
-+			u64 src_off, u64 len, u64 dest_off);
- 	int (*duplicate_extents)(const unsigned int, struct cifsFileInfo *src,
- 			struct cifsFileInfo *target_file, u64 src_off, u64 len,
- 			u64 dest_off);
-diff --git a/fs/cifs/ioctl.c b/fs/cifs/ioctl.c
-index 9bf0f94..265c45f 100644
---- a/fs/cifs/ioctl.c
-+++ b/fs/cifs/ioctl.c
-@@ -34,63 +34,6 @@
- #include "cifs_ioctl.h"
- #include <linux/btrfs.h>
- 
--static int cifs_file_copychunk_range(unsigned int xid, struct file *src_file,
--			  struct file *dst_file)
--{
--	struct inode *src_inode = file_inode(src_file);
--	struct inode *target_inode = file_inode(dst_file);
--	struct cifsFileInfo *smb_file_src;
--	struct cifsFileInfo *smb_file_target;
--	struct cifs_tcon *src_tcon;
--	struct cifs_tcon *target_tcon;
--	int rc;
--
--	cifs_dbg(FYI, "ioctl copychunk range\n");
--
--	if (!src_file->private_data || !dst_file->private_data) {
--		rc = -EBADF;
--		cifs_dbg(VFS, "missing cifsFileInfo on copy range src file\n");
--		goto out;
--	}
--
--	rc = -EXDEV;
--	smb_file_target = dst_file->private_data;
--	smb_file_src = src_file->private_data;
--	src_tcon = tlink_tcon(smb_file_src->tlink);
--	target_tcon = tlink_tcon(smb_file_target->tlink);
--
--	if (src_tcon->ses != target_tcon->ses) {
--		cifs_dbg(VFS, "source and target of copy not on same server\n");
--		goto out;
--	}
--
--	/*
--	 * Note: cifs case is easier than btrfs since server responsible for
--	 * checks for proper open modes and file type and if it wants
--	 * server could even support copy of range where source = target
--	 */
--	lock_two_nondirectories(target_inode, src_inode);
--
--	cifs_dbg(FYI, "about to flush pages\n");
--	/* should we flush first and last page first */
--	truncate_inode_pages(&target_inode->i_data, 0);
--
--	if (target_tcon->ses->server->ops->copychunk_range)
--		rc = target_tcon->ses->server->ops->copychunk_range(xid,
--			smb_file_src, smb_file_target, 0, src_inode->i_size, 0);
--	else
--		rc = -EOPNOTSUPP;
--
--	/* force revalidate of size and timestamps of target file now
--	   that target is updated on the server */
--	CIFS_I(target_inode)->time = 0;
--	/* although unlocking in the reverse order from locking is not
--	   strictly necessary here it is a little cleaner to be consistent */
--	unlock_two_nondirectories(src_inode, target_inode);
--out:
--	return rc;
--}
--
- static long cifs_ioctl_copychunk(unsigned int xid, struct file *dst_file,
- 			unsigned long srcfd)
- {
-@@ -129,7 +72,8 @@ static long cifs_ioctl_copychunk(unsigned int xid, struct file *dst_file,
- 	if (S_ISDIR(src_inode->i_mode))
- 		goto out_fput;
- 
--	rc = cifs_file_copychunk_range(xid, src_file.file, dst_file);
-+	rc = cifs_file_copychunk_range(xid, src_file.file, 0, dst_file, 0,
-+					src_inode->i_size, 0);
- 
- out_fput:
- 	fdput(src_file);
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 3dfd925..bf0c71d 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -586,7 +586,7 @@ SMB2_request_res_key(const unsigned int xid, struct cifs_tcon *tcon,
- 	return rc;
- }
- 
--static int
-+static ssize_t
- smb2_copychunk_range(const unsigned int xid,
- 			struct cifsFileInfo *srcfile,
- 			struct cifsFileInfo *trgtfile, u64 src_off,
-@@ -599,6 +599,7 @@ smb2_copychunk_range(const unsigned int xid,
- 	struct cifs_tcon *tcon;
- 	int chunks_copied = 0;
- 	bool chunk_sizes_updated = false;
-+	ssize_t bytes_written, total_bytes_written = 0;
- 
- 	pcchunk = kmalloc(sizeof(struct copychunk_ioctl), GFP_KERNEL);
- 
-@@ -662,14 +663,16 @@ smb2_copychunk_range(const unsigned int xid,
- 			}
- 			chunks_copied++;
- 
--			src_off += le32_to_cpu(retbuf->TotalBytesWritten);
--			dest_off += le32_to_cpu(retbuf->TotalBytesWritten);
--			len -= le32_to_cpu(retbuf->TotalBytesWritten);
-+			bytes_written = le32_to_cpu(retbuf->TotalBytesWritten);
-+			src_off += bytes_written;
-+			dest_off += bytes_written;
-+			len -= bytes_written;
-+			total_bytes_written += bytes_written;
- 
--			cifs_dbg(FYI, "Chunks %d PartialChunk %d Total %d\n",
-+			cifs_dbg(FYI, "Chunks %d PartialChunk %d Total %zu\n",
- 				le32_to_cpu(retbuf->ChunksWritten),
- 				le32_to_cpu(retbuf->ChunkBytesWritten),
--				le32_to_cpu(retbuf->TotalBytesWritten));
-+				bytes_written);
- 		} else if (rc == -EINVAL) {
- 			if (ret_data_len != sizeof(struct copychunk_ioctl_rsp))
- 				goto cchunk_out;
-@@ -706,7 +709,10 @@ smb2_copychunk_range(const unsigned int xid,
- cchunk_out:
- 	kfree(pcchunk);
- 	kfree(retbuf);
--	return rc;
-+	if (rc)
-+		return rc;
-+	else
-+		return total_bytes_written;
- }
- 
- static int
+ 	if (tcon->tidStatus == CifsExiting) {
+ 		/*
 -- 
-2.9.3
+1.9.1
+
+
+--------------CFCDF53D57E538DEB27BA2AF--
