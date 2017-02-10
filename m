@@ -1,128 +1,182 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [Samba] cifs-utils: regression in (mulituser?) mounting 'CIFS
- VFS: Send error in SessSetup = -126'
-Date: Fri, 10 Feb 2017 14:29:56 -0500
-Message-ID: <1486754996.4233.23.camel@samba.org>
-References: <a13d9992-6be8-6f16-f4cb-98e83d2e140b@physics.wisc.edu>
-         <mpsd1erijy1.fsf@aaptelpc.suse.de>
-         <60de4c72-5278-04b3-5298-658fd11ad978@physics.wisc.edu>
-         <106aff65-99f7-ede5-bc08-160b579abb9f@physics.wisc.edu>
-         <1486746542.4233.14.camel@samba.org>
-         <284d47c4-a3c7-a2c9-d7d1-e5444308922c@physics.wisc.edu>
-         <1486748379.4233.16.camel@samba.org> <1486751411.4233.21.camel@samba.org>
-         <1486754095.31734.20.camel@redhat.com>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 1/2] Rename clone_range to copychunk_range
+Date: Fri, 10 Feb 2017 12:03:15 -0800
+Message-ID: <CAKywueSparZaqOb=g28+RY5_KETHisb9_b01xpFEVdXi14ikpA@mail.gmail.com>
+References: <20170210103351.10163-1-sprabhu@redhat.com> <20170210103351.10163-2-sprabhu@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: =?ISO-8859-1?Q?Aur=E9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>,
-        Nalin Dahyabhai <nalin-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        Simo Sorce <ssorce-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Simo Sorce <simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        Chad William Seys <cwseys-JAjqph6Yjy/rea2nFwT0Kw@public.gmane.org>,
-        samba-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1486754095.31734.20.camel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <20170210103351.10163-2-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 2017-02-10 at 14:14 -0500, Simo Sorce wrote:
-> On Fri, 2017-02-10 at 13:30 -0500, Jeff Layton wrote:
-> > On Fri, 2017-02-10 at 12:39 -0500, Jeff Layton wrote:
-> > > On Fri, 2017-02-10 at 11:15 -0600, Chad William Seys wrote:
-> > > > Hi Jeff,
-> > > > 
-> > > > > So we have a default credcache for the user for whom we are
-> > > > > operating
-> > > > > as, but we can't get the default principal name from it. My
-> > > > > guess is
-> > > > > that it's not finding the
-> > > > 
-> > > > This mount is run by root UID=0 and seems to be find that
-> > > > credential 
-> > > > cache without problem (earlier in the logs).  The problem seems
-> > > > to come 
-> > > > in when it tries to find the cache for user with UID=1494 .
-> > > > 
-> > > > I'm wondering if the scan of /tmp was helpful for finding caches
-> > > > of 
-> > > > non-same users.
-> > > > 
-> > > > (I'm a little surprised that there is any attempt to find
-> > > > credentials of 
-> > > > the non-root user at mount time - what happens if the non-root
-> > > > user 
-> > > > hasn't kinit-ed yet?  And yet that case worked in the past...)
-> > > > 
-> > > 
-> > > I'm more interested in what the trailing info in your credcache
-> > > name is.
-> > > In your log output for the working case, there are:
-> > > 
-> > > /tmp/krb5cc_0
-> > > /tmp/krb5cc_1494_sM11PG
-> > > 
-> > > So first one doesn't have that _XXXXXX trailing bit. Maybe
-> > > cifs.upcall
-> > > is not guessing that piece of the filename correctly?
-> > > 
-> > 
-> > (cc'ing Nalin, Simo and the linux-cifs ml)
-> > 
-> > Yeah, it seems pretty likely that that is the problem. My guess is
-> > that
-> > the extra stuff on the ccname is coming from pam_krb5, which seems to
-> > want to create a credcache that is session-specific.
-> > 
-> > You could play with setting a different ccname_template for pam_krb5
-> > that doesn't have the trailing stuff at the end, but it looks like it
-> > won't clean them up on logout if you do that. Caveat emptor.
-> > 
-> > I'm not sure what the right solution is there. For Simo and Nalin:
-> > 
-> > The upshot here is that we did a big clean up of the cifs-utils code
-> > recently, to get it out of the business of scanning /tmp for
-> > credcaches.
-> > That allows us to have better compatibility with other credcache
-> > types
-> > (keyring or whatever), and it was always rather nasty anyway.
-> > 
-> > pam_krb5 wants to make session-specific credcaches however, and
-> > cifs.upcall can't easily guess them. cifs.upcall is called from the
-> > kernel, so it can't look in the environment or anything to find the
-> > credcache.
-> > 
-> > What's the right approach to fix this? Are we stuck with scanning
-> > /tmp
-> > forever?
-> 
-> I think the right approach in the long run will be the KCM we are
-> building in SSSD and planning to make the default cache type for F26.
-> 
-> For file ccaches you are out of luck, even scanning /tmp can fail as
-> users can decide to put them elsewhere.
-> 
-> If a scan need to be made I would rather stat the files and look which
-> one belong to the user that start with "/tmp/krb" rather than trying to
-> guess the file name. Keep in mind predictable file names in /tmp are
-> really not an option so pam_krb5 is doing the right thing in using a
-> randomized file name given it runs as root.
-> 
+2017-02-10 2:33 GMT-08:00 Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> Renaming calls to reflect the underlying smb2 ioctl called. This is
+> similar to the name duplicate_extents used for a similar ioctl which is
+> also used to duplicate files by reusing fs blocks. The name change is to
+> avoid confusion.
+>
+> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/cifsglob.h |  3 ++-
+>  fs/cifs/ioctl.c    | 16 ++++++++--------
+>  fs/cifs/smb2ops.c  | 12 ++++++------
+>  3 files changed, 16 insertions(+), 15 deletions(-)
+>
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 7ea8a33..f9376db 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -405,7 +405,8 @@ struct smb_version_operations {
+>         char * (*create_lease_buf)(u8 *, u8);
+>         /* parse lease context buffer and return oplock/epoch info */
+>         __u8 (*parse_lease_buf)(void *, unsigned int *);
+> -       int (*clone_range)(const unsigned int, struct cifsFileInfo *src_file,
+> +       int (*copychunk_range)(const unsigned int,
+> +                       struct cifsFileInfo *src_file,
+>                         struct cifsFileInfo *target_file, u64 src_off, u64 len,
+>                         u64 dest_off);
+>         int (*duplicate_extents)(const unsigned int, struct cifsFileInfo *src,
+> diff --git a/fs/cifs/ioctl.c b/fs/cifs/ioctl.c
+> index 0015287..9bf0f94 100644
+> --- a/fs/cifs/ioctl.c
+> +++ b/fs/cifs/ioctl.c
+> @@ -34,7 +34,7 @@
+>  #include "cifs_ioctl.h"
+>  #include <linux/btrfs.h>
+>
+> -static int cifs_file_clone_range(unsigned int xid, struct file *src_file,
+> +static int cifs_file_copychunk_range(unsigned int xid, struct file *src_file,
+>                           struct file *dst_file)
+>  {
+>         struct inode *src_inode = file_inode(src_file);
+> @@ -45,7 +45,7 @@ static int cifs_file_clone_range(unsigned int xid, struct file *src_file,
+>         struct cifs_tcon *target_tcon;
+>         int rc;
+>
+> -       cifs_dbg(FYI, "ioctl clone range\n");
+> +       cifs_dbg(FYI, "ioctl copychunk range\n");
+>
+>         if (!src_file->private_data || !dst_file->private_data) {
+>                 rc = -EBADF;
+> @@ -75,8 +75,8 @@ static int cifs_file_clone_range(unsigned int xid, struct file *src_file,
+>         /* should we flush first and last page first */
+>         truncate_inode_pages(&target_inode->i_data, 0);
+>
+> -       if (target_tcon->ses->server->ops->clone_range)
+> -               rc = target_tcon->ses->server->ops->clone_range(xid,
+> +       if (target_tcon->ses->server->ops->copychunk_range)
+> +               rc = target_tcon->ses->server->ops->copychunk_range(xid,
+>                         smb_file_src, smb_file_target, 0, src_inode->i_size, 0);
+>         else
+>                 rc = -EOPNOTSUPP;
+> @@ -91,14 +91,14 @@ static int cifs_file_clone_range(unsigned int xid, struct file *src_file,
+>         return rc;
+>  }
+>
+> -static long cifs_ioctl_clone(unsigned int xid, struct file *dst_file,
+> +static long cifs_ioctl_copychunk(unsigned int xid, struct file *dst_file,
+>                         unsigned long srcfd)
+>  {
+>         int rc;
+>         struct fd src_file;
+>         struct inode *src_inode;
+>
+> -       cifs_dbg(FYI, "ioctl clone range\n");
+> +       cifs_dbg(FYI, "ioctl copychunk range\n");
+>         /* the destination must be opened for writing */
+>         if (!(dst_file->f_mode & FMODE_WRITE)) {
+>                 cifs_dbg(FYI, "file target not open for write\n");
+> @@ -129,7 +129,7 @@ static long cifs_ioctl_clone(unsigned int xid, struct file *dst_file,
+>         if (S_ISDIR(src_inode->i_mode))
+>                 goto out_fput;
+>
+> -       rc = cifs_file_clone_range(xid, src_file.file, dst_file);
+> +       rc = cifs_file_copychunk_range(xid, src_file.file, dst_file);
+>
+>  out_fput:
+>         fdput(src_file);
+> @@ -251,7 +251,7 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
+>                         }
+>                         break;
+>                 case CIFS_IOC_COPYCHUNK_FILE:
+> -                       rc = cifs_ioctl_clone(xid, filep, arg);
+> +                       rc = cifs_ioctl_copychunk(xid, filep, arg);
+>                         break;
+>                 case CIFS_IOC_SET_INTEGRITY:
+>                         if (pSMBFile == NULL)
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index 5d456eb..3dfd925 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -587,7 +587,7 @@ SMB2_request_res_key(const unsigned int xid, struct cifs_tcon *tcon,
+>  }
+>
+>  static int
+> -smb2_clone_range(const unsigned int xid,
+> +smb2_copychunk_range(const unsigned int xid,
+>                         struct cifsFileInfo *srcfile,
+>                         struct cifsFileInfo *trgtfile, u64 src_off,
+>                         u64 len, u64 dest_off)
+> @@ -605,7 +605,7 @@ smb2_clone_range(const unsigned int xid,
+>         if (pcchunk == NULL)
+>                 return -ENOMEM;
+>
+> -       cifs_dbg(FYI, "in smb2_clone_range - about to call request res key\n");
+> +       cifs_dbg(FYI, "in smb2_copychunk_range - about to call request res key\n");
+>         /* Request a key from the server to identify the source of the copy */
+>         rc = SMB2_request_res_key(xid, tlink_tcon(srcfile->tlink),
+>                                 srcfile->fid.persistent_fid,
+> @@ -1620,7 +1620,7 @@ struct smb_version_operations smb20_operations = {
+>         .set_oplock_level = smb2_set_oplock_level,
+>         .create_lease_buf = smb2_create_lease_buf,
+>         .parse_lease_buf = smb2_parse_lease_buf,
+> -       .clone_range = smb2_clone_range,
+> +       .copychunk_range = smb2_copychunk_range,
+>         .wp_retry_size = smb2_wp_retry_size,
+>         .dir_needs_close = smb2_dir_needs_close,
+>  };
+> @@ -1700,7 +1700,7 @@ struct smb_version_operations smb21_operations = {
+>         .set_oplock_level = smb21_set_oplock_level,
+>         .create_lease_buf = smb2_create_lease_buf,
+>         .parse_lease_buf = smb2_parse_lease_buf,
+> -       .clone_range = smb2_clone_range,
+> +       .copychunk_range = smb2_copychunk_range,
+>         .wp_retry_size = smb2_wp_retry_size,
+>         .dir_needs_close = smb2_dir_needs_close,
+>         .enum_snapshots = smb3_enum_snapshots,
+> @@ -1784,7 +1784,7 @@ struct smb_version_operations smb30_operations = {
+>         .set_oplock_level = smb3_set_oplock_level,
+>         .create_lease_buf = smb3_create_lease_buf,
+>         .parse_lease_buf = smb3_parse_lease_buf,
+> -       .clone_range = smb2_clone_range,
+> +       .copychunk_range = smb2_copychunk_range,
+>         .duplicate_extents = smb2_duplicate_extents,
+>         .validate_negotiate = smb3_validate_negotiate,
+>         .wp_retry_size = smb2_wp_retry_size,
+> @@ -1872,7 +1872,7 @@ struct smb_version_operations smb311_operations = {
+>         .set_oplock_level = smb3_set_oplock_level,
+>         .create_lease_buf = smb3_create_lease_buf,
+>         .parse_lease_buf = smb3_parse_lease_buf,
+> -       .clone_range = smb2_clone_range,
+> +       .copychunk_range = smb2_copychunk_range,
+>         .duplicate_extents = smb2_duplicate_extents,
+>  /*     .validate_negotiate = smb3_validate_negotiate, */ /* not used in 3.11 */
+>         .wp_retry_size = smb2_wp_retry_size,
+> --
+> 2.9.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Well, that's what we used to do -- do a readdir in /tmp, start looking
-for files that might be credcaches. Of course that meant we have to
-carry around a bunch of cruft for handling FILE: credcaches that doesn't
-really adapt well to DIR: or KEYRING: ones.
+Thank you for the cleanup!
 
-I guess I have a philosophical question: how is an application (like
-cifs.upcall), which is not descended from the user's session expected to
-find a user's credcache? Is that use-case just not really accounted for
-buy the krb5 libs?
-
-One thing we could do (though I really don't like it), is to take the
-pid value passed in the upcall and scrape that task's
-/proc/<pid>/environ file for KRB5CCNAME=. That really is pretty nasty
-though.
+Reviewed-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Best regards,
+Pavel Shilovsky
