@@ -1,432 +1,297 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH 1/2] CIFS: Add asynchronous read support through kernel AIO
-Date: Fri, 10 Feb 2017 15:17:57 -0800
-Message-ID: <1486768678-36802-2-git-send-email-pshilov@microsoft.com>
-References: <1486768678-36802-1-git-send-email-pshilov@microsoft.com>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [RFC][cifs-utils PATCH] cifs.upcall: allow scraping of KRB5CCNAME out of initiating task's /proc/<pid>/environ file
+Date: Sat, 11 Feb 2017 08:41:49 -0500
+Message-ID: <20170211134149.8135-1-jlayton@samba.org>
+Cc: cwseys-JAjqph6Yjy/rea2nFwT0Kw@public.gmane.org, simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, samba-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1486768678-36802-1-git-send-email-pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Currently the code doesn't recognize asynchronous calls passed
-by io_submit() and processes all calls synchronously. This is not
-what kernel AIO expects. This patch improves this for reading
-by introducing new async context that keeps track of all issued i/o
-requests and moving a response collecting procedure to a separate
-thread. This allows to return to the caller immediately for
-asynchronous calls and call the iocb->ki_complete() once all requests
-are completed. For synchronous calls the current thread simply
-waits until all requests are completed.
+Chad reported that he was seeing a regression in cifs-utils-6.6. Prior
+to that, cifs.upcall was able to find credcaches in non-default FILE:
+locations, but with the rework of that code, that ability was lost.
 
-This improves reading performance of single threaded applications
-with increasing of i/o queue depth size.
+Unfortunately, the krb5 library design doesn't really take into account
+the fact that we might need to find a credcache in a process that isn't
+descended from the session.
 
-Signed-off-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+When the kernel does an upcall, it passes several bits of info about the
+task that initiated the upcall. One of those things is the PID (the
+tgid, in particular). We can use that info to reach into the
+/proc/<pid>/environ file for the process, and grab whatever value of
+KRB5CCNAME is there.  This patch adds this ability to cifs.upcall.
+
+I'm not 100% convinced that this is a good idea however, so for now,
+this is disabled unless the command line has a '-e' switch. Anyone
+wishing to play with this should edit their /etc/request-key.conf files
+accordingly.
+
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/cifsglob.h |  18 ++++
- fs/cifs/file.c     | 273 +++++++++++++++++++++++++++++++++++++++++++++--------
- 2 files changed, 252 insertions(+), 39 deletions(-)
+ cifs.upcall.8.in |  10 ++++
+ cifs.upcall.c    | 148 ++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 152 insertions(+), 6 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index f9a9a12..80771ca 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -1109,6 +1109,23 @@ struct cifs_io_parms {
- 	struct cifs_tcon *tcon;
- };
- 
-+struct cifs_aio_ctx {
-+	struct kref		refcount;
-+	struct list_head	list;
-+	struct mutex		aio_mutex;
-+	struct completion	done;
-+	struct iov_iter		iter;
-+	struct kiocb		*iocb;
-+	struct cifsFileInfo	*cfile;
-+	struct page		**pages;
-+	struct bio_vec		*bv;
-+	unsigned int		npages;
-+	ssize_t			rc;
-+	unsigned int		len;
-+	unsigned int		total_len;
-+	bool			should_dirty;
-+};
-+
- struct cifs_readdata;
- 
- /* asynchronous read support */
-@@ -1118,6 +1135,7 @@ struct cifs_readdata {
- 	struct completion		done;
- 	struct cifsFileInfo		*cfile;
- 	struct address_space		*mapping;
-+	struct cifs_aio_ctx		*ctx;
- 	__u64				offset;
- 	unsigned int			bytes;
- 	unsigned int			got_bytes;
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 98dc842..6ceeed2 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -33,6 +33,7 @@
- #include <linux/mount.h>
- #include <linux/slab.h>
- #include <linux/swap.h>
-+#include <linux/vmalloc.h>
- #include <asm/div64.h>
- #include "cifsfs.h"
- #include "cifspdu.h"
-@@ -2410,6 +2411,108 @@ int cifs_flush(struct file *file, fl_owner_t id)
- 	return rc;
+diff --git a/cifs.upcall.8.in b/cifs.upcall.8.in
+index 50f79d18331d..06c6d3a02c2f 100644
+--- a/cifs.upcall.8.in
++++ b/cifs.upcall.8.in
+@@ -38,6 +38,16 @@ for a particular key type\&. While it can be run directly from the command\-line
+ This option is deprecated and is currently ignored\&.
+ .RE
+ .PP
++\-\-env-probe|\-e
++.RS 4
++Allow cifs.upcall to do an environment probe to help find the credential
++cache. This can assist the program with finding credential caches in
++non-default locations. If this is set, then the program will attempt to
++retrieve the KRB5CCNAME environment variable from the process that initiated
++the upcall, and then set that in the upcall process for use when searching for
++a credcache.
++.RE
++.PP
+ \--krb5conf=/path/to/krb5.conf|-k /path/to/krb5.conf
+ .RS 4
+ This option allows administrators to set an alternate location for the
+diff --git a/cifs.upcall.c b/cifs.upcall.c
+index 8f146c92b4a5..1b2c6c19e39e 100644
+--- a/cifs.upcall.c
++++ b/cifs.upcall.c
+@@ -40,6 +40,7 @@
+ #include <dirent.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
++#include <fcntl.h>
+ #include <unistd.h>
+ #include <keyutils.h>
+ #include <time.h>
+@@ -154,11 +155,126 @@ err_cache:
+ 	return credtime;
  }
  
-+static inline struct cifs_aio_ctx *
-+cifs_aio_ctx_alloc(void)
-+{
-+	struct cifs_aio_ctx *ctx;
++#define	ENV_PATH_FMT			"/proc/%d/environ"
++#define	ENV_PATH_MAXLEN			(6 + 10 + 8 + 1)
 +
-+	ctx = kzalloc(sizeof(struct cifs_aio_ctx), GFP_KERNEL);
-+	if (!ctx)
++#define	ENV_NAME			"KRB5CCNAME"
++#define	ENV_PREFIX			"KRB5CCNAME="
++#define	ENV_PREFIX_LEN			11
++
++#define	ENV_BUF_START			(4096)
++#define	ENV_BUF_MAX			(131072)
++
++/**
++ * get_cachename_from_process_env - scrape value of $KRB5CCNAME out of the
++ * 				    initiating process' environment.
++ * @pid: initiating pid value from the upcall string
++ *
++ * Open the /proc/<pid>/environ file for the given pid, and scrape it for
++ * KRB5CCNAME entries.
++ *
++ * We start with a page-size buffer, and then progressively double it until
++ * we can slurp in the whole thing.
++ *
++ * Note that this is not entirely reliable. If the process is sitting in a
++ * container or something, then this is almost certainly not going to point
++ * where you expect.
++ *
++ * Probably it just won't work, but could a user use this to trick cifs.upcall
++ * into reading a file outside the container, by setting KRB5CCNAME in a
++ * crafty way?
++ *
++ * YMMV here.
++ */
++static char *
++get_cachename_from_process_env(pid_t pid)
++{
++	int fd, ret;
++	ssize_t buflen;
++	ssize_t bufsize = ENV_BUF_START;
++	char pathname[ENV_PATH_MAXLEN];
++	char *cachename = NULL;
++	char *buf = NULL, *pos;
++
++	if (!pid) {
++		syslog(LOG_DEBUG, "%s: pid == 0\n", __func__);
 +		return NULL;
-+
-+	INIT_LIST_HEAD(&ctx->list);
-+	mutex_init(&ctx->aio_mutex);
-+	init_completion(&ctx->done);
-+	kref_init(&ctx->refcount);
-+	return ctx;
-+}
-+
-+static inline void
-+cifs_aio_ctx_release(struct kref *refcount)
-+{
-+	struct cifs_aio_ctx *ctx = container_of(refcount,
-+					struct cifs_aio_ctx, refcount);
-+
-+	cifsFileInfo_put(ctx->cfile);
-+	kvfree(ctx->bv);
-+	kfree(ctx);
-+}
-+
-+static int
-+setup_aio_ctx_iter(struct cifs_aio_ctx *ctx, struct iov_iter *iter, int rw)
-+{
-+	ssize_t rc;
-+	unsigned int cur_npages;
-+	unsigned int npages = 0;
-+	unsigned int i;
-+	size_t len;
-+	size_t count = iov_iter_count(iter);
-+	unsigned int saved_len;
-+	size_t start;
-+	unsigned int max_pages = iov_iter_npages(iter, INT_MAX);
-+	struct page **pages;
-+	struct bio_vec *bv;
-+
-+	if (iter->type & ITER_KVEC) {
-+		memcpy(&ctx->iter, iter, sizeof(struct iov_iter));
-+		ctx->len = count;
-+		iov_iter_advance(iter, count);
-+		return 0;
 +	}
 +
-+	bv = kmalloc_array(max_pages, sizeof(struct bio_vec), GFP_KERNEL);
-+	if (!bv) {
-+		bv = vmalloc(max_pages * sizeof(struct bio_vec));
-+		if (!bv)
-+			return -ENOMEM;
++	pathname[ENV_PATH_MAXLEN - 1] = '\0';
++	ret = snprintf(pathname, ENV_PATH_MAXLEN, ENV_PATH_FMT, pid);
++	if (ret >= ENV_PATH_MAXLEN) {
++		syslog(LOG_DEBUG, "%s: unterminated path!\n", __func__);
++		return NULL;
 +	}
 +
-+	saved_len = count;
++	syslog(LOG_DEBUG, "%s: pathname=%s\n", __func__, pathname);
++	fd = open(pathname, O_RDONLY);
++	if (fd < 0) {
++		syslog(LOG_DEBUG, "%s: open failed: %d\n", __func__, errno);
++		return NULL;
++	}
++retry:
++	if (bufsize > ENV_BUF_MAX) {
++		syslog(LOG_DEBUG, "%s: buffer too big: %d\n", __func__, errno);
++		goto out_close;
++	}
 +
-+	while (count && npages < max_pages) {
-+		rc = iov_iter_get_pages_alloc(iter, &pages, count, &start);
-+		if (rc < 0) {
-+			cifs_dbg(VFS, "couldn't get user pages (rc=%zd)\n", rc);
++	buf = malloc(bufsize);
++	if (!buf) {
++		syslog(LOG_DEBUG, "%s: malloc failure\n", __func__);
++		goto out_close;
++	}
++
++	buflen = read(fd, buf, bufsize);
++	if (buflen < 0) {
++		syslog(LOG_DEBUG, "%s: read failed: %d\n", __func__, errno);
++		goto out_close;
++	}
++
++	if (buflen == bufsize) {
++		/* We read to the end of the buffer, double and try again */
++		syslog(LOG_DEBUG, "%s: read to end of buffer (%zu bytes)\n",
++					__func__, bufsize);
++		free(buf);
++		bufsize *= 2;
++		if (lseek(fd, 0, SEEK_SET) < 0)
++			goto out_close;
++		goto retry;
++	}
++
++	pos = buf;
++	while (buflen > 0) {
++		size_t len = strnlen(pos, buflen);
++
++		if (len > ENV_PREFIX_LEN &&
++		    !memcmp(pos, ENV_PREFIX, ENV_PREFIX_LEN)) {
++			cachename = strndup(pos + ENV_PREFIX_LEN,
++							len - ENV_PREFIX_LEN);
++			syslog(LOG_DEBUG, "%s: cachename = %s\n",
++							__func__, cachename);
 +			break;
 +		}
-+
-+		if (rc > count) {
-+			cifs_dbg(VFS, "get pages rc=%zd more than %zu\n", rc,
-+				 count);
-+			break;
-+		}
-+
-+		iov_iter_advance(iter, rc);
-+		count -= rc;
-+		rc += start;
-+		cur_npages = (rc + PAGE_SIZE - 1) / PAGE_SIZE;
-+
-+		if (npages + cur_npages > max_pages) {
-+			cifs_dbg(VFS, "out of vec array capacity (%u vs %u)\n",
-+				 npages + cur_npages, max_pages);
-+			break;
-+		}
-+
-+		for (i = 0; i < cur_npages; i++) {
-+			len = rc > PAGE_SIZE ? PAGE_SIZE : rc;
-+			bv[npages + i].bv_page = pages[i];
-+			bv[npages + i].bv_offset = start;
-+			bv[npages + i].bv_len = len - start;
-+			rc -= len;
-+			start = 0;
-+		}
-+
-+		npages += cur_npages;
-+		kvfree(pages);
++		buflen -= (len + 1);
++		pos += (len + 1);
 +	}
-+
-+	ctx->bv = bv;
-+	ctx->len = saved_len - count;
-+	ctx->npages = npages;
-+	iov_iter_bvec(&ctx->iter, ITER_BVEC | rw, ctx->bv, npages, ctx->len);
-+	return 0;
++	free(buf);
++out_close:
++	close(fd);
++	return cachename;
 +}
 +
- static int
- cifs_write_allocate_pages(struct page **pages, unsigned long num_pages)
+ static krb5_ccache
+-get_default_cc(void)
++get_existing_cc(const char *env_cachename)
  {
-@@ -2859,6 +2962,7 @@ cifs_uncached_readdata_release(struct kref *refcount)
- 					struct cifs_readdata, refcount);
- 	unsigned int i;
- 
-+	kref_put(&rdata->ctx->refcount, cifs_aio_ctx_release);
- 	for (i = 0; i < rdata->nr_pages; i++) {
- 		put_page(rdata->pages[i]);
- 		rdata->pages[i] = NULL;
-@@ -2900,6 +3004,8 @@ cifs_readdata_to_iov(struct cifs_readdata *rdata, struct iov_iter *iter)
- 	return remaining ? -EFAULT : 0;
- }
- 
-+static void collect_uncached_read_data(struct cifs_aio_ctx *ctx);
+ 	krb5_error_code ret;
+ 	krb5_ccache cc;
++	char *cachename;
 +
- static void
- cifs_uncached_readv_complete(struct work_struct *work)
- {
-@@ -2907,6 +3013,8 @@ cifs_uncached_readv_complete(struct work_struct *work)
- 						struct cifs_readdata, work);
- 
- 	complete(&rdata->done);
-+	collect_uncached_read_data(rdata->ctx);
-+	/* the below call can possibly free the last ref to aio ctx */
- 	kref_put(&rdata->refcount, cifs_uncached_readdata_release);
- }
- 
-@@ -2973,7 +3081,8 @@ cifs_uncached_copy_into_pages(struct TCP_Server_Info *server,
- 
- static int
- cifs_send_async_read(loff_t offset, size_t len, struct cifsFileInfo *open_file,
--		     struct cifs_sb_info *cifs_sb, struct list_head *rdata_list)
-+		     struct cifs_sb_info *cifs_sb, struct list_head *rdata_list,
-+		     struct cifs_aio_ctx *ctx)
- {
- 	struct cifs_readdata *rdata;
- 	unsigned int npages, rsize, credits;
-@@ -3020,6 +3129,8 @@ cifs_send_async_read(loff_t offset, size_t len, struct cifsFileInfo *open_file,
- 		rdata->read_into_pages = cifs_uncached_read_into_pages;
- 		rdata->copy_into_pages = cifs_uncached_copy_into_pages;
- 		rdata->credits = credits;
-+		rdata->ctx = ctx;
-+		kref_get(&ctx->refcount);
- 
- 		if (!rdata->cfile->invalidHandle ||
- 		    !cifs_reopen_file(rdata->cfile, true))
-@@ -3042,50 +3153,37 @@ cifs_send_async_read(loff_t offset, size_t len, struct cifsFileInfo *open_file,
- 	return rc;
- }
- 
--ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to)
-+static void
-+collect_uncached_read_data(struct cifs_aio_ctx *ctx)
- {
--	struct file *file = iocb->ki_filp;
--	ssize_t rc;
--	size_t len;
--	ssize_t total_read = 0;
--	loff_t offset = iocb->ki_pos;
-+	struct cifs_readdata *rdata, *tmp;
-+	struct iov_iter *to = &ctx->iter;
- 	struct cifs_sb_info *cifs_sb;
- 	struct cifs_tcon *tcon;
--	struct cifsFileInfo *open_file;
--	struct cifs_readdata *rdata, *tmp;
--	struct list_head rdata_list;
--
--	len = iov_iter_count(to);
--	if (!len)
--		return 0;
--
--	INIT_LIST_HEAD(&rdata_list);
--	cifs_sb = CIFS_FILE_SB(file);
--	open_file = file->private_data;
--	tcon = tlink_tcon(open_file->tlink);
--
--	if (!tcon->ses->server->ops->async_readv)
--		return -ENOSYS;
-+	unsigned int i;
-+	int rc;
- 
--	if ((file->f_flags & O_ACCMODE) == O_WRONLY)
--		cifs_dbg(FYI, "attempting read on write only file instance\n");
-+	tcon = tlink_tcon(ctx->cfile->tlink);
-+	cifs_sb = CIFS_SB(ctx->cfile->dentry->d_sb);
- 
--	rc = cifs_send_async_read(offset, len, open_file, cifs_sb, &rdata_list);
-+	mutex_lock(&ctx->aio_mutex);
- 
--	/* if at least one read request send succeeded, then reset rc */
--	if (!list_empty(&rdata_list))
--		rc = 0;
-+	if (list_empty(&ctx->list)) {
-+		mutex_unlock(&ctx->aio_mutex);
-+		return;
++	if (env_cachename) {
++		if (setenv(ENV_NAME, env_cachename, 1))
++			syslog(LOG_DEBUG, "%s: failed to setenv %d\n", __func__, errno);
 +	}
  
--	len = iov_iter_count(to);
-+	rc = ctx->rc;
- 	/* the loop below should proceed in the order of increasing offsets */
- again:
--	list_for_each_entry_safe(rdata, tmp, &rdata_list, list) {
-+	list_for_each_entry_safe(rdata, tmp, &ctx->list, list) {
- 		if (!rc) {
--			/* FIXME: freezable sleep too? */
--			rc = wait_for_completion_killable(&rdata->done);
--			if (rc)
--				rc = -EINTR;
--			else if (rdata->result == -EAGAIN) {
-+			if (!try_wait_for_completion(&rdata->done)) {
-+				mutex_unlock(&ctx->aio_mutex);
-+				return;
-+			}
-+
-+			if (rdata->result == -EAGAIN) {
- 				/* resend call if it's a retryable error */
- 				struct list_head tmp_list;
- 				unsigned int got_bytes = rdata->got_bytes;
-@@ -3111,9 +3209,9 @@ ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to)
- 						rdata->offset + got_bytes,
- 						rdata->bytes - got_bytes,
- 						rdata->cfile, cifs_sb,
--						&tmp_list);
-+						&tmp_list, ctx);
- 
--				list_splice(&tmp_list, &rdata_list);
-+				list_splice(&tmp_list, &ctx->list);
- 
- 				kref_put(&rdata->refcount,
- 					 cifs_uncached_readdata_release);
-@@ -3131,14 +3229,111 @@ ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to)
- 		kref_put(&rdata->refcount, cifs_uncached_readdata_release);
+ 	ret = krb5_cc_default(context, &cc);
+ 	if (ret) {
+@@ -166,6 +282,14 @@ get_default_cc(void)
+ 		return NULL;
  	}
  
--	total_read = len - iov_iter_count(to);
-+	for (i = 0; i < ctx->npages; i++) {
-+		if (ctx->should_dirty)
-+			set_page_dirty(ctx->bv[i].bv_page);
-+		put_page(ctx->bv[i].bv_page);
-+	}
-+
-+	ctx->total_len = ctx->len - iov_iter_count(to);
- 
--	cifs_stats_bytes_read(tcon, total_read);
-+	cifs_stats_bytes_read(tcon, ctx->total_len);
- 
- 	/* mask nodata case */
- 	if (rc == -ENODATA)
- 		rc = 0;
- 
-+	ctx->rc = (rc == 0) ? ctx->total_len : rc;
-+
-+	mutex_unlock(&ctx->aio_mutex);
-+
-+	if (ctx->iocb && ctx->iocb->ki_complete)
-+		ctx->iocb->ki_complete(ctx->iocb, ctx->rc, 0);
-+	else
-+		complete(&ctx->done);
-+}
-+
-+ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to)
-+{
-+	struct file *file = iocb->ki_filp;
-+	ssize_t rc;
-+	size_t len;
-+	ssize_t total_read = 0;
-+	loff_t offset = iocb->ki_pos;
-+	struct cifs_sb_info *cifs_sb;
-+	struct cifs_tcon *tcon;
-+	struct cifsFileInfo *cfile;
-+	struct cifs_aio_ctx *ctx;
-+
-+	len = iov_iter_count(to);
-+	if (!len)
-+		return 0;
-+
-+	cifs_sb = CIFS_FILE_SB(file);
-+	cfile = file->private_data;
-+	tcon = tlink_tcon(cfile->tlink);
-+
-+	if (!tcon->ses->server->ops->async_readv)
-+		return -ENOSYS;
-+
-+	if ((file->f_flags & O_ACCMODE) == O_WRONLY)
-+		cifs_dbg(FYI, "attempting read on write only file instance\n");
-+
-+	ctx = cifs_aio_ctx_alloc();
-+	if (!ctx)
-+		return -ENOMEM;
-+
-+	ctx->cfile = cifsFileInfo_get(cfile);
-+
-+	if (!is_sync_kiocb(iocb))
-+		ctx->iocb = iocb;
-+
-+	if (to->type & ITER_IOVEC)
-+		ctx->should_dirty = true;
-+
-+	rc = setup_aio_ctx_iter(ctx, to, READ);
-+	if (rc) {
-+		kref_put(&ctx->refcount, cifs_aio_ctx_release);
-+		return rc;
-+	}
-+
-+	len = ctx->len;
-+
-+	/* grab a lock here due to read response handlers can access ctx */
-+	mutex_lock(&ctx->aio_mutex);
-+
-+	rc = cifs_send_async_read(offset, len, cfile, cifs_sb, &ctx->list, ctx);
-+
-+	/* if at least one read request send succeeded, then reset rc */
-+	if (!list_empty(&ctx->list))
-+		rc = 0;
-+
-+	mutex_unlock(&ctx->aio_mutex);
-+
-+	if (rc) {
-+		kref_put(&ctx->refcount, cifs_aio_ctx_release);
-+		return rc;
-+	}
-+
-+	if (!is_sync_kiocb(iocb)) {
-+		kref_put(&ctx->refcount, cifs_aio_ctx_release);
-+		return -EIOCBQUEUED;
-+	}
-+
-+	/* FIXME: freezable sleep too? */
-+	rc = wait_for_completion_killable(&ctx->done);
-+	if (rc) {
-+		mutex_lock(&ctx->aio_mutex);
-+		ctx->rc = rc = -EINTR;
-+		total_read = ctx->total_len;
-+		mutex_unlock(&ctx->aio_mutex);
++	ret = krb5_cc_get_full_name(context, cc, &cachename);
++	if (ret) {
++		syslog(LOG_DEBUG, "%s: krb5_cc_get_full_name failed: %d\n", __func__, ret);
 +	} else {
-+		rc = ctx->rc;
-+		total_read = ctx->total_len;
++		syslog(LOG_DEBUG, "%s: default ccache is %s\n", __func__, cachename);
++		krb5_free_string(context, cachename);
 +	}
 +
-+	kref_put(&ctx->refcount, cifs_aio_ctx_release);
+ 	if (!get_tgt_time(cc)) {
+ 		krb5_cc_close(context, cc);
+ 		cc = NULL;
+@@ -173,7 +297,6 @@ get_default_cc(void)
+ 	return cc;
+ }
+ 
+-
+ static krb5_ccache
+ init_cc_from_keytab(const char *keytab_name, const char *user)
+ {
+@@ -664,10 +787,11 @@ lowercase_string(char *c)
+ 
+ static void usage(void)
+ {
+-	fprintf(stderr, "Usage: %s [ -K /path/to/keytab] [-k /path/to/krb5.conf] [-t] [-v] [-l] key_serial\n", prog);
++	fprintf(stderr, "Usage: %s [ -K /path/to/keytab] [-k /path/to/krb5.conf] [-e] [-t] [-v] [-l] key_serial\n", prog);
+ }
+ 
+ static const struct option long_options[] = {
++	{"env-probe", 0, NULL, 'e'},
+ 	{"krb5conf", 1, NULL, 'k'},
+ 	{"legacy-uid", 0, NULL, 'l'},
+ 	{"trust-dns", 0, NULL, 't'},
+@@ -685,13 +809,14 @@ int main(const int argc, char *const argv[])
+ 	size_t datalen;
+ 	unsigned int have;
+ 	long rc = 1;
+-	int c, try_dns = 0, legacy_uid = 0;
++	int c, try_dns = 0, legacy_uid = 0, env_probe = 0;
+ 	char *buf;
+ 	char hostbuf[NI_MAXHOST], *host;
+ 	struct decoded_args arg;
+ 	const char *oid;
+ 	uid_t uid;
+ 	char *keytab_name = NULL;
++	char *env_cachename = NULL;
+ 	krb5_ccache ccache = NULL;
+ 
+ 	hostbuf[0] = '\0';
+@@ -699,11 +824,15 @@ int main(const int argc, char *const argv[])
+ 
+ 	openlog(prog, 0, LOG_DAEMON);
+ 
+-	while ((c = getopt_long(argc, argv, "ck:K:ltv", long_options, NULL)) != -1) {
++	while ((c = getopt_long(argc, argv, "cek:K:ltv", long_options, NULL)) != -1) {
+ 		switch (c) {
+ 		case 'c':
+ 			/* legacy option -- skip it */
+ 			break;
++		case 'e':
++			/* do an environmental probe to get the credcache */
++			env_probe++;
++			break;
+ 		case 't':
+ 			try_dns++;
+ 			break;
+@@ -794,6 +923,12 @@ int main(const int argc, char *const argv[])
+ 		goto out;
+ 	}
+ 
++	/*
++	 * Must do this before setuid, as we need ptrace perms to look at
++	 * environ file.
++	 */
++	env_cachename = get_cachename_from_process_env(env_probe ? arg.pid : 0);
 +
- 	if (total_read) {
- 		iocb->ki_pos += total_read;
- 		return total_read;
+ 	rc = setuid(uid);
+ 	if (rc == -1) {
+ 		syslog(LOG_ERR, "setuid: %s", strerror(errno));
+@@ -806,7 +941,7 @@ int main(const int argc, char *const argv[])
+ 		goto out;
+ 	}
+ 
+-	ccache = get_default_cc();
++	ccache = get_existing_cc(env_cachename);
+ 	/* Couldn't find credcache? Try to use keytab */
+ 	if (ccache == NULL && arg.username != NULL)
+ 		ccache = init_cc_from_keytab(keytab_name, arg.username);
+@@ -959,6 +1094,7 @@ out:
+ 	SAFE_FREE(arg.ip);
+ 	SAFE_FREE(arg.username);
+ 	SAFE_FREE(keydata);
++	SAFE_FREE(env_cachename);
+ 	syslog(LOG_DEBUG, "Exit status %ld", rc);
+ 	return rc;
+ }
 -- 
-2.7.4
+2.9.3
