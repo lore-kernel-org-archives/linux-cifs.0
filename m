@@ -1,62 +1,146 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [cifs-utils PATCH] cifs.upcall: convert several flags from int to bool
-Date: Mon, 13 Feb 2017 09:46:59 -0500
-Message-ID: <20170213144659.10812-1-jlayton@samba.org>
-Cc: cwseys-JAjqph6Yjy/rea2nFwT0Kw@public.gmane.org, simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, samba-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH v28 00/21] Richacls (Core and Ext4)
+Date: Mon, 13 Feb 2017 16:32:16 +0100
+Message-ID: <1486999957-2381-1-git-send-email-agruenba@redhat.com>
+Cc: Andreas Gruenbacher <agruenba-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        Miklos Szeredi <mszeredi-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+        "Theodore Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,
+        Andreas Dilger <adilger.kernel-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>,
+        "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
+        Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>,
+        Trond Myklebust <trond.myklebust-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
+        Anna Schumaker <anna.schumaker-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
+        Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>, linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-xfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- cifs.upcall.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+Here is another update of the richacl patches.  Changes since the last posting
+(https://lwn.net/Articles/703199/):
 
-diff --git a/cifs.upcall.c b/cifs.upcall.c
-index cc9ecf0d1fed..e94087cec9dd 100644
---- a/cifs.upcall.c
-+++ b/cifs.upcall.c
-@@ -810,7 +810,8 @@ int main(const int argc, char *const argv[])
- 	size_t datalen;
- 	unsigned int have;
- 	long rc = 1;
--	int c, try_dns = 0, legacy_uid = 0, env_probe = 0;
-+	int c;
-+	bool try_dns = false, legacy_uid = false, env_probe = false;
- 	char *buf;
- 	char hostbuf[NI_MAXHOST], *host;
- 	struct decoded_args arg;
-@@ -833,10 +834,10 @@ int main(const int argc, char *const argv[])
- 			break;
- 		case 'e':
- 			/* do an environmental probe to get the credcache */
--			env_probe++;
-+			env_probe = true;
- 			break;
- 		case 't':
--			try_dns++;
-+			try_dns = true;
- 			break;
- 		case 'k':
- 			if (setenv("KRB5_CONFIG", optarg, 1) != 0) {
-@@ -848,7 +849,7 @@ int main(const int argc, char *const argv[])
- 			keytab_name = optarg;
- 			break;
- 		case 'l':
--			legacy_uid++;
-+			legacy_uid = true;
- 			break;
- 		case 'v':
- 			rc = 0;
-@@ -1071,7 +1072,7 @@ retry_new_hostname:
- 		if (rc)
- 			break;
- 
--		try_dns = 0;
-+		try_dns = false;
- 		host = hostbuf;
- 		goto retry_new_hostname;
- 	default:
+ * Fix permission checking for file exchange (i.e., renameat2 with the
+   RENAME_EXCHANGE flag): in some cases, the MAY_CREATE_FILE and MAY_CREATE_DIR
+   permissions were swapped.
+
+   This should have been caught by the test suite but wasn't.  Meanwhile the
+   test suite is fixed as well.
+
+ * When deleting a file and we have MAY_DELETE_SELF permission on the file, we
+   don't require MAY_DELETE_CHILD permission on the containing directory.
+   However, we must still call inode_permission with MAY_WRITE in mask for
+   checks beyond file permission bits or ACLs, such as LSM.
+
+
+Many thanks to Miklos for the previous patch review.
+
+
+The complete patch queue is available here:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/agruen/linux-richacl.git \
+	richacl-2017-02-13
+
+
+The richacl user-space utilitites, man pages, and test suite are available
+here:
+
+  https://github.com/andreas-gruenbacher/richacl
+
+
+Changes to other user-space packages for richacl:
+
+  https://github.com/andreas-gruenbacher/coreutils
+  https://github.com/andreas-gruenbacher/e2fsprogs
+  https://github.com/andreas-gruenbacher/samba
+  https://github.com/andreas-gruenbacher/xfsprogs-dev
+  https://github.com/andreas-gruenbacher/nfs-utils
+
+
+Please see the richacl homepage for more information:
+
+  http://www.bestbits.at/richacl/
+
+
+Thanks,
+Andreas
+
+Andreas Gruenbacher (19):
+  vfs: Add IS_ACL() and IS_RICHACL() tests
+  vfs: Add MAY_CREATE_FILE and MAY_CREATE_DIR permission flags
+  vfs: Add MAY_DELETE_SELF and MAY_DELETE_CHILD permission flags
+  vfs: Add permission flags for setting file attributes
+  richacl: In-memory representation and helper functions
+  richacl: Permission mapping functions
+  richacl: Permission check algorithm
+  richacl: Compute maximum file masks from an acl
+  vfs: Cache base_acl objects in inodes
+  vfs: Add get_richacl and set_richacl inode operations
+  vfs: Cache richacl in struct inode
+  richacl: Update the file masks in chmod()
+  richacl: Check if an acl is equivalent to a file mode
+  richacl: Create-time inheritance
+  richacl: Automatic Inheritance
+  richacl: xattr mapping functions
+  richacl: Add richacl xattr handler
+  vfs: Add richacl permission checking
+  vfs: Move check_posix_acl and check_richacl out of fs/namei.c
+
+Aneesh Kumar K.V (2):
+  ext4: Add richacl support
+  ext4: Add richacl feature flag
+
+ fs/9p/acl.c                        |   8 +-
+ fs/Kconfig                         |   3 +
+ fs/Makefile                        |   1 +
+ fs/attr.c                          |  79 +++-
+ fs/ext4/Kconfig                    |  11 +
+ fs/ext4/Makefile                   |   1 +
+ fs/ext4/ext4.h                     |   7 +-
+ fs/ext4/file.c                     |   3 +
+ fs/ext4/ialloc.c                   |  11 +-
+ fs/ext4/inode.c                    |   4 +-
+ fs/ext4/namei.c                    |   5 +
+ fs/ext4/richacl.c                  | 134 ++++++
+ fs/ext4/richacl.h                  |  40 ++
+ fs/ext4/super.c                    |  48 +-
+ fs/ext4/xattr.c                    |   7 +
+ fs/f2fs/acl.c                      |   4 +-
+ fs/inode.c                         |  43 +-
+ fs/jffs2/acl.c                     |   6 +-
+ fs/namei.c                         | 150 +++---
+ fs/nfs/nfs3acl.c                   |  14 +-
+ fs/posix_acl.c                     |  97 ++--
+ fs/richacl.c                       | 937 +++++++++++++++++++++++++++++++++++++
+ fs/richacl_xattr.c                 | 222 +++++++++
+ include/linux/acl.h                |  15 +
+ include/linux/fs.h                 |  58 ++-
+ include/linux/posix_acl.h          |  24 +-
+ include/linux/richacl.h            | 218 +++++++++
+ include/linux/richacl_xattr.h      |  31 ++
+ include/uapi/linux/Kbuild          |   2 +
+ include/uapi/linux/fs.h            |   3 +-
+ include/uapi/linux/richacl.h       | 152 ++++++
+ include/uapi/linux/richacl_xattr.h |  44 ++
+ include/uapi/linux/xattr.h         |   2 +
+ 33 files changed, 2216 insertions(+), 168 deletions(-)
+ create mode 100644 fs/ext4/richacl.c
+ create mode 100644 fs/ext4/richacl.h
+ create mode 100644 fs/richacl.c
+ create mode 100644 fs/richacl_xattr.c
+ create mode 100644 include/linux/acl.h
+ create mode 100644 include/linux/richacl.h
+ create mode 100644 include/linux/richacl_xattr.h
+ create mode 100644 include/uapi/linux/richacl.h
+ create mode 100644 include/uapi/linux/richacl_xattr.h
+
 -- 
-2.9.3
+2.7.4
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
