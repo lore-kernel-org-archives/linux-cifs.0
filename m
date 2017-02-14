@@ -1,44 +1,98 @@
-From: Jan-Marek Glogowski <glogow-iG8UcmBuX++ELgA04lAiVw@public.gmane.org>
-Subject: Re: Fix SMB2_TREE_CONNECT requests with the wrong TreeId
-Date: Tue, 14 Feb 2017 17:39:39 +0100
-Message-ID: <1a130ab9-84bf-82cb-8c23-e071c286822c@fbihome.de>
-References: <25f3edd0-3abf-f541-d7f8-54ae1dbac081@fbihome.de>
- <mps60keik2w.fsf@aaptelpc.suse.de>
- <066cc0b2-0e63-8cf6-7d46-578e524cf3bf@fbihome.de>
- <mpszihohiad.fsf@aaptelpc.suse.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-To: =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>,
-        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH v2 1/2] cifs.upcall: switch group IDs when handling an upcall
+Date: Tue, 14 Feb 2017 13:23:24 -0500
+Message-ID: <20170214182325.25067-2-jlayton@samba.org>
+References: <20170214182325.25067-1-jlayton@samba.org>
+Cc: cwseys-JAjqph6Yjy/rea2nFwT0Kw@public.gmane.org, simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, samba-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <mpszihohiad.fsf-zpEvHKhluMwYitT5tn2FcQ@public.gmane.org>
+In-Reply-To: <20170214182325.25067-1-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Am 14.02.2017 um 17:02 schrieb Aurélien Aptel:
-> Jan-Marek Glogowski <glogow-iG8UcmBuX++ELgA04lAiVw@public.gmane.org> writes:
->> I also had a look at the CIFS code and the tcon->tid member is just used
->> to set the SMB2 header TreeId field or is set from the the SMB2 header
->> TreeId field. If tcon structs are reused, I couldn't see a code path to
->> zero it.
-> 
-> wasn't thinking of the reconnection, good catch!
-> 
-> I'm still not sure why you got the stacktrace on the old kernel. I'll
-> try it out.
+Currently, we leave the group ID alone, but in a later patch we'll be
+changing cifs.upcall to scrape $KRB5CCNAME out of the originating
+process. At that point, we want to be a little more careful with the
+process credentials we'll be using.
 
-The trace starts with
+After we get the uid, do a getpwuid and grab the default gid for the
+user. Then use setgid to set it before calling setuid.
 
-[ 1815.635294] WARNING: CPU: 1 PID: 65 at
-/tmp/cifs-3.13.0-100.147-patched/smb2pdu.c:164
-small_smb2_init+0x246/0x560 [cifs]()
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ cifs.upcall.c | 37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
-which is the place of the WARN call in my code. Since I also had a patch
-for a newer kernel (Ubuntu 16.04 HWE for 14.04 AKA Linux 4.4), the
-offsets are wrong in the attached patch.
-
-I just re-checked my code. I didn't test the non-WARN variant and
-assumed the code simply got inlined, so the function name is wrong.
-
-Jan-Marek
+diff --git a/cifs.upcall.c b/cifs.upcall.c
+index 8f146c92b4a5..122b6a7a324a 100644
+--- a/cifs.upcall.c
++++ b/cifs.upcall.c
+@@ -46,6 +46,8 @@
+ #include <netdb.h>
+ #include <arpa/inet.h>
+ #include <ctype.h>
++#include <pwd.h>
++#include <grp.h>
+ 
+ #include "replace.h"
+ #include "data_blob.h"
+@@ -693,6 +695,7 @@ int main(const int argc, char *const argv[])
+ 	uid_t uid;
+ 	char *keytab_name = NULL;
+ 	krb5_ccache ccache = NULL;
++	struct passwd *pw;
+ 
+ 	hostbuf[0] = '\0';
+ 	memset(&arg, 0, sizeof(arg));
+@@ -794,15 +797,49 @@ int main(const int argc, char *const argv[])
+ 		goto out;
+ 	}
+ 
++	/*
++	 * The kernel doesn't pass down the gid, so we resort here to scraping
++	 * one out of the passwd nss db. Note that this might not reflect the
++	 * actual gid of the process that initiated the upcall. While we could
++	 * scrape that out of /proc, relying on that is a bit more risky.
++	 */
++	pw = getpwuid(uid);
++	if (!pw) {
++		syslog(LOG_ERR, "Unable to find pw entry for uid %d: %s\n",
++			uid, strerror(errno));
++		rc = 1;
++		goto out;
++	}
++
++	/*
++	 * The kernel should send down a zero-length grouplist already, but
++	 * just to be on the safe side...
++	 */
++	rc = setgroups(0, NULL);
++	if (rc == -1) {
++		syslog(LOG_ERR, "setgroups: %s", strerror(errno));
++		rc = 1;
++		goto out;
++	}
++
++	rc = setgid(pw->pw_gid);
++	if (rc == -1) {
++		syslog(LOG_ERR, "setgid: %s", strerror(errno));
++		rc = 1;
++		goto out;
++	}
++
+ 	rc = setuid(uid);
+ 	if (rc == -1) {
+ 		syslog(LOG_ERR, "setuid: %s", strerror(errno));
++		rc = 1;
+ 		goto out;
+ 	}
+ 
+ 	rc = krb5_init_context(&context);
+ 	if (rc) {
+ 		syslog(LOG_ERR, "unable to init krb5 context: %ld", rc);
++		rc = 1;
+ 		goto out;
+ 	}
+ 
+-- 
+2.9.3
