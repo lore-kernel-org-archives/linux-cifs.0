@@ -1,12 +1,12 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [cifs-utils PATCHv3 3/3] cifs.upcall: allow scraping of KRB5CCNAME out of initiating task's /proc/<pid>/environ file
-Date: Wed, 15 Feb 2017 11:13:23 -0500
-Message-ID: <20170215161325.16914-4-jlayton@samba.org>
-References: <20170215161325.16914-1-jlayton@samba.org>
+Subject: [cifs-utils PATCH v4 4/4] cifs.upcall: allow scraping of KRB5CCNAME out of initiating task's /proc/<pid>/environ file
+Date: Wed, 15 Feb 2017 11:15:22 -0500
+Message-ID: <20170215161522.17063-5-jlayton@samba.org>
+References: <20170215161522.17063-1-jlayton@samba.org>
 Cc: cwseys-JAjqph6Yjy/rea2nFwT0Kw@public.gmane.org, simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, samba-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170215161325.16914-1-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <20170215161522.17063-1-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
@@ -35,8 +35,8 @@ Reported-by: Chad William Seys <cwseys-JAjqph6Yjy/rea2nFwT0Kw@public.gmane.org>
 Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
  cifs.upcall.8.in |   9 ++++
- cifs.upcall.c    | 148 ++++++++++++++++++++++++++++++++++++++++++++++++++++---
- 2 files changed, 151 insertions(+), 6 deletions(-)
+ cifs.upcall.c    | 150 ++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 152 insertions(+), 7 deletions(-)
 
 diff --git a/cifs.upcall.8.in b/cifs.upcall.8.in
 index 50f79d18331d..e1f3956e176a 100644
@@ -59,7 +59,7 @@ index 50f79d18331d..e1f3956e176a 100644
  .RS 4
  This option allows administrators to set an alternate location for the
 diff --git a/cifs.upcall.c b/cifs.upcall.c
-index 2b535a133a30..3a556e10b593 100644
+index 25af0fb6957b..c9ddd35856a9 100644
 --- a/cifs.upcall.c
 +++ b/cifs.upcall.c
 @@ -40,6 +40,7 @@
@@ -70,7 +70,7 @@ index 2b535a133a30..3a556e10b593 100644
  #include <unistd.h>
  #include <keyutils.h>
  #include <time.h>
-@@ -156,11 +157,125 @@ err_cache:
+@@ -212,11 +213,125 @@ err_cache:
  	return credtime;
  }
  
@@ -197,7 +197,7 @@ index 2b535a133a30..3a556e10b593 100644
  
  	ret = krb5_cc_default(context, &cc);
  	if (ret) {
-@@ -168,6 +283,14 @@ get_default_cc(void)
+@@ -224,6 +339,14 @@ get_default_cc(void)
  		return NULL;
  	}
  
@@ -212,7 +212,7 @@ index 2b535a133a30..3a556e10b593 100644
  	if (!get_tgt_time(cc)) {
  		krb5_cc_close(context, cc);
  		cc = NULL;
-@@ -175,7 +298,6 @@ get_default_cc(void)
+@@ -231,7 +354,6 @@ get_default_cc(void)
  	return cc;
  }
  
@@ -220,7 +220,7 @@ index 2b535a133a30..3a556e10b593 100644
  static krb5_ccache
  init_cc_from_keytab(const char *keytab_name, const char *user)
  {
-@@ -666,10 +788,11 @@ lowercase_string(char *c)
+@@ -722,10 +844,11 @@ lowercase_string(char *c)
  
  static void usage(void)
  {
@@ -233,7 +233,7 @@ index 2b535a133a30..3a556e10b593 100644
  	{"krb5conf", 1, NULL, 'k'},
  	{"legacy-uid", 0, NULL, 'l'},
  	{"trust-dns", 0, NULL, 't'},
-@@ -688,13 +811,14 @@ int main(const int argc, char *const argv[])
+@@ -744,13 +867,14 @@ int main(const int argc, char *const argv[])
  	unsigned int have;
  	long rc = 1;
  	int c;
@@ -249,7 +249,7 @@ index 2b535a133a30..3a556e10b593 100644
  	krb5_ccache ccache = NULL;
  	struct passwd *pw;
  
-@@ -703,11 +827,15 @@ int main(const int argc, char *const argv[])
+@@ -759,11 +883,15 @@ int main(const int argc, char *const argv[])
  
  	openlog(prog, 0, LOG_DAEMON);
  
@@ -266,7 +266,16 @@ index 2b535a133a30..3a556e10b593 100644
  		case 't':
  			try_dns = true;
  			break;
-@@ -830,6 +958,13 @@ int main(const int argc, char *const argv[])
+@@ -789,7 +917,7 @@ int main(const int argc, char *const argv[])
+ 		}
+ 	}
+ 
+-	if (trim_capabilities(false))
++	if (trim_capabilities(env_probe))
+ 		goto out;
+ 
+ 	/* is there a key? */
+@@ -889,6 +1017,13 @@ int main(const int argc, char *const argv[])
  		goto out;
  	}
  
@@ -280,7 +289,7 @@ index 2b535a133a30..3a556e10b593 100644
  	rc = setuid(uid);
  	if (rc == -1) {
  		syslog(LOG_ERR, "setuid: %s", strerror(errno));
-@@ -844,7 +979,7 @@ int main(const int argc, char *const argv[])
+@@ -907,7 +1042,7 @@ int main(const int argc, char *const argv[])
  		goto out;
  	}
  
@@ -289,7 +298,7 @@ index 2b535a133a30..3a556e10b593 100644
  	/* Couldn't find credcache? Try to use keytab */
  	if (ccache == NULL && arg.username != NULL)
  		ccache = init_cc_from_keytab(keytab_name, arg.username);
-@@ -997,6 +1132,7 @@ out:
+@@ -1060,6 +1195,7 @@ out:
  	SAFE_FREE(arg.ip);
  	SAFE_FREE(arg.username);
  	SAFE_FREE(keydata);
