@@ -1,48 +1,65 @@
-From: Simo Sorce <simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [cifs-utils PATCH v3 0/4] cifs.upcall: allow cifs.upcall to
- scrape cache location initiating task's environment
-Date: Thu, 16 Feb 2017 08:59:00 -0500
-Message-ID: <1487253540.6697.3.camel@redhat.com>
-References: <20170215161522.17063-1-jlayton@samba.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-        cwseys-JAjqph6Yjy/rea2nFwT0Kw@public.gmane.org, samba-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [cifs-utils PATCH] cifs.upcall: trim even more capabilities
+Date: Thu, 16 Feb 2017 09:59:13 -0500
+Message-ID: <20170216145913.15848-1-jlayton@samba.org>
+Cc: simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170215161522.17063-1-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 2017-02-15 at 11:15 -0500, Jeff Layton wrote:
-> Apologies for v3 series, I had some extra patches in there. This is
-> the one that should have been sent. Relabeled as v4 for clarity.
-> 
-> Third respin of this series. Reordered for better safety for bisecting.
-> The environment scraping is now on by default, but can be disabled with
-> "-E" in environments where it's not needed.
-> 
-> Also, I've added a patch to make cifs.upcall drop capabilities before
-> doing most of its work. This may help reduce the attack surface of the
-> program.
-> 
-> Jeff Layton (4):
->   cifs.upcall: convert two flags from int to bool
->   cifs.upcall: switch group IDs when handling an upcall
->   cifs.upcall: drop capabilities early in program
->   cifs.upcall: allow scraping of KRB5CCNAME out of initiating task's
->     /proc/<pid>/environ file
-> 
->  Makefile.am      |   2 +-
->  cifs.upcall.8.in |   9 ++
->  cifs.upcall.c    | 255 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
->  3 files changed, 256 insertions(+), 10 deletions(-)
-> 
+We really only need CAP_DAC_READ_SEARCH, not CAP_DAC_OVERRIDE, and
+only when we are going to probe the environ file.
 
-You can add a reviewed-by with my name.
+Also, fix the non-libcap-ng trim_capabilities prototype.
 
-Simo.
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ cifs.upcall.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
+diff --git a/cifs.upcall.c b/cifs.upcall.c
+index 6d9c427b7032..dae58b919408 100644
+--- a/cifs.upcall.c
++++ b/cifs.upcall.c
+@@ -70,22 +70,21 @@ typedef enum _sectype {
+ 
+ #ifdef HAVE_LIBCAP_NG
+ static int
+-trim_capabilities(bool need_ptrace)
++trim_capabilities(bool need_environ)
+ {
+ 	capng_clear(CAPNG_SELECT_BOTH);
+ 
+-	/*
+-	 * Need PTRACE and DAC_OVERRIDE for environment scraping, SETGID to
+-	 * change gid and grouplist, and SETUID to change uid.
+-	 */
++	/* SETUID and SETGID to change uid, gid, and grouplist */
+ 	if (capng_updatev(CAPNG_ADD, CAPNG_PERMITTED|CAPNG_EFFECTIVE,
+-			CAP_SETUID, CAP_SETGID, CAP_DAC_OVERRIDE, -1)) {
++			CAP_SETUID, CAP_SETGID, -1)) {
+ 		syslog(LOG_ERR, "%s: Unable to update capability set: %m\n", __func__);
+ 		return 1;
+ 	}
+ 
+-	if (need_ptrace &&
+-	    capng_update(CAPNG_ADD, CAPNG_PERMITTED|CAPNG_EFFECTIVE, CAP_SYS_PTRACE)) {
++	 /* Need PTRACE and DAC_OVERRIDE for environment scraping */
++	if (need_environ &&
++	    capng_updatev(CAPNG_ADD, CAPNG_PERMITTED|CAPNG_EFFECTIVE,
++			CAP_SYS_PTRACE, CAP_DAC_READ_SEARCH, -1)) {
+ 		syslog(LOG_ERR, "%s: Unable to update capability set: %m\n", __func__);
+ 		return 1;
+ 	}
+@@ -109,7 +108,7 @@ drop_all_capabilities(void)
+ }
+ #else /* HAVE_LIBCAP_NG */
+ static int
+-trim_capabilities(void)
++trim_capabilities(bool unused)
+ {
+ 	return 0;
+ }
 -- 
-Simo Sorce * Red Hat, Inc * New York
+2.9.3
