@@ -1,68 +1,87 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [cifs-utils PATCH] cifs.upcall: trim even more capabilities
-Date: Thu, 16 Feb 2017 12:44:51 -0500
-Message-ID: <1487267091.3661.6.camel@samba.org>
-References: <20170216145913.15848-1-jlayton@samba.org>
-         <CAKywueQiDRKZPW3ev7OBmXea=h7W1bc_5rtf9Ds7NChVm6=gbg@mail.gmail.com>
+From: Jan-Marek Glogowski <glogow-iG8UcmBuX++ELgA04lAiVw@public.gmane.org>
+Subject: Re: Fix SMB2_TREE_CONNECT requests with the wrong TreeId
+Date: Fri, 17 Feb 2017 11:55:15 +0100
+Message-ID: <41c29ddb-eafa-dc03-ab2b-864919aa4192@fbihome.de>
+References: <25f3edd0-3abf-f541-d7f8-54ae1dbac081@fbihome.de>
+ <mps60keik2w.fsf@aaptelpc.suse.de>
+ <066cc0b2-0e63-8cf6-7d46-578e524cf3bf@fbihome.de>
+ <mpszihohiad.fsf@aaptelpc.suse.de>
+ <1a130ab9-84bf-82cb-8c23-e071c286822c@fbihome.de>
+ <mpswpcrhaet.fsf@aaptelpc.suse.de>
+ <461c47b3-a4ae-c21c-26c5-b33dd19f2b37@fbihome.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-        simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: multipart/mixed;
+ boundary="------------2D53E13FA49341812424BD33"
+To: =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>,
+        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueQiDRKZPW3ev7OBmXea=h7W1bc_5rtf9Ds7NChVm6=gbg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <461c47b3-a4ae-c21c-26c5-b33dd19f2b37-iG8UcmBuX++ELgA04lAiVw@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 2017-02-16 at 09:28 -0800, Pavel Shilovsky wrote:
-> 2017-02-16 6:59 GMT-08:00 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
-> > We really only need CAP_DAC_READ_SEARCH, not CAP_DAC_OVERRIDE, and
-> > only when we are going to probe the environ file.
-> > 
-> > Also, fix the non-libcap-ng trim_capabilities prototype.
-> > 
-> > Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> > ---
-> >  cifs.upcall.c | 17 ++++++++---------
-> >  1 file changed, 8 insertions(+), 9 deletions(-)
-> > 
-> > diff --git a/cifs.upcall.c b/cifs.upcall.c
-> > index 6d9c427b7032..dae58b919408 100644
-> > --- a/cifs.upcall.c
-> > +++ b/cifs.upcall.c
-> > @@ -70,22 +70,21 @@ typedef enum _sectype {
-> > 
-> >  #ifdef HAVE_LIBCAP_NG
-> >  static int
-> > -trim_capabilities(bool need_ptrace)
-> > +trim_capabilities(bool need_environ)
-> >  {
-> >         capng_clear(CAPNG_SELECT_BOTH);
-> > 
-> > -       /*
-> > -        * Need PTRACE and DAC_OVERRIDE for environment scraping, SETGID to
-> > -        * change gid and grouplist, and SETUID to change uid.
-> > -        */
-> > +       /* SETUID and SETGID to change uid, gid, and grouplist */
-> >         if (capng_updatev(CAPNG_ADD, CAPNG_PERMITTED|CAPNG_EFFECTIVE,
-> > -                       CAP_SETUID, CAP_SETGID, CAP_DAC_OVERRIDE, -1)) {
-> > +                       CAP_SETUID, CAP_SETGID, -1)) {
-> >                 syslog(LOG_ERR, "%s: Unable to update capability set: %m\n", __func__);
-> >                 return 1;
-> >         }
-> > 
-> > -       if (need_ptrace &&
-> > -           capng_update(CAPNG_ADD, CAPNG_PERMITTED|CAPNG_EFFECTIVE, CAP_SYS_PTRACE)) {
-> > +        /* Need PTRACE and DAC_OVERRIDE for environment scraping */
-> 
-> It seems that the comment above doesn't reflect the proposed change.
-> Should it be DAC_READ_SEARCH instead?
-> 
+This is a multi-part message in MIME format.
+--------------2D53E13FA49341812424BD33
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Yes! It should and it's fixed in the version in the tree.
+Am 15.02.2017 um 15:24 schrieb Jan-Marek Glogowski:
+> I won't be able to test the patch today but hopefully tomorrow,
+> depending on the current LiMux stuff. I'm tired too. It compiled for my
+> old kernel and should work.
 
-Thanks,
+Took some time to test the 2nd patch and it turned out it doesn't work.
+The TreeId must be reset before small_smb2_init(SMB2_TREE_CONNECT, ...)
+call, as this copies the tcon->tid into the smb2 header.
+
+This is fixed in the attached patch.
+
+Can I add "Reported-by" or "Tested-by" for myself and Suggested-by, and
+Reviewed-by for you?
+
+Do you want to test it?
+
+Jan-Marek
+
+--------------2D53E13FA49341812424BD33
+Content-Type: text/x-patch;
+ name="0001-Reset-TreeId-to-zero-on-SMB2_TREE_CONNECT.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="0001-Reset-TreeId-to-zero-on-SMB2_TREE_CONNECT.patch"
+
+>From faf5ea71a567fa9f68daf296e0fa27823f968ee8 Mon Sep 17 00:00:00 2001
+From: Jan-Marek Glogowski <glogow-iG8UcmBuX++ELgA04lAiVw@public.gmane.org>
+Date: Fri, 10 Feb 2017 16:43:46 +0100
+Subject: [PATCH] Reset TreeId to zero on SMB2_TREE_CONNECT
+
+Currently the cifs module breaks the CIFS specs on reconnect as
+described in http://msdn.microsoft.com/en-us/library/cc246529.aspx:
+
+"TreeId (4 bytes): Uniquely identifies the tree connect for the
+command. This MUST be 0 for the SMB2 TREE_CONNECT Request."
+
+Signed-off-by: Jan-Marek Glogowski <glogow-iG8UcmBuX++ELgA04lAiVw@public.gmane.org>
+---
+ fs/cifs/smb2pdu.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 8745722..bdd3292 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1104,6 +1104,10 @@ static inline void init_copy_chunk_defaults(struct cifs_tcon *tcon)
+ 		return -EINVAL;
+ 	}
+ 
++	/* SMB2 TREE_CONNECT request must be called with TreeId == 0 */
++	if (tcon)
++		tcon->tid = 0;
++
+ 	rc = small_smb2_init(SMB2_TREE_CONNECT, tcon, (void **) &req);
+ 	if (rc) {
+ 		kfree(unc_path);
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+1.9.1
+
+
+--------------2D53E13FA49341812424BD33--
