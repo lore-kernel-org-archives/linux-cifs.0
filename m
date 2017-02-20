@@ -1,39 +1,37 @@
-From: Jan-Marek Glogowski <glogow-iG8UcmBuX++ELgA04lAiVw@public.gmane.org>
-Subject: [PATCH] Reset TreeId to zero on SMB2 TREE_CONNECT
-Date: Mon, 20 Feb 2017 12:25:58 +0100
-Message-ID: <1487589958-20489-1-git-send-email-glogow@fbihome.de>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Pavel's async i/o CIFS/SMB3 patches
+Date: Mon, 20 Feb 2017 16:11:36 -0600
+Message-ID: <CAH2r5muZqhZV9TO5CxuhvnDpfhN0u1CAwP-HT9nZBEfqX9Kx=g@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+To: samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Currently the cifs module breaks the CIFS specs on reconnect as
-described in http://msdn.microsoft.com/en-us/library/cc246529.aspx:
+The two async i/o improvement patches that Pavel posted a week ago:
 
-"TreeId (4 bytes): Uniquely identifies the tree connect for the
-command. This MUST be 0 for the SMB2 TREE_CONNECT Request."
+CIFS: Add asynchronous write support through kernel AIO
+and
+CIFS: Add asynchronous read support through kernel AIO
 
-Signed-off-by: Jan-Marek Glogowski <glogow-iG8UcmBuX++ELgA04lAiVw@public.gmane.org>
-Reviewed-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Tested-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
----
- fs/cifs/smb2pdu.c | 4 ++++
- 1 file changed, 4 insertions(+)
+at https://github.com/piastry/linux/commits/async
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 8745722..bdd3292 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -1104,6 +1104,10 @@ static inline void init_copy_chunk_defaults(struct cifs_tcon *tcon)
- 		return -EINVAL;
- 	}
- 
-+	/* SMB2 TREE_CONNECT request must be called with TreeId == 0 */
-+	if (tcon)
-+		tcon->tid = 0;
-+
- 	rc = small_smb2_init(SMB2_TREE_CONNECT, tcon, (void **) &req);
- 	if (rc) {
- 		kfree(unc_path);
+are intriguing.  The performance improvements are fantastic for SMB3
+large read/write, and not just to Samba server (look great to Windows,
+and should also be great to Mac).   Any review feedback would be
+appreciated because async i/o can be complex, yet the value in getting
+near maximal i/o performance end to end (over a network fs) is huge
+(even to normal users).
+
+I would like to merge these as soon as possible, but want more time
+for testing and review feedback - so any feedback on Pavel's patches
+would be appreciated.
+
 -- 
-1.9.1
+Thanks,
+
+Steve
