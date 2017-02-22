@@ -1,81 +1,473 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS/SMB3 patches
-Date: Mon, 20 Feb 2017 18:27:32 -0600
-Message-ID: <CAH2r5mtOFXgQpQZSDXzfNxX6POg7wdWQdOx41yCUav09_CVvrQ@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 1/2] CIFS: Add asynchronous read support through kernel
+ AIO
+Date: Wed, 22 Feb 2017 15:11:20 -0500
+Message-ID: <1487794280.7731.8.camel@redhat.com>
+References: <1486768678-36802-1-git-send-email-pshilov@microsoft.com>
+         <1486768678-36802-2-git-send-email-pshilov@microsoft.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1486768678-36802-2-git-send-email-pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Please pull the following changes since commit
-6d04dfc8966019b8b0977b2cb942351f13d2b178:
+On Fri, 2017-02-10 at 15:17 -0800, Pavel Shilovsky wrote:
+> Currently the code doesn't recognize asynchronous calls passed
+> by io_submit() and processes all calls synchronously. This is not
+> what kernel AIO expects. This patch improves this for reading
+> by introducing new async context that keeps track of all issued i/o
+> requests and moving a response collecting procedure to a separate
+> thread. This allows to return to the caller immediately for
+> asynchronous calls and call the iocb->ki_complete() once all requests
+> are completed. For synchronous calls the current thread simply
+> waits until all requests are completed.
+> 
+> This improves reading performance of single threaded applications
+> with increasing of i/o queue depth size.
+> 
+> Signed-off-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+> ---
+>  fs/cifs/cifsglob.h |  18 ++++
+>  fs/cifs/file.c     | 273 +++++++++++++++++++++++++++++++++++++++++++++--------
+>  2 files changed, 252 insertions(+), 39 deletions(-)
+> 
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index f9a9a12..80771ca 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -1109,6 +1109,23 @@ struct cifs_io_parms {
+>  	struct cifs_tcon *tcon;
+>  };
+>  
 
-Includes support for a critical SMB3 security feature: per-share
-encryption from Pavel, and a cleanup from Jean Delvare. Will have
-another cifs/smb3 merge next week.
 
-  Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/net
-(2017-02-01 11:52:27 -0800)
+My first thought here is that this patch is huge, and I'm having a
+difficult time following the changes that you're introducing. Have you
+considered breaking this up into smaller (and bisectable)changes. If
+there is a regression in here, tracking it down will be very difficuly
+with this patch as a single monolithic blob.
 
-are available in the git repository at:
+My second thought here is that this is an awful lot of new
+infrastructure -- some more verbose explanation is warranted.
+
+Can we not just take a reference to the iocb and keep a pointer to it
+in cifs_readdata. Then when we go to fill pages or deal with an error,
+do the ki_complete? I guess each aio request can end up with multiple
+write SMBs on the wire, so maybe you do need something to aggregate all
+of that? I'm not sure I follow the rationale 100%...
+
+> +struct cifs_aio_ctx {
+> +	struct kref		refcount;
+> +	struct list_head	list;
+> +	struct mutex		aio_mutex;
+> +	struct completion	done;
+> +	struct iov_iter		iter;
+> +	struct kiocb		*iocb;
+> +	struct cifsFileInfo	*cfile;
+> +	struct page		**pages;
+> +	struct bio_vec		*bv;
+> +	unsigned int		npages;
+> +	ssize_t			rc;
+> +	unsigned int		len;
+> +	unsigned int		total_len;
+> +	bool			should_dirty;
+> +};
+> +
+
+>  struct cifs_readdata;
+>  
+>  /* asynchronous read support */
+> @@ -1118,6 +1135,7 @@ struct cifs_readdata {
+>  	struct completion		done;
+>  	struct cifsFileInfo		*cfile;
+>  	struct address_space		*mapping;
+> +	struct cifs_aio_ctx		*ctx;
+>  	__u64				offset;
+>  	unsigned int			bytes;
+>  	unsigned int			got_bytes;
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index 98dc842..6ceeed2 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -33,6 +33,7 @@
+>  #include <linux/mount.h>
+>  #include <linux/slab.h>
+>  #include <linux/swap.h>
+> +#include <linux/vmalloc.h>
+>  #include <asm/div64.h>
+>  #include "cifsfs.h"
+>  #include "cifspdu.h"
+> @@ -2410,6 +2411,108 @@ int cifs_flush(struct file *file, fl_owner_t id)
+>  	return rc;
+>  }
+>  
+> +static inline struct cifs_aio_ctx *
+> +cifs_aio_ctx_alloc(void)
+> +{
+> +	struct cifs_aio_ctx *ctx;
+> +
+> +	ctx = kzalloc(sizeof(struct cifs_aio_ctx), GFP_KERNEL);
+> +	if (!ctx)
+> +		return NULL;
+> +
+> +	INIT_LIST_HEAD(&ctx->list);
+> +	mutex_init(&ctx->aio_mutex);
+> +	init_completion(&ctx->done);
+> +	kref_init(&ctx->refcount);
+> +	return ctx;
+> +}
+> +
+> +static inline void
+> +cifs_aio_ctx_release(struct kref *refcount)
+> +{
+> +	struct cifs_aio_ctx *ctx = container_of(refcount,
+> +					struct cifs_aio_ctx, refcount);
+> +
+> +	cifsFileInfo_put(ctx->cfile);
+> +	kvfree(ctx->bv);
+> +	kfree(ctx);
+> +}
+> +
+> +static int
+> +setup_aio_ctx_iter(struct cifs_aio_ctx *ctx, struct iov_iter *iter, int rw)
+> +{
+> +	ssize_t rc;
+> +	unsigned int cur_npages;
+> +	unsigned int npages = 0;
+> +	unsigned int i;
+> +	size_t len;
+> +	size_t count = iov_iter_count(iter);
+> +	unsigned int saved_len;
+> +	size_t start;
+> +	unsigned int max_pages = iov_iter_npages(iter, INT_MAX);
+> +	struct page **pages;
+> +	struct bio_vec *bv;
+> +
+> +	if (iter->type & ITER_KVEC) {
+> +		memcpy(&ctx->iter, iter, sizeof(struct iov_iter));
+> +		ctx->len = count;
+> +		iov_iter_advance(iter, count);
+> +		return 0;
+> +	}
+> +
+> +	bv = kmalloc_array(max_pages, sizeof(struct bio_vec), GFP_KERNEL);
+> +	if (!bv) {
+> +		bv = vmalloc(max_pages * sizeof(struct bio_vec));
+> +		if (!bv)
+> +			return -ENOMEM;
+> +	}
+> +
+> +	saved_len = count;
+> +
+> +	while (count && npages < max_pages) {
+> +		rc = iov_iter_get_pages_alloc(iter, &pages, count, &start);
+> +		if (rc < 0) {
+> +			cifs_dbg(VFS, "couldn't get user pages (rc=%zd)\n", rc);
+> +			break;
+> +		}
+> +
+> +		if (rc > count) {
+> +			cifs_dbg(VFS, "get pages rc=%zd more than %zu\n", rc,
+> +				 count);
+> +			break;
+> +		}
+> +
+> +		iov_iter_advance(iter, rc);
+> +		count -= rc;
+> +		rc += start;
+> +		cur_npages = (rc + PAGE_SIZE - 1) / PAGE_SIZE;
+> +
+> +		if (npages + cur_npages > max_pages) {
+> +			cifs_dbg(VFS, "out of vec array capacity (%u vs %u)\n",
+> +				 npages + cur_npages, max_pages);
+> +			break;
+> +		}
+> +
+> +		for (i = 0; i < cur_npages; i++) {
+> +			len = rc > PAGE_SIZE ? PAGE_SIZE : rc;
+> +			bv[npages + i].bv_page = pages[i];
+> +			bv[npages + i].bv_offset = start;
+> +			bv[npages + i].bv_len = len - start;
+> +			rc -= len;
+> +			start = 0;
+> +		}
+> +
+> +		npages += cur_npages;
+> +		kvfree(pages);
+> +	}
+> +
+> +	ctx->bv = bv;
+> +	ctx->len = saved_len - count;
+> +	ctx->npages = npages;
+> +	iov_iter_bvec(&ctx->iter, ITER_BVEC | rw, ctx->bv, npages, ctx->len);
+> +	return 0;
+> +}
+> +
+>  static int
+>  cifs_write_allocate_pages(struct page **pages, unsigned long num_pages)
+>  {
+> @@ -2859,6 +2962,7 @@ cifs_uncached_readdata_release(struct kref *refcount)
+>  					struct cifs_readdata, refcount);
+>  	unsigned int i;
+>  
+> +	kref_put(&rdata->ctx->refcount, cifs_aio_ctx_release);
+>  	for (i = 0; i < rdata->nr_pages; i++) {
+>  		put_page(rdata->pages[i]);
+>  		rdata->pages[i] = NULL;
+> @@ -2900,6 +3004,8 @@ cifs_readdata_to_iov(struct cifs_readdata *rdata, struct iov_iter *iter)
+>  	return remaining ? -EFAULT : 0;
+>  }
+>  
+> +static void collect_uncached_read_data(struct cifs_aio_ctx *ctx);
+> +
+>  static void
+>  cifs_uncached_readv_complete(struct work_struct *work)
+>  {
+> @@ -2907,6 +3013,8 @@ cifs_uncached_readv_complete(struct work_struct *work)
+>  						struct cifs_readdata, work);
+>  
+>  	complete(&rdata->done);
+> +	collect_uncached_read_data(rdata->ctx);
+> +	/* the below call can possibly free the last ref to aio ctx */
+>  	kref_put(&rdata->refcount, cifs_uncached_readdata_release);
+>  }
+>  
+> @@ -2973,7 +3081,8 @@ cifs_uncached_copy_into_pages(struct TCP_Server_Info *server,
+>  
+>  static int
+>  cifs_send_async_read(loff_t offset, size_t len, struct cifsFileInfo *open_file,
+> -		     struct cifs_sb_info *cifs_sb, struct list_head *rdata_list)
+> +		     struct cifs_sb_info *cifs_sb, struct list_head *rdata_list,
+> +		     struct cifs_aio_ctx *ctx)
+>  {
+>  	struct cifs_readdata *rdata;
+>  	unsigned int npages, rsize, credits;
+> @@ -3020,6 +3129,8 @@ cifs_send_async_read(loff_t offset, size_t len, struct cifsFileInfo *open_file,
+>  		rdata->read_into_pages = cifs_uncached_read_into_pages;
+>  		rdata->copy_into_pages = cifs_uncached_copy_into_pages;
+>  		rdata->credits = credits;
+> +		rdata->ctx = ctx;
+> +		kref_get(&ctx->refcount);
+>  
+>  		if (!rdata->cfile->invalidHandle ||
+>  		    !cifs_reopen_file(rdata->cfile, true))
+> @@ -3042,50 +3153,37 @@ cifs_send_async_read(loff_t offset, size_t len, struct cifsFileInfo *open_file,
+>  	return rc;
+>  }
+>  
+> -ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to)
+> +static void
+> +collect_uncached_read_data(struct cifs_aio_ctx *ctx)
+>  {
+> -	struct file *file = iocb->ki_filp;
+> -	ssize_t rc;
+> -	size_t len;
+> -	ssize_t total_read = 0;
+> -	loff_t offset = iocb->ki_pos;
+> +	struct cifs_readdata *rdata, *tmp;
+> +	struct iov_iter *to = &ctx->iter;
+>  	struct cifs_sb_info *cifs_sb;
+>  	struct cifs_tcon *tcon;
+> -	struct cifsFileInfo *open_file;
+> -	struct cifs_readdata *rdata, *tmp;
+> -	struct list_head rdata_list;
+> -
+> -	len = iov_iter_count(to);
+> -	if (!len)
+> -		return 0;
+> -
+> -	INIT_LIST_HEAD(&rdata_list);
+> -	cifs_sb = CIFS_FILE_SB(file);
+> -	open_file = file->private_data;
+> -	tcon = tlink_tcon(open_file->tlink);
+> -
+> -	if (!tcon->ses->server->ops->async_readv)
+> -		return -ENOSYS;
+> +	unsigned int i;
+> +	int rc;
+>  
+> -	if ((file->f_flags & O_ACCMODE) == O_WRONLY)
+> -		cifs_dbg(FYI, "attempting read on write only file instance\n");
+> +	tcon = tlink_tcon(ctx->cfile->tlink);
+> +	cifs_sb = CIFS_SB(ctx->cfile->dentry->d_sb);
+>  
+> -	rc = cifs_send_async_read(offset, len, open_file, cifs_sb, &rdata_list);
+> +	mutex_lock(&ctx->aio_mutex);
+>  
+> -	/* if at least one read request send succeeded, then reset rc */
+> -	if (!list_empty(&rdata_list))
+> -		rc = 0;
+> +	if (list_empty(&ctx->list)) {
+> +		mutex_unlock(&ctx->aio_mutex);
+> +		return;
+> +	}
+>  
+> -	len = iov_iter_count(to);
+> +	rc = ctx->rc;
+>  	/* the loop below should proceed in the order of increasing offsets */
+>  again:
+> -	list_for_each_entry_safe(rdata, tmp, &rdata_list, list) {
+> +	list_for_each_entry_safe(rdata, tmp, &ctx->list, list) {
+>  		if (!rc) {
+> -			/* FIXME: freezable sleep too? */
+> -			rc = wait_for_completion_killable(&rdata->done);
+> -			if (rc)
+> -				rc = -EINTR;
+> -			else if (rdata->result == -EAGAIN) {
+> +			if (!try_wait_for_completion(&rdata->done)) {
+> +				mutex_unlock(&ctx->aio_mutex);
+> +				return;
+> +			}
+> +
+
+The coarse-grained aio_mutex here is particularly nasty, and will be a
+pain to rip out later if it turns out to be a performance bottleneck.
+It's held over almost all of this new code, so it's not clear what it
+protects. Is it really necessary, or could you get away with some
+lighter-weight synchronization -- e.g. spinlocks?
 
 
-  git://git.samba.org/sfrench/cifs-2.6.git for-next
+> +			if (rdata->result == -EAGAIN) {
+>  				/* resend call if it's a retryable error */
+>  				struct list_head tmp_list;
+>  				unsigned int got_bytes = rdata->got_bytes;
+> @@ -3111,9 +3209,9 @@ ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to)
+>  						rdata->offset + got_bytes,
+>  						rdata->bytes - got_bytes,
+>  						rdata->cfile, cifs_sb,
+> -						&tmp_list);
+> +						&tmp_list, ctx);
+>  
+> -				list_splice(&tmp_list, &rdata_list);
+> +				list_splice(&tmp_list, &ctx->list);
+>  
+>  				kref_put(&rdata->refcount,
+>  					 cifs_uncached_readdata_release);
+> @@ -3131,14 +3229,111 @@ ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to)
+>  		kref_put(&rdata->refcount, cifs_uncached_readdata_release);
+>  	}
+>  
+> -	total_read = len - iov_iter_count(to);
+> +	for (i = 0; i < ctx->npages; i++) {
+> +		if (ctx->should_dirty)
+> +			set_page_dirty(ctx->bv[i].bv_page);
+> +		put_page(ctx->bv[i].bv_page);
+> +	}
+> +
+> +	ctx->total_len = ctx->len - iov_iter_count(to);
+>  
+> -	cifs_stats_bytes_read(tcon, total_read);
+> +	cifs_stats_bytes_read(tcon, ctx->total_len);
+>  
+>  	/* mask nodata case */
+>  	if (rc == -ENODATA)
+>  		rc = 0;
+>  
+> +	ctx->rc = (rc == 0) ? ctx->total_len : rc;
+> +
+> +	mutex_unlock(&ctx->aio_mutex);
+> +
+> +	if (ctx->iocb && ctx->iocb->ki_complete)
+> +		ctx->iocb->ki_complete(ctx->iocb, ctx->rc, 0);
+> +	else
+> +		complete(&ctx->done);
+> +}
+> +
 
-for you to fetch changes up to ae6f8dd4d0c87bfb72da9d9b56342adf53e69c31:
+I haven't gone to go dig around in the AIO code, but what guarantees
+that ctx->iocb still points to valid memory once you get here. This
+will be called in workqueue context when the read reply comes in?
 
-  CIFS: Allow to switch on encryption with seal mount option
-(2017-02-01 16:46:37 -0600)
+Is it possible that this kiocb could be freed (via aio_cancel perhaps?)
+while there are still requests in flight?
 
-----------------------------------------------------------------
-Jean Delvare (3):
-      cifs: Simplify SMB2 and SMB311 dependencies
-      cifs: Only select the required crypto modules
-      cifs: Add soft dependencies
-
-Pavel Shilovsky (16):
-      CIFS: Fix splice read for non-cached files
-      CIFS: Separate SMB2 header structure
-      CIFS: Make SendReceive2() takes resp iov
-      CIFS: Make send_cancel take rqst as argument
-      CIFS: Send RFC1001 length in a separate iov
-      CIFS: Separate SMB2 sync header processing
-      CIFS: Separate RFC1001 length processing for SMB2 read
-      CIFS: Add capability to transform requests before sending
-      CIFS: Enable encryption during session setup phase
-      CIFS: Encrypt SMB3 requests before sending
-      CIFS: Add transform header handling callbacks
-      CIFS: Add mid handle callback
-      CIFS: Add copy into pages callback for a read operation
-      CIFS: Decrypt and process small encrypted packets
-      CIFS: Add capability to decrypt big read responses
-      CIFS: Allow to switch on encryption with seal mount option
-
- fs/cifs/Kconfig         |  12 +-
- fs/cifs/cifsencrypt.c   |  51 ++--
- fs/cifs/cifsfs.c        |  14 +
- fs/cifs/cifsglob.h      |  28 +-
- fs/cifs/cifsproto.h     |  13 +-
- fs/cifs/cifssmb.c       | 135 +++++-----
- fs/cifs/connect.c       |  71 ++++--
- fs/cifs/file.c          |  62 ++++-
- fs/cifs/sess.c          |  27 +-
- fs/cifs/smb1ops.c       |   4 +-
- fs/cifs/smb2glob.h      |   5 +
- fs/cifs/smb2maperror.c  |   5 +-
- fs/cifs/smb2misc.c      |  61 +++--
- fs/cifs/smb2ops.c       | 663 +++++++++++++++++++++++++++++++++++++++++++++++-
- fs/cifs/smb2pdu.c       | 575 +++++++++++++++++++++++++++--------------
- fs/cifs/smb2pdu.h       |  27 +-
- fs/cifs/smb2proto.h     |   5 +
- fs/cifs/smb2transport.c | 132 ++++++----
- fs/cifs/transport.c     | 171 ++++++++-----
- 19 files changed, 1582 insertions(+), 479 deletions(-)
+> +ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to)
+> +{
+> +	struct file *file = iocb->ki_filp;
+> +	ssize_t rc;
+> +	size_t len;
+> +	ssize_t total_read = 0;
+> +	loff_t offset = iocb->ki_pos;
+> +	struct cifs_sb_info *cifs_sb;
+> +	struct cifs_tcon *tcon;
+> +	struct cifsFileInfo *cfile;
+> +	struct cifs_aio_ctx *ctx;
+> +
+> +	len = iov_iter_count(to);
+> +	if (!len)
+> +		return 0;
+> +
+> +	cifs_sb = CIFS_FILE_SB(file);
+> +	cfile = file->private_data;
+> +	tcon = tlink_tcon(cfile->tlink);
+> +
+> +	if (!tcon->ses->server->ops->async_readv)
+> +		return -ENOSYS;
+> +
+> +	if ((file->f_flags & O_ACCMODE) == O_WRONLY)
+> +		cifs_dbg(FYI, "attempting read on write only file instance\n");
+> +
+> +	ctx = cifs_aio_ctx_alloc();
+> +	if (!ctx)
+> +		return -ENOMEM;
+> +
+> +	ctx->cfile = cifsFileInfo_get(cfile);
+> +
+> +	if (!is_sync_kiocb(iocb))
+> +		ctx->iocb = iocb;
+> +
+> +	if (to->type & ITER_IOVEC)
+> +		ctx->should_dirty = true;
+> +
+> +	rc = setup_aio_ctx_iter(ctx, to, READ);
+> +	if (rc) {
+> +		kref_put(&ctx->refcount, cifs_aio_ctx_release);
+> +		return rc;
+> +	}
+> +
+> +	len = ctx->len;
+> +
+> +	/* grab a lock here due to read response handlers can access ctx */
+> +	mutex_lock(&ctx->aio_mutex);
+> +
+> +	rc = cifs_send_async_read(offset, len, cfile, cifs_sb, &ctx->list, ctx);
+> +
+> +	/* if at least one read request send succeeded, then reset rc */
+> +	if (!list_empty(&ctx->list))
+> +		rc = 0;
+> +
+> +	mutex_unlock(&ctx->aio_mutex);
+> +
+> +	if (rc) {
+> +		kref_put(&ctx->refcount, cifs_aio_ctx_release);
+> +		return rc;
+> +	}
+> +
+> +	if (!is_sync_kiocb(iocb)) {
+> +		kref_put(&ctx->refcount, cifs_aio_ctx_release);
+> +		return -EIOCBQUEUED;
+> +	}
+> +
+> +	/* FIXME: freezable sleep too? */
+> +	rc = wait_for_completion_killable(&ctx->done);
+> +	if (rc) {
+> +		mutex_lock(&ctx->aio_mutex);
+> +		ctx->rc = rc = -EINTR;
+> +		total_read = ctx->total_len;
+> +		mutex_unlock(&ctx->aio_mutex);
+> +	} else {
+> +		rc = ctx->rc;
+> +		total_read = ctx->total_len;
+> +	}
+> +
+> +	kref_put(&ctx->refcount, cifs_aio_ctx_release);
+> +
+>  	if (total_read) {
+>  		iocb->ki_pos += total_read;
+>  		return total_read;
 
 -- 
-Thanks,
-
-Steve
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
