@@ -1,7 +1,7 @@
 From: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: [PATCH v2 2/6] CIFS: add build_path_from_dentry_optional_prefix()
-Date: Thu, 23 Feb 2017 15:43:30 +0100
-Message-ID: <20170223144334.22320-3-aaptel@suse.com>
+Subject: [PATCH v2 1/6] CIFS: move DFS response parsing out of SMB1 code
+Date: Thu, 23 Feb 2017 15:43:29 +0100
+Message-ID: <20170223144334.22320-2-aaptel@suse.com>
 References: <20170223144334.22320-1-aaptel@suse.com>
 Cc: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -10,80 +10,318 @@ In-Reply-To: <20170223144334.22320-1-aaptel-IBi9RG/b67k@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-this function does the same thing as add build_path_from_dentry() but
-takes a boolean parameter to decide whether or not to prefix the path
-with the tree name.
-
-we cannot rely on tcon->Flags & SMB_SHARE_IS_IN_DFS for SMB2 as smb2
-code never sets tcon->Flags but it sets tcon->share_flags and it seems
-the SMB_SHARE_IS_IN_DFS has different semantics in SMB2: the prefix
-shouldn't be added everytime it was in SMB1.
+since the DFS payload is not tied to the SMB version we can:
+* isolate the DFS payload in its own struct, and include that struct in
+  packet structs
+* move the function that parses the response to misc.c and make it work
+  on the new DFS payload struct (add payload size and utf16 flag as a
+  result).
 
 Signed-off-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
 ---
- fs/cifs/cifs_dfs_ref.c |  4 +++-
- fs/cifs/cifsproto.h    |  2 ++
- fs/cifs/dir.c          | 13 ++++++++++++-
- 3 files changed, 17 insertions(+), 2 deletions(-)
+ fs/cifs/cifspdu.h   |  16 ++++---
+ fs/cifs/cifsproto.h |   5 +++
+ fs/cifs/cifssmb.c   | 119 +++-------------------------------------------------
+ fs/cifs/misc.c      | 105 ++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 125 insertions(+), 120 deletions(-)
 
-diff --git a/fs/cifs/cifs_dfs_ref.c b/fs/cifs/cifs_dfs_ref.c
-index ec9dbbc..8a9ebfd 100644
---- a/fs/cifs/cifs_dfs_ref.c
-+++ b/fs/cifs/cifs_dfs_ref.c
-@@ -302,7 +302,9 @@ static struct vfsmount *cifs_dfs_do_automount(struct dentry *mntpt)
- 	 * gives us the latter, so we must adjust the result.
- 	 */
- 	mnt = ERR_PTR(-ENOMEM);
--	full_path = build_path_from_dentry(mntpt);
-+
-+	/* always use tree name prefix */
-+	full_path = build_path_from_dentry_optional_prefix(mntpt, true);
- 	if (full_path == NULL)
- 		goto cdda_exit;
+diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
+index f5b8730..1ce733f 100644
+--- a/fs/cifs/cifspdu.h
++++ b/fs/cifs/cifspdu.h
+@@ -2086,17 +2086,21 @@ typedef struct dfs_referral_level_3 { /* version 4 is same, + one flag bit */
+ 	__u8   ServiceSiteGuid[16];  /* MBZ, ignored */
+ } __attribute__((packed)) REFERRAL3;
  
+-typedef struct smb_com_transaction_get_dfs_refer_rsp {
+-	struct smb_hdr hdr;	/* wct = 10 */
+-	struct trans2_resp t2;
+-	__u16 ByteCount;
+-	__u8 Pad;
++struct get_dfs_referral_rsp {
+ 	__le16 PathConsumed;
+ 	__le16 NumberOfReferrals;
+ 	__le32 DFSFlags;
+ 	REFERRAL3 referrals[1];	/* array of level 3 dfs_referral structures */
+ 	/* followed by the strings pointed to by the referral structures */
+-} __attribute__((packed)) TRANSACTION2_GET_DFS_REFER_RSP;
++} __packed;
++
++typedef struct smb_com_transaction_get_dfs_refer_rsp {
++	struct smb_hdr hdr;	/* wct = 10 */
++	struct trans2_resp t2;
++	__u16 ByteCount;
++	__u8 Pad;
++	struct get_dfs_referral_rsp dfs_data;
++} __packed TRANSACTION2_GET_DFS_REFER_RSP;
+ 
+ /* DFS Flags */
+ #define DFSREF_REFERRAL_SERVER  0x00000001 /* all targets are DFS roots */
 diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index c097830..9ee46c1 100644
+index 406d2c1..c097830 100644
 --- a/fs/cifs/cifsproto.h
 +++ b/fs/cifs/cifsproto.h
-@@ -61,6 +61,8 @@ extern void exit_cifs_idmap(void);
- extern int init_cifs_spnego(void);
- extern void exit_cifs_spnego(void);
- extern char *build_path_from_dentry(struct dentry *);
-+extern char *build_path_from_dentry_optional_prefix(struct dentry *direntry,
-+						    bool prefix);
- extern char *cifs_build_path_to_root(struct smb_vol *vol,
- 				     struct cifs_sb_info *cifs_sb,
- 				     struct cifs_tcon *tcon,
-diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index 2c227a9..56366e9 100644
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@ -81,6 +81,17 @@ cifs_build_path_to_root(struct smb_vol *vol, struct cifs_sb_info *cifs_sb,
- char *
- build_path_from_dentry(struct dentry *direntry)
- {
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(direntry->d_sb);
-+	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
-+	bool prefix = tcon->Flags & SMB_SHARE_IS_IN_DFS;
-+
-+	return build_path_from_dentry_optional_prefix(direntry,
-+						      prefix);
-+}
-+
-+char *
-+build_path_from_dentry_optional_prefix(struct dentry *direntry, bool prefix)
-+{
- 	struct dentry *temp;
- 	int namelen;
- 	int dfsplen;
-@@ -92,7 +103,7 @@ build_path_from_dentry(struct dentry *direntry)
- 	unsigned seq;
+@@ -284,6 +284,11 @@ extern int get_dfs_path(const unsigned int xid, struct cifs_ses *ses,
+ 			const struct nls_table *nls_codepage,
+ 			unsigned int *num_referrals,
+ 			struct dfs_info3_param **referrals, int remap);
++extern int parse_dfs_referrals(struct get_dfs_referral_rsp *rsp, u32 rsp_size,
++			       unsigned int *num_of_nodes,
++			       struct dfs_info3_param **target_nodes,
++			       const struct nls_table *nls_codepage, int remap,
++			       const char *searchName, bool is_unicode);
+ extern void reset_cifs_unix_caps(unsigned int xid, struct cifs_tcon *tcon,
+ 				 struct cifs_sb_info *cifs_sb,
+ 				 struct smb_vol *vol);
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index f5099fb..5005c79 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -4786,117 +4786,6 @@ CIFSGetSrvInodeNumber(const unsigned int xid, struct cifs_tcon *tcon,
+ 	return rc;
+ }
  
- 	dirsep = CIFS_DIR_SEP(cifs_sb);
--	if (tcon->Flags & SMB_SHARE_IS_IN_DFS)
-+	if (prefix)
- 		dfsplen = strnlen(tcon->treeName, MAX_TREE_SIZE + 1);
- 	else
- 		dfsplen = 0;
+-/* parses DFS refferal V3 structure
+- * caller is responsible for freeing target_nodes
+- * returns:
+- * 	on success - 0
+- *	on failure - errno
+- */
+-static int
+-parse_DFS_referrals(TRANSACTION2_GET_DFS_REFER_RSP *pSMBr,
+-		unsigned int *num_of_nodes,
+-		struct dfs_info3_param **target_nodes,
+-		const struct nls_table *nls_codepage, int remap,
+-		const char *searchName)
+-{
+-	int i, rc = 0;
+-	char *data_end;
+-	bool is_unicode;
+-	struct dfs_referral_level_3 *ref;
+-
+-	if (pSMBr->hdr.Flags2 & SMBFLG2_UNICODE)
+-		is_unicode = true;
+-	else
+-		is_unicode = false;
+-	*num_of_nodes = le16_to_cpu(pSMBr->NumberOfReferrals);
+-
+-	if (*num_of_nodes < 1) {
+-		cifs_dbg(VFS, "num_referrals: must be at least > 0, but we get num_referrals = %d\n",
+-			 *num_of_nodes);
+-		rc = -EINVAL;
+-		goto parse_DFS_referrals_exit;
+-	}
+-
+-	ref = (struct dfs_referral_level_3 *) &(pSMBr->referrals);
+-	if (ref->VersionNumber != cpu_to_le16(3)) {
+-		cifs_dbg(VFS, "Referrals of V%d version are not supported, should be V3\n",
+-			 le16_to_cpu(ref->VersionNumber));
+-		rc = -EINVAL;
+-		goto parse_DFS_referrals_exit;
+-	}
+-
+-	/* get the upper boundary of the resp buffer */
+-	data_end = (char *)(&(pSMBr->PathConsumed)) +
+-				le16_to_cpu(pSMBr->t2.DataCount);
+-
+-	cifs_dbg(FYI, "num_referrals: %d dfs flags: 0x%x ...\n",
+-		 *num_of_nodes, le32_to_cpu(pSMBr->DFSFlags));
+-
+-	*target_nodes = kcalloc(*num_of_nodes, sizeof(struct dfs_info3_param),
+-				GFP_KERNEL);
+-	if (*target_nodes == NULL) {
+-		rc = -ENOMEM;
+-		goto parse_DFS_referrals_exit;
+-	}
+-
+-	/* collect necessary data from referrals */
+-	for (i = 0; i < *num_of_nodes; i++) {
+-		char *temp;
+-		int max_len;
+-		struct dfs_info3_param *node = (*target_nodes)+i;
+-
+-		node->flags = le32_to_cpu(pSMBr->DFSFlags);
+-		if (is_unicode) {
+-			__le16 *tmp = kmalloc(strlen(searchName)*2 + 2,
+-						GFP_KERNEL);
+-			if (tmp == NULL) {
+-				rc = -ENOMEM;
+-				goto parse_DFS_referrals_exit;
+-			}
+-			cifsConvertToUTF16((__le16 *) tmp, searchName,
+-					   PATH_MAX, nls_codepage, remap);
+-			node->path_consumed = cifs_utf16_bytes(tmp,
+-					le16_to_cpu(pSMBr->PathConsumed),
+-					nls_codepage);
+-			kfree(tmp);
+-		} else
+-			node->path_consumed = le16_to_cpu(pSMBr->PathConsumed);
+-
+-		node->server_type = le16_to_cpu(ref->ServerType);
+-		node->ref_flag = le16_to_cpu(ref->ReferralEntryFlags);
+-
+-		/* copy DfsPath */
+-		temp = (char *)ref + le16_to_cpu(ref->DfsPathOffset);
+-		max_len = data_end - temp;
+-		node->path_name = cifs_strndup_from_utf16(temp, max_len,
+-						is_unicode, nls_codepage);
+-		if (!node->path_name) {
+-			rc = -ENOMEM;
+-			goto parse_DFS_referrals_exit;
+-		}
+-
+-		/* copy link target UNC */
+-		temp = (char *)ref + le16_to_cpu(ref->NetworkAddressOffset);
+-		max_len = data_end - temp;
+-		node->node_name = cifs_strndup_from_utf16(temp, max_len,
+-						is_unicode, nls_codepage);
+-		if (!node->node_name) {
+-			rc = -ENOMEM;
+-			goto parse_DFS_referrals_exit;
+-		}
+-
+-		ref++;
+-	}
+-
+-parse_DFS_referrals_exit:
+-	if (rc) {
+-		free_dfs_info_array(*target_nodes, *num_of_nodes);
+-		*target_nodes = NULL;
+-		*num_of_nodes = 0;
+-	}
+-	return rc;
+-}
+-
+ int
+ CIFSGetDFSRefer(const unsigned int xid, struct cifs_ses *ses,
+ 		const char *search_name, struct dfs_info3_param **target_nodes,
+@@ -4993,9 +4882,11 @@ CIFSGetDFSRefer(const unsigned int xid, struct cifs_ses *ses,
+ 		 get_bcc(&pSMBr->hdr), le16_to_cpu(pSMBr->t2.DataOffset));
+ 
+ 	/* parse returned result into more usable form */
+-	rc = parse_DFS_referrals(pSMBr, num_of_nodes,
+-				 target_nodes, nls_codepage, remap,
+-				 search_name);
++	rc = parse_dfs_referrals(&pSMBr->dfs_data,
++				 le16_to_cpu(pSMBr->t2.DataCount),
++				 num_of_nodes, target_nodes, nls_codepage,
++				 remap, search_name,
++				 pSMBr->hdr.Flags2 & SMBFLG2_UNICODE);
+ 
+ GetDFSRefExit:
+ 	cifs_buf_release(pSMB);
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index c672915..d3fb115 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -640,3 +640,108 @@ cifs_add_pending_open(struct cifs_fid *fid, struct tcon_link *tlink,
+ 	cifs_add_pending_open_locked(fid, tlink, open);
+ 	spin_unlock(&tlink_tcon(open->tlink)->open_file_lock);
+ }
++
++/* parses DFS refferal V3 structure
++ * caller is responsible for freeing target_nodes
++ * returns:
++ * - on success - 0
++ * - on failure - errno
++ */
++int
++parse_dfs_referrals(struct get_dfs_referral_rsp *rsp, u32 rsp_size,
++		    unsigned int *num_of_nodes,
++		    struct dfs_info3_param **target_nodes,
++		    const struct nls_table *nls_codepage, int remap,
++		    const char *searchName, bool is_unicode)
++{
++	int i, rc = 0;
++	char *data_end;
++	struct dfs_referral_level_3 *ref;
++
++	*num_of_nodes = le16_to_cpu(rsp->NumberOfReferrals);
++
++	if (*num_of_nodes < 1) {
++		cifs_dbg(VFS, "num_referrals: must be at least > 0, but we get num_referrals = %d\n",
++			 *num_of_nodes);
++		rc = -EINVAL;
++		goto parse_DFS_referrals_exit;
++	}
++
++	ref = (struct dfs_referral_level_3 *) &(rsp->referrals);
++	if (ref->VersionNumber != cpu_to_le16(3)) {
++		cifs_dbg(VFS, "Referrals of V%d version are not supported, should be V3\n",
++			 le16_to_cpu(ref->VersionNumber));
++		rc = -EINVAL;
++		goto parse_DFS_referrals_exit;
++	}
++
++	/* get the upper boundary of the resp buffer */
++	data_end = (char *)rsp + rsp_size;
++
++	cifs_dbg(FYI, "num_referrals: %d dfs flags: 0x%x ...\n",
++		 *num_of_nodes, le32_to_cpu(rsp->DFSFlags));
++
++	*target_nodes = kcalloc(*num_of_nodes, sizeof(struct dfs_info3_param),
++				GFP_KERNEL);
++	if (*target_nodes == NULL) {
++		rc = -ENOMEM;
++		goto parse_DFS_referrals_exit;
++	}
++
++	/* collect necessary data from referrals */
++	for (i = 0; i < *num_of_nodes; i++) {
++		char *temp;
++		int max_len;
++		struct dfs_info3_param *node = (*target_nodes)+i;
++
++		node->flags = le32_to_cpu(rsp->DFSFlags);
++		if (is_unicode) {
++			__le16 *tmp = kmalloc(strlen(searchName)*2 + 2,
++						GFP_KERNEL);
++			if (tmp == NULL) {
++				rc = -ENOMEM;
++				goto parse_DFS_referrals_exit;
++			}
++			cifsConvertToUTF16((__le16 *) tmp, searchName,
++					   PATH_MAX, nls_codepage, remap);
++			node->path_consumed = cifs_utf16_bytes(tmp,
++					le16_to_cpu(rsp->PathConsumed),
++					nls_codepage);
++			kfree(tmp);
++		} else
++			node->path_consumed = le16_to_cpu(rsp->PathConsumed);
++
++		node->server_type = le16_to_cpu(ref->ServerType);
++		node->ref_flag = le16_to_cpu(ref->ReferralEntryFlags);
++
++		/* copy DfsPath */
++		temp = (char *)ref + le16_to_cpu(ref->DfsPathOffset);
++		max_len = data_end - temp;
++		node->path_name = cifs_strndup_from_utf16(temp, max_len,
++						is_unicode, nls_codepage);
++		if (!node->path_name) {
++			rc = -ENOMEM;
++			goto parse_DFS_referrals_exit;
++		}
++
++		/* copy link target UNC */
++		temp = (char *)ref + le16_to_cpu(ref->NetworkAddressOffset);
++		max_len = data_end - temp;
++		node->node_name = cifs_strndup_from_utf16(temp, max_len,
++						is_unicode, nls_codepage);
++		if (!node->node_name) {
++			rc = -ENOMEM;
++			goto parse_DFS_referrals_exit;
++		}
++
++		ref++;
++	}
++
++parse_DFS_referrals_exit:
++	if (rc) {
++		free_dfs_info_array(*target_nodes, *num_of_nodes);
++		*target_nodes = NULL;
++		*num_of_nodes = 0;
++	}
++	return rc;
++}
 -- 
 2.10.2
