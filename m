@@ -1,38 +1,97 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [cifs-utils PATCH] cifs.upcall: unset $KRB5CCNAME when creating new credcache from keytab
-Date: Thu, 23 Feb 2017 18:43:23 -0500
-Message-ID: <20170223234323.22802-1-jlayton@samba.org>
+Subject: [cifs-utils PATCH] replace.h: remove some stuff that just shouldn't be there
+Date: Thu, 23 Feb 2017 18:44:08 -0500
+Message-ID: <20170223234408.22882-1-jlayton@samba.org>
 Cc: cwseys-JAjqph6Yjy/rea2nFwT0Kw@public.gmane.org
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-We don't want to trust $KRB5CCNAME since we could be operating under
-the wrong credentials. Always create new credcaches in the default
-location instead.
-
 Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- cifs.upcall.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ replace.h | 69 ---------------------------------------------------------------
+ 1 file changed, 69 deletions(-)
 
-diff --git a/cifs.upcall.c b/cifs.upcall.c
-index f766a8b5799e..dbdfe7aff681 100644
---- a/cifs.upcall.c
-+++ b/cifs.upcall.c
-@@ -365,6 +365,12 @@ init_cc_from_keytab(const char *keytab_name, const char *user)
+diff --git a/replace.h b/replace.h
+index 03d293704a2e..6e45b236bd8d 100644
+--- a/replace.h
++++ b/replace.h
+@@ -119,75 +119,6 @@
+ #include <stddef.h>
+ #endif
  
- 	memset((char *) &my_creds, 0, sizeof(my_creds));
- 
-+	/*
-+	 * Unset the environment variable, if any. If we're creating our own
-+	 * credcache here, stick it in the default location.
-+	 */
-+	unsetenv(ENV_NAME);
-+
- 	if (keytab_name)
- 		ret = krb5_kt_resolve(context, keytab_name, &keytab);
- 	else
+-#ifndef HAVE_STRERROR
+-extern char *sys_errlist[];
+-#define strerror(i) sys_errlist[i]
+-#endif
+-
+-#ifndef HAVE_STRDUP
+-#define strdup rep_strdup
+-char *rep_strdup(const char *s);
+-#endif
+-
+-#ifndef HAVE_MEMMEM
+-#define memmem rep_memmem
+-void *rep_memmem(const void *haystack, size_t haystacklen,
+-		 const void *needle, size_t needlelen);
+-#endif
+-
+-#ifndef HAVE_MKTIME
+-#define mktime rep_mktime
+-/* prototype is in "system/time.h" */
+-#endif
+-
+-#ifndef HAVE_TIMEGM
+-#define timegm rep_timegm
+-/* prototype is in "system/time.h" */
+-#endif
+-
+-#ifndef HAVE_UTIME
+-#define utime rep_utime
+-/* prototype is in "system/time.h" */
+-#endif
+-
+-#ifndef HAVE_UTIMES
+-#define utimes rep_utimes
+-/* prototype is in "system/time.h" */
+-#endif
+-
+-#if !HAVE_DECL_ENVIRON
+-#ifdef __APPLE__
+-#include <crt_externs.h>
+-#define environ (*_NSGetEnviron())
+-#else
+-extern char **environ;
+-#endif
+-#endif
+-
+-#ifndef HAVE_SETENV
+-#define setenv rep_setenv
+-int rep_setenv(const char *name, const char *value, int overwrite);
+-#else
+-#ifndef HAVE_SETENV_DECL
+-int setenv(const char *name, const char *value, int overwrite);
+-#endif
+-#endif
+-
+-#ifndef HAVE_UNSETENV
+-#define unsetenv rep_unsetenv
+-int rep_unsetenv(const char *name);
+-#endif
+-
+-#ifndef HAVE_SETEUID
+-#define seteuid rep_seteuid
+-int rep_seteuid(uid_t);
+-#endif
+-
+-#ifndef HAVE_SETEGID
+-#define setegid rep_setegid
+-int rep_setegid(gid_t);
+-#endif
+-
+ #if (defined(USE_SETRESUID) && !defined(HAVE_SETRESUID_DECL))
+ /* stupid glibc */
+ int setresuid(uid_t ruid, uid_t euid, uid_t suid);
 -- 
 2.9.3
