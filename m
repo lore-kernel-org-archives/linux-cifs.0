@@ -1,90 +1,38 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [cifs-utils RFC PATCH] cifs.upcall: don't do env scraping when
- uid is 0
-Date: Thu, 23 Feb 2017 18:24:01 -0500
-Message-ID: <1487892241.10904.11.camel@samba.org>
-References: <20170223215835.18490-1-jlayton@samba.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+Subject: [cifs-utils PATCH] cifs.upcall: unset $KRB5CCNAME when creating new credcache from keytab
+Date: Thu, 23 Feb 2017 18:43:23 -0500
+Message-ID: <20170223234323.22802-1-jlayton@samba.org>
 Cc: cwseys-JAjqph6Yjy/rea2nFwT0Kw@public.gmane.org
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170223215835.18490-1-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 2017-02-23 at 16:58 -0500, Jeff Layton wrote:
-> Setuid programs triggering upcalls could trick the program here. Also,
-> the d_automount method is done with credentials overridden so if you
-> can end up with mismatched creds and env vars due to that as well.
-> 
-> It's a hack, but the only recourse I can see is to avoid doing this
-> when the uid is 0. That means we can rely on this for getting to root's
-> credcache, but hopefully that's not a huge issue.
-> 
-> Reported-by: Chad William Seys <cwseys-JAjqph6Yjy/rea2nFwT0Kw@public.gmane.org>
-> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> ---
->  cifs.upcall.8.in |  5 ++++-
->  cifs.upcall.c    | 10 +++++++++-
->  2 files changed, 13 insertions(+), 2 deletions(-)
-> 
-> diff --git a/cifs.upcall.8.in b/cifs.upcall.8.in
-> index e1f3956e176a..81481a482fb4 100644
-> --- a/cifs.upcall.8.in
-> +++ b/cifs.upcall.8.in
-> @@ -44,7 +44,10 @@ Normally, cifs.upcall will probe the environment variable space of the process
->  that initiated the upcall in order to fetch the value of $KRB5CCNAME. This can
->  assist the program with finding credential caches in non-default locations. If
->  this option is set, then the program won't do this and will rely on finding
-> -credcaches in the default locations specified in krb5.conf.
-> +credcaches in the default locations specified in krb5.conf. Note that this is
-> +never performed when the uid is 0. The default credcache location is always
-> +used when the uid is 0, regardless of the environment variable setting in the
-> +process.
->  .RE
->  .PP
->  \--krb5conf=/path/to/krb5.conf|-k /path/to/krb5.conf
-> diff --git a/cifs.upcall.c b/cifs.upcall.c
-> index f766a8b5799e..8f6bb761a27e 100644
-> --- a/cifs.upcall.c
-> +++ b/cifs.upcall.c
-> @@ -1018,11 +1018,19 @@ int main(const int argc, char *const argv[])
->  	}
->  
->  	/*
-> +	 * We can't reasonably do this for root. Mounting a DFS share, for
-> +	 * instance we can end up with creds being overridden, but the env
-> +	 * variable left intact.
-> +	 */
-> +	if (uid == 0)
-> +		env_probe = false;
-> +
-> +	/*
->  	 * Must do this before setuid, as we need elevated capabilities to
->  	 * look at the environ file.
->  	 */
->  	env_cachename =
-> -		get_cachename_from_process_env(env_probe ?  arg.pid : 0);
-> +		get_cachename_from_process_env(env_probe ? arg.pid : 0);
->  
->  	rc = setuid(uid);
->  	if (rc == -1) {
+We don't want to trust $KRB5CCNAME since we could be operating under
+the wrong credentials. Always create new credcaches in the default
+location instead.
 
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ cifs.upcall.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Actually...what may be better here is to just unset KRB5CCNAME after we
-try to find an existing credcache, but before we try to set one up from
-the keytab. I see no need to use the environment var at all when we
-expect to instantiate a new ccache.
-
-Now that I think about it though, we might still want to restrict root
-like this too. In particular, we could end up performing session setup
-for root's session from the wrong credcache. I don't think that's quite
-what we want there. 
-
-So I think we'll want to keep this patch, and have it unset the
-environment var too. There's probably some way to do all of this more
-cleanly from a namespace standpoint, but I'm not sure how...
+diff --git a/cifs.upcall.c b/cifs.upcall.c
+index f766a8b5799e..dbdfe7aff681 100644
+--- a/cifs.upcall.c
++++ b/cifs.upcall.c
+@@ -365,6 +365,12 @@ init_cc_from_keytab(const char *keytab_name, const char *user)
+ 
+ 	memset((char *) &my_creds, 0, sizeof(my_creds));
+ 
++	/*
++	 * Unset the environment variable, if any. If we're creating our own
++	 * credcache here, stick it in the default location.
++	 */
++	unsetenv(ENV_NAME);
++
+ 	if (keytab_name)
+ 		ret = krb5_kt_resolve(context, keytab_name, &keytab);
+ 	else
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+2.9.3
