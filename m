@@ -1,7 +1,7 @@
 From: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: [PATCH v2 5/6] CIFS: use DFS pathnames in SMB2+ Create requests
-Date: Thu, 23 Feb 2017 15:43:33 +0100
-Message-ID: <20170223144334.22320-6-aaptel@suse.com>
+Subject: [PATCH v2 6/6] CIFS: enable get_dfs_refer for SMB2+
+Date: Thu, 23 Feb 2017 15:43:34 +0100
+Message-ID: <20170223144334.22320-7-aaptel@suse.com>
 References: <20170223144334.22320-1-aaptel@suse.com>
 Cc: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -10,150 +10,48 @@ In-Reply-To: <20170223144334.22320-1-aaptel-IBi9RG/b67k@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-When connected to a DFS capable share, the client must set the
-SMB2_FLAGS_DFS_OPERATIONS flag in the SMB2 header and use
-DFS path names: "<server>\<share>\<path>" *without* leading \\.
-
-Sources:
-
-[MS-SMB2] 3.2.5.5 Receiving an SMB2 TREE_CONNECT Response
-> TreeConnect.IsDfsShare MUST be set to TRUE, if the SMB2_SHARE_CAP_DFS
-> bit is set in the Capabilities field of the response.
-
-[MS-SMB2] 3.2.4.3 Application Requests Opening a File
-> If TreeConnect.IsDfsShare is TRUE, the SMB2_FLAGS_DFS_OPERATIONS flag
-> is set in the Flags field.
-
-[MS-SMB2] 2.2.13 SMB2 CREATE Request, NameOffset:
-> If SMB2_FLAGS_DFS_OPERATIONS is set in the Flags field of the SMB2
-> header, the file name includes a prefix that will be processed during
-> DFS name normalization as specified in section 3.3.5.9. Otherwise, the
-> file name is relative to the share that is identified by the TreeId in
-> the SMB2 header.
+Add the newly defined operation to the relevant structures.
 
 Signed-off-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c | 93 +++++++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 77 insertions(+), 16 deletions(-)
+ fs/cifs/smb2ops.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index c9a1d71..9e9f449 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -1527,6 +1527,48 @@ add_durable_context(struct kvec *iov, unsigned int *num_iovec,
- 	return 0;
- }
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 2563fe8..1537cc8 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -2326,6 +2326,7 @@ struct smb_version_operations smb20_operations = {
+ 	.clone_range = smb2_clone_range,
+ 	.wp_retry_size = smb2_wp_retry_size,
+ 	.dir_needs_close = smb2_dir_needs_close,
++	.get_dfs_refer = smb2_get_dfs_refer,
+ };
  
-+static int
-+alloc_path_with_tree_prefix(__le16 **out_path, int *out_size, int *out_len,
-+			    const char *treename, const __le16 *path)
-+{
-+	int treename_len, path_len;
-+	const __le16 sep[] = {cpu_to_le16('\\'), cpu_to_le16(0x0000)};
-+
-+	/*
-+	 * skip leading "\\"
-+	 */
-+	treename_len = strlen(treename);
-+	if (treename_len < 2 || !(treename[0] == '\\' && treename[1] == '\\'))
-+		return -EINVAL;
-+
-+	treename += 2;
-+	treename_len -= 2;
-+
-+	path_len = UniStrnlen((wchar_t *)path, PATH_MAX);
-+
-+	/*
-+	 * make room for one path separator between the treename and
-+	 * path
-+	 */
-+	*out_len = treename_len + 1 + path_len;
-+
-+	/*
-+	 * final path needs to be null-terminated UTF16 with a
-+	 * size aligned to 8
-+	 */
-+
-+	*out_size = roundup((*out_len+1)*2, 8);
-+	*out_path = kzalloc(*out_size, GFP_KERNEL);
-+	if (!*out_path)
-+		return -ENOMEM;
-+
-+	cifs_strtoUTF16(*out_path, treename, treename_len, load_nls_default());
-+	UniStrcat(*out_path, sep);
-+	UniStrcat(*out_path, path);
-+
-+	return 0;
-+}
-+
- int
- SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
- 	  __u8 *oplock, struct smb2_file_all_info *buf,
-@@ -1575,30 +1617,49 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
- 	req->ShareAccess = FILE_SHARE_ALL_LE;
- 	req->CreateDisposition = cpu_to_le32(oparms->disposition);
- 	req->CreateOptions = cpu_to_le32(oparms->create_options & CREATE_OPTIONS_MASK);
--	uni_path_len = (2 * UniStrnlen((wchar_t *)path, PATH_MAX)) + 2;
--	/* do not count rfc1001 len field */
--	req->NameOffset = cpu_to_le16(sizeof(struct smb2_create_req) - 4);
+ struct smb_version_operations smb21_operations = {
+@@ -2407,6 +2408,7 @@ struct smb_version_operations smb21_operations = {
+ 	.wp_retry_size = smb2_wp_retry_size,
+ 	.dir_needs_close = smb2_dir_needs_close,
+ 	.enum_snapshots = smb3_enum_snapshots,
++	.get_dfs_refer = smb2_get_dfs_refer,
+ };
  
- 	iov[0].iov_base = (char *)req;
- 	/* 4 for rfc1002 length field */
- 	iov[0].iov_len = get_rfc1002_length(req) + 4;
--
--	/* MUST set path len (NameLength) to 0 opening root of share */
--	req->NameLength = cpu_to_le16(uni_path_len - 2);
- 	/* -1 since last byte is buf[0] which is sent below (path) */
- 	iov[0].iov_len--;
--	if (uni_path_len % 8 != 0) {
--		copy_size = uni_path_len / 8 * 8;
--		if (copy_size < uni_path_len)
--			copy_size += 8;
--
--		copy_path = kzalloc(copy_size, GFP_KERNEL);
--		if (!copy_path)
--			return -ENOMEM;
--		memcpy((char *)copy_path, (const char *)path,
--			uni_path_len);
-+
-+	req->NameOffset = cpu_to_le16(sizeof(struct smb2_create_req) - 4);
-+
-+	/* [MS-SMB2] 2.2.13 NameOffset:
-+	 * If SMB2_FLAGS_DFS_OPERATIONS is set in the Flags field of
-+	 * the SMB2 header, the file name includes a prefix that will
-+	 * be processed during DFS name normalization as specified in
-+	 * section 3.3.5.9. Otherwise, the file name is relative to
-+	 * the share that is identified by the TreeId in the SMB2
-+	 * header.
-+	 */
-+	if (tcon->share_flags & SHI1005_FLAGS_DFS) {
-+		int name_len;
-+
-+		req->hdr.sync_hdr.Flags |= SMB2_FLAGS_DFS_OPERATIONS;
-+		rc = alloc_path_with_tree_prefix(&copy_path, &copy_size,
-+						 &name_len,
-+						 tcon->treeName, path);
-+		if (rc)
-+			return rc;
-+		req->NameLength = cpu_to_le16(name_len * 2);
- 		uni_path_len = copy_size;
- 		path = copy_path;
-+	} else {
-+		uni_path_len = (2 * UniStrnlen((wchar_t *)path, PATH_MAX)) + 2;
-+		/* MUST set path len (NameLength) to 0 opening root of share */
-+		req->NameLength = cpu_to_le16(uni_path_len - 2);
-+		if (uni_path_len % 8 != 0) {
-+			copy_size = roundup(uni_path_len, 8);
-+			copy_path = kzalloc(copy_size, GFP_KERNEL);
-+			if (!copy_path)
-+				return -ENOMEM;
-+			memcpy((char *)copy_path, (const char *)path,
-+			       uni_path_len);
-+			uni_path_len = copy_size;
-+			path = copy_path;
-+		}
- 	}
+ struct smb_version_operations smb30_operations = {
+@@ -2498,6 +2500,7 @@ struct smb_version_operations smb30_operations = {
+ 	.free_transform_rq = smb3_free_transform_rq,
+ 	.is_transform_hdr = smb3_is_transform_hdr,
+ 	.receive_transform = smb3_receive_transform,
++	.get_dfs_refer = smb2_get_dfs_refer,
+ };
  
- 	iov[1].iov_len = uni_path_len;
+ #ifdef CONFIG_CIFS_SMB311
+@@ -2590,6 +2593,7 @@ struct smb_version_operations smb311_operations = {
+ 	.free_transform_rq = smb3_free_transform_rq,
+ 	.is_transform_hdr = smb3_is_transform_hdr,
+ 	.receive_transform = smb3_receive_transform,
++	.get_dfs_refer = smb2_get_dfs_refer,
+ };
+ #endif /* CIFS_SMB311 */
+ 
 -- 
 2.10.2
