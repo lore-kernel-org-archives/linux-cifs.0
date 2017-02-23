@@ -1,93 +1,159 @@
 From: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: [PATCH v2 0/6] Add support for DFS in SMB2+
-Date: Thu, 23 Feb 2017 15:43:28 +0100
-Message-ID: <20170223144334.22320-1-aaptel@suse.com>
+Subject: [PATCH v2 5/6] CIFS: use DFS pathnames in SMB2+ Create requests
+Date: Thu, 23 Feb 2017 15:43:33 +0100
+Message-ID: <20170223144334.22320-6-aaptel@suse.com>
+References: <20170223144334.22320-1-aaptel@suse.com>
 Cc: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20170223144334.22320-1-aaptel-IBi9RG/b67k@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This series of patch tries to implement the get_dfs_refer operation
-for SMB2+.
+When connected to a DFS capable share, the client must set the
+SMB2_FLAGS_DFS_OPERATIONS flag in the SMB2 header and use
+DFS path names: "<server>\<share>\<path>" *without* leading \\.
 
-In SMB2+, DFS resolving is now done through an FSCTL (patch #3). The
-relevant Microsoft specifications for this are:
+Sources:
 
-MS-SMB2: 3.2.4.20   Application Requests an IO Control Code Operation
-MS-SMB2: 3.2.4.20.3 Application Requests DFS Referral Information
-MS-SMB2: 3.2.5.14   Receiving an SMB2 IOCTL Response
-MS-SMB2: 3.2.5.14.4 Handling a DFS Referral Information Response
+[MS-SMB2] 3.2.5.5 Receiving an SMB2 TREE_CONNECT Response
+> TreeConnect.IsDfsShare MUST be set to TRUE, if the SMB2_SHARE_CAP_DFS
+> bit is set in the Capabilities field of the response.
 
-MS-DFSC: 2.2  Message Syntax (but really the whole document is useful)
+[MS-SMB2] 3.2.4.3 Application Requests Opening a File
+> If TreeConnect.IsDfsShare is TRUE, the SMB2_FLAGS_DFS_OPERATIONS flag
+> is set in the Flags field.
 
-The DFS response payload however is identical. Patch #1 moves the
-DFS response parsing out of SMB1 code and makes it work on any version
-of SMB.
+[MS-SMB2] 2.2.13 SMB2 CREATE Request, NameOffset:
+> If SMB2_FLAGS_DFS_OPERATIONS is set in the Flags field of the SMB2
+> header, the file name includes a prefix that will be processed during
+> DFS name normalization as specified in section 3.3.5.9. Otherwise, the
+> file name is relative to the share that is identified by the TreeId in
+> the SMB2 header.
 
-DFS code has 2 "main" entry points: initial mounting and automount
-(when a DFS link is accessed/traversed).
+Signed-off-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+---
+ fs/cifs/smb2pdu.c | 93 +++++++++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 77 insertions(+), 16 deletions(-)
 
-When automounting, cifs.ko calls build_path_from_dentry() which only
-makes treename-prefixed paths when the tcon has the
-SMB_IN_DFS_SHARE. This flag is checked in tcon->Flags which is never
-touched by SMB2 code as it sets tcon->share_flags on connexion.
-
-* CIFS requires to prefix all pathnames with the treename prefix when
-  connected to a DFS server, so the current build_path_from_dentry()
-  makes sense for CIFS. 
-* For SMB2+ it seems only the Create request requires the treename
-  prefix. Simply making the function check for both CIFS SMB2+ flag
-  for DFS to add a prefix does not work as the server has different
-  expectations about which packet can have/require a DFS pathname.
-
-Patch #2 adds build_path_from_dentry_optional_prefix() with an extra
-bool arg to decide to prefix or not. The automount code path always
-ask for it. Patch #5 modifies SMB2_open() to add the treename prefix
-to the given path if the server requires it.
-
-As part of the mouting process a IPC tcon is made (I suspect we don't
-need it anymore in SMB3). This tcon doesn't respect the signing
-requirement. This is fixed by patch #4.
-
-Finally the SMB2+ implementation of the get_dfs_referral operation is
-added in all supported SMB versions in patch #6.
-
-I've sucessfuly tested this against a Windows Server 2016 DFS
-setup. Samba requires a patch as currently it only accepts DFS
-referrals requests on an IPC connexion, which is in violation of the
-spec. A patch was sent on samba-technical:
-
-https://lists.samba.org/archive/samba-technical/2017-February/118859.html
-
-Changes since v1:
-
-* The fsctl is made on the first available tcon to the server, which
-  is allowed by the spec. This way we avoid hardcoding additional
-  rules in SMB2_ioctl().
-* add signing flag in smb2 header if required
-* no copy/pasting, the DFS parsing code is now generic and works for
-  both SMB versions
-* add treename prefix in SMB2_open() when required
-
-Aurelien Aptel (6):
-  CIFS: move DFS response parsing out of SMB1 code
-  CIFS: add build_path_from_dentry_optional_prefix()
-  CIFS: implement get_dfs_refer for SMB2+
-  CIFS: set signing flag in SMB2+ TreeConnect if needed
-  CIFS: use DFS pathnames in SMB2+ Create requests
-  CIFS: enable get_dfs_refer for SMB2+
-
- fs/cifs/cifs_dfs_ref.c |   4 +-
- fs/cifs/cifspdu.h      |  16 ++++---
- fs/cifs/cifsproto.h    |   7 +++
- fs/cifs/cifssmb.c      | 119 +++----------------------------------------------
- fs/cifs/dir.c          |  13 +++++-
- fs/cifs/misc.c         | 105 +++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2ops.c      |  76 +++++++++++++++++++++++++++++++
- fs/cifs/smb2pdu.c      |  97 ++++++++++++++++++++++++++++++++--------
- fs/cifs/smb2pdu.h      |   8 ++++
- 9 files changed, 305 insertions(+), 140 deletions(-)
-
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index c9a1d71..9e9f449 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1527,6 +1527,48 @@ add_durable_context(struct kvec *iov, unsigned int *num_iovec,
+ 	return 0;
+ }
+ 
++static int
++alloc_path_with_tree_prefix(__le16 **out_path, int *out_size, int *out_len,
++			    const char *treename, const __le16 *path)
++{
++	int treename_len, path_len;
++	const __le16 sep[] = {cpu_to_le16('\\'), cpu_to_le16(0x0000)};
++
++	/*
++	 * skip leading "\\"
++	 */
++	treename_len = strlen(treename);
++	if (treename_len < 2 || !(treename[0] == '\\' && treename[1] == '\\'))
++		return -EINVAL;
++
++	treename += 2;
++	treename_len -= 2;
++
++	path_len = UniStrnlen((wchar_t *)path, PATH_MAX);
++
++	/*
++	 * make room for one path separator between the treename and
++	 * path
++	 */
++	*out_len = treename_len + 1 + path_len;
++
++	/*
++	 * final path needs to be null-terminated UTF16 with a
++	 * size aligned to 8
++	 */
++
++	*out_size = roundup((*out_len+1)*2, 8);
++	*out_path = kzalloc(*out_size, GFP_KERNEL);
++	if (!*out_path)
++		return -ENOMEM;
++
++	cifs_strtoUTF16(*out_path, treename, treename_len, load_nls_default());
++	UniStrcat(*out_path, sep);
++	UniStrcat(*out_path, path);
++
++	return 0;
++}
++
+ int
+ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
+ 	  __u8 *oplock, struct smb2_file_all_info *buf,
+@@ -1575,30 +1617,49 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
+ 	req->ShareAccess = FILE_SHARE_ALL_LE;
+ 	req->CreateDisposition = cpu_to_le32(oparms->disposition);
+ 	req->CreateOptions = cpu_to_le32(oparms->create_options & CREATE_OPTIONS_MASK);
+-	uni_path_len = (2 * UniStrnlen((wchar_t *)path, PATH_MAX)) + 2;
+-	/* do not count rfc1001 len field */
+-	req->NameOffset = cpu_to_le16(sizeof(struct smb2_create_req) - 4);
+ 
+ 	iov[0].iov_base = (char *)req;
+ 	/* 4 for rfc1002 length field */
+ 	iov[0].iov_len = get_rfc1002_length(req) + 4;
+-
+-	/* MUST set path len (NameLength) to 0 opening root of share */
+-	req->NameLength = cpu_to_le16(uni_path_len - 2);
+ 	/* -1 since last byte is buf[0] which is sent below (path) */
+ 	iov[0].iov_len--;
+-	if (uni_path_len % 8 != 0) {
+-		copy_size = uni_path_len / 8 * 8;
+-		if (copy_size < uni_path_len)
+-			copy_size += 8;
+-
+-		copy_path = kzalloc(copy_size, GFP_KERNEL);
+-		if (!copy_path)
+-			return -ENOMEM;
+-		memcpy((char *)copy_path, (const char *)path,
+-			uni_path_len);
++
++	req->NameOffset = cpu_to_le16(sizeof(struct smb2_create_req) - 4);
++
++	/* [MS-SMB2] 2.2.13 NameOffset:
++	 * If SMB2_FLAGS_DFS_OPERATIONS is set in the Flags field of
++	 * the SMB2 header, the file name includes a prefix that will
++	 * be processed during DFS name normalization as specified in
++	 * section 3.3.5.9. Otherwise, the file name is relative to
++	 * the share that is identified by the TreeId in the SMB2
++	 * header.
++	 */
++	if (tcon->share_flags & SHI1005_FLAGS_DFS) {
++		int name_len;
++
++		req->hdr.sync_hdr.Flags |= SMB2_FLAGS_DFS_OPERATIONS;
++		rc = alloc_path_with_tree_prefix(&copy_path, &copy_size,
++						 &name_len,
++						 tcon->treeName, path);
++		if (rc)
++			return rc;
++		req->NameLength = cpu_to_le16(name_len * 2);
+ 		uni_path_len = copy_size;
+ 		path = copy_path;
++	} else {
++		uni_path_len = (2 * UniStrnlen((wchar_t *)path, PATH_MAX)) + 2;
++		/* MUST set path len (NameLength) to 0 opening root of share */
++		req->NameLength = cpu_to_le16(uni_path_len - 2);
++		if (uni_path_len % 8 != 0) {
++			copy_size = roundup(uni_path_len, 8);
++			copy_path = kzalloc(copy_size, GFP_KERNEL);
++			if (!copy_path)
++				return -ENOMEM;
++			memcpy((char *)copy_path, (const char *)path,
++			       uni_path_len);
++			uni_path_len = copy_size;
++			path = copy_path;
++		}
+ 	}
+ 
+ 	iov[1].iov_len = uni_path_len;
 -- 
 2.10.2
