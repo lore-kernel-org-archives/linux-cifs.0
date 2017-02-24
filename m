@@ -1,146 +1,318 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v2 3/6] CIFS: implement get_dfs_refer for SMB2+
-Date: Thu, 23 Feb 2017 17:06:23 -0800
-Message-ID: <CAKywueSCHszmzBbfLfJTP66=w6FcKgR2p1UJJig4uxcgC4QSfA@mail.gmail.com>
-References: <20170223144334.22320-1-aaptel@suse.com> <20170223144334.22320-4-aaptel@suse.com>
+From: Simo Sorce <ssorce-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: problem when testing recent cifs.upcall
+Date: Thu, 23 Feb 2017 20:14:16 -0500
+Message-ID: <1487898856.1893.122.camel@redhat.com>
+References: <20170215161522.17063-1-jlayton@samba.org>
+         <20170215161522.17063-3-jlayton@samba.org>
+         <d29a36ca-693d-e3c6-9428-90b1ee9bce10@physics.wisc.edu>
+         <1487853902.7731.21.camel@samba.org>
+         <f922a603-0095-b86a-27a0-c7a6064e93d3@physics.wisc.edu>
+         <1487884245.3448.15.camel@samba.org>
+         <1487885407.3448.17.camel@poochiereds.net>
+         <1487886136.10904.1.camel@samba.org> <1487893583.1893.117.camel@redhat.com>
+         <1487896552.14855.1.camel@samba.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Chad William Seys <cwseys-JAjqph6Yjy/rea2nFwT0Kw@public.gmane.org>,
+        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170223144334.22320-4-aaptel-IBi9RG/b67k@public.gmane.org>
+In-Reply-To: <1487896552.14855.1.camel-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2017-02-23 6:43 GMT-08:00 Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>:
-> Signed-off-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-> ---
->  fs/cifs/smb2ops.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  fs/cifs/smb2pdu.h |  8 +++++++
->  2 files changed, 80 insertions(+)
->
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index a44b4db..2563fe8 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -1097,6 +1097,78 @@ smb2_new_lease_key(struct cifs_fid *fid)
->         generate_random_uuid(fid->lease_key);
->  }
->
-> +static int
-> +smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
-> +                  const char *search_name,
-> +                  struct dfs_info3_param **target_nodes,
-> +                  unsigned int *num_of_nodes,
-> +                  const struct nls_table *nls_codepage, int remap)
-> +{
-> +       int rc = -EINVAL;
-> +       __le16 *utf16_path = NULL;
-> +       int utf16_path_len = 0;
-> +       struct cifs_tcon *tcon;
-> +       struct fsctl_get_dfs_referral_req *dfs_req = NULL;
-> +       struct get_dfs_referral_rsp *dfs_rsp = NULL;
-> +       u32 dfs_req_size = 0, dfs_rsp_size = 0;
-> +
-> +       cifs_dbg(FYI, "smb2_get_dfs_refer path <%s>\n", search_name);
-> +
-> +       /*
-> +        * Use any tcon from the current session. Here, the first one.
-> +        */
-> +       tcon = list_first_entry(&ses->tcon_list, struct cifs_tcon, tcon_list);
-> +       if (!tcon)
-> +               goto out;
+On Thu, 2017-02-23 at 19:35 -0500, Jeff Layton wrote:
+> On Thu, 2017-02-23 at 18:46 -0500, Simo Sorce wrote:
+> > On Thu, 2017-02-23 at 16:42 -0500, Jeff Layton wrote:
+> > > On Thu, 2017-02-23 at 16:30 -0500, Jeff Layton wrote:
+> > > > On Thu, 2017-02-23 at 16:10 -0500, Jeff Layton wrote:
+> > > > > On Thu, 2017-02-23 at 14:18 -0600, Chad William Seys wrote:
+> > > > > > > To be clear...I assume that you have a keytab set up someplace that
+> > > > > > > has the smbadmin@ credentials in it, correct? That's the only way
+> > > > > > > that cifs.upcall would instantiate a new credcache.
+> > > > > > 
+> > > > > > Right.  smbadmin@ credentials are in /etc/krb5.keytab.  'mount' must
+> > > > > > check there by default.
+> > > > > > 
+> > > > > > > It sounds like you're walking into the DFS mount in a task that is
+> > > > > > > running as root, but that has inherited a KRB5CCNAME environment
+> > > > > > > variable from a cwseys@ login session.
+> > > > > > 
+> > > > > > The task that is walking into the DFS mount is running as 'cwseys' .  My
+> > > > > > guess is that when cwseys tries to cd into DFS mount, cifs.upcall or the
+> > > > > > kernel is using the wrong name for root's credential cache.
+> > > > > > 
+> > > > > > > It might be nice to see the debug level output from syslog, so we can
+> > > > > > > tell what's actually happening in the upcall. Can you provide that?
+> > > > > > 
+> > > > > > 
+> > > > > > cwseys:Simo.> 
+> > > > > > > --> To unsubscribe from this list: send the line
+> > > > > > "unsubscribe linux-cifs" in> the body of a message to
+> > > > > > majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org> More majordomo info at  http://vge
+> > > > > > r.kernel.org/majordomo-info.html
+> > > > > > 
+> > > > > > $ kdestroy
+> > > > > > $ cd /
+> > > > > > 
+> > > > > > root:
+> > > > > > # umount /smb
+> > > > > > # umount /smb  # to be sure!
+> > > > > > # kdestroy
+> > > > > > #  ls /tmp/krb5cc_* -al
+> > > > > > ls: cannot access '/tmp/krb5cc_*': No such file or directory
+> > > > > > 
+> > > > > > cwseys:
+> > > > > > $ kinit
+> > > > > > Password for cwseys-8oz4Nevp0l1cSxESns1TRQ@public.gmane.org:
+> > > > > > $ ls /tmp/krb5cc_* -al
+> > > > > > -rw------- 1 cwseys cwseys 939 Feb 23 12:59 /tmp/krb5cc_1494_sM11PG
+> > > > > > 
+> > > > > > $ klist -c /tmp/krb5cc_1494_sM11PG
+> > > > > > Ticket cache: FILE:/tmp/krb5cc_1494_sM11PG
+> > > > > > Default principal: cwseys-8oz4Nevp0l1cSxESns1TRQ@public.gmane.org
+> > > > > > 
+> > > > > > Valid starting       Expires              Service principal
+> > > > > > 02/23/2017 12:59:00  03/05/2017 12:58:57
+> > > > > > krbtgt/PHYSICS.WISC.EDU-8oz4Nevp0l1cSxESns1TRQ@public.gmane.org
+> > > > > > 
+> > > > > > 
+> > > > > > root:
+> > > > > > # mount -t cifs //smb.physics.wisc.edu/smb /smb
+> > > > > > -osec=krb5,multiuser,username=smbadmin-8oz4Nevp0l1cSxESns1TRQ@public.gmane.org --verbose
+> > > > > > mount.cifs kernel mount options:
+> > > > > > ip=128.104.160.17,unc=\\smb.physics.wisc.edu\smb,sec=krb5,multiuser,user=smbadmin-8oz4Nevp0l1cSxESns1TRQ@public.gmane.org,pass=********
+> > > > > > 
+> > > > > > #  ls /tmp/krb5cc_* -al
+> > > > > > -rw------- 1 root   root   1046 Feb 23 13:00 /tmp/krb5cc_0
+> > > > > > -rw------- 1 cwseys cwseys  939 Feb 23 12:59 /tmp/krb5cc_1494_sM11PG
+> > > > > > 
+> > > > > > # klist -c /tmp/krb5cc_0
+> > > > > > Ticket cache: FILE:/tmp/krb5cc_0
+> > > > > > Default principal: smbadmin-8oz4Nevp0l1cSxESns1TRQ@public.gmane.org
+> > > > > > 
+> > > > > > Valid starting       Expires              Service principal
+> > > > > > 02/23/2017 13:00:01  03/05/2017 13:00:01
+> > > > > > krbtgt/PHYSICS.WISC.EDU-8oz4Nevp0l1cSxESns1TRQ@public.gmane.org
+> > > > > > 02/23/2017 13:00:01  03/05/2017 13:00:01
+> > > > > > cifs/smb.physics.wisc.edu-8oz4Nevp0l1cSxESns1TRQ@public.gmane.org
+> > > > > > 
+> > > > > > [debug.log after mount]
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: key description:
+> > > > > > cifs.spnego;0;0;39010000;ver=0x2;host=smb.physics.wisc.edu;ip4=128.104.160
+> > > > > > .17;sec=krb5;uid=0x0;creduid=0x0;user=smbadmin-8oz4Nevp0l1cSxESns1TRQ@public.gmane.org;pid=0x6abf
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: ver=2
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: host=smb.physics.wisc.edu
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: ip=128.104.160.17
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: sec=1
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: uid=0
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: creduid=0
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: user=smbadmin-8oz4Nevp0l1cSxESns1TRQ@public.gmane.org
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: pid=27327
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: get_cachename_from_process_env:
+> > > > > > pathname=/proc/27327/environ
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: get_existing_cc: default ccache is
+> > > > > > FILE:/tmp/krb5cc_0
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: get_tgt_time: unable to get principal
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: handle_krb5_mech: getting service
+> > > > > > ticket for smb.physics.wisc.edu
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: handle_krb5_mech: obtained service ticket
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: Exit status 0
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: key description:
+> > > > > > cifs.spnego;0;0;39010000;ver=0x2;host=smb.physics.wisc.edu;ip4=128.104.160.17;sec=krb5;uid=0x0;creduid=0x0;user=smbadmin-8oz4Nevp0l1cSxESns1TRQ@public.gmane.org;pid=0x6abf
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: ver=2
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: host=smb.physics.wisc.edu
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: ip=128.104.160.17
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: sec=1
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: uid=0
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: creduid=0
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: user=smbadmin-8oz4Nevp0l1cSxESns1TRQ@public.gmane.org
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: pid=27327
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: get_cachename_from_process_env:
+> > > > > > pathname=/proc/27327/environ
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: get_existing_cc: default ccache is
+> > > > > > FILE:/tmp/krb5cc_0
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: handle_krb5_mech: getting service
+> > > > > > ticket for smb.physics.wisc.edu
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: handle_krb5_mech: obtained service ticket
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: Exit status 0
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: key description:
+> > > > > > cifs.spnego;0;0;39010000;ver=0x2;host=smb.physics.wisc.edu;ip4=128.104.160.17;sec=krb5;uid=0x5d6;creduid=0x5d6;pid=0x6725
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: ver=2
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: host=smb.physics.wisc.edu
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: ip=128.104.160.17
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: sec=1
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: uid=1494
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: creduid=1494
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: pid=26405
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: get_cachename_from_process_env:
+> > > > > > pathname=/proc/26405/environ
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: get_cachename_from_process_env:
+> > > > > > cachename = FILE:/tmp/krb5cc_1494_bkfO2z
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: get_existing_cc: default ccache is
+> > > > > > FILE:/tmp/krb5cc_1494_bkfO2z
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: get_tgt_time: unable to
+> > > > > > gSimo.> 
+> > > > > > > --> To unsubscribe from this list: send the line
+> > > > > > "unsubscribe linux-cifs" in> the body of a message to
+> > > > > > majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org> More majordomo info at  http://vge
+> > > > > > r.kernel.org/majordomo-info.html
+> > > > > > et principal
+> > > > > > Feb 23 13:00:01 trog cifs.upcall: Exit status 1
+> > > > > > 
+> > > > > > cwseys:
+> > > > > > $ cd /smb
+> > > > > > 
+> > > > > > [debug.log after cd /smb]
+> > > > > > Feb 23 13:05:20 trog cifs.upcall: key description:
+> > > > > > cifs.spnego;0;0;39010000;ver=0x2;host=smb.physics.wisc.edu;ip4=128.104.160.17;sec=krb5;uid=0x5d6;creduid=0x5d6;pid=0x3397
+> > > > > > Feb 23 13:05:20 trog cifs.upcall: ver=2
+> > > > > > Feb 23 13:05:20 trog cifs.upcall: host=smb.physics.wisc.edu
+> > > > > > Feb 23 13:05:20 trog cifs.upcall: ip=128.104.160.17
+> > > > > > Feb 23 13:05:20 trog cifs.upcall: sec=1
+> > > > > > Feb 23 13:05:20 trog cifs.upcall: uid=1494
+> > > > > > Feb 23 13:05:20 trog cifs.upcall: creduid=1494
+> > > > > > Feb 23 13:05:20 trog cifs.upcall: pid=13207
+> > > > > > Feb 23 13:05:20 trog cifs.upcall: get_cachename_from_process_env:
+> > > > > > pathname=/proc/13207/environ
+> > > > > > Feb 23 13:05:20 trog cifs.upcall: get_cachename_from_process_env:
+> > > > > > cachename = FILE:/tmp/krb5cc_1494_sM11PG
+> > > > > > Feb 23 13:05:20 trog cifs.upcall: get_existing_cc: default ccache is
+> > > > > > FILE:/tmp/krb5cc_1494_sM11PG
+> > > > > > Feb 23 13:05:20 trog cifs.upcall: handle_krb5_mech: getting service
+> > > > > > ticket for smb.physics.wisc.edu
+> > > > > > Feb 23 13:05:20 trog cifs.upcall: handle_krb5_mech: obtained service ticket
+> > > > > > Feb 23 13:05:20 trog cifs.upcall: Exit status 0
+> > > > > > 
+> > > > > > $ kdestroy
+> > > > > > $ ls /tmp/krb5cc_* -al
+> > > > > > -rw------- 1 root root 1046 Feb 23 13:00 /tmp/krb5cc_0
+> > > > > > 
+> > > > > > # obs-cos is on a different server - DFS linked.
+> > > > > > $ cd obs-cos
+> > > > > > $ ls
+> > > > > > ls: cannot open directory '.': Permission denied
+> > > > > > 
+> > > > > > # kerberos cache file created with root owner/group !
+> > > > > > # The file has bytes in it, but not matching the size above. Wonder
+> > > > > > # what's in it... ?
+> > > > > > $ ls /tmp/krb5cc_* -al
+> > > > > > -rw------- 1 root root 1046 Feb 23 13:00 /tmp/krb5cc_0
+> > > > > > -rw------- 1 root root 1050 Feb 23 13:05 /tmp/krb5cc_1494_sM11PG
+> > > > > > 
+> > > > > > # now cannot kinit
+> > > > > > $ kinit
+> > > > > > Password for cwseys-8oz4Nevp0l1cSxESns1TRQ@public.gmane.org:
+> > > > > > kinit: Failed to store credentials: Internal credentials cache error
+> > > > > > (filename: /tmp/krb5cc_1494_sM11PG) while getting initial credentials
+> > > > > > 
+> > > > > > root:
+> > > > > > # lets look in the credential cache that was created by root.
+> > > > > > # looks like credentials used by root to mount /smb:
+> > > > > > # My guess is the kernel was trying to stash the
+> > > > > > # cifs/smb02.physics.wisc.edu-8oz4Nevp0l1cSxESns1TRQ@public.gmane.org
+> > > > > > # kerberos ticket, but put it in krb5cc_1494_sM11PG instead
+> > > > > > # of krb5cc_0
+> > > > > > # klist -c /tmp/krb5cc_1494_sM11PG
+> > > > > > Ticket cache: FILE:/tmp/krb5cc_1494_sM11PG
+> > > > > > Default principal: smbadmin-8oz4Nevp0l1cSxESns1TRQ@public.gmane.org
+> > > > > > 
+> > > > > > Valid starting       Expires              Service principal
+> > > > > > 02/23/2017 13:05:59  03/05/2017 13:05:59
+> > > > > > krbtgt/PHYSICS.WISC.EDU-8oz4Nevp0l1cSxESns1TRQ@public.gmane.org
+> > > > > > 02/23/2017 13:05:59  03/05/2017 13:05:59
+> > > > > > cifs/smb02.physics.wisc.edu-8oz4Nevp0l1cSxESns1TRQ@public.gmane.org
+> > > > > > 
+> > > > > > # klist -c /tmp/krb5cc_0
+> > > > > > Ticket cache: FILE:/tmp/krb5cc_0
+> > > > > > Default principal: smbadmin-8oz4Nevp0l1cSxESns1TRQ@public.gmane.org
+> > > > > > 
+> > > > > > Valid starting       Expires              Service principal
+> > > > > > 02/23/2017 13:00:01  03/05/2017 13:00:01
+> > > > > > krbtgt/PHYSICS.WISC.EDU-8oz4Nevp0l1cSxESns1TRQ@public.gmane.org
+> > > > > > 02/23/2017 13:00:01  03/05/2017 13:00:01
+> > > > > > cifs/smb.physics.wisc.edu-8oz4Nevp0l1cSxESns1TRQ@public.gmane.org
+> > > > > > 
+> > > > > > [debug.log after trying to cd obs-cos]
+> > > > > > vvvvvvvvvvvvvvvvvvvvvvvvvvvv
+> > > > > > I think the error is here:  Notice pid=13207, that belongs
+> > > > > > to cwseys but cifs.upcall key description is trying to use uid=0 and 
+> > > > > > creduid=0 . The credential cache file is correct, but the uid/creduid 
+> > > > > > are not.
+> > > > > > 
+> > > > > > cwseys   13207 /bin/bash
+> > > > > > 
+> > > > > > Also, in the above the log from 'cd /smb' cifs.upcall used  uid=1494 and 
+> > > > > > creduid=1494 .
+> > > > > > ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> > > > > > 
+> > > > > 
+> > > > > Yep, that's clearly the issue. The question is how you're ending up in
+> > > > > that situation...
+> > > > > 
+> > > > > Regardless of how it's happening to you, it's probably possible to fool
+> > > > > the environment scraping like this, by triggering a krb5 upcall from
+> > > > > the context of a setuid program that has inherited the KRB5CCNAME
+> > > > > environment variable from an unprivileged process.
+> > > > > 
+> > > > > I'm not sure what we can reasonably do about that. I suppose it might
+> > > > > be interesting to dump the Uid: line from /proc/pid/status when we do
+> > > > > this upcall, and see what all of the values are set to. Maybe we can
+> > > > > reject using the credcache if the uid in the upcall doesn't match one
+> > > > > of the values?
+> > > > > 
+> > > > > I'll see if I can cook up a debug patch sometime soon for that.
+> > > > > 
+> > > > 
+> > > > Just out of curiousity. As that unprivileged user, what do you get back
+> > > >  if you do this?
+> > > > 
+> > > >     $ which cd ; ls -l `which cd`
+> > > > 
+> > > > Thanks,
+> > > 
+> > > Nevermind, I see the problem. From follow_automount in the pathwalking
+> > > code:
+> > > 
+> > >         old_cred = override_creds(&init_cred);
+> > >         mnt = path->dentry->d_op->d_automount(path);
+> > >         revert_creds(old_cred);
+> > > 
+> > > So we end up overriding the process creds in order to do the automount,
+> > > which leads to exactly this problem.
+> > > 
+> > > I think the best we can do here is probably to just not do the
+> > > environment scraping if the uid is 0. It's pretty hacky, but hey, we're
+> > > already in rather nasty hack territory as it is.
+> > > 
+> > > Thoughts?
+> > 
+> > 
+> > Can't we detect that the process has changed id ?
+> 
+> How? The credentials are completely overridden with the init_creds once
+> we get into d_automount.
+> 
+> > Cutting off root may be a way, but I can see how some peoepl may want
+> > root too to be able to mount and walk cifs shares ...
+> > 
+> > 
+> 
+> Well, root still can with this patch -- just not if his credcache is in
+> a non-default location.
+> 
+> The other option is to just unset the environment var. That will
+> probably fix Chad's issue, but my worry there is that root's session
+> setup can end up being done with the wrong credcache if cwseys had a
+> valid one when he triggers the automount.
+> 
+> Maybe the right fix is to have mount creds be separate from root's
+> creds altogether. You'd have a duplicate session for root in most
+> cases, but maybe that's ok?
 
-Accessing the tcon_list should be protected by spin_locks and also a
-reference to the tcon should be acquired before using it safely.
+Sounds sensible, with cifs specifically you may want to use "machine
+creds" to mount, and then root creds to walk on the filesystem.
 
-Also you can extend SMB2_ioctl argument list to allow passing ipc_tid.
-In this case SMB2_ioctl() can choose what to use - ipc_tid or tcon; if
-tcon is passed -use it, otherwise - use ipc_tid.
-
-In this case you can fallback to ipc_tid if no tcon is found in the list.
-
-> +
-> +       utf16_path = cifs_strndup_to_utf16(search_name, PATH_MAX,
-> +                                          &utf16_path_len,
-> +                                          nls_codepage, remap);
-> +       if (!utf16_path) {
-> +               rc = -ENOMEM;
-> +               goto out;
-> +       }
-> +
-> +       dfs_req_size = sizeof(*dfs_req) + utf16_path_len;
-> +       dfs_req = kzalloc(dfs_req_size, GFP_KERNEL);
-> +       if (!dfs_req) {
-> +               rc = -ENOMEM;
-> +               goto out;
-> +       }
-> +
-> +       /* Highest DFS referral version understood */
-> +       dfs_req->MaxReferralLevel = cpu_to_le16(DFS_VERSION);
-> +
-> +       /* Path to resolve in an UTF-16 null-terminated string */
-> +       memcpy(dfs_req->RequestFileName, utf16_path, utf16_path_len);
-> +
-> +       do {
-> +               rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
-> +                               FSCTL_DFS_GET_REFERRALS, true /* is_fsctl */,
-> +                               (char *)dfs_req, dfs_req_size,
-> +                               (char **)&dfs_rsp, &dfs_rsp_size);
-> +       } while (rc == -EAGAIN);
-> +
-> +       if (rc) {
-> +               cifs_dbg(VFS, "ioctl error in smb2_get_dfs_refer rc=%d\n", rc);
-> +               goto out;
-> +       }
-> +
-> +       rc = parse_dfs_referrals(dfs_rsp, dfs_rsp_size,
-> +                                num_of_nodes, target_nodes,
-> +                                nls_codepage, remap, search_name,
-> +                                true /* is_unicode */);
-> +       if (rc) {
-> +               cifs_dbg(VFS, "parse error in smb2_get_dfs_refer rc=%d\n", rc);
-> +               goto out;
-> +       }
-> +
-> + out:
-> +       kfree(utf16_path);
-> +       kfree(dfs_req);
-> +       kfree(dfs_rsp);
-> +       return rc;
-> +}
->  #define SMB2_SYMLINK_STRUCT_SIZE \
->         (sizeof(struct smb2_err_rsp) - 1 + sizeof(struct smb2_symlink_err_rsp))
->
-> diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-> index c03b252..18700fd 100644
-> --- a/fs/cifs/smb2pdu.h
-> +++ b/fs/cifs/smb2pdu.h
-> @@ -695,6 +695,14 @@ struct fsctl_get_integrity_information_rsp {
->  /* Integrity flags for above */
->  #define FSCTL_INTEGRITY_FLAG_CHECKSUM_ENFORCEMENT_OFF  0x00000001
->
-> +/* See MS-DFSC 2.2.2 */
-> +struct fsctl_get_dfs_referral_req {
-> +       __le16 MaxReferralLevel;
-> +       __u8 RequestFileName[];
-> +} __packed;
-> +
-> +/* DFS response is struct get_dfs_refer_rsp */
-> +
->  /* See MS-SMB2 2.2.31.3 */
->  struct network_resiliency_req {
->         __le32 Timeout;
-> --
-> 2.10.2
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Best regards,
-Pavel Shilovsky
+Simo.
