@@ -1,56 +1,47 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [cifs-utils PATCH 7/8] cifs.upcall: unset $KRB5CCNAME when
- creating new credcache from keytab
-Date: Fri, 24 Feb 2017 09:54:18 -0500
-Message-ID: <1487948058.3314.2.camel@samba.org>
-References: <20170224142750.4151-1-jlayton@samba.org>
-         <20170224142750.4151-8-jlayton@samba.org>
-         <1487947130.1893.127.camel@redhat.com>
+From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+Subject: Re: [PATCH v2 3/6] CIFS: implement get_dfs_refer for SMB2+
+Date: Fri, 24 Feb 2017 16:25:36 +0100
+Message-ID: <mpsvarzfw5r.fsf@aaptelpc.suse.de>
+References: <20170223144334.22320-1-aaptel@suse.com> <20170223144334.22320-4-aaptel@suse.com> <CAKywueSCHszmzBbfLfJTP66=w6FcKgR2p1UJJig4uxcgC4QSfA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, cwseys-JAjqph6Yjy/rea2nFwT0Kw@public.gmane.org,
-        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
-To: Simo Sorce <ssorce-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1487947130.1893.127.camel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <CAKywueSCHszmzBbfLfJTP66=w6FcKgR2p1UJJig4uxcgC4QSfA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 2017-02-24 at 09:38 -0500, Simo Sorce wrote:
-> On Fri, 2017-02-24 at 09:27 -0500, Jeff Layton wrote:
-> > We don't want to trust $KRB5CCNAME when creating or updating a new
-> > credcache since we could be operating under the wrong credentials.
-> > Always create new credcaches in the default location instead.
-> > 
-> > Reported-by: Chad William Seys <cwseys-JAjqph6Yjy/rea2nFwT0Kw@public.gmane.org>
-> > Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> > ---
-> >  cifs.upcall.c | 6 ++++++
-> >  1 file changed, 6 insertions(+)
-> > 
-> > diff --git a/cifs.upcall.c b/cifs.upcall.c
-> > index 15e1e0f91c22..0c89d7cf40d7 100644
-> > --- a/cifs.upcall.c
-> > +++ b/cifs.upcall.c
-> > @@ -379,6 +379,12 @@ init_cc_from_keytab(const char *keytab_name, const char *user)
-> >  
-> >  	memset((char *) &my_creds, 0, sizeof(my_creds));
-> >  
-> > +	/*
-> > +	 * Unset the environment variable, if any. If we're creating our own
-> > +	 * credcache here, stick it in the default location.
-> > +	 */
-> > +	unsetenv(ENV_NAME);
-> > +
-> >  	if (keytab_name)
-> >  		ret = krb5_kt_resolve(context, keytab_name, &keytab);
-> >  	else
-> 
-> How long do you need these credentials around for ?
-> I wonder if using a memory ccache would work here.
-> 
-> 
+Hi Pavel,
 
-Only for as long as the upcall program lasts. A memory cache sounds
-like a good idea, actually. Let me ponder that...
+Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> writes:
+> Accessing the tcon_list should be protected by spin_locks and also a
+> reference to the tcon should be acquired before using it safely.
+
+I've noticed we have the cifs_tcp_ses_lock but also a per-session
+session_mutex. I'm guessing we want cifs_tcp_ses_lock here.
+
+By acquiring a reference you mean incrementing/decrementing tc_count. Do
+we need to protect this inc/dec operation with cifs_tcp_ses_lock too?
+
+> Also you can extend SMB2_ioctl argument list to allow passing ipc_tid.
+> In this case SMB2_ioctl() can choose what to use - ipc_tid or tcon; if
+> tcon is passed -use it, otherwise - use ipc_tid.
+>
+> In this case you can fallback to ipc_tid if no tcon is found in the list.
+>
+
+SMB2_ioctl() uses the tcon for many things. I don't see how we can just
+use ipc_tid number if we don't pass a tcon.
+
+Or do you mean: add a use_ipc bool to SMB2_ioctl arg list and use the tcon as
+usual except overwrite the Tid field with ses->ipc_tid before sending?
+
+Thanks,
+
+-- 
+Aurélien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
+GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
