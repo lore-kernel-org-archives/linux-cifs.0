@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [cifs-utils PATCH 3/8] cifs.upcall: remove need for replace.h
-Date: Fri, 24 Feb 2017 09:27:45 -0500
-Message-ID: <20170224142750.4151-4-jlayton@samba.org>
+Subject: [cifs-utils PATCH 8/8] cifs.upcall: don't do env scraping when uid is 0
+Date: Fri, 24 Feb 2017 09:27:50 -0500
+Message-ID: <20170224142750.4151-9-jlayton@samba.org>
 References: <20170224142750.4151-1-jlayton@samba.org>
 Cc: cwseys-JAjqph6Yjy/rea2nFwT0Kw@public.gmane.org, ssorce-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
         samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
@@ -11,67 +11,62 @@ In-Reply-To: <20170224142750.4151-1-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Take just what we need from replace.h and move it to cifs.upcall.c.
+Setuid programs triggering upcalls could trick the program here. Also,
+the d_automount method is done with credentials overridden so if you
+can end up with mismatched creds and env vars due to that as well.
 
+It's a hack, but the only recourse I can see is to avoid doing this
+when the uid is 0. That means we can't rely on finding root credcaches
+in alternate locations using $KRB5CCNAME, but I think that's the best
+we can do.
+
+Reported-by: Chad William Seys <cwseys-JAjqph6Yjy/rea2nFwT0Kw@public.gmane.org>
 Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- cifs.upcall.c | 22 +++++++++++++++++++---
- 1 file changed, 19 insertions(+), 3 deletions(-)
+ cifs.upcall.8.in |  5 ++++-
+ cifs.upcall.c    | 10 +++++++++-
+ 2 files changed, 13 insertions(+), 2 deletions(-)
 
+diff --git a/cifs.upcall.8.in b/cifs.upcall.8.in
+index e1f3956e176a..81481a482fb4 100644
+--- a/cifs.upcall.8.in
++++ b/cifs.upcall.8.in
+@@ -44,7 +44,10 @@ Normally, cifs.upcall will probe the environment variable space of the process
+ that initiated the upcall in order to fetch the value of $KRB5CCNAME. This can
+ assist the program with finding credential caches in non-default locations. If
+ this option is set, then the program won't do this and will rely on finding
+-credcaches in the default locations specified in krb5.conf.
++credcaches in the default locations specified in krb5.conf. Note that this is
++never performed when the uid is 0. The default credcache location is always
++used when the uid is 0, regardless of the environment variable setting in the
++process.
+ .RE
+ .PP
+ \--krb5conf=/path/to/krb5.conf|-k /path/to/krb5.conf
 diff --git a/cifs.upcall.c b/cifs.upcall.c
-index f766a8b5799e..cfc926cd9d09 100644
+index 0c89d7cf40d7..8545e09611ad 100644
 --- a/cifs.upcall.c
 +++ b/cifs.upcall.c
-@@ -49,8 +49,9 @@
- #include <ctype.h>
- #include <pwd.h>
- #include <grp.h>
-+#include <stdbool.h>
-+#include <errno.h>
+@@ -1038,11 +1038,19 @@ int main(const int argc, char *const argv[])
+ 	}
  
--#include "replace.h"
- #include "data_blob.h"
- #include "spnego.h"
- #include "cifs_spnego.h"
-@@ -68,6 +69,21 @@ typedef enum _sectype {
- 	MS_KRB5
- } sectype_t;
- 
-+/* These macros unify the keyblock handling of Heimdal and MIT somewhat */
-+#ifdef HAVE_KRB5_KEYBLOCK_KEYVALUE /* Heimdal */
-+#define KRB5_KEY_TYPE(k)        ((k)->keytype)
-+#define KRB5_KEY_LENGTH(k)      ((k)->keyvalue.length)
-+#define KRB5_KEY_DATA(k)        ((k)->keyvalue.data)
-+#define KRB5_KEY_DATA_CAST      void
-+#else /* MIT */
-+#define KRB5_KEY_TYPE(k)        ((k)->enctype)
-+#define KRB5_KEY_LENGTH(k)      ((k)->length)
-+#define KRB5_KEY_DATA(k)        ((k)->contents)
-+#define KRB5_KEY_DATA_CAST      krb5_octet
-+#endif
+ 	/*
++	 * We can't reasonably do this for root. Mounting a DFS share, for
++	 * instance we can end up with creds being overridden, but the env
++	 * variable left intact.
++	 */
++	if (uid == 0)
++		env_probe = false;
 +
-+#define SAFE_FREE(x) do { if ((x) != NULL) {free(x); x = NULL; } } while (0)
-+
- #ifdef HAVE_LIBCAP_NG
- static int
- trim_capabilities(bool need_environ)
-@@ -434,7 +450,7 @@ cifs_krb5_get_req(const char *host, krb5_ccache ccache,
- 	krb5_data apreq_pkt, in_data;
- 	krb5_auth_context auth_context = NULL;
- #if defined(HAVE_KRB5_AUTH_CON_SETADDRS) && defined(HAVE_KRB5_AUTH_CON_SET_REQ_CKSUMTYPE)
--	static const uint8_t gss_cksum[24] = { 0x10, 0x00, /* ... */};
-+	static char gss_cksum[24] = { 0x10, 0x00, /* ... */};
- #endif
- 	memset(&in_creds, 0, sizeof(in_creds));
- 
-@@ -498,7 +514,7 @@ cifs_krb5_get_req(const char *host, krb5_ccache ccache,
- 	 *
- 	 * See https://bugzilla.samba.org/show_bug.cgi?id=7890
++	/*
+ 	 * Must do this before setuid, as we need elevated capabilities to
+ 	 * look at the environ file.
  	 */
--	in_data.data = discard_const_p(char, gss_cksum);
-+	in_data.data = gss_cksum;
- 	in_data.length = 24;
+ 	env_cachename =
+-		get_cachename_from_process_env(env_probe ?  arg.pid : 0);
++		get_cachename_from_process_env(env_probe ? arg.pid : 0);
  
- 	/* MIT krb5 < 1.7 is missing the prototype, but still has the symbol */
+ 	rc = setuid(uid);
+ 	if (rc == -1) {
 -- 
 2.9.3
