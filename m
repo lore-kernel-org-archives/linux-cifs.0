@@ -1,106 +1,192 @@
 From: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: [PATCH v3 0/7] Add support for DFS in SMB2+
-Date: Tue, 28 Feb 2017 19:40:27 +0100
-Message-ID: <20170228184034.18771-1-aaptel@suse.com>
+Subject: [PATCH v3 7/7] CIFS: implement get_dfs_refer for SMB2+
+Date: Tue, 28 Feb 2017 19:40:34 +0100
+Message-ID: <20170228184034.18771-8-aaptel@suse.com>
+References: <20170228184034.18771-1-aaptel@suse.com>
 Cc: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20170228184034.18771-1-aaptel-IBi9RG/b67k@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This series of patch tries to implement the get_dfs_refer operation
-for SMB2+.
-
-In SMB2+, DFS resolving is now done through an FSCTL (patch #7). The
-relevant Microsoft specifications for this are:
-
-MS-SMB2: 3.2.4.20   Application Requests an IO Control Code Operation
-MS-SMB2: 3.2.4.20.3 Application Requests DFS Referral Information
-MS-SMB2: 3.2.5.14   Receiving an SMB2 IOCTL Response
-MS-SMB2: 3.2.5.14.4 Handling a DFS Referral Information Response
-
-MS-DFSC: 2.2  Message Syntax (but really the whole document is useful)
-
-The DFS response payload however is identical. Patch #1 moves the
-DFS response parsing out of SMB1 code and makes it work on any version
-of SMB.
-
-DFS code has 2 "main" entry points: initial mounting and automount
-(when a DFS link is accessed/traversed).
-
-When automounting, cifs.ko calls build_path_from_dentry() which only
-makes treename-prefixed paths when the tcon has the
-SMB_IN_DFS_SHARE. This flag is checked in tcon->Flags which is never
-touched by SMB2 code as it sets tcon->share_flags on connexion.
-
-* CIFS requires to prefix all pathnames with the treename prefix when
-  connected to a DFS server, so the current build_path_from_dentry()
-  makes sense for CIFS. 
-* For SMB2+ it seems only the Create request requires the treename
-  prefix. Simply making the function check for both CIFS SMB2+ flag
-  for DFS to add a prefix does not work as the server has different
-  expectations about which packet can have/require a DFS pathname.
-
-Patch #2 adds build_path_from_dentry_optional_prefix() with an extra
-bool arg to decide to prefix or not. The automount code path always
-ask for it. Patch #6 modifies SMB2_open() to add the treename prefix
-to the given path if the server requires it.
-
-We try to use an IPC connection first for the DFS request. Patch #3
-adds a flag to SMB2_ioctl() to force the usage of ipc_tid. The SMB2
-get_dfs_refer operation tries with the flag set and fallback to a
-share connection if that doesn't work.
-
-Patch #4 updates the type of ipc_tid from u16 to u32 as that is what a
-Tid is in SMB2+. This is correct and really needed since in SMB2 Samba
-doesn't use sequential tree id but random ones in the 32bit space.
-
-As part of the mouting process a IPC tcon is made (I suspect we don't
-need it anymore in SMB3). This tcon doesn't respect the signing
-requirement. This is fixed by patch #5.
-
-Finally the SMB2+ implementation of the get_dfs_referral operation is
-added in all supported SMB versions in patch #7.
-
-I've sucessfuly tested this (v1.0 and v3.0) against a Windows Server
-2016 DFS setup and a Samba DFS setup.
-
-Samba used to only accepts DFS referrals requests on an IPC connexion,
-which is in violation of the spec. A patch was sent on samba-technical
-and merged. It is not required anymore.
+in SMB2+ the get_dfs_refer operation uses a FSCTL. The request can be
+made on any Tree Connection according to the specs. Since Samba only
+accepted it on an IPC connection until recently, try that first.
 
 https://lists.samba.org/archive/samba-technical/2017-February/118859.html
 
-Changes since v2:
+3.2.4.20.3 Application Requests DFS Referral Information:
+> The client MUST search for an existing Session and TreeConnect to any
+> share on the server identified by ServerName for the user identified by
+> UserCredentials. If no Session and TreeConnect are found, the client
+> MUST establish a new Session and TreeConnect to IPC$ on the target
+> server as described in section 3.2.4.2 using the supplied ServerName and
+> UserCredentials.
 
-* add use_ipc flag to SMB2_open()
-* make smb2_get_dfs_refer() try IPC connections first
-* use first_entry_or_null() instead of first_entry() on the tcon list
-* protect tcon list access with spinlock
-* add inc/dec of the tcon reference number, protected by spinlock
+Signed-off-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+---
+ fs/cifs/smb2ops.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2pdu.h |   8 +++++
+ 2 files changed, 108 insertions(+)
 
-Aurelien Aptel (7):
-  CIFS: move DFS response parsing out of SMB1 code
-  CIFS: add build_path_from_dentry_optional_prefix()
-  CIFS: add use_ipc flag to SMB2_ioctl()
-  CIFS: let ses->ipc_tid hold smb2 TreeIds
-  CIFS: set signing flag in SMB2+ TreeConnect if needed
-  CIFS: use DFS pathnames in SMB2+ Create requests
-  CIFS: implement get_dfs_refer for SMB2+
-
- fs/cifs/cifs_dfs_ref.c |   4 +-
- fs/cifs/cifsglob.h     |   2 +-
- fs/cifs/cifspdu.h      |  16 ++++---
- fs/cifs/cifsproto.h    |   7 +++
- fs/cifs/cifssmb.c      | 119 ++---------------------------------------------
- fs/cifs/dir.c          |  13 +++++-
- fs/cifs/misc.c         | 105 +++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2file.c     |   3 +-
- fs/cifs/smb2ops.c      | 123 ++++++++++++++++++++++++++++++++++++++++++++++---
- fs/cifs/smb2pdu.c      | 114 +++++++++++++++++++++++++++++++++++++--------
- fs/cifs/smb2pdu.h      |   8 ++++
- fs/cifs/smb2proto.h    |   3 +-
- 12 files changed, 365 insertions(+), 152 deletions(-)
-
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 02937cc..fcd524d 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -1104,6 +1104,102 @@ smb2_new_lease_key(struct cifs_fid *fid)
+ 	generate_random_uuid(fid->lease_key);
+ }
+ 
++static int
++smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
++		   const char *search_name,
++		   struct dfs_info3_param **target_nodes,
++		   unsigned int *num_of_nodes,
++		   const struct nls_table *nls_codepage, int remap)
++{
++	int rc;
++	__le16 *utf16_path = NULL;
++	int utf16_path_len = 0;
++	struct cifs_tcon *tcon;
++	struct fsctl_get_dfs_referral_req *dfs_req = NULL;
++	struct get_dfs_referral_rsp *dfs_rsp = NULL;
++	u32 dfs_req_size = 0, dfs_rsp_size = 0;
++
++	cifs_dbg(FYI, "smb2_get_dfs_refer path <%s>\n", search_name);
++
++	/*
++	 * Use any tcon from the current session. Here, the first one.
++	 */
++	spin_lock(&cifs_tcp_ses_lock);
++	tcon = list_first_entry_or_null(&ses->tcon_list, struct cifs_tcon, tcon_list);
++	if (tcon)
++		tcon->tc_count++;
++	spin_unlock(&cifs_tcp_ses_lock);
++
++	if (!tcon) {
++		cifs_dbg(VFS, "session %p has no tcon available for a dfs referral request\n",
++			 ses);
++		rc = -ENOTCONN;
++		goto out;
++	}
++
++	utf16_path = cifs_strndup_to_utf16(search_name, PATH_MAX,
++					   &utf16_path_len,
++					   nls_codepage, remap);
++	if (!utf16_path) {
++		rc = -ENOMEM;
++		goto out;
++	}
++
++	dfs_req_size = sizeof(*dfs_req) + utf16_path_len;
++	dfs_req = kzalloc(dfs_req_size, GFP_KERNEL);
++	if (!dfs_req) {
++		rc = -ENOMEM;
++		goto out;
++	}
++
++	/* Highest DFS referral version understood */
++	dfs_req->MaxReferralLevel = cpu_to_le16(DFS_VERSION);
++
++	/* Path to resolve in an UTF-16 null-terminated string */
++	memcpy(dfs_req->RequestFileName, utf16_path, utf16_path_len);
++
++	do {
++		/* try first with IPC */
++		rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
++				FSCTL_DFS_GET_REFERRALS,
++				true /* is_fsctl */, true /* use_ipc */,
++				(char *)dfs_req, dfs_req_size,
++				(char **)&dfs_rsp, &dfs_rsp_size);
++		if (rc == -ENOTCONN) {
++			/* try with normal tcon */
++			rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
++					FSCTL_DFS_GET_REFERRALS,
++					true /* is_fsctl */, false /*use_ipc*/,
++					(char *)dfs_req, dfs_req_size,
++					(char **)&dfs_rsp, &dfs_rsp_size);
++		}
++	} while (rc == -EAGAIN);
++
++	if (rc) {
++		cifs_dbg(VFS, "ioctl error in smb2_get_dfs_refer rc=%d\n", rc);
++		goto out;
++	}
++
++	rc = parse_dfs_referrals(dfs_rsp, dfs_rsp_size,
++				 num_of_nodes, target_nodes,
++				 nls_codepage, remap, search_name,
++				 true /* is_unicode */);
++	if (rc) {
++		cifs_dbg(VFS, "parse error in smb2_get_dfs_refer rc=%d\n", rc);
++		goto out;
++	}
++
++ out:
++	if (tcon) {
++		spin_lock(&cifs_tcp_ses_lock);
++		tcon->tc_count--;
++		spin_unlock(&cifs_tcp_ses_lock);
++	}
++	kfree(utf16_path);
++	kfree(dfs_req);
++	kfree(dfs_rsp);
++	return rc;
++}
+ #define SMB2_SYMLINK_STRUCT_SIZE \
+ 	(sizeof(struct smb2_err_rsp) - 1 + sizeof(struct smb2_symlink_err_rsp))
+ 
+@@ -2263,6 +2359,7 @@ struct smb_version_operations smb20_operations = {
+ 	.clone_range = smb2_clone_range,
+ 	.wp_retry_size = smb2_wp_retry_size,
+ 	.dir_needs_close = smb2_dir_needs_close,
++	.get_dfs_refer = smb2_get_dfs_refer,
+ };
+ 
+ struct smb_version_operations smb21_operations = {
+@@ -2344,6 +2441,7 @@ struct smb_version_operations smb21_operations = {
+ 	.wp_retry_size = smb2_wp_retry_size,
+ 	.dir_needs_close = smb2_dir_needs_close,
+ 	.enum_snapshots = smb3_enum_snapshots,
++	.get_dfs_refer = smb2_get_dfs_refer,
+ };
+ 
+ struct smb_version_operations smb30_operations = {
+@@ -2435,6 +2533,7 @@ struct smb_version_operations smb30_operations = {
+ 	.free_transform_rq = smb3_free_transform_rq,
+ 	.is_transform_hdr = smb3_is_transform_hdr,
+ 	.receive_transform = smb3_receive_transform,
++	.get_dfs_refer = smb2_get_dfs_refer,
+ };
+ 
+ #ifdef CONFIG_CIFS_SMB311
+@@ -2527,6 +2626,7 @@ struct smb_version_operations smb311_operations = {
+ 	.free_transform_rq = smb3_free_transform_rq,
+ 	.is_transform_hdr = smb3_is_transform_hdr,
+ 	.receive_transform = smb3_receive_transform,
++	.get_dfs_refer = smb2_get_dfs_refer,
+ };
+ #endif /* CIFS_SMB311 */
+ 
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index c03b252..18700fd 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -695,6 +695,14 @@ struct fsctl_get_integrity_information_rsp {
+ /* Integrity flags for above */
+ #define FSCTL_INTEGRITY_FLAG_CHECKSUM_ENFORCEMENT_OFF	0x00000001
+ 
++/* See MS-DFSC 2.2.2 */
++struct fsctl_get_dfs_referral_req {
++	__le16 MaxReferralLevel;
++	__u8 RequestFileName[];
++} __packed;
++
++/* DFS response is struct get_dfs_refer_rsp */
++
+ /* See MS-SMB2 2.2.31.3 */
+ struct network_resiliency_req {
+ 	__le32 Timeout;
 -- 
 2.10.2
