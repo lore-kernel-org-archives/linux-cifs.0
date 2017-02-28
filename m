@@ -1,50 +1,61 @@
-From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: Re: cifs running amok after being disconnected (timeout?)
-Date: Tue, 28 Feb 2017 11:52:38 +0100
-Message-ID: <mpslgsqfuyx.fsf@aaptelpc.suse.de>
-References: <58B48122.5000708@tlinx.org>
+From: Jeff Layton <jlayton@samba.org>
+Subject: Re: [cifs-utils PATCH 0/8] cifs-utils: fix problems with credcaches
+ with overridden process creds
+Date: Tue, 28 Feb 2017 13:31:50 -0500
+Message-ID: <1488306710.2613.2.camel@samba.org>
+References: <20170224142750.4151-1-jlayton@samba.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-To: L A Walsh <cifs-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org>, linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <58B48122.5000708-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: ssorce@redhat.com, samba-technical@lists.samba.org, cwseys@physics.wisc.edu
+To: linux-cifs@vger.kernel.org
+Return-path: <samba-technical-bounces@lists.samba.org>
+In-Reply-To: <20170224142750.4151-1-jlayton@samba.org>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
+ <mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical/>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
+ <mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Errors-To: samba-technical-bounces@lists.samba.org
+Sender: "samba-technical" <samba-technical-bounces@lists.samba.org>
+List-Id: linux-cifs.vger.kernel.org
 
-Hi,
+On Fri, 2017-02-24 at 09:27 -0500, Jeff Layton wrote:
+> The main impetus for this set is patch #7, which is a one-liner. #8 may
+> be overkill, but I do think that it's the right approach, at least for
+> now.
+> 
+> In order to get all of this to build however, we need to eliminate the
+> unsetenv override in replace.h, or add a test for unsetenv. I chose the
+> former, so the real patches are preceded by a number of cleanup patches.
+> 
+> Jeff Layton (8):
+>   data_blob: remove need for replace.h
+>   spengo.c/asn1.c: remove need for replace.h
+>   cifs.upcall: remove need for replace.h
+>   replace.h: remove it
+>   treewide: Eliminate SAFE_FREE
+>   data_blob: Eliminate _PUBLIC_
+>   cifs.upcall: unset $KRB5CCNAME when creating new credcache from keytab
+>   cifs.upcall: don't do env scraping when uid is 0
+> 
+>  asn1.c           |   2 +-
+>  cifs.upcall.8.in |   5 +-
+>  cifs.upcall.c    |  56 +++--
+>  configure.ac     |   2 +-
+>  data_blob.c      |  11 +-
+>  data_blob.h      |  10 +-
+>  mount.cifs.c     |  16 +-
+>  replace.h        | 674 -------------------------------------------------------
+>  spnego.c         |   2 +-
+>  9 files changed, 64 insertions(+), 714 deletions(-)
+>  delete mode 100644 replace.h
+> 
 
-L A Walsh <cifs-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org> writes:
-> I tried turning on debug by echoing 1 to /proc/fs/cifs/traceSMB, and that
-> "effectively" stopped the conversation, as it was then saturating my
-> message log with lines like:
+Chad messaged me privately and stated that these patches fixed the
+issue he was having. Merged into cifs-utils master branch. This should
+make v6.7.
 
-enabling traceSMB just does a hexdump of every packet sent on the
-wire. You probably want this:
-
-    echo 1 > /proc/fs/cifs/cifsFYI
-    echo 'module cifs +p' > /sys/kernel/debug/dynamic_debug/control
-    echo 'file fs/cifs/* +p' > /sys/kernel/debug/dynamic_debug/control
-
-with CONFIG_CIFS_DEBUG, CONFIG_CIFS_DEBUG2, CONFIG_DYNAMIC_DEBUG enabled.
-
-
-> Any idea what might have been going on?  Anything better tracing
-> options to determine what was going on?
-
-As you said it seems the server keeps reseting the tcp connexion. A full
-trace starting from the initial mount will help.
-
-You should be able to open a bug on either samba on the kernel
-bugtracker and attach traces there.
-
-Have you tried to mount using a newer protocol (2.1 or 3.0)? (using
-e.g. -o vers=2.1)
-
-Cheers,
-
--- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
-GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+Thanks!
