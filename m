@@ -1,39 +1,67 @@
-From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: Re: [PATCH v2 3/6] CIFS: implement get_dfs_refer for SMB2+
-Date: Tue, 28 Feb 2017 19:44:07 +0100
-Message-ID: <mpsh93ef954.fsf@aaptelpc.suse.de>
-References: <20170223144334.22320-1-aaptel@suse.com> <20170223144334.22320-4-aaptel@suse.com> <CAKywueSCHszmzBbfLfJTP66=w6FcKgR2p1UJJig4uxcgC4QSfA@mail.gmail.com> <mpsvarzfw5r.fsf@aaptelpc.suse.de> <CAKywueSw5+cBkitxVT47U-F-r4i8mXTDK4KLuBYhnGiGD0eJCQ@mail.gmail.com> <mpsshmzg1ka.fsf@aaptelpc.suse.de>
+From: L A Walsh <cifs-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org>
+Subject: Re: cifs running amok after being disconnected (timeout?)
+Date: Tue, 28 Feb 2017 13:58:46 -0800
+Message-ID: <58B5F296.1080408@tlinx.org>
+References: <58B48122.5000708@tlinx.org> <mpslgsqfuyx.fsf@aaptelpc.suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: =?UTF-8?B?QXVyw6lsaWVuIEFwdGVs?= <aaptel-IBi9RG/b67k@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <mpsshmzg1ka.fsf-zpEvHKhluMwYitT5tn2FcQ@public.gmane.org>
+In-Reply-To: <mpslgsqfuyx.fsf-zpEvHKhluMwYitT5tn2FcQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Aurélien Aptel <aaptel-IBi9RG/b67k@public.gmane.org> writes:
-> What I'm proposing is to add a bool flag use_ipc to SMB2_ioctl. And do
-> something like this:
+Aurélien Aptel wrote:
+> Hi,
 >
->     if use_ipc:
->         if tcon->ses->ipc_tid == 0:
->             return -ENOTCONN
->         else:
->             req->tid = tcon->ses->ipc_tid
+> L A Walsh <cifs-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org> writes:
+>   
+>> I tried turning on debug by echoing 1 to /proc/fs/cifs/traceSMB, and that
+>> "effectively" stopped the conversation, as it was then saturating my
+>> message log with lines like:
+>>     
 >
-> Now in smb2_get_dfs_referral can first try to call it with
-> use_ipc=true and if that fails with ENOTCONN try again with false.
+> enabling traceSMB just does a hexdump of every packet sent on the
+> wire. You probably want this:
+>
+>     echo 1 > /proc/fs/cifs/cifsFYI
+>     echo 'module cifs +p' > /sys/kernel/debug/dynamic_debug/control
+>     echo 'file fs/cifs/* +p' > /sys/kernel/debug/dynamic_debug/control
+>
+> with CONFIG_CIFS_DEBUG, CONFIG_CIFS_DEBUG2, CONFIG_DYNAMIC_DEBUG enabled.
+>   
+----
+    Have to gen a new kernel -- about time for that w/4.10 being
+released...but the last patch and one before don't apply well
+for some reason ('git' tag? or index up front?)...
 
-I went ahead and implemented this along with small improvements in a v3
-patchset. I'm still open to rework on this if can understand better what
-you were proposing.
+>
+>   
+>> Any idea what might have been going on?  Anything better tracing
+>> options to determine what was going on?
+>>     
+>
+> As you said it seems the server keeps reseting the tcp connexion. A full
+> trace starting from the initial mount will help.
+>
+> You should be able to open a bug on either samba on the kernel
+> bugtracker and attach traces there.
+>   
+----
+    kernel seems best for kernel-based stuff.
+> Have you tried to mount using a newer protocol (2.1 or 3.0)? (using
+> e.g. -o vers=2.1)
+>   
+----
+    I don't specify a protocol on my mount lines, but the
+samba server doesn't have a SMB2.1 option that I know of (nor
+a 'SMB3').  Should samba allow specifications of 'smb' > 2?
 
-Cheers,
-
--- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
-GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+    As for the client -- Win7, it could use 2.1 I believe
+(not sure what differences are between 2.1 and 2), but smb3
+is unavailable for win7.  That said, though, if I don't
+specify a proto, the client is win7sp1, and the server is
+the in-kernel CIFS, shouldn't "2.1" be negotiated as
+the highest level supported?
