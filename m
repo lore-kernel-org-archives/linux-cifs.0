@@ -1,7 +1,7 @@
 From: Elena Reshetova <elena.reshetova@intel.com>
-Subject: [PATCH 06/10] fs, fscache: convert fscache_cache_tag.usage from atomic_t to refcount_t
-Date: Thu,  2 Mar 2017 12:43:13 +0200
-Message-ID: <1488451397-3365-7-git-send-email-elena.reshetova@intel.com>
+Subject: [PATCH 03/10] fs, proc: convert proc_dir_entry.count from atomic_t to refcount_t
+Date: Thu,  2 Mar 2017 12:43:10 +0200
+Message-ID: <1488451397-3365-4-git-send-email-elena.reshetova@intel.com>
 References: <1488451397-3365-1-git-send-email-elena.reshetova@intel.com>
 Cc: linux-fsdevel@vger.kernel.org, linux-nilfs@vger.kernel.org,
         linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
@@ -30,70 +30,75 @@ Signed-off-by: Hans Liljestrand <ishkamiel@gmail.com>
 Signed-off-by: Kees Cook <keescook@chromium.org>
 Signed-off-by: David Windsor <dwindsor@gmail.com>
 ---
- fs/fscache/cache.c            | 8 ++++----
- include/linux/fscache-cache.h | 3 ++-
- 2 files changed, 6 insertions(+), 5 deletions(-)
+ fs/proc/generic.c  | 4 ++--
+ fs/proc/internal.h | 5 +++--
+ fs/proc/root.c     | 2 +-
+ 3 files changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/fs/fscache/cache.c b/fs/fscache/cache.c
-index 56cce7f..ca6e282 100644
---- a/fs/fscache/cache.c
-+++ b/fs/fscache/cache.c
-@@ -33,7 +33,7 @@ struct fscache_cache_tag *__fscache_lookup_cache_tag(const char *name)
+diff --git a/fs/proc/generic.c b/fs/proc/generic.c
+index ee27feb..0850766 100644
+--- a/fs/proc/generic.c
++++ b/fs/proc/generic.c
+@@ -388,7 +388,7 @@ static struct proc_dir_entry *__proc_create(struct proc_dir_entry **parent,
+ 	ent->mode = mode;
+ 	ent->nlink = nlink;
+ 	ent->subdir = RB_ROOT;
+-	atomic_set(&ent->count, 1);
++	refcount_set(&ent->count, 1);
+ 	spin_lock_init(&ent->pde_unload_lock);
+ 	INIT_LIST_HEAD(&ent->pde_openers);
+ 	proc_set_user(ent, (*parent)->uid, (*parent)->gid);
+@@ -540,7 +540,7 @@ static void free_proc_entry(struct proc_dir_entry *de)
  
- 	list_for_each_entry(tag, &fscache_cache_tag_list, link) {
- 		if (strcmp(tag->name, name) == 0) {
--			atomic_inc(&tag->usage);
-+			refcount_inc(&tag->usage);
- 			up_read(&fscache_addremove_sem);
- 			return tag;
- 		}
-@@ -47,7 +47,7 @@ struct fscache_cache_tag *__fscache_lookup_cache_tag(const char *name)
- 		/* return a dummy tag if out of memory */
- 		return ERR_PTR(-ENOMEM);
+ void pde_put(struct proc_dir_entry *pde)
+ {
+-	if (atomic_dec_and_test(&pde->count))
++	if (refcount_dec_and_test(&pde->count))
+ 		free_proc_entry(pde);
+ }
  
--	atomic_set(&xtag->usage, 1);
-+	refcount_set(&xtag->usage, 1);
- 	strcpy(xtag->name, name);
- 
- 	/* write lock, search again and add if still not present */
-@@ -55,7 +55,7 @@ struct fscache_cache_tag *__fscache_lookup_cache_tag(const char *name)
- 
- 	list_for_each_entry(tag, &fscache_cache_tag_list, link) {
- 		if (strcmp(tag->name, name) == 0) {
--			atomic_inc(&tag->usage);
-+			refcount_inc(&tag->usage);
- 			up_write(&fscache_addremove_sem);
- 			kfree(xtag);
- 			return tag;
-@@ -75,7 +75,7 @@ void __fscache_release_cache_tag(struct fscache_cache_tag *tag)
- 	if (tag != ERR_PTR(-ENOMEM)) {
- 		down_write(&fscache_addremove_sem);
- 
--		if (atomic_dec_and_test(&tag->usage))
-+		if (refcount_dec_and_test(&tag->usage))
- 			list_del_init(&tag->link);
- 		else
- 			tag = NULL;
-diff --git a/include/linux/fscache-cache.h b/include/linux/fscache-cache.h
-index 4c467ef..dcec7b3 100644
---- a/include/linux/fscache-cache.h
-+++ b/include/linux/fscache-cache.h
-@@ -21,6 +21,7 @@
- #include <linux/fscache.h>
- #include <linux/sched.h>
- #include <linux/workqueue.h>
+diff --git a/fs/proc/internal.h b/fs/proc/internal.h
+index e93cdc6..7b5fa12 100644
+--- a/fs/proc/internal.h
++++ b/fs/proc/internal.h
+@@ -13,6 +13,7 @@
+ #include <linux/proc_ns.h>
+ #include <linux/spinlock.h>
+ #include <linux/atomic.h>
 +#include <linux/refcount.h>
+ #include <linux/binfmts.h>
  
- #define NR_MAXCACHES BITS_PER_LONG
+ struct ctl_table_header;
+@@ -41,7 +42,7 @@ struct proc_dir_entry {
+ 	struct rb_root subdir;
+ 	struct rb_node subdir_node;
+ 	void *data;
+-	atomic_t count;		/* use count */
++	refcount_t count;	/* use count */
+ 	atomic_t in_use;	/* number of callers into module in progress; */
+ 			/* negative -> it's going away RSN */
+ 	struct completion *pde_unload_completion;
+@@ -175,7 +176,7 @@ extern int proc_readdir_de(struct proc_dir_entry *, struct file *, struct dir_co
  
-@@ -37,7 +38,7 @@ struct fscache_cache_tag {
- 	struct fscache_cache	*cache;		/* cache referred to by this tag */
- 	unsigned long		flags;
- #define FSCACHE_TAG_RESERVED	0		/* T if tag is reserved for a cache */
--	atomic_t		usage;
-+	refcount_t		usage;
- 	char			name[0];	/* tag name */
- };
- 
+ static inline struct proc_dir_entry *pde_get(struct proc_dir_entry *pde)
+ {
+-	atomic_inc(&pde->count);
++	refcount_inc(&pde->count);
+ 	return pde;
+ }
+ extern void pde_put(struct proc_dir_entry *);
+diff --git a/fs/proc/root.c b/fs/proc/root.c
+index fb1955c..882bcb5 100644
+--- a/fs/proc/root.c
++++ b/fs/proc/root.c
+@@ -204,7 +204,7 @@ struct proc_dir_entry proc_root = {
+ 	.namelen	= 5, 
+ 	.mode		= S_IFDIR | S_IRUGO | S_IXUGO, 
+ 	.nlink		= 2, 
+-	.count		= ATOMIC_INIT(1),
++	.count		= REFCOUNT_INIT(1),
+ 	.proc_iops	= &proc_root_inode_operations, 
+ 	.proc_fops	= &proc_root_operations,
+ 	.parent		= &proc_root,
 -- 
 2.7.4
