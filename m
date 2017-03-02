@@ -1,7 +1,7 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH v2] smb2: Enforce sec= mount option
-Date: Thu, 2 Mar 2017 17:29:20 -0600
-Message-ID: <CAH2r5mtGJN3evZzDnn3hpbiSxqWzmnJvJnAUR7CXBLe8sAfEww@mail.gmail.com>
+Date: Thu, 2 Mar 2017 12:41:33 -0800
+Message-ID: <CAKywueSKZFg+7vPUu2oDOoMsik4nCyw-cqmN-d6jGSbd_djDoQ@mail.gmail.com>
 References: <20170118100557.19668-1-sprabhu@redhat.com> <1485351402.2736.2.camel@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -13,9 +13,7 @@ In-Reply-To: <1485351402.2736.2.camel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-merged into cifs-2.6.git for-next
-
-On Wed, Jan 25, 2017 at 7:36 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+2017-01-25 5:36 GMT-08:00 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
 > On Wed, 2017-01-18 at 15:35 +0530, Sachin Prabhu wrote:
 >> If the security type specified using a mount option is not supported,
 >> the SMB2 session setup code changes the security type to RawNTLMSSP. We
@@ -230,9 +228,8 @@ On Wed, Jan 25, 2017 at 7:36 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@pub
 > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-
+Acked-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 
 -- 
-Thanks,
-
-Steve
+Best regards,
+Pavel Shilovsky
