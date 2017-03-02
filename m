@@ -1,103 +1,125 @@
-From: L A Walsh <cifs-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org>
-Subject: Re: cifs running amok after being disconnected (timeout?)
-Date: Wed, 01 Mar 2017 10:06:43 -0800
-Message-ID: <58B70DB3.6010102@tlinx.org>
-References: <58B48122.5000708@tlinx.org> <mpslgsqfuyx.fsf@aaptelpc.suse.de> <58B5F296.1080408@tlinx.org> <mpsefyhfd6b.fsf@aaptelpc.suse.de>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH v3 0/7] Add support for DFS in SMB2+
+Date: Wed, 1 Mar 2017 22:41:28 -0600
+Message-ID: <CAH2r5mu2C200nBkgbaSwHSFEkR0Ld5AuQspyGpWJcveZcs=CAA@mail.gmail.com>
+References: <20170228184034.18771-1-aaptel@suse.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: =?UTF-8?B?QXVyw6lsaWVuIEFwdGVs?= <aaptel-IBi9RG/b67k@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <mpsefyhfd6b.fsf-zpEvHKhluMwYitT5tn2FcQ@public.gmane.org>
+In-Reply-To: <20170228184034.18771-1-aaptel-IBi9RG/b67k@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Aurélien Aptel wrote:
-> L A Walsh <cifs-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org> writes:
->   
->>     Have to gen a new kernel -- about time for that w/4.10 being
->> released...but the last patch and one before don't apply well
->> for some reason ('git' tag? or index up front?)...
->>     
->
-> I'm not sure I understand what you mean.
----
-    Sorry, I was referring to my normally getting my kernel
-source by downloading the patch from the last version from
-kernel.org.
+Merged v4 of this into cifs-2.6.git for-next
 
-    Recently (starting in 4.9), the patch hasn't been able to be
-applied with 'patch' (latest version AFAICanTell) but seems or
-appears like it might need 'git' -- which defeats the purpose of
-creating patches to the released tarballs.
-
-    For now, I just D/L'd the full 4.10.1 tarball, but really need
-to get the diff working w/patch again.  Having a git-diff exported
-that only will update a git tree is inconvenient, besides being
-pointless (i.e. if you have your tree in git, then I don't see
-the need for a separate 'diff+patch' that is meant to be applied
-to the previous version tarball).
-
+On Tue, Feb 28, 2017 at 12:40 PM, Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org> wrote:
+> This series of patch tries to implement the get_dfs_refer operation
+> for SMB2+.
 >
-> Historically cifs.ko was a samba project. Both have a (neglected :(...)
-> cifs section you can use.
->   
-----
-    Didn't know about samba's cifs section.
-> https://bugzilla.samba.org/buglist.cgi?component=kernel%20fs&list_id=11514&product=CifsVFS&resolution=---
-> https://bugzilla.kernel.org/buglist.cgi?component=CIFS&product=File%20System&resolution=---
+> In SMB2+, DFS resolving is now done through an FSCTL (patch #7). The
+> relevant Microsoft specifications for this are:
 >
->   
->>     I don't specify a protocol on my mount lines, but the
->> samba server doesn't have a SMB2.1 option that I know of (nor
->> a 'SMB3').  Should samba allow specifications of 'smb' > 2?
->>     
+> MS-SMB2: 3.2.4.20   Application Requests an IO Control Code Operation
+> MS-SMB2: 3.2.4.20.3 Application Requests DFS Referral Information
+> MS-SMB2: 3.2.5.14   Receiving an SMB2 IOCTL Response
+> MS-SMB2: 3.2.5.14.4 Handling a DFS Referral Information Response
 >
-> The Samba server lets you pick the min and max supported protocols via
-> "server min protocol" and "server max protocol" in smb.conf.
-====
-    Right... my samba version only supports up to SMB2.
->   
->>     As for the client -- Win7, it could use 2.1 I believe
->> (not sure what differences are between 2.1 and 2), but smb3
->> is unavailable for win7.  That said, though, if I don't
->> specify a proto, the client is win7sp1, and the server is
->>     
-^^^^^^^^^^^^^^^^^^^^^^^^server
->> the in-kernel CIFS, shouldn't "2.1" be negotiated as
->> the highest level supported?
->>     
+> MS-DFSC: 2.2  Message Syntax (but really the whole document is useful)
 >
-> (I'm assuming you meant "the server is samba" as there is no in-kernel
-> cifs server that I know of)
->   
----
-    Sorry, to use the linux-cifs fs on linux, I mean to call
-my Win7sp1 a "server". 
-> Windows clients will try to negotiate the highest protocol version but
-> cifs.ko defaults to 1.0 unless you specify otherwise via -o vers=xyz at
-> mount.
->   
-----
-    *ouch*.  That doesn't sound compatible.  Good to know, I guess.
-But if I specify 2.1, and a client can't connect at 2.1, will it fail, or
-gracefully fall back to 2.0?  I.e. is the '-o vers=xyz' used to specify
-a maximum? 
+> The DFS response payload however is identical. Patch #1 moves the
+> DFS response parsing out of SMB1 code and makes it work on any version
+> of SMB.
+>
+> DFS code has 2 "main" entry points: initial mounting and automount
+> (when a DFS link is accessed/traversed).
+>
+> When automounting, cifs.ko calls build_path_from_dentry() which only
+> makes treename-prefixed paths when the tcon has the
+> SMB_IN_DFS_SHARE. This flag is checked in tcon->Flags which is never
+> touched by SMB2 code as it sets tcon->share_flags on connexion.
+>
+> * CIFS requires to prefix all pathnames with the treename prefix when
+>   connected to a DFS server, so the current build_path_from_dentry()
+>   makes sense for CIFS.
+> * For SMB2+ it seems only the Create request requires the treename
+>   prefix. Simply making the function check for both CIFS SMB2+ flag
+>   for DFS to add a prefix does not work as the server has different
+>   expectations about which packet can have/require a DFS pathname.
+>
+> Patch #2 adds build_path_from_dentry_optional_prefix() with an extra
+> bool arg to decide to prefix or not. The automount code path always
+> ask for it. Patch #6 modifies SMB2_open() to add the treename prefix
+> to the given path if the server requires it.
+>
+> We try to use an IPC connection first for the DFS request. Patch #3
+> adds a flag to SMB2_ioctl() to force the usage of ipc_tid. The SMB2
+> get_dfs_refer operation tries with the flag set and fallback to a
+> share connection if that doesn't work.
+>
+> Patch #4 updates the type of ipc_tid from u16 to u32 as that is what a
+> Tid is in SMB2+. This is correct and really needed since in SMB2 Samba
+> doesn't use sequential tree id but random ones in the 32bit space.
+>
+> As part of the mouting process a IPC tcon is made (I suspect we don't
+> need it anymore in SMB3). This tcon doesn't respect the signing
+> requirement. This is fixed by patch #5.
+>
+> Finally the SMB2+ implementation of the get_dfs_referral operation is
+> added in all supported SMB versions in patch #7.
+>
+> I've sucessfuly tested this (v1.0 and v3.0) against a Windows Server
+> 2016 DFS setup and a Samba DFS setup.
+>
+> Samba used to only accepts DFS referrals requests on an IPC connexion,
+> which is in violation of the spec. A patch was sent on samba-technical
+> and merged. It is not required anymore.
+>
+> https://lists.samba.org/archive/samba-technical/2017-February/118859.html
+>
+> Changes since v2:
+>
+> * add use_ipc flag to SMB2_open()
+> * make smb2_get_dfs_refer() try IPC connections first
+> * use first_entry_or_null() instead of first_entry() on the tcon list
+> * protect tcon list access with spinlock
+> * add inc/dec of the tcon reference number, protected by spinlock
+>
+> Aurelien Aptel (7):
+>   CIFS: move DFS response parsing out of SMB1 code
+>   CIFS: add build_path_from_dentry_optional_prefix()
+>   CIFS: add use_ipc flag to SMB2_ioctl()
+>   CIFS: let ses->ipc_tid hold smb2 TreeIds
+>   CIFS: set signing flag in SMB2+ TreeConnect if needed
+>   CIFS: use DFS pathnames in SMB2+ Create requests
+>   CIFS: implement get_dfs_refer for SMB2+
+>
+>  fs/cifs/cifs_dfs_ref.c |   4 +-
+>  fs/cifs/cifsglob.h     |   2 +-
+>  fs/cifs/cifspdu.h      |  16 ++++---
+>  fs/cifs/cifsproto.h    |   7 +++
+>  fs/cifs/cifssmb.c      | 119 ++---------------------------------------------
+>  fs/cifs/dir.c          |  13 +++++-
+>  fs/cifs/misc.c         | 105 +++++++++++++++++++++++++++++++++++++++++
+>  fs/cifs/smb2file.c     |   3 +-
+>  fs/cifs/smb2ops.c      | 123 ++++++++++++++++++++++++++++++++++++++++++++++---
+>  fs/cifs/smb2pdu.c      | 114 +++++++++++++++++++++++++++++++++++++--------
+>  fs/cifs/smb2pdu.h      |   8 ++++
+>  fs/cifs/smb2proto.h    |   3 +-
+>  12 files changed, 365 insertions(+), 152 deletions(-)
+>
+> --
+> 2.10.2
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-    you mentioned gettign a trace from when I mount -- but the
-reset-loop doesn't start @ mount, but seems to start a few minutes
-later (maybe 120 seconds?)...Just checked my settings on the
-Win machine (recently "upgraded" (same-to-same) to try to
-eliminate some problems on the Win-machine) -- it has a setting
-for disconnecting idle clients which had been reset to a
-default of 15 minutes, so that's not likely the trigger.  I reset
-it back to "don't disconnect" -- useful for my setup.
 
-    Got several things on the plate, so not sure how soon I'll
-be able to reboot the lnx server w/new kernel.  Sure would be nice
-if it could 'hot boot', but every time I do, the screen doesn't
-get reset to default state so can't see any boot messages until
-the system runs tty/video setup as services are started (i.e. after
-kernel booting has completed).  I really prefer being able to see
-what's going on as it boots...*sigh*
+
+-- 
+Thanks,
+
+Steve
