@@ -1,7 +1,7 @@
 From: Elena Reshetova <elena.reshetova-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH 01/10] fs, kernfs: convert kernfs_node.count from atomic_t to refcount_t
-Date: Thu,  2 Mar 2017 12:43:08 +0200
-Message-ID: <1488451397-3365-2-git-send-email-elena.reshetova@intel.com>
+Subject: [PATCH 08/10] fs, fsnotify: convert fsnotify_group.refcnt from atomic_t to refcount_t
+Date: Thu,  2 Mar 2017 12:43:15 +0200
+Message-ID: <1488451397-3365-9-git-send-email-elena.reshetova@intel.com>
 References: <1488451397-3365-1-git-send-email-elena.reshetova@intel.com>
 Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nilfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
         linux-cachefs-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
@@ -30,75 +30,62 @@ Signed-off-by: Hans Liljestrand <ishkamiel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.o
 Signed-off-by: Kees Cook <keescook-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>
 Signed-off-by: David Windsor <dwindsor-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/kernfs/dir.c        | 12 +++++-------
- include/linux/kernfs.h |  3 ++-
- 2 files changed, 7 insertions(+), 8 deletions(-)
+ fs/notify/group.c                | 6 +++---
+ include/linux/fsnotify_backend.h | 3 ++-
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/fs/kernfs/dir.c b/fs/kernfs/dir.c
-index db5900aaa..2a07de1 100644
---- a/fs/kernfs/dir.c
-+++ b/fs/kernfs/dir.c
-@@ -489,10 +489,8 @@ static void kernfs_drain(struct kernfs_node *kn)
+diff --git a/fs/notify/group.c b/fs/notify/group.c
+index fbe3cbe..81356c1 100644
+--- a/fs/notify/group.c
++++ b/fs/notify/group.c
+@@ -98,7 +98,7 @@ void fsnotify_destroy_group(struct fsnotify_group *group)
   */
- void kernfs_get(struct kernfs_node *kn)
+ void fsnotify_get_group(struct fsnotify_group *group)
  {
--	if (kn) {
--		WARN_ON(!atomic_read(&kn->count));
--		atomic_inc(&kn->count);
--	}
-+	if (kn)
-+		refcount_inc(&kn->count);
+-	atomic_inc(&group->refcnt);
++	refcount_inc(&group->refcnt);
  }
- EXPORT_SYMBOL_GPL(kernfs_get);
  
-@@ -507,7 +505,7 @@ void kernfs_put(struct kernfs_node *kn)
- 	struct kernfs_node *parent;
- 	struct kernfs_root *root;
- 
--	if (!kn || !atomic_dec_and_test(&kn->count))
-+	if (!kn || !refcount_dec_and_test(&kn->count))
- 		return;
- 	root = kernfs_root(kn);
-  repeat:
-@@ -538,7 +536,7 @@ void kernfs_put(struct kernfs_node *kn)
- 
- 	kn = parent;
- 	if (kn) {
--		if (atomic_dec_and_test(&kn->count))
-+		if (refcount_dec_and_test(&kn->count))
- 			goto repeat;
- 	} else {
- 		/* just released the root kn, free @root too */
-@@ -635,7 +633,7 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
- 		goto err_out2;
- 	kn->ino = ret;
- 
--	atomic_set(&kn->count, 1);
-+	refcount_set(&kn->count, 1);
- 	atomic_set(&kn->active, KN_DEACTIVATED_BIAS);
- 	RB_CLEAR_NODE(&kn->rb);
- 
-diff --git a/include/linux/kernfs.h b/include/linux/kernfs.h
-index a9b11b8..baabbaf 100644
---- a/include/linux/kernfs.h
-+++ b/include/linux/kernfs.h
-@@ -15,6 +15,7 @@
- #include <linux/lockdep.h>
- #include <linux/rbtree.h>
- #include <linux/atomic.h>
-+#include <linux/refcount.h>
- #include <linux/wait.h>
- 
- struct file;
-@@ -105,7 +106,7 @@ struct kernfs_elem_attr {
-  * active reference.
+ /*
+@@ -106,7 +106,7 @@ void fsnotify_get_group(struct fsnotify_group *group)
   */
- struct kernfs_node {
--	atomic_t		count;
-+	refcount_t		count;
- 	atomic_t		active;
- #ifdef CONFIG_DEBUG_LOCK_ALLOC
- 	struct lockdep_map	dep_map;
+ void fsnotify_put_group(struct fsnotify_group *group)
+ {
+-	if (atomic_dec_and_test(&group->refcnt))
++	if (refcount_dec_and_test(&group->refcnt))
+ 		fsnotify_final_destroy_group(group);
+ }
+ 
+@@ -122,7 +122,7 @@ struct fsnotify_group *fsnotify_alloc_group(const struct fsnotify_ops *ops)
+ 		return ERR_PTR(-ENOMEM);
+ 
+ 	/* set to 0 when there a no external references to this group */
+-	atomic_set(&group->refcnt, 1);
++	refcount_set(&group->refcnt, 1);
+ 	atomic_set(&group->num_marks, 0);
+ 
+ 	spin_lock_init(&group->notification_lock);
+diff --git a/include/linux/fsnotify_backend.h b/include/linux/fsnotify_backend.h
+index e6e689b..1f7aa16 100644
+--- a/include/linux/fsnotify_backend.h
++++ b/include/linux/fsnotify_backend.h
+@@ -17,6 +17,7 @@
+ #include <linux/types.h>
+ #include <linux/atomic.h>
+ #include <linux/user_namespace.h>
++#include <linux/refcount.h>
+ 
+ /*
+  * IN_* from inotfy.h lines up EXACTLY with FS_*, this is so we can easily
+@@ -131,7 +132,7 @@ struct fsnotify_group {
+ 	 * inotify_init() and the refcnt will hit 0 only when that fd has been
+ 	 * closed.
+ 	 */
+-	atomic_t refcnt;		/* things with interest in this group */
++	refcount_t refcnt;		/* things with interest in this group */
+ 
+ 	const struct fsnotify_ops *ops;	/* how this group handles things */
+ 
 -- 
 2.7.4
 
