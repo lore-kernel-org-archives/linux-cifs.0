@@ -1,7 +1,7 @@
 From: Elena Reshetova <elena.reshetova-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH 07/10] fs, fscache: convert fscache_operation.usage from atomic_t to refcount_t
-Date: Thu,  2 Mar 2017 12:43:14 +0200
-Message-ID: <1488451397-3365-8-git-send-email-elena.reshetova@intel.com>
+Subject: [PATCH 01/10] fs, kernfs: convert kernfs_node.count from atomic_t to refcount_t
+Date: Thu,  2 Mar 2017 12:43:08 +0200
+Message-ID: <1488451397-3365-2-git-send-email-elena.reshetova@intel.com>
 References: <1488451397-3365-1-git-send-email-elena.reshetova@intel.com>
 Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nilfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
         linux-cachefs-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
@@ -30,206 +30,75 @@ Signed-off-by: Hans Liljestrand <ishkamiel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.o
 Signed-off-by: Kees Cook <keescook-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>
 Signed-off-by: David Windsor <dwindsor-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cachefiles/rdwr.c          |  2 +-
- fs/fscache/operation.c        | 38 +++++++++++++++++++-------------------
- fs/fscache/page.c             |  2 +-
- include/linux/fscache-cache.h |  4 ++--
- 4 files changed, 23 insertions(+), 23 deletions(-)
+ fs/kernfs/dir.c        | 12 +++++-------
+ include/linux/kernfs.h |  3 ++-
+ 2 files changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/fs/cachefiles/rdwr.c b/fs/cachefiles/rdwr.c
-index afbdc41..c987de6 100644
---- a/fs/cachefiles/rdwr.c
-+++ b/fs/cachefiles/rdwr.c
-@@ -692,7 +692,7 @@ int cachefiles_read_or_alloc_pages(struct fscache_retrieval *op,
- 			     struct cachefiles_cache, cache);
- 
- 	_enter("{OBJ%x,%d},,%d,,",
--	       object->fscache.debug_id, atomic_read(&op->op.usage),
-+	       object->fscache.debug_id, refcount_read(&op->op.usage),
- 	       *nr_pages);
- 
- 	if (!object->backer)
-diff --git a/fs/fscache/operation.c b/fs/fscache/operation.c
-index de67745..eb84c95 100644
---- a/fs/fscache/operation.c
-+++ b/fs/fscache/operation.c
-@@ -38,7 +38,7 @@ void fscache_operation_init(struct fscache_operation *op,
- 			    fscache_operation_release_t release)
+diff --git a/fs/kernfs/dir.c b/fs/kernfs/dir.c
+index db5900aaa..2a07de1 100644
+--- a/fs/kernfs/dir.c
++++ b/fs/kernfs/dir.c
+@@ -489,10 +489,8 @@ static void kernfs_drain(struct kernfs_node *kn)
+  */
+ void kernfs_get(struct kernfs_node *kn)
  {
- 	INIT_WORK(&op->work, fscache_op_work_func);
--	atomic_set(&op->usage, 1);
-+	refcount_set(&op->usage, 1);
- 	op->state = FSCACHE_OP_ST_INITIALISED;
- 	op->debug_id = atomic_inc_return(&fscache_op_debug_id);
- 	op->processor = processor;
-@@ -60,19 +60,19 @@ EXPORT_SYMBOL(fscache_operation_init);
- void fscache_enqueue_operation(struct fscache_operation *op)
- {
- 	_enter("{OBJ%x OP%x,%u}",
--	       op->object->debug_id, op->debug_id, atomic_read(&op->usage));
-+	       op->object->debug_id, op->debug_id, refcount_read(&op->usage));
- 
- 	ASSERT(list_empty(&op->pend_link));
- 	ASSERT(op->processor != NULL);
- 	ASSERT(fscache_object_is_available(op->object));
--	ASSERTCMP(atomic_read(&op->usage), >, 0);
-+	ASSERTCMP(refcount_read(&op->usage), >, 0);
- 	ASSERTCMP(op->state, ==, FSCACHE_OP_ST_IN_PROGRESS);
- 
- 	fscache_stat(&fscache_n_op_enqueue);
- 	switch (op->flags & FSCACHE_OP_TYPE) {
- 	case FSCACHE_OP_ASYNC:
- 		_debug("queue async");
--		atomic_inc(&op->usage);
-+		refcount_inc(&op->usage);
- 		if (!queue_work(fscache_op_wq, &op->work))
- 			fscache_put_operation(op);
- 		break;
-@@ -156,7 +156,7 @@ int fscache_submit_exclusive_op(struct fscache_object *object,
- 	_enter("{OBJ%x OP%x},", object->debug_id, op->debug_id);
- 
- 	ASSERTCMP(op->state, ==, FSCACHE_OP_ST_INITIALISED);
--	ASSERTCMP(atomic_read(&op->usage), >, 0);
-+	ASSERTCMP(refcount_read(&op->usage), >, 0);
- 
- 	spin_lock(&object->lock);
- 	ASSERTCMP(object->n_ops, >=, object->n_in_progress);
-@@ -183,11 +183,11 @@ int fscache_submit_exclusive_op(struct fscache_object *object,
- 		object->n_exclusive++;	/* reads and writes must wait */
- 
- 		if (object->n_in_progress > 0) {
--			atomic_inc(&op->usage);
-+			refcount_inc(&op->usage);
- 			list_add_tail(&op->pend_link, &object->pending_ops);
- 			fscache_stat(&fscache_n_op_pend);
- 		} else if (!list_empty(&object->pending_ops)) {
--			atomic_inc(&op->usage);
-+			refcount_inc(&op->usage);
- 			list_add_tail(&op->pend_link, &object->pending_ops);
- 			fscache_stat(&fscache_n_op_pend);
- 			fscache_start_operations(object);
-@@ -203,7 +203,7 @@ int fscache_submit_exclusive_op(struct fscache_object *object,
- 		op->object = object;
- 		object->n_ops++;
- 		object->n_exclusive++;	/* reads and writes must wait */
--		atomic_inc(&op->usage);
-+		refcount_inc(&op->usage);
- 		list_add_tail(&op->pend_link, &object->pending_ops);
- 		fscache_stat(&fscache_n_op_pend);
- 		ret = 0;
-@@ -238,10 +238,10 @@ int fscache_submit_op(struct fscache_object *object,
- 	int ret;
- 
- 	_enter("{OBJ%x OP%x},{%u}",
--	       object->debug_id, op->debug_id, atomic_read(&op->usage));
-+	       object->debug_id, op->debug_id, refcount_read(&op->usage));
- 
- 	ASSERTCMP(op->state, ==, FSCACHE_OP_ST_INITIALISED);
--	ASSERTCMP(atomic_read(&op->usage), >, 0);
-+	ASSERTCMP(refcount_read(&op->usage), >, 0);
- 
- 	spin_lock(&object->lock);
- 	ASSERTCMP(object->n_ops, >=, object->n_in_progress);
-@@ -267,11 +267,11 @@ int fscache_submit_op(struct fscache_object *object,
- 		object->n_ops++;
- 
- 		if (object->n_exclusive > 0) {
--			atomic_inc(&op->usage);
-+			refcount_inc(&op->usage);
- 			list_add_tail(&op->pend_link, &object->pending_ops);
- 			fscache_stat(&fscache_n_op_pend);
- 		} else if (!list_empty(&object->pending_ops)) {
--			atomic_inc(&op->usage);
-+			refcount_inc(&op->usage);
- 			list_add_tail(&op->pend_link, &object->pending_ops);
- 			fscache_stat(&fscache_n_op_pend);
- 			fscache_start_operations(object);
-@@ -283,7 +283,7 @@ int fscache_submit_op(struct fscache_object *object,
- 	} else if (flags & BIT(FSCACHE_OBJECT_IS_LOOKED_UP)) {
- 		op->object = object;
- 		object->n_ops++;
--		atomic_inc(&op->usage);
-+		refcount_inc(&op->usage);
- 		list_add_tail(&op->pend_link, &object->pending_ops);
- 		fscache_stat(&fscache_n_op_pend);
- 		ret = 0;
-@@ -359,7 +359,7 @@ int fscache_cancel_op(struct fscache_operation *op,
- 
- 	ASSERTCMP(op->state, >=, FSCACHE_OP_ST_PENDING);
- 	ASSERTCMP(op->state, !=, FSCACHE_OP_ST_CANCELLED);
--	ASSERTCMP(atomic_read(&op->usage), >, 0);
-+	ASSERTCMP(refcount_read(&op->usage), >, 0);
- 
- 	spin_lock(&object->lock);
- 
-@@ -481,11 +481,11 @@ void fscache_put_operation(struct fscache_operation *op)
- 	struct fscache_cache *cache;
- 
- 	_enter("{OBJ%x OP%x,%d}",
--	       op->object->debug_id, op->debug_id, atomic_read(&op->usage));
-+	       op->object->debug_id, op->debug_id, refcount_read(&op->usage));
- 
--	ASSERTCMP(atomic_read(&op->usage), >, 0);
-+	ASSERTCMP(refcount_read(&op->usage), >, 0);
- 
--	if (!atomic_dec_and_test(&op->usage))
-+	if (!refcount_dec_and_test(&op->usage))
- 		return;
- 
- 	_debug("PUT OP");
-@@ -569,7 +569,7 @@ void fscache_operation_gc(struct work_struct *work)
- 		       object->debug_id, op->debug_id);
- 		fscache_stat(&fscache_n_op_gc);
- 
--		ASSERTCMP(atomic_read(&op->usage), ==, 0);
-+		ASSERTCMP(refcount_read(&op->usage), ==, 0);
- 		ASSERTCMP(op->state, ==, FSCACHE_OP_ST_DEAD);
- 
- 		ASSERTCMP(object->n_ops, >, 0);
-@@ -599,7 +599,7 @@ void fscache_op_work_func(struct work_struct *work)
- 	unsigned long start;
- 
- 	_enter("{OBJ%x OP%x,%d}",
--	       op->object->debug_id, op->debug_id, atomic_read(&op->usage));
-+	       op->object->debug_id, op->debug_id, refcount_read(&op->usage));
- 
- 	ASSERT(op->processor != NULL);
- 	start = jiffies;
-diff --git a/fs/fscache/page.c b/fs/fscache/page.c
-index c8c4f79..352393c 100644
---- a/fs/fscache/page.c
-+++ b/fs/fscache/page.c
-@@ -774,7 +774,7 @@ static void fscache_write_op(struct fscache_operation *_op)
- 	void *results[1];
- 	int ret;
- 
--	_enter("{OP%x,%d}", op->op.debug_id, atomic_read(&op->op.usage));
-+	_enter("{OP%x,%d}", op->op.debug_id, refcount_read(&op->op.usage));
- 
- 	spin_lock(&object->lock);
- 	cookie = object->cookie;
-diff --git a/include/linux/fscache-cache.h b/include/linux/fscache-cache.h
-index dcec7b3..0093158 100644
---- a/include/linux/fscache-cache.h
-+++ b/include/linux/fscache-cache.h
-@@ -103,7 +103,7 @@ struct fscache_operation {
- #define FSCACHE_OP_KEEP_FLAGS	0x00f0	/* flags to keep when repurposing an op */
- 
- 	enum fscache_operation_state state;
--	atomic_t		usage;
-+	refcount_t		usage;
- 	unsigned		debug_id;	/* debugging ID */
- 
- 	/* operation processor callback
-@@ -161,7 +161,7 @@ typedef int (*fscache_pages_retrieval_func_t)(struct fscache_retrieval *op,
- static inline
- struct fscache_retrieval *fscache_get_retrieval(struct fscache_retrieval *op)
- {
--	atomic_inc(&op->op.usage);
-+	refcount_inc(&op->op.usage);
- 	return op;
+-	if (kn) {
+-		WARN_ON(!atomic_read(&kn->count));
+-		atomic_inc(&kn->count);
+-	}
++	if (kn)
++		refcount_inc(&kn->count);
  }
+ EXPORT_SYMBOL_GPL(kernfs_get);
  
+@@ -507,7 +505,7 @@ void kernfs_put(struct kernfs_node *kn)
+ 	struct kernfs_node *parent;
+ 	struct kernfs_root *root;
+ 
+-	if (!kn || !atomic_dec_and_test(&kn->count))
++	if (!kn || !refcount_dec_and_test(&kn->count))
+ 		return;
+ 	root = kernfs_root(kn);
+  repeat:
+@@ -538,7 +536,7 @@ void kernfs_put(struct kernfs_node *kn)
+ 
+ 	kn = parent;
+ 	if (kn) {
+-		if (atomic_dec_and_test(&kn->count))
++		if (refcount_dec_and_test(&kn->count))
+ 			goto repeat;
+ 	} else {
+ 		/* just released the root kn, free @root too */
+@@ -635,7 +633,7 @@ static struct kernfs_node *__kernfs_new_node(struct kernfs_root *root,
+ 		goto err_out2;
+ 	kn->ino = ret;
+ 
+-	atomic_set(&kn->count, 1);
++	refcount_set(&kn->count, 1);
+ 	atomic_set(&kn->active, KN_DEACTIVATED_BIAS);
+ 	RB_CLEAR_NODE(&kn->rb);
+ 
+diff --git a/include/linux/kernfs.h b/include/linux/kernfs.h
+index a9b11b8..baabbaf 100644
+--- a/include/linux/kernfs.h
++++ b/include/linux/kernfs.h
+@@ -15,6 +15,7 @@
+ #include <linux/lockdep.h>
+ #include <linux/rbtree.h>
+ #include <linux/atomic.h>
++#include <linux/refcount.h>
+ #include <linux/wait.h>
+ 
+ struct file;
+@@ -105,7 +106,7 @@ struct kernfs_elem_attr {
+  * active reference.
+  */
+ struct kernfs_node {
+-	atomic_t		count;
++	refcount_t		count;
+ 	atomic_t		active;
+ #ifdef CONFIG_DEBUG_LOCK_ALLOC
+ 	struct lockdep_map	dep_map;
 -- 
 2.7.4
 
