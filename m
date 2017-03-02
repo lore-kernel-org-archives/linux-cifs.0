@@ -1,22 +1,22 @@
-From: Elena Reshetova <elena.reshetova-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH 08/10] fs, fsnotify: convert fsnotify_group.refcnt from atomic_t to refcount_t
-Date: Thu,  2 Mar 2017 12:43:15 +0200
-Message-ID: <1488451397-3365-9-git-send-email-elena.reshetova@intel.com>
+From: Elena Reshetova <elena.reshetova@intel.com>
+Subject: [PATCH 04/10] fs, nilfs: convert nilfs_root.count from atomic_t to refcount_t
+Date: Thu,  2 Mar 2017 12:43:11 +0200
+Message-ID: <1488451397-3365-5-git-send-email-elena.reshetova@intel.com>
 References: <1488451397-3365-1-git-send-email-elena.reshetova@intel.com>
-Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nilfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-cachefs-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        peterz-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org, gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org,
-        viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
-        eparis-FjpueFixGhCM4zKIHC2jIg@public.gmane.org, konishi.ryusuke-Zyj7fXuS5i5L9jVzuh4AOg@public.gmane.org,
-        john-jueV0HHMeujJJrXXpGQQMAC/G2K4zDHf@public.gmane.org, rlove-L7G0xEPcOZbYtjvyW6yDsg@public.gmane.org, paul-r2n+y4ga6xFZroRs9YW3xA@public.gmane.org,
-        Elena Reshetova <elena.reshetova-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-        Hans Liljestrand <ishkamiel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Kees Cook <keescook-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>,
-        David Windsor <dwindsor-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-nilfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1488451397-3365-1-git-send-email-elena.reshetova-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Sender: linux-nilfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: linux-fsdevel@vger.kernel.org, linux-nilfs@vger.kernel.org,
+        linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
+        peterz@infradead.org, gregkh@linuxfoundation.org,
+        viro@zeniv.linux.org.uk, dhowells@redhat.com, sfrench@samba.org,
+        eparis@parisplace.org, konishi.ryusuke@lab.ntt.co.jp,
+        john@johnmccutchan.com, rlove@rlove.org, paul@paul-moore.com,
+        Elena Reshetova <elena.reshetova@intel.com>,
+        Hans Liljestrand <ishkamiel@gmail.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Windsor <dwindsor@gmail.com>
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <1488451397-3365-1-git-send-email-elena.reshetova@intel.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
 refcount_t type and corresponding API should be
@@ -25,71 +25,84 @@ a reference counter. This allows to avoid accidental
 refcounter overflows that might lead to use-after-free
 situations.
 
-Signed-off-by: Elena Reshetova <elena.reshetova-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Signed-off-by: Hans Liljestrand <ishkamiel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Signed-off-by: Kees Cook <keescook-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>
-Signed-off-by: David Windsor <dwindsor-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Signed-off-by: Elena Reshetova <elena.reshetova@intel.com>
+Signed-off-by: Hans Liljestrand <ishkamiel@gmail.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: David Windsor <dwindsor@gmail.com>
 ---
- fs/notify/group.c                | 6 +++---
- include/linux/fsnotify_backend.h | 3 ++-
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ fs/nilfs2/the_nilfs.c | 8 ++++----
+ fs/nilfs2/the_nilfs.h | 5 +++--
+ 2 files changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/fs/notify/group.c b/fs/notify/group.c
-index fbe3cbe..81356c1 100644
---- a/fs/notify/group.c
-+++ b/fs/notify/group.c
-@@ -98,7 +98,7 @@ void fsnotify_destroy_group(struct fsnotify_group *group)
-  */
- void fsnotify_get_group(struct fsnotify_group *group)
+diff --git a/fs/nilfs2/the_nilfs.c b/fs/nilfs2/the_nilfs.c
+index 2dd75bf..afebb50 100644
+--- a/fs/nilfs2/the_nilfs.c
++++ b/fs/nilfs2/the_nilfs.c
+@@ -737,7 +737,7 @@ struct nilfs_root *nilfs_lookup_root(struct the_nilfs *nilfs, __u64 cno)
+ 		} else if (cno > root->cno) {
+ 			n = n->rb_right;
+ 		} else {
+-			atomic_inc(&root->count);
++			refcount_inc(&root->count);
+ 			spin_unlock(&nilfs->ns_cptree_lock);
+ 			return root;
+ 		}
+@@ -776,7 +776,7 @@ nilfs_find_or_create_root(struct the_nilfs *nilfs, __u64 cno)
+ 		} else if (cno > root->cno) {
+ 			p = &(*p)->rb_right;
+ 		} else {
+-			atomic_inc(&root->count);
++			refcount_inc(&root->count);
+ 			spin_unlock(&nilfs->ns_cptree_lock);
+ 			kfree(new);
+ 			return root;
+@@ -786,7 +786,7 @@ nilfs_find_or_create_root(struct the_nilfs *nilfs, __u64 cno)
+ 	new->cno = cno;
+ 	new->ifile = NULL;
+ 	new->nilfs = nilfs;
+-	atomic_set(&new->count, 1);
++	refcount_set(&new->count, 1);
+ 	atomic64_set(&new->inodes_count, 0);
+ 	atomic64_set(&new->blocks_count, 0);
+ 
+@@ -806,7 +806,7 @@ nilfs_find_or_create_root(struct the_nilfs *nilfs, __u64 cno)
+ 
+ void nilfs_put_root(struct nilfs_root *root)
  {
--	atomic_inc(&group->refcnt);
-+	refcount_inc(&group->refcnt);
- }
+-	if (atomic_dec_and_test(&root->count)) {
++	if (refcount_dec_and_test(&root->count)) {
+ 		struct the_nilfs *nilfs = root->nilfs;
  
- /*
-@@ -106,7 +106,7 @@ void fsnotify_get_group(struct fsnotify_group *group)
-  */
- void fsnotify_put_group(struct fsnotify_group *group)
- {
--	if (atomic_dec_and_test(&group->refcnt))
-+	if (refcount_dec_and_test(&group->refcnt))
- 		fsnotify_final_destroy_group(group);
- }
- 
-@@ -122,7 +122,7 @@ struct fsnotify_group *fsnotify_alloc_group(const struct fsnotify_ops *ops)
- 		return ERR_PTR(-ENOMEM);
- 
- 	/* set to 0 when there a no external references to this group */
--	atomic_set(&group->refcnt, 1);
-+	refcount_set(&group->refcnt, 1);
- 	atomic_set(&group->num_marks, 0);
- 
- 	spin_lock_init(&group->notification_lock);
-diff --git a/include/linux/fsnotify_backend.h b/include/linux/fsnotify_backend.h
-index e6e689b..1f7aa16 100644
---- a/include/linux/fsnotify_backend.h
-+++ b/include/linux/fsnotify_backend.h
-@@ -17,6 +17,7 @@
- #include <linux/types.h>
- #include <linux/atomic.h>
- #include <linux/user_namespace.h>
+ 		nilfs_sysfs_delete_snapshot_group(root);
+diff --git a/fs/nilfs2/the_nilfs.h b/fs/nilfs2/the_nilfs.h
+index b305c6f..883d732 100644
+--- a/fs/nilfs2/the_nilfs.h
++++ b/fs/nilfs2/the_nilfs.h
+@@ -27,6 +27,7 @@
+ #include <linux/blkdev.h>
+ #include <linux/backing-dev.h>
+ #include <linux/slab.h>
 +#include <linux/refcount.h>
  
- /*
-  * IN_* from inotfy.h lines up EXACTLY with FS_*, this is so we can easily
-@@ -131,7 +132,7 @@ struct fsnotify_group {
- 	 * inotify_init() and the refcnt will hit 0 only when that fd has been
- 	 * closed.
- 	 */
--	atomic_t refcnt;		/* things with interest in this group */
-+	refcount_t refcnt;		/* things with interest in this group */
+ struct nilfs_sc_info;
+ struct nilfs_sysfs_dev_subgroups;
+@@ -246,7 +247,7 @@ struct nilfs_root {
+ 	__u64 cno;
+ 	struct rb_node rb_node;
  
- 	const struct fsnotify_ops *ops;	/* how this group handles things */
+-	atomic_t count;
++	refcount_t count;
+ 	struct the_nilfs *nilfs;
+ 	struct inode *ifile;
  
+@@ -299,7 +300,7 @@ void nilfs_swap_super_block(struct the_nilfs *);
+ 
+ static inline void nilfs_get_root(struct nilfs_root *root)
+ {
+-	atomic_inc(&root->count);
++	refcount_inc(&root->count);
+ }
+ 
+ static inline int nilfs_valid_fs(struct the_nilfs *nilfs)
 -- 
 2.7.4
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-nilfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
