@@ -1,7 +1,7 @@
 From: Elena Reshetova <elena.reshetova@intel.com>
-Subject: [PATCH 02/10] fs, cachefiles: convert cachefiles_object.usage from atomic_t to refcount_t
-Date: Thu,  2 Mar 2017 12:43:09 +0200
-Message-ID: <1488451397-3365-3-git-send-email-elena.reshetova@intel.com>
+Subject: [PATCH 06/10] fs, fscache: convert fscache_cache_tag.usage from atomic_t to refcount_t
+Date: Thu,  2 Mar 2017 12:43:13 +0200
+Message-ID: <1488451397-3365-7-git-send-email-elena.reshetova@intel.com>
 References: <1488451397-3365-1-git-send-email-elena.reshetova@intel.com>
 Cc: linux-fsdevel@vger.kernel.org, linux-nilfs@vger.kernel.org,
         linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
@@ -14,9 +14,9 @@ Cc: linux-fsdevel@vger.kernel.org, linux-nilfs@vger.kernel.org,
         Kees Cook <keescook@chromium.org>,
         David Windsor <dwindsor@gmail.com>
 To: linux-kernel@vger.kernel.org
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1488451397-3365-1-git-send-email-elena.reshetova@intel.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
 refcount_t type and corresponding API should be
@@ -30,124 +30,70 @@ Signed-off-by: Hans Liljestrand <ishkamiel@gmail.com>
 Signed-off-by: Kees Cook <keescook@chromium.org>
 Signed-off-by: David Windsor <dwindsor@gmail.com>
 ---
- fs/cachefiles/bind.c      |  2 +-
- fs/cachefiles/interface.c | 18 +++++++++---------
- fs/cachefiles/internal.h  |  3 ++-
- fs/cachefiles/namei.c     |  2 +-
- 4 files changed, 13 insertions(+), 12 deletions(-)
+ fs/fscache/cache.c            | 8 ++++----
+ include/linux/fscache-cache.h | 3 ++-
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/fs/cachefiles/bind.c b/fs/cachefiles/bind.c
-index 3ff867f..341864e 100644
---- a/fs/cachefiles/bind.c
-+++ b/fs/cachefiles/bind.c
-@@ -109,7 +109,7 @@ static int cachefiles_daemon_add_cache(struct cachefiles_cache *cache)
+diff --git a/fs/fscache/cache.c b/fs/fscache/cache.c
+index 56cce7f..ca6e282 100644
+--- a/fs/fscache/cache.c
++++ b/fs/fscache/cache.c
+@@ -33,7 +33,7 @@ struct fscache_cache_tag *__fscache_lookup_cache_tag(const char *name)
  
- 	ASSERTCMP(fsdef->backer, ==, NULL);
+ 	list_for_each_entry(tag, &fscache_cache_tag_list, link) {
+ 		if (strcmp(tag->name, name) == 0) {
+-			atomic_inc(&tag->usage);
++			refcount_inc(&tag->usage);
+ 			up_read(&fscache_addremove_sem);
+ 			return tag;
+ 		}
+@@ -47,7 +47,7 @@ struct fscache_cache_tag *__fscache_lookup_cache_tag(const char *name)
+ 		/* return a dummy tag if out of memory */
+ 		return ERR_PTR(-ENOMEM);
  
--	atomic_set(&fsdef->usage, 1);
-+	refcount_set(&fsdef->usage, 1);
- 	fsdef->type = FSCACHE_COOKIE_TYPE_INDEX;
+-	atomic_set(&xtag->usage, 1);
++	refcount_set(&xtag->usage, 1);
+ 	strcpy(xtag->name, name);
  
- 	_debug("- fsdef %p", fsdef);
-diff --git a/fs/cachefiles/interface.c b/fs/cachefiles/interface.c
-index e7f16a7..d3f87c3 100644
---- a/fs/cachefiles/interface.c
-+++ b/fs/cachefiles/interface.c
-@@ -51,7 +51,7 @@ static struct fscache_object *cachefiles_alloc_object(
- 	ASSERTCMP(object->backer, ==, NULL);
+ 	/* write lock, search again and add if still not present */
+@@ -55,7 +55,7 @@ struct fscache_cache_tag *__fscache_lookup_cache_tag(const char *name)
  
- 	BUG_ON(test_bit(CACHEFILES_OBJECT_ACTIVE, &object->flags));
--	atomic_set(&object->usage, 1);
-+	refcount_set(&object->usage, 1);
+ 	list_for_each_entry(tag, &fscache_cache_tag_list, link) {
+ 		if (strcmp(tag->name, name) == 0) {
+-			atomic_inc(&tag->usage);
++			refcount_inc(&tag->usage);
+ 			up_write(&fscache_addremove_sem);
+ 			kfree(xtag);
+ 			return tag;
+@@ -75,7 +75,7 @@ void __fscache_release_cache_tag(struct fscache_cache_tag *tag)
+ 	if (tag != ERR_PTR(-ENOMEM)) {
+ 		down_write(&fscache_addremove_sem);
  
- 	fscache_object_init(&object->fscache, cookie, &cache->cache);
- 
-@@ -182,13 +182,13 @@ struct fscache_object *cachefiles_grab_object(struct fscache_object *_object)
- 	struct cachefiles_object *object =
- 		container_of(_object, struct cachefiles_object, fscache);
- 
--	_enter("{OBJ%x,%d}", _object->debug_id, atomic_read(&object->usage));
-+	_enter("{OBJ%x,%d}", _object->debug_id, refcount_read(&object->usage));
- 
- #ifdef CACHEFILES_DEBUG_SLAB
--	ASSERT((atomic_read(&object->usage) & 0xffff0000) != 0x6b6b0000);
-+	ASSERT((refcount_read(&object->usage) & 0xffff0000) != 0x6b6b0000);
- #endif
- 
--	atomic_inc(&object->usage);
-+	refcount_inc(&object->usage);
- 	return &object->fscache;
- }
- 
-@@ -261,13 +261,13 @@ static void cachefiles_drop_object(struct fscache_object *_object)
- 	object = container_of(_object, struct cachefiles_object, fscache);
- 
- 	_enter("{OBJ%x,%d}",
--	       object->fscache.debug_id, atomic_read(&object->usage));
-+	       object->fscache.debug_id, refcount_read(&object->usage));
- 
- 	cache = container_of(object->fscache.cache,
- 			     struct cachefiles_cache, cache);
- 
- #ifdef CACHEFILES_DEBUG_SLAB
--	ASSERT((atomic_read(&object->usage) & 0xffff0000) != 0x6b6b0000);
-+	ASSERT((refcount_read(&object->usage) & 0xffff0000) != 0x6b6b0000);
- #endif
- 
- 	/* We need to tidy the object up if we did in fact manage to open it.
-@@ -319,16 +319,16 @@ static void cachefiles_put_object(struct fscache_object *_object)
- 	object = container_of(_object, struct cachefiles_object, fscache);
- 
- 	_enter("{OBJ%x,%d}",
--	       object->fscache.debug_id, atomic_read(&object->usage));
-+	       object->fscache.debug_id, refcount_read(&object->usage));
- 
- #ifdef CACHEFILES_DEBUG_SLAB
--	ASSERT((atomic_read(&object->usage) & 0xffff0000) != 0x6b6b0000);
-+	ASSERT((refcount_read(&object->usage) & 0xffff0000) != 0x6b6b0000);
- #endif
- 
- 	ASSERTIFCMP(object->fscache.parent,
- 		    object->fscache.parent->n_children, >, 0);
- 
--	if (atomic_dec_and_test(&object->usage)) {
-+	if (refcount_dec_and_test(&object->usage)) {
- 		_debug("- kill object OBJ%x", object->fscache.debug_id);
- 
- 		ASSERT(!test_bit(CACHEFILES_OBJECT_ACTIVE, &object->flags));
-diff --git a/fs/cachefiles/internal.h b/fs/cachefiles/internal.h
-index cd1effe..61771e6 100644
---- a/fs/cachefiles/internal.h
-+++ b/fs/cachefiles/internal.h
+-		if (atomic_dec_and_test(&tag->usage))
++		if (refcount_dec_and_test(&tag->usage))
+ 			list_del_init(&tag->link);
+ 		else
+ 			tag = NULL;
+diff --git a/include/linux/fscache-cache.h b/include/linux/fscache-cache.h
+index 4c467ef..dcec7b3 100644
+--- a/include/linux/fscache-cache.h
++++ b/include/linux/fscache-cache.h
 @@ -21,6 +21,7 @@
- #include <linux/wait.h>
+ #include <linux/fscache.h>
+ #include <linux/sched.h>
  #include <linux/workqueue.h>
- #include <linux/security.h>
 +#include <linux/refcount.h>
  
- struct cachefiles_cache;
- struct cachefiles_object;
-@@ -43,7 +44,7 @@ struct cachefiles_object {
- 	loff_t				i_size;		/* object size */
- 	unsigned long			flags;
- #define CACHEFILES_OBJECT_ACTIVE	0		/* T if marked active */
--	atomic_t			usage;		/* object usage count */
-+	refcount_t			usage;		/* object usage count */
- 	uint8_t				type;		/* object type */
- 	uint8_t				new;		/* T if object new */
- 	spinlock_t			work_lock;
-diff --git a/fs/cachefiles/namei.c b/fs/cachefiles/namei.c
-index 41df8a2..e3bc512 100644
---- a/fs/cachefiles/namei.c
-+++ b/fs/cachefiles/namei.c
-@@ -197,7 +197,7 @@ static int cachefiles_mark_object_active(struct cachefiles_cache *cache,
- 		cachefiles_printk_object(object, xobject);
- 		BUG();
- 	}
--	atomic_inc(&xobject->usage);
-+	refcount_inc(&xobject->usage);
- 	write_unlock(&cache->active_lock);
+ #define NR_MAXCACHES BITS_PER_LONG
  
- 	if (test_bit(CACHEFILES_OBJECT_ACTIVE, &xobject->flags)) {
+@@ -37,7 +38,7 @@ struct fscache_cache_tag {
+ 	struct fscache_cache	*cache;		/* cache referred to by this tag */
+ 	unsigned long		flags;
+ #define FSCACHE_TAG_RESERVED	0		/* T if tag is reserved for a cache */
+-	atomic_t		usage;
++	refcount_t		usage;
+ 	char			name[0];	/* tag name */
+ };
+ 
 -- 
 2.7.4
