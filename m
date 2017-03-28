@@ -1,7 +1,7 @@
 From: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 0/4] Various fixes and improvements for SMB CA
-Date: Wed, 29 Mar 2017 00:26:50 +0100
-Message-ID: <1490743614-5439-1-git-send-email-germano.percossi@citrix.com>
+Subject: [PATCH 4/4] CIFS: store results of cifs_reopen_file to avoid infinite wait
+Date: Wed, 29 Mar 2017 00:26:54 +0100
+Message-ID: <1490743614-5439-5-git-send-email-germano.percossi@citrix.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
@@ -11,56 +11,58 @@ Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This patches series is in increasing order of importance.
-SMB Continuous Availability is broken when the server replies
-with errors or unexpected packets during the reconnect phase.
+This fixes Continuous Availability when errors during
+file reopen are encountered.
 
-The first patch is a small improvement to align the reconnect
-thread with the other threads (e.g. echo) that are not queued
-immediately.
-In this case the value is set to 2 seconds but it could be configured
-using command line arguments, as it is done with echo_interval.
-If making it configurable is the best choice I'll be happy to do it.
+cifs_user_readv and cifs_user_writev would wait for ever if
+results of cifs_reopen_file are not stored and for later inspection.
 
-The second one will make the reconnect thread reschedule itself in
-case of errors.
-Doing this, reconnect does not need to wait for the echo thread for
-being rescheduled.
-In this case, too, there is no point in rushing the reconnection.
+In fact, results are checked and, in case of errors, a chain
+of function calls leading to reads and writes to be scheduled in
+a separate thread is skipped.
+These threads will wake up the corresponding waiters once reads
+and writes are done.
 
-The third one is to cope with STATUS_BAD_NETWORK_NAME sent by some
-servers during the node failover.
-This has been observed with some Microsoft Windows servers and
-Microsoft confirmed that this could be the case if reconnect requests
-happen within few seconds from the failover start.
-Previous patches were limiting the reconnection aggressiveness to
-limit the rate of errors during reconnect.
-Setting the flag during reconnect will make any other attempt fail,
-given nothing wil clear that flag.
-I did not see any case where retaining the flag is going to be useful:
-passing a bad share name during mount will fail regardless, while
-retaining it will cause problems to reconnect.
-I could be missing something, though.
+However, given the return value is not stored, when rc is checked
+for errors a previous one (always zero) is inspected instead.
+This leads to pending reads/writes added to the list, making
+cifs_user_readv and cifs_user_writev wait for ever.
 
-The fourth patch is clearly a bug fix preventing the user space program
-hang forever waiting for read and write events that will never come.
+Signed-off-by: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/file.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Patches are attached or available here on this branch
-https://github.com/germanop/linux/commits/fix-ca-reconnect
-
-As a side note, I think some of the return codes from cifs_reopen_file
-need to be revisited.
-
-Germano Percossi (4):
-  CIFS: queue 'reconnect' thread with a delay
-  CIFS: reconnect thread reschedule itself
-  CIFS: remove bad_network_name flag
-  CIFS: store results of cifs_reopen_file to avoid infinite wait
-
- fs/cifs/cifsglob.h |  1 -
- fs/cifs/file.c     |  6 +++---
- fs/cifs/smb2pdu.c  | 21 +++++++++++++--------
- 3 files changed, 16 insertions(+), 12 deletions(-)
-
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index aa3debb..21d4045 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -2597,7 +2597,7 @@ cifs_write_from_iter(loff_t offset, size_t len, struct iov_iter *from,
+ 		wdata->credits = credits;
+ 
+ 		if (!wdata->cfile->invalidHandle ||
+-		    !cifs_reopen_file(wdata->cfile, false))
++		    !(rc = cifs_reopen_file(wdata->cfile, false)))
+ 			rc = server->ops->async_writev(wdata,
+ 					cifs_uncached_writedata_release);
+ 		if (rc) {
+@@ -3022,7 +3022,7 @@ cifs_send_async_read(loff_t offset, size_t len, struct cifsFileInfo *open_file,
+ 		rdata->credits = credits;
+ 
+ 		if (!rdata->cfile->invalidHandle ||
+-		    !cifs_reopen_file(rdata->cfile, true))
++		    !(rc = cifs_reopen_file(rdata->cfile, true)))
+ 			rc = server->ops->async_readv(rdata);
+ error:
+ 		if (rc) {
+@@ -3617,7 +3617,7 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
+ 		}
+ 
+ 		if (!rdata->cfile->invalidHandle ||
+-		    !cifs_reopen_file(rdata->cfile, true))
++		    !(rc = cifs_reopen_file(rdata->cfile, true)))
+ 			rc = server->ops->async_readv(rdata);
+ 		if (rc) {
+ 			add_credits_and_wake_if(server, rdata->credits, 0);
 -- 
 2.7.4
