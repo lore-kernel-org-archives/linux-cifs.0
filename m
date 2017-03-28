@@ -1,7 +1,7 @@
 From: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 3/4] CIFS: remove bad_network_name flag
-Date: Wed, 29 Mar 2017 00:26:53 +0100
-Message-ID: <1490743614-5439-4-git-send-email-germano.percossi@citrix.com>
+Subject: [PATCH 1/4] CIFS: queue 'reconnect' thread with a delay
+Date: Wed, 29 Mar 2017 00:26:51 +0100
+Message-ID: <1490743614-5439-2-git-send-email-germano.percossi@citrix.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
@@ -11,59 +11,35 @@ Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-STATUS_BAD_NETWORK_NAME can be received during node failover,
-causing the flag to be set and making the reconnect thread
-always unsuccessful, thereafter.
-
-Once the only place where it is set is removed, the remaining
-bits are rendered moot.
-
-Removing it does not prevent "mount" from failing when a non
-existent share is passed.
-
-What happens when the share really ceases to exist while the
-share is mounted is undefined now as much as it was before.
+All the other threads are queue with a delay, no reason
+why this one need to be so aggressive.
 
 Signed-off-by: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsglob.h | 1 -
- fs/cifs/smb2pdu.c  | 5 -----
- 2 files changed, 6 deletions(-)
+ fs/cifs/smb2pdu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index c34bdb1..b04f107 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -947,7 +947,6 @@ struct cifs_tcon {
- 	bool use_persistent:1; /* use persistent instead of durable handles */
- #ifdef CONFIG_CIFS_SMB2
- 	bool print:1;		/* set if connection to printer share */
--	bool bad_network_name:1; /* set if ret status STATUS_BAD_NETWORK_NAME */
- 	__le32 capabilities;
- 	__u32 share_flags;
- 	__u32 maximal_access;
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 523e3f1..af388af 100644
+index 7446496..efe167c 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -1171,9 +1171,6 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
- 	else
- 		return -EIO;
+@@ -258,7 +258,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon)
+ 		goto out;
  
--	if (tcon && tcon->bad_network_name)
--		return -ENOENT;
--
- 	unc_path = kmalloc(MAX_SHARENAME_LENGTH * 2, GFP_KERNEL);
- 	if (unc_path == NULL)
- 		return -ENOMEM;
-@@ -1273,8 +1270,6 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
- tcon_error_exit:
- 	if (rsp->hdr.sync_hdr.Status == STATUS_BAD_NETWORK_NAME) {
- 		cifs_dbg(VFS, "BAD_NETWORK_NAME: %s\n", tree);
--		if (tcon)
--			tcon->bad_network_name = true;
+ 	if (smb2_command != SMB2_INTERNAL_CMD)
+-		queue_delayed_work(cifsiod_wq, &server->reconnect, 0);
++		queue_delayed_work(cifsiod_wq, &server->reconnect, 2 * HZ);
+ 
+ 	atomic_inc(&tconInfoReconnectCount);
+ out:
+@@ -2231,7 +2231,7 @@ SMB2_echo(struct TCP_Server_Info *server)
+ 
+ 	if (server->tcpStatus == CifsNeedNegotiate) {
+ 		/* No need to send echo on newly established connections */
+-		queue_delayed_work(cifsiod_wq, &server->reconnect, 0);
++		queue_delayed_work(cifsiod_wq, &server->reconnect, 2 * HZ);
+ 		return rc;
  	}
- 	goto tcon_exit;
- }
+ 
 -- 
 2.7.4
