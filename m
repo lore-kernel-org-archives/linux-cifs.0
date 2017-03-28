@@ -1,59 +1,39 @@
-From: Andrew Lunn <andrew-g2DYL2Zd6BY@public.gmane.org>
-Subject: [PATCH net-next 0/2] break include loop and dsa devlink support
-Date: Tue, 28 Mar 2017 23:45:05 +0200
-Message-ID: <1490737507-7864-1-git-send-email-andrew@lunn.ch>
+From: Florian Fainelli <f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH net-next 1/2] net: break include loop netdevice.h, dsa.h,
+ devlink.h
+Date: Tue, 28 Mar 2017 15:04:30 -0700
+Message-ID: <224a8890-5eaa-34cf-107b-70718a9c37e5@gmail.com>
+References: <1490737507-7864-1-git-send-email-andrew@lunn.ch>
+ <1490737507-7864-2-git-send-email-andrew@lunn.ch>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Cc: netdev <netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
         linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        Florian Fainelli <f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Vivien Didelot <vivien.didelot-4ysUXcep3aM1wj+D4I0NRVaTQe2KTcn/@public.gmane.org>,
-        Andrew Lunn <andrew-g2DYL2Zd6BY@public.gmane.org>
-To: David Miller <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>
+        Vivien Didelot <vivien.didelot-4ysUXcep3aM1wj+D4I0NRVaTQe2KTcn/@public.gmane.org>
+To: Andrew Lunn <andrew-g2DYL2Zd6BY@public.gmane.org>, David Miller <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1490737507-7864-2-git-send-email-andrew-g2DYL2Zd6BY@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-These two patches add very basic support for devlink to DSA, in
-preparation for playing with dpipe.
+On 03/28/2017 02:45 PM, Andrew Lunn wrote:
+> There is an include loop between netdevice.h, dsa.h, devlink.h because
+> of NETDEV_ALIGN, making it impossible to use devlink structures in
+> dsa.h.
+> 
+> Break this loop by taking dsa.h out of netdevice.h, add a forward
+> declaration of dsa_switch_tree and netdev_set_default_ethtool_ops()
+> function, which is what netdevice.h requires.
+> 
+> No longer having dsa.h in netdevice.h means the includes in dsa.h no
+> longer get included. This breaks a few other files which depend on
+> these includes. Add these directly in the affected file.
+> 
+> Signed-off-by: Andrew Lunn <andrew-g2DYL2Zd6BY@public.gmane.org>
 
-The first patch is needed to break an include loop between
-netdevice.h, dsa.h and devlink.h. We need to remove dsa.h from
-netdevice.h. As a result, some files fail to compile, because they
-require includes pulled in via dsa.h. So this patch adds a number of
-includes in various places. The majority is within the network
-subsystem, but cifs also needs a few fixes.
+Woah, thanks for doing this!
 
-0-day has been chewing on this for over a day now, and not found any
-breakage. But Arnd's randconfig might uncover something.
-
-Andrew Lunn (2):
-  net: break include loop netdevice.h, dsa.h, devlink.h
-  net: dsa: dsa2: Add basic support of devlink
-
- drivers/net/dsa/bcm_sf2_cfp.c                    |  3 +-
- drivers/net/dsa/mv88e6xxx/mv88e6xxx.h            |  1 +
- drivers/net/ethernet/broadcom/bcmsysport.c       |  1 +
- drivers/net/ethernet/freescale/fman/fman_memac.h |  1 +
- drivers/net/ethernet/hisilicon/hns/hnae.c        |  2 +-
- drivers/net/ieee802154/mrf24j40.c                |  1 +
- drivers/net/phy/smsc.c                           |  1 +
- drivers/net/usb/lan78xx.c                        |  1 +
- fs/cifs/cifsfs.c                                 |  1 +
- fs/cifs/connect.c                                |  1 +
- fs/cifs/smb2pdu.c                                |  1 +
- include/linux/netdevice.h                        | 12 +-----
- include/net/dsa.h                                | 14 +++++++
- net/bridge/br_if.c                               |  1 +
- net/core/netprio_cgroup.c                        |  1 +
- net/dsa/dsa.c                                    |  3 +-
- net/dsa/dsa2.c                                   | 50 ++++++++++++++++++++++--
- net/dsa/slave.c                                  |  1 +
- net/dsa/tag_brcm.c                               |  1 +
- net/dsa/tag_dsa.c                                |  1 +
- net/dsa/tag_edsa.c                               |  1 +
- net/dsa/tag_qca.c                                |  1 +
- net/dsa/tag_trailer.c                            |  1 +
- net/ipv4/ipconfig.c                              |  1 +
- 24 files changed, 86 insertions(+), 16 deletions(-)
-
--- 
-2.11.0
+Reviewed-by: Florian Fainelli <f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+--
+Florian
