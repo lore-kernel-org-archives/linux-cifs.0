@@ -1,39 +1,115 @@
-From: Andrew Lunn <andrew-g2DYL2Zd6BY@public.gmane.org>
-Subject: Re: [PATCH net-next 2/2] net: dsa: dsa2: Add basic support of devlink
-Date: Wed, 29 Mar 2017 19:36:24 +0200
-Message-ID: <20170329173624.GE7942@lunn.ch>
-References: <1490737507-7864-1-git-send-email-andrew@lunn.ch>
- <1490737507-7864-3-git-send-email-andrew@lunn.ch>
- <2fe7ffc9-1bf1-537a-e361-33156a6f5a07@gmail.com>
- <20170329013112.GF3152@lunn.ch>
- <c844a885-cfd3-4358-89dd-c619d3d394e4@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: David Miller <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        netdev <netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
-        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        Vivien Didelot <vivien.didelot-4ysUXcep3aM1wj+D4I0NRVaTQe2KTcn/@public.gmane.org>
-To: Florian Fainelli <f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <c844a885-cfd3-4358-89dd-c619d3d394e4-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Eric Biggers <ebiggers-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] KEYS: make keyctl_invalidate() also require Setattr permission
+Date: Wed, 29 Mar 2017 15:01:01 -0700
+Message-ID: <20170329220101.26067-1-ebiggers@google.com>
+Cc: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fscrypt-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Gwendal Grignou <gwendal-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>,
+        Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Richard Weinberger <richard-/L3Ra7n9ekc@public.gmane.org>,
+        Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>, stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-> Tangential question: we do not currently report to user space what kind
-> of switch tagging protocol is used (DSA, eDSA etc.) I was going to add a
-> sysfs attribute for that under the switch device's directory, but maybe
-> devlink would be more appropriate for that?
+Currently, a process only needs Search permission on a key to invalidate
+it with keyctl_invalidate(), which has an effect similar to unlinking it
+from all keyrings.  Unfortunately, this significantly compromises the
+keys permission system because as a result, there is no way to grant
+read-only access to keys without also granting de-facto "delete" access.
+Even worse, processes may invalidate entire _keyrings_, given only
+permission to "search" them.
 
-We don't report it. What are you thinking you want to do with this
-information?
+Key invalidation seems to have intended for cases where keyrings are
+used as caches, and keys can be re-requested at any time by an upcall to
+/sbin/request-key.  However, keyrings are not always used in this way.
+For example, users of ext4, f2fs, and ubifs encryption may wish to grant
+many differently-privileged processes access to the same keys, set up in
+a shared keyring ahead of time.  Permitting everyone to invalidate keys
+in this scenario enables a trivial denial-of-service.  And even users of
+keyrings as "just caches" may wish to restrict invalidation because it
+may require significant work or user interaction to regenerate keys.
 
-I suppose it might be possible to teach libpcap/tcpdump about it, so
-it can slide in an additional dissector. EDSA you can detect anyway,
-since it uses a well know Ethertype. tcpdump already supports
-this. But the other tag protocols cannot be detected.
+This patch fixes the flaw by requiring both Search and Setattr
+permission to invalidate a key rather than just Search permission.
+Requiring Setattr permission is appropriate because Setattr permission
+also allows revoking (via keyctl_revoke()) or expiring (via
+keyctl_set_timeout()) the key, which also make the key inaccessible
+regardless of how many keyrings it is in.  Continuing to require Search
+permission ensures we do not decrease the level of permissions required.
 
-devlink does seem like a good candidate for this, make it part of the
-port type.
+The problem could also be solved by requiring Write permission, but this
+would arguably be less relevant because Write is supposed to deal with
+the key payload, not the key itself.  A new "Invalidate" permission
+would also work but would require keyctl_setperm() users to start
+including a new permission which never existed before.
 
-     Andrew
+This is a user-visible API change.  But we don't seem to have much
+choice, and any breakage will be limited to users who override the
+default key permissions using keyctl_setperm() to remove Setattr
+permission, then later call keyctl_invalidate().  There are probably not
+many such users, possibly even none at all.  In fact, the only user of
+keyctl_invalidate() I could find is nfsidmap, which will be unaffected
+because it relies on the "root is permitted to invalidate certain
+special keys" exception rather than the actual key permissions.
+
+Cc: linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: linux-fscrypt-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: Gwendal Grignou <gwendal-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>
+Cc: Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Cc: Richard Weinberger <richard-/L3Ra7n9ekc@public.gmane.org>
+Cc: Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>
+Cc: stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org # v3.5+
+Signed-off-by: Eric Biggers <ebiggers-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>
+---
+ Documentation/security/keys.txt | 4 ++--
+ security/keys/keyctl.c          | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/Documentation/security/keys.txt b/Documentation/security/keys.txt
+index 0e03baf271bd..b167f352c043 100644
+--- a/Documentation/security/keys.txt
++++ b/Documentation/security/keys.txt
+@@ -820,8 +820,8 @@ The keyctl syscall functions are:
+      immediately, though they are still visible in /proc/keys until deleted
+      (they're marked with an 'i' flag).
+ 
+-     A process must have search permission on the key for this function to be
+-     successful.
++     A process must have Search and Setattr permission on the key for this
++     function to be successful.
+ 
+  (*) Compute a Diffie-Hellman shared secret or public key
+ 
+diff --git a/security/keys/keyctl.c b/security/keys/keyctl.c
+index 52c34532c785..c58674710251 100644
+--- a/security/keys/keyctl.c
++++ b/security/keys/keyctl.c
+@@ -397,7 +397,7 @@ long keyctl_revoke_key(key_serial_t id)
+ /*
+  * Invalidate a key.
+  *
+- * The key must be grant the caller Invalidate permission for this to work.
++ * The key must grant the caller Search and Setattr permission for this to work.
+  * The key and any links to the key will be automatically garbage collected
+  * immediately.
+  *
+@@ -413,7 +413,7 @@ long keyctl_invalidate_key(key_serial_t id)
+ 
+ 	kenter("%d", id);
+ 
+-	key_ref = lookup_user_key(id, 0, KEY_NEED_SEARCH);
++	key_ref = lookup_user_key(id, 0, KEY_NEED_SEARCH | KEY_NEED_SETATTR);
+ 	if (IS_ERR(key_ref)) {
+ 		ret = PTR_ERR(key_ref);
+ 
+-- 
+2.12.2.564.g063fe858b8-goog
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
