@@ -1,59 +1,36 @@
-From: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 2/4] CIFS: reconnect thread reschedule itself
-Date: Wed, 29 Mar 2017 00:26:52 +0100
-Message-ID: <1490743614-5439-3-git-send-email-germano.percossi@citrix.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+Subject: Re: [PATCH net-next 2/2] net: dsa: dsa2: Add basic support of devlink
+Date: Tue, 28 Mar 2017 17:33:18 -0700
+Message-ID: <2fe7ffc9-1bf1-537a-e361-33156a6f5a07@gmail.com>
+References: <1490737507-7864-1-git-send-email-andrew@lunn.ch>
+ <1490737507-7864-3-git-send-email-andrew@lunn.ch>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: netdev <netdev@vger.kernel.org>, sfrench@samba.org,
+        linux-cifs@vger.kernel.org,
+        Vivien Didelot <vivien.didelot@savoirfairelinux.com>
+To: Andrew Lunn <andrew@lunn.ch>, David Miller <davem@davemloft.net>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <1490737507-7864-3-git-send-email-andrew@lunn.ch>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-In case of error, smb2_reconnect_server reschedule itself
-with a delay, to avoid being too aggressive.
+On 03/28/2017 02:45 PM, Andrew Lunn wrote:
+> Register the switch and its ports with devlink.
+> 
+> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
 
-Signed-off-by: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/smb2pdu.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
+Tested-by: Florian Fainelli <f.fainelli@gmail.com>
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index efe167c..523e3f1 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -2177,6 +2177,9 @@ void smb2_reconnect_server(struct work_struct *work)
- 	struct cifs_tcon *tcon, *tcon2;
- 	struct list_head tmp_list;
- 	int tcon_exist = false;
-+	int rc;
-+	int resched = false;
-+
- 
- 	/* Prevent simultaneous reconnects that can corrupt tcon->rlist list */
- 	mutex_lock(&server->reconnect_mutex);
-@@ -2204,13 +2207,20 @@ void smb2_reconnect_server(struct work_struct *work)
- 	spin_unlock(&cifs_tcp_ses_lock);
- 
- 	list_for_each_entry_safe(tcon, tcon2, &tmp_list, rlist) {
--		if (!smb2_reconnect(SMB2_INTERNAL_CMD, tcon))
-+		rc = smb2_reconnect(SMB2_INTERNAL_CMD, tcon);
-+		if (!rc) {
- 			cifs_reopen_persistent_handles(tcon);
-+		} else {
-+			resched = true;
-+		}
- 		list_del_init(&tcon->rlist);
- 		cifs_put_tcon(tcon);
- 	}
- 
- 	cifs_dbg(FYI, "Reconnecting tcons finished\n");
-+	if (resched) {
-+		queue_delayed_work(cifsiod_wq, &server->reconnect, 2 * HZ);
-+	}
- 	mutex_unlock(&server->reconnect_mutex);
- 
- 	/* now we can safely release srv struct */
+root@net-vm:~# devlink -p port
+mdio_bus/fixed-0:1f/0: type eth netdev lan1
+mdio_bus/fixed-0:1f/1: type eth netdev lan2
+mdio_bus/fixed-0:1f/2: type eth netdev lan3
+mdio_bus/fixed-0:1f/3: type eth netdev lan4
+mdio_bus/fixed-0:1f/5: type notset
+root@net-vm:~# devlink -p dev
+mdio_bus/fixed-0:1f
 -- 
-2.7.4
+Florian
