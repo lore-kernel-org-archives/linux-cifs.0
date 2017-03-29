@@ -1,49 +1,34 @@
-From: Andrew Lunn <andrew-g2DYL2Zd6BY@public.gmane.org>
-Subject: Re: [PATCH net-next 2/2] net: dsa: dsa2: Add basic support of devlink
-Date: Wed, 29 Mar 2017 03:31:12 +0200
-Message-ID: <20170329013112.GF3152@lunn.ch>
+From: David Miller <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>
+Subject: Re: [PATCH net-next 0/2] break include loop and dsa devlink support
+Date: Tue, 28 Mar 2017 22:46:20 -0700 (PDT)
+Message-ID: <20170328.224620.578507195105981119.davem@davemloft.net>
 References: <1490737507-7864-1-git-send-email-andrew@lunn.ch>
- <1490737507-7864-3-git-send-email-andrew@lunn.ch>
- <2fe7ffc9-1bf1-537a-e361-33156a6f5a07@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: David Miller <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        netdev <netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
-        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        Vivien Didelot <vivien.didelot-4ysUXcep3aM1wj+D4I0NRVaTQe2KTcn/@public.gmane.org>
-To: Florian Fainelli <f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
+        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+        vivien.didelot-4ysUXcep3aM1wj+D4I0NRVaTQe2KTcn/@public.gmane.org
+To: andrew-g2DYL2Zd6BY@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <2fe7ffc9-1bf1-537a-e361-33156a6f5a07-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <1490737507-7864-1-git-send-email-andrew-g2DYL2Zd6BY@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Mar 28, 2017 at 05:33:18PM -0700, Florian Fainelli wrote:
-> On 03/28/2017 02:45 PM, Andrew Lunn wrote:
-> > Register the switch and its ports with devlink.
-> > 
-> > Signed-off-by: Andrew Lunn <andrew-g2DYL2Zd6BY@public.gmane.org>
+From: Andrew Lunn <andrew-g2DYL2Zd6BY@public.gmane.org>
+Date: Tue, 28 Mar 2017 23:45:05 +0200
+
+> These two patches add very basic support for devlink to DSA, in
+> preparation for playing with dpipe.
 > 
-> Reviewed-by: Florian Fainelli <f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> Tested-by: Florian Fainelli <f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> The first patch is needed to break an include loop between
+> netdevice.h, dsa.h and devlink.h. We need to remove dsa.h from
+> netdevice.h. As a result, some files fail to compile, because they
+> require includes pulled in via dsa.h. So this patch adds a number of
+> includes in various places. The majority is within the network
+> subsystem, but cifs also needs a few fixes.
 > 
-> root@net-vm:~# devlink -p port
-> mdio_bus/fixed-0:1f/0: type eth netdev lan1
-> mdio_bus/fixed-0:1f/1: type eth netdev lan2
-> mdio_bus/fixed-0:1f/2: type eth netdev lan3
-> mdio_bus/fixed-0:1f/3: type eth netdev lan4
-> mdio_bus/fixed-0:1f/5: type notset
-> root@net-vm:~# devlink -p dev
-> mdio_bus/fixed-0:1f
+> 0-day has been chewing on this for over a day now, and not found any
+> breakage. But Arnd's randconfig might uncover something.
 
-Thanks Florian
-
-I have another patch somewhere which adds new types for CPU and DSA
-ports. Once these 2 patches have landed, and the reports of broken
-builds stop, i will dig it out.
-
-But my main priority at the moment is to play with dpipe and make sure
-it can represent tables we have in DSA switches, before the Binary API
-is frozen.
-
-       Andrew
+Looks good, series applied, thanks.
