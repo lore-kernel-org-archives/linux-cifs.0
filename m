@@ -1,163 +1,107 @@
-From: Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>
-Subject: [PATCH 04/25] fs: Provide infrastructure for dynamic
-	BDIs in filesystems
-Date: Wed, 29 Mar 2017 12:56:02 +0200
-Message-ID: <20170329105623.18241-5-jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+Subject: [PATCH 10/25] cifs: Convert to separately allocated bdi
+Date: Wed, 29 Mar 2017 12:56:08 +0200
+Message-ID: <20170329105623.18241-11-jack@suse.cz>
 References: <20170329105623.18241-1-jack@suse.cz>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-nilfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, ecryptfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	codalist-/uMB558Y47wP4a1z8dhFYw@public.gmane.org, linux-block-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
-	osd-dev-yNzVSZO3znNg9hUCZPvPmw@public.gmane.org, v9fs-developer-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
-	ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Petr Vandrovec <petr-vPk2MGR0e28uaRcfnNAh7A@public.gmane.org>,
-	linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-btrfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	lustre-devel-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org
-To: <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <lustre-devel-bounces-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org>
-In-Reply-To: <20170329105623.18241-1-jack-AlSwsSmVLrQ@public.gmane.org>
-List-Unsubscribe: <http://lists.lustre.org/options.cgi/lustre-devel-lustre.org>,
-	<mailto:lustre-devel-request-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.lustre.org/pipermail/lustre-devel-lustre.org/>
-List-Post: <mailto:lustre-devel-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org>
-List-Help: <mailto:lustre-devel-request-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org?subject=help>
-List-Subscribe: <http://lists.lustre.org/listinfo.cgi/lustre-devel-lustre.org>,
-	<mailto:lustre-devel-request-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org?subject=subscribe>
-Errors-To: lustre-devel-bounces-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org
-Sender: "lustre-devel" <lustre-devel-bounces-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Jan Kara <jack@suse.cz>, Steve French <sfrench@samba.org>,
+        linux-cifs@vger.kernel.org
+To: <linux-fsdevel@vger.kernel.org>
+Return-path: <linux-block-owner@vger.kernel.org>
+In-Reply-To: <20170329105623.18241-1-jack@suse.cz>
+Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Provide helper functions for setting up dynamically allocated
-backing_dev_info structures for filesystems and cleaning them up on
-superblock destruction.
+Allocate struct backing_dev_info separately instead of embedding it
+inside superblock. This unifies handling of bdi among users.
 
-CC: linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-CC: linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-CC: Petr Vandrovec <petr-vPk2MGR0e28uaRcfnNAh7A@public.gmane.org>
-CC: linux-nilfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-CC: cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-CC: osd-dev-yNzVSZO3znNg9hUCZPvPmw@public.gmane.org
-CC: codalist-/uMB558Y47wP4a1z8dhFYw@public.gmane.org
-CC: linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-CC: ecryptfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-CC: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-CC: ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-CC: linux-btrfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-CC: v9fs-developer-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org
-CC: lustre-devel-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org
-Signed-off-by: Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>
+CC: Steve French <sfrench@samba.org>
+CC: linux-cifs@vger.kernel.org
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- fs/super.c                       | 49 ++++++++++++++++++++++++++++++++++++++++
- include/linux/backing-dev-defs.h |  2 +-
- include/linux/fs.h               |  6 +++++
- 3 files changed, 56 insertions(+), 1 deletion(-)
+ fs/cifs/cifs_fs_sb.h |  1 -
+ fs/cifs/cifsfs.c     |  7 ++++++-
+ fs/cifs/connect.c    | 10 ----------
+ 3 files changed, 6 insertions(+), 12 deletions(-)
 
-diff --git a/fs/super.c b/fs/super.c
-index b8b6a086c03b..0f51a437c269 100644
---- a/fs/super.c
-+++ b/fs/super.c
-@@ -446,6 +446,11 @@ void generic_shutdown_super(struct super_block *sb)
- 	hlist_del_init(&sb->s_instances);
- 	spin_unlock(&sb_lock);
- 	up_write(&sb->s_umount);
-+	if (sb->s_iflags & SB_I_DYNBDI) {
-+		bdi_put(sb->s_bdi);
-+		sb->s_bdi = &noop_backing_dev_info;
-+		sb->s_iflags &= ~SB_I_DYNBDI;
-+	}
- }
+diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+index 07ed81cf1552..cbd216b57239 100644
+--- a/fs/cifs/cifs_fs_sb.h
++++ b/fs/cifs/cifs_fs_sb.h
+@@ -68,7 +68,6 @@ struct cifs_sb_info {
+ 	umode_t	mnt_dir_mode;
+ 	unsigned int mnt_cifs_flags;
+ 	char   *mountdata; /* options received at mount time or via DFS refs */
+-	struct backing_dev_info bdi;
+ 	struct delayed_work prune_tlinks;
+ 	struct rcu_head rcu;
+ 	char *prepath;
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 15e1db8738ae..502eab6bdbc4 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -138,7 +138,12 @@ cifs_read_super(struct super_block *sb)
+ 	sb->s_magic = CIFS_MAGIC_NUMBER;
+ 	sb->s_op = &cifs_super_ops;
+ 	sb->s_xattr = cifs_xattr_handlers;
+-	sb->s_bdi = &cifs_sb->bdi;
++	rc = super_setup_bdi(sb);
++	if (rc)
++		goto out_no_root;
++	/* tune readahead according to rsize */
++	sb->s_bdi->ra_pages = cifs_sb->rsize / PAGE_SIZE;
++
+ 	sb->s_blocksize = CIFS_MAX_MSGSIZE;
+ 	sb->s_blocksize_bits = 14;	/* default 2**14 = CIFS_MAX_MSGSIZE */
+ 	inode = cifs_root_iget(sb);
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 9ae695ae3ed7..7f50c8949401 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -3683,10 +3683,6 @@ cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *volume_info)
+ 	int referral_walks_count = 0;
+ #endif
  
- EXPORT_SYMBOL(generic_shutdown_super);
-@@ -1256,6 +1261,50 @@ mount_fs(struct file_system_type *type, int flags, const char *name, void *data)
- }
+-	rc = bdi_setup_and_register(&cifs_sb->bdi, "cifs");
+-	if (rc)
+-		return rc;
+-
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ try_mount_again:
+ 	/* cleanup activities if we're chasing a referral */
+@@ -3714,7 +3710,6 @@ cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *volume_info)
+ 	server = cifs_get_tcp_session(volume_info);
+ 	if (IS_ERR(server)) {
+ 		rc = PTR_ERR(server);
+-		bdi_destroy(&cifs_sb->bdi);
+ 		goto out;
+ 	}
+ 	if ((volume_info->max_credits < 20) ||
+@@ -3768,9 +3763,6 @@ cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *volume_info)
+ 	cifs_sb->wsize = server->ops->negotiate_wsize(tcon, volume_info);
+ 	cifs_sb->rsize = server->ops->negotiate_rsize(tcon, volume_info);
  
- /*
-+ * Setup private BDI for given superblock. It gets automatically cleaned up
-+ * in generic_shutdown_super().
-+ */
-+int super_setup_bdi_name(struct super_block *sb, char *fmt, ...)
-+{
-+	struct backing_dev_info *bdi;
-+	int err;
-+	va_list args;
-+
-+	bdi = bdi_alloc(GFP_KERNEL);
-+	if (!bdi)
-+		return -ENOMEM;
-+
-+	bdi->name = sb->s_type->name;
-+
-+	va_start(args, fmt);
-+	err = bdi_register_va(bdi, NULL, fmt, args);
-+	va_end(args);
-+	if (err) {
-+		bdi_put(bdi);
-+		return err;
-+	}
-+	WARN_ON(sb->s_bdi != &noop_backing_dev_info);
-+	sb->s_bdi = bdi;
-+	sb->s_iflags |= SB_I_DYNBDI;
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL(super_setup_bdi_name);
-+
-+/*
-+ * Setup private BDI for given superblock. I gets automatically cleaned up
-+ * in generic_shutdown_super().
-+ */
-+int super_setup_bdi(struct super_block *sb)
-+{
-+	static atomic_long_t bdi_seq = ATOMIC_LONG_INIT(0);
-+
-+	return super_setup_bdi_name(sb, "%.28s-%ld", sb->s_type->name,
-+				    atomic_long_inc_return(&bdi_seq));
-+}
-+EXPORT_SYMBOL(super_setup_bdi);
-+
-+/*
-  * This is an internal function, please use sb_end_{write,pagefault,intwrite}
-  * instead.
-  */
-diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
-index e66d4722db8e..866c433e7d32 100644
---- a/include/linux/backing-dev-defs.h
-+++ b/include/linux/backing-dev-defs.h
-@@ -146,7 +146,7 @@ struct backing_dev_info {
- 	congested_fn *congested_fn; /* Function pointer if device is md/dm */
- 	void *congested_data;	/* Pointer to aux data for congested func */
+-	/* tune readahead according to rsize */
+-	cifs_sb->bdi.ra_pages = cifs_sb->rsize / PAGE_SIZE;
+-
+ remote_path_check:
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ 	/*
+@@ -3887,7 +3879,6 @@ cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *volume_info)
+ 			cifs_put_smb_ses(ses);
+ 		else
+ 			cifs_put_tcp_session(server, 0);
+-		bdi_destroy(&cifs_sb->bdi);
+ 	}
  
--	char *name;
-+	const char *name;
+ out:
+@@ -4090,7 +4081,6 @@ cifs_umount(struct cifs_sb_info *cifs_sb)
+ 	}
+ 	spin_unlock(&cifs_sb->tlink_tree_lock);
  
- 	struct kref refcnt;	/* Reference counter for the structure */
- 	unsigned int capabilities; /* Device capabilities */
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 7251f7bb45e8..98cf14ea78c0 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -1272,6 +1272,9 @@ struct mm_struct;
- /* sb->s_iflags to limit user namespace mounts */
- #define SB_I_USERNS_VISIBLE		0x00000010 /* fstype already mounted */
- 
-+/* Temporary flag until all filesystems are converted to dynamic bdis */
-+#define SB_I_DYNBDI	0x00000100
-+
- /* Possible states of 'frozen' field */
- enum {
- 	SB_UNFROZEN = 0,		/* FS is unfrozen */
-@@ -2121,6 +2124,9 @@ extern int vfs_ustat(dev_t, struct kstatfs *);
- extern int freeze_super(struct super_block *super);
- extern int thaw_super(struct super_block *super);
- extern bool our_mnt(struct vfsmount *mnt);
-+extern __printf(2, 3)
-+int super_setup_bdi_name(struct super_block *sb, char *fmt, ...);
-+extern int super_setup_bdi(struct super_block *sb);
- 
- extern int current_umask(void);
- 
+-	bdi_destroy(&cifs_sb->bdi);
+ 	kfree(cifs_sb->mountdata);
+ 	kfree(cifs_sb->prepath);
+ 	call_rcu(&cifs_sb->rcu, delayed_free);
 -- 
 2.10.2
