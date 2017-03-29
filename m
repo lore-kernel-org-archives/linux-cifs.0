@@ -1,34 +1,54 @@
-From: David Miller <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>
-Subject: Re: [PATCH net-next 0/2] break include loop and dsa devlink support
-Date: Tue, 28 Mar 2017 22:46:20 -0700 (PDT)
-Message-ID: <20170328.224620.578507195105981119.davem@davemloft.net>
-References: <1490737507-7864-1-git-send-email-andrew@lunn.ch>
+From: Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>
+Subject: [PATCH 0/25 v2] fs: Convert all embedded bdis into
+	separate ones
+Date: Wed, 29 Mar 2017 12:55:58 +0200
+Message-ID: <20170329105623.18241-1-jack@suse.cz>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
-        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-        vivien.didelot-4ysUXcep3aM1wj+D4I0NRVaTQe2KTcn/@public.gmane.org
-To: andrew-g2DYL2Zd6BY@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1490737507-7864-1-git-send-email-andrew-g2DYL2Zd6BY@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nilfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, ecryptfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	codalist-/uMB558Y47wP4a1z8dhFYw@public.gmane.org, linux-block-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	osd-dev-yNzVSZO3znNg9hUCZPvPmw@public.gmane.org, v9fs-developer-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
+	ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Petr Vandrovec <petr-vPk2MGR0e28uaRcfnNAh7A@public.gmane.org>,
+	linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-btrfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	lustre-devel-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org
+To: <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <lustre-devel-bounces-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org>
+List-Unsubscribe: <http://lists.lustre.org/options.cgi/lustre-devel-lustre.org>,
+	<mailto:lustre-devel-request-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.lustre.org/pipermail/lustre-devel-lustre.org/>
+List-Post: <mailto:lustre-devel-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org>
+List-Help: <mailto:lustre-devel-request-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org?subject=help>
+List-Subscribe: <http://lists.lustre.org/listinfo.cgi/lustre-devel-lustre.org>,
+	<mailto:lustre-devel-request-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org?subject=subscribe>
+Errors-To: lustre-devel-bounces-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org
+Sender: "lustre-devel" <lustre-devel-bounces-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org>
+List-Id: linux-cifs.vger.kernel.org
 
-From: Andrew Lunn <andrew-g2DYL2Zd6BY@public.gmane.org>
-Date: Tue, 28 Mar 2017 23:45:05 +0200
+Hello,
 
-> These two patches add very basic support for devlink to DSA, in
-> preparation for playing with dpipe.
-> 
-> The first patch is needed to break an include loop between
-> netdevice.h, dsa.h and devlink.h. We need to remove dsa.h from
-> netdevice.h. As a result, some files fail to compile, because they
-> require includes pulled in via dsa.h. So this patch adds a number of
-> includes in various places. The majority is within the network
-> subsystem, but cifs also needs a few fixes.
-> 
-> 0-day has been chewing on this for over a day now, and not found any
-> breakage. But Arnd's randconfig might uncover something.
+this is the second revision of the patch series which converts all embedded
+occurences of struct backing_dev_info to use standalone dynamically allocated
+structures. This makes bdi handling unified across all bdi users and generally
+removes some boilerplate code from filesystems setting up their own bdi. It
+also allows us to remove some code from generic bdi implementation.
 
-Looks good, series applied, thanks.
+The patches were only compile-tested for most filesystems (I've tested
+mounting only for NFS & btrfs) so fs maintainers please have a look whether
+the changes look sound to you.
+
+This series is based on top of bdi fixes that were merged into linux-block
+git tree into for-next branch. I have pushed out the result as a branch to
+
+git://git.kernel.org/pub/scm/linux/kernel/git/jack/linux-fs.git bdi
+
+Changes since v1:
+* Added some acks
+* Added further FUSE cleanup patch
+* Added removal of unused argument to bdi_register()
+* Fixed up some compilation failures spotted by 0-day testing
+
+								Honza
