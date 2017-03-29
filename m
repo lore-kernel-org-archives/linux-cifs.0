@@ -1,58 +1,39 @@
-From: Florian Fainelli <f.fainelli@gmail.com>
+From: Andrew Lunn <andrew-g2DYL2Zd6BY@public.gmane.org>
 Subject: Re: [PATCH net-next 2/2] net: dsa: dsa2: Add basic support of devlink
-Date: Wed, 29 Mar 2017 10:29:07 -0700
-Message-ID: <c844a885-cfd3-4358-89dd-c619d3d394e4@gmail.com>
+Date: Wed, 29 Mar 2017 19:36:24 +0200
+Message-ID: <20170329173624.GE7942@lunn.ch>
 References: <1490737507-7864-1-git-send-email-andrew@lunn.ch>
  <1490737507-7864-3-git-send-email-andrew@lunn.ch>
  <2fe7ffc9-1bf1-537a-e361-33156a6f5a07@gmail.com>
  <20170329013112.GF3152@lunn.ch>
+ <c844a885-cfd3-4358-89dd-c619d3d394e4@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: David Miller <davem@davemloft.net>,
-        netdev <netdev@vger.kernel.org>, sfrench@samba.org,
-        linux-cifs@vger.kernel.org,
-        Vivien Didelot <vivien.didelot@savoirfairelinux.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20170329013112.GF3152@lunn.ch>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: David Miller <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        netdev <netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
+        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Vivien Didelot <vivien.didelot-4ysUXcep3aM1wj+D4I0NRVaTQe2KTcn/@public.gmane.org>
+To: Florian Fainelli <f.fainelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <c844a885-cfd3-4358-89dd-c619d3d394e4-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On 03/28/2017 06:31 PM, Andrew Lunn wrote:
-> On Tue, Mar 28, 2017 at 05:33:18PM -0700, Florian Fainelli wrote:
->> On 03/28/2017 02:45 PM, Andrew Lunn wrote:
->>> Register the switch and its ports with devlink.
->>>
->>> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
->>
->> Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
->> Tested-by: Florian Fainelli <f.fainelli@gmail.com>
->>
->> root@net-vm:~# devlink -p port
->> mdio_bus/fixed-0:1f/0: type eth netdev lan1
->> mdio_bus/fixed-0:1f/1: type eth netdev lan2
->> mdio_bus/fixed-0:1f/2: type eth netdev lan3
->> mdio_bus/fixed-0:1f/3: type eth netdev lan4
->> mdio_bus/fixed-0:1f/5: type notset
->> root@net-vm:~# devlink -p dev
->> mdio_bus/fixed-0:1f
-> 
-> Thanks Florian
-> 
-> I have another patch somewhere which adds new types for CPU and DSA
-> ports. Once these 2 patches have landed, and the reports of broken
-> builds stop, i will dig it out.
-> 
-> But my main priority at the moment is to play with dpipe and make sure
-> it can represent tables we have in DSA switches, before the Binary API
-> is frozen.
+> Tangential question: we do not currently report to user space what kind
+> of switch tagging protocol is used (DSA, eDSA etc.) I was going to add a
+> sysfs attribute for that under the switch device's directory, but maybe
+> devlink would be more appropriate for that?
 
-Yes, that is a very good point actually.
+We don't report it. What are you thinking you want to do with this
+information?
 
-Tangential question: we do not currently report to user space what kind
-of switch tagging protocol is used (DSA, eDSA etc.) I was going to add a
-sysfs attribute for that under the switch device's directory, but maybe
-devlink would be more appropriate for that?
--- 
-Florian
+I suppose it might be possible to teach libpcap/tcpdump about it, so
+it can slide in an additional dissector. EDSA you can detect anyway,
+since it uses a well know Ethertype. tcpdump already supports
+this. But the other tag protocols cannot be detected.
+
+devlink does seem like a good candidate for this, make it part of the
+port type.
+
+     Andrew
