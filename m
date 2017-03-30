@@ -1,39 +1,28 @@
-From: Tobias Regnery <tobias.regnery@gmail.com>
-Subject: [PATCH] CIFS: Fix build failure with smb2
-Date: Thu, 30 Mar 2017 12:34:14 +0200
-Message-ID: <20170330103414.19972-1-tobias.regnery@gmail.com>
-Cc: Tobias Regnery <tobias.regnery@gmail.com>
-To: sfrench@samba.org, linux-cifs@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aurelien.aptel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] CIFS: Fix build failure with smb2
+Date: Thu, 30 Mar 2017 13:47:38 +0200
+Message-ID: <mps1stfhtph.fsf@aaptelpc.suse.de>
+References: <20170330103414.19972-1-tobias.regnery@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Cc: Tobias Regnery <tobias.regnery-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Tobias Regnery <tobias.regnery-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
+        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20170330103414.19972-1-tobias.regnery-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-I saw the following build error during a randconfig build:
+Tobias Regnery <tobias.regnery-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> writes:
+> Explicit include the right header to fix this issue.
 
-fs/cifs/smb2ops.c: In function 'smb2_new_lease_key':
-fs/cifs/smb2ops.c:1104:2: error: implicit declaration of function 'generate_random_uuid' [-Werror=implicit-function-declaration]
+uuid.h indeed declares generate_random_uuid(). Looks good to me.
 
-Explicit include the right header to fix this issue.
+Reviewed-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
 
-Signed-off-by: Tobias Regnery <tobias.regnery@gmail.com>
----
-This is against next-20170330
-
- fs/cifs/smb2ops.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index c6d14cc44510..c1b70559496c 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -21,6 +21,7 @@
- #include <linux/vfs.h>
- #include <linux/falloc.h>
- #include <linux/scatterlist.h>
-+#include <linux/uuid.h>
- #include <crypto/aead.h>
- #include "cifsglob.h"
- #include "smb2pdu.h"
 -- 
-2.11.0
+Aurélien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
+GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
