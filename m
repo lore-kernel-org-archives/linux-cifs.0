@@ -1,69 +1,82 @@
-From: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-Subject: Re: Unable to mount windows share as administrator
-Date: Tue, 4 Apr 2017 09:52:08 +0100
-Message-ID: <d280afda-7acd-9f18-1c63-f9a2a886d1f7@citrix.com>
-References: <CAJvXCJfBq=iLK=pPXuwQN1fZ4exVkrp2QP5cywWhygpMoKZPLA@mail.gmail.com>
- <af6f37b9-fb85-da5d-7867-8aaec8f05f7a@citrix.com>
- <CAJvXCJdEbWByRsViSTj1RajM1PSVBUqdq4EzQZW=uH5Bz6yB0w@mail.gmail.com>
+From: Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] KEYS: make keyctl_invalidate() also require Setattr
+ permission
+Date: Tue, 4 Apr 2017 11:44:33 -0700
+Message-ID: <20170404184433.GA46469@gmail.com>
+References: <20170329220101.26067-1-ebiggers@google.com>
+ <10049.1491207629@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Jon Scott <jonzanscott-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAJvXCJdEbWByRsViSTj1RajM1PSVBUqdq4EzQZW=uH5Bz6yB0w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Eric Biggers <ebiggers-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>, keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-fscrypt-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Gwendal Grignou <gwendal-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>,
+        Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Richard Weinberger <richard-/L3Ra7n9ekc@public.gmane.org>,
+        Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>, stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <10049.1491207629-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-On 04/04/2017 02:22 AM, Jon Scott wrote:
-> 
-> and from the unsuccessful one:
-> 
-[cut]
-> AndX Request, NTLMSSP_NEGOTIATE
->  29 3.002076572  192.168.1.2 -> 192.168.1.4  SMB 321 Session Setup
-> AndX Response, NTLMSSP_CHALLENGE, Error:
-> STATUS_MORE_PROCESSING_REQUIRED
->  30 3.002505936  192.168.1.4 -> 192.168.1.2  SMB 450 Session Setup
-> AndX Request, NTLMSSP_AUTH, User: RONE\root
->  31 3.003142299  192.168.1.2 -> 192.168.1.4  SMB 105 Session Setup
-> AndX Response, Error: STATUS_LOGON_FAILURE
+Hi David,
 
-Does Windows understand "root" as administrator?
-
+On Mon, Apr 03, 2017 at 09:20:29AM +0100, David Howells wrote:
+> Eric Biggers <ebiggers-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org> wrote:
 > 
-> On Mon, Apr 3, 2017 at 6:09 AM, Germano Percossi
-> <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org> wrote:
->> Hi,
->>
->> Before the right guys would answer more appropriately than me:
->>
->> 1) are the 2 users credentials stored in the same domain?
->> 2) what is the difference in the packet trace between the successful
->>    one and the failing one?
->> 3) what does the kern.log (or dmesg) says when the cifs module verbosity
->>    is increased?
->>
->> Cheers,
->> Germano
->>
->> On 04/02/2017 11:39 PM, Jon Scott wrote:
->>> I'm able to mount a share from Windows 10 without problems if my
->>> .smbcredentials file contains a username and password of a regular
->>> user on the Windows system.  However, if I change the credentials to
->>> an administrator on the Windows system, I get:
->>>
->>> mount error(13): Permission denied
->>> Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
->>>
->>> Here's the relevant /etc/fstab entry:
->>> //RONE/Users/fran /rone_users cifs
->>> credentials=/home/jon/.smbcredentials,ro,iocharset=utf8 0 0
->>>
->>> 4.4.0-71-generic
->>> mount.cifs version: 6.4
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>
+> > Currently, a process only needs Search permission on a key to invalidate
+> > it with keyctl_invalidate(), which has an effect similar to unlinking it
+> > from all keyrings.  Unfortunately, this significantly compromises the
+> > keys permission system because as a result, there is no way to grant
+> > read-only access to keys without also granting de-facto "delete" access.
+> > Even worse, processes may invalidate entire _keyrings_, given only
+> > permission to "search" them.
+> > 
+> > Key invalidation seems to have intended for cases where keyrings are
+> > used as caches, and keys can be re-requested at any time by an upcall to
+> > /sbin/request-key.  However, keyrings are not always used in this way.
+> > For example, users of ext4, f2fs, and ubifs encryption may wish to grant
+> > many differently-privileged processes access to the same keys, set up in
+> > a shared keyring ahead of time.  Permitting everyone to invalidate keys
+> > in this scenario enables a trivial denial-of-service.  And even users of
+> > keyrings as "just caches" may wish to restrict invalidation because it
+> > may require significant work or user interaction to regenerate keys.
+> > 
+> > This patch fixes the flaw by requiring both Search and Setattr
+> > permission to invalidate a key rather than just Search permission.
+> > Requiring Setattr permission is appropriate because Setattr permission
+> > also allows revoking (via keyctl_revoke()) or expiring (via
+> > keyctl_set_timeout()) the key, which also make the key inaccessible
+> > regardless of how many keyrings it is in.  Continuing to require Search
+> > permission ensures we do not decrease the level of permissions required.
+> 
+> I'm not sure this is the right method either.  It might be better to allocate
+> one of the remaining two permissions bits for this and/or mark keys that are
+> invalidateable.
+> 
+
+What do you think is the right solution?  We really need to do _something_.  Can
+you elaborate on what the use case(s) for "invalidate" were intended to be, and
+what users of it are known?
+
+As I noted in the commit message I was hesistant to create a new Invalidate
+permission because that would require that users of keyctl_setperm +
+keyctl_invalidate to start including a new permission which never existed
+before.  Note that the new permission would be rejected with EINVAL by old
+kernels, so applications might even need to try it both ways.
+
+However perhaps no one cares and doing that would be a non-issue.
+
+If furthermore the only users of "invalidate" are nfsidmap and the in-kernel
+dns_resolver, then it may be fine to rename the KEY_FLAG_ROOT_CAN_INVAL flag to
+something like "KEY_FLAG_INVALIDATABLE" and making it so only those keys can be
+invalidated.  That would be much better, but I don't know for sure that there
+aren't other users of keyctl_invalidate() (you may know more).
+
+- Eric
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
