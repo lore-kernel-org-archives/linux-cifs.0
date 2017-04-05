@@ -1,82 +1,59 @@
-From: Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] KEYS: make keyctl_invalidate() also require Setattr
- permission
-Date: Tue, 4 Apr 2017 11:44:33 -0700
-Message-ID: <20170404184433.GA46469@gmail.com>
-References: <20170329220101.26067-1-ebiggers@google.com>
- <10049.1491207629@warthog.procyon.org.uk>
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 1/4] CIFS: queue 'reconnect' thread with a delay
+Date: Wed, 05 Apr 2017 19:07:02 +0100
+Message-ID: <1491415622.18814.6.camel@redhat.com>
+References: <1490743614-5439-2-git-send-email-germano.percossi@citrix.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Eric Biggers <ebiggers-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>, keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-fscrypt-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        Gwendal Grignou <gwendal-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>,
-        Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Richard Weinberger <richard-/L3Ra7n9ekc@public.gmane.org>,
-        Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>, stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <10049.1491207629-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+To: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>,
+        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org,
+        smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1490743614-5439-2-git-send-email-germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Hi David,
+On Wed, 2017-03-29 at 00:26 +0100, Germano Percossi wrote:
+> All the other threads are queue with a delay, no reason
+> why this one need to be so aggressive.
 
-On Mon, Apr 03, 2017 at 09:20:29AM +0100, David Howells wrote:
-> Eric Biggers <ebiggers-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org> wrote:
+Is there any reason to queue with a delay? Is there a problem with
+reconnecting immediately?
+
+Sachin Prabhu
+
 > 
-> > Currently, a process only needs Search permission on a key to invalidate
-> > it with keyctl_invalidate(), which has an effect similar to unlinking it
-> > from all keyrings.  Unfortunately, this significantly compromises the
-> > keys permission system because as a result, there is no way to grant
-> > read-only access to keys without also granting de-facto "delete" access.
-> > Even worse, processes may invalidate entire _keyrings_, given only
-> > permission to "search" them.
-> > 
-> > Key invalidation seems to have intended for cases where keyrings are
-> > used as caches, and keys can be re-requested at any time by an upcall to
-> > /sbin/request-key.  However, keyrings are not always used in this way.
-> > For example, users of ext4, f2fs, and ubifs encryption may wish to grant
-> > many differently-privileged processes access to the same keys, set up in
-> > a shared keyring ahead of time.  Permitting everyone to invalidate keys
-> > in this scenario enables a trivial denial-of-service.  And even users of
-> > keyrings as "just caches" may wish to restrict invalidation because it
-> > may require significant work or user interaction to regenerate keys.
-> > 
-> > This patch fixes the flaw by requiring both Search and Setattr
-> > permission to invalidate a key rather than just Search permission.
-> > Requiring Setattr permission is appropriate because Setattr permission
-> > also allows revoking (via keyctl_revoke()) or expiring (via
-> > keyctl_set_timeout()) the key, which also make the key inaccessible
-> > regardless of how many keyrings it is in.  Continuing to require Search
-> > permission ensures we do not decrease the level of permissions required.
+> Signed-off-by: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/smb2pdu.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> I'm not sure this is the right method either.  It might be better to allocate
-> one of the remaining two permissions bits for this and/or mark keys that are
-> invalidateable.
-> 
-
-What do you think is the right solution?  We really need to do _something_.  Can
-you elaborate on what the use case(s) for "invalidate" were intended to be, and
-what users of it are known?
-
-As I noted in the commit message I was hesistant to create a new Invalidate
-permission because that would require that users of keyctl_setperm +
-keyctl_invalidate to start including a new permission which never existed
-before.  Note that the new permission would be rejected with EINVAL by old
-kernels, so applications might even need to try it both ways.
-
-However perhaps no one cares and doing that would be a non-issue.
-
-If furthermore the only users of "invalidate" are nfsidmap and the in-kernel
-dns_resolver, then it may be fine to rename the KEY_FLAG_ROOT_CAN_INVAL flag to
-something like "KEY_FLAG_INVALIDATABLE" and making it so only those keys can be
-invalidated.  That would be much better, but I don't know for sure that there
-aren't other users of keyctl_invalidate() (you may know more).
-
-- Eric
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index 7446496..efe167c 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -258,7 +258,7 @@ smb2_reconnect(__le16 smb2_command, struct
+> cifs_tcon *tcon)
+>  		goto out;
+>  
+>  	if (smb2_command != SMB2_INTERNAL_CMD)
+> -		queue_delayed_work(cifsiod_wq, &server->reconnect,
+> 0);
+> +		queue_delayed_work(cifsiod_wq, &server->reconnect, 2
+> * HZ);
+>  
+>  	atomic_inc(&tconInfoReconnectCount);
+>  out:
+> @@ -2231,7 +2231,7 @@ SMB2_echo(struct TCP_Server_Info *server)
+>  
+>  	if (server->tcpStatus == CifsNeedNegotiate) {
+>  		/* No need to send echo on newly established
+> connections */
+> -		queue_delayed_work(cifsiod_wq, &server->reconnect,
+> 0);
+> +		queue_delayed_work(cifsiod_wq, &server->reconnect, 2
+> * HZ);
+>  		return rc;
+>  	}
+>  
