@@ -1,59 +1,48 @@
-From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 1/4] CIFS: queue 'reconnect' thread with a delay
-Date: Wed, 05 Apr 2017 19:07:02 +0100
-Message-ID: <1491415622.18814.6.camel@redhat.com>
-References: <1490743614-5439-2-git-send-email-germano.percossi@citrix.com>
+From: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+Subject: [bug report] Handle mismatched open calls
+Date: Thu, 6 Apr 2017 12:11:36 +0300
+Message-ID: <20170406091021.GA28584@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-To: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>,
-        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org,
-        smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1490743614-5439-2-git-send-email-germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+Content-Disposition: inline
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 2017-03-29 at 00:26 +0100, Germano Percossi wrote:
-> All the other threads are queue with a delay, no reason
-> why this one need to be so aggressive.
+Hello Sachin Prabhu,
 
-Is there any reason to queue with a delay? Is there a problem with
-reconnecting immediately?
+The patch 96b75d0508f8: "Handle mismatched open calls" from Mar 3,
+2017, leads to the following static checker warning:
 
-Sachin Prabhu
+	fs/cifs/cifssmb.c:1530 cifs_readv_receive()
+	error: potential NULL dereference 'server->smallbuf'.
 
-> 
-> Signed-off-by: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/smb2pdu.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 7446496..efe167c 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -258,7 +258,7 @@ smb2_reconnect(__le16 smb2_command, struct
-> cifs_tcon *tcon)
->  		goto out;
->  
->  	if (smb2_command != SMB2_INTERNAL_CMD)
-> -		queue_delayed_work(cifsiod_wq, &server->reconnect,
-> 0);
-> +		queue_delayed_work(cifsiod_wq, &server->reconnect, 2
-> * HZ);
->  
->  	atomic_inc(&tconInfoReconnectCount);
->  out:
-> @@ -2231,7 +2231,7 @@ SMB2_echo(struct TCP_Server_Info *server)
->  
->  	if (server->tcpStatus == CifsNeedNegotiate) {
->  		/* No need to send echo on newly established
-> connections */
-> -		queue_delayed_work(cifsiod_wq, &server->reconnect,
-> 0);
-> +		queue_delayed_work(cifsiod_wq, &server->reconnect, 2
-> * HZ);
->  		return rc;
->  	}
->  
+fs/cifs/cifssmb.c
+  1519          cifs_dbg(FYI, "0: iov_base=%p iov_len=%u\n",
+  1520                   rdata->iov[0].iov_base, server->total_read);
+  1521  
+  1522          mid->resp_buf = server->smallbuf;
+  1523          server->smallbuf = NULL;
+                ^^^^^^^^^^^^^^^^^^^^^^^
+We set this to NULL here
+
+  1524  
+  1525          /* how much data is in the response? */
+  1526          data_len = server->ops->read_data_length(buf);
+  1527          if (data_offset + data_len > buflen) {
+  1528                  /* data_len is corrupt -- discard frame */
+  1529                  rdata->result = -EIO;
+  1530                  return cifs_readv_discard(server, mid);
+                                                  ^^^^^^
+but we need it here.
+
+  1531          }
+  1532  
+  1533          length = rdata->read_into_pages(server, rdata, data_len);
+  1534          if (length < 0)
+  1535                  return length;
+
+regards,
+dan carpenter
