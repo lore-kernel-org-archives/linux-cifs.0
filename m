@@ -1,59 +1,97 @@
-From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [bug report] Handle mismatched open calls
-Date: Thu, 06 Apr 2017 11:07:07 +0100
-Message-ID: <1491473227.3042.2.camel@redhat.com>
-References: <20170406091021.GA28584@mwanda>
+From: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 1/4] CIFS: queue 'reconnect' thread with a delay
+Date: Thu, 6 Apr 2017 15:03:05 +0100
+Message-ID: <2487ae35-2cd3-9227-b7eb-0b410ee6f980@citrix.com>
+References: <1490743614-5439-2-git-send-email-germano.percossi@citrix.com>
+ <1491415622.18814.6.camel@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>, <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170406091021.GA28584@mwanda>
+In-Reply-To: <1491415622.18814.6.camel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 2017-04-06 at 12:11 +0300, Dan Carpenter wrote:
-> Hello Sachin Prabhu,
-> 
-> The patch 96b75d0508f8: "Handle mismatched open calls" from Mar 3,
-> 2017, leads to the following static checker warning:
-> 
-> 	fs/cifs/cifssmb.c:1530 cifs_readv_receive()
-> 	error: potential NULL dereference 'server->smallbuf'.
-> 
-> fs/cifs/cifssmb.c
->   1519          cifs_dbg(FYI, "0: iov_base=%p iov_len=%u\n",
->   1520                   rdata->iov[0].iov_base, server->total_read);
->   1521  
->   1522          mid->resp_buf = server->smallbuf;
->   1523          server->smallbuf = NULL;
->                 ^^^^^^^^^^^^^^^^^^^^^^^
-> We set this to NULL here
-> 
->   1524  
->   1525          /* how much data is in the response? */
->   1526          data_len = server->ops->read_data_length(buf);
->   1527          if (data_offset + data_len > buflen) {
->   1528                  /* data_len is corrupt -- discard frame */
->   1529                  rdata->result = -EIO;
->   1530                  return cifs_readv_discard(server, mid);
->                                                   ^^^^^^
-> but we need it here.
-> 
->   1531          }
->   1532  
->   1533          length = rdata->read_into_pages(server, rdata,
-> data_len);
->   1534          if (length < 0)
->   1535                  return length;
-> 
-> regards,
-> dan carpenter
+Some servers (Microsoft for example) reply to reconnection
+requests with errors during the failover phase.
+Asking repeatedly to reconnect (hundreds times in few
+seconds) is not gonna solve the problem.
 
-Thanks Dan,
+This is would happen (reconnection bugs aside, fix later)
+without self-rescheduling and delay:
+* one node fails over during I/O
+* reconnect thread is immediately started
+* server is not ready and send an error
+* reconnect fails and exit
+* echo will notice connection is down and schedule reconnect
+* reconnect (hopefully succeeds)
 
-We should probably move that piece of code to the bottom of the
-function just before we return.
+The problem here is that the echo timeout will make the difference:
+60 seconds for some applications are not tolerable and
+making echo more frequent just to solve a once-off problem is
+sub-optimal.
 
-Sachin Prabhu
+The reason for rescheduling by itself is to avoid relying
+on the echo thread and make possible to tune parameters
+separately: echo can still be used with its default (60s)
+without impacting the reconnect that usually happens when
+there is pending I/O.
+
+My initial idea was to make it configurable like
+echo_interval.
+Happy to do it if the whole idea of a delay and self rescheduling
+is accepted.
+
+Cheers,
+Germano
+
+P.S: there is a coding style error in this patch, I am
+sending the correct version.
+
+On 04/05/2017 07:07 PM, Sachin Prabhu wrote:
+> On Wed, 2017-03-29 at 00:26 +0100, Germano Percossi wrote:
+>> All the other threads are queue with a delay, no reason
+>> why this one need to be so aggressive.
+> 
+> Is there any reason to queue with a delay? Is there a problem with
+> reconnecting immediately?
+> 
+> Sachin Prabhu
+> 
+>>
+>> Signed-off-by: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+>> ---
+>>  fs/cifs/smb2pdu.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+>> index 7446496..efe167c 100644
+>> --- a/fs/cifs/smb2pdu.c
+>> +++ b/fs/cifs/smb2pdu.c
+>> @@ -258,7 +258,7 @@ smb2_reconnect(__le16 smb2_command, struct
+>> cifs_tcon *tcon)
+>>  		goto out;
+>>  
+>>  	if (smb2_command != SMB2_INTERNAL_CMD)
+>> -		queue_delayed_work(cifsiod_wq, &server->reconnect,
+>> 0);
+>> +		queue_delayed_work(cifsiod_wq, &server->reconnect, 2
+>> * HZ);
+>>  
+>>  	atomic_inc(&tconInfoReconnectCount);
+>>  out:
+>> @@ -2231,7 +2231,7 @@ SMB2_echo(struct TCP_Server_Info *server)
+>>  
+>>  	if (server->tcpStatus == CifsNeedNegotiate) {
+>>  		/* No need to send echo on newly established
+>> connections */
+>> -		queue_delayed_work(cifsiod_wq, &server->reconnect,
+>> 0);
+>> +		queue_delayed_work(cifsiod_wq, &server->reconnect, 2
+>> * HZ);
+>>  		return rc;
+>>  	}
+>>  
+> 
