@@ -1,71 +1,71 @@
 From: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v2 0/4] Various fixes and improvements for SMB CA
-Date: Fri, 7 Apr 2017 12:29:34 +0100
-Message-ID: <cover.333fa5a2e4d6ba38ce99ad2ef69bf44685343ca0.1491415908.git-series.germano.percossi@citrix.com>
+Subject: [PATCH v2 3/4] CIFS: remove bad_network_name flag
+Date: Fri, 7 Apr 2017 12:29:37 +0100
+Message-ID: <d573d29c68474595aaa803447ebfec8f04eb75fc.1491415908.git-series.germano.percossi@citrix.com>
+References: <cover.333fa5a2e4d6ba38ce99ad2ef69bf44685343ca0.1491415908.git-series.germano.percossi@citrix.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
 To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
         <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <cover.333fa5a2e4d6ba38ce99ad2ef69bf44685343ca0.1491415908.git-series.germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-v2: Fixed coding style in "CIFS: reconnect thread reschedule itself"
-    Remaining patches untouched.
-    "queue reconnect thread with a delay" can be dropped
+STATUS_BAD_NETWORK_NAME can be received during node failover,
+causing the flag to be set and making the reconnect thread
+always unsuccessful, thereafter.
 
-This patches series is in increasing order of importance.
-SMB Continuous Availability is broken when the server replies
-with errors or unexpected packets during the reconnect phase.
+Once the only place where it is set is removed, the remaining
+bits are rendered moot.
 
-The first patch is a small improvement to align the reconnect
-thread with the other threads (e.g. echo) that are not queued
-immediately.
-In this case the value is set to 2 seconds but it could be configured
-using command line arguments, as it is done with echo_interval.
-If making it configurable is the best choice I'll be happy to do it.
+Removing it does not prevent "mount" from failing when a non
+existent share is passed.
 
-The second one will make the reconnect thread reschedule itself in
-case of errors.
-Doing this, reconnect does not need to wait for the echo thread for
-being rescheduled.
-In this case, too, there is no point in rushing the reconnection.
+What happens when the share really ceases to exist while the
+share is mounted is undefined now as much as it was before.
 
-The third one is to cope with STATUS_BAD_NETWORK_NAME sent by some
-servers during the node failover.
-This has been observed with some Microsoft Windows servers and
-Microsoft confirmed that this could be the case if reconnect requests
-happen within few seconds from the failover start.
-Previous patches were limiting the reconnection aggressiveness to
-limit the rate of errors during reconnect.
-Setting the flag during reconnect will make any other attempt fail,
-given nothing wil clear that flag.
-I did not see any case where retaining the flag is going to be useful:
-passing a bad share name during mount will fail regardless, while
-retaining it will cause problems to reconnect.
-I could be missing something, though.
+Signed-off-by: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifsglob.h | 1 -
+ fs/cifs/smb2pdu.c  | 5 -----
+ 2 files changed, 6 deletions(-)
 
-The fourth patch is clearly a bug fix preventing the user space program
-hang forever waiting for read and write events that will never come.
-
-Patches are attached or available here on this branch
-https://github.com/germanop/linux/commits/fix-ca-reconnect
-
-As a side note, I think some of the return codes from cifs_reopen_file
-need to be revisited.
-
-Germano Percossi (4):
-  CIFS: queue 'reconnect' thread with a delay
-  CIFS: reconnect thread reschedule itself
-  CIFS: remove bad_network_name flag
-  CIFS: store results of cifs_reopen_file to avoid infinite wait
-
- fs/cifs/cifsglob.h |  1 -
- fs/cifs/file.c     |  6 +++---
- fs/cifs/smb2pdu.c  | 19 +++++++++++--------
- 3 files changed, 14 insertions(+), 12 deletions(-)
-
-base-commit: 70c1da060b51ff5661b6ab4cc5044c06ffeff894
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index c34bdb1..b04f107 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -947,7 +947,6 @@ struct cifs_tcon {
+ 	bool use_persistent:1; /* use persistent instead of durable handles */
+ #ifdef CONFIG_CIFS_SMB2
+ 	bool print:1;		/* set if connection to printer share */
+-	bool bad_network_name:1; /* set if ret status STATUS_BAD_NETWORK_NAME */
+ 	__le32 capabilities;
+ 	__u32 share_flags;
+ 	__u32 maximal_access;
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 17af75a..3d1cb32 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1171,9 +1171,6 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+ 	else
+ 		return -EIO;
+ 
+-	if (tcon && tcon->bad_network_name)
+-		return -ENOENT;
+-
+ 	unc_path = kmalloc(MAX_SHARENAME_LENGTH * 2, GFP_KERNEL);
+ 	if (unc_path == NULL)
+ 		return -ENOMEM;
+@@ -1273,8 +1270,6 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+ tcon_error_exit:
+ 	if (rsp->hdr.sync_hdr.Status == STATUS_BAD_NETWORK_NAME) {
+ 		cifs_dbg(VFS, "BAD_NETWORK_NAME: %s\n", tree);
+-		if (tcon)
+-			tcon->bad_network_name = true;
+ 	}
+ 	goto tcon_exit;
+ }
 -- 
 git-series 0.9.1
