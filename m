@@ -1,47 +1,71 @@
 From: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v2 1/4] CIFS: queue 'reconnect' thread with a delay
-Date: Fri, 7 Apr 2017 12:29:35 +0100
-Message-ID: <e5001a2225ed3d175befd7203f06fdcf5b8a087d.1491415908.git-series.germano.percossi@citrix.com>
-References: <cover.333fa5a2e4d6ba38ce99ad2ef69bf44685343ca0.1491415908.git-series.germano.percossi@citrix.com>
+Subject: [PATCH v2 0/4] Various fixes and improvements for SMB CA
+Date: Fri, 7 Apr 2017 12:29:34 +0100
+Message-ID: <cover.333fa5a2e4d6ba38ce99ad2ef69bf44685343ca0.1491415908.git-series.germano.percossi@citrix.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
 To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
         <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <cover.333fa5a2e4d6ba38ce99ad2ef69bf44685343ca0.1491415908.git-series.germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-All the other threads are queue with a delay, no reason
-why this one need to be so aggressive.
+v2: Fixed coding style in "CIFS: reconnect thread reschedule itself"
+    Remaining patches untouched.
+    "queue reconnect thread with a delay" can be dropped
 
-Signed-off-by: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/smb2pdu.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+This patches series is in increasing order of importance.
+SMB Continuous Availability is broken when the server replies
+with errors or unexpected packets during the reconnect phase.
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 7446496..efe167c 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -258,7 +258,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon)
- 		goto out;
- 
- 	if (smb2_command != SMB2_INTERNAL_CMD)
--		queue_delayed_work(cifsiod_wq, &server->reconnect, 0);
-+		queue_delayed_work(cifsiod_wq, &server->reconnect, 2 * HZ);
- 
- 	atomic_inc(&tconInfoReconnectCount);
- out:
-@@ -2231,7 +2231,7 @@ SMB2_echo(struct TCP_Server_Info *server)
- 
- 	if (server->tcpStatus == CifsNeedNegotiate) {
- 		/* No need to send echo on newly established connections */
--		queue_delayed_work(cifsiod_wq, &server->reconnect, 0);
-+		queue_delayed_work(cifsiod_wq, &server->reconnect, 2 * HZ);
- 		return rc;
- 	}
- 
+The first patch is a small improvement to align the reconnect
+thread with the other threads (e.g. echo) that are not queued
+immediately.
+In this case the value is set to 2 seconds but it could be configured
+using command line arguments, as it is done with echo_interval.
+If making it configurable is the best choice I'll be happy to do it.
+
+The second one will make the reconnect thread reschedule itself in
+case of errors.
+Doing this, reconnect does not need to wait for the echo thread for
+being rescheduled.
+In this case, too, there is no point in rushing the reconnection.
+
+The third one is to cope with STATUS_BAD_NETWORK_NAME sent by some
+servers during the node failover.
+This has been observed with some Microsoft Windows servers and
+Microsoft confirmed that this could be the case if reconnect requests
+happen within few seconds from the failover start.
+Previous patches were limiting the reconnection aggressiveness to
+limit the rate of errors during reconnect.
+Setting the flag during reconnect will make any other attempt fail,
+given nothing wil clear that flag.
+I did not see any case where retaining the flag is going to be useful:
+passing a bad share name during mount will fail regardless, while
+retaining it will cause problems to reconnect.
+I could be missing something, though.
+
+The fourth patch is clearly a bug fix preventing the user space program
+hang forever waiting for read and write events that will never come.
+
+Patches are attached or available here on this branch
+https://github.com/germanop/linux/commits/fix-ca-reconnect
+
+As a side note, I think some of the return codes from cifs_reopen_file
+need to be revisited.
+
+Germano Percossi (4):
+  CIFS: queue 'reconnect' thread with a delay
+  CIFS: reconnect thread reschedule itself
+  CIFS: remove bad_network_name flag
+  CIFS: store results of cifs_reopen_file to avoid infinite wait
+
+ fs/cifs/cifsglob.h |  1 -
+ fs/cifs/file.c     |  6 +++---
+ fs/cifs/smb2pdu.c  | 19 +++++++++++--------
+ 3 files changed, 14 insertions(+), 12 deletions(-)
+
+base-commit: 70c1da060b51ff5661b6ab4cc5044c06ffeff894
 -- 
 git-series 0.9.1
