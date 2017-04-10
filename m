@@ -1,79 +1,181 @@
-From: <ujagu8185-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: (unknown)
-Date: Sun, 09 Apr 2017 21:15:58 -0000
-Message-ID: <149177255894.7951.322823427938362876@hinet.net>
-Reply-To: <ujagu8185-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: NeilBrown <neilb-IBi9RG/b67k@public.gmane.org>
+Subject: [PATCH] cifs: don't check for failure from mempool_alloc()
+Date: Mon, 10 Apr 2017 12:08:53 +1000
+Message-ID: <87h91xxbd6.fsf@notabene.neil.brown.name>
 Mime-Version: 1.0
-Content-Type: application/zip; name="4326157402_linux-cifs.zip"
-Content-Transfer-Encoding: base64
-To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha256; protocol="application/pgp-signature"
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: attachment
-Subject: 
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-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
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+
+
+mempool_alloc() cannot fail if the gfp flags allow it to
+sleep, and both GFP_FS allows for sleeping.
+
+So these tests of the return value from mempool_alloc()
+cannot be needed.
+
+Signed-off-by: NeilBrown <neilb-IBi9RG/b67k@public.gmane.org>
+=2D--
+ fs/cifs/misc.c          | 14 +++++---------
+ fs/cifs/smb2transport.c | 30 +++++++++++++-----------------
+ fs/cifs/transport.c     | 32 ++++++++++++++------------------
+ 3 files changed, 32 insertions(+), 44 deletions(-)
+
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index d3fb11529ed9..843787850435 100644
+=2D-- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -167,13 +167,11 @@ cifs_buf_get(void)
+=20
+ 	/* clear the first few header bytes */
+ 	/* for most paths, more is cleared in header_assemble */
+=2D	if (ret_buf) {
+=2D		memset(ret_buf, 0, buf_size + 3);
+=2D		atomic_inc(&bufAllocCount);
++	memset(ret_buf, 0, buf_size + 3);
++	atomic_inc(&bufAllocCount);
+ #ifdef CONFIG_CIFS_STATS2
+=2D		atomic_inc(&totBufAllocCount);
++	atomic_inc(&totBufAllocCount);
+ #endif /* CONFIG_CIFS_STATS2 */
+=2D	}
+=20
+ 	return ret_buf;
+ }
+@@ -201,15 +199,13 @@ cifs_small_buf_get(void)
+    albeit slightly larger than necessary and maxbuffersize
+    defaults to this and can not be bigger */
+ 	ret_buf =3D mempool_alloc(cifs_sm_req_poolp, GFP_NOFS);
+=2D	if (ret_buf) {
+ 	/* No need to clear memory here, cleared in header assemble */
+ 	/*	memset(ret_buf, 0, sizeof(struct smb_hdr) + 27);*/
+=2D		atomic_inc(&smBufAllocCount);
++	atomic_inc(&smBufAllocCount);
+ #ifdef CONFIG_CIFS_STATS2
+=2D		atomic_inc(&totSmBufAllocCount);
++	atomic_inc(&totSmBufAllocCount);
+ #endif /* CONFIG_CIFS_STATS2 */
+=20
+=2D	}
+ 	return ret_buf;
+ }
+=20
+diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+index 506b67fc93d9..c69ec96e92ac 100644
+=2D-- a/fs/cifs/smb2transport.c
++++ b/fs/cifs/smb2transport.c
+@@ -538,23 +538,19 @@ smb2_mid_entry_alloc(const struct smb2_sync_hdr *shdr,
+ 	}
+=20
+ 	temp =3D mempool_alloc(cifs_mid_poolp, GFP_NOFS);
+=2D	if (temp =3D=3D NULL)
+=2D		return temp;
+=2D	else {
+=2D		memset(temp, 0, sizeof(struct mid_q_entry));
+=2D		temp->mid =3D le64_to_cpu(shdr->MessageId);
+=2D		temp->pid =3D current->pid;
+=2D		temp->command =3D shdr->Command; /* Always LE */
+=2D		temp->when_alloc =3D jiffies;
+=2D		temp->server =3D server;
+=2D
+=2D		/*
+=2D		 * The default is for the mid to be synchronous, so the
+=2D		 * default callback just wakes up the current task.
+=2D		 */
+=2D		temp->callback =3D cifs_wake_up_task;
+=2D		temp->callback_data =3D current;
+=2D	}
++	memset(temp, 0, sizeof(struct mid_q_entry));
++	temp->mid =3D le64_to_cpu(shdr->MessageId);
++	temp->pid =3D current->pid;
++	temp->command =3D shdr->Command; /* Always LE */
++	temp->when_alloc =3D jiffies;
++	temp->server =3D server;
++
++	/*
++	 * The default is for the mid to be synchronous, so the
++	 * default callback just wakes up the current task.
++	 */
++	temp->callback =3D cifs_wake_up_task;
++	temp->callback_data =3D current;
+=20
+ 	atomic_inc(&midCount);
+ 	temp->mid_state =3D MID_REQUEST_ALLOCATED;
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index f6e13a977fc8..4d64b5b8fc9c 100644
+=2D-- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -55,26 +55,22 @@ AllocMidQEntry(const struct smb_hdr *smb_buffer, struct=
+ TCP_Server_Info *server)
+ 	}
+=20
+ 	temp =3D mempool_alloc(cifs_mid_poolp, GFP_NOFS);
+=2D	if (temp =3D=3D NULL)
+=2D		return temp;
+=2D	else {
+=2D		memset(temp, 0, sizeof(struct mid_q_entry));
+=2D		temp->mid =3D get_mid(smb_buffer);
+=2D		temp->pid =3D current->pid;
+=2D		temp->command =3D cpu_to_le16(smb_buffer->Command);
+=2D		cifs_dbg(FYI, "For smb_command %d\n", smb_buffer->Command);
++	memset(temp, 0, sizeof(struct mid_q_entry));
++	temp->mid =3D get_mid(smb_buffer);
++	temp->pid =3D current->pid;
++	temp->command =3D cpu_to_le16(smb_buffer->Command);
++	cifs_dbg(FYI, "For smb_command %d\n", smb_buffer->Command);
+ 	/*	do_gettimeofday(&temp->when_sent);*/ /* easier to use jiffies */
+=2D		/* when mid allocated can be before when sent */
+=2D		temp->when_alloc =3D jiffies;
+=2D		temp->server =3D server;
++	/* when mid allocated can be before when sent */
++	temp->when_alloc =3D jiffies;
++	temp->server =3D server;
+=20
+=2D		/*
+=2D		 * The default is for the mid to be synchronous, so the
+=2D		 * default callback just wakes up the current task.
+=2D		 */
+=2D		temp->callback =3D cifs_wake_up_task;
+=2D		temp->callback_data =3D current;
+=2D	}
++	/*
++	 * The default is for the mid to be synchronous, so the
++	 * default callback just wakes up the current task.
++	 */
++	temp->callback =3D cifs_wake_up_task;
++	temp->callback_data =3D current;
+=20
+ 	atomic_inc(&midCount);
+ 	temp->mid_state =3D MID_REQUEST_ALLOCATED;
+=2D-=20
+2.12.2
+
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAljq6TUACgkQOeye3VZi
+gbkKjhAAsKAWAddsPh7QL8t5VSEch9D9HFt6SU5ycrZ1nBr6OtKwBIK+UkEyVS3h
+LaDX8YQSvMi93efi3OiJnsYxlaNcNaJd4vY4qXT5kIaHH5bVC0Hu0QKLVt/q1qT4
+7VgrLGRjuHdE9owsOvM8I+zjwF8rSmHw7zjxdRuzmUAoPGdXTrz6GtPmFFbVAwtW
+4u/EK8TzQpxEJsjrQHppo5CtqZvOIa4lYippex4DxmvKy+liGVEoZFbHZn8qJ1qV
+9kjFS5djO1OxMruAnXRCSY0+8CwFe0LQ4Qkm2jYrCHBc1dIQm8ivLsIEnH4yFFt2
++gUVM3Ls66Pt+G1e6EGtFC4BRKwYc47OSl0ZVjcLoU365xf1Cgt3j79FbTQscJDi
+nCmD4x81TC56+PUMBC5xlxmroq5lw/wvpfDSeUx0exkPk9TaGFRsWOHcg3o7Pz/H
+ExqYbB9syozRfWPRHdHynltfzuk8KzT6zc1EXsfNv1WQi3uiJtakX/LnQrNOBg0o
+2Cc3a+c5wLadDErHZE0TSFalTjYE6w1knKm5Lli5fxMV3wCQNuWX22pS+C3JfbQw
+z5Envq4Qnr8RelKAwr8JUN8lvbwzVwYXFVWiCpOi11CsINsRFEFsFbrz79BhScm2
+A5Wicnefa0qPQeHftP+gFgGORduJQkl7u5Wmn248zUq2+gLIwR8=
+=p1e0
+-----END PGP SIGNATURE-----
+--=-=-=--
