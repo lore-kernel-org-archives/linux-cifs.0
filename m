@@ -1,483 +1,156 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 1/2] CIFS: Add asynchronous read support through kernel AIO
-Date: Mon, 10 Apr 2017 13:54:09 -0700
-Message-ID: <CAKywueTUpndSB=1=pDng7kwRDrE6d8385MmnPeLmqkFf40009A@mail.gmail.com>
-References: <1486768678-36802-1-git-send-email-pshilov@microsoft.com>
- <1486768678-36802-2-git-send-email-pshilov@microsoft.com> <1490454724.2665.1.camel@redhat.com>
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [4.11-rc6 bug] fstests generic/010 crashes cifs 2.0/2.1/3.0
+ mounts
+Date: Mon, 10 Apr 2017 22:32:56 +0100
+Message-ID: <1491859976.8507.6.camel@redhat.com>
+References: <20170410044446.GC22845@eguan.usersys.redhat.com>
+         <CAKywueQMB_T=FXdKsRC6txbGYVpbZbWQFScuvzas75WzoJbahA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Eryu Guan <eguan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1490454724.2665.1.camel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <CAKywueQMB_T=FXdKsRC6txbGYVpbZbWQFScuvzas75WzoJbahA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2017-03-25 8:12 GMT-07:00 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> On Fri, 2017-02-10 at 15:17 -0800, Pavel Shilovsky wrote:
->> Currently the code doesn't recognize asynchronous calls passed
->> by io_submit() and processes all calls synchronously. This is not
->> what kernel AIO expects. This patch improves this for reading
->> by introducing new async context that keeps track of all issued i/o
->> requests and moving a response collecting procedure to a separate
->> thread. This allows to return to the caller immediately for
->> asynchronous calls and call the iocb->ki_complete() once all requests
->> are completed. For synchronous calls the current thread simply
->> waits until all requests are completed.
->>
->> This improves reading performance of single threaded applications
->> with increasing of i/o queue depth size.
->>
->> Signed-off-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
->
-> I would really, really appreciate seeing this patch broken up into
-> smaller, logical changes. It's very difficult to
->
->> ---
->>  fs/cifs/cifsglob.h |  18 ++++
->>  fs/cifs/file.c     | 273 +++++++++++++++++++++++++++++++++++++++++++++--------
->>  2 files changed, 252 insertions(+), 39 deletions(-)
->>
->> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
->> index f9a9a12..80771ca 100644
->> --- a/fs/cifs/cifsglob.h
->> +++ b/fs/cifs/cifsglob.h
->> @@ -1109,6 +1109,23 @@ struct cifs_io_parms {
->>       struct cifs_tcon *tcon;
->>  };
->>
->> +struct cifs_aio_ctx {
->> +     struct kref             refcount;
->> +     struct list_head        list;
->> +     struct mutex            aio_mutex;
->> +     struct completion       done;
->> +     struct iov_iter         iter;
->> +     struct kiocb            *iocb;
->> +     struct cifsFileInfo     *cfile;
->> +     struct page             **pages;
-> ^^^
-> Nothing uses the above pointer.
->
->> +     struct bio_vec          *bv;
->> +     unsigned int            npages;
->> +     ssize_t                 rc;
->> +     unsigned int            len;
->> +     unsigned int            total_len;
->> +     bool                    should_dirty;
->> +};
->> +
->>  struct cifs_readdata;
->>
->>  /* asynchronous read support */
->> @@ -1118,6 +1135,7 @@ struct cifs_readdata {
->>       struct completion               done;
->>       struct cifsFileInfo             *cfile;
->>       struct address_space            *mapping;
->> +     struct cifs_aio_ctx             *ctx;
->>       __u64                           offset;
->>       unsigned int                    bytes;
->>       unsigned int                    got_bytes;
->> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
->> index 98dc842..6ceeed2 100644
->> --- a/fs/cifs/file.c
->> +++ b/fs/cifs/file.c
->> @@ -33,6 +33,7 @@
->>  #include <linux/mount.h>
->>  #include <linux/slab.h>
->>  #include <linux/swap.h>
->> +#include <linux/vmalloc.h>
->>  #include <asm/div64.h>
->>  #include "cifsfs.h"
->>  #include "cifspdu.h"
->> @@ -2410,6 +2411,108 @@ int cifs_flush(struct file *file, fl_owner_t id)
->>       return rc;
->>  }
->>
->> +static inline struct cifs_aio_ctx *
->> +cifs_aio_ctx_alloc(void)
->> +{
->> +     struct cifs_aio_ctx *ctx;
->> +
->> +     ctx = kzalloc(sizeof(struct cifs_aio_ctx), GFP_KERNEL);
->> +     if (!ctx)
->> +             return NULL;
->> +
->> +     INIT_LIST_HEAD(&ctx->list);
->> +     mutex_init(&ctx->aio_mutex);
->> +     init_completion(&ctx->done);
->> +     kref_init(&ctx->refcount);
->> +     return ctx;
->> +}
->> +
->> +static inline void
->> +cifs_aio_ctx_release(struct kref *refcount)
->> +{
->> +     struct cifs_aio_ctx *ctx = container_of(refcount,
->> +                                     struct cifs_aio_ctx, refcount);
->> +
->> +     cifsFileInfo_put(ctx->cfile);
->> +     kvfree(ctx->bv);
->> +     kfree(ctx);
->> +}
->> +
->> +static int
->> +setup_aio_ctx_iter(struct cifs_aio_ctx *ctx, struct iov_iter *iter, int rw)
->> +{
->> +     ssize_t rc;
->> +     unsigned int cur_npages;
->> +     unsigned int npages = 0;
->> +     unsigned int i;
->> +     size_t len;
->> +     size_t count = iov_iter_count(iter);
->> +     unsigned int saved_len;
->> +     size_t start;
->> +     unsigned int max_pages = iov_iter_npages(iter, INT_MAX);
->> +     struct page **pages;
->> +     struct bio_vec *bv;
->> +
->> +     if (iter->type & ITER_KVEC) {
->> +             memcpy(&ctx->iter, iter, sizeof(struct iov_iter));
->> +             ctx->len = count;
->> +             iov_iter_advance(iter, count);
->> +             return 0;
->> +     }
->> +
->> +     bv = kmalloc_array(max_pages, sizeof(struct bio_vec), GFP_KERNEL);
->> +     if (!bv) {
->> +             bv = vmalloc(max_pages * sizeof(struct bio_vec));
->> +             if (!bv)
->> +                     return -ENOMEM;
->> +     }
->> +
->> +     saved_len = count;
->> +
->> +     while (count && npages < max_pages) {
->> +             rc = iov_iter_get_pages_alloc(iter, &pages, count, &start);
->
-> It would be more efficient to allocate a page array of the max length,
-> and then reuse that array in each call to iov_iter_get_pages --
-> especially if contiguous memory is tight and you end up having to use
-> vmalloc.
+On Mon, 2017-04-10 at 13:18 -0700, Pavel Shilovsky wrote:
+> 2017-04-09 21:44 GMT-07:00 Eryu Guan <eguan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> > Hi all,
+> > 
+> > Starting from 4.11-rc6 kernel, I noticed fstests generic/010 would
+> > crash
+> > cifs v2.0/2.1/3.0 mounts, I was testing with local mount linux
+> > samba
+> > server.
+> > 
+> > [  324.109085] run fstests generic/010 at 2017-04-09 17:39:05
+> > [  324.245779] BUG: unable to handle kernel NULL pointer
+> > dereference at           (null)
+> > [  324.254532] IP: cifs_discard_remaining_data+0x12/0x70 [cifs]
+> > [  324.260843] PGD 0
+> > [  324.260844]
+> > [  324.264741] Oops: 0000 [#1] SMP
+> > [  324.268241] Modules linked in: cmac arc4 md4 nls_utf8 cifs ccm
+> > dns_resolver binfmt_misc intel_rapl x86_pkg_temp_thermal
+> > intel_powerclamp coretemp kvm_intel kvm irqbypass crct10dif_pclmul
+> > crc32_pclmul ghash_clmulni_intel pcbc aesni_intel cdc_ether nfsd
+> > crypto_simd iTCO_wdt glue_helper usbnet cryptd iTCO_vendor_support
+> > gpio_ich ipmi_ssif mii wmi ipmi_si sg pcspkr ie31200_edac
+> > ipmi_devintf edac_core shpchp i2c_i801 ipmi_msghandler lpc_ich
+> > auth_rpcgss nfs_acl lockd grace sunrpc ip_tables xfs libcrc32c
+> > sr_mod cdrom sd_mod ata_generic pata_acpi mgag200 i2c_algo_bit
+> > drm_kms_helper syscopyarea sysfillrect sysimgblt fb_sys_fops ttm
+> > e1000e drm ata_piix libata ptp crc32c_intel pps_core i2c_core
+> > dm_mirror dm_region_hash dm_log dm_mod
+> > [  324.339637] CPU: 0 PID: 25782 Comm: cifsd Not tainted 4.11.0-rc6 
+> > #1
+> > [  324.346627] Hardware name: IBM IBM System X3250 M4 -[2583AC1]-
+> > /00D3729, BIOS -[JQE164AUS-1.07]- 12/09/2013
+> > [  324.357399] task: ffff999d307fc380 task.stack: ffffb01f490e8000
+> > [  324.364010] RIP: 0010:cifs_discard_remaining_data+0x12/0x70
+> > [cifs]
+> > [  324.370904] RSP: 0018:ffffb01f490ebdf8 EFLAGS: 00010246
+> > [  324.376732] RAX: 00000000ffffffc3 RBX: ffff999d31185480 RCX:
+> > 0000000000000d50
+> > [  324.384691] RDX: 0000000000000d50 RSI: 0000000000000000 RDI:
+> > ffff999cac4a0800
+> > [  324.392651] RBP: ffffb01f490ebe08 R08: 0000000000071888 R09:
+> > 0000000000000077
+> > [  324.400611] R10: 0000000000038c44 R11: 0000000000081840 R12:
+> > 0000000000000004
+> > [  324.408569] R13: ffff999c7e815100 R14: ffff999c7e815100 R15:
+> > 000000000000004d
+> > [  324.416529] FS:  0000000000000000(0000)
+> > GS:ffff999d3fc00000(0000) knlGS:0000000000000000
+> > [  324.425556] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > [  324.431965] CR2: 0000000000000000 CR3: 00000001a6809000 CR4:
+> > 00000000001406f0
+> > [  324.439924] Call Trace:
+> > [  324.442657]  cifs_readv_discard+0x1e/0x40 [cifs]
+> > [  324.447812]  cifs_readv_receive+0xd6/0x560 [cifs]
+> > [  324.453056]  cifs_demultiplex_thread+0x66f/0xa70 [cifs]
+> > [  324.458887]  kthread+0x101/0x140
+> > [  324.462491]  ? cifs_handle_standard+0x130/0x130 [cifs]
+> > [  324.468222]  ? kthread_park+0x90/0x90
+> > [  324.472306]  ? do_syscall_64+0x67/0x180
+> > [  324.476584]  ret_from_fork+0x2c/0x40
+> > [  324.480570] Code: 05 55 39 d4 e9 50 fe ff ff e8 3b 2a 07 d4 90
+> > 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 55 48 89 e5 41 54 41
+> > bc 04 00 00 00 53 <8b> 06 48 89 fb 44 2b a7 38 03 00 00 0f c8 25 ff
+> > ff ff 00 41 01
+> > [  324.501642] RIP: cifs_discard_remaining_data+0x12/0x70 [cifs]
+> > RSP: ffffb01f490ebdf8
+> > [  324.510182] CR2: 0000000000000000
+> > [  324.513879] ---[ end trace 754f09c6094faa76 ]---
+> > [  324.519028] Kernel panic - not syncing: Fatal exception
+> > [  324.524889] Kernel Offset: 0x13600000 from 0xffffffff81000000
+> > (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+> > [  324.536921] ---[ end Kernel panic - not syncing: Fatal exception
+> > 
+> > And I bisected this to
+> > 
+> > commit 38bd49064a1ecb67baad33598e3d824448ab11ec
+> > Author: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> > Date:   Fri Mar 3 15:41:38 2017 -0800
+> > 
+> >     Handle mismatched open calls
+> > 
+> >     A signal can interrupt a SendReceive call which result in
+> > incoming
+> >     responses to the call being ignored. This is a problem for
+> > calls such as
+> >     open which results in the successful response being ignored.
+> > This
+> >     results in an open file resource on the server.
+> > 
+> >     The patch looks into responses which were cancelled after being
+> > sent and
+> >     in case of successful open closes the open fids.
+> > 
+> >     For this patch, the check is only done in SendReceive2()
+> > 
+> >     RH-bz: 1403319
+> > 
+> >     Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> >     Reviewed-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+> >     Cc: Stable <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+> > 
+> > I was able to reproduce this crash with cifs2.0/2.1 mounts manually
+> > and
+> > it was easy to hit. Though I haven't seen it with cifs 3.0 mount in
+> > my
+> > manual test, I did see v3.0 crash in my auto tests. If you need
+> > more
+> > info please let me know.
+> > 
+> > Thanks,
+> > Eryu
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-
+> > cifs" in
+> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> Hi Eryu,
+> 
+> Thank for reporting this. I ended up with a fix for the problem (see
+> patch attached).
+> 
+> Sachin, can you please review the patch?
 
-Do you mean allocating a fixed size array (like 4096 pages) or an
-array of "max_pages" size? The latter can potentially lead to large
-allocation and need to fallback to vmalloc (as we have for bio_vec
-above). The former should work with kmalloc but the code will stuck in
-the loop for a while for big i/o sizes if we choose the fixed size
-rather small.
+Hello Pavel,
 
->
-> Also, just a heads up that I sent a patch a couple of months ago to
-> rework the above function to generate longer page arrays when possible,
-> but Al didn't care for it. He's supposedly going to rework the above
-> function into something that grabs a pile of pages and issues a callback
-> to each of them. Once that goes in, you may want to rework this code to
-> use that instead.
->
->> +             if (rc < 0) {
->> +                     cifs_dbg(VFS, "couldn't get user pages (rc=%zd)\n", rc);
->> +                     break;
->> +             }
->> +
->
->> +             if (rc > count) {
->> +                     cifs_dbg(VFS, "get pages rc=%zd more than %zu\n", rc,
->> +                              count);
->> +                     break;
->> +             }
->> +
->> +             iov_iter_advance(iter, rc);
->> +             count -= rc;
->> +             rc += start;
->> +             cur_npages = (rc + PAGE_SIZE - 1) / PAGE_SIZE;
->
-> cur_npages = DIV_ROUND_UP(rc, PAGE_SIZE);
->
->> +
->> +             if (npages + cur_npages > max_pages) {
->> +                     cifs_dbg(VFS, "out of vec array capacity (%u vs %u)\n",
->> +                              npages + cur_npages, max_pages);
->> +                     break;
->> +             }
->> +
->> +             for (i = 0; i < cur_npages; i++) {
->> +                     len = rc > PAGE_SIZE ? PAGE_SIZE : rc;
->> +                     bv[npages + i].bv_page = pages[i];
->> +                     bv[npages + i].bv_offset = start;
->> +                     bv[npages + i].bv_len = len - start;
->> +                     rc -= len;
->> +                     start = 0;
->> +             }
->> +
->> +             npages += cur_npages;
->> +             kvfree(pages);
->> +     }
->> +
->> +     ctx->bv = bv;
->> +     ctx->len = saved_len - count;
->> +     ctx->npages = npages;
->> +     iov_iter_bvec(&ctx->iter, ITER_BVEC | rw, ctx->bv, npages, ctx->len);
->> +     return 0;
->> +}
->> +
->>  static int
->>  cifs_write_allocate_pages(struct page **pages, unsigned long num_pages)
->>  {
->> @@ -2859,6 +2962,7 @@ cifs_uncached_readdata_release(struct kref *refcount)
->>                                       struct cifs_readdata, refcount);
->>       unsigned int i;
->>
->> +     kref_put(&rdata->ctx->refcount, cifs_aio_ctx_release);
->>       for (i = 0; i < rdata->nr_pages; i++) {
->>               put_page(rdata->pages[i]);
->>               rdata->pages[i] = NULL;
->> @@ -2900,6 +3004,8 @@ cifs_readdata_to_iov(struct cifs_readdata *rdata, struct iov_iter *iter)
->>       return remaining ? -EFAULT : 0;
->>  }
->>
->> +static void collect_uncached_read_data(struct cifs_aio_ctx *ctx);
->> +
->>  static void
->>  cifs_uncached_readv_complete(struct work_struct *work)
->>  {
->> @@ -2907,6 +3013,8 @@ cifs_uncached_readv_complete(struct work_struct *work)
->>                                               struct cifs_readdata, work);
->>
->>       complete(&rdata->done);
->> +     collect_uncached_read_data(rdata->ctx);
->> +     /* the below call can possibly free the last ref to aio ctx */
->>       kref_put(&rdata->refcount, cifs_uncached_readdata_release);
->>  }
->>
->> @@ -2973,7 +3081,8 @@ cifs_uncached_copy_into_pages(struct TCP_Server_Info *server,
->>
->>  static int
->>  cifs_send_async_read(loff_t offset, size_t len, struct cifsFileInfo *open_file,
->> -                  struct cifs_sb_info *cifs_sb, struct list_head *rdata_list)
->> +                  struct cifs_sb_info *cifs_sb, struct list_head *rdata_list,
->> +                  struct cifs_aio_ctx *ctx)
->>  {
->>       struct cifs_readdata *rdata;
->>       unsigned int npages, rsize, credits;
->> @@ -3020,6 +3129,8 @@ cifs_send_async_read(loff_t offset, size_t len, struct cifsFileInfo *open_file,
->>               rdata->read_into_pages = cifs_uncached_read_into_pages;
->>               rdata->copy_into_pages = cifs_uncached_copy_into_pages;
->>               rdata->credits = credits;
->> +             rdata->ctx = ctx;
->> +             kref_get(&ctx->refcount);
->>
->>               if (!rdata->cfile->invalidHandle ||
->>                   !cifs_reopen_file(rdata->cfile, true))
->> @@ -3042,50 +3153,37 @@ cifs_send_async_read(loff_t offset, size_t len, struct cifsFileInfo *open_file,
->>       return rc;
->>  }
->>
->> -ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to)
->> +static void
->> +collect_uncached_read_data(struct cifs_aio_ctx *ctx)
->>  {
->> -     struct file *file = iocb->ki_filp;
->> -     ssize_t rc;
->> -     size_t len;
->> -     ssize_t total_read = 0;
->> -     loff_t offset = iocb->ki_pos;
->> +     struct cifs_readdata *rdata, *tmp;
->> +     struct iov_iter *to = &ctx->iter;
->>       struct cifs_sb_info *cifs_sb;
->>       struct cifs_tcon *tcon;
->> -     struct cifsFileInfo *open_file;
->> -     struct cifs_readdata *rdata, *tmp;
->> -     struct list_head rdata_list;
->> -
->> -     len = iov_iter_count(to);
->> -     if (!len)
->> -             return 0;
->> -
->> -     INIT_LIST_HEAD(&rdata_list);
->> -     cifs_sb = CIFS_FILE_SB(file);
->> -     open_file = file->private_data;
->> -     tcon = tlink_tcon(open_file->tlink);
->> -
->> -     if (!tcon->ses->server->ops->async_readv)
->> -             return -ENOSYS;
->> +     unsigned int i;
->> +     int rc;
->>
->> -     if ((file->f_flags & O_ACCMODE) == O_WRONLY)
->> -             cifs_dbg(FYI, "attempting read on write only file instance\n");
->> +     tcon = tlink_tcon(ctx->cfile->tlink);
->> +     cifs_sb = CIFS_SB(ctx->cfile->dentry->d_sb);
->>
->> -     rc = cifs_send_async_read(offset, len, open_file, cifs_sb, &rdata_list);
->> +     mutex_lock(&ctx->aio_mutex);
->>
->> -     /* if at least one read request send succeeded, then reset rc */
->> -     if (!list_empty(&rdata_list))
->> -             rc = 0;
->> +     if (list_empty(&ctx->list)) {
->> +             mutex_unlock(&ctx->aio_mutex);
->> +             return;
->> +     }
->>
->> -     len = iov_iter_count(to);
->> +     rc = ctx->rc;
->>       /* the loop below should proceed in the order of increasing offsets */
->>  again:
->> -     list_for_each_entry_safe(rdata, tmp, &rdata_list, list) {
->> +     list_for_each_entry_safe(rdata, tmp, &ctx->list, list) {
->>               if (!rc) {
->> -                     /* FIXME: freezable sleep too? */
->> -                     rc = wait_for_completion_killable(&rdata->done);
->> -                     if (rc)
->> -                             rc = -EINTR;
->> -                     else if (rdata->result == -EAGAIN) {
->> +                     if (!try_wait_for_completion(&rdata->done)) {
->> +                             mutex_unlock(&ctx->aio_mutex);
->> +                             return;
->> +                     }
->> +
->> +                     if (rdata->result == -EAGAIN) {
->>                               /* resend call if it's a retryable error */
->>                               struct list_head tmp_list;
->>                               unsigned int got_bytes = rdata->got_bytes;
->> @@ -3111,9 +3209,9 @@ ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to)
->>                                               rdata->offset + got_bytes,
->>                                               rdata->bytes - got_bytes,
->>                                               rdata->cfile, cifs_sb,
->> -                                             &tmp_list);
->> +                                             &tmp_list, ctx);
->>
->> -                             list_splice(&tmp_list, &rdata_list);
->> +                             list_splice(&tmp_list, &ctx->list);
->>
->>                               kref_put(&rdata->refcount,
->>                                        cifs_uncached_readdata_release);
->> @@ -3131,14 +3229,111 @@ ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to)
->>               kref_put(&rdata->refcount, cifs_uncached_readdata_release);
->>       }
->>
->> -     total_read = len - iov_iter_count(to);
->> +     for (i = 0; i < ctx->npages; i++) {
->> +             if (ctx->should_dirty)
->> +                     set_page_dirty(ctx->bv[i].bv_page);
->> +             put_page(ctx->bv[i].bv_page);
->> +     }
->> +
->> +     ctx->total_len = ctx->len - iov_iter_count(to);
->>
->> -     cifs_stats_bytes_read(tcon, total_read);
->> +     cifs_stats_bytes_read(tcon, ctx->total_len);
->>
->>       /* mask nodata case */
->>       if (rc == -ENODATA)
->>               rc = 0;
->>
->> +     ctx->rc = (rc == 0) ? ctx->total_len : rc;
->> +
->> +     mutex_unlock(&ctx->aio_mutex);
->> +
->> +     if (ctx->iocb && ctx->iocb->ki_complete)
->> +             ctx->iocb->ki_complete(ctx->iocb, ctx->rc, 0);
->> +     else
->> +             complete(&ctx->done);
->> +}
->> +
->> +ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to)
->> +{
->> +     struct file *file = iocb->ki_filp;
->> +     ssize_t rc;
->> +     size_t len;
->> +     ssize_t total_read = 0;
->> +     loff_t offset = iocb->ki_pos;
->> +     struct cifs_sb_info *cifs_sb;
->> +     struct cifs_tcon *tcon;
->> +     struct cifsFileInfo *cfile;
->> +     struct cifs_aio_ctx *ctx;
->> +
->> +     len = iov_iter_count(to);
->> +     if (!len)
->> +             return 0;
->> +
->> +     cifs_sb = CIFS_FILE_SB(file);
->> +     cfile = file->private_data;
->> +     tcon = tlink_tcon(cfile->tlink);
->> +
->> +     if (!tcon->ses->server->ops->async_readv)
->> +             return -ENOSYS;
->> +
->> +     if ((file->f_flags & O_ACCMODE) == O_WRONLY)
->> +             cifs_dbg(FYI, "attempting read on write only file instance\n");
->> +
->> +     ctx = cifs_aio_ctx_alloc();
->> +     if (!ctx)
->> +             return -ENOMEM;
->> +
->> +     ctx->cfile = cifsFileInfo_get(cfile);
->> +
->> +     if (!is_sync_kiocb(iocb))
->> +             ctx->iocb = iocb;
->> +
->> +     if (to->type & ITER_IOVEC)
->> +             ctx->should_dirty = true;
->> +
->> +     rc = setup_aio_ctx_iter(ctx, to, READ);
->> +     if (rc) {
->> +             kref_put(&ctx->refcount, cifs_aio_ctx_release);
->> +             return rc;
->> +     }
->> +
->> +     len = ctx->len;
->> +
->> +     /* grab a lock here due to read response handlers can access ctx */
->> +     mutex_lock(&ctx->aio_mutex);
->> +
->> +     rc = cifs_send_async_read(offset, len, cfile, cifs_sb, &ctx->list, ctx);
->> +
->> +     /* if at least one read request send succeeded, then reset rc */
->> +     if (!list_empty(&ctx->list))
->> +             rc = 0;
->> +
->> +     mutex_unlock(&ctx->aio_mutex);
->> +
->> +     if (rc) {
->> +             kref_put(&ctx->refcount, cifs_aio_ctx_release);
->> +             return rc;
->> +     }
->> +
->> +     if (!is_sync_kiocb(iocb)) {
->> +             kref_put(&ctx->refcount, cifs_aio_ctx_release);
->> +             return -EIOCBQUEUED;
->> +     }
->> +
->> +     /* FIXME: freezable sleep too? */
->
-> I think you can remove the above comment, and this should probably be a
-> TASK_INTERRUPTIBLE sleep.
->
->> +     rc = wait_for_completion_killable(&ctx->done);
->> +     if (rc) {
->> +             mutex_lock(&ctx->aio_mutex);
->> +             ctx->rc = rc = -EINTR;
->> +             total_read = ctx->total_len;
->> +             mutex_unlock(&ctx->aio_mutex);
->> +     } else {
->> +             rc = ctx->rc;
->> +             total_read = ctx->total_len;
->> +     }
->> +
->> +     kref_put(&ctx->refcount, cifs_aio_ctx_release);
->> +
->>       if (total_read) {
->>               iocb->ki_pos += total_read;
->>               return total_read;
->
-> Other than the above, this looks pretty reasonable. Nice work!
+I had sent another version of the patch which fixes the problem but it
+ended up being sent privately to Steve. 
+
+I like your version better. 
+
+Acked-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+
+
+> 
 > --
-> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-
-Thanks. I will move the new infrastructure to a separate patch with
-your suggestions.
-
---
-Best regards,
-Pavel Shilovsky
+> Best regards,
+> Pavel Shilovsky
