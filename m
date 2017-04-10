@@ -1,38 +1,73 @@
-From: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: small underflow in cnvrtDosUnixTm()
-Date: Mon, 10 Apr 2017 16:49:31 +0300
-Message-ID: <20170410134931.GC1918@mwanda>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH v2 2/4] CIFS: reconnect thread reschedule itself
+Date: Mon, 10 Apr 2017 10:38:13 -0700
+Message-ID: <CAKywueTDrk7h639+EJUDpQ6cgtg74VSV1pSjPN8f7rUUN42Avg@mail.gmail.com>
+References: <cover.333fa5a2e4d6ba38ce99ad2ef69bf44685343ca0.1491415908.git-series.germano.percossi@citrix.com>
+ <db6a87eb7372072d4da844ca5b01496d60ed3baa.1491415908.git-series.germano.percossi@citrix.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-        kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
+In-Reply-To: <db6a87eb7372072d4da844ca5b01496d60ed3baa.1491415908.git-series.germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-January is month 1.  There is no zero-th month.  We don't care very much
-if the days are invalid but for months, we use it to read from an array
-so this bug means we read one space before the start of the
-total_days_of_prev_months[] array.
+2017-04-07 4:29 GMT-07:00 Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>:
+> In case of error, smb2_reconnect_server reschedule itself
+> with a delay, to avoid being too aggressive.
+>
+> Signed-off-by: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/smb2pdu.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+>
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index efe167c..17af75a 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -2177,6 +2177,9 @@ void smb2_reconnect_server(struct work_struct *work)
+>         struct cifs_tcon *tcon, *tcon2;
+>         struct list_head tmp_list;
+>         int tcon_exist = false;
+> +       int rc;
+> +       int resched = false;
+> +
+>
+>         /* Prevent simultaneous reconnects that can corrupt tcon->rlist list */
+>         mutex_lock(&server->reconnect_mutex);
+> @@ -2204,13 +2207,18 @@ void smb2_reconnect_server(struct work_struct *work)
+>         spin_unlock(&cifs_tcp_ses_lock);
+>
+>         list_for_each_entry_safe(tcon, tcon2, &tmp_list, rlist) {
+> -               if (!smb2_reconnect(SMB2_INTERNAL_CMD, tcon))
+> +               rc = smb2_reconnect(SMB2_INTERNAL_CMD, tcon);
+> +               if (!rc)
+>                         cifs_reopen_persistent_handles(tcon);
+> +               else
+> +                       resched = true;
+>                 list_del_init(&tcon->rlist);
+>                 cifs_put_tcon(tcon);
+>         }
+>
+>         cifs_dbg(FYI, "Reconnecting tcons finished\n");
+> +       if (resched)
+> +               queue_delayed_work(cifsiod_wq, &server->reconnect, 2 * HZ);
+>         mutex_unlock(&server->reconnect_mutex);
+>
+>         /* now we can safely release srv struct */
+> --
+> git-series 0.9.1
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Fixes: 1bd5bbcb6531 ("[CIFS] Legacy time handling for Win9x and OS/2 part 1")
-Signed-off-by: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+Reviewed-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 
-diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
-index abae6dd2c6b9..f1f64a15215a 100644
---- a/fs/cifs/netmisc.c
-+++ b/fs/cifs/netmisc.c
-@@ -980,8 +980,10 @@ struct timespec cnvrtDosUnixTm(__le16 le_date, __le16 le_time, int offset)
- 		cifs_dbg(VFS, "illegal hours %d\n", st->Hours);
- 	days = sd->Day;
- 	month = sd->Month;
--	if ((days > 31) || (month > 12)) {
-+	if (days > 31 || month < 1 || month > 12) {
- 		cifs_dbg(VFS, "illegal date, month %d day: %d\n", month, days);
-+		if (month < 1)
-+			month = 1;
- 		if (month > 12)
- 			month = 12;
- 	}
+--
+Best regards,
+Pavel Shilovsky
