@@ -1,60 +1,212 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] CIFS: handle guest access errors to Windows shares
-Date: Mon, 10 Apr 2017 10:57:26 -0700
-Message-ID: <CAKywueT__B6Z=yRMwmECRDW+Pei=Bd0zEatNF9ou3v6kaZ-UQw@mail.gmail.com>
-References: <20161129113646.13360-2-mark.syms@citrix.com>
+Subject: Re: [4.11-rc6 bug] fstests generic/010 crashes cifs 2.0/2.1/3.0 mounts
+Date: Mon, 10 Apr 2017 13:18:33 -0700
+Message-ID: <CAKywueQMB_T=FXdKsRC6txbGYVpbZbWQFScuvzas75WzoJbahA@mail.gmail.com>
+References: <20170410044446.GC22845@eguan.usersys.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Mark Syms <mark.syms-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+Content-Type: multipart/mixed; boundary=001a1142bed202ccd8054cd5ae85
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Eryu Guan <eguan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20161129113646.13360-2-mark.syms-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <20170410044446.GC22845-+7p9VZFSOIEFmhoHi+V13ACJwEvxM/w9@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2016-11-29 3:36 GMT-08:00 Mark Syms <mark.syms-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>:
-> Commit 1a967d6c9b39c226be1b45f13acd4d8a5ab3dc44 ("correctly to
-> anonymous authentication for the NTLM(v2) authentication") introduces
-> a regression in handling errors related to attempting a guest
-> connection to a Windows share which requires authentication. This
-> should result in a permission denied error but actually causes the
-> kernel module to enter a never-ending loop trying to follow a DFS
-> referal which doesn't exist.
+--001a1142bed202ccd8054cd5ae85
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+2017-04-09 21:44 GMT-07:00 Eryu Guan <eguan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> Hi all,
 >
-> The base cause of this is the failure now occurs later in the process
-> during tree connect and not at the session setup setup and all errors
-> in tree connect are interpreted as needing to follow the DFS paths
-> which isn't in this case correct. So, check the returned error against
-> EACCES and fail if this is returned error.
-> ---
->  fs/cifs/connect.c | 3 +++
->  1 file changed, 3 insertions(+)
+> Starting from 4.11-rc6 kernel, I noticed fstests generic/010 would crash
+> cifs v2.0/2.1/3.0 mounts, I was testing with local mount linux samba
+> server.
 >
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 4547aed..a1737aa 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -3651,6 +3651,9 @@ cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *volume_info)
->         if (IS_ERR(tcon)) {
->                 rc = PTR_ERR(tcon);
->                 tcon = NULL;
-> +               if (rc == -EACCES) {
-> +                       goto mount_fail_check;
-> +               }
->                 goto remote_path_check;
->         }
+> [  324.109085] run fstests generic/010 at 2017-04-09 17:39:05
+> [  324.245779] BUG: unable to handle kernel NULL pointer dereference at  =
+         (null)
+> [  324.254532] IP: cifs_discard_remaining_data+0x12/0x70 [cifs]
+> [  324.260843] PGD 0
+> [  324.260844]
+> [  324.264741] Oops: 0000 [#1] SMP
+> [  324.268241] Modules linked in: cmac arc4 md4 nls_utf8 cifs ccm dns_res=
+olver binfmt_misc intel_rapl x86_pkg_temp_thermal intel_powerclamp coretemp=
+ kvm_intel kvm irqbypass crct10dif_pclmul crc32_pclmul ghash_clmulni_intel =
+pcbc aesni_intel cdc_ether nfsd crypto_simd iTCO_wdt glue_helper usbnet cry=
+ptd iTCO_vendor_support gpio_ich ipmi_ssif mii wmi ipmi_si sg pcspkr ie3120=
+0_edac ipmi_devintf edac_core shpchp i2c_i801 ipmi_msghandler lpc_ich auth_=
+rpcgss nfs_acl lockd grace sunrpc ip_tables xfs libcrc32c sr_mod cdrom sd_m=
+od ata_generic pata_acpi mgag200 i2c_algo_bit drm_kms_helper syscopyarea sy=
+sfillrect sysimgblt fb_sys_fops ttm e1000e drm ata_piix libata ptp crc32c_i=
+ntel pps_core i2c_core dm_mirror dm_region_hash dm_log dm_mod
+> [  324.339637] CPU: 0 PID: 25782 Comm: cifsd Not tainted 4.11.0-rc6 #1
+> [  324.346627] Hardware name: IBM IBM System X3250 M4 -[2583AC1]-/00D3729=
+, BIOS -[JQE164AUS-1.07]- 12/09/2013
+> [  324.357399] task: ffff999d307fc380 task.stack: ffffb01f490e8000
+> [  324.364010] RIP: 0010:cifs_discard_remaining_data+0x12/0x70 [cifs]
+> [  324.370904] RSP: 0018:ffffb01f490ebdf8 EFLAGS: 00010246
+> [  324.376732] RAX: 00000000ffffffc3 RBX: ffff999d31185480 RCX: 000000000=
+0000d50
+> [  324.384691] RDX: 0000000000000d50 RSI: 0000000000000000 RDI: ffff999ca=
+c4a0800
+> [  324.392651] RBP: ffffb01f490ebe08 R08: 0000000000071888 R09: 000000000=
+0000077
+> [  324.400611] R10: 0000000000038c44 R11: 0000000000081840 R12: 000000000=
+0000004
+> [  324.408569] R13: ffff999c7e815100 R14: ffff999c7e815100 R15: 000000000=
+000004d
+> [  324.416529] FS:  0000000000000000(0000) GS:ffff999d3fc00000(0000) knlG=
+S:0000000000000000
+> [  324.425556] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [  324.431965] CR2: 0000000000000000 CR3: 00000001a6809000 CR4: 000000000=
+01406f0
+> [  324.439924] Call Trace:
+> [  324.442657]  cifs_readv_discard+0x1e/0x40 [cifs]
+> [  324.447812]  cifs_readv_receive+0xd6/0x560 [cifs]
+> [  324.453056]  cifs_demultiplex_thread+0x66f/0xa70 [cifs]
+> [  324.458887]  kthread+0x101/0x140
+> [  324.462491]  ? cifs_handle_standard+0x130/0x130 [cifs]
+> [  324.468222]  ? kthread_park+0x90/0x90
+> [  324.472306]  ? do_syscall_64+0x67/0x180
+> [  324.476584]  ret_from_fork+0x2c/0x40
+> [  324.480570] Code: 05 55 39 d4 e9 50 fe ff ff e8 3b 2a 07 d4 90 66 2e 0=
+f 1f 84 00 00 00 00 00 0f 1f 44 00 00 55 48 89 e5 41 54 41 bc 04 00 00 00 5=
+3 <8b> 06 48 89 fb 44 2b a7 38 03 00 00 0f c8 25 ff ff ff 00 41 01
+> [  324.501642] RIP: cifs_discard_remaining_data+0x12/0x70 [cifs] RSP: fff=
+fb01f490ebdf8
+> [  324.510182] CR2: 0000000000000000
+> [  324.513879] ---[ end trace 754f09c6094faa76 ]---
+> [  324.519028] Kernel panic - not syncing: Fatal exception
+> [  324.524889] Kernel Offset: 0x13600000 from 0xffffffff81000000 (relocat=
+ion range: 0xffffffff80000000-0xffffffffbfffffff)
+> [  324.536921] ---[ end Kernel panic - not syncing: Fatal exception
 >
-> --
-> 2.10.2
+> And I bisected this to
 >
+> commit 38bd49064a1ecb67baad33598e3d824448ab11ec
+> Author: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> Date:   Fri Mar 3 15:41:38 2017 -0800
+>
+>     Handle mismatched open calls
+>
+>     A signal can interrupt a SendReceive call which result in incoming
+>     responses to the call being ignored. This is a problem for calls such=
+ as
+>     open which results in the successful response being ignored. This
+>     results in an open file resource on the server.
+>
+>     The patch looks into responses which were cancelled after being sent =
+and
+>     in case of successful open closes the open fids.
+>
+>     For this patch, the check is only done in SendReceive2()
+>
+>     RH-bz: 1403319
+>
+>     Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>     Reviewed-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+>     Cc: Stable <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+>
+> I was able to reproduce this crash with cifs2.0/2.1 mounts manually and
+> it was easy to hit. Though I haven't seen it with cifs 3.0 mount in my
+> manual test, I did see v3.0 crash in my auto tests. If you need more
+> info please let me know.
+>
+> Thanks,
+> Eryu
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
 > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Acked-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Hi Eryu,
+
+Thank for reporting this. I ended up with a fix for the problem (see
+patch attached).
+
+Sachin, can you please review the patch?
 
 --
 Best regards,
 Pavel Shilovsky
+
+--001a1142bed202ccd8054cd5ae85
+Content-Type: application/octet-stream;
+	name="0001-CIFS-Fix-null-pointer-deref-during-read-resp-process.patch"
+Content-Disposition: attachment;
+	filename="0001-CIFS-Fix-null-pointer-deref-during-read-resp-process.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_j1ck5a8i0
+
+RnJvbSA3ZDk3ZjFhZjdmNzYyYzBmMjFjZTg2NWQ4Njk0NWZjOWFiMjE4MThkIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBQYXZlbCBTaGlsb3Zza3kgPHBzaGlsb3ZAbWljcm9zb2Z0LmNv
+bT4KRGF0ZTogTW9uLCAxMCBBcHIgMjAxNyAxMDozMTozMyAtMDcwMApTdWJqZWN0OiBbUEFUQ0hd
+IENJRlM6IEZpeCBudWxsIHBvaW50ZXIgZGVyZWYgZHVyaW5nIHJlYWQgcmVzcCBwcm9jZXNzaW5n
+CgpDdXJyZW50bHkgZHVyaW5nIHJlY2VpdmluZyBhIHJlYWQgcmVzcG9uc2UgbWlkLT5yZXNwX2J1
+ZiBjYW4gYmUKTlVMTCB3aGVuIGl0IGlzIGJlaW5nIHBhc3NlZCB0byBjaWZzX2Rpc2NhcmRfcmVt
+YWluaW5nX2RhdGEoKSBmcm9tCmNpZnNfcmVhZHZfZGlzY2FyZCgpLiBGaXggaXQgYnkgYWx3YXlz
+IHBhc3Npbmcgc2VydmVyLT5zbWFsbGJ1ZgppbnN0ZWFkIGFuZCBpbml0aWFsaXppbmcgbWlkLT5y
+ZXNwX2J1ZiBhdCB0aGUgZW5kIG9mIHJlYWQgcmVzcG9uc2UKcHJvY2Vzc2luZy4KClNpZ25lZC1v
+ZmYtYnk6IFBhdmVsIFNoaWxvdnNreSA8cHNoaWxvdkBtaWNyb3NvZnQuY29tPgotLS0KIGZzL2Np
+ZnMvY2lmc3Byb3RvLmggfCAgMyArLS0KIGZzL2NpZnMvY2lmc3NtYi5jICAgfCAxNSArKysrKysr
+Ky0tLS0tLS0KIGZzL2NpZnMvc21iMm9wcy5jICAgfCAgNCArKy0tCiAzIGZpbGVzIGNoYW5nZWQs
+IDExIGluc2VydGlvbnMoKyksIDExIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMv
+Y2lmc3Byb3RvLmggYi9mcy9jaWZzL2NpZnNwcm90by5oCmluZGV4IGVjNWU1ZTUuLjk3ZTVkMjMg
+MTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvY2lmc3Byb3RvLmgKKysrIGIvZnMvY2lmcy9jaWZzcHJvdG8u
+aApAQCAtNzksOCArNzksNyBAQCBleHRlcm4gdm9pZCBjaWZzX2RlbGV0ZV9taWQoc3RydWN0IG1p
+ZF9xX2VudHJ5ICptaWQpOwogZXh0ZXJuIHZvaWQgY2lmc193YWtlX3VwX3Rhc2soc3RydWN0IG1p
+ZF9xX2VudHJ5ICptaWQpOwogZXh0ZXJuIGludCBjaWZzX2hhbmRsZV9zdGFuZGFyZChzdHJ1Y3Qg
+VENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIsCiAJCQkJc3RydWN0IG1pZF9xX2VudHJ5ICptaWQpOwot
+ZXh0ZXJuIGludCBjaWZzX2Rpc2NhcmRfcmVtYWluaW5nX2RhdGEoc3RydWN0IFRDUF9TZXJ2ZXJf
+SW5mbyAqc2VydmVyLAotCQkJCSAgICAgICBjaGFyICpidWYpOworZXh0ZXJuIGludCBjaWZzX2Rp
+c2NhcmRfcmVtYWluaW5nX2RhdGEoc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyKTsKIGV4
+dGVybiBpbnQgY2lmc19jYWxsX2FzeW5jKHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciwK
+IAkJCXN0cnVjdCBzbWJfcnFzdCAqcnFzdCwKIAkJCW1pZF9yZWNlaXZlX3QgKnJlY2VpdmUsIG1p
+ZF9jYWxsYmFja190ICpjYWxsYmFjaywKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc3NtYi5jIGIv
+ZnMvY2lmcy9jaWZzc21iLmMKaW5kZXggOTY3YjkyNjMuLjVkMjFmMDAgMTAwNjQ0Ci0tLSBhL2Zz
+L2NpZnMvY2lmc3NtYi5jCisrKyBiL2ZzL2NpZnMvY2lmc3NtYi5jCkBAIC0xNDAwLDkgKzE0MDAs
+OSBAQCBDSUZTX29wZW4oY29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGNpZnNfb3Blbl9w
+YXJtcyAqb3Bhcm1zLCBpbnQgKm9wbG9jaywKICAqIGN1cnJlbnQgYmlnYnVmLgogICovCiBpbnQK
+LWNpZnNfZGlzY2FyZF9yZW1haW5pbmdfZGF0YShzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2
+ZXIsIGNoYXIgKmJ1ZikKK2NpZnNfZGlzY2FyZF9yZW1haW5pbmdfZGF0YShzdHJ1Y3QgVENQX1Nl
+cnZlcl9JbmZvICpzZXJ2ZXIpCiB7Ci0JdW5zaWduZWQgaW50IHJmY2xlbiA9IGdldF9yZmMxMDAy
+X2xlbmd0aChidWYpOworCXVuc2lnbmVkIGludCByZmNsZW4gPSBnZXRfcmZjMTAwMl9sZW5ndGgo
+c2VydmVyLT5zbWFsbGJ1Zik7CiAJaW50IHJlbWFpbmluZyA9IHJmY2xlbiArIDQgLSBzZXJ2ZXIt
+PnRvdGFsX3JlYWQ7CiAKIAl3aGlsZSAocmVtYWluaW5nID4gMCkgewpAQCAtMTQyNiw4ICsxNDI2
+LDEwIEBAIGNpZnNfcmVhZHZfZGlzY2FyZChzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIs
+IHN0cnVjdCBtaWRfcV9lbnRyeSAqbWlkKQogCWludCBsZW5ndGg7CiAJc3RydWN0IGNpZnNfcmVh
+ZGRhdGEgKnJkYXRhID0gbWlkLT5jYWxsYmFja19kYXRhOwogCi0JbGVuZ3RoID0gY2lmc19kaXNj
+YXJkX3JlbWFpbmluZ19kYXRhKHNlcnZlciwgbWlkLT5yZXNwX2J1Zik7CisJbGVuZ3RoID0gY2lm
+c19kaXNjYXJkX3JlbWFpbmluZ19kYXRhKHNlcnZlcik7CiAJZGVxdWV1ZV9taWQobWlkLCByZGF0
+YS0+cmVzdWx0KTsKKwltaWQtPnJlc3BfYnVmID0gc2VydmVyLT5zbWFsbGJ1ZjsKKwlzZXJ2ZXIt
+PnNtYWxsYnVmID0gTlVMTDsKIAlyZXR1cm4gbGVuZ3RoOwogfQogCkBAIC0xNDU5LDcgKzE0NjEs
+NyBAQCBjaWZzX3JlYWR2X3JlY2VpdmUoc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyLCBz
+dHJ1Y3QgbWlkX3FfZW50cnkgKm1pZCkKIAogCWlmIChzZXJ2ZXItPm9wcy0+aXNfc3RhdHVzX3Bl
+bmRpbmcgJiYKIAkgICAgc2VydmVyLT5vcHMtPmlzX3N0YXR1c19wZW5kaW5nKGJ1Ziwgc2VydmVy
+LCAwKSkgewotCQljaWZzX2Rpc2NhcmRfcmVtYWluaW5nX2RhdGEoc2VydmVyLCBidWYpOworCQlj
+aWZzX2Rpc2NhcmRfcmVtYWluaW5nX2RhdGEoc2VydmVyKTsKIAkJcmV0dXJuIC0xOwogCX0KIApA
+QCAtMTUxOSw5ICsxNTIxLDYgQEAgY2lmc19yZWFkdl9yZWNlaXZlKHN0cnVjdCBUQ1BfU2VydmVy
+X0luZm8gKnNlcnZlciwgc3RydWN0IG1pZF9xX2VudHJ5ICptaWQpCiAJY2lmc19kYmcoRllJLCAi
+MDogaW92X2Jhc2U9JXAgaW92X2xlbj0ldVxuIiwKIAkJIHJkYXRhLT5pb3ZbMF0uaW92X2Jhc2Us
+IHNlcnZlci0+dG90YWxfcmVhZCk7CiAKLQltaWQtPnJlc3BfYnVmID0gc2VydmVyLT5zbWFsbGJ1
+ZjsKLQlzZXJ2ZXItPnNtYWxsYnVmID0gTlVMTDsKLQogCS8qIGhvdyBtdWNoIGRhdGEgaXMgaW4g
+dGhlIHJlc3BvbnNlPyAqLwogCWRhdGFfbGVuID0gc2VydmVyLT5vcHMtPnJlYWRfZGF0YV9sZW5n
+dGgoYnVmKTsKIAlpZiAoZGF0YV9vZmZzZXQgKyBkYXRhX2xlbiA+IGJ1ZmxlbikgewpAQCAtMTU0
+NCw2ICsxNTQzLDggQEAgY2lmc19yZWFkdl9yZWNlaXZlKHN0cnVjdCBUQ1BfU2VydmVyX0luZm8g
+KnNlcnZlciwgc3RydWN0IG1pZF9xX2VudHJ5ICptaWQpCiAJCXJldHVybiBjaWZzX3JlYWR2X2Rp
+c2NhcmQoc2VydmVyLCBtaWQpOwogCiAJZGVxdWV1ZV9taWQobWlkLCBmYWxzZSk7CisJbWlkLT5y
+ZXNwX2J1ZiA9IHNlcnZlci0+c21hbGxidWY7CisJc2VydmVyLT5zbWFsbGJ1ZiA9IE5VTEw7CiAJ
+cmV0dXJuIGxlbmd0aDsKIH0KIApkaWZmIC0tZ2l0IGEvZnMvY2lmcy9zbWIyb3BzLmMgYi9mcy9j
+aWZzL3NtYjJvcHMuYwppbmRleCA3YjEyYTcyLi4xNTJlMzdmIDEwMDY0NAotLS0gYS9mcy9jaWZz
+L3NtYjJvcHMuYworKysgYi9mcy9jaWZzL3NtYjJvcHMuYwpAQCAtMjE5NSw3ICsyMTk1LDcgQEAg
+cmVjZWl2ZV9lbmNyeXB0ZWRfcmVhZChzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIsIHN0
+cnVjdCBtaWRfcV9lbnRyeSAqKm1pZCkKIAlpZiAocmMpCiAJCWdvdG8gZnJlZV9wYWdlczsKIAot
+CXJjID0gY2lmc19kaXNjYXJkX3JlbWFpbmluZ19kYXRhKHNlcnZlciwgYnVmKTsKKwlyYyA9IGNp
+ZnNfZGlzY2FyZF9yZW1haW5pbmdfZGF0YShzZXJ2ZXIpOwogCWlmIChyYykKIAkJZ290byBmcmVl
+X3BhZ2VzOwogCkBAIC0yMjIxLDcgKzIyMjEsNyBAQCByZWNlaXZlX2VuY3J5cHRlZF9yZWFkKHN0
+cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciwgc3RydWN0IG1pZF9xX2VudHJ5ICoqbWlkKQog
+CWtmcmVlKHBhZ2VzKTsKIAlyZXR1cm4gcmM7CiBkaXNjYXJkX2RhdGE6Ci0JY2lmc19kaXNjYXJk
+X3JlbWFpbmluZ19kYXRhKHNlcnZlciwgYnVmKTsKKwljaWZzX2Rpc2NhcmRfcmVtYWluaW5nX2Rh
+dGEoc2VydmVyKTsKIAlnb3RvIGZyZWVfcGFnZXM7CiB9CiAKLS0gCjIuNy40Cgo=
+--001a1142bed202ccd8054cd5ae85--
