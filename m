@@ -1,162 +1,59 @@
-From: Jan Kara <jack@suse.cz>
-Subject: [PATCH 04/25] fs: Provide infrastructure for
-	dynamic BDIs in filesystems
-Date: Wed, 12 Apr 2017 12:24:28 +0200
-Message-ID: <20170412102449.16901-5-jack@suse.cz>
-References: <20170412102449.16901-1-jack@suse.cz>
-Cc: codalist@TELEMANN.coda.cs.cmu.edu, cluster-devel@redhat.com,
-	linux-nfs@vger.kernel.org, linux-nilfs@vger.kernel.org,
-	Jan Kara <jack@suse.cz>, linux-cifs@vger.kernel.org,
-	ecryptfs@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-mtd@lists.infradead.org, osd-dev@open-osd.org,
-	linux-fsdevel@vger.kernel.org,
-	v9fs-developer@lists.sourceforge.net, ceph-devel@vger.kernel.org,
-	Petr Vandrovec <petr@vandrovec.name>,
-	linux-afs@lists.infradead.org, linux-btrfs@vger.kernel.org,
-	lustre-devel@lists.lustre.org
-To: Jens Axboe <axboe@kernel.dk>
-Return-path: <cluster-devel-bounces@redhat.com>
-In-Reply-To: <20170412102449.16901-1-jack@suse.cz>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/cluster-devel>,
-	<mailto:cluster-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/cluster-devel>
-List-Post: <mailto:cluster-devel@redhat.com>
-List-Help: <mailto:cluster-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/cluster-devel>,
-	<mailto:cluster-devel-request@redhat.com?subject=subscribe>
-Sender: cluster-devel-bounces@redhat.com
-Errors-To: cluster-devel-bounces@redhat.com
+From: David Sterba <dsterba@suse.cz>
+Subject: Re: [PATCH 07/12] fs: btrfs: Use ktime_get_real_ts for root
+	ctime
+Date: Wed, 12 Apr 2017 15:42:45 +0200
+Message-ID: <20170412134245.GK4781@twin.jikos.cz>
+References: <1491613030-11599-1-git-send-email-deepa.kernel@gmail.com>
+ <1491613030-11599-8-git-send-email-deepa.kernel@gmail.com>
+Reply-To: dsterba@suse.cz
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: yuchao0@huawei.com, bfields@fieldses.org, clm@fb.com,
+ linux-mtd@lists.infradead.org, dushistov@mail.ru, jlayton@poochiereds.net,
+ ceph-devel@vger.kernel.org, devel@driverdev.osuosl.org,
+ linux-cifs@vger.kernel.org, paul@paul-moore.com, y2038@lists.linaro.org,
+ mingo@redhat.com, jsimmons@infradead.org, arnd@arndb.de, rostedt@goodmis.org,
+ oleg.drokin@intel.com, john.stultz@linaro.org, viro@zeniv.linux.org.uk,
+ dsterba@suse.com, jaegeuk@kernel.org, tglx@linutronix.de,
+ andreas.dilger@intel.com, jbacik@fb.com, gregkh@linuxfoundation.org,
+ samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+ eparis@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
+ linux-security-module@vger.kernel.org, linux-audit@redhat.com,
+ netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ akpm@linux-foundation.org, davem@davemloft.net, linux-btrfs@vger.kernel.org,
+ lustre-devel@lists.lustre.org
+To: Deepa Dinamani <deepa.kernel@gmail.com>
+Return-path: <y2038-bounces@lists.linaro.org>
+Content-Disposition: inline
+In-Reply-To: <1491613030-11599-8-git-send-email-deepa.kernel@gmail.com>
+List-Unsubscribe: <https://lists.linaro.org/mailman/options/y2038>,
+ <mailto:y2038-request@lists.linaro.org?subject=unsubscribe>
+List-Archive: <http://lists.linaro.org/pipermail/y2038/>
+List-Post: <mailto:y2038@lists.linaro.org>
+List-Help: <mailto:y2038-request@lists.linaro.org?subject=help>
+List-Subscribe: <https://lists.linaro.org/mailman/listinfo/y2038>,
+ <mailto:y2038-request@lists.linaro.org?subject=subscribe>
+Errors-To: y2038-bounces@lists.linaro.org
+Sender: "Y2038" <y2038-bounces@lists.linaro.org>
 List-Id: linux-cifs.vger.kernel.org
 
-Provide helper functions for setting up dynamically allocated
-backing_dev_info structures for filesystems and cleaning them up on
-superblock destruction.
-
-CC: linux-mtd@lists.infradead.org
-CC: linux-nfs@vger.kernel.org
-CC: Petr Vandrovec <petr@vandrovec.name>
-CC: linux-nilfs@vger.kernel.org
-CC: cluster-devel@redhat.com
-CC: osd-dev@open-osd.org
-CC: codalist@coda.cs.cmu.edu
-CC: linux-afs@lists.infradead.org
-CC: ecryptfs@vger.kernel.org
-CC: linux-cifs@vger.kernel.org
-CC: ceph-devel@vger.kernel.org
-CC: linux-btrfs@vger.kernel.org
-CC: v9fs-developer@lists.sourceforge.net
-CC: lustre-devel@lists.lustre.org
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- fs/super.c                       | 49 ++++++++++++++++++++++++++++++++++++++++
- include/linux/backing-dev-defs.h |  2 +-
- include/linux/fs.h               |  6 +++++
- 3 files changed, 56 insertions(+), 1 deletion(-)
-
-diff --git a/fs/super.c b/fs/super.c
-index b8b6a086c03b..0f51a437c269 100644
---- a/fs/super.c
-+++ b/fs/super.c
-@@ -446,6 +446,11 @@ void generic_shutdown_super(struct super_block *sb)
- 	hlist_del_init(&sb->s_instances);
- 	spin_unlock(&sb_lock);
- 	up_write(&sb->s_umount);
-+	if (sb->s_iflags & SB_I_DYNBDI) {
-+		bdi_put(sb->s_bdi);
-+		sb->s_bdi = &noop_backing_dev_info;
-+		sb->s_iflags &= ~SB_I_DYNBDI;
-+	}
- }
- 
- EXPORT_SYMBOL(generic_shutdown_super);
-@@ -1256,6 +1261,50 @@ mount_fs(struct file_system_type *type, int flags, const char *name, void *data)
- }
- 
- /*
-+ * Setup private BDI for given superblock. It gets automatically cleaned up
-+ * in generic_shutdown_super().
-+ */
-+int super_setup_bdi_name(struct super_block *sb, char *fmt, ...)
-+{
-+	struct backing_dev_info *bdi;
-+	int err;
-+	va_list args;
-+
-+	bdi = bdi_alloc(GFP_KERNEL);
-+	if (!bdi)
-+		return -ENOMEM;
-+
-+	bdi->name = sb->s_type->name;
-+
-+	va_start(args, fmt);
-+	err = bdi_register_va(bdi, NULL, fmt, args);
-+	va_end(args);
-+	if (err) {
-+		bdi_put(bdi);
-+		return err;
-+	}
-+	WARN_ON(sb->s_bdi != &noop_backing_dev_info);
-+	sb->s_bdi = bdi;
-+	sb->s_iflags |= SB_I_DYNBDI;
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL(super_setup_bdi_name);
-+
-+/*
-+ * Setup private BDI for given superblock. I gets automatically cleaned up
-+ * in generic_shutdown_super().
-+ */
-+int super_setup_bdi(struct super_block *sb)
-+{
-+	static atomic_long_t bdi_seq = ATOMIC_LONG_INIT(0);
-+
-+	return super_setup_bdi_name(sb, "%.28s-%ld", sb->s_type->name,
-+				    atomic_long_inc_return(&bdi_seq));
-+}
-+EXPORT_SYMBOL(super_setup_bdi);
-+
-+/*
-  * This is an internal function, please use sb_end_{write,pagefault,intwrite}
-  * instead.
-  */
-diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
-index e66d4722db8e..866c433e7d32 100644
---- a/include/linux/backing-dev-defs.h
-+++ b/include/linux/backing-dev-defs.h
-@@ -146,7 +146,7 @@ struct backing_dev_info {
- 	congested_fn *congested_fn; /* Function pointer if device is md/dm */
- 	void *congested_data;	/* Pointer to aux data for congested func */
- 
--	char *name;
-+	const char *name;
- 
- 	struct kref refcnt;	/* Reference counter for the structure */
- 	unsigned int capabilities; /* Device capabilities */
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 7251f7bb45e8..98cf14ea78c0 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -1272,6 +1272,9 @@ struct mm_struct;
- /* sb->s_iflags to limit user namespace mounts */
- #define SB_I_USERNS_VISIBLE		0x00000010 /* fstype already mounted */
- 
-+/* Temporary flag until all filesystems are converted to dynamic bdis */
-+#define SB_I_DYNBDI	0x00000100
-+
- /* Possible states of 'frozen' field */
- enum {
- 	SB_UNFROZEN = 0,		/* FS is unfrozen */
-@@ -2121,6 +2124,9 @@ extern int vfs_ustat(dev_t, struct kstatfs *);
- extern int freeze_super(struct super_block *super);
- extern int thaw_super(struct super_block *super);
- extern bool our_mnt(struct vfsmount *mnt);
-+extern __printf(2, 3)
-+int super_setup_bdi_name(struct super_block *sb, char *fmt, ...);
-+extern int super_setup_bdi(struct super_block *sb);
- 
- extern int current_umask(void);
- 
--- 
-2.12.0
+T24gRnJpLCBBcHIgMDcsIDIwMTcgYXQgMDU6NTc6MDVQTSAtMDcwMCwgRGVlcGEgRGluYW1hbmkg
+d3JvdGU6Cj4gYnRyZnNfcm9vdF9pdGVtIG1haW50YWlucyB0aGUgY3RpbWUgZm9yIHJvb3QgdXBk
+YXRlcy4KPiBUaGlzIGlzIG5vdCBwYXJ0IG9mIHZmc19pbm9kZS4KPiAKPiBTaW5jZSBjdXJyZW50
+X3RpbWUoKSB1c2VzIHN0cnVjdCBpbm9kZSogYXMgYW4gYXJndW1lbnQKPiBhcyBMaW51cyBzdWdn
+ZXN0ZWQsIHRoaXMgY2Fubm90IGJlIHVzZWQgdG8gdXBkYXRlIHJvb3QKPiB0aW1lcyB1bmxlc3Ms
+IHdlIG1vZGlmeSB0aGUgc2lnbmF0dXJlIHRvIHVzZSBpbm9kZS4KPiAKPiBTaW5jZSBidHJmcyB1
+c2VzIG5hbm9zZWNvbmQgdGltZSBncmFudWxhcml0eSwgaXQgY2FuIGFsc28KPiB1c2Uga3RpbWVf
+Z2V0X3JlYWxfdHMgZGlyZWN0bHkgdG8gb2J0YWluIHRpbWVzdGFtcCBmb3IKPiB0aGUgcm9vdC4g
+SXQgaXMgbmVjZXNzYXJ5IHRvIHVzZSB0aGUgdGltZXNwZWMgdGltZSBhcGkKPiBoZXJlIGJlY2F1
+c2UgdGhlIHNhbWUgYnRyZnNfc2V0X3N0YWNrX3RpbWVzcGVjXyooKSBhcGlzCj4gYXJlIHVzZWQg
+Zm9yIHZmcyBpbm9kZSB0aW1lcyBhcyB3ZWxsLiBUaGVzZSBjYW4gYmUKPiB0cmFuc2l0aW9uZWQg
+dG8gdXNpbmcgdGltZXNwZWM2NCB3aGVuIGJ0cmZzIGludGVybmFsbHkKPiBjaGFuZ2VzIHRvIHVz
+ZSB0aW1lc3BlYzY0IGFzIHdlbGwuCj4gCj4gU2lnbmVkLW9mZi1ieTogRGVlcGEgRGluYW1hbmkg
+PGRlZXBhLmtlcm5lbEBnbWFpbC5jb20+Cj4gQWNrZWQtYnk6IERhdmlkIFN0ZXJiYSA8ZHN0ZXJi
+YUBzdXNlLmNvbT4KPiBSZXZpZXdlZC1ieTogQXJuZCBCZXJnbWFubiA8YXJuZEBhcm5kYi5kZT4K
+CkknbSBnb2luZyB0byBhZGQgdGhlIHBhdGNoIHRvIG15IDQuMTIgcXVldWUgYW5kIHdpbGwgbGV0
+IEFuZHJldyBrbm93LgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fXwpZMjAzOCBtYWlsaW5nIGxpc3QKWTIwMzhAbGlzdHMubGluYXJvLm9yZwpodHRwczovL2xp
+c3RzLmxpbmFyby5vcmcvbWFpbG1hbi9saXN0aW5mby95MjAzOAo=
