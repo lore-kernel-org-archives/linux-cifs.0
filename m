@@ -1,27 +1,60 @@
-From: Package Unit <amit-FpRz5xulseMAvxtiuMwx3w@public.gmane.org>
-Subject: Dear Esteemed Customer,
-Date: Thu, 13 Apr 2017 04:38:23 +0200
-Message-ID: <9ac3c8a3c56840c7883f87096d3cabd3@SHS-EXC.sr.local>
-Reply-To: <cargo.forwarder-CZK690njTpI@public.gmane.org>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] CIFS: Fix SMB3 mount without specifying a security mechanism
+Date: Thu, 13 Apr 2017 10:06:30 -0500
+Message-ID: <CAH2r5mudx3x7MWn_0epXiruPr1Mkn0u2vrNutDpNVuSpMmnw4g@mail.gmail.com>
+References: <1492029127-4524-1-git-send-email-pshilov@microsoft.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-To: Recipients <amit-FpRz5xulseMAvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Description: Mail message body
+In-Reply-To: <1492029127-4524-1-git-send-email-pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Dear Esteemed Customer,
+merged into cifs-2.6.git for-next
 
-Your package/diplomatic pouch is ready to be delivered. You have to call stating your LAST NAME and First Name for us to verify your details and also send your telephone number with which we can reach you in case we will need further details to confirm your booking for delivery.
+Let me know if missed any must fix ASAP patches that have to go in.
 
-This package is being sent to you from the European Financial Authorities as a highly classified package,so you should attend to this case promptly.You have to Confirm if you wish to come to Italy for pickup of your cash or if you want us to deliver to you in your location.
+On Wed, Apr 12, 2017 at 3:32 PM, Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org> wrote:
+> Commit ef65aaede23f ("smb2: Enforce sec= mount option") changed the
+> behavior of a mount command to enforce a specified security mechanism
+> during mounting. On another hand according to the spec if SMB3 server
+> doesn't respond with a security context it implies that it supports
+> NTLMSSP. The current code doesn't keep it in mind and fails a mount
+> for such servers if no security mechanism is specified. Fix this by
+> indicating that a server supports NTLMSSP if a security context isn't
+> returned during negotiate phase. This allows the code to use NTLMSSP
+> by default for SMB3 mounts.
+>
+> Signed-off-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+> ---
+>  fs/cifs/smb2pdu.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index 1bd5d30..02da648 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -562,8 +562,10 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
+>          * but for time being this is our only auth choice so doesn't matter.
+>          * We just found a server which sets blob length to zero expecting raw.
+>          */
+> -       if (blob_length == 0)
+> +       if (blob_length == 0) {
+>                 cifs_dbg(FYI, "missing security blob on negprot\n");
+> +               server->sec_ntlmssp = true;
+> +       }
+>
+>         rc = cifs_enable_signing(server, ses->sign);
+>         if (rc)
+> --
+> 2.7.4
+>
 
-Looking forward to a prompt response from you.
 
-Sig. Adolf Martin
-Package Recovery Unit
-Admin section 1
-Phone: +39 3510402196
-Email: cargo.forwarder-CZK690njTpI@public.gmane.org
+
+-- 
+Thanks,
+
+Steve
