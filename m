@@ -1,60 +1,25 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Fix SMB3 mount without specifying a security mechanism
-Date: Thu, 13 Apr 2017 10:06:30 -0500
-Message-ID: <CAH2r5mudx3x7MWn_0epXiruPr1Mkn0u2vrNutDpNVuSpMmnw4g@mail.gmail.com>
-References: <1492029127-4524-1-git-send-email-pshilov@microsoft.com>
+From: Sarah JOHNSON <sarah.johnson197070-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Greetings.
+Date: Fri, 14 Apr 2017 09:22:50 +0000 (UTC)
+Message-ID: <1940046256.242872.1492161770258__34054.0914716714$1492161779$gmane$org@mail.yahoo.com>
+References: <1940046256.242872.1492161770258.ref@mail.yahoo.com>
+Reply-To: Sarah JOHNSON <sarah.johnson197070-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Content-Transfer-Encoding: 7bit
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1492029127-4524-1-git-send-email-pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-merged into cifs-2.6.git for-next
+Good Day Dearest.
 
-Let me know if missed any must fix ASAP patches that have to go in.
+My name is Sarah JOHNSON I am 18 years old, the only daughter of late Mr. Raymond JOHNSON from Burkina Faso, I am contacting you to help me relocate to your country to continue my university education in  your country, before my father died he gave me a deposit slip document of ($7,000,000 USD) and made me understand that it was because of his position in the government that his government associates planed and poisoned him on a business trip with them to France and he advised me to look for a faithful and reliable foreigner who will help me to transfer this money to his country and help me to relocate over there to continue my studies.
 
-On Wed, Apr 12, 2017 at 3:32 PM, Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org> wrote:
-> Commit ef65aaede23f ("smb2: Enforce sec= mount option") changed the
-> behavior of a mount command to enforce a specified security mechanism
-> during mounting. On another hand according to the spec if SMB3 server
-> doesn't respond with a security context it implies that it supports
-> NTLMSSP. The current code doesn't keep it in mind and fails a mount
-> for such servers if no security mechanism is specified. Fix this by
-> indicating that a server supports NTLMSSP if a security context isn't
-> returned during negotiate phase. This allows the code to use NTLMSSP
-> by default for SMB3 mounts.
->
-> Signed-off-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> ---
->  fs/cifs/smb2pdu.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 1bd5d30..02da648 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -562,8 +562,10 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
->          * but for time being this is our only auth choice so doesn't matter.
->          * We just found a server which sets blob length to zero expecting raw.
->          */
-> -       if (blob_length == 0)
-> +       if (blob_length == 0) {
->                 cifs_dbg(FYI, "missing security blob on negprot\n");
-> +               server->sec_ntlmssp = true;
-> +       }
->
->         rc = cifs_enable_signing(server, ses->sign);
->         if (rc)
-> --
-> 2.7.4
->
+I hope you will help me with the good faith and trust I have in you, after you have secured the money and settle my education, I will give you 30% of the money for your good and kind assistance to me. Please Contact me e-Mail:sarah.johnson197070-/E1597aS9LQAvxtiuMwx3w@public.gmane.org 
 
+I am waiting on your reply
 
+Regards,
 
--- 
-Thanks,
-
-Steve
+Sarah.
