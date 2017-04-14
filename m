@@ -1,97 +1,57 @@
-From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Subject: [PATCH 4/4] mm/truncate: avoid pointless cleancache_invalidate_inode() calls.
-Date: Fri, 14 Apr 2017 17:07:53 +0300
-Message-ID: <20170414140753.16108-5-aryabinin@virtuozzo.com>
-References: <20170414140753.16108-1-aryabinin@virtuozzo.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [GIT] SMB3 fixes
+Date: Fri, 14 Apr 2017 11:01:01 -0500
+Message-ID: <CAH2r5msvKz_N-Kycse86hwjsC_3p8+WqA82-1C0diNZ=FEiu9A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Konrad Rzeszutek Wilk
-	<konrad.wilk@oracle.com>, Eric Van Hensbergen <ericvh@gmail.com>, Ron Minnich
-	<rminnich@sandia.gov>, Latchesar Ionkov <lucho@ionkov.net>, Steve French
-	<sfrench@samba.org>, Matthew Wilcox <mawilcox@microsoft.com>, Ross Zwisler
-	<ross.zwisler@linux.intel.com>, Trond Myklebust
-	<trond.myklebust@primarydata.com>, Anna Schumaker
-	<anna.schumaker@netapp.com>, Andrew Morton <akpm@linux-foundation.org>, Jan
- Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>, Johannes Weiner
-	<hannes@cmpxchg.org>, Alexey Kuznetsov <kuznet@virtuozzo.com>, Christoph
- Hellwig <hch@lst.de>, <v9fs-developer@lists.sourceforge.net>,
-	<linux-kernel@vger.kernel.org>, <linux-cifs@vger.kernel.org>,
-	<samba-technical@lists.samba.org>, <linux-nfs@vger.kernel.org>,
-	<linux-mm@kvack.org>
-To: Alexander Viro <viro@zeniv.linux.org.uk>, <linux-fsdevel@vger.kernel.org>
-Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <20170414140753.16108-1-aryabinin@virtuozzo.com>
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-cleancache_invalidate_inode() called truncate_inode_pages_range()
-and invalidate_inode_pages2_range() twice - on entry and on exit.
-It's stupid and waste of time. It's enough to call it once at
-exit.
+As promised, here is the remaining set of cifs/smb3 fixes for stable
+(and a fix for one regression) now that they have had additional
+review and testing.  Please pull the following changes since commit
+c08e611b7d0169b513e3b4515ffd51ac7f37f22c:
 
-Signed-off-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
----
- mm/truncate.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+  Merge branch 'linus' of
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6
+(2017-04-10 09:37:43 -0700)
 
-diff --git a/mm/truncate.c b/mm/truncate.c
-index 8f12b0e..83a059e 100644
---- a/mm/truncate.c
-+++ b/mm/truncate.c
-@@ -266,9 +266,8 @@ void truncate_inode_pages_range(struct address_space *mapping,
- 	pgoff_t		index;
- 	int		i;
- 
--	cleancache_invalidate_inode(mapping);
- 	if (mapping->nrpages == 0 && mapping->nrexceptional == 0)
--		return;
-+		goto out;
- 
- 	/* Offsets within partial pages */
- 	partial_start = lstart & (PAGE_SIZE - 1);
-@@ -363,7 +362,7 @@ void truncate_inode_pages_range(struct address_space *mapping,
- 	 * will be released, just zeroed, so we can bail out now.
- 	 */
- 	if (start >= end)
--		return;
-+		goto out;
- 
- 	index = start;
- 	for ( ; ; ) {
-@@ -410,6 +409,8 @@ void truncate_inode_pages_range(struct address_space *mapping,
- 		pagevec_release(&pvec);
- 		index++;
- 	}
-+
-+out:
- 	cleancache_invalidate_inode(mapping);
- }
- EXPORT_SYMBOL(truncate_inode_pages_range);
-@@ -623,9 +624,8 @@ int invalidate_inode_pages2_range(struct address_space *mapping,
- 	int ret2 = 0;
- 	int did_range_unmap = 0;
- 
--	cleancache_invalidate_inode(mapping);
- 	if (mapping->nrpages == 0 && mapping->nrexceptional == 0)
--		return 0;
-+		goto out;
- 
- 	pagevec_init(&pvec, 0);
- 	index = start;
-@@ -689,6 +689,8 @@ int invalidate_inode_pages2_range(struct address_space *mapping,
- 		cond_resched();
- 		index++;
- 	}
-+
-+out:
- 	cleancache_invalidate_inode(mapping);
- 	return ret;
- }
+are available in the git repository at:
+
+
+  git://git.samba.org/sfrench/cifs-2.6.git for-next
+
+for you to fetch changes up to 67dbea2ce6873f8ba57988ba3e608e8bf61c347f:
+
+  CIFS: Fix SMB3 mount without specifying a security mechanism
+(2017-04-13 10:03:26 -0500)
+
+----------------------------------------------------------------
+Germano Percossi (3):
+      CIFS: reconnect thread reschedule itself
+      CIFS: remove bad_network_name flag
+      CIFS: store results of cifs_reopen_file to avoid infinite wait
+
+Mark Syms (1):
+      CIFS: handle guest access errors to Windows shares
+
+Pavel Shilovsky (2):
+      CIFS: Fix null pointer deref during read resp processing
+      CIFS: Fix SMB3 mount without specifying a security mechanism
+
+ fs/cifs/cifsglob.h  |  1 -
+ fs/cifs/cifsproto.h |  3 +--
+ fs/cifs/cifssmb.c   | 15 ++++++++-------
+ fs/cifs/connect.c   |  3 +++
+ fs/cifs/file.c      |  6 +++---
+ fs/cifs/smb2ops.c   |  4 ++--
+ fs/cifs/smb2pdu.c   | 19 ++++++++++++-------
+ 7 files changed, 29 insertions(+), 22 deletions(-)
+
 -- 
-2.10.2
+Thanks,
 
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+Steve
