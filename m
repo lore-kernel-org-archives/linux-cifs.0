@@ -1,7 +1,7 @@
 From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Subject: [PATCH 2/4] fs/block_dev: always invalidate cleancache in invalidate_bdev()
-Date: Fri, 14 Apr 2017 17:07:51 +0300
-Message-ID: <20170414140753.16108-3-aryabinin@virtuozzo.com>
+Subject: [PATCH 3/4] mm/truncate: bail out early from invalidate_inode_pages2_range() if mapping is empty
+Date: Fri, 14 Apr 2017 17:07:52 +0300
+Message-ID: <20170414140753.16108-4-aryabinin@virtuozzo.com>
 References: <20170414140753.16108-1-aryabinin@virtuozzo.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -24,38 +24,29 @@ In-Reply-To: <20170414140753.16108-1-aryabinin@virtuozzo.com>
 Sender: owner-linux-mm@kvack.org
 List-Id: linux-cifs.vger.kernel.org
 
-invalidate_bdev() calls cleancache_invalidate_inode() iff ->nrpages != 0
-which doen't make any sense.
-Make invalidate_bdev() always invalidate cleancache data.
+If mapping is empty (both ->nrpages and ->nrexceptional is zero) we can avoid
+pointless lookups in empty radix tree and bail out immediately after cleancache
+invalidation.
 
-Fixes: c515e1fd361c ("mm/fs: add hooks to support cleancache")
 Signed-off-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
 ---
- fs/block_dev.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ mm/truncate.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index e405d8e..7af4787 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -103,12 +103,11 @@ void invalidate_bdev(struct block_device *bdev)
- {
- 	struct address_space *mapping = bdev->bd_inode->i_mapping;
+diff --git a/mm/truncate.c b/mm/truncate.c
+index 6263aff..8f12b0e 100644
+--- a/mm/truncate.c
++++ b/mm/truncate.c
+@@ -624,6 +624,9 @@ int invalidate_inode_pages2_range(struct address_space *mapping,
+ 	int did_range_unmap = 0;
  
--	if (mapping->nrpages == 0)
--		return;
--
--	invalidate_bh_lrus();
--	lru_add_drain_all();	/* make sure all lru add caches are flushed */
--	invalidate_mapping_pages(mapping, 0, -1);
-+	if (mapping->nrpages) {
-+		invalidate_bh_lrus();
-+		lru_add_drain_all();	/* make sure all lru add caches are flushed */
-+		invalidate_mapping_pages(mapping, 0, -1);
-+	}
- 	/* 99% of the time, we don't need to flush the cleancache on the bdev.
- 	 * But, for the strange corners, lets be cautious
- 	 */
+ 	cleancache_invalidate_inode(mapping);
++	if (mapping->nrpages == 0 && mapping->nrexceptional == 0)
++		return 0;
++
+ 	pagevec_init(&pvec, 0);
+ 	index = start;
+ 	while (index <= end && pagevec_lookup_entries(&pvec, mapping, index,
 -- 
 2.10.2
 
