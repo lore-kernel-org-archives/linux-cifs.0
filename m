@@ -1,7 +1,7 @@
 From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Subject: [PATCH 1/4] fs: fix data invalidation in the cleancache during direct IO
-Date: Fri, 14 Apr 2017 17:07:50 +0300
-Message-ID: <20170414140753.16108-2-aryabinin@virtuozzo.com>
+Subject: [PATCH 2/4] fs/block_dev: always invalidate cleancache in invalidate_bdev()
+Date: Fri, 14 Apr 2017 17:07:51 +0300
+Message-ID: <20170414140753.16108-3-aryabinin@virtuozzo.com>
 References: <20170414140753.16108-1-aryabinin@virtuozzo.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -24,186 +24,38 @@ In-Reply-To: <20170414140753.16108-1-aryabinin@virtuozzo.com>
 Sender: owner-linux-mm@kvack.org
 List-Id: linux-cifs.vger.kernel.org
 
-Some direct write fs hooks call invalidate_inode_pages2[_range]()
-conditionally iff mapping->nrpages is not zero. If page cache is empty,
-buffered read following after direct IO write would get stale data from
-the cleancache.
-
-Also it doesn't feel right to check only for ->nrpages because
-invalidate_inode_pages2[_range] invalidates exceptional entries as well.
-
-Fix this by calling invalidate_inode_pages2[_range]() regardless of nrpages
-state.
+invalidate_bdev() calls cleancache_invalidate_inode() iff ->nrpages != 0
+which doen't make any sense.
+Make invalidate_bdev() always invalidate cleancache data.
 
 Fixes: c515e1fd361c ("mm/fs: add hooks to support cleancache")
 Signed-off-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
 ---
- fs/9p/vfs_file.c |  2 +-
- fs/cifs/inode.c  |  2 +-
- fs/dax.c         |  2 +-
- fs/iomap.c       | 16 +++++++---------
- fs/nfs/direct.c  |  6 ++----
- fs/nfs/inode.c   |  8 +++++---
- mm/filemap.c     | 26 +++++++++++---------------
- 7 files changed, 28 insertions(+), 34 deletions(-)
+ fs/block_dev.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/fs/9p/vfs_file.c b/fs/9p/vfs_file.c
-index 3de3b4a8..786d0de 100644
---- a/fs/9p/vfs_file.c
-+++ b/fs/9p/vfs_file.c
-@@ -423,7 +423,7 @@ v9fs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 		unsigned long pg_start, pg_end;
- 		pg_start = origin >> PAGE_SHIFT;
- 		pg_end = (origin + retval - 1) >> PAGE_SHIFT;
--		if (inode->i_mapping && inode->i_mapping->nrpages)
-+		if (inode->i_mapping)
- 			invalidate_inode_pages2_range(inode->i_mapping,
- 						      pg_start, pg_end);
- 		iocb->ki_pos += retval;
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index c3b2fa0..6539fa3 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -1857,7 +1857,7 @@ cifs_invalidate_mapping(struct inode *inode)
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index e405d8e..7af4787 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -103,12 +103,11 @@ void invalidate_bdev(struct block_device *bdev)
  {
- 	int rc = 0;
+ 	struct address_space *mapping = bdev->bd_inode->i_mapping;
  
--	if (inode->i_mapping && inode->i_mapping->nrpages != 0) {
-+	if (inode->i_mapping) {
- 		rc = invalidate_inode_pages2(inode->i_mapping);
- 		if (rc)
- 			cifs_dbg(VFS, "%s: could not invalidate inode %p\n",
-diff --git a/fs/dax.c b/fs/dax.c
-index 2e382fe..1e8cca0 100644
---- a/fs/dax.c
-+++ b/fs/dax.c
-@@ -1047,7 +1047,7 @@ dax_iomap_actor(struct inode *inode, loff_t pos, loff_t length, void *data,
- 	 * into page tables. We have to tear down these mappings so that data
- 	 * written by write(2) is visible in mmap.
+-	if (mapping->nrpages == 0)
+-		return;
+-
+-	invalidate_bh_lrus();
+-	lru_add_drain_all();	/* make sure all lru add caches are flushed */
+-	invalidate_mapping_pages(mapping, 0, -1);
++	if (mapping->nrpages) {
++		invalidate_bh_lrus();
++		lru_add_drain_all();	/* make sure all lru add caches are flushed */
++		invalidate_mapping_pages(mapping, 0, -1);
++	}
+ 	/* 99% of the time, we don't need to flush the cleancache on the bdev.
+ 	 * But, for the strange corners, lets be cautious
  	 */
--	if ((iomap->flags & IOMAP_F_NEW) && inode->i_mapping->nrpages) {
-+	if ((iomap->flags & IOMAP_F_NEW)) {
- 		invalidate_inode_pages2_range(inode->i_mapping,
- 					      pos >> PAGE_SHIFT,
- 					      (end - 1) >> PAGE_SHIFT);
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 0b457ff..7e1f947 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -880,16 +880,14 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
- 		flags |= IOMAP_WRITE;
- 	}
- 
--	if (mapping->nrpages) {
--		ret = filemap_write_and_wait_range(mapping, start, end);
--		if (ret)
--			goto out_free_dio;
-+	ret = filemap_write_and_wait_range(mapping, start, end);
-+	if (ret)
-+		goto out_free_dio;
- 
--		ret = invalidate_inode_pages2_range(mapping,
-+	ret = invalidate_inode_pages2_range(mapping,
- 				start >> PAGE_SHIFT, end >> PAGE_SHIFT);
--		WARN_ON_ONCE(ret);
--		ret = 0;
--	}
-+	WARN_ON_ONCE(ret);
-+	ret = 0;
- 
- 	inode_dio_begin(inode);
- 
-@@ -944,7 +942,7 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
- 	 * one is a pretty crazy thing to do, so we don't support it 100%.  If
- 	 * this invalidation fails, tough, the write still worked...
- 	 */
--	if (iov_iter_rw(iter) == WRITE && mapping->nrpages) {
-+	if (iov_iter_rw(iter) == WRITE) {
- 		int err = invalidate_inode_pages2_range(mapping,
- 				start >> PAGE_SHIFT, end >> PAGE_SHIFT);
- 		WARN_ON_ONCE(err);
-diff --git a/fs/nfs/direct.c b/fs/nfs/direct.c
-index aab32fc..183ab4d 100644
---- a/fs/nfs/direct.c
-+++ b/fs/nfs/direct.c
-@@ -1024,10 +1024,8 @@ ssize_t nfs_file_direct_write(struct kiocb *iocb, struct iov_iter *iter)
- 
- 	result = nfs_direct_write_schedule_iovec(dreq, iter, pos);
- 
--	if (mapping->nrpages) {
--		invalidate_inode_pages2_range(mapping,
--					      pos >> PAGE_SHIFT, end);
--	}
-+	invalidate_inode_pages2_range(mapping,
-+				pos >> PAGE_SHIFT, end);
- 
- 	nfs_end_io_direct(inode);
- 
-diff --git a/fs/nfs/inode.c b/fs/nfs/inode.c
-index f489a5a..b727ec8 100644
---- a/fs/nfs/inode.c
-+++ b/fs/nfs/inode.c
-@@ -1118,10 +1118,12 @@ static int nfs_invalidate_mapping(struct inode *inode, struct address_space *map
- 			if (ret < 0)
- 				return ret;
- 		}
--		ret = invalidate_inode_pages2(mapping);
--		if (ret < 0)
--			return ret;
- 	}
-+
-+	ret = invalidate_inode_pages2(mapping);
-+	if (ret < 0)
-+		return ret;
-+
- 	if (S_ISDIR(inode->i_mode)) {
- 		spin_lock(&inode->i_lock);
- 		memset(nfsi->cookieverf, 0, sizeof(nfsi->cookieverf));
-diff --git a/mm/filemap.c b/mm/filemap.c
-index e9e5f7b..d233d59 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -2721,18 +2721,16 @@ generic_file_direct_write(struct kiocb *iocb, struct iov_iter *from)
- 	 * about to write.  We do this *before* the write so that we can return
- 	 * without clobbering -EIOCBQUEUED from ->direct_IO().
- 	 */
--	if (mapping->nrpages) {
--		written = invalidate_inode_pages2_range(mapping,
-+	written = invalidate_inode_pages2_range(mapping,
- 					pos >> PAGE_SHIFT, end);
--		/*
--		 * If a page can not be invalidated, return 0 to fall back
--		 * to buffered write.
--		 */
--		if (written) {
--			if (written == -EBUSY)
--				return 0;
--			goto out;
--		}
-+	/*
-+	 * If a page can not be invalidated, return 0 to fall back
-+	 * to buffered write.
-+	 */
-+	if (written) {
-+		if (written == -EBUSY)
-+			return 0;
-+		goto out;
- 	}
- 
- 	data = *from;
-@@ -2746,10 +2744,8 @@ generic_file_direct_write(struct kiocb *iocb, struct iov_iter *from)
- 	 * so we don't support it 100%.  If this invalidation
- 	 * fails, tough, the write still worked...
- 	 */
--	if (mapping->nrpages) {
--		invalidate_inode_pages2_range(mapping,
--					      pos >> PAGE_SHIFT, end);
--	}
-+	invalidate_inode_pages2_range(mapping,
-+				pos >> PAGE_SHIFT, end);
- 
- 	if (written > 0) {
- 		pos += written;
 -- 
 2.10.2
 
