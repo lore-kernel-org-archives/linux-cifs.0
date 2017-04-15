@@ -1,57 +1,61 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] SMB3 fixes
-Date: Fri, 14 Apr 2017 11:01:01 -0500
-Message-ID: <CAH2r5msvKz_N-Kycse86hwjsC_3p8+WqA82-1C0diNZ=FEiu9A@mail.gmail.com>
+From: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
+Subject: Re: [PATCH 06/12] audit: Use timespec64 to represent
+	audit timestamps
+Date: Sat, 15 Apr 2017 10:29:00 +0000
+Message-ID: <CAK8P3a3w_3JKxW6kz-V9roxzf9RwbVgHaK8XjO5OOktVvZ_Sog@mail.gmail.com>
+References: <1491613030-11599-1-git-send-email-deepa.kernel@gmail.com>
+	<1491613030-11599-7-git-send-email-deepa.kernel@gmail.com>
+	<CAHC9VhTYWeKL+BAb6F3tfwzs7OKUEA8ANM=V05sfoiahNNX=9w@mail.gmail.com>
+	<CABeXuvoKmvbo_n3XQ0Y+iWGz88Jr3TwbPA7GiR3pia9407ANLw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: yuchao0-hv44wF8Li93QT0dZR+AlfA@public.gmane.org, "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
+	Chris Mason <clm-b10kYP2dOMg@public.gmane.org>, linux-mtd <linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
+	Evgeniy Dushistov <dushistov-JGs/UdohzUI@public.gmane.org>,
+	Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>,
+	ceph-devel <ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Paul Moore <paul-r2n+y4ga6xFZroRs9YW3xA@public.gmane.org>,
+	y2038 Mailman List <y2038-cunTk1MwBs8s++Sfvej+rw@public.gmane.org>,
+	Ingo Molnar <mingo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Steven Rostedt <rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org>, "Drokin,
+	Oleg" <oleg.drokin-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, John Stultz <john.stultz-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
+	Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>, David Sterba <dsterba-IBi9RG/b67k@public.gmane.org>,
+	Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>,
+	Josef Bacik <jbacik-b10kYP2dOMg@public.gmane.org>, Greg KH <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	Linux Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Eric Paris <eparis-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, "Linux F2F
+To: Deepa Dinamani <deepa.kernel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <lustre-devel-bounces-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org>
+In-Reply-To: <CABeXuvoKmvbo_n3XQ0Y+iWGz88Jr3TwbPA7GiR3pia9407ANLw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+List-Unsubscribe: <http://lists.lustre.org/options.cgi/lustre-devel-lustre.org>,
+	<mailto:lustre-devel-request-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.lustre.org/pipermail/lustre-devel-lustre.org/>
+List-Post: <mailto:lustre-devel-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org>
+List-Help: <mailto:lustre-devel-request-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org?subject=help>
+List-Subscribe: <http://lists.lustre.org/listinfo.cgi/lustre-devel-lustre.org>,
+	<mailto:lustre-devel-request-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org?subject=subscribe>
+Errors-To: lustre-devel-bounces-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org
+Sender: "lustre-devel" <lustre-devel-bounces-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org>
+List-Id: linux-cifs.vger.kernel.org
 
-As promised, here is the remaining set of cifs/smb3 fixes for stable
-(and a fix for one regression) now that they have had additional
-review and testing.  Please pull the following changes since commit
-c08e611b7d0169b513e3b4515ffd51ac7f37f22c:
+On Sat, Apr 8, 2017 at 5:58 PM, Deepa Dinamani <deepa.kernel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>> I have no problem merging this patch into audit/next for v4.12, would
+>> you prefer me to do that so at least this patch is merged?
+>
+> This would be fine.
+> But, I think whoever takes the last 2 deletion patches should also take them.
+> I'm not sure how that part works out.
+>
+>> It would probably make life a small bit easier for us in the audit
+>> world too as it would reduce the potential merge conflict.  However,
+>> that's a relatively small thing to worry about.
 
-  Merge branch 'linus' of
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6
-(2017-04-10 09:37:43 -0700)
+As Andrew has picked the remaining patches up into -mm, this will work
+out fine: any patches picked up by the respective maintainers for v4.12
+should arrive as git pull requests before the -mm patches get applied
+at a later stage of the merge window.
 
-are available in the git repository at:
-
-
-  git://git.samba.org/sfrench/cifs-2.6.git for-next
-
-for you to fetch changes up to 67dbea2ce6873f8ba57988ba3e608e8bf61c347f:
-
-  CIFS: Fix SMB3 mount without specifying a security mechanism
-(2017-04-13 10:03:26 -0500)
-
-----------------------------------------------------------------
-Germano Percossi (3):
-      CIFS: reconnect thread reschedule itself
-      CIFS: remove bad_network_name flag
-      CIFS: store results of cifs_reopen_file to avoid infinite wait
-
-Mark Syms (1):
-      CIFS: handle guest access errors to Windows shares
-
-Pavel Shilovsky (2):
-      CIFS: Fix null pointer deref during read resp processing
-      CIFS: Fix SMB3 mount without specifying a security mechanism
-
- fs/cifs/cifsglob.h  |  1 -
- fs/cifs/cifsproto.h |  3 +--
- fs/cifs/cifssmb.c   | 15 ++++++++-------
- fs/cifs/connect.c   |  3 +++
- fs/cifs/file.c      |  6 +++---
- fs/cifs/smb2ops.c   |  4 ++--
- fs/cifs/smb2pdu.c   | 19 ++++++++++++-------
- 7 files changed, 29 insertions(+), 22 deletions(-)
-
--- 
-Thanks,
-
-Steve
+     Arnd
