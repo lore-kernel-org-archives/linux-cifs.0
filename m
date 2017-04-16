@@ -1,7 +1,7 @@
 From: Jonathan Liu <net147-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH] cifs: Do not send echoes before Negotiate is complete
-Date: Mon, 17 Apr 2017 08:59:12 +1000
-Message-ID: <CANwerB37d56Eg7-YHGA6OwZGodiS2ZF7rc3H-K3zdsYZMDMZzQ@mail.gmail.com>
+Date: Mon, 17 Apr 2017 09:14:15 +1000
+Message-ID: <CANwerB3oiNSyRfpPL3XeAkhm8N27N_DX9co5FM=Bahna96PJEw@mail.gmail.com>
 References: <20170416193724.4945-1-sprabhu@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -56,6 +56,18 @@ On 17 April 2017 at 05:37, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.
 > +               return true;
 > +
 > +       return false;
+
+scripts/checkpatch.pl shows whitespace errors:
+ERROR: code indent should use tabs where possible
+#43: FILE: fs/cifs/smb1ops.c:1022:
++^I        return true;$
+
+total: 1 errors, 0 warnings, 22 lines checked
+
+
+Can be written more simply as:
+return server->tcpStatus == CifsGood;
+
 > +}
 > +
 >  struct smb_version_operations smb1_operations = {
@@ -73,6 +85,5 @@ On 17 April 2017 at 05:37, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.
 > 2.9.3
 >
 
-This fixes the issue for me.
-
-Tested-by: Jonathan Liu <net147-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Regards,
+Jonathan
