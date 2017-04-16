@@ -1,63 +1,66 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [v2] Call echo service immediately after socket reconnect
-Date: Sat, 15 Apr 2017 09:06:24 -0700
-Message-ID: <CAKywueQYAGcaCqq63QLiwxYVxUtQ2NBzVzybQ=LcFKpP+hUbDg@mail.gmail.com>
-References: <1477007544-4656-1-git-send-email-sprabhu@redhat.com> <CANwerB1NH=D3NKz_A3pxg+aty9U4P66b5Lo3KAqOBTLKDEAkew@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Jonathan Liu <net147-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: Do not send echoes before Negotiate is complete
+Date: Sun, 16 Apr 2017 20:37:24 +0100
+Message-ID: <20170416193724.4945-1-sprabhu@redhat.com>
+Cc: Jonathan Liu <net147-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CANwerB1NH=D3NKz_A3pxg+aty9U4P66b5Lo3KAqOBTLKDEAkew-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2017-04-15 8:38 GMT-07:00 Jonathan Liu <net147-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> Hi Sachin,
->
-> On 21 October 2016 at 10:52, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->>
->> Commit 4fcd1813e640 ("Fix reconnect to not defer smb3 session reconnect
->> long after socket reconnect") changes the behaviour of the SMB2 echo
->> service and causes it to renegotiate after a socket reconnect. However
->> under default settings, the echo service could take up to 120 seconds to
->> be scheduled.
->>
->> The patch forces the echo service to be called immediately resulting a
->> negotiate call being made immediately on reconnect.
->>
->> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->> Reviewed-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
->
-> This commit is causing a flood of connections to Samba server as well
-> as high server CPU load when the Samba is restarted while CIFS share
-> is mounted on the client. This can cause the Samba server to become
-> slow or unresponsive resulting in denial of service to other users
-> connected to the Samba server.
->
-> Bug report: https://bugzilla.kernel.org/show_bug.cgi?id=194531
->
-> Could you please have a look?
->
-> Thanks.
->
-> Regards,
-> Jonathan
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+commit 4fcd1813e640 ("Fix reconnect to not defer smb3 session reconnect
+long after socket reconnect") added support for Negotiate requests to
+be initiated by echo calls.
 
-Hi Jonathan,
+To avoid delays in calling echo after a reconnect, I added the patch
+introduced by the commit b8c600120fc8 ("Call echo service immediately
+after socket reconnect").
 
-Thanks for reporting this.
+This has however caused a regression with cifs shares which do not have
+support for echo calls to trigger Negotiate requests. On connections
+which need to call Negotiation, the echo calls trigger an error which
+triggers a reconnect which in turn triggers another echo call. This
+results in a loop which is only broken when an operation is performed on
+the cifs share. For an idle share, it can DOS a server.
 
-It seems like we need to make CIFSSMBEcho() call as noop in case of
-(server->tcpStatus == CifsNeedNegotiate) as we already did for
-SMB2_echo().
+The patch uses the smb_operation can_echo() for cifs so that it is
+called only if connection has been already been setup.
 
---
-Best regards,
-Pavel Shilovsky
+kernel bz: 194531
+
+Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/smb1ops.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index cc93ba4..60a1979 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -1015,6 +1015,15 @@ cifs_dir_needs_close(struct cifsFileInfo *cfile)
+ 	return !cfile->srch_inf.endOfSearch && !cfile->invalidHandle;
+ }
+ 
++static bool
++cifs_can_echo(struct TCP_Server_Info *server)
++{
++	if (server->tcpStatus == CifsGood)
++	        return true;
++
++	return false;
++}
++
+ struct smb_version_operations smb1_operations = {
+ 	.send_cancel = send_nt_cancel,
+ 	.compare_fids = cifs_compare_fids,
+@@ -1049,6 +1058,7 @@ struct smb_version_operations smb1_operations = {
+ 	.get_dfs_refer = CIFSGetDFSRefer,
+ 	.qfs_tcon = cifs_qfs_tcon,
+ 	.is_path_accessible = cifs_is_path_accessible,
++	.can_echo = cifs_can_echo,
+ 	.query_path_info = cifs_query_path_info,
+ 	.query_file_info = cifs_query_file_info,
+ 	.get_srv_inum = cifs_get_srv_inum,
+-- 
+2.9.3
