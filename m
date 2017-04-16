@@ -1,126 +1,49 @@
-From: Alastair Rankine <alastair-cr5PMK9k0NKsTnJN9+BGXg@public.gmane.org>
-Subject: SMB2_ECHO Flags2
-Date: Sun, 16 Apr 2017 16:54:10 -0400
-Message-ID: <1492376050.8438.7.camel@yahoo.co.uk>
+From: <ujagu8185-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: (unknown)
+Date: Sun, 16 Apr 2017 21:22:46 -0000
+Message-ID: <149237776686.20709.12532841432304412267@bol-online.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: application/zip; name="COMPANY-926043103481-linux-cifs.zip"
+Content-Transfer-Encoding: base64
+To: "linux-cifs" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Subject: 
+Content-Disposition: attachment
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi, CIFS newbie here, please excuse my inevitable gaffes. Also the
-mailing list archives are down so I can't tell if this is an active
-issue or not. Again, my apologies.
-
-I'm connecting to a MacOS (10.11.6) server from a Linux client (kernel
-4.9.18, debian testing). It connects fine and seems to work, but after
-a while the server log gets flooded with messages like this:
-
-4/16/17 2:36:20.987 PM smbd[86828]: 192.168.1.12 SMB client not
-supported - Unicode strings are required
-4/16/17 2:36:20.989 PM smbd[86828]: 192.168.1.12 SMB client not
-supported - Unicode strings are required
-4/16/17 2:36:20.989 PM smbd[86828]: 192.168.1.12 SMB client not
-supported - Unicode strings are required
-4/16/17 2:36:20.990 PM smbd[86828]: 192.168.1.12 SMB client not
-supported - Unicode strings are required
-4/16/17 2:36:20.991 PM smbd[86828]: 192.168.1.12 SMB client not
-supported - Unicode strings are required
-
-Using Wireshark I traced this to the SMB Echo request being issued from
-the client:
-
-SMB (Server Message Block Protocol)
-=C2=A0=C2=A0=C2=A0=C2=A0SMB Header
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Server Component: SMB
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0[Response in: 197]
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0SMB Command: Echo (0x2b)
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Error Class: Success (0x00)
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Reserved: 00
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Error Code: No Error
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Flags: 0x00
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Flags2: 0x0001, Long Names =
-Allowed
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Process ID High: 0
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Signature: 0000000000000000
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Reserved: 0000
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Tree ID: 65535=C2=A0=C2=A0(=
-\\192.168.1.10\IPC$)
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0[Pa=
-th: \\192.168.1.10\IPC$]
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0[Ma=
-pped in: 26]
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Process ID: 45
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0User ID: 0
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Multiplex ID: 0
-=C2=A0=C2=A0=C2=A0=C2=A0Echo Request (0x2b)
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Word Count (WCT): 1
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Echo Count: 1
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Byte Count (BCC): 1
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Echo Data: 61
-
-The server responds thusly:
-
-SMB (Server Message Block Protocol)
-=C2=A0=C2=A0=C2=A0=C2=A0SMB Header
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Server Component: SMB
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0[Response to: 195]
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0[Time from request: 0.00063=
-2456 seconds]
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0SMB Command: Echo (0x2b)
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0NT Status: STATUS_NOT_SUPPO=
-RTED (0xc00000bb)
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Flags: 0x80, Request/Respon=
-se
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Flags2: 0xc841, Unicode Str=
-ings, Error Code Type, Extended
-Security Negotiation, Long Names Used, Long Names Allowed
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Process ID High: 0
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Signature: 0000000000000000
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Reserved: 0000
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Tree ID: 65535=C2=A0=C2=A0(=
-\\192.168.1.10\IPC$)
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0[Pa=
-th: \\192.168.1.10\IPC$]
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0[Ma=
-pped in: 26]
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Process ID: 45
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0User ID: 0
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Multiplex ID: 0
-=C2=A0=C2=A0=C2=A0=C2=A0Echo Response (0x2b)
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Word Count (WCT): 0
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Byte Count (BCC): 0
-
-This corresponds with a server log entry at the same time on an
-otherwise idle session. My theory is that the echo request header
-Flags2 field does not have the Unicode Strings flag enabled, and hence
-the server is rejecting it.
-
-So the problems really start after about an hour - the client decides
-to increase the frequency at which it sends echo requests. Again from
-looking at the wireshark logs I can see it decreasing the echo interval
- from 1 minute down to about 20 seconds. But the server reacts poorly
-to this - probably triggering a message reject rate limit. After about
-another minute at the increased echo rate, the server decides to
-terminate the connection.
-
-So then we go into a tight loop where the client reconnects, sends an
-echo request, and is instantly disconnected by the server, which in
-turn triggers an instant reconnect. Meanwhile the server logs are
-filling up and the machine is actually struggling to keep up.
-
-I can provide packet captures for all of the above if required.
-
-It seems to me that not setting the Flags2 field correctly for the echo
-request is at the heart of this problem. Looking at the code for
-SMB2_echo I see that the request header is initialized via a call to
-small_smb2_init. This in turn calls header_assemble to initialize the
-header, which can set the relevant Flags2 flags, but only if it is
-provided with a cifs_tcon pointer as a function parameter.
-Unfortunately in this case the SMB2_echo function passes NULL. So one
-possible fix here would be to populate this parameter, although it's
-not immediately obvious how this could be done.
-
-Hope this all makes sense, please let me know if not.
+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
