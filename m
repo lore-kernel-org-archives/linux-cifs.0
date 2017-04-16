@@ -1,49 +1,78 @@
-From: <ujagu8185-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: (unknown)
-Date: Sun, 16 Apr 2017 21:22:46 -0000
-Message-ID: <149237776686.20709.12532841432304412267@bol-online.com>
+From: Jonathan Liu <net147-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: Do not send echoes before Negotiate is complete
+Date: Mon, 17 Apr 2017 08:59:12 +1000
+Message-ID: <CANwerB37d56Eg7-YHGA6OwZGodiS2ZF7rc3H-K3zdsYZMDMZzQ@mail.gmail.com>
+References: <20170416193724.4945-1-sprabhu@redhat.com>
 Mime-Version: 1.0
-Content-Type: application/zip; name="COMPANY-926043103481-linux-cifs.zip"
-Content-Transfer-Encoding: base64
-To: "linux-cifs" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Subject: 
-Content-Disposition: attachment
+In-Reply-To: <20170416193724.4945-1-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-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
+Hi Sachin,
+
+On 17 April 2017 at 05:37, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> commit 4fcd1813e640 ("Fix reconnect to not defer smb3 session reconnect
+> long after socket reconnect") added support for Negotiate requests to
+> be initiated by echo calls.
+>
+> To avoid delays in calling echo after a reconnect, I added the patch
+> introduced by the commit b8c600120fc8 ("Call echo service immediately
+> after socket reconnect").
+>
+> This has however caused a regression with cifs shares which do not have
+> support for echo calls to trigger Negotiate requests. On connections
+> which need to call Negotiation, the echo calls trigger an error which
+> triggers a reconnect which in turn triggers another echo call. This
+> results in a loop which is only broken when an operation is performed on
+> the cifs share. For an idle share, it can DOS a server.
+>
+> The patch uses the smb_operation can_echo() for cifs so that it is
+> called only if connection has been already been setup.
+>
+> kernel bz: 194531
+>
+> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/smb1ops.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+>
+> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+> index cc93ba4..60a1979 100644
+> --- a/fs/cifs/smb1ops.c
+> +++ b/fs/cifs/smb1ops.c
+> @@ -1015,6 +1015,15 @@ cifs_dir_needs_close(struct cifsFileInfo *cfile)
+>         return !cfile->srch_inf.endOfSearch && !cfile->invalidHandle;
+>  }
+>
+> +static bool
+> +cifs_can_echo(struct TCP_Server_Info *server)
+> +{
+> +       if (server->tcpStatus == CifsGood)
+> +               return true;
+> +
+> +       return false;
+> +}
+> +
+>  struct smb_version_operations smb1_operations = {
+>         .send_cancel = send_nt_cancel,
+>         .compare_fids = cifs_compare_fids,
+> @@ -1049,6 +1058,7 @@ struct smb_version_operations smb1_operations = {
+>         .get_dfs_refer = CIFSGetDFSRefer,
+>         .qfs_tcon = cifs_qfs_tcon,
+>         .is_path_accessible = cifs_is_path_accessible,
+> +       .can_echo = cifs_can_echo,
+>         .query_path_info = cifs_query_path_info,
+>         .query_file_info = cifs_query_file_info,
+>         .get_srv_inum = cifs_get_srv_inum,
+> --
+> 2.9.3
+>
+
+This fixes the issue for me.
+
+Tested-by: Jonathan Liu <net147-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
