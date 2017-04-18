@@ -1,38 +1,39 @@
-From: Ross Zwisler <ross.zwisler@linux.intel.com>
+From: Andrew Morton <akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Subject: Re: [PATCH 1/4] fs: fix data invalidation in the cleancache during
  direct IO
-Date: Tue, 18 Apr 2017 13:38:08 -0600
-Message-ID: <20170418193808.GA16667@linux.intel.com>
+Date: Tue, 18 Apr 2017 15:46:47 -0700
+Message-ID: <20170418154647.9583bfa06705c614a2640a15@linux-foundation.org>
 References: <20170414140753.16108-1-aryabinin@virtuozzo.com>
- <20170414140753.16108-2-aryabinin@virtuozzo.com>
+        <20170414140753.16108-2-aryabinin@virtuozzo.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Ron Minnich <rminnich@sandia.gov>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Steve French <sfrench@samba.org>,
-        Matthew Wilcox <mawilcox@microsoft.com>,
-        Ross Zwisler <ross.zwisler@linux.intel.com>,
-        Trond Myklebust <trond.myklebust@primarydata.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Alexey Kuznetsov <kuznet@virtuozzo.com>,
-        Christoph Hellwig <hch@lst.de>,
-        v9fs-developer@lists.sourceforge.net, linux-kernel@vger.kernel.org,
-        linux-cifs@vger.kernel.org, samba-t
-To: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20170414140753.16108-2-aryabinin@virtuozzo.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
+        <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
+        Eric Van Hensbergen <ericvh-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Ron Minnich <rminnich-4OHPYypu0djtX7QSmKvirg@public.gmane.org>,
+        Latchesar Ionkov <lucho-OnYtXJJ0/fesTnJN9+BGXg@public.gmane.org>,
+        Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Ross Zwisler <ross.zwisler-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>,
+        Trond Myklebust <trond.myklebust-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
+        Anna Schumaker <anna.schumaker-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
+        Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>, Jens Axboe <axboe-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org>,
+        Johannes Weiner <hannes-druUgvl0LCNAfugRpC6u6w@public.gmane.org>,
+        Alexey Kuznetsov <kuznet-5HdwGun5lf+gSpxsJD1C4w@public.gmane.org>,
+        Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>,
+        <v9fs-developer-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org>,
+        <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>, <linux-
+To: Andrey Ryabinin <aryabinin-5HdwGun5lf+gSpxsJD1C4w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20170414140753.16108-2-aryabinin-5HdwGun5lf+gSpxsJD1C4w@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, Apr 14, 2017 at 05:07:50PM +0300, Andrey Ryabinin wrote:
+On Fri, 14 Apr 2017 17:07:50 +0300 Andrey Ryabinin <aryabinin-5HdwGun5lf+gSpxsJD1C4w@public.gmane.org> wrote:
+
 > Some direct write fs hooks call invalidate_inode_pages2[_range]()
 > conditionally iff mapping->nrpages is not zero. If page cache is empty,
 > buffered read following after direct IO write would get stale data from
@@ -43,37 +44,11 @@ On Fri, Apr 14, 2017 at 05:07:50PM +0300, Andrey Ryabinin wrote:
 > 
 > Fix this by calling invalidate_inode_pages2[_range]() regardless of nrpages
 > state.
-> 
-> Fixes: c515e1fd361c ("mm/fs: add hooks to support cleancache")
-> Signed-off-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
-> ---
-<>
-> diff --git a/fs/dax.c b/fs/dax.c
-> index 2e382fe..1e8cca0 100644
-> --- a/fs/dax.c
-> +++ b/fs/dax.c
-> @@ -1047,7 +1047,7 @@ dax_iomap_actor(struct inode *inode, loff_t pos, loff_t length, void *data,
->  	 * into page tables. We have to tear down these mappings so that data
->  	 * written by write(2) is visible in mmap.
->  	 */
-> -	if ((iomap->flags & IOMAP_F_NEW) && inode->i_mapping->nrpages) {
-> +	if ((iomap->flags & IOMAP_F_NEW)) {
->  		invalidate_inode_pages2_range(inode->i_mapping,
->  					      pos >> PAGE_SHIFT,
->  					      (end - 1) >> PAGE_SHIFT);
 
-tl;dr: I think the old code is correct, and that you don't need this change.
+I'm not understanding this.  I can buy the argument about
+nrexceptional, but why does cleancache require the
+invalidate_inode_pages2_range) call even when ->nrpages is zero?
 
-This should be harmless, but could slow us down a little if we keep
-calling invalidate_inode_pages2_range() without really needing to.  Really for
-DAX I think we need to call invalidate_inode_page2_range() only if we have
-zero pages mapped over the place where we are doing I/O, which is why we check
-nrpages.
-
-Is DAX even allowed to be used at the same time as cleancache?  From a brief
-look at Documentation/vm/cleancache.txt, it seems like these two features are
-incompatible.  With DAX we already are avoiding the page cache completely.
-
-Anyway, I don't see how this change in DAX can save us from a data corruption
-(which is what you're seeing, right?), and I think it could slow us down, so
-I'd prefer to leave things as they are.
+I *assume* it's because invalidate_inode_pages2_range() calls
+cleancache_invalidate_inode(), yes?  If so, can we please add this to
+the changelog?  If not then please explain further.
