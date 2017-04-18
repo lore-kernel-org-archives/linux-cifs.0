@@ -1,77 +1,79 @@
-From: Nikolay Borisov <n.borisov.lkml@gmail.com>
-Subject: Re: [PATCH 2/4] fs/block_dev: always invalidate cleancache in
- invalidate_bdev()
-Date: Tue, 18 Apr 2017 21:51:59 +0300
-Message-ID: <705067e3-eb15-ce2a-cfc8-d048dfc8be4f@gmail.com>
+From: Ross Zwisler <ross.zwisler@linux.intel.com>
+Subject: Re: [PATCH 1/4] fs: fix data invalidation in the cleancache during
+ direct IO
+Date: Tue, 18 Apr 2017 13:38:08 -0600
+Message-ID: <20170418193808.GA16667@linux.intel.com>
 References: <20170414140753.16108-1-aryabinin@virtuozzo.com>
- <20170414140753.16108-3-aryabinin@virtuozzo.com>
+ <20170414140753.16108-2-aryabinin@virtuozzo.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
- Eric Van Hensbergen <ericvh@gmail.com>, Ron Minnich <rminnich@sandia.gov>,
- Latchesar Ionkov <lucho@ionkov.net>, Steve French <sfrench@samba.org>,
- Matthew Wilcox <mawilcox@microsoft.com>,
- Ross Zwisler <ross.zwisler@linux.intel.com>,
- Trond Myklebust <trond.myklebust@primarydata.com>,
- Anna Schumaker <anna.schumaker@netapp.com>,
- Andrew Morton <akpm@linux-foundation.org>, Jan Kara <jack@suse.cz>,
- Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
- Alexey Kuznetsov <kuznet@virtuozzo.com>, Christoph Hellwig <hch@lst.de>,
- v9fs-developer@lists.sourceforge.net, linux-kernel@vger.kernel.org,
- linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
- linux-nfs@vger.kernel.org, linux-mm@kvack.org
-To: Andrey Ryabinin <aryabinin@virtuozzo.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>, linux-fsdevel@vger.kernel.org
-Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <20170414140753.16108-3-aryabinin@virtuozzo.com>
-Sender: owner-linux-mm@kvack.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Ron Minnich <rminnich@sandia.gov>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Steve French <sfrench@samba.org>,
+        Matthew Wilcox <mawilcox@microsoft.com>,
+        Ross Zwisler <ross.zwisler@linux.intel.com>,
+        Trond Myklebust <trond.myklebust@primarydata.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Alexey Kuznetsov <kuznet@virtuozzo.com>,
+        Christoph Hellwig <hch@lst.de>,
+        v9fs-developer@lists.sourceforge.net, linux-kernel@vger.kernel.org,
+        linux-cifs@vger.kernel.org, samba-t
+To: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20170414140753.16108-2-aryabinin@virtuozzo.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-
-
-On 14.04.2017 17:07, Andrey Ryabinin wrote:
-> invalidate_bdev() calls cleancache_invalidate_inode() iff ->nrpages != 0
-> which doen't make any sense.
-> Make invalidate_bdev() always invalidate cleancache data.
+On Fri, Apr 14, 2017 at 05:07:50PM +0300, Andrey Ryabinin wrote:
+> Some direct write fs hooks call invalidate_inode_pages2[_range]()
+> conditionally iff mapping->nrpages is not zero. If page cache is empty,
+> buffered read following after direct IO write would get stale data from
+> the cleancache.
+> 
+> Also it doesn't feel right to check only for ->nrpages because
+> invalidate_inode_pages2[_range] invalidates exceptional entries as well.
+> 
+> Fix this by calling invalidate_inode_pages2[_range]() regardless of nrpages
+> state.
 > 
 > Fixes: c515e1fd361c ("mm/fs: add hooks to support cleancache")
 > Signed-off-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
 > ---
->  fs/block_dev.c | 11 +++++------
->  1 file changed, 5 insertions(+), 6 deletions(-)
-> 
-> diff --git a/fs/block_dev.c b/fs/block_dev.c
-> index e405d8e..7af4787 100644
-> --- a/fs/block_dev.c
-> +++ b/fs/block_dev.c
-> @@ -103,12 +103,11 @@ void invalidate_bdev(struct block_device *bdev)
->  {
->  	struct address_space *mapping = bdev->bd_inode->i_mapping;
->  
-> -	if (mapping->nrpages == 0)
-> -		return;
-> -
-> -	invalidate_bh_lrus();
-> -	lru_add_drain_all();	/* make sure all lru add caches are flushed */
-> -	invalidate_mapping_pages(mapping, 0, -1);
-> +	if (mapping->nrpages) {
-> +		invalidate_bh_lrus();
-> +		lru_add_drain_all();	/* make sure all lru add caches are flushed */
-> +		invalidate_mapping_pages(mapping, 0, -1);
-> +	}
-
-How is this different than the current code? You will only invalidate
-the mapping iff ->nrpages > 0 ( I assume it can't go down below 0) ?
-Perhaps just remove the if altogether?
-
->  	/* 99% of the time, we don't need to flush the cleancache on the bdev.
->  	 * But, for the strange corners, lets be cautious
+<>
+> diff --git a/fs/dax.c b/fs/dax.c
+> index 2e382fe..1e8cca0 100644
+> --- a/fs/dax.c
+> +++ b/fs/dax.c
+> @@ -1047,7 +1047,7 @@ dax_iomap_actor(struct inode *inode, loff_t pos, loff_t length, void *data,
+>  	 * into page tables. We have to tear down these mappings so that data
+>  	 * written by write(2) is visible in mmap.
 >  	 */
-> 
+> -	if ((iomap->flags & IOMAP_F_NEW) && inode->i_mapping->nrpages) {
+> +	if ((iomap->flags & IOMAP_F_NEW)) {
+>  		invalidate_inode_pages2_range(inode->i_mapping,
+>  					      pos >> PAGE_SHIFT,
+>  					      (end - 1) >> PAGE_SHIFT);
 
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+tl;dr: I think the old code is correct, and that you don't need this change.
+
+This should be harmless, but could slow us down a little if we keep
+calling invalidate_inode_pages2_range() without really needing to.  Really for
+DAX I think we need to call invalidate_inode_page2_range() only if we have
+zero pages mapped over the place where we are doing I/O, which is why we check
+nrpages.
+
+Is DAX even allowed to be used at the same time as cleancache?  From a brief
+look at Documentation/vm/cleancache.txt, it seems like these two features are
+incompatible.  With DAX we already are avoiding the page cache completely.
+
+Anyway, I don't see how this change in DAX can save us from a data corruption
+(which is what you're seeing, right?), and I think it could slow us down, so
+I'd prefer to leave things as they are.
