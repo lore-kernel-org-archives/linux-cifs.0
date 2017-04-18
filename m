@@ -1,117 +1,79 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Do not send echoes before Negotiate is complete
-Date: Mon, 17 Apr 2017 17:10:42 -0500
-Message-ID: <CAH2r5mucwEwMp7r90EsMSQ9pvH3OS0vU_hcKwVzhd+dFzz4Qsw@mail.gmail.com>
-References: <20170416193724.4945-1-sprabhu@redhat.com> <CANwerB37d56Eg7-YHGA6OwZGodiS2ZF7rc3H-K3zdsYZMDMZzQ@mail.gmail.com>
- <CAH2r5mvMHLHLLK3-dT=s_mbuKPWfLF8PWtz-VkwwWzdyez1uLQ@mail.gmail.com> <CAKywueQppodr4tgwc0Kc6tcip3fhgkkQO4qcf1nfziWoQPW_eQ@mail.gmail.com>
+From: Konrad Rzeszutek Wilk <konrad.wilk-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 0/4] Properly invalidate data in the cleancache.
+Date: Tue, 18 Apr 2017 11:24:11 -0400
+Message-ID: <20170418152411.GC12001@char.us.oracle.com>
+References: <20170414140753.16108-1-aryabinin@virtuozzo.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Jonathan Liu <net147-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
+        linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Eric Van Hensbergen <ericvh-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Ron Minnich <rminnich-4OHPYypu0djtX7QSmKvirg@public.gmane.org>,
+        Latchesar Ionkov <lucho-OnYtXJJ0/fesTnJN9+BGXg@public.gmane.org>,
+        Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Ross Zwisler <ross.zwisler-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>,
+        Trond Myklebust <trond.myklebust-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
+        Anna Schumaker <anna.schumaker-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
+        Andrew Morton <akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
+        Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>, Jens Axboe <axboe-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org>,
+        Johannes Weiner <hannes-druUgvl0LCNAfugRpC6u6w@public.gmane.org>,
+        Alexey Kuznetsov <kuznet-5HdwGun5lf+gSpxsJD1C4w@public.gmane.org>,
+        Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>,
+        v9fs-developer-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+        linux-nfs-u79uwXL29TasMV2rI37PzA@public.gmane.org
+To: Andrey Ryabinin <aryabinin-5HdwGun5lf+gSpxsJD1C4w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueQppodr4tgwc0Kc6tcip3fhgkkQO4qcf1nfziWoQPW_eQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20170414140753.16108-1-aryabinin-5HdwGun5lf+gSpxsJD1C4w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Already in cifs-2.6.git (updated to include cc:stable)
+On Fri, Apr 14, 2017 at 05:07:49PM +0300, Andrey Ryabinin wrote:
+> We've noticed that after direct IO write, buffered read sometimes gets
+> stale data which is coming from the cleancache.
 
-On Mon, Apr 17, 2017 at 10:28 AM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> 2017-04-16 21:27 GMT-07:00 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
->> I fixed the checkpatch error (missing tab in Sachin's patch) and merged into
->> cifs-2.6.git
->>
->> thx
->>
->> On Sun, Apr 16, 2017 at 5:59 PM, Jonathan Liu <net147-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->>>
->>> Hi Sachin,
->>>
->>> On 17 April 2017 at 05:37, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->>> > commit 4fcd1813e640 ("Fix reconnect to not defer smb3 session reconnect
->>> > long after socket reconnect") added support for Negotiate requests to
->>> > be initiated by echo calls.
->>> >
->>> > To avoid delays in calling echo after a reconnect, I added the patch
->>> > introduced by the commit b8c600120fc8 ("Call echo service immediately
->>> > after socket reconnect").
->>> >
->>> > This has however caused a regression with cifs shares which do not have
->>> > support for echo calls to trigger Negotiate requests. On connections
->>> > which need to call Negotiation, the echo calls trigger an error which
->>> > triggers a reconnect which in turn triggers another echo call. This
->>> > results in a loop which is only broken when an operation is performed on
->>> > the cifs share. For an idle share, it can DOS a server.
->>> >
->>> > The patch uses the smb_operation can_echo() for cifs so that it is
->>> > called only if connection has been already been setup.
->>> >
->>> > kernel bz: 194531
->>> >
->>> > Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->>> > ---
->>> >  fs/cifs/smb1ops.c | 10 ++++++++++
->>> >  1 file changed, 10 insertions(+)
->>> >
->>> > diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
->>> > index cc93ba4..60a1979 100644
->>> > --- a/fs/cifs/smb1ops.c
->>> > +++ b/fs/cifs/smb1ops.c
->>> > @@ -1015,6 +1015,15 @@ cifs_dir_needs_close(struct cifsFileInfo *cfile)
->>> >         return !cfile->srch_inf.endOfSearch && !cfile->invalidHandle;
->>> >  }
->>> >
->>> > +static bool
->>> > +cifs_can_echo(struct TCP_Server_Info *server)
->>> > +{
->>> > +       if (server->tcpStatus == CifsGood)
->>> > +               return true;
->>> > +
->>> > +       return false;
->>> > +}
->>> > +
->>> >  struct smb_version_operations smb1_operations = {
->>> >         .send_cancel = send_nt_cancel,
->>> >         .compare_fids = cifs_compare_fids,
->>> > @@ -1049,6 +1058,7 @@ struct smb_version_operations smb1_operations = {
->>> >         .get_dfs_refer = CIFSGetDFSRefer,
->>> >         .qfs_tcon = cifs_qfs_tcon,
->>> >         .is_path_accessible = cifs_is_path_accessible,
->>> > +       .can_echo = cifs_can_echo,
->>> >         .query_path_info = cifs_query_path_info,
->>> >         .query_file_info = cifs_query_file_info,
->>> >         .get_srv_inum = cifs_get_srv_inum,
->>> > --
->>> > 2.9.3
->>> >
->>>
->>> This fixes the issue for me.
->>>
->>> Tested-by: Jonathan Liu <net147-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->>
->>
->>
->> --
->> Thanks,
->>
->> Steve
->
->
-> I think this patch should go to stable as well.
->
-> --
-> Best regards,
-> Pavel Shilovsky
+That is not good.
+> The reason for this is that some direct write hooks call call invalidate_inode_pages2[_range]()
+> conditionally iff mapping->nrpages is not zero, so we may not invalidate
+> data in the cleancache.
+> 
+> Another odd thing is that we check only for ->nrpages and don't check for ->nrexceptional,
 
+Yikes.
+> but invalidate_inode_pages2[_range] also invalidates exceptional entries as well.
+> So we invalidate exceptional entries only if ->nrpages != 0? This doesn't feel right.
+> 
+>  - Patch 1 fixes direct IO writes by removing ->nrpages check.
+>  - Patch 2 fixes similar case in invalidate_bdev(). 
+>      Note: I only fixed conditional cleancache_invalidate_inode() here.
+>        Do we also need to add ->nrexceptional check in into invalidate_bdev()?
+>      
+>  - Patches 3-4: some optimizations.
 
+Acked-by: Konrad Rzeszutek Wilk <konrad.wilk-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
 
--- 
-Thanks,
-
-Steve
+Thanks!
+> 
+> Andrey Ryabinin (4):
+>   fs: fix data invalidation in the cleancache during direct IO
+>   fs/block_dev: always invalidate cleancache in invalidate_bdev()
+>   mm/truncate: bail out early from invalidate_inode_pages2_range() if
+>     mapping is empty
+>   mm/truncate: avoid pointless cleancache_invalidate_inode() calls.
+> 
+>  fs/9p/vfs_file.c |  2 +-
+>  fs/block_dev.c   | 11 +++++------
+>  fs/cifs/inode.c  |  2 +-
+>  fs/dax.c         |  2 +-
+>  fs/iomap.c       | 16 +++++++---------
+>  fs/nfs/direct.c  |  6 ++----
+>  fs/nfs/inode.c   |  8 +++++---
+>  mm/filemap.c     | 26 +++++++++++---------------
+>  mm/truncate.c    | 13 +++++++++----
+>  9 files changed, 42 insertions(+), 44 deletions(-)
+> 
+> -- 
+> 2.10.2
+> 
