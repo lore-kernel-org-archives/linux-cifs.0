@@ -1,54 +1,91 @@
-From: Andrew Morton <akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
-Subject: Re: [PATCH 1/4] fs: fix data invalidation in the cleancache during
- direct IO
-Date: Tue, 18 Apr 2017 15:46:47 -0700
-Message-ID: <20170418154647.9583bfa06705c614a2640a15@linux-foundation.org>
+From: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Subject: Re: [PATCH 2/4] fs/block_dev: always invalidate cleancache in
+ invalidate_bdev()
+Date: Wed, 19 Apr 2017 16:22:42 +0300
+Message-ID: <b2c72883-d9a2-bfda-2cd3-ae9475922bc5@virtuozzo.com>
 References: <20170414140753.16108-1-aryabinin@virtuozzo.com>
-        <20170414140753.16108-2-aryabinin@virtuozzo.com>
+ <20170414140753.16108-3-aryabinin@virtuozzo.com>
+ <705067e3-eb15-ce2a-cfc8-d048dfc8be4f@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
-Cc: Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
-        <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Konrad Rzeszutek Wilk <konrad.wilk-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
-        Eric Van Hensbergen <ericvh-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Ron Minnich <rminnich-4OHPYypu0djtX7QSmKvirg@public.gmane.org>,
-        Latchesar Ionkov <lucho-OnYtXJJ0/fesTnJN9+BGXg@public.gmane.org>,
-        Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Ross Zwisler <ross.zwisler-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>,
-        Trond Myklebust <trond.myklebust-7I+n7zu2hftEKMMhf/gKZA@public.gmane.org>,
-        Anna Schumaker <anna.schumaker-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
-        Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>, Jens Axboe <axboe-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org>,
-        Johannes Weiner <hannes-druUgvl0LCNAfugRpC6u6w@public.gmane.org>,
-        Alexey Kuznetsov <kuznet-5HdwGun5lf+gSpxsJD1C4w@public.gmane.org>,
-        Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>,
-        <v9fs-developer-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org>,
-        <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>, <linux-
-To: Andrey Ryabinin <aryabinin-5HdwGun5lf+gSpxsJD1C4w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170414140753.16108-2-aryabinin-5HdwGun5lf+gSpxsJD1C4w@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Eric Van Hensbergen
+	<ericvh@gmail.com>, Ron Minnich <rminnich@sandia.gov>, Latchesar Ionkov
+	<lucho@ionkov.net>, Steve French <sfrench@samba.org>, Matthew Wilcox
+	<mawilcox@microsoft.com>, Ross Zwisler <ross.zwisler@linux.intel.com>, Trond
+ Myklebust <trond.myklebust@primarydata.com>, Anna Schumaker
+	<anna.schumaker@netapp.com>, Andrew Morton <akpm@linux-foundation.org>, Jan
+ Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>, Johannes Weiner
+	<hannes@cmpxchg.org>, Alexey Kuznetsov <kuznet@virtuozzo.com>, Christoph
+ Hellwig <hch@lst.de>, <v9fs-developer@lists.sourceforge.net>,
+	<linux-kernel@vger.kernel.org>, <linux-cifs@vger.kernel.org>,
+	<samba-technical@lists.samba.org>, <linux-nfs@vger.kernel.org>,
+	<linux-mm@kvack.org>
+To: Nikolay Borisov <n.borisov.lkml@gmail.com>, Alexander Viro
+	<viro@zeniv.linux.org.uk>, <linux-fsdevel@vger.kernel.org>
+Return-path: <owner-linux-mm@kvack.org>
+In-Reply-To: <705067e3-eb15-ce2a-cfc8-d048dfc8be4f@gmail.com>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Fri, 14 Apr 2017 17:07:50 +0300 Andrey Ryabinin <aryabinin-5HdwGun5lf+gSpxsJD1C4w@public.gmane.org> wrote:
-
-> Some direct write fs hooks call invalidate_inode_pages2[_range]()
-> conditionally iff mapping->nrpages is not zero. If page cache is empty,
-> buffered read following after direct IO write would get stale data from
-> the cleancache.
+On 04/18/2017 09:51 PM, Nikolay Borisov wrote:
 > 
-> Also it doesn't feel right to check only for ->nrpages because
-> invalidate_inode_pages2[_range] invalidates exceptional entries as well.
 > 
-> Fix this by calling invalidate_inode_pages2[_range]() regardless of nrpages
-> state.
+> On 14.04.2017 17:07, Andrey Ryabinin wrote:
+>> invalidate_bdev() calls cleancache_invalidate_inode() iff ->nrpages != 0
+>> which doen't make any sense.
+>> Make invalidate_bdev() always invalidate cleancache data.
+>>
+>> Fixes: c515e1fd361c ("mm/fs: add hooks to support cleancache")
+>> Signed-off-by: Andrey Ryabinin <aryabinin@virtuozzo.com>
+>> ---
+>>  fs/block_dev.c | 11 +++++------
+>>  1 file changed, 5 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/fs/block_dev.c b/fs/block_dev.c
+>> index e405d8e..7af4787 100644
+>> --- a/fs/block_dev.c
+>> +++ b/fs/block_dev.c
+>> @@ -103,12 +103,11 @@ void invalidate_bdev(struct block_device *bdev)
+>>  {
+>>  	struct address_space *mapping = bdev->bd_inode->i_mapping;
+>>  
+>> -	if (mapping->nrpages == 0)
+>> -		return;
+>> -
+>> -	invalidate_bh_lrus();
+>> -	lru_add_drain_all();	/* make sure all lru add caches are flushed */
+>> -	invalidate_mapping_pages(mapping, 0, -1);
+>> +	if (mapping->nrpages) {
+>> +		invalidate_bh_lrus();
+>> +		lru_add_drain_all();	/* make sure all lru add caches are flushed */
+>> +		invalidate_mapping_pages(mapping, 0, -1);
+>> +	}
+> 
+> How is this different than the current code? You will only invalidate
+> the mapping iff ->nrpages > 0 ( I assume it can't go down below 0) ?
 
-I'm not understanding this.  I can buy the argument about
-nrexceptional, but why does cleancache require the
-invalidate_inode_pages2_range) call even when ->nrpages is zero?
+The difference is that invalidate_bdev() now always calls cleancache_invalidate_inode()
+(you won't see it in this diff, it's placed after this if(mapping->nrpages){} block,)
 
-I *assume* it's because invalidate_inode_pages2_range() calls
-cleancache_invalidate_inode(), yes?  If so, can we please add this to
-the changelog?  If not then please explain further.
+> Perhaps just remove the if altogether?
+> 
+
+Given that invalidate_mapping_pages() invalidates exceptional entries as well, it certainly doesn't look
+right that we look only at mapping->nrpages and completely ignore ->nrexceptional.
+So maybe removing if() would be a right thing to do. But I think that should be a separate patch as it would
+fix a another bug probably introduced by commit 91b0abe36a7b ("mm + fs: store shadow entries in page cache")
+
+My intention here was to fix only cleancache case.
+
+
+>>  	/* 99% of the time, we don't need to flush the cleancache on the bdev.
+>>  	 * But, for the strange corners, lets be cautious
+>>  	 */
+>>
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
