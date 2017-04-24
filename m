@@ -1,38 +1,74 @@
-From: =?UTF-8?Q?Miloslav_H=c5=afla?= <miloslav.hula-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: mout.cifs - No such file or directory/Permission denied
-Date: Mon, 24 Apr 2017 17:57:52 +0200
-Message-ID: <8f4a5d81-3727-1382-8a00-5b7d8aecb3cc@gmail.com>
-References: <0e877de6-0d85-d185-aaa9-f64b058e19b6@gmail.com>
- <mpsmvb6xb24.fsf@aaptelpc.suse.de>
+From: Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH v3 10/20] fuse: set mapping error in
+ writepage_locked when it fails
+Date: Mon, 24 Apr 2017 18:04:31 +0200
+Message-ID: <20170424160431.GK23988@quack2.suse.cz>
+References: <20170424132259.8680-1-jlayton@redhat.com>
+	<20170424132259.8680-11-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-To: =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aurelien.aptel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <mpsmvb6xb24.fsf-zpEvHKhluMwYitT5tn2FcQ@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: jfs-discussion@lists.sourceforge.net, hch@infradead.org,
+	dhowells@redhat.com, linux-mm@kvack.org,
+	linux-cifs@vger.kernel.org, linux-nilfs@vger.kernel.org,
+	corbet@lwn.net, cluster-devel@redhat.com,
+	v9fs-developer@lists.sourceforge.net,
+	ross.zwisler@linux.intel.com, linux-ext4@vger.kernel.org,
+	linux-block@vger.kernel.org, osd-dev@open-osd.org,
+	axboe@kernel.dk, tytso@mit.edu, clm@fb.com,
+	mawilcox@microsoft.com, linux-kernel@vger.kernel.org,
+	linux-f2fs-devel@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org, jack@suse.com,
+	linux-fsdevel@vger.kernel.org, akpm@linux-foundation.org,
+	linux-btrfs@vger.kernel.org, viro@zeniv.linux.org.uk
+To: Jeff Layton <jlayton@redhat.com>
+Return-path: <linux-f2fs-devel-bounces@lists.sourceforge.net>
+Content-Disposition: inline
+In-Reply-To: <20170424132259.8680-11-jlayton@redhat.com>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/linux-f2fs-devel>,
+	<mailto:linux-f2fs-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=linux-f2fs-devel>
+List-Post: <mailto:linux-f2fs-devel@lists.sourceforge.net>
+List-Help: <mailto:linux-f2fs-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/linux-f2fs-devel>,
+	<mailto:linux-f2fs-devel-request@lists.sourceforge.net?subject=subscribe>
+Errors-To: linux-f2fs-devel-bounces@lists.sourceforge.net
+List-Id: linux-cifs.vger.kernel.org
 
-Dne 24-Apr-17 v 14:08 Aurélien Aptel napsal(a):
-> Miloslav Hůla <miloslav.hula-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> writes:
->> I'm trying to mount NetApp CIFS share, but without success. Connecting
->> it as a network drive or accessing it directly by pasting path into
->> explorer in Windows 8/10 works. smbclient works too.
->
-> This looks like good old bso#8950 [1]. You should try a kernel with the
-> following commits (4.9 or above, or a kernel where they have been backported):
->
->  a6b5058 fs/cifs: make share unaccessible at root level mountable
->  4214ebf Fix memory leaks in cifs_do_mount()
->  c1d8b24 Compare prepaths when comparing superblocks
->  348c1bf Move check for prefix path to within cifs_get_root()
->  d171356 Fix regression which breaks DFS mounting
->
-> 1: https://bugzilla.samba.org/show_bug.cgi?id=8950
+On Mon 24-04-17 09:22:49, Jeff Layton wrote:
+> This ensures that we see errors on fsync when writeback fails.
+> 
+> Signed-off-by: Jeff Layton <jlayton@redhat.com>
 
-In deed it is. With kernel 4.9.0-0.bpo.2-amd64 from jessie-backports 
-mount works.
+Hum, but do we really want to clobber mapping errors with temporary stuff
+like ENOMEM? Or do you want to handle that in mapping_set_error?
 
-Thank you,
-Milo
+								Honza
+
+> ---
+>  fs/fuse/file.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/fs/fuse/file.c b/fs/fuse/file.c
+> index ec238fb5a584..07d0efcb050c 100644
+> --- a/fs/fuse/file.c
+> +++ b/fs/fuse/file.c
+> @@ -1669,6 +1669,7 @@ static int fuse_writepage_locked(struct page *page)
+>  err_free:
+>  	fuse_request_free(req);
+>  err:
+> +	mapping_set_error(page->mapping, error);
+>  	end_page_writeback(page);
+>  	return error;
+>  }
+> -- 
+> 2.9.3
+> 
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
+
+------------------------------------------------------------------------------
+Check out the vibrant tech community on one of the world's most
+engaging tech sites, Slashdot.org! http://sdm.link/slashdot
