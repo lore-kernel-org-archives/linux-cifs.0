@@ -1,76 +1,38 @@
-From: Jan Kara <jack@suse.cz>
-Subject: Re: [PATCH v3 09/20] 9p: set mapping error when
- writeback fails in launder_page
-Date: Mon, 24 Apr 2017 17:57:55 +0200
-Message-ID: <20170424155755.GJ23988@quack2.suse.cz>
-References: <20170424132259.8680-1-jlayton@redhat.com>
-	<20170424132259.8680-10-jlayton@redhat.com>
+From: =?UTF-8?Q?Miloslav_H=c5=afla?= <miloslav.hula-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: mout.cifs - No such file or directory/Permission denied
+Date: Mon, 24 Apr 2017 17:57:52 +0200
+Message-ID: <8f4a5d81-3727-1382-8a00-5b7d8aecb3cc@gmail.com>
+References: <0e877de6-0d85-d185-aaa9-f64b058e19b6@gmail.com>
+ <mpsmvb6xb24.fsf@aaptelpc.suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: jfs-discussion@lists.sourceforge.net, neilb@suse.de, dhowells@redhat.com,
-	linux-mm@kvack.org, linux-cifs@vger.kernel.org,
-	linux-nilfs@vger.kernel.org, corbet@lwn.net,
-	cluster-devel@redhat.com, v9fs-developer@lists.sourceforge.net,
-	ross.zwisler@linux.intel.com, linux-ext4@vger.kernel.org,
-	linux-block@vger.kernel.org, osd-dev@open-osd.org,
-	axboe@kernel.dk, tytso@mit.edu, clm@fb.com,
-	mawilcox@microsoft.com, linux-kernel@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org, jack@suse.com,
-	linux-fsdevel@vger.kernel.org, akpm@linux-foundation.org,
-	linux-btrfs@vger.kernel.org, viro@zeniv.linux.org.uk
-To: Jeff Layton <jlayton@redhat.com>
-Return-path: <cluster-devel-bounces@redhat.com>
-Content-Disposition: inline
-In-Reply-To: <20170424132259.8680-10-jlayton@redhat.com>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/cluster-devel>,
-	<mailto:cluster-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/cluster-devel>
-List-Post: <mailto:cluster-devel@redhat.com>
-List-Help: <mailto:cluster-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/cluster-devel>,
-	<mailto:cluster-devel-request@redhat.com?subject=subscribe>
-Sender: cluster-devel-bounces@redhat.com
-Errors-To: cluster-devel-bounces@redhat.com
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+To: =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aurelien.aptel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <mpsmvb6xb24.fsf-zpEvHKhluMwYitT5tn2FcQ@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon 24-04-17 09:22:48, Jeff Layton wrote:
-> launder_page is just writeback under the page lock. We still need to
-> mark the mapping for errors there when they occur.
-> 
-> Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Dne 24-Apr-17 v 14:08 Aurélien Aptel napsal(a):
+> Miloslav Hůla <miloslav.hula-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> writes:
+>> I'm trying to mount NetApp CIFS share, but without success. Connecting
+>> it as a network drive or accessing it directly by pasting path into
+>> explorer in Windows 8/10 works. smbclient works too.
+>
+> This looks like good old bso#8950 [1]. You should try a kernel with the
+> following commits (4.9 or above, or a kernel where they have been backported):
+>
+>  a6b5058 fs/cifs: make share unaccessible at root level mountable
+>  4214ebf Fix memory leaks in cifs_do_mount()
+>  c1d8b24 Compare prepaths when comparing superblocks
+>  348c1bf Move check for prefix path to within cifs_get_root()
+>  d171356 Fix regression which breaks DFS mounting
+>
+> 1: https://bugzilla.samba.org/show_bug.cgi?id=8950
 
-Looks good. You can add:
+In deed it is. With kernel 4.9.0-0.bpo.2-amd64 from jessie-backports 
+mount works.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
-> ---
->  fs/9p/vfs_addr.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/fs/9p/vfs_addr.c b/fs/9p/vfs_addr.c
-> index adaf6f6dd858..7af6e6501698 100644
-> --- a/fs/9p/vfs_addr.c
-> +++ b/fs/9p/vfs_addr.c
-> @@ -223,8 +223,11 @@ static int v9fs_launder_page(struct page *page)
->  	v9fs_fscache_wait_on_page_write(inode, page);
->  	if (clear_page_dirty_for_io(page)) {
->  		retval = v9fs_vfs_writepage_locked(page);
-> -		if (retval)
-> +		if (retval) {
-> +			if (retval != -EAGAIN)
-> +				mapping_set_error(page->mapping, retval);
->  			return retval;
-> +		}
->  	}
->  	return 0;
->  }
-> -- 
-> 2.9.3
-> 
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Thank you,
+Milo
