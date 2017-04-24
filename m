@@ -1,36 +1,35 @@
 From: Christoph Hellwig <hch@infradead.org>
-Subject: Re: [RFC xfstests PATCH] xfstests: add a writeback error handling
- test
-Date: Mon, 24 Apr 2017 08:00:19 -0700
-Message-ID: <20170424150019.GA3288@infradead.org>
-References: <20170424134551.10301-1-jlayton@redhat.com>
+Subject: Re: [PATCH v3 01/20] mm: drop "wait" parameter from write_one_page
+Date: Mon, 24 Apr 2017 08:22:23 -0700
+Message-ID: <20170424152223.GA9112@infradead.org>
+References: <20170424132259.8680-1-jlayton@redhat.com>
+ <20170424132259.8680-2-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: fstests@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-mm@kvack.org, jfs-discussion@lists.sourceforge.net,
-        linux-xfs@vger.kernel.org, cluster-devel@redhat.com,
-        linux-f2fs-devel@lists.sourceforge.net,
-        v9fs-developer@lists.sourceforge.net, osd-dev@open-osd.org,
-        linux-nilfs@vger.kernel.org, linux-block@vger.kernel.org,
-        dhowells@redhat.com, akpm@linux-foundation.org, hch@infradead.org,
-        ross.zwisler@linux.intel.com, mawilcox@microsoft.com,
-        jack@suse.com, viro@zeniv.linux.org.uk, corbet@lwn.net,
-        neilb@suse.de, clm@fb.com, tytso@mit.edu, axboe@kernel.dk
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-mm@kvack.org,
+	jfs-discussion@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+	cluster-devel@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net, osd-dev@open-osd.org,
+	linux-nilfs@vger.kernel.org, linux-block@vger.kernel.org,
+	dhowells@redhat.com, akpm@linux-foundation.org, hch@infradead.org,
+	ross.zwisler@linux.intel.com, mawilcox@microsoft.com, jack@suse.com,
+	viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de, clm@fb.com,
+	tytso@mit.edu, axboe@kernel.dk
 To: Jeff Layton <jlayton@redhat.com>
-Return-path: <linux-btrfs-owner@vger.kernel.org>
+Return-path: <owner-linux-mm@kvack.org>
 Content-Disposition: inline
-In-Reply-To: <20170424134551.10301-1-jlayton@redhat.com>
-Sender: linux-btrfs-owner@vger.kernel.org
+In-Reply-To: <20170424132259.8680-2-jlayton@redhat.com>
+Sender: owner-linux-mm@kvack.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Mon, Apr 24, 2017 at 09:45:51AM -0400, Jeff Layton wrote:
-> With the patch series above, ext4 now passes. xfs and btrfs end up in
-> r/o mode after the test. xfs returns -EIO at that point though, and
-> btrfs returns -EROFS. What behavior we actually want there, I'm not
-> certain. We might be able to mitigate that by putting the journals on a
-> separate device?
+Looks fine,
 
-This looks like XFS shut down because of a permanent write error from
-dm-error.  Which seems like the expected behavior.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
