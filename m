@@ -1,162 +1,109 @@
-From: Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>
-Subject: Re: [PATCH 2/2] dax: fix data corruption due to stale mmap reads
-Date: Tue, 25 Apr 2017 13:10:43 +0200
-Message-ID: <20170425111043.GH2793@quack2.suse.cz>
-References: <20170420191446.GA21694@linux.intel.com>
- <20170421034437.4359-1-ross.zwisler@linux.intel.com>
- <20170421034437.4359-2-ross.zwisler@linux.intel.com>
+From: Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH v3 10/20] fuse: set mapping error in writepage_locked
+ when it fails
+Date: Tue, 25 Apr 2017 13:19:03 +0200
+Message-ID: <20170425111903.GI2793@quack2.suse.cz>
+References: <20170424132259.8680-1-jlayton@redhat.com>
+ <20170424132259.8680-11-jlayton@redhat.com>
+ <20170424160431.GK23988@quack2.suse.cz>
+ <1493054076.2895.17.camel@redhat.com>
+ <20170425081720.GA2793@quack2.suse.cz>
+ <1493116513.2758.1.camel@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Andrew Morton <akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
-        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
-        Alexey Kuznetsov <kuznet-5HdwGun5lf+gSpxsJD1C4w@public.gmane.org>,
-        Andrey Ryabinin <aryabinin-5HdwGun5lf+gSpxsJD1C4w@public.gmane.org>,
-        Anna Schumaker <anna.schumaker-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
-        Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>,
-        Dan Williams <dan.j.williams-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-        "Darrick J. Wong" <darrick.wong-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
-        Eric Van Hensbergen <ericvh-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>, Jens Axboe <axboe-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org>,
-        Johannes Weiner <hannes-druUgvl0LCNAfugRpC6u6w@public.gmane.org>,
-        Konrad Rzeszutek Wilk <konrad.wilk-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
-        Latchesar Ionkov <lucho-OnYtXJJ0/fesTnJN9+BGXg@public.gmane.org>,
-        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-mm-Bw31MaZKKs3YtjvyW6yDsg@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-nvdimm-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org, Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Ron Min
-To: Ross Zwisler <ross.zwisler-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-cifs@vger.kernel.org,
+	linux-mm@kvack.org, jfs-discussion@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org, cluster-devel@redhat.com,
+	linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net, osd-dev@open-osd.org,
+	linux-nilfs@vger.kernel.org, linux-block@vger.kernel.org,
+	dhowells@redhat.com, akpm@linux-foundation.org, hch@infradead.org,
+	ross.zwisler@linux.intel.com, mawilcox@microsoft.com, jack@suse.com,
+	viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de, clm@fb.com,
+	tytso@mit.edu, axboe@kernel.dk
+To: Jeff Layton <jlayton@redhat.com>
+Return-path: <owner-linux-mm@kvack.org>
 Content-Disposition: inline
-In-Reply-To: <20170421034437.4359-2-ross.zwisler-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+In-Reply-To: <1493116513.2758.1.camel@redhat.com>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Thu 20-04-17 21:44:37, Ross Zwisler wrote:
-> Users of DAX can suffer data corruption from stale mmap reads via the
-> following sequence:
+On Tue 25-04-17 06:35:13, Jeff Layton wrote:
+> On Tue, 2017-04-25 at 10:17 +0200, Jan Kara wrote:
+> > On Mon 24-04-17 13:14:36, Jeff Layton wrote:
+> > > On Mon, 2017-04-24 at 18:04 +0200, Jan Kara wrote:
+> > > > On Mon 24-04-17 09:22:49, Jeff Layton wrote:
+> > > > > This ensures that we see errors on fsync when writeback fails.
+> > > > > 
+> > > > > Signed-off-by: Jeff Layton <jlayton@redhat.com>
+> > > > 
+> > > > Hum, but do we really want to clobber mapping errors with temporary stuff
+> > > > like ENOMEM? Or do you want to handle that in mapping_set_error?
+> > > > 
+> > > 
+> > > Right now we don't really have such a thing as temporary errors in the
+> > > writeback codepath. If you return an error here, the data doesn't stay
+> > > dirty or anything, and I think we want to ensure that that gets reported
+> > > via fsync.
+> > > 
+> > > I'd like to see us add better handling for retryable errors for stuff
+> > > like ENOMEM or EAGAIN. I think this is the first step toward that
+> > > though. Once we have more consistent handling of writeback errors in
+> > > general, then we can start doing more interesting things with retryable
+> > > errors.
+> > > 
+> > > So yeah, I this is the right thing to do for now.
+> > 
+> > OK, fair enough. And question number 2):
+> > 
+> > Who is actually responsible for setting the error in the mapping when error
+> > happens inside ->writepage()? Is it the ->writepage() callback or the
+> > caller of ->writepage()? Or something else? Currently it seems to be a
+> > strange mix (e.g. mm/page-writeback.c: __writepage() calls
+> > mapping_set_error() when ->writepage() returns error) so I'd like to
+> > understand what's the plan and have that recorded in the changelogs.
+> > 
 > 
-> - open an mmap over a 2MiB hole
+> That's an excellent question.
 > 
-> - read from a 2MiB hole, faulting in a 2MiB zero page
-> 
-> - write to the hole with write(3p).  The write succeeds but we incorrectly
->   leave the 2MiB zero page mapping intact.
-> 
-> - via the mmap, read the data that was just written.  Since the zero page
->   mapping is still intact we read back zeroes instead of the new data.
-> 
-> We fix this by unconditionally calling invalidate_inode_pages2_range() in
-> dax_iomap_actor() for new block allocations, and by enhancing
-> __dax_invalidate_mapping_entry() so that it properly unmaps the DAX entry
-> being removed from the radix tree.
-> 
-> This is based on an initial patch from Jan Kara.
-> 
-> Signed-off-by: Ross Zwisler <ross.zwisler-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
-> Fixes: c6dcf52c23d2 ("mm: Invalidate DAX radix tree entries only if appropriate")
-> Reported-by: Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>
-> Cc: <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>    [4.10+]
-> ---
->  fs/dax.c | 26 +++++++++++++++++++-------
->  1 file changed, 19 insertions(+), 7 deletions(-)
-> 
-> diff --git a/fs/dax.c b/fs/dax.c
-> index 166504c..3f445d5 100644
-> --- a/fs/dax.c
-> +++ b/fs/dax.c
-> @@ -468,23 +468,35 @@ static int __dax_invalidate_mapping_entry(struct address_space *mapping,
->  					  pgoff_t index, bool trunc)
->  {
->  	int ret = 0;
-> -	void *entry;
-> +	void *entry, **slot;
->  	struct radix_tree_root *page_tree = &mapping->page_tree;
->  
->  	spin_lock_irq(&mapping->tree_lock);
-> -	entry = get_unlocked_mapping_entry(mapping, index, NULL);
-> +	entry = get_unlocked_mapping_entry(mapping, index, &slot);
->  	if (!entry || !radix_tree_exceptional_entry(entry))
->  		goto out;
->  	if (!trunc &&
->  	    (radix_tree_tag_get(page_tree, index, PAGECACHE_TAG_DIRTY) ||
->  	     radix_tree_tag_get(page_tree, index, PAGECACHE_TAG_TOWRITE)))
->  		goto out;
-> +
-> +	/*
-> +	 * Make sure 'entry' remains valid while we drop mapping->tree_lock to
-> +	 * do the unmap_mapping_range() call.
-> +	 */
-> +	entry = lock_slot(mapping, slot);
+> I think we probably want the writepage/launder_page operations to call
+> mapping_set_error. That makes it possible for filesystems (e.g. NFS) to
+> handle their own error tracking and reporting without using the new
+> infrastructure. If they never call mapping_set_error then we'll always
+> just return whatever their ->fsync operation returns on an fsync.
 
-This also stops page faults from mapping the entry again. Maybe worth
-mentioning here as well.
+OK, makes sense. It is also in line with what you did for DAX, 9p, or here
+for FUSE. So feel free to add:
 
-> +	spin_unlock_irq(&mapping->tree_lock);
-> +
-> +	unmap_mapping_range(mapping, (loff_t)index << PAGE_SHIFT,
-> +			(loff_t)PAGE_SIZE << dax_radix_order(entry), 0);
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-Ouch, unmapping entry-by-entry may get quite expensive if you are unmapping
-large ranges - each unmap means an rmap walk... Since this is a data
-corruption class of bug, let's fix it this way for now but I think we'll
-need to improve this later.
+for this patch but please also add a sentense that ->writepage() is
+responsible for calling mapping_set_error() if it fails and page is not
+redirtied to the changelogs of patches changing writepage handlers.
 
-E.g. what if we called unmap_mapping_range() for the whole invalidated
-range after removing the radix tree entries?
+> I'll make another pass through the tree and see whether we have some
+> mapping_set_error calls that should be removed, and will flesh out
+> vfs.txt to state this. Maybe that file needs a whole section on
+> writeback error reporting? Hmmm...
 
-Hum, but now thinking more about it I have hard time figuring out why write
-vs fault cannot actually still race:
+I think it would be nice to have all the logic described in one place. So
++1 from me.
 
-CPU1 - write(2)				CPU2 - read fault
+> That probably also means that I should drop patch 8 from this series
+> (mm: ensure that we set mapping error if writeout fails), since that
+> should be happening in writepage already.
 
-					dax_iomap_pte_fault()
-					  ->iomap_begin() - sees hole
-dax_iomap_rw()
-  iomap_apply()
-    ->iomap_begin - allocates blocks
-    dax_iomap_actor()
-      invalidate_inode_pages2_range()
-        - there's nothing to invalidate
-					  grab_mapping_entry()
-					  - we add zero page in the radix
-					    tree & map it to page tables
-
-Similarly read vs write fault may end up racing in a wrong way and try to
-replace already existing exceptional entry with a hole page?
+Yes.
 
 								Honza
-> +
-> +	spin_lock_irq(&mapping->tree_lock);
->  	radix_tree_delete(page_tree, index);
->  	mapping->nrexceptional--;
->  	ret = 1;
->  out:
-> -	put_unlocked_mapping_entry(mapping, index, entry);
->  	spin_unlock_irq(&mapping->tree_lock);
-> +	dax_wake_mapping_entry_waiter(mapping, index, entry, true);
->  	return ret;
->  }
->  /*
-> @@ -999,11 +1011,11 @@ dax_iomap_actor(struct inode *inode, loff_t pos, loff_t length, void *data,
->  		return -EIO;
->  
->  	/*
-> -	 * Write can allocate block for an area which has a hole page mapped
-> -	 * into page tables. We have to tear down these mappings so that data
-> -	 * written by write(2) is visible in mmap.
-> +	 * Write can allocate block for an area which has a hole page or zero
-> +	 * PMD entry in the radix tree.  We have to tear down these mappings so
-> +	 * that data written by write(2) is visible in mmap.
->  	 */
-> -	if ((iomap->flags & IOMAP_F_NEW) && inode->i_mapping->nrpages) {
-> +	if (iomap->flags & IOMAP_F_NEW) {
->  		invalidate_inode_pages2_range(inode->i_mapping,
->  					      pos >> PAGE_SHIFT,
->  					      (end - 1) >> PAGE_SHIFT);
-> -- 
-> 2.9.3
-> 
 -- 
-Jan Kara <jack-IBi9RG/b67k@public.gmane.org>
+Jan Kara <jack@suse.com>
 SUSE Labs, CR
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
