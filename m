@@ -1,32 +1,99 @@
-From: "Ms. Katherine" <ulia-lr1Dud67lTSvSplVBqRQBQ@public.gmane.org>
-Subject: EXTREMELY IMPORTANT
-Date: Mon, 24 Apr 2017 23:25:18 +0100
-Message-ID: <20170424222523.C50F151C1436__7542.47282534397$1493082054$gmane$org@mail.distral.ro>
-Reply-To: kathrynnmison-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH v3 10/20] fuse: set mapping error in writepage_locked
+ when it fails
+Date: Tue, 25 Apr 2017 10:17:20 +0200
+Message-ID: <20170425081720.GA2793@quack2.suse.cz>
+References: <20170424132259.8680-1-jlayton@redhat.com>
+ <20170424132259.8680-11-jlayton@redhat.com>
+ <20170424160431.GK23988@quack2.suse.cz>
+ <1493054076.2895.17.camel@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-To: Recipients <ulia-lr1Dud67lTSvSplVBqRQBQ@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Description: Mail message body
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-cifs@vger.kernel.org,
+	linux-mm@kvack.org, jfs-discussion@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org, cluster-devel@redhat.com,
+	linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net, osd-dev@open-osd.org,
+	linux-nilfs@vger.kernel.org, linux-block@vger.kernel.org,
+	dhowells@redhat.com, akpm@linux-foundation.org, hch@infradead.org,
+	ross.zwisler@linux.intel.com, mawilcox@microsoft.com, jack@suse.com,
+	viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de, clm@fb.com,
+	tytso@mit.edu, axboe@kernel.dk
+To: Jeff Layton <jlayton@redhat.com>
+Return-path: <owner-linux-mm@kvack.org>
+Content-Disposition: inline
+In-Reply-To: <1493054076.2895.17.camel@redhat.com>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-cifs.vger.kernel.org
 
-Dear Beloved, Sorry for the inconvenience, I am getting in touch with you regarding an extremely important and urgent matter, Please I need your urgent assistance and idea to finish up a project (Orphanage Home) Due to my health condition, Everything is available to finish up the project, All I need is your idea and trust...............
+On Mon 24-04-17 13:14:36, Jeff Layton wrote:
+> On Mon, 2017-04-24 at 18:04 +0200, Jan Kara wrote:
+> > On Mon 24-04-17 09:22:49, Jeff Layton wrote:
+> > > This ensures that we see errors on fsync when writeback fails.
+> > > 
+> > > Signed-off-by: Jeff Layton <jlayton@redhat.com>
+> > 
+> > Hum, but do we really want to clobber mapping errors with temporary stuff
+> > like ENOMEM? Or do you want to handle that in mapping_set_error?
+> > 
+> 
+> Right now we don't really have such a thing as temporary errors in the
+> writeback codepath. If you return an error here, the data doesn't stay
+> dirty or anything, and I think we want to ensure that that gets reported
+> via fsync.
+> 
+> I'd like to see us add better handling for retryable errors for stuff
+> like ENOMEM or EAGAIN. I think this is the first step toward that
+> though. Once we have more consistent handling of writeback errors in
+> general, then we can start doing more interesting things with retryable
+> errors.
+> 
+> So yeah, I this is the right thing to do for now.
 
-Geachte Geliefde, Sorry voor het ongemak, ik kom met je in contact met betrekking tot een zeer belangrijke en dringende zaak. Gelieve mijn dringende hulp en idee nodig om een project af te ronden (Weeshuishuis) Vanwege mijn gezondheidstoestand is alles beschikbaar voor Voltooi het project, alles wat ik nodig heb is jouw idee en vertrouwen.
+OK, fair enough. And question number 2):
 
-Please contact me for more details.
-Contact Email: kathrynnmison-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Who is actually responsible for setting the error in the mapping when error
+happens inside ->writepage()? Is it the ->writepage() callback or the
+caller of ->writepage()? Or something else? Currently it seems to be a
+strange mix (e.g. mm/page-writeback.c: __writepage() calls
+mapping_set_error() when ->writepage() returns error) so I'd like to
+understand what's the plan and have that recorded in the changelogs.
 
-Thanks
+								Honza
 
----
-This email has been checked for viruses by Avast antivirus software.
-https://www.avast.com/antivirus
-
-
+> 
+> > 
+> > > ---
+> > >  fs/fuse/file.c | 1 +
+> > >  1 file changed, 1 insertion(+)
+> > > 
+> > > diff --git a/fs/fuse/file.c b/fs/fuse/file.c
+> > > index ec238fb5a584..07d0efcb050c 100644
+> > > --- a/fs/fuse/file.c
+> > > +++ b/fs/fuse/file.c
+> > > @@ -1669,6 +1669,7 @@ static int fuse_writepage_locked(struct page *page)
+> > >  err_free:
+> > >  	fuse_request_free(req);
+> > >  err:
+> > > +	mapping_set_error(page->mapping, error);
+> > >  	end_page_writeback(page);
+> > >  	return error;
+> > >  }
+> > > -- 
+> > > 2.9.3
+> > > 
+> > > 
+> 
+> -- 
+> Jeff Layton <jlayton@redhat.com>
 -- 
-This message has been scanned for viruses and
-dangerous content by MailScanner, and is
-believed to be clean.
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
