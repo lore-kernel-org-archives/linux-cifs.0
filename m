@@ -1,80 +1,47 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] Fix match_prepath()
-Date: Thu, 27 Apr 2017 15:09:08 -0500
-Message-ID: <CAH2r5mt5PN2zX+g-Ybnux0tNcfG_W1WECX5cXRuaD=Jj+-DazA@mail.gmail.com>
-References: <20170426130546.4493-1-sprabhu@redhat.com> <CAKywueQLpqdj9erZOPPbr-B6mROi6wPpBszASLoev8Uis-pr7w@mail.gmail.com>
+From: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH v2] cifs: small underflow in cnvrtDosUnixTm()
+Date: Fri, 28 Apr 2017 15:51:30 +0300
+Message-ID: <20170428125130.4y22bpllksfyb37k@mwanda>
+References: <20170410134931.GC1918@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+        kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueQLpqdj9erZOPPbr-B6mROi6wPpBszASLoev8Uis-pr7w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20170410134931.GC1918@mwanda>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-merged into cifs-2.6.git for-next
+January is month 1.  There is no zero-th month.  If someone passes a
+zero month then it means we read from one space before the start of the
+total_days_of_prev_months[] array.
 
-On Wed, Apr 26, 2017 at 5:15 PM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> 2017-04-26 6:05 GMT-07:00 Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
->> Incorrect return value for shares not using the prefix patch means that
->> we will never match superblocks for these shares.
->>
->> Fixes: commit c1d8b24d1819 ("Compare prepaths when comparing superblocks")
->> Cc: stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->> ---
->>  fs/cifs/connect.c | 14 ++++++--------
->>  1 file changed, 6 insertions(+), 8 deletions(-)
->>
->> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
->> index d82467c..d95744d 100644
->> --- a/fs/cifs/connect.c
->> +++ b/fs/cifs/connect.c
->> @@ -2912,16 +2912,14 @@ match_prepath(struct super_block *sb, struct cifs_mnt_data *mnt_data)
->>  {
->>         struct cifs_sb_info *old = CIFS_SB(sb);
->>         struct cifs_sb_info *new = mnt_data->cifs_sb;
->> +       bool old_set = old->mnt_cifs_flags & CIFS_MOUNT_USE_PREFIX_PATH;
->> +       bool new_set = new->mnt_cifs_flags & CIFS_MOUNT_USE_PREFIX_PATH;
->>
->> -       if (old->mnt_cifs_flags & CIFS_MOUNT_USE_PREFIX_PATH) {
->> -               if (!(new->mnt_cifs_flags & CIFS_MOUNT_USE_PREFIX_PATH))
->> -                       return 0;
->> -               /* The prepath should be null terminated strings */
->> -               if (strcmp(new->prepath, old->prepath))
->> -                       return 0;
->> -
->> +       if (old_set && new_set && !strcmp(new->prepath, old->prepath))
->>                 return 1;
->> -       }
->> +       else if (!old_set && !new_set)
->> +               return 1;
->> +
->>         return 0;
->>  }
->>
->> --
->> 2.9.3
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-> Reviewed-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
->
-> --
-> Best regards,
-> Pavel Shilovsky
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+We may as well also be strict about days as well.
 
+Fixes: 1bd5bbcb6531 ("[CIFS] Legacy time handling for Win9x and OS/2 part 1")
+Signed-off-by: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+---
+v2:  Be strict about days as well.  My first patch was less intrusive
+because it only prevented the out of bounds access.  I have no idea how
+common it is to pass in an illegal day but, hopefully, not very common.
 
-
--- 
-Thanks,
-
-Steve
+diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
+index abae6dd2c6b9..4b2726ee4fad 100644
+--- a/fs/cifs/netmisc.c
++++ b/fs/cifs/netmisc.c
+@@ -980,10 +980,10 @@ struct timespec cnvrtDosUnixTm(__le16 le_date, __le16 le_time, int offset)
+ 		cifs_dbg(VFS, "illegal hours %d\n", st->Hours);
+ 	days = sd->Day;
+ 	month = sd->Month;
+-	if ((days > 31) || (month > 12)) {
++	if (days < 1 || days > 31 || month < 1 || month > 12) {
+ 		cifs_dbg(VFS, "illegal date, month %d day: %d\n", month, days);
+-		if (month > 12)
+-			month = 12;
++		days = (days < 1) ? 1 : ((days <= 31) ? days : 31);
++		month = (month < 1) ? 1 : ((month <= 12) ? month : 12);
+ 	}
+ 	month -= 1;
+ 	days += total_days_of_prev_months[month];
