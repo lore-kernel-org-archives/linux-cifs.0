@@ -1,114 +1,90 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: (unknown)
-Date: Thu, 4 May 2017 08:20:01 -0500
-Message-ID: <CAH2r5mtBQ3gRpvcx593sr3mUF6+pgy6cKcu3ipq7M13A7rVhwQ@mail.gmail.com>
+From: Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH 2/2] dax: fix data corruption due to stale mmap reads
+Date: Thu, 4 May 2017 11:12:33 +0200
+Message-ID: <20170504091233.GA808@quack2.suse.cz>
+References: <20170420191446.GA21694@linux.intel.com>
+ <20170421034437.4359-1-ross.zwisler@linux.intel.com>
+ <20170421034437.4359-2-ross.zwisler@linux.intel.com>
+ <20170425111043.GH2793@quack2.suse.cz>
+ <20170425225936.GA29655@linux.intel.com>
+ <20170426085235.GA21738@quack2.suse.cz>
+ <20170426225236.GA25838@linux.intel.com>
+ <20170427072659.GA29789@quack2.suse.cz>
+ <20170501223855.GA25862@linux.intel.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary=94eb2c18a36e974af5054eb2a2e1
-To: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Subject: 
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Jan Kara <jack@suse.cz>, Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Alexey Kuznetsov <kuznet@virtuozzo.com>,
+	Andrey Ryabinin <aryabinin@virtuozzo.com>,
+	Anna Schumaker <anna.schumaker@netapp.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"Darrick J. Wong" <darrick.wong@oracle.com>,
+	Eric Van Hensbergen <ericvh@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+	Latchesar Ionkov <lucho@ionkov.net>, linux-cifs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-nfs@vger.kernel.org, linux-nvdimm@lists.01.org,
+	Matthew Wilcox <mawilcox@microsoft.com>,
+	Ron Minnich <rminnich@sandia.gov>, samba-technical@lists.samba.org,
+	Steve French <sfrench@samba.org>,
+	Trond Myklebust <trond.
+To: Ross Zwisler <ross.zwisler@linux.intel.com>
+Return-path: <owner-linux-mm@kvack.org>
+Content-Disposition: inline
+In-Reply-To: <20170501223855.GA25862@linux.intel.com>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-cifs.vger.kernel.org
 
---94eb2c18a36e974af5054eb2a2e1
-Content-Type: text/plain; charset=UTF-8
+On Mon 01-05-17 16:38:55, Ross Zwisler wrote:
+> > So for now I'm still more inclined to just stay with the radix tree lock as
+> > is and just fix up the locking as I suggest and go for larger rewrite only
+> > if we can demonstrate further performance wins.
+> 
+> Sounds good.
+> 
+> > WRT your second patch, if we go with the locking as I suggest, it is enough
+> > to unmap the whole range after invalidate_inode_pages2() has cleared radix
+> > tree entries (*) which will be much cheaper (for large writes) than doing
+> > unmapping entry by entry.
+> 
+> I'm still not convinced that it is safe to do the unmap in a separate step.  I
+> see your point about it being expensive to do a rmap walk to unmap each entry
+> in __dax_invalidate_mapping_entry(), but I think we might need to because the
+> unmap is part of the contract imposed by invalidate_inode_pages2_range() and
+> invalidate_inode_pages2().  This exists in the header comment above each:
+> 
+>  * Any pages which are found to be mapped into pagetables are unmapped prior
+>  * to invalidation.
+> 
+> If you look at the usage of invalidate_inode_pages2_range() in
+> generic_file_direct_write() for example (which I realize we won't call for a
+> DAX inode, but still), I think that it really does rely on the fact that
+> invalidated pages are unmapped, right?  If it didn't, and hole pages were
+> mapped, the hole pages could remain mapped while a direct I/O write allocated
+> blocks and then wrote real data.
+> 
+> If we really want to unmap the entire range at once, maybe it would have to be
+> done in invalidate_inode_pages2_range(), after the loop?  My hesitation about
+> this is that we'd be leaking yet more DAX special casing up into the
+> mm/truncate.c code.
+> 
+> Or am I missing something?
 
-Any thoughts on removing the dependency on srv_mutex in deleting
-completed requests (and freeing its memory) ? Otherwise it can cause
-problems with long running socket writes (on sending new requests)
-which don't get the benefit of finishing up response processing due to
-the blocking of DeleteMidQEntry on server->srv_mutex
+No, my thinking was to put the invalidation at the end of
+invalidate_inode_pages2_range(). I agree it means more special-casing for
+DAX in mm/truncate.c.
 
-This should improve performance as well.
-
-(Long Li was noticing this looking at RDMA with cifs.ko)
-
-See attached patch
-
+								Honza
 -- 
-Thanks,
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
 
-Steve
-
---94eb2c18a36e974af5054eb2a2e1
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-CIFS-Don-t-delay-freeing-mids-when-blocked-on-slow-s.patch"
-Content-Disposition: attachment;
-	filename="0001-CIFS-Don-t-delay-freeing-mids-when-blocked-on-slow-s.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_j2afmymo0
-
-RnJvbSA0MjliYjBlOWRhMGRiMzRiZjc1ZDUzMzVmZTZiNDAxMWRiODc2NWFkIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHNtZnJlbmNoQGdtYWlsLmNvbT4KRGF0
-ZTogVGh1LCA0IE1heSAyMDE3IDA3OjU0OjA0IC0wNTAwClN1YmplY3Q6IFtQQVRDSF0gW0NJRlNd
-IERvbid0IGRlbGF5IGZyZWVpbmcgbWlkcyB3aGVuIGJsb2NrZWQgb24gc2xvdyBzb2NrZXQKIHdy
-aXRlIG9mIHJlcXVlc3QKCldoZW4gcHJvY2Vzc2luZyByZXNwb25zZXMsIGFuZCBpbiBwYXJ0aWN1
-bGFyIGZyZWVpbmcgbWlkcyAoRGVsZXRlTWlkUUVudHJ5KSwKd2hpY2ggaXMgdmVyeSBpbXBvcnRh
-bnQgc2luY2UgaXQgYWxzbyBmcmVlcyB0aGUgYXNzb2NpYXRlZCBidWZmZXJzIChjaWZzX2J1Zl9y
-ZWxlYXNlKSwKd2UgY2FuIGJsb2NrIGEgbG9uZyB0aW1lIGlmICh3cml0ZXMgdG8pIHNvY2tldCBp
-cyBzbG93IGR1ZSB0byBsb3cgbWVtb3J5IG9yIG5ldHdvcmtpbmcKaXNzdWVzLgoKV2UgY2FuIGJs
-b2NrIGluIHNlbmQgKHNtYiByZXF1ZXN0KSB3YWl0aW5nIGZvciBtZW1vcnksIGFuZCBiZSBibG9j
-a2VkIGluIHByb2Nlc3NpbmcKcmVzcG9uZXNzICh3aGljaCBjb3VsZCBmcmVlIG1lbW9yeSBpZiB3
-ZSBsZXQgaXQpIC0gc2luY2UgdGhleSBib3RoIGdyYWIgdGhlCnNlcnZlci0+c3J2X211dGV4LgoK
-SW4gcHJhY3RpY2UsIGluIHRoZSBEZWxldGVNaWRRRW50cnkgY2FzZSAtIHRoZXJlIGlzIG5vIHJl
-YXNvbiB3ZSBuZWVkIHRvCmdyYWIgdGhlIHNydl9tdXRleCBzbyByZW1vdmUgdGhlc2UgYXJvdW5k
-IERlbGV0ZU1pZFFFbnRyeSwgYW5kIGl0IGFsbG93cwp1cyB0byBmcmVlIG1lbW9yeSBmYXN0ZXIu
-CgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZXZlLmZyZW5jaEBwcmltYXJ5ZGF0YS5j
-b20+Ci0tLQogZnMvY2lmcy9jaWZzc21iLmMgICB8IDcgLS0tLS0tLQogZnMvY2lmcy9zbWIycGR1
-LmMgICB8IDcgLS0tLS0tLQogZnMvY2lmcy90cmFuc3BvcnQuYyB8IDIgLS0KIDMgZmlsZXMgY2hh
-bmdlZCwgMTYgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jaWZzc21iLmMgYi9m
-cy9jaWZzL2NpZnNzbWIuYwppbmRleCAyMDVmZDk0Li41MjQ1NzIzIDEwMDY0NAotLS0gYS9mcy9j
-aWZzL2NpZnNzbWIuYworKysgYi9mcy9jaWZzL2NpZnNzbWIuYwpAQCAtNjk3LDkgKzY5Nyw3IEBA
-IHN0YXRpYyBpbnQgdmFsaWRhdGVfdDIoc3RydWN0IHNtYl90Ml9yc3AgKnBTTUIpCiB7CiAJc3Ry
-dWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyID0gbWlkLT5jYWxsYmFja19kYXRhOwogCi0JbXV0
-ZXhfbG9jaygmc2VydmVyLT5zcnZfbXV0ZXgpOwogCURlbGV0ZU1pZFFFbnRyeShtaWQpOwotCW11
-dGV4X3VubG9jaygmc2VydmVyLT5zcnZfbXV0ZXgpOwogCWFkZF9jcmVkaXRzKHNlcnZlciwgMSwg
-Q0lGU19FQ0hPX09QKTsKIH0KIApAQCAtMTU5OSw5ICsxNTk3LDcgQEAgc3RhdGljIF9fdTE2IGNv
-bnZlcnRfZGlzcG9zaXRpb24oaW50IGRpc3Bvc2l0aW9uKQogCX0KIAogCXF1ZXVlX3dvcmsoY2lm
-c2lvZF93cSwgJnJkYXRhLT53b3JrKTsKLQltdXRleF9sb2NrKCZzZXJ2ZXItPnNydl9tdXRleCk7
-CiAJRGVsZXRlTWlkUUVudHJ5KG1pZCk7Ci0JbXV0ZXhfdW5sb2NrKCZzZXJ2ZXItPnNydl9tdXRl
-eCk7CiAJYWRkX2NyZWRpdHMoc2VydmVyLCAxLCAwKTsKIH0KIApAQCAtMjA1OCw3ICsyMDU0LDYg
-QEAgc3RydWN0IGNpZnNfd3JpdGVkYXRhICoKIHsKIAlzdHJ1Y3QgY2lmc193cml0ZWRhdGEgKndk
-YXRhID0gbWlkLT5jYWxsYmFja19kYXRhOwogCXN0cnVjdCBjaWZzX3Rjb24gKnRjb24gPSB0bGlu
-a190Y29uKHdkYXRhLT5jZmlsZS0+dGxpbmspOwotCXN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNl
-cnZlciA9IHRjb24tPnNlcy0+c2VydmVyOwogCXVuc2lnbmVkIGludCB3cml0dGVuOwogCVdSSVRF
-X1JTUCAqc21iID0gKFdSSVRFX1JTUCAqKW1pZC0+cmVzcF9idWY7CiAKQEAgLTIwOTUsOSArMjA5
-MCw3IEBAIHN0cnVjdCBjaWZzX3dyaXRlZGF0YSAqCiAJfQogCiAJcXVldWVfd29yayhjaWZzaW9k
-X3dxLCAmd2RhdGEtPndvcmspOwotCW11dGV4X2xvY2soJnNlcnZlci0+c3J2X211dGV4KTsKIAlE
-ZWxldGVNaWRRRW50cnkobWlkKTsKLQltdXRleF91bmxvY2soJnNlcnZlci0+c3J2X211dGV4KTsK
-IAlhZGRfY3JlZGl0cyh0Y29uLT5zZXMtPnNlcnZlciwgMSwgMCk7CiB9CiAKZGlmZiAtLWdpdCBh
-L2ZzL2NpZnMvc21iMnBkdS5jIGIvZnMvY2lmcy9zbWIycGR1LmMKaW5kZXggMGZkNjNmMC4uZTQw
-MDdlZSAxMDA2NDQKLS0tIGEvZnMvY2lmcy9zbWIycGR1LmMKKysrIGIvZnMvY2lmcy9zbWIycGR1
-LmMKQEAgLTIxNzIsOSArMjE3Miw3IEBAIHN0YXRpYyBpbmxpbmUgdm9pZCBpbml0X2NvcHlfY2h1
-bmtfZGVmYXVsdHMoc3RydWN0IGNpZnNfdGNvbiAqdGNvbikKIAlpZiAobWlkLT5taWRfc3RhdGUg
-PT0gTUlEX1JFU1BPTlNFX1JFQ0VJVkVEKQogCQljcmVkaXRzX3JlY2VpdmVkID0gbGUxNl90b19j
-cHUocnNwLT5oZHIuc3luY19oZHIuQ3JlZGl0UmVxdWVzdCk7CiAKLQltdXRleF9sb2NrKCZzZXJ2
-ZXItPnNydl9tdXRleCk7CiAJRGVsZXRlTWlkUUVudHJ5KG1pZCk7Ci0JbXV0ZXhfdW5sb2NrKCZz
-ZXJ2ZXItPnNydl9tdXRleCk7CiAJYWRkX2NyZWRpdHMoc2VydmVyLCBjcmVkaXRzX3JlY2VpdmVk
-LCBDSUZTX0VDSE9fT1ApOwogfQogCkBAIC0yNDMyLDkgKzI0MzAsNyBAQCB2b2lkIHNtYjJfcmVj
-b25uZWN0X3NlcnZlcihzdHJ1Y3Qgd29ya19zdHJ1Y3QgKndvcmspCiAJCWNpZnNfc3RhdHNfZmFp
-bF9pbmModGNvbiwgU01CMl9SRUFEX0hFKTsKIAogCXF1ZXVlX3dvcmsoY2lmc2lvZF93cSwgJnJk
-YXRhLT53b3JrKTsKLQltdXRleF9sb2NrKCZzZXJ2ZXItPnNydl9tdXRleCk7CiAJRGVsZXRlTWlk
-UUVudHJ5KG1pZCk7Ci0JbXV0ZXhfdW5sb2NrKCZzZXJ2ZXItPnNydl9tdXRleCk7CiAJYWRkX2Ny
-ZWRpdHMoc2VydmVyLCBjcmVkaXRzX3JlY2VpdmVkLCAwKTsKIH0KIApAQCAtMjU5Myw3ICsyNTg5
-LDYgQEAgdm9pZCBzbWIyX3JlY29ubmVjdF9zZXJ2ZXIoc3RydWN0IHdvcmtfc3RydWN0ICp3b3Jr
-KQogewogCXN0cnVjdCBjaWZzX3dyaXRlZGF0YSAqd2RhdGEgPSBtaWQtPmNhbGxiYWNrX2RhdGE7
-CiAJc3RydWN0IGNpZnNfdGNvbiAqdGNvbiA9IHRsaW5rX3Rjb24od2RhdGEtPmNmaWxlLT50bGlu
-ayk7Ci0Jc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyID0gdGNvbi0+c2VzLT5zZXJ2ZXI7
-CiAJdW5zaWduZWQgaW50IHdyaXR0ZW47CiAJc3RydWN0IHNtYjJfd3JpdGVfcnNwICpyc3AgPSAo
-c3RydWN0IHNtYjJfd3JpdGVfcnNwICopbWlkLT5yZXNwX2J1ZjsKIAl1bnNpZ25lZCBpbnQgY3Jl
-ZGl0c19yZWNlaXZlZCA9IDE7CkBAIC0yNjMzLDkgKzI2MjgsNyBAQCB2b2lkIHNtYjJfcmVjb25u
-ZWN0X3NlcnZlcihzdHJ1Y3Qgd29ya19zdHJ1Y3QgKndvcmspCiAJCWNpZnNfc3RhdHNfZmFpbF9p
-bmModGNvbiwgU01CMl9XUklURV9IRSk7CiAKIAlxdWV1ZV93b3JrKGNpZnNpb2Rfd3EsICZ3ZGF0
-YS0+d29yayk7Ci0JbXV0ZXhfbG9jaygmc2VydmVyLT5zcnZfbXV0ZXgpOwogCURlbGV0ZU1pZFFF
-bnRyeShtaWQpOwotCW11dGV4X3VubG9jaygmc2VydmVyLT5zcnZfbXV0ZXgpOwogCWFkZF9jcmVk
-aXRzKHRjb24tPnNlcy0+c2VydmVyLCBjcmVkaXRzX3JlY2VpdmVkLCAwKTsKIH0KIApkaWZmIC0t
-Z2l0IGEvZnMvY2lmcy90cmFuc3BvcnQuYyBiL2ZzL2NpZnMvdHJhbnNwb3J0LmMKaW5kZXggNGQ2
-NGI1Yi4uZGU1ODlkMCAxMDA2NDQKLS0tIGEvZnMvY2lmcy90cmFuc3BvcnQuYworKysgYi9mcy9j
-aWZzL3RyYW5zcG9ydC5jCkBAIC02MTMsOSArNjEzLDcgQEAgc3RydWN0IG1pZF9xX2VudHJ5ICoK
-IAl9CiAJc3Bpbl91bmxvY2soJkdsb2JhbE1pZF9Mb2NrKTsKIAotCW11dGV4X2xvY2soJnNlcnZl
-ci0+c3J2X211dGV4KTsKIAlEZWxldGVNaWRRRW50cnkobWlkKTsKLQltdXRleF91bmxvY2soJnNl
-cnZlci0+c3J2X211dGV4KTsKIAlyZXR1cm4gcmM7CiB9CiAKLS0gCjEuOS4xCgo=
---94eb2c18a36e974af5054eb2a2e1--
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
