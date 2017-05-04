@@ -1,90 +1,41 @@
-From: Jan Kara <jack@suse.cz>
-Subject: Re: [PATCH 2/2] dax: fix data corruption due to stale mmap reads
-Date: Thu, 4 May 2017 11:12:33 +0200
-Message-ID: <20170504091233.GA808@quack2.suse.cz>
-References: <20170420191446.GA21694@linux.intel.com>
- <20170421034437.4359-1-ross.zwisler@linux.intel.com>
- <20170421034437.4359-2-ross.zwisler@linux.intel.com>
- <20170425111043.GH2793@quack2.suse.cz>
- <20170425225936.GA29655@linux.intel.com>
- <20170426085235.GA21738@quack2.suse.cz>
- <20170426225236.GA25838@linux.intel.com>
- <20170427072659.GA29789@quack2.suse.cz>
- <20170501223855.GA25862@linux.intel.com>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: smb3 mount fix for Macs
+Date: Thu, 4 May 2017 11:43:39 -0700
+Message-ID: <CAKywueR3XgeCHRu_a6CJ9gk33CveMjSLivkRXAjuwOZP4O4FSw@mail.gmail.com>
+References: <CAH2r5mtm7mJn7V5qiP6Xz3PW-+d_j02idQcsZkgfS3Gqw4=92g@mail.gmail.com>
+ <CAH2r5mtrghs-cnnxDvwtSzz5orUxNU-xpwFxJ0GVCr2BCeDOWg@mail.gmail.com>
+ <20170504122447.03f54767@suse.de> <CAH2r5mvt2MKaeMC7zJ+xX5jXpEMGWP6ja4F-BmwPq8q=TdNGOg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Jan Kara <jack@suse.cz>, Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Alexey Kuznetsov <kuznet@virtuozzo.com>,
-	Andrey Ryabinin <aryabinin@virtuozzo.com>,
-	Anna Schumaker <anna.schumaker@netapp.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Dan Williams <dan.j.williams@intel.com>,
-	"Darrick J. Wong" <darrick.wong@oracle.com>,
-	Eric Van Hensbergen <ericvh@gmail.com>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	Latchesar Ionkov <lucho@ionkov.net>, linux-cifs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-nfs@vger.kernel.org, linux-nvdimm@lists.01.org,
-	Matthew Wilcox <mawilcox@microsoft.com>,
-	Ron Minnich <rminnich@sandia.gov>, samba-technical@lists.samba.org,
-	Steve French <sfrench@samba.org>,
-	Trond Myklebust <trond.
-To: Ross Zwisler <ross.zwisler@linux.intel.com>
-Return-path: <owner-linux-mm@kvack.org>
-Content-Disposition: inline
-In-Reply-To: <20170501223855.GA25862@linux.intel.com>
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org>,
+        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAH2r5mvt2MKaeMC7zJ+xX5jXpEMGWP6ja4F-BmwPq8q=TdNGOg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon 01-05-17 16:38:55, Ross Zwisler wrote:
-> > So for now I'm still more inclined to just stay with the radix tree lock as
-> > is and just fix up the locking as I suggest and go for larger rewrite only
-> > if we can demonstrate further performance wins.
-> 
-> Sounds good.
-> 
-> > WRT your second patch, if we go with the locking as I suggest, it is enough
-> > to unmap the whole range after invalidate_inode_pages2() has cleared radix
-> > tree entries (*) which will be much cheaper (for large writes) than doing
-> > unmapping entry by entry.
-> 
-> I'm still not convinced that it is safe to do the unmap in a separate step.  I
-> see your point about it being expensive to do a rmap walk to unmap each entry
-> in __dax_invalidate_mapping_entry(), but I think we might need to because the
-> unmap is part of the contract imposed by invalidate_inode_pages2_range() and
-> invalidate_inode_pages2().  This exists in the header comment above each:
-> 
->  * Any pages which are found to be mapped into pagetables are unmapped prior
->  * to invalidation.
-> 
-> If you look at the usage of invalidate_inode_pages2_range() in
-> generic_file_direct_write() for example (which I realize we won't call for a
-> DAX inode, but still), I think that it really does rely on the fact that
-> invalidated pages are unmapped, right?  If it didn't, and hole pages were
-> mapped, the hole pages could remain mapped while a direct I/O write allocated
-> blocks and then wrote real data.
-> 
-> If we really want to unmap the entire range at once, maybe it would have to be
-> done in invalidate_inode_pages2_range(), after the loop?  My hesitation about
-> this is that we'd be leaking yet more DAX special casing up into the
-> mm/truncate.c code.
-> 
-> Or am I missing something?
+2017-05-04 3:30 GMT-07:00 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+> On Thu, May 4, 2017 at 5:24 AM, David Disseldorp <ddiss-l3A5Bk7waGM@public.gmane.org> wrote:
+>> On Wed, 3 May 2017 21:25:50 -0500, Steve French wrote:
+>>
+>>> Minor update and added cc:stable
+>>>
+>>> https://git.samba.org/?p=sfrench/cifs-2.6.git;a=commit;h=7db0a6efdc3e990cdfd4b24820d010e9eb7890ad
+>>
+>> The relaxed validate negotiate rsplen check looks okay, but I think the
+>> reduced MaxOutputResponse change should probably be split out into a
+>> separate commit, as it affects all other ioctls.
+>
+> That is a good thing in a way - because we don't want any ioctls to
+> send more than maxbufsize until we can handle this.
+>
 
-No, my thinking was to put the invalidation at the end of
-invalidate_inode_pages2_range(). I agree it means more special-casing for
-DAX in mm/truncate.c.
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+I agree that we need to split the patch into two because it is
+targeted to stable. SMB2_ioctl() and smb3_validate_negotiate() were
+introduced in different times, so the single patch won't be applied
+properly on some stable kernel versions.
 
 --
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+Best regards,
+Pavel Shilovsky
