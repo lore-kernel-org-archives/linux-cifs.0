@@ -1,134 +1,83 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [RFC 10/10] crypto: adapt api sample to use async. op wait
-Date: Sat,  6 May 2017 15:59:59 +0300
-Message-ID: <1494075602-5061-11-git-send-email-gilad@benyossef.com>
-References: <1494075602-5061-1-git-send-email-gilad@benyossef.com>
-Cc: Ofir Drang <ofir.drang@arm.com>,
-        Gilad Ben-Yossef <gilad.benyossef@arm.com>,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-fsdevel@vger.kernel.org,
-        linux-ima-devel@lists.sourceforge.net,
-        linux-ima-user@lists.sourceforge.net,
-        linux-security-module@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <james.l.morris@oracle.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>
-Return-path: <linux-doc-owner@vger.kernel.org>
-In-Reply-To: <1494075602-5061-1-git-send-email-gilad@benyossef.com>
-Sender: linux-doc-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [GIT] SMB3 Fixes
+Date: Sat, 6 May 2017 12:34:35 -0500
+Message-ID: <CAH2r5mvNknV7-By6Fo767opCsL+ZuzWF5NJpt9efp-YLBDKL=Q@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-The code sample is waiting for an async. crypto op completion.
-Adapt sample to use the new generic infrastructure to do the same.
+The following includes various fixes for stable for CIFS/SMB3 especially
+for better interoperability for SMB3 to Macs. It also includes Pavel's
+improvements to SMB3 async i/o support (which is much faster now).
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
----
- Documentation/crypto/api-samples.rst | 52 +++++++-----------------------------
- 1 file changed, 10 insertions(+), 42 deletions(-)
+Please pull the following changes since commit
+204f144c9fcac355843412b6ba1150086488a208:
 
-diff --git a/Documentation/crypto/api-samples.rst b/Documentation/crypto/api-samples.rst
-index d021fd9..73b466b 100644
---- a/Documentation/crypto/api-samples.rst
-+++ b/Documentation/crypto/api-samples.rst
-@@ -7,59 +7,27 @@ Code Example For Symmetric Key Cipher Operation
- ::
- 
- 
--    struct tcrypt_result {
--        struct completion completion;
--        int err;
--    };
--
-     /* tie all data structures together */
-     struct skcipher_def {
-         struct scatterlist sg;
-         struct crypto_skcipher *tfm;
-         struct skcipher_request *req;
--        struct tcrypt_result result;
-+        struct crypto_wait wait;
-     };
- 
--    /* Callback function */
--    static void test_skcipher_cb(struct crypto_async_request *req, int error)
--    {
--        struct tcrypt_result *result = req->data;
--
--        if (error == -EINPROGRESS)
--            return;
--        result->err = error;
--        complete(&result->completion);
--        pr_info("Encryption finished successfully\n");
--    }
--
-     /* Perform cipher operation */
-     static unsigned int test_skcipher_encdec(struct skcipher_def *sk,
-                          int enc)
-     {
--        int rc = 0;
-+        int rc;
- 
-         if (enc)
--            rc = crypto_skcipher_encrypt(sk->req);
-+            rc = crypto_wait_req(crypto_skcipher_encrypt(sk->req), &sk->wait);
-         else
--            rc = crypto_skcipher_decrypt(sk->req);
--
--        switch (rc) {
--        case 0:
--            break;
--        case -EINPROGRESS:
--        case -EBUSY:
--            rc = wait_for_completion_interruptible(
--                &sk->result.completion);
--            if (!rc && !sk->result.err) {
--                reinit_completion(&sk->result.completion);
--                break;
--            }
--        default:
--            pr_info("skcipher encrypt returned with %d result %d\n",
--                rc, sk->result.err);
--            break;
--        }
--        init_completion(&sk->result.completion);
-+            rc = crypto_wait_req(crypto_skcipher_decrypt(sk->req), &sk->wait);
-+
-+	if (rc)
-+		pr_info("skcipher encrypt returned with result %d\n", rc);
- 
-         return rc;
-     }
-@@ -89,8 +57,8 @@ Code Example For Symmetric Key Cipher Operation
-         }
- 
-         skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
--                          test_skcipher_cb,
--                          &sk.result);
-+                          crypto_req_done,
-+                          &sk.wait);
- 
-         /* AES 256 with random key */
-         get_random_bytes(&key, 32);
-@@ -122,7 +90,7 @@ Code Example For Symmetric Key Cipher Operation
-         /* We encrypt one block */
-         sg_init_one(&sk.sg, scratchpad, 16);
-         skcipher_request_set_crypt(req, &sk.sg, &sk.sg, 16, ivdata);
--        init_completion(&sk.result.completion);
-+        crypto_init_wait(&sk.wait);
- 
-         /* encrypt data */
-         ret = test_skcipher_encdec(&sk, 1);
--- 
-2.1.4
+  Merge branch 'work.compat' of
+git://git.kernel.org/pub/scm/linux/kernel/git/viro/vfs (2017-05-02
+11:54:26 -0700)
 
+are available in the git repository at:
+
+
+  git://git.samba.org/sfrench/cifs-2.6.git for-next
+
+for you to fetch changes up to 85435d7a15294f9f7ef23469e6aaf7c5dfcc54f0:
+
+  CIFS: add misssing SFM mapping for doublequote (2017-05-05 08:33:44 -0500=
+)
+
+----------------------------------------------------------------
+Bj=C3=B6rn Jacke (2):
+      CIFS: fix mapping of SFM_SPACE and SFM_PERIOD
+      CIFS: add misssing SFM mapping for doublequote
+
+Dan Carpenter (1):
+      cifs: small underflow in cnvrtDosUnixTm()
+
+Daniel N Pettersson (1):
+      cifs: fix IPv6 link local, with scope id, address parsing
+
+David Disseldorp (3):
+      cifs: fix leak in FSCTL_ENUM_SNAPS response handling
+      cifs: fix CIFS_ENUMERATE_SNAPSHOTS oops
+      cifs: fix CIFS_IOC_GET_MNT_INFO oops
+
+Pavel Shilovsky (3):
+      CIFS: Add asynchronous context to support kernel AIO
+      CIFS: Add asynchronous read support through kernel AIO
+      CIFS: Add asynchronous write support through kernel AIO
+
+Rabin Vincent (1):
+      CIFS: fix oplock break deadlocks
+
+Steve French (2):
+      Set unicode flag on cifs echo request to avoid Mac error
+      SMB3: Work around mount failure when using SMB3 dialect to Macs
+
+ fs/cifs/cifs_unicode.c |   6 +
+ fs/cifs/cifs_unicode.h |   5 +-
+ fs/cifs/cifsfs.c       |  15 ++-
+ fs/cifs/cifsglob.h     |  20 +++
+ fs/cifs/cifsproto.h    |   3 +
+ fs/cifs/cifssmb.c      |   3 +
+ fs/cifs/connect.c      |   9 +-
+ fs/cifs/file.c         | 357 ++++++++++++++++++++++++++++++++++++---------=
+----
+ fs/cifs/ioctl.c        |   4 +
+ fs/cifs/misc.c         | 122 ++++++++++++++++-
+ fs/cifs/netmisc.c      |   6 +-
+ fs/cifs/smb2misc.c     |   5 +-
+ fs/cifs/smb2ops.c      |   1 +
+ fs/cifs/smb2pdu.c      |  14 +-
+ 14 files changed, 465 insertions(+), 105 deletions(-)
+
+--=20
+Thanks,
+
+Steve
