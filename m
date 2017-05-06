@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [RFC 03/10] crypto: move drbg to generic async completion
-Date: Sat,  6 May 2017 15:59:52 +0300
-Message-ID: <1494075602-5061-4-git-send-email-gilad@benyossef.com>
+Subject: [RFC 04/10] crypto: move gcm to generic async completion
+Date: Sat,  6 May 2017 15:59:53 +0300
+Message-ID: <1494075602-5061-5-git-send-email-gilad@benyossef.com>
 References: <1494075602-5061-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -37,99 +37,93 @@ Sender: dm-devel-bounces@redhat.com
 Errors-To: dm-devel-bounces@redhat.com
 List-Id: linux-cifs.vger.kernel.org
 
-DRBG is starting an async. crypto op and waiting for it complete.
+gcm is starting an async. crypto op and waiting for it complete.
 Move it over to generic code doing the same.
-
-As part of the move the wait for op completion lost its
-_interruptible property. However, since each invocation is
-supposed to be short and since no other user in the kernel
-does the same I believe this is acceptable.
-
-In similar fashion the code now passes CRYPTO_TFM_REQ_MAY_SLEEP
-flag indicating crypto request memory  allocation may use GFP_KERNEL
-which should be perfectly fine as the code is obviously sleeping
-for the completion of the request any way.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- crypto/drbg.c         | 35 ++++++++---------------------------
- include/crypto/drbg.h |  3 +--
- 2 files changed, 9 insertions(+), 29 deletions(-)
+ crypto/gcm.c | 34 ++++++----------------------------
+ 1 file changed, 6 insertions(+), 28 deletions(-)
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index fa749f4..101d9f0 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -1651,16 +1651,6 @@ static int drbg_fini_sym_kernel(struct drbg_state *drbg)
- 	return 0;
+diff --git a/crypto/gcm.c b/crypto/gcm.c
+index b7ad808..fb923a5 100644
+--- a/crypto/gcm.c
++++ b/crypto/gcm.c
+@@ -16,7 +16,6 @@
+ #include <crypto/scatterwalk.h>
+ #include <crypto/hash.h>
+ #include "internal.h"
+-#include <linux/completion.h>
+ #include <linux/err.h>
+ #include <linux/init.h>
+ #include <linux/kernel.h>
+@@ -78,11 +77,6 @@ struct crypto_gcm_req_priv_ctx {
+ 	} u;
+ };
+ 
+-struct crypto_gcm_setkey_result {
+-	int err;
+-	struct completion completion;
+-};
+-
+ static struct {
+ 	u8 buf[16];
+ 	struct scatterlist sg;
+@@ -98,17 +92,6 @@ static inline struct crypto_gcm_req_priv_ctx *crypto_gcm_reqctx(
+ 	return (void *)PTR_ALIGN((u8 *)aead_request_ctx(req), align + 1);
  }
  
--static void drbg_skcipher_cb(struct crypto_async_request *req, int error)
+-static void crypto_gcm_setkey_done(struct crypto_async_request *req, int err)
 -{
--	struct drbg_state *drbg = req->data;
+-	struct crypto_gcm_setkey_result *result = req->data;
 -
--	if (error == -EINPROGRESS)
+-	if (err == -EINPROGRESS)
 -		return;
--	drbg->ctr_async_err = error;
--	complete(&drbg->ctr_completion);
+-
+-	result->err = err;
+-	complete(&result->completion);
 -}
 -
- static int drbg_init_sym_kernel(struct drbg_state *drbg)
+ static int crypto_gcm_setkey(struct crypto_aead *aead, const u8 *key,
+ 			     unsigned int keylen)
  {
- 	struct crypto_cipher *tfm;
-@@ -1699,8 +1689,9 @@ static int drbg_init_sym_kernel(struct drbg_state *drbg)
+@@ -119,7 +102,7 @@ static int crypto_gcm_setkey(struct crypto_aead *aead, const u8 *key,
+ 		be128 hash;
+ 		u8 iv[16];
+ 
+-		struct crypto_gcm_setkey_result result;
++		struct crypto_wait wait;
+ 
+ 		struct scatterlist sg[1];
+ 		struct skcipher_request req;
+@@ -140,23 +123,18 @@ static int crypto_gcm_setkey(struct crypto_aead *aead, const u8 *key,
+ 	if (!data)
  		return -ENOMEM;
- 	}
- 	drbg->ctr_req = req;
--	skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
--					drbg_skcipher_cb, drbg);
-+	skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
-+						CRYPTO_TFM_REQ_MAY_SLEEP,
-+					crypto_req_done, &drbg->ctr_wait);
  
- 	alignmask = crypto_skcipher_alignmask(sk_tfm);
- 	drbg->ctr_null_value_buf = kzalloc(DRBG_CTR_NULL_LEN + alignmask,
-@@ -1761,22 +1752,12 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
- 		/* Output buffer may not be valid for SGL, use scratchpad */
- 		skcipher_request_set_crypt(drbg->ctr_req, &sg_in, &sg_out,
- 					   cryptlen, drbg->V);
--		ret = crypto_skcipher_encrypt(drbg->ctr_req);
--		switch (ret) {
--		case 0:
--			break;
--		case -EINPROGRESS:
--		case -EBUSY:
--			ret = wait_for_completion_interruptible(
--				&drbg->ctr_completion);
--			if (!ret && !drbg->ctr_async_err) {
--				reinit_completion(&drbg->ctr_completion);
--				break;
--			}
--		default:
-+		ret = crypto_wait_req(crypto_skcipher_encrypt(drbg->ctr_req),
-+					&drbg->ctr_wait);
-+		if (ret)
- 			goto out;
--		}
--		init_completion(&drbg->ctr_completion);
-+
-+		crypto_init_wait(&drbg->ctr_wait);
+-	init_completion(&data->result.completion);
++	crypto_init_wait(&data->wait);
+ 	sg_init_one(data->sg, &data->hash, sizeof(data->hash));
+ 	skcipher_request_set_tfm(&data->req, ctr);
+ 	skcipher_request_set_callback(&data->req, CRYPTO_TFM_REQ_MAY_SLEEP |
+ 						  CRYPTO_TFM_REQ_MAY_BACKLOG,
+-				      crypto_gcm_setkey_done,
+-				      &data->result);
++				      crypto_req_done,
++				      &data->wait);
+ 	skcipher_request_set_crypt(&data->req, data->sg, data->sg,
+ 				   sizeof(data->hash), data->iv);
  
- 		memcpy(outbuf, drbg->outscratchpad, cryptlen);
+-	err = crypto_skcipher_encrypt(&data->req);
+-	if (err == -EINPROGRESS || err == -EBUSY) {
+-		err = wait_for_completion_interruptible(
+-			&data->result.completion);
+-		if (!err)
+-			err = data->result.err;
+-	}
++	err = crypto_wait_req(crypto_skcipher_encrypt(&data->req),
++							&data->wait);
  
-diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
-index 22f884c..8f94110 100644
---- a/include/crypto/drbg.h
-+++ b/include/crypto/drbg.h
-@@ -126,8 +126,7 @@ struct drbg_state {
- 	__u8 *ctr_null_value;			/* CTR mode aligned zero buf */
- 	__u8 *outscratchpadbuf;			/* CTR mode output scratchpad */
-         __u8 *outscratchpad;			/* CTR mode aligned outbuf */
--	struct completion ctr_completion;	/* CTR mode async handler */
--	int ctr_async_err;			/* CTR mode async error */
-+	struct crypto_wait ctr_wait;		/* CTR mode async wait obj */
- 
- 	bool seeded;		/* DRBG fully seeded? */
- 	bool pr;		/* Prediction resistance enabled? */
+ 	if (err)
+ 		goto out;
 -- 
 2.1.4
