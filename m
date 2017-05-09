@@ -1,135 +1,364 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v4 25/27] Documentation: flesh out the section in
- vfs.txt on storing and reporting writeback errors
-Date: Tue, 09 May 2017 12:24:17 -0400
-Message-ID: <1494347057.2659.10.camel@redhat.com>
-References: <20170509154930.29524-1-jlayton@redhat.com>
-         <20170509154930.29524-26-jlayton@redhat.com>
+From: NeilBrown <neil@brown.name>
+Subject: Re: [PATCH v4 13/27] lib: add errseq_t type and infrastructure for handling it
+Date: Wed, 10 May 2017 08:03:13 +1000
+Message-ID: <87inl9n0wu.fsf@notabene.neil.brown.name>
+References: <20170509154930.29524-1-jlayton@redhat.com> <20170509154930.29524-14-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org,
-        ross.zwisler-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org,
-        jack-IBi9RG/b67k@public.gmane.org, viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, corbet-T1hC0tSOHrs@public.gmane.org,
-        neilb-l3A5Bk7waGM@public.gmane.org, clm-b10kYP2dOMg@public.gmane.org, tytso-3s7WtUTddSA@public.gmane.org, axboe-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org,
-        josef-DigfWCa+lFGyeJad7bwFQA@public.gmane.org, hubcap-gqc3UtWaqJ5Wk0Htik3J/w@public.gmane.org, rpeterso-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-        bo.li.liu-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org, Michael Kerrisk <mtk.manpages-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-btrfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-mm-Bw31MaZKKs3YtjvyW6yDsg@public.gmane.org, jfs-discussion-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
-        linux-xfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-        linux-f2fs-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
-        v9fs-developer-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, linux-nilfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-block-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-nilfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170509154930.29524-26-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-nilfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha256; protocol="application/pgp-signature"
+Cc: dhowells@redhat.com, akpm@linux-foundation.org, hch@infradead.org, ross.zwisler@linux.intel.com, mawilcox@microsoft.com, jack@suse.com, viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de, clm@fb.com, tytso@mit.edu, axboe@kernel.dk, josef@toxicpanda.com, hubcap@omnibond.com, rpeterso@redhat.com, bo.li.liu@oracle.com
+To: Jeff Layton <jlayton@redhat.com>, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org, linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org, linux-mm@kvack.org, jfs-discussion@lists.sourceforge.net, linux-xfs@vger.kernel.org, cluster-devel@redhat.com, linux-f2fs-devel@lists.sourceforge.net, v9fs-developer@lists.sourceforge.net, linux-nilfs@vger.kernel.org, linux-block@vger.kernel.org
+Return-path: <owner-linux-mm@kvack.org>
+In-Reply-To: <20170509154930.29524-14-jlayton@redhat.com>
+Sender: owner-linux-mm@kvack.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Tue, 2017-05-09 at 11:49 -0400, Jeff Layton wrote:
-> I waxed a little loquacious here, but I figured that more detail was
-> better, and writeback error handling is so hard to get right.
-> 
-> Cc: Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, May 09 2017, Jeff Layton wrote:
+
+> An errseq_t is a way of recording errors in one place, and allowing any
+> number of "subscribers" to tell whether an error has been set again
+> since a previous time.
+>
+> It's implemented as an unsigned 32-bit value that is managed with atomic
+> operations. The low order bits are designated to hold an error code
+> (max size of MAX_ERRNO). The upper bits are used as a counter.
+>
+> The API works with consumers sampling an errseq_t value at a particular
+> point in time. Later, that value can be used to tell whether new errors
+> have been set since that time.
+>
+> Note that there is a 1 in 512k risk of collisions here if new errors
+> are being recorded frequently, since we have so few bits to use as a
+> counter. To mitigate this, one bit is used as a flag to tell whether the
+> value has been sampled since a new value was recorded. That allows
+> us to avoid bumping the counter if no one has sampled it since it
+> was last bumped.
+>
+> Later patches will build on this infrastructure to change how writeback
+> errors are tracked in the kernel.
+>
+> Signed-off-by: Jeff Layton <jlayton@redhat.com>
+
+I like that this is a separate lib/*.c - nicely structured too.
+
+Reviewed-by: NeilBrown <neilb@suse.com>
+
+Thanks,
+NeilBrown
+
+
 > ---
->  Documentation/filesystems/vfs.txt | 54 ++++++++++++++++++++++++++++++++-------
->  1 file changed, 45 insertions(+), 9 deletions(-)
-> 
-> diff --git a/Documentation/filesystems/vfs.txt b/Documentation/filesystems/vfs.txt
-> index f201a77873f7..382190a872e5 100644
-> --- a/Documentation/filesystems/vfs.txt
-> +++ b/Documentation/filesystems/vfs.txt
-> @@ -576,12 +576,46 @@ should clear PG_Dirty and set PG_Writeback.  It can be actually
->  written at any point after PG_Dirty is clear.  Once it is known to be
->  safe, PG_Writeback is cleared.
->  
-> -If there is an error during writeback, then the address_space should be
-> -marked with an error (typically using mapping_set_error), in order to
-> -ensure that the error can later be reported to the application when an
-> -fsync is issued.
-> -
-> -Writeback makes use of a writeback_control structure...
-> +Writeback makes use of a writeback_control structure to direct the
-> +operations.  This gives the the writepage and writepages operations some
-> +information about the nature of and reason for the writeback request,
-> +and the constraints under which it is being done.  It is also used to
-> +return information back to the caller about the result of a writepage or
-> +writepages request.
+>  include/linux/errseq.h |  19 +++++
+>  lib/Makefile           |   2 +-
+>  lib/errseq.c           | 199 +++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  3 files changed, 219 insertions(+), 1 deletion(-)
+>  create mode 100644 include/linux/errseq.h
+>  create mode 100644 lib/errseq.c
+>
+> diff --git a/include/linux/errseq.h b/include/linux/errseq.h
+> new file mode 100644
+> index 000000000000..0d2555f310cd
+> --- /dev/null
+> +++ b/include/linux/errseq.h
+> @@ -0,0 +1,19 @@
+> +#ifndef _LINUX_ERRSEQ_H
+> +#define _LINUX_ERRSEQ_H
 > +
-> +Handling errors during writeback
-> +--------------------------------
-> +Most applications that utilize the pagecache will periodically call
-> +fsync to ensure that data written has made it to the backing store.
-> +When there is an error during writeback, that error should be reported
-> +when fsync is called.  After an error has been reported to fsync,
-> +subsequent fsync calls on the same file descriptor should return 0,
-> +unless further writeback errors have occurred since the previous fsync.
+> +/* See lib/errseq.c for more info */
 > +
-> +Ideally, the kernel would report it only on file descriptions on which
-> +writes were done that subsequently failed to be written back.  The
-> +generic pagecache infrastructure does not track the file descriptions
-> +that have dirtied each individual page however, so determining which
-> +file descriptors should get back an error is not possible.
+> +typedef u32	errseq_t;
 > +
-> +Instead, the generic writeback error tracking infrastructure in the
-> +kernel settles for reporting errors to fsync on all file descriptions
-> +that were open at the time that the error occurred.  In a situation with
-> +multiple writers, all of them will get back an error on a subsequent fsync,
-> +even if all of the writes done through that particular file descriptor
-> +succeeded (or even if there were no writes on that file descriptor at all).
+> +void __errseq_set(errseq_t *eseq, int err);
+> +static inline void errseq_set(errseq_t *eseq, int err)
+> +{
+> +	/* Optimize for the common case of no error */
+> +	if (unlikely(err))
+> +		__errseq_set(eseq, err);
+> +}
 > +
-
-(cc'ing Michael Kerrisk)
-
-Once this is closer to merge, I think we'll also want to update the
-fsync(2) manpage with something similar to the 3 paragraphs above, and
-also with an explanation of the behavior that applications can expect
-from earlier kernels.
-
-> +Filesystems that wish to use this infrastructure should call
-> +mapping_set_error to record the error in the address_space when it
-> +occurs.  The generic vfs code will then handle reporting the error when
-> +fsync is called, even if the fsync file operation returned 0.
+> +errseq_t errseq_sample(errseq_t *eseq);
+> +int errseq_check(errseq_t *eseq, errseq_t since);
+> +int errseq_check_and_advance(errseq_t *eseq, errseq_t *since);
+> +#endif
+> diff --git a/lib/Makefile b/lib/Makefile
+> index 320ac46a8725..2423afef40f7 100644
+> --- a/lib/Makefile
+> +++ b/lib/Makefile
+> @@ -41,7 +41,7 @@ obj-y +=3D bcd.o div64.o sort.o parser.o debug_locks.o =
+random32.o \
+>  	 gcd.o lcm.o list_sort.o uuid.o flex_array.o iov_iter.o clz_ctz.o \
+>  	 bsearch.o find_bit.o llist.o memweight.o kfifo.o \
+>  	 percpu-refcount.o percpu_ida.o rhashtable.o reciprocal_div.o \
+> -	 once.o refcount.o
+> +	 once.o refcount.o errseq.o
+>  obj-y +=3D string_helpers.o
+>  obj-$(CONFIG_TEST_STRING_HELPERS) +=3D test-string_helpers.o
+>  obj-y +=3D hexdump.o
+> diff --git a/lib/errseq.c b/lib/errseq.c
+> new file mode 100644
+> index 000000000000..0f8b4ed460f0
+> --- /dev/null
+> +++ b/lib/errseq.c
+> @@ -0,0 +1,199 @@
+> +#include <linux/err.h>
+> +#include <linux/bug.h>
+> +#include <linux/atomic.h>
+> +#include <linux/errseq.h>
 > +
-> +Filesystems are free to track errors internally if they choose (i.e. if
-> +they do keep track of how the pages were dirtied), but they should aim
-> +to provide the same (or better) error reporting semantics for when there
-> +are multiple writers.  Those filesystems should avoid calling
-> +mapping_set_error in order to ensure that errors stored in the mapping
-> +aren't improperly reported by the generic filesystem code.
->  
->  struct address_space_operations
->  -------------------------------
-> @@ -810,7 +844,8 @@ struct address_space_operations {
->  The File Object
->  ===============
->  
-> -A file object represents a file opened by a process.
-> +A file object represents a file opened by a process. This is also known
-> +as an "open file description" in POSIX parlance.
->  
->  
->  struct file_operations
-> @@ -893,9 +928,10 @@ otherwise noted.
->  
->    release: called when the last reference to an open file is closed
->  
-> -  fsync: called by the fsync(2) system call. Errors that were previously
-> +  fsync: called by the fsync(2) system call.  Errors that were previously
->  	 recorded using mapping_set_error will automatically be returned to
-> -	 the application and the file's error sequence advanced.
-> +	 the application and the struct file's error sequence advanced.
-> +	 See the section above on handling writeback errors.
->  
->    fasync: called by the fcntl(2) system call when asynchronous
->  	(non-blocking) mode is enabled for a file
+> +/*
+> + * An errseq_t is a way of recording errors in one place, and allowing a=
+ny
+> + * number of "subscribers" to tell whether it has changed since an arbit=
+rary
+> + * time of their choosing.
+> + *
+> + * It's implemented as an unsigned 32-bit value. The low order bits are
+> + * designated to hold an error code (between 0 and -MAX_ERRNO). The uppe=
+r bits
+> + * are used as a counter. This is done with atomics instead of locking s=
+o that
+> + * these functions can be called from any context.
+> + *
+> + * The general idea is for consumers to sample an errseq_t value at a
+> + * particular point in time. Later, that value can be used to tell wheth=
+er any
+> + * new errors have occurred since that time.
+> + *
+> + * Note that there is a risk of collisions, if new errors are being reco=
+rded
+> + * frequently, since we have so few bits to use as a counter.
+> + *
+> + * To mitigate this, one bit is used as a flag to tell whether the value=
+ has
+> + * been sampled since a new value was recorded. That allows us to avoid =
+bumping
+> + * the counter if no one has sampled it since the last time an error was
+> + * recorded.
+> + *
+> + * A new errseq_t should always be zeroed out.  A errseq_t value of all =
+zeroes
+> + * is the special (but common) case where there has never been an error.=
+ An all
+> + * zero value thus serves as the "epoch" if one wishes to know whether t=
+here
+> + * has ever been an error set since it was first initialized.
+> + */
+> +
+> +/* The low bits are designated for error code (max of MAX_ERRNO) */
+> +#define ERRSEQ_SHIFT		ilog2(MAX_ERRNO + 1)
+> +
+> +/* This bit is used as a flag to indicate whether the value has been see=
+n */
+> +#define ERRSEQ_SEEN		(1 << ERRSEQ_SHIFT)
+> +
+> +/* The "ones" bit for the counter */
+> +#define ERRSEQ_CTR_INC		(1 << (ERRSEQ_SHIFT + 1))
+> +
+> +/**
+> + * __errseq_set - set a errseq_t for later reporting
+> + * @eseq: errseq_t field that should be set
+> + * @err: error to set
+> + *
+> + * This function sets the error in *eseq, and increments the sequence co=
+unter
+> + * if the last sequence was sampled at some point in the past.
+> + *
+> + * Any error set will always overwrite an existing error.
+> + *
+> + * Most callers will want to use the errseq_set inline wrapper to effici=
+ently
+> + * handle the common case where err is 0.
+> + */
+> +void __errseq_set(errseq_t *eseq, int err)
+> +{
+> +	errseq_t old;
+> +
+> +	/* MAX_ERRNO must be able to serve as a mask */
+> +	BUILD_BUG_ON_NOT_POWER_OF_2(MAX_ERRNO + 1);
+> +
+> +	/*
+> +	 * Ensure the error code actually fits where we want it to go. If it
+> +	 * doesn't then just throw a warning and don't record anything. We
+> +	 * also don't accept zero here as that would effectively clear a
+> +	 * previous error.
+> +	 */
+> +	if (WARN(unlikely(err =3D=3D 0 || (unsigned int)-err > MAX_ERRNO),
+> +				"err =3D %d\n", err))
+> +		return;
+> +
+> +	old =3D READ_ONCE(*eseq);
+> +	for (;;) {
+> +		errseq_t new, cur;
+> +
+> +		/* Clear out error bits and set new error */
+> +		new =3D (old & ~(MAX_ERRNO|ERRSEQ_SEEN)) | -err;
+> +
+> +		/* Only increment if someone has looked at it */
+> +		if (old & ERRSEQ_SEEN)
+> +			new +=3D ERRSEQ_CTR_INC;
+> +
+> +		/* If there would be no change, then call it done */
+> +		if (new =3D=3D old)
+> +			break;
+> +
+> +		/* Try to swap the new value into place */
+> +		cur =3D cmpxchg(eseq, old, new);
+> +
+> +		/*
+> +		 * Call it success if we did the swap or someone else beat us
+> +		 * to it for the same value.
+> +		 */
+> +		if (likely(cur =3D=3D old || cur =3D=3D new))
+> +			break;
+> +
+> +		/* Raced with an update, try again */
+> +		old =3D cur;
+> +	}
+> +}
+> +EXPORT_SYMBOL(__errseq_set);
+> +
+> +/**
+> + * errseq_sample - grab current errseq_t value
+> + * @eseq: pointer to errseq_t to be sampled
+> + *
+> + * This function allows callers to sample an errseq_t value, marking it =
+as
+> + * "seen" if required.
+> + */
+> +errseq_t errseq_sample(errseq_t *eseq)
+> +{
+> +	errseq_t old =3D READ_ONCE(*eseq);
+> +	errseq_t new =3D old;
+> +
+> +	/*
+> +	 * For the common case of no errors ever having been set, we can skip
+> +	 * marking the SEEN bit. Once an error has been set, the value will
+> +	 * never go back to zero.
+> +	 */
+> +	if (old !=3D 0) {
+> +		new |=3D ERRSEQ_SEEN;
+> +		if (old !=3D new)
+> +			cmpxchg(eseq, old, new);
+> +	}
+> +	return new;
+> +}
+> +EXPORT_SYMBOL(errseq_sample);
+> +
+> +/**
+> + * errseq_check - has an error occurred since a particular point in time?
+> + * @eseq: pointer to errseq_t value to be checked
+> + * @since: previously-sampled errseq_t from which to check
+> + *
+> + * Grab the value that eseq points to, and see if it has changed "since"
+> + * the given value was sampled. The "since" value is not advanced, so th=
+ere
+> + * is no need to mark the value as seen.
+> + *
+> + * Returns the latest error set in the errseq_t or 0 if it hasn't change=
+d.
+> + */
+> +int errseq_check(errseq_t *eseq, errseq_t since)
+> +{
+> +	errseq_t cur =3D READ_ONCE(*eseq);
+> +
+> +	if (likely(cur =3D=3D since))
+> +		return 0;
+> +	return -(cur & MAX_ERRNO);
+> +}
+> +EXPORT_SYMBOL(errseq_check);
+> +
+> +/**
+> + * errseq_check_and_advance - check an errseq_t and advance it to the cu=
+rrent value
+> + * @eseq: pointer to value being checked reported
+> + * @since: pointer to previously-sampled errseq_t to check against and a=
+dvance
+> + *
+> + * Grab the eseq value, and see whether it matches the value that "since"
+> + * points to. If it does, then just return 0.
+> + *
+> + * If it doesn't, then the value has changed. Set the "seen" flag, and t=
+ry to
+> + * swap it into place as the new eseq value. Then, set that value as the=
+ new
+> + * "since" value, and return whatever the error portion is set to.
+> + *
+> + * Note that no locking is provided here for concurrent updates to the "=
+since"
+> + * value. The caller must provide that if necessary. Because of this, ca=
+llers
+> + * may want to do a lockless errseq_check before taking the lock and cal=
+ling
+> + * this.
+> + */
+> +int errseq_check_and_advance(errseq_t *eseq, errseq_t *since)
+> +{
+> +	int err =3D 0;
+> +	errseq_t old, new;
+> +
+> +	/*
+> +	 * Most callers will want to use the inline wrapper to check this,
+> +	 * so that the common case of no error is handled without needing
+> +	 * to lock.
+> +	 */
+> +	old =3D READ_ONCE(*eseq);
+> +	if (old !=3D *since) {
+> +		/*
+> +		 * Set the flag and try to swap it into place if it has
+> +		 * changed.
+> +		 *
+> +		 * We don't care about the outcome of the swap here. If the
+> +		 * swap doesn't occur, then it has either been updated by a
+> +		 * writer who is bumping the seq count anyway, or another
+> +		 * reader who is just setting the "seen" flag. Either outcome
+> +		 * is OK, and we can advance "since" and return an error based
+> +		 * on what we have.
+> +		 */
+> +		new =3D old | ERRSEQ_SEEN;
+> +		if (new !=3D old)
+> +			cmpxchg(eseq, old, new);
+> +		*since =3D new;
+> +		err =3D -(new & MAX_ERRNO);
+> +	}
+> +	return err;
+> +}
+> +EXPORT_SYMBOL(errseq_check_and_advance);
+> --=20
+> 2.9.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-btrfs" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAlkSPKEACgkQOeye3VZi
+gbnuIxAAh+uwr7ld5xG/+sJ34NQGClTF5XiM8XKxTPt2KqGf1ub0p8+BybGKM+QU
+K8ccb9N6DbIxJBQRF4SE8IrmD8lsXOt9wtukewcU0QFSJdLGpXC3knZ5AbRWfSYs
+jNNiY/nTIMWTHFvmTvI5CV6jYms5t74IyN5qBZr63YZ5wV7Vmf9MwZNRu2hdjMD1
+fLSaxbwbiLh1Lgwvjg2IFvcRPKNDeMgJV7UNHbTm6IofEETccs1JbNx6dWRXOJ8C
+pQzn1k69vsht6rcl1wZHtrSenXJh5u3pw5NekKRFyhg+sb89jBORPnINQWSCI1fI
+iZLg9f57jmiBRLPKm22LkgQQmHlMYQ8POct6Uh1BgvSf/0ob5f6vuxj8Cp93uWoR
+Tbdz55R9OLfAhdCqltG32SC7avQP6xj/OndP1BXpFac7X+j2+kIZaDUqACvB1Uc1
+XpsAozqut2ZdepA/60Bxf4B2DdxEv9VmUVxYsztr/742fFDX5EB1xL/yQlzLjsgY
+mHYWIWsuOdVqGaH2Wry0aABurx6kW/qFqEQ2Xkoc152WX5PFZnU2uQk1a4IFBxDM
+Dj/yLNuHBAUy3actoadIj2ttg4EY3HrAfnpDxxvg2gF4aTS1jqAeOkv/euk0b4NN
+gimJWImKKEdRKuWOfBHtGe8gwuOwrQbIKkUIX4Dz+Yg086nNv+0=
+=XxtA
+-----END PGP SIGNATURE-----
+--=-=-=--
+
 --
-To unsubscribe from this list: send the line "unsubscribe linux-nilfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
