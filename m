@@ -1,56 +1,198 @@
-From: Bob Peterson <rpeterso@redhat.com>
-Subject: Re: [PATCH v4 23/27] gfs2: clean up some filemap_*
-	calls
-Date: Wed, 10 May 2017 12:18:51 -0400 (EDT)
-Message-ID: <1840580824.6421109.1494433131277.JavaMail.zimbra@redhat.com>
-References: <20170509154930.29524-1-jlayton@redhat.com>
-	<20170509154930.29524-24-jlayton@redhat.com>
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Subject: Re: [RFC 09/10] ima: move to generic async completion
+Date: Wed, 10 May 2017 17:26:08 -0400
+Message-ID: <1494451568.3006.30.camel@linux.vnet.ibm.com>
+References: <1494075602-5061-1-git-send-email-gilad@benyossef.com>
+         <1494075602-5061-10-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: jfs-discussion@lists.sourceforge.net, neilb@suse.de, dhowells@redhat.com,
-	linux-mm@kvack.org, hubcap@omnibond.com,
-	linux-cifs@vger.kernel.org, linux-nilfs@vger.kernel.org,
-	corbet@lwn.net, cluster-devel@redhat.com, bo li liu <bo.li.liu@oracle.com>,
-	v9fs-developer@lists.sourceforge.net,
-	ross zwisler <ross.zwisler@linux.intel.com>,
-	linux-ext4@vger.kernel.org, josef@toxicpanda.com,
-	linux-block@vger.kernel.org, viro@zeniv.linux.org.uk,
-	axboe@kernel.dk, linux-nfs@vger.kernel.org, tytso@mit.edu,
-	clm@fb.com, mawilcox@microsoft.com, linux-kernel@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org, jack@suse.com,
-	linux-fsdevel@vger.kernel.org, akpm@linux-foundation.org,
-	linux-btrfs@vger.kernel.org
-To: Jeff Layton <jlayton@redhat.com>
-Return-path: <cluster-devel-bounces@redhat.com>
-In-Reply-To: <20170509154930.29524-24-jlayton@redhat.com>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/cluster-devel>,
-	<mailto:cluster-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/cluster-devel>
-List-Post: <mailto:cluster-devel@redhat.com>
-List-Help: <mailto:cluster-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/cluster-devel>,
-	<mailto:cluster-devel-request@redhat.com?subject=subscribe>
-Sender: cluster-devel-bounces@redhat.com
-Errors-To: cluster-devel-bounces@redhat.com
+Cc: Ofir Drang <ofir.drang@arm.com>,
+        Gilad Ben-Yossef <gilad.benyossef@arm.com>,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-fsdevel@vger.kernel.org,
+        linux-ima-devel@lists.sourceforge.net,
+        linux-ima-user@lists.sourceforge.net,
+        linux-security-module@vger.kernel.org
+To: Gilad Ben-Yossef <gilad@benyossef.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <james.l.morris@oracle.com>,
+        "Serge E. Hallyn" <serge@hallyn.com>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+In-Reply-To: <1494075602-5061-10-git-send-email-gilad@benyossef.com>
+Sender: owner-linux-security-module@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
------ Original Message -----
-| In some places, it's trying to reset the mapping error after calling
-| filemap_fdatawait. That's no longer required. Also, turn several
-| filemap_fdatawrite+filemap_fdatawait calls into filemap_write_and_wait.
-| That will at least return writeback errors that occur during the write
-| phase.
-| 
-| Signed-off-by: Jeff Layton <jlayton@redhat.com>
-| ---
+On Sat, 2017-05-06 at 15:59 +0300, Gilad Ben-Yossef wrote:
+> ima starts several async. crypto ops and  waits for their completions.
+> Move it over to generic code doing the same.
+> 
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 
-Hi Jeff,
+Acked-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
 
-This version looks better. ACK.
+> ---
+>  security/integrity/ima/ima_crypto.c | 56 +++++++++++--------------------------
+>  1 file changed, 17 insertions(+), 39 deletions(-)
+> 
+> diff --git a/security/integrity/ima/ima_crypto.c b/security/integrity/ima/ima_crypto.c
+> index 802d5d2..0e4db1fe 100644
+> --- a/security/integrity/ima/ima_crypto.c
+> +++ b/security/integrity/ima/ima_crypto.c
+> @@ -27,11 +27,6 @@
+> 
+>  #include "ima.h"
+> 
+> -struct ahash_completion {
+> -	struct completion completion;
+> -	int err;
+> -};
+> -
+>  /* minimum file size for ahash use */
+>  static unsigned long ima_ahash_minsize;
+>  module_param_named(ahash_minsize, ima_ahash_minsize, ulong, 0644);
+> @@ -196,30 +191,13 @@ static void ima_free_atfm(struct crypto_ahash *tfm)
+>  		crypto_free_ahash(tfm);
+>  }
+> 
+> -static void ahash_complete(struct crypto_async_request *req, int err)
+> +static inline int ahash_wait(int err, struct crypto_wait *wait)
+>  {
+> -	struct ahash_completion *res = req->data;
+> 
+> -	if (err == -EINPROGRESS)
+> -		return;
+> -	res->err = err;
+> -	complete(&res->completion);
+> -}
+> +	err = crypto_wait_req(err, wait);
+> 
+> -static int ahash_wait(int err, struct ahash_completion *res)
+> -{
+> -	switch (err) {
+> -	case 0:
+> -		break;
+> -	case -EINPROGRESS:
+> -	case -EBUSY:
+> -		wait_for_completion(&res->completion);
+> -		reinit_completion(&res->completion);
+> -		err = res->err;
+> -		/* fall through */
+> -	default:
+> +	if (err)
+>  		pr_crit_ratelimited("ahash calculation failed: err: %d\n", err);
+> -	}
+> 
+>  	return err;
+>  }
+> @@ -233,7 +211,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
+>  	int rc, read = 0, rbuf_len, active = 0, ahash_rc = 0;
+>  	struct ahash_request *req;
+>  	struct scatterlist sg[1];
+> -	struct ahash_completion res;
+> +	struct crypto_wait wait;
+>  	size_t rbuf_size[2];
+> 
+>  	hash->length = crypto_ahash_digestsize(tfm);
+> @@ -242,12 +220,12 @@ static int ima_calc_file_hash_atfm(struct file *file,
+>  	if (!req)
+>  		return -ENOMEM;
+> 
+> -	init_completion(&res.completion);
+> +	crypto_init_wait(&wait);
+>  	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
+>  				   CRYPTO_TFM_REQ_MAY_SLEEP,
+> -				   ahash_complete, &res);
+> +				   crypto_req_done, &wait);
+> 
+> -	rc = ahash_wait(crypto_ahash_init(req), &res);
+> +	rc = ahash_wait(crypto_ahash_init(req), &wait);
+>  	if (rc)
+>  		goto out1;
+> 
+> @@ -288,7 +266,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
+>  			 * read/request, wait for the completion of the
+>  			 * previous ahash_update() request.
+>  			 */
+> -			rc = ahash_wait(ahash_rc, &res);
+> +			rc = ahash_wait(ahash_rc, &wait);
+>  			if (rc)
+>  				goto out3;
+>  		}
+> @@ -304,7 +282,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
+>  			 * read/request, wait for the completion of the
+>  			 * previous ahash_update() request.
+>  			 */
+> -			rc = ahash_wait(ahash_rc, &res);
+> +			rc = ahash_wait(ahash_rc, &wait);
+>  			if (rc)
+>  				goto out3;
+>  		}
+> @@ -318,7 +296,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
+>  			active = !active; /* swap buffers, if we use two */
+>  	}
+>  	/* wait for the last update request to complete */
+> -	rc = ahash_wait(ahash_rc, &res);
+> +	rc = ahash_wait(ahash_rc, &wait);
+>  out3:
+>  	if (read)
+>  		file->f_mode &= ~FMODE_READ;
+> @@ -327,7 +305,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
+>  out2:
+>  	if (!rc) {
+>  		ahash_request_set_crypt(req, NULL, hash->digest, 0);
+> -		rc = ahash_wait(crypto_ahash_final(req), &res);
+> +		rc = ahash_wait(crypto_ahash_final(req), &wait);
+>  	}
+>  out1:
+>  	ahash_request_free(req);
+> @@ -527,7 +505,7 @@ static int calc_buffer_ahash_atfm(const void *buf, loff_t len,
+>  {
+>  	struct ahash_request *req;
+>  	struct scatterlist sg;
+> -	struct ahash_completion res;
+> +	struct crypto_wait wait;
+>  	int rc, ahash_rc = 0;
+> 
+>  	hash->length = crypto_ahash_digestsize(tfm);
+> @@ -536,12 +514,12 @@ static int calc_buffer_ahash_atfm(const void *buf, loff_t len,
+>  	if (!req)
+>  		return -ENOMEM;
+> 
+> -	init_completion(&res.completion);
+> +	crypto_init_wait(&wait);
+>  	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
+>  				   CRYPTO_TFM_REQ_MAY_SLEEP,
+> -				   ahash_complete, &res);
+> +				   crypto_req_done, &wait);
+> 
+> -	rc = ahash_wait(crypto_ahash_init(req), &res);
+> +	rc = ahash_wait(crypto_ahash_init(req), &wait);
+>  	if (rc)
+>  		goto out;
+> 
+> @@ -551,10 +529,10 @@ static int calc_buffer_ahash_atfm(const void *buf, loff_t len,
+>  	ahash_rc = crypto_ahash_update(req);
+> 
+>  	/* wait for the update request to complete */
+> -	rc = ahash_wait(ahash_rc, &res);
+> +	rc = ahash_wait(ahash_rc, &wait);
+>  	if (!rc) {
+>  		ahash_request_set_crypt(req, NULL, hash->digest, 0);
+> -		rc = ahash_wait(crypto_ahash_final(req), &res);
+> +		rc = ahash_wait(crypto_ahash_final(req), &wait);
+>  	}
+>  out:
+>  	ahash_request_free(req);
 
-Regards,
-
-Bob Peterson
-Red Hat File Systems
