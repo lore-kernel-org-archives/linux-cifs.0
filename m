@@ -1,126 +1,118 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] CIFS: silence lockdep splat in cifs_relock_file()
-Date: Tue, 9 May 2017 20:38:57 -0500
-Message-ID: <CAH2r5muYaCXXhbROUHEe=w1xdzLXFCVASBXv3c20RZgvBU69mw@mail.gmail.com>
-References: <1493824641-9455-1-git-send-email-rabin.vincent@axis.com> <CAKywueRqQyaN4AQCDx_F7qVAW3-Gkwar1Q0KjOkcAz+ZcDovUw@mail.gmail.com>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: cifsacl: Use a temporary ops variable to reduce
+ code length
+Date: Tue, 9 May 2017 23:26:25 -0500
+Message-ID: <CADT32eKcAAa9ORxf1OLL-+ju_XhSevb5d44=N7m6ngsbwuZ_rQ@mail.gmail.com>
+References: <35756168f871fb4f8149153f6e5b85352de3166b.1494145833.git.joe@perches.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Rabin Vincent <rabin.vincent-VrBV9hrLPhE@public.gmane.org>,
-        Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
         linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
         samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-        Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
-To: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Joe Perches <joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueRqQyaN4AQCDx_F7qVAW3-Gkwar1Q0KjOkcAz+ZcDovUw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <35756168f871fb4f8149153f6e5b85352de3166b.1494145833.git.joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-merged into cifs-2.6.git for-next
+Looks correct.
 
-thx
+Acked-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-On Tue, May 9, 2017 at 8:34 PM, Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> 2017-05-03 8:17 GMT-07:00 Rabin Vincent <rabin.vincent-VrBV9hrLPhE@public.gmane.org>:
->> From: Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
->>
->> cifs_relock_file() can perform a down_write() on the inode's lock_sem even
->> though it was already performed in cifs_strict_readv().  Lockdep complains
->> about this.  AFAICS, there is no problem here, and lockdep just needs to be
->> told that this nesting is OK.
->>
->>  =============================================
->>  [ INFO: possible recursive locking detected ]
->>  4.11.0+ #20 Not tainted
->>  ---------------------------------------------
->>  cat/701 is trying to acquire lock:
->>   (&cifsi->lock_sem){++++.+}, at: cifs_reopen_file+0x7a7/0xc00
->>
->>  but task is already holding lock:
->>   (&cifsi->lock_sem){++++.+}, at: cifs_strict_readv+0x177/0x310
->>
->>  other info that might help us debug this:
->>   Possible unsafe locking scenario:
->>
->>         CPU0
->>         ----
->>    lock(&cifsi->lock_sem);
->>    lock(&cifsi->lock_sem);
->>
->>   *** DEADLOCK ***
->>
->>   May be due to missing lock nesting notation
->>
->>  1 lock held by cat/701:
->>   #0:  (&cifsi->lock_sem){++++.+}, at: cifs_strict_readv+0x177/0x310
->>
->>  stack backtrace:
->>  CPU: 0 PID: 701 Comm: cat Not tainted 4.11.0+ #20
->>  Call Trace:
->>   dump_stack+0x85/0xc2
->>   __lock_acquire+0x17dd/0x2260
->>   ? trace_hardirqs_on_thunk+0x1a/0x1c
->>   ? preempt_schedule_irq+0x6b/0x80
->>   lock_acquire+0xcc/0x260
->>   ? lock_acquire+0xcc/0x260
->>   ? cifs_reopen_file+0x7a7/0xc00
->>   down_read+0x2d/0x70
->>   ? cifs_reopen_file+0x7a7/0xc00
->>   cifs_reopen_file+0x7a7/0xc00
->>   ? printk+0x43/0x4b
->>   cifs_readpage_worker+0x327/0x8a0
->>   cifs_readpage+0x8c/0x2a0
->>   generic_file_read_iter+0x692/0xd00
->>   cifs_strict_readv+0x29f/0x310
->>   generic_file_splice_read+0x11c/0x1c0
->>   do_splice_to+0xa5/0xc0
->>   splice_direct_to_actor+0xfa/0x350
->>   ? generic_pipe_buf_nosteal+0x10/0x10
->>   do_splice_direct+0xb5/0xe0
->>   do_sendfile+0x278/0x3a0
->>   SyS_sendfile64+0xc4/0xe0
->>   entry_SYSCALL_64_fastpath+0x1f/0xbe
->>
->> Signed-off-by: Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
->> ---
->>  fs/cifs/file.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
->> index 21d4045..64b590b 100644
->> --- a/fs/cifs/file.c
->> +++ b/fs/cifs/file.c
->> @@ -582,7 +582,7 @@ cifs_relock_file(struct cifsFileInfo *cfile)
->>         struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
->>         int rc = 0;
->>
->> -       down_read(&cinode->lock_sem);
->> +       down_read_nested(&cinode->lock_sem, SINGLE_DEPTH_NESTING);
->>         if (cinode->can_cache_brlcks) {
->>                 /* can cache locks - no need to relock */
->>                 up_read(&cinode->lock_sem);
->> --
->> 2.1.4
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+On Sun, May 7, 2017 at 3:31 AM, Joe Perches via samba-technical
+<samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org> wrote:
+> Create an ops variable to store tcon->ses->server->ops and cache
+> indirections and reduce code size a trivial bit.
 >
-> Acked-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+> $ size fs/cifs/cifsacl.o*
+>    text    data     bss     dec     hex filename
+>    5338     136       8    5482    156a fs/cifs/cifsacl.o.new
+>    5371     136       8    5515    158b fs/cifs/cifsacl.o.old
 >
-> Best regards,
-> Pavel Shilovsky
+> Signed-off-by: Joe Perches <joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org>
+> ---
+>  fs/cifs/cifsacl.c | 30 ++++++++++++++----------------
+>  1 file changed, 14 insertions(+), 16 deletions(-)
+>
+> diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+> index 15bac390dff9..b98436f5c7c7 100644
+> --- a/fs/cifs/cifsacl.c
+> +++ b/fs/cifs/cifsacl.c
+> @@ -1135,20 +1135,19 @@ cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
+>         u32 acllen = 0;
+>         int rc = 0;
+>         struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
+> -       struct cifs_tcon *tcon;
+> +       struct smb_version_operations *ops;
+>
+>         cifs_dbg(NOISY, "converting ACL to mode for %s\n", path);
+>
+>         if (IS_ERR(tlink))
+>                 return PTR_ERR(tlink);
+> -       tcon = tlink_tcon(tlink);
+>
+> -       if (pfid && (tcon->ses->server->ops->get_acl_by_fid))
+> -               pntsd = tcon->ses->server->ops->get_acl_by_fid(cifs_sb, pfid,
+> -                                                         &acllen);
+> -       else if (tcon->ses->server->ops->get_acl)
+> -               pntsd = tcon->ses->server->ops->get_acl(cifs_sb, inode, path,
+> -                                                       &acllen);
+> +       ops = tlink_tcon(tlink)->ses->server->ops;
+> +
+> +       if (pfid && (ops->get_acl_by_fid))
+> +               pntsd = ops->get_acl_by_fid(cifs_sb, pfid, &acllen);
+> +       else if (ops->get_acl)
+> +               pntsd = ops->get_acl(cifs_sb, inode, path, &acllen);
+>         else {
+>                 cifs_put_tlink(tlink);
+>                 return -EOPNOTSUPP;
+> @@ -1181,23 +1180,23 @@ id_mode_to_cifs_acl(struct inode *inode, const char *path, __u64 nmode,
+>         struct cifs_ntsd *pnntsd = NULL; /* modified acl to be sent to server */
+>         struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+>         struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
+> -       struct cifs_tcon *tcon;
+> +       struct smb_version_operations *ops;
+>
+>         if (IS_ERR(tlink))
+>                 return PTR_ERR(tlink);
+> -       tcon = tlink_tcon(tlink);
+> +
+> +       ops = tlink_tcon(tlink)->ses->server->ops;
+>
+>         cifs_dbg(NOISY, "set ACL from mode for %s\n", path);
+>
+>         /* Get the security descriptor */
+>
+> -       if (tcon->ses->server->ops->get_acl == NULL) {
+> +       if (ops->get_acl == NULL) {
+>                 cifs_put_tlink(tlink);
+>                 return -EOPNOTSUPP;
+>         }
+>
+> -       pntsd = tcon->ses->server->ops->get_acl(cifs_sb, inode, path,
+> -                                               &secdesclen);
+> +       pntsd = ops->get_acl(cifs_sb, inode, path, &secdesclen);
+>         if (IS_ERR(pntsd)) {
+>                 rc = PTR_ERR(pntsd);
+>                 cifs_dbg(VFS, "%s: error %d getting sec desc\n", __func__, rc);
+> @@ -1224,13 +1223,12 @@ id_mode_to_cifs_acl(struct inode *inode, const char *path, __u64 nmode,
+>
+>         cifs_dbg(NOISY, "build_sec_desc rc: %d\n", rc);
+>
+> -       if (tcon->ses->server->ops->set_acl == NULL)
+> +       if (ops->set_acl == NULL)
+>                 rc = -EOPNOTSUPP;
+>
+>         if (!rc) {
+>                 /* Set the security descriptor */
+> -               rc = tcon->ses->server->ops->set_acl(pnntsd, secdesclen, inode,
+> -                                                    path, aclflag);
+> +               rc = ops->set_acl(pnntsd, secdesclen, inode, path, aclflag);
+>                 cifs_dbg(NOISY, "set_cifs_acl rc: %d\n", rc);
+>         }
+>         cifs_put_tlink(tlink);
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Thanks,
-
-Steve
+> 2.10.0.rc2.1.g053435c
+>
+>
