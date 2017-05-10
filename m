@@ -1,118 +1,68 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: cifsacl: Use a temporary ops variable to reduce
- code length
-Date: Tue, 9 May 2017 23:26:25 -0500
-Message-ID: <CADT32eKcAAa9ORxf1OLL-+ju_XhSevb5d44=N7m6ngsbwuZ_rQ@mail.gmail.com>
-References: <35756168f871fb4f8149153f6e5b85352de3166b.1494145833.git.joe@perches.com>
+From: Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH v4 01/27] fs: remove unneeded forward definition of
+ mm_struct from fs.h
+Date: Wed, 10 May 2017 13:04:57 +0200
+Message-ID: <20170510110457.GA25137@quack2.suse.cz>
+References: <20170509154930.29524-1-jlayton@redhat.com>
+ <20170509154930.29524-2-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Joe Perches <joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <35756168f871fb4f8149153f6e5b85352de3166b.1494145833.git.joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-mm@kvack.org, jfs-discussion@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org, cluster-devel@redhat.com,
+	linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
+	linux-block@vger.kernel.org, dhowells@redhat.com,
+	akpm@linux-foundation.org, hch@infradead.org,
+	ross.zwisler@linux.intel.com, mawilcox@microsoft.com, jack@suse.com,
+	viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de, clm@fb.com,
+	tytso@mit.edu, axboe@kernel.dk, josef@toxicpanda.com,
+	hubcap@omnibond.com, rpeterso@redhat.com, bo.li.liu@oracle.com
+To: Jeff Layton <jlayton@redhat.com>
+Return-path: <owner-linux-mm@kvack.org>
+Content-Disposition: inline
+In-Reply-To: <20170509154930.29524-2-jlayton@redhat.com>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-cifs.vger.kernel.org
 
-Looks correct.
+On Tue 09-05-17 11:49:04, Jeff Layton wrote:
+> Signed-off-by: Jeff Layton <jlayton@redhat.com>
 
-Acked-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Looks good. You can add:
 
-On Sun, May 7, 2017 at 3:31 AM, Joe Perches via samba-technical
-<samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org> wrote:
-> Create an ops variable to store tcon->ses->server->ops and cache
-> indirections and reduce code size a trivial bit.
->
-> $ size fs/cifs/cifsacl.o*
->    text    data     bss     dec     hex filename
->    5338     136       8    5482    156a fs/cifs/cifsacl.o.new
->    5371     136       8    5515    158b fs/cifs/cifsacl.o.old
->
-> Signed-off-by: Joe Perches <joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org>
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+
 > ---
->  fs/cifs/cifsacl.c | 30 ++++++++++++++----------------
->  1 file changed, 14 insertions(+), 16 deletions(-)
->
-> diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
-> index 15bac390dff9..b98436f5c7c7 100644
-> --- a/fs/cifs/cifsacl.c
-> +++ b/fs/cifs/cifsacl.c
-> @@ -1135,20 +1135,19 @@ cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
->         u32 acllen = 0;
->         int rc = 0;
->         struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
-> -       struct cifs_tcon *tcon;
-> +       struct smb_version_operations *ops;
->
->         cifs_dbg(NOISY, "converting ACL to mode for %s\n", path);
->
->         if (IS_ERR(tlink))
->                 return PTR_ERR(tlink);
-> -       tcon = tlink_tcon(tlink);
->
-> -       if (pfid && (tcon->ses->server->ops->get_acl_by_fid))
-> -               pntsd = tcon->ses->server->ops->get_acl_by_fid(cifs_sb, pfid,
-> -                                                         &acllen);
-> -       else if (tcon->ses->server->ops->get_acl)
-> -               pntsd = tcon->ses->server->ops->get_acl(cifs_sb, inode, path,
-> -                                                       &acllen);
-> +       ops = tlink_tcon(tlink)->ses->server->ops;
-> +
-> +       if (pfid && (ops->get_acl_by_fid))
-> +               pntsd = ops->get_acl_by_fid(cifs_sb, pfid, &acllen);
-> +       else if (ops->get_acl)
-> +               pntsd = ops->get_acl(cifs_sb, inode, path, &acllen);
->         else {
->                 cifs_put_tlink(tlink);
->                 return -EOPNOTSUPP;
-> @@ -1181,23 +1180,23 @@ id_mode_to_cifs_acl(struct inode *inode, const char *path, __u64 nmode,
->         struct cifs_ntsd *pnntsd = NULL; /* modified acl to be sent to server */
->         struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
->         struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
-> -       struct cifs_tcon *tcon;
-> +       struct smb_version_operations *ops;
->
->         if (IS_ERR(tlink))
->                 return PTR_ERR(tlink);
-> -       tcon = tlink_tcon(tlink);
-> +
-> +       ops = tlink_tcon(tlink)->ses->server->ops;
->
->         cifs_dbg(NOISY, "set ACL from mode for %s\n", path);
->
->         /* Get the security descriptor */
->
-> -       if (tcon->ses->server->ops->get_acl == NULL) {
-> +       if (ops->get_acl == NULL) {
->                 cifs_put_tlink(tlink);
->                 return -EOPNOTSUPP;
->         }
->
-> -       pntsd = tcon->ses->server->ops->get_acl(cifs_sb, inode, path,
-> -                                               &secdesclen);
-> +       pntsd = ops->get_acl(cifs_sb, inode, path, &secdesclen);
->         if (IS_ERR(pntsd)) {
->                 rc = PTR_ERR(pntsd);
->                 cifs_dbg(VFS, "%s: error %d getting sec desc\n", __func__, rc);
-> @@ -1224,13 +1223,12 @@ id_mode_to_cifs_acl(struct inode *inode, const char *path, __u64 nmode,
->
->         cifs_dbg(NOISY, "build_sec_desc rc: %d\n", rc);
->
-> -       if (tcon->ses->server->ops->set_acl == NULL)
-> +       if (ops->set_acl == NULL)
->                 rc = -EOPNOTSUPP;
->
->         if (!rc) {
->                 /* Set the security descriptor */
-> -               rc = tcon->ses->server->ops->set_acl(pnntsd, secdesclen, inode,
-> -                                                    path, aclflag);
-> +               rc = ops->set_acl(pnntsd, secdesclen, inode, path, aclflag);
->                 cifs_dbg(NOISY, "set_cifs_acl rc: %d\n", rc);
->         }
->         cifs_put_tlink(tlink);
-> --
-> 2.10.0.rc2.1.g053435c
->
->
+>  include/linux/fs.h | 2 --
+>  1 file changed, 2 deletions(-)
+> 
+> diff --git a/include/linux/fs.h b/include/linux/fs.h
+> index 7251f7bb45e8..38adefd8e2a0 100644
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -1252,8 +1252,6 @@ extern void f_delown(struct file *filp);
+>  extern pid_t f_getown(struct file *filp);
+>  extern int send_sigurg(struct fown_struct *fown);
+>  
+> -struct mm_struct;
+> -
+>  /*
+>   *	Umount options
+>   */
+> -- 
+> 2.9.3
+> 
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
