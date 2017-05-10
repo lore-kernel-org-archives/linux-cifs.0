@@ -1,26 +1,113 @@
-From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aurelien.aptel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: backing up to a Drobo CIFS VFS: Error -11 sending data on socket to server, Bufferbloat?
-Date: Wed, 10 May 2017 13:33:48 +0200
-Message-ID: <mpso9v1c5er.fsf@aaptelpc.suse.de>
-References: <286943BF-E8A7-4844-B58C-0B2A8D9B4046@fordham.edu> <2F251951-5DEC-4B0B-ABF8-D80CC77A1D75@fordham.edu>
+From: Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH v4 13/27] lib: add errseq_t type and infrastructure for
+ handling it
+Date: Wed, 10 May 2017 13:34:30 +0200
+Message-ID: <20170510113430.GE25137@quack2.suse.cz>
+References: <20170509154930.29524-1-jlayton@redhat.com>
+ <20170509154930.29524-14-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-To: Robert Kudyba <rkudyba-tzaSEmCkE7qVc3sceRu5cw@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <2F251951-5DEC-4B0B-ABF8-D80CC77A1D75-tzaSEmCkE7qVc3sceRu5cw@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-mm@kvack.org, jfs-discussion@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org, cluster-devel@redhat.com,
+	linux-f2fs-devel@lists.sourceforge.net,
+	v9fs-developer@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
+	linux-block@vger.kernel.org, dhowells@redhat.com,
+	akpm@linux-foundation.org, hch@infradead.org,
+	ross.zwisler@linux.intel.com, mawilcox@microsoft.com, jack@suse.com,
+	viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de, clm@fb.com,
+	tytso@mit.edu, axboe@kernel.dk, josef@toxicpanda.com,
+	hubcap@omnibond.com, rpeterso@redhat.com, bo.li.liu@oracle.com
+To: Jeff Layton <jlayton@redhat.com>
+Return-path: <owner-linux-mm@kvack.org>
+Content-Disposition: inline
+In-Reply-To: <20170509154930.29524-14-jlayton@redhat.com>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-cifs.vger.kernel.org
 
-Hi Robert,
+On Tue 09-05-17 11:49:16, Jeff Layton wrote:
+> An errseq_t is a way of recording errors in one place, and allowing any
+> number of "subscribers" to tell whether an error has been set again
+> since a previous time.
+> 
+> It's implemented as an unsigned 32-bit value that is managed with atomic
+> operations. The low order bits are designated to hold an error code
+> (max size of MAX_ERRNO). The upper bits are used as a counter.
+> 
+> The API works with consumers sampling an errseq_t value at a particular
+> point in time. Later, that value can be used to tell whether new errors
+> have been set since that time.
+> 
+> Note that there is a 1 in 512k risk of collisions here if new errors
+> are being recorded frequently, since we have so few bits to use as a
+> counter. To mitigate this, one bit is used as a flag to tell whether the
+> value has been sampled since a new value was recorded. That allows
+> us to avoid bumping the counter if no one has sampled it since it
+> was last bumped.
+> 
+> Later patches will build on this infrastructure to change how writeback
+> errors are tracked in the kernel.
+> 
+> Signed-off-by: Jeff Layton <jlayton@redhat.com>
 
-Could you provide a network trace of the isssue happening? You can add a
-new bug report on bugzilla.samba.org in the cifsVFS/kernel fs section
-and attach the trace there.
+The patch looks good to me. Feel free to add:
 
-Cheers,
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+Just two nits below:
+...
+> +int errseq_check_and_advance(errseq_t *eseq, errseq_t *since)
+> +{
+> +	int err = 0;
+> +	errseq_t old, new;
+> +
+> +	/*
+> +	 * Most callers will want to use the inline wrapper to check this,
+> +	 * so that the common case of no error is handled without needing
+> +	 * to lock.
+> +	 */
+
+I'm not sure which locking you are speaking about here. Is the comment
+stale?
+
+> +	old = READ_ONCE(*eseq);
+> +	if (old != *since) {
+> +		/*
+> +		 * Set the flag and try to swap it into place if it has
+> +		 * changed.
+> +		 *
+> +		 * We don't care about the outcome of the swap here. If the
+> +		 * swap doesn't occur, then it has either been updated by a
+> +		 * writer who is bumping the seq count anyway, or another
+
+"bumping the seq count anyway" part is not quite true. Writer may see
+ERRSEQ_SEEN not set and so just update the error code and leave seq count
+as is. But since you compare full errseq_t for equality, this works out as
+designed...
+
+> +		 * reader who is just setting the "seen" flag. Either outcome
+> +		 * is OK, and we can advance "since" and return an error based
+> +		 * on what we have.
+> +		 */
+> +		new = old | ERRSEQ_SEEN;
+> +		if (new != old)
+> +			cmpxchg(eseq, old, new);
+> +		*since = new;
+> +		err = -(new & MAX_ERRNO);
+> +	}
+> +	return err;
+> +}
+> +EXPORT_SYMBOL(errseq_check_and_advance);
+
+								Honza
 -- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
-GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
