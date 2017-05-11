@@ -1,23 +1,12 @@
-From: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Subject: Re: [RFC 09/10] ima: move to generic async completion
-Date: Wed, 10 May 2017 17:26:08 -0400
-Message-ID: <1494451568.3006.30.camel@linux.vnet.ibm.com>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: [RFC 01/10] crypto: factor async completion for general use
+Date: Wed, 10 May 2017 20:55:27 -0700
+Message-ID: <20170511035527.GA2936@zzz>
 References: <1494075602-5061-1-git-send-email-gilad@benyossef.com>
-         <1494075602-5061-10-git-send-email-gilad@benyossef.com>
+ <1494075602-5061-2-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Ofir Drang <ofir.drang@arm.com>,
-        Gilad Ben-Yossef <gilad.benyossef@arm.com>,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-fsdevel@vger.kernel.org,
-        linux-ima-devel@lists.sourceforge.net,
-        linux-ima-user@lists.sourceforge.net,
-        linux-security-module@vger.kernel.org
-To: Gilad Ben-Yossef <gilad@benyossef.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Jonathan Corbet <corbet@lwn.net>,
         David Howells <dhowells@redhat.com>,
@@ -26,173 +15,166 @@ To: Gilad Ben-Yossef <gilad@benyossef.com>,
         Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
         "Theodore Y. Ts'o" <tytso@mit.edu>,
         Jaegeuk Kim <jaegeuk@kernel.org>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
         Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
         James Morris <james.l.morris@oracle.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <1494075602-5061-10-git-send-email-gilad@benyossef.com>
-Sender: owner-linux-security-module@vger.kernel.org
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Ofir Drang <ofir.drang@arm.com>,
+        Gilad Ben-Yossef <gilad.benyossef@arm.com>,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-raid@vger.kernel.org,
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1494075602-5061-2-git-send-email-gilad@benyossef.com>
+Sender: linux-crypto-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Sat, 2017-05-06 at 15:59 +0300, Gilad Ben-Yossef wrote:
-> ima starts several async. crypto ops and  waits for their completions.
-> Move it over to generic code doing the same.
-> 
-> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Hi Gilad,
 
-Acked-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
+On Sat, May 06, 2017 at 03:59:50PM +0300, Gilad Ben-Yossef wrote:
+> Invoking a possibly async. crypto op and waiting for completion
+> while correctly handling backlog processing is a common task
+> in the crypto API implementation and outside users of it.
+> 
+> This patch re-factors one of the in crypto API implementation in
+> preparation for using it across the board instead of hand
+> rolled versions.
 
-> ---
->  security/integrity/ima/ima_crypto.c | 56 +++++++++++--------------------------
->  1 file changed, 17 insertions(+), 39 deletions(-)
-> 
-> diff --git a/security/integrity/ima/ima_crypto.c b/security/integrity/ima/ima_crypto.c
-> index 802d5d2..0e4db1fe 100644
-> --- a/security/integrity/ima/ima_crypto.c
-> +++ b/security/integrity/ima/ima_crypto.c
-> @@ -27,11 +27,6 @@
-> 
->  #include "ima.h"
-> 
-> -struct ahash_completion {
-> -	struct completion completion;
-> -	int err;
-> -};
-> -
->  /* minimum file size for ahash use */
->  static unsigned long ima_ahash_minsize;
->  module_param_named(ahash_minsize, ima_ahash_minsize, ulong, 0644);
-> @@ -196,30 +191,13 @@ static void ima_free_atfm(struct crypto_ahash *tfm)
->  		crypto_free_ahash(tfm);
+Thanks for doing this!  It annoyed me too that there wasn't a helper function
+for this.  Just a few comments below:
+
+> diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+> index 3556d8e..bf4acaf 100644
+> --- a/crypto/af_alg.c
+> +++ b/crypto/af_alg.c
+> @@ -480,33 +480,6 @@ int af_alg_cmsg_send(struct msghdr *msg, struct af_alg_control *con)
 >  }
-> 
-> -static void ahash_complete(struct crypto_async_request *req, int err)
-> +static inline int ahash_wait(int err, struct crypto_wait *wait)
->  {
-> -	struct ahash_completion *res = req->data;
-> 
-> -	if (err == -EINPROGRESS)
-> -		return;
-> -	res->err = err;
-> -	complete(&res->completion);
-> -}
-> +	err = crypto_wait_req(err, wait);
-> 
-> -static int ahash_wait(int err, struct ahash_completion *res)
+>  EXPORT_SYMBOL_GPL(af_alg_cmsg_send);
+>  
+> -int af_alg_wait_for_completion(int err, struct af_alg_completion *completion)
 > -{
 > -	switch (err) {
-> -	case 0:
-> -		break;
 > -	case -EINPROGRESS:
 > -	case -EBUSY:
-> -		wait_for_completion(&res->completion);
-> -		reinit_completion(&res->completion);
-> -		err = res->err;
-> -		/* fall through */
-> -	default:
-> +	if (err)
->  		pr_crit_ratelimited("ahash calculation failed: err: %d\n", err);
-> -	}
-> 
->  	return err;
->  }
-> @@ -233,7 +211,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
->  	int rc, read = 0, rbuf_len, active = 0, ahash_rc = 0;
->  	struct ahash_request *req;
->  	struct scatterlist sg[1];
-> -	struct ahash_completion res;
-> +	struct crypto_wait wait;
->  	size_t rbuf_size[2];
-> 
->  	hash->length = crypto_ahash_digestsize(tfm);
-> @@ -242,12 +220,12 @@ static int ima_calc_file_hash_atfm(struct file *file,
->  	if (!req)
->  		return -ENOMEM;
-> 
-> -	init_completion(&res.completion);
-> +	crypto_init_wait(&wait);
->  	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
->  				   CRYPTO_TFM_REQ_MAY_SLEEP,
-> -				   ahash_complete, &res);
-> +				   crypto_req_done, &wait);
-> 
-> -	rc = ahash_wait(crypto_ahash_init(req), &res);
-> +	rc = ahash_wait(crypto_ahash_init(req), &wait);
->  	if (rc)
->  		goto out1;
-> 
-> @@ -288,7 +266,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
->  			 * read/request, wait for the completion of the
->  			 * previous ahash_update() request.
->  			 */
-> -			rc = ahash_wait(ahash_rc, &res);
-> +			rc = ahash_wait(ahash_rc, &wait);
->  			if (rc)
->  				goto out3;
->  		}
-> @@ -304,7 +282,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
->  			 * read/request, wait for the completion of the
->  			 * previous ahash_update() request.
->  			 */
-> -			rc = ahash_wait(ahash_rc, &res);
-> +			rc = ahash_wait(ahash_rc, &wait);
->  			if (rc)
->  				goto out3;
->  		}
-> @@ -318,7 +296,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
->  			active = !active; /* swap buffers, if we use two */
->  	}
->  	/* wait for the last update request to complete */
-> -	rc = ahash_wait(ahash_rc, &res);
-> +	rc = ahash_wait(ahash_rc, &wait);
->  out3:
->  	if (read)
->  		file->f_mode &= ~FMODE_READ;
-> @@ -327,7 +305,7 @@ static int ima_calc_file_hash_atfm(struct file *file,
->  out2:
->  	if (!rc) {
->  		ahash_request_set_crypt(req, NULL, hash->digest, 0);
-> -		rc = ahash_wait(crypto_ahash_final(req), &res);
-> +		rc = ahash_wait(crypto_ahash_final(req), &wait);
->  	}
->  out1:
->  	ahash_request_free(req);
-> @@ -527,7 +505,7 @@ static int calc_buffer_ahash_atfm(const void *buf, loff_t len,
->  {
->  	struct ahash_request *req;
->  	struct scatterlist sg;
-> -	struct ahash_completion res;
-> +	struct crypto_wait wait;
->  	int rc, ahash_rc = 0;
-> 
->  	hash->length = crypto_ahash_digestsize(tfm);
-> @@ -536,12 +514,12 @@ static int calc_buffer_ahash_atfm(const void *buf, loff_t len,
->  	if (!req)
->  		return -ENOMEM;
-> 
-> -	init_completion(&res.completion);
-> +	crypto_init_wait(&wait);
->  	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
->  				   CRYPTO_TFM_REQ_MAY_SLEEP,
-> -				   ahash_complete, &res);
-> +				   crypto_req_done, &wait);
-> 
-> -	rc = ahash_wait(crypto_ahash_init(req), &res);
-> +	rc = ahash_wait(crypto_ahash_init(req), &wait);
->  	if (rc)
->  		goto out;
-> 
-> @@ -551,10 +529,10 @@ static int calc_buffer_ahash_atfm(const void *buf, loff_t len,
->  	ahash_rc = crypto_ahash_update(req);
-> 
->  	/* wait for the update request to complete */
-> -	rc = ahash_wait(ahash_rc, &res);
-> +	rc = ahash_wait(ahash_rc, &wait);
->  	if (!rc) {
->  		ahash_request_set_crypt(req, NULL, hash->digest, 0);
-> -		rc = ahash_wait(crypto_ahash_final(req), &res);
-> +		rc = ahash_wait(crypto_ahash_final(req), &wait);
->  	}
->  out:
->  	ahash_request_free(req);
+> -		wait_for_completion(&completion->completion);
+> -		reinit_completion(&completion->completion);
+> -		err = completion->err;
+> -		break;
+> -	};
+> -
+> -	return err;
+> -}
+> -EXPORT_SYMBOL_GPL(af_alg_wait_for_completion);
+> -
+> -void af_alg_complete(struct crypto_async_request *req, int err)
+> -{
+> -	struct af_alg_completion *completion = req->data;
+> -
+> -	if (err == -EINPROGRESS)
+> -		return;
+> -
+> -	completion->err = err;
+> -	complete(&completion->completion);
+> -}
+> -EXPORT_SYMBOL_GPL(af_alg_complete);
+> -
 
+I think it would be cleaner to switch af_alg and algif_* over to the new
+interface in its own patch, rather than in the same patch that introduces the
+new interface.
+
+> @@ -88,8 +88,8 @@ static int hash_sendmsg(struct socket *sock, struct msghdr *msg,
+>  		if ((msg->msg_flags & MSG_MORE))
+>  			hash_free_result(sk, ctx);
+>  
+> -		err = af_alg_wait_for_completion(crypto_ahash_init(&ctx->req),
+> -						&ctx->completion);
+> +		err = crypto_wait_req(crypto_ahash_init(&ctx->req),
+> +						&ctx->wait);
+>  		if (err)
+>  			goto unlock;
+>  	}
+
+In general can you try to keep the argument lists indented sanely?  (This
+applies throughout the patch series.)  e.g. here I'd have expected:
+
+		err = crypto_wait_req(crypto_ahash_init(&ctx->req),
+				      &ctx->wait);
+
+>  
+> diff --git a/crypto/api.c b/crypto/api.c
+> index 941cd4c..1c6e9cd 100644
+> --- a/crypto/api.c
+> +++ b/crypto/api.c
+> @@ -24,6 +24,7 @@
+>  #include <linux/sched/signal.h>
+>  #include <linux/slab.h>
+>  #include <linux/string.h>
+> +#include <linux/completion.h>
+>  #include "internal.h"
+>  
+>  LIST_HEAD(crypto_alg_list);
+> @@ -595,5 +596,32 @@ int crypto_has_alg(const char *name, u32 type, u32 mask)
+>  }
+>  EXPORT_SYMBOL_GPL(crypto_has_alg);
+>  
+> +int crypto_wait_req(int err, struct crypto_wait *wait)
+> +{
+> +	switch (err) {
+> +	case -EINPROGRESS:
+> +	case -EBUSY:
+> +		wait_for_completion(&wait->completion);
+> +		reinit_completion(&wait->completion);
+> +		err = wait->err;
+> +		break;
+> +	};
+> +
+> +	return err;
+> +}
+> +EXPORT_SYMBOL_GPL(crypto_wait_req);
+
+crypto_wait_req() maybe should be inlined, since it doesn't do much (note that
+reinit_completion is actually just a variable assignment), and the common case
+is that 'err' will be 0, so there will be nothing to wait for.
+
+Also drop the unnecessary semicolon at the end of the switch block.
+
+With regards to the wait being uninterruptible, I agree that this should be the
+default behavior, because I think users waiting for specific crypto requests are
+generally not prepared to handle the wait actually being interrupted.  After
+interruption the crypto operation will still proceed in the background, and it
+will use buffers which the caller has in many cases already freed.  However, I'd
+suggest taking a close look at anything that was actually doing an interruptible
+wait before, to see whether it was a bug or intentional (or "doesn't matter").
+
+And yes there could always be a crypto_wait_req_interruptible() introduced if
+some users need it.
+
+>  
+>  #define CRYPTO_MINALIGN_ATTR __attribute__ ((__aligned__(CRYPTO_MINALIGN)))
+>  
+> +/*
+> + * Macro for declaring a crypto op async wait object on stack
+> + */
+> +#define DECLARE_CRYPTO_WAIT(_wait) \
+> +	struct crypto_wait _wait = { \
+> +		COMPLETION_INITIALIZER_ONSTACK((_wait).completion), 0 }
+> +
+
+Move this definition down below, so it's next to crypto_wait?
+
+>  
+>  /*
+>   * Algorithm registration interface.
+>   */
+> @@ -1604,5 +1631,6 @@ static inline int crypto_comp_decompress(struct crypto_comp *tfm,
+>  						    src, slen, dst, dlen);
+>  }
+>  
+> +
+
+Don't add unrelated blank lines.
+
+- Eric
