@@ -1,34 +1,266 @@
-From: Karim Eshapa <karim.eshapa-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH] fs: cifs: transport: Use time_after for time comparison
-Date: Fri, 12 May 2017 01:53:38 +0200
-Message-ID: <1494546818-5544-1-git-send-email-karim.eshapa@gmail.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Karim Eshapa <karim.eshapa-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
+From: Robert Kudyba <rkudyba-tzaSEmCkE7qVc3sceRu5cw@public.gmane.org>
+Subject: Fwd: backing up to a Drobo CIFS VFS: Error -11 sending data on socket
+ to server, Bufferbloat?
+Date: Thu, 11 May 2017 22:37:51 -0400
+Message-ID: <CAFHi+KQhXFrOVDb51fZCs1e5ik3RY+v91H5Sz1Z3YkgUpMPURw@mail.gmail.com>
+References: <B0AAEC04-DBAE-49AB-A549-B772D5F1B7F6@fordham.edu>
+ <D5627D5A-065B-4C28-B152-7B0A587A0CBF@fordham.edu> <CACyXjPzG4L3Px8ws+CQkh0K6xwB7Kd6tCC7zSO0C11j4SWHY1w@mail.gmail.com>
+ <CAFHi+KS6HtBGvqTJxNgMYvBaYnibryf==5x8FTJfGtjMJOSkBA@mail.gmail.com>
+ <CAFHi+KRGNSvfgj7o+tK0RZZa9Nf2NQANUiygsUR5aokJH5NP7w@mail.gmail.com>
+ <CAFHi+KSB348xPhYSf=x7FW9kmgU5iN-mDGvs2Fhyv=UYCMQckw@mail.gmail.com> <CAFHi+KRjK-pLxr+gNkE0jpsM1YfgE4s2Lw8Q4XTSTP-V0_Ds8A@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAFHi+KRjK-pLxr+gNkE0jpsM1YfgE4s2Lw8Q4XTSTP-V0_Ds8A-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Use time_after kernel macro for time comparison
-that has safety check.
+Does this help? Here's the last few lines. Seems to be increasing in time?
 
-Signed-off-by: Karim Eshapa <karim.eshapa-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- fs/cifs/transport.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 4d64b5b..a7f5168 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -94,7 +94,7 @@ DeleteMidQEntry(struct mid_q_entry *midEntry)
- 	now = jiffies;
- 	/* commands taking longer than one second are indications that
- 	   something is wrong, unless it is quite a slow link or server */
--	if ((now - midEntry->when_alloc) > HZ) {
-+	if (time_after(now, midEntry->when_alloc + HZ)) {
- 		if ((cifsFYI & CIFS_TIMER) && (midEntry->command != command)) {
- 			pr_debug(" CIFS slow rsp: cmd %d mid %llu",
- 			       midEntry->command, midEntry->mid);
--- 
-2.7.4
+ 424 0.101504413 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK]=
+ Seq=3D817
+Ack=3D1072969 Win=3D26508 Len=3D0 TSval=3D623636942 TSecr=3D2708013080
+
+  427 0.101741409 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D817
+Ack=3D1075865 Win=3D26508 Len=3D0 TSval=3D623636942 TSecr=3D2708013081
+
+  432 0.102065108 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D817
+Ack=3D1080209 Win=3D26334 Len=3D0 TSval=3D623636942 TSecr=3D2708013081
+
+  433 0.102072906 ourserver =E2=86=92 drobo TCP 13098 [TCP segment of a rea=
+ssembled PDU]
+
+  438 0.102829996 drobo =E2=86=92 ourserver SMB 117 Write AndX Response, 65=
+536 bytes
+
+  439 0.103240767 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D868
+Ack=3D1090345 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013082
+
+  440 0.103251494 ourserver =E2=86=92 drobo TCP 10202 [TCP segment of a rea=
+ssembled PDU]
+
+  441 0.103259721 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D868
+Ack=3D1093241 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013082
+
+  442 0.103475120 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D868
+Ack=3D1096137 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013083
+
+  443 0.103794874 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D868
+Ack=3D1099033 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013083
+
+  444 0.104305892 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D868
+Ack=3D1101929 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013083
+
+  445 0.104312236 ourserver =E2=86=92 drobo TCP 11650 [TCP segment of a rea=
+ssembled PDU]
+
+  446 0.104320705 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D868
+Ack=3D1104825 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013083
+
+  447 0.104568606 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D868
+Ack=3D1107721 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013083
+
+  448 0.104935339 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D868
+Ack=3D1110617 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013083
+
+  449 0.104945095 ourserver =E2=86=92 drobo TCP 8754 [TCP segment of a reas=
+sembled PDU]
+
+  450 0.104953663 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D868
+Ack=3D1113513 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013083
+
+  451 0.105193542 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D868
+Ack=3D1116409 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013083
+
+  452 0.105666892 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D868
+Ack=3D1119305 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013084
+
+  453 0.105922535 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D868
+Ack=3D1122201 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013084
+
+  454 0.105935375 ourserver =E2=86=92 drobo TCP 11650 [TCP segment of a rea=
+ssembled PDU]
+
+  455 0.105944869 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D868
+Ack=3D1125097 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013085
+
+  456 0.106190594 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D868
+Ack=3D1127993 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013085
+
+  458 0.106504814 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D868
+Ack=3D1130889 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013085
+
+  459 0.106510176 ourserver =E2=86=92 drobo TCP 7306 [TCP segment of a reas=
+sembled PDU]
+
+  460 0.106763808 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D868
+Ack=3D1133785 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013085
+
+  461 0.107075671 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D868
+Ack=3D1136681 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013086
+
+  462 0.107081982 ourserver =E2=86=92 drobo TCP 7306 [TCP segment of a reas=
+sembled PDU]
+
+  463 0.107332634 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D868
+Ack=3D1139577 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013086
+
+  464 0.107668225 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D868
+Ack=3D1142473 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013086
+
+  465 0.107676435 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D868
+Ack=3D1145369 Win=3D26421 Len=3D0 TSval=3D623636943 TSecr=3D2708013086
+
+  466 0.108678068 drobo =E2=86=92 ourserver SMB 117 Write AndX Response, 65=
+536 bytes
+
+  467 0.108694727 ourserver =E2=86=92 drobo TCP 13098 [TCP segment of a rea=
+ssembled PDU]
+
+  468 0.108703948 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D919
+Ack=3D1155505 Win=3D25812 Len=3D0 TSval=3D623636943 TSecr=3D2708013087
+
+  469 0.108951009 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D919
+Ack=3D1158401 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013088
+
+  470 0.108961831 ourserver =E2=86=92 drobo TCP 8754 [TCP segment of a reas=
+sembled PDU]
+
+  471 0.109218407 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D919
+Ack=3D1161297 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013088
+
+  472 0.109231036 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D919
+Ack=3D1164193 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013088
+
+  473 0.109662758 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D919
+Ack=3D1167089 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013088
+
+  474 0.109918958 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D919
+Ack=3D1169985 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013088
+
+  475 0.109932278 ourserver =E2=86=92 drobo TCP 11650 [TCP segment of a rea=
+ssembled PDU]
+
+  476 0.110190734 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D919
+Ack=3D1172881 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013089
+
+  477 0.110200652 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D919
+Ack=3D1175777 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013089
+
+  478 0.110661525 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D919
+Ack=3D1178673 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013089
+
+  479 0.110670551 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D919
+Ack=3D1181569 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013090
+
+  480 0.111313324 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D919
+Ack=3D1184465 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013090
+
+  481 0.111325306 ourserver =E2=86=92 drobo TCP 13098 [TCP segment of a rea=
+ssembled PDU]
+
+  482 0.111336728 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D919
+Ack=3D1187361 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013090
+
+  483 0.111579771 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D919
+Ack=3D1190257 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013090
+
+  484 0.111918239 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D919
+Ack=3D1193153 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013091
+
+  485 0.111924773 ourserver =E2=86=92 drobo TCP 10202 [TCP segment of a rea=
+ssembled PDU]
+
+  486 0.112172538 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D919
+Ack=3D1196049 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013091
+
+  487 0.112178669 ourserver =E2=86=92 drobo TCP 1514 [TCP segment of a reas=
+sembled PDU]
+
+  488 0.112186029 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D919
+Ack=3D1198945 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013091
+
+  489 0.112430393 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D919
+Ack=3D1201841 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013092
+
+  490 0.112934871 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D919
+Ack=3D1204737 Win=3D26508 Len=3D0 TSval=3D623636943 TSecr=3D2708013092
+
+  491 0.112946063 ourserver =E2=86=92 drobo TCP 10202 [TCP segment of a rea=
+ssembled PDU]
+
+  492 0.113132494 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D919
+Ack=3D1207633 Win=3D26508 Len=3D0 TSval=3D623636944 TSecr=3D2708013092
+
+  493 0.113256633 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D919
+Ack=3D1211977 Win=3D26334 Len=3D0 TSval=3D623636944 TSecr=3D2708013092
+
+  494 0.114291076 drobo =E2=86=92 ourserver SMB 117 Write AndX Response, 65=
+536 bytes
+
+  495 0.114305898 ourserver =E2=86=92 drobo TCP 13098 [TCP segment of a rea=
+ssembled PDU]
+
+  496 0.114548027 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D970
+Ack=3D1222113 Win=3D26508 Len=3D0 TSval=3D623636944 TSecr=3D2708013093
+
+  497 0.114554350 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D970
+Ack=3D1225009 Win=3D26508 Len=3D0 TSval=3D623636944 TSecr=3D2708013093
+
+  498 0.114559411 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D970
+Ack=3D1227905 Win=3D26508 Len=3D0 TSval=3D623636944 TSecr=3D2708013094
+
+  499 0.115071785 drobo =E2=86=92 ourserver TCP 66 445 =E2=86=92 58706 [ACK=
+] Seq=3D970
+Ack=3D1230801 Win=3D26508 Len=3D0 TSval=3D623636944 TSecr=3D2708013094
+
+  500 0.115078479 ourserver =E2=86=92 drobo TCP 13098 [TCP segment of a rea=
+ssembled PDU]
