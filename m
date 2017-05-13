@@ -1,64 +1,134 @@
-From: Christophe JAILLET <christophe.jaillet-39ZsbGIQGT5GWvitb5QawA@public.gmane.org>
-Subject: [PATCH V2] SMB2: Fix share type handling
-Date: Fri, 12 May 2017 17:59:32 +0200
-Message-ID: <20170512155932.20120-1-christophe.jaillet@wanadoo.fr>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        Christophe JAILLET <christophe.jaillet-39ZsbGIQGT5GWvitb5QawA@public.gmane.org>
-To: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: cifsacl: Use a temporary ops variable to reduce
+ code length
+Date: Fri, 12 May 2017 19:57:14 -0500
+Message-ID: <CAH2r5muPkALa5Q_DxfHfbNeV0KxvWw-UUuSeJm502MPMdkgoyw@mail.gmail.com>
+References: <35756168f871fb4f8149153f6e5b85352de3166b.1494145833.git.joe@perches.com>
+ <CADT32eKcAAa9ORxf1OLL-+ju_XhSevb5d44=N7m6ngsbwuZ_rQ@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Cc: Joe Perches <joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CADT32eKcAAa9ORxf1OLL-+ju_XhSevb5d44=N7m6ngsbwuZ_rQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-In fs/cifs/smb2pdu.h, we have:
-#define SMB2_SHARE_TYPE_DISK    0x01
-#define SMB2_SHARE_TYPE_PIPE    0x02
-#define SMB2_SHARE_TYPE_PRINT   0x03
+merged into cifs-2.6.git for-next
 
-Knowing that, with the current code, the SMB2_SHARE_TYPE_PRINT case can
-never trigger and printer share would be interpreted as disk share.
+On Tue, May 9, 2017 at 11:26 PM, Shirish Pargaonkar
+<shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> Looks correct.
+>
+> Acked-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>
+> On Sun, May 7, 2017 at 3:31 AM, Joe Perches via samba-technical
+> <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org> wrote:
+>> Create an ops variable to store tcon->ses->server->ops and cache
+>> indirections and reduce code size a trivial bit.
+>>
+>> $ size fs/cifs/cifsacl.o*
+>>    text    data     bss     dec     hex filename
+>>    5338     136       8    5482    156a fs/cifs/cifsacl.o.new
+>>    5371     136       8    5515    158b fs/cifs/cifsacl.o.old
+>>
+>> Signed-off-by: Joe Perches <joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org>
+>> ---
+>>  fs/cifs/cifsacl.c | 30 ++++++++++++++----------------
+>>  1 file changed, 14 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+>> index 15bac390dff9..b98436f5c7c7 100644
+>> --- a/fs/cifs/cifsacl.c
+>> +++ b/fs/cifs/cifsacl.c
+>> @@ -1135,20 +1135,19 @@ cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
+>>         u32 acllen = 0;
+>>         int rc = 0;
+>>         struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
+>> -       struct cifs_tcon *tcon;
+>> +       struct smb_version_operations *ops;
+>>
+>>         cifs_dbg(NOISY, "converting ACL to mode for %s\n", path);
+>>
+>>         if (IS_ERR(tlink))
+>>                 return PTR_ERR(tlink);
+>> -       tcon = tlink_tcon(tlink);
+>>
+>> -       if (pfid && (tcon->ses->server->ops->get_acl_by_fid))
+>> -               pntsd = tcon->ses->server->ops->get_acl_by_fid(cifs_sb, pfid,
+>> -                                                         &acllen);
+>> -       else if (tcon->ses->server->ops->get_acl)
+>> -               pntsd = tcon->ses->server->ops->get_acl(cifs_sb, inode, path,
+>> -                                                       &acllen);
+>> +       ops = tlink_tcon(tlink)->ses->server->ops;
+>> +
+>> +       if (pfid && (ops->get_acl_by_fid))
+>> +               pntsd = ops->get_acl_by_fid(cifs_sb, pfid, &acllen);
+>> +       else if (ops->get_acl)
+>> +               pntsd = ops->get_acl(cifs_sb, inode, path, &acllen);
+>>         else {
+>>                 cifs_put_tlink(tlink);
+>>                 return -EOPNOTSUPP;
+>> @@ -1181,23 +1180,23 @@ id_mode_to_cifs_acl(struct inode *inode, const char *path, __u64 nmode,
+>>         struct cifs_ntsd *pnntsd = NULL; /* modified acl to be sent to server */
+>>         struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+>>         struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
+>> -       struct cifs_tcon *tcon;
+>> +       struct smb_version_operations *ops;
+>>
+>>         if (IS_ERR(tlink))
+>>                 return PTR_ERR(tlink);
+>> -       tcon = tlink_tcon(tlink);
+>> +
+>> +       ops = tlink_tcon(tlink)->ses->server->ops;
+>>
+>>         cifs_dbg(NOISY, "set ACL from mode for %s\n", path);
+>>
+>>         /* Get the security descriptor */
+>>
+>> -       if (tcon->ses->server->ops->get_acl == NULL) {
+>> +       if (ops->get_acl == NULL) {
+>>                 cifs_put_tlink(tlink);
+>>                 return -EOPNOTSUPP;
+>>         }
+>>
+>> -       pntsd = tcon->ses->server->ops->get_acl(cifs_sb, inode, path,
+>> -                                               &secdesclen);
+>> +       pntsd = ops->get_acl(cifs_sb, inode, path, &secdesclen);
+>>         if (IS_ERR(pntsd)) {
+>>                 rc = PTR_ERR(pntsd);
+>>                 cifs_dbg(VFS, "%s: error %d getting sec desc\n", __func__, rc);
+>> @@ -1224,13 +1223,12 @@ id_mode_to_cifs_acl(struct inode *inode, const char *path, __u64 nmode,
+>>
+>>         cifs_dbg(NOISY, "build_sec_desc rc: %d\n", rc);
+>>
+>> -       if (tcon->ses->server->ops->set_acl == NULL)
+>> +       if (ops->set_acl == NULL)
+>>                 rc = -EOPNOTSUPP;
+>>
+>>         if (!rc) {
+>>                 /* Set the security descriptor */
+>> -               rc = tcon->ses->server->ops->set_acl(pnntsd, secdesclen, inode,
+>> -                                                    path, aclflag);
+>> +               rc = ops->set_acl(pnntsd, secdesclen, inode, path, aclflag);
+>>                 cifs_dbg(NOISY, "set_cifs_acl rc: %d\n", rc);
+>>         }
+>>         cifs_put_tlink(tlink);
+>> --
+>> 2.10.0.rc2.1.g053435c
+>>
+>>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-So, test the ShareType value for equality instead.
 
-Fixes: faaf946a7d5b ("CIFS: Add tree connect/disconnect capability for SMB2")
-Signed-off-by: Christophe JAILLET <christophe.jaillet-39ZsbGIQGT5GWvitb5QawA@public.gmane.org>
----
-V2: use a 'switch' instead of some 'if'
 
-The v1 and related comments are quite old. They can be found at:
-   http://marc.info/?t=147976541800001&r=1&w=4
----
- fs/cifs/smb2pdu.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
-
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index e0517f499c38..e4afdaae743f 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -1240,15 +1240,19 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
- 		goto tcon_exit;
- 	}
- 
--	if (rsp->ShareType & SMB2_SHARE_TYPE_DISK)
-+	switch (rsp->ShareType) {
-+	case SMB2_SHARE_TYPE_DISK:
- 		cifs_dbg(FYI, "connection to disk share\n");
--	else if (rsp->ShareType & SMB2_SHARE_TYPE_PIPE) {
-+		break;
-+	case SMB2_SHARE_TYPE_PIPE:
- 		tcon->ipc = true;
- 		cifs_dbg(FYI, "connection to pipe share\n");
--	} else if (rsp->ShareType & SMB2_SHARE_TYPE_PRINT) {
--		tcon->print = true;
-+		break;
-+	case SMB2_SHARE_TYPE_PRINT:
-+		tcon->ipc = true;
- 		cifs_dbg(FYI, "connection to printer\n");
--	} else {
-+		break;
-+	default:
- 		cifs_dbg(VFS, "unknown share type %d\n", rsp->ShareType);
- 		rc = -EOPNOTSUPP;
- 		goto tcon_error_exit;
 -- 
-2.11.0
+Thanks,
+
+Steve
