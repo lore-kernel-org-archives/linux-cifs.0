@@ -1,58 +1,135 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Sun, 14 May 2017 09:51:07 -0500
-Message-ID: <CAH2r5mtx+GhrgJpnpf=1nYC_8TMsSGF24i2BodS7e4ezAnJOsQ@mail.gmail.com>
+From: Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>
+Subject: Re: [PATCH v4 15/27] fs: retrofit old error reporting API onto new
+ infrastructure
+Date: Mon, 15 May 2017 12:42:46 +0200
+Message-ID: <20170515104246.GC16182@quack2.suse.cz>
+References: <20170509154930.29524-1-jlayton@redhat.com>
+ <20170509154930.29524-16-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-btrfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-mm-Bw31MaZKKs3YtjvyW6yDsg@public.gmane.org, jfs-discussion-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
+        linux-xfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+        linux-f2fs-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
+        v9fs-developer-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, linux-nilfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-block-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+        akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org,
+        ross.zwisler-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org,
+        jack-IBi9RG/b67k@public.gmane.org, viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, corbet-T1hC0tSOHrs@public.gmane.org,
+        neilb-l3A5Bk7waGM@public.gmane.org, clm-b10kYP2dOMg@public.gmane.org, tytso-3s7WtUTddSA@public.gmane.org, axboe-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org,
+        josef-DigfWCa+lFGyeJad7bwFQA@public.gmane.org, hubcap-gqc3UtWaqJ5Wk0Htik3J/w@public.gmane.org, rpeterso-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+        bo.li.liu-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20170509154930.29524-16-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Please pull the following changes since commit
-56868a460b83c0f93d339256a81064d89aadae8e:
+On Tue 09-05-17 11:49:18, Jeff Layton wrote:
+> Now that we have a better way to store and report errors that occur
+> during writeback, we need to convert the existing codebase to use it. We
+> could just adapt all of the filesystem code and related infrastructure
+> to the new API, but that's a lot of churn.
+> 
+> When it comes to setting errors in the mapping, filemap_set_wb_error is
+> a drop-in replacement for mapping_set_error. Turn that function into a
+> simple wrapper around the new one.
+> 
+> Because we want to ensure that writeback errors are always reported at
+> fsync time, inject filemap_report_wb_error calls much closer to the
+> syscall boundary, in call_fsync.
+> 
+> For fsync calls (and things like the nfsd equivalent), we either return
+> the error that the fsync operation returns, or the one returned by
+> filemap_report_wb_error. In both cases, we advance the file->f_wb_err to
+> the latest value. This allows us to provide new fsync semantics that
+> will return errors that may have occurred previously and been viewed
+> via other file descriptors.
+> 
+> The final piece of the puzzle is what to do about filemap_check_errors
+> calls that are being called directly or via filemap_* functions. Here,
+> we must take a little "creative license".
+> 
+> Since we now handle advancing the file->f_wb_err value at the generic
+> filesystem layer, we no longer need those callers to clear errors out
+> of the mapping or advance an errseq_t.
+> 
+> A lot of the existing codebase relies on being getting an error back
+> from those functions when there is a writeback problem, so we do still
+> want to have them report writeback errors somehow.
+> 
+> When reporting writeback errors, we will always report errors that have
+> occurred since a particular point in time. With the old writeback error
+> reporting, the time we used was "since it was last tested/cleared" which
+> is entirely arbitrary and potentially racy. Now, we can at least report
+> the latest error that has occurred since an arbitrary point in time
+> (represented as a sampled errseq_t value).
+> 
+> In the case where we don't have a struct file to work with, this patch
+> just has the wrappers sample the current mapping->wb_err value, and use
+> that as an arbitrary point from which to check for errors.
 
-  Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/ide
-(2017-05-09 15:56:58 -0700)
+I think this is really dangerous and we shouldn't do this. You are quite
+likely to lose IO errors in such calls because you will ignore all errors
+that happened during previous background writeback or even for IO that
+managed to complete before we called filemap_fdatawait(). Maybe we need to
+keep the original set-clear-bit IO error reporting for these cases, until
+we can convert them to fdatawait_range_since()?
 
-A set of minor cifs fixes are available in the git repository at:
+> That's probably not "correct" in all cases, particularly in the case of
+> something like filemap_fdatawait, but I'm not sure it's any worse than
+> what we already have, and this gives us a basis from which to work.
+> 
+> A lot of those callers will likely want to change to a model where they
+> sample the errseq_t much earlier (perhaps when starting a transaction),
+> store it in an appropriate place and then use that value later when
+> checking to see if an error occurred.
+> 
+> That will almost certainly take some involvement from other subsystem
+> maintainers. I'm quite open to adding new API functions to help enable
+> this if that would be helpful, but I don't really want to do that until
+> I better understand what's needed.
+> 
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
-  git://git.samba.org/sfrench/cifs-2.6.git for-next
+...
 
-for you to fetch changes up to 67b4c889cc835a2a6e2ff4e20544a33e37e2875d:
+> diff --git a/fs/f2fs/file.c b/fs/f2fs/file.c
+> index 5f7317875a67..7ce13281925f 100644
+> --- a/fs/f2fs/file.c
+> +++ b/fs/f2fs/file.c
+> @@ -187,6 +187,7 @@ static int f2fs_do_sync_file(struct file *file, loff_t start, loff_t end,
+>  		.nr_to_write = LONG_MAX,
+>  		.for_reclaim = 0,
+>  	};
+> +	errseq_t since = READ_ONCE(file->f_wb_err);
+>  
+>  	if (unlikely(f2fs_readonly(inode->i_sb)))
+>  		return 0;
+> @@ -265,6 +266,8 @@ static int f2fs_do_sync_file(struct file *file, loff_t start, loff_t end,
+>  	}
+>  
+>  	ret = wait_on_node_pages_writeback(sbi, ino);
+> +	if (ret == 0)
+> +		ret = filemap_check_wb_error(NODE_MAPPING(sbi), since);
+>  	if (ret)
+>  		goto out;
 
-  [CIFS] Minor cleanup of xattr query function (2017-05-12 20:59:10 -0500)
+So this conversion looks wrong and actually points to a larger issue with
+the scheme. The problem is there are two mappings that come into play here
+- file_inode(file)->i_mapping which is the data mapping and
+NODE_MAPPING(sbi) which is the metadata mapping (and this is not a problem
+specific to f2fs. For example ext2 also uses this scheme where block
+devices' mapping is the metadata mapping). And we need to merge error
+information from these two mappings so for the stamping scheme to work,
+we'd need two stamps stored in struct file. One for data mapping and one
+for metadata mapping. Or maybe there's some more clever scheme but for now
+I don't see one...
 
-----------------------------------------------------------------
-Christophe JAILLET (1):
-      SMB2: Fix share type handling
-
-Joe Perches via samba-technical (1):
-      cifs: cifsacl: Use a temporary ops variable to reduce code length
-
-Karim Eshapa (1):
-      fs: cifs: transport: Use time_after for time comparison
-
-Rabin Vincent (1):
-      CIFS: silence lockdep splat in cifs_relock_file()
-
-Steve French (2):
-      Don't delay freeing mids when blocked on slow socket write of request
-      [CIFS] Minor cleanup of xattr query function
-
- fs/cifs/cifsacl.c   | 30 ++++++++++++++----------------
- fs/cifs/cifsglob.h  |  2 +-
- fs/cifs/cifsproto.h |  3 +--
- fs/cifs/cifssmb.c   | 11 +++--------
- fs/cifs/file.c      |  2 +-
- fs/cifs/inode.c     |  3 +--
- fs/cifs/smb2pdu.c   | 21 +++++++++------------
- fs/cifs/transport.c |  4 +---
- fs/cifs/xattr.c     |  6 ++----
- 9 files changed, 33 insertions(+), 49 deletions(-)
-
+								Honza
 -- 
-Thanks,
-
-Steve
+Jan Kara <jack-IBi9RG/b67k@public.gmane.org>
+SUSE Labs, CR
