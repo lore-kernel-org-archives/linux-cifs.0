@@ -1,93 +1,83 @@
-From: Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>
-Subject: Re: [PATCH v4 21/27] mm: clean up error handling in write_one_page
-Date: Mon, 15 May 2017 14:01:14 +0200
-Message-ID: <20170515120114.GF16182@quack2.suse.cz>
-References: <20170509154930.29524-1-jlayton@redhat.com>
- <20170509154930.29524-22-jlayton@redhat.com>
+From: "Darrick J. Wong" <darrick.wong@oracle.com>
+Subject: Re: [xfstests PATCH v2 2/3] ext4: allow ext4 to use
+	$SCRATCH_LOGDEV
+Date: Mon, 15 May 2017 10:42:51 -0700
+Message-ID: <20170515174251.GD4514@birch.djwong.org>
+References: <20170509161245.29908-1-jlayton@redhat.com>
+	<20170509161245.29908-3-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-btrfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-mm-Bw31MaZKKs3YtjvyW6yDsg@public.gmane.org, jfs-discussion-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
-        linux-xfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-        linux-f2fs-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
-        v9fs-developer-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, linux-nilfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-block-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-        akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org,
-        ross.zwisler-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org,
-        jack-IBi9RG/b67k@public.gmane.org, viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, corbet-T1hC0tSOHrs@public.gmane.org,
-        neilb-l3A5Bk7waGM@public.gmane.org, clm-b10kYP2dOMg@public.gmane.org, tytso-3s7WtUTddSA@public.gmane.org, axboe-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org,
-        josef-DigfWCa+lFGyeJad7bwFQA@public.gmane.org, hubcap-gqc3UtWaqJ5Wk0Htik3J/w@public.gmane.org, rpeterso-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-        bo.li.liu-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: jfs-discussion@lists.sourceforge.net, hch@infradead.org,
+	dhowells@redhat.com, linux-mm@kvack.org, hubcap@omnibond.com,
+	linux-cifs@vger.kernel.org, linux-nilfs@vger.kernel.org,
+	mawilcox@microsoft.com, cluster-devel@redhat.com,
+	bo.li.liu@oracle.com, v9fs-developer@lists.sourceforge.net,
+	ross.zwisler@linux.intel.com, linux-ext4@vger.kernel.org,
+	josef@toxicpanda.com, linux-block@vger.kernel.org,
+	rpeterso@redhat.com, viro@zeniv.linux.org.uk, axboe@kernel.dk,
+	linux-nfs@vger.kernel.org, tytso@mit.edu, clm@fb.com,
+	corbet@lwn.net, linux-kernel@vger.kernel.org,
+	fstests@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org, jack@suse.com,
+	linux-fsdevel@vger.kernel.org, akpm@linux-foundation.org,
+	linux-btrfs@vger.kernel.org
+To: Jeff Layton <jlayton@redhat.com>
+Return-path: <linux-f2fs-devel-bounces@lists.sourceforge.net>
 Content-Disposition: inline
-In-Reply-To: <20170509154930.29524-22-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+In-Reply-To: <20170509161245.29908-3-jlayton@redhat.com>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/linux-f2fs-devel>,
+	<mailto:linux-f2fs-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=linux-f2fs-devel>
+List-Post: <mailto:linux-f2fs-devel@lists.sourceforge.net>
+List-Help: <mailto:linux-f2fs-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/linux-f2fs-devel>,
+	<mailto:linux-f2fs-devel-request@lists.sourceforge.net?subject=subscribe>
+Errors-To: linux-f2fs-devel-bounces@lists.sourceforge.net
+List-Id: linux-cifs.vger.kernel.org
 
-On Tue 09-05-17 11:49:24, Jeff Layton wrote:
-> Don't try to check PageError since that's potentially racy and not
-> necessarily going to be set after writepage errors out.
+On Tue, May 09, 2017 at 12:12:44PM -0400, Jeff Layton wrote:
+> The writeback error handling test requires that you put the journal on a
+> separate device. This allows us to use dmerror to simulate data
+> writeback failure, without affecting the journal.
 > 
-> Instead, sample the mapping error early on, and use that value to tell
-> us whether we got a writeback error since then.
+> xfs already has infrastructure for this (a'la $SCRATCH_LOGDEV), so wire
+> up the ext4 code so that it can do the same thing when _scratch_mkfs is
+> called.
 > 
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> Signed-off-by: Jeff Layton <jlayton@redhat.com>
 
-Looks good to me. You can add:
+Looks ok,
+Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
 
-Reviewed-by: Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>
-
-								Honza
+--D
 
 > ---
->  mm/page-writeback.c | 11 +++++------
->  1 file changed, 5 insertions(+), 6 deletions(-)
+>  common/rc | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-> index de0dbf12e2c1..1643456881b4 100644
-> --- a/mm/page-writeback.c
-> +++ b/mm/page-writeback.c
-> @@ -2373,11 +2373,12 @@ int do_writepages(struct address_space *mapping, struct writeback_control *wbc)
->  int write_one_page(struct page *page)
->  {
->  	struct address_space *mapping = page->mapping;
-> -	int ret = 0;
-> +	int ret = 0, ret2;
->  	struct writeback_control wbc = {
->  		.sync_mode = WB_SYNC_ALL,
->  		.nr_to_write = 1,
->  	};
-> +	errseq_t since = filemap_sample_wb_error(mapping);
+> diff --git a/common/rc b/common/rc
+> index 257b1903359d..8b815d9c8c33 100644
+> --- a/common/rc
+> +++ b/common/rc
+> @@ -675,6 +675,9 @@ _scratch_mkfs_ext4()
+>  	local tmp=`mktemp`
+>  	local mkfs_status
 >  
->  	BUG_ON(!PageLocked(page));
+> +	[ "$USE_EXTERNAL" = yes -a ! -z "$SCRATCH_LOGDEV" ] && \
+> +	    $mkfs_cmd -O journal_dev $SCRATCH_LOGDEV && \
+> +	    mkfs_cmd="$mkfs_cmd -J device=$SCRATCH_LOGDEV"
 >  
-> @@ -2386,16 +2387,14 @@ int write_one_page(struct page *page)
->  	if (clear_page_dirty_for_io(page)) {
->  		get_page(page);
->  		ret = mapping->a_ops->writepage(page, &wbc);
-> -		if (ret == 0) {
-> +		if (ret == 0)
->  			wait_on_page_writeback(page);
-> -			if (PageError(page))
-> -				ret = -EIO;
-> -		}
->  		put_page(page);
->  	} else {
->  		unlock_page(page);
->  	}
-> -	return ret;
-> +	ret2 = filemap_check_wb_error(mapping, since);
-> +	return ret ? : ret2;
->  }
->  EXPORT_SYMBOL(write_one_page);
->  
+>  	_scratch_do_mkfs "$mkfs_cmd" "$mkfs_filter" $* 2>$tmp.mkfserr 1>$tmp.mkfsstd
+>  	mkfs_status=$?
 > -- 
 > 2.9.3
 > 
-> 
--- 
-Jan Kara <jack-IBi9RG/b67k@public.gmane.org>
-SUSE Labs, CR
+> --
+> To unsubscribe from this list: send the line "unsubscribe fstests" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+------------------------------------------------------------------------------
+Check out the vibrant tech community on one of the world's most
+engaging tech sites, Slashdot.org! http://sdm.link/slashdot
