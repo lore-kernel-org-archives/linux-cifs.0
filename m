@@ -1,166 +1,101 @@
-From: Jeff Layton <jlayton@redhat.com>
-Subject: Re: [PATCH v4 15/27] fs: retrofit old error reporting API onto new
- infrastructure
-Date: Mon, 15 May 2017 13:58:59 -0400
-Message-ID: <1494871139.4080.3.camel@redhat.com>
-References: <20170509154930.29524-1-jlayton@redhat.com>
-	 <20170509154930.29524-16-jlayton@redhat.com>
-	 <20170515104246.GC16182@quack2.suse.cz>
+From: Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] KEYS: make keyctl_invalidate() also require Setattr
+ permission
+Date: Tue, 16 May 2017 14:49:57 -0700
+Message-ID: <20170516214957.GA113464@gmail.com>
+References: <20170329220101.26067-1-ebiggers@google.com>
+ <10049.1491207629@warthog.procyon.org.uk>
+ <20170404184433.GA46469@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
- linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org, linux-mm@kvack.org,
- jfs-discussion@lists.sourceforge.net, linux-xfs@vger.kernel.org,
- cluster-devel@redhat.com, linux-f2fs-devel@lists.sourceforge.net,
- v9fs-developer@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
- linux-block@vger.kernel.org, dhowells@redhat.com,
- akpm@linux-foundation.org,  hch@infradead.org,
- ross.zwisler@linux.intel.com, mawilcox@microsoft.com,  jack@suse.com,
- viro@zeniv.linux.org.uk, corbet@lwn.net, neilb@suse.de, clm@fb.com,
- tytso@mit.edu, axboe@kernel.dk, josef@toxicpanda.com, hubcap@omnibond.com,
- rpeterso@redhat.com, bo.li.liu@oracle.com
-To: Jan Kara <jack@suse.cz>
-Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <20170515104246.GC16182@quack2.suse.cz>
-Sender: owner-linux-mm@kvack.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Eric Biggers <ebiggers-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>, keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-fscrypt-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Gwendal Grignou <gwendal-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>,
+        Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Richard Weinberger <richard-/L3Ra7n9ekc@public.gmane.org>,
+        Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>, stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20170404184433.GA46469-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Mon, 2017-05-15 at 12:42 +0200, Jan Kara wrote:
-> On Tue 09-05-17 11:49:18, Jeff Layton wrote:
-> > Now that we have a better way to store and report errors that occur
-> > during writeback, we need to convert the existing codebase to use it. We
-> > could just adapt all of the filesystem code and related infrastructure
-> > to the new API, but that's a lot of churn.
-> > 
-> > When it comes to setting errors in the mapping, filemap_set_wb_error is
-> > a drop-in replacement for mapping_set_error. Turn that function into a
-> > simple wrapper around the new one.
-> > 
-> > Because we want to ensure that writeback errors are always reported at
-> > fsync time, inject filemap_report_wb_error calls much closer to the
-> > syscall boundary, in call_fsync.
-> > 
-> > For fsync calls (and things like the nfsd equivalent), we either return
-> > the error that the fsync operation returns, or the one returned by
-> > filemap_report_wb_error. In both cases, we advance the file->f_wb_err to
-> > the latest value. This allows us to provide new fsync semantics that
-> > will return errors that may have occurred previously and been viewed
-> > via other file descriptors.
-> > 
-> > The final piece of the puzzle is what to do about filemap_check_errors
-> > calls that are being called directly or via filemap_* functions. Here,
-> > we must take a little "creative license".
-> > 
-> > Since we now handle advancing the file->f_wb_err value at the generic
-> > filesystem layer, we no longer need those callers to clear errors out
-> > of the mapping or advance an errseq_t.
-> > 
-> > A lot of the existing codebase relies on being getting an error back
-> > from those functions when there is a writeback problem, so we do still
-> > want to have them report writeback errors somehow.
-> > 
-> > When reporting writeback errors, we will always report errors that have
-> > occurred since a particular point in time. With the old writeback error
-> > reporting, the time we used was "since it was last tested/cleared" which
-> > is entirely arbitrary and potentially racy. Now, we can at least report
-> > the latest error that has occurred since an arbitrary point in time
-> > (represented as a sampled errseq_t value).
-> > 
-> > In the case where we don't have a struct file to work with, this patch
-> > just has the wrappers sample the current mapping->wb_err value, and use
-> > that as an arbitrary point from which to check for errors.
-> 
-> I think this is really dangerous and we shouldn't do this. You are quite
-> likely to lose IO errors in such calls because you will ignore all errors
-> that happened during previous background writeback or even for IO that
-> managed to complete before we called filemap_fdatawait(). Maybe we need to
-> keep the original set-clear-bit IO error reporting for these cases, until
-> we can convert them to fdatawait_range_since()?
-> 
+Hi David,
 
-Yes that is a danger.
-
-In fact, late last week I was finally able to make my xfstest work with
-btrfs, and started hitting oopses with it because of the way the error
-reporting changed. I rolled up a patch to fix that (and it simplifies
-the code some, IMO), but other callers of filemap_fdatawait may have
-similar problems here.
-
-I'll pick up working on this again in a more piecemeal way. I had
-originally looked at doing that, but there are some problematic places
-(e.g. buffer.c), where the code is shared by a bunch of different
-filesystems that makes it difficult.
-
-We may end up needing some sort of FS_WB_ERRSEQ flag to do this
-correctly, at least until the transition to errseq_t is done.
-
-> > That's probably not "correct" in all cases, particularly in the case of
-> > something like filemap_fdatawait, but I'm not sure it's any worse than
-> > what we already have, and this gives us a basis from which to work.
+On Tue, Apr 04, 2017 at 11:44:33AM -0700, Eric Biggers wrote:
+> On Mon, Apr 03, 2017 at 09:20:29AM +0100, David Howells wrote:
+> > Eric Biggers <ebiggers-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org> wrote:
 > > 
-> > A lot of those callers will likely want to change to a model where they
-> > sample the errseq_t much earlier (perhaps when starting a transaction),
-> > store it in an appropriate place and then use that value later when
-> > checking to see if an error occurred.
+> > > Currently, a process only needs Search permission on a key to invalidate
+> > > it with keyctl_invalidate(), which has an effect similar to unlinking it
+> > > from all keyrings.  Unfortunately, this significantly compromises the
+> > > keys permission system because as a result, there is no way to grant
+> > > read-only access to keys without also granting de-facto "delete" access.
+> > > Even worse, processes may invalidate entire _keyrings_, given only
+> > > permission to "search" them.
+> > > 
+> > > Key invalidation seems to have intended for cases where keyrings are
+> > > used as caches, and keys can be re-requested at any time by an upcall to
+> > > /sbin/request-key.  However, keyrings are not always used in this way.
+> > > For example, users of ext4, f2fs, and ubifs encryption may wish to grant
+> > > many differently-privileged processes access to the same keys, set up in
+> > > a shared keyring ahead of time.  Permitting everyone to invalidate keys
+> > > in this scenario enables a trivial denial-of-service.  And even users of
+> > > keyrings as "just caches" may wish to restrict invalidation because it
+> > > may require significant work or user interaction to regenerate keys.
+> > > 
+> > > This patch fixes the flaw by requiring both Search and Setattr
+> > > permission to invalidate a key rather than just Search permission.
+> > > Requiring Setattr permission is appropriate because Setattr permission
+> > > also allows revoking (via keyctl_revoke()) or expiring (via
+> > > keyctl_set_timeout()) the key, which also make the key inaccessible
+> > > regardless of how many keyrings it is in.  Continuing to require Search
+> > > permission ensures we do not decrease the level of permissions required.
 > > 
-> > That will almost certainly take some involvement from other subsystem
-> > maintainers. I'm quite open to adding new API functions to help enable
-> > this if that would be helpful, but I don't really want to do that until
-> > I better understand what's needed.
+> > I'm not sure this is the right method either.  It might be better to allocate
+> > one of the remaining two permissions bits for this and/or mark keys that are
+> > invalidateable.
 > > 
-> > Signed-off-by: Jeff Layton <jlayton@redhat.com>
 > 
-> ...
+> What do you think is the right solution?  We really need to do _something_.  Can
+> you elaborate on what the use case(s) for "invalidate" were intended to be, and
+> what users of it are known?
 > 
-> > diff --git a/fs/f2fs/file.c b/fs/f2fs/file.c
-> > index 5f7317875a67..7ce13281925f 100644
-> > --- a/fs/f2fs/file.c
-> > +++ b/fs/f2fs/file.c
-> > @@ -187,6 +187,7 @@ static int f2fs_do_sync_file(struct file *file, loff_t start, loff_t end,
-> >  		.nr_to_write = LONG_MAX,
-> >  		.for_reclaim = 0,
-> >  	};
-> > +	errseq_t since = READ_ONCE(file->f_wb_err);
-> >  
-> >  	if (unlikely(f2fs_readonly(inode->i_sb)))
-> >  		return 0;
-> > @@ -265,6 +266,8 @@ static int f2fs_do_sync_file(struct file *file, loff_t start, loff_t end,
-> >  	}
-> >  
-> >  	ret = wait_on_node_pages_writeback(sbi, ino);
-> > +	if (ret == 0)
-> > +		ret = filemap_check_wb_error(NODE_MAPPING(sbi), since);
-> >  	if (ret)
-> >  		goto out;
+> As I noted in the commit message I was hesistant to create a new Invalidate
+> permission because that would require that users of keyctl_setperm +
+> keyctl_invalidate to start including a new permission which never existed
+> before.  Note that the new permission would be rejected with EINVAL by old
+> kernels, so applications might even need to try it both ways.
 > 
-> So this conversion looks wrong and actually points to a larger issue with
-> the scheme. The problem is there are two mappings that come into play here
-> - file_inode(file)->i_mapping which is the data mapping and
-> NODE_MAPPING(sbi) which is the metadata mapping (and this is not a problem
-> specific to f2fs. For example ext2 also uses this scheme where block
-> devices' mapping is the metadata mapping). And we need to merge error
-> information from these two mappings so for the stamping scheme to work,
-> we'd need two stamps stored in struct file. One for data mapping and one
-> for metadata mapping. Or maybe there's some more clever scheme but for now
-> I don't see one...
+> However perhaps no one cares and doing that would be a non-issue.
+> 
+> If furthermore the only users of "invalidate" are nfsidmap and the in-kernel
+> dns_resolver, then it may be fine to rename the KEY_FLAG_ROOT_CAN_INVAL flag to
+> something like "KEY_FLAG_INVALIDATABLE" and making it so only those keys can be
+> invalidated.  That would be much better, but I don't know for sure that there
+> aren't other users of keyctl_invalidate() (you may know more).
 > 
 
-Got it -- since there are two mappings, there are two errseq_t's and
-you'd need a since cursor for each. I don't really like having to add a
-second 32-bit word to struct file, but I also don't see a real
-alternative right offhand. May be able to stash it in file->private_data 
-for some of these filesystems.
+I'm still thinking my proposed fix to require Setattr permission is the best
+solution.  Allocating a new permission bit breaks everyone calling
+keyctl_setperm() along with keyctl_invalidate(), while marking only certain keys
+as invalidatable breaks everyone using keyctl_invalidate() for some "unintended"
+key.
 
-In any case, I'll ponder how to do this in a more piecemeal way.
+Personally, I've now seen keyctl_invalidate() used in two different places for
+removing ext4 encryption keys: in Chrome OS userspace, and in a test script.
+The fact is that almost everyone using the keyrings API gets confused about the
+difference between revocation, invalidation, expiration, and unlinking, so they
+may end up doing "invalidate" when maybe they were "supposed" to do something
+else.  And it may not be a good idea to break the people who happened to choose
+"invalidate", beyond what we have to do to close the security hole.
 
-Thanks for all of the review so far!
--- 
-Jeff Layton <jlayton@redhat.com>
+What do you say?
 
+- Eric
 --
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
