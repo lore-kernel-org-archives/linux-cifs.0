@@ -1,46 +1,40 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: set mapping error when page writeback fails in writepage or launder_pages
-Date: Thu, 25 May 2017 06:59:52 -0400
-Message-ID: <20170525105952.8867-1-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>, Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>
-To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: L A Walsh <cifs-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org>
+Subject: kudos & congrats on efficiency.
+Date: Fri, 26 May 2017 11:12:36 -0700
+Message-ID: <59287014.4040006@tlinx.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Reviewed-by: Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>
-Reviewed-by: Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>
----
- fs/cifs/file.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+I tend to be a bit of a performance-geek -- often running various 
+self-relevant benchmarks to see how long things take and working on 
+optimizing configs for  speed & efficiency. 
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 0fd081bd2a2f..5009860dbdc6 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -2234,14 +2234,16 @@ cifs_writepage_locked(struct page *page, struct writeback_control *wbc)
- 	set_page_writeback(page);
- retry_write:
- 	rc = cifs_partialpagewrite(page, 0, PAGE_SIZE);
--	if (rc == -EAGAIN && wbc->sync_mode == WB_SYNC_ALL)
--		goto retry_write;
--	else if (rc == -EAGAIN)
-+	if (rc == -EAGAIN) {
-+		if (wbc->sync_mode == WB_SYNC_ALL)
-+			goto retry_write;
- 		redirty_page_for_writepage(wbc, page);
--	else if (rc != 0)
-+	} else if (rc != 0) {
- 		SetPageError(page);
--	else
-+		mapping_set_error(page->mapping, rc);
-+	} else {
- 		SetPageUptodate(page);
-+	}
- 	end_page_writeback(page);
- 	put_page(page);
- 	free_xid(xid);
--- 
-2.9.4
+I wanted to backup a 45.5GB dir (with 260 subdirs, & 633 files) from my
+Win7SP1 PC to my home server.  I frequently have the Win7 disk
+(SSD-based) mounted on a top-level dir. 
+
+An aside, I want to repeat a kudo relating to win-symlinks appearing
+as linux-native symlinks via CIFS.  That's excellent.  It may have
+just 'fallen out' from other work, but it's still very cool.
+
+Second is on efficiency, uncovered by running tar.  I thought
+the 45G would take a few-several minutes to xfer even with my 8Gb (says
+10, but get a 20% penalty for having an older PCIe bus) ethernet.
+It took < 2 minutes to write to a tar file.  I ran the tar again
+(after dropping local caches) w/output to /dev/null...
+took 82.02s : average 568MB/s!  With CIFS taking 70-80% cpu.
+A rerun on the server after another dropcache, averaged 687MB/s. 
+Maybe subsequent runs benefit from the win7-cache.
+Not sure how to readily drop the Win7 cache (other than alloc'ing
+all mem in the machine and forcing the cache to be dumped)...
+
+Anyway, for comparison, my current version of samba
+gives ~450MB/s for reads and ~200MB/s for writes.
+
+Congrats!
+-Linda W.
