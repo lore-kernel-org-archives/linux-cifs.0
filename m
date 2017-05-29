@@ -1,7 +1,8 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v2 00/11] introduce crypto wait for async op
-Date: Mon, 29 May 2017 11:22:47 +0300
-Message-ID: <1496046180-21962-1-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v2 01/11] crypto: introduce crypto wait for async op
+Date: Mon, 29 May 2017 11:22:48 +0300
+Message-ID: <1496046180-21962-2-git-send-email-gilad@benyossef.com>
+References: <1496046180-21962-1-git-send-email-gilad@benyossef.com>
 Cc: Eric Biggers <ebiggers3@gmail.com>,
         Ofir Drang <ofir.drang@arm.com>,
         Pavel Shilovsky <pshilov@microsoft.com>,
@@ -25,72 +26,121 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
         Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
         James Morris <james.l.morris@oracle.com>,
         "Serge E. Hallyn" <serge@hallyn.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Sender: linux-crypto-owner@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1496046180-21962-1-git-send-email-gilad@benyossef.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Many users of kernel async. crypto services have a pattern of
-starting an async. crypto op and than using a completion
-to wait for it to end, resulting of the same code repeating
-itself in multiple places, sometime with coding errors.
+Invoking a possibly async. crypto op and waiting for completion
+while correctly handling backlog processing is a common task
+in the crypto API implementation and outside users of it.
 
-This patch aims to introduce a generic "wait for async.
-crypto op to complete" functions and move all the users
-I could find to use it.  This gets rid of almost 300
-lines of code and uncovered a few bugs in existing code
-(separate bug fix patch set sent previously).
+This patch adds a generic implementation for doing so in
+preparation for using it across the board instead of hand
+rolled versions.
 
-The patch set was boot tested on x86_64 and arm64 which
-at the very least tests the crypto users via testmgr
-but I am less confident regarding some of the other
-users and would love more testers.
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+CC: Eric Biggers <ebiggers3@gmail.com>
+CC: Ofir Drang <ofir.drang@arm.com>
+---
+ crypto/api.c           | 13 +++++++++++++
+ include/linux/crypto.h | 41 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 54 insertions(+)
+
+diff --git a/crypto/api.c b/crypto/api.c
+index 941cd4c..2a2479d 100644
+--- a/crypto/api.c
++++ b/crypto/api.c
+@@ -24,6 +24,7 @@
+ #include <linux/sched/signal.h>
+ #include <linux/slab.h>
+ #include <linux/string.h>
++#include <linux/completion.h>
+ #include "internal.h"
  
-Changes from v1:
-- Address review comments from Eric Biggers.
-- Separated out bug fixes of existing code and rebase
-  on top of that patch set.
-- Rename 'ecr' to 'wait' in fscrypto code.
-- Split patch introducing the new API from the change
-  moving over the algif code which it originated from
-  to the new API.
-- Inline crypto_wait_req().
-- Some code indentation fixes.
-
-Gilad Ben-Yossef (11):
-  crypto: introduce crypto wait for async op
-  crypto: move algif to generic async completion
-  crypto: move pub key to generic async completion
-  crypto: move drbg to generic async completion
-  crypto: move gcm to generic async completion
-  crypto: move testmgr to generic async completion
-  dm: move dm-verity to generic async completion
-  fscrypt: move to generic async completion
-  cifs: move to generic async completion
-  ima: move to generic async completion
-  crypto: adapt api sample to use async. op wait
-
- Documentation/crypto/api-samples.rst |  52 ++--------
- crypto/af_alg.c                      |  27 -----
- crypto/algif_aead.c                  |  14 +--
- crypto/algif_hash.c                  |  29 +++---
- crypto/algif_skcipher.c              |  15 ++-
- crypto/api.c                         |  13 +++
- crypto/asymmetric_keys/public_key.c  |  28 +-----
- crypto/drbg.c                        |  34 ++-----
- crypto/gcm.c                         |  32 ++----
- crypto/testmgr.c                     | 184 +++++++++++------------------------
- drivers/md/dm-verity-target.c        |  81 ++++-----------
- drivers/md/dm-verity.h               |   5 -
- fs/cifs/smb2ops.c                    |  30 +-----
- fs/crypto/crypto.c                   |  28 +-----
- fs/crypto/fname.c                    |  36 ++-----
- fs/crypto/fscrypt_private.h          |  10 --
- fs/crypto/keyinfo.c                  |  21 +---
- include/crypto/drbg.h                |   3 +-
- include/crypto/if_alg.h              |  14 ---
- include/linux/crypto.h               |  41 ++++++++
- security/integrity/ima/ima_crypto.c  |  56 ++++-------
- 21 files changed, 220 insertions(+), 533 deletions(-)
-
+ LIST_HEAD(crypto_alg_list);
+@@ -595,5 +596,17 @@ int crypto_has_alg(const char *name, u32 type, u32 mask)
+ }
+ EXPORT_SYMBOL_GPL(crypto_has_alg);
+ 
++void crypto_req_done(struct crypto_async_request *req, int err)
++{
++	struct crypto_wait *wait = req->data;
++
++	if (err == -EINPROGRESS)
++		return;
++
++	wait->err = err;
++	complete(&wait->completion);
++}
++EXPORT_SYMBOL_GPL(crypto_req_done);
++
+ MODULE_DESCRIPTION("Cryptographic core API");
+ MODULE_LICENSE("GPL");
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 84da997..bb00186 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -24,6 +24,7 @@
+ #include <linux/slab.h>
+ #include <linux/string.h>
+ #include <linux/uaccess.h>
++#include <linux/completion.h>
+ 
+ /*
+  * Autoloaded crypto modules should only use a prefixed name to avoid allowing
+@@ -468,6 +469,45 @@ struct crypto_alg {
+ } CRYPTO_MINALIGN_ATTR;
+ 
+ /*
++ * A helper struct for waiting for completion of async crypto ops
++ */
++struct crypto_wait {
++	struct completion completion;
++	int err;
++};
++
++/*
++ * Macro for declaring a crypto op async wait object on stack
++ */
++#define DECLARE_CRYPTO_WAIT(_wait) \
++	struct crypto_wait _wait = { \
++		COMPLETION_INITIALIZER_ONSTACK((_wait).completion), 0 }
++
++/*
++ * Async ops completion helper functioons
++ */
++void crypto_req_done(struct crypto_async_request *req, int err);
++
++static inline int crypto_wait_req(int err, struct crypto_wait *wait)
++{
++	switch (err) {
++	case -EINPROGRESS:
++	case -EBUSY:
++		wait_for_completion(&wait->completion);
++		reinit_completion(&wait->completion);
++		err = wait->err;
++		break;
++	};
++
++	return err;
++}
++
++static inline void crypto_init_wait(struct crypto_wait *wait)
++{
++	init_completion(&wait->completion);
++}
++
++/*
+  * Algorithm registration interface.
+  */
+ int crypto_register_alg(struct crypto_alg *alg);
+@@ -1604,5 +1644,6 @@ static inline int crypto_comp_decompress(struct crypto_comp *tfm,
+ 						    src, slen, dst, dlen);
+ }
+ 
++
+ #endif	/* _LINUX_CRYPTO_H */
+ 
 -- 
 2.1.4
