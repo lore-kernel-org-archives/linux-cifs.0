@@ -1,140 +1,68 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v2 11/11] crypto: adapt api sample to use async. op wait
-Date: Mon, 29 May 2017 11:22:58 +0300
-Message-ID: <1496046180-21962-12-git-send-email-gilad@benyossef.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: [PATCH v2 04/11] crypto: move drbg to generic async
+	completion
+Date: Mon, 29 May 2017 11:04:01 +0200
+Message-ID: <1638335.mkZCLTBCSi@tauon.chronox.de>
 References: <1496046180-21962-1-git-send-email-gilad@benyossef.com>
-Cc: Eric Biggers <ebiggers3@gmail.com>,
-        Ofir Drang <ofir.drang@arm.com>,
-        Pavel Shilovsky <pshilov@microsoft.com>,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-fscrypt@vger.kernel.org,
-        linux-ima-devel@lists.sourceforge.net,
-        linux-ima-user@lists.sourceforge.net,
-        linux-security-module@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <james.l.morris@oracle.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <1496046180-21962-1-git-send-email-gilad@benyossef.com>
-Sender: owner-linux-security-module@vger.kernel.org
+	<1496046180-21962-5-git-send-email-gilad@benyossef.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Cc: linux-security-module@l.org, Mike Snitzer <snitzer@redhat.com>,
+	linux-doc@vger.kernel.org, David Howells <dhowells@redhat.com>,
+	dm-devel@redhat.com, keyrings@vger.kernel.org,
+	linux-ima-devel@lists.sourceforge.net,
+	Pavel Shilovsky <pshilov@microsoft.com>,
+	Alasdair Kergon <agk@redhat.com>, linux-cifs@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>, Jonathan Corbet <corbet@lwn.net>,
+	Mimi Zohar <zohar@linux.vnet.ibm.com>,
+	"Serge E. Hallyn" <serge@hallyn.com>, linux-ima-user@lists.sourceforge.net,
+	Eric Biggers <ebiggers3@gmail.com>, linux-raid@vger.kernel.org,
+	linux-fscrypt@vger.kernel.org, James Morris <james.l.morris@oracle.com>,
+	Jaegeuk Kim <jaegeuk@kernel.org>, Ofir Drang <ofir.drang@arm.com>,
+	"Theodore Y. Ts'o" <tytso@mit.edu>,
+	Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+	Steve French <sfrench@sam
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Return-path: <dm-devel-bounces@redhat.com>
+In-Reply-To: <1496046180-21962-5-git-send-email-gilad@benyossef.com>
+List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
+List-Archive: <https://www.redhat.com/archives/dm-devel>
+List-Post: <mailto:dm-devel@redhat.com>
+List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
+List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=subscribe>
+Sender: dm-devel-bounces@redhat.com
+Errors-To: dm-devel-bounces@redhat.com
 List-Id: linux-cifs.vger.kernel.org
 
-The code sample is waiting for an async. crypto op completion.
-Adapt sample to use the new generic infrastructure to do the same.
+Am Montag, 29. Mai 2017, 10:22:51 CEST schrieb Gilad Ben-Yossef:
 
-This also fixes a possible data coruption bug created by the
-use of wait_for_completion_interruptible() without dealing
-correctly with an interrupt aborting the wait prior to the
-async op finishing.
+Hi Gilad,
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
----
- Documentation/crypto/api-samples.rst | 52 +++++++-----------------------------
- 1 file changed, 10 insertions(+), 42 deletions(-)
+> DRBG is starting an async. crypto op and waiting for it complete.
+> Move it over to generic code doing the same.
+> =
 
-diff --git a/Documentation/crypto/api-samples.rst b/Documentation/crypto/api-samples.rst
-index d021fd9..73b466b 100644
---- a/Documentation/crypto/api-samples.rst
-+++ b/Documentation/crypto/api-samples.rst
-@@ -7,59 +7,27 @@ Code Example For Symmetric Key Cipher Operation
- ::
- 
- 
--    struct tcrypt_result {
--        struct completion completion;
--        int err;
--    };
--
-     /* tie all data structures together */
-     struct skcipher_def {
-         struct scatterlist sg;
-         struct crypto_skcipher *tfm;
-         struct skcipher_request *req;
--        struct tcrypt_result result;
-+        struct crypto_wait wait;
-     };
- 
--    /* Callback function */
--    static void test_skcipher_cb(struct crypto_async_request *req, int error)
--    {
--        struct tcrypt_result *result = req->data;
--
--        if (error == -EINPROGRESS)
--            return;
--        result->err = error;
--        complete(&result->completion);
--        pr_info("Encryption finished successfully\n");
--    }
--
-     /* Perform cipher operation */
-     static unsigned int test_skcipher_encdec(struct skcipher_def *sk,
-                          int enc)
-     {
--        int rc = 0;
-+        int rc;
- 
-         if (enc)
--            rc = crypto_skcipher_encrypt(sk->req);
-+            rc = crypto_wait_req(crypto_skcipher_encrypt(sk->req), &sk->wait);
-         else
--            rc = crypto_skcipher_decrypt(sk->req);
--
--        switch (rc) {
--        case 0:
--            break;
--        case -EINPROGRESS:
--        case -EBUSY:
--            rc = wait_for_completion_interruptible(
--                &sk->result.completion);
--            if (!rc && !sk->result.err) {
--                reinit_completion(&sk->result.completion);
--                break;
--            }
--        default:
--            pr_info("skcipher encrypt returned with %d result %d\n",
--                rc, sk->result.err);
--            break;
--        }
--        init_completion(&sk->result.completion);
-+            rc = crypto_wait_req(crypto_skcipher_decrypt(sk->req), &sk->wait);
-+
-+	if (rc)
-+		pr_info("skcipher encrypt returned with result %d\n", rc);
- 
-         return rc;
-     }
-@@ -89,8 +57,8 @@ Code Example For Symmetric Key Cipher Operation
-         }
- 
-         skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
--                          test_skcipher_cb,
--                          &sk.result);
-+                          crypto_req_done,
-+                          &sk.wait);
- 
-         /* AES 256 with random key */
-         get_random_bytes(&key, 32);
-@@ -122,7 +90,7 @@ Code Example For Symmetric Key Cipher Operation
-         /* We encrypt one block */
-         sg_init_one(&sk.sg, scratchpad, 16);
-         skcipher_request_set_crypt(req, &sk.sg, &sk.sg, 16, ivdata);
--        init_completion(&sk.result.completion);
-+        crypto_init_wait(&sk.wait);
- 
-         /* encrypt data */
-         ret = test_skcipher_encdec(&sk, 1);
--- 
-2.1.4
+> The code now also passes CRYPTO_TFM_REQ_MAY_SLEEP flag indicating
+> crypto request memory allocation may use GFP_KERNEL which should
+> be perfectly fine as the code is obviously sleeping for the
+> completion of the request any way.
+> =
 
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+
+Acked-by: Stephan M=FCller <smueller@chronox.de>
+
+However, please note that there is a patch "crypto:drbg- Fixes panic in =
+
+wait_for_completion call." which adds another init_completion. I guess that =
+
+needs conversion to crypto_init_wait as well, once this patch set is accept=
+ed.
+
+
+Ciao
+Stephan
