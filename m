@@ -1,183 +1,94 @@
-From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH 2/2] cifs: Use smb 2 - 3 and cifsacl mount options getacl functions
-Date: Wed, 31 May 2017 23:50:24 -0500
-Message-ID: <1496292624-8818-1-git-send-email-shirishpargaonkar@gmail.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: =?iso-8859-1?Q?Bj=F6rn?= JACKE <bjacke-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH] CIFS: add SFM mapping for 0x01-0x1F
+Date: Thu, 1 Jun 2017 11:00:06 +0200
+Message-ID: <20170601090006.GA21508@SerNet.DE>
+Mime-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="Pd0ReVV5GZGQvF3a"
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-Fill in smb2/3 query acl functions in ops structures and use them.
+--Pd0ReVV5GZGQvF3a
+Content-Type: multipart/mixed; boundary="6c2NcOVqGQ03X4Wi"
+Content-Disposition: inline
 
-Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
+--6c2NcOVqGQ03X4Wi
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+attached patch adds more missing mappings for the 0x01-0x1f range. Please
+review, if you're fine with it, considere it also for stable.
+
+Bj=F6rn
+
+--6c2NcOVqGQ03X4Wi
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment; filename="0001-cifs-add-SFM-mapping-for-0x1-0x20.patch"
+Content-Transfer-Encoding: quoted-printable
+
+=46rom a97720c26db2ee77d4e798e3d383fcb6a348bd29 Mon Sep 17 00:00:00 2001
+=46rom: =3D?UTF-8?q?Bj=3DC3=3DB6rn=3D20Jacke?=3D <bjacke-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Date: Wed, 31 May 2017 22:48:41 +0200
+Subject: [PATCH] cifs: add SFM mapping for 0x01-0x1F
+
+0x1-0x1F has to be mapped to 0xF001-0xF01F
+
+Signed-off-by: Bjoern Jacke <bjacke-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/smb2ops.c | 121 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 121 insertions(+)
+ fs/cifs/cifs_unicode.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index c586918..7157f52 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -1288,6 +1288,107 @@ static bool smb2_set_sparse(const unsigned int xid, struct cifs_tcon *tcon,
- 	return rc;
- }
- 
-+static struct cifs_ntsd *
-+get_smb2_acl_by_fid(struct cifs_sb_info *cifs_sb,
-+		const struct cifs_fid *cifsfid, u32 *pacllen)
-+{
-+	struct cifs_ntsd *pntsd = NULL;
-+	unsigned int xid;
-+	int rc = -EOPNOTSUPP;
-+	struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
-+
-+	if (IS_ERR(tlink))
-+		return ERR_CAST(tlink);
-+
-+	xid = get_xid();
-+	cifs_dbg(VFS, "trying to get acl\n");
-+
-+	rc = SMB2_query_acl(xid, tlink_tcon(tlink), cifsfid->persistent_fid,
-+			    cifsfid->volatile_fid, (void **)&pntsd, pacllen);
-+	free_xid(xid);
-+
-+	cifs_put_tlink(tlink);
-+
-+	cifs_dbg(FYI, "%s: rc = %d ACL len %d\n", __func__, rc, *pacllen);
-+	if (rc)
-+		return ERR_PTR(rc);
-+	return pntsd;
-+
-+}
-+
-+static struct cifs_ntsd *
-+get_smb2_acl_by_path(struct cifs_sb_info *cifs_sb,
-+		const char *path, u32 *pacllen)
-+{
-+	struct cifs_ntsd *pntsd = NULL;
-+	u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
-+	unsigned int xid;
-+	int rc;
-+	struct cifs_tcon *tcon;
-+	struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
-+	struct cifs_fid fid;
-+	struct cifs_open_parms oparms;
-+	__le16 *utf16_path;
-+
-+	cifs_dbg(FYI, "get smb3 acl for path %s\n", path);
-+	if (IS_ERR(tlink))
-+		return ERR_CAST(tlink);
-+
-+	tcon = tlink_tcon(tlink);
-+	xid = get_xid();
-+
-+	if (backup_cred(cifs_sb))
-+		oparms.create_options |= CREATE_OPEN_BACKUP_INTENT;
-+	else
-+		oparms.create_options = 0;
-+
-+	utf16_path = cifs_convert_path_to_utf16(path, cifs_sb);
-+	if (!utf16_path)
-+		return ERR_PTR(-ENOMEM);
-+
-+	oparms.tcon = tcon;
-+	oparms.desired_access = READ_CONTROL;
-+	oparms.disposition = FILE_OPEN;
-+	oparms.fid = &fid;
-+	oparms.reconnect = false;
-+
-+	rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL);
-+	kfree(utf16_path);
-+	if (!rc) {
-+		rc = SMB2_query_acl(xid, tlink_tcon(tlink), fid.persistent_fid,
-+			    fid.volatile_fid, (void **)&pntsd, pacllen);
-+		SMB2_close(xid, tcon, fid.persistent_fid, fid.volatile_fid);
-+	}
-+
-+	cifs_put_tlink(tlink);
-+	free_xid(xid);
-+
-+	cifs_dbg(FYI, "%s: rc = %d ACL len %d\n", __func__, rc, *pacllen);
-+	if (rc)
-+		return ERR_PTR(rc);
-+	return pntsd;
-+}
-+
-+/* Retrieve an ACL from the server */
-+static struct cifs_ntsd *
-+get_smb2_acl(struct cifs_sb_info *cifs_sb,
-+				      struct inode *inode, const char *path,
-+				      u32 *pacllen)
-+{
-+	struct cifs_ntsd *pntsd = NULL;
-+	struct cifsFileInfo *open_file = NULL;
-+
-+	if (inode)
-+		open_file = find_readable_file(CIFS_I(inode), true);
-+	if (!open_file)
-+		return get_smb2_acl_by_path(cifs_sb, path, pacllen);
-+
-+	pntsd = get_smb2_acl_by_fid(cifs_sb, &open_file->fid, pacllen);
-+	cifsFileInfo_put(open_file);
-+	return pntsd;
-+}
-+
-+
- static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
- 			    loff_t offset, loff_t len, bool keep_size)
+diff --git a/fs/cifs/cifs_unicode.c b/fs/cifs/cifs_unicode.c
+index a0b3e7d..e0445e2 100644
+--- a/fs/cifs/cifs_unicode.c
++++ b/fs/cifs/cifs_unicode.c
+@@ -79,6 +79,10 @@ convert_sfu_char(const __u16 src_char, char *target)
+ static bool
+ convert_sfm_char(const __u16 src_char, char *target)
  {
-@@ -2391,6 +2492,11 @@ struct smb_version_operations smb20_operations = {
- 	.dir_needs_close = smb2_dir_needs_close,
- 	.get_dfs_refer = smb2_get_dfs_refer,
- 	.select_sectype = smb2_select_sectype,
-+#ifdef CONFIG_CIFS_ACL
-+	.get_acl = get_smb2_acl,
-+	.get_acl_by_fid = get_smb2_acl_by_fid,
-+/*	.set_acl = set_smb3_acl, */
-+#endif /* CIFS_ACL */
- };
- 
- struct smb_version_operations smb21_operations = {
-@@ -2475,6 +2581,11 @@ struct smb_version_operations smb21_operations = {
- 	.enum_snapshots = smb3_enum_snapshots,
- 	.get_dfs_refer = smb2_get_dfs_refer,
- 	.select_sectype = smb2_select_sectype,
-+#ifdef CONFIG_CIFS_ACL
-+	.get_acl = get_smb2_acl,
-+	.get_acl_by_fid = get_smb2_acl_by_fid,
-+/*	.set_acl = set_smb3_acl, */
-+#endif /* CIFS_ACL */
- };
- 
- struct smb_version_operations smb30_operations = {
-@@ -2569,6 +2680,11 @@ struct smb_version_operations smb30_operations = {
- 	.receive_transform = smb3_receive_transform,
- 	.get_dfs_refer = smb2_get_dfs_refer,
- 	.select_sectype = smb2_select_sectype,
-+#ifdef CONFIG_CIFS_ACL
-+	.get_acl = get_smb2_acl,
-+	.get_acl_by_fid = get_smb2_acl_by_fid,
-+/*	.set_acl = set_smb3_acl, */
-+#endif /* CIFS_ACL */
- };
- 
- #ifdef CONFIG_CIFS_SMB311
-@@ -2664,6 +2780,11 @@ struct smb_version_operations smb311_operations = {
- 	.receive_transform = smb3_receive_transform,
- 	.get_dfs_refer = smb2_get_dfs_refer,
- 	.select_sectype = smb2_select_sectype,
-+#ifdef CONFIG_CIFS_ACL
-+	.get_acl = get_smb2_acl,
-+	.get_acl_by_fid = get_smb2_acl_by_fid,
-+/*	.set_acl = set_smb3_acl, */
-+#endif /* CIFS_ACL */
- };
- #endif /* CIFS_SMB311 */
- 
--- 
-1.9.1
++	if (src_char >=3D 0xF001 && src_char <=3D 0xF01F) {
++		*target =3D src_char - 0xF000;
++		return true;
++	}
+ 	switch (src_char) {
+ 	case SFM_COLON:
+ 		*target =3D ':';
+@@ -417,6 +421,10 @@ static __le16 convert_to_sfm_char(char src_char, bool =
+end_of_string)
+ {
+ 	__le16 dest_char;
+=20
++	if (src_char >=3D 0x01 && src_char <=3D 0x1F) {
++		dest_char =3D cpu_to_le16(src_char + 0xF000);
++		return dest_char;
++	}
+ 	switch (src_char) {
+ 	case ':':
+ 		dest_char =3D cpu_to_le16(SFM_COLON);
+--=20
+2.7.4
+
+
+--6c2NcOVqGQ03X4Wi--
+
+--Pd0ReVV5GZGQvF3a
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEAREIAAYFAlkv15YACgkQdoo0s+hIejnqhgCeKUqClws9DJmOHfcrTvAG5DFt
+rqAAn1kToX6XNQdJdlPg432QQQVYYF9V
+=Of3n
+-----END PGP SIGNATURE-----
+
+--Pd0ReVV5GZGQvF3a--
