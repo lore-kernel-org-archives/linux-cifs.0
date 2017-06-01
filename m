@@ -1,7 +1,7 @@
 From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH 1/2] cifs: prototype declaration and definition for smb 2 - 3 and cifsacl mount options
-Date: Wed, 31 May 2017 23:50:05 -0500
-Message-ID: <1496292605-8754-1-git-send-email-shirishpargaonkar@gmail.com>
+Subject: [PATCH 2/2] cifs: Use smb 2 - 3 and cifsacl mount options getacl functions
+Date: Wed, 31 May 2017 23:50:24 -0500
+Message-ID: <1496292624-8818-1-git-send-email-shirishpargaonkar@gmail.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
         Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -11,135 +11,173 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-Add definition and declaration of function to get cifs acls when
-mounting with smb version 2 onwards to 3.
-
-Extend/Alter query info function to allocate and return
-security descriptors within the response.
-
-Not yet handling the error case when the size of security descriptors
-in response to query exceeds SMB2_MAX_BUFFER_SIZE.
+Fill in smb2/3 query acl functions in ops structures and use them.
 
 Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
 ---
- fs/cifs/smb2pdu.c   | 52 +++++++++++++++++++++++++++++++++++++++++-----------
- fs/cifs/smb2proto.h |  3 +++
- 2 files changed, 44 insertions(+), 11 deletions(-)
+ fs/cifs/smb2ops.c | 121 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 121 insertions(+)
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index e4afdaa..4938e8b 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -2081,8 +2081,9 @@ static inline void init_copy_chunk_defaults(struct cifs_tcon *tcon)
- 
- static int
- query_info(const unsigned int xid, struct cifs_tcon *tcon,
--	   u64 persistent_fid, u64 volatile_fid, u8 info_class,
--	   size_t output_len, size_t min_len, void *data)
-+	   u64 persistent_fid, u64 volatile_fid, u8 info_class, u8 info_type,
-+	   u32 additional_info, size_t output_len, size_t min_len, void **data,
-+		u32 *dlen)
- {
- 	struct smb2_query_info_req *req;
- 	struct smb2_query_info_rsp *rsp = NULL;
-@@ -2108,10 +2109,11 @@ static inline void init_copy_chunk_defaults(struct cifs_tcon *tcon)
- 	if (encryption_required(tcon))
- 		flags |= CIFS_TRANSFORM_REQ;
- 
--	req->InfoType = SMB2_O_INFO_FILE;
-+	req->InfoType = info_type;
- 	req->FileInfoClass = info_class;
- 	req->PersistentFileId = persistent_fid;
- 	req->VolatileFileId = volatile_fid;
-+	req->AdditionalInformation = cpu_to_le32(additional_info);
- 	/* 4 for rfc1002 length field and 1 for Buffer */
- 	req->InputBufferOffset =
- 		cpu_to_le16(sizeof(struct smb2_query_info_req) - 1 - 4);
-@@ -2130,24 +2132,51 @@ static inline void init_copy_chunk_defaults(struct cifs_tcon *tcon)
- 		goto qinf_exit;
- 	}
- 
-+	if (dlen) {
-+		*dlen = le32_to_cpu(rsp->OutputBufferLength);
-+		if (!*data) {
-+			*data = kmalloc(*dlen, GFP_KERNEL);
-+			if (!*data) {
-+				cifs_dbg(VFS,
-+					"Error %d allocating memory for acl\n",
-+					rc);
-+				*dlen = 0;
-+				goto qinf_exit;
-+			}
-+		}
-+	}
-+
- 	rc = validate_and_copy_buf(le16_to_cpu(rsp->OutputBufferOffset),
- 				   le32_to_cpu(rsp->OutputBufferLength),
--				   &rsp->hdr, min_len, data);
-+				   &rsp->hdr, min_len, *data);
- 
- qinf_exit:
- 	free_rsp_buf(resp_buftype, rsp);
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index c586918..7157f52 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -1288,6 +1288,107 @@ static bool smb2_set_sparse(const unsigned int xid, struct cifs_tcon *tcon,
  	return rc;
  }
  
-+int SMB2_query_info(const unsigned int xid, struct cifs_tcon *tcon,
-+	u64 persistent_fid, u64 volatile_fid, struct smb2_file_all_info *data)
++static struct cifs_ntsd *
++get_smb2_acl_by_fid(struct cifs_sb_info *cifs_sb,
++		const struct cifs_fid *cifsfid, u32 *pacllen)
 +{
-+	return query_info(xid, tcon, persistent_fid, volatile_fid,
-+			  FILE_ALL_INFORMATION, SMB2_O_INFO_FILE, 0,
-+			  sizeof(struct smb2_file_all_info) + PATH_MAX * 2,
-+			  sizeof(struct smb2_file_all_info), (void **)&data,
-+			  NULL);
++	struct cifs_ntsd *pntsd = NULL;
++	unsigned int xid;
++	int rc = -EOPNOTSUPP;
++	struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
++
++	if (IS_ERR(tlink))
++		return ERR_CAST(tlink);
++
++	xid = get_xid();
++	cifs_dbg(VFS, "trying to get acl\n");
++
++	rc = SMB2_query_acl(xid, tlink_tcon(tlink), cifsfid->persistent_fid,
++			    cifsfid->volatile_fid, (void **)&pntsd, pacllen);
++	free_xid(xid);
++
++	cifs_put_tlink(tlink);
++
++	cifs_dbg(FYI, "%s: rc = %d ACL len %d\n", __func__, rc, *pacllen);
++	if (rc)
++		return ERR_PTR(rc);
++	return pntsd;
++
 +}
 +
- int
--SMB2_query_info(const unsigned int xid, struct cifs_tcon *tcon,
-+SMB2_query_acl(const unsigned int xid, struct cifs_tcon *tcon,
- 		u64 persistent_fid, u64 volatile_fid,
--		struct smb2_file_all_info *data)
-+		void **data, u32 *plen)
- {
-+	__u32 additional_info = OWNER_SECINFO | GROUP_SECINFO | DACL_SECINFO;
-+	*plen = 0;
++static struct cifs_ntsd *
++get_smb2_acl_by_path(struct cifs_sb_info *cifs_sb,
++		const char *path, u32 *pacllen)
++{
++	struct cifs_ntsd *pntsd = NULL;
++	u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
++	unsigned int xid;
++	int rc;
++	struct cifs_tcon *tcon;
++	struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
++	struct cifs_fid fid;
++	struct cifs_open_parms oparms;
++	__le16 *utf16_path;
 +
- 	return query_info(xid, tcon, persistent_fid, volatile_fid,
--			  FILE_ALL_INFORMATION,
--			  sizeof(struct smb2_file_all_info) + PATH_MAX * 2,
--			  sizeof(struct smb2_file_all_info), data);
-+			  0, SMB2_O_INFO_SECURITY, additional_info,
-+			  SMB2_MAX_BUFFER_SIZE,
-+			  sizeof(struct smb2_file_all_info), data, plen);
- }
- 
- int
-@@ -2155,9 +2184,10 @@ static inline void init_copy_chunk_defaults(struct cifs_tcon *tcon)
- 		 u64 persistent_fid, u64 volatile_fid, __le64 *uniqueid)
++	cifs_dbg(FYI, "get smb3 acl for path %s\n", path);
++	if (IS_ERR(tlink))
++		return ERR_CAST(tlink);
++
++	tcon = tlink_tcon(tlink);
++	xid = get_xid();
++
++	if (backup_cred(cifs_sb))
++		oparms.create_options |= CREATE_OPEN_BACKUP_INTENT;
++	else
++		oparms.create_options = 0;
++
++	utf16_path = cifs_convert_path_to_utf16(path, cifs_sb);
++	if (!utf16_path)
++		return ERR_PTR(-ENOMEM);
++
++	oparms.tcon = tcon;
++	oparms.desired_access = READ_CONTROL;
++	oparms.disposition = FILE_OPEN;
++	oparms.fid = &fid;
++	oparms.reconnect = false;
++
++	rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL);
++	kfree(utf16_path);
++	if (!rc) {
++		rc = SMB2_query_acl(xid, tlink_tcon(tlink), fid.persistent_fid,
++			    fid.volatile_fid, (void **)&pntsd, pacllen);
++		SMB2_close(xid, tcon, fid.persistent_fid, fid.volatile_fid);
++	}
++
++	cifs_put_tlink(tlink);
++	free_xid(xid);
++
++	cifs_dbg(FYI, "%s: rc = %d ACL len %d\n", __func__, rc, *pacllen);
++	if (rc)
++		return ERR_PTR(rc);
++	return pntsd;
++}
++
++/* Retrieve an ACL from the server */
++static struct cifs_ntsd *
++get_smb2_acl(struct cifs_sb_info *cifs_sb,
++				      struct inode *inode, const char *path,
++				      u32 *pacllen)
++{
++	struct cifs_ntsd *pntsd = NULL;
++	struct cifsFileInfo *open_file = NULL;
++
++	if (inode)
++		open_file = find_readable_file(CIFS_I(inode), true);
++	if (!open_file)
++		return get_smb2_acl_by_path(cifs_sb, path, pacllen);
++
++	pntsd = get_smb2_acl_by_fid(cifs_sb, &open_file->fid, pacllen);
++	cifsFileInfo_put(open_file);
++	return pntsd;
++}
++
++
+ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
+ 			    loff_t offset, loff_t len, bool keep_size)
  {
- 	return query_info(xid, tcon, persistent_fid, volatile_fid,
--			  FILE_INTERNAL_INFORMATION,
-+			  FILE_INTERNAL_INFORMATION, SMB2_O_INFO_FILE, 0,
-+			  sizeof(struct smb2_file_internal_info),
- 			  sizeof(struct smb2_file_internal_info),
--			  sizeof(struct smb2_file_internal_info), uniqueid);
-+			  (void **)&uniqueid, NULL);
- }
+@@ -2391,6 +2492,11 @@ struct smb_version_operations smb20_operations = {
+ 	.dir_needs_close = smb2_dir_needs_close,
+ 	.get_dfs_refer = smb2_get_dfs_refer,
+ 	.select_sectype = smb2_select_sectype,
++#ifdef CONFIG_CIFS_ACL
++	.get_acl = get_smb2_acl,
++	.get_acl_by_fid = get_smb2_acl_by_fid,
++/*	.set_acl = set_smb3_acl, */
++#endif /* CIFS_ACL */
+ };
  
- /*
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index 6853454..3595cd7 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -135,6 +135,9 @@ extern int SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon,
- extern int SMB2_query_info(const unsigned int xid, struct cifs_tcon *tcon,
- 			   u64 persistent_file_id, u64 volatile_file_id,
- 			   struct smb2_file_all_info *data);
-+extern int SMB2_query_acl(const unsigned int xid, struct cifs_tcon *tcon,
-+			   u64 persistent_file_id, u64 volatile_file_id,
-+			   void **data, unsigned int *plen);
- extern int SMB2_get_srv_num(const unsigned int xid, struct cifs_tcon *tcon,
- 			    u64 persistent_fid, u64 volatile_fid,
- 			    __le64 *uniqueid);
+ struct smb_version_operations smb21_operations = {
+@@ -2475,6 +2581,11 @@ struct smb_version_operations smb21_operations = {
+ 	.enum_snapshots = smb3_enum_snapshots,
+ 	.get_dfs_refer = smb2_get_dfs_refer,
+ 	.select_sectype = smb2_select_sectype,
++#ifdef CONFIG_CIFS_ACL
++	.get_acl = get_smb2_acl,
++	.get_acl_by_fid = get_smb2_acl_by_fid,
++/*	.set_acl = set_smb3_acl, */
++#endif /* CIFS_ACL */
+ };
+ 
+ struct smb_version_operations smb30_operations = {
+@@ -2569,6 +2680,11 @@ struct smb_version_operations smb30_operations = {
+ 	.receive_transform = smb3_receive_transform,
+ 	.get_dfs_refer = smb2_get_dfs_refer,
+ 	.select_sectype = smb2_select_sectype,
++#ifdef CONFIG_CIFS_ACL
++	.get_acl = get_smb2_acl,
++	.get_acl_by_fid = get_smb2_acl_by_fid,
++/*	.set_acl = set_smb3_acl, */
++#endif /* CIFS_ACL */
+ };
+ 
+ #ifdef CONFIG_CIFS_SMB311
+@@ -2664,6 +2780,11 @@ struct smb_version_operations smb311_operations = {
+ 	.receive_transform = smb3_receive_transform,
+ 	.get_dfs_refer = smb2_get_dfs_refer,
+ 	.select_sectype = smb2_select_sectype,
++#ifdef CONFIG_CIFS_ACL
++	.get_acl = get_smb2_acl,
++	.get_acl_by_fid = get_smb2_acl_by_fid,
++/*	.set_acl = set_smb3_acl, */
++#endif /* CIFS_ACL */
+ };
+ #endif /* CIFS_SMB311 */
+ 
 -- 
 1.9.1
