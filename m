@@ -1,76 +1,98 @@
-From: =?UTF-8?Q?Bj=c3=b6rn_Jacke?= <bjacke-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] CIFS: add SFM mapping for 0x01-0x1F
-Date: Thu, 1 Jun 2017 12:04:28 +0200
-Message-ID: <9c69c458-07a8-cd52-df30-72eb28fde38a@samba.org>
-References: <20170601090006.GA21508@SerNet.DE>
- <mps4lw0t5o8.fsf@aaptelpc.suse.de>
+From: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
+Subject: Re: [PATCH 04/12] fs: ceph: CURRENT_TIME with
+	ktime_get_real_ts()
+Date: Thu, 1 Jun 2017 12:22:47 +0200
+Message-ID: <CAK8P3a1pCw1Oo-Wg70kH5L12pbtEzGDfaPZ8g6ErERJjvY8znQ@mail.gmail.com>
+References: <1491613030-11599-1-git-send-email-deepa.kernel@gmail.com>
+	<1491613030-11599-5-git-send-email-deepa.kernel@gmail.com>
+	<CAAM7YAmp=cZKqGHa8UqDnrQLCe+6TKx+7w9SDZv4cW5fr4dfvA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="LTmk2KcS76Ut3ce1NTNlhAiFclFreO5Eb"
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>,
-        sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <mps4lw0t5o8.fsf-zpEvHKhluMwYitT5tn2FcQ@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: yuchao0-hv44wF8Li93QT0dZR+AlfA@public.gmane.org, "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
+	Chris Mason <clm-b10kYP2dOMg@public.gmane.org>, linux-mtd <linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
+	Deepa Dinamani <deepa.kernel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Evgeniy Dushistov <dushistov-JGs/UdohzUI@public.gmane.org>,
+	Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>,
+	ceph-devel <ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Paul Moore <paul-r2n+y4ga6xFZroRs9YW3xA@public.gmane.org>,
+	y2038 Mailman List <y2038-cunTk1MwBs8s++Sfvej+rw@public.gmane.org>,
+	Ingo Molnar <mingo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Steven Rostedt <rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org>, "Drokin,
+	Oleg" <oleg.drokin-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, John Stultz <john.stultz-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
+	Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>, David Sterba <dsterba-IBi9RG/b67k@public.gmane.org>,
+	Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>,
+	Josef Bacik <jbacik-b10kYP2dOMg@public.gmane.org>, gregkh <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	Linux Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Eric Par
+To: "Yan, Zheng" <ukernel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <lustre-devel-bounces-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org>
+In-Reply-To: <CAAM7YAmp=cZKqGHa8UqDnrQLCe+6TKx+7w9SDZv4cW5fr4dfvA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+List-Unsubscribe: <http://lists.lustre.org/options.cgi/lustre-devel-lustre.org>,
+	<mailto:lustre-devel-request-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.lustre.org/pipermail/lustre-devel-lustre.org/>
+List-Post: <mailto:lustre-devel-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org>
+List-Help: <mailto:lustre-devel-request-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org?subject=help>
+List-Subscribe: <http://lists.lustre.org/listinfo.cgi/lustre-devel-lustre.org>,
+	<mailto:lustre-devel-request-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org?subject=subscribe>
+Errors-To: lustre-devel-bounces-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org
+Sender: "lustre-devel" <lustre-devel-bounces-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org>
+List-Id: linux-cifs.vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---LTmk2KcS76Ut3ce1NTNlhAiFclFreO5Eb
-Content-Type: multipart/mixed; boundary="neRDVL0UlHprhSCqfggEIEWEtXQx9oAmk";
- protected-headers="v1"
-From: =?UTF-8?Q?Bj=c3=b6rn_Jacke?= <bjacke-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-To: =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>, sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Message-ID: <9c69c458-07a8-cd52-df30-72eb28fde38a-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] CIFS: add SFM mapping for 0x01-0x1F
-References: <20170601090006.GA21508-PS7XAnAlDA+VvDNblw4Uiw@public.gmane.org>
- <mps4lw0t5o8.fsf-zpEvHKhluMwYitT5tn2FcQ@public.gmane.org>
-In-Reply-To: <mps4lw0t5o8.fsf-zpEvHKhluMwYitT5tn2FcQ@public.gmane.org>
+On Thu, Jun 1, 2017 at 11:56 AM, Yan, Zheng <ukernel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> On Sat, Apr 8, 2017 at 8:57 AM, Deepa Dinamani <deepa.kernel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
---neRDVL0UlHprhSCqfggEIEWEtXQx9oAmk
-Content-Type: text/plain; charset=utf-8
-Content-Language: de-DE
-Content-Transfer-Encoding: quoted-printable
+>> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+>> index 517838b..77204da 100644
+>> --- a/drivers/block/rbd.c
+>> +++ b/drivers/block/rbd.c
+>> @@ -1922,7 +1922,7 @@ static void rbd_osd_req_format_write(struct rbd_obj_request *obj_request)
+>>  {
+>>         struct ceph_osd_request *osd_req = obj_request->osd_req;
+>>
+>> -       osd_req->r_mtime = CURRENT_TIME;
+>> +       ktime_get_real_ts(&osd_req->r_mtime);
+>>         osd_req->r_data_offset = obj_request->offset;
+>>  }
+>>
+>> diff --git a/fs/ceph/mds_client.c b/fs/ceph/mds_client.c
+>> index c681762..1d3fa90 100644
+>> --- a/fs/ceph/mds_client.c
+>> +++ b/fs/ceph/mds_client.c
+>> @@ -1666,6 +1666,7 @@ struct ceph_mds_request *
+>>  ceph_mdsc_create_request(struct ceph_mds_client *mdsc, int op, int mode)
+>>  {
+>>         struct ceph_mds_request *req = kzalloc(sizeof(*req), GFP_NOFS);
+>> +       struct timespec ts;
+>>
+>>         if (!req)
+>>                 return ERR_PTR(-ENOMEM);
+>> @@ -1684,7 +1685,8 @@ ceph_mdsc_create_request(struct ceph_mds_client *mdsc, int op, int mode)
+>>         init_completion(&req->r_safe_completion);
+>>         INIT_LIST_HEAD(&req->r_unsafe_item);
+>>
+>> -       req->r_stamp = current_fs_time(mdsc->fsc->sb);
+>> +       ktime_get_real_ts(&ts);
+>> +       req->r_stamp = timespec_trunc(ts, mdsc->fsc->sb->s_time_gran);
+>
+> This change causes our kernel_untar_tar test case to fail (inode's
+> ctime goes back). The reason is that there is time drift between the
+> time stamps got by  ktime_get_real_ts() and current_time(). We need to
+> revert this change until current_time() uses ktime_get_real_ts()
+> internally.
 
-Hi Aur=C3=A9lien,
-On 01.06.2017 11:31, Aur=C3=A9lien Aptel wrote:
-> Are these mappings documented somewhere? Now that Windows has a new
-> Linux subsystem I wonder if any of these SFM/SFU mappings have changed.=
+Hmm, the change was not supposed to have a user-visible effect, so
+something has gone wrong, but I don't immediately see how it
+relates to what you observe.
 
->=20
-> Cheers,
->=20
+ktime_get_real_ts() and current_time() use the same time base, there
+is no drift, but there is a difference in resolution, as the latter uses
+the time stamp of the last jiffies update, which may be up to one jiffy
+(10ms) behind the exact time we put in the request stamps here.
 
-it once was documentd in MS KB117258 ... which disappeared
-unfortunately, wayback machine still has is though:
+Do you still see problems if you use current_kernel_time() instead of
+ktime_get_real_ts()?
 
-https://web-beta.archive.org/web/20150315001238/http://support.microsoft.=
-com:80/en-us/kb/117258
-
-I also verified that current OS X clients use these mappings for SMB.
-
-The only remaining mapping which needs fixing in the cifs module is the
-backslash now.
-
-Bj=C3=B6rn
-
-
-
---neRDVL0UlHprhSCqfggEIEWEtXQx9oAmk--
-
---LTmk2KcS76Ut3ce1NTNlhAiFclFreO5Eb
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEAREIAAYFAlkv5q0ACgkQdoo0s+hIejlbfACg9aJ69Y6Hh2BvetNdO4oadmwD
-6eMAnRK5H7tdSYR2kJfzNaLdi5LuB7YS
-=ourF
------END PGP SIGNATURE-----
-
---LTmk2KcS76Ut3ce1NTNlhAiFclFreO5Eb--
+        Arnd
