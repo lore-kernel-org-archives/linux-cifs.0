@@ -1,70 +1,194 @@
-From: <jessica.jones-PnMVE5gNl/Vkbu+0n/iG1Q@public.gmane.org>
-Subject: (unknown)
-Date: Fri, 02 Jun 2017 08:02:55 -0000
-Message-ID: <149639057510.8931.9691434506660071505@mts-nn.ru>
+From: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
+Subject: Re: [PATCH 04/12] fs: ceph: CURRENT_TIME with
+	ktime_get_real_ts()
+Date: Fri, 2 Jun 2017 11:45:47 +0200
+Message-ID: <CAK8P3a1TwkVRCwDWqgYE8Z3wZT2+v6xayq=dVeW8KaHmO0W4cg@mail.gmail.com>
+References: <1491613030-11599-1-git-send-email-deepa.kernel@gmail.com>
+	<1491613030-11599-5-git-send-email-deepa.kernel@gmail.com>
+	<CAAM7YAmp=cZKqGHa8UqDnrQLCe+6TKx+7w9SDZv4cW5fr4dfvA@mail.gmail.com>
+	<CAK8P3a1pCw1Oo-Wg70kH5L12pbtEzGDfaPZ8g6ErERJjvY8znQ@mail.gmail.com>
+	<CAAM7YAnWLUXMOCVbgfdKGfvK04EtAQcz-ETm7xFO=8Y=_fCvOQ@mail.gmail.com>
+	<CALAqxLV-yVKWM5es7fAFiDzhSQmtZFiZDPQwBRUYbWUtqhoWVg@mail.gmail.com>
+	<CABeXuvqvLr6sSGF+rZEXXxpCBDKTOeLX1ObSjbPPY4aFBuwvMg@mail.gmail.com>
+	<CAAM7YAkXNo_69tOrw6a5kpyref9nEpEp-2vxBbFVSHGmAVbt+A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: application/zip; name="6161255567811.zip"
-Content-Transfer-Encoding: base64
-To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: attachment
-Subject: 
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: yuchao0-hv44wF8Li93QT0dZR+AlfA@public.gmane.org, "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
+	Chris Mason <clm-b10kYP2dOMg@public.gmane.org>, linux-mtd <linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
+	Deepa Dinamani <deepa.kernel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Evgeniy Dushistov <dushistov-JGs/UdohzUI@public.gmane.org>,
+	Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>,
+	ceph-devel <ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Paul Moore <paul-r2n+y4ga6xFZroRs9YW3xA@public.gmane.org>,
+	y2038 Mailman List <y2038-cunTk1MwBs8s++Sfvej+rw@public.gmane.org>,
+	Ingo Molnar <mingo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Steven Rostedt <rostedt-nx8X9YLhiw1AfugRpC6u6w@public.gmane.org>, "Drokin,
+	Oleg" <oleg.drokin-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, John Stultz <john.stultz-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
+	Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>, David Sterba <dsterba-IBi9RG/b67k@public.gmane.org>,
+	Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>,
+	Josef Bacik <jbacik-b10kYP2dOMg@public.gmane.org>, gregkh <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	Linux Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Eric Par
+To: "Yan, Zheng" <ukernel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <lustre-devel-bounces-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org>
+In-Reply-To: <CAAM7YAkXNo_69tOrw6a5kpyref9nEpEp-2vxBbFVSHGmAVbt+A-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+List-Unsubscribe: <http://lists.lustre.org/options.cgi/lustre-devel-lustre.org>,
+	<mailto:lustre-devel-request-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.lustre.org/pipermail/lustre-devel-lustre.org/>
+List-Post: <mailto:lustre-devel-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org>
+List-Help: <mailto:lustre-devel-request-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org?subject=help>
+List-Subscribe: <http://lists.lustre.org/listinfo.cgi/lustre-devel-lustre.org>,
+	<mailto:lustre-devel-request-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org?subject=subscribe>
+Errors-To: lustre-devel-bounces-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org
+Sender: "lustre-devel" <lustre-devel-bounces-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org>
+List-Id: linux-cifs.vger.kernel.org
 
-UEsDBBQAAgAIAAVtwkoTFdqXoAsAAKILAAAJABwAMTAxODEuemlwVVQJAANZFjFZWRYxWXV4CwAB
-BAAAAAAEAAAAAHWWeTQUjBrGBymML9HYKss3yBbG2MJkCCNh7MZ2EWWNQiMhQlRmMiTZiTENEUqW
-YRCyRtllp8aeGTuDMbfu98c9555zn3Oe53nf95z3/5+FCdsJEIAVwAE44d9yvZogpXjEBQBsgwG/
-LxcAyhDly8qKvsG2NpwANnsBZYc/RocCASwnAL/1n1hznEicQPA9rGZhxjYLYviSVWmSnlWfwJ8a
-FbZnOzJ4P5V4uYdzyASFsLYyG9FvkZgh5yTjMzd5f502xYAPrdKsiSV1apGk1cSawamJqa9rlDtq
-mosXNQwHkToh1vsLO6Ma5a4i8T/TWqecGie35tuyRmemyaLm+pexc3bQHkkFfI5qKkb/aPLCNBXy
-aDccDTsCM3/GNZKmTjJ9E1mmye4laysB+3sTUUHbtpDlYEGDaKzS1lLOoOx2RhbFnEouHTmCfp8M
-iMkyqSa70Gkjx2H8ZZrOoQ95H/PE4cRb4aefLKTZXpCyPMf+k+ijdWLuVhhjfyqftEr8dgDlzsek
-L9qOXqjPGr7LUUyrGcutvPL1175RLWtUCnd0Wj0BaLMh8vg8sXXlB9hGLF27R2yc2qHQc2lgzU47
-p7u46/Pl0RnGNoGxHGovZckXHy7Ec0e6hxIyuqAv8vOn+lLA9LOuRaMOfzfdPqSTY9JfMhP6HR7f
-OZE6Aazv0fxGga+M0ASxwNxO2+5UxKaSYqVMMb722o7ZHJhu1WG50vI07Lbm9Hz9t5ja3g6zdcbw
-8GH5WA0N/ji5WwrszI7SM4irobK+ga5uGBug50XyGM9bo/Z8ag/vkjdwGudn7lVyNk0nykceHr5S
-dztcX4X90Lj+fkwOknO277iWswVzpxnhCICWrKOoMfynOKN9cbF93FOi8Qv4aVasF4fUiQBDbmYk
-5/ezYa+8tXvrHgnfy5iMvbY4aJS8ZmP2bMr4Xby2BHtk03r1KQXxF7deDvsX4Wg1KjTv2KetcYKg
-A1GBzoJZ662tM+RLiuYDcA65HHtvNqscHwxqUMJ/Z/ks7GSThdPKlXzChByfh96Pth5374iuN6Py
-1arlmeI8oTL73G2PH78QfNFnvK+Sh/RtJ5hL38qeUrenDQY1iH3YmUavMtI7r+jMH9qX7j2on0a1
-hrmqrz5Efa//4EgDkrQeoBJXH2KPi7dpBByZRglOWvRQpFEa00LiImgU31uT9uMgqAsu8FYjiNEH
-r6IH4kJiJ73ef9QPp09/yY7d7iI8lPUYgbr8DSUkoXKloAtJWdjYiDt+wpUFR7LzYv7HpT9qB6Tb
-agtiU0pSdBoiEvFdydqDxKTF1J6x64dWN7vPr6YQ33hI5Dl0HIP1xSZsO9WuT5iO2wTNtKvztC+d
-HYSXmVGFNvPN9OBD2a5lqjXHDZ22I56xjmWq79/PNn3PEHGrr9YQCSLRCs2U04+VcsRC4pXmmGVz
-R8+XMxYXzL/DU6uN/f1ztpf9xpuq5V8dX1kb5XVy8A+9yjRol9dKAdapb47ZDOmN34qlc6bHus6i
-YPLXt3nUYzz17nKaWIRfY/n2PMkXYiLHZTgwIMwV7sWhC48wcjUUKxXK4m8faBc+l2KarOSBJjQ8
-qcrXVEWAAG26l0on7DyLm/sTqhz0qooue/bSz1fqag1op08oswbODGCWXIW4eDMq3FkKCUAQ5aJg
-32xyn6RB/Uf5J2NAuvfStoupCsbdsN8NmltQ8dH7ieANo1R4/vFUadP4jGVkd3Gu/3N28Z8v2G2i
-XuOr6DdqJiVkapRP4q7iCtojgjOboOrXgjCwfcvD7nr1mqUty9dbHbvInTQv9I0Qg6jhJjXGSxY5
-/ey0CbxQD0Hm0qWEDyNJ3AyV7wpq571BsxnYf3ktEN+qZMVodo9LCD21kR9ZeDCaSXlr6IunUEyx
-rLIgh1khL2c2kPSQ4qu9Xrfc29ltoNA68EyIZocpli31y/xDrfSFPvfXiNmYZryQs3iwjctEcykP
-HdguCzuNjN6BwGuv5d0y6PfebMEs5YnLqSD0EKBgM8sTO0rr7qSlPPuo1JxJVsXotjnDeZ0Phtnf
-dh+LfpE53rJYR+0yn8UycTHMG6CjVAaN98hPxkLyDHvGz+60Aa538zcjDRW1PSWXXCd6+tyLLinF
-8zcIhiWWy4d5yfPZ4Qs9GiU9NHRqUpWdOpzl1coPydykD99K1MrNerQcWugZaTwKlgYmDJTKixEo
-1zs1RJarSlWoclRAME9POf9G6vLyljX5yVECshy+lhtoOFrqrnre18UhI+/R1V5Y5hYZBBXnGmLG
-VUX3qubhFM4aLMSQz2lqVTyidV4FwZ8t0xwARaM9XLurMsRv3vZ+UgS6Kb5Co+GMz6e/Dv4CMpLj
-YhTqrAVYgOHyvmiLTKmPdcYKr1636UayCN6gQCvTdaMotUXUMARLad89A0tf5YRaPydMupxXIbeB
-UxsZejHhwjt7iNg3BSW2hCot79tfkzWrg2RJ3NlPgU+7MsQOVgxIRdklwB2wBFs/3uWSlyKrViob
-TPq+XWqzvK4jwwY9Zo/mNJEWJmHzdME3rejBHtEXvdDAcov7NraOKFBPg3zioBAXTNDnq6PjO8tt
-9bIgn96lANkoX+ciMsMUJO5Kc9gBtzSLvs/Cd+K7UHsJLdH23t5RCCIuchjvMqTWe5XZ/IuD+Zly
-t3dU28kk/h5vnPmHIqOKoGVIsGwphyxX+x1YZupJqvAlD8uSyunCTgTVcmgIXBNoHeZB6SYOd8Xy
-M3hm8ELcnOsVfreR4oaoj82w6RRms1TSX+GcfXokiLISeAU5/DwLz/EUxXCqFMvNZ/rg3lTIPJqf
-E3n+MX5LUMDwqe/85yAXIAz4KbYRcX/yPCuuAL7dCywQV6GyYT4JODS/1VChV/EpYVOcyuAHuUWA
-YFtsJ9Y2J1HbEVS9TBZIxFzJjNnyG+IlrBcHFeMZlZr4jWHSwfuqBx3sGBmM1akKoQNJitM7quCx
-PoKwizN/sO5dFG6H6Q+xVi1/5oXAkTZXEj7bfvKSzBQEv3LUL6IOQfbOLSenl5h07Qo5kb6/b9Je
-DJryoSvYzYp+8SFiI+LqRO2+Fgd3c8/eVrj2rOBe2QZa4bV0vWciWNx2a3xyE2XftOibLelcI+Ay
-lNOeyGAgJRzEpYHeUeIZpNqfZRfAhhmFYAwIQ97lFIi53U2QcJDMut/tToWHgnJD6hwX5nvGjBC/
-OiNCbiKSv1S+hXyldlm5nWx6Ff08KXUJuRZ75SJMH5Rrjw2HuCkPsUYqGBcJjrD2sn39dX8csy9i
-N5QDtTu1nltT4NrPP9wLlqArOCMVY53rrNU2H2zGkMkQ+UIdidmytM1IuNcJM+Zl/MaWNjWwBaOj
-1FGbKbjQw0laxPJbNuzHkAVkREnWahVWV9sKD4dTe4nkzlQhNIvFSwvXNMvI0BToUve3nO7csB8O
-y6sxCX7GAYc7IvRxVJH5hz53YqVbNYXkrCJMfVn9a4YHcxzQzxQGyfEBP1zzPViNDN6MQBf7CTuc
-IcOWphuNKhakREpKsCSkp5WNc79VOwR2Wn6HIrnj3rHyGhrw+KIm3YRE1pD0Rs/Zs8BSpg75Fbxc
-KPgi57v512egGor+9532TAbpQ3p4iAfo8kjtDhmcnzcypoaa9iwLUB13e+ApWRHQ9ZBaiXW3zPFB
-LzbUVrj2mkoYL1qLvZN3XyBgVqg30Ammn946XZHMNW8KBO0szU6eLl0D3NU6nIvOrdaBva4k4r5m
-7cACf/xNYezK3d1DNcfjlGZEiHsdrWtTT+6PlmypIOC0L4nHDQZexAAYrW2RGn2S+ozN9izk0WXi
-DBKGbnnbFNmX0u50xf+z+YUQmz4xTBOP+l7WbOu8LcRlzogP1WwWvK8XMHYU1maJvF5JfBvAatR8
-4+BI/24IWNiUceZx2gYmim9jqH+Vdmz8eTntzDFMhbzPY2HCwirK9v/4WegPHgNYfrsw+s/0X5pm
-/4em/4ekLUzYT/7zwQJA/m4d4J/t31BLAQIeAxQAAgAIAAVtwkoTFdqXoAsAAKILAAAJABgAAAAA
-AAAAAACkgQAAAAAxMDE4MS56aXBVVAUAA1kWMVl1eAsAAQQAAAAABAAAAABQSwUGAAAAAAEAAQBP
-AAAA4wsAAAAA
+On Fri, Jun 2, 2017 at 4:09 AM, Yan, Zheng <ukernel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> On Fri, Jun 2, 2017 at 8:57 AM, Deepa Dinamani <deepa.kernel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>> On Thu, Jun 1, 2017 at 5:36 PM, John Stultz <john.stultz-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
+>>> On Thu, Jun 1, 2017 at 5:26 PM, Yan, Zheng <ukernel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>>>> On Thu, Jun 1, 2017 at 6:22 PM, Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org> wrote:
+>>>>> On Thu, Jun 1, 2017 at 11:56 AM, Yan, Zheng <ukernel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>>>>>> On Sat, Apr 8, 2017 at 8:57 AM, Deepa Dinamani <deepa.kernel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>>>>>
+>>>>>>> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+>>>>>>> index 517838b..77204da 100644
+>>>>>>> --- a/drivers/block/rbd.c
+>>>>>>> +++ b/drivers/block/rbd.c
+>>>>>>> @@ -1922,7 +1922,7 @@ static void rbd_osd_req_format_write(struct rbd_obj_request *obj_request)
+>>>>>>>  {
+>>>>>>>         struct ceph_osd_request *osd_req = obj_request->osd_req;
+>>>>>>>
+>>>>>>> -       osd_req->r_mtime = CURRENT_TIME;
+>>>>>>> +       ktime_get_real_ts(&osd_req->r_mtime);
+>>>>>>>         osd_req->r_data_offset = obj_request->offset;
+>>>>>>>  }
+>>>>>>>
+>>>>>>> diff --git a/fs/ceph/mds_client.c b/fs/ceph/mds_client.c
+>>>>>>> index c681762..1d3fa90 100644
+>>>>>>> --- a/fs/ceph/mds_client.c
+>>>>>>> +++ b/fs/ceph/mds_client.c
+>>>>>>> @@ -1666,6 +1666,7 @@ struct ceph_mds_request *
+>>>>>>>  ceph_mdsc_create_request(struct ceph_mds_client *mdsc, int op, int mode)
+>>>>>>>  {
+>>>>>>>         struct ceph_mds_request *req = kzalloc(sizeof(*req), GFP_NOFS);
+>>>>>>> +       struct timespec ts;
+>>>>>>>
+>>>>>>>         if (!req)
+>>>>>>>                 return ERR_PTR(-ENOMEM);
+>>>>>>> @@ -1684,7 +1685,8 @@ ceph_mdsc_create_request(struct ceph_mds_client *mdsc, int op, int mode)
+>>>>>>>         init_completion(&req->r_safe_completion);
+>>>>>>>         INIT_LIST_HEAD(&req->r_unsafe_item);
+>>>>>>>
+>>>>>>> -       req->r_stamp = current_fs_time(mdsc->fsc->sb);
+>>>>>>> +       ktime_get_real_ts(&ts);
+>>>>>>> +       req->r_stamp = timespec_trunc(ts, mdsc->fsc->sb->s_time_gran);
+>>>>>>
+>>>>>> This change causes our kernel_untar_tar test case to fail (inode's
+>>>>>> ctime goes back). The reason is that there is time drift between the
+>>>>>> time stamps got by  ktime_get_real_ts() and current_time(). We need to
+>>>>>> revert this change until current_time() uses ktime_get_real_ts()
+>>>>>> internally.
+>>>>>
+>>>>> Hmm, the change was not supposed to have a user-visible effect, so
+>>>>> something has gone wrong, but I don't immediately see how it
+>>>>> relates to what you observe.
+>>>>>
+>>>>> ktime_get_real_ts() and current_time() use the same time base, there
+>>>>> is no drift, but there is a difference in resolution, as the latter uses
+>>>>> the time stamp of the last jiffies update, which may be up to one jiffy
+>>>>> (10ms) behind the exact time we put in the request stamps here.
+>>>>>
+>>>>> Do you still see problems if you use current_kernel_time() instead of
+>>>>> ktime_get_real_ts()?
+>>>>
+>>>> The problem disappears after using current_kernel_time().
+>>>>
+>>>> https://github.com/ceph/ceph-client/commit/2e0f648da23167034a3cf1500bc90ec60aef2417
+>>>
+>>> From the commit above:
+>>> "It seems there is time drift between ktime_get_real_ts() and
+>>> current_kernel_time()"
+>>>
+>>> Its more of a granularity difference. current_kernel_time() returns
+>>> the cached time at the last tick, where as ktime_get_real_ts() reads
+>>> the clocksource hardware and returns the immediate time.
+>>>
+>>> Filesystems usually use the cached time (similar to
+>>> CLOCK_REALTIME_COARSE), for performance reasons, as touching the
+>>> clocksource takes time.
+>>
+>> Alternatively, it would be best for this code also to use current_time().
+>> I had suggested this in one of the previous versions of the patch.
+>> The implementation of current_time() will change when we switch vfs to
+>> use 64 bit time. This will prevent such errors from happening again.
+>> But, this also means there is more code reordering for these modules
+>> to get a reference to inode.
+>>
+>
+> I took a look. it's quite inconvenience to use current_time(). I
+> prefer to temporarily use current_kernel_time().
+
+I've looked at the code some more and I think there is another angle to it:
+In your test case, 'tar' calls into the utimes syscall (or a member of its
+family), which sets the i_ctime field in the inode to the curren time
+(using current_time()), then calls __ceph_setattr(), which creates
+a mds client request, and ceph_mdsc_create_request() takes another
+time stamp and stores it in r_stamp.
+
+We then store the first timestamp (only) in the in-memory inode, and the
+second time stamp in the request. Depending on the state of the inode,
+we may also set the ctime to a third timestamp we again take using
+current_time().
+
+The mtime and atime from user space get passed correctly through
+union ceph_mds_request_args->setattr and are kept in sync between
+the in-memory inode and the persistent inode data, but the ctime
+in the inode never makes it to the lower protocol levels and instead
+we use the r_stamp field that got set a little earlier or a little later.
+
+I believe the bug you see is the result of the two timestamps
+currently being almost guaranteed to be different in the latest
+kernels.
+Changing r_stamp to use current_kernel_time() will make it the
+same value most of the time (as it was before Deepa's patch),
+but when the timer interrupt happens between the timestamps,
+the two are still different, it's just much harder to hit.
+
+I think the proper solution should be to change __ceph_setattr()
+in a way that has req->r_stamp always synchronized with i_ctime.
+If we copy i_ctime to r_stamp, that will also take care of the
+future issues with the planned changes to current_time().
+
+The part I don't understand is what else r_stamp (i.e. the time
+stamp in ceph_msg_data with type==
+CEPH_MSG_CLIENT_REQUEST) is used for, other than setting
+ctime in CEPH_MDS_OP_SETATTR.
+
+Will this be used to update the stored i_ctime for other operations
+too? If so, we would need to synchronize it with the in-memory
+i_ctime for all operations that do this.
+
+Semi-related side note: I see that the granularity for ceph_timespec
+is 1000 nanoseconds, so the value is always a multiple of 1000.
+If the full 32-bit data gets stored, we could use this it to store the
+epoch number in the future:
+
+static inline void ceph_decode_timespec(struct timespec64 *ts,
+                                        const struct ceph_timespec *tv)
+{
+        u32 ns_epoch = le32_to_cpu(tv->tv_nsec);
+        u32 epoch = ns_epoch % 1000;
+
+        /* tv_sec is traditionally interpreted as unsigned
+         * with time ranges 1970-2106, we extend
+         * it to 1970-138069 */
+        ts->tv_sec = (u64)le32_to_cpu(tv->tv_sec) +
+                            (u64)epoch << 32;
+        ts->tv_nsec = ns_epoch - epoch;
+}
+
+      Arnd
