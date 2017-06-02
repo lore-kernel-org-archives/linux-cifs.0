@@ -1,25 +1,22 @@
-From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: Re: [PATCH] cifs: remove redundant return in cifs_creation_time_get
-Date: Wed, 07 Jun 2017 15:00:07 +0200
-Message-ID: <mpsd1agymug.fsf@aaptelpc.suse.de>
-References: <20170606233345.5980-1-colin.king@canonical.com>
+From: "Seydou Thieba" <seydouthieba-IWqWACnzNjwqdlJmJB21zg@public.gmane.org>
+Subject: Investment Interest & Offer
+Date: Sat, 03 Jun 2017 00:01:51 +0100
+Message-ID: <201706022301.v52MWded028747__44667.9341410801$1496897977$gmane$org@www.brfliseberg.se>
+Reply-To: seydouthiebaconsultant-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: 8BIT
-Cc: kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Colin King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>,
-        Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: Recipients <seydouthieba-IWqWACnzNjwqdlJmJB21zg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170606233345.5980-1-colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+Content-Description: Mail message body
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+We are a Fund management company located in the United Kingdom, we specialize in searching for potential investments opportunities for our high net-worth clients globally. Should this be of interest to you, please do not hesitate to email me for  further information.
 
-Looks good to me.
+Thanks
+Seydou Thieba
 
--- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
-GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+---
+This email has been checked for viruses by AVG.
+http://www.avg.com
