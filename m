@@ -1,42 +1,66 @@
-From: Colin King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
-Subject: [PATCH] cifs: remove redundant return in cifs_creation_time_get
-Date: Wed,  7 Jun 2017 00:33:45 +0100
-Message-ID: <20170606233345.5980-1-colin.king@canonical.com>
+From: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Subject: [PATCH] CIFS: Improve readdir verbosity
+Date: Tue,  6 Jun 2017 16:58:58 -0700
+Message-ID: <1496793538-3018-1-git-send-email-pshilov@microsoft.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Cc: kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+Content-Type: text/plain
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+Downgrade the loglevel for SMB2 to prevent filling the log
+with messages if e.g. readdir was interrupted. Also make SMB2
+and SMB1 codepaths do the same logging during readdir.
 
-There is a redundant return in function cifs_creation_time_get
-that appears to be old vestigial code than can be removed. So
-remove it.
-
-Detected by CoverityScan, CID#1361924 ("Structurally dead code")
-
-Signed-off-by: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+Signed-off-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 ---
- fs/cifs/xattr.c | 2 --
- 1 file changed, 2 deletions(-)
+ fs/cifs/smb1ops.c | 9 +++++++--
+ fs/cifs/smb2ops.c | 4 ++--
+ 2 files changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/fs/cifs/xattr.c b/fs/cifs/xattr.c
-index 3cb5c9e2d4e7..de50e749ff05 100644
---- a/fs/cifs/xattr.c
-+++ b/fs/cifs/xattr.c
-@@ -188,8 +188,6 @@ static int cifs_creation_time_get(struct dentry *dentry, struct inode *inode,
- 	pcreatetime = (__u64 *)value;
- 	*pcreatetime = CIFS_I(inode)->createtime;
- 	return sizeof(__u64);
--
--	return rc;
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index 27bc360..a723df3 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -849,8 +849,13 @@ cifs_query_dir_first(const unsigned int xid, struct cifs_tcon *tcon,
+ 		     struct cifs_fid *fid, __u16 search_flags,
+ 		     struct cifs_search_info *srch_inf)
+ {
+-	return CIFSFindFirst(xid, tcon, path, cifs_sb,
+-			     &fid->netfid, search_flags, srch_inf, true);
++	int rc;
++
++	rc = CIFSFindFirst(xid, tcon, path, cifs_sb,
++			   &fid->netfid, search_flags, srch_inf, true);
++	if (rc)
++		cifs_dbg(FYI, "find first failed=%d\n", rc);
++	return rc;
  }
  
+ static int
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index c586918..5972601 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -982,7 +982,7 @@ smb2_query_dir_first(const unsigned int xid, struct cifs_tcon *tcon,
+ 	rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL);
+ 	kfree(utf16_path);
+ 	if (rc) {
+-		cifs_dbg(VFS, "open dir failed\n");
++		cifs_dbg(FYI, "open dir failed rc=%d\n", rc);
+ 		return rc;
+ 	}
  
+@@ -992,7 +992,7 @@ smb2_query_dir_first(const unsigned int xid, struct cifs_tcon *tcon,
+ 	rc = SMB2_query_directory(xid, tcon, fid->persistent_fid,
+ 				  fid->volatile_fid, 0, srch_inf);
+ 	if (rc) {
+-		cifs_dbg(VFS, "query directory failed\n");
++		cifs_dbg(FYI, "query directory failed rc=%d\n", rc);
+ 		SMB2_close(xid, tcon, fid->persistent_fid, fid->volatile_fid);
+ 	}
+ 	return rc;
 -- 
-2.11.0
+2.7.4
