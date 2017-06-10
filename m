@@ -1,96 +1,64 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH v2 01/11] crypto: introduce crypto wait for async op
-Date: Sat, 10 Jun 2017 11:05:39 +0300
-Message-ID: <CAOtvUMeRtcVcp8HE9oJAkJO35yF9XBsry3tdNQYj-e31DnDFQQ@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2 01/11] crypto: introduce crypto wait for
+	async op
+Date: Sat, 10 Jun 2017 17:01:31 +0800
+Message-ID: <20170610090131.GA15594@gondor.apana.org.au>
 References: <1496046180-21962-1-git-send-email-gilad@benyossef.com>
- <1496046180-21962-2-git-send-email-gilad@benyossef.com> <20170610034336.GB14206@gondor.apana.org.au>
+	<1496046180-21962-2-git-send-email-gilad@benyossef.com>
+	<20170610034336.GB14206@gondor.apana.org.au>
+	<CAOtvUMeRtcVcp8HE9oJAkJO35yF9XBsry3tdNQYj-e31DnDFQQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        device-mapper development <dm-devel@redhat.com>,
-        Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <james.l.morris@oracle.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        Ofir Drang <ofir.drang@arm.com>,
-        Pavel Shilovsky <pshilov@microsoft.com>,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-In-Reply-To: <20170610034336.GB14206@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Mike Snitzer <snitzer@redhat.com>, linux-doc@vger.kernel.org,
+	David Howells <dhowells@redhat.com>,
+	device-mapper development <dm-devel@redhat.com>,
+	keyrings@vger.kernel.org, linux-ima-devel@lists.sourceforge.net,
+	Pavel Shilovsky <pshilov@microsoft.com>,
+	Alasdair Kergon <agk@redhat.com>, linux-cifs@vger.kernel.org,
+	Jonathan Corbet <corbet@lwn.net>, Mimi Zohar <zohar@linux.vnet.ibm.com>,
+	"Serge E. Hallyn" <serge@hallyn.com>, linux-ima-user@lists.sourceforge.net,
+	Eric Biggers <ebiggers3@gmail.com>, linux-raid@vger.kernel.org,
+	linux-fscrypt@vger.kernel.org, James Morris <james.l.morris@oracle.com>,
+	Jaegeuk Kim <jaegeuk@kernel.org>, Ofir Drang <ofir.drang@arm.com>,
+	"Theodore Y. Ts'o" <tytso@mit.edu>,
+	Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+	samba-technical@lists.samba.org,
+	Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+	Steve French <sfrench@samba.org>, linux-
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Return-path: <dm-devel-bounces@redhat.com>
+Content-Disposition: inline
+In-Reply-To: <CAOtvUMeRtcVcp8HE9oJAkJO35yF9XBsry3tdNQYj-e31DnDFQQ@mail.gmail.com>
+List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
+List-Archive: <https://www.redhat.com/archives/dm-devel>
+List-Post: <mailto:dm-devel@redhat.com>
+List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
+List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=subscribe>
+Sender: dm-devel-bounces@redhat.com
+Errors-To: dm-devel-bounces@redhat.com
 List-Id: linux-cifs.vger.kernel.org
 
-On Sat, Jun 10, 2017 at 6:43 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Mon, May 29, 2017 at 11:22:48AM +0300, Gilad Ben-Yossef wrote:
->>
->> +static inline int crypto_wait_req(int err, struct crypto_wait *wait)
->> +{
->> +     switch (err) {
->> +     case -EINPROGRESS:
->> +     case -EBUSY:
->> +             wait_for_completion(&wait->completion);
->> +             reinit_completion(&wait->completion);
->> +             err = wait->err;
->> +             break;
->> +     };
->> +
->> +     return err;
->> +}
+On Sat, Jun 10, 2017 at 11:05:39AM +0300, Gilad Ben-Yossef wrote:
 >
-> This assumes that the request is used with backlog.  For non-backlog
-> requests this would result in a memory leak as EBUSY in that case is
-> a fatal error.
->
-> So this API can't be used without backlog.
+> I guess there is a question if it really is important to know that
+> your request ended up
+> on the backlog, rather than being handled.I can imagine it can be used
+> as back pressure
+> indication but I wonder if someone is using that.
 
-You are right, of course. I did not take that into account.
+Oh yes we do want it to return EBUSY if we put it on the backlog
+because in that case we want the user to stop sending us new
+requests.
 
->
-> We could introduce a flag to indicate whether we want backlog or not,
-> or maybe we should change our API so that in the non-backlog case we
-> return something other than EBUSY.
->
-> Opinions?
+It's the other case where we dropped the request and returned
+EBUSY where I think we could return something other than EBUSY
+and get rid of the ambiguity.
 
-I guess there is a question if it really is important to know that
-your request ended up
-on the backlog, rather than being handled.I can imagine it can be used
-as back pressure
-indication but I wonder if someone is using that.
-
-If not, maybe we can simplify things and use EINPROGRESS asindication
-of a request
-being accepted by the next layer (either being processed or queued in
-the back log), whereas
-EBUSY would indicate failure.
-
-It does have a potential to make things simpler, I think.
-
-Gilad
-
->
-> Thanks,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-
-
-
+Thanks,
 -- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
