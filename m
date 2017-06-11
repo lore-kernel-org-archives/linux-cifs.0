@@ -1,64 +1,48 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 01/11] crypto: introduce crypto wait for
-	async op
-Date: Sat, 10 Jun 2017 17:01:31 +0800
-Message-ID: <20170610090131.GA15594@gondor.apana.org.au>
-References: <1496046180-21962-1-git-send-email-gilad@benyossef.com>
-	<1496046180-21962-2-git-send-email-gilad@benyossef.com>
-	<20170610034336.GB14206@gondor.apana.org.au>
-	<CAOtvUMeRtcVcp8HE9oJAkJO35yF9XBsry3tdNQYj-e31DnDFQQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Mike Snitzer <snitzer@redhat.com>, linux-doc@vger.kernel.org,
-	David Howells <dhowells@redhat.com>,
-	device-mapper development <dm-devel@redhat.com>,
-	keyrings@vger.kernel.org, linux-ima-devel@lists.sourceforge.net,
-	Pavel Shilovsky <pshilov@microsoft.com>,
-	Alasdair Kergon <agk@redhat.com>, linux-cifs@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>, Mimi Zohar <zohar@linux.vnet.ibm.com>,
-	"Serge E. Hallyn" <serge@hallyn.com>, linux-ima-user@lists.sourceforge.net,
-	Eric Biggers <ebiggers3@gmail.com>, linux-raid@vger.kernel.org,
-	linux-fscrypt@vger.kernel.org, James Morris <james.l.morris@oracle.com>,
-	Jaegeuk Kim <jaegeuk@kernel.org>, Ofir Drang <ofir.drang@arm.com>,
-	"Theodore Y. Ts'o" <tytso@mit.edu>,
-	Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-	samba-technical@lists.samba.org,
-	Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-	Steve French <sfrench@samba.org>, linux-
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <dm-devel-bounces@redhat.com>
-Content-Disposition: inline
-In-Reply-To: <CAOtvUMeRtcVcp8HE9oJAkJO35yF9XBsry3tdNQYj-e31DnDFQQ@mail.gmail.com>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: [PATCH] CIFS: Fix some return values in case of error in 'crypt_message'
+Date: Sun, 11 Jun 2017 09:12:47 +0200
+Message-ID: <20170611071247.2038-1-christophe.jaillet@wanadoo.fr>
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To: sfrench@samba.org
+Return-path: <kernel-janitors-owner@vger.kernel.org>
+Sender: kernel-janitors-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Sat, Jun 10, 2017 at 11:05:39AM +0300, Gilad Ben-Yossef wrote:
->
-> I guess there is a question if it really is important to know that
-> your request ended up
-> on the backlog, rather than being handled.I can imagine it can be used
-> as back pressure
-> indication but I wonder if someone is using that.
+'rc' is known to be 0 at this point. So if 'init_sg' or 'kzalloc' fails, we
+should return -ENOMEM instead.
 
-Oh yes we do want it to return EBUSY if we put it on the backlog
-because in that case we want the user to stop sending us new
-requests.
+Also remove a useless 'rc' in a debug message as it is meaningless here.
 
-It's the other case where we dropped the request and returned
-EBUSY where I think we could return something other than EBUSY
-and get rid of the ambiguity.
+Fixes: 026e93dc0a3ee ("CIFS: Encrypt SMB3 requests before sending")
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+ fs/cifs/smb2ops.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Thanks,
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index c58691834eb2..cdcb3d95add8 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -1809,7 +1809,8 @@ crypt_message(struct TCP_Server_Info *server, struct smb_rqst *rqst, int enc)
+ 
+ 	sg = init_sg(rqst, sign);
+ 	if (!sg) {
+-		cifs_dbg(VFS, "%s: Failed to init sg %d", __func__, rc);
++		cifs_dbg(VFS, "%s: Failed to init sg", __func__);
++		rc = -ENOMEM;
+ 		goto free_req;
+ 	}
+ 
+@@ -1817,6 +1818,7 @@ crypt_message(struct TCP_Server_Info *server, struct smb_rqst *rqst, int enc)
+ 	iv = kzalloc(iv_len, GFP_KERNEL);
+ 	if (!iv) {
+ 		cifs_dbg(VFS, "%s: Failed to alloc IV", __func__);
++		rc = -ENOMEM;
+ 		goto free_sg;
+ 	}
+ 	iv[0] = 3;
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.11.0
+
