@@ -1,76 +1,156 @@
-From: <ujagu8185-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: (unknown)
-Date: Tue, 13 Jun 2017 04:35:10 -0000
-Message-ID: <149732851051.29695.7415662314639407669@zaural.ru>
+From: Robin Blanchard <robin.blanchard-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: cifs.ko + smb 3.0 + DFS fails (though direct mount succeeds)
+Date: Wed, 14 Jun 2017 13:18:12 -0500
+Message-ID: <CAJUwKM25Kd-BHgPNXHkTtvYvK1Ad5uaLkooG6i4H+kawDL1ACg@mail.gmail.com>
+References: <CAJUwKM3-U2yRHB5O-R19wmzj1-yrO3sU_b8+xVCFaFwsZRWtTA@mail.gmail.com>
+ <CAH2r5mvn_Z5B=kYza1gAr3SkPX+kwKmXBEXcTBL327zcW8FP-g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: application/zip; name="51151522.zip"
-Content-Transfer-Encoding: base64
-To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Subject: 
-Content-Disposition: attachment
+In-Reply-To: <CAH2r5mvn_Z5B=kYza1gAr3SkPX+kwKmXBEXcTBL327zcW8FP-g-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-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
-AQABAE8AAAA+DQAAAAA=
+Thanks, Steve.
+
+Given WannaCry (and its derivatives), many shops are disabling SMBv1
+entirely (not necessarily a bad idea). Any idea as to when the
+aforementioned fixes might be pushed downstream? I've tested Ubuntu
+17.04 with the same results (DFS fails with SMB > v1).
+
+Status code returned 0xc0000016 STATUS_MORE_PROCESSING_REQUIRED
+Status code returned 0xc0000257 STATUS_PATH_NOT_COVERED
+CIFS VFS: cifs_mount failed w/return code = -38
+
+# uname -r
+4.10.0-22-generic
+
+# modinfo cifs
+filename:       /lib/modules/4.10.0-22-generic/kernel/fs/cifs/cifs.ko
+softdep:        pre: ccm
+softdep:        pre: aead2
+softdep:        pre: sha256
+softdep:        pre: cmac
+softdep:        pre: aes
+softdep:        pre: nls
+softdep:        pre: md5
+softdep:        pre: md4
+softdep:        pre: hmac
+softdep:        pre: ecb
+softdep:        pre: des
+softdep:        pre: arc4
+version:        2.09
+description:    VFS to access servers complying with the SNIA CIFS
+Specification e.g. Samba and Windows
+license:        GPL
+author:         Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+alias:          fs-cifs
+srcversion:     2EEBCAE8D1598E85D808811
+depends:        fscache
+intree:         Y
+vermagic:       4.10.0-22-generic SMP mod_unload
+parm:           CIFSMaxBufSize:Network buffer size (not including
+header). Default: 16384 Range: 8192 to 130048 (uint)
+parm:           cifs_min_rcv:Network buffers in pool. Default: 4
+Range: 1 to 64 (uint)
+parm:           cifs_min_small:Small network buffers in pool. Default:
+30 Range: 2 to 256 (uint)
+parm:           cifs_max_pending:Simultaneous requests to server.
+Default: 32767 Range: 2 to 32767. (uint)
+parm:           enable_oplocks:Enable or disable oplocks. Default: y/Y/1 (bool)
+
+On Thu, Apr 20, 2017 at 3:14 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> Fixes to add SMB2/SMB3 support for DFS were added fairly recently
+> (about two months ago) by Aurelien, so will be in new kernels.
+>
+> Hopefully RedHat and other will backport these as they are quite useful.
+>
+> On Thu, Apr 20, 2017 at 3:09 PM, Robin Blanchard
+> <robin.blanchard-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>> environment:
+>>
+>> # cat /etc/redhat-release
+>> CentOS Linux release 7.3.1611 (Core)
+>>
+>> # uname -r
+>> 3.10.0-514.16.1.el7.x86_64
+>>
+>> # modinfo cifs
+>> filename:       /lib/modules/3.10.0-514.16.1.el7.x86_64/kernel/fs/cifs/cifs.ko
+>> version:        2.08
+>> description:    VFS to access servers complying with the SNIA CIFS
+>> Specification e.g. Samba and Windows
+>> license:        GPL
+>> author:         Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+>> alias:          fs-cifs
+>> rhelversion:    7.3
+>> srcversion:     119ACC0FE17824C08D648CE
+>> depends:        dns_resolver
+>> intree:         Y
+>> vermagic:       3.10.0-514.16.1.el7.x86_64 SMP mod_unload modversions
+>> signer:         CentOS Linux kernel signing key
+>> sig_key:        3F:E1:EB:8B:4F:91:D4:84:CD:55:44:84:54:A0:24:DE:56:34:E1:06
+>> sig_hashalgo:   sha256
+>> parm:           CIFSMaxBufSize:Network buffer size (not including
+>> header). Default: 16384 Range: 8192 to 130048 (uint)
+>> parm:           cifs_min_rcv:Network buffers in pool. Default: 4
+>> Range: 1 to 64 (uint)
+>> parm:           cifs_min_small:Small network buffers in pool. Default:
+>> 30 Range: 2 to 256 (uint)
+>> parm:           cifs_max_pending:Simultaneous requests to server.
+>> Default: 32767 Range: 2 to 32767. (uint)
+>> parm:           enable_oplocks:Enable or disable oplocks. Default: y/Y/1 (bool)
+>>
+>>
+>>
+>> issue:
+>>
+>> 01) smb vers=1.0 + DFS works as expected:
+>>
+>> # mount -v -t cifs //my.domain/dfs/path /mnt -o
+>> "ro,vers=1.0,domain=my.domain,username=silly_user"
+>> # echo $?
+>> 0
+>>
+>>
+>> 02) smb vers=3.0 + DFS fails with:
+>>
+>> # echo 7 > /proc/fs/cifs/cifsFYI ; mount -v -t cifs
+>> //my.domain/dfs/path /mnt -o
+>> "ro,vers=3.0,domain=my.domain,username=silly_user"; sleep 5 ; echo 0 >
+>> /proc/fs/cifs/cifsFYI ; dmesg |tail -3
+>>
+>> mount error(38): Function not implemented
+>> Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
+>> [273116.707979] Status code returned 0xc0000016 STATUS_MORE_PROCESSING_REQUIRED
+>> [273116.712186] Status code returned 0xc0000257 STATUS_PATH_NOT_COVERED
+>> [273116.713723] CIFS VFS: cifs_mount failed w/return code = -38
+>>
+>>
+>> 03) smb vers=3.0 w/o CFS works as expected
+>>
+>> # mount -v -t cifs //real.win2k12.server/non-dfs/path /mnt -o
+>> "ro,vers=3.0,domain=my.domain,username=silly_user
+>> # echo $?
+>> 0
+>>
+>>
+>>
+>> Is there another incantation of mount -t cifs to get smbv3 + DFS
+>> working? Or is this a known issue (and if so, is there a work-around)
+>> ?
+>>
+>> Thanks in advance!
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+>
+> --
+> Thanks,
+>
+> Steve
