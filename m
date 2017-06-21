@@ -1,55 +1,46 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] CIFS: check if pages is null rather than bv for a failed allocation
-Date: Wed, 21 Jun 2017 11:59:38 -0500
-Message-ID: <CAH2r5mvmyaGrDUB38kndWBCGHHVvL4fj6pnwJK=VKVpB294xyw@mail.gmail.com>
-References: <20170517182415.12081-1-colin.king@canonical.com>
+Subject: Re: [PATCH] CIFS: Set ->should_dirty in cifs_user_readv()
+Date: Wed, 21 Jun 2017 12:00:42 -0500
+Message-ID: <CAH2r5mujedkOYtT4+2XjvLKBUZdz2OvuGst59Byv9Z6ONbvcEg@mail.gmail.com>
+References: <20170505053040.x67a5f4riyba2wqb@mwanda>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
         "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
         samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-        kernel-janitors <kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Colin King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+        kernel-janitors <kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170517182415.12081-1-colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+In-Reply-To: <20170505053040.x67a5f4riyba2wqb@mwanda>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-meged into cifs-2.6.git for-next
+merged into cifs-2.6.git for-next
 
-On Wed, May 17, 2017 at 1:24 PM, Colin King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org> wrote:
-> From: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+On Fri, May 5, 2017 at 12:30 AM, Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org> wrote:
+> The current code causes a static checker warning because ITER_IOVEC is
+> zero so the condition is never true.
 >
-> pages is being allocated however a null check on bv is being used
-> to see if the allocation failed. Fix this by checking if pages is
-> null.
->
-> Detected by CoverityScan, CID#1432974 ("Logically dead code")
->
-> Fixes: ccf7f4088af2dd ("CIFS: Add asynchronous context to support kernel AIO")
-> Signed-off-by: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+> Fixes: 6685c5e2d1ac ("CIFS: Add asynchronous read support through kernel AIO")
+> Signed-off-by: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
 > ---
->  fs/cifs/misc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> I'm assuming this is the correct fix from looking at how ITER_IOVEC is
+> normally used.  Please review.
 >
-> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-> index b08531977daa..3b147dc6af63 100644
-> --- a/fs/cifs/misc.c
-> +++ b/fs/cifs/misc.c
-> @@ -810,7 +810,7 @@ setup_aio_ctx_iter(struct cifs_aio_ctx *ctx, struct iov_iter *iter, int rw)
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index 6ef78ad838e6..71ba8fa63c41 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -3271,7 +3271,7 @@ ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to)
+>         if (!is_sync_kiocb(iocb))
+>                 ctx->iocb = iocb;
 >
->         if (!pages) {
->                 pages = vmalloc(max_pages * sizeof(struct page *));
-> -               if (!bv) {
-> +               if (!pages) {
->                         kvfree(bv);
->                         return -ENOMEM;
->                 }
-> --
-> 2.11.0
+> -       if (to->type & ITER_IOVEC)
+> +       if (to->type == ITER_IOVEC)
+>                 ctx->should_dirty = true;
 >
+>         rc = setup_aio_ctx_iter(ctx, to, READ);
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
 > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
