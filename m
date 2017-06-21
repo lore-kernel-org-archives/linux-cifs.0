@@ -1,57 +1,29 @@
-From: Robin Blanchard <robin.blanchard-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: cifs.ko + smb 3.0 + DFS fails (though direct mount succeeds)
-Date: Tue, 20 Jun 2017 09:14:27 -0500
-Message-ID: <CAJUwKM24-XrP3rMRTtv_=Fi3G5V3Fm+XsiKpdhS_PppFhr822Q@mail.gmail.com>
-References: <CAJUwKM3-U2yRHB5O-R19wmzj1-yrO3sU_b8+xVCFaFwsZRWtTA@mail.gmail.com>
- <CAH2r5mvn_Z5B=kYza1gAr3SkPX+kwKmXBEXcTBL327zcW8FP-g@mail.gmail.com>
- <CAJUwKM25Kd-BHgPNXHkTtvYvK1Ad5uaLkooG6i4H+kawDL1ACg@mail.gmail.com> <mpsmv98ti7d.fsf@aaptelpc.suse.de>
+From: Steve French <smfrench@gmail.com>
+Subject: Re: [PATCH] cifs: remove redundant return in cifs_creation_time_get
+Date: Wed, 21 Jun 2017 11:59:18 -0500
+Message-ID: <CAH2r5mv1rLPGS+qZeuAgNf=p4Km--AN0-zHUbBxdOT0J1S9h8g@mail.gmail.com>
+References: <20170606233345.5980-1-colin.king@canonical.com> <mpsd1agymug.fsf@aaptelpc.suse.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <mpsmv98ti7d.fsf-zpEvHKhluMwYitT5tn2FcQ@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: Colin King <colin.king@canonical.com>,
+        Steve French <sfrench@samba.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        kernel-janitors <kernel-janitors@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+To: =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <mpsd1agymug.fsf@aaptelpc.suse.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Thanks, Aur=C3=A9lien.
+merged into cifs-2.6.git for-next
 
-I can confirm that DFS + smb 3.0 works as expected on Ubuntu 17.04 +
-ppa:canonical-kernel-team/ppa
-
-# uname -rsov
-Linux 4.11.0-7-generic #12-Ubuntu SMP Mon Jun 19 17:35:19 UTC 2017 GNU/Linu=
-x
-
-
-Hopefully these changes will be incorporated/backported into mainline
-RedHat variants soon....
-
-On Fri, Jun 16, 2017 at 4:06 AM, Aur=C3=A9lien Aptel <aaptel-IBi9RG/b67k@public.gmane.org> wrot=
-e:
-> Hi Robin,
+On Wed, Jun 7, 2017 at 8:00 AM, Aur=C3=A9lien Aptel <aaptel@suse.com> wrote=
+:
 >
-> Robin Blanchard <robin.blanchard-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> writes:
->
->> Thanks, Steve.
->>
->> Given WannaCry (and its derivatives), many shops are disabling SMBv1
->> entirely (not necessarily a bad idea). Any idea as to when the
->> aforementioned fixes might be pushed downstream? I've tested Ubuntu
->> 17.04 with the same results (DFS fails with SMB > v1).
->>
->> Status code returned 0xc0000016 STATUS_MORE_PROCESSING_REQUIRED
->> Status code returned 0xc0000257 STATUS_PATH_NOT_COVERED
->> CIFS VFS: cifs_mount failed w/return code =3D -38
->>
->> # uname -r
->> 4.10.0-22-generic
->
-> Unless canonical has backported my changes you need at least linux 4.11.
->
-> Cheers,
+> Looks good to me.
 >
 > --
 > Aur=C3=A9lien Aptel / SUSE Labs Samba Team
@@ -59,3 +31,14 @@ e:
 > SUSE Linux GmbH, Maxfeldstra=C3=9Fe 5, 90409 N=C3=BCrnberg, Germany
 > GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton, HRB 21284 (AG N=
 =C3=BCrnberg)
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+--=20
+Thanks,
+
+Steve
