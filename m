@@ -1,67 +1,55 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH] CIFS: Fix some return values in case of error in 'crypt_message'
-Date: Wed, 21 Jun 2017 12:01:39 -0500
-Message-ID: <CAH2r5muiqTjpty9o9xKM3ai8zzpSwQD49O4oVAz4yTiPfG3jZA@mail.gmail.com>
-References: <20170611071247.2038-1-christophe.jaillet@wanadoo.fr>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [GIT] CIFS Fixes
+Date: Thu, 22 Jun 2017 11:30:26 -0500
+Message-ID: <CAH2r5mvDc3F5b6j_1hLeoBRb+fdJvy+HUZk_wSj24PH6SyMddQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Steve French <sfrench@samba.org>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kernel-janitors <kernel-janitors@vger.kernel.org>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170611071247.2038-1-christophe.jaillet@wanadoo.fr>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-merged into cifs-2.6.git for-next
+Please pull the following changes since commit
+9705596d08ac87c18aee32cc97f2783b7d14624e:
 
-On Sun, Jun 11, 2017 at 2:12 AM, Christophe JAILLET
-<christophe.jaillet@wanadoo.fr> wrote:
-> 'rc' is known to be 0 at this point. So if 'init_sg' or 'kzalloc' fails, we
-> should return -ENOMEM instead.
->
-> Also remove a useless 'rc' in a debug message as it is meaningless here.
->
-> Fixes: 026e93dc0a3ee ("CIFS: Encrypt SMB3 requests before sending")
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> ---
->  fs/cifs/smb2ops.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index c58691834eb2..cdcb3d95add8 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -1809,7 +1809,8 @@ crypt_message(struct TCP_Server_Info *server, struct smb_rqst *rqst, int enc)
->
->         sg = init_sg(rqst, sign);
->         if (!sg) {
-> -               cifs_dbg(VFS, "%s: Failed to init sg %d", __func__, rc);
-> +               cifs_dbg(VFS, "%s: Failed to init sg", __func__);
-> +               rc = -ENOMEM;
->                 goto free_req;
->         }
->
-> @@ -1817,6 +1818,7 @@ crypt_message(struct TCP_Server_Info *server, struct smb_rqst *rqst, int enc)
->         iv = kzalloc(iv_len, GFP_KERNEL);
->         if (!iv) {
->                 cifs_dbg(VFS, "%s: Failed to alloc IV", __func__);
-> +               rc = -ENOMEM;
->                 goto free_sg;
->         }
->         iv[0] = 3;
-> --
-> 2.11.0
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+  Merge tag 'clk-fixes-for-linus' of
+git://git.kernel.org/pub/scm/linux/kernel/git/clk/linux (2017-06-20
+11:02:29 +0800)
+
+are available in the git repository at:
 
 
+  git://git.samba.org/sfrench/cifs-2.6.git for-next
+
+for you to fetch changes up to 517a6e43c4872c89794af5b377fa085e47345952:
+
+  CIFS: Fix some return values in case of error in 'crypt_message'
+(2017-06-21 00:09:28 -0500)
+
+
+Includes various small fixes for stable
+
+----------------------------------------------------------------
+Christophe Jaillet (1):
+      CIFS: Fix some return values in case of error in 'crypt_message'
+
+Colin Ian King (2):
+      CIFS: check if pages is null rather than bv for a failed allocation
+      cifs: remove redundant return in cifs_creation_time_get
+
+Dan Carpenter (1):
+      CIFS: Set ->should_dirty in cifs_user_readv()
+
+Pavel Shilovsky (1):
+      CIFS: Improve readdir verbosity
+
+ fs/cifs/file.c    | 2 +-
+ fs/cifs/misc.c    | 2 +-
+ fs/cifs/smb1ops.c | 9 +++++++--
+ fs/cifs/smb2ops.c | 8 +++++---
+ fs/cifs/xattr.c   | 2 --
+ 5 files changed, 14 insertions(+), 9 deletions(-)
 
 -- 
 Thanks,
