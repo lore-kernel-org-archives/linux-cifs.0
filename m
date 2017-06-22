@@ -1,27 +1,185 @@
-From: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
-Subject: Re: [GIT] CIFS Fixes
-Date: Thu, 22 Jun 2017 11:19:11 -0700
-Message-ID: <CA+55aFzQsH8bUcuSbMD7FqFkTwOADJacjnKOMUApQnZ8FGZ0VQ@mail.gmail.com>
-References: <CAH2r5mvDc3F5b6j_1hLeoBRb+fdJvy+HUZk_wSj24PH6SyMddQ@mail.gmail.com>
+From: Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Subject: RE: [PATCH 1/2] cifs: prototype declaration and definition for smb 2
+ - 3 and cifsacl mount options
+Date: Thu, 22 Jun 2017 22:30:10 +0000
+Message-ID: <CY4PR21MB01357C6A1157603D5DA63C86B6DB0@CY4PR21MB0135.namprd21.prod.outlook.com>
+References: <1496292605-8754-1-git-send-email-shirishpargaonkar@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: "shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org" <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        "smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org" <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mvDc3F5b6j_1hLeoBRb+fdJvy+HUZk_wSj24PH6SyMddQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1496292605-8754-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, Jun 22, 2017 at 9:30 AM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+2017-05-31 21:50 GMT-07:00  <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 >
->   git://git.samba.org/sfrench/cifs-2.6.git for-next
+> Add definition and declaration of function to get cifs acls when
+> mounting with smb version 2 onwards to 3.
+>
+> Extend/Alter query info function to allocate and return
+> security descriptors within the response.
+>
+> Not yet handling the error case when the size of security descriptors
+> in response to query exceeds SMB2_MAX_BUFFER_SIZE.
+>
+> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>
+> ---
+>  fs/cifs/smb2pdu.c   | 52 +++++++++++++++++++++++++++++++++++++++++------=
+-----
+>  fs/cifs/smb2proto.h |  3 +++
+>  2 files changed, 44 insertions(+), 11 deletions(-)
+>
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index e4afdaa..4938e8b 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -2081,8 +2081,9 @@ static inline void init_copy_chunk_defaults(struct =
+cifs_tcon *tcon)
+>
+>  static int
+>  query_info(const unsigned int xid, struct cifs_tcon *tcon,
+> -          u64 persistent_fid, u64 volatile_fid, u8 info_class,
+> -          size_t output_len, size_t min_len, void *data)
+> +          u64 persistent_fid, u64 volatile_fid, u8 info_class, u8 info_t=
+ype,
+> +          u32 additional_info, size_t output_len, size_t min_len, void *=
+*data,
+> +               u32 *dlen)
+>  {
+>         struct smb2_query_info_req *req;
+>         struct smb2_query_info_rsp *rsp =3D NULL;
+> @@ -2108,10 +2109,11 @@ static inline void init_copy_chunk_defaults(struc=
+t cifs_tcon *tcon)
+>         if (encryption_required(tcon))
+>                 flags |=3D CIFS_TRANSFORM_REQ;
+>
+> -       req->InfoType =3D SMB2_O_INFO_FILE;
+> +       req->InfoType =3D info_type;
+>         req->FileInfoClass =3D info_class;
+>         req->PersistentFileId =3D persistent_fid;
+>         req->VolatileFileId =3D volatile_fid;
+> +       req->AdditionalInformation =3D cpu_to_le32(additional_info);
+>         /* 4 for rfc1002 length field and 1 for Buffer */
+>         req->InputBufferOffset =3D
+>                 cpu_to_le16(sizeof(struct smb2_query_info_req) - 1 - 4);
+> @@ -2130,24 +2132,51 @@ static inline void init_copy_chunk_defaults(struc=
+t cifs_tcon *tcon)
+>                 goto qinf_exit;
+>         }
+>
+> +       if (dlen) {
+> +               *dlen =3D le32_to_cpu(rsp->OutputBufferLength);
+> +               if (!*data) {
+> +                       *data =3D kmalloc(*dlen, GFP_KERNEL);
+> +                       if (!*data) {
+> +                               cifs_dbg(VFS,
+> +                                       "Error %d allocating memory for a=
+cl\n",
+> +                                       rc);
+> +                               *dlen =3D 0;
+> +                               goto qinf_exit;
+> +                       }
+> +               }
+> +       }
+> +
+>         rc =3D validate_and_copy_buf(le16_to_cpu(rsp->OutputBufferOffset)=
+,
+>                                    le32_to_cpu(rsp->OutputBufferLength),
+> -                                  &rsp->hdr, min_len, data);
+> +                                  &rsp->hdr, min_len, *data);
+>
+>  qinf_exit:
+>         free_rsp_buf(resp_buftype, rsp);
+>         return rc;
+>  }
+>
+> +int SMB2_query_info(const unsigned int xid, struct cifs_tcon *tcon,
+> +       u64 persistent_fid, u64 volatile_fid, struct smb2_file_all_info *=
+data)
+> +{
+> +       return query_info(xid, tcon, persistent_fid, volatile_fid,
+> +                         FILE_ALL_INFORMATION, SMB2_O_INFO_FILE, 0,
+> +                         sizeof(struct smb2_file_all_info) + PATH_MAX * =
+2,
+> +                         sizeof(struct smb2_file_all_info), (void **)&da=
+ta,
+> +                         NULL);
+> +}
+> +
+>  int
+> -SMB2_query_info(const unsigned int xid, struct cifs_tcon *tcon,
+> +SMB2_query_acl(const unsigned int xid, struct cifs_tcon *tcon,
+>                 u64 persistent_fid, u64 volatile_fid,
+> -               struct smb2_file_all_info *data)
+> +               void **data, u32 *plen)
+>  {
+> +       __u32 additional_info =3D OWNER_SECINFO | GROUP_SECINFO | DACL_SE=
+CINFO;
+> +       *plen =3D 0;
+> +
+>         return query_info(xid, tcon, persistent_fid, volatile_fid,
+> -                         FILE_ALL_INFORMATION,
+> -                         sizeof(struct smb2_file_all_info) + PATH_MAX * =
+2,
+> -                         sizeof(struct smb2_file_all_info), data);
+> +                         0, SMB2_O_INFO_SECURITY, additional_info,
+> +                         SMB2_MAX_BUFFER_SIZE,
+> +                         sizeof(struct smb2_file_all_info), data, plen);
+>  }
+>
+>  int
+> @@ -2155,9 +2184,10 @@ static inline void init_copy_chunk_defaults(struct=
+ cifs_tcon *tcon)
+>                  u64 persistent_fid, u64 volatile_fid, __le64 *uniqueid)
+>  {
+>         return query_info(xid, tcon, persistent_fid, volatile_fid,
+> -                         FILE_INTERNAL_INFORMATION,
+> +                         FILE_INTERNAL_INFORMATION, SMB2_O_INFO_FILE, 0,
+> +                         sizeof(struct smb2_file_internal_info),
+>                           sizeof(struct smb2_file_internal_info),
+> -                         sizeof(struct smb2_file_internal_info), uniquei=
+d);
+> +                         (void **)&uniqueid, NULL);
+>  }
+>
+>  /*
+> diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+> index 6853454..3595cd7 100644
+> --- a/fs/cifs/smb2proto.h
+> +++ b/fs/cifs/smb2proto.h
+> @@ -135,6 +135,9 @@ extern int SMB2_flush(const unsigned int xid, struct =
+cifs_tcon *tcon,
+>  extern int SMB2_query_info(const unsigned int xid, struct cifs_tcon *tco=
+n,
+>                            u64 persistent_file_id, u64 volatile_file_id,
+>                            struct smb2_file_all_info *data);
+> +extern int SMB2_query_acl(const unsigned int xid, struct cifs_tcon *tcon=
+,
+> +                          u64 persistent_file_id, u64 volatile_file_id,
+> +                          void **data, unsigned int *plen);
+>  extern int SMB2_get_srv_num(const unsigned int xid, struct cifs_tcon *tc=
+on,
+>                             u64 persistent_fid, u64 volatile_fid,
+>                             __le64 *uniqueid);
+> --
+> 1.9.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Btw, since I don't know how secure samba.org actually is, would you
-mind using signed tags?
+Looks good!
 
-Right now I only require signed tags for actual public hosting sites
-(ie github), but I'd prefer them from everybody, and most particularly
-from non-kernel.org places where I don't really know how the accounts
-are given out or the machines secured...
+Reviewed-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 
-                  Linus
+--
+Best regards,
+Pavel Shilovsky
