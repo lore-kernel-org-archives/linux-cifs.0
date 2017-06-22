@@ -1,219 +1,128 @@
-From: Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: RE: [PATCH 2/2] cifs: Use smb 2 - 3 and cifsacl mount options getacl
- functions
-Date: Thu, 22 Jun 2017 22:33:05 +0000
-Message-ID: <CY4PR21MB0135C9BFE562AC78D4357FAAB6DB0@CY4PR21MB0135.namprd21.prod.outlook.com>
-References: <1496292624-8818-1-git-send-email-shirishpargaonkar@gmail.com>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH v3 7/7] CIFS: implement get_dfs_refer for SMB2+
+Date: Thu, 22 Jun 2017 16:03:18 -0700
+Message-ID: <CAKywueTx4b4+MDYeTm+jBsUZfmYe+Sa1HT9cUx-d4043hKxr+A@mail.gmail.com>
+References: <20170228184034.18771-1-aaptel@suse.com> <20170228184034.18771-8-aaptel@suse.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: "shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org" <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        "smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org" <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1496292624-8818-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Content-Language: en-US
+In-Reply-To: <20170228184034.18771-8-aaptel-IBi9RG/b67k@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2017-05-31 21:50 GMT-07:00  <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+2017-02-28 10:40 GMT-08:00 Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>:
+> in SMB2+ the get_dfs_refer operation uses a FSCTL. The request can be
+> made on any Tree Connection according to the specs. Since Samba only
+> accepted it on an IPC connection until recently, try that first.
 >
-> Fill in smb2/3 query acl functions in ops structures and use them.
+> https://lists.samba.org/archive/samba-technical/2017-February/118859.html
 >
-> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> 3.2.4.20.3 Application Requests DFS Referral Information:
+>> The client MUST search for an existing Session and TreeConnect to any
+>> share on the server identified by ServerName for the user identified by
+>> UserCredentials. If no Session and TreeConnect are found, the client
+>> MUST establish a new Session and TreeConnect to IPC$ on the target
+>> server as described in section 3.2.4.2 using the supplied ServerName and
+>> UserCredentials.
 >
+> Signed-off-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
 > ---
->  fs/cifs/smb2ops.c | 121 ++++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
->  1 file changed, 121 insertions(+)
+>  fs/cifs/smb2ops.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  fs/cifs/smb2pdu.h |   8 +++++
+>  2 files changed, 108 insertions(+)
 >
 > diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index c586918..7157f52 100644
+> index 02937cc..fcd524d 100644
 > --- a/fs/cifs/smb2ops.c
 > +++ b/fs/cifs/smb2ops.c
-> @@ -1288,6 +1288,107 @@ static bool smb2_set_sparse(const unsigned int xi=
-d, struct cifs_tcon *tcon,
->         return rc;
+> @@ -1104,6 +1104,102 @@ smb2_new_lease_key(struct cifs_fid *fid)
+>         generate_random_uuid(fid->lease_key);
 >  }
 >
-> +static struct cifs_ntsd *
-> +get_smb2_acl_by_fid(struct cifs_sb_info *cifs_sb,
-> +               const struct cifs_fid *cifsfid, u32 *pacllen)
+> +static int
+> +smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
+> +                  const char *search_name,
+> +                  struct dfs_info3_param **target_nodes,
+> +                  unsigned int *num_of_nodes,
+> +                  const struct nls_table *nls_codepage, int remap)
 > +{
-> +       struct cifs_ntsd *pntsd =3D NULL;
-> +       unsigned int xid;
-> +       int rc =3D -EOPNOTSUPP;
-> +       struct tcon_link *tlink =3D cifs_sb_tlink(cifs_sb);
-> +
-> +       if (IS_ERR(tlink))
-> +               return ERR_CAST(tlink);
-> +
-> +       xid =3D get_xid();
-> +       cifs_dbg(VFS, "trying to get acl\n");
-
-This should be FYI debug level.
-
-> +
-> +       rc =3D SMB2_query_acl(xid, tlink_tcon(tlink), cifsfid->persistent=
-_fid,
-> +                           cifsfid->volatile_fid, (void **)&pntsd, pacll=
-en);
-> +       free_xid(xid);
-> +
-> +       cifs_put_tlink(tlink);
-> +
-> +       cifs_dbg(FYI, "%s: rc =3D %d ACL len %d\n", __func__, rc, *paclle=
-n);
-> +       if (rc)
-> +               return ERR_PTR(rc);
-> +       return pntsd;
-> +
-> +}
-> +
-> +static struct cifs_ntsd *
-> +get_smb2_acl_by_path(struct cifs_sb_info *cifs_sb,
-> +               const char *path, u32 *pacllen)
-> +{
-> +       struct cifs_ntsd *pntsd =3D NULL;
-> +       u8 oplock =3D SMB2_OPLOCK_LEVEL_NONE;
-> +       unsigned int xid;
 > +       int rc;
+> +       __le16 *utf16_path = NULL;
+> +       int utf16_path_len = 0;
 > +       struct cifs_tcon *tcon;
-> +       struct tcon_link *tlink =3D cifs_sb_tlink(cifs_sb);
-> +       struct cifs_fid fid;
-> +       struct cifs_open_parms oparms;
-> +       __le16 *utf16_path;
+> +       struct fsctl_get_dfs_referral_req *dfs_req = NULL;
+> +       struct get_dfs_referral_rsp *dfs_rsp = NULL;
+> +       u32 dfs_req_size = 0, dfs_rsp_size = 0;
 > +
-> +       cifs_dbg(FYI, "get smb3 acl for path %s\n", path);
-> +       if (IS_ERR(tlink))
-> +               return ERR_CAST(tlink);
+> +       cifs_dbg(FYI, "smb2_get_dfs_refer path <%s>\n", search_name);
 > +
-> +       tcon =3D tlink_tcon(tlink);
-> +       xid =3D get_xid();
+> +       /*
+> +        * Use any tcon from the current session. Here, the first one.
+> +        */
+> +       spin_lock(&cifs_tcp_ses_lock);
+> +       tcon = list_first_entry_or_null(&ses->tcon_list, struct cifs_tcon, tcon_list);
+> +       if (tcon)
+> +               tcon->tc_count++;
+> +       spin_unlock(&cifs_tcp_ses_lock);
 > +
-> +       if (backup_cred(cifs_sb))
-> +               oparms.create_options |=3D CREATE_OPEN_BACKUP_INTENT;
-> +       else
-> +               oparms.create_options =3D 0;
-> +
-> +       utf16_path =3D cifs_convert_path_to_utf16(path, cifs_sb);
-> +       if (!utf16_path)
-> +               return ERR_PTR(-ENOMEM);
-> +
-> +       oparms.tcon =3D tcon;
-> +       oparms.desired_access =3D READ_CONTROL;
-> +       oparms.disposition =3D FILE_OPEN;
-> +       oparms.fid =3D &fid;
-> +       oparms.reconnect =3D false;
-> +
-> +       rc =3D SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL);
-> +       kfree(utf16_path);
-> +       if (!rc) {
-> +               rc =3D SMB2_query_acl(xid, tlink_tcon(tlink), fid.persist=
-ent_fid,
-> +                           fid.volatile_fid, (void **)&pntsd, pacllen);
-> +               SMB2_close(xid, tcon, fid.persistent_fid, fid.volatile_fi=
-d);
+> +       if (!tcon) {
+> +               cifs_dbg(VFS, "session %p has no tcon available for a dfs referral request\n",
+> +                        ses);
+> +               rc = -ENOTCONN;
+> +               goto out;
 > +       }
 > +
-> +       cifs_put_tlink(tlink);
-> +       free_xid(xid);
+> +       utf16_path = cifs_strndup_to_utf16(search_name, PATH_MAX,
+> +                                          &utf16_path_len,
+> +                                          nls_codepage, remap);
+> +       if (!utf16_path) {
+> +               rc = -ENOMEM;
+> +               goto out;
+> +       }
 > +
-> +       cifs_dbg(FYI, "%s: rc =3D %d ACL len %d\n", __func__, rc, *paclle=
-n);
-> +       if (rc)
-> +               return ERR_PTR(rc);
-> +       return pntsd;
-> +}
+> +       dfs_req_size = sizeof(*dfs_req) + utf16_path_len;
+> +       dfs_req = kzalloc(dfs_req_size, GFP_KERNEL);
+> +       if (!dfs_req) {
+> +               rc = -ENOMEM;
+> +               goto out;
+> +       }
 > +
-> +/* Retrieve an ACL from the server */
-> +static struct cifs_ntsd *
-> +get_smb2_acl(struct cifs_sb_info *cifs_sb,
-> +                                     struct inode *inode, const char *pa=
-th,
-> +                                     u32 *pacllen)
-> +{
-> +       struct cifs_ntsd *pntsd =3D NULL;
-> +       struct cifsFileInfo *open_file =3D NULL;
+> +       /* Highest DFS referral version understood */
+> +       dfs_req->MaxReferralLevel = cpu_to_le16(DFS_VERSION);
 > +
-> +       if (inode)
-> +               open_file =3D find_readable_file(CIFS_I(inode), true);
-> +       if (!open_file)
-> +               return get_smb2_acl_by_path(cifs_sb, path, pacllen);
+> +       /* Path to resolve in an UTF-16 null-terminated string */
+> +       memcpy(dfs_req->RequestFileName, utf16_path, utf16_path_len);
 > +
-> +       pntsd =3D get_smb2_acl_by_fid(cifs_sb, &open_file->fid, pacllen);
-> +       cifsFileInfo_put(open_file);
-> +       return pntsd;
-> +}
+> +       do {
+> +               /* try first with IPC */
+> +               rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
+> +                               FSCTL_DFS_GET_REFERRALS,
+> +                               true /* is_fsctl */, true /* use_ipc */,
+> +                               (char *)dfs_req, dfs_req_size,
+> +                               (char **)&dfs_rsp, &dfs_rsp_size);
+> +               if (rc == -ENOTCONN) {
+> +                       /* try with normal tcon */
+> +                       rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
+> +                                       FSCTL_DFS_GET_REFERRALS,
+> +                                       true /* is_fsctl */, false /*use_ipc*/,
+> +                                       (char *)dfs_req, dfs_req_size,
+> +                                       (char **)&dfs_rsp, &dfs_rsp_size);
+> +               }
+> +       } while (rc == -EAGAIN);
 > +
-> +
->  static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
->                             loff_t offset, loff_t len, bool keep_size)
->  {
-> @@ -2391,6 +2492,11 @@ struct smb_version_operations smb20_operations =3D=
- {
->         .dir_needs_close =3D smb2_dir_needs_close,
->         .get_dfs_refer =3D smb2_get_dfs_refer,
->         .select_sectype =3D smb2_select_sectype,
-> +#ifdef CONFIG_CIFS_ACL
-> +       .get_acl =3D get_smb2_acl,
-> +       .get_acl_by_fid =3D get_smb2_acl_by_fid,
-> +/*     .set_acl =3D set_smb3_acl, */
-> +#endif /* CIFS_ACL */
->  };
->
->  struct smb_version_operations smb21_operations =3D {
-> @@ -2475,6 +2581,11 @@ struct smb_version_operations smb21_operations =3D=
- {
->         .enum_snapshots =3D smb3_enum_snapshots,
->         .get_dfs_refer =3D smb2_get_dfs_refer,
->         .select_sectype =3D smb2_select_sectype,
-> +#ifdef CONFIG_CIFS_ACL
-> +       .get_acl =3D get_smb2_acl,
-> +       .get_acl_by_fid =3D get_smb2_acl_by_fid,
-> +/*     .set_acl =3D set_smb3_acl, */
-> +#endif /* CIFS_ACL */
->  };
->
->  struct smb_version_operations smb30_operations =3D {
-> @@ -2569,6 +2680,11 @@ struct smb_version_operations smb30_operations =3D=
- {
->         .receive_transform =3D smb3_receive_transform,
->         .get_dfs_refer =3D smb2_get_dfs_refer,
->         .select_sectype =3D smb2_select_sectype,
-> +#ifdef CONFIG_CIFS_ACL
-> +       .get_acl =3D get_smb2_acl,
-> +       .get_acl_by_fid =3D get_smb2_acl_by_fid,
-> +/*     .set_acl =3D set_smb3_acl, */
-> +#endif /* CIFS_ACL */
->  };
->
->  #ifdef CONFIG_CIFS_SMB311
-> @@ -2664,6 +2780,11 @@ struct smb_version_operations smb311_operations =
-=3D {
->         .receive_transform =3D smb3_receive_transform,
->         .get_dfs_refer =3D smb2_get_dfs_refer,
->         .select_sectype =3D smb2_select_sectype,
-> +#ifdef CONFIG_CIFS_ACL
-> +       .get_acl =3D get_smb2_acl,
-> +       .get_acl_by_fid =3D get_smb2_acl_by_fid,
-> +/*     .set_acl =3D set_smb3_acl, */
-> +#endif /* CIFS_ACL */
->  };
->  #endif /* CIFS_SMB311 */
->
-> --
-> 1.9.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> +       if (rc) {
+> +               cifs_dbg(VFS, "ioctl error in smb2_get_dfs_refer rc=%d\n", rc);
+> +               goto out;
+> +       }
 
-Other than the notice above the patch looks right.
+During the local testing with cthon and xfstests with DFS is being
+involved I see a bunch of error messages like the one below:
 
-Reviewed-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+CIFS VFS: ioctl error in smb2_get_dfs_refer rc=-2
+
+Should we lower a debug level to FYI here?
 
 --
 Best regards,
