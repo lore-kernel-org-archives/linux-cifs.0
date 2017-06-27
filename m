@@ -1,87 +1,52 @@
-From: Benjamin Coddington <bcodding-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 0/3 v6] Fixups for l_pid
-Date: Tue, 27 Jun 2017 11:18:06 -0400
-Message-ID: <cover.1498572504.git.bcodding@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	v9fs-developer-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	lustre-devel-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org
-To: Oleg Drokin <oleg.drokin-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	Andreas Dilger <andreas.dilger-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	James Simmons <jsimmons-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-	Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
-	Eric Van Hensbergen <ericvh-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Ron Minnich <rminnich-4OHPYypu0djtX7QSmKvirg@public.gmane.org>,
-	Latchesar Ionkov <lucho-OnYtXJJ0/fesTnJN9+BGXg@public.gmane.org>, "Yan, Zheng" <zyan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Sage Weil <sage-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Ilya Dryomov <idryomov-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Christine Caulfield <ccaulfie-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	David Teigland <teigland-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Miklos Szeredi <miklos-sUDqSbJrdHQHWmgEVkV9KA@public.gmane.org>,
-	Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
-	Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>,
-	"J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
-	Vitaly Fertman <vitaly_fertman-qCPWdT176rRBDgjK7y7TUQ@public.gmane.org>,
-	"John L. Hammond" <john.hammond-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	Andriy Skulysh <andriy.skulysh-ShLqkCeKS0lBDgjK7y7TUQ@public.gmane.org>,
-	Benjamin Coddington <bcodding-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Emoly Liu <emoly.liu-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Return-path: <lustre-devel-bounces-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org>
-List-Unsubscribe: <http://lists.lustre.org/options.cgi/lustre-devel-lustre.org>,
-	<mailto:lustre-devel-request-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.lustre.org/pipermail/lustre-devel-lustre.org/>
-List-Post: <mailto:lustre-devel-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org>
-List-Help: <mailto:lustre-devel-request-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org?subject=help>
-List-Subscribe: <http://lists.lustre.org/listinfo.cgi/lustre-devel-lustre.org>,
-	<mailto:lustre-devel-request-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org?subject=subscribe>
-Errors-To: lustre-devel-bounces-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org
-Sender: "lustre-devel" <lustre-devel-bounces-aLEFhgZF4x6X6Mz3xDxJMA@public.gmane.org>
-List-Id: linux-cifs.vger.kernel.org
+From: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
+Subject: [PATCH] cifs: hide unused functions
+Date: Tue, 27 Jun 2017 17:06:13 +0200
+Message-ID: <20170627152302.806239-1-arnd@arndb.de>
+Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>,
+        Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-LTP fcntl tests (fcntl11 fcntl14 fcntl17 fcntl19 fcntl20 fcntl21) have been
-failing for NFSv4 mounts due to an unexpected l_pid.  What follows are some
-fixups:
+Some functions are only referenced under an #ifdef, causing a harmless
+warning:
 
-v2: - Rebase onto linux-next
-    - Revert back to using the stack in locks_mandatory_area(), and fixup
-	patch description for 1/3
+fs/cifs/smb2ops.c:1374:1: error: 'get_smb2_acl' defined but not used [-Werror=unused-function]
 
-v3: - The lkp-robot found some serious per_thread_ops performance
-	regressions for v1 and v2, so this version changes things around to not
-	acquire a reference to struct pid in fl_nspid for every lock.  Instead,
-	it drops fl_nspid altogether, and defers the lookup of the
-	namespace-translated pid until it actually needed.
+We could mark them __maybe_unused or add another #ifdef, I picked
+the second approach here.
 
-v4: - Instead of looking up the virtual pid by way of referencing the struct
-	task of the that pid, instead use find_pid_ns() and pid_nr_ns(), which
-	avoids a the problem where we race to get a reference to the struct task
-	while it may be freed.
+Fixes: b3fdda4d1e1b ("cifs: Use smb 2 - 3 and cifsacl mount options getacl functions")
+Signed-off-by: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
+---
+ fs/cifs/smb2ops.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-v5: - Squash previous 2/3 and 3/3 to avoid regression where F_GETLK would
-	return the init_ns pid instead of a translated pid.
-
-v6: - State clearly how the differing cases of l_pid translation should be
-	handled, specifically regarding remote locks on remote files: that
-	fl_pid ought to be returned from the filesystem as <= 0 to indicate that
-	it makes no sense to translate this l_pid.
-	- Follow up with a patch to have filesystems negate fl_pid for remote
-	locks on remote files.
-
-Benjamin Coddington (3):
-  fs/locks: Use allocation rather than the stack in fcntl_getlk()
-  fs/locks: Remove fl_nspid and use fs-specific l_pid for remote locks
-  staging/lustre, 9p, ceph, cifs, dlm: negate remote pids for F_GETLK
-
- drivers/staging/lustre/lustre/ldlm/ldlm_flock.c |   2 +-
- fs/9p/vfs_file.c                                |   2 +-
- fs/ceph/locks.c                                 |   2 +-
- fs/cifs/cifssmb.c                               |   2 +-
- fs/dlm/plock.c                                  |   2 +-
- fs/fuse/file.c                                  |   6 +-
- fs/locks.c                                      | 108 ++++++++++++++----------
- include/linux/fs.h                              |   2 +-
- 8 files changed, 72 insertions(+), 54 deletions(-)
-
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 06494e11c570..941c40b7a870 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -1288,6 +1288,7 @@ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
+ 	return rc;
+ }
+ 
++#ifdef CONFIG_CIFS_ACL
+ static struct cifs_ntsd *
+ get_smb2_acl_by_fid(struct cifs_sb_info *cifs_sb,
+ 		const struct cifs_fid *cifsfid, u32 *pacllen)
+@@ -1387,7 +1388,7 @@ get_smb2_acl(struct cifs_sb_info *cifs_sb,
+ 	cifsFileInfo_put(open_file);
+ 	return pntsd;
+ }
+-
++#endif
+ 
+ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
+ 			    loff_t offset, loff_t len, bool keep_size)
 -- 
-2.9.3
+2.9.0
