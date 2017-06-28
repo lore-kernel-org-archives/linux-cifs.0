@@ -1,7 +1,7 @@
 From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Subject: [PATCH] cifs: Do not modify mid entry after submitting I/O in cifs_call_async
-Date: Wed, 28 Jun 2017 10:50:02 -0700
-Message-ID: <1498672202-30452-1-git-send-email-longli@exchange.microsoft.com>
+Subject: [PATCH resend] cifs: Do not modify mid entry after submitting I/O in cifs_call_async
+Date: Wed, 28 Jun 2017 11:05:54 -0700
+Message-ID: <1498673154-30879-1-git-send-email-longli@exchange.microsoft.com>
 Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
         samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -12,7 +12,8 @@ List-ID: <linux-cifs.vger.kernel.org>
 From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 
 In cifs_call_async, server response may return as soon as I/O is submitted.
-Do not touch it after that.
+Because mid entry is freed on the return path, do not modify it after I/O is
+submitted.
 
 Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 ---
