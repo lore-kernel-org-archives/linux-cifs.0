@@ -1,53 +1,38 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] CIFS: add SFM mapping for 0x01-0x1F
-Date: Wed, 28 Jun 2017 00:02:28 -0500
-Message-ID: <CAH2r5msDp046AGiSTXjxfCrkwZoAA7HS7UkhSL8SqAkGaSRP_w@mail.gmail.com>
-References: <20170601090006.GA21508@SerNet.DE> <mps4lw0t5o8.fsf@aaptelpc.suse.de>
- <9c69c458-07a8-cd52-df30-72eb28fde38a@samba.org>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: Request update on Bug 194691 - Unreachable CIFS mount hangs system
+Date: Tue, 27 Jun 2017 22:07:28 -0700
+Message-ID: <CAKywueQBznxKkXNnCNOuYHLA-J0N59-Je+zt5J1u7YXAyH6KSg@mail.gmail.com>
+References: <CADg6pLkLC9BuYDOvwkV86jJq7ZpjV2DrLexGvtsjFzVYu6RZsA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Cc: =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>,
-        Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: =?UTF-8?B?QmrDtnJuIEphY2tl?= <bjacke-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Rajesh Srinivasan <rajesh.chivas-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <9c69c458-07a8-cd52-df30-72eb28fde38a-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <CADg6pLkLC9BuYDOvwkV86jJq7ZpjV2DrLexGvtsjFzVYu6RZsA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-merged into cifs-2.6.git
+2017-06-27 21:25 GMT-07:00 Rajesh Srinivasan <rajesh.chivas-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+> Hi,
+>
+> Could you please review the bug 194691
+> https://bugzilla.kernel.org/show_bug.cgi?id=194691 and let me know if
+> there are any upcoming patches that can fix this issue.
+>
+> This has become a severe issue for our software after upgrading from
+> 3.14 to 3.16 and any pointers on handling it would help.
+>
+> Thanks,
+> Rajesh
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-JRA had some security concerns about allowing \ mapping so we need to
-be careful in deciding how we want Samba to handle that too
+Reconnect fixes were backported to 3.16 kernel starting from v3.16.42
+version. I suggest upgrading the kernel from v3.16.38 (as mentioned in
+the bug) to the newer one.
 
-On Thu, Jun 1, 2017 at 5:04 AM, Bj=C3=B6rn Jacke <bjacke-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> Hi Aur=C3=A9lien,
-> On 01.06.2017 11:31, Aur=C3=A9lien Aptel wrote:
->> Are these mappings documented somewhere? Now that Windows has a new
->> Linux subsystem I wonder if any of these SFM/SFU mappings have changed.
->>
->> Cheers,
->>
->
-> it once was documentd in MS KB117258 ... which disappeared
-> unfortunately, wayback machine still has is though:
->
-> https://web-beta.archive.org/web/20150315001238/http://support.microsoft.=
-com:80/en-us/kb/117258
->
-> I also verified that current OS X clients use these mappings for SMB.
->
-> The only remaining mapping which needs fixing in the cifs module is the
-> backslash now.
->
-> Bj=C3=B6rn
->
->
-
-
-
---=20
-Thanks,
-
-Steve
+--
+Best regards,
+Pavel Shilovsky
