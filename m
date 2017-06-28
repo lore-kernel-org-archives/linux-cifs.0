@@ -1,62 +1,43 @@
-From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: RE: [PATCH resend] cifs: Do not modify mid entry after submitting I/O
- in cifs_call_async
-Date: Wed, 28 Jun 2017 18:30:45 +0000
-Message-ID: <MWHPR03MB31367BE8AE74F49F9C5210FFCEDD0@MWHPR03MB3136.namprd03.prod.outlook.com>
-References: <1498673154-30879-1-git-send-email-longli@exchange.microsoft.com>
- <CAKywueQZ5hzogURY6sFiv2nJREY9h0KAvbBAsEoNcqApymtxKw@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-        Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+Subject: [PATCH v2] cifs: Do not modify mid entry after submitting I/O in cifs_call_async
+Date: Wed, 28 Jun 2017 11:56:03 -0700
+Message-ID: <1498676163-31746-1-git-send-email-longli@exchange.microsoft.com>
+Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueQZ5hzogURY6sFiv2nJREY9h0KAvbBAsEoNcqApymtxKw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGF2ZWwgU2hpbG92c2t5
-IFttYWlsdG86cGlhc3RyeXl5QGdtYWlsLmNvbV0NCj4gU2VudDogV2VkbmVzZGF5LCBKdW5lIDI4
-LCAyMDE3IDExOjIzIEFNDQo+IFRvOiBMb25nIExpIDxsb25nbGlAbWljcm9zb2Z0LmNvbT4NCj4g
-Q2M6IFN0ZXZlIEZyZW5jaCA8c2ZyZW5jaEBzYW1iYS5vcmc+OyBsaW51eC1jaWZzIDxsaW51eC0N
-Cj4gY2lmc0B2Z2VyLmtlcm5lbC5vcmc+OyBzYW1iYS10ZWNobmljYWwgPHNhbWJhLXRlY2huaWNh
-bEBsaXN0cy5zYW1iYS5vcmc+Ow0KPiBLZXJuZWwgTWFpbGluZyBMaXN0IDxsaW51eC1rZXJuZWxA
-dmdlci5rZXJuZWwub3JnPjsgTG9uZyBMaQ0KPiA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+IFN1
-YmplY3Q6IFJlOiBbUEFUQ0ggcmVzZW5kXSBjaWZzOiBEbyBub3QgbW9kaWZ5IG1pZCBlbnRyeSBh
-ZnRlciBzdWJtaXR0aW5nDQo+IEkvTyBpbiBjaWZzX2NhbGxfYXN5bmMNCj4gDQo+IDIwMTctMDYt
-MjggMTE6MDUgR01ULTA3OjAwIExvbmcgTGkgPGxvbmdsaUBleGNoYW5nZS5taWNyb3NvZnQuY29t
-PjoNCj4gPiBGcm9tOiBMb25nIExpIDxsb25nbGlAbWljcm9zb2Z0LmNvbT4NCj4gPg0KPiA+IElu
-IGNpZnNfY2FsbF9hc3luYywgc2VydmVyIHJlc3BvbnNlIG1heSByZXR1cm4gYXMgc29vbiBhcyBJ
-L08gaXMgc3VibWl0dGVkLg0KPiA+IEJlY2F1c2UgbWlkIGVudHJ5IGlzIGZyZWVkIG9uIHRoZSBy
-ZXR1cm4gcGF0aCwgZG8gbm90IG1vZGlmeSBpdCBhZnRlcg0KPiA+IEkvTyBpcyBzdWJtaXR0ZWQu
-DQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBMb25nIExpIDxsb25nbGlAbWljcm9zb2Z0LmNvbT4N
-Cj4gPiAtLS0NCj4gPiAgZnMvY2lmcy90cmFuc3BvcnQuYyB8IDIgKy0NCj4gPiAgMSBmaWxlIGNo
-YW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0pDQo+ID4NCj4gPiBkaWZmIC0tZ2l0
-IGEvZnMvY2lmcy90cmFuc3BvcnQuYyBiL2ZzL2NpZnMvdHJhbnNwb3J0LmMgaW5kZXgNCj4gPiA0
-N2ExMjVlLi5iYTYyYWFmIDEwMDY0NA0KPiA+IC0tLSBhL2ZzL2NpZnMvdHJhbnNwb3J0LmMNCj4g
-PiArKysgYi9mcy9jaWZzL3RyYW5zcG9ydC5jDQo+ID4gQEAgLTUzNywxMCArNTM3LDEwIEBAIGNp
-ZnNfY2FsbF9hc3luYyhzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIsDQo+IHN0cnVjdCBz
-bWJfcnFzdCAqcnFzdCwNCj4gPiAgICAgICAgIHNwaW5fdW5sb2NrKCZHbG9iYWxNaWRfTG9jayk7
-DQo+ID4NCj4gPg0KPiA+ICsgICAgICAgY2lmc19zYXZlX3doZW5fc2VudChtaWQpOw0KPiA+ICAg
-ICAgICAgY2lmc19pbl9zZW5kX2luYyhzZXJ2ZXIpOw0KPiA+ICAgICAgICAgcmMgPSBzbWJfc2Vu
-ZF9ycXN0KHNlcnZlciwgcnFzdCwgZmxhZ3MpOw0KPiA+ICAgICAgICAgY2lmc19pbl9zZW5kX2Rl
-YyhzZXJ2ZXIpOw0KPiA+IC0gICAgICAgY2lmc19zYXZlX3doZW5fc2VudChtaWQpOw0KPiA+DQo+
-ID4gICAgICAgICBpZiAocmMgPCAwKSB7DQo+ID4gICAgICAgICAgICAgICAgIHNlcnZlci0+c2Vx
-dWVuY2VfbnVtYmVyIC09IDI7DQo+ID4gLS0NCj4gPiAyLjcuNA0KPiA+DQo+ID4gLS0NCj4gPiBU
-byB1bnN1YnNjcmliZSBmcm9tIHRoaXMgbGlzdDogc2VuZCB0aGUgbGluZSAidW5zdWJzY3JpYmUg
-bGludXgtY2lmcyINCj4gPiBpbiB0aGUgYm9keSBvZiBhIG1lc3NhZ2UgdG8gbWFqb3Jkb21vQHZn
-ZXIua2VybmVsLm9yZyBNb3JlDQo+IG1ham9yZG9tbw0KPiA+IGluZm8gYXQNCj4gPg0KPiBodHRw
-czovL25hMDEuc2FmZWxpbmtzLnByb3RlY3Rpb24ub3V0bG9vay5jb20vP3VybD1odHRwJTNBJTJG
-JTJGdmdlci5rDQo+ID4gZXJuZWwub3JnJTJGbWFqb3Jkb21vLQ0KPiBpbmZvLmh0bWwmZGF0YT0w
-MiU3QzAxJTdDbG9uZ2xpJTQwbWljcm9zb2Z0LmNvbSUNCj4gPg0KPiA3QzEyZTcyODg4Yzk0MDQ5
-ZDU4Y2ViMDhkNGJlNTJjMjhjJTdDNzJmOTg4YmY4NmYxNDFhZjkxYWIyZDdjZDAxMWQNCj4gYjQ3
-JQ0KPiA+DQo+IDdDMSU3QzAlN0M2MzYzNDI3MTAwNDI5OTQxMDMmc2RhdGE9aCUyRmtaSEJRNWJ3
-dklpUzNLMEhKJTJCU2dIDQo+IDd3b0I0RUhwDQo+ID4gdCUyRnpvV0U2MjZ4M1UlM0QmcmVzZXJ2
-ZWQ9MA0KPiANCj4gTG9va3MgZ29vZC4gQ291bGQgeW91IHBsZWFzZSBhZGQgYW4gYWRkaXRpb25h
-bCBjb21tZW50IGRlc2NyaWJpbmcgdGhlDQo+IGJlaGF2aW9yIGluIHRoZSBjb2RlPw0KDQpTdXJl
-LCB3aWxsIGRvLg0KDQo+IA0KPiAtLQ0KPiBCZXN0IHJlZ2FyZHMsDQo+IFBhdmVsIFNoaWxvdnNr
-eQ0K
+From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+
+In cifs_call_async, server may respond as soon as I/O is submitted. Because 
+mid entry is freed on the return path, it should not be modified after I/O 
+is submitted.
+
+cifs_save_when_sent modifies the sent timestamp in mid entry, and should not
+be called after I/O. Call it before I/O.
+
+Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+---
+ fs/cifs/transport.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 47a125e..ba62aaf 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -537,10 +537,10 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
+ 	spin_unlock(&GlobalMid_Lock);
+ 
+ 
++	cifs_save_when_sent(mid);
+ 	cifs_in_send_inc(server);
+ 	rc = smb_send_rqst(server, rqst, flags);
+ 	cifs_in_send_dec(server);
+-	cifs_save_when_sent(mid);
+ 
+ 	if (rc < 0) {
+ 		server->sequence_number -= 2;
+-- 
+2.7.4
