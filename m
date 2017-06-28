@@ -1,47 +1,39 @@
-From: Rajesh Srinivasan <rajesh.chivas-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Request update on Bug 194691 - Unreachable CIFS mount hangs system
-Date: Wed, 28 Jun 2017 17:08:42 +0530
-Message-ID: <CADg6pLma0nHYFZGSz4SAh4CnNTejtD7CELUXAo+=7rVtErJe=Q@mail.gmail.com>
-References: <CADg6pLkLC9BuYDOvwkV86jJq7ZpjV2DrLexGvtsjFzVYu6RZsA@mail.gmail.com>
- <CAKywueQBznxKkXNnCNOuYHLA-J0N59-Je+zt5J1u7YXAyH6KSg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+Subject: [PATCH] cifs: Do not modify mid entry after submitting I/O in cifs_call_async
+Date: Wed, 28 Jun 2017 10:50:02 -0700
+Message-ID: <1498672202-30452-1-git-send-email-longli@exchange.microsoft.com>
+Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueQBznxKkXNnCNOuYHLA-J0N59-Je+zt5J1u7YXAyH6KSg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi Pavel,
+From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 
-The issue is reproducible on 3.16.42 and 3.16.44.
+In cifs_call_async, server response may return as soon as I/O is submitted.
+Do not touch it after that.
 
-Thanks,
-Rajesh
+Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+---
+ fs/cifs/transport.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On Wed, Jun 28, 2017 at 10:37 AM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> 2017-06-27 21:25 GMT-07:00 Rajesh Srinivasan <rajesh.chivas-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
->> Hi,
->>
->> Could you please review the bug 194691
->> https://bugzilla.kernel.org/show_bug.cgi?id=194691 and let me know if
->> there are any upcoming patches that can fix this issue.
->>
->> This has become a severe issue for our software after upgrading from
->> 3.14 to 3.16 and any pointers on handling it would help.
->>
->> Thanks,
->> Rajesh
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-> Reconnect fixes were backported to 3.16 kernel starting from v3.16.42
-> version. I suggest upgrading the kernel from v3.16.38 (as mentioned in
-> the bug) to the newer one.
->
-> --
-> Best regards,
-> Pavel Shilovsky
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 47a125e..ba62aaf 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -537,10 +537,10 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
+ 	spin_unlock(&GlobalMid_Lock);
+ 
+ 
++	cifs_save_when_sent(mid);
+ 	cifs_in_send_inc(server);
+ 	rc = smb_send_rqst(server, rqst, flags);
+ 	cifs_in_send_dec(server);
+-	cifs_save_when_sent(mid);
+ 
+ 	if (rc < 0) {
+ 		server->sequence_number -= 2;
+-- 
+2.7.4
