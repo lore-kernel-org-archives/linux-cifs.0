@@ -1,7 +1,7 @@
 From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Subject: [PATCH v2] cifs: Do not modify mid entry after submitting I/O in cifs_call_async
-Date: Wed, 28 Jun 2017 11:56:03 -0700
-Message-ID: <1498676163-31746-1-git-send-email-longli@exchange.microsoft.com>
+Subject: [PATCH v3] cifs: Do not modify mid entry after submitting I/O in cifs_call_async
+Date: Wed, 28 Jun 2017 15:02:38 -0700
+Message-ID: <1498687358-7492-1-git-send-email-longli@exchange.microsoft.com>
 Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
         samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -11,8 +11,8 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 
-In cifs_call_async, server may respond as soon as I/O is submitted. Because 
-mid entry is freed on the return path, it should not be modified after I/O 
+In cifs_call_async, server may respond as soon as I/O is submitted. Because
+mid entry is freed on the return path, it should not be modified after I/O
 is submitted.
 
 cifs_save_when_sent modifies the sent timestamp in mid entry, and should not
@@ -20,17 +20,21 @@ be called after I/O. Call it before I/O.
 
 Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 ---
- fs/cifs/transport.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/cifs/transport.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 47a125e..ba62aaf 100644
+index 47a125e..f49b73f 100644
 --- a/fs/cifs/transport.c
 +++ b/fs/cifs/transport.c
-@@ -537,10 +537,10 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
+@@ -536,11 +536,13 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
+ 	list_add_tail(&mid->qhead, &server->pending_mid_q);
  	spin_unlock(&GlobalMid_Lock);
  
- 
+-
++	/* Need to store the time in mid before calling I/O. For call_async,
++	 * I/O response can come back and free the mid entry on another thread.
++	 */
 +	cifs_save_when_sent(mid);
  	cifs_in_send_inc(server);
  	rc = smb_send_rqst(server, rqst, flags);
