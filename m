@@ -1,7 +1,7 @@
 From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH 1/2] cifs: prototype declaration and definition to set acl for smb 2 - 3 and cifsacl mount options
-Date: Wed, 28 Jun 2017 22:37:00 -0500
-Message-ID: <1498707420-8702-1-git-send-email-shirishpargaonkar@gmail.com>
+Subject: [PATCH 2/2] cifs: Use smb 2 - 3 and cifsacl mount options setacl function
+Date: Wed, 28 Jun 2017 22:37:32 -0500
+Message-ID: <1498707452-8745-1-git-send-email-shirishpargaonkar@gmail.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
         Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -11,129 +11,117 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-Modified current set info function to accommodate multiple info types and
-additional information.
-
-Added cifs acl specific function to invoke set info functionality.
-
+Added set acl function. Very similar to set cifs acl function for smb1.
 
 Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
 ---
- fs/cifs/smb2pdu.c   | 39 +++++++++++++++++++++++++++------------
- fs/cifs/smb2proto.h |  3 +++
- 2 files changed, 30 insertions(+), 12 deletions(-)
+ fs/cifs/smb2ops.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 61 insertions(+), 4 deletions(-)
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 4938e8b..c3c8eaf 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -3000,8 +3000,9 @@ void smb2_reconnect_server(struct work_struct *work)
- 
- static int
- send_set_info(const unsigned int xid, struct cifs_tcon *tcon,
--	       u64 persistent_fid, u64 volatile_fid, u32 pid, int info_class,
--	       unsigned int num, void **data, unsigned int *size)
-+	       u64 persistent_fid, u64 volatile_fid, u32 pid, u8 info_class,
-+	       u8 info_type, u32 additional_info, unsigned int num,
-+		void **data, unsigned int *size)
- {
- 	struct smb2_set_info_req *req;
- 	struct smb2_set_info_rsp *rsp = NULL;
-@@ -3037,10 +3038,11 @@ void smb2_reconnect_server(struct work_struct *work)
- 
- 	req->hdr.sync_hdr.ProcessId = cpu_to_le32(pid);
- 
--	req->InfoType = SMB2_O_INFO_FILE;
-+	req->InfoType = info_type;
- 	req->FileInfoClass = info_class;
- 	req->PersistentFileId = persistent_fid;
- 	req->VolatileFileId = volatile_fid;
-+	req->AdditionalInformation = cpu_to_le32(additional_info);
- 
- 	/* 4 for RFC1001 length and 1 for Buffer */
- 	req->BufferOffset =
-@@ -3100,8 +3102,8 @@ void smb2_reconnect_server(struct work_struct *work)
- 	size[1] = len + 2 /* null */;
- 
- 	rc = send_set_info(xid, tcon, persistent_fid, volatile_fid,
--			   current->tgid, FILE_RENAME_INFORMATION, 2, data,
--			   size);
-+		current->tgid, FILE_RENAME_INFORMATION, SMB2_O_INFO_FILE,
-+		0, 2, data, size);
- 	kfree(data);
- 	return rc;
- }
-@@ -3118,8 +3120,8 @@ void smb2_reconnect_server(struct work_struct *work)
- 	size = 1; /* sizeof __u8 */
- 
- 	return send_set_info(xid, tcon, persistent_fid, volatile_fid,
--			current->tgid, FILE_DISPOSITION_INFORMATION, 1, &data,
--			&size);
-+		current->tgid, FILE_DISPOSITION_INFORMATION, SMB2_O_INFO_FILE,
-+		0, 1, &data, &size);
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 6b1ef79..490737c 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -1369,6 +1369,63 @@ static bool smb2_set_sparse(const unsigned int xid, struct cifs_tcon *tcon,
+ 	return pntsd;
  }
  
- int
-@@ -3148,7 +3150,8 @@ void smb2_reconnect_server(struct work_struct *work)
- 	size[1] = len + 2 /* null */;
- 
- 	rc = send_set_info(xid, tcon, persistent_fid, volatile_fid,
--			   current->tgid, FILE_LINK_INFORMATION, 2, data, size);
-+			current->tgid, FILE_LINK_INFORMATION, SMB2_O_INFO_FILE,
-+			0, 2, data, size);
- 	kfree(data);
- 	return rc;
- }
-@@ -3168,10 +3171,12 @@ void smb2_reconnect_server(struct work_struct *work)
- 
- 	if (is_falloc)
- 		return send_set_info(xid, tcon, persistent_fid, volatile_fid,
--			pid, FILE_ALLOCATION_INFORMATION, 1, &data, &size);
-+			pid, FILE_ALLOCATION_INFORMATION, SMB2_O_INFO_FILE,
-+			0, 1, &data, &size);
- 	else
- 		return send_set_info(xid, tcon, persistent_fid, volatile_fid,
--			pid, FILE_END_OF_FILE_INFORMATION, 1, &data, &size);
-+			pid, FILE_END_OF_FILE_INFORMATION, SMB2_O_INFO_FILE,
-+			0, 1, &data, &size);
- }
- 
- int
-@@ -3181,8 +3186,18 @@ void smb2_reconnect_server(struct work_struct *work)
- 	unsigned int size;
- 	size = sizeof(FILE_BASIC_INFO);
- 	return send_set_info(xid, tcon, persistent_fid, volatile_fid,
--			     current->tgid, FILE_BASIC_INFORMATION, 1,
--			     (void **)&buf, &size);
-+		current->tgid, FILE_BASIC_INFORMATION, SMB2_O_INFO_FILE,
-+		0, 1, (void **)&buf, &size);
-+}
-+
++#ifdef CONFIG_CIFS_ACL
 +int
-+SMB2_set_acl(const unsigned int xid, struct cifs_tcon *tcon,
-+		u64 persistent_fid, u64 volatile_fid,
-+		struct cifs_ntsd *pnntsd, int pacllen, int aclflag)
++set_smb2_acl(struct cifs_ntsd *pnntsd, __u32 acllen,
++		struct inode *inode, const char *path, int aclflag)
 +{
-+	return send_set_info(xid, tcon, persistent_fid, volatile_fid,
-+			current->tgid, 0, SMB2_O_INFO_SECURITY, aclflag,
-+			1, (void **)&pnntsd, &pacllen);
- }
++	u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
++	unsigned int xid;
++	int rc, access_flags, create_options = 0;
++	struct cifs_tcon *tcon;
++	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
++	struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
++	struct cifs_fid fid;
++	struct cifs_open_parms oparms;
++	__le16 *utf16_path;
++
++	cifs_dbg(FYI, "set smb3 acl for path %s\n", path);
++	if (IS_ERR(tlink))
++		return PTR_ERR(tlink);
++
++	tcon = tlink_tcon(tlink);
++	xid = get_xid();
++
++	if (backup_cred(cifs_sb))
++		oparms.create_options |= CREATE_OPEN_BACKUP_INTENT;
++
++	if (aclflag == CIFS_ACL_OWNER || aclflag == CIFS_ACL_GROUP)
++		access_flags = WRITE_OWNER;
++	else
++		access_flags = WRITE_DAC;
++
++	utf16_path = cifs_convert_path_to_utf16(path, cifs_sb);
++	if (!utf16_path)
++		return -ENOMEM;
++
++	oparms.tcon = tcon;
++	oparms.desired_access = access_flags;
++	oparms.create_options = create_options;
++	oparms.disposition = FILE_OPEN;
++	oparms.path = path;
++	oparms.fid = &fid;
++	oparms.reconnect = false;
++
++	rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL);
++	kfree(utf16_path);
++	if (!rc) {
++		rc = SMB2_set_acl(xid, tlink_tcon(tlink), fid.persistent_fid,
++			    fid.volatile_fid, pnntsd, acllen, aclflag);
++		SMB2_close(xid, tcon, fid.persistent_fid, fid.volatile_fid);
++	}
++
++	cifs_put_tlink(tlink);
++	free_xid(xid);
++
++	return rc;
++}
++#endif /* CIFS_ACL */
++
+ /* Retrieve an ACL from the server */
+ static struct cifs_ntsd *
+ get_smb2_acl(struct cifs_sb_info *cifs_sb,
+@@ -2495,7 +2552,7 @@ struct smb_version_operations smb20_operations = {
+ #ifdef CONFIG_CIFS_ACL
+ 	.get_acl = get_smb2_acl,
+ 	.get_acl_by_fid = get_smb2_acl_by_fid,
+-/*	.set_acl = set_smb3_acl, */
++	.set_acl = set_smb2_acl,
+ #endif /* CIFS_ACL */
+ };
  
- int
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index 3595cd7..1cadaf9 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -166,6 +166,9 @@ extern int SMB2_set_eof(const unsigned int xid, struct cifs_tcon *tcon,
- extern int SMB2_set_info(const unsigned int xid, struct cifs_tcon *tcon,
- 			 u64 persistent_fid, u64 volatile_fid,
- 			 FILE_BASIC_INFO *buf);
-+extern int SMB2_set_acl(const unsigned int xid, struct cifs_tcon *tcon,
-+			u64 persistent_fid, u64 volatile_fid,
-+			struct cifs_ntsd *pnntsd, int pacllen, int aclflag);
- extern int SMB2_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
- 				u64 persistent_fid, u64 volatile_fid);
- extern int SMB2_oplock_break(const unsigned int xid, struct cifs_tcon *tcon,
+@@ -2584,7 +2641,7 @@ struct smb_version_operations smb21_operations = {
+ #ifdef CONFIG_CIFS_ACL
+ 	.get_acl = get_smb2_acl,
+ 	.get_acl_by_fid = get_smb2_acl_by_fid,
+-/*	.set_acl = set_smb3_acl, */
++	.set_acl = set_smb2_acl,
+ #endif /* CIFS_ACL */
+ };
+ 
+@@ -2683,7 +2740,7 @@ struct smb_version_operations smb30_operations = {
+ #ifdef CONFIG_CIFS_ACL
+ 	.get_acl = get_smb2_acl,
+ 	.get_acl_by_fid = get_smb2_acl_by_fid,
+-/*	.set_acl = set_smb3_acl, */
++	.set_acl = set_smb2_acl,
+ #endif /* CIFS_ACL */
+ };
+ 
+@@ -2783,7 +2840,7 @@ struct smb_version_operations smb311_operations = {
+ #ifdef CONFIG_CIFS_ACL
+ 	.get_acl = get_smb2_acl,
+ 	.get_acl_by_fid = get_smb2_acl_by_fid,
+-/*	.set_acl = set_smb3_acl, */
++	.set_acl = set_smb2_acl,
+ #endif /* CIFS_ACL */
+ };
+ #endif /* CIFS_SMB311 */
 -- 
 1.9.1
