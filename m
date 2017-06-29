@@ -1,137 +1,71 @@
-From: Rabin Vincent <rabin.vincent-VrBV9hrLPhE@public.gmane.org>
-Subject: [PATCH] CIFS: fix circular locking dependency
-Date: Thu, 29 Jun 2017 16:01:42 +0200
-Message-ID: <1498744902-22754-1-git-send-email-rabin.vincent@axis.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
-To: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH v4] cifs: Do not modify mid entry after submitting I/O in cifs_call_async
+Date: Thu, 29 Jun 2017 10:56:08 -0500
+Message-ID: <CAH2r5muWvG-6mo=s+35CLJi7BeGoLm-5uP+OZz_2Hkm9G=kG_w@mail.gmail.com>
+References: <1498690555-8454-1-git-send-email-longli@exchange.microsoft.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1498690555-8454-1-git-send-email-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
+merged into cifs-2.6.git for-next
 
-When a CIFS filesystem is mounted with the forcemand option and the
-following command is run on it, lockdep warns about a circular locking
-dependency between CifsInodeInfo::lock_sem and the inode lock.
+On Wed, Jun 28, 2017 at 5:55 PM, Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org> wrote:
+> From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+>
+> In cifs_call_async, server may respond as soon as I/O is submitted. Because
+> mid entry is freed on the return path, it should not be modified after I/O
+> is submitted.
+>
+> cifs_save_when_sent modifies the sent timestamp in mid entry, and should not
+> be called after I/O. Call it before I/O.
+>
+> Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+> Reviewed-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+> ---
+>  fs/cifs/transport.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+>
+> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+> index 47a125e..7efbab0 100644
+> --- a/fs/cifs/transport.c
+> +++ b/fs/cifs/transport.c
+> @@ -536,11 +536,14 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
+>         list_add_tail(&mid->qhead, &server->pending_mid_q);
+>         spin_unlock(&GlobalMid_Lock);
+>
+> -
+> +       /*
+> +        * Need to store the time in mid before calling I/O. For call_async,
+> +        * I/O response may come back and free the mid entry on another thread.
+> +        */
+> +       cifs_save_when_sent(mid);
+>         cifs_in_send_inc(server);
+>         rc = smb_send_rqst(server, rqst, flags);
+>         cifs_in_send_dec(server);
+> -       cifs_save_when_sent(mid);
+>
+>         if (rc < 0) {
+>                 server->sequence_number -= 2;
+> --
+> 2.7.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
- while echo foo > hello; do :; done & while touch -c hello; do :; done
 
-cifs_writev() takes the locks in the wrong order, but note that we can't
-only flip the order around because it releases the inode lock before the
-call to generic_write_sync() while it holds the lock_sem across that
-call.
 
-But, AFAICS, there is no need to hold the CifsInodeInfo::lock_sem across
-the generic_write_sync() call either, so we can release both the locks
-before generic_write_sync(), and change the order.
-
- ======================================================
- WARNING: possible circular locking dependency detected
- 4.12.0-rc7+ #9 Not tainted
- ------------------------------------------------------
- touch/487 is trying to acquire lock:
-  (&cifsi->lock_sem){++++..}, at: cifsFileInfo_put+0x88f/0x16a0
-
- but task is already holding lock:
-  (&sb->s_type->i_mutex_key#11){+.+.+.}, at: utimes_common+0x3ad/0x870
-
- which lock already depends on the new lock.
-
- the existing dependency chain (in reverse order) is:
-
- -> #1 (&sb->s_type->i_mutex_key#11){+.+.+.}:
-        __lock_acquire+0x1f74/0x38f0
-        lock_acquire+0x1cc/0x600
-        down_write+0x74/0x110
-        cifs_strict_writev+0x3cb/0x8c0
-        __vfs_write+0x4c1/0x930
-        vfs_write+0x14c/0x2d0
-        SyS_write+0xf7/0x240
-        entry_SYSCALL_64_fastpath+0x1f/0xbe
-
- -> #0 (&cifsi->lock_sem){++++..}:
-        check_prevs_add+0xfa0/0x1d10
-        __lock_acquire+0x1f74/0x38f0
-        lock_acquire+0x1cc/0x600
-        down_write+0x74/0x110
-        cifsFileInfo_put+0x88f/0x16a0
-        cifs_setattr+0x992/0x1680
-        notify_change+0x61a/0xa80
-        utimes_common+0x3d4/0x870
-        do_utimes+0x1c1/0x220
-        SyS_utimensat+0x84/0x1a0
-        entry_SYSCALL_64_fastpath+0x1f/0xbe
-
- other info that might help us debug this:
-
-  Possible unsafe locking scenario:
-
-        CPU0                    CPU1
-        ----                    ----
-   lock(&sb->s_type->i_mutex_key#11);
-                                lock(&cifsi->lock_sem);
-                                lock(&sb->s_type->i_mutex_key#11);
-   lock(&cifsi->lock_sem);
-
-  *** DEADLOCK ***
-
- 2 locks held by touch/487:
-  #0:  (sb_writers#10){.+.+.+}, at: mnt_want_write+0x41/0xb0
-  #1:  (&sb->s_type->i_mutex_key#11){+.+.+.}, at: utimes_common+0x3ad/0x870
-
- stack backtrace:
- CPU: 0 PID: 487 Comm: touch Not tainted 4.12.0-rc7+ #9
- Call Trace:
-  dump_stack+0xdb/0x185
-  print_circular_bug+0x45b/0x790
-  __lock_acquire+0x1f74/0x38f0
-  lock_acquire+0x1cc/0x600
-  down_write+0x74/0x110
-  cifsFileInfo_put+0x88f/0x16a0
-  cifs_setattr+0x992/0x1680
-  notify_change+0x61a/0xa80
-  utimes_common+0x3d4/0x870
-  do_utimes+0x1c1/0x220
-  SyS_utimensat+0x84/0x1a0
-  entry_SYSCALL_64_fastpath+0x1f/0xbe
-
-Fixes: 19dfc1f5f2ef03a52 ("cifs: fix the race in cifs_writev()")
-Signed-off-by: Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
----
- fs/cifs/file.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index fcef706..d16fa55 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -2810,12 +2810,12 @@ cifs_writev(struct kiocb *iocb, struct iov_iter *from)
- 	struct TCP_Server_Info *server = tlink_tcon(cfile->tlink)->ses->server;
- 	ssize_t rc;
- 
-+	inode_lock(inode);
- 	/*
- 	 * We need to hold the sem to be sure nobody modifies lock list
- 	 * with a brlock that prevents writing.
- 	 */
- 	down_read(&cinode->lock_sem);
--	inode_lock(inode);
- 
- 	rc = generic_write_checks(iocb, from);
- 	if (rc <= 0)
-@@ -2828,11 +2828,11 @@ cifs_writev(struct kiocb *iocb, struct iov_iter *from)
- 	else
- 		rc = -EACCES;
- out:
-+	up_read(&cinode->lock_sem);
- 	inode_unlock(inode);
- 
- 	if (rc > 0)
- 		rc = generic_write_sync(iocb, rc);
--	up_read(&cinode->lock_sem);
- 	return rc;
- }
- 
 -- 
-2.1.4
+Thanks,
+
+Steve
