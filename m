@@ -1,49 +1,139 @@
-From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Subject: [PATCH v4] cifs: Do not modify mid entry after submitting I/O in cifs_call_async
-Date: Wed, 28 Jun 2017 15:55:55 -0700
-Message-ID: <1498690555-8454-1-git-send-email-longli@exchange.microsoft.com>
-Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH 1/2] cifs: prototype declaration and definition to set acl for smb 2 - 3 and cifsacl mount options
+Date: Wed, 28 Jun 2017 22:37:00 -0500
+Message-ID: <1498707420-8702-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-In cifs_call_async, server may respond as soon as I/O is submitted. Because
-mid entry is freed on the return path, it should not be modified after I/O
-is submitted.
+Modified current set info function to accommodate multiple info types and
+additional information.
 
-cifs_save_when_sent modifies the sent timestamp in mid entry, and should not
-be called after I/O. Call it before I/O.
+Added cifs acl specific function to invoke set info functionality.
 
-Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Reviewed-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+
 ---
- fs/cifs/transport.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ fs/cifs/smb2pdu.c   | 39 +++++++++++++++++++++++++++------------
+ fs/cifs/smb2proto.h |  3 +++
+ 2 files changed, 30 insertions(+), 12 deletions(-)
 
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 47a125e..7efbab0 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -536,11 +536,14 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
- 	list_add_tail(&mid->qhead, &server->pending_mid_q);
- 	spin_unlock(&GlobalMid_Lock);
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 4938e8b..c3c8eaf 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -3000,8 +3000,9 @@ void smb2_reconnect_server(struct work_struct *work)
  
--
-+	/*
-+	 * Need to store the time in mid before calling I/O. For call_async,
-+	 * I/O response may come back and free the mid entry on another thread.
-+	 */
-+	cifs_save_when_sent(mid);
- 	cifs_in_send_inc(server);
- 	rc = smb_send_rqst(server, rqst, flags);
- 	cifs_in_send_dec(server);
--	cifs_save_when_sent(mid);
+ static int
+ send_set_info(const unsigned int xid, struct cifs_tcon *tcon,
+-	       u64 persistent_fid, u64 volatile_fid, u32 pid, int info_class,
+-	       unsigned int num, void **data, unsigned int *size)
++	       u64 persistent_fid, u64 volatile_fid, u32 pid, u8 info_class,
++	       u8 info_type, u32 additional_info, unsigned int num,
++		void **data, unsigned int *size)
+ {
+ 	struct smb2_set_info_req *req;
+ 	struct smb2_set_info_rsp *rsp = NULL;
+@@ -3037,10 +3038,11 @@ void smb2_reconnect_server(struct work_struct *work)
  
- 	if (rc < 0) {
- 		server->sequence_number -= 2;
+ 	req->hdr.sync_hdr.ProcessId = cpu_to_le32(pid);
+ 
+-	req->InfoType = SMB2_O_INFO_FILE;
++	req->InfoType = info_type;
+ 	req->FileInfoClass = info_class;
+ 	req->PersistentFileId = persistent_fid;
+ 	req->VolatileFileId = volatile_fid;
++	req->AdditionalInformation = cpu_to_le32(additional_info);
+ 
+ 	/* 4 for RFC1001 length and 1 for Buffer */
+ 	req->BufferOffset =
+@@ -3100,8 +3102,8 @@ void smb2_reconnect_server(struct work_struct *work)
+ 	size[1] = len + 2 /* null */;
+ 
+ 	rc = send_set_info(xid, tcon, persistent_fid, volatile_fid,
+-			   current->tgid, FILE_RENAME_INFORMATION, 2, data,
+-			   size);
++		current->tgid, FILE_RENAME_INFORMATION, SMB2_O_INFO_FILE,
++		0, 2, data, size);
+ 	kfree(data);
+ 	return rc;
+ }
+@@ -3118,8 +3120,8 @@ void smb2_reconnect_server(struct work_struct *work)
+ 	size = 1; /* sizeof __u8 */
+ 
+ 	return send_set_info(xid, tcon, persistent_fid, volatile_fid,
+-			current->tgid, FILE_DISPOSITION_INFORMATION, 1, &data,
+-			&size);
++		current->tgid, FILE_DISPOSITION_INFORMATION, SMB2_O_INFO_FILE,
++		0, 1, &data, &size);
+ }
+ 
+ int
+@@ -3148,7 +3150,8 @@ void smb2_reconnect_server(struct work_struct *work)
+ 	size[1] = len + 2 /* null */;
+ 
+ 	rc = send_set_info(xid, tcon, persistent_fid, volatile_fid,
+-			   current->tgid, FILE_LINK_INFORMATION, 2, data, size);
++			current->tgid, FILE_LINK_INFORMATION, SMB2_O_INFO_FILE,
++			0, 2, data, size);
+ 	kfree(data);
+ 	return rc;
+ }
+@@ -3168,10 +3171,12 @@ void smb2_reconnect_server(struct work_struct *work)
+ 
+ 	if (is_falloc)
+ 		return send_set_info(xid, tcon, persistent_fid, volatile_fid,
+-			pid, FILE_ALLOCATION_INFORMATION, 1, &data, &size);
++			pid, FILE_ALLOCATION_INFORMATION, SMB2_O_INFO_FILE,
++			0, 1, &data, &size);
+ 	else
+ 		return send_set_info(xid, tcon, persistent_fid, volatile_fid,
+-			pid, FILE_END_OF_FILE_INFORMATION, 1, &data, &size);
++			pid, FILE_END_OF_FILE_INFORMATION, SMB2_O_INFO_FILE,
++			0, 1, &data, &size);
+ }
+ 
+ int
+@@ -3181,8 +3186,18 @@ void smb2_reconnect_server(struct work_struct *work)
+ 	unsigned int size;
+ 	size = sizeof(FILE_BASIC_INFO);
+ 	return send_set_info(xid, tcon, persistent_fid, volatile_fid,
+-			     current->tgid, FILE_BASIC_INFORMATION, 1,
+-			     (void **)&buf, &size);
++		current->tgid, FILE_BASIC_INFORMATION, SMB2_O_INFO_FILE,
++		0, 1, (void **)&buf, &size);
++}
++
++int
++SMB2_set_acl(const unsigned int xid, struct cifs_tcon *tcon,
++		u64 persistent_fid, u64 volatile_fid,
++		struct cifs_ntsd *pnntsd, int pacllen, int aclflag)
++{
++	return send_set_info(xid, tcon, persistent_fid, volatile_fid,
++			current->tgid, 0, SMB2_O_INFO_SECURITY, aclflag,
++			1, (void **)&pnntsd, &pacllen);
+ }
+ 
+ int
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index 3595cd7..1cadaf9 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -166,6 +166,9 @@ extern int SMB2_set_eof(const unsigned int xid, struct cifs_tcon *tcon,
+ extern int SMB2_set_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 			 u64 persistent_fid, u64 volatile_fid,
+ 			 FILE_BASIC_INFO *buf);
++extern int SMB2_set_acl(const unsigned int xid, struct cifs_tcon *tcon,
++			u64 persistent_fid, u64 volatile_fid,
++			struct cifs_ntsd *pnntsd, int pacllen, int aclflag);
+ extern int SMB2_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
+ 				u64 persistent_fid, u64 volatile_fid);
+ extern int SMB2_oplock_break(const unsigned int xid, struct cifs_tcon *tcon,
 -- 
-2.7.4
+1.9.1
