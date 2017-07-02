@@ -1,7 +1,8 @@
 From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Subject: [PATCH v3 00/28] simplify crypto wait for async op
-Date: Sun,  2 Jul 2017 17:41:42 +0300
-Message-ID: <1499006535-19760-1-git-send-email-gilad__26858.227272942$1499006556$gmane$org@benyossef.com>
+Subject: [PATCH v3 01/28] crypto: change backlog return code to -EIOCBQUEUED
+Date: Sun,  2 Jul 2017 17:41:43 +0300
+Message-ID: <1499006535-19760-2-git-send-email-gilad__40298.5711502426$1499006588$gmane$org@benyossef.com>
+References: <1499006535-19760-1-git-send-email-gilad@benyossef.com>
 Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
 To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
         "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
@@ -22,136 +23,400 @@ To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
         James Morris <james.l.morris-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
         "Serge E. Hallyn" <serge-A9i7LUbDfNHQT0dZR+AlfA@public.gmane.org>, linux-crypto@v
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1499006535-19760-1-git-send-email-gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Many users of kernel async. crypto services have a pattern of
-starting an async. crypto op and than using a completion
-to wait for it to end.
+The crypto API was using the -EBUSY return value to indicate
+both a hard failure to submit a crypto operation into a
+transformation provider when the latter was busy and the backlog
+mechanism was not enabled as well as a notification that the operation
+was queued into the backlog when the backlog mechanism was enabled.
 
-This patch set simplifies this common use case in two ways:
+Having the same return code indicate two very different conditions
+depending on a flag is both error prone and requires extra runtime
+check like the following to discern between the cases:
 
-First, by giving the case where a request was queued to the
-backlog a separate return code (-EIOCBQUEUED) of its own
-rather than sharing the -EBUSY return code with the fatal
-error of a busy provider when backlog is not enabled.
+	if (err == -EINPROGRESS ||
+	    (err == -EBUSY && (ahash_request_flags(req) &
+			       CRYPTO_TFM_REQ_MAY_BACKLOG)))
 
-Next, this change is than built on to create a generic way
-to wait for a async. crypto operation to complete.
+This patch changes the return code used to indicate a crypto op
+was queued in the backlog to -EIOCBQUEUED, thus resolving both
+issues.
 
-The end result is that after replacing all the call sites
-I could find, the code is smaller by ~340 lines, a branch
-is saved in some cases in run-time and the code is more
-straightforward to follow.
+Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+---
+ crypto/af_alg.c                     |  2 +-
+ crypto/ahash.c                      | 12 +++---------
+ crypto/algapi.c                     |  6 ++++--
+ crypto/asymmetric_keys/public_key.c |  2 +-
+ crypto/chacha20poly1305.c           |  2 +-
+ crypto/cryptd.c                     |  4 +---
+ crypto/cts.c                        |  6 ++----
+ crypto/drbg.c                       |  2 +-
+ crypto/gcm.c                        |  2 +-
+ crypto/lrw.c                        |  8 ++------
+ crypto/rsa-pkcs1pad.c               | 16 ++++------------
+ crypto/tcrypt.c                     |  6 +++---
+ crypto/testmgr.c                    | 12 ++++++------
+ crypto/xts.c                        |  8 ++------
+ 14 files changed, 32 insertions(+), 56 deletions(-)
 
-Please note that patches 1-13 should be squashed together
-when applied in order to function correctly. They are
-only separated out to ease review.
-
-The patch set was boot tested on x86_64 and arm64 which
-at the very least tests the crypto users via testmgr and
-tcrypt but I do note that I do not have access to some
-of the HW whose drivers are modified nor do I claim I was
-able to test all of the corner cases.
-
-Last but not least, I do apologize for the size of this
-patch set and number of recipients, but I did have to
-touch every crypto async API user in the kernel. May the
-340 deleted lines serve as penance for my sin :-)
-
-Changes from v2:
-- Patch title changed from "introduce crypto wait for
-  async op" to better reflect the current state.
-- Rebase on top of latest linux-next.
-- Add a new return code of -EIOCBQUEUED for backlog
-  queueing, as suggested by Herbert Xu.
-- Transform more users to the new API.
-- Update the drbg change to account for new init as
-  indicated by Stephan Muller.
-
-Changes from v1:
-- Address review comments from Eric Biggers.
-- Separated out bug fixes of existing code and rebase
-  on top of that patch set.
-- Rename 'ecr' to 'wait' in fscrypto code.
-- Split patch introducing the new API from the change
-  moving over the algif code which it originated from
-  to the new API.
-- Inline crypto_wait_req().
-- Some code indentation fixes.
-
-Gilad Ben-Yossef (28):
-  crypto: change backlog return code to -EIOCBQUEUED
-  crypto: atmel: use -EIOCBQUEUED for backlog indication
-  crypto: ccm: use -EIOCBQUEUED for backlog indication
-  crypto: marvell/cesa: use -EIOCBQUEUED for backlog indication
-  crypto: mediatek: use -EIOCBQUEUED for backlog indication
-  crypto: omap: use -EIOCBQUEUED for backlog indication
-  crypto: qce: use -EIOCBQUEUED for backlog indication
-  crypto: talitos: use -EIOCBQUEUED for backlog indication
-  dm: verity: use -EIOCBQUEUED for backlog indication
-  fscrypt: use -EIOCBQUEUED for backlog indication
-  cifs: use -EIOCBQUEUED for backlog indication
-  ima: use -EIOCBQUEUED for backlog indication
-  crypto: adapt api sample to -EIOCBQUEUED as backlog indication
-  crypto: introduce crypto wait for async op
-  crypto: move algif to generic async completion
-  crypto: move pub key to generic async completion
-  crypto: move drbg to generic async completion
-  crypto: move gcm to generic async completion
-  crypto: move testmgr to generic async completion
-  dm: move dm-verity to generic async completion
-  fscrypt: move to generic async completion
-  cifs: move to generic async completion
-  ima: move to generic async completion
-  crypto: tcrypt: move to generic async completion
-  crypto: talitos: move to generic async completion
-  crypto: qce: move to generic async completion
-  crypto: mediatek: move to generic async completion
-  crypto: adapt api sample to use async. op wait
-
- Documentation/crypto/api-samples.rst |  52 ++-------
- crypto/af_alg.c                      |  27 -----
- crypto/ahash.c                       |  12 +--
- crypto/algapi.c                      |   6 +-
- crypto/algif_aead.c                  |  14 +--
- crypto/algif_hash.c                  |  29 +++--
- crypto/algif_skcipher.c              |  15 ++-
- crypto/api.c                         |  13 +++
- crypto/asymmetric_keys/public_key.c  |  28 +----
- crypto/chacha20poly1305.c            |   2 +-
- crypto/cryptd.c                      |   4 +-
- crypto/cts.c                         |   6 +-
- crypto/drbg.c                        |  36 ++-----
- crypto/gcm.c                         |  32 ++----
- crypto/lrw.c                         |   8 +-
- crypto/rsa-pkcs1pad.c                |  16 +--
- crypto/tcrypt.c                      |  84 +++++----------
- crypto/testmgr.c                     | 204 ++++++++++++-----------------------
- crypto/xts.c                         |   8 +-
- drivers/crypto/atmel-sha.c           |   2 +-
- drivers/crypto/ccp/ccp-crypto-main.c |  10 +-
- drivers/crypto/ccp/ccp-dev.c         |   8 +-
- drivers/crypto/ccp/ccp-dmaengine.c   |   2 +-
- drivers/crypto/marvell/cesa.c        |   2 +-
- drivers/crypto/marvell/cesa.h        |   2 +-
- drivers/crypto/mediatek/mtk-aes.c    |  31 +-----
- drivers/crypto/mediatek/mtk-sha.c    |   2 +-
- drivers/crypto/omap-sham.c           |   2 +-
- drivers/crypto/qce/sha.c             |  30 +-----
- drivers/crypto/talitos.c             |  39 +------
- drivers/md/dm-verity-target.c        |  81 ++++----------
- drivers/md/dm-verity.h               |   5 -
- fs/cifs/smb2ops.c                    |  30 +-----
- fs/crypto/crypto.c                   |  29 +----
- fs/crypto/fname.c                    |  36 ++-----
- fs/crypto/fscrypt_private.h          |  10 --
- fs/crypto/keyinfo.c                  |  21 +---
- include/crypto/drbg.h                |   3 +-
- include/crypto/if_alg.h              |  14 ---
- include/linux/crypto.h               |  40 +++++++
- security/integrity/ima/ima_crypto.c  |  56 +++-------
- 41 files changed, 305 insertions(+), 746 deletions(-)
-
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index 3556d8e..c67daba 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -484,7 +484,7 @@ int af_alg_wait_for_completion(int err, struct af_alg_completion *completion)
+ {
+ 	switch (err) {
+ 	case -EINPROGRESS:
+-	case -EBUSY:
++	case -EIOCBQUEUED:
+ 		wait_for_completion(&completion->completion);
+ 		reinit_completion(&completion->completion);
+ 		err = completion->err;
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index 826cd7a..65d08db 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -334,9 +334,7 @@ static int ahash_op_unaligned(struct ahash_request *req,
+ 		return err;
+ 
+ 	err = op(req);
+-	if (err == -EINPROGRESS ||
+-	    (err == -EBUSY && (ahash_request_flags(req) &
+-			       CRYPTO_TFM_REQ_MAY_BACKLOG)))
++	if (err == -EINPROGRESS || err == -EIOCBQUEUED)
+ 		return err;
+ 
+ 	ahash_restore_req(req, err);
+@@ -394,9 +392,7 @@ static int ahash_def_finup_finish1(struct ahash_request *req, int err)
+ 	req->base.complete = ahash_def_finup_done2;
+ 
+ 	err = crypto_ahash_reqtfm(req)->final(req);
+-	if (err == -EINPROGRESS ||
+-	    (err == -EBUSY && (ahash_request_flags(req) &
+-			       CRYPTO_TFM_REQ_MAY_BACKLOG)))
++	if (err == -EINPROGRESS || err == -EIOCBQUEUED)
+ 		return err;
+ 
+ out:
+@@ -432,9 +428,7 @@ static int ahash_def_finup(struct ahash_request *req)
+ 		return err;
+ 
+ 	err = tfm->update(req);
+-	if (err == -EINPROGRESS ||
+-	    (err == -EBUSY && (ahash_request_flags(req) &
+-			       CRYPTO_TFM_REQ_MAY_BACKLOG)))
++	if (err == -EINPROGRESS || err == -EIOCBQUEUED)
+ 		return err;
+ 
+ 	return ahash_def_finup_finish1(req, err);
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index e4cc761..3bfd1fa 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -897,9 +897,11 @@ int crypto_enqueue_request(struct crypto_queue *queue,
+ 	int err = -EINPROGRESS;
+ 
+ 	if (unlikely(queue->qlen >= queue->max_qlen)) {
+-		err = -EBUSY;
+-		if (!(request->flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++		if (!(request->flags & CRYPTO_TFM_REQ_MAY_BACKLOG)) {
++			err = -EBUSY;
+ 			goto out;
++		}
++		err = -EIOCBQUEUED;
+ 		if (queue->backlog == &queue->list)
+ 			queue->backlog = &request->list;
+ 	}
+diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+index 3cd6e12..3fad1fd 100644
+--- a/crypto/asymmetric_keys/public_key.c
++++ b/crypto/asymmetric_keys/public_key.c
+@@ -141,7 +141,7 @@ int public_key_verify_signature(const struct public_key *pkey,
+ 	 * signature and returns that to us.
+ 	 */
+ 	ret = crypto_akcipher_verify(req);
+-	if ((ret == -EINPROGRESS) || (ret == -EBUSY)) {
++	if ((ret == -EINPROGRESS) || (ret == -EIOCBQUEUED)) {
+ 		wait_for_completion(&compl.completion);
+ 		ret = compl.err;
+ 	}
+diff --git a/crypto/chacha20poly1305.c b/crypto/chacha20poly1305.c
+index db1bc31..e0e2785 100644
+--- a/crypto/chacha20poly1305.c
++++ b/crypto/chacha20poly1305.c
+@@ -79,7 +79,7 @@ static inline void async_done_continue(struct aead_request *req, int err,
+ 	if (!err)
+ 		err = cont(req);
+ 
+-	if (err != -EINPROGRESS && err != -EBUSY)
++	if (err != -EINPROGRESS && err != -EIOCBQUEUED)
+ 		aead_request_complete(req, err);
+ }
+ 
+diff --git a/crypto/cryptd.c b/crypto/cryptd.c
+index 0508c48..5daca13 100644
+--- a/crypto/cryptd.c
++++ b/crypto/cryptd.c
+@@ -137,16 +137,14 @@ static int cryptd_enqueue_request(struct cryptd_queue *queue,
+ 	int cpu, err;
+ 	struct cryptd_cpu_queue *cpu_queue;
+ 	atomic_t *refcnt;
+-	bool may_backlog;
+ 
+ 	cpu = get_cpu();
+ 	cpu_queue = this_cpu_ptr(queue->cpu_queue);
+ 	err = crypto_enqueue_request(&cpu_queue->queue, request);
+ 
+ 	refcnt = crypto_tfm_ctx(request->tfm);
+-	may_backlog = request->flags & CRYPTO_TFM_REQ_MAY_BACKLOG;
+ 
+-	if (err == -EBUSY && !may_backlog)
++	if (err == -EBUSY)
+ 		goto out_put_cpu;
+ 
+ 	queue_work_on(cpu, kcrypto_wq, &cpu_queue->work);
+diff --git a/crypto/cts.c b/crypto/cts.c
+index 243f591..e2068dc 100644
+--- a/crypto/cts.c
++++ b/crypto/cts.c
+@@ -136,8 +136,7 @@ static void crypto_cts_encrypt_done(struct crypto_async_request *areq, int err)
+ 		goto out;
+ 
+ 	err = cts_cbc_encrypt(req);
+-	if (err == -EINPROGRESS ||
+-	    (err == -EBUSY && req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++	if (err == -EINPROGRESS || err == -EIOCBQUEUED)
+ 		return;
+ 
+ out:
+@@ -229,8 +228,7 @@ static void crypto_cts_decrypt_done(struct crypto_async_request *areq, int err)
+ 		goto out;
+ 
+ 	err = cts_cbc_decrypt(req);
+-	if (err == -EINPROGRESS ||
+-	    (err == -EBUSY && req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++	if (err == -EINPROGRESS || err == -EIOCBQUEUED)
+ 		return;
+ 
+ out:
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 633a88e..850b451 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -1767,7 +1767,7 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
+ 		case 0:
+ 			break;
+ 		case -EINPROGRESS:
+-		case -EBUSY:
++		case -EIOCBQUEUED:
+ 			wait_for_completion(&drbg->ctr_completion);
+ 			if (!drbg->ctr_async_err) {
+ 				reinit_completion(&drbg->ctr_completion);
+diff --git a/crypto/gcm.c b/crypto/gcm.c
+index 3841b5e..ffac821 100644
+--- a/crypto/gcm.c
++++ b/crypto/gcm.c
+@@ -151,7 +151,7 @@ static int crypto_gcm_setkey(struct crypto_aead *aead, const u8 *key,
+ 				   sizeof(data->hash), data->iv);
+ 
+ 	err = crypto_skcipher_encrypt(&data->req);
+-	if (err == -EINPROGRESS || err == -EBUSY) {
++	if (err == -EINPROGRESS || err == -EIOCBQUEUED) {
+ 		wait_for_completion(&data->result.completion);
+ 		err = data->result.err;
+ 	}
+diff --git a/crypto/lrw.c b/crypto/lrw.c
+index a8bfae4..e2b1378 100644
+--- a/crypto/lrw.c
++++ b/crypto/lrw.c
+@@ -328,9 +328,7 @@ static int do_encrypt(struct skcipher_request *req, int err)
+ 		      crypto_skcipher_encrypt(subreq) ?:
+ 		      post_crypt(req);
+ 
+-		if (err == -EINPROGRESS ||
+-		    (err == -EBUSY &&
+-		     req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++		if (err == -EINPROGRESS || err == -EIOCBQUEUED)
+ 			return err;
+ 	}
+ 
+@@ -380,9 +378,7 @@ static int do_decrypt(struct skcipher_request *req, int err)
+ 		      crypto_skcipher_decrypt(subreq) ?:
+ 		      post_crypt(req);
+ 
+-		if (err == -EINPROGRESS ||
+-		    (err == -EBUSY &&
+-		     req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++		if (err == -EINPROGRESS || err == -EIOCBQUEUED)
+ 			return err;
+ 	}
+ 
+diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
+index 407c64b..3c82542 100644
+--- a/crypto/rsa-pkcs1pad.c
++++ b/crypto/rsa-pkcs1pad.c
+@@ -279,9 +279,7 @@ static int pkcs1pad_encrypt(struct akcipher_request *req)
+ 				   req->dst, ctx->key_size - 1, req->dst_len);
+ 
+ 	err = crypto_akcipher_encrypt(&req_ctx->child_req);
+-	if (err != -EINPROGRESS &&
+-			(err != -EBUSY ||
+-			 !(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)))
++	if (err != -EINPROGRESS && err != -EIOCBQUEUED)
+ 		return pkcs1pad_encrypt_sign_complete(req, err);
+ 
+ 	return err;
+@@ -383,9 +381,7 @@ static int pkcs1pad_decrypt(struct akcipher_request *req)
+ 				   ctx->key_size);
+ 
+ 	err = crypto_akcipher_decrypt(&req_ctx->child_req);
+-	if (err != -EINPROGRESS &&
+-			(err != -EBUSY ||
+-			 !(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)))
++	if (err != -EINPROGRESS && err != -EIOCBQUEUED)
+ 		return pkcs1pad_decrypt_complete(req, err);
+ 
+ 	return err;
+@@ -440,9 +436,7 @@ static int pkcs1pad_sign(struct akcipher_request *req)
+ 				   req->dst, ctx->key_size - 1, req->dst_len);
+ 
+ 	err = crypto_akcipher_sign(&req_ctx->child_req);
+-	if (err != -EINPROGRESS &&
+-			(err != -EBUSY ||
+-			 !(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)))
++	if (err != -EINPROGRESS && err != -EIOCBQUEUED)
+ 		return pkcs1pad_encrypt_sign_complete(req, err);
+ 
+ 	return err;
+@@ -561,9 +555,7 @@ static int pkcs1pad_verify(struct akcipher_request *req)
+ 				   ctx->key_size);
+ 
+ 	err = crypto_akcipher_verify(&req_ctx->child_req);
+-	if (err != -EINPROGRESS &&
+-			(err != -EBUSY ||
+-			 !(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)))
++	if (err != -EINPROGRESS && err != -EIOCBQUEUED)
+ 		return pkcs1pad_verify_complete(req, err);
+ 
+ 	return err;
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 0dd6a43..57f7ac4 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -97,7 +97,7 @@ static void tcrypt_complete(struct crypto_async_request *req, int err)
+ 
+ static inline int do_one_aead_op(struct aead_request *req, int ret)
+ {
+-	if (ret == -EINPROGRESS || ret == -EBUSY) {
++	if (ret == -EINPROGRESS || ret == -EIOCBQUEUED) {
+ 		struct tcrypt_result *tr = req->base.data;
+ 
+ 		ret = wait_for_completion_interruptible(&tr->completion);
+@@ -397,7 +397,7 @@ static void test_hash_sg_init(struct scatterlist *sg)
+ 
+ static inline int do_one_ahash_op(struct ahash_request *req, int ret)
+ {
+-	if (ret == -EINPROGRESS || ret == -EBUSY) {
++	if (ret == -EINPROGRESS || ret == -EIOCBQUEUED) {
+ 		struct tcrypt_result *tr = req->base.data;
+ 
+ 		wait_for_completion(&tr->completion);
+@@ -765,7 +765,7 @@ static void test_hash_speed(const char *algo, unsigned int secs,
+ 
+ static inline int do_one_acipher_op(struct skcipher_request *req, int ret)
+ {
+-	if (ret == -EINPROGRESS || ret == -EBUSY) {
++	if (ret == -EINPROGRESS || ret == -EIOCBQUEUED) {
+ 		struct tcrypt_result *tr = req->base.data;
+ 
+ 		wait_for_completion(&tr->completion);
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 7125ba3..fb5418f 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -195,7 +195,7 @@ static void testmgr_free_buf(char *buf[XBUFSIZE])
+ 
+ static int wait_async_op(struct tcrypt_result *tr, int ret)
+ {
+-	if (ret == -EINPROGRESS || ret == -EBUSY) {
++	if (ret == -EINPROGRESS || ret == -EIOCBQUEUED) {
+ 		wait_for_completion(&tr->completion);
+ 		reinit_completion(&tr->completion);
+ 		ret = tr->err;
+@@ -425,7 +425,7 @@ static int __test_hash(struct crypto_ahash *tfm,
+ 		case 0:
+ 			break;
+ 		case -EINPROGRESS:
+-		case -EBUSY:
++		case -EIOCBQUEUED:
+ 			wait_for_completion(&tresult.completion);
+ 			reinit_completion(&tresult.completion);
+ 			ret = tresult.err;
+@@ -723,7 +723,7 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
+ 			}
+ 			break;
+ 		case -EINPROGRESS:
+-		case -EBUSY:
++		case -EIOCBQUEUED:
+ 			wait_for_completion(&result.completion);
+ 			reinit_completion(&result.completion);
+ 			ret = result.err;
+@@ -880,7 +880,7 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
+ 			}
+ 			break;
+ 		case -EINPROGRESS:
+-		case -EBUSY:
++		case -EIOCBQUEUED:
+ 			wait_for_completion(&result.completion);
+ 			reinit_completion(&result.completion);
+ 			ret = result.err;
+@@ -1171,7 +1171,7 @@ static int __test_skcipher(struct crypto_skcipher *tfm, int enc,
+ 		case 0:
+ 			break;
+ 		case -EINPROGRESS:
+-		case -EBUSY:
++		case -EIOCBQUEUED:
+ 			wait_for_completion(&result.completion);
+ 			reinit_completion(&result.completion);
+ 			ret = result.err;
+@@ -1279,7 +1279,7 @@ static int __test_skcipher(struct crypto_skcipher *tfm, int enc,
+ 		case 0:
+ 			break;
+ 		case -EINPROGRESS:
+-		case -EBUSY:
++		case -EIOCBQUEUED:
+ 			wait_for_completion(&result.completion);
+ 			reinit_completion(&result.completion);
+ 			ret = result.err;
+diff --git a/crypto/xts.c b/crypto/xts.c
+index d86c11a..b4b90cc 100644
+--- a/crypto/xts.c
++++ b/crypto/xts.c
+@@ -269,9 +269,7 @@ static int do_encrypt(struct skcipher_request *req, int err)
+ 		      crypto_skcipher_encrypt(subreq) ?:
+ 		      post_crypt(req);
+ 
+-		if (err == -EINPROGRESS ||
+-		    (err == -EBUSY &&
+-		     req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++		if (err == -EINPROGRESS || err == -EIOCBQUEUED)
+ 			return err;
+ 	}
+ 
+@@ -321,9 +319,7 @@ static int do_decrypt(struct skcipher_request *req, int err)
+ 		      crypto_skcipher_decrypt(subreq) ?:
+ 		      post_crypt(req);
+ 
+-		if (err == -EINPROGRESS ||
+-		    (err == -EBUSY &&
+-		     req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++		if (err == -EINPROGRESS || err == -EIOCBQUEUED)
+ 			return err;
+ 	}
+ 
 -- 
 2.1.4
