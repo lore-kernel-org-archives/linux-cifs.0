@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Subject: [PATCH v3 12/28] ima: use -EIOCBQUEUED for backlog indication
-Date: Sun,  2 Jul 2017 17:41:54 +0300
-Message-ID: <1499006535-19760-13-git-send-email-gilad__29857.7657471926$1499006727$gmane$org@benyossef.com>
+Subject: [PATCH v3 13/28] crypto: adapt api sample to -EIOCBQUEUED as backlog indication
+Date: Sun,  2 Jul 2017 17:41:55 +0300
+Message-ID: <1499006535-19760-14-git-send-email-gilad@benyossef.com>
 References: <1499006535-19760-1-git-send-email-gilad@benyossef.com>
 Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
 To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
@@ -36,21 +36,21 @@ Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
 This patch should be squashed with the first patch in the series
 when applied.
 
- security/integrity/ima/ima_crypto.c | 2 +-
+ Documentation/crypto/api-samples.rst | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/security/integrity/ima/ima_crypto.c b/security/integrity/ima/ima_crypto.c
-index 802d5d2..226dd88 100644
---- a/security/integrity/ima/ima_crypto.c
-+++ b/security/integrity/ima/ima_crypto.c
-@@ -212,7 +212,7 @@ static int ahash_wait(int err, struct ahash_completion *res)
- 	case 0:
- 		break;
- 	case -EINPROGRESS:
--	case -EBUSY:
-+	case -EIOCBQUEUED:
- 		wait_for_completion(&res->completion);
- 		reinit_completion(&res->completion);
- 		err = res->err;
+diff --git a/Documentation/crypto/api-samples.rst b/Documentation/crypto/api-samples.rst
+index 2531948..c6aa4ba 100644
+--- a/Documentation/crypto/api-samples.rst
++++ b/Documentation/crypto/api-samples.rst
+@@ -47,7 +47,7 @@ Code Example For Symmetric Key Cipher Operation
+         case 0:
+             break;
+         case -EINPROGRESS:
+-        case -EBUSY:
++        case -EIOCBQUEUED:
+             rc = wait_for_completion_interruptible(
+                 &sk->result.completion);
+             if (!rc && !sk->result.err) {
 -- 
 2.1.4
