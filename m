@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Subject: [PATCH v3 11/28] cifs: use -EIOCBQUEUED for backlog indication
-Date: Sun,  2 Jul 2017 17:41:53 +0300
-Message-ID: <1499006535-19760-12-git-send-email-gilad__47029.4331702918$1499006707$gmane$org@benyossef.com>
+Subject: [PATCH v3 12/28] ima: use -EIOCBQUEUED for backlog indication
+Date: Sun,  2 Jul 2017 17:41:54 +0300
+Message-ID: <1499006535-19760-13-git-send-email-gilad__29857.7657471926$1499006727$gmane$org@benyossef.com>
 References: <1499006535-19760-1-git-send-email-gilad@benyossef.com>
 Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
 To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
@@ -36,21 +36,21 @@ Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
 This patch should be squashed with the first patch in the series
 when applied.
 
- fs/cifs/smb2ops.c | 2 +-
+ security/integrity/ima/ima_crypto.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 941c40b..00b1143 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -1934,7 +1934,7 @@ crypt_message(struct TCP_Server_Info *server, struct smb_rqst *rqst, int enc)
- 
- 	rc = enc ? crypto_aead_encrypt(req) : crypto_aead_decrypt(req);
- 
--	if (rc == -EINPROGRESS || rc == -EBUSY) {
-+	if (rc == -EINPROGRESS || rc == -EIOCBQUEUED) {
- 		wait_for_completion(&result.completion);
- 		rc = result.err;
- 	}
+diff --git a/security/integrity/ima/ima_crypto.c b/security/integrity/ima/ima_crypto.c
+index 802d5d2..226dd88 100644
+--- a/security/integrity/ima/ima_crypto.c
++++ b/security/integrity/ima/ima_crypto.c
+@@ -212,7 +212,7 @@ static int ahash_wait(int err, struct ahash_completion *res)
+ 	case 0:
+ 		break;
+ 	case -EINPROGRESS:
+-	case -EBUSY:
++	case -EIOCBQUEUED:
+ 		wait_for_completion(&res->completion);
+ 		reinit_completion(&res->completion);
+ 		err = res->err;
 -- 
 2.1.4
