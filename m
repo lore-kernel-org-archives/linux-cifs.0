@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Subject: [PATCH v3 06/28] crypto: omap: use -EIOCBQUEUED for backlog indication
-Date: Sun,  2 Jul 2017 17:41:48 +0300
-Message-ID: <1499006535-19760-7-git-send-email-gilad__40887.0730003857$1499007071$gmane$org@benyossef.com>
+Subject: [PATCH v3 05/28] crypto: mediatek: use -EIOCBQUEUED for backlog indication
+Date: Sun,  2 Jul 2017 17:41:47 +0300
+Message-ID: <1499006535-19760-6-git-send-email-gilad__29685.268426738$1499007072$gmane$org@benyossef.com>
 References: <1499006535-19760-1-git-send-email-gilad@benyossef.com>
 Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
 To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
@@ -36,17 +36,31 @@ Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
 This patch should be squashed with the first patch in the series
 when applied.
 
- drivers/crypto/omap-sham.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/mediatek/mtk-aes.c | 2 +-
+ drivers/crypto/mediatek/mtk-sha.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index 9ad9d39..dfac821 100644
---- a/drivers/crypto/omap-sham.c
-+++ b/drivers/crypto/omap-sham.c
-@@ -1279,7 +1279,7 @@ static int omap_sham_finup(struct ahash_request *req)
- 	ctx->flags |= BIT(FLAGS_FINUP);
+diff --git a/drivers/crypto/mediatek/mtk-aes.c b/drivers/crypto/mediatek/mtk-aes.c
+index 9e845e8..5254e13 100644
+--- a/drivers/crypto/mediatek/mtk-aes.c
++++ b/drivers/crypto/mediatek/mtk-aes.c
+@@ -1012,7 +1012,7 @@ static int mtk_aes_gcm_setkey(struct crypto_aead *aead, const u8 *key,
+ 				   AES_BLOCK_SIZE, data->iv);
  
- 	err1 = omap_sham_update(req);
+ 	err = crypto_skcipher_encrypt(&data->req);
+-	if (err == -EINPROGRESS || err == -EBUSY) {
++	if (err == -EINPROGRESS || err == -EIOCBQUEUED) {
+ 		err = wait_for_completion_interruptible(
+ 			&data->result.completion);
+ 		if (!err)
+diff --git a/drivers/crypto/mediatek/mtk-sha.c b/drivers/crypto/mediatek/mtk-sha.c
+index 5f4f845..5c75b50 100644
+--- a/drivers/crypto/mediatek/mtk-sha.c
++++ b/drivers/crypto/mediatek/mtk-sha.c
+@@ -782,7 +782,7 @@ static int mtk_sha_finup(struct ahash_request *req)
+ 	ctx->flags |= SHA_FLAGS_FINUP;
+ 
+ 	err1 = mtk_sha_update(req);
 -	if (err1 == -EINPROGRESS || err1 == -EBUSY)
 +	if (err1 == -EINPROGRESS || err1 == -EIOCBQUEUED)
  		return err1;
