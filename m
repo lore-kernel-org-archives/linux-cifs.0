@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Subject: [PATCH v3 02/28] crypto: atmel: use -EIOCBQUEUED for backlog indication
-Date: Sun,  2 Jul 2017 17:41:44 +0300
-Message-ID: <1499006535-19760-3-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v3 09/28] dm: verity: use -EIOCBQUEUED for backlog indication
+Date: Sun,  2 Jul 2017 17:41:51 +0300
+Message-ID: <1499006535-19760-10-git-send-email-gilad__3517.75449603355$1499006681$gmane$org@benyossef.com>
 References: <1499006535-19760-1-git-send-email-gilad@benyossef.com>
 Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
 To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
@@ -28,7 +28,7 @@ Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 Replace -EBUSY with -EIOCBQUEUED for backlog queueing indication
-as part of new API
+as part of new API.
 
 Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
 ---
@@ -36,21 +36,21 @@ Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
 This patch should be squashed with the first patch in the series
 when applied.
 
- drivers/crypto/atmel-sha.c | 2 +-
+ drivers/md/dm-verity-target.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index a948202..30223ee 100644
---- a/drivers/crypto/atmel-sha.c
-+++ b/drivers/crypto/atmel-sha.c
-@@ -1204,7 +1204,7 @@ static int atmel_sha_finup(struct ahash_request *req)
- 	ctx->flags |= SHA_FLAGS_FINUP;
+diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
+index b46705e..4fe7d18 100644
+--- a/drivers/md/dm-verity-target.c
++++ b/drivers/md/dm-verity-target.c
+@@ -116,7 +116,7 @@ static inline int verity_complete_op(struct verity_result *res, int ret)
+ 		break;
  
- 	err1 = atmel_sha_update(req);
--	if (err1 == -EINPROGRESS || err1 == -EBUSY)
-+	if (err1 == -EINPROGRESS || err1 == -EIOCBQUEUED)
- 		return err1;
- 
- 	/*
+ 	case -EINPROGRESS:
+-	case -EBUSY:
++	case -EIOCBQUEUED:
+ 		ret = wait_for_completion_interruptible(&res->completion);
+ 		if (!ret)
+ 			ret = res->err;
 -- 
 2.1.4
