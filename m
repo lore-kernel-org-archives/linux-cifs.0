@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Subject: [PATCH v3 08/28] crypto: talitos: use -EIOCBQUEUED for backlog indication
-Date: Sun,  2 Jul 2017 17:41:50 +0300
-Message-ID: <1499006535-19760-9-git-send-email-gilad__4853.55112837187$1499007061$gmane$org@benyossef.com>
+Subject: [PATCH v3 06/28] crypto: omap: use -EIOCBQUEUED for backlog indication
+Date: Sun,  2 Jul 2017 17:41:48 +0300
+Message-ID: <1499006535-19760-7-git-send-email-gilad__40887.0730003857$1499007071$gmane$org@benyossef.com>
 References: <1499006535-19760-1-git-send-email-gilad@benyossef.com>
 Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
 To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
@@ -36,21 +36,21 @@ Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
 This patch should be squashed with the first patch in the series
 when applied.
 
- drivers/crypto/talitos.c | 2 +-
+ drivers/crypto/omap-sham.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 79791c6..0ab3c4d 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -2082,7 +2082,7 @@ static int keyhash(struct crypto_ahash *tfm, const u8 *key, unsigned int keylen,
- 	case 0:
- 		break;
- 	case -EINPROGRESS:
--	case -EBUSY:
-+	case -EIOCBQUEUED:
- 		ret = wait_for_completion_interruptible(
- 			&hresult.completion);
- 		if (!ret)
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index 9ad9d39..dfac821 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -1279,7 +1279,7 @@ static int omap_sham_finup(struct ahash_request *req)
+ 	ctx->flags |= BIT(FLAGS_FINUP);
+ 
+ 	err1 = omap_sham_update(req);
+-	if (err1 == -EINPROGRESS || err1 == -EBUSY)
++	if (err1 == -EINPROGRESS || err1 == -EIOCBQUEUED)
+ 		return err1;
+ 	/*
+ 	 * final() has to be always called to cleanup resources
 -- 
 2.1.4
