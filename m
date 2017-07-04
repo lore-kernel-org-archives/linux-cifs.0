@@ -1,94 +1,182 @@
-From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Subject: Re: [PATCH v3 01/28] crypto: change backlog return code to -EIOCBQUEUED
-Date: Mon, 3 Jul 2017 16:23:18 +0300
-Message-ID: <CAOtvUMdoMfrpZPuRfD_cQo4=FDp5Vn4uv51Vzc-0Gitmvr2V6g@mail.gmail.com>
-References: <1499006535-19760-1-git-send-email-gilad@benyossef.com>
- <1499006535-19760-2-git-send-email-gilad@benyossef.com> <20170703123515.GC30067@gondor.apana.org.au>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: cifs-utils: setcifsacl receives STATUS_INVALID_SECURITY_DESCR
+ reply from custom CIFS implementation
+Date: Tue, 4 Jul 2017 16:17:21 -0500
+Message-ID: <CADT32e+jR+5h=K1ujnScnGoHuDMgqinOSpKUdigQafaY8-MBWw@mail.gmail.com>
+References: <CAFoiuNiOdjSRwFWmEqSU2WWotUOL_ywrOpj8oSk8UWBC=_cujw@mail.gmail.com>
+ <CADT32eKnksmhQNpuQfo91ybQKAiUgdpa3SG5GxSyxGCnTXeH6w@mail.gmail.com> <CAFoiuNjj6s8179EMh_f-a2zCjTatGLZtrM5H6Bk7D=mGndNgDg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
-        David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        Tom Lendacky <thomas.lendacky-5C7GfCeVMHo@public.gmane.org>,
-        Gary Hook <gary.hook-5C7GfCeVMHo@public.gmane.org>,
-        Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-        Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>,
-        Matthias Brugger <matthias.bgg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Alasdair Kergon <agk-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        Mike Snitzer <snitzer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        device-mapper development <dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        Shaohua Li <shli-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        "Theodore Y. Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,
-        Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Mimi Zohar <zohar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
-        Dmitry Kasatkin <dmitry.kasatkin-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        James Morris <james.l.morris-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
-        "Serge E. Hallyn" <serge-A9i7LUbDfNHQT0dZR+AlfA@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Content-Transfer-Encoding: quoted-printable
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Paul van Schayck <polleke-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170703123515.GC30067-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+In-Reply-To: <CAFoiuNjj6s8179EMh_f-a2zCjTatGLZtrM5H6Bk7D=mGndNgDg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Jul 3, 2017 at 3:35 PM, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org> wrote:
-> On Sun, Jul 02, 2017 at 05:41:43PM +0300, Gilad Ben-Yossef wrote:
->> The crypto API was using the -EBUSY return value to indicate
->> both a hard failure to submit a crypto operation into a
->> transformation provider when the latter was busy and the backlog
->> mechanism was not enabled as well as a notification that the operation
->> was queued into the backlog when the backlog mechanism was enabled.
->>
->> Having the same return code indicate two very different conditions
->> depending on a flag is both error prone and requires extra runtime
->> check like the following to discern between the cases:
->>
->>       if (err == -EINPROGRESS ||
->>           (err == -EBUSY && (ahash_request_flags(req) &
->>                              CRYPTO_TFM_REQ_MAY_BACKLOG)))
->>
->> This patch changes the return code used to indicate a crypto op
->> was queued in the backlog to -EIOCBQUEUED, thus resolving both
->> issues.
->>
->> Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+Hi Paul,
+
+So something like this works with smb 2.1 with the patchset I posted
+on the mailing list
+to make set acl work over smb 2 onwards...
+
+$ sudo ls -l /mnt/
+total 1
+-rwx------ 1 root root 32 Jan 26  2015 file1.txt
+-rwx------ 1 root root  0 Nov 30  2014 file2.txt
+drwx------ 2 root root  0 Nov 30  2014 folder1
+drwx------ 2 root root  0 Dec 22  2014 folder2
+
+$ sudo setcifsacl -S
+"ACL:S-1-5-21-609720889-20222076-3464071719-1001:ALLOWED/0x0/FULL,ACL:S-1-5=
+-21-609720889-20222076-3464071719-513:ALLOWED/0x0/0x1f01b9,ACL:\Everyone:AL=
+LOWED/0x0/0x1f01b9"
+/mnt/file1.txt
+
+$ sudo ls -l /mnt/
+total 1
+-rwxr-xr-x 1 root root 32 Jan 26  2015 file1.txt
+-rwx------ 1 root root  0 Nov 30  2014 file2.txt
+drwx------ 2 root root  0 Nov 30  2014 folder1
+drwx------ 2 root root  0 Dec 22  2014 folder2
+
+I then changed it back to 700 using smb1 set cifs acl and it worked too.
+
+$ sudo setcifsacl -S
+"ACL:S-1-5-21-609720889-20222076-3464071719-1001:ALLOWED/0x0/FULL,ACL:S-1-5=
+-21-609720889-20222076-3464071719-513:ALLOWED/0x0/0x120088,ACL:\Everyone:AL=
+LOWED/0x0/0x120088"
+/mnt/file1.txt
+
+$ sudo ls -l /mnt/
+total 1
+-rwx------ 1 root root 32 Jan 26  2015 file1.txt
+-rwx------ 1 root root  0 Nov 30  2014 file2.txt
+drwx------ 2 root root  0 Nov 30  2014 folder1
+drwx------ 2 root root  0 Dec 22  2014 folder2
+
+What type of Windows server is this?  These requests succeed but I do
+see extra bytes
+at the end of the security descriptor in both the requests, trying to
+figure out why is it allocated in the first place...
+
+
+On Tue, Jun 27, 2017 at 5:43 AM, Paul van Schayck <polleke-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote=
+:
+> Hi Shirish,
 >
-> So you're changing the success case from EBUSY to EIOCBQUEUED.
-> This results in a lot of churn as you have to change every single
-> driver and caller.
+> Thank you for your answer.
 >
-> How about changing the error case to use something other than
-> EBUSY instead?
-
-That was indeed my first thought - I wanted to change EBUSY to EAGAIN.
-It might even be a more descriptive error message since the failure is
-transient.
-
-What stopped me was that I saw the algif interface passes this EBUSY value
-to user space. I don't know of any software that depends on this value but
-I'm really averse to changing user space API.
-
-Of course, we can just plant a (ret != AGAIN : ? EBUSY) in the algif interface
-return to user space code path but that felt like a kludge to me.
-
-And it doesn't really save any churn, I think - I'd still have to
-visit all the places that
-use the flags value to distinguish between the two EBUSY use cases and  I need
-to visit most places that check for EBUSY as backlog indication because I'm
-replacing the check with the generic replacement, so it doesn't look
-like in the end
-it will be a smaller change.
-
-Having said that, if you prefer me to replace the error case I'd
-happily do that.
-
-Thanks,
-Gilad
-
-
--- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+> Attached you can find three pcap files.
+>
+> 1. linux-fail.pcap: Using the setcifsacl 6.7 version.
+> 2. linux-succes.pcap: Using the modified setcifsacl with the patch
+> above (note, I had to change to len + 4 in trim_request())
+> 3. windows-succes-trimmed.pcap: Using the dialog in Windows. Note that
+> this is over smbv2. The file was trimmed down, because windows was
+> noisy.
+>
+> The command I used was
+>
+> setcifsacl -S "ACL:S-1-5-21-1572361299-1184395705-1606240830-247332:ALLOW=
+ED/OI|CI/CHANGE,ACL:S-1-5-21-1572361299-1184395705-1606240830-544559:ALLOWE=
+D/I/FULL,ACL:S-1-3-0:ALLOWED/OI|CI|IO|I/FULL,ACL:S-1-5-21-1572361299-118439=
+5705-1606240830-512:ALLOWED/OI|CI|I/FULL,ACL:S-1-5-21-1572361299-1184395705=
+-1606240830-549266:ALLOWED/OI|CI|I/FULL,ACL:S-1-5-21-1572361299-1184395705-=
+1606240830-544559:ALLOWED/OI|CI|IO|I/FULL,ACL:S-1-5-18:ALLOWED/OI|CI|I/FULL=
+"
+> cifs-test/
+>
+> In Windows I used the dialog to set the same ACEs. Between the
+> linux-success and linux-fail file you can see the difference in the
+> number of zero bytes after the DACL.
+>
+> If this test case is still a bit noisy for you, I can try to build a
+> more simple ACE list. But I have to setup a new share for this.
+>
+> Thanks,
+>
+> Paul van Schayck
+>
+> On Tue, Jun 27, 2017 at 6:40 AM, Shirish Pargaonkar
+> <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>> if you can provide tcpdumpas well as the command you are using of/for
+>> both Windows and Linux way, that would be helpful
+>>
+>> On Mon, Jun 26, 2017 at 8:04 AM, Paul van Schayck via samba-technical
+>> <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org> wrote:
+>>> Dear samba-technical,
+>>>
+>>> If this list is inappropriate for this question then please redirect
+>>> me to a better one.
+>>>
+>>> I'm working with a HDS HNAS (Hitachi NAS) which has its own
+>>> implementation of the CIFS protocol. Mounting, and interactions all go
+>>> fine using linux-cifs and related tools.
+>>>
+>>> However, when sending a `setcifsacl -a ACE /dir` the response is
+>>> "main: setxattr error: Input/output error". Upon further digging using
+>>> tcpdump/wireshark it became clear that the HNAS is responding with
+>>>
+>>> NT Status: STATUS_INVALID_SECURITY_DESCR (0xc0000079)
+>>>
+>>> Setting the same ACE using a Windows client did work. So further
+>>> examining of the request being sent showed that the only difference
+>>> between the Windows client and setcifsacl was the addition of a lot of
+>>> padding zero bytes at the end of the security descriptor.
+>>>
+>>> Examining the code of setcifsacl.c and the request more it seems like
+>>> the request was not properly trimmed down to the number of aces being
+>>> sent. More buffer was allocated that the number of aces being sent. So
+>>> I made the attached patch to trim down the request. This fixes some of
+>>> the problems with setcifsacl, but for example breaks deleting aces. I
+>>> also think it's most likely an ugly fix, and the problem needs to be
+>>> solved elsewhere most likely.
+>>>
+>>> So my question is if someone can point me at the correct way to fix
+>>> this in setcifsacl, or help me fix it properly. If necessary I can
+>>> provide tcpdump's of Windows and Linux clients performing the request.
+>>>
+>>> Thanks,
+>>>
+>>> Paul van Schayck
+>>>
+>>> diff --git a/setcifsacl.c b/setcifsacl.c
+>>> index 7eeeaa6..4ada3c8 100644
+>>> --- a/setcifsacl.c
+>>> +++ b/setcifsacl.c
+>>> @@ -761,6 +761,20 @@ setacl_action(struct cifs_ntsd *pntsd, struct
+>>> cifs_ntsd **npntsd,
+>>>         return rc;
+>>>  }
+>>>
+>>> +ssize_t
+>>> +trim_request(ssize_t bufsize, struct cifs_ntsd *npntsd) {
+>>> +       int i, len =3D 0;
+>>> +       char *a =3D (char *) npntsd;
+>>> +
+>>> +       for( i =3D 0; i < bufsize; i++) {
+>>> +               if ( a[i] !=3D 0 )
+>>> +                       len =3D i;
+>>> +       }
+>>> +
+>>> +       return (ssize_t) len + 2;
+>>> +}
+>>> +
+>>> +
+>>>  static void
+>>>  setcifsacl_usage(const char *prog)
+>>>  {
+>>> @@ -902,7 +916,7 @@ cifsacl:
+>>>         if (rc)
+>>>                 goto setcifsacl_action_ret;
+>>>
+>>> -       attrlen =3D setxattr(filename, ATTRNAME, ntsdptr, bufsize, 0);
+>>> +       attrlen =3D setxattr(filename, ATTRNAME, ntsdptr,
+>>> trim_request(bufsize, ntsdptr), 0);
+>>>         if (attrlen =3D=3D -1) {
+>>>                 printf("%s: setxattr error: %s\n", __func__, strerror(e=
+rrno));
+>>>                 goto setcifsacl_facenum_ret;
+>>>
