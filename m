@@ -1,54 +1,150 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH][cifs-next] cifs: set oparms.create_options rather than
- or'ing in CREATE_OPEN_BACKUP_INTENT
-Date: Wed, 5 Jul 2017 20:02:22 -0500
-Message-ID: <CAH2r5mvDn+YnFiag3oeakjkBj3dnYxXPRrhN=p9NiDXrDY4nnQ@mail.gmail.com>
-References: <20170705124734.12816-1-colin.king@canonical.com>
+Subject: Re: [PATCH] CIFS: fix circular locking dependency
+Date: Wed, 5 Jul 2017 20:03:23 -0500
+Message-ID: <CAH2r5muzJv2x89kYA4E-j7UDd=iHAy8EbDK4Oi5QFKt3STGqVg@mail.gmail.com>
+References: <1498744902-22754-1-git-send-email-rabin.vincent@axis.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
         "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-        kernel-janitors <kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Colin King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
+        Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
+To: Rabin Vincent <rabin.vincent-VrBV9hrLPhE@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170705124734.12816-1-colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+In-Reply-To: <1498744902-22754-1-git-send-email-rabin.vincent-VrBV9hrLPhE@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-good catch - merged into cifs-2.6.git for-next
+merged into cifs-2.6.git for-next
 
-On Wed, Jul 5, 2017 at 7:47 AM, Colin King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org> wrote:
-> From: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+On Thu, Jun 29, 2017 at 9:01 AM, Rabin Vincent <rabin.vincent-VrBV9hrLPhE@public.gmane.org> wrote:
+> From: Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
 >
-> Currently oparms.create_options is uninitialized and the code is logically
-> or'ing in CREATE_OPEN_BACKUP_INTENT onto a garbage value of
-> oparms.create_options from the stack.  Fix this by just setting the value
-> rather than or'ing in the setting.
+> When a CIFS filesystem is mounted with the forcemand option and the
+> following command is run on it, lockdep warns about a circular locking
+> dependency between CifsInodeInfo::lock_sem and the inode lock.
 >
-> Detected by CoverityScan, CID#1447220 ("Unitialized scale value")
+>  while echo foo > hello; do :; done & while touch -c hello; do :; done
 >
-> Signed-off-by: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+> cifs_writev() takes the locks in the wrong order, but note that we can't
+> only flip the order around because it releases the inode lock before the
+> call to generic_write_sync() while it holds the lock_sem across that
+> call.
+>
+> But, AFAICS, there is no need to hold the CifsInodeInfo::lock_sem across
+> the generic_write_sync() call either, so we can release both the locks
+> before generic_write_sync(), and change the order.
+>
+>  ======================================================
+>  WARNING: possible circular locking dependency detected
+>  4.12.0-rc7+ #9 Not tainted
+>  ------------------------------------------------------
+>  touch/487 is trying to acquire lock:
+>   (&cifsi->lock_sem){++++..}, at: cifsFileInfo_put+0x88f/0x16a0
+>
+>  but task is already holding lock:
+>   (&sb->s_type->i_mutex_key#11){+.+.+.}, at: utimes_common+0x3ad/0x870
+>
+>  which lock already depends on the new lock.
+>
+>  the existing dependency chain (in reverse order) is:
+>
+>  -> #1 (&sb->s_type->i_mutex_key#11){+.+.+.}:
+>         __lock_acquire+0x1f74/0x38f0
+>         lock_acquire+0x1cc/0x600
+>         down_write+0x74/0x110
+>         cifs_strict_writev+0x3cb/0x8c0
+>         __vfs_write+0x4c1/0x930
+>         vfs_write+0x14c/0x2d0
+>         SyS_write+0xf7/0x240
+>         entry_SYSCALL_64_fastpath+0x1f/0xbe
+>
+>  -> #0 (&cifsi->lock_sem){++++..}:
+>         check_prevs_add+0xfa0/0x1d10
+>         __lock_acquire+0x1f74/0x38f0
+>         lock_acquire+0x1cc/0x600
+>         down_write+0x74/0x110
+>         cifsFileInfo_put+0x88f/0x16a0
+>         cifs_setattr+0x992/0x1680
+>         notify_change+0x61a/0xa80
+>         utimes_common+0x3d4/0x870
+>         do_utimes+0x1c1/0x220
+>         SyS_utimensat+0x84/0x1a0
+>         entry_SYSCALL_64_fastpath+0x1f/0xbe
+>
+>  other info that might help us debug this:
+>
+>   Possible unsafe locking scenario:
+>
+>         CPU0                    CPU1
+>         ----                    ----
+>    lock(&sb->s_type->i_mutex_key#11);
+>                                 lock(&cifsi->lock_sem);
+>                                 lock(&sb->s_type->i_mutex_key#11);
+>    lock(&cifsi->lock_sem);
+>
+>   *** DEADLOCK ***
+>
+>  2 locks held by touch/487:
+>   #0:  (sb_writers#10){.+.+.+}, at: mnt_want_write+0x41/0xb0
+>   #1:  (&sb->s_type->i_mutex_key#11){+.+.+.}, at: utimes_common+0x3ad/0x870
+>
+>  stack backtrace:
+>  CPU: 0 PID: 487 Comm: touch Not tainted 4.12.0-rc7+ #9
+>  Call Trace:
+>   dump_stack+0xdb/0x185
+>   print_circular_bug+0x45b/0x790
+>   __lock_acquire+0x1f74/0x38f0
+>   lock_acquire+0x1cc/0x600
+>   down_write+0x74/0x110
+>   cifsFileInfo_put+0x88f/0x16a0
+>   cifs_setattr+0x992/0x1680
+>   notify_change+0x61a/0xa80
+>   utimes_common+0x3d4/0x870
+>   do_utimes+0x1c1/0x220
+>   SyS_utimensat+0x84/0x1a0
+>   entry_SYSCALL_64_fastpath+0x1f/0xbe
+>
+> Fixes: 19dfc1f5f2ef03a52 ("cifs: fix the race in cifs_writev()")
+> Signed-off-by: Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
 > ---
->  fs/cifs/smb2ops.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  fs/cifs/file.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 941c40b7a870..c805b7619083 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -1339,7 +1339,7 @@ get_smb2_acl_by_path(struct cifs_sb_info *cifs_sb,
->         xid = get_xid();
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index fcef706..d16fa55 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -2810,12 +2810,12 @@ cifs_writev(struct kiocb *iocb, struct iov_iter *from)
+>         struct TCP_Server_Info *server = tlink_tcon(cfile->tlink)->ses->server;
+>         ssize_t rc;
 >
->         if (backup_cred(cifs_sb))
-> -               oparms.create_options |= CREATE_OPEN_BACKUP_INTENT;
-> +               oparms.create_options = CREATE_OPEN_BACKUP_INTENT;
+> +       inode_lock(inode);
+>         /*
+>          * We need to hold the sem to be sure nobody modifies lock list
+>          * with a brlock that prevents writing.
+>          */
+>         down_read(&cinode->lock_sem);
+> -       inode_lock(inode);
+>
+>         rc = generic_write_checks(iocb, from);
+>         if (rc <= 0)
+> @@ -2828,11 +2828,11 @@ cifs_writev(struct kiocb *iocb, struct iov_iter *from)
 >         else
->                 oparms.create_options = 0;
+>                 rc = -EACCES;
+>  out:
+> +       up_read(&cinode->lock_sem);
+>         inode_unlock(inode);
+>
+>         if (rc > 0)
+>                 rc = generic_write_sync(iocb, rc);
+> -       up_read(&cinode->lock_sem);
+>         return rc;
+>  }
 >
 > --
-> 2.11.0
+> 2.1.4
 >
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
