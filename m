@@ -1,166 +1,43 @@
-From: Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: RE: [PATCH] CIFS: fix circular locking dependency
-Date: Thu, 6 Jul 2017 00:59:36 +0000
-Message-ID: <CY4PR21MB0135988CEAE5F721D342A07CB6D50@CY4PR21MB0135.namprd21.prod.outlook.com>
-References: <1498744902-22754-1-git-send-email-rabin.vincent@axis.com>
+From: Pavel Shilovskiy <pshilov@microsoft.com>
+Subject: RE: [PATCH][cifs-next] cifs: set oparms.create_options rather than
+ or'ing in CREATE_OPEN_BACKUP_INTENT
+Date: Thu, 6 Jul 2017 01:01:34 +0000
+Message-ID: <CY4PR21MB0135AAAA14C1E9BBD39FC7CEB6D50@CY4PR21MB0135.namprd21.prod.outlook.com>
+References: <20170705124734.12816-1-colin.king@canonical.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org" <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
-        Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
-To: Rabin Vincent <rabin.vincent-VrBV9hrLPhE@public.gmane.org>,
-        "sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org" <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1498744902-22754-1-git-send-email-rabin.vincent-VrBV9hrLPhE@public.gmane.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Colin King <colin.king@canonical.com>,
+        Steve French <sfrench@samba.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>
+Return-path: <kernel-janitors-owner@vger.kernel.org>
+In-Reply-To: <20170705124734.12816-1-colin.king@canonical.com>
 Content-Language: en-US
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Sender: kernel-janitors-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-
-
-2017-06-29 7:01 GMT-07:00 Rabin Vincent <rabin.vincent-VrBV9hrLPhE@public.gmane.org>:
-> From: Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
->
-> When a CIFS filesystem is mounted with the forcemand option and the
-> following command is run on it, lockdep warns about a circular locking
-> dependency between CifsInodeInfo::lock_sem and the inode lock.
->
->  while echo foo > hello; do :; done & while touch -c hello; do :; done
->
-> cifs_writev() takes the locks in the wrong order, but note that we can't
-> only flip the order around because it releases the inode lock before the
-> call to generic_write_sync() while it holds the lock_sem across that
-> call.
->
-> But, AFAICS, there is no need to hold the CifsInodeInfo::lock_sem across
-> the generic_write_sync() call either, so we can release both the locks
-> before generic_write_sync(), and change the order.
->
->  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
->  WARNING: possible circular locking dependency detected
->  4.12.0-rc7+ #9 Not tainted
->  ------------------------------------------------------
->  touch/487 is trying to acquire lock:
->   (&cifsi->lock_sem){++++..}, at: cifsFileInfo_put+0x88f/0x16a0
->
->  but task is already holding lock:
->   (&sb->s_type->i_mutex_key#11){+.+.+.}, at: utimes_common+0x3ad/0x870
->
->  which lock already depends on the new lock.
->
->  the existing dependency chain (in reverse order) is:
->
->  -> #1 (&sb->s_type->i_mutex_key#11){+.+.+.}:
->         __lock_acquire+0x1f74/0x38f0
->         lock_acquire+0x1cc/0x600
->         down_write+0x74/0x110
->         cifs_strict_writev+0x3cb/0x8c0
->         __vfs_write+0x4c1/0x930
->         vfs_write+0x14c/0x2d0
->         SyS_write+0xf7/0x240
->         entry_SYSCALL_64_fastpath+0x1f/0xbe
->
->  -> #0 (&cifsi->lock_sem){++++..}:
->         check_prevs_add+0xfa0/0x1d10
->         __lock_acquire+0x1f74/0x38f0
->         lock_acquire+0x1cc/0x600
->         down_write+0x74/0x110
->         cifsFileInfo_put+0x88f/0x16a0
->         cifs_setattr+0x992/0x1680
->         notify_change+0x61a/0xa80
->         utimes_common+0x3d4/0x870
->         do_utimes+0x1c1/0x220
->         SyS_utimensat+0x84/0x1a0
->         entry_SYSCALL_64_fastpath+0x1f/0xbe
->
->  other info that might help us debug this:
->
->   Possible unsafe locking scenario:
->
->         CPU0                    CPU1
->         ----                    ----
->    lock(&sb->s_type->i_mutex_key#11);
->                                 lock(&cifsi->lock_sem);
->                                 lock(&sb->s_type->i_mutex_key#11);
->    lock(&cifsi->lock_sem);
->
->   *** DEADLOCK ***
->
->  2 locks held by touch/487:
->   #0:  (sb_writers#10){.+.+.+}, at: mnt_want_write+0x41/0xb0
->   #1:  (&sb->s_type->i_mutex_key#11){+.+.+.}, at: utimes_common+0x3ad/0x8=
-70
->
->  stack backtrace:
->  CPU: 0 PID: 487 Comm: touch Not tainted 4.12.0-rc7+ #9
->  Call Trace:
->   dump_stack+0xdb/0x185
->   print_circular_bug+0x45b/0x790
->   __lock_acquire+0x1f74/0x38f0
->   lock_acquire+0x1cc/0x600
->   down_write+0x74/0x110
->   cifsFileInfo_put+0x88f/0x16a0
->   cifs_setattr+0x992/0x1680
->   notify_change+0x61a/0xa80
->   utimes_common+0x3d4/0x870
->   do_utimes+0x1c1/0x220
->   SyS_utimensat+0x84/0x1a0
->   entry_SYSCALL_64_fastpath+0x1f/0xbe
->
-> Fixes: 19dfc1f5f2ef03a52 ("cifs: fix the race in cifs_writev()")
-> Signed-off-by: Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
-> ---
->  fs/cifs/file.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index fcef706..d16fa55 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -2810,12 +2810,12 @@ cifs_writev(struct kiocb *iocb, struct iov_iter *=
-from)
->         struct TCP_Server_Info *server =3D tlink_tcon(cfile->tlink)->ses-=
->server;
->         ssize_t rc;
->
-> +       inode_lock(inode);
->         /*
->          * We need to hold the sem to be sure nobody modifies lock list
->          * with a brlock that prevents writing.
->          */
->         down_read(&cinode->lock_sem);
-> -       inode_lock(inode);
->
->         rc =3D generic_write_checks(iocb, from);
->         if (rc <=3D 0)
-> @@ -2828,11 +2828,11 @@ cifs_writev(struct kiocb *iocb, struct iov_iter *=
-from)
->         else
->                 rc =3D -EACCES;
->  out:
-> +       up_read(&cinode->lock_sem);
->         inode_unlock(inode);
->
->         if (rc > 0)
->                 rc =3D generic_write_sync(iocb, rc);
-> -       up_read(&cinode->lock_sem);
->         return rc;
->  }
->
-> --
-> 2.1.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-Acked-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-
---
-Best regards,
-Pavel Shilovsky
+MjAxNy0wNy0wNSA1OjQ3IEdNVC0wNzowMCBDb2xpbiBLaW5nIDxjb2xpbi5raW5nQGNhbm9uaWNh
+bC5jb20+Og0KPiBGcm9tOiBDb2xpbiBJYW4gS2luZyA8Y29saW4ua2luZ0BjYW5vbmljYWwuY29t
+Pg0KPg0KPiBDdXJyZW50bHkgb3Bhcm1zLmNyZWF0ZV9vcHRpb25zIGlzIHVuaW5pdGlhbGl6ZWQg
+YW5kIHRoZSBjb2RlIGlzIGxvZ2ljYWxseQ0KPiBvcidpbmcgaW4gQ1JFQVRFX09QRU5fQkFDS1VQ
+X0lOVEVOVCBvbnRvIGEgZ2FyYmFnZSB2YWx1ZSBvZg0KPiBvcGFybXMuY3JlYXRlX29wdGlvbnMg
+ZnJvbSB0aGUgc3RhY2suICBGaXggdGhpcyBieSBqdXN0IHNldHRpbmcgdGhlIHZhbHVlDQo+IHJh
+dGhlciB0aGFuIG9yJ2luZyBpbiB0aGUgc2V0dGluZy4NCj4NCj4gRGV0ZWN0ZWQgYnkgQ292ZXJp
+dHlTY2FuLCBDSUQjMTQ0NzIyMCAoIlVuaXRpYWxpemVkIHNjYWxlIHZhbHVlIikNCj4NCj4gU2ln
+bmVkLW9mZi1ieTogQ29saW4gSWFuIEtpbmcgPGNvbGluLmtpbmdAY2Fub25pY2FsLmNvbT4NCj4g
+LS0tDQo+ICBmcy9jaWZzL3NtYjJvcHMuYyB8IDIgKy0NCj4gIDEgZmlsZSBjaGFuZ2VkLCAxIGlu
+c2VydGlvbigrKSwgMSBkZWxldGlvbigtKQ0KPg0KPiBkaWZmIC0tZ2l0IGEvZnMvY2lmcy9zbWIy
+b3BzLmMgYi9mcy9jaWZzL3NtYjJvcHMuYw0KPiBpbmRleCA5NDFjNDBiN2E4NzAuLmM4MDViNzYx
+OTA4MyAxMDA2NDQNCj4gLS0tIGEvZnMvY2lmcy9zbWIyb3BzLmMNCj4gKysrIGIvZnMvY2lmcy9z
+bWIyb3BzLmMNCj4gQEAgLTEzMzksNyArMTMzOSw3IEBAIGdldF9zbWIyX2FjbF9ieV9wYXRoKHN0
+cnVjdCBjaWZzX3NiX2luZm8gKmNpZnNfc2IsDQo+ICAgICAgICAgeGlkID0gZ2V0X3hpZCgpOw0K
+Pg0KPiAgICAgICAgIGlmIChiYWNrdXBfY3JlZChjaWZzX3NiKSkNCj4gLSAgICAgICAgICAgICAg
+IG9wYXJtcy5jcmVhdGVfb3B0aW9ucyB8PSBDUkVBVEVfT1BFTl9CQUNLVVBfSU5URU5UOw0KPiAr
+ICAgICAgICAgICAgICAgb3Bhcm1zLmNyZWF0ZV9vcHRpb25zID0gQ1JFQVRFX09QRU5fQkFDS1VQ
+X0lOVEVOVDsNCj4gICAgICAgICBlbHNlDQo+ICAgICAgICAgICAgICAgICBvcGFybXMuY3JlYXRl
+X29wdGlvbnMgPSAwOw0KPg0KDQoNClJldmlld2VkLWJ5OiBQYXZlbCBTaGlsb3Zza3kgPHBzaGls
+b3ZAbWljcm9zb2Z0LmNvbT4NCg0KLS0NCkJlc3QgcmVnYXJkcywNClBhdmVsIFNoaWxvdnNreQ0K
+DQo=
