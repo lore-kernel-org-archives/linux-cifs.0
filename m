@@ -1,43 +1,63 @@
-From: Pavel Shilovskiy <pshilov@microsoft.com>
-Subject: RE: [PATCH][cifs-next] cifs: set oparms.create_options rather than
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH][cifs-next] cifs: set oparms.create_options rather than
  or'ing in CREATE_OPEN_BACKUP_INTENT
-Date: Thu, 6 Jul 2017 01:01:34 +0000
-Message-ID: <CY4PR21MB0135AAAA14C1E9BBD39FC7CEB6D50@CY4PR21MB0135.namprd21.prod.outlook.com>
+Date: Wed, 5 Jul 2017 20:02:22 -0500
+Message-ID: <CAH2r5mvDn+YnFiag3oeakjkBj3dnYxXPRrhN=p9NiDXrDY4nnQ@mail.gmail.com>
 References: <20170705124734.12816-1-colin.king@canonical.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Colin King <colin.king@canonical.com>,
-        Steve French <sfrench@samba.org>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
-In-Reply-To: <20170705124734.12816-1-colin.king@canonical.com>
-Content-Language: en-US
-Sender: kernel-janitors-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+        kernel-janitors <kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Colin King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20170705124734.12816-1-colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-MjAxNy0wNy0wNSA1OjQ3IEdNVC0wNzowMCBDb2xpbiBLaW5nIDxjb2xpbi5raW5nQGNhbm9uaWNh
-bC5jb20+Og0KPiBGcm9tOiBDb2xpbiBJYW4gS2luZyA8Y29saW4ua2luZ0BjYW5vbmljYWwuY29t
-Pg0KPg0KPiBDdXJyZW50bHkgb3Bhcm1zLmNyZWF0ZV9vcHRpb25zIGlzIHVuaW5pdGlhbGl6ZWQg
-YW5kIHRoZSBjb2RlIGlzIGxvZ2ljYWxseQ0KPiBvcidpbmcgaW4gQ1JFQVRFX09QRU5fQkFDS1VQ
-X0lOVEVOVCBvbnRvIGEgZ2FyYmFnZSB2YWx1ZSBvZg0KPiBvcGFybXMuY3JlYXRlX29wdGlvbnMg
-ZnJvbSB0aGUgc3RhY2suICBGaXggdGhpcyBieSBqdXN0IHNldHRpbmcgdGhlIHZhbHVlDQo+IHJh
-dGhlciB0aGFuIG9yJ2luZyBpbiB0aGUgc2V0dGluZy4NCj4NCj4gRGV0ZWN0ZWQgYnkgQ292ZXJp
-dHlTY2FuLCBDSUQjMTQ0NzIyMCAoIlVuaXRpYWxpemVkIHNjYWxlIHZhbHVlIikNCj4NCj4gU2ln
-bmVkLW9mZi1ieTogQ29saW4gSWFuIEtpbmcgPGNvbGluLmtpbmdAY2Fub25pY2FsLmNvbT4NCj4g
-LS0tDQo+ICBmcy9jaWZzL3NtYjJvcHMuYyB8IDIgKy0NCj4gIDEgZmlsZSBjaGFuZ2VkLCAxIGlu
-c2VydGlvbigrKSwgMSBkZWxldGlvbigtKQ0KPg0KPiBkaWZmIC0tZ2l0IGEvZnMvY2lmcy9zbWIy
-b3BzLmMgYi9mcy9jaWZzL3NtYjJvcHMuYw0KPiBpbmRleCA5NDFjNDBiN2E4NzAuLmM4MDViNzYx
-OTA4MyAxMDA2NDQNCj4gLS0tIGEvZnMvY2lmcy9zbWIyb3BzLmMNCj4gKysrIGIvZnMvY2lmcy9z
-bWIyb3BzLmMNCj4gQEAgLTEzMzksNyArMTMzOSw3IEBAIGdldF9zbWIyX2FjbF9ieV9wYXRoKHN0
-cnVjdCBjaWZzX3NiX2luZm8gKmNpZnNfc2IsDQo+ICAgICAgICAgeGlkID0gZ2V0X3hpZCgpOw0K
-Pg0KPiAgICAgICAgIGlmIChiYWNrdXBfY3JlZChjaWZzX3NiKSkNCj4gLSAgICAgICAgICAgICAg
-IG9wYXJtcy5jcmVhdGVfb3B0aW9ucyB8PSBDUkVBVEVfT1BFTl9CQUNLVVBfSU5URU5UOw0KPiAr
-ICAgICAgICAgICAgICAgb3Bhcm1zLmNyZWF0ZV9vcHRpb25zID0gQ1JFQVRFX09QRU5fQkFDS1VQ
-X0lOVEVOVDsNCj4gICAgICAgICBlbHNlDQo+ICAgICAgICAgICAgICAgICBvcGFybXMuY3JlYXRl
-X29wdGlvbnMgPSAwOw0KPg0KDQoNClJldmlld2VkLWJ5OiBQYXZlbCBTaGlsb3Zza3kgPHBzaGls
-b3ZAbWljcm9zb2Z0LmNvbT4NCg0KLS0NCkJlc3QgcmVnYXJkcywNClBhdmVsIFNoaWxvdnNreQ0K
-DQo=
+good catch - merged into cifs-2.6.git for-next
+
+On Wed, Jul 5, 2017 at 7:47 AM, Colin King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org> wrote:
+> From: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+>
+> Currently oparms.create_options is uninitialized and the code is logically
+> or'ing in CREATE_OPEN_BACKUP_INTENT onto a garbage value of
+> oparms.create_options from the stack.  Fix this by just setting the value
+> rather than or'ing in the setting.
+>
+> Detected by CoverityScan, CID#1447220 ("Unitialized scale value")
+>
+> Signed-off-by: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+> ---
+>  fs/cifs/smb2ops.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index 941c40b7a870..c805b7619083 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -1339,7 +1339,7 @@ get_smb2_acl_by_path(struct cifs_sb_info *cifs_sb,
+>         xid = get_xid();
+>
+>         if (backup_cred(cifs_sb))
+> -               oparms.create_options |= CREATE_OPEN_BACKUP_INTENT;
+> +               oparms.create_options = CREATE_OPEN_BACKUP_INTENT;
+>         else
+>                 oparms.create_options = 0;
+>
+> --
+> 2.11.0
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Thanks,
+
+Steve
