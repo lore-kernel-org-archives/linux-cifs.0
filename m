@@ -1,159 +1,87 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] CIFS: fix circular locking dependency
-Date: Wed, 5 Jul 2017 20:03:23 -0500
-Message-ID: <CAH2r5muzJv2x89kYA4E-j7UDd=iHAy8EbDK4Oi5QFKt3STGqVg@mail.gmail.com>
-References: <1498744902-22754-1-git-send-email-rabin.vincent@axis.com>
+Subject: [GIT] SMB3 fixes
+Date: Fri, 7 Jul 2017 18:13:19 -0500
+Message-ID: <CAH2r5mvnUjiMkHUKgDm=cp7SJkZo9JsSYDfDRvkeU7jrsynA9g@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
-        Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
-To: Rabin Vincent <rabin.vincent-VrBV9hrLPhE@public.gmane.org>
+Content-Transfer-Encoding: quoted-printable
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1498744902-22754-1-git-send-email-rabin.vincent-VrBV9hrLPhE@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-merged into cifs-2.6.git for-next
+First set of CIFS/SMB3 fixes for the merge window.  Also improves
+POSIX character
+mapping for SMB3.
 
-On Thu, Jun 29, 2017 at 9:01 AM, Rabin Vincent <rabin.vincent-VrBV9hrLPhE@public.gmane.org> wrote:
-> From: Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
->
-> When a CIFS filesystem is mounted with the forcemand option and the
-> following command is run on it, lockdep warns about a circular locking
-> dependency between CifsInodeInfo::lock_sem and the inode lock.
->
->  while echo foo > hello; do :; done & while touch -c hello; do :; done
->
-> cifs_writev() takes the locks in the wrong order, but note that we can't
-> only flip the order around because it releases the inode lock before the
-> call to generic_write_sync() while it holds the lock_sem across that
-> call.
->
-> But, AFAICS, there is no need to hold the CifsInodeInfo::lock_sem across
-> the generic_write_sync() call either, so we can release both the locks
-> before generic_write_sync(), and change the order.
->
->  ======================================================
->  WARNING: possible circular locking dependency detected
->  4.12.0-rc7+ #9 Not tainted
->  ------------------------------------------------------
->  touch/487 is trying to acquire lock:
->   (&cifsi->lock_sem){++++..}, at: cifsFileInfo_put+0x88f/0x16a0
->
->  but task is already holding lock:
->   (&sb->s_type->i_mutex_key#11){+.+.+.}, at: utimes_common+0x3ad/0x870
->
->  which lock already depends on the new lock.
->
->  the existing dependency chain (in reverse order) is:
->
->  -> #1 (&sb->s_type->i_mutex_key#11){+.+.+.}:
->         __lock_acquire+0x1f74/0x38f0
->         lock_acquire+0x1cc/0x600
->         down_write+0x74/0x110
->         cifs_strict_writev+0x3cb/0x8c0
->         __vfs_write+0x4c1/0x930
->         vfs_write+0x14c/0x2d0
->         SyS_write+0xf7/0x240
->         entry_SYSCALL_64_fastpath+0x1f/0xbe
->
->  -> #0 (&cifsi->lock_sem){++++..}:
->         check_prevs_add+0xfa0/0x1d10
->         __lock_acquire+0x1f74/0x38f0
->         lock_acquire+0x1cc/0x600
->         down_write+0x74/0x110
->         cifsFileInfo_put+0x88f/0x16a0
->         cifs_setattr+0x992/0x1680
->         notify_change+0x61a/0xa80
->         utimes_common+0x3d4/0x870
->         do_utimes+0x1c1/0x220
->         SyS_utimensat+0x84/0x1a0
->         entry_SYSCALL_64_fastpath+0x1f/0xbe
->
->  other info that might help us debug this:
->
->   Possible unsafe locking scenario:
->
->         CPU0                    CPU1
->         ----                    ----
->    lock(&sb->s_type->i_mutex_key#11);
->                                 lock(&cifsi->lock_sem);
->                                 lock(&sb->s_type->i_mutex_key#11);
->    lock(&cifsi->lock_sem);
->
->   *** DEADLOCK ***
->
->  2 locks held by touch/487:
->   #0:  (sb_writers#10){.+.+.+}, at: mnt_want_write+0x41/0xb0
->   #1:  (&sb->s_type->i_mutex_key#11){+.+.+.}, at: utimes_common+0x3ad/0x870
->
->  stack backtrace:
->  CPU: 0 PID: 487 Comm: touch Not tainted 4.12.0-rc7+ #9
->  Call Trace:
->   dump_stack+0xdb/0x185
->   print_circular_bug+0x45b/0x790
->   __lock_acquire+0x1f74/0x38f0
->   lock_acquire+0x1cc/0x600
->   down_write+0x74/0x110
->   cifsFileInfo_put+0x88f/0x16a0
->   cifs_setattr+0x992/0x1680
->   notify_change+0x61a/0xa80
->   utimes_common+0x3d4/0x870
->   do_utimes+0x1c1/0x220
->   SyS_utimensat+0x84/0x1a0
->   entry_SYSCALL_64_fastpath+0x1f/0xbe
->
-> Fixes: 19dfc1f5f2ef03a52 ("cifs: fix the race in cifs_writev()")
-> Signed-off-by: Rabin Vincent <rabinv-VrBV9hrLPhE@public.gmane.org>
-> ---
->  fs/cifs/file.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index fcef706..d16fa55 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -2810,12 +2810,12 @@ cifs_writev(struct kiocb *iocb, struct iov_iter *from)
->         struct TCP_Server_Info *server = tlink_tcon(cfile->tlink)->ses->server;
->         ssize_t rc;
->
-> +       inode_lock(inode);
->         /*
->          * We need to hold the sem to be sure nobody modifies lock list
->          * with a brlock that prevents writing.
->          */
->         down_read(&cinode->lock_sem);
-> -       inode_lock(inode);
->
->         rc = generic_write_checks(iocb, from);
->         if (rc <= 0)
-> @@ -2828,11 +2828,11 @@ cifs_writev(struct kiocb *iocb, struct iov_iter *from)
->         else
->                 rc = -EACCES;
->  out:
-> +       up_read(&cinode->lock_sem);
->         inode_unlock(inode);
->
->         if (rc > 0)
->                 rc = generic_write_sync(iocb, rc);
-> -       up_read(&cinode->lock_sem);
->         return rc;
->  }
->
-> --
-> 2.1.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Another set, which moves the default dialect up from cifs to smb3, and impr=
+oves
+set ACL and chmod support is still being reviewed, and I will try to have t=
+hat
+ready next week.
 
+Also let me know if you want me to change how I do signed tags - since I ad=
+ded
+one for this pull request.
 
+Please pull the following changes since commit
+6f7da290413ba713f0cdd9ff1a2a9bb129ef4f6c:
 
--- 
+  Linux 4.12 (2017-07-02 16:07:02 -0700)
+
+are available in the git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git for-next
+
+for you to fetch changes up to 966681c9f029afd5decee069b7658bb58ad0a863:
+
+  CIFS: fix circular locking dependency (2017-07-05 20:08:39 -0500)
+
+----------------------------------------------------------------
+Arnd Bergmann (1):
+      cifs: hide unused functions
+
+Aur=C3=A9lien Aptel (1):
+      CIFS: add CONFIG_CIFS_DEBUG_KEYS to dump encryption keys
+
+Bj=C3=B6rn JACKE (1):
+      CIFS: add SFM mapping for 0x01-0x1F
+
+Colin Ian King (1):
+      cifs: set oparms.create_options rather than or'ing in
+CREATE_OPEN_BACKUP_INTENT
+
+Jeff Layton (1):
+      cifs: set mapping error when page writeback fails in writepage
+or launder_pages
+
+Long Li (1):
+      cifs: Do not modify mid entry after submitting I/O in cifs_call_async
+
+Rabin Vincent (1):
+      CIFS: fix circular locking dependency
+
+Shirish Pargaonkar (2):
+      cifs: prototype declaration and definition for smb 2 - 3 and
+cifsacl mount options
+      cifs: Use smb 2 - 3 and cifsacl mount options getacl functions
+
+Steve French (1):
+      SMB3: Enable encryption for SMB3.1.1
+
+ fs/cifs/Kconfig         |   9 ++++
+ fs/cifs/cifs_unicode.c  |   8 ++++
+ fs/cifs/file.c          |  16 ++++---
+ fs/cifs/smb2ops.c       | 119 ++++++++++++++++++++++++++++++++++++++++++++=
++++-
+ fs/cifs/smb2pdu.c       |  52 ++++++++++++++++-----
+ fs/cifs/smb2proto.h     |   3 ++
+ fs/cifs/smb2transport.c |  28 ++++++++++--
+ fs/cifs/transport.c     |   7 ++-
+ 8 files changed, 218 insertions(+), 24 deletions(-)
+
+--=20
 Thanks,
 
 Steve
