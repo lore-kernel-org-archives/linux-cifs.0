@@ -1,170 +1,65 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Clean up unused variables in smb2pdu.c
-Date: Sun, 9 Jul 2017 23:38:44 -0500
-Message-ID: <CAH2r5mtQOKKbB0oi0pnSw1GTAne-Yk=gW-=btntwtSx2+ipk0Q@mail.gmail.com>
-References: <1499597104-918-1-git-send-email-chris.gekas@gmail.com>
+From: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] CIFS: Reconnect expired SMB sessions
+Date: Mon, 10 Jul 2017 15:04:25 +0100
+Message-ID: <7ee806d6-9d74-4c13-65f3-e23097211b19@citrix.com>
+References: <1499549520-113585-1-git-send-email-pshilov@microsoft.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Christos Gkekas <chris.gekas-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1499597104-918-1-git-send-email-chris.gekas-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <1499549520-113585-1-git-send-email-pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Content-Language: en-CA
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-merged into cifs-2.6.git for-next
+Hi Pavel,
 
-On Sun, Jul 9, 2017 at 5:45 AM, Christos Gkekas <chris.gekas-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> There are multiple unused variables struct TCP_Server_Info *server
-> defined in many methods in smb2pdu.c. They should be removed and related
-> logic simplified.
->
-> Signed-off-by: Christos Gkekas <chris.gekas-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+I have one comment/question.
+
+On 07/08/2017 10:32 PM, Pavel Shilovsky wrote:
+> According to the MS-SMB2 spec (3.2.5.1.6) once the client receives
+> STATUS_NETWORK_SESSION_EXPIRED error code from a server it should
+> reconnect the current SMB session. Currently the client doesn't do
+> that. This can result in subsequent client requests failing by
+> the server. The patch adds an additional logic to the demultiplex
+> thread to identify expired sessions and reconnect them.
+> 
+> Cc: <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+> Signed-off-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 > ---
->  fs/cifs/smb2pdu.c | 35 +++++++----------------------------
->  1 file changed, 7 insertions(+), 28 deletions(-)
->
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 4938e8b..ee59592 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -1167,15 +1167,12 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
->         int rc = 0;
->         int resp_buftype;
->         int unc_path_len;
-> -       struct TCP_Server_Info *server;
->         __le16 *unc_path = NULL;
->         int flags = 0;
->
->         cifs_dbg(FYI, "TCON\n");
->
-> -       if ((ses->server) && tree)
-> -               server = ses->server;
-> -       else
-> +       if (!(ses->server) || !tree)
->                 return -EIO;
->
->         unc_path = kmalloc(MAX_SHARENAME_LENGTH * 2, GFP_KERNEL);
-> @@ -1294,15 +1291,12 @@ SMB2_tdis(const unsigned int xid, struct cifs_tcon *tcon)
->  {
->         struct smb2_tree_disconnect_req *req; /* response is trivial */
->         int rc = 0;
-> -       struct TCP_Server_Info *server;
->         struct cifs_ses *ses = tcon->ses;
->         int flags = 0;
->
->         cifs_dbg(FYI, "Tree Disconnect\n");
->
-> -       if (ses && (ses->server))
-> -               server = ses->server;
-> -       else
-> +       if (!ses || !(ses->server))
->                 return -EIO;
->
->         if ((tcon->need_reconnect) || (tcon->ses->need_reconnect))
-> @@ -1794,7 +1788,6 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
->         struct smb2_ioctl_req *req;
->         struct smb2_ioctl_rsp *rsp;
->         struct smb2_sync_hdr *shdr;
-> -       struct TCP_Server_Info *server;
->         struct cifs_ses *ses;
->         struct kvec iov[2];
->         struct kvec rsp_iov;
-> @@ -1817,9 +1810,7 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
->         else
->                 return -EIO;
->
-> -       if (ses && (ses->server))
-> -               server = ses->server;
-> -       else
-> +       if (!ses || !(ses->server))
->                 return -EIO;
->
->         rc = small_smb2_init(SMB2_IOCTL, tcon, (void **) &req);
-> @@ -1977,7 +1968,6 @@ SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
->  {
->         struct smb2_close_req *req;
->         struct smb2_close_rsp *rsp;
-> -       struct TCP_Server_Info *server;
->         struct cifs_ses *ses = tcon->ses;
->         struct kvec iov[1];
->         struct kvec rsp_iov;
-> @@ -1987,9 +1977,7 @@ SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
->
->         cifs_dbg(FYI, "Close\n");
->
-> -       if (ses && (ses->server))
-> -               server = ses->server;
-> -       else
-> +       if (!ses || !(ses->server))
->                 return -EIO;
->
->         rc = small_smb2_init(SMB2_CLOSE, tcon, (void **) &req);
-> @@ -2091,15 +2079,12 @@ query_info(const unsigned int xid, struct cifs_tcon *tcon,
->         struct kvec rsp_iov;
->         int rc = 0;
->         int resp_buftype;
-> -       struct TCP_Server_Info *server;
->         struct cifs_ses *ses = tcon->ses;
->         int flags = 0;
->
->         cifs_dbg(FYI, "Query Info\n");
->
-> -       if (ses && (ses->server))
-> -               server = ses->server;
-> -       else
-> +       if (!ses || !(ses->server))
->                 return -EIO;
->
->         rc = small_smb2_init(SMB2_QUERY_INFO, tcon, (void **) &req);
-> @@ -2311,7 +2296,6 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
->            u64 volatile_fid)
->  {
->         struct smb2_flush_req *req;
-> -       struct TCP_Server_Info *server;
->         struct cifs_ses *ses = tcon->ses;
->         struct kvec iov[1];
->         struct kvec rsp_iov;
-> @@ -2321,9 +2305,7 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
->
->         cifs_dbg(FYI, "Flush\n");
->
-> -       if (ses && (ses->server))
-> -               server = ses->server;
-> -       else
-> +       if (!ses || !(ses->server))
->                 return -EIO;
->
->         rc = small_smb2_init(SMB2_FLUSH, tcon, (void **) &req);
-> @@ -3010,13 +2992,10 @@ send_set_info(const unsigned int xid, struct cifs_tcon *tcon,
->         int rc = 0;
->         int resp_buftype;
->         unsigned int i;
-> -       struct TCP_Server_Info *server;
->         struct cifs_ses *ses = tcon->ses;
->         int flags = 0;
->
-> -       if (ses && (ses->server))
-> -               server = ses->server;
-> -       else
-> +       if (!ses || !(ses->server))
->                 return -EIO;
->
->         if (!num)
-> --
-> 2.7.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>  fs/cifs/cifsglob.h |  2 ++
+>  fs/cifs/cifssmb.c  |  7 +++++++
+>  fs/cifs/connect.c  |  7 +++++++
+>  fs/cifs/smb2ops.c  | 23 +++++++++++++++++++++++
+>  4 files changed, 39 insertions(+)
+> 
+[cut]
+> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> index fbb0d4c..72a53bd 100644
+> --- a/fs/cifs/cifssmb.c
+> +++ b/fs/cifs/cifssmb.c
+> @@ -1460,6 +1460,13 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+>  		return length;
+>  	server->total_read += length;
+>  
+> +	if (server->ops->is_session_expired &&
+> +	    server->ops->is_session_expired(buf)) {
+> +		cifs_reconnect(server);
+> +		wake_up(&server->response_q);
+> +		return -1;
+> +	}
+> +
 
+Here (but the same applied to the other similar code blocks), as soon as
+the session is found expired, there is an attempt to reconnect and -1 is
+returned, regardless of the reconnect outcome.
 
+However, according to the specs, if the re-authentication attempt fails
+the client must fail the operation and terminate the session.
+Is the latter done implicitly, because I cannot see it?
 
--- 
-Thanks,
-
-Steve
+Cheers,
+Germano
