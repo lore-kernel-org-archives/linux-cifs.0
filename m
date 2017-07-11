@@ -1,65 +1,117 @@
-From: Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: RE: [PATCH] CIFS: Reconnect expired SMB sessions
-Date: Tue, 11 Jul 2017 00:07:23 +0000
-Message-ID: <CY4PR21MB0135FA5B93C1EB6AB849C18CB6AE0@CY4PR21MB0135.namprd21.prod.outlook.com>
-References: <1499549520-113585-1-git-send-email-pshilov@microsoft.com>
- <7ee806d6-9d74-4c13-65f3-e23097211b19@citrix.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        "piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org" <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>,
-        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+From: Samuel Cabrero <scabrero-l3A5Bk7waGM@public.gmane.org>
+Subject: [PATCH] cifs: Check for timeout on Negotiate stage
+Date: Tue, 11 Jul 2017 12:44:39 +0200
+Message-ID: <20170711104439.23254-1-scabrero@suse.de>
+Cc: Samuel Cabrero <scabrero-l3A5Bk7waGM@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <7ee806d6-9d74-4c13-65f3-e23097211b19-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-MjAxNy0wNy0xMCA3OjA0IEdNVC0wNzowMCBHZXJtYW5vIFBlcmNvc3NpIDxnZXJtYW5vLnBlcmNv
-c3NpQGNpdHJpeC5jb20+Og0KPiBIaSBQYXZlbCwNCj4NCj4gSSBoYXZlIG9uZSBjb21tZW50L3F1
-ZXN0aW9uLg0KPg0KPiBPbiAwNy8wOC8yMDE3IDEwOjMyIFBNLCBQYXZlbCBTaGlsb3Zza3kgd3Jv
-dGU6DQo+PiBBY2NvcmRpbmcgdG8gdGhlIE1TLVNNQjIgc3BlYyAoMy4yLjUuMS42KSBvbmNlIHRo
-ZSBjbGllbnQgcmVjZWl2ZXMNCj4+IFNUQVRVU19ORVRXT1JLX1NFU1NJT05fRVhQSVJFRCBlcnJv
-ciBjb2RlIGZyb20gYSBzZXJ2ZXIgaXQgc2hvdWxkDQo+PiByZWNvbm5lY3QgdGhlIGN1cnJlbnQg
-U01CIHNlc3Npb24uIEN1cnJlbnRseSB0aGUgY2xpZW50IGRvZXNuJ3QgZG8NCj4+IHRoYXQuIFRo
-aXMgY2FuIHJlc3VsdCBpbiBzdWJzZXF1ZW50IGNsaWVudCByZXF1ZXN0cyBmYWlsaW5nIGJ5DQo+
-PiB0aGUgc2VydmVyLiBUaGUgcGF0Y2ggYWRkcyBhbiBhZGRpdGlvbmFsIGxvZ2ljIHRvIHRoZSBk
-ZW11bHRpcGxleA0KPj4gdGhyZWFkIHRvIGlkZW50aWZ5IGV4cGlyZWQgc2Vzc2lvbnMgYW5kIHJl
-Y29ubmVjdCB0aGVtLg0KPj4NCj4+IENjOiA8c3RhYmxlQHZnZXIua2VybmVsLm9yZz4NCj4+IFNp
-Z25lZC1vZmYtYnk6IFBhdmVsIFNoaWxvdnNreSA8cHNoaWxvdkBtaWNyb3NvZnQuY29tPg0KPj4g
-LS0tDQo+PiAgZnMvY2lmcy9jaWZzZ2xvYi5oIHwgIDIgKysNCj4+ICBmcy9jaWZzL2NpZnNzbWIu
-YyAgfCAgNyArKysrKysrDQo+PiAgZnMvY2lmcy9jb25uZWN0LmMgIHwgIDcgKysrKysrKw0KPj4g
-IGZzL2NpZnMvc21iMm9wcy5jICB8IDIzICsrKysrKysrKysrKysrKysrKysrKysrDQo+PiAgNCBm
-aWxlcyBjaGFuZ2VkLCAzOSBpbnNlcnRpb25zKCspDQo+Pg0KPiBbY3V0XQ0KPj4gZGlmZiAtLWdp
-dCBhL2ZzL2NpZnMvY2lmc3NtYi5jIGIvZnMvY2lmcy9jaWZzc21iLmMNCj4+IGluZGV4IGZiYjBk
-NGMuLjcyYTUzYmQgMTAwNjQ0DQo+PiAtLS0gYS9mcy9jaWZzL2NpZnNzbWIuYw0KPj4gKysrIGIv
-ZnMvY2lmcy9jaWZzc21iLmMNCj4+IEBAIC0xNDYwLDYgKzE0NjAsMTMgQEAgY2lmc19yZWFkdl9y
-ZWNlaXZlKHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciwgc3RydWN0IG1pZF9xX2VudHJ5
-ICptaWQpDQo+PiAgICAgICAgICAgICAgIHJldHVybiBsZW5ndGg7DQo+PiAgICAgICBzZXJ2ZXIt
-PnRvdGFsX3JlYWQgKz0gbGVuZ3RoOw0KPj4NCj4+ICsgICAgIGlmIChzZXJ2ZXItPm9wcy0+aXNf
-c2Vzc2lvbl9leHBpcmVkICYmDQo+PiArICAgICAgICAgc2VydmVyLT5vcHMtPmlzX3Nlc3Npb25f
-ZXhwaXJlZChidWYpKSB7DQo+PiArICAgICAgICAgICAgIGNpZnNfcmVjb25uZWN0KHNlcnZlcik7
-DQo+PiArICAgICAgICAgICAgIHdha2VfdXAoJnNlcnZlci0+cmVzcG9uc2VfcSk7DQo+PiArICAg
-ICAgICAgICAgIHJldHVybiAtMTsNCj4+ICsgICAgIH0NCj4+ICsNCj4NCj4gSGVyZSAoYnV0IHRo
-ZSBzYW1lIGFwcGxpZWQgdG8gdGhlIG90aGVyIHNpbWlsYXIgY29kZSBibG9ja3MpLCBhcyBzb29u
-IGFzDQo+IHRoZSBzZXNzaW9uIGlzIGZvdW5kIGV4cGlyZWQsIHRoZXJlIGlzIGFuIGF0dGVtcHQg
-dG8gcmVjb25uZWN0IGFuZCAtMSBpcw0KPiByZXR1cm5lZCwgcmVnYXJkbGVzcyBvZiB0aGUgcmVj
-b25uZWN0IG91dGNvbWUuDQo+DQo+IEhvd2V2ZXIsIGFjY29yZGluZyB0byB0aGUgc3BlY3MsIGlm
-IHRoZSByZS1hdXRoZW50aWNhdGlvbiBhdHRlbXB0IGZhaWxzDQo+IHRoZSBjbGllbnQgbXVzdCBm
-YWlsIHRoZSBvcGVyYXRpb24gYW5kIHRlcm1pbmF0ZSB0aGUgc2Vzc2lvbi4NCj4gSXMgdGhlIGxh
-dHRlciBkb25lIGltcGxpY2l0bHksIGJlY2F1c2UgSSBjYW5ub3Qgc2VlIGl0Pw0KPg0KPiBDaGVl
-cnMsDQo+IEdlcm1hbm8NCj4NCg0KSGkgR2VybWFubywNCg0KY2lmc19yZWNvbm5lY3QgZG9lcyBz
-aHV0ZG93biBhbmQgdGhlbiBjb25uZWN0IGFnYWluIHRoZSBzb2NrZXQuIFNodXR0aW5nIGRvd24g
-dGhlIHNvY2tldCBpbXBsaWNpdGx5IHRlcm1pbmF0ZXMgdGhlIGV4aXN0aW5nIFNNQiBzZXNzaW9u
-IHdoaWNoIHdpbGwgYmUgc2NoZWR1bGVkIGZvciByZS1uZWdvdGlhdGlvbi4gVGhlIG5lZ290aWF0
-aW9uIGlzIGRvbmUgaW4gYSBzZXBhcmF0ZSB0aHJlYWQ6IHNlZSBjaWZzX3JlY29ubmVjdCgpIGNh
-bGxpbmcgbW9kX2RlbGF5ZWRfd29yaygpIHRoYXQgc2NoZWR1bGVzIHNlcnZlci0+ZWNobyB3b3Jr
-IHRvIGJlIGV4ZWN1dGVkIGltbWVkaWF0ZWx5OyB0aGUgbGF0dGVyIHRoZW4gc3RhcnRzIG5lZ290
-aWF0aW5nIFNNQiBzZXNzaW9uLg0KDQpjaWZzX3JlY29ubmVjdCgpIGl0c2VsZiBzaG91bGQgYmUg
-YSB2b2lkIGZ1bmN0aW9uIGJlY2F1c2UgaXQgYWx3YXlzIHJldHVybnMgMCAocGF0Y2hlcyBhcmUg
-d2VsY29tZSB0byBjbGVhbiBpdCB1cCkuIERlbXVsdGlwbGV4IHRocmVhZCB0cmVhdHMgLTEgZXJy
-b3IgY29kZSBhcyBhbiBpbmRpY2F0b3IgdGhhdCB0aGUgcmVxdWVzdCBzaG91bGQgbm90IGJlIHBy
-b2Nlc3NlZCBmdXJ0aGVyIGFuZCB3ZSBuZWVkIHRvIGNvbnRpbnVlIHBvbGxpbmcgdGhlIHNvY2tl
-dCBmb3IgZGF0YS4NCg0KLS0NCkJlc3QgcmVnYXJkcywNClBhdmVsIFNoaWxvdnNreQ0KDQo=
+Some servers seem to accept connections while booting but never send
+the SMBNegotiate response neither close the connection, causing all
+processes accessing the share hang on uninterruptible sleep state.
+
+This happens when the cifs_demultiplex_thread detects the server is
+unresponsive so releases the socket and start trying to reconnect.
+At some point, the faulty server will accept the socket and the TCP
+status will be set to NeedNegotiate. The first issued command accessing
+the share will start the negotiation (pid 5828 below), but the response
+will never arrive so other commands will be blocked waiting on the mutex
+(pid 55352).
+
+This patch checks for unresponsive servers also on the negotiate stage
+releasing the socket and reconnecting if the response is not received
+and checking again the tcp state when the mutex is acquired.
+
+PID: 55352  TASK: ffff880fd6cc02c0  CPU: 0   COMMAND: "ls"
+ #0 [ffff880fd9add9f0] schedule at ffffffff81467eb9
+ #1 [ffff880fd9addb38] __mutex_lock_slowpath at ffffffff81468fe0
+ #2 [ffff880fd9addba8] mutex_lock at ffffffff81468b1a
+ #3 [ffff880fd9addbc0] cifs_reconnect_tcon at ffffffffa042f905 [cifs]
+ #4 [ffff880fd9addc60] smb_init at ffffffffa042faeb [cifs]
+ #5 [ffff880fd9addca0] CIFSSMBQPathInfo at ffffffffa04360b5 [cifs]
+ ....
+
+Which is waiting a mutex owned by:
+
+PID: 5828   TASK: ffff880fcc55e400  CPU: 0   COMMAND: "xxxx"
+ #0 [ffff880fbfdc19b8] schedule at ffffffff81467eb9
+ #1 [ffff880fbfdc1b00] wait_for_response at ffffffffa044f96d [cifs]
+ #2 [ffff880fbfdc1b60] SendReceive at ffffffffa04505ce [cifs]
+ #3 [ffff880fbfdc1bb0] CIFSSMBNegotiate at ffffffffa0438d79 [cifs]
+ #4 [ffff880fbfdc1c50] cifs_negotiate_protocol at ffffffffa043b383 [cifs]
+ #5 [ffff880fbfdc1c80] cifs_reconnect_tcon at ffffffffa042f911 [cifs]
+ #6 [ffff880fbfdc1d20] smb_init at ffffffffa042faeb [cifs]
+ #7 [ffff880fbfdc1d60] CIFSSMBQFSInfo at ffffffffa0434eb0 [cifs]
+ ....
+
+Signed-off-by: Samuel Cabrero <scabrero-l3A5Bk7waGM@public.gmane.org>
+---
+ fs/cifs/cifssmb.c | 12 ++++++++++++
+ fs/cifs/connect.c |  3 ++-
+ fs/cifs/smb2pdu.c | 12 ++++++++++++
+ 3 files changed, 26 insertions(+), 1 deletion(-)
+
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index cb367050f972..f60ed4ebe75e 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -178,6 +178,18 @@ cifs_reconnect_tcon(struct cifs_tcon *tcon, int smb_command)
+ 	 * reconnect the same SMB session
+ 	 */
+ 	mutex_lock(&ses->session_mutex);
++
++	/*
++	 * Recheck after acquire mutex. If another thread is negotiating
++	 * and the server never sends an answer the socket will be closed
++	 * and tcpStatus set to reconnect.
++	 */
++	if (server->tcpStatus == CifsNeedReconnect) {
++		rc = -EHOSTDOWN;
++		mutex_unlock(&ses->session_mutex);
++		goto out;
++	}
++
+ 	rc = cifs_negotiate_protocol(0, ses);
+ 	if (rc == 0 && ses->need_reconnect)
+ 		rc = cifs_setup_session(0, ses, nls_codepage);
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 2eeaac6e9a55..082617c9edd0 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -513,7 +513,8 @@ server_unresponsive(struct TCP_Server_Info *server)
+ 	 * 65s kernel_recvmsg times out, and we see that we haven't gotten
+ 	 *     a response in >60s.
+ 	 */
+-	if (server->tcpStatus == CifsGood &&
++	if ((server->tcpStatus == CifsGood ||
++	    server->tcpStatus == CifsNeedNegotiate) &&
+ 	    time_after(jiffies, server->lstrp + 2 * server->echo_interval)) {
+ 		cifs_dbg(VFS, "Server %s has not responded in %lu seconds. Reconnecting...\n",
+ 			 server->hostname, (2 * server->echo_interval) / HZ);
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 5cc5f6c5e599..acfc950a2414 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -238,6 +238,18 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon)
+ 	 * the same SMB session
+ 	 */
+ 	mutex_lock(&tcon->ses->session_mutex);
++
++	/*
++	 * Recheck after acquire mutex. If another thread is negotiating
++	 * and the server never sends an answer the socket will be closed
++	 * and tcpStatus set to reconnect.
++	 */
++	if (server->tcpStatus == CifsNeedReconnect) {
++		rc = -EHOSTDOWN;
++		mutex_unlock(&tcon->ses->session_mutex);
++		goto out;
++	}
++
+ 	rc = cifs_negotiate_protocol(0, tcon->ses);
+ 	if (!rc && tcon->ses->need_reconnect)
+ 		rc = cifs_setup_session(0, tcon->ses, nls_codepage);
+-- 
+2.13.2
