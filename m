@@ -1,65 +1,65 @@
-From: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Reconnect expired SMB sessions
-Date: Mon, 10 Jul 2017 15:04:25 +0100
-Message-ID: <7ee806d6-9d74-4c13-65f3-e23097211b19@citrix.com>
+From: Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Subject: RE: [PATCH] CIFS: Reconnect expired SMB sessions
+Date: Tue, 11 Jul 2017 00:07:23 +0000
+Message-ID: <CY4PR21MB0135FA5B93C1EB6AB849C18CB6AE0@CY4PR21MB0135.namprd21.prod.outlook.com>
 References: <1499549520-113585-1-git-send-email-pshilov@microsoft.com>
+ <7ee806d6-9d74-4c13-65f3-e23097211b19@citrix.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Transfer-Encoding: base64
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        "piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org" <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Germano Percossi <germano.percossi-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>,
+        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1499549520-113585-1-git-send-email-pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Content-Language: en-CA
+In-Reply-To: <7ee806d6-9d74-4c13-65f3-e23097211b19-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi Pavel,
-
-I have one comment/question.
-
-On 07/08/2017 10:32 PM, Pavel Shilovsky wrote:
-> According to the MS-SMB2 spec (3.2.5.1.6) once the client receives
-> STATUS_NETWORK_SESSION_EXPIRED error code from a server it should
-> reconnect the current SMB session. Currently the client doesn't do
-> that. This can result in subsequent client requests failing by
-> the server. The patch adds an additional logic to the demultiplex
-> thread to identify expired sessions and reconnect them.
-> 
-> Cc: <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-> Signed-off-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> ---
->  fs/cifs/cifsglob.h |  2 ++
->  fs/cifs/cifssmb.c  |  7 +++++++
->  fs/cifs/connect.c  |  7 +++++++
->  fs/cifs/smb2ops.c  | 23 +++++++++++++++++++++++
->  4 files changed, 39 insertions(+)
-> 
-[cut]
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index fbb0d4c..72a53bd 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -1460,6 +1460,13 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
->  		return length;
->  	server->total_read += length;
->  
-> +	if (server->ops->is_session_expired &&
-> +	    server->ops->is_session_expired(buf)) {
-> +		cifs_reconnect(server);
-> +		wake_up(&server->response_q);
-> +		return -1;
-> +	}
-> +
-
-Here (but the same applied to the other similar code blocks), as soon as
-the session is found expired, there is an attempt to reconnect and -1 is
-returned, regardless of the reconnect outcome.
-
-However, according to the specs, if the re-authentication attempt fails
-the client must fail the operation and terminate the session.
-Is the latter done implicitly, because I cannot see it?
-
-Cheers,
-Germano
+MjAxNy0wNy0xMCA3OjA0IEdNVC0wNzowMCBHZXJtYW5vIFBlcmNvc3NpIDxnZXJtYW5vLnBlcmNv
+c3NpQGNpdHJpeC5jb20+Og0KPiBIaSBQYXZlbCwNCj4NCj4gSSBoYXZlIG9uZSBjb21tZW50L3F1
+ZXN0aW9uLg0KPg0KPiBPbiAwNy8wOC8yMDE3IDEwOjMyIFBNLCBQYXZlbCBTaGlsb3Zza3kgd3Jv
+dGU6DQo+PiBBY2NvcmRpbmcgdG8gdGhlIE1TLVNNQjIgc3BlYyAoMy4yLjUuMS42KSBvbmNlIHRo
+ZSBjbGllbnQgcmVjZWl2ZXMNCj4+IFNUQVRVU19ORVRXT1JLX1NFU1NJT05fRVhQSVJFRCBlcnJv
+ciBjb2RlIGZyb20gYSBzZXJ2ZXIgaXQgc2hvdWxkDQo+PiByZWNvbm5lY3QgdGhlIGN1cnJlbnQg
+U01CIHNlc3Npb24uIEN1cnJlbnRseSB0aGUgY2xpZW50IGRvZXNuJ3QgZG8NCj4+IHRoYXQuIFRo
+aXMgY2FuIHJlc3VsdCBpbiBzdWJzZXF1ZW50IGNsaWVudCByZXF1ZXN0cyBmYWlsaW5nIGJ5DQo+
+PiB0aGUgc2VydmVyLiBUaGUgcGF0Y2ggYWRkcyBhbiBhZGRpdGlvbmFsIGxvZ2ljIHRvIHRoZSBk
+ZW11bHRpcGxleA0KPj4gdGhyZWFkIHRvIGlkZW50aWZ5IGV4cGlyZWQgc2Vzc2lvbnMgYW5kIHJl
+Y29ubmVjdCB0aGVtLg0KPj4NCj4+IENjOiA8c3RhYmxlQHZnZXIua2VybmVsLm9yZz4NCj4+IFNp
+Z25lZC1vZmYtYnk6IFBhdmVsIFNoaWxvdnNreSA8cHNoaWxvdkBtaWNyb3NvZnQuY29tPg0KPj4g
+LS0tDQo+PiAgZnMvY2lmcy9jaWZzZ2xvYi5oIHwgIDIgKysNCj4+ICBmcy9jaWZzL2NpZnNzbWIu
+YyAgfCAgNyArKysrKysrDQo+PiAgZnMvY2lmcy9jb25uZWN0LmMgIHwgIDcgKysrKysrKw0KPj4g
+IGZzL2NpZnMvc21iMm9wcy5jICB8IDIzICsrKysrKysrKysrKysrKysrKysrKysrDQo+PiAgNCBm
+aWxlcyBjaGFuZ2VkLCAzOSBpbnNlcnRpb25zKCspDQo+Pg0KPiBbY3V0XQ0KPj4gZGlmZiAtLWdp
+dCBhL2ZzL2NpZnMvY2lmc3NtYi5jIGIvZnMvY2lmcy9jaWZzc21iLmMNCj4+IGluZGV4IGZiYjBk
+NGMuLjcyYTUzYmQgMTAwNjQ0DQo+PiAtLS0gYS9mcy9jaWZzL2NpZnNzbWIuYw0KPj4gKysrIGIv
+ZnMvY2lmcy9jaWZzc21iLmMNCj4+IEBAIC0xNDYwLDYgKzE0NjAsMTMgQEAgY2lmc19yZWFkdl9y
+ZWNlaXZlKHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciwgc3RydWN0IG1pZF9xX2VudHJ5
+ICptaWQpDQo+PiAgICAgICAgICAgICAgIHJldHVybiBsZW5ndGg7DQo+PiAgICAgICBzZXJ2ZXIt
+PnRvdGFsX3JlYWQgKz0gbGVuZ3RoOw0KPj4NCj4+ICsgICAgIGlmIChzZXJ2ZXItPm9wcy0+aXNf
+c2Vzc2lvbl9leHBpcmVkICYmDQo+PiArICAgICAgICAgc2VydmVyLT5vcHMtPmlzX3Nlc3Npb25f
+ZXhwaXJlZChidWYpKSB7DQo+PiArICAgICAgICAgICAgIGNpZnNfcmVjb25uZWN0KHNlcnZlcik7
+DQo+PiArICAgICAgICAgICAgIHdha2VfdXAoJnNlcnZlci0+cmVzcG9uc2VfcSk7DQo+PiArICAg
+ICAgICAgICAgIHJldHVybiAtMTsNCj4+ICsgICAgIH0NCj4+ICsNCj4NCj4gSGVyZSAoYnV0IHRo
+ZSBzYW1lIGFwcGxpZWQgdG8gdGhlIG90aGVyIHNpbWlsYXIgY29kZSBibG9ja3MpLCBhcyBzb29u
+IGFzDQo+IHRoZSBzZXNzaW9uIGlzIGZvdW5kIGV4cGlyZWQsIHRoZXJlIGlzIGFuIGF0dGVtcHQg
+dG8gcmVjb25uZWN0IGFuZCAtMSBpcw0KPiByZXR1cm5lZCwgcmVnYXJkbGVzcyBvZiB0aGUgcmVj
+b25uZWN0IG91dGNvbWUuDQo+DQo+IEhvd2V2ZXIsIGFjY29yZGluZyB0byB0aGUgc3BlY3MsIGlm
+IHRoZSByZS1hdXRoZW50aWNhdGlvbiBhdHRlbXB0IGZhaWxzDQo+IHRoZSBjbGllbnQgbXVzdCBm
+YWlsIHRoZSBvcGVyYXRpb24gYW5kIHRlcm1pbmF0ZSB0aGUgc2Vzc2lvbi4NCj4gSXMgdGhlIGxh
+dHRlciBkb25lIGltcGxpY2l0bHksIGJlY2F1c2UgSSBjYW5ub3Qgc2VlIGl0Pw0KPg0KPiBDaGVl
+cnMsDQo+IEdlcm1hbm8NCj4NCg0KSGkgR2VybWFubywNCg0KY2lmc19yZWNvbm5lY3QgZG9lcyBz
+aHV0ZG93biBhbmQgdGhlbiBjb25uZWN0IGFnYWluIHRoZSBzb2NrZXQuIFNodXR0aW5nIGRvd24g
+dGhlIHNvY2tldCBpbXBsaWNpdGx5IHRlcm1pbmF0ZXMgdGhlIGV4aXN0aW5nIFNNQiBzZXNzaW9u
+IHdoaWNoIHdpbGwgYmUgc2NoZWR1bGVkIGZvciByZS1uZWdvdGlhdGlvbi4gVGhlIG5lZ290aWF0
+aW9uIGlzIGRvbmUgaW4gYSBzZXBhcmF0ZSB0aHJlYWQ6IHNlZSBjaWZzX3JlY29ubmVjdCgpIGNh
+bGxpbmcgbW9kX2RlbGF5ZWRfd29yaygpIHRoYXQgc2NoZWR1bGVzIHNlcnZlci0+ZWNobyB3b3Jr
+IHRvIGJlIGV4ZWN1dGVkIGltbWVkaWF0ZWx5OyB0aGUgbGF0dGVyIHRoZW4gc3RhcnRzIG5lZ290
+aWF0aW5nIFNNQiBzZXNzaW9uLg0KDQpjaWZzX3JlY29ubmVjdCgpIGl0c2VsZiBzaG91bGQgYmUg
+YSB2b2lkIGZ1bmN0aW9uIGJlY2F1c2UgaXQgYWx3YXlzIHJldHVybnMgMCAocGF0Y2hlcyBhcmUg
+d2VsY29tZSB0byBjbGVhbiBpdCB1cCkuIERlbXVsdGlwbGV4IHRocmVhZCB0cmVhdHMgLTEgZXJy
+b3IgY29kZSBhcyBhbiBpbmRpY2F0b3IgdGhhdCB0aGUgcmVxdWVzdCBzaG91bGQgbm90IGJlIHBy
+b2Nlc3NlZCBmdXJ0aGVyIGFuZCB3ZSBuZWVkIHRvIGNvbnRpbnVlIHBvbGxpbmcgdGhlIHNvY2tl
+dCBmb3IgZGF0YS4NCg0KLS0NCkJlc3QgcmVnYXJkcywNClBhdmVsIFNoaWxvdnNreQ0KDQo=
