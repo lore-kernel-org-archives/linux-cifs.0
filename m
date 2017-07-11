@@ -1,78 +1,37 @@
-From: <indulge-HCInDj6vYHrk4FeknX8I/ZqQE7yCjDx5@public.gmane.org>
-Subject: (unknown)
-Date: Tue, 11 Jul 2017 16:39:18 -0000
-Message-ID: <149979115839.5245.1265868391549825500@vnpt.vn>
+From: Curt Gibson <cgibson-F4690COoD9GU+1/U8MakDg@public.gmane.org>
+Subject: New Homeowners List
+Date: Tue, 11 Jul 2017 13:14:57 -0400
+Message-ID: <d7ec499d-320b-3b65-0c63-b509d9c20c76@switchways.com>
 Mime-Version: 1.0
-Content-Type: application/zip; name="350891340.zip"
-Content-Transfer-Encoding: base64
-To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Subject: 
-Content-Disposition: attachment
+Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-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
-mspi+tIBUEsFBgAAAAABAAEAXgAAAK8NAAAAAA==
+
+Hi,
+
+Have a pleasure,
+
+Would you be interested in acquiring an email list of "New Homeowners List" from USA?
+
+Our Databases:-          1.Home Owners List             2.Condominium Owners
+                          3.Newly Movers                 4.Apartment Owners List
+                          5.Real Estate Investors        6.Luxury Brand Buyers List
+                          7.Travelers list               8.Apparel Buyers
+                          9.Rentals List                10.Pool Owners List and Many more..,
+
+Each record in the list contains Contact Name (First and Last Name), Mailing Address, List type and Opt-in email address.
+
+Let me know if you'd be interested in hearing more about it.
+
+Best Regards,
+Curt Gibson
+
+
+---
+This email has been checked for viruses by Avast antivirus software.
+https://www.avast.com/antivirus
