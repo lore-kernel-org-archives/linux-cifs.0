@@ -1,40 +1,86 @@
-From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: Re: PROBLEM: CIFS SMB2/SMB3 does not work for domain based DFS
-Date: Tue, 18 Jul 2017 17:09:23 +0200
-Message-ID: <mpslgnl3hp8.fsf@aaptelpc.suse.de>
-References: <F303188D30C85B49969BE73949AA0F8C6F171F0DF0@EXCHANGE.totemo.net>
+From: <mfr-6k8blvha/+BqlCpFK1mnLg@public.gmane.org>
+Subject: (unknown)
+Date: Thu, 20 Jul 2017 03:55:19 -0000
+Message-ID: <150052291977.17373.14982093370336894636@ttknet.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-To: Totemo Support <support-4BUtOHJXg7LQT0dZR+AlfA@public.gmane.org>,
-        "linux-cifs\@vger.kernel.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: application/zip; name="EMAIL_20824268419_linux-cifs.zip
+Content-Transfer-Encoding: base64
+To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <F303188D30C85B49969BE73949AA0F8C6F171F0DF0-Xnr6BND5kcg95swH8otnYdHuzzzSOjJt@public.gmane.org>
+Subject: 
+Content-Disposition: attachment
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi Totemo,
-
-Totemo Support <support-4BUtOHJXg7LQT0dZR+AlfA@public.gmane.org> writes:
-> From my point of view it looks like there is no resolution attempt of resolving the domain based UNC (//domain.dev.com/files) into the actual dfsroot representation.
->
-> Since my domain controller doesn't host the dfsroot structure, any attempts resolving on it directly will fail.
->
-> I tried initially with Kernel 4.11 but also build a recent 4.13 with the same issues.
-> Latest keyutils (/sbin/key.dns_resolver) are in place and configured on the system.
->
-> Do you need any further scripts/explanations how I set up the test servers? It's nothing special, everything sticks to the defaults.
-
-Could you open a bug report here [1] and provide network traces of you
-mounting with smb1 and another one of you mounting with smb3 (add them
-as attachement).
-
-Thanks
-
-1: https://bugzilla.samba.org/buglist.cgi?component=kernel%20fs&product=CifsVFS&resolution=---
-
--- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
-GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+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
