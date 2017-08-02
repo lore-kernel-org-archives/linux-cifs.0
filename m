@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [[PATCH v1] 09/37] [CIFS] SMBD: Add SMBD request and cache
-Date: Wed,  2 Aug 2017 13:10:20 -0700
-Message-ID: <1501704648-20159-10-git-send-email-longli@exchange.microsoft.com>
+Subject: [[PATCH v1] 17/37] [CIFS] SMBD: Track status for transport
+Date: Wed,  2 Aug 2017 13:10:28 -0700
+Message-ID: <1501704648-20159-18-git-send-email-longli@exchange.microsoft.com>
 References: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -13,73 +13,129 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-Define SMBD request. Unlike SMBD response, SMBD request doesn't use pre-allocated buffers. Data payload is passed from upper layer provided data buffers. SMBD requests are allocated through per-channel mempool.
+Introduce status for tracking the status of SMBD transport. They are used in transport reconnect and shutdown.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/cifsrdma.c | 12 ++++++++++++
- fs/cifs/cifsrdma.h | 19 +++++++++++++++++++
- 2 files changed, 31 insertions(+)
+ fs/cifs/cifsrdma.c | 25 +++++++++++++++++++++++++
+ fs/cifs/cifsrdma.h | 11 +++++++++++
+ 2 files changed, 36 insertions(+)
 
 diff --git a/fs/cifs/cifsrdma.c b/fs/cifs/cifsrdma.c
-index b3e43b1..9610897 100644
+index cf71bb1..ef21f1c 100644
 --- a/fs/cifs/cifsrdma.c
 +++ b/fs/cifs/cifsrdma.c
-@@ -459,6 +459,18 @@ struct cifs_rdma_info* cifs_create_rdma_session(
+@@ -173,9 +173,12 @@ static int cifs_rdma_conn_upcall(
+ 	case RDMA_CM_EVENT_DEVICE_REMOVAL:
+ 		log_rdma_event("connected event=%d\n", event->event);
+ 		info->connect_state = event->event;
++		info->transport_status = CIFS_RDMA_CONNECTED;
++		wake_up_all(&info->conn_wait);
+ 		break;
  
- 	log_rdma_event("rdma_connect connected\n");
+ 	case RDMA_CM_EVENT_DISCONNECTED:
++		info->transport_status = CIFS_RDMA_DISCONNECTED;
+ 		break;
  
-+	sprintf(cache_name, "cifs_smbd_request_%p", info);
-+	info->request_cache =
-+		kmem_cache_create(
-+			cache_name,
-+			sizeof(struct cifs_rdma_request) +
-+				sizeof(struct smbd_data_transfer),
-+			0, SLAB_HWCACHE_ALIGN, NULL);
+ 	default:
+@@ -581,6 +584,12 @@ static int cifs_rdma_post_send_page(struct cifs_rdma_info *info, struct page *pa
+ 	int rc = -ENOMEM;
+ 	int i;
+ 
++	// disconnected?
++	if (info->transport_status != CIFS_RDMA_CONNECTED) {
++		log_outgoing("disconnected not sending\n");
++		return -ENOENT;
++	}
 +
-+	info->request_mempool =
-+		mempool_create(info->send_credit_target, mempool_alloc_slab,
-+			mempool_free_slab, info->request_cache);
+ 	request = mempool_alloc(info->request_mempool, GFP_KERNEL);
+ 	if (!request)
+ 		return rc;
+@@ -686,6 +695,12 @@ static int cifs_rdma_post_send_empty(struct cifs_rdma_info *info)
+ 	int rc;
+ 	u16 credits_granted, flags=0;
+ 
++	// disconnected?
++	if (info->transport_status != CIFS_RDMA_CONNECTED) {
++		log_outgoing("disconnected not sending\n");
++		return -ENOENT;
++	}
 +
- 	sprintf(cache_name, "cifs_smbd_response_%p", info);
- 	info->response_cache =
- 		kmem_cache_create(
+ 	request = mempool_alloc(info->request_mempool, GFP_KERNEL);
+ 	if (!request) {
+ 		log_rdma_send("failed to get send buffer for empty packet\n");
+@@ -785,6 +800,12 @@ static int cifs_rdma_post_send_data(
+ 	int rc = -ENOMEM, i;
+ 	u32 data_length;
+ 
++	// disconnected?
++	if (info->transport_status != CIFS_RDMA_CONNECTED) {
++		log_outgoing("disconnected not sending\n");
++		return -ENOENT;
++	}
++
+ 	request = mempool_alloc(info->request_mempool, GFP_KERNEL);
+ 	if (!request)
+ 		return rc;
+@@ -1056,6 +1077,7 @@ struct cifs_rdma_info* cifs_create_rdma_session(
+ 		return NULL;
+ 
+ 	info->server_info = server;
++	info->transport_status = CIFS_RDMA_CONNECTING;
+ 
+ 	rc = cifs_rdma_ia_open(info, dstaddr);
+ 	if (rc) {
+@@ -1122,12 +1144,15 @@ struct cifs_rdma_info* cifs_create_rdma_session(
+ 	conn_param.retry_count = 6;
+ 	conn_param.rnr_retry_count = 6;
+ 	conn_param.flow_control = 0;
++	init_waitqueue_head(&info->conn_wait);
+ 	rc = rdma_connect(info->id, &conn_param);
+ 	if (rc) {
+ 		log_rdma_event("rdma_connect() failed with %i\n", rc);
+ 		goto out2;
+ 	}
+ 
++	wait_event_interruptible(
++		info->conn_wait, info->transport_status == CIFS_RDMA_CONNECTED);
+ 	if (info->connect_state != RDMA_CM_EVENT_ESTABLISHED)
+ 		goto out2;
+ 
 diff --git a/fs/cifs/cifsrdma.h b/fs/cifs/cifsrdma.h
-index ed0ff54..e925aa4 100644
+index 4a4c191..9618e0b 100644
 --- a/fs/cifs/cifsrdma.h
 +++ b/fs/cifs/cifsrdma.h
-@@ -62,6 +62,10 @@ struct cifs_rdma_info {
- 	struct list_head receive_queue;
- 	spinlock_t receive_queue_lock;
+@@ -25,6 +25,15 @@
+ #include <rdma/rdma_cm.h>
+ #include <linux/mempool.h>
  
-+	// request pool for RDMA send
-+	struct kmem_cache *request_cache;
-+	mempool_t *request_mempool;
-+
- 	// response pool for RDMA receive
- 	struct kmem_cache *response_cache;
- 	mempool_t *response_mempool;
-@@ -93,6 +97,21 @@ struct smbd_data_transfer {
- 	char buffer[0];
- } __packed;
- 
-+// The context for a SMBD request
-+struct cifs_rdma_request {
-+	struct cifs_rdma_info *info;
-+
-+	// completion queue entry
-+	struct ib_cqe cqe;
-+
-+	// the SGE entries for this packet
-+	struct ib_sge *sge;
-+	int num_sge;
-+
-+	// SMBD packet header follows this structure
-+	char packet[0];
++enum cifs_rdma_transport_status {
++	CIFS_RDMA_CREATED,
++	CIFS_RDMA_CONNECTING,
++	CIFS_RDMA_CONNECTED,
++	CIFS_RDMA_DISCONNECTING,
++	CIFS_RDMA_DISCONNECTED,
++	CIFS_RDMA_DESTROYED
 +};
 +
- // The context for a SMBD response
- struct cifs_rdma_response {
- 	struct cifs_rdma_info *info;
+ /*
+  * The context for the SMBDirect transport
+  * Everything related to the transport is here. It has several logical parts
+@@ -35,6 +44,7 @@
+  */
+ struct cifs_rdma_info {
+ 	struct TCP_Server_Info *server_info;
++	enum cifs_rdma_transport_status transport_status;
+ 
+ 	// RDMA related
+ 	struct rdma_cm_id *id;
+@@ -45,6 +55,7 @@ struct cifs_rdma_info {
+ 	int connect_state;
+ 	int ri_rc;
+ 	struct completion ri_done;
++	wait_queue_head_t conn_wait;
+ 
+ 	struct completion negotiate_completion;
+ 	bool negotiate_done;
 -- 
 2.7.4
