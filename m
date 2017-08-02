@@ -1,74 +1,122 @@
-From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Subject: [[PATCH v1] 00/37] Implement SMBD protocol: Series 1
-Date: Wed,  2 Aug 2017 13:10:11 -0700
-Message-ID: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
-Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Long Li <longli@exchange.microsoft.com>
+Subject: [[PATCH v1] 01/37] [CIFS] SMBD: Add parsing for new rdma mount option
+Date: Wed,  2 Aug 2017 13:10:12 -0700
+Message-ID: <1501704648-20159-2-git-send-email-longli@exchange.microsoft.com>
+References: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
+Cc: Long Li <longli@microsoft.com>
+To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+From: Long Li <longli@microsoft.com>
 
-SMB3 defines a protocol for transfer data over RDMA transport such as Infiniband, RoCE and iWARP. The prococol is published in [MS-SMBD] (https://msdn.microsoft.com/en-us/library/hh536346.aspx).
+When doing mount with "-o rdma", user can specify this is for connecting to a SMBD session.
 
-This is the series 1 of two patch sets. This patch set implements the SMBD transport for doing RDMA send/recv.
+Signed-off-by: Long Li <longli@microsoft.com>
+---
+ fs/cifs/cifs_debug.c |  2 ++
+ fs/cifs/cifsfs.c     |  2 ++
+ fs/cifs/cifsglob.h   |  2 ++
+ fs/cifs/connect.c    | 10 +++++++++-
+ 4 files changed, 15 insertions(+), 1 deletion(-)
 
-This patch set is the foundation of series 2 patch set, which implements sending upper layer RDMA read/write via memory registration.
-
-Long Li (37):
-  [CIFS] SMBD: Add parsing for new rdma mount option
-  [CIFS] SMBD: Add structure for SMBD transport
-  [CIFS] SMBD: Add logging functions for debug
-  [CIFS] SMBD: Define per-channel SMBD transport parameters and default
-    values
-  [CIFS] SMBD: Implement API for upper layer to create SMBD transport
-    and establish RDMA connection
-  [CIFS] SMBD: Add definition and cache for SMBD response
-  [CIFS] SMBD: Implement receive buffer for handling SMBD response
-  [CIFS] SMBD: Define packet format for SMBD data transfer message
-  [CIFS] SMBD: Add SMBD request and cache
-  [CIFS] SMBD: Introduce wait queue when sending SMBD request
-  [CIFS] SMBD: Post a receive request
-  [CIFS] SMBD: Handle send completion from CQ
-  [CIFS] SMBD: Implement SMBD protocol negotiation
-  [CIFS] SMBD: Post a SMBD data transfer message with page payload
-  [CIFS] SMBD: Post a SMBD data transfer message with data payload
-  [CIFS] SMBD: Post a SMBD message with no payload
-  [CIFS] SMBD: Track status for transport
-  [CIFS] SMBD: Implement API for upper layer to send data
-  [CIFS] SMBD: Manage credits on SMBD client and server
-  [CIFS] SMBD: Implement reassembly queue for receiving data
-  [CIFS] SMBD: Implement API for upper layer to receive data
-  [CIFS] SMBD: Implement API for upper layer to receive data to page
-  [CIFS] SMBD: Implement API for upper layer to reconnect transport
-  [CIFS] SMBD: Support for SMBD keep alive protocol
-  [CIFS] SMBD: Support SMBD idle connection timer
-  [CIFS] SMBD: Send an immediate packet when it's needed
-  [CIFS] SMBD: Destroy transport when RDMA channel is disconnected
-  [CIFS] SMBD: Implement API for upper layer to destroy the transport
-  [CIFS] SMBD: Disconnect RDMA connection on QP errors
-  [CIFS] SMBD: Add SMBDirect transport to Makefile
-  [CIFS] Add SMBD transport to SMB session context
-  [CIFS] Add SMBD debug couters to CIFS debug exports
-  [CIFS] Connect to SMBD transport when specified in mount option
-  [CIFS] Reconnect to SMBD transport when it's used
-  [CIFS] Destroy SMBD transport on exit
-  [CIFS] Read from SMBD transport when it's used
-  [CIFS] Write to SMBD transport when it's used
-
- fs/cifs/Makefile     |    2 +-
- fs/cifs/cifs_debug.c |   25 +
- fs/cifs/cifsfs.c     |    2 +
- fs/cifs/cifsglob.h   |    3 +
- fs/cifs/cifsrdma.c   | 1833 ++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/cifsrdma.h   |  243 +++++++
- fs/cifs/connect.c    |   56 +-
- fs/cifs/transport.c  |    7 +
- 8 files changed, 2164 insertions(+), 7 deletions(-)
- create mode 100644 fs/cifs/cifsrdma.c
- create mode 100644 fs/cifs/cifsrdma.h
-
+diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+index 9727e1d..ba0870d 100644
+--- a/fs/cifs/cifs_debug.c
++++ b/fs/cifs/cifs_debug.c
+@@ -171,6 +171,8 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+ 				ses->ses_count, ses->serverOS, ses->serverNOS,
+ 				ses->capabilities, ses->status);
+ 			}
++			if (server->rdma)
++				seq_printf(m, "RDMA\n\t");
+ 			seq_printf(m, "TCP status: %d\n\tLocal Users To "
+ 				   "Server: %d SecMode: 0x%x Req On Wire: %d",
+ 				   server->tcpStatus, server->srv_count,
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index fe0c8dc..a628800 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -330,6 +330,8 @@ cifs_show_address(struct seq_file *s, struct TCP_Server_Info *server)
+ 	default:
+ 		seq_puts(s, "(unknown)");
+ 	}
++	if (server->rdma)
++		seq_puts(s, ",rdma");
+ }
+ 
+ static void
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 8289f95..20af553 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -531,6 +531,7 @@ struct smb_vol {
+ 	bool nopersistent:1;
+ 	bool resilient:1; /* noresilient not required since not fored for CA */
+ 	bool domainauto:1;
++	bool rdma:1;
+ 	unsigned int rsize;
+ 	unsigned int wsize;
+ 	bool sockopt_tcp_nodelay:1;
+@@ -649,6 +650,7 @@ struct TCP_Server_Info {
+ 	bool	sec_kerberos;		/* supports plain Kerberos */
+ 	bool	sec_mskerberos;		/* supports legacy MS Kerberos */
+ 	bool	large_buf;		/* is current buffer large? */
++	bool	rdma;			/* use rdma wrapper instead of socket */
+ 	struct delayed_work	echo; /* echo ping workqueue job */
+ 	char	*smallbuf;	/* pointer to current "small" buffer */
+ 	char	*bigbuf;	/* pointer to current "big" buffer */
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 2eeaac6..0dc942c 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -94,7 +94,7 @@ enum {
+ 	Opt_multiuser, Opt_sloppy, Opt_nosharesock,
+ 	Opt_persistent, Opt_nopersistent,
+ 	Opt_resilient, Opt_noresilient,
+-	Opt_domainauto,
++	Opt_domainauto, Opt_rdma,
+ 
+ 	/* Mount options which take numeric value */
+ 	Opt_backupuid, Opt_backupgid, Opt_uid,
+@@ -185,6 +185,7 @@ static const match_table_t cifs_mount_option_tokens = {
+ 	{ Opt_resilient, "resilienthandles"},
+ 	{ Opt_noresilient, "noresilienthandles"},
+ 	{ Opt_domainauto, "domainauto"},
++	{ Opt_rdma, "rdma"},
+ 
+ 	{ Opt_backupuid, "backupuid=%s" },
+ 	{ Opt_backupgid, "backupgid=%s" },
+@@ -1541,6 +1542,9 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+ 		case Opt_domainauto:
+ 			vol->domainauto = true;
+ 			break;
++		case Opt_rdma:
++			vol->rdma = true;
++			break;
+ 
+ 		/* Numeric Values */
+ 		case Opt_backupuid:
+@@ -2134,6 +2138,9 @@ static int match_server(struct TCP_Server_Info *server, struct smb_vol *vol)
+ 	if (server->echo_interval != vol->echo_interval * HZ)
+ 		return 0;
+ 
++	if (server->rdma != vol->rdma)
++		return 0;
++
+ 	return 1;
+ }
+ 
+@@ -2234,6 +2241,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 	tcp_ses->noblocksnd = volume_info->noblocksnd;
+ 	tcp_ses->noautotune = volume_info->noautotune;
+ 	tcp_ses->tcp_nodelay = volume_info->sockopt_tcp_nodelay;
++	tcp_ses->rdma = volume_info->rdma;
+ 	tcp_ses->in_flight = 0;
+ 	tcp_ses->credits = 1;
+ 	init_waitqueue_head(&tcp_ses->response_q);
 -- 
 2.7.4
