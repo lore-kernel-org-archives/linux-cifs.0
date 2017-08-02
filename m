@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [[PATCH v1] 15/37] [CIFS] SMBD: Post a SMBD data transfer message with data payload
-Date: Wed,  2 Aug 2017 13:10:26 -0700
-Message-ID: <1501704648-20159-16-git-send-email-longli@exchange.microsoft.com>
+Subject: [[PATCH v1] 14/37] [CIFS] SMBD: Post a SMBD data transfer message with page payload
+Date: Wed,  2 Aug 2017 13:10:25 -0700
+Message-ID: <1501704648-20159-15-git-send-email-longli@exchange.microsoft.com>
 References: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -13,45 +13,46 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-Similar to sending transfer message with page payload, this function creates a SMBD data packet and send it over to RDMA, from iov passed from upper layer.
+Add the function to send a SMBD data transfer message to server with page passed from upper layer.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/cifsrdma.c | 119 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 119 insertions(+)
+ fs/cifs/cifsrdma.c | 113 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 113 insertions(+)
 
 diff --git a/fs/cifs/cifsrdma.c b/fs/cifs/cifsrdma.c
-index b3ec109..989cad8 100644
+index aa3d1a5..b3ec109 100644
 --- a/fs/cifs/cifsrdma.c
 +++ b/fs/cifs/cifsrdma.c
-@@ -66,6 +66,9 @@ static int cifs_rdma_post_recv(
+@@ -66,6 +66,10 @@ static int cifs_rdma_post_recv(
  		struct cifs_rdma_info *info,
  		struct cifs_rdma_response *response);
  
-+static int cifs_rdma_post_send_data(
-+		struct cifs_rdma_info *info,
-+		struct kvec *iov, int n_vec, int remaining_data_length);
- static int cifs_rdma_post_send_page(struct cifs_rdma_info *info,
- 		struct page *page, unsigned long offset,
- 		size_t size, int remaining_data_length);
-@@ -671,6 +674,122 @@ static int cifs_rdma_post_send_page(struct cifs_rdma_info *info, struct page *pa
++static int cifs_rdma_post_send_page(struct cifs_rdma_info *info,
++		struct page *page, unsigned long offset,
++		size_t size, int remaining_data_length);
++
+ /*
+  * Per RDMA transport connection parameters
+  * as defined in [MS-SMBD] 3.1.1.1
+@@ -558,6 +562,115 @@ static int cifs_rdma_post_send_negotiate_req(struct cifs_rdma_info *info)
  }
  
  /*
-+ * Send a data buffer
-+ * iov: the iov array describing the data buffers
-+ * n_vec: number of iov array
++ * Send a page
++ * page: the page to send
++ * offset: offset in the page to send
++ * size: length in the page to send
 + * remaining_data_length: remaining data to send in this payload
 + */
-+static int cifs_rdma_post_send_data(
-+	struct cifs_rdma_info *info, struct kvec *iov, int n_vec,
-+	int remaining_data_length)
++static int cifs_rdma_post_send_page(struct cifs_rdma_info *info, struct page *page,
++		unsigned long offset, size_t size, int remaining_data_length)
 +{
 +	struct cifs_rdma_request *request;
 +	struct smbd_data_transfer *packet;
 +	struct ib_send_wr send_wr, *send_wr_fail;
-+	int rc = -ENOMEM, i;
-+	u32 data_length;
++	int rc = -ENOMEM;
++	int i;
 +
 +	request = mempool_alloc(info->request_mempool, GFP_KERNEL);
 +	if (!request)
@@ -65,63 +66,56 @@ index b3ec109..989cad8 100644
 +	packet = (struct smbd_data_transfer *) request->packet;
 +	packet->credits_requested = cpu_to_le16(info->send_credit_target);
 +	packet->flags = cpu_to_le16(0);
++
 +	packet->reserved = cpu_to_le16(0);
-+
 +	packet->data_offset = cpu_to_le32(24);
-+
-+	data_length = 0;
-+	for (i=0; i<n_vec; i++)
-+		data_length += iov[i].iov_len;
-+	packet->data_length = cpu_to_le32(data_length);
-+
++	packet->data_length = cpu_to_le32(size);
 +	packet->remaining_data_length = cpu_to_le32(remaining_data_length);
++
 +	packet->padding = cpu_to_le32(0);
 +
-+	log_rdma_send("credits_requested=%d credits_granted=%d data_offset=%d "
-+		      "data_length=%d remaining_data_length=%d\n",
++	log_outgoing("credits_requested=%d credits_granted=%d data_offset=%d "
++		     "data_length=%d remaining_data_length=%d\n",
 +		le16_to_cpu(packet->credits_requested),
 +		le16_to_cpu(packet->credits_granted),
 +		le32_to_cpu(packet->data_offset),
 +		le32_to_cpu(packet->data_length),
 +		le32_to_cpu(packet->remaining_data_length));
 +
-+	request->sge = kzalloc(sizeof(struct ib_sge)*(n_vec+1), GFP_KERNEL);
++	request->sge = kzalloc(sizeof(struct ib_sge)*2, GFP_KERNEL);
 +	if (!request->sge)
 +		goto allocate_sge_failed;
++	request->num_sge = 2;
 +
-+	request->num_sge = n_vec+1;
-+
-+	request->sge[0].addr = ib_dma_map_single(
-+				info->id->device, (void *)packet,
-+				sizeof(*packet), DMA_BIDIRECTIONAL);
++	request->sge[0].addr = ib_dma_map_single(info->id->device,
++						 (void *)packet,
++						 sizeof(*packet),
++						 DMA_BIDIRECTIONAL);
 +	if(ib_dma_mapping_error(info->id->device, request->sge[0].addr)) {
 +		rc = -EIO;
-+		goto dma_mapping_failure;
++		goto dma_mapping_failed;
 +	}
 +	request->sge[0].length = sizeof(*packet);
 +	request->sge[0].lkey = info->pd->local_dma_lkey;
 +	ib_dma_sync_single_for_device(info->id->device, request->sge[0].addr,
-+		request->sge[0].length, DMA_TO_DEVICE);
++				      request->sge[0].length, DMA_TO_DEVICE);
 +
-+	for (i=0; i<n_vec; i++) {
-+		request->sge[i+1].addr = ib_dma_map_single(info->id->device, iov[i].iov_base,
-+						iov[i].iov_len, DMA_BIDIRECTIONAL);
-+		if(ib_dma_mapping_error(info->id->device, request->sge[i+1].addr)) {
-+			rc = -EIO;
-+			goto dma_mapping_failure;
-+		}
-+		request->sge[i+1].length = iov[i].iov_len;
-+		request->sge[i+1].lkey = info->pd->local_dma_lkey;
-+		ib_dma_sync_single_for_device(info->id->device, request->sge[i+i].addr,
-+			request->sge[i+i].length, DMA_TO_DEVICE);
++	request->sge[1].addr = ib_dma_map_page(info->id->device, page,
++					       offset, size, DMA_BIDIRECTIONAL);
++	if(ib_dma_mapping_error(info->id->device, request->sge[1].addr)) {
++		rc = -EIO;
++		goto dma_mapping_failed;
 +	}
++	request->sge[1].length = size;
++	request->sge[1].lkey = info->pd->local_dma_lkey;
++	ib_dma_sync_single_for_device(info->id->device, request->sge[1].addr,
++				      request->sge[1].length, DMA_TO_DEVICE);
 +
-+	log_rdma_send("rdma_request sge[0] addr=%llu legnth=%u lkey=%u\n",
-+		request->sge[0].addr, request->sge[0].length, request->sge[0].lkey);
-+	for (i=0; i<n_vec; i++)
-+		log_rdma_send("rdma_request sge[%d] addr=%llu legnth=%u lkey=%u\n",
-+			i+1, request->sge[i+1].addr,
-+			request->sge[i+1].length, request->sge[i+1].lkey);
++	log_rdma_send("rdma_request sge[0] addr=%llu legnth=%u lkey=%u sge[1] "
++		      "addr=%llu length=%u lkey=%u\n",
++		request->sge[0].addr, request->sge[0].length,
++		request->sge[0].lkey, request->sge[1].addr,
++		request->sge[1].length, request->sge[1].lkey);
 +
 +	request->cqe.done = send_done;
 +
@@ -139,8 +133,8 @@ index b3ec109..989cad8 100644
 +	// post send failed
 +	log_rdma_send("ib_post_send failed rc=%d\n", rc);
 +
-+dma_mapping_failure:
-+	for (i=0; i<n_vec+1; i++)
++dma_mapping_failed:
++	for (i=0; i<2; i++)
 +		if (request->sge[i].addr)
 +			ib_dma_unmap_single(info->id->device,
 +					    request->sge[i].addr,
