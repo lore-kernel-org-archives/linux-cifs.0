@@ -1,204 +1,320 @@
-From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Subject: [[PATCH v1] 11/37] [CIFS] SMBD: Post a receive request
-Date: Wed,  2 Aug 2017 13:10:22 -0700
-Message-ID: <1501704648-20159-12-git-send-email-longli@exchange.microsoft.com>
+From: Long Li <longli@exchange.microsoft.com>
+Subject: [[PATCH v1] 05/37] [CIFS] SMBD: Implement API for upper layer to create SMBD transport and establish RDMA connection
+Date: Wed,  2 Aug 2017 13:10:16 -0700
+Message-ID: <1501704648-20159-6-git-send-email-longli@exchange.microsoft.com>
 References: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
-Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1501704648-20159-1-git-send-email-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: Long Li <longli@microsoft.com>
+To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+From: Long Li <longli@microsoft.com>
 
-Add code to post a receive request to RDMA. Before the SMB server can send a packet to SMB client via SMBD, a receive request must be posted to local RDMA layer.
+Implement the code for connecting to SMBD server. The client and server are connected using RC Queue Pair over RDMA API, which suppports Infiniband, RoCE and iWARP. Upper layer code can call cifs_create_rdma_session to establish a SMBD RDMA connection.
 
-Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/cifsrdma.c | 124 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/cifsrdma.h |   5 +++
- 2 files changed, 129 insertions(+)
+ fs/cifs/cifsrdma.c | 257 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/cifsrdma.h |  14 +++
+ 2 files changed, 271 insertions(+)
 
 diff --git a/fs/cifs/cifsrdma.c b/fs/cifs/cifsrdma.c
-index 8aa8a47..20237b7 100644
+index 7c4c178..b18fb79 100644
 --- a/fs/cifs/cifsrdma.c
 +++ b/fs/cifs/cifsrdma.c
-@@ -62,6 +62,10 @@ static void put_receive_buffer(
- static int allocate_receive_buffers(struct cifs_rdma_info *info, int num_buf);
- static void destroy_receive_buffers(struct cifs_rdma_info *info);
- 
-+static int cifs_rdma_post_recv(
-+		struct cifs_rdma_info *info,
-+		struct cifs_rdma_response *response);
+@@ -120,3 +120,260 @@ do {									\
+ 			atomic_read(&info->send_credits),		\
+ 			info->send_credit_target);			\
+ } while (0)
 +
- /*
-  * Per RDMA transport connection parameters
-  * as defined in [MS-SMBD] 3.1.1.1
-@@ -193,6 +197,85 @@ cifs_rdma_qp_async_error_upcall(struct ib_event *event, void *context)
- 	}
- }
- 
-+/* Called from softirq, when recv is done */
-+static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
++/* Upcall from RDMA CM */
++static int cifs_rdma_conn_upcall(
++		struct rdma_cm_id *id, struct rdma_cm_event *event)
 +{
-+	struct smbd_data_transfer *data_transfer;
-+	struct cifs_rdma_response *response =
-+		container_of(wc->wr_cqe, struct cifs_rdma_response, cqe);
-+	struct cifs_rdma_info *info = response->info;
++	struct cifs_rdma_info *info = id->context;
 +
-+	log_rdma_recv("response=%p type=%d wc status=%d wc opcode %d "
-+		      "byte_len=%d pkey_index=%x\n",
-+		response, response->type, wc->status, wc->opcode,
-+		wc->byte_len, wc->pkey_index);
++	log_rdma_event("event=%d status=%d\n", event->event, event->status);
 +
-+	if (wc->status != IB_WC_SUCCESS || wc->opcode != IB_WC_RECV) {
-+		log_rdma_recv("wc->status=%d opcode=%d\n",
-+			wc->status, wc->opcode);
-+		goto error;
-+	}
++	switch (event->event) {
++	case RDMA_CM_EVENT_ADDR_RESOLVED:
++	case RDMA_CM_EVENT_ROUTE_RESOLVED:
++		info->ri_rc = 0;
++		complete(&info->ri_done);
++		break;
 +
-+	ib_dma_sync_single_for_cpu(
-+		wc->qp->device,
-+		response->sge.addr,
-+		response->sge.length,
-+		DMA_FROM_DEVICE);
++	case RDMA_CM_EVENT_ADDR_ERROR:
++		info->ri_rc = -EHOSTUNREACH;
++		complete(&info->ri_done);
++		break;
 +
-+	switch(response->type) {
-+	case SMBD_TRANSFER_DATA:
-+		data_transfer = (struct smbd_data_transfer *) response->packet;
-+		atomic_dec(&info->receive_credits);
-+		atomic_set(&info->receive_credit_target,
-+			le16_to_cpu(data_transfer->credits_requested));
-+		atomic_add(le16_to_cpu(data_transfer->credits_granted),
-+			&info->send_credits);
++	case RDMA_CM_EVENT_ROUTE_ERROR:
++		info->ri_rc = -ENETUNREACH;
++		complete(&info->ri_done);
++		break;
 +
-+		log_incoming("data flags %d data_offset %d data_length %d "
-+			     "remaining_data_length %d\n",
-+			le16_to_cpu(data_transfer->flags),
-+			le32_to_cpu(data_transfer->data_offset),
-+			le32_to_cpu(data_transfer->data_length),
-+			le32_to_cpu(data_transfer->remaining_data_length));
++	case RDMA_CM_EVENT_ESTABLISHED:
++	case RDMA_CM_EVENT_CONNECT_ERROR:
++	case RDMA_CM_EVENT_UNREACHABLE:
++	case RDMA_CM_EVENT_REJECTED:
++	case RDMA_CM_EVENT_DEVICE_REMOVAL:
++		log_rdma_event("connected event=%d\n", event->event);
++		info->connect_state = event->event;
++		break;
 +
-+		log_transport_credit(info);
-+
-+		// process sending queue on new credits
-+		if (atomic_read(&info->send_credits))
-+			wake_up(&info->wait_send_queue);
-+
-+		// process receive queue
-+		if (le32_to_cpu(data_transfer->data_length)) {
-+			if (info->full_packet_received) {
-+				response->first_segment = true;
-+			}
-+
-+			if (le32_to_cpu(data_transfer->remaining_data_length))
-+				info->full_packet_received = false;
-+			else
-+				info->full_packet_received = true;
-+
-+			goto queue_done;
-+		}
-+
-+		// if we reach here, this is an empty packet, finish it
++	case RDMA_CM_EVENT_DISCONNECTED:
 +		break;
 +
 +	default:
-+		log_rdma_recv("unexpected response type=%d\n", response->type);
++		break;
 +	}
 +
-+error:
-+	put_receive_buffer(info, response);
-+
-+queue_done:
-+	if (atomic_dec_and_test(&info->recv_pending)) {
-+		wake_up(&info->wait_recv_pending);
-+	}
-+
-+	return;
++	return 0;
 +}
 +
- static struct rdma_cm_id* cifs_rdma_create_id(
- 		struct cifs_rdma_info *info, struct sockaddr *dstaddr)
- {
-@@ -289,6 +372,44 @@ static int cifs_rdma_ia_open(
- }
- 
- /*
-+ * Post a receive request to the transport
-+ * The remote peer can only send data when a receive is posted
-+ * The interaction is controlled by send/recieve credit system
-+ */
-+static int cifs_rdma_post_recv(struct cifs_rdma_info *info, struct cifs_rdma_response *response)
++/* Upcall from RDMA QP */
++static void
++cifs_rdma_qp_async_error_upcall(struct ib_event *event, void *context)
 +{
-+	struct ib_recv_wr recv_wr, *recv_wr_fail=NULL;
-+	int rc = -EIO;
++	struct cifs_rdma_info *info = context;
++	log_rdma_event("%s on device %s info %p\n",
++		ib_event_msg(event->event), event->device->name, info);
 +
-+	response->sge.addr = ib_dma_map_single(info->id->device, response->packet,
-+				info->max_receive_size, DMA_FROM_DEVICE);
-+	if (ib_dma_mapping_error(info->id->device, response->sge.addr))
-+		return rc;
++	switch (event->event)
++	{
++	case IB_EVENT_CQ_ERR:
++	case IB_EVENT_QP_FATAL:
++	case IB_EVENT_QP_REQ_ERR:
++	case IB_EVENT_QP_ACCESS_ERR:
 +
-+	response->sge.length = info->max_receive_size;
-+	response->sge.lkey = info->pd->local_dma_lkey;
++	default:
++		break;
++	}
++}
 +
-+	response->cqe.done = recv_done;
++static struct rdma_cm_id* cifs_rdma_create_id(
++		struct cifs_rdma_info *info, struct sockaddr *dstaddr)
++{
++	struct rdma_cm_id *id;
++	int rc;
++	struct sockaddr_in *addr_in = (struct sockaddr_in*) dstaddr;
++	__be16 *sport;
 +
-+	recv_wr.wr_cqe = &response->cqe;
-+	recv_wr.next = NULL;
-+	recv_wr.sg_list = &response->sge;
-+	recv_wr.num_sge = 1;
++	log_rdma_event("connecting to IP %pI4 port %d\n",
++		&addr_in->sin_addr, ntohs(addr_in->sin_port));
 +
-+	atomic_inc(&info->recv_pending);
-+	rc = ib_post_recv(info->id->qp, &recv_wr, &recv_wr_fail);
-+	if (rc) {
-+		ib_dma_unmap_single(info->id->device, response->sge.addr,
-+				    response->sge.length, DMA_FROM_DEVICE);
-+
-+		log_rdma_recv("ib_post_recv failed rc=%d\n", rc);
-+		atomic_dec(&info->recv_pending);
++	id = rdma_create_id(&init_net, cifs_rdma_conn_upcall, info,
++		RDMA_PS_TCP, IB_QPT_RC);
++	if (IS_ERR(id)) {
++		rc = PTR_ERR(id);
++		log_rdma_event("rdma_create_id() failed %i\n", rc);
++		return id;
 +	}
 +
++	if (dstaddr->sa_family == AF_INET6)
++		sport = &((struct sockaddr_in6 *)dstaddr)->sin6_port;
++	else
++		sport = &((struct sockaddr_in *)dstaddr)->sin_port;
++
++	*sport = htons(445);
++try_again:
++	init_completion(&info->ri_done);
++	info->ri_rc = -ETIMEDOUT;
++	rc = rdma_resolve_addr(id, NULL, (struct sockaddr*)dstaddr, 5000);
++	if (rc) {
++		log_rdma_event("rdma_resolve_addr() failed %i\n", rc);
++		goto out;
++	}
++	wait_for_completion_interruptible_timeout(
++		&info->ri_done, msecs_to_jiffies(8000));
++	rc = info->ri_rc;
++	if (rc) {
++		log_rdma_event("rdma_resolve_addr() completed %i\n", rc);
++		goto out;
++	}
++
++	info->ri_rc = -ETIMEDOUT;
++	rc = rdma_resolve_route(id, 5000);
++	if (rc) {
++		log_rdma_event("rdma_resolve_route() failed %i\n", rc);
++		goto out;
++	}
++	wait_for_completion_interruptible_timeout(
++		&info->ri_done, msecs_to_jiffies(8000));
++	rc = info->ri_rc;
++	if (rc) {
++		log_rdma_event("rdma_resolve_route() completed %i\n", rc);
++		goto out;
++	}
++
++	return id;
++
++out:
++	// try port number 5445 if port 445 doesn't work
++	if (*sport == htons(445)) {
++		*sport = htons(5445);
++		goto try_again;
++	}
++	rdma_destroy_id(id);
++	return ERR_PTR(rc);
++}
++
++static int cifs_rdma_ia_open(
++		struct cifs_rdma_info *info, struct sockaddr *dstaddr)
++{
++	int rc;
++
++	info->id = cifs_rdma_create_id(info, dstaddr);
++	if (IS_ERR(info->id)) {
++		rc = PTR_ERR(info->id);
++		goto out1;
++	}
++
++	info->pd = ib_alloc_pd(info->id->device, 0);
++	if (IS_ERR(info->pd)) {
++		rc = PTR_ERR(info->pd);
++		log_rdma_event("ib_alloc_pd() returned %d\n", rc);
++		goto out2;
++	}
++
++	return 0;
++
++out2:
++	rdma_destroy_id(info->id);
++	info->id = NULL;
++
++out1:
 +	return rc;
 +}
 +
-+/*
-  * Receive buffer operations.
-  * For each remote send, we need to post a receive. The receive buffers are
-  * pre-allocated in advance.
-@@ -485,6 +606,9 @@ struct cifs_rdma_info* cifs_create_rdma_session(
- 
- 	allocate_receive_buffers(info, info->receive_credit_max);
- 	init_waitqueue_head(&info->wait_send_queue);
++struct cifs_rdma_info* cifs_create_rdma_session(
++	struct TCP_Server_Info *server, struct sockaddr *dstaddr)
++{
++	int rc;
++	struct cifs_rdma_info *info;
++	struct rdma_conn_param conn_param;
++	struct ib_qp_init_attr qp_attr;
++	int max_pending = receive_credit_max + send_credit_target;
 +
-+	init_waitqueue_head(&info->wait_recv_pending);
-+	atomic_set(&info->recv_pending, 0);
- out2:
- 	rdma_destroy_id(info->id);
- 
++	info = kzalloc(sizeof(struct cifs_rdma_info), GFP_KERNEL);
++	if (!info)
++		return NULL;
++
++	info->server_info = server;
++
++	rc = cifs_rdma_ia_open(info, dstaddr);
++	if (rc) {
++		log_rdma_event("cifs_rdma_ia_open rc=%d\n", rc);
++		goto out1;
++	}
++
++	if (max_pending > info->id->device->attrs.max_cqe ||
++	    max_pending > info->id->device->attrs.max_qp_wr) {
++		log_rdma_event("consider lowering receive_credit_max and "
++			"send_credit_target. Possible CQE overrun, device "
++			"reporting max_cpe %d max_qp_wr %d\n",
++			info->id->device->attrs.max_cqe,
++			info->id->device->attrs.max_qp_wr);
++		goto out2;
++	}
++
++	info->receive_credit_max = receive_credit_max;
++	info->send_credit_target = send_credit_target;
++	info->max_send_size = max_send_size;
++	info->max_fragmented_recv_size = max_fragmented_recv_size;
++	info->max_receive_size = max_receive_size;
++
++	max_send_sge = min_t(int, max_send_sge,
++		info->id->device->attrs.max_sge);
++	max_recv_sge = min_t(int, max_recv_sge,
++		info->id->device->attrs.max_sge_rd);
++
++	info->cq = ib_alloc_cq(info->id->device, info,
++			info->receive_credit_max + info->send_credit_target,
++			0, IB_POLL_SOFTIRQ);
++	if (IS_ERR(info->cq))
++		goto out2;
++
++	memset(&qp_attr, 0, sizeof qp_attr);
++	qp_attr.event_handler = cifs_rdma_qp_async_error_upcall;
++	qp_attr.qp_context = info;
++	qp_attr.cap.max_send_wr = info->send_credit_target;
++	qp_attr.cap.max_recv_wr = info->receive_credit_max;
++	qp_attr.cap.max_send_sge = max_send_sge;
++	qp_attr.cap.max_recv_sge = max_recv_sge;
++	qp_attr.cap.max_inline_data = 0;
++	qp_attr.sq_sig_type = IB_SIGNAL_REQ_WR;
++	qp_attr.qp_type = IB_QPT_RC;
++	qp_attr.send_cq = info->cq;
++	qp_attr.recv_cq = info->cq;
++	qp_attr.port_num = ~0;
++
++	rc = rdma_create_qp(info->id, info->pd, &qp_attr);
++	if (rc) {
++		log_rdma_event("rdma_create_qp failed %i\n", rc);
++		rc = -ENETUNREACH;
++		goto out2;
++	}
++
++	memset(&conn_param, 0, sizeof(conn_param));
++	conn_param.private_data = NULL;
++	conn_param.private_data_len = 0;
++	conn_param.initiator_depth = 0;
++	conn_param.responder_resources = 32;
++	if (info->id->device->attrs.max_qp_rd_atom < 32)
++		conn_param.responder_resources =
++			info->id->device->attrs.max_qp_rd_atom;
++	conn_param.retry_count = 6;
++	conn_param.rnr_retry_count = 6;
++	conn_param.flow_control = 0;
++	rc = rdma_connect(info->id, &conn_param);
++	if (rc) {
++		log_rdma_event("rdma_connect() failed with %i\n", rc);
++		goto out2;
++	}
++
++	if (info->connect_state != RDMA_CM_EVENT_ESTABLISHED)
++		goto out2;
++
++	log_rdma_event("rdma_connect connected\n");
++out2:
++	rdma_destroy_id(info->id);
++
++out1:
++	kfree(info);
++	return NULL;
++}
 diff --git a/fs/cifs/cifsrdma.h b/fs/cifs/cifsrdma.h
-index 287b5b1..8702a2b 100644
+index 9979fd4..71ea380 100644
 --- a/fs/cifs/cifsrdma.h
 +++ b/fs/cifs/cifsrdma.h
-@@ -59,6 +59,9 @@ struct cifs_rdma_info {
- 	atomic_t receive_credits;
- 	atomic_t receive_credit_target;
+@@ -36,6 +36,16 @@
+ struct cifs_rdma_info {
+ 	struct TCP_Server_Info *server_info;
  
-+	atomic_t recv_pending;
-+	wait_queue_head_t wait_recv_pending;
++	// RDMA related
++	struct rdma_cm_id *id;
++	struct ib_qp_init_attr qp_attr;
++	struct ib_pd *pd;
++	struct ib_cq *cq;
++	struct ib_device_attr dev_attr;
++	int connect_state;
++	int ri_rc;
++	struct completion ri_done;
 +
- 	struct list_head receive_queue;
- 	spinlock_t receive_queue_lock;
- 
-@@ -68,6 +71,8 @@ struct cifs_rdma_info {
- 	struct kmem_cache *request_cache;
- 	mempool_t *request_mempool;
- 
-+	bool full_packet_received;
+ 	//connection paramters
+ 	int receive_credit_max;
+ 	int send_credit_target;
+@@ -55,4 +65,8 @@ struct cifs_rdma_info {
+ 	unsigned int count_put_receive_buffer;
+ 	unsigned int count_send_empty;
+ };
 +
- 	// response pool for RDMA receive
- 	struct kmem_cache *response_cache;
- 	mempool_t *response_mempool;
++// Create a SMBDirect session
++struct cifs_rdma_info* cifs_create_rdma_session(
++	struct TCP_Server_Info *server, struct sockaddr *dstaddr);
+ #endif
 -- 
 2.7.4
