@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [[PATCH v1] 01/37] [CIFS] SMBD: Add parsing for new rdma mount option
-Date: Wed,  2 Aug 2017 13:10:12 -0700
-Message-ID: <1501704648-20159-2-git-send-email-longli@exchange.microsoft.com>
+Subject: [[PATCH v1] 06/37] [CIFS] SMBD: Add definition and cache for SMBD response
+Date: Wed,  2 Aug 2017 13:10:17 -0700
+Message-ID: <1501704648-20159-7-git-send-email-longli@exchange.microsoft.com>
 References: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -13,110 +13,93 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-When doing mount with "-o rdma", user can specify this is for connecting to a SMBD session.
+Define the data structure for receiving a SMBD response. SMBD responses are allocated through a per-channel mempool. For each server initiated response message, the SMB client must post a SMBD response to the local hardware.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/cifs_debug.c |  2 ++
- fs/cifs/cifsfs.c     |  2 ++
- fs/cifs/cifsglob.h   |  2 ++
- fs/cifs/connect.c    | 10 +++++++++-
- 4 files changed, 15 insertions(+), 1 deletion(-)
+ fs/cifs/cifsrdma.c | 13 +++++++++++++
+ fs/cifs/cifsrdma.h | 31 +++++++++++++++++++++++++++++++
+ 2 files changed, 44 insertions(+)
 
-diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-index 9727e1d..ba0870d 100644
---- a/fs/cifs/cifs_debug.c
-+++ b/fs/cifs/cifs_debug.c
-@@ -171,6 +171,8 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 				ses->ses_count, ses->serverOS, ses->serverNOS,
- 				ses->capabilities, ses->status);
- 			}
-+			if (server->rdma)
-+				seq_printf(m, "RDMA\n\t");
- 			seq_printf(m, "TCP status: %d\n\tLocal Users To "
- 				   "Server: %d SecMode: 0x%x Req On Wire: %d",
- 				   server->tcpStatus, server->srv_count,
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index fe0c8dc..a628800 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -330,6 +330,8 @@ cifs_show_address(struct seq_file *s, struct TCP_Server_Info *server)
- 	default:
- 		seq_puts(s, "(unknown)");
- 	}
-+	if (server->rdma)
-+		seq_puts(s, ",rdma");
- }
+diff --git a/fs/cifs/cifsrdma.c b/fs/cifs/cifsrdma.c
+index b18fb79..1636304 100644
+--- a/fs/cifs/cifsrdma.c
++++ b/fs/cifs/cifsrdma.c
+@@ -287,6 +287,7 @@ struct cifs_rdma_info* cifs_create_rdma_session(
+ 	struct cifs_rdma_info *info;
+ 	struct rdma_conn_param conn_param;
+ 	struct ib_qp_init_attr qp_attr;
++	char cache_name[80];
+ 	int max_pending = receive_credit_max + send_credit_target;
  
- static void
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 8289f95..20af553 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -531,6 +531,7 @@ struct smb_vol {
- 	bool nopersistent:1;
- 	bool resilient:1; /* noresilient not required since not fored for CA */
- 	bool domainauto:1;
-+	bool rdma:1;
- 	unsigned int rsize;
- 	unsigned int wsize;
- 	bool sockopt_tcp_nodelay:1;
-@@ -649,6 +650,7 @@ struct TCP_Server_Info {
- 	bool	sec_kerberos;		/* supports plain Kerberos */
- 	bool	sec_mskerberos;		/* supports legacy MS Kerberos */
- 	bool	large_buf;		/* is current buffer large? */
-+	bool	rdma;			/* use rdma wrapper instead of socket */
- 	struct delayed_work	echo; /* echo ping workqueue job */
- 	char	*smallbuf;	/* pointer to current "small" buffer */
- 	char	*bigbuf;	/* pointer to current "big" buffer */
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 2eeaac6..0dc942c 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -94,7 +94,7 @@ enum {
- 	Opt_multiuser, Opt_sloppy, Opt_nosharesock,
- 	Opt_persistent, Opt_nopersistent,
- 	Opt_resilient, Opt_noresilient,
--	Opt_domainauto,
-+	Opt_domainauto, Opt_rdma,
+ 	info = kzalloc(sizeof(struct cifs_rdma_info), GFP_KERNEL);
+@@ -370,6 +371,18 @@ struct cifs_rdma_info* cifs_create_rdma_session(
+ 		goto out2;
  
- 	/* Mount options which take numeric value */
- 	Opt_backupuid, Opt_backupgid, Opt_uid,
-@@ -185,6 +185,7 @@ static const match_table_t cifs_mount_option_tokens = {
- 	{ Opt_resilient, "resilienthandles"},
- 	{ Opt_noresilient, "noresilienthandles"},
- 	{ Opt_domainauto, "domainauto"},
-+	{ Opt_rdma, "rdma"},
- 
- 	{ Opt_backupuid, "backupuid=%s" },
- 	{ Opt_backupgid, "backupgid=%s" },
-@@ -1541,6 +1542,9 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
- 		case Opt_domainauto:
- 			vol->domainauto = true;
- 			break;
-+		case Opt_rdma:
-+			vol->rdma = true;
-+			break;
- 
- 		/* Numeric Values */
- 		case Opt_backupuid:
-@@ -2134,6 +2138,9 @@ static int match_server(struct TCP_Server_Info *server, struct smb_vol *vol)
- 	if (server->echo_interval != vol->echo_interval * HZ)
- 		return 0;
- 
-+	if (server->rdma != vol->rdma)
-+		return 0;
+ 	log_rdma_event("rdma_connect connected\n");
 +
- 	return 1;
- }
++	sprintf(cache_name, "cifs_smbd_response_%p", info);
++	info->response_cache =
++		kmem_cache_create(
++			cache_name,
++			sizeof(struct cifs_rdma_response) +
++				info->max_receive_size,
++			0, SLAB_HWCACHE_ALIGN, NULL);
++
++	info->response_mempool =
++		mempool_create(info->receive_credit_max, mempool_alloc_slab,
++		       mempool_free_slab, info->response_cache);
+ out2:
+ 	rdma_destroy_id(info->id);
  
-@@ -2234,6 +2241,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 	tcp_ses->noblocksnd = volume_info->noblocksnd;
- 	tcp_ses->noautotune = volume_info->noautotune;
- 	tcp_ses->tcp_nodelay = volume_info->sockopt_tcp_nodelay;
-+	tcp_ses->rdma = volume_info->rdma;
- 	tcp_ses->in_flight = 0;
- 	tcp_ses->credits = 1;
- 	init_waitqueue_head(&tcp_ses->response_q);
+diff --git a/fs/cifs/cifsrdma.h b/fs/cifs/cifsrdma.h
+index 71ea380..41ae61a 100644
+--- a/fs/cifs/cifsrdma.h
++++ b/fs/cifs/cifsrdma.h
+@@ -59,6 +59,10 @@ struct cifs_rdma_info {
+ 	atomic_t receive_credits;
+ 	atomic_t receive_credit_target;
+ 
++	// response pool for RDMA receive
++	struct kmem_cache *response_cache;
++	mempool_t *response_mempool;
++
+ 	// for debug purposes
+ 	unsigned int count_receive_buffer;
+ 	unsigned int count_get_receive_buffer;
+@@ -66,6 +70,33 @@ struct cifs_rdma_info {
+ 	unsigned int count_send_empty;
+ };
+ 
++enum smbd_message_type {
++	SMBD_NEGOTIATE_RESP,
++	SMBD_TRANSFER_DATA,
++};
++
++// The context for a SMBD response
++struct cifs_rdma_response {
++	struct cifs_rdma_info *info;
++
++	// completion queue entry
++	struct ib_cqe cqe;
++
++	// the SGE entry for the packet
++	struct ib_sge sge;
++
++	enum smbd_message_type type;
++
++	// link to receive queue or reassembly queue
++	struct list_head list;
++
++	// indicate if this is the 1st packet of a payload
++	bool first_segment;
++
++	// SMBD packet header and payload follows this structure
++	char packet[0];
++};
++
+ // Create a SMBDirect session
+ struct cifs_rdma_info* cifs_create_rdma_session(
+ 	struct TCP_Server_Info *server, struct sockaddr *dstaddr);
 -- 
 2.7.4
