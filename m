@@ -1,84 +1,145 @@
-From: Long Li <longli@exchange.microsoft.com>
-Subject: [[PATCH v1] 03/37] [CIFS] SMBD: Add logging functions for debug
-Date: Wed,  2 Aug 2017 13:10:14 -0700
-Message-ID: <1501704648-20159-4-git-send-email-longli@exchange.microsoft.com>
+From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+Subject: [[PATCH v1] 20/37] [CIFS] SMBD: Implement reassembly queue for receiving data
+Date: Wed,  2 Aug 2017 13:10:31 -0700
+Message-ID: <1501704648-20159-21-git-send-email-longli@exchange.microsoft.com>
 References: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
-Cc: Long Li <longli@microsoft.com>
-To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1501704648-20159-1-git-send-email-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-From: Long Li <longli@microsoft.com>
+From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 
-SMBD transport code will use those logging functions for debug.
+All the data recevied via SMBD are placed in the reassembly queue. When upper layer reads data, it looks into reassembly queue. The SMBD layer is responsibe for passing a complete SMB packet to upper layer.
 
-Signed-off-by: Long Li <longli@microsoft.com>
+Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 ---
  fs/cifs/cifsrdma.c | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 52 insertions(+)
+ fs/cifs/cifsrdma.h | 11 +++++++++++
+ 2 files changed, 63 insertions(+)
 
 diff --git a/fs/cifs/cifsrdma.c b/fs/cifs/cifsrdma.c
-index a2c0478..3c9f478 100644
+index 97cde3f..1d3fd26 100644
 --- a/fs/cifs/cifsrdma.c
 +++ b/fs/cifs/cifsrdma.c
-@@ -54,3 +54,55 @@
+@@ -62,6 +62,12 @@ static void put_receive_buffer(
+ static int allocate_receive_buffers(struct cifs_rdma_info *info, int num_buf);
+ static void destroy_receive_buffers(struct cifs_rdma_info *info);
  
- #include "cifsrdma.h"
++static void enqueue_reassembly(
++		struct cifs_rdma_info *info,
++		struct cifs_rdma_response *response, int data_length);
++static struct cifs_rdma_response* _get_first_reassembly(
++		struct cifs_rdma_info *info);
++
+ static int cifs_rdma_post_recv(
+ 		struct cifs_rdma_info *info,
+ 		struct cifs_rdma_response *response);
+@@ -377,6 +383,12 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
+ 			else
+ 				info->full_packet_received = true;
  
-+/* Logging functions
-+ * Logging are defined as classes. They can be ORed to define the actual
-+ * logging level via module parameter rdma_logging_class
-+ * e.g. cifs.rdma_logging_class=0x500 will log all log_rdma_recv() and
-+ * log_rdma_event()
++			enqueue_reassembly(
++				info,
++				response,
++				le32_to_cpu(data_transfer->data_length));
++
++			wake_up(&info->wait_reassembly_queue);
+ 			goto queue_done;
+ 		}
+ 
+@@ -1041,6 +1053,41 @@ static int cifs_rdma_negotiate(struct cifs_rdma_info *info)
+ }
+ 
+ /*
++ * Implement Connection.FragmentReassemblyBuffer defined in [MS-SMBD] 3.1.1.1
++ * This is a queue for reassembling upper layer payload and present to upper
++ * layer. All the inncoming payload go to the reassembly queue, regardless of
++ * reassembly is rquired. The uuper layer code reads from the queue for any
++ * incoming payloads.
 + */
-+#define LOG_CREDIT			0x1
-+#define LOG_OUTGOING			0x2
-+#define LOG_INCOMING			0x4
-+#define LOG_RECEIVE_QUEUE		0x8
-+#define LOG_REASSEMBLY_QUEUE		0x10
-+#define LOG_CIFS_READ			0x20
-+#define LOG_CIFS_WRITE			0x40
-+#define LOG_RDMA_SEND			0x80
-+#define LOG_RDMA_RECV			0x100
-+#define LOG_KEEP_ALIVE			0x200
-+#define LOG_RDMA_EVENT			0x400
++static void enqueue_reassembly(
++	struct cifs_rdma_info *info,
++	struct cifs_rdma_response *response,
++	int data_length)
++{
++	unsigned long flags;
++	spin_lock_irqsave(&info->reassembly_queue_lock, flags);
++	list_add_tail(&response->list, &info->reassembly_queue);
++	atomic_add(data_length, &info->reassembly_data_length);
++	log_reassembly_queue("info->reassembly_data_length=%d\n",
++			atomic_read(&info->reassembly_data_length));
++	info->count_reassembly_queue++;
++	info->count_enqueue_reassembly_queue++;
++	spin_unlock_irqrestore(&info->reassembly_queue_lock, flags);
++}
 +
-+static unsigned int rdma_logging_class = 0;
-+module_param(rdma_logging_class, uint, 0644);
-+MODULE_PARM_DESC(rdma_logging_class,
-+	"Logging class for SMBD transport 0 to 512");
++static struct cifs_rdma_response * _get_first_reassembly(struct cifs_rdma_info *info)
++{
++	struct cifs_rdma_response *ret = NULL;
 +
-+#define log_rdma(class, fmt, args...)					\
-+do {									\
-+	if (class & rdma_logging_class)					\
-+		cifs_dbg(VFS, "%s:%d " fmt, __func__, __LINE__, ##args);\
-+} while (0)
++	if (!list_empty(&info->reassembly_queue)) {
++		ret = list_first_entry(
++			&info->reassembly_queue,
++			struct cifs_rdma_response, list);
++	}
++	return ret;
++}
 +
-+#define log_rdma_credit(fmt, args...)	log_rdma(LOG_CREDIT, fmt, ##args)
-+#define log_outgoing(fmt, args...)	log_rdma(LOG_OUTGOING, fmt, ##args)
-+#define log_incoming(fmt, args...)	log_rdma(LOG_INCOMING, fmt, ##args)
-+#define log_receive_queue(fmt, args...)		\
-+	log_rdma(LOG_RECEIVE_QUEUE, fmt, ##args)
-+#define log_reassembly_queue(fmt, args...) 	\
-+		log_rdma(LOG_REASSEMBLY_QUEUE, fmt, ##args)
-+#define log_cifs_read(fmt, args...)	log_rdma(LOG_CIFS_READ, fmt, ##args)
-+#define log_cifs_write(fmt, args...)	log_rdma(LOG_CIFS_WRITE, fmt, ##args)
-+#define log_rdma_send(fmt, args...)	log_rdma(LOG_RDMA_SEND, fmt, ##args)
-+#define log_rdma_recv(fmt, args...)	log_rdma(LOG_RDMA_RECV, fmt, ##args)
-+#define log_keep_alive(fmt, args...)	log_rdma(LOG_KEEP_ALIVE, fmt, ##args)
-+#define log_rdma_event(fmt, args...)	log_rdma(LOG_RDMA_EVENT, fmt, ##args)
++/*
+  * Receive buffer operations.
+  * For each remote send, we need to post a receive. The receive buffers are
+  * pre-allocated in advance.
+@@ -1084,6 +1131,10 @@ static int allocate_receive_buffers(struct cifs_rdma_info *info, int num_buf)
+ 	int i;
+ 	struct cifs_rdma_response *response;
+ 
++	INIT_LIST_HEAD(&info->reassembly_queue);
++	spin_lock_init(&info->reassembly_queue_lock);
++	atomic_set(&info->reassembly_data_length, 0);
 +
-+#define log_transport_credit(info)					\
-+do {									\
-+	log_rdma_credit("receive_credits %d receive_credit_target %d "	\
-+			"send_credits %d send_credit_target %d\n",	\
-+			atomic_read(&info->receive_credits),		\
-+			atomic_read(&info->receive_credit_target),	\
-+			atomic_read(&info->send_credits),		\
-+			info->send_credit_target);			\
-+} while (0)
+ 	INIT_LIST_HEAD(&info->receive_queue);
+ 	spin_lock_init(&info->receive_queue_lock);
+ 
+@@ -1241,6 +1292,7 @@ struct cifs_rdma_info* cifs_create_rdma_session(
+ 
+ 	allocate_receive_buffers(info, info->receive_credit_max);
+ 	init_waitqueue_head(&info->wait_send_queue);
++	init_waitqueue_head(&info->wait_reassembly_queue);
+ 
+ 	init_waitqueue_head(&info->wait_send_pending);
+ 	atomic_set(&info->send_pending, 0);
+diff --git a/fs/cifs/cifsrdma.h b/fs/cifs/cifsrdma.h
+index 90746a4..b26e3b7 100644
+--- a/fs/cifs/cifsrdma.h
++++ b/fs/cifs/cifsrdma.h
+@@ -82,6 +82,14 @@ struct cifs_rdma_info {
+ 	struct list_head receive_queue;
+ 	spinlock_t receive_queue_lock;
+ 
++	/* reassembly queue */
++	struct list_head reassembly_queue;
++	spinlock_t reassembly_queue_lock;
++	wait_queue_head_t wait_reassembly_queue;
++
++	// total data length of reassembly queue
++	atomic_t reassembly_data_length;
++
+ 	wait_queue_head_t wait_send_queue;
+ 
+ 	// request pool for RDMA send
+@@ -98,6 +106,9 @@ struct cifs_rdma_info {
+ 	unsigned int count_receive_buffer;
+ 	unsigned int count_get_receive_buffer;
+ 	unsigned int count_put_receive_buffer;
++	unsigned int count_reassembly_queue;
++	unsigned int count_enqueue_reassembly_queue;
++	unsigned int count_dequeue_reassembly_queue;
+ 	unsigned int count_send_empty;
+ };
+ 
 -- 
 2.7.4
