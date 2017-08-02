@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [[PATCH v1] 33/37] [CIFS] Connect to SMBD transport when specified in mount option
-Date: Wed,  2 Aug 2017 13:10:44 -0700
-Message-ID: <1501704648-20159-34-git-send-email-longli@exchange.microsoft.com>
+Subject: [[PATCH v1] 35/37] [CIFS] Destroy SMBD transport on exit
+Date: Wed,  2 Aug 2017 13:10:46 -0700
+Message-ID: <1501704648-20159-36-git-send-email-longli@exchange.microsoft.com>
 References: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -13,55 +13,39 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-When "-o rdma" is specified, attempt to connect to SMB server via SMBD.
+When SMBD is used in the SMB session, destroy it on exit.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/connect.c | 23 +++++++++++++++++++----
- 1 file changed, 19 insertions(+), 4 deletions(-)
+ fs/cifs/connect.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 0dc942c..1ba5b92 100644
+index 54c1f7c..cc58cd8 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -45,6 +45,7 @@
- #include <linux/parser.h>
- #include <linux/bvec.h>
+@@ -708,6 +708,11 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
+ 	/* give those requests time to exit */
+ 	msleep(125);
  
-+#include "cifsrdma.h"
- #include "cifspdu.h"
- #include "cifsglob.h"
- #include "cifsproto.h"
-@@ -2284,12 +2285,26 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 	else
- 		tcp_ses->echo_interval = SMB_ECHO_INTERVAL_DEFAULT * HZ;
- 
--	rc = ip_connect(tcp_ses);
--	if (rc < 0) {
--		cifs_dbg(VFS, "Error connecting to socket. Aborting operation.\n");
--		goto out_err_crypto_release;
-+	if (tcp_ses->rdma) {
-+		tcp_ses->rdma_ses = cifs_create_rdma_session(tcp_ses, (struct sockaddr *)&volume_info->dstaddr);
-+		if (tcp_ses->rdma_ses) {
-+			cifs_dbg(VFS, "%s: RDMA transport established\n", __func__);
-+			rc = 0;
-+			goto connected;
-+		}
-+		else {
-+			rc = -ENOENT;
-+			goto out_err_crypto_release;
-+		}
-+	}
++       if (server->rdma && server->rdma_ses) {
++               cifs_destroy_rdma_session(server->rdma_ses);
++               server->rdma_ses = NULL;
++       }
 +
-+        rc = ip_connect(tcp_ses);
-+        if (rc < 0) {
-+                cifs_dbg(VFS, "Error connecting to socket. Aborting operation.\n");
-+                goto out_err_crypto_release;
+ 	if (server->ssocket) {
+ 		sock_release(server->ssocket);
+ 		server->ssocket = NULL;
+@@ -2179,6 +2184,10 @@ cifs_put_tcp_session(struct TCP_Server_Info *server, int from_reconnect)
+ 		return;
  	}
  
-+connected:
- 	/*
- 	 * since we're in a cifs function already, we know that
- 	 * this will succeed. No need for try_module_get().
++       if (server->rdma && server->rdma_ses) {
++               cifs_destroy_rdma_session(server->rdma_ses);
++       }
++
+ 	put_net(cifs_net_ns(server));
+ 
+ 	list_del_init(&server->tcp_ses_list);
 -- 
 2.7.4
