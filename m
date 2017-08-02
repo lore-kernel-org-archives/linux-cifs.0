@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [[PATCH v1] 08/37] [CIFS] SMBD: Define packet format for SMBD data transfer message
-Date: Wed,  2 Aug 2017 13:10:19 -0700
-Message-ID: <1501704648-20159-9-git-send-email-longli@exchange.microsoft.com>
+Subject: [[PATCH v1] 04/37] [CIFS] SMBD: Define per-channel SMBD transport parameters and default values
+Date: Wed,  2 Aug 2017 13:10:15 -0700
+Message-ID: <1501704648-20159-5-git-send-email-longli@exchange.microsoft.com>
 References: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -13,38 +13,62 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-Define the packet format for a SMBD data packet with payload
+For each channel, SMBD defines per-channel parameters. Those can be negotiated with the server, and are restricted by RDMA hardware limitations.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/cifsrdma.h | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ fs/cifs/cifsrdma.c | 14 ++++++++++++++
+ fs/cifs/cifsrdma.h | 13 +++++++++++++
+ 2 files changed, 27 insertions(+)
 
+diff --git a/fs/cifs/cifsrdma.c b/fs/cifs/cifsrdma.c
+index 3c9f478..7c4c178 100644
+--- a/fs/cifs/cifsrdma.c
++++ b/fs/cifs/cifsrdma.c
+@@ -54,6 +54,20 @@
+ 
+ #include "cifsrdma.h"
+ 
++/*
++ * Per RDMA transport connection parameters
++ * as defined in [MS-SMBD] 3.1.1.1
++ */
++static int receive_credit_max = 512;
++static int send_credit_target = 512;
++static int max_send_size = 8192;
++static int max_fragmented_recv_size = 1024*1024;
++static int max_receive_size = 8192;
++
++// maximum number of SGEs in a RDMA I/O
++static int max_send_sge = 16;
++static int max_recv_sge = 16;
++
+ /* Logging functions
+  * Logging are defined as classes. They can be ORed to define the actual
+  * logging level via module parameter rdma_logging_class
 diff --git a/fs/cifs/cifsrdma.h b/fs/cifs/cifsrdma.h
-index 78ce2bf..ed0ff54 100644
+index ec6aa61..9979fd4 100644
 --- a/fs/cifs/cifsrdma.h
 +++ b/fs/cifs/cifsrdma.h
-@@ -78,6 +78,21 @@ enum smbd_message_type {
- 	SMBD_TRANSFER_DATA,
- };
+@@ -36,6 +36,19 @@
+ struct cifs_rdma_info {
+ 	struct TCP_Server_Info *server_info;
  
-+#define SMB_DIRECT_RESPONSE_REQUESTED 0x0001
++	//connection paramters
++	int receive_credit_max;
++	int send_credit_target;
++	int max_send_size;
++	int max_fragmented_recv_size;
++	int max_fragmented_send_size;
++	int max_receive_size;
++	int max_readwrite_size;
++	int protocol;
++	atomic_t send_credits;
++	atomic_t receive_credits;
++	atomic_t receive_credit_target;
 +
-+// SMBD data transfer packet with payload [MS-SMBD] 2.2.3
-+struct smbd_data_transfer {
-+	__le16 credits_requested;
-+	__le16 credits_granted;
-+	__le16 flags;
-+	__le16 reserved;
-+	__le32 remaining_data_length;
-+	__le32 data_offset;
-+	__le32 data_length;
-+	__le32 padding;
-+	char buffer[0];
-+} __packed;
-+
- // The context for a SMBD response
- struct cifs_rdma_response {
- 	struct cifs_rdma_info *info;
+ 	// for debug purposes
+ 	unsigned int count_receive_buffer;
+ 	unsigned int count_get_receive_buffer;
 -- 
 2.7.4
