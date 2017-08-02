@@ -1,32 +1,67 @@
-From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Subject: [[PATCH v1] 30/37] [CIFS] SMBD: Add SMBDirect transport to Makefile
-Date: Wed,  2 Aug 2017 13:10:41 -0700
-Message-ID: <1501704648-20159-31-git-send-email-longli@exchange.microsoft.com>
+From: Long Li <longli@exchange.microsoft.com>
+Subject: [[PATCH v1] 33/37] [CIFS] Connect to SMBD transport when specified in mount option
+Date: Wed,  2 Aug 2017 13:10:44 -0700
+Message-ID: <1501704648-20159-34-git-send-email-longli@exchange.microsoft.com>
 References: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
-Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1501704648-20159-1-git-send-email-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: Long Li <longli@microsoft.com>
+To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+From: Long Li <longli@microsoft.com>
 
-Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+When "-o rdma" is specified, attempt to connect to SMB server via SMBD.
+
+Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/cifs/connect.c | 23 +++++++++++++++++++----
+ 1 file changed, 19 insertions(+), 4 deletions(-)
 
-diff --git a/fs/cifs/Makefile b/fs/cifs/Makefile
-index eed7eb0..7175e25 100644
---- a/fs/cifs/Makefile
-+++ b/fs/cifs/Makefile
-@@ -18,4 +18,4 @@ cifs-$(CONFIG_CIFS_DFS_UPCALL) += dns_resolve.o cifs_dfs_ref.o
- cifs-$(CONFIG_CIFS_FSCACHE) += fscache.o cache.o
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 0dc942c..1ba5b92 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -45,6 +45,7 @@
+ #include <linux/parser.h>
+ #include <linux/bvec.h>
  
- cifs-$(CONFIG_CIFS_SMB2) += smb2ops.o smb2maperror.o smb2transport.o \
--			    smb2misc.o smb2pdu.o smb2inode.o smb2file.o
-+			    smb2misc.o smb2pdu.o smb2inode.o smb2file.o cifsrdma.o
++#include "cifsrdma.h"
+ #include "cifspdu.h"
+ #include "cifsglob.h"
+ #include "cifsproto.h"
+@@ -2284,12 +2285,26 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 	else
+ 		tcp_ses->echo_interval = SMB_ECHO_INTERVAL_DEFAULT * HZ;
+ 
+-	rc = ip_connect(tcp_ses);
+-	if (rc < 0) {
+-		cifs_dbg(VFS, "Error connecting to socket. Aborting operation.\n");
+-		goto out_err_crypto_release;
++	if (tcp_ses->rdma) {
++		tcp_ses->rdma_ses = cifs_create_rdma_session(tcp_ses, (struct sockaddr *)&volume_info->dstaddr);
++		if (tcp_ses->rdma_ses) {
++			cifs_dbg(VFS, "%s: RDMA transport established\n", __func__);
++			rc = 0;
++			goto connected;
++		}
++		else {
++			rc = -ENOENT;
++			goto out_err_crypto_release;
++		}
++	}
++
++        rc = ip_connect(tcp_ses);
++        if (rc < 0) {
++                cifs_dbg(VFS, "Error connecting to socket. Aborting operation.\n");
++                goto out_err_crypto_release;
+ 	}
+ 
++connected:
+ 	/*
+ 	 * since we're in a cifs function already, we know that
+ 	 * this will succeed. No need for try_module_get().
 -- 
 2.7.4
