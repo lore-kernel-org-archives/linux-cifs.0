@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [[PATCH v1] 04/37] [CIFS] SMBD: Define per-channel SMBD transport parameters and default values
-Date: Wed,  2 Aug 2017 13:10:15 -0700
-Message-ID: <1501704648-20159-5-git-send-email-longli@exchange.microsoft.com>
+Subject: [[PATCH v1] 02/37] [CIFS] SMBD: Add structure for SMBD transport
+Date: Wed,  2 Aug 2017 13:10:13 -0700
+Message-ID: <1501704648-20159-3-git-send-email-longli@exchange.microsoft.com>
 References: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -13,62 +13,129 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-For each channel, SMBD defines per-channel parameters. Those can be negotiated with the server, and are restricted by RDMA hardware limitations.
+Define a new structure for SMBD transport. This stucture will have all the
+information on the transport, and it will be stored in the current SMB session.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/cifsrdma.c | 14 ++++++++++++++
- fs/cifs/cifsrdma.h | 13 +++++++++++++
- 2 files changed, 27 insertions(+)
+ fs/cifs/cifsrdma.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/cifsrdma.h | 45 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 101 insertions(+)
+ create mode 100644 fs/cifs/cifsrdma.c
+ create mode 100644 fs/cifs/cifsrdma.h
 
 diff --git a/fs/cifs/cifsrdma.c b/fs/cifs/cifsrdma.c
-index 3c9f478..7c4c178 100644
---- a/fs/cifs/cifsrdma.c
+new file mode 100644
+index 0000000..a2c0478
+--- /dev/null
 +++ b/fs/cifs/cifsrdma.c
-@@ -54,6 +54,20 @@
- 
- #include "cifsrdma.h"
- 
+@@ -0,0 +1,56 @@
 +/*
-+ * Per RDMA transport connection parameters
-+ * as defined in [MS-SMBD] 3.1.1.1
++ *   Copyright (C) 2017, Microsoft Corporation.
++ *
++ *   Author(s): Long Li <longli@microsoft.com>
++ *
++ *   This program is free software;  you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or
++ *   (at your option) any later version.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ *   the GNU General Public License for more details.
++ *
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program;  if not, write to the Free Software
++ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 + */
-+static int receive_credit_max = 512;
-+static int send_credit_target = 512;
-+static int max_send_size = 8192;
-+static int max_fragmented_recv_size = 1024*1024;
-+static int max_receive_size = 8192;
++#include <linux/fs.h>
++#include <linux/net.h>
++#include <linux/string.h>
++#include <linux/list.h>
++#include <linux/wait.h>
++#include <linux/slab.h>
++#include <linux/pagemap.h>
++#include <linux/ctype.h>
++#include <linux/utsname.h>
++#include <linux/mempool.h>
++#include <linux/delay.h>
++#include <linux/completion.h>
++#include <linux/kthread.h>
++#include <linux/pagevec.h>
++#include <linux/freezer.h>
++#include <linux/namei.h>
++#include <asm/uaccess.h>
++#include <asm/processor.h>
++#include <linux/inet.h>
++#include <linux/module.h>
++#include <keys/user-type.h>
++#include <net/ipv6.h>
++#include <linux/parser.h>
 +
-+// maximum number of SGEs in a RDMA I/O
-+static int max_send_sge = 16;
-+static int max_recv_sge = 16;
++#include "cifspdu.h"
++#include "cifsglob.h"
++#include "cifsproto.h"
++#include "cifs_unicode.h"
++#include "cifs_debug.h"
++#include "cifs_fs_sb.h"
++#include "ntlmssp.h"
++#include "nterr.h"
++#include "rfc1002pdu.h"
++#include "fscache.h"
 +
- /* Logging functions
-  * Logging are defined as classes. They can be ORed to define the actual
-  * logging level via module parameter rdma_logging_class
++#include "cifsrdma.h"
++
 diff --git a/fs/cifs/cifsrdma.h b/fs/cifs/cifsrdma.h
-index ec6aa61..9979fd4 100644
---- a/fs/cifs/cifsrdma.h
+new file mode 100644
+index 0000000..ec6aa61
+--- /dev/null
 +++ b/fs/cifs/cifsrdma.h
-@@ -36,6 +36,19 @@
- struct cifs_rdma_info {
- 	struct TCP_Server_Info *server_info;
- 
-+	//connection paramters
-+	int receive_credit_max;
-+	int send_credit_target;
-+	int max_send_size;
-+	int max_fragmented_recv_size;
-+	int max_fragmented_send_size;
-+	int max_receive_size;
-+	int max_readwrite_size;
-+	int protocol;
-+	atomic_t send_credits;
-+	atomic_t receive_credits;
-+	atomic_t receive_credit_target;
+@@ -0,0 +1,45 @@
++/*
++ *   Copyright (C) 2017, Microsoft Corporation.
++ *
++ *   Author(s): Long Li <longli@microsoft.com>
++ *
++ *   This program is free software;  you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or
++ *   (at your option) any later version.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ *   the GNU General Public License for more details.
++ *
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program;  if not, write to the Free Software
++ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++#ifndef _CIFS_RDMA_H
++#define _CIFS_RDMA_H
 +
- 	// for debug purposes
- 	unsigned int count_receive_buffer;
- 	unsigned int count_get_receive_buffer;
++#include "cifsglob.h"
++#include <rdma/ib_verbs.h>
++#include <rdma/rdma_cm.h>
++#include <linux/mempool.h>
++
++/*
++ * The context for the SMBDirect transport
++ * Everything related to the transport is here. It has several logical parts
++ * 1. RDMA related structures
++ * 2. SMBDirect connection parameters
++ * 3. Reassembly queue for data receive path
++ * 4. mempools for allocating packets
++ */
++struct cifs_rdma_info {
++	struct TCP_Server_Info *server_info;
++
++	// for debug purposes
++	unsigned int count_receive_buffer;
++	unsigned int count_get_receive_buffer;
++	unsigned int count_put_receive_buffer;
++	unsigned int count_send_empty;
++};
++#endif
 -- 
 2.7.4
