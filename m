@@ -1,53 +1,95 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v4 06/19] crypto: move algif to generic async
-	completion
-Date: Tue, 08 Aug 2017 15:10:01 +0200
-Message-ID: <8585274.Umn6qnzcUd@tauon.chronox.de>
+From: Gary R Hook <gary.hook-5C7GfCeVMHo@public.gmane.org>
+Subject: Re: [PATCH v4 02/19] crypto: ccm: use -EAGAIN for transient busy
+ indication
+Date: Tue, 8 Aug 2017 10:24:49 -0500
+Message-ID: <4600c898-a2f2-f95f-15b4-0adcc6acc0b5@amd.com>
 References: <1502193834-11289-1-git-send-email-gilad@benyossef.com>
-	<1502193834-11289-7-git-send-email-gilad@benyossef.com>
+ <1502193834-11289-3-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: Mike Snitzer <snitzer@redhat.com>, linux-doc@vger.kernel.org,
-	Gary Hook <gary.hook@amd.com>, David Howells <dhowells@redhat.com>,
-	samba.-technical@lists.samba.org, dm-devel@redhat.com,
-	keyrings@vger.kernel.org, linux-ima-devel@lists.sourceforge.net,
-	Alasdair Kergon <agk@redhat.com>,
-	Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, Jonathan Corbet <corbet@lwn.net>,
-	Mimi Zohar <zohar@linux.vnet.ibm.com>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	linux-cifs@vger.kernel.org, linux-ima-user@lists.sourceforge.net,
-	Arnaud Ebalard <arno@natisbad.org>, linux-raid@vger.kernel.org,
-	linux-fscrypt@vger.kernel.org, linux-mediatek@lists.infradead.org,
-	James Morris <james.l.morris@oracle.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	Jaegeuk Kim <jaegeuk@kernel.org>, linux-arm-kernel@lists.infradead.o
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <dm-devel-bounces@redhat.com>
-In-Reply-To: <1502193834-11289-7-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
-List-Id: linux-cifs.vger.kernel.org
+Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
+To: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>,
+        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
+        David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        "Lendacky, Thomas" <Thomas.Lendacky-5C7GfCeVMHo@public.gmane.org>,
+        Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+        Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>,
+        Matthias Brugger <matthias.bgg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Alasdair Kergon <agk-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        Mike Snitzer <snitzer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        "dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        Shaohua Li <shli-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        "Theodore Y. Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,
+        Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Mimi Zohar <zohar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
+        Dmitry Kasatkin <dmitry.kasatkin-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        James Morris <james.l.morris-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
+        "Serg
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1502193834-11289-3-git-send-email-gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Am Dienstag, 8. August 2017, 14:03:37 CEST schrieb Gilad Ben-Yossef:
+On 08/08/2017 07:03 AM, Gilad Ben-Yossef wrote:
+> Replace -EBUSY with -EAGAIN when reporting transient busy
+> indication in the absence of backlog.
+>
+> Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
 
-Hi Gilad,
+Could we use "ccp" in the subject line, please?
 
-> algif starts several async crypto ops and waits for their completion.
-> Move it over to generic code doing the same.
-
-Just FYI: your patch set and my patch [1] will clash.
-
-[1] https://patchwork.kernel.org/patch/9875959/
-
-Ciao
-Stephan
+> ---
+>  drivers/crypto/ccp/ccp-crypto-main.c | 8 +++-----
+>  drivers/crypto/ccp/ccp-dev.c         | 7 +++++--
+>  2 files changed, 8 insertions(+), 7 deletions(-)
+>
+> diff --git a/drivers/crypto/ccp/ccp-crypto-main.c b/drivers/crypto/ccp/ccp-crypto-main.c
+> index 35a9de7..403ff0a 100644
+> --- a/drivers/crypto/ccp/ccp-crypto-main.c
+> +++ b/drivers/crypto/ccp/ccp-crypto-main.c
+> @@ -222,9 +222,10 @@ static int ccp_crypto_enqueue_cmd(struct ccp_crypto_cmd *crypto_cmd)
+>
+>  	/* Check if the cmd can/should be queued */
+>  	if (req_queue.cmd_count >= CCP_CRYPTO_MAX_QLEN) {
+> -		ret = -EBUSY;
+> -		if (!(crypto_cmd->cmd->flags & CCP_CMD_MAY_BACKLOG))
+> +		if (!(crypto_cmd->cmd->flags & CCP_CMD_MAY_BACKLOG)) {
+> +			ret = -EAGAIN;
+>  			goto e_lock;
+> +		}
+>  	}
+>
+>  	/* Look for an entry with the same tfm.  If there is a cmd
+> @@ -243,9 +244,6 @@ static int ccp_crypto_enqueue_cmd(struct ccp_crypto_cmd *crypto_cmd)
+>  		ret = ccp_enqueue_cmd(crypto_cmd->cmd);
+>  		if (!ccp_crypto_success(ret))
+>  			goto e_lock;	/* Error, don't queue it */
+> -		if ((ret == -EBUSY) &&
+> -		    !(crypto_cmd->cmd->flags & CCP_CMD_MAY_BACKLOG))
+> -			goto e_lock;	/* Not backlogging, don't queue it */
+>  	}
+>
+>  	if (req_queue.cmd_count >= CCP_CRYPTO_MAX_QLEN) {
+> diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
+> index 4e029b1..3d637e3 100644
+> --- a/drivers/crypto/ccp/ccp-dev.c
+> +++ b/drivers/crypto/ccp/ccp-dev.c
+> @@ -292,9 +292,12 @@ int ccp_enqueue_cmd(struct ccp_cmd *cmd)
+>  	i = ccp->cmd_q_count;
+>
+>  	if (ccp->cmd_count >= MAX_CMD_QLEN) {
+> -		ret = -EBUSY;
+> -		if (cmd->flags & CCP_CMD_MAY_BACKLOG)
+> +		if (cmd->flags & CCP_CMD_MAY_BACKLOG) {
+> +			ret = -EBUSY;
+>  			list_add_tail(&cmd->entry, &ccp->backlog);
+> +		} else {
+> +			ret = -EAGAIN;
+> +		}
+>  	} else {
+>  		ret = -EINPROGRESS;
+>  		ccp->cmd_count++;
+>
