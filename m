@@ -1,9 +1,9 @@
 From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Subject: [PATCH v4 06/19] crypto: move algif to generic async completion
-Date: Tue,  8 Aug 2017 15:03:37 +0300
-Message-ID: <1502193834-11289-7-git-send-email-gilad__14544.1923560158$1502194298$gmane$org@benyossef.com>
+Subject: [PATCH v4 05/19] crypto: introduce crypto wait for async op
+Date: Tue,  8 Aug 2017 15:03:36 +0300
+Message-ID: <1502193834-11289-6-git-send-email-gilad__38080.417252104$1502194303$gmane$org@benyossef.com>
 References: <1502193834-11289-1-git-send-email-gilad@benyossef.com>
-Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
+Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>, Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
         "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
         Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
@@ -27,269 +27,115 @@ In-Reply-To: <1502193834-11289-1-git-send-email-gilad-6S/DczAoZh3WXxRugSxzZg@pub
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-algif starts several async crypto ops and waits for their completion.
-Move it over to generic code doing the same.
+Invoking a possibly async. crypto op and waiting for completion
+while correctly handling backlog processing is a common task
+in the crypto API implementation and outside users of it.
+
+This patch adds a generic implementation for doing so in
+preparation for using it across the board instead of hand
+rolled versions.
 
 Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+CC: Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- crypto/af_alg.c         | 27 ---------------------------
- crypto/algif_aead.c     | 14 +++++++-------
- crypto/algif_hash.c     | 30 ++++++++++++++----------------
- crypto/algif_skcipher.c | 15 +++++++--------
- include/crypto/if_alg.h | 13 -------------
- 5 files changed, 28 insertions(+), 71 deletions(-)
+ crypto/api.c           | 13 +++++++++++++
+ include/linux/crypto.h | 41 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 54 insertions(+)
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 92a3d54..887f75c 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -480,33 +480,6 @@ int af_alg_cmsg_send(struct msghdr *msg, struct af_alg_control *con)
+diff --git a/crypto/api.c b/crypto/api.c
+index 941cd4c..2a2479d 100644
+--- a/crypto/api.c
++++ b/crypto/api.c
+@@ -24,6 +24,7 @@
+ #include <linux/sched/signal.h>
+ #include <linux/slab.h>
+ #include <linux/string.h>
++#include <linux/completion.h>
+ #include "internal.h"
+ 
+ LIST_HEAD(crypto_alg_list);
+@@ -595,5 +596,17 @@ int crypto_has_alg(const char *name, u32 type, u32 mask)
  }
- EXPORT_SYMBOL_GPL(af_alg_cmsg_send);
+ EXPORT_SYMBOL_GPL(crypto_has_alg);
  
--int af_alg_wait_for_completion(int err, struct af_alg_completion *completion)
--{
--	switch (err) {
--	case -EINPROGRESS:
--	case -EBUSY:
--		wait_for_completion(&completion->completion);
--		reinit_completion(&completion->completion);
--		err = completion->err;
--		break;
--	};
--
--	return err;
--}
--EXPORT_SYMBOL_GPL(af_alg_wait_for_completion);
--
--void af_alg_complete(struct crypto_async_request *req, int err)
--{
--	struct af_alg_completion *completion = req->data;
--
--	if (err == -EINPROGRESS)
--		return;
--
--	completion->err = err;
--	complete(&completion->completion);
--}
--EXPORT_SYMBOL_GPL(af_alg_complete);
--
- static int __init af_alg_init(void)
- {
- 	int err = proto_register(&alg_proto, 0);
-diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
-index 9755aac..36be369 100644
---- a/crypto/algif_aead.c
-+++ b/crypto/algif_aead.c
-@@ -78,7 +78,7 @@ struct aead_ctx {
- 	void *iv;
- 	size_t aead_assoclen;
++void crypto_req_done(struct crypto_async_request *req, int err)
++{
++	struct crypto_wait *wait = req->data;
++
++	if (err == -EINPROGRESS)
++		return;
++
++	wait->err = err;
++	complete(&wait->completion);
++}
++EXPORT_SYMBOL_GPL(crypto_req_done);
++
+ MODULE_DESCRIPTION("Cryptographic core API");
+ MODULE_LICENSE("GPL");
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 84da997..bb00186 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -24,6 +24,7 @@
+ #include <linux/slab.h>
+ #include <linux/string.h>
+ #include <linux/uaccess.h>
++#include <linux/completion.h>
  
--	struct af_alg_completion completion;	/* sync work queue */
-+	struct crypto_wait wait;
+ /*
+  * Autoloaded crypto modules should only use a prefixed name to avoid allowing
+@@ -468,6 +469,45 @@ struct crypto_alg {
+ } CRYPTO_MINALIGN_ATTR;
  
- 	size_t used;		/* TX bytes sent to kernel */
- 	size_t rcvused;		/* total RX bytes to be processed by kernel */
-@@ -751,11 +751,11 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
- 		/* Synchronous operation */
- 		aead_request_set_callback(&areq->aead_req,
- 					  CRYPTO_TFM_REQ_MAY_BACKLOG,
--					  af_alg_complete, &ctx->completion);
--		err = af_alg_wait_for_completion(ctx->enc ?
--					 crypto_aead_encrypt(&areq->aead_req) :
--					 crypto_aead_decrypt(&areq->aead_req),
--					 &ctx->completion);
-+					  crypto_req_done, &ctx->wait);
-+		err = crypto_wait_req(ctx->enc ?
-+				      crypto_aead_encrypt(&areq->aead_req) :
-+				      crypto_aead_decrypt(&areq->aead_req),
-+				      &ctx->wait);
- 	}
- 
- 	/* AIO operation in progress */
-@@ -1036,7 +1036,7 @@ static int aead_accept_parent_nokey(void *private, struct sock *sk)
- 	ctx->merge = 0;
- 	ctx->enc = 0;
- 	ctx->aead_assoclen = 0;
--	af_alg_init_completion(&ctx->completion);
-+	crypto_init_wait(&ctx->wait);
- 
- 	ask->private = ctx;
- 
-diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
-index 3b3c154..d2ab8de 100644
---- a/crypto/algif_hash.c
-+++ b/crypto/algif_hash.c
-@@ -26,7 +26,7 @@ struct hash_ctx {
- 
- 	u8 *result;
- 
--	struct af_alg_completion completion;
-+	struct crypto_wait wait;
- 
- 	unsigned int len;
- 	bool more;
-@@ -102,8 +102,7 @@ static int hash_sendmsg(struct socket *sock, struct msghdr *msg,
- 		if ((msg->msg_flags & MSG_MORE))
- 			hash_free_result(sk, ctx);
- 
--		err = af_alg_wait_for_completion(crypto_ahash_init(&ctx->req),
--						&ctx->completion);
-+		err = crypto_wait_req(crypto_ahash_init(&ctx->req), &ctx->wait);
- 		if (err)
- 			goto unlock;
- 	}
-@@ -124,8 +123,8 @@ static int hash_sendmsg(struct socket *sock, struct msghdr *msg,
- 
- 		ahash_request_set_crypt(&ctx->req, ctx->sgl.sg, NULL, len);
- 
--		err = af_alg_wait_for_completion(crypto_ahash_update(&ctx->req),
--						 &ctx->completion);
-+		err = crypto_wait_req(crypto_ahash_update(&ctx->req),
-+				      &ctx->wait);
- 		af_alg_free_sg(&ctx->sgl);
- 		if (err)
- 			goto unlock;
-@@ -143,8 +142,8 @@ static int hash_sendmsg(struct socket *sock, struct msghdr *msg,
- 			goto unlock;
- 
- 		ahash_request_set_crypt(&ctx->req, NULL, ctx->result, 0);
--		err = af_alg_wait_for_completion(crypto_ahash_final(&ctx->req),
--						 &ctx->completion);
-+		err = crypto_wait_req(crypto_ahash_final(&ctx->req),
-+				      &ctx->wait);
- 	}
- 
- unlock:
-@@ -185,7 +184,7 @@ static ssize_t hash_sendpage(struct socket *sock, struct page *page,
- 	} else {
- 		if (!ctx->more) {
- 			err = crypto_ahash_init(&ctx->req);
--			err = af_alg_wait_for_completion(err, &ctx->completion);
-+			err = crypto_wait_req(err, &ctx->wait);
- 			if (err)
- 				goto unlock;
- 		}
-@@ -193,7 +192,7 @@ static ssize_t hash_sendpage(struct socket *sock, struct page *page,
- 		err = crypto_ahash_update(&ctx->req);
- 	}
- 
--	err = af_alg_wait_for_completion(err, &ctx->completion);
-+	err = crypto_wait_req(err, &ctx->wait);
- 	if (err)
- 		goto unlock;
- 
-@@ -229,17 +228,16 @@ static int hash_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
- 	ahash_request_set_crypt(&ctx->req, NULL, ctx->result, 0);
- 
- 	if (!result && !ctx->more) {
--		err = af_alg_wait_for_completion(
--				crypto_ahash_init(&ctx->req),
--				&ctx->completion);
-+		err = crypto_wait_req(crypto_ahash_init(&ctx->req),
-+				      &ctx->wait);
- 		if (err)
- 			goto unlock;
- 	}
- 
- 	if (!result || ctx->more) {
- 		ctx->more = 0;
--		err = af_alg_wait_for_completion(crypto_ahash_final(&ctx->req),
--						 &ctx->completion);
-+		err = crypto_wait_req(crypto_ahash_final(&ctx->req),
-+				      &ctx->wait);
- 		if (err)
- 			goto unlock;
- 	}
-@@ -490,13 +488,13 @@ static int hash_accept_parent_nokey(void *private, struct sock *sk)
- 	ctx->result = NULL;
- 	ctx->len = len;
- 	ctx->more = 0;
--	af_alg_init_completion(&ctx->completion);
-+	crypto_init_wait(&ctx->wait);
- 
- 	ask->private = ctx;
- 
- 	ahash_request_set_tfm(&ctx->req, hash);
- 	ahash_request_set_callback(&ctx->req, CRYPTO_TFM_REQ_MAY_BACKLOG,
--				   af_alg_complete, &ctx->completion);
-+				   crypto_req_done, &ctx->wait);
- 
- 	sk->sk_destruct = hash_sock_destruct;
- 
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index 968d094..ebbd433 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -75,7 +75,7 @@ struct skcipher_ctx {
- 
- 	void *iv;
- 
--	struct af_alg_completion completion;
-+	struct crypto_wait wait;
- 
- 	size_t used;
- 	size_t rcvused;
-@@ -677,12 +677,11 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
- 		skcipher_request_set_callback(&areq->req,
- 					      CRYPTO_TFM_REQ_MAY_SLEEP |
- 					      CRYPTO_TFM_REQ_MAY_BACKLOG,
--					      af_alg_complete,
--					      &ctx->completion);
--		err = af_alg_wait_for_completion(ctx->enc ?
--					crypto_skcipher_encrypt(&areq->req) :
--					crypto_skcipher_decrypt(&areq->req),
--						 &ctx->completion);
-+					      crypto_req_done, &ctx->wait);
-+		err = crypto_wait_req(ctx->enc ?
-+				      crypto_skcipher_encrypt(&areq->req) :
-+				      crypto_skcipher_decrypt(&areq->req),
-+				      &ctx->wait);
- 	}
- 
- 	/* AIO operation in progress */
-@@ -950,7 +949,7 @@ static int skcipher_accept_parent_nokey(void *private, struct sock *sk)
- 	ctx->more = 0;
- 	ctx->merge = 0;
- 	ctx->enc = 0;
--	af_alg_init_completion(&ctx->completion);
-+	crypto_init_wait(&ctx->wait);
- 
- 	ask->private = ctx;
- 
-diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
-index e2b9c6f..14b79e5 100644
---- a/include/crypto/if_alg.h
-+++ b/include/crypto/if_alg.h
-@@ -37,11 +37,6 @@ struct alg_sock {
- 	void *private;
- };
- 
--struct af_alg_completion {
--	struct completion completion;
--	int err;
--};
--
- struct af_alg_control {
- 	struct af_alg_iv *iv;
- 	int op;
-@@ -81,17 +76,9 @@ void af_alg_link_sg(struct af_alg_sgl *sgl_prev, struct af_alg_sgl *sgl_new);
- 
- int af_alg_cmsg_send(struct msghdr *msg, struct af_alg_control *con);
- 
--int af_alg_wait_for_completion(int err, struct af_alg_completion *completion);
--void af_alg_complete(struct crypto_async_request *req, int err);
--
- static inline struct alg_sock *alg_sk(struct sock *sk)
- {
- 	return (struct alg_sock *)sk;
+ /*
++ * A helper struct for waiting for completion of async crypto ops
++ */
++struct crypto_wait {
++	struct completion completion;
++	int err;
++};
++
++/*
++ * Macro for declaring a crypto op async wait object on stack
++ */
++#define DECLARE_CRYPTO_WAIT(_wait) \
++	struct crypto_wait _wait = { \
++		COMPLETION_INITIALIZER_ONSTACK((_wait).completion), 0 }
++
++/*
++ * Async ops completion helper functioons
++ */
++void crypto_req_done(struct crypto_async_request *req, int err);
++
++static inline int crypto_wait_req(int err, struct crypto_wait *wait)
++{
++	switch (err) {
++	case -EINPROGRESS:
++	case -EBUSY:
++		wait_for_completion(&wait->completion);
++		reinit_completion(&wait->completion);
++		err = wait->err;
++		break;
++	};
++
++	return err;
++}
++
++static inline void crypto_init_wait(struct crypto_wait *wait)
++{
++	init_completion(&wait->completion);
++}
++
++/*
+  * Algorithm registration interface.
+  */
+ int crypto_register_alg(struct crypto_alg *alg);
+@@ -1604,5 +1644,6 @@ static inline int crypto_comp_decompress(struct crypto_comp *tfm,
+ 						    src, slen, dst, dlen);
  }
  
--static inline void af_alg_init_completion(struct af_alg_completion *completion)
--{
--	init_completion(&completion->completion);
--}
--
- #endif	/* _CRYPTO_IF_ALG_H */
++
+ #endif	/* _LINUX_CRYPTO_H */
+ 
 -- 
 2.1.4
