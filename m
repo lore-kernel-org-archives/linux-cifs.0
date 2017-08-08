@@ -1,58 +1,83 @@
-From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: Fix df output for users with quota limits
-Date: Thu,  3 Aug 2017 13:09:03 +0530
-Message-ID: <20170803073903.31575-1-sprabhu@redhat.com>
-To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Stefan Metzmacher <metze@samba.org>
+Subject: Re: [[PATCH v1] 02/37] [CIFS] SMBD: Add structure for SMBD transport
+Date: Tue, 8 Aug 2017 08:58:02 +0200
+Message-ID: <9632c208-d6a5-2c47-b583-274d046d97bd@samba.org>
+References: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
+ <1501704648-20159-3-git-send-email-longli@exchange.microsoft.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: Long Li <longli@microsoft.com>
+To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1501704648-20159-3-git-send-email-longli@exchange.microsoft.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-The df for a SMB2 share triggers a GetInfo call for
-FS_FULL_SIZE_INFORMATION. The values returned are used to populate
-struct statfs.
+Hi Li,
 
-The problem is that none of the information returned by the call
-contains the total blocks available on the filesystem. Instead we use
-the blocks available to the user ie. quota limitation when filling out
-statfs.f_blocks. The information returned does contain Actual free units
-on the filesystem and is used to populate statfs.f_bfree. For users with
-quota enabled, it can lead to situations where the total free space
-reported is more than the total blocks on the system ending up with df
-reports like the following
+thanks for providing this patchset, I guess it will be a huge win to
+have SMBDirect support for the kernel client!
 
- # df -h /mnt/a
-Filesystem         Size  Used Avail Use% Mounted on
-//192.168.22.10/a  2.5G -2.3G  2.5G    - /mnt/a
+> Define a new structure for SMBD transport. This stucture will have all the
+> information on the transport, and it will be stored in the current SMB session.
+...
+> +/*
+> + * The context for the SMBDirect transport
+> + * Everything related to the transport is here. It has several
+logical parts
+> + * 1. RDMA related structures
+> + * 2. SMBDirect connection parameters
+> + * 3. Reassembly queue for data receive path
+> + * 4. mempools for allocating packets
+> + */
+> +struct cifs_rdma_info {
+> +	struct TCP_Server_Info *server_info;
+> +
+> +	// for debug purposes
+> +	unsigned int count_receive_buffer;
+> +	unsigned int count_get_receive_buffer;
+> +	unsigned int count_put_receive_buffer;
+> +	unsigned int count_send_empty;
+> +};
+> +#endif
+>
 
-To fix this problem, we instead populate both statfs.f_bfree with the
-same value as statfs.f_bavail ie. CallerAvailableAllocationUnits. This
-is similar to what is done already in the code for cifs and df now
-reports the quota information for the user used to mount the share.
+It seems that the new transport is tied to it's caller
+regarding structures and naming conventions.
 
- # df --si /mnt/a
-Filesystem         Size  Used Avail Use% Mounted on
-//192.168.22.10/a  2.7G  101M  2.6G   4% /mnt/a
+I think it would be better to strictly separate them,
+as I'd like to use the SMBDirect transport also from the
+userspace for the client side e.g. in Samba's '[lib]smbclient',
+but also in Samba's server side code 'smbd'.
 
-Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Signed-off-by: Pierguido Lambri <plambri-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/smb2pdu.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Would it be possible to isolate this in
+smb_direct.c and smb_direct.h while using
+smb_direct_* prefixes for structures and
+functions? Also avoiding the usage of other headers
+from fs/cifs/*.h, expect for something generic like
+nterr.h.
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 5fb2fc2..97edb4d3 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -3219,8 +3219,8 @@ copy_fs_info_to_kstatfs(struct smb2_fs_full_size_info *pfs_inf,
- 	kst->f_bsize = le32_to_cpu(pfs_inf->BytesPerSector) *
- 			  le32_to_cpu(pfs_inf->SectorsPerAllocationUnit);
- 	kst->f_blocks = le64_to_cpu(pfs_inf->TotalAllocationUnits);
--	kst->f_bfree  = le64_to_cpu(pfs_inf->ActualAvailableAllocationUnits);
--	kst->f_bavail = le64_to_cpu(pfs_inf->CallerAvailableAllocationUnits);
-+	kst->f_bfree  = kst->f_bavail =
-+			le64_to_cpu(pfs_inf->CallerAvailableAllocationUnits);
- 	return;
- }
- 
--- 
-2.9.4
+I guess 'struct cifs_rdma_info' would then be
+'struct smb_direct_connection'. And it won't
+have a reference to struct TCP_Server_Info.
+
+It the strict layering is too much change,
+I'd at least like to have the name changes.
+
+This should relatively easy to do by using somthing like
+
+git format-patch --stdout -37 > before
+
+cat before | sed \
+-e 's!struct cifs_rdma_info!struct smb_direct_connection!g' \
+-e 's!cifsrdma\.h!smb_direct.h!g' \
+-e 's!cifsrdma\.c!smb_direct.c!g' \
+> after
+
+git reset --hard HEAD~37
+git am after
+
+metze
