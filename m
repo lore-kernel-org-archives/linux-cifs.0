@@ -1,95 +1,266 @@
-From: Gary R Hook <gary.hook-5C7GfCeVMHo@public.gmane.org>
-Subject: Re: [PATCH v4 02/19] crypto: ccm: use -EAGAIN for transient busy
- indication
-Date: Tue, 8 Aug 2017 10:24:49 -0500
-Message-ID: <4600c898-a2f2-f95f-15b4-0adcc6acc0b5@amd.com>
-References: <1502193834-11289-1-git-send-email-gilad@benyossef.com>
- <1502193834-11289-3-git-send-email-gilad@benyossef.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
-To: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>,
-        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
-        David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        "Lendacky, Thomas" <Thomas.Lendacky-5C7GfCeVMHo@public.gmane.org>,
-        Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-        Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>,
-        Matthias Brugger <matthias.bgg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Alasdair Kergon <agk-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        Mike Snitzer <snitzer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        "dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        Shaohua Li <shli-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        "Theodore Y. Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,
-        Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Mimi Zohar <zohar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
-        Dmitry Kasatkin <dmitry.kasatkin-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        James Morris <james.l.morris-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
-        "Serg
+From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: Add support for reading attributes on SMB2+
+Date: Wed,  9 Aug 2017 13:27:53 +1000
+Message-ID: <20170809032753.26960-1-lsahlber@redhat.com>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Ronnie Sahlberg <ronniesahlberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1502193834-11289-3-git-send-email-gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 08/08/2017 07:03 AM, Gilad Ben-Yossef wrote:
-> Replace -EBUSY with -EAGAIN when reporting transient busy
-> indication in the absence of backlog.
->
-> Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+SMB1 already has support to read attributes. This adds similar support
+to SMB2+.
 
-Could we use "ccp" in the subject line, please?
+With this patch, tools such as 'getfattr' will now work with SMB2+ shares.
 
-> ---
->  drivers/crypto/ccp/ccp-crypto-main.c | 8 +++-----
->  drivers/crypto/ccp/ccp-dev.c         | 7 +++++--
->  2 files changed, 8 insertions(+), 7 deletions(-)
->
-> diff --git a/drivers/crypto/ccp/ccp-crypto-main.c b/drivers/crypto/ccp/ccp-crypto-main.c
-> index 35a9de7..403ff0a 100644
-> --- a/drivers/crypto/ccp/ccp-crypto-main.c
-> +++ b/drivers/crypto/ccp/ccp-crypto-main.c
-> @@ -222,9 +222,10 @@ static int ccp_crypto_enqueue_cmd(struct ccp_crypto_cmd *crypto_cmd)
->
->  	/* Check if the cmd can/should be queued */
->  	if (req_queue.cmd_count >= CCP_CRYPTO_MAX_QLEN) {
-> -		ret = -EBUSY;
-> -		if (!(crypto_cmd->cmd->flags & CCP_CMD_MAY_BACKLOG))
-> +		if (!(crypto_cmd->cmd->flags & CCP_CMD_MAY_BACKLOG)) {
-> +			ret = -EAGAIN;
->  			goto e_lock;
-> +		}
->  	}
->
->  	/* Look for an entry with the same tfm.  If there is a cmd
-> @@ -243,9 +244,6 @@ static int ccp_crypto_enqueue_cmd(struct ccp_crypto_cmd *crypto_cmd)
->  		ret = ccp_enqueue_cmd(crypto_cmd->cmd);
->  		if (!ccp_crypto_success(ret))
->  			goto e_lock;	/* Error, don't queue it */
-> -		if ((ret == -EBUSY) &&
-> -		    !(crypto_cmd->cmd->flags & CCP_CMD_MAY_BACKLOG))
-> -			goto e_lock;	/* Not backlogging, don't queue it */
->  	}
->
->  	if (req_queue.cmd_count >= CCP_CRYPTO_MAX_QLEN) {
-> diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
-> index 4e029b1..3d637e3 100644
-> --- a/drivers/crypto/ccp/ccp-dev.c
-> +++ b/drivers/crypto/ccp/ccp-dev.c
-> @@ -292,9 +292,12 @@ int ccp_enqueue_cmd(struct ccp_cmd *cmd)
->  	i = ccp->cmd_q_count;
->
->  	if (ccp->cmd_count >= MAX_CMD_QLEN) {
-> -		ret = -EBUSY;
-> -		if (cmd->flags & CCP_CMD_MAY_BACKLOG)
-> +		if (cmd->flags & CCP_CMD_MAY_BACKLOG) {
-> +			ret = -EBUSY;
->  			list_add_tail(&cmd->entry, &ccp->backlog);
-> +		} else {
-> +			ret = -EAGAIN;
-> +		}
->  	} else {
->  		ret = -EINPROGRESS;
->  		ccp->cmd_count++;
->
+RH-bz: 1110709
+
+Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/smb2ops.c   | 141 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2pdu.c   |  12 +++++
+ fs/cifs/smb2pdu.h   |  10 ++++
+ fs/cifs/smb2proto.h |   3 ++
+ 4 files changed, 166 insertions(+)
+
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index cfacf2c97e94..bb04b46b5e14 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -426,6 +426,135 @@ smb2_query_file_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 	return rc;
+ }
+ 
++static ssize_t
++move_smb2_ea_to_cifs(char *dst, size_t dst_size,
++		     struct smb2_file_full_ea_info *src, size_t src_size,
++		     const unsigned char *ea_name)
++{
++	int rc = 0;
++	unsigned int ea_name_len = ea_name ? strlen(ea_name) : 0;
++
++	while (src_size > 0) {
++		char *name = &src->EaData[0];
++		size_t name_len = (size_t)src->EaNameLength;
++		char *value = &src->EaData[src->EaNameLength + 1];
++		size_t value_len = (size_t)src->EaValueLength;
++
++		if (name_len == 0) {
++			break;
++		}
++
++		if (src_size < 8 + name_len + 1 + value_len) {
++			cifs_dbg(FYI, "EA entry goes beyond length of list\n");
++			rc = -EIO;
++			goto QAllEAsOut;
++		}
++
++		if (ea_name) {
++			if (ea_name_len == name_len &&
++			    memcmp(ea_name, name, name_len) == 0) {
++				rc = value_len;
++				if (dst_size == 0)
++					goto QAllEAsOut;
++				if (dst_size < value_len) {
++					rc = -ERANGE;
++					goto QAllEAsOut;
++				}
++				memcpy(dst, value, value_len);
++				goto QAllEAsOut;
++			}
++		} else {
++			/* 'user.' plus a terminating null */
++			size_t user_name_len = 5 + 1 + name_len;
++
++			rc += user_name_len;
++
++			if (dst_size >= user_name_len) {
++				dst_size -= user_name_len;
++				memcpy(dst, "user.", 5);
++				dst += 5;
++				memcpy(dst, src->EaData, name_len);
++				dst += name_len;
++				*dst = 0;
++				++dst;
++			} else if (dst_size == 0) {
++				/* skip copy - calc size only */
++			} else {
++				/* stop before overrun buffer */
++				rc = -ERANGE;
++				break;
++			}
++		}
++
++		if (!src->NextEntryOffset)
++			break;
++
++		if (src_size < src->NextEntryOffset) {
++			/* stop before overrun buffer */
++			rc = -ERANGE;
++			break;
++		}
++		src_size -= src->NextEntryOffset;
++		src = (void *)((char *)src + src->NextEntryOffset);
++	}
++
++	/* didn't find the named attribute */
++	if (ea_name)
++		rc = -ENODATA;
++
++QAllEAsOut:
++	return (ssize_t)rc;
++}
++
++static ssize_t
++smb2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
++	       const unsigned char *searchName, const unsigned char *ea_name,
++	       char *EAData, size_t buf_size,
++	       struct cifs_sb_info *cifs_sb)
++{
++	int rc;
++	__le16 *utf16_path;
++	__u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
++	struct cifs_open_parms oparms;
++	struct cifs_fid fid;
++	struct smb2_file_full_ea_info *smb2_data;
++
++	utf16_path = cifs_convert_path_to_utf16(searchName, cifs_sb);
++	if (!utf16_path)
++		return -ENOMEM;
++
++	oparms.tcon = tcon;
++	oparms.desired_access = FILE_READ_ATTRIBUTES;
++	oparms.disposition = FILE_OPEN;
++	oparms.create_options = 0;
++	oparms.fid = &fid;
++	oparms.reconnect = false;
++
++	rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL);
++	kfree(utf16_path);
++	if (rc) {
++		cifs_dbg(FYI, "open failed rc=%d\n", rc);
++		return rc;
++	}
++
++	smb2_data = kzalloc(SMB2_MAX_EA_BUF, GFP_KERNEL);
++	if (smb2_data == NULL) {
++		SMB2_close(xid, tcon, fid.persistent_fid, fid.volatile_fid);
++		return -ENOMEM;
++	}
++
++	rc = SMB2_query_eas(xid, tcon, fid.persistent_fid, fid.volatile_fid,
++			    smb2_data);
++	SMB2_close(xid, tcon, fid.persistent_fid, fid.volatile_fid);
++
++	if (!rc)
++		rc = move_smb2_ea_to_cifs(EAData, buf_size, smb2_data,
++					  SMB2_MAX_EA_BUF, ea_name);
++
++	kfree(smb2_data);
++	return rc;
++}
++
+ static bool
+ smb2_can_echo(struct TCP_Server_Info *server)
+ {
+@@ -2572,6 +2701,9 @@ struct smb_version_operations smb20_operations = {
+ 	.dir_needs_close = smb2_dir_needs_close,
+ 	.get_dfs_refer = smb2_get_dfs_refer,
+ 	.select_sectype = smb2_select_sectype,
++#ifdef CONFIG_CIFS_XATTR
++	.query_all_EAs = smb2_query_eas,
++#endif /* CIFS_XATTR */
+ #ifdef CONFIG_CIFS_ACL
+ 	.get_acl = get_smb2_acl,
+ 	.get_acl_by_fid = get_smb2_acl_by_fid,
+@@ -2662,6 +2794,9 @@ struct smb_version_operations smb21_operations = {
+ 	.enum_snapshots = smb3_enum_snapshots,
+ 	.get_dfs_refer = smb2_get_dfs_refer,
+ 	.select_sectype = smb2_select_sectype,
++#ifdef CONFIG_CIFS_XATTR
++	.query_all_EAs = smb2_query_eas,
++#endif /* CIFS_XATTR */
+ #ifdef CONFIG_CIFS_ACL
+ 	.get_acl = get_smb2_acl,
+ 	.get_acl_by_fid = get_smb2_acl_by_fid,
+@@ -2762,6 +2897,9 @@ struct smb_version_operations smb30_operations = {
+ 	.receive_transform = smb3_receive_transform,
+ 	.get_dfs_refer = smb2_get_dfs_refer,
+ 	.select_sectype = smb2_select_sectype,
++#ifdef CONFIG_CIFS_XATTR
++	.query_all_EAs = smb2_query_eas,
++#endif /* CIFS_XATTR */
+ #ifdef CONFIG_CIFS_ACL
+ 	.get_acl = get_smb2_acl,
+ 	.get_acl_by_fid = get_smb2_acl_by_fid,
+@@ -2863,6 +3001,9 @@ struct smb_version_operations smb311_operations = {
+ 	.receive_transform = smb3_receive_transform,
+ 	.get_dfs_refer = smb2_get_dfs_refer,
+ 	.select_sectype = smb2_select_sectype,
++#ifdef CONFIG_CIFS_XATTR
++	.query_all_EAs = smb2_query_eas,
++#endif /* CIFS_XATTR */
+ };
+ #endif /* CIFS_SMB311 */
+ 
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 5fb2fc2d0080..30ef93e459a9 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -2140,6 +2140,18 @@ query_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 	return rc;
+ }
+ 
++int SMB2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
++	u64 persistent_fid, u64 volatile_fid,
++	struct smb2_file_full_ea_info *data)
++{
++	return query_info(xid, tcon, persistent_fid, volatile_fid,
++			  FILE_FULL_EA_INFORMATION, SMB2_O_INFO_FILE, 0,
++			  SMB2_MAX_EA_BUF,
++			  sizeof(struct smb2_file_full_ea_info),
++			  (void **)&data,
++			  NULL);
++}
++
+ int SMB2_query_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 	u64 persistent_fid, u64 volatile_fid, struct smb2_file_all_info *data)
+ {
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index 18700fd25a0b..3c62f29626a9 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -1178,6 +1178,16 @@ struct smb2_file_link_info { /* encoding of request for level 11 */
+ 	char   FileName[0];     /* Name to be assigned to new link */
+ } __packed; /* level 11 Set */
+ 
++#define SMB2_MAX_EA_BUF 2048
++
++struct smb2_file_full_ea_info { /* encoding of response for level 15 */
++	__le32 NextEntryOffset;
++	__u8   Flags;
++	__u8   EaNameLength;
++	__u16  EaValueLength;
++	char   EaData[0]; /* \0 terminated name plus value */
++} __packed; /* level 15 Set */
++
+ /*
+  * This level 18, although with struct with same name is different from cifs
+  * level 0x107. Level 0x107 has an extra u64 between AccessFlags and
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index 1cadaf9f3c58..183389bfc8f6 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -132,6 +132,9 @@ extern int SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
+ 		      u64 persistent_file_id, u64 volatile_file_id);
+ extern int SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon,
+ 		      u64 persistent_file_id, u64 volatile_file_id);
++extern int SMB2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
++			  u64 persistent_file_id, u64 volatile_file_id,
++			  struct smb2_file_full_ea_info *data);
+ extern int SMB2_query_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 			   u64 persistent_file_id, u64 volatile_file_id,
+ 			   struct smb2_file_all_info *data);
+-- 
+2.13.3
