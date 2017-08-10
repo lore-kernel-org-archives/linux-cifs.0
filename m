@@ -1,55 +1,40 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH v4 02/19] crypto: ccm: use -EAGAIN for transient busy indication
-Date: Wed, 9 Aug 2017 08:18:03 +0300
-Message-ID: <CAOtvUMeUHk9KxQumhuvJ52dp-_-LFOD8XGvCWvhU6LjEZhEF7A@mail.gmail.com>
-References: <1502193834-11289-1-git-send-email-gilad@benyossef.com>
- <1502193834-11289-3-git-send-email-gilad@benyossef.com> <4600c898-a2f2-f95f-15b4-0adcc6acc0b5@amd.com>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [PATCH] cifs: don't send invalid setxattr requests
+Date: Thu, 10 Aug 2017 15:21:43 +0300
+Message-ID: <20170810122143.2o4jln4x6cvz5r2l@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <james.l.morris@oracle.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        "linux-
-To: Gary R Hook <gary.hook@amd.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <4600c898-a2f2-f95f-15b4-0adcc6acc0b5@amd.com>
-Sender: owner-linux-security-module@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        kernel-janitors@vger.kernel.org
+To: Steve French <sfrench@samba.org>
+Return-path: <kernel-janitors-owner@vger.kernel.org>
+Content-Disposition: inline
+Sender: kernel-janitors-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Tue, Aug 8, 2017 at 6:24 PM, Gary R Hook <gary.hook@amd.com> wrote:
-> On 08/08/2017 07:03 AM, Gilad Ben-Yossef wrote:
->>
->> Replace -EBUSY with -EAGAIN when reporting transient busy
->> indication in the absence of backlog.
->>
->> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
->
->
-> Could we use "ccp" in the subject line, please?
+There is a static checker warning here because we're taking a "size"
+from the user which is in the 1-XATTR_SIZE_MAX range and we're assuming
+it's large enough to hold a sizeof(struct cifs_ntsd).  This doesn't
+cause a buffer overflow or anything, we just end up sending an invalid
+sized command to the server.  The server checks for that in
+CIFSSMBGetCIFSACL() and rejects it.
 
-Of course, sorry about the the typo.
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+---
+Not tested.  Please review this one carefully.
 
-Gilad
-
--- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+diff --git a/fs/cifs/xattr.c b/fs/cifs/xattr.c
+index de50e749ff05..70bdce5add24 100644
+--- a/fs/cifs/xattr.c
++++ b/fs/cifs/xattr.c
+@@ -93,6 +93,10 @@ static int cifs_xattr_set(const struct xattr_handler *handler,
+ 
+ 		if (!value)
+ 			goto out;
++		if (size < sizeof(struct cifs_ntsd)) {
++			rc = -EINVAL;
++			goto out;
++		}
+ 		pacl = kmalloc(size, GFP_KERNEL);
+ 		if (!pacl) {
+ 			rc = -ENOMEM;
