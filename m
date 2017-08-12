@@ -1,40 +1,86 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [PATCH] cifs: don't send invalid setxattr requests
-Date: Thu, 10 Aug 2017 15:21:43 +0300
-Message-ID: <20170810122143.2o4jln4x6cvz5r2l@mwanda>
+From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Subject: RE: [[PATCH v1] 02/37] [CIFS] SMBD: Add structure for SMBD transport
+Date: Sat, 12 Aug 2017 08:32:48 +0000
+Message-ID: <MWHPR21MB019089DF6B0B68C5C2F4FE56CE8E0@MWHPR21MB0190.namprd21.prod.outlook.com>
+References: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
+ <1501704648-20159-3-git-send-email-longli@exchange.microsoft.com>
+ <9632c208-d6a5-2c47-b583-274d046d97bd@samba.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        kernel-janitors@vger.kernel.org
-To: Steve French <sfrench@samba.org>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
-Content-Disposition: inline
-Sender: kernel-janitors-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+To: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+        "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <9632c208-d6a5-2c47-b583-274d046d97bd-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Language: en-US
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-There is a static checker warning here because we're taking a "size"
-from the user which is in the 1-XATTR_SIZE_MAX range and we're assuming
-it's large enough to hold a sizeof(struct cifs_ntsd).  This doesn't
-cause a buffer overflow or anything, we just end up sending an invalid
-sized command to the server.  The server checks for that in
-CIFSSMBGetCIFSACL() and rejects it.
-
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
----
-Not tested.  Please review this one carefully.
-
-diff --git a/fs/cifs/xattr.c b/fs/cifs/xattr.c
-index de50e749ff05..70bdce5add24 100644
---- a/fs/cifs/xattr.c
-+++ b/fs/cifs/xattr.c
-@@ -93,6 +93,10 @@ static int cifs_xattr_set(const struct xattr_handler *handler,
- 
- 		if (!value)
- 			goto out;
-+		if (size < sizeof(struct cifs_ntsd)) {
-+			rc = -EINVAL;
-+			goto out;
-+		}
- 		pacl = kmalloc(size, GFP_KERNEL);
- 		if (!pacl) {
- 			rc = -ENOMEM;
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBTdGVmYW4gTWV0em1hY2hlciBb
+bWFpbHRvOm1ldHplQHNhbWJhLm9yZ10NCj4gU2VudDogTW9uZGF5LCBBdWd1c3QgNywgMjAxNyAx
+MTo1OCBQTQ0KPiBUbzogU3RldmUgRnJlbmNoIDxzZnJlbmNoQHNhbWJhLm9yZz47IGxpbnV4LWNp
+ZnNAdmdlci5rZXJuZWwub3JnOyBzYW1iYS0NCj4gdGVjaG5pY2FsQGxpc3RzLnNhbWJhLm9yZzsg
+bGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZw0KPiBDYzogTG9uZyBMaSA8bG9uZ2xpQG1pY3Jv
+c29mdC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbW1BBVENIIHYxXSAwMi8zN10gW0NJRlNdIFNNQkQ6
+IEFkZCBzdHJ1Y3R1cmUgZm9yIFNNQkQNCj4gdHJhbnNwb3J0DQo+IA0KPiBIaSBMaSwNCj4gDQo+
+IHRoYW5rcyBmb3IgcHJvdmlkaW5nIHRoaXMgcGF0Y2hzZXQsIEkgZ3Vlc3MgaXQgd2lsbCBiZSBh
+IGh1Z2Ugd2luIHRvIGhhdmUNCj4gU01CRGlyZWN0IHN1cHBvcnQgZm9yIHRoZSBrZXJuZWwgY2xp
+ZW50IQ0KPiANCj4gPiBEZWZpbmUgYSBuZXcgc3RydWN0dXJlIGZvciBTTUJEIHRyYW5zcG9ydC4g
+VGhpcyBzdHVjdHVyZSB3aWxsIGhhdmUgYWxsDQo+ID4gdGhlIGluZm9ybWF0aW9uIG9uIHRoZSB0
+cmFuc3BvcnQsIGFuZCBpdCB3aWxsIGJlIHN0b3JlZCBpbiB0aGUgY3VycmVudCBTTUINCj4gc2Vz
+c2lvbi4NCj4gLi4uDQo+ID4gKy8qDQo+ID4gKyAqIFRoZSBjb250ZXh0IGZvciB0aGUgU01CRGly
+ZWN0IHRyYW5zcG9ydA0KPiA+ICsgKiBFdmVyeXRoaW5nIHJlbGF0ZWQgdG8gdGhlIHRyYW5zcG9y
+dCBpcyBoZXJlLiBJdCBoYXMgc2V2ZXJhbA0KPiBsb2dpY2FsIHBhcnRzDQo+ID4gKyAqIDEuIFJE
+TUEgcmVsYXRlZCBzdHJ1Y3R1cmVzDQo+ID4gKyAqIDIuIFNNQkRpcmVjdCBjb25uZWN0aW9uIHBh
+cmFtZXRlcnMNCj4gPiArICogMy4gUmVhc3NlbWJseSBxdWV1ZSBmb3IgZGF0YSByZWNlaXZlIHBh
+dGgNCj4gPiArICogNC4gbWVtcG9vbHMgZm9yIGFsbG9jYXRpbmcgcGFja2V0cyAgKi8gc3RydWN0
+IGNpZnNfcmRtYV9pbmZvIHsNCj4gPiArCXN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlcl9p
+bmZvOw0KPiA+ICsNCj4gPiArCS8vIGZvciBkZWJ1ZyBwdXJwb3Nlcw0KPiA+ICsJdW5zaWduZWQg
+aW50IGNvdW50X3JlY2VpdmVfYnVmZmVyOw0KPiA+ICsJdW5zaWduZWQgaW50IGNvdW50X2dldF9y
+ZWNlaXZlX2J1ZmZlcjsNCj4gPiArCXVuc2lnbmVkIGludCBjb3VudF9wdXRfcmVjZWl2ZV9idWZm
+ZXI7DQo+ID4gKwl1bnNpZ25lZCBpbnQgY291bnRfc2VuZF9lbXB0eTsNCj4gPiArfTsNCj4gPiAr
+I2VuZGlmDQo+ID4NCj4gDQo+IEl0IHNlZW1zIHRoYXQgdGhlIG5ldyB0cmFuc3BvcnQgaXMgdGll
+ZCB0byBpdCdzIGNhbGxlciByZWdhcmRpbmcgc3RydWN0dXJlcyBhbmQNCj4gbmFtaW5nIGNvbnZl
+bnRpb25zLg0KPiANCj4gSSB0aGluayBpdCB3b3VsZCBiZSBiZXR0ZXIgdG8gc3RyaWN0bHkgc2Vw
+YXJhdGUgdGhlbSwgYXMgSSdkIGxpa2UgdG8gdXNlIHRoZQ0KPiBTTUJEaXJlY3QgdHJhbnNwb3J0
+IGFsc28gZnJvbSB0aGUgdXNlcnNwYWNlIGZvciB0aGUgY2xpZW50IHNpZGUgZS5nLiBpbg0KPiBT
+YW1iYSdzICdbbGliXXNtYmNsaWVudCcsIGJ1dCBhbHNvIGluIFNhbWJhJ3Mgc2VydmVyIHNpZGUg
+Y29kZSAnc21iZCcuDQoNClRoYW5rIHlvdSBmb3IgcmV2aWV3aW5nIHRoZSBwYXRjaCBzZXQuDQoN
+CkkgdGhpbmsgaXQgaXMgcG9zc2libGUgdG8gc2VwYXJhdGUgdGhlIGNvbW1vbiBjb2RlIHRoYXQg
+aW1wbGVtZW50cyB0aGUgU01CRGlyZWN0IHRyYW5zcG9ydC4gVGhlcmUgYXJlIHNvbWUgY2hhbGxl
+bmdlcyB0byByZXVzZSB0aGUgc2FtZSBjb2RlIGZvciBib3RoIGtlcm5lbCBhbmQgdXNlciBzcGFj
+ZXMuDQoxLiBLZXJuZWwgbW9kZSBSRE1BIHZlcmJzIGFyZSBzaW1pbGFyIGJ1dCBkaWZmZXJlbnQg
+dG8gdXNlci1tb2RlIG9uZXMuDQoyLiBTb21lIFJETUEgZmVhdHVyZXMgKGUuZyBGYXN0IFJlZ2lz
+dHJhdGlvbiBXb3JrIFJlcXVlc3QpIGFyZSBub3QgYXZhaWxhYmxlIGluIHVzZXItbW9kZS4NCjMu
+IExvY2tpbmcgYW5kIHN5bmNocm9uaXphdGlvbiBtZWNoYW5pc20gaXMgZGlmZmVyZW50DQo0LiBN
+ZW1vcnkgbWFuYWdlbWVudCBpcyBkaWZmZXJlbnQuDQo1LiBQcm9jZXNzIGNyZWF0aW9uL3NjaGVk
+dWxpbmcgYW5kIGRhdGEgc2hhcmluZyBiZXR3ZWVuIHByb2Nlc3NlcyBhcmUgZGlmZmVyZW50LCBh
+bmQgdGhlcmUgaXMgbm8gdXNlci1tb2RlIGNvZGUgcnVubmluZyBpbiBpbnRlcnJ1cHQvc29mdGly
+cS4NCg0KVGhvc2UgbmVlZHMgdG8gYmUgYWJzdHJhY3RlZCB0aHJvdWdoIGEgbGF5ZXIsIHRoZSBy
+ZXN0IG9mIHRoZSBjb2RlIGNhbiBiZSBzaGFyZWQuIEkgY2FuIHdvcmsgb24gdGhpcyBhZnRlciBw
+YXRjaCBzZXQgaXMgcmV2aWV3ZWQuDQoNCj4gDQo+IFdvdWxkIGl0IGJlIHBvc3NpYmxlIHRvIGlz
+b2xhdGUgdGhpcyBpbg0KPiBzbWJfZGlyZWN0LmMgYW5kIHNtYl9kaXJlY3QuaCB3aGlsZSB1c2lu
+Zw0KPiBzbWJfZGlyZWN0XyogcHJlZml4ZXMgZm9yIHN0cnVjdHVyZXMgYW5kIGZ1bmN0aW9ucz8g
+QWxzbyBhdm9pZGluZyB0aGUgdXNhZ2UNCj4gb2Ygb3RoZXIgaGVhZGVycyBmcm9tIGZzL2NpZnMv
+Ki5oLCBleHBlY3QgZm9yIHNvbWV0aGluZyBnZW5lcmljIGxpa2UgbnRlcnIuaC4NCg0KU3VyZSBJ
+IHdpbGwgbWFrZSBuYW1pbmcgY2hhbmdlcyBhbmQgY2xlYW4gdXAgdGhlIGhlYWRlciBmaWxlcy4N
+Cj4gDQo+IEkgZ3Vlc3MgJ3N0cnVjdCBjaWZzX3JkbWFfaW5mbycgd291bGQgdGhlbiBiZSAnc3Ry
+dWN0IHNtYl9kaXJlY3RfY29ubmVjdGlvbicuDQo+IEFuZCBpdCB3b24ndCBoYXZlIGEgcmVmZXJl
+bmNlIHRvIHN0cnVjdCBUQ1BfU2VydmVyX0luZm8uDQoNCkkgd2lsbCBsb29rIGZvciB3YXlzIHRv
+IHJlbW92ZSByZWZlcmVuY2UgdG8gc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAuIFRoZSByZWFzb24g
+d2h5IGl0IGhhcyBhIHJlZmVyZW5jZSB0byBUQ1BfU2VydmVyX0luZm8gaXMgdGhhdDogVENQX1Nl
+cnZlcl9JbmZvIHJlcHJlc2VudHMgYSB0cmFuc3BvcnQgY29ubmVjdGlvbiwgYWx0aG91Z2ggaXQg
+YWxzbyBoYXMgbWFueSBvdGhlciBUQ1AgcmVsYXRlZCBjb2RlLiBTTUJEIG5lZWRzIHRvIGdldCB0
+byB0aGlzIGNvbm5lY3Rpb24gVENQX1NlcnZlcl9JbmZvIGFuZCBzZXQgdGhlIHRyYW5zcG9ydCBz
+dGF0dXMgb24gc2h1dGRvd24gKGFuZCBtYXliZSBvdGhlciBzaXR1YXRpb25zKS4NCg0KDQpMb25n
+DQoNCj4gDQo+IEl0IHRoZSBzdHJpY3QgbGF5ZXJpbmcgaXMgdG9vIG11Y2ggY2hhbmdlLCBJJ2Qg
+YXQgbGVhc3QgbGlrZSB0byBoYXZlIHRoZSBuYW1lDQo+IGNoYW5nZXMuDQo+IA0KPiBUaGlzIHNo
+b3VsZCByZWxhdGl2ZWx5IGVhc3kgdG8gZG8gYnkgdXNpbmcgc29tdGhpbmcgbGlrZQ0KPiANCj4g
+Z2l0IGZvcm1hdC1wYXRjaCAtLXN0ZG91dCAtMzcgPiBiZWZvcmUNCj4gDQo+IGNhdCBiZWZvcmUg
+fCBzZWQgXA0KPiAtZSAncyFzdHJ1Y3QgY2lmc19yZG1hX2luZm8hc3RydWN0IHNtYl9kaXJlY3Rf
+Y29ubmVjdGlvbiFnJyBcIC1lDQo+ICdzIWNpZnNyZG1hXC5oIXNtYl9kaXJlY3QuaCFnJyBcIC1l
+ICdzIWNpZnNyZG1hXC5jIXNtYl9kaXJlY3QuYyFnJyBcDQo+ID4gYWZ0ZXINCj4gDQo+IGdpdCBy
+ZXNldCAtLWhhcmQgSEVBRH4zNw0KPiBnaXQgYW0gYWZ0ZXINCj4gDQo+IG1ldHplDQo=
