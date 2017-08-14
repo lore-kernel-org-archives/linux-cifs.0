@@ -1,75 +1,63 @@
-From: Long Li <longli@microsoft.com>
-Subject: RE: [[PATCH v1] 16/37] [CIFS] SMBD: Post a SMBD message with no
- payload
-Date: Mon, 14 Aug 2017 22:51:03 +0000
-Message-ID: <CY4PR21MB0182E3DB8E034407509E3205CE8C0@CY4PR21MB0182.namprd21.prod.outlook.com>
+From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Subject: RE: [[PATCH v1] 01/37] [CIFS] SMBD: Add parsing for new rdma mount
+ option
+Date: Mon, 14 Aug 2017 22:53:51 +0000
+Message-ID: <CY4PR21MB0182C5DD0577E62354624532CE8C0@CY4PR21MB0182.namprd21.prod.outlook.com>
 References: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
- <1501704648-20159-17-git-send-email-longli@exchange.microsoft.com>
- <20170813102412.GH17287@infradead.org>
- <CY4PR21MB0182366FB8C2EC58B6A77910CE8C0@CY4PR21MB0182.namprd21.prod.outlook.com>
- <CY4PR21MB0182AF2A752D333E367F2FC4A08C0@CY4PR21MB0182.namprd21.prod.outlook.com>
+ <1501704648-20159-2-git-send-email-longli@exchange.microsoft.com>
+ <CY4PR21MB01823BD35679AE110E9008B8A08C0@CY4PR21MB0182.namprd21.prod.outlook.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Cc: Steve French <sfrench@samba.org>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Tom Talpey <ttalpey@microsoft.com>,
-        Christoph Hellwig <hch@infradead.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CY4PR21MB0182AF2A752D333E367F2FC4A08C0@CY4PR21MB0182.namprd21.prod.outlook.com>
+To: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+        "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CY4PR21MB01823BD35679AE110E9008B8A08C0-kUhI0YP1syo7ifcEnHlXec1VXTxX1y3OvxpqHgZTriW3zl9H0oFU5g@public.gmane.org>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
 
 
 > -----Original Message-----
 > From: Tom Talpey
-> Sent: Monday, August 14, 2017 12:00 PM
-> To: Long Li <longli@microsoft.com>; Christoph Hellwig <hch@infradead.org>
-> Cc: Steve French <sfrench@samba.org>; linux-cifs@vger.kernel.org; samba-
-> technical@lists.samba.org; linux-kernel@vger.kernel.org
-> Subject: RE: [[PATCH v1] 16/37] [CIFS] SMBD: Post a SMBD message with no
-> payload
+> Sent: Monday, August 14, 2017 12:10 PM
+> To: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>; Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>;
+> linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org; linux-
+> kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> Subject: RE: [[PATCH v1] 01/37] [CIFS] SMBD: Add parsing for new rdma
+> mount option
 >=20
 > > -----Original Message-----
-> > From: linux-cifs-owner@vger.kernel.org [mailto:linux-cifs-
-> > owner@vger.kernel.org] On Behalf Of Long Li
-> > Sent: Monday, August 14, 2017 2:20 PM
-> > To: Christoph Hellwig <hch@infradead.org>
-> > Cc: Steve French <sfrench@samba.org>; linux-cifs@vger.kernel.org;
-> > samba- technical@lists.samba.org; linux-kernel@vger.kernel.org
-> > Subject: RE: [[PATCH v1] 16/37] [CIFS] SMBD: Post a SMBD message with
-> > no payload
+> > From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [mailto:linux-cifs-
+> > owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org] On Behalf Of Long Li
+> > Sent: Wednesday, August 2, 2017 4:10 PM
+> > To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>; linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org;
+> > samba- technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org; linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> > Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+> > Subject: [[PATCH v1] 01/37] [CIFS] SMBD: Add parsing for new rdma
+> > mount option
 > >
-> > > > Implement the function to send a SMBD message with no payload.
-> > > > This is
-> > > required at times when we want to extend credtis to server to have
-> > > it continue to send data, without sending any actual data payload.
-> > >
-> > > Shouldn't this just be implemented as a special case in the version
-> > > that posts data?
+> > From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 > >
-> > It uses a different packet format "struct smbd_data_transfer_no_data".
-> > I can restructure some common code to share between packet sending
-> functions.
+> > When doing mount with "-o rdma", user can specify this is for
+> > connecting to a SMBD session.
 >=20
-> The SMB Direct keepalive is just a Data Transfer Message with no payload
-> (MS-SMBD section 2.2.3) and the SMB_DIRECT_RESPONSE_REQUESTED flag
-> possibly set.  I don't see any need to define a special structure to desc=
-ribe
-> this?
+> Nit: it's an "SMB" session. SMBD (SMB Direct) is the transport connection=
+.
+>=20
+> The use of SMB Direct is only applicable when an SMB3.x dialect is negoti=
+ated.
+> Is there any restriction in the use of the mount option to preclude also
+> specifying
+> SMB1 and SMB2.x?
 
-Data Transfer Message has the following extra fields at the end of an empty=
- packet.
-
-        __le32 padding;
-        char buffer[0];
-
-I agree with you those can be merged to a special structure case. Will make=
- the change.
+SMB version is specified in mount "-o vers=3DXXX". For example,  "mount -o =
+vers=3D3.02" will try to negotiate SMB 3.02. I will make the change to retu=
+rn error on vers<3.
 
 >=20
 > Tom.
