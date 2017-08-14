@@ -1,178 +1,143 @@
-From: Tom Talpey <ttalpey@microsoft.com>
-Subject: RE: [[PATCH v1] 05/37] [CIFS] SMBD: Implement API for upper layer to
- create SMBD transport and establish RDMA connection
-Date: Mon, 14 Aug 2017 19:54:38 +0000
-Message-ID: <CY4PR21MB018254FE747A2FCEB0650090A08C0@CY4PR21MB0182.namprd21.prod.outlook.com>
+From: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Subject: RE: [[PATCH v1] 07/37] [CIFS] SMBD: Implement receive buffer for
+ handling SMBD response
+Date: Mon, 14 Aug 2017 20:09:01 +0000
+Message-ID: <CY4PR21MB0182912142A7AA71C981E3FDA08C0@CY4PR21MB0182.namprd21.prod.outlook.com>
 References: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
- <1501704648-20159-6-git-send-email-longli@exchange.microsoft.com>
+ <1501704648-20159-8-git-send-email-longli@exchange.microsoft.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-To: Long Li <longli@microsoft.com>, Steve French <sfrench@samba.org>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1501704648-20159-6-git-send-email-longli@exchange.microsoft.com>
+To: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+        "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1501704648-20159-8-git-send-email-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
 > -----Original Message-----
-> From: linux-cifs-owner@vger.kernel.org [mailto:linux-cifs-
-> owner@vger.kernel.org] On Behalf Of Long Li
+> From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [mailto:linux-cifs-
+> owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org] On Behalf Of Long Li
 > Sent: Wednesday, August 2, 2017 4:10 PM
-> To: Steve French <sfrench@samba.org>; linux-cifs@vger.kernel.org; samba-
-> technical@lists.samba.org; linux-kernel@vger.kernel.org
-> Cc: Long Li <longli@microsoft.com>
-> Subject: [[PATCH v1] 05/37] [CIFS] SMBD: Implement API for upper layer to
-> create SMBD transport and establish RDMA connection
+> To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>; linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; samba-
+> technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org; linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+> Subject: [[PATCH v1] 07/37] [CIFS] SMBD: Implement receive buffer for
+> handling SMBD response
 >=20
-> From: Long Li <longli@microsoft.com>
->=20
-> Implement the code for connecting to SMBD server. The client and server a=
-re
-> connected using RC Queue Pair over RDMA API, which suppports Infiniband,
-> RoCE and iWARP. Upper layer code can call cifs_create_rdma_session to
-> establish a SMBD RDMA connection.
->=20
-> +/* Upcall from RDMA CM */
-> +static int cifs_rdma_conn_upcall(
-> +               struct rdma_cm_id *id, struct rdma_cm_event *event)
+> +/*
+> + * Receive buffer operations.
+> + * For each remote send, we need to post a receive. The receive buffers =
+are
+> + * pre-allocated in advance.
+> + */
+
+This approach appears to have been derived from the NFS/RDMA one.
+The SMB protocol operates very differently! It is not a strict request/
+response protocol. Many operations can become asynchronous by the
+server choosing to make a STATUS_PENDING reply. A second reply then
+comes later. The SMB2_CANCEL operation normally has no reply at all.
+And callbacks for oplocks can occur at any time.
+
+Even within a single request, many replies can be received. For example,
+an SMB2_READ response which exceeds your negotiated receive size of
+8192. These will be fragmented by SMB Direct into a "train" of multiple
+messages, which will be logically reassembled by the receiver. Each of
+them will consume a credit.
+
+Thanks to SMB Direct crediting, the connection is not failing, but you are
+undoubtedly spending a lot of time and ping-ponging to re-post receives
+and allow the message trains to flow. And, because it's never one-to-one,
+there are also unneeded receives posted before and after such exchanges.
+
+You need to use SMB Direct crediting to post a more traffic-sensitive pool
+of receives, and simply manage its depth when posting client requests.
+As a start, I'd suggest simply choosing a constant number, approximately
+whatever credit value you actually negotiate with the peer. Then, just
+replenish (re-post) receive buffers as they are completed by the adapter.
+You can get more sophisticated about this strategy later.
+
+Tom.
+
+> +static struct cifs_rdma_response* get_receive_buffer(struct cifs_rdma_in=
+fo
+> *info)
 > +{
-> +       struct cifs_rdma_info *info =3D id->context;
+> +       struct cifs_rdma_response *ret =3D NULL;
+> +       unsigned long flags;
 > +
-> +       log_rdma_event("event=3D%d status=3D%d\n", event->event, event->s=
-tatus);
+> +       spin_lock_irqsave(&info->receive_queue_lock, flags);
+> +       if (!list_empty(&info->receive_queue)) {
+> +               ret =3D list_first_entry(
+> +                       &info->receive_queue,
+> +                       struct cifs_rdma_response, list);
+> +               list_del(&ret->list);
+> +               info->count_receive_buffer--;
+> +               info->count_get_receive_buffer++;
+> +       }
+> +       spin_unlock_irqrestore(&info->receive_queue_lock, flags);
 > +
-> +       switch (event->event) {
-> +       case RDMA_CM_EVENT_ADDR_RESOLVED:
-> +       case RDMA_CM_EVENT_ROUTE_RESOLVED:
-> +               info->ri_rc =3D 0;
-> +               complete(&info->ri_done);
-> +               break;
+> +       return ret;
+> +}
 > +
-> +       case RDMA_CM_EVENT_ADDR_ERROR:
-> +               info->ri_rc =3D -EHOSTUNREACH;
-> +               complete(&info->ri_done);
-> +               break;
+> +static void put_receive_buffer(
+> +       struct cifs_rdma_info *info, struct cifs_rdma_response *response)
+> +{
+> +       unsigned long flags;
 > +
-> +       case RDMA_CM_EVENT_ROUTE_ERROR:
-> +               info->ri_rc =3D -ENETUNREACH;
-> +               complete(&info->ri_done);
-> +               break;
+> +       ib_dma_unmap_single(info->id->device, response->sge.addr,
+> +               response->sge.length, DMA_FROM_DEVICE);
 > +
-> +       case RDMA_CM_EVENT_ESTABLISHED:
-> +       case RDMA_CM_EVENT_CONNECT_ERROR:
-> +       case RDMA_CM_EVENT_UNREACHABLE:
-> +       case RDMA_CM_EVENT_REJECTED:
-> +       case RDMA_CM_EVENT_DEVICE_REMOVAL:
-> +               log_rdma_event("connected event=3D%d\n", event->event);
-> +               info->connect_state =3D event->event;
-> +               break;
+> +       spin_lock_irqsave(&info->receive_queue_lock, flags);
+> +       list_add_tail(&response->list, &info->receive_queue);
+> +       info->count_receive_buffer++;
+> +       info->count_put_receive_buffer++;
+> +       spin_unlock_irqrestore(&info->receive_queue_lock, flags);
+> +}
 > +
-> +       case RDMA_CM_EVENT_DISCONNECTED:
-> +               break;
+> +static int allocate_receive_buffers(struct cifs_rdma_info *info, int num=
+_buf)
+> +{
+> +       int i;
+> +       struct cifs_rdma_response *response;
 > +
-> +       default:
-> +               break;
+> +       INIT_LIST_HEAD(&info->receive_queue);
+> +       spin_lock_init(&info->receive_queue_lock);
+> +
+> +       for (i=3D0; i<num_buf; i++) {
+> +               response =3D mempool_alloc(info->response_mempool, GFP_KE=
+RNEL);
+> +               if (!response)
+> +                       goto allocate_failed;
+> +
+> +               response->info =3D info;
+> +               list_add_tail(&response->list, &info->receive_queue);
+> +               info->count_receive_buffer++;
 > +       }
 > +
 > +       return 0;
+> +
+> +allocate_failed:
+> +       while (!list_empty(&info->receive_queue)) {
+> +               response =3D list_first_entry(
+> +                               &info->receive_queue,
+> +                               struct cifs_rdma_response, list);
+> +               list_del(&response->list);
+> +               info->count_receive_buffer--;
+> +
+> +               mempool_free(response, info->response_mempool);
+> +       }
+> +       return -ENOMEM;
 > +}
-
-This code looks a lot like the connection stuff in the NFS/RDMA RPC transpo=
-rt.
-Does your code have the same needs? If so, you might consider moving this t=
-o
-a common RDMA handler.
-
-> +/* Upcall from RDMA QP */
-> +static void
-> +cifs_rdma_qp_async_error_upcall(struct ib_event *event, void *context)
+> +
+> +static void destroy_receive_buffers(struct cifs_rdma_info *info)
 > +{
-> +       struct cifs_rdma_info *info =3D context;
-> +       log_rdma_event("%s on device %s info %p\n",
-> +               ib_event_msg(event->event), event->device->name, info);
-> +
-> +       switch (event->event)
-> +       {
-> +       case IB_EVENT_CQ_ERR:
-> +       case IB_EVENT_QP_FATAL:
-> +       case IB_EVENT_QP_REQ_ERR:
-> +       case IB_EVENT_QP_ACCESS_ERR:
-> +
-> +       default:
-> +               break;
-> +       }
+> +       struct cifs_rdma_response *response;
+> +       while ((response =3D get_receive_buffer(info)))
+> +               mempool_free(response, info->response_mempool);
 > +}
-
-Ditto. But, what's up with the empty switch(event->event) processing?
-
-> +static struct rdma_cm_id* cifs_rdma_create_id(
-> +               struct cifs_rdma_info *info, struct sockaddr *dstaddr)
-> +{
-...
-> +       log_rdma_event("connecting to IP %pI4 port %d\n",
-> +               &addr_in->sin_addr, ntohs(addr_in->sin_port));
->... and then...
-> +       if (dstaddr->sa_family =3D=3D AF_INET6)
-> +               sport =3D &((struct sockaddr_in6 *)dstaddr)->sin6_port;
-> +       else
-> +               sport =3D &((struct sockaddr_in *)dstaddr)->sin_port;
 > +
-> +       *sport =3D htons(445);
-...and
-> +out:
-> +       // try port number 5445 if port 445 doesn't work
-> +       if (*sport =3D=3D htons(445)) {
-> +               *sport =3D htons(5445);
-> +               goto try_again;
-> +       }
-
-Suggest rearranging the log_rdma_event() call to reflect reality.
-
-The IANA-assigned port for SMB Direct is 5445, and port 445 will be
-listening on TCP. Should you really be probing that port before 5445?
-I suggest not doing so unconditionally.
-
-> +struct cifs_rdma_info* cifs_create_rdma_session(
-> +       struct TCP_Server_Info *server, struct sockaddr *dstaddr)
-> +{
-> ...
-> +       int max_pending =3D receive_credit_max + send_credit_target;
->...
-> +       if (max_pending > info->id->device->attrs.max_cqe ||
-> +           max_pending > info->id->device->attrs.max_qp_wr) {
-> +               log_rdma_event("consider lowering receive_credit_max and =
-"
-> +                       "send_credit_target. Possible CQE overrun, device=
- "
-> +                       "reporting max_cpe %d max_qp_wr %d\n",
-> +                       info->id->device->attrs.max_cqe,
-> +                       info->id->device->attrs.max_qp_wr);
-> +               goto out2;
-> +       }
-
-I don't understand this. Why are you directing both Receive and Send comple=
-tions
-to the same CQ, won't that make it very hard to manage completions and thei=
-r
-interrupts? Also, what device(s) have you seen trigger this log? CQ's are g=
-enerally
-allowed to be quite large.
-
-> +       conn_param.responder_resources =3D 32;
-> +       if (info->id->device->attrs.max_qp_rd_atom < 32)
-> +               conn_param.responder_resources =3D
-> +                       info->id->device->attrs.max_qp_rd_atom;
-> +       conn_param.retry_count =3D 6;
-> +       conn_param.rnr_retry_count =3D 6;
-> +       conn_param.flow_control =3D 0;
-
-These choices warrant explanation. 32 responder resources is on the large s=
-ide for
-most datacenter networks. And because of SMB Direct's credits, why is RNR_r=
-etry not
-simply zero?
