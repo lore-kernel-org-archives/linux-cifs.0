@@ -1,73 +1,106 @@
-From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: RE: [[PATCH v1] 19/37] [CIFS] SMBD: Manage credits on SMBD client and
- server
-Date: Mon, 14 Aug 2017 23:03:42 +0000
-Message-ID: <CY4PR21MB0182FD5201C97A969C9B09A2CE8C0@CY4PR21MB0182.namprd21.prod.outlook.com>
+From: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Subject: RE: [[PATCH v1] 16/37] [CIFS] SMBD: Post a SMBD message with no
+ payload
+Date: Mon, 14 Aug 2017 23:12:31 +0000
+Message-ID: <CY4PR21MB0182C79BF7C81C249A84F56EA08C0@CY4PR21MB0182.namprd21.prod.outlook.com>
 References: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
- <1501704648-20159-20-git-send-email-longli@exchange.microsoft.com>
- <CY4PR21MB01823211DE659BEAA7932309A08C0@CY4PR21MB0182.namprd21.prod.outlook.com>
+ <1501704648-20159-17-git-send-email-longli@exchange.microsoft.com>
+ <20170813102412.GH17287@infradead.org>
+ <CY4PR21MB0182366FB8C2EC58B6A77910CE8C0@CY4PR21MB0182.namprd21.prod.outlook.com>
+ <CY4PR21MB0182AF2A752D333E367F2FC4A08C0@CY4PR21MB0182.namprd21.prod.outlook.com>
+ <CY4PR21MB0182E3DB8E034407509E3205CE8C0@CY4PR21MB0182.namprd21.prod.outlook.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-To: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
         "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
         "samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
         "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CY4PR21MB01823211DE659BEAA7932309A08C0-kUhI0YP1syo7ifcEnHlXec1VXTxX1y3OvxpqHgZTriW3zl9H0oFU5g@public.gmane.org>
+In-Reply-To: <CY4PR21MB0182E3DB8E034407509E3205CE8C0-kUhI0YP1syo7ifcEnHlXec1VXTxX1y3OvxpqHgZTriW3zl9H0oFU5g@public.gmane.org>
 Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-
-
 > -----Original Message-----
-> From: Tom Talpey
-> Sent: Monday, August 14, 2017 1:47 PM
-> To: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>; Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>;
-> linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org; linux-
-> kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> Subject: RE: [[PATCH v1] 19/37] [CIFS] SMBD: Manage credits on SMBD clien=
-t
-> and server
+> From: Long Li
+> Sent: Monday, August 14, 2017 6:51 PM
+> To: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>; Christoph Hellwig
+> <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+> Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>; linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; samba-
+> technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org; linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> Subject: RE: [[PATCH v1] 16/37] [CIFS] SMBD: Post a SMBD message with no
+> payload
+>=20
+>=20
 >=20
 > > -----Original Message-----
-> > From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [mailto:linux-cifs-
-> > owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org] On Behalf Of Long Li
-> > Sent: Wednesday, August 2, 2017 4:11 PM
-> > To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>; linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org;
-> > samba- technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org; linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> > Subject: [[PATCH v1] 19/37] [CIFS] SMBD: Manage credits on SMBD client
-> > and server
+> > From: Tom Talpey
+> > Sent: Monday, August 14, 2017 12:00 PM
+> > To: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>; Christoph Hellwig <hch-wEGCiKHe2LouzsEnZMApLA@public.gmane.org=
+g>
+> > Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>; linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; samba=
+-
+> > technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org; linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> > Subject: RE: [[PATCH v1] 16/37] [CIFS] SMBD: Post a SMBD message with n=
+o
+> > payload
 > >
-> >  /*
-> > + * Extend the credits to remote peer
-> > + * This implements [MS-SMBD] 3.1.5.9
-> > + * The idea is that we should extend credits to remote peer as
-> > +quickly as
-> > + * it's allowed, to maintain data flow. We allocate as much as
-> > +receive
-> > + * buffer as possible, and extend the receive credits to remote peer
-> > + * return value: the new credtis being granted.
-> > + */
-> > +static int manage_credits_prior_sending(struct cifs_rdma_info *info)
-> > +{
-> > +       int ret =3D 0;
-> > +       struct cifs_rdma_response *response;
-> > +       int rc;
-> > +
-> > +       if (atomic_read(&info->receive_credit_target) >
+> > > -----Original Message-----
+> > > From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [mailto:linux-cifs-
+> > > owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org] On Behalf Of Long Li
+> > > Sent: Monday, August 14, 2017 2:20 PM
+> > > To: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+> > > Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>; linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org;
+> > > samba- technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org; linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> > > Subject: RE: [[PATCH v1] 16/37] [CIFS] SMBD: Post a SMBD message with
+> > > no payload
+> > >
+> > > > > Implement the function to send a SMBD message with no payload.
+> > > > > This is
+> > > > required at times when we want to extend credtis to server to have
+> > > > it continue to send data, without sending any actual data payload.
+> > > >
+> > > > Shouldn't this just be implemented as a special case in the version
+> > > > that posts data?
+> > >
+> > > It uses a different packet format "struct smbd_data_transfer_no_data"=
+.
+> > > I can restructure some common code to share between packet sending
+> > functions.
+> >
+> > The SMB Direct keepalive is just a Data Transfer Message with no payloa=
+d
+> > (MS-SMBD section 2.2.3) and the SMB_DIRECT_RESPONSE_REQUESTED flag
+> > possibly set.  I don't see any need to define a special structure to de=
+scribe
+> > this?
 >=20
-> When does the receive_credit_target value change? It seems wasteful to
-> perform an atomic_read() on this local value each time.
-
-It could be potentially changed while receiving a SMBD packet, as specified=
- in MS-SMBD 3.1.5.8.
-
-I agree with you there is no need to use atomic since this value is not inc=
-reased or decreased, just being set. Will change it.
-
+> Data Transfer Message has the following extra fields at the end of an emp=
+ty
+> packet.
 >=20
-> Tom.
+>         __le32 padding;
+
+No need to omit the padding, it's ignored anyway and the DataLength is zero
+so there's no other payload to consume. You can send a packet of pretty muc=
+h
+any length. Just send the regular struct.
+
+BTW, the "padding" field is defined as variable array of bytes, meaning sem=
+antically
+you might want to code it as u8 padding[0] as well. However in practice it =
+is
+either 4 bytes or not present at all, so you'd probably end up writing extr=
+a code
+for that choice.
+
+>         char buffer[0];
+>=20
+> I agree with you those can be merged to a special structure case. Will ma=
+ke the
+> change.
+
+Tom.
