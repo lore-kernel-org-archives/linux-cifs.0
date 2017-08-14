@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Subject: [PATCH v5 17/19] crypto: qce: move to generic async completion
-Date: Mon, 14 Aug 2017 18:21:27 +0300
-Message-ID: <1502724094-23305-18-git-send-email-gilad__25052.2622991868$1502724398$gmane$org@benyossef.com>
+Subject: [PATCH v5 16/19] crypto: talitos: move to generic async completion
+Date: Mon, 14 Aug 2017 18:21:26 +0300
+Message-ID: <1502724094-23305-17-git-send-email-gilad__39529.3107642376$1502724410$gmane$org@benyossef.com>
 References: <1502724094-23305-1-git-send-email-gilad@benyossef.com>
 Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
 To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
@@ -27,74 +27,82 @@ In-Reply-To: <1502724094-23305-1-git-send-email-gilad-6S/DczAoZh3WXxRugSxzZg@pub
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The qce driver starts several async crypto ops and  waits for their
+The talitos driver starts several async crypto ops and  waits for their
 completions. Move it over to generic code doing the same.
 
 Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
 ---
- drivers/crypto/qce/sha.c | 30 ++++--------------------------
- 1 file changed, 4 insertions(+), 26 deletions(-)
+ drivers/crypto/talitos.c | 38 +++++---------------------------------
+ 1 file changed, 5 insertions(+), 33 deletions(-)
 
-diff --git a/drivers/crypto/qce/sha.c b/drivers/crypto/qce/sha.c
-index 47e114a..53227d7 100644
---- a/drivers/crypto/qce/sha.c
-+++ b/drivers/crypto/qce/sha.c
-@@ -349,28 +349,12 @@ static int qce_ahash_digest(struct ahash_request *req)
- 	return qce->async_req_enqueue(tmpl->qce, &req->base);
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 79791c6..194a307 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -2037,22 +2037,6 @@ static int ahash_import(struct ahash_request *areq, const void *in)
+ 	return 0;
  }
  
--struct qce_ahash_result {
+-struct keyhash_result {
 -	struct completion completion;
--	int error;
+-	int err;
 -};
 -
--static void qce_digest_complete(struct crypto_async_request *req, int error)
+-static void keyhash_complete(struct crypto_async_request *req, int err)
 -{
--	struct qce_ahash_result *result = req->data;
+-	struct keyhash_result *res = req->data;
 -
--	if (error == -EINPROGRESS)
+-	if (err == -EINPROGRESS)
 -		return;
 -
--	result->error = error;
--	complete(&result->completion);
+-	res->err = err;
+-	complete(&res->completion);
 -}
 -
- static int qce_ahash_hmac_setkey(struct crypto_ahash *tfm, const u8 *key,
- 				 unsigned int keylen)
+ static int keyhash(struct crypto_ahash *tfm, const u8 *key, unsigned int keylen,
+ 		   u8 *hash)
  {
- 	unsigned int digestsize = crypto_ahash_digestsize(tfm);
- 	struct qce_sha_ctx *ctx = crypto_tfm_ctx(&tfm->base);
--	struct qce_ahash_result result;
-+	struct crypto_wait wait;
+@@ -2060,10 +2044,10 @@ static int keyhash(struct crypto_ahash *tfm, const u8 *key, unsigned int keylen,
+ 
+ 	struct scatterlist sg[1];
  	struct ahash_request *req;
- 	struct scatterlist sg;
- 	unsigned int blocksize;
-@@ -405,9 +389,9 @@ static int qce_ahash_hmac_setkey(struct crypto_ahash *tfm, const u8 *key,
- 		goto err_free_ahash;
- 	}
+-	struct keyhash_result hresult;
++	struct crypto_wait wait;
+ 	int ret;
  
--	init_completion(&result.completion);
+-	init_completion(&hresult.completion);
 +	crypto_init_wait(&wait);
+ 
+ 	req = ahash_request_alloc(tfm, GFP_KERNEL);
+ 	if (!req)
+@@ -2072,25 +2056,13 @@ static int keyhash(struct crypto_ahash *tfm, const u8 *key, unsigned int keylen,
+ 	/* Keep tfm keylen == 0 during hash of the long key */
+ 	ctx->keylen = 0;
  	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
--				   qce_digest_complete, &result);
+-				   keyhash_complete, &hresult);
 +				   crypto_req_done, &wait);
- 	crypto_ahash_clear_flags(ahash_tfm, ~0);
  
- 	buf = kzalloc(keylen + QCE_MAX_ALIGN_SIZE, GFP_KERNEL);
-@@ -420,13 +404,7 @@ static int qce_ahash_hmac_setkey(struct crypto_ahash *tfm, const u8 *key,
- 	sg_init_one(&sg, buf, keylen);
- 	ahash_request_set_crypt(req, &sg, ctx->authkey, keylen);
+ 	sg_init_one(&sg[0], key, keylen);
  
+ 	ahash_request_set_crypt(req, sg, hash, keylen);
 -	ret = crypto_ahash_digest(req);
--	if (ret == -EINPROGRESS || ret == -EBUSY) {
--		ret = wait_for_completion_interruptible(&result.completion);
+-	switch (ret) {
+-	case 0:
+-		break;
+-	case -EINPROGRESS:
+-	case -EBUSY:
+-		ret = wait_for_completion_interruptible(
+-			&hresult.completion);
 -		if (!ret)
--			ret = result.error;
+-			ret = hresult.err;
+-		break;
+-	default:
+-		break;
 -	}
--
 +	ret = crypto_wait_req(crypto_ahash_digest(req), &wait);
- 	if (ret)
- 		crypto_ahash_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
++
+ 	ahash_request_free(req);
  
+ 	return ret;
 -- 
 2.1.4
