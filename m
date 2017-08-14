@@ -1,42 +1,75 @@
-From: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: RE: [[PATCH v1] 30/37] [CIFS] SMBD: Add SMBDirect transport to
- Makefile
-Date: Mon, 14 Aug 2017 21:20:01 +0000
-Message-ID: <CY4PR21MB0182D411A74EC17CEA5BD63BA08C0@CY4PR21MB0182.namprd21.prod.outlook.com>
+From: Long Li <longli@microsoft.com>
+Subject: RE: [[PATCH v1] 16/37] [CIFS] SMBD: Post a SMBD message with no
+ payload
+Date: Mon, 14 Aug 2017 22:51:03 +0000
+Message-ID: <CY4PR21MB0182E3DB8E034407509E3205CE8C0@CY4PR21MB0182.namprd21.prod.outlook.com>
 References: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
- <1501704648-20159-31-git-send-email-longli@exchange.microsoft.com>
+ <1501704648-20159-17-git-send-email-longli@exchange.microsoft.com>
+ <20170813102412.GH17287@infradead.org>
+ <CY4PR21MB0182366FB8C2EC58B6A77910CE8C0@CY4PR21MB0182.namprd21.prod.outlook.com>
+ <CY4PR21MB0182AF2A752D333E367F2FC4A08C0@CY4PR21MB0182.namprd21.prod.outlook.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-To: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-        "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1501704648-20159-31-git-send-email-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+Cc: Steve French <sfrench@samba.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Tom Talpey <ttalpey@microsoft.com>,
+        Christoph Hellwig <hch@infradead.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CY4PR21MB0182AF2A752D333E367F2FC4A08C0@CY4PR21MB0182.namprd21.prod.outlook.com>
 Content-Language: en-US
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
+
+
 
 > -----Original Message-----
-> From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [mailto:linux-cifs-
-> owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org] On Behalf Of Long Li
-> Sent: Wednesday, August 2, 2017 4:11 PM
-> To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>; linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; samba-
-> technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org; linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> Subject: [[PATCH v1] 30/37] [CIFS] SMBD: Add SMBDirect transport to Makef=
-ile
+> From: Tom Talpey
+> Sent: Monday, August 14, 2017 12:00 PM
+> To: Long Li <longli@microsoft.com>; Christoph Hellwig <hch@infradead.org>
+> Cc: Steve French <sfrench@samba.org>; linux-cifs@vger.kernel.org; samba-
+> technical@lists.samba.org; linux-kernel@vger.kernel.org
+> Subject: RE: [[PATCH v1] 16/37] [CIFS] SMBD: Post a SMBD message with no
+> payload
 >=20
->  cifs-$(CONFIG_CIFS_SMB2) +=3D smb2ops.o smb2maperror.o smb2transport.o \
-> -                           smb2misc.o smb2pdu.o smb2inode.o smb2file.o
-> +                           smb2misc.o smb2pdu.o smb2inode.o smb2file.o c=
-ifsrdma.o
+> > -----Original Message-----
+> > From: linux-cifs-owner@vger.kernel.org [mailto:linux-cifs-
+> > owner@vger.kernel.org] On Behalf Of Long Li
+> > Sent: Monday, August 14, 2017 2:20 PM
+> > To: Christoph Hellwig <hch@infradead.org>
+> > Cc: Steve French <sfrench@samba.org>; linux-cifs@vger.kernel.org;
+> > samba- technical@lists.samba.org; linux-kernel@vger.kernel.org
+> > Subject: RE: [[PATCH v1] 16/37] [CIFS] SMBD: Post a SMBD message with
+> > no payload
+> >
+> > > > Implement the function to send a SMBD message with no payload.
+> > > > This is
+> > > required at times when we want to extend credtis to server to have
+> > > it continue to send data, without sending any actual data payload.
+> > >
+> > > Shouldn't this just be implemented as a special case in the version
+> > > that posts data?
+> >
+> > It uses a different packet format "struct smbd_data_transfer_no_data".
+> > I can restructure some common code to share between packet sending
+> functions.
+>=20
+> The SMB Direct keepalive is just a Data Transfer Message with no payload
+> (MS-SMBD section 2.2.3) and the SMB_DIRECT_RESPONSE_REQUESTED flag
+> possibly set.  I don't see any need to define a special structure to desc=
+ribe
+> this?
 
-"cifsrdma.o" is a really confusing choice of names. SMB Direct is only
-possible when the negotiated SMB dialect is SMB3. "CIFS" historically
-means a dialect of SMB1, which many of us would like to see be in
-a separate, and therefore omittable, module. Please use a name
-more indicative of the function, perhaps "smbdirect.o".
+Data Transfer Message has the following extra fields at the end of an empty=
+ packet.
 
-Tom.
+        __le32 padding;
+        char buffer[0];
+
+I agree with you those can be merged to a special structure case. Will make=
+ the change.
+
+>=20
+> Tom.
