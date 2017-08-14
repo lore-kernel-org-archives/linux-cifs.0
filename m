@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Subject: [PATCH v5 01/19] crypto: change transient busy return code to -EAGAIN
-Date: Mon, 14 Aug 2017 18:21:11 +0300
-Message-ID: <1502724094-23305-2-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v5 08/19] crypto: move drbg to generic async completion
+Date: Mon, 14 Aug 2017 18:21:18 +0300
+Message-ID: <1502724094-23305-9-git-send-email-gilad@benyossef.com>
 References: <1502724094-23305-1-git-send-email-gilad@benyossef.com>
 Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
 To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
@@ -27,123 +27,102 @@ In-Reply-To: <1502724094-23305-1-git-send-email-gilad-6S/DczAoZh3WXxRugSxzZg@pub
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The crypto API was using the -EBUSY return value to indicate
-both a hard failure to submit a crypto operation into a
-transformation provider when the latter was busy and the backlog
-mechanism was not enabled as well as a notification that the
-operation was queued into the backlog when the backlog mechanism
-was enabled.
+DRBG is starting an async. crypto op and waiting for it complete.
+Move it over to generic code doing the same.
 
-Having the same return code indicate two very different conditions
-depending on a flag is both error prone and requires extra runtime
-check like the following to discern between the cases:
-
-	if (err == -EINPROGRESS ||
-	    (err == -EBUSY && (ahash_request_flags(req) &
-			       CRYPTO_TFM_REQ_MAY_BACKLOG)))
-
-This patch changes the return code used to indicate a crypto op
-failed due to the transformation provider being transiently busy
-to -EAGAIN.
+The code now also passes CRYPTO_TFM_REQ_MAY_SLEEP flag indicating
+crypto request memory allocation may use GFP_KERNEL which should
+be perfectly fine as the code is obviously sleeping for the
+completion of the request any way.
 
 Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
 ---
- crypto/algapi.c     |  6 ++++--
- crypto/algif_hash.c | 20 +++++++++++++++++---
- crypto/cryptd.c     |  4 +---
- 3 files changed, 22 insertions(+), 8 deletions(-)
+ crypto/drbg.c         | 36 +++++++++---------------------------
+ include/crypto/drbg.h |  3 +--
+ 2 files changed, 10 insertions(+), 29 deletions(-)
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index aa699ff..916bee3 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -897,9 +897,11 @@ int crypto_enqueue_request(struct crypto_queue *queue,
- 	int err = -EINPROGRESS;
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 633a88e..c522251 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -1651,16 +1651,6 @@ static int drbg_fini_sym_kernel(struct drbg_state *drbg)
+ 	return 0;
+ }
  
- 	if (unlikely(queue->qlen >= queue->max_qlen)) {
--		err = -EBUSY;
--		if (!(request->flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
-+		if (!(request->flags & CRYPTO_TFM_REQ_MAY_BACKLOG)) {
-+			err = -EAGAIN;
- 			goto out;
-+		}
-+		err = -EBUSY;
- 		if (queue->backlog == &queue->list)
- 			queue->backlog = &request->list;
- 	}
-diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
-index 5e92bd2..3b3c154 100644
---- a/crypto/algif_hash.c
-+++ b/crypto/algif_hash.c
-@@ -39,6 +39,20 @@ struct algif_hash_tfm {
- 	bool has_key;
- };
- 
-+/* Previous versions of crypto_* ops used to return -EBUSY
-+ * rather than -EAGAIN to indicate being tied up. The in
-+ * kernel API changed but we don't want to break the user
-+ * space API. As only the hash user interface exposed this
-+ * error ever to the user, do the translation here.
-+ */
-+static inline int crypto_user_err(int err)
-+{
-+	if (err == -EAGAIN)
-+		return -EBUSY;
-+
-+	return err;
-+}
-+
- static int hash_alloc_result(struct sock *sk, struct hash_ctx *ctx)
+-static void drbg_skcipher_cb(struct crypto_async_request *req, int error)
+-{
+-	struct drbg_state *drbg = req->data;
+-
+-	if (error == -EINPROGRESS)
+-		return;
+-	drbg->ctr_async_err = error;
+-	complete(&drbg->ctr_completion);
+-}
+-
+ static int drbg_init_sym_kernel(struct drbg_state *drbg)
  {
- 	unsigned ds;
-@@ -136,7 +150,7 @@ static int hash_sendmsg(struct socket *sock, struct msghdr *msg,
- unlock:
- 	release_sock(sk);
+ 	struct crypto_cipher *tfm;
+@@ -1691,7 +1681,7 @@ static int drbg_init_sym_kernel(struct drbg_state *drbg)
+ 		return PTR_ERR(sk_tfm);
+ 	}
+ 	drbg->ctr_handle = sk_tfm;
+-	init_completion(&drbg->ctr_completion);
++	crypto_init_wait(&drbg->ctr_wait);
  
--	return err ?: copied;
-+	return err ? crypto_user_err(err) : copied;
- }
+ 	req = skcipher_request_alloc(sk_tfm, GFP_KERNEL);
+ 	if (!req) {
+@@ -1700,8 +1690,9 @@ static int drbg_init_sym_kernel(struct drbg_state *drbg)
+ 		return -ENOMEM;
+ 	}
+ 	drbg->ctr_req = req;
+-	skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+-					drbg_skcipher_cb, drbg);
++	skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
++						CRYPTO_TFM_REQ_MAY_SLEEP,
++					crypto_req_done, &drbg->ctr_wait);
  
- static ssize_t hash_sendpage(struct socket *sock, struct page *page,
-@@ -188,7 +202,7 @@ static ssize_t hash_sendpage(struct socket *sock, struct page *page,
- unlock:
- 	release_sock(sk);
+ 	alignmask = crypto_skcipher_alignmask(sk_tfm);
+ 	drbg->ctr_null_value_buf = kzalloc(DRBG_CTR_NULL_LEN + alignmask,
+@@ -1762,21 +1753,12 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
+ 		/* Output buffer may not be valid for SGL, use scratchpad */
+ 		skcipher_request_set_crypt(drbg->ctr_req, &sg_in, &sg_out,
+ 					   cryptlen, drbg->V);
+-		ret = crypto_skcipher_encrypt(drbg->ctr_req);
+-		switch (ret) {
+-		case 0:
+-			break;
+-		case -EINPROGRESS:
+-		case -EBUSY:
+-			wait_for_completion(&drbg->ctr_completion);
+-			if (!drbg->ctr_async_err) {
+-				reinit_completion(&drbg->ctr_completion);
+-				break;
+-			}
+-		default:
++		ret = crypto_wait_req(crypto_skcipher_encrypt(drbg->ctr_req),
++					&drbg->ctr_wait);
++		if (ret)
+ 			goto out;
+-		}
+-		init_completion(&drbg->ctr_completion);
++
++		crypto_init_wait(&drbg->ctr_wait);
  
--	return err ?: size;
-+	return err ? crypto_user_err(err) : size;
- }
+ 		memcpy(outbuf, drbg->outscratchpad, cryptlen);
  
- static int hash_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-@@ -236,7 +250,7 @@ static int hash_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
- 	hash_free_result(sk, ctx);
- 	release_sock(sk);
+diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+index 22f884c..8f94110 100644
+--- a/include/crypto/drbg.h
++++ b/include/crypto/drbg.h
+@@ -126,8 +126,7 @@ struct drbg_state {
+ 	__u8 *ctr_null_value;			/* CTR mode aligned zero buf */
+ 	__u8 *outscratchpadbuf;			/* CTR mode output scratchpad */
+         __u8 *outscratchpad;			/* CTR mode aligned outbuf */
+-	struct completion ctr_completion;	/* CTR mode async handler */
+-	int ctr_async_err;			/* CTR mode async error */
++	struct crypto_wait ctr_wait;		/* CTR mode async wait obj */
  
--	return err ?: len;
-+	return err ? crypto_user_err(err) : len;
- }
- 
- static int hash_accept(struct socket *sock, struct socket *newsock, int flags,
-diff --git a/crypto/cryptd.c b/crypto/cryptd.c
-index 0508c48..d1dbdce 100644
---- a/crypto/cryptd.c
-+++ b/crypto/cryptd.c
-@@ -137,16 +137,14 @@ static int cryptd_enqueue_request(struct cryptd_queue *queue,
- 	int cpu, err;
- 	struct cryptd_cpu_queue *cpu_queue;
- 	atomic_t *refcnt;
--	bool may_backlog;
- 
- 	cpu = get_cpu();
- 	cpu_queue = this_cpu_ptr(queue->cpu_queue);
- 	err = crypto_enqueue_request(&cpu_queue->queue, request);
- 
- 	refcnt = crypto_tfm_ctx(request->tfm);
--	may_backlog = request->flags & CRYPTO_TFM_REQ_MAY_BACKLOG;
- 
--	if (err == -EBUSY && !may_backlog)
-+	if (err == -EAGAIN)
- 		goto out_put_cpu;
- 
- 	queue_work_on(cpu, kcrypto_wq, &cpu_queue->work);
+ 	bool seeded;		/* DRBG fully seeded? */
+ 	bool pr;		/* Prediction resistance enabled? */
 -- 
 2.1.4
