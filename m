@@ -1,73 +1,62 @@
-From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: RE: [[PATCH v1] 25/37] [CIFS] SMBD: Support SMBD idle connection
- timer
-Date: Mon, 14 Aug 2017 23:29:38 +0000
-Message-ID: <CY4PR21MB01829CD26D97DF63CAB08666CE8C0@CY4PR21MB0182.namprd21.prod.outlook.com>
+From: Long Li <longli@microsoft.com>
+Subject: RE: [[PATCH v1] 30/37] [CIFS] SMBD: Add SMBDirect transport to
+ Makefile
+Date: Mon, 14 Aug 2017 23:30:56 +0000
+Message-ID: <CY4PR21MB018280229D31930172B21412CE8C0@CY4PR21MB0182.namprd21.prod.outlook.com>
 References: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
- <1501704648-20159-26-git-send-email-longli@exchange.microsoft.com>
- <CY4PR21MB018266B47622680566B48575A08C0@CY4PR21MB0182.namprd21.prod.outlook.com>
+ <1501704648-20159-31-git-send-email-longli@exchange.microsoft.com>
+ <CY4PR21MB0182D411A74EC17CEA5BD63BA08C0@CY4PR21MB0182.namprd21.prod.outlook.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-To: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-        "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CY4PR21MB018266B47622680566B48575A08C0-kUhI0YP1syo7ifcEnHlXec1VXTxX1y3OvxpqHgZTriW3zl9H0oFU5g@public.gmane.org>
+To: Tom Talpey <ttalpey@microsoft.com>,
+        Steve French <sfrench@samba.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CY4PR21MB0182D411A74EC17CEA5BD63BA08C0@CY4PR21MB0182.namprd21.prod.outlook.com>
 Content-Language: en-US
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
 
 
 > -----Original Message-----
 > From: Tom Talpey
-> Sent: Monday, August 14, 2017 2:12 PM
-> To: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>; Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>;
-> linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org; linux-
-> kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> Subject: RE: [[PATCH v1] 25/37] [CIFS] SMBD: Support SMBD idle connection
-> timer
+> Sent: Monday, August 14, 2017 2:20 PM
+> To: Long Li <longli@microsoft.com>; Steve French <sfrench@samba.org>;
+> linux-cifs@vger.kernel.org; samba-technical@lists.samba.org; linux-
+> kernel@vger.kernel.org
+> Subject: RE: [[PATCH v1] 30/37] [CIFS] SMBD: Add SMBDirect transport to
+> Makefile
 >=20
 > > -----Original Message-----
-> > From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [mailto:linux-cifs-
-> > owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org] On Behalf Of Long Li
+> > From: linux-cifs-owner@vger.kernel.org [mailto:linux-cifs-
+> > owner@vger.kernel.org] On Behalf Of Long Li
 > > Sent: Wednesday, August 2, 2017 4:11 PM
-> > To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>; linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org;
-> > samba- technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org; linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> > Subject: [[PATCH v1] 25/37] [CIFS] SMBD: Support SMBD idle connection
-> > timer
+> > To: Steve French <sfrench@samba.org>; linux-cifs@vger.kernel.org;
+> > samba- technical@lists.samba.org; linux-kernel@vger.kernel.org
+> > Cc: Long Li <longli@microsoft.com>
+> > Subject: [[PATCH v1] 30/37] [CIFS] SMBD: Add SMBDirect transport to
+> > Makefile
 > >
-> > +static int keep_alive_interval =3D 120;
+> >  cifs-$(CONFIG_CIFS_SMB2) +=3D smb2ops.o smb2maperror.o
+> smb2transport.o \
+> > -                           smb2misc.o smb2pdu.o smb2inode.o smb2file.o
+> > +                           smb2misc.o smb2pdu.o smb2inode.o
+> > + smb2file.o cifsrdma.o
 >=20
-> This is the recommended value, but not the only possibility.
->=20
-> > @@ -1348,6 +1369,10 @@ struct cifs_rdma_info*
-> cifs_create_rdma_session(
-> >         init_waitqueue_head(&info->wait_send_queue);
-> >         init_waitqueue_head(&info->wait_reassembly_queue);
-> >
-> > +       INIT_DELAYED_WORK(&info->idle_timer_work,
-> idle_connection_timer);
-> > +       schedule_delayed_work(&info->idle_timer_work,
-> > +               info->keep_alive_interval*HZ);
-> > +
->=20
-> This initialization is ok, but the timer should be rescheduled (extended)=
- any
-> time any packet is sent. There is no need to perform keepalives on an act=
-ive
-> SMB Direct connection.
+> "cifsrdma.o" is a really confusing choice of names. SMB Direct is only po=
+ssible
+> when the negotiated SMB dialect is SMB3. "CIFS" historically means a dial=
+ect
+> of SMB1, which many of us would like to see be in a separate, and therefo=
+re
+> omittable, module. Please use a name more indicative of the function,
+> perhaps "smbdirect.o".
 
-My feeling is that rescheduling on a work queue for every packet is sent is=
- not efficient, especially under heavy conditions.
-
-Firing it every 120 seconds doesn't seem to be big waste and may actually s=
-ave some CPU.
+Yes, I will make the naming changes.
 
 >=20
 > Tom.
