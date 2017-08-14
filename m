@@ -1,71 +1,101 @@
-From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: RE: [[PATCH v1] 23/37] [CIFS] SMBD: Implement API for upper layer to
- reconnect transport
-Date: Mon, 14 Aug 2017 23:37:17 +0000
-Message-ID: <CY4PR21MB0182F763422AFCCDB3D88361CE8C0@CY4PR21MB0182.namprd21.prod.outlook.com>
+From: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Subject: RE: [[PATCH v1] 25/37] [CIFS] SMBD: Support SMBD idle connection
+ timer
+Date: Mon, 14 Aug 2017 23:42:13 +0000
+Message-ID: <CY4PR21MB01829585183A42669B962B4AA08C0@CY4PR21MB0182.namprd21.prod.outlook.com>
 References: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
- <1501704648-20159-24-git-send-email-longli@exchange.microsoft.com>
- <CY4PR21MB0182025BB8A39FB3F7291F94A08C0@CY4PR21MB0182.namprd21.prod.outlook.com>
+ <1501704648-20159-26-git-send-email-longli@exchange.microsoft.com>
+ <CY4PR21MB018266B47622680566B48575A08C0@CY4PR21MB0182.namprd21.prod.outlook.com>
+ <CY4PR21MB01829CD26D97DF63CAB08666CE8C0@CY4PR21MB0182.namprd21.prod.outlook.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-To: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+To: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
         "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
         "samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
         "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CY4PR21MB0182025BB8A39FB3F7291F94A08C0-kUhI0YP1syo7ifcEnHlXec1VXTxX1y3OvxpqHgZTriW3zl9H0oFU5g@public.gmane.org>
+In-Reply-To: <CY4PR21MB01829CD26D97DF63CAB08666CE8C0-kUhI0YP1syo7ifcEnHlXec1VXTxX1y3OvxpqHgZTriW3zl9H0oFU5g@public.gmane.org>
 Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-
-
 > -----Original Message-----
-> From: Tom Talpey
-> Sent: Monday, August 14, 2017 2:03 PM
-> To: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>; Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>;
+> From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [mailto:linux-cifs-
+> owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org] On Behalf Of Long Li
+> Sent: Monday, August 14, 2017 7:30 PM
+> To: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>; Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>;
 > linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org; linux-
 > kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> Subject: RE: [[PATCH v1] 23/37] [CIFS] SMBD: Implement API for upper laye=
-r
-> to reconnect transport
+> Subject: RE: [[PATCH v1] 25/37] [CIFS] SMBD: Support SMBD idle connection
+> timer
+>=20
+> [This sender failed our fraud detection checks and may not be who they ap=
+pear
+> to be. Learn about spoofing at http://aka.ms/LearnAboutSpoofing]
 >=20
 > > -----Original Message-----
-> > From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [mailto:linux-cifs-
-> > owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org] On Behalf Of Long Li
-> > Sent: Wednesday, August 2, 2017 4:11 PM
-> > To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>; linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org;
-> > samba- technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org; linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> > From: Tom Talpey
+> > Sent: Monday, August 14, 2017 2:12 PM
+> > To: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>; Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>;
+> > linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org; linux-
+> > kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 > > Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> > Subject: [[PATCH v1] 23/37] [CIFS] SMBD: Implement API for upper layer
-> > to reconnect transport
+> > Subject: RE: [[PATCH v1] 25/37] [CIFS] SMBD: Support SMBD idle connecti=
+on
+> > timer
 > >
-> > +int cifs_reconnect_rdma_session(struct TCP_Server_Info *server) {
-> > +       log_rdma_event("reconnecting rdma session\n");
-> > +
-> > +       // why reconnect while it is still connected?
-> > +       if (server->rdma_ses->transport_status =3D=3D CIFS_RDMA_CONNECT=
-ED)
-> {
-> > +               log_rdma_event("still connected, not reconnecting\n");
-> > +               return -EINVAL;
-> > +       }
+> > > -----Original Message-----
+> > > From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [mailto:linux-cifs-
+> > > owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org] On Behalf Of Long Li
+> > > Sent: Wednesday, August 2, 2017 4:11 PM
+> > > To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>; linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org;
+> > > samba- technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org; linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> > > Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+> > > Subject: [[PATCH v1] 25/37] [CIFS] SMBD: Support SMBD idle connection
+> > > timer
+> > >
+> > > +static int keep_alive_interval =3D 120;
+> >
+> > This is the recommended value, but not the only possibility.
+> >
+> > > @@ -1348,6 +1369,10 @@ struct cifs_rdma_info*
+> > cifs_create_rdma_session(
+> > >         init_waitqueue_head(&info->wait_send_queue);
+> > >         init_waitqueue_head(&info->wait_reassembly_queue);
+> > >
+> > > +       INIT_DELAYED_WORK(&info->idle_timer_work,
+> > idle_connection_timer);
+> > > +       schedule_delayed_work(&info->idle_timer_work,
+> > > +               info->keep_alive_interval*HZ);
+> > > +
+> >
+> > This initialization is ok, but the timer should be rescheduled (extende=
+d) any
+> > time any packet is sent. There is no need to perform keepalives on an a=
+ctive
+> > SMB Direct connection.
 >=20
-> Why is this check needed?
+> My feeling is that rescheduling on a work queue for every packet is sent =
+is not
+> efficient, especially under heavy conditions.
 
-This was used in early stage of development. It's probably not needed anymo=
-re. Will look into this.
+That's not what I was suggesting. Cant the timer simply be re-extended to t=
+he
+120-second interval? I.e. on an active connection, it will never fire becau=
+se it's
+always advancing.
+
+As defined here, it will go off and send a keepalive every 120 seconds. The
+idle_connection_timer() routine unconditionally sends it.
 
 >=20
-> > +
-> > +       // wait until the transport is destroyed
-> > +       while (server->rdma_ses->transport_status !=3D
-> CIFS_RDMA_DESTROYED)
-> > +               msleep(1);
->=20
-> Polling!? Please plan to implement a proper handshake for connection logi=
-c.
+> Firing it every 120 seconds doesn't seem to be big waste and may actually=
+ save
+> some CPU.
 
-Will look into using wait queue.
+Firing the timer, no big deal. Sending the packets and requiring the peer t=
+o process
+them too, disagree.
+
+Tom.
