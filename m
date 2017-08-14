@@ -1,9 +1,9 @@
 From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Subject: [PATCH v5 04/19] crypto: marvell/cesa: remove redundant backlog checks on EBUSY
-Date: Mon, 14 Aug 2017 18:21:14 +0300
-Message-ID: <1502724094-23305-5-git-send-email-gilad__3399.99794164232$1502724678$gmane$org@benyossef.com>
+Subject: [PATCH v5 05/19] crypto: introduce crypto wait for async op
+Date: Mon, 14 Aug 2017 18:21:15 +0300
+Message-ID: <1502724094-23305-6-git-send-email-gilad__26737.5146308497$1502724678$gmane$org@benyossef.com>
 References: <1502724094-23305-1-git-send-email-gilad@benyossef.com>
-Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
+Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>, Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
         "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
         Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
@@ -27,42 +27,115 @@ In-Reply-To: <1502724094-23305-1-git-send-email-gilad-6S/DczAoZh3WXxRugSxzZg@pub
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Now that -EBUSY return code only indicates backlog queueing
-we can safely remove the now redundant check for the
-CRYPTO_TFM_REQ_MAY_BACKLOG flag when -EBUSY is returned.
+Invoking a possibly async. crypto op and waiting for completion
+while correctly handling backlog processing is a common task
+in the crypto API implementation and outside users of it.
+
+This patch adds a generic implementation for doing so in
+preparation for using it across the board instead of hand
+rolled versions.
 
 Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+CC: Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- drivers/crypto/marvell/cesa.c | 3 +--
- drivers/crypto/marvell/cesa.h | 2 +-
- 2 files changed, 2 insertions(+), 3 deletions(-)
+ crypto/api.c           | 13 +++++++++++++
+ include/linux/crypto.h | 41 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 54 insertions(+)
 
-diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
-index 6e7a5c7..269737f 100644
---- a/drivers/crypto/marvell/cesa.c
-+++ b/drivers/crypto/marvell/cesa.c
-@@ -183,8 +183,7 @@ int mv_cesa_queue_req(struct crypto_async_request *req,
- 	spin_lock_bh(&engine->lock);
- 	ret = crypto_enqueue_request(&engine->queue, req);
- 	if ((mv_cesa_req_get_type(creq) == CESA_DMA_REQ) &&
--	    (ret == -EINPROGRESS ||
--	    (ret == -EBUSY && req->flags & CRYPTO_TFM_REQ_MAY_BACKLOG)))
-+	    (ret == -EINPROGRESS || ret == -EBUSY)
- 		mv_cesa_tdma_chain(engine, creq);
- 	spin_unlock_bh(&engine->lock);
+diff --git a/crypto/api.c b/crypto/api.c
+index 941cd4c..2a2479d 100644
+--- a/crypto/api.c
++++ b/crypto/api.c
+@@ -24,6 +24,7 @@
+ #include <linux/sched/signal.h>
+ #include <linux/slab.h>
+ #include <linux/string.h>
++#include <linux/completion.h>
+ #include "internal.h"
  
-diff --git a/drivers/crypto/marvell/cesa.h b/drivers/crypto/marvell/cesa.h
-index b7872f6..63c8457 100644
---- a/drivers/crypto/marvell/cesa.h
-+++ b/drivers/crypto/marvell/cesa.h
-@@ -763,7 +763,7 @@ static inline int mv_cesa_req_needs_cleanup(struct crypto_async_request *req,
- 	 * the backlog and will be processed later. There's no need to
- 	 * clean it up.
- 	 */
--	if (ret == -EBUSY && req->flags & CRYPTO_TFM_REQ_MAY_BACKLOG)
-+	if (ret == -EBUSY)
- 		return false;
+ LIST_HEAD(crypto_alg_list);
+@@ -595,5 +596,17 @@ int crypto_has_alg(const char *name, u32 type, u32 mask)
+ }
+ EXPORT_SYMBOL_GPL(crypto_has_alg);
  
- 	/* Request wasn't queued, we need to clean it up */
++void crypto_req_done(struct crypto_async_request *req, int err)
++{
++	struct crypto_wait *wait = req->data;
++
++	if (err == -EINPROGRESS)
++		return;
++
++	wait->err = err;
++	complete(&wait->completion);
++}
++EXPORT_SYMBOL_GPL(crypto_req_done);
++
+ MODULE_DESCRIPTION("Cryptographic core API");
+ MODULE_LICENSE("GPL");
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 84da997..bb00186 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -24,6 +24,7 @@
+ #include <linux/slab.h>
+ #include <linux/string.h>
+ #include <linux/uaccess.h>
++#include <linux/completion.h>
+ 
+ /*
+  * Autoloaded crypto modules should only use a prefixed name to avoid allowing
+@@ -468,6 +469,45 @@ struct crypto_alg {
+ } CRYPTO_MINALIGN_ATTR;
+ 
+ /*
++ * A helper struct for waiting for completion of async crypto ops
++ */
++struct crypto_wait {
++	struct completion completion;
++	int err;
++};
++
++/*
++ * Macro for declaring a crypto op async wait object on stack
++ */
++#define DECLARE_CRYPTO_WAIT(_wait) \
++	struct crypto_wait _wait = { \
++		COMPLETION_INITIALIZER_ONSTACK((_wait).completion), 0 }
++
++/*
++ * Async ops completion helper functioons
++ */
++void crypto_req_done(struct crypto_async_request *req, int err);
++
++static inline int crypto_wait_req(int err, struct crypto_wait *wait)
++{
++	switch (err) {
++	case -EINPROGRESS:
++	case -EBUSY:
++		wait_for_completion(&wait->completion);
++		reinit_completion(&wait->completion);
++		err = wait->err;
++		break;
++	};
++
++	return err;
++}
++
++static inline void crypto_init_wait(struct crypto_wait *wait)
++{
++	init_completion(&wait->completion);
++}
++
++/*
+  * Algorithm registration interface.
+  */
+ int crypto_register_alg(struct crypto_alg *alg);
+@@ -1604,5 +1644,6 @@ static inline int crypto_comp_decompress(struct crypto_comp *tfm,
+ 						    src, slen, dst, dlen);
+ }
+ 
++
+ #endif	/* _LINUX_CRYPTO_H */
+ 
 -- 
 2.1.4
