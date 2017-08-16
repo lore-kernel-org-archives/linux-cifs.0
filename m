@@ -1,29 +1,127 @@
-From: Robin <beanow-1RVBLsOYap9hl2p70BpVqQ@public.gmane.org>
-Subject: [4.13] Bad error message, old SMB protocol host.
-Date: Tue, 15 Aug 2017 11:11:38 +0200
-Message-ID: <d236d2ff-da83-efce-51a3-d480e140ecf2@oscp.info>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Language: en-US
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH v2] KEYS: make keyctl_invalidate() also require Setattr permission
+Date: Wed, 16 Aug 2017 14:14:03 -0700
+Message-ID: <20170816211403.121920-1-ebiggers3@gmail.com>
+Cc: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fscrypt-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Gwendal Grignou <gwendal-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>,
+        Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Paul Crowley <paulcrowley-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>,
+        Richard Weinberger <richard-/L3Ra7n9ekc@public.gmane.org>,
+        Ryo Hashimoto <hashimoto-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>,
+        Tyler Hicks <tyhicks-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>, stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-When trying to mount an older SMB host share, the errors cifs produces 
-are very cryptic. Such as
-CIFS VFS: cifs_mount failed w/return code = -112
+From: Eric Biggers <ebiggers-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>
 
-Or
-mount: mount //192.168.1.123/path/ on /mnt/path failed: Host is down
+Currently, a process only needs Search permission on a key to invalidate
+it with keyctl_invalidate(), which has an effect similar to unlinking it
+from all keyrings.  Unfortunately, this significantly compromises the
+keys permission system because as a result, there is no way to grant
+read-only access to keys without also granting de-facto "delete" access.
+Even worse, processes may invalidate entire _keyrings_, given only
+permission to "search" them.  It is not even possible to block this
+using SELinux, because SELinux is likewise only asked for Search
+permission, which needs to be allowed for read-only access.
 
-I reported this issue as a regression at first.
-https://bugzilla.kernel.org/show_bug.cgi?id=196599
-Thinking that cifs was just plain broken in this kernel as gvfs mounted 
-the same share just fine.
+Key invalidation seems to have intended for cases where keyrings are
+used as caches, and keys can be re-requested at any time by an upcall to
+/sbin/request-key.  However, keyrings are not always used in this way.
+For example, users of filesystem-level encryption (EXT4, F2FS, and/or
+UBIFS encryption) usually wish to grant many differently-privileged
+processes access to the same keys, set up in a shared keyring ahead of
+time.  Permitting everyone to invalidate keys in this scenario enables a
+trivial denial-of-service.  And even users of keyrings as "just caches"
+may wish to restrict invalidation because it may require significant
+work or user interaction to regenerate keys.
 
-Can this protocol mismatch scenario have it's own, more informative 
-error message?
-As this will likely effect more people when this change reaches the bulk 
-of users.
+This patch fixes the flaw by requiring both Search and Setattr
+permission to invalidate a key rather than just Search permission.
+Requiring Setattr permission is appropriate because Setattr permission
+also allows revoking (via keyctl_revoke()) or expiring (via
+keyctl_set_timeout()) the key, which also make the key inaccessible
+regardless of how many keyrings it is in.  Continuing to require Search
+permission ensures we do not decrease the level of permissions required.
+
+Alternatively, the problem could be solved by requiring Write
+permission.  However, that would be less appropriate because Write
+permission is ostensibly meant to deal with the key payload, not the key
+itself.  A new "Invalidate" permission would also work, but that would
+require keyctl_setperm() users to start including a new permission which
+never existed before, which would be much more likely to break users of
+keyctl_invalidate().  Finally, we could only allow invalidating keys
+which the kernel has explicitly marked as invalidatible, e.g. the
+"id_resolver" keys created for NFSv4 ID mapping.  However, that likewise
+would be much more likely to break users.
+
+This is a user-visible API change.  But we don't seem to have much
+choice, and any breakage will be limited to users who override the
+default key permissions using keyctl_setperm() to remove Setattr
+permission, then later call keyctl_invalidate().  There are probably not
+many such users, possibly even none at all.  In fact, the only users of
+keyctl_invalidate() I could find are nfsidmap and the Chromium OS
+cryptohome daemon.  nfsidmap will be unaffected because it runs as root
+and actually relies on the "root is permitted to invalidate certain
+special keys" exception (KEY_FLAG_ROOT_CAN_INVAL) rather than the actual
+key permissions.  cryptohomed will be unaffected because it already owns
+the keys and sets KEY_USR_SETATTR permission on them.
+
+Cc: linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: linux-fscrypt-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: Gwendal Grignou <gwendal-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>
+Cc: Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Cc: Paul Crowley <paulcrowley-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>
+Cc: Richard Weinberger <richard-/L3Ra7n9ekc@public.gmane.org>
+Cc: Ryo Hashimoto <hashimoto-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>
+Cc: Tyler Hicks <tyhicks-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+Cc: stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org # v3.5+
+Signed-off-by: Eric Biggers <ebiggers-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>
+---
+ Documentation/security/keys/core.rst | 4 ++--
+ security/keys/keyctl.c               | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/Documentation/security/keys/core.rst b/Documentation/security/keys/core.rst
+index 1648fa80b3bf..c8030f628810 100644
+--- a/Documentation/security/keys/core.rst
++++ b/Documentation/security/keys/core.rst
+@@ -815,8 +815,8 @@ The keyctl syscall functions are:
+      immediately, though they are still visible in /proc/keys until deleted
+      (they're marked with an 'i' flag).
+ 
+-     A process must have search permission on the key for this function to be
+-     successful.
++     A process must have Search and Setattr permission on the key for this
++     function to be successful.
+ 
+   *  Compute a Diffie-Hellman shared secret or public key::
+ 
+diff --git a/security/keys/keyctl.c b/security/keys/keyctl.c
+index ab0b337c84b4..0739e7934e74 100644
+--- a/security/keys/keyctl.c
++++ b/security/keys/keyctl.c
+@@ -400,7 +400,7 @@ long keyctl_revoke_key(key_serial_t id)
+ /*
+  * Invalidate a key.
+  *
+- * The key must be grant the caller Invalidate permission for this to work.
++ * The key must grant the caller Search and Setattr permission for this to work.
+  * The key and any links to the key will be automatically garbage collected
+  * immediately.
+  *
+@@ -416,7 +416,7 @@ long keyctl_invalidate_key(key_serial_t id)
+ 
+ 	kenter("%d", id);
+ 
+-	key_ref = lookup_user_key(id, 0, KEY_NEED_SEARCH);
++	key_ref = lookup_user_key(id, 0, KEY_NEED_SEARCH | KEY_NEED_SETATTR);
+ 	if (IS_ERR(key_ref)) {
+ 		ret = PTR_ERR(key_ref);
+ 
+-- 
+2.14.1.480.gb18f417b89-goog
