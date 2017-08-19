@@ -1,267 +1,269 @@
-From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 1/2] cifs: Add support for reading attributes on SMB2+
-Date: Fri, 18 Aug 2017 15:07:53 +1000
-Message-ID: <20170818050754.24425-2-lsahlber@redhat.com>
-References: <20170818050754.24425-1-lsahlber@redhat.com>
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Linux CIFS mailing list <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170818050754.24425-1-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Mikulas Patocka <mpatocka@redhat.com>
+Subject: Re: [dm-devel] [PATCH v5 12/19] dm: move dm-verity to generic async
+ completion
+Date: Sat, 19 Aug 2017 16:08:02 -0400 (EDT)
+Message-ID: <alpine.LRH.2.02.1708191605370.2380@file01.intranet.prod.int.rdu2.redhat.com>
+References: <1502724094-23305-1-git-send-email-gilad@benyossef.com> <1502724094-23305-13-git-send-email-gilad@benyossef.com>
+Mime-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>,
+        Boris Brezillon <boris.brezillon@free-electrons.com>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <james.l.morris@oracle.com>,
+        "Serge E. Hallyn" <serge@hallyn.com>, linux-crypto@v
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+In-Reply-To: <1502724094-23305-13-git-send-email-gilad@benyossef.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-SMB1 already has support to read attributes. This adds similar support
-to SMB2+.
 
-With this patch, tools such as 'getfattr' will now work with SMB2+ shares.
 
-RH-bz: 1110709
+On Mon, 14 Aug 2017, Gilad Ben-Yossef wrote:
 
-Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/smb2ops.c   | 141 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2pdu.c   |  12 +++++
- fs/cifs/smb2pdu.h   |  10 ++++
- fs/cifs/smb2proto.h |   3 ++
- 4 files changed, 166 insertions(+)
+> dm-verity is starting async. crypto ops and waiting for them to complete.
+> Move it over to generic code doing the same.
+> 
+> This also fixes a possible data coruption bug created by the
+> use of wait_for_completion_interruptible() without dealing
+> correctly with an interrupt aborting the wait prior to the
+> async op finishing.
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index cfacf2c97e94..f31d600fd41d 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -426,6 +426,135 @@ smb2_query_file_info(const unsigned int xid, struct cifs_tcon *tcon,
- 	return rc;
- }
- 
-+static ssize_t
-+move_smb2_ea_to_cifs(char *dst, size_t dst_size,
-+		     struct smb2_file_full_ea_info *src, size_t src_size,
-+		     const unsigned char *ea_name)
-+{
-+	int rc = 0;
-+	unsigned int ea_name_len = ea_name ? strlen(ea_name) : 0;
-+
-+	while (src_size > 0) {
-+		char *name = &src->EaData[0];
-+		size_t name_len = (size_t)src->EaNameLength;
-+		char *value = &src->EaData[src->EaNameLength + 1];
-+		size_t value_len = (size_t)src->EaValueLength;
-+
-+		if (name_len == 0) {
-+			break;
-+		}
-+
-+		if (src_size < 8 + name_len + 1 + value_len) {
-+			cifs_dbg(FYI, "EA entry goes beyond length of list\n");
-+			rc = -EIO;
-+			goto QAllEAsOut;
-+		}
-+
-+		if (ea_name) {
-+			if (ea_name_len == name_len &&
-+			    memcmp(ea_name, name, name_len) == 0) {
-+				rc = value_len;
-+				if (dst_size == 0)
-+					goto QAllEAsOut;
-+				if (dst_size < value_len) {
-+					rc = -ERANGE;
-+					goto QAllEAsOut;
-+				}
-+				memcpy(dst, value, value_len);
-+				goto QAllEAsOut;
-+			}
-+		} else {
-+			/* 'user.' plus a terminating null */
-+			size_t user_name_len = 5 + 1 + name_len;
-+
-+			rc += user_name_len;
-+
-+			if (dst_size >= user_name_len) {
-+				dst_size -= user_name_len;
-+				memcpy(dst, "user.", 5);
-+				dst += 5;
-+				memcpy(dst, src->EaData, name_len);
-+				dst += name_len;
-+				*dst = 0;
-+				++dst;
-+			} else if (dst_size == 0) {
-+				/* skip copy - calc size only */
-+			} else {
-+				/* stop before overrun buffer */
-+				rc = -ERANGE;
-+				break;
-+			}
-+		}
-+
-+		if (!src->NextEntryOffset)
-+			break;
-+
-+		if (src_size < src->NextEntryOffset) {
-+			/* stop before overrun buffer */
-+			rc = -ERANGE;
-+			break;
-+		}
-+		src_size -= src->NextEntryOffset;
-+		src = (void *)((char *)src + src->NextEntryOffset);
-+	}
-+
-+	/* didn't find the named attribute */
-+	if (ea_name)
-+		rc = -ENODATA;
-+
-+QAllEAsOut:
-+	return (ssize_t)rc;
-+}
-+
-+static ssize_t
-+smb2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
-+	       const unsigned char *searchName, const unsigned char *ea_name,
-+	       char *EAData, size_t buf_size,
-+	       struct cifs_sb_info *cifs_sb)
-+{
-+	int rc;
-+	__le16 *utf16_path;
-+	__u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
-+	struct cifs_open_parms oparms;
-+	struct cifs_fid fid;
-+	struct smb2_file_full_ea_info *smb2_data;
-+
-+	utf16_path = cifs_convert_path_to_utf16(searchName, cifs_sb);
-+	if (!utf16_path)
-+		return -ENOMEM;
-+
-+	oparms.tcon = tcon;
-+	oparms.desired_access = FILE_READ_EA;
-+	oparms.disposition = FILE_OPEN;
-+	oparms.create_options = 0;
-+	oparms.fid = &fid;
-+	oparms.reconnect = false;
-+
-+	rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL);
-+	kfree(utf16_path);
-+	if (rc) {
-+		cifs_dbg(FYI, "open failed rc=%d\n", rc);
-+		return rc;
-+	}
-+
-+	smb2_data = kzalloc(SMB2_MAX_EA_BUF, GFP_KERNEL);
-+	if (smb2_data == NULL) {
-+		SMB2_close(xid, tcon, fid.persistent_fid, fid.volatile_fid);
-+		return -ENOMEM;
-+	}
-+
-+	rc = SMB2_query_eas(xid, tcon, fid.persistent_fid, fid.volatile_fid,
-+			    smb2_data);
-+	SMB2_close(xid, tcon, fid.persistent_fid, fid.volatile_fid);
-+
-+	if (!rc)
-+		rc = move_smb2_ea_to_cifs(EAData, buf_size, smb2_data,
-+					  SMB2_MAX_EA_BUF, ea_name);
-+
-+	kfree(smb2_data);
-+	return rc;
-+}
-+
- static bool
- smb2_can_echo(struct TCP_Server_Info *server)
- {
-@@ -2572,6 +2701,9 @@ struct smb_version_operations smb20_operations = {
- 	.dir_needs_close = smb2_dir_needs_close,
- 	.get_dfs_refer = smb2_get_dfs_refer,
- 	.select_sectype = smb2_select_sectype,
-+#ifdef CONFIG_CIFS_XATTR
-+	.query_all_EAs = smb2_query_eas,
-+#endif /* CIFS_XATTR */
- #ifdef CONFIG_CIFS_ACL
- 	.get_acl = get_smb2_acl,
- 	.get_acl_by_fid = get_smb2_acl_by_fid,
-@@ -2662,6 +2794,9 @@ struct smb_version_operations smb21_operations = {
- 	.enum_snapshots = smb3_enum_snapshots,
- 	.get_dfs_refer = smb2_get_dfs_refer,
- 	.select_sectype = smb2_select_sectype,
-+#ifdef CONFIG_CIFS_XATTR
-+	.query_all_EAs = smb2_query_eas,
-+#endif /* CIFS_XATTR */
- #ifdef CONFIG_CIFS_ACL
- 	.get_acl = get_smb2_acl,
- 	.get_acl_by_fid = get_smb2_acl_by_fid,
-@@ -2762,6 +2897,9 @@ struct smb_version_operations smb30_operations = {
- 	.receive_transform = smb3_receive_transform,
- 	.get_dfs_refer = smb2_get_dfs_refer,
- 	.select_sectype = smb2_select_sectype,
-+#ifdef CONFIG_CIFS_XATTR
-+	.query_all_EAs = smb2_query_eas,
-+#endif /* CIFS_XATTR */
- #ifdef CONFIG_CIFS_ACL
- 	.get_acl = get_smb2_acl,
- 	.get_acl_by_fid = get_smb2_acl_by_fid,
-@@ -2863,6 +3001,9 @@ struct smb_version_operations smb311_operations = {
- 	.receive_transform = smb3_receive_transform,
- 	.get_dfs_refer = smb2_get_dfs_refer,
- 	.select_sectype = smb2_select_sectype,
-+#ifdef CONFIG_CIFS_XATTR
-+	.query_all_EAs = smb2_query_eas,
-+#endif /* CIFS_XATTR */
- };
- #endif /* CIFS_SMB311 */
- 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 5fb2fc2d0080..30ef93e459a9 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -2140,6 +2140,18 @@ query_info(const unsigned int xid, struct cifs_tcon *tcon,
- 	return rc;
- }
- 
-+int SMB2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
-+	u64 persistent_fid, u64 volatile_fid,
-+	struct smb2_file_full_ea_info *data)
-+{
-+	return query_info(xid, tcon, persistent_fid, volatile_fid,
-+			  FILE_FULL_EA_INFORMATION, SMB2_O_INFO_FILE, 0,
-+			  SMB2_MAX_EA_BUF,
-+			  sizeof(struct smb2_file_full_ea_info),
-+			  (void **)&data,
-+			  NULL);
-+}
-+
- int SMB2_query_info(const unsigned int xid, struct cifs_tcon *tcon,
- 	u64 persistent_fid, u64 volatile_fid, struct smb2_file_all_info *data)
- {
-diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 18700fd25a0b..3c62f29626a9 100644
---- a/fs/cifs/smb2pdu.h
-+++ b/fs/cifs/smb2pdu.h
-@@ -1178,6 +1178,16 @@ struct smb2_file_link_info { /* encoding of request for level 11 */
- 	char   FileName[0];     /* Name to be assigned to new link */
- } __packed; /* level 11 Set */
- 
-+#define SMB2_MAX_EA_BUF 2048
-+
-+struct smb2_file_full_ea_info { /* encoding of response for level 15 */
-+	__le32 NextEntryOffset;
-+	__u8   Flags;
-+	__u8   EaNameLength;
-+	__u16  EaValueLength;
-+	char   EaData[0]; /* \0 terminated name plus value */
-+} __packed; /* level 15 Set */
-+
- /*
-  * This level 18, although with struct with same name is different from cifs
-  * level 0x107. Level 0x107 has an extra u64 between AccessFlags and
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index 1cadaf9f3c58..183389bfc8f6 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -132,6 +132,9 @@ extern int SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
- 		      u64 persistent_file_id, u64 volatile_file_id);
- extern int SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon,
- 		      u64 persistent_file_id, u64 volatile_file_id);
-+extern int SMB2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
-+			  u64 persistent_file_id, u64 volatile_file_id,
-+			  struct smb2_file_full_ea_info *data);
- extern int SMB2_query_info(const unsigned int xid, struct cifs_tcon *tcon,
- 			   u64 persistent_file_id, u64 volatile_file_id,
- 			   struct smb2_file_all_info *data);
--- 
-2.13.3
+What is the exact problem there? The interruptible sleep is called from a 
+workqueue and workqueues have all signals blocked. Are signals unblocked 
+for some reason there?
+
+Should there be another patch for stable kernels that fixes the 
+interruptible sleep?
+
+Mikulas
+
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> ---
+>  drivers/md/dm-verity-target.c | 81 +++++++++++--------------------------------
+>  drivers/md/dm-verity.h        |  5 ---
+>  2 files changed, 20 insertions(+), 66 deletions(-)
+> 
+> diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
+> index 79f18d4..8df08a8 100644
+> --- a/drivers/md/dm-verity-target.c
+> +++ b/drivers/md/dm-verity-target.c
+> @@ -92,74 +92,33 @@ static sector_t verity_position_at_level(struct dm_verity *v, sector_t block,
+>  	return block >> (level * v->hash_per_block_bits);
+>  }
+>  
+> -/*
+> - * Callback function for asynchrnous crypto API completion notification
+> - */
+> -static void verity_op_done(struct crypto_async_request *base, int err)
+> -{
+> -	struct verity_result *res = (struct verity_result *)base->data;
+> -
+> -	if (err == -EINPROGRESS)
+> -		return;
+> -
+> -	res->err = err;
+> -	complete(&res->completion);
+> -}
+> -
+> -/*
+> - * Wait for async crypto API callback
+> - */
+> -static inline int verity_complete_op(struct verity_result *res, int ret)
+> -{
+> -	switch (ret) {
+> -	case 0:
+> -		break;
+> -
+> -	case -EINPROGRESS:
+> -	case -EBUSY:
+> -		ret = wait_for_completion_interruptible(&res->completion);
+> -		if (!ret)
+> -			ret = res->err;
+> -		reinit_completion(&res->completion);
+> -		break;
+> -
+> -	default:
+> -		DMERR("verity_wait_hash: crypto op submission failed: %d", ret);
+> -	}
+> -
+> -	if (unlikely(ret < 0))
+> -		DMERR("verity_wait_hash: crypto op failed: %d", ret);
+> -
+> -	return ret;
+> -}
+> -
+>  static int verity_hash_update(struct dm_verity *v, struct ahash_request *req,
+>  				const u8 *data, size_t len,
+> -				struct verity_result *res)
+> +				struct crypto_wait *wait)
+>  {
+>  	struct scatterlist sg;
+>  
+>  	sg_init_one(&sg, data, len);
+>  	ahash_request_set_crypt(req, &sg, NULL, len);
+>  
+> -	return verity_complete_op(res, crypto_ahash_update(req));
+> +	return crypto_wait_req(crypto_ahash_update(req), wait);
+>  }
+>  
+>  /*
+>   * Wrapper for crypto_ahash_init, which handles verity salting.
+>   */
+>  static int verity_hash_init(struct dm_verity *v, struct ahash_request *req,
+> -				struct verity_result *res)
+> +				struct crypto_wait *wait)
+>  {
+>  	int r;
+>  
+>  	ahash_request_set_tfm(req, v->tfm);
+>  	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP |
+>  					CRYPTO_TFM_REQ_MAY_BACKLOG,
+> -					verity_op_done, (void *)res);
+> -	init_completion(&res->completion);
+> +					crypto_req_done, (void *)wait);
+> +	crypto_init_wait(wait);
+>  
+> -	r = verity_complete_op(res, crypto_ahash_init(req));
+> +	r = crypto_wait_req(crypto_ahash_init(req), wait);
+>  
+>  	if (unlikely(r < 0)) {
+>  		DMERR("crypto_ahash_init failed: %d", r);
+> @@ -167,18 +126,18 @@ static int verity_hash_init(struct dm_verity *v, struct ahash_request *req,
+>  	}
+>  
+>  	if (likely(v->salt_size && (v->version >= 1)))
+> -		r = verity_hash_update(v, req, v->salt, v->salt_size, res);
+> +		r = verity_hash_update(v, req, v->salt, v->salt_size, wait);
+>  
+>  	return r;
+>  }
+>  
+>  static int verity_hash_final(struct dm_verity *v, struct ahash_request *req,
+> -			     u8 *digest, struct verity_result *res)
+> +			     u8 *digest, struct crypto_wait *wait)
+>  {
+>  	int r;
+>  
+>  	if (unlikely(v->salt_size && (!v->version))) {
+> -		r = verity_hash_update(v, req, v->salt, v->salt_size, res);
+> +		r = verity_hash_update(v, req, v->salt, v->salt_size, wait);
+>  
+>  		if (r < 0) {
+>  			DMERR("verity_hash_final failed updating salt: %d", r);
+> @@ -187,7 +146,7 @@ static int verity_hash_final(struct dm_verity *v, struct ahash_request *req,
+>  	}
+>  
+>  	ahash_request_set_crypt(req, NULL, digest, 0);
+> -	r = verity_complete_op(res, crypto_ahash_final(req));
+> +	r = crypto_wait_req(crypto_ahash_final(req), wait);
+>  out:
+>  	return r;
+>  }
+> @@ -196,17 +155,17 @@ int verity_hash(struct dm_verity *v, struct ahash_request *req,
+>  		const u8 *data, size_t len, u8 *digest)
+>  {
+>  	int r;
+> -	struct verity_result res;
+> +	struct crypto_wait wait;
+>  
+> -	r = verity_hash_init(v, req, &res);
+> +	r = verity_hash_init(v, req, &wait);
+>  	if (unlikely(r < 0))
+>  		goto out;
+>  
+> -	r = verity_hash_update(v, req, data, len, &res);
+> +	r = verity_hash_update(v, req, data, len, &wait);
+>  	if (unlikely(r < 0))
+>  		goto out;
+>  
+> -	r = verity_hash_final(v, req, digest, &res);
+> +	r = verity_hash_final(v, req, digest, &wait);
+>  
+>  out:
+>  	return r;
+> @@ -389,7 +348,7 @@ int verity_hash_for_block(struct dm_verity *v, struct dm_verity_io *io,
+>   * Calculates the digest for the given bio
+>   */
+>  int verity_for_io_block(struct dm_verity *v, struct dm_verity_io *io,
+> -			struct bvec_iter *iter, struct verity_result *res)
+> +			struct bvec_iter *iter, struct crypto_wait *wait)
+>  {
+>  	unsigned int todo = 1 << v->data_dev_block_bits;
+>  	struct bio *bio = dm_bio_from_per_bio_data(io, v->ti->per_io_data_size);
+> @@ -414,7 +373,7 @@ int verity_for_io_block(struct dm_verity *v, struct dm_verity_io *io,
+>  		 */
+>  		sg_set_page(&sg, bv.bv_page, len, bv.bv_offset);
+>  		ahash_request_set_crypt(req, &sg, NULL, len);
+> -		r = verity_complete_op(res, crypto_ahash_update(req));
+> +		r = crypto_wait_req(crypto_ahash_update(req), wait);
+>  
+>  		if (unlikely(r < 0)) {
+>  			DMERR("verity_for_io_block crypto op failed: %d", r);
+> @@ -482,7 +441,7 @@ static int verity_verify_io(struct dm_verity_io *io)
+>  	struct dm_verity *v = io->v;
+>  	struct bvec_iter start;
+>  	unsigned b;
+> -	struct verity_result res;
+> +	struct crypto_wait wait;
+>  
+>  	for (b = 0; b < io->n_blocks; b++) {
+>  		int r;
+> @@ -507,17 +466,17 @@ static int verity_verify_io(struct dm_verity_io *io)
+>  			continue;
+>  		}
+>  
+> -		r = verity_hash_init(v, req, &res);
+> +		r = verity_hash_init(v, req, &wait);
+>  		if (unlikely(r < 0))
+>  			return r;
+>  
+>  		start = io->iter;
+> -		r = verity_for_io_block(v, io, &io->iter, &res);
+> +		r = verity_for_io_block(v, io, &io->iter, &wait);
+>  		if (unlikely(r < 0))
+>  			return r;
+>  
+>  		r = verity_hash_final(v, req, verity_io_real_digest(v, io),
+> -					&res);
+> +					&wait);
+>  		if (unlikely(r < 0))
+>  			return r;
+>  
+> diff --git a/drivers/md/dm-verity.h b/drivers/md/dm-verity.h
+> index a59e0ad..b675bc0 100644
+> --- a/drivers/md/dm-verity.h
+> +++ b/drivers/md/dm-verity.h
+> @@ -90,11 +90,6 @@ struct dm_verity_io {
+>  	 */
+>  };
+>  
+> -struct verity_result {
+> -	struct completion completion;
+> -	int err;
+> -};
+> -
+>  static inline struct ahash_request *verity_io_hash_req(struct dm_verity *v,
+>  						     struct dm_verity_io *io)
+>  {
+> -- 
+> 2.1.4
+> 
+> --
+> dm-devel mailing list
+> dm-devel@redhat.com
+> https://www.redhat.com/mailman/listinfo/dm-devel
+> 
