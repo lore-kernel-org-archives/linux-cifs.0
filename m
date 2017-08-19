@@ -1,269 +1,171 @@
-From: Mikulas Patocka <mpatocka@redhat.com>
-Subject: Re: [dm-devel] [PATCH v5 12/19] dm: move dm-verity to generic async
- completion
-Date: Sat, 19 Aug 2017 16:08:02 -0400 (EDT)
-Message-ID: <alpine.LRH.2.02.1708191605370.2380@file01.intranet.prod.int.rdu2.redhat.com>
-References: <1502724094-23305-1-git-send-email-gilad@benyossef.com> <1502724094-23305-13-git-send-email-gilad@benyossef.com>
+From: Long Li <longli@microsoft.com>
+Subject: RE: [[PATCH v1] 07/37] [CIFS] SMBD: Implement receive buffer for
+ handling SMBD response
+Date: Sat, 19 Aug 2017 23:41:08 +0000
+Message-ID: <MWHPR21MB0190630AFAD0054F60945005CE810@MWHPR21MB0190.namprd21.prod.outlook.com>
+References: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
+ <1501704648-20159-8-git-send-email-longli@exchange.microsoft.com>
+ <CY4PR21MB0182912142A7AA71C981E3FDA08C0@CY4PR21MB0182.namprd21.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <james.l.morris@oracle.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>, linux-crypto@v
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-In-Reply-To: <1502724094-23305-13-git-send-email-gilad@benyossef.com>
-Sender: linux-crypto-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+To: Tom Talpey <ttalpey@microsoft.com>,
+        Steve French <sfrench@samba.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CY4PR21MB0182912142A7AA71C981E3FDA08C0@CY4PR21MB0182.namprd21.prod.outlook.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
 
 
-On Mon, 14 Aug 2017, Gilad Ben-Yossef wrote:
+> -----Original Message-----
+> From: Tom Talpey
+> Sent: Monday, August 14, 2017 1:09 PM
+> To: Long Li <longli@microsoft.com>; Steve French <sfrench@samba.org>;
+> linux-cifs@vger.kernel.org; samba-technical@lists.samba.org; linux-
+> kernel@vger.kernel.org; linux-rdma@vger.kernel.org
+> Subject: RE: [[PATCH v1] 07/37] [CIFS] SMBD: Implement receive buffer for
+> handling SMBD response
+>=20
+> > -----Original Message-----
+> > From: linux-cifs-owner@vger.kernel.org [mailto:linux-cifs-
+> > owner@vger.kernel.org] On Behalf Of Long Li
+> > Sent: Wednesday, August 2, 2017 4:10 PM
+> > To: Steve French <sfrench@samba.org>; linux-cifs@vger.kernel.org;
+> > samba- technical@lists.samba.org; linux-kernel@vger.kernel.org
+> > Cc: Long Li <longli@microsoft.com>
+> > Subject: [[PATCH v1] 07/37] [CIFS] SMBD: Implement receive buffer for
+> > handling SMBD response
+> >
+> > +/*
+> > + * Receive buffer operations.
+> > + * For each remote send, we need to post a receive. The receive
+> > +buffers are
+> > + * pre-allocated in advance.
+> > + */
+>=20
+> This approach appears to have been derived from the NFS/RDMA one.
+> The SMB protocol operates very differently! It is not a strict request/
+> response protocol. Many operations can become asynchronous by the
+> server choosing to make a STATUS_PENDING reply. A second reply then
+> comes later. The SMB2_CANCEL operation normally has no reply at all.
+> And callbacks for oplocks can occur at any time.
 
-> dm-verity is starting async. crypto ops and waiting for them to complete.
-> Move it over to generic code doing the same.
-> 
-> This also fixes a possible data coruption bug created by the
-> use of wait_for_completion_interruptible() without dealing
-> correctly with an interrupt aborting the wait prior to the
-> async op finishing.
+I think you misunderstood the receiver buffers. They are posted so the remo=
+te peer can post a send. The remote peer's receive credit is calculated bas=
+ed on how many receive buffer have been posted.  The code doesn't assume on=
+e post_send needs one corresponding post_recv. In practice, receive buffers=
+ are posted as soon as possible to extend receive credits to the remote pee=
+r.
 
-What is the exact problem there? The interruptible sleep is called from a 
-workqueue and workqueues have all signals blocked. Are signals unblocked 
-for some reason there?
+>=20
+> Even within a single request, many replies can be received. For example, =
+an
+> SMB2_READ response which exceeds your negotiated receive size of 8192.
+> These will be fragmented by SMB Direct into a "train" of multiple message=
+s,
+> which will be logically reassembled by the receiver. Each of them will
+> consume a credit.
+>=20
+> Thanks to SMB Direct crediting, the connection is not failing, but you ar=
+e
+> undoubtedly spending a lot of time and ping-ponging to re-post receives a=
+nd
+> allow the message trains to flow. And, because it's never one-to-one, the=
+re
+> are also unneeded receives posted before and after such exchanges.
+>=20
+> You need to use SMB Direct crediting to post a more traffic-sensitive poo=
+l of
+> receives, and simply manage its depth when posting client requests.
+> As a start, I'd suggest simply choosing a constant number, approximately
+> whatever credit value you actually negotiate with the peer. Then, just
+> replenish (re-post) receive buffers as they are completed by the adapter.
+> You can get more sophisticated about this strategy later.
 
-Should there be another patch for stable kernels that fixes the 
-interruptible sleep?
+The code behaves exactly the same as you described. It uses a constant to d=
+ecide how many receive buffer to post. It's not very smart and can be impro=
+ved.
 
-Mikulas
-
-> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-> ---
->  drivers/md/dm-verity-target.c | 81 +++++++++++--------------------------------
->  drivers/md/dm-verity.h        |  5 ---
->  2 files changed, 20 insertions(+), 66 deletions(-)
-> 
-> diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
-> index 79f18d4..8df08a8 100644
-> --- a/drivers/md/dm-verity-target.c
-> +++ b/drivers/md/dm-verity-target.c
-> @@ -92,74 +92,33 @@ static sector_t verity_position_at_level(struct dm_verity *v, sector_t block,
->  	return block >> (level * v->hash_per_block_bits);
->  }
->  
-> -/*
-> - * Callback function for asynchrnous crypto API completion notification
-> - */
-> -static void verity_op_done(struct crypto_async_request *base, int err)
-> -{
-> -	struct verity_result *res = (struct verity_result *)base->data;
-> -
-> -	if (err == -EINPROGRESS)
-> -		return;
-> -
-> -	res->err = err;
-> -	complete(&res->completion);
-> -}
-> -
-> -/*
-> - * Wait for async crypto API callback
-> - */
-> -static inline int verity_complete_op(struct verity_result *res, int ret)
-> -{
-> -	switch (ret) {
-> -	case 0:
-> -		break;
-> -
-> -	case -EINPROGRESS:
-> -	case -EBUSY:
-> -		ret = wait_for_completion_interruptible(&res->completion);
-> -		if (!ret)
-> -			ret = res->err;
-> -		reinit_completion(&res->completion);
-> -		break;
-> -
-> -	default:
-> -		DMERR("verity_wait_hash: crypto op submission failed: %d", ret);
-> -	}
-> -
-> -	if (unlikely(ret < 0))
-> -		DMERR("verity_wait_hash: crypto op failed: %d", ret);
-> -
-> -	return ret;
-> -}
-> -
->  static int verity_hash_update(struct dm_verity *v, struct ahash_request *req,
->  				const u8 *data, size_t len,
-> -				struct verity_result *res)
-> +				struct crypto_wait *wait)
->  {
->  	struct scatterlist sg;
->  
->  	sg_init_one(&sg, data, len);
->  	ahash_request_set_crypt(req, &sg, NULL, len);
->  
-> -	return verity_complete_op(res, crypto_ahash_update(req));
-> +	return crypto_wait_req(crypto_ahash_update(req), wait);
->  }
->  
->  /*
->   * Wrapper for crypto_ahash_init, which handles verity salting.
->   */
->  static int verity_hash_init(struct dm_verity *v, struct ahash_request *req,
-> -				struct verity_result *res)
-> +				struct crypto_wait *wait)
->  {
->  	int r;
->  
->  	ahash_request_set_tfm(req, v->tfm);
->  	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP |
->  					CRYPTO_TFM_REQ_MAY_BACKLOG,
-> -					verity_op_done, (void *)res);
-> -	init_completion(&res->completion);
-> +					crypto_req_done, (void *)wait);
-> +	crypto_init_wait(wait);
->  
-> -	r = verity_complete_op(res, crypto_ahash_init(req));
-> +	r = crypto_wait_req(crypto_ahash_init(req), wait);
->  
->  	if (unlikely(r < 0)) {
->  		DMERR("crypto_ahash_init failed: %d", r);
-> @@ -167,18 +126,18 @@ static int verity_hash_init(struct dm_verity *v, struct ahash_request *req,
->  	}
->  
->  	if (likely(v->salt_size && (v->version >= 1)))
-> -		r = verity_hash_update(v, req, v->salt, v->salt_size, res);
-> +		r = verity_hash_update(v, req, v->salt, v->salt_size, wait);
->  
->  	return r;
->  }
->  
->  static int verity_hash_final(struct dm_verity *v, struct ahash_request *req,
-> -			     u8 *digest, struct verity_result *res)
-> +			     u8 *digest, struct crypto_wait *wait)
->  {
->  	int r;
->  
->  	if (unlikely(v->salt_size && (!v->version))) {
-> -		r = verity_hash_update(v, req, v->salt, v->salt_size, res);
-> +		r = verity_hash_update(v, req, v->salt, v->salt_size, wait);
->  
->  		if (r < 0) {
->  			DMERR("verity_hash_final failed updating salt: %d", r);
-> @@ -187,7 +146,7 @@ static int verity_hash_final(struct dm_verity *v, struct ahash_request *req,
->  	}
->  
->  	ahash_request_set_crypt(req, NULL, digest, 0);
-> -	r = verity_complete_op(res, crypto_ahash_final(req));
-> +	r = crypto_wait_req(crypto_ahash_final(req), wait);
->  out:
->  	return r;
->  }
-> @@ -196,17 +155,17 @@ int verity_hash(struct dm_verity *v, struct ahash_request *req,
->  		const u8 *data, size_t len, u8 *digest)
->  {
->  	int r;
-> -	struct verity_result res;
-> +	struct crypto_wait wait;
->  
-> -	r = verity_hash_init(v, req, &res);
-> +	r = verity_hash_init(v, req, &wait);
->  	if (unlikely(r < 0))
->  		goto out;
->  
-> -	r = verity_hash_update(v, req, data, len, &res);
-> +	r = verity_hash_update(v, req, data, len, &wait);
->  	if (unlikely(r < 0))
->  		goto out;
->  
-> -	r = verity_hash_final(v, req, digest, &res);
-> +	r = verity_hash_final(v, req, digest, &wait);
->  
->  out:
->  	return r;
-> @@ -389,7 +348,7 @@ int verity_hash_for_block(struct dm_verity *v, struct dm_verity_io *io,
->   * Calculates the digest for the given bio
->   */
->  int verity_for_io_block(struct dm_verity *v, struct dm_verity_io *io,
-> -			struct bvec_iter *iter, struct verity_result *res)
-> +			struct bvec_iter *iter, struct crypto_wait *wait)
->  {
->  	unsigned int todo = 1 << v->data_dev_block_bits;
->  	struct bio *bio = dm_bio_from_per_bio_data(io, v->ti->per_io_data_size);
-> @@ -414,7 +373,7 @@ int verity_for_io_block(struct dm_verity *v, struct dm_verity_io *io,
->  		 */
->  		sg_set_page(&sg, bv.bv_page, len, bv.bv_offset);
->  		ahash_request_set_crypt(req, &sg, NULL, len);
-> -		r = verity_complete_op(res, crypto_ahash_update(req));
-> +		r = crypto_wait_req(crypto_ahash_update(req), wait);
->  
->  		if (unlikely(r < 0)) {
->  			DMERR("verity_for_io_block crypto op failed: %d", r);
-> @@ -482,7 +441,7 @@ static int verity_verify_io(struct dm_verity_io *io)
->  	struct dm_verity *v = io->v;
->  	struct bvec_iter start;
->  	unsigned b;
-> -	struct verity_result res;
-> +	struct crypto_wait wait;
->  
->  	for (b = 0; b < io->n_blocks; b++) {
->  		int r;
-> @@ -507,17 +466,17 @@ static int verity_verify_io(struct dm_verity_io *io)
->  			continue;
->  		}
->  
-> -		r = verity_hash_init(v, req, &res);
-> +		r = verity_hash_init(v, req, &wait);
->  		if (unlikely(r < 0))
->  			return r;
->  
->  		start = io->iter;
-> -		r = verity_for_io_block(v, io, &io->iter, &res);
-> +		r = verity_for_io_block(v, io, &io->iter, &wait);
->  		if (unlikely(r < 0))
->  			return r;
->  
->  		r = verity_hash_final(v, req, verity_io_real_digest(v, io),
-> -					&res);
-> +					&wait);
->  		if (unlikely(r < 0))
->  			return r;
->  
-> diff --git a/drivers/md/dm-verity.h b/drivers/md/dm-verity.h
-> index a59e0ad..b675bc0 100644
-> --- a/drivers/md/dm-verity.h
-> +++ b/drivers/md/dm-verity.h
-> @@ -90,11 +90,6 @@ struct dm_verity_io {
->  	 */
->  };
->  
-> -struct verity_result {
-> -	struct completion completion;
-> -	int err;
-> -};
-> -
->  static inline struct ahash_request *verity_io_hash_req(struct dm_verity *v,
->  						     struct dm_verity_io *io)
->  {
-> -- 
-> 2.1.4
-> 
-> --
-> dm-devel mailing list
-> dm-devel@redhat.com
-> https://www.redhat.com/mailman/listinfo/dm-devel
-> 
+>=20
+> Tom.
+>=20
+> > +static struct cifs_rdma_response* get_receive_buffer(struct
+> > +cifs_rdma_info
+> > *info)
+> > +{
+> > +       struct cifs_rdma_response *ret =3D NULL;
+> > +       unsigned long flags;
+> > +
+> > +       spin_lock_irqsave(&info->receive_queue_lock, flags);
+> > +       if (!list_empty(&info->receive_queue)) {
+> > +               ret =3D list_first_entry(
+> > +                       &info->receive_queue,
+> > +                       struct cifs_rdma_response, list);
+> > +               list_del(&ret->list);
+> > +               info->count_receive_buffer--;
+> > +               info->count_get_receive_buffer++;
+> > +       }
+> > +       spin_unlock_irqrestore(&info->receive_queue_lock, flags);
+> > +
+> > +       return ret;
+> > +}
+> > +
+> > +static void put_receive_buffer(
+> > +       struct cifs_rdma_info *info, struct cifs_rdma_response
+> > +*response) {
+> > +       unsigned long flags;
+> > +
+> > +       ib_dma_unmap_single(info->id->device, response->sge.addr,
+> > +               response->sge.length, DMA_FROM_DEVICE);
+> > +
+> > +       spin_lock_irqsave(&info->receive_queue_lock, flags);
+> > +       list_add_tail(&response->list, &info->receive_queue);
+> > +       info->count_receive_buffer++;
+> > +       info->count_put_receive_buffer++;
+> > +       spin_unlock_irqrestore(&info->receive_queue_lock, flags); }
+> > +
+> > +static int allocate_receive_buffers(struct cifs_rdma_info *info, int
+> > +num_buf) {
+> > +       int i;
+> > +       struct cifs_rdma_response *response;
+> > +
+> > +       INIT_LIST_HEAD(&info->receive_queue);
+> > +       spin_lock_init(&info->receive_queue_lock);
+> > +
+> > +       for (i=3D0; i<num_buf; i++) {
+> > +               response =3D mempool_alloc(info->response_mempool,
+> GFP_KERNEL);
+> > +               if (!response)
+> > +                       goto allocate_failed;
+> > +
+> > +               response->info =3D info;
+> > +               list_add_tail(&response->list, &info->receive_queue);
+> > +               info->count_receive_buffer++;
+> > +       }
+> > +
+> > +       return 0;
+> > +
+> > +allocate_failed:
+> > +       while (!list_empty(&info->receive_queue)) {
+> > +               response =3D list_first_entry(
+> > +                               &info->receive_queue,
+> > +                               struct cifs_rdma_response, list);
+> > +               list_del(&response->list);
+> > +               info->count_receive_buffer--;
+> > +
+> > +               mempool_free(response, info->response_mempool);
+> > +       }
+> > +       return -ENOMEM;
+> > +}
+> > +
+> > +static void destroy_receive_buffers(struct cifs_rdma_info *info) {
+> > +       struct cifs_rdma_response *response;
+> > +       while ((response =3D get_receive_buffer(info)))
+> > +               mempool_free(response, info->response_mempool); }
+> > +
