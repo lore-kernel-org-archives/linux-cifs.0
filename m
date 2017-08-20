@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v2 17/19] CIFS: SMBD: Implement SMB READ via RDMA write through memory registration
-Date: Sun, 20 Aug 2017 12:04:41 -0700
-Message-ID: <1503255883-3041-18-git-send-email-longli@exchange.microsoft.com>
+Subject: [Patch v2 19/19] CIFS: SMBD: Add SMBDirect debug counters
+Date: Sun, 20 Aug 2017 12:04:43 -0700
+Message-ID: <1503255883-3041-20-git-send-email-longli@exchange.microsoft.com>
 References: <1503255883-3041-1-git-send-email-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -16,87 +16,76 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-If I/O size is larger than rdma_readwrite_threshold, use RDMA write for SMB READ by specifying channel SMB2_CHANNEL_RDMA_V1 or SMB2_CHANNEL_RDMA_V1_INVALIDATE, depending on SMB dialect used. When RDMA write is used, there is no need to read from the transport for incoming payload. At the time SMB READ response comes back, the data is already transfered and placed in the pages by RDMA.
+Export SMBDirect debug counters to /proc/fs/cifs/DebugData, for debugging and troubleshooting.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/file.c    |  5 +++++
- fs/cifs/smb2pdu.c | 33 +++++++++++++++++++++++++++++++++
- 2 files changed, 38 insertions(+)
+ fs/cifs/cifs_debug.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index dec70b3..41460a5 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -42,6 +42,7 @@
+diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+index ba0870d..ca73950 100644
+--- a/fs/cifs/cifs_debug.c
++++ b/fs/cifs/cifs_debug.c
+@@ -30,6 +30,7 @@
+ #include "cifsproto.h"
  #include "cifs_debug.h"
- #include "cifs_fs_sb.h"
- #include "fscache.h"
+ #include "cifsfs.h"
 +#include "smbdirect.h"
  
- 
- static inline int cifs_convert_flags(unsigned int flags)
-@@ -3037,6 +3038,8 @@ uncached_fill_pages(struct TCP_Server_Info *server,
- 		}
- 		if (iter)
- 			result = copy_page_from_iter(page, 0, n, iter);
-+		else if (rdata->mr)
-+			result = n;
- 		else
- 			result = cifs_read_page_from_socket(server, page, n);
- 		if (result < 0)
-@@ -3606,6 +3609,8 @@ readpages_fill_pages(struct TCP_Server_Info *server,
- 
- 		if (iter)
- 			result = copy_page_from_iter(page, 0, n, iter);
-+		else if (rdata->mr)
-+			result = n;
- 		else
- 			result = cifs_read_page_from_socket(server, page, n);
- 		if (result < 0)
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index fbad987..1f08c75 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -2392,6 +2392,39 @@ smb2_new_read_req(void **buf, unsigned int *total_len,
- 	req->Length = cpu_to_le32(io_parms->length);
- 	req->Offset = cpu_to_le64(io_parms->offset);
- 
-+	/*
-+	 * If we want to do a RDMA write, fill in and append
-+	 * smbd_buffer_descriptor_v1 to the end of read request
-+	 */
-+	if (server->rdma && rdata &&
-+		rdata->bytes > server->smbd_conn->rdma_readwrite_threshold) {
+ void
+ cifs_dump_mem(char *label, void *data, int length)
+@@ -152,6 +153,51 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+ 	list_for_each(tmp1, &cifs_tcp_ses_list) {
+ 		server = list_entry(tmp1, struct TCP_Server_Info,
+ 				    tcp_ses_list);
 +
-+		struct smbd_buffer_descriptor_v1 *v1;
-+		bool need_invalidate =
-+			io_parms->tcon->ses->server->dialect == SMB30_PROT_ID;
++		if (!server->rdma)
++			goto skip_rdma;
 +
-+		rdata->mr = smbd_register_mr(
-+				server->smbd_conn, rdata->pages,
-+				rdata->nr_pages, rdata->tailsz,
-+				true, need_invalidate);
-+		if (!rdata->mr)
-+			return -ENOBUFS;
++		seq_printf(m, "\nSMBDirect transport status (all numbers in hex) protocol version: %x",
++			server->smbd_conn->protocol);
++		seq_printf(m, "\nConn receive_credit_max: %x send_credit_target: %x max_send_size: %x",
++			server->smbd_conn->receive_credit_max,
++			server->smbd_conn->send_credit_target,
++			server->smbd_conn->max_send_size);
++		seq_printf(m, "\nConn max_fragmented_recv_size: %x max_fragmented_send_size: %x max_receive_size:%x",
++			server->smbd_conn->max_fragmented_recv_size,
++			server->smbd_conn->max_fragmented_send_size,
++			server->smbd_conn->max_receive_size);
++		seq_printf(m, "\nConn keep_alive_interval: %x max_readwrite_size: %x rdma_readwrite_threshold: %x",
++			server->smbd_conn->keep_alive_interval,
++			server->smbd_conn->max_readwrite_size,
++			server->smbd_conn->rdma_readwrite_threshold);
++		seq_printf(m, "\nDebug count_receive_buffer: %x count_get_receive_buffer: %x count_put_receive_buffer: %x count_send_empty: %x",
++			server->smbd_conn->count_receive_buffer,
++			server->smbd_conn->count_get_receive_buffer,
++			server->smbd_conn->count_put_receive_buffer,
++			server->smbd_conn->count_send_empty);
++		seq_printf(m, "\nRead Queue count_reassembly_queue: %x count_enqueue_reassembly_queue: %x count_dequeue_reassembly_queue: %x fragment_reassembly_remaining: %x",
++			server->smbd_conn->count_reassembly_queue,
++			server->smbd_conn->count_enqueue_reassembly_queue,
++			server->smbd_conn->count_dequeue_reassembly_queue,
++			server->smbd_conn->fragment_reassembly_remaining);
++		seq_printf(m, "\nCurrent Credits send_credits: %x receive_credits: %x receive_credit_target: %x",
++			atomic_read(&server->smbd_conn->send_credits),
++			atomic_read(&server->smbd_conn->receive_credits),
++			server->smbd_conn->receive_credit_target);
++		seq_printf(m, "\nPending send_pending: %x send_payload_pending: %x recv_pending: %x read_pending: %x",
++			atomic_read(&server->smbd_conn->send_pending),
++			atomic_read(&server->smbd_conn->send_payload_pending),
++			atomic_read(&server->smbd_conn->recv_pending),
++			atomic_read(&server->smbd_conn->read_pending));
++		seq_printf(m, "\nMR responder_resources: %x max_frmr_depth: %x mr_type: %x",
++			server->smbd_conn->responder_resources,
++			server->smbd_conn->max_frmr_depth,
++			server->smbd_conn->mr_type);
++		seq_printf(m, "\nMR mr_ready_count: %x",
++			atomic_read(&server->smbd_conn->mr_ready_count));
 +
-+		req->Channel = SMB2_CHANNEL_RDMA_V1_INVALIDATE;
-+		if (need_invalidate)
-+			req->Channel = SMB2_CHANNEL_RDMA_V1;
-+		req->ReadChannelInfoOffset =
-+			offsetof(struct smb2_read_plain_req, Buffer);
-+		req->ReadChannelInfoLength =
-+			sizeof(struct smbd_buffer_descriptor_v1);
-+		v1 = (struct smbd_buffer_descriptor_v1 *) &req->Buffer[0];
-+		v1->offset = rdata->mr->mr->iova;
-+		v1->token = rdata->mr->mr->rkey;
-+		v1->length = rdata->mr->mr->length;
-+
-+		*total_len += sizeof(*v1) - 1;
-+	}
-+
- 	if (request_type & CHAINED_REQUEST) {
- 		if (!(request_type & END_OF_CHAIN)) {
- 			/* next 8-byte aligned request */
++skip_rdma:
+ 		seq_printf(m, "\nNumber of credits: %d", server->credits);
+ 		i++;
+ 		list_for_each(tmp2, &server->smb_ses_list) {
 -- 
 2.7.4
