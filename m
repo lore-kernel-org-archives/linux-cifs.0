@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v2 18/19] CIFS: SMBD: Deregister memory when finishing SMB READ
-Date: Sun, 20 Aug 2017 12:04:42 -0700
-Message-ID: <1503255883-3041-19-git-send-email-longli@exchange.microsoft.com>
+Subject: [Patch v2 15/19] CIFS: SMBD: Add parameter rdata to smb2_new_read_req
+Date: Sun, 20 Aug 2017 12:04:39 -0700
+Message-ID: <1503255883-3041-16-git-send-email-longli@exchange.microsoft.com>
 References: <1503255883-3041-1-git-send-email-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -16,33 +16,60 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-When SMB READ is finished, deregister the memory regions if RDMA write is used for this SMB READ. smbd_deregister_mr may need to do local invalidation and sleep, if server remote invalidation is not used.
+When we assemble the SMB READ packet header, we need to know the I/O layout if this request is to use a RDMA write. rdata has all the information we need for memory registration. Add rdata to smb2_new_read_req.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/smb2pdu.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ fs/cifs/smb2pdu.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 1f08c75..43a7b60 100644
+index 5551053..fbad987 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -2504,6 +2504,16 @@ smb2_readv_callback(struct mid_q_entry *mid)
- 			rdata->result = -EIO;
- 	}
+@@ -2363,18 +2363,21 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+  */
+ static int
+ smb2_new_read_req(void **buf, unsigned int *total_len,
+-		  struct cifs_io_parms *io_parms, unsigned int remaining_bytes,
+-		  int request_type)
++	struct cifs_io_parms *io_parms, struct cifs_readdata *rdata,
++	unsigned int remaining_bytes, int request_type)
+ {
+ 	int rc = -EACCES;
+ 	struct smb2_read_plain_req *req = NULL;
+ 	struct smb2_sync_hdr *shdr;
++	struct TCP_Server_Info *server;
  
-+	/*
-+	 * If this rdata has a memmory registered, the MR can be freed
-+	 * MR needs to be freed as soon as I/O finishes to prevent deadlock
-+	 * because they have limited number and are used for future I/Os
-+	 */
-+	if (rdata->mr) {
-+		smbd_deregister_mr(rdata->mr);
-+		rdata->mr = NULL;
-+	}
+ 	rc = smb2_plain_req_init(SMB2_READ, io_parms->tcon, (void **) &req,
+ 				 total_len);
+ 	if (rc)
+ 		return rc;
+-	if (io_parms->tcon->ses->server == NULL)
 +
- 	if (rdata->result)
- 		cifs_stats_fail_inc(tcon, SMB2_READ_HE);
++	server = io_parms->tcon->ses->server;
++	if (server == NULL)
+ 		return -ECONNABORTED;
+ 
+ 	shdr = &req->sync_hdr;
+@@ -2502,7 +2505,8 @@ smb2_async_readv(struct cifs_readdata *rdata)
+ 
+ 	server = io_parms.tcon->ses->server;
+ 
+-	rc = smb2_new_read_req((void **) &buf, &total_len, &io_parms, 0, 0);
++	rc = smb2_new_read_req(
++		(void **) &buf, &total_len, &io_parms, rdata, 0, 0);
+ 	if (rc) {
+ 		if (rc == -EAGAIN && rdata->credits) {
+ 			/* credits was reset by reconnect */
+@@ -2570,7 +2574,7 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
+ 	struct cifs_ses *ses = io_parms->tcon->ses;
+ 
+ 	*nbytes = 0;
+-	rc = smb2_new_read_req((void **)&req, &total_len, io_parms, 0, 0);
++	rc = smb2_new_read_req((void **)&req, &total_len, io_parms, NULL, 0, 0);
+ 	if (rc)
+ 		return rc;
  
 -- 
 2.7.4
