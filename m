@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v2 10/19] CIFS: SMBD: Send data through SMBDirect
-Date: Sun, 20 Aug 2017 12:04:34 -0700
-Message-ID: <1503255883-3041-11-git-send-email-longli@exchange.microsoft.com>
+Subject: [Patch v2 12/19] CIFS: SMBD: Fix the definition for SMB2_CHANNEL_RDMA_V1_INVALIDATE
+Date: Sun, 20 Aug 2017 12:04:36 -0700
+Message-ID: <1503255883-3041-13-git-send-email-longli@exchange.microsoft.com>
 References: <1503255883-3041-1-git-send-email-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -16,44 +16,25 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-With SMBDirect connected, use it for sending data via RDMA send.
+The channel value for requesting server remote invalidating local memory registration should be 0x00000002
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/transport.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ fs/cifs/smb2pdu.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index ba62aaf..bddb699 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -37,6 +37,7 @@
- #include "cifsglob.h"
- #include "cifsproto.h"
- #include "cifs_debug.h"
-+#include "smbdirect.h"
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index 18700fd..0417a36 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -832,7 +832,7 @@ struct smb2_flush_rsp {
+ /* Channel field for read and write: exactly one of following flags can be set*/
+ #define SMB2_CHANNEL_NONE		0x00000000
+ #define SMB2_CHANNEL_RDMA_V1		0x00000001 /* SMB3 or later */
+-#define SMB2_CHANNEL_RDMA_V1_INVALIDATE 0x00000001 /* SMB3.02 or later */
++#define SMB2_CHANNEL_RDMA_V1_INVALIDATE 0x00000002 /* SMB3.02 or later */
  
- void
- cifs_wake_up_task(struct mid_q_entry *mid)
-@@ -230,6 +231,11 @@ __smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
- 	struct msghdr smb_msg;
- 	int val = 1;
- 
-+	if (server->smbd_conn) {
-+		rc = smbd_send(server->smbd_conn, rqst);
-+		goto done;
-+	}
-+
- 	if (ssocket == NULL)
- 		return -ENOTSOCK;
- 
-@@ -299,6 +305,7 @@ __smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
- 		server->tcpStatus = CifsNeedReconnect;
- 	}
- 
-+done:
- 	if (rc < 0 && rc != -EINTR)
- 		cifs_dbg(VFS, "Error %d sending data on socket to server\n",
- 			 rc);
+ /* SMB2 read request without RFC1001 length at the beginning */
+ struct smb2_read_plain_req {
 -- 
 2.7.4
