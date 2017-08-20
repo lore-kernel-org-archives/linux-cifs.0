@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v2 12/19] CIFS: SMBD: Fix the definition for SMB2_CHANNEL_RDMA_V1_INVALIDATE
-Date: Sun, 20 Aug 2017 12:04:36 -0700
-Message-ID: <1503255883-3041-13-git-send-email-longli@exchange.microsoft.com>
+Subject: [Patch v2 14/19] CIFS: SMBD: Deregister memory when finishing SMB write
+Date: Sun, 20 Aug 2017 12:04:38 -0700
+Message-ID: <1503255883-3041-15-git-send-email-longli@exchange.microsoft.com>
 References: <1503255883-3041-1-git-send-email-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -16,25 +16,35 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-The channel value for requesting server remote invalidating local memory registration should be 0x00000002
+On write I/O finish, deregister the memory region if this was for a RDMA read. The call to smbd_deregister_mr will do local invalidation and possibly wait, if remote invalidate is not used.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/smb2pdu.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/cifs/smb2pdu.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 18700fd..0417a36 100644
---- a/fs/cifs/smb2pdu.h
-+++ b/fs/cifs/smb2pdu.h
-@@ -832,7 +832,7 @@ struct smb2_flush_rsp {
- /* Channel field for read and write: exactly one of following flags can be set*/
- #define SMB2_CHANNEL_NONE		0x00000000
- #define SMB2_CHANNEL_RDMA_V1		0x00000001 /* SMB3 or later */
--#define SMB2_CHANNEL_RDMA_V1_INVALIDATE 0x00000001 /* SMB3.02 or later */
-+#define SMB2_CHANNEL_RDMA_V1_INVALIDATE 0x00000002 /* SMB3.02 or later */
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 5581afd..5551053 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -2666,6 +2666,18 @@ smb2_writev_callback(struct mid_q_entry *mid)
+ 		break;
+ 	}
  
- /* SMB2 read request without RFC1001 length at the beginning */
- struct smb2_read_plain_req {
++	/*
++	 * If this wdata has a memory registered, the MR can be freed
++	 * The number of MRs available is limited, it's important to recover
++	 * used MR as soon as I/O is finished. Hold MR longer in the later
++	 * I/O process can possibly result in I/O deadlock due to lack of MR
++	 * to send request on I/O retry
++	 */
++	if (wdata->mr) {
++		smbd_deregister_mr(wdata->mr);
++		wdata->mr = NULL;
++	}
++
+ 	if (wdata->result)
+ 		cifs_stats_fail_inc(tcon, SMB2_WRITE_HE);
+ 
 -- 
 2.7.4
