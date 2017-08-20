@@ -1,49 +1,45 @@
-From: SF Markus Elfring <elfring-Rn4VEauK+AKRv+LV9MX5uipxlwaOVQ5f@public.gmane.org>
-Subject: [PATCH 6/8] CIFS: Return directly after a failed
- build_path_from_dentry() in cifs_do_create()
-Date: Sun, 20 Aug 2017 18:40:07 +0200
-Message-ID: <24a10b1a-3b4a-da70-1670-23b4ec9abff8@users.sourceforge.net>
+From: SF Markus Elfring <elfring@users.sourceforge.net>
+Subject: [PATCH 7/8] CIFS: Delete an unnecessary variable initialisation in
+ cifs_do_create()
+Date: Sun, 20 Aug 2017 18:41:12 +0200
+Message-ID: <fd13371d-c582-39b0-9ec7-dddf8cccf5ff@users.sourceforge.net>
 References: <826310e5-e01c-38af-90df-c5630f761a4d@users.sourceforge.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-        Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <826310e5-e01c-38af-90df-c5630f761a4d-Rn4VEauK+AKRv+LV9MX5uipxlwaOVQ5f@public.gmane.org>
+Content-Transfer-Encoding: 7bit
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org
+To: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        Steve French <sfrench@samba.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <826310e5-e01c-38af-90df-c5630f761a4d@users.sourceforge.net>
 Content-Language: en-GB
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-From: Markus Elfring <elfring-Rn4VEauK+AKRv+LV9MX5uipxlwaOVQ5f@public.gmane.org>
-Date: Sun, 20 Aug 2017 17:17:30 +0200
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Sun, 20 Aug 2017 17:20:36 +0200
 
-Return directly after a call of the function "build_path_from_dentry"
-failed at the beginning.
+The local variable "full_path" will be set to an appropriate pointer
+a bit later. Thus omit the explicit initialisation at the beginning.
 
-Signed-off-by: Markus Elfring <elfring-Rn4VEauK+AKRv+LV9MX5uipxlwaOVQ5f@public.gmane.org>
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 ---
- fs/cifs/dir.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ fs/cifs/dir.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index 2c9cbd8393d6..248aead1f3f4 100644
+index 248aead1f3f4..69babcf4f653 100644
 --- a/fs/cifs/dir.c
 +++ b/fs/cifs/dir.c
-@@ -239,10 +239,8 @@ cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned int xid,
- 		*oplock = REQ_OPLOCK;
- 
- 	full_path = build_path_from_dentry(direntry);
--	if (full_path == NULL) {
--		rc = -ENOMEM;
--		goto out;
--	}
-+	if (!full_path)
-+		return -ENOMEM;
- 
- 	if (tcon->unix_ext && cap_unix(tcon->ses) && !tcon->broken_posix_open &&
- 	    (CIFS_UNIX_POSIX_PATH_OPS_CAP &
+@@ -227,7 +227,7 @@ cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned int xid,
+ 	int desired_access;
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+ 	struct cifs_tcon *tcon = tlink_tcon(tlink);
+-	char *full_path = NULL;
++	char *full_path;
+ 	FILE_ALL_INFO *buf = NULL;
+ 	struct inode *newinode = NULL;
+ 	int disposition;
 -- 
 2.14.0
