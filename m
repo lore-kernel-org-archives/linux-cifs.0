@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v2 09/19] CIFS: SMBD: Read data from SMBDirect
-Date: Sun, 20 Aug 2017 12:04:33 -0700
-Message-ID: <1503255883-3041-10-git-send-email-longli@exchange.microsoft.com>
+Subject: [Patch v2 10/19] CIFS: SMBD: Send data through SMBDirect
+Date: Sun, 20 Aug 2017 12:04:34 -0700
+Message-ID: <1503255883-3041-11-git-send-email-longli@exchange.microsoft.com>
 References: <1503255883-3041-1-git-send-email-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -16,38 +16,44 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-With SMBDirect connected, use it for receiving data via RDMA recv.
+With SMBDirect connected, use it for sending data via RDMA send.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/connect.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ fs/cifs/transport.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index f65950f..9b0da7f 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -584,6 +584,10 @@ cifs_read_from_socket(struct TCP_Server_Info *server, char *buf,
- {
- 	struct msghdr smb_msg;
- 	struct kvec iov = {.iov_base = buf, .iov_len = to_read};
-+
-+	if (server->smbd_conn)
-+		return smbd_recv(server->smbd_conn, buf, to_read);
-+
- 	iov_iter_kvec(&smb_msg.msg_iter, READ | ITER_KVEC, &iov, 1, to_read);
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index ba62aaf..bddb699 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -37,6 +37,7 @@
+ #include "cifsglob.h"
+ #include "cifsproto.h"
+ #include "cifs_debug.h"
++#include "smbdirect.h"
  
- 	return cifs_readv_from_socket(server, &smb_msg);
-@@ -595,6 +599,10 @@ cifs_read_page_from_socket(struct TCP_Server_Info *server, struct page *page,
- {
+ void
+ cifs_wake_up_task(struct mid_q_entry *mid)
+@@ -230,6 +231,11 @@ __smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
  	struct msghdr smb_msg;
- 	struct bio_vec bv = {.bv_page = page, .bv_len = to_read};
+ 	int val = 1;
+ 
++	if (server->smbd_conn) {
++		rc = smbd_send(server->smbd_conn, rqst);
++		goto done;
++	}
 +
-+	if (server->smbd_conn)
-+		return smbd_recv_page(server->smbd_conn, page, to_read);
-+
- 	iov_iter_bvec(&smb_msg.msg_iter, READ | ITER_BVEC, &bv, 1, to_read);
- 	return cifs_readv_from_socket(server, &smb_msg);
- }
+ 	if (ssocket == NULL)
+ 		return -ENOTSOCK;
+ 
+@@ -299,6 +305,7 @@ __smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ 		server->tcpStatus = CifsNeedReconnect;
+ 	}
+ 
++done:
+ 	if (rc < 0 && rc != -EINTR)
+ 		cifs_dbg(VFS, "Error %d sending data on socket to server\n",
+ 			 rc);
 -- 
 2.7.4
