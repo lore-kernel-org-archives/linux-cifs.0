@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v2 06/19] CIFS: SMBD: Reconnect to SMBDirect session
-Date: Sun, 20 Aug 2017 12:04:30 -0700
-Message-ID: <1503255883-3041-7-git-send-email-longli@exchange.microsoft.com>
+Subject: [Patch v2 04/19] CIFS: SMBD: Add SMBDirect transport to SMB connection and Makefile
+Date: Sun, 20 Aug 2017 12:04:28 -0700
+Message-ID: <1503255883-3041-5-git-send-email-longli@exchange.microsoft.com>
 References: <1503255883-3041-1-git-send-email-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -16,29 +16,38 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-Do a reconnect on SMBDirect when it is used as the connection. Reconnect can happen for many reasons and it's mostly the decision of upper layer SMB2 not SMBDirect.
+Add SMBDirect as an optional connection to SMB session defined in CIFS. When connection is on SMBDirect, upper layer uses this connection to carry payloads.
+
+With the transport hooked up, add SMBDirect code to Makefile.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/connect.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ fs/cifs/Makefile   | 2 +-
+ fs/cifs/cifsglob.h | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 309eba0..b337ca7 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -409,7 +409,11 @@ cifs_reconnect(struct TCP_Server_Info *server)
+diff --git a/fs/cifs/Makefile b/fs/cifs/Makefile
+index eed7eb0..6bb9863 100644
+--- a/fs/cifs/Makefile
++++ b/fs/cifs/Makefile
+@@ -18,4 +18,4 @@ cifs-$(CONFIG_CIFS_DFS_UPCALL) += dns_resolve.o cifs_dfs_ref.o
+ cifs-$(CONFIG_CIFS_FSCACHE) += fscache.o cache.o
  
- 		/* we should try only the port we connected to before */
- 		mutex_lock(&server->srv_mutex);
--		rc = generic_ip_connect(server);
-+		if (server->rdma)
-+			rc = smbd_reconnect(server);
-+		else
-+			rc = generic_ip_connect(server);
-+
- 		if (rc) {
- 			cifs_dbg(FYI, "reconnect error %d\n", rc);
- 			mutex_unlock(&server->srv_mutex);
+ cifs-$(CONFIG_CIFS_SMB2) += smb2ops.o smb2maperror.o smb2transport.o \
+-			    smb2misc.o smb2pdu.o smb2inode.o smb2file.o
++			    smb2misc.o smb2pdu.o smb2inode.o smb2file.o smbdirect.o
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 703c2fb..dc5404d 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -652,6 +652,8 @@ struct TCP_Server_Info {
+ 	bool	large_buf;		/* is current buffer large? */
+ 	/* use SMBD connection instead of socket */
+ 	bool	rdma;
++	/* point to the SMBD connection if RDMA is used instead of socket */
++	struct smbd_connection *smbd_conn;
+ 	struct delayed_work	echo; /* echo ping workqueue job */
+ 	char	*smallbuf;	/* pointer to current "small" buffer */
+ 	char	*bigbuf;	/* pointer to current "big" buffer */
 -- 
 2.7.4
