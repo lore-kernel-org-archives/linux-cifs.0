@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Subject: [PATCH v6 03/19] crypto: remove redundant backlog checks on EBUSY
-Date: Mon, 21 Aug 2017 17:04:49 +0300
-Message-ID: <1503324309-13673-4-git-send-email-gilad__28686.9624433622$1503324388$gmane$org@benyossef.com>
+Subject: [PATCH v6 19/19] crypto: adapt api sample to use async. op wait
+Date: Mon, 21 Aug 2017 17:05:05 +0300
+Message-ID: <1503324309-13673-20-git-send-email-gilad__32458.5338509225$1503324626$gmane$org@benyossef.com>
 References: <1503324309-13673-1-git-send-email-gilad@benyossef.com>
 Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
 To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
@@ -27,179 +27,109 @@ In-Reply-To: <1503324309-13673-1-git-send-email-gilad-6S/DczAoZh3WXxRugSxzZg@pub
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Now that -EBUSY return code only indicates backlog queueing
-we can safely remove the now redundant check for the
-CRYPTO_TFM_REQ_MAY_BACKLOG flag when -EBUSY is returned.
+The code sample is waiting for an async. crypto op completion.
+Adapt sample to use the new generic infrastructure to do the same.
+
+This also fixes a possible data coruption bug created by the
+use of wait_for_completion_interruptible() without dealing
+correctly with an interrupt aborting the wait prior to the
+async op finishing.
 
 Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
 ---
- crypto/ahash.c        | 12 +++---------
- crypto/cts.c          |  6 ++----
- crypto/lrw.c          |  8 ++------
- crypto/rsa-pkcs1pad.c | 16 ++++------------
- crypto/xts.c          |  8 ++------
- 5 files changed, 13 insertions(+), 37 deletions(-)
+ Documentation/crypto/api-samples.rst | 52 +++++++-----------------------------
+ 1 file changed, 10 insertions(+), 42 deletions(-)
 
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index 826cd7a..d63eeef 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -334,9 +334,7 @@ static int ahash_op_unaligned(struct ahash_request *req,
- 		return err;
+diff --git a/Documentation/crypto/api-samples.rst b/Documentation/crypto/api-samples.rst
+index 2531948..006827e 100644
+--- a/Documentation/crypto/api-samples.rst
++++ b/Documentation/crypto/api-samples.rst
+@@ -7,59 +7,27 @@ Code Example For Symmetric Key Cipher Operation
+ ::
  
- 	err = op(req);
--	if (err == -EINPROGRESS ||
--	    (err == -EBUSY && (ahash_request_flags(req) &
--			       CRYPTO_TFM_REQ_MAY_BACKLOG)))
-+	if (err == -EINPROGRESS || err == -EBUSY)
- 		return err;
  
- 	ahash_restore_req(req, err);
-@@ -394,9 +392,7 @@ static int ahash_def_finup_finish1(struct ahash_request *req, int err)
- 	req->base.complete = ahash_def_finup_done2;
+-    struct tcrypt_result {
+-        struct completion completion;
+-        int err;
+-    };
+-
+     /* tie all data structures together */
+     struct skcipher_def {
+         struct scatterlist sg;
+         struct crypto_skcipher *tfm;
+         struct skcipher_request *req;
+-        struct tcrypt_result result;
++        struct crypto_wait wait;
+     };
  
- 	err = crypto_ahash_reqtfm(req)->final(req);
--	if (err == -EINPROGRESS ||
--	    (err == -EBUSY && (ahash_request_flags(req) &
--			       CRYPTO_TFM_REQ_MAY_BACKLOG)))
-+	if (err == -EINPROGRESS || err == -EBUSY)
- 		return err;
+-    /* Callback function */
+-    static void test_skcipher_cb(struct crypto_async_request *req, int error)
+-    {
+-        struct tcrypt_result *result = req->data;
+-
+-        if (error == -EINPROGRESS)
+-            return;
+-        result->err = error;
+-        complete(&result->completion);
+-        pr_info("Encryption finished successfully\n");
+-    }
+-
+     /* Perform cipher operation */
+     static unsigned int test_skcipher_encdec(struct skcipher_def *sk,
+                          int enc)
+     {
+-        int rc = 0;
++        int rc;
  
- out:
-@@ -432,9 +428,7 @@ static int ahash_def_finup(struct ahash_request *req)
- 		return err;
+         if (enc)
+-            rc = crypto_skcipher_encrypt(sk->req);
++            rc = crypto_wait_req(crypto_skcipher_encrypt(sk->req), &sk->wait);
+         else
+-            rc = crypto_skcipher_decrypt(sk->req);
+-
+-        switch (rc) {
+-        case 0:
+-            break;
+-        case -EINPROGRESS:
+-        case -EBUSY:
+-            rc = wait_for_completion_interruptible(
+-                &sk->result.completion);
+-            if (!rc && !sk->result.err) {
+-                reinit_completion(&sk->result.completion);
+-                break;
+-            }
+-        default:
+-            pr_info("skcipher encrypt returned with %d result %d\n",
+-                rc, sk->result.err);
+-            break;
+-        }
+-        init_completion(&sk->result.completion);
++            rc = crypto_wait_req(crypto_skcipher_decrypt(sk->req), &sk->wait);
++
++	if (rc)
++		pr_info("skcipher encrypt returned with result %d\n", rc);
  
- 	err = tfm->update(req);
--	if (err == -EINPROGRESS ||
--	    (err == -EBUSY && (ahash_request_flags(req) &
--			       CRYPTO_TFM_REQ_MAY_BACKLOG)))
-+	if (err == -EINPROGRESS || err == -EBUSY)
- 		return err;
+         return rc;
+     }
+@@ -89,8 +57,8 @@ Code Example For Symmetric Key Cipher Operation
+         }
  
- 	return ahash_def_finup_finish1(req, err);
-diff --git a/crypto/cts.c b/crypto/cts.c
-index 243f591..4773c18 100644
---- a/crypto/cts.c
-+++ b/crypto/cts.c
-@@ -136,8 +136,7 @@ static void crypto_cts_encrypt_done(struct crypto_async_request *areq, int err)
- 		goto out;
+         skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+-                          test_skcipher_cb,
+-                          &sk.result);
++                          crypto_req_done,
++                          &sk.wait);
  
- 	err = cts_cbc_encrypt(req);
--	if (err == -EINPROGRESS ||
--	    (err == -EBUSY && req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
-+	if (err == -EINPROGRESS || err == -EBUSY)
- 		return;
+         /* AES 256 with random key */
+         get_random_bytes(&key, 32);
+@@ -122,7 +90,7 @@ Code Example For Symmetric Key Cipher Operation
+         /* We encrypt one block */
+         sg_init_one(&sk.sg, scratchpad, 16);
+         skcipher_request_set_crypt(req, &sk.sg, &sk.sg, 16, ivdata);
+-        init_completion(&sk.result.completion);
++        crypto_init_wait(&sk.wait);
  
- out:
-@@ -229,8 +228,7 @@ static void crypto_cts_decrypt_done(struct crypto_async_request *areq, int err)
- 		goto out;
- 
- 	err = cts_cbc_decrypt(req);
--	if (err == -EINPROGRESS ||
--	    (err == -EBUSY && req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
-+	if (err == -EINPROGRESS || err == -EBUSY)
- 		return;
- 
- out:
-diff --git a/crypto/lrw.c b/crypto/lrw.c
-index a8bfae4..695cea9 100644
---- a/crypto/lrw.c
-+++ b/crypto/lrw.c
-@@ -328,9 +328,7 @@ static int do_encrypt(struct skcipher_request *req, int err)
- 		      crypto_skcipher_encrypt(subreq) ?:
- 		      post_crypt(req);
- 
--		if (err == -EINPROGRESS ||
--		    (err == -EBUSY &&
--		     req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
-+		if (err == -EINPROGRESS || err == -EBUSY)
- 			return err;
- 	}
- 
-@@ -380,9 +378,7 @@ static int do_decrypt(struct skcipher_request *req, int err)
- 		      crypto_skcipher_decrypt(subreq) ?:
- 		      post_crypt(req);
- 
--		if (err == -EINPROGRESS ||
--		    (err == -EBUSY &&
--		     req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
-+		if (err == -EINPROGRESS || err == -EBUSY)
- 			return err;
- 	}
- 
-diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
-index 407c64b..2908f93 100644
---- a/crypto/rsa-pkcs1pad.c
-+++ b/crypto/rsa-pkcs1pad.c
-@@ -279,9 +279,7 @@ static int pkcs1pad_encrypt(struct akcipher_request *req)
- 				   req->dst, ctx->key_size - 1, req->dst_len);
- 
- 	err = crypto_akcipher_encrypt(&req_ctx->child_req);
--	if (err != -EINPROGRESS &&
--			(err != -EBUSY ||
--			 !(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)))
-+	if (err != -EINPROGRESS && err != -EBUSY)
- 		return pkcs1pad_encrypt_sign_complete(req, err);
- 
- 	return err;
-@@ -383,9 +381,7 @@ static int pkcs1pad_decrypt(struct akcipher_request *req)
- 				   ctx->key_size);
- 
- 	err = crypto_akcipher_decrypt(&req_ctx->child_req);
--	if (err != -EINPROGRESS &&
--			(err != -EBUSY ||
--			 !(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)))
-+	if (err != -EINPROGRESS && err != -EBUSY)
- 		return pkcs1pad_decrypt_complete(req, err);
- 
- 	return err;
-@@ -440,9 +436,7 @@ static int pkcs1pad_sign(struct akcipher_request *req)
- 				   req->dst, ctx->key_size - 1, req->dst_len);
- 
- 	err = crypto_akcipher_sign(&req_ctx->child_req);
--	if (err != -EINPROGRESS &&
--			(err != -EBUSY ||
--			 !(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)))
-+	if (err != -EINPROGRESS && err != -EBUSY)
- 		return pkcs1pad_encrypt_sign_complete(req, err);
- 
- 	return err;
-@@ -561,9 +555,7 @@ static int pkcs1pad_verify(struct akcipher_request *req)
- 				   ctx->key_size);
- 
- 	err = crypto_akcipher_verify(&req_ctx->child_req);
--	if (err != -EINPROGRESS &&
--			(err != -EBUSY ||
--			 !(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)))
-+	if (err != -EINPROGRESS && err != -EBUSY)
- 		return pkcs1pad_verify_complete(req, err);
- 
- 	return err;
-diff --git a/crypto/xts.c b/crypto/xts.c
-index d86c11a..af68012 100644
---- a/crypto/xts.c
-+++ b/crypto/xts.c
-@@ -269,9 +269,7 @@ static int do_encrypt(struct skcipher_request *req, int err)
- 		      crypto_skcipher_encrypt(subreq) ?:
- 		      post_crypt(req);
- 
--		if (err == -EINPROGRESS ||
--		    (err == -EBUSY &&
--		     req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
-+		if (err == -EINPROGRESS || err == -EBUSY)
- 			return err;
- 	}
- 
-@@ -321,9 +319,7 @@ static int do_decrypt(struct skcipher_request *req, int err)
- 		      crypto_skcipher_decrypt(subreq) ?:
- 		      post_crypt(req);
- 
--		if (err == -EINPROGRESS ||
--		    (err == -EBUSY &&
--		     req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
-+		if (err == -EINPROGRESS || err == -EBUSY)
- 			return err;
- 	}
- 
+         /* encrypt data */
+         ret = test_skcipher_encdec(&sk, 1);
 -- 
 2.1.4
