@@ -1,65 +1,205 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH v5 05/19] crypto: introduce crypto wait for async op
-Date: Mon, 21 Aug 2017 15:49:41 +0300
-Message-ID: <CAOtvUMfJaG-Uomc1EnD1+HySz+X8SUaRUm1SEx4DusquWfOF0w@mail.gmail.com>
-References: <1502724094-23305-1-git-send-email-gilad@benyossef.com>
- <1502724094-23305-6-git-send-email-gilad@benyossef.com> <20170815032303.000042b2@huawei.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        device-mapper development <dm-devel@redhat.com>,
-        Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <james.l.morris@oracle.com>,
-        "Serge E. Hallyn
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <20170815032303.000042b2@huawei.com>
-Sender: owner-linux-security-module@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+Subject: [PATCH v6 03/19] crypto: remove redundant backlog checks on EBUSY
+Date: Mon, 21 Aug 2017 17:04:49 +0300
+Message-ID: <1503324309-13673-4-git-send-email-gilad__28686.9624433622$1503324388$gmane$org@benyossef.com>
+References: <1503324309-13673-1-git-send-email-gilad@benyossef.com>
+Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
+        David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        Tom Lendacky <thomas.lendacky-5C7GfCeVMHo@public.gmane.org>,
+        Gary Hook <gary.hook-5C7GfCeVMHo@public.gmane.org>,
+        Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+        Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>,
+        Matthias Brugger <matthias.bgg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Alasdair Kergon <agk-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        Mike Snitzer <snitzer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+        Shaohua Li <shli-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        "Theodore Y. Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,
+        Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Mimi Zohar <zohar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
+        Dmitry Kasatkin <dmitry.kasatkin-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        James Morris <james.l.morris-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
+        "Serge E. Hallyn" <serge-A9i7LUbDfNHQT0dZR+AlfA@public.gmane.org>, linux-crypto@v
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1503324309-13673-1-git-send-email-gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Aug 15, 2017 at 5:23 AM, Jonathan Cameron
-<Jonathan.Cameron@huawei.com> wrote:
-> On Mon, 14 Aug 2017 18:21:15 +0300
-> Gilad Ben-Yossef <gilad@benyossef.com> wrote:
->
->> Invoking a possibly async. crypto op and waiting for completion
->> while correctly handling backlog processing is a common task
->> in the crypto API implementation and outside users of it.
->>
->> This patch adds a generic implementation for doing so in
->> preparation for using it across the board instead of hand
->> rolled versions.
+Now that -EBUSY return code only indicates backlog queueing
+we can safely remove the now redundant check for the
+CRYPTO_TFM_REQ_MAY_BACKLOG flag when -EBUSY is returned.
 
->
-> Trivial observation.  Shouldn't have this bonus blank line inserted here.
->
->>  #endif       /* _LINUX_CRYPTO_H */
->>
->
+Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+---
+ crypto/ahash.c        | 12 +++---------
+ crypto/cts.c          |  6 ++----
+ crypto/lrw.c          |  8 ++------
+ crypto/rsa-pkcs1pad.c | 16 ++++------------
+ crypto/xts.c          |  8 ++------
+ 5 files changed, 13 insertions(+), 37 deletions(-)
 
-Indeed. Will be fixed.
-
-Thanks,
-Gilad
-
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index 826cd7a..d63eeef 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -334,9 +334,7 @@ static int ahash_op_unaligned(struct ahash_request *req,
+ 		return err;
+ 
+ 	err = op(req);
+-	if (err == -EINPROGRESS ||
+-	    (err == -EBUSY && (ahash_request_flags(req) &
+-			       CRYPTO_TFM_REQ_MAY_BACKLOG)))
++	if (err == -EINPROGRESS || err == -EBUSY)
+ 		return err;
+ 
+ 	ahash_restore_req(req, err);
+@@ -394,9 +392,7 @@ static int ahash_def_finup_finish1(struct ahash_request *req, int err)
+ 	req->base.complete = ahash_def_finup_done2;
+ 
+ 	err = crypto_ahash_reqtfm(req)->final(req);
+-	if (err == -EINPROGRESS ||
+-	    (err == -EBUSY && (ahash_request_flags(req) &
+-			       CRYPTO_TFM_REQ_MAY_BACKLOG)))
++	if (err == -EINPROGRESS || err == -EBUSY)
+ 		return err;
+ 
+ out:
+@@ -432,9 +428,7 @@ static int ahash_def_finup(struct ahash_request *req)
+ 		return err;
+ 
+ 	err = tfm->update(req);
+-	if (err == -EINPROGRESS ||
+-	    (err == -EBUSY && (ahash_request_flags(req) &
+-			       CRYPTO_TFM_REQ_MAY_BACKLOG)))
++	if (err == -EINPROGRESS || err == -EBUSY)
+ 		return err;
+ 
+ 	return ahash_def_finup_finish1(req, err);
+diff --git a/crypto/cts.c b/crypto/cts.c
+index 243f591..4773c18 100644
+--- a/crypto/cts.c
++++ b/crypto/cts.c
+@@ -136,8 +136,7 @@ static void crypto_cts_encrypt_done(struct crypto_async_request *areq, int err)
+ 		goto out;
+ 
+ 	err = cts_cbc_encrypt(req);
+-	if (err == -EINPROGRESS ||
+-	    (err == -EBUSY && req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++	if (err == -EINPROGRESS || err == -EBUSY)
+ 		return;
+ 
+ out:
+@@ -229,8 +228,7 @@ static void crypto_cts_decrypt_done(struct crypto_async_request *areq, int err)
+ 		goto out;
+ 
+ 	err = cts_cbc_decrypt(req);
+-	if (err == -EINPROGRESS ||
+-	    (err == -EBUSY && req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++	if (err == -EINPROGRESS || err == -EBUSY)
+ 		return;
+ 
+ out:
+diff --git a/crypto/lrw.c b/crypto/lrw.c
+index a8bfae4..695cea9 100644
+--- a/crypto/lrw.c
++++ b/crypto/lrw.c
+@@ -328,9 +328,7 @@ static int do_encrypt(struct skcipher_request *req, int err)
+ 		      crypto_skcipher_encrypt(subreq) ?:
+ 		      post_crypt(req);
+ 
+-		if (err == -EINPROGRESS ||
+-		    (err == -EBUSY &&
+-		     req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++		if (err == -EINPROGRESS || err == -EBUSY)
+ 			return err;
+ 	}
+ 
+@@ -380,9 +378,7 @@ static int do_decrypt(struct skcipher_request *req, int err)
+ 		      crypto_skcipher_decrypt(subreq) ?:
+ 		      post_crypt(req);
+ 
+-		if (err == -EINPROGRESS ||
+-		    (err == -EBUSY &&
+-		     req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++		if (err == -EINPROGRESS || err == -EBUSY)
+ 			return err;
+ 	}
+ 
+diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
+index 407c64b..2908f93 100644
+--- a/crypto/rsa-pkcs1pad.c
++++ b/crypto/rsa-pkcs1pad.c
+@@ -279,9 +279,7 @@ static int pkcs1pad_encrypt(struct akcipher_request *req)
+ 				   req->dst, ctx->key_size - 1, req->dst_len);
+ 
+ 	err = crypto_akcipher_encrypt(&req_ctx->child_req);
+-	if (err != -EINPROGRESS &&
+-			(err != -EBUSY ||
+-			 !(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)))
++	if (err != -EINPROGRESS && err != -EBUSY)
+ 		return pkcs1pad_encrypt_sign_complete(req, err);
+ 
+ 	return err;
+@@ -383,9 +381,7 @@ static int pkcs1pad_decrypt(struct akcipher_request *req)
+ 				   ctx->key_size);
+ 
+ 	err = crypto_akcipher_decrypt(&req_ctx->child_req);
+-	if (err != -EINPROGRESS &&
+-			(err != -EBUSY ||
+-			 !(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)))
++	if (err != -EINPROGRESS && err != -EBUSY)
+ 		return pkcs1pad_decrypt_complete(req, err);
+ 
+ 	return err;
+@@ -440,9 +436,7 @@ static int pkcs1pad_sign(struct akcipher_request *req)
+ 				   req->dst, ctx->key_size - 1, req->dst_len);
+ 
+ 	err = crypto_akcipher_sign(&req_ctx->child_req);
+-	if (err != -EINPROGRESS &&
+-			(err != -EBUSY ||
+-			 !(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)))
++	if (err != -EINPROGRESS && err != -EBUSY)
+ 		return pkcs1pad_encrypt_sign_complete(req, err);
+ 
+ 	return err;
+@@ -561,9 +555,7 @@ static int pkcs1pad_verify(struct akcipher_request *req)
+ 				   ctx->key_size);
+ 
+ 	err = crypto_akcipher_verify(&req_ctx->child_req);
+-	if (err != -EINPROGRESS &&
+-			(err != -EBUSY ||
+-			 !(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)))
++	if (err != -EINPROGRESS && err != -EBUSY)
+ 		return pkcs1pad_verify_complete(req, err);
+ 
+ 	return err;
+diff --git a/crypto/xts.c b/crypto/xts.c
+index d86c11a..af68012 100644
+--- a/crypto/xts.c
++++ b/crypto/xts.c
+@@ -269,9 +269,7 @@ static int do_encrypt(struct skcipher_request *req, int err)
+ 		      crypto_skcipher_encrypt(subreq) ?:
+ 		      post_crypt(req);
+ 
+-		if (err == -EINPROGRESS ||
+-		    (err == -EBUSY &&
+-		     req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++		if (err == -EINPROGRESS || err == -EBUSY)
+ 			return err;
+ 	}
+ 
+@@ -321,9 +319,7 @@ static int do_decrypt(struct skcipher_request *req, int err)
+ 		      crypto_skcipher_decrypt(subreq) ?:
+ 		      post_crypt(req);
+ 
+-		if (err == -EINPROGRESS ||
+-		    (err == -EBUSY &&
+-		     req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++		if (err == -EINPROGRESS || err == -EBUSY)
+ 			return err;
+ 	}
+ 
 -- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+2.1.4
