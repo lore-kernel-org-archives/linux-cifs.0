@@ -1,161 +1,313 @@
-From: Leon Romanovsky <leon-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Subject: Re: [Patch v2 01/19] CIFS: Add RDMA mount option
-Date: Mon, 21 Aug 2017 07:36:01 +0300
-Message-ID: <20170821043601.GD1724@mtr-leonro.local>
-References: <1503255883-3041-1-git-send-email-longli@exchange.microsoft.com>
- <1503255883-3041-2-git-send-email-longli@exchange.microsoft.com>
+From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+Subject: Re: [dm-devel] [PATCH v5 12/19] dm: move dm-verity to generic async completion
+Date: Mon, 21 Aug 2017 15:48:05 +0300
+Message-ID: <CAOtvUMdwH0u+1mOEJZxsgYCZ3mA-39_34bS+sCw8nMAX5bNXNQ@mail.gmail.com>
+References: <1502724094-23305-1-git-send-email-gilad@benyossef.com>
+ <1502724094-23305-13-git-send-email-gilad@benyossef.com> <alpine.LRH.2.02.1708191605370.2380@file01.intranet.prod.int.rdu2.redhat.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="qGV0fN9tzfkG3CxV"
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-        Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <1503255883-3041-2-git-send-email-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
+        David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        Tom Lendacky <thomas.lendacky-5C7GfCeVMHo@public.gmane.org>,
+        Gary Hook <gary.hook-5C7GfCeVMHo@public.gmane.org>,
+        Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+        Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>,
+        Matthias Brugger <matthias.bgg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Alasdair Kergon <agk-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        Mike Snitzer <snitzer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        device-mapper development <dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        Shaohua Li <shli-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        "Theodore Y. Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,
+        Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Mimi Zohar <zohar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
+        Dmitry Kasatkin <dmitry.kasatkin-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        James Morris <james.l.morris-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
+        "Serge E. Hallyn
+To: Mikulas Patocka <mpatocka-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <alpine.LRH.2.02.1708191605370.2380-Hpncn10jQN4oNljnaZt3ZvA+iT7yCHsGwRM8/txMwJMAicBL8TP8PQ@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
+
+On Sat, Aug 19, 2017 at 11:08 PM, Mikulas Patocka <mpatocka-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+>
+>
+>
+> On Mon, 14 Aug 2017, Gilad Ben-Yossef wrote:
+>
+> > dm-verity is starting async. crypto ops and waiting for them to complete.
+> > Move it over to generic code doing the same.
+> >
+> > This also fixes a possible data coruption bug created by the
+> > use of wait_for_completion_interruptible() without dealing
+> > correctly with an interrupt aborting the wait prior to the
+> > async op finishing.
+>
+> What is the exact problem there? The interruptible sleep is called from a
+> workqueue and workqueues have all signals blocked. Are signals unblocked
+> for some reason there?
 
 
---qGV0fN9tzfkG3CxV
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+I should have used "potential" rather then "possible". My bad.
 
-On Sun, Aug 20, 2017 at 12:04:25PM -0700, Long Li wrote:
-> From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
->
-> Add "rdma" to CIFS mount option, which tells CIFS this is for connecting to a SMB server over SMBDirect. Add checks to validate this feature is only used on SMB 3.X dialects.
->
-> To connect to SMBDirect, use "mount.cifs -o rdma,vers=3.x".
->
-> Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> ---
->  fs/cifs/cifs_debug.c |  2 ++
->  fs/cifs/cifsfs.c     |  2 ++
->  fs/cifs/cifsglob.h   |  3 +++
->  fs/cifs/connect.c    | 25 ++++++++++++++++++++++++-
->  4 files changed, 31 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-> index 9727e1d..ba0870d 100644
-> --- a/fs/cifs/cifs_debug.c
-> +++ b/fs/cifs/cifs_debug.c
-> @@ -171,6 +171,8 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
->  				ses->ses_count, ses->serverOS, ses->serverNOS,
->  				ses->capabilities, ses->status);
->  			}
-> +			if (server->rdma)
-> +				seq_printf(m, "RDMA\n\t");
->  			seq_printf(m, "TCP status: %d\n\tLocal Users To "
->  				   "Server: %d SecMode: 0x%x Req On Wire: %d",
->  				   server->tcpStatus, server->srv_count,
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index fe0c8dc..a628800 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -330,6 +330,8 @@ cifs_show_address(struct seq_file *s, struct TCP_Server_Info *server)
->  	default:
->  		seq_puts(s, "(unknown)");
->  	}
-> +	if (server->rdma)
-> +		seq_puts(s, ",rdma");
->  }
->
->  static void
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 8289f95..703c2fb 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -531,6 +531,7 @@ struct smb_vol {
->  	bool nopersistent:1;
->  	bool resilient:1; /* noresilient not required since not fored for CA */
->  	bool domainauto:1;
-> +	bool rdma:1;
->  	unsigned int rsize;
->  	unsigned int wsize;
->  	bool sockopt_tcp_nodelay:1;
-> @@ -649,6 +650,8 @@ struct TCP_Server_Info {
->  	bool	sec_kerberos;		/* supports plain Kerberos */
->  	bool	sec_mskerberos;		/* supports legacy MS Kerberos */
->  	bool	large_buf;		/* is current buffer large? */
-> +	/* use SMBD connection instead of socket */
-> +	bool	rdma;
->  	struct delayed_work	echo; /* echo ping workqueue job */
->  	char	*smallbuf;	/* pointer to current "small" buffer */
->  	char	*bigbuf;	/* pointer to current "big" buffer */
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 2eeaac6..d5d0ecd 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -94,7 +94,7 @@ enum {
->  	Opt_multiuser, Opt_sloppy, Opt_nosharesock,
->  	Opt_persistent, Opt_nopersistent,
->  	Opt_resilient, Opt_noresilient,
-> -	Opt_domainauto,
-> +	Opt_domainauto, Opt_rdma,
->
->  	/* Mount options which take numeric value */
->  	Opt_backupuid, Opt_backupgid, Opt_uid,
-> @@ -185,6 +185,7 @@ static const match_table_t cifs_mount_option_tokens = {
->  	{ Opt_resilient, "resilienthandles"},
->  	{ Opt_noresilient, "noresilienthandles"},
->  	{ Opt_domainauto, "domainauto"},
-> +	{ Opt_rdma, "rdma"},
->
->  	{ Opt_backupuid, "backupuid=%s" },
->  	{ Opt_backupgid, "backupgid=%s" },
-> @@ -1541,6 +1542,9 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
->  		case Opt_domainauto:
->  			vol->domainauto = true;
->  			break;
-> +		case Opt_rdma:
-> +			vol->rdma = true;
-> +			break;
->
->  		/* Numeric Values */
->  		case Opt_backupuid:
-> @@ -1931,6 +1935,21 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
->  		goto cifs_parse_mount_err;
->  	}
->
-> +	if (vol->rdma) {
-> +		switch (vol->vals->protocol_id) {
-> +		case SMB30_PROT_ID:
-> +		case SMB302_PROT_ID:
-> +		case SMB311_PROT_ID:
-> +			break;
+My point was that the use of wait_for_completion_interruptible() is wrong
+because we are not really ready to handle a signal *if* it arrives.
 
-In cover letter, you wrote that this option is relevant for 3.X versions,
-so why do you write explicitly versions and don't do check if (version > SMB30_PROT_ID) ...?
+Yes, since we are being called from a workqueue this will not happen, but:
 
-Thanks
+a. we (or rather I, since I wrote the offending code...) shouldn't call
+*_interruptible() in a function that is executing with signals masked
+unconditionally. It makes not sense.
 
---qGV0fN9tzfkG3CxV
-Content-Type: application/pgp-signature; name="signature.asc"
+b. someone might move the context this is executing in in the future, or make
+some other change that will enable signals and create a very subtle bug.
 
------BEGIN PGP SIGNATURE-----
+>
+>
+> Should there be another patch for stable kernels that fixes the
+> interruptible sleep?
 
-iQIzBAEBCAAdFiEEkhr/r4Op1/04yqaB5GN7iDZyWKcFAlmaYzEACgkQ5GN7iDZy
-WKc33w/8DK2askGTFKvt03g0R45z2gd7eG/J99I6o5rpiTsUlB6BW7tSYvg+o0Mf
-4u2SRMRIdHhzSklHIVFs5+O8lp4r57O6rDYhdtRmihNmy74yd4fd/ly7Pt4UhYUD
-bFklghfmQFbEE0RXZl/2kpO29Huc3LXe9//3w7Q/jqH3aywliTaFKYzMxqZcrC8h
-B/G4CNbEmzJEF+mXos8dM3r4kyT31IqAwYqrvHQxpd0YRjakqBGmwdyyguE1Y8uq
-SqK2Y1UJ0EiIOOAR2HH+y/tvtxvaV1yC3jiN8StU8Ic5ZLAIFI5AwhYMYtOXpkah
-6uqgo9+yLX6J2AouT/DXnflBVYJD1EZnF24iIHUaad/aYRC55haUiPZhn7Bul3dF
-eZLSddfFk7YOOkOk2/V6yygAv54DS+p9wRaASeyK52rWeTOd1FZS0fI3oEcvcO09
-I2Apw/KIsntAqfGpEa9IOf5ua4opHol0nKFZ7rtR5E0oaD9NclbsPnHbXwTHamma
-WYoKa6vKqS8GY6fV/O7912PCVbKLMDeQ+YIrzHQOPP4/PaiKulKQG9qrhRA3skrC
-EwubmQ7XNtLNTTfRIvQq0vPChbnXiltunjR9CM7f0hIpXmBBRNB67/htIGFeNl2q
-A2cYDk9aj/LOgZl7peVjNQQOOkzoSJd19Hxfdemlfs7GhxjzjNI=
-=lpqK
------END PGP SIGNATURE-----
 
---qGV0fN9tzfkG3CxV--
---
-To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+No, for the reason you pointed yourself - signals are blocked here, so this
+is a potential bug only but can't be triggered.
+
+I already sent a patch set fixing similar places that had the
+same issue and it went into stable - e.g.
+https://patchwork.kernel.org/patch/9781693/
+
+Thanks,
+Gilad
+
+>
+>
+> Mikulas
+>
+> > Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+> > ---
+> >  drivers/md/dm-verity-target.c | 81 +++++++++++--------------------------------
+> >  drivers/md/dm-verity.h        |  5 ---
+> >  2 files changed, 20 insertions(+), 66 deletions(-)
+> >
+> > diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
+> > index 79f18d4..8df08a8 100644
+> > --- a/drivers/md/dm-verity-target.c
+> > +++ b/drivers/md/dm-verity-target.c
+> > @@ -92,74 +92,33 @@ static sector_t verity_position_at_level(struct dm_verity *v, sector_t block,
+> >       return block >> (level * v->hash_per_block_bits);
+> >  }
+> >
+> > -/*
+> > - * Callback function for asynchrnous crypto API completion notification
+> > - */
+> > -static void verity_op_done(struct crypto_async_request *base, int err)
+> > -{
+> > -     struct verity_result *res = (struct verity_result *)base->data;
+> > -
+> > -     if (err == -EINPROGRESS)
+> > -             return;
+> > -
+> > -     res->err = err;
+> > -     complete(&res->completion);
+> > -}
+> > -
+> > -/*
+> > - * Wait for async crypto API callback
+> > - */
+> > -static inline int verity_complete_op(struct verity_result *res, int ret)
+> > -{
+> > -     switch (ret) {
+> > -     case 0:
+> > -             break;
+> > -
+> > -     case -EINPROGRESS:
+> > -     case -EBUSY:
+> > -             ret = wait_for_completion_interruptible(&res->completion);
+> > -             if (!ret)
+> > -                     ret = res->err;
+> > -             reinit_completion(&res->completion);
+> > -             break;
+> > -
+> > -     default:
+> > -             DMERR("verity_wait_hash: crypto op submission failed: %d", ret);
+> > -     }
+> > -
+> > -     if (unlikely(ret < 0))
+> > -             DMERR("verity_wait_hash: crypto op failed: %d", ret);
+> > -
+> > -     return ret;
+> > -}
+> > -
+> >  static int verity_hash_update(struct dm_verity *v, struct ahash_request *req,
+> >                               const u8 *data, size_t len,
+> > -                             struct verity_result *res)
+> > +                             struct crypto_wait *wait)
+> >  {
+> >       struct scatterlist sg;
+> >
+> >       sg_init_one(&sg, data, len);
+> >       ahash_request_set_crypt(req, &sg, NULL, len);
+> >
+> > -     return verity_complete_op(res, crypto_ahash_update(req));
+> > +     return crypto_wait_req(crypto_ahash_update(req), wait);
+> >  }
+> >
+> >  /*
+> >   * Wrapper for crypto_ahash_init, which handles verity salting.
+> >   */
+> >  static int verity_hash_init(struct dm_verity *v, struct ahash_request *req,
+> > -                             struct verity_result *res)
+> > +                             struct crypto_wait *wait)
+> >  {
+> >       int r;
+> >
+> >       ahash_request_set_tfm(req, v->tfm);
+> >       ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP |
+> >                                       CRYPTO_TFM_REQ_MAY_BACKLOG,
+> > -                                     verity_op_done, (void *)res);
+> > -     init_completion(&res->completion);
+> > +                                     crypto_req_done, (void *)wait);
+> > +     crypto_init_wait(wait);
+> >
+> > -     r = verity_complete_op(res, crypto_ahash_init(req));
+> > +     r = crypto_wait_req(crypto_ahash_init(req), wait);
+> >
+> >       if (unlikely(r < 0)) {
+> >               DMERR("crypto_ahash_init failed: %d", r);
+> > @@ -167,18 +126,18 @@ static int verity_hash_init(struct dm_verity *v, struct ahash_request *req,
+> >       }
+> >
+> >       if (likely(v->salt_size && (v->version >= 1)))
+> > -             r = verity_hash_update(v, req, v->salt, v->salt_size, res);
+> > +             r = verity_hash_update(v, req, v->salt, v->salt_size, wait);
+> >
+> >       return r;
+> >  }
+> >
+> >  static int verity_hash_final(struct dm_verity *v, struct ahash_request *req,
+> > -                          u8 *digest, struct verity_result *res)
+> > +                          u8 *digest, struct crypto_wait *wait)
+> >  {
+> >       int r;
+> >
+> >       if (unlikely(v->salt_size && (!v->version))) {
+> > -             r = verity_hash_update(v, req, v->salt, v->salt_size, res);
+> > +             r = verity_hash_update(v, req, v->salt, v->salt_size, wait);
+> >
+> >               if (r < 0) {
+> >                       DMERR("verity_hash_final failed updating salt: %d", r);
+> > @@ -187,7 +146,7 @@ static int verity_hash_final(struct dm_verity *v, struct ahash_request *req,
+> >       }
+> >
+> >       ahash_request_set_crypt(req, NULL, digest, 0);
+> > -     r = verity_complete_op(res, crypto_ahash_final(req));
+> > +     r = crypto_wait_req(crypto_ahash_final(req), wait);
+> >  out:
+> >       return r;
+> >  }
+> > @@ -196,17 +155,17 @@ int verity_hash(struct dm_verity *v, struct ahash_request *req,
+> >               const u8 *data, size_t len, u8 *digest)
+> >  {
+> >       int r;
+> > -     struct verity_result res;
+> > +     struct crypto_wait wait;
+> >
+> > -     r = verity_hash_init(v, req, &res);
+> > +     r = verity_hash_init(v, req, &wait);
+> >       if (unlikely(r < 0))
+> >               goto out;
+> >
+> > -     r = verity_hash_update(v, req, data, len, &res);
+> > +     r = verity_hash_update(v, req, data, len, &wait);
+> >       if (unlikely(r < 0))
+> >               goto out;
+> >
+> > -     r = verity_hash_final(v, req, digest, &res);
+> > +     r = verity_hash_final(v, req, digest, &wait);
+> >
+> >  out:
+> >       return r;
+> > @@ -389,7 +348,7 @@ int verity_hash_for_block(struct dm_verity *v, struct dm_verity_io *io,
+> >   * Calculates the digest for the given bio
+> >   */
+> >  int verity_for_io_block(struct dm_verity *v, struct dm_verity_io *io,
+> > -                     struct bvec_iter *iter, struct verity_result *res)
+> > +                     struct bvec_iter *iter, struct crypto_wait *wait)
+> >  {
+> >       unsigned int todo = 1 << v->data_dev_block_bits;
+> >       struct bio *bio = dm_bio_from_per_bio_data(io, v->ti->per_io_data_size);
+> > @@ -414,7 +373,7 @@ int verity_for_io_block(struct dm_verity *v, struct dm_verity_io *io,
+> >                */
+> >               sg_set_page(&sg, bv.bv_page, len, bv.bv_offset);
+> >               ahash_request_set_crypt(req, &sg, NULL, len);
+> > -             r = verity_complete_op(res, crypto_ahash_update(req));
+> > +             r = crypto_wait_req(crypto_ahash_update(req), wait);
+> >
+> >               if (unlikely(r < 0)) {
+> >                       DMERR("verity_for_io_block crypto op failed: %d", r);
+> > @@ -482,7 +441,7 @@ static int verity_verify_io(struct dm_verity_io *io)
+> >       struct dm_verity *v = io->v;
+> >       struct bvec_iter start;
+> >       unsigned b;
+> > -     struct verity_result res;
+> > +     struct crypto_wait wait;
+> >
+> >       for (b = 0; b < io->n_blocks; b++) {
+> >               int r;
+> > @@ -507,17 +466,17 @@ static int verity_verify_io(struct dm_verity_io *io)
+> >                       continue;
+> >               }
+> >
+> > -             r = verity_hash_init(v, req, &res);
+> > +             r = verity_hash_init(v, req, &wait);
+> >               if (unlikely(r < 0))
+> >                       return r;
+> >
+> >               start = io->iter;
+> > -             r = verity_for_io_block(v, io, &io->iter, &res);
+> > +             r = verity_for_io_block(v, io, &io->iter, &wait);
+> >               if (unlikely(r < 0))
+> >                       return r;
+> >
+> >               r = verity_hash_final(v, req, verity_io_real_digest(v, io),
+> > -                                     &res);
+> > +                                     &wait);
+> >               if (unlikely(r < 0))
+> >                       return r;
+> >
+> > diff --git a/drivers/md/dm-verity.h b/drivers/md/dm-verity.h
+> > index a59e0ad..b675bc0 100644
+> > --- a/drivers/md/dm-verity.h
+> > +++ b/drivers/md/dm-verity.h
+> > @@ -90,11 +90,6 @@ struct dm_verity_io {
+> >        */
+> >  };
+> >
+> > -struct verity_result {
+> > -     struct completion completion;
+> > -     int err;
+> > -};
+> > -
+> >  static inline struct ahash_request *verity_io_hash_req(struct dm_verity *v,
+> >                                                    struct dm_verity_io *io)
+> >  {
+> > --
+> > 2.1.4
+> >
+> > --
+> > dm-devel mailing list
+> > dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+> > https://www.redhat.com/mailman/listinfo/dm-devel
+> >
+
+
+
+
+-- 
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
