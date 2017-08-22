@@ -1,225 +1,282 @@
-From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 2/2] cifs: Add support for writing attributes on SMB2+
-Date: Tue, 22 Aug 2017 08:23:05 +1000
-Message-ID: <20170821222305.4628-3-lsahlber@redhat.com>
-References: <20170821222305.4628-1-lsahlber@redhat.com>
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 1/2] cifs: Add support for reading attributes on SMB2+
+Date: Tue, 22 Aug 2017 07:00:44 -0500
+Message-ID: <CADT32eJ89fjpyJHYox6PemL0P4d5nFe4Fdm=1-tXKp3aGNPuVw@mail.gmail.com>
+References: <20170821222305.4628-1-lsahlber@redhat.com> <20170821222305.4628-2-lsahlber@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170821222305.4628-1-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <20170821222305.4628-2-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This adds support for writing extended attributes on SMB2+ shares.
-Attributes can be written using the setfattr command.
+Looks correct (except for EAData)...
 
-RH-bz: 1110709
+Reviewed-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/cifsglob.h  |  2 +-
- fs/cifs/cifsproto.h |  3 ++-
- fs/cifs/cifssmb.c   |  3 ++-
- fs/cifs/smb2ops.c   | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2pdu.c   | 10 +++++++++
- fs/cifs/smb2proto.h |  3 +++
- fs/cifs/xattr.c     |  2 +-
- 7 files changed, 79 insertions(+), 4 deletions(-)
-
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 221693fe49ec..808486c29f0d 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -421,7 +421,7 @@ struct smb_version_operations {
- 			size_t, struct cifs_sb_info *);
- 	int (*set_EA)(const unsigned int, struct cifs_tcon *, const char *,
- 			const char *, const void *, const __u16,
--			const struct nls_table *, int);
-+			const struct nls_table *, struct cifs_sb_info *);
- 	struct cifs_ntsd * (*get_acl)(struct cifs_sb_info *, struct inode *,
- 			const char *, u32 *);
- 	struct cifs_ntsd * (*get_acl_by_fid)(struct cifs_sb_info *,
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 6eb3147132e3..4143c9dec463 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -484,7 +484,8 @@ extern ssize_t CIFSSMBQAllEAs(const unsigned int xid, struct cifs_tcon *tcon,
- extern int CIFSSMBSetEA(const unsigned int xid, struct cifs_tcon *tcon,
- 		const char *fileName, const char *ea_name,
- 		const void *ea_value, const __u16 ea_value_len,
--		const struct nls_table *nls_codepage, int remap_special_chars);
-+		const struct nls_table *nls_codepage,
-+		struct cifs_sb_info *cifs_sb);
- extern int CIFSSMBGetCIFSACL(const unsigned int xid, struct cifs_tcon *tcon,
- 			__u16 fid, struct cifs_ntsd **acl_inf, __u32 *buflen);
- extern int CIFSSMBSetCIFSACL(const unsigned int, struct cifs_tcon *, __u16,
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 72a53bd19865..48455afefec8 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -6264,7 +6264,7 @@ int
- CIFSSMBSetEA(const unsigned int xid, struct cifs_tcon *tcon,
- 	     const char *fileName, const char *ea_name, const void *ea_value,
- 	     const __u16 ea_value_len, const struct nls_table *nls_codepage,
--	     int remap)
-+	     struct cifs_sb_info *cifs_sb)
- {
- 	struct smb_com_transaction2_spi_req *pSMB = NULL;
- 	struct smb_com_transaction2_spi_rsp *pSMBr = NULL;
-@@ -6273,6 +6273,7 @@ CIFSSMBSetEA(const unsigned int xid, struct cifs_tcon *tcon,
- 	int rc = 0;
- 	int bytes_returned = 0;
- 	__u16 params, param_offset, byte_count, offset, count;
-+	int remap = cifs_remap(cifs_sb);
- 
- 	cifs_dbg(FYI, "In SetEA\n");
- SetEARetry:
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index c389a673574f..b9ab18690fa7 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -557,6 +557,62 @@ smb2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
- 	return rc;
- }
- 
-+
-+static int
-+smb2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
-+	    const char *fileName, const char *ea_name, const void *ea_value,
-+	    const __u16 ea_value_len, const struct nls_table *nls_codepage,
-+	    struct cifs_sb_info *cifs_sb)
-+{
-+	int rc;
-+	__le16 *utf16_path;
-+	__u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
-+	struct cifs_open_parms oparms;
-+	struct cifs_fid fid;
-+	struct smb2_file_full_ea_info *ea;
-+	int ea_name_len = strlen(ea_name);
-+	int len;
-+
-+	if (ea_name_len > 255)
-+		return -EINVAL;
-+
-+	utf16_path = cifs_convert_path_to_utf16(fileName, cifs_sb);
-+	if (!utf16_path)
-+		return -ENOMEM;
-+
-+	oparms.tcon = tcon;
-+	oparms.desired_access = FILE_WRITE_EA;
-+	oparms.disposition = FILE_OPEN;
-+	oparms.create_options = 0;
-+	oparms.fid = &fid;
-+	oparms.reconnect = false;
-+
-+	rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL);
-+	kfree(utf16_path);
-+	if (rc) {
-+		cifs_dbg(FYI, "open failed rc=%d\n", rc);
-+		return rc;
-+	}
-+
-+	len = sizeof(ea) + ea_name_len + ea_value_len + 1;
-+	ea = kzalloc(len, GFP_KERNEL);
-+	if (ea == NULL) {
-+		SMB2_close(xid, tcon, fid.persistent_fid, fid.volatile_fid);
-+		return -ENOMEM;
-+	}
-+
-+	ea->ea_name_length = ea_name_len;
-+	ea->ea_value_length = ea_value_len;
-+	memcpy(ea->ea_data, ea_name, ea_name_len + 1);
-+	memcpy(ea->ea_data + ea_name_len + 1, ea_value, ea_value_len);
-+
-+	rc = SMB2_set_ea(xid, tcon, fid.persistent_fid, fid.volatile_fid, ea,
-+			 len);
-+	SMB2_close(xid, tcon, fid.persistent_fid, fid.volatile_fid);
-+
-+	return rc;
-+}
-+
- static bool
- smb2_can_echo(struct TCP_Server_Info *server)
- {
-@@ -2705,6 +2761,7 @@ struct smb_version_operations smb20_operations = {
- 	.select_sectype = smb2_select_sectype,
- #ifdef CONFIG_CIFS_XATTR
- 	.query_all_EAs = smb2_query_eas,
-+	.set_EA = smb2_set_ea,
- #endif /* CIFS_XATTR */
- #ifdef CONFIG_CIFS_ACL
- 	.get_acl = get_smb2_acl,
-@@ -2798,6 +2855,7 @@ struct smb_version_operations smb21_operations = {
- 	.select_sectype = smb2_select_sectype,
- #ifdef CONFIG_CIFS_XATTR
- 	.query_all_EAs = smb2_query_eas,
-+	.set_EA = smb2_set_ea,
- #endif /* CIFS_XATTR */
- #ifdef CONFIG_CIFS_ACL
- 	.get_acl = get_smb2_acl,
-@@ -2901,6 +2959,7 @@ struct smb_version_operations smb30_operations = {
- 	.select_sectype = smb2_select_sectype,
- #ifdef CONFIG_CIFS_XATTR
- 	.query_all_EAs = smb2_query_eas,
-+	.set_EA = smb2_set_ea,
- #endif /* CIFS_XATTR */
- #ifdef CONFIG_CIFS_ACL
- 	.get_acl = get_smb2_acl,
-@@ -3005,6 +3064,7 @@ struct smb_version_operations smb311_operations = {
- 	.select_sectype = smb2_select_sectype,
- #ifdef CONFIG_CIFS_XATTR
- 	.query_all_EAs = smb2_query_eas,
-+	.set_EA = smb2_set_ea,
- #endif /* CIFS_XATTR */
- };
- #endif /* CIFS_SMB311 */
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 30ef93e459a9..93785a97b2bf 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -3192,6 +3192,16 @@ SMB2_set_acl(const unsigned int xid, struct cifs_tcon *tcon,
- }
- 
- int
-+SMB2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
-+	    u64 persistent_fid, u64 volatile_fid,
-+	    struct smb2_file_full_ea_info *buf, int len)
-+{
-+	return send_set_info(xid, tcon, persistent_fid, volatile_fid,
-+		current->tgid, FILE_FULL_EA_INFORMATION, SMB2_O_INFO_FILE,
-+		0, 1, (void **)&buf, &len);
-+}
-+
-+int
- SMB2_oplock_break(const unsigned int xid, struct cifs_tcon *tcon,
- 		  const u64 persistent_fid, const u64 volatile_fid,
- 		  __u8 oplock_level)
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index 183389bfc8f6..003217099ef3 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -172,6 +172,9 @@ extern int SMB2_set_info(const unsigned int xid, struct cifs_tcon *tcon,
- extern int SMB2_set_acl(const unsigned int xid, struct cifs_tcon *tcon,
- 			u64 persistent_fid, u64 volatile_fid,
- 			struct cifs_ntsd *pnntsd, int pacllen, int aclflag);
-+extern int SMB2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
-+		       u64 persistent_fid, u64 volatile_fid,
-+		       struct smb2_file_full_ea_info *buf, int len);
- extern int SMB2_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
- 				u64 persistent_fid, u64 volatile_fid);
- extern int SMB2_oplock_break(const unsigned int xid, struct cifs_tcon *tcon,
-diff --git a/fs/cifs/xattr.c b/fs/cifs/xattr.c
-index de50e749ff05..52f975d848a0 100644
---- a/fs/cifs/xattr.c
-+++ b/fs/cifs/xattr.c
-@@ -84,7 +84,7 @@ static int cifs_xattr_set(const struct xattr_handler *handler,
- 		if (pTcon->ses->server->ops->set_EA)
- 			rc = pTcon->ses->server->ops->set_EA(xid, pTcon,
- 				full_path, name, value, (__u16)size,
--				cifs_sb->local_nls, cifs_remap(cifs_sb));
-+				cifs_sb->local_nls, cifs_sb);
- 		break;
- 
- 	case XATTR_CIFS_ACL: {
--- 
-2.13.3
+On Mon, Aug 21, 2017 at 5:23 PM, Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> SMB1 already has support to read attributes. This adds similar support
+> to SMB2+.
+>
+> With this patch, tools such as 'getfattr' will now work with SMB2+ shares.
+>
+> RH-bz: 1110709
+>
+> Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/smb2ops.c   | 143 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  fs/cifs/smb2pdu.c   |  12 +++++
+>  fs/cifs/smb2pdu.h   |  10 ++++
+>  fs/cifs/smb2proto.h |   3 ++
+>  4 files changed, 168 insertions(+)
+>
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index cfacf2c97e94..c389a673574f 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -426,6 +426,137 @@ smb2_query_file_info(const unsigned int xid, struct cifs_tcon *tcon,
+>         return rc;
+>  }
+>
+> +static ssize_t
+> +move_smb2_ea_to_cifs(char *dst, size_t dst_size,
+> +                    struct smb2_file_full_ea_info *src, size_t src_size,
+> +                    const unsigned char *ea_name)
+> +{
+> +       int rc = 0;
+> +       unsigned int ea_name_len = ea_name ? strlen(ea_name) : 0;
+> +       char *name, *value;
+> +       size_t name_len, value_len, user_name_len;
+> +
+> +       while (src_size > 0) {
+> +               name = &src->ea_data[0];
+> +               name_len = (size_t)src->ea_name_length;
+> +               value = &src->ea_data[src->ea_name_length + 1];
+> +               value_len = (size_t)src->ea_value_length;
+> +
+> +               if (name_len == 0) {
+> +                       break;
+> +               }
+> +
+> +               if (src_size < 8 + name_len + 1 + value_len) {
+> +                       cifs_dbg(FYI, "EA entry goes beyond length of list\n");
+> +                       rc = -EIO;
+> +                       goto out;
+> +               }
+> +
+> +               if (ea_name) {
+> +                       if (ea_name_len == name_len &&
+> +                           memcmp(ea_name, name, name_len) == 0) {
+> +                               rc = value_len;
+> +                               if (dst_size == 0)
+> +                                       goto out;
+> +                               if (dst_size < value_len) {
+> +                                       rc = -ERANGE;
+> +                                       goto out;
+> +                               }
+> +                               memcpy(dst, value, value_len);
+> +                               goto out;
+> +                       }
+> +               } else {
+> +                       /* 'user.' plus a terminating null */
+> +                       user_name_len = 5 + 1 + name_len;
+> +
+> +                       rc += user_name_len;
+> +
+> +                       if (dst_size >= user_name_len) {
+> +                               dst_size -= user_name_len;
+> +                               memcpy(dst, "user.", 5);
+> +                               dst += 5;
+> +                               memcpy(dst, src->ea_data, name_len);
+> +                               dst += name_len;
+> +                               *dst = 0;
+> +                               ++dst;
+> +                       } else if (dst_size == 0) {
+> +                               /* skip copy - calc size only */
+> +                       } else {
+> +                               /* stop before overrun buffer */
+> +                               rc = -ERANGE;
+> +                               break;
+> +                       }
+> +               }
+> +
+> +               if (!src->next_entry_offset)
+> +                       break;
+> +
+> +               if (src_size < src->next_entry_offset) {
+> +                       /* stop before overrun buffer */
+> +                       rc = -ERANGE;
+> +                       break;
+> +               }
+> +               src_size -= src->next_entry_offset;
+> +               src = (void *)((char *)src + src->next_entry_offset);
+> +       }
+> +
+> +       /* didn't find the named attribute */
+> +       if (ea_name)
+> +               rc = -ENODATA;
+> +
+> +out:
+> +       return (ssize_t)rc;
+> +}
+> +
+> +static ssize_t
+> +smb2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
+> +              const unsigned char *searchName, const unsigned char *ea_name,
+> +              char *EAData, size_t buf_size,
+> +              struct cifs_sb_info *cifs_sb)
+> +{
+> +       int rc;
+> +       __le16 *utf16_path;
+> +       __u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
+> +       struct cifs_open_parms oparms;
+> +       struct cifs_fid fid;
+> +       struct smb2_file_full_ea_info *smb2_data;
+> +
+> +       utf16_path = cifs_convert_path_to_utf16(searchName, cifs_sb);
+> +       if (!utf16_path)
+> +               return -ENOMEM;
+> +
+> +       oparms.tcon = tcon;
+> +       oparms.desired_access = FILE_READ_EA;
+> +       oparms.disposition = FILE_OPEN;
+> +       oparms.create_options = 0;
+> +       oparms.fid = &fid;
+> +       oparms.reconnect = false;
+> +
+> +       rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL);
+> +       kfree(utf16_path);
+> +       if (rc) {
+> +               cifs_dbg(FYI, "open failed rc=%d\n", rc);
+> +               return rc;
+> +       }
+> +
+> +       smb2_data = kzalloc(SMB2_MAX_EA_BUF, GFP_KERNEL);
+> +       if (smb2_data == NULL) {
+> +               SMB2_close(xid, tcon, fid.persistent_fid, fid.volatile_fid);
+> +               return -ENOMEM;
+> +       }
+> +
+> +       rc = SMB2_query_eas(xid, tcon, fid.persistent_fid, fid.volatile_fid,
+> +                           smb2_data);
+> +       SMB2_close(xid, tcon, fid.persistent_fid, fid.volatile_fid);
+> +
+> +       if (!rc)
+> +               rc = move_smb2_ea_to_cifs(EAData, buf_size, smb2_data,
+> +                                         SMB2_MAX_EA_BUF, ea_name);
+> +
+> +       kfree(smb2_data);
+> +       return rc;
+> +}
+> +
+>  static bool
+>  smb2_can_echo(struct TCP_Server_Info *server)
+>  {
+> @@ -2572,6 +2703,9 @@ struct smb_version_operations smb20_operations = {
+>         .dir_needs_close = smb2_dir_needs_close,
+>         .get_dfs_refer = smb2_get_dfs_refer,
+>         .select_sectype = smb2_select_sectype,
+> +#ifdef CONFIG_CIFS_XATTR
+> +       .query_all_EAs = smb2_query_eas,
+> +#endif /* CIFS_XATTR */
+>  #ifdef CONFIG_CIFS_ACL
+>         .get_acl = get_smb2_acl,
+>         .get_acl_by_fid = get_smb2_acl_by_fid,
+> @@ -2662,6 +2796,9 @@ struct smb_version_operations smb21_operations = {
+>         .enum_snapshots = smb3_enum_snapshots,
+>         .get_dfs_refer = smb2_get_dfs_refer,
+>         .select_sectype = smb2_select_sectype,
+> +#ifdef CONFIG_CIFS_XATTR
+> +       .query_all_EAs = smb2_query_eas,
+> +#endif /* CIFS_XATTR */
+>  #ifdef CONFIG_CIFS_ACL
+>         .get_acl = get_smb2_acl,
+>         .get_acl_by_fid = get_smb2_acl_by_fid,
+> @@ -2762,6 +2899,9 @@ struct smb_version_operations smb30_operations = {
+>         .receive_transform = smb3_receive_transform,
+>         .get_dfs_refer = smb2_get_dfs_refer,
+>         .select_sectype = smb2_select_sectype,
+> +#ifdef CONFIG_CIFS_XATTR
+> +       .query_all_EAs = smb2_query_eas,
+> +#endif /* CIFS_XATTR */
+>  #ifdef CONFIG_CIFS_ACL
+>         .get_acl = get_smb2_acl,
+>         .get_acl_by_fid = get_smb2_acl_by_fid,
+> @@ -2863,6 +3003,9 @@ struct smb_version_operations smb311_operations = {
+>         .receive_transform = smb3_receive_transform,
+>         .get_dfs_refer = smb2_get_dfs_refer,
+>         .select_sectype = smb2_select_sectype,
+> +#ifdef CONFIG_CIFS_XATTR
+> +       .query_all_EAs = smb2_query_eas,
+> +#endif /* CIFS_XATTR */
+>  };
+>  #endif /* CIFS_SMB311 */
+>
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index 5fb2fc2d0080..30ef93e459a9 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -2140,6 +2140,18 @@ query_info(const unsigned int xid, struct cifs_tcon *tcon,
+>         return rc;
+>  }
+>
+> +int SMB2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
+> +       u64 persistent_fid, u64 volatile_fid,
+> +       struct smb2_file_full_ea_info *data)
+> +{
+> +       return query_info(xid, tcon, persistent_fid, volatile_fid,
+> +                         FILE_FULL_EA_INFORMATION, SMB2_O_INFO_FILE, 0,
+> +                         SMB2_MAX_EA_BUF,
+> +                         sizeof(struct smb2_file_full_ea_info),
+> +                         (void **)&data,
+> +                         NULL);
+> +}
+> +
+>  int SMB2_query_info(const unsigned int xid, struct cifs_tcon *tcon,
+>         u64 persistent_fid, u64 volatile_fid, struct smb2_file_all_info *data)
+>  {
+> diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+> index 18700fd25a0b..b080b715353c 100644
+> --- a/fs/cifs/smb2pdu.h
+> +++ b/fs/cifs/smb2pdu.h
+> @@ -1178,6 +1178,16 @@ struct smb2_file_link_info { /* encoding of request for level 11 */
+>         char   FileName[0];     /* Name to be assigned to new link */
+>  } __packed; /* level 11 Set */
+>
+> +#define SMB2_MAX_EA_BUF 2048
+> +
+> +struct smb2_file_full_ea_info { /* encoding of response for level 15 */
+> +       __le32 next_entry_offset;
+> +       __u8   flags;
+> +       __u8   ea_name_length;
+> +       __u16  ea_value_length;
+> +       char   ea_data[0]; /* \0 terminated name plus value */
+> +} __packed; /* level 15 Set */
+> +
+>  /*
+>   * This level 18, although with struct with same name is different from cifs
+>   * level 0x107. Level 0x107 has an extra u64 between AccessFlags and
+> diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+> index 1cadaf9f3c58..183389bfc8f6 100644
+> --- a/fs/cifs/smb2proto.h
+> +++ b/fs/cifs/smb2proto.h
+> @@ -132,6 +132,9 @@ extern int SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
+>                       u64 persistent_file_id, u64 volatile_file_id);
+>  extern int SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon,
+>                       u64 persistent_file_id, u64 volatile_file_id);
+> +extern int SMB2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
+> +                         u64 persistent_file_id, u64 volatile_file_id,
+> +                         struct smb2_file_full_ea_info *data);
+>  extern int SMB2_query_info(const unsigned int xid, struct cifs_tcon *tcon,
+>                            u64 persistent_file_id, u64 volatile_file_id,
+>                            struct smb2_file_all_info *data);
+> --
+> 2.13.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
