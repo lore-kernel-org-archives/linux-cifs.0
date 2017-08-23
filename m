@@ -1,101 +1,74 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: return ENAMETOOLONG for overlong names in cifs_open()/cifs_lookup()
-Date: Wed, 23 Aug 2017 14:41:21 -0500
-Message-ID: <CAH2r5msWcNUYmQxbTfJtAS1zHXw0HDNLGQdFUOooxTW1Rfz4ew@mail.gmail.com>
-References: <20170823044814.9609-1-lsahlber@redhat.com>
+Subject: Re: [PATCH] cifs: Fix df output for users with quota limits
+Date: Wed, 23 Aug 2017 14:42:42 -0500
+Message-ID: <CAH2r5mvzG5byf6VSGBtJhi+86gRWjZRbKxT7uQZ4z4Bs_YJtdg@mail.gmail.com>
+References: <20170803073903.31575-1-sprabhu@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170823044814.9609-1-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <20170803073903.31575-1-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 merged into cifs-2.6.git for-next and added cc: stable
 
-On Tue, Aug 22, 2017 at 11:48 PM, Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> Add checking for the path component length and verify it is <= the maximum
-> that the server advertizes via FileFsAttributeInformation.
+On Thu, Aug 3, 2017 at 2:39 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> The df for a SMB2 share triggers a GetInfo call for
+> FS_FULL_SIZE_INFORMATION. The values returned are used to populate
+> struct statfs.
 >
-> With this patch cifs.ko will now return ENAMETOOLONG instead of ENOENT
-> when users to access an overlong path.
+> The problem is that none of the information returned by the call
+> contains the total blocks available on the filesystem. Instead we use
+> the blocks available to the user ie. quota limitation when filling out
+> statfs.f_blocks. The information returned does contain Actual free units
+> on the filesystem and is used to populate statfs.f_bfree. For users with
+> quota enabled, it can lead to situations where the total free space
+> reported is more than the total blocks on the system ending up with df
+> reports like the following
 >
-> To test this, try to cd into a (non-existing) directory on a CIFS share
-> that has a too long name:
-> cd /mnt/aaaaaaaaaaaaaaa...
+>  # df -h /mnt/a
+> Filesystem         Size  Used Avail Use% Mounted on
+> //192.168.22.10/a  2.5G -2.3G  2.5G    - /mnt/a
 >
-> and it now should show a good error message from the shell:
-> bash: cd: /mnt/aaaaaaaaaaaaaaaa...aaaaaa: File name too long
+> To fix this problem, we instead populate both statfs.f_bfree with the
+> same value as statfs.f_bavail ie. CallerAvailableAllocationUnits. This
+> is similar to what is done already in the code for cifs and df now
+> reports the quota information for the user used to mount the share.
 >
-> rh bz 1153996
+>  # df --si /mnt/a
+> Filesystem         Size  Used Avail Use% Mounted on
+> //192.168.22.10/a  2.7G  101M  2.6G   4% /mnt/a
 >
-> Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> Signed-off-by: Pierguido Lambri <plambri-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > ---
->  fs/cifs/dir.c | 18 ++++++++++++------
->  1 file changed, 12 insertions(+), 6 deletions(-)
+>  fs/cifs/smb2pdu.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-> index 56366e984076..569d3fb736be 100644
-> --- a/fs/cifs/dir.c
-> +++ b/fs/cifs/dir.c
-> @@ -194,15 +194,20 @@ build_path_from_dentry_optional_prefix(struct dentry *direntry, bool prefix)
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index 5fb2fc2..97edb4d3 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -3219,8 +3219,8 @@ copy_fs_info_to_kstatfs(struct smb2_fs_full_size_info *pfs_inf,
+>         kst->f_bsize = le32_to_cpu(pfs_inf->BytesPerSector) *
+>                           le32_to_cpu(pfs_inf->SectorsPerAllocationUnit);
+>         kst->f_blocks = le64_to_cpu(pfs_inf->TotalAllocationUnits);
+> -       kst->f_bfree  = le64_to_cpu(pfs_inf->ActualAvailableAllocationUnits);
+> -       kst->f_bavail = le64_to_cpu(pfs_inf->CallerAvailableAllocationUnits);
+> +       kst->f_bfree  = kst->f_bavail =
+> +                       le64_to_cpu(pfs_inf->CallerAvailableAllocationUnits);
+>         return;
 >  }
 >
->  /*
-> + * Don't allow path components longer than the server max.
->   * Don't allow the separator character in a path component.
->   * The VFS will not allow "/", but "\" is allowed by posix.
->   */
->  static int
-> -check_name(struct dentry *direntry)
-> +check_name(struct dentry *direntry, struct cifs_tcon *tcon)
->  {
->         struct cifs_sb_info *cifs_sb = CIFS_SB(direntry->d_sb);
->         int i;
->
-> +       if (unlikely(direntry->d_name.len >
-> +                    tcon->fsAttrInfo.MaxPathNameComponentLength))
-> +               return -ENAMETOOLONG;
-> +
->         if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS)) {
->                 for (i = 0; i < direntry->d_name.len; i++) {
->                         if (direntry->d_name.name[i] == '\\') {
-> @@ -500,10 +505,6 @@ cifs_atomic_open(struct inode *inode, struct dentry *direntry,
->                 return finish_no_open(file, res);
->         }
->
-> -       rc = check_name(direntry);
-> -       if (rc)
-> -               return rc;
-> -
->         xid = get_xid();
->
->         cifs_dbg(FYI, "parent inode = 0x%p name is: %pd and dentry = 0x%p\n",
-> @@ -516,6 +517,11 @@ cifs_atomic_open(struct inode *inode, struct dentry *direntry,
->         }
->
->         tcon = tlink_tcon(tlink);
-> +
-> +       rc = check_name(direntry, tcon);
-> +       if (rc)
-> +               goto out_free_xid;
-> +
->         server = tcon->ses->server;
->
->         if (server->ops->new_lease_key)
-> @@ -776,7 +782,7 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
->         }
->         pTcon = tlink_tcon(tlink);
->
-> -       rc = check_name(direntry);
-> +       rc = check_name(direntry, pTcon);
->         if (rc)
->                 goto lookup_out;
+> --
+> 2.9.4
 >
 > --
-> 2.13.3
->
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 
