@@ -1,148 +1,289 @@
-From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: RE: [Patch v2 13/19] CIFS: SMBD: Use registered memory RDMA read for
- SMB write
-Date: Wed, 23 Aug 2017 18:09:11 +0000
-Message-ID: <MWHPR21MB0190DBBDE3317D973FEF0E43CE850@MWHPR21MB0190.namprd21.prod.outlook.com>
-References: <1503255883-3041-1-git-send-email-longli@exchange.microsoft.com>
- <1503255883-3041-14-git-send-email-longli@exchange.microsoft.com>
- <20170823135200.GP1724@mtr-leonro.local>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 1/2] cifs: Add support for reading attributes on SMB2+
+Date: Wed, 23 Aug 2017 11:45:53 -0700
+Message-ID: <CAKywueRPLErKPY1S29qinvrMqLB6CGMDoQtcY_W6HMryWRU9WQ@mail.gmail.com>
+References: <20170821222305.4628-1-lsahlber@redhat.com> <20170821222305.4628-2-lsahlber@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-        "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-        "Tom Talpey" <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Leon Romanovsky <leon-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170823135200.GP1724-U/DQcQFIOTAAJjI8aNfphQ@public.gmane.org>
-Content-Language: en-US
+In-Reply-To: <20170821222305.4628-2-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+2017-08-21 15:23 GMT-07:00 Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> SMB1 already has support to read attributes. This adds similar support
+> to SMB2+.
+>
+> With this patch, tools such as 'getfattr' will now work with SMB2+ shares.
+>
+> RH-bz: 1110709
+>
+> Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/smb2ops.c   | 143 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  fs/cifs/smb2pdu.c   |  12 +++++
+>  fs/cifs/smb2pdu.h   |  10 ++++
+>  fs/cifs/smb2proto.h |   3 ++
+>  4 files changed, 168 insertions(+)
+>
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index cfacf2c97e94..c389a673574f 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -426,6 +426,137 @@ smb2_query_file_info(const unsigned int xid, struct cifs_tcon *tcon,
+>         return rc;
+>  }
+>
+> +static ssize_t
+> +move_smb2_ea_to_cifs(char *dst, size_t dst_size,
+> +                    struct smb2_file_full_ea_info *src, size_t src_size,
+> +                    const unsigned char *ea_name)
+> +{
+> +       int rc = 0;
+> +       unsigned int ea_name_len = ea_name ? strlen(ea_name) : 0;
+> +       char *name, *value;
+> +       size_t name_len, value_len, user_name_len;
+> +
+> +       while (src_size > 0) {
+> +               name = &src->ea_data[0];
+> +               name_len = (size_t)src->ea_name_length;
+> +               value = &src->ea_data[src->ea_name_length + 1];
+> +               value_len = (size_t)src->ea_value_length;
+> +
+> +               if (name_len == 0) {
+> +                       break;
+> +               }
+> +
+> +               if (src_size < 8 + name_len + 1 + value_len) {
+> +                       cifs_dbg(FYI, "EA entry goes beyond length of list\n");
+> +                       rc = -EIO;
+> +                       goto out;
+> +               }
+> +
+> +               if (ea_name) {
+> +                       if (ea_name_len == name_len &&
+> +                           memcmp(ea_name, name, name_len) == 0) {
+> +                               rc = value_len;
+> +                               if (dst_size == 0)
+> +                                       goto out;
+> +                               if (dst_size < value_len) {
+> +                                       rc = -ERANGE;
+> +                                       goto out;
+> +                               }
+> +                               memcpy(dst, value, value_len);
+> +                               goto out;
+> +                       }
+> +               } else {
+> +                       /* 'user.' plus a terminating null */
+> +                       user_name_len = 5 + 1 + name_len;
+> +
+> +                       rc += user_name_len;
+> +
+> +                       if (dst_size >= user_name_len) {
+> +                               dst_size -= user_name_len;
+> +                               memcpy(dst, "user.", 5);
+> +                               dst += 5;
+> +                               memcpy(dst, src->ea_data, name_len);
+> +                               dst += name_len;
+> +                               *dst = 0;
+> +                               ++dst;
+> +                       } else if (dst_size == 0) {
+> +                               /* skip copy - calc size only */
+> +                       } else {
+> +                               /* stop before overrun buffer */
+> +                               rc = -ERANGE;
+> +                               break;
+> +                       }
+> +               }
+> +
+> +               if (!src->next_entry_offset)
+> +                       break;
+> +
+> +               if (src_size < src->next_entry_offset) {
+> +                       /* stop before overrun buffer */
+> +                       rc = -ERANGE;
+> +                       break;
+> +               }
+> +               src_size -= src->next_entry_offset;
+> +               src = (void *)((char *)src + src->next_entry_offset);
+> +       }
+> +
+> +       /* didn't find the named attribute */
+> +       if (ea_name)
+> +               rc = -ENODATA;
+> +
+> +out:
+> +       return (ssize_t)rc;
+> +}
+> +
+> +static ssize_t
+> +smb2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
+> +              const unsigned char *searchName, const unsigned char *ea_name,
+> +              char *EAData, size_t buf_size,
+                             ^^^
+Let's use ea_data name.
+
+> +              struct cifs_sb_info *cifs_sb)
+> +{
+> +       int rc;
+> +       __le16 *utf16_path;
+> +       __u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
+> +       struct cifs_open_parms oparms;
+> +       struct cifs_fid fid;
+> +       struct smb2_file_full_ea_info *smb2_data;
+> +
+> +       utf16_path = cifs_convert_path_to_utf16(searchName, cifs_sb);
+> +       if (!utf16_path)
+> +               return -ENOMEM;
+> +
+> +       oparms.tcon = tcon;
+> +       oparms.desired_access = FILE_READ_EA;
+> +       oparms.disposition = FILE_OPEN;
+> +       oparms.create_options = 0;
+> +       oparms.fid = &fid;
+> +       oparms.reconnect = false;
+> +
+> +       rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL);
+> +       kfree(utf16_path);
+> +       if (rc) {
+> +               cifs_dbg(FYI, "open failed rc=%d\n", rc);
+> +               return rc;
+> +       }
+> +
+> +       smb2_data = kzalloc(SMB2_MAX_EA_BUF, GFP_KERNEL);
+> +       if (smb2_data == NULL) {
+> +               SMB2_close(xid, tcon, fid.persistent_fid, fid.volatile_fid);
+> +               return -ENOMEM;
+> +       }
+> +
+> +       rc = SMB2_query_eas(xid, tcon, fid.persistent_fid, fid.volatile_fid,
+> +                           smb2_data);
+> +       SMB2_close(xid, tcon, fid.persistent_fid, fid.volatile_fid);
+> +
+> +       if (!rc)
+> +               rc = move_smb2_ea_to_cifs(EAData, buf_size, smb2_data,
+> +                                         SMB2_MAX_EA_BUF, ea_name);
+> +
+> +       kfree(smb2_data);
+> +       return rc;
+> +}
+> +
+>  static bool
+>  smb2_can_echo(struct TCP_Server_Info *server)
+>  {
+> @@ -2572,6 +2703,9 @@ struct smb_version_operations smb20_operations = {
+>         .dir_needs_close = smb2_dir_needs_close,
+>         .get_dfs_refer = smb2_get_dfs_refer,
+>         .select_sectype = smb2_select_sectype,
+> +#ifdef CONFIG_CIFS_XATTR
+> +       .query_all_EAs = smb2_query_eas,
+> +#endif /* CIFS_XATTR */
+>  #ifdef CONFIG_CIFS_ACL
+>         .get_acl = get_smb2_acl,
+>         .get_acl_by_fid = get_smb2_acl_by_fid,
+> @@ -2662,6 +2796,9 @@ struct smb_version_operations smb21_operations = {
+>         .enum_snapshots = smb3_enum_snapshots,
+>         .get_dfs_refer = smb2_get_dfs_refer,
+>         .select_sectype = smb2_select_sectype,
+> +#ifdef CONFIG_CIFS_XATTR
+> +       .query_all_EAs = smb2_query_eas,
+> +#endif /* CIFS_XATTR */
+>  #ifdef CONFIG_CIFS_ACL
+>         .get_acl = get_smb2_acl,
+>         .get_acl_by_fid = get_smb2_acl_by_fid,
+> @@ -2762,6 +2899,9 @@ struct smb_version_operations smb30_operations = {
+>         .receive_transform = smb3_receive_transform,
+>         .get_dfs_refer = smb2_get_dfs_refer,
+>         .select_sectype = smb2_select_sectype,
+> +#ifdef CONFIG_CIFS_XATTR
+> +       .query_all_EAs = smb2_query_eas,
+> +#endif /* CIFS_XATTR */
+>  #ifdef CONFIG_CIFS_ACL
+>         .get_acl = get_smb2_acl,
+>         .get_acl_by_fid = get_smb2_acl_by_fid,
+> @@ -2863,6 +3003,9 @@ struct smb_version_operations smb311_operations = {
+>         .receive_transform = smb3_receive_transform,
+>         .get_dfs_refer = smb2_get_dfs_refer,
+>         .select_sectype = smb2_select_sectype,
+> +#ifdef CONFIG_CIFS_XATTR
+> +       .query_all_EAs = smb2_query_eas,
+> +#endif /* CIFS_XATTR */
+>  };
+>  #endif /* CIFS_SMB311 */
+>
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index 5fb2fc2d0080..30ef93e459a9 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -2140,6 +2140,18 @@ query_info(const unsigned int xid, struct cifs_tcon *tcon,
+>         return rc;
+>  }
+>
+> +int SMB2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
+> +       u64 persistent_fid, u64 volatile_fid,
+> +       struct smb2_file_full_ea_info *data)
+> +{
+> +       return query_info(xid, tcon, persistent_fid, volatile_fid,
+> +                         FILE_FULL_EA_INFORMATION, SMB2_O_INFO_FILE, 0,
+> +                         SMB2_MAX_EA_BUF,
+> +                         sizeof(struct smb2_file_full_ea_info),
+> +                         (void **)&data,
+> +                         NULL);
+> +}
+> +
+>  int SMB2_query_info(const unsigned int xid, struct cifs_tcon *tcon,
+>         u64 persistent_fid, u64 volatile_fid, struct smb2_file_all_info *data)
+>  {
+> diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+> index 18700fd25a0b..b080b715353c 100644
+> --- a/fs/cifs/smb2pdu.h
+> +++ b/fs/cifs/smb2pdu.h
+> @@ -1178,6 +1178,16 @@ struct smb2_file_link_info { /* encoding of request for level 11 */
+>         char   FileName[0];     /* Name to be assigned to new link */
+>  } __packed; /* level 11 Set */
+>
+> +#define SMB2_MAX_EA_BUF 2048
+> +
+> +struct smb2_file_full_ea_info { /* encoding of response for level 15 */
+> +       __le32 next_entry_offset;
+> +       __u8   flags;
+> +       __u8   ea_name_length;
+> +       __u16  ea_value_length;
+
+Shouldn't it be __le32 instead of __u16 ?
+
+> +       char   ea_data[0]; /* \0 terminated name plus value */
+> +} __packed; /* level 15 Set */
+> +
+>  /*
+>   * This level 18, although with struct with same name is different from cifs
+>   * level 0x107. Level 0x107 has an extra u64 between AccessFlags and
+> diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+> index 1cadaf9f3c58..183389bfc8f6 100644
+> --- a/fs/cifs/smb2proto.h
+> +++ b/fs/cifs/smb2proto.h
+> @@ -132,6 +132,9 @@ extern int SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
+>                       u64 persistent_file_id, u64 volatile_file_id);
+>  extern int SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon,
+>                       u64 persistent_file_id, u64 volatile_file_id);
+> +extern int SMB2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
+> +                         u64 persistent_file_id, u64 volatile_file_id,
+> +                         struct smb2_file_full_ea_info *data);
+>  extern int SMB2_query_info(const unsigned int xid, struct cifs_tcon *tcon,
+>                            u64 persistent_file_id, u64 volatile_file_id,
+>                            struct smb2_file_all_info *data);
+> --
+> 2.13.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
-> -----Original Message-----
-> From: Leon Romanovsky [mailto:leon-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org]
-> Sent: Wednesday, August 23, 2017 6:52 AM
-> To: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>; linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; samba-
-> technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org; linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; linux-
-> rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>; Tom Talpey
-> <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>; Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>;
-> Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> Subject: Re: [Patch v2 13/19] CIFS: SMBD: Use registered memory RDMA
-> read for SMB write
->=20
-> On Sun, Aug 20, 2017 at 12:04:37PM -0700, Long Li wrote:
-> > From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> >
-> > When sending I/O, if size is larger than rdma_readwrite_threshold we
-> prepare to send SMB WRITE packet for a RDMA read via memory registration.
-> The actual I/O is done out-of-the-band, so modify the relevant fields in =
-the
-> packet accordingly.
-> >
-> > Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> > ---
-> >  fs/cifs/smb2pdu.c | 45
-> ++++++++++++++++++++++++++++++++++++++++++++-
-> >  1 file changed, 44 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c index
-> > 5cc5f6c..5581afd 100644
-> > --- a/fs/cifs/smb2pdu.c
-> > +++ b/fs/cifs/smb2pdu.c
-> > @@ -48,6 +48,7 @@
-> >  #include "smb2glob.h"
-> >  #include "cifspdu.h"
-> >  #include "cifs_spnego.h"
-> > +#include "smbdirect.h"
-> >
-> >  /*
-> >   *  The following table defines the expected "StructureSize" of SMB2
-> > requests @@ -2716,6 +2717,41 @@ smb2_async_writev(struct
-> cifs_writedata *wdata,
-> >  				offsetof(struct smb2_write_req, Buffer) - 4);
-> >  	req->RemainingBytes =3D 0;
-> >
-> > +	/*
-> > +	 * If we want to do a server RDMA read, fill in and append
-> > +	 * smbd_buffer_descriptor_v1 to the end of write request
-> > +	 */
-> > +	if (server->rdma && wdata->bytes >
-> > +		server->smbd_conn->rdma_readwrite_threshold) {
-> > +
-> > +		struct smbd_buffer_descriptor_v1 *v1;
-> > +		bool need_invalidate =3D server->dialect =3D=3D SMB30_PROT_ID;
-> > +
-> > +		wdata->mr =3D smbd_register_mr(
-> > +				server->smbd_conn, wdata->pages,
-> > +				wdata->nr_pages, wdata->tailsz,
-> > +				false, need_invalidate);
-> > +		if (!wdata->mr) {
-> > +			rc =3D -ENOBUFS;
-> > +			goto async_writev_out;
-> > +		}
-> > +		req->Length =3D 0;
-> > +		req->DataOffset =3D 0;
-> > +		req->RemainingBytes =3D
->=20
-> Wow, we have CamelCase variables in linux kernel. It will help if you sta=
-rt
-> your patchset with small cleanup to convert those variables from CamelCas=
-e
-> to normal names.
-
-They are used everywhere in the upper layer code for packet definitions, wr=
-itten a long time ago. (most in fs/cifs/smb2pdu.h and fs/cifs/cifspdu.h)
-
-I suggest we do another cleanup patch to clean things up.
-
->=20
-> Thanks
->=20
-> > +			(wdata->nr_pages-1)*PAGE_SIZE + wdata->tailsz;
-> > +		req->Channel =3D SMB2_CHANNEL_RDMA_V1_INVALIDATE;
-> > +		if (need_invalidate)
-> > +			req->Channel =3D SMB2_CHANNEL_RDMA_V1;
-> > +		req->WriteChannelInfoOffset =3D
-> > +			offsetof(struct smb2_write_req, Buffer) - 4;
-> > +		req->WriteChannelInfoLength =3D
-> > +			sizeof(struct smbd_buffer_descriptor_v1);
-> > +		v1 =3D (struct smbd_buffer_descriptor_v1 *) &req->Buffer[0];
-> > +		v1->offset =3D wdata->mr->mr->iova;
-> > +		v1->token =3D wdata->mr->mr->rkey;
-> > +		v1->length =3D wdata->mr->mr->length;
-> > +	}
-> > +
-> >  	/* 4 for rfc1002 length field and 1 for Buffer */
-> >  	iov[0].iov_len =3D 4;
-> >  	iov[0].iov_base =3D req;
-> > @@ -2729,10 +2765,17 @@ smb2_async_writev(struct cifs_writedata
-> *wdata,
-> >  	rqst.rq_pagesz =3D wdata->pagesz;
-> >  	rqst.rq_tailsz =3D wdata->tailsz;
-> >
-> > +	if (wdata->mr) {
-> > +		iov[1].iov_len +=3D sizeof(struct smbd_buffer_descriptor_v1);
-> > +		rqst.rq_npages =3D 0;
-> > +	}
-> > +
-> >  	cifs_dbg(FYI, "async write at %llu %u bytes\n",
-> >  		 wdata->offset, wdata->bytes);
-> >
-> > -	req->Length =3D cpu_to_le32(wdata->bytes);
-> > +	/* For RDMA read, I/O size is in RemainingBytes not in Length */
-> > +	if (!wdata->mr)
-> > +		req->Length =3D cpu_to_le32(wdata->bytes);
-> >
-> >  	inc_rfc1001_len(&req->hdr, wdata->bytes - 1 /* Buffer */);
-> >
-> > --
-> > 2.7.4
-> >
+--
+Best regards,
+Pavel Shilovsky
