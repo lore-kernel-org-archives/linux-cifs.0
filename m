@@ -1,158 +1,127 @@
-From: Leon Romanovsky <leon-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Subject: Re: [Patch v2 13/19] CIFS: SMBD: Use registered memory RDMA read for
+From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Subject: RE: [Patch v2 13/19] CIFS: SMBD: Use registered memory RDMA read for
  SMB write
-Date: Wed, 23 Aug 2017 22:02:14 +0300
-Message-ID: <20170823190214.GY1724@mtr-leonro.local>
+Date: Wed, 23 Aug 2017 19:10:38 +0000
+Message-ID: <MWHPR21MB0190DDCDB0B5F8FED3265A60CE850@MWHPR21MB0190.namprd21.prod.outlook.com>
 References: <1503255883-3041-1-git-send-email-longli@exchange.microsoft.com>
  <1503255883-3041-14-git-send-email-longli@exchange.microsoft.com>
  <20170823135200.GP1724@mtr-leonro.local>
  <MWHPR21MB0190DBBDE3317D973FEF0E43CE850@MWHPR21MB0190.namprd21.prod.outlook.com>
+ <20170823190214.GY1724@mtr-leonro.local>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="QQ8SllDnVL7XJJuW"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
         "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
         "samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
         "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
         "linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
         Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-        Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        "Tom Talpey" <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
         Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Leon Romanovsky <leon-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
 Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <MWHPR21MB0190DBBDE3317D973FEF0E43CE850-saRRjQKJ25M/hL2NnenhuM1VXTxX1y3OvxpqHgZTriW3zl9H0oFU5g@public.gmane.org>
+In-Reply-To: <20170823190214.GY1724-U/DQcQFIOTAAJjI8aNfphQ@public.gmane.org>
+Content-Language: en-US
 Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
-
---QQ8SllDnVL7XJJuW
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Aug 23, 2017 at 06:09:11PM +0000, Long Li wrote:
->
->
-> > -----Original Message-----
-> > From: Leon Romanovsky [mailto:leon-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org]
-> > Sent: Wednesday, August 23, 2017 6:52 AM
-> > To: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> > Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>; linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; samba-
-> > technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org; linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; linux-
-> > rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>; Tom Talpey
-> > <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>; Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>;
-> > Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> > Subject: Re: [Patch v2 13/19] CIFS: SMBD: Use registered memory RDMA
-> > read for SMB write
-> >
-> > On Sun, Aug 20, 2017 at 12:04:37PM -0700, Long Li wrote:
-> > > From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> > >
-> > > When sending I/O, if size is larger than rdma_readwrite_threshold we
-> > prepare to send SMB WRITE packet for a RDMA read via memory registratio=
-n.
-> > The actual I/O is done out-of-the-band, so modify the relevant fields i=
-n the
-> > packet accordingly.
-> > >
-> > > Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> > > ---
-> > >  fs/cifs/smb2pdu.c | 45
-> > ++++++++++++++++++++++++++++++++++++++++++++-
-> > >  1 file changed, 44 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c index
-> > > 5cc5f6c..5581afd 100644
-> > > --- a/fs/cifs/smb2pdu.c
-> > > +++ b/fs/cifs/smb2pdu.c
-> > > @@ -48,6 +48,7 @@
-> > >  #include "smb2glob.h"
-> > >  #include "cifspdu.h"
-> > >  #include "cifs_spnego.h"
-> > > +#include "smbdirect.h"
-> > >
-> > >  /*
-> > >   *  The following table defines the expected "StructureSize" of SMB2
-> > > requests @@ -2716,6 +2717,41 @@ smb2_async_writev(struct
-> > cifs_writedata *wdata,
-> > >  				offsetof(struct smb2_write_req, Buffer) - 4);
-> > >  	req->RemainingBytes =3D 0;
-> > >
-> > > +	/*
-> > > +	 * If we want to do a server RDMA read, fill in and append
-> > > +	 * smbd_buffer_descriptor_v1 to the end of write request
-> > > +	 */
-> > > +	if (server->rdma && wdata->bytes >
-> > > +		server->smbd_conn->rdma_readwrite_threshold) {
-> > > +
-> > > +		struct smbd_buffer_descriptor_v1 *v1;
-> > > +		bool need_invalidate =3D server->dialect =3D=3D SMB30_PROT_ID;
-> > > +
-> > > +		wdata->mr =3D smbd_register_mr(
-> > > +				server->smbd_conn, wdata->pages,
-> > > +				wdata->nr_pages, wdata->tailsz,
-> > > +				false, need_invalidate);
-> > > +		if (!wdata->mr) {
-> > > +			rc =3D -ENOBUFS;
-> > > +			goto async_writev_out;
-> > > +		}
-> > > +		req->Length =3D 0;
-> > > +		req->DataOffset =3D 0;
-> > > +		req->RemainingBytes =3D
-> >
-> > Wow, we have CamelCase variables in linux kernel. It will help if you s=
-tart
-> > your patchset with small cleanup to convert those variables from CamelC=
-ase
-> > to normal names.
->
-> They are used everywhere in the upper layer code for packet definitions, =
-written a long time ago. (most in fs/cifs/smb2pdu.h and fs/cifs/cifspdu.h)
-
-"everywhere" is a little bit over estimated in this case.
-=E2=9E=9C  linux-rdma git:(master) git grep RemainingBytes
-fs/cifs/smb2pdu.c:              req->RemainingBytes =3D cpu_to_le32(remaini=
-ng_bytes);
-fs/cifs/smb2pdu.c:              req->RemainingBytes =3D 0;
-fs/cifs/smb2pdu.c:      req->RemainingBytes =3D 0;
-fs/cifs/smb2pdu.c:      req->RemainingBytes =3D 0;
-fs/cifs/smb2pdu.h:      __le32 RemainingBytes;
-fs/cifs/smb2pdu.h:      __le32 RemainingBytes;
-
-One simple "sed -i" will replace all them in one shot and it doesn't
-look like undoable task.
-
->
-> I suggest we do another cleanup patch to clean things up.
-
-Yes, another cleanup patch is needed before your patches. You are adding
-your code in 2017 and you are expected to follow present coding standards
-like everyone else in the kernel.
-
-Thanks
-
---QQ8SllDnVL7XJJuW
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEkhr/r4Op1/04yqaB5GN7iDZyWKcFAlmd0TYACgkQ5GN7iDZy
-WKcWjg/7BU3NWGr3oN6PiFz1Sy1Ui/KUrPz0IWOzb/pcUf4nPrk9V9SHUfyvzJ+W
-oQhf+6dGsTW5vcKIYAY70lXjaNF2O/wGLzLZ9QS3Ncr+yg+Htwd+A9IX0pNJ6AJN
-ZDgCeFrYo02ZHz8/CC9T42jMXCLhR7uwrNCo8iRlGOwH5XICWoJ3vcLKsjvzXfqT
-+BeFThQQkgnfBOIA0XiOsaUtQvuoOyBsU35pwv6ht12iHVT7/763Wq6hDEdOUMdd
-+koBrpdYf0fgbjha9IQMlOKgY2umi4VOyCOV5gyHQK8p61jjB977QqyYzpW3ji0y
-enKWKksn5+NpWh7Md+1tqt93MznNgAGSSHvH0KdYUCrgBZPdB9yrV3tnGrV7h9xR
-gafzPzM3qG+RZmF0oWDxvXLUjGBbvGqkf3+9HCR4E3EN+tS/tFpBzRv1L12kZXJ3
-HVkLbzN7cSHNOOs2kBIUbutNSY12zSQPYZGHtshMmi5w/l7dRreieanfblWN9c1v
-QzQbh87M0OTL5gjDvn2hsH0ZNuWrdGrt8VuS7mzu7eo172vC/LsBUi5Ijo+p7G48
-khnZtzt2uwHL9YFYQ9VRZGJQjZJjaZXmf+OlKAhXnm/cYYpeuEUJBNWm76HZzkwG
-eoYG6ksBimDhmox8cntNIzVsDEHaUQecqz5c1jj+rFhkP0xbkZA=
-=R6VB
------END PGP SIGNATURE-----
-
---QQ8SllDnVL7XJJuW--
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTGVvbiBSb21hbm92c2t5
+IFttYWlsdG86bGVvbkBrZXJuZWwub3JnXQ0KPiBTZW50OiBXZWRuZXNkYXksIEF1Z3VzdCAyMywg
+MjAxNyAxMjowMiBQTQ0KPiBUbzogTG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+IENj
+OiBTdGV2ZSBGcmVuY2ggPHNmcmVuY2hAc2FtYmEub3JnPjsgbGludXgtY2lmc0B2Z2VyLmtlcm5l
+bC5vcmc7IHNhbWJhLQ0KPiB0ZWNobmljYWxAbGlzdHMuc2FtYmEub3JnOyBsaW51eC1rZXJuZWxA
+dmdlci5rZXJuZWwub3JnOyBsaW51eC0NCj4gcmRtYUB2Z2VyLmtlcm5lbC5vcmc7IENocmlzdG9w
+aCBIZWxsd2lnIDxoY2hAaW5mcmFkZWFkLm9yZz47IFRvbSBUYWxwZXkNCj4gPHR0YWxwZXlAbWlj
+cm9zb2Z0LmNvbT47IE1hdHRoZXcgV2lsY294IDxtYXdpbGNveEBtaWNyb3NvZnQuY29tPg0KPiBT
+dWJqZWN0OiBSZTogW1BhdGNoIHYyIDEzLzE5XSBDSUZTOiBTTUJEOiBVc2UgcmVnaXN0ZXJlZCBt
+ZW1vcnkgUkRNQQ0KPiByZWFkIGZvciBTTUIgd3JpdGUNCj4gDQo+IE9uIFdlZCwgQXVnIDIzLCAy
+MDE3IGF0IDA2OjA5OjExUE0gKzAwMDAsIExvbmcgTGkgd3JvdGU6DQo+ID4NCj4gPg0KPiA+ID4g
+LS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPiA+IEZyb206IExlb24gUm9tYW5vdnNreSBb
+bWFpbHRvOmxlb25Aa2VybmVsLm9yZ10NCj4gPiA+IFNlbnQ6IFdlZG5lc2RheSwgQXVndXN0IDIz
+LCAyMDE3IDY6NTIgQU0NCj4gPiA+IFRvOiBMb25nIExpIDxsb25nbGlAbWljcm9zb2Z0LmNvbT4N
+Cj4gPiA+IENjOiBTdGV2ZSBGcmVuY2ggPHNmcmVuY2hAc2FtYmEub3JnPjsgbGludXgtY2lmc0B2
+Z2VyLmtlcm5lbC5vcmc7DQo+ID4gPiBzYW1iYS0gdGVjaG5pY2FsQGxpc3RzLnNhbWJhLm9yZzsg
+bGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsNCj4gPiA+IGxpbnV4LSByZG1hQHZnZXIua2Vy
+bmVsLm9yZzsgQ2hyaXN0b3BoIEhlbGx3aWcgPGhjaEBpbmZyYWRlYWQub3JnPjsNCj4gPiA+IFRv
+bSBUYWxwZXkgPHR0YWxwZXlAbWljcm9zb2Z0LmNvbT47IE1hdHRoZXcgV2lsY294DQo+ID4gPiA8
+bWF3aWxjb3hAbWljcm9zb2Z0LmNvbT47IExvbmcgTGkgPGxvbmdsaUBtaWNyb3NvZnQuY29tPg0K
+PiA+ID4gU3ViamVjdDogUmU6IFtQYXRjaCB2MiAxMy8xOV0gQ0lGUzogU01CRDogVXNlIHJlZ2lz
+dGVyZWQgbWVtb3J5IFJETUENCj4gPiA+IHJlYWQgZm9yIFNNQiB3cml0ZQ0KPiA+ID4NCj4gPiA+
+IE9uIFN1biwgQXVnIDIwLCAyMDE3IGF0IDEyOjA0OjM3UE0gLTA3MDAsIExvbmcgTGkgd3JvdGU6
+DQo+ID4gPiA+IEZyb206IExvbmcgTGkgPGxvbmdsaUBtaWNyb3NvZnQuY29tPg0KPiA+ID4gPg0K
+PiA+ID4gPiBXaGVuIHNlbmRpbmcgSS9PLCBpZiBzaXplIGlzIGxhcmdlciB0aGFuIHJkbWFfcmVh
+ZHdyaXRlX3RocmVzaG9sZA0KPiA+ID4gPiB3ZQ0KPiA+ID4gcHJlcGFyZSB0byBzZW5kIFNNQiBX
+UklURSBwYWNrZXQgZm9yIGEgUkRNQSByZWFkIHZpYSBtZW1vcnkNCj4gcmVnaXN0cmF0aW9uLg0K
+PiA+ID4gVGhlIGFjdHVhbCBJL08gaXMgZG9uZSBvdXQtb2YtdGhlLWJhbmQsIHNvIG1vZGlmeSB0
+aGUgcmVsZXZhbnQNCj4gPiA+IGZpZWxkcyBpbiB0aGUgcGFja2V0IGFjY29yZGluZ2x5Lg0KPiA+
+ID4gPg0KPiA+ID4gPiBTaWduZWQtb2ZmLWJ5OiBMb25nIExpIDxsb25nbGlAbWljcm9zb2Z0LmNv
+bT4NCj4gPiA+ID4gLS0tDQo+ID4gPiA+ICBmcy9jaWZzL3NtYjJwZHUuYyB8IDQ1DQo+ID4gPiAr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0NCj4gPiA+ID4gIDEg
+ZmlsZSBjaGFuZ2VkLCA0NCBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pDQo+ID4gPiA+DQo+
+ID4gPiA+IGRpZmYgLS1naXQgYS9mcy9jaWZzL3NtYjJwZHUuYyBiL2ZzL2NpZnMvc21iMnBkdS5j
+IGluZGV4DQo+ID4gPiA+IDVjYzVmNmMuLjU1ODFhZmQgMTAwNjQ0DQo+ID4gPiA+IC0tLSBhL2Zz
+L2NpZnMvc21iMnBkdS5jDQo+ID4gPiA+ICsrKyBiL2ZzL2NpZnMvc21iMnBkdS5jDQo+ID4gPiA+
+IEBAIC00OCw2ICs0OCw3IEBADQo+ID4gPiA+ICAjaW5jbHVkZSAic21iMmdsb2IuaCINCj4gPiA+
+ID4gICNpbmNsdWRlICJjaWZzcGR1LmgiDQo+ID4gPiA+ICAjaW5jbHVkZSAiY2lmc19zcG5lZ28u
+aCINCj4gPiA+ID4gKyNpbmNsdWRlICJzbWJkaXJlY3QuaCINCj4gPiA+ID4NCj4gPiA+ID4gIC8q
+DQo+ID4gPiA+ICAgKiAgVGhlIGZvbGxvd2luZyB0YWJsZSBkZWZpbmVzIHRoZSBleHBlY3RlZCAi
+U3RydWN0dXJlU2l6ZSIgb2YNCj4gPiA+ID4gU01CMiByZXF1ZXN0cyBAQCAtMjcxNiw2ICsyNzE3
+LDQxIEBAIHNtYjJfYXN5bmNfd3JpdGV2KHN0cnVjdA0KPiA+ID4gY2lmc193cml0ZWRhdGEgKndk
+YXRhLA0KPiA+ID4gPiAgCQkJCW9mZnNldG9mKHN0cnVjdCBzbWIyX3dyaXRlX3JlcSwgQnVmZmVy
+KSAtIDQpOw0KPiA+ID4gPiAgCXJlcS0+UmVtYWluaW5nQnl0ZXMgPSAwOw0KPiA+ID4gPg0KPiA+
+ID4gPiArCS8qDQo+ID4gPiA+ICsJICogSWYgd2Ugd2FudCB0byBkbyBhIHNlcnZlciBSRE1BIHJl
+YWQsIGZpbGwgaW4gYW5kIGFwcGVuZA0KPiA+ID4gPiArCSAqIHNtYmRfYnVmZmVyX2Rlc2NyaXB0
+b3JfdjEgdG8gdGhlIGVuZCBvZiB3cml0ZSByZXF1ZXN0DQo+ID4gPiA+ICsJICovDQo+ID4gPiA+
+ICsJaWYgKHNlcnZlci0+cmRtYSAmJiB3ZGF0YS0+Ynl0ZXMgPg0KPiA+ID4gPiArCQlzZXJ2ZXIt
+PnNtYmRfY29ubi0+cmRtYV9yZWFkd3JpdGVfdGhyZXNob2xkKSB7DQo+ID4gPiA+ICsNCj4gPiA+
+ID4gKwkJc3RydWN0IHNtYmRfYnVmZmVyX2Rlc2NyaXB0b3JfdjEgKnYxOw0KPiA+ID4gPiArCQli
+b29sIG5lZWRfaW52YWxpZGF0ZSA9IHNlcnZlci0+ZGlhbGVjdCA9PSBTTUIzMF9QUk9UX0lEOw0K
+PiA+ID4gPiArDQo+ID4gPiA+ICsJCXdkYXRhLT5tciA9IHNtYmRfcmVnaXN0ZXJfbXIoDQo+ID4g
+PiA+ICsJCQkJc2VydmVyLT5zbWJkX2Nvbm4sIHdkYXRhLT5wYWdlcywNCj4gPiA+ID4gKwkJCQl3
+ZGF0YS0+bnJfcGFnZXMsIHdkYXRhLT50YWlsc3osDQo+ID4gPiA+ICsJCQkJZmFsc2UsIG5lZWRf
+aW52YWxpZGF0ZSk7DQo+ID4gPiA+ICsJCWlmICghd2RhdGEtPm1yKSB7DQo+ID4gPiA+ICsJCQly
+YyA9IC1FTk9CVUZTOw0KPiA+ID4gPiArCQkJZ290byBhc3luY193cml0ZXZfb3V0Ow0KPiA+ID4g
+PiArCQl9DQo+ID4gPiA+ICsJCXJlcS0+TGVuZ3RoID0gMDsNCj4gPiA+ID4gKwkJcmVxLT5EYXRh
+T2Zmc2V0ID0gMDsNCj4gPiA+ID4gKwkJcmVxLT5SZW1haW5pbmdCeXRlcyA9DQo+ID4gPg0KPiA+
+ID4gV293LCB3ZSBoYXZlIENhbWVsQ2FzZSB2YXJpYWJsZXMgaW4gbGludXgga2VybmVsLiBJdCB3
+aWxsIGhlbHAgaWYNCj4gPiA+IHlvdSBzdGFydCB5b3VyIHBhdGNoc2V0IHdpdGggc21hbGwgY2xl
+YW51cCB0byBjb252ZXJ0IHRob3NlDQo+ID4gPiB2YXJpYWJsZXMgZnJvbSBDYW1lbENhc2UgdG8g
+bm9ybWFsIG5hbWVzLg0KPiA+DQo+ID4gVGhleSBhcmUgdXNlZCBldmVyeXdoZXJlIGluIHRoZSB1
+cHBlciBsYXllciBjb2RlIGZvciBwYWNrZXQNCj4gPiBkZWZpbml0aW9ucywgd3JpdHRlbiBhIGxv
+bmcgdGltZSBhZ28uIChtb3N0IGluIGZzL2NpZnMvc21iMnBkdS5oIGFuZA0KPiA+IGZzL2NpZnMv
+Y2lmc3BkdS5oKQ0KPiANCj4gImV2ZXJ5d2hlcmUiIGlzIGEgbGl0dGxlIGJpdCBvdmVyIGVzdGlt
+YXRlZCBpbiB0aGlzIGNhc2UuDQo+IOKenCAgbGludXgtcmRtYSBnaXQ6KG1hc3RlcikgZ2l0IGdy
+ZXAgUmVtYWluaW5nQnl0ZXMNCj4gZnMvY2lmcy9zbWIycGR1LmM6ICAgICAgICAgICAgICByZXEt
+PlJlbWFpbmluZ0J5dGVzID0NCj4gY3B1X3RvX2xlMzIocmVtYWluaW5nX2J5dGVzKTsNCj4gZnMv
+Y2lmcy9zbWIycGR1LmM6ICAgICAgICAgICAgICByZXEtPlJlbWFpbmluZ0J5dGVzID0gMDsNCj4g
+ZnMvY2lmcy9zbWIycGR1LmM6ICAgICAgcmVxLT5SZW1haW5pbmdCeXRlcyA9IDA7DQo+IGZzL2Np
+ZnMvc21iMnBkdS5jOiAgICAgIHJlcS0+UmVtYWluaW5nQnl0ZXMgPSAwOw0KPiBmcy9jaWZzL3Nt
+YjJwZHUuaDogICAgICBfX2xlMzIgUmVtYWluaW5nQnl0ZXM7DQo+IGZzL2NpZnMvc21iMnBkdS5o
+OiAgICAgIF9fbGUzMiBSZW1haW5pbmdCeXRlczsNCj4gDQo+IE9uZSBzaW1wbGUgInNlZCAtaSIg
+d2lsbCByZXBsYWNlIGFsbCB0aGVtIGluIG9uZSBzaG90IGFuZCBpdCBkb2Vzbid0IGxvb2sgbGlr
+ZQ0KPiB1bmRvYWJsZSB0YXNrLg0KDQpJIG1lYW4gY2lmc3BkdS5oIGFuZCBzbWIycGR1LmguIHVz
+ZSBDYW1lbENhc2UgZm9yIGFsbCBwYWNrZXQgZGVmaW5pdGlvbnMuIEZvciBleGFtcGxlIGFub3Ro
+ZXIgb25lIGluIHNtYjJwZHUuaDoNCnN0cnVjdCBzbWIyX25lZ290aWF0ZV9yc3Agew0KICAgICAg
+ICBzdHJ1Y3Qgc21iMl9oZHIgaGRyOw0KICAgICAgICBfX2xlMTYgU3RydWN0dXJlU2l6ZTsgICAv
+KiBNdXN0IGJlIDY1ICovDQogICAgICAgIF9fbGUxNiBTZWN1cml0eU1vZGU7DQogICAgICAgIF9f
+bGUxNiBEaWFsZWN0UmV2aXNpb247DQogICAgICAgIF9fbGUxNiBOZWdvdGlhdGVDb250ZXh0Q291
+bnQ7ICAgLyogUHJpb3IgdG8gU01CMy4xLjEgd2FzIFJlc2VydmVkICYgTUJaICovDQogICAgICAg
+IF9fdTggICBTZXJ2ZXJHVUlEWzE2XTsNCiAgICAgICAgX19sZTMyIENhcGFiaWxpdGllczsNCiAg
+ICAgICAgX19sZTMyIE1heFRyYW5zYWN0U2l6ZTsNCiAgICAgICAgX19sZTMyIE1heFJlYWRTaXpl
+Ow0KICAgICAgICBfX2xlMzIgTWF4V3JpdGVTaXplOw0KICAgICAgICBfX2xlNjQgU3lzdGVtVGlt
+ZTsgICAgICAvKiBNQlogKi8NCiAgICAgICAgX19sZTY0IFNlcnZlclN0YXJ0VGltZTsNCiAgICAg
+ICAgX19sZTE2IFNlY3VyaXR5QnVmZmVyT2Zmc2V0Ow0KICAgICAgICBfX2xlMTYgU2VjdXJpdHlC
+dWZmZXJMZW5ndGg7DQogICAgICAgIF9fbGUzMiBOZWdvdGlhdGVDb250ZXh0T2Zmc2V0OyAgLyog
+UHJlOlNNQjMuMS4xIHdhcyByZXNlcnZlZC9pZ25vcmVkICovDQogICAgICAgIF9fdTggICBCdWZm
+ZXJbMV07ICAgICAgIC8qIHZhcmlhYmxlIGxlbmd0aCBHU1Mgc2VjdXJpdHkgYnVmZmVyICovDQp9
+IF9fcGFja2VkOw0KDQpXZSBtYXkgd2FudCB0byBjaGFuZ2UgdGhlbSBhbGwgdG9nZXRoZXIgdG8g
+a2VlcCBuYW1pbmcgY29uc2lzdGVudCwgdGhhdCdzIGEgbG90IG9mIGNoYW5nZXMuDQoNCj4gDQo+
+ID4NCj4gPiBJIHN1Z2dlc3Qgd2UgZG8gYW5vdGhlciBjbGVhbnVwIHBhdGNoIHRvIGNsZWFuIHRo
+aW5ncyB1cC4NCj4gDQo+IFllcywgYW5vdGhlciBjbGVhbnVwIHBhdGNoIGlzIG5lZWRlZCBiZWZv
+cmUgeW91ciBwYXRjaGVzLiBZb3UgYXJlIGFkZGluZw0KPiB5b3VyIGNvZGUgaW4gMjAxNyBhbmQg
+eW91IGFyZSBleHBlY3RlZCB0byBmb2xsb3cgcHJlc2VudCBjb2Rpbmcgc3RhbmRhcmRzDQo+IGxp
+a2UgZXZlcnlvbmUgZWxzZSBpbiB0aGUga2VybmVsLg0KPiANCj4gVGhhbmtzDQo=
 --
 To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
 the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
