@@ -1,270 +1,251 @@
-From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 1/2] cifs: Add support for reading attributes on SMB2+
-Date: Thu, 24 Aug 2017 11:24:55 +1000
-Message-ID: <20170824012456.10977-2-lsahlber@redhat.com>
-References: <20170824012456.10977-1-lsahlber@redhat.com>
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+From: Paul van Schayck <polleke-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: cifs-utils: setcifsacl receives STATUS_INVALID_SECURITY_DESCR
+ reply from custom CIFS implementation
+Date: Thu, 24 Aug 2017 13:06:50 +0200
+Message-ID: <CAFoiuNgAdBMmvUXfRKt_hpxEDtTEN_QenpsLyw85b=XyxKkLGQ@mail.gmail.com>
+References: <CAFoiuNiOdjSRwFWmEqSU2WWotUOL_ywrOpj8oSk8UWBC=_cujw@mail.gmail.com>
+ <CADT32eKnksmhQNpuQfo91ybQKAiUgdpa3SG5GxSyxGCnTXeH6w@mail.gmail.com>
+ <CAFoiuNjj6s8179EMh_f-a2zCjTatGLZtrM5H6Bk7D=mGndNgDg@mail.gmail.com>
+ <CADT32e+jR+5h=K1ujnScnGoHuDMgqinOSpKUdigQafaY8-MBWw@mail.gmail.com>
+ <CADT32eKtWMF+8+jf=UWh8hsuNGA6GoTqP-+s0H8E3U=6uhX61A@mail.gmail.com>
+ <CAFoiuNj1BiAXu4nPacmBxTvck4-TLeTWVEHN+_miR8WaTLv8DA@mail.gmail.com> <CADT32e+9G5qp1+0t00uY=pCCjpNk4Rn=-qa9LSUF+0P6fHkA3Q@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170824012456.10977-1-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <CADT32e+9G5qp1+0t00uY=pCCjpNk4Rn=-qa9LSUF+0P6fHkA3Q-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-SMB1 already has support to read attributes. This adds similar support
-to SMB2+.
+Hi Shirish,
 
-With this patch, tools such as 'getfattr' will now work with SMB2+ shares.
+Thanks, that would be great if you would be able to submit the
+setcifsacl patch. We're using it with great success in our
+environment.
 
-RH-bz: 1110709
+Cheers,
 
-Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/smb2ops.c   | 144 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2pdu.c   |  12 +++++
- fs/cifs/smb2pdu.h   |  10 ++++
- fs/cifs/smb2proto.h |   3 ++
- 4 files changed, 169 insertions(+)
+Paul
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index cfacf2c97e94..78516d3a133c 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -426,6 +426,138 @@ smb2_query_file_info(const unsigned int xid, struct cifs_tcon *tcon,
- 	return rc;
- }
- 
-+static ssize_t
-+move_smb2_ea_to_cifs(char *dst, size_t dst_size,
-+		     struct smb2_file_full_ea_info *src, size_t src_size,
-+		     const unsigned char *ea_name)
-+{
-+	int rc = 0;
-+	unsigned int ea_name_len = ea_name ? strlen(ea_name) : 0;
-+	char *name, *value;
-+	size_t name_len, value_len, user_name_len;
-+
-+	while (src_size > 0) {
-+		name = &src->ea_data[0];
-+		name_len = (size_t)src->ea_name_length;
-+		value = &src->ea_data[src->ea_name_length + 1];
-+		value_len = (size_t)le16_to_cpu(src->ea_value_length);
-+
-+		if (name_len == 0) {
-+			break;
-+		}
-+
-+		if (src_size < 8 + name_len + 1 + value_len) {
-+			cifs_dbg(FYI, "EA entry goes beyond length of list\n");
-+			rc = -EIO;
-+			goto out;
-+		}
-+
-+		if (ea_name) {
-+			if (ea_name_len == name_len &&
-+			    memcmp(ea_name, name, name_len) == 0) {
-+				rc = value_len;
-+				if (dst_size == 0)
-+					goto out;
-+				if (dst_size < value_len) {
-+					rc = -ERANGE;
-+					goto out;
-+				}
-+				memcpy(dst, value, value_len);
-+				goto out;
-+			}
-+		} else {
-+			/* 'user.' plus a terminating null */
-+			user_name_len = 5 + 1 + name_len;
-+
-+			rc += user_name_len;
-+
-+			if (dst_size >= user_name_len) {
-+				dst_size -= user_name_len;
-+				memcpy(dst, "user.", 5);
-+				dst += 5;
-+				memcpy(dst, src->ea_data, name_len);
-+				dst += name_len;
-+				*dst = 0;
-+				++dst;
-+			} else if (dst_size == 0) {
-+				/* skip copy - calc size only */
-+			} else {
-+				/* stop before overrun buffer */
-+				rc = -ERANGE;
-+				break;
-+			}
-+		}
-+
-+		if (!src->next_entry_offset)
-+			break;
-+
-+		if (src_size < le32_to_cpu(src->next_entry_offset)) {
-+			/* stop before overrun buffer */
-+			rc = -ERANGE;
-+			break;
-+		}
-+		src_size -= le32_to_cpu(src->next_entry_offset);
-+		src = (void *)((char *)src +
-+			       le32_to_cpu(src->next_entry_offset));
-+	}
-+
-+	/* didn't find the named attribute */
-+	if (ea_name)
-+		rc = -ENODATA;
-+
-+out:
-+	return (ssize_t)rc;
-+}
-+
-+static ssize_t
-+smb2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
-+	       const unsigned char *path, const unsigned char *ea_name,
-+	       char *ea_data, size_t buf_size,
-+	       struct cifs_sb_info *cifs_sb)
-+{
-+	int rc;
-+	__le16 *utf16_path;
-+	__u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
-+	struct cifs_open_parms oparms;
-+	struct cifs_fid fid;
-+	struct smb2_file_full_ea_info *smb2_data;
-+
-+	utf16_path = cifs_convert_path_to_utf16(path, cifs_sb);
-+	if (!utf16_path)
-+		return -ENOMEM;
-+
-+	oparms.tcon = tcon;
-+	oparms.desired_access = FILE_READ_EA;
-+	oparms.disposition = FILE_OPEN;
-+	oparms.create_options = 0;
-+	oparms.fid = &fid;
-+	oparms.reconnect = false;
-+
-+	rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL);
-+	kfree(utf16_path);
-+	if (rc) {
-+		cifs_dbg(FYI, "open failed rc=%d\n", rc);
-+		return rc;
-+	}
-+
-+	smb2_data = kzalloc(SMB2_MAX_EA_BUF, GFP_KERNEL);
-+	if (smb2_data == NULL) {
-+		SMB2_close(xid, tcon, fid.persistent_fid, fid.volatile_fid);
-+		return -ENOMEM;
-+	}
-+
-+	rc = SMB2_query_eas(xid, tcon, fid.persistent_fid, fid.volatile_fid,
-+			    smb2_data);
-+	SMB2_close(xid, tcon, fid.persistent_fid, fid.volatile_fid);
-+
-+	if (!rc)
-+		rc = move_smb2_ea_to_cifs(ea_data, buf_size, smb2_data,
-+					  SMB2_MAX_EA_BUF, ea_name);
-+
-+	kfree(smb2_data);
-+	return rc;
-+}
-+
- static bool
- smb2_can_echo(struct TCP_Server_Info *server)
- {
-@@ -2572,6 +2704,9 @@ struct smb_version_operations smb20_operations = {
- 	.dir_needs_close = smb2_dir_needs_close,
- 	.get_dfs_refer = smb2_get_dfs_refer,
- 	.select_sectype = smb2_select_sectype,
-+#ifdef CONFIG_CIFS_XATTR
-+	.query_all_EAs = smb2_query_eas,
-+#endif /* CIFS_XATTR */
- #ifdef CONFIG_CIFS_ACL
- 	.get_acl = get_smb2_acl,
- 	.get_acl_by_fid = get_smb2_acl_by_fid,
-@@ -2662,6 +2797,9 @@ struct smb_version_operations smb21_operations = {
- 	.enum_snapshots = smb3_enum_snapshots,
- 	.get_dfs_refer = smb2_get_dfs_refer,
- 	.select_sectype = smb2_select_sectype,
-+#ifdef CONFIG_CIFS_XATTR
-+	.query_all_EAs = smb2_query_eas,
-+#endif /* CIFS_XATTR */
- #ifdef CONFIG_CIFS_ACL
- 	.get_acl = get_smb2_acl,
- 	.get_acl_by_fid = get_smb2_acl_by_fid,
-@@ -2762,6 +2900,9 @@ struct smb_version_operations smb30_operations = {
- 	.receive_transform = smb3_receive_transform,
- 	.get_dfs_refer = smb2_get_dfs_refer,
- 	.select_sectype = smb2_select_sectype,
-+#ifdef CONFIG_CIFS_XATTR
-+	.query_all_EAs = smb2_query_eas,
-+#endif /* CIFS_XATTR */
- #ifdef CONFIG_CIFS_ACL
- 	.get_acl = get_smb2_acl,
- 	.get_acl_by_fid = get_smb2_acl_by_fid,
-@@ -2863,6 +3004,9 @@ struct smb_version_operations smb311_operations = {
- 	.receive_transform = smb3_receive_transform,
- 	.get_dfs_refer = smb2_get_dfs_refer,
- 	.select_sectype = smb2_select_sectype,
-+#ifdef CONFIG_CIFS_XATTR
-+	.query_all_EAs = smb2_query_eas,
-+#endif /* CIFS_XATTR */
- };
- #endif /* CIFS_SMB311 */
- 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 5fb2fc2d0080..30ef93e459a9 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -2140,6 +2140,18 @@ query_info(const unsigned int xid, struct cifs_tcon *tcon,
- 	return rc;
- }
- 
-+int SMB2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
-+	u64 persistent_fid, u64 volatile_fid,
-+	struct smb2_file_full_ea_info *data)
-+{
-+	return query_info(xid, tcon, persistent_fid, volatile_fid,
-+			  FILE_FULL_EA_INFORMATION, SMB2_O_INFO_FILE, 0,
-+			  SMB2_MAX_EA_BUF,
-+			  sizeof(struct smb2_file_full_ea_info),
-+			  (void **)&data,
-+			  NULL);
-+}
-+
- int SMB2_query_info(const unsigned int xid, struct cifs_tcon *tcon,
- 	u64 persistent_fid, u64 volatile_fid, struct smb2_file_all_info *data)
- {
-diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 18700fd25a0b..efe258c3b562 100644
---- a/fs/cifs/smb2pdu.h
-+++ b/fs/cifs/smb2pdu.h
-@@ -1178,6 +1178,16 @@ struct smb2_file_link_info { /* encoding of request for level 11 */
- 	char   FileName[0];     /* Name to be assigned to new link */
- } __packed; /* level 11 Set */
- 
-+#define SMB2_MAX_EA_BUF 2048
-+
-+struct smb2_file_full_ea_info { /* encoding of response for level 15 */
-+	__le32 next_entry_offset;
-+	__u8   flags;
-+	__u8   ea_name_length;
-+	__le16 ea_value_length;
-+	char   ea_data[0]; /* \0 terminated name plus value */
-+} __packed; /* level 15 Set */
-+
- /*
-  * This level 18, although with struct with same name is different from cifs
-  * level 0x107. Level 0x107 has an extra u64 between AccessFlags and
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index 1cadaf9f3c58..183389bfc8f6 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -132,6 +132,9 @@ extern int SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
- 		      u64 persistent_file_id, u64 volatile_file_id);
- extern int SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon,
- 		      u64 persistent_file_id, u64 volatile_file_id);
-+extern int SMB2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
-+			  u64 persistent_file_id, u64 volatile_file_id,
-+			  struct smb2_file_full_ea_info *data);
- extern int SMB2_query_info(const unsigned int xid, struct cifs_tcon *tcon,
- 			   u64 persistent_file_id, u64 volatile_file_id,
- 			   struct smb2_file_all_info *data);
--- 
-2.13.3
+On Sun, Aug 13, 2017 at 3:33 AM, Shirish Pargaonkar
+<shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> Somehow I missed this response. Out till Friday, will submit this
+> patch once I am back, next week. Thanks for testing the patch.
+>
+> Regards,
+>
+> Shirish
+>
+> On Tue, Jul 11, 2017 at 7:13 AM, Paul van Schayck <polleke-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wro=
+te:
+>> Hi Shirish,
+>>
+>> I've tested the patch, and as far as I can see it works perfectly. The
+>> extra zero bytes are no longer in the request and the server now
+>> accepts them. I've tested on a number of directories, with a number of
+>> different ACEs, adding and deleting, and could not find an issue so
+>> far.
+>>
+>> I've not tested the smb2 patches for setting acl's yet, as I do not
+>> have an environment ready to go for recompiling the cifs kernel
+>> module.
+>>
+>> The server we are using is a Hitachi HNAS:
+>> https://www.hds.com/en-us/products-solutions/storage/network-attached-st=
+orage-platform.html
+>>
+>> Thanks,
+>>
+>> Paul
+>>
+>> On Wed, Jul 5, 2017 at 7:08 AM, Shirish Pargaonkar
+>> <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>>> Can you try this patch, I did preliminary testing...
+>>>
+>>>
+>>>
+>>> On Tue, Jul 4, 2017 at 4:17 PM, Shirish Pargaonkar
+>>> <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>>>> Hi Paul,
+>>>>
+>>>> So something like this works with smb 2.1 with the patchset I posted
+>>>> on the mailing list
+>>>> to make set acl work over smb 2 onwards...
+>>>>
+>>>> $ sudo ls -l /mnt/
+>>>> total 1
+>>>> -rwx------ 1 root root 32 Jan 26  2015 file1.txt
+>>>> -rwx------ 1 root root  0 Nov 30  2014 file2.txt
+>>>> drwx------ 2 root root  0 Nov 30  2014 folder1
+>>>> drwx------ 2 root root  0 Dec 22  2014 folder2
+>>>>
+>>>> $ sudo setcifsacl -S
+>>>> "ACL:S-1-5-21-609720889-20222076-3464071719-1001:ALLOWED/0x0/FULL,ACL:=
+S-1-5-21-609720889-20222076-3464071719-513:ALLOWED/0x0/0x1f01b9,ACL:\Everyo=
+ne:ALLOWED/0x0/0x1f01b9"
+>>>> /mnt/file1.txt
+>>>>
+>>>> $ sudo ls -l /mnt/
+>>>> total 1
+>>>> -rwxr-xr-x 1 root root 32 Jan 26  2015 file1.txt
+>>>> -rwx------ 1 root root  0 Nov 30  2014 file2.txt
+>>>> drwx------ 2 root root  0 Nov 30  2014 folder1
+>>>> drwx------ 2 root root  0 Dec 22  2014 folder2
+>>>>
+>>>> I then changed it back to 700 using smb1 set cifs acl and it worked to=
+o.
+>>>>
+>>>> $ sudo setcifsacl -S
+>>>> "ACL:S-1-5-21-609720889-20222076-3464071719-1001:ALLOWED/0x0/FULL,ACL:=
+S-1-5-21-609720889-20222076-3464071719-513:ALLOWED/0x0/0x120088,ACL:\Everyo=
+ne:ALLOWED/0x0/0x120088"
+>>>> /mnt/file1.txt
+>>>>
+>>>> $ sudo ls -l /mnt/
+>>>> total 1
+>>>> -rwx------ 1 root root 32 Jan 26  2015 file1.txt
+>>>> -rwx------ 1 root root  0 Nov 30  2014 file2.txt
+>>>> drwx------ 2 root root  0 Nov 30  2014 folder1
+>>>> drwx------ 2 root root  0 Dec 22  2014 folder2
+>>>>
+>>>> What type of Windows server is this?  These requests succeed but I do
+>>>> see extra bytes
+>>>> at the end of the security descriptor in both the requests, trying to
+>>>> figure out why is it allocated in the first place...
+>>>>
+>>>>
+>>>> On Tue, Jun 27, 2017 at 5:43 AM, Paul van Schayck <polleke-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> =
+wrote:
+>>>>> Hi Shirish,
+>>>>>
+>>>>> Thank you for your answer.
+>>>>>
+>>>>> Attached you can find three pcap files.
+>>>>>
+>>>>> 1. linux-fail.pcap: Using the setcifsacl 6.7 version.
+>>>>> 2. linux-succes.pcap: Using the modified setcifsacl with the patch
+>>>>> above (note, I had to change to len + 4 in trim_request())
+>>>>> 3. windows-succes-trimmed.pcap: Using the dialog in Windows. Note tha=
+t
+>>>>> this is over smbv2. The file was trimmed down, because windows was
+>>>>> noisy.
+>>>>>
+>>>>> The command I used was
+>>>>>
+>>>>> setcifsacl -S "ACL:S-1-5-21-1572361299-1184395705-1606240830-247332:A=
+LLOWED/OI|CI/CHANGE,ACL:S-1-5-21-1572361299-1184395705-1606240830-544559:AL=
+LOWED/I/FULL,ACL:S-1-3-0:ALLOWED/OI|CI|IO|I/FULL,ACL:S-1-5-21-1572361299-11=
+84395705-1606240830-512:ALLOWED/OI|CI|I/FULL,ACL:S-1-5-21-1572361299-118439=
+5705-1606240830-549266:ALLOWED/OI|CI|I/FULL,ACL:S-1-5-21-1572361299-1184395=
+705-1606240830-544559:ALLOWED/OI|CI|IO|I/FULL,ACL:S-1-5-18:ALLOWED/OI|CI|I/=
+FULL"
+>>>>> cifs-test/
+>>>>>
+>>>>> In Windows I used the dialog to set the same ACEs. Between the
+>>>>> linux-success and linux-fail file you can see the difference in the
+>>>>> number of zero bytes after the DACL.
+>>>>>
+>>>>> If this test case is still a bit noisy for you, I can try to build a
+>>>>> more simple ACE list. But I have to setup a new share for this.
+>>>>>
+>>>>> Thanks,
+>>>>>
+>>>>> Paul van Schayck
+>>>>>
+>>>>> On Tue, Jun 27, 2017 at 6:40 AM, Shirish Pargaonkar
+>>>>> <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>>>>>> if you can provide tcpdumpas well as the command you are using of/fo=
+r
+>>>>>> both Windows and Linux way, that would be helpful
+>>>>>>
+>>>>>> On Mon, Jun 26, 2017 at 8:04 AM, Paul van Schayck via samba-technica=
+l
+>>>>>> <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org> wrote:
+>>>>>>> Dear samba-technical,
+>>>>>>>
+>>>>>>> If this list is inappropriate for this question then please redirec=
+t
+>>>>>>> me to a better one.
+>>>>>>>
+>>>>>>> I'm working with a HDS HNAS (Hitachi NAS) which has its own
+>>>>>>> implementation of the CIFS protocol. Mounting, and interactions all=
+ go
+>>>>>>> fine using linux-cifs and related tools.
+>>>>>>>
+>>>>>>> However, when sending a `setcifsacl -a ACE /dir` the response is
+>>>>>>> "main: setxattr error: Input/output error". Upon further digging us=
+ing
+>>>>>>> tcpdump/wireshark it became clear that the HNAS is responding with
+>>>>>>>
+>>>>>>> NT Status: STATUS_INVALID_SECURITY_DESCR (0xc0000079)
+>>>>>>>
+>>>>>>> Setting the same ACE using a Windows client did work. So further
+>>>>>>> examining of the request being sent showed that the only difference
+>>>>>>> between the Windows client and setcifsacl was the addition of a lot=
+ of
+>>>>>>> padding zero bytes at the end of the security descriptor.
+>>>>>>>
+>>>>>>> Examining the code of setcifsacl.c and the request more it seems li=
+ke
+>>>>>>> the request was not properly trimmed down to the number of aces bei=
+ng
+>>>>>>> sent. More buffer was allocated that the number of aces being sent.=
+ So
+>>>>>>> I made the attached patch to trim down the request. This fixes some=
+ of
+>>>>>>> the problems with setcifsacl, but for example breaks deleting aces.=
+ I
+>>>>>>> also think it's most likely an ugly fix, and the problem needs to b=
+e
+>>>>>>> solved elsewhere most likely.
+>>>>>>>
+>>>>>>> So my question is if someone can point me at the correct way to fix
+>>>>>>> this in setcifsacl, or help me fix it properly. If necessary I can
+>>>>>>> provide tcpdump's of Windows and Linux clients performing the reque=
+st.
+>>>>>>>
+>>>>>>> Thanks,
+>>>>>>>
+>>>>>>> Paul van Schayck
+>>>>>>>
+>>>>>>> diff --git a/setcifsacl.c b/setcifsacl.c
+>>>>>>> index 7eeeaa6..4ada3c8 100644
+>>>>>>> --- a/setcifsacl.c
+>>>>>>> +++ b/setcifsacl.c
+>>>>>>> @@ -761,6 +761,20 @@ setacl_action(struct cifs_ntsd *pntsd, struct
+>>>>>>> cifs_ntsd **npntsd,
+>>>>>>>         return rc;
+>>>>>>>  }
+>>>>>>>
+>>>>>>> +ssize_t
+>>>>>>> +trim_request(ssize_t bufsize, struct cifs_ntsd *npntsd) {
+>>>>>>> +       int i, len =3D 0;
+>>>>>>> +       char *a =3D (char *) npntsd;
+>>>>>>> +
+>>>>>>> +       for( i =3D 0; i < bufsize; i++) {
+>>>>>>> +               if ( a[i] !=3D 0 )
+>>>>>>> +                       len =3D i;
+>>>>>>> +       }
+>>>>>>> +
+>>>>>>> +       return (ssize_t) len + 2;
+>>>>>>> +}
+>>>>>>> +
+>>>>>>> +
+>>>>>>>  static void
+>>>>>>>  setcifsacl_usage(const char *prog)
+>>>>>>>  {
+>>>>>>> @@ -902,7 +916,7 @@ cifsacl:
+>>>>>>>         if (rc)
+>>>>>>>                 goto setcifsacl_action_ret;
+>>>>>>>
+>>>>>>> -       attrlen =3D setxattr(filename, ATTRNAME, ntsdptr, bufsize, =
+0);
+>>>>>>> +       attrlen =3D setxattr(filename, ATTRNAME, ntsdptr,
+>>>>>>> trim_request(bufsize, ntsdptr), 0);
+>>>>>>>         if (attrlen =3D=3D -1) {
+>>>>>>>                 printf("%s: setxattr error: %s\n", __func__, strerr=
+or(errno));
+>>>>>>>                 goto setcifsacl_facenum_ret;
+>>>>>>>
