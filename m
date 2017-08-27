@@ -1,69 +1,121 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Fix maximum SMB2 header size
-Date: Sun, 27 Aug 2017 16:49:41 -0500
-Message-ID: <CAH2r5mu5-54zkgDHbHS8FpJZnsRwvm-+VjqcNOK3zMFFyyRUbw@mail.gmail.com>
-References: <1503613000-2319-1-git-send-email-pshilov@microsoft.com> <CAMcOejXVrs5hdPuOMGO+s=qYMpQO_dAJCMpa5U98gPt83J_oSw@mail.gmail.com>
+Subject: Re: [PATCH] cifs: return ENAMETOOLONG for overlong names in cifs_open()/cifs_lookup()
+Date: Sun, 27 Aug 2017 17:02:14 -0500
+Message-ID: <CAH2r5muH=kE+S0V=9RQRAq_bzUBR=v00vE3Pc_sy8MMtu0o5Eg@mail.gmail.com>
+References: <20170823044814.9609-1-lsahlber@redhat.com> <CAH2r5mvqHKaSTU-E=xK8weYOeFw=TAR2N1J=OJYupPvpcf9biw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAMcOejXVrs5hdPuOMGO+s=qYMpQO_dAJCMpa5U98gPt83J_oSw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CAH2r5mvqHKaSTU-E=xK8weYOeFw=TAR2N1J=OJYupPvpcf9biw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-merged into cifs-2.6.git for-next
-
-On Fri, Aug 25, 2017 at 4:05 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> Tested it successfully with a reproducer listed in rh bz 1484099.
+On Sun, Aug 27, 2017 at 5:01 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> Had an endian warning - I fixed in followon patch (and cc: stable)
 >
-> # mkdir t1; for i in {1..1000}; do touch t1/aaaaaaaaaaaaaaaaaaaa$i; done
-> # find t1
+> Remember to make with sparse checking (and endian checking turned on)
 >
-> Acked-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> e.g.
+> make C=1 M=fs/cifs modules CF=-D__CHECK_ENDIAN__
 >
-> On Thu, Aug 24, 2017 at 11:16 PM, Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+> On Tue, Aug 22, 2017 at 11:48 PM, Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > wrote:
 >>
->> Currently the maximum size of SMB2/3 header is set incorrectly which
->> leads to hanging of directory listing operations on encrypted SMB3
->> connections. Fix this by setting the maximum size to 170 bytes that
->> is calculated as RFC1002 length field size (4) + transform header
->> size (52) + SMB2 header size (64) + create response size (56).
+>> Add checking for the path component length and verify it is <= the maximum
+>> that the server advertizes via FileFsAttributeInformation.
 >>
->> Cc: <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
->> Signed-off-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+>> With this patch cifs.ko will now return ENAMETOOLONG instead of ENOENT
+>> when users to access an overlong path.
+>>
+>> To test this, try to cd into a (non-existing) directory on a CIFS share
+>> that has a too long name:
+>> cd /mnt/aaaaaaaaaaaaaaa...
+>>
+>> and it now should show a good error message from the shell:
+>> bash: cd: /mnt/aaaaaaaaaaaaaaaa...aaaaaa: File name too long
+>>
+>> rh bz 1153996
+>>
+>> Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 >> ---
->>  fs/cifs/smb2pdu.h | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>  fs/cifs/dir.c | 18 ++++++++++++------
+>>  1 file changed, 12 insertions(+), 6 deletions(-)
 >>
->> diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
->> index 18700fd..2826882 100644
->> --- a/fs/cifs/smb2pdu.h
->> +++ b/fs/cifs/smb2pdu.h
->> @@ -84,8 +84,8 @@
+>> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+>> index 56366e984076..569d3fb736be 100644
+>> --- a/fs/cifs/dir.c
+>> +++ b/fs/cifs/dir.c
+>> @@ -194,15 +194,20 @@ build_path_from_dentry_optional_prefix(struct dentry
+>> *direntry, bool prefix)
+>>  }
 >>
->>  #define NUMBER_OF_SMB2_COMMANDS        0x0013
+>>  /*
+>> + * Don't allow path components longer than the server max.
+>>   * Don't allow the separator character in a path component.
+>>   * The VFS will not allow "/", but "\" is allowed by posix.
+>>   */
+>>  static int
+>> -check_name(struct dentry *direntry)
+>> +check_name(struct dentry *direntry, struct cifs_tcon *tcon)
+>>  {
+>>         struct cifs_sb_info *cifs_sb = CIFS_SB(direntry->d_sb);
+>>         int i;
 >>
->> -/* BB FIXME - analyze following length BB */
->> -#define MAX_SMB2_HDR_SIZE 0x78 /* 4 len + 64 hdr + (2*24 wct) + 2 bct + 2
->> pad */
->> +/* 4 len + 52 transform hdr + 64 hdr + 56 create rsp */
->> +#define MAX_SMB2_HDR_SIZE 0x00b0
+>> +       if (unlikely(direntry->d_name.len >
+>> +                    tcon->fsAttrInfo.MaxPathNameComponentLength))
+>> +               return -ENAMETOOLONG;
+>> +
+>>         if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS)) {
+>>                 for (i = 0; i < direntry->d_name.len; i++) {
+>>                         if (direntry->d_name.name[i] == '\\') {
+>> @@ -500,10 +505,6 @@ cifs_atomic_open(struct inode *inode, struct dentry
+>> *direntry,
+>>                 return finish_no_open(file, res);
+>>         }
 >>
->>  #define SMB2_PROTO_NUMBER cpu_to_le32(0x424d53fe)
->>  #define SMB2_TRANSFORM_PROTO_NUM cpu_to_le32(0x424d53fd)
+>> -       rc = check_name(direntry);
+>> -       if (rc)
+>> -               return rc;
+>> -
+>>         xid = get_xid();
+>>
+>>         cifs_dbg(FYI, "parent inode = 0x%p name is: %pd and dentry =
+>> 0x%p\n",
+>> @@ -516,6 +517,11 @@ cifs_atomic_open(struct inode *inode, struct dentry
+>> *direntry,
+>>         }
+>>
+>>         tcon = tlink_tcon(tlink);
+>> +
+>> +       rc = check_name(direntry, tcon);
+>> +       if (rc)
+>> +               goto out_free_xid;
+>> +
+>>         server = tcon->ses->server;
+>>
+>>         if (server->ops->new_lease_key)
+>> @@ -776,7 +782,7 @@ cifs_lookup(struct inode *parent_dir_inode, struct
+>> dentry *direntry,
+>>         }
+>>         pTcon = tlink_tcon(tlink);
+>>
+>> -       rc = check_name(direntry);
+>> +       rc = check_name(direntry, pTcon);
+>>         if (rc)
+>>                 goto lookup_out;
+>>
 >> --
->> 2.7.4
+>> 2.13.3
 >>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
 >
+>
+> --
+> Thanks,
+>
+> Steve
 
 
 
