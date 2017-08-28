@@ -1,296 +1,97 @@
-From: Jeffrey Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] cifs: setcifsacl - Send the actual (security
- descriptor) buffer size instead of the pre-allocated size
-Date: Mon, 28 Aug 2017 07:58:51 -0400
-Message-ID: <1503921531.4563.18.camel@samba.org>
-References: <1503804209-5419-1-git-send-email-shirishpargaonkar@gmail.com>
-         <1503828595.4743.5.camel@samba.org>
-         <CADT32eJdOx7z9jb41M=ZQmdKrOrGwH5YF-GxzSGx0Z52UvHcew@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32eJdOx7z9jb41M=ZQmdKrOrGwH5YF-GxzSGx0Z52UvHcew-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Kees Cook <keescook@chromium.org>
+Subject: [PATCH v2 16/30] cifs: Define usercopy region in cifs_request slab cache
+Date: Mon, 28 Aug 2017 14:34:57 -0700
+Message-ID: <1503956111-36652-17-git-send-email-keescook@chromium.org>
+References: <1503956111-36652-1-git-send-email-keescook@chromium.org>
+Cc: Kees Cook <keescook@chromium.org>,
+	David Windsor <dave@nullcore.net>,
+	Steve French <sfrench@samba.org>,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-mm@kvack.org,
+	kernel-hardening@lists.openwall.com
+To: linux-kernel@vger.kernel.org
+Return-path: <owner-linux-mm@kvack.org>
+In-Reply-To: <1503956111-36652-1-git-send-email-keescook@chromium.org>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-cifs.vger.kernel.org
 
-Got it, thanks. I see the thread now.
+From: David Windsor <dave@nullcore.net>
 
-I think it'd be cleaner to make copy_set_desc return a size_t instead
-of adding a return pointer there. That also means that we don't need to
-worry about how that value is initialized since the caller is in charge
-of it.
+CIFS request buffers, stored in the cifs_request slab cache, need to be
+copied to/from userspace.
 
-Also, could you add some more info the changelog about how the bug
-exhibits itself? That can make it easier for folks to notice a fix when
-the bug pops up.
+cache object allocation:
+    fs/cifs/cifsfs.c:
+        cifs_init_request_bufs():
+            ...
+            cifs_req_poolp = mempool_create_slab_pool(cifs_min_rcv,
+                                                      cifs_req_cachep);
 
-Thanks,
-Jeff
+    fs/cifs/misc.c:
+        cifs_buf_get():
+            ...
+            ret_buf = mempool_alloc(cifs_req_poolp, GFP_NOFS);
+            ...
+            return ret_buf;
 
-On Sun, 2017-08-27 at 22:44 -0500, Shirish Pargaonkar wrote:
-> Jeff,
-> 
-> Attaching two smb2 wireshark traces, you can see the incorrect
-> Setinfo size
-> in the current code (existing setcifsacl wireshark trace).
-> 
-> Regards,
-> 
-> Shirish
-> 
-> On Sun, Aug 27, 2017 at 5:09 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> wrote:
-> > On Sat, 2017-08-26 at 22:23 -0500, shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-> > wrote:
-> > > From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> > > 
-> > > 
-> > > Instead of sending allocated buffer size of a security
-> > > descriptor,
-> > > send the actual size of the security descriptor during set cifs
-> > > acl
-> > > operation.
-> > > 
-> > > 
-> > > Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> > > Tested-by: Paul van Schayck <polleke-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> > > ---
-> > >  setcifsacl.c | 58 +++++++++++++++++++++++++++++++++++++---------
-> > > ------------
-> > >  1 file changed, 37 insertions(+), 21 deletions(-)
-> > > 
-> > > diff --git a/setcifsacl.c b/setcifsacl.c
-> > > index 7eeeaa6..0d4b15f 100644
-> > > --- a/setcifsacl.c
-> > > +++ b/setcifsacl.c
-> > > @@ -50,24 +50,33 @@ enum setcifsacl_actions {
-> > >  static void *plugin_handle;
-> > >  static bool plugin_loaded;
-> > > 
-> > > -static void
-> > > +static int
-> > >  copy_cifs_sid(struct cifs_sid *dst, const struct cifs_sid *src)
-> > >  {
-> > > -     int i;
-> > > +     int i, size = 0;
-> > > 
-> > >       dst->revision = src->revision;
-> > > +     size += sizeof(uint8_t);
-> > > +
-> > >       dst->num_subauth = src->num_subauth;
-> > > +     size += sizeof(uint8_t);
-> > > +
-> > >       for (i = 0; i < NUM_AUTHS; i++)
-> > >               dst->authority[i] = src->authority[i];
-> > > +     size += (sizeof(uint8_t) * NUM_AUTHS);
-> > > +
-> > >       for (i = 0; i < src->num_subauth; i++)
-> > >               dst->sub_auth[i] = src->sub_auth[i];
-> > > +     size += (sizeof(uint32_t) * src->num_subauth);
-> > > +
-> > > +     return size;
-> > >  }
-> > > 
-> > >  static void
-> > >  copy_sec_desc(const struct cifs_ntsd *pntsd, struct cifs_ntsd
-> > > *pnntsd,
-> > > -             int numaces, int acessize)
-> > > +             int numaces, int acessize, ssize_t *bufsize)
-> > 
-> > A return pointer in a void return function is a little inefficient.
-> > How
-> > about making this function return ssize_t instead?
-> > 
-> > >  {
-> > > -     int osidsoffset, gsidsoffset, dacloffset;
-> > > +     int size, osidsoffset, gsidsoffset, dacloffset;
-> > >       struct cifs_sid *owner_sid_ptr, *group_sid_ptr;
-> > >       struct cifs_sid *nowner_sid_ptr, *ngroup_sid_ptr;
-> > >       struct cifs_ctrl_acl *dacl_ptr, *ndacl_ptr;
-> > > @@ -77,28 +86,34 @@ copy_sec_desc(const struct cifs_ntsd *pntsd,
-> > > struct cifs_ntsd *pnntsd,
-> > >       gsidsoffset = le32toh(pntsd->gsidoffset);
-> > >       dacloffset = le32toh(pntsd->dacloffset);
-> > > 
-> > > +     size = sizeof(struct cifs_ntsd);
-> > >       pnntsd->revision = pntsd->revision;
-> > >       pnntsd->type = pntsd->type;
-> > >       pnntsd->osidoffset = pntsd->osidoffset;
-> > >       pnntsd->gsidoffset = pntsd->gsidoffset;
-> > >       pnntsd->dacloffset = pntsd->dacloffset;
-> > > +     *bufsize = *bufsize + size;
-> > 
-> > Here you're assuming that the size being passed in is always 0. Is
-> > that
-> > a safe assumption? Would it be better to have it just do this
-> > there?
-> > 
-> >     *bufsize = size;
-> > 
-> > > 
-> > >       dacl_ptr = (struct cifs_ctrl_acl *)((char *)pntsd +
-> > > dacloffset);
-> > >       ndacl_ptr = (struct cifs_ctrl_acl *)((char *)pnntsd +
-> > > dacloffset);
-> > > 
-> > > +     size = acessize + sizeof(struct cifs_ctrl_acl);
-> > >       ndacl_ptr->revision = dacl_ptr->revision;
-> > > -     ndacl_ptr->size = htole16(acessize + sizeof(struct
-> > > cifs_ctrl_acl));
-> > > +     ndacl_ptr->size = htole16(size);
-> > >       ndacl_ptr->num_aces = htole32(numaces);
-> > > +     *bufsize = *bufsize + size;
-> > > 
-> > >       /* copy owner sid */
-> > >       owner_sid_ptr = (struct cifs_sid *)((char *)pntsd +
-> > > osidsoffset);
-> > >       nowner_sid_ptr = (struct cifs_sid *)((char *)pnntsd +
-> > > osidsoffset);
-> > > -     copy_cifs_sid(nowner_sid_ptr, owner_sid_ptr);
-> > > +     size = copy_cifs_sid(nowner_sid_ptr, owner_sid_ptr);
-> > > +     *bufsize = *bufsize + size;
-> > > 
-> > >       /* copy group sid */
-> > >       group_sid_ptr = (struct cifs_sid *)((char *)pntsd +
-> > > gsidsoffset);
-> > >       ngroup_sid_ptr = (struct cifs_sid *)((char *)pnntsd +
-> > > gsidsoffset);
-> > > -     copy_cifs_sid(ngroup_sid_ptr, group_sid_ptr);
-> > > +     size = copy_cifs_sid(ngroup_sid_ptr, group_sid_ptr);
-> > > +     *bufsize = *bufsize + size;
-> > > 
-> > >       return;
-> > >  }
-> > > @@ -156,10 +171,10 @@ compare_aces(struct cifs_ace *sace, struct
-> > > cifs_ace *dace, int compflags)
-> > >  }
-> > > 
-> > >  static int
-> > > -get_sec_desc_size(struct cifs_ntsd *pntsd, struct cifs_ntsd
-> > > **npntsd,
-> > > -                     int aces, ssize_t *bufsize, size_t
-> > > *acesoffset)
-> > > +alloc_sec_desc(struct cifs_ntsd *pntsd, struct cifs_ntsd
-> > > **npntsd,
-> > > +                     int aces, size_t *acesoffset)
-> > >  {
-> > > -     unsigned int size, acessize, dacloffset;
-> > > +     unsigned int size, acessize, bufsize, dacloffset;
-> > > 
-> > >       size = sizeof(struct cifs_ntsd) +
-> > >               2 * sizeof(struct cifs_sid) +
-> > > @@ -169,9 +184,9 @@ get_sec_desc_size(struct cifs_ntsd *pntsd,
-> > > struct cifs_ntsd **npntsd,
-> > > 
-> > >       *acesoffset = dacloffset + sizeof(struct cifs_ctrl_acl);
-> > >       acessize = aces * sizeof(struct cifs_ace);
-> > > -     *bufsize = size + acessize;
-> > > +     bufsize = size + acessize;
-> > > 
-> > > -     *npntsd = malloc(*bufsize);
-> > > +     *npntsd = malloc(bufsize);
-> > >       if (!*npntsd) {
-> > >               printf("%s: Memory allocation failure", __func__);
-> > >               return errno;
-> > > @@ -188,7 +203,7 @@ ace_set(struct cifs_ntsd *pntsd, struct
-> > > cifs_ntsd **npntsd, ssize_t *bufsize,
-> > >       size_t acesoffset;
-> > >       char *acesptr;
-> > > 
-> > > -     rc = get_sec_desc_size(pntsd, npntsd, numcaces, bufsize,
-> > > &acesoffset);
-> > > +     rc = alloc_sec_desc(pntsd, npntsd, numcaces, &acesoffset);
-> > >       if (rc)
-> > >               return rc;
-> > > 
-> > > @@ -198,9 +213,8 @@ ace_set(struct cifs_ntsd *pntsd, struct
-> > > cifs_ntsd **npntsd, ssize_t *bufsize,
-> > >               acessize += size;
-> > >               acesptr += size;
-> > >       }
-> > > -     copy_sec_desc(pntsd, *npntsd, numcaces, acessize);
-> > > -     acesptr = (char *)*npntsd + acesoffset;
-> > > 
-> > > +     copy_sec_desc(pntsd, *npntsd, numcaces, acessize, bufsize);
-> > > 
-> > >       return 0;
-> > >  }
-> > > @@ -215,7 +229,7 @@ ace_add(struct cifs_ntsd *pntsd, struct
-> > > cifs_ntsd **npntsd, ssize_t *bufsize,
-> > >       char *acesptr;
-> > > 
-> > >       numaces = numfaces + numcaces;
-> > > -     rc = get_sec_desc_size(pntsd, npntsd, numaces, bufsize,
-> > > &acesoffset);
-> > > +     rc = alloc_sec_desc(pntsd, npntsd, numaces, &acesoffset);
-> > >       if (rc)
-> > >               return rc;
-> > > 
-> > > @@ -230,7 +244,8 @@ ace_add(struct cifs_ntsd *pntsd, struct
-> > > cifs_ntsd **npntsd, ssize_t *bufsize,
-> > >               acesptr += size;
-> > >               acessize += size;
-> > >       }
-> > > -     copy_sec_desc(pntsd, *npntsd, numaces, acessize);
-> > > +
-> > > +     copy_sec_desc(pntsd, *npntsd, numaces, acessize, bufsize);
-> > > 
-> > >       return 0;
-> > >  }
-> > > @@ -249,7 +264,7 @@ ace_modify(struct cifs_ntsd *pntsd, struct
-> > > cifs_ntsd **npntsd, ssize_t *bufsize,
-> > >               return -1;
-> > >       }
-> > > 
-> > > -     rc = get_sec_desc_size(pntsd, npntsd, numfaces, bufsize,
-> > > &acesoffset);
-> > > +     rc = alloc_sec_desc(pntsd, npntsd, numfaces, &acesoffset);
-> > >       if (rc)
-> > >               return rc;
-> > > 
-> > > @@ -270,7 +285,7 @@ ace_modify(struct cifs_ntsd *pntsd, struct
-> > > cifs_ntsd **npntsd, ssize_t *bufsize,
-> > >               acessize += size;
-> > >       }
-> > > 
-> > > -     copy_sec_desc(pntsd, *npntsd, numfaces, acessize);
-> > > +     copy_sec_desc(pntsd, *npntsd, numfaces, acessize, bufsize);
-> > > 
-> > >       return 0;
-> > >  }
-> > > @@ -294,7 +309,7 @@ ace_delete(struct cifs_ntsd *pntsd, struct
-> > > cifs_ntsd **npntsd, ssize_t *bufsize,
-> > >               return -1;
-> > >       }
-> > > 
-> > > -     rc = get_sec_desc_size(pntsd, npntsd, numfaces, bufsize,
-> > > &acesoffset);
-> > > +     rc = alloc_sec_desc(pntsd, npntsd, numfaces, &acesoffset);
-> > >       if (rc)
-> > >               return rc;
-> > > 
-> > > @@ -317,7 +332,8 @@ ace_delete(struct cifs_ntsd *pntsd, struct
-> > > cifs_ntsd **npntsd, ssize_t *bufsize,
-> > >               printf("%s: Nothing to delete\n", __func__);
-> > >               return 1;
-> > >       }
-> > > -     copy_sec_desc(pntsd, *npntsd, numaces, acessize);
-> > > +
-> > > +     copy_sec_desc(pntsd, *npntsd, numaces, acessize, bufsize);
-> > > 
-> > >       return 0;
-> > >  }
-> > 
-> > Thanks for the patch. I'll plan to look more in detail tomorrow.
-> > Could
-> > you explain a little about this bug was manifested? Is there a
-> > public
-> > bug tracker link of some sort?
-> > 
-> > (PS for Steve: we don't really have a stable branch for cifs-utils.
-> > Distros are on their own there.)
-> > --
-> > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In support of usercopy hardening, this patch defines a region in the
+cifs_request slab cache in which userspace copy operations are allowed.
+
+This region is known as the slab cache's usercopy region.  Slab
+caches can now check that each copy operation involving cache-managed
+memory falls entirely within the slab's usercopy region.
+
+This patch is verbatim from Brad Spengler/PaX Team's PAX_USERCOPY
+whitelisting code in the last public patch of grsecurity/PaX based on my
+understanding of the code. Changes or omissions from the original code are
+mine and don't reflect the original grsecurity/PaX code.
+
+Signed-off-by: David Windsor <dave@nullcore.net>
+[kees: adjust commit log, provide usage trace]
+Cc: Steve French <sfrench@samba.org>
+Cc: linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ fs/cifs/cifsfs.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 180b3356ff86..09dfdf76c738 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -1229,9 +1229,11 @@ cifs_init_request_bufs(void)
+ 	cifs_dbg(VFS, "CIFSMaxBufSize %d 0x%x\n",
+ 		 CIFSMaxBufSize, CIFSMaxBufSize);
+ */
+-	cifs_req_cachep = kmem_cache_create("cifs_request",
++	cifs_req_cachep = kmem_cache_create_usercopy("cifs_request",
+ 					    CIFSMaxBufSize + max_hdr_size, 0,
+-					    SLAB_HWCACHE_ALIGN, NULL);
++					    SLAB_HWCACHE_ALIGN, 0,
++					    CIFSMaxBufSize + max_hdr_size,
++					    NULL);
+ 	if (cifs_req_cachep == NULL)
+ 		return -ENOMEM;
+ 
+@@ -1257,9 +1259,9 @@ cifs_init_request_bufs(void)
+ 	more SMBs to use small buffer alloc and is still much more
+ 	efficient to alloc 1 per page off the slab compared to 17K (5page)
+ 	alloc of large cifs buffers even when page debugging is on */
+-	cifs_sm_req_cachep = kmem_cache_create("cifs_small_rq",
++	cifs_sm_req_cachep = kmem_cache_create_usercopy("cifs_small_rq",
+ 			MAX_CIFS_SMALL_BUFFER_SIZE, 0, SLAB_HWCACHE_ALIGN,
+-			NULL);
++			0, MAX_CIFS_SMALL_BUFFER_SIZE, NULL);
+ 	if (cifs_sm_req_cachep == NULL) {
+ 		mempool_destroy(cifs_req_poolp);
+ 		kmem_cache_destroy(cifs_req_cachep);
+-- 
+2.7.4
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
