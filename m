@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v3 04/19] CIFS: SMBD: Add SMBDirect transport to SMB connection and Makefile
-Date: Tue, 29 Aug 2017 12:29:00 -0700
-Message-ID: <20170829192915.26251-5-longli@exchange.microsoft.com>
+Subject: [Patch v3 05/19] CIFS: SMBD: Connect to SMBDirect session
+Date: Tue, 29 Aug 2017 12:29:01 -0700
+Message-ID: <20170829192915.26251-6-longli@exchange.microsoft.com>
 References: <20170829192915.26251-1-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -16,41 +16,52 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-Add SMBDirect as an optional connection to the SMB session structure in CIFS.
-When SMB session is connected through SMBDirect, upper layer uses this
-connection to carry payloads.
-
-With the transport code hooked up to upper layer, add SMBDirect code to
-Makefile.
+When "rdma" is specified in the mount option, CIFS attempts to connect to
+SMBDirect instead of TCP socket.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/Makefile   | 2 +-
- fs/cifs/cifsglob.h | 2 ++
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ fs/cifs/connect.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/fs/cifs/Makefile b/fs/cifs/Makefile
-index eed7eb0..6bb9863 100644
---- a/fs/cifs/Makefile
-+++ b/fs/cifs/Makefile
-@@ -18,4 +18,4 @@ cifs-$(CONFIG_CIFS_DFS_UPCALL) += dns_resolve.o cifs_dfs_ref.o
- cifs-$(CONFIG_CIFS_FSCACHE) += fscache.o cache.o
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 19fdca8..43b4d54 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -45,6 +45,7 @@
+ #include <linux/parser.h>
+ #include <linux/bvec.h>
  
- cifs-$(CONFIG_CIFS_SMB2) += smb2ops.o smb2maperror.o smb2transport.o \
--			    smb2misc.o smb2pdu.o smb2inode.o smb2file.o
-+			    smb2misc.o smb2pdu.o smb2inode.o smb2file.o smbdirect.o
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 703c2fb..dc5404d 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -652,6 +652,8 @@ struct TCP_Server_Info {
- 	bool	large_buf;		/* is current buffer large? */
- 	/* use SMBD connection instead of socket */
- 	bool	rdma;
-+	/* point to the SMBD connection if RDMA is used instead of socket */
-+	struct smbd_connection *smbd_conn;
- 	struct delayed_work	echo; /* echo ping workqueue job */
- 	char	*smallbuf;	/* pointer to current "small" buffer */
- 	char	*bigbuf;	/* pointer to current "big" buffer */
++#include "smbdirect.h"
+ #include "cifspdu.h"
+ #include "cifsglob.h"
+ #include "cifsproto.h"
+@@ -2289,12 +2290,26 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 	else
+ 		tcp_ses->echo_interval = SMB_ECHO_INTERVAL_DEFAULT * HZ;
+ 
++	if (tcp_ses->rdma) {
++		tcp_ses->smbd_conn = smbd_get_connection(
++			tcp_ses, (struct sockaddr *)&volume_info->dstaddr);
++		if (tcp_ses->smbd_conn) {
++			cifs_dbg(VFS, "RDMA transport established\n");
++			rc = 0;
++			goto connected;
++		} else {
++			rc = -ENOENT;
++			goto out_err_crypto_release;
++		}
++	}
++
+ 	rc = ip_connect(tcp_ses);
+ 	if (rc < 0) {
+ 		cifs_dbg(VFS, "Error connecting to socket. Aborting operation.\n");
+ 		goto out_err_crypto_release;
+ 	}
+ 
++connected:
+ 	/*
+ 	 * since we're in a cifs function already, we know that
+ 	 * this will succeed. No need for try_module_get().
 -- 
 2.7.4
