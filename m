@@ -1,84 +1,64 @@
-From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: RE: [Patch v3 04/19] CIFS: SMBD: Add SMBDirect transport to SMB
- connection and Makefile
-Date: Tue, 29 Aug 2017 23:14:08 +0000
-Message-ID: <MWHPR21MB0190E084D29AFB86195FBBA2CE9F0@MWHPR21MB0190.namprd21.prod.outlook.com>
-References: <20170829192915.26251-1-longli@exchange.microsoft.com>
- <20170829192915.26251-5-longli@exchange.microsoft.com>
- <CAKywueRaTqR1yw_PbdcOYQTY9msweboej_6ZPcbsuyJfmiVgng@mail.gmail.com>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [Patch v3 06/19] CIFS: SMBD: Reconnect to SMBDirect session
+Date: Tue, 29 Aug 2017 16:15:29 -0700
+Message-ID: <CAKywueT9qYnY1cXwtrc4HgRHMt27+JOJafpFTupwV45nViSQbw@mail.gmail.com>
+References: <20170829192915.26251-1-longli@exchange.microsoft.com> <20170829192915.26251-7-longli@exchange.microsoft.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="UTF-8"
 Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
         linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
         samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
         Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-        "Tom Talpey" <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+        linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+        Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueRaTqR1yw_PbdcOYQTY9msweboej_6ZPcbsuyJfmiVgng-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Content-Language: en-US
+In-Reply-To: <20170829192915.26251-7-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQYXZlbCBTaGlsb3Zza3kgW21h
-aWx0bzpwaWFzdHJ5eXlAZ21haWwuY29tXQ0KPiBTZW50OiBUdWVzZGF5LCBBdWd1c3QgMjksIDIw
-MTcgNDoxMiBQTQ0KPiBUbzogTG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+IENjOiBT
-dGV2ZSBGcmVuY2ggPHNmcmVuY2hAc2FtYmEub3JnPjsgbGludXgtY2lmcyA8bGludXgtDQo+IGNp
-ZnNAdmdlci5rZXJuZWwub3JnPjsgc2FtYmEtdGVjaG5pY2FsIDxzYW1iYS10ZWNobmljYWxAbGlz
-dHMuc2FtYmEub3JnPjsNCj4gS2VybmVsIE1haWxpbmcgTGlzdCA8bGludXgta2VybmVsQHZnZXIu
-a2VybmVsLm9yZz47IGxpbnV4LQ0KPiByZG1hQHZnZXIua2VybmVsLm9yZzsgQ2hyaXN0b3BoIEhl
-bGx3aWcgPGhjaEBpbmZyYWRlYWQub3JnPjsgVG9tIFRhbHBleQ0KPiA8dHRhbHBleUBtaWNyb3Nv
-ZnQuY29tPjsgTWF0dGhldyBXaWxjb3ggPG1hd2lsY294QG1pY3Jvc29mdC5jb20+Ow0KPiBMb25n
-IExpIDxsb25nbGlAbWljcm9zb2Z0LmNvbT4NCj4gU3ViamVjdDogUmU6IFtQYXRjaCB2MyAwNC8x
-OV0gQ0lGUzogU01CRDogQWRkIFNNQkRpcmVjdCB0cmFuc3BvcnQgdG8gU01CDQo+IGNvbm5lY3Rp
-b24gYW5kIE1ha2VmaWxlDQo+IA0KPiAyMDE3LTA4LTI5IDEyOjI5IEdNVC0wNzowMCBMb25nIExp
-IDxsb25nbGlAZXhjaGFuZ2UubWljcm9zb2Z0LmNvbT46DQo+ID4gRnJvbTogTG9uZyBMaSA8bG9u
-Z2xpQG1pY3Jvc29mdC5jb20+DQo+ID4NCj4gPiBBZGQgU01CRGlyZWN0IGFzIGFuIG9wdGlvbmFs
-IGNvbm5lY3Rpb24gdG8gdGhlIFNNQiBzZXNzaW9uIHN0cnVjdHVyZSBpbg0KPiBDSUZTLg0KPiA+
-IFdoZW4gU01CIHNlc3Npb24gaXMgY29ubmVjdGVkIHRocm91Z2ggU01CRGlyZWN0LCB1cHBlciBs
-YXllciB1c2VzIHRoaXMNCj4gPiBjb25uZWN0aW9uIHRvIGNhcnJ5IHBheWxvYWRzLg0KPiA+DQo+
-ID4gV2l0aCB0aGUgdHJhbnNwb3J0IGNvZGUgaG9va2VkIHVwIHRvIHVwcGVyIGxheWVyLCBhZGQg
-U01CRGlyZWN0IGNvZGUNCj4gPiB0byBNYWtlZmlsZS4NCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6
-IExvbmcgTGkgPGxvbmdsaUBtaWNyb3NvZnQuY29tPg0KPiA+IC0tLQ0KPiA+ICBmcy9jaWZzL01h
-a2VmaWxlICAgfCAyICstDQo+ID4gIGZzL2NpZnMvY2lmc2dsb2IuaCB8IDIgKysNCj4gPiAgMiBm
-aWxlcyBjaGFuZ2VkLCAzIGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkNCj4gPg0KPiA+IGRp
-ZmYgLS1naXQgYS9mcy9jaWZzL01ha2VmaWxlIGIvZnMvY2lmcy9NYWtlZmlsZSBpbmRleA0KPiA+
-IGVlZDdlYjAuLjZiYjk4NjMgMTAwNjQ0DQo+ID4gLS0tIGEvZnMvY2lmcy9NYWtlZmlsZQ0KPiA+
-ICsrKyBiL2ZzL2NpZnMvTWFrZWZpbGUNCj4gPiBAQCAtMTgsNCArMTgsNCBAQCBjaWZzLSQoQ09O
-RklHX0NJRlNfREZTX1VQQ0FMTCkgKz0gZG5zX3Jlc29sdmUubw0KPiA+IGNpZnNfZGZzX3JlZi5v
-DQo+ID4gIGNpZnMtJChDT05GSUdfQ0lGU19GU0NBQ0hFKSArPSBmc2NhY2hlLm8gY2FjaGUubw0K
-PiA+DQo+ID4gIGNpZnMtJChDT05GSUdfQ0lGU19TTUIyKSArPSBzbWIyb3BzLm8gc21iMm1hcGVy
-cm9yLm8NCj4gc21iMnRyYW5zcG9ydC5vIFwNCj4gPiAtICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgc21iMm1pc2MubyBzbWIycGR1Lm8gc21iMmlub2RlLm8gc21iMmZpbGUubw0KPiA+ICsgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBzbWIybWlzYy5vIHNtYjJwZHUubyBzbWIyaW5vZGUubw0K
-PiA+ICsgc21iMmZpbGUubyBzbWJkaXJlY3Qubw0KPiA+IGRpZmYgLS1naXQgYS9mcy9jaWZzL2Np
-ZnNnbG9iLmggYi9mcy9jaWZzL2NpZnNnbG9iLmggaW5kZXgNCj4gPiA3MDNjMmZiLi5kYzU0MDRk
-IDEwMDY0NA0KPiA+IC0tLSBhL2ZzL2NpZnMvY2lmc2dsb2IuaA0KPiA+ICsrKyBiL2ZzL2NpZnMv
-Y2lmc2dsb2IuaA0KPiA+IEBAIC02NTIsNiArNjUyLDggQEAgc3RydWN0IFRDUF9TZXJ2ZXJfSW5m
-byB7DQo+ID4gICAgICAgICBib29sICAgIGxhcmdlX2J1ZjsgICAgICAgICAgICAgIC8qIGlzIGN1
-cnJlbnQgYnVmZmVyIGxhcmdlPyAqLw0KPiA+ICAgICAgICAgLyogdXNlIFNNQkQgY29ubmVjdGlv
-biBpbnN0ZWFkIG9mIHNvY2tldCAqLw0KPiA+ICAgICAgICAgYm9vbCAgICByZG1hOw0KPiA+ICsg
-ICAgICAgLyogcG9pbnQgdG8gdGhlIFNNQkQgY29ubmVjdGlvbiBpZiBSRE1BIGlzIHVzZWQgaW5z
-dGVhZCBvZiBzb2NrZXQgKi8NCj4gPiArICAgICAgIHN0cnVjdCBzbWJkX2Nvbm5lY3Rpb24gKnNt
-YmRfY29ubjsNCj4gPiAgICAgICAgIHN0cnVjdCBkZWxheWVkX3dvcmsgICAgIGVjaG87IC8qIGVj
-aG8gcGluZyB3b3JrcXVldWUgam9iICovDQo+ID4gICAgICAgICBjaGFyICAgICpzbWFsbGJ1Zjsg
-ICAgICAvKiBwb2ludGVyIHRvIGN1cnJlbnQgInNtYWxsIiBidWZmZXIgKi8NCj4gPiAgICAgICAg
-IGNoYXIgICAgKmJpZ2J1ZjsgICAgICAgIC8qIHBvaW50ZXIgdG8gY3VycmVudCAiYmlnIiBidWZm
-ZXIgKi8NCj4gPiAtLQ0KPiA+IDIuNy40DQo+ID4NCj4gPiAtLQ0KPiA+IFRvIHVuc3Vic2NyaWJl
-IGZyb20gdGhpcyBsaXN0OiBzZW5kIHRoZSBsaW5lICJ1bnN1YnNjcmliZSBsaW51eC1jaWZzIg0K
-PiA+IGluIHRoZSBib2R5IG9mIGEgbWVzc2FnZSB0byBtYWpvcmRvbW9Admdlci5rZXJuZWwub3Jn
-IE1vcmUNCj4gbWFqb3Jkb21vDQo+ID4gaW5mbyBhdA0KPiA+DQo+IGh0dHBzOi8vbmEwMS5zYWZl
-bGlua3MucHJvdGVjdGlvbi5vdXRsb29rLmNvbS8/dXJsPWh0dHAlM0ElMkYlMkZ2Z2VyLmsNCj4g
-PiBlcm5lbC5vcmclMkZtYWpvcmRvbW8tDQo+IGluZm8uaHRtbCZkYXRhPTAyJTdDMDElN0Nsb25n
-bGklNDBtaWNyb3NvZnQuY29tJQ0KPiA+DQo+IDdDNzRhNDU5YTY3YzY0NDBmODhkNDMwOGQ0ZWYz
-MzU4YzUlN0M3MmY5ODhiZjg2ZjE0MWFmOTFhYjJkN2NkMDExZGINCj4gNDclDQo+ID4NCj4gN0Mx
-JTdDMCU3QzYzNjM5NjQ1MTE5MjgxODMzNCZzZGF0YT1uSUZtVjV3dm5MMXhNbTZ0Q25mZEFnTE10
-JQ0KPiAyQkZLSlU2b2gNCj4gPiBoTmhFWE84WkpzJTNEJnJlc2VydmVkPTANCj4gDQo+IEl0IGlz
-IGJldHRlciB0byBzcGxpdCB0aGUgY3VycmVudCBwYXRjaCBpbnRvIDIgYW5kIG1lcmdlIHRoZSBN
-YWtlZmlsZSBwYXJ0IHRvICMzDQo+IGFuZCBjaWZzZ2xvYi5oIHBhcnQgdG8gIzUuDQoNClN1cmUs
-IHdpbGwgbWFrZSB0aGUgY2hhbmdlLg0KDQo+IA0KPiAtLQ0KPiBCZXN0IHJlZ2FyZHMsDQo+IFBh
-dmVsIFNoaWxvdnNreQ0K
+2017-08-29 12:29 GMT-07:00 Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>:
+> From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+>
+> Do a reconnect on SMBDirect when it is used as the connection. Reconnect can
+> happen for many reasons and it's mostly the decision of upper layer SMB2 not
+> SMBDirect.
+>
+> Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+> ---
+>  fs/cifs/connect.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 43b4d54..341a3fd 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -409,7 +409,11 @@ cifs_reconnect(struct TCP_Server_Info *server)
+>
+>                 /* we should try only the port we connected to before */
+>                 mutex_lock(&server->srv_mutex);
+> -               rc = generic_ip_connect(server);
+> +               if (server->rdma)
+> +                       rc = smbd_reconnect(server);
+> +               else
+> +                       rc = generic_ip_connect(server);
+> +
+>                 if (rc) {
+>                         cifs_dbg(FYI, "reconnect error %d\n", rc);
+>                         mutex_unlock(&server->srv_mutex);
+> --
+> 2.7.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+It is a easier to follow the logic if the definition is introduced
+together with using of this function in the existing code. I suggest
+to add smbd_reconnect() definition in this patch.
+--
+Best regards,
+Pavel Shilovsky
