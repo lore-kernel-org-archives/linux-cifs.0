@@ -1,129 +1,50 @@
-From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v3 19/19] CIFS: SMBD: Add SMBDirect debug counters
-Date: Tue, 29 Aug 2017 12:29:15 -0700
-Message-ID: <20170829192915.26251-20-longli@exchange.microsoft.com>
-References: <20170829192915.26251-1-longli@exchange.microsoft.com>
-Cc: Long Li <longli@microsoft.com>
-To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Tom Talpey <ttalpey@microsoft.com>,
-        Matthew Wilcox <mawilcox@microsoft.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170829192915.26251-1-longli@exchange.microsoft.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Subject: RE: [Patch v2 00/19] CIFS: Implement SMBDirect
+Date: Tue, 29 Aug 2017 19:31:25 +0000
+Message-ID: <CY4PR21MB01821B704C2F64F72A8A92A9CE9F0@CY4PR21MB0182.namprd21.prod.outlook.com>
+References: <1503255883-3041-1-git-send-email-longli@exchange.microsoft.com>
+ <CAL1RGDUGiOqjB8n0mJmF079jm7vXrdzE2rHdzoNOexvgHScjUQ@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+        Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Roland Dreier <roland-BHEL68pLQRGGvPXPguhicg@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAL1RGDUGiOqjB8n0mJmF079jm7vXrdzE2rHdzoNOexvgHScjUQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Language: en-US
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-From: Long Li <longli@microsoft.com>
-
-Export SMBDirect debug counters to /proc/fs/cifs/DebugData.
-
-Those are used for debugging, troubleshooting and profiling.
-
-Signed-off-by: Long Li <longli@microsoft.com>
----
- fs/cifs/cifs_debug.c | 82 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 82 insertions(+)
-
-diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-index ba0870d..dad13d5 100644
---- a/fs/cifs/cifs_debug.c
-+++ b/fs/cifs/cifs_debug.c
-@@ -30,6 +30,7 @@
- #include "cifsproto.h"
- #include "cifs_debug.h"
- #include "cifsfs.h"
-+#include "smbdirect.h"
- 
- void
- cifs_dump_mem(char *label, void *data, int length)
-@@ -152,6 +153,87 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 	list_for_each(tmp1, &cifs_tcp_ses_list) {
- 		server = list_entry(tmp1, struct TCP_Server_Info,
- 				    tcp_ses_list);
-+
-+		if (!server->rdma)
-+			goto skip_rdma;
-+
-+		seq_printf(m, "\nSMBDirect (in hex) protocol version: %x "
-+			"transport status: %x",
-+			server->smbd_conn->protocol,
-+			server->smbd_conn->transport_status);
-+		seq_printf(m, "\nConn receive_credit_max: %x "
-+			"send_credit_target: %x max_send_size: %x",
-+			server->smbd_conn->receive_credit_max,
-+			server->smbd_conn->send_credit_target,
-+			server->smbd_conn->max_send_size);
-+		seq_printf(m, "\nConn max_fragmented_recv_size: %x "
-+			"max_fragmented_send_size: %x max_receive_size:%x",
-+			server->smbd_conn->max_fragmented_recv_size,
-+			server->smbd_conn->max_fragmented_send_size,
-+			server->smbd_conn->max_receive_size);
-+		seq_printf(m, "\nConn keep_alive_interval: %x "
-+			"max_readwrite_size: %x rdma_readwrite_threshold: %x",
-+			server->smbd_conn->keep_alive_interval,
-+			server->smbd_conn->max_readwrite_size,
-+			server->smbd_conn->rdma_readwrite_threshold);
-+		seq_printf(m, "\nDebug count_get_receive_buffer: %x "
-+			"count_put_receive_buffer: %x count_send_empty: %x",
-+			server->smbd_conn->count_get_receive_buffer,
-+			server->smbd_conn->count_put_receive_buffer,
-+			server->smbd_conn->count_send_empty);
-+		seq_printf(m, "\nRead Queue count_reassembly_queue: %x "
-+			"count_enqueue_reassembly_queue: %x "
-+			"count_dequeue_reassembly_queue: %x "
-+			"fragment_reassembly_remaining: %x "
-+			"reassembly_data_length: %x "
-+			"reassembly_queue_length: %x",
-+			server->smbd_conn->count_reassembly_queue,
-+			server->smbd_conn->count_enqueue_reassembly_queue,
-+			server->smbd_conn->count_dequeue_reassembly_queue,
-+			server->smbd_conn->fragment_reassembly_remaining,
-+			server->smbd_conn->reassembly_data_length,
-+			server->smbd_conn->reassembly_queue_length);
-+		seq_printf(m, "\nCurrent Credits send_credits: %x "
-+			"receive_credits: %x receive_credit_target: %x",
-+			atomic_read(&server->smbd_conn->send_credits),
-+			atomic_read(&server->smbd_conn->receive_credits),
-+			server->smbd_conn->receive_credit_target);
-+		seq_printf(m, "\nPending send_pending: %x send_payload_pending:"
-+			" %x smbd_send_pending: %x smbd_recv_pending: %x",
-+			atomic_read(&server->smbd_conn->send_pending),
-+			atomic_read(&server->smbd_conn->send_payload_pending),
-+			server->smbd_conn->smbd_send_pending,
-+			server->smbd_conn->smbd_recv_pending);
-+		seq_printf(m, "\nReceive buffers count_receive_queue: %x "
-+			"count_empty_packet_queue: %x",
-+			server->smbd_conn->count_receive_queue,
-+			server->smbd_conn->count_empty_packet_queue);
-+		seq_printf(m, "\nMR responder_resources: %x "
-+			"max_frmr_depth: %x mr_type: %x",
-+			server->smbd_conn->responder_resources,
-+			server->smbd_conn->max_frmr_depth,
-+			server->smbd_conn->mr_type);
-+		seq_printf(m, "\nMR mr_ready_count: %x mr_used_count: %x",
-+			atomic_read(&server->smbd_conn->mr_ready_count),
-+			atomic_read(&server->smbd_conn->mr_used_count));
-+
-+		seq_printf(m, "\nTSC cycle histogram in I/O path: "
-+			"(the number of most significant bits)");
-+		seq_printf(m, "\nsmbd_register_mr cycles [1/10000]: ");
-+		profiling_display_histogram(m, server->smbd_conn->smbd_register_mr_cycles);
-+
-+		seq_printf(m, "\nsmbd_deregister_mr cycles [1/10000]: ");
-+		profiling_display_histogram(m, server->smbd_conn->smbd_deregister_mr_cycles);
-+
-+		seq_printf(m, "\nsmbd_send cycles [1/10000]: ");
-+		profiling_display_histogram(m, server->smbd_conn->smbd_write_cycles);
-+
-+		seq_printf(m, "\nsmbd_recv cycles [1/10000]: ");
-+		profiling_display_histogram(m, server->smbd_conn->smbd_recv_cycles);
-+
-+		seq_printf(m, "\nrecv_done cycles [1/10000]: ");
-+		profiling_display_histogram(m, server->smbd_conn->recv_done_cycles);
-+skip_rdma:
- 		seq_printf(m, "\nNumber of credits: %d", server->credits);
- 		i++;
- 		list_for_each(tmp2, &server->smb_ses_list) {
--- 
-2.7.4
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUm9sYW5kIERyZWllciBb
+bWFpbHRvOnJvbGFuZEBwdXJlc3RvcmFnZS5jb21dDQo+IFNlbnQ6IFR1ZXNkYXksIEF1Z3VzdCAy
+OSwgMjAxNyAxMToyMSBBTQ0KPiBUbzogTG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+
+IENjOiBTdGV2ZSBGcmVuY2ggPHNmcmVuY2hAc2FtYmEub3JnPjsgbGludXgtY2lmc0B2Z2VyLmtl
+cm5lbC5vcmc7IHNhbWJhLQ0KPiB0ZWNobmljYWxAbGlzdHMuc2FtYmEub3JnOyBMS01MIDxsaW51
+eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnPjsgbGludXgtDQo+IHJkbWFAdmdlci5rZXJuZWwub3Jn
+OyBDaHJpc3RvcGggSGVsbHdpZyA8aGNoQGluZnJhZGVhZC5vcmc+OyBUb20gVGFscGV5DQo+IDx0
+dGFscGV5QG1pY3Jvc29mdC5jb20+OyBNYXR0aGV3IFdpbGNveCA8bWF3aWxjb3hAbWljcm9zb2Z0
+LmNvbT47DQo+IExvbmcgTGkgPGxvbmdsaUBtaWNyb3NvZnQuY29tPg0KPiBTdWJqZWN0OiBSZTog
+W1BhdGNoIHYyIDAwLzE5XSBDSUZTOiBJbXBsZW1lbnQgU01CRGlyZWN0DQo+IA0KPiA+IFN0YXJ0
+aW5nIHdpdGggU01CMiBkaWFsZWN0IDMuMCwgTWljcm9zb2Z0IGludHJvZHVjZWQgU01CRGlyZWN0
+IHRyYW5zcG9ydA0KPiBwcm90b2NvbCBmb3IgdHJhbnNmZXJyaW5nIHVwcGVyIGxheWVyIChTTUIy
+KSBwYXlsb2FkIG92ZXIgUkRNQSB2aWENCj4gSW5maW5pYmFuZCwgUm9DRSBvciBpV0FSUC4gVGhl
+IHByb2NvY29sIGlzIHB1Ymxpc2hlZCBpbiBbTVMtU01CRF0NCj4gKGh0dHBzOi8vbmEwMS5zYWZl
+bGlua3MucHJvdGVjdGlvbi5vdXRsb29rLmNvbS8/dXJsPWh0dHBzJTNBJTJGJTJGbXNkbg0KPiAu
+bWljcm9zb2Z0LmNvbSUyRmVuLQ0KPiB1cyUyRmxpYnJhcnklMkZoaDUzNjM0Ni5hc3B4JmRhdGE9
+MDIlN0MwMSU3Q2xvbmdsaSU0MG1pY3Jvc29mdC5jb20NCj4gJTdDOTU3OWE4ZTU0NmNhNGRhOTIz
+YTcwOGQ0ZWYwYWJiNTElN0M3MmY5ODhiZjg2ZjE0MWFmOTFhYjJkN2NkMDExDQo+IGRiNDclN0Mx
+JTdDMCU3QzYzNjM5NjI3Njc1MjI3NzEyMyZzZGF0YT1GVVg5ZDVydTZmJTJCMlpxUiUyQkpkDQo+
+IFhweUlyJTJCTGY5bjhFcHVHWWh5T2dhVTk2YyUzRCZyZXNlcnZlZD0wKS4NCj4gDQo+IFRoaXMg
+aXMgZ3JlYXQgdG8gc2VlLiAgSXMgdGhlcmUgYSBMaW51eCBpbXBsZW1lbnRhdGlvbiBvZiB0aGUg
+c2VydmVyIHNpZGUgKGluDQo+IFNhbWJhPykgc28gdGhhdCB0aGUgY2xpZW50IGNhbiBiZSB0ZXN0
+ZWQgd2l0aG91dCBuZWVkaW5nIGEgV2luZG93cyBzZXJ2ZXI/DQoNCkknbSBub3QgYXdhcmUgb2Yg
+YSBMaW51eCBpbXBsZW1lbnRhdGlvbiBvbiBzZXJ2ZXIgc2lkZS4NCg0KQ3VycmVudGx5IGl0IGNh
+biBiZSB0ZXN0ZWQgd2l0aCBXaW5kb3dzIFNlcnZlciAyMDEyLCBTZXJ2ZXIgMjAxMiBSMiBhbmQg
+U2VydmVyIDIwMTYuDQoNCj4gDQo+ICAtIFIuDQo=
