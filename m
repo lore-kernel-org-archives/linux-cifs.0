@@ -1,167 +1,149 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [Patch v3 02/19] CIFS: SMBD: Add SMBDirect protocol and transport constants
-Date: Tue, 29 Aug 2017 15:44:59 -0700
-Message-ID: <CAKywueQ3Vz9NUwfqgk36pnaXN=r3DDrrNAumMP418EkcXQPT9g@mail.gmail.com>
-References: <20170829192915.26251-1-longli@exchange.microsoft.com> <20170829192915.26251-3-longli@exchange.microsoft.com>
+From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Subject: RE: [Patch v3 01/19] CIFS: Add rdma mount option
+Date: Tue, 29 Aug 2017 22:56:50 +0000
+Message-ID: <MWHPR21MB019064923E8C5A9CB75AEE87CE9F0@MWHPR21MB0190.namprd21.prod.outlook.com>
+References: <20170829192915.26251-1-longli@exchange.microsoft.com>
+ <20170829192915.26251-2-longli@exchange.microsoft.com>
+ <CAKywueRsjjG6BDbkZL_qeVn3V129N2OFwAaw60ZeZXmWbX-32A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
         linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
         samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
         Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-        Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170829192915.26251-3-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+        "linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+        "Tom Talpey" <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAKywueRsjjG6BDbkZL_qeVn3V129N2OFwAaw60ZeZXmWbX-32A-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Language: en-US
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-2017-08-29 12:28 GMT-07:00 Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>:
-> From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
->
-> To prepare for protocol implementation, add constants and user-configurable
-> values in the SMBDirect protocol.
->
-> Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> ---
->  fs/cifs/smbdirect.c | 78 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  fs/cifs/smbdirect.h | 20 ++++++++++++++
->  2 files changed, 98 insertions(+)
->  create mode 100644 fs/cifs/smbdirect.c
->  create mode 100644 fs/cifs/smbdirect.h
->
-> diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-> new file mode 100644
-> index 0000000..d785bc1
-> --- /dev/null
-> +++ b/fs/cifs/smbdirect.c
-> @@ -0,0 +1,78 @@
-> +/*
-> + *   Copyright (C) 2017, Microsoft Corporation.
-> + *
-> + *   Author(s): Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> + *
-> + *   This program is free software;  you can redistribute it and/or modify
-> + *   it under the terms of the GNU General Public License as published by
-> + *   the Free Software Foundation; either version 2 of the License, or
-> + *   (at your option) any later version.
-> + *
-> + *   This program is distributed in the hope that it will be useful,
-> + *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
-> + *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-> + *   the GNU General Public License for more details.
-> + */
-> +#include <linux/module.h>
-> +#include "smbdirect.h"
-> +#include "cifs_debug.h"
-> +
-> +/* SMBD version number */
-> +#define SMBD_V1        0x0100
-> +
-> +/* Port numbers for SMBD transport */
-> +#define SMB_PORT       445
-> +#define SMBD_PORT      5445
-> +
-> +/* Address lookup and resolve timeout in ms */
-> +#define RDMA_RESOLVE_TIMEOUT   5000
-> +
-> +/* SMBD negotiation timeout in seconds */
-> +#define SMBD_NEGOTIATE_TIMEOUT 120
-> +
-> +/* SMBD minimum receive size and fragmented sized defined in [MS-SMBD] */
-> +#define SMBD_MIN_RECEIVE_SIZE          128
-> +#define SMBD_MIN_FRAGMENTED_SIZE       131072
-> +
-> +/*
-> + * Default maximum number of RDMA read/write outstanding on this connection
-> + * This value is possibly decreased during QP creation on hardware limit
-> + */
-> +#define SMBD_CM_RESPONDER_RESOURCES    32
-> +
-> +/* Maximum number of retries on data transfer operations */
-> +#define SMBD_CM_RETRY                  6
-> +/* No need to retry on Receiver Not Ready since SMBD manages credits */
-> +#define SMBD_CM_RNR_RETRY              0
-> +
-> +/*
-> + * User configurable initial values per SMBD transport connection
-> + * as defined in [MS-SMBD] 3.1.1.1
-> + * Those may change after a SMBD negotiation
-> + */
-
-Since these value are per transport connection, why they are global?
-Shouldn't they be inside a some structure that is created for a
-particular connection? Also the constants below should be defines.
-
-> +/* The local peer's maximum number of credits to grant to the peer */
-> +static int receive_credit_max = 255;
-> +/* The remote peer's credit request of local peer */
-> +static int send_credit_target = 255;
-> +/* The maximum single message size can be sent to remote peer */
-> +static int max_send_size = 1364;
-> +/*  The maximum fragmented upper-layer payload receive size supported */
-> +static int max_fragmented_recv_size = 1024 * 1024;
-> +/*  The maximum single-message size which can be received */
-> +static int max_receive_size = 8192;
-> +
-> +/* The timeout to initiate send of a keepalive message on idle */
-> +static int keep_alive_interval = 120;
-> +
-> +/*
-> + * User configurable initial values for RDMA transport
-> + * The actual values used may be lower and are limited to hardware capabilities
-> + */
-> +/* Default maximum number of SGEs in a RDMA send/recv */
-> +static int max_send_sge = SMBDIRECT_MAX_SGE;
-> +static int max_recv_sge = SMBDIRECT_MAX_SGE;
-> +/* Default maximum number of SGEs in a RDMA write/read */
-> +static int max_frmr_depth = 2048;
-> +
-> +/* If payload is less than this byte, use RDMA send/recv not read/write */
-> +static int rdma_readwrite_threshold = 4096;
-> diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
-> new file mode 100644
-> index 0000000..06eeb0b
-> --- /dev/null
-> +++ b/fs/cifs/smbdirect.h
-> @@ -0,0 +1,20 @@
-> +/*
-> + *   Copyright (C) 2017, Microsoft Corporation.
-> + *
-> + *   Author(s): Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> + *
-> + *   This program is free software;  you can redistribute it and/or modify
-> + *   it under the terms of the GNU General Public License as published by
-> + *   the Free Software Foundation; either version 2 of the License, or
-> + *   (at your option) any later version.
-> + *
-> + *   This program is distributed in the hope that it will be useful,
-> + *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
-> + *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-> + *   the GNU General Public License for more details.
-> + */
-> +#ifndef _SMBDIRECT_H
-> +#define _SMBDIRECT_H
-> +
-> +#define SMBDIRECT_MAX_SGE      16
-> +#endif
-> --
-> 2.7.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
---
-Best regards,
-Pavel Shilovsky
---
-To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGF2ZWwgU2hpbG92c2t5
+IFttYWlsdG86cGlhc3RyeXl5QGdtYWlsLmNvbV0NCj4gU2VudDogVHVlc2RheSwgQXVndXN0IDI5
+LCAyMDE3IDM6MzcgUE0NCj4gVG86IExvbmcgTGkgPGxvbmdsaUBtaWNyb3NvZnQuY29tPg0KPiBD
+YzogU3RldmUgRnJlbmNoIDxzZnJlbmNoQHNhbWJhLm9yZz47IGxpbnV4LWNpZnMgPGxpbnV4LQ0K
+PiBjaWZzQHZnZXIua2VybmVsLm9yZz47IHNhbWJhLXRlY2huaWNhbCA8c2FtYmEtdGVjaG5pY2Fs
+QGxpc3RzLnNhbWJhLm9yZz47DQo+IEtlcm5lbCBNYWlsaW5nIExpc3QgPGxpbnV4LWtlcm5lbEB2
+Z2VyLmtlcm5lbC5vcmc+OyBsaW51eC0NCj4gcmRtYUB2Z2VyLmtlcm5lbC5vcmc7IENocmlzdG9w
+aCBIZWxsd2lnIDxoY2hAaW5mcmFkZWFkLm9yZz47IFRvbSBUYWxwZXkNCj4gPHR0YWxwZXlAbWlj
+cm9zb2Z0LmNvbT47IE1hdHRoZXcgV2lsY294IDxtYXdpbGNveEBtaWNyb3NvZnQuY29tPjsNCj4g
+TG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUGF0Y2ggdjMg
+MDEvMTldIENJRlM6IEFkZCByZG1hIG1vdW50IG9wdGlvbg0KPiANCj4gMjAxNy0wOC0yOSAxMjoy
+OCBHTVQtMDc6MDAgTG9uZyBMaSA8bG9uZ2xpQGV4Y2hhbmdlLm1pY3Jvc29mdC5jb20+Og0KPiA+
+IEZyb206IExvbmcgTGkgPGxvbmdsaUBtaWNyb3NvZnQuY29tPg0KPiA+DQo+ID4gQWRkICJyZG1h
+IiB0byBDSUZTIG1vdW50IG9wdGlvbnMgdG8gY29ubmVjdCB0byBTTUIgRGlyZWN0Lg0KPiA+IEFk
+ZCBjaGVja3MgdG8gdmFsaWRhdGUgdGhpcyBpcyB1c2VkIG9uIFNNQiAzLlggZGlhbGVjdHMuDQo+
+ID4NCj4gPiBUbyBjb25uZWN0IHRvIFNNQkRpcmVjdCwgdXNlICJtb3VudC5jaWZzIC1vIHJkbWEs
+dmVycz0zLngiLg0KPiA+IEF0IHRoZSB0aW1lIG9mIHRoaXMgcGF0Y2gsIDMueCBjYW4gYmUgMy4w
+LCAzLjAyIG9yIDMuMS4xLg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogTG9uZyBMaSA8bG9uZ2xp
+QG1pY3Jvc29mdC5jb20+DQo+ID4gLS0tDQo+ID4gIGZzL2NpZnMvY2lmc19kZWJ1Zy5jIHwgIDIg
+KysNCj4gPiAgZnMvY2lmcy9jaWZzZnMuYyAgICAgfCAgMiArKw0KPiA+ICBmcy9jaWZzL2NpZnNn
+bG9iLmggICB8ICAzICsrKw0KPiA+ICBmcy9jaWZzL2Nvbm5lY3QuYyAgICB8IDE1ICsrKysrKysr
+KysrKysrLQ0KPiA+ICA0IGZpbGVzIGNoYW5nZWQsIDIxIGluc2VydGlvbnMoKyksIDEgZGVsZXRp
+b24oLSkNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNfZGVidWcuYyBiL2ZzL2Np
+ZnMvY2lmc19kZWJ1Zy5jIGluZGV4DQo+ID4gOTcyN2UxZC4uYmEwODcwZCAxMDA2NDQNCj4gPiAt
+LS0gYS9mcy9jaWZzL2NpZnNfZGVidWcuYw0KPiA+ICsrKyBiL2ZzL2NpZnMvY2lmc19kZWJ1Zy5j
+DQo+ID4gQEAgLTE3MSw2ICsxNzEsOCBAQCBzdGF0aWMgaW50IGNpZnNfZGVidWdfZGF0YV9wcm9j
+X3Nob3coc3RydWN0DQo+IHNlcV9maWxlICptLCB2b2lkICp2KQ0KPiA+ICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgc2VzLT5zZXNfY291bnQsIHNlcy0+c2VydmVyT1MsIHNlcy0+c2Vy
+dmVyTk9TLA0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc2VzLT5jYXBhYmls
+aXRpZXMsIHNlcy0+c3RhdHVzKTsNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICB9DQo+ID4g
+KyAgICAgICAgICAgICAgICAgICAgICAgaWYgKHNlcnZlci0+cmRtYSkNCj4gPiArICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIHNlcV9wcmludGYobSwgIlJETUFcblx0Iik7DQo+ID4gICAg
+ICAgICAgICAgICAgICAgICAgICAgc2VxX3ByaW50ZihtLCAiVENQIHN0YXR1czogJWRcblx0TG9j
+YWwgVXNlcnMgVG8gIg0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIlNl
+cnZlcjogJWQgU2VjTW9kZTogMHgleCBSZXEgT24gV2lyZTogJWQiLA0KPiA+ICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgc2VydmVyLT50Y3BTdGF0dXMsDQo+ID4gc2VydmVyLT5z
+cnZfY291bnQsIGRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNmcy5jIGIvZnMvY2lmcy9jaWZzZnMu
+Yw0KPiA+IGluZGV4IGZlMGM4ZGMuLmE2Mjg4MDAgMTAwNjQ0DQo+ID4gLS0tIGEvZnMvY2lmcy9j
+aWZzZnMuYw0KPiA+ICsrKyBiL2ZzL2NpZnMvY2lmc2ZzLmMNCj4gPiBAQCAtMzMwLDYgKzMzMCw4
+IEBAIGNpZnNfc2hvd19hZGRyZXNzKHN0cnVjdCBzZXFfZmlsZSAqcywgc3RydWN0DQo+IFRDUF9T
+ZXJ2ZXJfSW5mbyAqc2VydmVyKQ0KPiA+ICAgICAgICAgZGVmYXVsdDoNCj4gPiAgICAgICAgICAg
+ICAgICAgc2VxX3B1dHMocywgIih1bmtub3duKSIpOw0KPiA+ICAgICAgICAgfQ0KPiA+ICsgICAg
+ICAgaWYgKHNlcnZlci0+cmRtYSkNCj4gPiArICAgICAgICAgICAgICAgc2VxX3B1dHMocywgIixy
+ZG1hIik7DQo+ID4gIH0NCj4gPg0KPiA+ICBzdGF0aWMgdm9pZA0KPiA+IGRpZmYgLS1naXQgYS9m
+cy9jaWZzL2NpZnNnbG9iLmggYi9mcy9jaWZzL2NpZnNnbG9iLmggaW5kZXgNCj4gPiA4Mjg5Zjk1
+Li43MDNjMmZiIDEwMDY0NA0KPiA+IC0tLSBhL2ZzL2NpZnMvY2lmc2dsb2IuaA0KPiA+ICsrKyBi
+L2ZzL2NpZnMvY2lmc2dsb2IuaA0KPiA+IEBAIC01MzEsNiArNTMxLDcgQEAgc3RydWN0IHNtYl92
+b2wgew0KPiA+ICAgICAgICAgYm9vbCBub3BlcnNpc3RlbnQ6MTsNCj4gPiAgICAgICAgIGJvb2wg
+cmVzaWxpZW50OjE7IC8qIG5vcmVzaWxpZW50IG5vdCByZXF1aXJlZCBzaW5jZSBub3QgZm9yZWQg
+Zm9yIENBICovDQo+ID4gICAgICAgICBib29sIGRvbWFpbmF1dG86MTsNCj4gPiArICAgICAgIGJv
+b2wgcmRtYToxOw0KPiA+ICAgICAgICAgdW5zaWduZWQgaW50IHJzaXplOw0KPiA+ICAgICAgICAg
+dW5zaWduZWQgaW50IHdzaXplOw0KPiA+ICAgICAgICAgYm9vbCBzb2Nrb3B0X3RjcF9ub2RlbGF5
+OjE7DQo+ID4gQEAgLTY0OSw2ICs2NTAsOCBAQCBzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvIHsNCj4g
+PiAgICAgICAgIGJvb2wgICAgc2VjX2tlcmJlcm9zOyAgICAgICAgICAgLyogc3VwcG9ydHMgcGxh
+aW4gS2VyYmVyb3MgKi8NCj4gPiAgICAgICAgIGJvb2wgICAgc2VjX21za2VyYmVyb3M7ICAgICAg
+ICAgLyogc3VwcG9ydHMgbGVnYWN5IE1TIEtlcmJlcm9zICovDQo+ID4gICAgICAgICBib29sICAg
+IGxhcmdlX2J1ZjsgICAgICAgICAgICAgIC8qIGlzIGN1cnJlbnQgYnVmZmVyIGxhcmdlPyAqLw0K
+PiA+ICsgICAgICAgLyogdXNlIFNNQkQgY29ubmVjdGlvbiBpbnN0ZWFkIG9mIHNvY2tldCAqLw0K
+PiA+ICsgICAgICAgYm9vbCAgICByZG1hOw0KPiA+ICAgICAgICAgc3RydWN0IGRlbGF5ZWRfd29y
+ayAgICAgZWNobzsgLyogZWNobyBwaW5nIHdvcmtxdWV1ZSBqb2IgKi8NCj4gPiAgICAgICAgIGNo
+YXIgICAgKnNtYWxsYnVmOyAgICAgIC8qIHBvaW50ZXIgdG8gY3VycmVudCAic21hbGwiIGJ1ZmZl
+ciAqLw0KPiA+ICAgICAgICAgY2hhciAgICAqYmlnYnVmOyAgICAgICAgLyogcG9pbnRlciB0byBj
+dXJyZW50ICJiaWciIGJ1ZmZlciAqLw0KPiA+IGRpZmYgLS1naXQgYS9mcy9jaWZzL2Nvbm5lY3Qu
+YyBiL2ZzL2NpZnMvY29ubmVjdC5jIGluZGV4DQo+ID4gMmVlYWFjNi4uMTlmZGNhOCAxMDA2NDQN
+Cj4gPiAtLS0gYS9mcy9jaWZzL2Nvbm5lY3QuYw0KPiA+ICsrKyBiL2ZzL2NpZnMvY29ubmVjdC5j
+DQo+ID4gQEAgLTk0LDcgKzk0LDcgQEAgZW51bSB7DQo+ID4gICAgICAgICBPcHRfbXVsdGl1c2Vy
+LCBPcHRfc2xvcHB5LCBPcHRfbm9zaGFyZXNvY2ssDQo+ID4gICAgICAgICBPcHRfcGVyc2lzdGVu
+dCwgT3B0X25vcGVyc2lzdGVudCwNCj4gPiAgICAgICAgIE9wdF9yZXNpbGllbnQsIE9wdF9ub3Jl
+c2lsaWVudCwNCj4gPiAtICAgICAgIE9wdF9kb21haW5hdXRvLA0KPiA+ICsgICAgICAgT3B0X2Rv
+bWFpbmF1dG8sIE9wdF9yZG1hLA0KPiA+DQo+ID4gICAgICAgICAvKiBNb3VudCBvcHRpb25zIHdo
+aWNoIHRha2UgbnVtZXJpYyB2YWx1ZSAqLw0KPiA+ICAgICAgICAgT3B0X2JhY2t1cHVpZCwgT3B0
+X2JhY2t1cGdpZCwgT3B0X3VpZCwgQEAgLTE4NSw2ICsxODUsNyBAQA0KPiA+IHN0YXRpYyBjb25z
+dCBtYXRjaF90YWJsZV90IGNpZnNfbW91bnRfb3B0aW9uX3Rva2VucyA9IHsNCj4gPiAgICAgICAg
+IHsgT3B0X3Jlc2lsaWVudCwgInJlc2lsaWVudGhhbmRsZXMifSwNCj4gPiAgICAgICAgIHsgT3B0
+X25vcmVzaWxpZW50LCAibm9yZXNpbGllbnRoYW5kbGVzIn0sDQo+ID4gICAgICAgICB7IE9wdF9k
+b21haW5hdXRvLCAiZG9tYWluYXV0byJ9LA0KPiA+ICsgICAgICAgeyBPcHRfcmRtYSwgInJkbWEi
+fSwNCj4gPg0KPiA+ICAgICAgICAgeyBPcHRfYmFja3VwdWlkLCAiYmFja3VwdWlkPSVzIiB9LA0K
+PiA+ICAgICAgICAgeyBPcHRfYmFja3VwZ2lkLCAiYmFja3VwZ2lkPSVzIiB9LCBAQCAtMTU0MSw2
+ICsxNTQyLDkgQEANCj4gPiBjaWZzX3BhcnNlX21vdW50X29wdGlvbnMoY29uc3QgY2hhciAqbW91
+bnRkYXRhLCBjb25zdCBjaGFyICpkZXZuYW1lLA0KPiA+ICAgICAgICAgICAgICAgICBjYXNlIE9w
+dF9kb21haW5hdXRvOg0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgIHZvbC0+ZG9tYWluYXV0
+byA9IHRydWU7DQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgYnJlYWs7DQo+ID4gKyAgICAg
+ICAgICAgICAgIGNhc2UgT3B0X3JkbWE6DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgdm9s
+LT5yZG1hID0gdHJ1ZTsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICBicmVhazsNCj4gPg0K
+PiA+ICAgICAgICAgICAgICAgICAvKiBOdW1lcmljIFZhbHVlcyAqLw0KPiA+ICAgICAgICAgICAg
+ICAgICBjYXNlIE9wdF9iYWNrdXB1aWQ6DQo+ID4gQEAgLTE5MzEsNiArMTkzNSwxMSBAQCBjaWZz
+X3BhcnNlX21vdW50X29wdGlvbnMoY29uc3QgY2hhcg0KPiAqbW91bnRkYXRhLCBjb25zdCBjaGFy
+ICpkZXZuYW1lLA0KPiA+ICAgICAgICAgICAgICAgICBnb3RvIGNpZnNfcGFyc2VfbW91bnRfZXJy
+Ow0KPiA+ICAgICAgICAgfQ0KPiA+DQo+ID4gKyAgICAgICBpZiAodm9sLT5yZG1hICYmIHZvbC0+
+dmFscy0+cHJvdG9jb2xfaWQgPCBTTUIzMF9QUk9UX0lEKSB7DQo+ID4gKyAgICAgICAgICAgICAg
+IGNpZnNfZGJnKFZGUywgIlNNQiBEaXJlY3QgcmVxdWlyZXMgVmVyc2lvbiA+PTMuMFxuIik7DQo+
+ID4gKyAgICAgICAgICAgICAgIGdvdG8gY2lmc19wYXJzZV9tb3VudF9lcnI7DQo+ID4gKyAgICAg
+ICB9DQo+ID4gKw0KPiA+ICAjaWZuZGVmIENPTkZJR19LRVlTDQo+ID4gICAgICAgICAvKiBNdWxp
+dXNlciBtb3VudHMgcmVxdWlyZSBDT05GSUdfS0VZUyBzdXBwb3J0ICovDQo+ID4gICAgICAgICBp
+ZiAodm9sLT5tdWx0aXVzZXIpIHsNCj4gPiBAQCAtMjEzNCw2ICsyMTQzLDkgQEAgc3RhdGljIGlu
+dCBtYXRjaF9zZXJ2ZXIoc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbw0KPiAqc2VydmVyLCBzdHJ1Y3Qg
+c21iX3ZvbCAqdm9sKQ0KPiA+ICAgICAgICAgaWYgKHNlcnZlci0+ZWNob19pbnRlcnZhbCAhPSB2
+b2wtPmVjaG9faW50ZXJ2YWwgKiBIWikNCj4gPiAgICAgICAgICAgICAgICAgcmV0dXJuIDA7DQo+
+ID4NCj4gPiArICAgICAgIGlmIChzZXJ2ZXItPnJkbWEgIT0gdm9sLT5yZG1hKQ0KPiA+ICsgICAg
+ICAgICAgICAgICByZXR1cm4gMDsNCj4gPiArDQo+ID4gICAgICAgICByZXR1cm4gMTsNCj4gPiAg
+fQ0KPiA+DQo+ID4gQEAgLTIyMzQsNiArMjI0Niw3IEBAIGNpZnNfZ2V0X3RjcF9zZXNzaW9uKHN0
+cnVjdCBzbWJfdm9sDQo+ICp2b2x1bWVfaW5mbykNCj4gPiAgICAgICAgIHRjcF9zZXMtPm5vYmxv
+Y2tzbmQgPSB2b2x1bWVfaW5mby0+bm9ibG9ja3NuZDsNCj4gPiAgICAgICAgIHRjcF9zZXMtPm5v
+YXV0b3R1bmUgPSB2b2x1bWVfaW5mby0+bm9hdXRvdHVuZTsNCj4gPiAgICAgICAgIHRjcF9zZXMt
+PnRjcF9ub2RlbGF5ID0gdm9sdW1lX2luZm8tPnNvY2tvcHRfdGNwX25vZGVsYXk7DQo+ID4gKyAg
+ICAgICB0Y3Bfc2VzLT5yZG1hID0gdm9sdW1lX2luZm8tPnJkbWE7DQo+ID4gICAgICAgICB0Y3Bf
+c2VzLT5pbl9mbGlnaHQgPSAwOw0KPiA+ICAgICAgICAgdGNwX3Nlcy0+Y3JlZGl0cyA9IDE7DQo+
+ID4gICAgICAgICBpbml0X3dhaXRxdWV1ZV9oZWFkKCZ0Y3Bfc2VzLT5yZXNwb25zZV9xKTsNCj4g
+PiAtLQ0KPiA+IDIuNy40DQo+ID4NCj4gPiAtLQ0KPiA+IFRvIHVuc3Vic2NyaWJlIGZyb20gdGhp
+cyBsaXN0OiBzZW5kIHRoZSBsaW5lICJ1bnN1YnNjcmliZSBsaW51eC1jaWZzIg0KPiA+IGluIHRo
+ZSBib2R5IG9mIGEgbWVzc2FnZSB0byBtYWpvcmRvbW9Admdlci5rZXJuZWwub3JnIE1vcmUNCj4g
+bWFqb3Jkb21vDQo+ID4gaW5mbyBhdA0KPiA+DQo+IGh0dHBzOi8vbmEwMS5zYWZlbGlua3MucHJv
+dGVjdGlvbi5vdXRsb29rLmNvbS8/dXJsPWh0dHAlM0ElMkYlMkZ2Z2VyLmsNCj4gPiBlcm5lbC5v
+cmclMkZtYWpvcmRvbW8tDQo+IGluZm8uaHRtbCZkYXRhPTAyJTdDMDElN0Nsb25nbGklNDBtaWNy
+b3NvZnQuY29tJQ0KPiA+DQo+IDdDNGU3MDMzOGUxNTIwNGE0MDdmZDkwOGQ0ZWYyZTg1NWMlN0M3
+MmY5ODhiZjg2ZjE0MWFmOTFhYjJkN2NkMDExZA0KPiBiNDclDQo+ID4NCj4gN0MxJTdDMCU3QzYz
+NjM5NjQzMDQ2NTM4NTU2MyZzZGF0YT1GWDBIYmt6dWVHQzRlbmUyd0l0TjZpQ2lJUnFaaw0KPiA3
+MU96WTcNCj4gPiBkJTJGWFg2clBNJTNEJnJlc2VydmVkPTANCj4gDQo+IEl0IGlzIGJldHRlciB0
+byBpbnRyb2R1Y2UgYSBtb3VudCBvcHRpb24gYWZ0ZXIgdGhlIGZ1bmN0aW9uYWwgY2hhbmdlcyBu
+b3QNCj4gYmVmb3JlIHRoZW0uIEluIHRoaXMgY2FzZSB3ZSBkbyBub3QgcmVzdWx0IGluIGhhdmlu
+ZyB0aGUgbW91bnQgb3B0aW9uIHRoYXQNCj4gZG9lcyBub3RoaW5nIGlmIHdlIGJyZWFrIHRoZSBw
+YXRjaHNldC4NCg0KSSBjYW4gbW92ZSB0aGlzIHBhdGNoIHRvIGxhdGVyLg0KDQpIb3dldmVyIGl0
+IGRvZXNu4oCZdCBicmVhayB0aGUgYnVpbGQsIGp1c3QgZG9lcyBub3RoaW5nIGF0IGFsbC4NCg0K
+PiANCj4gLS0NCj4gQmVzdCByZWdhcmRzLA0KPiBQYXZlbCBTaGlsb3Zza3kNCg==
