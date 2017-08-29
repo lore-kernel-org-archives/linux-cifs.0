@@ -1,109 +1,129 @@
-From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Subject: [Patch v3 16/19] CIFS: SMBD: Read correct returned data length for RDMA write (SMB read) I/O
-Date: Tue, 29 Aug 2017 12:29:12 -0700
-Message-ID: <20170829192915.26251-17-longli@exchange.microsoft.com>
+From: Long Li <longli@exchange.microsoft.com>
+Subject: [Patch v3 19/19] CIFS: SMBD: Add SMBDirect debug counters
+Date: Tue, 29 Aug 2017 12:29:15 -0700
+Message-ID: <20170829192915.26251-20-longli@exchange.microsoft.com>
 References: <20170829192915.26251-1-longli@exchange.microsoft.com>
-Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-        Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170829192915.26251-1-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: Long Li <longli@microsoft.com>
+To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Tom Talpey <ttalpey@microsoft.com>,
+        Matthew Wilcox <mawilcox@microsoft.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170829192915.26251-1-longli@exchange.microsoft.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+From: Long Li <longli@microsoft.com>
 
-When RDMA write is used for SMB read, the returned data length is in
-DataRemaining in the response packet. Reading it properly by adding a
-parameter to specifiy where the returned data length is.
+Export SMBDirect debug counters to /proc/fs/cifs/DebugData.
 
-Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Those are used for debugging, troubleshooting and profiling.
+
+Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/cifsglob.h | 10 ++++++++--
- fs/cifs/cifssmb.c  |  4 ++--
- fs/cifs/smb1ops.c  |  2 +-
- fs/cifs/smb2ops.c  |  8 ++++++--
- 4 files changed, 17 insertions(+), 7 deletions(-)
+ fs/cifs/cifs_debug.c | 82 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 82 insertions(+)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index dcd2b63..d391767 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -231,8 +231,14 @@ struct smb_version_operations {
- 	__u64 (*get_next_mid)(struct TCP_Server_Info *);
- 	/* data offset from read response message */
- 	unsigned int (*read_data_offset)(char *);
--	/* data length from read response message */
--	unsigned int (*read_data_length)(char *);
-+	/*
-+	 * Data length from read response message
-+	 * When in_remaining is true, the returned data length is in
-+	 * message field DataRemaining for out-of-band data read (e.g through
-+	 * Memory Registration RDMA write in SMBD).
-+	 * Otherwise, the returned data length is in message field DataLength.
-+	 */
-+	unsigned int (*read_data_length)(char *, bool in_remaining);
- 	/* map smb to linux error */
- 	int (*map_error)(char *, bool);
- 	/* find mid corresponding to the response message */
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 6e1de21..ff2848b 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -1524,8 +1524,8 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 		 rdata->iov[0].iov_base, server->total_read);
+diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+index ba0870d..dad13d5 100644
+--- a/fs/cifs/cifs_debug.c
++++ b/fs/cifs/cifs_debug.c
+@@ -30,6 +30,7 @@
+ #include "cifsproto.h"
+ #include "cifs_debug.h"
+ #include "cifsfs.h"
++#include "smbdirect.h"
  
- 	/* how much data is in the response? */
--	data_len = server->ops->read_data_length(buf);
--	if (data_offset + data_len > buflen) {
-+	data_len = server->ops->read_data_length(buf, rdata->mr);
-+	if (!rdata->mr && (data_offset + data_len > buflen)) {
- 		/* data_len is corrupt -- discard frame */
- 		rdata->result = -EIO;
- 		return cifs_readv_discard(server, mid);
-diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index a723df3..27a8280 100644
---- a/fs/cifs/smb1ops.c
-+++ b/fs/cifs/smb1ops.c
-@@ -87,7 +87,7 @@ cifs_read_data_offset(char *buf)
- }
- 
- static unsigned int
--cifs_read_data_length(char *buf)
-+cifs_read_data_length(char *buf, bool in_remaining)
- {
- 	READ_RSP *rsp = (READ_RSP *)buf;
- 	return (le16_to_cpu(rsp->DataLengthHigh) << 16) +
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index e67f5f0..4067629 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -747,9 +747,13 @@ smb2_read_data_offset(char *buf)
- }
- 
- static unsigned int
--smb2_read_data_length(char *buf)
-+smb2_read_data_length(char *buf, bool in_remaining)
- {
- 	struct smb2_read_rsp *rsp = (struct smb2_read_rsp *)buf;
+ void
+ cifs_dump_mem(char *label, void *data, int length)
+@@ -152,6 +153,87 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+ 	list_for_each(tmp1, &cifs_tcp_ses_list) {
+ 		server = list_entry(tmp1, struct TCP_Server_Info,
+ 				    tcp_ses_list);
 +
-+	if (in_remaining)
-+		return le32_to_cpu(rsp->DataRemaining);
++		if (!server->rdma)
++			goto skip_rdma;
 +
- 	return le32_to_cpu(rsp->DataLength);
- }
- 
-@@ -2181,7 +2185,7 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
- 	}
- 
- 	data_offset = server->ops->read_data_offset(buf) + 4;
--	data_len = server->ops->read_data_length(buf);
-+	data_len = server->ops->read_data_length(buf, rdata->mr);
- 
- 	if (data_offset < server->vals->read_rsp_size) {
- 		/*
++		seq_printf(m, "\nSMBDirect (in hex) protocol version: %x "
++			"transport status: %x",
++			server->smbd_conn->protocol,
++			server->smbd_conn->transport_status);
++		seq_printf(m, "\nConn receive_credit_max: %x "
++			"send_credit_target: %x max_send_size: %x",
++			server->smbd_conn->receive_credit_max,
++			server->smbd_conn->send_credit_target,
++			server->smbd_conn->max_send_size);
++		seq_printf(m, "\nConn max_fragmented_recv_size: %x "
++			"max_fragmented_send_size: %x max_receive_size:%x",
++			server->smbd_conn->max_fragmented_recv_size,
++			server->smbd_conn->max_fragmented_send_size,
++			server->smbd_conn->max_receive_size);
++		seq_printf(m, "\nConn keep_alive_interval: %x "
++			"max_readwrite_size: %x rdma_readwrite_threshold: %x",
++			server->smbd_conn->keep_alive_interval,
++			server->smbd_conn->max_readwrite_size,
++			server->smbd_conn->rdma_readwrite_threshold);
++		seq_printf(m, "\nDebug count_get_receive_buffer: %x "
++			"count_put_receive_buffer: %x count_send_empty: %x",
++			server->smbd_conn->count_get_receive_buffer,
++			server->smbd_conn->count_put_receive_buffer,
++			server->smbd_conn->count_send_empty);
++		seq_printf(m, "\nRead Queue count_reassembly_queue: %x "
++			"count_enqueue_reassembly_queue: %x "
++			"count_dequeue_reassembly_queue: %x "
++			"fragment_reassembly_remaining: %x "
++			"reassembly_data_length: %x "
++			"reassembly_queue_length: %x",
++			server->smbd_conn->count_reassembly_queue,
++			server->smbd_conn->count_enqueue_reassembly_queue,
++			server->smbd_conn->count_dequeue_reassembly_queue,
++			server->smbd_conn->fragment_reassembly_remaining,
++			server->smbd_conn->reassembly_data_length,
++			server->smbd_conn->reassembly_queue_length);
++		seq_printf(m, "\nCurrent Credits send_credits: %x "
++			"receive_credits: %x receive_credit_target: %x",
++			atomic_read(&server->smbd_conn->send_credits),
++			atomic_read(&server->smbd_conn->receive_credits),
++			server->smbd_conn->receive_credit_target);
++		seq_printf(m, "\nPending send_pending: %x send_payload_pending:"
++			" %x smbd_send_pending: %x smbd_recv_pending: %x",
++			atomic_read(&server->smbd_conn->send_pending),
++			atomic_read(&server->smbd_conn->send_payload_pending),
++			server->smbd_conn->smbd_send_pending,
++			server->smbd_conn->smbd_recv_pending);
++		seq_printf(m, "\nReceive buffers count_receive_queue: %x "
++			"count_empty_packet_queue: %x",
++			server->smbd_conn->count_receive_queue,
++			server->smbd_conn->count_empty_packet_queue);
++		seq_printf(m, "\nMR responder_resources: %x "
++			"max_frmr_depth: %x mr_type: %x",
++			server->smbd_conn->responder_resources,
++			server->smbd_conn->max_frmr_depth,
++			server->smbd_conn->mr_type);
++		seq_printf(m, "\nMR mr_ready_count: %x mr_used_count: %x",
++			atomic_read(&server->smbd_conn->mr_ready_count),
++			atomic_read(&server->smbd_conn->mr_used_count));
++
++		seq_printf(m, "\nTSC cycle histogram in I/O path: "
++			"(the number of most significant bits)");
++		seq_printf(m, "\nsmbd_register_mr cycles [1/10000]: ");
++		profiling_display_histogram(m, server->smbd_conn->smbd_register_mr_cycles);
++
++		seq_printf(m, "\nsmbd_deregister_mr cycles [1/10000]: ");
++		profiling_display_histogram(m, server->smbd_conn->smbd_deregister_mr_cycles);
++
++		seq_printf(m, "\nsmbd_send cycles [1/10000]: ");
++		profiling_display_histogram(m, server->smbd_conn->smbd_write_cycles);
++
++		seq_printf(m, "\nsmbd_recv cycles [1/10000]: ");
++		profiling_display_histogram(m, server->smbd_conn->smbd_recv_cycles);
++
++		seq_printf(m, "\nrecv_done cycles [1/10000]: ");
++		profiling_display_histogram(m, server->smbd_conn->recv_done_cycles);
++skip_rdma:
+ 		seq_printf(m, "\nNumber of credits: %d", server->credits);
+ 		i++;
+ 		list_for_each(tmp2, &server->smb_ses_list) {
 -- 
 2.7.4
