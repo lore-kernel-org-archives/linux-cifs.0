@@ -1,50 +1,70 @@
-From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: RE: [Patch v2 00/19] CIFS: Implement SMBDirect
-Date: Tue, 29 Aug 2017 19:31:25 +0000
-Message-ID: <CY4PR21MB01821B704C2F64F72A8A92A9CE9F0@CY4PR21MB0182.namprd21.prod.outlook.com>
-References: <1503255883-3041-1-git-send-email-longli@exchange.microsoft.com>
- <CAL1RGDUGiOqjB8n0mJmF079jm7vXrdzE2rHdzoNOexvgHScjUQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+Subject: [Patch v3 18/19] CIFS: SMBD: Deregister memory when finishing SMB read
+Date: Tue, 29 Aug 2017 12:29:14 -0700
+Message-ID: <20170829192915.26251-19-longli@exchange.microsoft.com>
+References: <20170829192915.26251-1-longli@exchange.microsoft.com>
+Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
         Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
         Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Roland Dreier <roland-BHEL68pLQRGGvPXPguhicg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAL1RGDUGiOqjB8n0mJmF079jm7vXrdzE2rHdzoNOexvgHScjUQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Content-Language: en-US
+In-Reply-To: <20170829192915.26251-1-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUm9sYW5kIERyZWllciBb
-bWFpbHRvOnJvbGFuZEBwdXJlc3RvcmFnZS5jb21dDQo+IFNlbnQ6IFR1ZXNkYXksIEF1Z3VzdCAy
-OSwgMjAxNyAxMToyMSBBTQ0KPiBUbzogTG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+
-IENjOiBTdGV2ZSBGcmVuY2ggPHNmcmVuY2hAc2FtYmEub3JnPjsgbGludXgtY2lmc0B2Z2VyLmtl
-cm5lbC5vcmc7IHNhbWJhLQ0KPiB0ZWNobmljYWxAbGlzdHMuc2FtYmEub3JnOyBMS01MIDxsaW51
-eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnPjsgbGludXgtDQo+IHJkbWFAdmdlci5rZXJuZWwub3Jn
-OyBDaHJpc3RvcGggSGVsbHdpZyA8aGNoQGluZnJhZGVhZC5vcmc+OyBUb20gVGFscGV5DQo+IDx0
-dGFscGV5QG1pY3Jvc29mdC5jb20+OyBNYXR0aGV3IFdpbGNveCA8bWF3aWxjb3hAbWljcm9zb2Z0
-LmNvbT47DQo+IExvbmcgTGkgPGxvbmdsaUBtaWNyb3NvZnQuY29tPg0KPiBTdWJqZWN0OiBSZTog
-W1BhdGNoIHYyIDAwLzE5XSBDSUZTOiBJbXBsZW1lbnQgU01CRGlyZWN0DQo+IA0KPiA+IFN0YXJ0
-aW5nIHdpdGggU01CMiBkaWFsZWN0IDMuMCwgTWljcm9zb2Z0IGludHJvZHVjZWQgU01CRGlyZWN0
-IHRyYW5zcG9ydA0KPiBwcm90b2NvbCBmb3IgdHJhbnNmZXJyaW5nIHVwcGVyIGxheWVyIChTTUIy
-KSBwYXlsb2FkIG92ZXIgUkRNQSB2aWENCj4gSW5maW5pYmFuZCwgUm9DRSBvciBpV0FSUC4gVGhl
-IHByb2NvY29sIGlzIHB1Ymxpc2hlZCBpbiBbTVMtU01CRF0NCj4gKGh0dHBzOi8vbmEwMS5zYWZl
-bGlua3MucHJvdGVjdGlvbi5vdXRsb29rLmNvbS8/dXJsPWh0dHBzJTNBJTJGJTJGbXNkbg0KPiAu
-bWljcm9zb2Z0LmNvbSUyRmVuLQ0KPiB1cyUyRmxpYnJhcnklMkZoaDUzNjM0Ni5hc3B4JmRhdGE9
-MDIlN0MwMSU3Q2xvbmdsaSU0MG1pY3Jvc29mdC5jb20NCj4gJTdDOTU3OWE4ZTU0NmNhNGRhOTIz
-YTcwOGQ0ZWYwYWJiNTElN0M3MmY5ODhiZjg2ZjE0MWFmOTFhYjJkN2NkMDExDQo+IGRiNDclN0Mx
-JTdDMCU3QzYzNjM5NjI3Njc1MjI3NzEyMyZzZGF0YT1GVVg5ZDVydTZmJTJCMlpxUiUyQkpkDQo+
-IFhweUlyJTJCTGY5bjhFcHVHWWh5T2dhVTk2YyUzRCZyZXNlcnZlZD0wKS4NCj4gDQo+IFRoaXMg
-aXMgZ3JlYXQgdG8gc2VlLiAgSXMgdGhlcmUgYSBMaW51eCBpbXBsZW1lbnRhdGlvbiBvZiB0aGUg
-c2VydmVyIHNpZGUgKGluDQo+IFNhbWJhPykgc28gdGhhdCB0aGUgY2xpZW50IGNhbiBiZSB0ZXN0
-ZWQgd2l0aG91dCBuZWVkaW5nIGEgV2luZG93cyBzZXJ2ZXI/DQoNCkknbSBub3QgYXdhcmUgb2Yg
-YSBMaW51eCBpbXBsZW1lbnRhdGlvbiBvbiBzZXJ2ZXIgc2lkZS4NCg0KQ3VycmVudGx5IGl0IGNh
-biBiZSB0ZXN0ZWQgd2l0aCBXaW5kb3dzIFNlcnZlciAyMDEyLCBTZXJ2ZXIgMjAxMiBSMiBhbmQg
-U2VydmVyIDIwMTYuDQoNCj4gDQo+ICAtIFIuDQo=
+From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+
+When SMB read is finished, deregister the memory regions if RDMA write is used
+for this SMB read. smbd_deregister_mr may need to do local invalidation and
+sleep, if server remote invalidation is not used.
+
+There are situations where the MID may not be created on I/O failure, under
+which memory region is deregistered when read data context is released.
+
+Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+---
+ fs/cifs/file.c    |  5 +++++
+ fs/cifs/smb2pdu.c | 10 ++++++++++
+ 2 files changed, 15 insertions(+)
+
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 41460a5..5a6df25 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -2910,6 +2910,11 @@ cifs_readdata_release(struct kref *refcount)
+ 	struct cifs_readdata *rdata = container_of(refcount,
+ 					struct cifs_readdata, refcount);
+ 
++	if (rdata->mr) {
++		smbd_deregister_mr(rdata->mr);
++		rdata->mr = NULL;
++	}
++
+ 	if (rdata->cfile)
+ 		cifsFileInfo_put(rdata->cfile);
+ 
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 1f08c75..43a7b60 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -2504,6 +2504,16 @@ smb2_readv_callback(struct mid_q_entry *mid)
+ 			rdata->result = -EIO;
+ 	}
+ 
++	/*
++	 * If this rdata has a memmory registered, the MR can be freed
++	 * MR needs to be freed as soon as I/O finishes to prevent deadlock
++	 * because they have limited number and are used for future I/Os
++	 */
++	if (rdata->mr) {
++		smbd_deregister_mr(rdata->mr);
++		rdata->mr = NULL;
++	}
++
+ 	if (rdata->result)
+ 		cifs_stats_fail_inc(tcon, SMB2_READ_HE);
+ 
+-- 
+2.7.4
