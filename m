@@ -1,41 +1,59 @@
-From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Subject: [Patch v3 12/19] CIFS: SMBD: Fix the definition for SMB2_CHANNEL_RDMA_V1_INVALIDATE
-Date: Tue, 29 Aug 2017 12:29:08 -0700
-Message-ID: <20170829192915.26251-13-longli@exchange.microsoft.com>
+From: Long Li <longli@exchange.microsoft.com>
+Subject: [Patch v3 10/19] CIFS: SMBD: Send data through SMBDirect
+Date: Tue, 29 Aug 2017 12:29:06 -0700
+Message-ID: <20170829192915.26251-11-longli@exchange.microsoft.com>
 References: <20170829192915.26251-1-longli@exchange.microsoft.com>
-Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-        Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170829192915.26251-1-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: Long Li <longli@microsoft.com>
+To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Tom Talpey <ttalpey@microsoft.com>,
+        Matthew Wilcox <mawilcox@microsoft.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170829192915.26251-1-longli@exchange.microsoft.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+From: Long Li <longli@microsoft.com>
 
-The channel value for requesting server remote invalidating local memory
-registration should be 0x00000002
+With SMBDirect connected, use it for sending data via RDMA send.
 
-Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/smb2pdu.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/cifs/transport.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 18700fd..0417a36 100644
---- a/fs/cifs/smb2pdu.h
-+++ b/fs/cifs/smb2pdu.h
-@@ -832,7 +832,7 @@ struct smb2_flush_rsp {
- /* Channel field for read and write: exactly one of following flags can be set*/
- #define SMB2_CHANNEL_NONE		0x00000000
- #define SMB2_CHANNEL_RDMA_V1		0x00000001 /* SMB3 or later */
--#define SMB2_CHANNEL_RDMA_V1_INVALIDATE 0x00000001 /* SMB3.02 or later */
-+#define SMB2_CHANNEL_RDMA_V1_INVALIDATE 0x00000002 /* SMB3.02 or later */
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index ba62aaf..bddb699 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -37,6 +37,7 @@
+ #include "cifsglob.h"
+ #include "cifsproto.h"
+ #include "cifs_debug.h"
++#include "smbdirect.h"
  
- /* SMB2 read request without RFC1001 length at the beginning */
- struct smb2_read_plain_req {
+ void
+ cifs_wake_up_task(struct mid_q_entry *mid)
+@@ -230,6 +231,11 @@ __smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ 	struct msghdr smb_msg;
+ 	int val = 1;
+ 
++	if (server->smbd_conn) {
++		rc = smbd_send(server->smbd_conn, rqst);
++		goto done;
++	}
++
+ 	if (ssocket == NULL)
+ 		return -ENOTSOCK;
+ 
+@@ -299,6 +305,7 @@ __smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ 		server->tcpStatus = CifsNeedReconnect;
+ 	}
+ 
++done:
+ 	if (rc < 0 && rc != -EINTR)
+ 		cifs_dbg(VFS, "Error %d sending data on socket to server\n",
+ 			 rc);
 -- 
 2.7.4
