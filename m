@@ -1,67 +1,109 @@
-From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v3 05/19] CIFS: SMBD: Connect to SMBDirect session
-Date: Tue, 29 Aug 2017 12:29:01 -0700
-Message-ID: <20170829192915.26251-6-longli@exchange.microsoft.com>
+From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+Subject: [Patch v3 16/19] CIFS: SMBD: Read correct returned data length for RDMA write (SMB read) I/O
+Date: Tue, 29 Aug 2017 12:29:12 -0700
+Message-ID: <20170829192915.26251-17-longli@exchange.microsoft.com>
 References: <20170829192915.26251-1-longli@exchange.microsoft.com>
-Cc: Long Li <longli@microsoft.com>
-To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Tom Talpey <ttalpey@microsoft.com>,
-        Matthew Wilcox <mawilcox@microsoft.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20170829192915.26251-1-longli@exchange.microsoft.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+        Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20170829192915.26251-1-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-From: Long Li <longli@microsoft.com>
+From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 
-When "rdma" is specified in the mount option, CIFS attempts to connect to
-SMBDirect instead of TCP socket.
+When RDMA write is used for SMB read, the returned data length is in
+DataRemaining in the response packet. Reading it properly by adding a
+parameter to specifiy where the returned data length is.
 
-Signed-off-by: Long Li <longli@microsoft.com>
+Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 ---
- fs/cifs/connect.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ fs/cifs/cifsglob.h | 10 ++++++++--
+ fs/cifs/cifssmb.c  |  4 ++--
+ fs/cifs/smb1ops.c  |  2 +-
+ fs/cifs/smb2ops.c  |  8 ++++++--
+ 4 files changed, 17 insertions(+), 7 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 19fdca8..43b4d54 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -45,6 +45,7 @@
- #include <linux/parser.h>
- #include <linux/bvec.h>
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index dcd2b63..d391767 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -231,8 +231,14 @@ struct smb_version_operations {
+ 	__u64 (*get_next_mid)(struct TCP_Server_Info *);
+ 	/* data offset from read response message */
+ 	unsigned int (*read_data_offset)(char *);
+-	/* data length from read response message */
+-	unsigned int (*read_data_length)(char *);
++	/*
++	 * Data length from read response message
++	 * When in_remaining is true, the returned data length is in
++	 * message field DataRemaining for out-of-band data read (e.g through
++	 * Memory Registration RDMA write in SMBD).
++	 * Otherwise, the returned data length is in message field DataLength.
++	 */
++	unsigned int (*read_data_length)(char *, bool in_remaining);
+ 	/* map smb to linux error */
+ 	int (*map_error)(char *, bool);
+ 	/* find mid corresponding to the response message */
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 6e1de21..ff2848b 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -1524,8 +1524,8 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+ 		 rdata->iov[0].iov_base, server->total_read);
  
-+#include "smbdirect.h"
- #include "cifspdu.h"
- #include "cifsglob.h"
- #include "cifsproto.h"
-@@ -2289,12 +2290,26 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 	else
- 		tcp_ses->echo_interval = SMB_ECHO_INTERVAL_DEFAULT * HZ;
+ 	/* how much data is in the response? */
+-	data_len = server->ops->read_data_length(buf);
+-	if (data_offset + data_len > buflen) {
++	data_len = server->ops->read_data_length(buf, rdata->mr);
++	if (!rdata->mr && (data_offset + data_len > buflen)) {
+ 		/* data_len is corrupt -- discard frame */
+ 		rdata->result = -EIO;
+ 		return cifs_readv_discard(server, mid);
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index a723df3..27a8280 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -87,7 +87,7 @@ cifs_read_data_offset(char *buf)
+ }
  
-+	if (tcp_ses->rdma) {
-+		tcp_ses->smbd_conn = smbd_get_connection(
-+			tcp_ses, (struct sockaddr *)&volume_info->dstaddr);
-+		if (tcp_ses->smbd_conn) {
-+			cifs_dbg(VFS, "RDMA transport established\n");
-+			rc = 0;
-+			goto connected;
-+		} else {
-+			rc = -ENOENT;
-+			goto out_err_crypto_release;
-+		}
-+	}
+ static unsigned int
+-cifs_read_data_length(char *buf)
++cifs_read_data_length(char *buf, bool in_remaining)
+ {
+ 	READ_RSP *rsp = (READ_RSP *)buf;
+ 	return (le16_to_cpu(rsp->DataLengthHigh) << 16) +
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index e67f5f0..4067629 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -747,9 +747,13 @@ smb2_read_data_offset(char *buf)
+ }
+ 
+ static unsigned int
+-smb2_read_data_length(char *buf)
++smb2_read_data_length(char *buf, bool in_remaining)
+ {
+ 	struct smb2_read_rsp *rsp = (struct smb2_read_rsp *)buf;
 +
- 	rc = ip_connect(tcp_ses);
- 	if (rc < 0) {
- 		cifs_dbg(VFS, "Error connecting to socket. Aborting operation.\n");
- 		goto out_err_crypto_release;
++	if (in_remaining)
++		return le32_to_cpu(rsp->DataRemaining);
++
+ 	return le32_to_cpu(rsp->DataLength);
+ }
+ 
+@@ -2181,7 +2185,7 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
  	}
  
-+connected:
- 	/*
- 	 * since we're in a cifs function already, we know that
- 	 * this will succeed. No need for try_module_get().
+ 	data_offset = server->ops->read_data_offset(buf) + 4;
+-	data_len = server->ops->read_data_length(buf);
++	data_len = server->ops->read_data_length(buf, rdata->mr);
+ 
+ 	if (data_offset < server->vals->read_rsp_size) {
+ 		/*
 -- 
 2.7.4
