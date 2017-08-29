@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v3 08/19] CIFS: SMBD: Set SMBDirect maximum read or write size for I/O
-Date: Tue, 29 Aug 2017 12:29:04 -0700
-Message-ID: <20170829192915.26251-9-longli@exchange.microsoft.com>
+Subject: [Patch v3 14/19] CIFS: SMBD: Deregister memory on finishing SMB write
+Date: Tue, 29 Aug 2017 12:29:10 -0700
+Message-ID: <20170829192915.26251-15-longli@exchange.microsoft.com>
 References: <20170829192915.26251-1-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -16,53 +16,65 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-When connecting over SMBDirect, the transport negotiates its maximum I/O sizes
-with the server and determines how to choose to do RDMA send/recv vs
-read/write. Expose these maximum I/O sizes to upper layer so we will get the
-correct sized payloads.
+On write I/O finish, deregister the memory region if this was for a RDMA read.
+If remote invalidation is not used, the call to smbd_deregister_mr will do
+local invalidation and possibly wait. Memory region is normally deregistered
+in MID callback as soon as it's used. There are situations where the MID may
+not be created on I/O failure, under which memory region is deregistered when
+write data context is released.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/smb2ops.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+ fs/cifs/cifssmb.c |  6 ++++++
+ fs/cifs/smb2pdu.c | 12 ++++++++++++
+ 2 files changed, 18 insertions(+)
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 06494e1..e67f5f0 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -32,6 +32,7 @@
- #include "smb2status.h"
- #include "smb2glob.h"
- #include "cifs_ioctl.h"
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index fbb0d4c..6e1de21 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -43,6 +43,7 @@
+ #include "cifs_unicode.h"
+ #include "cifs_debug.h"
+ #include "fscache.h"
 +#include "smbdirect.h"
  
- static int
- change_conf(struct TCP_Server_Info *server)
-@@ -249,7 +250,11 @@ smb2_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
+ #ifdef CONFIG_CIFS_POSIX
+ static struct {
+@@ -1905,6 +1906,11 @@ cifs_writedata_release(struct kref *refcount)
+ 	struct cifs_writedata *wdata = container_of(refcount,
+ 					struct cifs_writedata, refcount);
  
- 	/* start with specified wsize, or default */
- 	wsize = volume_info->wsize ? volume_info->wsize : CIFS_DEFAULT_IOSIZE;
--	wsize = min_t(unsigned int, wsize, server->max_write);
-+	if (server->rdma)
-+		wsize = min_t(unsigned int,
-+				wsize, server->smbd_conn->max_readwrite_size);
-+	else
-+		wsize = min_t(unsigned int, wsize, server->max_write);
++	if (wdata->mr) {
++		smbd_deregister_mr(wdata->mr);
++		wdata->mr = NULL;
++	}
++
+ 	if (wdata->cfile)
+ 		cifsFileInfo_put(wdata->cfile);
  
- 	if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
- 		wsize = min_t(unsigned int, wsize, SMB2_MAX_BUFFER_SIZE);
-@@ -265,7 +270,11 @@ smb2_negotiate_rsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 5581afd..5551053 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -2666,6 +2666,18 @@ smb2_writev_callback(struct mid_q_entry *mid)
+ 		break;
+ 	}
  
- 	/* start with specified rsize, or default */
- 	rsize = volume_info->rsize ? volume_info->rsize : CIFS_DEFAULT_IOSIZE;
--	rsize = min_t(unsigned int, rsize, server->max_read);
-+	if (server->rdma)
-+		rsize = min_t(unsigned int,
-+				rsize, server->smbd_conn->max_readwrite_size);
-+	else
-+		rsize = min_t(unsigned int, rsize, server->max_read);
++	/*
++	 * If this wdata has a memory registered, the MR can be freed
++	 * The number of MRs available is limited, it's important to recover
++	 * used MR as soon as I/O is finished. Hold MR longer in the later
++	 * I/O process can possibly result in I/O deadlock due to lack of MR
++	 * to send request on I/O retry
++	 */
++	if (wdata->mr) {
++		smbd_deregister_mr(wdata->mr);
++		wdata->mr = NULL;
++	}
++
+ 	if (wdata->result)
+ 		cifs_stats_fail_inc(tcon, SMB2_WRITE_HE);
  
- 	if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
- 		rsize = min_t(unsigned int, rsize, SMB2_MAX_BUFFER_SIZE);
 -- 
 2.7.4
