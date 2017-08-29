@@ -1,146 +1,75 @@
-From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: RE: [Patch v3 02/19] CIFS: SMBD: Add SMBDirect protocol and transport
- constants
-Date: Tue, 29 Aug 2017 23:00:58 +0000
-Message-ID: <MWHPR21MB0190D3CB134749B54A0F709ECE9F0@MWHPR21MB0190.namprd21.prod.outlook.com>
-References: <20170829192915.26251-1-longli@exchange.microsoft.com>
- <20170829192915.26251-3-longli@exchange.microsoft.com>
- <CAKywueQ3Vz9NUwfqgk36pnaXN=r3DDrrNAumMP418EkcXQPT9g@mail.gmail.com>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [Patch v3 04/19] CIFS: SMBD: Add SMBDirect transport to SMB
+ connection and Makefile
+Date: Tue, 29 Aug 2017 16:11:55 -0700
+Message-ID: <CAKywueRaTqR1yw_PbdcOYQTY9msweboej_6ZPcbsuyJfmiVgng@mail.gmail.com>
+References: <20170829192915.26251-1-longli@exchange.microsoft.com> <20170829192915.26251-5-longli@exchange.microsoft.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="UTF-8"
 Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
         linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
         samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
         Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-        "Tom Talpey" <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+        linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+        Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueQ3Vz9NUwfqgk36pnaXN=r3DDrrNAumMP418EkcXQPT9g-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Content-Language: en-US
+In-Reply-To: <20170829192915.26251-5-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQYXZlbCBTaGlsb3Zza3kgW21h
-aWx0bzpwaWFzdHJ5eXlAZ21haWwuY29tXQ0KPiBTZW50OiBUdWVzZGF5LCBBdWd1c3QgMjksIDIw
-MTcgMzo0NSBQTQ0KPiBUbzogTG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+IENjOiBT
-dGV2ZSBGcmVuY2ggPHNmcmVuY2hAc2FtYmEub3JnPjsgbGludXgtY2lmcyA8bGludXgtDQo+IGNp
-ZnNAdmdlci5rZXJuZWwub3JnPjsgc2FtYmEtdGVjaG5pY2FsIDxzYW1iYS10ZWNobmljYWxAbGlz
-dHMuc2FtYmEub3JnPjsNCj4gS2VybmVsIE1haWxpbmcgTGlzdCA8bGludXgta2VybmVsQHZnZXIu
-a2VybmVsLm9yZz47IGxpbnV4LQ0KPiByZG1hQHZnZXIua2VybmVsLm9yZzsgQ2hyaXN0b3BoIEhl
-bGx3aWcgPGhjaEBpbmZyYWRlYWQub3JnPjsgVG9tIFRhbHBleQ0KPiA8dHRhbHBleUBtaWNyb3Nv
-ZnQuY29tPjsgTWF0dGhldyBXaWxjb3ggPG1hd2lsY294QG1pY3Jvc29mdC5jb20+Ow0KPiBMb25n
-IExpIDxsb25nbGlAbWljcm9zb2Z0LmNvbT4NCj4gU3ViamVjdDogUmU6IFtQYXRjaCB2MyAwMi8x
-OV0gQ0lGUzogU01CRDogQWRkIFNNQkRpcmVjdCBwcm90b2NvbCBhbmQNCj4gdHJhbnNwb3J0IGNv
-bnN0YW50cw0KPiANCj4gMjAxNy0wOC0yOSAxMjoyOCBHTVQtMDc6MDAgTG9uZyBMaSA8bG9uZ2xp
-QGV4Y2hhbmdlLm1pY3Jvc29mdC5jb20+Og0KPiA+IEZyb206IExvbmcgTGkgPGxvbmdsaUBtaWNy
-b3NvZnQuY29tPg0KPiA+DQo+ID4gVG8gcHJlcGFyZSBmb3IgcHJvdG9jb2wgaW1wbGVtZW50YXRp
-b24sIGFkZCBjb25zdGFudHMgYW5kDQo+ID4gdXNlci1jb25maWd1cmFibGUgdmFsdWVzIGluIHRo
-ZSBTTUJEaXJlY3QgcHJvdG9jb2wuDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBMb25nIExpIDxs
-b25nbGlAbWljcm9zb2Z0LmNvbT4NCj4gPiAtLS0NCj4gPiAgZnMvY2lmcy9zbWJkaXJlY3QuYyB8
-IDc4DQo+ID4gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysNCj4gPiAgZnMvY2lmcy9zbWJkaXJlY3QuaCB8IDIwICsrKysrKysrKysrKysrDQo+ID4g
-IDIgZmlsZXMgY2hhbmdlZCwgOTggaW5zZXJ0aW9ucygrKQ0KPiA+ICBjcmVhdGUgbW9kZSAxMDA2
-NDQgZnMvY2lmcy9zbWJkaXJlY3QuYyAgY3JlYXRlIG1vZGUgMTAwNjQ0DQo+ID4gZnMvY2lmcy9z
-bWJkaXJlY3QuaA0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2ZzL2NpZnMvc21iZGlyZWN0LmMgYi9m
-cy9jaWZzL3NtYmRpcmVjdC5jIG5ldyBmaWxlIG1vZGUNCj4gPiAxMDA2NDQgaW5kZXggMDAwMDAw
-MC4uZDc4NWJjMQ0KPiA+IC0tLSAvZGV2L251bGwNCj4gPiArKysgYi9mcy9jaWZzL3NtYmRpcmVj
-dC5jDQo+ID4gQEAgLTAsMCArMSw3OCBAQA0KPiA+ICsvKg0KPiA+ICsgKiAgIENvcHlyaWdodCAo
-QykgMjAxNywgTWljcm9zb2Z0IENvcnBvcmF0aW9uLg0KPiA+ICsgKg0KPiA+ICsgKiAgIEF1dGhv
-cihzKTogTG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+ID4gKyAqDQo+ID4gKyAqICAg
-VGhpcyBwcm9ncmFtIGlzIGZyZWUgc29mdHdhcmU7ICB5b3UgY2FuIHJlZGlzdHJpYnV0ZSBpdCBh
-bmQvb3IgbW9kaWZ5DQo+ID4gKyAqICAgaXQgdW5kZXIgdGhlIHRlcm1zIG9mIHRoZSBHTlUgR2Vu
-ZXJhbCBQdWJsaWMgTGljZW5zZSBhcyBwdWJsaXNoZWQgYnkNCj4gPiArICogICB0aGUgRnJlZSBT
-b2Z0d2FyZSBGb3VuZGF0aW9uOyBlaXRoZXIgdmVyc2lvbiAyIG9mIHRoZSBMaWNlbnNlLCBvcg0K
-PiA+ICsgKiAgIChhdCB5b3VyIG9wdGlvbikgYW55IGxhdGVyIHZlcnNpb24uDQo+ID4gKyAqDQo+
-ID4gKyAqICAgVGhpcyBwcm9ncmFtIGlzIGRpc3RyaWJ1dGVkIGluIHRoZSBob3BlIHRoYXQgaXQg
-d2lsbCBiZSB1c2VmdWwsDQo+ID4gKyAqICAgYnV0IFdJVEhPVVQgQU5ZIFdBUlJBTlRZOyAgd2l0
-aG91dCBldmVuIHRoZSBpbXBsaWVkIHdhcnJhbnR5IG9mDQo+ID4gKyAqICAgTUVSQ0hBTlRBQklM
-SVRZIG9yIEZJVE5FU1MgRk9SIEEgUEFSVElDVUxBUiBQVVJQT1NFLiAgU2VlDQo+ID4gKyAqICAg
-dGhlIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlIGZvciBtb3JlIGRldGFpbHMuDQo+ID4gKyAq
-Lw0KPiA+ICsjaW5jbHVkZSA8bGludXgvbW9kdWxlLmg+DQo+ID4gKyNpbmNsdWRlICJzbWJkaXJl
-Y3QuaCINCj4gPiArI2luY2x1ZGUgImNpZnNfZGVidWcuaCINCj4gPiArDQo+ID4gKy8qIFNNQkQg
-dmVyc2lvbiBudW1iZXIgKi8NCj4gPiArI2RlZmluZSBTTUJEX1YxICAgICAgICAweDAxMDANCj4g
-PiArDQo+ID4gKy8qIFBvcnQgbnVtYmVycyBmb3IgU01CRCB0cmFuc3BvcnQgKi8NCj4gPiArI2Rl
-ZmluZSBTTUJfUE9SVCAgICAgICA0NDUNCj4gPiArI2RlZmluZSBTTUJEX1BPUlQgICAgICA1NDQ1
-DQo+ID4gKw0KPiA+ICsvKiBBZGRyZXNzIGxvb2t1cCBhbmQgcmVzb2x2ZSB0aW1lb3V0IGluIG1z
-ICovDQo+ID4gKyNkZWZpbmUgUkRNQV9SRVNPTFZFX1RJTUVPVVQgICA1MDAwDQo+ID4gKw0KPiA+
-ICsvKiBTTUJEIG5lZ290aWF0aW9uIHRpbWVvdXQgaW4gc2Vjb25kcyAqLyAjZGVmaW5lDQo+ID4g
-K1NNQkRfTkVHT1RJQVRFX1RJTUVPVVQgMTIwDQo+ID4gKw0KPiA+ICsvKiBTTUJEIG1pbmltdW0g
-cmVjZWl2ZSBzaXplIGFuZCBmcmFnbWVudGVkIHNpemVkIGRlZmluZWQgaW4gW01TLQ0KPiBTTUJE
-XSAqLw0KPiA+ICsjZGVmaW5lIFNNQkRfTUlOX1JFQ0VJVkVfU0laRSAgICAgICAgICAxMjgNCj4g
-PiArI2RlZmluZSBTTUJEX01JTl9GUkFHTUVOVEVEX1NJWkUgICAgICAgMTMxMDcyDQo+ID4gKw0K
-PiA+ICsvKg0KPiA+ICsgKiBEZWZhdWx0IG1heGltdW0gbnVtYmVyIG9mIFJETUEgcmVhZC93cml0
-ZSBvdXRzdGFuZGluZyBvbiB0aGlzDQo+ID4gK2Nvbm5lY3Rpb24NCj4gPiArICogVGhpcyB2YWx1
-ZSBpcyBwb3NzaWJseSBkZWNyZWFzZWQgZHVyaW5nIFFQIGNyZWF0aW9uIG9uIGhhcmR3YXJlDQo+
-ID4gK2xpbWl0ICAqLw0KPiA+ICsjZGVmaW5lIFNNQkRfQ01fUkVTUE9OREVSX1JFU09VUkNFUyAg
-ICAzMg0KPiA+ICsNCj4gPiArLyogTWF4aW11bSBudW1iZXIgb2YgcmV0cmllcyBvbiBkYXRhIHRy
-YW5zZmVyIG9wZXJhdGlvbnMgKi8NCj4gPiArI2RlZmluZSBTTUJEX0NNX1JFVFJZICAgICAgICAg
-ICAgICAgICAgNg0KPiA+ICsvKiBObyBuZWVkIHRvIHJldHJ5IG9uIFJlY2VpdmVyIE5vdCBSZWFk
-eSBzaW5jZSBTTUJEIG1hbmFnZXMgY3JlZGl0cw0KPiAqLw0KPiA+ICsjZGVmaW5lIFNNQkRfQ01f
-Uk5SX1JFVFJZICAgICAgICAgICAgICAwDQo+ID4gKw0KPiA+ICsvKg0KPiA+ICsgKiBVc2VyIGNv
-bmZpZ3VyYWJsZSBpbml0aWFsIHZhbHVlcyBwZXIgU01CRCB0cmFuc3BvcnQgY29ubmVjdGlvbg0K
-PiA+ICsgKiBhcyBkZWZpbmVkIGluIFtNUy1TTUJEXSAzLjEuMS4xDQo+ID4gKyAqIFRob3NlIG1h
-eSBjaGFuZ2UgYWZ0ZXIgYSBTTUJEIG5lZ290aWF0aW9uICAqLw0KPiANCj4gU2luY2UgdGhlc2Ug
-dmFsdWUgYXJlIHBlciB0cmFuc3BvcnQgY29ubmVjdGlvbiwgd2h5IHRoZXkgYXJlIGdsb2JhbD8N
-Cj4gU2hvdWxkbid0IHRoZXkgYmUgaW5zaWRlIGEgc29tZSBzdHJ1Y3R1cmUgdGhhdCBpcyBjcmVh
-dGVkIGZvciBhIHBhcnRpY3VsYXINCj4gY29ubmVjdGlvbj8gQWxzbyB0aGUgY29uc3RhbnRzIGJl
-bG93IHNob3VsZCBiZSBkZWZpbmVzLg0KDQpUaG9zZSBhcmUgY29uZmlndXJhYmxlIGluaXRpYWwg
-dmFsdWVzIChkZWZhdWx0IHZhbHVlcykgZm9yIGFsbCBjb25uZWN0aW9ucy4NCg0KRWFjaCBjb25u
-ZWN0aW9uIGhhcyBpdHMgb3duIHZhbHVlcyBiYXNlZCBvbiB0aG9zZSBpbml0aWFsIHZhbHVlcy4g
-QnV0IGNvbm5lY3Rpb24tYmFzZWQgdmFsdWVzIGNhbiBjaGFuZ2UgYWZ0ZXIgbmVnb3RpYXRpb24g
-aXMgZG9uZSwgb3IgYWZ0ZXIgUkRNQSBoYXJkd2FyZSBjYXBhYmlsaXRpZXMgYXJlIHByb2JlZC4N
-Cg0KPiANCj4gPiArLyogVGhlIGxvY2FsIHBlZXIncyBtYXhpbXVtIG51bWJlciBvZiBjcmVkaXRz
-IHRvIGdyYW50IHRvIHRoZSBwZWVyICovDQo+ID4gK3N0YXRpYyBpbnQgcmVjZWl2ZV9jcmVkaXRf
-bWF4ID0gMjU1Ow0KPiA+ICsvKiBUaGUgcmVtb3RlIHBlZXIncyBjcmVkaXQgcmVxdWVzdCBvZiBs
-b2NhbCBwZWVyICovIHN0YXRpYyBpbnQNCj4gPiArc2VuZF9jcmVkaXRfdGFyZ2V0ID0gMjU1Ow0K
-PiA+ICsvKiBUaGUgbWF4aW11bSBzaW5nbGUgbWVzc2FnZSBzaXplIGNhbiBiZSBzZW50IHRvIHJl
-bW90ZSBwZWVyICovDQo+ID4gK3N0YXRpYyBpbnQgbWF4X3NlbmRfc2l6ZSA9IDEzNjQ7DQo+ID4g
-Ky8qICBUaGUgbWF4aW11bSBmcmFnbWVudGVkIHVwcGVyLWxheWVyIHBheWxvYWQgcmVjZWl2ZSBz
-aXplIHN1cHBvcnRlZA0KPiA+ICsqLyBzdGF0aWMgaW50IG1heF9mcmFnbWVudGVkX3JlY3Zfc2l6
-ZSA9IDEwMjQgKiAxMDI0Ow0KPiA+ICsvKiAgVGhlIG1heGltdW0gc2luZ2xlLW1lc3NhZ2Ugc2l6
-ZSB3aGljaCBjYW4gYmUgcmVjZWl2ZWQgKi8gc3RhdGljDQo+ID4gK2ludCBtYXhfcmVjZWl2ZV9z
-aXplID0gODE5MjsNCj4gPiArDQo+ID4gKy8qIFRoZSB0aW1lb3V0IHRvIGluaXRpYXRlIHNlbmQg
-b2YgYSBrZWVwYWxpdmUgbWVzc2FnZSBvbiBpZGxlICovDQo+ID4gK3N0YXRpYyBpbnQga2VlcF9h
-bGl2ZV9pbnRlcnZhbCA9IDEyMDsNCj4gPiArDQo+ID4gKy8qDQo+ID4gKyAqIFVzZXIgY29uZmln
-dXJhYmxlIGluaXRpYWwgdmFsdWVzIGZvciBSRE1BIHRyYW5zcG9ydA0KPiA+ICsgKiBUaGUgYWN0
-dWFsIHZhbHVlcyB1c2VkIG1heSBiZSBsb3dlciBhbmQgYXJlIGxpbWl0ZWQgdG8gaGFyZHdhcmUN
-Cj4gPiArY2FwYWJpbGl0aWVzICAqLw0KPiA+ICsvKiBEZWZhdWx0IG1heGltdW0gbnVtYmVyIG9m
-IFNHRXMgaW4gYSBSRE1BIHNlbmQvcmVjdiAqLyBzdGF0aWMgaW50DQo+ID4gK21heF9zZW5kX3Nn
-ZSA9IFNNQkRJUkVDVF9NQVhfU0dFOyBzdGF0aWMgaW50IG1heF9yZWN2X3NnZSA9DQo+ID4gK1NN
-QkRJUkVDVF9NQVhfU0dFOw0KPiA+ICsvKiBEZWZhdWx0IG1heGltdW0gbnVtYmVyIG9mIFNHRXMg
-aW4gYSBSRE1BIHdyaXRlL3JlYWQgKi8gc3RhdGljIGludA0KPiA+ICttYXhfZnJtcl9kZXB0aCA9
-IDIwNDg7DQo+ID4gKw0KPiA+ICsvKiBJZiBwYXlsb2FkIGlzIGxlc3MgdGhhbiB0aGlzIGJ5dGUs
-IHVzZSBSRE1BIHNlbmQvcmVjdiBub3QNCj4gPiArcmVhZC93cml0ZSAqLyBzdGF0aWMgaW50IHJk
-bWFfcmVhZHdyaXRlX3RocmVzaG9sZCA9IDQwOTY7DQo+ID4gZGlmZiAtLWdpdCBhL2ZzL2NpZnMv
-c21iZGlyZWN0LmggYi9mcy9jaWZzL3NtYmRpcmVjdC5oIG5ldyBmaWxlIG1vZGUNCj4gPiAxMDA2
-NDQgaW5kZXggMDAwMDAwMC4uMDZlZWIwYg0KPiA+IC0tLSAvZGV2L251bGwNCj4gPiArKysgYi9m
-cy9jaWZzL3NtYmRpcmVjdC5oDQo+ID4gQEAgLTAsMCArMSwyMCBAQA0KPiA+ICsvKg0KPiA+ICsg
-KiAgIENvcHlyaWdodCAoQykgMjAxNywgTWljcm9zb2Z0IENvcnBvcmF0aW9uLg0KPiA+ICsgKg0K
-PiA+ICsgKiAgIEF1dGhvcihzKTogTG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+ID4g
-KyAqDQo+ID4gKyAqICAgVGhpcyBwcm9ncmFtIGlzIGZyZWUgc29mdHdhcmU7ICB5b3UgY2FuIHJl
-ZGlzdHJpYnV0ZSBpdCBhbmQvb3IgbW9kaWZ5DQo+ID4gKyAqICAgaXQgdW5kZXIgdGhlIHRlcm1z
-IG9mIHRoZSBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZSBhcyBwdWJsaXNoZWQgYnkNCj4gPiAr
-ICogICB0aGUgRnJlZSBTb2Z0d2FyZSBGb3VuZGF0aW9uOyBlaXRoZXIgdmVyc2lvbiAyIG9mIHRo
-ZSBMaWNlbnNlLCBvcg0KPiA+ICsgKiAgIChhdCB5b3VyIG9wdGlvbikgYW55IGxhdGVyIHZlcnNp
-b24uDQo+ID4gKyAqDQo+ID4gKyAqICAgVGhpcyBwcm9ncmFtIGlzIGRpc3RyaWJ1dGVkIGluIHRo
-ZSBob3BlIHRoYXQgaXQgd2lsbCBiZSB1c2VmdWwsDQo+ID4gKyAqICAgYnV0IFdJVEhPVVQgQU5Z
-IFdBUlJBTlRZOyAgd2l0aG91dCBldmVuIHRoZSBpbXBsaWVkIHdhcnJhbnR5IG9mDQo+ID4gKyAq
-ICAgTUVSQ0hBTlRBQklMSVRZIG9yIEZJVE5FU1MgRk9SIEEgUEFSVElDVUxBUiBQVVJQT1NFLiAg
-U2VlDQo+ID4gKyAqICAgdGhlIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlIGZvciBtb3JlIGRl
-dGFpbHMuDQo+ID4gKyAqLw0KPiA+ICsjaWZuZGVmIF9TTUJESVJFQ1RfSA0KPiA+ICsjZGVmaW5l
-IF9TTUJESVJFQ1RfSA0KPiA+ICsNCj4gPiArI2RlZmluZSBTTUJESVJFQ1RfTUFYX1NHRSAgICAg
-IDE2DQo+ID4gKyNlbmRpZg0KPiA+IC0tDQo+ID4gMi43LjQNCj4gPg0KPiA+IC0tDQo+ID4gVG8g
-dW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJlIGxp
-bnV4LWNpZnMiDQo+ID4gaW4gdGhlIGJvZHkgb2YgYSBtZXNzYWdlIHRvIG1ham9yZG9tb0B2Z2Vy
-Lmtlcm5lbC5vcmcgTW9yZQ0KPiBtYWpvcmRvbW8NCj4gPiBpbmZvIGF0DQo+ID4NCj4gaHR0cHM6
-Ly9uYTAxLnNhZmVsaW5rcy5wcm90ZWN0aW9uLm91dGxvb2suY29tLz91cmw9aHR0cCUzQSUyRiUy
-RnZnZXIuaw0KPiA+IGVybmVsLm9yZyUyRm1ham9yZG9tby0NCj4gaW5mby5odG1sJmRhdGE9MDIl
-N0MwMSU3Q2xvbmdsaSU0MG1pY3Jvc29mdC5jb20lDQo+ID4NCj4gN0MwNDhhYWE5MGMwNTc0OGVl
-MzZhODA4ZDRlZjJmOTU2NCU3QzcyZjk4OGJmODZmMTQxYWY5MWFiMmQ3Y2QwMTFkDQo+IGI0NyUN
-Cj4gPg0KPiA3QzElN0MwJTdDNjM2Mzk2NDM1MDM1NjYwNTk0JnNkYXRhPXFkWTRDd2paNzRXN0Fk
-cVRWa2xwbzhYbFdGSTYNCj4gZnhaOXkzaQ0KPiA+IGZQeVBRJTJGY2clM0QmcmVzZXJ2ZWQ9MA0K
-PiANCj4gDQo+IA0KPiAtLQ0KPiBCZXN0IHJlZ2FyZHMsDQo+IFBhdmVsIFNoaWxvdnNreQ0K
+2017-08-29 12:29 GMT-07:00 Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>:
+> From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+>
+> Add SMBDirect as an optional connection to the SMB session structure in CIFS.
+> When SMB session is connected through SMBDirect, upper layer uses this
+> connection to carry payloads.
+>
+> With the transport code hooked up to upper layer, add SMBDirect code to
+> Makefile.
+>
+> Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+> ---
+>  fs/cifs/Makefile   | 2 +-
+>  fs/cifs/cifsglob.h | 2 ++
+>  2 files changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/fs/cifs/Makefile b/fs/cifs/Makefile
+> index eed7eb0..6bb9863 100644
+> --- a/fs/cifs/Makefile
+> +++ b/fs/cifs/Makefile
+> @@ -18,4 +18,4 @@ cifs-$(CONFIG_CIFS_DFS_UPCALL) += dns_resolve.o cifs_dfs_ref.o
+>  cifs-$(CONFIG_CIFS_FSCACHE) += fscache.o cache.o
+>
+>  cifs-$(CONFIG_CIFS_SMB2) += smb2ops.o smb2maperror.o smb2transport.o \
+> -                           smb2misc.o smb2pdu.o smb2inode.o smb2file.o
+> +                           smb2misc.o smb2pdu.o smb2inode.o smb2file.o smbdirect.o
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 703c2fb..dc5404d 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -652,6 +652,8 @@ struct TCP_Server_Info {
+>         bool    large_buf;              /* is current buffer large? */
+>         /* use SMBD connection instead of socket */
+>         bool    rdma;
+> +       /* point to the SMBD connection if RDMA is used instead of socket */
+> +       struct smbd_connection *smbd_conn;
+>         struct delayed_work     echo; /* echo ping workqueue job */
+>         char    *smallbuf;      /* pointer to current "small" buffer */
+>         char    *bigbuf;        /* pointer to current "big" buffer */
+> --
+> 2.7.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+It is better to split the current patch into 2 and merge the Makefile
+part to #3 and cifsglob.h part to #5.
+
+--
+Best regards,
+Pavel Shilovsky
