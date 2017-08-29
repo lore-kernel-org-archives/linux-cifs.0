@@ -1,115 +1,141 @@
-From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Subject: [Patch v3 17/19] CIFS: SMBD: Implement SMB read via RDMA write through memory registration
-Date: Tue, 29 Aug 2017 12:29:13 -0700
-Message-ID: <20170829192915.26251-18-longli@exchange.microsoft.com>
+From: Long Li <longli@exchange.microsoft.com>
+Subject: [Patch v3 02/19] CIFS: SMBD: Add SMBDirect protocol and transport constants
+Date: Tue, 29 Aug 2017 12:28:58 -0700
+Message-ID: <20170829192915.26251-3-longli@exchange.microsoft.com>
 References: <20170829192915.26251-1-longli@exchange.microsoft.com>
-Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-        Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170829192915.26251-1-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: Long Li <longli@microsoft.com>
+To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Tom Talpey <ttalpey@microsoft.com>,
+        Matthew Wilcox <mawilcox@microsoft.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170829192915.26251-1-longli@exchange.microsoft.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+From: Long Li <longli@microsoft.com>
 
-If I/O size is larger than rdma_readwrite_threshold, use RDMA write for
-SMB read by specifying channel SMB2_CHANNEL_RDMA_V1 or
-SMB2_CHANNEL_RDMA_V1_INVALIDATE in the SMB packet, depending on SMB dialect
-used. Append a smbd_buffer_descriptor_v1 to the end of the SMB packet and fill
-in other values to indicate this SMB read uses RDMA write.
+To prepare for protocol implementation, add constants and user-configurable
+values in the SMBDirect protocol.
 
-There is no need to read from the transport for incoming payload. At the time
-SMB read response comes back, the data is already transfered and placed in the
-pages by RDMA hardware.
-
-Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/file.c    |  5 +++++
- fs/cifs/smb2pdu.c | 33 +++++++++++++++++++++++++++++++++
- 2 files changed, 38 insertions(+)
+ fs/cifs/smbdirect.c | 78 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smbdirect.h | 20 ++++++++++++++
+ 2 files changed, 98 insertions(+)
+ create mode 100644 fs/cifs/smbdirect.c
+ create mode 100644 fs/cifs/smbdirect.h
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index dec70b3..41460a5 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -42,6 +42,7 @@
- #include "cifs_debug.h"
- #include "cifs_fs_sb.h"
- #include "fscache.h"
+diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+new file mode 100644
+index 0000000..d785bc1
+--- /dev/null
++++ b/fs/cifs/smbdirect.c
+@@ -0,0 +1,78 @@
++/*
++ *   Copyright (C) 2017, Microsoft Corporation.
++ *
++ *   Author(s): Long Li <longli@microsoft.com>
++ *
++ *   This program is free software;  you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or
++ *   (at your option) any later version.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ *   the GNU General Public License for more details.
++ */
++#include <linux/module.h>
 +#include "smbdirect.h"
- 
- 
- static inline int cifs_convert_flags(unsigned int flags)
-@@ -3037,6 +3038,8 @@ uncached_fill_pages(struct TCP_Server_Info *server,
- 		}
- 		if (iter)
- 			result = copy_page_from_iter(page, 0, n, iter);
-+		else if (rdata->mr)
-+			result = n;
- 		else
- 			result = cifs_read_page_from_socket(server, page, n);
- 		if (result < 0)
-@@ -3606,6 +3609,8 @@ readpages_fill_pages(struct TCP_Server_Info *server,
- 
- 		if (iter)
- 			result = copy_page_from_iter(page, 0, n, iter);
-+		else if (rdata->mr)
-+			result = n;
- 		else
- 			result = cifs_read_page_from_socket(server, page, n);
- 		if (result < 0)
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index fbad987..1f08c75 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -2392,6 +2392,39 @@ smb2_new_read_req(void **buf, unsigned int *total_len,
- 	req->Length = cpu_to_le32(io_parms->length);
- 	req->Offset = cpu_to_le64(io_parms->offset);
- 
-+	/*
-+	 * If we want to do a RDMA write, fill in and append
-+	 * smbd_buffer_descriptor_v1 to the end of read request
-+	 */
-+	if (server->rdma && rdata &&
-+		rdata->bytes > server->smbd_conn->rdma_readwrite_threshold) {
++#include "cifs_debug.h"
 +
-+		struct smbd_buffer_descriptor_v1 *v1;
-+		bool need_invalidate =
-+			io_parms->tcon->ses->server->dialect == SMB30_PROT_ID;
++/* SMBD version number */
++#define SMBD_V1	0x0100
 +
-+		rdata->mr = smbd_register_mr(
-+				server->smbd_conn, rdata->pages,
-+				rdata->nr_pages, rdata->tailsz,
-+				true, need_invalidate);
-+		if (!rdata->mr)
-+			return -ENOBUFS;
++/* Port numbers for SMBD transport */
++#define SMB_PORT	445
++#define SMBD_PORT	5445
 +
-+		req->Channel = SMB2_CHANNEL_RDMA_V1_INVALIDATE;
-+		if (need_invalidate)
-+			req->Channel = SMB2_CHANNEL_RDMA_V1;
-+		req->ReadChannelInfoOffset =
-+			offsetof(struct smb2_read_plain_req, Buffer);
-+		req->ReadChannelInfoLength =
-+			sizeof(struct smbd_buffer_descriptor_v1);
-+		v1 = (struct smbd_buffer_descriptor_v1 *) &req->Buffer[0];
-+		v1->offset = rdata->mr->mr->iova;
-+		v1->token = rdata->mr->mr->rkey;
-+		v1->length = rdata->mr->mr->length;
++/* Address lookup and resolve timeout in ms */
++#define RDMA_RESOLVE_TIMEOUT	5000
 +
-+		*total_len += sizeof(*v1) - 1;
-+	}
++/* SMBD negotiation timeout in seconds */
++#define SMBD_NEGOTIATE_TIMEOUT	120
 +
- 	if (request_type & CHAINED_REQUEST) {
- 		if (!(request_type & END_OF_CHAIN)) {
- 			/* next 8-byte aligned request */
++/* SMBD minimum receive size and fragmented sized defined in [MS-SMBD] */
++#define SMBD_MIN_RECEIVE_SIZE		128
++#define SMBD_MIN_FRAGMENTED_SIZE	131072
++
++/*
++ * Default maximum number of RDMA read/write outstanding on this connection
++ * This value is possibly decreased during QP creation on hardware limit
++ */
++#define SMBD_CM_RESPONDER_RESOURCES	32
++
++/* Maximum number of retries on data transfer operations */
++#define SMBD_CM_RETRY			6
++/* No need to retry on Receiver Not Ready since SMBD manages credits */
++#define SMBD_CM_RNR_RETRY		0
++
++/*
++ * User configurable initial values per SMBD transport connection
++ * as defined in [MS-SMBD] 3.1.1.1
++ * Those may change after a SMBD negotiation
++ */
++/* The local peer's maximum number of credits to grant to the peer */
++static int receive_credit_max = 255;
++/* The remote peer's credit request of local peer */
++static int send_credit_target = 255;
++/* The maximum single message size can be sent to remote peer */
++static int max_send_size = 1364;
++/*  The maximum fragmented upper-layer payload receive size supported */
++static int max_fragmented_recv_size = 1024 * 1024;
++/*  The maximum single-message size which can be received */
++static int max_receive_size = 8192;
++
++/* The timeout to initiate send of a keepalive message on idle */
++static int keep_alive_interval = 120;
++
++/*
++ * User configurable initial values for RDMA transport
++ * The actual values used may be lower and are limited to hardware capabilities
++ */
++/* Default maximum number of SGEs in a RDMA send/recv */
++static int max_send_sge = SMBDIRECT_MAX_SGE;
++static int max_recv_sge = SMBDIRECT_MAX_SGE;
++/* Default maximum number of SGEs in a RDMA write/read */
++static int max_frmr_depth = 2048;
++
++/* If payload is less than this byte, use RDMA send/recv not read/write */
++static int rdma_readwrite_threshold = 4096;
+diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
+new file mode 100644
+index 0000000..06eeb0b
+--- /dev/null
++++ b/fs/cifs/smbdirect.h
+@@ -0,0 +1,20 @@
++/*
++ *   Copyright (C) 2017, Microsoft Corporation.
++ *
++ *   Author(s): Long Li <longli@microsoft.com>
++ *
++ *   This program is free software;  you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or
++ *   (at your option) any later version.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ *   the GNU General Public License for more details.
++ */
++#ifndef _SMBDIRECT_H
++#define _SMBDIRECT_H
++
++#define SMBDIRECT_MAX_SGE	16
++#endif
 -- 
 2.7.4
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
