@@ -1,78 +1,32 @@
-From: Long Li <longli@microsoft.com>
-Subject: RE: [Patch v2 00/19] CIFS: Implement SMBDirect
-Date: Tue, 29 Aug 2017 18:10:05 +0000
-Message-ID: <MWHPR21MB0190050F3699CDF6F52B51A2CE9F0@MWHPR21MB0190.namprd21.prod.outlook.com>
+From: Roland Dreier <roland-BHEL68pLQRGGvPXPguhicg@public.gmane.org>
+Subject: Re: [Patch v2 00/19] CIFS: Implement SMBDirect
+Date: Tue, 29 Aug 2017 11:20:51 -0700
+Message-ID: <CAL1RGDUGiOqjB8n0mJmF079jm7vXrdzE2rHdzoNOexvgHScjUQ@mail.gmail.com>
 References: <1503255883-3041-1-git-send-email-longli@exchange.microsoft.com>
- <01ff01d31ab1$ca836a60$5f8a3f20$@opengridcomputing.com>
- <MWHPR21MB019081F64C50E08043286EE3CE870@MWHPR21MB0190.namprd21.prod.outlook.com>
- <027d01d31ab7$85adbed0$91093c70$@opengridcomputing.com>
- <MWHPR21MB0190AD423095EEA25CA6CD81CE870@MWHPR21MB0190.namprd21.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-To: Long Li <longli@microsoft.com>,
-        Steve Wise <swise@opengridcomputing.com>,
-        'Steve French' <sfrench@samba.org>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        'Christoph Hellwig' <hch@infradead.org>,
-        "Tom Talpey" <ttalpey@microsoft.com>,
-        Matthew Wilcox <mawilcox@microsoft.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <MWHPR21MB0190AD423095EEA25CA6CD81CE870@MWHPR21MB0190.namprd21.prod.outlook.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+        Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1503255883-3041-1-git-send-email-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
+> Starting with SMB2 dialect 3.0, Microsoft introduced SMBDirect transport =
+protocol for transferring upper layer (SMB2) payload over RDMA via Infiniba=
+nd, RoCE or iWARP. The prococol is published in [MS-SMBD] (https://msdn.mic=
+rosoft.com/en-us/library/hh536346.aspx).
 
+This is great to see.  Is there a Linux implementation of the server
+side (in Samba?) so that the client can be tested without needing a
+Windows server?
 
-> -----Original Message-----
-> From: samba-technical [mailto:samba-technical-bounces@lists.samba.org]
-> On Behalf Of Long Li via samba-technical
-> Sent: Monday, August 21, 2017 1:24 PM
-> To: Steve Wise <swise@opengridcomputing.com>; 'Steve French'
-> <sfrench@samba.org>; linux-cifs@vger.kernel.org; samba-
-> technical@lists.samba.org; linux-kernel@vger.kernel.org; linux-
-> rdma@vger.kernel.org; 'Christoph Hellwig' <hch@infradead.org>; Tom
-> Talpey <ttalpey@microsoft.com>; Matthew Wilcox
-> <mawilcox@microsoft.com>
-> Subject: RE: [Patch v2 00/19] CIFS: Implement SMBDirect
->=20
-> > > > Hey Long,
-> > > >
-> > > > What testing have you done with this on the various rdma transports=
-?
-> > > > Does it work over IB, RoCE, and iWARP providers?
-> > >
-> > > Hi Steve,
-> > >
-> > > Currently all the tests have been done over Infiniband. We haven't
-> > > tested on
-> > RoCE
-> > > or iWARP, but planned to do it in the following weeks.
-> > >
-> > > Long
-> >
-> > Ok, good.
-> >
-> > Is this series available on github or somewhere so we can clone it and
-> > review it as it is applied to the kernel src?
-
-I have put the patch v3 in the following location:
-https://github.com/longlimsft/linux-next/tree/patch_v3
-
-I will be sending it out soon. Please give it a try.
-
->=20
-> Unfortunately they are not on github. I will look into putting them there=
- for
-> review. Will update soon.
->=20
-> Thanks for helping out!
->=20
-> >
-> > Thanks,
-> >
-> > Steve.
->=20
+ - R.
