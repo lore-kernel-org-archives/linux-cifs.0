@@ -1,70 +1,72 @@
-From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Subject: [Patch v3 18/19] CIFS: SMBD: Deregister memory when finishing SMB read
-Date: Tue, 29 Aug 2017 12:29:14 -0700
-Message-ID: <20170829192915.26251-19-longli@exchange.microsoft.com>
-References: <20170829192915.26251-1-longli@exchange.microsoft.com>
-Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-        Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170829192915.26251-1-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Long Li <longli@exchange.microsoft.com>
+Subject: [Patch v3 00/19] CIFS: Implement SMB Direct
+Date: Tue, 29 Aug 2017 12:28:56 -0700
+Message-ID: <20170829192915.26251-1-longli@exchange.microsoft.com>
+Cc: Long Li <longli@microsoft.com>
+To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Tom Talpey <ttalpey@microsoft.com>,
+        Matthew Wilcox <mawilcox@microsoft.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+From: Long Li <longli@microsoft.com>
 
-When SMB read is finished, deregister the memory regions if RDMA write is used
-for this SMB read. smbd_deregister_mr may need to do local invalidation and
-sleep, if server remote invalidation is not used.
+Starting with SMB2 dialect 3.0, Microsoft introduced SMBDirect transport
+protocol for transferring upper layer (SMB2) payload over RDMA via Infiniband,
+RoCE or iWARP. The prococol is published in [MS-SMBD]
+(https://msdn.microsoft.com/en-us/library/hh536346.aspx).
 
-There are situations where the MID may not be created on I/O failure, under
-which memory region is deregistered when read data context is released.
+Patch v2 added RDMA read/write via memory registration, and addressed
+feedbacks on v1.
 
-Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
----
- fs/cifs/file.c    |  5 +++++
- fs/cifs/smb2pdu.c | 10 ++++++++++
- 2 files changed, 15 insertions(+)
+Patch v3 improved performance by introducing an additional queue for handling
+empty packets and reducing lock contention on IRQ path. Also added light
+weight profiling by reading TSC and addressed feedbacks on v2.
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 41460a5..5a6df25 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -2910,6 +2910,11 @@ cifs_readdata_release(struct kref *refcount)
- 	struct cifs_readdata *rdata = container_of(refcount,
- 					struct cifs_readdata, refcount);
- 
-+	if (rdata->mr) {
-+		smbd_deregister_mr(rdata->mr);
-+		rdata->mr = NULL;
-+	}
-+
- 	if (rdata->cfile)
- 		cifsFileInfo_put(rdata->cfile);
- 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 1f08c75..43a7b60 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -2504,6 +2504,16 @@ smb2_readv_callback(struct mid_q_entry *mid)
- 			rdata->result = -EIO;
- 	}
- 
-+	/*
-+	 * If this rdata has a memmory registered, the MR can be freed
-+	 * MR needs to be freed as soon as I/O finishes to prevent deadlock
-+	 * because they have limited number and are used for future I/Os
-+	 */
-+	if (rdata->mr) {
-+		smbd_deregister_mr(rdata->mr);
-+		rdata->mr = NULL;
-+	}
-+
- 	if (rdata->result)
- 		cifs_stats_fail_inc(tcon, SMB2_READ_HE);
- 
+Long Li (19):
+  CIFS: Add rdma mount option
+  CIFS: SMBD: Add SMBDirect protocol and transport constants
+  CIFS: SMBD: Implement SMBDirect transport
+  CIFS: SMBD: Add SMBDirect transport to SMB connection and Makefile
+  CIFS: SMBD: Connect to SMBDirect session
+  CIFS: SMBD: Reconnect to SMBDirect session
+  CIFS: SMBD: Destroy SMBDirect session on shutdown or umount
+  CIFS: SMBD: Set SMBDirect maximum read or write size for I/O
+  CIFS: SMBD: Receive data from SMBDirect
+  CIFS: SMBD: Send data through SMBDirect
+  CIFS: SMBD: Define memory registration for I/O data
+  CIFS: SMBD: Fix the definition for SMB2_CHANNEL_RDMA_V1_INVALIDATE
+  CIFS: SMBD: Implement SMB write via RDMA read through memory
+    registration
+  CIFS: SMBD: Deregister memory on finishing SMB write
+  CIFS: SMBD: Add parameter rdata to smb2_new_read_req
+  CIFS: SMBD: Read correct returned data length for RDMA write (SMB
+    read) I/O
+  CIFS: SMBD: Implement SMB read via RDMA write through memory
+    registration
+  CIFS: SMBD: Deregister memory when finishing SMB read
+  CIFS: SMBD: Add SMBDirect debug counters
+
+ fs/cifs/Makefile     |    2 +-
+ fs/cifs/cifs_debug.c |   84 ++
+ fs/cifs/cifsfs.c     |    2 +
+ fs/cifs/cifsglob.h   |   17 +-
+ fs/cifs/cifssmb.c    |   10 +-
+ fs/cifs/connect.c    |   46 +-
+ fs/cifs/file.c       |   10 +
+ fs/cifs/smb1ops.c    |    2 +-
+ fs/cifs/smb2ops.c    |   21 +-
+ fs/cifs/smb2pdu.c    |  114 ++-
+ fs/cifs/smb2pdu.h    |    2 +-
+ fs/cifs/smbdirect.c  | 2639 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smbdirect.h  |  324 +++++++
+ fs/cifs/transport.c  |    7 +
+ 14 files changed, 3260 insertions(+), 20 deletions(-)
+ create mode 100644 fs/cifs/smbdirect.c
+ create mode 100644 fs/cifs/smbdirect.h
+
 -- 
 2.7.4
