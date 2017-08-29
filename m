@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v3 11/19] CIFS: SMBD: Define memory registration for I/O data
-Date: Tue, 29 Aug 2017 12:29:07 -0700
-Message-ID: <20170829192915.26251-12-longli@exchange.microsoft.com>
+Subject: [Patch v3 08/19] CIFS: SMBD: Set SMBDirect maximum read or write size for I/O
+Date: Tue, 29 Aug 2017 12:29:04 -0700
+Message-ID: <20170829192915.26251-9-longli@exchange.microsoft.com>
 References: <20170829192915.26251-1-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -16,33 +16,53 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-To prepare for RDMA read/write using memory registration, add memory
-registartion pointers to upper layer data I/O context.
+When connecting over SMBDirect, the transport negotiates its maximum I/O sizes
+with the server and determines how to choose to do RDMA send/recv vs
+read/write. Expose these maximum I/O sizes to upper layer so we will get the
+correct sized payloads.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/cifsglob.h | 2 ++
- 1 file changed, 2 insertions(+)
+ fs/cifs/smb2ops.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index dc5404d..dcd2b63 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -1166,6 +1166,7 @@ struct cifs_readdata {
- 				struct cifs_readdata *rdata,
- 				struct iov_iter *iter);
- 	struct kvec			iov[2];
-+	struct smbd_mr			*mr;
- 	unsigned int			pagesz;
- 	unsigned int			tailsz;
- 	unsigned int			credits;
-@@ -1188,6 +1189,7 @@ struct cifs_writedata {
- 	pid_t				pid;
- 	unsigned int			bytes;
- 	int				result;
-+	struct smbd_mr			*mr;
- 	unsigned int			pagesz;
- 	unsigned int			tailsz;
- 	unsigned int			credits;
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 06494e1..e67f5f0 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -32,6 +32,7 @@
+ #include "smb2status.h"
+ #include "smb2glob.h"
+ #include "cifs_ioctl.h"
++#include "smbdirect.h"
+ 
+ static int
+ change_conf(struct TCP_Server_Info *server)
+@@ -249,7 +250,11 @@ smb2_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
+ 
+ 	/* start with specified wsize, or default */
+ 	wsize = volume_info->wsize ? volume_info->wsize : CIFS_DEFAULT_IOSIZE;
+-	wsize = min_t(unsigned int, wsize, server->max_write);
++	if (server->rdma)
++		wsize = min_t(unsigned int,
++				wsize, server->smbd_conn->max_readwrite_size);
++	else
++		wsize = min_t(unsigned int, wsize, server->max_write);
+ 
+ 	if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
+ 		wsize = min_t(unsigned int, wsize, SMB2_MAX_BUFFER_SIZE);
+@@ -265,7 +270,11 @@ smb2_negotiate_rsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
+ 
+ 	/* start with specified rsize, or default */
+ 	rsize = volume_info->rsize ? volume_info->rsize : CIFS_DEFAULT_IOSIZE;
+-	rsize = min_t(unsigned int, rsize, server->max_read);
++	if (server->rdma)
++		rsize = min_t(unsigned int,
++				rsize, server->smbd_conn->max_readwrite_size);
++	else
++		rsize = min_t(unsigned int, rsize, server->max_read);
+ 
+ 	if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
+ 		rsize = min_t(unsigned int, rsize, SMB2_MAX_BUFFER_SIZE);
 -- 
 2.7.4
