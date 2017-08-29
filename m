@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v3 10/19] CIFS: SMBD: Send data through SMBDirect
-Date: Tue, 29 Aug 2017 12:29:06 -0700
-Message-ID: <20170829192915.26251-11-longli@exchange.microsoft.com>
+Subject: [Patch v3 06/19] CIFS: SMBD: Reconnect to SMBDirect session
+Date: Tue, 29 Aug 2017 12:29:02 -0700
+Message-ID: <20170829192915.26251-7-longli@exchange.microsoft.com>
 References: <20170829192915.26251-1-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -16,44 +16,31 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-With SMBDirect connected, use it for sending data via RDMA send.
+Do a reconnect on SMBDirect when it is used as the connection. Reconnect can
+happen for many reasons and it's mostly the decision of upper layer SMB2 not
+SMBDirect.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/transport.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ fs/cifs/connect.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index ba62aaf..bddb699 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -37,6 +37,7 @@
- #include "cifsglob.h"
- #include "cifsproto.h"
- #include "cifs_debug.h"
-+#include "smbdirect.h"
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 43b4d54..341a3fd 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -409,7 +409,11 @@ cifs_reconnect(struct TCP_Server_Info *server)
  
- void
- cifs_wake_up_task(struct mid_q_entry *mid)
-@@ -230,6 +231,11 @@ __smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
- 	struct msghdr smb_msg;
- 	int val = 1;
- 
-+	if (server->smbd_conn) {
-+		rc = smbd_send(server->smbd_conn, rqst);
-+		goto done;
-+	}
+ 		/* we should try only the port we connected to before */
+ 		mutex_lock(&server->srv_mutex);
+-		rc = generic_ip_connect(server);
++		if (server->rdma)
++			rc = smbd_reconnect(server);
++		else
++			rc = generic_ip_connect(server);
 +
- 	if (ssocket == NULL)
- 		return -ENOTSOCK;
- 
-@@ -299,6 +305,7 @@ __smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
- 		server->tcpStatus = CifsNeedReconnect;
- 	}
- 
-+done:
- 	if (rc < 0 && rc != -EINTR)
- 		cifs_dbg(VFS, "Error %d sending data on socket to server\n",
- 			 rc);
+ 		if (rc) {
+ 			cifs_dbg(FYI, "reconnect error %d\n", rc);
+ 			mutex_unlock(&server->srv_mutex);
 -- 
 2.7.4
