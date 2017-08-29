@@ -1,97 +1,78 @@
-From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v2 16/30] cifs: Define usercopy region in cifs_request slab cache
-Date: Mon, 28 Aug 2017 14:34:57 -0700
-Message-ID: <1503956111-36652-17-git-send-email-keescook@chromium.org>
-References: <1503956111-36652-1-git-send-email-keescook@chromium.org>
-Cc: Kees Cook <keescook@chromium.org>,
-	David Windsor <dave@nullcore.net>,
-	Steve French <sfrench@samba.org>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-mm@kvack.org,
-	kernel-hardening@lists.openwall.com
-To: linux-kernel@vger.kernel.org
-Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <1503956111-36652-1-git-send-email-keescook@chromium.org>
-Sender: owner-linux-mm@kvack.org
+From: Long Li <longli@microsoft.com>
+Subject: RE: [Patch v2 00/19] CIFS: Implement SMBDirect
+Date: Tue, 29 Aug 2017 18:10:05 +0000
+Message-ID: <MWHPR21MB0190050F3699CDF6F52B51A2CE9F0@MWHPR21MB0190.namprd21.prod.outlook.com>
+References: <1503255883-3041-1-git-send-email-longli@exchange.microsoft.com>
+ <01ff01d31ab1$ca836a60$5f8a3f20$@opengridcomputing.com>
+ <MWHPR21MB019081F64C50E08043286EE3CE870@MWHPR21MB0190.namprd21.prod.outlook.com>
+ <027d01d31ab7$85adbed0$91093c70$@opengridcomputing.com>
+ <MWHPR21MB0190AD423095EEA25CA6CD81CE870@MWHPR21MB0190.namprd21.prod.outlook.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+To: Long Li <longli@microsoft.com>,
+        Steve Wise <swise@opengridcomputing.com>,
+        'Steve French' <sfrench@samba.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        'Christoph Hellwig' <hch@infradead.org>,
+        "Tom Talpey" <ttalpey@microsoft.com>,
+        Matthew Wilcox <mawilcox@microsoft.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <MWHPR21MB0190AD423095EEA25CA6CD81CE870@MWHPR21MB0190.namprd21.prod.outlook.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-From: David Windsor <dave@nullcore.net>
 
-CIFS request buffers, stored in the cifs_request slab cache, need to be
-copied to/from userspace.
 
-cache object allocation:
-    fs/cifs/cifsfs.c:
-        cifs_init_request_bufs():
-            ...
-            cifs_req_poolp = mempool_create_slab_pool(cifs_min_rcv,
-                                                      cifs_req_cachep);
+> -----Original Message-----
+> From: samba-technical [mailto:samba-technical-bounces@lists.samba.org]
+> On Behalf Of Long Li via samba-technical
+> Sent: Monday, August 21, 2017 1:24 PM
+> To: Steve Wise <swise@opengridcomputing.com>; 'Steve French'
+> <sfrench@samba.org>; linux-cifs@vger.kernel.org; samba-
+> technical@lists.samba.org; linux-kernel@vger.kernel.org; linux-
+> rdma@vger.kernel.org; 'Christoph Hellwig' <hch@infradead.org>; Tom
+> Talpey <ttalpey@microsoft.com>; Matthew Wilcox
+> <mawilcox@microsoft.com>
+> Subject: RE: [Patch v2 00/19] CIFS: Implement SMBDirect
+>=20
+> > > > Hey Long,
+> > > >
+> > > > What testing have you done with this on the various rdma transports=
+?
+> > > > Does it work over IB, RoCE, and iWARP providers?
+> > >
+> > > Hi Steve,
+> > >
+> > > Currently all the tests have been done over Infiniband. We haven't
+> > > tested on
+> > RoCE
+> > > or iWARP, but planned to do it in the following weeks.
+> > >
+> > > Long
+> >
+> > Ok, good.
+> >
+> > Is this series available on github or somewhere so we can clone it and
+> > review it as it is applied to the kernel src?
 
-    fs/cifs/misc.c:
-        cifs_buf_get():
-            ...
-            ret_buf = mempool_alloc(cifs_req_poolp, GFP_NOFS);
-            ...
-            return ret_buf;
+I have put the patch v3 in the following location:
+https://github.com/longlimsft/linux-next/tree/patch_v3
 
-In support of usercopy hardening, this patch defines a region in the
-cifs_request slab cache in which userspace copy operations are allowed.
+I will be sending it out soon. Please give it a try.
 
-This region is known as the slab cache's usercopy region.  Slab
-caches can now check that each copy operation involving cache-managed
-memory falls entirely within the slab's usercopy region.
-
-This patch is verbatim from Brad Spengler/PaX Team's PAX_USERCOPY
-whitelisting code in the last public patch of grsecurity/PaX based on my
-understanding of the code. Changes or omissions from the original code are
-mine and don't reflect the original grsecurity/PaX code.
-
-Signed-off-by: David Windsor <dave@nullcore.net>
-[kees: adjust commit log, provide usage trace]
-Cc: Steve French <sfrench@samba.org>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- fs/cifs/cifsfs.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
-
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 180b3356ff86..09dfdf76c738 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -1229,9 +1229,11 @@ cifs_init_request_bufs(void)
- 	cifs_dbg(VFS, "CIFSMaxBufSize %d 0x%x\n",
- 		 CIFSMaxBufSize, CIFSMaxBufSize);
- */
--	cifs_req_cachep = kmem_cache_create("cifs_request",
-+	cifs_req_cachep = kmem_cache_create_usercopy("cifs_request",
- 					    CIFSMaxBufSize + max_hdr_size, 0,
--					    SLAB_HWCACHE_ALIGN, NULL);
-+					    SLAB_HWCACHE_ALIGN, 0,
-+					    CIFSMaxBufSize + max_hdr_size,
-+					    NULL);
- 	if (cifs_req_cachep == NULL)
- 		return -ENOMEM;
- 
-@@ -1257,9 +1259,9 @@ cifs_init_request_bufs(void)
- 	more SMBs to use small buffer alloc and is still much more
- 	efficient to alloc 1 per page off the slab compared to 17K (5page)
- 	alloc of large cifs buffers even when page debugging is on */
--	cifs_sm_req_cachep = kmem_cache_create("cifs_small_rq",
-+	cifs_sm_req_cachep = kmem_cache_create_usercopy("cifs_small_rq",
- 			MAX_CIFS_SMALL_BUFFER_SIZE, 0, SLAB_HWCACHE_ALIGN,
--			NULL);
-+			0, MAX_CIFS_SMALL_BUFFER_SIZE, NULL);
- 	if (cifs_sm_req_cachep == NULL) {
- 		mempool_destroy(cifs_req_poolp);
- 		kmem_cache_destroy(cifs_req_cachep);
--- 
-2.7.4
-
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+>=20
+> Unfortunately they are not on github. I will look into putting them there=
+ for
+> review. Will update soon.
+>=20
+> Thanks for helping out!
+>=20
+> >
+> > Thanks,
+> >
+> > Steve.
+>=20
