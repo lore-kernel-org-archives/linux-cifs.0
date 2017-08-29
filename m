@@ -1,8 +1,8 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [Patch v3 01/19] CIFS: Add rdma mount option
-Date: Tue, 29 Aug 2017 15:37:22 -0700
-Message-ID: <CAKywueRsjjG6BDbkZL_qeVn3V129N2OFwAaw60ZeZXmWbX-32A@mail.gmail.com>
-References: <20170829192915.26251-1-longli@exchange.microsoft.com> <20170829192915.26251-2-longli@exchange.microsoft.com>
+Subject: Re: [Patch v3 02/19] CIFS: SMBD: Add SMBDirect protocol and transport constants
+Date: Tue, 29 Aug 2017 15:44:59 -0700
+Message-ID: <CAKywueQ3Vz9NUwfqgk36pnaXN=r3DDrrNAumMP418EkcXQPT9g@mail.gmail.com>
+References: <20170829192915.26251-1-longli@exchange.microsoft.com> <20170829192915.26251-3-longli@exchange.microsoft.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
@@ -14,136 +14,140 @@ Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
         Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
         Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 To: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170829192915.26251-2-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20170829192915.26251-3-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
 2017-08-29 12:28 GMT-07:00 Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>:
 > From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 >
-> Add "rdma" to CIFS mount options to connect to SMB Direct.
-> Add checks to validate this is used on SMB 3.X dialects.
->
-> To connect to SMBDirect, use "mount.cifs -o rdma,vers=3.x".
-> At the time of this patch, 3.x can be 3.0, 3.02 or 3.1.1.
+> To prepare for protocol implementation, add constants and user-configurable
+> values in the SMBDirect protocol.
 >
 > Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 > ---
->  fs/cifs/cifs_debug.c |  2 ++
->  fs/cifs/cifsfs.c     |  2 ++
->  fs/cifs/cifsglob.h   |  3 +++
->  fs/cifs/connect.c    | 15 ++++++++++++++-
->  4 files changed, 21 insertions(+), 1 deletion(-)
+>  fs/cifs/smbdirect.c | 78 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  fs/cifs/smbdirect.h | 20 ++++++++++++++
+>  2 files changed, 98 insertions(+)
+>  create mode 100644 fs/cifs/smbdirect.c
+>  create mode 100644 fs/cifs/smbdirect.h
 >
-> diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-> index 9727e1d..ba0870d 100644
-> --- a/fs/cifs/cifs_debug.c
-> +++ b/fs/cifs/cifs_debug.c
-> @@ -171,6 +171,8 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
->                                 ses->ses_count, ses->serverOS, ses->serverNOS,
->                                 ses->capabilities, ses->status);
->                         }
-> +                       if (server->rdma)
-> +                               seq_printf(m, "RDMA\n\t");
->                         seq_printf(m, "TCP status: %d\n\tLocal Users To "
->                                    "Server: %d SecMode: 0x%x Req On Wire: %d",
->                                    server->tcpStatus, server->srv_count,
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index fe0c8dc..a628800 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -330,6 +330,8 @@ cifs_show_address(struct seq_file *s, struct TCP_Server_Info *server)
->         default:
->                 seq_puts(s, "(unknown)");
->         }
-> +       if (server->rdma)
-> +               seq_puts(s, ",rdma");
->  }
->
->  static void
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 8289f95..703c2fb 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -531,6 +531,7 @@ struct smb_vol {
->         bool nopersistent:1;
->         bool resilient:1; /* noresilient not required since not fored for CA */
->         bool domainauto:1;
-> +       bool rdma:1;
->         unsigned int rsize;
->         unsigned int wsize;
->         bool sockopt_tcp_nodelay:1;
-> @@ -649,6 +650,8 @@ struct TCP_Server_Info {
->         bool    sec_kerberos;           /* supports plain Kerberos */
->         bool    sec_mskerberos;         /* supports legacy MS Kerberos */
->         bool    large_buf;              /* is current buffer large? */
-> +       /* use SMBD connection instead of socket */
-> +       bool    rdma;
->         struct delayed_work     echo; /* echo ping workqueue job */
->         char    *smallbuf;      /* pointer to current "small" buffer */
->         char    *bigbuf;        /* pointer to current "big" buffer */
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 2eeaac6..19fdca8 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -94,7 +94,7 @@ enum {
->         Opt_multiuser, Opt_sloppy, Opt_nosharesock,
->         Opt_persistent, Opt_nopersistent,
->         Opt_resilient, Opt_noresilient,
-> -       Opt_domainauto,
-> +       Opt_domainauto, Opt_rdma,
->
->         /* Mount options which take numeric value */
->         Opt_backupuid, Opt_backupgid, Opt_uid,
-> @@ -185,6 +185,7 @@ static const match_table_t cifs_mount_option_tokens = {
->         { Opt_resilient, "resilienthandles"},
->         { Opt_noresilient, "noresilienthandles"},
->         { Opt_domainauto, "domainauto"},
-> +       { Opt_rdma, "rdma"},
->
->         { Opt_backupuid, "backupuid=%s" },
->         { Opt_backupgid, "backupgid=%s" },
-> @@ -1541,6 +1542,9 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
->                 case Opt_domainauto:
->                         vol->domainauto = true;
->                         break;
-> +               case Opt_rdma:
-> +                       vol->rdma = true;
-> +                       break;
->
->                 /* Numeric Values */
->                 case Opt_backupuid:
-> @@ -1931,6 +1935,11 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
->                 goto cifs_parse_mount_err;
->         }
->
-> +       if (vol->rdma && vol->vals->protocol_id < SMB30_PROT_ID) {
-> +               cifs_dbg(VFS, "SMB Direct requires Version >=3.0\n");
-> +               goto cifs_parse_mount_err;
-> +       }
+> diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+> new file mode 100644
+> index 0000000..d785bc1
+> --- /dev/null
+> +++ b/fs/cifs/smbdirect.c
+> @@ -0,0 +1,78 @@
+> +/*
+> + *   Copyright (C) 2017, Microsoft Corporation.
+> + *
+> + *   Author(s): Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+> + *
+> + *   This program is free software;  you can redistribute it and/or modify
+> + *   it under the terms of the GNU General Public License as published by
+> + *   the Free Software Foundation; either version 2 of the License, or
+> + *   (at your option) any later version.
+> + *
+> + *   This program is distributed in the hope that it will be useful,
+> + *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
+> + *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+> + *   the GNU General Public License for more details.
+> + */
+> +#include <linux/module.h>
+> +#include "smbdirect.h"
+> +#include "cifs_debug.h"
 > +
->  #ifndef CONFIG_KEYS
->         /* Muliuser mounts require CONFIG_KEYS support */
->         if (vol->multiuser) {
-> @@ -2134,6 +2143,9 @@ static int match_server(struct TCP_Server_Info *server, struct smb_vol *vol)
->         if (server->echo_interval != vol->echo_interval * HZ)
->                 return 0;
->
-> +       if (server->rdma != vol->rdma)
-> +               return 0;
+> +/* SMBD version number */
+> +#define SMBD_V1        0x0100
 > +
->         return 1;
->  }
->
-> @@ -2234,6 +2246,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
->         tcp_ses->noblocksnd = volume_info->noblocksnd;
->         tcp_ses->noautotune = volume_info->noautotune;
->         tcp_ses->tcp_nodelay = volume_info->sockopt_tcp_nodelay;
-> +       tcp_ses->rdma = volume_info->rdma;
->         tcp_ses->in_flight = 0;
->         tcp_ses->credits = 1;
->         init_waitqueue_head(&tcp_ses->response_q);
+> +/* Port numbers for SMBD transport */
+> +#define SMB_PORT       445
+> +#define SMBD_PORT      5445
+> +
+> +/* Address lookup and resolve timeout in ms */
+> +#define RDMA_RESOLVE_TIMEOUT   5000
+> +
+> +/* SMBD negotiation timeout in seconds */
+> +#define SMBD_NEGOTIATE_TIMEOUT 120
+> +
+> +/* SMBD minimum receive size and fragmented sized defined in [MS-SMBD] */
+> +#define SMBD_MIN_RECEIVE_SIZE          128
+> +#define SMBD_MIN_FRAGMENTED_SIZE       131072
+> +
+> +/*
+> + * Default maximum number of RDMA read/write outstanding on this connection
+> + * This value is possibly decreased during QP creation on hardware limit
+> + */
+> +#define SMBD_CM_RESPONDER_RESOURCES    32
+> +
+> +/* Maximum number of retries on data transfer operations */
+> +#define SMBD_CM_RETRY                  6
+> +/* No need to retry on Receiver Not Ready since SMBD manages credits */
+> +#define SMBD_CM_RNR_RETRY              0
+> +
+> +/*
+> + * User configurable initial values per SMBD transport connection
+> + * as defined in [MS-SMBD] 3.1.1.1
+> + * Those may change after a SMBD negotiation
+> + */
+
+Since these value are per transport connection, why they are global?
+Shouldn't they be inside a some structure that is created for a
+particular connection? Also the constants below should be defines.
+
+> +/* The local peer's maximum number of credits to grant to the peer */
+> +static int receive_credit_max = 255;
+> +/* The remote peer's credit request of local peer */
+> +static int send_credit_target = 255;
+> +/* The maximum single message size can be sent to remote peer */
+> +static int max_send_size = 1364;
+> +/*  The maximum fragmented upper-layer payload receive size supported */
+> +static int max_fragmented_recv_size = 1024 * 1024;
+> +/*  The maximum single-message size which can be received */
+> +static int max_receive_size = 8192;
+> +
+> +/* The timeout to initiate send of a keepalive message on idle */
+> +static int keep_alive_interval = 120;
+> +
+> +/*
+> + * User configurable initial values for RDMA transport
+> + * The actual values used may be lower and are limited to hardware capabilities
+> + */
+> +/* Default maximum number of SGEs in a RDMA send/recv */
+> +static int max_send_sge = SMBDIRECT_MAX_SGE;
+> +static int max_recv_sge = SMBDIRECT_MAX_SGE;
+> +/* Default maximum number of SGEs in a RDMA write/read */
+> +static int max_frmr_depth = 2048;
+> +
+> +/* If payload is less than this byte, use RDMA send/recv not read/write */
+> +static int rdma_readwrite_threshold = 4096;
+> diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
+> new file mode 100644
+> index 0000000..06eeb0b
+> --- /dev/null
+> +++ b/fs/cifs/smbdirect.h
+> @@ -0,0 +1,20 @@
+> +/*
+> + *   Copyright (C) 2017, Microsoft Corporation.
+> + *
+> + *   Author(s): Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+> + *
+> + *   This program is free software;  you can redistribute it and/or modify
+> + *   it under the terms of the GNU General Public License as published by
+> + *   the Free Software Foundation; either version 2 of the License, or
+> + *   (at your option) any later version.
+> + *
+> + *   This program is distributed in the hope that it will be useful,
+> + *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
+> + *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+> + *   the GNU General Public License for more details.
+> + */
+> +#ifndef _SMBDIRECT_H
+> +#define _SMBDIRECT_H
+> +
+> +#define SMBDIRECT_MAX_SGE      16
+> +#endif
 > --
 > 2.7.4
 >
@@ -152,10 +156,12 @@ List-ID: <linux-cifs.vger.kernel.org>
 > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-It is better to introduce a mount option after the functional changes
-not before them. In this case we do not result in having the mount
-option that does nothing if we break the patchset.
+
 
 --
 Best regards,
 Pavel Shilovsky
+--
+To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
