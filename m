@@ -1,48 +1,56 @@
-From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Subject: [Patch v3 07/19] CIFS: SMBD: Destroy SMBDirect session on shutdown or umount
-Date: Tue, 29 Aug 2017 12:29:03 -0700
-Message-ID: <20170829192915.26251-8-longli@exchange.microsoft.com>
+From: Long Li <longli@exchange.microsoft.com>
+Subject: [Patch v3 04/19] CIFS: SMBD: Add SMBDirect transport to SMB connection and Makefile
+Date: Tue, 29 Aug 2017 12:29:00 -0700
+Message-ID: <20170829192915.26251-5-longli@exchange.microsoft.com>
 References: <20170829192915.26251-1-longli@exchange.microsoft.com>
-Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-        Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170829192915.26251-1-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: Long Li <longli@microsoft.com>
+To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Tom Talpey <ttalpey@microsoft.com>,
+        Matthew Wilcox <mawilcox@microsoft.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170829192915.26251-1-longli@exchange.microsoft.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+From: Long Li <longli@microsoft.com>
 
-When CIFS wants to umount, call shutdown on transport when SMBDirect is used.
+Add SMBDirect as an optional connection to the SMB session structure in CIFS.
+When SMB session is connected through SMBDirect, upper layer uses this
+connection to carry payloads.
 
-Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+With the transport code hooked up to upper layer, add SMBDirect code to
+Makefile.
+
+Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/connect.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ fs/cifs/Makefile   | 2 +-
+ fs/cifs/cifsglob.h | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 341a3fd..4f62337 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -708,6 +708,11 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
- 	/* give those requests time to exit */
- 	msleep(125);
+diff --git a/fs/cifs/Makefile b/fs/cifs/Makefile
+index eed7eb0..6bb9863 100644
+--- a/fs/cifs/Makefile
++++ b/fs/cifs/Makefile
+@@ -18,4 +18,4 @@ cifs-$(CONFIG_CIFS_DFS_UPCALL) += dns_resolve.o cifs_dfs_ref.o
+ cifs-$(CONFIG_CIFS_FSCACHE) += fscache.o cache.o
  
-+	if (server->smbd_conn) {
-+		smbd_destroy(server->smbd_conn);
-+		server->smbd_conn = NULL;
-+	}
-+
- 	if (server->ssocket) {
- 		sock_release(server->ssocket);
- 		server->ssocket = NULL;
+ cifs-$(CONFIG_CIFS_SMB2) += smb2ops.o smb2maperror.o smb2transport.o \
+-			    smb2misc.o smb2pdu.o smb2inode.o smb2file.o
++			    smb2misc.o smb2pdu.o smb2inode.o smb2file.o smbdirect.o
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 703c2fb..dc5404d 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -652,6 +652,8 @@ struct TCP_Server_Info {
+ 	bool	large_buf;		/* is current buffer large? */
+ 	/* use SMBD connection instead of socket */
+ 	bool	rdma;
++	/* point to the SMBD connection if RDMA is used instead of socket */
++	struct smbd_connection *smbd_conn;
+ 	struct delayed_work	echo; /* echo ping workqueue job */
+ 	char	*smallbuf;	/* pointer to current "small" buffer */
+ 	char	*bigbuf;	/* pointer to current "big" buffer */
 -- 
 2.7.4
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
