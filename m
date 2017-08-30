@@ -1,203 +1,97 @@
-From: Long Li <longli@microsoft.com>
-Subject: RE: [[PATCH v1] 05/37] [CIFS] SMBD: Implement API for upper layer to
- create SMBD transport and establish RDMA connection
-Date: Wed, 30 Aug 2017 02:35:54 +0000
-Message-ID: <MWHPR21MB0190CB075B933236AF7C5810CE9C0@MWHPR21MB0190.namprd21.prod.outlook.com>
-References: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
- <1501704648-20159-6-git-send-email-longli@exchange.microsoft.com>
- <CY4PR21MB018254FE747A2FCEB0650090A08C0@CY4PR21MB0182.namprd21.prod.outlook.com>
+From: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [Patch v2 00/19] CIFS: Implement SMBDirect
+Date: Wed, 30 Aug 2017 07:16:16 +0200
+Message-ID: <8f07f19a-1fdf-b284-6fcc-e04920fe70db@samba.org>
+References: <1503255883-3041-1-git-send-email-longli@exchange.microsoft.com>
+ <CAL1RGDUGiOqjB8n0mJmF079jm7vXrdzE2rHdzoNOexvgHScjUQ@mail.gmail.com>
+ <CY4PR21MB01821B704C2F64F72A8A92A9CE9F0@CY4PR21MB0182.namprd21.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-To: Tom Talpey <ttalpey@microsoft.com>,
-        Steve French <sfrench@samba.org>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CY4PR21MB018254FE747A2FCEB0650090A08C0@CY4PR21MB0182.namprd21.prod.outlook.com>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="ECq4buv9FHFDGCf3Udt3tH5PHNLRofpC2"
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        "samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Roland Dreier <roland-BHEL68pLQRGGvPXPguhicg@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CY4PR21MB01821B704C2F64F72A8A92A9CE9F0-kUhI0YP1syo7ifcEnHlXec1VXTxX1y3OvxpqHgZTriW3zl9H0oFU5g@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ECq4buv9FHFDGCf3Udt3tH5PHNLRofpC2
+Content-Type: multipart/mixed; boundary="5Qea2WM35eg2H7AvU9ojP43XKRC3sjkNl";
+ protected-headers="v1"
+From: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>, Roland Dreier <roland-BHEL68pLQRGGvPXPguhicg@public.gmane.org>
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+ "linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+ Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+ "samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+ LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Message-ID: <8f07f19a-1fdf-b284-6fcc-e04920fe70db-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [Patch v2 00/19] CIFS: Implement SMBDirect
+References: <1503255883-3041-1-git-send-email-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+ <CAL1RGDUGiOqjB8n0mJmF079jm7vXrdzE2rHdzoNOexvgHScjUQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+ <CY4PR21MB01821B704C2F64F72A8A92A9CE9F0-kUhI0YP1syo7ifcEnHlXec1VXTxX1y3OvxpqHgZTriW3zl9H0oFU5g@public.gmane.org>
+In-Reply-To: <CY4PR21MB01821B704C2F64F72A8A92A9CE9F0-kUhI0YP1syo7ifcEnHlXec1VXTxX1y3OvxpqHgZTriW3zl9H0oFU5g@public.gmane.org>
+
+--5Qea2WM35eg2H7AvU9ojP43XKRC3sjkNl
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+>> This is great to see.  Is there a Linux implementation of the server s=
+ide (in
+>> Samba?) so that the client can be tested without needing a Windows ser=
+ver?
+>=20
+> I'm not aware of a Linux implementation on server side.
+
+Here's a very early work in progress branch:
+https://git.samba.org/?p=3Dmetze/samba/wip.git;a=3Dshortlog;h=3Drefs/head=
+s/master3-rdma
+It only explores how the protocol works, as it uses a userspace
+smb-direct proxy (which works around the missing fork support of the
+userspace libibverbs), which makes it really slow, but is required
+in order to have the code tested in Samba's autobuild.
+
+I think once this code lands in the kernel tree, we'll be able to
+arrange a userspace api to it, in order to make a useful implementation,
+so we can skip the userspace smb-dorect proxy.
+
+metze
 
 
+--5Qea2WM35eg2H7AvU9ojP43XKRC3sjkNl--
 
-> -----Original Message-----
-> From: Tom Talpey
-> Sent: Monday, August 14, 2017 12:55 PM
-> To: Long Li <longli@microsoft.com>; Steve French <sfrench@samba.org>;
-> linux-cifs@vger.kernel.org; samba-technical@lists.samba.org; linux-
-> kernel@vger.kernel.org; linux-rdma@vger.kernel.org
-> Subject: RE: [[PATCH v1] 05/37] [CIFS] SMBD: Implement API for upper laye=
-r
-> to create SMBD transport and establish RDMA connection
->=20
-> > -----Original Message-----
-> > From: linux-cifs-owner@vger.kernel.org [mailto:linux-cifs-
-> > owner@vger.kernel.org] On Behalf Of Long Li
-> > Sent: Wednesday, August 2, 2017 4:10 PM
-> > To: Steve French <sfrench@samba.org>; linux-cifs@vger.kernel.org;
-> > samba- technical@lists.samba.org; linux-kernel@vger.kernel.org
-> > Cc: Long Li <longli@microsoft.com>
-> > Subject: [[PATCH v1] 05/37] [CIFS] SMBD: Implement API for upper layer
-> > to create SMBD transport and establish RDMA connection
-> >
-> > From: Long Li <longli@microsoft.com>
-> >
-> > Implement the code for connecting to SMBD server. The client and
-> > server are connected using RC Queue Pair over RDMA API, which
-> > suppports Infiniband, RoCE and iWARP. Upper layer code can call
-> > cifs_create_rdma_session to establish a SMBD RDMA connection.
-> >
-> > +/* Upcall from RDMA CM */
-> > +static int cifs_rdma_conn_upcall(
-> > +               struct rdma_cm_id *id, struct rdma_cm_event *event) {
-> > +       struct cifs_rdma_info *info =3D id->context;
-> > +
-> > +       log_rdma_event("event=3D%d status=3D%d\n", event->event,
-> > + event->status);
-> > +
-> > +       switch (event->event) {
-> > +       case RDMA_CM_EVENT_ADDR_RESOLVED:
-> > +       case RDMA_CM_EVENT_ROUTE_RESOLVED:
-> > +               info->ri_rc =3D 0;
-> > +               complete(&info->ri_done);
-> > +               break;
-> > +
-> > +       case RDMA_CM_EVENT_ADDR_ERROR:
-> > +               info->ri_rc =3D -EHOSTUNREACH;
-> > +               complete(&info->ri_done);
-> > +               break;
-> > +
-> > +       case RDMA_CM_EVENT_ROUTE_ERROR:
-> > +               info->ri_rc =3D -ENETUNREACH;
-> > +               complete(&info->ri_done);
-> > +               break;
-> > +
-> > +       case RDMA_CM_EVENT_ESTABLISHED:
-> > +       case RDMA_CM_EVENT_CONNECT_ERROR:
-> > +       case RDMA_CM_EVENT_UNREACHABLE:
-> > +       case RDMA_CM_EVENT_REJECTED:
-> > +       case RDMA_CM_EVENT_DEVICE_REMOVAL:
-> > +               log_rdma_event("connected event=3D%d\n", event->event);
-> > +               info->connect_state =3D event->event;
-> > +               break;
-> > +
-> > +       case RDMA_CM_EVENT_DISCONNECTED:
-> > +               break;
-> > +
-> > +       default:
-> > +               break;
-> > +       }
-> > +
-> > +       return 0;
-> > +}
->=20
-> This code looks a lot like the connection stuff in the NFS/RDMA RPC trans=
-port.
-> Does your code have the same needs? If so, you might consider moving this
-> to a common RDMA handler.
+--ECq4buv9FHFDGCf3Udt3tH5PHNLRofpC2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
->=20
-> > +/* Upcall from RDMA QP */
-> > +static void
-> > +cifs_rdma_qp_async_error_upcall(struct ib_event *event, void
-> > +*context) {
-> > +       struct cifs_rdma_info *info =3D context;
-> > +       log_rdma_event("%s on device %s info %p\n",
-> > +               ib_event_msg(event->event), event->device->name,
-> > +info);
-> > +
-> > +       switch (event->event)
-> > +       {
-> > +       case IB_EVENT_CQ_ERR:
-> > +       case IB_EVENT_QP_FATAL:
-> > +       case IB_EVENT_QP_REQ_ERR:
-> > +       case IB_EVENT_QP_ACCESS_ERR:
-> > +
-> > +       default:
-> > +               break;
-> > +       }
-> > +}
->=20
-> Ditto. But, what's up with the empty switch(event->event) processing?
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
 
-I have changed to code to disconnect RDMA connection on QP errors.
+iQIcBAEBAgAGBQJZpkokAAoJEA219WEoab1WmDcP/iueqmtLcz6B1a5QmFJq/GlJ
+QTY+dAC0abylcjKEfQ9JoUkWRIyL3OsXB106KwaaQ2IZ6Tx0xgqblENGp8fkmEgb
+tT/4XpvDUB4ZTApUXZJkfrb/UXum/CL7HlU44dhyrmC/pvNEGr76EH9ZXYsMrPQq
+JWr2JmX3Igvuj769RGkgbx7ASBmo2aWIuYdkzu8n3yB9yg43EQfQFEBRzRqWmFEF
+RvtXTa200hYAHiyC1J/btPJ4S9OpGtKJySUnyQ0e1bDwPMusJqkMrPDm94mRdlcv
+Jd3r1S/VS4cW6fPPbLRyL8Dub8kVXlmvjeOUfrET88dbbwWdLEVMJzGntDA0woOo
+6kLQs3T8PDGx7psLF00ycrjRLNWO6/YVg5FU+fQ994weytNRnB8Ir/9WTBg7l+mw
+rLXOou8SnxMN/9lYTWx/LLVXeh+bGJQwyieKM9DvRjm9SUHsV0kX+bMQgxIcZd5q
+2oGUJsF2TdxLpXNaruiJYpHpB4X8pNvgB2m1cN9blMYdozST1zNQVYJyHrMfJglN
+DbOPnL2jjMCeQauKR1ZPF/DYlhh60ncPZg/0WsBFsvzUNDjWjuqHpP8prbJLxqAq
+uxxHCQRYzF3teJ0lhNeP3BosX+QQogOZBqKE29/f546JEpTTe8rRV5ilb63R2NlK
+ymi6CzOulXfXThVnK1zo
+=Kfwr
+-----END PGP SIGNATURE-----
 
-
->=20
-> > +static struct rdma_cm_id* cifs_rdma_create_id(
-> > +               struct cifs_rdma_info *info, struct sockaddr *dstaddr)
-> > +{
-> ...
-> > +       log_rdma_event("connecting to IP %pI4 port %d\n",
-> > +               &addr_in->sin_addr, ntohs(addr_in->sin_port));
-> >... and then...
-> > +       if (dstaddr->sa_family =3D=3D AF_INET6)
-> > +               sport =3D &((struct sockaddr_in6 *)dstaddr)->sin6_port;
-> > +       else
-> > +               sport =3D &((struct sockaddr_in *)dstaddr)->sin_port;
-> > +
-> > +       *sport =3D htons(445);
-> ...and
-> > +out:
-> > +       // try port number 5445 if port 445 doesn't work
-> > +       if (*sport =3D=3D htons(445)) {
-> > +               *sport =3D htons(5445);
-> > +               goto try_again;
-> > +       }
->=20
-> Suggest rearranging the log_rdma_event() call to reflect reality.
->=20
-> The IANA-assigned port for SMB Direct is 5445, and port 445 will be liste=
-ning
-> on TCP. Should you really be probing that port before 5445?
-> I suggest not doing so unconditionally.
-
-This part is reworked in V3 to behave as you suggested.
-
->=20
-> > +struct cifs_rdma_info* cifs_create_rdma_session(
-> > +       struct TCP_Server_Info *server, struct sockaddr *dstaddr) {
-> > ...
-> > +       int max_pending =3D receive_credit_max + send_credit_target;
-> >...
-> > +       if (max_pending > info->id->device->attrs.max_cqe ||
-> > +           max_pending > info->id->device->attrs.max_qp_wr) {
-> > +               log_rdma_event("consider lowering receive_credit_max an=
-d "
-> > +                       "send_credit_target. Possible CQE overrun, devi=
-ce "
-> > +                       "reporting max_cpe %d max_qp_wr %d\n",
-> > +                       info->id->device->attrs.max_cqe,
-> > +                       info->id->device->attrs.max_qp_wr);
-> > +               goto out2;
-> > +       }
->=20
-> I don't understand this. Why are you directing both Receive and Send
-> completions to the same CQ, won't that make it very hard to manage
-> completions and their interrupts? Also, what device(s) have you seen trig=
-ger
-> this log? CQ's are generally allowed to be quite large.
-
-I have moved them to separate completion queues in V3.
-
->=20
-> > +       conn_param.responder_resources =3D 32;
-> > +       if (info->id->device->attrs.max_qp_rd_atom < 32)
-> > +               conn_param.responder_resources =3D
-> > +                       info->id->device->attrs.max_qp_rd_atom;
-> > +       conn_param.retry_count =3D 6;
-> > +       conn_param.rnr_retry_count =3D 6;
-> > +       conn_param.flow_control =3D 0;
->=20
-> These choices warrant explanation. 32 responder resources is on the large
-> side for most datacenter networks. And because of SMB Direct's credits, w=
-hy
-> is RNR_retry not simply zero?
->=20
-
-Those have been fixed. On Mellanox ConnectX3, the attrs.max_qp_rd_atom is 1=
-6. So I choose a default value 32 to work with hardware that can potentiall=
-y support more responder resources.
+--ECq4buv9FHFDGCf3Udt3tH5PHNLRofpC2--
