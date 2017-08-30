@@ -1,59 +1,70 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [Patch v3 12/19] CIFS: SMBD: Fix the definition for SMB2_CHANNEL_RDMA_V1_INVALIDATE
-Date: Tue, 29 Aug 2017 17:50:21 -0700
-Message-ID: <CAKywueS4=RzCyodOYKDPEWvRrgpwsAX+s+v2KwfbrJWDTy10qg@mail.gmail.com>
-References: <20170829192915.26251-1-longli@exchange.microsoft.com> <20170829192915.26251-13-longli@exchange.microsoft.com>
+From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Subject: RE: [Patch v3 12/19] CIFS: SMBD: Fix the definition for
+ SMB2_CHANNEL_RDMA_V1_INVALIDATE
+Date: Wed, 30 Aug 2017 02:11:42 +0000
+Message-ID: <MWHPR21MB01901F1BA3D49D026C6B5C55CE9C0@MWHPR21MB0190.namprd21.prod.outlook.com>
+References: <20170829192915.26251-1-longli@exchange.microsoft.com>
+ <20170829192915.26251-13-longli@exchange.microsoft.com>
+ <CAKywueS4=RzCyodOYKDPEWvRrgpwsAX+s+v2KwfbrJWDTy10qg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
         linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
         samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
         Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-        Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+        "linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+        "Tom Talpey" <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170829192915.26251-13-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+In-Reply-To: <CAKywueS4=RzCyodOYKDPEWvRrgpwsAX+s+v2KwfbrJWDTy10qg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2017-08-29 12:29 GMT-07:00 Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>:
-> From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
->
-> The channel value for requesting server remote invalidating local memory
-> registration should be 0x00000002
->
-> Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> ---
->  fs/cifs/smb2pdu.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-> index 18700fd..0417a36 100644
-> --- a/fs/cifs/smb2pdu.h
-> +++ b/fs/cifs/smb2pdu.h
-> @@ -832,7 +832,7 @@ struct smb2_flush_rsp {
->  /* Channel field for read and write: exactly one of following flags can be set*/
->  #define SMB2_CHANNEL_NONE              0x00000000
->  #define SMB2_CHANNEL_RDMA_V1           0x00000001 /* SMB3 or later */
-> -#define SMB2_CHANNEL_RDMA_V1_INVALIDATE 0x00000001 /* SMB3.02 or later */
-> +#define SMB2_CHANNEL_RDMA_V1_INVALIDATE 0x00000002 /* SMB3.02 or later */
->
->  /* SMB2 read request without RFC1001 length at the beginning */
->  struct smb2_read_plain_req {
-> --
-> 2.7.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-If this is a bug in the existing code, this patch should go at the
-very beginning of the series.
-
---
-Best regards,
-Pavel Shilovsky
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGF2ZWwgU2hpbG92c2t5
+IFttYWlsdG86cGlhc3RyeXl5QGdtYWlsLmNvbV0NCj4gU2VudDogVHVlc2RheSwgQXVndXN0IDI5
+LCAyMDE3IDU6NTAgUE0NCj4gVG86IExvbmcgTGkgPGxvbmdsaUBtaWNyb3NvZnQuY29tPg0KPiBD
+YzogU3RldmUgRnJlbmNoIDxzZnJlbmNoQHNhbWJhLm9yZz47IGxpbnV4LWNpZnMgPGxpbnV4LQ0K
+PiBjaWZzQHZnZXIua2VybmVsLm9yZz47IHNhbWJhLXRlY2huaWNhbCA8c2FtYmEtdGVjaG5pY2Fs
+QGxpc3RzLnNhbWJhLm9yZz47DQo+IEtlcm5lbCBNYWlsaW5nIExpc3QgPGxpbnV4LWtlcm5lbEB2
+Z2VyLmtlcm5lbC5vcmc+OyBsaW51eC0NCj4gcmRtYUB2Z2VyLmtlcm5lbC5vcmc7IENocmlzdG9w
+aCBIZWxsd2lnIDxoY2hAaW5mcmFkZWFkLm9yZz47IFRvbSBUYWxwZXkNCj4gPHR0YWxwZXlAbWlj
+cm9zb2Z0LmNvbT47IE1hdHRoZXcgV2lsY294IDxtYXdpbGNveEBtaWNyb3NvZnQuY29tPjsNCj4g
+TG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUGF0Y2ggdjMg
+MTIvMTldIENJRlM6IFNNQkQ6IEZpeCB0aGUgZGVmaW5pdGlvbiBmb3INCj4gU01CMl9DSEFOTkVM
+X1JETUFfVjFfSU5WQUxJREFURQ0KPiANCj4gMjAxNy0wOC0yOSAxMjoyOSBHTVQtMDc6MDAgTG9u
+ZyBMaSA8bG9uZ2xpQGV4Y2hhbmdlLm1pY3Jvc29mdC5jb20+Og0KPiA+IEZyb206IExvbmcgTGkg
+PGxvbmdsaUBtaWNyb3NvZnQuY29tPg0KPiA+DQo+ID4gVGhlIGNoYW5uZWwgdmFsdWUgZm9yIHJl
+cXVlc3Rpbmcgc2VydmVyIHJlbW90ZSBpbnZhbGlkYXRpbmcgbG9jYWwNCj4gPiBtZW1vcnkgcmVn
+aXN0cmF0aW9uIHNob3VsZCBiZSAweDAwMDAwMDAyDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBM
+b25nIExpIDxsb25nbGlAbWljcm9zb2Z0LmNvbT4NCj4gPiAtLS0NCj4gPiAgZnMvY2lmcy9zbWIy
+cGR1LmggfCAyICstDQo+ID4gIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxl
+dGlvbigtKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2ZzL2NpZnMvc21iMnBkdS5oIGIvZnMvY2lm
+cy9zbWIycGR1LmggaW5kZXgNCj4gPiAxODcwMGZkLi4wNDE3YTM2IDEwMDY0NA0KPiA+IC0tLSBh
+L2ZzL2NpZnMvc21iMnBkdS5oDQo+ID4gKysrIGIvZnMvY2lmcy9zbWIycGR1LmgNCj4gPiBAQCAt
+ODMyLDcgKzgzMiw3IEBAIHN0cnVjdCBzbWIyX2ZsdXNoX3JzcCB7DQo+ID4gIC8qIENoYW5uZWwg
+ZmllbGQgZm9yIHJlYWQgYW5kIHdyaXRlOiBleGFjdGx5IG9uZSBvZiBmb2xsb3dpbmcgZmxhZ3Mg
+Y2FuIGJlDQo+IHNldCovDQo+ID4gICNkZWZpbmUgU01CMl9DSEFOTkVMX05PTkUgICAgICAgICAg
+ICAgIDB4MDAwMDAwMDANCj4gPiAgI2RlZmluZSBTTUIyX0NIQU5ORUxfUkRNQV9WMSAgICAgICAg
+ICAgMHgwMDAwMDAwMSAvKiBTTUIzIG9yIGxhdGVyICovDQo+ID4gLSNkZWZpbmUgU01CMl9DSEFO
+TkVMX1JETUFfVjFfSU5WQUxJREFURSAweDAwMDAwMDAxIC8qIFNNQjMuMDINCj4gb3INCj4gPiBs
+YXRlciAqLw0KPiA+ICsjZGVmaW5lIFNNQjJfQ0hBTk5FTF9SRE1BX1YxX0lOVkFMSURBVEUgMHgw
+MDAwMDAwMiAvKg0KPiBTTUIzLjAyIG9yDQo+ID4gK2xhdGVyICovDQo+ID4NCj4gPiAgLyogU01C
+MiByZWFkIHJlcXVlc3Qgd2l0aG91dCBSRkMxMDAxIGxlbmd0aCBhdCB0aGUgYmVnaW5uaW5nICov
+DQo+ID4gc3RydWN0IHNtYjJfcmVhZF9wbGFpbl9yZXEgew0KPiA+IC0tDQo+ID4gMi43LjQNCj4g
+Pg0KPiA+IC0tDQo+ID4gVG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxp
+bmUgInVuc3Vic2NyaWJlIGxpbnV4LWNpZnMiDQo+ID4gaW4gdGhlIGJvZHkgb2YgYSBtZXNzYWdl
+IHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcgTW9yZQ0KPiBtYWpvcmRvbW8NCj4gPiBpbmZv
+IGF0DQo+ID4NCj4gaHR0cHM6Ly9uYTAxLnNhZmVsaW5rcy5wcm90ZWN0aW9uLm91dGxvb2suY29t
+Lz91cmw9aHR0cCUzQSUyRiUyRnZnZXIuaw0KPiA+IGVybmVsLm9yZyUyRm1ham9yZG9tby0NCj4g
+aW5mby5odG1sJmRhdGE9MDIlN0MwMSU3Q2xvbmdsaSU0MG1pY3Jvc29mdC5jb20lDQo+ID4NCj4g
+N0M5YTExMDY2YTJjM2I0MDJkYTA5ZjA4ZDRlZjQxMTkyNyU3QzcyZjk4OGJmODZmMTQxYWY5MWFi
+MmQ3Y2QwMTFkDQo+IGI0NyUNCj4gPg0KPiA3QzElN0MwJTdDNjM2Mzk2NTEwMjUzMzc2NjU5JnNk
+YXRhPTBmTHdIY2RiT0xTT3NiS2o1UFoyeXJKYXAlMkINCj4gTjBaQiUyQg0KPiA+IFRHYkZpbVBN
+cWN4NCUzRCZyZXNlcnZlZD0wDQo+IA0KPiBJZiB0aGlzIGlzIGEgYnVnIGluIHRoZSBleGlzdGlu
+ZyBjb2RlLCB0aGlzIHBhdGNoIHNob3VsZCBnbyBhdCB0aGUgdmVyeSBiZWdpbm5pbmcNCj4gb2Yg
+dGhlIHNlcmllcy4NCg0KT2theSwgSSB3aWxsIHJlb3JkZXIgdGhlIHBhdGNoLg0KDQo+IA0KPiAt
+LQ0KPiBCZXN0IHJlZ2FyZHMsDQo+IFBhdmVsIFNoaWxvdnNreQ0K
