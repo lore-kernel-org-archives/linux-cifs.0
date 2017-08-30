@@ -1,79 +1,48 @@
-From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: RE: [Patch v3 11/19] CIFS: SMBD: Define memory registration for I/O
- data
-Date: Wed, 30 Aug 2017 02:12:32 +0000
-Message-ID: <MWHPR21MB0190E1D1698D183A6F0E8AA7CE9C0@MWHPR21MB0190.namprd21.prod.outlook.com>
-References: <20170829192915.26251-1-longli@exchange.microsoft.com>
- <20170829192915.26251-12-longli@exchange.microsoft.com>
- <CAKywueSMXWN1tsHbFDGK9d9STL1qcC9G_VMfV2hz9YZhxhhH+w@mail.gmail.com>
+From: Long Li <longli@microsoft.com>
+Subject: RE: [[PATCH v1] 15/37] [CIFS] SMBD: Post a SMBD data transfer message
+ with data payload
+Date: Wed, 30 Aug 2017 02:17:56 +0000
+Message-ID: <MWHPR21MB0190E9E8303EADE6A6C84D90CE9C0@MWHPR21MB0190.namprd21.prod.outlook.com>
+References: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
+ <1501704648-20159-16-git-send-email-longli@exchange.microsoft.com>
+ <20170813102345.GG17287@infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-        Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-        "Tom Talpey" <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueSMXWN1tsHbFDGK9d9STL1qcC9G_VMfV2hz9YZhxhhH+w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Cc: Steve French <sfrench@samba.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Christoph Hellwig <hch@infradead.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20170813102345.GG17287@infradead.org>
 Content-Language: en-US
-Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGF2ZWwgU2hpbG92c2t5
-IFttYWlsdG86cGlhc3RyeXl5QGdtYWlsLmNvbV0NCj4gU2VudDogVHVlc2RheSwgQXVndXN0IDI5
-LCAyMDE3IDU6NDkgUE0NCj4gVG86IExvbmcgTGkgPGxvbmdsaUBtaWNyb3NvZnQuY29tPg0KPiBD
-YzogU3RldmUgRnJlbmNoIDxzZnJlbmNoQHNhbWJhLm9yZz47IGxpbnV4LWNpZnMgPGxpbnV4LQ0K
-PiBjaWZzQHZnZXIua2VybmVsLm9yZz47IHNhbWJhLXRlY2huaWNhbCA8c2FtYmEtdGVjaG5pY2Fs
-QGxpc3RzLnNhbWJhLm9yZz47DQo+IEtlcm5lbCBNYWlsaW5nIExpc3QgPGxpbnV4LWtlcm5lbEB2
-Z2VyLmtlcm5lbC5vcmc+OyBsaW51eC0NCj4gcmRtYUB2Z2VyLmtlcm5lbC5vcmc7IENocmlzdG9w
-aCBIZWxsd2lnIDxoY2hAaW5mcmFkZWFkLm9yZz47IFRvbSBUYWxwZXkNCj4gPHR0YWxwZXlAbWlj
-cm9zb2Z0LmNvbT47IE1hdHRoZXcgV2lsY294IDxtYXdpbGNveEBtaWNyb3NvZnQuY29tPjsNCj4g
-TG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUGF0Y2ggdjMg
-MTEvMTldIENJRlM6IFNNQkQ6IERlZmluZSBtZW1vcnkgcmVnaXN0cmF0aW9uIGZvciBJL08NCj4g
-ZGF0YQ0KPiANCj4gMjAxNy0wOC0yOSAxMjoyOSBHTVQtMDc6MDAgTG9uZyBMaSA8bG9uZ2xpQGV4
-Y2hhbmdlLm1pY3Jvc29mdC5jb20+Og0KPiA+IEZyb206IExvbmcgTGkgPGxvbmdsaUBtaWNyb3Nv
-ZnQuY29tPg0KPiA+DQo+ID4gVG8gcHJlcGFyZSBmb3IgUkRNQSByZWFkL3dyaXRlIHVzaW5nIG1l
-bW9yeSByZWdpc3RyYXRpb24sIGFkZCBtZW1vcnkNCj4gPiByZWdpc3RhcnRpb24gcG9pbnRlcnMg
-dG8gdXBwZXIgbGF5ZXIgZGF0YSBJL08gY29udGV4dC4NCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6
-IExvbmcgTGkgPGxvbmdsaUBtaWNyb3NvZnQuY29tPg0KPiA+IC0tLQ0KPiA+ICBmcy9jaWZzL2Np
-ZnNnbG9iLmggfCAyICsrDQo+ID4gIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKykNCj4g
-Pg0KPiA+IGRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNnbG9iLmggYi9mcy9jaWZzL2NpZnNnbG9i
-LmggaW5kZXgNCj4gPiBkYzU0MDRkLi5kY2QyYjYzIDEwMDY0NA0KPiA+IC0tLSBhL2ZzL2NpZnMv
-Y2lmc2dsb2IuaA0KPiA+ICsrKyBiL2ZzL2NpZnMvY2lmc2dsb2IuaA0KPiA+IEBAIC0xMTY2LDYg
-KzExNjYsNyBAQCBzdHJ1Y3QgY2lmc19yZWFkZGF0YSB7DQo+ID4gICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBzdHJ1Y3QgY2lmc19yZWFkZGF0YSAqcmRhdGEsDQo+ID4gICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBzdHJ1Y3QgaW92X2l0ZXIgKml0ZXIpOw0KPiA+ICAgICAg
-ICAgc3RydWN0IGt2ZWMgICAgICAgICAgICAgICAgICAgICBpb3ZbMl07DQo+ID4gKyAgICAgICBz
-dHJ1Y3Qgc21iZF9tciAgICAgICAgICAgICAgICAgICptcjsNCj4gPiAgICAgICAgIHVuc2lnbmVk
-IGludCAgICAgICAgICAgICAgICAgICAgcGFnZXN6Ow0KPiA+ICAgICAgICAgdW5zaWduZWQgaW50
-ICAgICAgICAgICAgICAgICAgICB0YWlsc3o7DQo+ID4gICAgICAgICB1bnNpZ25lZCBpbnQgICAg
-ICAgICAgICAgICAgICAgIGNyZWRpdHM7DQo+ID4gQEAgLTExODgsNiArMTE4OSw3IEBAIHN0cnVj
-dCBjaWZzX3dyaXRlZGF0YSB7DQo+ID4gICAgICAgICBwaWRfdCAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIHBpZDsNCj4gPiAgICAgICAgIHVuc2lnbmVkIGludCAgICAgICAgICAgICAgICAgICAg
-Ynl0ZXM7DQo+ID4gICAgICAgICBpbnQgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJlc3Vs
-dDsNCj4gPiArICAgICAgIHN0cnVjdCBzbWJkX21yICAgICAgICAgICAgICAgICAgKm1yOw0KPiA+
-ICAgICAgICAgdW5zaWduZWQgaW50ICAgICAgICAgICAgICAgICAgICBwYWdlc3o7DQo+ID4gICAg
-ICAgICB1bnNpZ25lZCBpbnQgICAgICAgICAgICAgICAgICAgIHRhaWxzejsNCj4gPiAgICAgICAg
-IHVuc2lnbmVkIGludCAgICAgICAgICAgICAgICAgICAgY3JlZGl0czsNCj4gPiAtLQ0KPiA+IDIu
-Ny40DQo+ID4NCj4gPiAtLQ0KPiA+IFRvIHVuc3Vic2NyaWJlIGZyb20gdGhpcyBsaXN0OiBzZW5k
-IHRoZSBsaW5lICJ1bnN1YnNjcmliZSBsaW51eC1jaWZzIg0KPiA+IGluIHRoZSBib2R5IG9mIGEg
-bWVzc2FnZSB0byBtYWpvcmRvbW9Admdlci5rZXJuZWwub3JnIE1vcmUNCj4gbWFqb3Jkb21vDQo+
-ID4gaW5mbyBhdA0KPiA+DQo+IGh0dHBzOi8vbmEwMS5zYWZlbGlua3MucHJvdGVjdGlvbi5vdXRs
-b29rLmNvbS8/dXJsPWh0dHAlM0ElMkYlMkZ2Z2VyLmsNCj4gPiBlcm5lbC5vcmclMkZtYWpvcmRv
-bW8tDQo+IGluZm8uaHRtbCZkYXRhPTAyJTdDMDElN0Nsb25nbGklNDBtaWNyb3NvZnQuY29tJQ0K
-PiA+DQo+IDdDMWEwMmM2MTU5MDZlNDY0ODgzNWMwOGQ0ZWY0MGU2NTUlN0M3MmY5ODhiZjg2ZjE0
-MWFmOTFhYjJkN2NkMDExZA0KPiBiNDclDQo+ID4NCj4gN0MxJTdDMCU3QzYzNjM5NjUwOTM5NDAx
-ODQ0OSZzZGF0YT15anZ0M3hQWVBNbUJwOG5SaUFDJTJGWVVPT3MNCj4gZ2FudlBkJTINCj4gPiBG
-ZjZZMXVadGJxR1UlM0QmcmVzZXJ2ZWQ9MA0KPiANCj4gVGhlIHNhbWUgdGhpbmc6IGxldCdzIG5v
-dCBhZGQgc3RydWN0dXJlIGZpZWxkcyB0aGF0IHRoZSBjb2RlIGRvZXNuJ3QgZG8NCj4gYW55dGhp
-bmcgd2l0aC4NCg0KT2theS4gSSB3aWxsIGZvbGQgdGhlIHBhdGNoIGludG8gcmVsZXZhbnQgcGF0
-Y2hlcy4NCg0KPiANCj4gLS0NCj4gQmVzdCByZWdhcmRzLA0KPiBQYXZlbCBTaGlsb3Zza3kNCg==
---
-To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> -----Original Message-----
+> From: Christoph Hellwig [mailto:hch@infradead.org]
+> Sent: Sunday, August 13, 2017 3:24 AM
+> To: Long Li <longli@microsoft.com>
+> Cc: Steve French <sfrench@samba.org>; linux-cifs@vger.kernel.org; samba-
+> technical@lists.samba.org; linux-kernel@vger.kernel.org; Long Li
+> <longli@microsoft.com>
+> Subject: Re: [[PATCH v1] 15/37] [CIFS] SMBD: Post a SMBD data transfer
+> message with data payload
+>=20
+> You can always get the struct page for kernel allocations using virt_to_p=
+age
+> (or vmalloc_to_page, but this code would not handle the vmalloc case eith=
+er),
+> so I don't think you need this helper and can always use the one added in=
+ the
+> previous patch.
+
+I partially addressed this issue in the V3 patch. Most of the duplicate cod=
+e on sending path is merged.
+
+The difficulty with translating the buffer to pages is that: I don't know h=
+ow many pages will be translated, and how many struct page I need to alloca=
+te in advance to hold them. I try to avoid memory allocation in the I/O pat=
+h as much as possible. So I keep two functions of sending data: one for buf=
+fer and one for pages.
