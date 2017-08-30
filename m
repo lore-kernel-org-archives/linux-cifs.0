@@ -1,118 +1,203 @@
-From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: RE: [[PATCH v1] 18/37] [CIFS] SMBD: Implement API for upper layer to
- send data
-Date: Wed, 30 Aug 2017 02:30:04 +0000
-Message-ID: <MWHPR21MB0190E90448DDA01067016674CE9C0@MWHPR21MB0190.namprd21.prod.outlook.com>
+From: Long Li <longli@microsoft.com>
+Subject: RE: [[PATCH v1] 05/37] [CIFS] SMBD: Implement API for upper layer to
+ create SMBD transport and establish RDMA connection
+Date: Wed, 30 Aug 2017 02:35:54 +0000
+Message-ID: <MWHPR21MB0190CB075B933236AF7C5810CE9C0@MWHPR21MB0190.namprd21.prod.outlook.com>
 References: <1501704648-20159-1-git-send-email-longli@exchange.microsoft.com>
- <1501704648-20159-19-git-send-email-longli@exchange.microsoft.com>
- <CY4PR21MB01827F735F570CCAECD5AD8BA08C0@CY4PR21MB0182.namprd21.prod.outlook.com>
+ <1501704648-20159-6-git-send-email-longli@exchange.microsoft.com>
+ <CY4PR21MB018254FE747A2FCEB0650090A08C0@CY4PR21MB0182.namprd21.prod.outlook.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-To: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-        "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CY4PR21MB01827F735F570CCAECD5AD8BA08C0-kUhI0YP1syo7ifcEnHlXec1VXTxX1y3OvxpqHgZTriW3zl9H0oFU5g@public.gmane.org>
+To: Tom Talpey <ttalpey@microsoft.com>,
+        Steve French <sfrench@samba.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CY4PR21MB018254FE747A2FCEB0650090A08C0@CY4PR21MB0182.namprd21.prod.outlook.com>
 Content-Language: en-US
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
 
 
 > -----Original Message-----
 > From: Tom Talpey
-> Sent: Monday, August 14, 2017 1:44 PM
-> To: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>; Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>;
-> linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org; linux-
-> kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> Subject: RE: [[PATCH v1] 18/37] [CIFS] SMBD: Implement API for upper laye=
+> Sent: Monday, August 14, 2017 12:55 PM
+> To: Long Li <longli@microsoft.com>; Steve French <sfrench@samba.org>;
+> linux-cifs@vger.kernel.org; samba-technical@lists.samba.org; linux-
+> kernel@vger.kernel.org; linux-rdma@vger.kernel.org
+> Subject: RE: [[PATCH v1] 05/37] [CIFS] SMBD: Implement API for upper laye=
 r
-> to send data
+> to create SMBD transport and establish RDMA connection
 >=20
 > > -----Original Message-----
-> > From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [mailto:linux-cifs-
-> > owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org] On Behalf Of Long Li
+> > From: linux-cifs-owner@vger.kernel.org [mailto:linux-cifs-
+> > owner@vger.kernel.org] On Behalf Of Long Li
 > > Sent: Wednesday, August 2, 2017 4:10 PM
-> > To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>; linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org;
-> > samba- technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org; linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> > Subject: [[PATCH v1] 18/37] [CIFS] SMBD: Implement API for upper layer
-> > to send data
+> > To: Steve French <sfrench@samba.org>; linux-cifs@vger.kernel.org;
+> > samba- technical@lists.samba.org; linux-kernel@vger.kernel.org
+> > Cc: Long Li <longli@microsoft.com>
+> > Subject: [[PATCH v1] 05/37] [CIFS] SMBD: Implement API for upper layer
+> > to create SMBD transport and establish RDMA connection
 > >
-> > +/*
-> > + * Write data to transport
-> > + * Each rqst is transported as a SMBDirect payload
-> > + * rqst: the data to write
-> > + * return value: 0 if successfully write, otherwise error code  */
-> > +int cifs_rdma_write(struct cifs_rdma_info *info, struct smb_rqst
-> > +*rqst) {
+> > From: Long Li <longli@microsoft.com>
+> >
+> > Implement the code for connecting to SMBD server. The client and
+> > server are connected using RC Queue Pair over RDMA API, which
+> > suppports Infiniband, RoCE and iWARP. Upper layer code can call
+> > cifs_create_rdma_session to establish a SMBD RDMA connection.
+> >
+> > +/* Upcall from RDMA CM */
+> > +static int cifs_rdma_conn_upcall(
+> > +               struct rdma_cm_id *id, struct rdma_cm_event *event) {
+> > +       struct cifs_rdma_info *info =3D id->context;
+> > +
+> > +       log_rdma_event("event=3D%d status=3D%d\n", event->event,
+> > + event->status);
+> > +
+> > +       switch (event->event) {
+> > +       case RDMA_CM_EVENT_ADDR_RESOLVED:
+> > +       case RDMA_CM_EVENT_ROUTE_RESOLVED:
+> > +               info->ri_rc =3D 0;
+> > +               complete(&info->ri_done);
+> > +               break;
+> > +
+> > +       case RDMA_CM_EVENT_ADDR_ERROR:
+> > +               info->ri_rc =3D -EHOSTUNREACH;
+> > +               complete(&info->ri_done);
+> > +               break;
+> > +
+> > +       case RDMA_CM_EVENT_ROUTE_ERROR:
+> > +               info->ri_rc =3D -ENETUNREACH;
+> > +               complete(&info->ri_done);
+> > +               break;
+> > +
+> > +       case RDMA_CM_EVENT_ESTABLISHED:
+> > +       case RDMA_CM_EVENT_CONNECT_ERROR:
+> > +       case RDMA_CM_EVENT_UNREACHABLE:
+> > +       case RDMA_CM_EVENT_REJECTED:
+> > +       case RDMA_CM_EVENT_DEVICE_REMOVAL:
+> > +               log_rdma_event("connected event=3D%d\n", event->event);
+> > +               info->connect_state =3D event->event;
+> > +               break;
+> > +
+> > +       case RDMA_CM_EVENT_DISCONNECTED:
+> > +               break;
+> > +
+> > +       default:
+> > +               break;
+> > +       }
+> > +
+> > +       return 0;
+> > +}
 >=20
-> !!!
-> This is a VERY confusing name. It is not sending an RDMA Write, which wil=
-l
-> confuse any RDMA-enlightened reader. It's performing an RDMA Send, so
-> that name is perhaps one possibility.
-
-I have fixed that in v3.
+> This code looks a lot like the connection stuff in the NFS/RDMA RPC trans=
+port.
+> Does your code have the same needs? If so, you might consider moving this
+> to a common RDMA handler.
 
 >=20
-> > +       if (info->transport_status !=3D CIFS_RDMA_CONNECTED) {
-> > +               log_cifs_write("disconnected returning -EIO\n");
-> > +               return -EIO;
+> > +/* Upcall from RDMA QP */
+> > +static void
+> > +cifs_rdma_qp_async_error_upcall(struct ib_event *event, void
+> > +*context) {
+> > +       struct cifs_rdma_info *info =3D context;
+> > +       log_rdma_event("%s on device %s info %p\n",
+> > +               ib_event_msg(event->event), event->device->name,
+> > +info);
+> > +
+> > +       switch (event->event)
+> > +       {
+> > +       case IB_EVENT_CQ_ERR:
+> > +       case IB_EVENT_QP_FATAL:
+> > +       case IB_EVENT_QP_REQ_ERR:
+> > +       case IB_EVENT_QP_ACCESS_ERR:
+> > +
+> > +       default:
+> > +               break;
+> > +       }
+> > +}
+>=20
+> Ditto. But, what's up with the empty switch(event->event) processing?
+
+I have changed to code to disconnect RDMA connection on QP errors.
+
+
+>=20
+> > +static struct rdma_cm_id* cifs_rdma_create_id(
+> > +               struct cifs_rdma_info *info, struct sockaddr *dstaddr)
+> > +{
+> ...
+> > +       log_rdma_event("connecting to IP %pI4 port %d\n",
+> > +               &addr_in->sin_addr, ntohs(addr_in->sin_port));
+> >... and then...
+> > +       if (dstaddr->sa_family =3D=3D AF_INET6)
+> > +               sport =3D &((struct sockaddr_in6 *)dstaddr)->sin6_port;
+> > +       else
+> > +               sport =3D &((struct sockaddr_in *)dstaddr)->sin_port;
+> > +
+> > +       *sport =3D htons(445);
+> ...and
+> > +out:
+> > +       // try port number 5445 if port 445 doesn't work
+> > +       if (*sport =3D=3D htons(445)) {
+> > +               *sport =3D htons(5445);
+> > +               goto try_again;
 > > +       }
 >=20
-> Isn't this optimizing the error case? There's no guarantee it's still con=
-nected
-> by the time the following request construction occurs. Why not just proce=
-ed
-> without the check?
+> Suggest rearranging the log_rdma_event() call to reflect reality.
+>=20
+> The IANA-assigned port for SMB Direct is 5445, and port 445 will be liste=
+ning
+> on TCP. Should you really be probing that port before 5445?
+> I suggest not doing so unconditionally.
 
-I rearranged the shutdown logic in v3. Checking for transport status is sti=
-ll needed, but it checks after checking for other counters on pending activ=
-ities.
-
-For example, on sending code:
-
-info->smbd_send_pending++;
-if (info->transport_status !=3D SMBD_CONNECTED) {
-        info->smbd_send_pending--;
-        wake_up(&info->wait_smbd_send_pending);       =20
-}
-
-On transport shutdown code:
-
-        info->transport_status =3D SMBD_DISCONNECTING;
-.......
-.......
-.......
-        log_rdma_event(INFO, "wait for all send to finish\n");
-        wait_event(info->wait_smbd_send_pending,
-                info->smbd_send_pending =3D=3D 0);
-
-It guarantees no sending code can enter transport after shutdown is finishe=
-d. Shutdown is running on a separate work queue, so it is needed.
+This part is reworked in V3 to behave as you suggested.
 
 >=20
-> > +       /* Strip the first 4 bytes MS-SMB2 section 2.1
-> > +        * they are used only for TCP transport */
-> > +       iov[0].iov_base =3D (char*)rqst->rq_iov[0].iov_base + 4;
-> > +       iov[0].iov_len =3D rqst->rq_iov[0].iov_len - 4;
-> > +       buflen +=3D iov[0].iov_len;
+> > +struct cifs_rdma_info* cifs_create_rdma_session(
+> > +       struct TCP_Server_Info *server, struct sockaddr *dstaddr) {
+> > ...
+> > +       int max_pending =3D receive_credit_max + send_credit_target;
+> >...
+> > +       if (max_pending > info->id->device->attrs.max_cqe ||
+> > +           max_pending > info->id->device->attrs.max_qp_wr) {
+> > +               log_rdma_event("consider lowering receive_credit_max an=
+d "
+> > +                       "send_credit_target. Possible CQE overrun, devi=
+ce "
+> > +                       "reporting max_cpe %d max_qp_wr %d\n",
+> > +                       info->id->device->attrs.max_cqe,
+> > +                       info->id->device->attrs.max_qp_wr);
+> > +               goto out2;
+> > +       }
 >=20
-> Ok, that layering choice in the cifs.ko client code needs to be corrected=
-. After
-> all, it will need to be RDMA-aware to build the SMB3 read/write channel
-> structures.
-> And, the code in cifs_post_send_data() is allocating and building a struc=
-ture
-> that could have been accounted for much earlier, avoiding the extra
-> overhead.
+> I don't understand this. Why are you directing both Receive and Send
+> completions to the same CQ, won't that make it very hard to manage
+> completions and their interrupts? Also, what device(s) have you seen trig=
+ger
+> this log? CQ's are generally allowed to be quite large.
+
+I have moved them to separate completion queues in V3.
+
 >=20
-> That change could happen later, the hack is mostly ok for now. But
-> something needs to be said in a comment.
+> > +       conn_param.responder_resources =3D 32;
+> > +       if (info->id->device->attrs.max_qp_rd_atom < 32)
+> > +               conn_param.responder_resources =3D
+> > +                       info->id->device->attrs.max_qp_rd_atom;
+> > +       conn_param.retry_count =3D 6;
+> > +       conn_param.rnr_retry_count =3D 6;
+> > +       conn_param.flow_control =3D 0;
 >=20
-> Tom.
+> These choices warrant explanation. 32 responder resources is on the large
+> side for most datacenter networks. And because of SMB Direct's credits, w=
+hy
+> is RNR_retry not simply zero?
+>=20
+
+Those have been fixed. On Mellanox ConnectX3, the attrs.max_qp_rd_atom is 1=
+6. So I choose a default value 32 to work with hardware that can potentiall=
+y support more responder resources.
