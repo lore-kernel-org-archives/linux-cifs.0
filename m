@@ -1,72 +1,66 @@
-From: Long Li <longli@microsoft.com>
-Subject: RE: [Patch v3 06/19] CIFS: SMBD: Reconnect to SMBDirect session
-Date: Tue, 29 Aug 2017 23:39:29 +0000
-Message-ID: <MWHPR21MB0190B83AC543344F00A90B33CE9F0@MWHPR21MB0190.namprd21.prod.outlook.com>
-References: <20170829192915.26251-1-longli@exchange.microsoft.com>
- <20170829192915.26251-7-longli@exchange.microsoft.com>
- <CAKywueT9qYnY1cXwtrc4HgRHMt27+JOJafpFTupwV45nViSQbw@mail.gmail.com>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [Patch v3 11/19] CIFS: SMBD: Define memory registration for I/O data
+Date: Tue, 29 Aug 2017 17:48:56 -0700
+Message-ID: <CAKywueSMXWN1tsHbFDGK9d9STL1qcC9G_VMfV2hz9YZhxhhH+w@mail.gmail.com>
+References: <20170829192915.26251-1-longli@exchange.microsoft.com> <20170829192915.26251-12-longli@exchange.microsoft.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Steve French <sfrench@samba.org>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        "Tom Talpey" <ttalpey@microsoft.com>,
-        Matthew Wilcox <mawilcox@microsoft.com>
-To: Pavel Shilovsky <piastryyy@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAKywueT9qYnY1cXwtrc4HgRHMt27+JOJafpFTupwV45nViSQbw@mail.gmail.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+        Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+        Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20170829192915.26251-12-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGF2ZWwgU2hpbG92c2t5
-IFttYWlsdG86cGlhc3RyeXl5QGdtYWlsLmNvbV0NCj4gU2VudDogVHVlc2RheSwgQXVndXN0IDI5
-LCAyMDE3IDQ6MTUgUE0NCj4gVG86IExvbmcgTGkgPGxvbmdsaUBtaWNyb3NvZnQuY29tPg0KPiBD
-YzogU3RldmUgRnJlbmNoIDxzZnJlbmNoQHNhbWJhLm9yZz47IGxpbnV4LWNpZnMgPGxpbnV4LQ0K
-PiBjaWZzQHZnZXIua2VybmVsLm9yZz47IHNhbWJhLXRlY2huaWNhbCA8c2FtYmEtdGVjaG5pY2Fs
-QGxpc3RzLnNhbWJhLm9yZz47DQo+IEtlcm5lbCBNYWlsaW5nIExpc3QgPGxpbnV4LWtlcm5lbEB2
-Z2VyLmtlcm5lbC5vcmc+OyBsaW51eC0NCj4gcmRtYUB2Z2VyLmtlcm5lbC5vcmc7IENocmlzdG9w
-aCBIZWxsd2lnIDxoY2hAaW5mcmFkZWFkLm9yZz47IFRvbSBUYWxwZXkNCj4gPHR0YWxwZXlAbWlj
-cm9zb2Z0LmNvbT47IE1hdHRoZXcgV2lsY294IDxtYXdpbGNveEBtaWNyb3NvZnQuY29tPjsNCj4g
-TG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUGF0Y2ggdjMg
-MDYvMTldIENJRlM6IFNNQkQ6IFJlY29ubmVjdCB0byBTTUJEaXJlY3Qgc2Vzc2lvbg0KPiANCj4g
-MjAxNy0wOC0yOSAxMjoyOSBHTVQtMDc6MDAgTG9uZyBMaSA8bG9uZ2xpQGV4Y2hhbmdlLm1pY3Jv
-c29mdC5jb20+Og0KPiA+IEZyb206IExvbmcgTGkgPGxvbmdsaUBtaWNyb3NvZnQuY29tPg0KPiA+
-DQo+ID4gRG8gYSByZWNvbm5lY3Qgb24gU01CRGlyZWN0IHdoZW4gaXQgaXMgdXNlZCBhcyB0aGUg
-Y29ubmVjdGlvbi4NCj4gPiBSZWNvbm5lY3QgY2FuIGhhcHBlbiBmb3IgbWFueSByZWFzb25zIGFu
-ZCBpdCdzIG1vc3RseSB0aGUgZGVjaXNpb24gb2YNCj4gPiB1cHBlciBsYXllciBTTUIyIG5vdCBT
-TUJEaXJlY3QuDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBMb25nIExpIDxsb25nbGlAbWljcm9z
-b2Z0LmNvbT4NCj4gPiAtLS0NCj4gPiAgZnMvY2lmcy9jb25uZWN0LmMgfCA2ICsrKysrLQ0KPiA+
-ICAxIGZpbGUgY2hhbmdlZCwgNSBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pDQo+ID4NCj4g
-PiBkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jb25uZWN0LmMgYi9mcy9jaWZzL2Nvbm5lY3QuYyBpbmRl
-eA0KPiA+IDQzYjRkNTQuLjM0MWEzZmQgMTAwNjQ0DQo+ID4gLS0tIGEvZnMvY2lmcy9jb25uZWN0
-LmMNCj4gPiArKysgYi9mcy9jaWZzL2Nvbm5lY3QuYw0KPiA+IEBAIC00MDksNyArNDA5LDExIEBA
-IGNpZnNfcmVjb25uZWN0KHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlcikNCj4gPg0KPiA+
-ICAgICAgICAgICAgICAgICAvKiB3ZSBzaG91bGQgdHJ5IG9ubHkgdGhlIHBvcnQgd2UgY29ubmVj
-dGVkIHRvIGJlZm9yZSAqLw0KPiA+ICAgICAgICAgICAgICAgICBtdXRleF9sb2NrKCZzZXJ2ZXIt
-PnNydl9tdXRleCk7DQo+ID4gLSAgICAgICAgICAgICAgIHJjID0gZ2VuZXJpY19pcF9jb25uZWN0
-KHNlcnZlcik7DQo+ID4gKyAgICAgICAgICAgICAgIGlmIChzZXJ2ZXItPnJkbWEpDQo+ID4gKyAg
-ICAgICAgICAgICAgICAgICAgICAgcmMgPSBzbWJkX3JlY29ubmVjdChzZXJ2ZXIpOw0KPiA+ICsg
-ICAgICAgICAgICAgICBlbHNlDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgcmMgPSBnZW5l
-cmljX2lwX2Nvbm5lY3Qoc2VydmVyKTsNCj4gPiArDQo+ID4gICAgICAgICAgICAgICAgIGlmIChy
-Yykgew0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgIGNpZnNfZGJnKEZZSSwgInJlY29ubmVj
-dCBlcnJvciAlZFxuIiwgcmMpOw0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgIG11dGV4X3Vu
-bG9jaygmc2VydmVyLT5zcnZfbXV0ZXgpOw0KPiA+IC0tDQo+ID4gMi43LjQNCj4gPg0KPiA+IC0t
-DQo+ID4gVG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vi
-c2NyaWJlIGxpbnV4LWNpZnMiDQo+ID4gaW4gdGhlIGJvZHkgb2YgYSBtZXNzYWdlIHRvIG1ham9y
-ZG9tb0B2Z2VyLmtlcm5lbC5vcmcgTW9yZQ0KPiBtYWpvcmRvbW8NCj4gPiBpbmZvIGF0DQo+ID4N
-Cj4gaHR0cHM6Ly9uYTAxLnNhZmVsaW5rcy5wcm90ZWN0aW9uLm91dGxvb2suY29tLz91cmw9aHR0
-cCUzQSUyRiUyRnZnZXIuaw0KPiA+IGVybmVsLm9yZyUyRm1ham9yZG9tby0NCj4gaW5mby5odG1s
-JmRhdGE9MDIlN0MwMSU3Q2xvbmdsaSU0MG1pY3Jvc29mdC5jb20lDQo+ID4NCj4gN0MxOTI2Nzg2
-NDU3NTI0NDlhODc1YjA4ZDRlZjMzZDg3NCU3QzcyZjk4OGJmODZmMTQxYWY5MWFiMmQ3Y2QwMTFk
-DQo+IGI0NyUNCj4gPg0KPiA3QzElN0MwJTdDNjM2Mzk2NDUzMzM0Mzk4NTYyJnNkYXRhPWk1ZFpV
-b1VVOTFmb0ZHaXBUc2dRQm5tWUplVQ0KPiBhZVd3dzJRSQ0KPiA+IHhvUDlCU080JTNEJnJlc2Vy
-dmVkPTANCj4gDQo+IEl0IGlzIGEgZWFzaWVyIHRvIGZvbGxvdyB0aGUgbG9naWMgaWYgdGhlIGRl
-ZmluaXRpb24gaXMgaW50cm9kdWNlZCB0b2dldGhlciB3aXRoDQo+IHVzaW5nIG9mIHRoaXMgZnVu
-Y3Rpb24gaW4gdGhlIGV4aXN0aW5nIGNvZGUuIEkgc3VnZ2VzdCB0byBhZGQgc21iZF9yZWNvbm5l
-Y3QoKQ0KPiBkZWZpbml0aW9uIGluIHRoaXMgcGF0Y2guDQoNCkkgd2lsbCBkbyB0aGlzIGluIHY0
-Lg0KDQo+IC0tDQo+IEJlc3QgcmVnYXJkcywNCj4gUGF2ZWwgU2hpbG92c2t5DQo=
+2017-08-29 12:29 GMT-07:00 Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>:
+> From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+>
+> To prepare for RDMA read/write using memory registration, add memory
+> registartion pointers to upper layer data I/O context.
+>
+> Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+> ---
+>  fs/cifs/cifsglob.h | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index dc5404d..dcd2b63 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -1166,6 +1166,7 @@ struct cifs_readdata {
+>                                 struct cifs_readdata *rdata,
+>                                 struct iov_iter *iter);
+>         struct kvec                     iov[2];
+> +       struct smbd_mr                  *mr;
+>         unsigned int                    pagesz;
+>         unsigned int                    tailsz;
+>         unsigned int                    credits;
+> @@ -1188,6 +1189,7 @@ struct cifs_writedata {
+>         pid_t                           pid;
+>         unsigned int                    bytes;
+>         int                             result;
+> +       struct smbd_mr                  *mr;
+>         unsigned int                    pagesz;
+>         unsigned int                    tailsz;
+>         unsigned int                    credits;
+> --
+> 2.7.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+The same thing: let's not add structure fields that the code doesn't
+do anything with.
+
+--
+Best regards,
+Pavel Shilovsky
