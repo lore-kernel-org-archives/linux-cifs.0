@@ -1,87 +1,33 @@
-From: Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: RFC: Revert move default dialect from CIFS to to SMB3"
-Date: Fri, 01 Sep 2017 15:11:59 +1200
-Message-ID: <1504235519.8023.87.camel@samba.org>
-References: <1504213298-27431-1-git-send-email-linux@leemhuis.info>
-         <59A8A3E2.40804@tlinx.org>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: SMB3 security upgrade -fix warning messages on CIFS mount when
+ mounting to older servers
+Date: Fri, 1 Sep 2017 00:38:19 -0500
+Message-ID: <CAH2r5msZwRsdHLu8dEfh6g=A9XmR3R-MDfWUxJJNOQb5KEhsjw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: "L. A. Walsh" <linux-cifs-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org>,
-        Thorsten Leemhuis <linux-rCxcAJFjeRkk+I/owrrOrA@public.gmane.org>
+To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <59A8A3E2.40804-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 2017-08-31 at 17:03 -0700, L. A. Walsh wrote:
-> Thorsten Leemhuis wrote:
-> > This reverts commit eef914a9eb5eb83e60eb498315a491cd1edc13a1 (
-> > [SMB3] Improve security, move default dialect to SMB3 from old
-> > CIFS), 
-> > as it confuses users: https://bugzilla.kernel.org/show_bug.cgi?id=1
-> > 96599
-> > 
-> > It was a patch to improve security by switching to SMB3 by default
-> > and
-> > support SMB1 (aka CIFS) only when explicitly requested, as the
-> > latter
-> > is not considered secure anymore (see below for details). This is
-> > one of
-> > the rare cases where regressions are unavoidable and accepted in
-> > Linux.
-> >   
-> 
-> ----
->     Why not SMB2.1?  Win7 is still in support and getting security
-> updates.
-> MS has not issued any updates for Win7 upgrading it to SMB3.0 for any
-> reason (that I'm aware of) -- including security. 
-> 
->     If there were security problems in Win7 w/SMB2.1, wouldn't MS
-> issue patches -- as they did for WinXP just recently for a severe
-> SMB1 bug?
+There have been some questions about the upgrade of the default client
+dialect for cifs.ko from CIFS (SMB1) to SMB3 (discussed in earlier
+email threads), but also requests for clarification of some of the
+warning messages relating to the default dialect upgrade.  While
+additional changes can be made in mount.cifs to make the warnings
+clearer, this patch adds additional warnings to the kernel cifs.ko
+code, and clarifies the kernel log message when the server does not
+support the requested dialect.  See
 
-To be clear, the issue with SMB1 is lack of integrity protection, in
-particular on the negotiation, where a client may come to think it had
-to use NTLM(v2) to talk to the server. 
+https://git.samba.org/?p=sfrench/cifs-2.6.git;a=commit;h=7e682f766f289887c5cbf7c0a1e4970103f01ac4
 
-The only protection available on SMB1 is 'smb signing', which is after
-the negotiation of the authentication protocols etc.
-
->     Seems like if they are willing to patch "out of support" XP, for
-> a serious problem, then they would be more likely to patch Win7 for
-> lesser problems.
-> 
->     Seems like jumping the default to MS's latest and greatest puts
-> linux on MS's OS-release schedule -- especially when they haven't
-> declared
-> SMB2.1 as "bad"...  From what I understand, most of the new security
-> features in 3.0 when into SMB2.1 or 2.0.
-
-Sadly 'most' turned out not to be good enough to actually secure the
-negotiation, which is the main weakness.   If a change is to be made, I
-think it should move up to SMB3. 
-
-In terms of Windows versions, Windows 2012R2 is quite popular these
-days, even if Windows 8.1 still wasn't a great hit. 
-
-Finally, I do agree that the move from SMB1 is partly on the basis of a
-false premise.  It appears that Microsoft's recent declaration of SMB1
-as 'bad' is as much on the basis of coding flaws in their own SMB1
-implementation as the lack of protection.  It is hoped that more modern
-code might have less buffer-overflow style security flaws compared with
-the 25 year old stuff.
-
-Both however are good reasons to move off the SMB1 protocol towards
-SMB3 on the server, and this is easiest and safest to do once the
-clients also move to SMB3 by default.
-
-Andrew Bartlett
+Additional changes are planned in 4.14 to make this easier, and to
+improve the SMB3.1.1 support which is important for multiple reasons,
+not just for security improvements but also for the proposed POSIX
+extensions.
 -- 
-Andrew Bartlett
-https://samba.org/~abartlet/
-Authentication Developer, Samba Team         https://samba.org
-Samba Development and Support, Catalyst IT   
-https://catalyst.net.nz/services/samba
+Thanks,
+
+Steve
