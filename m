@@ -1,44 +1,39 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] Two small cifs fixes for stable
-Date: Thu, 31 Aug 2017 18:52:12 -0500
-Message-ID: <CAH2r5mtnxY05_AW=5+ajOAKcB4nW=RiFcEP3QAF=Gy+yoMzibw@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: RFC: Revert move default dialect from CIFS to to SMB3
+Date: Thu, 31 Aug 2017 17:12:09 -0700
+Message-ID: <CA+55aFwUdX3wNYCuWjUTLQGPMCw3peeKeSBfwXb+HuV36OwE+g@mail.gmail.com>
+References: <1504213298-27431-1-git-send-email-linux@leemhuis.info> <bf90b119-1e94-131b-d7b6-c35934d8d1bf@leemhuis.info>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
-        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: Steve French <smfrench@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        Pavel Shilovsky <pshilov@microsoft.com>
+To: Thorsten Leemhuis <linux@leemhuis.info>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <bf90b119-1e94-131b-d7b6-c35934d8d1bf@leemhuis.info>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Please pull the following changes since commit
-36fde05f3fb51edea879636db590d70e11f16c82:
+On Thu, Aug 31, 2017 at 2:36 PM, Thorsten Leemhuis <linux@leemhuis.info> wrote:
+> Lo! To give a bit more background to this (the mail I reply to was the
+> first I sent with git send-email and I missed some details): Maybe I'm
+> over stretching my abilities/position as regression tracker with this
+> RFC for a revert, but I hope it at least triggers a discussion if such a
+> revert should be done or not.
 
-  Merge branch 'for-4.13-fixes' of
-git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup (2017-08-29
-11:16:21 -0700)
+I don't think that a revert is appropriate.
 
-are available in the git repository at:
+But perhaps just a single printk() or something if the user does *not*
+specify the version explicitly? Just saying something like
 
-  git://git.samba.org/sfrench/cifs-2.6.git for-next
+  We used to default to 1.0, we now default to 3.0, if you want old
+defaults, use "vers=1.0"
 
-for you to fetch changes up to 6e3c1529c39e92ed64ca41d53abadabbaa1d5393:
+Oh, looking at that version parsing code, I think we also need to fix
+that legacy "ver=1" thing (ver without the 's') which now silently
+ignores "ver=1" as being the "default", even though it's not.
 
-  CIFS: remove endian related sparse warning (2017-08-30 14:43:11 -0500)
+I do *not* believe that "default to version 1" is acceptable.
 
-The signed tag is cifs-fixes-for-4.13-rc7-and-stable
-
-----------------------------------------------------------------
-Pavel Shilovsky (1):
-      CIFS: Fix maximum SMB2 header size
-
-Steve French (1):
-      CIFS: remove endian related sparse warning
-
- fs/cifs/dir.c     | 2 +-
- fs/cifs/smb2pdu.h | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
-
--- 
-Thanks,
-
-Steve
+                Linus
