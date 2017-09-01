@@ -1,81 +1,87 @@
-From: ronnie sahlberg <ronniesahlberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: RFC: Revert move default dialect from CIFS to to SMB3
-Date: Fri, 1 Sep 2017 13:06:45 +1000
-Message-ID: <CAN05THQtq_MNfDFNY-XHNXfhv36CWupyA5dzNL+XsNx-498U3A@mail.gmail.com>
+From: Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: RFC: Revert move default dialect from CIFS to to SMB3"
+Date: Fri, 01 Sep 2017 15:11:59 +1200
+Message-ID: <1504235519.8023.87.camel@samba.org>
 References: <1504213298-27431-1-git-send-email-linux@leemhuis.info>
- <bf90b119-1e94-131b-d7b6-c35934d8d1bf@leemhuis.info> <CA+55aFwUdX3wNYCuWjUTLQGPMCw3peeKeSBfwXb+HuV36OwE+g@mail.gmail.com>
- <CAH2r5msWDXzwbFPtUHCKbqHrEBTsvw5eaTayj5RkdgYCLM5nAQ@mail.gmail.com> <CAH2r5mv9roEvMX+C-csU=GZFM_HMbqxnHfF11NUp+2yonDVPgA@mail.gmail.com>
+         <59A8A3E2.40804@tlinx.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Thorsten Leemhuis <linux-rCxcAJFjeRkk+I/owrrOrA@public.gmane.org>,
-        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Transfer-Encoding: 8bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: "L. A. Walsh" <linux-cifs-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org>,
+        Thorsten Leemhuis <linux-rCxcAJFjeRkk+I/owrrOrA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mv9roEvMX+C-csU=GZFM_HMbqxnHfF11NUp+2yonDVPgA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <59A8A3E2.40804-gT3AUAsYRbTYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Two missing \n in connect.c
+On Thu, 2017-08-31 at 17:03 -0700, L. A. Walsh wrote:
+> Thorsten Leemhuis wrote:
+> > This reverts commit eef914a9eb5eb83e60eb498315a491cd1edc13a1 (
+> > [SMB3] Improve security, move default dialect to SMB3 from old
+> > CIFS), 
+> > as it confuses users: https://bugzilla.kernel.org/show_bug.cgi?id=1
+> > 96599
+> > 
+> > It was a patch to improve security by switching to SMB3 by default
+> > and
+> > support SMB1 (aka CIFS) only when explicitly requested, as the
+> > latter
+> > is not considered secure anymore (see below for details). This is
+> > one of
+> > the rare cases where regressions are unavoidable and accepted in
+> > Linux.
+> >   
+> 
+> ----
+>     Why not SMB2.1?  Win7 is still in support and getting security
+> updates.
+> MS has not issued any updates for Win7 upgrading it to SMB3.0 for any
+> reason (that I'm aware of) -- including security. 
+> 
+>     If there were security problems in Win7 w/SMB2.1, wouldn't MS
+> issue patches -- as they did for WinXP just recently for a severe
+> SMB1 bug?
 
-Fix those and you can add a
-Reviewed-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To be clear, the issue with SMB1 is lack of integrity protection, in
+particular on the negotiation, where a client may come to think it had
+to use NTLM(v2) to talk to the server. 
 
-On Fri, Sep 1, 2017 at 12:42 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> Any thoughts on this patch to add additional warnings for the user -
-> logging when using default dialects (or when server returns dialect
-> not supported), and noting the default dialect change?
->
-> See https://git.samba.org/?p=sfrench/cifs-2.6.git;a=commit;h=bb86f22eeddbb5879675b55168b8fa8990d74a21
->
-> On Thu, Aug 31, 2017 at 7:29 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> Yes - updating the parsing slightly and printks as suggested makes sense
->>
->> Some additional warning messages in the userspace helper (adding Jeff
->> Layton), mount.cifs can also help.
->>
->> I also have an experimental set of patches to allow multi-dialect
->> negotiation with at least three of the acceptable dialects
->> (smb2.1/smb3/smb3.02) which will help, but complicate secure dialect
->> validation ("validate negotiate") but that will have to wait till next
->> release.
->>
->> On Thu, Aug 31, 2017 at 7:12 PM, Linus Torvalds
->> <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org> wrote:
->>> On Thu, Aug 31, 2017 at 2:36 PM, Thorsten Leemhuis <linux-rCxcAJFjeRkk+I/owrrOrA@public.gmane.org> wrote:
->>>> Lo! To give a bit more background to this (the mail I reply to was the
->>>> first I sent with git send-email and I missed some details): Maybe I'm
->>>> over stretching my abilities/position as regression tracker with this
->>>> RFC for a revert, but I hope it at least triggers a discussion if such a
->>>> revert should be done or not.
->>>
->>> I don't think that a revert is appropriate.
->>>
->>> But perhaps just a single printk() or something if the user does *not*
->>> specify the version explicitly? Just saying something like
->>>
->>>   We used to default to 1.0, we now default to 3.0, if you want old
->>> defaults, use "vers=1.0"
->>>
->>> Oh, looking at that version parsing code, I think we also need to fix
->>> that legacy "ver=1" thing (ver without the 's') which now silently
->>> ignores "ver=1" as being the "default", even though it's not.
->>>
->>> I do *not* believe that "default to version 1" is acceptable.
->>>
->>>                 Linus
->>
->>
->>
->> --
->> Thanks,
->>
->> Steve
->
->
->
-> --
-> Thanks,
->
-> Steve
+The only protection available on SMB1 is 'smb signing', which is after
+the negotiation of the authentication protocols etc.
+
+>     Seems like if they are willing to patch "out of support" XP, for
+> a serious problem, then they would be more likely to patch Win7 for
+> lesser problems.
+> 
+>     Seems like jumping the default to MS's latest and greatest puts
+> linux on MS's OS-release schedule -- especially when they haven't
+> declared
+> SMB2.1 as "bad"...  From what I understand, most of the new security
+> features in 3.0 when into SMB2.1 or 2.0.
+
+Sadly 'most' turned out not to be good enough to actually secure the
+negotiation, which is the main weakness.   If a change is to be made, I
+think it should move up to SMB3. 
+
+In terms of Windows versions, Windows 2012R2 is quite popular these
+days, even if Windows 8.1 still wasn't a great hit. 
+
+Finally, I do agree that the move from SMB1 is partly on the basis of a
+false premise.  It appears that Microsoft's recent declaration of SMB1
+as 'bad' is as much on the basis of coding flaws in their own SMB1
+implementation as the lack of protection.  It is hoped that more modern
+code might have less buffer-overflow style security flaws compared with
+the 25 year old stuff.
+
+Both however are good reasons to move off the SMB1 protocol towards
+SMB3 on the server, and this is easiest and safest to do once the
+clients also move to SMB3 by default.
+
+Andrew Bartlett
+-- 
+Andrew Bartlett
+https://samba.org/~abartlet/
+Authentication Developer, Samba Team         https://samba.org
+Samba Development and Support, Catalyst IT   
+https://catalyst.net.nz/services/samba
