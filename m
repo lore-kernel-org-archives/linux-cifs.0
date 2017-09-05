@@ -1,11 +1,9 @@
 From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Subject: [PATCH v8 06/20] crypto: introduce crypto wait for async op
-Date: Tue,  5 Sep 2017 15:38:45 +0300
-Message-ID: <1504615144-29770-7-git-send-email-gilad__3029.18809834427$1504615320$gmane$org@benyossef.com>
+Subject: [PATCH v8 09/20] crypto: move drbg to generic async completion
+Date: Tue,  5 Sep 2017 15:38:48 +0300
+Message-ID: <1504615144-29770-10-git-send-email-gilad__3531.2416068793$1504615346$gmane$org@benyossef.com>
 References: <1504615144-29770-1-git-send-email-gilad@benyossef.com>
-Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>,
-        Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Jonathan Cameron <Jonathan.Cameron-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
+Cc: Ofir Drang <ofir.drang-5wv7dgnIgG8@public.gmane.org>
 To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
         "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
         Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
@@ -29,109 +27,102 @@ In-Reply-To: <1504615144-29770-1-git-send-email-gilad-6S/DczAoZh3WXxRugSxzZg@pub
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Invoking a possibly async. crypto op and waiting for completion
-while correctly handling backlog processing is a common task
-in the crypto API implementation and outside users of it.
+DRBG is starting an async. crypto op and waiting for it complete.
+Move it over to generic code doing the same.
 
-This patch adds a generic implementation for doing so in
-preparation for using it across the board instead of hand
-rolled versions.
+The code now also passes CRYPTO_TFM_REQ_MAY_SLEEP flag indicating
+crypto request memory allocation may use GFP_KERNEL which should
+be perfectly fine as the code is obviously sleeping for the
+completion of the request any way.
 
 Signed-off-by: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-CC: Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-CC: Jonathan Cameron <Jonathan.Cameron-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
 ---
- crypto/api.c           | 13 +++++++++++++
- include/linux/crypto.h | 40 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 53 insertions(+)
+ crypto/drbg.c         | 36 +++++++++---------------------------
+ include/crypto/drbg.h |  3 +--
+ 2 files changed, 10 insertions(+), 29 deletions(-)
 
-diff --git a/crypto/api.c b/crypto/api.c
-index 941cd4c..2a2479d 100644
---- a/crypto/api.c
-+++ b/crypto/api.c
-@@ -24,6 +24,7 @@
- #include <linux/sched/signal.h>
- #include <linux/slab.h>
- #include <linux/string.h>
-+#include <linux/completion.h>
- #include "internal.h"
- 
- LIST_HEAD(crypto_alg_list);
-@@ -595,5 +596,17 @@ int crypto_has_alg(const char *name, u32 type, u32 mask)
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 633a88e..c522251 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -1651,16 +1651,6 @@ static int drbg_fini_sym_kernel(struct drbg_state *drbg)
+ 	return 0;
  }
- EXPORT_SYMBOL_GPL(crypto_has_alg);
  
-+void crypto_req_done(struct crypto_async_request *req, int err)
-+{
-+	struct crypto_wait *wait = req->data;
-+
-+	if (err == -EINPROGRESS)
-+		return;
-+
-+	wait->err = err;
-+	complete(&wait->completion);
-+}
-+EXPORT_SYMBOL_GPL(crypto_req_done);
-+
- MODULE_DESCRIPTION("Cryptographic core API");
- MODULE_LICENSE("GPL");
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 84da997..78508ca 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -24,6 +24,7 @@
- #include <linux/slab.h>
- #include <linux/string.h>
- #include <linux/uaccess.h>
-+#include <linux/completion.h>
+-static void drbg_skcipher_cb(struct crypto_async_request *req, int error)
+-{
+-	struct drbg_state *drbg = req->data;
+-
+-	if (error == -EINPROGRESS)
+-		return;
+-	drbg->ctr_async_err = error;
+-	complete(&drbg->ctr_completion);
+-}
+-
+ static int drbg_init_sym_kernel(struct drbg_state *drbg)
+ {
+ 	struct crypto_cipher *tfm;
+@@ -1691,7 +1681,7 @@ static int drbg_init_sym_kernel(struct drbg_state *drbg)
+ 		return PTR_ERR(sk_tfm);
+ 	}
+ 	drbg->ctr_handle = sk_tfm;
+-	init_completion(&drbg->ctr_completion);
++	crypto_init_wait(&drbg->ctr_wait);
  
- /*
-  * Autoloaded crypto modules should only use a prefixed name to avoid allowing
-@@ -468,6 +469,45 @@ struct crypto_alg {
- } CRYPTO_MINALIGN_ATTR;
+ 	req = skcipher_request_alloc(sk_tfm, GFP_KERNEL);
+ 	if (!req) {
+@@ -1700,8 +1690,9 @@ static int drbg_init_sym_kernel(struct drbg_state *drbg)
+ 		return -ENOMEM;
+ 	}
+ 	drbg->ctr_req = req;
+-	skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+-					drbg_skcipher_cb, drbg);
++	skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
++						CRYPTO_TFM_REQ_MAY_SLEEP,
++					crypto_req_done, &drbg->ctr_wait);
  
- /*
-+ * A helper struct for waiting for completion of async crypto ops
-+ */
-+struct crypto_wait {
-+	struct completion completion;
-+	int err;
-+};
+ 	alignmask = crypto_skcipher_alignmask(sk_tfm);
+ 	drbg->ctr_null_value_buf = kzalloc(DRBG_CTR_NULL_LEN + alignmask,
+@@ -1762,21 +1753,12 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
+ 		/* Output buffer may not be valid for SGL, use scratchpad */
+ 		skcipher_request_set_crypt(drbg->ctr_req, &sg_in, &sg_out,
+ 					   cryptlen, drbg->V);
+-		ret = crypto_skcipher_encrypt(drbg->ctr_req);
+-		switch (ret) {
+-		case 0:
+-			break;
+-		case -EINPROGRESS:
+-		case -EBUSY:
+-			wait_for_completion(&drbg->ctr_completion);
+-			if (!drbg->ctr_async_err) {
+-				reinit_completion(&drbg->ctr_completion);
+-				break;
+-			}
+-		default:
++		ret = crypto_wait_req(crypto_skcipher_encrypt(drbg->ctr_req),
++					&drbg->ctr_wait);
++		if (ret)
+ 			goto out;
+-		}
+-		init_completion(&drbg->ctr_completion);
 +
-+/*
-+ * Macro for declaring a crypto op async wait object on stack
-+ */
-+#define DECLARE_CRYPTO_WAIT(_wait) \
-+	struct crypto_wait _wait = { \
-+		COMPLETION_INITIALIZER_ONSTACK((_wait).completion), 0 }
-+
-+/*
-+ * Async ops completion helper functioons
-+ */
-+void crypto_req_done(struct crypto_async_request *req, int err);
-+
-+static inline int crypto_wait_req(int err, struct crypto_wait *wait)
-+{
-+	switch (err) {
-+	case -EINPROGRESS:
-+	case -EBUSY:
-+		wait_for_completion(&wait->completion);
-+		reinit_completion(&wait->completion);
-+		err = wait->err;
-+		break;
-+	};
-+
-+	return err;
-+}
-+
-+static inline void crypto_init_wait(struct crypto_wait *wait)
-+{
-+	init_completion(&wait->completion);
-+}
-+
-+/*
-  * Algorithm registration interface.
-  */
- int crypto_register_alg(struct crypto_alg *alg);
++		crypto_init_wait(&drbg->ctr_wait);
+ 
+ 		memcpy(outbuf, drbg->outscratchpad, cryptlen);
+ 
+diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+index 22f884c..8f94110 100644
+--- a/include/crypto/drbg.h
++++ b/include/crypto/drbg.h
+@@ -126,8 +126,7 @@ struct drbg_state {
+ 	__u8 *ctr_null_value;			/* CTR mode aligned zero buf */
+ 	__u8 *outscratchpadbuf;			/* CTR mode output scratchpad */
+         __u8 *outscratchpad;			/* CTR mode aligned outbuf */
+-	struct completion ctr_completion;	/* CTR mode async handler */
+-	int ctr_async_err;			/* CTR mode async error */
++	struct crypto_wait ctr_wait;		/* CTR mode async wait obj */
+ 
+ 	bool seeded;		/* DRBG fully seeded? */
+ 	bool pr;		/* Prediction resistance enabled? */
 -- 
 2.1.4
