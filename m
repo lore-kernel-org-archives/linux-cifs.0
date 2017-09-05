@@ -1,67 +1,201 @@
-From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v2] KEYS: make keyctl_invalidate() also require Setattr permission
-Date: Tue, 05 Sep 2017 10:54:55 +0100
-Message-ID: <13221.1504605295@warthog.procyon.org.uk>
-References: <20170816211403.121920-1-ebiggers3@gmail.com>
+From: Harsh Jain <harshjain.prof@gmail.com>
+Subject: Re: [PATCH v7 00/19] simplify crypto wait for async op
+Date: Tue, 5 Sep 2017 16:53:23 +0530
+Message-ID: <CAFXBA=mqYxD3H_e38hEd2hVL4yvPXb_4DnfgGO5bf6YboTQVSg@mail.gmail.com>
+References: <1503584350-7831-1-git-send-email-gilad@benyossef.com>
+ <CAFXBA=n6W_n1P=NKHEUAgpaDDrdmh4QwB4aYma9xyio7UFP3Vw@mail.gmail.com> <CAOtvUMcjtEMj4eoCG_Rpp-8CmJP+Yu0dPDN3PyOTWjHapf_y1g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-fscrypt-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        Gwendal Grignou <gwendal-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>,
-        Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Paul Crowley <paulcrowley-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>,
-        Richard Weinberger <richard-/L3Ra7n9ekc@public.gmane.org>,
-        Ryo Hashimoto <hashimoto-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>,
-        Tyler Hicks <tyhicks-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>, stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170816211403.121920-1-ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Content-ID: <13220.1504605295.1-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>,
+        Boris Brezillon <boris.brezillon@free-electrons.com>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        device-mapper development <dm-devel@redhat.com>,
+        Shaohua Li <shli@kernel.org>, Steve French <sfrench@samba.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <james.l.morris@oracle.com>,
+        "Serge E. Hallyn
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Return-path: <linux-doc-owner@vger.kernel.org>
+In-Reply-To: <CAOtvUMcjtEMj4eoCG_Rpp-8CmJP+Yu0dPDN3PyOTWjHapf_y1g@mail.gmail.com>
+Sender: linux-doc-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-
-> This patch fixes the flaw by requiring both Search and Setattr permission to
-> invalidate a key rather than just Search permission.
-
-I'm not sure I agree.  The problem is that you then have to grant someone
-Setattr permission for them to be able to do this, which then opens up a whole
-host of other things they can also do.
-
-> Requiring Setattr permission is appropriate because Setattr permission also
-> allows revoking (via keyctl_revoke()) or expiring (via keyctl_set_timeout())
-> the key, which also make the key inaccessible regardless of how many
-> keyrings it is in.
-
-Note that setting the expiry time is not really equivalent to revokation in
-this regard as setting the expiry time is something you do when setting up a
-key, whereas revokation is something you do later to kill a key off.
-
-> Alternatively, the problem could be solved by requiring Write permission.
-
-That's not really a viable solution as things stand.  You can't turn Write
-permission on on a key whose type doesn't have an ->update() method (though
-this could be changed) and it also opens up a key to being modified.
-
-How about another solution:
-
- (1) I add a flag to a key to say that it can be invalidated and a keyctl to
-     change that flag.
-
- (2) I add a new key type op called ->allow_invalidation() that allows key
-     types to govern separately who is allowed to invalidate keys of that
-     type.
-
-     So, for instance, DNS record invalidation would require CAP_NET_ADMIN.
-
- (3) Allow keyrings to be cleared by users who don't have Write permission but
-     do have other permission, such as CAP_NET_ADMIN.  This would need to be
-     granted on a per-keyring basis.
-
-David
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+On Sun, Sep 3, 2017 at 11:47 AM, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+> On Thu, Aug 31, 2017 at 3:31 PM, Harsh Jain <harshjain.prof@gmail.com> wrote:
+>> HI Gilad,
+>>
+>> I think we need an update in ESP also. Now EBUSY return means driver
+>> has accepted, Packet should not be dropped in
+>>
+>> esp_output_tail() function.
+>
+> Good catch. You are right and the same holds true for ah_output() in ah4.c.
+>
+> But I do wonder, the code there now treats -EBUSY as a special case
+> and returns NET_XMIT_DROP
+> but if an AEAD or AHASH transformation return some other error, like
+> -ENOMEM or -EINVAL shouldn't
+> we return NET_XMIT_DROP in that case too?
+I think we should not,  XMIT_DROP implies drop current packet only,
+later on when device is recovered from busy state, Upper layer
+protocol(TCP) will re-transmit the packet. It helps in flow control.
+>
+> Any ideas?
+>
+> Gilad
+>
+>>
+>>
+>> On Thu, Aug 24, 2017 at 7:48 PM, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+>>> Many users of kernel async. crypto services have a pattern of
+>>> starting an async. crypto op and than using a completion
+>>> to wait for it to end.
+>>>
+>>> This patch set simplifies this common use case in two ways:
+>>>
+>>> First, by separating the return codes of the case where a
+>>> request is queued to a backlog due to the provider being
+>>> busy (-EBUSY) from the case the request has failed due
+>>> to the provider being busy and backlogging is not enabled
+>>> (-EAGAIN).
+>>>
+>>> Next, this change is than built on to create a generic API
+>>> to wait for a async. crypto operation to complete.
+>>>
+>>> The end result is a smaller code base and an API that is
+>>> easier to use and more difficult to get wrong.
+>>>
+>>> The patch set was boot tested on x86_64 and arm64 which
+>>> at the very least tests the crypto users via testmgr and
+>>> tcrypt but I do note that I do not have access to some
+>>> of the HW whose drivers are modified nor do I claim I was
+>>> able to test all of the corner cases.
+>>>
+>>> The patch set is based upon linux-next release tagged
+>>> next-20170824.
+>>>
+>>> Changes from v6:
+>>> - Fix brown paper bag compile error on marvell/cesa
+>>>   code.
+>>>
+>>> Changes from v5:
+>>> - Remove redundant new line as spotted by Jonathan
+>>>   Cameron.
+>>> - Reworded dm-verity change commit message to better
+>>>   clarify potential issue averted by change as
+>>>   pointed out by Mikulas Patocka.
+>>>
+>>> Changes from v4:
+>>> - Rebase on top of latest algif changes from Stephan
+>>>   Mueller.
+>>> - Fix typo in ccp patch title.
+>>>
+>>> Changes from v3:
+>>> - Instead of changing the return code to indicate
+>>>   backlog queueing, change the return code to indicate
+>>>   transient busy state, as suggested by Herbert Xu.
+>>>
+>>> Changes from v2:
+>>> - Patch title changed from "introduce crypto wait for
+>>>   async op" to better reflect the current state.
+>>> - Rebase on top of latest linux-next.
+>>> - Add a new return code of -EIOCBQUEUED for backlog
+>>>   queueing, as suggested by Herbert Xu.
+>>> - Transform more users to the new API.
+>>> - Update the drbg change to account for new init as
+>>>   indicated by Stephan Muller.
+>>>
+>>> Changes from v1:
+>>> - Address review comments from Eric Biggers.
+>>> - Separated out bug fixes of existing code and rebase
+>>>   on top of that patch set.
+>>> - Rename 'ecr' to 'wait' in fscrypto code.
+>>> - Split patch introducing the new API from the change
+>>>   moving over the algif code which it originated from
+>>>   to the new API.
+>>> - Inline crypto_wait_req().
+>>> - Some code indentation fixes.
+>>>
+>>> Gilad Ben-Yossef (19):
+>>>   crypto: change transient busy return code to -EAGAIN
+>>>   crypto: ccp: use -EAGAIN for transient busy indication
+>>>   crypto: remove redundant backlog checks on EBUSY
+>>>   crypto: marvell/cesa: remove redundant backlog checks on EBUSY
+>>>   crypto: introduce crypto wait for async op
+>>>   crypto: move algif to generic async completion
+>>>   crypto: move pub key to generic async completion
+>>>   crypto: move drbg to generic async completion
+>>>   crypto: move gcm to generic async completion
+>>>   crypto: move testmgr to generic async completion
+>>>   fscrypt: move to generic async completion
+>>>   dm: move dm-verity to generic async completion
+>>>   cifs: move to generic async completion
+>>>   ima: move to generic async completion
+>>>   crypto: tcrypt: move to generic async completion
+>>>   crypto: talitos: move to generic async completion
+>>>   crypto: qce: move to generic async completion
+>>>   crypto: mediatek: move to generic async completion
+>>>   crypto: adapt api sample to use async. op wait
+>>>
+>>>  Documentation/crypto/api-samples.rst |  52 ++-------
+>>>  crypto/af_alg.c                      |  27 -----
+>>>  crypto/ahash.c                       |  12 +--
+>>>  crypto/algapi.c                      |   6 +-
+>>>  crypto/algif_aead.c                  |   8 +-
+>>>  crypto/algif_hash.c                  |  50 +++++----
+>>>  crypto/algif_skcipher.c              |   9 +-
+>>>  crypto/api.c                         |  13 +++
+>>>  crypto/asymmetric_keys/public_key.c  |  28 +----
+>>>  crypto/cryptd.c                      |   4 +-
+>>>  crypto/cts.c                         |   6 +-
+>>>  crypto/drbg.c                        |  36 ++-----
+>>>  crypto/gcm.c                         |  32 ++----
+>>>  crypto/lrw.c                         |   8 +-
+>>>  crypto/rsa-pkcs1pad.c                |  16 +--
+>>>  crypto/tcrypt.c                      |  84 +++++----------
+>>>  crypto/testmgr.c                     | 204 ++++++++++++-----------------------
+>>>  crypto/xts.c                         |   8 +-
+>>>  drivers/crypto/ccp/ccp-crypto-main.c |   8 +-
+>>>  drivers/crypto/ccp/ccp-dev.c         |   7 +-
+>>>  drivers/crypto/marvell/cesa.c        |   3 +-
+>>>  drivers/crypto/marvell/cesa.h        |   2 +-
+>>>  drivers/crypto/mediatek/mtk-aes.c    |  31 +-----
+>>>  drivers/crypto/qce/sha.c             |  30 +-----
+>>>  drivers/crypto/talitos.c             |  38 +------
+>>>  drivers/md/dm-verity-target.c        |  81 ++++----------
+>>>  drivers/md/dm-verity.h               |   5 -
+>>>  fs/cifs/smb2ops.c                    |  30 +-----
+>>>  fs/crypto/crypto.c                   |  28 +----
+>>>  fs/crypto/fname.c                    |  36 ++-----
+>>>  fs/crypto/fscrypt_private.h          |  10 --
+>>>  fs/crypto/keyinfo.c                  |  21 +---
+>>>  include/crypto/drbg.h                |   3 +-
+>>>  include/crypto/if_alg.h              |  15 +--
+>>>  include/linux/crypto.h               |  40 +++++++
+>>>  security/integrity/ima/ima_crypto.c  |  56 +++-------
+>>>  36 files changed, 310 insertions(+), 737 deletions(-)
+>>>
+>>> --
+>>> 2.1.4
+>>>
+>
+>
+>
+> --
+> Gilad Ben-Yossef
+> Chief Coffee Drinker
+>
+> "If you take a class in large-scale robotics, can you end up in a
+> situation where the homework eats your dog?"
+>  -- Jean-Baptiste Queru
