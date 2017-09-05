@@ -1,55 +1,67 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] cifs: hide unused functions
-Date: Tue,  5 Sep 2017 11:24:15 +0200
-Message-ID: <20170905092440.2172429-1-arnd@arndb.de>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Pavel Shilovsky <pshilov@microsoft.com>,
-        Sachin Prabhu <sprabhu@redhat.com>,
-        Aurelien Aptel <aaptel@suse.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-kernel@vger.kernel.org
-To: Steve French <sfrench@samba.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH v2] KEYS: make keyctl_invalidate() also require Setattr permission
+Date: Tue, 05 Sep 2017 10:54:55 +0100
+Message-ID: <13221.1504605295@warthog.procyon.org.uk>
+References: <20170816211403.121920-1-ebiggers3@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-fscrypt-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Gwendal Grignou <gwendal-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>,
+        Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Paul Crowley <paulcrowley-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>,
+        Richard Weinberger <richard-/L3Ra7n9ekc@public.gmane.org>,
+        Ryo Hashimoto <hashimoto-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>,
+        Tyler Hicks <tyhicks-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>, stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20170816211403.121920-1-ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-ID: <13220.1504605295.1-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
-The newly added SMB2+ attribute support causes unused function
-warnings when CONFIG_CIFS_XATTR is disabled:
+Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-fs/cifs/smb2ops.c:563:1: error: 'smb2_set_ea' defined but not used [-Werror=unused-function]
- smb2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
-fs/cifs/smb2ops.c:513:1: error: 'smb2_query_eas' defined but not used [-Werror=unused-function]
- smb2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
+> This patch fixes the flaw by requiring both Search and Setattr permission to
+> invalidate a key rather than just Search permission.
 
-This adds another #ifdef around the affected functions.
+I'm not sure I agree.  The problem is that you then have to grant someone
+Setattr permission for them to be able to do this, which then opens up a whole
+host of other things they can also do.
 
-Fixes: 5517554e4313 ("cifs: Add support for writing attributes on SMB2+")
-Fixes: 95907fea4fd8 ("cifs: Add support for reading attributes on SMB2+")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- fs/cifs/smb2ops.c | 2 ++
- 1 file changed, 2 insertions(+)
+> Requiring Setattr permission is appropriate because Setattr permission also
+> allows revoking (via keyctl_revoke()) or expiring (via keyctl_set_timeout())
+> the key, which also make the key inaccessible regardless of how many
+> keyrings it is in.
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index fb2934b9b97c..6cd91670ba2d 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -426,6 +426,7 @@ smb2_query_file_info(const unsigned int xid, struct cifs_tcon *tcon,
- 	return rc;
- }
- 
-+#ifdef CONFIG_CIFS_XATTR
- static ssize_t
- move_smb2_ea_to_cifs(char *dst, size_t dst_size,
- 		     struct smb2_file_full_ea_info *src, size_t src_size,
-@@ -613,6 +614,7 @@ smb2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
- 
- 	return rc;
- }
-+#endif
- 
- static bool
- smb2_can_echo(struct TCP_Server_Info *server)
--- 
-2.9.0
+Note that setting the expiry time is not really equivalent to revokation in
+this regard as setting the expiry time is something you do when setting up a
+key, whereas revokation is something you do later to kill a key off.
+
+> Alternatively, the problem could be solved by requiring Write permission.
+
+That's not really a viable solution as things stand.  You can't turn Write
+permission on on a key whose type doesn't have an ->update() method (though
+this could be changed) and it also opens up a key to being modified.
+
+How about another solution:
+
+ (1) I add a flag to a key to say that it can be invalidated and a keyctl to
+     change that flag.
+
+ (2) I add a new key type op called ->allow_invalidation() that allows key
+     types to govern separately who is allowed to invalidate keys of that
+     type.
+
+     So, for instance, DNS record invalidation would require CAP_NET_ADMIN.
+
+ (3) Allow keyrings to be cleared by users who don't have Write permission but
+     do have other permission, such as CAP_NET_ADMIN.  This would need to be
+     granted on a per-keyring basis.
+
+David
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
