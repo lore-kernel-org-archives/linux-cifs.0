@@ -1,85 +1,52 @@
-From: Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v2] KEYS: make keyctl_invalidate() also require Setattr
- permission
-Date: Tue, 5 Sep 2017 11:32:50 -0700
-Message-ID: <20170905183250.GA92687@gmail.com>
-References: <20170816211403.121920-1-ebiggers3@gmail.com>
- <13221.1504605295@warthog.procyon.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fscrypt-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Gwendal Grignou <gwendal-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>,
-        Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Paul Crowley <paulcrowley-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>,
-        Richard Weinberger <richard-/L3Ra7n9ekc@public.gmane.org>,
-        Ryo Hashimoto <hashimoto-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>,
-        Tyler Hicks <tyhicks-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>, stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <13221.1504605295-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: shuwang@redhat.com
+Subject: [PATCH] cifs: release cifs root_cred after exit_cifs
+Date: Thu,  7 Sep 2017 16:03:27 +0800
+Message-ID: <20170907080327.21390-1-shuwang@redhat.com>
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org, chuhu@redhat.com, liwang@redhat.com,
+        Shu Wang <shuwang@redhat.com>
+To: sfrench@samba.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Hi David,
+From: Shu Wang <shuwang@redhat.com>
 
-On Tue, Sep 05, 2017 at 10:54:55AM +0100, David Howells wrote:
-> Eric Biggers <ebiggers3-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> 
-> > This patch fixes the flaw by requiring both Search and Setattr permission to
-> > invalidate a key rather than just Search permission.
-> 
-> I'm not sure I agree.  The problem is that you then have to grant someone
-> Setattr permission for them to be able to do this, which then opens up a whole
-> host of other things they can also do.
-> 
+memory leak was found by kmemleak. exit_cifs_spnego
+should be called before cifs module removed, or
+cifs root_cred will not be released.
 
-True, but Setattr permission has already been overloaded to allow several
-different types of modifications, and it makes *much* more sense than Search
-permission which should not allow any modifications.  And in practice I expect
-people care more about whether modifications are permitted or not, than the
-details of the finer-grained permissions.
+kmemleak report:
+unreferenced object 0xffff880070a3ce40 (size 192):
+  backtrace:
+     kmemleak_alloc+0x4a/0xa0
+     kmem_cache_alloc+0xc7/0x1d0
+     prepare_kernel_cred+0x20/0x120
+     init_cifs_spnego+0x2d/0x170 [cifs]
+     0xffffffffc07801f3
+     do_one_initcall+0x51/0x1b0
+     do_init_module+0x60/0x1fd
+     load_module+0x161e/0x1b60
+     SYSC_finit_module+0xa9/0x100
+     SyS_finit_module+0xe/0x10
 
-> > Requiring Setattr permission is appropriate because Setattr permission also
-> > allows revoking (via keyctl_revoke()) or expiring (via keyctl_set_timeout())
-> > the key, which also make the key inaccessible regardless of how many
-> > keyrings it is in.
-> 
-> Note that setting the expiry time is not really equivalent to revokation in
-> this regard as setting the expiry time is something you do when setting up a
-> key, whereas revokation is something you do later to kill a key off.
-> 
+Signed-off-by: Shu Wang <shuwang@redhat.com>
+---
+ fs/cifs/cifsfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Sort of, but actually keyctl_set_timeout() can be called at any time, and the
-timeout can be set to as little as 1 second.  So I don't see how keyctl_revoke()
-is that much different, fundamentally.
-
-> How about another solution:
-> 
->  (1) I add a flag to a key to say that it can be invalidated and a keyctl to
->      change that flag.
-
-And who would have permission to change that flag?  It seems to be the same
-problem again.
-
-> 
->  (2) I add a new key type op called ->allow_invalidation() that allows key
->      types to govern separately who is allowed to invalidate keys of that
->      type.
-> 
->      So, for instance, DNS record invalidation would require CAP_NET_ADMIN.
-
-What would the behavior be if ->allow_invalidation() was not supplied?  In other
-words, would the purpose of this be to lock down invalidation of dns_resolver
-keys, or to restrict invalidation to *only* dns_resolver keys?
-
-> 
->  (3) Allow keyrings to be cleared by users who don't have Write permission but
->      do have other permission, such as CAP_NET_ADMIN.  This would need to be
->      granted on a per-keyring basis.
-
-Granted by who, and how?  And do you mean keyctl_clear(), or
-keyctl_invalidate()?
-
-- Eric
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 180b3356ff86..a92bdb89bde3 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -1447,7 +1447,7 @@ exit_cifs(void)
+ 	exit_cifs_idmap();
+ #endif
+ #ifdef CONFIG_CIFS_UPCALL
+-	unregister_key_type(&cifs_spnego_key_type);
++	exit_cifs_spnego();
+ #endif
+ 	cifs_destroy_request_bufs();
+ 	cifs_destroy_mids();
+-- 
+2.13.5
