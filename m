@@ -1,82 +1,43 @@
-From: Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: RE: [PATCH] cifs: check rsp for NULL before dereferencing in
- SMB2_open
-Date: Fri, 8 Sep 2017 01:01:12 +0000
-Message-ID: <CY4PR21MB01356781E9457873AE7A8AAAB6950@CY4PR21MB0135.namprd21.prod.outlook.com>
-References: <20170908003735.14789-1-lsahlber@redhat.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: SMB3: Add xattr support to SMB3 and a bug fix
+Date: Thu, 7 Sep 2017 21:10:06 -0500
+Message-ID: <CAH2r5munsgjjqP-yuN6hJGsTdEs64YyZqum-3o-JWTk4tzicwg@mail.gmail.com>
+References: <CAH2r5muU8xpsW6WXkMkf_vY1r9u7_ZEsp4fEJykz=nsH=BfGpw@mail.gmail.com>
+ <CA+55aFwRv9X4L9kse4ODq=jBzUVqEnHdhi-2tesUpaZW6GbZMg@mail.gmail.com>
+ <CAH2r5mvVJVjFj_uMtxNkteQC=+njXq37o3RNDuJONtaXNfvpeg@mail.gmail.com> <CA+55aFzfajbmKGf9C+mwe4gc9bSTokgZK0VZe88DnbEqd9RpQA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20170908003735.14789-1-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Content-Language: en-US
+In-Reply-To: <CA+55aFzfajbmKGf9C+mwe4gc9bSTokgZK0VZe88DnbEqd9RpQA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2017-09-07 17:37 GMT-07:00 Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> In SMB2_open there are several paths where the SendReceive2
-> call will return an error before it sets rsp_iov.iov_base
-> thus leaving iov_base uninitialized.
->
-> Thus we need to check rsp before we dereference it in
-> the call to get_rfc1002_length().
->
-> A report of this issue was previously reported in
-> http://www.spinics.net/lists/linux-cifs/msg12846.html
->
-> RH-bugzilla : 1476151
->
-> Version 2 :
-> * Lets properly initialize rsp_iov before we use it.
->
-> Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/smb2pdu.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 97edb4d376cd..6e7d145d8b2f 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -1617,7 +1617,7 @@ SMB2_open(const unsigned int xid, struct cifs_open_=
-parms *oparms, __le16 *path,
->         struct cifs_tcon *tcon =3D oparms->tcon;
->         struct cifs_ses *ses =3D tcon->ses;
->         struct kvec iov[4];
-> -       struct kvec rsp_iov;
-> +       struct kvec rsp_iov =3D {NULL, 0};
->         int resp_buftype;
->         int uni_path_len;
->         __le16 *copy_path =3D NULL;
-> @@ -1746,7 +1746,7 @@ SMB2_open(const unsigned int xid, struct cifs_open_=
-parms *oparms, __le16 *path,
->
->         if (rc !=3D 0) {
->                 cifs_stats_fail_inc(tcon, SMB2_CREATE_HE);
-> -               if (err_buf)
-> +               if (err_buf && rsp)
->                         *err_buf =3D kmemdup(rsp, get_rfc1002_length(rsp)=
- + 4,
->                                            GFP_KERNEL);
->                 goto creat_exit;
-> --
-> 2.13.3
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Your suggestion works and will use it (feels weird not mentioning the
+branch name ... but makes sense that it would work for your tools)
 
-The patch looks correct. Good candidate for stable, I think.
+On Thu, Sep 7, 2017 at 6:19 PM, Linus Torvalds
+<torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org> wrote:
+> On Thu, Sep 7, 2017 at 4:13 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>> ok - with git request pull I end up with the branch name rather than
+>> the  equivalent signed tag in the pull request - so will fix these up
+>> manually to not show the branch but rather than tag
+>
+> You either have a really old version of git, or you're using git
+> request-pull wrong.
+>
+> You should just state the thing you want me to pull. So it should look
+> something like
+>
+>     git request-pull linus git://git.samba.org/sfrench/cifs-2.6.git
+> 4.14-smb3-xattr-enable
+>
 
-Reviewed-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>.
 
-Also It seems like we are not checking for the STATUS_STOPPED_ON_SYMLINK er=
-ror code in smb2_query_symlink().
 
---
-Best regards,
-Pavel Shilovsky
+
+-- 
+Thanks,
+
+Steve
