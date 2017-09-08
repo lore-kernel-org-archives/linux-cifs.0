@@ -1,38 +1,43 @@
-From: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
-Subject: Re: SMB3: Add xattr support to SMB3 and a bug fix
-Date: Thu, 7 Sep 2017 16:19:41 -0700
-Message-ID: <CA+55aFzfajbmKGf9C+mwe4gc9bSTokgZK0VZe88DnbEqd9RpQA@mail.gmail.com>
-References: <CAH2r5muU8xpsW6WXkMkf_vY1r9u7_ZEsp4fEJykz=nsH=BfGpw@mail.gmail.com>
- <CA+55aFwRv9X4L9kse4ODq=jBzUVqEnHdhi-2tesUpaZW6GbZMg@mail.gmail.com> <CAH2r5mvVJVjFj_uMtxNkteQC=+njXq37o3RNDuJONtaXNfvpeg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: check rsp for NULL before dereferencing in SMB2_open
+Date: Fri,  8 Sep 2017 10:18:51 +1000
+Message-ID: <20170908001851.7541-1-lsahlber@redhat.com>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mvVJVjFj_uMtxNkteQC=+njXq37o3RNDuJONtaXNfvpeg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, Sep 7, 2017 at 4:13 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> ok - with git request pull I end up with the branch name rather than
-> the  equivalent signed tag in the pull request - so will fix these up
-> manually to not show the branch but rather than tag
+In SMB2_open there are several paths where the SendReceive2
+call will return an error before it sets rsp_iov.iov_base
+thus leaving iov_base uninitialized.
 
-You either have a really old version of git, or you're using git
-request-pull wrong.
+Thus we need to check rsp before we dereference it in
+the call to get_rfc1002_length().
 
-You should just state the thing you want me to pull. So it should look
-something like
+A report of this issue was previously reported in
+http://www.spinics.net/lists/linux-cifs/msg12846.html
 
-    git request-pull linus git://git.samba.org/sfrench/cifs-2.6.git
-4.14-smb3-xattr-enable
+RH-bugzilla : 1476151
 
-and it should do the right thing - which includes verifying that the
-tag in question actually exists on the remote end etc.
+Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/smb2pdu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-(Of course, the above assumes that "linus" points to some branch that
-is my upstream, I don't actually know what your exact repository
-situation is, it might be "origin" or whatever depending on how you
-set things up)
-
-            Linus
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 97edb4d376cd..97706339a3f6 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1746,7 +1746,7 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
+ 
+ 	if (rc != 0) {
+ 		cifs_stats_fail_inc(tcon, SMB2_CREATE_HE);
+-		if (err_buf)
++		if (err_buf && rsp)
+ 			*err_buf = kmemdup(rsp, get_rfc1002_length(rsp) + 4,
+ 					   GFP_KERNEL);
+ 		goto creat_exit;
+-- 
+2.13.3
