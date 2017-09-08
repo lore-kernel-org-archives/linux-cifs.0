@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Subject: [PATCH] cifs: check rsp for NULL before dereferencing in SMB2_open
-Date: Fri,  8 Sep 2017 10:18:51 +1000
-Message-ID: <20170908001851.7541-1-lsahlber@redhat.com>
+Date: Fri,  8 Sep 2017 10:37:35 +1000
+Message-ID: <20170908003735.14789-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
         Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -21,15 +21,27 @@ http://www.spinics.net/lists/linux-cifs/msg12846.html
 
 RH-bugzilla : 1476151
 
+Version 2 :
+* Lets properly initialize rsp_iov before we use it.
+
 Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/cifs/smb2pdu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 97edb4d376cd..97706339a3f6 100644
+index 97edb4d376cd..6e7d145d8b2f 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
+@@ -1617,7 +1617,7 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
+ 	struct cifs_tcon *tcon = oparms->tcon;
+ 	struct cifs_ses *ses = tcon->ses;
+ 	struct kvec iov[4];
+-	struct kvec rsp_iov;
++	struct kvec rsp_iov = {NULL, 0};
+ 	int resp_buftype;
+ 	int uni_path_len;
+ 	__le16 *copy_path = NULL;
 @@ -1746,7 +1746,7 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
  
  	if (rc != 0) {
