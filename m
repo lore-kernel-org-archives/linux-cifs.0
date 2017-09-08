@@ -1,63 +1,88 @@
-From: shuwang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-Subject: [PATCH] cifs: release auth_key.response for reconnect.
-Date: Fri,  8 Sep 2017 18:48:33 +0800
-Message-ID: <20170908104833.7701-1-shuwang@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, chuhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, liwang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-        Shu Wang <shuwang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH v2] KEYS: make keyctl_invalidate() also require Setattr permission
+Date: Fri, 08 Sep 2017 16:41:40 +0100
+Message-ID: <610.1504885300@warthog.procyon.org.uk>
+References: <20170905183250.GA92687@gmail.com> <20170816211403.121920-1-ebiggers3@gmail.com> <13221.1504605295@warthog.procyon.org.uk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: dhowells@redhat.com, keyrings@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-nfs@vger.kernel.org,
+        Gwendal Grignou <gwendal@chromium.org>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Paul Crowley <paulcrowley@google.com>,
+        Richard Weinberger <richard@nod.at>,
+        Ryo Hashimoto <hashimoto@google.com>,
+        Tyler Hicks <tyhicks@canonical.com>, stable@vger.kernel.org
+To: Eric Biggers <ebiggers3@gmail.com>
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <20170905183250.GA92687@gmail.com>
+Content-ID: <609.1504885300.1@warthog.procyon.org.uk>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-From: Shu Wang <shuwang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Eric Biggers <ebiggers3@gmail.com> wrote:
 
-There is a race that cause cifs reconnect in cifs_mount,
-- cifs_mount
-  - cifs_get_tcp_session
-    - [ start thread cifs_demultiplex_thread
-      - cifs_read_from_socket: -ECONNABORTED
-        - DELAY_WORK smb2_reconnect_server ]
-  - cifs_setup_session
-  - [ smb2_reconnect_server ]
+> True, but Setattr permission has already been overloaded to allow several
+> different types of modifications,
 
-auth_key.response was allocated in cifs_setup_session, and
-will release when the session destoried. So when session re-
-connect, auth_key.response should be check and released.
+Perhaps therein lies the problem.  Setattr is too overloaded and really needs
+splitting along the following lines:
 
-Tested with my system:
-CIFS VFS: Free previous auth_key.response = ffff8800320bbf80
+ (1) Security: ownership, access, security label, restrictions.
 
-A simple auth_key.response allocation call trace:
-- cifs_setup_session
-- SMB2_sess_setup
-- SMB2_sess_auth_rawntlmssp_authenticate
-- build_ntlmssp_auth_blob
-- setup_ntlmv2_rsp
+ (2) Content: alter/update, timeout.
 
-Signed-off-by: Shu Wang <shuwang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/connect.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ (3) Revocation and invalidation.
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 83a8f52cd879..5a97744161c1 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -4143,6 +4143,14 @@ cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
- 	cifs_dbg(FYI, "Security Mode: 0x%x Capabilities: 0x%x TimeAdjust: %d\n",
- 		 server->sec_mode, server->capabilities, server->timeAdj);
- 
-+	if (ses->auth_key.response) {
-+		cifs_dbg(VFS, "Free previous auth_key.response = %p\n",
-+			 ses->auth_key.response);
-+		kfree(ses->auth_key.response);
-+		ses->auth_key.response = NULL;
-+		ses->auth_key.len = 0;
-+	}
-+
- 	if (server->ops->sess_setup)
- 		rc = server->ops->sess_setup(xid, ses, nls_info);
- 
--- 
-2.13.5
+Maybe I should create some sort of ACL for keys and map setperm onto that.
+
+I wonder if this could also intersect with user namespaces in some way so that
+you can make an ACL that has users from multiple namespaces - might be tricky,
+though.
+
+> and it makes *much* more sense than Search permission which should not allow
+> any modifications.  And in practice I expect people care more about whether
+> modifications are permitted or not, than the details of the finer-grained
+> permissions.
+
+I disagree still.  To allow users to invalidate a key you would *also* have to
+give them the ability to muck around with the permissions.
+
+> Sort of, but actually keyctl_set_timeout() can be called at any time, and
+> the timeout can be set to as little as 1 second.  So I don't see how
+> keyctl_revoke() is that much different, fundamentally.
+
+The timeout is a property of the key content and revoked is one of the states
+the key can be in.
+
+> >  (1) I add a flag to a key to say that it can be invalidated and a keyctl to
+> >      change that flag.
+> 
+> And who would have permission to change that flag?  It seems to be the same
+> problem again.
+
+No.  Setperm would be required to change the flag, but not to apply the
+invalidate operation if the flag is set.  Think of Invalidate as being a
+mass-unlink operation effected by the garbage collector.
+
+Kernel-created DNS keys, for example, don't grant Setperm to anyone.
+
+> What would the behavior be if ->allow_invalidation() was not supplied?
+
+The obvious would be to check that you're the owner of the key.
+
+> In other words, would the purpose of this be to lock down invalidation of
+> dns_resolver keys, or to restrict invalidation to *only* dns_resolver keys?
+
+To restrict who could invalidate keys of a particular type.  Actually, it
+wants to be per-key not per-key-type.  Hmmm...
+
+> Granted by who, and how?  And do you mean keyctl_clear(), or
+> keyctl_invalidate()?
+
+keyctl_clear().  Empty the keyring, not render it unusable.
+
+
+David
