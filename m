@@ -1,63 +1,64 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [SMB3] fixes for stable
-Date: Mon, 18 Sep 2017 14:32:45 -0500
-Message-ID: <CAH2r5msbPbw7AjnVaHNUsTdA2u=Eb9V3umDFXwEzJURPC0shsw@mail.gmail.com>
+From: Colin King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+Subject: [PATCH] CIFS: make arrays static const, reduces object code size
+Date: Tue, 19 Sep 2017 16:27:39 +0100
+Message-ID: <20170919152739.24749-1-colin.king@canonical.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Cc: kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Please pull the following changes since commit
-52269718dc2cf2585d7a2828f31d46ef46e68000:
+From: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
 
-  Merge tag 'dma-mapping-4.14' of
-git://git.infradead.org/users/hch/dma-mapping (2017-09-12 13:30:06
--0700)
+Don't populate the read-only arrays types[] on the stack, instead make
+them both static const.  Makes the object code smaller by over 200 bytes:
 
-are available in the git repository at:
+Before:
+   text	   data	    bss	    dec	    hex	filename
+ 111503	  37696	    448	 149647	  2488f	fs/cifs/file.o
 
-  git://git.samba.org/sfrench/cifs-2.6.git
-tags/4.14-smb3-multidialect-support-and-fixes-for-stable
+After:
+   text	   data	    bss	    dec	    hex	filename
+ 111140	  37856	    448	 149444	  247c4	fs/cifs/file.o
 
-for you to fetch changes up to 94a9daeaece415ce37ccb413b49a580e68e3477b:
+Signed-off-by: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+---
+ fs/cifs/file.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-  Update version of cifs module (2017-09-17 23:10:48 -0500)
-
-----------------------------------------------------------------
-Convert default dialect to smb2.1 or later to allow connecting to
-Windows 7 for example, also includes some fixes for stable
-
-I expect to send additional fixes, and an additional security
-improvement (SMB3.1.1) at the end of the week - since am in midst of
-an SMB3 test event where these are being verified.
-----------------------------------------------------------------
-Arnd Bergmann (1):
-      cifs: hide unused functions
-
-Ronnie Sahlberg (1):
-      cifs: check rsp for NULL before dereferencing in SMB2_open
-
-Steve French (3):
-      CIFS/SMB3: Update documentation to reflect SMB3 and various changes
-      SMB3: Add support for multidialect negotiate (SMB2.1 and later)
-      Update version of cifs module
-
- Documentation/filesystems/cifs/AUTHORS  |  5 ++
- Documentation/filesystems/cifs/README   | 81 ++++++++++++++----------------
- Documentation/filesystems/cifs/TODO     | 72 +++++++++++++-------------
- Documentation/filesystems/cifs/cifs.txt | 24 +++++----
- fs/cifs/cifsfs.h                        |  2 +-
- fs/cifs/cifsglob.h                      |  6 +++
- fs/cifs/connect.c                       | 24 ++++++---
- fs/cifs/smb2ops.c                       | 42 ++++++++++++++++
- fs/cifs/smb2pdu.c                       | 89 ++++++++++++++++++++++++++++-----
- fs/cifs/smb2pdu.h                       |  2 +-
- 10 files changed, 235 insertions(+), 112 deletions(-)
-
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 0786f19d288f..822311919163 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1102,8 +1102,10 @@ cifs_push_mandatory_locks(struct cifsFileInfo *cfile)
+ 	struct cifs_tcon *tcon;
+ 	unsigned int num, max_num, max_buf;
+ 	LOCKING_ANDX_RANGE *buf, *cur;
+-	int types[] = {LOCKING_ANDX_LARGE_FILES,
+-		       LOCKING_ANDX_SHARED_LOCK | LOCKING_ANDX_LARGE_FILES};
++	static const int types[] = {
++		LOCKING_ANDX_LARGE_FILES,
++		LOCKING_ANDX_SHARED_LOCK | LOCKING_ANDX_LARGE_FILES
++	};
+ 	int i;
+ 
+ 	xid = get_xid();
+@@ -1434,8 +1436,10 @@ cifs_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock,
+ 		  unsigned int xid)
+ {
+ 	int rc = 0, stored_rc;
+-	int types[] = {LOCKING_ANDX_LARGE_FILES,
+-		       LOCKING_ANDX_SHARED_LOCK | LOCKING_ANDX_LARGE_FILES};
++	static const int types[] = {
++		LOCKING_ANDX_LARGE_FILES,
++		LOCKING_ANDX_SHARED_LOCK | LOCKING_ANDX_LARGE_FILES
++	};
+ 	unsigned int i;
+ 	unsigned int max_num, num, max_buf;
+ 	LOCKING_ANDX_RANGE *buf, *cur;
 -- 
-Thanks,
-
-Steve
+2.14.1
