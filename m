@@ -1,64 +1,30 @@
-From: Colin King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
-Subject: [PATCH] CIFS: make arrays static const, reduces object code size
-Date: Tue, 19 Sep 2017 16:27:39 +0100
-Message-ID: <20170919152739.24749-1-colin.king@canonical.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Cc: kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: show 'soft' in the mount options for !hard mounts
+Date: Wed, 20 Sep 2017 13:09:23 +1000
+Message-ID: <20170920030923.23453-1-lsahlber@redhat.com>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
-
-Don't populate the read-only arrays types[] on the stack, instead make
-them both static const.  Makes the object code smaller by over 200 bytes:
-
-Before:
-   text	   data	    bss	    dec	    hex	filename
- 111503	  37696	    448	 149647	  2488f	fs/cifs/file.o
-
-After:
-   text	   data	    bss	    dec	    hex	filename
- 111140	  37856	    448	 149444	  247c4	fs/cifs/file.o
-
-Signed-off-by: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/file.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ fs/cifs/cifsfs.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 0786f19d288f..822311919163 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -1102,8 +1102,10 @@ cifs_push_mandatory_locks(struct cifsFileInfo *cfile)
- 	struct cifs_tcon *tcon;
- 	unsigned int num, max_num, max_buf;
- 	LOCKING_ANDX_RANGE *buf, *cur;
--	int types[] = {LOCKING_ANDX_LARGE_FILES,
--		       LOCKING_ANDX_SHARED_LOCK | LOCKING_ANDX_LARGE_FILES};
-+	static const int types[] = {
-+		LOCKING_ANDX_LARGE_FILES,
-+		LOCKING_ANDX_SHARED_LOCK | LOCKING_ANDX_LARGE_FILES
-+	};
- 	int i;
- 
- 	xid = get_xid();
-@@ -1434,8 +1436,10 @@ cifs_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock,
- 		  unsigned int xid)
- {
- 	int rc = 0, stored_rc;
--	int types[] = {LOCKING_ANDX_LARGE_FILES,
--		       LOCKING_ANDX_SHARED_LOCK | LOCKING_ANDX_LARGE_FILES};
-+	static const int types[] = {
-+		LOCKING_ANDX_LARGE_FILES,
-+		LOCKING_ANDX_SHARED_LOCK | LOCKING_ANDX_LARGE_FILES
-+	};
- 	unsigned int i;
- 	unsigned int max_num, num, max_buf;
- 	LOCKING_ANDX_RANGE *buf, *cur;
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 180b3356ff86..a864e6575309 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -461,6 +461,8 @@ cifs_show_options(struct seq_file *s, struct dentry *root)
+ 		seq_puts(s, ",nocase");
+ 	if (tcon->retry)
+ 		seq_puts(s, ",hard");
++	else
++		seq_puts(s, ",soft");
+ 	if (tcon->use_persistent)
+ 		seq_puts(s, ",persistenthandles");
+ 	else if (tcon->use_resilient)
 -- 
-2.14.1
+2.13.3
