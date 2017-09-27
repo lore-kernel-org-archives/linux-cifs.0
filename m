@@ -1,167 +1,147 @@
-From: Thorsten Leemhuis <linux-rCxcAJFjeRkk+I/owrrOrA@public.gmane.org>
-Subject: Regression in 4.14-rc: CIFS SMB2+ combined with pythons
- xattr.listxattr leads to "IOError: [Errno 61] No data available"
-Date: Tue, 26 Sep 2017 18:54:08 +0200
-Message-ID: <4d13dddc-2df2-4112-a214-15700c22ed50@leemhuis.info>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: handle large EA requests more gracefully in smb2+
+Date: Wed, 27 Sep 2017 16:20:01 +1000
+Message-ID: <20170927062001.979-1-lsahlber@redhat.com>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Language: en-MW
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Lo! Since updating to 4.14-rc my backup program rdiff-backup (written in
-python) crashes with an error when it tries to create a backup on a
-SMB2+ share mounted with CIFS (not sure which SMB version it is
-exactly). I assume this started to happen due to the xattr support for
-smb2+ that got merged in 8dc5b3a6cb2f (didn't find time to check a
-revert yet). It still happens with rc2, so the fixes that got merged to
-mainline at the end of last week didn't help.
+Update update reading the EA using increasingly larger buffer sizes
+until the response will fit in the buffer, or we exceed the
+(arbitrary) maximum set to 64kb.
 
-Find the error output from rdiff-backup at the end of the mail. I did a
-few tests and saw the following on 4.14-rc2;  /mnt/tests/ is the share I
-backup to.
+Without this change, a user is able to add more and more EAs using
+setfattr until the point where the total space of all EAs exceed 2kb
+at which point the user can no longer list the EAs at all
+and getfattr will abort with an error.
 
-"""
- >>> import xattr
- >>> xattr.listxattr('/mnt/tests/')
- Traceback (most recent call last):
-   File "<stdin>", line 1, in <module>
- IOError: [Errno 61] No data available>>>
-"""
+The maximum is currently set to 64kb almost arbitrarily. 64kb is
+the maximum size of all xattrs under XFS so at least for
+samba + XFS (or EXT4) servers we will not be able to write so many
+EAs that we no longer can list them any more.
 
-When I mount that share with "-o vers=1.0" the command works just fine:
+The same issue still exists for EAs in SMB1.
 
-"""
- >>> import xattr
- >>> xattr.listxattr('/mnt/tests/')
- []
- >>>
-"""
+Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/smb2maperror.c |  2 +-
+ fs/cifs/smb2ops.c      | 31 +++++++++++++++++++++++++------
+ fs/cifs/smb2pdu.c      |  6 +++---
+ fs/cifs/smb2pdu.h      |  3 ++-
+ fs/cifs/smb2proto.h    |  1 +
+ 5 files changed, 32 insertions(+), 11 deletions(-)
 
-FWIW, on 4.13.3 a SMB2+ mount of the share fails like this:
-
-"""
- >>> import xattr
- >>> xattr.listxattr('/mnt/tests')
- Traceback (most recent call last):
-   File "<stdin>", line 1, in <module>
- IOError: [Errno 95] Operation not supported>>>
-"""
-But it seems rdiff-backup can catch and handle this error just fine.
-
-What to do about this? Ciao, Thorsten
-
-P.S.: here is the complete error output from rdiff-backup:
-
-> Found interrupted initial backup. Removing...
-> Exception '[Errno 61] No data available' raised of class '<type 'exceptions.IOError'>':
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/Main.py", line 304, in error_check_Main
->     try: Main(arglist)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/Main.py", line 324, in Main
->     take_action(rps)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/Main.py", line 280, in take_action
->     elif action == "backup": Backup(rps[0], rps[1])
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/Main.py", line 334, in Backup
->     rpout.conn.fs_abilities.backup_set_globals(rpin, force)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/fs_abilities.py", line 936, in backup_set_globals
->     update_quoting = bsg.set_chars_to_quote(Globals.rbdir, force)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/fs_abilities.py", line 734, in set_chars_to_quote
->     self.get_ctq_from_fsas(), force)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/fs_abilities.py", line 765, in compare_ctq_file
->     ctq_rp.write_string(actual_ctq)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/rpath.py", line 1206, in write_string
->     self.setdata()
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/rpath.py", line 909, in setdata
->     if self.lstat(): self.conn.rpath.setdata_local(self)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/rpath.py", line 1496, in setdata_local
->     if Globals.eas_conn: rpath.data['ea'] = ea_get(rpath)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/eas_acls.py", line 597, in rpath_ea_get
->     ea.read_from_rp(rp)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/eas_acls.py", line 60, in read_from_rp
->     attr_list = rp.conn.xattr.listxattr(rp.path, rp.issym())
-> 
-> Traceback (most recent call last):
->   File "/usr/bin/rdiff-backup", line 30, in <module>
->     rdiff_backup.Main.error_check_Main(sys.argv[1:])
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/Main.py", line 304, in error_check_Main
->     try: Main(arglist)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/Main.py", line 324, in Main
->     take_action(rps)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/Main.py", line 280, in take_action
->     elif action == "backup": Backup(rps[0], rps[1])
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/Main.py", line 334, in Backup
->     rpout.conn.fs_abilities.backup_set_globals(rpin, force)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/fs_abilities.py", line 936, in backup_set_globals
->     update_quoting = bsg.set_chars_to_quote(Globals.rbdir, force)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/fs_abilities.py", line 734, in set_chars_to_quote
->     self.get_ctq_from_fsas(), force)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/fs_abilities.py", line 765, in compare_ctq_file
->     ctq_rp.write_string(actual_ctq)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/rpath.py", line 1206, in write_string
->     self.setdata()
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/rpath.py", line 909, in setdata
->     if self.lstat(): self.conn.rpath.setdata_local(self)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/rpath.py", line 1496, in setdata_local
->     if Globals.eas_conn: rpath.data['ea'] = ea_get(rpath)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/eas_acls.py", line 597, in rpath_ea_get
->     ea.read_from_rp(rp)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/eas_acls.py", line 60, in read_from_rp
->     attr_list = rp.conn.xattr.listxattr(rp.path, rp.issym())
-> IOError: [Errno 61] No data availableFound interrupted initial backup. Removing...
-> Exception '[Errno 61] No data available' raised of class '<type 'exceptions.IOError'>':
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/Main.py", line 304, in error_check_Main
->     try: Main(arglist)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/Main.py", line 324, in Main
->     take_action(rps)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/Main.py", line 280, in take_action
->     elif action == "backup": Backup(rps[0], rps[1])
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/Main.py", line 334, in Backup
->     rpout.conn.fs_abilities.backup_set_globals(rpin, force)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/fs_abilities.py", line 936, in backup_set_globals
->     update_quoting = bsg.set_chars_to_quote(Globals.rbdir, force)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/fs_abilities.py", line 734, in set_chars_to_quote
->     self.get_ctq_from_fsas(), force)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/fs_abilities.py", line 765, in compare_ctq_file
->     ctq_rp.write_string(actual_ctq)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/rpath.py", line 1206, in write_string
->     self.setdata()
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/rpath.py", line 909, in setdata
->     if self.lstat(): self.conn.rpath.setdata_local(self)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/rpath.py", line 1496, in setdata_local
->     if Globals.eas_conn: rpath.data['ea'] = ea_get(rpath)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/eas_acls.py", line 597, in rpath_ea_get
->     ea.read_from_rp(rp)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/eas_acls.py", line 60, in read_from_rp
->     attr_list = rp.conn.xattr.listxattr(rp.path, rp.issym())
-> 
-> Traceback (most recent call last):
->   File "/usr/bin/rdiff-backup", line 30, in <module>
->     rdiff_backup.Main.error_check_Main(sys.argv[1:])
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/Main.py", line 304, in error_check_Main
->     try: Main(arglist)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/Main.py", line 324, in Main
->     take_action(rps)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/Main.py", line 280, in take_action
->     elif action == "backup": Backup(rps[0], rps[1])
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/Main.py", line 334, in Backup
->     rpout.conn.fs_abilities.backup_set_globals(rpin, force)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/fs_abilities.py", line 936, in backup_set_globals
->     update_quoting = bsg.set_chars_to_quote(Globals.rbdir, force)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/fs_abilities.py", line 734, in set_chars_to_quote
->     self.get_ctq_from_fsas(), force)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/fs_abilities.py", line 765, in compare_ctq_file
->     ctq_rp.write_string(actual_ctq)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/rpath.py", line 1206, in write_string
->     self.setdata()
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/rpath.py", line 909, in setdata
->     if self.lstat(): self.conn.rpath.setdata_local(self)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/rpath.py", line 1496, in setdata_local
->     if Globals.eas_conn: rpath.data['ea'] = ea_get(rpath)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/eas_acls.py", line 597, in rpath_ea_get
->     ea.read_from_rp(rp)
->   File "/usr/lib64/python2.7/site-packages/rdiff_backup/eas_acls.py", line 60, in read_from_rp
->     attr_list = rp.conn.xattr.listxattr(rp.path, rp.issym())
+diff --git a/fs/cifs/smb2maperror.c b/fs/cifs/smb2maperror.c
+index 7ca9808a0daa..62c88dfed57b 100644
+--- a/fs/cifs/smb2maperror.c
++++ b/fs/cifs/smb2maperror.c
+@@ -214,7 +214,7 @@ static const struct status_to_posix_error smb2_error_map_table[] = {
+ 	{STATUS_DATATYPE_MISALIGNMENT, -EIO, "STATUS_DATATYPE_MISALIGNMENT"},
+ 	{STATUS_BREAKPOINT, -EIO, "STATUS_BREAKPOINT"},
+ 	{STATUS_SINGLE_STEP, -EIO, "STATUS_SINGLE_STEP"},
+-	{STATUS_BUFFER_OVERFLOW, -EIO, "STATUS_BUFFER_OVERFLOW"},
++	{STATUS_BUFFER_OVERFLOW, -E2BIG, "STATUS_BUFFER_OVERFLOW"},
+ 	{STATUS_NO_MORE_FILES, -ENODATA, "STATUS_NO_MORE_FILES"},
+ 	{STATUS_WAKE_SYSTEM_DEBUGGER, -EIO, "STATUS_WAKE_SYSTEM_DEBUGGER"},
+ 	{STATUS_HANDLES_CLOSED, -EIO, "STATUS_HANDLES_CLOSED"},
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 0dafdbae1f8c..bdb963d0ba32 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -522,6 +522,7 @@ smb2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
+ 	struct cifs_open_parms oparms;
+ 	struct cifs_fid fid;
+ 	struct smb2_file_full_ea_info *smb2_data;
++	int ea_buf_size = SMB2_MIN_EA_BUF;
+ 
+ 	utf16_path = cifs_convert_path_to_utf16(path, cifs_sb);
+ 	if (!utf16_path)
+@@ -541,14 +542,32 @@ smb2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
+ 		return rc;
+ 	}
+ 
+-	smb2_data = kzalloc(SMB2_MAX_EA_BUF, GFP_KERNEL);
+-	if (smb2_data == NULL) {
+-		SMB2_close(xid, tcon, fid.persistent_fid, fid.volatile_fid);
+-		return -ENOMEM;
++	while (1) {
++		smb2_data = kzalloc(ea_buf_size, GFP_KERNEL);
++		if (smb2_data == NULL) {
++			SMB2_close(xid, tcon, fid.persistent_fid,
++				   fid.volatile_fid);
++			return -ENOMEM;
++		}
++
++		rc = SMB2_query_eas(xid, tcon, fid.persistent_fid,
++				    fid.volatile_fid,
++				    ea_buf_size, smb2_data);
++
++		if (rc != -E2BIG)
++			break;
++
++		kfree(smb2_data);
++		ea_buf_size <<= 1;
++
++		if (ea_buf_size > SMB2_MAX_EA_BUF) {
++			cifs_dbg(VFS, "EA size is too large\n");
++			SMB2_close(xid, tcon, fid.persistent_fid,
++				   fid.volatile_fid);
++			return -ENOMEM;
++		}
+ 	}
+ 
+-	rc = SMB2_query_eas(xid, tcon, fid.persistent_fid, fid.volatile_fid,
+-			    smb2_data);
+ 	SMB2_close(xid, tcon, fid.persistent_fid, fid.volatile_fid);
+ 
+ 	if (!rc)
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 6f0e6343c15e..ba3865b338d8 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -2233,12 +2233,12 @@ query_info(const unsigned int xid, struct cifs_tcon *tcon,
+ }
+ 
+ int SMB2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
+-	u64 persistent_fid, u64 volatile_fid,
+-	struct smb2_file_full_ea_info *data)
++		   u64 persistent_fid, u64 volatile_fid,
++		   int ea_buf_size, struct smb2_file_full_ea_info *data)
+ {
+ 	return query_info(xid, tcon, persistent_fid, volatile_fid,
+ 			  FILE_FULL_EA_INFORMATION, SMB2_O_INFO_FILE, 0,
+-			  SMB2_MAX_EA_BUF,
++			  ea_buf_size,
+ 			  sizeof(struct smb2_file_full_ea_info),
+ 			  (void **)&data,
+ 			  NULL);
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index 6c9653a130c8..4c155b95b558 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -1178,7 +1178,8 @@ struct smb2_file_link_info { /* encoding of request for level 11 */
+ 	char   FileName[0];     /* Name to be assigned to new link */
+ } __packed; /* level 11 Set */
+ 
+-#define SMB2_MAX_EA_BUF 2048
++#define SMB2_MIN_EA_BUF  2048
++#define SMB2_MAX_EA_BUF 65536
+ 
+ struct smb2_file_full_ea_info { /* encoding of response for level 15 */
+ 	__le32 next_entry_offset;
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index 003217099ef3..e9ab5227e7a8 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -134,6 +134,7 @@ extern int SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon,
+ 		      u64 persistent_file_id, u64 volatile_file_id);
+ extern int SMB2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
+ 			  u64 persistent_file_id, u64 volatile_file_id,
++			  int ea_buf_size,
+ 			  struct smb2_file_full_ea_info *data);
+ extern int SMB2_query_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 			   u64 persistent_file_id, u64 volatile_file_id,
+-- 
+2.13.3
