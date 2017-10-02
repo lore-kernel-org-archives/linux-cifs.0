@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v4 08/22] CIFS: SMBD: Upper layer reconnects to SMBDirect session
-Date: Sun,  1 Oct 2017 19:30:16 -0700
-Message-ID: <20171002023030.3582-9-longli@exchange.microsoft.com>
+Subject: [Patch v4 11/22] CIFS: SMBD: Set SMBDirect maximum read or write size for I/O
+Date: Sun,  1 Oct 2017 19:30:19 -0700
+Message-ID: <20171002023030.3582-12-longli@exchange.microsoft.com>
 References: <20171002023030.3582-1-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -16,30 +16,53 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-Do a reconnect on SMBDirect when it is used as the connection. Reconnect can
-happen for many reasons and it's mostly the decision of upper layer SMB2.
+When connecting over SMBDirect, the transport negotiates its maximum I/O sizes
+with the server and determines how to choose to do RDMA send/recv vs
+read/write. Expose these maximum I/O sizes to upper layer so we will get the
+correct sized payloads.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/connect.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ fs/cifs/smb2ops.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 94b6357..26ad706 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -405,7 +405,11 @@ cifs_reconnect(struct TCP_Server_Info *server)
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index fb2934b..7ad35d6 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -32,6 +32,7 @@
+ #include "smb2status.h"
+ #include "smb2glob.h"
+ #include "cifs_ioctl.h"
++#include "smbdirect.h"
  
- 		/* we should try only the port we connected to before */
- 		mutex_lock(&server->srv_mutex);
--		rc = generic_ip_connect(server);
-+		if (server->rdma)
-+			rc = smbd_reconnect(server);
-+		else
-+			rc = generic_ip_connect(server);
-+
- 		if (rc) {
- 			cifs_dbg(FYI, "reconnect error %d\n", rc);
- 			mutex_unlock(&server->srv_mutex);
+ static int
+ change_conf(struct TCP_Server_Info *server)
+@@ -249,7 +250,11 @@ smb2_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
+ 
+ 	/* start with specified wsize, or default */
+ 	wsize = volume_info->wsize ? volume_info->wsize : CIFS_DEFAULT_IOSIZE;
+-	wsize = min_t(unsigned int, wsize, server->max_write);
++	if (server->rdma)
++		wsize = min_t(unsigned int,
++				wsize, server->smbd_conn->max_readwrite_size);
++	else
++		wsize = min_t(unsigned int, wsize, server->max_write);
+ 
+ 	if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
+ 		wsize = min_t(unsigned int, wsize, SMB2_MAX_BUFFER_SIZE);
+@@ -265,7 +270,11 @@ smb2_negotiate_rsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
+ 
+ 	/* start with specified rsize, or default */
+ 	rsize = volume_info->rsize ? volume_info->rsize : CIFS_DEFAULT_IOSIZE;
+-	rsize = min_t(unsigned int, rsize, server->max_read);
++	if (server->rdma)
++		rsize = min_t(unsigned int,
++				rsize, server->smbd_conn->max_readwrite_size);
++	else
++		rsize = min_t(unsigned int, rsize, server->max_read);
+ 
+ 	if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
+ 		rsize = min_t(unsigned int, rsize, SMB2_MAX_BUFFER_SIZE);
 -- 
 2.7.4
