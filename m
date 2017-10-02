@@ -1,64 +1,67 @@
-From: Christophe JAILLET <christophe.jaillet-39ZsbGIQGT5GWvitb5QawA@public.gmane.org>
-Subject: [PATCH] SMB3: Fix resource leak if an unexpected dialect is returned
-Date: Sat, 30 Sep 2017 08:05:29 +0200
-Message-ID: <20170930060529.8445-1-christophe.jaillet@wanadoo.fr>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        Christophe JAILLET <christophe.jaillet-39ZsbGIQGT5GWvitb5QawA@public.gmane.org>
-To: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
+From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+Subject: [Patch v4 06/22] CIFS: SMBD: Upper layer connects to SMBDirect session
+Date: Sun,  1 Oct 2017 19:30:14 -0700
+Message-ID: <20171002023030.3582-7-longli@exchange.microsoft.com>
+References: <20171002023030.3582-1-longli@exchange.microsoft.com>
+Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+        Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20171002023030.3582-1-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-If we receive an unexpected dialect, we must free some resources before
-returning.
+From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 
-Branch to the existing error hangling path to fix it.
+When "rdma" is specified in the mount option, CIFS attempts to connect to
+SMBDirect instead of TCP socket.
 
-Fixes: 9764c02fcbad ("SMB3: Add support for multidialect negotiate (SMB2.1 and later)")
-Signed-off-by: Christophe JAILLET <christophe.jaillet-39ZsbGIQGT5GWvitb5QawA@public.gmane.org>
+Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ fs/cifs/connect.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 6f0e6343c15e..29025398d7d2 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -554,18 +554,21 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
- 		if (rsp->DialectRevision == cpu_to_le16(SMB20_PROT_ID)) {
- 			cifs_dbg(VFS,
- 				"SMB2 dialect returned but not requested\n");
--			return -EIO;
-+			rc = -EIO;
-+			goto neg_exit;
- 		} else if (rsp->DialectRevision == cpu_to_le16(SMB21_PROT_ID)) {
- 			cifs_dbg(VFS,
- 				"SMB2.1 dialect returned but not requested\n");
--			return -EIO;
-+			rc = -EIO;
-+			goto neg_exit;
- 		}
- 	} else if (strcmp(ses->server->vals->version_string,
- 		   SMBDEFAULT_VERSION_STRING) == 0) {
- 		if (rsp->DialectRevision == cpu_to_le16(SMB20_PROT_ID)) {
- 			cifs_dbg(VFS,
- 				"SMB2 dialect returned but not requested\n");
--			return -EIO;
-+			rc = -EIO;
-+			goto neg_exit;
- 		} else if (rsp->DialectRevision == cpu_to_le16(SMB21_PROT_ID)) {
- 			/* ops set to 3.0 by default for default so update */
- 			ses->server->ops = &smb21_operations;
-@@ -575,7 +578,8 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
- 		/* if requested single dialect ensure returned dialect matched */
- 		cifs_dbg(VFS, "Illegal 0x%x dialect returned: not requested\n",
- 			le16_to_cpu(rsp->DialectRevision));
--		return -EIO;
-+		rc = -EIO;
-+		goto neg_exit;
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index b5a575f..94b6357 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -45,6 +45,7 @@
+ #include <linux/parser.h>
+ #include <linux/bvec.h>
+ 
++#include "smbdirect.h"
+ #include "cifspdu.h"
+ #include "cifsglob.h"
+ #include "cifsproto.h"
+@@ -2280,12 +2281,26 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 	else
+ 		tcp_ses->echo_interval = SMB_ECHO_INTERVAL_DEFAULT * HZ;
+ 
++	if (tcp_ses->rdma) {
++		tcp_ses->smbd_conn = smbd_get_connection(
++			tcp_ses, (struct sockaddr *)&volume_info->dstaddr);
++		if (tcp_ses->smbd_conn) {
++			cifs_dbg(VFS, "RDMA transport established\n");
++			rc = 0;
++			goto connected;
++		} else {
++			rc = -ENOENT;
++			goto out_err_crypto_release;
++		}
++	}
++
+ 	rc = ip_connect(tcp_ses);
+ 	if (rc < 0) {
+ 		cifs_dbg(VFS, "Error connecting to socket. Aborting operation.\n");
+ 		goto out_err_crypto_release;
  	}
  
- 	cifs_dbg(FYI, "mode 0x%x\n", rsp->SecurityMode);
++connected:
+ 	/*
+ 	 * since we're in a cifs function already, we know that
+ 	 * this will succeed. No need for try_module_get().
 -- 
-2.11.0
+2.7.4
