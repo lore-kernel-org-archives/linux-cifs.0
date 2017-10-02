@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v4 15/22] CIFS: SMBD: Upper layer sends data via RDMA send
-Date: Sun,  1 Oct 2017 19:30:23 -0700
-Message-ID: <20171002023030.3582-16-longli@exchange.microsoft.com>
+Subject: [Patch v4 20/22] CIFS: SMBD: Read correct returned data length for RDMA write (SMB read) I/O
+Date: Sun,  1 Oct 2017 19:30:28 -0700
+Message-ID: <20171002023030.3582-21-longli@exchange.microsoft.com>
 References: <20171002023030.3582-1-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -16,44 +16,96 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-With SMBDirect connected, use it for sending data via RDMA send.
+This patch is for preparing upper layer for doing SMB read via RDMA write.
+
+When RDMA write is used for SMB read, the returned data length is in
+DataRemaining in the response packet. Reading it properly by adding a
+parameter to specifiy where the returned data length is.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/transport.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ fs/cifs/cifsglob.h | 10 ++++++++--
+ fs/cifs/cifssmb.c  |  4 ++--
+ fs/cifs/smb1ops.c  |  2 +-
+ fs/cifs/smb2ops.c  |  8 ++++++--
+ 4 files changed, 17 insertions(+), 7 deletions(-)
 
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 7efbab0..3a9b5a0 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -37,6 +37,7 @@
- #include "cifsglob.h"
- #include "cifsproto.h"
- #include "cifs_debug.h"
-+#include "smbdirect.h"
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index bcb6df1..f851b50 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -228,8 +228,14 @@ struct smb_version_operations {
+ 	__u64 (*get_next_mid)(struct TCP_Server_Info *);
+ 	/* data offset from read response message */
+ 	unsigned int (*read_data_offset)(char *);
+-	/* data length from read response message */
+-	unsigned int (*read_data_length)(char *);
++	/*
++	 * Data length from read response message
++	 * When in_remaining is true, the returned data length is in
++	 * message field DataRemaining for out-of-band data read (e.g through
++	 * Memory Registration RDMA write in SMBD).
++	 * Otherwise, the returned data length is in message field DataLength.
++	 */
++	unsigned int (*read_data_length)(char *, bool in_remaining);
+ 	/* map smb to linux error */
+ 	int (*map_error)(char *, bool);
+ 	/* find mid corresponding to the response message */
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 0e29ecf..b9410e1 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -1531,8 +1531,8 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+ 		 rdata->iov[0].iov_base, server->total_read);
  
- void
- cifs_wake_up_task(struct mid_q_entry *mid)
-@@ -230,6 +231,11 @@ __smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
- 	struct msghdr smb_msg;
- 	int val = 1;
+ 	/* how much data is in the response? */
+-	data_len = server->ops->read_data_length(buf);
+-	if (data_offset + data_len > buflen) {
++	data_len = server->ops->read_data_length(buf, rdata->mr);
++	if (!rdata->mr && (data_offset + data_len > buflen)) {
+ 		/* data_len is corrupt -- discard frame */
+ 		rdata->result = -EIO;
+ 		return cifs_readv_discard(server, mid);
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index a723df3..27a8280 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -87,7 +87,7 @@ cifs_read_data_offset(char *buf)
+ }
  
-+	if (server->smbd_conn) {
-+		rc = smbd_send(server->smbd_conn, rqst);
-+		goto done;
-+	}
+ static unsigned int
+-cifs_read_data_length(char *buf)
++cifs_read_data_length(char *buf, bool in_remaining)
+ {
+ 	READ_RSP *rsp = (READ_RSP *)buf;
+ 	return (le16_to_cpu(rsp->DataLengthHigh) << 16) +
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 7ad35d6..a765877 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -935,9 +935,13 @@ smb2_read_data_offset(char *buf)
+ }
+ 
+ static unsigned int
+-smb2_read_data_length(char *buf)
++smb2_read_data_length(char *buf, bool in_remaining)
+ {
+ 	struct smb2_read_rsp *rsp = (struct smb2_read_rsp *)buf;
 +
- 	if (ssocket == NULL)
- 		return -ENOTSOCK;
++	if (in_remaining)
++		return le32_to_cpu(rsp->DataRemaining);
++
+ 	return le32_to_cpu(rsp->DataLength);
+ }
  
-@@ -299,6 +305,7 @@ __smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
- 		server->tcpStatus = CifsNeedReconnect;
+@@ -2446,7 +2450,7 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
  	}
  
-+done:
- 	if (rc < 0 && rc != -EINTR)
- 		cifs_dbg(VFS, "Error %d sending data on socket to server\n",
- 			 rc);
+ 	data_offset = server->ops->read_data_offset(buf) + 4;
+-	data_len = server->ops->read_data_length(buf);
++	data_len = server->ops->read_data_length(buf, rdata->mr);
+ 
+ 	if (data_offset < server->vals->read_rsp_size) {
+ 		/*
 -- 
 2.7.4
