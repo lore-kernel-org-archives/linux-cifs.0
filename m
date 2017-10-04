@@ -1,75 +1,57 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Fake rwx permissions if we can not read the CIFS ACL
-Date: Wed, 4 Oct 2017 17:07:02 -0500
-Message-ID: <CAH2r5msFuxZnYhyrgEExChLNb5_nM-8mn7ndq2=c2HAPW-uiDA@mail.gmail.com>
-References: <20171004045953.28134-1-lsahlber@redhat.com> <CAH2r5muHtkLFHkrKdmto04E=LSLn3BXJ54h4uGnhip7E0Z-hzQ@mail.gmail.com>
+Subject: Re: [Patch v4 16/22] CIFS: SMBD: Fix the definition for SMB2_CHANNEL_RDMA_V1_INVALIDATE
+Date: Wed, 4 Oct 2017 17:07:45 -0500
+Message-ID: <CAH2r5msU_H5FS+ZeO6yEJFrqOYctsUktaJ=e2Lu4eT8x_DrQ-g@mail.gmail.com>
+References: <20171002023030.3582-1-longli@exchange.microsoft.com> <20171002023030.3582-17-longli@exchange.microsoft.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+        Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5muHtkLFHkrKdmto04E=LSLn3BXJ54h4uGnhip7E0Z-hzQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20171002023030.3582-17-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-and added cc:stable
+Good catch - merged into cifs-2.6.git for-next
 
-On Wed, Oct 4, 2017 at 5:06 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> merged into cifs-2.6.git for-next but notice minor nit about comments
-> (always run checpatch before submitting)
+On Sun, Oct 1, 2017 at 9:30 PM, Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org> wrote:
+> From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 >
-> WARNING: Block comments use * on subsequent lines
-> #85: FILE: fs/cifs/cifsacl.c:1160:
-> +            /* If we do not have permission to read the ACL
-> +               just clear all rwx permissions */
+> The channel value for requesting server remote invalidating local memory
+> registration should be 0x00000002
 >
-> On Tue, Oct 3, 2017 at 11:59 PM, Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->> If the cifsacl mount option is used and we try to list a directory that
->> contains entries where we do not have READ_CONTROL access we will see errors
->> such as "ls: cannot access '...': Permission denied"
->> and the directory listing will show files with funny attributes like
->> "-?????????? ? ?    ?    ?            ? foo002.txt"
->>
->> This patch fixes this by checking the error from reading the security
->> descriptor and if it failed with EACCES we fake the attributes as
->> all 0.
->>
->> Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->> ---
->>  fs/cifs/cifsacl.c | 10 +++++++++-
->>  1 file changed, 9 insertions(+), 1 deletion(-)
->>
->> diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
->> index b98436f5c7c7..11d0d135a9b7 100644
->> --- a/fs/cifs/cifsacl.c
->> +++ b/fs/cifs/cifsacl.c
->> @@ -1155,7 +1155,15 @@ cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
->>         /* if we can retrieve the ACL, now parse Access Control Entries, ACEs */
->>         if (IS_ERR(pntsd)) {
->>                 rc = PTR_ERR(pntsd);
->> -               cifs_dbg(VFS, "%s: error %d getting sec desc\n", __func__, rc);
->> +               if (rc == -EACCES) {
->> +                       /* If we do not have permission to read the ACL
->> +                          just clear all rwx permissions */
->> +                       cifs_dbg(NOISY, "%s: EACCES reading ACL\n", __func__);
->> +                       fattr->cf_mode &= ~(S_IRWXUGO);
->> +                       rc = 0;
->> +               } else
->> +                       cifs_dbg(VFS, "%s: error %d getting sec desc\n",
->> +                                __func__, rc);
->>         } else {
->>                 rc = parse_sec_desc(cifs_sb, pntsd, acllen, fattr);
->>                 kfree(pntsd);
->> --
->> 2.13.3
->>
+> Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+> ---
+>  fs/cifs/smb2pdu.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
+> diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+> index 393ed5f..f783a08 100644
+> --- a/fs/cifs/smb2pdu.h
+> +++ b/fs/cifs/smb2pdu.h
+> @@ -832,7 +832,7 @@ struct smb2_flush_rsp {
+>  /* Channel field for read and write: exactly one of following flags can be set*/
+>  #define SMB2_CHANNEL_NONE              0x00000000
+>  #define SMB2_CHANNEL_RDMA_V1           0x00000001 /* SMB3 or later */
+> -#define SMB2_CHANNEL_RDMA_V1_INVALIDATE 0x00000001 /* SMB3.02 or later */
+> +#define SMB2_CHANNEL_RDMA_V1_INVALIDATE 0x00000002 /* SMB3.02 or later */
 >
+>  /* SMB2 read request without RFC1001 length at the beginning */
+>  struct smb2_read_plain_req {
+> --
+> 2.7.4
 >
 > --
-> Thanks,
->
-> Steve
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 
