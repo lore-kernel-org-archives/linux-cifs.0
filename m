@@ -1,54 +1,23 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Fix NULL pointer deref on TCON failures
-Date: Tue, 10 Oct 2017 18:07:32 -0500
-Message-ID: <CAH2r5muQYkkG8R8_Jzk52EkAzXkEKnQ5=qPpCsHNmDEkSoqj2Q@mail.gmail.com>
-References: <20171010230138.31832-1-lsahlber@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH 00/12] cifs: various fixes for NULL pointers
+Date: Wed, 11 Oct 2017 12:59:15 +1100
+Message-ID: <20171011015927.7669-1-lsahlber@redhat.com>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171010230138.31832-1-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-probably should cc stable ...
 
-On Tue, Oct 10, 2017 at 6:01 PM, Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/smb2pdu.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 6f0e6343c15e..6ff4c275ca9a 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -1255,7 +1255,7 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
->         struct smb2_tree_connect_req *req;
->         struct smb2_tree_connect_rsp *rsp = NULL;
->         struct kvec iov[2];
-> -       struct kvec rsp_iov;
-> +       struct kvec rsp_iov = { NULL, 0 };
->         int rc = 0;
->         int resp_buftype;
->         int unc_path_len;
-> @@ -1315,6 +1315,8 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
->         rc = SendReceive2(xid, ses, iov, 2, &resp_buftype, flags, &rsp_iov);
->         cifs_small_buf_release(req);
->         rsp = (struct smb2_tree_connect_rsp *)rsp_iov.iov_base;
-> +       if (rsp == NULL)
-> +               goto tcon_exit;
->
->         if (rc != 0) {
->                 if (tcon) {
-> --
-> 2.13.3
->
+List, Steve
 
+We recently had two very similar issues of dereferencing uninitialized pointer
+when Sendreceive2() would have certain failures.
 
+I went through the rest of smb2pdu.c to check for similar issues.
 
--- 
-Thanks,
+These are what I found. Including a memory leak in smb2_lockv().
 
-Steve
+These patches are all small and kept separate for review.
+It might make sense to collapse all these patches into a single one. I don't
+know. Up to you.
