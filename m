@@ -1,39 +1,46 @@
-From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Fix NULL pointer deref on TCON failures
-Date: Wed, 11 Oct 2017 13:23:08 +0200
-Message-ID: <mps376q9bdv.fsf@aaptelpc.suse.de>
+From: Aurelien Aptel <aaptel@suse.com>
+Subject: [PATCH] CIFS: Fix NULL pointer deref on SMB2_tcon() failure
+Date: Wed, 11 Oct 2017 13:23:36 +0200
+Message-ID: <20171011112336.11263-1-aaptel@suse.com>
 References: <20171010230138.31832-1-lsahlber@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171010230138.31832-1-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: lsahlber@redhat.com, smfrench@gmail.com,
+        Aurelien Aptel <aaptel@suse.com>, stable@vger.kernel.org
+To: linux-cifs@vger.kernel.org
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <20171010230138.31832-1-lsahlber@redhat.com>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Wah! I believe we worked on the exact same bug. I was just about to send
-a similar patch (coming up).
+If SendReceive2() fails rsp is set to NULL but is dereferenced in the
+error handling code.
 
-The difference is the code still goes thru the block that sets the
-reconnect flag, which we should do I think.
+Cc: stable@vger.kernel.org
+Signed-off-by: Aurelien Aptel <aaptel@suse.com>
+---
+ fs/cifs/smb2pdu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
->	rsp = (struct smb2_tree_connect_rsp *)rsp_iov.iov_base;
->
->	if (rc != 0) {
->		if (tcon) {
->			cifs_stats_fail_inc(tcon, SMB2_TREE_CONNECT_HE);
->			tcon->need_reconnect = true;
->		}
->		goto tcon_error_exit;
->	}
-
-this block ^^^^^
-
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 7aa67206f6da..eb658b641ded 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1168,7 +1168,7 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+ 	struct smb2_tree_connect_req *req;
+ 	struct smb2_tree_connect_rsp *rsp = NULL;
+ 	struct kvec iov[2];
+-	struct kvec rsp_iov;
++	struct kvec rsp_iov = { NULL, 0 };
+ 	int rc = 0;
+ 	int resp_buftype;
+ 	int unc_path_len;
+@@ -1285,7 +1285,7 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+ 	return rc;
+ 
+ tcon_error_exit:
+-	if (rsp->hdr.sync_hdr.Status == STATUS_BAD_NETWORK_NAME) {
++	if (rsp && rsp->hdr.sync_hdr.Status == STATUS_BAD_NETWORK_NAME) {
+ 		cifs_dbg(VFS, "BAD_NETWORK_NAME: %s\n", tree);
+ 	}
+ 	goto tcon_exit;
 -- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
-GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+2.12.3
