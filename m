@@ -1,183 +1,82 @@
-From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: fix remaining rsp_iov issues
-Date: Wed, 11 Oct 2017 16:41:40 +1100
-Message-ID: <20171011054140.26535-2-lsahlber@redhat.com>
-References: <20171011054140.26535-1-lsahlber@redhat.com>
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171011054140.26535-1-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v8 01/20] crypto: change transient busy return code to
+ -EAGAIN
+Date: Wed, 11 Oct 2017 14:26:51 +0800
+Message-ID: <20171011062651.GA18664@gondor.apana.org.au>
+References: <1504615144-29770-1-git-send-email-gilad@benyossef.com>
+ <1504615144-29770-2-git-send-email-gilad@benyossef.com>
+ <20171007030541.GA29421@gondor.apana.org.au>
+ <CAOtvUMd=vtju=VJkCYFRrvANbRRYj+95cdgDoMMfBvmPaPbsAA@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Mike Snitzer <snitzer@redhat.com>, linux-doc@vger.kernel.org,
+ Gary Hook <gary.hook@amd.com>, David Howells <dhowells@redhat.com>,
+ device-mapper development <dm-devel@redhat.com>, keyrings@vger.kernel.org,
+ linux-ima-devel@lists.sourceforge.net, Alasdair Kergon <agk@redhat.com>,
+ Steffen Klassert <steffen.klassert@secunet.com>,
+ Boris Brezillon <boris.brezillon@free-electrons.com>,
+ Jonathan Corbet <corbet@lwn.net>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+ Mimi Zohar <zohar@linux.vnet.ibm.com>, "Serge E. Hallyn" <serge@hallyn.com>,
+ Tom Lendacky <thomas.lendacky@amd.com>, linux-cifs@vger.kernel.org,
+ linux-ima-user@lists.sourceforge.net, Arnaud Ebalard <arno@natisbad.org>,
+ linux-raid@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+ linux-mediatek@lists.infradead.org, James Morris <james.l.morris@oracle.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>, Jaegeuk Kim <jaegeuk@kernel.o
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <CAOtvUMd=vtju=VJkCYFRrvANbRRYj+95cdgDoMMfBvmPaPbsAA@mail.gmail.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-cifs.vger.kernel.org
 
-This patch fixes the remaining issues with rsp_iov where
-we might dereference uninitialized pointers or pass them
-to free_rsp_buf().
-There is also one memory leak that is fixed.
+On Sat, Oct 07, 2017 at 10:51:42AM +0300, Gilad Ben-Yossef wrote:
+> On Sat, Oct 7, 2017 at 6:05 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> > On Tue, Sep 05, 2017 at 03:38:40PM +0300, Gilad Ben-Yossef wrote:
+> >>
+> >> diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
+> >> index 5e92bd2..3b3c154 100644
+> >> --- a/crypto/algif_hash.c
+> >> +++ b/crypto/algif_hash.c
+> >> @@ -39,6 +39,20 @@ struct algif_hash_tfm {
+> >>       bool has_key;
+> >>  };
+> >>
+> >> +/* Previous versions of crypto_* ops used to return -EBUSY
+> >> + * rather than -EAGAIN to indicate being tied up. The in
+> >> + * kernel API changed but we don't want to break the user
+> >> + * space API. As only the hash user interface exposed this
+> >> + * error ever to the user, do the translation here.
+> >> + */
+> >> +static inline int crypto_user_err(int err)
+> >> +{
+> >> +     if (err == -EAGAIN)
+> >> +             return -EBUSY;
+> >> +
+> >> +     return err;
+> >
+> > I don't see the need to carry along this baggage.  Does anyone
+> > in user-space actually rely on EBUSY?
+> 
+> 
+> I am not aware of anyone who does. I was just trying to avoid
+> changing the user ABI.
+> 
+> Shall I roll a new revision without this patch?
 
-Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/smb2pdu.c | 43 +++++++++++++++++++++++++------------------
- 1 file changed, 25 insertions(+), 18 deletions(-)
+Yes please.  I'd rather not carry this around for eternity unless
+it was actually required.
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 6ff4c275ca9a..fd2b2b8e86b0 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -470,7 +470,7 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
- 	struct smb2_negotiate_req *req;
- 	struct smb2_negotiate_rsp *rsp;
- 	struct kvec iov[1];
--	struct kvec rsp_iov;
-+	struct kvec rsp_iov = { NULL, 0 };
- 	int rc = 0;
- 	int resp_buftype;
- 	struct TCP_Server_Info *server = ses->server;
-@@ -1884,7 +1884,7 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
- 	struct smb2_sync_hdr *shdr;
- 	struct cifs_ses *ses;
- 	struct kvec iov[2];
--	struct kvec rsp_iov;
-+	struct kvec rsp_iov = { NULL, 0 };
- 	int resp_buftype;
- 	int n_iov;
- 	int rc = 0;
-@@ -1981,6 +1981,8 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
- 	rc = SendReceive2(xid, ses, iov, n_iov, &resp_buftype, flags, &rsp_iov);
- 	cifs_small_buf_release(req);
- 	rsp = (struct smb2_ioctl_rsp *)rsp_iov.iov_base;
-+	if (rsp == NULL)
-+		goto ioctl_exit;
- 
- 	if ((rc != 0) && (rc != -EINVAL)) {
- 		cifs_stats_fail_inc(tcon, SMB2_IOCTL_HE);
-@@ -2064,7 +2066,7 @@ SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
- 	struct smb2_close_rsp *rsp;
- 	struct cifs_ses *ses = tcon->ses;
- 	struct kvec iov[1];
--	struct kvec rsp_iov;
-+	struct kvec rsp_iov = { NULL, 0 };
- 	int resp_buftype;
- 	int rc = 0;
- 	int flags = 0;
-@@ -2168,9 +2170,9 @@ query_info(const unsigned int xid, struct cifs_tcon *tcon,
- 		u32 *dlen)
- {
- 	struct smb2_query_info_req *req;
--	struct smb2_query_info_rsp *rsp = NULL;
-+	struct smb2_query_info_rsp *rsp;
- 	struct kvec iov[2];
--	struct kvec rsp_iov;
-+	struct kvec rsp_iov = { NULL, 0 };
- 	int rc = 0;
- 	int resp_buftype;
- 	struct cifs_ses *ses = tcon->ses;
-@@ -2404,7 +2406,7 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
- 	struct smb2_flush_req *req;
- 	struct cifs_ses *ses = tcon->ses;
- 	struct kvec iov[1];
--	struct kvec rsp_iov;
-+	struct kvec rsp_iov = { NULL, 0 };
- 	int resp_buftype;
- 	int rc = 0;
- 	int flags = 0;
-@@ -2639,10 +2641,10 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
- {
- 	int resp_buftype, rc = -EACCES;
- 	struct smb2_read_plain_req *req = NULL;
--	struct smb2_read_rsp *rsp = NULL;
-+	struct smb2_read_rsp *rsp;
- 	struct smb2_sync_hdr *shdr;
- 	struct kvec iov[2];
--	struct kvec rsp_iov;
-+	struct kvec rsp_iov = { NULL, 0 };
- 	unsigned int total_len;
- 	__be32 req_len;
- 	struct smb_rqst rqst = { .rq_iov = iov,
-@@ -2669,6 +2671,10 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
- 	cifs_small_buf_release(req);
- 
- 	rsp = (struct smb2_read_rsp *)rsp_iov.iov_base;
-+	if (rsp == NULL) {
-+		cifs_dbg(VFS, "rsp is NULL in read\n");
-+		return -EIO;
-+	}
- 	shdr = get_sync_hdr(rsp);
- 
- 	if (shdr->Status == STATUS_END_OF_FILE) {
-@@ -2856,9 +2862,9 @@ SMB2_write(const unsigned int xid, struct cifs_io_parms *io_parms,
- {
- 	int rc = 0;
- 	struct smb2_write_req *req = NULL;
--	struct smb2_write_rsp *rsp = NULL;
-+	struct smb2_write_rsp *rsp;
- 	int resp_buftype;
--	struct kvec rsp_iov;
-+	struct kvec rsp_iov = { NULL, 0 };
- 	int flags = 0;
- 
- 	*nbytes = 0;
-@@ -2963,7 +2969,7 @@ SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
- 	struct smb2_query_directory_req *req;
- 	struct smb2_query_directory_rsp *rsp = NULL;
- 	struct kvec iov[2];
--	struct kvec rsp_iov;
-+	struct kvec rsp_iov = { NULL, 0 };
- 	int rc = 0;
- 	int len;
- 	int resp_buftype = CIFS_NO_BUFFER;
-@@ -3093,9 +3099,9 @@ send_set_info(const unsigned int xid, struct cifs_tcon *tcon,
- 		void **data, unsigned int *size)
- {
- 	struct smb2_set_info_req *req;
--	struct smb2_set_info_rsp *rsp = NULL;
-+	struct smb2_set_info_rsp *rsp;
- 	struct kvec *iov;
--	struct kvec rsp_iov;
-+	struct kvec rsp_iov = { NULL, 0 };
- 	int rc = 0;
- 	int resp_buftype;
- 	unsigned int i;
-@@ -3376,9 +3382,9 @@ int
- SMB2_QFS_info(const unsigned int xid, struct cifs_tcon *tcon,
- 	      u64 persistent_fid, u64 volatile_fid, struct kstatfs *fsdata)
- {
--	struct smb2_query_info_rsp *rsp = NULL;
-+	struct smb2_query_info_rsp *rsp;
- 	struct kvec iov;
--	struct kvec rsp_iov;
-+	struct kvec rsp_iov = { NULL, 0 };
- 	int rc = 0;
- 	int resp_buftype;
- 	struct cifs_ses *ses = tcon->ses;
-@@ -3419,9 +3425,9 @@ int
- SMB2_QFS_attr(const unsigned int xid, struct cifs_tcon *tcon,
- 	      u64 persistent_fid, u64 volatile_fid, int level)
- {
--	struct smb2_query_info_rsp *rsp = NULL;
-+	struct smb2_query_info_rsp *rsp;
- 	struct kvec iov;
--	struct kvec rsp_iov;
-+	struct kvec rsp_iov = { NULL, 0 };
- 	int rc = 0;
- 	int resp_buftype, max_len, min_len;
- 	struct cifs_ses *ses = tcon->ses;
-@@ -3492,7 +3498,7 @@ smb2_lockv(const unsigned int xid, struct cifs_tcon *tcon,
- 	int rc = 0;
- 	struct smb2_lock_req *req = NULL;
- 	struct kvec iov[2];
--	struct kvec rsp_iov;
-+	struct kvec rsp_iov = { NULL, 0 };
- 	int resp_buf_type;
- 	unsigned int count;
- 	int flags = CIFS_NO_RESP;
-@@ -3525,6 +3531,7 @@ smb2_lockv(const unsigned int xid, struct cifs_tcon *tcon,
- 	rc = SendReceive2(xid, tcon->ses, iov, 2, &resp_buf_type, flags,
- 			  &rsp_iov);
- 	cifs_small_buf_release(req);
-+	free_rsp_buf(resp_buf_type, rsp_iov.iov_base);
- 	if (rc) {
- 		cifs_dbg(FYI, "Send error in smb2_lockv = %d\n", rc);
- 		cifs_stats_fail_inc(tcon, SMB2_LOCK_HE);
+Thanks,
 -- 
-2.13.3
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
