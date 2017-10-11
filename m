@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 03/12] cifs: initialize rsp_iov in SMB2_close
-Date: Wed, 11 Oct 2017 12:59:18 +1100
-Message-ID: <20171011015927.7669-4-lsahlber@redhat.com>
+Subject: [PATCH 05/12] cifs: initialize rsp_iov in SMB2_flush
+Date: Wed, 11 Oct 2017 12:59:20 +1100
+Message-ID: <20171011015927.7669-6-lsahlber@redhat.com>
 References: <20171011015927.7669-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -11,7 +11,7 @@ Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 Or else we might call free_rsp_buf() on an uninitialized pointer if
-SendReceive2() failed.
+SendReceive2() failed
 
 Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
@@ -19,11 +19,11 @@ Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index bf35755501e3..acadbdbfc8cb 100644
+index 97dc913b8dd7..ca861ee4ac0a 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -2066,7 +2066,7 @@ SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
- 	struct smb2_close_rsp *rsp;
+@@ -2406,7 +2406,7 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+ 	struct smb2_flush_req *req;
  	struct cifs_ses *ses = tcon->ses;
  	struct kvec iov[1];
 -	struct kvec rsp_iov;
