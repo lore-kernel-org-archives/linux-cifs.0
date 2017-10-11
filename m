@@ -1,196 +1,58 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: fix remaining rsp_iov issues
-Date: Wed, 11 Oct 2017 10:18:57 -0500
-Message-ID: <CAH2r5msoioq2Vi76d9pBpMGW3AyQbwz2hZEzC1ebzBr81uE37w@mail.gmail.com>
-References: <20171011054140.26535-1-lsahlber@redhat.com> <20171011054140.26535-2-lsahlber@redhat.com>
+From: Richard Sharpe <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: Does linux smb2 client supports DFS capability?
+Date: Wed, 11 Oct 2017 09:42:12 -0700
+Message-ID: <CACyXjPzwUx4T7DnvtX55PrtAE9Tj1iPryZNhfStDWkGW3JrDDg@mail.gmail.com>
+References: <FBFAFA79-EEBE-4F0F-B898-19D2A8096E62@nutanix.com>
+ <mpsk2a4l69q.fsf@suse.com> <B4C283AF-91A2-435A-85A6-DAE11A90DB6D@nutanix.com>
+ <mpszi8x9a8i.fsf@aaptelpc.suse.de> <CAH2r5muEvnMZT9L-hvO-7o=fsaRU28KZEJA+3dgzmNyn4nVH5Q@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Transfer-Encoding: quoted-printable
+Cc: =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>,
+        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Hemanth Thummala <hemanth.thummala-8cO4VLV/4DJBDgjK7y7TUQ@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171011054140.26535-2-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <CAH2r5muEvnMZT9L-hvO-7o=fsaRU28KZEJA+3dgzmNyn4nVH5Q-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-merged into cifs-2.6.git for-next and cc: stable
+On Wed, Oct 11, 2017 at 7:25 AM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> If you are checking if the SMB3 DFS enablement has been added to your
+> kernel (if your kernel is older than version 4.11), you could look to
+> see if the equivalent of this patch (it is part of a small series of
+> DFS related patches, but would be one of the more visible ones in the
+> series)
+>
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit=
+/fs/cifs?id=3D9d49640a21bffd730a6ebf2a0032e022f7caf84a
+>
+>
+> On Wed, Oct 11, 2017 at 6:47 AM, Aur=C3=A9lien Aptel <aaptel-IBi9RG/b67k@public.gmane.org> wr=
+ote:
+>> Hi,
+>>
+>> Hemanth Thummala <hemanth.thummala-8cO4VLV/4DJBDgjK7y7TUQ@public.gmane.org> writes:
+>>> If so, Can you please let me know (or point me a link) the version of c=
+ifs-utils in which support is available.
+>>> I have tested with cifs-util-6.2 version. This doesn=E2=80=99t have the=
+ DFS support.
+>>
+>> cifs-util only contains the source code of the the mount.cifs program,
+>> which doesn't do much. The SMB client code lives in the cifs kernel
+>> module. To use DFS with SMB2 you need to use linux kernel v4.11 or
+>> newer.
+>>
+>> Cheers,
 
-On Wed, Oct 11, 2017 at 12:41 AM, Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> This patch fixes the remaining issues with rsp_iov where
-> we might dereference uninitialized pointers or pass them
-> to free_rsp_buf().
-> There is also one memory leak that is fixed.
->
-> Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/smb2pdu.c | 43 +++++++++++++++++++++++++------------------
->  1 file changed, 25 insertions(+), 18 deletions(-)
->
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 6ff4c275ca9a..fd2b2b8e86b0 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -470,7 +470,7 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
->         struct smb2_negotiate_req *req;
->         struct smb2_negotiate_rsp *rsp;
->         struct kvec iov[1];
-> -       struct kvec rsp_iov;
-> +       struct kvec rsp_iov = { NULL, 0 };
->         int rc = 0;
->         int resp_buftype;
->         struct TCP_Server_Info *server = ses->server;
-> @@ -1884,7 +1884,7 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
->         struct smb2_sync_hdr *shdr;
->         struct cifs_ses *ses;
->         struct kvec iov[2];
-> -       struct kvec rsp_iov;
-> +       struct kvec rsp_iov = { NULL, 0 };
->         int resp_buftype;
->         int n_iov;
->         int rc = 0;
-> @@ -1981,6 +1981,8 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
->         rc = SendReceive2(xid, ses, iov, n_iov, &resp_buftype, flags, &rsp_iov);
->         cifs_small_buf_release(req);
->         rsp = (struct smb2_ioctl_rsp *)rsp_iov.iov_base;
-> +       if (rsp == NULL)
-> +               goto ioctl_exit;
->
->         if ((rc != 0) && (rc != -EINVAL)) {
->                 cifs_stats_fail_inc(tcon, SMB2_IOCTL_HE);
-> @@ -2064,7 +2066,7 @@ SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
->         struct smb2_close_rsp *rsp;
->         struct cifs_ses *ses = tcon->ses;
->         struct kvec iov[1];
-> -       struct kvec rsp_iov;
-> +       struct kvec rsp_iov = { NULL, 0 };
->         int resp_buftype;
->         int rc = 0;
->         int flags = 0;
-> @@ -2168,9 +2170,9 @@ query_info(const unsigned int xid, struct cifs_tcon *tcon,
->                 u32 *dlen)
->  {
->         struct smb2_query_info_req *req;
-> -       struct smb2_query_info_rsp *rsp = NULL;
-> +       struct smb2_query_info_rsp *rsp;
->         struct kvec iov[2];
-> -       struct kvec rsp_iov;
-> +       struct kvec rsp_iov = { NULL, 0 };
->         int rc = 0;
->         int resp_buftype;
->         struct cifs_ses *ses = tcon->ses;
-> @@ -2404,7 +2406,7 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
->         struct smb2_flush_req *req;
->         struct cifs_ses *ses = tcon->ses;
->         struct kvec iov[1];
-> -       struct kvec rsp_iov;
-> +       struct kvec rsp_iov = { NULL, 0 };
->         int resp_buftype;
->         int rc = 0;
->         int flags = 0;
-> @@ -2639,10 +2641,10 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
->  {
->         int resp_buftype, rc = -EACCES;
->         struct smb2_read_plain_req *req = NULL;
-> -       struct smb2_read_rsp *rsp = NULL;
-> +       struct smb2_read_rsp *rsp;
->         struct smb2_sync_hdr *shdr;
->         struct kvec iov[2];
-> -       struct kvec rsp_iov;
-> +       struct kvec rsp_iov = { NULL, 0 };
->         unsigned int total_len;
->         __be32 req_len;
->         struct smb_rqst rqst = { .rq_iov = iov,
-> @@ -2669,6 +2671,10 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
->         cifs_small_buf_release(req);
->
->         rsp = (struct smb2_read_rsp *)rsp_iov.iov_base;
-> +       if (rsp == NULL) {
-> +               cifs_dbg(VFS, "rsp is NULL in read\n");
-> +               return -EIO;
-> +       }
->         shdr = get_sync_hdr(rsp);
->
->         if (shdr->Status == STATUS_END_OF_FILE) {
-> @@ -2856,9 +2862,9 @@ SMB2_write(const unsigned int xid, struct cifs_io_parms *io_parms,
->  {
->         int rc = 0;
->         struct smb2_write_req *req = NULL;
-> -       struct smb2_write_rsp *rsp = NULL;
-> +       struct smb2_write_rsp *rsp;
->         int resp_buftype;
-> -       struct kvec rsp_iov;
-> +       struct kvec rsp_iov = { NULL, 0 };
->         int flags = 0;
->
->         *nbytes = 0;
-> @@ -2963,7 +2969,7 @@ SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
->         struct smb2_query_directory_req *req;
->         struct smb2_query_directory_rsp *rsp = NULL;
->         struct kvec iov[2];
-> -       struct kvec rsp_iov;
-> +       struct kvec rsp_iov = { NULL, 0 };
->         int rc = 0;
->         int len;
->         int resp_buftype = CIFS_NO_BUFFER;
-> @@ -3093,9 +3099,9 @@ send_set_info(const unsigned int xid, struct cifs_tcon *tcon,
->                 void **data, unsigned int *size)
->  {
->         struct smb2_set_info_req *req;
-> -       struct smb2_set_info_rsp *rsp = NULL;
-> +       struct smb2_set_info_rsp *rsp;
->         struct kvec *iov;
-> -       struct kvec rsp_iov;
-> +       struct kvec rsp_iov = { NULL, 0 };
->         int rc = 0;
->         int resp_buftype;
->         unsigned int i;
-> @@ -3376,9 +3382,9 @@ int
->  SMB2_QFS_info(const unsigned int xid, struct cifs_tcon *tcon,
->               u64 persistent_fid, u64 volatile_fid, struct kstatfs *fsdata)
->  {
-> -       struct smb2_query_info_rsp *rsp = NULL;
-> +       struct smb2_query_info_rsp *rsp;
->         struct kvec iov;
-> -       struct kvec rsp_iov;
-> +       struct kvec rsp_iov = { NULL, 0 };
->         int rc = 0;
->         int resp_buftype;
->         struct cifs_ses *ses = tcon->ses;
-> @@ -3419,9 +3425,9 @@ int
->  SMB2_QFS_attr(const unsigned int xid, struct cifs_tcon *tcon,
->               u64 persistent_fid, u64 volatile_fid, int level)
->  {
-> -       struct smb2_query_info_rsp *rsp = NULL;
-> +       struct smb2_query_info_rsp *rsp;
->         struct kvec iov;
-> -       struct kvec rsp_iov;
-> +       struct kvec rsp_iov = { NULL, 0 };
->         int rc = 0;
->         int resp_buftype, max_len, min_len;
->         struct cifs_ses *ses = tcon->ses;
-> @@ -3492,7 +3498,7 @@ smb2_lockv(const unsigned int xid, struct cifs_tcon *tcon,
->         int rc = 0;
->         struct smb2_lock_req *req = NULL;
->         struct kvec iov[2];
-> -       struct kvec rsp_iov;
-> +       struct kvec rsp_iov = { NULL, 0 };
->         int resp_buf_type;
->         unsigned int count;
->         int flags = CIFS_NO_RESP;
-> @@ -3525,6 +3531,7 @@ smb2_lockv(const unsigned int xid, struct cifs_tcon *tcon,
->         rc = SendReceive2(xid, tcon->ses, iov, 2, &resp_buf_type, flags,
->                           &rsp_iov);
->         cifs_small_buf_release(req);
-> +       free_rsp_buf(resp_buf_type, rsp_iov.iov_base);
->         if (rc) {
->                 cifs_dbg(FYI, "Send error in smb2_lockv = %d\n", rc);
->                 cifs_stats_fail_inc(tcon, SMB2_LOCK_HE);
-> --
-> 2.13.3
->
+I think their real interest is in the CIFS FS getting DFS referrals if
+STATUS_PATH_NOT_COVERED is returned on a CREATE.
 
+When I last looked the client could not do that.
 
-
--- 
-Thanks,
-
-Steve
+--=20
+Regards,
+Richard Sharpe
+(=E4=BD=95=E4=BB=A5=E8=A7=A3=E6=86=82=EF=BC=9F=E5=94=AF=E6=9C=89=E6=9D=9C=
+=E5=BA=B7=E3=80=82--=E6=9B=B9=E6=93=8D)
