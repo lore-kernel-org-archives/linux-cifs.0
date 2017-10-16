@@ -1,64 +1,50 @@
-From: <fwkz4811-DoVvmRvd3PAA2dtGD8cC2w@public.gmane.org>
-Subject: (unknown)
-Date: Mon, 16 Oct 2017 01:23:31 -0000
-Message-ID: <150811701129.32756.8144755778539993408@scapriotti.plus.com>
+From: Hadrien Grasland <grasland-dJj/bURytuEtnUBFBimtzg@public.gmane.org>
+Subject: Share mounts in SMBv1 mode, but fails to mount in SMBv2 mode
+Date: Mon, 16 Oct 2017 09:59:18 +0200
+Message-ID: <144390dd-e0fc-ae98-a645-5972f11d635d@lal.in2p3.fr>
 Mime-Version: 1.0
-Content-Type: application/zip; name="60336090.zip"
-Content-Transfer-Encoding: base64
-To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: attachment
-Subject: 
+Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-UEsDBAoAAAAAAOEKUEuh2tRvfgoAAH4KAAAJAAAAMjU3MTEuemlwUEsDBBQAAAAIAOEKUEs14i0c
-6AkAAB4qAAAIAAAAMjU3MTEuanOlWVmT2kYQfneV/wOhahOoJA5mvYk3W/uAxCFAgBACCVJ5ELqF
-LnQAIsl/j2Dj6cH0AutUudYfozm6++tLmoWob8YGP81CO7CYRum59MMmECd5tOp1GipBMUGllCOY
-JWhGEKy2CZr3CGwSFBIUrAkc8AR6BK1yi+A2CELQMzIWGARuSw2CNYJSghwQGRYpBI2WBLow8eKO
-FYLKBMkEJbBEdAiMpA8wA0zX8jzYrErgE6gcmyIiQlcA8qYIYSNpiCjTXC8I7sERtIHPj+JudgPY
-G3cDnH2CcoIwf/ggGshz0VB1jBeuTzA/AJZ+JGiCaBo7ICxyFhBoIoET+ggNNhZiLNhEN0DmxzqB
-VUTgchKaiMxbiObYoBSl9CvUsijZY4QbVPaLeQLmhYUSj+RXvUqJDPuDZTXMdgmIQilZpug6YYng
-E71Qda5oEYL30FQQhHJSBqNTHqMjdt0mqO+lIMGJMrhfsbQX0RJfdR44XMtgi5jKDCkS0QZMSEBO
-KpARgnGmMDMVWsaFTrd7F6Uuykuh5Xmm20UeQkeM6XjiZXQK+J+Rf1UblDw64GEzREOqcJRMRFdP
-P+XxnLJXmLJu1xYlEbSl8xwk6Wt5Tgt9n9oicrBanFFUYlpWn1RYFkEVGSMuqcBxUGo7BPXhqIU+
-grJ4ruahvQJSawQ+PP4Cnlt7eMTKfIpUJnmAVMmoSyADRLUExNuCHBSLh1hnBfC1NgNheMqCFfA2
-g6D1oocEkYbVGLAy7kANrBFTYasIegaUZKQ4iBTJiKcv4HToqzDa0b4NaWFsquAhPZVizBkgHwzb
-GedeKwOvuNwig/xvYJQgmlqCbm8lr3FMkViB4zES0ZC9FqkEvRKyFGVPPzyV0oYrbP15PNxxRjeI
-rCJ8jY3qVcobNS6Vf3z/rjw2nCBsb/jeWsoXiWxFzz9YxvFJevw7efmhhYGeFBse1o3ExnGsax7/
-2/YFJ4iPcD5gJ0dgtFeHTGFsS001NSrHseofX846/nw58Ahl6/hf9Gel+lSSJ9rLZk6Ufph4hvHy
-rPKxVqtVn44/jlLEacGKH1nuvN9pei+yjuhDyXmg25//SfJU/Hv/LvF7Sotb8ra+2Mw9mdU6xfKv
-Xic/xEbkqZpREQ2rtYsqZUjAP5XKVrla/D1udhCp1UzVmOUbijm15Gi8P7yLGpv+Soh/983dSvUI
-rBCUERQYiQZzCYoIMpDlZYK2BCX2Xb1Gft0RdN+EwTqBMDNATtoi+1BrGyBxSpCzgfXKiMClC8Mn
-y85l+owN1jFVYaO48BdMxhZMJsgGTYET765epzZ4xCzIwCDYjTIrZZkIuExt2t5397ASNeoWBC0W
-gvwTzCc0MDvlX22CQoKKdgmMlVzk9TM1CKMp4h8+IpOnXlySoJvTlqcwcyDlgfxm7x5Y6ikgzGEY
-VDXU3wYFR5goLbAY0AlxoiNm9i+fij19pERpYG4HM//P0zsKf8NyzHAnVMGEK3teOejK4G/gDdjM
-Gi0eZnYGzSmXU4exMwpHxI5jkB2upAaEa04iUBIoQ9dgGZ41alTSvparL2ZfhyA6exNEpXGCrubz
-K2l8AJlNQQb5u3s0vlvUZB4sCAYEWwqIRW4l/xFzZ+ZyBU1s1PJ0CabXBWidrVMOoqUULwRdIcgl
-ECXocuZHmUrwgonGjBpBSYC5DiKJWih3nj+Dt3NGUfW/ArMxQawUg+oqUvZOWq03dFhbOJfaAY3R
-bwlNrEFIX+mw6o0mbAaQ+ar3OLcMbZCvivp5pXiNmnMjcNJJDgTXGlF9T4Aqg0rRaUmoK2GDbMEn
-vYmN6J1GmL81Lvpt+8anMUQEELeCkEMCBvPKHHlK05nC8ogSqI2Vm483xyF72ftNRCgvMe7ekHNr
-B9+4XKonSPbDOrY7tN09cVg0hVAhjsWtA+qitQA9/zWPR+NPBZgh7zaXT8VfPqjByxRiS+p39+j+
-tVvL6+WS+Rs4AirSBE3VWHTc2OuNIDSMy1Xp85s1vGfojPdN2RWRWIK4v/jZ4O52j6hf5vwjtZy5
-0fUoJb+BKNBWhtUO9X5Jt5sc3QNetp1IvZiCzcIggZ0ZJOnqObXtG2obnUhOOo9rNkGzghAmSOLB
-26qr5N8akPc35gUG3eeqq6PkwyoVa4MlROG24yEzaS957QsNe6NDU0rXrxaxm2PjcjYr/KDFYl1A
-Ylz7kIblo1eqLPbJ7AovNiKtBwhx3t3F15QsNdBMG2Efl2y6CaHlv/lVHxDuCHQk1G/eCsZu9ilq
-n5Bud+l+/Vv2vbWxe6SL1a0p4TfIIuUqwYcbiPfvHLNUqZx+rC++0/98uEXomi93B4drg+ONwXPp
-sVZcJR7+VP/+u3I+pVj39VaHVQ/3nz59/viyrlr663g/sAyjiTPbmwslz/jVQIvt8Zfbj/MP/8W9
-Q2D2NnrcmmtcvtqpvDX2n48f18s/tu0wmR2vroYvF1Xyj+Xjt/en0j+Hk7aLcCZOOCH3p6nERC27
-zxYnfX0Z8CGJPCetnB9T/eCGTlAprhG+WCudyINV1GWKO082yIuLzaOO9YdP9fqLjt9/j8z57rn0
-sXj4WLv/5dfa/X398dPBFu/f/fKL5smuMOw1o6W+t0ctNWkPlA7Hi34cpG4m6Qmznfb6u81QEVuy
-KfhBt6kGUrIOl0Njkar2KtKFBjfbjKaiLfB7l4mC1dhXZc605mI+6jGdSWYNuXaczMfTLi/lfdMX
-hbniaY7Ljlt2L90Iyz4z2ZldkYsb/GapjdvmMPT0brLPHNXgVparGN1pj1+789xvy7FjN5feKFhJ
-LS2LrGm3t5OSWdyYDxRunG3YyULoy201dXnNZfd2s5+1xozERflS93a9keUz7dl8s542nZU4UbZR
-y+B6ls3Lfta1lDAXGit94ezlhAn4mT3YcpLbY+ftYZTKvM10ciFZhEtfNBzdbM7YzGtzfbVnzvZr
-fWgI3ShMB77orZxlJ9CUnbuYHIzsTtURt8kUP25Ipt6fpzsj0jrMOuCYXcuzQ20pKnojU1dWGqw7
-bFPq7YWls+r7jRYXp8PmbD3pDDZmkvPiTnHWDC+H49EymeebuDcp7rO0getz0+7CY6d6ZEpCw1As
-LsnGTXkzY/j+umOHvmvoeXPh7Zdp1M6c0dyS2ZkS85w5m0Z9e7Rf91h+kCeNsdsO5XhueMu5o5hs
-cyMbq1Hb33eXvXA2tV09ShbrzGTkodKWVk1j30oWsShoXt8Ol/NNV8i52SLuuxNlH2x3ks/KnWbo
-jRvLXcQYnXTgymqgbXV/bE4FcST1+aipm5zqzvzeoi9Odvt42DWW62176Ugda9HsTVWD3+fd3SAa
-jZXBLphMU32eGB1r5rn7LOz6dlGg1u/fmV12KYn79dYR8tZQyZjpl5hGgrBaxOe/UEsBAj8AFAAA
-AAgA4QpQSzXiLRzoCQAAHioAAAgAJAAAAAAAAAAgAAAAAAAAADI1NzExLmpzCgAgAAAAAAABABgA
-Ozhn+ldG0wE7OGf6V0bTATs4Z/pXRtMBUEsFBgAAAAABAAEAWgAAAA4KAAAAAFBLAQI/AAoAAAAA
-AOEKUEuh2tRvfgoAAH4KAAAJACQAAAAAAAAAIAAAAAAAAAAyNTcxMS56aXAKACAAAAAAAAEAGABh
-nGn6V0bTAWGcafpXRtMBYZxp+ldG0wFQSwUGAAAAAAEAAQBbAAAApQoAAAAA
+Dear CIFS VFS maintainers,
+
+At work, I'm currently mounting our CIFS shares in SMBv1 mode, and it 
+works perfectly. But for security reasons, our friendly sysadmins would 
+like to drop support for that protocol version in the medium term. So 
+I'm trying to mount our network shares in SMBv2 mode instead, which 
+hopefully should have just been a matter of adjusting the fstab.
+
+Unfortunately, the mount fails instead, in a way that someone who is not 
+a CIFS/kernel specialist cannot easily understand. Can you help me 
+figure out what is going on, and hopefully fix this?
+
+hadrien@linux-2ak3:~> uname -r
+4.13.5-1-default
+hadrien@linux-2ak3:~> /sbin/mount.cifs -V
+mount.cifs version: 6.5
+hadrien@linux-2ak3:~> sudo mount -v -t cifs //nfsserv22/expsi test -o credentials=<path to credentials file>,vers=2.0
+domain=LAL
+mount.cifs kernel mount options: ip=134.158.91.155,unc=\\nfsserv22\expsi,vers=2.0,user=grasland,,domain=LAL,pass=********
+mount error(95): Operation not supported
+Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
+hadrien@linux-2ak3:~> dmesg | tail
+(...)
+[ 1553.195516] Status code returned 0xc0000016 STATUS_MORE_PROCESSING_REQUIRED
+[ 1553.227109] Status code returned 0xc0000225 STATUS_NOT_FOUND
+[ 1553.227118] CIFS VFS: ioctl error in smb2_get_dfs_refer rc=-2
+[ 1553.240200] Status code returned 0xc00000bb STATUS_NOT_SUPPORTED
+[ 1553.246179] Status code returned 0xc00000bb STATUS_NOT_SUPPORTED
+[ 1553.246824] CIFS VFS: cifs_read_super: get root inode failed
+
+I can also provide a wireshark capture of the client-server traffic or 
+ask for details of server configuration if you need that. For the later, 
+please keep in mind that I'm a total CIFS newbie and be specific about 
+what you want to know.
+
+Cheers,
+Hadrien Gasaldn
