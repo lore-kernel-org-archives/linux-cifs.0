@@ -1,422 +1,167 @@
-From: Hadrien Grasland <grasland-dJj/bURytuEtnUBFBimtzg@public.gmane.org>
+From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
 Subject: Re: Share mounts in SMBv1 mode, but fails to mount in SMBv2 mode
-Date: Mon, 16 Oct 2017 13:35:25 +0200
-Message-ID: <0b17f092-5c81-3b2e-5e48-b2a4c5b4145a@lal.in2p3.fr>
-References: <144390dd-e0fc-ae98-a645-5972f11d635d@lal.in2p3.fr>
- <mpsd15nv1up.fsf@aaptelpc.suse.de>
+Date: Mon, 16 Oct 2017 16:51:30 +0200
+Message-ID: <mpsa80ruowd.fsf@aaptelpc.suse.de>
+References: <144390dd-e0fc-ae98-a645-5972f11d635d@lal.in2p3.fr> <mpsd15nv1up.fsf@aaptelpc.suse.de> <0b17f092-5c81-3b2e-5e48-b2a4c5b4145a@lal.in2p3.fr>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="------------9ED4DC98170EA7C0E4A06FE8"
-To: =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+To: Hadrien Grasland <grasland-dJj/bURytuEtnUBFBimtzg@public.gmane.org>,
         linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <mpsd15nv1up.fsf-zpEvHKhluMwYitT5tn2FcQ@public.gmane.org>
-Content-Language: en-US
+In-Reply-To: <0b17f092-5c81-3b2e-5e48-b2a4c5b4145a-dJj/bURytuEtnUBFBimtzg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------9ED4DC98170EA7C0E4A06FE8
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Hadrien Grasland <grasland-dJj/bURytuEtnUBFBimtzg@public.gmane.org> writes:
+>> If the server is a samba server, the /etc/samba/smb.conf would be
+>> helpful.
+>
+> Output enclosed. Since a quick look suggests that all interesting 
+> traffic is on port 445, I added a "port 445" rule to tcpdump in order to 
+> reduce noise and keep unrelated local network traffic private, hope 
+> that's fine.
+
+When kerberos or DNS is involved it's always nice to see those too but
+here I think it's fine with just SMB.
+
+> I'm going to ask whether the server is samba-based or not, and if so 
+> I'll try to have a look at the smb.conf file.
+
+Great.
+
+> [16491.702119] CIFS VFS: ioctl error in smb2_get_dfs_refer rc=-2
+
+cifs.ko always does a DFS referal when mounting because some server
+don't report DFS roots properly (Windows Server 2008, supposedly). Any
+errors at this step are ignored so this is not the problem.
+
+The actual issue is when we try to create the root inode of the fs. To
+create a linux inode we need the file metadata from the SMB server. This
+is done via a QUERY INFO requests which has a field to specify how much
+metadata you need. cifs.ko always require the AllInfo level.
+
+> [16491.704895] ../fs/cifs/inode.c: CIFS VFS: in cifs_root_iget as Xid: 2941 with uid: 0
+> [16491.704897] ../fs/cifs/inode.c: Getting info on 
+> [16491.704904] ../fs/cifs/smb2pdu.c: create/open
+> [16491.705550] ../fs/cifs/smb2misc.c: SMB2 data length 0 offset 0
+> [16491.705553] ../fs/cifs/smb2misc.c: Calculated size 157 length 156 mismatch mid 14
+> [16491.705593] ../fs/cifs/smb2pdu.c: Query Info
+> [16491.706223] ../fs/cifs/smb2maperror.c: Mapping SMB2 status code 0xc00000bb to POSIX err -95
+> [16491.706228] ../fs/cifs/smb2pdu.c: Close
+> [16491.706861] ../fs/cifs/smb2pdu.c: create/open
+> [16491.707476] ../fs/cifs/smb2misc.c: Calculated size 157 length 156 mismatch mid 17
+> [16491.707514] ../fs/cifs/smb2pdu.c: Query Info
+> [16491.708101] ../fs/cifs/smb2maperror.c: Mapping SMB2 status code 0xc00000bb to POSIX err -95
+> [16491.708106] ../fs/cifs/smb2pdu.c: Close
+> [16491.708752] CIFS VFS: cifs_read_super: get root inode failed
+
+Call tree for this output is
+
+cifs_read_super
+  cifs_root_iget
+    cifs_get_inode_info
+      ops->query_path_info (smb2_query_path_info)
 
 
-Le 16/10/2017 à 12:11, Aurélien Aptel a écrit :
-> Hadrien Grasland <grasland-dJj/bURytuEtnUBFBimtzg@public.gmane.org> writes:
->> I can also provide a wireshark capture of the client-server traffic or
->> ask for details of server configuration if you need that. For the later,
->> please keep in mind that I'm a total CIFS newbie and be specific about
->> what you want to know.
-> Yes this would be helpful.
->
->      # make the kernel as verbose as possible
->      echo 'module cifs +p' > /sys/kernel/debug/dynamic_debug/control
->      echo 'file fs/cifs/* +p' > /sys/kernel/debug/dynamic_debug/control
->      echo 1 > /proc/fs/cifs/cifsFYI
->      echo 1 > /sys/module/dns_resolver/parameters/debug
->
->      # get kernel output + network trace
->      dmesg --clear
->      tcpdump -w trace.pcap & pid=$!
->      sleep 3
->      mount.cifs ....cd ... ls.. blahblah
->      sleep 3
->      kill $pid
->      dmesg > trace.log
->
-> this should produce a trace.pcap and trace.log file.
->
-> If the server is a samba server, the /etc/samba/smb.conf would be
-> helpful.
+This function does the 2 query info requests:
 
-Output enclosed. Since a quick look suggests that all interesting 
-traffic is on port 445, I added a "port 445" rule to tcpdump in order to 
-reduce noise and keep unrelated local network traffic private, hope 
-that's fine.
+>	rc = smb2_open_op_close(xid, tcon, cifs_sb, full_path,
+>				FILE_READ_ATTRIBUTES, FILE_OPEN, 0,
+>				smb2_data, SMB2_OP_QUERY_INFO);
+>	if (rc == -EOPNOTSUPP) {
+>		*symlink = true;
+>		/* Failed on a symbolic link - query a reparse point info */
+>		rc = smb2_open_op_close(xid, tcon, cifs_sb, full_path,
+>					FILE_READ_ATTRIBUTES, FILE_OPEN,
+>					OPEN_REPARSE_POINT, smb2_data,
+>					SMB2_OP_QUERY_INFO);
+>	}
+>	if (rc)
+>		goto out;
 
-I'm going to ask whether the server is samba-based or not, and if so 
-I'll try to have a look at the smb.conf file.
+Looking at the trace the query info level used is FILE_ALL_INFORMATION
+(0x12) and both fail with STATUS_NOT_SUPPORTED (frame #38,#39 and
+#44,#45).
+
+Regarding query info requests [MS-SMB2] 3.3.5.20.1 "Handling
+SMB2_0_INFO_FILE" reads:
+
+> Requests for information classes that are not listed in section 2.2.37
+> but which are documented in section 2.4 of [MS-FSCC] SHOULD<351> be
+> failed with STATUS_NOT_SUPPORTED.
+
+AllInfo is listed in 2.2.37 so this is not it.
+
+> The server MUST query the information requested from the underlying
+> object store.<354> If the store does not support the data requested,
+> the server MUST fail the request with STATUS_NOT_SUPPORTED.
+
+This is the more likely explanation so far. This would mean "the
+underlying filesystem on the server doesnt store all the fields the ALL
+INFO level requires".
+
+There was another query done by cifs.ko on the server FS info (frame #18
+#19) which reported it as NTFS, which should support all the fields so
+this doesn't make sense... Let's look at the wireshark trace more
+closely.
+
+Wireshark is a bit confused by some of the query info request fields:
+
+>    GetInfo Request (0x10)
+>        StructureSize: 0x0029
+>            0000 0000 0010 100. = Fixed Part Length: 20
+>            .... .... .... ...1 = Dynamic Part: True
+>        Class: FILE_INFO (0x01)
+>        InfoLevel: SMB2_FILE_ALL_INFO (0x12)
+>        Max Response Size: 8293
+>        unknown: 68000000000000000000000000000000
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ what's this?
+>        GUID handle File: [unknown]
+>            File Id: 002b8237-0000-0000-0500-000000000000
+>            [Frame handle opened: 37]
+
+The "[unknown]" part is ok, because we're querying the root of the
+share, which is the empty filename ("").
+
+Let's see what the unknown *field* corresponds to by reading the
+specs. This could just be a wireshark issue as this code works against
+other SMB servers just fine.
+
+68 00        "InputBufferOffset"     (hmm.. see next)
+00 00        "Reserved"              (specs says it must be zeros, ok)
+00 00 00 00  "InputBufferLength"     (hmm.. actual buffer length is 1 but
+                                      saying its zero in the packet
+                                      might explain why it's working on
+                                      others servers?)
+00 00 00 00  "AdditionalInformation" (for security info queries, ok)
+00 00 00 00  "Flags"                 (for EA info queries, ok)
+
+> InputBufferOffset (2 bytes): The offset, in bytes, from the beginning
+> of the SMB2 header to the input buffer. For quota requests, the input
+> buffer MUST contain an SMB2_QUERY_QUOTA_INFO, as specified in section
+> 2.2.37.1. For FileFullEaInformation requests, the input buffer MUST
+> contain the user supplied EA list with zero or more
+> FILE_GET_EA_INFORMATION structures, specified in [MS-FSCC] section
+> 2.4.15.1. For other information queries, this field SHOULD<69> be set
+> to 0.
+
+InputBufferOffset is an offset from the start of the smb2 header so
+that's 0x46 + 0x68 = 0xAE which points to the very last byte of the
+packet, a NULL byte. This doesn't seem right. The specs clearly says the
+offset must either be pointing to a proper {SMB2_QUERY_QUOTE_INFO,
+FILE_GET_EA_INFO} struct or be null.
+
+This also explains the length mismatch warning in the kernel console:
+
+> [16491.707476] ../fs/cifs/smb2misc.c: Calculated size 157 length 156 mismatch mid 17
+
+I'll try to write a patch for this so you can test it.
 
 Cheers,
-Hadrien
 
-
-
---------------9ED4DC98170EA7C0E4A06FE8
-Content-Type: text/x-log;
- name="trace.log"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="trace.log"
-
-[16483.016147] device enp0s25 entered promiscuous mode
-[16483.292154] ../fs/cifs/cifssmb.c: In echo request
-[16483.292161] ../fs/cifs/transport.c: For smb_command 43
-[16483.292164] __smb_send_rqst: 12 callbacks suppressed
-[16483.292166] ../fs/cifs/transport.c: Sending smb: smb_len=38
-[16483.292777] cifs_demultiplex_thread: 12 callbacks suppressed
-[16483.292780] ../fs/cifs/connect.c: RFC1002 header 0x26
-[16483.292786] ../fs/cifs/misc.c: checkSMB Length: 0x2a, smb_buf_length: 0x26
-[16491.674256] ../fs/cifs/cifsfs.c: Devname: //nfsserv22/expsi flags: 0
-[16491.674288] ../fs/cifs/connect.c: Domain name set
-[16491.674294] ../fs/cifs/connect.c: Username: grasland
-[16491.674298] ../fs/cifs/connect.c: file mode: 0x1ed  dir mode: 0x1ed
-[16491.674301] ../fs/cifs/connect.c: CIFS VFS: in cifs_mount as Xid: 2938 with uid: 0
-[16491.674303] ../fs/cifs/connect.c: UNC: \\nfsserv22\expsi
-[16491.674316] ../fs/cifs/connect.c: Socket created
-[16491.674319] ../fs/cifs/connect.c: sndbuf 16384 rcvbuf 87380 rcvtimeo 0x6d6
-[16491.679054] ../fs/cifs/connect.c: Demultiplex PID: 8864
-[16491.679058] ../fs/cifs/fscache.c: cifs_fscache_get_client_cookie: (0xffff98f2827d2000/0xffff98f2d1355730)
-[16491.679063] ../fs/cifs/connect.c: CIFS VFS: in cifs_get_smb_ses as Xid: 2939 with uid: 0
-[16491.679065] ../fs/cifs/connect.c: Existing smb sess not found
-[16491.679070] ../fs/cifs/smb2pdu.c: Negotiate protocol
-[16491.679078] ../fs/cifs/transport.c: Sending smb: smb_len=102
-[16491.681046] ../fs/cifs/connect.c: RFC1002 header 0xd3
-[16491.681052] smb2_check_message: 12 callbacks suppressed
-[16491.681054] ../fs/cifs/smb2misc.c: smb2_check_message length: 0xd7, smb_buf_length: 0xd3
-[16491.681056] smb2_calc_size: 3 callbacks suppressed
-[16491.681058] ../fs/cifs/smb2misc.c: SMB2 data length 83 offset 128
-[16491.681059] smb2_calc_size: 12 callbacks suppressed
-[16491.681060] ../fs/cifs/smb2misc.c: SMB2 len 215
-[16491.681080] cifs_sync_mid_result: 12 callbacks suppressed
-[16491.681085] ../fs/cifs/transport.c: cifs_sync_mid_result: cmd=0 mid=0 state=4
-[16491.681088] cifs_small_buf_release: 10 callbacks suppressed
-[16491.681090] ../fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
-[16491.681095] ../fs/cifs/smb2pdu.c: mode 0x1
-[16491.681097] ../fs/cifs/smb2pdu.c: negotiated smb2.0 dialect
-[16491.681105] ../fs/cifs/asn1.c: OID len = 7 oid = 0x1 0x2 0x348 0xbb92
-[16491.681109] ../fs/cifs/asn1.c: OID len = 7 oid = 0x1 0x2 0x348 0x1bb92
-[16491.681112] ../fs/cifs/asn1.c: OID len = 10 oid = 0x1 0x3 0x6 0x1
-[16491.681116] ../fs/cifs/connect.c: Security Mode: 0x1 Capabilities: 0x300001 TimeAdjust: 0
-[16491.681118] ../fs/cifs/smb2pdu.c: Session Setup
-[16491.681120] ../fs/cifs/smb2pdu.c: sess setup type 4
-[16491.681124] ../fs/cifs/transport.c: Sending smb: smb_len=120
-[16491.681734] ../fs/cifs/connect.c: RFC1002 header 0xee
-[16491.681740] ../fs/cifs/smb2misc.c: smb2_check_message length: 0xf2, smb_buf_length: 0xee
-[16491.681743] ../fs/cifs/smb2misc.c: SMB2 data length 166 offset 72
-[16491.681744] ../fs/cifs/smb2misc.c: SMB2 len 242
-[16491.681781] ../fs/cifs/transport.c: cifs_sync_mid_result: cmd=1 mid=1 state=4
-[16491.681787] ../fs/cifs/smb2maperror.c: Mapping SMB2 status code 0xc0000016 to POSIX err -5
-[16491.681788] ../fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
-[16491.681792] ../fs/cifs/smb2pdu.c: rawntlmssp session setup challenge phase
-[16491.681841] ../fs/cifs/transport.c: Sending smb: smb_len=348
-[16491.697275] ../fs/cifs/connect.c: RFC1002 header 0x48
-[16491.697281] ../fs/cifs/smb2misc.c: smb2_check_message length: 0x4c, smb_buf_length: 0x48
-[16491.697283] ../fs/cifs/smb2misc.c: SMB2 data length 0 offset 72
-[16491.697285] ../fs/cifs/smb2misc.c: SMB2 len 77
-[16491.697287] ../fs/cifs/smb2misc.c: Calculated size 77 length 76 mismatch mid 2
-[16491.697322] ../fs/cifs/transport.c: cifs_sync_mid_result: cmd=1 mid=2 state=4
-[16491.697325] ../fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
-[16491.697329] ../fs/cifs/smb2pdu.c: SMB2/3 session established successfully
-[16491.697333] ../fs/cifs/connect.c: CIFS VFS: leaving cifs_get_smb_ses (xid = 2939) rc = 0
-[16491.697338] ../fs/cifs/connect.c: CIFS VFS: in cifs_get_tcon as Xid: 2940 with uid: 0
-[16491.697339] ../fs/cifs/smb2pdu.c: TCON
-[16491.697343] ../fs/cifs/transport.c: Sending smb: smb_len=108
-[16491.698001] ../fs/cifs/connect.c: RFC1002 header 0x50
-[16491.698007] ../fs/cifs/smb2misc.c: smb2_check_message length: 0x54, smb_buf_length: 0x50
-[16491.698009] ../fs/cifs/smb2misc.c: SMB2 len 84
-[16491.698044] ../fs/cifs/transport.c: cifs_sync_mid_result: cmd=3 mid=3 state=4
-[16491.698047] ../fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
-[16491.698051] ../fs/cifs/smb2pdu.c: connection to disk share
-[16491.698054] ../fs/cifs/connect.c: CIFS VFS: leaving cifs_get_tcon (xid = 2940) rc = 0
-[16491.698055] ../fs/cifs/connect.c: Tcon rc = 0
-[16491.698060] ../fs/cifs/fscache.c: cifs_fscache_get_super_cookie: (0xffff98f2d1355730/0xffff98f2d1355c30)
-[16491.698062] ../fs/cifs/smb2pdu.c: create/open
-[16491.698066] ../fs/cifs/transport.c: Sending smb: smb_len=128
-[16491.698763] ../fs/cifs/connect.c: RFC1002 header 0x98
-[16491.698768] ../fs/cifs/smb2misc.c: smb2_check_message length: 0x9c, smb_buf_length: 0x98
-[16491.698770] ../fs/cifs/smb2misc.c: SMB2 data length 0 offset 0
-[16491.698772] ../fs/cifs/smb2misc.c: SMB2 len 157
-[16491.698774] ../fs/cifs/smb2misc.c: Calculated size 157 length 156 mismatch mid 4
-[16491.698809] ../fs/cifs/transport.c: cifs_sync_mid_result: cmd=5 mid=4 state=4
-[16491.698812] ../fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
-[16491.698817] ../fs/cifs/smb2pdu.c: Query FSInfo level 5
-[16491.698820] ../fs/cifs/transport.c: Sending smb: smb_len=105
-[16491.699452] ../fs/cifs/connect.c: RFC1002 header 0x5c
-[16491.699458] ../fs/cifs/smb2misc.c: smb2_check_message length: 0x60, smb_buf_length: 0x5c
-[16491.699460] ../fs/cifs/smb2misc.c: SMB2 data length 20 offset 72
-[16491.699461] ../fs/cifs/smb2misc.c: SMB2 len 96
-[16491.699497] ../fs/cifs/transport.c: cifs_sync_mid_result: cmd=16 mid=5 state=4
-[16491.699500] ../fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
-[16491.699504] ../fs/cifs/smb2pdu.c: Query FSInfo level 4
-[16491.699508] ../fs/cifs/transport.c: Sending smb: smb_len=105
-[16491.700059] ../fs/cifs/connect.c: RFC1002 header 0x50
-[16491.700062] ../fs/cifs/smb2misc.c: smb2_check_message length: 0x54, smb_buf_length: 0x50
-[16491.700064] ../fs/cifs/smb2misc.c: SMB2 data length 8 offset 72
-[16491.700065] ../fs/cifs/smb2misc.c: SMB2 len 84
-[16491.700097] ../fs/cifs/transport.c: cifs_sync_mid_result: cmd=16 mid=6 state=4
-[16491.700100] ../fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
-[16491.700103] ../fs/cifs/smb2pdu.c: Close
-[16491.700106] ../fs/cifs/transport.c: Sending smb: smb_len=88
-[16491.700695] ../fs/cifs/connect.c: RFC1002 header 0x7c
-[16491.700700] ../fs/cifs/smb2misc.c: smb2_check_message length: 0x80, smb_buf_length: 0x7c
-[16491.700702] ../fs/cifs/smb2misc.c: SMB2 len 128
-[16491.700741] ../fs/cifs/transport.c: cifs_sync_mid_result: cmd=6 mid=7 state=4
-[16491.700745] ../fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
-[16491.700751] ../fs/cifs/connect.c: build_unc_path_to_root: full_path=\\nfsserv22\expsi
-[16491.700753] ../fs/cifs/smb2pdu.c: TCON
-[16491.700757] ../fs/cifs/transport.c: Sending smb: smb_len=116
-[16491.701397] ../fs/cifs/connect.c: RFC1002 header 0x50
-[16491.701403] ../fs/cifs/smb2misc.c: smb2_check_message length: 0x54, smb_buf_length: 0x50
-[16491.701405] ../fs/cifs/smb2misc.c: SMB2 len 84
-[16491.701443] ../fs/cifs/transport.c: cifs_sync_mid_result: cmd=3 mid=8 state=4
-[16491.701447] ../fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
-[16491.701451] ../fs/cifs/connect.c: Tcon rc = 0 ipc_tid = 65
-[16491.701453] ../fs/cifs/smb2ops.c: smb2_get_dfs_refer path <\nfsserv22\expsi>
-[16491.701457] ../fs/cifs/smb2pdu.c: SMB2 IOCTL
-[16491.701460] ../fs/cifs/smb2pdu.c: replacing tid 0x40 with IPC tid 0x41
-[16491.701463] ../fs/cifs/transport.c: Sending smb: smb_len=156
-[16491.702055] ../fs/cifs/connect.c: RFC1002 header 0x49
-[16491.702062] ../fs/cifs/smb2misc.c: smb2_check_message length: 0x4d, smb_buf_length: 0x49
-[16491.702067] ../fs/cifs/smb2misc.c: SMB2 data length 0 offset 0
-[16491.702069] ../fs/cifs/smb2misc.c: SMB2 len 77
-[16491.702106] ../fs/cifs/transport.c: cifs_sync_mid_result: cmd=11 mid=9 state=4
-[16491.702113] ../fs/cifs/smb2maperror.c: Mapping SMB2 status code 0xc0000225 to POSIX err -2
-[16491.702115] ../fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
-[16491.702119] CIFS VFS: ioctl error in smb2_get_dfs_refer rc=-2
-[16491.702126] ../fs/cifs/smb2pdu.c: create/open
-[16491.702771] ../fs/cifs/smb2misc.c: SMB2 data length 0 offset 0
-[16491.702774] ../fs/cifs/smb2misc.c: Calculated size 157 length 156 mismatch mid 10
-[16491.702814] ../fs/cifs/smb2pdu.c: Close
-[16491.703473] ../fs/cifs/smb2pdu.c: create/open
-[16491.704114] ../fs/cifs/smb2misc.c: SMB2 data length 0 offset 0
-[16491.704117] ../fs/cifs/smb2misc.c: Calculated size 157 length 156 mismatch mid 12
-[16491.704130] ../fs/cifs/smb2pdu.c: Close
-[16491.704785] ../fs/cifs/connect.c: CIFS VFS: leaving cifs_mount (xid = 2938) rc = 0
-[16491.704895] ../fs/cifs/inode.c: CIFS VFS: in cifs_root_iget as Xid: 2941 with uid: 0
-[16491.704897] ../fs/cifs/inode.c: Getting info on 
-[16491.704904] ../fs/cifs/smb2pdu.c: create/open
-[16491.705550] ../fs/cifs/smb2misc.c: SMB2 data length 0 offset 0
-[16491.705553] ../fs/cifs/smb2misc.c: Calculated size 157 length 156 mismatch mid 14
-[16491.705593] ../fs/cifs/smb2pdu.c: Query Info
-[16491.706223] ../fs/cifs/smb2maperror.c: Mapping SMB2 status code 0xc00000bb to POSIX err -95
-[16491.706228] ../fs/cifs/smb2pdu.c: Close
-[16491.706861] ../fs/cifs/smb2pdu.c: create/open
-[16491.707476] ../fs/cifs/smb2misc.c: Calculated size 157 length 156 mismatch mid 17
-[16491.707514] ../fs/cifs/smb2pdu.c: Query Info
-[16491.708101] ../fs/cifs/smb2maperror.c: Mapping SMB2 status code 0xc00000bb to POSIX err -95
-[16491.708106] ../fs/cifs/smb2pdu.c: Close
-[16491.708752] CIFS VFS: cifs_read_super: get root inode failed
-[16491.724234] ../fs/cifs/connect.c: cifs_put_tcon: tc_count=1
-[16491.724238] ../fs/cifs/connect.c: CIFS VFS: in cifs_put_tcon as Xid: 2942 with uid: 0
-[16491.724239] ../fs/cifs/smb2pdu.c: Tree Disconnect
-[16491.724581] ../fs/cifs/fscache.c: cifs_fscache_release_super_cookie: (0xffff98f2d1355c30)
-[16491.724586] ../fs/cifs/connect.c: cifs_put_smb_ses: ses_count=1
-[16491.724588] ../fs/cifs/connect.c: CIFS VFS: in cifs_put_smb_ses as Xid: 2943 with uid: 0
-[16491.724590] ../fs/cifs/smb2pdu.c: disconnect session ffff98f32b761400
-[16491.725182] ../fs/cifs/fscache.c: cifs_fscache_release_client_cookie: (0xffff98f2827d2000/0xffff98f2d1355730)
-[16498.749502] device enp0s25 left promiscuous mode
-
---------------9ED4DC98170EA7C0E4A06FE8
-Content-Type: application/vnd.tcpdump.pcap;
- name="trace.pcap"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="trace.pcap"
-
-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
---------------9ED4DC98170EA7C0E4A06FE8--
+-- 
+Aurélien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
+GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
