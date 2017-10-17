@@ -1,125 +1,71 @@
-From: Christophe LEROY <christophe.leroy@c-s.fr>
-Subject: Re: [PATCH v9 17/20] crypto: talitos: move to generic async
- completion
-Date: Tue, 17 Oct 2017 12:50:41 +0200
-Message-ID: <b75d3b02-2aba-124c-ccf5-7241775c004c@c-s.fr>
-References: <1508059209-25529-1-git-send-email-gilad@benyossef.com>
- <1508059209-25529-18-git-send-email-gilad@benyossef.com>
+From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
+Subject: Re: [PATCH v9 00/20] simplify crypto wait for async op
+Date: Tue, 17 Oct 2017 14:55:21 +0300
+Message-ID: <CAOtvUMeESbKKaEvpW_MKrRaCxwQWnBa00m4v4F1jNZ_+Xq7pWA@mail.gmail.com>
+References: <1508059209-25529-1-git-send-email-gilad@benyossef.com> <20171015153831.GA22867@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Cc: Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        keyrings@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-fscrypt@vger.kernel.org,
-        netdev@vger.kernel.org, linux-ima-devel@lists.sourceforge.net,
-        linux-ima-user@lists.sourceforge.net,
-        linux-security-module@vger.kernel.org
-To: Gilad Ben-Yossef <gilad@benyossef.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Steve French <sfrench@samba.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Mimi Zohar <zohar@linux.v
-Return-path: <linux-crypto-owner@vger.kernel.org>
-In-Reply-To: <1508059209-25529-18-git-send-email-gilad@benyossef.com>
-Content-Language: fr
-Sender: linux-crypto-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
+        David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        Tom Lendacky <thomas.lendacky-5C7GfCeVMHo@public.gmane.org>,
+        Gary Hook <gary.hook-5C7GfCeVMHo@public.gmane.org>,
+        Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+        Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>,
+        Matthias Brugger <matthias.bgg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Alasdair Kergon <agk-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        Mike Snitzer <snitzer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        device-mapper development <dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        "Theodore Y. Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,
+        Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Steffen Klassert <steffen.klassert-opNxpl+3fjRBDgjK7y7TUQ@public.gmane.org>,
+        Alexey Kuznetsov <kuznet-v/Mj1YrvjDBInbfyfbPRSQ@public.gmane.org>,
+        Hideaki YOSHIFUJI <yoshfuji-VfPWfsRibaP+Ru+s062T9g@public.gmane.org>,
+        Mimi Zohar <zohar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.c
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20171015153831.GA22867-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Le 15/10/2017 à 11:20, Gilad Ben-Yossef a écrit :
-> The talitos driver starts several async crypto ops and  waits for their
-> completions. Move it over to generic code doing the same.
-> 
-> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+On Sun, Oct 15, 2017 at 6:38 PM, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org> wrote:
+>
+> On Sun, Oct 15, 2017 at 10:19:45AM +0100, Gilad Ben-Yossef wrote:
+> >
+> > Changes from v8:
+> > - Remove the translation of EAGAIN return code to the
+> >   previous return code of EBUSY for the user space
+> >   interface of algif as no one seems to rely on it as
+> >   requested by Herbert Xu.
+>
+> Sorry, but I forgot to mention that EAGAIN is not a good value
+> to use because it's used by the network system calls for other
+> meanings (interrupted by a signal).
+>
+> So if we stop doing the translation then we also need to pick
+> a different value, perhaps E2BIG or something similar that have
+> no current use within the crypto API or network API.
 
-Tested-by: Christophe Leroy <christophe.leroy@c-s.fr>
+Yes, I see what you mean. With a netlink based interface this can
+be confusing to debug.
 
-> ---
->   drivers/crypto/talitos.c | 38 +++++---------------------------------
->   1 file changed, 5 insertions(+), 33 deletions(-)
-> 
-> diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-> index 5bd8191..9c80e0c 100644
-> --- a/drivers/crypto/talitos.c
-> +++ b/drivers/crypto/talitos.c
-> @@ -2160,22 +2160,6 @@ static int ahash_import(struct ahash_request *areq, const void *in)
->   	return 0;
->   }
->   
-> -struct keyhash_result {
-> -	struct completion completion;
-> -	int err;
-> -};
-> -
-> -static void keyhash_complete(struct crypto_async_request *req, int err)
-> -{
-> -	struct keyhash_result *res = req->data;
-> -
-> -	if (err == -EINPROGRESS)
-> -		return;
-> -
-> -	res->err = err;
-> -	complete(&res->completion);
-> -}
-> -
->   static int keyhash(struct crypto_ahash *tfm, const u8 *key, unsigned int keylen,
->   		   u8 *hash)
->   {
-> @@ -2183,10 +2167,10 @@ static int keyhash(struct crypto_ahash *tfm, const u8 *key, unsigned int keylen,
->   
->   	struct scatterlist sg[1];
->   	struct ahash_request *req;
-> -	struct keyhash_result hresult;
-> +	struct crypto_wait wait;
->   	int ret;
->   
-> -	init_completion(&hresult.completion);
-> +	crypto_init_wait(&wait);
->   
->   	req = ahash_request_alloc(tfm, GFP_KERNEL);
->   	if (!req)
-> @@ -2195,25 +2179,13 @@ static int keyhash(struct crypto_ahash *tfm, const u8 *key, unsigned int keylen,
->   	/* Keep tfm keylen == 0 during hash of the long key */
->   	ctx->keylen = 0;
->   	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-> -				   keyhash_complete, &hresult);
-> +				   crypto_req_done, &wait);
->   
->   	sg_init_one(&sg[0], key, keylen);
->   
->   	ahash_request_set_crypt(req, sg, hash, keylen);
-> -	ret = crypto_ahash_digest(req);
-> -	switch (ret) {
-> -	case 0:
-> -		break;
-> -	case -EINPROGRESS:
-> -	case -EBUSY:
-> -		ret = wait_for_completion_interruptible(
-> -			&hresult.completion);
-> -		if (!ret)
-> -			ret = hresult.err;
-> -		break;
-> -	default:
-> -		break;
-> -	}
-> +	ret = crypto_wait_req(crypto_ahash_digest(req), &wait);
-> +
->   	ahash_request_free(req);
->   
->   	return ret;
-> 
+Would you mind if we used ENOSPC instead of E2BIG?
+
+"No space left on device" seems more appropriate than
+"Argument list too long".
+
+Thanks,
+Gilad
+
+
+
+
+-- 
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
