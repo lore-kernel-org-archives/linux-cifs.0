@@ -1,27 +1,37 @@
 From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
 Subject: Re: Share mounts in SMBv1 mode, but fails to mount in SMBv2 mode
-Date: Tue, 17 Oct 2017 11:28:38 +0200
-Message-ID: <mps7evuunqx.fsf@aaptelpc.suse.de>
-References: <144390dd-e0fc-ae98-a645-5972f11d635d@lal.in2p3.fr> <mpsd15nv1up.fsf@aaptelpc.suse.de> <0b17f092-5c81-3b2e-5e48-b2a4c5b4145a@lal.in2p3.fr> <mpsa80ruowd.fsf@aaptelpc.suse.de> <9e6bb290-6375-2dfe-8d5b-2128fcc9538d@lal.in2p3.fr> <CAH2r5mt+pRqKa+drXNUEZwhK4bJBH9AYyu048QpSkBnqd_XXgw@mail.gmail.com>
+Date: Tue, 17 Oct 2017 11:44:32 +0200
+Message-ID: <mps4lqyun0f.fsf@aaptelpc.suse.de>
+References: <144390dd-e0fc-ae98-a645-5972f11d635d@lal.in2p3.fr> <mpsd15nv1up.fsf@aaptelpc.suse.de> <0b17f092-5c81-3b2e-5e48-b2a4c5b4145a@lal.in2p3.fr> <mpsa80ruowd.fsf@aaptelpc.suse.de> <9e6bb290-6375-2dfe-8d5b-2128fcc9538d@lal.in2p3.fr>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8BIT
-Cc: "linux-cifs\@vger.kernel.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Hadrien Grasland <grasland-dJj/bURytuEtnUBFBimtzg@public.gmane.org>
+To: Hadrien Grasland <grasland-dJj/bURytuEtnUBFBimtzg@public.gmane.org>,
+        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mt+pRqKa+drXNUEZwhK4bJBH9AYyu048QpSkBnqd_XXgw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <9e6bb290-6375-2dfe-8d5b-2128fcc9538d-dJj/bURytuEtnUBFBimtzg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> writes:
-> Yes.  One option we have is to fall back to a lower, less complete info level
-> to work around this server bug.
+Hadrien Grasland <grasland-dJj/bURytuEtnUBFBimtzg@public.gmane.org> writes:
+> I've never patched a kernel module before, but I assume it should 
+> involve something like getting a copy of my kernel's sources, applying 
+> the patch, rebuilding the relevant module, unloading the old module and 
+> putting the new one in its place, right?
 
-Ok
+You can also build the kernel and directly boot the resulting binary in
+a qemu vm. You can find many tutorials for this online:
 
-What do you think about the extra null byte and the wrong offset in the
-query info request? It definitely looks like an error to me.
+http://ncmiller.github.io/2016/05/14/linux-and-qemu.html
+https://www.collabora.com/news-and-blog/blog/2017/01/16/setting-up-qemu-kvm-for-kernel-development/
+etc
+
+I'd also suggest using the bridge setup described here so you can access
+your host network from the vm transparently.
+
+http://blog.elastocloud.org/2015/07/qemukvm-bridged-network-with-tap.html
+
+Depending on your experience you might find this easier.
 
 -- 
 Aurélien Aptel / SUSE Labs Samba Team
