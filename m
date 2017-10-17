@@ -1,57 +1,49 @@
-From: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: [PATCH] CIFS: do not send invalid input buffer on QUERY_INFO requests
-Date: Tue, 17 Oct 2017 14:47:17 +0200
-Message-ID: <20171017124717.25955-1-aaptel@suse.com>
-References: <mpsa80ruowd.fsf@aaptelpc.suse.de>
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <mpsa80ruowd.fsf-zpEvHKhluMwYitT5tn2FcQ@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v9 00/20] simplify crypto wait for async op
+Date: Tue, 17 Oct 2017 21:09:10 +0800
+Message-ID: <20171017130910.GA28534@gondor.apana.org.au>
+References: <1508059209-25529-1-git-send-email-gilad@benyossef.com>
+ <20171015153831.GA22867@gondor.apana.org.au>
+ <CAOtvUMeESbKKaEvpW_MKrRaCxwQWnBa00m4v4F1jNZ_+Xq7pWA@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>,
+        Boris Brezillon <boris.brezillon@free-electrons.com>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        device-mapper development <dm-devel@redhat.com>,
+        Steve French <sfrench@samba.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.c
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Return-path: <netdev-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <CAOtvUMeESbKKaEvpW_MKrRaCxwQWnBa00m4v4F1jNZ_+Xq7pWA@mail.gmail.com>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-query_info() doesn't use the InputBuffer field of the QUERY_INFO
-request, therefore according to [MS-SMB2] it must:
+On Tue, Oct 17, 2017 at 02:55:21PM +0300, Gilad Ben-Yossef wrote:
+>
+> Would you mind if we used ENOSPC instead of E2BIG?
+> 
+> "No space left on device" seems more appropriate than
+> "Argument list too long".
 
-a) set the InputBufferOffset to 0
-b) send a zero-length InputBuffer
+It's fine by me.
 
-Doing a) is trivial but b) is a bit more tricky.
-
-The packet is allocated according to it's StructureSize, which takes
-into account an extra 1 byte buffer which we don't need
-here. StructureSize fields must have constant values no matter the
-actual length of the whole packet so we can't just edit that constant.
-
-Both the NetBIOS-over-TCP message length ("rfc1002 length") L and the
-iovec length L' have to be updated. Since L' is computed from L we
-just update L by decrementing it by one.
-
-Signed-off-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
----
- fs/cifs/smb2pdu.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
-
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 6f0e6343c15e..b927e131f997 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -2191,9 +2191,13 @@ query_info(const unsigned int xid, struct cifs_tcon *tcon,
- 	req->PersistentFileId = persistent_fid;
- 	req->VolatileFileId = volatile_fid;
- 	req->AdditionalInformation = cpu_to_le32(additional_info);
--	/* 4 for rfc1002 length field and 1 for Buffer */
--	req->InputBufferOffset =
--		cpu_to_le16(sizeof(struct smb2_query_info_req) - 1 - 4);
-+
-+	/*
-+	 * We do not use the input buffer (do not send extra byte)
-+	 */
-+	req->InputBufferOffset = 0;
-+	inc_rfc1001_len(req, -1);
-+
- 	req->OutputBufferLength = cpu_to_le32(output_len);
- 
- 	iov[0].iov_base = (char *)req;
+Thanks,
 -- 
-2.12.3
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
