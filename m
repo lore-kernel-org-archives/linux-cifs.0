@@ -1,71 +1,57 @@
-From: Gilad Ben-Yossef <gilad-6S/DczAoZh3WXxRugSxzZg@public.gmane.org>
-Subject: Re: [PATCH v9 00/20] simplify crypto wait for async op
-Date: Tue, 17 Oct 2017 14:55:21 +0300
-Message-ID: <CAOtvUMeESbKKaEvpW_MKrRaCxwQWnBa00m4v4F1jNZ_+Xq7pWA@mail.gmail.com>
-References: <1508059209-25529-1-git-send-email-gilad@benyossef.com> <20171015153831.GA22867@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-        Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
-        David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        Tom Lendacky <thomas.lendacky-5C7GfCeVMHo@public.gmane.org>,
-        Gary Hook <gary.hook-5C7GfCeVMHo@public.gmane.org>,
-        Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-        Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>,
-        Matthias Brugger <matthias.bgg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Alasdair Kergon <agk-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        Mike Snitzer <snitzer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        device-mapper development <dm-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        "Theodore Y. Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,
-        Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Steffen Klassert <steffen.klassert-opNxpl+3fjRBDgjK7y7TUQ@public.gmane.org>,
-        Alexey Kuznetsov <kuznet-v/Mj1YrvjDBInbfyfbPRSQ@public.gmane.org>,
-        Hideaki YOSHIFUJI <yoshfuji-VfPWfsRibaP+Ru+s062T9g@public.gmane.org>,
-        Mimi Zohar <zohar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.c
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+From: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+Subject: [PATCH] CIFS: do not send invalid input buffer on QUERY_INFO requests
+Date: Tue, 17 Oct 2017 14:47:17 +0200
+Message-ID: <20171017124717.25955-1-aaptel@suse.com>
+References: <mpsa80ruowd.fsf@aaptelpc.suse.de>
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171015153831.GA22867-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+In-Reply-To: <mpsa80ruowd.fsf-zpEvHKhluMwYitT5tn2FcQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, Oct 15, 2017 at 6:38 PM, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org> wrote:
->
-> On Sun, Oct 15, 2017 at 10:19:45AM +0100, Gilad Ben-Yossef wrote:
-> >
-> > Changes from v8:
-> > - Remove the translation of EAGAIN return code to the
-> >   previous return code of EBUSY for the user space
-> >   interface of algif as no one seems to rely on it as
-> >   requested by Herbert Xu.
->
-> Sorry, but I forgot to mention that EAGAIN is not a good value
-> to use because it's used by the network system calls for other
-> meanings (interrupted by a signal).
->
-> So if we stop doing the translation then we also need to pick
-> a different value, perhaps E2BIG or something similar that have
-> no current use within the crypto API or network API.
+query_info() doesn't use the InputBuffer field of the QUERY_INFO
+request, therefore according to [MS-SMB2] it must:
 
-Yes, I see what you mean. With a netlink based interface this can
-be confusing to debug.
+a) set the InputBufferOffset to 0
+b) send a zero-length InputBuffer
 
-Would you mind if we used ENOSPC instead of E2BIG?
+Doing a) is trivial but b) is a bit more tricky.
 
-"No space left on device" seems more appropriate than
-"Argument list too long".
+The packet is allocated according to it's StructureSize, which takes
+into account an extra 1 byte buffer which we don't need
+here. StructureSize fields must have constant values no matter the
+actual length of the whole packet so we can't just edit that constant.
 
-Thanks,
-Gilad
+Both the NetBIOS-over-TCP message length ("rfc1002 length") L and the
+iovec length L' have to be updated. Since L' is computed from L we
+just update L by decrementing it by one.
 
+Signed-off-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+---
+ fs/cifs/smb2pdu.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-
-
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 6f0e6343c15e..b927e131f997 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -2191,9 +2191,13 @@ query_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 	req->PersistentFileId = persistent_fid;
+ 	req->VolatileFileId = volatile_fid;
+ 	req->AdditionalInformation = cpu_to_le32(additional_info);
+-	/* 4 for rfc1002 length field and 1 for Buffer */
+-	req->InputBufferOffset =
+-		cpu_to_le16(sizeof(struct smb2_query_info_req) - 1 - 4);
++
++	/*
++	 * We do not use the input buffer (do not send extra byte)
++	 */
++	req->InputBufferOffset = 0;
++	inc_rfc1001_len(req, -1);
++
+ 	req->OutputBufferLength = cpu_to_le32(output_len);
+ 
+ 	iov[0].iov_base = (char *)req;
 -- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+2.12.3
