@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v5 03/21] CIFS: SMBD: export protocol initial values
-Date: Wed, 18 Oct 2017 16:09:02 -0700
-Message-ID: <20171018230920.21042-4-longli@exchange.microsoft.com>
+Subject: [Patch v5 06/21] CIFS: SMBD: Upper layer connects to SMBDirect session
+Date: Wed, 18 Oct 2017 16:09:05 -0700
+Message-ID: <20171018230920.21042-7-longli@exchange.microsoft.com>
 References: <20171018230920.21042-1-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -16,123 +16,70 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-For use-configurable SMB Direct protocol values, export them to /proc/fs/cifs.
+When "rdma" is specified in the mount option, make CIFS connect to
+SMB Direct.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/cifs_debug.c | 79 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 79 insertions(+)
+ fs/cifs/connect.c | 27 ++++++++++++++++++++++++---
+ 1 file changed, 24 insertions(+), 3 deletions(-)
 
-diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-index 9727e1d..26d0dff 100644
---- a/fs/cifs/cifs_debug.c
-+++ b/fs/cifs/cifs_debug.c
-@@ -30,6 +30,9 @@
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index b5a575f..2c0b34a 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -44,7 +44,6 @@
+ #include <net/ipv6.h>
+ #include <linux/parser.h>
+ #include <linux/bvec.h>
+-
+ #include "cifspdu.h"
+ #include "cifsglob.h"
  #include "cifsproto.h"
- #include "cifs_debug.h"
- #include "cifsfs.h"
+@@ -56,6 +55,9 @@
+ #include "rfc1002pdu.h"
+ #include "fscache.h"
+ #include "smb2proto.h"
 +#ifdef CONFIG_CIFS_SMB_DIRECT
 +#include "smbdirect.h"
 +#endif
  
- void
- cifs_dump_mem(char *label, void *data, int length)
-@@ -369,6 +372,54 @@ static const struct file_operations cifs_stats_proc_fops = {
- };
- #endif /* STATS */
- 
+ #define CIFS_PORT 445
+ #define RFC1001_PORT 139
+@@ -2279,13 +2281,32 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 		tcp_ses->echo_interval = volume_info->echo_interval * HZ;
+ 	else
+ 		tcp_ses->echo_interval = SMB_ECHO_INTERVAL_DEFAULT * HZ;
+-
++	if (tcp_ses->rdma) {
 +#ifdef CONFIG_CIFS_SMB_DIRECT
-+#define PROC_FILE_DEFINE(name) \
-+static ssize_t name##_write(struct file *file, const char __user *buffer, \
-+	size_t count, loff_t *ppos) \
-+{ \
-+	int rc; \
-+	rc = kstrtoint_from_user(buffer, count, 10, & name ); \
-+	if (rc) \
-+		return rc; \
-+	return count; \
-+} \
-+static int name##_proc_show(struct seq_file *m, void *v) \
-+{ \
-+	seq_printf(m, "%d\n", name ); \
-+	return 0; \
-+} \
-+static int name##_open(struct inode *inode, struct file *file) \
-+{ \
-+	return single_open(file, name##_proc_show, NULL); \
-+} \
-+\
-+static const struct file_operations cifs_##name##_proc_fops = { \
-+	.open		= name##_open, \
-+	.read		= seq_read, \
-+	.llseek		= seq_lseek, \
-+	.release	= single_release, \
-+	.write		= name##_write, \
-+}
-+
-+extern int rdma_readwrite_threshold;
-+extern int smbd_max_frmr_depth;
-+extern int smbd_keep_alive_interval;
-+extern int smbd_max_receive_size;
-+extern int smbd_max_fragmented_recv_size;
-+extern int smbd_max_send_size;
-+extern int smbd_send_credit_target;
-+extern int smbd_receive_credit_max;
-+
-+PROC_FILE_DEFINE(rdma_readwrite_threshold);
-+PROC_FILE_DEFINE(smbd_max_frmr_depth);
-+PROC_FILE_DEFINE(smbd_keep_alive_interval);
-+PROC_FILE_DEFINE(smbd_max_receive_size);
-+PROC_FILE_DEFINE(smbd_max_fragmented_recv_size);
-+PROC_FILE_DEFINE(smbd_max_send_size);
-+PROC_FILE_DEFINE(smbd_send_credit_target);
-+PROC_FILE_DEFINE(smbd_receive_credit_max);
++		tcp_ses->smbd_conn = smbd_get_connection(
++			tcp_ses, (struct sockaddr *)&volume_info->dstaddr);
++		if (tcp_ses->smbd_conn) {
++			cifs_dbg(VFS, "RDMA transport established\n");
++			rc = 0;
++			goto smbd_connected;
++		} else {
++			rc = -ENOENT;
++			goto out_err_crypto_release;
++		}
++#else
++		cifs_dbg(VFS, "CONFIG_CIFS_SMB_DIRECT is not enabled\n");
++		rc = -ENOENT;
++		goto out_err_crypto_release;
 +#endif
-+
- static struct proc_dir_entry *proc_fs_cifs;
- static const struct file_operations cifsFYI_proc_fops;
- static const struct file_operations cifs_lookup_cache_proc_fops;
-@@ -396,6 +447,24 @@ cifs_proc_init(void)
- 		    &cifs_security_flags_proc_fops);
- 	proc_create("LookupCacheEnabled", 0, proc_fs_cifs,
- 		    &cifs_lookup_cache_proc_fops);
++	}
+ 	rc = ip_connect(tcp_ses);
+ 	if (rc < 0) {
+ 		cifs_dbg(VFS, "Error connecting to socket. Aborting operation.\n");
+ 		goto out_err_crypto_release;
+ 	}
+-
 +#ifdef CONFIG_CIFS_SMB_DIRECT
-+	proc_create("rdma_readwrite_threshold", 0, proc_fs_cifs,
-+		&cifs_rdma_readwrite_threshold_proc_fops);
-+	proc_create("smbd_max_frmr_depth", 0, proc_fs_cifs,
-+		&cifs_smbd_max_frmr_depth_proc_fops);
-+	proc_create("smbd_keep_alive_interval", 0, proc_fs_cifs,
-+		&cifs_smbd_keep_alive_interval_proc_fops);
-+	proc_create("smbd_max_receive_size", 0, proc_fs_cifs,
-+		&cifs_smbd_max_receive_size_proc_fops);
-+	proc_create("smbd_max_fragmented_recv_size", 0, proc_fs_cifs,
-+		&cifs_smbd_max_fragmented_recv_size_proc_fops);
-+	proc_create("smbd_max_send_size", 0, proc_fs_cifs,
-+		&cifs_smbd_max_send_size_proc_fops);
-+	proc_create("smbd_send_credit_target", 0, proc_fs_cifs,
-+		&cifs_smbd_send_credit_target_proc_fops);
-+	proc_create("smbd_receive_credit_max", 0, proc_fs_cifs,
-+		&cifs_smbd_receive_credit_max_proc_fops);
++smbd_connected:
 +#endif
- }
- 
- void
-@@ -413,6 +482,16 @@ cifs_proc_clean(void)
- 	remove_proc_entry("SecurityFlags", proc_fs_cifs);
- 	remove_proc_entry("LinuxExtensionsEnabled", proc_fs_cifs);
- 	remove_proc_entry("LookupCacheEnabled", proc_fs_cifs);
-+#ifdef CONFIG_CIFS_SMB_DIRECT
-+	remove_proc_entry("rdma_readwrite_threshold", proc_fs_cifs);
-+	remove_proc_entry("smbd_max_frmr_depth", proc_fs_cifs);
-+	remove_proc_entry("smbd_keep_alive_interval", proc_fs_cifs);
-+	remove_proc_entry("smbd_max_receive_size", proc_fs_cifs);
-+	remove_proc_entry("smbd_max_fragmented_recv_size", proc_fs_cifs);
-+	remove_proc_entry("smbd_max_send_size", proc_fs_cifs);
-+	remove_proc_entry("smbd_send_credit_target", proc_fs_cifs);
-+	remove_proc_entry("smbd_receive_credit_max", proc_fs_cifs);
-+#endif
- 	remove_proc_entry("fs/cifs", NULL);
- }
- 
+ 	/*
+ 	 * since we're in a cifs function already, we know that
+ 	 * this will succeed. No need for try_module_get().
 -- 
 2.7.4
