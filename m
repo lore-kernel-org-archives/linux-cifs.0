@@ -1,43 +1,22 @@
-From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: Re: Regression in 4.14-rc: CIFS SMB2+ combined with pythons xattr.listxattr leads to "IOError: [Errno 61] No data available"
-Date: Wed, 18 Oct 2017 14:52:58 +0200
-Message-ID: <mpsshegty6t.fsf@aaptelpc.suse.de>
-References: <4d13dddc-2df2-4112-a214-15700c22ed50@leemhuis.info>
+From: 61169862-JVqo/v6+17SELdXlOq2cAlZq95QhYFEm@public.gmane.org
+Subject: AnswerD
+Date: Wed, 18 Oct 2017 09:09:59 -0400
+Message-ID: <HE1PR0102MB3162E77742C5AEF97E66FF0EBA4D0@HE1PR0102MB3162.eurprd01.prod.exchangelabs.com>
+Reply-To: mrlynneerwin97-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Thorsten Leemhuis <linux-rCxcAJFjeRkk+I/owrrOrA@public.gmane.org>,
-        Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+To: Recipients <61169862-JVqo/v6+17SELdXlOq2cAlZq95QhYFEm@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4d13dddc-2df2-4112-a214-15700c22ed50-rCxcAJFjeRkk+I/owrrOrA@public.gmane.org>
+Content-Description: Mail message body
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi Thorsten,
+Brauchen Sie eine dringende finanzielle f=FCr weitere Informationen E-Mail =
+mit Kreditbetrag ben=F6tigt: Darlehen Dauer: Telefonnummer: Land: Formular =
+10,000.00euros zu 50,000,000Euros kontaktieren Sie uns  Email: mrlynneerwin=
+97-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 
-If you still run into this problem, could you provide a network trace
-and kernel output?
-
-     # make the kernel as verbose as possible
-     echo 'module cifs +p' > /sys/kernel/debug/dynamic_debug/control
-     echo 'file fs/cifs/* +p' > /sys/kernel/debug/dynamic_debug/control
-     echo 1 > /proc/fs/cifs/cifsFYI
-     echo 1 > /sys/module/dns_resolver/parameters/debug
-
-     # get kernel output + network trace
-     dmesg --clear
-     tcpdump -w trace.pcap & pid=$!
-     sleep 3
-     mount.cifs ....cd ... ls.. blahblah
-     sleep 3
-     kill $pid
-     dmesg > trace.log
-
-this should produce a trace.pcap and trace.log file.
-
--- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
-GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+---
+This email has been checked for viruses by Avast antivirus software.
+https://www.avast.com/antivirus
