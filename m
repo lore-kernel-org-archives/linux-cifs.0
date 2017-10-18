@@ -1,55 +1,79 @@
-From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v5 09/21] CIFS: SMBD: Implement function to destroy a SMB Direct connection
-Date: Wed, 18 Oct 2017 16:09:08 -0700
-Message-ID: <20171018230920.21042-10-longli@exchange.microsoft.com>
+From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+Subject: [Patch v5 18/21] CIFS: SMBD: Add parameter rdata to smb2_new_read_req
+Date: Wed, 18 Oct 2017 16:09:17 -0700
+Message-ID: <20171018230920.21042-19-longli@exchange.microsoft.com>
 References: <20171018230920.21042-1-longli@exchange.microsoft.com>
-Cc: Long Li <longli@microsoft.com>
-To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Tom Talpey <ttalpey@microsoft.com>,
-        Matthew Wilcox <mawilcox@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20171018230920.21042-1-longli@exchange.microsoft.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Stephen Hemminger <sthemmin-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20171018230920.21042-1-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-From: Long Li <longli@microsoft.com>
+From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 
-Add function to tear down a SMB Direct connection. This is used by upper layer
-to free all SMB Direct connection and transport resources.
+This patch is for preparing upper layer for doing SMB read via RDMA write.
 
-Signed-off-by: Long Li <longli@microsoft.com>
+When we assemble the SMB read packet header, we need to know the I/O layout
+if this request is to use a RDMA write. rdata has all the information we need
+for memory registration. Add rdata to smb2_new_read_req.
+
+Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 ---
- fs/cifs/smbdirect.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ fs/cifs/smb2pdu.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index f54e7d8..f507de3 100644
---- a/fs/cifs/smbdirect.c
-+++ b/fs/cifs/smbdirect.c
-@@ -1392,6 +1392,22 @@ static void idle_connection_timer(struct work_struct *work)
- 			info->keep_alive_interval*HZ);
- }
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 0841aba..8ef4a2f 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -2353,18 +2353,21 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+  */
+ static int
+ smb2_new_read_req(void **buf, unsigned int *total_len,
+-		  struct cifs_io_parms *io_parms, unsigned int remaining_bytes,
+-		  int request_type)
++	struct cifs_io_parms *io_parms, struct cifs_readdata *rdata,
++	unsigned int remaining_bytes, int request_type)
+ {
+ 	int rc = -EACCES;
+ 	struct smb2_read_plain_req *req = NULL;
+ 	struct smb2_sync_hdr *shdr;
++	struct TCP_Server_Info *server;
  
-+/* Destroy this SMBD connection, called from upper layer */
-+void smbd_destroy(struct smbd_connection *info)
-+{
-+	log_rdma_event(INFO, "destroying rdma session\n");
+ 	rc = smb2_plain_req_init(SMB2_READ, io_parms->tcon, (void **) &req,
+ 				 total_len);
+ 	if (rc)
+ 		return rc;
+-	if (io_parms->tcon->ses->server == NULL)
 +
-+	/* Kick off the disconnection process */
-+	smbd_disconnect_rdma_connection(info);
-+
-+	log_rdma_event(INFO, "wait for transport being destroyed\n");
-+	wait_event(info->wait_destroy,
-+		info->transport_status == SMBD_DESTROYED);
-+
-+	destroy_workqueue(info->workqueue);
-+	kfree(info);
-+}
-+
- /*
-  * Reconnect this SMBD connection, called from upper layer
-  * return value: 0 on success, or actual error code
++	server = io_parms->tcon->ses->server;
++	if (server == NULL)
+ 		return -ECONNABORTED;
+ 
+ 	shdr = &req->sync_hdr;
+@@ -2492,7 +2495,8 @@ smb2_async_readv(struct cifs_readdata *rdata)
+ 
+ 	server = io_parms.tcon->ses->server;
+ 
+-	rc = smb2_new_read_req((void **) &buf, &total_len, &io_parms, 0, 0);
++	rc = smb2_new_read_req(
++		(void **) &buf, &total_len, &io_parms, rdata, 0, 0);
+ 	if (rc) {
+ 		if (rc == -EAGAIN && rdata->credits) {
+ 			/* credits was reset by reconnect */
+@@ -2560,7 +2564,7 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
+ 	struct cifs_ses *ses = io_parms->tcon->ses;
+ 
+ 	*nbytes = 0;
+-	rc = smb2_new_read_req((void **)&req, &total_len, io_parms, 0, 0);
++	rc = smb2_new_read_req((void **)&req, &total_len, io_parms, NULL, 0, 0);
+ 	if (rc)
+ 		return rc;
+ 
 -- 
 2.7.4
