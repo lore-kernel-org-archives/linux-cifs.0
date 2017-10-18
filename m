@@ -1,47 +1,74 @@
-From: Hadrien Grasland <grasland-dJj/bURytuEtnUBFBimtzg@public.gmane.org>
-Subject: Re: [PATCH] CIFS: do not send invalid input buffer on QUERY_INFO
- requests
-Date: Wed, 18 Oct 2017 22:20:25 +0200
-Message-ID: <2cc607c4-36cf-caaf-9deb-3ec25287ded9@lal.in2p3.fr>
-References: <mpsa80ruowd.fsf@aaptelpc.suse.de>
- <20171017124717.25955-1-aaptel@suse.com>
- <f87e7391-b2f0-feaf-3489-686d0368fe64@lal.in2p3.fr>
- <mpspo9ktsr5.fsf@aaptelpc.suse.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-To: =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>,
-        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <mpspo9ktsr5.fsf-zpEvHKhluMwYitT5tn2FcQ@public.gmane.org>
-Content-Language: fr
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+Subject: [Patch v5 11/21] CIFS: SMBD: Set SMB Direct maximum read or write size for I/O
+Date: Wed, 18 Oct 2017 16:09:10 -0700
+Message-ID: <20171018230920.21042-12-longli@exchange.microsoft.com>
+References: <20171018230920.21042-1-longli@exchange.microsoft.com>
+Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Stephen Hemminger <sthemmin-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20171018230920.21042-1-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-Le 18/10/2017 à 16:50, Aurélien Aptel a écrit :
-> Hadrien Grasland <grasland-dJj/bURytuEtnUBFBimtzg@public.gmane.org> writes:
->> Just tried out this patch, and the CIFS module does indeed produce
->> well-formed GetInfo requests now (according to Wireshark's definition at
->> least, didn't check myself).
->>
->> However, the server will still reject the request with a
->> STATUS_NOT_SUPPORTED error, suggesting that Steve's interpretation was
->> the right one: this is likely a server-side bug.
-> Yes. As Steve suggested as a workaround, we could try to use a less
-> detailed information level if FullInfo fails. Is it worth doing for a
-> single old NetApp server?
+From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 
-If it's only me that's having the issue, I would say don't bother. The 
-same system issue that prevents my sysadmin colleagues from updating to 
-a NetApp software version where the bug is fixed also prevents them from 
-disabling SMBv1 support, and sticking with SMBv1 for now is fine by me.
+When connecting over SMB Direct, the transport negotiates its maximum I/O sizes
+with the server and determines how to choose to do RDMA send/recv vs
+read/write. Expose these maximum I/O sizes to upper layer so we will get the
+correct sized payloads.
 
+Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+---
+ fs/cifs/smb2ops.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-> As for the offset and extra byte in QUERY_INFO I guess having the length
-> set to 0 makes it ok... I've sent a couple of patches to Wireshark to
-> fix the packet parsing. It now accepts the empty filename in CREATE (no
-> more "[unknown]"), which enables the proper parsing of the unknown
-> field.
-Thanks for looking into this!
-Hadrien
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index fb2934b..25028da 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -32,6 +32,9 @@
+ #include "smb2status.h"
+ #include "smb2glob.h"
+ #include "cifs_ioctl.h"
++#ifdef CONFIG_CIFS_SMB_DIRECT
++#include "smbdirect.h"
++#endif
+ 
+ static int
+ change_conf(struct TCP_Server_Info *server)
+@@ -250,7 +253,11 @@ smb2_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
+ 	/* start with specified wsize, or default */
+ 	wsize = volume_info->wsize ? volume_info->wsize : CIFS_DEFAULT_IOSIZE;
+ 	wsize = min_t(unsigned int, wsize, server->max_write);
+-
++#ifdef CONFIG_CIFS_SMB_DIRECT
++	if (server->rdma)
++		wsize = min_t(unsigned int,
++				wsize, server->smbd_conn->max_readwrite_size);
++#endif
+ 	if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
+ 		wsize = min_t(unsigned int, wsize, SMB2_MAX_BUFFER_SIZE);
+ 
+@@ -266,6 +273,11 @@ smb2_negotiate_rsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
+ 	/* start with specified rsize, or default */
+ 	rsize = volume_info->rsize ? volume_info->rsize : CIFS_DEFAULT_IOSIZE;
+ 	rsize = min_t(unsigned int, rsize, server->max_read);
++#ifdef CONFIG_CIFS_SMB_DIRECT
++	if (server->rdma)
++		rsize = min_t(unsigned int,
++				rsize, server->smbd_conn->max_readwrite_size);
++#endif
+ 
+ 	if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
+ 		rsize = min_t(unsigned int, rsize, SMB2_MAX_BUFFER_SIZE);
+-- 
+2.7.4
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
