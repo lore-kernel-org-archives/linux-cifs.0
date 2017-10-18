@@ -1,7 +1,7 @@
 From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Subject: [Patch v5 11/21] CIFS: SMBD: Set SMB Direct maximum read or write size for I/O
-Date: Wed, 18 Oct 2017 16:09:10 -0700
-Message-ID: <20171018230920.21042-12-longli@exchange.microsoft.com>
+Subject: [Patch v5 15/21] CIFS: SMBD: Upper layer sends data via RDMA send
+Date: Wed, 18 Oct 2017 16:09:14 -0700
+Message-ID: <20171018230920.21042-16-longli@exchange.microsoft.com>
 References: <20171018230920.21042-1-longli@exchange.microsoft.com>
 Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
@@ -16,55 +16,52 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 
-When connecting over SMB Direct, the transport negotiates its maximum I/O sizes
-with the server and determines how to choose to do RDMA send/recv vs
-read/write. Expose these maximum I/O sizes to upper layer so we will get the
-correct sized payloads.
+With SMB Direct connected, use it for sending data via RDMA send.
 
 Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 ---
- fs/cifs/smb2ops.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ fs/cifs/transport.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index fb2934b..25028da 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -32,6 +32,9 @@
- #include "smb2status.h"
- #include "smb2glob.h"
- #include "cifs_ioctl.h"
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 7efbab0..1b51d08 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -37,6 +37,9 @@
+ #include "cifsglob.h"
+ #include "cifsproto.h"
+ #include "cifs_debug.h"
 +#ifdef CONFIG_CIFS_SMB_DIRECT
 +#include "smbdirect.h"
 +#endif
  
- static int
- change_conf(struct TCP_Server_Info *server)
-@@ -250,7 +253,11 @@ smb2_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
- 	/* start with specified wsize, or default */
- 	wsize = volume_info->wsize ? volume_info->wsize : CIFS_DEFAULT_IOSIZE;
- 	wsize = min_t(unsigned int, wsize, server->max_write);
+ void
+ cifs_wake_up_task(struct mid_q_entry *mid)
+@@ -229,7 +232,12 @@ __smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ 	struct socket *ssocket = server->ssocket;
+ 	struct msghdr smb_msg;
+ 	int val = 1;
 -
 +#ifdef CONFIG_CIFS_SMB_DIRECT
-+	if (server->rdma)
-+		wsize = min_t(unsigned int,
-+				wsize, server->smbd_conn->max_readwrite_size);
++	if (server->smbd_conn) {
++		rc = smbd_send(server->smbd_conn, rqst);
++		goto smbd_done;
++	}
 +#endif
- 	if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
- 		wsize = min_t(unsigned int, wsize, SMB2_MAX_BUFFER_SIZE);
+ 	if (ssocket == NULL)
+ 		return -ENOTSOCK;
  
-@@ -266,6 +273,11 @@ smb2_negotiate_rsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
- 	/* start with specified rsize, or default */
- 	rsize = volume_info->rsize ? volume_info->rsize : CIFS_DEFAULT_IOSIZE;
- 	rsize = min_t(unsigned int, rsize, server->max_read);
+@@ -298,7 +306,9 @@ __smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ 		 */
+ 		server->tcpStatus = CifsNeedReconnect;
+ 	}
+-
 +#ifdef CONFIG_CIFS_SMB_DIRECT
-+	if (server->rdma)
-+		rsize = min_t(unsigned int,
-+				rsize, server->smbd_conn->max_readwrite_size);
++smbd_done:
 +#endif
- 
- 	if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
- 		rsize = min_t(unsigned int, rsize, SMB2_MAX_BUFFER_SIZE);
+ 	if (rc < 0 && rc != -EINTR)
+ 		cifs_dbg(VFS, "Error %d sending data on socket to server\n",
+ 			 rc);
 -- 
 2.7.4
 
