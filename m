@@ -1,11 +1,17 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH v9 00/20] simplify crypto wait for async op
-Date: Wed, 18 Oct 2017 08:44:31 +0300
-Message-ID: <CAOtvUMfOSo4KSBX3UKtYj1sgmReAdhmmi1MhZGq0aFk-vptahg@mail.gmail.com>
-References: <1508059209-25529-1-git-send-email-gilad@benyossef.com> <20171017140629.GO20805@n2100.armlinux.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Subject: [PATCH v10 01/20] crypto: change transient busy return code to -ENOSPC
+Date: Wed, 18 Oct 2017 08:00:33 +0100
+Message-ID: <1508310057-25369-2-git-send-email-gilad@benyossef.com>
+References: <1508310057-25369-1-git-send-email-gilad@benyossef.com>
+Cc: Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        keyrings@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-fscrypt@vger.kernel.org,
+        netdev@vger.kernel.org, linux-ima-devel@lists.sourceforge.net,
+        linux-ima-user@lists.sourceforge.net,
+        linux-security-module@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Jonathan Corbet <corbet@lwn.net>,
         David Howells <dhowells@redhat.com>,
@@ -15,111 +21,84 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
         Arnaud Ebalard <arno@natisbad.org>,
         Matthias Brugger <matthias.bgg@gmail.com>,
         Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        device-mapper development <dm-devel@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
         Steve French <sfrench@samba.org>,
         "Theodore Y. Ts'o" <tytso@mit.edu>,
         Jaegeuk Kim <jaegeuk@kernel.org>,
         Steffen Klassert <steffen.klassert@secunet.com>,
         Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
         Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>
-To: Russell King - ARM Linux <linux@armlinux.org.uk>
-Return-path: <linux-doc-owner@vger.kernel.org>
-In-Reply-To: <20171017140629.GO20805@n2100.armlinux.org.uk>
-Sender: linux-doc-owner@vger.kernel.org
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.ka
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1508310057-25369-1-git-send-email-gilad@benyossef.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Tue, Oct 17, 2017 at 5:06 PM, Russell King - ARM Linux
-<linux@armlinux.org.uk> wrote:
-> On Sun, Oct 15, 2017 at 10:19:45AM +0100, Gilad Ben-Yossef wrote:
->> Many users of kernel async. crypto services have a pattern of
->> starting an async. crypto op and than using a completion
->> to wait for it to end.
->>
->> This patch set simplifies this common use case in two ways:
->>
->> First, by separating the return codes of the case where a
->> request is queued to a backlog due to the provider being
->> busy (-EBUSY) from the case the request has failed due
->> to the provider being busy and backlogging is not enabled
->> (-EAGAIN).
->>
->> Next, this change is than built on to create a generic API
->> to wait for a async. crypto operation to complete.
->>
->> The end result is a smaller code base and an API that is
->> easier to use and more difficult to get wrong.
->>
->> The patch set was boot tested on x86_64 and arm64 which
->> at the very least tests the crypto users via testmgr and
->> tcrypt but I do note that I do not have access to some
->> of the HW whose drivers are modified nor do I claim I was
->> able to test all of the corner cases.
->>
->> The patch set is based upon linux-next release tagged
->> next-20171013.
->
-> Has there been any performance impact analysis of these changes?  I
-> ended up with patches for one of the crypto drivers which converted
-> its interrupt handling to threaded interrupts being reverted because
-> it caused a performance degredation.
->
-> Moving code to latest APIs to simplify it is not always beneficial.
+The crypto API was using the -EBUSY return value to indicate
+both a hard failure to submit a crypto operation into a
+transformation provider when the latter was busy and the backlog
+mechanism was not enabled as well as a notification that the
+operation was queued into the backlog when the backlog mechanism
+was enabled.
 
-I agree with the sentiment but I believe this one is justified.
+Having the same return code indicate two very different conditions
+depending on a flag is both error prone and requires extra runtime
+check like the following to discern between the cases:
 
-This patch set basically does 3 things:
+	if (err == -EINPROGRESS ||
+	    (err == -EBUSY && (ahash_request_flags(req) &
+			       CRYPTO_TFM_REQ_MAY_BACKLOG)))
 
-1.  Replace one immediate value (-EBUSY) by another (-EAGAIN). Mostly it's just
-s/EBUSY/EAGAIN/g. In very few places this resulted very trivial code
-changes. I don't
-foresee this having any effect on performance.
+This patch changes the return code used to indicate a crypto op
+failed due to the transformation provider being transiently busy
+to -ENOSPC.
 
-2. Removal of some conditions and/or conditional jumps that were used to discern
-between two different cases which are now now easily tested for by the
-different return
-value. If at all, this will be an increase in performance, although I
-don't expect it to be
-noticeable.
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+---
+ crypto/algapi.c | 6 ++++--
+ crypto/cryptd.c | 4 +---
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-3. Replacing a whole bunch of open coded code and data structures
-which were pretty much
-cut and pasted from the Documentation and therefore identical, with a
-single copy thereof.
-
-Every place that I found that deviated slightly from the identical
-pattern, it turned out to be
-a bug of some sorts and patches for those were sent and accepted already.
-
-So, we might be losing a few inline optimization opportunities but
-we're gaining better
-cache utilization. Again, I don't expect any of this to have a
-noticeable effect to either
-direction.
-
-I did run the changed code as best I could and did not notice any
-performance changes and
-none of the testers and maintainers that ACKed mentioned any.
-
-Having said that, it's a big change that touches many places,
-sub-systems and drivers. I do
-not claim to have thoroughly tested for performance all the changes in
-person. In some cases,
-I don't even have access to the specialized hardware. I did get a
-reasonable amount of review
-and testers I believe - would always love to see more :-)
-
-Many thanks,
-Gilad
-
-
-
-
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index aa699ff..60d7366 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -897,9 +897,11 @@ int crypto_enqueue_request(struct crypto_queue *queue,
+ 	int err = -EINPROGRESS;
+ 
+ 	if (unlikely(queue->qlen >= queue->max_qlen)) {
+-		err = -EBUSY;
+-		if (!(request->flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++		if (!(request->flags & CRYPTO_TFM_REQ_MAY_BACKLOG)) {
++			err = -ENOSPC;
+ 			goto out;
++		}
++		err = -EBUSY;
+ 		if (queue->backlog == &queue->list)
+ 			queue->backlog = &request->list;
+ 	}
+diff --git a/crypto/cryptd.c b/crypto/cryptd.c
+index 0508c48..bd43cf5 100644
+--- a/crypto/cryptd.c
++++ b/crypto/cryptd.c
+@@ -137,16 +137,14 @@ static int cryptd_enqueue_request(struct cryptd_queue *queue,
+ 	int cpu, err;
+ 	struct cryptd_cpu_queue *cpu_queue;
+ 	atomic_t *refcnt;
+-	bool may_backlog;
+ 
+ 	cpu = get_cpu();
+ 	cpu_queue = this_cpu_ptr(queue->cpu_queue);
+ 	err = crypto_enqueue_request(&cpu_queue->queue, request);
+ 
+ 	refcnt = crypto_tfm_ctx(request->tfm);
+-	may_backlog = request->flags & CRYPTO_TFM_REQ_MAY_BACKLOG;
+ 
+-	if (err == -EBUSY && !may_backlog)
++	if (err == -ENOSPC)
+ 		goto out_put_cpu;
+ 
+ 	queue_work_on(cpu, kcrypto_wq, &cpu_queue->work);
 -- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+2.7.4
