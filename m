@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v5 13/21] CIFS: SMBD: Upper layer receives data via RDMA receive
-Date: Wed, 18 Oct 2017 16:09:12 -0700
-Message-ID: <20171018230920.21042-14-longli@exchange.microsoft.com>
+Subject: [Patch v5 09/21] CIFS: SMBD: Implement function to destroy a SMB Direct connection
+Date: Wed, 18 Oct 2017 16:09:08 -0700
+Message-ID: <20171018230920.21042-10-longli@exchange.microsoft.com>
 References: <20171018230920.21042-1-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -16,32 +16,40 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-With SMB Direct connected, use it for receiving data via RDMA receive.
+Add function to tear down a SMB Direct connection. This is used by upper layer
+to free all SMB Direct connection and transport resources.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/connect.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ fs/cifs/smbdirect.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 23f10d1..6325062 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -545,8 +545,14 @@ cifs_readv_from_socket(struct TCP_Server_Info *server, struct msghdr *smb_msg)
+diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+index f54e7d8..f507de3 100644
+--- a/fs/cifs/smbdirect.c
++++ b/fs/cifs/smbdirect.c
+@@ -1392,6 +1392,22 @@ static void idle_connection_timer(struct work_struct *work)
+ 			info->keep_alive_interval*HZ);
+ }
  
- 		if (server_unresponsive(server))
- 			return -ECONNABORTED;
--
-+#ifdef CONFIG_CIFS_SMB_DIRECT
-+		if (server->smbd_conn)
-+			length = smbd_recv(server->smbd_conn, smb_msg);
-+		else
-+			length = sock_recvmsg(server->ssocket, smb_msg, 0);
-+#else
- 		length = sock_recvmsg(server->ssocket, smb_msg, 0);
-+#endif
- 
- 		if (server->tcpStatus == CifsExiting)
- 			return -ESHUTDOWN;
++/* Destroy this SMBD connection, called from upper layer */
++void smbd_destroy(struct smbd_connection *info)
++{
++	log_rdma_event(INFO, "destroying rdma session\n");
++
++	/* Kick off the disconnection process */
++	smbd_disconnect_rdma_connection(info);
++
++	log_rdma_event(INFO, "wait for transport being destroyed\n");
++	wait_event(info->wait_destroy,
++		info->transport_status == SMBD_DESTROYED);
++
++	destroy_workqueue(info->workqueue);
++	kfree(info);
++}
++
+ /*
+  * Reconnect this SMBD connection, called from upper layer
+  * return value: 0 on success, or actual error code
 -- 
 2.7.4
