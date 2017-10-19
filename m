@@ -1,64 +1,39 @@
-From: Chris Davies <chris.davies-fcHNbCilqsSHXe+LvDLADg@public.gmane.org>
-Subject: RE: CIFS backporting for kernel 2.6, SMB2/3 dialect support
-Date: Thu, 19 Oct 2017 17:10:43 +0000
-Message-ID: <DB6PR0301MB23735FBCB58183AD29C2219594420@DB6PR0301MB2373.eurprd03.prod.outlook.com>
-References: <DB6PR0301MB237377DF7009AFA00637913B944D0@DB6PR0301MB2373.eurprd03.prod.outlook.com>
- <mpsh8uvtsgf.fsf@aaptelpc.suse.de>
- <CAN05THSWsUsLPYOF8x0BwX2B7NivaateQZ51pqdP-06qOmkW6A@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: ronnie sahlberg <ronniesahlberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        =?utf-8?B?QXVyw6lsaWVuIEFwdGVs?= <aaptel-IBi9RG/b67k@public.gmane.org>
+From: Benjamin Gilbert <benjamin.gilbert-JW9irJGTvgXQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: Select all required crypto modules
+Date: Thu, 19 Oct 2017 13:09:29 -0700
+Message-ID: <20171019200929.4055-1-benjamin.gilbert@coreos.com>
+Cc: Benjamin Gilbert <benjamin.gilbert-JW9irJGTvgXQT0dZR+AlfA@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAN05THSWsUsLPYOF8x0BwX2B7NivaateQZ51pqdP-06qOmkW6A-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-VGhhbmsgeW91IGJvdGggdmVyeSBtdWNoIGZvciB0aGUgYWR2aWNlIGFuZCBkaXJlY3Rpb24gb24g
-dGhpcy4gQXZvaWRpbmcgdGhlIHJlc2VhcmNoIGFuZCBlZmZvcnQgd2UgbWlnaHQgaGF2ZSBzcGVu
-dCBvbiB0aGlzIGR1YmlvdXMgdGFzayBpcyBpbnZhbHVhYmxlIQ0KDQoNCi1DaHJpcw0KDQotLS0t
-LU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogcm9ubmllIHNhaGxiZXJnIFttYWlsdG86cm9u
-bmllc2FobGJlcmdAZ21haWwuY29tXSANClNlbnQ6IE9jdG9iZXIgMTksIDIwMTcgMjo1MCBBTQ0K
-VG86IEF1csOpbGllbiBBcHRlbCA8YWFwdGVsQHN1c2UuY29tPg0KQ2M6IENocmlzIERhdmllcyA8
-Y2hyaXMuZGF2aWVzQHVtZWRpYS5ldT47IGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnDQpTdWJq
-ZWN0OiBSZTogQ0lGUyBiYWNrcG9ydGluZyBmb3Iga2VybmVsIDIuNiwgU01CMi8zIGRpYWxlY3Qg
-c3VwcG9ydA0KDQpDb25jdXIgd2l0aCAgQXVyw6lsaWVuLg0KDQoyLjYuMzIgaXMgVkVSWSBvbGQg
-YW5kIHRoZXJlIGFyZSBzZXZlcmFsIGNvcmUga2VybmVsIEFQSXMgdGhhdCBoYXZlIGNoYW5nZWQg
-c2lnbmlmaWNhbnRseSBiZXR3ZWVuIDIuNiBhbmQgY3VycmVudCBrZXJuZWxzLg0KRm9yIGV4YW1w
-bGUgdGhlIHdob2xlIGlvdmVjdG9yIEFQSSBmb3IgaG93IGJ1ZmZlcnMgYXJlIGhhbmRsZWQgY2hh
-bmdlZCBkcmFtYXRpY2FsbHkuIEFuZCB0aGVyZSBhcmUgb3RoZXIgZHJhbWF0aWMgQVBJICBjaGFu
-Z2VzIHRvby4NCg0KQXMgYSBsb3Qgb2YgZGlzdHJvcyBkbyBzaGlwICJvbGQtaXNoIiAoYnV0IG5v
-dCBhcyBvbGQgYXMgMi42KSBrZXJuZWxzIGJ1dCB3aXRoIG1vZGVybiBDSUZTLCBpdCBpcyBub3Qg
-aW1wb3NzaWJsZSBidXQgaXQgaXMgZmFyIGZhciBmcm9tIGJlaW5nIHRyaXZpYWwuDQpFc3BlY2lh
-bGx5IHNpbmNlIDIuNi4zMiBpcyBzbyBvbGQgdGhhdCB5b3Ugd2lsbCBoYXZlIHRvIHdyaXRlIGEg
-d2hvbGUgYnVuY2ggb2YgdHJhbnNsYXRpb24gd3JhcHBlcnMgdG8gYWNjb21vZGF0ZSB0aGUga2Vy
-bmVsIEFQSSBjaGFuZ2VzIHRoYXQgY2lmcy5rbyBuZWVkIHRvIGludGVyZmFjZSB0by4NCg0KDQpV
-bmxlc3MgeW91IGFyZSB3aWxsaW5nIHRvIGRlZGljYXRlIHJlc291cmNlcyB0byBhIGJpZyBwb3J0
-LCBhbmQgY29udGludWVkIHN1cHBvcnQsIEl0IGlzIHBvc3NpYmxlIGJ1dCB3aWxsIHJlcXVpcmUg
-c2lnbmlmaWNhbnQgZWZmb3J0IGFuZCBsaWtlbHkgc2lnbmlmaWNhbnQgY29zdCwgYm90aCB0byBi
-YWNrcG9ydCBpdCBhcyB3ZWxsIGFzIHN1cHBvcnRpbmcgaXQuDQpJIHdvdWxkIGp1c3Qgc3RpY2sg
-d2l0aCAyLjYuMzIgYW5kIFNNQjEgZm9yIG5vdyB1bnRpbCB5b3UgZ2V0IHRvIHRoZSBwb2ludCB3
-aGVyZSB5b3UgY2FuIHVwZ3JhZGUgdGhlIHdob2xlIGRpc3Ryby9rZXJuZWwgdG8gYSBtb3JlIHJl
-Y2VudCB2YXJpZW50Lg0KDQoNCg0KcmVnYXJkcw0Kcm9ubmllIHNhaGxiZXJnDQoNCg0KT24gVGh1
-LCBPY3QgMTksIDIwMTcgYXQgNzowOSBQTSwgQXVyw6lsaWVuIEFwdGVsIDxhYXB0ZWxAc3VzZS5j
-b20+IHdyb3RlOg0KPiBIaSBDaHJpcywNCj4NCj4gQ2hyaXMgRGF2aWVzIDxjaHJpcy5kYXZpZXNA
-dW1lZGlhLmV1PiB3cml0ZXM6DQo+PiBIaSBmb2xrcywgSSdtIGhvcGluZyB0byBhY2hpZXZlIFNN
-QjIuMCsgZGlhbGVjdCBzdXBwb3J0IGZvciBDZW50T1MgNiBjbGllbnRzIChjdXJyZW50bHkgd2l0
-aCBDSUZTIDEuNjgpLiAgSGFzIGFueW9uZSBkb25lIGEgYmFja3BvcnQgb2YgbmV3ZXIgQ0lGUyB2
-ZXJzaW9ucyBmb3IgdXNlIGluIHByb2R1Y3Rpb24/IFdhcyBpdCB0cml2aWFsPw0KPg0KPiBBY2Nv
-cmRpbmcgdG8gd2lraXBlZGlhIENlbk9TIDYgaXMgYmFzZWQgb24ga2VybmVsIDIuNi4zMi4gVGhp
-cyBpcyANCj4gKm9sZCouIEFkZGluZyBTTUJ2MiBzdXBwb3J0IHJlcXVpcmVkIGxhcmdlIHJlZmFj
-dG9yaW5nIGVmZm9ydHMgYW5kIA0KPiBrZXJuZWwgQVBJcyBhcmUgb2Z0ZW4gY2hhbmdpbmcgc28g
-SSBleHBlY3QgYmFja3BvcnRpbmcgdG8gYmUgdmVyeSBoYXJkIA0KPiB1bmZvcnR1bmF0ZWx5Lg0K
-Pg0KPiBDaGVlcnMsDQo+DQo+IC0tDQo+IEF1csOpbGllbiBBcHRlbCAvIFNVU0UgTGFicyBTYW1i
-YSBUZWFtDQo+IEdQRzogMTgzOSBDQjVGIDlGNUIgRkI5QiBBQTk3ICA4Qzk5IDAzQzggQTQ5QiA1
-MjFCIEQ1RDMgU1VTRSBMaW51eCANCj4gR21iSCwgTWF4ZmVsZHN0cmHDn2UgNSwgOTA0MDkgTsO8
-cm5iZXJnLCBHZXJtYW55DQo+IEdGOiBGZWxpeCBJbWVuZMO2cmZmZXIsIEphbmUgU21pdGhhcmQs
-IEdyYWhhbSBOb3J0b24sIEhSQiAyMTI4NCAoQUcgDQo+IE7DvHJuYmVyZykNCj4gLS0NCj4gVG8g
-dW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJlIGxp
-bnV4LWNpZnMiIA0KPiBpbiB0aGUgYm9keSBvZiBhIG1lc3NhZ2UgdG8gbWFqb3Jkb21vQHZnZXIu
-a2VybmVsLm9yZyBNb3JlIG1ham9yZG9tbyANCj4gaW5mbyBhdCAgaHR0cDovL3ZnZXIua2VybmVs
-Lm9yZy9tYWpvcmRvbW8taW5mby5odG1sDQo=
+Some dependencies were lost when CIFS_SMB2 was merged into CIFS.
+
+Fixes: 2a38e12053b7 ("[SMB3] Remove ifdef since SMB3 (and later) now STRONGLY preferred")
+Signed-off-by: Benjamin Gilbert <benjamin.gilbert-JW9irJGTvgXQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/Kconfig | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
+index f7243617316c..d5b2e12b5d02 100644
+--- a/fs/cifs/Kconfig
++++ b/fs/cifs/Kconfig
+@@ -5,9 +5,14 @@ config CIFS
+ 	select CRYPTO
+ 	select CRYPTO_MD4
+ 	select CRYPTO_MD5
++	select CRYPTO_SHA256
++	select CRYPTO_CMAC
+ 	select CRYPTO_HMAC
+ 	select CRYPTO_ARC4
++	select CRYPTO_AEAD2
++	select CRYPTO_CCM
+ 	select CRYPTO_ECB
++	select CRYPTO_AES
+ 	select CRYPTO_DES
+ 	help
+ 	  This is the client VFS module for the SMB3 family of NAS protocols,
+-- 
+2.13.6
