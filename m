@@ -1,39 +1,64 @@
-From: Benjamin Gilbert <benjamin.gilbert-JW9irJGTvgXQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: Select all required crypto modules
-Date: Thu, 19 Oct 2017 13:09:29 -0700
-Message-ID: <20171019200929.4055-1-benjamin.gilbert@coreos.com>
-Cc: Benjamin Gilbert <benjamin.gilbert-JW9irJGTvgXQT0dZR+AlfA@public.gmane.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: shuwang@redhat.com
+Subject: [PATCH] SMB: fix memory leak in smb3_validate_negotiate
+Date: Fri, 20 Oct 2017 18:20:33 +0800
+Message-ID: <20171020102033.22936-1-shuwang@redhat.com>
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org, chuhu@redhat.com, yizhan@redhat.com,
+        Shu Wang <shuwang@redhat.com>
+To: sfrench@samba.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Some dependencies were lost when CIFS_SMB2 was merged into CIFS.
+From: Shu Wang <shuwang@redhat.com>
 
-Fixes: 2a38e12053b7 ("[SMB3] Remove ifdef since SMB3 (and later) now STRONGLY preferred")
-Signed-off-by: Benjamin Gilbert <benjamin.gilbert-JW9irJGTvgXQT0dZR+AlfA@public.gmane.org>
+Found the issue by kmemleak. The pointer pneg_rsp stores the
+pointer kmalloced from SMB2_ioctl, and should be release
+before function return.
+
+unreferenced object 0xffff88018c2b1900 (size 32):
+  backtrace:
+    kmemleak_alloc+0x4a/0xa0
+    __kmalloc+0xec/0x220
+    SMB2_ioctl+0x27a/0x3c0 [cifs]
+    smb3_validate_negotiate+0x135/0x370 [cifs]
+    SMB2_tcon+0x308/0xae0 [cifs]
+    cifs_put_tcp_session+0x4a5/0x900 [cifs]
+    cifs_mount+0x6f4/0x15f0 [cifs]
+
+Signed-off-by: Shu Wang <shuwang@redhat.com>
 ---
- fs/cifs/Kconfig | 5 +++++
- 1 file changed, 5 insertions(+)
+ fs/cifs/smb2pdu.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
-index f7243617316c..d5b2e12b5d02 100644
---- a/fs/cifs/Kconfig
-+++ b/fs/cifs/Kconfig
-@@ -5,9 +5,14 @@ config CIFS
- 	select CRYPTO
- 	select CRYPTO_MD4
- 	select CRYPTO_MD5
-+	select CRYPTO_SHA256
-+	select CRYPTO_CMAC
- 	select CRYPTO_HMAC
- 	select CRYPTO_ARC4
-+	select CRYPTO_AEAD2
-+	select CRYPTO_CCM
- 	select CRYPTO_ECB
-+	select CRYPTO_AES
- 	select CRYPTO_DES
- 	help
- 	  This is the client VFS module for the SMB3 family of NAS protocols,
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 6f0e6343c15e..4785ed8e1589 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -727,8 +727,10 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
+ 			 rsplen);
+ 
+ 		/* relax check since Mac returns max bufsize allowed on ioctl */
+-		if (rsplen > CIFSMaxBufSize)
++		if (rsplen > CIFSMaxBufSize) {
++			kfree(pneg_rsp);
+ 			return -EIO;
++		}
+ 	}
+ 
+ 	/* check validate negotiate info response matches what we got earlier */
+@@ -747,10 +749,12 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
+ 
+ 	/* validate negotiate successful */
+ 	cifs_dbg(FYI, "validate negotiate info successful\n");
++	kfree(pneg_rsp);
+ 	return 0;
+ 
+ vneg_out:
+ 	cifs_dbg(VFS, "protocol revalidation - security settings mismatch\n");
++	kfree(pneg_rsp);
+ 	return -EIO;
+ }
+ 
 -- 
-2.13.6
+2.13.5
