@@ -1,32 +1,65 @@
-From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: Re: [PATCH v2] man: generate all man pages from POD files when buidling
-Date: Mon, 23 Oct 2017 16:23:02 +0200
-Message-ID: <mps8tg2t03d.fsf@aaptelpc.suse.de>
-References: <20170920222053.7977-1-aaptel@suse.com> <20170929140303.24880-1-aaptel@suse.com> <1508761900.5859.10.camel@samba.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: initialize rsp_iov and avoid a NULL deref in SMB2_read
+Date: Tue, 24 Oct 2017 14:01:53 +1100
+Message-ID: <20171024030153.541-1-lsahlber@redhat.com>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1508761900.5859.10.camel-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> writes:
-> A one time conversion to rst files and twiddle the Makefile.am to use
-> rst2man and I think we'd be done. I'm happy to do the work, but I wanted
-> to run it by you in case you had a particular attachment to pod files.
+Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/smb2pdu.c | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
 
-I've just picked POD because there was already POD files in the
-tree. You can go ahead if you prefer RST, I personally don't mind much
-as long as it's not troff :)
-
-Cheers,
-
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 6ff4c275ca9a..efa06068e7e1 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -2669,27 +2669,27 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
+ 	cifs_small_buf_release(req);
+ 
+ 	rsp = (struct smb2_read_rsp *)rsp_iov.iov_base;
+-	shdr = get_sync_hdr(rsp);
+ 
+-	if (shdr->Status == STATUS_END_OF_FILE) {
++	if (rc) {
++		if (rc != -ENODATA) {
++			cifs_stats_fail_inc(io_parms->tcon, SMB2_READ_HE);
++			cifs_dbg(VFS, "Send error in read = %d\n", rc);
++		}
+ 		free_rsp_buf(resp_buftype, rsp_iov.iov_base);
+-		return 0;
++		return rc == -ENODATA ? 0 : rc;
+ 	}
+ 
+-	if (rc) {
+-		cifs_stats_fail_inc(io_parms->tcon, SMB2_READ_HE);
+-		cifs_dbg(VFS, "Send error in read = %d\n", rc);
+-	} else {
+-		*nbytes = le32_to_cpu(rsp->DataLength);
+-		if ((*nbytes > CIFS_MAX_MSGSIZE) ||
+-		    (*nbytes > io_parms->length)) {
+-			cifs_dbg(FYI, "bad length %d for count %d\n",
+-				 *nbytes, io_parms->length);
+-			rc = -EIO;
+-			*nbytes = 0;
+-		}
++	*nbytes = le32_to_cpu(rsp->DataLength);
++	if ((*nbytes > CIFS_MAX_MSGSIZE) ||
++	    (*nbytes > io_parms->length)) {
++		cifs_dbg(FYI, "bad length %d for count %d\n",
++			 *nbytes, io_parms->length);
++		rc = -EIO;
++		*nbytes = 0;
+ 	}
+ 
++	shdr = get_sync_hdr(rsp);
++
+ 	if (*buf) {
+ 		memcpy(*buf, (char *)shdr + rsp->DataOffset, *nbytes);
+ 		free_rsp_buf(resp_buftype, rsp_iov.iov_base);
 -- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
-GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+2.13.3
