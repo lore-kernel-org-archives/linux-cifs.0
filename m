@@ -1,36 +1,31 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Fwd: [Bug 197311] CIFS: mount.cifs stopped working with the Windows
- 10 Pro 15063 SMB server
-Date: Wed, 25 Oct 2017 16:14:32 -0500
-Message-ID: <CAH2r5mtfoumpO4S5VhkqDJPvRDnKTPTyBAVk=4DvhYX5ycj7hw@mail.gmail.com>
-References: <bug-197311-106681@https.bugzilla.kernel.org/> <bug-197311-106681-Z8cl32qM4P@https.bugzilla.kernel.org/>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: check MaxPathNameComponentLength != 0 before using it
+Date: Thu, 26 Oct 2017 09:31:32 +1100
+Message-ID: <20171025223132.10046-1-lsahlber@redhat.com>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <bug-197311-106681-Z8cl32qM4P-3bo0kxnWaOQUvHkbgXJLS5sdmw4N0Rt+2LY78lusg7I@public.gmane.org/>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Fix for problem with SMB3 validate_negotiate causing mount failure to
-some versions of windows when mounting smb3 or later.
+Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/dir.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-https://git.samba.org/?p=sfrench/cifs-2.6.git;a=commit;h=cf237481182846c508a4baa4f8281a2a7262ca09
-
----------- Forwarded message ----------
-From:  <bugzilla-daemon-590EEB7GvNiWaY/ihj7yzEB+6BGkLq7r@public.gmane.org>
-Date: Thu, Oct 19, 2017 at 4:38 PM
-Subject: [Bug 197311] CIFS: mount.cifs stopped working with the
-Windows 10 Pro 15063 SMB server
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-
-
-https://bugzilla.kernel.org/show_bug.cgi?id=197311
-
-
-
-
+diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+index e702d48bd023..513ff2986c97 100644
+--- a/fs/cifs/dir.c
++++ b/fs/cifs/dir.c
+@@ -204,7 +204,8 @@ check_name(struct dentry *direntry, struct cifs_tcon *tcon)
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(direntry->d_sb);
+ 	int i;
+ 
+-	if (unlikely(direntry->d_name.len >
++	if (unlikely(tcon->fsAttrInfo.MaxPathNameComponentLength &&
++		     direntry->d_name.len >
+ 		     le32_to_cpu(tcon->fsAttrInfo.MaxPathNameComponentLength)))
+ 		return -ENAMETOOLONG;
+ 
 -- 
-Thanks,
-
-Steve
+2.13.3
