@@ -1,57 +1,30 @@
-From: Leif Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: long name length protection triggering when it shouldn't
-Date: Thu, 26 Oct 2017 18:36:17 -0400 (EDT)
-Message-ID: <355654398.20246337.1509057377124.JavaMail.zimbra@redhat.com>
-References: <alpine.DEB.2.20.1710261653580.1395@Lib-ITS13.lib.duke.edu>
+From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+Subject: Re: [cifs-utils PATCH] doc: convert pod files to rst
+Date: Fri, 27 Oct 2017 11:41:13 +0200
+Message-ID: <mpszi8dhqrq.fsf@aaptelpc.suse.de>
+References: <20171025140002.5631-1-jlayton@kernel.org> <mps3765kfkq.fsf@aaptelpc.suse.de> <1509042102.29077.35.camel@kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jack Hill <jackhill-4+jYJfmkT58@public.gmane.org>
+Content-Transfer-Encoding: 8BIT
+Cc: piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: Jeff Layton <jlayton-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <alpine.DEB.2.20.1710261653580.1395-WLjXm773ss2rwpbwKtlw2QLqUvEzMhQG@public.gmane.org>
+In-Reply-To: <1509042102.29077.35.camel-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Thanks for the report.
+Jeff Layton <jlayton-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org> writes:
+> Fixed the name in the changelog.
+>
+> Many thanks for the extra cleanup there.
+>
+> I'll squash that in with my patch. Do you mind if I add your Signed-off-
+> by to the patch as well?
 
-I had a report yesterday about the name length check failing together with DFS use,
-this was fixed by applying this patch :
+Go ahead.
 
-http://www.spinics.net/lists/linux-cifs/msg13458.html
-
-Can you try that patch and confirm if it fixes the issue for you too ?
-
-
-regards
-ronnie sahlberg
-
-
------ Original Message -----
-From: "Jack Hill" <jackhill-4+jYJfmkT58@public.gmane.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Sent: Friday, 27 October, 2017 8:13:27 AM
-Subject: long name length protection triggering when it shouldn't
-
-Hi,
-
-I believe that I'm having a problem where the checks in 
-5ed70f7db9afe5e4e5cc1fa2239676e3b2d2c5b2 for file name length are 
-triggering when they shouldn't be. I see this problem on a normal Debian 
-Stretch system where the patch in question was introduced in Debian's 
-linux-image-4.9.0-4-amd64 kernel. I believe that the errors about file 
-name length are erroneous because I see no problems when using a prior 
-kernel. As an added twist, I only see this problem when using the sec=krb5 
-option. If I use sec=ntlmv2, the problem does not occur. I am looking for 
-advice on how to troubleshoot further.
-
-More information can be found in a post I made to a different list about 
-this issue 
-<https://trilug.org/pipermail/trilug/Week-of-Mon-20171023/077662.html>.
-
-Thanks,
-Jack
---
-To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+-- 
+Aurélien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
+GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
