@@ -1,53 +1,52 @@
-From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: Re: [PATCH] fs, cifs: convert tcon_link.tl_count from atomic_t to refcount_t
-Date: Mon, 30 Oct 2017 16:03:02 +0100
-Message-ID: <mpstvygispl.fsf@aaptelpc.suse.de>
+From: "Reshetova, Elena" <elena.reshetova@intel.com>
+Subject: RE: [PATCH] fs, cifs: convert tcon_link.tl_count from atomic_t to
+ refcount_t
+Date: Tue, 31 Oct 2017 09:41:46 +0000
+Message-ID: <2236FBA76BA1254E88B949DDB74E612B802B7A69@IRSMSX102.ger.corp.intel.com>
 References: <1508496110-2292-1-git-send-email-elena.reshetova@intel.com>
+ <mpstvygispl.fsf@aaptelpc.suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
-        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, peterz-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org,
-        keescook-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org, Elena Reshetova <elena.reshetova-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-To: Elena Reshetova <elena.reshetova-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1508496110-2292-1-git-send-email-elena.reshetova-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "sfrench@samba.org" <sfrench@samba.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "keescook@chromium.org" <keescook@chromium.org>
+To: =?utf-8?B?QXVyw6lsaWVuIEFwdGVs?= <aaptel@suse.com>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <mpstvygispl.fsf@aaptelpc.suse.de>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Elena Reshetova <elena.reshetova-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org> writes:
-> atomic_t variables are currently used to implement reference
-> counters with the following properties:
->  - counter is initialized to 1 using atomic_set()
->  - a resource is freed upon counter reaching zero
->  - once counter reaches zero, its further
->    increments aren't allowed
->  - counter schema uses basic atomic operations
->    (set, inc, inc_not_zero, dec_and_test, etc.)
->
-> Such atomic variables should be converted to a newly provided
-> refcount_t type and API that prevents accidental counter overflows
-> and underflows. This is important since overflows and underflows
-> can lead to use-after-free situation and be exploitable.
->
-> The variable tcon_link.tl_count is used as pure reference counter.
-> Convert it to refcount_t and fix up the operations.
-
-<snip>
-
-> -		cifs_get_tlink(tlink);
-> +		refcount_set(&tlink->tl_count, 1);
-
-Since cifs_get_tlink() basically only increments the reference count and
-given that this is a new tlink I also think this replacement is ok.
-
-Looks good to me and passes 'make C=1'.
-
-Reviewed-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-
--- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
-GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+DQo+IEVsZW5hIFJlc2hldG92YSA8ZWxlbmEucmVzaGV0b3ZhQGludGVsLmNvbT4gd3JpdGVzOg0K
+PiA+IGF0b21pY190IHZhcmlhYmxlcyBhcmUgY3VycmVudGx5IHVzZWQgdG8gaW1wbGVtZW50IHJl
+ZmVyZW5jZQ0KPiA+IGNvdW50ZXJzIHdpdGggdGhlIGZvbGxvd2luZyBwcm9wZXJ0aWVzOg0KPiA+
+ICAtIGNvdW50ZXIgaXMgaW5pdGlhbGl6ZWQgdG8gMSB1c2luZyBhdG9taWNfc2V0KCkNCj4gPiAg
+LSBhIHJlc291cmNlIGlzIGZyZWVkIHVwb24gY291bnRlciByZWFjaGluZyB6ZXJvDQo+ID4gIC0g
+b25jZSBjb3VudGVyIHJlYWNoZXMgemVybywgaXRzIGZ1cnRoZXINCj4gPiAgICBpbmNyZW1lbnRz
+IGFyZW4ndCBhbGxvd2VkDQo+ID4gIC0gY291bnRlciBzY2hlbWEgdXNlcyBiYXNpYyBhdG9taWMg
+b3BlcmF0aW9ucw0KPiA+ICAgIChzZXQsIGluYywgaW5jX25vdF96ZXJvLCBkZWNfYW5kX3Rlc3Qs
+IGV0Yy4pDQo+ID4NCj4gPiBTdWNoIGF0b21pYyB2YXJpYWJsZXMgc2hvdWxkIGJlIGNvbnZlcnRl
+ZCB0byBhIG5ld2x5IHByb3ZpZGVkDQo+ID4gcmVmY291bnRfdCB0eXBlIGFuZCBBUEkgdGhhdCBw
+cmV2ZW50cyBhY2NpZGVudGFsIGNvdW50ZXIgb3ZlcmZsb3dzDQo+ID4gYW5kIHVuZGVyZmxvd3Mu
+IFRoaXMgaXMgaW1wb3J0YW50IHNpbmNlIG92ZXJmbG93cyBhbmQgdW5kZXJmbG93cw0KPiA+IGNh
+biBsZWFkIHRvIHVzZS1hZnRlci1mcmVlIHNpdHVhdGlvbiBhbmQgYmUgZXhwbG9pdGFibGUuDQo+
+ID4NCj4gPiBUaGUgdmFyaWFibGUgdGNvbl9saW5rLnRsX2NvdW50IGlzIHVzZWQgYXMgcHVyZSBy
+ZWZlcmVuY2UgY291bnRlci4NCj4gPiBDb252ZXJ0IGl0IHRvIHJlZmNvdW50X3QgYW5kIGZpeCB1
+cCB0aGUgb3BlcmF0aW9ucy4NCj4gDQo+IDxzbmlwPg0KPiANCj4gPiAtCQljaWZzX2dldF90bGlu
+ayh0bGluayk7DQo+ID4gKwkJcmVmY291bnRfc2V0KCZ0bGluay0+dGxfY291bnQsIDEpOw0KPiAN
+Cj4gU2luY2UgY2lmc19nZXRfdGxpbmsoKSBiYXNpY2FsbHkgb25seSBpbmNyZW1lbnRzIHRoZSBy
+ZWZlcmVuY2UgY291bnQgYW5kDQo+IGdpdmVuIHRoYXQgdGhpcyBpcyBhIG5ldyB0bGluayBJIGFs
+c28gdGhpbmsgdGhpcyByZXBsYWNlbWVudCBpcyBvay4NCj4gDQo+IExvb2tzIGdvb2QgdG8gbWUg
+YW5kIHBhc3NlcyAnbWFrZSBDPTEnLg0KPiANCj4gUmV2aWV3ZWQtYnk6IEF1cmVsaWVuIEFwdGVs
+IDxhYXB0ZWxAc3VzZS5jb20+DQoNClRoYW5rIHlvdSB2ZXJ5IG11Y2ggZm9yIHlvdXIgcmV2aWV3
+IEF1cmVsaWVuISANCkRvIHlvdSBrbm93IHdobyB3b3VsZCBiZSB0aGUgcGVyc29uIHRvIHRha2Ug
+dGhpcyBwYXRjaCBmdXJ0aGVyPw0KDQpCZXN0IFJlZ2FyZHMsDQpFbGVuYS4NCg0KPiANCj4gLS0N
+Cj4gQXVyw6lsaWVuIEFwdGVsIC8gU1VTRSBMYWJzIFNhbWJhIFRlYW0NCj4gR1BHOiAxODM5IENC
+NUYgOUY1QiBGQjlCIEFBOTcgIDhDOTkgMDNDOCBBNDlCIDUyMUIgRDVEMw0KPiBTVVNFIExpbnV4
+IEdtYkgsIE1heGZlbGRzdHJhw59lIDUsIDkwNDA5IE7DvHJuYmVyZywgR2VybWFueQ0KPiBHRjog
+RmVsaXggSW1lbmTDtnJmZmVyLCBKYW5lIFNtaXRoYXJkLCBHcmFoYW0gTm9ydG9uLCBIUkIgMjEy
+ODQgKEFHIE7DvHJuYmVyZykNCg==
