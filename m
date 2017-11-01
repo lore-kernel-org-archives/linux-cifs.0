@@ -1,63 +1,159 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [Patch v5 02/21] CIFS: SMBD: Establish SMB Direct connection
-Date: Wed, 1 Nov 2017 10:19:01 -0700
-Message-ID: <CAKywueQaUdUZaKX1_paQgPAorwRZ=Xv_7yyeFEgyTcYMrw3O-g@mail.gmail.com>
-References: <20171018230920.21042-1-longli@exchange.microsoft.com> <20171018230920.21042-3-longli@exchange.microsoft.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [Patch v5 01/21] CIFS: SMBD: Add SMB Direct protocol initial
+ values and constants
+Date: Wed, 1 Nov 2017 12:21:12 -0500
+Message-ID: <CAH2r5msbXygf-GaSLyy4q_k6pNR8zSKw2KwF3--oeofimdghag@mail.gmail.com>
+References: <20171018230920.21042-1-longli@exchange.microsoft.com> <20171018230920.21042-2-longli@exchange.microsoft.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-        Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Stephen Hemminger <sthemmin-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 To: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171018230920.21042-3-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+In-Reply-To: <20171018230920.21042-2-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2017-10-18 16:09 GMT-07:00 Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>:
+Remember to run scripts/checkpatch - you had some trivial whitespace
+errors in this one (also always remember to run sparse compile with
+endian checking before submission   ie   make C=1 M=fs/cifs modules
+CF=-D__CHECK_ENDIAN__)
+
+On Wed, Oct 18, 2017 at 6:09 PM, Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org> wrote:
 > From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 >
-> Add code to implement the core functions to establish a SMB Direct connection.
->
-> 1. Establish an RDMA connection to SMB server.
-> 2. Negotiate and setup SMB Direct protocol.
-> 3. Implement idle connection timer and credit management.
->
-> SMB Direct is enabled by setting CONFIG_CIFS_SMB_DIRECT.
->
-> Add to Kconfig and Makefile to enable building SMB Direct.
+> To prepare for protocol implementation, add constants and user-configurable
+> values for the SMB Direct protocol.
 >
 > Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 > ---
->  fs/cifs/Kconfig     |    7 +
->  fs/cifs/Makefile    |    2 +
->  fs/cifs/smbdirect.c | 1576 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  fs/cifs/smbdirect.h |  265 +++++++++
->  4 files changed, 1850 insertions(+)
+>  fs/cifs/smbdirect.c | 77 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  fs/cifs/smbdirect.h | 21 +++++++++++++++
+>  2 files changed, 98 insertions(+)
+>  create mode 100644 fs/cifs/smbdirect.c
+>  create mode 100644 fs/cifs/smbdirect.h
 >
-> diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
-> index f724361..cb7db8d 100644
-> --- a/fs/cifs/Kconfig
-> +++ b/fs/cifs/Kconfig
-> @@ -191,6 +191,13 @@ config CIFS_SMB311
->           This dialect includes improved security negotiation features.
->           If unsure, say N
->
-> +config CIFS_SMB_DIRECT
-> +       bool "SMB Direct support (Experimental)"
-> +       depends on CIFS && INFINIBAND
-> +       help
-> +         Enables SMB Direct experimental support for SMB 3.0, 3.02 and 3.1.1.
-> +         SMB Direct allows transferring SMB packets over RDMA.
+> diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+> new file mode 100644
+> index 0000000..d3c16f8
+> --- /dev/null
+> +++ b/fs/cifs/smbdirect.c
+> @@ -0,0 +1,77 @@
+> +/*
+> + *   Copyright (C) 2017, Microsoft Corporation.
+> + *
+> + *   Author(s): Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+> + *
+> + *   This program is free software;  you can redistribute it and/or modify
+> + *   it under the terms of the GNU General Public License as published by
+> + *   the Free Software Foundation; either version 2 of the License, or
+> + *   (at your option) any later version.
+> + *
+> + *   This program is distributed in the hope that it will be useful,
+> + *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
+> + *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+> + *   the GNU General Public License for more details.
+> + */
+> +#include "smbdirect.h"
 > +
+> +/* SMBD version number */
+> +#define SMBD_V1        0x0100
+> +
+> +/* Port numbers for SMBD transport */
+> +#define SMB_PORT       445
+> +#define SMBD_PORT      5445
+> +
+> +/* Address lookup and resolve timeout in ms */
+> +#define RDMA_RESOLVE_TIMEOUT   5000
+> +
+> +/* SMBD negotiation timeout in seconds */
+> +#define SMBD_NEGOTIATE_TIMEOUT 120
+> +
+> +/* SMBD minimum receive size and fragmented sized defined in [MS-SMBD] */
+> +#define SMBD_MIN_RECEIVE_SIZE          128
+> +#define SMBD_MIN_FRAGMENTED_SIZE       131072
+> +
+> +/*
+> + * Default maximum number of RDMA read/write outstanding on this connection
+> + * This value is possibly decreased during QP creation on hardware limit
+> + */
+> +#define SMBD_CM_RESPONDER_RESOURCES    32
+> +
+> +/* Maximum number of retries on data transfer operations */
+> +#define SMBD_CM_RETRY                  6
+> +/* No need to retry on Receiver Not Ready since SMBD manages credits */
+> +#define SMBD_CM_RNR_RETRY              0
+> +
+> +/*
+> + * User configurable initial values per SMBD transport connection
+> + * as defined in [MS-SMBD] 3.1.1.1
+> + * Those may change after a SMBD negotiation
+> + */
+> +/* The local peer's maximum number of credits to grant to the peer */
+> +int smbd_receive_credit_max = 255;
+> +
+> +/* The remote peer's credit request of local peer */
+> +int smbd_send_credit_target = 255;
+> +
+> +/* The maximum single message size can be sent to remote peer */
+> +int smbd_max_send_size = 1364;
+> +
+> +/*  The maximum fragmented upper-layer payload receive size supported */
+> +int smbd_max_fragmented_recv_size = 1024 * 1024;
+> +
+> +/*  The maximum single-message size which can be received */
+> +int smbd_max_receive_size = 8192;
+> +
+> +/* The timeout to initiate send of a keepalive message on idle */
+> +int smbd_keep_alive_interval = 120;
+> +
+> +/*
+> + * User configurable initial values for RDMA transport
+> + * The actual values used may be lower and are limited to hardware capabilities
+> + */
+> +/* Default maximum number of SGEs in a RDMA write/read */
+> +int smbd_max_frmr_depth = 2048;
+> +
+> +/* If payload is less than this byte, use RDMA send/recv not read/write */
+> +int rdma_readwrite_threshold = 4096;
+> diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
+> new file mode 100644
+> index 0000000..c55f28b
+> --- /dev/null
+> +++ b/fs/cifs/smbdirect.h
+> @@ -0,0 +1,21 @@
+> +/*
+> + *   Copyright (C) 2017, Microsoft Corporation.
+> + *
+> + *   Author(s): Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+> + *
+> + *   This program is free software;  you can redistribute it and/or modify
+> + *   it under the terms of the GNU General Public License as published by
+> + *   the Free Software Foundation; either version 2 of the License, or
+> + *   (at your option) any later version.
+> + *
+> + *   This program is distributed in the hope that it will be useful,
+> + *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
+> + *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+> + *   the GNU General Public License for more details.
+> + */
+> +#ifndef _SMBDIRECT_H
+> +#define _SMBDIRECT_H
+> +
+> +/* Default maximum number of SGEs in a RDMA send/recv */
+> +#define SMBDIRECT_MAX_SGE      16
+> +#endif
+> --
+> 2.7.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Please add "If unsure, say N."
 
---
-Best regards,
-Pavel Shilovsky
+
+-- 
+Thanks,
+
+Steve
