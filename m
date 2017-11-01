@@ -1,159 +1,72 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [Patch v5 01/21] CIFS: SMBD: Add SMB Direct protocol initial
- values and constants
-Date: Wed, 1 Nov 2017 12:21:12 -0500
-Message-ID: <CAH2r5msbXygf-GaSLyy4q_k6pNR8zSKw2KwF3--oeofimdghag@mail.gmail.com>
-References: <20171018230920.21042-1-longli@exchange.microsoft.com> <20171018230920.21042-2-longli@exchange.microsoft.com>
+From: Steve French <smfrench@gmail.com>
+Subject: Re: [PATCH] fs, cifs: convert tcon_link.tl_count from atomic_t to refcount_t
+Date: Wed, 1 Nov 2017 12:56:29 -0500
+Message-ID: <CAH2r5mtWf5mxKjPNsBs5TRAaPJMaPKwnWTMYz6o49_+K_zGk_g@mail.gmail.com>
+References: <1508496110-2292-1-git-send-email-elena.reshetova@intel.com> <mpstvygispl.fsf@aaptelpc.suse.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171018230920.21042-2-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Cc: Elena Reshetova <elena.reshetova@intel.com>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Steve French <sfrench@samba.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Kees Cook <keescook@chromium.org>
+To: =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <mpstvygispl.fsf@aaptelpc.suse.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Remember to run scripts/checkpatch - you had some trivial whitespace
-errors in this one (also always remember to run sparse compile with
-endian checking before submission   ie   make C=1 M=fs/cifs modules
-CF=-D__CHECK_ENDIAN__)
+merged into cifs-2.6.git for-next
 
-On Wed, Oct 18, 2017 at 6:09 PM, Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org> wrote:
-> From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+On Mon, Oct 30, 2017 at 10:03 AM, Aur=C3=A9lien Aptel <aaptel@suse.com> wro=
+te:
+> Elena Reshetova <elena.reshetova@intel.com> writes:
+>> atomic_t variables are currently used to implement reference
+>> counters with the following properties:
+>>  - counter is initialized to 1 using atomic_set()
+>>  - a resource is freed upon counter reaching zero
+>>  - once counter reaches zero, its further
+>>    increments aren't allowed
+>>  - counter schema uses basic atomic operations
+>>    (set, inc, inc_not_zero, dec_and_test, etc.)
+>>
+>> Such atomic variables should be converted to a newly provided
+>> refcount_t type and API that prevents accidental counter overflows
+>> and underflows. This is important since overflows and underflows
+>> can lead to use-after-free situation and be exploitable.
+>>
+>> The variable tcon_link.tl_count is used as pure reference counter.
+>> Convert it to refcount_t and fix up the operations.
 >
-> To prepare for protocol implementation, add constants and user-configurable
-> values for the SMB Direct protocol.
+> <snip>
 >
-> Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> ---
->  fs/cifs/smbdirect.c | 77 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  fs/cifs/smbdirect.h | 21 +++++++++++++++
->  2 files changed, 98 insertions(+)
->  create mode 100644 fs/cifs/smbdirect.c
->  create mode 100644 fs/cifs/smbdirect.h
+>> -             cifs_get_tlink(tlink);
+>> +             refcount_set(&tlink->tl_count, 1);
 >
-> diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-> new file mode 100644
-> index 0000000..d3c16f8
-> --- /dev/null
-> +++ b/fs/cifs/smbdirect.c
-> @@ -0,0 +1,77 @@
-> +/*
-> + *   Copyright (C) 2017, Microsoft Corporation.
-> + *
-> + *   Author(s): Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> + *
-> + *   This program is free software;  you can redistribute it and/or modify
-> + *   it under the terms of the GNU General Public License as published by
-> + *   the Free Software Foundation; either version 2 of the License, or
-> + *   (at your option) any later version.
-> + *
-> + *   This program is distributed in the hope that it will be useful,
-> + *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
-> + *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-> + *   the GNU General Public License for more details.
-> + */
-> +#include "smbdirect.h"
-> +
-> +/* SMBD version number */
-> +#define SMBD_V1        0x0100
-> +
-> +/* Port numbers for SMBD transport */
-> +#define SMB_PORT       445
-> +#define SMBD_PORT      5445
-> +
-> +/* Address lookup and resolve timeout in ms */
-> +#define RDMA_RESOLVE_TIMEOUT   5000
-> +
-> +/* SMBD negotiation timeout in seconds */
-> +#define SMBD_NEGOTIATE_TIMEOUT 120
-> +
-> +/* SMBD minimum receive size and fragmented sized defined in [MS-SMBD] */
-> +#define SMBD_MIN_RECEIVE_SIZE          128
-> +#define SMBD_MIN_FRAGMENTED_SIZE       131072
-> +
-> +/*
-> + * Default maximum number of RDMA read/write outstanding on this connection
-> + * This value is possibly decreased during QP creation on hardware limit
-> + */
-> +#define SMBD_CM_RESPONDER_RESOURCES    32
-> +
-> +/* Maximum number of retries on data transfer operations */
-> +#define SMBD_CM_RETRY                  6
-> +/* No need to retry on Receiver Not Ready since SMBD manages credits */
-> +#define SMBD_CM_RNR_RETRY              0
-> +
-> +/*
-> + * User configurable initial values per SMBD transport connection
-> + * as defined in [MS-SMBD] 3.1.1.1
-> + * Those may change after a SMBD negotiation
-> + */
-> +/* The local peer's maximum number of credits to grant to the peer */
-> +int smbd_receive_credit_max = 255;
-> +
-> +/* The remote peer's credit request of local peer */
-> +int smbd_send_credit_target = 255;
-> +
-> +/* The maximum single message size can be sent to remote peer */
-> +int smbd_max_send_size = 1364;
-> +
-> +/*  The maximum fragmented upper-layer payload receive size supported */
-> +int smbd_max_fragmented_recv_size = 1024 * 1024;
-> +
-> +/*  The maximum single-message size which can be received */
-> +int smbd_max_receive_size = 8192;
-> +
-> +/* The timeout to initiate send of a keepalive message on idle */
-> +int smbd_keep_alive_interval = 120;
-> +
-> +/*
-> + * User configurable initial values for RDMA transport
-> + * The actual values used may be lower and are limited to hardware capabilities
-> + */
-> +/* Default maximum number of SGEs in a RDMA write/read */
-> +int smbd_max_frmr_depth = 2048;
-> +
-> +/* If payload is less than this byte, use RDMA send/recv not read/write */
-> +int rdma_readwrite_threshold = 4096;
-> diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
-> new file mode 100644
-> index 0000000..c55f28b
-> --- /dev/null
-> +++ b/fs/cifs/smbdirect.h
-> @@ -0,0 +1,21 @@
-> +/*
-> + *   Copyright (C) 2017, Microsoft Corporation.
-> + *
-> + *   Author(s): Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> + *
-> + *   This program is free software;  you can redistribute it and/or modify
-> + *   it under the terms of the GNU General Public License as published by
-> + *   the Free Software Foundation; either version 2 of the License, or
-> + *   (at your option) any later version.
-> + *
-> + *   This program is distributed in the hope that it will be useful,
-> + *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
-> + *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-> + *   the GNU General Public License for more details.
-> + */
-> +#ifndef _SMBDIRECT_H
-> +#define _SMBDIRECT_H
-> +
-> +/* Default maximum number of SGEs in a RDMA send/recv */
-> +#define SMBDIRECT_MAX_SGE      16
-> +#endif
+> Since cifs_get_tlink() basically only increments the reference count and
+> given that this is a new tlink I also think this replacement is ok.
+>
+> Looks good to me and passes 'make C=3D1'.
+>
+> Reviewed-by: Aurelien Aptel <aaptel@suse.com>
+>
 > --
-> 2.7.4
->
+> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+> SUSE Linux GmbH, Maxfeldstra=C3=9Fe 5, 90409 N=C3=BCrnberg, Germany
+> GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton, HRB 21284 (AG N=
+=C3=BCrnberg)
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 
--- 
+--=20
 Thanks,
 
 Steve
