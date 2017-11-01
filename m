@@ -1,81 +1,62 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: initialize rsp_iov and avoid a NULL deref in SMB2_read
-Date: Wed, 1 Nov 2017 09:57:05 -0700
-Message-ID: <CAKywueSup9jom1VB=ngkC7RHd=s67=EK3C7YghV-u0x4s-W3yA@mail.gmail.com>
-References: <20171024030153.541-1-lsahlber@redhat.com> <CAKywueQbQdsE23YE-jJg1t815kBtwFVOfijGxwCnC9Oa0okwhQ@mail.gmail.com>
+Subject: Re: [Patch v5 02/21] CIFS: SMBD: Establish SMB Direct connection
+Date: Wed, 1 Nov 2017 10:19:01 -0700
+Message-ID: <CAKywueQaUdUZaKX1_paQgPAorwRZ=Xv_7yyeFEgyTcYMrw3O-g@mail.gmail.com>
+References: <20171018230920.21042-1-longli@exchange.microsoft.com> <20171018230920.21042-3-longli@exchange.microsoft.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+        Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Stephen Hemminger <sthemmin-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueQbQdsE23YE-jJg1t815kBtwFVOfijGxwCnC9Oa0okwhQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20171018230920.21042-3-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2017-11-01 9:53 GMT-07:00 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> 2017-10-23 20:01 GMT-07:00 Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
->> Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->> ---
->>  fs/cifs/smb2pdu.c | 30 +++++++++++++++---------------
->>  1 file changed, 15 insertions(+), 15 deletions(-)
->>
->> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
->> index 6ff4c275ca9a..efa06068e7e1 100644
->> --- a/fs/cifs/smb2pdu.c
->> +++ b/fs/cifs/smb2pdu.c
->> @@ -2669,27 +2669,27 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
->>         cifs_small_buf_release(req);
->>
->>         rsp = (struct smb2_read_rsp *)rsp_iov.iov_base;
->> -       shdr = get_sync_hdr(rsp);
->>
->> -       if (shdr->Status == STATUS_END_OF_FILE) {
->> +       if (rc) {
->> +               if (rc != -ENODATA) {
->> +                       cifs_stats_fail_inc(io_parms->tcon, SMB2_READ_HE);
->> +                       cifs_dbg(VFS, "Send error in read = %d\n", rc);
->> +               }
->>                 free_rsp_buf(resp_buftype, rsp_iov.iov_base);
->> -               return 0;
->> +               return rc == -ENODATA ? 0 : rc;
->>         }
->>
->> -       if (rc) {
->> -               cifs_stats_fail_inc(io_parms->tcon, SMB2_READ_HE);
->> -               cifs_dbg(VFS, "Send error in read = %d\n", rc);
->> -       } else {
->> -               *nbytes = le32_to_cpu(rsp->DataLength);
->> -               if ((*nbytes > CIFS_MAX_MSGSIZE) ||
->> -                   (*nbytes > io_parms->length)) {
->> -                       cifs_dbg(FYI, "bad length %d for count %d\n",
->> -                                *nbytes, io_parms->length);
->> -                       rc = -EIO;
->> -                       *nbytes = 0;
->> -               }
->> +       *nbytes = le32_to_cpu(rsp->DataLength);
->> +       if ((*nbytes > CIFS_MAX_MSGSIZE) ||
->> +           (*nbytes > io_parms->length)) {
->> +               cifs_dbg(FYI, "bad length %d for count %d\n",
->> +                        *nbytes, io_parms->length);
->> +               rc = -EIO;
->> +               *nbytes = 0;
->>         }
->>
->> +       shdr = get_sync_hdr(rsp);
->> +
->>         if (*buf) {
->>                 memcpy(*buf, (char *)shdr + rsp->DataOffset, *nbytes);
->>                 free_rsp_buf(resp_buftype, rsp_iov.iov_base);
->> --
->> 2.13.3
->>
+2017-10-18 16:09 GMT-07:00 Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>:
+> From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 >
-> Looks good.
+> Add code to implement the core functions to establish a SMB Direct connection.
 >
-> Reviewed-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+> 1. Establish an RDMA connection to SMB server.
+> 2. Negotiate and setup SMB Direct protocol.
+> 3. Implement idle connection timer and credit management.
+>
+> SMB Direct is enabled by setting CONFIG_CIFS_SMB_DIRECT.
+>
+> Add to Kconfig and Makefile to enable building SMB Direct.
+>
+> Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+> ---
+>  fs/cifs/Kconfig     |    7 +
+>  fs/cifs/Makefile    |    2 +
+>  fs/cifs/smbdirect.c | 1576 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  fs/cifs/smbdirect.h |  265 +++++++++
+>  4 files changed, 1850 insertions(+)
+>
+> diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
+> index f724361..cb7db8d 100644
+> --- a/fs/cifs/Kconfig
+> +++ b/fs/cifs/Kconfig
+> @@ -191,6 +191,13 @@ config CIFS_SMB311
+>           This dialect includes improved security negotiation features.
+>           If unsure, say N
+>
+> +config CIFS_SMB_DIRECT
+> +       bool "SMB Direct support (Experimental)"
+> +       depends on CIFS && INFINIBAND
+> +       help
+> +         Enables SMB Direct experimental support for SMB 3.0, 3.02 and 3.1.1.
+> +         SMB Direct allows transferring SMB packets over RDMA.
+> +
 
-It seems like a good stable candidate. Thoughts?
+Please add "If unsure, say N."
 
 --
 Best regards,
