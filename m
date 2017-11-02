@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 08/19] cifs: remove rfc1002 header from smb2_sess_setup_req
-Date: Thu,  2 Nov 2017 18:03:01 +1100
-Message-ID: <20171102070312.18903-9-lsahlber@redhat.com>
+Subject: [PATCH 01/19] cifs: Add SendReceive3
+Date: Thu,  2 Nov 2017 18:02:54 +1100
+Message-ID: <20171102070312.18903-2-lsahlber@redhat.com>
 References: <20171102070312.18903-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -10,98 +10,78 @@ In-Reply-To: <20171102070312.18903-1-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gman
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+This function is similar to SendReceive2 except it does not expect
+a 4 byte rfc1002 length header in the first io vector.
+
 Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c | 27 +++++++++++++--------------
- fs/cifs/smb2pdu.h |  2 +-
- 2 files changed, 14 insertions(+), 15 deletions(-)
+ fs/cifs/cifsproto.h |  4 ++++
+ fs/cifs/transport.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 42 insertions(+)
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 908be5899502..bfd805da6874 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -802,20 +802,22 @@ SMB2_sess_alloc_buffer(struct SMB2_sess_data *sess_data)
- 	struct cifs_ses *ses = sess_data->ses;
- 	struct smb2_sess_setup_req *req;
- 	struct TCP_Server_Info *server = ses->server;
-+	unsigned int total_len;
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 4143c9dec463..a4e3c6c5aa64 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -106,6 +106,10 @@ extern int SendReceive2(const unsigned int /* xid */ , struct cifs_ses *,
+ 			struct kvec *, int /* nvec to send */,
+ 			int * /* type of buf returned */, const int flags,
+ 			struct kvec * /* resp vec */);
++extern int SendReceive3(const unsigned int /* xid */ , struct cifs_ses *,
++			struct kvec *, int /* nvec to send */,
++			int * /* type of buf returned */, const int flags,
++			struct kvec * /* resp vec */);
+ extern int SendReceiveBlockingLock(const unsigned int xid,
+ 			struct cifs_tcon *ptcon,
+ 			struct smb_hdr *in_buf ,
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 7efbab013957..3f16adec3df5 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -827,6 +827,44 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+ 	return rc;
+ }
  
--	rc = small_smb2_init(SMB2_SESSION_SETUP, NULL, (void **) &req);
-+	rc = smb2_plain_req_init(SMB2_SESSION_SETUP, NULL, (void **) &req,
-+			     &total_len);
- 	if (rc)
- 		return rc;
- 
- 	/* First session, not a reauthenticate */
--	req->hdr.sync_hdr.SessionId = 0;
-+	req->sync_hdr.SessionId = 0;
- 
- 	/* if reconnect, we need to send previous sess id, otherwise it is 0 */
- 	req->PreviousSessionId = sess_data->previous_session;
- 
- 	req->Flags = 0; /* MBZ */
- 	/* to enable echos and oplocks */
--	req->hdr.sync_hdr.CreditRequest = cpu_to_le16(3);
-+	req->sync_hdr.CreditRequest = cpu_to_le16(3);
- 
- 	/* only one of SMB2 signing flags may be set in SMB2 request */
- 	if (server->sign)
-@@ -829,8 +831,8 @@ SMB2_sess_alloc_buffer(struct SMB2_sess_data *sess_data)
- 	req->Channel = 0; /* MBZ */
- 
- 	sess_data->iov[0].iov_base = (char *)req;
--	/* 4 for rfc1002 length field and 1 for pad */
--	sess_data->iov[0].iov_len = get_rfc1002_length(req) + 4 - 1;
-+	/* 1 for pad */
-+	sess_data->iov[0].iov_len = total_len - 1;
- 	/*
- 	 * This variable will be used to clear the buffer
- 	 * allocated above in case of any error in the calling function.
-@@ -856,18 +858,15 @@ SMB2_sess_sendreceive(struct SMB2_sess_data *sess_data)
- 
- 	/* Testing shows that buffer offset must be at location of Buffer[0] */
- 	req->SecurityBufferOffset =
--		cpu_to_le16(sizeof(struct smb2_sess_setup_req) -
--			1 /* pad */ - 4 /* rfc1001 len */);
-+		cpu_to_le16(sizeof(struct smb2_sess_setup_req) - 1 /* pad */);
- 	req->SecurityBufferLength = cpu_to_le16(sess_data->iov[1].iov_len);
- 
--	inc_rfc1001_len(req, sess_data->iov[1].iov_len - 1 /* pad */);
--
- 	/* BB add code to build os and lm fields */
- 
--	rc = SendReceive2(sess_data->xid, sess_data->ses,
--				sess_data->iov, 2,
--				&sess_data->buf0_type,
--				CIFS_LOG_ERROR | CIFS_NEG_OP, &rsp_iov);
-+	rc = SendReceive3(sess_data->xid, sess_data->ses,
-+			  sess_data->iov, 2,
-+			  &sess_data->buf0_type,
-+			  CIFS_LOG_ERROR | CIFS_NEG_OP, &rsp_iov);
- 	cifs_small_buf_release(sess_data->iov[0].iov_base);
- 	memcpy(&sess_data->iov[0], &rsp_iov, sizeof(struct kvec));
- 
-@@ -1088,7 +1087,7 @@ SMB2_sess_auth_rawntlmssp_authenticate(struct SMB2_sess_data *sess_data)
- 		goto out;
- 
- 	req = (struct smb2_sess_setup_req *) sess_data->iov[0].iov_base;
--	req->hdr.sync_hdr.SessionId = ses->Suid;
-+	req->sync_hdr.SessionId = ses->Suid;
- 
- 	rc = build_ntlmssp_auth_blob(&ntlmssp_blob, &blob_length, ses,
- 					sess_data->nls_cp);
-diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index b22bf8c6753e..e7acfa5e3fa6 100644
---- a/fs/cifs/smb2pdu.h
-+++ b/fs/cifs/smb2pdu.h
-@@ -282,7 +282,7 @@ struct smb2_negotiate_rsp {
- #define SMB2_SESSION_REQ_FLAG_ENCRYPT_DATA	0x04
- 
- struct smb2_sess_setup_req {
--	struct smb2_hdr hdr;
-+	struct smb2_sync_hdr sync_hdr;
- 	__le16 StructureSize; /* Must be 25 */
- 	__u8   Flags;
- 	__u8   SecurityMode;
++/* Like SendReceive2 but iov[0] does not contain an rfc1002 header */
++int
++SendReceive3(const unsigned int xid, struct cifs_ses *ses,
++	     struct kvec *iov, int n_vec, int *resp_buf_type /* ret */,
++	     const int flags, struct kvec *resp_iov)
++{
++	struct smb_rqst rqst;
++	struct kvec *new_iov;
++	int rc;
++	int i;
++	__u32 count;
++	__be32 rfc1002_marker;
++
++	new_iov = kmalloc(sizeof(struct kvec) * (n_vec + 1), GFP_KERNEL);
++	if (!new_iov)
++		return -ENOMEM;
++
++	/* 1st iov is an RFC1002 Session Message length */
++	memcpy(new_iov + 1, iov, (sizeof(struct kvec) * n_vec));
++
++	count = 0;
++	for (i = 1; i < n_vec + 1; i++)
++		count += new_iov[i].iov_len;
++
++	rfc1002_marker = cpu_to_be32(count);
++
++	new_iov[0].iov_base = &rfc1002_marker;
++	new_iov[0].iov_len = 4;
++
++	memset(&rqst, 0, sizeof(struct smb_rqst));
++	rqst.rq_iov = new_iov;
++	rqst.rq_nvec = n_vec + 1;
++
++	rc = cifs_send_recv(xid, ses, &rqst, resp_buf_type, flags, resp_iov);
++	kfree(new_iov);
++	return rc;
++}
++
+ int
+ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+ 	    struct smb_hdr *in_buf, struct smb_hdr *out_buf,
 -- 
 2.13.3
