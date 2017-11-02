@@ -1,66 +1,38 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 05/19] cifs: remove rfc1002 header from smb2_close_req
-Date: Thu,  2 Nov 2017 18:02:58 +1100
-Message-ID: <20171102070312.18903-6-lsahlber@redhat.com>
-References: <20171102070312.18903-1-lsahlber@redhat.com>
+Subject: [PATCH 00/19] cifs: remove rfc1002 header from all smb2 requests
+Date: Thu,  2 Nov 2017 18:02:53 +1100
+Message-ID: <20171102070312.18903-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171102070312.18903-1-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/smb2pdu.c | 8 ++++----
- fs/cifs/smb2pdu.h | 2 +-
- 2 files changed, 5 insertions(+), 5 deletions(-)
+Steve, all
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 2e0a4ece88d6..0ed1c1d3846a 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -2088,13 +2088,14 @@ SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
- 	int resp_buftype;
- 	int rc = 0;
- 	int flags = 0;
-+	unsigned int total_len;
- 
- 	cifs_dbg(FYI, "Close\n");
- 
- 	if (!ses || !(ses->server))
- 		return -EIO;
- 
--	rc = small_smb2_init(SMB2_CLOSE, tcon, (void **) &req);
-+	rc = smb2_plain_req_init(SMB2_CLOSE, tcon, (void **) &req, &total_len);
- 	if (rc)
- 		return rc;
- 
-@@ -2105,10 +2106,9 @@ SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
- 	req->VolatileFileId = volatile_fid;
- 
- 	iov[0].iov_base = (char *)req;
--	/* 4 for rfc1002 length field */
--	iov[0].iov_len = get_rfc1002_length(req) + 4;
-+	iov[0].iov_len = total_len;
- 
--	rc = SendReceive2(xid, ses, iov, 1, &resp_buftype, flags, &rsp_iov);
-+	rc = SendReceive3(xid, ses, iov, 1, &resp_buftype, flags, &rsp_iov);
- 	cifs_small_buf_release(req);
- 	rsp = (struct smb2_close_rsp *)rsp_iov.iov_base;
- 
-diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 8b7aadefd4a5..5404207d9ee7 100644
---- a/fs/cifs/smb2pdu.h
-+++ b/fs/cifs/smb2pdu.h
-@@ -789,7 +789,7 @@ struct smb2_ioctl_rsp {
- /* Currently defined values for close flags */
- #define SMB2_CLOSE_FLAG_POSTQUERY_ATTRIB	cpu_to_le16(0x0001)
- struct smb2_close_req {
--	struct smb2_hdr hdr;
-+	struct smb2_sync_hdr sync_hdr;
- 	__le16 StructureSize;	/* Must be 24 */
- 	__le16 Flags;
- 	__le32 Reserved;
--- 
-2.13.3
+I split the !1002 patch into a small serie for easier review.
+
+This patch series removes the NBSS 4 byte header from all the
+smb2 request structures.
+Instead of computing and tweaking the header as part of composing
+the SMB2 request, we now compute it in the new SendReceive3() function
+that is used by all of SMB2.
+
+This eliminates a huge amount of magic +4 / -4 in the code
+and all the ugly inc_rfc1002.... stuff where the old code would
+constantly tweak the length field as it was building the PDU.
+
+So overall it also simplifies the code in some places I think.
+
+
+This series is to prepare for and make it easier to add smb2 compounding
+in the future as then we will need to construct multiple SMB2 pdus
+and wrap them all insode one single rfc1002 header.
+
+
+As a later series, before we get to the actual compounding, I plan to
+do a similar change to all the reply structures and remove the rfc1002
+header from them all too.
+
+
+Please review, and test.
