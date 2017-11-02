@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 13/19] cifs: remove rfc1002 header from smb2 read/write requests
-Date: Thu,  2 Nov 2017 18:03:06 +1100
-Message-ID: <20171102070312.18903-14-lsahlber@redhat.com>
+Subject: [PATCH 14/19] cifs: remove rfc1002 header from smb2_lease_ack
+Date: Thu,  2 Nov 2017 18:03:07 +1100
+Message-ID: <20171102070312.18903-15-lsahlber@redhat.com>
 References: <20171102070312.18903-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -12,148 +12,65 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c | 42 ++++++++++++++++++++----------------------
+ fs/cifs/smb2pdu.c | 18 ++++++++++++++----
  fs/cifs/smb2pdu.h |  2 +-
- 2 files changed, 21 insertions(+), 23 deletions(-)
+ 2 files changed, 15 insertions(+), 5 deletions(-)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 5dc0ec2cad1e..b0d4e9d15e29 100644
+index b0d4e9d15e29..84e71f6bc9eb 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -2469,7 +2469,7 @@ smb2_new_read_req(void **buf, unsigned int *total_len,
- 	struct smb2_sync_hdr *shdr;
- 
- 	rc = smb2_plain_req_init(SMB2_READ, io_parms->tcon, (void **) &req,
--				 total_len);
-+			     total_len);
- 	if (rc)
- 		return rc;
- 	if (io_parms->tcon->ses->server == NULL)
-@@ -2679,7 +2679,7 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
- 
- 	iov[0].iov_base = &req_len;
- 	iov[0].iov_len = sizeof(__be32);
--	iov[1].iov_base = req;
-+	iov[1].iov_base = (char *)req;
- 	iov[1].iov_len = total_len;
- 
- 	rc = cifs_send_recv(xid, ses, &rqst, &resp_buftype, flags, &rsp_iov);
-@@ -2784,8 +2784,10 @@ smb2_async_writev(struct cifs_writedata *wdata,
- 	struct TCP_Server_Info *server = tcon->ses->server;
- 	struct kvec iov[2];
- 	struct smb_rqst rqst = { };
+@@ -3570,24 +3570,34 @@ SMB2_lease_break(const unsigned int xid, struct cifs_tcon *tcon,
+ {
+ 	int rc;
+ 	struct smb2_lease_ack *req = NULL;
++	struct cifs_ses *ses = tcon->ses;
+ 	int flags = CIFS_OBREAK_OP;
 +	unsigned int total_len;
-+	__be32 rfc1002_marker;
++	struct kvec iov[1];
++	struct kvec rsp_iov;
++	int resp_buf_type;
  
--	rc = small_smb2_init(SMB2_WRITE, tcon, (void **) &req);
-+	rc = smb2_plain_req_init(SMB2_WRITE, tcon, (void **) &req, &total_len);
- 	if (rc) {
- 		if (rc == -EAGAIN && wdata->credits) {
- 			/* credits was reset by reconnect */
-@@ -2801,7 +2803,7 @@ smb2_async_writev(struct cifs_writedata *wdata,
- 	if (encryption_required(tcon))
- 		flags |= CIFS_TRANSFORM_REQ;
- 
--	shdr = get_sync_hdr(req);
-+	shdr = (struct smb2_sync_hdr *)req;
- 	shdr->ProcessId = cpu_to_le32(wdata->cfile->pid);
- 
- 	req->PersistentFileId = wdata->cfile->fid.persistent_fid;
-@@ -2810,16 +2812,16 @@ smb2_async_writev(struct cifs_writedata *wdata,
- 	req->WriteChannelInfoLength = 0;
- 	req->Channel = 0;
- 	req->Offset = cpu_to_le64(wdata->offset);
--	/* 4 for rfc1002 length field */
- 	req->DataOffset = cpu_to_le16(
--				offsetof(struct smb2_write_req, Buffer) - 4);
-+				offsetof(struct smb2_write_req, Buffer));
- 	req->RemainingBytes = 0;
- 
- 	/* 4 for rfc1002 length field and 1 for Buffer */
- 	iov[0].iov_len = 4;
--	iov[0].iov_base = req;
--	iov[1].iov_len = get_rfc1002_length(req) - 1;
--	iov[1].iov_base = (char *)req + 4;
-+	rfc1002_marker = cpu_to_be32(total_len - 1 + wdata->bytes);
-+	iov[0].iov_base = &rfc1002_marker;
-+	iov[1].iov_len = total_len - 1;
-+	iov[1].iov_base = (char *)req;
- 
- 	rqst.rq_iov = iov;
- 	rqst.rq_nvec = 2;
-@@ -2833,8 +2835,6 @@ smb2_async_writev(struct cifs_writedata *wdata,
- 
- 	req->Length = cpu_to_le32(wdata->bytes);
- 
--	inc_rfc1001_len(&req->hdr, wdata->bytes - 1 /* Buffer */);
--
- 	if (wdata->credits) {
- 		shdr->CreditCharge = cpu_to_le16(DIV_ROUND_UP(wdata->bytes,
- 						    SMB2_MAX_BUFFER_SIZE));
-@@ -2877,13 +2877,15 @@ SMB2_write(const unsigned int xid, struct cifs_io_parms *io_parms,
- 	int resp_buftype;
- 	struct kvec rsp_iov;
- 	int flags = 0;
-+	unsigned int total_len;
- 
- 	*nbytes = 0;
- 
- 	if (n_vec < 1)
- 		return rc;
- 
--	rc = small_smb2_init(SMB2_WRITE, io_parms->tcon, (void **) &req);
-+	rc = smb2_plain_req_init(SMB2_WRITE, io_parms->tcon, (void **) &req,
+ 	cifs_dbg(FYI, "SMB2_lease_break\n");
+-	rc = small_smb2_init(SMB2_OPLOCK_BREAK, tcon, (void **) &req);
++	rc = smb2_plain_req_init(SMB2_OPLOCK_BREAK, tcon, (void **) &req,
 +			     &total_len);
  	if (rc)
  		return rc;
  
-@@ -2893,7 +2895,7 @@ SMB2_write(const unsigned int xid, struct cifs_io_parms *io_parms,
- 	if (encryption_required(io_parms->tcon))
+ 	if (encryption_required(tcon))
  		flags |= CIFS_TRANSFORM_REQ;
  
--	req->hdr.sync_hdr.ProcessId = cpu_to_le32(io_parms->pid);
-+	req->sync_hdr.ProcessId = cpu_to_le32(io_parms->pid);
+-	req->hdr.sync_hdr.CreditRequest = cpu_to_le16(1);
++	req->sync_hdr.CreditRequest = cpu_to_le16(1);
+ 	req->StructureSize = cpu_to_le16(36);
+-	inc_rfc1001_len(req, 12);
  
- 	req->PersistentFileId = io_parms->persistent_fid;
- 	req->VolatileFileId = io_parms->volatile_fid;
-@@ -2902,20 +2904,16 @@ SMB2_write(const unsigned int xid, struct cifs_io_parms *io_parms,
- 	req->Channel = 0;
- 	req->Length = cpu_to_le32(io_parms->length);
- 	req->Offset = cpu_to_le64(io_parms->offset);
--	/* 4 for rfc1002 length field */
- 	req->DataOffset = cpu_to_le16(
--				offsetof(struct smb2_write_req, Buffer) - 4);
-+				offsetof(struct smb2_write_req, Buffer));
- 	req->RemainingBytes = 0;
+ 	memcpy(req->LeaseKey, lease_key, 16);
+ 	req->LeaseState = lease_state;
  
- 	iov[0].iov_base = (char *)req;
--	/* 4 for rfc1002 length field and 1 for Buffer */
--	iov[0].iov_len = get_rfc1002_length(req) + 4 - 1;
--
--	/* length of entire message including data to be written */
--	inc_rfc1001_len(req, io_parms->length - 1 /* Buffer */);
-+	/* 1 for Buffer */
-+	iov[0].iov_len = total_len - 1;
- 
--	rc = SendReceive2(xid, io_parms->tcon->ses, iov, n_vec + 1,
--			  &resp_buftype, flags, &rsp_iov);
-+	rc = SendReceive3(xid, io_parms->tcon->ses, iov, n_vec + 1,
-+			      &resp_buftype, flags, &rsp_iov);
+-	rc = SendReceiveNoRsp(xid, tcon->ses, (char *) req, flags);
++	flags |= CIFS_NO_RESP;
++
++	iov[0].iov_base = (char *)req;
++	iov[0].iov_len = total_len;
++
++	rc = SendReceive3(xid, ses, iov, 1, &resp_buf_type, flags, &rsp_iov);
  	cifs_small_buf_release(req);
- 	rsp = (struct smb2_write_rsp *)rsp_iov.iov_base;
  
+ 	if (rc) {
 diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 0c33fc8cce71..3c856f058be7 100644
+index 3c856f058be7..32f0f633b614 100644
 --- a/fs/cifs/smb2pdu.h
 +++ b/fs/cifs/smb2pdu.h
-@@ -868,7 +868,7 @@ struct smb2_read_rsp {
- #define SMB2_WRITEFLAG_WRITE_UNBUFFERED	0x00000002	/* SMB3.02 or later */
+@@ -1057,7 +1057,7 @@ struct smb2_lease_break {
+ } __packed;
  
- struct smb2_write_req {
+ struct smb2_lease_ack {
 -	struct smb2_hdr hdr;
 +	struct smb2_sync_hdr sync_hdr;
- 	__le16 StructureSize; /* Must be 49 */
- 	__le16 DataOffset; /* offset from start of SMB2 header to write data */
- 	__le32 Length;
+ 	__le16 StructureSize; /* Must be 36 */
+ 	__le16 Reserved;
+ 	__le32 Flags;
 -- 
 2.13.3
