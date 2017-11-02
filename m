@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 03/19] cifs: remove rfc1002 header from smb2_logoff_req
-Date: Thu,  2 Nov 2017 18:02:56 +1100
-Message-ID: <20171102070312.18903-4-lsahlber@redhat.com>
+Subject: [PATCH 17/19] cifs: remove rfc1002 header from smb2_query_directory_req
+Date: Thu,  2 Nov 2017 18:03:10 +1100
+Message-ID: <20171102070312.18903-18-lsahlber@redhat.com>
 References: <20171102070312.18903-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -12,66 +12,71 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c | 17 +++++++++++++----
+ fs/cifs/smb2pdu.c | 14 +++++++-------
  fs/cifs/smb2pdu.h |  2 +-
- 2 files changed, 14 insertions(+), 5 deletions(-)
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 2adb66cec917..e15d3d2a65df 100644
+index d85f60067c02..0af9efc3d8d2 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -1198,6 +1198,10 @@ SMB2_logoff(const unsigned int xid, struct cifs_ses *ses)
- 	int rc = 0;
- 	struct TCP_Server_Info *server;
+@@ -2990,13 +2990,15 @@ SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
+ 	unsigned int output_size = CIFSMaxBufSize;
+ 	size_t info_buf_size;
  	int flags = 0;
 +	unsigned int total_len;
-+	struct kvec iov[1];
-+	struct kvec rsp_iov;
-+	int resp_buf_type;
  
- 	cifs_dbg(FYI, "disconnect session %p\n", ses);
+ 	if (ses && (ses->server))
+ 		server = ses->server;
+ 	else
+ 		return -EIO;
  
-@@ -1210,19 +1214,24 @@ SMB2_logoff(const unsigned int xid, struct cifs_ses *ses)
- 	if (ses->need_reconnect)
- 		goto smb2_session_already_dead;
- 
--	rc = small_smb2_init(SMB2_LOGOFF, NULL, (void **) &req);
-+	rc = smb2_plain_req_init(SMB2_LOGOFF, NULL, (void **) &req, &total_len);
+-	rc = small_smb2_init(SMB2_QUERY_DIRECTORY, tcon, (void **) &req);
++	rc = smb2_plain_req_init(SMB2_QUERY_DIRECTORY, tcon, (void **) &req,
++			     &total_len);
  	if (rc)
  		return rc;
  
- 	 /* since no tcon, smb2_init can not do this, so do here */
--	req->hdr.sync_hdr.SessionId = ses->Suid;
-+	req->sync_hdr.SessionId = ses->Suid;
+@@ -3028,7 +3030,7 @@ SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
+ 	memcpy(bufptr, &asteriks, len);
  
- 	if (ses->session_flags & SMB2_SESSION_FLAG_ENCRYPT_DATA)
- 		flags |= CIFS_TRANSFORM_REQ;
- 	else if (server->sign)
--		req->hdr.sync_hdr.Flags |= SMB2_FLAGS_SIGNED;
-+		req->sync_hdr.Flags |= SMB2_FLAGS_SIGNED;
-+
-+	flags |= CIFS_NO_RESP;
-+
-+	iov[0].iov_base = (char *)req;
-+	iov[0].iov_len = total_len;
- 
--	rc = SendReceiveNoRsp(xid, ses, (char *) req, flags);
-+	rc = SendReceive3(xid, ses, iov, 1, &resp_buf_type, flags, &rsp_iov);
- 	cifs_small_buf_release(req);
+ 	req->FileNameOffset =
+-		cpu_to_le16(sizeof(struct smb2_query_directory_req) - 1 - 4);
++		cpu_to_le16(sizeof(struct smb2_query_directory_req) - 1);
+ 	req->FileNameLength = cpu_to_le16(len);
  	/*
- 	 * No tcon so can't do
+ 	 * BB could be 30 bytes or so longer if we used SMB2 specific
+@@ -3039,15 +3041,13 @@ SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
+ 	req->OutputBufferLength = cpu_to_le32(output_size);
+ 
+ 	iov[0].iov_base = (char *)req;
+-	/* 4 for RFC1001 length and 1 for Buffer */
+-	iov[0].iov_len = get_rfc1002_length(req) + 4 - 1;
++	/* 1 for Buffer */
++	iov[0].iov_len = total_len - 1;
+ 
+ 	iov[1].iov_base = (char *)(req->Buffer);
+ 	iov[1].iov_len = len;
+ 
+-	inc_rfc1001_len(req, len - 1 /* Buffer */);
+-
+-	rc = SendReceive2(xid, ses, iov, 2, &resp_buftype, flags, &rsp_iov);
++	rc = SendReceive3(xid, ses, iov, 2, &resp_buftype, flags, &rsp_iov);
+ 	cifs_small_buf_release(req);
+ 	rsp = (struct smb2_query_directory_rsp *)rsp_iov.iov_base;
+ 
 diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 0fe2382597ad..0799e0957499 100644
+index f0d6e637b95f..630a5c064f0c 100644
 --- a/fs/cifs/smb2pdu.h
 +++ b/fs/cifs/smb2pdu.h
-@@ -308,7 +308,7 @@ struct smb2_sess_setup_rsp {
- } __packed;
+@@ -942,7 +942,7 @@ struct smb2_echo_rsp {
+ #define SMB2_REOPEN			0x10
  
- struct smb2_logoff_req {
+ struct smb2_query_directory_req {
 -	struct smb2_hdr hdr;
 +	struct smb2_sync_hdr sync_hdr;
- 	__le16 StructureSize;	/* Must be 4 */
- 	__le16 Reserved;
- } __packed;
+ 	__le16 StructureSize; /* Must be 33 */
+ 	__u8   FileInformationClass;
+ 	__u8   Flags;
 -- 
 2.13.3
