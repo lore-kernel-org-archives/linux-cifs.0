@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 16/19] cifs: remove rfc1002 header from smb2_set_info_req
-Date: Thu,  2 Nov 2017 18:03:09 +1100
-Message-ID: <20171102070312.18903-17-lsahlber@redhat.com>
+Subject: [PATCH 08/19] cifs: remove rfc1002 header from smb2_sess_setup_req
+Date: Thu,  2 Nov 2017 18:03:01 +1100
+Message-ID: <20171102070312.18903-9-lsahlber@redhat.com>
 References: <20171102070312.18903-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -12,85 +12,96 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c | 18 ++++++++----------
+ fs/cifs/smb2pdu.c | 27 +++++++++++++--------------
  fs/cifs/smb2pdu.h |  2 +-
- 2 files changed, 9 insertions(+), 11 deletions(-)
+ 2 files changed, 14 insertions(+), 15 deletions(-)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 9a1b8e3d8704..d85f60067c02 100644
+index 908be5899502..bfd805da6874 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -3116,6 +3116,7 @@ send_set_info(const unsigned int xid, struct cifs_tcon *tcon,
- 	unsigned int i;
- 	struct cifs_ses *ses = tcon->ses;
- 	int flags = 0;
+@@ -802,20 +802,22 @@ SMB2_sess_alloc_buffer(struct SMB2_sess_data *sess_data)
+ 	struct cifs_ses *ses = sess_data->ses;
+ 	struct smb2_sess_setup_req *req;
+ 	struct TCP_Server_Info *server = ses->server;
 +	unsigned int total_len;
  
- 	if (!ses || !(ses->server))
- 		return -EIO;
-@@ -3127,7 +3128,7 @@ send_set_info(const unsigned int xid, struct cifs_tcon *tcon,
- 	if (!iov)
- 		return -ENOMEM;
- 
--	rc = small_smb2_init(SMB2_SET_INFO, tcon, (void **) &req);
-+	rc = smb2_plain_req_init(SMB2_SET_INFO, tcon, (void **) &req, &total_len);
- 	if (rc) {
- 		kfree(iov);
+-	rc = small_smb2_init(SMB2_SESSION_SETUP, NULL, (void **) &req);
++	rc = smb2_plain_req_init(SMB2_SESSION_SETUP, NULL, (void **) &req,
++			     &total_len);
+ 	if (rc)
  		return rc;
-@@ -3136,7 +3137,7 @@ send_set_info(const unsigned int xid, struct cifs_tcon *tcon,
- 	if (encryption_required(tcon))
- 		flags |= CIFS_TRANSFORM_REQ;
  
--	req->hdr.sync_hdr.ProcessId = cpu_to_le32(pid);
-+	req->sync_hdr.ProcessId = cpu_to_le32(pid);
+ 	/* First session, not a reauthenticate */
+-	req->hdr.sync_hdr.SessionId = 0;
++	req->sync_hdr.SessionId = 0;
  
- 	req->InfoType = info_type;
- 	req->FileInfoClass = info_class;
-@@ -3144,27 +3145,24 @@ send_set_info(const unsigned int xid, struct cifs_tcon *tcon,
- 	req->VolatileFileId = volatile_fid;
- 	req->AdditionalInformation = cpu_to_le32(additional_info);
+ 	/* if reconnect, we need to send previous sess id, otherwise it is 0 */
+ 	req->PreviousSessionId = sess_data->previous_session;
  
--	/* 4 for RFC1001 length and 1 for Buffer */
-+	/* 1 for Buffer */
- 	req->BufferOffset =
--			cpu_to_le16(sizeof(struct smb2_set_info_req) - 1 - 4);
-+			cpu_to_le16(sizeof(struct smb2_set_info_req) - 1);
- 	req->BufferLength = cpu_to_le32(*size);
+ 	req->Flags = 0; /* MBZ */
+ 	/* to enable echos and oplocks */
+-	req->hdr.sync_hdr.CreditRequest = cpu_to_le16(3);
++	req->sync_hdr.CreditRequest = cpu_to_le16(3);
  
--	inc_rfc1001_len(req, *size - 1 /* Buffer */);
+ 	/* only one of SMB2 signing flags may be set in SMB2 request */
+ 	if (server->sign)
+@@ -829,8 +831,8 @@ SMB2_sess_alloc_buffer(struct SMB2_sess_data *sess_data)
+ 	req->Channel = 0; /* MBZ */
+ 
+ 	sess_data->iov[0].iov_base = (char *)req;
+-	/* 4 for rfc1002 length field and 1 for pad */
+-	sess_data->iov[0].iov_len = get_rfc1002_length(req) + 4 - 1;
++	/* 1 for pad */
++	sess_data->iov[0].iov_len = total_len - 1;
+ 	/*
+ 	 * This variable will be used to clear the buffer
+ 	 * allocated above in case of any error in the calling function.
+@@ -856,18 +858,15 @@ SMB2_sess_sendreceive(struct SMB2_sess_data *sess_data)
+ 
+ 	/* Testing shows that buffer offset must be at location of Buffer[0] */
+ 	req->SecurityBufferOffset =
+-		cpu_to_le16(sizeof(struct smb2_sess_setup_req) -
+-			1 /* pad */ - 4 /* rfc1001 len */);
++		cpu_to_le16(sizeof(struct smb2_sess_setup_req) - 1 /* pad */);
+ 	req->SecurityBufferLength = cpu_to_le16(sess_data->iov[1].iov_len);
+ 
+-	inc_rfc1001_len(req, sess_data->iov[1].iov_len - 1 /* pad */);
 -
- 	memcpy(req->Buffer, *data, *size);
-+	total_len += *size;
+ 	/* BB add code to build os and lm fields */
  
- 	iov[0].iov_base = (char *)req;
--	/* 4 for RFC1001 length */
--	iov[0].iov_len = get_rfc1002_length(req) + 4;
-+	iov[0].iov_len = total_len;
+-	rc = SendReceive2(sess_data->xid, sess_data->ses,
+-				sess_data->iov, 2,
+-				&sess_data->buf0_type,
+-				CIFS_LOG_ERROR | CIFS_NEG_OP, &rsp_iov);
++	rc = SendReceive3(sess_data->xid, sess_data->ses,
++			  sess_data->iov, 2,
++			  &sess_data->buf0_type,
++			  CIFS_LOG_ERROR | CIFS_NEG_OP, &rsp_iov);
+ 	cifs_small_buf_release(sess_data->iov[0].iov_base);
+ 	memcpy(&sess_data->iov[0], &rsp_iov, sizeof(struct kvec));
  
- 	for (i = 1; i < num; i++) {
--		inc_rfc1001_len(req, size[i]);
- 		le32_add_cpu(&req->BufferLength, size[i]);
- 		iov[i].iov_base = (char *)data[i];
- 		iov[i].iov_len = size[i];
- 	}
+@@ -1088,7 +1087,7 @@ SMB2_sess_auth_rawntlmssp_authenticate(struct SMB2_sess_data *sess_data)
+ 		goto out;
  
--	rc = SendReceive2(xid, ses, iov, num, &resp_buftype, flags, &rsp_iov);
-+	rc = SendReceive3(xid, ses, iov, num, &resp_buftype, flags, &rsp_iov);
- 	cifs_small_buf_release(req);
- 	rsp = (struct smb2_set_info_rsp *)rsp_iov.iov_base;
+ 	req = (struct smb2_sess_setup_req *) sess_data->iov[0].iov_base;
+-	req->hdr.sync_hdr.SessionId = ses->Suid;
++	req->sync_hdr.SessionId = ses->Suid;
  
+ 	rc = build_ntlmssp_auth_blob(&ntlmssp_blob, &blob_length, ses,
+ 					sess_data->nls_cp);
 diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 7f2a7639ea15..f0d6e637b95f 100644
+index b22bf8c6753e..e7acfa5e3fa6 100644
 --- a/fs/cifs/smb2pdu.h
 +++ b/fs/cifs/smb2pdu.h
-@@ -1013,7 +1013,7 @@ struct smb2_query_info_rsp {
- } __packed;
+@@ -282,7 +282,7 @@ struct smb2_negotiate_rsp {
+ #define SMB2_SESSION_REQ_FLAG_ENCRYPT_DATA	0x04
  
- struct smb2_set_info_req {
+ struct smb2_sess_setup_req {
 -	struct smb2_hdr hdr;
 +	struct smb2_sync_hdr sync_hdr;
- 	__le16 StructureSize; /* Must be 33 */
- 	__u8   InfoType;
- 	__u8   FileInfoClass;
+ 	__le16 StructureSize; /* Must be 25 */
+ 	__u8   Flags;
+ 	__u8   SecurityMode;
 -- 
 2.13.3
