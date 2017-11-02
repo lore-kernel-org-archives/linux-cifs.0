@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 11/19] cifs: remove rfc1002 header from smb2_flush_req
-Date: Thu,  2 Nov 2017 18:03:04 +1100
-Message-ID: <20171102070312.18903-12-lsahlber@redhat.com>
+Subject: [PATCH 05/19] cifs: remove rfc1002 header from smb2_close_req
+Date: Thu,  2 Nov 2017 18:02:58 +1100
+Message-ID: <20171102070312.18903-6-lsahlber@redhat.com>
 References: <20171102070312.18903-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -17,26 +17,26 @@ Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
  2 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 1e012713d79b..b49e0028cf4f 100644
+index 2e0a4ece88d6..0ed1c1d3846a 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -2425,13 +2425,14 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+@@ -2088,13 +2088,14 @@ SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
  	int resp_buftype;
  	int rc = 0;
  	int flags = 0;
 +	unsigned int total_len;
  
- 	cifs_dbg(FYI, "Flush\n");
+ 	cifs_dbg(FYI, "Close\n");
  
  	if (!ses || !(ses->server))
  		return -EIO;
  
--	rc = small_smb2_init(SMB2_FLUSH, tcon, (void **) &req);
-+	rc = smb2_plain_req_init(SMB2_FLUSH, tcon, (void **) &req, &total_len);
+-	rc = small_smb2_init(SMB2_CLOSE, tcon, (void **) &req);
++	rc = smb2_plain_req_init(SMB2_CLOSE, tcon, (void **) &req, &total_len);
  	if (rc)
  		return rc;
  
-@@ -2442,10 +2443,9 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+@@ -2105,10 +2106,9 @@ SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
  	req->VolatileFileId = volatile_fid;
  
  	iov[0].iov_base = (char *)req;
@@ -47,20 +47,20 @@ index 1e012713d79b..b49e0028cf4f 100644
 -	rc = SendReceive2(xid, ses, iov, 1, &resp_buftype, flags, &rsp_iov);
 +	rc = SendReceive3(xid, ses, iov, 1, &resp_buftype, flags, &rsp_iov);
  	cifs_small_buf_release(req);
+ 	rsp = (struct smb2_close_rsp *)rsp_iov.iov_base;
  
- 	if (rc != 0)
 diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 6e1874a81014..a8102e5f4ebb 100644
+index 8b7aadefd4a5..5404207d9ee7 100644
 --- a/fs/cifs/smb2pdu.h
 +++ b/fs/cifs/smb2pdu.h
-@@ -812,7 +812,7 @@ struct smb2_close_rsp {
- } __packed;
- 
- struct smb2_flush_req {
+@@ -789,7 +789,7 @@ struct smb2_ioctl_rsp {
+ /* Currently defined values for close flags */
+ #define SMB2_CLOSE_FLAG_POSTQUERY_ATTRIB	cpu_to_le16(0x0001)
+ struct smb2_close_req {
 -	struct smb2_hdr hdr;
 +	struct smb2_sync_hdr sync_hdr;
  	__le16 StructureSize;	/* Must be 24 */
- 	__le16 Reserved1;
- 	__le32 Reserved2;
+ 	__le16 Flags;
+ 	__le32 Reserved;
 -- 
 2.13.3
