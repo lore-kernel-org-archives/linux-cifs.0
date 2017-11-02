@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 15/19] cifs: remove rfc1002 header from smb2_oplock_break we get from server
-Date: Thu,  2 Nov 2017 18:03:08 +1100
-Message-ID: <20171102070312.18903-16-lsahlber@redhat.com>
+Subject: [PATCH 03/19] cifs: remove rfc1002 header from smb2_logoff_req
+Date: Thu,  2 Nov 2017 18:02:56 +1100
+Message-ID: <20171102070312.18903-4-lsahlber@redhat.com>
 References: <20171102070312.18903-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -12,89 +12,66 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/smb2misc.c |  2 +-
- fs/cifs/smb2pdu.c  | 19 +++++++++++++++----
- fs/cifs/smb2pdu.h  | 14 +++++++++++++-
- 3 files changed, 29 insertions(+), 6 deletions(-)
+ fs/cifs/smb2pdu.c | 17 +++++++++++++----
+ fs/cifs/smb2pdu.h |  2 +-
+ 2 files changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-index 7b08a1446a7f..76d03abaa38c 100644
---- a/fs/cifs/smb2misc.c
-+++ b/fs/cifs/smb2misc.c
-@@ -578,7 +578,7 @@ smb2_is_valid_lease_break(char *buffer)
- bool
- smb2_is_valid_oplock_break(char *buffer, struct TCP_Server_Info *server)
- {
--	struct smb2_oplock_break *rsp = (struct smb2_oplock_break *)buffer;
-+	struct smb2_oplock_break_rsp *rsp = (struct smb2_oplock_break_rsp *)buffer;
- 	struct list_head *tmp, *tmp1, *tmp2;
- 	struct cifs_ses *ses;
- 	struct cifs_tcon *tcon;
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 84e71f6bc9eb..9a1b8e3d8704 100644
+index 2adb66cec917..e15d3d2a65df 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -3316,11 +3316,17 @@ SMB2_oplock_break(const unsigned int xid, struct cifs_tcon *tcon,
- 		  __u8 oplock_level)
- {
- 	int rc;
--	struct smb2_oplock_break *req = NULL;
-+	struct smb2_oplock_break_req *req = NULL;
-+	struct cifs_ses *ses = tcon->ses;
- 	int flags = CIFS_OBREAK_OP;
+@@ -1198,6 +1198,10 @@ SMB2_logoff(const unsigned int xid, struct cifs_ses *ses)
+ 	int rc = 0;
+ 	struct TCP_Server_Info *server;
+ 	int flags = 0;
 +	unsigned int total_len;
 +	struct kvec iov[1];
 +	struct kvec rsp_iov;
 +	int resp_buf_type;
  
- 	cifs_dbg(FYI, "SMB2_oplock_break\n");
--	rc = small_smb2_init(SMB2_OPLOCK_BREAK, tcon, (void **) &req);
-+	rc = smb2_plain_req_init(SMB2_OPLOCK_BREAK, tcon, (void **) &req,
-+			     &total_len);
+ 	cifs_dbg(FYI, "disconnect session %p\n", ses);
+ 
+@@ -1210,19 +1214,24 @@ SMB2_logoff(const unsigned int xid, struct cifs_ses *ses)
+ 	if (ses->need_reconnect)
+ 		goto smb2_session_already_dead;
+ 
+-	rc = small_smb2_init(SMB2_LOGOFF, NULL, (void **) &req);
++	rc = smb2_plain_req_init(SMB2_LOGOFF, NULL, (void **) &req, &total_len);
  	if (rc)
  		return rc;
  
-@@ -3330,9 +3336,14 @@ SMB2_oplock_break(const unsigned int xid, struct cifs_tcon *tcon,
- 	req->VolatileFid = volatile_fid;
- 	req->PersistentFid = persistent_fid;
- 	req->OplockLevel = oplock_level;
--	req->hdr.sync_hdr.CreditRequest = cpu_to_le16(1);
-+	req->sync_hdr.CreditRequest = cpu_to_le16(1);
+ 	 /* since no tcon, smb2_init can not do this, so do here */
+-	req->hdr.sync_hdr.SessionId = ses->Suid;
++	req->sync_hdr.SessionId = ses->Suid;
+ 
+ 	if (ses->session_flags & SMB2_SESSION_FLAG_ENCRYPT_DATA)
+ 		flags |= CIFS_TRANSFORM_REQ;
+ 	else if (server->sign)
+-		req->hdr.sync_hdr.Flags |= SMB2_FLAGS_SIGNED;
++		req->sync_hdr.Flags |= SMB2_FLAGS_SIGNED;
 +
 +	flags |= CIFS_NO_RESP;
- 
--	rc = SendReceiveNoRsp(xid, tcon->ses, (char *) req, flags);
++
 +	iov[0].iov_base = (char *)req;
 +	iov[0].iov_len = total_len;
-+
+ 
+-	rc = SendReceiveNoRsp(xid, ses, (char *) req, flags);
 +	rc = SendReceive3(xid, ses, iov, 1, &resp_buf_type, flags, &rsp_iov);
  	cifs_small_buf_release(req);
- 
- 	if (rc) {
+ 	/*
+ 	 * No tcon so can't do
 diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 32f0f633b614..7f2a7639ea15 100644
+index 0fe2382597ad..0799e0957499 100644
 --- a/fs/cifs/smb2pdu.h
 +++ b/fs/cifs/smb2pdu.h
-@@ -1031,7 +1031,19 @@ struct smb2_set_info_rsp {
- 	__le16 StructureSize; /* Must be 2 */
+@@ -308,7 +308,7 @@ struct smb2_sess_setup_rsp {
  } __packed;
  
--struct smb2_oplock_break {
-+/* oplock break without an rfc1002 header */
-+struct smb2_oplock_break_req {
+ struct smb2_logoff_req {
+-	struct smb2_hdr hdr;
 +	struct smb2_sync_hdr sync_hdr;
-+	__le16 StructureSize; /* Must be 24 */
-+	__u8   OplockLevel;
-+	__u8   Reserved;
-+	__le32 Reserved2;
-+	__u64  PersistentFid;
-+	__u64  VolatileFid;
-+} __packed;
-+
-+/* oplock break with an rfc1002 header */
-+struct smb2_oplock_break_rsp {
- 	struct smb2_hdr hdr;
- 	__le16 StructureSize; /* Must be 24 */
- 	__u8   OplockLevel;
+ 	__le16 StructureSize;	/* Must be 4 */
+ 	__le16 Reserved;
+ } __packed;
 -- 
 2.13.3
