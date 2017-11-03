@@ -1,61 +1,34 @@
-From: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: RE: [PATCH 0/1] Remove the rfc1002 length from all SMB2 requests
-Date: Thu, 2 Nov 2017 21:53:50 +0000
-Message-ID: <CY4PR21MB0182D2EE5EED34C547BF94D3A05C0@CY4PR21MB0182.namprd21.prod.outlook.com>
-References: <20171101015144.2034-1-lsahlber@redhat.com>
- <87shdxuhbg.fsf@suse.com>
- <CAN05THRMgZwUfgpXQudSzmH-8tOriv+dZnGPAK2u9h+4bmU2Mw@mail.gmail.com>
+From: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Subject: Re: [PATCH 01/19] cifs: Add SendReceive3
+Date: Thu, 2 Nov 2017 23:25:27 -0700
+Message-ID: <20171103062527.GA8075@infradead.org>
+References: <20171102070312.18903-1-lsahlber@redhat.com>
+ <20171102070312.18903-2-lsahlber@redhat.com>
+ <87o9okvkcd.fsf@suse.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 Cc: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
         linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
         Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: ronnie sahlberg <ronniesahlberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        =?utf-8?B?QXVyw6lsaWVuIEFwdGVs?= <aaptel-IBi9RG/b67k@public.gmane.org>
+To: =?iso-8859-1?Q?Aur=E9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAN05THRMgZwUfgpXQudSzmH-8tOriv+dZnGPAK2u9h+4bmU2Mw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <87o9okvkcd.fsf-IBi9RG/b67k@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-VGhpcyB3b3VsZCBhbHNvIGdyZWF0bHkgYmVuZWZpdCBTTUIgRGlyZWN0LCB3aGljaCBkb2Vzbid0
-IHVzZSB0aGUgaGVhZGVyIGF0IGFsbC4NCkxvbmcncyBwYXRjaGVzIGN1cnJlbnRseSBzdHJpcCBp
-dCBvdXQgb24gc2VuZCwgYW5kICphZGQgaXQgaW4qIG9uIHJlY2VpdmUsIGp1c3QgdG8NCndvcmsg
-YXJvdW5kIHRoaXMuDQoNClRvbS4NCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBG
-cm9tOiBsaW51eC1jaWZzLW93bmVyQHZnZXIua2VybmVsLm9yZyBbbWFpbHRvOmxpbnV4LWNpZnMt
-DQo+IG93bmVyQHZnZXIua2VybmVsLm9yZ10gT24gQmVoYWxmIE9mIHJvbm5pZSBzYWhsYmVyZw0K
-PiBTZW50OiBUaHVyc2RheSwgTm92ZW1iZXIgMiwgMjAxNyA2OjMyIEFNDQo+IFRvOiBBdXLDqWxp
-ZW4gQXB0ZWwgPGFhcHRlbEBzdXNlLmNvbT4NCj4gQ2M6IFJvbm5pZSBTYWhsYmVyZyA8bHNhaGxi
-ZXJAcmVkaGF0LmNvbT47IGxpbnV4LWNpZnMgPGxpbnV4LQ0KPiBjaWZzQHZnZXIua2VybmVsLm9y
-Zz47IFN0ZXZlIEZyZW5jaCA8c21mcmVuY2hAZ21haWwuY29tPg0KPiBTdWJqZWN0OiBSZTogW1BB
-VENIIDAvMV0gUmVtb3ZlIHRoZSByZmMxMDAyIGxlbmd0aCBmcm9tIGFsbCBTTUIyIHJlcXVlc3Rz
-DQo+IA0KPiBJIHJlc2VudCB0aGlzIGFzIGEgcGF0Y2ggc2VyaWVzIHRvIG1ha2UgcmV2aWV3IGVh
-c2llci4NCj4gDQo+IExldHMgd29yayB0b2dldGhlciB0byByZW1vdmUgdGhlIDEwMDIgaGVhZGVy
-cyBzbyB0aGF0DQo+IGNvbXBvdW5kaW5nIHdpbGwgYmVjb21lIGVhc2llciB0byBpbXBsZW1lbnQu
-DQo+IA0KPiANCj4gT24gVGh1LCBOb3YgMiwgMjAxNyBhdCA4OjA1IFBNLCBBdXLDqWxpZW4gQXB0
-ZWwgPGFhcHRlbEBzdXNlLmNvbT4gd3JvdGU6DQo+ID4gSGkgUm9ubmllLA0KPiA+DQo+ID4gSSB3
-YXMgYWxzbyBsb29raW5nIGludG8gdGhpcyEgSSB3aWxsIHRha2UgYSBsb29rIGF0IHRoaXMgcGF0
-Y2guDQo+ID4NCj4gPiAtLQ0KPiA+IEF1csOpbGllbiBBcHRlbCAvIFNVU0UgTGFicyBTYW1iYSBU
-ZWFtDQo+ID4gR1BHOiAxODM5IENCNUYgOUY1QiBGQjlCIEFBOTcgIDhDOTkgMDNDOCBBNDlCIDUy
-MUIgRDVEMw0KPiA+IFNVU0UgTGludXggR21iSCwgTWF4ZmVsZHN0cmHDn2UgNSwgOTA0MDkgTsO8
-cm5iZXJnLCBHZXJtYW55DQo+ID4gR0Y6IEZlbGl4IEltZW5kw7ZyZmZlciwgSmFuZSBTbWl0aGFy
-ZCwgR3JhaGFtIE5vcnRvbiwgSFJCIDIxMjg0IChBRw0KPiBOw7xybmJlcmcpDQo+ID4gLS0NCj4g
-PiBUbyB1bnN1YnNjcmliZSBmcm9tIHRoaXMgbGlzdDogc2VuZCB0aGUgbGluZSAidW5zdWJzY3Jp
-YmUgbGludXgtY2lmcyIgaW4NCj4gPiB0aGUgYm9keSBvZiBhIG1lc3NhZ2UgdG8gbWFqb3Jkb21v
-QHZnZXIua2VybmVsLm9yZw0KPiA+IE1vcmUgbWFqb3Jkb21vIGluZm8gYXQNCj4gaHR0cHM6Ly9u
-YTAxLnNhZmVsaW5rcy5wcm90ZWN0aW9uLm91dGxvb2suY29tLz91cmw9aHR0cCUzQSUyRiUyRnZn
-ZXIua2VybmUNCj4gbC5vcmclMkZtYWpvcmRvbW8tDQo+IGluZm8uaHRtbCZkYXRhPTAyJTdDMDEl
-N0N0dGFscGV5JTQwbWljcm9zb2Z0LmNvbSU3QzIwYTM1MDE1YmJkNjRmMw0KPiAyMmE5NjA4ZDUy
-MWRjZTY5YSU3QzcyZjk4OGJmODZmMTQxYWY5MWFiMmQ3Y2QwMTFkYjQ3JTdDMSU3QzAlN0MNCj4g
-NjM2NDUyMTU1MDA2MjQ2MjY2JnNkYXRhPUR6N3l3azlScUlaciUyQkJjMDAlMkJ4ZDNCRWc0UXdH
-b2tvQ3UNCj4gcEZiSDhQVTk3byUzRCZyZXNlcnZlZD0wDQo+IC0tDQo+IFRvIHVuc3Vic2NyaWJl
-IGZyb20gdGhpcyBsaXN0OiBzZW5kIHRoZSBsaW5lICJ1bnN1YnNjcmliZSBsaW51eC1jaWZzIiBp
-bg0KPiB0aGUgYm9keSBvZiBhIG1lc3NhZ2UgdG8gbWFqb3Jkb21vQHZnZXIua2VybmVsLm9yZw0K
-PiBNb3JlIG1ham9yZG9tbyBpbmZvIGF0DQo+IGh0dHBzOi8vbmEwMS5zYWZlbGlua3MucHJvdGVj
-dGlvbi5vdXRsb29rLmNvbS8/dXJsPWh0dHAlM0ElMkYlMkZ2Z2VyLmtlcm5lDQo+IGwub3JnJTJG
-bWFqb3Jkb21vLQ0KPiBpbmZvLmh0bWwmZGF0YT0wMiU3QzAxJTdDdHRhbHBleSU0MG1pY3Jvc29m
-dC5jb20lN0MyMGEzNTAxNWJiZDY0ZjMNCj4gMjJhOTYwOGQ1MjFkY2U2OWElN0M3MmY5ODhiZjg2
-ZjE0MWFmOTFhYjJkN2NkMDExZGI0NyU3QzElN0MwJTdDDQo+IDYzNjQ1MjE1NTAwNjI0NjI2NiZz
-ZGF0YT1Eejd5d2s5UnFJWnIlMkJCYzAwJTJCeGQzQkVnNFF3R29rb0N1DQo+IHBGYkg4UFU5N28l
-M0QmcmVzZXJ2ZWQ9MA0K
+On Thu, Nov 02, 2017 at 03:14:26PM +0100, Aurélien Aptel wrote:
+> I know this is kind of unrelated but I've been thinking to myself we
+> should try to get rid of this dynamic allocation at some point.
+> 
+> IIUC the iovec never has more than a couple of elements, so we could
+> have something like a fixed sized stack allocated iovec array +
+> MAX_IOVEC_LENGTH macro.
+> 
+> Doing a kmalloc() for every packet defeats the purpose of the memory
+> pool optimization we use for small/large buffers.
+
+Yes.  You probably just want everyone to allocate an additional
+entry in the vector for the header if needed, and just leave the
+slot empty and start processing at offset for cases like SMB direct.
