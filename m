@@ -1,74 +1,69 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v10 00/20] simplify crypto wait for async op
-Date: Fri, 3 Nov 2017 22:25:29 +0800
-Message-ID: <20171103142528.GL9011@gondor.apana.org.au>
-References: <1508310057-25369-1-git-send-email-gilad@benyossef.com>
+From: Jeff Layton <jlayton-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Subject: Re: [cifs-utils PATCH v2] manpage: update mount.cifs manpage with
+ info about default version being mounted
+Date: Sat, 04 Nov 2017 07:33:05 -0400
+Message-ID: <1509795185.29302.5.camel@kernel.org>
+References: <20171031160224.12523-1-jlayton@kernel.org>
+         <CAKywueR4DpsM72EK6u=6PHRm+uD6m8vJWnmHfhYzUuYfFn1oNA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: Mike Snitzer <snitzer@redhat.com>, linux-doc@vger.kernel.org,
-	Gary Hook <gary.hook@amd.com>,
-	David Howells <dhowells@redhat.com>, dm-devel@redhat.com,
-	keyrings@vger.kernel.org, linux-ima-devel@lists.sourceforge.net,
-	Alasdair Kergon <agk@redhat.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Jonathan Corbet <corbet@lwn.net>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-	Mimi Zohar <zohar@linux.vnet.ibm.com>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	linux-cifs@vger.kernel.org, linux-ima-user@lists.sourceforge.net,
-	Arnaud Ebalard <arno@natisbad.org>, linux-fscrypt@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	James Morris <james.l.morris@oracle.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	Jaegeuk Kim <jaegeuk@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	Ofir Dra
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <dm-devel-bounces@redhat.com>
-Content-Disposition: inline
-In-Reply-To: <1508310057-25369-1-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
-List-Id: linux-cifs.vger.kernel.org
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        =?ISO-8859-1?Q?Aur=E9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>,
+        Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAKywueR4DpsM72EK6u=6PHRm+uD6m8vJWnmHfhYzUuYfFn1oNA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, Oct 18, 2017 at 08:00:32AM +0100, Gilad Ben-Yossef wrote:
-> Many users of kernel async. crypto services have a pattern of
-> starting an async. crypto op and than using a completion
-> to wait for it to end.
+On Tue, 2017-10-31 at 10:45 -0700, Pavel Shilovsky wrote:
+> 2017-10-31 9:02 GMT-07:00 Jeff Layton <jlayton-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>:
+> > From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> > 
+> > Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> > ---
+> >  mount.cifs.rst | 6 ++++--
+> >  1 file changed, 4 insertions(+), 2 deletions(-)
+> > 
+> > Thanks Aurelien. I dropped Ronnie's Reviewed-by since this is a bit different.
+> > Let me know if you'd like me to add it back.
+> > 
+> > diff --git a/mount.cifs.rst b/mount.cifs.rst
+> > index 9714f795fe76..01305df60651 100644
+> > --- a/mount.cifs.rst
+> > +++ b/mount.cifs.rst
+> > @@ -517,7 +517,7 @@ prefixpath=arg
+> >  vers=arg
+> >    SMB protocol version. Allowed values are:
+> > 
+> > -  - 1.0 - The classic CIFS/SMBv1 protocol. This is the default.
+> > +  - 1.0 - The classic CIFS/SMBv1 protocol.
+> >    - 2.0 - The SMBv2.002 protocol. This was initially introduced in
+> >      Windows Vista Service Pack 1, and Windows Server 2008. Note that
+> >      the initial release version of Windows Vista spoke a slightly
+> > @@ -529,6 +529,9 @@ vers=arg
+> >    Note too that while this option governs the protocol version used, not
+> >    all features of each version are available.
+> > 
+> > +  In kernels v4.13 and later, the client and server negotiate a version greater
+> > +  than or equal to ``2.1``. In kernels prior to v4.13, the default is ``1.0``.
+> > +
 > 
-> This patch set simplifies this common use case in two ways:
+> The multi-dialect negotiation (version 2.1 and above) was added in
+> v4.13.5 kernel. Should we mention the specific stable version in the
+> doc?
 > 
-> First, by separating the return codes of the case where a
-> request is queued to a backlog due to the provider being
-> busy (-EBUSY) from the case the request has failed due
-> to the provider being busy and backlogging is not enabled
-> (-ENOSPC).
-> 
-> Next, this change is than built on to create a generic API
-> to wait for a async. crypto operation to complete.
-> 
-> The end result is a smaller code base and an API that is
-> easier to use and more difficult to get wrong.
-> 
-> The patch set was boot tested on x86_64 and arm64 which
-> at the very least tests the crypto users via testmgr and
-> tcrypt but I do note that I do not have access to some
-> of the HW whose drivers are modified nor do I claim I was
-> able to test all of the corner cases.
-> 
-> The patch set is based upon linux-next release tagged
-> next-20171017.
 
-All applied.  Thanks.
+It would be very odd to make that sort of change in a stable series
+kernel. What patch actually flipped the default to autonegotiate?
+
+I was assuming that it was eef914a9eb5eb83e60eb498315a491cd1edc13a1:
+
+    $ git tag --contains eef914a9eb5eb83e60eb498315a491cd1edc13a1 | grep v4.13$
+    v4.13
+
+git says that that commit went into v4.13. Was it a different one?
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Jeff Layton <jlayton-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
