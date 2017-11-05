@@ -1,7 +1,7 @@
 From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Subject: [Patch v6 12/22] CIFS: SMBD: Upper layer destroys SMB Direct session on shutdown or umount
-Date: Sat,  4 Nov 2017 22:43:54 -0700
-Message-ID: <20171105054404.23886-13-longli@exchange.microsoft.com>
+Subject: [Patch v6 07/22] CIFS: SMBD: Implement function to create a SMB Direct connection
+Date: Sat,  4 Nov 2017 22:43:49 -0700
+Message-ID: <20171105054404.23886-8-longli@exchange.microsoft.com>
 References: <20171105054404.23886-1-longli@exchange.microsoft.com>
 Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
@@ -17,32 +17,39 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 
-When upper layer wants to umount, make it call shutdown on transport when
-SMB Direct is used.
+The upper layer calls this function to connect to peer through SMB Direct.
+Each SMB Direct connection is based on a RDMA RC Queue Pair.
 
 Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 ---
- fs/cifs/connect.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ fs/cifs/smbdirect.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 8ca3c13..23f10d1 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -707,7 +707,12 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
- 	wake_up_all(&server->request_q);
- 	/* give those requests time to exit */
- 	msleep(125);
--
-+#ifdef CONFIG_CIFS_SMB_DIRECT
-+	if (server->smbd_conn) {
-+		smbd_destroy(server->smbd_conn);
-+		server->smbd_conn = NULL;
+diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+index 7af49cd..47d999f 100644
+--- a/fs/cifs/smbdirect.c
++++ b/fs/cifs/smbdirect.c
+@@ -1652,3 +1652,20 @@ struct smbd_connection *_smbd_get_connection(
+ 	kfree(info);
+ 	return NULL;
+ }
++
++struct smbd_connection *smbd_get_connection(
++	struct TCP_Server_Info *server, struct sockaddr *dstaddr)
++{
++	struct smbd_connection *ret;
++	int port = SMBD_PORT;
++
++try_again:
++	ret = _smbd_get_connection(server, dstaddr, port);
++
++	/* Try SMB_PORT if SMBD_PORT doesn't work */
++	if (!ret && port == SMBD_PORT) {
++		port = SMB_PORT;
++		goto try_again;
 +	}
-+#endif
- 	if (server->ssocket) {
- 		sock_release(server->ssocket);
- 		server->ssocket = NULL;
++	return ret;
++}
 -- 
 2.7.4
 
