@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v6 01/22] CIFS: SMBD: Add parameter rdata to smb2_new_read_req
-Date: Sat,  4 Nov 2017 22:43:43 -0700
-Message-ID: <20171105054404.23886-2-longli@exchange.microsoft.com>
+Subject: [Patch v6 13/22] CIFS: SMBD: Set SMB Direct maximum read or write size for I/O
+Date: Sat,  4 Nov 2017 22:43:55 -0700
+Message-ID: <20171105054404.23886-14-longli@exchange.microsoft.com>
 References: <20171105054404.23886-1-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -17,66 +17,54 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-This patch is for preparing upper layer for doing SMB read via RDMA write.
-
-When the SMB read packet header is assembled, SMB Direct code needs to know
-the I/O layout if this request is to use a RDMA write. rdata has all the
-information of I/O layout for memory registration.
-
-Add rdata to smb2_new_read_req.
+When connecting over SMB Direct, the transport negotiates its maximum I/O
+sizes with the server and determines how to choose to do RDMA send/recv vs
+read/write. Expose these maximum I/O sizes to upper layer so we will get
+the correct sized payloads.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/smb2pdu.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ fs/cifs/smb2ops.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index bab3da6..32ad590 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -2350,18 +2350,21 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
-  */
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index fb2934b..25028da 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -32,6 +32,9 @@
+ #include "smb2status.h"
+ #include "smb2glob.h"
+ #include "cifs_ioctl.h"
++#ifdef CONFIG_CIFS_SMB_DIRECT
++#include "smbdirect.h"
++#endif
+ 
  static int
- smb2_new_read_req(void **buf, unsigned int *total_len,
--		  struct cifs_io_parms *io_parms, unsigned int remaining_bytes,
--		  int request_type)
-+	struct cifs_io_parms *io_parms, struct cifs_readdata *rdata,
-+	unsigned int remaining_bytes, int request_type)
- {
- 	int rc = -EACCES;
- 	struct smb2_read_plain_req *req = NULL;
- 	struct smb2_sync_hdr *shdr;
-+	struct TCP_Server_Info *server;
+ change_conf(struct TCP_Server_Info *server)
+@@ -250,7 +253,11 @@ smb2_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
+ 	/* start with specified wsize, or default */
+ 	wsize = volume_info->wsize ? volume_info->wsize : CIFS_DEFAULT_IOSIZE;
+ 	wsize = min_t(unsigned int, wsize, server->max_write);
+-
++#ifdef CONFIG_CIFS_SMB_DIRECT
++	if (server->rdma)
++		wsize = min_t(unsigned int,
++				wsize, server->smbd_conn->max_readwrite_size);
++#endif
+ 	if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
+ 		wsize = min_t(unsigned int, wsize, SMB2_MAX_BUFFER_SIZE);
  
- 	rc = smb2_plain_req_init(SMB2_READ, io_parms->tcon, (void **) &req,
- 				 total_len);
- 	if (rc)
- 		return rc;
--	if (io_parms->tcon->ses->server == NULL)
-+
-+	server = io_parms->tcon->ses->server;
-+	if (server == NULL)
- 		return -ECONNABORTED;
+@@ -266,6 +273,11 @@ smb2_negotiate_rsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
+ 	/* start with specified rsize, or default */
+ 	rsize = volume_info->rsize ? volume_info->rsize : CIFS_DEFAULT_IOSIZE;
+ 	rsize = min_t(unsigned int, rsize, server->max_read);
++#ifdef CONFIG_CIFS_SMB_DIRECT
++	if (server->rdma)
++		rsize = min_t(unsigned int,
++				rsize, server->smbd_conn->max_readwrite_size);
++#endif
  
- 	shdr = &req->sync_hdr;
-@@ -2489,7 +2492,8 @@ smb2_async_readv(struct cifs_readdata *rdata)
- 
- 	server = io_parms.tcon->ses->server;
- 
--	rc = smb2_new_read_req((void **) &buf, &total_len, &io_parms, 0, 0);
-+	rc = smb2_new_read_req(
-+		(void **) &buf, &total_len, &io_parms, rdata, 0, 0);
- 	if (rc) {
- 		if (rc == -EAGAIN && rdata->credits) {
- 			/* credits was reset by reconnect */
-@@ -2557,7 +2561,7 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
- 	struct cifs_ses *ses = io_parms->tcon->ses;
- 
- 	*nbytes = 0;
--	rc = smb2_new_read_req((void **)&req, &total_len, io_parms, 0, 0);
-+	rc = smb2_new_read_req((void **)&req, &total_len, io_parms, NULL, 0, 0);
- 	if (rc)
- 		return rc;
- 
+ 	if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
+ 		rsize = min_t(unsigned int, rsize, SMB2_MAX_BUFFER_SIZE);
 -- 
 2.7.4
