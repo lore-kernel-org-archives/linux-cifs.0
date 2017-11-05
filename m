@@ -1,71 +1,69 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [cifs-utils PATCH v3] manpage: update mount.cifs manpage with
- info about default version being mounted
-Date: Sun, 5 Nov 2017 10:06:45 -0800
-Message-ID: <CAKywueQ+NGsmvzg6Mcn41rKFGHcyM+AXurQbKdZSMCw4JJw_mg@mail.gmail.com>
-References: <20171104205151.3507-1-jlayton@kernel.org> <CAKywueRMN0-NfUVsBra+wRCsA0N8jwG+J3FqQUt5K18favSA=Q@mail.gmail.com>
- <1509888942.4773.6.camel@kernel.org>
+From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Subject: RE: [Patch v5 08/21] CIFS: SMBD: Upper layer reconnects to SMB Direct
+ session
+Date: Sun, 5 Nov 2017 18:37:09 +0000
+Message-ID: <MWHPR21MB01904A80D5C08396A7209471CE530@MWHPR21MB0190.namprd21.prod.outlook.com>
+References: <20171018230920.21042-1-longli@exchange.microsoft.com>
+ <20171018230920.21042-9-longli@exchange.microsoft.com>
+ <CAKywueRMRGhkw1zFh5HEBqV748hoq0DVsjGoVg8ttD22sTsYOQ@mail.gmail.com>
+ <BN6PR21MB083455CADF03A6BD40863968CB5F0@BN6PR21MB0834.namprd21.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>,
-        Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Jeff Layton <jlayton-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+        Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        "Stephen Hemminger" <sthemmin-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1509888942.4773.6.camel-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+In-Reply-To: <BN6PR21MB083455CADF03A6BD40863968CB5F0-M7qishpO4ShSLOx3ThEYWs1VXTxX1y3OvxpqHgZTriW3zl9H0oFU5g@public.gmane.org>
+Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2017-11-05 5:35 GMT-08:00 Jeff Layton <jlayton-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>:
-> On Sat, 2017-11-04 at 18:27 -0700, Pavel Shilovsky wrote:
->> 2017-11-04 13:51 GMT-07:00 Jeff Layton <jlayton-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>:
->> > From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
->> >
->> > Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
->> > ---
->> >  mount.cifs.rst | 7 +++++--
->> >  1 file changed, 5 insertions(+), 2 deletions(-)
->> >
->> > diff --git a/mount.cifs.rst b/mount.cifs.rst
->> > index 9714f795fe76..499b9a778927 100644
->> > --- a/mount.cifs.rst
->> > +++ b/mount.cifs.rst
->> > @@ -517,7 +517,7 @@ prefixpath=arg
->> >  vers=arg
->> >    SMB protocol version. Allowed values are:
->> >
->> > -  - 1.0 - The classic CIFS/SMBv1 protocol. This is the default.
->> > +  - 1.0 - The classic CIFS/SMBv1 protocol.
->> >    - 2.0 - The SMBv2.002 protocol. This was initially introduced in
->> >      Windows Vista Service Pack 1, and Windows Server 2008. Note that
->> >      the initial release version of Windows Vista spoke a slightly
->> > @@ -529,6 +529,10 @@ vers=arg
->> >    Note too that while this option governs the protocol version used, not
->> >    all features of each version are available.
->> >
->> > +  In kernels v4.13.5 and later, the client and server negotiate a version
->> > +  greater than or equal to ``2.1``. In kernels prior to v4.13.5, the default
->> > +  is ``1.0``.
->>
->> Between v4.13 and v4.13.4 (included) the default is 3.0, not sure if
->> we should be so precise here.
->>
->
-> Grumble...the merge of that feature outside the normal merge window
-> makes this difficult to document. How about this?
->
->     The default since v4.13.5 is for the client and server to negotiate
->     the highest possible version greater than or equal to ``2.1``. In
->     kernels prior to v4.13, the default was ``1.0``. For kernels
->     between v4.13 and v4.13.5 the default is ``3.0``.
->
-> It's still awkward, but I think it's correct.
-
-Looks good.
-
-Reviewed-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-
---
-Best regards,
-Pavel Shilovsky
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBNYXR0aGV3IFdpbGNveA0KPiBT
+ZW50OiBXZWRuZXNkYXksIE5vdmVtYmVyIDEsIDIwMTcgMTI6NDUgUE0NCj4gVG86IFBhdmVsIFNo
+aWxvdnNreSA8cGlhc3RyeXl5QGdtYWlsLmNvbT47IExvbmcgTGkgPGxvbmdsaUBtaWNyb3NvZnQu
+Y29tPg0KPiBDYzogU3RldmUgRnJlbmNoIDxzZnJlbmNoQHNhbWJhLm9yZz47IGxpbnV4LWNpZnMg
+PGxpbnV4LQ0KPiBjaWZzQHZnZXIua2VybmVsLm9yZz47IHNhbWJhLXRlY2huaWNhbCA8c2FtYmEt
+dGVjaG5pY2FsQGxpc3RzLnNhbWJhLm9yZz47DQo+IEtlcm5lbCBNYWlsaW5nIExpc3QgPGxpbnV4
+LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc+OyBsaW51eC0NCj4gcmRtYUB2Z2VyLmtlcm5lbC5vcmc7
+IFRvbSBUYWxwZXkgPHR0YWxwZXlAbWljcm9zb2Z0LmNvbT47IFN0ZXBoZW4NCj4gSGVtbWluZ2Vy
+IDxzdGhlbW1pbkBtaWNyb3NvZnQuY29tPjsgTG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+
+DQo+IFN1YmplY3Q6IFJFOiBbUGF0Y2ggdjUgMDgvMjFdIENJRlM6IFNNQkQ6IFVwcGVyIGxheWVy
+IHJlY29ubmVjdHMgdG8gU01CDQo+IERpcmVjdCBzZXNzaW9uDQo+IA0KPiBGcm9tOiBQYXZlbCBT
+aGlsb3Zza3kgW21haWx0bzpwaWFzdHJ5eXlAZ21haWwuY29tXQ0KPiA+IDIwMTctMTAtMTggMTY6
+MDkgR01ULTA3OjAwIExvbmcgTGkgPGxvbmdsaUBleGNoYW5nZS5taWNyb3NvZnQuY29tPjoNCj4g
+PiA+IEZyb206IExvbmcgTGkgPGxvbmdsaUBtaWNyb3NvZnQuY29tPg0KPiA+ID4NCj4gPiA+IERv
+IGEgcmVjb25uZWN0IG9uIFNNQiBEaXJlY3Qgd2hlbiBpdCBpcyB1c2VkIGFzIHRoZSBjb25uZWN0
+aW9uLg0KPiA+ID4gUmVjb25uZWN0DQo+ID4gY2FuDQo+ID4gPiBoYXBwZW4gZm9yIG1hbnkgcmVh
+c29ucyBhbmQgaXQncyBtb3N0bHkgdGhlIGRlY2lzaW9uIG9mIFNNQjIgdXBwZXINCj4gbGF5ZXIu
+DQo+ID4gPg0KPiA+ID4gU2lnbmVkLW9mZi1ieTogTG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5j
+b20+DQo+ID4gPiAtLS0NCj4gPiA+ICBmcy9jaWZzL2Nvbm5lY3QuYyB8IDcgKysrKysrKw0KPiA+
+ID4gIDEgZmlsZSBjaGFuZ2VkLCA3IGluc2VydGlvbnMoKykNCj4gPiA+DQo+ID4gPiBkaWZmIC0t
+Z2l0IGEvZnMvY2lmcy9jb25uZWN0LmMgYi9mcy9jaWZzL2Nvbm5lY3QuYyBpbmRleA0KPiA+ID4g
+MmMwYjM0YS4uOGNhM2MxMyAxMDA2NDQNCj4gPiA+IC0tLSBhL2ZzL2NpZnMvY29ubmVjdC5jDQo+
+ID4gPiArKysgYi9mcy9jaWZzL2Nvbm5lY3QuYw0KPiA+ID4gQEAgLTQwNiw3ICs0MDYsMTQgQEAg
+Y2lmc19yZWNvbm5lY3Qoc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyKQ0KPiA+ID4NCj4g
+PiA+ICAgICAgICAgICAgICAgICAvKiB3ZSBzaG91bGQgdHJ5IG9ubHkgdGhlIHBvcnQgd2UgY29u
+bmVjdGVkIHRvIGJlZm9yZSAqLw0KPiA+ID4gICAgICAgICAgICAgICAgIG11dGV4X2xvY2soJnNl
+cnZlci0+c3J2X211dGV4KTsNCj4gPiA+ICsjaWZkZWYgQ09ORklHX0NJRlNfU01CX0RJUkVDVA0K
+PiA+ID4gKyAgICAgICAgICAgICAgIGlmIChzZXJ2ZXItPnJkbWEpDQo+ID4gPiArICAgICAgICAg
+ICAgICAgICAgICAgICByYyA9IHNtYmRfcmVjb25uZWN0KHNlcnZlcik7DQo+ID4gPiArICAgICAg
+ICAgICAgICAgZWxzZQ0KPiA+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgcmMgPSBnZW5lcmlj
+X2lwX2Nvbm5lY3Qoc2VydmVyKTsNCj4gPg0KPiA+IE1pbm9yOiBoZXJlIGFuZCBpbiBvdGhlciBz
+aW1pbGFyIHBsYWNlcyB3ZSBjYW4gcmVtb3ZlICNlbHNlIHBhcnQgYmVsb3cNCj4gPiBhbmQgcHV0
+ICNlbmRpZiBiZWZvcmUgZWxzZSBibG9jayBhYm92ZS4NCj4gPg0KPiA+ID4gKyNlbHNlDQo+ID4g
+PiAgICAgICAgICAgICAgICAgcmMgPSBnZW5lcmljX2lwX2Nvbm5lY3Qoc2VydmVyKTsNCj4gPiA+
+ICsjZW5kaWYNCj4gDQo+IEknZCBzdWdnZXN0IHJhdGhlcjoNCj4gDQo+ICNpZmRlZiBDT05GSUdf
+Q0lGU19TTUJfRElSRUNUDQo+ICNkZWZpbmUgY2lmc19yZG1hX2VuYWJsZWQoc2VydmVyKQkoKHNl
+cnZlciktPnJkbWEpDQo+ICNlbHNlDQo+ICNkZWZpbmUgY2lmc19yZG1hX2VuYWJsZWQoc2VydmVy
+KQkwDQo+ICNlbmRpZg0KPiANCj4gVGhlbiB3ZSBkb24ndCBuZWVkIGFuIGlmZGVmIGluIHRoZSB1
+c2VycywganVzdDoNCj4gDQo+IAlpZiAoY2lmc19yZG1hX2VuYWJsZWQoc2VydmVyKSkNCj4gCQly
+YyA9IHNtYmRfcmVjb25uZWN0KHNlcnZlcik7DQo+IAllbHNlDQo+IAkJcmMgPSBnZW5lcmljX2lw
+X2Nvbm5lY3Qoc2VydmVyKTsNCg0KSSB3aWxsIGZpeCB0aGlzLiBUaGFuayB5b3UuDQoNCkxvbmcN
+Cg==
