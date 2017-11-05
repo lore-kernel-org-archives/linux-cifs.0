@@ -1,8 +1,7 @@
 From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Subject: [Patch v6 06/22] CIFS: SMBD: export protocol initial values
-Date: Sat,  4 Nov 2017 22:43:48 -0700
-Message-ID: <20171105054404.23886-7-longli@exchange.microsoft.com>
-References: <20171105054404.23886-1-longli@exchange.microsoft.com>
+Subject: [Patch v6 00/22] CIFS: Implement SMB Direct protocol
+Date: Sat,  4 Nov 2017 22:43:42 -0700
+Message-ID: <20171105054404.23886-1-longli@exchange.microsoft.com>
 Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
         samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
@@ -10,136 +9,77 @@ To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u
         Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
         Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
         Stephen Hemminger <sthemmin-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171105054404.23886-1-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
 From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 
-For use-configurable SMB Direct protocol values, export them to
-/proc/fs/cifs.
+Starting with SMB2 dialect 3.0, Microsoft introduced SMB Direct transport
+protocol for transferring upper layer (SMB2) payload over RDMA via Infiniband,
+RoCE or iWARP. The prococol is published in [MS-SMBD]
+(https://msdn.microsoft.com/en-us/library/hh536346.aspx).
 
-Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
----
- fs/cifs/cifs_debug.c | 79 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 79 insertions(+)
+Patch v2 added RDMA read/write via memory registration, and addressed
+feedbacks on v1.
 
-diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-index ba0870d..7025d8d 100644
---- a/fs/cifs/cifs_debug.c
-+++ b/fs/cifs/cifs_debug.c
-@@ -30,6 +30,9 @@
- #include "cifsproto.h"
- #include "cifs_debug.h"
- #include "cifsfs.h"
-+#ifdef CONFIG_CIFS_SMB_DIRECT
-+#include "smbdirect.h"
-+#endif
- 
- void
- cifs_dump_mem(char *label, void *data, int length)
-@@ -371,6 +374,54 @@ static const struct file_operations cifs_stats_proc_fops = {
- };
- #endif /* STATS */
- 
-+#ifdef CONFIG_CIFS_SMB_DIRECT
-+#define PROC_FILE_DEFINE(name) \
-+static ssize_t name##_write(struct file *file, const char __user *buffer, \
-+	size_t count, loff_t *ppos) \
-+{ \
-+	int rc; \
-+	rc = kstrtoint_from_user(buffer, count, 10, & name ); \
-+	if (rc) \
-+		return rc; \
-+	return count; \
-+} \
-+static int name##_proc_show(struct seq_file *m, void *v) \
-+{ \
-+	seq_printf(m, "%d\n", name ); \
-+	return 0; \
-+} \
-+static int name##_open(struct inode *inode, struct file *file) \
-+{ \
-+	return single_open(file, name##_proc_show, NULL); \
-+} \
-+\
-+static const struct file_operations cifs_##name##_proc_fops = { \
-+	.open		= name##_open, \
-+	.read		= seq_read, \
-+	.llseek		= seq_lseek, \
-+	.release	= single_release, \
-+	.write		= name##_write, \
-+}
-+
-+extern int rdma_readwrite_threshold;
-+extern int smbd_max_frmr_depth;
-+extern int smbd_keep_alive_interval;
-+extern int smbd_max_receive_size;
-+extern int smbd_max_fragmented_recv_size;
-+extern int smbd_max_send_size;
-+extern int smbd_send_credit_target;
-+extern int smbd_receive_credit_max;
-+
-+PROC_FILE_DEFINE(rdma_readwrite_threshold);
-+PROC_FILE_DEFINE(smbd_max_frmr_depth);
-+PROC_FILE_DEFINE(smbd_keep_alive_interval);
-+PROC_FILE_DEFINE(smbd_max_receive_size);
-+PROC_FILE_DEFINE(smbd_max_fragmented_recv_size);
-+PROC_FILE_DEFINE(smbd_max_send_size);
-+PROC_FILE_DEFINE(smbd_send_credit_target);
-+PROC_FILE_DEFINE(smbd_receive_credit_max);
-+#endif
-+
- static struct proc_dir_entry *proc_fs_cifs;
- static const struct file_operations cifsFYI_proc_fops;
- static const struct file_operations cifs_lookup_cache_proc_fops;
-@@ -398,6 +449,24 @@ cifs_proc_init(void)
- 		    &cifs_security_flags_proc_fops);
- 	proc_create("LookupCacheEnabled", 0, proc_fs_cifs,
- 		    &cifs_lookup_cache_proc_fops);
-+#ifdef CONFIG_CIFS_SMB_DIRECT
-+	proc_create("rdma_readwrite_threshold", 0, proc_fs_cifs,
-+		&cifs_rdma_readwrite_threshold_proc_fops);
-+	proc_create("smbd_max_frmr_depth", 0, proc_fs_cifs,
-+		&cifs_smbd_max_frmr_depth_proc_fops);
-+	proc_create("smbd_keep_alive_interval", 0, proc_fs_cifs,
-+		&cifs_smbd_keep_alive_interval_proc_fops);
-+	proc_create("smbd_max_receive_size", 0, proc_fs_cifs,
-+		&cifs_smbd_max_receive_size_proc_fops);
-+	proc_create("smbd_max_fragmented_recv_size", 0, proc_fs_cifs,
-+		&cifs_smbd_max_fragmented_recv_size_proc_fops);
-+	proc_create("smbd_max_send_size", 0, proc_fs_cifs,
-+		&cifs_smbd_max_send_size_proc_fops);
-+	proc_create("smbd_send_credit_target", 0, proc_fs_cifs,
-+		&cifs_smbd_send_credit_target_proc_fops);
-+	proc_create("smbd_receive_credit_max", 0, proc_fs_cifs,
-+		&cifs_smbd_receive_credit_max_proc_fops);
-+#endif
- }
- 
- void
-@@ -415,6 +484,16 @@ cifs_proc_clean(void)
- 	remove_proc_entry("SecurityFlags", proc_fs_cifs);
- 	remove_proc_entry("LinuxExtensionsEnabled", proc_fs_cifs);
- 	remove_proc_entry("LookupCacheEnabled", proc_fs_cifs);
-+#ifdef CONFIG_CIFS_SMB_DIRECT
-+	remove_proc_entry("rdma_readwrite_threshold", proc_fs_cifs);
-+	remove_proc_entry("smbd_max_frmr_depth", proc_fs_cifs);
-+	remove_proc_entry("smbd_keep_alive_interval", proc_fs_cifs);
-+	remove_proc_entry("smbd_max_receive_size", proc_fs_cifs);
-+	remove_proc_entry("smbd_max_fragmented_recv_size", proc_fs_cifs);
-+	remove_proc_entry("smbd_max_send_size", proc_fs_cifs);
-+	remove_proc_entry("smbd_send_credit_target", proc_fs_cifs);
-+	remove_proc_entry("smbd_receive_credit_max", proc_fs_cifs);
-+#endif
- 	remove_proc_entry("fs/cifs", NULL);
- }
- 
+Patch v3 improved performance by introducing an additional queue for handling
+empty packets and reducing lock contention on IRQ path. Also added light
+weight profiling by reading TSC and addressed feedbacks on v2.
+
+Patch v4 fixed connectivity issues with iWAPR devices and addressed comments.
+
+Patch v5 fixed compiling errors on ia64, i386 and when INFINIBAND is not
+configured, and addressed comments. Profiling is removed and will be
+introduced in a seperate patch.
+
+Patch v6 addressed comments.
+
+Long Li (22):
+  CIFS: SMBD: Add parameter rdata to smb2_new_read_req
+  CIFS: SMBD: Introduce kernel config option CONFIG_CIFS_SMB_DIRECT
+  CIFS: SMBD: Add rdma mount option
+  CIFS: SMBD: Add SMB Direct protocol initial values and constants
+  CIFS: SMBD: Establish SMB Direct connection
+  CIFS: SMBD: export protocol initial values
+  CIFS: SMBD: Implement function to create a SMB Direct connection
+  CIFS: SMBD: Upper layer connects to SMBDirect session
+  CIFS: SMBD: Implement function to reconnect to a SMB Direct transport
+  CIFS: SMBD: Upper layer reconnects to SMB Direct session
+  CIFS: SMBD: Implement function to destroy a SMB Direct connection
+  CIFS: SMBD: Upper layer destroys SMB Direct session on shutdown or
+    umount
+  CIFS: SMBD: Set SMB Direct maximum read or write size for I/O
+  CIFS: SMBD: Implement function to receive data via RDMA receive
+  CIFS: SMBD: Upper layer receives data via RDMA receive
+  CIFS: SMBD: Implement function to send data via RDMA send
+  CIFS: SMBD: Upper layer sends data via RDMA send
+  CIFS: SMBD: Implement RDMA memory registration
+  CIFS: SMBD: Upper layer performs SMB write via RDMA read through
+    memory registration
+  CIFS: SMBD: Read correct returned data length for RDMA write (SMB
+    read) I/O
+  CIFS: SMBD: Upper layer performs SMB read via RDMA write through
+    memory registration
+  CIFS: SMBD: Add SMB Direct debug counters
+
+ fs/cifs/Kconfig      |    8 +
+ fs/cifs/Makefile     |    2 +
+ fs/cifs/cifs_debug.c |  147 +++
+ fs/cifs/cifsfs.c     |    2 +
+ fs/cifs/cifsglob.h   |   23 +-
+ fs/cifs/cifssmb.c    |   16 +-
+ fs/cifs/connect.c    |   64 +-
+ fs/cifs/file.c       |   19 +-
+ fs/cifs/smb1ops.c    |    4 +-
+ fs/cifs/smb2ops.c    |   26 +-
+ fs/cifs/smb2pdu.c    |  129 ++-
+ fs/cifs/smbdirect.c  | 2618 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smbdirect.h  |  315 ++++++
+ fs/cifs/transport.c  |   14 +-
+ 14 files changed, 3359 insertions(+), 28 deletions(-)
+ create mode 100644 fs/cifs/smbdirect.c
+ create mode 100644 fs/cifs/smbdirect.h
+
 -- 
 2.7.4
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
