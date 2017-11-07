@@ -1,86 +1,61 @@
-From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Subject: [Patch v7 08/22] CIFS: SMBD: Upper layer connects to SMBDirect session
-Date: Tue,  7 Nov 2017 01:55:00 -0700
-Message-ID: <20171107085514.12693-9-longli@exchange.microsoft.com>
+From: Long Li <longli@exchange.microsoft.com>
+Subject: [Patch v7 17/22] CIFS: SMBD: Upper layer sends data via RDMA send
+Date: Tue,  7 Nov 2017 01:55:09 -0700
+Message-ID: <20171107085514.12693-18-longli@exchange.microsoft.com>
 References: <20171107085514.12693-1-longli@exchange.microsoft.com>
-Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-        Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Stephen Hemminger <sthemmin-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171107085514.12693-1-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: Long Li <longli@microsoft.com>
+To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Tom Talpey <ttalpey@microsoft.com>,
+        Matthew Wilcox <mawilcox@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20171107085514.12693-1-longli@exchange.microsoft.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+From: Long Li <longli@microsoft.com>
 
-When "rdma" is specified in the mount option, make CIFS connect to
-SMB Direct.
+With SMB Direct connected, use it for sending data via RDMA send.
 
-Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/connect.c | 22 +++++++++++++++++++---
- 1 file changed, 19 insertions(+), 3 deletions(-)
+ fs/cifs/transport.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index b5a575f..75eb50b 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -44,7 +44,6 @@
- #include <net/ipv6.h>
- #include <linux/parser.h>
- #include <linux/bvec.h>
--
- #include "cifspdu.h"
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 7efbab0..bb9ffdd 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -37,6 +37,7 @@
  #include "cifsglob.h"
  #include "cifsproto.h"
-@@ -56,6 +55,7 @@
- #include "rfc1002pdu.h"
- #include "fscache.h"
- #include "smb2proto.h"
+ #include "cifs_debug.h"
 +#include "smbdirect.h"
  
- #define CIFS_PORT 445
- #define RFC1001_PORT 139
-@@ -2279,13 +2279,29 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 		tcp_ses->echo_interval = volume_info->echo_interval * HZ;
- 	else
- 		tcp_ses->echo_interval = SMB_ECHO_INTERVAL_DEFAULT * HZ;
+ void
+ cifs_wake_up_task(struct mid_q_entry *mid)
+@@ -229,7 +230,10 @@ __smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ 	struct socket *ssocket = server->ssocket;
+ 	struct msghdr smb_msg;
+ 	int val = 1;
 -
-+	if (tcp_ses->rdma) {
-+#ifndef CONFIG_CIFS_SMB_DIRECT
-+		cifs_dbg(VFS, "CONFIG_CIFS_SMB_DIRECT is not enabled\n");
-+		rc = -ENOENT;
-+		goto out_err_crypto_release;
-+#endif
-+		tcp_ses->smbd_conn = smbd_get_connection(
-+			tcp_ses, (struct sockaddr *)&volume_info->dstaddr);
-+		if (tcp_ses->smbd_conn) {
-+			cifs_dbg(VFS, "RDMA transport established\n");
-+			rc = 0;
-+			goto smbd_connected;
-+		} else {
-+			rc = -ENOENT;
-+			goto out_err_crypto_release;
-+		}
++	if (cifs_rdma_enabled(server) && server->smbd_conn) {
++		rc = smbd_send(server->smbd_conn, rqst);
++		goto smbd_done;
 +	}
- 	rc = ip_connect(tcp_ses);
- 	if (rc < 0) {
- 		cifs_dbg(VFS, "Error connecting to socket. Aborting operation.\n");
- 		goto out_err_crypto_release;
+ 	if (ssocket == NULL)
+ 		return -ENOTSOCK;
+ 
+@@ -298,7 +302,7 @@ __smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ 		 */
+ 		server->tcpStatus = CifsNeedReconnect;
  	}
 -
-+smbd_connected:
- 	/*
- 	 * since we're in a cifs function already, we know that
- 	 * this will succeed. No need for try_module_get().
++smbd_done:
+ 	if (rc < 0 && rc != -EINTR)
+ 		cifs_dbg(VFS, "Error %d sending data on socket to server\n",
+ 			 rc);
 -- 
 2.7.4
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
