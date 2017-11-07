@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v7 04/22] CIFS: SMBD: Add SMB Direct protocol initial values and constants
-Date: Tue,  7 Nov 2017 01:54:56 -0700
-Message-ID: <20171107085514.12693-5-longli@exchange.microsoft.com>
+Subject: [Patch v7 18/22] CIFS: SMBD: Implement RDMA memory registration
+Date: Tue,  7 Nov 2017 01:55:10 -0700
+Message-ID: <20171107085514.12693-19-longli@exchange.microsoft.com>
 References: <20171107085514.12693-1-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -17,126 +17,529 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-To prepare for protocol implementation, add constants and user-configurable
-values for the SMB Direct protocol.
+Memory registration is used for transferring payload via RDMA read or write.
+After I/O is done, memory registrations are recovered and reused. This
+process can be time consuming and is done in a work queue.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/smbdirect.c | 77 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smbdirect.h | 21 +++++++++++++++
- 2 files changed, 98 insertions(+)
- create mode 100644 fs/cifs/smbdirect.c
- create mode 100644 fs/cifs/smbdirect.h
+ fs/cifs/smbdirect.c | 421 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smbdirect.h |  23 +++
+ 2 files changed, 444 insertions(+)
 
 diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-new file mode 100644
-index 0000000..d3c16f8
---- /dev/null
+index 0705f49..5c50c8a 100644
+--- a/fs/cifs/smbdirect.c
 +++ b/fs/cifs/smbdirect.c
-@@ -0,0 +1,77 @@
+@@ -49,6 +49,9 @@ static int smbd_post_send_page(struct smbd_connection *info,
+ 		struct page *page, unsigned long offset,
+ 		size_t size, int remaining_data_length);
+ 
++static void destroy_mr_list(struct smbd_connection *info);
++static int allocate_mr_list(struct smbd_connection *info);
++
+ /* SMBD version number */
+ #define SMBD_V1	0x0100
+ 
+@@ -199,6 +202,12 @@ static void smbd_destroy_rdma_work(struct work_struct *work)
+ 	wait_event(info->wait_send_payload_pending,
+ 		atomic_read(&info->send_payload_pending) == 0);
+ 
++	log_rdma_event(INFO, "freeing mr list\n");
++	wake_up_interruptible_all(&info->wait_mr);
++	wait_event(info->wait_for_mr_cleanup,
++		atomic_read(&info->mr_used_count) == 0);
++	destroy_mr_list(info);
++
+ 	/* It's not posssible for upper layer to get to reassembly */
+ 	log_rdma_event(INFO, "drain the reassembly queue\n");
+ 	do {
+@@ -455,6 +464,16 @@ static bool process_negotiation_response(
+ 	}
+ 	info->max_fragmented_send_size =
+ 		le32_to_cpu(packet->max_fragmented_size);
++	info->rdma_readwrite_threshold =
++		rdma_readwrite_threshold > info->max_fragmented_send_size ?
++		info->max_fragmented_send_size :
++		rdma_readwrite_threshold;
++
++
++	info->max_readwrite_size = min_t(u32,
++			le32_to_cpu(packet->max_readwrite_size),
++			info->max_frmr_depth * PAGE_SIZE);
++	info->max_frmr_depth = info->max_readwrite_size / PAGE_SIZE;
+ 
+ 	return true;
+ }
+@@ -750,6 +769,12 @@ static int smbd_ia_open(
+ 		rc = -EPROTONOSUPPORT;
+ 		goto out2;
+ 	}
++	info->max_frmr_depth = min_t(int,
++		smbd_max_frmr_depth,
++		info->id->device->attrs.max_fast_reg_page_list_len);
++	info->mr_type = IB_MR_TYPE_MEM_REG;
++	if (info->id->device->attrs.device_cap_flags & IB_DEVICE_SG_GAPS_REG)
++		info->mr_type = IB_MR_TYPE_SG_GAPS;
+ 
+ 	info->pd = ib_alloc_pd(info->id->device, 0);
+ 	if (IS_ERR(info->pd)) {
+@@ -1587,6 +1612,8 @@ struct smbd_connection *_smbd_get_connection(
+ 	struct rdma_conn_param conn_param;
+ 	struct ib_qp_init_attr qp_attr;
+ 	struct sockaddr_in *addr_in = (struct sockaddr_in *) dstaddr;
++	struct ib_port_immutable port_immutable;
++	u32 ird_ord_hdr[2];
+ 
+ 	info = kzalloc(sizeof(struct smbd_connection), GFP_KERNEL);
+ 	if (!info)
+@@ -1675,6 +1702,28 @@ struct smbd_connection *_smbd_get_connection(
+ 	memset(&conn_param, 0, sizeof(conn_param));
+ 	conn_param.initiator_depth = 0;
+ 
++	conn_param.responder_resources =
++		info->id->device->attrs.max_qp_rd_atom
++			< SMBD_CM_RESPONDER_RESOURCES ?
++		info->id->device->attrs.max_qp_rd_atom :
++		SMBD_CM_RESPONDER_RESOURCES;
++	info->responder_resources = conn_param.responder_resources;
++	log_rdma_mr(INFO, "responder_resources=%d\n",
++		info->responder_resources);
++
++	/* Need to send IRD/ORD in private data for iWARP */
++	info->id->device->get_port_immutable(
++		info->id->device, info->id->port_num, &port_immutable);
++	if (port_immutable.core_cap_flags & RDMA_CORE_PORT_IWARP) {
++		ird_ord_hdr[0] = info->responder_resources;
++		ird_ord_hdr[1] = 1;
++		conn_param.private_data = ird_ord_hdr;
++		conn_param.private_data_len = sizeof(ird_ord_hdr);
++	} else {
++		conn_param.private_data = NULL;
++		conn_param.private_data_len = 0;
++	}
++
+ 	conn_param.retry_count = SMBD_CM_RETRY;
+ 	conn_param.rnr_retry_count = SMBD_CM_RNR_RETRY;
+ 	conn_param.flow_control = 0;
+@@ -1739,8 +1788,19 @@ struct smbd_connection *_smbd_get_connection(
+ 		goto negotiation_failed;
+ 	}
+ 
++	rc = allocate_mr_list(info);
++	if (rc) {
++		log_rdma_mr(ERR, "memory registration allocation failed\n");
++		goto allocate_mr_failed;
++	}
++
+ 	return info;
+ 
++allocate_mr_failed:
++	/* At this point, need to a full transport shutdown */
++	smbd_destroy(info);
++	return NULL;
++
+ negotiation_failed:
+ 	cancel_delayed_work_sync(&info->idle_timer_work);
+ 	destroy_caches_and_workqueue(info);
+@@ -2194,3 +2254,364 @@ int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst)
+ 
+ 	return rc;
+ }
++
++static void register_mr_done(struct ib_cq *cq, struct ib_wc *wc)
++{
++	struct smbd_mr *mr;
++	struct ib_cqe *cqe;
++
++	if (wc->status) {
++		log_rdma_mr(ERR, "status=%d\n", wc->status);
++		cqe = wc->wr_cqe;
++		mr = container_of(cqe, struct smbd_mr, cqe);
++		smbd_disconnect_rdma_connection(mr->conn);
++	}
++}
++
 +/*
-+ *   Copyright (C) 2017, Microsoft Corporation.
-+ *
-+ *   Author(s): Long Li <longli@microsoft.com>
-+ *
-+ *   This program is free software;  you can redistribute it and/or modify
-+ *   it under the terms of the GNU General Public License as published by
-+ *   the Free Software Foundation; either version 2 of the License, or
-+ *   (at your option) any later version.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-+ *   the GNU General Public License for more details.
++ * The work queue function that recovers MRs
++ * We need to call ib_dereg_mr() and ib_alloc_mr() before this MR can be used
++ * again. Both calls are slow, so finish them in a workqueue. This will not
++ * block I/O path.
++ * There is one workqueue that recovers MRs, there is no need to lock as the
++ * I/O requests calling smbd_register_mr will never update the links in the
++ * mr_list.
 + */
-+#include "smbdirect.h"
++static void smbd_mr_recovery_work(struct work_struct *work)
++{
++	struct smbd_connection *info =
++		container_of(work, struct smbd_connection, mr_recovery_work);
++	struct smbd_mr *smbdirect_mr;
++	int rc;
 +
-+/* SMBD version number */
-+#define SMBD_V1	0x0100
++	list_for_each_entry(smbdirect_mr, &info->mr_list, list) {
++		if (smbdirect_mr->state == MR_INVALIDATED ||
++			smbdirect_mr->state == MR_ERROR) {
 +
-+/* Port numbers for SMBD transport */
-+#define SMB_PORT	445
-+#define SMBD_PORT	5445
++			if (smbdirect_mr->state == MR_INVALIDATED) {
++				ib_dma_unmap_sg(
++					info->id->device, smbdirect_mr->sgl,
++					smbdirect_mr->sgl_count,
++					smbdirect_mr->dir);
++				smbdirect_mr->state = MR_READY;
++			} else if (smbdirect_mr->state == MR_ERROR) {
 +
-+/* Address lookup and resolve timeout in ms */
-+#define RDMA_RESOLVE_TIMEOUT	5000
++				/* recover this MR entry */
++				rc = ib_dereg_mr(smbdirect_mr->mr);
++				if (rc) {
++					log_rdma_mr(ERR,
++						"ib_dereg_mr faield rc=%x\n",
++						rc);
++					smbd_disconnect_rdma_connection(info);
++				}
 +
-+/* SMBD negotiation timeout in seconds */
-+#define SMBD_NEGOTIATE_TIMEOUT	120
++				smbdirect_mr->mr = ib_alloc_mr(
++					info->pd, info->mr_type,
++					info->max_frmr_depth);
++				if (IS_ERR(smbdirect_mr->mr)) {
++					log_rdma_mr(ERR,
++						"ib_alloc_mr failed mr_type=%x "
++						"max_frmr_depth=%x\n",
++						info->mr_type,
++						info->max_frmr_depth);
++					smbd_disconnect_rdma_connection(info);
++				}
 +
-+/* SMBD minimum receive size and fragmented sized defined in [MS-SMBD] */
-+#define SMBD_MIN_RECEIVE_SIZE		128
-+#define SMBD_MIN_FRAGMENTED_SIZE	131072
++				smbdirect_mr->state = MR_READY;
++			}
++			/* smbdirect_mr->state is updated by this function
++			 * and is read and updated by I/O issuing CPUs trying
++			 * to get a MR, the call to atomic_inc_return
++			 * implicates a memory barrier and guarantees this
++			 * value is updated before waking up any calls to
++			 * get_mr() from the I/O issuing CPUs
++			 */
++			if (atomic_inc_return(&info->mr_ready_count) == 1)
++				wake_up_interruptible(&info->wait_mr);
++		}
++	}
++}
++
++static void destroy_mr_list(struct smbd_connection *info)
++{
++	struct smbd_mr *mr, *tmp;
++
++	cancel_work_sync(&info->mr_recovery_work);
++	list_for_each_entry_safe(mr, tmp, &info->mr_list, list) {
++		if (mr->state == MR_INVALIDATED)
++			ib_dma_unmap_sg(info->id->device, mr->sgl,
++				mr->sgl_count, mr->dir);
++		ib_dereg_mr(mr->mr);
++		kfree(mr->sgl);
++		kfree(mr);
++	}
++}
 +
 +/*
-+ * Default maximum number of RDMA read/write outstanding on this connection
-+ * This value is possibly decreased during QP creation on hardware limit
++ * Allocate MRs used for RDMA read/write
++ * The number of MRs will not exceed hardware capability in responder_resources
++ * All MRs are kept in mr_list. The MR can be recovered after it's used
++ * Recovery is done in smbd_mr_recovery_work. The content of list entry changes
++ * as MRs are used and recovered for I/O, but the list links will not change
 + */
-+#define SMBD_CM_RESPONDER_RESOURCES	32
++static int allocate_mr_list(struct smbd_connection *info)
++{
++	int i;
++	struct smbd_mr *smbdirect_mr, *tmp;
 +
-+/* Maximum number of retries on data transfer operations */
-+#define SMBD_CM_RETRY			6
-+/* No need to retry on Receiver Not Ready since SMBD manages credits */
-+#define SMBD_CM_RNR_RETRY		0
++	INIT_LIST_HEAD(&info->mr_list);
++	init_waitqueue_head(&info->wait_mr);
++	spin_lock_init(&info->mr_list_lock);
++	atomic_set(&info->mr_ready_count, 0);
++	atomic_set(&info->mr_used_count, 0);
++	init_waitqueue_head(&info->wait_for_mr_cleanup);
++	/* Allocate more MRs (2x) than hardware responder_resources */
++	for (i = 0; i < info->responder_resources * 2; i++) {
++		smbdirect_mr = kzalloc(sizeof(*smbdirect_mr), GFP_KERNEL);
++		if (!smbdirect_mr)
++			goto out;
++		smbdirect_mr->mr = ib_alloc_mr(info->pd, info->mr_type,
++					info->max_frmr_depth);
++		if (IS_ERR(smbdirect_mr->mr)) {
++			log_rdma_mr(ERR, "ib_alloc_mr failed mr_type=%x "
++				"max_frmr_depth=%x\n",
++				info->mr_type, info->max_frmr_depth);
++			goto out;
++		}
++		smbdirect_mr->sgl = kcalloc(
++					info->max_frmr_depth,
++					sizeof(struct scatterlist),
++					GFP_KERNEL);
++		if (!smbdirect_mr->sgl) {
++			log_rdma_mr(ERR, "failed to allocate sgl\n");
++			ib_dereg_mr(smbdirect_mr->mr);
++			goto out;
++		}
++		smbdirect_mr->state = MR_READY;
++		smbdirect_mr->conn = info;
++
++		list_add_tail(&smbdirect_mr->list, &info->mr_list);
++		atomic_inc(&info->mr_ready_count);
++	}
++	INIT_WORK(&info->mr_recovery_work, smbd_mr_recovery_work);
++	return 0;
++
++out:
++	kfree(smbdirect_mr);
++
++	list_for_each_entry_safe(smbdirect_mr, tmp, &info->mr_list, list) {
++		ib_dereg_mr(smbdirect_mr->mr);
++		kfree(smbdirect_mr->sgl);
++		kfree(smbdirect_mr);
++	}
++	return -ENOMEM;
++}
 +
 +/*
-+ * User configurable initial values per SMBD transport connection
-+ * as defined in [MS-SMBD] 3.1.1.1
-+ * Those may change after a SMBD negotiation
++ * Get a MR from mr_list. This function waits until there is at least one
++ * MR available in the list. It may access the list while the
++ * smbd_mr_recovery_work is recovering the MR list. This doesn't need a lock
++ * as they never modify the same places. However, there may be several CPUs
++ * issueing I/O trying to get MR at the same time, mr_list_lock is used to
++ * protect this situation.
 + */
-+/* The local peer's maximum number of credits to grant to the peer */
-+int smbd_receive_credit_max = 255;
++static struct smbd_mr *get_mr(struct smbd_connection *info)
++{
++	struct smbd_mr *ret;
++	int rc;
++again:
++	rc = wait_event_interruptible(info->wait_mr,
++		atomic_read(&info->mr_ready_count) ||
++		info->transport_status != SMBD_CONNECTED);
++	if (rc) {
++		log_rdma_mr(ERR, "wait_event_interruptible rc=%x\n", rc);
++		return NULL;
++	}
 +
-+/* The remote peer's credit request of local peer */
-+int smbd_send_credit_target = 255;
++	if (info->transport_status != SMBD_CONNECTED) {
++		log_rdma_mr(ERR, "info->transport_status=%x\n",
++			info->transport_status);
++		return NULL;
++	}
 +
-+/* The maximum single message size can be sent to remote peer */
-+int smbd_max_send_size = 1364;
++	spin_lock(&info->mr_list_lock);
++	list_for_each_entry(ret, &info->mr_list, list) {
++		if (ret->state == MR_READY) {
++			ret->state = MR_REGISTERED;
++			spin_unlock(&info->mr_list_lock);
++			atomic_dec(&info->mr_ready_count);
++			atomic_inc(&info->mr_used_count);
++			return ret;
++		}
++	}
 +
-+/*  The maximum fragmented upper-layer payload receive size supported */
-+int smbd_max_fragmented_recv_size = 1024 * 1024;
-+
-+/*  The maximum single-message size which can be received */
-+int smbd_max_receive_size = 8192;
-+
-+/* The timeout to initiate send of a keepalive message on idle */
-+int smbd_keep_alive_interval = 120;
++	spin_unlock(&info->mr_list_lock);
++	/*
++	 * It is possible that we can get a MR because other processes may try
++	 * to acquire a MR at the same time. If this is the case, retry it.
++	 */
++	goto again;
++}
 +
 +/*
-+ * User configurable initial values for RDMA transport
-+ * The actual values used may be lower and are limited to hardware capabilities
++ * Register memory for RDMA read/write
++ * pages[]: the list of pages to register memory with
++ * num_pages: the number of pages to register
++ * tailsz: if non-zero, the bytes to register in the last page
++ * writing: true if this is a RDMA write (SMB read), false for RDMA read
++ * need_invalidate: true if this MR needs to be locally invalidated after I/O
++ * return value: the MR registered, NULL if failed.
 + */
-+/* Default maximum number of SGEs in a RDMA write/read */
-+int smbd_max_frmr_depth = 2048;
++struct smbd_mr *smbd_register_mr(
++	struct smbd_connection *info, struct page *pages[], int num_pages,
++	int tailsz, bool writing, bool need_invalidate)
++{
++	struct smbd_mr *smbdirect_mr;
++	int rc, i;
++	enum dma_data_direction dir;
++	struct ib_reg_wr *reg_wr;
++	struct ib_send_wr *bad_wr;
 +
-+/* If payload is less than this byte, use RDMA send/recv not read/write */
-+int rdma_readwrite_threshold = 4096;
++	if (num_pages > info->max_frmr_depth) {
++		log_rdma_mr(ERR, "num_pages=%d max_frmr_depth=%d\n",
++			num_pages, info->max_frmr_depth);
++		return NULL;
++	}
++
++	smbdirect_mr = get_mr(info);
++	if (!smbdirect_mr) {
++		log_rdma_mr(ERR, "get_mr returning NULL\n");
++		return NULL;
++	}
++	smbdirect_mr->need_invalidate = need_invalidate;
++	smbdirect_mr->sgl_count = num_pages;
++	sg_init_table(smbdirect_mr->sgl, num_pages);
++
++	for (i = 0; i < num_pages - 1; i++)
++		sg_set_page(&smbdirect_mr->sgl[i], pages[i], PAGE_SIZE, 0);
++
++	sg_set_page(&smbdirect_mr->sgl[i], pages[i],
++		tailsz ? tailsz : PAGE_SIZE, 0);
++
++	dir = writing ? DMA_FROM_DEVICE : DMA_TO_DEVICE;
++	smbdirect_mr->dir = dir;
++	rc = ib_dma_map_sg(info->id->device, smbdirect_mr->sgl, num_pages, dir);
++	if (!rc) {
++		log_rdma_mr(INFO, "ib_dma_map_sg num_pages=%x dir=%x rc=%x\n",
++			num_pages, dir, rc);
++		goto dma_map_error;
++	}
++
++	rc = ib_map_mr_sg(smbdirect_mr->mr, smbdirect_mr->sgl, num_pages,
++		NULL, PAGE_SIZE);
++	if (rc != num_pages) {
++		log_rdma_mr(INFO,
++			"ib_map_mr_sg failed rc = %x num_pages = %x\n",
++			rc, num_pages);
++		goto map_mr_error;
++	}
++
++	ib_update_fast_reg_key(smbdirect_mr->mr,
++		ib_inc_rkey(smbdirect_mr->mr->rkey));
++	reg_wr = &smbdirect_mr->wr;
++	reg_wr->wr.opcode = IB_WR_REG_MR;
++	smbdirect_mr->cqe.done = register_mr_done;
++	reg_wr->wr.wr_cqe = &smbdirect_mr->cqe;
++	reg_wr->wr.num_sge = 0;
++	reg_wr->wr.send_flags = IB_SEND_SIGNALED;
++	reg_wr->mr = smbdirect_mr->mr;
++	reg_wr->key = smbdirect_mr->mr->rkey;
++	reg_wr->access = writing ?
++			IB_ACCESS_REMOTE_WRITE | IB_ACCESS_LOCAL_WRITE :
++			IB_ACCESS_REMOTE_READ;
++
++	/*
++	 * There is no need for waiting for complemtion on ib_post_send
++	 * on IB_WR_REG_MR. Hardware enforces a barrier and order of execution
++	 * on the next ib_post_send when we actaully send I/O to remote peer
++	 */
++	rc = ib_post_send(info->id->qp, &reg_wr->wr, &bad_wr);
++	if (!rc)
++		return smbdirect_mr;
++
++	log_rdma_mr(ERR, "ib_post_send failed rc=%x reg_wr->key=%x\n",
++		rc, reg_wr->key);
++
++	/* If all failed, attempt to recover this MR by setting it MR_ERROR*/
++map_mr_error:
++	ib_dma_unmap_sg(info->id->device, smbdirect_mr->sgl,
++		smbdirect_mr->sgl_count, smbdirect_mr->dir);
++
++dma_map_error:
++	smbdirect_mr->state = MR_ERROR;
++	if (atomic_dec_and_test(&info->mr_used_count))
++		wake_up(&info->wait_for_mr_cleanup);
++
++	return NULL;
++}
++
++static void local_inv_done(struct ib_cq *cq, struct ib_wc *wc)
++{
++	struct smbd_mr *smbdirect_mr;
++	struct ib_cqe *cqe;
++
++	cqe = wc->wr_cqe;
++	smbdirect_mr = container_of(cqe, struct smbd_mr, cqe);
++	smbdirect_mr->state = MR_INVALIDATED;
++	if (wc->status != IB_WC_SUCCESS) {
++		log_rdma_mr(ERR, "invalidate failed status=%x\n", wc->status);
++		smbdirect_mr->state = MR_ERROR;
++	}
++	complete(&smbdirect_mr->invalidate_done);
++}
++
++/*
++ * Deregister a MR after I/O is done
++ * This function may wait if remote invalidation is not used
++ * and we have to locally invalidate the buffer to prevent data is being
++ * modified by remote peer after upper layer consumes it
++ */
++int smbd_deregister_mr(struct smbd_mr *smbdirect_mr)
++{
++	struct ib_send_wr *wr, *bad_wr;
++	struct smbd_connection *info = smbdirect_mr->conn;
++	int rc = 0;
++
++	if (smbdirect_mr->need_invalidate) {
++		/* Need to finish local invalidation before returning */
++		wr = &smbdirect_mr->inv_wr;
++		wr->opcode = IB_WR_LOCAL_INV;
++		smbdirect_mr->cqe.done = local_inv_done;
++		wr->wr_cqe = &smbdirect_mr->cqe;
++		wr->num_sge = 0;
++		wr->ex.invalidate_rkey = smbdirect_mr->mr->rkey;
++		wr->send_flags = IB_SEND_SIGNALED;
++
++		init_completion(&smbdirect_mr->invalidate_done);
++		rc = ib_post_send(info->id->qp, wr, &bad_wr);
++		if (rc) {
++			log_rdma_mr(ERR, "ib_post_send failed rc=%x\n", rc);
++			smbd_disconnect_rdma_connection(info);
++			goto done;
++		}
++		wait_for_completion(&smbdirect_mr->invalidate_done);
++		smbdirect_mr->need_invalidate = false;
++	} else
++		/*
++		 * For remote invalidation, just set it to MR_INVALIDATED
++		 * and defer to mr_recovery_work to recover the MR for next use
++		 */
++		smbdirect_mr->state = MR_INVALIDATED;
++
++	/*
++	 * Schedule the work to do MR recovery for future I/Os
++	 * MR recovery is slow and we don't want it to block the current I/O
++	 */
++	queue_work(info->workqueue, &info->mr_recovery_work);
++
++done:
++	if (atomic_dec_and_test(&info->mr_used_count))
++		wake_up(&info->wait_for_mr_cleanup);
++
++	return rc;
++}
 diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
-new file mode 100644
-index 0000000..c55f28b
---- /dev/null
+index e777d77..42c61d3 100644
+--- a/fs/cifs/smbdirect.h
 +++ b/fs/cifs/smbdirect.h
-@@ -0,0 +1,21 @@
-+/*
-+ *   Copyright (C) 2017, Microsoft Corporation.
-+ *
-+ *   Author(s): Long Li <longli@microsoft.com>
-+ *
-+ *   This program is free software;  you can redistribute it and/or modify
-+ *   it under the terms of the GNU General Public License as published by
-+ *   the Free Software Foundation; either version 2 of the License, or
-+ *   (at your option) any later version.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-+ *   the GNU General Public License for more details.
-+ */
-+#ifndef _SMBDIRECT_H
-+#define _SMBDIRECT_H
+@@ -90,6 +90,29 @@ struct smbd_connection {
+ 	int receive_credit_target;
+ 	int fragment_reassembly_remaining;
+ 
++	/* Memory registrations */
++	/* Maximum number of RDMA read/write outstanding on this connection */
++	int responder_resources;
++	/* Maximum number of SGEs in a RDMA write/read */
++	int max_frmr_depth;
++	/*
++	 * If payload is less than or equal to the threshold,
++	 * use RDMA send/recv to send upper layer I/O.
++	 * If payload is more than the threshold,
++	 * use RDMA read/write through memory registration for I/O.
++	 */
++	int rdma_readwrite_threshold;
++	enum ib_mr_type mr_type;
++	struct list_head mr_list;
++	spinlock_t mr_list_lock;
++	/* The number of available MRs ready for memory registration */
++	atomic_t mr_ready_count;
++	atomic_t mr_used_count;
++	wait_queue_head_t wait_mr;
++	struct work_struct mr_recovery_work;
++	/* Used by transport to wait until all MRs are returned */
++	wait_queue_head_t wait_for_mr_cleanup;
 +
-+/* Default maximum number of SGEs in a RDMA send/recv */
-+#define SMBDIRECT_MAX_SGE	16
-+#endif
+ 	/* Activity accoutning */
+ 	/* Pending reqeusts issued from upper layer */
+ 	int smbd_send_pending;
 -- 
 2.7.4
