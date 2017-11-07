@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v7 01/22] CIFS: SMBD: Add parameter rdata to smb2_new_read_req
-Date: Tue,  7 Nov 2017 01:54:53 -0700
-Message-ID: <20171107085514.12693-2-longli@exchange.microsoft.com>
+Subject: [Patch v7 20/22] CIFS: SMBD: Read correct returned data length for RDMA write (SMB read) I/O
+Date: Tue,  7 Nov 2017 01:55:12 -0700
+Message-ID: <20171107085514.12693-21-longli@exchange.microsoft.com>
 References: <20171107085514.12693-1-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -17,64 +17,135 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-This patch is for preparing upper layer for doing SMB read via RDMA write.
+This patch is for preparing upper layer doing SMB read via RDMA write.
 
-When we assemble the SMB read packet header, we need to know the I/O layout
-if this request is to use a RDMA write. rdata has all the information we need
-for memory registration. Add rdata to smb2_new_read_req.
+When RDMA write is used for SMB read, the returned data length is in
+DataRemaining in the response packet. Reading it properly by adding a
+parameter to specifiy where the returned data length is.
+
+Add the defition for memory registration to wdata and return the correct
+length based on if RDMA write is used.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/smb2pdu.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ fs/cifs/cifsglob.h | 13 +++++++++++--
+ fs/cifs/cifssmb.c  |  8 ++++++--
+ fs/cifs/smb1ops.c  |  4 +++-
+ fs/cifs/smb2ops.c  | 12 ++++++++++--
+ 4 files changed, 30 insertions(+), 7 deletions(-)
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index bab3da6..32ad590 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -2350,18 +2350,21 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
-  */
- static int
- smb2_new_read_req(void **buf, unsigned int *total_len,
--		  struct cifs_io_parms *io_parms, unsigned int remaining_bytes,
--		  int request_type)
-+	struct cifs_io_parms *io_parms, struct cifs_readdata *rdata,
-+	unsigned int remaining_bytes, int request_type)
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 66f210d..ab62755 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -228,8 +228,14 @@ struct smb_version_operations {
+ 	__u64 (*get_next_mid)(struct TCP_Server_Info *);
+ 	/* data offset from read response message */
+ 	unsigned int (*read_data_offset)(char *);
+-	/* data length from read response message */
+-	unsigned int (*read_data_length)(char *);
++	/*
++	 * Data length from read response message
++	 * When in_remaining is true, the returned data length is in
++	 * message field DataRemaining for out-of-band data read (e.g through
++	 * Memory Registration RDMA write in SMBD).
++	 * Otherwise, the returned data length is in message field DataLength.
++	 */
++	unsigned int (*read_data_length)(char *, bool in_remaining);
+ 	/* map smb to linux error */
+ 	int (*map_error)(char *, bool);
+ 	/* find mid corresponding to the response message */
+@@ -1146,6 +1152,9 @@ struct cifs_readdata {
+ 				struct cifs_readdata *rdata,
+ 				struct iov_iter *iter);
+ 	struct kvec			iov[2];
++#ifdef CONFIG_CIFS_SMB_DIRECT
++	struct smbd_mr			*mr;
++#endif
+ 	unsigned int			pagesz;
+ 	unsigned int			tailsz;
+ 	unsigned int			credits;
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index e012e3f..494ebb4 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -1443,6 +1443,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+ 	struct cifs_readdata *rdata = mid->callback_data;
+ 	char *buf = server->smallbuf;
+ 	unsigned int buflen = get_rfc1002_length(buf) + 4;
++	bool use_rdma_mr = false;
+ 
+ 	cifs_dbg(FYI, "%s: mid=%llu offset=%llu bytes=%u\n",
+ 		 __func__, mid->mid, rdata->offset, rdata->bytes);
+@@ -1531,8 +1532,11 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+ 		 rdata->iov[0].iov_base, server->total_read);
+ 
+ 	/* how much data is in the response? */
+-	data_len = server->ops->read_data_length(buf);
+-	if (data_offset + data_len > buflen) {
++#ifdef CONFIG_CIFS_SMB_DIRECT
++	use_rdma_mr = rdata->mr;
++#endif
++	data_len = server->ops->read_data_length(buf, use_rdma_mr);
++	if (!use_rdma_mr && (data_offset + data_len > buflen)) {
+ 		/* data_len is corrupt -- discard frame */
+ 		rdata->result = -EIO;
+ 		return cifs_readv_discard(server, mid);
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index a723df3..3d495e4 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -87,9 +87,11 @@ cifs_read_data_offset(char *buf)
+ }
+ 
+ static unsigned int
+-cifs_read_data_length(char *buf)
++cifs_read_data_length(char *buf, bool in_remaining)
  {
- 	int rc = -EACCES;
- 	struct smb2_read_plain_req *req = NULL;
- 	struct smb2_sync_hdr *shdr;
-+	struct TCP_Server_Info *server;
+ 	READ_RSP *rsp = (READ_RSP *)buf;
++	/* It's a bug reading remaining data for SMB1 packets */
++	WARN_ON(in_remaining);
+ 	return (le16_to_cpu(rsp->DataLengthHigh) << 16) +
+ 	       le16_to_cpu(rsp->DataLength);
+ }
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index abc8bd5..60273028 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -936,9 +936,13 @@ smb2_read_data_offset(char *buf)
+ }
  
- 	rc = smb2_plain_req_init(SMB2_READ, io_parms->tcon, (void **) &req,
- 				 total_len);
- 	if (rc)
- 		return rc;
--	if (io_parms->tcon->ses->server == NULL)
+ static unsigned int
+-smb2_read_data_length(char *buf)
++smb2_read_data_length(char *buf, bool in_remaining)
+ {
+ 	struct smb2_read_rsp *rsp = (struct smb2_read_rsp *)buf;
 +
-+	server = io_parms->tcon->ses->server;
-+	if (server == NULL)
- 		return -ECONNABORTED;
++	if (in_remaining)
++		return le32_to_cpu(rsp->DataRemaining);
++
+ 	return le32_to_cpu(rsp->DataLength);
+ }
  
- 	shdr = &req->sync_hdr;
-@@ -2489,7 +2492,8 @@ smb2_async_readv(struct cifs_readdata *rdata)
+@@ -2421,6 +2425,7 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+ 	struct iov_iter iter;
+ 	struct kvec iov;
+ 	int length;
++	bool use_rdma_mr = false;
  
- 	server = io_parms.tcon->ses->server;
+ 	if (shdr->Command != SMB2_READ) {
+ 		cifs_dbg(VFS, "only big read responses are supported\n");
+@@ -2447,7 +2452,10 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+ 	}
  
--	rc = smb2_new_read_req((void **) &buf, &total_len, &io_parms, 0, 0);
-+	rc = smb2_new_read_req(
-+		(void **) &buf, &total_len, &io_parms, rdata, 0, 0);
- 	if (rc) {
- 		if (rc == -EAGAIN && rdata->credits) {
- 			/* credits was reset by reconnect */
-@@ -2557,7 +2561,7 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
- 	struct cifs_ses *ses = io_parms->tcon->ses;
+ 	data_offset = server->ops->read_data_offset(buf) + 4;
+-	data_len = server->ops->read_data_length(buf);
++#ifdef CONFIG_CIFS_SMB_DIRECT
++	use_rdma_mr = rdata->mr;
++#endif
++	data_len = server->ops->read_data_length(buf, use_rdma_mr);
  
- 	*nbytes = 0;
--	rc = smb2_new_read_req((void **)&req, &total_len, io_parms, 0, 0);
-+	rc = smb2_new_read_req((void **)&req, &total_len, io_parms, NULL, 0, 0);
- 	if (rc)
- 		return rc;
- 
+ 	if (data_offset < server->vals->read_rsp_size) {
+ 		/*
 -- 
 2.7.4
