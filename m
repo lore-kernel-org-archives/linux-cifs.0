@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v7 13/22] CIFS: SMBD: Set SMB Direct maximum read or write size for I/O
-Date: Tue,  7 Nov 2017 01:55:05 -0700
-Message-ID: <20171107085514.12693-14-longli@exchange.microsoft.com>
+Subject: [Patch v7 21/22] CIFS: SMBD: Upper layer performs SMB read via RDMA write through memory registration
+Date: Tue,  7 Nov 2017 01:55:13 -0700
+Message-ID: <20171107085514.12693-22-longli@exchange.microsoft.com>
 References: <20171107085514.12693-1-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -17,52 +17,141 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-When connecting over SMB Direct, the transport negotiates its maximum I/O sizes
-with the server and determines how to choose to do RDMA send/recv vs
-read/write. Expose these maximum I/O sizes to upper layer so we will get the
-correct sized payloads.
+If I/O size is larger than rdma_readwrite_threshold, use RDMA write for
+SMB read by specifying channel SMB2_CHANNEL_RDMA_V1 or
+SMB2_CHANNEL_RDMA_V1_INVALIDATE in the SMB packet, depending on SMB dialect
+used. Append a smbd_buffer_descriptor_v1 to the end of the SMB packet and fill
+in other values to indicate this SMB read uses RDMA write.
+
+There is no need to read from the transport for incoming payload. At the time
+SMB read response comes back, the data is already transfered and placed in the
+pages by RDMA hardware.
+
+When SMB read is finished, deregister the memory regions if RDMA write is used
+for this SMB read. smbd_deregister_mr may need to do local invalidation and
+sleep, if server remote invalidation is not used.
+
+There are situations where the MID may not be created on I/O failure, under
+which memory region is deregistered when read data context is released.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/smb2ops.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ fs/cifs/file.c    | 17 +++++++++++++++--
+ fs/cifs/smb2pdu.c | 45 ++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 59 insertions(+), 3 deletions(-)
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index fb2934b..abc8bd5 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -32,6 +32,7 @@
- #include "smb2status.h"
- #include "smb2glob.h"
- #include "cifs_ioctl.h"
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 0786f19..464776a 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -42,7 +42,7 @@
+ #include "cifs_debug.h"
+ #include "cifs_fs_sb.h"
+ #include "fscache.h"
+-
 +#include "smbdirect.h"
  
- static int
- change_conf(struct TCP_Server_Info *server)
-@@ -250,7 +251,11 @@ smb2_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
- 	/* start with specified wsize, or default */
- 	wsize = volume_info->wsize ? volume_info->wsize : CIFS_DEFAULT_IOSIZE;
- 	wsize = min_t(unsigned int, wsize, server->max_write);
+ static inline int cifs_convert_flags(unsigned int flags)
+ {
+@@ -2908,7 +2908,12 @@ cifs_readdata_release(struct kref *refcount)
+ {
+ 	struct cifs_readdata *rdata = container_of(refcount,
+ 					struct cifs_readdata, refcount);
 -
 +#ifdef CONFIG_CIFS_SMB_DIRECT
-+	if (server->rdma)
-+		wsize = min_t(unsigned int,
-+				wsize, server->smbd_conn->max_readwrite_size);
++	if (rdata->mr) {
++		smbd_deregister_mr(rdata->mr);
++		rdata->mr = NULL;
++	}
 +#endif
- 	if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
- 		wsize = min_t(unsigned int, wsize, SMB2_MAX_BUFFER_SIZE);
+ 	if (rdata->cfile)
+ 		cifsFileInfo_put(rdata->cfile);
  
-@@ -266,6 +271,11 @@ smb2_negotiate_rsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
- 	/* start with specified rsize, or default */
- 	rsize = volume_info->rsize ? volume_info->rsize : CIFS_DEFAULT_IOSIZE;
- 	rsize = min_t(unsigned int, rsize, server->max_read);
+@@ -3037,6 +3042,10 @@ uncached_fill_pages(struct TCP_Server_Info *server,
+ 		}
+ 		if (iter)
+ 			result = copy_page_from_iter(page, 0, n, iter);
 +#ifdef CONFIG_CIFS_SMB_DIRECT
-+	if (server->rdma)
-+		rsize = min_t(unsigned int,
-+				rsize, server->smbd_conn->max_readwrite_size);
++		else if (rdata->mr)
++			result = n;
 +#endif
+ 		else
+ 			result = cifs_read_page_from_socket(server, page, n);
+ 		if (result < 0)
+@@ -3606,6 +3615,10 @@ readpages_fill_pages(struct TCP_Server_Info *server,
  
- 	if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
- 		rsize = min_t(unsigned int, rsize, SMB2_MAX_BUFFER_SIZE);
+ 		if (iter)
+ 			result = copy_page_from_iter(page, 0, n, iter);
++#ifdef CONFIG_CIFS_SMB_DIRECT
++		else if (rdata->mr)
++			result = n;
++#endif
+ 		else
+ 			result = cifs_read_page_from_socket(server, page, n);
+ 		if (result < 0)
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index c8afb83..8a5ff90 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -2379,7 +2379,40 @@ smb2_new_read_req(void **buf, unsigned int *total_len,
+ 	req->MinimumCount = 0;
+ 	req->Length = cpu_to_le32(io_parms->length);
+ 	req->Offset = cpu_to_le64(io_parms->offset);
++#ifdef CONFIG_CIFS_SMB_DIRECT
++	/*
++	 * If we want to do a RDMA write, fill in and append
++	 * smbd_buffer_descriptor_v1 to the end of read request
++	 */
++	if (server->rdma && rdata &&
++		rdata->bytes >= server->smbd_conn->rdma_readwrite_threshold) {
++
++		struct smbd_buffer_descriptor_v1 *v1;
++		bool need_invalidate =
++			io_parms->tcon->ses->server->dialect == SMB30_PROT_ID;
++
++		rdata->mr = smbd_register_mr(
++				server->smbd_conn, rdata->pages,
++				rdata->nr_pages, rdata->tailsz,
++				true, need_invalidate);
++		if (!rdata->mr)
++			return -ENOBUFS;
++
++		req->Channel = SMB2_CHANNEL_RDMA_V1_INVALIDATE;
++		if (need_invalidate)
++			req->Channel = SMB2_CHANNEL_RDMA_V1;
++		req->ReadChannelInfoOffset =
++			offsetof(struct smb2_read_plain_req, Buffer);
++		req->ReadChannelInfoLength =
++			sizeof(struct smbd_buffer_descriptor_v1);
++		v1 = (struct smbd_buffer_descriptor_v1 *) &req->Buffer[0];
++		v1->offset = rdata->mr->mr->iova;
++		v1->token = rdata->mr->mr->rkey;
++		v1->length = rdata->mr->mr->length;
+ 
++		*total_len += sizeof(*v1) - 1;
++	}
++#endif
+ 	if (request_type & CHAINED_REQUEST) {
+ 		if (!(request_type & END_OF_CHAIN)) {
+ 			/* next 8-byte aligned request */
+@@ -2458,7 +2491,17 @@ smb2_readv_callback(struct mid_q_entry *mid)
+ 		if (rdata->result != -ENODATA)
+ 			rdata->result = -EIO;
+ 	}
+-
++#ifdef CONFIG_CIFS_SMB_DIRECT
++	/*
++	 * If this rdata has a memmory registered, the MR can be freed
++	 * MR needs to be freed as soon as I/O finishes to prevent deadlock
++	 * because they have limited number and are used for future I/Os
++	 */
++	if (rdata->mr) {
++		smbd_deregister_mr(rdata->mr);
++		rdata->mr = NULL;
++	}
++#endif
+ 	if (rdata->result)
+ 		cifs_stats_fail_inc(tcon, SMB2_READ_HE);
+ 
 -- 
 2.7.4
