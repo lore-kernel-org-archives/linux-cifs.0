@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v7 14/22] CIFS: SMBD: Implement function to receive data via RDMA receive
-Date: Tue,  7 Nov 2017 01:55:06 -0700
-Message-ID: <20171107085514.12693-15-longli@exchange.microsoft.com>
+Subject: [Patch v7 19/22] CIFS: SMBD: Upper layer performs SMB write via RDMA read through memory registration
+Date: Tue,  7 Nov 2017 01:55:11 -0700
+Message-ID: <20171107085514.12693-20-longli@exchange.microsoft.com>
 References: <20171107085514.12693-1-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -17,292 +17,166 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-On the receive path, the transport maintains receive buffers and a reassembly
-queue for transferring payload via RDMA recv. There is data copy in the
-transport on recv when it copies the payload to upper layer.
+When sending I/O, if size is larger than rdma_readwrite_threshold we prepare
+to send SMB write packet for a RDMA read via memory registration. The actual
+I/O is done by remote peer through local RDMA hardware. Modify the relevant
+fields in the packet accordingly, and append a smbd_buffer_descriptor_v1 to
+the end of the SMB write packet.
 
-The transport recognizes the RFC1002 header length use in the SMB
-upper layer payloads in CIFS. Because this length is mainly used for TCP and
-not applicable to RDMA, it is handled as a out-of-band information and is
-never sent over the wire, and the trasnport behaves like TCP to upper layer
-by processing and exposing the length correctly on data payloads.
+On write I/O finish, deregister the memory region if this was for a RDMA read.
+If remote invalidation is not used, the call to smbd_deregister_mr will do
+local invalidation and possibly wait. Memory region is normally deregistered
+in MID callback as soon as it's used. There are situations where the MID may
+not be created on I/O failure, under which memory region is deregistered when
+write data context is released.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/smbdirect.c | 228 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smbdirect.h |   3 +
- 2 files changed, 231 insertions(+)
+ fs/cifs/cifsglob.h |  3 +++
+ fs/cifs/cifssmb.c  |  7 ++++++
+ fs/cifs/smb2pdu.c  | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 3 files changed, 72 insertions(+), 4 deletions(-)
 
-diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index a8e7239..5a08015 100644
---- a/fs/cifs/smbdirect.c
-+++ b/fs/cifs/smbdirect.c
-@@ -14,6 +14,7 @@
-  *   the GNU General Public License for more details.
-  */
- #include <linux/module.h>
-+#include <linux/highmem.h>
- #include "smbdirect.h"
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 5585516..66f210d 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -1168,6 +1168,9 @@ struct cifs_writedata {
+ 	pid_t				pid;
+ 	unsigned int			bytes;
+ 	int				result;
++#ifdef CONFIG_CIFS_SMB_DIRECT
++	struct smbd_mr			*mr;
++#endif
+ 	unsigned int			pagesz;
+ 	unsigned int			tailsz;
+ 	unsigned int			credits;
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 5857009..e012e3f 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -43,6 +43,7 @@
+ #include "cifs_unicode.h"
  #include "cifs_debug.h"
+ #include "fscache.h"
++#include "smbdirect.h"
  
-@@ -179,6 +180,8 @@ static void smbd_destroy_rdma_work(struct work_struct *work)
+ #ifdef CONFIG_CIFS_POSIX
+ static struct {
+@@ -1911,6 +1912,12 @@ cifs_writedata_release(struct kref *refcount)
+ {
+ 	struct cifs_writedata *wdata = container_of(refcount,
+ 					struct cifs_writedata, refcount);
++#ifdef CONFIG_CIFS_SMB_DIRECT
++	if (wdata->mr) {
++		smbd_deregister_mr(wdata->mr);
++		wdata->mr = NULL;
++	}
++#endif
  
- 	log_rdma_event(INFO, "wait for all recv to finish\n");
- 	wake_up_interruptible(&info->wait_reassembly_queue);
-+	wait_event(info->wait_smbd_recv_pending,
-+		info->smbd_recv_pending == 0);
+ 	if (wdata->cfile)
+ 		cifsFileInfo_put(wdata->cfile);
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 32ad590..c8afb83 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -48,6 +48,7 @@
+ #include "smb2glob.h"
+ #include "cifspdu.h"
+ #include "cifs_spnego.h"
++#include "smbdirect.h"
  
- 	log_rdma_event(INFO, "wait for all send posted to IB to finish\n");
- 	wait_event(info->wait_send_pending,
-@@ -1654,6 +1657,9 @@ struct smbd_connection *_smbd_get_connection(
- 	queue_delayed_work(info->workqueue, &info->idle_timer_work,
- 		info->keep_alive_interval*HZ);
- 
-+	init_waitqueue_head(&info->wait_smbd_recv_pending);
-+	info->smbd_recv_pending = 0;
-+
- 	init_waitqueue_head(&info->wait_send_pending);
- 	atomic_set(&info->send_pending, 0);
- 
-@@ -1720,3 +1726,225 @@ struct smbd_connection *smbd_get_connection(
+ /*
+  *  The following table defines the expected "StructureSize" of SMB2 requests
+@@ -2656,7 +2657,19 @@ smb2_writev_callback(struct mid_q_entry *mid)
+ 		wdata->result = -EIO;
+ 		break;
  	}
- 	return ret;
- }
-+
-+/*
-+ * Receive data from receive reassembly queue
-+ * All the incoming data packets are placed in reassembly queue
-+ * buf: the buffer to read data into
-+ * size: the length of data to read
-+ * return value: actual data read
-+ * Note: this implementation copies the data from reassebmly queue to receive
-+ * buffers used by upper layer. This is not the optimal code path. A better way
-+ * to do it is to not have upper layer allocate its receive buffers but rather
-+ * borrow the buffer from reassembly queue, and return it after data is
-+ * consumed. But this will require more changes to upper layer code, and also
-+ * need to consider packet boundaries while they still being reassembled.
-+ */
-+int smbd_recv_buf(struct smbd_connection *info, char *buf, unsigned int size)
-+{
-+	struct smbd_response *response;
-+	struct smbd_data_transfer *data_transfer;
-+	int to_copy, to_read, data_read, offset;
-+	u32 data_length, remaining_data_length, data_offset;
-+	int rc;
-+	unsigned long flags;
-+
-+again:
-+	if (info->transport_status != SMBD_CONNECTED) {
-+		log_read(ERR, "disconnected\n");
-+		return -ENODEV;
-+	}
-+
+-
++#ifdef CONFIG_CIFS_SMB_DIRECT
 +	/*
-+	 * No need to hold the reassembly queue lock all the time as we are
-+	 * the only one reading from the front of the queue. The transport
-+	 * may add more entries to the back of the queeu at the same time
++	 * If this wdata has a memory registered, the MR can be freed
++	 * The number of MRs available is limited, it's important to recover
++	 * used MR as soon as I/O is finished. Hold MR longer in the later
++	 * I/O process can possibly result in I/O deadlock due to lack of MR
++	 * to send request on I/O retry
 +	 */
-+	log_read(INFO, "size=%d info->reassembly_data_length=%d\n", size,
-+		info->reassembly_data_length);
-+	if (info->reassembly_data_length >= size) {
-+		int queue_length;
-+		int queue_removed = 0;
++	if (wdata->mr) {
++		smbd_deregister_mr(wdata->mr);
++		wdata->mr = NULL;
++	}
++#endif
+ 	if (wdata->result)
+ 		cifs_stats_fail_inc(tcon, SMB2_WRITE_HE);
+ 
+@@ -2707,7 +2720,42 @@ smb2_async_writev(struct cifs_writedata *wdata,
+ 	req->DataOffset = cpu_to_le16(
+ 				offsetof(struct smb2_write_req, Buffer) - 4);
+ 	req->RemainingBytes = 0;
+-
++#ifdef CONFIG_CIFS_SMB_DIRECT
++	/*
++	 * If we want to do a server RDMA read, fill in and append
++	 * smbd_buffer_descriptor_v1 to the end of write request
++	 */
++	if (server->rdma && wdata->bytes >=
++		server->smbd_conn->rdma_readwrite_threshold) {
 +
-+		/*
-+		 * Need to make sure reassembly_data_length is read before
-+		 * reading reassembly_queue_length and calling
-+		 * _get_first_reassembly. This call is lock free
-+		 * as we never read at the end of the queue which are being
-+		 * updated in SOFTIRQ as more data is received
-+		 */
-+		virt_rmb();
-+		queue_length = info->reassembly_queue_length;
-+		data_read = 0;
-+		to_read = size;
-+		offset = info->first_entry_offset;
-+		while (data_read < size) {
-+			response = _get_first_reassembly(info);
-+			data_transfer = smbd_response_payload(response);
-+			data_length = le32_to_cpu(data_transfer->data_length);
-+			remaining_data_length =
-+				le32_to_cpu(
-+					data_transfer->remaining_data_length);
-+			data_offset = le32_to_cpu(data_transfer->data_offset);
++		struct smbd_buffer_descriptor_v1 *v1;
++		bool need_invalidate = server->dialect == SMB30_PROT_ID;
 +
-+			/*
-+			 * The upper layer expects RFC1002 length at the
-+			 * beginning of the payload. Return it to indicate
-+			 * the total length of the packet. This minimize the
-+			 * change to upper layer packet processing logic. This
-+			 * will be eventually remove when an intermediate
-+			 * transport layer is added
-+			 */
-+			if (response->first_segment && size == 4) {
-+				unsigned int rfc1002_len =
-+					data_length + remaining_data_length;
-+				*((__be32 *)buf) = cpu_to_be32(rfc1002_len);
-+				data_read = 4;
-+				response->first_segment = false;
-+				log_read(INFO, "returning rfc1002 length %d\n",
-+					rfc1002_len);
-+				goto read_rfc1002_done;
-+			}
-+
-+			to_copy = min_t(int, data_length - offset, to_read);
-+			memcpy(
-+				buf + data_read,
-+				(char *)data_transfer + data_offset + offset,
-+				to_copy);
-+
-+			/* move on to the next buffer? */
-+			if (to_copy == data_length - offset) {
-+				queue_length--;
-+				/*
-+				 * No need to lock if we are not at the
-+				 * end of the queue
-+				 */
-+				if (!queue_length)
-+					spin_lock_irqsave(
-+						&info->reassembly_queue_lock,
-+						flags);
-+				list_del(&response->list);
-+				queue_removed++;
-+				if (!queue_length)
-+					spin_unlock_irqrestore(
-+						&info->reassembly_queue_lock,
-+						flags);
-+
-+				info->count_reassembly_queue--;
-+				info->count_dequeue_reassembly_queue++;
-+				put_receive_buffer(info, response, true);
-+				offset = 0;
-+				log_read(INFO, "put_receive_buffer offset=0\n");
-+			} else
-+				offset += to_copy;
-+
-+			to_read -= to_copy;
-+			data_read += to_copy;
-+
-+			log_read(INFO, "_get_first_reassembly memcpy %d bytes "
-+				"data_transfer_length-offset=%d after that "
-+				"to_read=%d data_read=%d offset=%d\n",
-+				to_copy, data_length - offset,
-+				to_read, data_read, offset);
++		wdata->mr = smbd_register_mr(
++				server->smbd_conn, wdata->pages,
++				wdata->nr_pages, wdata->tailsz,
++				false, need_invalidate);
++		if (!wdata->mr) {
++			rc = -ENOBUFS;
++			goto async_writev_out;
 +		}
-+
-+		spin_lock_irqsave(&info->reassembly_queue_lock, flags);
-+		info->reassembly_data_length -= data_read;
-+		info->reassembly_queue_length -= queue_removed;
-+		spin_unlock_irqrestore(&info->reassembly_queue_lock, flags);
-+
-+		info->first_entry_offset = offset;
-+		log_read(INFO, "returning to thread data_read=%d "
-+			"reassembly_data_length=%d first_entry_offset=%d\n",
-+			data_read, info->reassembly_data_length,
-+			info->first_entry_offset);
-+read_rfc1002_done:
-+		return data_read;
++		req->Length = 0;
++		req->DataOffset = 0;
++		req->RemainingBytes =
++			(wdata->nr_pages-1)*PAGE_SIZE + wdata->tailsz;
++		req->Channel = SMB2_CHANNEL_RDMA_V1_INVALIDATE;
++		if (need_invalidate)
++			req->Channel = SMB2_CHANNEL_RDMA_V1;
++		req->WriteChannelInfoOffset =
++			offsetof(struct smb2_write_req, Buffer) - 4;
++		req->WriteChannelInfoLength =
++			sizeof(struct smbd_buffer_descriptor_v1);
++		v1 = (struct smbd_buffer_descriptor_v1 *) &req->Buffer[0];
++		v1->offset = wdata->mr->mr->iova;
++		v1->token = wdata->mr->mr->rkey;
++		v1->length = wdata->mr->mr->length;
 +	}
-+
-+	log_read(INFO, "wait_event on more data\n");
-+	rc = wait_event_interruptible(
-+		info->wait_reassembly_queue,
-+		info->reassembly_data_length >= size ||
-+			info->transport_status != SMBD_CONNECTED);
-+	/* Don't return any data if interrupted */
-+	if (rc)
-+		return -ENODEV;
-+
-+	goto again;
-+}
-+
-+/*
-+ * Receive a page from receive reassembly queue
-+ * page: the page to read data into
-+ * to_read: the length of data to read
-+ * return value: actual data read
-+ */
-+int smbd_recv_page(struct smbd_connection *info,
-+		struct page *page, unsigned int to_read)
-+{
-+	int ret;
-+	char *to_address;
-+
-+	/* make sure we have the page ready for read */
-+	ret = wait_event_interruptible(
-+		info->wait_reassembly_queue,
-+		info->reassembly_data_length >= to_read ||
-+			info->transport_status != SMBD_CONNECTED);
-+	if (ret)
-+		return 0;
-+
-+	/* now we can read from reassembly queue and not sleep */
-+	to_address = kmap_atomic(page);
-+
-+	log_read(INFO, "reading from page=%p address=%p to_read=%d\n",
-+		page, to_address, to_read);
-+
-+	ret = smbd_recv_buf(info, to_address, to_read);
-+	kunmap_atomic(to_address);
-+
-+	return ret;
-+}
-+
-+/*
-+ * Receive data from transport
-+ * msg: a msghdr point to the buffer, can be ITER_KVEC or ITER_BVEC
-+ * return: total bytes read, or 0. SMB Direct will not do partial read.
-+ */
-+int smbd_recv(struct smbd_connection *info, struct msghdr *msg)
-+{
-+	char *buf;
-+	struct page *page;
-+	unsigned int to_read;
-+	int rc;
-+
-+	info->smbd_recv_pending++;
-+
-+	switch (msg->msg_iter.type) {
-+	case READ | ITER_KVEC:
-+		buf = msg->msg_iter.kvec->iov_base;
-+		to_read = msg->msg_iter.kvec->iov_len;
-+		rc = smbd_recv_buf(info, buf, to_read);
-+		break;
-+
-+	case READ | ITER_BVEC:
-+		page = msg->msg_iter.bvec->bv_page;
-+		to_read = msg->msg_iter.bvec->bv_len;
-+		rc = smbd_recv_page(info, page, to_read);
-+		break;
-+
-+	default:
-+		/* It's a bug in upper layer to get there */
-+		cifs_dbg(VFS, "CIFS: invalid msg type %d\n",
-+			msg->msg_iter.type);
-+		rc = -EIO;
++#endif
+ 	/* 4 for rfc1002 length field and 1 for Buffer */
+ 	iov[0].iov_len = 4;
+ 	iov[0].iov_base = req;
+@@ -2720,12 +2768,22 @@ smb2_async_writev(struct cifs_writedata *wdata,
+ 	rqst.rq_npages = wdata->nr_pages;
+ 	rqst.rq_pagesz = wdata->pagesz;
+ 	rqst.rq_tailsz = wdata->tailsz;
+-
++#ifdef CONFIG_CIFS_SMB_DIRECT
++	if (wdata->mr) {
++		iov[1].iov_len += sizeof(struct smbd_buffer_descriptor_v1);
++		rqst.rq_npages = 0;
 +	}
-+
-+	info->smbd_recv_pending--;
-+	wake_up(&info->wait_smbd_recv_pending);
-+
-+	/* SMBDirect will read it all or nothing */
-+	if (rc > 0)
-+		msg->msg_iter.count = 0;
-+	return rc;
-+}
-diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
-index 35bc25b..65a431f 100644
---- a/fs/cifs/smbdirect.h
-+++ b/fs/cifs/smbdirect.h
-@@ -91,6 +91,9 @@ struct smbd_connection {
- 	int fragment_reassembly_remaining;
++#endif
+ 	cifs_dbg(FYI, "async write at %llu %u bytes\n",
+ 		 wdata->offset, wdata->bytes);
  
- 	/* Activity accoutning */
-+	/* Pending reqeusts issued from upper layer */
-+	int smbd_recv_pending;
-+	wait_queue_head_t wait_smbd_recv_pending;
++#ifdef CONFIG_CIFS_SMB_DIRECT
++	/* For RDMA read, I/O size is in RemainingBytes not in Length */
++	if (!wdata->mr)
++		req->Length = cpu_to_le32(wdata->bytes);
++#else
+ 	req->Length = cpu_to_le32(wdata->bytes);
+-
++#endif
+ 	inc_rfc1001_len(&req->hdr, wdata->bytes - 1 /* Buffer */);
  
- 	atomic_t send_pending;
- 	wait_queue_head_t wait_send_pending;
+ 	if (wdata->credits) {
 -- 
 2.7.4
