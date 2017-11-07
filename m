@@ -1,7 +1,8 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v7 00/22] CIFS: Implement SMB Direct protocol
-Date: Tue,  7 Nov 2017 01:54:52 -0700
-Message-ID: <20171107085514.12693-1-longli@exchange.microsoft.com>
+Subject: [Patch v7 09/22] CIFS: SMBD: Implement function to reconnect to a SMB Direct transport
+Date: Tue,  7 Nov 2017 01:55:01 -0700
+Message-ID: <20171107085514.12693-10-longli@exchange.microsoft.com>
+References: <20171107085514.12693-1-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
@@ -10,100 +11,66 @@ To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
         Matthew Wilcox <mawilcox@microsoft.com>,
         Stephen Hemminger <sthemmin@microsoft.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20171107085514.12693-1-longli@exchange.microsoft.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-Starting with SMB2 dialect 3.0, Microsoft introduced SMB Direct transport
-protocol for transferring upper layer (SMB2) payload over RDMA via Infiniband,
-RoCE or iWARP. The prococol is published in [MS-SMBD]
-(https://msdn.microsoft.com/en-us/library/hh536346.aspx).
+Add function to implement a reconnect to SMB Direct. This involves tearing down
+the current connection and establishing/negotiating a new connection.
 
-Change log:
-v2:
-Implemented RDMA read/write via memory registration.
-Re-arranged patches for review [Christoph Hellwig <hch@infradead.org>].
-Restructured the code and fixed bugs on protocol timer and keepalive
-[Tom Talpey <ttalpey@microsoft.com>].
+Signed-off-by: Long Li <longli@microsoft.com>
+---
+ fs/cifs/smbdirect.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-v3:
-Improved performance by introducing an additional queue for handling
-empty packets and reducing lock contention on IRQ path.
-Added light weight profiling by reading TSC.
-Improved the code for checking SMB versions when mounting with rdma option
-[Leon Romanovsky <leon@kernel.org>]. 
-Moved to use pages instead of buffers for passing I/O for RDMA
-[Christoph Hellwig <hch@infradead.org>].
-Removed redundant code and refactored I/O code paths
-[Christoph Hellwig <hch@infradead.org>, Tom Talpey <ttalpey@microsoft.com>].
-
-v4:
-Fixed connectivity issues with iWAPR devices.
-Exported configurable protocol parameters to /proc/fs/cifs
-[Steve French <sfrench@samba.org>]
-Re-arranged patches for review
-[Pavel Shilovsky <piastryyy@gmail.com>].
-
-v5:
-Fixed compiling errors on ia64, i386 and when INFINIBAND is not
-configured. [kbuild test robot]
-Profiling is removed and will be introduced in a seperate patch.
-
-v6:
-Report internal code error via WARN_ON(). Change description in
-Kconfig [Pavel Shilovsky <piastryyy@gmail.com>].
-
-v7:
-Removed the use of #ifdef CONFIG_CIFS_SMB_DIRECT in upper layer
-code calling transport I/O. [Matthew Wilcox <mawilcox@microsoft.com>,
-Tom Talpey <ttalpey@microsoft.com>]
-
-Long Li (22):
-  CIFS: SMBD: Add parameter rdata to smb2_new_read_req
-  CIFS: SMBD: Introduce kernel config option CONFIG_CIFS_SMB_DIRECT
-  CIFS: SMBD: Add rdma mount option
-  CIFS: SMBD: Add SMB Direct protocol initial values and constants
-  CIFS: SMBD: Establish SMB Direct connection
-  CIFS: SMBD: export protocol initial values
-  CIFS: SMBD: Implement function to create a SMB Direct connection
-  CIFS: SMBD: Upper layer connects to SMBDirect session
-  CIFS: SMBD: Implement function to reconnect to a SMB Direct transport
-  CIFS: SMBD: Upper layer reconnects to SMB Direct session
-  CIFS: SMBD: Implement function to destroy a SMB Direct connection
-  CIFS: SMBD: Upper layer destroys SMB Direct session on shutdown or
-    umount
-  CIFS: SMBD: Set SMB Direct maximum read or write size for I/O
-  CIFS: SMBD: Implement function to receive data via RDMA receive
-  CIFS: SMBD: Upper layer receives data via RDMA receive
-  CIFS: SMBD: Implement function to send data via RDMA send
-  CIFS: SMBD: Upper layer sends data via RDMA send
-  CIFS: SMBD: Implement RDMA memory registration
-  CIFS: SMBD: Upper layer performs SMB write via RDMA read through
-    memory registration
-  CIFS: SMBD: Read correct returned data length for RDMA write (SMB
-    read) I/O
-  CIFS: SMBD: Upper layer performs SMB read via RDMA write through
-    memory registration
-  CIFS: SMBD: Add SMB Direct debug counters
-
- fs/cifs/Kconfig      |    8 +
- fs/cifs/Makefile     |    2 +
- fs/cifs/cifs_debug.c |  147 +++
- fs/cifs/cifsfs.c     |    2 +
- fs/cifs/cifsglob.h   |   21 +-
- fs/cifs/cifssmb.c    |   15 +-
- fs/cifs/connect.c    |   53 +-
- fs/cifs/file.c       |   17 +-
- fs/cifs/smb1ops.c    |    4 +-
- fs/cifs/smb2ops.c    |   24 +-
- fs/cifs/smb2pdu.c    |  127 ++-
- fs/cifs/smbdirect.c  | 2617 ++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smbdirect.h  |  330 +++++++
- fs/cifs/transport.c  |    8 +-
- 14 files changed, 3344 insertions(+), 31 deletions(-)
- create mode 100644 fs/cifs/smbdirect.c
- create mode 100644 fs/cifs/smbdirect.h
-
+diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+index 1db39a34..9f23330 100644
+--- a/fs/cifs/smbdirect.c
++++ b/fs/cifs/smbdirect.c
+@@ -1392,6 +1392,42 @@ static void idle_connection_timer(struct work_struct *work)
+ 			info->keep_alive_interval*HZ);
+ }
+ 
++/*
++ * Reconnect this SMBD connection, called from upper layer
++ * return value: 0 on success, or actual error code
++ */
++int smbd_reconnect(struct TCP_Server_Info *server)
++{
++	log_rdma_event(INFO, "reconnecting rdma session\n");
++
++	if (!server->smbd_conn) {
++		log_rdma_event(ERR, "rdma session already destroyed\n");
++		return -EINVAL;
++	}
++
++	/*
++	 * This is possible if transport is disconnected and we haven't received
++	 * notification from RDMA, but upper layer has detected timeout
++	 */
++	if (server->smbd_conn->transport_status == SMBD_CONNECTED) {
++		log_rdma_event(INFO, "disconnecting transport\n");
++		smbd_disconnect_rdma_connection(server->smbd_conn);
++	}
++
++	/* wait until the transport is destroyed */
++	wait_event(server->smbd_conn->wait_destroy,
++		server->smbd_conn->transport_status == SMBD_DESTROYED);
++
++	destroy_workqueue(server->smbd_conn->workqueue);
++	kfree(server->smbd_conn);
++
++	log_rdma_event(INFO, "creating rdma session\n");
++	server->smbd_conn = smbd_get_connection(
++		server, (struct sockaddr *) &server->dstaddr);
++
++	return server->smbd_conn ? 0 : -ENOENT;
++}
++
+ static void destroy_caches_and_workqueue(struct smbd_connection *info)
+ {
+ 	destroy_receive_buffers(info);
 -- 
 2.7.4
