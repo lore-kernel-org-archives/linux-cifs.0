@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 18/19] cifs: remove rfc1002 header from smb2_query_info_req
-Date: Thu,  9 Nov 2017 12:14:32 +1100
-Message-ID: <20171109011433.14468-19-lsahlber@redhat.com>
+Subject: [PATCH 11/19] cifs: remove rfc1002 header from smb2_flush_req
+Date: Thu,  9 Nov 2017 12:14:25 +1100
+Message-ID: <20171109011433.14468-12-lsahlber@redhat.com>
 References: <20171109011433.14468-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -12,116 +12,55 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c | 26 ++++++++++++++------------
- fs/cifs/smb2pdu.h |  2 +-
- 2 files changed, 15 insertions(+), 13 deletions(-)
+ fs/cifs/smb2pdu.c | 8 ++++----
+ fs/cifs/smb2pdu.h | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 673eea319cbf..62b8b08e9b13 100644
+index a9726a2b7b88..144395bab5c1 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -2188,13 +2188,15 @@ query_info(const unsigned int xid, struct cifs_tcon *tcon,
+@@ -2427,13 +2427,14 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
  	int resp_buftype;
- 	struct cifs_ses *ses = tcon->ses;
+ 	int rc = 0;
  	int flags = 0;
 +	unsigned int total_len;
  
- 	cifs_dbg(FYI, "Query Info\n");
+ 	cifs_dbg(FYI, "Flush\n");
  
  	if (!ses || !(ses->server))
  		return -EIO;
  
--	rc = small_smb2_init(SMB2_QUERY_INFO, tcon, (void **) &req);
-+	rc = smb2_plain_req_init(SMB2_QUERY_INFO, tcon, (void **) &req,
-+			     &total_len);
+-	rc = small_smb2_init(SMB2_FLUSH, tcon, (void **) &req);
++	rc = smb2_plain_req_init(SMB2_FLUSH, tcon, (void **) &req, &total_len);
  	if (rc)
  		return rc;
  
-@@ -2211,15 +2213,14 @@ query_info(const unsigned int xid, struct cifs_tcon *tcon,
- 	 * We do not use the input buffer (do not send extra byte)
- 	 */
- 	req->InputBufferOffset = 0;
--	inc_rfc1001_len(req, -1);
- 
- 	req->OutputBufferLength = cpu_to_le32(output_len);
+@@ -2444,10 +2445,9 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+ 	req->VolatileFileId = volatile_fid;
  
  	iov[0].iov_base = (char *)req;
 -	/* 4 for rfc1002 length field */
 -	iov[0].iov_len = get_rfc1002_length(req) + 4;
-+	/* 1 for Buffer */
-+	iov[0].iov_len = total_len - 1;
++	iov[0].iov_len = total_len;
  
 -	rc = SendReceive2(xid, ses, iov, 1, &resp_buftype, flags, &rsp_iov);
 +	rc = smb2_send_recv(xid, ses, iov, 1, &resp_buftype, flags, &rsp_iov);
  	cifs_small_buf_release(req);
- 	rsp = (struct smb2_query_info_rsp *)rsp_iov.iov_base;
  
-@@ -3373,13 +3374,15 @@ build_qfs_info_req(struct kvec *iov, struct cifs_tcon *tcon, int level,
- {
- 	int rc;
- 	struct smb2_query_info_req *req;
-+	unsigned int total_len;
- 
- 	cifs_dbg(FYI, "Query FSInfo level %d\n", level);
- 
- 	if ((tcon->ses == NULL) || (tcon->ses->server == NULL))
- 		return -EIO;
- 
--	rc = small_smb2_init(SMB2_QUERY_INFO, tcon, (void **) &req);
-+	rc = smb2_plain_req_init(SMB2_QUERY_INFO, tcon, (void **) &req,
-+			     &total_len);
- 	if (rc)
- 		return rc;
- 
-@@ -3387,15 +3390,14 @@ build_qfs_info_req(struct kvec *iov, struct cifs_tcon *tcon, int level,
- 	req->FileInfoClass = level;
- 	req->PersistentFileId = persistent_fid;
- 	req->VolatileFileId = volatile_fid;
--	/* 4 for rfc1002 length field and 1 for pad */
-+	/* 1 for pad */
- 	req->InputBufferOffset =
--			cpu_to_le16(sizeof(struct smb2_query_info_req) - 1 - 4);
-+			cpu_to_le16(sizeof(struct smb2_query_info_req) - 1);
- 	req->OutputBufferLength = cpu_to_le32(
- 		outbuf_len + sizeof(struct smb2_query_info_rsp) - 1 - 4);
- 
- 	iov->iov_base = (char *)req;
--	/* 4 for rfc1002 length field */
--	iov->iov_len = get_rfc1002_length(req) + 4;
-+	iov->iov_len = total_len;
- 	return 0;
- }
- 
-@@ -3421,7 +3423,7 @@ SMB2_QFS_info(const unsigned int xid, struct cifs_tcon *tcon,
- 	if (encryption_required(tcon))
- 		flags |= CIFS_TRANSFORM_REQ;
- 
--	rc = SendReceive2(xid, ses, &iov, 1, &resp_buftype, flags, &rsp_iov);
-+	rc = smb2_send_recv(xid, ses, &iov, 1, &resp_buftype, flags, &rsp_iov);
- 	cifs_small_buf_release(iov.iov_base);
- 	if (rc) {
- 		cifs_stats_fail_inc(tcon, SMB2_QUERY_INFO_HE);
-@@ -3477,7 +3479,7 @@ SMB2_QFS_attr(const unsigned int xid, struct cifs_tcon *tcon,
- 	if (encryption_required(tcon))
- 		flags |= CIFS_TRANSFORM_REQ;
- 
--	rc = SendReceive2(xid, ses, &iov, 1, &resp_buftype, flags, &rsp_iov);
-+	rc = smb2_send_recv(xid, ses, &iov, 1, &resp_buftype, flags, &rsp_iov);
- 	cifs_small_buf_release(iov.iov_base);
- 	if (rc) {
- 		cifs_stats_fail_inc(tcon, SMB2_QUERY_INFO_HE);
+ 	if (rc != 0)
 diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 630a5c064f0c..19d34881815f 100644
+index 6e1874a81014..a8102e5f4ebb 100644
 --- a/fs/cifs/smb2pdu.h
 +++ b/fs/cifs/smb2pdu.h
-@@ -989,7 +989,7 @@ struct smb2_query_directory_rsp {
- #define SL_INDEX_SPECIFIED	0x00000004
+@@ -812,7 +812,7 @@ struct smb2_close_rsp {
+ } __packed;
  
- struct smb2_query_info_req {
+ struct smb2_flush_req {
 -	struct smb2_hdr hdr;
 +	struct smb2_sync_hdr sync_hdr;
- 	__le16 StructureSize; /* Must be 41 */
- 	__u8   InfoType;
- 	__u8   FileInfoClass;
+ 	__le16 StructureSize;	/* Must be 24 */
+ 	__le16 Reserved1;
+ 	__le32 Reserved2;
 -- 
 2.13.3
