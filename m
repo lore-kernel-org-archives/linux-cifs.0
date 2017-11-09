@@ -1,8 +1,8 @@
 From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: Re: [PATCH 14/19] cifs: remove rfc1002 header from smb2_lease_ack
-Date: Thu, 09 Nov 2017 15:11:20 +0100
-Message-ID: <87375nh793.fsf@suse.com>
-References: <20171109011433.14468-1-lsahlber@redhat.com> <20171109011433.14468-15-lsahlber@redhat.com>
+Subject: Re: [PATCH 15/19] cifs: remove rfc1002 header from smb2_oplock_break we get from server
+Date: Thu, 09 Nov 2017 15:11:26 +0100
+Message-ID: <87zi7vfsoh.fsf@suse.com>
+References: <20171109011433.14468-1-lsahlber@redhat.com> <20171109011433.14468-16-lsahlber@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8BIT
@@ -10,7 +10,7 @@ Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
         linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171109011433.14468-15-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <20171109011433.14468-16-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
