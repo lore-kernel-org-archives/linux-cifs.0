@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 16/19] cifs: remove rfc1002 header from smb2_set_info_req
-Date: Thu,  9 Nov 2017 12:14:30 +1100
-Message-ID: <20171109011433.14468-17-lsahlber@redhat.com>
+Subject: [PATCH 06/19] cifs: remove rfc1002 header from smb2_ioctl_req
+Date: Thu,  9 Nov 2017 12:14:20 +1100
+Message-ID: <20171109011433.14468-7-lsahlber@redhat.com>
 References: <20171109011433.14468-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -12,86 +12,91 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c | 19 +++++++++----------
+ fs/cifs/smb2pdu.c | 22 +++++++++++-----------
  fs/cifs/smb2pdu.h |  2 +-
- 2 files changed, 10 insertions(+), 11 deletions(-)
+ 2 files changed, 12 insertions(+), 12 deletions(-)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 192b07bcc330..af807b7417b4 100644
+index 2b31c6011591..1e2d231305fa 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -3118,6 +3118,7 @@ send_set_info(const unsigned int xid, struct cifs_tcon *tcon,
- 	unsigned int i;
- 	struct cifs_ses *ses = tcon->ses;
+@@ -1906,6 +1906,7 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+ 	int n_iov;
+ 	int rc = 0;
  	int flags = 0;
 +	unsigned int total_len;
  
+ 	cifs_dbg(FYI, "SMB2 IOCTL\n");
+ 
+@@ -1924,7 +1925,7 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
  	if (!ses || !(ses->server))
  		return -EIO;
-@@ -3129,7 +3130,7 @@ send_set_info(const unsigned int xid, struct cifs_tcon *tcon,
- 	if (!iov)
- 		return -ENOMEM;
  
--	rc = small_smb2_init(SMB2_SET_INFO, tcon, (void **) &req);
-+	rc = smb2_plain_req_init(SMB2_SET_INFO, tcon, (void **) &req, &total_len);
- 	if (rc) {
- 		kfree(iov);
+-	rc = small_smb2_init(SMB2_IOCTL, tcon, (void **) &req);
++	rc = smb2_plain_req_init(SMB2_IOCTL, tcon, (void **) &req, &total_len);
+ 	if (rc)
  		return rc;
-@@ -3138,7 +3139,7 @@ send_set_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+@@ -1935,8 +1936,8 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+ 		}
+ 
+ 		cifs_dbg(FYI, "replacing tid 0x%x with IPC tid 0x%x\n",
+-			 req->hdr.sync_hdr.TreeId, ses->ipc_tid);
+-		req->hdr.sync_hdr.TreeId = ses->ipc_tid;
++			 req->sync_hdr.TreeId, ses->ipc_tid);
++		req->sync_hdr.TreeId = ses->ipc_tid;
+ 	}
  	if (encryption_required(tcon))
  		flags |= CIFS_TRANSFORM_REQ;
+@@ -1949,7 +1950,7 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+ 		req->InputCount = cpu_to_le32(indatalen);
+ 		/* do not set InputOffset if no input data */
+ 		req->InputOffset =
+-		       cpu_to_le32(offsetof(struct smb2_ioctl_req, Buffer) - 4);
++		       cpu_to_le32(offsetof(struct smb2_ioctl_req, Buffer));
+ 		iov[1].iov_base = in_data;
+ 		iov[1].iov_len = indatalen;
+ 		n_iov = 2;
+@@ -1984,21 +1985,20 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+ 	 * but if input data passed to ioctl, we do not
+ 	 * want to double count this, so we do not send
+ 	 * the dummy one byte of data in iovec[0] if sending
+-	 * input data (in iovec[1]). We also must add 4 bytes
+-	 * in first iovec to allow for rfc1002 length field.
++	 * input data (in iovec[1]).
+ 	 */
  
--	req->hdr.sync_hdr.ProcessId = cpu_to_le32(pid);
-+	req->sync_hdr.ProcessId = cpu_to_le32(pid);
+ 	if (indatalen) {
+-		iov[0].iov_len = get_rfc1002_length(req) + 4 - 1;
+-		inc_rfc1001_len(req, indatalen - 1);
++		iov[0].iov_len = total_len - 1;
+ 	} else
+-		iov[0].iov_len = get_rfc1002_length(req) + 4;
++		iov[0].iov_len = total_len;
  
- 	req->InfoType = info_type;
- 	req->FileInfoClass = info_class;
-@@ -3146,27 +3147,25 @@ send_set_info(const unsigned int xid, struct cifs_tcon *tcon,
- 	req->VolatileFileId = volatile_fid;
- 	req->AdditionalInformation = cpu_to_le32(additional_info);
+ 	/* validate negotiate request must be signed - see MS-SMB2 3.2.5.5 */
+ 	if (opcode == FSCTL_VALIDATE_NEGOTIATE_INFO)
+-		req->hdr.sync_hdr.Flags |= SMB2_FLAGS_SIGNED;
++		req->sync_hdr.Flags |= SMB2_FLAGS_SIGNED;
  
--	/* 4 for RFC1001 length and 1 for Buffer */
- 	req->BufferOffset =
--			cpu_to_le16(sizeof(struct smb2_set_info_req) - 1 - 4);
-+			cpu_to_le16(sizeof(struct smb2_set_info_req) - 1);
- 	req->BufferLength = cpu_to_le32(*size);
- 
--	inc_rfc1001_len(req, *size - 1 /* Buffer */);
--
- 	memcpy(req->Buffer, *data, *size);
-+	total_len += *size;
- 
- 	iov[0].iov_base = (char *)req;
--	/* 4 for RFC1001 length */
--	iov[0].iov_len = get_rfc1002_length(req) + 4;
-+	/* 1 for Buffer */
-+	iov[0].iov_len = total_len - 1;
- 
- 	for (i = 1; i < num; i++) {
--		inc_rfc1001_len(req, size[i]);
- 		le32_add_cpu(&req->BufferLength, size[i]);
- 		iov[i].iov_base = (char *)data[i];
- 		iov[i].iov_len = size[i];
- 	}
- 
--	rc = SendReceive2(xid, ses, iov, num, &resp_buftype, flags, &rsp_iov);
-+	rc = smb2_send_recv(xid, ses, iov, num, &resp_buftype, flags,
+-	rc = SendReceive2(xid, ses, iov, n_iov, &resp_buftype, flags, &rsp_iov);
++	rc = smb2_send_recv(xid, ses, iov, n_iov, &resp_buftype, flags,
 +			    &rsp_iov);
  	cifs_small_buf_release(req);
- 	rsp = (struct smb2_set_info_rsp *)rsp_iov.iov_base;
+ 	rsp = (struct smb2_ioctl_rsp *)rsp_iov.iov_base;
  
 diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 7f2a7639ea15..f0d6e637b95f 100644
+index 5404207d9ee7..2c743d338a11 100644
 --- a/fs/cifs/smb2pdu.h
 +++ b/fs/cifs/smb2pdu.h
-@@ -1013,7 +1013,7 @@ struct smb2_query_info_rsp {
+@@ -753,7 +753,7 @@ struct duplicate_extents_to_file {
  } __packed;
  
- struct smb2_set_info_req {
+ struct smb2_ioctl_req {
 -	struct smb2_hdr hdr;
 +	struct smb2_sync_hdr sync_hdr;
- 	__le16 StructureSize; /* Must be 33 */
- 	__u8   InfoType;
- 	__u8   FileInfoClass;
+ 	__le16 StructureSize;	/* Must be 57 */
+ 	__u16 Reserved;
+ 	__le32 CtlCode;
 -- 
 2.13.3
