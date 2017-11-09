@@ -1,87 +1,121 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 01/19] cifs: Add smb2_send_recv
-Date: Thu,  9 Nov 2017 12:14:15 +1100
-Message-ID: <20171109011433.14468-2-lsahlber@redhat.com>
-References: <20171109011433.14468-1-lsahlber@redhat.com>
+Subject: [PATCH] cifs: fix return code when failing to rename a file onto a directory
+Date: Thu,  9 Nov 2017 16:11:57 +1100
+Message-ID: <20171109051157.30814-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171109011433.14468-1-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This function is similar to SendReceive2 except it does not expect
-a 4 byte rfc1002 length header in the first io vector.
+Cifs servers return ACCESS_DENIED when trying to rename onto a non-empty
+directory. This is different from xfstest where we expect this to return
+-EEXIST instead.
+
+As a workaround, if we failed to rename the file and we got -EACCES
+then try to open the target file and check the attributes if it is a
+directory or not and if so remap the error to -EEXIST.
+
+This makes us pass xfstest  generic/245
 
 Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsproto.h |  4 ++++
- fs/cifs/transport.c | 38 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 42 insertions(+)
+ fs/cifs/smb2ops.c   | 39 +++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2pdu.c   | 13 ++++++++++++-
+ fs/cifs/smb2proto.h |  2 ++
+ 3 files changed, 53 insertions(+), 1 deletion(-)
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 4143c9dec463..6d86cd120349 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -106,6 +106,10 @@ extern int SendReceive2(const unsigned int /* xid */ , struct cifs_ses *,
- 			struct kvec *, int /* nvec to send */,
- 			int * /* type of buf returned */, const int flags,
- 			struct kvec * /* resp vec */);
-+extern int smb2_send_recv(const unsigned int /* xid */ , struct cifs_ses *,
-+			  struct kvec *, int /* nvec to send */,
-+			  int * /* type of buf returned */, const int flags,
-+			  struct kvec * /* resp vec */);
- extern int SendReceiveBlockingLock(const unsigned int xid,
- 			struct cifs_tcon *ptcon,
- 			struct smb_hdr *in_buf ,
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 7efbab013957..e678307bb7a0 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -827,6 +827,44 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index bdb963d0ba32..1c46aab0d015 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -426,6 +426,45 @@ smb2_query_file_info(const unsigned int xid, struct cifs_tcon *tcon,
  	return rc;
  }
  
-+/* Like SendReceive2 but iov[0] does not contain an rfc1002 header */
 +int
-+smb2_send_recv(const unsigned int xid, struct cifs_ses *ses,
-+	       struct kvec *iov, int n_vec, int *resp_buf_type /* ret */,
-+	       const int flags, struct kvec *resp_iov)
++smb2_is_dir(const unsigned int xid, struct cifs_tcon *tcon,
++	    __le16 *target_file)
 +{
-+	struct smb_rqst rqst;
-+	struct kvec *new_iov;
 +	int rc;
-+	int i;
-+	__u32 count;
-+	__be32 rfc1002_marker;
++	u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
++	struct cifs_open_parms oparms;
++	struct cifs_fid fid;
++	struct smb2_file_all_info *smb2_data;
 +
-+	new_iov = kmalloc(sizeof(struct kvec) * (n_vec + 1), GFP_KERNEL);
-+	if (!new_iov)
++	smb2_data = kzalloc(sizeof(struct smb2_file_all_info) + PATH_MAX * 2,
++			    GFP_KERNEL);
++	if (smb2_data == NULL)
 +		return -ENOMEM;
 +
-+	/* 1st iov is an RFC1002 Session Message length */
-+	memcpy(new_iov + 1, iov, (sizeof(struct kvec) * n_vec));
++	oparms.tcon = tcon;
++	oparms.desired_access = FILE_READ_ATTRIBUTES;
++	oparms.disposition = FILE_OPEN;
++	oparms.create_options = 0;
++	oparms.fid = &fid;
++	oparms.reconnect = false;
 +
-+	count = 0;
-+	for (i = 1; i < n_vec + 1; i++)
-+		count += new_iov[i].iov_len;
++	rc = SMB2_open(xid, &oparms, target_file, &oplock, NULL, NULL);
++	if (rc)
++		goto out;
 +
-+	rfc1002_marker = cpu_to_be32(count);
++	rc = SMB2_query_info(xid, tcon, fid.persistent_fid, fid.volatile_fid,
++			     smb2_data);
++	SMB2_close(xid, tcon, fid.persistent_fid, fid.volatile_fid);
++	if (rc)
++		goto out;
 +
-+	new_iov[0].iov_base = &rfc1002_marker;
-+	new_iov[0].iov_len = 4;
++	rc = !!(le32_to_cpu(smb2_data->Attributes) & FILE_ATTRIBUTE_DIRECTORY);
 +
-+	memset(&rqst, 0, sizeof(struct smb_rqst));
-+	rqst.rq_iov = new_iov;
-+	rqst.rq_nvec = n_vec + 1;
-+
-+	rc = cifs_send_recv(xid, ses, &rqst, resp_buf_type, flags, resp_iov);
-+	kfree(new_iov);
++out:
++	kfree(smb2_data);
 +	return rc;
 +}
 +
- int
- SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 	    struct smb_hdr *in_buf, struct smb_hdr *out_buf,
+ #ifdef CONFIG_CIFS_XATTR
+ static ssize_t
+ move_smb2_ea_to_cifs(char *dst, size_t dst_size,
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 553d574940b9..91f0b4a5e749 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -3144,7 +3144,7 @@ SMB2_rename(const unsigned int xid, struct cifs_tcon *tcon,
+ 	struct smb2_file_rename_info info;
+ 	void **data;
+ 	unsigned int size[2];
+-	int rc;
++	int rc, is_dir;
+ 	int len = (2 * UniStrnlen((wchar_t *)target_file, PATH_MAX));
+ 
+ 	data = kmalloc(sizeof(void *) * 2, GFP_KERNEL);
+@@ -3165,6 +3165,17 @@ SMB2_rename(const unsigned int xid, struct cifs_tcon *tcon,
+ 	rc = send_set_info(xid, tcon, persistent_fid, volatile_fid,
+ 		current->tgid, FILE_RENAME_INFORMATION, SMB2_O_INFO_FILE,
+ 		0, 2, data, size);
++
++	/* SMB2 servers responds with ACCESS_DENIED when trying to rename
++	 * and replace onto a non-empty directory. Check for this and remap
++	 * to EEXIST.
++	 */
++	if (rc == -EACCES) {
++		is_dir = smb2_is_dir(xid, tcon, target_file);
++		if (is_dir == 1)
++			rc = -EEXIST;
++	}
++
+ 	kfree(data);
+ 	return rc;
+ }
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index e9ab5227e7a8..35c075364f7e 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -203,4 +203,6 @@ extern int smb3_validate_negotiate(const unsigned int, struct cifs_tcon *);
+ 
+ extern enum securityEnum smb2_select_sectype(struct TCP_Server_Info *,
+ 					enum securityEnum);
++extern int smb2_is_dir(const unsigned int xid, struct cifs_tcon *tcon,
++		       __le16 *target_file);
+ #endif			/* _SMB2PROTO_H */
 -- 
 2.13.3
