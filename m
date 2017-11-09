@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 19/19] cifs: remove small_smb2_init
-Date: Thu,  9 Nov 2017 12:14:33 +1100
-Message-ID: <20171109011433.14468-20-lsahlber@redhat.com>
+Subject: [PATCH 07/19] cifs: remove rfc1002 header from smb2_echo_req
+Date: Thu,  9 Nov 2017 12:14:21 +1100
+Message-ID: <20171109011433.14468-8-lsahlber@redhat.com>
 References: <20171109011433.14468-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -12,86 +12,59 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c | 53 ++++++-----------------------------------------------
- 1 file changed, 6 insertions(+), 47 deletions(-)
+ fs/cifs/smb2pdu.c | 14 ++++++++------
+ fs/cifs/smb2pdu.h |  2 +-
+ 2 files changed, 9 insertions(+), 7 deletions(-)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 62b8b08e9b13..553d574940b9 100644
+index 1e2d231305fa..6e08b609d9c0 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -319,54 +319,16 @@ fill_small_buf(__le16 smb2_command, struct cifs_tcon *tcon, void *buf,
- 	*total_len = parmsize + sizeof(struct smb2_sync_hdr);
- }
+@@ -2391,6 +2391,8 @@ SMB2_echo(struct TCP_Server_Info *server)
+ 	struct kvec iov[2];
+ 	struct smb_rqst rqst = { .rq_iov = iov,
+ 				 .rq_nvec = 2 };
++	unsigned int total_len;
++	__be32 rfc1002_marker;
  
--/* init request without RFC1001 length at the beginning */
--static int
--smb2_plain_req_init(__le16 smb2_command, struct cifs_tcon *tcon,
--		    void **request_buf, unsigned int *total_len)
--{
--	int rc;
--	struct smb2_sync_hdr *shdr;
--
--	rc = smb2_reconnect(smb2_command, tcon);
--	if (rc)
--		return rc;
--
--	/* BB eventually switch this to SMB2 specific small buf size */
--	*request_buf = cifs_small_buf_get();
--	if (*request_buf == NULL) {
--		/* BB should we add a retry in here if not a writepage? */
--		return -ENOMEM;
--	}
--
--	shdr = (struct smb2_sync_hdr *)(*request_buf);
--
--	fill_small_buf(smb2_command, tcon, shdr, total_len);
--
--	if (tcon != NULL) {
--#ifdef CONFIG_CIFS_STATS2
--		uint16_t com_code = le16_to_cpu(smb2_command);
--
--		cifs_stats_inc(&tcon->stats.smb2_stats.smb2_com_sent[com_code]);
--#endif
--		cifs_stats_inc(&tcon->num_smbs_sent);
--	}
--
--	return rc;
--}
--
- /*
-  * Allocate and return pointer to an SMB request hdr, and set basic
-  * SMB information in the SMB header. If the return code is zero, this
-- * function must have filled in request_buf pointer. The returned buffer
-- * has RFC1001 length at the beginning.
-+ * function must have filled in request_buf pointer.
-  */
- static int
--small_smb2_init(__le16 smb2_command, struct cifs_tcon *tcon,
--		void **request_buf)
-+smb2_plain_req_init(__le16 smb2_command, struct cifs_tcon *tcon,
-+		    void **request_buf, unsigned int *total_len)
- {
- 	int rc;
--	unsigned int total_len;
--	struct smb2_pdu *pdu;
+ 	cifs_dbg(FYI, "In echo request\n");
  
- 	rc = smb2_reconnect(smb2_command, tcon);
- 	if (rc)
-@@ -379,12 +341,9 @@ small_smb2_init(__le16 smb2_command, struct cifs_tcon *tcon,
- 		return -ENOMEM;
+@@ -2400,17 +2402,17 @@ SMB2_echo(struct TCP_Server_Info *server)
+ 		return rc;
  	}
  
--	pdu = (struct smb2_pdu *)(*request_buf);
--
--	fill_small_buf(smb2_command, tcon, get_sync_hdr(pdu), &total_len);
--
--	/* Note this is only network field converted to big endian */
--	pdu->hdr.smb2_buf_length = cpu_to_be32(total_len);
-+	fill_small_buf(smb2_command, tcon,
-+		       (struct smb2_sync_hdr *)(*request_buf),
-+		       total_len);
+-	rc = small_smb2_init(SMB2_ECHO, NULL, (void **)&req);
++	rc = smb2_plain_req_init(SMB2_ECHO, NULL, (void **)&req, &total_len);
+ 	if (rc)
+ 		return rc;
  
- 	if (tcon != NULL) {
- #ifdef CONFIG_CIFS_STATS2
+-	req->hdr.sync_hdr.CreditRequest = cpu_to_le16(1);
++	req->sync_hdr.CreditRequest = cpu_to_le16(1);
+ 
+-	/* 4 for rfc1002 length field */
+ 	iov[0].iov_len = 4;
+-	iov[0].iov_base = (char *)req;
+-	iov[1].iov_len = get_rfc1002_length(req);
+-	iov[1].iov_base = (char *)req + 4;
++	rfc1002_marker = cpu_to_be32(total_len);
++	iov[0].iov_base = &rfc1002_marker;
++	iov[1].iov_len = total_len;
++	iov[1].iov_base = (char *)req;
+ 
+ 	rc = cifs_call_async(server, &rqst, NULL, smb2_echo_callback, NULL,
+ 			     server, CIFS_ECHO_OP);
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index 2c743d338a11..b22bf8c6753e 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -924,7 +924,7 @@ struct smb2_lock_rsp {
+ } __packed;
+ 
+ struct smb2_echo_req {
+-	struct smb2_hdr hdr;
++	struct smb2_sync_hdr sync_hdr;
+ 	__le16 StructureSize;	/* Must be 4 */
+ 	__u16  Reserved;
+ } __packed;
 -- 
 2.13.3
