@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 15/19] cifs: remove rfc1002 header from smb2_oplock_break we get from server
-Date: Thu,  9 Nov 2017 12:14:29 +1100
-Message-ID: <20171109011433.14468-16-lsahlber@redhat.com>
+Subject: [PATCH 01/19] cifs: Add smb2_send_recv
+Date: Thu,  9 Nov 2017 12:14:15 +1100
+Message-ID: <20171109011433.14468-2-lsahlber@redhat.com>
 References: <20171109011433.14468-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -10,91 +10,78 @@ In-Reply-To: <20171109011433.14468-1-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gman
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+This function is similar to SendReceive2 except it does not expect
+a 4 byte rfc1002 length header in the first io vector.
+
 Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/smb2misc.c |  2 +-
- fs/cifs/smb2pdu.c  | 19 +++++++++++++++----
- fs/cifs/smb2pdu.h  | 14 +++++++++++++-
- 3 files changed, 29 insertions(+), 6 deletions(-)
+ fs/cifs/cifsproto.h |  4 ++++
+ fs/cifs/transport.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 42 insertions(+)
 
-diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-index 7b08a1446a7f..76d03abaa38c 100644
---- a/fs/cifs/smb2misc.c
-+++ b/fs/cifs/smb2misc.c
-@@ -578,7 +578,7 @@ smb2_is_valid_lease_break(char *buffer)
- bool
- smb2_is_valid_oplock_break(char *buffer, struct TCP_Server_Info *server)
- {
--	struct smb2_oplock_break *rsp = (struct smb2_oplock_break *)buffer;
-+	struct smb2_oplock_break_rsp *rsp = (struct smb2_oplock_break_rsp *)buffer;
- 	struct list_head *tmp, *tmp1, *tmp2;
- 	struct cifs_ses *ses;
- 	struct cifs_tcon *tcon;
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index d5c295cd44ea..192b07bcc330 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -3318,11 +3318,17 @@ SMB2_oplock_break(const unsigned int xid, struct cifs_tcon *tcon,
- 		  __u8 oplock_level)
- {
- 	int rc;
--	struct smb2_oplock_break *req = NULL;
-+	struct smb2_oplock_break_req *req = NULL;
-+	struct cifs_ses *ses = tcon->ses;
- 	int flags = CIFS_OBREAK_OP;
-+	unsigned int total_len;
-+	struct kvec iov[1];
-+	struct kvec rsp_iov;
-+	int resp_buf_type;
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 4143c9dec463..6d86cd120349 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -106,6 +106,10 @@ extern int SendReceive2(const unsigned int /* xid */ , struct cifs_ses *,
+ 			struct kvec *, int /* nvec to send */,
+ 			int * /* type of buf returned */, const int flags,
+ 			struct kvec * /* resp vec */);
++extern int smb2_send_recv(const unsigned int /* xid */ , struct cifs_ses *,
++			  struct kvec *, int /* nvec to send */,
++			  int * /* type of buf returned */, const int flags,
++			  struct kvec * /* resp vec */);
+ extern int SendReceiveBlockingLock(const unsigned int xid,
+ 			struct cifs_tcon *ptcon,
+ 			struct smb_hdr *in_buf ,
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 7efbab013957..e678307bb7a0 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -827,6 +827,44 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+ 	return rc;
+ }
  
- 	cifs_dbg(FYI, "SMB2_oplock_break\n");
--	rc = small_smb2_init(SMB2_OPLOCK_BREAK, tcon, (void **) &req);
-+	rc = smb2_plain_req_init(SMB2_OPLOCK_BREAK, tcon, (void **) &req,
-+			     &total_len);
- 	if (rc)
- 		return rc;
- 
-@@ -3332,9 +3338,14 @@ SMB2_oplock_break(const unsigned int xid, struct cifs_tcon *tcon,
- 	req->VolatileFid = volatile_fid;
- 	req->PersistentFid = persistent_fid;
- 	req->OplockLevel = oplock_level;
--	req->hdr.sync_hdr.CreditRequest = cpu_to_le16(1);
-+	req->sync_hdr.CreditRequest = cpu_to_le16(1);
++/* Like SendReceive2 but iov[0] does not contain an rfc1002 header */
++int
++smb2_send_recv(const unsigned int xid, struct cifs_ses *ses,
++	       struct kvec *iov, int n_vec, int *resp_buf_type /* ret */,
++	       const int flags, struct kvec *resp_iov)
++{
++	struct smb_rqst rqst;
++	struct kvec *new_iov;
++	int rc;
++	int i;
++	__u32 count;
++	__be32 rfc1002_marker;
 +
-+	flags |= CIFS_NO_RESP;
- 
--	rc = SendReceiveNoRsp(xid, tcon->ses, (char *) req, flags);
-+	iov[0].iov_base = (char *)req;
-+	iov[0].iov_len = total_len;
++	new_iov = kmalloc(sizeof(struct kvec) * (n_vec + 1), GFP_KERNEL);
++	if (!new_iov)
++		return -ENOMEM;
 +
-+	rc = smb2_send_recv(xid, ses, iov, 1, &resp_buf_type, flags, &rsp_iov);
- 	cifs_small_buf_release(req);
- 
- 	if (rc) {
-diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 32f0f633b614..7f2a7639ea15 100644
---- a/fs/cifs/smb2pdu.h
-+++ b/fs/cifs/smb2pdu.h
-@@ -1031,7 +1031,19 @@ struct smb2_set_info_rsp {
- 	__le16 StructureSize; /* Must be 2 */
- } __packed;
- 
--struct smb2_oplock_break {
-+/* oplock break without an rfc1002 header */
-+struct smb2_oplock_break_req {
-+	struct smb2_sync_hdr sync_hdr;
-+	__le16 StructureSize; /* Must be 24 */
-+	__u8   OplockLevel;
-+	__u8   Reserved;
-+	__le32 Reserved2;
-+	__u64  PersistentFid;
-+	__u64  VolatileFid;
-+} __packed;
++	/* 1st iov is an RFC1002 Session Message length */
++	memcpy(new_iov + 1, iov, (sizeof(struct kvec) * n_vec));
 +
-+/* oplock break with an rfc1002 header */
-+struct smb2_oplock_break_rsp {
- 	struct smb2_hdr hdr;
- 	__le16 StructureSize; /* Must be 24 */
- 	__u8   OplockLevel;
++	count = 0;
++	for (i = 1; i < n_vec + 1; i++)
++		count += new_iov[i].iov_len;
++
++	rfc1002_marker = cpu_to_be32(count);
++
++	new_iov[0].iov_base = &rfc1002_marker;
++	new_iov[0].iov_len = 4;
++
++	memset(&rqst, 0, sizeof(struct smb_rqst));
++	rqst.rq_iov = new_iov;
++	rqst.rq_nvec = n_vec + 1;
++
++	rc = cifs_send_recv(xid, ses, &rqst, resp_buf_type, flags, resp_iov);
++	kfree(new_iov);
++	return rc;
++}
++
+ int
+ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+ 	    struct smb_hdr *in_buf, struct smb_hdr *out_buf,
 -- 
 2.13.3
