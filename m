@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 07/19] cifs: remove rfc1002 header from smb2_echo_req
-Date: Thu,  9 Nov 2017 12:14:21 +1100
-Message-ID: <20171109011433.14468-8-lsahlber@redhat.com>
+Subject: [PATCH 17/19] cifs: remove rfc1002 header from smb2_query_directory_req
+Date: Thu,  9 Nov 2017 12:14:31 +1100
+Message-ID: <20171109011433.14468-18-lsahlber@redhat.com>
 References: <20171109011433.14468-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -12,59 +12,71 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c | 14 ++++++++------
+ fs/cifs/smb2pdu.c | 14 +++++++-------
  fs/cifs/smb2pdu.h |  2 +-
- 2 files changed, 9 insertions(+), 7 deletions(-)
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 1e2d231305fa..6e08b609d9c0 100644
+index af807b7417b4..673eea319cbf 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -2391,6 +2391,8 @@ SMB2_echo(struct TCP_Server_Info *server)
- 	struct kvec iov[2];
- 	struct smb_rqst rqst = { .rq_iov = iov,
- 				 .rq_nvec = 2 };
+@@ -2992,13 +2992,15 @@ SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
+ 	unsigned int output_size = CIFSMaxBufSize;
+ 	size_t info_buf_size;
+ 	int flags = 0;
 +	unsigned int total_len;
-+	__be32 rfc1002_marker;
  
- 	cifs_dbg(FYI, "In echo request\n");
+ 	if (ses && (ses->server))
+ 		server = ses->server;
+ 	else
+ 		return -EIO;
  
-@@ -2400,17 +2402,17 @@ SMB2_echo(struct TCP_Server_Info *server)
- 		return rc;
- 	}
- 
--	rc = small_smb2_init(SMB2_ECHO, NULL, (void **)&req);
-+	rc = smb2_plain_req_init(SMB2_ECHO, NULL, (void **)&req, &total_len);
+-	rc = small_smb2_init(SMB2_QUERY_DIRECTORY, tcon, (void **) &req);
++	rc = smb2_plain_req_init(SMB2_QUERY_DIRECTORY, tcon, (void **) &req,
++			     &total_len);
  	if (rc)
  		return rc;
  
--	req->hdr.sync_hdr.CreditRequest = cpu_to_le16(1);
-+	req->sync_hdr.CreditRequest = cpu_to_le16(1);
+@@ -3030,7 +3032,7 @@ SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
+ 	memcpy(bufptr, &asteriks, len);
  
--	/* 4 for rfc1002 length field */
- 	iov[0].iov_len = 4;
--	iov[0].iov_base = (char *)req;
--	iov[1].iov_len = get_rfc1002_length(req);
--	iov[1].iov_base = (char *)req + 4;
-+	rfc1002_marker = cpu_to_be32(total_len);
-+	iov[0].iov_base = &rfc1002_marker;
-+	iov[1].iov_len = total_len;
-+	iov[1].iov_base = (char *)req;
+ 	req->FileNameOffset =
+-		cpu_to_le16(sizeof(struct smb2_query_directory_req) - 1 - 4);
++		cpu_to_le16(sizeof(struct smb2_query_directory_req) - 1);
+ 	req->FileNameLength = cpu_to_le16(len);
+ 	/*
+ 	 * BB could be 30 bytes or so longer if we used SMB2 specific
+@@ -3041,15 +3043,13 @@ SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
+ 	req->OutputBufferLength = cpu_to_le32(output_size);
  
- 	rc = cifs_call_async(server, &rqst, NULL, smb2_echo_callback, NULL,
- 			     server, CIFS_ECHO_OP);
+ 	iov[0].iov_base = (char *)req;
+-	/* 4 for RFC1001 length and 1 for Buffer */
+-	iov[0].iov_len = get_rfc1002_length(req) + 4 - 1;
++	/* 1 for Buffer */
++	iov[0].iov_len = total_len - 1;
+ 
+ 	iov[1].iov_base = (char *)(req->Buffer);
+ 	iov[1].iov_len = len;
+ 
+-	inc_rfc1001_len(req, len - 1 /* Buffer */);
+-
+-	rc = SendReceive2(xid, ses, iov, 2, &resp_buftype, flags, &rsp_iov);
++	rc = smb2_send_recv(xid, ses, iov, 2, &resp_buftype, flags, &rsp_iov);
+ 	cifs_small_buf_release(req);
+ 	rsp = (struct smb2_query_directory_rsp *)rsp_iov.iov_base;
+ 
 diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 2c743d338a11..b22bf8c6753e 100644
+index f0d6e637b95f..630a5c064f0c 100644
 --- a/fs/cifs/smb2pdu.h
 +++ b/fs/cifs/smb2pdu.h
-@@ -924,7 +924,7 @@ struct smb2_lock_rsp {
- } __packed;
+@@ -942,7 +942,7 @@ struct smb2_echo_rsp {
+ #define SMB2_REOPEN			0x10
  
- struct smb2_echo_req {
+ struct smb2_query_directory_req {
 -	struct smb2_hdr hdr;
 +	struct smb2_sync_hdr sync_hdr;
- 	__le16 StructureSize;	/* Must be 4 */
- 	__u16  Reserved;
- } __packed;
+ 	__le16 StructureSize; /* Must be 33 */
+ 	__u8   FileInformationClass;
+ 	__u8   Flags;
 -- 
 2.13.3
