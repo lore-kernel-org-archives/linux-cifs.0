@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 03/19] cifs: remove rfc1002 header from smb2_logoff_req
-Date: Thu,  9 Nov 2017 12:14:17 +1100
-Message-ID: <20171109011433.14468-4-lsahlber@redhat.com>
+Subject: [PATCH 12/19] cifs: remove rfc1002 header from smb2_lock_req
+Date: Thu,  9 Nov 2017 12:14:26 +1100
+Message-ID: <20171109011433.14468-13-lsahlber@redhat.com>
 References: <20171109011433.14468-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -12,66 +12,67 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c | 17 +++++++++++++----
+ fs/cifs/smb2pdu.c | 13 ++++++-------
  fs/cifs/smb2pdu.h |  2 +-
- 2 files changed, 14 insertions(+), 5 deletions(-)
+ 2 files changed, 7 insertions(+), 8 deletions(-)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index f5cf9953955c..02ad55aef029 100644
+index 144395bab5c1..a44d54ea946b 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -1198,6 +1198,10 @@ SMB2_logoff(const unsigned int xid, struct cifs_ses *ses)
- 	int rc = 0;
- 	struct TCP_Server_Info *server;
- 	int flags = 0;
+@@ -3515,34 +3515,33 @@ smb2_lockv(const unsigned int xid, struct cifs_tcon *tcon,
+ 	int resp_buf_type;
+ 	unsigned int count;
+ 	int flags = CIFS_NO_RESP;
 +	unsigned int total_len;
-+	struct kvec iov[1];
-+	struct kvec rsp_iov;
-+	int resp_buf_type;
  
- 	cifs_dbg(FYI, "disconnect session %p\n", ses);
+ 	cifs_dbg(FYI, "smb2_lockv num lock %d\n", num_lock);
  
-@@ -1210,19 +1214,24 @@ SMB2_logoff(const unsigned int xid, struct cifs_ses *ses)
- 	if (ses->need_reconnect)
- 		goto smb2_session_already_dead;
- 
--	rc = small_smb2_init(SMB2_LOGOFF, NULL, (void **) &req);
-+	rc = smb2_plain_req_init(SMB2_LOGOFF, NULL, (void **) &req, &total_len);
+-	rc = small_smb2_init(SMB2_LOCK, tcon, (void **) &req);
++	rc = smb2_plain_req_init(SMB2_LOCK, tcon, (void **) &req, &total_len);
  	if (rc)
  		return rc;
  
- 	 /* since no tcon, smb2_init can not do this, so do here */
--	req->hdr.sync_hdr.SessionId = ses->Suid;
-+	req->sync_hdr.SessionId = ses->Suid;
- 
- 	if (ses->session_flags & SMB2_SESSION_FLAG_ENCRYPT_DATA)
+ 	if (encryption_required(tcon))
  		flags |= CIFS_TRANSFORM_REQ;
- 	else if (server->sign)
--		req->hdr.sync_hdr.Flags |= SMB2_FLAGS_SIGNED;
-+		req->sync_hdr.Flags |= SMB2_FLAGS_SIGNED;
-+
-+	flags |= CIFS_NO_RESP;
-+
-+	iov[0].iov_base = (char *)req;
-+	iov[0].iov_len = total_len;
  
--	rc = SendReceiveNoRsp(xid, ses, (char *) req, flags);
-+	rc = smb2_send_recv(xid, ses, iov, 1, &resp_buf_type, flags, &rsp_iov);
+-	req->hdr.sync_hdr.ProcessId = cpu_to_le32(pid);
++	req->sync_hdr.ProcessId = cpu_to_le32(pid);
+ 	req->LockCount = cpu_to_le16(num_lock);
+ 
+ 	req->PersistentFileId = persist_fid;
+ 	req->VolatileFileId = volatile_fid;
+ 
+ 	count = num_lock * sizeof(struct smb2_lock_element);
+-	inc_rfc1001_len(req, count - sizeof(struct smb2_lock_element));
+ 
+ 	iov[0].iov_base = (char *)req;
+-	/* 4 for rfc1002 length field and count for all locks */
+-	iov[0].iov_len = get_rfc1002_length(req) + 4 - count;
++	iov[0].iov_len = total_len;
+ 	iov[1].iov_base = (char *)buf;
+ 	iov[1].iov_len = count;
+ 
+ 	cifs_stats_inc(&tcon->stats.cifs_stats.num_locks);
+-	rc = SendReceive2(xid, tcon->ses, iov, 2, &resp_buf_type, flags,
+-			  &rsp_iov);
++	rc = smb2_send_recv(xid, tcon->ses, iov, 2, &resp_buf_type, flags,
++			    &rsp_iov);
  	cifs_small_buf_release(req);
- 	/*
- 	 * No tcon so can't do
+ 	if (rc) {
+ 		cifs_dbg(FYI, "Send error in smb2_lockv = %d\n", rc);
 diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 0fe2382597ad..0799e0957499 100644
+index a8102e5f4ebb..0c33fc8cce71 100644
 --- a/fs/cifs/smb2pdu.h
 +++ b/fs/cifs/smb2pdu.h
-@@ -308,7 +308,7 @@ struct smb2_sess_setup_rsp {
+@@ -907,7 +907,7 @@ struct smb2_lock_element {
  } __packed;
  
- struct smb2_logoff_req {
+ struct smb2_lock_req {
 -	struct smb2_hdr hdr;
 +	struct smb2_sync_hdr sync_hdr;
- 	__le16 StructureSize;	/* Must be 4 */
- 	__le16 Reserved;
- } __packed;
+ 	__le16 StructureSize; /* Must be 48 */
+ 	__le16 LockCount;
+ 	__le32 Reserved;
 -- 
 2.13.3
