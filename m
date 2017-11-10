@@ -1,121 +1,134 @@
-From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: fix return code when failing to rename a file onto a directory
-Date: Fri, 10 Nov 2017 10:52:49 +1100
-Message-ID: <20171109235249.8013-1-lsahlber@redhat.com>
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+From: aaptel-IBi9RG/b67k@public.gmane.org (=?utf-8?Q?Aur=C3=A9lien?= Aptel)
+Subject: compound requests roadmap
+Date: Fri, 10 Nov 2017 17:07:13 +0100
+Message-ID: <87fu9mf77y.fsf@suse.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Cifs servers return ACCESS_DENIED when trying to rename onto a non-empty
-directory. This is different from xfstest where we expect this to return
--EEXIST instead.
+Hello linux-cifs,
 
-As a workaround, if we failed to rename the file and we got -EACCES
-then try to open the target file and check the attributes if it is a
-directory or not and if so remap the error to -EEXIST.
+I've been looking into adding compound requests for some time and
+Ronnie's latest patch series is one of the first step in the right
+direction.
 
-This makes us pass xfstest  generic/245
+I've talked with Pavel at SDC and he gave me great advices although a
+lot of it went over my head at the time. I have the notes from that
+discussion, which I'm still trying to make sense of now that I'm more
+familiar with the parts involved.
 
-Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/smb2ops.c   | 40 ++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2pdu.c   | 12 +++++++++++-
- fs/cifs/smb2proto.h |  2 ++
- 3 files changed, 53 insertions(+), 1 deletion(-)
+Compound requests are just a bundle of requests sent together to save
+roundtrips. The server can send back compounded responses too.
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index bdb963d0ba32..5a620c71d91f 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -426,6 +426,46 @@ smb2_query_file_info(const unsigned int xid, struct cifs_tcon *tcon,
- 	return rc;
- }
- 
-+int
-+smb2_is_dir(const unsigned int xid, struct cifs_tcon *tcon,
-+	    __le16 *target_file, int *is_dir)
-+{
-+	int rc;
-+	u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
-+	struct cifs_open_parms oparms;
-+	struct cifs_fid fid;
-+	struct smb2_file_all_info *smb2_data;
-+
-+	smb2_data = kzalloc(sizeof(struct smb2_file_all_info) + PATH_MAX * 2,
-+			    GFP_KERNEL);
-+	if (smb2_data == NULL)
-+		return -ENOMEM;
-+
-+	oparms.tcon = tcon;
-+	oparms.desired_access = FILE_READ_ATTRIBUTES;
-+	oparms.disposition = FILE_OPEN;
-+	oparms.create_options = 0;
-+	oparms.fid = &fid;
-+	oparms.reconnect = false;
-+
-+	rc = SMB2_open(xid, &oparms, target_file, &oplock, NULL, NULL);
-+	if (rc)
-+		goto out;
-+
-+	rc = SMB2_query_info(xid, tcon, fid.persistent_fid, fid.volatile_fid,
-+			     smb2_data);
-+	SMB2_close(xid, tcon, fid.persistent_fid, fid.volatile_fid);
-+	if (rc)
-+		goto out;
-+
-+	*is_dir = !!(le32_to_cpu(smb2_data->Attributes) &
-+		     FILE_ATTRIBUTE_DIRECTORY);
-+
-+out:
-+	kfree(smb2_data);
-+	return rc;
-+}
-+
- #ifdef CONFIG_CIFS_XATTR
- static ssize_t
- move_smb2_ea_to_cifs(char *dst, size_t dst_size,
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 553d574940b9..ec5de0a23378 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -3144,7 +3144,7 @@ SMB2_rename(const unsigned int xid, struct cifs_tcon *tcon,
- 	struct smb2_file_rename_info info;
- 	void **data;
- 	unsigned int size[2];
--	int rc;
-+	int rc, is_dir;
- 	int len = (2 * UniStrnlen((wchar_t *)target_file, PATH_MAX));
- 
- 	data = kmalloc(sizeof(void *) * 2, GFP_KERNEL);
-@@ -3165,6 +3165,16 @@ SMB2_rename(const unsigned int xid, struct cifs_tcon *tcon,
- 	rc = send_set_info(xid, tcon, persistent_fid, volatile_fid,
- 		current->tgid, FILE_RENAME_INFORMATION, SMB2_O_INFO_FILE,
- 		0, 2, data, size);
-+
-+	/* SMB2 servers responds with ACCESS_DENIED when trying to rename
-+	 * and replace onto a non-empty directory. Check for this and remap
-+	 * to EEXIST.
-+	 */
-+	if (rc == -EACCES) {
-+		if (!smb2_is_dir(xid, tcon, target_file, &is_dir) && is_dir)
-+			rc = -EEXIST;
-+	}
-+
- 	kfree(data);
- 	return rc;
- }
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index e9ab5227e7a8..a7528c0941c6 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -203,4 +203,6 @@ extern int smb3_validate_negotiate(const unsigned int, struct cifs_tcon *);
- 
- extern enum securityEnum smb2_select_sectype(struct TCP_Server_Info *,
- 					enum securityEnum);
-+extern int smb2_is_dir(const unsigned int xid, struct cifs_tcon *tcon,
-+		       __le16 *target_file, int *is_dir);
- #endif			/* _SMB2PROTO_H */
+The most important SMB2 header field related to them is the NextCommand,
+which is an offset that lets the server know where the next request is
+in the payload.
+
+You can make 2 types of compound requests, which is specified via a
+header flag: related and unrelated requests.
+
+Related requests are requests that kind of rely on each other e.g. open
+a file, do X with it, close. You need to give the FID of the file you
+haven't opened yet to do the X command and to close the file. Marking
+the bundle as "related requests" allow to use a special FID (0xfffff...)
+to mean "actually use the FID obtained from the previous open".
+
+Unrelated requests are just regular valid requests bundled together.
+
+Here are my ideas for implementations.
+
+First we need to remove the netbios header (aka rfc1002 len) from the
+smb2 header structures and let the code that send and receive
+respectively add and remove it.
+
+We need to do this because the netbios header is not repeated for each
+request in the bundle of requests. It only appears once and the length
+will be the length of the bundle.
+
+This is what Ronnie started.
+
+>From there you can have a function that accumulates smb2 commands in
+kvecs, setting the next command offset and flags properly each time and
+sends them. But can we really do it that way?
+
+I have started to write some code that basically reimplements
+smb2_open_op_close() to do everything in one kvec array... but then you
+hit the mid layer.
+
+Message ID or mid is the object used to represent a request, its
+response and some of the data associated with them. There's a queue of
+them (cf struct mid_q_entry) that is consumed by the cifsd kernel
+thread, who handles the (de)multiplexation of the packets on the tcp
+connection. In particular, a mid entry has a callback function pointer
+that is called when the response arrives.
+
+A mid entry represents a single request, so now that we have several in
+one, we need to create a mid for each, as the server doesn't have to
+reply to them in a compound way and might just send multiple simple smb2
+responses. So a having a kvec array that represents the bundle is not
+good, we have to reparse it to make the individual mid...
+
+In the open/X/close usecase, we only want to wait for the X response so
+we can probably hack something to make the mid entry of the bundle only
+wait for X...
+
+But in the general case --if we want to go beyond the most common and
+already very useful open/x/close usecase-- we probably want a way to
+make a batch and wait on it. I was thinking of introducting a Compound
+REQuest (creq) struct to accumulate the requests and modify the PDU
+routines to write in the creq and return early (before send_recv) if its
+not NULL.
+
+    struct smb2_creq creq;
+
+    smb2_creq_init(&creq, tcon, ...);
+
+    SMB2_xxx_send(&creq, ...);
+    SMB2_yyy_send(&creq, ...);
+    SMB2_zzz_send(&creq, ...);
+
+    smb2_creq_send_recv(&creq, ...);
+
+The send_recv call would block until we have a response for
+everything. We can also imagine a flag in SMB2_* calls to hint at whether
+we want to wait for it.
+
+PDU routines would be split into packet crafting (pre send_recv) and
+response handling (post send_recv) the code would be doing something like:
+
+SMB2_xxx_send(creq)
+{
+    smb2_xxx_req *req = smb2_plain_req_init(...)
+    // ... fill up req members ...
+    
+    if (creq) {
+        return smb2_creq_add(creq, req, ...);
+    }
+    
+    // otherwise send
+    return smb2_send_recv(req, ..);
+}
+
+SMB2_xxx_recv()
+{
+    // old post send_recv code to handle results
+}
+
+In turn smb2_creq_add() would add the request to the creq and
+smb2_creq_send_recv() would send everything and generata a mid_q_entry
+for each.
+
+I think this design is somewhat similar to the send/recv/done functions
+in Samba. There might be a simpler way I've overlooked.
+
+Cheers,
+
 -- 
-2.13.3
+Aurélien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
+GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
