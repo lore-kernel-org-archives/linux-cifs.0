@@ -1,66 +1,68 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 13/19] cifs: remove rfc1002 header from smb2 read/write requests
-Date: Thu, 16 Nov 2017 17:48:58 -0800
-Message-ID: <CAKywueQABC-J2ag4iYeQU_FsNK5zE=SCJYiy0pbZgVb92zpyCA@mail.gmail.com>
-References: <20171109011433.14468-1-lsahlber@redhat.com> <20171109011433.14468-14-lsahlber@redhat.com>
- <CAKywueRU_HM44i04yv_gKza=tgsuxwfF4h-XfstbXTZe3AZQeg@mail.gmail.com> <546793899.27950063.1510883138100.JavaMail.zimbra@redhat.com>
+From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+Subject: Re: [PATCH] cifs: fix return code when failing to rename a file onto a directory
+Date: Fri, 17 Nov 2017 16:10:40 +0100
+Message-ID: <mpsshddos9b.fsf@aaptelpc.suse.de>
+References: <20171109235249.8013-1-lsahlber@redhat.com> <CAKywueStf29fgZ-52ONqL+WLSYotaVwMpsqnu2gQdppuw5xtoA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
         Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Leif Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <546793899.27950063.1510883138100.JavaMail.zimbra-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <CAKywueStf29fgZ-52ONqL+WLSYotaVwMpsqnu2gQdppuw5xtoA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2017-11-16 17:45 GMT-08:00 Leif Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> writes:
 >
->
-> ----- Original Message -----
-> From: "Pavel Shilovsky" <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> To: "Ronnie Sahlberg" <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> Cc: "linux-cifs" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "Steve French" <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> Sent: Friday, 17 November, 2017 12:42:07 PM
-> Subject: Re: [PATCH 13/19] cifs: remove rfc1002 header from smb2 read/write requests
->
-> 2017-11-08 17:14 GMT-08:00 Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
->> Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->> ---
->>  fs/cifs/smb2pdu.c | 42 ++++++++++++++++++++----------------------
->>  fs/cifs/smb2pdu.h |  2 +-
->>  2 files changed, 21 insertions(+), 23 deletions(-)
->>
->> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
->> index a44d54ea946b..3ba9b2853902 100644
->> --- a/fs/cifs/smb2pdu.c
->> +++ b/fs/cifs/smb2pdu.c
->> @@ -2471,7 +2471,7 @@ smb2_new_read_req(void **buf, unsigned int *total_len,
->>         struct smb2_sync_hdr *shdr;
->>
->>         rc = smb2_plain_req_init(SMB2_READ, io_parms->tcon, (void **) &req,
->> -                                total_len);
->> +                            total_len);
->>         if (rc)
->>                 return rc;
->>         if (io_parms->tcon->ses->server == NULL)
->> @@ -2681,7 +2681,7 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
->>
->>         iov[0].iov_base = &req_len;
->>         iov[0].iov_len = sizeof(__be32);
->> -       iov[1].iov_base = req;
->> +       iov[1].iov_base = (char *)req;
->>         iov[1].iov_len = total_len;
->>
->>         rc = cifs_send_recv(xid, ses, &rqst, &resp_buftype, flags, &rsp_iov);
->
->> Why do not convert it to use new smb2_send_recv() function?
->
-> Good point.
-> Do you want me to do that change as a follow up patch or should I edit and re-send the patch series ?
+> What if the target is directory but the permissions are read-only?
 
-A follow up patch is fine.
+I get the same resulsts on a local filesystem (xfs) and on a mounted
+smb2 windows2016 share (both with and without the patch applied):
 
---
-Best regards,
-Pavel Shilovsky
+overwrite dir b with file a (with access to b)
+=======================
+rename("test/a", "test/b")              = -1 EISDIR (Is a directory)
+
+overwrite dir b with file a (without access to b)
+=======================
+rename("test/a", "test/b")              = -1 EISDIR (Is a directory)
+
+overwrite file b with file a (with access to b)
+=======================
+rename("test/a", "test/b")              = 0
+
+overwrite file b with file a (without access to b)
+=======================
+rename("test/a", "test/b")              = 0
+
+So.. I'm not sure what the xfstest test is doing.
+
+The only difference between the local and remote fs is that for cifs you
+can't delete test if you can't access test/b. (I am deleting "test"
+between my tests).
+
+That is on cifs:
+
+  mkdir -p test/b
+  chmod a-rw test/b
+  rm -rf test
+
+Will fail, but works on xfs. You you strace rm you will see:
+
+  unlinkat(4, "b", AT_REMOVEDIR) = -1 EACCES (Permission denied)
+
+I think this is due to the fundamental difference in how file removal
+permission works in Windows vs POSIX. In POSIX you need +w on the parent
+dir ("test") to be able to delete a file. On Windows there is a special
+delete permission on the object itself. Not sure if this is "fixable".
+
+Cheers,
+
+-- 
+Aurélien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
+GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
