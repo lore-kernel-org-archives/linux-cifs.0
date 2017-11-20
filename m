@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 11/19] cifs: remove rfc1002 header from smb2_flush_req
-Date: Mon, 20 Nov 2017 11:24:39 +1100
-Message-ID: <20171120002447.32322-12-lsahlber@redhat.com>
+Subject: [PATCH 04/19] cifs: remove rfc1002 header from smb2_tree_disconnect_req
+Date: Mon, 20 Nov 2017 11:24:32 +1100
+Message-ID: <20171120002447.32322-5-lsahlber@redhat.com>
 References: <20171120002447.32322-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -12,55 +12,60 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c | 8 ++++----
- fs/cifs/smb2pdu.h | 2 +-
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ fs/cifs/smb2pdu.c | 14 ++++++++++++--
+ fs/cifs/smb2pdu.h |  2 +-
+ 2 files changed, 13 insertions(+), 3 deletions(-)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 8c927c6098da..c1dd5961cf3f 100644
+index 20757d82b86b..879192966bec 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -2433,13 +2433,14 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
- 	int resp_buftype;
+@@ -1400,6 +1400,10 @@ SMB2_tdis(const unsigned int xid, struct cifs_tcon *tcon)
  	int rc = 0;
+ 	struct cifs_ses *ses = tcon->ses;
  	int flags = 0;
 +	unsigned int total_len;
++	struct kvec iov[1];
++	struct kvec rsp_iov;
++	int resp_buf_type;
  
- 	cifs_dbg(FYI, "Flush\n");
+ 	cifs_dbg(FYI, "Tree Disconnect\n");
  
- 	if (!ses || !(ses->server))
- 		return -EIO;
+@@ -1409,14 +1413,20 @@ SMB2_tdis(const unsigned int xid, struct cifs_tcon *tcon)
+ 	if ((tcon->need_reconnect) || (tcon->ses->need_reconnect))
+ 		return 0;
  
--	rc = small_smb2_init(SMB2_FLUSH, tcon, (void **) &req);
-+	rc = smb2_plain_req_init(SMB2_FLUSH, tcon, (void **) &req, &total_len);
+-	rc = small_smb2_init(SMB2_TREE_DISCONNECT, tcon, (void **) &req);
++	rc = smb2_plain_req_init(SMB2_TREE_DISCONNECT, tcon, (void **) &req,
++			     &total_len);
  	if (rc)
  		return rc;
  
-@@ -2450,10 +2451,9 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
- 	req->VolatileFileId = volatile_fid;
+ 	if (encryption_required(tcon))
+ 		flags |= CIFS_TRANSFORM_REQ;
  
- 	iov[0].iov_base = (char *)req;
--	/* 4 for rfc1002 length field */
--	iov[0].iov_len = get_rfc1002_length(req) + 4;
+-	rc = SendReceiveNoRsp(xid, ses, (char *)req, flags);
++	flags |= CIFS_NO_RESP;
++
++	iov[0].iov_base = (char *)req;
 +	iov[0].iov_len = total_len;
- 
--	rc = SendReceive2(xid, ses, iov, 1, &resp_buftype, flags, &rsp_iov);
-+	rc = smb2_send_recv(xid, ses, iov, 1, &resp_buftype, flags, &rsp_iov);
++
++	rc = smb2_send_recv(xid, ses, iov, 1, &resp_buf_type, flags, &rsp_iov);
  	cifs_small_buf_release(req);
- 
- 	if (rc != 0)
+ 	if (rc)
+ 		cifs_stats_fail_inc(tcon, SMB2_TREE_DISCONNECT_HE);
 diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 6e1874a81014..a8102e5f4ebb 100644
+index 0799e0957499..8b7aadefd4a5 100644
 --- a/fs/cifs/smb2pdu.h
 +++ b/fs/cifs/smb2pdu.h
-@@ -812,7 +812,7 @@ struct smb2_close_rsp {
- } __packed;
+@@ -375,7 +375,7 @@ struct smb2_tree_connect_rsp {
+ #define SMB2_SHARE_CAP_ASYMMETRIC cpu_to_le32(0x00000080) /* 3.02 */
  
- struct smb2_flush_req {
+ struct smb2_tree_disconnect_req {
 -	struct smb2_hdr hdr;
 +	struct smb2_sync_hdr sync_hdr;
- 	__le16 StructureSize;	/* Must be 24 */
- 	__le16 Reserved1;
- 	__le32 Reserved2;
+ 	__le16 StructureSize;	/* Must be 4 */
+ 	__le16 Reserved;
+ } __packed;
 -- 
 2.13.3
