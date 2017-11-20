@@ -1,41 +1,42 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: remove unused variable from SMB2_read
-Date: Mon, 20 Nov 2017 17:20:42 -0600
-Message-ID: <CAH2r5muqVmwzFA1syQUjA0JfY4Rxksx0E88n3h9X5+n+2nkGrQ@mail.gmail.com>
-References: <20171120225745.1384-1-lsahlber@redhat.com>
+Subject: Re: linux-next: build warning after merge of the cifs tree
+Date: Mon, 20 Nov 2017 17:37:52 -0600
+Message-ID: <CAH2r5muoR_8eFK+ZNUqdrzWTw3h6T9uHBYD4PbCUKYK6xCn1=A@mail.gmail.com>
+References: <20171121101916.4970d5f9@canb.auug.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: CIFS <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Linux-Next Mailing List <linux-next-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Linux Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+To: Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171120225745.1384-1-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <20171121101916.4970d5f9-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-merged into cifs-2.6.git for-next
+fix for this warning merged into cifs-2.6.git for-next
 
-On Mon, Nov 20, 2017 at 4:57 PM, Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/smb2pdu.c | 2 --
->  1 file changed, 2 deletions(-)
+On Mon, Nov 20, 2017 at 5:19 PM, Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org> wrote:
+> Hi all,
 >
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index a555d2b39b30..3ff0b08eaac2 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -2629,8 +2629,6 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
->         struct kvec iov[1];
->         struct kvec rsp_iov;
->         unsigned int total_len;
-> -       struct smb_rqst rqst = { .rq_iov = iov,
-> -                                .rq_nvec = 2 };
->         int flags = CIFS_LOG_ERROR;
->         struct cifs_ses *ses = io_parms->tcon->ses;
+> After merging the cifs tree, today's linux-next build (powerpc
+> ppc64_defconfig) produced this warning:
+>
+> fs/cifs/smb2pdu.c: In function 'SMB2_read':
+> fs/cifs/smb2pdu.c:2677:18: warning: unused variable 'rqst' [-Wunused-variable]
+>   struct smb_rqst rqst = { .rq_iov = iov,
+>                   ^
+>
+> Introduced by commit
+>
+>   889143494e16 ("cifs: remove rfc1002 header from smb2 read/write requests")
 >
 > --
-> 2.13.3
->
+> Cheers,
+> Stephen Rothwell
 
 
 
