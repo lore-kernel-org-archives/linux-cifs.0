@@ -1,71 +1,30 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 12/19] cifs: remove rfc1002 header from smb2_lock_req
-Date: Mon, 20 Nov 2017 14:56:59 -0800
-Message-ID: <CAKywueSLVCv5bn+g22nTOBK_mDe_Qabe+UoocVYhmLAQgnqekg@mail.gmail.com>
-References: <20171120002447.32322-1-lsahlber@redhat.com> <20171120002447.32322-13-lsahlber@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: remove unused variable from SMB2_read
+Date: Tue, 21 Nov 2017 09:57:45 +1100
+Message-ID: <20171120225745.1384-1-lsahlber@redhat.com>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171120002447.32322-13-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2017-11-19 16:24 GMT-08:00 Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/smb2pdu.c | 13 ++++++-------
->  fs/cifs/smb2pdu.h |  2 +-
->  2 files changed, 7 insertions(+), 8 deletions(-)
->
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index c1dd5961cf3f..d1242b1c9c35 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -3521,34 +3521,33 @@ smb2_lockv(const unsigned int xid, struct cifs_tcon *tcon,
->         int resp_buf_type;
->         unsigned int count;
->         int flags = CIFS_NO_RESP;
-> +       unsigned int total_len;
->
->         cifs_dbg(FYI, "smb2_lockv num lock %d\n", num_lock);
->
-> -       rc = small_smb2_init(SMB2_LOCK, tcon, (void **) &req);
-> +       rc = smb2_plain_req_init(SMB2_LOCK, tcon, (void **) &req, &total_len);
->         if (rc)
->                 return rc;
->
->         if (encryption_required(tcon))
->                 flags |= CIFS_TRANSFORM_REQ;
->
-> -       req->hdr.sync_hdr.ProcessId = cpu_to_le32(pid);
-> +       req->sync_hdr.ProcessId = cpu_to_le32(pid);
->         req->LockCount = cpu_to_le16(num_lock);
->
->         req->PersistentFileId = persist_fid;
->         req->VolatileFileId = volatile_fid;
->
->         count = num_lock * sizeof(struct smb2_lock_element);
-> -       inc_rfc1001_len(req, count - sizeof(struct smb2_lock_element));
+Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/smb2pdu.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-StructureSize already has one lock element inside...
-
->
->         iov[0].iov_base = (char *)req;
-> -       /* 4 for rfc1002 length field and count for all locks */
-> -       iov[0].iov_len = get_rfc1002_length(req) + 4 - count;
-> +       iov[0].iov_len = total_len;
-
-... which should be accounted here by substracting sizeof(struct
-smb2_lock_element) from total_len.
-
->         iov[1].iov_base = (char *)buf;
->         iov[1].iov_len = count;
-
-This was caught by running cthon tests against the patchset.
-
---
-Best regards,
-Pavel Shilovsky
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index a555d2b39b30..3ff0b08eaac2 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -2629,8 +2629,6 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
+ 	struct kvec iov[1];
+ 	struct kvec rsp_iov;
+ 	unsigned int total_len;
+-	struct smb_rqst rqst = { .rq_iov = iov,
+-				 .rq_nvec = 2 };
+ 	int flags = CIFS_LOG_ERROR;
+ 	struct cifs_ses *ses = io_parms->tcon->ses;
+ 
+-- 
+2.13.3
