@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 15/19] cifs: remove rfc1002 header from smb2_oplock_break we get from server
-Date: Mon, 20 Nov 2017 11:24:43 +1100
-Message-ID: <20171120002447.32322-16-lsahlber@redhat.com>
+Subject: [PATCH 02/19] cifs: remove rfc1002 header from smb2_negotiate_req
+Date: Mon, 20 Nov 2017 11:24:30 +1100
+Message-ID: <20171120002447.32322-3-lsahlber@redhat.com>
 References: <20171120002447.32322-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -12,89 +12,131 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/smb2misc.c |  2 +-
- fs/cifs/smb2pdu.c  | 19 +++++++++++++++----
- fs/cifs/smb2pdu.h  | 14 +++++++++++++-
- 3 files changed, 29 insertions(+), 6 deletions(-)
+ fs/cifs/smb2pdu.c | 38 ++++++++++++++++++++------------------
+ fs/cifs/smb2pdu.h |  2 +-
+ 2 files changed, 21 insertions(+), 19 deletions(-)
 
-diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-index 7b08a1446a7f..76d03abaa38c 100644
---- a/fs/cifs/smb2misc.c
-+++ b/fs/cifs/smb2misc.c
-@@ -578,7 +578,7 @@ smb2_is_valid_lease_break(char *buffer)
- bool
- smb2_is_valid_oplock_break(char *buffer, struct TCP_Server_Info *server)
- {
--	struct smb2_oplock_break *rsp = (struct smb2_oplock_break *)buffer;
-+	struct smb2_oplock_break_rsp *rsp = (struct smb2_oplock_break_rsp *)buffer;
- 	struct list_head *tmp, *tmp1, *tmp2;
- 	struct cifs_ses *ses;
- 	struct cifs_tcon *tcon;
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 42fc53f0c90d..5246ba0f1de2 100644
+index 5331631386a2..adfae01fe4d9 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -3319,11 +3319,17 @@ SMB2_oplock_break(const unsigned int xid, struct cifs_tcon *tcon,
- 		  __u8 oplock_level)
- {
- 	int rc;
--	struct smb2_oplock_break *req = NULL;
-+	struct smb2_oplock_break_req *req = NULL;
-+	struct cifs_ses *ses = tcon->ses;
- 	int flags = CIFS_OBREAK_OP;
-+	unsigned int total_len;
-+	struct kvec iov[1];
-+	struct kvec rsp_iov;
-+	int resp_buf_type;
+@@ -398,8 +398,8 @@ small_smb2_init(__le16 smb2_command, struct cifs_tcon *tcon,
+ }
  
- 	cifs_dbg(FYI, "SMB2_oplock_break\n");
--	rc = small_smb2_init(SMB2_OPLOCK_BREAK, tcon, (void **) &req);
-+	rc = smb2_plain_req_init(SMB2_OPLOCK_BREAK, tcon, (void **) &req,
-+			     &total_len);
+ #ifdef CONFIG_CIFS_SMB311
+-/* offset is sizeof smb2_negotiate_req - 4 but rounded up to 8 bytes */
+-#define OFFSET_OF_NEG_CONTEXT 0x68  /* sizeof(struct smb2_negotiate_req) - 4 */
++/* offset is sizeof smb2_negotiate_req but rounded up to 8 bytes */
++#define OFFSET_OF_NEG_CONTEXT 0x68  /* sizeof(struct smb2_negotiate_req) */
+ 
+ 
+ #define SMB2_PREAUTH_INTEGRITY_CAPABILITIES	cpu_to_le16(1)
+@@ -427,23 +427,25 @@ build_encrypt_ctxt(struct smb2_encryption_neg_context *pneg_ctxt)
+ }
+ 
+ static void
+-assemble_neg_contexts(struct smb2_negotiate_req *req)
++assemble_neg_contexts(struct smb2_negotiate_req *req,
++		      unsigned int *total_len)
+ {
+-
+-	/* +4 is to account for the RFC1001 len field */
+-	char *pneg_ctxt = (char *)req + OFFSET_OF_NEG_CONTEXT + 4;
++	char *pneg_ctxt = (char *)req + OFFSET_OF_NEG_CONTEXT;
+ 
+ 	build_preauth_ctxt((struct smb2_preauth_neg_context *)pneg_ctxt);
+ 	/* Add 2 to size to round to 8 byte boundary */
++
+ 	pneg_ctxt += 2 + sizeof(struct smb2_preauth_neg_context);
+ 	build_encrypt_ctxt((struct smb2_encryption_neg_context *)pneg_ctxt);
+ 	req->NegotiateContextOffset = cpu_to_le32(OFFSET_OF_NEG_CONTEXT);
+ 	req->NegotiateContextCount = cpu_to_le16(2);
+-	inc_rfc1001_len(req, 4 + sizeof(struct smb2_preauth_neg_context)
+-			+ sizeof(struct smb2_encryption_neg_context)); /* calculate hash */
++
++	*total_len += 4 + sizeof(struct smb2_preauth_neg_context)
++		+ sizeof(struct smb2_encryption_neg_context);
+ }
+ #else
+-static void assemble_neg_contexts(struct smb2_negotiate_req *req)
++static void assemble_neg_contexts(struct smb2_negotiate_req *req,
++				  unsigned int *total_len)
+ {
+ 	return;
+ }
+@@ -477,6 +479,7 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
+ 	int blob_offset, blob_length;
+ 	char *security_blob;
+ 	int flags = CIFS_NEG_OP;
++	unsigned int total_len;
+ 
+ 	cifs_dbg(FYI, "Negotiate protocol\n");
+ 
+@@ -485,30 +488,30 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
+ 		return -EIO;
+ 	}
+ 
+-	rc = small_smb2_init(SMB2_NEGOTIATE, NULL, (void **) &req);
++	rc = smb2_plain_req_init(SMB2_NEGOTIATE, NULL, (void **) &req, &total_len);
  	if (rc)
  		return rc;
  
-@@ -3333,9 +3339,14 @@ SMB2_oplock_break(const unsigned int xid, struct cifs_tcon *tcon,
- 	req->VolatileFid = volatile_fid;
- 	req->PersistentFid = persistent_fid;
- 	req->OplockLevel = oplock_level;
--	req->hdr.sync_hdr.CreditRequest = cpu_to_le16(1);
-+	req->sync_hdr.CreditRequest = cpu_to_le16(1);
-+
-+	flags |= CIFS_NO_RESP;
+-	req->hdr.sync_hdr.SessionId = 0;
++	req->sync_hdr.SessionId = 0;
  
--	rc = SendReceiveNoRsp(xid, tcon->ses, (char *) req, flags);
-+	iov[0].iov_base = (char *)req;
+ 	if (strcmp(ses->server->vals->version_string,
+ 		   SMB3ANY_VERSION_STRING) == 0) {
+ 		req->Dialects[0] = cpu_to_le16(SMB30_PROT_ID);
+ 		req->Dialects[1] = cpu_to_le16(SMB302_PROT_ID);
+ 		req->DialectCount = cpu_to_le16(2);
+-		inc_rfc1001_len(req, 4);
++		total_len += 4;
+ 	} else if (strcmp(ses->server->vals->version_string,
+ 		   SMBDEFAULT_VERSION_STRING) == 0) {
+ 		req->Dialects[0] = cpu_to_le16(SMB21_PROT_ID);
+ 		req->Dialects[1] = cpu_to_le16(SMB30_PROT_ID);
+ 		req->Dialects[2] = cpu_to_le16(SMB302_PROT_ID);
+ 		req->DialectCount = cpu_to_le16(3);
+-		inc_rfc1001_len(req, 6);
++		total_len += 6;
+ 	} else {
+ 		/* otherwise send specific dialect */
+ 		req->Dialects[0] = cpu_to_le16(ses->server->vals->protocol_id);
+ 		req->DialectCount = cpu_to_le16(1);
+-		inc_rfc1001_len(req, 2);
++		total_len += 2;
+ 	}
+ 
+ 	/* only one of SMB2 signing flags may be set in SMB2 request */
+@@ -528,13 +531,12 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
+ 		memcpy(req->ClientGUID, server->client_guid,
+ 			SMB2_CLIENT_GUID_SIZE);
+ 		if (ses->server->vals->protocol_id == SMB311_PROT_ID)
+-			assemble_neg_contexts(req);
++			assemble_neg_contexts(req, &total_len);
+ 	}
+ 	iov[0].iov_base = (char *)req;
+-	/* 4 for rfc1002 length field */
+-	iov[0].iov_len = get_rfc1002_length(req) + 4;
 +	iov[0].iov_len = total_len;
-+
-+	rc = smb2_send_recv(xid, ses, iov, 1, &resp_buf_type, flags, &rsp_iov);
- 	cifs_small_buf_release(req);
  
- 	if (rc) {
+-	rc = SendReceive2(xid, ses, iov, 1, &resp_buftype, flags, &rsp_iov);
++	rc = smb2_send_recv(xid, ses, iov, 1, &resp_buftype, flags, &rsp_iov);
+ 	cifs_small_buf_release(req);
+ 	rsp = (struct smb2_negotiate_rsp *)rsp_iov.iov_base;
+ 	/*
 diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 32f0f633b614..7f2a7639ea15 100644
+index c2ec934be968..0fe2382597ad 100644
 --- a/fs/cifs/smb2pdu.h
 +++ b/fs/cifs/smb2pdu.h
-@@ -1031,7 +1031,19 @@ struct smb2_set_info_rsp {
- 	__le16 StructureSize; /* Must be 2 */
- } __packed;
+@@ -195,7 +195,7 @@ struct smb2_symlink_err_rsp {
+ #define SMB2_CLIENT_GUID_SIZE 16
  
--struct smb2_oplock_break {
-+/* oplock break without an rfc1002 header */
-+struct smb2_oplock_break_req {
+ struct smb2_negotiate_req {
+-	struct smb2_hdr hdr;
 +	struct smb2_sync_hdr sync_hdr;
-+	__le16 StructureSize; /* Must be 24 */
-+	__u8   OplockLevel;
-+	__u8   Reserved;
-+	__le32 Reserved2;
-+	__u64  PersistentFid;
-+	__u64  VolatileFid;
-+} __packed;
-+
-+/* oplock break with an rfc1002 header */
-+struct smb2_oplock_break_rsp {
- 	struct smb2_hdr hdr;
- 	__le16 StructureSize; /* Must be 24 */
- 	__u8   OplockLevel;
+ 	__le16 StructureSize; /* Must be 36 */
+ 	__le16 DialectCount;
+ 	__le16 SecurityMode;
 -- 
 2.13.3
