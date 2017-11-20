@@ -1,9 +1,9 @@
 From: Leif Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [Patch v7 01/22] CIFS: SMBD: Add parameter rdata to
- smb2_new_read_req
-Date: Mon, 20 Nov 2017 00:28:13 -0500 (EST)
-Message-ID: <427177066.28433649.1511155693413.JavaMail.zimbra@redhat.com>
-References: <20171107085514.12693-1-longli@exchange.microsoft.com> <20171107085514.12693-2-longli@exchange.microsoft.com>
+Subject: Re: [Patch v7 02/22] CIFS: SMBD: Introduce kernel config option
+ CONFIG_CIFS_SMB_DIRECT
+Date: Mon, 20 Nov 2017 00:28:51 -0500 (EST)
+Message-ID: <1448269298.28433661.1511155731311.JavaMail.zimbra@redhat.com>
+References: <20171107085514.12693-1-longli@exchange.microsoft.com> <20171107085514.12693-3-longli@exchange.microsoft.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
@@ -16,80 +16,48 @@ Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u
         Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 To: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
 Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171107085514.12693-2-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+In-Reply-To: <20171107085514.12693-3-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
 Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
 Acked-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
+
 ----- Original Message -----
 From: "Long Li" <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
 To: "Steve French" <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, "Christoph Hellwig" <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>, "Tom Talpey" <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>, "Matthew Wilcox" <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>, "Stephen Hemminger" <sthemmin-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 Cc: "Long Li" <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Sent: Tuesday, 7 November, 2017 7:54:53 PM
-Subject: [Patch v7 01/22] CIFS: SMBD: Add parameter rdata to smb2_new_read_req
+Sent: Tuesday, 7 November, 2017 7:54:54 PM
+Subject: [Patch v7 02/22] CIFS: SMBD: Introduce kernel config option CONFIG_CIFS_SMB_DIRECT
 
 From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 
-This patch is for preparing upper layer for doing SMB read via RDMA write.
-
-When we assemble the SMB read packet header, we need to know the I/O layout
-if this request is to use a RDMA write. rdata has all the information we need
-for memory registration. Add rdata to smb2_new_read_req.
+Build SMB Direct code when this option is set.
 
 Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ fs/cifs/Kconfig | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index bab3da6..32ad590 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -2350,18 +2350,21 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
-  */
- static int
- smb2_new_read_req(void **buf, unsigned int *total_len,
--		  struct cifs_io_parms *io_parms, unsigned int remaining_bytes,
--		  int request_type)
-+	struct cifs_io_parms *io_parms, struct cifs_readdata *rdata,
-+	unsigned int remaining_bytes, int request_type)
- {
- 	int rc = -EACCES;
- 	struct smb2_read_plain_req *req = NULL;
- 	struct smb2_sync_hdr *shdr;
-+	struct TCP_Server_Info *server;
+diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
+index f724361..8d05fff 100644
+--- a/fs/cifs/Kconfig
++++ b/fs/cifs/Kconfig
+@@ -191,6 +191,14 @@ config CIFS_SMB311
+ 	  This dialect includes improved security negotiation features.
+ 	  If unsure, say N
  
- 	rc = smb2_plain_req_init(SMB2_READ, io_parms->tcon, (void **) &req,
- 				 total_len);
- 	if (rc)
- 		return rc;
--	if (io_parms->tcon->ses->server == NULL)
++config CIFS_SMB_DIRECT
++	bool "SMB Direct support (Experimental)"
++	depends on CIFS && INFINIBAND
++	help
++	  Enables SMB Direct experimental support for SMB 3.0, 3.02 and 3.1.1.
++	  SMB Direct allows transferring SMB packets over RDMA. If unsure,
++	  say N.
 +
-+	server = io_parms->tcon->ses->server;
-+	if (server == NULL)
- 		return -ECONNABORTED;
- 
- 	shdr = &req->sync_hdr;
-@@ -2489,7 +2492,8 @@ smb2_async_readv(struct cifs_readdata *rdata)
- 
- 	server = io_parms.tcon->ses->server;
- 
--	rc = smb2_new_read_req((void **) &buf, &total_len, &io_parms, 0, 0);
-+	rc = smb2_new_read_req(
-+		(void **) &buf, &total_len, &io_parms, rdata, 0, 0);
- 	if (rc) {
- 		if (rc == -EAGAIN && rdata->credits) {
- 			/* credits was reset by reconnect */
-@@ -2557,7 +2561,7 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
- 	struct cifs_ses *ses = io_parms->tcon->ses;
- 
- 	*nbytes = 0;
--	rc = smb2_new_read_req((void **)&req, &total_len, io_parms, 0, 0);
-+	rc = smb2_new_read_req((void **)&req, &total_len, io_parms, NULL, 0, 0);
- 	if (rc)
- 		return rc;
- 
+ config CIFS_FSCACHE
+ 	  bool "Provide CIFS client caching support"
+ 	  depends on CIFS=m && FSCACHE || CIFS=y && FSCACHE=y
 -- 
 2.7.4
 
