@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 12/19] cifs: remove rfc1002 header from smb2_lock_req
-Date: Mon, 20 Nov 2017 11:24:40 +1100
-Message-ID: <20171120002447.32322-13-lsahlber@redhat.com>
+Subject: [PATCH 09/19] cifs: remove rfc1002 header from smb2_tree_connect_req
+Date: Mon, 20 Nov 2017 11:24:37 +1100
+Message-ID: <20171120002447.32322-10-lsahlber@redhat.com>
 References: <20171120002447.32322-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -12,67 +12,77 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c | 13 ++++++-------
+ fs/cifs/smb2pdu.c | 18 +++++++++---------
  fs/cifs/smb2pdu.h |  2 +-
- 2 files changed, 7 insertions(+), 8 deletions(-)
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index c1dd5961cf3f..d1242b1c9c35 100644
+index c939b98dfb56..1d68dd0e3e45 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -3521,34 +3521,33 @@ smb2_lockv(const unsigned int xid, struct cifs_tcon *tcon,
- 	int resp_buf_type;
- 	unsigned int count;
- 	int flags = CIFS_NO_RESP;
+@@ -1275,6 +1275,7 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+ 	int unc_path_len;
+ 	__le16 *unc_path = NULL;
+ 	int flags = 0;
 +	unsigned int total_len;
  
- 	cifs_dbg(FYI, "smb2_lockv num lock %d\n", num_lock);
+ 	cifs_dbg(FYI, "TCON\n");
  
--	rc = small_smb2_init(SMB2_LOCK, tcon, (void **) &req);
-+	rc = smb2_plain_req_init(SMB2_LOCK, tcon, (void **) &req, &total_len);
- 	if (rc)
+@@ -1296,7 +1297,8 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+ 	if (tcon)
+ 		tcon->tid = 0;
+ 
+-	rc = small_smb2_init(SMB2_TREE_CONNECT, tcon, (void **) &req);
++	rc = smb2_plain_req_init(SMB2_TREE_CONNECT, tcon, (void **) &req,
++			     &total_len);
+ 	if (rc) {
+ 		kfree(unc_path);
  		return rc;
+@@ -1307,26 +1309,24 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+ 			flags |= CIFS_TRANSFORM_REQ;
  
- 	if (encryption_required(tcon))
+ 		/* since no tcon, smb2_init can not do this, so do here */
+-		req->hdr.sync_hdr.SessionId = ses->Suid;
++		req->sync_hdr.SessionId = ses->Suid;
+ 		if (ses->server->sign)
+-			req->hdr.sync_hdr.Flags |= SMB2_FLAGS_SIGNED;
++			req->sync_hdr.Flags |= SMB2_FLAGS_SIGNED;
+ 	} else if (encryption_required(tcon))
  		flags |= CIFS_TRANSFORM_REQ;
  
--	req->hdr.sync_hdr.ProcessId = cpu_to_le32(pid);
-+	req->sync_hdr.ProcessId = cpu_to_le32(pid);
- 	req->LockCount = cpu_to_le16(num_lock);
- 
- 	req->PersistentFileId = persist_fid;
- 	req->VolatileFileId = volatile_fid;
- 
- 	count = num_lock * sizeof(struct smb2_lock_element);
--	inc_rfc1001_len(req, count - sizeof(struct smb2_lock_element));
- 
  	iov[0].iov_base = (char *)req;
--	/* 4 for rfc1002 length field and count for all locks */
--	iov[0].iov_len = get_rfc1002_length(req) + 4 - count;
-+	iov[0].iov_len = total_len;
- 	iov[1].iov_base = (char *)buf;
- 	iov[1].iov_len = count;
+-	/* 4 for rfc1002 length field and 1 for pad */
+-	iov[0].iov_len = get_rfc1002_length(req) + 4 - 1;
++	/* 1 for pad */
++	iov[0].iov_len = total_len - 1;
  
- 	cifs_stats_inc(&tcon->stats.cifs_stats.num_locks);
--	rc = SendReceive2(xid, tcon->ses, iov, 2, &resp_buf_type, flags,
--			  &rsp_iov);
-+	rc = smb2_send_recv(xid, tcon->ses, iov, 2, &resp_buf_type, flags,
-+			    &rsp_iov);
+ 	/* Testing shows that buffer offset must be at location of Buffer[0] */
+ 	req->PathOffset = cpu_to_le16(sizeof(struct smb2_tree_connect_req)
+-			- 1 /* pad */ - 4 /* do not count rfc1001 len field */);
++			- 1 /* pad */);
+ 	req->PathLength = cpu_to_le16(unc_path_len - 2);
+ 	iov[1].iov_base = unc_path;
+ 	iov[1].iov_len = unc_path_len;
+ 
+-	inc_rfc1001_len(req, unc_path_len - 1 /* pad */);
+-
+-	rc = SendReceive2(xid, ses, iov, 2, &resp_buftype, flags, &rsp_iov);
++	rc = smb2_send_recv(xid, ses, iov, 2, &resp_buftype, flags, &rsp_iov);
  	cifs_small_buf_release(req);
- 	if (rc) {
- 		cifs_dbg(FYI, "Send error in smb2_lockv = %d\n", rc);
+ 	rsp = (struct smb2_tree_connect_rsp *)rsp_iov.iov_base;
+ 
 diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index a8102e5f4ebb..0c33fc8cce71 100644
+index e7acfa5e3fa6..4f80b95d02ae 100644
 --- a/fs/cifs/smb2pdu.h
 +++ b/fs/cifs/smb2pdu.h
-@@ -907,7 +907,7 @@ struct smb2_lock_element {
- } __packed;
+@@ -323,7 +323,7 @@ struct smb2_logoff_rsp {
+ #define SMB2_SHAREFLAG_CLUSTER_RECONNECT	0x0001
  
- struct smb2_lock_req {
+ struct smb2_tree_connect_req {
 -	struct smb2_hdr hdr;
 +	struct smb2_sync_hdr sync_hdr;
- 	__le16 StructureSize; /* Must be 48 */
- 	__le16 LockCount;
- 	__le32 Reserved;
+ 	__le16 StructureSize;	/* Must be 9 */
+ 	__le16 Reserved; /* Flags in SMB3.1.1 */
+ 	__le16 PathOffset;
 -- 
 2.13.3
