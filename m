@@ -1,98 +1,103 @@
-From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: fix return code when failing to rename a file onto a directory
-Date: Mon, 20 Nov 2017 16:25:49 +1100
-Message-ID: <20171120052549.17909-1-lsahlber@redhat.com>
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Leif Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [Patch v7 01/22] CIFS: SMBD: Add parameter rdata to
+ smb2_new_read_req
+Date: Mon, 20 Nov 2017 00:28:13 -0500 (EST)
+Message-ID: <427177066.28433649.1511155693413.JavaMail.zimbra@redhat.com>
+References: <20171107085514.12693-1-longli@exchange.microsoft.com> <20171107085514.12693-2-longli@exchange.microsoft.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+        Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Stephen Hemminger <sthemmin-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20171107085514.12693-2-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-Cifs servers return ACCESS_DENIED when trying to rename onto a non-empty
-directory. This is different from xfstest where we expect this to return
--EEXIST instead.
+Acked-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
-This makes us pass xfstest  generic/245
+----- Original Message -----
+From: "Long Li" <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+To: "Steve French" <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, "Christoph Hellwig" <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>, "Tom Talpey" <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>, "Matthew Wilcox" <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>, "Stephen Hemminger" <sthemmin-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Cc: "Long Li" <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Sent: Tuesday, 7 November, 2017 7:54:53 PM
+Subject: [Patch v7 01/22] CIFS: SMBD: Add parameter rdata to smb2_new_read_req
 
-Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+
+This patch is for preparing upper layer for doing SMB read via RDMA write.
+
+When we assemble the SMB read packet header, we need to know the I/O layout
+if this request is to use a RDMA write. rdata has all the information we need
+for memory registration. Add rdata to smb2_new_read_req.
+
+Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 ---
- fs/cifs/smb2inode.c |  7 +++++--
- fs/cifs/smb2pdu.c   | 10 +++++++++-
- fs/cifs/smb2proto.h |  2 +-
- 3 files changed, 15 insertions(+), 4 deletions(-)
+ fs/cifs/smb2pdu.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
-index 1238cd3552f9..6ada981f1f83 100644
---- a/fs/cifs/smb2inode.c
-+++ b/fs/cifs/smb2inode.c
-@@ -48,6 +48,7 @@ smb2_open_op_close(const unsigned int xid, struct cifs_tcon *tcon,
- 	__u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
- 	struct cifs_open_parms oparms;
- 	struct cifs_fid fid;
-+	struct smb2_file_all_info all_info;
- 
- 	utf16_path = cifs_convert_path_to_utf16(full_path, cifs_sb);
- 	if (!utf16_path)
-@@ -60,7 +61,7 @@ smb2_open_op_close(const unsigned int xid, struct cifs_tcon *tcon,
- 	oparms.fid = &fid;
- 	oparms.reconnect = false;
- 
--	rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL);
-+	rc = SMB2_open(xid, &oparms, utf16_path, &oplock, &all_info, NULL);
- 	if (rc) {
- 		kfree(utf16_path);
- 		return rc;
-@@ -86,7 +87,9 @@ smb2_open_op_close(const unsigned int xid, struct cifs_tcon *tcon,
- 		break;
- 	case SMB2_OP_RENAME:
- 		tmprc = SMB2_rename(xid, tcon, fid.persistent_fid,
--				    fid.volatile_fid, (__le16 *)data);
-+				    fid.volatile_fid, (__le16 *)data,
-+				    le32_to_cpu(all_info.Attributes) &
-+				    FILE_ATTRIBUTE_DIRECTORY);
- 		break;
- 	case SMB2_OP_HARDLINK:
- 		tmprc = SMB2_set_hardlink(xid, tcon, fid.persistent_fid,
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 553d574940b9..56c71a58d971 100644
+index bab3da6..32ad590 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -3139,7 +3139,8 @@ send_set_info(const unsigned int xid, struct cifs_tcon *tcon,
- 
- int
- SMB2_rename(const unsigned int xid, struct cifs_tcon *tcon,
--	    u64 persistent_fid, u64 volatile_fid, __le16 *target_file)
-+	    u64 persistent_fid, u64 volatile_fid, __le16 *target_file,
-+	    bool is_dir)
+@@ -2350,18 +2350,21 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+  */
+ static int
+ smb2_new_read_req(void **buf, unsigned int *total_len,
+-		  struct cifs_io_parms *io_parms, unsigned int remaining_bytes,
+-		  int request_type)
++	struct cifs_io_parms *io_parms, struct cifs_readdata *rdata,
++	unsigned int remaining_bytes, int request_type)
  {
- 	struct smb2_file_rename_info info;
- 	void **data;
-@@ -3165,6 +3166,13 @@ SMB2_rename(const unsigned int xid, struct cifs_tcon *tcon,
- 	rc = send_set_info(xid, tcon, persistent_fid, volatile_fid,
- 		current->tgid, FILE_RENAME_INFORMATION, SMB2_O_INFO_FILE,
- 		0, 2, data, size);
-+	/* SMB2 servers responds with ACCESS_DENIED when trying to rename
-+	 * and replace onto a non-empty directory. Check for this and remap
-+	 * to EEXIST.
-+	 */
-+	if (rc == -EACCES && is_dir)
-+		rc = -EEXIST;
+ 	int rc = -EACCES;
+ 	struct smb2_read_plain_req *req = NULL;
+ 	struct smb2_sync_hdr *shdr;
++	struct TCP_Server_Info *server;
+ 
+ 	rc = smb2_plain_req_init(SMB2_READ, io_parms->tcon, (void **) &req,
+ 				 total_len);
+ 	if (rc)
+ 		return rc;
+-	if (io_parms->tcon->ses->server == NULL)
 +
- 	kfree(data);
- 	return rc;
- }
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index e9ab5227e7a8..69fa9a39c7fa 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -158,7 +158,7 @@ extern int SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
- 				struct cifs_search_info *srch_inf);
- extern int SMB2_rename(const unsigned int xid, struct cifs_tcon *tcon,
- 		       u64 persistent_fid, u64 volatile_fid,
--		       __le16 *target_file);
-+		       __le16 *target_file, bool is_dir);
- extern int SMB2_rmdir(const unsigned int xid, struct cifs_tcon *tcon,
- 		      u64 persistent_fid, u64 volatile_fid);
- extern int SMB2_set_hardlink(const unsigned int xid, struct cifs_tcon *tcon,
++	server = io_parms->tcon->ses->server;
++	if (server == NULL)
+ 		return -ECONNABORTED;
+ 
+ 	shdr = &req->sync_hdr;
+@@ -2489,7 +2492,8 @@ smb2_async_readv(struct cifs_readdata *rdata)
+ 
+ 	server = io_parms.tcon->ses->server;
+ 
+-	rc = smb2_new_read_req((void **) &buf, &total_len, &io_parms, 0, 0);
++	rc = smb2_new_read_req(
++		(void **) &buf, &total_len, &io_parms, rdata, 0, 0);
+ 	if (rc) {
+ 		if (rc == -EAGAIN && rdata->credits) {
+ 			/* credits was reset by reconnect */
+@@ -2557,7 +2561,7 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
+ 	struct cifs_ses *ses = io_parms->tcon->ses;
+ 
+ 	*nbytes = 0;
+-	rc = smb2_new_read_req((void **)&req, &total_len, io_parms, 0, 0);
++	rc = smb2_new_read_req((void **)&req, &total_len, io_parms, NULL, 0, 0);
+ 	if (rc)
+ 		return rc;
+ 
 -- 
-2.13.3
+2.7.4
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+--
+To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
