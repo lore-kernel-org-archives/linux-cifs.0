@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 14/19] cifs: remove rfc1002 header from smb2_lease_ack
-Date: Mon, 20 Nov 2017 11:24:42 +1100
-Message-ID: <20171120002447.32322-15-lsahlber@redhat.com>
+Subject: [PATCH 11/19] cifs: remove rfc1002 header from smb2_flush_req
+Date: Mon, 20 Nov 2017 11:24:39 +1100
+Message-ID: <20171120002447.32322-12-lsahlber@redhat.com>
 References: <20171120002447.32322-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -12,66 +12,55 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c | 19 +++++++++++++++----
- fs/cifs/smb2pdu.h |  2 +-
- 2 files changed, 16 insertions(+), 5 deletions(-)
+ fs/cifs/smb2pdu.c | 8 ++++----
+ fs/cifs/smb2pdu.h | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 58f02213696a..42fc53f0c90d 100644
+index 8c927c6098da..c1dd5961cf3f 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -3573,24 +3573,35 @@ SMB2_lease_break(const unsigned int xid, struct cifs_tcon *tcon,
- {
- 	int rc;
- 	struct smb2_lease_ack *req = NULL;
-+	struct cifs_ses *ses = tcon->ses;
- 	int flags = CIFS_OBREAK_OP;
+@@ -2433,13 +2433,14 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+ 	int resp_buftype;
+ 	int rc = 0;
+ 	int flags = 0;
 +	unsigned int total_len;
-+	struct kvec iov[1];
-+	struct kvec rsp_iov;
-+	int resp_buf_type;
  
- 	cifs_dbg(FYI, "SMB2_lease_break\n");
--	rc = small_smb2_init(SMB2_OPLOCK_BREAK, tcon, (void **) &req);
-+	rc = smb2_plain_req_init(SMB2_OPLOCK_BREAK, tcon, (void **) &req,
-+			     &total_len);
+ 	cifs_dbg(FYI, "Flush\n");
+ 
+ 	if (!ses || !(ses->server))
+ 		return -EIO;
+ 
+-	rc = small_smb2_init(SMB2_FLUSH, tcon, (void **) &req);
++	rc = smb2_plain_req_init(SMB2_FLUSH, tcon, (void **) &req, &total_len);
  	if (rc)
  		return rc;
  
- 	if (encryption_required(tcon))
- 		flags |= CIFS_TRANSFORM_REQ;
+@@ -2450,10 +2451,9 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+ 	req->VolatileFileId = volatile_fid;
  
--	req->hdr.sync_hdr.CreditRequest = cpu_to_le16(1);
-+	req->sync_hdr.CreditRequest = cpu_to_le16(1);
- 	req->StructureSize = cpu_to_le16(36);
--	inc_rfc1001_len(req, 12);
-+	total_len += 12;
- 
- 	memcpy(req->LeaseKey, lease_key, 16);
- 	req->LeaseState = lease_state;
- 
--	rc = SendReceiveNoRsp(xid, tcon->ses, (char *) req, flags);
-+	flags |= CIFS_NO_RESP;
-+
-+	iov[0].iov_base = (char *)req;
+ 	iov[0].iov_base = (char *)req;
+-	/* 4 for rfc1002 length field */
+-	iov[0].iov_len = get_rfc1002_length(req) + 4;
 +	iov[0].iov_len = total_len;
-+
-+	rc = smb2_send_recv(xid, ses, iov, 1, &resp_buf_type, flags, &rsp_iov);
+ 
+-	rc = SendReceive2(xid, ses, iov, 1, &resp_buftype, flags, &rsp_iov);
++	rc = smb2_send_recv(xid, ses, iov, 1, &resp_buftype, flags, &rsp_iov);
  	cifs_small_buf_release(req);
  
- 	if (rc) {
+ 	if (rc != 0)
 diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 3c856f058be7..32f0f633b614 100644
+index 6e1874a81014..a8102e5f4ebb 100644
 --- a/fs/cifs/smb2pdu.h
 +++ b/fs/cifs/smb2pdu.h
-@@ -1057,7 +1057,7 @@ struct smb2_lease_break {
+@@ -812,7 +812,7 @@ struct smb2_close_rsp {
  } __packed;
  
- struct smb2_lease_ack {
+ struct smb2_flush_req {
 -	struct smb2_hdr hdr;
 +	struct smb2_sync_hdr sync_hdr;
- 	__le16 StructureSize; /* Must be 36 */
- 	__le16 Reserved;
- 	__le32 Flags;
+ 	__le16 StructureSize;	/* Must be 24 */
+ 	__le16 Reserved1;
+ 	__le32 Reserved2;
 -- 
 2.13.3
