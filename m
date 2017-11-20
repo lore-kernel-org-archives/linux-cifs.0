@@ -1,1957 +1,1143 @@
-From: Leif Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [Patch v7 05/22] CIFS: SMBD: Establish SMB Direct connection
-Date: Mon, 20 Nov 2017 00:46:47 -0500 (EST)
-Message-ID: <817309867.28473523.1511156807466.JavaMail.zimbra@redhat.com>
-References: <20171107085514.12693-1-longli@exchange.microsoft.com> <20171107085514.12693-6-longli@exchange.microsoft.com>
+From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Subject: RE: [Patch v7 05/22] CIFS: SMBD: Establish SMB Direct connection
+Date: Mon, 20 Nov 2017 06:07:41 +0000
+Message-ID: <MWHPR21MB084640A54337C1467767A974CE220@MWHPR21MB0846.namprd21.prod.outlook.com>
+References: <20171107085514.12693-1-longli@exchange.microsoft.com>
+ <20171107085514.12693-6-longli@exchange.microsoft.com>
+ <817309867.28473523.1511156807466.JavaMail.zimbra@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
         Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-        Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        "Tom Talpey" <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
         Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Stephen Hemminger <sthemmin-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+        Stephen Hemminger <sthemmin-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Leif Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171107085514.12693-6-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+In-Reply-To: <817309867.28473523.1511156807466.JavaMail.zimbra-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Acked-by: Ronnie Sahlberg <lsahlber-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-
-But two tiny nits:
-+ * e.g. cifs.smbd_logging_class=0x500 will log all log_rdma_recv() and
-Should be 0xa0
-
-+//	queue_work(info->workqueue, &info->destroy_work);
-Don't leave commented out code in there.
-
-
------ Original Message -----
-From: "Long Li" <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-To: "Steve French" <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, "Christoph Hellwig" <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>, "Tom Talpey" <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>, "Matthew Wilcox" <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>, "Stephen Hemminger" <sthemmin-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Cc: "Long Li" <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Sent: Tuesday, 7 November, 2017 7:54:57 PM
-Subject: [Patch v7 05/22] CIFS: SMBD: Establish SMB Direct connection
-
-From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-
-Add code to implement the core functions to establish a SMB Direct connection.
-
-1. Establish an RDMA connection to SMB server.
-2. Negotiate and setup SMB Direct protocol.
-3. Implement idle connection timer and credit management.
-
-SMB Direct is enabled by setting CONFIG_CIFS_SMB_DIRECT.
-
-Add to Makefile to enable building SMB Direct.
-
-Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
----
- fs/cifs/Makefile    |    2 +
- fs/cifs/smbdirect.c | 1576 +++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smbdirect.h |  280 +++++++++
- 3 files changed, 1858 insertions(+)
-
-diff --git a/fs/cifs/Makefile b/fs/cifs/Makefile
-index 5e853a3..ad00873 100644
---- a/fs/cifs/Makefile
-+++ b/fs/cifs/Makefile
-@@ -18,3 +18,5 @@ cifs-$(CONFIG_CIFS_UPCALL) += cifs_spnego.o
- cifs-$(CONFIG_CIFS_DFS_UPCALL) += dns_resolve.o cifs_dfs_ref.o
- 
- cifs-$(CONFIG_CIFS_FSCACHE) += fscache.o cache.o
-+
-+cifs-$(CONFIG_CIFS_SMB_DIRECT) += smbdirect.o
-diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index d3c16f8..021d527 100644
---- a/fs/cifs/smbdirect.c
-+++ b/fs/cifs/smbdirect.c
-@@ -13,7 +13,34 @@
-  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-  *   the GNU General Public License for more details.
-  */
-+#include <linux/module.h>
- #include "smbdirect.h"
-+#include "cifs_debug.h"
-+
-+static struct smbd_response *get_empty_queue_buffer(
-+		struct smbd_connection *info);
-+static struct smbd_response *get_receive_buffer(
-+		struct smbd_connection *info);
-+static void put_receive_buffer(
-+		struct smbd_connection *info,
-+		struct smbd_response *response,
-+		bool lock);
-+static int allocate_receive_buffers(struct smbd_connection *info, int num_buf);
-+static void destroy_receive_buffers(struct smbd_connection *info);
-+
-+static void put_empty_packet(
-+		struct smbd_connection *info, struct smbd_response *response);
-+static void enqueue_reassembly(
-+		struct smbd_connection *info,
-+		struct smbd_response *response, int data_length);
-+static struct smbd_response *_get_first_reassembly(
-+		struct smbd_connection *info);
-+
-+static int smbd_post_recv(
-+		struct smbd_connection *info,
-+		struct smbd_response *response);
-+
-+static int smbd_post_send_empty(struct smbd_connection *info);
- 
- /* SMBD version number */
- #define SMBD_V1	0x0100
-@@ -75,3 +102,1552 @@ int smbd_max_frmr_depth = 2048;
- 
- /* If payload is less than this byte, use RDMA send/recv not read/write */
- int rdma_readwrite_threshold = 4096;
-+
-+/* Transport logging functions
-+ * Logging are defined as classes. They can be OR'ed to define the actual
-+ * logging level via module parameter smbd_logging_class
-+ * e.g. cifs.smbd_logging_class=0x500 will log all log_rdma_recv() and
-+ * log_rdma_event()
-+ */
-+#define LOG_OUTGOING			0x1
-+#define LOG_INCOMING			0x2
-+#define LOG_READ			0x4
-+#define LOG_WRITE			0x8
-+#define LOG_RDMA_SEND			0x10
-+#define LOG_RDMA_RECV			0x20
-+#define LOG_KEEP_ALIVE			0x40
-+#define LOG_RDMA_EVENT			0x80
-+#define LOG_RDMA_MR			0x100
-+static unsigned int smbd_logging_class = 0;
-+module_param(smbd_logging_class, uint, 0644);
-+MODULE_PARM_DESC(smbd_logging_class,
-+	"Logging class for SMBD transport 0x0 to 0x100");
-+
-+#define ERR		0x0
-+#define INFO		0x1
-+static unsigned int smbd_logging_level = ERR;
-+module_param(smbd_logging_level, uint, 0644);
-+MODULE_PARM_DESC(smbd_logging_level,
-+	"Logging level for SMBD transport, 0 (default): error, 1: info");
-+
-+#define log_rdma(level, class, fmt, args...)				\
-+do {									\
-+	if (level <= smbd_logging_level || class & smbd_logging_class)	\
-+		cifs_dbg(VFS, "%s:%d " fmt, __func__, __LINE__, ##args);\
-+} while (0)
-+
-+#define log_outgoing(level, fmt, args...) \
-+		log_rdma(level, LOG_OUTGOING, fmt, ##args)
-+#define log_incoming(level, fmt, args...) \
-+		log_rdma(level, LOG_INCOMING, fmt, ##args)
-+#define log_read(level, fmt, args...)	log_rdma(level, LOG_READ, fmt, ##args)
-+#define log_write(level, fmt, args...)	log_rdma(level, LOG_WRITE, fmt, ##args)
-+#define log_rdma_send(level, fmt, args...) \
-+		log_rdma(level, LOG_RDMA_SEND, fmt, ##args)
-+#define log_rdma_recv(level, fmt, args...) \
-+		log_rdma(level, LOG_RDMA_RECV, fmt, ##args)
-+#define log_keep_alive(level, fmt, args...) \
-+		log_rdma(level, LOG_KEEP_ALIVE, fmt, ##args)
-+#define log_rdma_event(level, fmt, args...) \
-+		log_rdma(level, LOG_RDMA_EVENT, fmt, ##args)
-+#define log_rdma_mr(level, fmt, args...) \
-+		log_rdma(level, LOG_RDMA_MR, fmt, ##args)
-+
-+/*
-+ * Destroy the transport and related RDMA and memory resources
-+ * Need to go through all the pending counters and make sure on one is using
-+ * the transport while it is destroyed
-+ */
-+static void smbd_destroy_rdma_work(struct work_struct *work)
-+{
-+	struct smbd_response *response;
-+	struct smbd_connection *info =
-+		container_of(work, struct smbd_connection, destroy_work);
-+	unsigned long flags;
-+
-+	log_rdma_event(INFO, "destroying qp\n");
-+	ib_drain_qp(info->id->qp);
-+	rdma_destroy_qp(info->id);
-+
-+	/* Unblock all I/O waiting on the send queue */
-+	wake_up_interruptible_all(&info->wait_send_queue);
-+
-+	log_rdma_event(INFO, "cancelling idle timer\n");
-+	cancel_delayed_work_sync(&info->idle_timer_work);
-+	log_rdma_event(INFO, "cancelling send immediate work\n");
-+	cancel_delayed_work_sync(&info->send_immediate_work);
-+
-+	log_rdma_event(INFO, "wait for all recv to finish\n");
-+	wake_up_interruptible(&info->wait_reassembly_queue);
-+
-+	log_rdma_event(INFO, "wait for all send posted to IB to finish\n");
-+	wait_event(info->wait_send_pending,
-+		atomic_read(&info->send_pending) == 0);
-+	wait_event(info->wait_send_payload_pending,
-+		atomic_read(&info->send_payload_pending) == 0);
-+
-+	/* It's not posssible for upper layer to get to reassembly */
-+	log_rdma_event(INFO, "drain the reassembly queue\n");
-+	do {
-+		spin_lock_irqsave(&info->reassembly_queue_lock, flags);
-+		response = _get_first_reassembly(info);
-+		if (response) {
-+			list_del(&response->list);
-+			spin_unlock_irqrestore(
-+				&info->reassembly_queue_lock, flags);
-+			put_receive_buffer(info, response, true);
-+		}
-+	} while (response);
-+	spin_unlock_irqrestore(&info->reassembly_queue_lock, flags);
-+	info->reassembly_data_length = 0;
-+
-+	log_rdma_event(INFO, "free receive buffers\n");
-+	wait_event(info->wait_receive_queues,
-+		info->count_receive_queue + info->count_empty_packet_queue
-+			== info->receive_credit_max);
-+	destroy_receive_buffers(info);
-+
-+	ib_free_cq(info->send_cq);
-+	ib_free_cq(info->recv_cq);
-+	ib_dealloc_pd(info->pd);
-+	rdma_destroy_id(info->id);
-+
-+	/* free mempools */
-+	mempool_destroy(info->request_mempool);
-+	kmem_cache_destroy(info->request_cache);
-+
-+	mempool_destroy(info->response_mempool);
-+	kmem_cache_destroy(info->response_cache);
-+
-+	info->transport_status = SMBD_DESTROYED;
-+	wake_up_all(&info->wait_destroy);
-+}
-+
-+static int smbd_process_disconnected(struct smbd_connection *info)
-+{
-+//	queue_work(info->workqueue, &info->destroy_work);
-+	schedule_work(&info->destroy_work);
-+	return 0;
-+}
-+
-+static void smbd_disconnect_rdma_work(struct work_struct *work)
-+{
-+	struct smbd_connection *info =
-+		container_of(work, struct smbd_connection, disconnect_work);
-+
-+	if (info->transport_status == SMBD_CONNECTED) {
-+		info->transport_status = SMBD_DISCONNECTING;
-+		rdma_disconnect(info->id);
-+	}
-+}
-+
-+static void smbd_disconnect_rdma_connection(struct smbd_connection *info)
-+{
-+	queue_work(info->workqueue, &info->disconnect_work);
-+}
-+
-+/* Upcall from RDMA CM */
-+static int smbd_conn_upcall(
-+		struct rdma_cm_id *id, struct rdma_cm_event *event)
-+{
-+	struct smbd_connection *info = id->context;
-+
-+	log_rdma_event(INFO, "event=%d status=%d\n",
-+		event->event, event->status);
-+
-+	switch (event->event) {
-+	case RDMA_CM_EVENT_ADDR_RESOLVED:
-+	case RDMA_CM_EVENT_ROUTE_RESOLVED:
-+		info->ri_rc = 0;
-+		complete(&info->ri_done);
-+		break;
-+
-+	case RDMA_CM_EVENT_ADDR_ERROR:
-+		info->ri_rc = -EHOSTUNREACH;
-+		complete(&info->ri_done);
-+		break;
-+
-+	case RDMA_CM_EVENT_ROUTE_ERROR:
-+		info->ri_rc = -ENETUNREACH;
-+		complete(&info->ri_done);
-+		break;
-+
-+	case RDMA_CM_EVENT_ESTABLISHED:
-+		log_rdma_event(INFO, "connected event=%d\n", event->event);
-+		info->transport_status = SMBD_CONNECTED;
-+		wake_up_interruptible(&info->conn_wait);
-+		break;
-+
-+	case RDMA_CM_EVENT_CONNECT_ERROR:
-+	case RDMA_CM_EVENT_UNREACHABLE:
-+	case RDMA_CM_EVENT_REJECTED:
-+		log_rdma_event(INFO, "connecting failed event=%d\n", event->event);
-+		info->transport_status = SMBD_DISCONNECTED;
-+		wake_up_interruptible(&info->conn_wait);
-+		break;
-+
-+	case RDMA_CM_EVENT_DEVICE_REMOVAL:
-+	case RDMA_CM_EVENT_DISCONNECTED:
-+		/* This happenes when we fail the negotiation */
-+		if (info->transport_status == SMBD_NEGOTIATE_FAILED) {
-+			info->transport_status = SMBD_DISCONNECTED;
-+			wake_up(&info->conn_wait);
-+			break;
-+		}
-+
-+		info->transport_status = SMBD_DISCONNECTED;
-+		smbd_process_disconnected(info);
-+		break;
-+
-+	default:
-+		break;
-+	}
-+
-+	return 0;
-+}
-+
-+/* Upcall from RDMA QP */
-+static void
-+smbd_qp_async_error_upcall(struct ib_event *event, void *context)
-+{
-+	struct smbd_connection *info = context;
-+
-+	log_rdma_event(ERR, "%s on device %s info %p\n",
-+		ib_event_msg(event->event), event->device->name, info);
-+
-+	switch (event->event) {
-+	case IB_EVENT_CQ_ERR:
-+	case IB_EVENT_QP_FATAL:
-+		smbd_disconnect_rdma_connection(info);
-+
-+	default:
-+		break;
-+	}
-+}
-+
-+static inline void *smbd_request_payload(struct smbd_request *request)
-+{
-+	return (void *)request->packet;
-+}
-+
-+static inline void *smbd_response_payload(struct smbd_response *response)
-+{
-+	return (void *)response->packet;
-+}
-+
-+/* Called when a RDMA send is done */
-+static void send_done(struct ib_cq *cq, struct ib_wc *wc)
-+{
-+	int i;
-+	struct smbd_request *request =
-+		container_of(wc->wr_cqe, struct smbd_request, cqe);
-+
-+	log_rdma_send(INFO, "smbd_request %p completed wc->status=%d\n",
-+		request, wc->status);
-+
-+	if (wc->status != IB_WC_SUCCESS || wc->opcode != IB_WC_SEND) {
-+		log_rdma_send(ERR, "wc->status=%d wc->opcode=%d\n",
-+			wc->status, wc->opcode);
-+		smbd_disconnect_rdma_connection(request->info);
-+	}
-+
-+	for (i = 0; i < request->num_sge; i++)
-+		ib_dma_unmap_single(request->info->id->device,
-+			request->sge[i].addr,
-+			request->sge[i].length,
-+			DMA_TO_DEVICE);
-+
-+	if (request->has_payload) {
-+		if (atomic_dec_and_test(&request->info->send_payload_pending))
-+			wake_up(&request->info->wait_send_payload_pending);
-+	} else {
-+		if (atomic_dec_and_test(&request->info->send_pending))
-+			wake_up(&request->info->wait_send_pending);
-+	}
-+
-+	mempool_free(request, request->info->request_mempool);
-+}
-+
-+static void dump_smbd_negotiate_resp(struct smbd_negotiate_resp *resp)
-+{
-+	log_rdma_event(INFO, "resp message min_version %u max_version %u "
-+		"negotiated_version %u credits_requested %u "
-+		"credits_granted %u status %u max_readwrite_size %u "
-+		"preferred_send_size %u max_receive_size %u "
-+		"max_fragmented_size %u\n",
-+		resp->min_version, resp->max_version, resp->negotiated_version,
-+		resp->credits_requested, resp->credits_granted, resp->status,
-+		resp->max_readwrite_size, resp->preferred_send_size,
-+		resp->max_receive_size, resp->max_fragmented_size);
-+}
-+
-+/*
-+ * Process a negotiation response message, according to [MS-SMBD]3.1.5.7
-+ * response, packet_length: the negotiation response message
-+ * return value: true if negotiation is a success, false if failed
-+ */
-+static bool process_negotiation_response(
-+		struct smbd_response *response, int packet_length)
-+{
-+	struct smbd_connection *info = response->info;
-+	struct smbd_negotiate_resp *packet = smbd_response_payload(response);
-+
-+	if (packet_length < sizeof(struct smbd_negotiate_resp)) {
-+		log_rdma_event(ERR,
-+			"error: packet_length=%d\n", packet_length);
-+		return false;
-+	}
-+
-+	if (le16_to_cpu(packet->negotiated_version) != SMBD_V1) {
-+		log_rdma_event(ERR, "error: negotiated_version=%x\n",
-+			le16_to_cpu(packet->negotiated_version));
-+		return false;
-+	}
-+	info->protocol = le16_to_cpu(packet->negotiated_version);
-+
-+	if (packet->credits_requested == 0) {
-+		log_rdma_event(ERR, "error: credits_requested==0\n");
-+		return false;
-+	}
-+	info->receive_credit_target = le16_to_cpu(packet->credits_requested);
-+
-+	if (packet->credits_granted == 0) {
-+		log_rdma_event(ERR, "error: credits_granted==0\n");
-+		return false;
-+	}
-+	atomic_set(&info->send_credits, le16_to_cpu(packet->credits_granted));
-+
-+	atomic_set(&info->receive_credits, 0);
-+
-+	if (le32_to_cpu(packet->preferred_send_size) > info->max_receive_size) {
-+		log_rdma_event(ERR, "error: preferred_send_size=%d\n",
-+			le32_to_cpu(packet->preferred_send_size));
-+		return false;
-+	}
-+	info->max_receive_size = le32_to_cpu(packet->preferred_send_size);
-+
-+	if (le32_to_cpu(packet->max_receive_size) < SMBD_MIN_RECEIVE_SIZE) {
-+		log_rdma_event(ERR, "error: max_receive_size=%d\n",
-+			le32_to_cpu(packet->max_receive_size));
-+		return false;
-+	}
-+	info->max_send_size = min_t(int, info->max_send_size,
-+					le32_to_cpu(packet->max_receive_size));
-+
-+	if (le32_to_cpu(packet->max_fragmented_size) <
-+			SMBD_MIN_FRAGMENTED_SIZE) {
-+		log_rdma_event(ERR, "error: max_fragmented_size=%d\n",
-+			le32_to_cpu(packet->max_fragmented_size));
-+		return false;
-+	}
-+	info->max_fragmented_send_size =
-+		le32_to_cpu(packet->max_fragmented_size);
-+
-+	return true;
-+}
-+
-+/*
-+ * Check and schedule to send an immediate packet
-+ * This is used to extend credtis to remote peer to keep the transport busy
-+ */
-+static void check_and_send_immediate(struct smbd_connection *info)
-+{
-+	if (info->transport_status != SMBD_CONNECTED)
-+		return;
-+
-+	info->send_immediate = true;
-+
-+	/*
-+	 * Promptly send a packet if our peer is running low on receive
-+	 * credits
-+	 */
-+	if (atomic_read(&info->receive_credits) <
-+		info->receive_credit_target - 1)
-+		queue_delayed_work(
-+			info->workqueue, &info->send_immediate_work, 0);
-+}
-+
-+static void smbd_post_send_credits(struct work_struct *work)
-+{
-+	int ret = 0;
-+	int use_receive_queue = 1;
-+	int rc;
-+	struct smbd_response *response;
-+	struct smbd_connection *info =
-+		container_of(work, struct smbd_connection,
-+			post_send_credits_work);
-+
-+	if (info->transport_status != SMBD_CONNECTED) {
-+		wake_up(&info->wait_receive_queues);
-+		return;
-+	}
-+
-+	if (info->receive_credit_target >
-+		atomic_read(&info->receive_credits)) {
-+		while (true) {
-+			if (use_receive_queue)
-+				response = get_receive_buffer(info);
-+			else
-+				response = get_empty_queue_buffer(info);
-+			if (!response) {
-+				/* now switch to emtpy packet queue */
-+				if (use_receive_queue) {
-+					use_receive_queue = 0;
-+					continue;
-+				} else
-+					break;
-+			}
-+
-+			response->type = SMBD_TRANSFER_DATA;
-+			response->first_segment = false;
-+			rc = smbd_post_recv(info, response);
-+			if (rc) {
-+				log_rdma_recv(ERR,
-+					"post_recv failed rc=%d\n", rc);
-+				put_receive_buffer(info, response, true);
-+				break;
-+			}
-+
-+			ret++;
-+		}
-+	}
-+
-+	spin_lock(&info->lock_new_credits_offered);
-+	info->new_credits_offered += ret;
-+	spin_unlock(&info->lock_new_credits_offered);
-+
-+	atomic_add(ret, &info->receive_credits);
-+
-+	/* Check if we can post new receive and grant credits to peer */
-+	check_and_send_immediate(info);
-+}
-+
-+static void smbd_recv_done_work(struct work_struct *work)
-+{
-+	struct smbd_connection *info =
-+		container_of(work, struct smbd_connection, recv_done_work);
-+
-+	/*
-+	 * We may have new send credits granted from remote peer
-+	 * If any sender is blcoked on lack of credets, unblock it
-+	 */
-+	if (atomic_read(&info->send_credits))
-+		wake_up_interruptible(&info->wait_send_queue);
-+
-+	/*
-+	 * Check if we need to send something to remote peer to
-+	 * grant more credits or respond to KEEP_ALIVE packet
-+	 */
-+	check_and_send_immediate(info);
-+}
-+
-+/* Called from softirq, when recv is done */
-+static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
-+{
-+	struct smbd_data_transfer *data_transfer;
-+	struct smbd_response *response =
-+		container_of(wc->wr_cqe, struct smbd_response, cqe);
-+	struct smbd_connection *info = response->info;
-+	int data_length = 0;
-+
-+	log_rdma_recv(INFO, "response=%p type=%d wc status=%d wc opcode %d "
-+		      "byte_len=%d pkey_index=%x\n",
-+		response, response->type, wc->status, wc->opcode,
-+		wc->byte_len, wc->pkey_index);
-+
-+	if (wc->status != IB_WC_SUCCESS || wc->opcode != IB_WC_RECV) {
-+		log_rdma_recv(INFO, "wc->status=%d opcode=%d\n",
-+			wc->status, wc->opcode);
-+		smbd_disconnect_rdma_connection(info);
-+		goto error;
-+	}
-+
-+	ib_dma_sync_single_for_cpu(
-+		wc->qp->device,
-+		response->sge.addr,
-+		response->sge.length,
-+		DMA_FROM_DEVICE);
-+
-+	switch (response->type) {
-+	/* SMBD negotiation response */
-+	case SMBD_NEGOTIATE_RESP:
-+		dump_smbd_negotiate_resp(smbd_response_payload(response));
-+		info->full_packet_received = true;
-+		info->negotiate_done =
-+			process_negotiation_response(response, wc->byte_len);
-+		complete(&info->negotiate_completion);
-+		break;
-+
-+	/* SMBD data transfer packet */
-+	case SMBD_TRANSFER_DATA:
-+		data_transfer = smbd_response_payload(response);
-+		data_length = le32_to_cpu(data_transfer->data_length);
-+
-+		/*
-+		 * If this is a packet with data playload place the data in
-+		 * reassembly queue and wake up the reading thread
-+		 */
-+		if (data_length) {
-+			if (info->full_packet_received)
-+				response->first_segment = true;
-+
-+			if (le32_to_cpu(data_transfer->remaining_data_length))
-+				info->full_packet_received = false;
-+			else
-+				info->full_packet_received = true;
-+
-+			enqueue_reassembly(
-+				info,
-+				response,
-+				data_length);
-+		} else
-+			put_empty_packet(info, response);
-+
-+		if (data_length)
-+			wake_up_interruptible(&info->wait_reassembly_queue);
-+
-+		atomic_dec(&info->receive_credits);
-+		info->receive_credit_target =
-+			le16_to_cpu(data_transfer->credits_requested);
-+		atomic_add(le16_to_cpu(data_transfer->credits_granted),
-+			&info->send_credits);
-+
-+		log_incoming(INFO, "data flags %d data_offset %d "
-+			"data_length %d remaining_data_length %d\n",
-+			le16_to_cpu(data_transfer->flags),
-+			le32_to_cpu(data_transfer->data_offset),
-+			le32_to_cpu(data_transfer->data_length),
-+			le32_to_cpu(data_transfer->remaining_data_length));
-+
-+		/* Send a KEEP_ALIVE response right away if requested */
-+		info->keep_alive_requested = KEEP_ALIVE_NONE;
-+		if (le16_to_cpu(data_transfer->flags) &
-+				SMB_DIRECT_RESPONSE_REQUESTED) {
-+			info->keep_alive_requested = KEEP_ALIVE_PENDING;
-+		}
-+
-+		queue_work(info->workqueue, &info->recv_done_work);
-+		return;
-+
-+	default:
-+		log_rdma_recv(ERR,
-+			"unexpected response type=%d\n", response->type);
-+	}
-+
-+error:
-+	put_receive_buffer(info, response, true);
-+}
-+
-+static struct rdma_cm_id *smbd_create_id(
-+		struct smbd_connection *info,
-+		struct sockaddr *dstaddr, int port)
-+{
-+	struct rdma_cm_id *id;
-+	int rc;
-+	__be16 *sport;
-+
-+	id = rdma_create_id(&init_net, smbd_conn_upcall, info,
-+		RDMA_PS_TCP, IB_QPT_RC);
-+	if (IS_ERR(id)) {
-+		rc = PTR_ERR(id);
-+		log_rdma_event(ERR, "rdma_create_id() failed %i\n", rc);
-+		return id;
-+	}
-+
-+	if (dstaddr->sa_family == AF_INET6)
-+		sport = &((struct sockaddr_in6 *)dstaddr)->sin6_port;
-+	else
-+		sport = &((struct sockaddr_in *)dstaddr)->sin_port;
-+
-+	*sport = htons(port);
-+
-+	init_completion(&info->ri_done);
-+	info->ri_rc = -ETIMEDOUT;
-+
-+	rc = rdma_resolve_addr(id, NULL, (struct sockaddr *)dstaddr,
-+		RDMA_RESOLVE_TIMEOUT);
-+	if (rc) {
-+		log_rdma_event(ERR, "rdma_resolve_addr() failed %i\n", rc);
-+		goto out;
-+	}
-+	wait_for_completion_interruptible_timeout(
-+		&info->ri_done, msecs_to_jiffies(RDMA_RESOLVE_TIMEOUT));
-+	rc = info->ri_rc;
-+	if (rc) {
-+		log_rdma_event(ERR, "rdma_resolve_addr() completed %i\n", rc);
-+		goto out;
-+	}
-+
-+	info->ri_rc = -ETIMEDOUT;
-+	rc = rdma_resolve_route(id, RDMA_RESOLVE_TIMEOUT);
-+	if (rc) {
-+		log_rdma_event(ERR, "rdma_resolve_route() failed %i\n", rc);
-+		goto out;
-+	}
-+	wait_for_completion_interruptible_timeout(
-+		&info->ri_done, msecs_to_jiffies(RDMA_RESOLVE_TIMEOUT));
-+	rc = info->ri_rc;
-+	if (rc) {
-+		log_rdma_event(ERR, "rdma_resolve_route() completed %i\n", rc);
-+		goto out;
-+	}
-+
-+	return id;
-+
-+out:
-+	rdma_destroy_id(id);
-+	return ERR_PTR(rc);
-+}
-+
-+/*
-+ * Test if FRWR (Fast Registration Work Requests) is supported on the device
-+ * This implementation requries FRWR on RDMA read/write
-+ * return value: true if it is supported
-+ */
-+static bool frwr_is_supported(struct ib_device_attr *attrs)
-+{
-+	if (!(attrs->device_cap_flags & IB_DEVICE_MEM_MGT_EXTENSIONS))
-+		return false;
-+	if (attrs->max_fast_reg_page_list_len == 0)
-+		return false;
-+	return true;
-+}
-+
-+static int smbd_ia_open(
-+		struct smbd_connection *info,
-+		struct sockaddr *dstaddr, int port)
-+{
-+	int rc;
-+
-+	info->id = smbd_create_id(info, dstaddr, port);
-+	if (IS_ERR(info->id)) {
-+		rc = PTR_ERR(info->id);
-+		goto out1;
-+	}
-+
-+	if (!frwr_is_supported(&info->id->device->attrs)) {
-+		log_rdma_event(ERR,
-+			"Fast Registration Work Requests "
-+			"(FRWR) is not supported\n");
-+		log_rdma_event(ERR,
-+			"Device capability flags = %llx "
-+			"max_fast_reg_page_list_len = %u\n",
-+			info->id->device->attrs.device_cap_flags,
-+			info->id->device->attrs.max_fast_reg_page_list_len);
-+		rc = -EPROTONOSUPPORT;
-+		goto out2;
-+	}
-+
-+	info->pd = ib_alloc_pd(info->id->device, 0);
-+	if (IS_ERR(info->pd)) {
-+		rc = PTR_ERR(info->pd);
-+		log_rdma_event(ERR, "ib_alloc_pd() returned %d\n", rc);
-+		goto out2;
-+	}
-+
-+	return 0;
-+
-+out2:
-+	rdma_destroy_id(info->id);
-+	info->id = NULL;
-+
-+out1:
-+	return rc;
-+}
-+
-+/*
-+ * Send a negotiation request message to the peer
-+ * The negotiation procedure is in [MS-SMBD] 3.1.5.2 and 3.1.5.3
-+ * After negotiation, the transport is connected and ready for
-+ * carrying upper layer SMB payload
-+ */
-+static int smbd_post_send_negotiate_req(struct smbd_connection *info)
-+{
-+	struct ib_send_wr send_wr, *send_wr_fail;
-+	int rc = -ENOMEM;
-+	struct smbd_request *request;
-+	struct smbd_negotiate_req *packet;
-+
-+	request = mempool_alloc(info->request_mempool, GFP_KERNEL);
-+	if (!request)
-+		return rc;
-+
-+	request->info = info;
-+
-+	packet = smbd_request_payload(request);
-+	packet->min_version = cpu_to_le16(SMBD_V1);
-+	packet->max_version = cpu_to_le16(SMBD_V1);
-+	packet->reserved = 0;
-+	packet->credits_requested = cpu_to_le16(info->send_credit_target);
-+	packet->preferred_send_size = cpu_to_le32(info->max_send_size);
-+	packet->max_receive_size = cpu_to_le32(info->max_receive_size);
-+	packet->max_fragmented_size =
-+		cpu_to_le32(info->max_fragmented_recv_size);
-+
-+	request->num_sge = 1;
-+	request->sge[0].addr = ib_dma_map_single(
-+				info->id->device, (void *)packet,
-+				sizeof(*packet), DMA_TO_DEVICE);
-+	if (ib_dma_mapping_error(info->id->device, request->sge[0].addr)) {
-+		rc = -EIO;
-+		goto dma_mapping_failed;
-+	}
-+
-+	request->sge[0].length = sizeof(*packet);
-+	request->sge[0].lkey = info->pd->local_dma_lkey;
-+
-+	ib_dma_sync_single_for_device(
-+		info->id->device, request->sge[0].addr,
-+		request->sge[0].length, DMA_TO_DEVICE);
-+
-+	request->cqe.done = send_done;
-+
-+	send_wr.next = NULL;
-+	send_wr.wr_cqe = &request->cqe;
-+	send_wr.sg_list = request->sge;
-+	send_wr.num_sge = request->num_sge;
-+	send_wr.opcode = IB_WR_SEND;
-+	send_wr.send_flags = IB_SEND_SIGNALED;
-+
-+	log_rdma_send(INFO, "sge addr=%llx length=%x lkey=%x\n",
-+		request->sge[0].addr,
-+		request->sge[0].length, request->sge[0].lkey);
-+
-+	request->has_payload = false;
-+	atomic_inc(&info->send_pending);
-+	rc = ib_post_send(info->id->qp, &send_wr, &send_wr_fail);
-+	if (!rc)
-+		return 0;
-+
-+	/* if we reach here, post send failed */
-+	log_rdma_send(ERR, "ib_post_send failed rc=%d\n", rc);
-+	atomic_dec(&info->send_pending);
-+	ib_dma_unmap_single(info->id->device, request->sge[0].addr,
-+		request->sge[0].length, DMA_TO_DEVICE);
-+
-+dma_mapping_failed:
-+	mempool_free(request, info->request_mempool);
-+	return rc;
-+}
-+
-+/*
-+ * Extend the credits to remote peer
-+ * This implements [MS-SMBD] 3.1.5.9
-+ * The idea is that we should extend credits to remote peer as quickly as
-+ * it's allowed, to maintain data flow. We allocate as much receive
-+ * buffer as possible, and extend the receive credits to remote peer
-+ * return value: the new credtis being granted.
-+ */
-+static int manage_credits_prior_sending(struct smbd_connection *info)
-+{
-+	int new_credits;
-+
-+	spin_lock(&info->lock_new_credits_offered);
-+	new_credits = info->new_credits_offered;
-+	info->new_credits_offered = 0;
-+	spin_unlock(&info->lock_new_credits_offered);
-+
-+	return new_credits;
-+}
-+
-+/*
-+ * Check if we need to send a KEEP_ALIVE message
-+ * The idle connection timer triggers a KEEP_ALIVE message when expires
-+ * SMB_DIRECT_RESPONSE_REQUESTED is set in the message flag to have peer send
-+ * back a response.
-+ * return value:
-+ * 1 if SMB_DIRECT_RESPONSE_REQUESTED needs to be set
-+ * 0: otherwise
-+ */
-+static int manage_keep_alive_before_sending(struct smbd_connection *info)
-+{
-+	if (info->keep_alive_requested == KEEP_ALIVE_PENDING) {
-+		info->keep_alive_requested = KEEP_ALIVE_SENT;
-+		return 1;
-+	}
-+	return 0;
-+}
-+
-+/*
-+ * Build and prepare the SMBD packet header
-+ * This function waits for avaialbe send credits and build a SMBD packet
-+ * header. The caller then optional append payload to the packet after
-+ * the header
-+ * intput values
-+ * size: the size of the payload
-+ * remaining_data_length: remaining data to send if this is part of a
-+ * fragmented packet
-+ * output values
-+ * request_out: the request allocated from this function
-+ * return values: 0 on success, otherwise actual error code returned
-+ */
-+static int smbd_create_header(struct smbd_connection *info,
-+		int size, int remaining_data_length,
-+		struct smbd_request **request_out)
-+{
-+	struct smbd_request *request;
-+	struct smbd_data_transfer *packet;
-+	int header_length;
-+	int rc;
-+
-+	/* Wait for send credits. A SMBD packet needs one credit */
-+	rc = wait_event_interruptible(info->wait_send_queue,
-+		atomic_read(&info->send_credits) > 0 ||
-+		info->transport_status != SMBD_CONNECTED);
-+	if (rc)
-+		return rc;
-+
-+	if (info->transport_status != SMBD_CONNECTED) {
-+		log_outgoing(ERR, "disconnected not sending\n");
-+		return -ENOENT;
-+	}
-+	atomic_dec(&info->send_credits);
-+
-+	request = mempool_alloc(info->request_mempool, GFP_KERNEL);
-+	if (!request) {
-+		rc = -ENOMEM;
-+		goto err;
-+	}
-+
-+	request->info = info;
-+
-+	/* Fill in the packet header */
-+	packet = smbd_request_payload(request);
-+	packet->credits_requested = cpu_to_le16(info->send_credit_target);
-+	packet->credits_granted =
-+		cpu_to_le16(manage_credits_prior_sending(info));
-+	info->send_immediate = false;
-+
-+	packet->flags = 0;
-+	if (manage_keep_alive_before_sending(info))
-+		packet->flags |= cpu_to_le16(SMB_DIRECT_RESPONSE_REQUESTED);
-+
-+	packet->reserved = 0;
-+	if (!size)
-+		packet->data_offset = 0;
-+	else
-+		packet->data_offset = cpu_to_le32(24);
-+	packet->data_length = cpu_to_le32(size);
-+	packet->remaining_data_length = cpu_to_le32(remaining_data_length);
-+	packet->padding = 0;
-+
-+	log_outgoing(INFO, "credits_requested=%d credits_granted=%d "
-+		"data_offset=%d data_length=%d remaining_data_length=%d\n",
-+		le16_to_cpu(packet->credits_requested),
-+		le16_to_cpu(packet->credits_granted),
-+		le32_to_cpu(packet->data_offset),
-+		le32_to_cpu(packet->data_length),
-+		le32_to_cpu(packet->remaining_data_length));
-+
-+	/* Map the packet to DMA */
-+	header_length = sizeof(struct smbd_data_transfer);
-+	/* If this is a packet without payload, don't send padding */
-+	if (!size)
-+		header_length = offsetof(struct smbd_data_transfer, padding);
-+
-+	request->num_sge = 1;
-+	request->sge[0].addr = ib_dma_map_single(info->id->device,
-+						 (void *)packet,
-+						 header_length,
-+						 DMA_BIDIRECTIONAL);
-+	if (ib_dma_mapping_error(info->id->device, request->sge[0].addr)) {
-+		mempool_free(request, info->request_mempool);
-+		rc = -EIO;
-+		goto err;
-+	}
-+
-+	request->sge[0].length = header_length;
-+	request->sge[0].lkey = info->pd->local_dma_lkey;
-+
-+	*request_out = request;
-+	return 0;
-+
-+err:
-+	atomic_inc(&info->send_credits);
-+	return rc;
-+}
-+
-+static void smbd_destroy_header(struct smbd_connection *info,
-+		struct smbd_request *request)
-+{
-+
-+	ib_dma_unmap_single(info->id->device,
-+			    request->sge[0].addr,
-+			    request->sge[0].length,
-+			    DMA_TO_DEVICE);
-+	mempool_free(request, info->request_mempool);
-+	atomic_inc(&info->send_credits);
-+}
-+
-+/* Post the send request */
-+static int smbd_post_send(struct smbd_connection *info,
-+		struct smbd_request *request, bool has_payload)
-+{
-+	struct ib_send_wr send_wr, *send_wr_fail;
-+	int rc, i;
-+
-+	for (i = 0; i < request->num_sge; i++) {
-+		log_rdma_send(INFO,
-+			"rdma_request sge[%d] addr=%llu legnth=%u\n",
-+			i, request->sge[0].addr, request->sge[0].length);
-+		ib_dma_sync_single_for_device(
-+			info->id->device,
-+			request->sge[i].addr,
-+			request->sge[i].length,
-+			DMA_TO_DEVICE);
-+	}
-+
-+	request->cqe.done = send_done;
-+
-+	send_wr.next = NULL;
-+	send_wr.wr_cqe = &request->cqe;
-+	send_wr.sg_list = request->sge;
-+	send_wr.num_sge = request->num_sge;
-+	send_wr.opcode = IB_WR_SEND;
-+	send_wr.send_flags = IB_SEND_SIGNALED;
-+
-+	if (has_payload) {
-+		request->has_payload = true;
-+		atomic_inc(&info->send_payload_pending);
-+	} else {
-+		request->has_payload = false;
-+		atomic_inc(&info->send_pending);
-+	}
-+
-+	rc = ib_post_send(info->id->qp, &send_wr, &send_wr_fail);
-+	if (rc) {
-+		log_rdma_send(ERR, "ib_post_send failed rc=%d\n", rc);
-+		if (has_payload) {
-+			if (atomic_dec_and_test(&info->send_payload_pending))
-+				wake_up(&info->wait_send_payload_pending);
-+		} else {
-+			if (atomic_dec_and_test(&info->send_pending))
-+				wake_up(&info->wait_send_pending);
-+		}
-+	} else
-+		/* Reset timer for idle connection after packet is sent */
-+		mod_delayed_work(info->workqueue, &info->idle_timer_work,
-+			info->keep_alive_interval*HZ);
-+
-+	return rc;
-+}
-+
-+static int smbd_post_send_sgl(struct smbd_connection *info,
-+	struct scatterlist *sgl, int data_length, int remaining_data_length)
-+{
-+	int num_sgs;
-+	int i, rc;
-+	struct smbd_request *request;
-+	struct scatterlist *sg;
-+
-+	rc = smbd_create_header(
-+		info, data_length, remaining_data_length, &request);
-+	if (rc)
-+		return rc;
-+
-+	num_sgs = sgl ? sg_nents(sgl) : 0;
-+	for_each_sg(sgl, sg, num_sgs, i) {
-+		request->sge[i+1].addr =
-+			ib_dma_map_page(info->id->device, sg_page(sg),
-+			       sg->offset, sg->length, DMA_BIDIRECTIONAL);
-+		if (ib_dma_mapping_error(
-+				info->id->device, request->sge[i+1].addr)) {
-+			rc = -EIO;
-+			request->sge[i+1].addr = 0;
-+			goto dma_mapping_failure;
-+		}
-+		request->sge[i+1].length = sg->length;
-+		request->sge[i+1].lkey = info->pd->local_dma_lkey;
-+		request->num_sge++;
-+	}
-+
-+	rc = smbd_post_send(info, request, data_length);
-+	if (!rc)
-+		return 0;
-+
-+dma_mapping_failure:
-+	for (i = 1; i < request->num_sge; i++)
-+		if (request->sge[i].addr)
-+			ib_dma_unmap_single(info->id->device,
-+					    request->sge[i].addr,
-+					    request->sge[i].length,
-+					    DMA_TO_DEVICE);
-+	smbd_destroy_header(info, request);
-+	return rc;
-+}
-+
-+/*
-+ * Send an empty message
-+ * Empty message is used to extend credits to peer to for keep live
-+ * while there is no upper layer payload to send at the time
-+ */
-+static int smbd_post_send_empty(struct smbd_connection *info)
-+{
-+	info->count_send_empty++;
-+	return smbd_post_send_sgl(info, NULL, 0, 0);
-+}
-+
-+/*
-+ * Post a receive request to the transport
-+ * The remote peer can only send data when a receive request is posted
-+ * The interaction is controlled by send/receive credit system
-+ */
-+static int smbd_post_recv(
-+		struct smbd_connection *info, struct smbd_response *response)
-+{
-+	struct ib_recv_wr recv_wr, *recv_wr_fail = NULL;
-+	int rc = -EIO;
-+
-+	response->sge.addr = ib_dma_map_single(
-+				info->id->device, response->packet,
-+				info->max_receive_size, DMA_FROM_DEVICE);
-+	if (ib_dma_mapping_error(info->id->device, response->sge.addr))
-+		return rc;
-+
-+	response->sge.length = info->max_receive_size;
-+	response->sge.lkey = info->pd->local_dma_lkey;
-+
-+	response->cqe.done = recv_done;
-+
-+	recv_wr.wr_cqe = &response->cqe;
-+	recv_wr.next = NULL;
-+	recv_wr.sg_list = &response->sge;
-+	recv_wr.num_sge = 1;
-+
-+	rc = ib_post_recv(info->id->qp, &recv_wr, &recv_wr_fail);
-+	if (rc) {
-+		ib_dma_unmap_single(info->id->device, response->sge.addr,
-+				    response->sge.length, DMA_FROM_DEVICE);
-+
-+		log_rdma_recv(ERR, "ib_post_recv failed rc=%d\n", rc);
-+	}
-+
-+	return rc;
-+}
-+
-+/* Perform SMBD negotiate according to [MS-SMBD] 3.1.5.2 */
-+static int smbd_negotiate(struct smbd_connection *info)
-+{
-+	int rc;
-+	struct smbd_response *response = get_receive_buffer(info);
-+
-+	response->type = SMBD_NEGOTIATE_RESP;
-+	rc = smbd_post_recv(info, response);
-+	log_rdma_event(INFO,
-+		"smbd_post_recv rc=%d iov.addr=%llx iov.length=%x "
-+		"iov.lkey=%x\n",
-+		rc, response->sge.addr,
-+		response->sge.length, response->sge.lkey);
-+	if (rc)
-+		return rc;
-+
-+	init_completion(&info->negotiate_completion);
-+	info->negotiate_done = false;
-+	rc = smbd_post_send_negotiate_req(info);
-+	if (rc)
-+		return rc;
-+
-+	rc = wait_for_completion_interruptible_timeout(
-+		&info->negotiate_completion, SMBD_NEGOTIATE_TIMEOUT * HZ);
-+	log_rdma_event(INFO, "wait_for_completion_timeout rc=%d\n", rc);
-+
-+	if (info->negotiate_done)
-+		return 0;
-+
-+	if (rc == 0)
-+		rc = -ETIMEDOUT;
-+	else if (rc == -ERESTARTSYS)
-+		rc = -EINTR;
-+	else
-+		rc = -ENOTCONN;
-+
-+	return rc;
-+}
-+
-+static void put_empty_packet(
-+		struct smbd_connection *info, struct smbd_response *response)
-+{
-+	spin_lock(&info->empty_packet_queue_lock);
-+	list_add_tail(&response->list, &info->empty_packet_queue);
-+	info->count_empty_packet_queue++;
-+	spin_unlock(&info->empty_packet_queue_lock);
-+
-+	queue_work(info->workqueue, &info->post_send_credits_work);
-+}
-+
-+/*
-+ * Implement Connection.FragmentReassemblyBuffer defined in [MS-SMBD] 3.1.1.1
-+ * This is a queue for reassembling upper layer payload and present to upper
-+ * layer. All the inncoming payload go to the reassembly queue, regardless of
-+ * if reassembly is required. The uuper layer code reads from the queue for all
-+ * incoming payloads.
-+ * Put a received packet to the reassembly queue
-+ * response: the packet received
-+ * data_length: the size of payload in this packet
-+ */
-+static void enqueue_reassembly(
-+	struct smbd_connection *info,
-+	struct smbd_response *response,
-+	int data_length)
-+{
-+	spin_lock(&info->reassembly_queue_lock);
-+	list_add_tail(&response->list, &info->reassembly_queue);
-+	info->reassembly_queue_length++;
-+	/*
-+	 * Make sure reassembly_data_length is updated after list and
-+	 * reassembly_queue_length are updated. On the dequeue side
-+	 * reassembly_data_length is checked without a lock to determine
-+	 * if reassembly_queue_length and list is up to date
-+	 */
-+	virt_wmb();
-+	info->reassembly_data_length += data_length;
-+	spin_unlock(&info->reassembly_queue_lock);
-+	info->count_reassembly_queue++;
-+	info->count_enqueue_reassembly_queue++;
-+}
-+
-+/*
-+ * Get the first entry at the front of reassembly queue
-+ * Caller is responsible for locking
-+ * return value: the first entry if any, NULL if queue is empty
-+ */
-+static struct smbd_response *_get_first_reassembly(struct smbd_connection *info)
-+{
-+	struct smbd_response *ret = NULL;
-+
-+	if (!list_empty(&info->reassembly_queue)) {
-+		ret = list_first_entry(
-+			&info->reassembly_queue,
-+			struct smbd_response, list);
-+	}
-+	return ret;
-+}
-+
-+static struct smbd_response *get_empty_queue_buffer(
-+		struct smbd_connection *info)
-+{
-+	struct smbd_response *ret = NULL;
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&info->empty_packet_queue_lock, flags);
-+	if (!list_empty(&info->empty_packet_queue)) {
-+		ret = list_first_entry(
-+			&info->empty_packet_queue,
-+			struct smbd_response, list);
-+		list_del(&ret->list);
-+		info->count_empty_packet_queue--;
-+	}
-+	spin_unlock_irqrestore(&info->empty_packet_queue_lock, flags);
-+
-+	return ret;
-+}
-+
-+/*
-+ * Get a receive buffer
-+ * For each remote send, we need to post a receive. The receive buffers are
-+ * pre-allocated in advance.
-+ * return value: the receive buffer, NULL if none is available
-+ */
-+static struct smbd_response *get_receive_buffer(struct smbd_connection *info)
-+{
-+	struct smbd_response *ret = NULL;
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&info->receive_queue_lock, flags);
-+	if (!list_empty(&info->receive_queue)) {
-+		ret = list_first_entry(
-+			&info->receive_queue,
-+			struct smbd_response, list);
-+		list_del(&ret->list);
-+		info->count_receive_queue--;
-+		info->count_get_receive_buffer++;
-+	}
-+	spin_unlock_irqrestore(&info->receive_queue_lock, flags);
-+
-+	return ret;
-+}
-+
-+/*
-+ * Return a receive buffer
-+ * Upon returning of a receive buffer, we can post new receive and extend
-+ * more receive credits to remote peer. This is done immediately after a
-+ * receive buffer is returned.
-+ */
-+static void put_receive_buffer(
-+	struct smbd_connection *info, struct smbd_response *response,
-+	bool lock)
-+{
-+	unsigned long flags;
-+
-+	ib_dma_unmap_single(info->id->device, response->sge.addr,
-+		response->sge.length, DMA_FROM_DEVICE);
-+
-+	if (lock)
-+		spin_lock_irqsave(&info->receive_queue_lock, flags);
-+	list_add_tail(&response->list, &info->receive_queue);
-+	info->count_receive_queue++;
-+	info->count_put_receive_buffer++;
-+	if (lock)
-+		spin_unlock_irqrestore(&info->receive_queue_lock, flags);
-+
-+	queue_work(info->workqueue, &info->post_send_credits_work);
-+}
-+
-+/* Preallocate all receive buffer on transport establishment */
-+static int allocate_receive_buffers(struct smbd_connection *info, int num_buf)
-+{
-+	int i;
-+	struct smbd_response *response;
-+
-+	INIT_LIST_HEAD(&info->reassembly_queue);
-+	spin_lock_init(&info->reassembly_queue_lock);
-+	info->reassembly_data_length = 0;
-+	info->reassembly_queue_length = 0;
-+
-+	INIT_LIST_HEAD(&info->receive_queue);
-+	spin_lock_init(&info->receive_queue_lock);
-+	info->count_receive_queue = 0;
-+
-+	INIT_LIST_HEAD(&info->empty_packet_queue);
-+	spin_lock_init(&info->empty_packet_queue_lock);
-+	info->count_empty_packet_queue = 0;
-+
-+	init_waitqueue_head(&info->wait_receive_queues);
-+
-+	for (i = 0; i < num_buf; i++) {
-+		response = mempool_alloc(info->response_mempool, GFP_KERNEL);
-+		if (!response)
-+			goto allocate_failed;
-+
-+		response->info = info;
-+		list_add_tail(&response->list, &info->receive_queue);
-+		info->count_receive_queue++;
-+	}
-+
-+	return 0;
-+
-+allocate_failed:
-+	while (!list_empty(&info->receive_queue)) {
-+		response = list_first_entry(
-+				&info->receive_queue,
-+				struct smbd_response, list);
-+		list_del(&response->list);
-+		info->count_receive_queue--;
-+
-+		mempool_free(response, info->response_mempool);
-+	}
-+	return -ENOMEM;
-+}
-+
-+static void destroy_receive_buffers(struct smbd_connection *info)
-+{
-+	struct smbd_response *response;
-+
-+	while ((response = get_receive_buffer(info)))
-+		mempool_free(response, info->response_mempool);
-+
-+	while ((response = get_empty_queue_buffer(info)))
-+		mempool_free(response, info->response_mempool);
-+}
-+
-+/*
-+ * Check and send an immediate or keep alive packet
-+ * The condition to send those packets are defined in [MS-SMBD] 3.1.1.1
-+ * Connection.KeepaliveRequested and Connection.SendImmediate
-+ * The idea is to extend credits to server as soon as it becomes available
-+ */
-+static void send_immediate_work(struct work_struct *work)
-+{
-+	struct smbd_connection *info = container_of(
-+					work, struct smbd_connection,
-+					send_immediate_work.work);
-+
-+	if (info->keep_alive_requested == KEEP_ALIVE_PENDING ||
-+	    info->send_immediate) {
-+		log_keep_alive(INFO, "send an empty message\n");
-+		smbd_post_send_empty(info);
-+	}
-+}
-+
-+/* Implement idle connection timer [MS-SMBD] 3.1.6.2 */
-+static void idle_connection_timer(struct work_struct *work)
-+{
-+	struct smbd_connection *info = container_of(
-+					work, struct smbd_connection,
-+					idle_timer_work.work);
-+
-+	if (info->keep_alive_requested != KEEP_ALIVE_NONE) {
-+		log_keep_alive(ERR,
-+			"error status info->keep_alive_requested=%d\n",
-+			info->keep_alive_requested);
-+		smbd_disconnect_rdma_connection(info);
-+		return;
-+	}
-+
-+	log_keep_alive(INFO, "about to send an empty idle message\n");
-+	smbd_post_send_empty(info);
-+
-+	/* Setup the next idle timeout work */
-+	queue_delayed_work(info->workqueue, &info->idle_timer_work,
-+			info->keep_alive_interval*HZ);
-+}
-+
-+static void destroy_caches_and_workqueue(struct smbd_connection *info)
-+{
-+	destroy_receive_buffers(info);
-+	destroy_workqueue(info->workqueue);
-+	mempool_destroy(info->response_mempool);
-+	kmem_cache_destroy(info->response_cache);
-+	mempool_destroy(info->request_mempool);
-+	kmem_cache_destroy(info->request_cache);
-+}
-+
-+#define MAX_NAME_LEN	80
-+static int allocate_caches_and_workqueue(struct smbd_connection *info)
-+{
-+	char name[MAX_NAME_LEN];
-+	int rc;
-+
-+	snprintf(name, MAX_NAME_LEN, "smbd_request_%p", info);
-+	info->request_cache =
-+		kmem_cache_create(
-+			name,
-+			sizeof(struct smbd_request) +
-+				sizeof(struct smbd_data_transfer),
-+			0, SLAB_HWCACHE_ALIGN, NULL);
-+	if (!info->request_cache)
-+		return -ENOMEM;
-+
-+	info->request_mempool =
-+		mempool_create(info->send_credit_target, mempool_alloc_slab,
-+			mempool_free_slab, info->request_cache);
-+	if (!info->request_mempool)
-+		goto out1;
-+
-+	snprintf(name, MAX_NAME_LEN, "smbd_response_%p", info);
-+	info->response_cache =
-+		kmem_cache_create(
-+			name,
-+			sizeof(struct smbd_response) +
-+				info->max_receive_size,
-+			0, SLAB_HWCACHE_ALIGN, NULL);
-+	if (!info->response_cache)
-+		goto out2;
-+
-+	info->response_mempool =
-+		mempool_create(info->receive_credit_max, mempool_alloc_slab,
-+		       mempool_free_slab, info->response_cache);
-+	if (!info->response_mempool)
-+		goto out3;
-+
-+	snprintf(name, MAX_NAME_LEN, "smbd_%p", info);
-+	info->workqueue = create_workqueue(name);
-+	if (!info->workqueue)
-+		goto out4;
-+
-+	rc = allocate_receive_buffers(info, info->receive_credit_max);
-+	if (rc) {
-+		log_rdma_event(ERR, "failed to allocate receive buffers\n");
-+		goto out5;
-+	}
-+
-+	return 0;
-+
-+out5:
-+	destroy_workqueue(info->workqueue);
-+out4:
-+	mempool_destroy(info->response_mempool);
-+out3:
-+	kmem_cache_destroy(info->response_cache);
-+out2:
-+	mempool_destroy(info->request_mempool);
-+out1:
-+	kmem_cache_destroy(info->request_cache);
-+	return -ENOMEM;
-+}
-+
-+/* Create a SMBD connection, called by upper layer */
-+struct smbd_connection *_smbd_get_connection(
-+	struct TCP_Server_Info *server, struct sockaddr *dstaddr, int port)
-+{
-+	int rc;
-+	struct smbd_connection *info;
-+	struct rdma_conn_param conn_param;
-+	struct ib_qp_init_attr qp_attr;
-+	struct sockaddr_in *addr_in = (struct sockaddr_in *) dstaddr;
-+
-+	info = kzalloc(sizeof(struct smbd_connection), GFP_KERNEL);
-+	if (!info)
-+		return NULL;
-+
-+	info->transport_status = SMBD_CONNECTING;
-+	rc = smbd_ia_open(info, dstaddr, port);
-+	if (rc) {
-+		log_rdma_event(INFO, "smbd_ia_open rc=%d\n", rc);
-+		goto create_id_failed;
-+	}
-+
-+	if (smbd_send_credit_target > info->id->device->attrs.max_cqe ||
-+	    smbd_send_credit_target > info->id->device->attrs.max_qp_wr) {
-+		log_rdma_event(ERR,
-+			"consider lowering send_credit_target = %d. "
-+			"Possible CQE overrun, device "
-+			"reporting max_cpe %d max_qp_wr %d\n",
-+			smbd_send_credit_target,
-+			info->id->device->attrs.max_cqe,
-+			info->id->device->attrs.max_qp_wr);
-+		goto config_failed;
-+	}
-+
-+	if (smbd_receive_credit_max > info->id->device->attrs.max_cqe ||
-+	    smbd_receive_credit_max > info->id->device->attrs.max_qp_wr) {
-+		log_rdma_event(ERR,
-+			"consider lowering receive_credit_max = %d. "
-+			"Possible CQE overrun, device "
-+			"reporting max_cpe %d max_qp_wr %d\n",
-+			smbd_receive_credit_max,
-+			info->id->device->attrs.max_cqe,
-+			info->id->device->attrs.max_qp_wr);
-+		goto config_failed;
-+	}
-+
-+	info->receive_credit_max = smbd_receive_credit_max;
-+	info->send_credit_target = smbd_send_credit_target;
-+	info->max_send_size = smbd_max_send_size;
-+	info->max_fragmented_recv_size = smbd_max_fragmented_recv_size;
-+	info->max_receive_size = smbd_max_receive_size;
-+	info->keep_alive_interval = smbd_keep_alive_interval;
-+
-+	if (SMBDIRECT_MAX_SGE > info->id->device->attrs.max_sge) {
-+		log_rdma_event(ERR, "warning: device max_sge = %d too small\n",
-+			info->id->device->attrs.max_sge);
-+		log_rdma_event(ERR, "Queue Pair creation may fail\n");
-+	}
-+
-+	info->send_cq = NULL;
-+	info->recv_cq = NULL;
-+	info->send_cq = ib_alloc_cq(info->id->device, info,
-+			info->send_credit_target, 0, IB_POLL_SOFTIRQ);
-+	if (IS_ERR(info->send_cq)) {
-+		info->send_cq = NULL;
-+		goto alloc_cq_failed;
-+	}
-+
-+	info->recv_cq = ib_alloc_cq(info->id->device, info,
-+			info->receive_credit_max, 0, IB_POLL_SOFTIRQ);
-+	if (IS_ERR(info->recv_cq)) {
-+		info->recv_cq = NULL;
-+		goto alloc_cq_failed;
-+	}
-+
-+	memset(&qp_attr, 0, sizeof(qp_attr));
-+	qp_attr.event_handler = smbd_qp_async_error_upcall;
-+	qp_attr.qp_context = info;
-+	qp_attr.cap.max_send_wr = info->send_credit_target;
-+	qp_attr.cap.max_recv_wr = info->receive_credit_max;
-+	qp_attr.cap.max_send_sge = SMBDIRECT_MAX_SGE;
-+	qp_attr.cap.max_recv_sge = SMBDIRECT_MAX_SGE;
-+	qp_attr.cap.max_inline_data = 0;
-+	qp_attr.sq_sig_type = IB_SIGNAL_REQ_WR;
-+	qp_attr.qp_type = IB_QPT_RC;
-+	qp_attr.send_cq = info->send_cq;
-+	qp_attr.recv_cq = info->recv_cq;
-+	qp_attr.port_num = ~0;
-+
-+	rc = rdma_create_qp(info->id, info->pd, &qp_attr);
-+	if (rc) {
-+		log_rdma_event(ERR, "rdma_create_qp failed %i\n", rc);
-+		goto create_qp_failed;
-+	}
-+
-+	memset(&conn_param, 0, sizeof(conn_param));
-+	conn_param.initiator_depth = 0;
-+
-+	conn_param.retry_count = SMBD_CM_RETRY;
-+	conn_param.rnr_retry_count = SMBD_CM_RNR_RETRY;
-+	conn_param.flow_control = 0;
-+	init_waitqueue_head(&info->wait_destroy);
-+
-+	log_rdma_event(INFO, "connecting to IP %pI4 port %d\n",
-+		&addr_in->sin_addr, port);
-+
-+	init_waitqueue_head(&info->conn_wait);
-+	rc = rdma_connect(info->id, &conn_param);
-+	if (rc) {
-+		log_rdma_event(ERR, "rdma_connect() failed with %i\n", rc);
-+		goto rdma_connect_failed;
-+	}
-+
-+	wait_event_interruptible(
-+		info->conn_wait, info->transport_status != SMBD_CONNECTING);
-+
-+	if (info->transport_status != SMBD_CONNECTED) {
-+		log_rdma_event(ERR, "rdma_connect failed port=%d\n", port);
-+		goto rdma_connect_failed;
-+	}
-+
-+	log_rdma_event(INFO, "rdma_connect connected\n");
-+
-+	rc = allocate_caches_and_workqueue(info);
-+	if (rc) {
-+		log_rdma_event(ERR, "cache allocation failed\n");
-+		goto allocate_cache_failed;
-+	}
-+
-+	init_waitqueue_head(&info->wait_send_queue);
-+	init_waitqueue_head(&info->wait_reassembly_queue);
-+
-+	INIT_DELAYED_WORK(&info->idle_timer_work, idle_connection_timer);
-+	INIT_DELAYED_WORK(&info->send_immediate_work, send_immediate_work);
-+	queue_delayed_work(info->workqueue, &info->idle_timer_work,
-+		info->keep_alive_interval*HZ);
-+
-+	init_waitqueue_head(&info->wait_send_pending);
-+	atomic_set(&info->send_pending, 0);
-+
-+	init_waitqueue_head(&info->wait_send_payload_pending);
-+	atomic_set(&info->send_payload_pending, 0);
-+
-+	INIT_WORK(&info->disconnect_work, smbd_disconnect_rdma_work);
-+	INIT_WORK(&info->destroy_work, smbd_destroy_rdma_work);
-+	INIT_WORK(&info->recv_done_work, smbd_recv_done_work);
-+	INIT_WORK(&info->post_send_credits_work, smbd_post_send_credits);
-+	info->new_credits_offered = 0;
-+	spin_lock_init(&info->lock_new_credits_offered);
-+
-+	rc = smbd_negotiate(info);
-+	if (rc) {
-+		log_rdma_event(ERR, "smbd_negotiate rc=%d\n", rc);
-+		goto negotiation_failed;
-+	}
-+
-+	return info;
-+
-+negotiation_failed:
-+	cancel_delayed_work_sync(&info->idle_timer_work);
-+	destroy_caches_and_workqueue(info);
-+	info->transport_status = SMBD_NEGOTIATE_FAILED;
-+	init_waitqueue_head(&info->conn_wait);
-+	rdma_disconnect(info->id);
-+	wait_event(info->conn_wait,
-+		info->transport_status == SMBD_DISCONNECTED);
-+
-+allocate_cache_failed:
-+rdma_connect_failed:
-+	rdma_destroy_qp(info->id);
-+
-+create_qp_failed:
-+alloc_cq_failed:
-+	if (info->send_cq)
-+		ib_free_cq(info->send_cq);
-+	if (info->recv_cq)
-+		ib_free_cq(info->recv_cq);
-+
-+config_failed:
-+	ib_dealloc_pd(info->pd);
-+	rdma_destroy_id(info->id);
-+
-+create_id_failed:
-+	kfree(info);
-+	return NULL;
-+}
-diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
-index c55f28b..35bc25b 100644
---- a/fs/cifs/smbdirect.h
-+++ b/fs/cifs/smbdirect.h
-@@ -16,6 +16,286 @@
- #ifndef _SMBDIRECT_H
- #define _SMBDIRECT_H
- 
-+#ifdef CONFIG_CIFS_SMB_DIRECT
-+#define cifs_rdma_enabled(server)	((server)->rdma)
-+
-+#include "cifsglob.h"
-+#include <rdma/ib_verbs.h>
-+#include <rdma/rdma_cm.h>
-+#include <linux/mempool.h>
-+
-+enum keep_alive_status {
-+	KEEP_ALIVE_NONE,
-+	KEEP_ALIVE_PENDING,
-+	KEEP_ALIVE_SENT,
-+};
-+
-+enum smbd_connection_status {
-+	SMBD_CREATED,
-+	SMBD_CONNECTING,
-+	SMBD_CONNECTED,
-+	SMBD_NEGOTIATE_FAILED,
-+	SMBD_DISCONNECTING,
-+	SMBD_DISCONNECTED,
-+	SMBD_DESTROYED
-+};
-+
-+/*
-+ * The context for the SMBDirect transport
-+ * Everything related to the transport is here. It has several logical parts
-+ * 1. RDMA related structures
-+ * 2. SMBDirect connection parameters
-+ * 3. Memory registrations
-+ * 4. Receive and reassembly queues for data receive path
-+ * 5. mempools for allocating packets
-+ */
-+struct smbd_connection {
-+	enum smbd_connection_status transport_status;
-+
-+	/* RDMA related */
-+	struct rdma_cm_id *id;
-+	struct ib_qp_init_attr qp_attr;
-+	struct ib_pd *pd;
-+	struct ib_cq *send_cq, *recv_cq;
-+	struct ib_device_attr dev_attr;
-+	int ri_rc;
-+	struct completion ri_done;
-+	wait_queue_head_t conn_wait;
-+	wait_queue_head_t wait_destroy;
-+
-+	struct completion negotiate_completion;
-+	bool negotiate_done;
-+
-+	struct work_struct destroy_work;
-+	struct work_struct disconnect_work;
-+	struct work_struct recv_done_work;
-+	struct work_struct post_send_credits_work;
-+
-+	spinlock_t lock_new_credits_offered;
-+	int new_credits_offered;
-+
-+	/* Connection parameters defined in [MS-SMBD] 3.1.1.1 */
-+	int receive_credit_max;
-+	int send_credit_target;
-+	int max_send_size;
-+	int max_fragmented_recv_size;
-+	int max_fragmented_send_size;
-+	int max_receive_size;
-+	int keep_alive_interval;
-+	int max_readwrite_size;
-+	enum keep_alive_status keep_alive_requested;
-+	int protocol;
-+	atomic_t send_credits;
-+	atomic_t receive_credits;
-+	int receive_credit_target;
-+	int fragment_reassembly_remaining;
-+
-+	/* Activity accoutning */
-+
-+	atomic_t send_pending;
-+	wait_queue_head_t wait_send_pending;
-+	atomic_t send_payload_pending;
-+	wait_queue_head_t wait_send_payload_pending;
-+
-+	/* Receive queue */
-+	struct list_head receive_queue;
-+	int count_receive_queue;
-+	spinlock_t receive_queue_lock;
-+
-+	struct list_head empty_packet_queue;
-+	int count_empty_packet_queue;
-+	spinlock_t empty_packet_queue_lock;
-+
-+	wait_queue_head_t wait_receive_queues;
-+
-+	/* Reassembly queue */
-+	struct list_head reassembly_queue;
-+	spinlock_t reassembly_queue_lock;
-+	wait_queue_head_t wait_reassembly_queue;
-+
-+	/* total data length of reassembly queue */
-+	int reassembly_data_length;
-+	int reassembly_queue_length;
-+	/* the offset to first buffer in reassembly queue */
-+	int first_entry_offset;
-+
-+	bool send_immediate;
-+
-+	wait_queue_head_t wait_send_queue;
-+
-+	/*
-+	 * Indicate if we have received a full packet on the connection
-+	 * This is used to identify the first SMBD packet of a assembled
-+	 * payload (SMB packet) in reassembly queue so we can return a
-+	 * RFC1002 length to upper layer to indicate the length of the SMB
-+	 * packet received
-+	 */
-+	bool full_packet_received;
-+
-+	struct workqueue_struct *workqueue;
-+	struct delayed_work idle_timer_work;
-+	struct delayed_work send_immediate_work;
-+
-+	/* Memory pool for preallocating buffers */
-+	/* request pool for RDMA send */
-+	struct kmem_cache *request_cache;
-+	mempool_t *request_mempool;
-+
-+	/* response pool for RDMA receive */
-+	struct kmem_cache *response_cache;
-+	mempool_t *response_mempool;
-+
-+	/* for debug purposes */
-+	unsigned int count_get_receive_buffer;
-+	unsigned int count_put_receive_buffer;
-+	unsigned int count_reassembly_queue;
-+	unsigned int count_enqueue_reassembly_queue;
-+	unsigned int count_dequeue_reassembly_queue;
-+	unsigned int count_send_empty;
-+};
-+
-+enum smbd_message_type {
-+	SMBD_NEGOTIATE_RESP,
-+	SMBD_TRANSFER_DATA,
-+};
-+
-+#define SMB_DIRECT_RESPONSE_REQUESTED 0x0001
-+
-+/* SMBD negotiation request packet [MS-SMBD] 2.2.1 */
-+struct smbd_negotiate_req {
-+	__le16 min_version;
-+	__le16 max_version;
-+	__le16 reserved;
-+	__le16 credits_requested;
-+	__le32 preferred_send_size;
-+	__le32 max_receive_size;
-+	__le32 max_fragmented_size;
-+} __packed;
-+
-+/* SMBD negotiation response packet [MS-SMBD] 2.2.2 */
-+struct smbd_negotiate_resp {
-+	__le16 min_version;
-+	__le16 max_version;
-+	__le16 negotiated_version;
-+	__le16 reserved;
-+	__le16 credits_requested;
-+	__le16 credits_granted;
-+	__le32 status;
-+	__le32 max_readwrite_size;
-+	__le32 preferred_send_size;
-+	__le32 max_receive_size;
-+	__le32 max_fragmented_size;
-+} __packed;
-+
-+/* SMBD data transfer packet with payload [MS-SMBD] 2.2.3 */
-+struct smbd_data_transfer {
-+	__le16 credits_requested;
-+	__le16 credits_granted;
-+	__le16 flags;
-+	__le16 reserved;
-+	__le32 remaining_data_length;
-+	__le32 data_offset;
-+	__le32 data_length;
-+	__le32 padding;
-+	__u8 buffer[];
-+} __packed;
-+
-+/* The packet fields for a registered RDMA buffer */
-+struct smbd_buffer_descriptor_v1 {
-+	__le64 offset;
-+	__le32 token;
-+	__le32 length;
-+} __packed;
-+
- /* Default maximum number of SGEs in a RDMA send/recv */
- #define SMBDIRECT_MAX_SGE	16
-+/* The context for a SMBD request */
-+struct smbd_request {
-+	struct smbd_connection *info;
-+	struct ib_cqe cqe;
-+
-+	/* true if this request carries upper layer payload */
-+	bool has_payload;
-+
-+	/* the SGE entries for this packet */
-+	struct ib_sge sge[SMBDIRECT_MAX_SGE];
-+	int num_sge;
-+
-+	/* SMBD packet header follows this structure */
-+	u8 packet[];
-+};
-+
-+/* The context for a SMBD response */
-+struct smbd_response {
-+	struct smbd_connection *info;
-+	struct ib_cqe cqe;
-+	struct ib_sge sge;
-+
-+	enum smbd_message_type type;
-+
-+	/* Link to receive queue or reassembly queue */
-+	struct list_head list;
-+
-+	/* Indicate if this is the 1st packet of a payload */
-+	bool first_segment;
-+
-+	/* SMBD packet header and payload follows this structure */
-+	u8 packet[];
-+};
-+
-+/* Create a SMBDirect session */
-+struct smbd_connection *smbd_get_connection(
-+	struct TCP_Server_Info *server, struct sockaddr *dstaddr);
-+
-+/* Reconnect SMBDirect session */
-+int smbd_reconnect(struct TCP_Server_Info *server);
-+
-+/* Destroy SMBDirect session */
-+void smbd_destroy(struct smbd_connection *info);
-+
-+/* Interface for carrying upper layer I/O through send/recv */
-+int smbd_recv(struct smbd_connection *info, struct msghdr *msg);
-+int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst);
-+
-+enum mr_state {
-+	MR_READY,
-+	MR_REGISTERED,
-+	MR_INVALIDATED,
-+	MR_ERROR
-+};
-+
-+struct smbd_mr {
-+	struct smbd_connection	*conn;
-+	struct list_head	list;
-+	enum mr_state		state;
-+	struct ib_mr		*mr;
-+	struct scatterlist	*sgl;
-+	int			sgl_count;
-+	enum dma_data_direction	dir;
-+	union {
-+		struct ib_reg_wr	wr;
-+		struct ib_send_wr	inv_wr;
-+	};
-+	struct ib_cqe		cqe;
-+	bool			need_invalidate;
-+	struct completion	invalidate_done;
-+};
-+
-+/* Interfaces to register and deregister MR for RDMA read/write */
-+struct smbd_mr *smbd_register_mr(
-+	struct smbd_connection *info, struct page *pages[], int num_pages,
-+	int tailsz, bool writing, bool need_invalidate);
-+int smbd_deregister_mr(struct smbd_mr *mr);
-+
-+#else
-+#define cifs_rdma_enabled(server)	0
-+struct smbd_connection{};
-+static inline void *smbd_get_connection(
-+	struct TCP_Server_Info *server, struct sockaddr *dstaddr) {return NULL;}
-+static inline int smbd_reconnect(struct TCP_Server_Info *server) {return -1;}
-+static inline void smbd_destroy(struct smbd_connection *info) {}
-+static inline int smbd_recv(struct smbd_connection *info, struct msghdr *msg) {return -1;}
-+static inline int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst) {return -1;}
-+#endif
-+
- #endif
--- 
-2.7.4
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBMZWlmIFNhaGxiZXJnIFttYWls
+dG86bHNhaGxiZXJAcmVkaGF0LmNvbV0NCj4gU2VudDogU3VuZGF5LCBOb3ZlbWJlciAxOSwgMjAx
+NyA5OjQ3IFBNDQo+IFRvOiBMb25nIExpIDxsb25nbGlAbWljcm9zb2Z0LmNvbT4NCj4gQ2M6IFN0
+ZXZlIEZyZW5jaCA8c2ZyZW5jaEBzYW1iYS5vcmc+OyBsaW51eC1jaWZzQHZnZXIua2VybmVsLm9y
+ZzsgbGludXgtDQo+IGtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LXJkbWFAdmdlci5rZXJu
+ZWwub3JnOyBDaHJpc3RvcGggSGVsbHdpZw0KPiA8aGNoQGluZnJhZGVhZC5vcmc+OyBUb20gVGFs
+cGV5IDx0dGFscGV5QG1pY3Jvc29mdC5jb20+OyBNYXR0aGV3DQo+IFdpbGNveCA8bWF3aWxjb3hA
+bWljcm9zb2Z0LmNvbT47IFN0ZXBoZW4gSGVtbWluZ2VyDQo+IDxzdGhlbW1pbkBtaWNyb3NvZnQu
+Y29tPjsgTG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUGF0
+Y2ggdjcgMDUvMjJdIENJRlM6IFNNQkQ6IEVzdGFibGlzaCBTTUIgRGlyZWN0IGNvbm5lY3Rpb24N
+Cj4gDQo+IEFja2VkLWJ5OiBSb25uaWUgU2FobGJlcmcgPGxzYWhsYmVyQGdtYWlsLmNvbT4NCj4g
+DQo+IEJ1dCB0d28gdGlueSBuaXRzOg0KPiArICogZS5nLiBjaWZzLnNtYmRfbG9nZ2luZ19jbGFz
+cz0weDUwMCB3aWxsIGxvZyBhbGwgbG9nX3JkbWFfcmVjdigpIGFuZA0KPiBTaG91bGQgYmUgMHhh
+MA0KPiANCj4gKy8vCXF1ZXVlX3dvcmsoaW5mby0+d29ya3F1ZXVlLCAmaW5mby0+ZGVzdHJveV93
+b3JrKTsNCj4gRG9uJ3QgbGVhdmUgY29tbWVudGVkIG91dCBjb2RlIGluIHRoZXJlLg0KDQpJIHdp
+bGwgYWRkcmVzcyB0aG9zZS4gVGhhbmtzIQ0KDQo+IA0KPiANCj4gLS0tLS0gT3JpZ2luYWwgTWVz
+c2FnZSAtLS0tLQ0KPiBGcm9tOiAiTG9uZyBMaSIgPGxvbmdsaUBleGNoYW5nZS5taWNyb3NvZnQu
+Y29tPg0KPiBUbzogIlN0ZXZlIEZyZW5jaCIgPHNmcmVuY2hAc2FtYmEub3JnPiwgbGludXgtY2lm
+c0B2Z2VyLmtlcm5lbC5vcmcsDQo+IHNhbWJhLXRlY2huaWNhbEBsaXN0cy5zYW1iYS5vcmcsIGxp
+bnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmcsIGxpbnV4LQ0KPiByZG1hQHZnZXIua2VybmVsLm9y
+ZywgIkNocmlzdG9waCBIZWxsd2lnIiA8aGNoQGluZnJhZGVhZC5vcmc+LCAiVG9tDQo+IFRhbHBl
+eSIgPHR0YWxwZXlAbWljcm9zb2Z0LmNvbT4sICJNYXR0aGV3IFdpbGNveCINCj4gPG1hd2lsY294
+QG1pY3Jvc29mdC5jb20+LCAiU3RlcGhlbiBIZW1taW5nZXIiDQo+IDxzdGhlbW1pbkBtaWNyb3Nv
+ZnQuY29tPg0KPiBDYzogIkxvbmcgTGkiIDxsb25nbGlAbWljcm9zb2Z0LmNvbT4NCj4gU2VudDog
+VHVlc2RheSwgNyBOb3ZlbWJlciwgMjAxNyA3OjU0OjU3IFBNDQo+IFN1YmplY3Q6IFtQYXRjaCB2
+NyAwNS8yMl0gQ0lGUzogU01CRDogRXN0YWJsaXNoIFNNQiBEaXJlY3QgY29ubmVjdGlvbg0KPiAN
+Cj4gRnJvbTogTG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+IA0KPiBBZGQgY29kZSB0
+byBpbXBsZW1lbnQgdGhlIGNvcmUgZnVuY3Rpb25zIHRvIGVzdGFibGlzaCBhIFNNQiBEaXJlY3QN
+Cj4gY29ubmVjdGlvbi4NCj4gDQo+IDEuIEVzdGFibGlzaCBhbiBSRE1BIGNvbm5lY3Rpb24gdG8g
+U01CIHNlcnZlci4NCj4gMi4gTmVnb3RpYXRlIGFuZCBzZXR1cCBTTUIgRGlyZWN0IHByb3RvY29s
+Lg0KPiAzLiBJbXBsZW1lbnQgaWRsZSBjb25uZWN0aW9uIHRpbWVyIGFuZCBjcmVkaXQgbWFuYWdl
+bWVudC4NCj4gDQo+IFNNQiBEaXJlY3QgaXMgZW5hYmxlZCBieSBzZXR0aW5nIENPTkZJR19DSUZT
+X1NNQl9ESVJFQ1QuDQo+IA0KPiBBZGQgdG8gTWFrZWZpbGUgdG8gZW5hYmxlIGJ1aWxkaW5nIFNN
+QiBEaXJlY3QuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBMb25nIExpIDxsb25nbGlAbWljcm9zb2Z0
+LmNvbT4NCj4gLS0tDQo+ICBmcy9jaWZzL01ha2VmaWxlICAgIHwgICAgMiArDQo+ICBmcy9jaWZz
+L3NtYmRpcmVjdC5jIHwgMTU3Ng0KPiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysNCj4gIGZzL2NpZnMvc21iZGlyZWN0LmggfCAgMjgwICsrKysrKysr
+Kw0KPiAgMyBmaWxlcyBjaGFuZ2VkLCAxODU4IGluc2VydGlvbnMoKykNCj4gDQo+IGRpZmYgLS1n
+aXQgYS9mcy9jaWZzL01ha2VmaWxlIGIvZnMvY2lmcy9NYWtlZmlsZQ0KPiBpbmRleCA1ZTg1M2Ez
+Li5hZDAwODczIDEwMDY0NA0KPiAtLS0gYS9mcy9jaWZzL01ha2VmaWxlDQo+ICsrKyBiL2ZzL2Np
+ZnMvTWFrZWZpbGUNCj4gQEAgLTE4LDMgKzE4LDUgQEAgY2lmcy0kKENPTkZJR19DSUZTX1VQQ0FM
+TCkgKz0gY2lmc19zcG5lZ28ubw0KPiAgY2lmcy0kKENPTkZJR19DSUZTX0RGU19VUENBTEwpICs9
+IGRuc19yZXNvbHZlLm8gY2lmc19kZnNfcmVmLm8NCj4gDQo+ICBjaWZzLSQoQ09ORklHX0NJRlNf
+RlNDQUNIRSkgKz0gZnNjYWNoZS5vIGNhY2hlLm8NCj4gKw0KPiArY2lmcy0kKENPTkZJR19DSUZT
+X1NNQl9ESVJFQ1QpICs9IHNtYmRpcmVjdC5vDQo+IGRpZmYgLS1naXQgYS9mcy9jaWZzL3NtYmRp
+cmVjdC5jIGIvZnMvY2lmcy9zbWJkaXJlY3QuYw0KPiBpbmRleCBkM2MxNmY4Li4wMjFkNTI3IDEw
+MDY0NA0KPiAtLS0gYS9mcy9jaWZzL3NtYmRpcmVjdC5jDQo+ICsrKyBiL2ZzL2NpZnMvc21iZGly
+ZWN0LmMNCj4gQEAgLTEzLDcgKzEzLDM0IEBADQo+ICAgKiAgIE1FUkNIQU5UQUJJTElUWSBvciBG
+SVRORVNTIEZPUiBBIFBBUlRJQ1VMQVIgUFVSUE9TRS4gIFNlZQ0KPiAgICogICB0aGUgR05VIEdl
+bmVyYWwgUHVibGljIExpY2Vuc2UgZm9yIG1vcmUgZGV0YWlscy4NCj4gICAqLw0KPiArI2luY2x1
+ZGUgPGxpbnV4L21vZHVsZS5oPg0KPiAgI2luY2x1ZGUgInNtYmRpcmVjdC5oIg0KPiArI2luY2x1
+ZGUgImNpZnNfZGVidWcuaCINCj4gKw0KPiArc3RhdGljIHN0cnVjdCBzbWJkX3Jlc3BvbnNlICpn
+ZXRfZW1wdHlfcXVldWVfYnVmZmVyKA0KPiArCQlzdHJ1Y3Qgc21iZF9jb25uZWN0aW9uICppbmZv
+KTsNCj4gK3N0YXRpYyBzdHJ1Y3Qgc21iZF9yZXNwb25zZSAqZ2V0X3JlY2VpdmVfYnVmZmVyKA0K
+PiArCQlzdHJ1Y3Qgc21iZF9jb25uZWN0aW9uICppbmZvKTsNCj4gK3N0YXRpYyB2b2lkIHB1dF9y
+ZWNlaXZlX2J1ZmZlcigNCj4gKwkJc3RydWN0IHNtYmRfY29ubmVjdGlvbiAqaW5mbywNCj4gKwkJ
+c3RydWN0IHNtYmRfcmVzcG9uc2UgKnJlc3BvbnNlLA0KPiArCQlib29sIGxvY2spOw0KPiArc3Rh
+dGljIGludCBhbGxvY2F0ZV9yZWNlaXZlX2J1ZmZlcnMoc3RydWN0IHNtYmRfY29ubmVjdGlvbiAq
+aW5mbywgaW50DQo+IG51bV9idWYpOw0KPiArc3RhdGljIHZvaWQgZGVzdHJveV9yZWNlaXZlX2J1
+ZmZlcnMoc3RydWN0IHNtYmRfY29ubmVjdGlvbiAqaW5mbyk7DQo+ICsNCj4gK3N0YXRpYyB2b2lk
+IHB1dF9lbXB0eV9wYWNrZXQoDQo+ICsJCXN0cnVjdCBzbWJkX2Nvbm5lY3Rpb24gKmluZm8sIHN0
+cnVjdCBzbWJkX3Jlc3BvbnNlDQo+ICpyZXNwb25zZSk7DQo+ICtzdGF0aWMgdm9pZCBlbnF1ZXVl
+X3JlYXNzZW1ibHkoDQo+ICsJCXN0cnVjdCBzbWJkX2Nvbm5lY3Rpb24gKmluZm8sDQo+ICsJCXN0
+cnVjdCBzbWJkX3Jlc3BvbnNlICpyZXNwb25zZSwgaW50IGRhdGFfbGVuZ3RoKTsNCj4gK3N0YXRp
+YyBzdHJ1Y3Qgc21iZF9yZXNwb25zZSAqX2dldF9maXJzdF9yZWFzc2VtYmx5KA0KPiArCQlzdHJ1
+Y3Qgc21iZF9jb25uZWN0aW9uICppbmZvKTsNCj4gKw0KPiArc3RhdGljIGludCBzbWJkX3Bvc3Rf
+cmVjdigNCj4gKwkJc3RydWN0IHNtYmRfY29ubmVjdGlvbiAqaW5mbywNCj4gKwkJc3RydWN0IHNt
+YmRfcmVzcG9uc2UgKnJlc3BvbnNlKTsNCj4gKw0KPiArc3RhdGljIGludCBzbWJkX3Bvc3Rfc2Vu
+ZF9lbXB0eShzdHJ1Y3Qgc21iZF9jb25uZWN0aW9uICppbmZvKTsNCj4gDQo+ICAvKiBTTUJEIHZl
+cnNpb24gbnVtYmVyICovDQo+ICAjZGVmaW5lIFNNQkRfVjEJMHgwMTAwDQo+IEBAIC03NSwzICsx
+MDIsMTU1MiBAQCBpbnQgc21iZF9tYXhfZnJtcl9kZXB0aCA9IDIwNDg7DQo+IA0KPiAgLyogSWYg
+cGF5bG9hZCBpcyBsZXNzIHRoYW4gdGhpcyBieXRlLCB1c2UgUkRNQSBzZW5kL3JlY3Ygbm90IHJl
+YWQvd3JpdGUgKi8NCj4gIGludCByZG1hX3JlYWR3cml0ZV90aHJlc2hvbGQgPSA0MDk2Ow0KPiAr
+DQo+ICsvKiBUcmFuc3BvcnQgbG9nZ2luZyBmdW5jdGlvbnMNCj4gKyAqIExvZ2dpbmcgYXJlIGRl
+ZmluZWQgYXMgY2xhc3Nlcy4gVGhleSBjYW4gYmUgT1InZWQgdG8gZGVmaW5lIHRoZSBhY3R1YWwN
+Cj4gKyAqIGxvZ2dpbmcgbGV2ZWwgdmlhIG1vZHVsZSBwYXJhbWV0ZXIgc21iZF9sb2dnaW5nX2Ns
+YXNzDQo+ICsgKiBlLmcuIGNpZnMuc21iZF9sb2dnaW5nX2NsYXNzPTB4NTAwIHdpbGwgbG9nIGFs
+bCBsb2dfcmRtYV9yZWN2KCkgYW5kDQo+ICsgKiBsb2dfcmRtYV9ldmVudCgpDQo+ICsgKi8NCj4g
+KyNkZWZpbmUgTE9HX09VVEdPSU5HCQkJMHgxDQo+ICsjZGVmaW5lIExPR19JTkNPTUlORwkJCTB4
+Mg0KPiArI2RlZmluZSBMT0dfUkVBRAkJCTB4NA0KPiArI2RlZmluZSBMT0dfV1JJVEUJCQkweDgN
+Cj4gKyNkZWZpbmUgTE9HX1JETUFfU0VORAkJCTB4MTANCj4gKyNkZWZpbmUgTE9HX1JETUFfUkVD
+VgkJCTB4MjANCj4gKyNkZWZpbmUgTE9HX0tFRVBfQUxJVkUJCQkweDQwDQo+ICsjZGVmaW5lIExP
+R19SRE1BX0VWRU5UCQkJMHg4MA0KPiArI2RlZmluZSBMT0dfUkRNQV9NUgkJCTB4MTAwDQo+ICtz
+dGF0aWMgdW5zaWduZWQgaW50IHNtYmRfbG9nZ2luZ19jbGFzcyA9IDA7DQo+ICttb2R1bGVfcGFy
+YW0oc21iZF9sb2dnaW5nX2NsYXNzLCB1aW50LCAwNjQ0KTsNCj4gK01PRFVMRV9QQVJNX0RFU0Mo
+c21iZF9sb2dnaW5nX2NsYXNzLA0KPiArCSJMb2dnaW5nIGNsYXNzIGZvciBTTUJEIHRyYW5zcG9y
+dCAweDAgdG8gMHgxMDAiKTsNCj4gKw0KPiArI2RlZmluZSBFUlIJCTB4MA0KPiArI2RlZmluZSBJ
+TkZPCQkweDENCj4gK3N0YXRpYyB1bnNpZ25lZCBpbnQgc21iZF9sb2dnaW5nX2xldmVsID0gRVJS
+Ow0KPiArbW9kdWxlX3BhcmFtKHNtYmRfbG9nZ2luZ19sZXZlbCwgdWludCwgMDY0NCk7DQo+ICtN
+T0RVTEVfUEFSTV9ERVNDKHNtYmRfbG9nZ2luZ19sZXZlbCwNCj4gKwkiTG9nZ2luZyBsZXZlbCBm
+b3IgU01CRCB0cmFuc3BvcnQsIDAgKGRlZmF1bHQpOiBlcnJvciwgMTogaW5mbyIpOw0KPiArDQo+
+ICsjZGVmaW5lIGxvZ19yZG1hKGxldmVsLCBjbGFzcywgZm10LCBhcmdzLi4uKQkJCQlcDQo+ICtk
+byB7CQkJCQkJCQkJXA0KPiArCWlmIChsZXZlbCA8PSBzbWJkX2xvZ2dpbmdfbGV2ZWwgfHwgY2xh
+c3MgJiBzbWJkX2xvZ2dpbmdfY2xhc3MpCVwNCj4gKwkJY2lmc19kYmcoVkZTLCAiJXM6JWQgIiBm
+bXQsIF9fZnVuY19fLCBfX0xJTkVfXywgIyNhcmdzKTtcDQo+ICt9IHdoaWxlICgwKQ0KPiArDQo+
+ICsjZGVmaW5lIGxvZ19vdXRnb2luZyhsZXZlbCwgZm10LCBhcmdzLi4uKSBcDQo+ICsJCWxvZ19y
+ZG1hKGxldmVsLCBMT0dfT1VUR09JTkcsIGZtdCwgIyNhcmdzKQ0KPiArI2RlZmluZSBsb2dfaW5j
+b21pbmcobGV2ZWwsIGZtdCwgYXJncy4uLikgXA0KPiArCQlsb2dfcmRtYShsZXZlbCwgTE9HX0lO
+Q09NSU5HLCBmbXQsICMjYXJncykNCj4gKyNkZWZpbmUgbG9nX3JlYWQobGV2ZWwsIGZtdCwgYXJn
+cy4uLikJbG9nX3JkbWEobGV2ZWwsIExPR19SRUFELCBmbXQsDQo+ICMjYXJncykNCj4gKyNkZWZp
+bmUgbG9nX3dyaXRlKGxldmVsLCBmbXQsIGFyZ3MuLi4pCWxvZ19yZG1hKGxldmVsLCBMT0dfV1JJ
+VEUsIGZtdCwNCj4gIyNhcmdzKQ0KPiArI2RlZmluZSBsb2dfcmRtYV9zZW5kKGxldmVsLCBmbXQs
+IGFyZ3MuLi4pIFwNCj4gKwkJbG9nX3JkbWEobGV2ZWwsIExPR19SRE1BX1NFTkQsIGZtdCwgIyNh
+cmdzKQ0KPiArI2RlZmluZSBsb2dfcmRtYV9yZWN2KGxldmVsLCBmbXQsIGFyZ3MuLi4pIFwNCj4g
+KwkJbG9nX3JkbWEobGV2ZWwsIExPR19SRE1BX1JFQ1YsIGZtdCwgIyNhcmdzKQ0KPiArI2RlZmlu
+ZSBsb2dfa2VlcF9hbGl2ZShsZXZlbCwgZm10LCBhcmdzLi4uKSBcDQo+ICsJCWxvZ19yZG1hKGxl
+dmVsLCBMT0dfS0VFUF9BTElWRSwgZm10LCAjI2FyZ3MpDQo+ICsjZGVmaW5lIGxvZ19yZG1hX2V2
+ZW50KGxldmVsLCBmbXQsIGFyZ3MuLi4pIFwNCj4gKwkJbG9nX3JkbWEobGV2ZWwsIExPR19SRE1B
+X0VWRU5ULCBmbXQsICMjYXJncykNCj4gKyNkZWZpbmUgbG9nX3JkbWFfbXIobGV2ZWwsIGZtdCwg
+YXJncy4uLikgXA0KPiArCQlsb2dfcmRtYShsZXZlbCwgTE9HX1JETUFfTVIsIGZtdCwgIyNhcmdz
+KQ0KPiArDQo+ICsvKg0KPiArICogRGVzdHJveSB0aGUgdHJhbnNwb3J0IGFuZCByZWxhdGVkIFJE
+TUEgYW5kIG1lbW9yeSByZXNvdXJjZXMNCj4gKyAqIE5lZWQgdG8gZ28gdGhyb3VnaCBhbGwgdGhl
+IHBlbmRpbmcgY291bnRlcnMgYW5kIG1ha2Ugc3VyZSBvbiBvbmUgaXMNCj4gdXNpbmcNCj4gKyAq
+IHRoZSB0cmFuc3BvcnQgd2hpbGUgaXQgaXMgZGVzdHJveWVkDQo+ICsgKi8NCj4gK3N0YXRpYyB2
+b2lkIHNtYmRfZGVzdHJveV9yZG1hX3dvcmsoc3RydWN0IHdvcmtfc3RydWN0ICp3b3JrKQ0KPiAr
+ew0KPiArCXN0cnVjdCBzbWJkX3Jlc3BvbnNlICpyZXNwb25zZTsNCj4gKwlzdHJ1Y3Qgc21iZF9j
+b25uZWN0aW9uICppbmZvID0NCj4gKwkJY29udGFpbmVyX29mKHdvcmssIHN0cnVjdCBzbWJkX2Nv
+bm5lY3Rpb24sIGRlc3Ryb3lfd29yayk7DQo+ICsJdW5zaWduZWQgbG9uZyBmbGFnczsNCj4gKw0K
+PiArCWxvZ19yZG1hX2V2ZW50KElORk8sICJkZXN0cm95aW5nIHFwXG4iKTsNCj4gKwlpYl9kcmFp
+bl9xcChpbmZvLT5pZC0+cXApOw0KPiArCXJkbWFfZGVzdHJveV9xcChpbmZvLT5pZCk7DQo+ICsN
+Cj4gKwkvKiBVbmJsb2NrIGFsbCBJL08gd2FpdGluZyBvbiB0aGUgc2VuZCBxdWV1ZSAqLw0KPiAr
+CXdha2VfdXBfaW50ZXJydXB0aWJsZV9hbGwoJmluZm8tPndhaXRfc2VuZF9xdWV1ZSk7DQo+ICsN
+Cj4gKwlsb2dfcmRtYV9ldmVudChJTkZPLCAiY2FuY2VsbGluZyBpZGxlIHRpbWVyXG4iKTsNCj4g
+KwljYW5jZWxfZGVsYXllZF93b3JrX3N5bmMoJmluZm8tPmlkbGVfdGltZXJfd29yayk7DQo+ICsJ
+bG9nX3JkbWFfZXZlbnQoSU5GTywgImNhbmNlbGxpbmcgc2VuZCBpbW1lZGlhdGUgd29ya1xuIik7
+DQo+ICsJY2FuY2VsX2RlbGF5ZWRfd29ya19zeW5jKCZpbmZvLT5zZW5kX2ltbWVkaWF0ZV93b3Jr
+KTsNCj4gKw0KPiArCWxvZ19yZG1hX2V2ZW50KElORk8sICJ3YWl0IGZvciBhbGwgcmVjdiB0byBm
+aW5pc2hcbiIpOw0KPiArCXdha2VfdXBfaW50ZXJydXB0aWJsZSgmaW5mby0+d2FpdF9yZWFzc2Vt
+Ymx5X3F1ZXVlKTsNCj4gKw0KPiArCWxvZ19yZG1hX2V2ZW50KElORk8sICJ3YWl0IGZvciBhbGwg
+c2VuZCBwb3N0ZWQgdG8gSUIgdG8gZmluaXNoXG4iKTsNCj4gKwl3YWl0X2V2ZW50KGluZm8tPndh
+aXRfc2VuZF9wZW5kaW5nLA0KPiArCQlhdG9taWNfcmVhZCgmaW5mby0+c2VuZF9wZW5kaW5nKSA9
+PSAwKTsNCj4gKwl3YWl0X2V2ZW50KGluZm8tPndhaXRfc2VuZF9wYXlsb2FkX3BlbmRpbmcsDQo+
+ICsJCWF0b21pY19yZWFkKCZpbmZvLT5zZW5kX3BheWxvYWRfcGVuZGluZykgPT0gMCk7DQo+ICsN
+Cj4gKwkvKiBJdCdzIG5vdCBwb3Nzc2libGUgZm9yIHVwcGVyIGxheWVyIHRvIGdldCB0byByZWFz
+c2VtYmx5ICovDQo+ICsJbG9nX3JkbWFfZXZlbnQoSU5GTywgImRyYWluIHRoZSByZWFzc2VtYmx5
+IHF1ZXVlXG4iKTsNCj4gKwlkbyB7DQo+ICsJCXNwaW5fbG9ja19pcnFzYXZlKCZpbmZvLT5yZWFz
+c2VtYmx5X3F1ZXVlX2xvY2ssIGZsYWdzKTsNCj4gKwkJcmVzcG9uc2UgPSBfZ2V0X2ZpcnN0X3Jl
+YXNzZW1ibHkoaW5mbyk7DQo+ICsJCWlmIChyZXNwb25zZSkgew0KPiArCQkJbGlzdF9kZWwoJnJl
+c3BvbnNlLT5saXN0KTsNCj4gKwkJCXNwaW5fdW5sb2NrX2lycXJlc3RvcmUoDQo+ICsJCQkJJmlu
+Zm8tPnJlYXNzZW1ibHlfcXVldWVfbG9jaywgZmxhZ3MpOw0KPiArCQkJcHV0X3JlY2VpdmVfYnVm
+ZmVyKGluZm8sIHJlc3BvbnNlLCB0cnVlKTsNCj4gKwkJfQ0KPiArCX0gd2hpbGUgKHJlc3BvbnNl
+KTsNCj4gKwlzcGluX3VubG9ja19pcnFyZXN0b3JlKCZpbmZvLT5yZWFzc2VtYmx5X3F1ZXVlX2xv
+Y2ssIGZsYWdzKTsNCj4gKwlpbmZvLT5yZWFzc2VtYmx5X2RhdGFfbGVuZ3RoID0gMDsNCj4gKw0K
+PiArCWxvZ19yZG1hX2V2ZW50KElORk8sICJmcmVlIHJlY2VpdmUgYnVmZmVyc1xuIik7DQo+ICsJ
+d2FpdF9ldmVudChpbmZvLT53YWl0X3JlY2VpdmVfcXVldWVzLA0KPiArCQlpbmZvLT5jb3VudF9y
+ZWNlaXZlX3F1ZXVlICsgaW5mby0NCj4gPmNvdW50X2VtcHR5X3BhY2tldF9xdWV1ZQ0KPiArCQkJ
+PT0gaW5mby0+cmVjZWl2ZV9jcmVkaXRfbWF4KTsNCj4gKwlkZXN0cm95X3JlY2VpdmVfYnVmZmVy
+cyhpbmZvKTsNCj4gKw0KPiArCWliX2ZyZWVfY3EoaW5mby0+c2VuZF9jcSk7DQo+ICsJaWJfZnJl
+ZV9jcShpbmZvLT5yZWN2X2NxKTsNCj4gKwlpYl9kZWFsbG9jX3BkKGluZm8tPnBkKTsNCj4gKwly
+ZG1hX2Rlc3Ryb3lfaWQoaW5mby0+aWQpOw0KPiArDQo+ICsJLyogZnJlZSBtZW1wb29scyAqLw0K
+PiArCW1lbXBvb2xfZGVzdHJveShpbmZvLT5yZXF1ZXN0X21lbXBvb2wpOw0KPiArCWttZW1fY2Fj
+aGVfZGVzdHJveShpbmZvLT5yZXF1ZXN0X2NhY2hlKTsNCj4gKw0KPiArCW1lbXBvb2xfZGVzdHJv
+eShpbmZvLT5yZXNwb25zZV9tZW1wb29sKTsNCj4gKwlrbWVtX2NhY2hlX2Rlc3Ryb3koaW5mby0+
+cmVzcG9uc2VfY2FjaGUpOw0KPiArDQo+ICsJaW5mby0+dHJhbnNwb3J0X3N0YXR1cyA9IFNNQkRf
+REVTVFJPWUVEOw0KPiArCXdha2VfdXBfYWxsKCZpbmZvLT53YWl0X2Rlc3Ryb3kpOw0KPiArfQ0K
+PiArDQo+ICtzdGF0aWMgaW50IHNtYmRfcHJvY2Vzc19kaXNjb25uZWN0ZWQoc3RydWN0IHNtYmRf
+Y29ubmVjdGlvbiAqaW5mbykNCj4gK3sNCj4gKy8vCXF1ZXVlX3dvcmsoaW5mby0+d29ya3F1ZXVl
+LCAmaW5mby0+ZGVzdHJveV93b3JrKTsNCj4gKwlzY2hlZHVsZV93b3JrKCZpbmZvLT5kZXN0cm95
+X3dvcmspOw0KPiArCXJldHVybiAwOw0KPiArfQ0KPiArDQo+ICtzdGF0aWMgdm9pZCBzbWJkX2Rp
+c2Nvbm5lY3RfcmRtYV93b3JrKHN0cnVjdCB3b3JrX3N0cnVjdCAqd29yaykNCj4gK3sNCj4gKwlz
+dHJ1Y3Qgc21iZF9jb25uZWN0aW9uICppbmZvID0NCj4gKwkJY29udGFpbmVyX29mKHdvcmssIHN0
+cnVjdCBzbWJkX2Nvbm5lY3Rpb24sDQo+IGRpc2Nvbm5lY3Rfd29yayk7DQo+ICsNCj4gKwlpZiAo
+aW5mby0+dHJhbnNwb3J0X3N0YXR1cyA9PSBTTUJEX0NPTk5FQ1RFRCkgew0KPiArCQlpbmZvLT50
+cmFuc3BvcnRfc3RhdHVzID0gU01CRF9ESVNDT05ORUNUSU5HOw0KPiArCQlyZG1hX2Rpc2Nvbm5l
+Y3QoaW5mby0+aWQpOw0KPiArCX0NCj4gK30NCj4gKw0KPiArc3RhdGljIHZvaWQgc21iZF9kaXNj
+b25uZWN0X3JkbWFfY29ubmVjdGlvbihzdHJ1Y3Qgc21iZF9jb25uZWN0aW9uDQo+ICppbmZvKQ0K
+PiArew0KPiArCXF1ZXVlX3dvcmsoaW5mby0+d29ya3F1ZXVlLCAmaW5mby0+ZGlzY29ubmVjdF93
+b3JrKTsNCj4gK30NCj4gKw0KPiArLyogVXBjYWxsIGZyb20gUkRNQSBDTSAqLw0KPiArc3RhdGlj
+IGludCBzbWJkX2Nvbm5fdXBjYWxsKA0KPiArCQlzdHJ1Y3QgcmRtYV9jbV9pZCAqaWQsIHN0cnVj
+dCByZG1hX2NtX2V2ZW50ICpldmVudCkNCj4gK3sNCj4gKwlzdHJ1Y3Qgc21iZF9jb25uZWN0aW9u
+ICppbmZvID0gaWQtPmNvbnRleHQ7DQo+ICsNCj4gKwlsb2dfcmRtYV9ldmVudChJTkZPLCAiZXZl
+bnQ9JWQgc3RhdHVzPSVkXG4iLA0KPiArCQlldmVudC0+ZXZlbnQsIGV2ZW50LT5zdGF0dXMpOw0K
+PiArDQo+ICsJc3dpdGNoIChldmVudC0+ZXZlbnQpIHsNCj4gKwljYXNlIFJETUFfQ01fRVZFTlRf
+QUREUl9SRVNPTFZFRDoNCj4gKwljYXNlIFJETUFfQ01fRVZFTlRfUk9VVEVfUkVTT0xWRUQ6DQo+
+ICsJCWluZm8tPnJpX3JjID0gMDsNCj4gKwkJY29tcGxldGUoJmluZm8tPnJpX2RvbmUpOw0KPiAr
+CQlicmVhazsNCj4gKw0KPiArCWNhc2UgUkRNQV9DTV9FVkVOVF9BRERSX0VSUk9SOg0KPiArCQlp
+bmZvLT5yaV9yYyA9IC1FSE9TVFVOUkVBQ0g7DQo+ICsJCWNvbXBsZXRlKCZpbmZvLT5yaV9kb25l
+KTsNCj4gKwkJYnJlYWs7DQo+ICsNCj4gKwljYXNlIFJETUFfQ01fRVZFTlRfUk9VVEVfRVJST1I6
+DQo+ICsJCWluZm8tPnJpX3JjID0gLUVORVRVTlJFQUNIOw0KPiArCQljb21wbGV0ZSgmaW5mby0+
+cmlfZG9uZSk7DQo+ICsJCWJyZWFrOw0KPiArDQo+ICsJY2FzZSBSRE1BX0NNX0VWRU5UX0VTVEFC
+TElTSEVEOg0KPiArCQlsb2dfcmRtYV9ldmVudChJTkZPLCAiY29ubmVjdGVkIGV2ZW50PSVkXG4i
+LCBldmVudC0NCj4gPmV2ZW50KTsNCj4gKwkJaW5mby0+dHJhbnNwb3J0X3N0YXR1cyA9IFNNQkRf
+Q09OTkVDVEVEOw0KPiArCQl3YWtlX3VwX2ludGVycnVwdGlibGUoJmluZm8tPmNvbm5fd2FpdCk7
+DQo+ICsJCWJyZWFrOw0KPiArDQo+ICsJY2FzZSBSRE1BX0NNX0VWRU5UX0NPTk5FQ1RfRVJST1I6
+DQo+ICsJY2FzZSBSRE1BX0NNX0VWRU5UX1VOUkVBQ0hBQkxFOg0KPiArCWNhc2UgUkRNQV9DTV9F
+VkVOVF9SRUpFQ1RFRDoNCj4gKwkJbG9nX3JkbWFfZXZlbnQoSU5GTywgImNvbm5lY3RpbmcgZmFp
+bGVkIGV2ZW50PSVkXG4iLA0KPiBldmVudC0+ZXZlbnQpOw0KPiArCQlpbmZvLT50cmFuc3BvcnRf
+c3RhdHVzID0gU01CRF9ESVNDT05ORUNURUQ7DQo+ICsJCXdha2VfdXBfaW50ZXJydXB0aWJsZSgm
+aW5mby0+Y29ubl93YWl0KTsNCj4gKwkJYnJlYWs7DQo+ICsNCj4gKwljYXNlIFJETUFfQ01fRVZF
+TlRfREVWSUNFX1JFTU9WQUw6DQo+ICsJY2FzZSBSRE1BX0NNX0VWRU5UX0RJU0NPTk5FQ1RFRDoN
+Cj4gKwkJLyogVGhpcyBoYXBwZW5lcyB3aGVuIHdlIGZhaWwgdGhlIG5lZ290aWF0aW9uICovDQo+
+ICsJCWlmIChpbmZvLT50cmFuc3BvcnRfc3RhdHVzID09IFNNQkRfTkVHT1RJQVRFX0ZBSUxFRCkg
+ew0KPiArCQkJaW5mby0+dHJhbnNwb3J0X3N0YXR1cyA9IFNNQkRfRElTQ09OTkVDVEVEOw0KPiAr
+CQkJd2FrZV91cCgmaW5mby0+Y29ubl93YWl0KTsNCj4gKwkJCWJyZWFrOw0KPiArCQl9DQo+ICsN
+Cj4gKwkJaW5mby0+dHJhbnNwb3J0X3N0YXR1cyA9IFNNQkRfRElTQ09OTkVDVEVEOw0KPiArCQlz
+bWJkX3Byb2Nlc3NfZGlzY29ubmVjdGVkKGluZm8pOw0KPiArCQlicmVhazsNCj4gKw0KPiArCWRl
+ZmF1bHQ6DQo+ICsJCWJyZWFrOw0KPiArCX0NCj4gKw0KPiArCXJldHVybiAwOw0KPiArfQ0KPiAr
+DQo+ICsvKiBVcGNhbGwgZnJvbSBSRE1BIFFQICovDQo+ICtzdGF0aWMgdm9pZA0KPiArc21iZF9x
+cF9hc3luY19lcnJvcl91cGNhbGwoc3RydWN0IGliX2V2ZW50ICpldmVudCwgdm9pZCAqY29udGV4
+dCkNCj4gK3sNCj4gKwlzdHJ1Y3Qgc21iZF9jb25uZWN0aW9uICppbmZvID0gY29udGV4dDsNCj4g
+Kw0KPiArCWxvZ19yZG1hX2V2ZW50KEVSUiwgIiVzIG9uIGRldmljZSAlcyBpbmZvICVwXG4iLA0K
+PiArCQlpYl9ldmVudF9tc2coZXZlbnQtPmV2ZW50KSwgZXZlbnQtPmRldmljZS0+bmFtZSwgaW5m
+byk7DQo+ICsNCj4gKwlzd2l0Y2ggKGV2ZW50LT5ldmVudCkgew0KPiArCWNhc2UgSUJfRVZFTlRf
+Q1FfRVJSOg0KPiArCWNhc2UgSUJfRVZFTlRfUVBfRkFUQUw6DQo+ICsJCXNtYmRfZGlzY29ubmVj
+dF9yZG1hX2Nvbm5lY3Rpb24oaW5mbyk7DQo+ICsNCj4gKwlkZWZhdWx0Og0KPiArCQlicmVhazsN
+Cj4gKwl9DQo+ICt9DQo+ICsNCj4gK3N0YXRpYyBpbmxpbmUgdm9pZCAqc21iZF9yZXF1ZXN0X3Bh
+eWxvYWQoc3RydWN0IHNtYmRfcmVxdWVzdCAqcmVxdWVzdCkNCj4gK3sNCj4gKwlyZXR1cm4gKHZv
+aWQgKilyZXF1ZXN0LT5wYWNrZXQ7DQo+ICt9DQo+ICsNCj4gK3N0YXRpYyBpbmxpbmUgdm9pZCAq
+c21iZF9yZXNwb25zZV9wYXlsb2FkKHN0cnVjdCBzbWJkX3Jlc3BvbnNlDQo+ICpyZXNwb25zZSkN
+Cj4gK3sNCj4gKwlyZXR1cm4gKHZvaWQgKilyZXNwb25zZS0+cGFja2V0Ow0KPiArfQ0KPiArDQo+
+ICsvKiBDYWxsZWQgd2hlbiBhIFJETUEgc2VuZCBpcyBkb25lICovDQo+ICtzdGF0aWMgdm9pZCBz
+ZW5kX2RvbmUoc3RydWN0IGliX2NxICpjcSwgc3RydWN0IGliX3djICp3YykNCj4gK3sNCj4gKwlp
+bnQgaTsNCj4gKwlzdHJ1Y3Qgc21iZF9yZXF1ZXN0ICpyZXF1ZXN0ID0NCj4gKwkJY29udGFpbmVy
+X29mKHdjLT53cl9jcWUsIHN0cnVjdCBzbWJkX3JlcXVlc3QsIGNxZSk7DQo+ICsNCj4gKwlsb2df
+cmRtYV9zZW5kKElORk8sICJzbWJkX3JlcXVlc3QgJXAgY29tcGxldGVkIHdjLQ0KPiA+c3RhdHVz
+PSVkXG4iLA0KPiArCQlyZXF1ZXN0LCB3Yy0+c3RhdHVzKTsNCj4gKw0KPiArCWlmICh3Yy0+c3Rh
+dHVzICE9IElCX1dDX1NVQ0NFU1MgfHwgd2MtPm9wY29kZSAhPSBJQl9XQ19TRU5EKSB7DQo+ICsJ
+CWxvZ19yZG1hX3NlbmQoRVJSLCAid2MtPnN0YXR1cz0lZCB3Yy0+b3Bjb2RlPSVkXG4iLA0KPiAr
+CQkJd2MtPnN0YXR1cywgd2MtPm9wY29kZSk7DQo+ICsJCXNtYmRfZGlzY29ubmVjdF9yZG1hX2Nv
+bm5lY3Rpb24ocmVxdWVzdC0+aW5mbyk7DQo+ICsJfQ0KPiArDQo+ICsJZm9yIChpID0gMDsgaSA8
+IHJlcXVlc3QtPm51bV9zZ2U7IGkrKykNCj4gKwkJaWJfZG1hX3VubWFwX3NpbmdsZShyZXF1ZXN0
+LT5pbmZvLT5pZC0+ZGV2aWNlLA0KPiArCQkJcmVxdWVzdC0+c2dlW2ldLmFkZHIsDQo+ICsJCQly
+ZXF1ZXN0LT5zZ2VbaV0ubGVuZ3RoLA0KPiArCQkJRE1BX1RPX0RFVklDRSk7DQo+ICsNCj4gKwlp
+ZiAocmVxdWVzdC0+aGFzX3BheWxvYWQpIHsNCj4gKwkJaWYgKGF0b21pY19kZWNfYW5kX3Rlc3Qo
+JnJlcXVlc3QtPmluZm8tDQo+ID5zZW5kX3BheWxvYWRfcGVuZGluZykpDQo+ICsJCQl3YWtlX3Vw
+KCZyZXF1ZXN0LT5pbmZvLQ0KPiA+d2FpdF9zZW5kX3BheWxvYWRfcGVuZGluZyk7DQo+ICsJfSBl
+bHNlIHsNCj4gKwkJaWYgKGF0b21pY19kZWNfYW5kX3Rlc3QoJnJlcXVlc3QtPmluZm8tPnNlbmRf
+cGVuZGluZykpDQo+ICsJCQl3YWtlX3VwKCZyZXF1ZXN0LT5pbmZvLT53YWl0X3NlbmRfcGVuZGlu
+Zyk7DQo+ICsJfQ0KPiArDQo+ICsJbWVtcG9vbF9mcmVlKHJlcXVlc3QsIHJlcXVlc3QtPmluZm8t
+PnJlcXVlc3RfbWVtcG9vbCk7DQo+ICt9DQo+ICsNCj4gK3N0YXRpYyB2b2lkIGR1bXBfc21iZF9u
+ZWdvdGlhdGVfcmVzcChzdHJ1Y3Qgc21iZF9uZWdvdGlhdGVfcmVzcA0KPiAqcmVzcCkNCj4gK3sN
+Cj4gKwlsb2dfcmRtYV9ldmVudChJTkZPLCAicmVzcCBtZXNzYWdlIG1pbl92ZXJzaW9uICV1IG1h
+eF92ZXJzaW9uDQo+ICV1ICINCj4gKwkJIm5lZ290aWF0ZWRfdmVyc2lvbiAldSBjcmVkaXRzX3Jl
+cXVlc3RlZCAldSAiDQo+ICsJCSJjcmVkaXRzX2dyYW50ZWQgJXUgc3RhdHVzICV1IG1heF9yZWFk
+d3JpdGVfc2l6ZSAldSAiDQo+ICsJCSJwcmVmZXJyZWRfc2VuZF9zaXplICV1IG1heF9yZWNlaXZl
+X3NpemUgJXUgIg0KPiArCQkibWF4X2ZyYWdtZW50ZWRfc2l6ZSAldVxuIiwNCj4gKwkJcmVzcC0+
+bWluX3ZlcnNpb24sIHJlc3AtPm1heF92ZXJzaW9uLCByZXNwLQ0KPiA+bmVnb3RpYXRlZF92ZXJz
+aW9uLA0KPiArCQlyZXNwLT5jcmVkaXRzX3JlcXVlc3RlZCwgcmVzcC0+Y3JlZGl0c19ncmFudGVk
+LCByZXNwLQ0KPiA+c3RhdHVzLA0KPiArCQlyZXNwLT5tYXhfcmVhZHdyaXRlX3NpemUsIHJlc3At
+PnByZWZlcnJlZF9zZW5kX3NpemUsDQo+ICsJCXJlc3AtPm1heF9yZWNlaXZlX3NpemUsIHJlc3At
+Pm1heF9mcmFnbWVudGVkX3NpemUpOw0KPiArfQ0KPiArDQo+ICsvKg0KPiArICogUHJvY2VzcyBh
+IG5lZ290aWF0aW9uIHJlc3BvbnNlIG1lc3NhZ2UsIGFjY29yZGluZyB0byBbTVMtU01CRF0zLjEu
+NS43DQo+ICsgKiByZXNwb25zZSwgcGFja2V0X2xlbmd0aDogdGhlIG5lZ290aWF0aW9uIHJlc3Bv
+bnNlIG1lc3NhZ2UNCj4gKyAqIHJldHVybiB2YWx1ZTogdHJ1ZSBpZiBuZWdvdGlhdGlvbiBpcyBh
+IHN1Y2Nlc3MsIGZhbHNlIGlmIGZhaWxlZA0KPiArICovDQo+ICtzdGF0aWMgYm9vbCBwcm9jZXNz
+X25lZ290aWF0aW9uX3Jlc3BvbnNlKA0KPiArCQlzdHJ1Y3Qgc21iZF9yZXNwb25zZSAqcmVzcG9u
+c2UsIGludCBwYWNrZXRfbGVuZ3RoKQ0KPiArew0KPiArCXN0cnVjdCBzbWJkX2Nvbm5lY3Rpb24g
+KmluZm8gPSByZXNwb25zZS0+aW5mbzsNCj4gKwlzdHJ1Y3Qgc21iZF9uZWdvdGlhdGVfcmVzcCAq
+cGFja2V0ID0NCj4gc21iZF9yZXNwb25zZV9wYXlsb2FkKHJlc3BvbnNlKTsNCj4gKw0KPiArCWlm
+IChwYWNrZXRfbGVuZ3RoIDwgc2l6ZW9mKHN0cnVjdCBzbWJkX25lZ290aWF0ZV9yZXNwKSkgew0K
+PiArCQlsb2dfcmRtYV9ldmVudChFUlIsDQo+ICsJCQkiZXJyb3I6IHBhY2tldF9sZW5ndGg9JWRc
+biIsIHBhY2tldF9sZW5ndGgpOw0KPiArCQlyZXR1cm4gZmFsc2U7DQo+ICsJfQ0KPiArDQo+ICsJ
+aWYgKGxlMTZfdG9fY3B1KHBhY2tldC0+bmVnb3RpYXRlZF92ZXJzaW9uKSAhPSBTTUJEX1YxKSB7
+DQo+ICsJCWxvZ19yZG1hX2V2ZW50KEVSUiwgImVycm9yOiBuZWdvdGlhdGVkX3ZlcnNpb249JXhc
+biIsDQo+ICsJCQlsZTE2X3RvX2NwdShwYWNrZXQtPm5lZ290aWF0ZWRfdmVyc2lvbikpOw0KPiAr
+CQlyZXR1cm4gZmFsc2U7DQo+ICsJfQ0KPiArCWluZm8tPnByb3RvY29sID0gbGUxNl90b19jcHUo
+cGFja2V0LT5uZWdvdGlhdGVkX3ZlcnNpb24pOw0KPiArDQo+ICsJaWYgKHBhY2tldC0+Y3JlZGl0
+c19yZXF1ZXN0ZWQgPT0gMCkgew0KPiArCQlsb2dfcmRtYV9ldmVudChFUlIsICJlcnJvcjogY3Jl
+ZGl0c19yZXF1ZXN0ZWQ9PTBcbiIpOw0KPiArCQlyZXR1cm4gZmFsc2U7DQo+ICsJfQ0KPiArCWlu
+Zm8tPnJlY2VpdmVfY3JlZGl0X3RhcmdldCA9IGxlMTZfdG9fY3B1KHBhY2tldC0NCj4gPmNyZWRp
+dHNfcmVxdWVzdGVkKTsNCj4gKw0KPiArCWlmIChwYWNrZXQtPmNyZWRpdHNfZ3JhbnRlZCA9PSAw
+KSB7DQo+ICsJCWxvZ19yZG1hX2V2ZW50KEVSUiwgImVycm9yOiBjcmVkaXRzX2dyYW50ZWQ9PTBc
+biIpOw0KPiArCQlyZXR1cm4gZmFsc2U7DQo+ICsJfQ0KPiArCWF0b21pY19zZXQoJmluZm8tPnNl
+bmRfY3JlZGl0cywgbGUxNl90b19jcHUocGFja2V0LQ0KPiA+Y3JlZGl0c19ncmFudGVkKSk7DQo+
+ICsNCj4gKwlhdG9taWNfc2V0KCZpbmZvLT5yZWNlaXZlX2NyZWRpdHMsIDApOw0KPiArDQo+ICsJ
+aWYgKGxlMzJfdG9fY3B1KHBhY2tldC0+cHJlZmVycmVkX3NlbmRfc2l6ZSkgPiBpbmZvLQ0KPiA+
+bWF4X3JlY2VpdmVfc2l6ZSkgew0KPiArCQlsb2dfcmRtYV9ldmVudChFUlIsICJlcnJvcjogcHJl
+ZmVycmVkX3NlbmRfc2l6ZT0lZFxuIiwNCj4gKwkJCWxlMzJfdG9fY3B1KHBhY2tldC0+cHJlZmVy
+cmVkX3NlbmRfc2l6ZSkpOw0KPiArCQlyZXR1cm4gZmFsc2U7DQo+ICsJfQ0KPiArCWluZm8tPm1h
+eF9yZWNlaXZlX3NpemUgPSBsZTMyX3RvX2NwdShwYWNrZXQtDQo+ID5wcmVmZXJyZWRfc2VuZF9z
+aXplKTsNCj4gKw0KPiArCWlmIChsZTMyX3RvX2NwdShwYWNrZXQtPm1heF9yZWNlaXZlX3NpemUp
+IDwNCj4gU01CRF9NSU5fUkVDRUlWRV9TSVpFKSB7DQo+ICsJCWxvZ19yZG1hX2V2ZW50KEVSUiwg
+ImVycm9yOiBtYXhfcmVjZWl2ZV9zaXplPSVkXG4iLA0KPiArCQkJbGUzMl90b19jcHUocGFja2V0
+LT5tYXhfcmVjZWl2ZV9zaXplKSk7DQo+ICsJCXJldHVybiBmYWxzZTsNCj4gKwl9DQo+ICsJaW5m
+by0+bWF4X3NlbmRfc2l6ZSA9IG1pbl90KGludCwgaW5mby0+bWF4X3NlbmRfc2l6ZSwNCj4gKwkJ
+CQkJbGUzMl90b19jcHUocGFja2V0LQ0KPiA+bWF4X3JlY2VpdmVfc2l6ZSkpOw0KPiArDQo+ICsJ
+aWYgKGxlMzJfdG9fY3B1KHBhY2tldC0+bWF4X2ZyYWdtZW50ZWRfc2l6ZSkgPA0KPiArCQkJU01C
+RF9NSU5fRlJBR01FTlRFRF9TSVpFKSB7DQo+ICsJCWxvZ19yZG1hX2V2ZW50KEVSUiwgImVycm9y
+OiBtYXhfZnJhZ21lbnRlZF9zaXplPSVkXG4iLA0KPiArCQkJbGUzMl90b19jcHUocGFja2V0LT5t
+YXhfZnJhZ21lbnRlZF9zaXplKSk7DQo+ICsJCXJldHVybiBmYWxzZTsNCj4gKwl9DQo+ICsJaW5m
+by0+bWF4X2ZyYWdtZW50ZWRfc2VuZF9zaXplID0NCj4gKwkJbGUzMl90b19jcHUocGFja2V0LT5t
+YXhfZnJhZ21lbnRlZF9zaXplKTsNCj4gKw0KPiArCXJldHVybiB0cnVlOw0KPiArfQ0KPiArDQo+
+ICsvKg0KPiArICogQ2hlY2sgYW5kIHNjaGVkdWxlIHRvIHNlbmQgYW4gaW1tZWRpYXRlIHBhY2tl
+dA0KPiArICogVGhpcyBpcyB1c2VkIHRvIGV4dGVuZCBjcmVkdGlzIHRvIHJlbW90ZSBwZWVyIHRv
+IGtlZXAgdGhlIHRyYW5zcG9ydCBidXN5DQo+ICsgKi8NCj4gK3N0YXRpYyB2b2lkIGNoZWNrX2Fu
+ZF9zZW5kX2ltbWVkaWF0ZShzdHJ1Y3Qgc21iZF9jb25uZWN0aW9uICppbmZvKQ0KPiArew0KPiAr
+CWlmIChpbmZvLT50cmFuc3BvcnRfc3RhdHVzICE9IFNNQkRfQ09OTkVDVEVEKQ0KPiArCQlyZXR1
+cm47DQo+ICsNCj4gKwlpbmZvLT5zZW5kX2ltbWVkaWF0ZSA9IHRydWU7DQo+ICsNCj4gKwkvKg0K
+PiArCSAqIFByb21wdGx5IHNlbmQgYSBwYWNrZXQgaWYgb3VyIHBlZXIgaXMgcnVubmluZyBsb3cg
+b24gcmVjZWl2ZQ0KPiArCSAqIGNyZWRpdHMNCj4gKwkgKi8NCj4gKwlpZiAoYXRvbWljX3JlYWQo
+JmluZm8tPnJlY2VpdmVfY3JlZGl0cykgPA0KPiArCQlpbmZvLT5yZWNlaXZlX2NyZWRpdF90YXJn
+ZXQgLSAxKQ0KPiArCQlxdWV1ZV9kZWxheWVkX3dvcmsoDQo+ICsJCQlpbmZvLT53b3JrcXVldWUs
+ICZpbmZvLT5zZW5kX2ltbWVkaWF0ZV93b3JrLA0KPiAwKTsNCj4gK30NCj4gKw0KPiArc3RhdGlj
+IHZvaWQgc21iZF9wb3N0X3NlbmRfY3JlZGl0cyhzdHJ1Y3Qgd29ya19zdHJ1Y3QgKndvcmspDQo+
+ICt7DQo+ICsJaW50IHJldCA9IDA7DQo+ICsJaW50IHVzZV9yZWNlaXZlX3F1ZXVlID0gMTsNCj4g
+KwlpbnQgcmM7DQo+ICsJc3RydWN0IHNtYmRfcmVzcG9uc2UgKnJlc3BvbnNlOw0KPiArCXN0cnVj
+dCBzbWJkX2Nvbm5lY3Rpb24gKmluZm8gPQ0KPiArCQljb250YWluZXJfb2Yod29yaywgc3RydWN0
+IHNtYmRfY29ubmVjdGlvbiwNCj4gKwkJCXBvc3Rfc2VuZF9jcmVkaXRzX3dvcmspOw0KPiArDQo+
+ICsJaWYgKGluZm8tPnRyYW5zcG9ydF9zdGF0dXMgIT0gU01CRF9DT05ORUNURUQpIHsNCj4gKwkJ
+d2FrZV91cCgmaW5mby0+d2FpdF9yZWNlaXZlX3F1ZXVlcyk7DQo+ICsJCXJldHVybjsNCj4gKwl9
+DQo+ICsNCj4gKwlpZiAoaW5mby0+cmVjZWl2ZV9jcmVkaXRfdGFyZ2V0ID4NCj4gKwkJYXRvbWlj
+X3JlYWQoJmluZm8tPnJlY2VpdmVfY3JlZGl0cykpIHsNCj4gKwkJd2hpbGUgKHRydWUpIHsNCj4g
+KwkJCWlmICh1c2VfcmVjZWl2ZV9xdWV1ZSkNCj4gKwkJCQlyZXNwb25zZSA9IGdldF9yZWNlaXZl
+X2J1ZmZlcihpbmZvKTsNCj4gKwkJCWVsc2UNCj4gKwkJCQlyZXNwb25zZSA9IGdldF9lbXB0eV9x
+dWV1ZV9idWZmZXIoaW5mbyk7DQo+ICsJCQlpZiAoIXJlc3BvbnNlKSB7DQo+ICsJCQkJLyogbm93
+IHN3aXRjaCB0byBlbXRweSBwYWNrZXQgcXVldWUgKi8NCj4gKwkJCQlpZiAodXNlX3JlY2VpdmVf
+cXVldWUpIHsNCj4gKwkJCQkJdXNlX3JlY2VpdmVfcXVldWUgPSAwOw0KPiArCQkJCQljb250aW51
+ZTsNCj4gKwkJCQl9IGVsc2UNCj4gKwkJCQkJYnJlYWs7DQo+ICsJCQl9DQo+ICsNCj4gKwkJCXJl
+c3BvbnNlLT50eXBlID0gU01CRF9UUkFOU0ZFUl9EQVRBOw0KPiArCQkJcmVzcG9uc2UtPmZpcnN0
+X3NlZ21lbnQgPSBmYWxzZTsNCj4gKwkJCXJjID0gc21iZF9wb3N0X3JlY3YoaW5mbywgcmVzcG9u
+c2UpOw0KPiArCQkJaWYgKHJjKSB7DQo+ICsJCQkJbG9nX3JkbWFfcmVjdihFUlIsDQo+ICsJCQkJ
+CSJwb3N0X3JlY3YgZmFpbGVkIHJjPSVkXG4iLCByYyk7DQo+ICsJCQkJcHV0X3JlY2VpdmVfYnVm
+ZmVyKGluZm8sIHJlc3BvbnNlLCB0cnVlKTsNCj4gKwkJCQlicmVhazsNCj4gKwkJCX0NCj4gKw0K
+PiArCQkJcmV0Kys7DQo+ICsJCX0NCj4gKwl9DQo+ICsNCj4gKwlzcGluX2xvY2soJmluZm8tPmxv
+Y2tfbmV3X2NyZWRpdHNfb2ZmZXJlZCk7DQo+ICsJaW5mby0+bmV3X2NyZWRpdHNfb2ZmZXJlZCAr
+PSByZXQ7DQo+ICsJc3Bpbl91bmxvY2soJmluZm8tPmxvY2tfbmV3X2NyZWRpdHNfb2ZmZXJlZCk7
+DQo+ICsNCj4gKwlhdG9taWNfYWRkKHJldCwgJmluZm8tPnJlY2VpdmVfY3JlZGl0cyk7DQo+ICsN
+Cj4gKwkvKiBDaGVjayBpZiB3ZSBjYW4gcG9zdCBuZXcgcmVjZWl2ZSBhbmQgZ3JhbnQgY3JlZGl0
+cyB0byBwZWVyICovDQo+ICsJY2hlY2tfYW5kX3NlbmRfaW1tZWRpYXRlKGluZm8pOw0KPiArfQ0K
+PiArDQo+ICtzdGF0aWMgdm9pZCBzbWJkX3JlY3ZfZG9uZV93b3JrKHN0cnVjdCB3b3JrX3N0cnVj
+dCAqd29yaykNCj4gK3sNCj4gKwlzdHJ1Y3Qgc21iZF9jb25uZWN0aW9uICppbmZvID0NCj4gKwkJ
+Y29udGFpbmVyX29mKHdvcmssIHN0cnVjdCBzbWJkX2Nvbm5lY3Rpb24sDQo+IHJlY3ZfZG9uZV93
+b3JrKTsNCj4gKw0KPiArCS8qDQo+ICsJICogV2UgbWF5IGhhdmUgbmV3IHNlbmQgY3JlZGl0cyBn
+cmFudGVkIGZyb20gcmVtb3RlIHBlZXINCj4gKwkgKiBJZiBhbnkgc2VuZGVyIGlzIGJsY29rZWQg
+b24gbGFjayBvZiBjcmVkZXRzLCB1bmJsb2NrIGl0DQo+ICsJICovDQo+ICsJaWYgKGF0b21pY19y
+ZWFkKCZpbmZvLT5zZW5kX2NyZWRpdHMpKQ0KPiArCQl3YWtlX3VwX2ludGVycnVwdGlibGUoJmlu
+Zm8tPndhaXRfc2VuZF9xdWV1ZSk7DQo+ICsNCj4gKwkvKg0KPiArCSAqIENoZWNrIGlmIHdlIG5l
+ZWQgdG8gc2VuZCBzb21ldGhpbmcgdG8gcmVtb3RlIHBlZXIgdG8NCj4gKwkgKiBncmFudCBtb3Jl
+IGNyZWRpdHMgb3IgcmVzcG9uZCB0byBLRUVQX0FMSVZFIHBhY2tldA0KPiArCSAqLw0KPiArCWNo
+ZWNrX2FuZF9zZW5kX2ltbWVkaWF0ZShpbmZvKTsNCj4gK30NCj4gKw0KPiArLyogQ2FsbGVkIGZy
+b20gc29mdGlycSwgd2hlbiByZWN2IGlzIGRvbmUgKi8NCj4gK3N0YXRpYyB2b2lkIHJlY3ZfZG9u
+ZShzdHJ1Y3QgaWJfY3EgKmNxLCBzdHJ1Y3QgaWJfd2MgKndjKQ0KPiArew0KPiArCXN0cnVjdCBz
+bWJkX2RhdGFfdHJhbnNmZXIgKmRhdGFfdHJhbnNmZXI7DQo+ICsJc3RydWN0IHNtYmRfcmVzcG9u
+c2UgKnJlc3BvbnNlID0NCj4gKwkJY29udGFpbmVyX29mKHdjLT53cl9jcWUsIHN0cnVjdCBzbWJk
+X3Jlc3BvbnNlLCBjcWUpOw0KPiArCXN0cnVjdCBzbWJkX2Nvbm5lY3Rpb24gKmluZm8gPSByZXNw
+b25zZS0+aW5mbzsNCj4gKwlpbnQgZGF0YV9sZW5ndGggPSAwOw0KPiArDQo+ICsJbG9nX3JkbWFf
+cmVjdihJTkZPLCAicmVzcG9uc2U9JXAgdHlwZT0lZCB3YyBzdGF0dXM9JWQgd2MNCj4gb3Bjb2Rl
+ICVkICINCj4gKwkJICAgICAgImJ5dGVfbGVuPSVkIHBrZXlfaW5kZXg9JXhcbiIsDQo+ICsJCXJl
+c3BvbnNlLCByZXNwb25zZS0+dHlwZSwgd2MtPnN0YXR1cywgd2MtPm9wY29kZSwNCj4gKwkJd2Mt
+PmJ5dGVfbGVuLCB3Yy0+cGtleV9pbmRleCk7DQo+ICsNCj4gKwlpZiAod2MtPnN0YXR1cyAhPSBJ
+Ql9XQ19TVUNDRVNTIHx8IHdjLT5vcGNvZGUgIT0gSUJfV0NfUkVDVikgew0KPiArCQlsb2dfcmRt
+YV9yZWN2KElORk8sICJ3Yy0+c3RhdHVzPSVkIG9wY29kZT0lZFxuIiwNCj4gKwkJCXdjLT5zdGF0
+dXMsIHdjLT5vcGNvZGUpOw0KPiArCQlzbWJkX2Rpc2Nvbm5lY3RfcmRtYV9jb25uZWN0aW9uKGlu
+Zm8pOw0KPiArCQlnb3RvIGVycm9yOw0KPiArCX0NCj4gKw0KPiArCWliX2RtYV9zeW5jX3Npbmds
+ZV9mb3JfY3B1KA0KPiArCQl3Yy0+cXAtPmRldmljZSwNCj4gKwkJcmVzcG9uc2UtPnNnZS5hZGRy
+LA0KPiArCQlyZXNwb25zZS0+c2dlLmxlbmd0aCwNCj4gKwkJRE1BX0ZST01fREVWSUNFKTsNCj4g
+Kw0KPiArCXN3aXRjaCAocmVzcG9uc2UtPnR5cGUpIHsNCj4gKwkvKiBTTUJEIG5lZ290aWF0aW9u
+IHJlc3BvbnNlICovDQo+ICsJY2FzZSBTTUJEX05FR09USUFURV9SRVNQOg0KPiArDQo+IAlkdW1w
+X3NtYmRfbmVnb3RpYXRlX3Jlc3Aoc21iZF9yZXNwb25zZV9wYXlsb2FkKHJlc3BvbnNlKSk7DQo+
+ICsJCWluZm8tPmZ1bGxfcGFja2V0X3JlY2VpdmVkID0gdHJ1ZTsNCj4gKwkJaW5mby0+bmVnb3Rp
+YXRlX2RvbmUgPQ0KPiArCQkJcHJvY2Vzc19uZWdvdGlhdGlvbl9yZXNwb25zZShyZXNwb25zZSwg
+d2MtDQo+ID5ieXRlX2xlbik7DQo+ICsJCWNvbXBsZXRlKCZpbmZvLT5uZWdvdGlhdGVfY29tcGxl
+dGlvbik7DQo+ICsJCWJyZWFrOw0KPiArDQo+ICsJLyogU01CRCBkYXRhIHRyYW5zZmVyIHBhY2tl
+dCAqLw0KPiArCWNhc2UgU01CRF9UUkFOU0ZFUl9EQVRBOg0KPiArCQlkYXRhX3RyYW5zZmVyID0g
+c21iZF9yZXNwb25zZV9wYXlsb2FkKHJlc3BvbnNlKTsNCj4gKwkJZGF0YV9sZW5ndGggPSBsZTMy
+X3RvX2NwdShkYXRhX3RyYW5zZmVyLT5kYXRhX2xlbmd0aCk7DQo+ICsNCj4gKwkJLyoNCj4gKwkJ
+ICogSWYgdGhpcyBpcyBhIHBhY2tldCB3aXRoIGRhdGEgcGxheWxvYWQgcGxhY2UgdGhlIGRhdGEg
+aW4NCj4gKwkJICogcmVhc3NlbWJseSBxdWV1ZSBhbmQgd2FrZSB1cCB0aGUgcmVhZGluZyB0aHJl
+YWQNCj4gKwkJICovDQo+ICsJCWlmIChkYXRhX2xlbmd0aCkgew0KPiArCQkJaWYgKGluZm8tPmZ1
+bGxfcGFja2V0X3JlY2VpdmVkKQ0KPiArCQkJCXJlc3BvbnNlLT5maXJzdF9zZWdtZW50ID0gdHJ1
+ZTsNCj4gKw0KPiArCQkJaWYgKGxlMzJfdG9fY3B1KGRhdGFfdHJhbnNmZXItDQo+ID5yZW1haW5p
+bmdfZGF0YV9sZW5ndGgpKQ0KPiArCQkJCWluZm8tPmZ1bGxfcGFja2V0X3JlY2VpdmVkID0gZmFs
+c2U7DQo+ICsJCQllbHNlDQo+ICsJCQkJaW5mby0+ZnVsbF9wYWNrZXRfcmVjZWl2ZWQgPSB0cnVl
+Ow0KPiArDQo+ICsJCQllbnF1ZXVlX3JlYXNzZW1ibHkoDQo+ICsJCQkJaW5mbywNCj4gKwkJCQly
+ZXNwb25zZSwNCj4gKwkJCQlkYXRhX2xlbmd0aCk7DQo+ICsJCX0gZWxzZQ0KPiArCQkJcHV0X2Vt
+cHR5X3BhY2tldChpbmZvLCByZXNwb25zZSk7DQo+ICsNCj4gKwkJaWYgKGRhdGFfbGVuZ3RoKQ0K
+PiArCQkJd2FrZV91cF9pbnRlcnJ1cHRpYmxlKCZpbmZvLQ0KPiA+d2FpdF9yZWFzc2VtYmx5X3F1
+ZXVlKTsNCj4gKw0KPiArCQlhdG9taWNfZGVjKCZpbmZvLT5yZWNlaXZlX2NyZWRpdHMpOw0KPiAr
+CQlpbmZvLT5yZWNlaXZlX2NyZWRpdF90YXJnZXQgPQ0KPiArCQkJbGUxNl90b19jcHUoZGF0YV90
+cmFuc2Zlci0+Y3JlZGl0c19yZXF1ZXN0ZWQpOw0KPiArCQlhdG9taWNfYWRkKGxlMTZfdG9fY3B1
+KGRhdGFfdHJhbnNmZXItPmNyZWRpdHNfZ3JhbnRlZCksDQo+ICsJCQkmaW5mby0+c2VuZF9jcmVk
+aXRzKTsNCj4gKw0KPiArCQlsb2dfaW5jb21pbmcoSU5GTywgImRhdGEgZmxhZ3MgJWQgZGF0YV9v
+ZmZzZXQgJWQgIg0KPiArCQkJImRhdGFfbGVuZ3RoICVkIHJlbWFpbmluZ19kYXRhX2xlbmd0aCAl
+ZFxuIiwNCj4gKwkJCWxlMTZfdG9fY3B1KGRhdGFfdHJhbnNmZXItPmZsYWdzKSwNCj4gKwkJCWxl
+MzJfdG9fY3B1KGRhdGFfdHJhbnNmZXItPmRhdGFfb2Zmc2V0KSwNCj4gKwkJCWxlMzJfdG9fY3B1
+KGRhdGFfdHJhbnNmZXItPmRhdGFfbGVuZ3RoKSwNCj4gKwkJCWxlMzJfdG9fY3B1KGRhdGFfdHJh
+bnNmZXItDQo+ID5yZW1haW5pbmdfZGF0YV9sZW5ndGgpKTsNCj4gKw0KPiArCQkvKiBTZW5kIGEg
+S0VFUF9BTElWRSByZXNwb25zZSByaWdodCBhd2F5IGlmIHJlcXVlc3RlZCAqLw0KPiArCQlpbmZv
+LT5rZWVwX2FsaXZlX3JlcXVlc3RlZCA9IEtFRVBfQUxJVkVfTk9ORTsNCj4gKwkJaWYgKGxlMTZf
+dG9fY3B1KGRhdGFfdHJhbnNmZXItPmZsYWdzKSAmDQo+ICsJCQkJU01CX0RJUkVDVF9SRVNQT05T
+RV9SRVFVRVNURUQpIHsNCj4gKwkJCWluZm8tPmtlZXBfYWxpdmVfcmVxdWVzdGVkID0NCj4gS0VF
+UF9BTElWRV9QRU5ESU5HOw0KPiArCQl9DQo+ICsNCj4gKwkJcXVldWVfd29yayhpbmZvLT53b3Jr
+cXVldWUsICZpbmZvLT5yZWN2X2RvbmVfd29yayk7DQo+ICsJCXJldHVybjsNCj4gKw0KPiArCWRl
+ZmF1bHQ6DQo+ICsJCWxvZ19yZG1hX3JlY3YoRVJSLA0KPiArCQkJInVuZXhwZWN0ZWQgcmVzcG9u
+c2UgdHlwZT0lZFxuIiwgcmVzcG9uc2UtDQo+ID50eXBlKTsNCj4gKwl9DQo+ICsNCj4gK2Vycm9y
+Og0KPiArCXB1dF9yZWNlaXZlX2J1ZmZlcihpbmZvLCByZXNwb25zZSwgdHJ1ZSk7DQo+ICt9DQo+
+ICsNCj4gK3N0YXRpYyBzdHJ1Y3QgcmRtYV9jbV9pZCAqc21iZF9jcmVhdGVfaWQoDQo+ICsJCXN0
+cnVjdCBzbWJkX2Nvbm5lY3Rpb24gKmluZm8sDQo+ICsJCXN0cnVjdCBzb2NrYWRkciAqZHN0YWRk
+ciwgaW50IHBvcnQpDQo+ICt7DQo+ICsJc3RydWN0IHJkbWFfY21faWQgKmlkOw0KPiArCWludCBy
+YzsNCj4gKwlfX2JlMTYgKnNwb3J0Ow0KPiArDQo+ICsJaWQgPSByZG1hX2NyZWF0ZV9pZCgmaW5p
+dF9uZXQsIHNtYmRfY29ubl91cGNhbGwsIGluZm8sDQo+ICsJCVJETUFfUFNfVENQLCBJQl9RUFRf
+UkMpOw0KPiArCWlmIChJU19FUlIoaWQpKSB7DQo+ICsJCXJjID0gUFRSX0VSUihpZCk7DQo+ICsJ
+CWxvZ19yZG1hX2V2ZW50KEVSUiwgInJkbWFfY3JlYXRlX2lkKCkgZmFpbGVkICVpXG4iLCByYyk7
+DQo+ICsJCXJldHVybiBpZDsNCj4gKwl9DQo+ICsNCj4gKwlpZiAoZHN0YWRkci0+c2FfZmFtaWx5
+ID09IEFGX0lORVQ2KQ0KPiArCQlzcG9ydCA9ICYoKHN0cnVjdCBzb2NrYWRkcl9pbjYgKilkc3Rh
+ZGRyKS0+c2luNl9wb3J0Ow0KPiArCWVsc2UNCj4gKwkJc3BvcnQgPSAmKChzdHJ1Y3Qgc29ja2Fk
+ZHJfaW4gKilkc3RhZGRyKS0+c2luX3BvcnQ7DQo+ICsNCj4gKwkqc3BvcnQgPSBodG9ucyhwb3J0
+KTsNCj4gKw0KPiArCWluaXRfY29tcGxldGlvbigmaW5mby0+cmlfZG9uZSk7DQo+ICsJaW5mby0+
+cmlfcmMgPSAtRVRJTUVET1VUOw0KPiArDQo+ICsJcmMgPSByZG1hX3Jlc29sdmVfYWRkcihpZCwg
+TlVMTCwgKHN0cnVjdCBzb2NrYWRkciAqKWRzdGFkZHIsDQo+ICsJCVJETUFfUkVTT0xWRV9USU1F
+T1VUKTsNCj4gKwlpZiAocmMpIHsNCj4gKwkJbG9nX3JkbWFfZXZlbnQoRVJSLCAicmRtYV9yZXNv
+bHZlX2FkZHIoKSBmYWlsZWQgJWlcbiIsDQo+IHJjKTsNCj4gKwkJZ290byBvdXQ7DQo+ICsJfQ0K
+PiArCXdhaXRfZm9yX2NvbXBsZXRpb25faW50ZXJydXB0aWJsZV90aW1lb3V0KA0KPiArCQkmaW5m
+by0+cmlfZG9uZSwNCj4gbXNlY3NfdG9famlmZmllcyhSRE1BX1JFU09MVkVfVElNRU9VVCkpOw0K
+PiArCXJjID0gaW5mby0+cmlfcmM7DQo+ICsJaWYgKHJjKSB7DQo+ICsJCWxvZ19yZG1hX2V2ZW50
+KEVSUiwgInJkbWFfcmVzb2x2ZV9hZGRyKCkgY29tcGxldGVkDQo+ICVpXG4iLCByYyk7DQo+ICsJ
+CWdvdG8gb3V0Ow0KPiArCX0NCj4gKw0KPiArCWluZm8tPnJpX3JjID0gLUVUSU1FRE9VVDsNCj4g
+KwlyYyA9IHJkbWFfcmVzb2x2ZV9yb3V0ZShpZCwgUkRNQV9SRVNPTFZFX1RJTUVPVVQpOw0KPiAr
+CWlmIChyYykgew0KPiArCQlsb2dfcmRtYV9ldmVudChFUlIsICJyZG1hX3Jlc29sdmVfcm91dGUo
+KSBmYWlsZWQgJWlcbiIsDQo+IHJjKTsNCj4gKwkJZ290byBvdXQ7DQo+ICsJfQ0KPiArCXdhaXRf
+Zm9yX2NvbXBsZXRpb25faW50ZXJydXB0aWJsZV90aW1lb3V0KA0KPiArCQkmaW5mby0+cmlfZG9u
+ZSwNCj4gbXNlY3NfdG9famlmZmllcyhSRE1BX1JFU09MVkVfVElNRU9VVCkpOw0KPiArCXJjID0g
+aW5mby0+cmlfcmM7DQo+ICsJaWYgKHJjKSB7DQo+ICsJCWxvZ19yZG1hX2V2ZW50KEVSUiwgInJk
+bWFfcmVzb2x2ZV9yb3V0ZSgpIGNvbXBsZXRlZA0KPiAlaVxuIiwgcmMpOw0KPiArCQlnb3RvIG91
+dDsNCj4gKwl9DQo+ICsNCj4gKwlyZXR1cm4gaWQ7DQo+ICsNCj4gK291dDoNCj4gKwlyZG1hX2Rl
+c3Ryb3lfaWQoaWQpOw0KPiArCXJldHVybiBFUlJfUFRSKHJjKTsNCj4gK30NCj4gKw0KPiArLyoN
+Cj4gKyAqIFRlc3QgaWYgRlJXUiAoRmFzdCBSZWdpc3RyYXRpb24gV29yayBSZXF1ZXN0cykgaXMg
+c3VwcG9ydGVkIG9uIHRoZQ0KPiBkZXZpY2UNCj4gKyAqIFRoaXMgaW1wbGVtZW50YXRpb24gcmVx
+dXJpZXMgRlJXUiBvbiBSRE1BIHJlYWQvd3JpdGUNCj4gKyAqIHJldHVybiB2YWx1ZTogdHJ1ZSBp
+ZiBpdCBpcyBzdXBwb3J0ZWQNCj4gKyAqLw0KPiArc3RhdGljIGJvb2wgZnJ3cl9pc19zdXBwb3J0
+ZWQoc3RydWN0IGliX2RldmljZV9hdHRyICphdHRycykNCj4gK3sNCj4gKwlpZiAoIShhdHRycy0+
+ZGV2aWNlX2NhcF9mbGFncyAmDQo+IElCX0RFVklDRV9NRU1fTUdUX0VYVEVOU0lPTlMpKQ0KPiAr
+CQlyZXR1cm4gZmFsc2U7DQo+ICsJaWYgKGF0dHJzLT5tYXhfZmFzdF9yZWdfcGFnZV9saXN0X2xl
+biA9PSAwKQ0KPiArCQlyZXR1cm4gZmFsc2U7DQo+ICsJcmV0dXJuIHRydWU7DQo+ICt9DQo+ICsN
+Cj4gK3N0YXRpYyBpbnQgc21iZF9pYV9vcGVuKA0KPiArCQlzdHJ1Y3Qgc21iZF9jb25uZWN0aW9u
+ICppbmZvLA0KPiArCQlzdHJ1Y3Qgc29ja2FkZHIgKmRzdGFkZHIsIGludCBwb3J0KQ0KPiArew0K
+PiArCWludCByYzsNCj4gKw0KPiArCWluZm8tPmlkID0gc21iZF9jcmVhdGVfaWQoaW5mbywgZHN0
+YWRkciwgcG9ydCk7DQo+ICsJaWYgKElTX0VSUihpbmZvLT5pZCkpIHsNCj4gKwkJcmMgPSBQVFJf
+RVJSKGluZm8tPmlkKTsNCj4gKwkJZ290byBvdXQxOw0KPiArCX0NCj4gKw0KPiArCWlmICghZnJ3
+cl9pc19zdXBwb3J0ZWQoJmluZm8tPmlkLT5kZXZpY2UtPmF0dHJzKSkgew0KPiArCQlsb2dfcmRt
+YV9ldmVudChFUlIsDQo+ICsJCQkiRmFzdCBSZWdpc3RyYXRpb24gV29yayBSZXF1ZXN0cyAiDQo+
+ICsJCQkiKEZSV1IpIGlzIG5vdCBzdXBwb3J0ZWRcbiIpOw0KPiArCQlsb2dfcmRtYV9ldmVudChF
+UlIsDQo+ICsJCQkiRGV2aWNlIGNhcGFiaWxpdHkgZmxhZ3MgPSAlbGx4ICINCj4gKwkJCSJtYXhf
+ZmFzdF9yZWdfcGFnZV9saXN0X2xlbiA9ICV1XG4iLA0KPiArCQkJaW5mby0+aWQtPmRldmljZS0+
+YXR0cnMuZGV2aWNlX2NhcF9mbGFncywNCj4gKwkJCWluZm8tPmlkLT5kZXZpY2UtDQo+ID5hdHRy
+cy5tYXhfZmFzdF9yZWdfcGFnZV9saXN0X2xlbik7DQo+ICsJCXJjID0gLUVQUk9UT05PU1VQUE9S
+VDsNCj4gKwkJZ290byBvdXQyOw0KPiArCX0NCj4gKw0KPiArCWluZm8tPnBkID0gaWJfYWxsb2Nf
+cGQoaW5mby0+aWQtPmRldmljZSwgMCk7DQo+ICsJaWYgKElTX0VSUihpbmZvLT5wZCkpIHsNCj4g
+KwkJcmMgPSBQVFJfRVJSKGluZm8tPnBkKTsNCj4gKwkJbG9nX3JkbWFfZXZlbnQoRVJSLCAiaWJf
+YWxsb2NfcGQoKSByZXR1cm5lZCAlZFxuIiwgcmMpOw0KPiArCQlnb3RvIG91dDI7DQo+ICsJfQ0K
+PiArDQo+ICsJcmV0dXJuIDA7DQo+ICsNCj4gK291dDI6DQo+ICsJcmRtYV9kZXN0cm95X2lkKGlu
+Zm8tPmlkKTsNCj4gKwlpbmZvLT5pZCA9IE5VTEw7DQo+ICsNCj4gK291dDE6DQo+ICsJcmV0dXJu
+IHJjOw0KPiArfQ0KPiArDQo+ICsvKg0KPiArICogU2VuZCBhIG5lZ290aWF0aW9uIHJlcXVlc3Qg
+bWVzc2FnZSB0byB0aGUgcGVlcg0KPiArICogVGhlIG5lZ290aWF0aW9uIHByb2NlZHVyZSBpcyBp
+biBbTVMtU01CRF0gMy4xLjUuMiBhbmQgMy4xLjUuMw0KPiArICogQWZ0ZXIgbmVnb3RpYXRpb24s
+IHRoZSB0cmFuc3BvcnQgaXMgY29ubmVjdGVkIGFuZCByZWFkeSBmb3INCj4gKyAqIGNhcnJ5aW5n
+IHVwcGVyIGxheWVyIFNNQiBwYXlsb2FkDQo+ICsgKi8NCj4gK3N0YXRpYyBpbnQgc21iZF9wb3N0
+X3NlbmRfbmVnb3RpYXRlX3JlcShzdHJ1Y3Qgc21iZF9jb25uZWN0aW9uICppbmZvKQ0KPiArew0K
+PiArCXN0cnVjdCBpYl9zZW5kX3dyIHNlbmRfd3IsICpzZW5kX3dyX2ZhaWw7DQo+ICsJaW50IHJj
+ID0gLUVOT01FTTsNCj4gKwlzdHJ1Y3Qgc21iZF9yZXF1ZXN0ICpyZXF1ZXN0Ow0KPiArCXN0cnVj
+dCBzbWJkX25lZ290aWF0ZV9yZXEgKnBhY2tldDsNCj4gKw0KPiArCXJlcXVlc3QgPSBtZW1wb29s
+X2FsbG9jKGluZm8tPnJlcXVlc3RfbWVtcG9vbCwgR0ZQX0tFUk5FTCk7DQo+ICsJaWYgKCFyZXF1
+ZXN0KQ0KPiArCQlyZXR1cm4gcmM7DQo+ICsNCj4gKwlyZXF1ZXN0LT5pbmZvID0gaW5mbzsNCj4g
+Kw0KPiArCXBhY2tldCA9IHNtYmRfcmVxdWVzdF9wYXlsb2FkKHJlcXVlc3QpOw0KPiArCXBhY2tl
+dC0+bWluX3ZlcnNpb24gPSBjcHVfdG9fbGUxNihTTUJEX1YxKTsNCj4gKwlwYWNrZXQtPm1heF92
+ZXJzaW9uID0gY3B1X3RvX2xlMTYoU01CRF9WMSk7DQo+ICsJcGFja2V0LT5yZXNlcnZlZCA9IDA7
+DQo+ICsJcGFja2V0LT5jcmVkaXRzX3JlcXVlc3RlZCA9IGNwdV90b19sZTE2KGluZm8tDQo+ID5z
+ZW5kX2NyZWRpdF90YXJnZXQpOw0KPiArCXBhY2tldC0+cHJlZmVycmVkX3NlbmRfc2l6ZSA9IGNw
+dV90b19sZTMyKGluZm8tPm1heF9zZW5kX3NpemUpOw0KPiArCXBhY2tldC0+bWF4X3JlY2VpdmVf
+c2l6ZSA9IGNwdV90b19sZTMyKGluZm8tPm1heF9yZWNlaXZlX3NpemUpOw0KPiArCXBhY2tldC0+
+bWF4X2ZyYWdtZW50ZWRfc2l6ZSA9DQo+ICsJCWNwdV90b19sZTMyKGluZm8tPm1heF9mcmFnbWVu
+dGVkX3JlY3Zfc2l6ZSk7DQo+ICsNCj4gKwlyZXF1ZXN0LT5udW1fc2dlID0gMTsNCj4gKwlyZXF1
+ZXN0LT5zZ2VbMF0uYWRkciA9IGliX2RtYV9tYXBfc2luZ2xlKA0KPiArCQkJCWluZm8tPmlkLT5k
+ZXZpY2UsICh2b2lkICopcGFja2V0LA0KPiArCQkJCXNpemVvZigqcGFja2V0KSwgRE1BX1RPX0RF
+VklDRSk7DQo+ICsJaWYgKGliX2RtYV9tYXBwaW5nX2Vycm9yKGluZm8tPmlkLT5kZXZpY2UsIHJl
+cXVlc3QtPnNnZVswXS5hZGRyKSkNCj4gew0KPiArCQlyYyA9IC1FSU87DQo+ICsJCWdvdG8gZG1h
+X21hcHBpbmdfZmFpbGVkOw0KPiArCX0NCj4gKw0KPiArCXJlcXVlc3QtPnNnZVswXS5sZW5ndGgg
+PSBzaXplb2YoKnBhY2tldCk7DQo+ICsJcmVxdWVzdC0+c2dlWzBdLmxrZXkgPSBpbmZvLT5wZC0+
+bG9jYWxfZG1hX2xrZXk7DQo+ICsNCj4gKwlpYl9kbWFfc3luY19zaW5nbGVfZm9yX2RldmljZSgN
+Cj4gKwkJaW5mby0+aWQtPmRldmljZSwgcmVxdWVzdC0+c2dlWzBdLmFkZHIsDQo+ICsJCXJlcXVl
+c3QtPnNnZVswXS5sZW5ndGgsIERNQV9UT19ERVZJQ0UpOw0KPiArDQo+ICsJcmVxdWVzdC0+Y3Fl
+LmRvbmUgPSBzZW5kX2RvbmU7DQo+ICsNCj4gKwlzZW5kX3dyLm5leHQgPSBOVUxMOw0KPiArCXNl
+bmRfd3Iud3JfY3FlID0gJnJlcXVlc3QtPmNxZTsNCj4gKwlzZW5kX3dyLnNnX2xpc3QgPSByZXF1
+ZXN0LT5zZ2U7DQo+ICsJc2VuZF93ci5udW1fc2dlID0gcmVxdWVzdC0+bnVtX3NnZTsNCj4gKwlz
+ZW5kX3dyLm9wY29kZSA9IElCX1dSX1NFTkQ7DQo+ICsJc2VuZF93ci5zZW5kX2ZsYWdzID0gSUJf
+U0VORF9TSUdOQUxFRDsNCj4gKw0KPiArCWxvZ19yZG1hX3NlbmQoSU5GTywgInNnZSBhZGRyPSVs
+bHggbGVuZ3RoPSV4IGxrZXk9JXhcbiIsDQo+ICsJCXJlcXVlc3QtPnNnZVswXS5hZGRyLA0KPiAr
+CQlyZXF1ZXN0LT5zZ2VbMF0ubGVuZ3RoLCByZXF1ZXN0LT5zZ2VbMF0ubGtleSk7DQo+ICsNCj4g
+KwlyZXF1ZXN0LT5oYXNfcGF5bG9hZCA9IGZhbHNlOw0KPiArCWF0b21pY19pbmMoJmluZm8tPnNl
+bmRfcGVuZGluZyk7DQo+ICsJcmMgPSBpYl9wb3N0X3NlbmQoaW5mby0+aWQtPnFwLCAmc2VuZF93
+ciwgJnNlbmRfd3JfZmFpbCk7DQo+ICsJaWYgKCFyYykNCj4gKwkJcmV0dXJuIDA7DQo+ICsNCj4g
+KwkvKiBpZiB3ZSByZWFjaCBoZXJlLCBwb3N0IHNlbmQgZmFpbGVkICovDQo+ICsJbG9nX3JkbWFf
+c2VuZChFUlIsICJpYl9wb3N0X3NlbmQgZmFpbGVkIHJjPSVkXG4iLCByYyk7DQo+ICsJYXRvbWlj
+X2RlYygmaW5mby0+c2VuZF9wZW5kaW5nKTsNCj4gKwlpYl9kbWFfdW5tYXBfc2luZ2xlKGluZm8t
+PmlkLT5kZXZpY2UsIHJlcXVlc3QtPnNnZVswXS5hZGRyLA0KPiArCQlyZXF1ZXN0LT5zZ2VbMF0u
+bGVuZ3RoLCBETUFfVE9fREVWSUNFKTsNCj4gKw0KPiArZG1hX21hcHBpbmdfZmFpbGVkOg0KPiAr
+CW1lbXBvb2xfZnJlZShyZXF1ZXN0LCBpbmZvLT5yZXF1ZXN0X21lbXBvb2wpOw0KPiArCXJldHVy
+biByYzsNCj4gK30NCj4gKw0KPiArLyoNCj4gKyAqIEV4dGVuZCB0aGUgY3JlZGl0cyB0byByZW1v
+dGUgcGVlcg0KPiArICogVGhpcyBpbXBsZW1lbnRzIFtNUy1TTUJEXSAzLjEuNS45DQo+ICsgKiBU
+aGUgaWRlYSBpcyB0aGF0IHdlIHNob3VsZCBleHRlbmQgY3JlZGl0cyB0byByZW1vdGUgcGVlciBh
+cyBxdWlja2x5IGFzDQo+ICsgKiBpdCdzIGFsbG93ZWQsIHRvIG1haW50YWluIGRhdGEgZmxvdy4g
+V2UgYWxsb2NhdGUgYXMgbXVjaCByZWNlaXZlDQo+ICsgKiBidWZmZXIgYXMgcG9zc2libGUsIGFu
+ZCBleHRlbmQgdGhlIHJlY2VpdmUgY3JlZGl0cyB0byByZW1vdGUgcGVlcg0KPiArICogcmV0dXJu
+IHZhbHVlOiB0aGUgbmV3IGNyZWR0aXMgYmVpbmcgZ3JhbnRlZC4NCj4gKyAqLw0KPiArc3RhdGlj
+IGludCBtYW5hZ2VfY3JlZGl0c19wcmlvcl9zZW5kaW5nKHN0cnVjdCBzbWJkX2Nvbm5lY3Rpb24g
+KmluZm8pDQo+ICt7DQo+ICsJaW50IG5ld19jcmVkaXRzOw0KPiArDQo+ICsJc3Bpbl9sb2NrKCZp
+bmZvLT5sb2NrX25ld19jcmVkaXRzX29mZmVyZWQpOw0KPiArCW5ld19jcmVkaXRzID0gaW5mby0+
+bmV3X2NyZWRpdHNfb2ZmZXJlZDsNCj4gKwlpbmZvLT5uZXdfY3JlZGl0c19vZmZlcmVkID0gMDsN
+Cj4gKwlzcGluX3VubG9jaygmaW5mby0+bG9ja19uZXdfY3JlZGl0c19vZmZlcmVkKTsNCj4gKw0K
+PiArCXJldHVybiBuZXdfY3JlZGl0czsNCj4gK30NCj4gKw0KPiArLyoNCj4gKyAqIENoZWNrIGlm
+IHdlIG5lZWQgdG8gc2VuZCBhIEtFRVBfQUxJVkUgbWVzc2FnZQ0KPiArICogVGhlIGlkbGUgY29u
+bmVjdGlvbiB0aW1lciB0cmlnZ2VycyBhIEtFRVBfQUxJVkUgbWVzc2FnZSB3aGVuIGV4cGlyZXMN
+Cj4gKyAqIFNNQl9ESVJFQ1RfUkVTUE9OU0VfUkVRVUVTVEVEIGlzIHNldCBpbiB0aGUgbWVzc2Fn
+ZSBmbGFnIHRvIGhhdmUNCj4gcGVlciBzZW5kDQo+ICsgKiBiYWNrIGEgcmVzcG9uc2UuDQo+ICsg
+KiByZXR1cm4gdmFsdWU6DQo+ICsgKiAxIGlmIFNNQl9ESVJFQ1RfUkVTUE9OU0VfUkVRVUVTVEVE
+IG5lZWRzIHRvIGJlIHNldA0KPiArICogMDogb3RoZXJ3aXNlDQo+ICsgKi8NCj4gK3N0YXRpYyBp
+bnQgbWFuYWdlX2tlZXBfYWxpdmVfYmVmb3JlX3NlbmRpbmcoc3RydWN0IHNtYmRfY29ubmVjdGlv
+bg0KPiAqaW5mbykNCj4gK3sNCj4gKwlpZiAoaW5mby0+a2VlcF9hbGl2ZV9yZXF1ZXN0ZWQgPT0g
+S0VFUF9BTElWRV9QRU5ESU5HKSB7DQo+ICsJCWluZm8tPmtlZXBfYWxpdmVfcmVxdWVzdGVkID0g
+S0VFUF9BTElWRV9TRU5UOw0KPiArCQlyZXR1cm4gMTsNCj4gKwl9DQo+ICsJcmV0dXJuIDA7DQo+
+ICt9DQo+ICsNCj4gKy8qDQo+ICsgKiBCdWlsZCBhbmQgcHJlcGFyZSB0aGUgU01CRCBwYWNrZXQg
+aGVhZGVyDQo+ICsgKiBUaGlzIGZ1bmN0aW9uIHdhaXRzIGZvciBhdmFpYWxiZSBzZW5kIGNyZWRp
+dHMgYW5kIGJ1aWxkIGEgU01CRCBwYWNrZXQNCj4gKyAqIGhlYWRlci4gVGhlIGNhbGxlciB0aGVu
+IG9wdGlvbmFsIGFwcGVuZCBwYXlsb2FkIHRvIHRoZSBwYWNrZXQgYWZ0ZXINCj4gKyAqIHRoZSBo
+ZWFkZXINCj4gKyAqIGludHB1dCB2YWx1ZXMNCj4gKyAqIHNpemU6IHRoZSBzaXplIG9mIHRoZSBw
+YXlsb2FkDQo+ICsgKiByZW1haW5pbmdfZGF0YV9sZW5ndGg6IHJlbWFpbmluZyBkYXRhIHRvIHNl
+bmQgaWYgdGhpcyBpcyBwYXJ0IG9mIGENCj4gKyAqIGZyYWdtZW50ZWQgcGFja2V0DQo+ICsgKiBv
+dXRwdXQgdmFsdWVzDQo+ICsgKiByZXF1ZXN0X291dDogdGhlIHJlcXVlc3QgYWxsb2NhdGVkIGZy
+b20gdGhpcyBmdW5jdGlvbg0KPiArICogcmV0dXJuIHZhbHVlczogMCBvbiBzdWNjZXNzLCBvdGhl
+cndpc2UgYWN0dWFsIGVycm9yIGNvZGUgcmV0dXJuZWQNCj4gKyAqLw0KPiArc3RhdGljIGludCBz
+bWJkX2NyZWF0ZV9oZWFkZXIoc3RydWN0IHNtYmRfY29ubmVjdGlvbiAqaW5mbywNCj4gKwkJaW50
+IHNpemUsIGludCByZW1haW5pbmdfZGF0YV9sZW5ndGgsDQo+ICsJCXN0cnVjdCBzbWJkX3JlcXVl
+c3QgKipyZXF1ZXN0X291dCkNCj4gK3sNCj4gKwlzdHJ1Y3Qgc21iZF9yZXF1ZXN0ICpyZXF1ZXN0
+Ow0KPiArCXN0cnVjdCBzbWJkX2RhdGFfdHJhbnNmZXIgKnBhY2tldDsNCj4gKwlpbnQgaGVhZGVy
+X2xlbmd0aDsNCj4gKwlpbnQgcmM7DQo+ICsNCj4gKwkvKiBXYWl0IGZvciBzZW5kIGNyZWRpdHMu
+IEEgU01CRCBwYWNrZXQgbmVlZHMgb25lIGNyZWRpdCAqLw0KPiArCXJjID0gd2FpdF9ldmVudF9p
+bnRlcnJ1cHRpYmxlKGluZm8tPndhaXRfc2VuZF9xdWV1ZSwNCj4gKwkJYXRvbWljX3JlYWQoJmlu
+Zm8tPnNlbmRfY3JlZGl0cykgPiAwIHx8DQo+ICsJCWluZm8tPnRyYW5zcG9ydF9zdGF0dXMgIT0g
+U01CRF9DT05ORUNURUQpOw0KPiArCWlmIChyYykNCj4gKwkJcmV0dXJuIHJjOw0KPiArDQo+ICsJ
+aWYgKGluZm8tPnRyYW5zcG9ydF9zdGF0dXMgIT0gU01CRF9DT05ORUNURUQpIHsNCj4gKwkJbG9n
+X291dGdvaW5nKEVSUiwgImRpc2Nvbm5lY3RlZCBub3Qgc2VuZGluZ1xuIik7DQo+ICsJCXJldHVy
+biAtRU5PRU5UOw0KPiArCX0NCj4gKwlhdG9taWNfZGVjKCZpbmZvLT5zZW5kX2NyZWRpdHMpOw0K
+PiArDQo+ICsJcmVxdWVzdCA9IG1lbXBvb2xfYWxsb2MoaW5mby0+cmVxdWVzdF9tZW1wb29sLCBH
+RlBfS0VSTkVMKTsNCj4gKwlpZiAoIXJlcXVlc3QpIHsNCj4gKwkJcmMgPSAtRU5PTUVNOw0KPiAr
+CQlnb3RvIGVycjsNCj4gKwl9DQo+ICsNCj4gKwlyZXF1ZXN0LT5pbmZvID0gaW5mbzsNCj4gKw0K
+PiArCS8qIEZpbGwgaW4gdGhlIHBhY2tldCBoZWFkZXIgKi8NCj4gKwlwYWNrZXQgPSBzbWJkX3Jl
+cXVlc3RfcGF5bG9hZChyZXF1ZXN0KTsNCj4gKwlwYWNrZXQtPmNyZWRpdHNfcmVxdWVzdGVkID0g
+Y3B1X3RvX2xlMTYoaW5mby0NCj4gPnNlbmRfY3JlZGl0X3RhcmdldCk7DQo+ICsJcGFja2V0LT5j
+cmVkaXRzX2dyYW50ZWQgPQ0KPiArCQljcHVfdG9fbGUxNihtYW5hZ2VfY3JlZGl0c19wcmlvcl9z
+ZW5kaW5nKGluZm8pKTsNCj4gKwlpbmZvLT5zZW5kX2ltbWVkaWF0ZSA9IGZhbHNlOw0KPiArDQo+
+ICsJcGFja2V0LT5mbGFncyA9IDA7DQo+ICsJaWYgKG1hbmFnZV9rZWVwX2FsaXZlX2JlZm9yZV9z
+ZW5kaW5nKGluZm8pKQ0KPiArCQlwYWNrZXQtPmZsYWdzIHw9DQo+IGNwdV90b19sZTE2KFNNQl9E
+SVJFQ1RfUkVTUE9OU0VfUkVRVUVTVEVEKTsNCj4gKw0KPiArCXBhY2tldC0+cmVzZXJ2ZWQgPSAw
+Ow0KPiArCWlmICghc2l6ZSkNCj4gKwkJcGFja2V0LT5kYXRhX29mZnNldCA9IDA7DQo+ICsJZWxz
+ZQ0KPiArCQlwYWNrZXQtPmRhdGFfb2Zmc2V0ID0gY3B1X3RvX2xlMzIoMjQpOw0KPiArCXBhY2tl
+dC0+ZGF0YV9sZW5ndGggPSBjcHVfdG9fbGUzMihzaXplKTsNCj4gKwlwYWNrZXQtPnJlbWFpbmlu
+Z19kYXRhX2xlbmd0aCA9DQo+IGNwdV90b19sZTMyKHJlbWFpbmluZ19kYXRhX2xlbmd0aCk7DQo+
+ICsJcGFja2V0LT5wYWRkaW5nID0gMDsNCj4gKw0KPiArCWxvZ19vdXRnb2luZyhJTkZPLCAiY3Jl
+ZGl0c19yZXF1ZXN0ZWQ9JWQgY3JlZGl0c19ncmFudGVkPSVkICINCj4gKwkJImRhdGFfb2Zmc2V0
+PSVkIGRhdGFfbGVuZ3RoPSVkDQo+IHJlbWFpbmluZ19kYXRhX2xlbmd0aD0lZFxuIiwNCj4gKwkJ
+bGUxNl90b19jcHUocGFja2V0LT5jcmVkaXRzX3JlcXVlc3RlZCksDQo+ICsJCWxlMTZfdG9fY3B1
+KHBhY2tldC0+Y3JlZGl0c19ncmFudGVkKSwNCj4gKwkJbGUzMl90b19jcHUocGFja2V0LT5kYXRh
+X29mZnNldCksDQo+ICsJCWxlMzJfdG9fY3B1KHBhY2tldC0+ZGF0YV9sZW5ndGgpLA0KPiArCQls
+ZTMyX3RvX2NwdShwYWNrZXQtPnJlbWFpbmluZ19kYXRhX2xlbmd0aCkpOw0KPiArDQo+ICsJLyog
+TWFwIHRoZSBwYWNrZXQgdG8gRE1BICovDQo+ICsJaGVhZGVyX2xlbmd0aCA9IHNpemVvZihzdHJ1
+Y3Qgc21iZF9kYXRhX3RyYW5zZmVyKTsNCj4gKwkvKiBJZiB0aGlzIGlzIGEgcGFja2V0IHdpdGhv
+dXQgcGF5bG9hZCwgZG9uJ3Qgc2VuZCBwYWRkaW5nICovDQo+ICsJaWYgKCFzaXplKQ0KPiArCQlo
+ZWFkZXJfbGVuZ3RoID0gb2Zmc2V0b2Yoc3RydWN0IHNtYmRfZGF0YV90cmFuc2ZlciwNCj4gcGFk
+ZGluZyk7DQo+ICsNCj4gKwlyZXF1ZXN0LT5udW1fc2dlID0gMTsNCj4gKwlyZXF1ZXN0LT5zZ2Vb
+MF0uYWRkciA9IGliX2RtYV9tYXBfc2luZ2xlKGluZm8tPmlkLT5kZXZpY2UsDQo+ICsJCQkJCQkg
+KHZvaWQgKilwYWNrZXQsDQo+ICsJCQkJCQkgaGVhZGVyX2xlbmd0aCwNCj4gKwkJCQkJCSBETUFf
+QklESVJFQ1RJT05BTCk7DQo+ICsJaWYgKGliX2RtYV9tYXBwaW5nX2Vycm9yKGluZm8tPmlkLT5k
+ZXZpY2UsIHJlcXVlc3QtPnNnZVswXS5hZGRyKSkNCj4gew0KPiArCQltZW1wb29sX2ZyZWUocmVx
+dWVzdCwgaW5mby0+cmVxdWVzdF9tZW1wb29sKTsNCj4gKwkJcmMgPSAtRUlPOw0KPiArCQlnb3Rv
+IGVycjsNCj4gKwl9DQo+ICsNCj4gKwlyZXF1ZXN0LT5zZ2VbMF0ubGVuZ3RoID0gaGVhZGVyX2xl
+bmd0aDsNCj4gKwlyZXF1ZXN0LT5zZ2VbMF0ubGtleSA9IGluZm8tPnBkLT5sb2NhbF9kbWFfbGtl
+eTsNCj4gKw0KPiArCSpyZXF1ZXN0X291dCA9IHJlcXVlc3Q7DQo+ICsJcmV0dXJuIDA7DQo+ICsN
+Cj4gK2VycjoNCj4gKwlhdG9taWNfaW5jKCZpbmZvLT5zZW5kX2NyZWRpdHMpOw0KPiArCXJldHVy
+biByYzsNCj4gK30NCj4gKw0KPiArc3RhdGljIHZvaWQgc21iZF9kZXN0cm95X2hlYWRlcihzdHJ1
+Y3Qgc21iZF9jb25uZWN0aW9uICppbmZvLA0KPiArCQlzdHJ1Y3Qgc21iZF9yZXF1ZXN0ICpyZXF1
+ZXN0KQ0KPiArew0KPiArDQo+ICsJaWJfZG1hX3VubWFwX3NpbmdsZShpbmZvLT5pZC0+ZGV2aWNl
+LA0KPiArCQkJICAgIHJlcXVlc3QtPnNnZVswXS5hZGRyLA0KPiArCQkJICAgIHJlcXVlc3QtPnNn
+ZVswXS5sZW5ndGgsDQo+ICsJCQkgICAgRE1BX1RPX0RFVklDRSk7DQo+ICsJbWVtcG9vbF9mcmVl
+KHJlcXVlc3QsIGluZm8tPnJlcXVlc3RfbWVtcG9vbCk7DQo+ICsJYXRvbWljX2luYygmaW5mby0+
+c2VuZF9jcmVkaXRzKTsNCj4gK30NCj4gKw0KPiArLyogUG9zdCB0aGUgc2VuZCByZXF1ZXN0ICov
+DQo+ICtzdGF0aWMgaW50IHNtYmRfcG9zdF9zZW5kKHN0cnVjdCBzbWJkX2Nvbm5lY3Rpb24gKmlu
+Zm8sDQo+ICsJCXN0cnVjdCBzbWJkX3JlcXVlc3QgKnJlcXVlc3QsIGJvb2wgaGFzX3BheWxvYWQp
+DQo+ICt7DQo+ICsJc3RydWN0IGliX3NlbmRfd3Igc2VuZF93ciwgKnNlbmRfd3JfZmFpbDsNCj4g
+KwlpbnQgcmMsIGk7DQo+ICsNCj4gKwlmb3IgKGkgPSAwOyBpIDwgcmVxdWVzdC0+bnVtX3NnZTsg
+aSsrKSB7DQo+ICsJCWxvZ19yZG1hX3NlbmQoSU5GTywNCj4gKwkJCSJyZG1hX3JlcXVlc3Qgc2dl
+WyVkXSBhZGRyPSVsbHUgbGVnbnRoPSV1XG4iLA0KPiArCQkJaSwgcmVxdWVzdC0+c2dlWzBdLmFk
+ZHIsIHJlcXVlc3QtPnNnZVswXS5sZW5ndGgpOw0KPiArCQlpYl9kbWFfc3luY19zaW5nbGVfZm9y
+X2RldmljZSgNCj4gKwkJCWluZm8tPmlkLT5kZXZpY2UsDQo+ICsJCQlyZXF1ZXN0LT5zZ2VbaV0u
+YWRkciwNCj4gKwkJCXJlcXVlc3QtPnNnZVtpXS5sZW5ndGgsDQo+ICsJCQlETUFfVE9fREVWSUNF
+KTsNCj4gKwl9DQo+ICsNCj4gKwlyZXF1ZXN0LT5jcWUuZG9uZSA9IHNlbmRfZG9uZTsNCj4gKw0K
+PiArCXNlbmRfd3IubmV4dCA9IE5VTEw7DQo+ICsJc2VuZF93ci53cl9jcWUgPSAmcmVxdWVzdC0+
+Y3FlOw0KPiArCXNlbmRfd3Iuc2dfbGlzdCA9IHJlcXVlc3QtPnNnZTsNCj4gKwlzZW5kX3dyLm51
+bV9zZ2UgPSByZXF1ZXN0LT5udW1fc2dlOw0KPiArCXNlbmRfd3Iub3Bjb2RlID0gSUJfV1JfU0VO
+RDsNCj4gKwlzZW5kX3dyLnNlbmRfZmxhZ3MgPSBJQl9TRU5EX1NJR05BTEVEOw0KPiArDQo+ICsJ
+aWYgKGhhc19wYXlsb2FkKSB7DQo+ICsJCXJlcXVlc3QtPmhhc19wYXlsb2FkID0gdHJ1ZTsNCj4g
+KwkJYXRvbWljX2luYygmaW5mby0+c2VuZF9wYXlsb2FkX3BlbmRpbmcpOw0KPiArCX0gZWxzZSB7
+DQo+ICsJCXJlcXVlc3QtPmhhc19wYXlsb2FkID0gZmFsc2U7DQo+ICsJCWF0b21pY19pbmMoJmlu
+Zm8tPnNlbmRfcGVuZGluZyk7DQo+ICsJfQ0KPiArDQo+ICsJcmMgPSBpYl9wb3N0X3NlbmQoaW5m
+by0+aWQtPnFwLCAmc2VuZF93ciwgJnNlbmRfd3JfZmFpbCk7DQo+ICsJaWYgKHJjKSB7DQo+ICsJ
+CWxvZ19yZG1hX3NlbmQoRVJSLCAiaWJfcG9zdF9zZW5kIGZhaWxlZCByYz0lZFxuIiwgcmMpOw0K
+PiArCQlpZiAoaGFzX3BheWxvYWQpIHsNCj4gKwkJCWlmIChhdG9taWNfZGVjX2FuZF90ZXN0KCZp
+bmZvLQ0KPiA+c2VuZF9wYXlsb2FkX3BlbmRpbmcpKQ0KPiArCQkJCXdha2VfdXAoJmluZm8tDQo+
+ID53YWl0X3NlbmRfcGF5bG9hZF9wZW5kaW5nKTsNCj4gKwkJfSBlbHNlIHsNCj4gKwkJCWlmIChh
+dG9taWNfZGVjX2FuZF90ZXN0KCZpbmZvLT5zZW5kX3BlbmRpbmcpKQ0KPiArCQkJCXdha2VfdXAo
+JmluZm8tPndhaXRfc2VuZF9wZW5kaW5nKTsNCj4gKwkJfQ0KPiArCX0gZWxzZQ0KPiArCQkvKiBS
+ZXNldCB0aW1lciBmb3IgaWRsZSBjb25uZWN0aW9uIGFmdGVyIHBhY2tldCBpcyBzZW50ICovDQo+
+ICsJCW1vZF9kZWxheWVkX3dvcmsoaW5mby0+d29ya3F1ZXVlLCAmaW5mby0NCj4gPmlkbGVfdGlt
+ZXJfd29yaywNCj4gKwkJCWluZm8tPmtlZXBfYWxpdmVfaW50ZXJ2YWwqSFopOw0KPiArDQo+ICsJ
+cmV0dXJuIHJjOw0KPiArfQ0KPiArDQo+ICtzdGF0aWMgaW50IHNtYmRfcG9zdF9zZW5kX3NnbChz
+dHJ1Y3Qgc21iZF9jb25uZWN0aW9uICppbmZvLA0KPiArCXN0cnVjdCBzY2F0dGVybGlzdCAqc2ds
+LCBpbnQgZGF0YV9sZW5ndGgsIGludCByZW1haW5pbmdfZGF0YV9sZW5ndGgpDQo+ICt7DQo+ICsJ
+aW50IG51bV9zZ3M7DQo+ICsJaW50IGksIHJjOw0KPiArCXN0cnVjdCBzbWJkX3JlcXVlc3QgKnJl
+cXVlc3Q7DQo+ICsJc3RydWN0IHNjYXR0ZXJsaXN0ICpzZzsNCj4gKw0KPiArCXJjID0gc21iZF9j
+cmVhdGVfaGVhZGVyKA0KPiArCQlpbmZvLCBkYXRhX2xlbmd0aCwgcmVtYWluaW5nX2RhdGFfbGVu
+Z3RoLCAmcmVxdWVzdCk7DQo+ICsJaWYgKHJjKQ0KPiArCQlyZXR1cm4gcmM7DQo+ICsNCj4gKwlu
+dW1fc2dzID0gc2dsID8gc2dfbmVudHMoc2dsKSA6IDA7DQo+ICsJZm9yX2VhY2hfc2coc2dsLCBz
+ZywgbnVtX3NncywgaSkgew0KPiArCQlyZXF1ZXN0LT5zZ2VbaSsxXS5hZGRyID0NCj4gKwkJCWli
+X2RtYV9tYXBfcGFnZShpbmZvLT5pZC0+ZGV2aWNlLCBzZ19wYWdlKHNnKSwNCj4gKwkJCSAgICAg
+ICBzZy0+b2Zmc2V0LCBzZy0+bGVuZ3RoLCBETUFfQklESVJFQ1RJT05BTCk7DQo+ICsJCWlmIChp
+Yl9kbWFfbWFwcGluZ19lcnJvcigNCj4gKwkJCQlpbmZvLT5pZC0+ZGV2aWNlLCByZXF1ZXN0LT5z
+Z2VbaSsxXS5hZGRyKSkgew0KPiArCQkJcmMgPSAtRUlPOw0KPiArCQkJcmVxdWVzdC0+c2dlW2kr
+MV0uYWRkciA9IDA7DQo+ICsJCQlnb3RvIGRtYV9tYXBwaW5nX2ZhaWx1cmU7DQo+ICsJCX0NCj4g
+KwkJcmVxdWVzdC0+c2dlW2krMV0ubGVuZ3RoID0gc2ctPmxlbmd0aDsNCj4gKwkJcmVxdWVzdC0+
+c2dlW2krMV0ubGtleSA9IGluZm8tPnBkLT5sb2NhbF9kbWFfbGtleTsNCj4gKwkJcmVxdWVzdC0+
+bnVtX3NnZSsrOw0KPiArCX0NCj4gKw0KPiArCXJjID0gc21iZF9wb3N0X3NlbmQoaW5mbywgcmVx
+dWVzdCwgZGF0YV9sZW5ndGgpOw0KPiArCWlmICghcmMpDQo+ICsJCXJldHVybiAwOw0KPiArDQo+
+ICtkbWFfbWFwcGluZ19mYWlsdXJlOg0KPiArCWZvciAoaSA9IDE7IGkgPCByZXF1ZXN0LT5udW1f
+c2dlOyBpKyspDQo+ICsJCWlmIChyZXF1ZXN0LT5zZ2VbaV0uYWRkcikNCj4gKwkJCWliX2RtYV91
+bm1hcF9zaW5nbGUoaW5mby0+aWQtPmRldmljZSwNCj4gKwkJCQkJICAgIHJlcXVlc3QtPnNnZVtp
+XS5hZGRyLA0KPiArCQkJCQkgICAgcmVxdWVzdC0+c2dlW2ldLmxlbmd0aCwNCj4gKwkJCQkJICAg
+IERNQV9UT19ERVZJQ0UpOw0KPiArCXNtYmRfZGVzdHJveV9oZWFkZXIoaW5mbywgcmVxdWVzdCk7
+DQo+ICsJcmV0dXJuIHJjOw0KPiArfQ0KPiArDQo+ICsvKg0KPiArICogU2VuZCBhbiBlbXB0eSBt
+ZXNzYWdlDQo+ICsgKiBFbXB0eSBtZXNzYWdlIGlzIHVzZWQgdG8gZXh0ZW5kIGNyZWRpdHMgdG8g
+cGVlciB0byBmb3Iga2VlcCBsaXZlDQo+ICsgKiB3aGlsZSB0aGVyZSBpcyBubyB1cHBlciBsYXll
+ciBwYXlsb2FkIHRvIHNlbmQgYXQgdGhlIHRpbWUNCj4gKyAqLw0KPiArc3RhdGljIGludCBzbWJk
+X3Bvc3Rfc2VuZF9lbXB0eShzdHJ1Y3Qgc21iZF9jb25uZWN0aW9uICppbmZvKQ0KPiArew0KPiAr
+CWluZm8tPmNvdW50X3NlbmRfZW1wdHkrKzsNCj4gKwlyZXR1cm4gc21iZF9wb3N0X3NlbmRfc2ds
+KGluZm8sIE5VTEwsIDAsIDApOw0KPiArfQ0KPiArDQo+ICsvKg0KPiArICogUG9zdCBhIHJlY2Vp
+dmUgcmVxdWVzdCB0byB0aGUgdHJhbnNwb3J0DQo+ICsgKiBUaGUgcmVtb3RlIHBlZXIgY2FuIG9u
+bHkgc2VuZCBkYXRhIHdoZW4gYSByZWNlaXZlIHJlcXVlc3QgaXMgcG9zdGVkDQo+ICsgKiBUaGUg
+aW50ZXJhY3Rpb24gaXMgY29udHJvbGxlZCBieSBzZW5kL3JlY2VpdmUgY3JlZGl0IHN5c3RlbQ0K
+PiArICovDQo+ICtzdGF0aWMgaW50IHNtYmRfcG9zdF9yZWN2KA0KPiArCQlzdHJ1Y3Qgc21iZF9j
+b25uZWN0aW9uICppbmZvLCBzdHJ1Y3Qgc21iZF9yZXNwb25zZQ0KPiAqcmVzcG9uc2UpDQo+ICt7
+DQo+ICsJc3RydWN0IGliX3JlY3Zfd3IgcmVjdl93ciwgKnJlY3Zfd3JfZmFpbCA9IE5VTEw7DQo+
+ICsJaW50IHJjID0gLUVJTzsNCj4gKw0KPiArCXJlc3BvbnNlLT5zZ2UuYWRkciA9IGliX2RtYV9t
+YXBfc2luZ2xlKA0KPiArCQkJCWluZm8tPmlkLT5kZXZpY2UsIHJlc3BvbnNlLT5wYWNrZXQsDQo+
+ICsJCQkJaW5mby0+bWF4X3JlY2VpdmVfc2l6ZSwNCj4gRE1BX0ZST01fREVWSUNFKTsNCj4gKwlp
+ZiAoaWJfZG1hX21hcHBpbmdfZXJyb3IoaW5mby0+aWQtPmRldmljZSwgcmVzcG9uc2UtPnNnZS5h
+ZGRyKSkNCj4gKwkJcmV0dXJuIHJjOw0KPiArDQo+ICsJcmVzcG9uc2UtPnNnZS5sZW5ndGggPSBp
+bmZvLT5tYXhfcmVjZWl2ZV9zaXplOw0KPiArCXJlc3BvbnNlLT5zZ2UubGtleSA9IGluZm8tPnBk
+LT5sb2NhbF9kbWFfbGtleTsNCj4gKw0KPiArCXJlc3BvbnNlLT5jcWUuZG9uZSA9IHJlY3ZfZG9u
+ZTsNCj4gKw0KPiArCXJlY3Zfd3Iud3JfY3FlID0gJnJlc3BvbnNlLT5jcWU7DQo+ICsJcmVjdl93
+ci5uZXh0ID0gTlVMTDsNCj4gKwlyZWN2X3dyLnNnX2xpc3QgPSAmcmVzcG9uc2UtPnNnZTsNCj4g
+KwlyZWN2X3dyLm51bV9zZ2UgPSAxOw0KPiArDQo+ICsJcmMgPSBpYl9wb3N0X3JlY3YoaW5mby0+
+aWQtPnFwLCAmcmVjdl93ciwgJnJlY3Zfd3JfZmFpbCk7DQo+ICsJaWYgKHJjKSB7DQo+ICsJCWli
+X2RtYV91bm1hcF9zaW5nbGUoaW5mby0+aWQtPmRldmljZSwgcmVzcG9uc2UtDQo+ID5zZ2UuYWRk
+ciwNCj4gKwkJCQkgICAgcmVzcG9uc2UtPnNnZS5sZW5ndGgsDQo+IERNQV9GUk9NX0RFVklDRSk7
+DQo+ICsNCj4gKwkJbG9nX3JkbWFfcmVjdihFUlIsICJpYl9wb3N0X3JlY3YgZmFpbGVkIHJjPSVk
+XG4iLCByYyk7DQo+ICsJfQ0KPiArDQo+ICsJcmV0dXJuIHJjOw0KPiArfQ0KPiArDQo+ICsvKiBQ
+ZXJmb3JtIFNNQkQgbmVnb3RpYXRlIGFjY29yZGluZyB0byBbTVMtU01CRF0gMy4xLjUuMiAqLw0K
+PiArc3RhdGljIGludCBzbWJkX25lZ290aWF0ZShzdHJ1Y3Qgc21iZF9jb25uZWN0aW9uICppbmZv
+KQ0KPiArew0KPiArCWludCByYzsNCj4gKwlzdHJ1Y3Qgc21iZF9yZXNwb25zZSAqcmVzcG9uc2Ug
+PSBnZXRfcmVjZWl2ZV9idWZmZXIoaW5mbyk7DQo+ICsNCj4gKwlyZXNwb25zZS0+dHlwZSA9IFNN
+QkRfTkVHT1RJQVRFX1JFU1A7DQo+ICsJcmMgPSBzbWJkX3Bvc3RfcmVjdihpbmZvLCByZXNwb25z
+ZSk7DQo+ICsJbG9nX3JkbWFfZXZlbnQoSU5GTywNCj4gKwkJInNtYmRfcG9zdF9yZWN2IHJjPSVk
+IGlvdi5hZGRyPSVsbHggaW92Lmxlbmd0aD0leCAiDQo+ICsJCSJpb3YubGtleT0leFxuIiwNCj4g
+KwkJcmMsIHJlc3BvbnNlLT5zZ2UuYWRkciwNCj4gKwkJcmVzcG9uc2UtPnNnZS5sZW5ndGgsIHJl
+c3BvbnNlLT5zZ2UubGtleSk7DQo+ICsJaWYgKHJjKQ0KPiArCQlyZXR1cm4gcmM7DQo+ICsNCj4g
+Kwlpbml0X2NvbXBsZXRpb24oJmluZm8tPm5lZ290aWF0ZV9jb21wbGV0aW9uKTsNCj4gKwlpbmZv
+LT5uZWdvdGlhdGVfZG9uZSA9IGZhbHNlOw0KPiArCXJjID0gc21iZF9wb3N0X3NlbmRfbmVnb3Rp
+YXRlX3JlcShpbmZvKTsNCj4gKwlpZiAocmMpDQo+ICsJCXJldHVybiByYzsNCj4gKw0KPiArCXJj
+ID0gd2FpdF9mb3JfY29tcGxldGlvbl9pbnRlcnJ1cHRpYmxlX3RpbWVvdXQoDQo+ICsJCSZpbmZv
+LT5uZWdvdGlhdGVfY29tcGxldGlvbiwgU01CRF9ORUdPVElBVEVfVElNRU9VVA0KPiAqIEhaKTsN
+Cj4gKwlsb2dfcmRtYV9ldmVudChJTkZPLCAid2FpdF9mb3JfY29tcGxldGlvbl90aW1lb3V0IHJj
+PSVkXG4iLA0KPiByYyk7DQo+ICsNCj4gKwlpZiAoaW5mby0+bmVnb3RpYXRlX2RvbmUpDQo+ICsJ
+CXJldHVybiAwOw0KPiArDQo+ICsJaWYgKHJjID09IDApDQo+ICsJCXJjID0gLUVUSU1FRE9VVDsN
+Cj4gKwllbHNlIGlmIChyYyA9PSAtRVJFU1RBUlRTWVMpDQo+ICsJCXJjID0gLUVJTlRSOw0KPiAr
+CWVsc2UNCj4gKwkJcmMgPSAtRU5PVENPTk47DQo+ICsNCj4gKwlyZXR1cm4gcmM7DQo+ICt9DQo+
+ICsNCj4gK3N0YXRpYyB2b2lkIHB1dF9lbXB0eV9wYWNrZXQoDQo+ICsJCXN0cnVjdCBzbWJkX2Nv
+bm5lY3Rpb24gKmluZm8sIHN0cnVjdCBzbWJkX3Jlc3BvbnNlDQo+ICpyZXNwb25zZSkNCj4gK3sN
+Cj4gKwlzcGluX2xvY2soJmluZm8tPmVtcHR5X3BhY2tldF9xdWV1ZV9sb2NrKTsNCj4gKwlsaXN0
+X2FkZF90YWlsKCZyZXNwb25zZS0+bGlzdCwgJmluZm8tPmVtcHR5X3BhY2tldF9xdWV1ZSk7DQo+
+ICsJaW5mby0+Y291bnRfZW1wdHlfcGFja2V0X3F1ZXVlKys7DQo+ICsJc3Bpbl91bmxvY2soJmlu
+Zm8tPmVtcHR5X3BhY2tldF9xdWV1ZV9sb2NrKTsNCj4gKw0KPiArCXF1ZXVlX3dvcmsoaW5mby0+
+d29ya3F1ZXVlLCAmaW5mby0+cG9zdF9zZW5kX2NyZWRpdHNfd29yayk7DQo+ICt9DQo+ICsNCj4g
+Ky8qDQo+ICsgKiBJbXBsZW1lbnQgQ29ubmVjdGlvbi5GcmFnbWVudFJlYXNzZW1ibHlCdWZmZXIg
+ZGVmaW5lZCBpbiBbTVMtDQo+IFNNQkRdIDMuMS4xLjENCj4gKyAqIFRoaXMgaXMgYSBxdWV1ZSBm
+b3IgcmVhc3NlbWJsaW5nIHVwcGVyIGxheWVyIHBheWxvYWQgYW5kIHByZXNlbnQgdG8NCj4gdXBw
+ZXINCj4gKyAqIGxheWVyLiBBbGwgdGhlIGlubmNvbWluZyBwYXlsb2FkIGdvIHRvIHRoZSByZWFz
+c2VtYmx5IHF1ZXVlLCByZWdhcmRsZXNzDQo+IG9mDQo+ICsgKiBpZiByZWFzc2VtYmx5IGlzIHJl
+cXVpcmVkLiBUaGUgdXVwZXIgbGF5ZXIgY29kZSByZWFkcyBmcm9tIHRoZSBxdWV1ZSBmb3INCj4g
+YWxsDQo+ICsgKiBpbmNvbWluZyBwYXlsb2Fkcy4NCj4gKyAqIFB1dCBhIHJlY2VpdmVkIHBhY2tl
+dCB0byB0aGUgcmVhc3NlbWJseSBxdWV1ZQ0KPiArICogcmVzcG9uc2U6IHRoZSBwYWNrZXQgcmVj
+ZWl2ZWQNCj4gKyAqIGRhdGFfbGVuZ3RoOiB0aGUgc2l6ZSBvZiBwYXlsb2FkIGluIHRoaXMgcGFj
+a2V0DQo+ICsgKi8NCj4gK3N0YXRpYyB2b2lkIGVucXVldWVfcmVhc3NlbWJseSgNCj4gKwlzdHJ1
+Y3Qgc21iZF9jb25uZWN0aW9uICppbmZvLA0KPiArCXN0cnVjdCBzbWJkX3Jlc3BvbnNlICpyZXNw
+b25zZSwNCj4gKwlpbnQgZGF0YV9sZW5ndGgpDQo+ICt7DQo+ICsJc3Bpbl9sb2NrKCZpbmZvLT5y
+ZWFzc2VtYmx5X3F1ZXVlX2xvY2spOw0KPiArCWxpc3RfYWRkX3RhaWwoJnJlc3BvbnNlLT5saXN0
+LCAmaW5mby0+cmVhc3NlbWJseV9xdWV1ZSk7DQo+ICsJaW5mby0+cmVhc3NlbWJseV9xdWV1ZV9s
+ZW5ndGgrKzsNCj4gKwkvKg0KPiArCSAqIE1ha2Ugc3VyZSByZWFzc2VtYmx5X2RhdGFfbGVuZ3Ro
+IGlzIHVwZGF0ZWQgYWZ0ZXIgbGlzdCBhbmQNCj4gKwkgKiByZWFzc2VtYmx5X3F1ZXVlX2xlbmd0
+aCBhcmUgdXBkYXRlZC4gT24gdGhlIGRlcXVldWUgc2lkZQ0KPiArCSAqIHJlYXNzZW1ibHlfZGF0
+YV9sZW5ndGggaXMgY2hlY2tlZCB3aXRob3V0IGEgbG9jayB0byBkZXRlcm1pbmUNCj4gKwkgKiBp
+ZiByZWFzc2VtYmx5X3F1ZXVlX2xlbmd0aCBhbmQgbGlzdCBpcyB1cCB0byBkYXRlDQo+ICsJICov
+DQo+ICsJdmlydF93bWIoKTsNCj4gKwlpbmZvLT5yZWFzc2VtYmx5X2RhdGFfbGVuZ3RoICs9IGRh
+dGFfbGVuZ3RoOw0KPiArCXNwaW5fdW5sb2NrKCZpbmZvLT5yZWFzc2VtYmx5X3F1ZXVlX2xvY2sp
+Ow0KPiArCWluZm8tPmNvdW50X3JlYXNzZW1ibHlfcXVldWUrKzsNCj4gKwlpbmZvLT5jb3VudF9l
+bnF1ZXVlX3JlYXNzZW1ibHlfcXVldWUrKzsNCj4gK30NCj4gKw0KPiArLyoNCj4gKyAqIEdldCB0
+aGUgZmlyc3QgZW50cnkgYXQgdGhlIGZyb250IG9mIHJlYXNzZW1ibHkgcXVldWUNCj4gKyAqIENh
+bGxlciBpcyByZXNwb25zaWJsZSBmb3IgbG9ja2luZw0KPiArICogcmV0dXJuIHZhbHVlOiB0aGUg
+Zmlyc3QgZW50cnkgaWYgYW55LCBOVUxMIGlmIHF1ZXVlIGlzIGVtcHR5DQo+ICsgKi8NCj4gK3N0
+YXRpYyBzdHJ1Y3Qgc21iZF9yZXNwb25zZSAqX2dldF9maXJzdF9yZWFzc2VtYmx5KHN0cnVjdA0K
+PiBzbWJkX2Nvbm5lY3Rpb24gKmluZm8pDQo+ICt7DQo+ICsJc3RydWN0IHNtYmRfcmVzcG9uc2Ug
+KnJldCA9IE5VTEw7DQo+ICsNCj4gKwlpZiAoIWxpc3RfZW1wdHkoJmluZm8tPnJlYXNzZW1ibHlf
+cXVldWUpKSB7DQo+ICsJCXJldCA9IGxpc3RfZmlyc3RfZW50cnkoDQo+ICsJCQkmaW5mby0+cmVh
+c3NlbWJseV9xdWV1ZSwNCj4gKwkJCXN0cnVjdCBzbWJkX3Jlc3BvbnNlLCBsaXN0KTsNCj4gKwl9
+DQo+ICsJcmV0dXJuIHJldDsNCj4gK30NCj4gKw0KPiArc3RhdGljIHN0cnVjdCBzbWJkX3Jlc3Bv
+bnNlICpnZXRfZW1wdHlfcXVldWVfYnVmZmVyKA0KPiArCQlzdHJ1Y3Qgc21iZF9jb25uZWN0aW9u
+ICppbmZvKQ0KPiArew0KPiArCXN0cnVjdCBzbWJkX3Jlc3BvbnNlICpyZXQgPSBOVUxMOw0KPiAr
+CXVuc2lnbmVkIGxvbmcgZmxhZ3M7DQo+ICsNCj4gKwlzcGluX2xvY2tfaXJxc2F2ZSgmaW5mby0+
+ZW1wdHlfcGFja2V0X3F1ZXVlX2xvY2ssIGZsYWdzKTsNCj4gKwlpZiAoIWxpc3RfZW1wdHkoJmlu
+Zm8tPmVtcHR5X3BhY2tldF9xdWV1ZSkpIHsNCj4gKwkJcmV0ID0gbGlzdF9maXJzdF9lbnRyeSgN
+Cj4gKwkJCSZpbmZvLT5lbXB0eV9wYWNrZXRfcXVldWUsDQo+ICsJCQlzdHJ1Y3Qgc21iZF9yZXNw
+b25zZSwgbGlzdCk7DQo+ICsJCWxpc3RfZGVsKCZyZXQtPmxpc3QpOw0KPiArCQlpbmZvLT5jb3Vu
+dF9lbXB0eV9wYWNrZXRfcXVldWUtLTsNCj4gKwl9DQo+ICsJc3Bpbl91bmxvY2tfaXJxcmVzdG9y
+ZSgmaW5mby0+ZW1wdHlfcGFja2V0X3F1ZXVlX2xvY2ssIGZsYWdzKTsNCj4gKw0KPiArCXJldHVy
+biByZXQ7DQo+ICt9DQo+ICsNCj4gKy8qDQo+ICsgKiBHZXQgYSByZWNlaXZlIGJ1ZmZlcg0KPiAr
+ICogRm9yIGVhY2ggcmVtb3RlIHNlbmQsIHdlIG5lZWQgdG8gcG9zdCBhIHJlY2VpdmUuIFRoZSBy
+ZWNlaXZlIGJ1ZmZlcnMgYXJlDQo+ICsgKiBwcmUtYWxsb2NhdGVkIGluIGFkdmFuY2UuDQo+ICsg
+KiByZXR1cm4gdmFsdWU6IHRoZSByZWNlaXZlIGJ1ZmZlciwgTlVMTCBpZiBub25lIGlzIGF2YWls
+YWJsZQ0KPiArICovDQo+ICtzdGF0aWMgc3RydWN0IHNtYmRfcmVzcG9uc2UgKmdldF9yZWNlaXZl
+X2J1ZmZlcihzdHJ1Y3Qgc21iZF9jb25uZWN0aW9uDQo+ICppbmZvKQ0KPiArew0KPiArCXN0cnVj
+dCBzbWJkX3Jlc3BvbnNlICpyZXQgPSBOVUxMOw0KPiArCXVuc2lnbmVkIGxvbmcgZmxhZ3M7DQo+
+ICsNCj4gKwlzcGluX2xvY2tfaXJxc2F2ZSgmaW5mby0+cmVjZWl2ZV9xdWV1ZV9sb2NrLCBmbGFn
+cyk7DQo+ICsJaWYgKCFsaXN0X2VtcHR5KCZpbmZvLT5yZWNlaXZlX3F1ZXVlKSkgew0KPiArCQly
+ZXQgPSBsaXN0X2ZpcnN0X2VudHJ5KA0KPiArCQkJJmluZm8tPnJlY2VpdmVfcXVldWUsDQo+ICsJ
+CQlzdHJ1Y3Qgc21iZF9yZXNwb25zZSwgbGlzdCk7DQo+ICsJCWxpc3RfZGVsKCZyZXQtPmxpc3Qp
+Ow0KPiArCQlpbmZvLT5jb3VudF9yZWNlaXZlX3F1ZXVlLS07DQo+ICsJCWluZm8tPmNvdW50X2dl
+dF9yZWNlaXZlX2J1ZmZlcisrOw0KPiArCX0NCj4gKwlzcGluX3VubG9ja19pcnFyZXN0b3JlKCZp
+bmZvLT5yZWNlaXZlX3F1ZXVlX2xvY2ssIGZsYWdzKTsNCj4gKw0KPiArCXJldHVybiByZXQ7DQo+
+ICt9DQo+ICsNCj4gKy8qDQo+ICsgKiBSZXR1cm4gYSByZWNlaXZlIGJ1ZmZlcg0KPiArICogVXBv
+biByZXR1cm5pbmcgb2YgYSByZWNlaXZlIGJ1ZmZlciwgd2UgY2FuIHBvc3QgbmV3IHJlY2VpdmUg
+YW5kIGV4dGVuZA0KPiArICogbW9yZSByZWNlaXZlIGNyZWRpdHMgdG8gcmVtb3RlIHBlZXIuIFRo
+aXMgaXMgZG9uZSBpbW1lZGlhdGVseSBhZnRlciBhDQo+ICsgKiByZWNlaXZlIGJ1ZmZlciBpcyBy
+ZXR1cm5lZC4NCj4gKyAqLw0KPiArc3RhdGljIHZvaWQgcHV0X3JlY2VpdmVfYnVmZmVyKA0KPiAr
+CXN0cnVjdCBzbWJkX2Nvbm5lY3Rpb24gKmluZm8sIHN0cnVjdCBzbWJkX3Jlc3BvbnNlICpyZXNw
+b25zZSwNCj4gKwlib29sIGxvY2spDQo+ICt7DQo+ICsJdW5zaWduZWQgbG9uZyBmbGFnczsNCj4g
+Kw0KPiArCWliX2RtYV91bm1hcF9zaW5nbGUoaW5mby0+aWQtPmRldmljZSwgcmVzcG9uc2UtPnNn
+ZS5hZGRyLA0KPiArCQlyZXNwb25zZS0+c2dlLmxlbmd0aCwgRE1BX0ZST01fREVWSUNFKTsNCj4g
+Kw0KPiArCWlmIChsb2NrKQ0KPiArCQlzcGluX2xvY2tfaXJxc2F2ZSgmaW5mby0+cmVjZWl2ZV9x
+dWV1ZV9sb2NrLCBmbGFncyk7DQo+ICsJbGlzdF9hZGRfdGFpbCgmcmVzcG9uc2UtPmxpc3QsICZp
+bmZvLT5yZWNlaXZlX3F1ZXVlKTsNCj4gKwlpbmZvLT5jb3VudF9yZWNlaXZlX3F1ZXVlKys7DQo+
+ICsJaW5mby0+Y291bnRfcHV0X3JlY2VpdmVfYnVmZmVyKys7DQo+ICsJaWYgKGxvY2spDQo+ICsJ
+CXNwaW5fdW5sb2NrX2lycXJlc3RvcmUoJmluZm8tPnJlY2VpdmVfcXVldWVfbG9jaywgZmxhZ3Mp
+Ow0KPiArDQo+ICsJcXVldWVfd29yayhpbmZvLT53b3JrcXVldWUsICZpbmZvLT5wb3N0X3NlbmRf
+Y3JlZGl0c193b3JrKTsNCj4gK30NCj4gKw0KPiArLyogUHJlYWxsb2NhdGUgYWxsIHJlY2VpdmUg
+YnVmZmVyIG9uIHRyYW5zcG9ydCBlc3RhYmxpc2htZW50ICovDQo+ICtzdGF0aWMgaW50IGFsbG9j
+YXRlX3JlY2VpdmVfYnVmZmVycyhzdHJ1Y3Qgc21iZF9jb25uZWN0aW9uICppbmZvLCBpbnQNCj4g
+bnVtX2J1ZikNCj4gK3sNCj4gKwlpbnQgaTsNCj4gKwlzdHJ1Y3Qgc21iZF9yZXNwb25zZSAqcmVz
+cG9uc2U7DQo+ICsNCj4gKwlJTklUX0xJU1RfSEVBRCgmaW5mby0+cmVhc3NlbWJseV9xdWV1ZSk7
+DQo+ICsJc3Bpbl9sb2NrX2luaXQoJmluZm8tPnJlYXNzZW1ibHlfcXVldWVfbG9jayk7DQo+ICsJ
+aW5mby0+cmVhc3NlbWJseV9kYXRhX2xlbmd0aCA9IDA7DQo+ICsJaW5mby0+cmVhc3NlbWJseV9x
+dWV1ZV9sZW5ndGggPSAwOw0KPiArDQo+ICsJSU5JVF9MSVNUX0hFQUQoJmluZm8tPnJlY2VpdmVf
+cXVldWUpOw0KPiArCXNwaW5fbG9ja19pbml0KCZpbmZvLT5yZWNlaXZlX3F1ZXVlX2xvY2spOw0K
+PiArCWluZm8tPmNvdW50X3JlY2VpdmVfcXVldWUgPSAwOw0KPiArDQo+ICsJSU5JVF9MSVNUX0hF
+QUQoJmluZm8tPmVtcHR5X3BhY2tldF9xdWV1ZSk7DQo+ICsJc3Bpbl9sb2NrX2luaXQoJmluZm8t
+PmVtcHR5X3BhY2tldF9xdWV1ZV9sb2NrKTsNCj4gKwlpbmZvLT5jb3VudF9lbXB0eV9wYWNrZXRf
+cXVldWUgPSAwOw0KPiArDQo+ICsJaW5pdF93YWl0cXVldWVfaGVhZCgmaW5mby0+d2FpdF9yZWNl
+aXZlX3F1ZXVlcyk7DQo+ICsNCj4gKwlmb3IgKGkgPSAwOyBpIDwgbnVtX2J1ZjsgaSsrKSB7DQo+
+ICsJCXJlc3BvbnNlID0gbWVtcG9vbF9hbGxvYyhpbmZvLT5yZXNwb25zZV9tZW1wb29sLA0KPiBH
+RlBfS0VSTkVMKTsNCj4gKwkJaWYgKCFyZXNwb25zZSkNCj4gKwkJCWdvdG8gYWxsb2NhdGVfZmFp
+bGVkOw0KPiArDQo+ICsJCXJlc3BvbnNlLT5pbmZvID0gaW5mbzsNCj4gKwkJbGlzdF9hZGRfdGFp
+bCgmcmVzcG9uc2UtPmxpc3QsICZpbmZvLT5yZWNlaXZlX3F1ZXVlKTsNCj4gKwkJaW5mby0+Y291
+bnRfcmVjZWl2ZV9xdWV1ZSsrOw0KPiArCX0NCj4gKw0KPiArCXJldHVybiAwOw0KPiArDQo+ICth
+bGxvY2F0ZV9mYWlsZWQ6DQo+ICsJd2hpbGUgKCFsaXN0X2VtcHR5KCZpbmZvLT5yZWNlaXZlX3F1
+ZXVlKSkgew0KPiArCQlyZXNwb25zZSA9IGxpc3RfZmlyc3RfZW50cnkoDQo+ICsJCQkJJmluZm8t
+PnJlY2VpdmVfcXVldWUsDQo+ICsJCQkJc3RydWN0IHNtYmRfcmVzcG9uc2UsIGxpc3QpOw0KPiAr
+CQlsaXN0X2RlbCgmcmVzcG9uc2UtPmxpc3QpOw0KPiArCQlpbmZvLT5jb3VudF9yZWNlaXZlX3F1
+ZXVlLS07DQo+ICsNCj4gKwkJbWVtcG9vbF9mcmVlKHJlc3BvbnNlLCBpbmZvLT5yZXNwb25zZV9t
+ZW1wb29sKTsNCj4gKwl9DQo+ICsJcmV0dXJuIC1FTk9NRU07DQo+ICt9DQo+ICsNCj4gK3N0YXRp
+YyB2b2lkIGRlc3Ryb3lfcmVjZWl2ZV9idWZmZXJzKHN0cnVjdCBzbWJkX2Nvbm5lY3Rpb24gKmlu
+Zm8pDQo+ICt7DQo+ICsJc3RydWN0IHNtYmRfcmVzcG9uc2UgKnJlc3BvbnNlOw0KPiArDQo+ICsJ
+d2hpbGUgKChyZXNwb25zZSA9IGdldF9yZWNlaXZlX2J1ZmZlcihpbmZvKSkpDQo+ICsJCW1lbXBv
+b2xfZnJlZShyZXNwb25zZSwgaW5mby0+cmVzcG9uc2VfbWVtcG9vbCk7DQo+ICsNCj4gKwl3aGls
+ZSAoKHJlc3BvbnNlID0gZ2V0X2VtcHR5X3F1ZXVlX2J1ZmZlcihpbmZvKSkpDQo+ICsJCW1lbXBv
+b2xfZnJlZShyZXNwb25zZSwgaW5mby0+cmVzcG9uc2VfbWVtcG9vbCk7DQo+ICt9DQo+ICsNCj4g
+Ky8qDQo+ICsgKiBDaGVjayBhbmQgc2VuZCBhbiBpbW1lZGlhdGUgb3Iga2VlcCBhbGl2ZSBwYWNr
+ZXQNCj4gKyAqIFRoZSBjb25kaXRpb24gdG8gc2VuZCB0aG9zZSBwYWNrZXRzIGFyZSBkZWZpbmVk
+IGluIFtNUy1TTUJEXSAzLjEuMS4xDQo+ICsgKiBDb25uZWN0aW9uLktlZXBhbGl2ZVJlcXVlc3Rl
+ZCBhbmQgQ29ubmVjdGlvbi5TZW5kSW1tZWRpYXRlDQo+ICsgKiBUaGUgaWRlYSBpcyB0byBleHRl
+bmQgY3JlZGl0cyB0byBzZXJ2ZXIgYXMgc29vbiBhcyBpdCBiZWNvbWVzIGF2YWlsYWJsZQ0KPiAr
+ICovDQo+ICtzdGF0aWMgdm9pZCBzZW5kX2ltbWVkaWF0ZV93b3JrKHN0cnVjdCB3b3JrX3N0cnVj
+dCAqd29yaykNCj4gK3sNCj4gKwlzdHJ1Y3Qgc21iZF9jb25uZWN0aW9uICppbmZvID0gY29udGFp
+bmVyX29mKA0KPiArCQkJCQl3b3JrLCBzdHJ1Y3Qgc21iZF9jb25uZWN0aW9uLA0KPiArCQkJCQlz
+ZW5kX2ltbWVkaWF0ZV93b3JrLndvcmspOw0KPiArDQo+ICsJaWYgKGluZm8tPmtlZXBfYWxpdmVf
+cmVxdWVzdGVkID09IEtFRVBfQUxJVkVfUEVORElORyB8fA0KPiArCSAgICBpbmZvLT5zZW5kX2lt
+bWVkaWF0ZSkgew0KPiArCQlsb2dfa2VlcF9hbGl2ZShJTkZPLCAic2VuZCBhbiBlbXB0eSBtZXNz
+YWdlXG4iKTsNCj4gKwkJc21iZF9wb3N0X3NlbmRfZW1wdHkoaW5mbyk7DQo+ICsJfQ0KPiArfQ0K
+PiArDQo+ICsvKiBJbXBsZW1lbnQgaWRsZSBjb25uZWN0aW9uIHRpbWVyIFtNUy1TTUJEXSAzLjEu
+Ni4yICovDQo+ICtzdGF0aWMgdm9pZCBpZGxlX2Nvbm5lY3Rpb25fdGltZXIoc3RydWN0IHdvcmtf
+c3RydWN0ICp3b3JrKQ0KPiArew0KPiArCXN0cnVjdCBzbWJkX2Nvbm5lY3Rpb24gKmluZm8gPSBj
+b250YWluZXJfb2YoDQo+ICsJCQkJCXdvcmssIHN0cnVjdCBzbWJkX2Nvbm5lY3Rpb24sDQo+ICsJ
+CQkJCWlkbGVfdGltZXJfd29yay53b3JrKTsNCj4gKw0KPiArCWlmIChpbmZvLT5rZWVwX2FsaXZl
+X3JlcXVlc3RlZCAhPSBLRUVQX0FMSVZFX05PTkUpIHsNCj4gKwkJbG9nX2tlZXBfYWxpdmUoRVJS
+LA0KPiArCQkJImVycm9yIHN0YXR1cyBpbmZvLT5rZWVwX2FsaXZlX3JlcXVlc3RlZD0lZFxuIiwN
+Cj4gKwkJCWluZm8tPmtlZXBfYWxpdmVfcmVxdWVzdGVkKTsNCj4gKwkJc21iZF9kaXNjb25uZWN0
+X3JkbWFfY29ubmVjdGlvbihpbmZvKTsNCj4gKwkJcmV0dXJuOw0KPiArCX0NCj4gKw0KPiArCWxv
+Z19rZWVwX2FsaXZlKElORk8sICJhYm91dCB0byBzZW5kIGFuIGVtcHR5IGlkbGUgbWVzc2FnZVxu
+Iik7DQo+ICsJc21iZF9wb3N0X3NlbmRfZW1wdHkoaW5mbyk7DQo+ICsNCj4gKwkvKiBTZXR1cCB0
+aGUgbmV4dCBpZGxlIHRpbWVvdXQgd29yayAqLw0KPiArCXF1ZXVlX2RlbGF5ZWRfd29yayhpbmZv
+LT53b3JrcXVldWUsICZpbmZvLT5pZGxlX3RpbWVyX3dvcmssDQo+ICsJCQlpbmZvLT5rZWVwX2Fs
+aXZlX2ludGVydmFsKkhaKTsNCj4gK30NCj4gKw0KPiArc3RhdGljIHZvaWQgZGVzdHJveV9jYWNo
+ZXNfYW5kX3dvcmtxdWV1ZShzdHJ1Y3Qgc21iZF9jb25uZWN0aW9uDQo+ICppbmZvKQ0KPiArew0K
+PiArCWRlc3Ryb3lfcmVjZWl2ZV9idWZmZXJzKGluZm8pOw0KPiArCWRlc3Ryb3lfd29ya3F1ZXVl
+KGluZm8tPndvcmtxdWV1ZSk7DQo+ICsJbWVtcG9vbF9kZXN0cm95KGluZm8tPnJlc3BvbnNlX21l
+bXBvb2wpOw0KPiArCWttZW1fY2FjaGVfZGVzdHJveShpbmZvLT5yZXNwb25zZV9jYWNoZSk7DQo+
+ICsJbWVtcG9vbF9kZXN0cm95KGluZm8tPnJlcXVlc3RfbWVtcG9vbCk7DQo+ICsJa21lbV9jYWNo
+ZV9kZXN0cm95KGluZm8tPnJlcXVlc3RfY2FjaGUpOw0KPiArfQ0KPiArDQo+ICsjZGVmaW5lIE1B
+WF9OQU1FX0xFTgk4MA0KPiArc3RhdGljIGludCBhbGxvY2F0ZV9jYWNoZXNfYW5kX3dvcmtxdWV1
+ZShzdHJ1Y3Qgc21iZF9jb25uZWN0aW9uICppbmZvKQ0KPiArew0KPiArCWNoYXIgbmFtZVtNQVhf
+TkFNRV9MRU5dOw0KPiArCWludCByYzsNCj4gKw0KPiArCXNucHJpbnRmKG5hbWUsIE1BWF9OQU1F
+X0xFTiwgInNtYmRfcmVxdWVzdF8lcCIsIGluZm8pOw0KPiArCWluZm8tPnJlcXVlc3RfY2FjaGUg
+PQ0KPiArCQlrbWVtX2NhY2hlX2NyZWF0ZSgNCj4gKwkJCW5hbWUsDQo+ICsJCQlzaXplb2Yoc3Ry
+dWN0IHNtYmRfcmVxdWVzdCkgKw0KPiArCQkJCXNpemVvZihzdHJ1Y3Qgc21iZF9kYXRhX3RyYW5z
+ZmVyKSwNCj4gKwkJCTAsIFNMQUJfSFdDQUNIRV9BTElHTiwgTlVMTCk7DQo+ICsJaWYgKCFpbmZv
+LT5yZXF1ZXN0X2NhY2hlKQ0KPiArCQlyZXR1cm4gLUVOT01FTTsNCj4gKw0KPiArCWluZm8tPnJl
+cXVlc3RfbWVtcG9vbCA9DQo+ICsJCW1lbXBvb2xfY3JlYXRlKGluZm8tPnNlbmRfY3JlZGl0X3Rh
+cmdldCwNCj4gbWVtcG9vbF9hbGxvY19zbGFiLA0KPiArCQkJbWVtcG9vbF9mcmVlX3NsYWIsIGlu
+Zm8tPnJlcXVlc3RfY2FjaGUpOw0KPiArCWlmICghaW5mby0+cmVxdWVzdF9tZW1wb29sKQ0KPiAr
+CQlnb3RvIG91dDE7DQo+ICsNCj4gKwlzbnByaW50ZihuYW1lLCBNQVhfTkFNRV9MRU4sICJzbWJk
+X3Jlc3BvbnNlXyVwIiwgaW5mbyk7DQo+ICsJaW5mby0+cmVzcG9uc2VfY2FjaGUgPQ0KPiArCQlr
+bWVtX2NhY2hlX2NyZWF0ZSgNCj4gKwkJCW5hbWUsDQo+ICsJCQlzaXplb2Yoc3RydWN0IHNtYmRf
+cmVzcG9uc2UpICsNCj4gKwkJCQlpbmZvLT5tYXhfcmVjZWl2ZV9zaXplLA0KPiArCQkJMCwgU0xB
+Ql9IV0NBQ0hFX0FMSUdOLCBOVUxMKTsNCj4gKwlpZiAoIWluZm8tPnJlc3BvbnNlX2NhY2hlKQ0K
+PiArCQlnb3RvIG91dDI7DQo+ICsNCj4gKwlpbmZvLT5yZXNwb25zZV9tZW1wb29sID0NCj4gKwkJ
+bWVtcG9vbF9jcmVhdGUoaW5mby0+cmVjZWl2ZV9jcmVkaXRfbWF4LA0KPiBtZW1wb29sX2FsbG9j
+X3NsYWIsDQo+ICsJCSAgICAgICBtZW1wb29sX2ZyZWVfc2xhYiwgaW5mby0+cmVzcG9uc2VfY2Fj
+aGUpOw0KPiArCWlmICghaW5mby0+cmVzcG9uc2VfbWVtcG9vbCkNCj4gKwkJZ290byBvdXQzOw0K
+PiArDQo+ICsJc25wcmludGYobmFtZSwgTUFYX05BTUVfTEVOLCAic21iZF8lcCIsIGluZm8pOw0K
+PiArCWluZm8tPndvcmtxdWV1ZSA9IGNyZWF0ZV93b3JrcXVldWUobmFtZSk7DQo+ICsJaWYgKCFp
+bmZvLT53b3JrcXVldWUpDQo+ICsJCWdvdG8gb3V0NDsNCj4gKw0KPiArCXJjID0gYWxsb2NhdGVf
+cmVjZWl2ZV9idWZmZXJzKGluZm8sIGluZm8tPnJlY2VpdmVfY3JlZGl0X21heCk7DQo+ICsJaWYg
+KHJjKSB7DQo+ICsJCWxvZ19yZG1hX2V2ZW50KEVSUiwgImZhaWxlZCB0byBhbGxvY2F0ZSByZWNl
+aXZlIGJ1ZmZlcnNcbiIpOw0KPiArCQlnb3RvIG91dDU7DQo+ICsJfQ0KPiArDQo+ICsJcmV0dXJu
+IDA7DQo+ICsNCj4gK291dDU6DQo+ICsJZGVzdHJveV93b3JrcXVldWUoaW5mby0+d29ya3F1ZXVl
+KTsNCj4gK291dDQ6DQo+ICsJbWVtcG9vbF9kZXN0cm95KGluZm8tPnJlc3BvbnNlX21lbXBvb2wp
+Ow0KPiArb3V0MzoNCj4gKwlrbWVtX2NhY2hlX2Rlc3Ryb3koaW5mby0+cmVzcG9uc2VfY2FjaGUp
+Ow0KPiArb3V0MjoNCj4gKwltZW1wb29sX2Rlc3Ryb3koaW5mby0+cmVxdWVzdF9tZW1wb29sKTsN
+Cj4gK291dDE6DQo+ICsJa21lbV9jYWNoZV9kZXN0cm95KGluZm8tPnJlcXVlc3RfY2FjaGUpOw0K
+PiArCXJldHVybiAtRU5PTUVNOw0KPiArfQ0KPiArDQo+ICsvKiBDcmVhdGUgYSBTTUJEIGNvbm5l
+Y3Rpb24sIGNhbGxlZCBieSB1cHBlciBsYXllciAqLw0KPiArc3RydWN0IHNtYmRfY29ubmVjdGlv
+biAqX3NtYmRfZ2V0X2Nvbm5lY3Rpb24oDQo+ICsJc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2Vy
+dmVyLCBzdHJ1Y3Qgc29ja2FkZHIgKmRzdGFkZHIsIGludCBwb3J0KQ0KPiArew0KPiArCWludCBy
+YzsNCj4gKwlzdHJ1Y3Qgc21iZF9jb25uZWN0aW9uICppbmZvOw0KPiArCXN0cnVjdCByZG1hX2Nv
+bm5fcGFyYW0gY29ubl9wYXJhbTsNCj4gKwlzdHJ1Y3QgaWJfcXBfaW5pdF9hdHRyIHFwX2F0dHI7
+DQo+ICsJc3RydWN0IHNvY2thZGRyX2luICphZGRyX2luID0gKHN0cnVjdCBzb2NrYWRkcl9pbiAq
+KSBkc3RhZGRyOw0KPiArDQo+ICsJaW5mbyA9IGt6YWxsb2Moc2l6ZW9mKHN0cnVjdCBzbWJkX2Nv
+bm5lY3Rpb24pLCBHRlBfS0VSTkVMKTsNCj4gKwlpZiAoIWluZm8pDQo+ICsJCXJldHVybiBOVUxM
+Ow0KPiArDQo+ICsJaW5mby0+dHJhbnNwb3J0X3N0YXR1cyA9IFNNQkRfQ09OTkVDVElORzsNCj4g
+KwlyYyA9IHNtYmRfaWFfb3BlbihpbmZvLCBkc3RhZGRyLCBwb3J0KTsNCj4gKwlpZiAocmMpIHsN
+Cj4gKwkJbG9nX3JkbWFfZXZlbnQoSU5GTywgInNtYmRfaWFfb3BlbiByYz0lZFxuIiwgcmMpOw0K
+PiArCQlnb3RvIGNyZWF0ZV9pZF9mYWlsZWQ7DQo+ICsJfQ0KPiArDQo+ICsJaWYgKHNtYmRfc2Vu
+ZF9jcmVkaXRfdGFyZ2V0ID4gaW5mby0+aWQtPmRldmljZS0+YXR0cnMubWF4X2NxZSB8fA0KPiAr
+CSAgICBzbWJkX3NlbmRfY3JlZGl0X3RhcmdldCA+IGluZm8tPmlkLT5kZXZpY2UtPmF0dHJzLm1h
+eF9xcF93cikgew0KPiArCQlsb2dfcmRtYV9ldmVudChFUlIsDQo+ICsJCQkiY29uc2lkZXIgbG93
+ZXJpbmcgc2VuZF9jcmVkaXRfdGFyZ2V0ID0gJWQuICINCj4gKwkJCSJQb3NzaWJsZSBDUUUgb3Zl
+cnJ1biwgZGV2aWNlICINCj4gKwkJCSJyZXBvcnRpbmcgbWF4X2NwZSAlZCBtYXhfcXBfd3IgJWRc
+biIsDQo+ICsJCQlzbWJkX3NlbmRfY3JlZGl0X3RhcmdldCwNCj4gKwkJCWluZm8tPmlkLT5kZXZp
+Y2UtPmF0dHJzLm1heF9jcWUsDQo+ICsJCQlpbmZvLT5pZC0+ZGV2aWNlLT5hdHRycy5tYXhfcXBf
+d3IpOw0KPiArCQlnb3RvIGNvbmZpZ19mYWlsZWQ7DQo+ICsJfQ0KPiArDQo+ICsJaWYgKHNtYmRf
+cmVjZWl2ZV9jcmVkaXRfbWF4ID4gaW5mby0+aWQtPmRldmljZS0+YXR0cnMubWF4X2NxZSB8fA0K
+PiArCSAgICBzbWJkX3JlY2VpdmVfY3JlZGl0X21heCA+IGluZm8tPmlkLT5kZXZpY2UtPmF0dHJz
+Lm1heF9xcF93cikNCj4gew0KPiArCQlsb2dfcmRtYV9ldmVudChFUlIsDQo+ICsJCQkiY29uc2lk
+ZXIgbG93ZXJpbmcgcmVjZWl2ZV9jcmVkaXRfbWF4ID0gJWQuICINCj4gKwkJCSJQb3NzaWJsZSBD
+UUUgb3ZlcnJ1biwgZGV2aWNlICINCj4gKwkJCSJyZXBvcnRpbmcgbWF4X2NwZSAlZCBtYXhfcXBf
+d3IgJWRcbiIsDQo+ICsJCQlzbWJkX3JlY2VpdmVfY3JlZGl0X21heCwNCj4gKwkJCWluZm8tPmlk
+LT5kZXZpY2UtPmF0dHJzLm1heF9jcWUsDQo+ICsJCQlpbmZvLT5pZC0+ZGV2aWNlLT5hdHRycy5t
+YXhfcXBfd3IpOw0KPiArCQlnb3RvIGNvbmZpZ19mYWlsZWQ7DQo+ICsJfQ0KPiArDQo+ICsJaW5m
+by0+cmVjZWl2ZV9jcmVkaXRfbWF4ID0gc21iZF9yZWNlaXZlX2NyZWRpdF9tYXg7DQo+ICsJaW5m
+by0+c2VuZF9jcmVkaXRfdGFyZ2V0ID0gc21iZF9zZW5kX2NyZWRpdF90YXJnZXQ7DQo+ICsJaW5m
+by0+bWF4X3NlbmRfc2l6ZSA9IHNtYmRfbWF4X3NlbmRfc2l6ZTsNCj4gKwlpbmZvLT5tYXhfZnJh
+Z21lbnRlZF9yZWN2X3NpemUgPQ0KPiBzbWJkX21heF9mcmFnbWVudGVkX3JlY3Zfc2l6ZTsNCj4g
+KwlpbmZvLT5tYXhfcmVjZWl2ZV9zaXplID0gc21iZF9tYXhfcmVjZWl2ZV9zaXplOw0KPiArCWlu
+Zm8tPmtlZXBfYWxpdmVfaW50ZXJ2YWwgPSBzbWJkX2tlZXBfYWxpdmVfaW50ZXJ2YWw7DQo+ICsN
+Cj4gKwlpZiAoU01CRElSRUNUX01BWF9TR0UgPiBpbmZvLT5pZC0+ZGV2aWNlLT5hdHRycy5tYXhf
+c2dlKSB7DQo+ICsJCWxvZ19yZG1hX2V2ZW50KEVSUiwgIndhcm5pbmc6IGRldmljZSBtYXhfc2dl
+ID0gJWQgdG9vDQo+IHNtYWxsXG4iLA0KPiArCQkJaW5mby0+aWQtPmRldmljZS0+YXR0cnMubWF4
+X3NnZSk7DQo+ICsJCWxvZ19yZG1hX2V2ZW50KEVSUiwgIlF1ZXVlIFBhaXIgY3JlYXRpb24gbWF5
+IGZhaWxcbiIpOw0KPiArCX0NCj4gKw0KPiArCWluZm8tPnNlbmRfY3EgPSBOVUxMOw0KPiArCWlu
+Zm8tPnJlY3ZfY3EgPSBOVUxMOw0KPiArCWluZm8tPnNlbmRfY3EgPSBpYl9hbGxvY19jcShpbmZv
+LT5pZC0+ZGV2aWNlLCBpbmZvLA0KPiArCQkJaW5mby0+c2VuZF9jcmVkaXRfdGFyZ2V0LCAwLCBJ
+Ql9QT0xMX1NPRlRJUlEpOw0KPiArCWlmIChJU19FUlIoaW5mby0+c2VuZF9jcSkpIHsNCj4gKwkJ
+aW5mby0+c2VuZF9jcSA9IE5VTEw7DQo+ICsJCWdvdG8gYWxsb2NfY3FfZmFpbGVkOw0KPiArCX0N
+Cj4gKw0KPiArCWluZm8tPnJlY3ZfY3EgPSBpYl9hbGxvY19jcShpbmZvLT5pZC0+ZGV2aWNlLCBp
+bmZvLA0KPiArCQkJaW5mby0+cmVjZWl2ZV9jcmVkaXRfbWF4LCAwLCBJQl9QT0xMX1NPRlRJUlEp
+Ow0KPiArCWlmIChJU19FUlIoaW5mby0+cmVjdl9jcSkpIHsNCj4gKwkJaW5mby0+cmVjdl9jcSA9
+IE5VTEw7DQo+ICsJCWdvdG8gYWxsb2NfY3FfZmFpbGVkOw0KPiArCX0NCj4gKw0KPiArCW1lbXNl
+dCgmcXBfYXR0ciwgMCwgc2l6ZW9mKHFwX2F0dHIpKTsNCj4gKwlxcF9hdHRyLmV2ZW50X2hhbmRs
+ZXIgPSBzbWJkX3FwX2FzeW5jX2Vycm9yX3VwY2FsbDsNCj4gKwlxcF9hdHRyLnFwX2NvbnRleHQg
+PSBpbmZvOw0KPiArCXFwX2F0dHIuY2FwLm1heF9zZW5kX3dyID0gaW5mby0+c2VuZF9jcmVkaXRf
+dGFyZ2V0Ow0KPiArCXFwX2F0dHIuY2FwLm1heF9yZWN2X3dyID0gaW5mby0+cmVjZWl2ZV9jcmVk
+aXRfbWF4Ow0KPiArCXFwX2F0dHIuY2FwLm1heF9zZW5kX3NnZSA9IFNNQkRJUkVDVF9NQVhfU0dF
+Ow0KPiArCXFwX2F0dHIuY2FwLm1heF9yZWN2X3NnZSA9IFNNQkRJUkVDVF9NQVhfU0dFOw0KPiAr
+CXFwX2F0dHIuY2FwLm1heF9pbmxpbmVfZGF0YSA9IDA7DQo+ICsJcXBfYXR0ci5zcV9zaWdfdHlw
+ZSA9IElCX1NJR05BTF9SRVFfV1I7DQo+ICsJcXBfYXR0ci5xcF90eXBlID0gSUJfUVBUX1JDOw0K
+PiArCXFwX2F0dHIuc2VuZF9jcSA9IGluZm8tPnNlbmRfY3E7DQo+ICsJcXBfYXR0ci5yZWN2X2Nx
+ID0gaW5mby0+cmVjdl9jcTsNCj4gKwlxcF9hdHRyLnBvcnRfbnVtID0gfjA7DQo+ICsNCj4gKwly
+YyA9IHJkbWFfY3JlYXRlX3FwKGluZm8tPmlkLCBpbmZvLT5wZCwgJnFwX2F0dHIpOw0KPiArCWlm
+IChyYykgew0KPiArCQlsb2dfcmRtYV9ldmVudChFUlIsICJyZG1hX2NyZWF0ZV9xcCBmYWlsZWQg
+JWlcbiIsIHJjKTsNCj4gKwkJZ290byBjcmVhdGVfcXBfZmFpbGVkOw0KPiArCX0NCj4gKw0KPiAr
+CW1lbXNldCgmY29ubl9wYXJhbSwgMCwgc2l6ZW9mKGNvbm5fcGFyYW0pKTsNCj4gKwljb25uX3Bh
+cmFtLmluaXRpYXRvcl9kZXB0aCA9IDA7DQo+ICsNCj4gKwljb25uX3BhcmFtLnJldHJ5X2NvdW50
+ID0gU01CRF9DTV9SRVRSWTsNCj4gKwljb25uX3BhcmFtLnJucl9yZXRyeV9jb3VudCA9IFNNQkRf
+Q01fUk5SX1JFVFJZOw0KPiArCWNvbm5fcGFyYW0uZmxvd19jb250cm9sID0gMDsNCj4gKwlpbml0
+X3dhaXRxdWV1ZV9oZWFkKCZpbmZvLT53YWl0X2Rlc3Ryb3kpOw0KPiArDQo+ICsJbG9nX3JkbWFf
+ZXZlbnQoSU5GTywgImNvbm5lY3RpbmcgdG8gSVAgJXBJNCBwb3J0ICVkXG4iLA0KPiArCQkmYWRk
+cl9pbi0+c2luX2FkZHIsIHBvcnQpOw0KPiArDQo+ICsJaW5pdF93YWl0cXVldWVfaGVhZCgmaW5m
+by0+Y29ubl93YWl0KTsNCj4gKwlyYyA9IHJkbWFfY29ubmVjdChpbmZvLT5pZCwgJmNvbm5fcGFy
+YW0pOw0KPiArCWlmIChyYykgew0KPiArCQlsb2dfcmRtYV9ldmVudChFUlIsICJyZG1hX2Nvbm5l
+Y3QoKSBmYWlsZWQgd2l0aCAlaVxuIiwgcmMpOw0KPiArCQlnb3RvIHJkbWFfY29ubmVjdF9mYWls
+ZWQ7DQo+ICsJfQ0KPiArDQo+ICsJd2FpdF9ldmVudF9pbnRlcnJ1cHRpYmxlKA0KPiArCQlpbmZv
+LT5jb25uX3dhaXQsIGluZm8tPnRyYW5zcG9ydF9zdGF0dXMgIT0NCj4gU01CRF9DT05ORUNUSU5H
+KTsNCj4gKw0KPiArCWlmIChpbmZvLT50cmFuc3BvcnRfc3RhdHVzICE9IFNNQkRfQ09OTkVDVEVE
+KSB7DQo+ICsJCWxvZ19yZG1hX2V2ZW50KEVSUiwgInJkbWFfY29ubmVjdCBmYWlsZWQgcG9ydD0l
+ZFxuIiwNCj4gcG9ydCk7DQo+ICsJCWdvdG8gcmRtYV9jb25uZWN0X2ZhaWxlZDsNCj4gKwl9DQo+
+ICsNCj4gKwlsb2dfcmRtYV9ldmVudChJTkZPLCAicmRtYV9jb25uZWN0IGNvbm5lY3RlZFxuIik7
+DQo+ICsNCj4gKwlyYyA9IGFsbG9jYXRlX2NhY2hlc19hbmRfd29ya3F1ZXVlKGluZm8pOw0KPiAr
+CWlmIChyYykgew0KPiArCQlsb2dfcmRtYV9ldmVudChFUlIsICJjYWNoZSBhbGxvY2F0aW9uIGZh
+aWxlZFxuIik7DQo+ICsJCWdvdG8gYWxsb2NhdGVfY2FjaGVfZmFpbGVkOw0KPiArCX0NCj4gKw0K
+PiArCWluaXRfd2FpdHF1ZXVlX2hlYWQoJmluZm8tPndhaXRfc2VuZF9xdWV1ZSk7DQo+ICsJaW5p
+dF93YWl0cXVldWVfaGVhZCgmaW5mby0+d2FpdF9yZWFzc2VtYmx5X3F1ZXVlKTsNCj4gKw0KPiAr
+CUlOSVRfREVMQVlFRF9XT1JLKCZpbmZvLT5pZGxlX3RpbWVyX3dvcmssDQo+IGlkbGVfY29ubmVj
+dGlvbl90aW1lcik7DQo+ICsJSU5JVF9ERUxBWUVEX1dPUksoJmluZm8tPnNlbmRfaW1tZWRpYXRl
+X3dvcmssDQo+IHNlbmRfaW1tZWRpYXRlX3dvcmspOw0KPiArCXF1ZXVlX2RlbGF5ZWRfd29yayhp
+bmZvLT53b3JrcXVldWUsICZpbmZvLT5pZGxlX3RpbWVyX3dvcmssDQo+ICsJCWluZm8tPmtlZXBf
+YWxpdmVfaW50ZXJ2YWwqSFopOw0KPiArDQo+ICsJaW5pdF93YWl0cXVldWVfaGVhZCgmaW5mby0+
+d2FpdF9zZW5kX3BlbmRpbmcpOw0KPiArCWF0b21pY19zZXQoJmluZm8tPnNlbmRfcGVuZGluZywg
+MCk7DQo+ICsNCj4gKwlpbml0X3dhaXRxdWV1ZV9oZWFkKCZpbmZvLT53YWl0X3NlbmRfcGF5bG9h
+ZF9wZW5kaW5nKTsNCj4gKwlhdG9taWNfc2V0KCZpbmZvLT5zZW5kX3BheWxvYWRfcGVuZGluZywg
+MCk7DQo+ICsNCj4gKwlJTklUX1dPUksoJmluZm8tPmRpc2Nvbm5lY3Rfd29yaywNCj4gc21iZF9k
+aXNjb25uZWN0X3JkbWFfd29yayk7DQo+ICsJSU5JVF9XT1JLKCZpbmZvLT5kZXN0cm95X3dvcmss
+IHNtYmRfZGVzdHJveV9yZG1hX3dvcmspOw0KPiArCUlOSVRfV09SSygmaW5mby0+cmVjdl9kb25l
+X3dvcmssIHNtYmRfcmVjdl9kb25lX3dvcmspOw0KPiArCUlOSVRfV09SSygmaW5mby0+cG9zdF9z
+ZW5kX2NyZWRpdHNfd29yaywNCj4gc21iZF9wb3N0X3NlbmRfY3JlZGl0cyk7DQo+ICsJaW5mby0+
+bmV3X2NyZWRpdHNfb2ZmZXJlZCA9IDA7DQo+ICsJc3Bpbl9sb2NrX2luaXQoJmluZm8tPmxvY2tf
+bmV3X2NyZWRpdHNfb2ZmZXJlZCk7DQo+ICsNCj4gKwlyYyA9IHNtYmRfbmVnb3RpYXRlKGluZm8p
+Ow0KPiArCWlmIChyYykgew0KPiArCQlsb2dfcmRtYV9ldmVudChFUlIsICJzbWJkX25lZ290aWF0
+ZSByYz0lZFxuIiwgcmMpOw0KPiArCQlnb3RvIG5lZ290aWF0aW9uX2ZhaWxlZDsNCj4gKwl9DQo+
+ICsNCj4gKwlyZXR1cm4gaW5mbzsNCj4gKw0KPiArbmVnb3RpYXRpb25fZmFpbGVkOg0KPiArCWNh
+bmNlbF9kZWxheWVkX3dvcmtfc3luYygmaW5mby0+aWRsZV90aW1lcl93b3JrKTsNCj4gKwlkZXN0
+cm95X2NhY2hlc19hbmRfd29ya3F1ZXVlKGluZm8pOw0KPiArCWluZm8tPnRyYW5zcG9ydF9zdGF0
+dXMgPSBTTUJEX05FR09USUFURV9GQUlMRUQ7DQo+ICsJaW5pdF93YWl0cXVldWVfaGVhZCgmaW5m
+by0+Y29ubl93YWl0KTsNCj4gKwlyZG1hX2Rpc2Nvbm5lY3QoaW5mby0+aWQpOw0KPiArCXdhaXRf
+ZXZlbnQoaW5mby0+Y29ubl93YWl0LA0KPiArCQlpbmZvLT50cmFuc3BvcnRfc3RhdHVzID09IFNN
+QkRfRElTQ09OTkVDVEVEKTsNCj4gKw0KPiArYWxsb2NhdGVfY2FjaGVfZmFpbGVkOg0KPiArcmRt
+YV9jb25uZWN0X2ZhaWxlZDoNCj4gKwlyZG1hX2Rlc3Ryb3lfcXAoaW5mby0+aWQpOw0KPiArDQo+
+ICtjcmVhdGVfcXBfZmFpbGVkOg0KPiArYWxsb2NfY3FfZmFpbGVkOg0KPiArCWlmIChpbmZvLT5z
+ZW5kX2NxKQ0KPiArCQlpYl9mcmVlX2NxKGluZm8tPnNlbmRfY3EpOw0KPiArCWlmIChpbmZvLT5y
+ZWN2X2NxKQ0KPiArCQlpYl9mcmVlX2NxKGluZm8tPnJlY3ZfY3EpOw0KPiArDQo+ICtjb25maWdf
+ZmFpbGVkOg0KPiArCWliX2RlYWxsb2NfcGQoaW5mby0+cGQpOw0KPiArCXJkbWFfZGVzdHJveV9p
+ZChpbmZvLT5pZCk7DQo+ICsNCj4gK2NyZWF0ZV9pZF9mYWlsZWQ6DQo+ICsJa2ZyZWUoaW5mbyk7
+DQo+ICsJcmV0dXJuIE5VTEw7DQo+ICt9DQo+IGRpZmYgLS1naXQgYS9mcy9jaWZzL3NtYmRpcmVj
+dC5oIGIvZnMvY2lmcy9zbWJkaXJlY3QuaA0KPiBpbmRleCBjNTVmMjhiLi4zNWJjMjViIDEwMDY0
+NA0KPiAtLS0gYS9mcy9jaWZzL3NtYmRpcmVjdC5oDQo+ICsrKyBiL2ZzL2NpZnMvc21iZGlyZWN0
+LmgNCj4gQEAgLTE2LDYgKzE2LDI4NiBAQA0KPiAgI2lmbmRlZiBfU01CRElSRUNUX0gNCj4gICNk
+ZWZpbmUgX1NNQkRJUkVDVF9IDQo+IA0KPiArI2lmZGVmIENPTkZJR19DSUZTX1NNQl9ESVJFQ1QN
+Cj4gKyNkZWZpbmUgY2lmc19yZG1hX2VuYWJsZWQoc2VydmVyKQkoKHNlcnZlciktPnJkbWEpDQo+
+ICsNCj4gKyNpbmNsdWRlICJjaWZzZ2xvYi5oIg0KPiArI2luY2x1ZGUgPHJkbWEvaWJfdmVyYnMu
+aD4NCj4gKyNpbmNsdWRlIDxyZG1hL3JkbWFfY20uaD4NCj4gKyNpbmNsdWRlIDxsaW51eC9tZW1w
+b29sLmg+DQo+ICsNCj4gK2VudW0ga2VlcF9hbGl2ZV9zdGF0dXMgew0KPiArCUtFRVBfQUxJVkVf
+Tk9ORSwNCj4gKwlLRUVQX0FMSVZFX1BFTkRJTkcsDQo+ICsJS0VFUF9BTElWRV9TRU5ULA0KPiAr
+fTsNCj4gKw0KPiArZW51bSBzbWJkX2Nvbm5lY3Rpb25fc3RhdHVzIHsNCj4gKwlTTUJEX0NSRUFU
+RUQsDQo+ICsJU01CRF9DT05ORUNUSU5HLA0KPiArCVNNQkRfQ09OTkVDVEVELA0KPiArCVNNQkRf
+TkVHT1RJQVRFX0ZBSUxFRCwNCj4gKwlTTUJEX0RJU0NPTk5FQ1RJTkcsDQo+ICsJU01CRF9ESVND
+T05ORUNURUQsDQo+ICsJU01CRF9ERVNUUk9ZRUQNCj4gK307DQo+ICsNCj4gKy8qDQo+ICsgKiBU
+aGUgY29udGV4dCBmb3IgdGhlIFNNQkRpcmVjdCB0cmFuc3BvcnQNCj4gKyAqIEV2ZXJ5dGhpbmcg
+cmVsYXRlZCB0byB0aGUgdHJhbnNwb3J0IGlzIGhlcmUuIEl0IGhhcyBzZXZlcmFsIGxvZ2ljYWwg
+cGFydHMNCj4gKyAqIDEuIFJETUEgcmVsYXRlZCBzdHJ1Y3R1cmVzDQo+ICsgKiAyLiBTTUJEaXJl
+Y3QgY29ubmVjdGlvbiBwYXJhbWV0ZXJzDQo+ICsgKiAzLiBNZW1vcnkgcmVnaXN0cmF0aW9ucw0K
+PiArICogNC4gUmVjZWl2ZSBhbmQgcmVhc3NlbWJseSBxdWV1ZXMgZm9yIGRhdGEgcmVjZWl2ZSBw
+YXRoDQo+ICsgKiA1LiBtZW1wb29scyBmb3IgYWxsb2NhdGluZyBwYWNrZXRzDQo+ICsgKi8NCj4g
+K3N0cnVjdCBzbWJkX2Nvbm5lY3Rpb24gew0KPiArCWVudW0gc21iZF9jb25uZWN0aW9uX3N0YXR1
+cyB0cmFuc3BvcnRfc3RhdHVzOw0KPiArDQo+ICsJLyogUkRNQSByZWxhdGVkICovDQo+ICsJc3Ry
+dWN0IHJkbWFfY21faWQgKmlkOw0KPiArCXN0cnVjdCBpYl9xcF9pbml0X2F0dHIgcXBfYXR0cjsN
+Cj4gKwlzdHJ1Y3QgaWJfcGQgKnBkOw0KPiArCXN0cnVjdCBpYl9jcSAqc2VuZF9jcSwgKnJlY3Zf
+Y3E7DQo+ICsJc3RydWN0IGliX2RldmljZV9hdHRyIGRldl9hdHRyOw0KPiArCWludCByaV9yYzsN
+Cj4gKwlzdHJ1Y3QgY29tcGxldGlvbiByaV9kb25lOw0KPiArCXdhaXRfcXVldWVfaGVhZF90IGNv
+bm5fd2FpdDsNCj4gKwl3YWl0X3F1ZXVlX2hlYWRfdCB3YWl0X2Rlc3Ryb3k7DQo+ICsNCj4gKwlz
+dHJ1Y3QgY29tcGxldGlvbiBuZWdvdGlhdGVfY29tcGxldGlvbjsNCj4gKwlib29sIG5lZ290aWF0
+ZV9kb25lOw0KPiArDQo+ICsJc3RydWN0IHdvcmtfc3RydWN0IGRlc3Ryb3lfd29yazsNCj4gKwlz
+dHJ1Y3Qgd29ya19zdHJ1Y3QgZGlzY29ubmVjdF93b3JrOw0KPiArCXN0cnVjdCB3b3JrX3N0cnVj
+dCByZWN2X2RvbmVfd29yazsNCj4gKwlzdHJ1Y3Qgd29ya19zdHJ1Y3QgcG9zdF9zZW5kX2NyZWRp
+dHNfd29yazsNCj4gKw0KPiArCXNwaW5sb2NrX3QgbG9ja19uZXdfY3JlZGl0c19vZmZlcmVkOw0K
+PiArCWludCBuZXdfY3JlZGl0c19vZmZlcmVkOw0KPiArDQo+ICsJLyogQ29ubmVjdGlvbiBwYXJh
+bWV0ZXJzIGRlZmluZWQgaW4gW01TLVNNQkRdIDMuMS4xLjEgKi8NCj4gKwlpbnQgcmVjZWl2ZV9j
+cmVkaXRfbWF4Ow0KPiArCWludCBzZW5kX2NyZWRpdF90YXJnZXQ7DQo+ICsJaW50IG1heF9zZW5k
+X3NpemU7DQo+ICsJaW50IG1heF9mcmFnbWVudGVkX3JlY3Zfc2l6ZTsNCj4gKwlpbnQgbWF4X2Zy
+YWdtZW50ZWRfc2VuZF9zaXplOw0KPiArCWludCBtYXhfcmVjZWl2ZV9zaXplOw0KPiArCWludCBr
+ZWVwX2FsaXZlX2ludGVydmFsOw0KPiArCWludCBtYXhfcmVhZHdyaXRlX3NpemU7DQo+ICsJZW51
+bSBrZWVwX2FsaXZlX3N0YXR1cyBrZWVwX2FsaXZlX3JlcXVlc3RlZDsNCj4gKwlpbnQgcHJvdG9j
+b2w7DQo+ICsJYXRvbWljX3Qgc2VuZF9jcmVkaXRzOw0KPiArCWF0b21pY190IHJlY2VpdmVfY3Jl
+ZGl0czsNCj4gKwlpbnQgcmVjZWl2ZV9jcmVkaXRfdGFyZ2V0Ow0KPiArCWludCBmcmFnbWVudF9y
+ZWFzc2VtYmx5X3JlbWFpbmluZzsNCj4gKw0KPiArCS8qIEFjdGl2aXR5IGFjY291dG5pbmcgKi8N
+Cj4gKw0KPiArCWF0b21pY190IHNlbmRfcGVuZGluZzsNCj4gKwl3YWl0X3F1ZXVlX2hlYWRfdCB3
+YWl0X3NlbmRfcGVuZGluZzsNCj4gKwlhdG9taWNfdCBzZW5kX3BheWxvYWRfcGVuZGluZzsNCj4g
+Kwl3YWl0X3F1ZXVlX2hlYWRfdCB3YWl0X3NlbmRfcGF5bG9hZF9wZW5kaW5nOw0KPiArDQo+ICsJ
+LyogUmVjZWl2ZSBxdWV1ZSAqLw0KPiArCXN0cnVjdCBsaXN0X2hlYWQgcmVjZWl2ZV9xdWV1ZTsN
+Cj4gKwlpbnQgY291bnRfcmVjZWl2ZV9xdWV1ZTsNCj4gKwlzcGlubG9ja190IHJlY2VpdmVfcXVl
+dWVfbG9jazsNCj4gKw0KPiArCXN0cnVjdCBsaXN0X2hlYWQgZW1wdHlfcGFja2V0X3F1ZXVlOw0K
+PiArCWludCBjb3VudF9lbXB0eV9wYWNrZXRfcXVldWU7DQo+ICsJc3BpbmxvY2tfdCBlbXB0eV9w
+YWNrZXRfcXVldWVfbG9jazsNCj4gKw0KPiArCXdhaXRfcXVldWVfaGVhZF90IHdhaXRfcmVjZWl2
+ZV9xdWV1ZXM7DQo+ICsNCj4gKwkvKiBSZWFzc2VtYmx5IHF1ZXVlICovDQo+ICsJc3RydWN0IGxp
+c3RfaGVhZCByZWFzc2VtYmx5X3F1ZXVlOw0KPiArCXNwaW5sb2NrX3QgcmVhc3NlbWJseV9xdWV1
+ZV9sb2NrOw0KPiArCXdhaXRfcXVldWVfaGVhZF90IHdhaXRfcmVhc3NlbWJseV9xdWV1ZTsNCj4g
+Kw0KPiArCS8qIHRvdGFsIGRhdGEgbGVuZ3RoIG9mIHJlYXNzZW1ibHkgcXVldWUgKi8NCj4gKwlp
+bnQgcmVhc3NlbWJseV9kYXRhX2xlbmd0aDsNCj4gKwlpbnQgcmVhc3NlbWJseV9xdWV1ZV9sZW5n
+dGg7DQo+ICsJLyogdGhlIG9mZnNldCB0byBmaXJzdCBidWZmZXIgaW4gcmVhc3NlbWJseSBxdWV1
+ZSAqLw0KPiArCWludCBmaXJzdF9lbnRyeV9vZmZzZXQ7DQo+ICsNCj4gKwlib29sIHNlbmRfaW1t
+ZWRpYXRlOw0KPiArDQo+ICsJd2FpdF9xdWV1ZV9oZWFkX3Qgd2FpdF9zZW5kX3F1ZXVlOw0KPiAr
+DQo+ICsJLyoNCj4gKwkgKiBJbmRpY2F0ZSBpZiB3ZSBoYXZlIHJlY2VpdmVkIGEgZnVsbCBwYWNr
+ZXQgb24gdGhlIGNvbm5lY3Rpb24NCj4gKwkgKiBUaGlzIGlzIHVzZWQgdG8gaWRlbnRpZnkgdGhl
+IGZpcnN0IFNNQkQgcGFja2V0IG9mIGEgYXNzZW1ibGVkDQo+ICsJICogcGF5bG9hZCAoU01CIHBh
+Y2tldCkgaW4gcmVhc3NlbWJseSBxdWV1ZSBzbyB3ZSBjYW4gcmV0dXJuIGENCj4gKwkgKiBSRkMx
+MDAyIGxlbmd0aCB0byB1cHBlciBsYXllciB0byBpbmRpY2F0ZSB0aGUgbGVuZ3RoIG9mIHRoZSBT
+TUINCj4gKwkgKiBwYWNrZXQgcmVjZWl2ZWQNCj4gKwkgKi8NCj4gKwlib29sIGZ1bGxfcGFja2V0
+X3JlY2VpdmVkOw0KPiArDQo+ICsJc3RydWN0IHdvcmtxdWV1ZV9zdHJ1Y3QgKndvcmtxdWV1ZTsN
+Cj4gKwlzdHJ1Y3QgZGVsYXllZF93b3JrIGlkbGVfdGltZXJfd29yazsNCj4gKwlzdHJ1Y3QgZGVs
+YXllZF93b3JrIHNlbmRfaW1tZWRpYXRlX3dvcms7DQo+ICsNCj4gKwkvKiBNZW1vcnkgcG9vbCBm
+b3IgcHJlYWxsb2NhdGluZyBidWZmZXJzICovDQo+ICsJLyogcmVxdWVzdCBwb29sIGZvciBSRE1B
+IHNlbmQgKi8NCj4gKwlzdHJ1Y3Qga21lbV9jYWNoZSAqcmVxdWVzdF9jYWNoZTsNCj4gKwltZW1w
+b29sX3QgKnJlcXVlc3RfbWVtcG9vbDsNCj4gKw0KPiArCS8qIHJlc3BvbnNlIHBvb2wgZm9yIFJE
+TUEgcmVjZWl2ZSAqLw0KPiArCXN0cnVjdCBrbWVtX2NhY2hlICpyZXNwb25zZV9jYWNoZTsNCj4g
+KwltZW1wb29sX3QgKnJlc3BvbnNlX21lbXBvb2w7DQo+ICsNCj4gKwkvKiBmb3IgZGVidWcgcHVy
+cG9zZXMgKi8NCj4gKwl1bnNpZ25lZCBpbnQgY291bnRfZ2V0X3JlY2VpdmVfYnVmZmVyOw0KPiAr
+CXVuc2lnbmVkIGludCBjb3VudF9wdXRfcmVjZWl2ZV9idWZmZXI7DQo+ICsJdW5zaWduZWQgaW50
+IGNvdW50X3JlYXNzZW1ibHlfcXVldWU7DQo+ICsJdW5zaWduZWQgaW50IGNvdW50X2VucXVldWVf
+cmVhc3NlbWJseV9xdWV1ZTsNCj4gKwl1bnNpZ25lZCBpbnQgY291bnRfZGVxdWV1ZV9yZWFzc2Vt
+Ymx5X3F1ZXVlOw0KPiArCXVuc2lnbmVkIGludCBjb3VudF9zZW5kX2VtcHR5Ow0KPiArfTsNCj4g
+Kw0KPiArZW51bSBzbWJkX21lc3NhZ2VfdHlwZSB7DQo+ICsJU01CRF9ORUdPVElBVEVfUkVTUCwN
+Cj4gKwlTTUJEX1RSQU5TRkVSX0RBVEEsDQo+ICt9Ow0KPiArDQo+ICsjZGVmaW5lIFNNQl9ESVJF
+Q1RfUkVTUE9OU0VfUkVRVUVTVEVEIDB4MDAwMQ0KPiArDQo+ICsvKiBTTUJEIG5lZ290aWF0aW9u
+IHJlcXVlc3QgcGFja2V0IFtNUy1TTUJEXSAyLjIuMSAqLw0KPiArc3RydWN0IHNtYmRfbmVnb3Rp
+YXRlX3JlcSB7DQo+ICsJX19sZTE2IG1pbl92ZXJzaW9uOw0KPiArCV9fbGUxNiBtYXhfdmVyc2lv
+bjsNCj4gKwlfX2xlMTYgcmVzZXJ2ZWQ7DQo+ICsJX19sZTE2IGNyZWRpdHNfcmVxdWVzdGVkOw0K
+PiArCV9fbGUzMiBwcmVmZXJyZWRfc2VuZF9zaXplOw0KPiArCV9fbGUzMiBtYXhfcmVjZWl2ZV9z
+aXplOw0KPiArCV9fbGUzMiBtYXhfZnJhZ21lbnRlZF9zaXplOw0KPiArfSBfX3BhY2tlZDsNCj4g
+Kw0KPiArLyogU01CRCBuZWdvdGlhdGlvbiByZXNwb25zZSBwYWNrZXQgW01TLVNNQkRdIDIuMi4y
+ICovDQo+ICtzdHJ1Y3Qgc21iZF9uZWdvdGlhdGVfcmVzcCB7DQo+ICsJX19sZTE2IG1pbl92ZXJz
+aW9uOw0KPiArCV9fbGUxNiBtYXhfdmVyc2lvbjsNCj4gKwlfX2xlMTYgbmVnb3RpYXRlZF92ZXJz
+aW9uOw0KPiArCV9fbGUxNiByZXNlcnZlZDsNCj4gKwlfX2xlMTYgY3JlZGl0c19yZXF1ZXN0ZWQ7
+DQo+ICsJX19sZTE2IGNyZWRpdHNfZ3JhbnRlZDsNCj4gKwlfX2xlMzIgc3RhdHVzOw0KPiArCV9f
+bGUzMiBtYXhfcmVhZHdyaXRlX3NpemU7DQo+ICsJX19sZTMyIHByZWZlcnJlZF9zZW5kX3NpemU7
+DQo+ICsJX19sZTMyIG1heF9yZWNlaXZlX3NpemU7DQo+ICsJX19sZTMyIG1heF9mcmFnbWVudGVk
+X3NpemU7DQo+ICt9IF9fcGFja2VkOw0KPiArDQo+ICsvKiBTTUJEIGRhdGEgdHJhbnNmZXIgcGFj
+a2V0IHdpdGggcGF5bG9hZCBbTVMtU01CRF0gMi4yLjMgKi8NCj4gK3N0cnVjdCBzbWJkX2RhdGFf
+dHJhbnNmZXIgew0KPiArCV9fbGUxNiBjcmVkaXRzX3JlcXVlc3RlZDsNCj4gKwlfX2xlMTYgY3Jl
+ZGl0c19ncmFudGVkOw0KPiArCV9fbGUxNiBmbGFnczsNCj4gKwlfX2xlMTYgcmVzZXJ2ZWQ7DQo+
+ICsJX19sZTMyIHJlbWFpbmluZ19kYXRhX2xlbmd0aDsNCj4gKwlfX2xlMzIgZGF0YV9vZmZzZXQ7
+DQo+ICsJX19sZTMyIGRhdGFfbGVuZ3RoOw0KPiArCV9fbGUzMiBwYWRkaW5nOw0KPiArCV9fdTgg
+YnVmZmVyW107DQo+ICt9IF9fcGFja2VkOw0KPiArDQo+ICsvKiBUaGUgcGFja2V0IGZpZWxkcyBm
+b3IgYSByZWdpc3RlcmVkIFJETUEgYnVmZmVyICovDQo+ICtzdHJ1Y3Qgc21iZF9idWZmZXJfZGVz
+Y3JpcHRvcl92MSB7DQo+ICsJX19sZTY0IG9mZnNldDsNCj4gKwlfX2xlMzIgdG9rZW47DQo+ICsJ
+X19sZTMyIGxlbmd0aDsNCj4gK30gX19wYWNrZWQ7DQo+ICsNCj4gIC8qIERlZmF1bHQgbWF4aW11
+bSBudW1iZXIgb2YgU0dFcyBpbiBhIFJETUEgc2VuZC9yZWN2ICovDQo+ICAjZGVmaW5lIFNNQkRJ
+UkVDVF9NQVhfU0dFCTE2DQo+ICsvKiBUaGUgY29udGV4dCBmb3IgYSBTTUJEIHJlcXVlc3QgKi8N
+Cj4gK3N0cnVjdCBzbWJkX3JlcXVlc3Qgew0KPiArCXN0cnVjdCBzbWJkX2Nvbm5lY3Rpb24gKmlu
+Zm87DQo+ICsJc3RydWN0IGliX2NxZSBjcWU7DQo+ICsNCj4gKwkvKiB0cnVlIGlmIHRoaXMgcmVx
+dWVzdCBjYXJyaWVzIHVwcGVyIGxheWVyIHBheWxvYWQgKi8NCj4gKwlib29sIGhhc19wYXlsb2Fk
+Ow0KPiArDQo+ICsJLyogdGhlIFNHRSBlbnRyaWVzIGZvciB0aGlzIHBhY2tldCAqLw0KPiArCXN0
+cnVjdCBpYl9zZ2Ugc2dlW1NNQkRJUkVDVF9NQVhfU0dFXTsNCj4gKwlpbnQgbnVtX3NnZTsNCj4g
+Kw0KPiArCS8qIFNNQkQgcGFja2V0IGhlYWRlciBmb2xsb3dzIHRoaXMgc3RydWN0dXJlICovDQo+
+ICsJdTggcGFja2V0W107DQo+ICt9Ow0KPiArDQo+ICsvKiBUaGUgY29udGV4dCBmb3IgYSBTTUJE
+IHJlc3BvbnNlICovDQo+ICtzdHJ1Y3Qgc21iZF9yZXNwb25zZSB7DQo+ICsJc3RydWN0IHNtYmRf
+Y29ubmVjdGlvbiAqaW5mbzsNCj4gKwlzdHJ1Y3QgaWJfY3FlIGNxZTsNCj4gKwlzdHJ1Y3QgaWJf
+c2dlIHNnZTsNCj4gKw0KPiArCWVudW0gc21iZF9tZXNzYWdlX3R5cGUgdHlwZTsNCj4gKw0KPiAr
+CS8qIExpbmsgdG8gcmVjZWl2ZSBxdWV1ZSBvciByZWFzc2VtYmx5IHF1ZXVlICovDQo+ICsJc3Ry
+dWN0IGxpc3RfaGVhZCBsaXN0Ow0KPiArDQo+ICsJLyogSW5kaWNhdGUgaWYgdGhpcyBpcyB0aGUg
+MXN0IHBhY2tldCBvZiBhIHBheWxvYWQgKi8NCj4gKwlib29sIGZpcnN0X3NlZ21lbnQ7DQo+ICsN
+Cj4gKwkvKiBTTUJEIHBhY2tldCBoZWFkZXIgYW5kIHBheWxvYWQgZm9sbG93cyB0aGlzIHN0cnVj
+dHVyZSAqLw0KPiArCXU4IHBhY2tldFtdOw0KPiArfTsNCj4gKw0KPiArLyogQ3JlYXRlIGEgU01C
+RGlyZWN0IHNlc3Npb24gKi8NCj4gK3N0cnVjdCBzbWJkX2Nvbm5lY3Rpb24gKnNtYmRfZ2V0X2Nv
+bm5lY3Rpb24oDQo+ICsJc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyLCBzdHJ1Y3Qgc29j
+a2FkZHIgKmRzdGFkZHIpOw0KPiArDQo+ICsvKiBSZWNvbm5lY3QgU01CRGlyZWN0IHNlc3Npb24g
+Ki8NCj4gK2ludCBzbWJkX3JlY29ubmVjdChzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIp
+Ow0KPiArDQo+ICsvKiBEZXN0cm95IFNNQkRpcmVjdCBzZXNzaW9uICovDQo+ICt2b2lkIHNtYmRf
+ZGVzdHJveShzdHJ1Y3Qgc21iZF9jb25uZWN0aW9uICppbmZvKTsNCj4gKw0KPiArLyogSW50ZXJm
+YWNlIGZvciBjYXJyeWluZyB1cHBlciBsYXllciBJL08gdGhyb3VnaCBzZW5kL3JlY3YgKi8NCj4g
+K2ludCBzbWJkX3JlY3Yoc3RydWN0IHNtYmRfY29ubmVjdGlvbiAqaW5mbywgc3RydWN0IG1zZ2hk
+ciAqbXNnKTsNCj4gK2ludCBzbWJkX3NlbmQoc3RydWN0IHNtYmRfY29ubmVjdGlvbiAqaW5mbywg
+c3RydWN0IHNtYl9ycXN0ICpycXN0KTsNCj4gKw0KPiArZW51bSBtcl9zdGF0ZSB7DQo+ICsJTVJf
+UkVBRFksDQo+ICsJTVJfUkVHSVNURVJFRCwNCj4gKwlNUl9JTlZBTElEQVRFRCwNCj4gKwlNUl9F
+UlJPUg0KPiArfTsNCj4gKw0KPiArc3RydWN0IHNtYmRfbXIgew0KPiArCXN0cnVjdCBzbWJkX2Nv
+bm5lY3Rpb24JKmNvbm47DQo+ICsJc3RydWN0IGxpc3RfaGVhZAlsaXN0Ow0KPiArCWVudW0gbXJf
+c3RhdGUJCXN0YXRlOw0KPiArCXN0cnVjdCBpYl9tcgkJKm1yOw0KPiArCXN0cnVjdCBzY2F0dGVy
+bGlzdAkqc2dsOw0KPiArCWludAkJCXNnbF9jb3VudDsNCj4gKwllbnVtIGRtYV9kYXRhX2RpcmVj
+dGlvbglkaXI7DQo+ICsJdW5pb24gew0KPiArCQlzdHJ1Y3QgaWJfcmVnX3dyCXdyOw0KPiArCQlz
+dHJ1Y3QgaWJfc2VuZF93cglpbnZfd3I7DQo+ICsJfTsNCj4gKwlzdHJ1Y3QgaWJfY3FlCQljcWU7
+DQo+ICsJYm9vbAkJCW5lZWRfaW52YWxpZGF0ZTsNCj4gKwlzdHJ1Y3QgY29tcGxldGlvbglpbnZh
+bGlkYXRlX2RvbmU7DQo+ICt9Ow0KPiArDQo+ICsvKiBJbnRlcmZhY2VzIHRvIHJlZ2lzdGVyIGFu
+ZCBkZXJlZ2lzdGVyIE1SIGZvciBSRE1BIHJlYWQvd3JpdGUgKi8NCj4gK3N0cnVjdCBzbWJkX21y
+ICpzbWJkX3JlZ2lzdGVyX21yKA0KPiArCXN0cnVjdCBzbWJkX2Nvbm5lY3Rpb24gKmluZm8sIHN0
+cnVjdCBwYWdlICpwYWdlc1tdLCBpbnQgbnVtX3BhZ2VzLA0KPiArCWludCB0YWlsc3osIGJvb2wg
+d3JpdGluZywgYm9vbCBuZWVkX2ludmFsaWRhdGUpOw0KPiAraW50IHNtYmRfZGVyZWdpc3Rlcl9t
+cihzdHJ1Y3Qgc21iZF9tciAqbXIpOw0KPiArDQo+ICsjZWxzZQ0KPiArI2RlZmluZSBjaWZzX3Jk
+bWFfZW5hYmxlZChzZXJ2ZXIpCTANCj4gK3N0cnVjdCBzbWJkX2Nvbm5lY3Rpb257fTsNCj4gK3N0
+YXRpYyBpbmxpbmUgdm9pZCAqc21iZF9nZXRfY29ubmVjdGlvbigNCj4gKwlzdHJ1Y3QgVENQX1Nl
+cnZlcl9JbmZvICpzZXJ2ZXIsIHN0cnVjdCBzb2NrYWRkciAqZHN0YWRkcikge3JldHVybg0KPiBO
+VUxMO30NCj4gK3N0YXRpYyBpbmxpbmUgaW50IHNtYmRfcmVjb25uZWN0KHN0cnVjdCBUQ1BfU2Vy
+dmVyX0luZm8gKnNlcnZlcikge3JldHVybiAtDQo+IDE7fQ0KPiArc3RhdGljIGlubGluZSB2b2lk
+IHNtYmRfZGVzdHJveShzdHJ1Y3Qgc21iZF9jb25uZWN0aW9uICppbmZvKSB7fQ0KPiArc3RhdGlj
+IGlubGluZSBpbnQgc21iZF9yZWN2KHN0cnVjdCBzbWJkX2Nvbm5lY3Rpb24gKmluZm8sIHN0cnVj
+dCBtc2doZHINCj4gKm1zZykge3JldHVybiAtMTt9DQo+ICtzdGF0aWMgaW5saW5lIGludCBzbWJk
+X3NlbmQoc3RydWN0IHNtYmRfY29ubmVjdGlvbiAqaW5mbywgc3RydWN0IHNtYl9ycXN0DQo+ICpy
+cXN0KSB7cmV0dXJuIC0xO30NCj4gKyNlbmRpZg0KPiArDQo+ICAjZW5kaWYNCj4gLS0NCj4gMi43
+LjQNCj4gDQo+IC0tDQo+IFRvIHVuc3Vic2NyaWJlIGZyb20gdGhpcyBsaXN0OiBzZW5kIHRoZSBs
+aW5lICJ1bnN1YnNjcmliZSBsaW51eC1jaWZzIiBpbg0KPiB0aGUgYm9keSBvZiBhIG1lc3NhZ2Ug
+dG8gbWFqb3Jkb21vQHZnZXIua2VybmVsLm9yZw0KPiBNb3JlIG1ham9yZG9tbyBpbmZvIGF0DQo+
+IGh0dHBzOi8vbmEwMS5zYWZlbGlua3MucHJvdGVjdGlvbi5vdXRsb29rLmNvbS8/dXJsPWh0dHAl
+M0ElMkYlMkZ2Z2VyLmtlDQo+IHJuZWwub3JnJTJGbWFqb3Jkb21vLQ0KPiBpbmZvLmh0bWwmZGF0
+YT0wMiU3QzAxJTdDbG9uZ2xpJTQwbWljcm9zb2Z0LmNvbSU3Q2U3ZGEzOWUzZmY4ZjQwOWVhDQo+
+IDI5MjA4ZDUyZmRhMTdhNCU3QzcyZjk4OGJmODZmMTQxYWY5MWFiMmQ3Y2QwMTFkYjQ3JTdDMSU3
+QzAlN0M2MzYNCj4gNDY3NTM2MTI0MDkxMjEyJnNkYXRhPWVSQ2lqdVhSMVklMkZzRmRzM1VaRHJk
+SzZBb0R1dEJCTENRMFVaVTV2DQo+IDVYQWMlM0QmcmVzZXJ2ZWQ9MA0K
