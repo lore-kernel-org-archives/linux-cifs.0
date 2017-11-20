@@ -1,170 +1,98 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [Patch v6 04/22] CIFS: SMBD: Add SMB Direct protocol initial
- values and constants
-Date: Sun, 19 Nov 2017 21:53:35 -0600
-Message-ID: <CAH2r5mu847=bMXvV8rpqFbQkk3H47dXKRZJRwG-egE+=KiYZSQ@mail.gmail.com>
-References: <20171105054404.23886-1-longli@exchange.microsoft.com> <20171105054404.23886-5-longli@exchange.microsoft.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-        Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Stephen Hemminger <sthemmin-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171105054404.23886-5-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: fix return code when failing to rename a file onto a directory
+Date: Mon, 20 Nov 2017 16:25:49 +1100
+Message-ID: <20171120052549.17909-1-lsahlber@redhat.com>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Have merged the first 4 patches in the series (had to merge patch 1 by
-hand to deal with merge conflicts) - am examining the rest.  Let me
-know if updates needed/expected soon  for any of the rest of the
-series
+Cifs servers return ACCESS_DENIED when trying to rename onto a non-empty
+directory. This is different from xfstest where we expect this to return
+-EEXIST instead.
 
-On Sun, Nov 5, 2017 at 12:43 AM, Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org> wrote:
-> From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
->
-> To prepare for protocol implementation, add constants and user-configurable
-> values for the SMB Direct protocol.
->
-> Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> ---
->  fs/cifs/smbdirect.c | 77 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  fs/cifs/smbdirect.h | 21 +++++++++++++++
->  2 files changed, 98 insertions(+)
->  create mode 100644 fs/cifs/smbdirect.c
->  create mode 100644 fs/cifs/smbdirect.h
->
-> diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-> new file mode 100644
-> index 0000000..d3c16f8
-> --- /dev/null
-> +++ b/fs/cifs/smbdirect.c
-> @@ -0,0 +1,77 @@
-> +/*
-> + *   Copyright (C) 2017, Microsoft Corporation.
-> + *
-> + *   Author(s): Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> + *
-> + *   This program is free software;  you can redistribute it and/or modify
-> + *   it under the terms of the GNU General Public License as published by
-> + *   the Free Software Foundation; either version 2 of the License, or
-> + *   (at your option) any later version.
-> + *
-> + *   This program is distributed in the hope that it will be useful,
-> + *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
-> + *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-> + *   the GNU General Public License for more details.
-> + */
-> +#include "smbdirect.h"
-> +
-> +/* SMBD version number */
-> +#define SMBD_V1        0x0100
-> +
-> +/* Port numbers for SMBD transport */
-> +#define SMB_PORT       445
-> +#define SMBD_PORT      5445
-> +
-> +/* Address lookup and resolve timeout in ms */
-> +#define RDMA_RESOLVE_TIMEOUT   5000
-> +
-> +/* SMBD negotiation timeout in seconds */
-> +#define SMBD_NEGOTIATE_TIMEOUT 120
-> +
-> +/* SMBD minimum receive size and fragmented sized defined in [MS-SMBD] */
-> +#define SMBD_MIN_RECEIVE_SIZE          128
-> +#define SMBD_MIN_FRAGMENTED_SIZE       131072
-> +
-> +/*
-> + * Default maximum number of RDMA read/write outstanding on this connection
-> + * This value is possibly decreased during QP creation on hardware limit
-> + */
-> +#define SMBD_CM_RESPONDER_RESOURCES    32
-> +
-> +/* Maximum number of retries on data transfer operations */
-> +#define SMBD_CM_RETRY                  6
-> +/* No need to retry on Receiver Not Ready since SMBD manages credits */
-> +#define SMBD_CM_RNR_RETRY              0
-> +
-> +/*
-> + * User configurable initial values per SMBD transport connection
-> + * as defined in [MS-SMBD] 3.1.1.1
-> + * Those may change after a SMBD negotiation
-> + */
-> +/* The local peer's maximum number of credits to grant to the peer */
-> +int smbd_receive_credit_max = 255;
-> +
-> +/* The remote peer's credit request of local peer */
-> +int smbd_send_credit_target = 255;
-> +
-> +/* The maximum single message size can be sent to remote peer */
-> +int smbd_max_send_size = 1364;
-> +
-> +/*  The maximum fragmented upper-layer payload receive size supported */
-> +int smbd_max_fragmented_recv_size = 1024 * 1024;
-> +
-> +/*  The maximum single-message size which can be received */
-> +int smbd_max_receive_size = 8192;
-> +
-> +/* The timeout to initiate send of a keepalive message on idle */
-> +int smbd_keep_alive_interval = 120;
-> +
-> +/*
-> + * User configurable initial values for RDMA transport
-> + * The actual values used may be lower and are limited to hardware capabilities
-> + */
-> +/* Default maximum number of SGEs in a RDMA write/read */
-> +int smbd_max_frmr_depth = 2048;
-> +
-> +/* If payload is less than this byte, use RDMA send/recv not read/write */
-> +int rdma_readwrite_threshold = 4096;
-> diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
-> new file mode 100644
-> index 0000000..c55f28b
-> --- /dev/null
-> +++ b/fs/cifs/smbdirect.h
-> @@ -0,0 +1,21 @@
-> +/*
-> + *   Copyright (C) 2017, Microsoft Corporation.
-> + *
-> + *   Author(s): Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> + *
-> + *   This program is free software;  you can redistribute it and/or modify
-> + *   it under the terms of the GNU General Public License as published by
-> + *   the Free Software Foundation; either version 2 of the License, or
-> + *   (at your option) any later version.
-> + *
-> + *   This program is distributed in the hope that it will be useful,
-> + *   but WITHOUT ANY WARRANTY;  without even the implied warranty of
-> + *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-> + *   the GNU General Public License for more details.
-> + */
-> +#ifndef _SMBDIRECT_H
-> +#define _SMBDIRECT_H
-> +
-> +/* Default maximum number of SGEs in a RDMA send/recv */
-> +#define SMBDIRECT_MAX_SGE      16
-> +#endif
-> --
-> 2.7.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+This makes us pass xfstest  generic/245
 
+Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/smb2inode.c |  7 +++++--
+ fs/cifs/smb2pdu.c   | 10 +++++++++-
+ fs/cifs/smb2proto.h |  2 +-
+ 3 files changed, 15 insertions(+), 4 deletions(-)
 
-
+diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+index 1238cd3552f9..6ada981f1f83 100644
+--- a/fs/cifs/smb2inode.c
++++ b/fs/cifs/smb2inode.c
+@@ -48,6 +48,7 @@ smb2_open_op_close(const unsigned int xid, struct cifs_tcon *tcon,
+ 	__u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
+ 	struct cifs_open_parms oparms;
+ 	struct cifs_fid fid;
++	struct smb2_file_all_info all_info;
+ 
+ 	utf16_path = cifs_convert_path_to_utf16(full_path, cifs_sb);
+ 	if (!utf16_path)
+@@ -60,7 +61,7 @@ smb2_open_op_close(const unsigned int xid, struct cifs_tcon *tcon,
+ 	oparms.fid = &fid;
+ 	oparms.reconnect = false;
+ 
+-	rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL);
++	rc = SMB2_open(xid, &oparms, utf16_path, &oplock, &all_info, NULL);
+ 	if (rc) {
+ 		kfree(utf16_path);
+ 		return rc;
+@@ -86,7 +87,9 @@ smb2_open_op_close(const unsigned int xid, struct cifs_tcon *tcon,
+ 		break;
+ 	case SMB2_OP_RENAME:
+ 		tmprc = SMB2_rename(xid, tcon, fid.persistent_fid,
+-				    fid.volatile_fid, (__le16 *)data);
++				    fid.volatile_fid, (__le16 *)data,
++				    le32_to_cpu(all_info.Attributes) &
++				    FILE_ATTRIBUTE_DIRECTORY);
+ 		break;
+ 	case SMB2_OP_HARDLINK:
+ 		tmprc = SMB2_set_hardlink(xid, tcon, fid.persistent_fid,
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 553d574940b9..56c71a58d971 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -3139,7 +3139,8 @@ send_set_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ int
+ SMB2_rename(const unsigned int xid, struct cifs_tcon *tcon,
+-	    u64 persistent_fid, u64 volatile_fid, __le16 *target_file)
++	    u64 persistent_fid, u64 volatile_fid, __le16 *target_file,
++	    bool is_dir)
+ {
+ 	struct smb2_file_rename_info info;
+ 	void **data;
+@@ -3165,6 +3166,13 @@ SMB2_rename(const unsigned int xid, struct cifs_tcon *tcon,
+ 	rc = send_set_info(xid, tcon, persistent_fid, volatile_fid,
+ 		current->tgid, FILE_RENAME_INFORMATION, SMB2_O_INFO_FILE,
+ 		0, 2, data, size);
++	/* SMB2 servers responds with ACCESS_DENIED when trying to rename
++	 * and replace onto a non-empty directory. Check for this and remap
++	 * to EEXIST.
++	 */
++	if (rc == -EACCES && is_dir)
++		rc = -EEXIST;
++
+ 	kfree(data);
+ 	return rc;
+ }
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index e9ab5227e7a8..69fa9a39c7fa 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -158,7 +158,7 @@ extern int SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
+ 				struct cifs_search_info *srch_inf);
+ extern int SMB2_rename(const unsigned int xid, struct cifs_tcon *tcon,
+ 		       u64 persistent_fid, u64 volatile_fid,
+-		       __le16 *target_file);
++		       __le16 *target_file, bool is_dir);
+ extern int SMB2_rmdir(const unsigned int xid, struct cifs_tcon *tcon,
+ 		      u64 persistent_fid, u64 volatile_fid);
+ extern int SMB2_set_hardlink(const unsigned int xid, struct cifs_tcon *tcon,
 -- 
-Thanks,
-
-Steve
---
-To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+2.13.3
