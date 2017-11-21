@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 01/19] cifs: Add smb2_send_recv
-Date: Tue, 21 Nov 2017 11:04:24 +1100
-Message-ID: <20171121000442.24888-2-lsahlber@redhat.com>
+Subject: [PATCH 19/19] cifs: remove small_smb2_init
+Date: Tue, 21 Nov 2017 11:04:42 +1100
+Message-ID: <20171121000442.24888-20-lsahlber@redhat.com>
 References: <20171121000442.24888-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -10,78 +10,88 @@ In-Reply-To: <20171121000442.24888-1-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gman
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This function is similar to SendReceive2 except it does not expect
-a 4 byte rfc1002 length header in the first io vector.
-
 Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsproto.h |  4 ++++
- fs/cifs/transport.c | 38 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 42 insertions(+)
+ fs/cifs/smb2pdu.c | 53 ++++++-----------------------------------------------
+ 1 file changed, 6 insertions(+), 47 deletions(-)
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 4143c9dec463..6d86cd120349 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -106,6 +106,10 @@ extern int SendReceive2(const unsigned int /* xid */ , struct cifs_ses *,
- 			struct kvec *, int /* nvec to send */,
- 			int * /* type of buf returned */, const int flags,
- 			struct kvec * /* resp vec */);
-+extern int smb2_send_recv(const unsigned int /* xid */ , struct cifs_ses *,
-+			  struct kvec *, int /* nvec to send */,
-+			  int * /* type of buf returned */, const int flags,
-+			  struct kvec * /* resp vec */);
- extern int SendReceiveBlockingLock(const unsigned int xid,
- 			struct cifs_tcon *ptcon,
- 			struct smb_hdr *in_buf ,
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 7efbab013957..e678307bb7a0 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -827,6 +827,44 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
- 	return rc;
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index f44c3bcb56ae..c78047c9a93e 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -319,54 +319,16 @@ fill_small_buf(__le16 smb2_command, struct cifs_tcon *tcon, void *buf,
+ 	*total_len = parmsize + sizeof(struct smb2_sync_hdr);
  }
  
-+/* Like SendReceive2 but iov[0] does not contain an rfc1002 header */
-+int
-+smb2_send_recv(const unsigned int xid, struct cifs_ses *ses,
-+	       struct kvec *iov, int n_vec, int *resp_buf_type /* ret */,
-+	       const int flags, struct kvec *resp_iov)
-+{
-+	struct smb_rqst rqst;
-+	struct kvec *new_iov;
-+	int rc;
-+	int i;
-+	__u32 count;
-+	__be32 rfc1002_marker;
-+
-+	new_iov = kmalloc(sizeof(struct kvec) * (n_vec + 1), GFP_KERNEL);
-+	if (!new_iov)
-+		return -ENOMEM;
-+
-+	/* 1st iov is an RFC1002 Session Message length */
-+	memcpy(new_iov + 1, iov, (sizeof(struct kvec) * n_vec));
-+
-+	count = 0;
-+	for (i = 1; i < n_vec + 1; i++)
-+		count += new_iov[i].iov_len;
-+
-+	rfc1002_marker = cpu_to_be32(count);
-+
-+	new_iov[0].iov_base = &rfc1002_marker;
-+	new_iov[0].iov_len = 4;
-+
-+	memset(&rqst, 0, sizeof(struct smb_rqst));
-+	rqst.rq_iov = new_iov;
-+	rqst.rq_nvec = n_vec + 1;
-+
-+	rc = cifs_send_recv(xid, ses, &rqst, resp_buf_type, flags, resp_iov);
-+	kfree(new_iov);
-+	return rc;
-+}
-+
- int
- SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 	    struct smb_hdr *in_buf, struct smb_hdr *out_buf,
+-/* init request without RFC1001 length at the beginning */
+-static int
+-smb2_plain_req_init(__le16 smb2_command, struct cifs_tcon *tcon,
+-		    void **request_buf, unsigned int *total_len)
+-{
+-	int rc;
+-	struct smb2_sync_hdr *shdr;
+-
+-	rc = smb2_reconnect(smb2_command, tcon);
+-	if (rc)
+-		return rc;
+-
+-	/* BB eventually switch this to SMB2 specific small buf size */
+-	*request_buf = cifs_small_buf_get();
+-	if (*request_buf == NULL) {
+-		/* BB should we add a retry in here if not a writepage? */
+-		return -ENOMEM;
+-	}
+-
+-	shdr = (struct smb2_sync_hdr *)(*request_buf);
+-
+-	fill_small_buf(smb2_command, tcon, shdr, total_len);
+-
+-	if (tcon != NULL) {
+-#ifdef CONFIG_CIFS_STATS2
+-		uint16_t com_code = le16_to_cpu(smb2_command);
+-
+-		cifs_stats_inc(&tcon->stats.smb2_stats.smb2_com_sent[com_code]);
+-#endif
+-		cifs_stats_inc(&tcon->num_smbs_sent);
+-	}
+-
+-	return rc;
+-}
+-
+ /*
+  * Allocate and return pointer to an SMB request hdr, and set basic
+  * SMB information in the SMB header. If the return code is zero, this
+- * function must have filled in request_buf pointer. The returned buffer
+- * has RFC1001 length at the beginning.
++ * function must have filled in request_buf pointer.
+  */
+ static int
+-small_smb2_init(__le16 smb2_command, struct cifs_tcon *tcon,
+-		void **request_buf)
++smb2_plain_req_init(__le16 smb2_command, struct cifs_tcon *tcon,
++		    void **request_buf, unsigned int *total_len)
+ {
+ 	int rc;
+-	unsigned int total_len;
+-	struct smb2_pdu *pdu;
+ 
+ 	rc = smb2_reconnect(smb2_command, tcon);
+ 	if (rc)
+@@ -379,12 +341,9 @@ small_smb2_init(__le16 smb2_command, struct cifs_tcon *tcon,
+ 		return -ENOMEM;
+ 	}
+ 
+-	pdu = (struct smb2_pdu *)(*request_buf);
+-
+-	fill_small_buf(smb2_command, tcon, get_sync_hdr(pdu), &total_len);
+-
+-	/* Note this is only network field converted to big endian */
+-	pdu->hdr.smb2_buf_length = cpu_to_be32(total_len);
++	fill_small_buf(smb2_command, tcon,
++		       (struct smb2_sync_hdr *)(*request_buf),
++		       total_len);
+ 
+ 	if (tcon != NULL) {
+ #ifdef CONFIG_CIFS_STATS2
 -- 
 2.13.3
