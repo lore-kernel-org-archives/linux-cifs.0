@@ -1,86 +1,50 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 06/19] cifs: remove rfc1002 header from smb2_ioctl_req
-Date: Mon, 20 Nov 2017 17:14:22 -0800
-Message-ID: <CAKywueRQgczDXjyCBuQZWxcJA4sVWCT_HwryWAnysPvhcW5wEw@mail.gmail.com>
-References: <20171121000442.24888-1-lsahlber@redhat.com> <20171121000442.24888-7-lsahlber@redhat.com>
+Subject: Re: [PATCH 00/19 Version 4] cifs: remove rfc1002 from smb2 requests
+Date: Mon, 20 Nov 2017 17:22:33 -0800
+Message-ID: <CAKywueTabn0mDuagWUq5h4ByN_UszFZtpy4d5H_cy1qfEPZHEw@mail.gmail.com>
+References: <20171121000442.24888-1-lsahlber@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
         Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel-IBi9RG/b67k@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171121000442.24888-7-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <20171121000442.24888-1-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 2017-11-20 16:04 GMT-08:00 Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/smb2pdu.c | 22 +++++++++++-----------
->  fs/cifs/smb2pdu.h |  2 +-
->  2 files changed, 12 insertions(+), 12 deletions(-)
+> Steve, All,
 >
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index be68b129c8fa..071e5d57ec6c 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -1912,6 +1912,7 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
->         int n_iov;
->         int rc = 0;
->         int flags = 0;
-> +       unsigned int total_len;
+> Please find an updated version of the patch series to get rid of the
+> rfc1002 header from all request structures in SMB2.
 >
->         cifs_dbg(FYI, "SMB2 IOCTL\n");
+> Version 2:
+> * changed SendReceive3 to smb2_send_recv
+> * fixed a Buffer[1] error that aaptel@xxxxxxxx reported
 >
-> @@ -1930,7 +1931,7 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
->         if (!ses || !(ses->server))
->                 return -EIO;
+> Version 3:
+> * Change SMB2_read() to use smb2_send_recv instead of cifs_send_recv
+> * Fix smb2_negotiate_req where we didnt update the total length to
+> accomodate smb2 contexts.
+> * Fix smb2_lease_ack where I forgot to bump total length by 12.
 >
-> -       rc = small_smb2_init(SMB2_IOCTL, tcon, (void **) &req);
-> +       rc = smb2_plain_req_init(SMB2_IOCTL, tcon, (void **) &req, &total_len);
->         if (rc)
->                 return rc;
+> Version 4:
+> * Fix incorrect length in smb2_lockv
 >
-> @@ -1941,8 +1942,8 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
->                 }
->
->                 cifs_dbg(FYI, "replacing tid 0x%x with IPC tid 0x%x\n",
-> -                        req->hdr.sync_hdr.TreeId, ses->ipc_tid);
-> -               req->hdr.sync_hdr.TreeId = ses->ipc_tid;
-> +                        req->sync_hdr.TreeId, ses->ipc_tid);
-> +               req->sync_hdr.TreeId = ses->ipc_tid;
->         }
->         if (encryption_required(tcon))
->                 flags |= CIFS_TRANSFORM_REQ;
-> @@ -1955,7 +1956,7 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
->                 req->InputCount = cpu_to_le32(indatalen);
->                 /* do not set InputOffset if no input data */
->                 req->InputOffset =
-> -                      cpu_to_le32(offsetof(struct smb2_ioctl_req, Buffer) - 4);
-> +                      cpu_to_le32(offsetof(struct smb2_ioctl_req, Buffer));
->                 iov[1].iov_base = in_data;
->                 iov[1].iov_len = indatalen;
->                 n_iov = 2;
-> @@ -1990,21 +1991,20 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
->          * but if input data passed to ioctl, we do not
->          * want to double count this, so we do not send
->          * the dummy one byte of data in iovec[0] if sending
-> -        * input data (in iovec[1]). We also must add 4 bytes
-> -        * in first iovec to allow for rfc1002 length field.
-> +        * input data (in iovec[1]).
->          */
->
->         if (indatalen) {
-> -               iov[0].iov_len = get_rfc1002_length(req) + 4 - 1;
-> -               inc_rfc1001_len(req, indatalen - 1);
-> +               iov[0].iov_len = total_len - 1;
->         } else
-> -               iov[0].iov_len = get_rfc1002_length(req) + 4;
-> +               iov[0].iov_len = total_len;
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-We should remove square brackets here or even move the code above to
-the same if {} else {} block. It can be done through a follow on patch
-- no need to fixup this one.
+Finished reviewing patches and testing with cthon and xfstests.
+
+Reviewed-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+
+Aurelien, a lot of error messages like "CIFS VFS: ioctl error in
+smb2_get_dfs_refer rc=-2" are being written into syslog. What do you
+think about decreasing the log level of this message?
 
 --
 Best regards,
