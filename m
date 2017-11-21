@@ -1,63 +1,86 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] CIFS: do not send invalid input buffer on QUERY_INFO requests
-Date: Mon, 20 Nov 2017 17:10:30 -0800
-Message-ID: <CAKywueTbGHNrABXjdKg1LCgCaK+iOj31p0TnGXUShGcxLW=NRA@mail.gmail.com>
-References: <mpsa80ruowd.fsf@aaptelpc.suse.de> <20171017124717.25955-1-aaptel@suse.com>
+Subject: Re: [PATCH 06/19] cifs: remove rfc1002 header from smb2_ioctl_req
+Date: Mon, 20 Nov 2017 17:14:22 -0800
+Message-ID: <CAKywueRQgczDXjyCBuQZWxcJA4sVWCT_HwryWAnysPvhcW5wEw@mail.gmail.com>
+References: <20171121000442.24888-1-lsahlber@redhat.com> <20171121000442.24888-7-lsahlber@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
         Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171017124717.25955-1-aaptel-IBi9RG/b67k@public.gmane.org>
+In-Reply-To: <20171121000442.24888-7-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2017-10-17 5:47 GMT-07:00 Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>:
-> query_info() doesn't use the InputBuffer field of the QUERY_INFO
-> request, therefore according to [MS-SMB2] it must:
->
-> a) set the InputBufferOffset to 0
-> b) send a zero-length InputBuffer
->
-> Doing a) is trivial but b) is a bit more tricky.
->
-> The packet is allocated according to it's StructureSize, which takes
-> into account an extra 1 byte buffer which we don't need
-> here. StructureSize fields must have constant values no matter the
-> actual length of the whole packet so we can't just edit that constant.
->
-> Both the NetBIOS-over-TCP message length ("rfc1002 length") L and the
-> iovec length L' have to be updated. Since L' is computed from L we
-> just update L by decrementing it by one.
->
-> Signed-off-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+2017-11-20 16:04 GMT-08:00 Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > ---
->  fs/cifs/smb2pdu.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
+>  fs/cifs/smb2pdu.c | 22 +++++++++++-----------
+>  fs/cifs/smb2pdu.h |  2 +-
+>  2 files changed, 12 insertions(+), 12 deletions(-)
 >
 > diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 6f0e6343c15e..b927e131f997 100644
+> index be68b129c8fa..071e5d57ec6c 100644
 > --- a/fs/cifs/smb2pdu.c
 > +++ b/fs/cifs/smb2pdu.c
-> @@ -2191,9 +2191,13 @@ query_info(const unsigned int xid, struct cifs_tcon *tcon,
->         req->PersistentFileId = persistent_fid;
->         req->VolatileFileId = volatile_fid;
->         req->AdditionalInformation = cpu_to_le32(additional_info);
-> -       /* 4 for rfc1002 length field and 1 for Buffer */
-> -       req->InputBufferOffset =
-> -               cpu_to_le16(sizeof(struct smb2_query_info_req) - 1 - 4);
-> +
-> +       /*
-> +        * We do not use the input buffer (do not send extra byte)
-> +        */
-> +       req->InputBufferOffset = 0;
-> +       inc_rfc1001_len(req, -1);
-> +
+> @@ -1912,6 +1912,7 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+>         int n_iov;
+>         int rc = 0;
+>         int flags = 0;
+> +       unsigned int total_len;
+>
+>         cifs_dbg(FYI, "SMB2 IOCTL\n");
+>
+> @@ -1930,7 +1931,7 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+>         if (!ses || !(ses->server))
+>                 return -EIO;
+>
+> -       rc = small_smb2_init(SMB2_IOCTL, tcon, (void **) &req);
+> +       rc = smb2_plain_req_init(SMB2_IOCTL, tcon, (void **) &req, &total_len);
+>         if (rc)
+>                 return rc;
+>
+> @@ -1941,8 +1942,8 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+>                 }
+>
+>                 cifs_dbg(FYI, "replacing tid 0x%x with IPC tid 0x%x\n",
+> -                        req->hdr.sync_hdr.TreeId, ses->ipc_tid);
+> -               req->hdr.sync_hdr.TreeId = ses->ipc_tid;
+> +                        req->sync_hdr.TreeId, ses->ipc_tid);
+> +               req->sync_hdr.TreeId = ses->ipc_tid;
+>         }
+>         if (encryption_required(tcon))
+>                 flags |= CIFS_TRANSFORM_REQ;
+> @@ -1955,7 +1956,7 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+>                 req->InputCount = cpu_to_le32(indatalen);
+>                 /* do not set InputOffset if no input data */
+>                 req->InputOffset =
+> -                      cpu_to_le32(offsetof(struct smb2_ioctl_req, Buffer) - 4);
+> +                      cpu_to_le32(offsetof(struct smb2_ioctl_req, Buffer));
+>                 iov[1].iov_base = in_data;
+>                 iov[1].iov_len = indatalen;
+>                 n_iov = 2;
+> @@ -1990,21 +1991,20 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+>          * but if input data passed to ioctl, we do not
+>          * want to double count this, so we do not send
+>          * the dummy one byte of data in iovec[0] if sending
+> -        * input data (in iovec[1]). We also must add 4 bytes
+> -        * in first iovec to allow for rfc1002 length field.
+> +        * input data (in iovec[1]).
+>          */
+>
+>         if (indatalen) {
+> -               iov[0].iov_len = get_rfc1002_length(req) + 4 - 1;
+> -               inc_rfc1001_len(req, indatalen - 1);
+> +               iov[0].iov_len = total_len - 1;
+>         } else
+> -               iov[0].iov_len = get_rfc1002_length(req) + 4;
+> +               iov[0].iov_len = total_len;
 
-I was looking at the code and noticed that build_qfs_info_req() uses
-the same pattern of initializing InputBufferOffset field. Do we need
-to fix it in the same way?
+We should remove square brackets here or even move the code above to
+the same if {} else {} block. It can be done through a follow on patch
+- no need to fixup this one.
 
 --
 Best regards,
