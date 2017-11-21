@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 02/19] cifs: remove rfc1002 header from smb2_negotiate_req
-Date: Tue, 21 Nov 2017 11:04:25 +1100
-Message-ID: <20171121000442.24888-3-lsahlber@redhat.com>
+Subject: [PATCH 10/19] cifs: remove rfc1002 header from smb2_create_req
+Date: Tue, 21 Nov 2017 11:04:33 +1100
+Message-ID: <20171121000442.24888-11-lsahlber@redhat.com>
 References: <20171121000442.24888-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -12,131 +12,138 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c | 38 ++++++++++++++++++++------------------
+ fs/cifs/smb2pdu.c | 30 ++++++++++++------------------
  fs/cifs/smb2pdu.h |  2 +-
- 2 files changed, 21 insertions(+), 19 deletions(-)
+ 2 files changed, 13 insertions(+), 19 deletions(-)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 5331631386a2..adfae01fe4d9 100644
+index 1d68dd0e3e45..8c927c6098da 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -398,8 +398,8 @@ small_smb2_init(__le16 smb2_command, struct cifs_tcon *tcon,
+@@ -1525,11 +1525,10 @@ add_lease_context(struct TCP_Server_Info *server, struct kvec *iov,
+ 	req->RequestedOplockLevel = SMB2_OPLOCK_LEVEL_LEASE;
+ 	if (!req->CreateContextsOffset)
+ 		req->CreateContextsOffset = cpu_to_le32(
+-				sizeof(struct smb2_create_req) - 4 +
++				sizeof(struct smb2_create_req) +
+ 				iov[num - 1].iov_len);
+ 	le32_add_cpu(&req->CreateContextsLength,
+ 		     server->vals->create_lease_size);
+-	inc_rfc1001_len(&req->hdr, server->vals->create_lease_size);
+ 	*num_iovec = num + 1;
+ 	return 0;
  }
- 
- #ifdef CONFIG_CIFS_SMB311
--/* offset is sizeof smb2_negotiate_req - 4 but rounded up to 8 bytes */
--#define OFFSET_OF_NEG_CONTEXT 0x68  /* sizeof(struct smb2_negotiate_req) - 4 */
-+/* offset is sizeof smb2_negotiate_req but rounded up to 8 bytes */
-+#define OFFSET_OF_NEG_CONTEXT 0x68  /* sizeof(struct smb2_negotiate_req) */
- 
- 
- #define SMB2_PREAUTH_INTEGRITY_CAPABILITIES	cpu_to_le16(1)
-@@ -427,23 +427,25 @@ build_encrypt_ctxt(struct smb2_encryption_neg_context *pneg_ctxt)
+@@ -1609,10 +1608,9 @@ add_durable_v2_context(struct kvec *iov, unsigned int *num_iovec,
+ 	iov[num].iov_len = sizeof(struct create_durable_v2);
+ 	if (!req->CreateContextsOffset)
+ 		req->CreateContextsOffset =
+-			cpu_to_le32(sizeof(struct smb2_create_req) - 4 +
++			cpu_to_le32(sizeof(struct smb2_create_req) +
+ 								iov[1].iov_len);
+ 	le32_add_cpu(&req->CreateContextsLength, sizeof(struct create_durable_v2));
+-	inc_rfc1001_len(&req->hdr, sizeof(struct create_durable_v2));
+ 	*num_iovec = num + 1;
+ 	return 0;
  }
- 
- static void
--assemble_neg_contexts(struct smb2_negotiate_req *req)
-+assemble_neg_contexts(struct smb2_negotiate_req *req,
-+		      unsigned int *total_len)
- {
--
--	/* +4 is to account for the RFC1001 len field */
--	char *pneg_ctxt = (char *)req + OFFSET_OF_NEG_CONTEXT + 4;
-+	char *pneg_ctxt = (char *)req + OFFSET_OF_NEG_CONTEXT;
- 
- 	build_preauth_ctxt((struct smb2_preauth_neg_context *)pneg_ctxt);
- 	/* Add 2 to size to round to 8 byte boundary */
-+
- 	pneg_ctxt += 2 + sizeof(struct smb2_preauth_neg_context);
- 	build_encrypt_ctxt((struct smb2_encryption_neg_context *)pneg_ctxt);
- 	req->NegotiateContextOffset = cpu_to_le32(OFFSET_OF_NEG_CONTEXT);
- 	req->NegotiateContextCount = cpu_to_le16(2);
--	inc_rfc1001_len(req, 4 + sizeof(struct smb2_preauth_neg_context)
--			+ sizeof(struct smb2_encryption_neg_context)); /* calculate hash */
-+
-+	*total_len += 4 + sizeof(struct smb2_preauth_neg_context)
-+		+ sizeof(struct smb2_encryption_neg_context);
+@@ -1633,12 +1631,10 @@ add_durable_reconnect_v2_context(struct kvec *iov, unsigned int *num_iovec,
+ 	iov[num].iov_len = sizeof(struct create_durable_handle_reconnect_v2);
+ 	if (!req->CreateContextsOffset)
+ 		req->CreateContextsOffset =
+-			cpu_to_le32(sizeof(struct smb2_create_req) - 4 +
++			cpu_to_le32(sizeof(struct smb2_create_req) +
+ 								iov[1].iov_len);
+ 	le32_add_cpu(&req->CreateContextsLength,
+ 			sizeof(struct create_durable_handle_reconnect_v2));
+-	inc_rfc1001_len(&req->hdr,
+-			sizeof(struct create_durable_handle_reconnect_v2));
+ 	*num_iovec = num + 1;
+ 	return 0;
  }
- #else
--static void assemble_neg_contexts(struct smb2_negotiate_req *req)
-+static void assemble_neg_contexts(struct smb2_negotiate_req *req,
-+				  unsigned int *total_len)
- {
- 	return;
+@@ -1669,10 +1665,9 @@ add_durable_context(struct kvec *iov, unsigned int *num_iovec,
+ 	iov[num].iov_len = sizeof(struct create_durable);
+ 	if (!req->CreateContextsOffset)
+ 		req->CreateContextsOffset =
+-			cpu_to_le32(sizeof(struct smb2_create_req) - 4 +
++			cpu_to_le32(sizeof(struct smb2_create_req) +
+ 								iov[1].iov_len);
+ 	le32_add_cpu(&req->CreateContextsLength, sizeof(struct create_durable));
+-	inc_rfc1001_len(&req->hdr, sizeof(struct create_durable));
+ 	*num_iovec = num + 1;
+ 	return 0;
  }
-@@ -477,6 +479,7 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
- 	int blob_offset, blob_length;
- 	char *security_blob;
- 	int flags = CIFS_NEG_OP;
+@@ -1743,6 +1738,7 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
+ 	__u32 file_attributes = 0;
+ 	char *dhc_buf = NULL, *lc_buf = NULL;
+ 	int flags = 0;
 +	unsigned int total_len;
  
- 	cifs_dbg(FYI, "Negotiate protocol\n");
+ 	cifs_dbg(FYI, "create/open\n");
  
-@@ -485,30 +488,30 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
+@@ -1751,7 +1747,8 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
+ 	else
  		return -EIO;
- 	}
  
--	rc = small_smb2_init(SMB2_NEGOTIATE, NULL, (void **) &req);
-+	rc = smb2_plain_req_init(SMB2_NEGOTIATE, NULL, (void **) &req, &total_len);
+-	rc = small_smb2_init(SMB2_CREATE, tcon, (void **) &req);
++	rc = smb2_plain_req_init(SMB2_CREATE, tcon, (void **) &req, &total_len);
++
  	if (rc)
  		return rc;
  
--	req->hdr.sync_hdr.SessionId = 0;
-+	req->sync_hdr.SessionId = 0;
+@@ -1772,12 +1769,10 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
+ 	req->CreateOptions = cpu_to_le32(oparms->create_options & CREATE_OPTIONS_MASK);
  
- 	if (strcmp(ses->server->vals->version_string,
- 		   SMB3ANY_VERSION_STRING) == 0) {
- 		req->Dialects[0] = cpu_to_le16(SMB30_PROT_ID);
- 		req->Dialects[1] = cpu_to_le16(SMB302_PROT_ID);
- 		req->DialectCount = cpu_to_le16(2);
--		inc_rfc1001_len(req, 4);
-+		total_len += 4;
- 	} else if (strcmp(ses->server->vals->version_string,
- 		   SMBDEFAULT_VERSION_STRING) == 0) {
- 		req->Dialects[0] = cpu_to_le16(SMB21_PROT_ID);
- 		req->Dialects[1] = cpu_to_le16(SMB30_PROT_ID);
- 		req->Dialects[2] = cpu_to_le16(SMB302_PROT_ID);
- 		req->DialectCount = cpu_to_le16(3);
--		inc_rfc1001_len(req, 6);
-+		total_len += 6;
- 	} else {
- 		/* otherwise send specific dialect */
- 		req->Dialects[0] = cpu_to_le16(ses->server->vals->protocol_id);
- 		req->DialectCount = cpu_to_le16(1);
--		inc_rfc1001_len(req, 2);
-+		total_len += 2;
- 	}
- 
- 	/* only one of SMB2 signing flags may be set in SMB2 request */
-@@ -528,13 +531,12 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
- 		memcpy(req->ClientGUID, server->client_guid,
- 			SMB2_CLIENT_GUID_SIZE);
- 		if (ses->server->vals->protocol_id == SMB311_PROT_ID)
--			assemble_neg_contexts(req);
-+			assemble_neg_contexts(req, &total_len);
- 	}
  	iov[0].iov_base = (char *)req;
 -	/* 4 for rfc1002 length field */
 -	iov[0].iov_len = get_rfc1002_length(req) + 4;
-+	iov[0].iov_len = total_len;
+ 	/* -1 since last byte is buf[0] which is sent below (path) */
+-	iov[0].iov_len--;
++	iov[0].iov_len = total_len - 1;
  
--	rc = SendReceive2(xid, ses, iov, 1, &resp_buftype, flags, &rsp_iov);
-+	rc = smb2_send_recv(xid, ses, iov, 1, &resp_buftype, flags, &rsp_iov);
+-	req->NameOffset = cpu_to_le16(sizeof(struct smb2_create_req) - 4);
++	req->NameOffset = cpu_to_le16(sizeof(struct smb2_create_req));
+ 
+ 	/* [MS-SMB2] 2.2.13 NameOffset:
+ 	 * If SMB2_FLAGS_DFS_OPERATIONS is set in the Flags field of
+@@ -1790,7 +1785,7 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
+ 	if (tcon->share_flags & SHI1005_FLAGS_DFS) {
+ 		int name_len;
+ 
+-		req->hdr.sync_hdr.Flags |= SMB2_FLAGS_DFS_OPERATIONS;
++		req->sync_hdr.Flags |= SMB2_FLAGS_DFS_OPERATIONS;
+ 		rc = alloc_path_with_tree_prefix(&copy_path, &copy_size,
+ 						 &name_len,
+ 						 tcon->treeName, path);
+@@ -1817,8 +1812,6 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
+ 
+ 	iov[1].iov_len = uni_path_len;
+ 	iov[1].iov_base = path;
+-	/* -1 since last byte is buf[0] which was counted in smb2_buf_len */
+-	inc_rfc1001_len(req, uni_path_len - 1);
+ 
+ 	if (!server->oplocks)
+ 		*oplock = SMB2_OPLOCK_LEVEL_NONE;
+@@ -1856,7 +1849,8 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
+ 		dhc_buf = iov[n_iov-1].iov_base;
+ 	}
+ 
+-	rc = SendReceive2(xid, ses, iov, n_iov, &resp_buftype, flags, &rsp_iov);
++	rc = smb2_send_recv(xid, ses, iov, n_iov, &resp_buftype, flags,
++			    &rsp_iov);
  	cifs_small_buf_release(req);
- 	rsp = (struct smb2_negotiate_rsp *)rsp_iov.iov_base;
- 	/*
+ 	rsp = (struct smb2_create_rsp *)rsp_iov.iov_base;
+ 
 diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index c2ec934be968..0fe2382597ad 100644
+index 4f80b95d02ae..6e1874a81014 100644
 --- a/fs/cifs/smb2pdu.h
 +++ b/fs/cifs/smb2pdu.h
-@@ -195,7 +195,7 @@ struct smb2_symlink_err_rsp {
- #define SMB2_CLIENT_GUID_SIZE 16
+@@ -496,7 +496,7 @@ struct smb2_tree_disconnect_rsp {
+ #define SVHDX_OPEN_DEVICE_CONTEXT	0x83CE6F1AD851E0986E34401CC9BCFCE9
  
- struct smb2_negotiate_req {
+ struct smb2_create_req {
 -	struct smb2_hdr hdr;
 +	struct smb2_sync_hdr sync_hdr;
- 	__le16 StructureSize; /* Must be 36 */
- 	__le16 DialectCount;
- 	__le16 SecurityMode;
+ 	__le16 StructureSize;	/* Must be 57 */
+ 	__u8   SecurityFlags;
+ 	__u8   RequestedOplockLevel;
 -- 
 2.13.3
