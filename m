@@ -1,30 +1,29 @@
-From: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: [PATCH] CIFS: decrease log level of smb2 DFS error
-Date: Tue, 21 Nov 2017 12:14:29 +0100
-Message-ID: <20171121111429.14496-1-aaptel@suse.com>
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+Subject: Re: [PATCH 00/19 Version 4] cifs: remove rfc1002 from smb2 requests
+Date: Tue, 21 Nov 2017 12:15:38 +0100
+Message-ID: <873757ubl1.fsf@suse.com>
+References: <20171121000442.24888-1-lsahlber@redhat.com> <CAKywueTabn0mDuagWUq5h4ByN_UszFZtpy4d5H_cy1qfEPZHEw@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAKywueTabn0mDuagWUq5h4ByN_UszFZtpy4d5H_cy1qfEPZHEw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Signed-off-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
----
- fs/cifs/smb2ops.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> writes:
+> Aurelien, a lot of error messages like "CIFS VFS: ioctl error in
+> smb2_get_dfs_refer rc=-2" are being written into syslog. What do you
+> think about decreasing the log level of this message?
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 0dafdbae1f8c..59d18a7d550d 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -1387,7 +1387,7 @@ smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
- 	} while (rc == -EAGAIN);
- 
- 	if (rc) {
--		cifs_dbg(VFS, "ioctl error in smb2_get_dfs_refer rc=%d\n", rc);
-+		cifs_dbg(FYI, "ioctl error in smb2_get_dfs_refer rc=%d\n", rc);
- 		goto out;
- 	}
- 
+Sure, I've sent a patch.
+
 -- 
-2.12.3
+Aurélien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
+GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
