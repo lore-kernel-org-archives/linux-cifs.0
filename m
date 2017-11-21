@@ -1,29 +1,53 @@
-From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: Re: [PATCH 00/19 Version 4] cifs: remove rfc1002 from smb2 requests
-Date: Tue, 21 Nov 2017 12:15:38 +0100
-Message-ID: <873757ubl1.fsf@suse.com>
-References: <20171121000442.24888-1-lsahlber@redhat.com> <CAKywueTabn0mDuagWUq5h4ByN_UszFZtpy4d5H_cy1qfEPZHEw@mail.gmail.com>
+From: ronnie sahlberg <ronniesahlberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] CIFS: decrease log level of smb2 DFS error
+Date: Tue, 21 Nov 2017 21:22:33 +1000
+Message-ID: <CAN05THRymsFpZcbXsSQj6=OVd94ZWE1L5a1EQF5-bz8qbG=oFA@mail.gmail.com>
+References: <20171121111429.14496-1-aaptel@suse.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+Content-Type: text/plain; charset="UTF-8"
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
         Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueTabn0mDuagWUq5h4ByN_UszFZtpy4d5H_cy1qfEPZHEw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20171121111429.14496-1-aaptel-IBi9RG/b67k@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> writes:
-> Aurelien, a lot of error messages like "CIFS VFS: ioctl error in
-> smb2_get_dfs_refer rc=-2" are being written into syslog. What do you
-> think about decreasing the log level of this message?
+Since in 99.999999% times happens just because "it is a real share",
+we could optionally change it instead to be wrapped in :
 
-Sure, I've sent a patch.
+if (rc != <whatever STATUS_NOT_FOUND maps to>)
+     cifs_dbg(VFS, log the error message
 
--- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
-GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+so that we do not log anything if it is just a normal share
+but that we do log something if there is a real error.
+
+
+
+
+On Tue, Nov 21, 2017 at 9:14 PM, Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org> wrote:
+> Signed-off-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+> ---
+>  fs/cifs/smb2ops.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index 0dafdbae1f8c..59d18a7d550d 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -1387,7 +1387,7 @@ smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
+>         } while (rc == -EAGAIN);
+>
+>         if (rc) {
+> -               cifs_dbg(VFS, "ioctl error in smb2_get_dfs_refer rc=%d\n", rc);
+> +               cifs_dbg(FYI, "ioctl error in smb2_get_dfs_refer rc=%d\n", rc);
+>                 goto out;
+>         }
+>
+> --
+> 2.12.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
