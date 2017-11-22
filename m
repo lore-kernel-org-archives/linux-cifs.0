@@ -1,161 +1,96 @@
-From: Leif Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: avoid a kmalloc in smb2_send_recv/SendReceive2
- for the common case
-Date: Tue, 21 Nov 2017 19:18:43 -0500 (EST)
-Message-ID: <1876027630.29126264.1511309923566.JavaMail.zimbra@redhat.com>
-References: <20171121040807.8364-1-lsahlber@redhat.com> <CY4PR21MB013522818F6E904053FA08D4B6200@CY4PR21MB0135.namprd21.prod.outlook.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [SMB3] Updates for 4.15
+Date: Wed, 22 Nov 2017 14:35:28 -0600
+Message-ID: <CAH2r5msieYWn-5_9OX+OYpvVOdsEAjG8aCuSFzi1Mcb3A+x9gg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CY4PR21MB013522818F6E904053FA08D4B6200-kUhI0YP1syr0Ny/52Wgz2s1VXTxX1y3OvxpqHgZTriW3zl9H0oFU5g@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+Please pull the following changes since commit
+ed30b147e1f6e396e70a52dbb6c7d66befedd786:
 
+  Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/ide
+(2017-11-19 08:04:41 -1000)
 
+are available in the git repository at:
 
+  git://git.samba.org/sfrench/cifs-2.6.git tags/4.15-smb3-updates
 
------ Original Message -----
-> From: "Pavel Shilovskiy" <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> To: "Ronnie Sahlberg" <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, "Steve French" <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> Cc: "linux-cifs" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-> Sent: Wednesday, 22 November, 2017 11:06:38 AM
-> Subject: RE: [PATCH] cifs: avoid a kmalloc in smb2_send_recv/SendReceive2 for the common case
-> 
-> 
-> 
-> 2017-11-20 20:08 GMT-08:00 Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> > In both functions, use an array of 8 (arbitrary but should be big enough
-> > for all current uses) iov and avoid having to kmalloc the array
-> > for the common case.
-> >
-> > If 8 is too small, then fall back to the original behaviour and use
-> > kmalloc/kfree.
-> >
-> > This should not change any behaviour but should save us a tiny amount of
-> > cpu cycles.
-> >
-> > Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> > ---
-> >  fs/cifs/transport.c | 33 +++++++++++++++++++++++----------
-> >  1 file changed, 23 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> > index e678307bb7a0..510f41a435c8 100644
-> > --- a/fs/cifs/transport.c
-> > +++ b/fs/cifs/transport.c
-> > @@ -38,6 +38,9 @@
-> >  #include "cifsproto.h"
-> >  #include "cifs_debug.h"
-> >
-> > +/* Max number of iovectors we can use off the stack when sending requests.
-> > */
-> > +#define CIFS_MAX_IOV_SIZE 8
-> > +
-> >  void
-> >  cifs_wake_up_task(struct mid_q_entry *mid)
-> >  {
-> > @@ -803,12 +806,16 @@ SendReceive2(const unsigned int xid, struct cifs_ses
-> > *ses,
-> >              const int flags, struct kvec *resp_iov)
-> >  {
-> >         struct smb_rqst rqst;
-> > -       struct kvec *new_iov;
-> > +       struct kvec s_iov[CIFS_MAX_IOV_SIZE], *new_iov;
-> >         int rc;
-> >
-> > -       new_iov = kmalloc(sizeof(struct kvec) * (n_vec + 1), GFP_KERNEL);
-> > -       if (!new_iov)
-> > -               return -ENOMEM;
-> > +       if (n_vec + 1 > CIFS_MAX_IOV_SIZE) {
-> > +               new_iov = kmalloc(sizeof(struct kvec) * (n_vec + 1),
-> > +                                 GFP_KERNEL);
-> > +               if (!new_iov)
-> > +                       return -ENOMEM;
-> > +       } else
-> > +               new_iov = s_iov;
-> >
-> >         /* 1st iov is a RFC1001 length followed by the rest of the packet
-> >         */
-> >         memcpy(new_iov + 1, iov, (sizeof(struct kvec) * n_vec));
-> > @@ -823,7 +830,8 @@ SendReceive2(const unsigned int xid, struct cifs_ses
-> > *ses,
-> >         rqst.rq_nvec = n_vec + 1;
-> >
-> >         rc = cifs_send_recv(xid, ses, &rqst, resp_buf_type, flags,
-> >         resp_iov);
-> > -       kfree(new_iov);
-> > +       if (n_vec + 1 > CIFS_MAX_IOV_SIZE)
-> > +               kfree(new_iov);
-> >         return rc;
-> >  }
-> >
-> > @@ -834,15 +842,19 @@ smb2_send_recv(const unsigned int xid, struct
-> > cifs_ses *ses,
-> >                const int flags, struct kvec *resp_iov)
-> >  {
-> >         struct smb_rqst rqst;
-> > -       struct kvec *new_iov;
-> > +       struct kvec s_iov[CIFS_MAX_IOV_SIZE], *new_iov;
-> >         int rc;
-> >         int i;
-> >         __u32 count;
-> >         __be32 rfc1002_marker;
-> >
-> > -       new_iov = kmalloc(sizeof(struct kvec) * (n_vec + 1), GFP_KERNEL);
-> > -       if (!new_iov)
-> > -               return -ENOMEM;
-> > +       if (n_vec + 1 > CIFS_MAX_IOV_SIZE) {
-> > +               new_iov = kmalloc(sizeof(struct kvec) * (n_vec + 1),
-> > +                                 GFP_KERNEL);
-> > +               if (!new_iov)
-> > +                       return -ENOMEM;
-> > +       } else
-> > +               new_iov = s_iov;
-> >
-> >         /* 1st iov is an RFC1002 Session Message length */
-> >         memcpy(new_iov + 1, iov, (sizeof(struct kvec) * n_vec));
-> > @@ -861,7 +873,8 @@ smb2_send_recv(const unsigned int xid, struct cifs_ses
-> > *ses,
-> >         rqst.rq_nvec = n_vec + 1;
-> >
-> >         rc = cifs_send_recv(xid, ses, &rqst, resp_buf_type, flags,
-> >         resp_iov);
-> > -       kfree(new_iov);
-> > +       if (n_vec + 1 > CIFS_MAX_IOV_SIZE)
-> > +               kfree(new_iov);
-> >         return rc;
-> >  }
-> >
-> > --
-> > 2.13.3
-> >
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> Thanks for the patch!
-> 
-> Should we split it into two and mark the 1st part for stable? This would
-> address possible performance degradation in previous kernels because
-> SendReceive2() was changed to use kmalloc() several kernels ago. I didn't
-> measure a performance difference, so not sure if it is worth the effort.
+for you to fetch changes up to cfb6a953bfce3ece5f25af28d1cde762c328ae9d:
 
-Don't know. I leave that to Steve.
-It is low risk and probably improves performance a little bit, but it is
-not a bug so ...
+  cifs: avoid a kmalloc in smb2_send_recv/SendReceive2 for the common
+case (2017-11-21 18:29:11 -0600)
 
-> 
-> In both cases (as one patch or two), you can add my
-> 
-> Reviewed-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> 
-> --
-> Best regards,
-> Pavel Shilovsky
-> 
+----------------------------------------------------------------
+SMB3 updates for 4.15
+
+Includes cleanup of the RFC1001 length handling, and
+experimentalSMB3  RDMA support and a few additional misc fixes (one for stable).
+
+I expect to have another set of SMB3 RDMA patches from Long Li and Pavel in
+a few days after additional testing, as well as a few SMB3.1.1 fixes
+(improve security).
+
+----------------------------------------------------------------
+Aurelien Aptel (1):
+      CIFS: don't log STATUS_NOT_FOUND errors for DFS
+
+Long Li (7):
+      CIFS: SMBD: Add parameter rdata to smb2_new_read_req
+      CIFS: SMBD: Introduce kernel config option CONFIG_CIFS_SMB_DIRECT
+      CIFS: SMBD: Add rdma mount option
+      CIFS: SMBD: Add SMB Direct protocol initial values and constants
+      CIFS: SMBD: Establish SMB Direct connection
+      CIFS: SMBD: Implement function to create a SMB Direct connection
+      CIFS: SMBD: export protocol initial values
+
+Ronnie Sahlberg (22):
+      cifs: Add smb2_send_recv
+      cifs: remove rfc1002 header from smb2_negotiate_req
+      cifs: remove rfc1002 header from smb2_logoff_req
+      cifs: remove rfc1002 header from smb2_tree_disconnect_req
+      cifs: remove rfc1002 header from smb2_close_req
+      cifs: remove rfc1002 header from smb2_ioctl_req
+      cifs: remove rfc1002 header from smb2_echo_req
+      cifs: remove rfc1002 header from smb2_tree_connect_req
+      cifs: remove rfc1002 header from smb2_sess_setup_req
+      cifs: remove rfc1002 header from smb2_create_req
+      cifs: remove rfc1002 header from smb2_flush_req
+      cifs: remove rfc1002 header from smb2_lock_req
+      cifs: remove rfc1002 header from smb2 read/write requests
+      cifs: remove rfc1002 header from smb2_set_info_req
+      cifs: remove rfc1002 header from smb2_query_directory_req
+      cifs: remove rfc1002 header from smb2_query_info_req
+      cifs: remove rfc1002 header from smb2_oplock_break we get from server
+      cifs: fix NULL deref in SMB2_read
+      cifs: remove unused variable from SMB2_read
+      cifs: remove rfc1002 header from smb2_lease_ack
+      cifs: remove small_smb2_init
+      cifs: avoid a kmalloc in smb2_send_recv/SendReceive2 for the common case
+
+ fs/cifs/Kconfig      |    8 +
+ fs/cifs/Makefile     |    2 +
+ fs/cifs/cifs_debug.c |   81 +++
+ fs/cifs/cifsfs.c     |    2 +
+ fs/cifs/cifsglob.h   |    5 +
+ fs/cifs/cifsproto.h  |    4 +
+ fs/cifs/connect.c    |   15 +-
+ fs/cifs/smb2misc.c   |    2 +-
+ fs/cifs/smb2ops.c    |    3 +-
+ fs/cifs/smb2pdu.c    |  456 +++++++-------
+ fs/cifs/smb2pdu.h    |   46 +-
+ fs/cifs/smbdirect.c  | 1665 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smbdirect.h  |  257 ++++++++
+ fs/cifs/transport.c  |   61 +-
+ 14 files changed, 2350 insertions(+), 257 deletions(-)
+ create mode 100644 fs/cifs/smbdirect.c
+ create mode 100644 fs/cifs/smbdirect.h
+
+-- 
+Thanks,
+
+Steve
