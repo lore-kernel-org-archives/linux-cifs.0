@@ -1,62 +1,144 @@
 From: Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: RE: [PATCH v2] CIFS: don't log STATUS_NOT_FOUND errors for DFS
-Date: Tue, 21 Nov 2017 23:51:14 +0000
-Message-ID: <CY4PR21MB013584AFCEC42F23FF2B6A5CB6230@CY4PR21MB0135.namprd21.prod.outlook.com>
-References: <CAN05THRymsFpZcbXsSQj6=OVd94ZWE1L5a1EQF5-bz8qbG=oFA@mail.gmail.com>
- <20171121134756.25201-1-aaptel@suse.com>
+Subject: RE: [PATCH] cifs: avoid a kmalloc in smb2_send_recv/SendReceive2 for
+ the common case
+Date: Wed, 22 Nov 2017 00:06:38 +0000
+Message-ID: <CY4PR21MB013522818F6E904053FA08D4B6200@CY4PR21MB0135.namprd21.prod.outlook.com>
+References: <20171121040807.8364-1-lsahlber@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Cc: "smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org" <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>,
-        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171121134756.25201-1-aaptel-IBi9RG/b67k@public.gmane.org>
+In-Reply-To: <20171121040807.8364-1-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 
 
-2017-11-21 5:47 GMT-08:00 Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>:
-> cifs.ko makes DFS queries regardless of the type of the server and
-> non-DFS servers are common. This often results in superfluous logging of
-> non-critical errors.
+2017-11-20 20:08 GMT-08:00 Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> In both functions, use an array of 8 (arbitrary but should be big enough
+> for all current uses) iov and avoid having to kmalloc the array
+> for the common case.
 >
-> Signed-off-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+> If 8 is too small, then fall back to the original behaviour and use
+> kmalloc/kfree.
+>
+> This should not change any behaviour but should save us a tiny amount of
+> cpu cycles.
+>
+> Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > ---
-> v2: instead of always logging at FYI level, only log non-ENOENT errors
->     at VFS level
+>  fs/cifs/transport.c | 33 +++++++++++++++++++++++----------
+>  1 file changed, 23 insertions(+), 10 deletions(-)
 >
->  fs/cifs/smb2ops.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+> index e678307bb7a0..510f41a435c8 100644
+> --- a/fs/cifs/transport.c
+> +++ b/fs/cifs/transport.c
+> @@ -38,6 +38,9 @@
+>  #include "cifsproto.h"
+>  #include "cifs_debug.h"
 >
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 0dafdbae1f8c..3aa9f46c51e3 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -1387,7 +1387,8 @@ smb2_get_dfs_refer(const unsigned int xid, struct c=
-ifs_ses *ses,
->         } while (rc =3D=3D -EAGAIN);
+> +/* Max number of iovectors we can use off the stack when sending request=
+s. */
+> +#define CIFS_MAX_IOV_SIZE 8
+> +
+>  void
+>  cifs_wake_up_task(struct mid_q_entry *mid)
+>  {
+> @@ -803,12 +806,16 @@ SendReceive2(const unsigned int xid, struct cifs_se=
+s *ses,
+>              const int flags, struct kvec *resp_iov)
+>  {
+>         struct smb_rqst rqst;
+> -       struct kvec *new_iov;
+> +       struct kvec s_iov[CIFS_MAX_IOV_SIZE], *new_iov;
+>         int rc;
 >
->         if (rc) {
-> -               cifs_dbg(VFS, "ioctl error in smb2_get_dfs_refer rc=3D%d\=
-n", rc);
-> +               if (rc !=3D -ENOENT)
-> +                       cifs_dbg(VFS, "ioctl error in smb2_get_dfs_refer =
-rc=3D%d\n", rc);
->                 goto out;
->         }
+> -       new_iov =3D kmalloc(sizeof(struct kvec) * (n_vec + 1), GFP_KERNEL=
+);
+> -       if (!new_iov)
+> -               return -ENOMEM;
+> +       if (n_vec + 1 > CIFS_MAX_IOV_SIZE) {
+> +               new_iov =3D kmalloc(sizeof(struct kvec) * (n_vec + 1),
+> +                                 GFP_KERNEL);
+> +               if (!new_iov)
+> +                       return -ENOMEM;
+> +       } else
+> +               new_iov =3D s_iov;
+>
+>         /* 1st iov is a RFC1001 length followed by the rest of the packet=
+ */
+>         memcpy(new_iov + 1, iov, (sizeof(struct kvec) * n_vec));
+> @@ -823,7 +830,8 @@ SendReceive2(const unsigned int xid, struct cifs_ses =
+*ses,
+>         rqst.rq_nvec =3D n_vec + 1;
+>
+>         rc =3D cifs_send_recv(xid, ses, &rqst, resp_buf_type, flags, resp=
+_iov);
+> -       kfree(new_iov);
+> +       if (n_vec + 1 > CIFS_MAX_IOV_SIZE)
+> +               kfree(new_iov);
+>         return rc;
+>  }
+>
+> @@ -834,15 +842,19 @@ smb2_send_recv(const unsigned int xid, struct cifs_=
+ses *ses,
+>                const int flags, struct kvec *resp_iov)
+>  {
+>         struct smb_rqst rqst;
+> -       struct kvec *new_iov;
+> +       struct kvec s_iov[CIFS_MAX_IOV_SIZE], *new_iov;
+>         int rc;
+>         int i;
+>         __u32 count;
+>         __be32 rfc1002_marker;
+>
+> -       new_iov =3D kmalloc(sizeof(struct kvec) * (n_vec + 1), GFP_KERNEL=
+);
+> -       if (!new_iov)
+> -               return -ENOMEM;
+> +       if (n_vec + 1 > CIFS_MAX_IOV_SIZE) {
+> +               new_iov =3D kmalloc(sizeof(struct kvec) * (n_vec + 1),
+> +                                 GFP_KERNEL);
+> +               if (!new_iov)
+> +                       return -ENOMEM;
+> +       } else
+> +               new_iov =3D s_iov;
+>
+>         /* 1st iov is an RFC1002 Session Message length */
+>         memcpy(new_iov + 1, iov, (sizeof(struct kvec) * n_vec));
+> @@ -861,7 +873,8 @@ smb2_send_recv(const unsigned int xid, struct cifs_se=
+s *ses,
+>         rqst.rq_nvec =3D n_vec + 1;
+>
+>         rc =3D cifs_send_recv(xid, ses, &rqst, resp_buf_type, flags, resp=
+_iov);
+> -       kfree(new_iov);
+> +       if (n_vec + 1 > CIFS_MAX_IOV_SIZE)
+> +               kfree(new_iov);
+>         return rc;
+>  }
 >
 > --
-> 2.12.3
+> 2.13.3
 >
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
 > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Thanks!
+Thanks for the patch!
+
+Should we split it into two and mark the 1st part for stable? This would ad=
+dress possible performance degradation in previous kernels because SendRece=
+ive2() was changed to use kmalloc() several kernels ago. I didn't measure a=
+ performance difference, so not sure if it is worth the effort.
+
+In both cases (as one patch or two), you can add my
 
 Reviewed-by: Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 
