@@ -1,7 +1,7 @@
 From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Subject: [Patch v8 09/16] CIFS: SMBD: Implement function to send data via RDMA send
-Date: Wed, 22 Nov 2017 17:38:42 -0700
-Message-ID: <20171123003849.17093-10-longli@exchange.microsoft.com>
+Subject: [Patch v8 12/16] CIFS: SMBD: Upper layer performs SMB write via RDMA read through memory registration
+Date: Wed, 22 Nov 2017 17:38:45 -0700
+Message-ID: <20171123003849.17093-13-longli@exchange.microsoft.com>
 References: <20171123003849.17093-1-longli@exchange.microsoft.com>
 Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
@@ -10,340 +10,177 @@ To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u
         Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
         Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
         Stephen Hemminger <sthemmin-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <20171123003849.17093-1-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 
-The transport doesn't maintain send buffers or send queue for transferring
-payload via RDMA send. There is no data copy in the transport on send.
+When sending I/O, if size is larger than rdma_readwrite_threshold we prepare
+to send SMB write packet for a RDMA read via memory registration. The actual
+I/O is done by remote peer through local RDMA hardware. Modify the relevant
+fields in the packet accordingly, and append a smbd_buffer_descriptor_v1 to
+the end of the SMB write packet.
+
+On write I/O finish, deregister the memory region if this was for a RDMA read.
+If remote invalidation is not used, the call to smbd_deregister_mr will do
+local invalidation and possibly wait. Memory region is normally deregistered
+in MID callback as soon as it's used. There are situations where the MID may
+not be created on I/O failure, under which memory region is deregistered when
+write data context is released.
 
 Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 ---
- fs/cifs/smbdirect.c | 246 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smbdirect.h |   5 ++
- 2 files changed, 251 insertions(+)
+ fs/cifs/cifsglob.h |  3 +++
+ fs/cifs/cifssmb.c  |  7 ++++++
+ fs/cifs/smb2pdu.c  | 65 +++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 3 files changed, 72 insertions(+), 3 deletions(-)
 
-diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index 6cff234..cb062e2 100644
---- a/fs/cifs/smbdirect.c
-+++ b/fs/cifs/smbdirect.c
-@@ -41,6 +41,12 @@ static int smbd_post_recv(
- 		struct smbd_response *response);
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 3fb1a2f..22bfda0 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -1174,6 +1174,9 @@ struct cifs_writedata {
+ 	pid_t				pid;
+ 	unsigned int			bytes;
+ 	int				result;
++#ifdef CONFIG_CIFS_SMB_DIRECT
++	struct smbd_mr			*mr;
++#endif
+ 	unsigned int			pagesz;
+ 	unsigned int			tailsz;
+ 	unsigned int			credits;
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 35dc5bf..66d1ebf 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -43,6 +43,7 @@
+ #include "cifs_unicode.h"
+ #include "cifs_debug.h"
+ #include "fscache.h"
++#include "smbdirect.h"
  
- static int smbd_post_send_empty(struct smbd_connection *info);
-+static int smbd_post_send_data(
-+		struct smbd_connection *info,
-+		struct kvec *iov, int n_vec, int remaining_data_length);
-+static int smbd_post_send_page(struct smbd_connection *info,
-+		struct page *page, unsigned long offset,
-+		size_t size, int remaining_data_length);
+ #ifdef CONFIG_CIFS_POSIX
+ static struct {
+@@ -1923,6 +1924,12 @@ cifs_writedata_release(struct kref *refcount)
+ {
+ 	struct cifs_writedata *wdata = container_of(refcount,
+ 					struct cifs_writedata, refcount);
++#ifdef CONFIG_CIFS_SMB_DIRECT
++	if (wdata->mr) {
++		smbd_deregister_mr(wdata->mr);
++		wdata->mr = NULL;
++	}
++#endif
  
- /* SMBD version number */
- #define SMBD_V1	0x0100
-@@ -177,6 +183,10 @@ static void smbd_destroy_rdma_work(struct work_struct *work)
- 	log_rdma_event(INFO, "cancelling send immediate work\n");
- 	cancel_delayed_work_sync(&info->send_immediate_work);
- 
-+	log_rdma_event(INFO, "wait for all send to finish\n");
-+	wait_event(info->wait_smbd_send_pending,
-+		info->smbd_send_pending == 0);
-+
- 	log_rdma_event(INFO, "wait for all recv to finish\n");
- 	wake_up_interruptible(&info->wait_reassembly_queue);
- 	wait_event(info->wait_smbd_recv_pending,
-@@ -1078,6 +1088,24 @@ static int smbd_post_send_sgl(struct smbd_connection *info,
- }
+ 	if (wdata->cfile)
+ 		cifsFileInfo_put(wdata->cfile);
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index c0dc049..908d777 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -48,6 +48,7 @@
+ #include "smb2glob.h"
+ #include "cifspdu.h"
+ #include "cifs_spnego.h"
++#include "smbdirect.h"
  
  /*
-+ * Send a page
-+ * page: the page to send
-+ * offset: offset in the page to send
-+ * size: length in the page to send
-+ * remaining_data_length: remaining data to send in this payload
-+ */
-+static int smbd_post_send_page(struct smbd_connection *info, struct page *page,
-+		unsigned long offset, size_t size, int remaining_data_length)
-+{
-+	struct scatterlist sgl;
-+
-+	sg_init_table(&sgl, 1);
-+	sg_set_page(&sgl, page, size, offset);
-+
-+	return smbd_post_send_sgl(info, &sgl, size, remaining_data_length);
-+}
-+
-+/*
-  * Send an empty message
-  * Empty message is used to extend credits to peer to for keep live
-  * while there is no upper layer payload to send at the time
-@@ -1089,6 +1117,35 @@ static int smbd_post_send_empty(struct smbd_connection *info)
- }
- 
- /*
-+ * Send a data buffer
-+ * iov: the iov array describing the data buffers
-+ * n_vec: number of iov array
-+ * remaining_data_length: remaining data to send following this packet
-+ * in segmented SMBD packet
-+ */
-+static int smbd_post_send_data(
-+	struct smbd_connection *info, struct kvec *iov, int n_vec,
-+	int remaining_data_length)
-+{
-+	int i;
-+	u32 data_length = 0;
-+	struct scatterlist sgl[SMBDIRECT_MAX_SGE];
-+
-+	if (n_vec > SMBDIRECT_MAX_SGE) {
-+		cifs_dbg(VFS, "Can't fit data to SGL, n_vec=%d\n", n_vec);
-+		return -ENOMEM;
-+	}
-+
-+	sg_init_table(sgl, n_vec);
-+	for (i = 0; i < n_vec; i++) {
-+		data_length += iov[i].iov_len;
-+		sg_set_buf(&sgl[i], iov[i].iov_base, iov[i].iov_len);
-+	}
-+
-+	return smbd_post_send_sgl(info, sgl, data_length, remaining_data_length);
-+}
-+
-+/*
-  * Post a receive request to the transport
-  * The remote peer can only send data when a receive request is posted
-  * The interaction is controlled by send/receive credit system
-@@ -1652,6 +1709,9 @@ struct smbd_connection *_smbd_get_connection(
- 	queue_delayed_work(info->workqueue, &info->idle_timer_work,
- 		info->keep_alive_interval*HZ);
- 
-+	init_waitqueue_head(&info->wait_smbd_send_pending);
-+	info->smbd_send_pending = 0;
-+
- 	init_waitqueue_head(&info->wait_smbd_recv_pending);
- 	info->smbd_recv_pending = 0;
- 
-@@ -1943,3 +2003,189 @@ int smbd_recv(struct smbd_connection *info, struct msghdr *msg)
- 		msg->msg_iter.count = 0;
- 	return rc;
- }
-+
-+/*
-+ * Send data to transport
-+ * Each rqst is transported as a SMBDirect payload
-+ * rqst: the data to write
-+ * return value: 0 if successfully write, otherwise error code
-+ */
-+int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst)
-+{
-+	struct kvec vec;
-+	int nvecs;
-+	int size;
-+	int buflen = 0, remaining_data_length;
-+	int start, i, j;
-+	int max_iov_size =
-+		info->max_send_size - sizeof(struct smbd_data_transfer);
-+	struct kvec iov[SMBDIRECT_MAX_SGE];
-+	int rc;
-+
-+	info->smbd_send_pending++;
-+	if (info->transport_status != SMBD_CONNECTED) {
-+		rc = -ENODEV;
-+		goto done;
-+	}
-+
+  *  The following table defines the expected "StructureSize" of SMB2 requests
+@@ -2728,7 +2729,19 @@ smb2_writev_callback(struct mid_q_entry *mid)
+ 		wdata->result = -EIO;
+ 		break;
+ 	}
+-
++#ifdef CONFIG_CIFS_SMB_DIRECT
 +	/*
-+	 * This usually means a configuration error
-+	 * We use RDMA read/write for packet size > rdma_readwrite_threshold
-+	 * as long as it's properly configured we should never get into this
-+	 * situation
++	 * If this wdata has a memory registered, the MR can be freed
++	 * The number of MRs available is limited, it's important to recover
++	 * used MR as soon as I/O is finished. Hold MR longer in the later
++	 * I/O process can possibly result in I/O deadlock due to lack of MR
++	 * to send request on I/O retry
 +	 */
-+	if (rqst->rq_nvec + rqst->rq_npages > SMBDIRECT_MAX_SGE) {
-+		log_write(ERR, "maximum send segment %x exceeding %x\n",
-+			 rqst->rq_nvec + rqst->rq_npages, SMBDIRECT_MAX_SGE);
-+		rc = -EINVAL;
-+		goto done;
++	if (wdata->mr) {
++		smbd_deregister_mr(wdata->mr);
++		wdata->mr = NULL;
 +	}
-+
++#endif
+ 	if (wdata->result)
+ 		cifs_stats_fail_inc(tcon, SMB2_WRITE_HE);
+ 
+@@ -2780,7 +2793,42 @@ smb2_async_writev(struct cifs_writedata *wdata,
+ 	req->DataOffset = cpu_to_le16(
+ 				offsetof(struct smb2_write_req, Buffer));
+ 	req->RemainingBytes = 0;
+-
++#ifdef CONFIG_CIFS_SMB_DIRECT
 +	/*
-+	 * Remove the RFC1002 length defined in MS-SMB2 section 2.1
-+	 * It is used only for TCP transport
-+	 * In future we may want to add a transport layer under protocol
-+	 * layer so this will only be issued to TCP transport
++	 * If we want to do a server RDMA read, fill in and append
++	 * smbd_buffer_descriptor_v1 to the end of write request
 +	 */
-+	iov[0].iov_base = (char *)rqst->rq_iov[0].iov_base + 4;
-+	iov[0].iov_len = rqst->rq_iov[0].iov_len - 4;
-+	buflen += iov[0].iov_len;
++	if (server->rdma && wdata->bytes >=
++		server->smbd_conn->rdma_readwrite_threshold) {
 +
-+	/* total up iov array first */
-+	for (i = 1; i < rqst->rq_nvec; i++) {
-+		iov[i].iov_base = rqst->rq_iov[i].iov_base;
-+		iov[i].iov_len = rqst->rq_iov[i].iov_len;
-+		buflen += iov[i].iov_len;
-+	}
++		struct smbd_buffer_descriptor_v1 *v1;
++		bool need_invalidate = server->dialect == SMB30_PROT_ID;
 +
-+	/* add in the page array if there is one */
-+	if (rqst->rq_npages) {
-+		buflen += rqst->rq_pagesz * (rqst->rq_npages - 1);
-+		buflen += rqst->rq_tailsz;
-+	}
-+
-+	if (buflen + sizeof(struct smbd_data_transfer) >
-+		info->max_fragmented_send_size) {
-+		log_write(ERR, "payload size %d > max size %d\n",
-+			buflen, info->max_fragmented_send_size);
-+		rc = -EINVAL;
-+		goto done;
-+	}
-+
-+	remaining_data_length = buflen;
-+
-+	log_write(INFO, "rqst->rq_nvec=%d rqst->rq_npages=%d rq_pagesz=%d "
-+		"rq_tailsz=%d buflen=%d\n",
-+		rqst->rq_nvec, rqst->rq_npages, rqst->rq_pagesz,
-+		rqst->rq_tailsz, buflen);
-+
-+	start = i = iov[0].iov_len ? 0 : 1;
-+	buflen = 0;
-+	while (true) {
-+		buflen += iov[i].iov_len;
-+		if (buflen > max_iov_size) {
-+			if (i > start) {
-+				remaining_data_length -=
-+					(buflen-iov[i].iov_len);
-+				log_write(INFO, "sending iov[] from start=%d "
-+					"i=%d nvecs=%d "
-+					"remaining_data_length=%d\n",
-+					start, i, i-start,
-+					remaining_data_length);
-+				rc = smbd_post_send_data(
-+					info, &iov[start], i-start,
-+					remaining_data_length);
-+				if (rc)
-+					goto done;
-+			} else {
-+				/* iov[start] is too big, break it */
-+				nvecs = (buflen+max_iov_size-1)/max_iov_size;
-+				log_write(INFO, "iov[%d] iov_base=%p buflen=%d"
-+					" break to %d vectors\n",
-+					start, iov[start].iov_base,
-+					buflen, nvecs);
-+				for (j = 0; j < nvecs; j++) {
-+					vec.iov_base =
-+						(char *)iov[start].iov_base +
-+						j*max_iov_size;
-+					vec.iov_len = max_iov_size;
-+					if (j == nvecs-1)
-+						vec.iov_len =
-+							buflen -
-+							max_iov_size*(nvecs-1);
-+					remaining_data_length -= vec.iov_len;
-+					log_write(INFO,
-+						"sending vec j=%d iov_base=%p"
-+						" iov_len=%zu "
-+						"remaining_data_length=%d\n",
-+						j, vec.iov_base, vec.iov_len,
-+						remaining_data_length);
-+					rc = smbd_post_send_data(
-+						info, &vec, 1,
-+						remaining_data_length);
-+					if (rc)
-+						goto done;
-+				}
-+				i++;
-+			}
-+			start = i;
-+			buflen = 0;
-+		} else {
-+			i++;
-+			if (i == rqst->rq_nvec) {
-+				/* send out all remaining vecs */
-+				remaining_data_length -= buflen;
-+				log_write(INFO,
-+					"sending iov[] from start=%d i=%d "
-+					"nvecs=%d remaining_data_length=%d\n",
-+					start, i, i-start,
-+					remaining_data_length);
-+				rc = smbd_post_send_data(info, &iov[start],
-+					i-start, remaining_data_length);
-+				if (rc)
-+					goto done;
-+				break;
-+			}
++		wdata->mr = smbd_register_mr(
++				server->smbd_conn, wdata->pages,
++				wdata->nr_pages, wdata->tailsz,
++				false, need_invalidate);
++		if (!wdata->mr) {
++			rc = -ENOBUFS;
++			goto async_writev_out;
 +		}
-+		log_write(INFO, "looping i=%d buflen=%d\n", i, buflen);
++		req->Length = 0;
++		req->DataOffset = 0;
++		req->RemainingBytes =
++			(wdata->nr_pages-1)*PAGE_SIZE + wdata->tailsz;
++		req->Channel = SMB2_CHANNEL_RDMA_V1_INVALIDATE;
++		if (need_invalidate)
++			req->Channel = SMB2_CHANNEL_RDMA_V1;
++		req->WriteChannelInfoOffset =
++			offsetof(struct smb2_write_req, Buffer);
++		req->WriteChannelInfoLength =
++			sizeof(struct smbd_buffer_descriptor_v1);
++		v1 = (struct smbd_buffer_descriptor_v1 *) &req->Buffer[0];
++		v1->offset = wdata->mr->mr->iova;
++		v1->token = wdata->mr->mr->rkey;
++		v1->length = wdata->mr->mr->length;
 +	}
-+
-+	/* now sending pages if there are any */
-+	for (i = 0; i < rqst->rq_npages; i++) {
-+		buflen = (i == rqst->rq_npages-1) ?
-+			rqst->rq_tailsz : rqst->rq_pagesz;
-+		nvecs = (buflen + max_iov_size - 1) / max_iov_size;
-+		log_write(INFO, "sending pages buflen=%d nvecs=%d\n",
-+			buflen, nvecs);
-+		for (j = 0; j < nvecs; j++) {
-+			size = max_iov_size;
-+			if (j == nvecs-1)
-+				size = buflen - j*max_iov_size;
-+			remaining_data_length -= size;
-+			log_write(INFO, "sending pages i=%d offset=%d size=%d"
-+				" remaining_data_length=%d\n",
-+				i, j*max_iov_size, size, remaining_data_length);
-+			rc = smbd_post_send_page(
-+				info, rqst->rq_pages[i], j*max_iov_size,
-+				size, remaining_data_length);
-+			if (rc)
-+				goto done;
-+		}
++#endif
+ 	/* 4 for rfc1002 length field and 1 for Buffer */
+ 	iov[0].iov_len = 4;
+ 	rfc1002_marker = cpu_to_be32(total_len - 1 + wdata->bytes);
+@@ -2794,11 +2842,22 @@ smb2_async_writev(struct cifs_writedata *wdata,
+ 	rqst.rq_npages = wdata->nr_pages;
+ 	rqst.rq_pagesz = wdata->pagesz;
+ 	rqst.rq_tailsz = wdata->tailsz;
+-
++#ifdef CONFIG_CIFS_SMB_DIRECT
++	if (wdata->mr) {
++		iov[1].iov_len += sizeof(struct smbd_buffer_descriptor_v1);
++		rqst.rq_npages = 0;
 +	}
-+
-+done:
-+	/*
-+	 * As an optimization, we don't wait for individual I/O to finish
-+	 * before sending the next one.
-+	 * Send them all and wait for pending send count to get to 0
-+	 * that means all the I/Os have been out and we are good to return
-+	 */
-+
-+	wait_event(info->wait_send_payload_pending,
-+		atomic_read(&info->send_payload_pending) == 0);
-+
-+	info->smbd_send_pending--;
-+	wake_up(&info->wait_smbd_send_pending);
-+
-+	return rc;
-+}
-diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
-index 990342e..d1cafa1 100644
---- a/fs/cifs/smbdirect.h
-+++ b/fs/cifs/smbdirect.h
-@@ -92,6 +92,9 @@ struct smbd_connection {
++#endif
+ 	cifs_dbg(FYI, "async write at %llu %u bytes\n",
+ 		 wdata->offset, wdata->bytes);
  
- 	/* Activity accoutning */
- 	/* Pending reqeusts issued from upper layer */
-+	int smbd_send_pending;
-+	wait_queue_head_t wait_smbd_send_pending;
-+
- 	int smbd_recv_pending;
- 	wait_queue_head_t wait_smbd_recv_pending;
++#ifdef CONFIG_CIFS_SMB_DIRECT
++	/* For RDMA read, I/O size is in RemainingBytes not in Length */
++	if (!wdata->mr)
++		req->Length = cpu_to_le32(wdata->bytes);
++#else
+ 	req->Length = cpu_to_le32(wdata->bytes);
++#endif
  
-@@ -257,6 +260,7 @@ void smbd_destroy(struct smbd_connection *info);
- 
- /* Interface for carrying upper layer I/O through send/recv */
- int smbd_recv(struct smbd_connection *info, struct msghdr *msg);
-+int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst);
- 
- #else
- #define cifs_rdma_enabled(server)	0
-@@ -266,6 +270,7 @@ static inline void *smbd_get_connection(
- static inline int smbd_reconnect(struct TCP_Server_Info *server) {return -1;}
- static inline void smbd_destroy(struct smbd_connection *info) {}
- static inline int smbd_recv(struct smbd_connection *info, struct msghdr *msg) {return -1;}
-+static inline int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst) {return -1;}
- #endif
- 
- #endif
+ 	if (wdata->credits) {
+ 		shdr->CreditCharge = cpu_to_le16(DIV_ROUND_UP(wdata->bytes,
 -- 
 2.7.4
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
