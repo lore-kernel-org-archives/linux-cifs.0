@@ -1,8 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v8 13/16] CIFS: SMBD: Read correct returned data length for RDMA write (SMB read) I/O
-Date: Wed, 22 Nov 2017 17:38:46 -0700
-Message-ID: <20171123003849.17093-14-longli@exchange.microsoft.com>
-References: <20171123003849.17093-1-longli@exchange.microsoft.com>
+Subject: [Patch v8 00/16] CIFS: Implement SMB Direct protocol
+Date: Wed, 22 Nov 2017 17:38:33 -0700
+Message-ID: <20171123003849.17093-1-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
@@ -11,141 +10,101 @@ To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
         Matthew Wilcox <mawilcox@microsoft.com>,
         Stephen Hemminger <sthemmin@microsoft.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20171123003849.17093-1-longli@exchange.microsoft.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-This patch is for preparing upper layer doing SMB read via RDMA write.
+Starting with SMB2 dialect 3.0, Microsoft introduced SMB Direct transport
+protocol for transferring upper layer (SMB2) payload over RDMA via Infiniband,
+RoCE or iWARP. The prococol is published in [MS-SMBD]
+(https://msdn.microsoft.com/en-us/library/hh536346.aspx).
 
-When RDMA write is used for SMB read, the returned data length is in
-DataRemaining in the response packet. Reading it properly by adding a
-parameter to specifiy where the returned data length is.
+Change log:
+v2:
+Implemented RDMA read/write via memory registration.
+Re-arranged patches for review [Christoph Hellwig <hch@infradead.org>].
+Restructured the code and fixed bugs on protocol timer and keepalive
+[Tom Talpey <ttalpey@microsoft.com>].
 
-Add the defition for memory registration to wdata and return the correct
-length based on if RDMA write is used.
+v3:
+Improved performance by introducing an additional queue for handling
+empty packets and reducing lock contention on IRQ path.
+Added light weight profiling by reading TSC.
+Improved the code for checking SMB versions when mounting with rdma option
+[Leon Romanovsky <leon@kernel.org>].
+Moved to use pages instead of buffers for passing I/O for RDMA
+[Christoph Hellwig <hch@infradead.org>].
+Removed redundant code and refactored I/O code paths
+[Christoph Hellwig <hch@infradead.org>, Tom Talpey <ttalpey@microsoft.com>].
 
-Signed-off-by: Long Li <longli@microsoft.com>
----
- fs/cifs/cifsglob.h | 13 +++++++++++--
- fs/cifs/cifssmb.c  |  8 ++++++--
- fs/cifs/smb1ops.c  |  4 +++-
- fs/cifs/smb2ops.c  | 12 ++++++++++--
- 4 files changed, 30 insertions(+), 7 deletions(-)
+v4:
+Fixed connectivity issues with iWAPR devices.
+Exported configurable protocol parameters to /proc/fs/cifs
+[Steve French <sfrench@samba.org>]
+Re-arranged patches for review
+[Pavel Shilovsky <piastryyy@gmail.com>].
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 22bfda0..8d39ca4 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -230,8 +230,14 @@ struct smb_version_operations {
- 	__u64 (*get_next_mid)(struct TCP_Server_Info *);
- 	/* data offset from read response message */
- 	unsigned int (*read_data_offset)(char *);
--	/* data length from read response message */
--	unsigned int (*read_data_length)(char *);
-+	/*
-+	 * Data length from read response message
-+	 * When in_remaining is true, the returned data length is in
-+	 * message field DataRemaining for out-of-band data read (e.g through
-+	 * Memory Registration RDMA write in SMBD).
-+	 * Otherwise, the returned data length is in message field DataLength.
-+	 */
-+	unsigned int (*read_data_length)(char *, bool in_remaining);
- 	/* map smb to linux error */
- 	int (*map_error)(char *, bool);
- 	/* find mid corresponding to the response message */
-@@ -1152,6 +1158,9 @@ struct cifs_readdata {
- 				struct cifs_readdata *rdata,
- 				struct iov_iter *iter);
- 	struct kvec			iov[2];
-+#ifdef CONFIG_CIFS_SMB_DIRECT
-+	struct smbd_mr			*mr;
-+#endif
- 	unsigned int			pagesz;
- 	unsigned int			tailsz;
- 	unsigned int			credits;
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 66d1ebf..49cf999 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -1455,6 +1455,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 	struct cifs_readdata *rdata = mid->callback_data;
- 	char *buf = server->smallbuf;
- 	unsigned int buflen = get_rfc1002_length(buf) + 4;
-+	bool use_rdma_mr = false;
- 
- 	cifs_dbg(FYI, "%s: mid=%llu offset=%llu bytes=%u\n",
- 		 __func__, mid->mid, rdata->offset, rdata->bytes);
-@@ -1543,8 +1544,11 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 		 rdata->iov[0].iov_base, server->total_read);
- 
- 	/* how much data is in the response? */
--	data_len = server->ops->read_data_length(buf);
--	if (data_offset + data_len > buflen) {
-+#ifdef CONFIG_CIFS_SMB_DIRECT
-+	use_rdma_mr = rdata->mr;
-+#endif
-+	data_len = server->ops->read_data_length(buf, use_rdma_mr);
-+	if (!use_rdma_mr && (data_offset + data_len > buflen)) {
- 		/* data_len is corrupt -- discard frame */
- 		rdata->result = -EIO;
- 		return cifs_readv_discard(server, mid);
-diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index a723df3..3d495e4 100644
---- a/fs/cifs/smb1ops.c
-+++ b/fs/cifs/smb1ops.c
-@@ -87,9 +87,11 @@ cifs_read_data_offset(char *buf)
- }
- 
- static unsigned int
--cifs_read_data_length(char *buf)
-+cifs_read_data_length(char *buf, bool in_remaining)
- {
- 	READ_RSP *rsp = (READ_RSP *)buf;
-+	/* It's a bug reading remaining data for SMB1 packets */
-+	WARN_ON(in_remaining);
- 	return (le16_to_cpu(rsp->DataLengthHigh) << 16) +
- 	       le16_to_cpu(rsp->DataLength);
- }
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 5e6a5e6..2ead98a 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -957,9 +957,13 @@ smb2_read_data_offset(char *buf)
- }
- 
- static unsigned int
--smb2_read_data_length(char *buf)
-+smb2_read_data_length(char *buf, bool in_remaining)
- {
- 	struct smb2_read_rsp *rsp = (struct smb2_read_rsp *)buf;
-+
-+	if (in_remaining)
-+		return le32_to_cpu(rsp->DataRemaining);
-+
- 	return le32_to_cpu(rsp->DataLength);
- }
- 
-@@ -2420,6 +2424,7 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
- 	struct iov_iter iter;
- 	struct kvec iov;
- 	int length;
-+	bool use_rdma_mr = false;
- 
- 	if (shdr->Command != SMB2_READ) {
- 		cifs_dbg(VFS, "only big read responses are supported\n");
-@@ -2446,7 +2451,10 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
- 	}
- 
- 	data_offset = server->ops->read_data_offset(buf) + 4;
--	data_len = server->ops->read_data_length(buf);
-+#ifdef CONFIG_CIFS_SMB_DIRECT
-+	use_rdma_mr = rdata->mr;
-+#endif
-+	data_len = server->ops->read_data_length(buf, use_rdma_mr);
- 
- 	if (data_offset < server->vals->read_rsp_size) {
- 		/*
+v5:
+Fixed compiling errors on ia64, i386 and when INFINIBAND is not
+configured. [kbuild test robot]
+Profiling is removed and will be introduced in a seperate patch.
+
+v6:
+Report internal code error via WARN_ON(). Change description in
+Kconfig [Pavel Shilovsky <piastryyy@gmail.com>].
+
+v7:
+Removed the use of #ifdef CONFIG_CIFS_SMB_DIRECT in upper layer
+code calling transport I/O. [Matthew Wilcox <mawilcox@microsoft.com>,
+Tom Talpey <ttalpey@microsoft.com>]
+
+v8:
+Fixed comment typos and removed unused code
+[Ronnie Sahlberg <lsahlber@redhat.com>]
+Removed the first 7 patches in v7, which have been merged.
+Restructed the code to move relevant function definitions to later patches.
+[Pavel Shilovsky <piastryyy@gmail.com>]
+Added a patch to disable signing when RDMA is in use. Signing will be
+enabled after it is properly implemented in SMB Direct code paths.
+Fixed an issue on passing the incorrect offset to smbd_buffer_descriptor_v1
+when RDMA read is used for SMB write. This was caused by recent CIFS
+patches to remove packet length from SMB2 packet header.
+
+Long Li (16):
+  CIFS: SMBD: Upper layer connects to SMBDirect session
+  CIFS: SMBD: Implement function to reconnect to a SMB Direct transport
+  CIFS: SMBD: Upper layer reconnects to SMB Direct session
+  CIFS: SMBD: Implement function to destroy a SMB Direct connection
+  CIFS: SMBD: Upper layer destroys SMB Direct session on shutdown or
+    umount
+  CIFS: SMBD: Set SMB Direct maximum read or write size for I/O
+  CIFS: SMBD: Implement function to receive data via RDMA receive
+  CIFS: SMBD: Upper layer receives data via RDMA receive
+  CIFS: SMBD: Implement function to send data via RDMA send
+  CIFS: SMBD: Upper layer sends data via RDMA send
+  CIFS: SMBD: Implement RDMA memory registration
+  CIFS: SMBD: Upper layer performs SMB write via RDMA read through
+    memory registration
+  CIFS: SMBD: Read correct returned data length for RDMA write (SMB
+    read) I/O
+  CIFS: SMBD: Upper layer performs SMB read via RDMA write through
+    memory registration
+  CIFS: SMBD: Add SMB Direct debug counters
+  CIFS: SMBD: Disable signing on SMB direct transport
+
+ fs/cifs/cifs_debug.c |  66 ++++
+ fs/cifs/cifsglob.h   |  16 +-
+ fs/cifs/cifssmb.c    |  15 +-
+ fs/cifs/connect.c    |  46 ++-
+ fs/cifs/file.c       |  17 +-
+ fs/cifs/smb1ops.c    |   4 +-
+ fs/cifs/smb2ops.c    |  24 +-
+ fs/cifs/smb2pdu.c    | 117 ++++++-
+ fs/cifs/smbdirect.c  | 947 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smbdirect.h  |  72 ++++
+ fs/cifs/transport.c  |   8 +-
+ 11 files changed, 1308 insertions(+), 24 deletions(-)
+
 -- 
 2.7.4
