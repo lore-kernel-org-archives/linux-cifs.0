@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v8 16/16] CIFS: SMBD: Disable signing on SMB direct transport
-Date: Wed, 22 Nov 2017 17:38:49 -0700
-Message-ID: <20171123003849.17093-17-longli@exchange.microsoft.com>
+Subject: [Patch v8 04/16] CIFS: SMBD: Implement function to destroy a SMB Direct connection
+Date: Wed, 22 Nov 2017 17:38:37 -0700
+Message-ID: <20171123003849.17093-5-longli@exchange.microsoft.com>
 References: <20171123003849.17093-1-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -17,51 +17,62 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-Currently the CIFS SMB Direct implementation (experimental) doesn't properly
-support signing. Disable it when SMB Direct is in use for transport.
-
-Signing will be enabled in future after it is implemented.
+Add function to tear down a SMB Direct connection. This is used by upper layer
+to free all SMB Direct connection and transport resources.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/connect.c | 8 ++++++++
- fs/cifs/smb2pdu.c | 5 +++++
- 2 files changed, 13 insertions(+)
+ fs/cifs/smbdirect.c | 16 ++++++++++++++++
+ fs/cifs/smbdirect.h |  3 +++
+ 2 files changed, 19 insertions(+)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 1677401..b18eae1 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1968,6 +1968,14 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
- 		goto cifs_parse_mount_err;
- 	}
+diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+index a96058a..b462a2f 100644
+--- a/fs/cifs/smbdirect.c
++++ b/fs/cifs/smbdirect.c
+@@ -1387,6 +1387,22 @@ static void idle_connection_timer(struct work_struct *work)
+ 			info->keep_alive_interval*HZ);
+ }
  
-+#ifdef CONFIG_CIFS_SMB_DIRECT
-+	if (vol->rdma && vol->sign) {
-+		cifs_dbg(VFS, "Currently SMB direct doesn't support signing."
-+			" This is being fixed\n");
-+		goto cifs_parse_mount_err;
-+	}
-+#endif
++/* Destroy this SMBD connection, called from upper layer */
++void smbd_destroy(struct smbd_connection *info)
++{
++	log_rdma_event(INFO, "destroying rdma session\n");
 +
- #ifndef CONFIG_KEYS
- 	/* Muliuser mounts require CONFIG_KEYS support */
- 	if (vol->multiuser) {
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index bee0871d..a3e67be 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -616,6 +616,11 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
- 
- 	cifs_dbg(FYI, "validate negotiate\n");
- 
-+#ifdef CONFIG_CIFS_SMB_DIRECT
-+	if (tcon->ses->server->rdma)
-+		return 0;
-+#endif
++	/* Kick off the disconnection process */
++	smbd_disconnect_rdma_connection(info);
 +
- 	/*
- 	 * validation ioctl must be signed, so no point sending this if we
- 	 * can not sign it (ie are not known user).  Even if signing is not
++	log_rdma_event(INFO, "wait for transport being destroyed\n");
++	wait_event(info->wait_destroy,
++		info->transport_status == SMBD_DESTROYED);
++
++	destroy_workqueue(info->workqueue);
++	kfree(info);
++}
++
+ /*
+  * Reconnect this SMBD connection, called from upper layer
+  * return value: 0 on success, or actual error code
+diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
+index 8948f06..61bb649 100644
+--- a/fs/cifs/smbdirect.h
++++ b/fs/cifs/smbdirect.h
+@@ -249,6 +249,8 @@ struct smbd_connection *smbd_get_connection(
+ 
+ /* Reconnect SMBDirect session */
+ int smbd_reconnect(struct TCP_Server_Info *server);
++/* Destroy SMBDirect session */
++void smbd_destroy(struct smbd_connection *info);
+ 
+ #else
+ #define cifs_rdma_enabled(server)	0
+@@ -256,6 +258,7 @@ struct smbd_connection {};
+ static inline void *smbd_get_connection(
+ 	struct TCP_Server_Info *server, struct sockaddr *dstaddr) {return NULL;}
+ static inline int smbd_reconnect(struct TCP_Server_Info *server) {return -1;}
++static inline void smbd_destroy(struct smbd_connection *info) {}
+ #endif
+ 
+ #endif
 -- 
 2.7.4
