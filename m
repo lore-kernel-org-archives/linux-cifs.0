@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v8 01/16] CIFS: SMBD: Upper layer connects to SMBDirect session
-Date: Wed, 22 Nov 2017 17:38:34 -0700
-Message-ID: <20171123003849.17093-2-longli@exchange.microsoft.com>
+Subject: [Patch v8 14/16] CIFS: SMBD: Upper layer performs SMB read via RDMA write through memory registration
+Date: Wed, 22 Nov 2017 17:38:47 -0700
+Message-ID: <20171123003849.17093-15-longli@exchange.microsoft.com>
 References: <20171123003849.17093-1-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -17,65 +17,141 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-When "rdma" is specified in the mount option, make CIFS connect to
-SMB Direct.
+If I/O size is larger than rdma_readwrite_threshold, use RDMA write for
+SMB read by specifying channel SMB2_CHANNEL_RDMA_V1 or
+SMB2_CHANNEL_RDMA_V1_INVALIDATE in the SMB packet, depending on SMB dialect
+used. Append a smbd_buffer_descriptor_v1 to the end of the SMB packet and fill
+in other values to indicate this SMB read uses RDMA write.
+
+There is no need to read from the transport for incoming payload. At the time
+SMB read response comes back, the data is already transfered and placed in the
+pages by RDMA hardware.
+
+When SMB read is finished, deregister the memory regions if RDMA write is used
+for this SMB read. smbd_deregister_mr may need to do local invalidation and
+sleep, if server remote invalidation is not used.
+
+There are situations where the MID may not be created on I/O failure, under
+which memory region is deregistered when read data context is released.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/connect.c | 22 +++++++++++++++++++---
- 1 file changed, 19 insertions(+), 3 deletions(-)
+ fs/cifs/file.c    | 17 +++++++++++++++--
+ fs/cifs/smb2pdu.c | 45 ++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 59 insertions(+), 3 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 64be6f9..fafaecb 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -44,7 +44,6 @@
- #include <net/ipv6.h>
- #include <linux/parser.h>
- #include <linux/bvec.h>
--
- #include "cifspdu.h"
- #include "cifsglob.h"
- #include "cifsproto.h"
-@@ -56,6 +55,7 @@
- #include "rfc1002pdu.h"
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index df9f682..93259a16 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -42,7 +42,7 @@
+ #include "cifs_debug.h"
+ #include "cifs_fs_sb.h"
  #include "fscache.h"
- #include "smb2proto.h"
+-
 +#include "smbdirect.h"
  
- #define CIFS_PORT 445
- #define RFC1001_PORT 139
-@@ -2310,13 +2310,29 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 		tcp_ses->echo_interval = volume_info->echo_interval * HZ;
- 	else
- 		tcp_ses->echo_interval = SMB_ECHO_INTERVAL_DEFAULT * HZ;
+ static inline int cifs_convert_flags(unsigned int flags)
+ {
+@@ -2902,7 +2902,12 @@ cifs_readdata_release(struct kref *refcount)
+ {
+ 	struct cifs_readdata *rdata = container_of(refcount,
+ 					struct cifs_readdata, refcount);
 -
-+	if (tcp_ses->rdma) {
-+#ifndef CONFIG_CIFS_SMB_DIRECT
-+		cifs_dbg(VFS, "CONFIG_CIFS_SMB_DIRECT is not enabled\n");
-+		rc = -ENOENT;
-+		goto out_err_crypto_release;
-+#endif
-+		tcp_ses->smbd_conn = smbd_get_connection(
-+			tcp_ses, (struct sockaddr *)&volume_info->dstaddr);
-+		if (tcp_ses->smbd_conn) {
-+			cifs_dbg(VFS, "RDMA transport established\n");
-+			rc = 0;
-+			goto smbd_connected;
-+		} else {
-+			rc = -ENOENT;
-+			goto out_err_crypto_release;
-+		}
++#ifdef CONFIG_CIFS_SMB_DIRECT
++	if (rdata->mr) {
++		smbd_deregister_mr(rdata->mr);
++		rdata->mr = NULL;
 +	}
- 	rc = ip_connect(tcp_ses);
- 	if (rc < 0) {
- 		cifs_dbg(VFS, "Error connecting to socket. Aborting operation.\n");
- 		goto out_err_crypto_release;
++#endif
+ 	if (rdata->cfile)
+ 		cifsFileInfo_put(rdata->cfile);
+ 
+@@ -3031,6 +3036,10 @@ uncached_fill_pages(struct TCP_Server_Info *server,
+ 		}
+ 		if (iter)
+ 			result = copy_page_from_iter(page, 0, n, iter);
++#ifdef CONFIG_CIFS_SMB_DIRECT
++		else if (rdata->mr)
++			result = n;
++#endif
+ 		else
+ 			result = cifs_read_page_from_socket(server, page, n);
+ 		if (result < 0)
+@@ -3600,6 +3609,10 @@ readpages_fill_pages(struct TCP_Server_Info *server,
+ 
+ 		if (iter)
+ 			result = copy_page_from_iter(page, 0, n, iter);
++#ifdef CONFIG_CIFS_SMB_DIRECT
++		else if (rdata->mr)
++			result = n;
++#endif
+ 		else
+ 			result = cifs_read_page_from_socket(server, page, n);
+ 		if (result < 0)
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 908d777..bee0871d 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -2458,7 +2458,40 @@ smb2_new_read_req(void **buf, unsigned int *total_len,
+ 	req->MinimumCount = 0;
+ 	req->Length = cpu_to_le32(io_parms->length);
+ 	req->Offset = cpu_to_le64(io_parms->offset);
++#ifdef CONFIG_CIFS_SMB_DIRECT
++	/*
++	 * If we want to do a RDMA write, fill in and append
++	 * smbd_buffer_descriptor_v1 to the end of read request
++	 */
++	if (server->rdma && rdata &&
++		rdata->bytes >= server->smbd_conn->rdma_readwrite_threshold) {
++
++		struct smbd_buffer_descriptor_v1 *v1;
++		bool need_invalidate =
++			io_parms->tcon->ses->server->dialect == SMB30_PROT_ID;
++
++		rdata->mr = smbd_register_mr(
++				server->smbd_conn, rdata->pages,
++				rdata->nr_pages, rdata->tailsz,
++				true, need_invalidate);
++		if (!rdata->mr)
++			return -ENOBUFS;
++
++		req->Channel = SMB2_CHANNEL_RDMA_V1_INVALIDATE;
++		if (need_invalidate)
++			req->Channel = SMB2_CHANNEL_RDMA_V1;
++		req->ReadChannelInfoOffset =
++			offsetof(struct smb2_read_plain_req, Buffer);
++		req->ReadChannelInfoLength =
++			sizeof(struct smbd_buffer_descriptor_v1);
++		v1 = (struct smbd_buffer_descriptor_v1 *) &req->Buffer[0];
++		v1->offset = rdata->mr->mr->iova;
++		v1->token = rdata->mr->mr->rkey;
++		v1->length = rdata->mr->mr->length;
+ 
++		*total_len += sizeof(*v1) - 1;
++	}
++#endif
+ 	if (request_type & CHAINED_REQUEST) {
+ 		if (!(request_type & END_OF_CHAIN)) {
+ 			/* next 8-byte aligned request */
+@@ -2537,7 +2570,17 @@ smb2_readv_callback(struct mid_q_entry *mid)
+ 		if (rdata->result != -ENODATA)
+ 			rdata->result = -EIO;
  	}
 -
-+smbd_connected:
- 	/*
- 	 * since we're in a cifs function already, we know that
- 	 * this will succeed. No need for try_module_get().
++#ifdef CONFIG_CIFS_SMB_DIRECT
++	/*
++	 * If this rdata has a memmory registered, the MR can be freed
++	 * MR needs to be freed as soon as I/O finishes to prevent deadlock
++	 * because they have limited number and are used for future I/Os
++	 */
++	if (rdata->mr) {
++		smbd_deregister_mr(rdata->mr);
++		rdata->mr = NULL;
++	}
++#endif
+ 	if (rdata->result)
+ 		cifs_stats_fail_inc(tcon, SMB2_READ_HE);
+ 
 -- 
 2.7.4
