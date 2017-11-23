@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v8 04/16] CIFS: SMBD: Implement function to destroy a SMB Direct connection
-Date: Wed, 22 Nov 2017 17:38:37 -0700
-Message-ID: <20171123003849.17093-5-longli@exchange.microsoft.com>
+Subject: [Patch v8 10/16] CIFS: SMBD: Upper layer sends data via RDMA send
+Date: Wed, 22 Nov 2017 17:38:43 -0700
+Message-ID: <20171123003849.17093-11-longli@exchange.microsoft.com>
 References: <20171123003849.17093-1-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -17,62 +17,45 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-Add function to tear down a SMB Direct connection. This is used by upper layer
-to free all SMB Direct connection and transport resources.
+With SMB Direct connected, use it for sending data via RDMA send.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/smbdirect.c | 16 ++++++++++++++++
- fs/cifs/smbdirect.h |  3 +++
- 2 files changed, 19 insertions(+)
+ fs/cifs/transport.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index a96058a..b462a2f 100644
---- a/fs/cifs/smbdirect.c
-+++ b/fs/cifs/smbdirect.c
-@@ -1387,6 +1387,22 @@ static void idle_connection_timer(struct work_struct *work)
- 			info->keep_alive_interval*HZ);
- }
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index e678307..4001842 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -37,6 +37,7 @@
+ #include "cifsglob.h"
+ #include "cifsproto.h"
+ #include "cifs_debug.h"
++#include "smbdirect.h"
  
-+/* Destroy this SMBD connection, called from upper layer */
-+void smbd_destroy(struct smbd_connection *info)
-+{
-+	log_rdma_event(INFO, "destroying rdma session\n");
-+
-+	/* Kick off the disconnection process */
-+	smbd_disconnect_rdma_connection(info);
-+
-+	log_rdma_event(INFO, "wait for transport being destroyed\n");
-+	wait_event(info->wait_destroy,
-+		info->transport_status == SMBD_DESTROYED);
-+
-+	destroy_workqueue(info->workqueue);
-+	kfree(info);
-+}
-+
- /*
-  * Reconnect this SMBD connection, called from upper layer
-  * return value: 0 on success, or actual error code
-diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
-index 8948f06..61bb649 100644
---- a/fs/cifs/smbdirect.h
-+++ b/fs/cifs/smbdirect.h
-@@ -249,6 +249,8 @@ struct smbd_connection *smbd_get_connection(
+ void
+ cifs_wake_up_task(struct mid_q_entry *mid)
+@@ -229,7 +230,10 @@ __smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ 	struct socket *ssocket = server->ssocket;
+ 	struct msghdr smb_msg;
+ 	int val = 1;
+-
++	if (cifs_rdma_enabled(server) && server->smbd_conn) {
++		rc = smbd_send(server->smbd_conn, rqst);
++		goto smbd_done;
++	}
+ 	if (ssocket == NULL)
+ 		return -ENOTSOCK;
  
- /* Reconnect SMBDirect session */
- int smbd_reconnect(struct TCP_Server_Info *server);
-+/* Destroy SMBDirect session */
-+void smbd_destroy(struct smbd_connection *info);
- 
- #else
- #define cifs_rdma_enabled(server)	0
-@@ -256,6 +258,7 @@ struct smbd_connection {};
- static inline void *smbd_get_connection(
- 	struct TCP_Server_Info *server, struct sockaddr *dstaddr) {return NULL;}
- static inline int smbd_reconnect(struct TCP_Server_Info *server) {return -1;}
-+static inline void smbd_destroy(struct smbd_connection *info) {}
- #endif
- 
- #endif
+@@ -298,7 +302,7 @@ __smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ 		 */
+ 		server->tcpStatus = CifsNeedReconnect;
+ 	}
+-
++smbd_done:
+ 	if (rc < 0 && rc != -EINTR)
+ 		cifs_dbg(VFS, "Error %d sending data on socket to server\n",
+ 			 rc);
 -- 
 2.7.4
