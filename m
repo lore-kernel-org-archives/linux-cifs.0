@@ -1,7 +1,7 @@
 From: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Subject: [Patch v8 03/16] CIFS: SMBD: Upper layer reconnects to SMB Direct session
-Date: Wed, 22 Nov 2017 17:38:36 -0700
-Message-ID: <20171123003849.17093-4-longli@exchange.microsoft.com>
+Subject: [Patch v8 05/16] CIFS: SMBD: Upper layer destroys SMB Direct session on shutdown or umount
+Date: Wed, 22 Nov 2017 17:38:38 -0700
+Message-ID: <20171123003849.17093-6-longli@exchange.microsoft.com>
 References: <20171123003849.17093-1-longli@exchange.microsoft.com>
 Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
@@ -17,8 +17,8 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 
-Do a reconnect on SMB Direct when it is used as the connection. Reconnect can
-happen for many reasons and it's mostly the decision of SMB2 upper layer.
+When upper layer wants to umount, make it call shutdown on transport when
+SMB Direct is used.
 
 Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 ---
@@ -26,21 +26,21 @@ Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index fafaecb..fc46066 100644
+index fc46066..d8bfa89 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -406,7 +406,10 @@ cifs_reconnect(struct TCP_Server_Info *server)
- 
- 		/* we should try only the port we connected to before */
- 		mutex_lock(&server->srv_mutex);
--		rc = generic_ip_connect(server);
-+		if (cifs_rdma_enabled(server))
-+			rc = smbd_reconnect(server);
-+		else
-+			rc = generic_ip_connect(server);
- 		if (rc) {
- 			cifs_dbg(FYI, "reconnect error %d\n", rc);
- 			mutex_unlock(&server->srv_mutex);
+@@ -704,7 +704,10 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
+ 	wake_up_all(&server->request_q);
+ 	/* give those requests time to exit */
+ 	msleep(125);
+-
++	if (cifs_rdma_enabled(server) && server->smbd_conn) {
++		smbd_destroy(server->smbd_conn);
++		server->smbd_conn = NULL;
++	}
+ 	if (server->ssocket) {
+ 		sock_release(server->ssocket);
+ 		server->ssocket = NULL;
 -- 
 2.7.4
 
