@@ -1,7 +1,7 @@
 From: Long Li <longli@exchange.microsoft.com>
-Subject: [Patch v8 15/16] CIFS: SMBD: Add SMB Direct debug counters
-Date: Wed, 22 Nov 2017 17:38:48 -0700
-Message-ID: <20171123003849.17093-16-longli@exchange.microsoft.com>
+Subject: [Patch v8 01/16] CIFS: SMBD: Upper layer connects to SMBDirect session
+Date: Wed, 22 Nov 2017 17:38:34 -0700
+Message-ID: <20171123003849.17093-2-longli@exchange.microsoft.com>
 References: <20171123003849.17093-1-longli@exchange.microsoft.com>
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -17,90 +17,65 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-For debugging and troubleshooting, export SMBDirect debug counters to
-/proc/fs/cifs/DebugData.
+When "rdma" is specified in the mount option, make CIFS connect to
+SMB Direct.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/cifs_debug.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 66 insertions(+)
+ fs/cifs/connect.c | 22 +++++++++++++++++++---
+ 1 file changed, 19 insertions(+), 3 deletions(-)
 
-diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-index e6045fd..05be9b4 100644
---- a/fs/cifs/cifs_debug.c
-+++ b/fs/cifs/cifs_debug.c
-@@ -155,6 +155,72 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 	list_for_each(tmp1, &cifs_tcp_ses_list) {
- 		server = list_entry(tmp1, struct TCP_Server_Info,
- 				    tcp_ses_list);
-+
-+#ifdef CONFIG_CIFS_SMB_DIRECT
-+		if (!server->rdma)
-+			goto skip_rdma;
-+
-+		seq_printf(m, "\nSMBDirect (in hex) protocol version: %x "
-+			"transport status: %x",
-+			server->smbd_conn->protocol,
-+			server->smbd_conn->transport_status);
-+		seq_printf(m, "\nConn receive_credit_max: %x "
-+			"send_credit_target: %x max_send_size: %x",
-+			server->smbd_conn->receive_credit_max,
-+			server->smbd_conn->send_credit_target,
-+			server->smbd_conn->max_send_size);
-+		seq_printf(m, "\nConn max_fragmented_recv_size: %x "
-+			"max_fragmented_send_size: %x max_receive_size:%x",
-+			server->smbd_conn->max_fragmented_recv_size,
-+			server->smbd_conn->max_fragmented_send_size,
-+			server->smbd_conn->max_receive_size);
-+		seq_printf(m, "\nConn keep_alive_interval: %x "
-+			"max_readwrite_size: %x rdma_readwrite_threshold: %x",
-+			server->smbd_conn->keep_alive_interval,
-+			server->smbd_conn->max_readwrite_size,
-+			server->smbd_conn->rdma_readwrite_threshold);
-+		seq_printf(m, "\nDebug count_get_receive_buffer: %x "
-+			"count_put_receive_buffer: %x count_send_empty: %x",
-+			server->smbd_conn->count_get_receive_buffer,
-+			server->smbd_conn->count_put_receive_buffer,
-+			server->smbd_conn->count_send_empty);
-+		seq_printf(m, "\nRead Queue count_reassembly_queue: %x "
-+			"count_enqueue_reassembly_queue: %x "
-+			"count_dequeue_reassembly_queue: %x "
-+			"fragment_reassembly_remaining: %x "
-+			"reassembly_data_length: %x "
-+			"reassembly_queue_length: %x",
-+			server->smbd_conn->count_reassembly_queue,
-+			server->smbd_conn->count_enqueue_reassembly_queue,
-+			server->smbd_conn->count_dequeue_reassembly_queue,
-+			server->smbd_conn->fragment_reassembly_remaining,
-+			server->smbd_conn->reassembly_data_length,
-+			server->smbd_conn->reassembly_queue_length);
-+		seq_printf(m, "\nCurrent Credits send_credits: %x "
-+			"receive_credits: %x receive_credit_target: %x",
-+			atomic_read(&server->smbd_conn->send_credits),
-+			atomic_read(&server->smbd_conn->receive_credits),
-+			server->smbd_conn->receive_credit_target);
-+		seq_printf(m, "\nPending send_pending: %x send_payload_pending:"
-+			" %x smbd_send_pending: %x smbd_recv_pending: %x",
-+			atomic_read(&server->smbd_conn->send_pending),
-+			atomic_read(&server->smbd_conn->send_payload_pending),
-+			server->smbd_conn->smbd_send_pending,
-+			server->smbd_conn->smbd_recv_pending);
-+		seq_printf(m, "\nReceive buffers count_receive_queue: %x "
-+			"count_empty_packet_queue: %x",
-+			server->smbd_conn->count_receive_queue,
-+			server->smbd_conn->count_empty_packet_queue);
-+		seq_printf(m, "\nMR responder_resources: %x "
-+			"max_frmr_depth: %x mr_type: %x",
-+			server->smbd_conn->responder_resources,
-+			server->smbd_conn->max_frmr_depth,
-+			server->smbd_conn->mr_type);
-+		seq_printf(m, "\nMR mr_ready_count: %x mr_used_count: %x",
-+			atomic_read(&server->smbd_conn->mr_ready_count),
-+			atomic_read(&server->smbd_conn->mr_used_count));
-+skip_rdma:
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 64be6f9..fafaecb 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -44,7 +44,6 @@
+ #include <net/ipv6.h>
+ #include <linux/parser.h>
+ #include <linux/bvec.h>
+-
+ #include "cifspdu.h"
+ #include "cifsglob.h"
+ #include "cifsproto.h"
+@@ -56,6 +55,7 @@
+ #include "rfc1002pdu.h"
+ #include "fscache.h"
+ #include "smb2proto.h"
++#include "smbdirect.h"
+ 
+ #define CIFS_PORT 445
+ #define RFC1001_PORT 139
+@@ -2310,13 +2310,29 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 		tcp_ses->echo_interval = volume_info->echo_interval * HZ;
+ 	else
+ 		tcp_ses->echo_interval = SMB_ECHO_INTERVAL_DEFAULT * HZ;
+-
++	if (tcp_ses->rdma) {
++#ifndef CONFIG_CIFS_SMB_DIRECT
++		cifs_dbg(VFS, "CONFIG_CIFS_SMB_DIRECT is not enabled\n");
++		rc = -ENOENT;
++		goto out_err_crypto_release;
 +#endif
- 		seq_printf(m, "\nNumber of credits: %d", server->credits);
- 		i++;
- 		list_for_each(tmp2, &server->smb_ses_list) {
++		tcp_ses->smbd_conn = smbd_get_connection(
++			tcp_ses, (struct sockaddr *)&volume_info->dstaddr);
++		if (tcp_ses->smbd_conn) {
++			cifs_dbg(VFS, "RDMA transport established\n");
++			rc = 0;
++			goto smbd_connected;
++		} else {
++			rc = -ENOENT;
++			goto out_err_crypto_release;
++		}
++	}
+ 	rc = ip_connect(tcp_ses);
+ 	if (rc < 0) {
+ 		cifs_dbg(VFS, "Error connecting to socket. Aborting operation.\n");
+ 		goto out_err_crypto_release;
+ 	}
+-
++smbd_connected:
+ 	/*
+ 	 * since we're in a cifs function already, we know that
+ 	 * this will succeed. No need for try_module_get().
 -- 
 2.7.4
