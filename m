@@ -1,40 +1,26 @@
-From: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: RE: reconnection loop
-Date: Wed, 29 Nov 2017 14:16:37 +0000
-Message-ID: <CY4PR21MB0182437D646D0DD3525EE02FA03B0@CY4PR21MB0182.namprd21.prod.outlook.com>
-References: <dd42aeea-3097-b013-fb9b-633df41ec49e@urlichs.de>
+From: Matt <matt.w.burnett-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: MS SOFS compatibility issue
+Date: Thu, 30 Nov 2017 16:31:27 -0600
+Message-ID: <FB50F504-E400-44E8-904F-528E345C1AEE@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-To: Matthias Urlichs <matthias-+qxcz+fHsVSELgA04lAiVw@public.gmane.org>,
-        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain;
+        charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <dd42aeea-3097-b013-fb9b-633df41ec49e-+qxcz+fHsVSELgA04lAiVw@public.gmane.org>
-Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51eC1jaWZzLW93bmVyQHZn
-ZXIua2VybmVsLm9yZyBbbWFpbHRvOmxpbnV4LWNpZnMtDQo+IG93bmVyQHZnZXIua2VybmVsLm9y
-Z10gT24gQmVoYWxmIE9mIE1hdHRoaWFzIFVybGljaHMNCj4gU2VudDogV2VkbmVzZGF5LCBOb3Zl
-bWJlciAyOSwgMjAxNyA3OjE0IEFNDQo+IFRvOiBsaW51eC1jaWZzQHZnZXIua2VybmVsLm9yZw0K
-PiBTdWJqZWN0OiByZWNvbm5lY3Rpb24gbG9vcA0KPiANCj4gSGksDQo+IA0KPiBJIGFtIG9ic2Vy
-dmluZyBhIHJlY29ubmVjdCBsb29wIHdpdGggc2FtYmE0Lg0KPiANCj4gVGhlIHByb2JsZW0gaXMg
-dGhhdCB0aGUga2VybmVsIG9wZW5zIHRoZSBjb25uZWN0aW9uIGFuZCBpbml0aWFsbHkgc2VuZHMN
-Cj4gYW4gU01CZWNobyBwYWNrZXQuIFNhbWJhNCBob3dldmVyIG9ubHkgYWNjZXB0cyBTTUJuZWdw
-cm90IGFzIHRoZSBmaXJzdA0KPiBwYWNrZXQsIHRodXMgaXQgaW1tZWRpYXRlbHkgY2xvc2VzIHRo
-ZSBjb25uZWN0aW9uLiBUaGUga2VybmVsDQo+IGltbWVkaWF0ZWx5IHRyaWVzIGFnYWluLg0KDQpU
-aGF0J3MgY2xlYXJseSBhIGNsaWVudCBidWcsIGFuZCB0aGUgc2VydmVyIGlzIGRvaW5nIHRoZSBy
-aWdodCB0aGluZy4gQmVmb3JlIGENCmRpYWxlY3QgaXMgbmVnb3RpYXRlZCwgdGhlIHByb3RvY29s
-IHJlcXVpcmVtZW50IGlzIGNsZWFyOg0KDQpNUy1TTUIyOiAzLjMuNS4yLjIJVmVyaWZ5aW5nIHRo
-ZSBDb25uZWN0aW9uIFN0YXRlDQogIElmIHRoZSByZXF1ZXN0IGJlaW5nIHJlY2VpdmVkIGlzIG5v
-dCBhbiBTTUIyIE5FR09USUFURSBSZXF1ZXN0IG9yIGEgdHJhZGl0aW9uYWwNCiAgU01CX0NPTV9O
-RUdPVElBVEUsIGFzIGRlc2NyaWJlZCBpbiBzZWN0aW9uIDEuNywgYW5kIENvbm5lY3Rpb24uTmVn
-b3RpYXRlRGlhbGVjdA0KICBpcyAweEZGRkYgb3IgMHgwMkZGLCB0aGUgc2VydmVyIE1VU1QgZGlz
-Y29ubmVjdCB0aGUgY29ubmVjdGlvbiwgYXMgc3BlY2lmaWVkIGluDQogIHNlY3Rpb24gMy4zLjcu
-MSwgYW5kIHNlbmQgbm8gcmVwbHkuDQoNCj4gUmVnYXJkbGVzcyBvZiB3aGV0aGVyIGl0J3MgYWNj
-ZXB0YWJsZSB0byBpbml0aWFsbHkgc2VuZCBhbiBlY2hvIHBhY2tldDoNCj4gc2hvdWxkbid0IHRo
-ZSBrZXJuZWwgZG8gc29tZSBzb3J0IG9mIHJ1ZGltZW50YXJ5IGJhY2stb2ZmPyBhcyBpdCBpcyBJ
-DQo+IGhhdmUgbG9nZ2VkIDE1IG1pbGxpb24gcmVjb25uZWN0aW9ucyBzaW5jZSB5ZXN0ZXJkYXkg
-4oCmDQoNClBvc3NpYmx5IGJhY2tvZmYgaXMgaW5kaWNhdGVkLCBidXQgaXQgd29uJ3QgZml4IHRo
-ZSB2aW9sYXRpb24uDQoNClRvbS4NCg==
+I=E2=80=99ve been experiencing issues when trying to mount CIFS shares on a Micro=
+soft Scale Out File Server 2016 Cluster from a VMware Photon Linux 1.0 clien=
+t. If a vers option is not provided, mount.cifs will give the error mount er=
+ror(13): Permission denied. =C2=A0I was able to work around them by specifying v=
+ers=3D3.02 as a mount option, but a kernel update eventually broke that and I =
+was forced to use vers=3D2.0. However since upgrading to Photon 2.0, the mount=
+.cifs version changed from 6.4 to 6.7, and whenever I specify a vers=3D option=
+, it gives the error mount error(22): Invalid argument. If it is relevant th=
+e Photon 1.0 client was running kernel 4.4.96-1 and Photon 2.0 is running ke=
+rnel 4.9.60-1.
+=C2=A0
+Does anyone know what I can do to resolve these issues? Can someone point m=
+e in the direction of where I should submit a bug report? Thanks!
