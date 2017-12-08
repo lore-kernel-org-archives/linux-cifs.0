@@ -1,40 +1,87 @@
-From: Matt <matt.w.burnett-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: MS SOFS compatibility issue
-Date: Thu, 30 Nov 2017 21:55:06 -0600
-Message-ID: <2E12F6EE-3C29-4C03-B3F4-822FBB98AC10@gmail.com>
-References: <FB50F504-E400-44E8-904F-528E345C1AEE@gmail.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] manpage: update mount.cifs manpage with info about
+ incomplete options
+Date: Fri, 08 Dec 2017 09:03:08 -0500
+Message-ID: <1512741788.3961.7.camel@samba.org>
+References: <201712081511450916550@zte.com.cn>
 Mime-Version: 1.0
-Content-Type: text/plain;
-        charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: zhang.xianwei8-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <FB50F504-E400-44E8-904F-528E345C1AEE-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <201712081511450916550-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Sorry, I forgot to subscribe to this list, if you replied, and did not incl=
-ude me directly, if you could resend your message to me, I=E2=80=99d appreciate it=
-.
+On Fri, 2017-12-08 at 15:11 +0800, zhang.xianwei8-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org wrote:
+> This commit a1f3acd40b265f134a97a739a6898b3958d206b9 modified mount
+> parameters, but not updated mount.cifs manpage. Fix it.
+> 
+> Signed-off-by: Zhang Xianwei <zhang.xianwei8-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+> ---
+> mount.cifs.rst | 10 +++++-----
+> 1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/mount.cifs.rst b/mount.cifs.rst
+> index 023ff34..a4445b8 100644
+> --- a/mount.cifs.rst
+> +++ b/mount.cifs.rst
+> @@ -48,7 +48,7 @@ OPTIONS
+> *******
+> 
+> 
+> -username=arg
+> +username=arg|user=arg
+> specifies the username to connect as. If this is not
+> given, then the environment variable USER is used.
+> 
+> @@ -64,7 +64,7 @@ username=arg
+> non-superuser mount. It is therefore recommended to use the full
+> ``username=`` option name.
+> 
+> -password=arg
+> +password=arg|pass=arg
+> specifies the CIFS password. If this option is not given then the
+> environment variable PASSWD is used. If the password is not specified
+> directly or indirectly via an argument to mount, mount.cifs will
+> @@ -76,7 +76,7 @@ password=arg
+> variable or via a credentials file (see below) or entered at the
+> password prompt will be read correctly.
+> 
+> -credentials=filename
+> +credentials=filename|cred=filename
+> specifies a file that contains a username and/or password and
+> optionally the name of the workgroup. The format of the file is::
+> 
+> @@ -159,12 +159,12 @@ dir_mode=arg
+> If the server does not support the CIFS Unix extensions this overrides
+> the default mode for directories.
+> 
+> -ip=arg
+> +ip=arg|addr=arg
+> sets the destination IP address. This option is set automatically if
+> the server name portion of the requested UNC name can be resolved so
+> rarely needs to be specified by the user.
+> 
+> -domain=arg
+> +domain=arg|dom=arg|workgroup=arg
+> sets the domain (workgroup) of the user.
+> 
+> guest
 
+Honestly, I'd really prefer to move this in the other direction and have
+the kernel/userland programs stop accepting some of these aliases. They
+don't add anything to usability and they are a long-term maintenance
+burden.
 
-On 11/30/17, 4:31 PM, "Matt" <matt.w.burnett-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+We'd probably need a 2-3 releases where we accept the aliases and throw
+a warning when someone tries to use them. Then we can just rip out
+support for them.
 
-    I=E2=80=99ve been experiencing issues when trying to mount CIFS shares on a M=
-icrosoft Scale Out File Server 2016 Cluster from a VMware Photon Linux 1.0 c=
-lient. If a vers option is not provided, mount.cifs will give the error moun=
-t error(13): Permission denied.  I was able to work around them by specifyin=
-g vers=3D3.02 as a mount option, but a kernel update eventually broke that and=
- I was forced to use vers=3D2.0. However since upgrading to Photon 2.0, the mo=
-unt.cifs version changed from 6.4 to 6.7, and whenever I specify a vers=3D opt=
-ion, it gives the error mount error(22): Invalid argument. If it is relevant=
- the Photon 1.0 client was running kernel 4.4.96-1 and Photon 2.0 is running=
- kernel 4.9.60-1.
-    =20
-    Does anyone know what I can do to resolve these issues? Can someone poi=
-nt me in the direction of where I should submit a bug report? Thanks!
-   =20
-   =20
-   =20
-   =20
-   =20
+That said, if the consensus is to keep the aliases in, then I'll just
+plan to merge this patch.
+
+Anyone have thoughts on this?
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
