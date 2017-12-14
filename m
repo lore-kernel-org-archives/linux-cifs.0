@@ -1,53 +1,56 @@
-From: David Sterba <dsterba@suse.cz>
+From: "Yan, Zheng" <zyan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Subject: Re: [PATCH] fs/*/Kconfig: drop links to 404-compliant
  http://acl.bestbits.at
-Date: Thu, 14 Dec 2017 01:44:28 +0100
-Message-ID: <20171214004428.GF3553@twin.jikos.cz>
+Date: Thu, 14 Dec 2017 14:34:27 +0800
+Message-ID: <7C5A4F68-5893-4EC7-99D6-8235C8DA1381@redhat.com>
 References: <20171213053825.10903-1-kilobyte@angband.pl>
-Reply-To: dsterba@suse.cz
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Latchesar Ionkov <lucho@ionkov.net>, Dave Kleikamp <shaggy@kernel.org>,
- jfs-discussion@lists.sourceforge.net,
- Andreas Dilger <adilger.kernel@dilger.ca>, linux-xfs@vger.kernel.org,
- linux-cifs@vger.kernel.org, Sage Weil <sage@redhat.com>,
- Jonathan Corbet <corbet@lwn.net>, v9fs-developer@lists.sourceforge.net,
- Ilya Dryomov <idryomov@gmail.com>, linux-ext4@vger.kernel.org,
- Eric Van Hensbergen <ericvh@gmail.com>, reiserfs-devel@vger.kernel.org,
- Alexander Viro <viro@zeniv.linux.org.uk>, linux-mtd@lists.infradead.org,
- David Sterba <dsterba@suse.com>, Jaegeuk Kim <jaegeuk@kernel.org>,
- ceph-devel@vger.kernel.org, "Yan, Zheng" <zyan@redhat.com>,
- Theodore Ts'o <tytso@mit.edu>, "Darrick J. Wong" <darrick.wong@oracle.com>,
- linux-f2fs-devel@lists.sourceforge.net, Steve French <sfrench@samba.org>,
- Jan Kara <jack@suse.com>, linux-fsdevel@vger.kernel.org,
- Ron Minnich <rminnich@sandia.gov
-To: Adam Borowski <kilobyte@angband.pl>
-Return-path: <linux-f2fs-devel-bounces@lists.sourceforge.net>
-Content-Disposition: inline
-In-Reply-To: <20171213053825.10903-1-kilobyte@angband.pl>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/options/linux-f2fs-devel>,
- <mailto:linux-f2fs-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=linux-f2fs-devel>
-List-Post: <mailto:linux-f2fs-devel@lists.sourceforge.net>
-List-Help: <mailto:linux-f2fs-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/linux-f2fs-devel>,
- <mailto:linux-f2fs-devel-request@lists.sourceforge.net?subject=subscribe>
-Errors-To: linux-f2fs-devel-bounces@lists.sourceforge.net
-List-Id: linux-cifs.vger.kernel.org
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Content-Type: text/plain;
+        charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Cc: Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
+        linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Jan Kara <jack-IBi9RG/b67k@public.gmane.org>, Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
+        linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>,
+        Andreas Dilger <adilger.kernel-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>,
+        Eric Van Hensbergen <ericvh-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Ron Minnich <rminnich-4OHPYypu0djtX7QSmKvirg@public.gmane.org>,
+        Latchesar Ionkov <lucho-OnYtXJJ0/fesTnJN9+BGXg@public.gmane.org>,
+        v9fs-developer-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
+        David Sterba <dsterba-IBi9RG/b67k@public.gmane.org>, linux-btrfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Sage Weil <sage-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Ilya Dryomov <idryomov-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        ceph-devel <ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Jaegeuk Kim <jaegeuk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Chao Yu <yuchao0-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
+        linux-f2fs-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
+        David Woodhouse <dwmw2-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+To: Adam Borowski <kilobyte-b9QjgO8OEXPVItvQsEIGlw@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20171213053825.10903-1-kilobyte-b9QjgO8OEXPVItvQsEIGlw@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, Dec 13, 2017 at 06:38:25AM +0100, Adam Borowski wrote:
+
+
+> On 13 Dec 2017, at 13:38, Adam Borowski <kilobyte-b9QjgO8OEXPVItvQsEIGlw@public.gmane.org> wrote:
+> 
 > This link is replicated in most filesystems' config stanzas.  Referring
 > to an archived version of that site is pointless as it mostly deals with
 > patches; user documentation is available elsewhere.
 > 
-> Signed-off-by: Adam Borowski <kilobyte@angband.pl>
+> Signed-off-by: Adam Borowski <kilobyte-b9QjgO8OEXPVItvQsEIGlw@public.gmane.org>
 > ---
+> Sending this as one piece; if you guys would instead prefer this chopped
+> into tiny per-filesystem bits, please say so.
+> 
+> 
+> Documentation/filesystems/ext2.txt |  2 --
+> Documentation/filesystems/ext4.txt |  7 +++----
+> fs/9p/Kconfig                      |  3 ---
+> fs/Kconfig                         |  6 +-----
+> fs/btrfs/Kconfig                   |  3 ---
+> fs/ceph/Kconfig                    |  3 —
 
->  fs/btrfs/Kconfig                   |  3 ---
+Ceph bits looks good.
 
-Acked-by: David Sterba <dsterba@suse.com>
-
-------------------------------------------------------------------------------
-Check out the vibrant tech community on one of the world's most
-engaging tech sites, Slashdot.org! http://sdm.link/slashdot
+Acked-by:  Yan, Zheng" <zyan-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
