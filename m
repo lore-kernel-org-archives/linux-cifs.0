@@ -1,71 +1,43 @@
-From: Chao Yu <yuchao0@huawei.com>
-Subject: Re: [PATCH] fs/*/Kconfig: drop links to 404-compliant
- http://acl.bestbits.at
-Date: Thu, 14 Dec 2017 18:39:40 +0800
-Message-ID: <8b0816ac-186e-77ec-68d9-d28e90d0d5d1@huawei.com>
-References: <20171213053825.10903-1-kilobyte@angband.pl>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [SMB3] Misc SMB3 fixes
+Date: Thu, 14 Dec 2017 13:15:27 -0600
+Message-ID: <CAH2r5ms9gnA15jQjMMjYHr3zPd2N5=+FduHciyXQpFvzTLYHng@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-To: Adam Borowski <kilobyte@angband.pl>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        <linux-fsdevel@vger.kernel.org>, Jan Kara <jack@suse.com>,
-        Jonathan Corbet <corbet@lwn.net>, <linux-ext4@vger.kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        "Ron Minnich" <rminnich@sandia.gov>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        <v9fs-developer@lists.sourceforge.net>,
-        David Sterba <dsterba@suse.com>, <linux-btrfs@vger.kernel.org>,
-        "Yan, Zheng" <zyan@redhat.com>, Sage Weil <sage@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        <ceph-devel@vger.kernel.org>, Steve French <sfrench@samba.org>,
-        <linux-cifs@vger.kernel.org>, Jaegeuk Kim <jaegeuk@kernel.org>,
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        David Wo
-Return-path: <linux-ext4-owner@vger.kernel.org>
-In-Reply-To: <20171213053825.10903-1-kilobyte@angband.pl>
-Content-Language: en-US
-Sender: linux-ext4-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On 2017/12/13 13:38, Adam Borowski wrote:
-> This link is replicated in most filesystems' config stanzas.  Referring
-> to an archived version of that site is pointless as it mostly deals with
-> patches; user documentation is available elsewhere.
-> 
-> Signed-off-by: Adam Borowski <kilobyte@angband.pl>
+Please pull the following changes since commit
+328b4ed93b69a6f2083d52f31a240a09e5de386a:
 
-[skip]
+  x86: don't hash faulting address in oops printout (2017-12-05 17:59:29 -0800)
 
-> diff --git a/fs/f2fs/Kconfig b/fs/f2fs/Kconfig
-> index 378c221d68a9..9a20ef42fadd 100644
-> --- a/fs/f2fs/Kconfig
-> +++ b/fs/f2fs/Kconfig
-> @@ -35,8 +35,7 @@ config F2FS_FS_XATTR
->  	default y
->  	help
->  	  Extended attributes are name:value pairs associated with inodes by
-> -	  the kernel or by users (see the attr(5) manual page, or visit
-> -	  <http://acl.bestbits.at/> for details).
-> +	  the kernel or by users (see the attr(5) manual page for details).
->  
->  	  If unsure, say N.
->  
-> @@ -49,9 +48,6 @@ config F2FS_FS_POSIX_ACL
->  	  Posix Access Control Lists (ACLs) support permissions for users and
->  	  groups beyond the owner/group/world scheme.
->  
-> -	  To learn more about Access Control Lists, visit the POSIX ACLs for
-> -	  Linux website <http://acl.bestbits.at/>.
-> -
->  	  If you don't know what Access Control Lists are, say N
->  
->  config F2FS_FS_SECURITY
+are available in the git repository at:
 
-Looks good to me.
+  git://git.samba.org/sfrench/cifs-2.6.git tags/4.15-rc-smb3
 
-Acked-by: Chao Yu <yuchao0@huawei.com>
+for you to fetch changes up to 5702591fc6a3f409f460def104ee149330dac82d:
 
+  CIFS: don't log STATUS_NOT_FOUND errors for DFS (2017-12-06 12:48:01 -0600)
+
+----------------------------------------------------------------
+Small SMB3 fixes for stable and 4.15rc
+
+----------------------------------------------------------------
+Aurelien Aptel (1):
+      CIFS: don't log STATUS_NOT_FOUND errors for DFS
+
+Ronnie Sahlberg (1):
+      cifs: fix NULL deref in SMB2_read
+
+ fs/cifs/smb2ops.c |  3 ++-
+ fs/cifs/smb2pdu.c | 30 +++++++++++++++---------------
+ 2 files changed, 17 insertions(+), 16 deletions(-)
+
+-- 
 Thanks,
+
+Steve
