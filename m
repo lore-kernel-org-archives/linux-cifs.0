@@ -1,35 +1,39 @@
-From: kbuild test robot <fengguang.wu-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Subject: [linux-next:master 5061/5571] fs/cifs/smbdirect.c:1465:24: sparse:
- symbol '_smbd_get_connection' was not declared. Should it be static?
-Date: Mon, 18 Dec 2017 21:30:05 +0800
-Message-ID: <201712182136.tWBuroDL%fengguang.wu@intel.com>
+From: kbuild test robot <fengguang.wu@intel.com>
+Subject: [RFC PATCH linux-next] CIFS: SMBD: _smbd_get_connection() can be
+ static
+Date: Mon, 18 Dec 2017 21:30:06 +0800
+Message-ID: <20171218133006.GA79761@cairo>
+References: <201712182136.tWBuroDL%fengguang.wu@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: kbuild-all-JC7UmRfGjtg@public.gmane.org, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: kbuild-all@01.org, Steve French <smfrench@gmail.com>,
+        Pavel Shilovsky <pshilov@microsoft.com>,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org
+To: Long Li <longli@microsoft.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-head:   53600ecfb6004f355bd3551bee180caf4b42d7a7
-commit: 07495ff5d9bc753b5cc4cd26c355bf186e865892 [5061/5571] CIFS: SMBD: Establish SMB Direct connection
-reproduce:
-        # apt-get install sparse
-        git checkout 07495ff5d9bc753b5cc4cd26c355bf186e865892
-        make ARCH=x86_64 allmodconfig
-        make C=1 CF=-D__CHECK_ENDIAN__
+In-Reply-To: <201712182136.tWBuroDL%fengguang.wu@intel.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
 
-sparse warnings: (new ones prefixed by >>)
-
-
-Please review and possibly fold the followup patch.
-
+Fixes: 07495ff5d9bc ("CIFS: SMBD: Establish SMB Direct connection")
+Signed-off-by: Fengguang Wu <fengguang.wu@intel.com>
 ---
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+ smbdirect.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+index 2ecd5c1..62a5c3f 100644
+--- a/fs/cifs/smbdirect.c
++++ b/fs/cifs/smbdirect.c
+@@ -1462,7 +1462,7 @@ static int allocate_caches_and_workqueue(struct smbd_connection *info)
+ }
+ 
+ /* Create a SMBD connection, called by upper layer */
+-struct smbd_connection *_smbd_get_connection(
++static struct smbd_connection *_smbd_get_connection(
+ 	struct TCP_Server_Info *server, struct sockaddr *dstaddr, int port)
+ {
+ 	int rc;
