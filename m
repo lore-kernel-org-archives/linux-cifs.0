@@ -1,126 +1,129 @@
-From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [Patch v8 00/16] CIFS: Implement SMB Direct protocol
-Date: Mon, 1 Jan 2018 18:28:12 -0500 (EST)
-Message-ID: <268646755.2430987.1514849292814.JavaMail.zimbra@redhat.com>
-References: <20171123003849.17093-1-longli@exchange.microsoft.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: =?UTF-8?Q?=E7=AD=94=E5=A4=8D=3A?= Re: [PATCH] manpage: update
+ mount.cifs manpage with info aboutincomplete options
+Date: Tue, 02 Jan 2018 10:56:20 -0500
+Message-ID: <1514908580.3462.7.camel@samba.org>
+References: 201712081511450916550@zte.com.cn,1512741788.3961.7.camel@samba.org,CAH2r5mvLoDWWbJ0THCF0O0fT5OyUAPmpzvCD8jzsLs0kV8WwKw@mail.gmail.com <201801021817142206552@zte.com.cn>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: zhang.xianwei8-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171123003849.17093-1-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+In-Reply-To: <201801021817142206552-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Reviewed-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Yes, we'll be merging it -- thank you!
 
+I'm in the process of handing off cifs-utils maintainership to Pavel,
+and he's working on getting his account set up correctly. Once that's
+done, we'll merge this patch soon afterward.
 
------ Original Message -----
-From: "Long Li" <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-To: "Steve French" <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, "Christoph Hellwig" <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>, "Tom Talpey" <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>, "Matthew Wilcox" <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>, "Stephen Hemminger" <sthemmin-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Cc: "Long Li" <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Sent: Thursday, 23 November, 2017 11:38:33 AM
-Subject: [Patch v8 00/16] CIFS: Implement SMB Direct protocol
+-- Jeff
 
-From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-
-Starting with SMB2 dialect 3.0, Microsoft introduced SMB Direct transport
-protocol for transferring upper layer (SMB2) payload over RDMA via Infiniband,
-RoCE or iWARP. The prococol is published in [MS-SMBD]
-(https://msdn.microsoft.com/en-us/library/hh536346.aspx).
-
-Change log:
-v2:
-Implemented RDMA read/write via memory registration.
-Re-arranged patches for review [Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>].
-Restructured the code and fixed bugs on protocol timer and keepalive
-[Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>].
-
-v3:
-Improved performance by introducing an additional queue for handling
-empty packets and reducing lock contention on IRQ path.
-Added light weight profiling by reading TSC.
-Improved the code for checking SMB versions when mounting with rdma option
-[Leon Romanovsky <leon-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>].
-Moved to use pages instead of buffers for passing I/O for RDMA
-[Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>].
-Removed redundant code and refactored I/O code paths
-[Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>, Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>].
-
-v4:
-Fixed connectivity issues with iWAPR devices.
-Exported configurable protocol parameters to /proc/fs/cifs
-[Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>]
-Re-arranged patches for review
-[Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>].
-
-v5:
-Fixed compiling errors on ia64, i386 and when INFINIBAND is not
-configured. [kbuild test robot]
-Profiling is removed and will be introduced in a seperate patch.
-
-v6:
-Report internal code error via WARN_ON(). Change description in
-Kconfig [Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>].
-
-v7:
-Removed the use of #ifdef CONFIG_CIFS_SMB_DIRECT in upper layer
-code calling transport I/O. [Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>]
-
-v8:
-Fixed comment typos and removed unused code
-[Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>]
-Removed the first 7 patches in v7, which have been merged.
-Restructed the code to move relevant function definitions to later patches.
-[Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>]
-Added a patch to disable signing when RDMA is in use. Signing will be
-enabled after it is properly implemented in SMB Direct code paths.
-Fixed an issue on passing the incorrect offset to smbd_buffer_descriptor_v1
-when RDMA read is used for SMB write. This was caused by recent CIFS
-patches to remove packet length from SMB2 packet header.
-
-Long Li (16):
-  CIFS: SMBD: Upper layer connects to SMBDirect session
-  CIFS: SMBD: Implement function to reconnect to a SMB Direct transport
-  CIFS: SMBD: Upper layer reconnects to SMB Direct session
-  CIFS: SMBD: Implement function to destroy a SMB Direct connection
-  CIFS: SMBD: Upper layer destroys SMB Direct session on shutdown or
-    umount
-  CIFS: SMBD: Set SMB Direct maximum read or write size for I/O
-  CIFS: SMBD: Implement function to receive data via RDMA receive
-  CIFS: SMBD: Upper layer receives data via RDMA receive
-  CIFS: SMBD: Implement function to send data via RDMA send
-  CIFS: SMBD: Upper layer sends data via RDMA send
-  CIFS: SMBD: Implement RDMA memory registration
-  CIFS: SMBD: Upper layer performs SMB write via RDMA read through
-    memory registration
-  CIFS: SMBD: Read correct returned data length for RDMA write (SMB
-    read) I/O
-  CIFS: SMBD: Upper layer performs SMB read via RDMA write through
-    memory registration
-  CIFS: SMBD: Add SMB Direct debug counters
-  CIFS: SMBD: Disable signing on SMB direct transport
-
- fs/cifs/cifs_debug.c |  66 ++++
- fs/cifs/cifsglob.h   |  16 +-
- fs/cifs/cifssmb.c    |  15 +-
- fs/cifs/connect.c    |  46 ++-
- fs/cifs/file.c       |  17 +-
- fs/cifs/smb1ops.c    |   4 +-
- fs/cifs/smb2ops.c    |  24 +-
- fs/cifs/smb2pdu.c    | 117 ++++++-
- fs/cifs/smbdirect.c  | 947 +++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smbdirect.h  |  72 ++++
- fs/cifs/transport.c  |   8 +-
- 11 files changed, 1308 insertions(+), 24 deletions(-)
+On Tue, 2018-01-02 at 18:17 +0800, zhang.xianwei8-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org wrote:
+> So, could merge the patch?
+> 
+> 
+> 
+> ------------------原始邮件------------------
+> 发件人： <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>;
+> 收件人： <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>;
+> 抄送人：张贤伟10129966; <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>;
+> 日 期 ：2017年12月08日 22:30
+> 主 题 ：Re: [PATCH] manpage: update mount.cifs manpage with info aboutincomplete options
+> > Anyone have thoughts on this?
+> 
+> My reaction is that it is more work to remove the aliases, and not
+> likely to improve usability in this case to remove the alias - so
+> better to leave the aliases in.
+> 
+> 
+> On Fri, Dec 8, 2017 at 8:03 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> > On Fri, 2017-12-08 at 15:11 +0800, zhang.xianwei8-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org wrote:
+> > > This commit a1f3acd40b265f134a97a739a6898b3958d206b9 modified mount
+> > > parameters, but not updated mount.cifs manpage. Fix it.
+> > > 
+> > > Signed-off-by: Zhang Xianwei <zhang.xianwei8-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+> > > ---
+> > > mount.cifs.rst | 10 +++++-----
+> > > 1 file changed, 5 insertions(+), 5 deletions(-)
+> > > 
+> > > diff --git a/mount.cifs.rst b/mount.cifs.rst
+> > > index 023ff34..a4445b8 100644
+> > > --- a/mount.cifs.rst
+> > > +++ b/mount.cifs.rst
+> > > @@ -48,7 +48,7 @@ OPTIONS
+> > > *******
+> > > 
+> > > 
+> > > -username=arg
+> > > +username=arg|user=arg
+> > > specifies the username to connect as. If this is not
+> > > given, then the environment variable USER is used.
+> > > 
+> > > @@ -64,7 +64,7 @@ username=arg
+> > > non-superuser mount. It is therefore recommended to use the full
+> > > ``username=`` option name.
+> > > 
+> > > -password=arg
+> > > +password=arg|pass=arg
+> > > specifies the CIFS password. If this option is not given then the
+> > > environment variable PASSWD is used. If the password is not specified
+> > > directly or indirectly via an argument to mount, mount.cifs will
+> > > @@ -76,7 +76,7 @@ password=arg
+> > > variable or via a credentials file (see below) or entered at the
+> > > password prompt will be read correctly.
+> > > 
+> > > -credentials=filename
+> > > +credentials=filename|cred=filename
+> > > specifies a file that contains a username and/or password and
+> > > optionally the name of the workgroup. The format of the file is::
+> > > 
+> > > @@ -159,12 +159,12 @@ dir_mode=arg
+> > > If the server does not support the CIFS Unix extensions this overrides
+> > > the default mode for directories.
+> > > 
+> > > -ip=arg
+> > > +ip=arg|addr=arg
+> > > sets the destination IP address. This option is set automatically if
+> > > the server name portion of the requested UNC name can be resolved so
+> > > rarely needs to be specified by the user.
+> > > 
+> > > -domain=arg
+> > > +domain=arg|dom=arg|workgroup=arg
+> > > sets the domain (workgroup) of the user.
+> > > 
+> > > guest
+> > 
+> > Honestly, I'd really prefer to move this in the other direction and have
+> > the kernel/userland programs stop accepting some of these aliases. They
+> > don't add anything to usability and they are a long-term maintenance
+> > burden.
+> > 
+> > We'd probably need a 2-3 releases where we accept the aliases and throw
+> > a warning when someone tries to use them. Then we can just rip out
+> > support for them.
+> > 
+> > That said, if the consensus is to keep the aliases in, then I'll just
+> > plan to merge this patch.
+> > 
+> > Anyone have thoughts on this?
+> > --
+> > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> 
+> 
+> --
+> Thanks,
+> 
+> Steve
 
 -- 
-2.7.4
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
