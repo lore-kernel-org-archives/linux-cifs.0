@@ -1,129 +1,67 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: =?UTF-8?Q?=E7=AD=94=E5=A4=8D=3A?= Re: [PATCH] manpage: update
- mount.cifs manpage with info aboutincomplete options
-Date: Tue, 02 Jan 2018 10:56:20 -0500
-Message-ID: <1514908580.3462.7.camel@samba.org>
-References: 201712081511450916550@zte.com.cn,1512741788.3961.7.camel@samba.org,CAH2r5mvLoDWWbJ0THCF0O0fT5OyUAPmpzvCD8jzsLs0kV8WwKw@mail.gmail.com <201801021817142206552@zte.com.cn>
+From: Randy Dunlap <rdunlap-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Subject: [PATCH -next] cifs: fix build errors for SMB_DIRECT
+Date: Tue, 2 Jan 2018 09:43:10 -0800
+Message-ID: <23f1bd9a-8c16-5893-e23e-ca1c04c80bad@infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: zhang.xianwei8-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <201801021817142206552-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Yes, we'll be merging it -- thank you!
+From: Randy Dunlap <rdunlap-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
 
-I'm in the process of handing off cifs-utils maintainership to Pavel,
-and he's working on getting his account set up correctly. Once that's
-done, we'll merge this patch soon afterward.
+Prevent build errors when CIFS=y and INFINIBAND=m.
 
--- Jeff
+fs/cifs/smbdirect.o: In function `smbd_qp_async_error_upcall':
+smbdirect.c:(.text+0x28c): undefined reference to `ib_event_msg'
+fs/cifs/smbdirect.o: In function `smbd_destroy_rdma_work':
+smbdirect.c:(.text+0xfde): undefined reference to `ib_drain_qp'
+smbdirect.c:(.text+0xfea): undefined reference to `rdma_destroy_qp'
+smbdirect.c:(.text+0x12a0): undefined reference to `ib_free_cq'
+smbdirect.c:(.text+0x12ac): undefined reference to `ib_free_cq'
+smbdirect.c:(.text+0x12b8): undefined reference to `ib_dealloc_pd'
+smbdirect.c:(.text+0x12c4): undefined reference to `rdma_destroy_id'
+fs/cifs/smbdirect.o: In function `_smbd_get_connection':
+smbdirect.c:(.text+0x168c): undefined reference to `rdma_create_id'
+smbdirect.c:(.text+0x1713): undefined reference to `rdma_resolve_addr'
+smbdirect.c:(.text+0x1780): undefined reference to `rdma_resolve_route'
+smbdirect.c:(.text+0x17e3): undefined reference to `rdma_destroy_id'
+smbdirect.c:(.text+0x183d): undefined reference to `rdma_destroy_id'
+smbdirect.c:(.text+0x199d): undefined reference to `ib_alloc_cq'
+smbdirect.c:(.text+0x19d9): undefined reference to `ib_alloc_cq'
+smbdirect.c:(.text+0x1a89): undefined reference to `rdma_create_qp'
+smbdirect.c:(.text+0x1b3c): undefined reference to `rdma_connect'
+smbdirect.c:(.text+0x2538): undefined reference to `rdma_destroy_qp'
+smbdirect.c:(.text+0x2549): undefined reference to `ib_free_cq'
+smbdirect.c:(.text+0x255a): undefined reference to `ib_free_cq'
+smbdirect.c:(.text+0x2563): undefined reference to `ib_dealloc_pd'
+smbdirect.c:(.text+0x256c): undefined reference to `rdma_destroy_id'
+smbdirect.c:(.text+0x25f0): undefined reference to `__ib_alloc_pd'
+smbdirect.c:(.text+0x26bb): undefined reference to `rdma_disconnect'
+fs/cifs/smbdirect.o: In function `smbd_disconnect_rdma_work':
+smbdirect.c:(.text+0x62): undefined reference to `rdma_disconnect'
 
-On Tue, 2018-01-02 at 18:17 +0800, zhang.xianwei8-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org wrote:
-> So, could merge the patch?
-> 
-> 
-> 
-> ------------------原始邮件------------------
-> 发件人： <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>;
-> 收件人： <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>;
-> 抄送人：张贤伟10129966; <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>;
-> 日 期 ：2017年12月08日 22:30
-> 主 题 ：Re: [PATCH] manpage: update mount.cifs manpage with info aboutincomplete options
-> > Anyone have thoughts on this?
-> 
-> My reaction is that it is more work to remove the aliases, and not
-> likely to improve usability in this case to remove the alias - so
-> better to leave the aliases in.
-> 
-> 
-> On Fri, Dec 8, 2017 at 8:03 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> > On Fri, 2017-12-08 at 15:11 +0800, zhang.xianwei8-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org wrote:
-> > > This commit a1f3acd40b265f134a97a739a6898b3958d206b9 modified mount
-> > > parameters, but not updated mount.cifs manpage. Fix it.
-> > > 
-> > > Signed-off-by: Zhang Xianwei <zhang.xianwei8-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
-> > > ---
-> > > mount.cifs.rst | 10 +++++-----
-> > > 1 file changed, 5 insertions(+), 5 deletions(-)
-> > > 
-> > > diff --git a/mount.cifs.rst b/mount.cifs.rst
-> > > index 023ff34..a4445b8 100644
-> > > --- a/mount.cifs.rst
-> > > +++ b/mount.cifs.rst
-> > > @@ -48,7 +48,7 @@ OPTIONS
-> > > *******
-> > > 
-> > > 
-> > > -username=arg
-> > > +username=arg|user=arg
-> > > specifies the username to connect as. If this is not
-> > > given, then the environment variable USER is used.
-> > > 
-> > > @@ -64,7 +64,7 @@ username=arg
-> > > non-superuser mount. It is therefore recommended to use the full
-> > > ``username=`` option name.
-> > > 
-> > > -password=arg
-> > > +password=arg|pass=arg
-> > > specifies the CIFS password. If this option is not given then the
-> > > environment variable PASSWD is used. If the password is not specified
-> > > directly or indirectly via an argument to mount, mount.cifs will
-> > > @@ -76,7 +76,7 @@ password=arg
-> > > variable or via a credentials file (see below) or entered at the
-> > > password prompt will be read correctly.
-> > > 
-> > > -credentials=filename
-> > > +credentials=filename|cred=filename
-> > > specifies a file that contains a username and/or password and
-> > > optionally the name of the workgroup. The format of the file is::
-> > > 
-> > > @@ -159,12 +159,12 @@ dir_mode=arg
-> > > If the server does not support the CIFS Unix extensions this overrides
-> > > the default mode for directories.
-> > > 
-> > > -ip=arg
-> > > +ip=arg|addr=arg
-> > > sets the destination IP address. This option is set automatically if
-> > > the server name portion of the requested UNC name can be resolved so
-> > > rarely needs to be specified by the user.
-> > > 
-> > > -domain=arg
-> > > +domain=arg|dom=arg|workgroup=arg
-> > > sets the domain (workgroup) of the user.
-> > > 
-> > > guest
-> > 
-> > Honestly, I'd really prefer to move this in the other direction and have
-> > the kernel/userland programs stop accepting some of these aliases. They
-> > don't add anything to usability and they are a long-term maintenance
-> > burden.
-> > 
-> > We'd probably need a 2-3 releases where we accept the aliases and throw
-> > a warning when someone tries to use them. Then we can just rip out
-> > support for them.
-> > 
-> > That said, if the consensus is to keep the aliases in, then I'll just
-> > plan to merge this patch.
-> > 
-> > Anyone have thoughts on this?
-> > --
-> > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> 
-> 
-> --
-> Thanks,
-> 
-> Steve
+Signed-off-by: Randy Dunlap <rdunlap-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Cc:	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Cc:	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc:	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org (moderated for non-subscribers)
+---
+ fs/cifs/Kconfig |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+--- linux-next-20180102.orig/fs/cifs/Kconfig
++++ linux-next-20180102/fs/cifs/Kconfig
+@@ -197,7 +197,7 @@ config CIFS_SMB311
+ 
+ config CIFS_SMB_DIRECT
+ 	bool "SMB Direct support (Experimental)"
+-	depends on CIFS && INFINIBAND
++	depends on CIFS=m && INFINIBAND || CIFS=y && INFINIBAND=y
+ 	help
+ 	  Enables SMB Direct experimental support for SMB 3.0, 3.02 and 3.1.1.
+ 	  SMB Direct allows transferring SMB packets over RDMA. If unsure,
