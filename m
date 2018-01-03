@@ -1,60 +1,45 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: linux-next: build warning after merge of the cifs tree
-Date: Wed, 3 Jan 2018 16:44:59 -0600
-Message-ID: <CAH2r5mvgtC3Y_aLxk7-_R8E=ohR1LoFSkiqZZ6rhn9azXY05xw@mail.gmail.com>
-References: <20180104093359.4e012f2f@canb.auug.org.au>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [RFC PATCH linux-next] CIFS: SMBD: _smbd_get_connection() can be static
+Date: Wed, 3 Jan 2018 17:15:19 -0600
+Message-ID: <CAH2r5mt0a3Qs6fTQP8ZyWxk5_SU4owWQx4=rxKpP9h7sYcFzwA@mail.gmail.com>
+References: <201712182136.tWBuroDL%fengguang.wu@intel.com> <20171218133006.GA79761@cairo>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: CIFS <linux-cifs@vger.kernel.org>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Long Li <longli@microsoft.com>,
-        Pavel Shilovsky <pshilov@microsoft.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180104093359.4e012f2f@canb.auug.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>, kbuild-all-JC7UmRfGjtg@public.gmane.org,
+        Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        CIFS <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: kbuild test robot <fengguang.wu-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20171218133006.GA79761@cairo>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-I don't see this with gcc 5.4
+merged into cifs-2.6.git for-next thx
 
-Stephen,
-Harmless to initialize flags here ... even if unneeded ... so if it
-makes your life easier I don't mind initializes to 0.  Let me know.
-Wonder why it doesn't generate the warning on the various other places
-in the fs that do the same thing?
-
-On Wed, Jan 3, 2018 at 4:33 PM, Stephen Rothwell <sfr@canb.auug.org.au> wrote:
-> Hi all,
+On Mon, Dec 18, 2017 at 7:30 AM, kbuild test robot
+<fengguang.wu-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org> wrote:
 >
-> After merging the cifs tree, today's linux-next build (x86_64
-> allmodconfig) produced this warning:
+> Fixes: 07495ff5d9bc ("CIFS: SMBD: Establish SMB Direct connection")
+> Signed-off-by: Fengguang Wu <fengguang.wu-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+> ---
+>  smbdirect.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> In file included from include/linux/seqlock.h:36:0,
->                  from include/linux/time.h:6,
->                  from include/linux/stat.h:19,
->                  from include/linux/module.h:10,
->                  from fs/cifs/smbdirect.c:16:
-> fs/cifs/smbdirect.c: In function 'smbd_recv_buf':
-> include/linux/spinlock.h:260:3: warning: 'flags' may be used uninitialized in this function [-Wmaybe-uninitialized]
->    _raw_spin_unlock_irqrestore(lock, flags); \
->    ^
-> fs/cifs/smbdirect.c:1865:16: note: 'flags' was declared here
->   unsigned long flags;
->                 ^
+> diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+> index 2ecd5c1..62a5c3f 100644
+> --- a/fs/cifs/smbdirect.c
+> +++ b/fs/cifs/smbdirect.c
+> @@ -1462,7 +1462,7 @@ static int allocate_caches_and_workqueue(struct smbd_connection *info)
+>  }
 >
-> Introduced by commit
->
->   ac69f66e54ca ("CIFS: SMBD: Implement function to receive data via RDMA receive")
->
-> OK, this is a false positive, but annoying.
->
-> I am using gcc 5.2.0.
->
-> --
-> Cheers,
-> Stephen Rothwell
+>  /* Create a SMBD connection, called by upper layer */
+> -struct smbd_connection *_smbd_get_connection(
+> +static struct smbd_connection *_smbd_get_connection(
+>         struct TCP_Server_Info *server, struct sockaddr *dstaddr, int port)
+>  {
+>         int rc;
 
 
 
