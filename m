@@ -1,60 +1,85 @@
-From: ronnie sahlberg <ronniesahlberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 0/2] Remove rfc1002 headers from SMB2 responses
-Date: Wed, 3 Jan 2018 08:43:03 +1000
-Message-ID: <CAN05THQ8c7yzDxT+8-fJPTo1JPGEAU7=ScrJAKvOcuAVYuOKzg@mail.gmail.com>
-References: <20180102223524.8389-1-lsahlber@redhat.com>
+From: Steve French <smfrench@gmail.com>
+Subject: Re: [PATCH -next] cifs: fix build errors for SMB_DIRECT
+Date: Wed, 3 Jan 2018 11:48:24 -0600
+Message-ID: <CAH2r5mt8ENue0cfcqW_52A084dWaYYhhXLxV5Brmz3gnVSdz8g@mail.gmail.com>
+References: <23f1bd9a-8c16-5893-e23e-ca1c04c80bad@infradead.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20180102223524.8389-1-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        Steve French <sfrench@samba.org>
+To: Randy Dunlap <rdunlap@infradead.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <23f1bd9a-8c16-5893-e23e-ca1c04c80bad@infradead.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Wed, Jan 3, 2018 at 8:35 AM, Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> Steve, all
->
-> Please review but do not merge.
-> This is based on current sfrench/for-next and is the final step
-> before we can start doing compounding.
->
-> The patch will break the soon to be merged SMBD support from Long Li
-> so do not merge this. I suggest we wait until Long's patches are merged and
-> I will rebase, and fixup the SMBD parts that this breaks.
->
-> The first patch removes the rfc1002 length field from all SMB2 responses.
-> Unfortunately it is not easy to do this in a set of incremental patches
-> as opposed to one single big patch since in the demultiplex loop
-> we can not really distinguish between different response structures
-> until we have read the full SMB2 header, and in order to read the header
-> we must know whether there should be a rfc1002 length there or not.
-> I.e. chicken and egg.
->
-> During developmnet of these patches I did have a series that performed
-> the change one structure at a time but it is very ugly, doing
-> memcpy to strip off the header when there should be none
-> and converting several helper functions to check their char*buf arguments
-> whether it looked like the buffer started with a rfc1002 header or not.
-> Very ugly and not I think something we want in the upstream commit history
-> but if someone really wants to see the "individual change for each response
-> structure" I could make those intermediate patchsets available.
->
-> It works for basic and manual testing. What remains is to ensure that
-> SMBD is updated to not have to prepend the length field any more
-> once those patches go in, and also SMB3 encryption.
-> I have not had a chance to test it so if someone could help here
-> would be awesome.
+merged into cifs-2.6.git for-next
 
-I have not had a chance to test it, WITH SMB3 ENCRYPTION, so ...
-
+On Tue, Jan 2, 2018 at 11:43 AM, Randy Dunlap <rdunlap@infradead.org> wrote:
+> From: Randy Dunlap <rdunlap@infradead.org>
 >
+> Prevent build errors when CIFS=y and INFINIBAND=m.
 >
-> The second patch updates the demultiplex loop so that it can handle
-> compounded responses.
+> fs/cifs/smbdirect.o: In function `smbd_qp_async_error_upcall':
+> smbdirect.c:(.text+0x28c): undefined reference to `ib_event_msg'
+> fs/cifs/smbdirect.o: In function `smbd_destroy_rdma_work':
+> smbdirect.c:(.text+0xfde): undefined reference to `ib_drain_qp'
+> smbdirect.c:(.text+0xfea): undefined reference to `rdma_destroy_qp'
+> smbdirect.c:(.text+0x12a0): undefined reference to `ib_free_cq'
+> smbdirect.c:(.text+0x12ac): undefined reference to `ib_free_cq'
+> smbdirect.c:(.text+0x12b8): undefined reference to `ib_dealloc_pd'
+> smbdirect.c:(.text+0x12c4): undefined reference to `rdma_destroy_id'
+> fs/cifs/smbdirect.o: In function `_smbd_get_connection':
+> smbdirect.c:(.text+0x168c): undefined reference to `rdma_create_id'
+> smbdirect.c:(.text+0x1713): undefined reference to `rdma_resolve_addr'
+> smbdirect.c:(.text+0x1780): undefined reference to `rdma_resolve_route'
+> smbdirect.c:(.text+0x17e3): undefined reference to `rdma_destroy_id'
+> smbdirect.c:(.text+0x183d): undefined reference to `rdma_destroy_id'
+> smbdirect.c:(.text+0x199d): undefined reference to `ib_alloc_cq'
+> smbdirect.c:(.text+0x19d9): undefined reference to `ib_alloc_cq'
+> smbdirect.c:(.text+0x1a89): undefined reference to `rdma_create_qp'
+> smbdirect.c:(.text+0x1b3c): undefined reference to `rdma_connect'
+> smbdirect.c:(.text+0x2538): undefined reference to `rdma_destroy_qp'
+> smbdirect.c:(.text+0x2549): undefined reference to `ib_free_cq'
+> smbdirect.c:(.text+0x255a): undefined reference to `ib_free_cq'
+> smbdirect.c:(.text+0x2563): undefined reference to `ib_dealloc_pd'
+> smbdirect.c:(.text+0x256c): undefined reference to `rdma_destroy_id'
+> smbdirect.c:(.text+0x25f0): undefined reference to `__ib_alloc_pd'
+> smbdirect.c:(.text+0x26bb): undefined reference to `rdma_disconnect'
+> fs/cifs/smbdirect.o: In function `smbd_disconnect_rdma_work':
+> smbdirect.c:(.text+0x62): undefined reference to `rdma_disconnect'
+>
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Cc:     Steve French <sfrench@samba.org>
+> Cc:     linux-cifs@vger.kernel.org
+> Cc:     samba-technical@lists.samba.org (moderated for non-subscribers)
+> ---
+>  fs/cifs/Kconfig |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> --- linux-next-20180102.orig/fs/cifs/Kconfig
+> +++ linux-next-20180102/fs/cifs/Kconfig
+> @@ -197,7 +197,7 @@ config CIFS_SMB311
+>
+>  config CIFS_SMB_DIRECT
+>         bool "SMB Direct support (Experimental)"
+> -       depends on CIFS && INFINIBAND
+> +       depends on CIFS=m && INFINIBAND || CIFS=y && INFINIBAND=y
+>         help
+>           Enables SMB Direct experimental support for SMB 3.0, 3.02 and 3.1.1.
+>           SMB Direct allows transferring SMB packets over RDMA. If unsure,
+>
 >
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Thanks,
+
+Steve
