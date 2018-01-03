@@ -1,122 +1,50 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [Patch v8 02/16] CIFS: SMBD: Implement function to reconnect to a
- SMB Direct transport
-Date: Wed, 3 Jan 2018 11:51:12 -0600
-Message-ID: <CAH2r5mv7mTLFAxW1GKiOSD7zGrdC=4vQFVO73JvtA466ZQdMnA@mail.gmail.com>
-References: <20171123003849.17093-1-longli@exchange.microsoft.com> <20171123003849.17093-3-longli@exchange.microsoft.com>
+From: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Subject: RE: [PATCH 1/2] cifs: remove rfc1002 header from all SMB2 response
+ structures
+Date: Wed, 3 Jan 2018 18:26:52 +0000
+Message-ID: <DM5PR2101MB0886F4E951689CB179F9215FA01E0@DM5PR2101MB0886.namprd21.prod.outlook.com>
+References: <20180102223524.8389-1-lsahlber@redhat.com>
+ <20180102223524.8389-2-lsahlber@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-        Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Stephen Hemminger <sthemmin-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171123003849.17093-3-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20180102223524.8389-2-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Language: en-US
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-various checkpatch errors (remember to run scripts/chekckpatch.pl
-before submitting)
+> -----Original Message-----
+> From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [mailto:linux-cifs-
+> owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org] On Behalf Of Ronnie Sahlberg
+> Sent: Tuesday, January 2, 2018 5:35 PM
+> To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+> Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Subject: [PATCH 1/2] cifs: remove rfc1002 header from all SMB2 response
+> structures
+>=20
+> Separate out all the 4 byte rfc1002 headers so that they are no longer
+> part of the SMB2 header structures to prepare for future work to add
+> compounding support.
+>=20
+> When using compounding, the wire format will consist of a single
+> rfc1002 length header followed by one, or more, SMB2 headers, like this :
+>=20
+> * 4 byte rfc1002 length
+> * SMB2 header
+> * SMB2 header
+> * ...
 
-On Wed, Nov 22, 2017 at 6:38 PM, Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org> wrote:
-> From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
->
-> Add function to implement a reconnect to SMB Direct. This involves tearing down
-> the current connection and establishing/negotiating a new connection.
->
-> Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> ---
->  fs/cifs/smbdirect.c | 36 ++++++++++++++++++++++++++++++++++++
->  fs/cifs/smbdirect.h |  4 ++++
->  2 files changed, 40 insertions(+)
->
-> diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-> index 862cdf9..a96058a 100644
-> --- a/fs/cifs/smbdirect.c
-> +++ b/fs/cifs/smbdirect.c
-> @@ -1387,6 +1387,42 @@ static void idle_connection_timer(struct work_struct *work)
->                         info->keep_alive_interval*HZ);
->  }
->
-> +/*
-> + * Reconnect this SMBD connection, called from upper layer
-> + * return value: 0 on success, or actual error code
-> + */
-> +int smbd_reconnect(struct TCP_Server_Info *server)
-> +{
-> +       log_rdma_event(INFO, "reconnecting rdma session\n");
-> +
-> +       if (!server->smbd_conn) {
-> +               log_rdma_event(ERR, "rdma session already destroyed\n");
-> +               return -EINVAL;
-> +       }
-> +
-> +       /*
-> +        * This is possible if transport is disconnected and we haven't received
-> +        * notification from RDMA, but upper layer has detected timeout
-> +        */
-> +       if (server->smbd_conn->transport_status == SMBD_CONNECTED) {
-> +               log_rdma_event(INFO, "disconnecting transport\n");
-> +               smbd_disconnect_rdma_connection(server->smbd_conn);
-> +       }
-> +
-> +       /* wait until the transport is destroyed */
-> +       wait_event(server->smbd_conn->wait_destroy,
-> +               server->smbd_conn->transport_status == SMBD_DESTROYED);
-> +
-> +       destroy_workqueue(server->smbd_conn->workqueue);
-> +       kfree(server->smbd_conn);
-> +
-> +       log_rdma_event(INFO, "creating rdma session\n");
-> +       server->smbd_conn = smbd_get_connection(
-> +               server, (struct sockaddr *) &server->dstaddr);
-> +
-> +       return server->smbd_conn ? 0 : -ENOENT;
-> +}
-> +
->  static void destroy_caches_and_workqueue(struct smbd_connection *info)
->  {
->         destroy_receive_buffers(info);
-> diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
-> index 25b3782..8948f06 100644
-> --- a/fs/cifs/smbdirect.h
-> +++ b/fs/cifs/smbdirect.h
-> @@ -247,11 +247,15 @@ struct smbd_response {
->  struct smbd_connection *smbd_get_connection(
->         struct TCP_Server_Info *server, struct sockaddr *dstaddr);
->
-> +/* Reconnect SMBDirect session */
-> +int smbd_reconnect(struct TCP_Server_Info *server);
-> +
->  #else
->  #define cifs_rdma_enabled(server)      0
->  struct smbd_connection {};
->  static inline void *smbd_get_connection(
->         struct TCP_Server_Info *server, struct sockaddr *dstaddr) {return NULL;}
-> +static inline int smbd_reconnect(struct TCP_Server_Info *server) {return -1;}
->  #endif
->
->  #endif
-> --
-> 2.7.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Comment purely on the changelog.
 
+This second paragraph is somewhat misleading, and should perhaps be omitted=
+.
+The RFC1002 length is a transport frame marker, and used only on stream-bas=
+ed
+transports such as TCP. For example, it's not present when the transport is
+SMB Direct. There is no protocol dependency on its use by Compounding.
 
-
--- 
-Thanks,
-
-Steve
---
-To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Tom.
