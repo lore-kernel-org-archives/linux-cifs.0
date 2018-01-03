@@ -1,80 +1,113 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH -next] cifs: fix build errors for SMB_DIRECT
-Date: Wed, 3 Jan 2018 11:48:24 -0600
-Message-ID: <CAH2r5mt8ENue0cfcqW_52A084dWaYYhhXLxV5Brmz3gnVSdz8g@mail.gmail.com>
-References: <23f1bd9a-8c16-5893-e23e-ca1c04c80bad@infradead.org>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [Patch v8 02/16] CIFS: SMBD: Implement function to reconnect to a
+ SMB Direct transport
+Date: Wed, 3 Jan 2018 11:51:12 -0600
+Message-ID: <CAH2r5mv7mTLFAxW1GKiOSD7zGrdC=4vQFVO73JvtA466ZQdMnA@mail.gmail.com>
+References: <20171123003849.17093-1-longli@exchange.microsoft.com> <20171123003849.17093-3-longli@exchange.microsoft.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: LKML <linux-kernel@vger.kernel.org>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        Steve French <sfrench@samba.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <23f1bd9a-8c16-5893-e23e-ca1c04c80bad@infradead.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+        Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Matthew Wilcox <mawilcox-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Stephen Hemminger <sthemmin-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20171123003849.17093-3-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
+Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
-merged into cifs-2.6.git for-next
+various checkpatch errors (remember to run scripts/chekckpatch.pl
+before submitting)
 
-On Tue, Jan 2, 2018 at 11:43 AM, Randy Dunlap <rdunlap@infradead.org> wrote:
-> From: Randy Dunlap <rdunlap@infradead.org>
+On Wed, Nov 22, 2017 at 6:38 PM, Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org> wrote:
+> From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 >
-> Prevent build errors when CIFS=y and INFINIBAND=m.
+> Add function to implement a reconnect to SMB Direct. This involves tearing down
+> the current connection and establishing/negotiating a new connection.
 >
-> fs/cifs/smbdirect.o: In function `smbd_qp_async_error_upcall':
-> smbdirect.c:(.text+0x28c): undefined reference to `ib_event_msg'
-> fs/cifs/smbdirect.o: In function `smbd_destroy_rdma_work':
-> smbdirect.c:(.text+0xfde): undefined reference to `ib_drain_qp'
-> smbdirect.c:(.text+0xfea): undefined reference to `rdma_destroy_qp'
-> smbdirect.c:(.text+0x12a0): undefined reference to `ib_free_cq'
-> smbdirect.c:(.text+0x12ac): undefined reference to `ib_free_cq'
-> smbdirect.c:(.text+0x12b8): undefined reference to `ib_dealloc_pd'
-> smbdirect.c:(.text+0x12c4): undefined reference to `rdma_destroy_id'
-> fs/cifs/smbdirect.o: In function `_smbd_get_connection':
-> smbdirect.c:(.text+0x168c): undefined reference to `rdma_create_id'
-> smbdirect.c:(.text+0x1713): undefined reference to `rdma_resolve_addr'
-> smbdirect.c:(.text+0x1780): undefined reference to `rdma_resolve_route'
-> smbdirect.c:(.text+0x17e3): undefined reference to `rdma_destroy_id'
-> smbdirect.c:(.text+0x183d): undefined reference to `rdma_destroy_id'
-> smbdirect.c:(.text+0x199d): undefined reference to `ib_alloc_cq'
-> smbdirect.c:(.text+0x19d9): undefined reference to `ib_alloc_cq'
-> smbdirect.c:(.text+0x1a89): undefined reference to `rdma_create_qp'
-> smbdirect.c:(.text+0x1b3c): undefined reference to `rdma_connect'
-> smbdirect.c:(.text+0x2538): undefined reference to `rdma_destroy_qp'
-> smbdirect.c:(.text+0x2549): undefined reference to `ib_free_cq'
-> smbdirect.c:(.text+0x255a): undefined reference to `ib_free_cq'
-> smbdirect.c:(.text+0x2563): undefined reference to `ib_dealloc_pd'
-> smbdirect.c:(.text+0x256c): undefined reference to `rdma_destroy_id'
-> smbdirect.c:(.text+0x25f0): undefined reference to `__ib_alloc_pd'
-> smbdirect.c:(.text+0x26bb): undefined reference to `rdma_disconnect'
-> fs/cifs/smbdirect.o: In function `smbd_disconnect_rdma_work':
-> smbdirect.c:(.text+0x62): undefined reference to `rdma_disconnect'
->
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Cc:     Steve French <sfrench@samba.org>
-> Cc:     linux-cifs@vger.kernel.org
-> Cc:     samba-technical@lists.samba.org (moderated for non-subscribers)
+> Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 > ---
->  fs/cifs/Kconfig |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  fs/cifs/smbdirect.c | 36 ++++++++++++++++++++++++++++++++++++
+>  fs/cifs/smbdirect.h |  4 ++++
+>  2 files changed, 40 insertions(+)
 >
-> --- linux-next-20180102.orig/fs/cifs/Kconfig
-> +++ linux-next-20180102/fs/cifs/Kconfig
-> @@ -197,7 +197,7 @@ config CIFS_SMB311
+> diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+> index 862cdf9..a96058a 100644
+> --- a/fs/cifs/smbdirect.c
+> +++ b/fs/cifs/smbdirect.c
+> @@ -1387,6 +1387,42 @@ static void idle_connection_timer(struct work_struct *work)
+>                         info->keep_alive_interval*HZ);
+>  }
 >
->  config CIFS_SMB_DIRECT
->         bool "SMB Direct support (Experimental)"
-> -       depends on CIFS && INFINIBAND
-> +       depends on CIFS=m && INFINIBAND || CIFS=y && INFINIBAND=y
->         help
->           Enables SMB Direct experimental support for SMB 3.0, 3.02 and 3.1.1.
->           SMB Direct allows transferring SMB packets over RDMA. If unsure,
+> +/*
+> + * Reconnect this SMBD connection, called from upper layer
+> + * return value: 0 on success, or actual error code
+> + */
+> +int smbd_reconnect(struct TCP_Server_Info *server)
+> +{
+> +       log_rdma_event(INFO, "reconnecting rdma session\n");
+> +
+> +       if (!server->smbd_conn) {
+> +               log_rdma_event(ERR, "rdma session already destroyed\n");
+> +               return -EINVAL;
+> +       }
+> +
+> +       /*
+> +        * This is possible if transport is disconnected and we haven't received
+> +        * notification from RDMA, but upper layer has detected timeout
+> +        */
+> +       if (server->smbd_conn->transport_status == SMBD_CONNECTED) {
+> +               log_rdma_event(INFO, "disconnecting transport\n");
+> +               smbd_disconnect_rdma_connection(server->smbd_conn);
+> +       }
+> +
+> +       /* wait until the transport is destroyed */
+> +       wait_event(server->smbd_conn->wait_destroy,
+> +               server->smbd_conn->transport_status == SMBD_DESTROYED);
+> +
+> +       destroy_workqueue(server->smbd_conn->workqueue);
+> +       kfree(server->smbd_conn);
+> +
+> +       log_rdma_event(INFO, "creating rdma session\n");
+> +       server->smbd_conn = smbd_get_connection(
+> +               server, (struct sockaddr *) &server->dstaddr);
+> +
+> +       return server->smbd_conn ? 0 : -ENOENT;
+> +}
+> +
+>  static void destroy_caches_and_workqueue(struct smbd_connection *info)
+>  {
+>         destroy_receive_buffers(info);
+> diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
+> index 25b3782..8948f06 100644
+> --- a/fs/cifs/smbdirect.h
+> +++ b/fs/cifs/smbdirect.h
+> @@ -247,11 +247,15 @@ struct smbd_response {
+>  struct smbd_connection *smbd_get_connection(
+>         struct TCP_Server_Info *server, struct sockaddr *dstaddr);
 >
+> +/* Reconnect SMBDirect session */
+> +int smbd_reconnect(struct TCP_Server_Info *server);
+> +
+>  #else
+>  #define cifs_rdma_enabled(server)      0
+>  struct smbd_connection {};
+>  static inline void *smbd_get_connection(
+>         struct TCP_Server_Info *server, struct sockaddr *dstaddr) {return NULL;}
+> +static inline int smbd_reconnect(struct TCP_Server_Info *server) {return -1;}
+>  #endif
+>
+>  #endif
+> --
+> 2.7.4
 >
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo@vger.kernel.org
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
@@ -83,3 +116,7 @@ On Tue, Jan 2, 2018 at 11:43 AM, Randy Dunlap <rdunlap@infradead.org> wrote:
 Thanks,
 
 Steve
+--
+To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
