@@ -1,167 +1,122 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [Patch v8 14/16] CIFS: SMBD: Upper layer performs SMB read via
- RDMA write through memory registration
-Date: Wed, 3 Jan 2018 15:31:28 -0600
-Message-ID: <CAH2r5mt3ucNBUCssvPMr8LZPC3odhrnG1PZE=LRnsmFv9raDLQ@mail.gmail.com>
-References: <20171123003849.17093-1-longli@exchange.microsoft.com> <20171123003849.17093-15-longli@exchange.microsoft.com>
+From: Steve French <smfrench@gmail.com>
+Subject: Re: [Patch v8 00/16] CIFS: Implement SMB Direct protocol
+Date: Wed, 3 Jan 2018 15:39:31 -0600
+Message-ID: <CAH2r5muSmtRFdQvmb0ce9vE0nSAAm8kZGe4Kcib1X=mcxfKZdw@mail.gmail.com>
+References: <20171123003849.17093-1-longli@exchange.microsoft.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-        linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20171123003849.17093-15-longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org>
-Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: linux-cifs@vger.kernel.org, linux-rdma@vger.kernel.org,
+        samba-technical <samba-technical@lists.samba.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>
+To: Long Li <longli@exchange.microsoft.com>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <20171123003849.17093-1-longli@exchange.microsoft.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Fixed minor typo ("transferred") before merging
+Merged into cifs-2.6.git for-next after cleaning up some minor typos
+and checkpatch warnings
 
-On Wed, Nov 22, 2017 at 6:38 PM, Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfmx@public.gmane.org> wrote:
-> From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+On Wed, Nov 22, 2017 at 6:38 PM, Long Li <longli@exchange.microsoft.com> wrote:
+> From: Long Li <longli@microsoft.com>
 >
-> If I/O size is larger than rdma_readwrite_threshold, use RDMA write for
-> SMB read by specifying channel SMB2_CHANNEL_RDMA_V1 or
-> SMB2_CHANNEL_RDMA_V1_INVALIDATE in the SMB packet, depending on SMB dialect
-> used. Append a smbd_buffer_descriptor_v1 to the end of the SMB packet and fill
-> in other values to indicate this SMB read uses RDMA write.
+> Starting with SMB2 dialect 3.0, Microsoft introduced SMB Direct transport
+> protocol for transferring upper layer (SMB2) payload over RDMA via Infiniband,
+> RoCE or iWARP. The prococol is published in [MS-SMBD]
+> (https://msdn.microsoft.com/en-us/library/hh536346.aspx).
 >
-> There is no need to read from the transport for incoming payload. At the time
-> SMB read response comes back, the data is already transfered and placed in the
-> pages by RDMA hardware.
+> Change log:
+> v2:
+> Implemented RDMA read/write via memory registration.
+> Re-arranged patches for review [Christoph Hellwig <hch@infradead.org>].
+> Restructured the code and fixed bugs on protocol timer and keepalive
+> [Tom Talpey <ttalpey@microsoft.com>].
 >
-> When SMB read is finished, deregister the memory regions if RDMA write is used
-> for this SMB read. smbd_deregister_mr may need to do local invalidation and
-> sleep, if server remote invalidation is not used.
+> v3:
+> Improved performance by introducing an additional queue for handling
+> empty packets and reducing lock contention on IRQ path.
+> Added light weight profiling by reading TSC.
+> Improved the code for checking SMB versions when mounting with rdma option
+> [Leon Romanovsky <leon@kernel.org>].
+> Moved to use pages instead of buffers for passing I/O for RDMA
+> [Christoph Hellwig <hch@infradead.org>].
+> Removed redundant code and refactored I/O code paths
+> [Christoph Hellwig <hch@infradead.org>, Tom Talpey <ttalpey@microsoft.com>].
 >
-> There are situations where the MID may not be created on I/O failure, under
-> which memory region is deregistered when read data context is released.
+> v4:
+> Fixed connectivity issues with iWAPR devices.
+> Exported configurable protocol parameters to /proc/fs/cifs
+> [Steve French <sfrench@samba.org>]
+> Re-arranged patches for review
+> [Pavel Shilovsky <piastryyy@gmail.com>].
 >
-> Signed-off-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-> ---
->  fs/cifs/file.c    | 17 +++++++++++++++--
->  fs/cifs/smb2pdu.c | 45 ++++++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 59 insertions(+), 3 deletions(-)
+> v5:
+> Fixed compiling errors on ia64, i386 and when INFINIBAND is not
+> configured. [kbuild test robot]
+> Profiling is removed and will be introduced in a seperate patch.
 >
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index df9f682..93259a16 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -42,7 +42,7 @@
->  #include "cifs_debug.h"
->  #include "cifs_fs_sb.h"
->  #include "fscache.h"
-> -
-> +#include "smbdirect.h"
+> v6:
+> Report internal code error via WARN_ON(). Change description in
+> Kconfig [Pavel Shilovsky <piastryyy@gmail.com>].
 >
->  static inline int cifs_convert_flags(unsigned int flags)
->  {
-> @@ -2902,7 +2902,12 @@ cifs_readdata_release(struct kref *refcount)
->  {
->         struct cifs_readdata *rdata = container_of(refcount,
->                                         struct cifs_readdata, refcount);
-> -
-> +#ifdef CONFIG_CIFS_SMB_DIRECT
-> +       if (rdata->mr) {
-> +               smbd_deregister_mr(rdata->mr);
-> +               rdata->mr = NULL;
-> +       }
-> +#endif
->         if (rdata->cfile)
->                 cifsFileInfo_put(rdata->cfile);
+> v7:
+> Removed the use of #ifdef CONFIG_CIFS_SMB_DIRECT in upper layer
+> code calling transport I/O. [Matthew Wilcox <mawilcox@microsoft.com>,
+> Tom Talpey <ttalpey@microsoft.com>]
 >
-> @@ -3031,6 +3036,10 @@ uncached_fill_pages(struct TCP_Server_Info *server,
->                 }
->                 if (iter)
->                         result = copy_page_from_iter(page, 0, n, iter);
-> +#ifdef CONFIG_CIFS_SMB_DIRECT
-> +               else if (rdata->mr)
-> +                       result = n;
-> +#endif
->                 else
->                         result = cifs_read_page_from_socket(server, page, n);
->                 if (result < 0)
-> @@ -3600,6 +3609,10 @@ readpages_fill_pages(struct TCP_Server_Info *server,
+> v8:
+> Fixed comment typos and removed unused code
+> [Ronnie Sahlberg <lsahlber@redhat.com>]
+> Removed the first 7 patches in v7, which have been merged.
+> Restructed the code to move relevant function definitions to later patches.
+> [Pavel Shilovsky <piastryyy@gmail.com>]
+> Added a patch to disable signing when RDMA is in use. Signing will be
+> enabled after it is properly implemented in SMB Direct code paths.
+> Fixed an issue on passing the incorrect offset to smbd_buffer_descriptor_v1
+> when RDMA read is used for SMB write. This was caused by recent CIFS
+> patches to remove packet length from SMB2 packet header.
 >
->                 if (iter)
->                         result = copy_page_from_iter(page, 0, n, iter);
-> +#ifdef CONFIG_CIFS_SMB_DIRECT
-> +               else if (rdata->mr)
-> +                       result = n;
-> +#endif
->                 else
->                         result = cifs_read_page_from_socket(server, page, n);
->                 if (result < 0)
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 908d777..bee0871d 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -2458,7 +2458,40 @@ smb2_new_read_req(void **buf, unsigned int *total_len,
->         req->MinimumCount = 0;
->         req->Length = cpu_to_le32(io_parms->length);
->         req->Offset = cpu_to_le64(io_parms->offset);
-> +#ifdef CONFIG_CIFS_SMB_DIRECT
-> +       /*
-> +        * If we want to do a RDMA write, fill in and append
-> +        * smbd_buffer_descriptor_v1 to the end of read request
-> +        */
-> +       if (server->rdma && rdata &&
-> +               rdata->bytes >= server->smbd_conn->rdma_readwrite_threshold) {
-> +
-> +               struct smbd_buffer_descriptor_v1 *v1;
-> +               bool need_invalidate =
-> +                       io_parms->tcon->ses->server->dialect == SMB30_PROT_ID;
-> +
-> +               rdata->mr = smbd_register_mr(
-> +                               server->smbd_conn, rdata->pages,
-> +                               rdata->nr_pages, rdata->tailsz,
-> +                               true, need_invalidate);
-> +               if (!rdata->mr)
-> +                       return -ENOBUFS;
-> +
-> +               req->Channel = SMB2_CHANNEL_RDMA_V1_INVALIDATE;
-> +               if (need_invalidate)
-> +                       req->Channel = SMB2_CHANNEL_RDMA_V1;
-> +               req->ReadChannelInfoOffset =
-> +                       offsetof(struct smb2_read_plain_req, Buffer);
-> +               req->ReadChannelInfoLength =
-> +                       sizeof(struct smbd_buffer_descriptor_v1);
-> +               v1 = (struct smbd_buffer_descriptor_v1 *) &req->Buffer[0];
-> +               v1->offset = rdata->mr->mr->iova;
-> +               v1->token = rdata->mr->mr->rkey;
-> +               v1->length = rdata->mr->mr->length;
+> Long Li (16):
+>   CIFS: SMBD: Upper layer connects to SMBDirect session
+>   CIFS: SMBD: Implement function to reconnect to a SMB Direct transport
+>   CIFS: SMBD: Upper layer reconnects to SMB Direct session
+>   CIFS: SMBD: Implement function to destroy a SMB Direct connection
+>   CIFS: SMBD: Upper layer destroys SMB Direct session on shutdown or
+>     umount
+>   CIFS: SMBD: Set SMB Direct maximum read or write size for I/O
+>   CIFS: SMBD: Implement function to receive data via RDMA receive
+>   CIFS: SMBD: Upper layer receives data via RDMA receive
+>   CIFS: SMBD: Implement function to send data via RDMA send
+>   CIFS: SMBD: Upper layer sends data via RDMA send
+>   CIFS: SMBD: Implement RDMA memory registration
+>   CIFS: SMBD: Upper layer performs SMB write via RDMA read through
+>     memory registration
+>   CIFS: SMBD: Read correct returned data length for RDMA write (SMB
+>     read) I/O
+>   CIFS: SMBD: Upper layer performs SMB read via RDMA write through
+>     memory registration
+>   CIFS: SMBD: Add SMB Direct debug counters
+>   CIFS: SMBD: Disable signing on SMB direct transport
 >
-> +               *total_len += sizeof(*v1) - 1;
-> +       }
-> +#endif
->         if (request_type & CHAINED_REQUEST) {
->                 if (!(request_type & END_OF_CHAIN)) {
->                         /* next 8-byte aligned request */
-> @@ -2537,7 +2570,17 @@ smb2_readv_callback(struct mid_q_entry *mid)
->                 if (rdata->result != -ENODATA)
->                         rdata->result = -EIO;
->         }
-> -
-> +#ifdef CONFIG_CIFS_SMB_DIRECT
-> +       /*
-> +        * If this rdata has a memmory registered, the MR can be freed
-> +        * MR needs to be freed as soon as I/O finishes to prevent deadlock
-> +        * because they have limited number and are used for future I/Os
-> +        */
-> +       if (rdata->mr) {
-> +               smbd_deregister_mr(rdata->mr);
-> +               rdata->mr = NULL;
-> +       }
-> +#endif
->         if (rdata->result)
->                 cifs_stats_fail_inc(tcon, SMB2_READ_HE);
+>  fs/cifs/cifs_debug.c |  66 ++++
+>  fs/cifs/cifsglob.h   |  16 +-
+>  fs/cifs/cifssmb.c    |  15 +-
+>  fs/cifs/connect.c    |  46 ++-
+>  fs/cifs/file.c       |  17 +-
+>  fs/cifs/smb1ops.c    |   4 +-
+>  fs/cifs/smb2ops.c    |  24 +-
+>  fs/cifs/smb2pdu.c    | 117 ++++++-
+>  fs/cifs/smbdirect.c  | 947 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  fs/cifs/smbdirect.h  |  72 ++++
+>  fs/cifs/transport.c  |   8 +-
+>  11 files changed, 1308 insertions(+), 24 deletions(-)
 >
 > --
 > 2.7.4
 >
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
@@ -170,7 +125,3 @@ On Wed, Nov 22, 2017 at 6:38 PM, Long Li <longli-Lp/cVzEoVyZiJJESP9tAQJZ3qXmFLfm
 Thanks,
 
 Steve
---
-To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
