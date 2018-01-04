@@ -1,41 +1,55 @@
-From: Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
-Subject: Re: linux-next: build warning after merge of the cifs tree
-Date: Thu, 4 Jan 2018 16:52:17 +1100
-Message-ID: <20180104165217.7737a0bc@canb.auug.org.au>
-References: <20180104093359.4e012f2f@canb.auug.org.au>
-        <CAH2r5mvgtC3Y_aLxk7-_R8E=ohR1LoFSkiqZZ6rhn9azXY05xw@mail.gmail.com>
+From: Colin King <colin.king@canonical.com>
+Subject: [PATCH][cifs-next] CIFS: SMBD: make functions smbd_recv_buf and smbd_recv_page static
+Date: Thu,  4 Jan 2018 13:35:55 +0000
+Message-ID: <20180104133555.8449-1-colin.king@canonical.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: CIFS <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Linux-Next Mailing List <linux-next-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Linux Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mvgtC3Y_aLxk7-_R8E=ohR1LoFSkiqZZ6rhn9azXY05xw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Hi Steve,
+From: Colin Ian King <colin.king@canonical.com>
 
-On Wed, 3 Jan 2018 16:44:59 -0600 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
-> I don't see this with gcc 5.4
+The functions smbd_recv_buf and smbd_recv_page are local to the source
+and do not need to be in global scope, so make them static.
 
-Good to know.
+Cleans up sparse warnings:
+symbol 'smbd_recv_buf' was not declared. Should it be static?
+symbol 'smbd_recv_page' was not declared. Should it be static?
 
-> Harmless to initialize flags here ... even if unneeded ... so if it
-> makes your life easier I don't mind initializes to 0.  Let me know.
-> Wonder why it doesn't generate the warning on the various other places
-> in the fs that do the same thing?
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ fs/cifs/smbdirect.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-I might just take the hint to upgrade my cross compilers :-)  Thanks anyway.
-
-In the mean time, my scripts will automatically skip reporting this
-warning to me.
+diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+index 731577d4317f..0d0545ef735f 100644
+--- a/fs/cifs/smbdirect.c
++++ b/fs/cifs/smbdirect.c
+@@ -1855,7 +1855,8 @@ struct smbd_connection *smbd_get_connection(
+  * consumed. But this will require more changes to upper layer code, and also
+  * need to consider packet boundaries while they still being reassembled.
+  */
+-int smbd_recv_buf(struct smbd_connection *info, char *buf, unsigned int size)
++static int smbd_recv_buf(struct smbd_connection *info, char *buf,
++			 unsigned int size)
+ {
+ 	struct smbd_response *response;
+ 	struct smbd_data_transfer *data_transfer;
+@@ -1995,8 +1996,8 @@ int smbd_recv_buf(struct smbd_connection *info, char *buf, unsigned int size)
+  * to_read: the length of data to read
+  * return value: actual data read
+  */
+-int smbd_recv_page(struct smbd_connection *info,
+-		struct page *page, unsigned int to_read)
++static int smbd_recv_page(struct smbd_connection *info,
++			  struct page *page, unsigned int to_read)
+ {
+ 	int ret;
+ 	char *to_address;
 -- 
-Cheers,
-Stephen Rothwell
+2.14.1
