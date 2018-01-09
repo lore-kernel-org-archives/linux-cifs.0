@@ -1,55 +1,112 @@
-From: 56103204-JVqo/v6+17SELdXlOq2cAlZq95QhYFEm@public.gmane.org
-Subject: Hallo mein lieber Freund,
-Date: Mon, 08 Jan 2018 11:29:54 +0530
-Message-ID: <DB3PR0102MB34170B89D19568F7B7A203D7B8130@DB3PR0102MB3417.eurprd01.prod.exchangelabs.com>
-Reply-To: verahollin88-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-To: Recipients <56103204-JVqo/v6+17SELdXlOq2cAlZq95QhYFEm@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Description: Mail message body
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Kees Cook <keescook@chromium.org>
+Subject: [PATCH 18/36] cifs: Define usercopy region in cifs_request slab cache
+Date: Tue,  9 Jan 2018 12:55:47 -0800
+Message-ID: <1515531365-37423-19-git-send-email-keescook@chromium.org>
+References: <1515531365-37423-1-git-send-email-keescook@chromium.org>
+Cc: Kees Cook <keescook@chromium.org>,
+	David Windsor <dave@nullcore.net>,
+	Steve French <sfrench@samba.org>,
+	linux-cifs@vger.kernel.org,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Andy Lutomirski <luto@kernel.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Christoph Lameter <cl@linux.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Laura Abbott <labbott@redhat.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Christian Borntraeger <borntraeger@de.ibm.com>,
+	Christoffer Dall <christoffer.dall@linaro.org>,
+	Dave Kleikamp <dave.kleikamp@oracle.com>,
+	Jan Kara <jack@suse.cz>,
+	Luis de Bethencourt <luisbg@kernel.org>,
+	Marc Zyngier <marc.zyngier@arm.com>,
+	Rik van Riel <riel@redhat.com>,
+	Matthew Garrett <mjg59@goog
+To: linux-kernel@vger.kernel.org
+Return-path: <owner-linux-mm@kvack.org>
+In-Reply-To: <1515531365-37423-1-git-send-email-keescook@chromium.org>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-cifs.vger.kernel.org
 
-Hallo mein lieber Freund,
+From: David Windsor <dave@nullcore.net>
 
-Ich schreibe dir diese Post mit schweren Tr=E4nen In meinen Augen und gro=
-=DFem Kummer in meinem Herzen, Mein Name ist Vera Hollin Kvan, und ich kont=
-aktiere dich aus meinem Land Indien Ich m=F6chte dir das sagen, weil ich ke=
-ine habe Eine andere M=F6glichkeit, als Ihnen zu sagen, wie ich ber=FChrt w=
-ar, um Sie zu =F6ffnen, heiratete ich mit Herrn Hollin Kvan, der f=FCr neun=
- Jahre mit der tunesischen Botschaft in Madrid Spanien arbeitete, bevor er =
-im Jahr 2005 starb. Wir waren elf Jahre ohne verheiratet Kind.
+CIFS request buffers, stored in the cifs_request slab cache, need to be
+copied to/from userspace.
 
-Er starb nach einer kurzen Krankheit, die nur f=FCnf Tage dauerte. Seit sei=
-nem Tod entschied ich mich, nicht wieder zu heiraten. Als mein verstorbener=
- Mann noch am Leben war, hinterlegte er die Summe von $ 4.850.000,00USD (Vi=
-er Millionen Achthundertundf=FCnfzigtausend Dollar) in einer Bank hier in I=
-ndien Neu-Delhi, der Hauptstadt Indiens, zur Zeit dieses Geldes ist immer n=
-och in der Bank.
+cache object allocation:
+    fs/cifs/cifsfs.c:
+        cifs_init_request_bufs():
+            ...
+            cifs_req_poolp = mempool_create_slab_pool(cifs_min_rcv,
+                                                      cifs_req_cachep);
 
-Er stellte dieses Geld f=FCr den Export von Gold aus dem Minenfactory in Ma=
-drid Spanien zur Verf=FCgung. In letzter Zeit sagte mir mein Doktor, dass i=
-ch wegen der Krebserkrankung f=FCr die Dauer von sieben Monaten nicht =FCbe=
-rleben w=FCrde. Derjenige, der mich am meisten st=F6rt, ist meine Schlaganf=
-all-Krankheit. Nachdem ich meinen Zustand gekannt habe, habe ich beschlosse=
-n, dir dieses Geld auszuh=E4ndigen, um auf die weniger privilegierten Mensc=
-hen aufzupassen, du wirst dieses Geld auf die Art und Weise benutzen, wie i=
-ch es hier unterrichten werde.
+    fs/cifs/misc.c:
+        cifs_buf_get():
+            ...
+            ret_buf = mempool_alloc(cifs_req_poolp, GFP_NOFS);
+            ...
+            return ret_buf;
 
-Ich m=F6chte, dass Sie 30 Prozent des gesamten Geldes f=FCr Ihren pers=F6nl=
-ichen Gebrauch aufwenden, w=E4hrend 70% des Geldes an wohlt=E4tige Zwecke g=
-ehen, Menschen auf der Stra=DFe und dem Waisenhaus helfen. Ich bin als Wais=
-e aufgewachsen und habe keinen K=F6rper als mein Familienmitglied, nur um z=
-u beenden, dass das Haus Gottes auch erhalten wird. Mache dies, damit Gott =
-meine S=FCnden vergibt und meine Seele akzeptiert, weil diese Krankheiten m=
-ich so sehr leiden. Sobald ich Ihre Antwort erhalten habe, werde ich Ihnen =
-den Kontakt der Bank hier in Delhi Indien geben und ich werde auch den Bank=
-manager beauftragen, Ihnen einen Vollmachtsbrief auszustellen, der Ihnen de=
-n gegenw=E4rtigen Beg=FCnstigten des Geldes in der Bank beweisen wird, wenn=
- Sie versichern mir, dass Sie entsprechend handeln werden, wie ich hier ang=
-egeben habe.
+In support of usercopy hardening, this patch defines a region in the
+cifs_request slab cache in which userspace copy operations are allowed.
 
-Ich hoffe auf Ihre Antwort.
-Von Vera Hollin kVan
+This region is known as the slab cache's usercopy region. Slab caches
+can now check that each dynamically sized copy operation involving
+cache-managed memory falls entirely within the slab's usercopy region.
+
+This patch is verbatim from Brad Spengler/PaX Team's PAX_USERCOPY
+whitelisting code in the last public patch of grsecurity/PaX based on my
+understanding of the code. Changes or omissions from the original code are
+mine and don't reflect the original grsecurity/PaX code.
+
+Signed-off-by: David Windsor <dave@nullcore.net>
+[kees: adjust commit log, provide usage trace]
+Cc: Steve French <sfrench@samba.org>
+Cc: linux-cifs@vger.kernel.org
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ fs/cifs/cifsfs.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 31b7565b1617..29f4b0290fbd 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -1231,9 +1231,11 @@ cifs_init_request_bufs(void)
+ 	cifs_dbg(VFS, "CIFSMaxBufSize %d 0x%x\n",
+ 		 CIFSMaxBufSize, CIFSMaxBufSize);
+ */
+-	cifs_req_cachep = kmem_cache_create("cifs_request",
++	cifs_req_cachep = kmem_cache_create_usercopy("cifs_request",
+ 					    CIFSMaxBufSize + max_hdr_size, 0,
+-					    SLAB_HWCACHE_ALIGN, NULL);
++					    SLAB_HWCACHE_ALIGN, 0,
++					    CIFSMaxBufSize + max_hdr_size,
++					    NULL);
+ 	if (cifs_req_cachep == NULL)
+ 		return -ENOMEM;
+ 
+@@ -1259,9 +1261,9 @@ cifs_init_request_bufs(void)
+ 	more SMBs to use small buffer alloc and is still much more
+ 	efficient to alloc 1 per page off the slab compared to 17K (5page)
+ 	alloc of large cifs buffers even when page debugging is on */
+-	cifs_sm_req_cachep = kmem_cache_create("cifs_small_rq",
++	cifs_sm_req_cachep = kmem_cache_create_usercopy("cifs_small_rq",
+ 			MAX_CIFS_SMALL_BUFFER_SIZE, 0, SLAB_HWCACHE_ALIGN,
+-			NULL);
++			0, MAX_CIFS_SMALL_BUFFER_SIZE, NULL);
+ 	if (cifs_sm_req_cachep == NULL) {
+ 		mempool_destroy(cifs_req_poolp);
+ 		kmem_cache_destroy(cifs_req_cachep);
+-- 
+2.7.4
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
