@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Subject: [PATCH] list_debug: check prev/next for NULL when checking list_head for validity
-Date: Wed, 10 Jan 2018 11:08:10 +1100
-Message-ID: <20180110000810.15547-1-lsahlber@redhat.com>
+Date: Wed, 10 Jan 2018 14:07:57 +1100
+Message-ID: <20180110030757.16774-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -14,7 +14,7 @@ Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
  1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/lib/list_debug.c b/lib/list_debug.c
-index a34db8d27667..01ef3f6d4706 100644
+index a34db8d27667..e33947f06d84 100644
 --- a/lib/list_debug.c
 +++ b/lib/list_debug.c
 @@ -42,7 +42,13 @@ bool __list_del_entry_valid(struct list_head *entry)
@@ -23,11 +23,11 @@ index a34db8d27667..01ef3f6d4706 100644
  
 -	if (CHECK_DATA_CORRUPTION(next == LIST_POISON1,
 +	if (CHECK_DATA_CORRUPTION(next == NULL,
-+			"list_del corruption, %p->next is NULL (%p)\n",
-+			entry, LIST_POISON1) ||
++			"list_del corruption, %p->next is NULL\n",
++			entry) ||
 +	    CHECK_DATA_CORRUPTION(prev == NULL,
-+			"list_del corruption, %p->prev is NULL (%p)\n",
-+			entry, LIST_POISON2) ||
++			"list_del corruption, %p->prev is NULL\n",
++			entry) ||
 +	    CHECK_DATA_CORRUPTION(next == LIST_POISON1,
  			"list_del corruption, %p->next is LIST_POISON1 (%p)\n",
  			entry, LIST_POISON1) ||
