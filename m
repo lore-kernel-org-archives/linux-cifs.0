@@ -1,31 +1,36 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Check list_head->next/prev for NULL in __list_del_entry_valid
-Date: Wed, 10 Jan 2018 11:03:48 +1100
-Message-ID: <20180110000349.14963-1-lsahlber@redhat.com>
+Subject: [PATCH] list_debug: check prev/next for NULL when checking list_head for validity
+Date: Wed, 10 Jan 2018 11:08:10 +1100
+Message-ID: <20180110000810.15547-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Steve, all,
+Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ lib/list_debug.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-I am trying to track down a NULL deref that happens during cifs_reconnect().
-I don't have the root cause yet but I can mitigate the issue slightly by adding
-NULL checks in the list_debug code and avoid the bug I am chasing from
-causing a NULL deref to to just become a harmless run-time check.
-
-This is not a fix for the underlying bug, I have yet for find it, but it
-will avoif the debugging code from making things worse by causing a crash.
-
-During cifs_reconnect() we are calling
-                list_del_init(&mid_entry->qhead);
-
-at this point entry->prev->next is equal to entry and all is good,
-but entry->next is NULL which causes the crash in
-list_debug.c:__list_del_entry_valid() :
-            CHECK_DATA_CORRUPTION(next->prev != entry,
-
-Since __list_del_entry_valid() is used to check that the pointers are all
-valid, I think is is acceptable to also add NULL checks here as NULL
-is a common value for invalid pointers.
+diff --git a/lib/list_debug.c b/lib/list_debug.c
+index a34db8d27667..01ef3f6d4706 100644
+--- a/lib/list_debug.c
++++ b/lib/list_debug.c
+@@ -42,7 +42,13 @@ bool __list_del_entry_valid(struct list_head *entry)
+ 	prev = entry->prev;
+ 	next = entry->next;
+ 
+-	if (CHECK_DATA_CORRUPTION(next == LIST_POISON1,
++	if (CHECK_DATA_CORRUPTION(next == NULL,
++			"list_del corruption, %p->next is NULL (%p)\n",
++			entry, LIST_POISON1) ||
++	    CHECK_DATA_CORRUPTION(prev == NULL,
++			"list_del corruption, %p->prev is NULL (%p)\n",
++			entry, LIST_POISON2) ||
++	    CHECK_DATA_CORRUPTION(next == LIST_POISON1,
+ 			"list_del corruption, %p->next is LIST_POISON1 (%p)\n",
+ 			entry, LIST_POISON1) ||
+ 	    CHECK_DATA_CORRUPTION(prev == LIST_POISON2,
+-- 
+2.13.3
