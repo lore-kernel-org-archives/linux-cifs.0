@@ -1,107 +1,102 @@
-From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: RE: [PATCH] CIFS: SMBD: work around gcc -Wmaybe-uninitialized warning
-Date: Wed, 10 Jan 2018 21:55:48 +0000
-Message-ID: <MWHPR21MB0846F519ADCDDF1B238187ADCE110@MWHPR21MB0846.namprd21.prod.outlook.com>
-References: <20180110205137.2044979-1-arnd@arndb.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Cc: Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-        "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20180110205137.2044979-1-arnd-r2nGTMty4D4@public.gmane.org>
-Content-Language: en-US
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Kees Cook <keescook@chromium.org>
+Subject: [PATCH 21/38] cifs: Define usercopy region in cifs_request slab cache
+Date: Wed, 10 Jan 2018 18:02:53 -0800
+Message-ID: <1515636190-24061-22-git-send-email-keescook@chromium.org>
+References: <1515636190-24061-1-git-send-email-keescook@chromium.org>
+Cc: Kees Cook <keescook@chromium.org>,
+        David Windsor <dave@nullcore.net>,
+        Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christoph Lameter <cl@linux.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Laura Abbott <labbott@redhat.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Christoffer Dall <christoffer.dall@linaro.org>,
+        Dave Kleikamp <dave.kleikamp@oracle.com>,
+        Jan Kara <jack@suse.cz>,
+        Luis de Bethenc
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <1515636190-24061-1-git-send-email-keescook@chromium.org>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-> GCC versions from 4.9 to 6.3 produce a false-positive warning when dealin=
-g
-> with a conditional spin_lock_irqsave():
->=20
-> fs/cifs/smbdirect.c: In function 'smbd_recv_buf':
-> include/linux/spinlock.h:260:3: warning: 'flags' may be used uninitialize=
-d in
-> this function [-Wmaybe-uninitialized]
->=20
-> This function calls some sleeping interfaces, so it is clear that it does=
- not get
-> called with interrupts disabled and there is no need to save the irq stat=
-e
-> before taking the spinlock. This lets us remove the variable, which makes=
- the
-> function slightly more efficient and avoids the warning.
->=20
-> A further cleanup could do the same change for other functions in this fi=
-le,
-> but I did not want to take this too far for now.
->=20
-> Fixes: ac69f66e54ca ("CIFS: SMBD: Implement function to receive data via
-> RDMA receive")
-> Signed-off-by: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
+From: David Windsor <dave@nullcore.net>
 
-Reviewed-by: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+CIFS request buffers, stored in the cifs_request slab cache, need to be
+copied to/from userspace.
 
-> ---
->  fs/cifs/smbdirect.c | 15 ++++++---------
->  1 file changed, 6 insertions(+), 9 deletions(-)
->=20
-> diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c index
-> f527e22650f5..f9234ed83a60 100644
-> --- a/fs/cifs/smbdirect.c
-> +++ b/fs/cifs/smbdirect.c
-> @@ -1862,7 +1862,6 @@ int smbd_recv_buf(struct smbd_connection *info,
-> char *buf, unsigned int size)
->  	int to_copy, to_read, data_read, offset;
->  	u32 data_length, remaining_data_length, data_offset;
->  	int rc;
-> -	unsigned long flags;
->=20
->  again:
->  	if (info->transport_status !=3D SMBD_CONNECTED) { @@ -1935,15
-> +1934,13 @@ int smbd_recv_buf(struct smbd_connection *info, char *buf,
-> unsigned int size)
->  				 * end of the queue
->  				 */
->  				if (!queue_length)
-> -					spin_lock_irqsave(
-> -						&info-
-> >reassembly_queue_lock,
-> -						flags);
-> +					spin_lock_irq(
-> +						&info-
-> >reassembly_queue_lock);
->  				list_del(&response->list);
->  				queue_removed++;
->  				if (!queue_length)
-> -					spin_unlock_irqrestore(
-> -						&info-
-> >reassembly_queue_lock,
-> -						flags);
-> +					spin_unlock_irq(
-> +						&info-
-> >reassembly_queue_lock);
->=20
->  				info->count_reassembly_queue--;
->  				info-
-> >count_dequeue_reassembly_queue++;
-> @@ -1963,10 +1960,10 @@ int smbd_recv_buf(struct smbd_connection
-> *info, char *buf, unsigned int size)
->  				to_read, data_read, offset);
->  		}
->=20
-> -		spin_lock_irqsave(&info->reassembly_queue_lock, flags);
-> +		spin_lock_irq(&info->reassembly_queue_lock);
->  		info->reassembly_data_length -=3D data_read;
->  		info->reassembly_queue_length -=3D queue_removed;
-> -		spin_unlock_irqrestore(&info->reassembly_queue_lock,
-> flags);
-> +		spin_unlock_irq(&info->reassembly_queue_lock);
->=20
->  		info->first_entry_offset =3D offset;
->  		log_read(INFO, "returning to thread data_read=3D%d "
-> --
-> 2.9.0
+cache object allocation:
+    fs/cifs/cifsfs.c:
+        cifs_init_request_bufs():
+            ...
+            cifs_req_poolp = mempool_create_slab_pool(cifs_min_rcv,
+                                                      cifs_req_cachep);
+
+    fs/cifs/misc.c:
+        cifs_buf_get():
+            ...
+            ret_buf = mempool_alloc(cifs_req_poolp, GFP_NOFS);
+            ...
+            return ret_buf;
+
+In support of usercopy hardening, this patch defines a region in the
+cifs_request slab cache in which userspace copy operations are allowed.
+
+This region is known as the slab cache's usercopy region. Slab caches
+can now check that each dynamically sized copy operation involving
+cache-managed memory falls entirely within the slab's usercopy region.
+
+This patch is verbatim from Brad Spengler/PaX Team's PAX_USERCOPY
+whitelisting code in the last public patch of grsecurity/PaX based on my
+understanding of the code. Changes or omissions from the original code are
+mine and don't reflect the original grsecurity/PaX code.
+
+Signed-off-by: David Windsor <dave@nullcore.net>
+[kees: adjust commit log, provide usage trace]
+Cc: Steve French <sfrench@samba.org>
+Cc: linux-cifs@vger.kernel.org
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ fs/cifs/cifsfs.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 31b7565b1617..29f4b0290fbd 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -1231,9 +1231,11 @@ cifs_init_request_bufs(void)
+ 	cifs_dbg(VFS, "CIFSMaxBufSize %d 0x%x\n",
+ 		 CIFSMaxBufSize, CIFSMaxBufSize);
+ */
+-	cifs_req_cachep = kmem_cache_create("cifs_request",
++	cifs_req_cachep = kmem_cache_create_usercopy("cifs_request",
+ 					    CIFSMaxBufSize + max_hdr_size, 0,
+-					    SLAB_HWCACHE_ALIGN, NULL);
++					    SLAB_HWCACHE_ALIGN, 0,
++					    CIFSMaxBufSize + max_hdr_size,
++					    NULL);
+ 	if (cifs_req_cachep == NULL)
+ 		return -ENOMEM;
+ 
+@@ -1259,9 +1261,9 @@ cifs_init_request_bufs(void)
+ 	more SMBs to use small buffer alloc and is still much more
+ 	efficient to alloc 1 per page off the slab compared to 17K (5page)
+ 	alloc of large cifs buffers even when page debugging is on */
+-	cifs_sm_req_cachep = kmem_cache_create("cifs_small_rq",
++	cifs_sm_req_cachep = kmem_cache_create_usercopy("cifs_small_rq",
+ 			MAX_CIFS_SMALL_BUFFER_SIZE, 0, SLAB_HWCACHE_ALIGN,
+-			NULL);
++			0, MAX_CIFS_SMALL_BUFFER_SIZE, NULL);
+ 	if (cifs_sm_req_cachep == NULL) {
+ 		mempool_destroy(cifs_req_poolp);
+ 		kmem_cache_destroy(cifs_req_cachep);
+-- 
+2.7.4
