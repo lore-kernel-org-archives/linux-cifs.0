@@ -1,70 +1,68 @@
-From: aaptel-IBi9RG/b67k@public.gmane.org (=?utf-8?Q?Aur=C3=A9lien?= Aptel)
-Subject: tcon and session refcounts, get/put
-Date: Fri, 12 Jan 2018 19:38:47 +0100
-Message-ID: <876086apmw.fsf@suse.com>
+From: Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Subject: RE: tcon and session refcounts, get/put
+Date: Fri, 12 Jan 2018 23:02:04 +0000
+Message-ID: <DM5PR2101MB09361C20BD140B6E02B2C426B6170@DM5PR2101MB0936.namprd21.prod.outlook.com>
+References: <876086apmw.fsf@suse.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jeff Layton <jlayton-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+To: =?utf-8?B?QXVyw6lsaWVuIEFwdGVs?= <aaptel-IBi9RG/b67k@public.gmane.org>,
+        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Jeff Layton <jlayton-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <876086apmw.fsf-IBi9RG/b67k@public.gmane.org>
+Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi,
-
-While working on a bug I've found something strange.
-
-cifs_get_tcon(ses, volinfo) looks for a tcon matching volinfo in ses
-tcon list. If it doesn't find one it create one.
-
-Can someone explain to me why when it finds a matching one, it *puts*
-the session?
-
-static struct cifs_tcon *
-cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
-{
-	int rc, xid;
-	struct cifs_tcon *tcon;
-
-	tcon = cifs_find_tcon(ses, volume_info);
-	if (tcon) {
-		cifs_dbg(FYI, "Found match on UNC path\n");
-		/* existing tcon already has a reference */
-		cifs_put_smb_ses(ses); <---- why?
-		return tcon;
-	}
-
-        <... code that creates the missing tcon ...>
-
-I think the "existing tcon already has a reference" comment refers to the
-fact that cifs_find_tcon() already increments the refcount of the tcon
-and so there's no need to do it a second time.
-
-static struct cifs_tcon *
-cifs_find_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
-{
-	struct list_head *tmp;
-	struct cifs_tcon *tcon;
-
-	spin_lock(&cifs_tcp_ses_lock);
-	list_for_each(tmp, &ses->tcon_list) {
-		tcon = list_entry(tmp, struct cifs_tcon, tcon_list);
-		if (!match_tcon(tcon, volume_info))
-			continue;
-		++tcon->tc_count;
-		spin_unlock(&cifs_tcp_ses_lock);
-		return tcon;
-	}
-	spin_unlock(&cifs_tcp_ses_lock);
-	return NULL;
-}
-
-
-I don't understand the logic here and I have a feeling it might be a
-bug.
-
--- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
-GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+MjAxOC0wMS0xMiAxMDozOCBHTVQtMDg6MDAgQXVyw6lsaWVuIEFwdGVsIDxhYXB0ZWxAc3VzZS5j
+b20+Og0KPiBIaSwNCg0KSGkgQXVyZWxpZW4sDQoNCj4NCj4gV2hpbGUgd29ya2luZyBvbiBhIGJ1
+ZyBJJ3ZlIGZvdW5kIHNvbWV0aGluZyBzdHJhbmdlLg0KPg0KPiBjaWZzX2dldF90Y29uKHNlcywg
+dm9saW5mbykgbG9va3MgZm9yIGEgdGNvbiBtYXRjaGluZyB2b2xpbmZvIGluIHNlcw0KPiB0Y29u
+IGxpc3QuIElmIGl0IGRvZXNuJ3QgZmluZCBvbmUgaXQgY3JlYXRlIG9uZS4NCj4NCj4gQ2FuIHNv
+bWVvbmUgZXhwbGFpbiB0byBtZSB3aHkgd2hlbiBpdCBmaW5kcyBhIG1hdGNoaW5nIG9uZSwgaXQg
+KnB1dHMqDQo+IHRoZSBzZXNzaW9uPw0KPg0KPiBzdGF0aWMgc3RydWN0IGNpZnNfdGNvbiAqDQo+
+IGNpZnNfZ2V0X3Rjb24oc3RydWN0IGNpZnNfc2VzICpzZXMsIHN0cnVjdCBzbWJfdm9sICp2b2x1
+bWVfaW5mbykNCj4gew0KPiAgICAgICAgIGludCByYywgeGlkOw0KPiAgICAgICAgIHN0cnVjdCBj
+aWZzX3Rjb24gKnRjb247DQo+DQo+ICAgICAgICAgdGNvbiA9IGNpZnNfZmluZF90Y29uKHNlcywg
+dm9sdW1lX2luZm8pOw0KPiAgICAgICAgIGlmICh0Y29uKSB7DQo+ICAgICAgICAgICAgICAgICBj
+aWZzX2RiZyhGWUksICJGb3VuZCBtYXRjaCBvbiBVTkMgcGF0aFxuIik7DQo+ICAgICAgICAgICAg
+ICAgICAvKiBleGlzdGluZyB0Y29uIGFscmVhZHkgaGFzIGEgcmVmZXJlbmNlICovDQo+ICAgICAg
+ICAgICAgICAgICBjaWZzX3B1dF9zbWJfc2VzKHNlcyk7IDwtLS0tIHdoeT8NCj4gICAgICAgICAg
+ICAgICAgIHJldHVybiB0Y29uOw0KPiAgICAgICAgIH0NCj4NCj4gICAgICAgICA8Li4uIGNvZGUg
+dGhhdCBjcmVhdGVzIHRoZSBtaXNzaW5nIHRjb24gLi4uPg0KPg0KPiBJIHRoaW5rIHRoZSAiZXhp
+c3RpbmcgdGNvbiBhbHJlYWR5IGhhcyBhIHJlZmVyZW5jZSIgY29tbWVudCByZWZlcnMgdG8gdGhl
+DQo+IGZhY3QgdGhhdCBjaWZzX2ZpbmRfdGNvbigpIGFscmVhZHkgaW5jcmVtZW50cyB0aGUgcmVm
+Y291bnQgb2YgdGhlIHRjb24NCj4gYW5kIHNvIHRoZXJlJ3Mgbm8gbmVlZCB0byBkbyBpdCBhIHNl
+Y29uZCB0aW1lLg0KDQpFdmVyeSB0Y29uIGhvbGRzIGEgcmVmZXJlbmNlIHRvIHNtYiBzZXMsIGV2
+ZXJ5IHNtYiBzZXMgaG9sZCBhIHJlZmVyZW5jZSB0byB0Y3Agc2VzLiBSZWZjb3VudCBvZiB0Y3Ag
+c2VzIG1lYW5zIGEgbnVtYmVyIG9mIHNtYiBzZXMgcmVmZXJlbmNpbmcgdGhpcyB0Y3Agc2VzLiBS
+ZWZjb3VudCBvZiBzbWIgc2VzIG1lYW5zIGEgbnVtYmVyIG9mIHRjb24gcmVmZXJlbmNpbmcgdGhp
+cyBzbWIgc2VzLiBSZWZjb3VudCBvZiB0Y29uIG1lYW5zIGEgbnVtYmVyIG9mIG1vdW50cyByZWZl
+cmVuY2luZyB0aGUgdGNvbi4NCg0KU3VwcG9zZSB3ZSBoYXZlIDEgdGNvbiBwb2ludGluZyB0byAx
+IHNtYiBzZXMgKHBvaW50aW5nIHRvIDEgdGNwIHNlcykuIEJlZm9yZSBjYWxsaW5nIGNpZnNfZ2V0
+X3Rjb24oKSB3ZSBoYXZlIGFscmVhZHkgb2J0YWluZWQgYSByZWZlcmVuY2UgdG8gc21iIHNlcyAo
+d2hpY2ggaW5jcmVtZW50cyByZWZjb3VudCBvZiB0aGlzIHNtYiBzZXMgdG8gMikgYW5kIG5vdyB3
+ZSBhcmUgdHJ5aW5nIHRvIHNlYXJjaCBmb3IgdGNvbiB0aGF0IG1hdGNoZXMgb3Vycy4gSWYgd2Ug
+Zm91bmQgb25lIHdlIHNob3VsZCBpbmNyZW1lbnQgcmVmY291bnQgb2YgdGhpcyB0Y29uLCBzbywg
+dGNfY291bnQgPSAyLg0KDQo+DQo+IHN0YXRpYyBzdHJ1Y3QgY2lmc190Y29uICoNCj4gY2lmc19m
+aW5kX3Rjb24oc3RydWN0IGNpZnNfc2VzICpzZXMsIHN0cnVjdCBzbWJfdm9sICp2b2x1bWVfaW5m
+bykNCj4gew0KPiAgICAgICAgIHN0cnVjdCBsaXN0X2hlYWQgKnRtcDsNCj4gICAgICAgICBzdHJ1
+Y3QgY2lmc190Y29uICp0Y29uOw0KPg0KPiAgICAgICAgIHNwaW5fbG9jaygmY2lmc190Y3Bfc2Vz
+X2xvY2spOw0KPiAgICAgICAgIGxpc3RfZm9yX2VhY2godG1wLCAmc2VzLT50Y29uX2xpc3QpIHsN
+Cj4gICAgICAgICAgICAgICAgIHRjb24gPSBsaXN0X2VudHJ5KHRtcCwgc3RydWN0IGNpZnNfdGNv
+biwgdGNvbl9saXN0KTsNCj4gICAgICAgICAgICAgICAgIGlmICghbWF0Y2hfdGNvbih0Y29uLCB2
+b2x1bWVfaW5mbykpDQo+ICAgICAgICAgICAgICAgICAgICAgICAgIGNvbnRpbnVlOw0KPiAgICAg
+ICAgICAgICAgICAgKyt0Y29uLT50Y19jb3VudDsNCj4gICAgICAgICAgICAgICAgIHNwaW5fdW5s
+b2NrKCZjaWZzX3RjcF9zZXNfbG9jayk7DQo+ICAgICAgICAgICAgICAgICByZXR1cm4gdGNvbjsN
+Cj4gICAgICAgICB9DQo+ICAgICAgICAgc3Bpbl91bmxvY2soJmNpZnNfdGNwX3Nlc19sb2NrKTsN
+Cj4gICAgICAgICByZXR1cm4gTlVMTDsNCj4gfQ0KDQpCdXQgdGhpcyB0Y29uIGFscmVhZHkgaGFz
+IGl0cyBvd24gcmVmZXJlbmNlIHRvIHNtYiBzZXMuIFNvLCBvdXIgcmVmZXJlbmNlIHRvIHNtYiBz
+ZXMgaXMgdXNlbGVzcyBiZWNhdXNlIHdlIGRvZXNuJ3QgY3JlYXRlIGEgbmV3IHRjb24gd2hpY2gg
+c2hvdWxkIGhvbGQgdGhlIHJlZmVyZW5jZS4gU28sIHRoYXQncyB3aHkgd2UgZHJvcCBvdXIgcmVm
+ZXJlbmNlLiBBdCB0aGUgZW5kIHdlIGhhdmUgMSB0Y3Agc2VzIHJlZmVyZW5jZWQgYnkgMSBzbWIg
+c2VzIHJlZmVyZW5jZWQgYnkgMSB0Y29uIHJlZmVyZW5jZWQgYnkgMiBtb3VudHMuDQoNCj4NCj4g
+SSBkb24ndCB1bmRlcnN0YW5kIHRoZSBsb2dpYyBoZXJlIGFuZCBJIGhhdmUgYSBmZWVsaW5nIGl0
+IG1pZ2h0IGJlIGENCj4gYnVnLg0KDQpXZSBwcm9iYWJseSBuZWVkIGEgY29tbWVudCBkZXNjcmli
+aW5nIHRoaXMgYmVoYXZpb3IsIHNvLCBhbiBhcHByb3ByaWF0ZSBwYXRjaCBpcyBoaWdobHkgd2Vs
+Y29tZWQuDQoNCi0tDQpCZXN0IHJlZ2FyZHMsDQpQYXZlbCBTaGlsb3Zza3kNCg==
