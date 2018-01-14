@@ -1,63 +1,95 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Fix autonegotiate security settings mismatch
-Date: Sun, 14 Jan 2018 13:05:29 -0600
-Message-ID: <CAH2r5mv8MzH8AvgCJ2=L3XcBwLVu31X94Uc_yOU8-TQdvTxRjQ@mail.gmail.com>
-References: <1515682812-21567-1-git-send-email-Daniel.N.Pettersson@axis.com>
+Subject: Re: [PATCH] CIFS: SMBD: work around gcc -Wmaybe-uninitialized warning
+Date: Sun, 14 Jan 2018 13:07:42 -0600
+Message-ID: <CAH2r5mvYkZnoSnr1+6jvJKavwfQJvJFHw-E8vNCwOHKXWNNQtw@mail.gmail.com>
+References: <20180110205137.2044979-1-arnd@arndb.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: CIFS <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Daniel N Pettersson <danielnp-VrBV9hrLPhE@public.gmane.org>
-To: Daniel N Pettersson <daniel.n.pettersson-VrBV9hrLPhE@public.gmane.org>
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Pavel Shilovsky <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        CIFS <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1515682812-21567-1-git-send-email-Daniel.N.Pettersson-VrBV9hrLPhE@public.gmane.org>
+In-Reply-To: <20180110205137.2044979-1-arnd-r2nGTMty4D4@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-merged into cifs-2.6.git for-next and added cc:stable
+merged into cifs-2.6.git for-next
 
-On Thu, Jan 11, 2018 at 9:00 AM, Daniel N Pettersson
-<daniel.n.pettersson-VrBV9hrLPhE@public.gmane.org> wrote:
-> From: Daniel N Pettersson <danielnp-VrBV9hrLPhE@public.gmane.org>
+Also noticed a few sparse warnings in the same file that need to be cleaned up
+
+On Wed, Jan 10, 2018 at 2:51 PM, Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org> wrote:
+> GCC versions from 4.9 to 6.3 produce a false-positive warning when
+> dealing with a conditional spin_lock_irqsave():
 >
-> Autonegotiation gives a security settings mismatch error if the SMB
-> server selects an SMBv3 dialect that isn't SMB3.02. The exact error is
-> "protocol revalidation - security settings mismatch".
-> This can be tested using Samba v4.2 or by setting the global Samba
-> setting max protocol = SMB3_00.
+> fs/cifs/smbdirect.c: In function 'smbd_recv_buf':
+> include/linux/spinlock.h:260:3: warning: 'flags' may be used uninitialized in this function [-Wmaybe-uninitialized]
 >
-> The check that fails in smb3_validate_negotiate is the dialect
-> verification of the negotiate info response. This is because it tries
-> to verify against the protocol_id in the global smbdefault_values. The
-> protocol_id in smbdefault_values is SMB3.02.
-> In SMB2_negotiate the protocol_id in smbdefault_values isn't updated,
-> it is global so it probably shouldn't be, but server->dialect is.
+> This function calls some sleeping interfaces, so it is clear that it
+> does not get called with interrupts disabled and there is no need
+> to save the irq state before taking the spinlock. This lets us
+> remove the variable, which makes the function slightly more efficient
+> and avoids the warning.
 >
-> This patch changes the check in smb3_validate_negotiate to use
-> server->dialect instead of server->vals->protocol_id. The patch works
-> with autonegotiate and when using a specific version in the vers mount
-> option.
+> A further cleanup could do the same change for other functions in this
+> file, but I did not want to take this too far for now.
 >
-> Signed-off-by: Daniel N Pettersson <danielnp-VrBV9hrLPhE@public.gmane.org>
+> Fixes: ac69f66e54ca ("CIFS: SMBD: Implement function to receive data via RDMA receive")
+> Signed-off-by: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
 > ---
->  fs/cifs/smb2pdu.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+>  fs/cifs/smbdirect.c | 15 ++++++---------
+>  1 file changed, 6 insertions(+), 9 deletions(-)
 >
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 01346b8..66af1f8 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -733,8 +733,7 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
->         }
+> diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+> index f527e22650f5..f9234ed83a60 100644
+> --- a/fs/cifs/smbdirect.c
+> +++ b/fs/cifs/smbdirect.c
+> @@ -1862,7 +1862,6 @@ int smbd_recv_buf(struct smbd_connection *info, char *buf, unsigned int size)
+>         int to_copy, to_read, data_read, offset;
+>         u32 data_length, remaining_data_length, data_offset;
+>         int rc;
+> -       unsigned long flags;
 >
->         /* check validate negotiate info response matches what we got earlier */
-> -       if (pneg_rsp->Dialect !=
-> -                       cpu_to_le16(tcon->ses->server->vals->protocol_id))
-> +       if (pneg_rsp->Dialect != cpu_to_le16(tcon->ses->server->dialect))
->                 goto vneg_out;
+>  again:
+>         if (info->transport_status != SMBD_CONNECTED) {
+> @@ -1935,15 +1934,13 @@ int smbd_recv_buf(struct smbd_connection *info, char *buf, unsigned int size)
+>                                  * end of the queue
+>                                  */
+>                                 if (!queue_length)
+> -                                       spin_lock_irqsave(
+> -                                               &info->reassembly_queue_lock,
+> -                                               flags);
+> +                                       spin_lock_irq(
+> +                                               &info->reassembly_queue_lock);
+>                                 list_del(&response->list);
+>                                 queue_removed++;
+>                                 if (!queue_length)
+> -                                       spin_unlock_irqrestore(
+> -                                               &info->reassembly_queue_lock,
+> -                                               flags);
+> +                                       spin_unlock_irq(
+> +                                               &info->reassembly_queue_lock);
 >
->         if (pneg_rsp->SecurityMode != cpu_to_le16(tcon->ses->server->sec_mode))
+>                                 info->count_reassembly_queue--;
+>                                 info->count_dequeue_reassembly_queue++;
+> @@ -1963,10 +1960,10 @@ int smbd_recv_buf(struct smbd_connection *info, char *buf, unsigned int size)
+>                                 to_read, data_read, offset);
+>                 }
+>
+> -               spin_lock_irqsave(&info->reassembly_queue_lock, flags);
+> +               spin_lock_irq(&info->reassembly_queue_lock);
+>                 info->reassembly_data_length -= data_read;
+>                 info->reassembly_queue_length -= queue_removed;
+> -               spin_unlock_irqrestore(&info->reassembly_queue_lock, flags);
+> +               spin_unlock_irq(&info->reassembly_queue_lock);
+>
+>                 info->first_entry_offset = offset;
+>                 log_read(INFO, "returning to thread data_read=%d "
 > --
-> 2.1.4
+> 2.9.0
 >
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
