@@ -1,79 +1,219 @@
 From: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: [PATCH v1 0/3] Make IPC a regular tcon and fix SMB2 domain-based DFS
-Date: Wed, 17 Jan 2018 18:21:57 +0100
-Message-ID: <20180117172200.3221-1-aaptel@suse.com>
+Subject: [PATCH v1 3/3] CIFS: use tcon_ipc instead of use_ipc parameter from SMB2_ioctl
+Date: Wed, 17 Jan 2018 18:22:00 +0100
+Message-ID: <20180117172200.3221-4-aaptel@suse.com>
+References: <20180117172200.3221-1-aaptel@suse.com>
 Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20180117172200.3221-1-aaptel-IBi9RG/b67k@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi,
+Since IPC now has a tcon object, the caller can just pass it.
 
-The DFS code for smb2 doesn't work [1] when cifs.ko connects to a
-domain-based DFS where you have an extra level on indirection (so 3
-machines: AD, nameserver and the final storage).
+Link: https://bugzilla.samba.org/show_bug.cgi?id=12917
+Fixes: 9d49640a21bf ("CIFS: implement get_dfs_refer for SMB2+")
+Signed-off-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+---
+ fs/cifs/smb2file.c  |  2 +-
+ fs/cifs/smb2ops.c   | 50 ++++++++++++++++++++------------------------------
+ fs/cifs/smb2pdu.c   |  4 +---
+ fs/cifs/smb2proto.h |  3 +--
+ 4 files changed, 23 insertions(+), 36 deletions(-)
 
-* In SMB1 code, the DFS request is made without the tcon object. It works
-  directly on the session.
-* In SMB2 code, we use SMB2_ioctl() which works on a tcon.
-
-For domain-based DFS UNC \\DOMAIN\namespace\link, cifs.ko first tries to
-connect to \\DOMAIN\namespace. DOMAIN doesn't have a "namespace" share
-so no valid tcon object is created.
-
-* SMB1 doesn't care as it's working on the session object and just use
-  the ses->ipc_tid number to make the DFS request.
-* SMB2 code on the other hand fails as SMB2_ioctl() needs a tcon
-  object (even if you pass use_ipc=true) because it uses the tcon you
-  pass and simply overwrites the packet tid with ipc_tid. There is no
-  valid tcon object at that time since DOMAIN rejected the "namespace"
-  tcon request.
-
-So to solve this I thought I would get rid of ses->ipc_tid and make a
-real IPC tcon, that would be added to the session tcon_list and be
-managed like any other tcon (almost).
-
-This patch series cleans some definitions and makes the IPC connection
-a regular tcon owned by the session. It removes the use_ipc param from
-SMB2_ioct() (you can pass ses->tcon_ipc as the tcon param).
-
-I've made the choice of having the IPC tcon completely associated to
-the session instead of any other tcon. Its refcount is not really used
-as it's always created as soon as we have a valid session and always
-destroy when the session is destroyed and no mount points directly
-refer to it.
-
-All patches compile when applied sequentially, no warnings with
-checkpatch.pl, no warnings with make C=1.
-
-I've tested this against Windows Server 2016 vms with smb1, 2, 3 (with
-and without encryption) and it seems to be working properly.
-
-I've also quickly tested the reconnection code path but it probably
-needs some work still (making sure DFS works after a reconnection) as
-there are multiple ways to trigger the reconnection (I've been using
-qemu monitor "set_link xyz off" which is analogous to unplugging the
-network cable IIUC).
-
-Please take a look, review, test :)
-
-1: https://bugzilla.samba.org/show_bug.cgi?id=12917
-
-Aurelien Aptel (3):
-  CIFS: set SERVER_NAME_LENGTH to serverName actual size
-  CIFS: make IPC a regular tcon
-  CIFS: use tcon_ipc instead of use_ipc parameter from SMB2_ioctl
-
- fs/cifs/cifsglob.h  |  14 ++---
- fs/cifs/cifssmb.c   |   5 +-
- fs/cifs/connect.c   | 159 ++++++++++++++++++++++++++++++++++++++++------------
- fs/cifs/inode.c     |   2 +-
- fs/cifs/smb2file.c  |   2 +-
- fs/cifs/smb2ops.c   |  50 +++++++----------
- fs/cifs/smb2pdu.c   |  36 ++----------
- fs/cifs/smb2proto.h |   3 +-
- 8 files changed, 160 insertions(+), 111 deletions(-)
-
+diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
+index b4b1f0305f29..12af5dba742b 100644
+--- a/fs/cifs/smb2file.c
++++ b/fs/cifs/smb2file.c
+@@ -74,7 +74,7 @@ smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms,
+ 		nr_ioctl_req.Reserved = 0;
+ 		rc = SMB2_ioctl(xid, oparms->tcon, fid->persistent_fid,
+ 			fid->volatile_fid, FSCTL_LMR_REQUEST_RESILIENCY,
+-			true /* is_fsctl */, false /* use_ipc */,
++			true /* is_fsctl */,
+ 			(char *)&nr_ioctl_req, sizeof(nr_ioctl_req),
+ 			NULL, NULL /* no return info */);
+ 		if (rc == -EOPNOTSUPP) {
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index ed88ab8a4774..7e51bb7a587c 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -283,7 +283,6 @@ SMB3_request_interfaces(const unsigned int xid, struct cifs_tcon *tcon)
+ 
+ 	rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
+ 			FSCTL_QUERY_NETWORK_INTERFACE_INFO, true /* is_fsctl */,
+-			false /* use_ipc */,
+ 			NULL /* no data input */, 0 /* no data input */,
+ 			(char **)&out_buf, &ret_data_len);
+ 	if (rc != 0)
+@@ -782,7 +781,6 @@ SMB2_request_res_key(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	rc = SMB2_ioctl(xid, tcon, persistent_fid, volatile_fid,
+ 			FSCTL_SRV_REQUEST_RESUME_KEY, true /* is_fsctl */,
+-			false /* use_ipc */,
+ 			NULL, 0 /* no input */,
+ 			(char **)&res_key, &ret_data_len);
+ 
+@@ -848,8 +846,7 @@ smb2_copychunk_range(const unsigned int xid,
+ 		/* Request server copy to target from src identified by key */
+ 		rc = SMB2_ioctl(xid, tcon, trgtfile->fid.persistent_fid,
+ 			trgtfile->fid.volatile_fid, FSCTL_SRV_COPYCHUNK_WRITE,
+-			true /* is_fsctl */, false /* use_ipc */,
+-			(char *)pcchunk,
++			true /* is_fsctl */, (char *)pcchunk,
+ 			sizeof(struct copychunk_ioctl),	(char **)&retbuf,
+ 			&ret_data_len);
+ 		if (rc == 0) {
+@@ -1006,7 +1003,7 @@ static bool smb2_set_sparse(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
+ 			cfile->fid.volatile_fid, FSCTL_SET_SPARSE,
+-			true /* is_fctl */, false /* use_ipc */,
++			true /* is_fctl */,
+ 			&setsparse, 1, NULL, NULL);
+ 	if (rc) {
+ 		tcon->broken_sparse_sup = true;
+@@ -1077,7 +1074,7 @@ smb2_duplicate_extents(const unsigned int xid,
+ 	rc = SMB2_ioctl(xid, tcon, trgtfile->fid.persistent_fid,
+ 			trgtfile->fid.volatile_fid,
+ 			FSCTL_DUPLICATE_EXTENTS_TO_FILE,
+-			true /* is_fsctl */, false /* use_ipc */,
++			true /* is_fsctl */,
+ 			(char *)&dup_ext_buf,
+ 			sizeof(struct duplicate_extents_to_file),
+ 			NULL,
+@@ -1112,7 +1109,7 @@ smb3_set_integrity(const unsigned int xid, struct cifs_tcon *tcon,
+ 	return SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
+ 			cfile->fid.volatile_fid,
+ 			FSCTL_SET_INTEGRITY_INFORMATION,
+-			true /* is_fsctl */, false /* use_ipc */,
++			true /* is_fsctl */,
+ 			(char *)&integr_info,
+ 			sizeof(struct fsctl_set_integrity_information_req),
+ 			NULL,
+@@ -1132,7 +1129,7 @@ smb3_enum_snapshots(const unsigned int xid, struct cifs_tcon *tcon,
+ 	rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
+ 			cfile->fid.volatile_fid,
+ 			FSCTL_SRV_ENUMERATE_SNAPSHOTS,
+-			true /* is_fsctl */, false /* use_ipc */,
++			true /* is_fsctl */,
+ 			NULL, 0 /* no input data */,
+ 			(char **)&retbuf,
+ 			&ret_data_len);
+@@ -1351,16 +1348,20 @@ smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
+ 	cifs_dbg(FYI, "smb2_get_dfs_refer path <%s>\n", search_name);
+ 
+ 	/*
+-	 * Use any tcon from the current session. Here, the first one.
++	 * Try to use the IPC tcon, otherwise just use any
+ 	 */
+-	spin_lock(&cifs_tcp_ses_lock);
+-	tcon = list_first_entry_or_null(&ses->tcon_list, struct cifs_tcon,
+-					tcon_list);
+-	if (tcon)
+-		tcon->tc_count++;
+-	spin_unlock(&cifs_tcp_ses_lock);
++	tcon = ses->tcon_ipc;
++	if (tcon == NULL) {
++		spin_lock(&cifs_tcp_ses_lock);
++		tcon = list_first_entry_or_null(&ses->tcon_list,
++						struct cifs_tcon,
++						tcon_list);
++		if (tcon)
++			tcon->tc_count++;
++		spin_unlock(&cifs_tcp_ses_lock);
++	}
+ 
+-	if (!tcon) {
++	if (tcon == NULL) {
+ 		cifs_dbg(VFS, "session %p has no tcon available for a dfs referral request\n",
+ 			 ses);
+ 		rc = -ENOTCONN;
+@@ -1389,20 +1390,11 @@ smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
+ 	memcpy(dfs_req->RequestFileName, utf16_path, utf16_path_len);
+ 
+ 	do {
+-		/* try first with IPC */
+ 		rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
+ 				FSCTL_DFS_GET_REFERRALS,
+-				true /* is_fsctl */, true /* use_ipc */,
++				true /* is_fsctl */,
+ 				(char *)dfs_req, dfs_req_size,
+ 				(char **)&dfs_rsp, &dfs_rsp_size);
+-		if (rc == -ENOTCONN) {
+-			/* try with normal tcon */
+-			rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
+-					FSCTL_DFS_GET_REFERRALS,
+-					true /* is_fsctl */, false /*use_ipc*/,
+-					(char *)dfs_req, dfs_req_size,
+-					(char **)&dfs_rsp, &dfs_rsp_size);
+-		}
+ 	} while (rc == -EAGAIN);
+ 
+ 	if (rc) {
+@@ -1713,8 +1705,7 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
+ 
+ 	rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
+ 			cfile->fid.volatile_fid, FSCTL_SET_ZERO_DATA,
+-			true /* is_fctl */, false /* use_ipc */,
+-			(char *)&fsctl_buf,
++			true /* is_fctl */, (char *)&fsctl_buf,
+ 			sizeof(struct file_zero_data_information), NULL, NULL);
+ 	free_xid(xid);
+ 	return rc;
+@@ -1748,8 +1739,7 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
+ 
+ 	rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
+ 			cfile->fid.volatile_fid, FSCTL_SET_ZERO_DATA,
+-			true /* is_fctl */, false /* use_ipc */,
+-			(char *)&fsctl_buf,
++			true /* is_fctl */, (char *)&fsctl_buf,
+ 			sizeof(struct file_zero_data_information), NULL, NULL);
+ 	free_xid(xid);
+ 	return rc;
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index a5c94f8308eb..a8a632c44c1b 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -713,7 +713,6 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
+ 
+ 	rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
+ 		FSCTL_VALIDATE_NEGOTIATE_INFO, true /* is_fsctl */,
+-		false /* use_ipc */,
+ 		(char *)&vneg_inbuf, sizeof(struct validate_negotiate_info_req),
+ 		(char **)&pneg_rsp, &rsplen);
+ 
+@@ -1863,7 +1862,7 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
+  */
+ int
+ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+-	   u64 volatile_fid, u32 opcode, bool is_fsctl, bool use_ipc,
++	   u64 volatile_fid, u32 opcode, bool is_fsctl,
+ 	   char *in_data, u32 indatalen,
+ 	   char **out_data, u32 *plen /* returned data len */)
+ {
+@@ -2028,7 +2027,6 @@ SMB2_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	rc = SMB2_ioctl(xid, tcon, persistent_fid, volatile_fid,
+ 			FSCTL_SET_COMPRESSION, true /* is_fsctl */,
+-			false /* use_ipc */,
+ 			(char *)&fsctl_input /* data input */,
+ 			2 /* in data len */, &ret_data /* out data */, NULL);
+ 
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index e9ab5227e7a8..05287b01f596 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -125,8 +125,7 @@ extern int SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms,
+ 		     struct smb2_err_rsp **err_buf);
+ extern int SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon,
+ 		     u64 persistent_fid, u64 volatile_fid, u32 opcode,
+-		     bool is_fsctl, bool use_ipc,
+-		     char *in_data, u32 indatalen,
++		     bool is_fsctl, char *in_data, u32 indatalen,
+ 		     char **out_data, u32 *plen /* returned data len */);
+ extern int SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
+ 		      u64 persistent_file_id, u64 volatile_file_id);
 -- 
 2.12.3
