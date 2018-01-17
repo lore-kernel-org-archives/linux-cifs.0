@@ -1,101 +1,62 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v1 0/3] Make IPC a regular tcon and fix SMB2
- domain-based DFS
-Date: Wed, 17 Jan 2018 18:08:41 -0500 (EST)
-Message-ID: <1022154593.702819.1516230521852.JavaMail.zimbra@redhat.com>
-References: <20180117172200.3221-1-aaptel@suse.com>
+Subject: Re: [PATCH] cifs: remove redundant duplicated assignment of pointer
+ 'node'
+Date: Wed, 17 Jan 2018 18:11:23 -0500 (EST)
+Message-ID: <2031352942.702941.1516230683335.JavaMail.zimbra@redhat.com>
+References: <20180117095239.10670-1-colin.king@canonical.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-To: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Colin King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20180117172200.3221-1-aaptel-IBi9RG/b67k@public.gmane.org>
+In-Reply-To: <20180117095239.10670-1-colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
-
-Very Nice. I like that it also gets rid of a lot of magic tcon==NULL.
 
 Reviewed-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
 
-
 ----- Original Message -----
-From: "Aurelien Aptel" <aaptel-IBi9RG/b67k@public.gmane.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, "Aurelien Aptel" <aaptel-IBi9RG/b67k@public.gmane.org>
-Sent: Thursday, 18 January, 2018 4:21:57 AM
-Subject: [PATCH v1 0/3] Make IPC a regular tcon and fix SMB2 domain-based DFS
+From: "Colin King" <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+To: "Steve French" <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+Cc: kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Sent: Wednesday, 17 January, 2018 8:52:39 PM
+Subject: [PATCH] cifs: remove redundant duplicated assignment of pointer 'node'
 
-Hi,
+From: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
 
-The DFS code for smb2 doesn't work [1] when cifs.ko connects to a
-domain-based DFS where you have an extra level on indirection (so 3
-machines: AD, nameserver and the final storage).
+Node is assigned twice to rb_first(root), first during declaration
+time and second after a taking a spin lock, so we have a duplicated
+assignment.  Remove the first assignment because it is redundant and
+also not protected by the spin lock.
 
-* In SMB1 code, the DFS request is made without the tcon object. It works
-  directly on the session.
-* In SMB2 code, we use SMB2_ioctl() which works on a tcon.
+Cleans up clang warning:
+fs/cifs/connect.c:4435:18: warning: Value stored to 'node' during
+its initialization is never read
 
-For domain-based DFS UNC \\DOMAIN\namespace\link, cifs.ko first tries to
-connect to \\DOMAIN\namespace. DOMAIN doesn't have a "namespace" share
-so no valid tcon object is created.
+Signed-off-by: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+---
+ fs/cifs/connect.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-* SMB1 doesn't care as it's working on the session object and just use
-  the ses->ipc_tid number to make the DFS request.
-* SMB2 code on the other hand fails as SMB2_ioctl() needs a tcon
-  object (even if you pass use_ipc=true) because it uses the tcon you
-  pass and simply overwrites the packet tid with ipc_tid. There is no
-  valid tcon object at that time since DOMAIN rejected the "namespace"
-  tcon request.
-
-So to solve this I thought I would get rid of ses->ipc_tid and make a
-real IPC tcon, that would be added to the session tcon_list and be
-managed like any other tcon (almost).
-
-This patch series cleans some definitions and makes the IPC connection
-a regular tcon owned by the session. It removes the use_ipc param from
-SMB2_ioct() (you can pass ses->tcon_ipc as the tcon param).
-
-I've made the choice of having the IPC tcon completely associated to
-the session instead of any other tcon. Its refcount is not really used
-as it's always created as soon as we have a valid session and always
-destroy when the session is destroyed and no mount points directly
-refer to it.
-
-All patches compile when applied sequentially, no warnings with
-checkpatch.pl, no warnings with make C=1.
-
-I've tested this against Windows Server 2016 vms with smb1, 2, 3 (with
-and without encryption) and it seems to be working properly.
-
-I've also quickly tested the reconnection code path but it probably
-needs some work still (making sure DFS works after a reconnection) as
-there are multiple ways to trigger the reconnection (I've been using
-qemu monitor "set_link xyz off" which is analogous to unplugging the
-network cable IIUC).
-
-Please take a look, review, test :)
-
-1: https://bugzilla.samba.org/show_bug.cgi?id=12917
-
-Aurelien Aptel (3):
-  CIFS: set SERVER_NAME_LENGTH to serverName actual size
-  CIFS: make IPC a regular tcon
-  CIFS: use tcon_ipc instead of use_ipc parameter from SMB2_ioctl
-
- fs/cifs/cifsglob.h  |  14 ++---
- fs/cifs/cifssmb.c   |   5 +-
- fs/cifs/connect.c   | 159 ++++++++++++++++++++++++++++++++++++++++------------
- fs/cifs/inode.c     |   2 +-
- fs/cifs/smb2file.c  |   2 +-
- fs/cifs/smb2ops.c   |  50 +++++++----------
- fs/cifs/smb2pdu.c   |  36 ++----------
- fs/cifs/smb2proto.h |   3 +-
- 8 files changed, 160 insertions(+), 111 deletions(-)
-
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 0efd22e75ac7..63c5d85fe25e 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -4432,7 +4432,7 @@ cifs_prune_tlinks(struct work_struct *work)
+ 	struct cifs_sb_info *cifs_sb = container_of(work, struct cifs_sb_info,
+ 						    prune_tlinks.work);
+ 	struct rb_root *root = &cifs_sb->tlink_tree;
+-	struct rb_node *node = rb_first(root);
++	struct rb_node *node;
+ 	struct rb_node *tmp;
+ 	struct tcon_link *tlink;
+ 
 -- 
-2.12.3
+2.15.1
 
 --
 To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
