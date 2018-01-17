@@ -1,47 +1,79 @@
 From: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: [PATCH v1 1/3] CIFS: set SERVER_NAME_LENGTH to serverName actual size
-Date: Wed, 17 Jan 2018 18:21:58 +0100
-Message-ID: <20180117172200.3221-2-aaptel@suse.com>
-References: <20180117172200.3221-1-aaptel@suse.com>
+Subject: [PATCH v1 0/3] Make IPC a regular tcon and fix SMB2 domain-based DFS
+Date: Wed, 17 Jan 2018 18:21:57 +0100
+Message-ID: <20180117172200.3221-1-aaptel@suse.com>
 Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20180117172200.3221-1-aaptel-IBi9RG/b67k@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The maximum length of an ipv6 string representation is defined in
-INET6_ADDRSTRLEN as 45+1 for null but lets keep what we know works.
+Hi,
 
-Signed-off-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
----
- fs/cifs/cifsglob.h | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+The DFS code for smb2 doesn't work [1] when cifs.ko connects to a
+domain-based DFS where you have an extra level on indirection (so 3
+machines: AD, nameserver and the final storage).
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index b16583594d1a..eca386d8dcfb 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -64,8 +64,8 @@
- #define RFC1001_NAME_LEN 15
- #define RFC1001_NAME_LEN_WITH_NULL (RFC1001_NAME_LEN + 1)
- 
--/* currently length of NIP6_FMT */
--#define SERVER_NAME_LENGTH 40
-+/* maximum length of ip addr as a string (including ipv6 and sctp) */
-+#define SERVER_NAME_LENGTH 80
- #define SERVER_NAME_LEN_WITH_NULL     (SERVER_NAME_LENGTH + 1)
- 
- /* echo interval in seconds */
-@@ -835,8 +835,7 @@ struct cifs_ses {
- 	kuid_t linux_uid;	/* overriding owner of files on the mount */
- 	kuid_t cred_uid;	/* owner of credentials */
- 	unsigned int capabilities;
--	char serverName[SERVER_NAME_LEN_WITH_NULL * 2];	/* BB make bigger for
--				TCP names - will ipv6 and sctp addresses fit? */
-+	char serverName[SERVER_NAME_LEN_WITH_NULL];
- 	char *user_name;	/* must not be null except during init of sess
- 				   and after mount option parsing we fill it */
- 	char *domainName;
+* In SMB1 code, the DFS request is made without the tcon object. It works
+  directly on the session.
+* In SMB2 code, we use SMB2_ioctl() which works on a tcon.
+
+For domain-based DFS UNC \\DOMAIN\namespace\link, cifs.ko first tries to
+connect to \\DOMAIN\namespace. DOMAIN doesn't have a "namespace" share
+so no valid tcon object is created.
+
+* SMB1 doesn't care as it's working on the session object and just use
+  the ses->ipc_tid number to make the DFS request.
+* SMB2 code on the other hand fails as SMB2_ioctl() needs a tcon
+  object (even if you pass use_ipc=true) because it uses the tcon you
+  pass and simply overwrites the packet tid with ipc_tid. There is no
+  valid tcon object at that time since DOMAIN rejected the "namespace"
+  tcon request.
+
+So to solve this I thought I would get rid of ses->ipc_tid and make a
+real IPC tcon, that would be added to the session tcon_list and be
+managed like any other tcon (almost).
+
+This patch series cleans some definitions and makes the IPC connection
+a regular tcon owned by the session. It removes the use_ipc param from
+SMB2_ioct() (you can pass ses->tcon_ipc as the tcon param).
+
+I've made the choice of having the IPC tcon completely associated to
+the session instead of any other tcon. Its refcount is not really used
+as it's always created as soon as we have a valid session and always
+destroy when the session is destroyed and no mount points directly
+refer to it.
+
+All patches compile when applied sequentially, no warnings with
+checkpatch.pl, no warnings with make C=1.
+
+I've tested this against Windows Server 2016 vms with smb1, 2, 3 (with
+and without encryption) and it seems to be working properly.
+
+I've also quickly tested the reconnection code path but it probably
+needs some work still (making sure DFS works after a reconnection) as
+there are multiple ways to trigger the reconnection (I've been using
+qemu monitor "set_link xyz off" which is analogous to unplugging the
+network cable IIUC).
+
+Please take a look, review, test :)
+
+1: https://bugzilla.samba.org/show_bug.cgi?id=12917
+
+Aurelien Aptel (3):
+  CIFS: set SERVER_NAME_LENGTH to serverName actual size
+  CIFS: make IPC a regular tcon
+  CIFS: use tcon_ipc instead of use_ipc parameter from SMB2_ioctl
+
+ fs/cifs/cifsglob.h  |  14 ++---
+ fs/cifs/cifssmb.c   |   5 +-
+ fs/cifs/connect.c   | 159 ++++++++++++++++++++++++++++++++++++++++------------
+ fs/cifs/inode.c     |   2 +-
+ fs/cifs/smb2file.c  |   2 +-
+ fs/cifs/smb2ops.c   |  50 +++++++----------
+ fs/cifs/smb2pdu.c   |  36 ++----------
+ fs/cifs/smb2proto.h |   3 +-
+ 8 files changed, 160 insertions(+), 111 deletions(-)
+
 -- 
 2.12.3
