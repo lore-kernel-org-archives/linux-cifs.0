@@ -1,7 +1,7 @@
 From: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: [PATCH v1 3/3] CIFS: use tcon_ipc instead of use_ipc parameter from SMB2_ioctl
-Date: Wed, 17 Jan 2018 18:22:00 +0100
-Message-ID: <20180117172200.3221-4-aaptel@suse.com>
+Subject: [PATCH v1 2/3] CIFS: make IPC a regular tcon
+Date: Wed, 17 Jan 2018 18:21:59 +0100
+Message-ID: <20180117172200.3221-3-aaptel@suse.com>
 References: <20180117172200.3221-1-aaptel@suse.com>
 Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -10,210 +10,435 @@ In-Reply-To: <20180117172200.3221-1-aaptel-IBi9RG/b67k@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Since IPC now has a tcon object, the caller can just pass it.
+* Remove ses->ipc_tid.
+* Make IPC$ regular tcon by having it stored in the session tcon list.
+* Add a direct pointer to it in ses->tcon_ipc.
+* Distinguish PIPE tcon from IPC tcon by adding a tcon->pipe flag. All
+  IPC tcons are pipes but not all pipes are IPC.
+* All TreeConnect functions now cannot take a NULL tcon object.
 
-Link: https://bugzilla.samba.org/show_bug.cgi?id=12917
-Fixes: 9d49640a21bf ("CIFS: implement get_dfs_refer for SMB2+")
+The IPC tcon has the same lifetime as the session it belongs to. It is
+created when the session is created and destroyed when the session is
+destroyed.
+
+Since no mounts directly refer to the IPC tcon, its refcount should
+always be 0. Thus we make sure cifs_put_tcon() skips it.
+
+If the mount request resulting in a new session being created requires
+encryption, try to require it too for IPC.
+
+NOTE TO BACKPORTER: the previous SERVER_NAME_LENGTH change MUST be
+included with this.
+
 Signed-off-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
 ---
- fs/cifs/smb2file.c  |  2 +-
- fs/cifs/smb2ops.c   | 50 ++++++++++++++++++++------------------------------
- fs/cifs/smb2pdu.c   |  4 +---
- fs/cifs/smb2proto.h |  3 +--
- 4 files changed, 23 insertions(+), 36 deletions(-)
+ fs/cifs/cifsglob.h |   7 ++-
+ fs/cifs/cifssmb.c  |   5 +-
+ fs/cifs/connect.c  | 159 ++++++++++++++++++++++++++++++++++++++++-------------
+ fs/cifs/inode.c    |   2 +-
+ fs/cifs/smb2pdu.c  |  32 ++---------
+ 5 files changed, 134 insertions(+), 71 deletions(-)
 
-diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
-index b4b1f0305f29..12af5dba742b 100644
---- a/fs/cifs/smb2file.c
-+++ b/fs/cifs/smb2file.c
-@@ -74,7 +74,7 @@ smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms,
- 		nr_ioctl_req.Reserved = 0;
- 		rc = SMB2_ioctl(xid, oparms->tcon, fid->persistent_fid,
- 			fid->volatile_fid, FSCTL_LMR_REQUEST_RESILIENCY,
--			true /* is_fsctl */, false /* use_ipc */,
-+			true /* is_fsctl */,
- 			(char *)&nr_ioctl_req, sizeof(nr_ioctl_req),
- 			NULL, NULL /* no return info */);
- 		if (rc == -EOPNOTSUPP) {
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index ed88ab8a4774..7e51bb7a587c 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -283,7 +283,6 @@ SMB3_request_interfaces(const unsigned int xid, struct cifs_tcon *tcon)
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index eca386d8dcfb..804ec79af5e1 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -822,12 +822,12 @@ static inline void cifs_set_net_ns(struct TCP_Server_Info *srv, struct net *net)
+ struct cifs_ses {
+ 	struct list_head smb_ses_list;
+ 	struct list_head tcon_list;
++	struct cifs_tcon *tcon_ipc;
+ 	struct mutex session_mutex;
+ 	struct TCP_Server_Info *server;	/* pointer to server info */
+ 	int ses_count;		/* reference counter */
+ 	enum statusEnum status;
+ 	unsigned overrideSecFlg;  /* if non-zero override global sec flags */
+-	__u32 ipc_tid;		/* special tid for connection to IPC share */
+ 	char *serverOS;		/* name of operating system underlying server */
+ 	char *serverNOS;	/* name of network operating system of server */
+ 	char *serverDomain;	/* security realm of server */
+@@ -930,7 +930,9 @@ struct cifs_tcon {
+ 	FILE_SYSTEM_DEVICE_INFO fsDevInfo;
+ 	FILE_SYSTEM_ATTRIBUTE_INFO fsAttrInfo; /* ok if fs name truncated */
+ 	FILE_SYSTEM_UNIX_INFO fsUnixInfo;
+-	bool ipc:1;		/* set if connection to IPC$ eg for RPC/PIPES */
++	bool ipc:1;   /* set if connection to IPC$ share (always also pipe) */
++	bool pipe:1;  /* set if connection to pipe share */
++	bool print:1; /* set if connection to printer share */
+ 	bool retry:1;
+ 	bool nocase:1;
+ 	bool seal:1;      /* transport encryption for this mounted share */
+@@ -943,7 +945,6 @@ struct cifs_tcon {
+ 	bool need_reopen_files:1; /* need to reopen tcon file handles */
+ 	bool use_resilient:1; /* use resilient instead of durable handles */
+ 	bool use_persistent:1; /* use persistent instead of durable handles */
+-	bool print:1;		/* set if connection to printer share */
+ 	__le32 capabilities;
+ 	__u32 share_flags;
+ 	__u32 maximal_access;
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 35dc5bf01ee2..2f8dea905ef9 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -4822,8 +4822,9 @@ CIFSGetDFSRefer(const unsigned int xid, struct cifs_ses *ses,
+ 	*target_nodes = NULL;
  
- 	rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
- 			FSCTL_QUERY_NETWORK_INTERFACE_INFO, true /* is_fsctl */,
--			false /* use_ipc */,
- 			NULL /* no data input */, 0 /* no data input */,
- 			(char **)&out_buf, &ret_data_len);
- 	if (rc != 0)
-@@ -782,7 +781,6 @@ SMB2_request_res_key(const unsigned int xid, struct cifs_tcon *tcon,
+ 	cifs_dbg(FYI, "In GetDFSRefer the path %s\n", search_name);
+-	if (ses == NULL)
++	if (ses == NULL || ses->tcon_ipc == NULL)
+ 		return -ENODEV;
++
+ getDFSRetry:
+ 	rc = smb_init(SMB_COM_TRANSACTION2, 15, NULL, (void **) &pSMB,
+ 		      (void **) &pSMBr);
+@@ -4833,7 +4834,7 @@ CIFSGetDFSRefer(const unsigned int xid, struct cifs_ses *ses,
+ 	/* server pointer checked in called function,
+ 	but should never be null here anyway */
+ 	pSMB->hdr.Mid = get_next_mid(ses->server);
+-	pSMB->hdr.Tid = ses->ipc_tid;
++	pSMB->hdr.Tid = ses->tcon_ipc->tid;
+ 	pSMB->hdr.Uid = ses->Suid;
+ 	if (ses->capabilities & CAP_STATUS32)
+ 		pSMB->hdr.Flags2 |= SMBFLG2_ERR_STATUS;
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 0bfc2280436d..5ae393fe0c5d 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -353,7 +353,6 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 	list_for_each(tmp, &server->smb_ses_list) {
+ 		ses = list_entry(tmp, struct cifs_ses, smb_ses_list);
+ 		ses->need_reconnect = true;
+-		ses->ipc_tid = 0;
+ 		list_for_each(tmp2, &ses->tcon_list) {
+ 			tcon = list_entry(tmp2, struct cifs_tcon, tcon_list);
+ 			tcon->need_reconnect = true;
+@@ -2381,6 +2380,104 @@ static int match_session(struct cifs_ses *ses, struct smb_vol *vol)
+ 	return 1;
+ }
  
- 	rc = SMB2_ioctl(xid, tcon, persistent_fid, volatile_fid,
- 			FSCTL_SRV_REQUEST_RESUME_KEY, true /* is_fsctl */,
--			false /* use_ipc */,
- 			NULL, 0 /* no input */,
- 			(char **)&res_key, &ret_data_len);
- 
-@@ -848,8 +846,7 @@ smb2_copychunk_range(const unsigned int xid,
- 		/* Request server copy to target from src identified by key */
- 		rc = SMB2_ioctl(xid, tcon, trgtfile->fid.persistent_fid,
- 			trgtfile->fid.volatile_fid, FSCTL_SRV_COPYCHUNK_WRITE,
--			true /* is_fsctl */, false /* use_ipc */,
--			(char *)pcchunk,
-+			true /* is_fsctl */, (char *)pcchunk,
- 			sizeof(struct copychunk_ioctl),	(char **)&retbuf,
- 			&ret_data_len);
- 		if (rc == 0) {
-@@ -1006,7 +1003,7 @@ static bool smb2_set_sparse(const unsigned int xid, struct cifs_tcon *tcon,
- 
- 	rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
- 			cfile->fid.volatile_fid, FSCTL_SET_SPARSE,
--			true /* is_fctl */, false /* use_ipc */,
-+			true /* is_fctl */,
- 			&setsparse, 1, NULL, NULL);
- 	if (rc) {
- 		tcon->broken_sparse_sup = true;
-@@ -1077,7 +1074,7 @@ smb2_duplicate_extents(const unsigned int xid,
- 	rc = SMB2_ioctl(xid, tcon, trgtfile->fid.persistent_fid,
- 			trgtfile->fid.volatile_fid,
- 			FSCTL_DUPLICATE_EXTENTS_TO_FILE,
--			true /* is_fsctl */, false /* use_ipc */,
-+			true /* is_fsctl */,
- 			(char *)&dup_ext_buf,
- 			sizeof(struct duplicate_extents_to_file),
- 			NULL,
-@@ -1112,7 +1109,7 @@ smb3_set_integrity(const unsigned int xid, struct cifs_tcon *tcon,
- 	return SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
- 			cfile->fid.volatile_fid,
- 			FSCTL_SET_INTEGRITY_INFORMATION,
--			true /* is_fsctl */, false /* use_ipc */,
-+			true /* is_fsctl */,
- 			(char *)&integr_info,
- 			sizeof(struct fsctl_set_integrity_information_req),
- 			NULL,
-@@ -1132,7 +1129,7 @@ smb3_enum_snapshots(const unsigned int xid, struct cifs_tcon *tcon,
- 	rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
- 			cfile->fid.volatile_fid,
- 			FSCTL_SRV_ENUMERATE_SNAPSHOTS,
--			true /* is_fsctl */, false /* use_ipc */,
-+			true /* is_fsctl */,
- 			NULL, 0 /* no input data */,
- 			(char **)&retbuf,
- 			&ret_data_len);
-@@ -1351,16 +1348,20 @@ smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
- 	cifs_dbg(FYI, "smb2_get_dfs_refer path <%s>\n", search_name);
- 
- 	/*
--	 * Use any tcon from the current session. Here, the first one.
-+	 * Try to use the IPC tcon, otherwise just use any
- 	 */
--	spin_lock(&cifs_tcp_ses_lock);
--	tcon = list_first_entry_or_null(&ses->tcon_list, struct cifs_tcon,
--					tcon_list);
--	if (tcon)
--		tcon->tc_count++;
--	spin_unlock(&cifs_tcp_ses_lock);
++/**
++ * cifs_setup_ipc - helper to setup the IPC tcon for the session
++ *
++ * A new IPC connection is made and added to the session tcon list
++ * (also accessible through ses->tcon_ipc). The IPC tcon has the same
++ * lifetime as the session.
++ */
++static int
++cifs_setup_ipc(struct cifs_ses *ses, struct smb_vol *volume_info)
++{
++	int rc = 0, xid;
++	struct cifs_tcon *tcon;
++	struct nls_table *nls_codepage;
++	char unc[SERVER_NAME_LENGTH + sizeof("//x/IPC$")] = {0};
++	bool seal = false;
++
++	/*
++	 * If the mount request that resulted in the creation of the
++	 * session requires encryption, force IPC to be encrypted too.
++	 */
++	if (volume_info->seal) {
++		if (ses->server->capabilities & SMB2_GLOBAL_CAP_ENCRYPTION)
++			seal = true;
++		else {
++			cifs_dbg(VFS,
++				 "IPC: server doesn't support encryption\n");
++			return -EOPNOTSUPP;
++		}
++	}
++
++	tcon = tconInfoAlloc();
++	if (tcon == NULL)
++		return -ENOMEM;
++
++	snprintf(unc, sizeof(unc), "\\\\%s\\IPC$", ses->serverName);
++
++	/* cannot fail */
++	nls_codepage = load_nls_default();
++
++	xid = get_xid();
++	tcon->ses = ses;
++	tcon->ipc = true;
++	tcon->seal = seal;
++	rc = ses->server->ops->tree_connect(xid, ses, unc, tcon, nls_codepage);
++	free_xid(xid);
++
++	if (rc) {
++		cifs_dbg(VFS, "failed to connect to IPC (rc=%d)\n", rc);
++		tconInfoFree(tcon);
++		goto out;
++	}
++
++	cifs_dbg(FYI, "IPC tcon rc = %d ipc tid = %d\n", rc, tcon->tid);
++
++	spin_lock(&cifs_tcp_ses_lock);
++	list_add(&tcon->tcon_list, &ses->tcon_list);
++	ses->tcon_ipc = tcon;
++	spin_unlock(&cifs_tcp_ses_lock);
++
++out:
++	unload_nls(nls_codepage);
++	return rc;
++}
++
++/**
++ * cifs_free_ipc - helper to release the session IPC tcon
++ *
++ * Needs to be called everytime a session is destroyed
++ */
++static int
++cifs_free_ipc(struct cifs_ses *ses)
++{
++	int rc = 0, xid;
++	struct cifs_tcon *tcon;
++
++	spin_lock(&cifs_tcp_ses_lock);
 +	tcon = ses->tcon_ipc;
 +	if (tcon == NULL) {
-+		spin_lock(&cifs_tcp_ses_lock);
-+		tcon = list_first_entry_or_null(&ses->tcon_list,
-+						struct cifs_tcon,
-+						tcon_list);
-+		if (tcon)
-+			tcon->tc_count++;
 +		spin_unlock(&cifs_tcp_ses_lock);
++		return 0;
 +	}
++	list_del_init(&tcon->tcon_list);
++	spin_unlock(&cifs_tcp_ses_lock);
++
++	if (ses->server->ops->tree_disconnect) {
++		xid = get_xid();
++		rc = ses->server->ops->tree_disconnect(xid, tcon);
++		free_xid(xid);
++	}
++
++	if (rc)
++		cifs_dbg(FYI, "failed to disconnect IPC tcon (rc=%d)\n", rc);
++
++	tconInfoFree(tcon);
++	ses->tcon_ipc = NULL;
++	return rc;
++}
++
+ static struct cifs_ses *
+ cifs_find_smb_ses(struct TCP_Server_Info *server, struct smb_vol *vol)
+ {
+@@ -2421,6 +2518,8 @@ cifs_put_smb_ses(struct cifs_ses *ses)
+ 		ses->status = CifsExiting;
+ 	spin_unlock(&cifs_tcp_ses_lock);
  
--	if (!tcon) {
-+	if (tcon == NULL) {
- 		cifs_dbg(VFS, "session %p has no tcon available for a dfs referral request\n",
- 			 ses);
- 		rc = -ENOTCONN;
-@@ -1389,20 +1390,11 @@ smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
- 	memcpy(dfs_req->RequestFileName, utf16_path, utf16_path_len);
++	cifs_free_ipc(ses);
++
+ 	if (ses->status == CifsExiting && server->ops->logoff) {
+ 		xid = get_xid();
+ 		rc = server->ops->logoff(xid, ses);
+@@ -2665,6 +2764,9 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
+ 	spin_unlock(&cifs_tcp_ses_lock);
  
- 	do {
--		/* try first with IPC */
- 		rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
- 				FSCTL_DFS_GET_REFERRALS,
--				true /* is_fsctl */, true /* use_ipc */,
-+				true /* is_fsctl */,
- 				(char *)dfs_req, dfs_req_size,
- 				(char **)&dfs_rsp, &dfs_rsp_size);
--		if (rc == -ENOTCONN) {
--			/* try with normal tcon */
--			rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
--					FSCTL_DFS_GET_REFERRALS,
--					true /* is_fsctl */, false /*use_ipc*/,
--					(char *)dfs_req, dfs_req_size,
--					(char **)&dfs_rsp, &dfs_rsp_size);
--		}
- 	} while (rc == -EAGAIN);
- 
- 	if (rc) {
-@@ -1713,8 +1705,7 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
- 
- 	rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
- 			cfile->fid.volatile_fid, FSCTL_SET_ZERO_DATA,
--			true /* is_fctl */, false /* use_ipc */,
--			(char *)&fsctl_buf,
-+			true /* is_fctl */, (char *)&fsctl_buf,
- 			sizeof(struct file_zero_data_information), NULL, NULL);
  	free_xid(xid);
++
++	cifs_setup_ipc(ses, volume_info);
++
+ 	return ses;
+ 
+ get_ses_fail:
+@@ -2709,8 +2811,16 @@ void
+ cifs_put_tcon(struct cifs_tcon *tcon)
+ {
+ 	unsigned int xid;
+-	struct cifs_ses *ses = tcon->ses;
++	struct cifs_ses *ses;
++
++	/*
++	 * IPC tcon share the lifetime of their session and are
++	 * destroyed in the session put function
++	 */
++	if (tcon == NULL || tcon->ipc)
++		return;
+ 
++	ses = tcon->ses;
+ 	cifs_dbg(FYI, "%s: tc_count=%d\n", __func__, tcon->tc_count);
+ 	spin_lock(&cifs_tcp_ses_lock);
+ 	if (--tcon->tc_count > 0) {
+@@ -2986,39 +3096,17 @@ get_dfs_path(const unsigned int xid, struct cifs_ses *ses, const char *old_path,
+ 	     const struct nls_table *nls_codepage, unsigned int *num_referrals,
+ 	     struct dfs_info3_param **referrals, int remap)
+ {
+-	char *temp_unc;
+ 	int rc = 0;
+ 
+-	if (!ses->server->ops->tree_connect || !ses->server->ops->get_dfs_refer)
++	if (!ses->server->ops->get_dfs_refer)
+ 		return -ENOSYS;
+ 
+ 	*num_referrals = 0;
+ 	*referrals = NULL;
+ 
+-	if (ses->ipc_tid == 0) {
+-		temp_unc = kmalloc(2 /* for slashes */ +
+-			strnlen(ses->serverName, SERVER_NAME_LEN_WITH_NULL * 2)
+-				+ 1 + 4 /* slash IPC$ */ + 2, GFP_KERNEL);
+-		if (temp_unc == NULL)
+-			return -ENOMEM;
+-		temp_unc[0] = '\\';
+-		temp_unc[1] = '\\';
+-		strcpy(temp_unc + 2, ses->serverName);
+-		strcpy(temp_unc + 2 + strlen(ses->serverName), "\\IPC$");
+-		rc = ses->server->ops->tree_connect(xid, ses, temp_unc, NULL,
+-						    nls_codepage);
+-		cifs_dbg(FYI, "Tcon rc = %d ipc_tid = %d\n", rc, ses->ipc_tid);
+-		kfree(temp_unc);
+-	}
+-	if (rc == 0)
+-		rc = ses->server->ops->get_dfs_refer(xid, ses, old_path,
+-						     referrals, num_referrals,
+-						     nls_codepage, remap);
+-	/*
+-	 * BB - map targetUNCs to dfs_info3 structures, here or in
+-	 * ses->server->ops->get_dfs_refer.
+-	 */
+-
++	rc = ses->server->ops->get_dfs_refer(xid, ses, old_path,
++					     referrals, num_referrals,
++					     nls_codepage, remap);
  	return rc;
-@@ -1748,8 +1739,7 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
+ }
  
- 	rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
- 			cfile->fid.volatile_fid, FSCTL_SET_ZERO_DATA,
--			true /* is_fctl */, false /* use_ipc */,
--			(char *)&fsctl_buf,
-+			true /* is_fctl */, (char *)&fsctl_buf,
- 			sizeof(struct file_zero_data_information), NULL, NULL);
- 	free_xid(xid);
- 	return rc;
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index a5c94f8308eb..a8a632c44c1b 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -713,7 +713,6 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
+@@ -3783,7 +3871,7 @@ cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *volume_info)
+ 		tcon->unix_ext = 0; /* server does not support them */
  
- 	rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
- 		FSCTL_VALIDATE_NEGOTIATE_INFO, true /* is_fsctl */,
--		false /* use_ipc */,
- 		(char *)&vneg_inbuf, sizeof(struct validate_negotiate_info_req),
- 		(char **)&pneg_rsp, &rsplen);
+ 	/* do not care if a following call succeed - informational */
+-	if (!tcon->ipc && server->ops->qfs_tcon)
++	if (!tcon->pipe && server->ops->qfs_tcon)
+ 		server->ops->qfs_tcon(xid, tcon);
  
-@@ -1863,7 +1862,7 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
+ 	cifs_sb->wsize = server->ops->negotiate_wsize(tcon, volume_info);
+@@ -3913,8 +4001,7 @@ cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *volume_info)
+ }
+ 
+ /*
+- * Issue a TREE_CONNECT request. Note that for IPC$ shares, that the tcon
+- * pointer may be NULL.
++ * Issue a TREE_CONNECT request.
   */
  int
- SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
--	   u64 volatile_fid, u32 opcode, bool is_fsctl, bool use_ipc,
-+	   u64 volatile_fid, u32 opcode, bool is_fsctl,
- 	   char *in_data, u32 indatalen,
- 	   char **out_data, u32 *plen /* returned data len */)
- {
-@@ -2028,7 +2027,6 @@ SMB2_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
+ CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
+@@ -3950,7 +4037,7 @@ CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
+ 	pSMB->AndXCommand = 0xFF;
+ 	pSMB->Flags = cpu_to_le16(TCON_EXTENDED_SECINFO);
+ 	bcc_ptr = &pSMB->Password[0];
+-	if (!tcon || (ses->server->sec_mode & SECMODE_USER)) {
++	if (tcon->pipe || (ses->server->sec_mode & SECMODE_USER)) {
+ 		pSMB->PasswordLength = cpu_to_le16(1);	/* minimum */
+ 		*bcc_ptr = 0; /* password is null byte */
+ 		bcc_ptr++;              /* skip password */
+@@ -4022,7 +4109,7 @@ CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
+ 			 0);
  
- 	rc = SMB2_ioctl(xid, tcon, persistent_fid, volatile_fid,
- 			FSCTL_SET_COMPRESSION, true /* is_fsctl */,
--			false /* use_ipc */,
- 			(char *)&fsctl_input /* data input */,
- 			2 /* in data len */, &ret_data /* out data */, NULL);
+ 	/* above now done in SendReceive */
+-	if ((rc == 0) && (tcon != NULL)) {
++	if (rc == 0) {
+ 		bool is_unicode;
  
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index e9ab5227e7a8..05287b01f596 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -125,8 +125,7 @@ extern int SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms,
- 		     struct smb2_err_rsp **err_buf);
- extern int SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon,
- 		     u64 persistent_fid, u64 volatile_fid, u32 opcode,
--		     bool is_fsctl, bool use_ipc,
--		     char *in_data, u32 indatalen,
-+		     bool is_fsctl, char *in_data, u32 indatalen,
- 		     char **out_data, u32 *plen /* returned data len */);
- extern int SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
- 		      u64 persistent_file_id, u64 volatile_file_id);
+ 		tcon->tidStatus = CifsGood;
+@@ -4042,7 +4129,8 @@ CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
+ 			if ((bcc_ptr[0] == 'I') && (bcc_ptr[1] == 'P') &&
+ 			    (bcc_ptr[2] == 'C')) {
+ 				cifs_dbg(FYI, "IPC connection\n");
+-				tcon->ipc = 1;
++				tcon->ipc = true;
++				tcon->pipe = true;
+ 			}
+ 		} else if (length == 2) {
+ 			if ((bcc_ptr[0] == 'A') && (bcc_ptr[1] == ':')) {
+@@ -4069,9 +4157,6 @@ CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
+ 		else
+ 			tcon->Flags = 0;
+ 		cifs_dbg(FYI, "Tcon flags: 0x%x\n", tcon->Flags);
+-	} else if ((rc == 0) && tcon == NULL) {
+-		/* all we need to save for IPC$ connection */
+-		ses->ipc_tid = smb_buffer_response->Tid;
+ 	}
+ 
+ 	cifs_buf_release(smb_buffer);
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index ecb99079363a..8f9a8cc7cc62 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -1049,7 +1049,7 @@ struct inode *cifs_root_iget(struct super_block *sb)
+ 	tcon->resource_id = CIFS_I(inode)->uniqueid;
+ #endif
+ 
+-	if (rc && tcon->ipc) {
++	if (rc && tcon->pipe) {
+ 		cifs_dbg(FYI, "ipc connection - fake read inode\n");
+ 		spin_lock(&inode->i_lock);
+ 		inode->i_mode |= S_IFDIR;
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 01346b8b6edb..a5c94f8308eb 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1283,8 +1283,7 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+ 	}
+ 
+ 	/* SMB2 TREE_CONNECT request must be called with TreeId == 0 */
+-	if (tcon)
+-		tcon->tid = 0;
++	tcon->tid = 0;
+ 
+ 	rc = small_smb2_init(SMB2_TREE_CONNECT, tcon, (void **) &req);
+ 	if (rc) {
+@@ -1292,15 +1291,7 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+ 		return rc;
+ 	}
+ 
+-	if (tcon == NULL) {
+-		if ((ses->session_flags & SMB2_SESSION_FLAG_ENCRYPT_DATA))
+-			flags |= CIFS_TRANSFORM_REQ;
+-
+-		/* since no tcon, smb2_init can not do this, so do here */
+-		req->hdr.sync_hdr.SessionId = ses->Suid;
+-		if (ses->server->sign)
+-			req->hdr.sync_hdr.Flags |= SMB2_FLAGS_SIGNED;
+-	} else if (encryption_required(tcon))
++	if (encryption_required(tcon))
+ 		flags |= CIFS_TRANSFORM_REQ;
+ 
+ 	iov[0].iov_base = (char *)req;
+@@ -1328,21 +1319,16 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+ 		goto tcon_error_exit;
+ 	}
+ 
+-	if (tcon == NULL) {
+-		ses->ipc_tid = rsp->hdr.sync_hdr.TreeId;
+-		goto tcon_exit;
+-	}
+-
+ 	switch (rsp->ShareType) {
+ 	case SMB2_SHARE_TYPE_DISK:
+ 		cifs_dbg(FYI, "connection to disk share\n");
+ 		break;
+ 	case SMB2_SHARE_TYPE_PIPE:
+-		tcon->ipc = true;
++		tcon->pipe = true;
+ 		cifs_dbg(FYI, "connection to pipe share\n");
+ 		break;
+ 	case SMB2_SHARE_TYPE_PRINT:
+-		tcon->ipc = true;
++		tcon->print = true;
+ 		cifs_dbg(FYI, "connection to printer\n");
+ 		break;
+ 	default:
+@@ -1913,16 +1899,6 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+ 	if (rc)
+ 		return rc;
+ 
+-	if (use_ipc) {
+-		if (ses->ipc_tid == 0) {
+-			cifs_small_buf_release(req);
+-			return -ENOTCONN;
+-		}
+-
+-		cifs_dbg(FYI, "replacing tid 0x%x with IPC tid 0x%x\n",
+-			 req->hdr.sync_hdr.TreeId, ses->ipc_tid);
+-		req->hdr.sync_hdr.TreeId = ses->ipc_tid;
+-	}
+ 	if (encryption_required(tcon))
+ 		flags |= CIFS_TRANSFORM_REQ;
+ 
 -- 
 2.12.3
