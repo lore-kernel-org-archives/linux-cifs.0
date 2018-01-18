@@ -1,41 +1,81 @@
-From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: RE: [PATCH v1 2/3] CIFS: make IPC a regular tcon
-Date: Thu, 18 Jan 2018 11:30:04 +0100
-Message-ID: <87607z4fyr.fsf@suse.com>
-References: <20180117172200.3221-1-aaptel@suse.com> <20180117172200.3221-3-aaptel@suse.com> <DM5PR2101MB0936C7D8EE43D6E069870B10B6E80@DM5PR2101MB0936.namprd21.prod.outlook.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: remove redundant duplicated assignment of pointer 'node'
+Date: Thu, 18 Jan 2018 10:17:53 -0600
+Message-ID: <CAH2r5mvkycvyx2OBDfTh89tO12Y4RYfw5ZVEJHg8YxVpjtJbQw@mail.gmail.com>
+References: <20180117095239.10670-1-colin.king@canonical.com> <2031352942.702941.1516230683335.JavaMail.zimbra@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Cc: "smfrench\@gmail.com" <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-        "linux-cifs\@vger.kernel.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Colin King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>,
+        Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        CIFS <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+        kernel-janitors <kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <DM5PR2101MB0936C7D8EE43D6E069870B10B6E80-uvswG4RmAWieOSyIubIsYpz2gl+EIwcenBOFsp37pqbUKgpGm//BTAC/G2K4zDHf@public.gmane.org>
+In-Reply-To: <2031352942.702941.1516230683335.JavaMail.zimbra-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org> writes:
-> Minor: it should probably work this way, but since we set ses->tcon_ipc under a spinlock in cifs_setup_ipc(), it would be better to do something similar here.
+merged into cifs-2.6.git for-next
 
-I was actually thinking that the spinlock might not be necessary for
-that pointer. It's always only set at session creation (new tcon) and
-destruction (to null). In between, it's only going to be read. What do
-you think?
+thx
 
->> -       /*
->> -        * BB - map targetUNCs to dfs_info3 structures, here or in
->> -        * ses->server->ops->get_dfs_refer.
->> -        */
+On Wed, Jan 17, 2018 at 5:11 PM, Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> Reviewed-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 >
-> Is this no longer needed?
+>
+> ----- Original Message -----
+> From: "Colin King" <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+> To: "Steve French" <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+> Cc: kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> Sent: Wednesday, 17 January, 2018 8:52:39 PM
+> Subject: [PATCH] cifs: remove redundant duplicated assignment of pointer 'node'
+>
+> From: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+>
+> Node is assigned twice to rb_first(root), first during declaration
+> time and second after a taking a spin lock, so we have a duplicated
+> assignment.  Remove the first assignment because it is redundant and
+> also not protected by the spin lock.
+>
+> Cleans up clang warning:
+> fs/cifs/connect.c:4435:18: warning: Value stored to 'node' during
+> its initialization is never read
+>
+> Signed-off-by: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+> ---
+>  fs/cifs/connect.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 0efd22e75ac7..63c5d85fe25e 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -4432,7 +4432,7 @@ cifs_prune_tlinks(struct work_struct *work)
+>         struct cifs_sb_info *cifs_sb = container_of(work, struct cifs_sb_info,
+>                                                     prune_tlinks.work);
+>         struct rb_root *root = &cifs_sb->tlink_tree;
+> -       struct rb_node *node = rb_first(root);
+> +       struct rb_node *node;
+>         struct rb_node *tmp;
+>         struct tcon_link *tlink;
+>
+> --
+> 2.15.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-If you are talking about the tcon creation, it is now done all the time
-at session creation. If you are talking about that specific comment, I
-believe it's already done now in parse_dfs_referrals(). That function
-parses the packet into dfs_info3_param structures.
+
 
 -- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
-GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+Thanks,
+
+Steve
