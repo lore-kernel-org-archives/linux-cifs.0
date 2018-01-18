@@ -1,72 +1,41 @@
-From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Regression in SMB3 encryption
-Date: Wed, 17 Jan 2018 21:25:51 -0500 (EST)
-Message-ID: <1044636361.721617.1516242351557.JavaMail.zimbra@redhat.com>
-References: <394032014.721382.1516242281388.JavaMail.zimbra@redhat.com>
+From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+Subject: RE: [PATCH v1 2/3] CIFS: make IPC a regular tcon
+Date: Thu, 18 Jan 2018 11:30:04 +0100
+Message-ID: <87607z4fyr.fsf@suse.com>
+References: <20180117172200.3221-1-aaptel@suse.com> <20180117172200.3221-3-aaptel@suse.com> <DM5PR2101MB0936C7D8EE43D6E069870B10B6E80@DM5PR2101MB0936.namprd21.prod.outlook.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Transfer-Encoding: 8BIT
+Cc: "smfrench\@gmail.com" <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+        "linux-cifs\@vger.kernel.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <394032014.721382.1516242281388.JavaMail.zimbra-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <DM5PR2101MB0936C7D8EE43D6E069870B10B6E80-uvswG4RmAWieOSyIubIsYpz2gl+EIwcenBOFsp37pqbUKgpGm//BTAC/G2K4zDHf@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-List,
+Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org> writes:
+> Minor: it should probably work this way, but since we set ses->tcon_ipc under a spinlock in cifs_setup_ipc(), it would be better to do something similar here.
 
-There seems to be a regression in sfrench/for-next for smb3 encryption.
+I was actually thinking that the spinlock might not be necessary for
+that pointer. It's always only set at session creation (new tcon) and
+destruction (to null). In between, it's only going to be read. What do
+you think?
 
-It crashes with :
+>> -       /*
+>> -        * BB - map targetUNCs to dfs_info3 structures, here or in
+>> -        * ses->server->ops->get_dfs_refer.
+>> -        */
+>
+> Is this no longer needed?
 
-[  684.452727] ------------[ cut here ]------------
-[  684.452744] kernel BUG at ./include/linux/scatterlist.h:147!
-[  684.453011] invalid opcode: 0000 [#1] SMP PTI
-[  684.453037] Modules linked in: cmac arc4 md4 nls_utf8 cifs ccm dns_resolver nfsv3 nfs_acl nfs lockd grace fscache ip6t_rpfilter ip6t_REJECT nf_reject_ipv6 xt_conntrack ip_set nfnetlink ebtable_nat ebtable_broute bridge stp llc ip6table_nat nf_conntrack_ipv6 nf_defrag_ipv6 nf_nat_ipv6 ip6table_mangle ip6table_raw ip6table_security iptable_nat nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4 nf_nat nf_conntrack libcrc32c iptable_mangle iptable_raw iptable_security ebtable_filter ebtables ip6table_filter ip6_tables snd_hda_codec_generic virtio_console virtio_balloon crct10dif_pclmul crc32_pclmul crc32c_intel ghash_clmulni_intel 8139too snd_hda_intel snd_hda_codec snd_hda_core snd_hwdep snd_seq snd_seq_device snd_pcm 8139cp snd_timer serio_raw pcspkr i2c_piix4 mii virtio_pci virtio_ring virtio 
- snd soundcore
-[  684.453496]  auth_rpcgss sunrpc qxl drm_kms_helper ttm drm floppy qemu_fw_cfg ata_generic pata_acpi
-[  684.453558] CPU: 1 PID: 914 Comm: mount.cifs Not tainted 4.15.0-rc8+ #8
-[  684.453594] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1.fc26 04/01/2014
-[  684.453660] RIP: 0010:crypt_message+0x7ac/0x7e0 [cifs]
-[  684.453699] RSP: 0018:ffffb0d440eb7920 EFLAGS: 00010246
-[  684.453730] RAX: 0000000000000000 RBX: ffff8e58ed9f30c0 RCX: 0000000000000028
-[  684.453768] RDX: ffff8e58f300b240 RSI: 0000000000000022 RDI: ffffb0d4c0eb79c8
-[  684.453806] RBP: ffffb0d440eb7a20 R08: ffff8e58f300b240 R09: ffff8e58f300b240
-[  684.453844] R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000001
-[  684.453882] R13: ffffb0d440eb79c8 R14: 0000000000000058 R15: ffff8e58f300b2b8
-[  684.453920] FS:  00007f753959d740(0000) GS:ffff8e58fb000000(0000) knlGS:0000000000000000
-[  684.453963] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  684.453994] CR2: 00007f3b8c315000 CR3: 000000013856a001 CR4: 00000000003606e0
-[  684.454035] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[  684.454075] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[  684.454117] Call Trace:
-[  684.454163]  ? smb3_init_transform_rq+0x2af/0x380 [cifs]
-[  684.454206]  smb3_init_transform_rq+0x2af/0x380 [cifs]
-[  684.454263]  ? smb2_setup_request+0xf8/0x1b0 [cifs]
-[  684.454308]  smb_send_rqst+0x46/0xb0 [cifs]
-[  684.454343]  ? smb2_setup_request+0x107/0x1b0 [cifs]
-[  684.454385]  cifs_send_recv+0xda/0x3a0 [cifs]
-[  684.454423]  smb2_send_recv+0x139/0x250 [cifs]
-[  684.454459]  ? _raw_spin_unlock+0x24/0x30
-[  684.454497]  ? SMB2_tcon+0x180/0x5c0 [cifs]
-[  684.454535]  SMB2_tcon+0x180/0x5c0 [cifs]
-[  684.454577]  ? cifs_get_tcon+0x177/0x5b0 [cifs]
-[  684.454613]  cifs_get_tcon+0x177/0x5b0 [cifs]
-[  684.454651]  cifs_mount+0x6b8/0xee0 [cifs]
-[  684.454687]  ? __lockdep_init_map+0x57/0x1d0
-[  684.454725]  ? cifs_do_mount+0x16c/0x5f0 [cifs]
-[  684.454768]  cifs_do_mount+0x16c/0x5f0 [cifs]
-[  684.454797]  ? selinux_sb_copy_data+0x172/0x1d0
-[  684.454828]  mount_fs+0x30/0x150
-[  684.454853]  vfs_kern_mount.part.25+0x54/0x150
-[  684.455928]  do_mount+0x620/0xd60
-[  684.456987]  ? rcu_read_lock_sched_held+0x6b/0x80
-[  684.458048]  ? kmem_cache_alloc_trace+0x273/0x2d0
-[  684.459124]  ? copy_mount_options+0x28/0x230
-[  684.460168]  SyS_mount+0x80/0xd0
-[  684.461193]  entry_SYSCALL_64_fastpath+0x25/0x9c
-[  684.462206] RIP: 0033:0x7f7538eb6cea
-[  684.463185] RSP: 002b:00007fffb1b08bf8 EFLAGS: 00000202
-[  684.463193] Code: 48 c7 c6 00 87 87 c0 48 c7 c7 64 52 88 c0 48 89 95 38 ff ff ff e8 05 21 fd ff b8 f4 ff ff ff 48 8b 95 38 ff ff ff e9 8b fe ff ff <0f> 0b 0f 0b e8 6b ea 84 d2 0f 0b 0f 0b 48 8b 0d 70 af bb d3 e9 
-[  684.466175] RIP: crypt_message+0x7ac/0x7e0 [cifs] RSP: ffffb0d440eb7920
-[  684.467167] ---[ end trace b27c56cf9ad4130e ]---
+If you are talking about the tcon creation, it is now done all the time
+at session creation. If you are talking about that specific comment, I
+believe it's already done now in parse_dfs_referrals(). That function
+parses the packet into dfs_info3_param structures.
+
+-- 
+Aurélien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
+GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
