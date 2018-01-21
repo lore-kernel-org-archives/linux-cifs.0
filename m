@@ -1,57 +1,164 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 0/2] cifs: remove rfc1002 length field from all SMB2 response structures
-Date: Mon, 22 Jan 2018 09:06:42 +1100
-Message-ID: <20180121220644.7907-1-lsahlber@redhat.com>
+Subject: [PATCH 2/2] cifs: update multiplex loop to handle compounded responses
+Date: Mon, 22 Jan 2018 09:06:44 +1100
+Message-ID: <20180121220644.7907-3-lsahlber@redhat.com>
+References: <20180121220644.7907-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20180121220644.7907-1-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Steve, All
+Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifsglob.h |  2 +-
+ fs/cifs/connect.c  | 18 +++++++++++++++---
+ fs/cifs/smb2ops.c  | 26 ++++++++++++++++++++++++--
+ 3 files changed, 40 insertions(+), 6 deletions(-)
 
-Review but do not merge to for-next. This patch still breaks SMBD.
-I have tested the patch with SMB1/2/3 with and without signing as well as
-with SMB3 encryption and it works in my tests.
-
-The first patch removes the rfc1002 length from all the response structures
-hopefully making it easier to implement compounding later. It also gets rid
-of a lot of magic add/subtract 4 from various computations.
-
-The second patch updates the demultiplex loop so that it will now be able
-to handle compounded responses we receive from the server. In theory, we
-will not know it this works until we can actually send compounded requests.
-
-
-
-Next steps will be to start implementing the actual compounding.
-That, I think, will consist of refactoring the SMB2_open/query/close
-functions into dedicated marshalling functions and then create a new
-compound_send_recv() function.
-The second part will require some additional plumbing.
-In smb2_send_recv() we currently create iovectors as
-[0] length
-[1] smb2 header
-[2+] additional data
-
-or, when smb3 encryption is used
-
-[0] length
-[1] transform header
-[2] smb2 header
-[3+] additional data
-
-Instead, in compound_send_recv() we will need to create an array of iovectors,
-one for each pdu, that would look like
-[0] smb2 header
-[1+] additional data
-
-and similar for smb3 encryption.
-
-These iovectors would then be propagated down the stack without an initial
-length field until we are ready to transmit them.
-So, for the TCP case, we would not prepend the vectors we want to send with
-a [0] length field until the point where we are just about to start writing
-the data to the tcp socket.
-
-That shouldnt be too hard. But we need these patches first.
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 14db722c4b0d..18a961d32e0c 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -449,7 +449,7 @@ struct smb_version_operations {
+ 				 struct mid_q_entry **);
+ 	enum securityEnum (*select_sectype)(struct TCP_Server_Info *,
+ 			    enum securityEnum);
+-
++	int (*next_header)(char *);
+ };
+ 
+ struct smb_version_values {
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 18a1cb4f2330..9bf79e1f0a05 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -840,6 +840,7 @@ cifs_demultiplex_thread(void *p)
+ 	int length;
+ 	struct TCP_Server_Info *server = p;
+ 	unsigned int pdu_length;
++	unsigned int next_offset;
+ 	char *buf = NULL;
+ 	struct task_struct *task_to_wake = NULL;
+ 	struct mid_q_entry *mid_entry;
+@@ -877,17 +878,18 @@ cifs_demultiplex_thread(void *p)
+ 		 * so we can now interpret the length field.
+ 		 */
+ 		pdu_length = get_rfc1002_length(buf);
++next_pdu:
+ 		server->total_size = pdu_length;
+ 
+-		cifs_dbg(FYI, "RFC1002 header 0x%x\n", pdu_length);
++		cifs_dbg(FYI, "RFC1002 header 0x%x\n", server->total_size);
+ 		if (!is_smb_response(server, buf[0]))
+ 			continue;
+ 
+ 		/* make sure we have enough to get to the MID */
+-		if (pdu_length < HEADER_SIZE(server) - 1 -
++		if (server->total_size < HEADER_SIZE(server) - 1 -
+ 		    server->vals->header_preamble_size) {
+ 			cifs_dbg(VFS, "SMB response too short (%u bytes)\n",
+-				 pdu_length);
++				 server->total_size);
+ 			cifs_reconnect(server);
+ 			wake_up(&server->response_q);
+ 			continue;
+@@ -902,6 +904,12 @@ cifs_demultiplex_thread(void *p)
+ 			continue;
+ 		server->total_read += length;
+ 
++		if (server->ops->next_header) {
++			next_offset = server->ops->next_header(buf);
++			if (next_offset)
++				server->total_size = next_offset;
++		}
++
+ 		if (server->ops->is_transform_hdr &&
+ 		    server->ops->receive_transform &&
+ 		    server->ops->is_transform_hdr(buf))
+@@ -947,6 +955,10 @@ cifs_demultiplex_thread(void *p)
+ 			cifs_dump_mids(server);
+ #endif /* CIFS_DEBUG2 */
+ 
++			if (pdu_length > server->total_size) {
++				pdu_length -= server->total_size;
++				goto next_pdu;
++			}
+ 		}
+ 	} /* end while !EXITING */
+ 
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index fef40876a77a..58b12ed106cd 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -125,8 +125,8 @@ smb2_get_credits(struct mid_q_entry *mid)
+ 	char *buf = mid->resp_buf;
+ 	struct smb2_sync_hdr *shdr;
+ 
+-	if ( *(__u32 *)buf == SMB2_PROTO_NUMBER ||
+-	     *(__u32 *)buf == SMB2_TRANSFORM_PROTO_NUM)
++	if ( *(__le32 *)buf == SMB2_PROTO_NUMBER ||
++	     *(__le32 *)buf == SMB2_TRANSFORM_PROTO_NUM)
+ 		shdr = (struct smb2_sync_hdr *)buf;
+ 	else
+ 		shdr = (struct smb2_sync_hdr *)(buf + 4);
+@@ -2718,6 +2718,24 @@ smb3_handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+ 				NULL, 0, 0);
+ }
+ 
++static int
++smb2_next_header(char *buf)
++{
++	struct smb2_sync_hdr *hdr = (struct smb2_sync_hdr *)buf;
++	struct smb2_transform_hdr *t_hdr = (struct smb2_transform_hdr *)buf;
++
++	/* FIXME: compounding.
++	 * How does compounding work with smb3 encryption?
++	 * For now, assume that we will have one transform header for each
++	 * smb2 header (and assume that smb2->NextOffset is 0 for all of them.)
++	 */
++	if (hdr->ProtocolId == SMB2_TRANSFORM_PROTO_NUM)
++		return sizeof(struct smb2_transform_hdr) +
++		  le32_to_cpu(t_hdr->OriginalMessageSize);
++
++	return le32_to_cpu(hdr->NextCommand);
++}
++
+ struct smb_version_operations smb20_operations = {
+ 	.compare_fids = smb2_compare_fids,
+ 	.setup_request = smb2_setup_request,
+@@ -2809,6 +2827,7 @@ struct smb_version_operations smb20_operations = {
+ 	.get_acl_by_fid = get_smb2_acl_by_fid,
+ 	.set_acl = set_smb2_acl,
+ #endif /* CIFS_ACL */
++	.next_header = smb2_next_header,
+ };
+ 
+ struct smb_version_operations smb21_operations = {
+@@ -2903,6 +2922,7 @@ struct smb_version_operations smb21_operations = {
+ 	.get_acl_by_fid = get_smb2_acl_by_fid,
+ 	.set_acl = set_smb2_acl,
+ #endif /* CIFS_ACL */
++	.next_header = smb2_next_header,
+ };
+ 
+ struct smb_version_operations smb30_operations = {
+@@ -3007,6 +3027,7 @@ struct smb_version_operations smb30_operations = {
+ 	.get_acl_by_fid = get_smb2_acl_by_fid,
+ 	.set_acl = set_smb2_acl,
+ #endif /* CIFS_ACL */
++	.next_header = smb2_next_header,
+ };
+ 
+ #ifdef CONFIG_CIFS_SMB311
+@@ -3107,6 +3128,7 @@ struct smb_version_operations smb311_operations = {
+ 	.query_all_EAs = smb2_query_eas,
+ 	.set_EA = smb2_set_ea,
+ #endif /* CIFS_XATTR */
++	.next_header = smb2_next_header,
+ };
+ #endif /* CIFS_SMB311 */
+ 
+-- 
+2.13.3
