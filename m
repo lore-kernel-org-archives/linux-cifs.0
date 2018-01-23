@@ -1,79 +1,38 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifscreds: check optind before accessing argv[optind]
-Date: Mon, 22 Jan 2018 18:59:16 -0600
-Message-ID: <CAH2r5muaQ3sL3YmgzL=J0rZYoaOvpS=UoLpvH6nF8ksON4s+hQ@mail.gmail.com>
-References: <20180123004801.10182-1-lsahlber@redhat.com> <CAH2r5ms-rpxf5E_XZc1W+h1tMmV26WEbXWCxEfYa+cA7PX-VTw@mail.gmail.com>
- <1836982403.1740018.1516669060551.JavaMail.zimbra@redhat.com>
+From: Kenneth Dsouza <kdsouza-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: manpage: update mount.cifs manpage with info about echo_interval option.
+Date: Tue, 23 Jan 2018 23:07:16 +0530
+Message-ID: <CAA_-hQJ=DsbeVWU7mr-W0sTRiPXnCC3vznmznQwBedQLtE0s_g@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: CIFS <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1836982403.1740018.1516669060551.JavaMail.zimbra-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-sorry - I misread this.  Userspace patch doersn't need the cc:
+Signed-off-by:  Kenneth D'souza <kdsouza-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
-but in any case can add my reviewed-by
+diff --git a/mount.cifs.rst b/mount.cifs.rst
+index 023ff34..efd7055 100644
+--- a/mount.cifs.rst
++++ b/mount.cifs.rst
+@@ -385,6 +385,14 @@ mfsymlinks
+   option. Minshall+French symlinks are used even if the server supports
+   the CIFS Unix Extensions.
 
-On Mon, Jan 22, 2018 at 6:57 PM, Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->
->
->
->
-> ----- Original Message -----
->> From: "Steve French" <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->> To: "Ronnie Sahlberg" <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->> Cc: "CIFS" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "Pavel Shilovsky" <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->> Sent: Tuesday, 23 January, 2018 11:50:38 AM
->> Subject: Re: [PATCH] cifscreds: check optind before accessing argv[optind]
->>
->> I would like to add cc stable. Ok?
->
-> SGTM
->
->>
->> On Jan 22, 2018 18:48, "Ronnie Sahlberg" <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->>
->> > Redhat bugzilla: 1278543
->> >
->> > This fixes a segfault for some incorrect usage, for example
->> >    cifscreds -u test
->> >
->> > Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->> > ---
->> >  cifscreds.c | 3 +++
->> >  1 file changed, 3 insertions(+)
->> >
->> > diff --git a/cifscreds.c b/cifscreds.c
->> > index 5d84c3c..32f2ee4 100644
->> > --- a/cifscreds.c
->> > +++ b/cifscreds.c
->> > @@ -487,6 +487,9 @@ int main(int argc, char **argv)
->> >                 }
->> >         }
->> >
->> > +       if (optind >= argc)
->> > +               return usage();
->> > +
->> >         /* find the best fit command */
->> >         best = NULL;
->> >         n = strnlen(argv[optind], MAX_COMMAND_SIZE);
->> > --
->> > 2.15.1
->> >
->> > --
->> > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
->> >
->>
++echo_interval=n
++  sets the interval at which echo requests are sent to the server on an
++  idling connection. This setting also affects the time required
++  for a connection to an unresponsive server to timeout.
++  Here n is the echo interval in seconds. If this option is not given then
++  the default value of 60 seconds is used.
++  The minimum tunable value is 1 second and maximum can go up to 600 seconds.
++
+ serverino
+   Use inode numbers (unique persistent file identifiers) returned by the
+   server instead of automatically generating temporary inode numbers on
 
 
 
--- 
-Thanks,
 
-Steve
+Kind Regards,
+Kenneth D'souza
