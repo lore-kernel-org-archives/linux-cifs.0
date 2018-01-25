@@ -1,21 +1,66 @@
-From: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
-Subject: Re: [SMB3][PATCH] cleanup some minor endian warnings in smbdirect
- (SMB3 RDMA) code.
-Date: Thu, 25 Jan 2018 07:04:37 -0800
-Message-ID: <20180125150437.GA19612@infradead.org>
-References: <CAH2r5mvZMPmEQYSnioXvo_cXfe+fxOE_kSsOi4HnEZm6bxBTEw@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH][SMB3] quiet 'symbol was not declared' warnings in SMB3 RDMA series
+Date: Thu, 25 Jan 2018 09:37:42 -0600
+Message-ID: <CAH2r5muHCQsPB+=sqKM4oX9GnX7qcUStnLtd1qYsz3aFDbMMjA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: CIFS <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: multipart/mixed; boundary="000000000000c67a8205639b9062"
+Cc: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: CIFS <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <CAH2r5mvZMPmEQYSnioXvo_cXfe+fxOE_kSsOi4HnEZm6bxBTEw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, Jan 24, 2018 at 11:18:59PM -0600, Steve French wrote:
-> Cleans up various minor warnings that sparse endian checking showed in
-> the recent SMB3 RDMA patch series
+--000000000000c67a8205639b9062
+Content-Type: text/plain; charset="UTF-8"
 
-Not really minor for big endian systems :)
+Minor fixup - moved these eight defines to smbdirect.h to quiet sparse
+
+
+
+-- 
+Thanks,
+
+Steve
+
+--000000000000c67a8205639b9062
+Content-Type: text/x-patch; charset="US-ASCII";
+	name="0001-SMB3-move-a-few-externs-to-smbdirect.h-to-eliminate-.patch"
+Content-Disposition: attachment;
+	filename="0001-SMB3-move-a-few-externs-to-smbdirect.h-to-eliminate-.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_jcunwips0
+
+RnJvbSA3NWFhMDQ0ZTRlOTMyZDAyNjU0YjI1MDc1MjdkNDAwOGQ1MWZjODdmIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHNtZnJlbmNoQGdtYWlsLmNvbT4KRGF0
+ZTogVGh1LCAyNSBKYW4gMjAxOCAwOToyODoyNSAtMDYwMApTdWJqZWN0OiBbUEFUQ0hdIFtTTUIz
+XSBtb3ZlIGEgZmV3IGV4dGVybnMgdG8gc21iZGlyZWN0LmggdG8gZWxpbWluYXRlIHdhcm5pbmcK
+ClF1aWV0IG1pbm9yIHNwYXJzZSB3YXJuaW5ncyBpbiBuZXcgU01CMyByZG1hIHBhdGNoIHNlcmll
+cwooInN5bWJvbCB3YXMgbm90IGRlY2xhcmVkIC4uLiIpIGJ5IG1vdmluZyB0aGVzZSBleHRlcm5z
+IHRvIHNtYmRpcmVjdC5oCgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHNtZnJlbmNoQGdt
+YWlsLmNvbT4KLS0tCiBmcy9jaWZzL2NpZnNfZGVidWcuYyB8IDkgLS0tLS0tLS0tCiBmcy9jaWZz
+L3NtYmRpcmVjdC5oICB8IDkgKysrKysrKysrCiAyIGZpbGVzIGNoYW5nZWQsIDkgaW5zZXJ0aW9u
+cygrKSwgOSBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNfZGVidWcuYyBi
+L2ZzL2NpZnMvY2lmc19kZWJ1Zy5jCmluZGV4IGY0OTEzNDBmMzJhZC4uYzdhODYzMjE5ZmEzIDEw
+MDY0NAotLS0gYS9mcy9jaWZzL2NpZnNfZGVidWcuYworKysgYi9mcy9jaWZzL2NpZnNfZGVidWcu
+YwpAQCAtNDgzLDE1ICs0ODMsNiBAQCBzdGF0aWMgY29uc3Qgc3RydWN0IGZpbGVfb3BlcmF0aW9u
+cyBjaWZzXyMjbmFtZSMjX3Byb2NfZm9wcyA9IHsgXAogCS53cml0ZQkJPSBuYW1lIyNfd3JpdGUs
+IFwKIH0KIAotZXh0ZXJuIGludCByZG1hX3JlYWR3cml0ZV90aHJlc2hvbGQ7Ci1leHRlcm4gaW50
+IHNtYmRfbWF4X2ZybXJfZGVwdGg7Ci1leHRlcm4gaW50IHNtYmRfa2VlcF9hbGl2ZV9pbnRlcnZh
+bDsKLWV4dGVybiBpbnQgc21iZF9tYXhfcmVjZWl2ZV9zaXplOwotZXh0ZXJuIGludCBzbWJkX21h
+eF9mcmFnbWVudGVkX3JlY3Zfc2l6ZTsKLWV4dGVybiBpbnQgc21iZF9tYXhfc2VuZF9zaXplOwot
+ZXh0ZXJuIGludCBzbWJkX3NlbmRfY3JlZGl0X3RhcmdldDsKLWV4dGVybiBpbnQgc21iZF9yZWNl
+aXZlX2NyZWRpdF9tYXg7Ci0KIFBST0NfRklMRV9ERUZJTkUocmRtYV9yZWFkd3JpdGVfdGhyZXNo
+b2xkKTsKIFBST0NfRklMRV9ERUZJTkUoc21iZF9tYXhfZnJtcl9kZXB0aCk7CiBQUk9DX0ZJTEVf
+REVGSU5FKHNtYmRfa2VlcF9hbGl2ZV9pbnRlcnZhbCk7CmRpZmYgLS1naXQgYS9mcy9jaWZzL3Nt
+YmRpcmVjdC5oIGIvZnMvY2lmcy9zbWJkaXJlY3QuaAppbmRleCBmZGI4ZGY4NGZhMWYuLmY5MDM4
+ZGFlYTE5NCAxMDA2NDQKLS0tIGEvZnMvY2lmcy9zbWJkaXJlY3QuaAorKysgYi9mcy9jaWZzL3Nt
+YmRpcmVjdC5oCkBAIC0yNCw2ICsyNCwxNSBAQAogI2luY2x1ZGUgPHJkbWEvcmRtYV9jbS5oPgog
+I2luY2x1ZGUgPGxpbnV4L21lbXBvb2wuaD4KIAorZXh0ZXJuIGludCByZG1hX3JlYWR3cml0ZV90
+aHJlc2hvbGQ7CitleHRlcm4gaW50IHNtYmRfbWF4X2ZybXJfZGVwdGg7CitleHRlcm4gaW50IHNt
+YmRfa2VlcF9hbGl2ZV9pbnRlcnZhbDsKK2V4dGVybiBpbnQgc21iZF9tYXhfcmVjZWl2ZV9zaXpl
+OworZXh0ZXJuIGludCBzbWJkX21heF9mcmFnbWVudGVkX3JlY3Zfc2l6ZTsKK2V4dGVybiBpbnQg
+c21iZF9tYXhfc2VuZF9zaXplOworZXh0ZXJuIGludCBzbWJkX3NlbmRfY3JlZGl0X3RhcmdldDsK
+K2V4dGVybiBpbnQgc21iZF9yZWNlaXZlX2NyZWRpdF9tYXg7CisKIGVudW0ga2VlcF9hbGl2ZV9z
+dGF0dXMgewogCUtFRVBfQUxJVkVfTk9ORSwKIAlLRUVQX0FMSVZFX1BFTkRJTkcsCi0tIAoyLjE0
+LjMKCg==
+--000000000000c67a8205639b9062--
