@@ -1,56 +1,122 @@
-From: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: [PATCH v3 0/3] Make IPC a regular tcon and fix SMB2 domain-based DFS
-Date: Wed, 24 Jan 2018 13:46:09 +0100
-Message-ID: <20180124124612.21993-1-aaptel@suse.com>
-References: <20180117172200.3221-1-aaptel@suse.com>
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [SMB3][PATCH] cleanup some minor endian warnings in smbdirect (SMB3
+ RDMA) code.
+Date: Wed, 24 Jan 2018 23:18:59 -0600
+Message-ID: <CAH2r5mvZMPmEQYSnioXvo_cXfe+fxOE_kSsOi4HnEZm6bxBTEw@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: multipart/mixed; boundary="f403045c505216a30f056392ec0e"
+To: CIFS <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20180117172200.3221-1-aaptel-IBi9RG/b67k@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-changes since v2:
+--f403045c505216a30f056392ec0e
+Content-Type: text/plain; charset="UTF-8"
 
-* rebased against Steve's for-next
-* mark IPC tcon for reconnection like other tcons
-* dump IPC tcon in /proc DebugData
-* pass IPC tcon instead of NULL to smb_init() in CIFSGetDFSRefer() so
-  that it reconnect it if needed
-
-passes make C=1, checkpatch.pl, and reconnection works in these cases
-(domain-based DFS with Windows Server 2016):
-
-| test                      | v1.0 | v3.0 |
-|---------------------------+------+------|
-| mount root, reco, cd link |  ok  |  ok  |
-| mount link, reco, ls      |  ok  |  ok  |
+Cleans up various minor warnings that sparse endian checking showed in
+the recent SMB3 RDMA patch series
 
 
-
-changes since v1:
-
-* squashed definition change of SERVER_NAME_LENGTH in first patch
-* ipc tcon no longer added the the session tcon list
-* ipc tcon no longer protected by spinlock
-* decrement tcon refcount only if it was incremented earlier (ie not
-  an ipc tcon) in smb2_get_dfs_refer()
-
-Aurelien Aptel (3):
-  CIFS: make IPC a regular tcon
-  CIFS: use tcon_ipc instead of use_ipc parameter of SMB2_ioctl
-  CIFS: dump IPC tcon in debug proc file
-
- fs/cifs/cifs_debug.c |  61 ++++++++++++---------
- fs/cifs/cifsglob.h   |  14 ++---
- fs/cifs/cifssmb.c    |   7 +--
- fs/cifs/connect.c    | 150 ++++++++++++++++++++++++++++++++++++++-------------
- fs/cifs/inode.c      |   2 +-
- fs/cifs/smb2file.c   |   2 +-
- fs/cifs/smb2ops.c    |  53 ++++++++----------
- fs/cifs/smb2pdu.c    |  40 ++++----------
- fs/cifs/smb2proto.h  |   3 +-
- 9 files changed, 193 insertions(+), 139 deletions(-)
 
 -- 
-2.12.3
+Thanks,
+
+Steve
+
+--f403045c505216a30f056392ec0e
+Content-Type: text/x-patch; charset="US-ASCII";
+	name="0001-SMB3-Cleanup-some-minor-endian-issues-in-smb3-rdma.patch"
+Content-Disposition: attachment;
+	filename="0001-SMB3-Cleanup-some-minor-endian-issues-in-smb3-rdma.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_jcu1sfji0
+
+RnJvbSA2OTY0ZjE5NjYwNzc1OTUzMzkyY2IwMWI1NmQ3NDY1ZWRlMWFjZDVlIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHNtZnJlbmNoQGdtYWlsLmNvbT4KRGF0
+ZTogV2VkLCAyNCBKYW4gMjAxOCAyMzowNzo0MSAtMDYwMApTdWJqZWN0OiBbUEFUQ0hdIFtTTUIz
+XSBDbGVhbnVwIHNvbWUgbWlub3IgZW5kaWFuIGlzc3VlcyBpbiBzbWIzIHJkbWEKCk1pbm9yIGNs
+ZWFudXAgb2Ygc29tZSBzcGFyc2Ugd2FybmluZ3MgKGluY2x1ZGluZyBhIGZldyBtaXNjCmVuZGlh
+biBmaXhlcyBmb3IgdGhlIG5ldyBzbWIzIHJkbWEgY29kZSkKClNpZ25lZC1vZmYtYnk6IFN0ZXZl
+IEZyZW5jaCA8c21mcmVuY2hAZ21haWwuY29tPgotLS0KIGZzL2NpZnMvc21iMnBkdS5jICAgfCAy
+MiArKysrKysrKysrKy0tLS0tLS0tLS0tCiBmcy9jaWZzL3NtYjJwZHUuaCAgIHwgMTQgKysrKysr
+Ky0tLS0tLS0KIGZzL2NpZnMvc21iZGlyZWN0LmMgfCAgNSArKystLQogMyBmaWxlcyBjaGFuZ2Vk
+LCAyMSBpbnNlcnRpb25zKCspLCAyMCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9mcy9jaWZz
+L3NtYjJwZHUuYyBiL2ZzL2NpZnMvc21iMnBkdS5jCmluZGV4IDE3YjdmM2FlZDE5NS4uNjM3Nzhh
+YzIyZmQ5IDEwMDY0NAotLS0gYS9mcy9jaWZzL3NtYjJwZHUuYworKysgYi9mcy9jaWZzL3NtYjJw
+ZHUuYwpAQCAtMjQ2MywxMyArMjQ2MywxMyBAQCBzbWIyX25ld19yZWFkX3JlcSh2b2lkICoqYnVm
+LCB1bnNpZ25lZCBpbnQgKnRvdGFsX2xlbiwKIAkJaWYgKG5lZWRfaW52YWxpZGF0ZSkKIAkJCXJl
+cS0+Q2hhbm5lbCA9IFNNQjJfQ0hBTk5FTF9SRE1BX1YxOwogCQlyZXEtPlJlYWRDaGFubmVsSW5m
+b09mZnNldCA9Ci0JCQlvZmZzZXRvZihzdHJ1Y3Qgc21iMl9yZWFkX3BsYWluX3JlcSwgQnVmZmVy
+KTsKKwkJCWNwdV90b19sZTE2KG9mZnNldG9mKHN0cnVjdCBzbWIyX3JlYWRfcGxhaW5fcmVxLCBC
+dWZmZXIpKTsKIAkJcmVxLT5SZWFkQ2hhbm5lbEluZm9MZW5ndGggPQotCQkJc2l6ZW9mKHN0cnVj
+dCBzbWJkX2J1ZmZlcl9kZXNjcmlwdG9yX3YxKTsKKwkJCWNwdV90b19sZTE2KHNpemVvZihzdHJ1
+Y3Qgc21iZF9idWZmZXJfZGVzY3JpcHRvcl92MSkpOwogCQl2MSA9IChzdHJ1Y3Qgc21iZF9idWZm
+ZXJfZGVzY3JpcHRvcl92MSAqKSAmcmVxLT5CdWZmZXJbMF07Ci0JCXYxLT5vZmZzZXQgPSByZGF0
+YS0+bXItPm1yLT5pb3ZhOwotCQl2MS0+dG9rZW4gPSByZGF0YS0+bXItPm1yLT5ya2V5OwotCQl2
+MS0+bGVuZ3RoID0gcmRhdGEtPm1yLT5tci0+bGVuZ3RoOworCQl2MS0+b2Zmc2V0ID0gY3B1X3Rv
+X2xlNjQocmRhdGEtPm1yLT5tci0+aW92YSk7CisJCXYxLT50b2tlbiA9IGNwdV90b19sZTMyKHJk
+YXRhLT5tci0+bXItPnJrZXkpOworCQl2MS0+bGVuZ3RoID0gY3B1X3RvX2xlMzIocmRhdGEtPm1y
+LT5tci0+bGVuZ3RoKTsKIAogCQkqdG90YWxfbGVuICs9IHNpemVvZigqdjEpIC0gMTsKIAl9CkBA
+IC0yODQwLDE4ICsyODQwLDE4IEBAIHNtYjJfYXN5bmNfd3JpdGV2KHN0cnVjdCBjaWZzX3dyaXRl
+ZGF0YSAqd2RhdGEsCiAJCXJlcS0+TGVuZ3RoID0gMDsKIAkJcmVxLT5EYXRhT2Zmc2V0ID0gMDsK
+IAkJcmVxLT5SZW1haW5pbmdCeXRlcyA9Ci0JCQkod2RhdGEtPm5yX3BhZ2VzLTEpKlBBR0VfU0la
+RSArIHdkYXRhLT50YWlsc3o7CisJCQljcHVfdG9fbGUzMigod2RhdGEtPm5yX3BhZ2VzLTEpKlBB
+R0VfU0laRSArIHdkYXRhLT50YWlsc3opOwogCQlyZXEtPkNoYW5uZWwgPSBTTUIyX0NIQU5ORUxf
+UkRNQV9WMV9JTlZBTElEQVRFOwogCQlpZiAobmVlZF9pbnZhbGlkYXRlKQogCQkJcmVxLT5DaGFu
+bmVsID0gU01CMl9DSEFOTkVMX1JETUFfVjE7CiAJCXJlcS0+V3JpdGVDaGFubmVsSW5mb09mZnNl
+dCA9Ci0JCQlvZmZzZXRvZihzdHJ1Y3Qgc21iMl93cml0ZV9yZXEsIEJ1ZmZlcik7CisJCQljcHVf
+dG9fbGUxNihvZmZzZXRvZihzdHJ1Y3Qgc21iMl93cml0ZV9yZXEsIEJ1ZmZlcikpOwogCQlyZXEt
+PldyaXRlQ2hhbm5lbEluZm9MZW5ndGggPQotCQkJc2l6ZW9mKHN0cnVjdCBzbWJkX2J1ZmZlcl9k
+ZXNjcmlwdG9yX3YxKTsKKwkJCWNwdV90b19sZTE2KHNpemVvZihzdHJ1Y3Qgc21iZF9idWZmZXJf
+ZGVzY3JpcHRvcl92MSkpOwogCQl2MSA9IChzdHJ1Y3Qgc21iZF9idWZmZXJfZGVzY3JpcHRvcl92
+MSAqKSAmcmVxLT5CdWZmZXJbMF07Ci0JCXYxLT5vZmZzZXQgPSB3ZGF0YS0+bXItPm1yLT5pb3Zh
+OwotCQl2MS0+dG9rZW4gPSB3ZGF0YS0+bXItPm1yLT5ya2V5OwotCQl2MS0+bGVuZ3RoID0gd2Rh
+dGEtPm1yLT5tci0+bGVuZ3RoOworCQl2MS0+b2Zmc2V0ID0gY3B1X3RvX2xlNjQod2RhdGEtPm1y
+LT5tci0+aW92YSk7CisJCXYxLT50b2tlbiA9IGNwdV90b19sZTMyKHdkYXRhLT5tci0+bXItPnJr
+ZXkpOworCQl2MS0+bGVuZ3RoID0gY3B1X3RvX2xlMzIod2RhdGEtPm1yLT5tci0+bGVuZ3RoKTsK
+IAl9CiAjZW5kaWYKIAkvKiA0IGZvciByZmMxMDAyIGxlbmd0aCBmaWVsZCBhbmQgMSBmb3IgQnVm
+ZmVyICovCmRpZmYgLS1naXQgYS9mcy9jaWZzL3NtYjJwZHUuaCBiL2ZzL2NpZnMvc21iMnBkdS5o
+CmluZGV4IDE5ZDM0ODgxODE1Zi4uNmViOWY5NjkxZWQ0IDEwMDY0NAotLS0gYS9mcy9jaWZzL3Nt
+YjJwZHUuaAorKysgYi9mcy9jaWZzL3NtYjJwZHUuaApAQCAtODMwLDkgKzgzMCw5IEBAIHN0cnVj
+dCBzbWIyX2ZsdXNoX3JzcCB7CiAjZGVmaW5lIFNNQjJfUkVBREZMQUdfUkVBRF9VTkJVRkZFUkVE
+CTB4MDEKIAogLyogQ2hhbm5lbCBmaWVsZCBmb3IgcmVhZCBhbmQgd3JpdGU6IGV4YWN0bHkgb25l
+IG9mIGZvbGxvd2luZyBmbGFncyBjYW4gYmUgc2V0Ki8KLSNkZWZpbmUgU01CMl9DSEFOTkVMX05P
+TkUJCTB4MDAwMDAwMDAKLSNkZWZpbmUgU01CMl9DSEFOTkVMX1JETUFfVjEJCTB4MDAwMDAwMDEg
+LyogU01CMyBvciBsYXRlciAqLwotI2RlZmluZSBTTUIyX0NIQU5ORUxfUkRNQV9WMV9JTlZBTElE
+QVRFIDB4MDAwMDAwMDIgLyogU01CMy4wMiBvciBsYXRlciAqLworI2RlZmluZSBTTUIyX0NIQU5O
+RUxfTk9ORQljcHVfdG9fbGUzMigweDAwMDAwMDAwKQorI2RlZmluZSBTTUIyX0NIQU5ORUxfUkRN
+QV9WMQljcHVfdG9fbGUzMigweDAwMDAwMDAxKSAvKiBTTUIzIG9yIGxhdGVyICovCisjZGVmaW5l
+IFNNQjJfQ0hBTk5FTF9SRE1BX1YxX0lOVkFMSURBVEUgY3B1X3RvX2xlMzIoMHgwMDAwMDAwMikg
+LyogPj0gU01CMy4wMiAqLwogCiAvKiBTTUIyIHJlYWQgcmVxdWVzdCB3aXRob3V0IFJGQzEwMDEg
+bGVuZ3RoIGF0IHRoZSBiZWdpbm5pbmcgKi8KIHN0cnVjdCBzbWIyX3JlYWRfcGxhaW5fcmVxIHsK
+QEAgLTg0Nyw4ICs4NDcsOCBAQCBzdHJ1Y3Qgc21iMl9yZWFkX3BsYWluX3JlcSB7CiAJX19sZTMy
+IE1pbmltdW1Db3VudDsKIAlfX2xlMzIgQ2hhbm5lbDsgLyogTUJaIGV4Y2VwdCBmb3IgU01CMyBv
+ciBsYXRlciAqLwogCV9fbGUzMiBSZW1haW5pbmdCeXRlczsKLQlfX2xlMTYgUmVhZENoYW5uZWxJ
+bmZvT2Zmc2V0OyAvKiBSZXNlcnZlZCBNQlogKi8KLQlfX2xlMTYgUmVhZENoYW5uZWxJbmZvTGVu
+Z3RoOyAvKiBSZXNlcnZlZCBNQlogKi8KKwlfX2xlMTYgUmVhZENoYW5uZWxJbmZvT2Zmc2V0Owor
+CV9fbGUxNiBSZWFkQ2hhbm5lbEluZm9MZW5ndGg7CiAJX191OCAgIEJ1ZmZlclsxXTsKIH0gX19w
+YWNrZWQ7CiAKQEAgLTg3Nyw4ICs4NzcsOCBAQCBzdHJ1Y3Qgc21iMl93cml0ZV9yZXEgewogCV9f
+dTY0ICBWb2xhdGlsZUZpbGVJZDsgLyogb3BhcXVlIGVuZGlhbm5lc3MgKi8KIAlfX2xlMzIgQ2hh
+bm5lbDsgLyogUmVzZXJ2ZWQgTUJaICovCiAJX19sZTMyIFJlbWFpbmluZ0J5dGVzOwotCV9fbGUx
+NiBXcml0ZUNoYW5uZWxJbmZvT2Zmc2V0OyAvKiBSZXNlcnZlZCBNQlogKi8KLQlfX2xlMTYgV3Jp
+dGVDaGFubmVsSW5mb0xlbmd0aDsgLyogUmVzZXJ2ZWQgTUJaICovCisJX19sZTE2IFdyaXRlQ2hh
+bm5lbEluZm9PZmZzZXQ7CisJX19sZTE2IFdyaXRlQ2hhbm5lbEluZm9MZW5ndGg7CiAJX19sZTMy
+IEZsYWdzOwogCV9fdTggICBCdWZmZXJbMV07CiB9IF9fcGFja2VkOwpkaWZmIC0tZ2l0IGEvZnMv
+Y2lmcy9zbWJkaXJlY3QuYyBiL2ZzL2NpZnMvc21iZGlyZWN0LmMKaW5kZXggZjkyMzRlZDgzYTYw
+Li41MTMwNDkyODQ3ZWIgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvc21iZGlyZWN0LmMKKysrIGIvZnMv
+Y2lmcy9zbWJkaXJlY3QuYwpAQCAtMTg1NSw3ICsxODU1LDggQEAgc3RydWN0IHNtYmRfY29ubmVj
+dGlvbiAqc21iZF9nZXRfY29ubmVjdGlvbigKICAqIGNvbnN1bWVkLiBCdXQgdGhpcyB3aWxsIHJl
+cXVpcmUgbW9yZSBjaGFuZ2VzIHRvIHVwcGVyIGxheWVyIGNvZGUsIGFuZCBhbHNvCiAgKiBuZWVk
+IHRvIGNvbnNpZGVyIHBhY2tldCBib3VuZGFyaWVzIHdoaWxlIHRoZXkgc3RpbGwgYmVpbmcgcmVh
+c3NlbWJsZWQuCiAgKi8KLWludCBzbWJkX3JlY3ZfYnVmKHN0cnVjdCBzbWJkX2Nvbm5lY3Rpb24g
+KmluZm8sIGNoYXIgKmJ1ZiwgdW5zaWduZWQgaW50IHNpemUpCitzdGF0aWMgaW50IHNtYmRfcmVj
+dl9idWYoc3RydWN0IHNtYmRfY29ubmVjdGlvbiAqaW5mbywgY2hhciAqYnVmLAorCQl1bnNpZ25l
+ZCBpbnQgc2l6ZSkKIHsKIAlzdHJ1Y3Qgc21iZF9yZXNwb25zZSAqcmVzcG9uc2U7CiAJc3RydWN0
+IHNtYmRfZGF0YV90cmFuc2ZlciAqZGF0YV90cmFuc2ZlcjsKQEAgLTE5OTIsNyArMTk5Myw3IEBA
+IGludCBzbWJkX3JlY3ZfYnVmKHN0cnVjdCBzbWJkX2Nvbm5lY3Rpb24gKmluZm8sIGNoYXIgKmJ1
+ZiwgdW5zaWduZWQgaW50IHNpemUpCiAgKiB0b19yZWFkOiB0aGUgbGVuZ3RoIG9mIGRhdGEgdG8g
+cmVhZAogICogcmV0dXJuIHZhbHVlOiBhY3R1YWwgZGF0YSByZWFkCiAgKi8KLWludCBzbWJkX3Jl
+Y3ZfcGFnZShzdHJ1Y3Qgc21iZF9jb25uZWN0aW9uICppbmZvLAorc3RhdGljIGludCBzbWJkX3Jl
+Y3ZfcGFnZShzdHJ1Y3Qgc21iZF9jb25uZWN0aW9uICppbmZvLAogCQlzdHJ1Y3QgcGFnZSAqcGFn
+ZSwgdW5zaWduZWQgaW50IHRvX3JlYWQpCiB7CiAJaW50IHJldDsKLS0gCjIuMTQuMwoK
+--f403045c505216a30f056392ec0e--
