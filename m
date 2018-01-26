@@ -1,88 +1,39 @@
-From: ronnie sahlberg <ronniesahlberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 1/1] CIFS: document tcon/ses/server refcount dance
-Date: Fri, 26 Jan 2018 04:58:47 +1000
-Message-ID: <CAN05THRLA-1m55tpwY5Sm+TZz=8JwekVFBy1oLB3cTX9MCXuwA@mail.gmail.com>
-References: <20180125174752.5139-1-aaptel@suse.com>
+From: Peter Schuster <femi.ageuh-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: =?UTF-8?Q?Darlehen_Geld_f=C3=BCr_Einzelpersonen_und_Fachleute_in_w?=
+        =?UTF-8?Q?eniger_als_72_Stunden?=
+Date: Fri, 26 Jan 2018 08:22:47 +0100
+Message-ID: <CACKcKZ-YTVoO8xO=VcRR-F_91T=fQ=MZa2wBTk_EaRT7GRz52Q__28042.9013692357$1516951272$gmane$org@mail.gmail.com>
+Reply-To: klaus.peterschuster-1ViLX0X+lBKELgA04lAiVw@public.gmane.org
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+Content-Transfer-Encoding: quoted-printable
+To: undisclosed-recipients:;
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20180125174752.5139-1-aaptel-IBi9RG/b67k@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Reviewed-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Hallo,
 
-On Fri, Jan 26, 2018 at 3:47 AM, Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org> wrote:
-> Signed-off-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-> ---
->  fs/cifs/connect.c | 32 +++++++++++++++++++++++++++++++-
->  1 file changed, 31 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 8b5e401f547a..ff7a653fd322 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -2704,6 +2704,13 @@ cifs_set_cifscreds(struct smb_vol *vol __attribute__((unused)),
->  }
->  #endif /* CONFIG_KEYS */
->
-> +/**
-> + * cifs_get_smb_ses - get a session matching @volume_info data from @server
-> + *
-> + * This function assumes it is being called from cifs_mount() where we
-> + * already got a server reference (server refcount +1). See
-> + * cifs_get_tcon() for refcount explanations.
-> + */
->  static struct cifs_ses *
->  cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
->  {
-> @@ -2877,6 +2884,26 @@ cifs_put_tcon(struct cifs_tcon *tcon)
->         cifs_put_smb_ses(ses);
->  }
->
-> +/**
-> + * cifs_get_tcon - get a tcon matching @volume_info data from @ses
-> + *
-> + * - tcon refcount is the number of mount points using the tcon.
-> + * - ses refcount is the number of tcon using the session.
-> + *
-> + * 1. This function assumes it is being called from cifs_mount() where
-> + *    we already got a session reference (ses refcount +1).
-> + *
-> + * 2. Since we're in the context of adding a mount point, the end
-> + *    result should be either:
-> + *
-> + * a) a new tcon already allocated with refcount=1 (1 mount point) and
-> + *    its session refcount incremented (1 new tcon). This +1 was
-> + *    already done in (1).
-> + *
-> + * b) an existing tcon with refcount+1 (add a mount point to it) and
-> + *    identical ses refcount (no new tcon). Because of (1) we need to
-> + *    decrement the ses refcount.
-> + */
->  static struct cifs_tcon *
->  cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
->  {
-> @@ -2885,8 +2912,11 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
->
->         tcon = cifs_find_tcon(ses, volume_info);
->         if (tcon) {
-> +               /*
-> +                * tcon has refcount already incremented but we need to
-> +                * decrement extra ses reference gotten by caller (case b)
-> +                */
->                 cifs_dbg(FYI, "Found match on UNC path\n");
-> -               /* existing tcon already has a reference */
->                 cifs_put_smb_ses(ses);
->                 return tcon;
->         }
-> --
-> 2.12.3
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Sind Sie in einer schwierigen Situation, f=C3=BCr die Sie sich f=C3=BCr ein
+Darlehen suchen? Ben=C3=B6tigen Sie eine Finanzierung, um eine Schuld zu
+begleichen oder eine Aktivit=C3=A4t zu finanzieren? Haben Sie einen
+Verbraucherkredit, eine Hypothek, einen pers=C3=B6nlichen Kredit, eine
+Hypothek, Investition Darlehen, Schuldenkonsolidierung Darlehen oder
+andere braucht?
+
+Ich bin ein einzelner Investor. I zur Verf=C3=BCgung stellen die Kredit
+kurz-, mittel- und langfristige. Ihr Finanzierungsbedingungen sind
+sehr einfach und meine Zinssatz betr=C3=A4gt 3% pro Jahr.
+
+F=C3=BCr alle Anfragen, bleibe ich zur Verf=C3=BCgung, um Ihre Fragen zu be=
+antworten.
+
+Danke, dass Sie mir per E-Mail an Sie von  :   klaus.peterschuster@outlook.=
+de
+
+Mit freundlichen Gr=C3=BC=C3=9Fen.
+
+Peter Schuster
+
+Financial Bank
+https://firstfinancialsa.com/de
