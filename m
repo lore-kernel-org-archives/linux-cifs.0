@@ -1,39 +1,34 @@
-From: Peter Schuster <femi.ageuh-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: =?UTF-8?Q?Darlehen_Geld_f=C3=BCr_Einzelpersonen_und_Fachleute_in_w?=
-        =?UTF-8?Q?eniger_als_72_Stunden?=
-Date: Fri, 26 Jan 2018 08:22:47 +0100
-Message-ID: <CACKcKZ-YTVoO8xO=VcRR-F_91T=fQ=MZa2wBTk_EaRT7GRz52Q__28042.9013692357$1516951272$gmane$org@mail.gmail.com>
-Reply-To: klaus.peterschuster-1ViLX0X+lBKELgA04lAiVw@public.gmane.org
+From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
+Subject: Re: [PATCH 0/2] cifs: remove rfc1002 length field from all SMB2 response structures
+Date: Fri, 26 Jan 2018 17:57:50 +0100
+Message-ID: <87vafod0c1.fsf@suse.com>
+References: <20180121220644.7907-1-lsahlber@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-To: undisclosed-recipients:;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20180121220644.7907-1-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hallo,
+Hi Ronnie,
 
-Sind Sie in einer schwierigen Situation, f=C3=BCr die Sie sich f=C3=BCr ein
-Darlehen suchen? Ben=C3=B6tigen Sie eine Finanzierung, um eine Schuld zu
-begleichen oder eine Aktivit=C3=A4t zu finanzieren? Haben Sie einen
-Verbraucherkredit, eine Hypothek, einen pers=C3=B6nlichen Kredit, eine
-Hypothek, Investition Darlehen, Schuldenkonsolidierung Darlehen oder
-andere braucht?
+These are dense patches and even though I have an idea of what it is
+supposed to do I'm not familiar enough with the data structures and
+their purpose to evaluate all of this right now (well I've put it aside
+for some time).
 
-Ich bin ein einzelner Investor. I zur Verf=C3=BCgung stellen die Kredit
-kurz-, mittel- und langfristige. Ihr Finanzierungsbedingungen sind
-sehr einfach und meine Zinssatz betr=C3=A4gt 3% pro Jahr.
+Could you guide us throught the added struct members and maybe tell us
+in which order we should start reading the changes to make this easier
+to grok?
 
-F=C3=BCr alle Anfragen, bleibe ich zur Verf=C3=BCgung, um Ihre Fragen zu be=
-antworten.
+Cheers,
 
-Danke, dass Sie mir per E-Mail an Sie von  :   klaus.peterschuster@outlook.=
-de
-
-Mit freundlichen Gr=C3=BC=C3=9Fen.
-
-Peter Schuster
-
-Financial Bank
-https://firstfinancialsa.com/de
+-- 
+Aurélien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
+GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
