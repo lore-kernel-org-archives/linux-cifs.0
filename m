@@ -1,34 +1,28 @@
-From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: Re: [PATCH 0/2] cifs: remove rfc1002 length field from all SMB2 response structures
-Date: Fri, 26 Jan 2018 17:57:50 +0100
-Message-ID: <87vafod0c1.fsf@suse.com>
-References: <20180121220644.7907-1-lsahlber@redhat.com>
+From: =?iso-8859-1?Q?Andr=E9s?= Souto <kai670-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: add .splice_write
+Date: Fri, 26 Jan 2018 19:13:20 +0100
+Message-ID: <20180126181320.hc3sz4hyrfytj5d2@Dell-XPS-L322X>
+References: <20171228132308.5709-1-kai670@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20180121220644.7907-1-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20171228132308.5709-1-kai670-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi Ronnie,
+I want to explain a bit what is the problem this patch solves.
 
-These are dense patches and even though I have an idea of what it is
-supposed to do I'm not familiar enough with the data structures and
-their purpose to evaluate all of this right now (well I've put it aside
-for some time).
+Without it, I always obtain a transfer rate below 9MB/s when writing to a cifs share using splice syscall independently of the buffer size used. However, when reading from the cifs share, I obtain around 105 MB/s.
 
-Could you guide us throught the added struct members and maybe tell us
-in which order we should start reading the changes to make this easier
-to grok?
+After applying the patch, the transfer rate I obtain writing to the cifs share depending on the buffer size is:
 
-Cheers,
-
--- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
-GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+blocksize (kB)| transfer rate (MB/s)
+--------------+----------------------
+           64 | 51.52
+          128 | 65.41
+          256 | 76.64
+          512 | 85.72
+         1024 | 90.21
