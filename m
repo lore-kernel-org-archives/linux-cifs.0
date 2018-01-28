@@ -1,33 +1,28 @@
-From: Achilles Gaikwad <achillesgaikwad-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH] fs/cifs/cifsacl.c Fixes typo in a comment
-Date: Sun, 28 Jan 2018 13:39:48 +0530
-Message-ID: <20180128080948.GA16698@fubar>
+From: Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH stable] cifs: empty TargetInfo leads to crash on recovery
+Date: Sun, 28 Jan 2018 15:43:48 +0100
+Message-ID: <20180128144348.GA19937@kroah.com>
+References: <20180127200741.57298-1-dan@kernelim.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: linux-kernel@vger.kernel.org, Steve French <sfrench@samba.org>,
+        stable@vger.kernel.org, linux-cifs@vger.kernel.org
+To: Dan Aloni <dan@kernelim.com>
+Return-path: <stable-owner@vger.kernel.org>
 Content-Disposition: inline
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+In-Reply-To: <20180127200741.57298-1-dan@kernelim.com>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Signed-off-by: Achilles Gaikwad <achillesgaikwad-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- fs/cifs/cifsacl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Sat, Jan 27, 2018 at 10:07:41PM +0200, Dan Aloni wrote:
+> commit cabfb3680f78 upstream.
 
-diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
-index b98436f5c7c7..13a8a77322c9 100644
---- a/fs/cifs/cifsacl.c
-+++ b/fs/cifs/cifsacl.c
-@@ -1125,7 +1125,7 @@ int set_cifs_acl(struct cifs_ntsd *pnntsd, __u32 acllen,
- 	return rc;
- }
- 
--/* Translate the CIFS ACL (simlar to NTFS ACL) for a file into mode bits */
-+/* Translate the CIFS ACL (similar to NTFS ACL) for a file into mode bits */
- int
- cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
- 		  struct inode *inode, const char *path,
--- 
-2.14.3
+Are you sure?
+$ gsr cabfb3680f78
+cabfb3680f78 ("CIFS: Enable encryption during session setup phase")
+
+Doesn't seem to match up at all here :(
+
+totally confused,
+
+greg k-h
