@@ -1,47 +1,41 @@
-From: =?iso-8859-1?Q?Andr=E9s?= Souto <kai670@gmail.com>
-Subject: Re: Fwd: [PATCH] cifs: add .splice_write
-Date: Mon, 29 Jan 2018 11:47:07 +0100
-Message-ID: <20180129104707.mlqg36xp2am5tfte@Dell-XPS-L322X>
-References: <f29bddaa-62b5-046d-70f9-b809fd41a1d7@kernel.dk>
+From: Kenneth Dsouza <kdsouza-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH v2] update mount.cifs manpage with info about echo_interval option.
+Date: Mon, 29 Jan 2018 22:16:08 +0530
+Message-ID: <CAA_-hQKtvKwC1aKYYhe=gieVj9MXgEms2QDfCMgbeHhFPhiBbw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Jens Axboe <axboe@kernel.dk>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
-To: Steve French <smfrench@gmail.com>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <f29bddaa-62b5-046d-70f9-b809fd41a1d7@kernel.dk>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-I have been trying to reproduce it with a localhost samba and I wasn't
-able to. I also tried adding delays and limiting bandwidth using tc
-with the idea of replicating network delays of a gigabit ethernet
-network but I didn't see a significant difference either.
+Adds information regarding reconnection time.
 
-So I investigate what is the difference between writing to the NAS
-(where I discovered the problem) compared to the samba at localhost and
-I see a completely different behaviour in the amount of data carried
-by each SMB message.
+Signed-off-by: Kenneth D'souza <kdsouza-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ mount.cifs.rst | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
- writing to NAS
- -----------------------------
- read/write 64kB         64kB
- read/write 1MB        1024kB
- splice 64kB            4096B
- splice 64kB (PATCH)     64kB
- splice 1MB (PATCH)    1024kB
+diff --git a/mount.cifs.rst b/mount.cifs.rst
+index 023ff34..3bf30cd 100644
+--- a/mount.cifs.rst
++++ b/mount.cifs.rst
+@@ -385,6 +385,15 @@ mfsymlinks
+   option. Minshall+French symlinks are used even if the server supports
+   the CIFS Unix Extensions.
 
-
- writing to localhost samba
- ---------------------------
- read/write 64kB         1MB
- splice 64kB             1MB
- splice 64kB (PATCH)     1MB
-
-In every case, the server seems to send one ack SMB message for each
-block of data and client doesn't sends new data until the ack is
-received. I suppose this explains why the throughput is ridiculous
-low for the situations when a SMB message carries so little data.
++echo_interval=n
++  sets the interval at which echo requests are sent to the server on an
++  idling connection. This setting also affects the time required for a
++  connection to an unresponsive server to timeout. Here n is the echo
++  interval in seconds. The reconnection happens at twice the value of the
++  echo_interval set for an unresponsive server.
++  If this option is not given then the default value of 60 seconds is used.
++  The minimum tunable value is 1 second and maximum can go up to 600 seconds.
++
+ serverino
+   Use inode numbers (unique persistent file identifiers) returned by the
+   server instead of automatically generating temporary inode numbers on
+-- 
+2.14.3
