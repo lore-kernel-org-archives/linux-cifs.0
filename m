@@ -1,66 +1,49 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v2] update mount.cifs manpage with info about
- echo_interval option.
-Date: Tue, 30 Jan 2018 10:53:49 -0800
-Message-ID: <CAKywueQYnznda6Fh8Jc2X=HPi_+==eKy6OoC-wxAfg6d+QktXA@mail.gmail.com>
-References: <CAA_-hQKtvKwC1aKYYhe=gieVj9MXgEms2QDfCMgbeHhFPhiBbw@mail.gmail.com>
- <CAMcOejVQYB9xC7fQGFQ86=ZcwvL+0HyaiaygdBs1zHpHFGDk0Q@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [LSF/MM TOPIC] Network and Cluster File System topics
+Date: Wed, 31 Jan 2018 15:56:55 -0600
+Message-ID: <CAH2r5mszV4owrEmEEcTH59L1Ac2LqKNz4QAZaCLUN=NUvmnAnw@mail.gmail.com>
+References: <CAH2r5mvZ6S_k-vfkBAZd3t3OB=jYq1+Gm1WB6Hw+xPQsDjhbtA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Kenneth Dsouza <kdsouza-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-        linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "French, Steve" <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: ronnie sahlberg <ronniesahlberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+To: lsf-pc-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org,
+        CIFS <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAMcOejVQYB9xC7fQGFQ86=ZcwvL+0HyaiaygdBs1zHpHFGDk0Q-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CAH2r5mvZ6S_k-vfkBAZd3t3OB=jYq1+Gm1WB6Hw+xPQsDjhbtA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2018-01-30 4:13 GMT-08:00 Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> Acked-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Add progress and requirements in RDMA enablement in fs
+
+And as Ronnie reminded me, File Systems (especially SMB3 smbdirect in
+cifs.ko and NFS but probably others, and there is some interest in
+whether any of that code could be made common for user space servers
+but that may be a topic for a different event) which use RDMA would
+benefit from a discussion of the progress in RDMA enablement in file
+systems (and whether any of the code could/should be made common).
+
+
+
+On Wed, Jan 31, 2018 at 3:22 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> I would like to make sure we have at least a brief discussion of
+> Network and Cluster File System topics (in the past we have discussed
+> how to make delegations/leases more usable, richacl, statx, and a few
+> features that would help Samba server).
 >
-> On Mon, Jan 29, 2018 at 10:16 PM, Kenneth Dsouza <kdsouza-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->> Adds information regarding reconnection time.
->>
->> Signed-off-by: Kenneth D'souza <kdsouza-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->> ---
->>  mount.cifs.rst | 9 +++++++++
->>  1 file changed, 9 insertions(+)
->>
->> diff --git a/mount.cifs.rst b/mount.cifs.rst
->> index 023ff34..3bf30cd 100644
->> --- a/mount.cifs.rst
->> +++ b/mount.cifs.rst
->> @@ -385,6 +385,15 @@ mfsymlinks
->>    option. Minshall+French symlinks are used even if the server supports
->>    the CIFS Unix Extensions.
->>
->> +echo_interval=n
->> +  sets the interval at which echo requests are sent to the server on an
->> +  idling connection. This setting also affects the time required for a
->> +  connection to an unresponsive server to timeout. Here n is the echo
->> +  interval in seconds. The reconnection happens at twice the value of the
->> +  echo_interval set for an unresponsive server.
->> +  If this option is not given then the default value of 60 seconds is used.
->> +  The minimum tunable value is 1 second and maximum can go up to 600 seconds.
->> +
->>  serverino
->>    Use inode numbers (unique persistent file identifiers) returned by the
->>    server instead of automatically generating temporary inode numbers on
->> --
->> 2.14.3
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> I can ask around to others on the Samba team as well for their current
+> fs pain points (since I am one of the few of us who usually attend).
+>
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Thanks,
+>
+> Steve
 
-Thanks. I am going to merge this and other patches within two weeks.
 
---
-Best regards,
-Pavel Shilovsky
+
+-- 
+Thanks,
+
+Steve
