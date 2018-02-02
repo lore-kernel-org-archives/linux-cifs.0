@@ -1,81 +1,49 @@
-From: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: RE: Work in progress SMB-Direct driver for the linux kernel
-Date: Fri, 2 Feb 2018 14:52:42 +0000
-Message-ID: <DM5PR2101MB0886A864F574BDE09CE8A878A0F90@DM5PR2101MB0886.namprd21.prod.outlook.com>
-References: <959c3608-c508-17c4-bad6-fd9421a4a235@samba.org>
- <20180201175247.GT17053@ziepe.ca>
- <CACyXjPyKcLktNqEdBbicSd=3GU7R9BeE-=Dcc2DyCh2sH9wxMg@mail.gmail.com>
- <2f684247-04ec-1c0f-8153-9b6f8d45f265@samba.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        "linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Samba Technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-        Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        David Disseldorp <ddiss-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-To: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        Richard Sharpe <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Jason Gunthorpe <jgg-uk2M96/98Pc@public.gmane.org>
-Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <2f684247-04ec-1c0f-8153-9b6f8d45f265-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Content-Language: en-US
-Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] cifs: silence compiler warnings showing up with gcc-8.0.0
+Date: Fri,  2 Feb 2018 16:48:47 +0100
+Message-ID: <20180202154902.1626750-1-arnd@arndb.de>
+Cc: Martin Sebor <msebor@gcc.gnu.org>, Arnd Bergmann <arnd@arndb.de>,
+        Pavel Shilovsky <pshilov@microsoft.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Aurelien Aptel <aaptel@suse.com>,
+        Long Li <longli@microsoft.com>,
+        Samuel Cabrero <scabrero@suse.de>,
+        Sachin Prabhu <sprabhu@redhat.com>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+To: Steve French <sfrench@samba.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51eC1jaWZzLW93bmVyQHZn
-ZXIua2VybmVsLm9yZyA8bGludXgtY2lmcy1vd25lckB2Z2VyLmtlcm5lbC5vcmc+IE9uDQo+IEJl
-aGFsZiBPZiBTdGVmYW4gTWV0em1hY2hlcg0KPiBTZW50OiBGcmlkYXksIEZlYnJ1YXJ5IDIsIDIw
-MTggNDoyNSBBTQ0KPiBUbzogUmljaGFyZCBTaGFycGUgPHJlYWxyaWNoYXJkc2hhcnBlQGdtYWls
-LmNvbT47IEphc29uIEd1bnRob3JwZQ0KPiA8amdnQHppZXBlLmNhPg0KPiBDYzogbGludXgtY2lm
-c0B2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LXJkbWFAdmdlci5rZXJuZWwub3JnOyBTYW1iYSBUZWNo
-bmljYWwNCj4gPHNhbWJhLXRlY2huaWNhbEBsaXN0cy5zYW1iYS5vcmc+OyBTdGV2ZSBGcmVuY2gg
-PHNtZnJlbmNoQGdtYWlsLmNvbT47DQo+IERhdmlkIERpc3NlbGRvcnAgPGRkaXNzQHNhbWJhLm9y
-Zz4NCj4gU3ViamVjdDogUmU6IFdvcmsgaW4gcHJvZ3Jlc3MgU01CLURpcmVjdCBkcml2ZXIgZm9y
-IHRoZSBsaW51eCBrZXJuZWwNCj4gDQo+IEhpIEphc29uLA0KPiANCj4gPj4+IFRoZSBmaXJzdCBn
-b2FsIGlzIHRvIHByb3ZpZGUgYSBzb2NrZXQgZmQgdG8gdXNlcnNwYWNlIChvciBpbiBrZXJuZWwN
-Cj4gPj4+IGNvbnN1bWVycykNCj4gPj4+IHdoaWNoIHByb3ZpZGVzIHNlbWFudGljcyBsaWtlIGEg
-VENQIHNvY2tldCB3aGljaCBpcyB1c2VkIGFzIHRyYW5zcG9ydA0KPiA+Pj4gZm9yIFNNQjMuIEJh
-c2ljYWxseSBmcmFtZXMgYXJlIHN1Ym1pdHRlZCB3aXRoIGEgNCBieXRlIGxlbmd0aCBoZWFkZXIu
-DQo+ID4+DQo+ID4+IFBhcnQgb2YgdGhlIHBvaW50IG9mIFJETUEgaXMgdGhhdCB3ZSBkb24ndCBu
-ZWVkIHRvIG1ha2UgcHJvdG9jb2wNCj4gPj4gc3BlY2lmaWMga2VybmVsIG1vZHVsZXMgbGlrZSB0
-aGlzIC0gaXMgdGhlcmUgYSBzcGVjaWZpYyByZWFzb24gdGhpcw0KPiA+PiBuZWVkcyB0byBiZSBp
-biB0aGUga2VybmVsIGxpa2UgdGhpcz8NCj4gPg0KPiA+IElmIEkgaGFkIHRvIGd1ZXNzIGl0IHdv
-dWxkIGJlIGJlY2F1c2UgU2FtYmEgY3VycmVudGx5IHVzZXMgYSBmb3JrDQo+ID4gbW9kZWwgLi4u
-IGl0IG1pZ2h0IGJlIHllYXJzIGJlZm9yZSBpdCBnZXRzIHRvIGEgY29tcGxldGVseSB0aHJlYWRl
-ZA0KPiA+IG1vZGVsLg0KPiANCj4gWWVzLCBhbmQgaXQgYWxzbyBtZWFucyB0aGF0IG91ciBjbGll
-bnQgYW5kIHNlcnZlciBjb2RlIG9ubHkgbmVlZA0KPiBtaW5pbWFsIGNoYW5nZXMgaW4gb3JkZXIg
-dG8gd29yayBpbiB0aGUgc2FtZSB3YXkgaXQgd291bGQgd29yaw0KPiBvdmVyIHRjcC4NCj4gDQo+
-IE9ubHkgdGhlIFJETUEgcmVhZCBhbmQgd3JpdGVzIG5lZWQgc29tZSBtb3JlIHdvcmssIGJ1dCBJ
-IGhhdmUNCj4gc29tZSBpZGVhcyB3aGVyZSB0aGUgdXNlcnNwYWNlIGdpdmVzIHRoZSBrZXJuZWwg
-YW4gZmQsIG9mZnNldCBhbmQgbGVuZ3RoDQo+IHBsdXMgYSByZW1vdmUgbWVtb3J5IGRlc2NyaXB0
-b3IgYXMgaW9jdGwgb24gdGhlIGNvbm5lY3Rpb24gZmQuIFRoZW4gdGhlDQo+IGtlcm5lbCBjYW4g
-Z2V0IHRoZSBjb250ZW50IGZyb20gdGhlIGZpbGVzeXN0ZW0gYW5kIGRpcmVjdGx5IHBhc3MgaXQg
-dG8NCj4gdGhlIHJkbWEgYWRhcHRlciwgYXZvaWRpbmcgdGhlIGNvcHkgZnJvbSBrZXJuZWwgdG8g
-dXNlcnNwYWNlIGFuZCBiYWNrLg0KPiBGcm9tIHVzZXJzcGFjZSB3ZSdsbCBqdXN0IHdhaXQgaW4g
-dGhlIHN5c2NhbGwgYW5kIGRvbid0IGhhdmUgdG8gY2FyZQ0KPiBhYm91dCBtZW1vcnkgcmVnaXN0
-cmF0aW9ucyBhbmQgYWxsIG90aGVyIGNvbXBsZXggc3R1ZmYuDQoNCkRvZXNuJ3QgdGhpcyBzb3J0
-IG9mIHRyYW5zcG9ydCBzaGltbWluZyBwdXQgYmFjayBhbGwgdGhlIG92ZXJoZWFkIGl0IHdhcw0K
-dHJ5aW5nIHRvIGF2b2lkPyBTdHJpcHBpbmcgb2ZmIHRoZSA0LWJ5dGUgcmVjb3JkIG1hcmtlciwg
-cmVhcnJhbmdpbmcgdGhlDQpyZWFkL3dyaXRlIGRhdGEgYW5kIFNNQjNfUkVBRCBvcGVyYXRpb24g
-aGVhZGVyIHRvIGFkZCB0aGUgY2hhbm5lbA0KKG1lbW9yeSByZWdpc3RyYXRpb24pIGhhbmRsZXMs
-IGFuZCBtb3N0IGltcG9ydGFudGx5IHBsYWNpbmcgdGhlIGRhdGENCmluIGJvdW5jZSBidWZmZXJz
-IHRvIGFjY29tbW9kYXRlIHRoZSByZWFkdigpL3dyaXRldigpIGNhbGxzIGFyZSBxdWl0ZQ0KY29t
-cGxleCBhbmQgZXhwZW5zaXZlLiBBbmQsIGp1c3QgdG8gcHJlc2VudCBhIGZpbGUgZGVzY3JpcHRv
-cj8gDQoNCkV4cGVyaWVuY2UgaW4gZWFybHkgTkZTL1JETUEgYW5kIFdpbmRvd3MgU29ja2V0cyBE
-aXJlY3QgaGF2ZSB0YXVnaHQNCnRoYXQgdHJhbnNwYXJlbmN5IGFib3ZlIHRoZSBSRE1BIHRyYW5z
-cG9ydCBpbnRlcmZhY2UgaXMgZ2VuZXJhbGx5IHRoZQ0KZW5lbXkgb2YgcGVyZm9ybWFuY2UuIFRo
-ZSBzaGltcyBhcmUgZm9yY2VkIHRvIHBlcmZvcm0gYWRkaXRpb25hbCBzeXNjYWxscywNClJETUEg
-d29yayByZXF1ZXN0cywgYW5kIHNvbWV0aW1lcyBldmVuIG5ldHdvcmsgcm91bmQgdHJpcHMuIERv
-IHlvdQ0KaGF2ZSBwZXJmb3JtYW5jZSByZXN1bHRzIGZvciB5b3Vycz8NCg0KPiBJdCBhbHNvIGhh
-cHBlbnMgdGhhdCBzbWJkIHNvbWV0aW1lcyBibG9ja3MgaW4gc3lzY2FsbHMgbGlrZSB1bmxpbmsg
-Zm9yDQo+IGEgbG9uZyB0aW1lLiBJdCdzIGdvb2QgdG8gaGF2ZSB0aGUga2VybmVsIGFzIDJuZCBl
-bnRpdHkgdGhhdCB0YWtlcyBjYXJlDQo+IG9mIGtlZXBhbGl2ZXMuDQoNCkkgYWdyZWUgdGhhdCBp
-bXBsZW1lbnRpbmcgU01CIERpcmVjdCBpbiB5b3VyIHVzZXJzcGFjZSBTTUIzIGRhZW1vbg0KbWF5
-IGJlIHByb2JsZW1hdGljLiBCdXQgd2hhdCBvZiB0aGUgZXhpc3RpbmcgU01CIERpcmVjdCBjb2Rl
-IGluIHRoZQ0KQ0lGUyBrZXJuZWwgY2xpZW50PyBIb3cgd2lsbCB0aGF0IGNvZXhpc3QgZ29pbmcg
-Zm9yd2FyZD8NCg0KVG9tLg0K
---
-To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+This bug was fixed before, but came up again with the latest
+compiler in another function:
+
+fs/cifs/cifssmb.c: In function 'CIFSSMBSetEA':
+fs/cifs/cifssmb.c:6362:3: error: 'strncpy' offset 8 is out of the bounds [0, 4] [-Werror=array-bounds]
+   strncpy(parm_data->list[0].name, ea_name, name_len);
+
+Let's apply the same fix that was used for the other instances.
+
+Fixes: b2a3ad9ca502 ("cifs: silence compiler warnings showing up with gcc-4.7.0")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ fs/cifs/cifssmb.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 72d71703f1e8..78bc86c315ec 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -6343,9 +6343,7 @@ CIFSSMBSetEA(const unsigned int xid, struct cifs_tcon *tcon,
+ 	pSMB->InformationLevel =
+ 		cpu_to_le16(SMB_SET_FILE_EA);
+ 
+-	parm_data =
+-		(struct fealist *) (((char *) &pSMB->hdr.Protocol) +
+-				       offset);
++	parm_data = (void *)pSMB + offsetof(struct smb_hdr, Protocol) + offset;
+ 	pSMB->ParameterOffset = cpu_to_le16(param_offset);
+ 	pSMB->DataOffset = cpu_to_le16(offset);
+ 	pSMB->SetupCount = 1;
+-- 
+2.9.0
