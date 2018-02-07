@@ -1,45 +1,31 @@
-From: Long Li <longli-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: RE: [SMB3][PATCH] Address the remaining sparse warning in new
- smbdirect code
-Date: Mon, 5 Feb 2018 23:18:37 +0000
-Message-ID: <MWHPR2101MB0729AF4B6F0EECB2615B7F5CCEFE0@MWHPR2101MB0729.namprd21.prod.outlook.com>
-References: <CAH2r5muxQSY7j2vTPttd6R89QBwjMfnynE=19TjnCb5JV+20fQ@mail.gmail.com>
- <CAN05THSCfhRa50tYhJdkKbS7732Bwv=_xc12-ukVZzr0vXCqYw@mail.gmail.com>
+From: ronnie sahlberg <ronniesahlberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH][SMB3] New structs and defines from MS-SMB2
+Date: Wed, 7 Feb 2018 16:44:09 +1000
+Message-ID: <CAN05THTc+3iDwh0gTCUeyFvKRNTHFZ8_rTHyXLW51WM_GKWZtw@mail.gmail.com>
+References: <CAH2r5mtATZn8gTiO0j8wdsPFXjbEFJnVNrTzXq+Yn-i4iRzz4g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="UTF-8"
 Cc: CIFS <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: ronnie sahlberg <ronniesahlberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAN05THSCfhRa50tYhJdkKbS7732Bwv=_xc12-ukVZzr0vXCqYw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Content-Language: en-US
+In-Reply-To: <CAH2r5mtATZn8gTiO0j8wdsPFXjbEFJnVNrTzXq+Yn-i4iRzz4g-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-PiBTdWJqZWN0OiBSZTogW1NNQjNdW1BBVENIXSBBZGRyZXNzIHRoZSByZW1haW5pbmcgc3BhcnNl
-IHdhcm5pbmcgaW4gbmV3DQo+IHNtYmRpcmVjdCBjb2RlDQo+IA0KPiBSZXZpZXdlZC1ieTogUm9u
-bmllIFNhaGxiZXJnIDxsc2FobGJlckByZWRoYXQuY29tPg0KDQpSZXZpZXdlZC1ieTogTG9uZyBM
-aSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+IA0KPiBPbiBTdW4sIEZlYiA0LCAyMDE4IGF0IDEx
-OjUyIEFNLCBTdGV2ZSBGcmVuY2ggPHNtZnJlbmNoQGdtYWlsLmNvbT4NCj4gd3JvdGU6DQo+ID4g
-RXZlbiBpZiBvbmUgb2YgdGhlc2Ugd2FzIGEgc3BhcnNlIGJ1ZyAob3IgYmVpbmcgb3Zlcmx5IHN0
-cmljdCksIGl0IGlzDQo+ID4gd29ydGggZml4aW5nIHRvIHF1aWV0IHRoZSBidWlsZHMgKHdoZW4g
-c21iZGlyZWN0IGlzIGVuYWJsZWQpOg0KPiA+DQo+ID4gaHR0cHM6Ly9uYTAxLnNhZmVsaW5rcy5w
-cm90ZWN0aW9uLm91dGxvb2suY29tLz91cmw9aHR0cHMlM0ElMkYlMkZnaXQucw0KPiA+IGFtYmEu
-b3JnJTJGJTNGcCUzRHNmcmVuY2glMkZjaWZzLQ0KPiAyLjYuZ2l0JTNCYSUzRGNvbW1pdCUzQmgl
-M0QwZTBiN2QyMDljDQo+ID4NCj4gOGZmNTY2MTA2MjliZDBiZjBlZGM1YzRlMWU0MWEyJmRhdGE9
-MDIlN0MwMSU3Q2xvbmdsaSU0MG1pY3Jvc29mdC5jbw0KPiBtJTcNCj4gPg0KPiBDZTI1NDM2M2Fl
-Y2I0NDE2ODI5ODkwOGQ1NmI3YjEzMDYlN0NlZTMzMDNkN2ZiNzM0YjBjODU4OWJjZDg0N2YxYw0K
-PiAyNzclNw0KPiA+DQo+IEMxJTdDMCU3QzYzNjUzMzA5ODcwNTg2NTYxOCZzZGF0YT1JQjF6T0pM
-QmNxQWdKVWVoVjhrR2JPY0p3c2NxdA0KPiBORWx6RDhJDQo+ID4gSjdkNXlwMCUzRCZyZXNlcnZl
-ZD0wDQo+ID4NCj4gPiAtLQ0KPiA+IFRoYW5rcywNCj4gPg0KPiA+IFN0ZXZlDQo+ID4gLS0NCj4g
-PiBUbyB1bnN1YnNjcmliZSBmcm9tIHRoaXMgbGlzdDogc2VuZCB0aGUgbGluZSAidW5zdWJzY3Jp
-YmUgbGludXgtY2lmcyINCj4gPiBpbiB0aGUgYm9keSBvZiBhIG1lc3NhZ2UgdG8gbWFqb3Jkb21v
-QHZnZXIua2VybmVsLm9yZyBNb3JlDQo+IG1ham9yZG9tbw0KPiA+IGluZm8gYXQNCj4gPg0KPiBo
-dHRwczovL25hMDEuc2FmZWxpbmtzLnByb3RlY3Rpb24ub3V0bG9vay5jb20vP3VybD1odHRwJTNB
-JTJGJTJGdmdlci5rDQo+ID4gZXJuZWwub3JnJTJGbWFqb3Jkb21vLQ0KPiBpbmZvLmh0bWwmZGF0
-YT0wMiU3QzAxJTdDbG9uZ2xpJTQwbWljcm9zb2Z0LmNvbSUNCj4gPg0KPiA3Q2UyNTQzNjNhZWNi
-NDQxNjgyOTg5MDhkNTZiN2IxMzA2JTdDZWUzMzAzZDdmYjczNGIwYzg1ODliY2Q4NDdmMQ0KPiBj
-Mjc3JQ0KPiA+DQo+IDdDMSU3QzAlN0M2MzY1MzMwOTg3MDU4NjU2MTgmc2RhdGE9aUJlMGxNV3pJ
-T0ppWk1XSU1ZdGYxaXBUU1R4bQ0KPiA0JTJCbVVQDQo+ID4gdG1tMlJTZzFDNCUzRCZyZXNlcnZl
-ZD0wDQo=
+Reviewed-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+
+On Tue, Feb 6, 2018 at 6:54 AM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> I checking through the structs and defines for the new tcon related
+> features in MS-SMB2 protocol documentation, I also noticed a few
+> missing flags so updated smb2pdu.h to include them.
+>
+> https://git.samba.org/?p=sfrench/cifs-2.6.git;a=commit;h=022bdb0c463ea4df4ab5039b1685fe54b6810a61
+>
+> If you notice any additional missing ones (I focused on the last three
+> revs to MS-SMB2 over the last couple days so might have missed some
+> older ones) or errors, let me know.
+>
+> --
+> Thanks,
+>
+> Steve
