@@ -1,51 +1,65 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT][SMB3] A few small SMB3 fixes
-Date: Fri, 9 Feb 2018 11:41:59 -0600
-Message-ID: <CAH2r5msKkKG-B4RH97NwuBVv3Tb-eaz3fWFs+HjBn3-6WGhpBA@mail.gmail.com>
+Subject: Re: [PATCH][V2] CIFS: SMBD: fix spelling mistake: "faield" and "legnth"
+Date: Fri, 9 Feb 2018 17:57:03 -0600
+Message-ID: <CAH2r5muR7bKGxjQBgjLbrsDPKOLut_j71vTrq-QNKefNhiJB1w@mail.gmail.com>
+References: <20180209121415.564-1-colin.king@canonical.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: CIFS <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+        CIFS <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+        kernel-janitors <kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Colin King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20180209121415.564-1-colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Please pull the following changes since commit
-617aebe6a97efa539cc4b8a52adccd89596e6be0:
+merged into cifs-2.6.git for-next
 
-  Merge tag 'usercopy-v4.16-rc1' of
-git://git.kernel.org/pub/scm/linux/kernel/git/kees/linux (2018-02-03
-16:25:42 -0800)
+On Fri, Feb 9, 2018 at 6:14 AM, Colin King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org> wrote:
+> From: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+>
+> Trivial fix to spelling mistake in log_rdma_send and log_rdma_mr
+> message text.
+>
+> Signed-off-by: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+> ---
+>  fs/cifs/smbdirect.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+> index 91710eb571fb..5aa0b54b32ce 100644
+> --- a/fs/cifs/smbdirect.c
+> +++ b/fs/cifs/smbdirect.c
+> @@ -1025,7 +1025,7 @@ static int smbd_post_send(struct smbd_connection *info,
+>
+>         for (i = 0; i < request->num_sge; i++) {
+>                 log_rdma_send(INFO,
+> -                       "rdma_request sge[%d] addr=%llu legnth=%u\n",
+> +                       "rdma_request sge[%d] addr=%llu length=%u\n",
+>                         i, request->sge[0].addr, request->sge[0].length);
+>                 ib_dma_sync_single_for_device(
+>                         info->id->device,
+> @@ -2295,7 +2295,7 @@ static void smbd_mr_recovery_work(struct work_struct *work)
+>                                 rc = ib_dereg_mr(smbdirect_mr->mr);
+>                                 if (rc) {
+>                                         log_rdma_mr(ERR,
+> -                                               "ib_dereg_mr faield rc=%x\n",
+> +                                               "ib_dereg_mr failed rc=%x\n",
+>                                                 rc);
+>                                         smbd_disconnect_rdma_connection(info);
+>                                 }
+> --
+> 2.15.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-are available in the Git repository at:
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/4.16-minor-rc-SMB3-fixes
-
-for you to fetch changes up to 5f60a56494ea5518376b274dd93b3ceee9a783fb:
-
-  Add missing structs and defines from recent SMB3.1.1 documentation
-(2018-02-07 09:36:46 -0600)
-
-----------------------------------------------------------------
-4.16 minor SMB3 fixes
-
-There are a couple additional security fixes that are still being tested
-that are not in this set.
-
-----------------------------------------------------------------
-Arnd Bergmann (1):
-      cifs: silence compiler warnings showing up with gcc-8.0.0
-
-Steve French (3):
-      Add some missing debug fields in server and tcon structs
-      address lock imbalance warnings in smbdirect.c
-      Add missing structs and defines from recent SMB3.1.1 documentation
-
- fs/cifs/cifs_debug.c |   9 +++-
- fs/cifs/cifssmb.c    |   4 +-
- fs/cifs/smb2pdu.h    | 114 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- fs/cifs/smbdirect.c  |  16 ++++----
- 4 files changed, 130 insertions(+), 13 deletions(-)
 
 -- 
 Thanks,
