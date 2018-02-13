@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 07/14] cifs: update init_sg and crypt_message to take an array of rqst
-Date: Tue, 13 Feb 2018 15:42:27 +1100
-Message-ID: <20180213044234.18364-8-lsahlber@redhat.com>
+Subject: [PATCH 09/14] cifs: add compound_send_recv()
+Date: Tue, 13 Feb 2018 15:42:29 +1100
+Message-ID: <20180213044234.18364-10-lsahlber@redhat.com>
 References: <20180213044234.18364-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -10,117 +10,213 @@ In-Reply-To: <20180213044234.18364-1-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gman
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This is used for SMB3 encryption and compounded requests.
-The first rqst begins with a smb3 transform header as the first iov.
-
 Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/smb2ops.c | 46 ++++++++++++++++++++++++++++++----------------
- 1 file changed, 30 insertions(+), 16 deletions(-)
+ fs/cifs/cifsproto.h |   4 ++
+ fs/cifs/transport.c | 136 ++++++++++++++++++++++++++++++----------------------
+ 2 files changed, 82 insertions(+), 58 deletions(-)
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 23ff4cf3ac88..dd49354a35af 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -2077,29 +2077,42 @@ fill_transform_hdr(struct smb2_transform_hdr *tr_hdr, unsigned int orig_len,
-  * rqst->rq_iov[1+] data to be encrypted/decrypted
-  */
- static struct scatterlist *
--init_sg(struct smb_rqst *rqst, u8 *sign)
-+init_sg(int num_rqst, struct smb_rqst *rqst, u8 *sign)
- {
- 	unsigned int sg_len = rqst->rq_nvec + rqst->rq_npages + 1;
- 	unsigned int assoc_data_len = sizeof(struct smb2_transform_hdr) - 20;
- 	struct scatterlist *sg;
- 	unsigned int i;
- 	unsigned int j;
-+	unsigned int idx = 0;
- 
- 	sg = kmalloc_array(sg_len, sizeof(struct scatterlist), GFP_KERNEL);
- 	if (!sg)
- 		return NULL;
- 
- 	sg_init_table(sg, sg_len);
--	sg_set_buf(&sg[0], rqst->rq_iov[0].iov_base + 20, assoc_data_len);
--	for (i = 1; i < rqst->rq_nvec; i++)
--		sg_set_buf(&sg[i], rqst->rq_iov[i].iov_base,
--						rqst->rq_iov[i].iov_len);
--	for (j = 0; i < sg_len - 1; i++, j++) {
--		unsigned int len = (j < rqst->rq_npages - 1) ? rqst->rq_pagesz
--							: rqst->rq_tailsz;
--		sg_set_page(&sg[i], rqst->rq_pages[j], len, 0);
--	}
--	sg_set_buf(&sg[sg_len - 1], sign, SMB2_SIGNATURE_SIZE);
-+	for (i = 0; i < num_rqst; i++) {
-+		/* the first rqst has a transform header where the first 20
-+		 * bytes are not part of the encrypted blob
-+		 */
-+		if (i == 0)
-+			sg_set_buf(&sg[idx++], rqst[i].rq_iov[i].iov_base + 20,
-+				   assoc_data_len);
-+		else
-+			sg_set_buf(&sg[idx++], rqst[i].rq_iov[i].iov_base,
-+				   rqst[i].rq_iov[0].iov_len);
-+
-+		for (j = 1; j < rqst[i].rq_nvec; j++)
-+			sg_set_buf(&sg[idx++], rqst[i].rq_iov[j].iov_base,
-+				   rqst[i].rq_iov[j].iov_len);
-+
-+		for (j = 0; j < rqst[i].rq_npages; j++) {
-+			unsigned int len = (j < rqst[i].rq_npages - 1) ?
-+				rqst[i].rq_pagesz : rqst[i].rq_tailsz;
-+			sg_set_page(&sg[idx++], rqst[i].rq_pages[j], len, 0);
-+		}
-+	}
-+	sg_set_buf(&sg[idx], sign, SMB2_SIGNATURE_SIZE);
- 	return sg;
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 4143c9dec463..c1d049aa6a75 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -87,6 +87,10 @@ extern int cifs_call_async(struct TCP_Server_Info *server,
+ extern int cifs_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 			  struct smb_rqst *rqst, int *resp_buf_type,
+ 			  const int flags, struct kvec *resp_iov);
++extern int compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
++			      const int flags, const int num_rqst,
++			      struct smb_rqst *rqst, int *resp_buf_type,
++			      struct kvec *resp_iov);
+ extern int SendReceive(const unsigned int /* xid */ , struct cifs_ses *,
+ 			struct smb_hdr * /* input */ ,
+ 			struct smb_hdr * /* out */ ,
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 6f3733380e41..d810d4af33ad 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -707,20 +707,22 @@ cifs_setup_request(struct cifs_ses *ses, struct smb_rqst *rqst)
  }
  
-@@ -2131,7 +2144,8 @@ smb2_get_enc_key(struct TCP_Server_Info *server, __u64 ses_id, int enc, u8 *key)
-  * untouched.
-  */
- static int
--crypt_message(struct TCP_Server_Info *server, struct smb_rqst *rqst, int enc)
-+crypt_message(struct TCP_Server_Info *server, int num_rqst,
-+	      struct smb_rqst *rqst, int enc)
+ int
+-cifs_send_recv(const unsigned int xid, struct cifs_ses *ses,
+-	       struct smb_rqst *rqst, int *resp_buf_type, const int flags,
+-	       struct kvec *resp_iov)
++compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
++		   const int flags, const int num_rqst, struct smb_rqst *rqst,
++		   int *resp_buf_type, struct kvec *resp_iov)
  {
- 	struct smb2_transform_hdr *tr_hdr =
- 			(struct smb2_transform_hdr *)rqst->rq_iov[0].iov_base;
-@@ -2185,7 +2199,7 @@ crypt_message(struct TCP_Server_Info *server, struct smb_rqst *rqst, int enc)
- 		crypt_len += SMB2_SIGNATURE_SIZE;
+-	int rc = 0;
++	int i, rc = 0;
+ 	int timeout, optype;
+-	struct mid_q_entry *midQ;
++	struct mid_q_entry *midQ[MAX_COMPOUND];
+ 	unsigned int credits = 1;
+ 	char *buf;
+ 
++	/* FIXME fix sequence_number and credits */
+ 	timeout = flags & CIFS_TIMEOUT_MASK;
+ 	optype = flags & CIFS_OP_MASK;
+ 
+-	*resp_buf_type = CIFS_NO_BUFFER;  /* no response buf yet */
++	for (i = 0; i < num_rqst; i++)
++		resp_buf_type[i] = CIFS_NO_BUFFER;  /* no response buf yet */
+ 
+ 	if ((ses == NULL) || (ses->server == NULL)) {
+ 		cifs_dbg(VFS, "Null session\n");
+@@ -747,83 +749,101 @@ cifs_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 
+ 	mutex_lock(&ses->server->srv_mutex);
+ 
+-	midQ = ses->server->ops->setup_request(ses, rqst);
+-	if (IS_ERR(midQ)) {
+-		mutex_unlock(&ses->server->srv_mutex);
+-		/* Update # of requests on wire to server */
+-		add_credits(ses->server, 1, optype);
+-		return PTR_ERR(midQ);
++	for (i = 0; i < num_rqst; i++) {
++		midQ[i] = ses->server->ops->setup_request(ses, &rqst[i]);
++		if (IS_ERR(midQ[i])) {
++			mutex_unlock(&ses->server->srv_mutex);
++			/* Update # of requests on wire to server */
++			add_credits(ses->server, 1, optype);
++			return PTR_ERR(midQ[i]);
++		}
++
++		midQ[i]->mid_state = MID_REQUEST_SUBMITTED;
  	}
  
--	sg = init_sg(rqst, sign);
-+	sg = init_sg(num_rqst, rqst, sign);
- 	if (!sg) {
- 		cifs_dbg(VFS, "%s: Failed to init sg", __func__);
- 		rc = -ENOMEM;
-@@ -2269,7 +2283,7 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, int num_rqst,
- 	new_rq->rq_iov = iov;
- 	new_rq->rq_nvec = old_rq->rq_nvec + 1;
+-	midQ->mid_state = MID_REQUEST_SUBMITTED;
+ 	cifs_in_send_inc(ses->server);
+-	rc = smb_send_rqst(ses->server, 1, rqst, flags);
++	rc = smb_send_rqst(ses->server, num_rqst, rqst, flags);
+ 	cifs_in_send_dec(ses->server);
+-	cifs_save_when_sent(midQ);
  
--	/* fill the 2nd iov with a transform header */
-+	/* fill the 1st iov with a transform header */
- 	fill_transform_hdr(tr_hdr, orig_len, old_rq);
- 	new_rq->rq_iov[0].iov_base = tr_hdr;
- 	new_rq->rq_iov[0].iov_len = sizeof(struct smb2_transform_hdr);
-@@ -2285,7 +2299,7 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, int num_rqst,
- 		kunmap(old_rq->rq_pages[i]);
- 	}
+-	if (rc < 0)
+-		ses->server->sequence_number -= 2;
+-	mutex_unlock(&ses->server->srv_mutex);
++	for (i = 0; i < num_rqst; i++) {
++		cifs_save_when_sent(midQ[i]);
  
--	rc = crypt_message(server, new_rq, 1);
-+	rc = crypt_message(server, num_rqst, new_rq, 1);
- 	cifs_dbg(FYI, "encrypt message returned %d", rc);
- 	if (rc)
- 		goto err_free_iov;
-@@ -2349,7 +2363,7 @@ decrypt_raw_data(struct TCP_Server_Info *server, char *buf,
- 	rqst.rq_pagesz = PAGE_SIZE;
- 	rqst.rq_tailsz = (page_data_size % PAGE_SIZE) ? : PAGE_SIZE;
+-	if (rc < 0)
+-		goto out;
++		if (rc < 0)
++			ses->server->sequence_number -= 2;
++		mutex_unlock(&ses->server->srv_mutex);
  
--	rc = crypt_message(server, &rqst, 0);
-+	rc = crypt_message(server, 1, &rqst, 0);
- 	cifs_dbg(FYI, "decrypt message returned %d\n", rc);
+-	if (timeout == CIFS_ASYNC_OP)
+-		goto out;
++		if (rc < 0)
++			goto out;
  
- 	if (rc)
+-	rc = wait_for_response(ses->server, midQ);
+-	if (rc != 0) {
+-		cifs_dbg(FYI, "Cancelling wait for mid %llu\n",	midQ->mid);
+-		send_cancel(ses->server, rqst, midQ);
+-		spin_lock(&GlobalMid_Lock);
+-		if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
+-			midQ->mid_flags |= MID_WAIT_CANCELLED;
+-			midQ->callback = DeleteMidQEntry;
++		if (timeout == CIFS_ASYNC_OP)
++			goto out;
++
++		rc = wait_for_response(ses->server, midQ[i]);
++		if (rc != 0) {
++			cifs_dbg(FYI, "Cancelling wait for mid %llu\n",
++				 midQ[i]->mid);
++			send_cancel(ses->server, &rqst[i], midQ[i]);
++			spin_lock(&GlobalMid_Lock);
++			if (midQ[i]->mid_state == MID_REQUEST_SUBMITTED) {
++				midQ[i]->mid_flags |= MID_WAIT_CANCELLED;
++				midQ[i]->callback = DeleteMidQEntry;
++				spin_unlock(&GlobalMid_Lock);
++				add_credits(ses->server, 1, optype);
++				return rc;
++			}
+ 			spin_unlock(&GlobalMid_Lock);
++		}
++
++		rc = cifs_sync_mid_result(midQ[i], ses->server);
++		if (rc != 0) {
+ 			add_credits(ses->server, 1, optype);
+ 			return rc;
+ 		}
+-		spin_unlock(&GlobalMid_Lock);
+-	}
+ 
+-	rc = cifs_sync_mid_result(midQ, ses->server);
+-	if (rc != 0) {
+-		add_credits(ses->server, 1, optype);
+-		return rc;
+-	}
+-
+-	if (!midQ->resp_buf || midQ->mid_state != MID_RESPONSE_RECEIVED) {
+-		rc = -EIO;
+-		cifs_dbg(FYI, "Bad MID state?\n");
+-		goto out;
+-	}
++		if (!midQ[i]->resp_buf ||
++		    midQ[i]->mid_state != MID_RESPONSE_RECEIVED) {
++			rc = -EIO;
++			cifs_dbg(FYI, "Bad MID state?\n");
++			goto out;
++		}
+ 
+-	buf = (char *)midQ->resp_buf;
+-	resp_iov->iov_base = buf;
+-	resp_iov->iov_len = ses->server->total_size +
+-		ses->server->vals->header_preamble_size;
++		buf = (char *)midQ[i]->resp_buf;
++		resp_iov[i].iov_base = buf;
++		resp_iov[i].iov_len = ses->server->total_size +
++			ses->server->vals->header_preamble_size;
+ 
+-	if (midQ->large_buf)
+-		*resp_buf_type = CIFS_LARGE_BUFFER;
+-	else
+-		*resp_buf_type = CIFS_SMALL_BUFFER;
++		if (midQ[i]->large_buf)
++			resp_buf_type[i] = CIFS_LARGE_BUFFER;
++		else
++			resp_buf_type[i] = CIFS_SMALL_BUFFER;
+ 
+-	credits = ses->server->ops->get_credits(midQ);
++		credits = ses->server->ops->get_credits(midQ[i]);
+ 
+-	rc = ses->server->ops->check_receive(midQ, ses->server,
+-					     flags & CIFS_LOG_ERROR);
++		rc = ses->server->ops->check_receive(midQ[i], ses->server,
++						     flags & CIFS_LOG_ERROR);
+ 
+-	/* mark it so buf will not be freed by cifs_delete_mid */
+-	if ((flags & CIFS_NO_RESP) == 0)
+-		midQ->resp_buf = NULL;
++		/* mark it so buf will not be freed by cifs_delete_mid */
++		if ((flags & CIFS_NO_RESP) == 0)
++			midQ[i]->resp_buf = NULL;
++	}
+ out:
+-	cifs_delete_mid(midQ);
++	for (i = 0; i < num_rqst; i++)
++		cifs_delete_mid(midQ[i]);
+ 	add_credits(ses->server, credits, optype);
+ 
+ 	return rc;
+ }
+ 
+ int
++cifs_send_recv(const unsigned int xid, struct cifs_ses *ses,
++	       struct smb_rqst *rqst, int *resp_buf_type, const int flags,
++	       struct kvec *resp_iov)
++{
++	return compound_send_recv(xid, ses, flags, 1, rqst, resp_buf_type,
++				  resp_iov);
++}
++
++int
+ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+ 	     struct kvec *iov, int n_vec, int *resp_buf_type /* ret */,
+ 	     const int flags, struct kvec *resp_iov)
 -- 
 2.13.3
