@@ -1,49 +1,60 @@
-From: Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH stable] cifs: empty TargetInfo leads to crash on recovery
-Date: Tue, 13 Feb 2018 16:38:13 +0100
-Message-ID: <20180213153813.GA5919@kroah.com>
-References: <20180127200741.57298-1-dan@kernelim.com>
- <20180128144348.GA19937@kroah.com>
- <20180128145220.GA47771@gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 10/14] cifs: fix memory leak in SMB2_open()
+Date: Tue, 13 Feb 2018 16:10:48 -0600
+Message-ID: <CAH2r5muqS3szwdXW054uE5vOCOSKoOOnXBHvptT=SWm+p6_6XQ@mail.gmail.com>
+References: <20180213044234.18364-1-lsahlber@redhat.com> <20180213044234.18364-11-lsahlber@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, Steve French <sfrench@samba.org>,
-        stable@vger.kernel.org, linux-cifs@vger.kernel.org
-To: Dan Aloni <dan@kernelim.com>
-Return-path: <stable-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180128145220.GA47771@gmail.com>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20180213044234.18364-11-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, Jan 28, 2018 at 04:52:20PM +0200, Dan Aloni wrote:
-> On Sun, Jan 28, 2018 at 03:43:48PM +0100, Greg KH wrote:
-> > On Sat, Jan 27, 2018 at 10:07:41PM +0200, Dan Aloni wrote:
-> > > commit cabfb3680f78 upstream.
-> > 
-> > Are you sure?
-> > $ gsr cabfb3680f78
-> > cabfb3680f78 ("CIFS: Enable encryption during session setup phase")
-> > 
-> > Doesn't seem to match up at all here :(
-> 
-> That's only because it fixed the issue unknownly, accordingly to
-> git-bisectings I've done. Should I have not added 'commit <githash>
-> upstream.' in that case? stable_kernel_rules.txt is not so clear
-> about it.
+merged into cifs-2.6.git for-next and added cc:stable
 
-I need the git commit id of the patch that is in Linus's tree in order
-to apply it to the stable tress.  And the text and comments and change
-needs to match.  To have a different subject would be really confusing.
+On Mon, Feb 12, 2018 at 10:42 PM, Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/smb2pdu.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index ac6b1d8d0c88..511c441c6b4f 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -1773,8 +1773,10 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
+>                 rc = alloc_path_with_tree_prefix(&copy_path, &copy_size,
+>                                                  &name_len,
+>                                                  tcon->treeName, path);
+> -               if (rc)
+> +               if (rc) {
+> +                       cifs_small_buf_release(req);
+>                         return rc;
+> +               }
+>                 req->NameLength = cpu_to_le16(name_len * 2);
+>                 uni_path_len = copy_size;
+>                 path = copy_path;
+> @@ -1785,8 +1787,10 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
+>                 if (uni_path_len % 8 != 0) {
+>                         copy_size = roundup(uni_path_len, 8);
+>                         copy_path = kzalloc(copy_size, GFP_KERNEL);
+> -                       if (!copy_path)
+> +                       if (!copy_path) {
+> +                               cifs_small_buf_release(req);
+>                                 return -ENOMEM;
+> +                       }
+>                         memcpy((char *)copy_path, (const char *)path,
+>                                uni_path_len);
+>                         uni_path_len = copy_size;
+> --
+> 2.13.3
+>
 
-You can put a note in the changelog body that says
 
-[note this fixes issue x and y - myname]
 
-which is what some people do.
+-- 
+Thanks,
 
-Care to fix this up and resend?
-
-thanks,
-
-greg k-h
+Steve
