@@ -1,67 +1,132 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH][V2] CIFS: SMBD: fix spelling mistake: "faield" and "legnth"
-Date: Fri, 9 Feb 2018 17:57:03 -0600
-Message-ID: <CAH2r5muR7bKGxjQBgjLbrsDPKOLut_j71vTrq-QNKefNhiJB1w@mail.gmail.com>
-References: <20180209121415.564-1-colin.king@canonical.com>
+From: Pavel Shilovskiy <pshilov-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Subject: =?utf-8?B?UkU6IFJFOiBSZTog562U5aSNOiBSZTogW1BBVENIXSBtYW5wYWdlOiB1cGRh?=
+ =?utf-8?B?dGVtb3VudC5jaWZzIG1hbnBhZ2Ugd2l0aCBpbmZvIGFib3V0aW5jb21wbGV0?=
+ =?utf-8?Q?e_options?=
+Date: Tue, 13 Feb 2018 02:18:59 +0000
+Message-ID: <DM5PR2101MB09362C40A49814A3258C67FAB6F60@DM5PR2101MB0936.namprd21.prod.outlook.com>
+References: 201801151650046392624@zte.com.cn,DM5PR2101MB0936F8C919B485B6AF8ED3E8B6EA0@DM5PR2101MB0936.namprd21.prod.outlook.com
+ <201802130955105901242@zte.com.cn>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-        CIFS <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-        kernel-janitors <kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Colin King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org" <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: "zhang.xianwei8-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org" <zhang.xianwei8-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>,
+        "jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org" <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20180209121415.564-1-colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+In-Reply-To: <201802130955105901242-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-merged into cifs-2.6.git for-next
-
-On Fri, Feb 9, 2018 at 6:14 AM, Colin King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org> wrote:
-> From: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
->
-> Trivial fix to spelling mistake in log_rdma_send and log_rdma_mr
-> message text.
->
-> Signed-off-by: Colin Ian King <colin.king-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
-> ---
->  fs/cifs/smbdirect.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-> index 91710eb571fb..5aa0b54b32ce 100644
-> --- a/fs/cifs/smbdirect.c
-> +++ b/fs/cifs/smbdirect.c
-> @@ -1025,7 +1025,7 @@ static int smbd_post_send(struct smbd_connection *info,
->
->         for (i = 0; i < request->num_sge; i++) {
->                 log_rdma_send(INFO,
-> -                       "rdma_request sge[%d] addr=%llu legnth=%u\n",
-> +                       "rdma_request sge[%d] addr=%llu length=%u\n",
->                         i, request->sge[0].addr, request->sge[0].length);
->                 ib_dma_sync_single_for_device(
->                         info->id->device,
-> @@ -2295,7 +2295,7 @@ static void smbd_mr_recovery_work(struct work_struct *work)
->                                 rc = ib_dereg_mr(smbdirect_mr->mr);
->                                 if (rc) {
->                                         log_rdma_mr(ERR,
-> -                                               "ib_dereg_mr faield rc=%x\n",
-> +                                               "ib_dereg_mr failed rc=%x\n",
->                                                 rc);
->                                         smbd_disconnect_rdma_connection(info);
->                                 }
-> --
-> 2.15.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Thanks,
-
-Steve
+SGkgWmhhbmcsDQoNCllvdXIgcGF0Y2ggaGFzIGFscmVhZHkgYmVlbiBtZXJnZWQgaW50byAibmV4
+dCIgYnJhbmNoOg0KaHR0cHM6Ly9naXQuc2FtYmEub3JnLz9wPWNpZnMtdXRpbHMuZ2l0O2E9c2hv
+cnRsb2c7aD1yZWZzL2hlYWRzL25leHQNCg0KQmVzdCByZWdhcmRzLA0KUGF2ZWwgU2hpbG92c2t5
+DQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiB6aGFuZy54aWFud2VpOEB6dGUu
+Y29tLmNuIDx6aGFuZy54aWFud2VpOEB6dGUuY29tLmNuPiANClNlbnQ6IE1vbmRheSwgRmVicnVh
+cnkgMTIsIDIwMTggNTo1NSBQTQ0KVG86IFBhdmVsIFNoaWxvdnNraXkgPHBzaGlsb3ZAbWljcm9z
+b2Z0LmNvbT47IGpsYXl0b25Ac2FtYmEub3JnDQpDYzogc21mcmVuY2hAZ21haWwuY29tOyBsaW51
+eC1jaWZzQHZnZXIua2VybmVsLm9yZw0KU3ViamVjdDog562U5aSNOiBSRTogUmU6IOetlOWkjTog
+UmU6IFtQQVRDSF0gbWFucGFnZTogdXBkYXRlbW91bnQuY2lmcyBtYW5wYWdlIHdpdGggaW5mbyBh
+Ym91dGluY29tcGxldGUgb3B0aW9ucw0KDQpIaSBKZWZmLA0KICAgIFdoZW4gd291bGQgdGhlIHBh
+dGNoIGJlIG1lcmdlZD8gVGhhbmtzOikNCg0KDQpCZXN0IHJlZ2FyZHMsDQpaaGFuZyBYaWFud2Vp
+DQoNCi0tLS0tLS0tLS0tLS0tLS0tLeWOn+Wni+mCruS7ti0tLS0tLS0tLS0tLS0tLS0tLQ0K5Y+R
+5Lu25Lq677yaUGF2ZWxTaGlsb3Zza2l5IDxwc2hpbG92QG1pY3Jvc29mdC5jb20+DQrmlLbku7bk
+urrvvJrlvKDotKTkvJ8xMDEyOTk2NjtqbGF5dG9uQHNhbWJhLm9yZyA8amxheXRvbkBzYW1iYS5v
+cmc+DQrmioTpgIHkurrvvJpzbWZyZW5jaEBnbWFpbC5jb20gPHNtZnJlbmNoQGdtYWlsLmNvbT5s
+aW51eC1jaWZzQHZnZXIua2VybmVsLm9yZyA8bGludXgtY2lmc0B2Z2VyLmtlcm5lbC5vcmc+DQrm
+l6Ug5pyfIO+8mjIwMTjlubQwMeaciDE35pelIDAxOjU0DQrkuLsg6aKYIO+8mlJFOiBSZTog562U
+5aSNOiBSZTogW1BBVENIXSBtYW5wYWdlOiB1cGRhdGVtb3VudC5jaWZzIG1hbnBhZ2Ugd2l0aCBp
+bmZvIGFib3V0aW5jb21wbGV0ZSBvcHRpb25zIEhpIFpoYW5nLA0KDQpJIGFtIGV4cGVjdGluZyB0
+byByZWxlYXNlIHRoZSBuZXh0IHN0YWJsZSB2ZXJzaW9uIGluIDMtNCB3ZWVrcy4NCg0KQmVzdCBy
+ZWdhcmRzLA0KUGF2ZWwgU2hpbG92c2tpeQ0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0K
+RnJvbTogemhhbmcueGlhbndlaThAenRlLmNvbS5jbiBbbWFpbHRvOnpoYW5nLnhpYW53ZWk4QHp0
+ZS5jb20uY25dDQpTZW50OiBNb25kYXksIEphbnVhcnkgMTUsIDIwMTggMTI6NTAgQU0NClRvOiBq
+bGF5dG9uQHNhbWJhLm9yZw0KQ2M6IHNtZnJlbmNoQGdtYWlsLmNvbTsgbGludXgtY2lmc0B2Z2Vy
+Lmtlcm5lbC5vcmc7IFBhdmVsIFNoaWxvdnNraXkgPHBzaGlsb3ZAbWljcm9zb2Z0LmNvbT4NClN1
+YmplY3Q6IOetlOWkjTogUmU6IOetlOWkjTogUmU6IFtQQVRDSF0gbWFucGFnZTogdXBkYXRlbW91
+bnQuY2lmcyBtYW5wYWdlIHdpdGggaW5mbyBhYm91dGluY29tcGxldGUgb3B0aW9ucw0KDQpUaGFu
+a3MuDQpCeSB0aGUgd2F5LCB3aGVuIHdpbGwgdGhlIG5leHQgc3RhYmxlIHZlcnNpb24gYmUgcmVs
+ZWFzZWQ/DQoNCg0KLS0tLS0tLS0tLS0tLS0tLS0t5Y6f5aeL6YKu5Lu2LS0tLS0tLS0tLS0tLS0t
+LS0tDQrlj5Hku7bkurrvvJogPGpsYXl0b25Ac2FtYmEub3JnPjsNCuaUtuS7tuS6uu+8muW8oOi0
+pOS8nzEwMTI5OTY2OyA8c21mcmVuY2hAZ21haWwuY29tPjsNCuaKhOmAgeS6uu+8miA8bGludXgt
+Y2lmc0B2Z2VyLmtlcm5lbC5vcmc+OyA8cHNoaWxvdkBtaWNyb3NvZnQuY29tPjsNCuaXpSDmnJ8g
+77yaMjAxOOW5tDAx5pyIMDLml6UgMjM6NTYNCuS4uyDpopgg77yaUmU6IOetlOWkjTogUmU6IFtQ
+QVRDSF0gbWFucGFnZTogdXBkYXRlbW91bnQuY2lmcyBtYW5wYWdlIHdpdGggaW5mbyBhYm91dGlu
+Y29tcGxldGUgb3B0aW9ucyBZZXMsIHdlJ2xsIGJlIG1lcmdpbmcgaXQgLS0gdGhhbmsgeW91IQ0K
+DQpJJ20gaW4gdGhlIHByb2Nlc3Mgb2YgaGFuZGluZyBvZmYgY2lmcy11dGlscyBtYWludGFpbmVy
+c2hpcCB0byBQYXZlbCwgYW5kIGhlJ3Mgd29ya2luZyBvbiBnZXR0aW5nIGhpcyBhY2NvdW50IHNl
+dCB1cCBjb3JyZWN0bHkuIE9uY2UgdGhhdCdzIGRvbmUsIHdlJ2xsIG1lcmdlIHRoaXMgcGF0Y2gg
+c29vbiBhZnRlcndhcmQuDQoNCi0tIEplZmYNCg0KT24gVHVlLCAyMDE4LTAxLTAyIGF0IDE4OjE3
+ICswODAwLCB6aGFuZy54aWFud2VpOEB6dGUuY29tLmNuIHdyb3RlOg0KPiBTbywgY291bGQgbWVy
+Z2UgdGhlIHBhdGNoPw0KPg0KPg0KPg0KPiAtLS0tLS0tLS0tLS0tLS0tLS3ljp/lp4vpgq7ku7Yt
+LS0tLS0tLS0tLS0tLS0tLS0NCj4g5Y+R5Lu25Lq677yaIDxzbWZyZW5jaEBnbWFpbC5jb20+Ow0K
+PiDmlLbku7bkurrvvJogPGpsYXl0b25Ac2FtYmEub3JnPjsNCj4g5oqE6YCB5Lq677ya5byg6LSk
+5LyfMTAxMjk5NjY7IDxsaW51eC1jaWZzQHZnZXIua2VybmVsLm9yZz47DQo+IOaXpSDmnJ8g77ya
+MjAxN+W5tDEy5pyIMDjml6UgMjI6MzANCj4g5Li7IOmimCDvvJpSZTogW1BBVENIXSBtYW5wYWdl
+OiB1cGRhdGUgbW91bnQuY2lmcyBtYW5wYWdlIHdpdGggaW5mbyANCj4gYWJvdXRpbmNvbXBsZXRl
+IG9wdGlvbnMNCj4gPiBBbnlvbmUgaGF2ZSB0aG91Z2h0cyBvbiB0aGlzPw0KPg0KPiBNeSByZWFj
+dGlvbiBpcyB0aGF0IGl0IGlzIG1vcmUgd29yayB0byByZW1vdmUgdGhlIGFsaWFzZXMsIGFuZCBu
+b3QgDQo+IGxpa2VseSB0byBpbXByb3ZlIHVzYWJpbGl0eSBpbiB0aGlzIGNhc2UgdG8gcmVtb3Zl
+IHRoZSBhbGlhcyAtIHNvIA0KPiBiZXR0ZXIgdG8gbGVhdmUgdGhlIGFsaWFzZXMgaW4uDQo+DQo+
+DQo+IE9uIEZyaSwgRGVjIDgsIDIwMTcgYXQgODowMyBBTSwgSmVmZiBMYXl0b24gPGpsYXl0b25A
+c2FtYmEub3JnPiB3cm90ZToNCj4gPiBPbiBGcmksIDIwMTctMTItMDggYXQgMTU6MTEgKzA4MDAs
+IHpoYW5nLnhpYW53ZWk4QHp0ZS5jb20uY24gd3JvdGU6DQo+ID4gPiBUaGlzIGNvbW1pdCBhMWYz
+YWNkNDBiMjY1ZjEzNGE5N2E3MzlhNjg5OGIzOTU4ZDIwNmI5IG1vZGlmaWVkIA0KPiA+ID4gbW91
+bnQgcGFyYW1ldGVycywgYnV0IG5vdCB1cGRhdGVkIG1vdW50LmNpZnMgbWFucGFnZS4gRml4IGl0
+Lg0KPiA+ID4NCj4gPiA+IFNpZ25lZC1vZmYtYnk6IFpoYW5nIFhpYW53ZWkgPHpoYW5nLnhpYW53
+ZWk4QHp0ZS5jb20uY24+DQo+ID4gPiAtLS0NCj4gPiA+IG1vdW50LmNpZnMucnN0IHwgMTAgKysr
+KystLS0tLQ0KPiA+ID4gMSBmaWxlIGNoYW5nZWQsIDUgaW5zZXJ0aW9ucygrKSwgNSBkZWxldGlv
+bnMoLSkNCj4gPiA+DQo+ID4gPiBkaWZmIC0tZ2l0IGEvbW91bnQuY2lmcy5yc3QgYi9tb3VudC5j
+aWZzLnJzdCBpbmRleA0KPiA+ID4gMDIzZmYzNC4uYTQ0NDViOCAxMDA2NDQNCj4gPiA+IC0tLSBh
+L21vdW50LmNpZnMucnN0DQo+ID4gPiArKysgYi9tb3VudC5jaWZzLnJzdA0KPiA+ID4gQEAgLTQ4
+LDcgKzQ4LDcgQEAgT1BUSU9OUw0KPiA+ID4gKioqKioqKg0KPiA+ID4NCj4gPiA+DQo+ID4gPiAt
+dXNlcm5hbWU9YXJnDQo+ID4gPiArdXNlcm5hbWU9YXJnfHVzZXI9YXJnDQo+ID4gPiBzcGVjaWZp
+ZXMgdGhlIHVzZXJuYW1lIHRvIGNvbm5lY3QgYXMuIElmIHRoaXMgaXMgbm90IGdpdmVuLCB0aGVu
+IA0KPiA+ID4gdGhlIGVudmlyb25tZW50IHZhcmlhYmxlIFVTRVIgaXMgdXNlZC4NCj4gPiA+DQo+
+ID4gPiBAQCAtNjQsNyArNjQsNyBAQCB1c2VybmFtZT1hcmcNCj4gPiA+IG5vbi1zdXBlcnVzZXIg
+bW91bnQuIEl0IGlzIHRoZXJlZm9yZSByZWNvbW1lbmRlZCB0byB1c2UgdGhlIGZ1bGwgDQo+ID4g
+PiBgYHVzZXJuYW1lPWBgIG9wdGlvbiBuYW1lLg0KPiA+ID4NCj4gPiA+IC1wYXNzd29yZD1hcmcN
+Cj4gPiA+ICtwYXNzd29yZD1hcmd8cGFzcz1hcmcNCj4gPiA+IHNwZWNpZmllcyB0aGUgQ0lGUyBw
+YXNzd29yZC4gSWYgdGhpcyBvcHRpb24gaXMgbm90IGdpdmVuIHRoZW4gdGhlIA0KPiA+ID4gZW52
+aXJvbm1lbnQgdmFyaWFibGUgUEFTU1dEIGlzIHVzZWQuIElmIHRoZSBwYXNzd29yZCBpcyBub3Qg
+DQo+ID4gPiBzcGVjaWZpZWQgZGlyZWN0bHkgb3IgaW5kaXJlY3RseSB2aWEgYW4gYXJndW1lbnQg
+dG8gbW91bnQsIA0KPiA+ID4gbW91bnQuY2lmcyB3aWxsIEBAIC03Niw3ICs3Niw3IEBAIHBhc3N3
+b3JkPWFyZyB2YXJpYWJsZSBvciB2aWEgYSANCj4gPiA+IGNyZWRlbnRpYWxzIGZpbGUgKHNlZSBi
+ZWxvdykgb3IgZW50ZXJlZCBhdCB0aGUgcGFzc3dvcmQgcHJvbXB0IA0KPiA+ID4gd2lsbCBiZSBy
+ZWFkIGNvcnJlY3RseS4NCj4gPiA+DQo+ID4gPiAtY3JlZGVudGlhbHM9ZmlsZW5hbWUNCj4gPiA+
+ICtjcmVkZW50aWFscz1maWxlbmFtZXxjcmVkPWZpbGVuYW1lDQo+ID4gPiBzcGVjaWZpZXMgYSBm
+aWxlIHRoYXQgY29udGFpbnMgYSB1c2VybmFtZSBhbmQvb3IgcGFzc3dvcmQgYW5kIA0KPiA+ID4g
+b3B0aW9uYWxseSB0aGUgbmFtZSBvZiB0aGUgd29ya2dyb3VwLiBUaGUgZm9ybWF0IG9mIHRoZSBm
+aWxlIGlzOjoNCj4gPiA+DQo+ID4gPiBAQCAtMTU5LDEyICsxNTksMTIgQEAgZGlyX21vZGU9YXJn
+IElmIHRoZSBzZXJ2ZXIgZG9lcyBub3Qgc3VwcG9ydCANCj4gPiA+IHRoZSBDSUZTIFVuaXggZXh0
+ZW5zaW9ucyB0aGlzIG92ZXJyaWRlcyB0aGUgZGVmYXVsdCBtb2RlIGZvciANCj4gPiA+IGRpcmVj
+dG9yaWVzLg0KPiA+ID4NCj4gPiA+IC1pcD1hcmcNCj4gPiA+ICtpcD1hcmd8YWRkcj1hcmcNCj4g
+PiA+IHNldHMgdGhlIGRlc3RpbmF0aW9uIElQIGFkZHJlc3MuIFRoaXMgb3B0aW9uIGlzIHNldCBh
+dXRvbWF0aWNhbGx5IA0KPiA+ID4gaWYgdGhlIHNlcnZlciBuYW1lIHBvcnRpb24gb2YgdGhlIHJl
+cXVlc3RlZCBVTkMgbmFtZSBjYW4gYmUgDQo+ID4gPiByZXNvbHZlZCBzbyByYXJlbHkgbmVlZHMg
+dG8gYmUgc3BlY2lmaWVkIGJ5IHRoZSB1c2VyLg0KPiA+ID4NCj4gPiA+IC1kb21haW49YXJnDQo+
+ID4gPiArZG9tYWluPWFyZ3xkb209YXJnfHdvcmtncm91cD1hcmcNCj4gPiA+IHNldHMgdGhlIGRv
+bWFpbiAod29ya2dyb3VwKSBvZiB0aGUgdXNlci4NCj4gPiA+DQo+ID4gPiBndWVzdA0KPiA+DQo+
+ID4gSG9uZXN0bHksIEknZCByZWFsbHkgcHJlZmVyIHRvIG1vdmUgdGhpcyBpbiB0aGUgb3RoZXIg
+ZGlyZWN0aW9uIGFuZCANCj4gPiBoYXZlIHRoZSBrZXJuZWwvdXNlcmxhbmQgcHJvZ3JhbXMgc3Rv
+cCBhY2NlcHRpbmcgc29tZSBvZiB0aGVzZSANCj4gPiBhbGlhc2VzLiBUaGV5IGRvbid0IGFkZCBh
+bnl0aGluZyB0byB1c2FiaWxpdHkgYW5kIHRoZXkgYXJlIGEgDQo+ID4gbG9uZy10ZXJtIG1haW50
+ZW5hbmNlIGJ1cmRlbi4NCj4gPg0KPiA+IFdlJ2QgcHJvYmFibHkgbmVlZCBhIDItMyByZWxlYXNl
+cyB3aGVyZSB3ZSBhY2NlcHQgdGhlIGFsaWFzZXMgYW5kIA0KPiA+IHRocm93IGEgd2FybmluZyB3
+aGVuIHNvbWVvbmUgdHJpZXMgdG8gdXNlIHRoZW0uIFRoZW4gd2UgY2FuIGp1c3QgcmlwIA0KPiA+
+IG91dCBzdXBwb3J0IGZvciB0aGVtLg0KPiA+DQo+ID4gVGhhdCBzYWlkLCBpZiB0aGUgY29uc2Vu
+c3VzIGlzIHRvIGtlZXAgdGhlIGFsaWFzZXMgaW4sIHRoZW4gSSdsbCANCj4gPiBqdXN0IHBsYW4g
+dG8gbWVyZ2UgdGhpcyBwYXRjaC4NCj4gPg0KPiA+IEFueW9uZSBoYXZlIHRob3VnaHRzIG9uIHRo
+aXM/DQo+ID4gLS0NCj4gPiBKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+DQo+ID4gLS0N
+Cj4gPiBUbyB1bnN1YnNjcmliZSBmcm9tIHRoaXMgbGlzdDogc2VuZCB0aGUgbGluZSAidW5zdWJz
+Y3JpYmUgDQo+ID4gbGludXgtY2lmcyIgaW4gdGhlIGJvZHkgb2YgYSBtZXNzYWdlIHRvIG1ham9y
+ZG9tb0B2Z2VyLmtlcm5lbC5vcmcgDQo+ID4gTW9yZSBtYWpvcmRvbW8gaW5mbyBhdCANCj4gPiBo
+dHRwczovL25hMDEuc2FmZWxpbmtzLnByb3RlY3Rpb24ub3V0bG9vay5jb20vP3VybD1odHRwJTNB
+JTJGJTJGdmdlcg0KPiA+IC5rZXJuZWwub3JnJTJGbWFqb3Jkb21vLWluZm8uaHRtbCZkYXRhPTAy
+JTdDMDElN0Nwc2hpbG92JTQwbWljcm9zb2Z0DQo+ID4gLmNvbSU3QzUzNzExZTJhOGQ2NTQxYjg0
+NjU0MDhkNTViZjUwZGY1JTdDNzJmOTg4YmY4NmYxNDFhZjkxYWIyZDdjZDANCj4gPiAxMWRiNDcl
+N0MxJTdDMCU3QzYzNjUxNjAzMDQyNzQ3NzgzMCZzZGF0YT1ibjV3ME45R2ZnZ09oUXhoS0E5U0ky
+VzZYNw0KPiA+IDlEV25XeUVhdmVmZUpDcDdBJTNEJnJlc2VydmVkPTANCj4NCj4NCj4NCj4gLS0N
+Cj4gVGhhbmtzLA0KPg0KPiBTdGV2ZQ0KDQotLQ0KSmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEu
+b3JnPg0K
