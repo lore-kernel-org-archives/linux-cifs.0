@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 06/14] cifs: make smb_send_rqst() take an array of requests
-Date: Tue, 13 Feb 2018 15:42:26 +1100
-Message-ID: <20180213044234.18364-7-lsahlber@redhat.com>
+Subject: [PATCH 12/14] cifs: add SMB2_close_init()/SMB2_close_free()
+Date: Tue, 13 Feb 2018 15:42:32 +1100
+Message-ID: <20180213044234.18364-13-lsahlber@redhat.com>
 References: <20180213044234.18364-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -10,184 +10,115 @@ In-Reply-To: <20180213044234.18364-1-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gman
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Update free_transform_rq to take an array of requests.
-Only the first request has a transform header which needs to be freed.
-
 Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsglob.h  |  6 +++---
- fs/cifs/smb2ops.c   | 37 +++++++++++++++++++++----------------
- fs/cifs/transport.c | 22 ++++++++++++++--------
- 3 files changed, 38 insertions(+), 27 deletions(-)
+ fs/cifs/smb2pdu.c   | 48 ++++++++++++++++++++++++++++++++++--------------
+ fs/cifs/smb2proto.h |  3 +++
+ 2 files changed, 37 insertions(+), 14 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 51d0d29dceed..a5ffcaf4b144 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -440,10 +440,10 @@ struct smb_version_operations {
- 	long (*fallocate)(struct file *, struct cifs_tcon *, int, loff_t,
- 			  loff_t);
- 	/* init transform request - used for encryption for now */
--	int (*init_transform_rq)(struct TCP_Server_Info *, struct smb_rqst *,
--				 struct smb_rqst *);
-+	int (*init_transform_rq)(struct TCP_Server_Info *, int num_rqst,
-+				 struct smb_rqst *, struct smb_rqst *);
- 	/* free transform request */
--	void (*free_transform_rq)(struct smb_rqst *);
-+	void (*free_transform_rq)(int num_rqst, struct smb_rqst *);
- 	int (*is_transform_hdr)(void *buf);
- 	int (*receive_transform)(struct TCP_Server_Info *,
- 				 struct mid_q_entry **);
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index be1cb6aaa19c..23ff4cf3ac88 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -2222,9 +2222,10 @@ crypt_message(struct TCP_Server_Info *server, struct smb_rqst *rqst, int enc)
- 	return rc;
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index f264d7605351..bd1ccfb10ec6 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -2079,44 +2079,63 @@ SMB2_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
  }
  
-+/* Encrypt all the requests but only add a transform header to the first */
- static int
--smb3_init_transform_rq(struct TCP_Server_Info *server, struct smb_rqst *new_rq,
--		       struct smb_rqst *old_rq)
-+smb3_init_transform_rq(struct TCP_Server_Info *server, int num_rqst,
-+		       struct smb_rqst *new_rq, struct smb_rqst *old_rq)
- {
- 	struct kvec *iov;
- 	struct page **pages;
-@@ -2234,9 +2235,13 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, struct smb_rqst *new_rq,
- 	int i;
- 	int rc = -ENOMEM;
- 
-+	tr_hdr = kmalloc(sizeof(struct smb2_transform_hdr), GFP_KERNEL);
-+	if (!tr_hdr)
+ int
++SMB2_close_init(struct cifs_tcon *tcon, struct smb_rqst *rqst,
++		u64 persistent_fid, u64 volatile_fid)
++{
++	struct smb2_close_req *req;
++	struct kvec *iov = rqst->rq_iov;
++	unsigned int total_len;
++	int rc;
++
++	rc = smb2_plain_req_init(SMB2_CLOSE, tcon, (void **) &req, &total_len);
++	if (rc)
 +		return rc;
 +
- 	pages = kmalloc_array(npages, sizeof(struct page *), GFP_KERNEL);
- 	if (!pages)
--		return rc;
-+		goto err_free_tr_hdr;
- 
- 	new_rq->rq_pages = pages;
- 	new_rq->rq_npages = old_rq->rq_npages;
-@@ -2264,10 +2269,6 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, struct smb_rqst *new_rq,
- 	new_rq->rq_iov = iov;
- 	new_rq->rq_nvec = old_rq->rq_nvec + 1;
- 
--	tr_hdr = kmalloc(sizeof(struct smb2_transform_hdr), GFP_KERNEL);
--	if (!tr_hdr)
--		goto err_free_iov;
--
- 	/* fill the 2nd iov with a transform header */
- 	fill_transform_hdr(tr_hdr, orig_len, old_rq);
- 	new_rq->rq_iov[0].iov_base = tr_hdr;
-@@ -2287,32 +2288,36 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, struct smb_rqst *new_rq,
- 	rc = crypt_message(server, new_rq, 1);
- 	cifs_dbg(FYI, "encrypt message returned %d", rc);
- 	if (rc)
--		goto err_free_tr_hdr;
-+		goto err_free_iov;
- 
- 	return rc;
- 
--err_free_tr_hdr:
--	kfree(tr_hdr);
- err_free_iov:
- 	kfree(iov);
- err_free_pages:
- 	for (i = i - 1; i >= 0; i--)
- 		put_page(pages[i]);
- 	kfree(pages);
-+err_free_tr_hdr:
-+	kfree(tr_hdr);
- 	return rc;
- }
- 
-+/* Only the first request has a transform header */
- static void
--smb3_free_transform_rq(struct smb_rqst *rqst)
-+smb3_free_transform_rq(int num_rqst, struct smb_rqst *rqst)
++	req->PersistentFileId = persistent_fid;
++	req->VolatileFileId = volatile_fid;
++
++	iov[0].iov_base = (char *)req;
++	iov[0].iov_len = total_len;
++
++	return 0;
++}
++
++void
++SMB2_close_free(struct smb_rqst *rqst) {
++	cifs_small_buf_release(rqst->rq_iov[0].iov_base); /* request */
++}
++
++int
+ SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
+ 	   u64 persistent_fid, u64 volatile_fid)
  {
--	int i = rqst->rq_npages - 1;
-+	int i, j;
+ 	struct smb_rqst rqst;
+-	struct smb2_close_req *req;
+-	struct smb2_close_rsp *rsp;
++	struct smb2_close_rsp *rsp = NULL;
+ 	struct cifs_ses *ses = tcon->ses;
+ 	struct kvec iov[1];
+ 	struct kvec rsp_iov;
+ 	int resp_buftype;
+ 	int rc = 0;
+ 	int flags = 0;
+-	unsigned int total_len;
  
--	for (; i >= 0; i--)
--		put_page(rqst->rq_pages[i]);
--	kfree(rqst->rq_pages);
- 	/* free transform header */
- 	kfree(rqst->rq_iov[0].iov_base);
--	kfree(rqst->rq_iov);
-+
-+	for (i = 0; i < num_rqst; i++) {
-+		for (j = rqst[i].rq_npages - 1; j >= 0; j--)
-+			put_page(rqst[i].rq_pages[j]);
-+		kfree(rqst[i].rq_pages);
-+		kfree(rqst[i].rq_iov);
-+	}
- }
+ 	cifs_dbg(FYI, "Close\n");
  
- static int
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index b2af2341f6b8..6f3733380e41 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -327,14 +327,20 @@ __smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
- 	return rc;
- }
- 
-+#define MAX_COMPOUND 5
-+
- static int
--smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst, int flags)
-+smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
-+	      struct smb_rqst *rqst, int flags)
- {
--	struct smb_rqst cur_rqst;
-+	struct smb_rqst cur_rqst[MAX_COMPOUND];
- 	int rc;
- 
-+	if (num_rqst > MAX_COMPOUND)
-+		return -ENOMEM;
-+
- 	if (!(flags & CIFS_TRANSFORM_REQ))
--		return __smb_send_rqst(server, 1, rqst);
-+		return __smb_send_rqst(server, num_rqst, rqst);
- 
- 	if (!server->ops->init_transform_rq ||
- 	    !server->ops->free_transform_rq) {
-@@ -342,12 +348,12 @@ smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst, int flags)
+ 	if (!ses || !(ses->server))
  		return -EIO;
- 	}
  
--	rc = server->ops->init_transform_rq(server, &cur_rqst, rqst);
-+	rc = server->ops->init_transform_rq(server, num_rqst, cur_rqst, rqst);
- 	if (rc)
- 		return rc;
+-	rc = smb2_plain_req_init(SMB2_CLOSE, tcon, (void **) &req, &total_len);
+-	if (rc)
+-		return rc;
+-
+ 	if (encryption_required(tcon))
+ 		flags |= CIFS_TRANSFORM_REQ;
  
--	rc = __smb_send_rqst(server, 1, &cur_rqst);
--	server->ops->free_transform_rq(&cur_rqst);
-+	rc = __smb_send_rqst(server, num_rqst, cur_rqst);
-+	server->ops->free_transform_rq(num_rqst, cur_rqst);
+-	req->PersistentFileId = persistent_fid;
+-	req->VolatileFileId = volatile_fid;
+-
+-	iov[0].iov_base = (char *)req;
+-	iov[0].iov_len = total_len;
+-
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
++	memset(&iov, 0, sizeof(iov));
+ 	rqst.rq_iov = iov;
+ 	rqst.rq_nvec = 1;
+ 
++	rc = SMB2_close_init(tcon, &rqst, persistent_fid, volatile_fid);
++	if (rc)
++		goto close_exit;
++
+ 	rc = cifs_send_recv(xid, ses, &rqst, &resp_buftype, flags, &rsp_iov);
+-	cifs_small_buf_release(req);
+ 	rsp = (struct smb2_close_rsp *)rsp_iov.iov_base;
+ 
+ 	if (rc != 0) {
+@@ -2127,6 +2146,7 @@ SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
+ 	/* BB FIXME - decode close response, update inode for caching */
+ 
+ close_exit:
++	SMB2_close_free(&rqst);
+ 	free_rsp_buf(resp_buftype, rsp);
  	return rc;
  }
- 
-@@ -561,7 +567,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
- 	 */
- 	cifs_save_when_sent(mid);
- 	cifs_in_send_inc(server);
--	rc = smb_send_rqst(server, rqst, flags);
-+	rc = smb_send_rqst(server, 1, rqst, flags);
- 	cifs_in_send_dec(server);
- 
- 	if (rc < 0) {
-@@ -751,7 +757,7 @@ cifs_send_recv(const unsigned int xid, struct cifs_ses *ses,
- 
- 	midQ->mid_state = MID_REQUEST_SUBMITTED;
- 	cifs_in_send_inc(ses->server);
--	rc = smb_send_rqst(ses->server, rqst, flags);
-+	rc = smb_send_rqst(ses->server, 1, rqst, flags);
- 	cifs_in_send_dec(ses->server);
- 	cifs_save_when_sent(midQ);
- 
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index 06151df3c316..f31b9f3d060a 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -135,6 +135,9 @@ extern int SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon,
+ 		     char **out_data, u32 *plen /* returned data len */);
+ extern int SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
+ 		      u64 persistent_file_id, u64 volatile_file_id);
++extern int SMB2_close_init(struct cifs_tcon *tcon, struct smb_rqst *rqst,
++		      u64 persistent_file_id, u64 volatile_file_id);
++extern void SMB2_close_free(struct smb_rqst *rqst);
+ extern int SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon,
+ 		      u64 persistent_file_id, u64 volatile_file_id);
+ extern int SMB2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
 -- 
 2.13.3
