@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 09/14] cifs: add compound_send_recv()
-Date: Tue, 13 Feb 2018 15:42:29 +1100
-Message-ID: <20180213044234.18364-10-lsahlber@redhat.com>
+Subject: [PATCH 06/14] cifs: make smb_send_rqst() take an array of requests
+Date: Tue, 13 Feb 2018 15:42:26 +1100
+Message-ID: <20180213044234.18364-7-lsahlber@redhat.com>
 References: <20180213044234.18364-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -10,213 +10,184 @@ In-Reply-To: <20180213044234.18364-1-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gman
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+Update free_transform_rq to take an array of requests.
+Only the first request has a transform header which needs to be freed.
+
 Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsproto.h |   4 ++
- fs/cifs/transport.c | 136 ++++++++++++++++++++++++++++++----------------------
- 2 files changed, 82 insertions(+), 58 deletions(-)
+ fs/cifs/cifsglob.h  |  6 +++---
+ fs/cifs/smb2ops.c   | 37 +++++++++++++++++++++----------------
+ fs/cifs/transport.c | 22 ++++++++++++++--------
+ 3 files changed, 38 insertions(+), 27 deletions(-)
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 4143c9dec463..c1d049aa6a75 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -87,6 +87,10 @@ extern int cifs_call_async(struct TCP_Server_Info *server,
- extern int cifs_send_recv(const unsigned int xid, struct cifs_ses *ses,
- 			  struct smb_rqst *rqst, int *resp_buf_type,
- 			  const int flags, struct kvec *resp_iov);
-+extern int compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
-+			      const int flags, const int num_rqst,
-+			      struct smb_rqst *rqst, int *resp_buf_type,
-+			      struct kvec *resp_iov);
- extern int SendReceive(const unsigned int /* xid */ , struct cifs_ses *,
- 			struct smb_hdr * /* input */ ,
- 			struct smb_hdr * /* out */ ,
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 6f3733380e41..d810d4af33ad 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -707,20 +707,22 @@ cifs_setup_request(struct cifs_ses *ses, struct smb_rqst *rqst)
- }
- 
- int
--cifs_send_recv(const unsigned int xid, struct cifs_ses *ses,
--	       struct smb_rqst *rqst, int *resp_buf_type, const int flags,
--	       struct kvec *resp_iov)
-+compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
-+		   const int flags, const int num_rqst, struct smb_rqst *rqst,
-+		   int *resp_buf_type, struct kvec *resp_iov)
- {
--	int rc = 0;
-+	int i, rc = 0;
- 	int timeout, optype;
--	struct mid_q_entry *midQ;
-+	struct mid_q_entry *midQ[MAX_COMPOUND];
- 	unsigned int credits = 1;
- 	char *buf;
- 
-+	/* FIXME fix sequence_number and credits */
- 	timeout = flags & CIFS_TIMEOUT_MASK;
- 	optype = flags & CIFS_OP_MASK;
- 
--	*resp_buf_type = CIFS_NO_BUFFER;  /* no response buf yet */
-+	for (i = 0; i < num_rqst; i++)
-+		resp_buf_type[i] = CIFS_NO_BUFFER;  /* no response buf yet */
- 
- 	if ((ses == NULL) || (ses->server == NULL)) {
- 		cifs_dbg(VFS, "Null session\n");
-@@ -747,83 +749,101 @@ cifs_send_recv(const unsigned int xid, struct cifs_ses *ses,
- 
- 	mutex_lock(&ses->server->srv_mutex);
- 
--	midQ = ses->server->ops->setup_request(ses, rqst);
--	if (IS_ERR(midQ)) {
--		mutex_unlock(&ses->server->srv_mutex);
--		/* Update # of requests on wire to server */
--		add_credits(ses->server, 1, optype);
--		return PTR_ERR(midQ);
-+	for (i = 0; i < num_rqst; i++) {
-+		midQ[i] = ses->server->ops->setup_request(ses, &rqst[i]);
-+		if (IS_ERR(midQ[i])) {
-+			mutex_unlock(&ses->server->srv_mutex);
-+			/* Update # of requests on wire to server */
-+			add_credits(ses->server, 1, optype);
-+			return PTR_ERR(midQ[i]);
-+		}
-+
-+		midQ[i]->mid_state = MID_REQUEST_SUBMITTED;
- 	}
- 
--	midQ->mid_state = MID_REQUEST_SUBMITTED;
- 	cifs_in_send_inc(ses->server);
--	rc = smb_send_rqst(ses->server, 1, rqst, flags);
-+	rc = smb_send_rqst(ses->server, num_rqst, rqst, flags);
- 	cifs_in_send_dec(ses->server);
--	cifs_save_when_sent(midQ);
- 
--	if (rc < 0)
--		ses->server->sequence_number -= 2;
--	mutex_unlock(&ses->server->srv_mutex);
-+	for (i = 0; i < num_rqst; i++) {
-+		cifs_save_when_sent(midQ[i]);
- 
--	if (rc < 0)
--		goto out;
-+		if (rc < 0)
-+			ses->server->sequence_number -= 2;
-+		mutex_unlock(&ses->server->srv_mutex);
- 
--	if (timeout == CIFS_ASYNC_OP)
--		goto out;
-+		if (rc < 0)
-+			goto out;
- 
--	rc = wait_for_response(ses->server, midQ);
--	if (rc != 0) {
--		cifs_dbg(FYI, "Cancelling wait for mid %llu\n",	midQ->mid);
--		send_cancel(ses->server, rqst, midQ);
--		spin_lock(&GlobalMid_Lock);
--		if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
--			midQ->mid_flags |= MID_WAIT_CANCELLED;
--			midQ->callback = DeleteMidQEntry;
-+		if (timeout == CIFS_ASYNC_OP)
-+			goto out;
-+
-+		rc = wait_for_response(ses->server, midQ[i]);
-+		if (rc != 0) {
-+			cifs_dbg(FYI, "Cancelling wait for mid %llu\n",
-+				 midQ[i]->mid);
-+			send_cancel(ses->server, &rqst[i], midQ[i]);
-+			spin_lock(&GlobalMid_Lock);
-+			if (midQ[i]->mid_state == MID_REQUEST_SUBMITTED) {
-+				midQ[i]->mid_flags |= MID_WAIT_CANCELLED;
-+				midQ[i]->callback = DeleteMidQEntry;
-+				spin_unlock(&GlobalMid_Lock);
-+				add_credits(ses->server, 1, optype);
-+				return rc;
-+			}
- 			spin_unlock(&GlobalMid_Lock);
-+		}
-+
-+		rc = cifs_sync_mid_result(midQ[i], ses->server);
-+		if (rc != 0) {
- 			add_credits(ses->server, 1, optype);
- 			return rc;
- 		}
--		spin_unlock(&GlobalMid_Lock);
--	}
- 
--	rc = cifs_sync_mid_result(midQ, ses->server);
--	if (rc != 0) {
--		add_credits(ses->server, 1, optype);
--		return rc;
--	}
--
--	if (!midQ->resp_buf || midQ->mid_state != MID_RESPONSE_RECEIVED) {
--		rc = -EIO;
--		cifs_dbg(FYI, "Bad MID state?\n");
--		goto out;
--	}
-+		if (!midQ[i]->resp_buf ||
-+		    midQ[i]->mid_state != MID_RESPONSE_RECEIVED) {
-+			rc = -EIO;
-+			cifs_dbg(FYI, "Bad MID state?\n");
-+			goto out;
-+		}
- 
--	buf = (char *)midQ->resp_buf;
--	resp_iov->iov_base = buf;
--	resp_iov->iov_len = ses->server->total_size +
--		ses->server->vals->header_preamble_size;
-+		buf = (char *)midQ[i]->resp_buf;
-+		resp_iov[i].iov_base = buf;
-+		resp_iov[i].iov_len = ses->server->total_size +
-+			ses->server->vals->header_preamble_size;
- 
--	if (midQ->large_buf)
--		*resp_buf_type = CIFS_LARGE_BUFFER;
--	else
--		*resp_buf_type = CIFS_SMALL_BUFFER;
-+		if (midQ[i]->large_buf)
-+			resp_buf_type[i] = CIFS_LARGE_BUFFER;
-+		else
-+			resp_buf_type[i] = CIFS_SMALL_BUFFER;
- 
--	credits = ses->server->ops->get_credits(midQ);
-+		credits = ses->server->ops->get_credits(midQ[i]);
- 
--	rc = ses->server->ops->check_receive(midQ, ses->server,
--					     flags & CIFS_LOG_ERROR);
-+		rc = ses->server->ops->check_receive(midQ[i], ses->server,
-+						     flags & CIFS_LOG_ERROR);
- 
--	/* mark it so buf will not be freed by cifs_delete_mid */
--	if ((flags & CIFS_NO_RESP) == 0)
--		midQ->resp_buf = NULL;
-+		/* mark it so buf will not be freed by cifs_delete_mid */
-+		if ((flags & CIFS_NO_RESP) == 0)
-+			midQ[i]->resp_buf = NULL;
-+	}
- out:
--	cifs_delete_mid(midQ);
-+	for (i = 0; i < num_rqst; i++)
-+		cifs_delete_mid(midQ[i]);
- 	add_credits(ses->server, credits, optype);
- 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 51d0d29dceed..a5ffcaf4b144 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -440,10 +440,10 @@ struct smb_version_operations {
+ 	long (*fallocate)(struct file *, struct cifs_tcon *, int, loff_t,
+ 			  loff_t);
+ 	/* init transform request - used for encryption for now */
+-	int (*init_transform_rq)(struct TCP_Server_Info *, struct smb_rqst *,
+-				 struct smb_rqst *);
++	int (*init_transform_rq)(struct TCP_Server_Info *, int num_rqst,
++				 struct smb_rqst *, struct smb_rqst *);
+ 	/* free transform request */
+-	void (*free_transform_rq)(struct smb_rqst *);
++	void (*free_transform_rq)(int num_rqst, struct smb_rqst *);
+ 	int (*is_transform_hdr)(void *buf);
+ 	int (*receive_transform)(struct TCP_Server_Info *,
+ 				 struct mid_q_entry **);
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index be1cb6aaa19c..23ff4cf3ac88 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -2222,9 +2222,10 @@ crypt_message(struct TCP_Server_Info *server, struct smb_rqst *rqst, int enc)
  	return rc;
  }
  
- int
-+cifs_send_recv(const unsigned int xid, struct cifs_ses *ses,
-+	       struct smb_rqst *rqst, int *resp_buf_type, const int flags,
-+	       struct kvec *resp_iov)
-+{
-+	return compound_send_recv(xid, ses, flags, 1, rqst, resp_buf_type,
-+				  resp_iov);
-+}
++/* Encrypt all the requests but only add a transform header to the first */
+ static int
+-smb3_init_transform_rq(struct TCP_Server_Info *server, struct smb_rqst *new_rq,
+-		       struct smb_rqst *old_rq)
++smb3_init_transform_rq(struct TCP_Server_Info *server, int num_rqst,
++		       struct smb_rqst *new_rq, struct smb_rqst *old_rq)
+ {
+ 	struct kvec *iov;
+ 	struct page **pages;
+@@ -2234,9 +2235,13 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, struct smb_rqst *new_rq,
+ 	int i;
+ 	int rc = -ENOMEM;
+ 
++	tr_hdr = kmalloc(sizeof(struct smb2_transform_hdr), GFP_KERNEL);
++	if (!tr_hdr)
++		return rc;
 +
-+int
- SendReceive2(const unsigned int xid, struct cifs_ses *ses,
- 	     struct kvec *iov, int n_vec, int *resp_buf_type /* ret */,
- 	     const int flags, struct kvec *resp_iov)
+ 	pages = kmalloc_array(npages, sizeof(struct page *), GFP_KERNEL);
+ 	if (!pages)
+-		return rc;
++		goto err_free_tr_hdr;
+ 
+ 	new_rq->rq_pages = pages;
+ 	new_rq->rq_npages = old_rq->rq_npages;
+@@ -2264,10 +2269,6 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, struct smb_rqst *new_rq,
+ 	new_rq->rq_iov = iov;
+ 	new_rq->rq_nvec = old_rq->rq_nvec + 1;
+ 
+-	tr_hdr = kmalloc(sizeof(struct smb2_transform_hdr), GFP_KERNEL);
+-	if (!tr_hdr)
+-		goto err_free_iov;
+-
+ 	/* fill the 2nd iov with a transform header */
+ 	fill_transform_hdr(tr_hdr, orig_len, old_rq);
+ 	new_rq->rq_iov[0].iov_base = tr_hdr;
+@@ -2287,32 +2288,36 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, struct smb_rqst *new_rq,
+ 	rc = crypt_message(server, new_rq, 1);
+ 	cifs_dbg(FYI, "encrypt message returned %d", rc);
+ 	if (rc)
+-		goto err_free_tr_hdr;
++		goto err_free_iov;
+ 
+ 	return rc;
+ 
+-err_free_tr_hdr:
+-	kfree(tr_hdr);
+ err_free_iov:
+ 	kfree(iov);
+ err_free_pages:
+ 	for (i = i - 1; i >= 0; i--)
+ 		put_page(pages[i]);
+ 	kfree(pages);
++err_free_tr_hdr:
++	kfree(tr_hdr);
+ 	return rc;
+ }
+ 
++/* Only the first request has a transform header */
+ static void
+-smb3_free_transform_rq(struct smb_rqst *rqst)
++smb3_free_transform_rq(int num_rqst, struct smb_rqst *rqst)
+ {
+-	int i = rqst->rq_npages - 1;
++	int i, j;
+ 
+-	for (; i >= 0; i--)
+-		put_page(rqst->rq_pages[i]);
+-	kfree(rqst->rq_pages);
+ 	/* free transform header */
+ 	kfree(rqst->rq_iov[0].iov_base);
+-	kfree(rqst->rq_iov);
++
++	for (i = 0; i < num_rqst; i++) {
++		for (j = rqst[i].rq_npages - 1; j >= 0; j--)
++			put_page(rqst[i].rq_pages[j]);
++		kfree(rqst[i].rq_pages);
++		kfree(rqst[i].rq_iov);
++	}
+ }
+ 
+ static int
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index b2af2341f6b8..6f3733380e41 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -327,14 +327,20 @@ __smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
+ 	return rc;
+ }
+ 
++#define MAX_COMPOUND 5
++
+ static int
+-smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst, int flags)
++smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
++	      struct smb_rqst *rqst, int flags)
+ {
+-	struct smb_rqst cur_rqst;
++	struct smb_rqst cur_rqst[MAX_COMPOUND];
+ 	int rc;
+ 
++	if (num_rqst > MAX_COMPOUND)
++		return -ENOMEM;
++
+ 	if (!(flags & CIFS_TRANSFORM_REQ))
+-		return __smb_send_rqst(server, 1, rqst);
++		return __smb_send_rqst(server, num_rqst, rqst);
+ 
+ 	if (!server->ops->init_transform_rq ||
+ 	    !server->ops->free_transform_rq) {
+@@ -342,12 +348,12 @@ smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst, int flags)
+ 		return -EIO;
+ 	}
+ 
+-	rc = server->ops->init_transform_rq(server, &cur_rqst, rqst);
++	rc = server->ops->init_transform_rq(server, num_rqst, cur_rqst, rqst);
+ 	if (rc)
+ 		return rc;
+ 
+-	rc = __smb_send_rqst(server, 1, &cur_rqst);
+-	server->ops->free_transform_rq(&cur_rqst);
++	rc = __smb_send_rqst(server, num_rqst, cur_rqst);
++	server->ops->free_transform_rq(num_rqst, cur_rqst);
+ 	return rc;
+ }
+ 
+@@ -561,7 +567,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
+ 	 */
+ 	cifs_save_when_sent(mid);
+ 	cifs_in_send_inc(server);
+-	rc = smb_send_rqst(server, rqst, flags);
++	rc = smb_send_rqst(server, 1, rqst, flags);
+ 	cifs_in_send_dec(server);
+ 
+ 	if (rc < 0) {
+@@ -751,7 +757,7 @@ cifs_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 
+ 	midQ->mid_state = MID_REQUEST_SUBMITTED;
+ 	cifs_in_send_inc(ses->server);
+-	rc = smb_send_rqst(ses->server, rqst, flags);
++	rc = smb_send_rqst(ses->server, 1, rqst, flags);
+ 	cifs_in_send_dec(ses->server);
+ 	cifs_save_when_sent(midQ);
+ 
 -- 
 2.13.3
