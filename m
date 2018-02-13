@@ -1,7 +1,7 @@
 From: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 13/14] cifs: add SMB2_query_info_[init|free]()
-Date: Tue, 13 Feb 2018 15:42:33 +1100
-Message-ID: <20180213044234.18364-14-lsahlber@redhat.com>
+Subject: [PATCH 07/14] cifs: update init_sg and crypt_message to take an array of rqst
+Date: Tue, 13 Feb 2018 15:42:27 +1100
+Message-ID: <20180213044234.18364-8-lsahlber@redhat.com>
 References: <20180213044234.18364-1-lsahlber@redhat.com>
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -10,142 +10,117 @@ In-Reply-To: <20180213044234.18364-1-lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gman
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+This is used for SMB3 encryption and compounded requests.
+The first rqst begins with a smb3 transform header as the first iov.
+
 Signed-off-by: Ronnie Sahlberg <lsahlber-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c   | 70 +++++++++++++++++++++++++++++++++++------------------
- fs/cifs/smb2proto.h |  5 ++++
- 2 files changed, 52 insertions(+), 23 deletions(-)
+ fs/cifs/smb2ops.c | 46 ++++++++++++++++++++++++++++++----------------
+ 1 file changed, 30 insertions(+), 16 deletions(-)
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index bd1ccfb10ec6..2fa1b55fe6fa 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -2206,36 +2206,23 @@ validate_and_copy_iov(unsigned int offset, unsigned int buffer_length,
- 	return 0;
- }
- 
--static int
--query_info(const unsigned int xid, struct cifs_tcon *tcon,
--	   u64 persistent_fid, u64 volatile_fid, u8 info_class, u8 info_type,
--	   u32 additional_info, size_t output_len, size_t min_len, void **data,
--		u32 *dlen)
-+
-+int
-+SMB2_query_info_init(struct cifs_tcon *tcon, struct smb_rqst *rqst,
-+		     u64 persistent_fid, u64 volatile_fid,
-+		     u8 info_class, u8 info_type, u32 additional_info,
-+		     size_t output_len)
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 23ff4cf3ac88..dd49354a35af 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -2077,29 +2077,42 @@ fill_transform_hdr(struct smb2_transform_hdr *tr_hdr, unsigned int orig_len,
+  * rqst->rq_iov[1+] data to be encrypted/decrypted
+  */
+ static struct scatterlist *
+-init_sg(struct smb_rqst *rqst, u8 *sign)
++init_sg(int num_rqst, struct smb_rqst *rqst, u8 *sign)
  {
--	struct smb_rqst rqst;
- 	struct smb2_query_info_req *req;
--	struct smb2_query_info_rsp *rsp = NULL;
--	struct kvec iov[2];
--	struct kvec rsp_iov;
--	int rc = 0;
--	int resp_buftype;
--	struct cifs_ses *ses = tcon->ses;
--	int flags = 0;
-+	struct kvec *iov = rqst->rq_iov;
- 	unsigned int total_len;
--
--	cifs_dbg(FYI, "Query Info\n");
--
--	if (!ses || !(ses->server))
--		return -EIO;
-+	int rc;
+ 	unsigned int sg_len = rqst->rq_nvec + rqst->rq_npages + 1;
+ 	unsigned int assoc_data_len = sizeof(struct smb2_transform_hdr) - 20;
+ 	struct scatterlist *sg;
+ 	unsigned int i;
+ 	unsigned int j;
++	unsigned int idx = 0;
  
- 	rc = smb2_plain_req_init(SMB2_QUERY_INFO, tcon, (void **) &req,
- 			     &total_len);
- 	if (rc)
- 		return rc;
+ 	sg = kmalloc_array(sg_len, sizeof(struct scatterlist), GFP_KERNEL);
+ 	if (!sg)
+ 		return NULL;
  
--	if (encryption_required(tcon))
--		flags |= CIFS_TRANSFORM_REQ;
--
- 	req->InfoType = info_type;
- 	req->FileInfoClass = info_class;
- 	req->PersistentFileId = persistent_fid;
-@@ -2246,19 +2233,55 @@ query_info(const unsigned int xid, struct cifs_tcon *tcon,
- 	 * We do not use the input buffer (do not send extra byte)
- 	 */
- 	req->InputBufferOffset = 0;
--
- 	req->OutputBufferLength = cpu_to_le32(output_len);
- 
- 	iov[0].iov_base = (char *)req;
- 	/* 1 for Buffer */
- 	iov[0].iov_len = total_len - 1;
- 
-+	return 0;
-+}
+ 	sg_init_table(sg, sg_len);
+-	sg_set_buf(&sg[0], rqst->rq_iov[0].iov_base + 20, assoc_data_len);
+-	for (i = 1; i < rqst->rq_nvec; i++)
+-		sg_set_buf(&sg[i], rqst->rq_iov[i].iov_base,
+-						rqst->rq_iov[i].iov_len);
+-	for (j = 0; i < sg_len - 1; i++, j++) {
+-		unsigned int len = (j < rqst->rq_npages - 1) ? rqst->rq_pagesz
+-							: rqst->rq_tailsz;
+-		sg_set_page(&sg[i], rqst->rq_pages[j], len, 0);
+-	}
+-	sg_set_buf(&sg[sg_len - 1], sign, SMB2_SIGNATURE_SIZE);
++	for (i = 0; i < num_rqst; i++) {
++		/* the first rqst has a transform header where the first 20
++		 * bytes are not part of the encrypted blob
++		 */
++		if (i == 0)
++			sg_set_buf(&sg[idx++], rqst[i].rq_iov[i].iov_base + 20,
++				   assoc_data_len);
++		else
++			sg_set_buf(&sg[idx++], rqst[i].rq_iov[i].iov_base,
++				   rqst[i].rq_iov[0].iov_len);
 +
-+void
-+SMB2_query_info_free(struct smb_rqst *rqst) {
-+	cifs_small_buf_release(rqst->rq_iov[0].iov_base); /* request */
-+}
++		for (j = 1; j < rqst[i].rq_nvec; j++)
++			sg_set_buf(&sg[idx++], rqst[i].rq_iov[j].iov_base,
++				   rqst[i].rq_iov[j].iov_len);
 +
-+static int
-+query_info(const unsigned int xid, struct cifs_tcon *tcon,
-+	   u64 persistent_fid, u64 volatile_fid, u8 info_class, u8 info_type,
-+	   u32 additional_info, size_t output_len, size_t min_len, void **data,
-+		u32 *dlen)
-+{
-+	struct smb_rqst rqst;
-+	struct smb2_query_info_rsp *rsp = NULL;
-+	struct kvec iov[1];
-+	struct kvec rsp_iov;
-+	int rc = 0;
-+	int resp_buftype;
-+	struct cifs_ses *ses = tcon->ses;
-+	int flags = 0;
-+
-+	cifs_dbg(FYI, "Query Info\n");
-+
-+	if (!ses || !(ses->server))
-+		return -EIO;
-+
-+	if (encryption_required(tcon))
-+		flags |= CIFS_TRANSFORM_REQ;
-+
- 	memset(&rqst, 0, sizeof(struct smb_rqst));
-+	memset(&iov, 0, sizeof(iov));
- 	rqst.rq_iov = iov;
- 	rqst.rq_nvec = 1;
- 
-+	rc = SMB2_query_info_init(tcon, &rqst, persistent_fid, volatile_fid,
-+				  info_class, info_type, additional_info,
-+				  output_len);
-+	if (rc)
-+		goto qinf_exit;
-+
- 	rc = cifs_send_recv(xid, ses, &rqst, &resp_buftype, flags, &rsp_iov);
--	cifs_small_buf_release(req);
- 	rsp = (struct smb2_query_info_rsp *)rsp_iov.iov_base;
- 
- 	if (rc) {
-@@ -2285,6 +2308,7 @@ query_info(const unsigned int xid, struct cifs_tcon *tcon,
- 				   &rsp_iov, min_len, *data);
- 
- qinf_exit:
-+	SMB2_query_info_free(&rqst);
- 	free_rsp_buf(resp_buftype, rsp);
- 	return rc;
++		for (j = 0; j < rqst[i].rq_npages; j++) {
++			unsigned int len = (j < rqst[i].rq_npages - 1) ?
++				rqst[i].rq_pagesz : rqst[i].rq_tailsz;
++			sg_set_page(&sg[idx++], rqst[i].rq_pages[j], len, 0);
++		}
++	}
++	sg_set_buf(&sg[idx], sign, SMB2_SIGNATURE_SIZE);
+ 	return sg;
  }
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index f31b9f3d060a..5e6d46548bec 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -147,6 +147,11 @@ extern int SMB2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
- extern int SMB2_query_info(const unsigned int xid, struct cifs_tcon *tcon,
- 			   u64 persistent_file_id, u64 volatile_file_id,
- 			   struct smb2_file_all_info *data);
-+extern int SMB2_query_info_init(struct cifs_tcon *tcon, struct smb_rqst *rqst,
-+				u64 persistent_fid, u64 volatile_fid,
-+				u8 info_class, u8 info_type,
-+				u32 additional_info, size_t output_len);
-+extern void SMB2_query_info_free(struct smb_rqst *rqst);
- extern int SMB2_query_acl(const unsigned int xid, struct cifs_tcon *tcon,
- 			   u64 persistent_file_id, u64 volatile_file_id,
- 			   void **data, unsigned int *plen);
+ 
+@@ -2131,7 +2144,8 @@ smb2_get_enc_key(struct TCP_Server_Info *server, __u64 ses_id, int enc, u8 *key)
+  * untouched.
+  */
+ static int
+-crypt_message(struct TCP_Server_Info *server, struct smb_rqst *rqst, int enc)
++crypt_message(struct TCP_Server_Info *server, int num_rqst,
++	      struct smb_rqst *rqst, int enc)
+ {
+ 	struct smb2_transform_hdr *tr_hdr =
+ 			(struct smb2_transform_hdr *)rqst->rq_iov[0].iov_base;
+@@ -2185,7 +2199,7 @@ crypt_message(struct TCP_Server_Info *server, struct smb_rqst *rqst, int enc)
+ 		crypt_len += SMB2_SIGNATURE_SIZE;
+ 	}
+ 
+-	sg = init_sg(rqst, sign);
++	sg = init_sg(num_rqst, rqst, sign);
+ 	if (!sg) {
+ 		cifs_dbg(VFS, "%s: Failed to init sg", __func__);
+ 		rc = -ENOMEM;
+@@ -2269,7 +2283,7 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, int num_rqst,
+ 	new_rq->rq_iov = iov;
+ 	new_rq->rq_nvec = old_rq->rq_nvec + 1;
+ 
+-	/* fill the 2nd iov with a transform header */
++	/* fill the 1st iov with a transform header */
+ 	fill_transform_hdr(tr_hdr, orig_len, old_rq);
+ 	new_rq->rq_iov[0].iov_base = tr_hdr;
+ 	new_rq->rq_iov[0].iov_len = sizeof(struct smb2_transform_hdr);
+@@ -2285,7 +2299,7 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, int num_rqst,
+ 		kunmap(old_rq->rq_pages[i]);
+ 	}
+ 
+-	rc = crypt_message(server, new_rq, 1);
++	rc = crypt_message(server, num_rqst, new_rq, 1);
+ 	cifs_dbg(FYI, "encrypt message returned %d", rc);
+ 	if (rc)
+ 		goto err_free_iov;
+@@ -2349,7 +2363,7 @@ decrypt_raw_data(struct TCP_Server_Info *server, char *buf,
+ 	rqst.rq_pagesz = PAGE_SIZE;
+ 	rqst.rq_tailsz = (page_data_size % PAGE_SIZE) ? : PAGE_SIZE;
+ 
+-	rc = crypt_message(server, &rqst, 0);
++	rc = crypt_message(server, 1, &rqst, 0);
+ 	cifs_dbg(FYI, "decrypt message returned %d\n", rc);
+ 
+ 	if (rc)
 -- 
 2.13.3
