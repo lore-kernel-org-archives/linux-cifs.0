@@ -1,7 +1,7 @@
 From: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
-Subject: [PATCH v1 1/3] CIFS: refactor crypto shash/sdesc allocation&free
-Date: Fri, 16 Feb 2018 19:19:27 +0100
-Message-ID: <20180216181929.21383-2-aaptel@suse.com>
+Subject: [PATCH v1 3/3] CIFS: implement v3.11 preauth integrity
+Date: Fri, 16 Feb 2018 19:19:29 +0100
+Message-ID: <20180216181929.21383-4-aaptel@suse.com>
 References: <20180216181929.21383-1-aaptel@suse.com>
 Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -10,402 +10,240 @@ In-Reply-To: <20180216181929.21383-1-aaptel-IBi9RG/b67k@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-shash and sdesc and always allocated and freed together.
-* abstract this in new functions cifs_alloc_hash() and cifs_free_hash().
-* make smb2/3 crypto allocation independent from each other.
+SMB3.11 clients must implement pre-authentification integrity.
+
+* new mechanism to certify requests/responses happening before Tree
+  Connect.
+* supersedes VALIDATE_NEGOTIATE
+* fixes signing for SMB3.11
 
 Signed-off-by: Aurelien Aptel <aaptel-IBi9RG/b67k@public.gmane.org>
 ---
- fs/cifs/cifsencrypt.c   | 78 +++++--------------------------------------------
- fs/cifs/cifsproto.h     |  5 ++++
- fs/cifs/link.c          | 27 ++++-------------
- fs/cifs/misc.c          | 54 ++++++++++++++++++++++++++++++++++
- fs/cifs/smb2transport.c | 75 ++++++++++-------------------------------------
- fs/cifs/smbencrypt.c    | 27 ++++-------------
- 6 files changed, 93 insertions(+), 173 deletions(-)
+ fs/cifs/cifsglob.h  |  5 +++--
+ fs/cifs/smb2misc.c  | 64 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2pdu.c   | 25 +++++++++++++++++++++
+ fs/cifs/smb2pdu.h   |  1 +
+ fs/cifs/smb2proto.h |  2 ++
+ fs/cifs/transport.c | 17 ++++++++++++++
+ 6 files changed, 112 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index f2b0a7f124da..478a145aa4d0 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -36,37 +36,6 @@
- #include <crypto/skcipher.h>
- #include <crypto/aead.h>
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 765fc2c9fd91..c294093f04d5 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -675,7 +675,8 @@ struct TCP_Server_Info {
+ 	unsigned int	max_read;
+ 	unsigned int	max_write;
+ #ifdef CONFIG_CIFS_SMB311
+-	__u8	preauth_sha_hash[64]; /* save initital negprot hash */
++	 /* save initital negprot hash */
++	__u8	preauth_sha_hash[SMB2_PREAUTH_HASH_SIZE];
+ #endif /* 3.1.1 */
+ 	struct delayed_work reconnect; /* reconnect workqueue job */
+ 	struct mutex reconnect_mutex; /* prevent simultaneous reconnects */
+@@ -864,7 +865,7 @@ struct cifs_ses {
+ 	__u8 smb3encryptionkey[SMB3_SIGN_KEY_SIZE];
+ 	__u8 smb3decryptionkey[SMB3_SIGN_KEY_SIZE];
+ #ifdef CONFIG_CIFS_SMB311
+-	__u8 preauth_sha_hash[64];
++	__u8 preauth_sha_hash[SMB2_PREAUTH_HASH_SIZE];
+ #endif /* 3.1.1 */
+ };
  
--static int
--cifs_crypto_shash_md5_allocate(struct TCP_Server_Info *server)
--{
--	int rc;
--	unsigned int size;
--
--	if (server->secmech.sdescmd5 != NULL)
--		return 0; /* already allocated */
--
--	server->secmech.md5 = crypto_alloc_shash("md5", 0, 0);
--	if (IS_ERR(server->secmech.md5)) {
--		cifs_dbg(VFS, "could not allocate crypto md5\n");
--		rc = PTR_ERR(server->secmech.md5);
--		server->secmech.md5 = NULL;
--		return rc;
--	}
--
--	size = sizeof(struct shash_desc) +
--			crypto_shash_descsize(server->secmech.md5);
--	server->secmech.sdescmd5 = kmalloc(size, GFP_KERNEL);
--	if (!server->secmech.sdescmd5) {
--		crypto_free_shash(server->secmech.md5);
--		server->secmech.md5 = NULL;
--		return -ENOMEM;
--	}
--	server->secmech.sdescmd5->shash.tfm = server->secmech.md5;
--	server->secmech.sdescmd5->shash.flags = 0x0;
--
--	return 0;
--}
--
- int __cifs_calc_signature(struct smb_rqst *rqst,
- 			struct TCP_Server_Info *server, char *signature,
- 			struct shash_desc *shash)
-@@ -132,13 +101,10 @@ static int cifs_calc_signature(struct smb_rqst *rqst,
- 	if (!rqst->rq_iov || !signature || !server)
- 		return -EINVAL;
+diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
+index 76d03abaa38c..da012c3ab700 100644
+--- a/fs/cifs/smb2misc.c
++++ b/fs/cifs/smb2misc.c
+@@ -706,3 +706,67 @@ smb2_handle_cancelled_mid(char *buffer, struct TCP_Server_Info *server)
  
--	if (!server->secmech.sdescmd5) {
--		rc = cifs_crypto_shash_md5_allocate(server);
--		if (rc) {
--			cifs_dbg(VFS, "%s: Can't alloc md5 crypto\n", __func__);
--			return -1;
--		}
--	}
-+	rc = cifs_alloc_hash("md5", &server->secmech.md5,
-+			     &server->secmech.sdescmd5);
-+	if (rc)
-+		return -1;
- 
- 	rc = crypto_shash_init(&server->secmech.sdescmd5->shash);
- 	if (rc) {
-@@ -663,37 +629,6 @@ CalcNTLMv2_response(const struct cifs_ses *ses, char *ntlmv2_hash)
- 	return rc;
- }
- 
--static int crypto_hmacmd5_alloc(struct TCP_Server_Info *server)
--{
--	int rc;
--	unsigned int size;
--
--	/* check if already allocated */
--	if (server->secmech.sdeschmacmd5)
--		return 0;
--
--	server->secmech.hmacmd5 = crypto_alloc_shash("hmac(md5)", 0, 0);
--	if (IS_ERR(server->secmech.hmacmd5)) {
--		cifs_dbg(VFS, "could not allocate crypto hmacmd5\n");
--		rc = PTR_ERR(server->secmech.hmacmd5);
--		server->secmech.hmacmd5 = NULL;
--		return rc;
--	}
--
--	size = sizeof(struct shash_desc) +
--			crypto_shash_descsize(server->secmech.hmacmd5);
--	server->secmech.sdeschmacmd5 = kmalloc(size, GFP_KERNEL);
--	if (!server->secmech.sdeschmacmd5) {
--		crypto_free_shash(server->secmech.hmacmd5);
--		server->secmech.hmacmd5 = NULL;
--		return -ENOMEM;
--	}
--	server->secmech.sdeschmacmd5->shash.tfm = server->secmech.hmacmd5;
--	server->secmech.sdeschmacmd5->shash.flags = 0x0;
--
--	return 0;
--}
--
- int
- setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
- {
-@@ -757,9 +692,10 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
- 
- 	mutex_lock(&ses->server->srv_mutex);
- 
--	rc = crypto_hmacmd5_alloc(ses->server);
-+	rc = cifs_alloc_hash("hmac(md5)",
-+			     &ses->server->secmech.hmacmd5,
-+			     &ses->server->secmech.sdeschmacmd5);
- 	if (rc) {
--		cifs_dbg(VFS, "could not crypto alloc hmacmd5 rc %d\n", rc);
- 		goto unlock;
- 	}
- 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 93d565186698..365a414a75e9 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -542,4 +542,9 @@ enum securityEnum cifs_select_sectype(struct TCP_Server_Info *,
- struct cifs_aio_ctx *cifs_aio_ctx_alloc(void);
- void cifs_aio_ctx_release(struct kref *refcount);
- int setup_aio_ctx_iter(struct cifs_aio_ctx *ctx, struct iov_iter *iter, int rw);
-+
-+int cifs_alloc_hash(const char *name, struct crypto_shash **shash,
-+		    struct sdesc **sdesc);
-+void cifs_free_hash(struct crypto_shash **shash, struct sdesc **sdesc);
-+
- #endif			/* _CIFSPROTO_H */
-diff --git a/fs/cifs/link.c b/fs/cifs/link.c
-index 60b5a11ee11b..889a840172eb 100644
---- a/fs/cifs/link.c
-+++ b/fs/cifs/link.c
-@@ -50,25 +50,12 @@ static int
- symlink_hash(unsigned int link_len, const char *link_str, u8 *md5_hash)
- {
- 	int rc;
--	unsigned int size;
--	struct crypto_shash *md5;
--	struct sdesc *sdescmd5;
--
--	md5 = crypto_alloc_shash("md5", 0, 0);
--	if (IS_ERR(md5)) {
--		rc = PTR_ERR(md5);
--		cifs_dbg(VFS, "%s: Crypto md5 allocation error %d\n",
--			 __func__, rc);
--		return rc;
--	}
--	size = sizeof(struct shash_desc) + crypto_shash_descsize(md5);
--	sdescmd5 = kmalloc(size, GFP_KERNEL);
--	if (!sdescmd5) {
--		rc = -ENOMEM;
-+	struct crypto_shash *md5 = NULL;
-+	struct sdesc *sdescmd5 = NULL;
-+
-+	rc = cifs_alloc_hash("md5", &md5, &sdescmd5);
-+	if (rc)
- 		goto symlink_hash_err;
--	}
--	sdescmd5->shash.tfm = md5;
--	sdescmd5->shash.flags = 0x0;
- 
- 	rc = crypto_shash_init(&sdescmd5->shash);
- 	if (rc) {
-@@ -85,9 +72,7 @@ symlink_hash(unsigned int link_len, const char *link_str, u8 *md5_hash)
- 		cifs_dbg(VFS, "%s: Could not generate md5 hash\n", __func__);
- 
- symlink_hash_err:
--	crypto_free_shash(md5);
--	kfree(sdescmd5);
--
-+	cifs_free_hash(&md5, &sdescmd5);
- 	return rc;
- }
- 
-diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-index a0dbced4a45c..460084a8eac5 100644
---- a/fs/cifs/misc.c
-+++ b/fs/cifs/misc.c
-@@ -848,3 +848,57 @@ setup_aio_ctx_iter(struct cifs_aio_ctx *ctx, struct iov_iter *iter, int rw)
- 	iov_iter_bvec(&ctx->iter, ITER_BVEC | rw, ctx->bv, npages, ctx->len);
  	return 0;
  }
 +
++#ifdef CONFIG_CIFS_SMB311
 +/**
-+ * cifs_alloc_hash - allocate hash and hash context together
++ * smb311_update_preauth_hash - update @ses hash with the packet data in @iov
 + *
-+ * The caller has to make sure @sdesc is initialized to either NULL or
-+ * a valid context. Both can be freed via cifs_free_hash().
++ * Assumes @iov does not contain the rfc1002 length and iov[0] has the
++ * SMB2 header.
 + */
 +int
-+cifs_alloc_hash(const char *name,
-+		struct crypto_shash **shash, struct sdesc **sdesc)
++smb311_update_preauth_hash(struct cifs_ses *ses, struct kvec *iov, int nvec)
 +{
-+	int rc = 0;
-+	size_t size;
++	int i, rc;
++	struct sdesc *d;
++	struct smb2_sync_hdr *hdr;
 +
-+	if (*sdesc != NULL)
-+		return 0;
++	if (ses->server->tcpStatus == CifsGood) {
++		/* skip non smb311 connections */
++		if (ses->server->dialect != SMB311_PROT_ID)
++			return 0;
 +
-+	*shash = crypto_alloc_shash(name, 0, 0);
-+	if (IS_ERR(*shash)) {
-+		cifs_dbg(VFS, "could not allocate crypto %s\n", name);
-+		rc = PTR_ERR(*shash);
-+		*shash = NULL;
-+		*sdesc = NULL;
++		/* skip last sess setup response */
++		hdr = (struct smb2_sync_hdr *)iov[0].iov_base;
++		if (hdr->Flags & SMB2_FLAGS_SIGNED)
++			return 0;
++	}
++
++	rc = smb311_crypto_shash_allocate(ses->server);
++	if (rc)
++		return rc;
++
++	d = ses->server->secmech.sdescsha512;
++	rc = crypto_shash_init(&d->shash);
++	if (rc) {
++		cifs_dbg(VFS, "%s: could not init sha512 shash\n", __func__);
 +		return rc;
 +	}
 +
-+	size = sizeof(struct shash_desc) + crypto_shash_descsize(*shash);
-+	*sdesc = kmalloc(size, GFP_KERNEL);
-+	if (*sdesc == NULL) {
-+		cifs_dbg(VFS, "no memory left to allocate crypto %s\n", name);
-+		crypto_free_shash(*shash);
-+		*shash = NULL;
-+		return -ENOMEM;
++	rc = crypto_shash_update(&d->shash, ses->preauth_sha_hash,
++				 SMB2_PREAUTH_HASH_SIZE);
++	if (rc) {
++		cifs_dbg(VFS, "%s: could not update sha512 shash\n", __func__);
++		return rc;
 +	}
 +
-+	(*sdesc)->shash.tfm = *shash;
-+	(*sdesc)->shash.flags = 0x0;
++	for (i = 0; i < nvec; i++) {
++		rc = crypto_shash_update(&d->shash,
++					 iov[i].iov_base, iov[i].iov_len);
++		if (rc) {
++			cifs_dbg(VFS, "%s: could not update sha512 shash\n",
++				 __func__);
++			return rc;
++		}
++	}
++
++	rc = crypto_shash_final(&d->shash, ses->preauth_sha_hash);
++	if (rc) {
++		cifs_dbg(VFS, "%s: could not finalize sha512 shash\n",
++			 __func__);
++		return rc;
++	}
++
 +	return 0;
 +}
-+
-+/**
-+ * cifs_free_hash - free hash and hash context together
-+ *
-+ * Freeing a NULL hash or context is safe.
-+ */
-+void
-+cifs_free_hash(struct crypto_shash **shash, struct sdesc **sdesc)
-+{
-+	kfree(*sdesc);
-+	*sdesc = NULL;
-+	if (*shash)
-+		crypto_free_shash(*shash);
-+	*shash = NULL;
-+}
-diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-index 99493946e2f9..c3c271f557a0 100644
---- a/fs/cifs/smb2transport.c
-+++ b/fs/cifs/smb2transport.c
-@@ -43,76 +43,31 @@
- static int
- smb2_crypto_shash_allocate(struct TCP_Server_Info *server)
- {
--	int rc;
--	unsigned int size;
--
--	if (server->secmech.sdeschmacsha256 != NULL)
--		return 0; /* already allocated */
--
--	server->secmech.hmacsha256 = crypto_alloc_shash("hmac(sha256)", 0, 0);
--	if (IS_ERR(server->secmech.hmacsha256)) {
--		cifs_dbg(VFS, "could not allocate crypto hmacsha256\n");
--		rc = PTR_ERR(server->secmech.hmacsha256);
--		server->secmech.hmacsha256 = NULL;
--		return rc;
--	}
--
--	size = sizeof(struct shash_desc) +
--			crypto_shash_descsize(server->secmech.hmacsha256);
--	server->secmech.sdeschmacsha256 = kmalloc(size, GFP_KERNEL);
--	if (!server->secmech.sdeschmacsha256) {
--		crypto_free_shash(server->secmech.hmacsha256);
--		server->secmech.hmacsha256 = NULL;
--		return -ENOMEM;
--	}
--	server->secmech.sdeschmacsha256->shash.tfm = server->secmech.hmacsha256;
--	server->secmech.sdeschmacsha256->shash.flags = 0x0;
--
--	return 0;
-+	return cifs_alloc_hash("hmac(sha256)",
-+			       &server->secmech.hmacsha256,
-+			       &server->secmech.sdeschmacsha256);
- }
- 
- static int
- smb3_crypto_shash_allocate(struct TCP_Server_Info *server)
- {
--	unsigned int size;
-+	struct cifs_secmech *p = &server->secmech;
- 	int rc;
- 
--	if (server->secmech.sdesccmacaes != NULL)
--		return 0;  /* already allocated */
--
--	rc = smb2_crypto_shash_allocate(server);
-+	rc = cifs_alloc_hash("hmac(sha256)",
-+			     &p->hmacsha256,
-+			     &p->sdeschmacsha256);
- 	if (rc)
--		return rc;
--
--	server->secmech.cmacaes = crypto_alloc_shash("cmac(aes)", 0, 0);
--	if (IS_ERR(server->secmech.cmacaes)) {
--		cifs_dbg(VFS, "could not allocate crypto cmac-aes");
--		kfree(server->secmech.sdeschmacsha256);
--		server->secmech.sdeschmacsha256 = NULL;
--		crypto_free_shash(server->secmech.hmacsha256);
--		server->secmech.hmacsha256 = NULL;
--		rc = PTR_ERR(server->secmech.cmacaes);
--		server->secmech.cmacaes = NULL;
--		return rc;
--	}
-+		goto err;
- 
--	size = sizeof(struct shash_desc) +
--			crypto_shash_descsize(server->secmech.cmacaes);
--	server->secmech.sdesccmacaes = kmalloc(size, GFP_KERNEL);
--	if (!server->secmech.sdesccmacaes) {
--		cifs_dbg(VFS, "%s: Can't alloc cmacaes\n", __func__);
--		kfree(server->secmech.sdeschmacsha256);
--		server->secmech.sdeschmacsha256 = NULL;
--		crypto_free_shash(server->secmech.hmacsha256);
--		crypto_free_shash(server->secmech.cmacaes);
--		server->secmech.hmacsha256 = NULL;
--		server->secmech.cmacaes = NULL;
--		return -ENOMEM;
--	}
--	server->secmech.sdesccmacaes->shash.tfm = server->secmech.cmacaes;
--	server->secmech.sdesccmacaes->shash.flags = 0x0;
-+	rc = cifs_alloc_hash("cmac(aes)", &p->cmacaes, &p->sdesccmacaes);
-+	if (rc)
-+		goto err;
- 
- 	return 0;
-+err:
-+	cifs_free_hash(&p->hmacsha256, &p->sdeschmacsha256);
-+	return rc;
- }
- 
- static struct cifs_ses *
-@@ -457,7 +412,7 @@ smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
- 		cifs_dbg(VFS, "%s: Could not init cmac aes\n", __func__);
++#endif
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index ab4c20687cc0..4b6920de2541 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -453,6 +453,10 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
  		return rc;
- 	}
--	
+ 
+ 	req->sync_hdr.SessionId = 0;
++#ifdef CONFIG_CIFS_SMB311
++	memset(server->preauth_sha_hash, 0, SMB2_PREAUTH_HASH_SIZE);
++	memset(ses->preauth_sha_hash, 0, SMB2_PREAUTH_HASH_SIZE);
++#endif
+ 
+ 	if (strcmp(ses->server->vals->version_string,
+ 		   SMB3ANY_VERSION_STRING) == 0) {
+@@ -564,6 +568,15 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
+ 
+ 	/* BB: add check that dialect was valid given dialect(s) we asked for */
+ 
++#ifdef CONFIG_CIFS_SMB311
++	/*
++	 * Keep a copy of the hash after negprot. This hash will be
++	 * the starting hash value for all sessions made from this
++	 * server.
++	 */
++	memcpy(server->preauth_sha_hash, ses->preauth_sha_hash,
++	       SMB2_PREAUTH_HASH_SIZE);
++#endif
+ 	/* SMB2 only has an extended negflavor */
+ 	server->negflavor = CIFS_NEGFLAVOR_EXTENDED;
+ 	/* set it to the maximum buffer size value we can send with 1 credit */
+@@ -621,6 +634,10 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
+ 		return 0;
+ #endif
+ 
++	/* In SMB3.11 preauth integrity supersedes validate negotiate */
++	if (tcon->ses->server->dialect == SMB311_PROT_ID)
++		return 0;
 +
- 	rc = __cifs_calc_signature(rqst, server, sigptr,
- 				   &server->secmech.sdesccmacaes->shash);
+ 	/*
+ 	 * validation ioctl must be signed, so no point sending this if we
+ 	 * can not sign it (ie are not known user).  Even if signing is not
+@@ -1148,6 +1165,14 @@ SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
+ 	sess_data->buf0_type = CIFS_NO_BUFFER;
+ 	sess_data->nls_cp = (struct nls_table *) nls_cp;
  
-diff --git a/fs/cifs/smbencrypt.c b/fs/cifs/smbencrypt.c
-index c12bffefa3c9..a0b80ac651a6 100644
---- a/fs/cifs/smbencrypt.c
-+++ b/fs/cifs/smbencrypt.c
-@@ -121,25 +121,12 @@ int
- mdfour(unsigned char *md4_hash, unsigned char *link_str, int link_len)
- {
- 	int rc;
--	unsigned int size;
--	struct crypto_shash *md4;
--	struct sdesc *sdescmd4;
--
--	md4 = crypto_alloc_shash("md4", 0, 0);
--	if (IS_ERR(md4)) {
--		rc = PTR_ERR(md4);
--		cifs_dbg(VFS, "%s: Crypto md4 allocation error %d\n",
--			 __func__, rc);
--		return rc;
--	}
--	size = sizeof(struct shash_desc) + crypto_shash_descsize(md4);
--	sdescmd4 = kmalloc(size, GFP_KERNEL);
--	if (!sdescmd4) {
--		rc = -ENOMEM;
-+	struct crypto_shash *md4 = NULL;
-+	struct sdesc *sdescmd4 = NULL;
++#ifdef CONFIG_CIFS_SMB311
++	/*
++	 * Initialize the session hash with the server one.
++	 */
++	memcpy(ses->preauth_sha_hash, ses->server->preauth_sha_hash,
++	       SMB2_PREAUTH_HASH_SIZE);
++#endif
 +
-+	rc = cifs_alloc_hash("md4", &md4, &sdescmd4);
-+	if (rc)
- 		goto mdfour_err;
--	}
--	sdescmd4->shash.tfm = md4;
--	sdescmd4->shash.flags = 0x0;
+ 	while (sess_data->func)
+ 		sess_data->func(sess_data);
  
- 	rc = crypto_shash_init(&sdescmd4->shash);
- 	if (rc) {
-@@ -156,9 +143,7 @@ mdfour(unsigned char *md4_hash, unsigned char *link_str, int link_len)
- 		cifs_dbg(VFS, "%s: Could not generate md4 hash\n", __func__);
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index 2a2b34ccaf49..8b901c69a65a 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -264,6 +264,7 @@ struct smb2_negotiate_req {
+ #define SMB311_SALT_SIZE			32
+ /* Hash Algorithm Types */
+ #define SMB2_PREAUTH_INTEGRITY_SHA512	cpu_to_le16(0x0001)
++#define SMB2_PREAUTH_HASH_SIZE 64
  
- mdfour_err:
--	crypto_free_shash(md4);
--	kfree(sdescmd4);
--
-+	cifs_free_hash(&md4, &sdescmd4);
- 	return rc;
- }
+ struct smb2_preauth_neg_context {
+ 	__le16	ContextType; /* 1 */
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index 3b8e9c2e55bc..cbcce3f7e86f 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -204,5 +204,7 @@ extern enum securityEnum smb2_select_sectype(struct TCP_Server_Info *,
+ 					enum securityEnum);
+ #ifdef CONFIG_CIFS_SMB311
+ extern int smb311_crypto_shash_allocate(struct TCP_Server_Info *server);
++extern int smb311_update_preauth_hash(struct cifs_ses *ses,
++				      struct kvec *iov, int nvec);
+ #endif
+ #endif			/* _SMB2PROTO_H */
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 9779b3292d8e..665661464067 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -37,6 +37,7 @@
+ #include "cifsglob.h"
+ #include "cifsproto.h"
+ #include "cifs_debug.h"
++#include "smb2proto.h"
+ #include "smbdirect.h"
  
+ /* Max number of iovectors we can use off the stack when sending requests. */
+@@ -751,6 +752,12 @@ cifs_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 	if (rc < 0)
+ 		goto out;
+ 
++#ifdef CONFIG_CIFS_SMB311
++	if (ses->status == CifsNew)
++		smb311_update_preauth_hash(ses, rqst->rq_iov+1,
++					   rqst->rq_nvec-1);
++#endif
++
+ 	if (timeout == CIFS_ASYNC_OP)
+ 		goto out;
+ 
+@@ -789,6 +796,16 @@ cifs_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 	else
+ 		*resp_buf_type = CIFS_SMALL_BUFFER;
+ 
++#ifdef CONFIG_CIFS_SMB311
++	if (ses->status == CifsNew) {
++		struct kvec iov = {
++			.iov_base = buf + 4,
++			.iov_len = get_rfc1002_length(buf)
++		};
++		smb311_update_preauth_hash(ses, &iov, 1);
++	}
++#endif
++
+ 	credits = ses->server->ops->get_credits(midQ);
+ 
+ 	rc = ses->server->ops->check_receive(midQ, ses->server,
 -- 
 2.12.3
