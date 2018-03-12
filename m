@@ -1,59 +1,63 @@
-From: "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
+From: Steve French <smfrench@gmail.com>
 Subject: Re: [PATCH 4.13 28/43] SMB3: Validate negotiate request must always
  be signed
-Date: Thu, 1 Mar 2018 12:51:09 -0800
-Message-ID: <188c02d6-e27f-235c-a833-021f7304161b@csail.mit.edu>
-References: <20171031095530.520746935@linuxfoundation.org>
- <20171031095531.633196173@linuxfoundation.org>
- <97340c9a-0ea2-0d3d-cf26-58c799d76cae@mageia.org>
- <20171101151803.GB31285@kroah.com>
- <4ba67095-4075-688f-d3fb-157847aee4d9@csail.mit.edu>
- <28ffc363-5140-5685-d288-6e3dc07c6369@csail.mit.edu>
- <20180227085428.GA16879@kroah.com>
- <b20cbd94-ce9b-cb2c-dc95-a6821376823f@csail.mit.edu>
- <20180227124050.GB31888@kroah.com>
- <6bca5a97-f581-86b8-12ad-77147619d519@csail.mit.edu>
- <CAH2r5mt91WGHDk-+LP4EBTEfAOmrY2k6_X7KKjc0D+LcDCfxRw@mail.gmail.com>
- <CAH2r5ms9mpdYOFYQo5gck9XAsTzZpHe75GHCgd_xCc25suSBHQ@mail.gmail.com>
+Date: Sun, 11 Mar 2018 19:37:55 -0700
+Message-ID: <CAH2r5muUfsZsqaBqkAfi_dXRheib+7DN=VSsbGcV22C2MdJaGw@mail.gmail.com>
+References: <20171031095530.520746935@linuxfoundation.org> <20171031095531.633196173@linuxfoundation.org>
+ <97340c9a-0ea2-0d3d-cf26-58c799d76cae@mageia.org> <20171101151803.GB31285@kroah.com>
+ <4ba67095-4075-688f-d3fb-157847aee4d9@csail.mit.edu> <28ffc363-5140-5685-d288-6e3dc07c6369@csail.mit.edu>
+ <20180227085428.GA16879@kroah.com> <b20cbd94-ce9b-cb2c-dc95-a6821376823f@csail.mit.edu>
+ <20180227124050.GB31888@kroah.com> <6bca5a97-f581-86b8-12ad-77147619d519@csail.mit.edu>
+ <CAH2r5mt91WGHDk-+LP4EBTEfAOmrY2k6_X7KKjc0D+LcDCfxRw@mail.gmail.com> <309db6c4-7e21-bfbe-44d4-eb41f5516d5e@csail.mit.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Thomas Backlund <tmb@mageia.org>,
-        =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel@suse.com>,
+        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
         LKML <linux-kernel@vger.kernel.org>,
         Stable <stable@vger.kernel.org>,
         Ronnie Sahlberg <lsahlber@redhat.com>,
         Pavel Shilovskiy <pshilov@microsoft.com>,
         CIFS <linux-cifs@vger.kernel.org>
-To: Steve French <smfrench@gmail.com>
+To: "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
 Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <CAH2r5ms9mpdYOFYQo5gck9XAsTzZpHe75GHCgd_xCc25suSBHQ@mail.gmail.com>
-Content-Language: en-US
+In-Reply-To: <309db6c4-7e21-bfbe-44d4-eb41f5516d5e@csail.mit.edu>
 Sender: stable-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On 3/1/18 12:12 PM, Steve French wrote:
-> So far I haven't been able to reproduce this on the current 4.9 stable
-> tree with vers=3.0 or with default (vers=1.0 for these older kernels).
-> 
+Just got a wireshark trace - this is a fairly trivial issue (missing
+the validate negotiate must be signed patch) - I had some trouble
+getting this version of the kernel running (unrelated issue) and on
+systems with access to Windows 2016...
 
-Maybe the problem also depends on the particular version of Windows
-that hosts the SMB shares? I'm using Windows Server 2016 (Version
-1607, OS Build 14393.693). With vers=3.0, the issue is reproducible
-every time, but vers=1.0 works fine.
 
-Regards,
-Srivatsa
 
-> On Tue, Feb 27, 2018 at 11:56 AM, Steve French <smfrench@gmail.com> wrote:
+On Tue, Feb 27, 2018 at 10:33 AM, Srivatsa S. Bhat
+<srivatsa@csail.mit.edu> wrote:
+> On 2/27/18 9:56 AM, Steve French wrote:
 >> This shouldn't be too hard to figure out if willing to backport a
 >> slightly larger set of fixes to the older stable, but I don't have a
 >> system running 4.9 stable.
 >>
+>
+> If you have the proposed patches that apply on 4.9, I'd be happy to
+> try them out!
+>
+> [ I would have offered to backport the patches myself, but actually I
+> already tried doing that with a larger set of patches from mainline
+> (picking those commits between the regression and the fix that seemed
+> relevant), but I felt quite out-of-depth trying to adapt them to 4.9
+> and 4.4, as I'm not that familiar with the internals of SMB/CIFS. ]
+>
 >> Is this the correct stable tree branch?
 >> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git/log/?h=linux-4.9.y
 >>
+>
+> Yep!
+>
+> Regards,
+> Srivatsa
+>
 >> On Tue, Feb 27, 2018 at 11:45 AM, Srivatsa S. Bhat
 >> <srivatsa@csail.mit.edu> wrote:
 >>> On 2/27/18 4:40 AM, Greg Kroah-Hartman wrote:
@@ -196,10 +200,11 @@ Srivatsa
 >>
 >>
 >>
->> --
->> Thanks,
->>
->> Steve
-> 
-> 
-> 
+>
+
+
+
+-- 
+Thanks,
+
+Steve
