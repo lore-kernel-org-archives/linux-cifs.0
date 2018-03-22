@@ -1,8 +1,8 @@
 From: "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
 Subject: Re: [PATCH 4.13 28/43] SMB3: Validate negotiate request must always
  be signed
-Date: Wed, 21 Mar 2018 22:12:01 -0700
-Message-ID: <6745f869-e249-a891-8d76-79f2830dd57f@csail.mit.edu>
+Date: Wed, 21 Mar 2018 22:15:51 -0700
+Message-ID: <46a98623-2125-1f16-c456-db06f015f95a@csail.mit.edu>
 References: <28ffc363-5140-5685-d288-6e3dc07c6369@csail.mit.edu>
  <20180227085428.GA16879@kroah.com>
  <b20cbd94-ce9b-cb2c-dc95-a6821376823f@csail.mit.edu>
@@ -15,9 +15,10 @@ References: <28ffc363-5140-5685-d288-6e3dc07c6369@csail.mit.edu>
  <CAH2r5mvmiTaC4W=LAaOvWv6xGEMce957c+u+Af6wNgxudbO3_w@mail.gmail.com>
  <20180316133241.GC11397@kroah.com>
  <CAH2r5mvYxpr_0CPZNiNJTGhFNaM06w-EoTT7WS8oVjVZq8HCCw@mail.gmail.com>
+ <6745f869-e249-a891-8d76-79f2830dd57f@csail.mit.edu>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="------------D6FB28CE7AF7DFC86731D754"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Cc: Thomas Backlund <tmb@mageia.org>,
         =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel@suse.com>,
         LKML <linux-kernel@vger.kernel.org>,
@@ -28,137 +29,27 @@ Cc: Thomas Backlund <tmb@mageia.org>,
 To: Steve French <smfrench@gmail.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <CAH2r5mvYxpr_0CPZNiNJTGhFNaM06w-EoTT7WS8oVjVZq8HCCw@mail.gmail.com>
+In-Reply-To: <6745f869-e249-a891-8d76-79f2830dd57f@csail.mit.edu>
 Content-Language: en-US
 Sender: stable-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-This is a multi-part message in MIME format.
---------------D6FB28CE7AF7DFC86731D754
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-
-On 3/21/18 7:02 PM, Steve French wrote:
-> Found a patch which solves the dependency issue.  In my testing (on
-> 4.9, with Windows 2016, and also to Samba) as Pavel suggested this
-> appears to fix the problem, but I will let Srivatsa confirm that it
-> also fixes it for him.  The two attached patches for 4.9 should work.
+On 3/21/18 10:12 PM, Srivatsa S. Bhat wrote:
+> On 3/21/18 7:02 PM, Steve French wrote:
+>> Found a patch which solves the dependency issue.  In my testing (on
+>> 4.9, with Windows 2016, and also to Samba) as Pavel suggested this
+>> appears to fix the problem, but I will let Srivatsa confirm that it
+>> also fixes it for him.  The two attached patches for 4.9 should work.
+>>
 > 
+> Indeed, those two patches fix the problem for me on 4.9. Thanks a lot
+> Steve, Pavel and Aurelien for all your efforts in fixing this!
+> 
+> I was also interested in getting this fixed on 4.4, so I modified the
+> patches to apply on 4.4.88 and verified that they fix the mount
 
-Indeed, those two patches fix the problem for me on 4.9. Thanks a lot
-Steve, Pavel and Aurelien for all your efforts in fixing this!
-
-I was also interested in getting this fixed on 4.4, so I modified the
-patches to apply on 4.4.88 and verified that they fix the mount
-failure. I have attached my patches for 4.4 with this mail.
-
-Steve, Pavel, could you kindly double-check the second patch for 4.4,
-especially around the keygen_exit error path?
-
-Thank you very much!
+I meant to say 4.4.122 there (the latest stable 4.4 version at the moment).
 
 Regards,
 Srivatsa
 VMware Photon OS
-
---------------D6FB28CE7AF7DFC86731D754
-Content-Type: text/plain; charset=UTF-8; x-mac-type="0"; x-mac-creator="0";
- name="v4.4-0001-SMB3-Validate-negotiate-request-must-always-be-signe.patch"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename*0="v4.4-0001-SMB3-Validate-negotiate-request-must-always-be-sig";
- filename*1="ne.patch"
-
-RnJvbSBhMDFhN2RmYjYwZTJkNTQyMWE0ODdhN2I4MWZkOGExYmY3MmQ5NmQ0IE1vbiBTZXAg
-MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHNtZnJlbmNoQGdtYWlsLmNv
-bT4KRGF0ZTogU3VuLCAxMSBNYXIgMjAxOCAyMDowMDoyNyAtMDcwMApTdWJqZWN0OiBbUEFU
-Q0ggMS8yXSBTTUIzOiBWYWxpZGF0ZSBuZWdvdGlhdGUgcmVxdWVzdCBtdXN0IGFsd2F5cyBi
-ZSBzaWduZWQKCmNvbW1pdCA0NTg3ZWVlMDRlMmFjN2FjM2FjOWZhMmJjMTY0ZmI2ZTU0OGY5
-OWNkIHVwc3RyZWFtLgoKQWNjb3JkaW5nIHRvIE1TLVNNQjIgMy4yLjU1IHZhbGlkYXRlX25l
-Z290aWF0ZSByZXF1ZXN0IG11c3QKYWx3YXlzIGJlIHNpZ25lZC4gU29tZSBXaW5kb3dzIGNh
-biBmYWlsIHRoZSByZXF1ZXN0IGlmIHlvdSBzZW5kIGl0IHVuc2lnbmVkCgpTZWUga2VybmVs
-IGJ1Z3ppbGxhIGJ1ZyAxOTczMTEKClsgRml4ZWQgdXAgZm9yIGtlcm5lbCB2ZXJzaW9uIDQu
-NCBdCgpDQzogU3RhYmxlIDxzdGFibGVAdmdlci5rZXJuZWwub3JnPgpBY2tlZC1ieTogUm9u
-bmllIFNhaGxiZXJnIDxsc2FobGJlci5yZWRoYXQuY29tPgpTaWduZWQtb2ZmLWJ5OiBTdGV2
-ZSBGcmVuY2ggPHNtZnJlbmNoQGdtYWlsLmNvbT4KU2lnbmVkLW9mZi1ieTogU3JpdmF0c2Eg
-Uy4gQmhhdCA8c3JpdmF0c2FAY3NhaWwubWl0LmVkdT4KLS0tCiBmcy9jaWZzL3NtYjJwZHUu
-YyB8IDMgKysrCiAxIGZpbGUgY2hhbmdlZCwgMyBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0
-IGEvZnMvY2lmcy9zbWIycGR1LmMgYi9mcy9jaWZzL3NtYjJwZHUuYwppbmRleCA4NDYxNGE1
-Li42ZGFlNWI4IDEwMDY0NAotLS0gYS9mcy9jaWZzL3NtYjJwZHUuYworKysgYi9mcy9jaWZz
-L3NtYjJwZHUuYwpAQCAtMTU1OCw2ICsxNTU4LDkgQEAgU01CMl9pb2N0bChjb25zdCB1bnNp
-Z25lZCBpbnQgeGlkLCBzdHJ1Y3QgY2lmc190Y29uICp0Y29uLCB1NjQgcGVyc2lzdGVudF9m
-aWQsCiAJfSBlbHNlCiAJCWlvdlswXS5pb3ZfbGVuID0gZ2V0X3JmYzEwMDJfbGVuZ3RoKHJl
-cSkgKyA0OwogCisJLyogdmFsaWRhdGUgbmVnb3RpYXRlIHJlcXVlc3QgbXVzdCBiZSBzaWdu
-ZWQgLSBzZWUgTVMtU01CMiAzLjIuNS41ICovCisJaWYgKG9wY29kZSA9PSBGU0NUTF9WQUxJ
-REFURV9ORUdPVElBVEVfSU5GTykKKwkJcmVxLT5oZHIuRmxhZ3MgfD0gU01CMl9GTEFHU19T
-SUdORUQ7CiAKIAlyYyA9IFNlbmRSZWNlaXZlMih4aWQsIHNlcywgaW92LCBudW1faW92ZWNz
-LCAmcmVzcF9idWZ0eXBlLCAwKTsKIAlyc3AgPSAoc3RydWN0IHNtYjJfaW9jdGxfcnNwICop
-aW92WzBdLmlvdl9iYXNlOwotLSAKMi43LjQKCg==
---------------D6FB28CE7AF7DFC86731D754
-Content-Type: text/plain; charset=UTF-8; x-mac-type="0"; x-mac-creator="0";
- name="v4.4-0002-CIFS-Enable-encryption-during-session-setup-phase.patch"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename*0="v4.4-0002-CIFS-Enable-encryption-during-session-setup-phase.";
- filename*1="patch"
-
-RnJvbSBkMDE3OGQ4ZjA5NmIyOWE4ODkxNDc4NzI3NGJkYzhlZTgzMzRhYjA3IE1vbiBTZXAg
-MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBQYXZlbCBTaGlsb3Zza3kgPHBzaGlsb3ZAbWljcm9z
-b2Z0LmNvbT4KRGF0ZTogTW9uLCA3IE5vdiAyMDE2IDE4OjIwOjUwIC0wODAwClN1YmplY3Q6
-IFtQQVRDSCAyLzJdIENJRlM6IEVuYWJsZSBlbmNyeXB0aW9uIGR1cmluZyBzZXNzaW9uIHNl
-dHVwIHBoYXNlCgpjb21taXQgY2FiZmIzNjgwZjc4OTgxZDI2YzA3OGEyNmU1Yzc0ODUzMTI1
-N2ViYiB1cHN0cmVhbS4KCkluIG9yZGVyIHRvIGFsbG93IGVuY3J5cHRpb24gb24gU01CIGNv
-bm5lY3Rpb24gd2UgbmVlZCB0byBleGNoYW5nZQphIHNlc3Npb24ga2V5IGFuZCBnZW5lcmF0
-ZSBlbmNyeXB0aW9uIGFuZCBkZWNyeXB0aW9uIGtleXMuCgpbIEZpeGVkIHVwIGZvciBrZXJu
-ZWwgdmVyc2lvbiA0LjQgXQoKU2lnbmVkLW9mZi1ieTogUGF2ZWwgU2hpbG92c2t5IDxwc2hp
-bG92QG1pY3Jvc29mdC5jb20+ClNpZ25lZC1vZmYtYnk6IFNyaXZhdHNhIFMuIEJoYXQgPHNy
-aXZhdHNhQGNzYWlsLm1pdC5lZHU+Ci0tLQogZnMvY2lmcy9zZXNzLmMgICAgfCAyMiArKysr
-KysrKysrLS0tLS0tLS0tLS0tCiBmcy9jaWZzL3NtYjJwZHUuYyB8ICA4ICstLS0tLS0tCiAy
-IGZpbGVzIGNoYW5nZWQsIDExIGluc2VydGlvbnMoKyksIDE5IGRlbGV0aW9ucygtKQoKZGlm
-ZiAtLWdpdCBhL2ZzL2NpZnMvc2Vzcy5jIGIvZnMvY2lmcy9zZXNzLmMKaW5kZXggZTg4ZmZl
-MS4uYTAzNWQxYSAxMDA2NDQKLS0tIGEvZnMvY2lmcy9zZXNzLmMKKysrIGIvZnMvY2lmcy9z
-ZXNzLmMKQEAgLTM0NCwxMyArMzQ0LDEyIEBAIHZvaWQgYnVpbGRfbnRsbXNzcF9uZWdvdGlh
-dGVfYmxvYih1bnNpZ25lZCBjaGFyICpwYnVmZmVyLAogCS8qIEJCIGlzIE5UTE1WMiBzZXNz
-aW9uIHNlY3VyaXR5IGZvcm1hdCBlYXNpZXIgdG8gdXNlIGhlcmU/ICovCiAJZmxhZ3MgPSBO
-VExNU1NQX05FR09USUFURV81NiB8CU5UTE1TU1BfUkVRVUVTVF9UQVJHRVQgfAogCQlOVExN
-U1NQX05FR09USUFURV8xMjggfCBOVExNU1NQX05FR09USUFURV9VTklDT0RFIHwKLQkJTlRM
-TVNTUF9ORUdPVElBVEVfTlRMTSB8IE5UTE1TU1BfTkVHT1RJQVRFX0VYVEVOREVEX1NFQzsK
-LQlpZiAoc2VzLT5zZXJ2ZXItPnNpZ24pIHsKKwkJTlRMTVNTUF9ORUdPVElBVEVfTlRMTSB8
-IE5UTE1TU1BfTkVHT1RJQVRFX0VYVEVOREVEX1NFQyB8CisJCU5UTE1TU1BfTkVHT1RJQVRF
-X1NFQUw7CisJaWYgKHNlcy0+c2VydmVyLT5zaWduKQogCQlmbGFncyB8PSBOVExNU1NQX05F
-R09USUFURV9TSUdOOwotCQlpZiAoIXNlcy0+c2VydmVyLT5zZXNzaW9uX2VzdGFiIHx8Ci0J
-CQkJc2VzLT5udGxtc3NwLT5zZXNza2V5X3Blcl9zbWJzZXNzKQotCQkJZmxhZ3MgfD0gTlRM
-TVNTUF9ORUdPVElBVEVfS0VZX1hDSDsKLQl9CisJaWYgKCFzZXMtPnNlcnZlci0+c2Vzc2lv
-bl9lc3RhYiB8fCBzZXMtPm50bG1zc3AtPnNlc3NrZXlfcGVyX3NtYnNlc3MpCisJCWZsYWdz
-IHw9IE5UTE1TU1BfTkVHT1RJQVRFX0tFWV9YQ0g7CiAKIAlzZWNfYmxvYi0+TmVnb3RpYXRl
-RmxhZ3MgPSBjcHVfdG9fbGUzMihmbGFncyk7CiAKQEAgLTQwNywxMyArNDA2LDEyIEBAIGlu
-dCBidWlsZF9udGxtc3NwX2F1dGhfYmxvYih1bnNpZ25lZCBjaGFyICoqcGJ1ZmZlciwKIAlm
-bGFncyA9IE5UTE1TU1BfTkVHT1RJQVRFXzU2IHwKIAkJTlRMTVNTUF9SRVFVRVNUX1RBUkdF
-VCB8IE5UTE1TU1BfTkVHT1RJQVRFX1RBUkdFVF9JTkZPIHwKIAkJTlRMTVNTUF9ORUdPVElB
-VEVfMTI4IHwgTlRMTVNTUF9ORUdPVElBVEVfVU5JQ09ERSB8Ci0JCU5UTE1TU1BfTkVHT1RJ
-QVRFX05UTE0gfCBOVExNU1NQX05FR09USUFURV9FWFRFTkRFRF9TRUM7Ci0JaWYgKHNlcy0+
-c2VydmVyLT5zaWduKSB7CisJCU5UTE1TU1BfTkVHT1RJQVRFX05UTE0gfCBOVExNU1NQX05F
-R09USUFURV9FWFRFTkRFRF9TRUMgfAorCQlOVExNU1NQX05FR09USUFURV9TRUFMOworCWlm
-IChzZXMtPnNlcnZlci0+c2lnbikKIAkJZmxhZ3MgfD0gTlRMTVNTUF9ORUdPVElBVEVfU0lH
-TjsKLQkJaWYgKCFzZXMtPnNlcnZlci0+c2Vzc2lvbl9lc3RhYiB8fAotCQkJCXNlcy0+bnRs
-bXNzcC0+c2Vzc2tleV9wZXJfc21ic2VzcykKLQkJCWZsYWdzIHw9IE5UTE1TU1BfTkVHT1RJ
-QVRFX0tFWV9YQ0g7Ci0JfQorCWlmICghc2VzLT5zZXJ2ZXItPnNlc3Npb25fZXN0YWIgfHwg
-c2VzLT5udGxtc3NwLT5zZXNza2V5X3Blcl9zbWJzZXNzKQorCQlmbGFncyB8PSBOVExNU1NQ
-X05FR09USUFURV9LRVlfWENIOwogCiAJdG1wID0gKnBidWZmZXIgKyBzaXplb2YoQVVUSEVO
-VElDQVRFX01FU1NBR0UpOwogCXNlY19ibG9iLT5OZWdvdGlhdGVGbGFncyA9IGNwdV90b19s
-ZTMyKGZsYWdzKTsKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvc21iMnBkdS5jIGIvZnMvY2lmcy9z
-bWIycGR1LmMKaW5kZXggNmRhZTViOC4uMzNiMWJjMiAxMDA2NDQKLS0tIGEvZnMvY2lmcy9z
-bWIycGR1LmMKKysrIGIvZnMvY2lmcy9zbWIycGR1LmMKQEAgLTgzMiwxMCArODMyLDggQEAg
-c3NldHVwX2V4aXQ6CiAKIAlpZiAoIXJjKSB7CiAJCW11dGV4X2xvY2soJnNlcnZlci0+c3J2
-X211dGV4KTsKLQkJaWYgKHNlcnZlci0+c2lnbiAmJiBzZXJ2ZXItPm9wcy0+Z2VuZXJhdGVf
-c2lnbmluZ2tleSkgeworCQlpZiAoc2VydmVyLT5vcHMtPmdlbmVyYXRlX3NpZ25pbmdrZXkp
-IHsKIAkJCXJjID0gc2VydmVyLT5vcHMtPmdlbmVyYXRlX3NpZ25pbmdrZXkoc2VzKTsKLQkJ
-CWtmcmVlKHNlcy0+YXV0aF9rZXkucmVzcG9uc2UpOwotCQkJc2VzLT5hdXRoX2tleS5yZXNw
-b25zZSA9IE5VTEw7CiAJCQlpZiAocmMpIHsKIAkJCQljaWZzX2RiZyhGWUksCiAJCQkJCSJT
-TUIzIHNlc3Npb24ga2V5IGdlbmVyYXRpb24gZmFpbGVkXG4iKTsKQEAgLTg1NywxMCArODU1
-LDYgQEAgc3NldHVwX2V4aXQ6CiAJfQogCiBrZXlnZW5fZXhpdDoKLQlpZiAoIXNlcnZlci0+
-c2lnbikgewotCQlrZnJlZShzZXMtPmF1dGhfa2V5LnJlc3BvbnNlKTsKLQkJc2VzLT5hdXRo
-X2tleS5yZXNwb25zZSA9IE5VTEw7Ci0JfQogCWlmIChzcG5lZ29fa2V5KSB7CiAJCWtleV9p
-bnZhbGlkYXRlKHNwbmVnb19rZXkpOwogCQlrZXlfcHV0KHNwbmVnb19rZXkpOwotLSAKMi43
-LjQKCg==
---------------D6FB28CE7AF7DFC86731D754--
