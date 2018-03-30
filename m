@@ -1,49 +1,65 @@
-From: Pavel Shilovsky <piastryyy@gmail.com>
-Subject: Re: [PATCH 4.13 28/43] SMB3: Validate negotiate request must always
- be signed
-Date: Thu, 22 Mar 2018 12:14:24 -0700
-Message-ID: <CAKywueS_8hhS3X=cCAD9etPr=L348kY3Wfv+n9q=gBV2ey6cbw@mail.gmail.com>
-References: <28ffc363-5140-5685-d288-6e3dc07c6369@csail.mit.edu>
- <20180227085428.GA16879@kroah.com> <b20cbd94-ce9b-cb2c-dc95-a6821376823f@csail.mit.edu>
- <20180227124050.GB31888@kroah.com> <6bca5a97-f581-86b8-12ad-77147619d519@csail.mit.edu>
- <CAH2r5mt91WGHDk-+LP4EBTEfAOmrY2k6_X7KKjc0D+LcDCfxRw@mail.gmail.com>
- <309db6c4-7e21-bfbe-44d4-eb41f5516d5e@csail.mit.edu> <CAH2r5muUfsZsqaBqkAfi_dXRheib+7DN=VSsbGcV22C2MdJaGw@mail.gmail.com>
- <20180313092133.GA13325@kroah.com> <CAH2r5mvmiTaC4W=LAaOvWv6xGEMce957c+u+Af6wNgxudbO3_w@mail.gmail.com>
- <20180316133241.GC11397@kroah.com> <CAH2r5mvYxpr_0CPZNiNJTGhFNaM06w-EoTT7WS8oVjVZq8HCCw@mail.gmail.com>
- <6745f869-e249-a891-8d76-79f2830dd57f@csail.mit.edu>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Steve French <smfrench@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Thomas Backlund <tmb@mageia.org>,
-        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Stable <stable@vger.kernel.org>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Pavel Shilovskiy <pshilov@microsoft.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-To: "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <6745f869-e249-a891-8d76-79f2830dd57f@csail.mit.edu>
-Sender: stable-owner@vger.kernel.org
+From: Long Li <longli@linuxonhyperv.com>
+Subject: [PATCH 2/2] cifs: smbd: disconnect transport on RDMA errors
+Date: Fri, 30 Mar 2018 15:16:36 -0700
+Message-ID: <20180330221636.32512-2-longli@linuxonhyperv.com>
+References: <20180330221636.32512-1-longli@linuxonhyperv.com>
+Reply-To: longli@microsoft.com
+Cc: Long Li <longli@microsoft.com>
+To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180330221636.32512-1-longli@linuxonhyperv.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-2018-03-21 22:12 GMT-07:00 Srivatsa S. Bhat <srivatsa@csail.mit.edu>:
-> On 3/21/18 7:02 PM, Steve French wrote:
->> Found a patch which solves the dependency issue.  In my testing (on
->> 4.9, with Windows 2016, and also to Samba) as Pavel suggested this
->> appears to fix the problem, but I will let Srivatsa confirm that it
->> also fixes it for him.  The two attached patches for 4.9 should work.
->>
->
-> Indeed, those two patches fix the problem for me on 4.9. Thanks a lot
-> Steve, Pavel and Aurelien for all your efforts in fixing this!
->
-> I was also interested in getting this fixed on 4.4, so I modified the
-> patches to apply on 4.4.88 and verified that they fix the mount
-> failure. I have attached my patches for 4.4 with this mail.
->
-> Steve, Pavel, could you kindly double-check the second patch for 4.4,
-> especially around the keygen_exit error path?
+From: Long Li <longli@microsoft.com>
 
-The patch looks good. Thanks for the backport.
+On RDMA errors, transport should disconnect the RDMA CM connection. This
+will notify the upper layer, and it will attempt transport reconnect.
+
+Signed-off-by: Long Li <longli@microsoft.com>
+---
+ fs/cifs/smbdirect.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+index 3f7883e..5008af5 100644
+--- a/fs/cifs/smbdirect.c
++++ b/fs/cifs/smbdirect.c
+@@ -862,6 +862,8 @@ static int smbd_post_send_negotiate_req(struct smbd_connection *info)
+ 	ib_dma_unmap_single(info->id->device, request->sge[0].addr,
+ 		request->sge[0].length, DMA_TO_DEVICE);
+ 
++	smbd_disconnect_rdma_connection(info);
++
+ dma_mapping_failed:
+ 	mempool_free(request, info->request_mempool);
+ 	return rc;
+@@ -1061,6 +1063,7 @@ static int smbd_post_send(struct smbd_connection *info,
+ 			if (atomic_dec_and_test(&info->send_pending))
+ 				wake_up(&info->wait_send_pending);
+ 		}
++		smbd_disconnect_rdma_connection(info);
+ 	} else
+ 		/* Reset timer for idle connection after packet is sent */
+ 		mod_delayed_work(info->workqueue, &info->idle_timer_work,
+@@ -1202,7 +1205,7 @@ static int smbd_post_recv(
+ 	if (rc) {
+ 		ib_dma_unmap_single(info->id->device, response->sge.addr,
+ 				    response->sge.length, DMA_FROM_DEVICE);
+-
++		smbd_disconnect_rdma_connection(info);
+ 		log_rdma_recv(ERR, "ib_post_recv failed rc=%d\n", rc);
+ 	}
+ 
+@@ -2546,6 +2549,8 @@ struct smbd_mr *smbd_register_mr(
+ 	if (atomic_dec_and_test(&info->mr_used_count))
+ 		wake_up(&info->wait_for_mr_cleanup);
+ 
++	smbd_disconnect_rdma_connection(info);
++
+ 	return NULL;
+ }
+ 
+-- 
+2.7.4
