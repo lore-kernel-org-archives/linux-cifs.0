@@ -1,101 +1,51 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH 1/2] cifs: smbd: avoid reconnect lockup
-Date: Fri, 30 Mar 2018 19:19:54 -0500
-Message-ID: <CAH2r5msBv0tUjitg64fBaitC83_8i6iGOzzmjhE4HxEUtBe6hQ@mail.gmail.com>
-References: <20180330221636.32512-1-longli@linuxonhyperv.com> <CAN05THTrte19yRdyAOHvcjhxmOW=auh=z5nvVXsqcLxbmYn7Dg@mail.gmail.com>
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: linux-next: Signed-off-by missing for commit in the cifs tree
+Date: Sun, 1 Apr 2018 11:38:28 +1000
+Message-ID: <20180401113828.05bf52d5@canb.auug.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Long Li <longli@microsoft.com>, Steve French <sfrench@samba.org>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>
-To: ronnie sahlberg <ronniesahlberg@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/Mw6kmUKCKhy7k7bSojDqmeQ"; protocol="application/pgp-signature"
+Cc: Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Steve French <stfrench@microsoft.com>
+To: Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAN05THTrte19yRdyAOHvcjhxmOW=auh=z5nvVXsqcLxbmYn7Dg@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-merged into cifs-2.6.git for-next
+--Sig_/Mw6kmUKCKhy7k7bSojDqmeQ
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-added cc:stable
+Hi all,
 
-On Fri, Mar 30, 2018 at 5:23 PM, ronnie sahlberg
-<ronniesahlberg@gmail.com> wrote:
-> Looks good to me (both patches)
->
-> Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
->
-> On Sat, Mar 31, 2018 at 8:16 AM, Long Li <longli@linuxonhyperv.com> wrote:
->> From: Long Li <longli@microsoft.com>
->>
->> During transport reconnect, other processes may have registered memory
->> and blocked on transport. This creates a deadlock situation because the
->> transport resources can't be freed, and reconnect is blocked.
->>
->> Fix this by returning to upper layer on timeout. Before returning,
->> transport status is set to reconnecting so other processes will release
->> memory registration resources.
->>
->> Upper layer will retry the reconnect. This is not in fast I/O path so
->> setting the timeout to 5 seconds.
->>
->> Signed-off-by: Long Li <longli@microsoft.com>
->> ---
->>  fs/cifs/smbdirect.c | 12 ++++++++----
->>  1 file changed, 8 insertions(+), 4 deletions(-)
->>
->> diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
->> index 5aa0b54..3f7883e 100644
->> --- a/fs/cifs/smbdirect.c
->> +++ b/fs/cifs/smbdirect.c
->> @@ -1498,8 +1498,8 @@ int smbd_reconnect(struct TCP_Server_Info *server)
->>         log_rdma_event(INFO, "reconnecting rdma session\n");
->>
->>         if (!server->smbd_conn) {
->> -               log_rdma_event(ERR, "rdma session already destroyed\n");
->> -               return -EINVAL;
->> +               log_rdma_event(INFO, "rdma session already destroyed\n");
->> +               goto create_conn;
->>         }
->>
->>         /*
->> @@ -1512,15 +1512,19 @@ int smbd_reconnect(struct TCP_Server_Info *server)
->>         }
->>
->>         /* wait until the transport is destroyed */
->> -       wait_event(server->smbd_conn->wait_destroy,
->> -               server->smbd_conn->transport_status == SMBD_DESTROYED);
->> +       if (!wait_event_timeout(server->smbd_conn->wait_destroy,
->> +               server->smbd_conn->transport_status == SMBD_DESTROYED, 5*HZ))
->> +               return -EAGAIN;
->>
->>         destroy_workqueue(server->smbd_conn->workqueue);
->>         kfree(server->smbd_conn);
->>
->> +create_conn:
->>         log_rdma_event(INFO, "creating rdma session\n");
->>         server->smbd_conn = smbd_get_connection(
->>                 server, (struct sockaddr *) &server->dstaddr);
->> +       log_rdma_event(INFO, "created rdma session info=%p\n",
->> +               server->smbd_conn);
->>
->>         return server->smbd_conn ? 0 : -ENOENT;
->>  }
->> --
->> 2.7.4
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Commit
 
+  7127583a1b4b ("cifs: add server->vals->header_preamble_size")
 
+is missing a Signed-off-by from its committer.
 
--- 
-Thanks,
+[I am assuming that smfrench@gmail.com =3D=3D stfrench@microsoft.com]
 
-Steve
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/Mw6kmUKCKhy7k7bSojDqmeQ
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAlrAOBQACgkQAVBC80lX
+0GxyAwf9EaEJUTwOC+LTuEXVMkBBUHXC2l60K30NLbi59HXjQEBCZRzPxh2R+GWZ
+G/bj2Wotq7ABgVcfAIfLt/S0ML0lbecherseRiDooBpcQrqY/MpuKtWAAOzDaivD
+pcR90JkLbejsMZsPro9LxQFA8IKsTMJ65n/2rtNSwi3CYFo2YUI34zQUwrYpc2Ja
+to9N2NXt+gXtqR5NOpdZX+2C3hYEOAEGa/+nFz1c24v2d0O3Us2clggPcX6kD0P+
+Bvc57P30B9xvrAkfDNgTtWaq4nUAOLANgsA9MaDDyACKIWPkY4IVhN0tz8rmEJTV
+IFOiXuff7nzEFcGLyPEwuUNmnFsMKA==
+=+5Py
+-----END PGP SIGNATURE-----
+
+--Sig_/Mw6kmUKCKhy7k7bSojDqmeQ--
