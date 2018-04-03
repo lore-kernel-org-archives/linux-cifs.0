@@ -1,40 +1,56 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: linux-next: Signed-off-by missing for commit in the cifs tree
-Date: Sat, 31 Mar 2018 23:45:07 -0500
-Message-ID: <CAH2r5mur2R=5MQLNEOBbCRbtRa7NXg+gc6R2hZaize62baj+WA@mail.gmail.com>
-References: <20180401113828.05bf52d5@canb.auug.org.au>
+From: "Gustavo A. R. Silva" <garsilva@embeddedor.com>
+Subject: [PATCH v2] cifs: smb2pdu: Fix potential NULL pointer dereference
+Date: Tue, 3 Apr 2018 16:00:40 -0500
+Message-ID: <20180403210039.GA28968@embeddedor.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: CIFS <linux-cifs@vger.kernel.org>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Steve French <stfrench@microsoft.com>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavo@embeddeor.com>
+To: Ronnie Sahlberg <lsahlber@redhat.com>,
+        Steve French <sfrench@samba.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180401113828.05bf52d5@canb.auug.org.au>
+Content-Disposition: inline
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-fixed
+tcon->ses is being dereferenced before it is null checked, hence
+there is a potential null pointer dereference.
 
-On Sat, Mar 31, 2018 at 8:38 PM, Stephen Rothwell <sfr@canb.auug.org.au> wrote:
-> Hi all,
->
-> Commit
->
->   7127583a1b4b ("cifs: add server->vals->header_preamble_size")
->
-> is missing a Signed-off-by from its committer.
->
-> [I am assuming that smfrench@gmail.com == stfrench@microsoft.com]
->
-> --
-> Cheers,
-> Stephen Rothwell
+Fix this by moving the pointer dereference after tcon->ses has
+been properly null checked.
 
+Addresses-Coverity-ID: 1467426 ("Dereference before null check")
+Fixes: 93012bf98416 ("cifs: add server->vals->header_preamble_size")
+Signed-off-by: Gustavo A. R. Silva <garsilva@embeddedor.com>
+---
+Changes in v2:
+ - Update subject.
 
+ fs/cifs/smb2pdu.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index f7741ce..e5ac474 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -3454,7 +3454,7 @@ static int
+ build_qfs_info_req(struct kvec *iov, struct cifs_tcon *tcon, int level,
+ 		   int outbuf_len, u64 persistent_fid, u64 volatile_fid)
+ {
+-	struct TCP_Server_Info *server = tcon->ses->server;
++	struct TCP_Server_Info *server;
+ 	int rc;
+ 	struct smb2_query_info_req *req;
+ 	unsigned int total_len;
+@@ -3464,6 +3464,8 @@ build_qfs_info_req(struct kvec *iov, struct cifs_tcon *tcon, int level,
+ 	if ((tcon->ses == NULL) || (tcon->ses->server == NULL))
+ 		return -EIO;
+ 
++	server = tcon->ses->server;
++
+ 	rc = smb2_plain_req_init(SMB2_QUERY_INFO, tcon, (void **) &req,
+ 			     &total_len);
+ 	if (rc)
 -- 
-Thanks,
-
-Steve
+2.7.4
