@@ -1,53 +1,37 @@
-From: "Gustavo A. R. Silva" <garsilva@embeddedor.com>
-Subject: [PATCH] cifs: cifssmb: Fix potential NULL pointer dereference
-Date: Tue, 3 Apr 2018 15:55:12 -0500
-Message-ID: <20180403205512.GA28804@embeddedor.com>
+From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
+Subject: Re: [PATCH v2] cifs: smb2pdu: Fix potential NULL pointer dereference
+Date: Wed, 04 Apr 2018 12:18:00 +0200
+Message-ID: <87muyjff6v.fsf@suse.com>
+References: <20180403210039.GA28968@embeddedor.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
         linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To: Ronnie Sahlberg <lsahlber@redhat.com>,
+        "Gustavo A. R. Silva" <gustavo@embeddeor.com>
+To: "Gustavo A. R. Silva" <garsilva@embeddedor.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
         Steve French <sfrench@samba.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
+In-Reply-To: <20180403210039.GA28968@embeddedor.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-tcon->ses is being dereferenced before it is null checked, hence
-there is a potential null pointer dereference.
+"Gustavo A. R. Silva" <garsilva@embeddedor.com> writes:
+> tcon->ses is being dereferenced before it is null checked, hence
+> there is a potential null pointer dereference.
+>
+> Fix this by moving the pointer dereference after tcon->ses has
+> been properly null checked.
+>
+> Addresses-Coverity-ID: 1467426 ("Dereference before null check")
+> Fixes: 93012bf98416 ("cifs: add server->vals->header_preamble_size")
+> Signed-off-by: Gustavo A. R. Silva <garsilva@embeddedor.com>
 
-Fix this by moving the pointer dereference after tcon->ses has
-been properly null checked.
+Reviewed-by: Aurelien Aptel <aaptel@suse.com>
 
-Addresses-Coverity-ID: 1467426 ("Dereference before null check")
-Fixes: 93012bf98416 ("cifs: add server->vals->header_preamble_size")
-Signed-off-by: Gustavo A. R. Silva <garsilva@embeddedor.com>
----
- fs/cifs/smb2pdu.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index f7741ce..e5ac474 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -3454,7 +3454,7 @@ static int
- build_qfs_info_req(struct kvec *iov, struct cifs_tcon *tcon, int level,
- 		   int outbuf_len, u64 persistent_fid, u64 volatile_fid)
- {
--	struct TCP_Server_Info *server = tcon->ses->server;
-+	struct TCP_Server_Info *server;
- 	int rc;
- 	struct smb2_query_info_req *req;
- 	unsigned int total_len;
-@@ -3464,6 +3464,8 @@ build_qfs_info_req(struct kvec *iov, struct cifs_tcon *tcon, int level,
- 	if ((tcon->ses == NULL) || (tcon->ses->server == NULL))
- 		return -EIO;
- 
-+	server = tcon->ses->server;
-+
- 	rc = smb2_plain_req_init(SMB2_QUERY_INFO, tcon, (void **) &req,
- 			     &total_len);
- 	if (rc)
 -- 
-2.7.4
+Aurélien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
+GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
