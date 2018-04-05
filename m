@@ -1,37 +1,41 @@
-From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-Subject: Re: [PATCH v2] cifs: smb2pdu: Fix potential NULL pointer dereference
-Date: Wed, 04 Apr 2018 12:18:00 +0200
-Message-ID: <87muyjff6v.fsf@suse.com>
-References: <20180403210039.GA28968@embeddedor.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH] cifs: Use ULL suffix for 64-bit constant
+Date: Thu,  5 Apr 2018 14:57:11 +0200
+Message-ID: <1522933031-25574-1-git-send-email-geert@linux-m68k.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
         linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavo@embeddeor.com>
-To: "Gustavo A. R. Silva" <garsilva@embeddedor.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Steve French <sfrench@samba.org>
+        Geert Uytterhoeven <geert@linux-m68k.org>
+To: Steve French <sfrench@samba.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180403210039.GA28968@embeddedor.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-"Gustavo A. R. Silva" <garsilva@embeddedor.com> writes:
-> tcon->ses is being dereferenced before it is null checked, hence
-> there is a potential null pointer dereference.
->
-> Fix this by moving the pointer dereference after tcon->ses has
-> been properly null checked.
->
-> Addresses-Coverity-ID: 1467426 ("Dereference before null check")
-> Fixes: 93012bf98416 ("cifs: add server->vals->header_preamble_size")
-> Signed-off-by: Gustavo A. R. Silva <garsilva@embeddedor.com>
+On 32-bit (e.g. with m68k-linux-gnu-gcc-4.1):
 
-Reviewed-by: Aurelien Aptel <aaptel@suse.com>
+    fs/cifs/inode.c: In function ‘simple_hashstr’:
+    fs/cifs/inode.c:713: warning: integer constant is too large for ‘long’ type
 
+Fixes: 7ea884c77e5c97f1 ("smb3: Fix root directory when server returns inode number of zero")
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+---
+ fs/cifs/inode.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index f856df4adae3c8e8..3c371f7f5963e793 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -710,7 +710,7 @@ cifs_get_file_info(struct file *filp)
+ /* Simple function to return a 64 bit hash of string.  Rarely called */
+ static __u64 simple_hashstr(const char *str)
+ {
+-	const __u64 hash_mult =  1125899906842597L; /* a big enough prime */
++	const __u64 hash_mult =  1125899906842597ULL; /* a big enough prime */
+ 	__u64 hash = 0;
+ 
+ 	while (*str)
 -- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
-GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+2.7.4
