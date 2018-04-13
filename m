@@ -1,80 +1,57 @@
-From: Vlastimil Babka <vbabka@suse.cz>
-Subject: cifs buffer overflow in kernels before 3.7
-Date: Thu, 12 Apr 2018 09:51:38 +0200
-Message-ID: <86df41d8-80d8-a32c-69f8-f15b879c015d@suse.cz>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Subject: [PATCH] cifs: smb2ops: Fix NULL check in smb2_query_symlink
+Date: Fri, 13 Apr 2018 10:13:29 -0500
+Message-ID: <20180413151329.GA27418@embeddedor.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        Aurelien Aptel <aaptel@suse.com>,
-        Ben Hutchings <ben@decadent.org.uk>,
-        Jeff Layton <jlayton@redhat.com>
-To: Steve French <sfrench@samba.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+To: Ronnie Sahlberg <lsahlber@redhat.com>,
+        Steve French <sfrench@samba.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Language: en-US
+Content-Disposition: inline
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Hi,
+The current code null checks variable err_buf, which is always null
+when it is checked, hence utf16_path is free'd and the function
+returns -ENOENT everytime it is called, making it impossible for the
+execution path to reach the following code:
 
-we have tracked down (in our 3.0-based kernel) a nasty overflow from
-cifs_build_path_to_root() calling convert_delimiter() on a kmalloced
-buffer that's not guaranteed to be null-terminated. AFAIU this happens
-during mount of a share's subdirectory (vol->prepath is non-zero). This
-was fixed (unknowingly) in 839db3d10a5b ("cifs: fix up handling of
-prefixpath= option") in 3.7, so I believe there's at least the 3.2 LTS
-affected. You could either backport the commit with followup fixes, or
-do something like we did (below). Current mainline could also use
-kzalloc() and move (or remove) the manual trailing null setting, as now
-it maybe give false assurance to whoever will be modifying the code.
+err_buf = err_iov.iov_base;
 
-Vlastimil
+Fix this by null checking err_iov.iov_base instead of err_buf. Also,
+notice that err_buf no longer needs to be initialized to NULL.
 
------8<-----
-From: Vlastimil Babka <vbabka@suse.cz>
-Subject: [PATCH] cifs: fix buffer overflow in cifs_build_path_to_root()
-
-After the strncpy() in cifs_build_path_to_root(), there is no guarantee of a
-trailing null, because pplen is initialized by strlen() which doesn't include
-it. Then convert_delimiter() is called before the trailing null is added, which
-means it can overflow the kmalloced object and corrupt unrelated memory until
-it hits a null byte.
-
-Make sure pplen includes the trailing null in vol->prepath. Also use kzalloc()
-and add the trailing null (now redundant) before convert_delimiter().
-
-Reviewed-by: Aurelien Aptel <aaptel@suse.com>
-Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+Addresses-Coverity-ID: 1467876 ("Logically dead code")
+Fixes: 2d636199e400 ("cifs: Change SMB2_open to return an iov for the error parameter")
+Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
 ---
- fs/cifs/inode.c |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ fs/cifs/smb2ops.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -792,7 +792,7 @@ static const struct inode_operations cif
- char *cifs_build_path_to_root(struct smb_vol *vol, struct cifs_sb_info *cifs_sb,
- 			      struct cifs_tcon *tcon, int add_treename)
- {
--	int pplen = vol->prepath ? strlen(vol->prepath) : 0;
-+	int pplen = vol->prepath ? strlen(vol->prepath) + 1: 0;
- 	int dfsplen;
- 	char *full_path = NULL;
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index b4ae932..38ebf3f 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -1452,7 +1452,7 @@ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
+ 	struct cifs_open_parms oparms;
+ 	struct cifs_fid fid;
+ 	struct kvec err_iov = {NULL, 0};
+-	struct smb2_err_rsp *err_buf = NULL;
++	struct smb2_err_rsp *err_buf;
+ 	struct smb2_symlink_err_rsp *symlink;
+ 	unsigned int sub_len;
+ 	unsigned int sub_offset;
+@@ -1476,7 +1476,7 @@ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
  
-@@ -809,15 +809,15 @@ char *cifs_build_path_to_root(struct smb
- 	else
- 		dfsplen = 0;
+ 	rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, &err_iov);
  
--	full_path = kmalloc(dfsplen + pplen + 1, GFP_KERNEL);
-+	full_path = kzalloc(dfsplen + pplen + 1, GFP_KERNEL);
- 	if (full_path == NULL)
- 		return full_path;
- 
- 	if (dfsplen)
- 		strncpy(full_path, tcon->treeName, dfsplen);
- 	strncpy(full_path + dfsplen, vol->prepath, pplen);
--	convert_delimiter(full_path, CIFS_DIR_SEP(cifs_sb));
- 	full_path[dfsplen + pplen] = 0; /* add trailing null */
-+	convert_delimiter(full_path, CIFS_DIR_SEP(cifs_sb));
- 	return full_path;
- }
- 
+-	if (!rc || !err_buf) {
++	if (!rc || !err_iov.iov_base) {
+ 		kfree(utf16_path);
+ 		return -ENOENT;
+ 	}
+-- 
+2.7.4
