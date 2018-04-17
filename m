@@ -1,9 +1,9 @@
-From: Greg KH <greg@kroah.com>
-Subject: Re: [PATCH 3/6] cifs: smbd: Avoid allocating iov on the stack
-Date: Tue, 17 Apr 2018 09:29:32 +0200
-Message-ID: <20180417072932.GB15310@kroah.com>
+From: Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH 5/6] cifs: smbd: Enable signing with smbdirect
+Date: Tue, 17 Apr 2018 09:29:40 +0200
+Message-ID: <20180417072940.GC15310@kroah.com>
 References: <20180417004918.29213-1-longli@linuxonhyperv.com>
- <20180417004918.29213-3-longli@linuxonhyperv.com>
+ <20180417004918.29213-5-longli@linuxonhyperv.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
@@ -12,95 +12,57 @@ Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
 To: longli@microsoft.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180417004918.29213-3-longli@linuxonhyperv.com>
+In-Reply-To: <20180417004918.29213-5-longli@linuxonhyperv.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Mon, Apr 16, 2018 at 05:49:15PM -0700, Long Li wrote:
+On Mon, Apr 16, 2018 at 05:49:17PM -0700, Long Li wrote:
 > From: Long Li <longli@microsoft.com>
 > 
-> It's not necessary to allocate another iov when going through the buffers
-> in smbd_send() through RDMA send.
+> Now signing is supported with RDMA transport.
 > 
-> Remove it to reduce stack size.
+> Remove the code that disabled it.
 > 
 > Signed-off-by: Long Li <longli@microsoft.com>
 > ---
->  fs/cifs/smbdirect.c | 36 ++++++++++++------------------------
->  1 file changed, 12 insertions(+), 24 deletions(-)
+>  fs/cifs/connect.c | 8 --------
+>  fs/cifs/smb2pdu.c | 4 ----
+>  2 files changed, 12 deletions(-)
 > 
-> diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-> index b5c6c0d..f575e9a 100644
-> --- a/fs/cifs/smbdirect.c
-> +++ b/fs/cifs/smbdirect.c
-> @@ -2088,7 +2088,7 @@ int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst)
->  	int start, i, j;
->  	int max_iov_size =
->  		info->max_send_size - sizeof(struct smbd_data_transfer);
-> -	struct kvec iov[SMBDIRECT_MAX_SGE];
-> +	struct kvec *iov;
->  	int rc;
->  
->  	info->smbd_send_pending++;
-> @@ -2099,32 +2099,20 @@ int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst)
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index e8830f0..deef270 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -1977,14 +1977,6 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+>  		goto cifs_parse_mount_err;
 >  	}
 >  
->  	/*
-> -	 * This usually means a configuration error
-> -	 * We use RDMA read/write for packet size > rdma_readwrite_threshold
-> -	 * as long as it's properly configured we should never get into this
-> -	 * situation
-> -	 */
-> -	if (rqst->rq_nvec + rqst->rq_npages > SMBDIRECT_MAX_SGE) {
-> -		log_write(ERR, "maximum send segment %x exceeding %x\n",
-> -			 rqst->rq_nvec + rqst->rq_npages, SMBDIRECT_MAX_SGE);
-> -		rc = -EINVAL;
-> -		goto done;
+> -#ifdef CONFIG_CIFS_SMB_DIRECT
+> -	if (vol->rdma && vol->sign) {
+> -		cifs_dbg(VFS, "Currently SMB direct doesn't support signing."
+> -			" This is being fixed\n");
+> -		goto cifs_parse_mount_err;
 > -	}
+> -#endif
 > -
-> -	/*
-> -	 * Remove the RFC1002 length defined in MS-SMB2 section 2.1
-> -	 * It is used only for TCP transport
-> +	 * Skip the RFC1002 length defined in MS-SMB2 section 2.1
-> +	 * It is used only for TCP transport in the iov[0]
->  	 * In future we may want to add a transport layer under protocol
->  	 * layer so this will only be issued to TCP transport
->  	 */
-> -	iov[0].iov_base = (char *)rqst->rq_iov[0].iov_base + 4;
-> -	iov[0].iov_len = rqst->rq_iov[0].iov_len - 4;
-> -	buflen += iov[0].iov_len;
-> +
-> +	if (rqst->rq_iov[0].iov_len != 4) {
-> +		log_write(ERR, "expected the pdu length in 1st iov, but got 0x%lu\n", rqst->rq_iov[0].iov_len);
-> +		return -EINVAL;
-> +	}
-> +	iov = &rqst->rq_iov[1];
+>  #ifndef CONFIG_KEYS
+>  	/* Muliuser mounts require CONFIG_KEYS support */
+>  	if (vol->multiuser) {
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index 6759035..d71ce51 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -737,10 +737,6 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
 >  
->  	/* total up iov array first */
-> -	for (i = 1; i < rqst->rq_nvec; i++) {
-> -		iov[i].iov_base = rqst->rq_iov[i].iov_base;
-> -		iov[i].iov_len = rqst->rq_iov[i].iov_len;
-> +	for (i = 0; i < rqst->rq_nvec-1; i++) {
->  		buflen += iov[i].iov_len;
->  	}
+>  	cifs_dbg(FYI, "validate negotiate\n");
 >  
-> @@ -2197,14 +2185,14 @@ int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst)
->  						goto done;
->  				}
->  				i++;
-> -				if (i == rqst->rq_nvec)
-> +				if (i == rqst->rq_nvec-1)
->  					break;
->  			}
->  			start = i;
->  			buflen = 0;
->  		} else {
->  			i++;
-> -			if (i == rqst->rq_nvec) {
-> +			if (i == rqst->rq_nvec-1) {
->  				/* send out all remaining vecs */
->  				remaining_data_length -= buflen;
->  				log_write(INFO,
+> -#ifdef CONFIG_CIFS_SMB_DIRECT
+> -	if (tcon->ses->server->rdma)
+> -		return 0;
+> -#endif
+>  	pneg_inbuf = kmalloc(sizeof(*pneg_inbuf), GFP_KERNEL);
+>  	if (!pneg_inbuf)
+>  		return -ENOMEM;
 > -- 
 > 2.7.4
 
