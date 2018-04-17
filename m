@@ -1,108 +1,182 @@
-From: Long Li <longli@linuxonhyperv.com>
-Subject: [Patch v2 4/6] cifs: smbd: Don't use RDMA read/write when signing is used
-Date: Tue, 17 Apr 2018 12:17:08 -0700
-Message-ID: <20180417191710.14855-4-longli@linuxonhyperv.com>
+From: Parav Pandit <parav@mellanox.com>
+Subject: RE: [Patch v2 2/6] cifs: Allocate validate negotiation request
+ through kmalloc
+Date: Tue, 17 Apr 2018 19:59:22 +0000
+Message-ID: <VI1PR0502MB30080A26FFC2A6132397C549D1B70@VI1PR0502MB3008.eurprd05.prod.outlook.com>
 References: <20180417191710.14855-1-longli@linuxonhyperv.com>
-Reply-To: longli@microsoft.com
-Cc: Long Li <longli@microsoft.com>, stable@vger.kernel.org
-To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-        linux-rdma@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180417191710.14855-1-longli@linuxonhyperv.com>
-Sender: linux-kernel-owner@vger.kernel.org
+ <20180417191710.14855-2-longli@linuxonhyperv.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>
+To: longli <longli@microsoft.com>, Steve French <sfrench@samba.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <20180417191710.14855-2-longli@linuxonhyperv.com>
+Content-Language: en-US
+Sender: stable-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-From: Long Li <longli@microsoft.com>
 
-SMB server will not sign data transferred through RDMA read/write. When
-signing is used, it's a good idea to have all the data signed.
 
-In this case, use RDMA send/recv for all data transfers. This will degrade
-performance as this is not generally configured in RDMA environemnt. So
-warn the user on signing and RDMA send/recv.
+> -----Original Message-----
+> From: linux-rdma-owner@vger.kernel.org [mailto:linux-rdma-
+> owner@vger.kernel.org] On Behalf Of Long Li
+> Sent: Tuesday, April 17, 2018 2:17 PM
+> To: Steve French <sfrench@samba.org>; linux-cifs@vger.kernel.org; samba-
+> technical@lists.samba.org; linux-kernel@vger.kernel.org; linux-
+> rdma@vger.kernel.org
+> Cc: longli <longli@microsoft.com>; stable@vger.kernel.org
+> Subject: [Patch v2 2/6] cifs: Allocate validate negotiation request throu=
+gh
+> kmalloc
+>=20
+> From: Long Li <longli@microsoft.com>
+>=20
+> The data buffer allocated on the stack can't be DMA'ed, and hence can't s=
+end
+> through RDMA via SMB Direct.
+>=20
+> Fix this by allocating the request on the heap in smb3_validate_negotiate=
+.
+>=20
+> Fixes: ff1c038addc4f205d5f1ede449426c7d316c0eed "Check SMB3 dialects
+> against downgrade attacks"
+>=20
 
-Signed-off-by: Long Li <longli@microsoft.com>
-Cc: stable@vger.kernel.org
----
- fs/cifs/cifssmb.c |  3 +++
- fs/cifs/smb2ops.c | 18 ++++++++++++++----
- fs/cifs/smb2pdu.c |  4 ++--
- 3 files changed, 19 insertions(+), 6 deletions(-)
+Format is:
+Fixes: ff1c038addc4 ("Check SMB3 dialects against downgrade attacks")
+It should be right above Signed-off signature.
 
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 6d3e40d..1529a08 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -455,6 +455,9 @@ cifs_enable_signing(struct TCP_Server_Info *server, bool mnt_sign_required)
- 		server->sign = true;
- 	}
- 
-+	if (cifs_rdma_enabled(server) && server->sign)
-+		cifs_dbg(VFS, "Signing is enabled, and RDMA read/write will be disabled");
-+
- 	return 0;
- }
- 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 38ebf3f..b76b858 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -252,9 +252,14 @@ smb2_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
- 	wsize = volume_info->wsize ? volume_info->wsize : CIFS_DEFAULT_IOSIZE;
- 	wsize = min_t(unsigned int, wsize, server->max_write);
- #ifdef CONFIG_CIFS_SMB_DIRECT
--	if (server->rdma)
--		wsize = min_t(unsigned int,
-+	if (server->rdma) {
-+		if (server->sign)
-+			wsize = min_t(unsigned int,
-+				wsize, server->smbd_conn->max_fragmented_send_size);
-+		else
-+			wsize = min_t(unsigned int,
- 				wsize, server->smbd_conn->max_readwrite_size);
-+	}
- #endif
- 	if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
- 		wsize = min_t(unsigned int, wsize, SMB2_MAX_BUFFER_SIZE);
-@@ -272,9 +277,14 @@ smb2_negotiate_rsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
- 	rsize = volume_info->rsize ? volume_info->rsize : CIFS_DEFAULT_IOSIZE;
- 	rsize = min_t(unsigned int, rsize, server->max_read);
- #ifdef CONFIG_CIFS_SMB_DIRECT
--	if (server->rdma)
--		rsize = min_t(unsigned int,
-+	if (server->rdma) {
-+		if (server->sign)
-+			rsize = min_t(unsigned int,
-+				rsize, server->smbd_conn->max_fragmented_recv_size);
-+		else
-+			rsize = min_t(unsigned int,
- 				rsize, server->smbd_conn->max_readwrite_size);
-+	}
- #endif
- 
- 	if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 41625e4..33f612f 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -2595,7 +2595,7 @@ smb2_new_read_req(void **buf, unsigned int *total_len,
- 	 * If we want to do a RDMA write, fill in and append
- 	 * smbd_buffer_descriptor_v1 to the end of read request
- 	 */
--	if (server->rdma && rdata &&
-+	if (server->rdma && rdata && !server->sign &&
- 		rdata->bytes >= server->smbd_conn->rdma_readwrite_threshold) {
- 
- 		struct smbd_buffer_descriptor_v1 *v1;
-@@ -2973,7 +2973,7 @@ smb2_async_writev(struct cifs_writedata *wdata,
- 	 * If we want to do a server RDMA read, fill in and append
- 	 * smbd_buffer_descriptor_v1 to the end of write request
- 	 */
--	if (server->rdma && wdata->bytes >=
-+	if (server->rdma && !server->sign && wdata->bytes >=
- 		server->smbd_conn->rdma_readwrite_threshold) {
- 
- 		struct smbd_buffer_descriptor_v1 *v1;
--- 
-2.7.4
+> Changes in v2:
+> Removed duplicated code on freeing buffers on function exit.
+> (Thanks to Parav Pandit <parav@mellanox.com>)
+>=20
+> Fixed typo in the patch title.
+>=20
+> Signed-off-by: Long Li <longli@microsoft.com>
+> Cc: stable@vger.kernel.org
+> ---
+>  fs/cifs/smb2pdu.c | 57 ++++++++++++++++++++++++++++++-------------------=
+-----
+> -
+>  1 file changed, 31 insertions(+), 26 deletions(-)
+>=20
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c index 0f044c4..41625e4
+> 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -729,8 +729,8 @@ SMB2_negotiate(const unsigned int xid, struct cifs_se=
+s
+> *ses)
+>=20
+>  int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tc=
+on)  {
+> -	int rc =3D 0;
+> -	struct validate_negotiate_info_req vneg_inbuf;
+> +	int ret, rc =3D -EIO;
+> +	struct validate_negotiate_info_req *pneg_inbuf;
+>  	struct validate_negotiate_info_rsp *pneg_rsp =3D NULL;
+>  	u32 rsplen;
+>  	u32 inbuflen; /* max of 4 dialects */
+> @@ -741,6 +741,9 @@ int smb3_validate_negotiate(const unsigned int xid,
+> struct cifs_tcon *tcon)
+>  	if (tcon->ses->server->rdma)
+>  		return 0;
+>  #endif
+> +	pneg_inbuf =3D kmalloc(sizeof(*pneg_inbuf), GFP_KERNEL);
+> +	if (!pneg_inbuf)
+> +		return -ENOMEM;
+>=20
+>  	/* In SMB3.11 preauth integrity supersedes validate negotiate */
+>  	if (tcon->ses->server->dialect =3D=3D SMB311_PROT_ID) @@ -764,53
+> +767,53 @@ int smb3_validate_negotiate(const unsigned int xid, struct
+> cifs_tcon *tcon)
+>  	if (tcon->ses->session_flags & SMB2_SESSION_FLAG_IS_NULL)
+>  		cifs_dbg(VFS, "Unexpected null user (anonymous) auth flag sent
+> by server\n");
+>=20
+> -	vneg_inbuf.Capabilities =3D
+> +	pneg_inbuf->Capabilities =3D
+>  			cpu_to_le32(tcon->ses->server->vals-
+> >req_capabilities);
+> -	memcpy(vneg_inbuf.Guid, tcon->ses->server->client_guid,
+> +	memcpy(pneg_inbuf->Guid, tcon->ses->server->client_guid,
+>  					SMB2_CLIENT_GUID_SIZE);
+>=20
+>  	if (tcon->ses->sign)
+> -		vneg_inbuf.SecurityMode =3D
+> +		pneg_inbuf->SecurityMode =3D
+>  			cpu_to_le16(SMB2_NEGOTIATE_SIGNING_REQUIRED);
+>  	else if (global_secflags & CIFSSEC_MAY_SIGN)
+> -		vneg_inbuf.SecurityMode =3D
+> +		pneg_inbuf->SecurityMode =3D
+>  			cpu_to_le16(SMB2_NEGOTIATE_SIGNING_ENABLED);
+>  	else
+> -		vneg_inbuf.SecurityMode =3D 0;
+> +		pneg_inbuf->SecurityMode =3D 0;
+>=20
+>=20
+>  	if (strcmp(tcon->ses->server->vals->version_string,
+Please check if strncmp() should be used or not.
+
+>  		SMB3ANY_VERSION_STRING) =3D=3D 0) {
+> -		vneg_inbuf.Dialects[0] =3D cpu_to_le16(SMB30_PROT_ID);
+> -		vneg_inbuf.Dialects[1] =3D cpu_to_le16(SMB302_PROT_ID);
+> -		vneg_inbuf.DialectCount =3D cpu_to_le16(2);
+> +		pneg_inbuf->Dialects[0] =3D cpu_to_le16(SMB30_PROT_ID);
+> +		pneg_inbuf->Dialects[1] =3D cpu_to_le16(SMB302_PROT_ID);
+> +		pneg_inbuf->DialectCount =3D cpu_to_le16(2);
+>  		/* structure is big enough for 3 dialects, sending only 2 */
+>  		inbuflen =3D sizeof(struct validate_negotiate_info_req) - 2;
+>  	} else if (strcmp(tcon->ses->server->vals->version_string,
+>  		SMBDEFAULT_VERSION_STRING) =3D=3D 0) {
+> -		vneg_inbuf.Dialects[0] =3D cpu_to_le16(SMB21_PROT_ID);
+> -		vneg_inbuf.Dialects[1] =3D cpu_to_le16(SMB30_PROT_ID);
+> -		vneg_inbuf.Dialects[2] =3D cpu_to_le16(SMB302_PROT_ID);
+> -		vneg_inbuf.DialectCount =3D cpu_to_le16(3);
+> +		pneg_inbuf->Dialects[0] =3D cpu_to_le16(SMB21_PROT_ID);
+> +		pneg_inbuf->Dialects[1] =3D cpu_to_le16(SMB30_PROT_ID);
+> +		pneg_inbuf->Dialects[2] =3D cpu_to_le16(SMB302_PROT_ID);
+> +		pneg_inbuf->DialectCount =3D cpu_to_le16(3);
+>  		/* structure is big enough for 3 dialects */
+>  		inbuflen =3D sizeof(struct validate_negotiate_info_req);
+>  	} else {
+>  		/* otherwise specific dialect was requested */
+> -		vneg_inbuf.Dialects[0] =3D
+> +		pneg_inbuf->Dialects[0] =3D
+>  			cpu_to_le16(tcon->ses->server->vals->protocol_id);
+> -		vneg_inbuf.DialectCount =3D cpu_to_le16(1);
+> +		pneg_inbuf->DialectCount =3D cpu_to_le16(1);
+>  		/* structure is big enough for 3 dialects, sending only 1 */
+>  		inbuflen =3D sizeof(struct validate_negotiate_info_req) - 4;
+>  	}
+>=20
+> -	rc =3D SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
+> +	ret =3D SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
+>  		FSCTL_VALIDATE_NEGOTIATE_INFO, true /* is_fsctl */,
+> -		(char *)&vneg_inbuf, sizeof(struct
+> validate_negotiate_info_req),
+> +		(char *)pneg_inbuf, sizeof(struct validate_negotiate_info_req),
+
+Use sizeof(*pneg_inbuf)
+
+>  		(char **)&pneg_rsp, &rsplen);
+>=20
+> -	if (rc !=3D 0) {
+> -		cifs_dbg(VFS, "validate protocol negotiate failed: %d\n", rc);
+> -		return -EIO;
+> +	if (ret !=3D 0) {
+
+if (ret) is fine.
+
+> +		cifs_dbg(VFS, "validate protocol negotiate failed: %d\n", ret);
+> +		goto out_free_inbuf;
+>  	}
+>=20
+>  	if (rsplen !=3D sizeof(struct validate_negotiate_info_rsp)) { @@ -820,7
+
+if (rsplen !=3D sizeof(*pneg_rsp))
