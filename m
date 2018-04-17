@@ -1,150 +1,85 @@
-From: Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH 2/6] cifs: Allocate validate negoation request through
- kmalloc
-Date: Tue, 17 Apr 2018 09:30:01 +0200
-Message-ID: <20180417073001.GF15310@kroah.com>
+From: Long Li <longli@microsoft.com>
+Subject: RE: [PATCH 1/6] cifs: smbd: Check for iov length on sending the last
+ iov
+Date: Tue, 17 Apr 2018 17:55:00 +0000
+Message-ID: <MWHPR2101MB0729066A1D5BB83987440EDECEB70@MWHPR2101MB0729.namprd21.prod.outlook.com>
 References: <20180417004918.29213-1-longli@linuxonhyperv.com>
- <20180417004918.29213-2-longli@linuxonhyperv.com>
+ <20180417072923.GA15310@kroah.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-        linux-rdma@vger.kernel.org, stable@vger.kernel.org
-To: longli@microsoft.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Cc: Steve French <sfrench@samba.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>
+To: Greg KH <gregkh@linuxfoundation.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180417004918.29213-2-longli@linuxonhyperv.com>
+In-Reply-To: <20180417072923.GA15310@kroah.com>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Mon, Apr 16, 2018 at 05:49:14PM -0700, Long Li wrote:
-> From: Long Li <longli@microsoft.com>
-> 
-> The data buffer allocated on the stack can't be DMA'ed, and hence can't send
-> through RDMA via SMB Direct.
-> 
-> Fix this by allocating the request on the heap in smb3_validate_negotiate.
-> 
-> Signed-off-by: Long Li <longli@microsoft.com>
-> ---
->  fs/cifs/smb2pdu.c | 38 ++++++++++++++++++++++----------------
->  1 file changed, 22 insertions(+), 16 deletions(-)
-> 
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 0f044c4..abbefe2 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -730,7 +730,7 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
->  int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
->  {
->  	int rc = 0;
-> -	struct validate_negotiate_info_req vneg_inbuf;
-> +	struct validate_negotiate_info_req *pneg_inbuf;
->  	struct validate_negotiate_info_rsp *pneg_rsp = NULL;
->  	u32 rsplen;
->  	u32 inbuflen; /* max of 4 dialects */
-> @@ -741,6 +741,9 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
->  	if (tcon->ses->server->rdma)
->  		return 0;
->  #endif
-> +	pneg_inbuf = kmalloc(sizeof(*pneg_inbuf), GFP_KERNEL);
-> +	if (!pneg_inbuf)
-> +		return -ENOMEM;
->  
->  	/* In SMB3.11 preauth integrity supersedes validate negotiate */
->  	if (tcon->ses->server->dialect == SMB311_PROT_ID)
-> @@ -764,52 +767,53 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
->  	if (tcon->ses->session_flags & SMB2_SESSION_FLAG_IS_NULL)
->  		cifs_dbg(VFS, "Unexpected null user (anonymous) auth flag sent by server\n");
->  
-> -	vneg_inbuf.Capabilities =
-> +	pneg_inbuf->Capabilities =
->  			cpu_to_le32(tcon->ses->server->vals->req_capabilities);
-> -	memcpy(vneg_inbuf.Guid, tcon->ses->server->client_guid,
-> +	memcpy(pneg_inbuf->Guid, tcon->ses->server->client_guid,
->  					SMB2_CLIENT_GUID_SIZE);
->  
->  	if (tcon->ses->sign)
-> -		vneg_inbuf.SecurityMode =
-> +		pneg_inbuf->SecurityMode =
->  			cpu_to_le16(SMB2_NEGOTIATE_SIGNING_REQUIRED);
->  	else if (global_secflags & CIFSSEC_MAY_SIGN)
-> -		vneg_inbuf.SecurityMode =
-> +		pneg_inbuf->SecurityMode =
->  			cpu_to_le16(SMB2_NEGOTIATE_SIGNING_ENABLED);
->  	else
-> -		vneg_inbuf.SecurityMode = 0;
-> +		pneg_inbuf->SecurityMode = 0;
->  
->  
->  	if (strcmp(tcon->ses->server->vals->version_string,
->  		SMB3ANY_VERSION_STRING) == 0) {
-> -		vneg_inbuf.Dialects[0] = cpu_to_le16(SMB30_PROT_ID);
-> -		vneg_inbuf.Dialects[1] = cpu_to_le16(SMB302_PROT_ID);
-> -		vneg_inbuf.DialectCount = cpu_to_le16(2);
-> +		pneg_inbuf->Dialects[0] = cpu_to_le16(SMB30_PROT_ID);
-> +		pneg_inbuf->Dialects[1] = cpu_to_le16(SMB302_PROT_ID);
-> +		pneg_inbuf->DialectCount = cpu_to_le16(2);
->  		/* structure is big enough for 3 dialects, sending only 2 */
->  		inbuflen = sizeof(struct validate_negotiate_info_req) - 2;
->  	} else if (strcmp(tcon->ses->server->vals->version_string,
->  		SMBDEFAULT_VERSION_STRING) == 0) {
-> -		vneg_inbuf.Dialects[0] = cpu_to_le16(SMB21_PROT_ID);
-> -		vneg_inbuf.Dialects[1] = cpu_to_le16(SMB30_PROT_ID);
-> -		vneg_inbuf.Dialects[2] = cpu_to_le16(SMB302_PROT_ID);
-> -		vneg_inbuf.DialectCount = cpu_to_le16(3);
-> +		pneg_inbuf->Dialects[0] = cpu_to_le16(SMB21_PROT_ID);
-> +		pneg_inbuf->Dialects[1] = cpu_to_le16(SMB30_PROT_ID);
-> +		pneg_inbuf->Dialects[2] = cpu_to_le16(SMB302_PROT_ID);
-> +		pneg_inbuf->DialectCount = cpu_to_le16(3);
->  		/* structure is big enough for 3 dialects */
->  		inbuflen = sizeof(struct validate_negotiate_info_req);
->  	} else {
->  		/* otherwise specific dialect was requested */
-> -		vneg_inbuf.Dialects[0] =
-> +		pneg_inbuf->Dialects[0] =
->  			cpu_to_le16(tcon->ses->server->vals->protocol_id);
-> -		vneg_inbuf.DialectCount = cpu_to_le16(1);
-> +		pneg_inbuf->DialectCount = cpu_to_le16(1);
->  		/* structure is big enough for 3 dialects, sending only 1 */
->  		inbuflen = sizeof(struct validate_negotiate_info_req) - 4;
->  	}
->  
->  	rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
->  		FSCTL_VALIDATE_NEGOTIATE_INFO, true /* is_fsctl */,
-> -		(char *)&vneg_inbuf, sizeof(struct validate_negotiate_info_req),
-> +		(char *)pneg_inbuf, sizeof(struct validate_negotiate_info_req),
->  		(char **)&pneg_rsp, &rsplen);
->  
->  	if (rc != 0) {
->  		cifs_dbg(VFS, "validate protocol negotiate failed: %d\n", rc);
-> +		kfree(pneg_inbuf);
->  		return -EIO;
->  	}
->  
-> @@ -838,12 +842,14 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
->  
->  	/* validate negotiate successful */
->  	cifs_dbg(FYI, "validate negotiate info successful\n");
-> +	kfree(pneg_inbuf);
->  	kfree(pneg_rsp);
->  	return 0;
->  
->  vneg_out:
->  	cifs_dbg(VFS, "protocol revalidation - security settings mismatch\n");
->  err_rsp_free:
-> +	kfree(pneg_inbuf);
->  	kfree(pneg_rsp);
->  	return -EIO;
->  }
-> -- 
-> 2.7.4
+> Subject: Re: [PATCH 1/6] cifs: smbd: Check for iov length on sending the =
+last
+> iov
+>=20
+> On Mon, Apr 16, 2018 at 05:49:13PM -0700, Long Li wrote:
+> > From: Long Li <longli@microsoft.com>
+> >
+> > When sending the last iov that breaks into smaller buffers to fit the
+> > transfer size, it's necessary to check if this is the last iov.
+> >
+> > If this is the latest iov, stop and proceed to send pages.
+> >
+> > Signed-off-by: Long Li <longli@microsoft.com>
+> > ---
+> >  fs/cifs/smbdirect.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> >
+> > diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c index
+> > 90e673c..b5c6c0d 100644
+> > --- a/fs/cifs/smbdirect.c
+> > +++ b/fs/cifs/smbdirect.c
+> > @@ -2197,6 +2197,8 @@ int smbd_send(struct smbd_connection *info,
+> struct smb_rqst *rqst)
+> >  						goto done;
+> >  				}
+> >  				i++;
+> > +				if (i =3D=3D rqst->rq_nvec)
+> > +					break;
+> >  			}
+> >  			start =3D i;
+> >  			buflen =3D 0;
+> > --
+> > 2.7.4
+>=20
+> <formletter>
+>=20
+> This is not the correct way to submit patches for inclusion in the stable=
+ kernel
+> tree.  Please read:
+>=20
+> https://na01.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fwww.
+> kernel.org%2Fdoc%2Fhtml%2Flatest%2Fprocess%2Fstable-kernel-
+> rules.html&data=3D02%7C01%7Clongli%40microsoft.com%7Cec2fc0284244483b
+> 25bf08d5a434f6dc%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C636
+> 595469807590402&sdata=3DYXqnaTFgRyUyN1ubhCcyblT2ni%2F%2BCowPYJSFje
+> 6PuCk%3D&reserved=3D0
+> for how to do this properly.
+>=20
+> </formletter>
 
-<formletter>
+Will do. Thank you.
 
-This is not the correct way to submit patches for inclusion in the
-stable kernel tree.  Please read:
-    https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
-for how to do this properly.
-
-</formletter>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in =
+the
+> body of a message to majordomo@vger.kernel.org More majordomo info at
+> https://na01.safelinks.protection.outlook.com/?url=3Dhttp%3A%2F%2Fvger.ke
+> rnel.org%2Fmajordomo-
+> info.html&data=3D02%7C01%7Clongli%40microsoft.com%7Cec2fc0284244483b2
+> 5bf08d5a434f6dc%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C6365
+> 95469807590402&sdata=3Duu9VQ%2BHscmeFJH6kQEf39G2a7Y8M9hMmvBI2s9
+> T1DXs%3D&reserved=3D0
