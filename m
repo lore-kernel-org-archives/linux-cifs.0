@@ -1,182 +1,199 @@
-From: Parav Pandit <parav@mellanox.com>
+From: Long Li <longli@microsoft.com>
 Subject: RE: [Patch v2 2/6] cifs: Allocate validate negotiation request
  through kmalloc
-Date: Tue, 17 Apr 2018 19:59:22 +0000
-Message-ID: <VI1PR0502MB30080A26FFC2A6132397C549D1B70@VI1PR0502MB3008.eurprd05.prod.outlook.com>
+Date: Tue, 17 Apr 2018 20:11:14 +0000
+Message-ID: <MWHPR2101MB0729D25984E4C57E79355794CEB70@MWHPR2101MB0729.namprd21.prod.outlook.com>
 References: <20180417191710.14855-1-longli@linuxonhyperv.com>
  <20180417191710.14855-2-longli@linuxonhyperv.com>
+ <VI1PR0502MB30080A26FFC2A6132397C549D1B70@VI1PR0502MB3008.eurprd05.prod.outlook.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>
-To: longli <longli@microsoft.com>, Steve French <sfrench@samba.org>,
+To: Parav Pandit <parav@mellanox.com>,
+        Steve French <sfrench@samba.org>,
         "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
         "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
 Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20180417191710.14855-2-longli@linuxonhyperv.com>
+In-Reply-To: <VI1PR0502MB30080A26FFC2A6132397C549D1B70@VI1PR0502MB3008.eurprd05.prod.outlook.com>
 Content-Language: en-US
 Sender: stable-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-
-
-> -----Original Message-----
-> From: linux-rdma-owner@vger.kernel.org [mailto:linux-rdma-
-> owner@vger.kernel.org] On Behalf Of Long Li
-> Sent: Tuesday, April 17, 2018 2:17 PM
-> To: Steve French <sfrench@samba.org>; linux-cifs@vger.kernel.org; samba-
-> technical@lists.samba.org; linux-kernel@vger.kernel.org; linux-
-> rdma@vger.kernel.org
-> Cc: longli <longli@microsoft.com>; stable@vger.kernel.org
-> Subject: [Patch v2 2/6] cifs: Allocate validate negotiation request throu=
-gh
+> Subject: RE: [Patch v2 2/6] cifs: Allocate validate negotiation request t=
+hrough
 > kmalloc
 >=20
-> From: Long Li <longli@microsoft.com>
 >=20
-> The data buffer allocated on the stack can't be DMA'ed, and hence can't s=
-end
-> through RDMA via SMB Direct.
 >=20
-> Fix this by allocating the request on the heap in smb3_validate_negotiate=
-.
+> > -----Original Message-----
+> > From: linux-rdma-owner@vger.kernel.org [mailto:linux-rdma-
+> > owner@vger.kernel.org] On Behalf Of Long Li
+> > Sent: Tuesday, April 17, 2018 2:17 PM
+> > To: Steve French <sfrench@samba.org>; linux-cifs@vger.kernel.org;
+> > samba- technical@lists.samba.org; linux-kernel@vger.kernel.org; linux-
+> > rdma@vger.kernel.org
+> > Cc: longli <longli@microsoft.com>; stable@vger.kernel.org
+> > Subject: [Patch v2 2/6] cifs: Allocate validate negotiation request
+> > through kmalloc
+> >
+> > From: Long Li <longli@microsoft.com>
+> >
+> > The data buffer allocated on the stack can't be DMA'ed, and hence
+> > can't send through RDMA via SMB Direct.
+> >
+> > Fix this by allocating the request on the heap in smb3_validate_negotia=
+te.
+> >
+> > Fixes: ff1c038addc4f205d5f1ede449426c7d316c0eed "Check SMB3 dialects
+> > against downgrade attacks"
+> >
 >=20
-> Fixes: ff1c038addc4f205d5f1ede449426c7d316c0eed "Check SMB3 dialects
-> against downgrade attacks"
->=20
+> Format is:
+> Fixes: ff1c038addc4 ("Check SMB3 dialects against downgrade attacks") It
+> should be right above Signed-off signature.
 
-Format is:
-Fixes: ff1c038addc4 ("Check SMB3 dialects against downgrade attacks")
-It should be right above Signed-off signature.
+I will fix up and resend this patch.
 
-> Changes in v2:
-> Removed duplicated code on freeing buffers on function exit.
-> (Thanks to Parav Pandit <parav@mellanox.com>)
->=20
-> Fixed typo in the patch title.
->=20
-> Signed-off-by: Long Li <longli@microsoft.com>
-> Cc: stable@vger.kernel.org
-> ---
->  fs/cifs/smb2pdu.c | 57 ++++++++++++++++++++++++++++++-------------------=
------
-> -
->  1 file changed, 31 insertions(+), 26 deletions(-)
->=20
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c index 0f044c4..41625e4
-> 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -729,8 +729,8 @@ SMB2_negotiate(const unsigned int xid, struct cifs_se=
-s
-> *ses)
->=20
->  int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tc=
-on)  {
-> -	int rc =3D 0;
-> -	struct validate_negotiate_info_req vneg_inbuf;
-> +	int ret, rc =3D -EIO;
-> +	struct validate_negotiate_info_req *pneg_inbuf;
->  	struct validate_negotiate_info_rsp *pneg_rsp =3D NULL;
->  	u32 rsplen;
->  	u32 inbuflen; /* max of 4 dialects */
-> @@ -741,6 +741,9 @@ int smb3_validate_negotiate(const unsigned int xid,
-> struct cifs_tcon *tcon)
->  	if (tcon->ses->server->rdma)
->  		return 0;
->  #endif
-> +	pneg_inbuf =3D kmalloc(sizeof(*pneg_inbuf), GFP_KERNEL);
-> +	if (!pneg_inbuf)
-> +		return -ENOMEM;
->=20
->  	/* In SMB3.11 preauth integrity supersedes validate negotiate */
->  	if (tcon->ses->server->dialect =3D=3D SMB311_PROT_ID) @@ -764,53
-> +767,53 @@ int smb3_validate_negotiate(const unsigned int xid, struct
-> cifs_tcon *tcon)
->  	if (tcon->ses->session_flags & SMB2_SESSION_FLAG_IS_NULL)
->  		cifs_dbg(VFS, "Unexpected null user (anonymous) auth flag sent
-> by server\n");
->=20
-> -	vneg_inbuf.Capabilities =3D
-> +	pneg_inbuf->Capabilities =3D
->  			cpu_to_le32(tcon->ses->server->vals-
-> >req_capabilities);
-> -	memcpy(vneg_inbuf.Guid, tcon->ses->server->client_guid,
-> +	memcpy(pneg_inbuf->Guid, tcon->ses->server->client_guid,
->  					SMB2_CLIENT_GUID_SIZE);
->=20
->  	if (tcon->ses->sign)
-> -		vneg_inbuf.SecurityMode =3D
-> +		pneg_inbuf->SecurityMode =3D
->  			cpu_to_le16(SMB2_NEGOTIATE_SIGNING_REQUIRED);
->  	else if (global_secflags & CIFSSEC_MAY_SIGN)
-> -		vneg_inbuf.SecurityMode =3D
-> +		pneg_inbuf->SecurityMode =3D
->  			cpu_to_le16(SMB2_NEGOTIATE_SIGNING_ENABLED);
->  	else
-> -		vneg_inbuf.SecurityMode =3D 0;
-> +		pneg_inbuf->SecurityMode =3D 0;
->=20
->=20
->  	if (strcmp(tcon->ses->server->vals->version_string,
-Please check if strncmp() should be used or not.
+How about the rest patches (1, 3-6) in the series? If they don't need any c=
+hanges, is it okay that I resend this one only?
 
->  		SMB3ANY_VERSION_STRING) =3D=3D 0) {
-> -		vneg_inbuf.Dialects[0] =3D cpu_to_le16(SMB30_PROT_ID);
-> -		vneg_inbuf.Dialects[1] =3D cpu_to_le16(SMB302_PROT_ID);
-> -		vneg_inbuf.DialectCount =3D cpu_to_le16(2);
-> +		pneg_inbuf->Dialects[0] =3D cpu_to_le16(SMB30_PROT_ID);
-> +		pneg_inbuf->Dialects[1] =3D cpu_to_le16(SMB302_PROT_ID);
-> +		pneg_inbuf->DialectCount =3D cpu_to_le16(2);
->  		/* structure is big enough for 3 dialects, sending only 2 */
->  		inbuflen =3D sizeof(struct validate_negotiate_info_req) - 2;
->  	} else if (strcmp(tcon->ses->server->vals->version_string,
->  		SMBDEFAULT_VERSION_STRING) =3D=3D 0) {
-> -		vneg_inbuf.Dialects[0] =3D cpu_to_le16(SMB21_PROT_ID);
-> -		vneg_inbuf.Dialects[1] =3D cpu_to_le16(SMB30_PROT_ID);
-> -		vneg_inbuf.Dialects[2] =3D cpu_to_le16(SMB302_PROT_ID);
-> -		vneg_inbuf.DialectCount =3D cpu_to_le16(3);
-> +		pneg_inbuf->Dialects[0] =3D cpu_to_le16(SMB21_PROT_ID);
-> +		pneg_inbuf->Dialects[1] =3D cpu_to_le16(SMB30_PROT_ID);
-> +		pneg_inbuf->Dialects[2] =3D cpu_to_le16(SMB302_PROT_ID);
-> +		pneg_inbuf->DialectCount =3D cpu_to_le16(3);
->  		/* structure is big enough for 3 dialects */
->  		inbuflen =3D sizeof(struct validate_negotiate_info_req);
->  	} else {
->  		/* otherwise specific dialect was requested */
-> -		vneg_inbuf.Dialects[0] =3D
-> +		pneg_inbuf->Dialects[0] =3D
->  			cpu_to_le16(tcon->ses->server->vals->protocol_id);
-> -		vneg_inbuf.DialectCount =3D cpu_to_le16(1);
-> +		pneg_inbuf->DialectCount =3D cpu_to_le16(1);
->  		/* structure is big enough for 3 dialects, sending only 1 */
->  		inbuflen =3D sizeof(struct validate_negotiate_info_req) - 4;
->  	}
 >=20
-> -	rc =3D SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
-> +	ret =3D SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
->  		FSCTL_VALIDATE_NEGOTIATE_INFO, true /* is_fsctl */,
-> -		(char *)&vneg_inbuf, sizeof(struct
+> > Changes in v2:
+> > Removed duplicated code on freeing buffers on function exit.
+> > (Thanks to Parav Pandit <parav@mellanox.com>)
+> >
+> > Fixed typo in the patch title.
+> >
+> > Signed-off-by: Long Li <longli@microsoft.com>
+> > Cc: stable@vger.kernel.org
+> > ---
+> >  fs/cifs/smb2pdu.c | 57
+> > ++++++++++++++++++++++++++++++------------------------
+> > -
+> >  1 file changed, 31 insertions(+), 26 deletions(-)
+> >
+> > diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c index
+> > 0f044c4..41625e4
+> > 100644
+> > --- a/fs/cifs/smb2pdu.c
+> > +++ b/fs/cifs/smb2pdu.c
+> > @@ -729,8 +729,8 @@ SMB2_negotiate(const unsigned int xid, struct
+> > cifs_ses
+> > *ses)
+> >
+> >  int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *=
+tcon)
+> {
+> > -	int rc =3D 0;
+> > -	struct validate_negotiate_info_req vneg_inbuf;
+> > +	int ret, rc =3D -EIO;
+> > +	struct validate_negotiate_info_req *pneg_inbuf;
+> >  	struct validate_negotiate_info_rsp *pneg_rsp =3D NULL;
+> >  	u32 rsplen;
+> >  	u32 inbuflen; /* max of 4 dialects */ @@ -741,6 +741,9 @@ int
+> > smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon
+> > *tcon)
+> >  	if (tcon->ses->server->rdma)
+> >  		return 0;
+> >  #endif
+> > +	pneg_inbuf =3D kmalloc(sizeof(*pneg_inbuf), GFP_KERNEL);
+> > +	if (!pneg_inbuf)
+> > +		return -ENOMEM;
+> >
+> >  	/* In SMB3.11 preauth integrity supersedes validate negotiate */
+> >  	if (tcon->ses->server->dialect =3D=3D SMB311_PROT_ID) @@ -764,53
+> > +767,53 @@ int smb3_validate_negotiate(const unsigned int xid, struct
+> > cifs_tcon *tcon)
+> >  	if (tcon->ses->session_flags & SMB2_SESSION_FLAG_IS_NULL)
+> >  		cifs_dbg(VFS, "Unexpected null user (anonymous) auth flag
+> sent by
+> > server\n");
+> >
+> > -	vneg_inbuf.Capabilities =3D
+> > +	pneg_inbuf->Capabilities =3D
+> >  			cpu_to_le32(tcon->ses->server->vals-
+> > >req_capabilities);
+> > -	memcpy(vneg_inbuf.Guid, tcon->ses->server->client_guid,
+> > +	memcpy(pneg_inbuf->Guid, tcon->ses->server->client_guid,
+> >  					SMB2_CLIENT_GUID_SIZE);
+> >
+> >  	if (tcon->ses->sign)
+> > -		vneg_inbuf.SecurityMode =3D
+> > +		pneg_inbuf->SecurityMode =3D
+> >
+> 	cpu_to_le16(SMB2_NEGOTIATE_SIGNING_REQUIRED);
+> >  	else if (global_secflags & CIFSSEC_MAY_SIGN)
+> > -		vneg_inbuf.SecurityMode =3D
+> > +		pneg_inbuf->SecurityMode =3D
+> >
+> 	cpu_to_le16(SMB2_NEGOTIATE_SIGNING_ENABLED);
+> >  	else
+> > -		vneg_inbuf.SecurityMode =3D 0;
+> > +		pneg_inbuf->SecurityMode =3D 0;
+> >
+> >
+> >  	if (strcmp(tcon->ses->server->vals->version_string,
+> Please check if strncmp() should be used or not.
+>=20
+> >  		SMB3ANY_VERSION_STRING) =3D=3D 0) {
+> > -		vneg_inbuf.Dialects[0] =3D cpu_to_le16(SMB30_PROT_ID);
+> > -		vneg_inbuf.Dialects[1] =3D cpu_to_le16(SMB302_PROT_ID);
+> > -		vneg_inbuf.DialectCount =3D cpu_to_le16(2);
+> > +		pneg_inbuf->Dialects[0] =3D cpu_to_le16(SMB30_PROT_ID);
+> > +		pneg_inbuf->Dialects[1] =3D cpu_to_le16(SMB302_PROT_ID);
+> > +		pneg_inbuf->DialectCount =3D cpu_to_le16(2);
+> >  		/* structure is big enough for 3 dialects, sending only 2 */
+> >  		inbuflen =3D sizeof(struct validate_negotiate_info_req) - 2;
+> >  	} else if (strcmp(tcon->ses->server->vals->version_string,
+> >  		SMBDEFAULT_VERSION_STRING) =3D=3D 0) {
+> > -		vneg_inbuf.Dialects[0] =3D cpu_to_le16(SMB21_PROT_ID);
+> > -		vneg_inbuf.Dialects[1] =3D cpu_to_le16(SMB30_PROT_ID);
+> > -		vneg_inbuf.Dialects[2] =3D cpu_to_le16(SMB302_PROT_ID);
+> > -		vneg_inbuf.DialectCount =3D cpu_to_le16(3);
+> > +		pneg_inbuf->Dialects[0] =3D cpu_to_le16(SMB21_PROT_ID);
+> > +		pneg_inbuf->Dialects[1] =3D cpu_to_le16(SMB30_PROT_ID);
+> > +		pneg_inbuf->Dialects[2] =3D cpu_to_le16(SMB302_PROT_ID);
+> > +		pneg_inbuf->DialectCount =3D cpu_to_le16(3);
+> >  		/* structure is big enough for 3 dialects */
+> >  		inbuflen =3D sizeof(struct validate_negotiate_info_req);
+> >  	} else {
+> >  		/* otherwise specific dialect was requested */
+> > -		vneg_inbuf.Dialects[0] =3D
+> > +		pneg_inbuf->Dialects[0] =3D
+> >  			cpu_to_le16(tcon->ses->server->vals->protocol_id);
+> > -		vneg_inbuf.DialectCount =3D cpu_to_le16(1);
+> > +		pneg_inbuf->DialectCount =3D cpu_to_le16(1);
+> >  		/* structure is big enough for 3 dialects, sending only 1 */
+> >  		inbuflen =3D sizeof(struct validate_negotiate_info_req) - 4;
+> >  	}
+> >
+> > -	rc =3D SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
+> > +	ret =3D SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
+> >  		FSCTL_VALIDATE_NEGOTIATE_INFO, true /* is_fsctl */,
+> > -		(char *)&vneg_inbuf, sizeof(struct
+> > validate_negotiate_info_req),
+> > +		(char *)pneg_inbuf, sizeof(struct
 > validate_negotiate_info_req),
-> +		(char *)pneg_inbuf, sizeof(struct validate_negotiate_info_req),
-
-Use sizeof(*pneg_inbuf)
-
->  		(char **)&pneg_rsp, &rsplen);
 >=20
-> -	if (rc !=3D 0) {
-> -		cifs_dbg(VFS, "validate protocol negotiate failed: %d\n", rc);
-> -		return -EIO;
-> +	if (ret !=3D 0) {
-
-if (ret) is fine.
-
-> +		cifs_dbg(VFS, "validate protocol negotiate failed: %d\n", ret);
-> +		goto out_free_inbuf;
->  	}
+> Use sizeof(*pneg_inbuf)
 >=20
->  	if (rsplen !=3D sizeof(struct validate_negotiate_info_rsp)) { @@ -820,7
-
-if (rsplen !=3D sizeof(*pneg_rsp))
+> >  		(char **)&pneg_rsp, &rsplen);
+> >
+> > -	if (rc !=3D 0) {
+> > -		cifs_dbg(VFS, "validate protocol negotiate failed: %d\n", rc);
+> > -		return -EIO;
+> > +	if (ret !=3D 0) {
+>=20
+> if (ret) is fine.
+>=20
+> > +		cifs_dbg(VFS, "validate protocol negotiate failed: %d\n", ret);
+> > +		goto out_free_inbuf;
+> >  	}
+> >
+> >  	if (rsplen !=3D sizeof(struct validate_negotiate_info_rsp)) { @@
+> > -820,7
+>=20
+> if (rsplen !=3D sizeof(*pneg_rsp))
