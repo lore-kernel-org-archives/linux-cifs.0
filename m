@@ -1,40 +1,63 @@
 From: Long Li <longli@linuxonhyperv.com>
-Subject: [PATCH 1/6] cifs: smbd: Check for iov length on sending the last iov
-Date: Mon, 16 Apr 2018 17:49:13 -0700
-Message-ID: <20180417004918.29213-1-longli@linuxonhyperv.com>
+Subject: [PATCH 5/6] cifs: smbd: Enable signing with smbdirect
+Date: Mon, 16 Apr 2018 17:49:17 -0700
+Message-ID: <20180417004918.29213-5-longli@linuxonhyperv.com>
+References: <20180417004918.29213-1-longli@linuxonhyperv.com>
 Reply-To: longli@microsoft.com
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
         linux-rdma@vger.kernel.org, stable@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180417004918.29213-1-longli@linuxonhyperv.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-When sending the last iov that breaks into smaller buffers to fit the
-transfer size, it's necessary to check if this is the last iov.
+Now signing is supported with RDMA transport.
 
-If this is the latest iov, stop and proceed to send pages.
+Remove the code that disabled it.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/smbdirect.c | 2 ++
- 1 file changed, 2 insertions(+)
+ fs/cifs/connect.c | 8 --------
+ fs/cifs/smb2pdu.c | 4 ----
+ 2 files changed, 12 deletions(-)
 
-diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index 90e673c..b5c6c0d 100644
---- a/fs/cifs/smbdirect.c
-+++ b/fs/cifs/smbdirect.c
-@@ -2197,6 +2197,8 @@ int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst)
- 						goto done;
- 				}
- 				i++;
-+				if (i == rqst->rq_nvec)
-+					break;
- 			}
- 			start = i;
- 			buflen = 0;
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index e8830f0..deef270 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -1977,14 +1977,6 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+ 		goto cifs_parse_mount_err;
+ 	}
+ 
+-#ifdef CONFIG_CIFS_SMB_DIRECT
+-	if (vol->rdma && vol->sign) {
+-		cifs_dbg(VFS, "Currently SMB direct doesn't support signing."
+-			" This is being fixed\n");
+-		goto cifs_parse_mount_err;
+-	}
+-#endif
+-
+ #ifndef CONFIG_KEYS
+ 	/* Muliuser mounts require CONFIG_KEYS support */
+ 	if (vol->multiuser) {
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 6759035..d71ce51 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -737,10 +737,6 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
+ 
+ 	cifs_dbg(FYI, "validate negotiate\n");
+ 
+-#ifdef CONFIG_CIFS_SMB_DIRECT
+-	if (tcon->ses->server->rdma)
+-		return 0;
+-#endif
+ 	pneg_inbuf = kmalloc(sizeof(*pneg_inbuf), GFP_KERNEL);
+ 	if (!pneg_inbuf)
+ 		return -ENOMEM;
 -- 
 2.7.4
