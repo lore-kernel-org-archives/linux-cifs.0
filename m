@@ -1,225 +1,63 @@
-From: Tom Talpey <tom@talpey.com>
-Subject: Re: [Patch v3 2/6] cifs: Allocate validate negotiation request
+From: Long Li <longli@microsoft.com>
+Subject: RE: [Patch v3 2/6] cifs: Allocate validate negotiation request
  through kmalloc
-Date: Wed, 18 Apr 2018 13:42:44 -0400
-Message-ID: <aabd22d8-3644-6987-1d51-5592f9e04ced@talpey.com>
+Date: Wed, 18 Apr 2018 18:53:00 +0000
+Message-ID: <MWHPR2101MB07298391D72A2877D8A237B3CEB60@MWHPR2101MB0729.namprd21.prod.outlook.com>
 References: <20180418003358.25098-1-longli@linuxonhyperv.com>
  <d7e569b6-d268-b8c1-e91d-d6dc0e7cdfc2@talpey.com>
- <MWHPR2101MB07298108AA78EBC4B8D10B4BCEB60@MWHPR2101MB0729.namprd21.prod.outlook.com>
+ <e9e7f77032c5402e848de0293e4db3ee@AcuMS.aculab.com>
+ <b8e56b14-a746-2a22-cb8d-94f1ba7d646b@talpey.com>
+ <MWHPR2101MB072909460F3898C6D13B4D4CCEB60@MWHPR2101MB0729.namprd21.prod.outlook.com>
+ <568a36d2-29a1-442f-f725-58a02b8a90e5@talpey.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>
-To: Long Li <longli@microsoft.com>, Steve French <sfrench@samba.org>,
+To: Tom Talpey <tom@talpey.com>,
+        David Laight <David.Laight@ACULAB.COM>,
+        Steve French <sfrench@samba.org>,
         "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
         "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <MWHPR2101MB07298108AA78EBC4B8D10B4BCEB60@MWHPR2101MB0729.namprd21.prod.outlook.com>
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <568a36d2-29a1-442f-f725-58a02b8a90e5@talpey.com>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: stable-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On 4/18/2018 1:16 PM, Long Li wrote:
->> Subject: Re: [Patch v3 2/6] cifs: Allocate validate negotiation request through
->> kmalloc
->>
->> Two comments.
->>
->> On 4/17/2018 8:33 PM, Long Li wrote:
->>> From: Long Li <longli@microsoft.com>
->>>
->>> The data buffer allocated on the stack can't be DMA'ed, and hence
->>> can't send through RDMA via SMB Direct.
->>
->> This comment is confusing. Any registered memory can be DMA'd, need to
->> state the reason for the choice here more clearly.
->>
->>>
->>> Fix this by allocating the request on the heap in smb3_validate_negotiate.
->>>
->>> Changes in v2:
->>> Removed duplicated code on freeing buffers on function exit.
->>> (Thanks to Parav Pandit <parav@mellanox.com>) Fixed typo in the patch
->>> title.
->>>
->>> Changes in v3:
->>> Added "Fixes" to the patch.
->>> Changed sizeof() to use *pointer in place of struct.
->>>
->>> Fixes: ff1c038addc4 ("Check SMB3 dialects against downgrade attacks")
->>> Signed-off-by: Long Li <longli@microsoft.com>
->>> Cc: stable@vger.kernel.org
->>> ---
->>>    fs/cifs/smb2pdu.c | 59 ++++++++++++++++++++++++++++++--------------
->> -----------
->>>    1 file changed, 32 insertions(+), 27 deletions(-)
->>>
->>> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c index
->>> 0f044c4..5582a02 100644
->>> --- a/fs/cifs/smb2pdu.c
->>> +++ b/fs/cifs/smb2pdu.c
->>> @@ -729,8 +729,8 @@ SMB2_negotiate(const unsigned int xid, struct
->>> cifs_ses *ses)
->>>
->>>    int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
->>>    {
->>> -	int rc = 0;
->>> -	struct validate_negotiate_info_req vneg_inbuf;
->>> +	int ret, rc = -EIO;
->>> +	struct validate_negotiate_info_req *pneg_inbuf;
->>>    	struct validate_negotiate_info_rsp *pneg_rsp = NULL;
->>>    	u32 rsplen;
->>>    	u32 inbuflen; /* max of 4 dialects */ @@ -741,6 +741,9 @@ int
->>> smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
->>>    	if (tcon->ses->server->rdma)
->>>    		return 0;
->>>    #endif
->>> +	pneg_inbuf = kmalloc(sizeof(*pneg_inbuf), GFP_KERNEL);
->>> +	if (!pneg_inbuf)
->>> +		return -ENOMEM;
->>
->> Why is this a nonblocking allocation? It would seem more robust to use
->> GFP_NOFS here.
-> 
-> I agree it makes sense to use GFP_NOFS.
-> 
-> The choice here is made consistent with all the rest CIFS code allocating protocol request buffers. Maybe we should do another patch to cleanup all those code.
-
-It'll be required sooner or later. I'm agnostic as to how you apply it,
-but I still suggest you change this one now rather than continue the
-fragile behavior. It may not be a global search-and-replace since some
-allocations may require nonblocking.
-
-
-> 
->>
->> Tom.
->>
->>>
->>>    	/* In SMB3.11 preauth integrity supersedes validate negotiate */
->>>    	if (tcon->ses->server->dialect == SMB311_PROT_ID) @@ -764,63
->>> +767,63 @@ int smb3_validate_negotiate(const unsigned int xid, struct
->> cifs_tcon *tcon)
->>>    	if (tcon->ses->session_flags & SMB2_SESSION_FLAG_IS_NULL)
->>>    		cifs_dbg(VFS, "Unexpected null user (anonymous) auth flag
->> sent by
->>> server\n");
->>>
->>> -	vneg_inbuf.Capabilities =
->>> +	pneg_inbuf->Capabilities =
->>>    			cpu_to_le32(tcon->ses->server->vals-
->>> req_capabilities);
->>> -	memcpy(vneg_inbuf.Guid, tcon->ses->server->client_guid,
->>> +	memcpy(pneg_inbuf->Guid, tcon->ses->server->client_guid,
->>>    					SMB2_CLIENT_GUID_SIZE);
->>>
->>>    	if (tcon->ses->sign)
->>> -		vneg_inbuf.SecurityMode =
->>> +		pneg_inbuf->SecurityMode =
->>>
->> 	cpu_to_le16(SMB2_NEGOTIATE_SIGNING_REQUIRED);
->>>    	else if (global_secflags & CIFSSEC_MAY_SIGN)
->>> -		vneg_inbuf.SecurityMode =
->>> +		pneg_inbuf->SecurityMode =
->>>
->> 	cpu_to_le16(SMB2_NEGOTIATE_SIGNING_ENABLED);
->>>    	else
->>> -		vneg_inbuf.SecurityMode = 0;
->>> +		pneg_inbuf->SecurityMode = 0;
->>>
->>>
->>>    	if (strcmp(tcon->ses->server->vals->version_string,
->>>    		SMB3ANY_VERSION_STRING) == 0) {
->>> -		vneg_inbuf.Dialects[0] = cpu_to_le16(SMB30_PROT_ID);
->>> -		vneg_inbuf.Dialects[1] = cpu_to_le16(SMB302_PROT_ID);
->>> -		vneg_inbuf.DialectCount = cpu_to_le16(2);
->>> +		pneg_inbuf->Dialects[0] = cpu_to_le16(SMB30_PROT_ID);
->>> +		pneg_inbuf->Dialects[1] = cpu_to_le16(SMB302_PROT_ID);
->>> +		pneg_inbuf->DialectCount = cpu_to_le16(2);
->>>    		/* structure is big enough for 3 dialects, sending only 2 */
->>>    		inbuflen = sizeof(struct validate_negotiate_info_req) - 2;
->>>    	} else if (strcmp(tcon->ses->server->vals->version_string,
->>>    		SMBDEFAULT_VERSION_STRING) == 0) {
->>> -		vneg_inbuf.Dialects[0] = cpu_to_le16(SMB21_PROT_ID);
->>> -		vneg_inbuf.Dialects[1] = cpu_to_le16(SMB30_PROT_ID);
->>> -		vneg_inbuf.Dialects[2] = cpu_to_le16(SMB302_PROT_ID);
->>> -		vneg_inbuf.DialectCount = cpu_to_le16(3);
->>> +		pneg_inbuf->Dialects[0] = cpu_to_le16(SMB21_PROT_ID);
->>> +		pneg_inbuf->Dialects[1] = cpu_to_le16(SMB30_PROT_ID);
->>> +		pneg_inbuf->Dialects[2] = cpu_to_le16(SMB302_PROT_ID);
->>> +		pneg_inbuf->DialectCount = cpu_to_le16(3);
->>>    		/* structure is big enough for 3 dialects */
->>>    		inbuflen = sizeof(struct validate_negotiate_info_req);
->>>    	} else {
->>>    		/* otherwise specific dialect was requested */
->>> -		vneg_inbuf.Dialects[0] =
->>> +		pneg_inbuf->Dialects[0] =
->>>    			cpu_to_le16(tcon->ses->server->vals->protocol_id);
->>> -		vneg_inbuf.DialectCount = cpu_to_le16(1);
->>> +		pneg_inbuf->DialectCount = cpu_to_le16(1);
->>>    		/* structure is big enough for 3 dialects, sending only 1 */
->>>    		inbuflen = sizeof(struct validate_negotiate_info_req) - 4;
->>>    	}
->>>
->>> -	rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
->>> +	ret = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
->>>    		FSCTL_VALIDATE_NEGOTIATE_INFO, true /* is_fsctl */,
->>> -		(char *)&vneg_inbuf, sizeof(struct
->> validate_negotiate_info_req),
->>> +		(char *)pneg_inbuf, sizeof(*pneg_inbuf),
->>>    		(char **)&pneg_rsp, &rsplen);
->>>
->>> -	if (rc != 0) {
->>> -		cifs_dbg(VFS, "validate protocol negotiate failed: %d\n", rc);
->>> -		return -EIO;
->>> +	if (ret) {
->>> +		cifs_dbg(VFS, "validate protocol negotiate failed: %d\n", ret);
->>> +		goto out_free_inbuf;
->>>    	}
->>>
->>> -	if (rsplen != sizeof(struct validate_negotiate_info_rsp)) {
->>> +	if (rsplen != sizeof(*pneg_rsp)) {
->>>    		cifs_dbg(VFS, "invalid protocol negotiate response
->> size: %d\n",
->>>    			 rsplen);
->>>
->>>    		/* relax check since Mac returns max bufsize allowed on ioctl
->> */
->>>    		if ((rsplen > CIFSMaxBufSize)
->>>    		     || (rsplen < sizeof(struct validate_negotiate_info_rsp)))
->>> -			goto err_rsp_free;
->>> +			goto out_free_rsp;
->>>    	}
->>>
->>>    	/* check validate negotiate info response matches what we got
->>> earlier */ @@ -838,14 +841,16 @@ int smb3_validate_negotiate(const
->>> unsigned int xid, struct cifs_tcon *tcon)
->>>
->>>    	/* validate negotiate successful */
->>>    	cifs_dbg(FYI, "validate negotiate info successful\n");
->>> -	kfree(pneg_rsp);
->>> -	return 0;
->>> +	rc = 0;
->>> +	goto out_free_rsp;
->>>
->>>    vneg_out:
->>>    	cifs_dbg(VFS, "protocol revalidation - security settings
->>> mismatch\n");
->>> -err_rsp_free:
->>> +out_free_rsp:
->>>    	kfree(pneg_rsp);
->>> -	return -EIO;
->>> +out_free_inbuf:
->>> +	kfree(pneg_inbuf);
->>> +	return rc;
->>>    }
->>>
->>>    enum securityEnum
->>>
-> N�����r��y���b�X��ǧv�^�)޺{.n�+����{��ٚ�{ay�
-ʇڙ�,j��f���h���z�
-�w���
-���j:+v���w�j�m��������zZ+�����ݢj"��!tml=
-> 
+PiBTdWJqZWN0OiBSZTogW1BhdGNoIHYzIDIvNl0gY2lmczogQWxsb2NhdGUgdmFsaWRhdGUgbmVn
+b3RpYXRpb24gcmVxdWVzdCB0aHJvdWdoDQo+IGttYWxsb2MNCj4gDQo+IE9uIDQvMTgvMjAxOCAx
+OjExIFBNLCBMb25nIExpIHdyb3RlOg0KPiA+PiBTdWJqZWN0OiBSZTogW1BhdGNoIHYzIDIvNl0g
+Y2lmczogQWxsb2NhdGUgdmFsaWRhdGUgbmVnb3RpYXRpb24NCj4gPj4gcmVxdWVzdCB0aHJvdWdo
+IGttYWxsb2MNCj4gPj4NCj4gPj4gT24gNC8xOC8yMDE4IDk6MDggQU0sIERhdmlkIExhaWdodCB3
+cm90ZToNCj4gPj4+IEZyb206IFRvbSBUYWxwZXkNCj4gPj4+PiBTZW50OiAxOCBBcHJpbCAyMDE4
+IDEyOjMyDQo+ID4+PiAuLi4NCj4gPj4+PiBPbiA0LzE3LzIwMTggODozMyBQTSwgTG9uZyBMaSB3
+cm90ZToNCj4gPj4+Pj4gRnJvbTogTG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+ID4+
+Pj4+DQo+ID4+Pj4+IFRoZSBkYXRhIGJ1ZmZlciBhbGxvY2F0ZWQgb24gdGhlIHN0YWNrIGNhbid0
+IGJlIERNQSdlZCwgYW5kIGhlbmNlDQo+ID4+Pj4+IGNhbid0IHNlbmQgdGhyb3VnaCBSRE1BIHZp
+YSBTTUIgRGlyZWN0Lg0KPiA+Pj4+DQo+ID4+Pj4gVGhpcyBjb21tZW50IGlzIGNvbmZ1c2luZy4g
+QW55IHJlZ2lzdGVyZWQgbWVtb3J5IGNhbiBiZSBETUEnZCwNCj4gbmVlZA0KPiA+Pj4+IHRvIHN0
+YXRlIHRoZSByZWFzb24gZm9yIHRoZSBjaG9pY2UgaGVyZSBtb3JlIGNsZWFybHkuDQo+ID4+Pg0K
+PiA+Pj4gVGhlIHN0YWNrIGNvdWxkIGJlIGFsbG9jYXRlZCB3aXRoIHZtYWxsb2MoKS4NCj4gPj4+
+IEluIHdoaWNoIGNhc2UgdGhlIHBhZ2VzIG1pZ2h0IG5vdCBiZSBwaHlzaWNhbGx5IGNvbnRpZ3Vv
+dXMgYW5kIHRoZXJlDQo+ID4+PiBpcyBubw0KPiA+Pj4gKHNlbnNpYmxlKSBjYWxsIHRvIGdldCB0
+aGUgcGh5c2ljYWwgYWRkcmVzcyByZXF1aXJlZCBieSB0aGUgZG1hDQo+ID4+PiBjb250cm9sbGVy
+IChvciBvdGhlciBidXMgbWFzdGVyKS4NCj4gPj4NCj4gPj4gTWVtb3J5IHJlZ2lzdHJhdGlvbiBk
+b2VzIG5vdCByZXF1aXJlcyBwYWdlcyB0byBiZSBwaHlzaWNhbGx5IGNvbnRpZ3VvdXMuDQo+ID4+
+IFJETUEgUmVnaW9ucyBjYW4gYW5kIGRvIHN1cHBvcnQgdmVyeSBsYXJnZSBwaHlzaWNhbCBwYWdl
+DQo+ID4+IHNjYXR0ZXIvZ2F0aGVyLCBhbmQgdGhlIGFkYXB0ZXIgRE1BJ3MgdGhlbSByZWFkaWx5
+LiBJcyB0aGlzIHRoZSBvbmx5DQo+IHJlYXNvbj8NCj4gPg0KPiA+IGliX2RtYV9tYXBfcGFnZSB3
+aWxsIHJldHVybiBhbiBpbnZhbGlkIERNQSBhZGRyZXNzIGZvciBhIGJ1ZmZlciBvbiBzdGFjay4N
+Cj4gRXZlbiB3b3JzZSwgdGhpcyBpbmNvcnJlY3QgYWRkcmVzcyBjYW4ndCBiZSBkZXRlY3RlZCBi
+eQ0KPiBpYl9kbWFfbWFwcGluZ19lcnJvci4gU2VuZGluZyBkYXRhIGZyb20gdGhpcyBhZGRyZXNz
+IHRvIGhhcmR3YXJlIHdpbGwgbm90DQo+IGZhaWwsIGJ1dCB0aGUgcmVtb3RlIHBlZXIgd2lsbCBn
+ZXQganVuayBkYXRhLg0KPiA+DQo+ID4gSSB0aGluayBpdCBtYWtlcyBzZW5zZSBhcyBzdGFjayBp
+cyBkeW5hbWljIGFuZCBjYW4gc2hyaW5rIGFzIEkvTyBwcm9jZWVkcywgc28NCj4gdGhlIGJ1ZmZl
+ciBpcyBnb25lLiBPdGhlciBrZXJuZWwgY29kZSB1c2Ugb25seSBkYXRhIG9uIHRoZSBoZWFwIGZv
+ciBETUEsIGUuZy4NCj4gQkxLL1NDU0kgbGF5ZXIgbmV2ZXIgdXNlIGJ1ZmZlciBvbiB0aGUgc3Rh
+Y2sgdG8gc2VuZCBkYXRhLg0KPiANCj4gSSB0b3RhbGx5IGFncmVlIHRoYXQgcmVnaXN0ZXJpbmcg
+dGhlIHN0YWNrIGlzIGEgYmFkIGlkZWEuIEkgbWFpbmx5IHN1Z2dlc3QgdGhhdA0KPiB5b3UgY2Fw
+dHVyZSB0aGVzZSBmdW5kYW1lbnRhbCBpYl9kbWEqIHJlYXNvbnMgaW4gdGhlIGNvbW1pdC4gVGhl
+cmUncyBubw0KPiBvdGhlciBwcmFjdGljYWwgcmVhc29uIHdoeSB0aGUgb3JpZ2luYWwgYXBwcm9h
+Y2ggd291bGQgbm90IHdvcmsuDQoNClN1cmUgSSB3aWxsIGZpeCB0aGF0Lg0K
