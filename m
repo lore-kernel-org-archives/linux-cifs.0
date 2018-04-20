@@ -1,207 +1,128 @@
-From: Tom Talpey <tom@talpey.com>
-Subject: Re: [Patch v4] cifs: Allocate validate negotiation request through
- kmalloc
-Date: Fri, 20 Apr 2018 10:55:52 -0400
-Message-ID: <c8924b83-dfa2-a44c-a425-deb7e03d0bf1@talpey.com>
-References: <20180419213807.3128-1-longli@linuxonhyperv.com>
+From: Steve French <smfrench@gmail.com>
+Subject: Re: [PATCH] cifs: dir: fix memory leak in cifs_mknod
+Date: Fri, 20 Apr 2018 12:37:32 -0500
+Message-ID: <CAH2r5mtYQujfeEUpEiE557o3YccD9QwWCTLCJFbBoF7zbYcggQ@mail.gmail.com>
+References: <20180420131919.GA1766@embeddedor.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-To: longli@microsoft.com, Steve French <sfrench@samba.org>,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
+Content-Type: multipart/mixed; boundary="001a11469b8ae4cc20056a4b251f"
+Cc: Ronnie Sahlberg <lsahlber@redhat.com>,
+        Steve French <sfrench@samba.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kernel-janitors <kernel-janitors@vger.kernel.org>
+To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        Colin King <colin.king@canonical.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180419213807.3128-1-longli@linuxonhyperv.com>
-Content-Language: en-US
+In-Reply-To: <20180420131919.GA1766@embeddedor.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Looks good, but I have two possibly style-related comments.
+--001a11469b8ae4cc20056a4b251f
+Content-Type: text/plain; charset="UTF-8"
 
-On 4/19/2018 5:38 PM, Long Li wrote:
-> From: Long Li <longli@microsoft.com>
-> 
-> The data buffer allocated on the stack can't be DMA'ed, ib_dma_map_page will
-> return an invalid DMA address for a buffer on stack. Even worse, this
-> incorrect address can't be detected by ib_dma_mapping_error. Sending data
-> from this address to hardware will not fail, but the remote peer will get
-> junk data.
-> 
-> Fix this by allocating the request on the heap in smb3_validate_negotiate.
-> 
-> Changes in v2:
-> Removed duplicated code on freeing buffers on function exit.
-> (Thanks to Parav Pandit <parav@mellanox.com>)
-> Fixed typo in the patch title.
-> 
-> Changes in v3:
-> Added "Fixes" to the patch.
-> Changed several sizeof() to use *pointer in place of struct.
-> 
-> Changes in v4:
-> Added detailed comments on the failure through RDMA.
-> Allocate request buffer using GPF_NOFS.
-> Fixed possible memory leak.
-> 
-> Fixes: ff1c038addc4 ("Check SMB3 dialects against downgrade attacks")
-> Signed-off-by: Long Li <longli@microsoft.com>
+I noticed a similar problem with the tcon link leak on that (which
+Colin and Gustavo pointed out - thank you!) but also in another return
+statement, so updated the original patch of Ronnie's merging the fixes
+
+https://git.samba.org/sfrench/cifs-2.6.git/?p=sfrench/cifs-2.6.git;a=commit;h=167bc5de08dc97695f9d5c7069c3e69f409ff80b
+
+
+Let me know if you see any problems with it.
+
+On Fri, Apr 20, 2018 at 8:19 AM, Gustavo A. R. Silva
+<gustavo@embeddedor.com> wrote:
+> Free allocated memory for full_path and xid before return.
+>
+> Addresses-Coverity-ID: 1468029 ("Resource leak")
+> Fixes: 49162bfde140 ("cifs: do not allow creating sockets except with
+> SMB1 posix exensions")
+> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
 > ---
->   fs/cifs/smb2pdu.c | 61 ++++++++++++++++++++++++++++++-------------------------
->   1 file changed, 33 insertions(+), 28 deletions(-)
-> 
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 0f044c4..caa2a1e 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -729,8 +729,8 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
->   
->   int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
->   {
-> -	int rc = 0;
-> -	struct validate_negotiate_info_req vneg_inbuf;
-> +	int ret, rc = -EIO;
+>  fs/cifs/dir.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+> index f0a759d..71e32d9 100644
+> --- a/fs/cifs/dir.c
+> +++ b/fs/cifs/dir.c
+> @@ -684,8 +684,11 @@ int cifs_mknod(struct inode *inode, struct dentry *direntry, umode_t mode,
+>                 goto mknod_out;
+>         }
+>
+> -       if (!S_ISCHR(mode) && !S_ISBLK(mode))
+> +       if (!S_ISCHR(mode) && !S_ISBLK(mode)) {
+> +               kfree(full_path);
+> +               free_xid(xid);
+>                 return -EPERM;
+> +       }
+>
+>         if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_UNX_EMUL))
+>                 goto mknod_out;
+> --
+> 2.7.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Seems awkward to have "rc" and "ret", and based on the code below I
-don't see why two variables are needed. Simplify? (see later comment)
 
-> +	struct validate_negotiate_info_req *pneg_inbuf;
->   	struct validate_negotiate_info_rsp *pneg_rsp = NULL;
->   	u32 rsplen;
->   	u32 inbuflen; /* max of 4 dialects */
-> @@ -741,7 +741,6 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
->   	if (tcon->ses->server->rdma)
->   		return 0;
->   #endif
-> -
->   	/* In SMB3.11 preauth integrity supersedes validate negotiate */
->   	if (tcon->ses->server->dialect == SMB311_PROT_ID)
->   		return 0;
-> @@ -764,63 +763,67 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
->   	if (tcon->ses->session_flags & SMB2_SESSION_FLAG_IS_NULL)
->   		cifs_dbg(VFS, "Unexpected null user (anonymous) auth flag sent by server\n");
->   
-> -	vneg_inbuf.Capabilities =
-> +	pneg_inbuf = kmalloc(sizeof(*pneg_inbuf), GFP_NOFS);
-> +	if (!pneg_inbuf)
-> +		return -ENOMEM;
-> +
-> +	pneg_inbuf->Capabilities =
->   			cpu_to_le32(tcon->ses->server->vals->req_capabilities);
-> -	memcpy(vneg_inbuf.Guid, tcon->ses->server->client_guid,
-> +	memcpy(pneg_inbuf->Guid, tcon->ses->server->client_guid,
->   					SMB2_CLIENT_GUID_SIZE);
->   
->   	if (tcon->ses->sign)
-> -		vneg_inbuf.SecurityMode =
-> +		pneg_inbuf->SecurityMode =
->   			cpu_to_le16(SMB2_NEGOTIATE_SIGNING_REQUIRED);
->   	else if (global_secflags & CIFSSEC_MAY_SIGN)
-> -		vneg_inbuf.SecurityMode =
-> +		pneg_inbuf->SecurityMode =
->   			cpu_to_le16(SMB2_NEGOTIATE_SIGNING_ENABLED);
->   	else
-> -		vneg_inbuf.SecurityMode = 0;
-> +		pneg_inbuf->SecurityMode = 0;
->   
->   
->   	if (strcmp(tcon->ses->server->vals->version_string,
->   		SMB3ANY_VERSION_STRING) == 0) {
-> -		vneg_inbuf.Dialects[0] = cpu_to_le16(SMB30_PROT_ID);
-> -		vneg_inbuf.Dialects[1] = cpu_to_le16(SMB302_PROT_ID);
-> -		vneg_inbuf.DialectCount = cpu_to_le16(2);
-> +		pneg_inbuf->Dialects[0] = cpu_to_le16(SMB30_PROT_ID);
-> +		pneg_inbuf->Dialects[1] = cpu_to_le16(SMB302_PROT_ID);
-> +		pneg_inbuf->DialectCount = cpu_to_le16(2);
->   		/* structure is big enough for 3 dialects, sending only 2 */
->   		inbuflen = sizeof(struct validate_negotiate_info_req) - 2;
 
-The "- 2" is a little confusing here. This was existing code, but I
-suggest you change this to a sizeof (u16) construct for consistency.
-It's reducing by the length of a single Dialects[n] entry.
+-- 
+Thanks,
 
->   	} else if (strcmp(tcon->ses->server->vals->version_string,
->   		SMBDEFAULT_VERSION_STRING) == 0) {
-> -		vneg_inbuf.Dialects[0] = cpu_to_le16(SMB21_PROT_ID);
-> -		vneg_inbuf.Dialects[1] = cpu_to_le16(SMB30_PROT_ID);
-> -		vneg_inbuf.Dialects[2] = cpu_to_le16(SMB302_PROT_ID);
-> -		vneg_inbuf.DialectCount = cpu_to_le16(3);
-> +		pneg_inbuf->Dialects[0] = cpu_to_le16(SMB21_PROT_ID);
-> +		pneg_inbuf->Dialects[1] = cpu_to_le16(SMB30_PROT_ID);
-> +		pneg_inbuf->Dialects[2] = cpu_to_le16(SMB302_PROT_ID);
-> +		pneg_inbuf->DialectCount = cpu_to_le16(3);
->   		/* structure is big enough for 3 dialects */
->   		inbuflen = sizeof(struct validate_negotiate_info_req);
->   	} else {
->   		/* otherwise specific dialect was requested */
-> -		vneg_inbuf.Dialects[0] =
-> +		pneg_inbuf->Dialects[0] =
->   			cpu_to_le16(tcon->ses->server->vals->protocol_id);
-> -		vneg_inbuf.DialectCount = cpu_to_le16(1);
-> +		pneg_inbuf->DialectCount = cpu_to_le16(1);
->   		/* structure is big enough for 3 dialects, sending only 1 */
->   		inbuflen = sizeof(struct validate_negotiate_info_req) - 4;
+Steve
 
-Ditto previous sizeof (u16) comment, with a *2 this case.
+--001a11469b8ae4cc20056a4b251f
+Content-Type: text/x-patch; charset="US-ASCII";
+	name="0001-cifs-do-not-allow-creating-sockets-except-with-SMB1-.patch"
+Content-Disposition: attachment;
+	filename="0001-cifs-do-not-allow-creating-sockets-except-with-SMB1-.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_jg88jr3o0
 
->   	}
->   
-> -	rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
-> +	ret = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
->   		FSCTL_VALIDATE_NEGOTIATE_INFO, true /* is_fsctl */,
-> -		(char *)&vneg_inbuf, sizeof(struct validate_negotiate_info_req),
-> +		(char *)pneg_inbuf, sizeof(*pneg_inbuf),
->   		(char **)&pneg_rsp, &rsplen);
->   
-> -	if (rc != 0) {
-> -		cifs_dbg(VFS, "validate protocol negotiate failed: %d\n", rc);
-> -		return -EIO;
-> +	if (ret) {
-> +		cifs_dbg(VFS, "validate protocol negotiate failed: %d\n", ret);
-> +		goto out_free_inbuf;
->   	}
-
-Why not leave "rc" alone, and set its value to -EIO before the goto
-if the ioctl fails? That will simplify and make the code much more
-readable IMO.
-
->   
-> -	if (rsplen != sizeof(struct validate_negotiate_info_rsp)) {
-> +	if (rsplen != sizeof(*pneg_rsp)) {
->   		cifs_dbg(VFS, "invalid protocol negotiate response size: %d\n",
->   			 rsplen);
->   
->   		/* relax check since Mac returns max bufsize allowed on ioctl */
->   		if ((rsplen > CIFSMaxBufSize)
->   		     || (rsplen < sizeof(struct validate_negotiate_info_rsp)))
-> -			goto err_rsp_free;
-> +			goto out_free_rsp;
->   	}
-
-Would need an rc = -EIO here too if above comment is accepted.
-
-Tom.
-
->   
->   	/* check validate negotiate info response matches what we got earlier */
-> @@ -838,14 +841,16 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
->   
->   	/* validate negotiate successful */
->   	cifs_dbg(FYI, "validate negotiate info successful\n");
-> -	kfree(pneg_rsp);
-> -	return 0;
-> +	rc = 0;
-> +	goto out_free_rsp;
->   
->   vneg_out:
->   	cifs_dbg(VFS, "protocol revalidation - security settings mismatch\n");
-> -err_rsp_free:
-> +out_free_rsp:
->   	kfree(pneg_rsp);
-> -	return -EIO;
-> +out_free_inbuf:
-> +	kfree(pneg_inbuf);
-> +	return rc;
->   }
->   
->   enum securityEnum
-> 
+RnJvbSAxNjdiYzVkZTA4ZGM5NzY5NWY5ZDVjNzA2OWMzZTY5ZjQwOWZmODBiIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHNtZnJlbmNoQGdtYWlsLmNvbT4KRGF0
+ZTogRnJpLCAyMCBBcHIgMjAxOCAxMjoxOTowNyAtMDUwMApTdWJqZWN0OiBbUEFUQ0ggMS8yXSBj
+aWZzOiBkbyBub3QgYWxsb3cgY3JlYXRpbmcgc29ja2V0cyBleGNlcHQgd2l0aCBTTUIxCiBwb3Np
+eCBleGVuc2lvbnMKClJIQlo6IDE0NTMxMjMKClNpbmNlIGF0IGxlYXN0IHRoZSAzLjEwIGtlcm5l
+bCBhbmQgbGlrZWx5IGEgbG90IGVhcmxpZXIgd2UgaGF2ZQpub3QgYmVlbiBhYmxlIHRvIGNyZWF0
+ZSB1bml4IGRvbWFpbiBzb2NrZXRzIGluIGEgY2lmcyBzaGFyZQp3aGVuIG1vdW50ZWQgdXNpbmcg
+dGhlIFNGVSBtb3VudCBvcHRpb24gKGV4Y2VwdCB3aGVuIG1vdW50ZWQKd2l0aCB0aGUgY2lmcyB1
+bml4IGV4dGVuc2lvbnMgdG8gU2FtYmEgZS5nLikKVHJ5aW5nIHRvIGNyZWF0ZSBhIHNvY2tldCwg
+Zm9yIGV4YW1wbGUgdXNpbmcgdGhlIGFmX3VuaXggY29tbWFuZCBmcm9tCnhmc3Rlc3RzIHdpbGwg
+Y2F1c2UgOgpCVUc6IHVuYWJsZSB0byBoYW5kbGUga2VybmVsIE5VTEwgcG9pbnRlciBkZXJlZmVy
+ZW5jZSBhdCAwMDAwMDAwMAowMDAwMDA0MAoKU2luY2Ugbm8gb25lIHVzZXMgb3IgZGVwZW5kcyBv
+biBiZWluZyBhYmxlIHRvIGNyZWF0ZSB1bml4IGRvbWFpbnMgc29ja2V0cwpvbiBhIGNpZnMgc2hh
+cmUgdGhlIGVhc2llc3QgZml4IHRvIHN0b3AgdGhpcyB2dWxuZXJhYmlsaXR5IGlzIHRvIHNpbXBs
+eQpub3QgYWxsb3cgY3JlYXRpb24gb2YgYW55IG90aGVyIHNwZWNpYWwgZmlsZXMgdGhhbiBjaGFy
+IG9yIGJsb2NrIGRldmljZXMKd2hlbiBzZnUgaXMgdXNlZC4KCkFkZGVkIHVwZGF0ZSB0byBSb25u
+aWUncyBwYXRjaCB0byBoYW5kbGUgYSB0Y29uIGxpbmsgbGVhaywgYW5kCnRvIGFkZHJlc3MgYSBi
+dWYgbGVhayBub3RpY2VkIGJ5IEd1c3Rhdm8gYW5kIENvbGluLgoKQ0M6IEd1c3Rhdm8gQS4gUi4g
+U2lsdmEgPGd1c3Rhdm9AZW1iZWRkZWRvci5jb20+CkNDOiAgQ29saW4gSWFuIEtpbmcgPGNvbGlu
+LmtpbmdAY2Fub25pY2FsLmNvbT4KUmVwb3J0ZWQtYnk6IEVyeXUgR3VhbiA8ZWd1YW5AcmVkaGF0
+LmNvbT4KU2lnbmVkLW9mZi1ieTogUm9ubmllIFNhaGxiZXJnIDxsc2FobGJlckByZWRoYXQuY29t
+PgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHNtZnJlbmNoQGdtYWlsLmNvbT4KQ2M6IHN0
+YWJsZUB2Z2VyLmtlcm5lbC5vcmcKLS0tCiBmcy9jaWZzL2Rpci5jIHwgOSArKysrKy0tLS0KIDEg
+ZmlsZSBjaGFuZ2VkLCA1IGluc2VydGlvbnMoKyksIDQgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0
+IGEvZnMvY2lmcy9kaXIuYyBiL2ZzL2NpZnMvZGlyLmMKaW5kZXggODFiYTZlMGQ4OGQ4Li45MjU4
+NDQzNDMwMzggMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvZGlyLmMKKysrIGIvZnMvY2lmcy9kaXIuYwpA
+QCAtNjg0LDYgKzY4NCw5IEBAIGludCBjaWZzX21rbm9kKHN0cnVjdCBpbm9kZSAqaW5vZGUsIHN0
+cnVjdCBkZW50cnkgKmRpcmVudHJ5LCB1bW9kZV90IG1vZGUsCiAJCWdvdG8gbWtub2Rfb3V0Owog
+CX0KIAorCWlmICghU19JU0NIUihtb2RlKSAmJiAhU19JU0JMSyhtb2RlKSkKKwkJZ290byBta25v
+ZF9vdXQ7CisKIAlpZiAoIShjaWZzX3NiLT5tbnRfY2lmc19mbGFncyAmIENJRlNfTU9VTlRfVU5Y
+X0VNVUwpKQogCQlnb3RvIG1rbm9kX291dDsKIApAQCAtNjkyLDEwICs2OTUsOCBAQCBpbnQgY2lm
+c19ta25vZChzdHJ1Y3QgaW5vZGUgKmlub2RlLCBzdHJ1Y3QgZGVudHJ5ICpkaXJlbnRyeSwgdW1v
+ZGVfdCBtb2RlLAogCiAJYnVmID0ga21hbGxvYyhzaXplb2YoRklMRV9BTExfSU5GTyksIEdGUF9L
+RVJORUwpOwogCWlmIChidWYgPT0gTlVMTCkgewotCQlrZnJlZShmdWxsX3BhdGgpOwogCQlyYyA9
+IC1FTk9NRU07Ci0JCWZyZWVfeGlkKHhpZCk7Ci0JCXJldHVybiByYzsKKwkJZ290byBta25vZF9v
+dXQ7CiAJfQogCiAJaWYgKGJhY2t1cF9jcmVkKGNpZnNfc2IpKQpAQCAtNzQyLDcgKzc0Myw3IEBA
+IGludCBjaWZzX21rbm9kKHN0cnVjdCBpbm9kZSAqaW5vZGUsIHN0cnVjdCBkZW50cnkgKmRpcmVu
+dHJ5LCB1bW9kZV90IG1vZGUsCiAJCXBkZXYtPm1pbm9yID0gY3B1X3RvX2xlNjQoTUlOT1IoZGV2
+aWNlX251bWJlcikpOwogCQlyYyA9IHRjb24tPnNlcy0+c2VydmVyLT5vcHMtPnN5bmNfd3JpdGUo
+eGlkLCAmZmlkLCAmaW9fcGFybXMsCiAJCQkJCQkJJmJ5dGVzX3dyaXR0ZW4sIGlvdiwgMSk7Ci0J
+fSAvKiBlbHNlIGlmIChTX0lTRklGTykgKi8KKwl9CiAJdGNvbi0+c2VzLT5zZXJ2ZXItPm9wcy0+
+Y2xvc2UoeGlkLCB0Y29uLCAmZmlkKTsKIAlkX2Ryb3AoZGlyZW50cnkpOwogCi0tIAoyLjE0LjEK
+Cg==
+--001a11469b8ae4cc20056a4b251f--
