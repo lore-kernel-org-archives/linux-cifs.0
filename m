@@ -1,160 +1,250 @@
-From: Long Li <longli@microsoft.com>
-Subject: RE: [Patch v4] cifs: Allocate validate negotiation request through
+From: Tom Talpey <tom@talpey.com>
+Subject: Re: [Patch v4] cifs: Allocate validate negotiation request through
  kmalloc
-Date: Fri, 20 Apr 2018 18:41:16 +0000
-Message-ID: <MWHPR2101MB0729D25131DCC9AF638E0449CEB40@MWHPR2101MB0729.namprd21.prod.outlook.com>
+Date: Fri, 20 Apr 2018 14:50:22 -0400
+Message-ID: <1734dfc1-acef-def8-9aa9-1b9960d26f94@talpey.com>
 References: <20180419213807.3128-1-longli@linuxonhyperv.com>
  <c8924b83-dfa2-a44c-a425-deb7e03d0bf1@talpey.com>
+ <MWHPR2101MB0729D25131DCC9AF638E0449CEB40@MWHPR2101MB0729.namprd21.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-To: Tom Talpey <tom@talpey.com>, Steve French <sfrench@samba.org>,
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+To: Long Li <longli@microsoft.com>, Steve French <sfrench@samba.org>,
         "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
         "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <c8924b83-dfa2-a44c-a425-deb7e03d0bf1@talpey.com>
+In-Reply-To: <MWHPR2101MB0729D25131DCC9AF638E0449CEB40@MWHPR2101MB0729.namprd21.prod.outlook.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-PiBTdWJqZWN0OiBSZTogW1BhdGNoIHY0XSBjaWZzOiBBbGxvY2F0ZSB2YWxpZGF0ZSBuZWdvdGlh
-dGlvbiByZXF1ZXN0IHRocm91Z2gNCj4ga21hbGxvYw0KPiANCj4gTG9va3MgZ29vZCwgYnV0IEkg
-aGF2ZSB0d28gcG9zc2libHkgc3R5bGUtcmVsYXRlZCBjb21tZW50cy4NCj4gDQo+IE9uIDQvMTkv
-MjAxOCA1OjM4IFBNLCBMb25nIExpIHdyb3RlOg0KPiA+IEZyb206IExvbmcgTGkgPGxvbmdsaUBt
-aWNyb3NvZnQuY29tPg0KPiA+DQo+ID4gVGhlIGRhdGEgYnVmZmVyIGFsbG9jYXRlZCBvbiB0aGUg
-c3RhY2sgY2FuJ3QgYmUgRE1BJ2VkLA0KPiA+IGliX2RtYV9tYXBfcGFnZSB3aWxsIHJldHVybiBh
-biBpbnZhbGlkIERNQSBhZGRyZXNzIGZvciBhIGJ1ZmZlciBvbg0KPiA+IHN0YWNrLiBFdmVuIHdv
-cnNlLCB0aGlzIGluY29ycmVjdCBhZGRyZXNzIGNhbid0IGJlIGRldGVjdGVkIGJ5DQo+ID4gaWJf
-ZG1hX21hcHBpbmdfZXJyb3IuIFNlbmRpbmcgZGF0YSBmcm9tIHRoaXMgYWRkcmVzcyB0byBoYXJk
-d2FyZSB3aWxsDQo+ID4gbm90IGZhaWwsIGJ1dCB0aGUgcmVtb3RlIHBlZXIgd2lsbCBnZXQganVu
-ayBkYXRhLg0KPiA+DQo+ID4gRml4IHRoaXMgYnkgYWxsb2NhdGluZyB0aGUgcmVxdWVzdCBvbiB0
-aGUgaGVhcCBpbiBzbWIzX3ZhbGlkYXRlX25lZ290aWF0ZS4NCj4gPg0KPiA+IENoYW5nZXMgaW4g
-djI6DQo+ID4gUmVtb3ZlZCBkdXBsaWNhdGVkIGNvZGUgb24gZnJlZWluZyBidWZmZXJzIG9uIGZ1
-bmN0aW9uIGV4aXQuDQo+ID4gKFRoYW5rcyB0byBQYXJhdiBQYW5kaXQgPHBhcmF2QG1lbGxhbm94
-LmNvbT4pIEZpeGVkIHR5cG8gaW4gdGhlIHBhdGNoDQo+ID4gdGl0bGUuDQo+ID4NCj4gPiBDaGFu
-Z2VzIGluIHYzOg0KPiA+IEFkZGVkICJGaXhlcyIgdG8gdGhlIHBhdGNoLg0KPiA+IENoYW5nZWQg
-c2V2ZXJhbCBzaXplb2YoKSB0byB1c2UgKnBvaW50ZXIgaW4gcGxhY2Ugb2Ygc3RydWN0Lg0KPiA+
-DQo+ID4gQ2hhbmdlcyBpbiB2NDoNCj4gPiBBZGRlZCBkZXRhaWxlZCBjb21tZW50cyBvbiB0aGUg
-ZmFpbHVyZSB0aHJvdWdoIFJETUEuDQo+ID4gQWxsb2NhdGUgcmVxdWVzdCBidWZmZXIgdXNpbmcg
-R1BGX05PRlMuDQo+ID4gRml4ZWQgcG9zc2libGUgbWVtb3J5IGxlYWsuDQo+ID4NCj4gPiBGaXhl
-czogZmYxYzAzOGFkZGM0ICgiQ2hlY2sgU01CMyBkaWFsZWN0cyBhZ2FpbnN0IGRvd25ncmFkZSBh
-dHRhY2tzIikNCj4gPiBTaWduZWQtb2ZmLWJ5OiBMb25nIExpIDxsb25nbGlAbWljcm9zb2Z0LmNv
-bT4NCj4gPiAtLS0NCj4gPiAgIGZzL2NpZnMvc21iMnBkdS5jIHwgNjEgKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0NCj4gLS0tLS0tLS0tLS0NCj4gPiAgIDEgZmls
-ZSBjaGFuZ2VkLCAzMyBpbnNlcnRpb25zKCspLCAyOCBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IGRp
-ZmYgLS1naXQgYS9mcy9jaWZzL3NtYjJwZHUuYyBiL2ZzL2NpZnMvc21iMnBkdS5jIGluZGV4DQo+
-ID4gMGYwNDRjNC4uY2FhMmExZSAxMDA2NDQNCj4gPiAtLS0gYS9mcy9jaWZzL3NtYjJwZHUuYw0K
-PiA+ICsrKyBiL2ZzL2NpZnMvc21iMnBkdS5jDQo+ID4gQEAgLTcyOSw4ICs3MjksOCBAQCBTTUIy
-X25lZ290aWF0ZShjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1Y3QNCj4gPiBjaWZzX3NlcyAq
-c2VzKQ0KPiA+DQo+ID4gICBpbnQgc21iM192YWxpZGF0ZV9uZWdvdGlhdGUoY29uc3QgdW5zaWdu
-ZWQgaW50IHhpZCwgc3RydWN0IGNpZnNfdGNvbiAqdGNvbikNCj4gPiAgIHsNCj4gPiAtCWludCBy
-YyA9IDA7DQo+ID4gLQlzdHJ1Y3QgdmFsaWRhdGVfbmVnb3RpYXRlX2luZm9fcmVxIHZuZWdfaW5i
-dWY7DQo+ID4gKwlpbnQgcmV0LCByYyA9IC1FSU87DQo+IA0KPiBTZWVtcyBhd2t3YXJkIHRvIGhh
-dmUgInJjIiBhbmQgInJldCIsIGFuZCBiYXNlZCBvbiB0aGUgY29kZSBiZWxvdyBJIGRvbid0DQo+
-IHNlZSB3aHkgdHdvIHZhcmlhYmxlcyBhcmUgbmVlZGVkLiBTaW1wbGlmeT8gKHNlZSBsYXRlciBj
-b21tZW50KQ0KDQpUaGlzIGlzIGZvciBhZGRyZXNzaW5nIGEgcHJpb3IgY29tbWVudCB0byByZWR1
-Y2UgZHVwbGljYXRlIGNvZGUuIEFsbCB0aGUgZmFpbHVyZSBwYXRocw0KKGFmdGVyIGlzc3Vpbmcg
-SS9PKSByZXR1cm5pbmcgLUVJTywgdGhlcmUgYXJlIDUgb2YgdGhlbS4gU2V0IHJjIHRvIC1FSU8g
-YXQgdGhlIGJlZ2lubmluZw0Kc28gd2UgZG9u4oCZdCBuZWVkIHRvIHNldCBpdCBtdWx0aXBsZSB0
-aW1lcy4NCg0KPiANCj4gPiArCXN0cnVjdCB2YWxpZGF0ZV9uZWdvdGlhdGVfaW5mb19yZXEgKnBu
-ZWdfaW5idWY7DQo+ID4gICAJc3RydWN0IHZhbGlkYXRlX25lZ290aWF0ZV9pbmZvX3JzcCAqcG5l
-Z19yc3AgPSBOVUxMOw0KPiA+ICAgCXUzMiByc3BsZW47DQo+ID4gICAJdTMyIGluYnVmbGVuOyAv
-KiBtYXggb2YgNCBkaWFsZWN0cyAqLyBAQCAtNzQxLDcgKzc0MSw2IEBAIGludA0KPiA+IHNtYjNf
-dmFsaWRhdGVfbmVnb3RpYXRlKGNvbnN0IHVuc2lnbmVkIGludCB4aWQsIHN0cnVjdCBjaWZzX3Rj
-b24gKnRjb24pDQo+ID4gICAJaWYgKHRjb24tPnNlcy0+c2VydmVyLT5yZG1hKQ0KPiA+ICAgCQly
-ZXR1cm4gMDsNCj4gPiAgICNlbmRpZg0KPiA+IC0NCj4gPiAgIAkvKiBJbiBTTUIzLjExIHByZWF1
-dGggaW50ZWdyaXR5IHN1cGVyc2VkZXMgdmFsaWRhdGUgbmVnb3RpYXRlICovDQo+ID4gICAJaWYg
-KHRjb24tPnNlcy0+c2VydmVyLT5kaWFsZWN0ID09IFNNQjMxMV9QUk9UX0lEKQ0KPiA+ICAgCQly
-ZXR1cm4gMDsNCj4gPiBAQCAtNzY0LDYzICs3NjMsNjcgQEAgaW50IHNtYjNfdmFsaWRhdGVfbmVn
-b3RpYXRlKGNvbnN0IHVuc2lnbmVkIGludA0KPiB4aWQsIHN0cnVjdCBjaWZzX3Rjb24gKnRjb24p
-DQo+ID4gICAJaWYgKHRjb24tPnNlcy0+c2Vzc2lvbl9mbGFncyAmIFNNQjJfU0VTU0lPTl9GTEFH
-X0lTX05VTEwpDQo+ID4gICAJCWNpZnNfZGJnKFZGUywgIlVuZXhwZWN0ZWQgbnVsbCB1c2VyIChh
-bm9ueW1vdXMpIGF1dGggZmxhZw0KPiBzZW50IGJ5DQo+ID4gc2VydmVyXG4iKTsNCj4gPg0KPiA+
-IC0Jdm5lZ19pbmJ1Zi5DYXBhYmlsaXRpZXMgPQ0KPiA+ICsJcG5lZ19pbmJ1ZiA9IGttYWxsb2Mo
-c2l6ZW9mKCpwbmVnX2luYnVmKSwgR0ZQX05PRlMpOw0KPiA+ICsJaWYgKCFwbmVnX2luYnVmKQ0K
-PiA+ICsJCXJldHVybiAtRU5PTUVNOw0KPiA+ICsNCj4gPiArCXBuZWdfaW5idWYtPkNhcGFiaWxp
-dGllcyA9DQo+ID4gICAJCQljcHVfdG9fbGUzMih0Y29uLT5zZXMtPnNlcnZlci0+dmFscy0NCj4g
-PnJlcV9jYXBhYmlsaXRpZXMpOw0KPiA+IC0JbWVtY3B5KHZuZWdfaW5idWYuR3VpZCwgdGNvbi0+
-c2VzLT5zZXJ2ZXItPmNsaWVudF9ndWlkLA0KPiA+ICsJbWVtY3B5KHBuZWdfaW5idWYtPkd1aWQs
-IHRjb24tPnNlcy0+c2VydmVyLT5jbGllbnRfZ3VpZCwNCj4gPiAgIAkJCQkJU01CMl9DTElFTlRf
-R1VJRF9TSVpFKTsNCj4gPg0KPiA+ICAgCWlmICh0Y29uLT5zZXMtPnNpZ24pDQo+ID4gLQkJdm5l
-Z19pbmJ1Zi5TZWN1cml0eU1vZGUgPQ0KPiA+ICsJCXBuZWdfaW5idWYtPlNlY3VyaXR5TW9kZSA9
-DQo+ID4NCj4gCWNwdV90b19sZTE2KFNNQjJfTkVHT1RJQVRFX1NJR05JTkdfUkVRVUlSRUQpOw0K
-PiA+ICAgCWVsc2UgaWYgKGdsb2JhbF9zZWNmbGFncyAmIENJRlNTRUNfTUFZX1NJR04pDQo+ID4g
-LQkJdm5lZ19pbmJ1Zi5TZWN1cml0eU1vZGUgPQ0KPiA+ICsJCXBuZWdfaW5idWYtPlNlY3VyaXR5
-TW9kZSA9DQo+ID4NCj4gCWNwdV90b19sZTE2KFNNQjJfTkVHT1RJQVRFX1NJR05JTkdfRU5BQkxF
-RCk7DQo+ID4gICAJZWxzZQ0KPiA+IC0JCXZuZWdfaW5idWYuU2VjdXJpdHlNb2RlID0gMDsNCj4g
-PiArCQlwbmVnX2luYnVmLT5TZWN1cml0eU1vZGUgPSAwOw0KPiA+DQo+ID4NCj4gPiAgIAlpZiAo
-c3RyY21wKHRjb24tPnNlcy0+c2VydmVyLT52YWxzLT52ZXJzaW9uX3N0cmluZywNCj4gPiAgIAkJ
-U01CM0FOWV9WRVJTSU9OX1NUUklORykgPT0gMCkgew0KPiA+IC0JCXZuZWdfaW5idWYuRGlhbGVj
-dHNbMF0gPSBjcHVfdG9fbGUxNihTTUIzMF9QUk9UX0lEKTsNCj4gPiAtCQl2bmVnX2luYnVmLkRp
-YWxlY3RzWzFdID0gY3B1X3RvX2xlMTYoU01CMzAyX1BST1RfSUQpOw0KPiA+IC0JCXZuZWdfaW5i
-dWYuRGlhbGVjdENvdW50ID0gY3B1X3RvX2xlMTYoMik7DQo+ID4gKwkJcG5lZ19pbmJ1Zi0+RGlh
-bGVjdHNbMF0gPSBjcHVfdG9fbGUxNihTTUIzMF9QUk9UX0lEKTsNCj4gPiArCQlwbmVnX2luYnVm
-LT5EaWFsZWN0c1sxXSA9IGNwdV90b19sZTE2KFNNQjMwMl9QUk9UX0lEKTsNCj4gPiArCQlwbmVn
-X2luYnVmLT5EaWFsZWN0Q291bnQgPSBjcHVfdG9fbGUxNigyKTsNCj4gPiAgIAkJLyogc3RydWN0
-dXJlIGlzIGJpZyBlbm91Z2ggZm9yIDMgZGlhbGVjdHMsIHNlbmRpbmcgb25seSAyICovDQo+ID4g
-ICAJCWluYnVmbGVuID0gc2l6ZW9mKHN0cnVjdCB2YWxpZGF0ZV9uZWdvdGlhdGVfaW5mb19yZXEp
-IC0gMjsNCj4gDQo+IFRoZSAiLSAyIiBpcyBhIGxpdHRsZSBjb25mdXNpbmcgaGVyZS4gVGhpcyB3
-YXMgZXhpc3RpbmcgY29kZSwgYnV0IEkgc3VnZ2VzdCB5b3UNCj4gY2hhbmdlIHRoaXMgdG8gYSBz
-aXplb2YgKHUxNikgY29uc3RydWN0IGZvciBjb25zaXN0ZW5jeS4NCj4gSXQncyByZWR1Y2luZyBi
-eSB0aGUgbGVuZ3RoIG9mIGEgc2luZ2xlIERpYWxlY3RzW25dIGVudHJ5Lg0KPiANCj4gPiAgIAl9
-IGVsc2UgaWYgKHN0cmNtcCh0Y29uLT5zZXMtPnNlcnZlci0+dmFscy0+dmVyc2lvbl9zdHJpbmcs
-DQo+ID4gICAJCVNNQkRFRkFVTFRfVkVSU0lPTl9TVFJJTkcpID09IDApIHsNCj4gPiAtCQl2bmVn
-X2luYnVmLkRpYWxlY3RzWzBdID0gY3B1X3RvX2xlMTYoU01CMjFfUFJPVF9JRCk7DQo+ID4gLQkJ
-dm5lZ19pbmJ1Zi5EaWFsZWN0c1sxXSA9IGNwdV90b19sZTE2KFNNQjMwX1BST1RfSUQpOw0KPiA+
-IC0JCXZuZWdfaW5idWYuRGlhbGVjdHNbMl0gPSBjcHVfdG9fbGUxNihTTUIzMDJfUFJPVF9JRCk7
-DQo+ID4gLQkJdm5lZ19pbmJ1Zi5EaWFsZWN0Q291bnQgPSBjcHVfdG9fbGUxNigzKTsNCj4gPiAr
-CQlwbmVnX2luYnVmLT5EaWFsZWN0c1swXSA9IGNwdV90b19sZTE2KFNNQjIxX1BST1RfSUQpOw0K
-PiA+ICsJCXBuZWdfaW5idWYtPkRpYWxlY3RzWzFdID0gY3B1X3RvX2xlMTYoU01CMzBfUFJPVF9J
-RCk7DQo+ID4gKwkJcG5lZ19pbmJ1Zi0+RGlhbGVjdHNbMl0gPSBjcHVfdG9fbGUxNihTTUIzMDJf
-UFJPVF9JRCk7DQo+ID4gKwkJcG5lZ19pbmJ1Zi0+RGlhbGVjdENvdW50ID0gY3B1X3RvX2xlMTYo
-Myk7DQo+ID4gICAJCS8qIHN0cnVjdHVyZSBpcyBiaWcgZW5vdWdoIGZvciAzIGRpYWxlY3RzICov
-DQo+ID4gICAJCWluYnVmbGVuID0gc2l6ZW9mKHN0cnVjdCB2YWxpZGF0ZV9uZWdvdGlhdGVfaW5m
-b19yZXEpOw0KPiA+ICAgCX0gZWxzZSB7DQo+ID4gICAJCS8qIG90aGVyd2lzZSBzcGVjaWZpYyBk
-aWFsZWN0IHdhcyByZXF1ZXN0ZWQgKi8NCj4gPiAtCQl2bmVnX2luYnVmLkRpYWxlY3RzWzBdID0N
-Cj4gPiArCQlwbmVnX2luYnVmLT5EaWFsZWN0c1swXSA9DQo+ID4gICAJCQljcHVfdG9fbGUxNih0
-Y29uLT5zZXMtPnNlcnZlci0+dmFscy0+cHJvdG9jb2xfaWQpOw0KPiA+IC0JCXZuZWdfaW5idWYu
-RGlhbGVjdENvdW50ID0gY3B1X3RvX2xlMTYoMSk7DQo+ID4gKwkJcG5lZ19pbmJ1Zi0+RGlhbGVj
-dENvdW50ID0gY3B1X3RvX2xlMTYoMSk7DQo+ID4gICAJCS8qIHN0cnVjdHVyZSBpcyBiaWcgZW5v
-dWdoIGZvciAzIGRpYWxlY3RzLCBzZW5kaW5nIG9ubHkgMSAqLw0KPiA+ICAgCQlpbmJ1ZmxlbiA9
-IHNpemVvZihzdHJ1Y3QgdmFsaWRhdGVfbmVnb3RpYXRlX2luZm9fcmVxKSAtIDQ7DQo+IA0KPiBE
-aXR0byBwcmV2aW91cyBzaXplb2YgKHUxNikgY29tbWVudCwgd2l0aCBhICoyIHRoaXMgY2FzZS4N
-Cj4gDQo+ID4gICAJfQ0KPiA+DQo+ID4gLQlyYyA9IFNNQjJfaW9jdGwoeGlkLCB0Y29uLCBOT19G
-SUxFX0lELCBOT19GSUxFX0lELA0KPiA+ICsJcmV0ID0gU01CMl9pb2N0bCh4aWQsIHRjb24sIE5P
-X0ZJTEVfSUQsIE5PX0ZJTEVfSUQsDQo+ID4gICAJCUZTQ1RMX1ZBTElEQVRFX05FR09USUFURV9J
-TkZPLCB0cnVlIC8qIGlzX2ZzY3RsICovLA0KPiA+IC0JCShjaGFyICopJnZuZWdfaW5idWYsIHNp
-emVvZihzdHJ1Y3QNCj4gdmFsaWRhdGVfbmVnb3RpYXRlX2luZm9fcmVxKSwNCj4gPiArCQkoY2hh
-ciAqKXBuZWdfaW5idWYsIHNpemVvZigqcG5lZ19pbmJ1ZiksDQo+ID4gICAJCShjaGFyICoqKSZw
-bmVnX3JzcCwgJnJzcGxlbik7DQo+ID4NCj4gPiAtCWlmIChyYyAhPSAwKSB7DQo+ID4gLQkJY2lm
-c19kYmcoVkZTLCAidmFsaWRhdGUgcHJvdG9jb2wgbmVnb3RpYXRlIGZhaWxlZDogJWRcbiIsIHJj
-KTsNCj4gPiAtCQlyZXR1cm4gLUVJTzsNCj4gPiArCWlmIChyZXQpIHsNCj4gPiArCQljaWZzX2Ri
-ZyhWRlMsICJ2YWxpZGF0ZSBwcm90b2NvbCBuZWdvdGlhdGUgZmFpbGVkOiAlZFxuIiwgcmV0KTsN
-Cj4gPiArCQlnb3RvIG91dF9mcmVlX2luYnVmOw0KPiA+ICAgCX0NCj4gDQo+IFdoeSBub3QgbGVh
-dmUgInJjIiBhbG9uZSwgYW5kIHNldCBpdHMgdmFsdWUgdG8gLUVJTyBiZWZvcmUgdGhlIGdvdG8g
-aWYgdGhlIGlvY3RsDQo+IGZhaWxzPyBUaGF0IHdpbGwgc2ltcGxpZnkgYW5kIG1ha2UgdGhlIGNv
-ZGUgbXVjaCBtb3JlIHJlYWRhYmxlIElNTy4NCj4gDQo+ID4NCj4gPiAtCWlmIChyc3BsZW4gIT0g
-c2l6ZW9mKHN0cnVjdCB2YWxpZGF0ZV9uZWdvdGlhdGVfaW5mb19yc3ApKSB7DQo+ID4gKwlpZiAo
-cnNwbGVuICE9IHNpemVvZigqcG5lZ19yc3ApKSB7DQo+ID4gICAJCWNpZnNfZGJnKFZGUywgImlu
-dmFsaWQgcHJvdG9jb2wgbmVnb3RpYXRlIHJlc3BvbnNlDQo+IHNpemU6ICVkXG4iLA0KPiA+ICAg
-CQkJIHJzcGxlbik7DQo+ID4NCj4gPiAgIAkJLyogcmVsYXggY2hlY2sgc2luY2UgTWFjIHJldHVy
-bnMgbWF4IGJ1ZnNpemUgYWxsb3dlZCBvbiBpb2N0bA0KPiAqLw0KPiA+ICAgCQlpZiAoKHJzcGxl
-biA+IENJRlNNYXhCdWZTaXplKQ0KPiA+ICAgCQkgICAgIHx8IChyc3BsZW4gPCBzaXplb2Yoc3Ry
-dWN0IHZhbGlkYXRlX25lZ290aWF0ZV9pbmZvX3JzcCkpKQ0KPiA+IC0JCQlnb3RvIGVycl9yc3Bf
-ZnJlZTsNCj4gPiArCQkJZ290byBvdXRfZnJlZV9yc3A7DQo+ID4gICAJfQ0KPiANCj4gV291bGQg
-bmVlZCBhbiByYyA9IC1FSU8gaGVyZSB0b28gaWYgYWJvdmUgY29tbWVudCBpcyBhY2NlcHRlZC4N
-Cj4gDQo+IFRvbS4NCj4gDQo+ID4NCj4gPiAgIAkvKiBjaGVjayB2YWxpZGF0ZSBuZWdvdGlhdGUg
-aW5mbyByZXNwb25zZSBtYXRjaGVzIHdoYXQgd2UgZ290DQo+ID4gZWFybGllciAqLyBAQCAtODM4
-LDE0ICs4NDEsMTYgQEAgaW50IHNtYjNfdmFsaWRhdGVfbmVnb3RpYXRlKGNvbnN0DQo+ID4gdW5z
-aWduZWQgaW50IHhpZCwgc3RydWN0IGNpZnNfdGNvbiAqdGNvbikNCj4gPg0KPiA+ICAgCS8qIHZh
-bGlkYXRlIG5lZ290aWF0ZSBzdWNjZXNzZnVsICovDQo+ID4gICAJY2lmc19kYmcoRllJLCAidmFs
-aWRhdGUgbmVnb3RpYXRlIGluZm8gc3VjY2Vzc2Z1bFxuIik7DQo+ID4gLQlrZnJlZShwbmVnX3Jz
-cCk7DQo+ID4gLQlyZXR1cm4gMDsNCj4gPiArCXJjID0gMDsNCj4gPiArCWdvdG8gb3V0X2ZyZWVf
-cnNwOw0KPiA+DQo+ID4gICB2bmVnX291dDoNCj4gPiAgIAljaWZzX2RiZyhWRlMsICJwcm90b2Nv
-bCByZXZhbGlkYXRpb24gLSBzZWN1cml0eSBzZXR0aW5ncw0KPiA+IG1pc21hdGNoXG4iKTsNCj4g
-PiAtZXJyX3JzcF9mcmVlOg0KPiA+ICtvdXRfZnJlZV9yc3A6DQo+ID4gICAJa2ZyZWUocG5lZ19y
-c3ApOw0KPiA+IC0JcmV0dXJuIC1FSU87DQo+ID4gK291dF9mcmVlX2luYnVmOg0KPiA+ICsJa2Zy
-ZWUocG5lZ19pbmJ1Zik7DQo+ID4gKwlyZXR1cm4gcmM7DQo+ID4gICB9DQo+ID4NCj4gPiAgIGVu
-dW0gc2VjdXJpdHlFbnVtDQo+ID4NCg==
+On 4/20/2018 2:41 PM, Long Li wrote:
+>> Subject: Re: [Patch v4] cifs: Allocate validate negotiation request through
+>> kmalloc
+>>
+>> Looks good, but I have two possibly style-related comments.
+>>
+>> On 4/19/2018 5:38 PM, Long Li wrote:
+>>> From: Long Li <longli@microsoft.com>
+>>>
+>>> The data buffer allocated on the stack can't be DMA'ed,
+>>> ib_dma_map_page will return an invalid DMA address for a buffer on
+>>> stack. Even worse, this incorrect address can't be detected by
+>>> ib_dma_mapping_error. Sending data from this address to hardware will
+>>> not fail, but the remote peer will get junk data.
+>>>
+>>> Fix this by allocating the request on the heap in smb3_validate_negotiate.
+>>>
+>>> Changes in v2:
+>>> Removed duplicated code on freeing buffers on function exit.
+>>> (Thanks to Parav Pandit <parav@mellanox.com>) Fixed typo in the patch
+>>> title.
+>>>
+>>> Changes in v3:
+>>> Added "Fixes" to the patch.
+>>> Changed several sizeof() to use *pointer in place of struct.
+>>>
+>>> Changes in v4:
+>>> Added detailed comments on the failure through RDMA.
+>>> Allocate request buffer using GPF_NOFS.
+>>> Fixed possible memory leak.
+>>>
+>>> Fixes: ff1c038addc4 ("Check SMB3 dialects against downgrade attacks")
+>>> Signed-off-by: Long Li <longli@microsoft.com>
+>>> ---
+>>>    fs/cifs/smb2pdu.c | 61 ++++++++++++++++++++++++++++++--------------
+>> -----------
+>>>    1 file changed, 33 insertions(+), 28 deletions(-)
+>>>
+>>> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c index
+>>> 0f044c4..caa2a1e 100644
+>>> --- a/fs/cifs/smb2pdu.c
+>>> +++ b/fs/cifs/smb2pdu.c
+>>> @@ -729,8 +729,8 @@ SMB2_negotiate(const unsigned int xid, struct
+>>> cifs_ses *ses)
+>>>
+>>>    int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
+>>>    {
+>>> -	int rc = 0;
+>>> -	struct validate_negotiate_info_req vneg_inbuf;
+>>> +	int ret, rc = -EIO;
+>>
+>> Seems awkward to have "rc" and "ret", and based on the code below I don't
+>> see why two variables are needed. Simplify? (see later comment)
+> 
+> This is for addressing a prior comment to reduce duplicate code. All the failure paths
+> (after issuing I/O) returning -EIO, there are 5 of them. Set rc to -EIO at the beginning
+> so we don’t need to set it multiple times.
+
+Well, ok but now there are semi-duplicate and rather confusing "rc"
+and "ret" local variables, only one of which is actually returned.
+
+How about a "goto err" with unconditonal -EIO, and just leave the
+"return 0" path alone, like it was? That would be much clearer IMO.
+
+As-is, I needed to read it several times to convince myself the right
+rc was returned.
+
+Tom,
+
+
+> 
+>>
+>>> +	struct validate_negotiate_info_req *pneg_inbuf;
+>>>    	struct validate_negotiate_info_rsp *pneg_rsp = NULL;
+>>>    	u32 rsplen;
+>>>    	u32 inbuflen; /* max of 4 dialects */ @@ -741,7 +741,6 @@ int
+>>> smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
+>>>    	if (tcon->ses->server->rdma)
+>>>    		return 0;
+>>>    #endif
+>>> -
+>>>    	/* In SMB3.11 preauth integrity supersedes validate negotiate */
+>>>    	if (tcon->ses->server->dialect == SMB311_PROT_ID)
+>>>    		return 0;
+>>> @@ -764,63 +763,67 @@ int smb3_validate_negotiate(const unsigned int
+>> xid, struct cifs_tcon *tcon)
+>>>    	if (tcon->ses->session_flags & SMB2_SESSION_FLAG_IS_NULL)
+>>>    		cifs_dbg(VFS, "Unexpected null user (anonymous) auth flag
+>> sent by
+>>> server\n");
+>>>
+>>> -	vneg_inbuf.Capabilities =
+>>> +	pneg_inbuf = kmalloc(sizeof(*pneg_inbuf), GFP_NOFS);
+>>> +	if (!pneg_inbuf)
+>>> +		return -ENOMEM;
+>>> +
+>>> +	pneg_inbuf->Capabilities =
+>>>    			cpu_to_le32(tcon->ses->server->vals-
+>>> req_capabilities);
+>>> -	memcpy(vneg_inbuf.Guid, tcon->ses->server->client_guid,
+>>> +	memcpy(pneg_inbuf->Guid, tcon->ses->server->client_guid,
+>>>    					SMB2_CLIENT_GUID_SIZE);
+>>>
+>>>    	if (tcon->ses->sign)
+>>> -		vneg_inbuf.SecurityMode =
+>>> +		pneg_inbuf->SecurityMode =
+>>>
+>> 	cpu_to_le16(SMB2_NEGOTIATE_SIGNING_REQUIRED);
+>>>    	else if (global_secflags & CIFSSEC_MAY_SIGN)
+>>> -		vneg_inbuf.SecurityMode =
+>>> +		pneg_inbuf->SecurityMode =
+>>>
+>> 	cpu_to_le16(SMB2_NEGOTIATE_SIGNING_ENABLED);
+>>>    	else
+>>> -		vneg_inbuf.SecurityMode = 0;
+>>> +		pneg_inbuf->SecurityMode = 0;
+>>>
+>>>
+>>>    	if (strcmp(tcon->ses->server->vals->version_string,
+>>>    		SMB3ANY_VERSION_STRING) == 0) {
+>>> -		vneg_inbuf.Dialects[0] = cpu_to_le16(SMB30_PROT_ID);
+>>> -		vneg_inbuf.Dialects[1] = cpu_to_le16(SMB302_PROT_ID);
+>>> -		vneg_inbuf.DialectCount = cpu_to_le16(2);
+>>> +		pneg_inbuf->Dialects[0] = cpu_to_le16(SMB30_PROT_ID);
+>>> +		pneg_inbuf->Dialects[1] = cpu_to_le16(SMB302_PROT_ID);
+>>> +		pneg_inbuf->DialectCount = cpu_to_le16(2);
+>>>    		/* structure is big enough for 3 dialects, sending only 2 */
+>>>    		inbuflen = sizeof(struct validate_negotiate_info_req) - 2;
+>>
+>> The "- 2" is a little confusing here. This was existing code, but I suggest you
+>> change this to a sizeof (u16) construct for consistency.
+>> It's reducing by the length of a single Dialects[n] entry.
+>>
+>>>    	} else if (strcmp(tcon->ses->server->vals->version_string,
+>>>    		SMBDEFAULT_VERSION_STRING) == 0) {
+>>> -		vneg_inbuf.Dialects[0] = cpu_to_le16(SMB21_PROT_ID);
+>>> -		vneg_inbuf.Dialects[1] = cpu_to_le16(SMB30_PROT_ID);
+>>> -		vneg_inbuf.Dialects[2] = cpu_to_le16(SMB302_PROT_ID);
+>>> -		vneg_inbuf.DialectCount = cpu_to_le16(3);
+>>> +		pneg_inbuf->Dialects[0] = cpu_to_le16(SMB21_PROT_ID);
+>>> +		pneg_inbuf->Dialects[1] = cpu_to_le16(SMB30_PROT_ID);
+>>> +		pneg_inbuf->Dialects[2] = cpu_to_le16(SMB302_PROT_ID);
+>>> +		pneg_inbuf->DialectCount = cpu_to_le16(3);
+>>>    		/* structure is big enough for 3 dialects */
+>>>    		inbuflen = sizeof(struct validate_negotiate_info_req);
+>>>    	} else {
+>>>    		/* otherwise specific dialect was requested */
+>>> -		vneg_inbuf.Dialects[0] =
+>>> +		pneg_inbuf->Dialects[0] =
+>>>    			cpu_to_le16(tcon->ses->server->vals->protocol_id);
+>>> -		vneg_inbuf.DialectCount = cpu_to_le16(1);
+>>> +		pneg_inbuf->DialectCount = cpu_to_le16(1);
+>>>    		/* structure is big enough for 3 dialects, sending only 1 */
+>>>    		inbuflen = sizeof(struct validate_negotiate_info_req) - 4;
+>>
+>> Ditto previous sizeof (u16) comment, with a *2 this case.
+>>
+>>>    	}
+>>>
+>>> -	rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
+>>> +	ret = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
+>>>    		FSCTL_VALIDATE_NEGOTIATE_INFO, true /* is_fsctl */,
+>>> -		(char *)&vneg_inbuf, sizeof(struct
+>> validate_negotiate_info_req),
+>>> +		(char *)pneg_inbuf, sizeof(*pneg_inbuf),
+>>>    		(char **)&pneg_rsp, &rsplen);
+>>>
+>>> -	if (rc != 0) {
+>>> -		cifs_dbg(VFS, "validate protocol negotiate failed: %d\n", rc);
+>>> -		return -EIO;
+>>> +	if (ret) {
+>>> +		cifs_dbg(VFS, "validate protocol negotiate failed: %d\n", ret);
+>>> +		goto out_free_inbuf;
+>>>    	}
+>>
+>> Why not leave "rc" alone, and set its value to -EIO before the goto if the ioctl
+>> fails? That will simplify and make the code much more readable IMO.
+>>
+>>>
+>>> -	if (rsplen != sizeof(struct validate_negotiate_info_rsp)) {
+>>> +	if (rsplen != sizeof(*pneg_rsp)) {
+>>>    		cifs_dbg(VFS, "invalid protocol negotiate response
+>> size: %d\n",
+>>>    			 rsplen);
+>>>
+>>>    		/* relax check since Mac returns max bufsize allowed on ioctl
+>> */
+>>>    		if ((rsplen > CIFSMaxBufSize)
+>>>    		     || (rsplen < sizeof(struct validate_negotiate_info_rsp)))
+>>> -			goto err_rsp_free;
+>>> +			goto out_free_rsp;
+>>>    	}
+>>
+>> Would need an rc = -EIO here too if above comment is accepted.
+>>
+>> Tom.
+>>
+>>>
+>>>    	/* check validate negotiate info response matches what we got
+>>> earlier */ @@ -838,14 +841,16 @@ int smb3_validate_negotiate(const
+>>> unsigned int xid, struct cifs_tcon *tcon)
+>>>
+>>>    	/* validate negotiate successful */
+>>>    	cifs_dbg(FYI, "validate negotiate info successful\n");
+>>> -	kfree(pneg_rsp);
+>>> -	return 0;
+>>> +	rc = 0;
+>>> +	goto out_free_rsp;
+>>>
+>>>    vneg_out:
+>>>    	cifs_dbg(VFS, "protocol revalidation - security settings
+>>> mismatch\n");
+>>> -err_rsp_free:
+>>> +out_free_rsp:
+>>>    	kfree(pneg_rsp);
+>>> -	return -EIO;
+>>> +out_free_inbuf:
+>>> +	kfree(pneg_inbuf);
+>>> +	return rc;
+>>>    }
+>>>
+>>>    enum securityEnum
+>>>
+> N�����r��y���b�X��ǧv�^�)޺{.n�+����{��ٚ�{ay�
+ʇڙ�,j��f���h���z�
+�w���
+���j:+v���w�j�m��������zZ+�����ݢj"��!tml=
+> 
