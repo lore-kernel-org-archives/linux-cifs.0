@@ -1,74 +1,145 @@
-From: "Michael Kelley (EOSG)" <Michael.H.Kelley@microsoft.com>
-Subject: RE: [Patch v2 1/6] cifs: smbd: Check for iov length on sending the
- last iov
-Date: Sun, 22 Apr 2018 23:27:08 +0000
-Message-ID: <DM5PR2101MB1030B8026AC0E48F3E96E739DC8A0@DM5PR2101MB1030.namprd21.prod.outlook.com>
-References: <20180417191710.14855-1-longli@linuxonhyperv.com>
+From: Steve French <smfrench@gmail.com>
+Subject: Re: [Patch v2 3/6] cifs: smbd: Avoid allocating iov on the stack
+Date: Mon, 23 Apr 2018 10:31:51 -0500
+Message-ID: <CAH2r5mv65CGR04f3Z20aRBufisPon5Ptvqk++zii3YT=GN8epQ@mail.gmail.com>
+References: <20180417191710.14855-1-longli@linuxonhyperv.com> <20180417191710.14855-3-longli@linuxonhyperv.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>
-To: Long Li <longli@microsoft.com>, Steve French <sfrench@samba.org>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        LKML <linux-kernel@vger.kernel.org>, linux-rdma@vger.kernel.org
+To: Long Li <longli@microsoft.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180417191710.14855-1-longli@linuxonhyperv.com>
-Content-Language: en-US
+In-Reply-To: <20180417191710.14855-3-longli@linuxonhyperv.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-> -----Original Message-----
-> From: linux-kernel-owner@vger.kernel.org <linux-kernel-owner@vger.kernel.=
-org> On Behalf
-> Of Long Li
-> Sent: Tuesday, April 17, 2018 12:17 PM
-> To: Steve French <sfrench@samba.org>; linux-cifs@vger.kernel.org; samba-
-> technical@lists.samba.org; linux-kernel@vger.kernel.org; linux-rdma@vger.=
-kernel.org
-> Cc: Long Li <longli@microsoft.com>; stable@vger.kernel.org
-> Subject: [Patch v2 1/6] cifs: smbd: Check for iov length on sending the l=
-ast iov
->=20
+Didn't see any obvious problems, but can you fix the checkpatch
+warnings and resend to the list (I am more concerned about the last
+two warnings rather than the first one).
+
+$ scripts/checkpatch.pl 0001-cifs-smbd-Avoid-allocating-iov-on-the-stack.patch
+WARNING: line over 80 characters
+#60: FILE: fs/cifs/smbdirect.c:2106:
++        log_write(ERR, "expected the pdu length in 1st iov, but got
+0x%lu\n", rqst->rq_iov[0].iov_len);
+
+ERROR: Prefixing 0x with decimal output is defective
+#60: FILE: fs/cifs/smbdirect.c:2106:
++        log_write(ERR, "expected the pdu length in 1st iov, but got
+0x%lu\n", rqst->rq_iov[0].iov_len);
+
+WARNING: braces {} are not necessary for single statement blocks
+#69: FILE: fs/cifs/smbdirect.c:2112:
++    for (i = 0; i < rqst->rq_nvec-1; i++) {
+         buflen += iov[i].iov_len;
+     }
+
+total: 1 errors, 2 warnings, 65 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+0001-cifs-smbd-Avoid-allocating-iov-on-the-stack.patch has style
+problems, please review.
+
+On Tue, Apr 17, 2018 at 2:17 PM, Long Li <longli@linuxonhyperv.com> wrote:
 > From: Long Li <longli@microsoft.com>
->=20
-> When sending the last iov that breaks into smaller buffers to fit the
-> transfer size, it's necessary to check if this is the last iov.
->=20
-> If this is the latest iov, stop and proceed to send pages.
->=20
+>
+> It's not necessary to allocate another iov when going through the buffers
+> in smbd_send() through RDMA send.
+>
+> Remove it to reduce stack size.
+>
 > Signed-off-by: Long Li <longli@microsoft.com>
 > Cc: stable@vger.kernel.org
-
-Reviewed-by: Michael Kelley <mikelley@microsoft.com>
-
-But a question unrelated to this change arose during my review:  At the
-beginning and end of smbd_send(), the field smbd_send_pending is
-incremented and decremented, respectively.   The increment/decrement
-are not done as atomic operations.  Is this code guaranteed to be single
-threaded?  If not, the count could become corrupted, and
-smbd_destroy_rdma_work(), which waits for the count to become zero,
-could hang.  A similar question applies to smbd_recv_pending in smbd_recv()=
-.
-
 > ---
->  fs/cifs/smbdirect.c | 2 ++
->  1 file changed, 2 insertions(+)
->=20
+>  fs/cifs/smbdirect.c | 36 ++++++++++++------------------------
+>  1 file changed, 12 insertions(+), 24 deletions(-)
+>
 > diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-> index 90e673c..b5c6c0d 100644
+> index b5c6c0d..f575e9a 100644
 > --- a/fs/cifs/smbdirect.c
 > +++ b/fs/cifs/smbdirect.c
-> @@ -2197,6 +2197,8 @@ int smbd_send(struct smbd_connection *info, struct =
-smb_rqst *rqst)
->  						goto done;
->  				}
->  				i++;
-> +				if (i =3D=3D rqst->rq_nvec)
-> +					break;
->  			}
->  			start =3D i;
->  			buflen =3D 0;
+> @@ -2088,7 +2088,7 @@ int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst)
+>         int start, i, j;
+>         int max_iov_size =
+>                 info->max_send_size - sizeof(struct smbd_data_transfer);
+> -       struct kvec iov[SMBDIRECT_MAX_SGE];
+> +       struct kvec *iov;
+>         int rc;
+>
+>         info->smbd_send_pending++;
+> @@ -2099,32 +2099,20 @@ int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst)
+>         }
+>
+>         /*
+> -        * This usually means a configuration error
+> -        * We use RDMA read/write for packet size > rdma_readwrite_threshold
+> -        * as long as it's properly configured we should never get into this
+> -        * situation
+> -        */
+> -       if (rqst->rq_nvec + rqst->rq_npages > SMBDIRECT_MAX_SGE) {
+> -               log_write(ERR, "maximum send segment %x exceeding %x\n",
+> -                        rqst->rq_nvec + rqst->rq_npages, SMBDIRECT_MAX_SGE);
+> -               rc = -EINVAL;
+> -               goto done;
+> -       }
+> -
+> -       /*
+> -        * Remove the RFC1002 length defined in MS-SMB2 section 2.1
+> -        * It is used only for TCP transport
+> +        * Skip the RFC1002 length defined in MS-SMB2 section 2.1
+> +        * It is used only for TCP transport in the iov[0]
+>          * In future we may want to add a transport layer under protocol
+>          * layer so this will only be issued to TCP transport
+>          */
+> -       iov[0].iov_base = (char *)rqst->rq_iov[0].iov_base + 4;
+> -       iov[0].iov_len = rqst->rq_iov[0].iov_len - 4;
+> -       buflen += iov[0].iov_len;
+> +
+> +       if (rqst->rq_iov[0].iov_len != 4) {
+> +               log_write(ERR, "expected the pdu length in 1st iov, but got 0x%lu\n", rqst->rq_iov[0].iov_len);
+> +               return -EINVAL;
+> +       }
+> +       iov = &rqst->rq_iov[1];
+>
+>         /* total up iov array first */
+> -       for (i = 1; i < rqst->rq_nvec; i++) {
+> -               iov[i].iov_base = rqst->rq_iov[i].iov_base;
+> -               iov[i].iov_len = rqst->rq_iov[i].iov_len;
+> +       for (i = 0; i < rqst->rq_nvec-1; i++) {
+>                 buflen += iov[i].iov_len;
+>         }
+>
+> @@ -2197,14 +2185,14 @@ int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst)
+>                                                 goto done;
+>                                 }
+>                                 i++;
+> -                               if (i == rqst->rq_nvec)
+> +                               if (i == rqst->rq_nvec-1)
+>                                         break;
+>                         }
+>                         start = i;
+>                         buflen = 0;
+>                 } else {
+>                         i++;
+> -                       if (i == rqst->rq_nvec) {
+> +                       if (i == rqst->rq_nvec-1) {
+>                                 /* send out all remaining vecs */
+>                                 remaining_data_length -= buflen;
+>                                 log_write(INFO,
 > --
 > 2.7.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Thanks,
+
+Steve
