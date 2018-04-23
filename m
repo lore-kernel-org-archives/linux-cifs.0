@@ -1,126 +1,132 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [Patch v2 4/6] cifs: smbd: Don't use RDMA read/write when signing
- is used
-Date: Mon, 23 Apr 2018 10:34:55 -0500
-Message-ID: <CAH2r5msFfBuTb5AF7inHVnA0B=miTc-S3kw_cKV_SfmeEd0_cw@mail.gmail.com>
-References: <20180417191710.14855-1-longli@linuxonhyperv.com> <20180417191710.14855-4-longli@linuxonhyperv.com>
+From: Long Li <longli@microsoft.com>
+Subject: RE: [Patch v2 3/6] cifs: smbd: Avoid allocating iov on the stack
+Date: Mon, 23 Apr 2018 17:33:23 +0000
+Message-ID: <SN4PR2101MB0733595DB7FC0A122ADB9128CE890@SN4PR2101MB0733.namprd21.prod.outlook.com>
+References: <20180417191710.14855-1-longli@linuxonhyperv.com>
+ <20180417191710.14855-3-longli@linuxonhyperv.com>
+ <CAH2r5mv65CGR04f3Z20aRBufisPon5Ptvqk++zii3YT=GN8epQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: CIFS <linux-cifs@vger.kernel.org>,
         samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>, linux-rdma@vger.kernel.org
-To: Long Li <longli@microsoft.com>
+        LKML <linux-kernel@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+To: Steve French <smfrench@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180417191710.14855-4-longli@linuxonhyperv.com>
+In-Reply-To: <CAH2r5mv65CGR04f3Z20aRBufisPon5Ptvqk++zii3YT=GN8epQ@mail.gmail.com>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-merged into cifs-2.6.git for-next
-
-On Tue, Apr 17, 2018 at 2:17 PM, Long Li <longli@linuxonhyperv.com> wrote:
-> From: Long Li <longli@microsoft.com>
->
-> SMB server will not sign data transferred through RDMA read/write. When
-> signing is used, it's a good idea to have all the data signed.
->
-> In this case, use RDMA send/recv for all data transfers. This will degrade
-> performance as this is not generally configured in RDMA environemnt. So
-> warn the user on signing and RDMA send/recv.
->
-> Signed-off-by: Long Li <longli@microsoft.com>
-> Cc: stable@vger.kernel.org
-> ---
->  fs/cifs/cifssmb.c |  3 +++
->  fs/cifs/smb2ops.c | 18 ++++++++++++++----
->  fs/cifs/smb2pdu.c |  4 ++--
->  3 files changed, 19 insertions(+), 6 deletions(-)
->
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index 6d3e40d..1529a08 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -455,6 +455,9 @@ cifs_enable_signing(struct TCP_Server_Info *server, bool mnt_sign_required)
->                 server->sign = true;
->         }
->
-> +       if (cifs_rdma_enabled(server) && server->sign)
-> +               cifs_dbg(VFS, "Signing is enabled, and RDMA read/write will be disabled");
-> +
->         return 0;
->  }
->
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 38ebf3f..b76b858 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -252,9 +252,14 @@ smb2_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
->         wsize = volume_info->wsize ? volume_info->wsize : CIFS_DEFAULT_IOSIZE;
->         wsize = min_t(unsigned int, wsize, server->max_write);
->  #ifdef CONFIG_CIFS_SMB_DIRECT
-> -       if (server->rdma)
-> -               wsize = min_t(unsigned int,
-> +       if (server->rdma) {
-> +               if (server->sign)
-> +                       wsize = min_t(unsigned int,
-> +                               wsize, server->smbd_conn->max_fragmented_send_size);
-> +               else
-> +                       wsize = min_t(unsigned int,
->                                 wsize, server->smbd_conn->max_readwrite_size);
-> +       }
->  #endif
->         if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
->                 wsize = min_t(unsigned int, wsize, SMB2_MAX_BUFFER_SIZE);
-> @@ -272,9 +277,14 @@ smb2_negotiate_rsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
->         rsize = volume_info->rsize ? volume_info->rsize : CIFS_DEFAULT_IOSIZE;
->         rsize = min_t(unsigned int, rsize, server->max_read);
->  #ifdef CONFIG_CIFS_SMB_DIRECT
-> -       if (server->rdma)
-> -               rsize = min_t(unsigned int,
-> +       if (server->rdma) {
-> +               if (server->sign)
-> +                       rsize = min_t(unsigned int,
-> +                               rsize, server->smbd_conn->max_fragmented_recv_size);
-> +               else
-> +                       rsize = min_t(unsigned int,
->                                 rsize, server->smbd_conn->max_readwrite_size);
-> +       }
->  #endif
->
->         if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 41625e4..33f612f 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -2595,7 +2595,7 @@ smb2_new_read_req(void **buf, unsigned int *total_len,
->          * If we want to do a RDMA write, fill in and append
->          * smbd_buffer_descriptor_v1 to the end of read request
->          */
-> -       if (server->rdma && rdata &&
-> +       if (server->rdma && rdata && !server->sign &&
->                 rdata->bytes >= server->smbd_conn->rdma_readwrite_threshold) {
->
->                 struct smbd_buffer_descriptor_v1 *v1;
-> @@ -2973,7 +2973,7 @@ smb2_async_writev(struct cifs_writedata *wdata,
->          * If we want to do a server RDMA read, fill in and append
->          * smbd_buffer_descriptor_v1 to the end of write request
->          */
-> -       if (server->rdma && wdata->bytes >=
-> +       if (server->rdma && !server->sign && wdata->bytes >=
->                 server->smbd_conn->rdma_readwrite_threshold) {
->
->                 struct smbd_buffer_descriptor_v1 *v1;
-> --
-> 2.7.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Thanks,
-
-Steve
+PiBTdWJqZWN0OiBSZTogW1BhdGNoIHYyIDMvNl0gY2lmczogc21iZDogQXZvaWQgYWxsb2NhdGlu
+ZyBpb3Ygb24gdGhlIHN0YWNrDQo+IA0KPiBEaWRuJ3Qgc2VlIGFueSBvYnZpb3VzIHByb2JsZW1z
+LCBidXQgY2FuIHlvdSBmaXggdGhlIGNoZWNrcGF0Y2ggd2FybmluZ3MNCj4gYW5kIHJlc2VuZCB0
+byB0aGUgbGlzdCAoSSBhbSBtb3JlIGNvbmNlcm5lZCBhYm91dCB0aGUgbGFzdCB0d28gd2Fybmlu
+Z3MNCj4gcmF0aGVyIHRoYW4gdGhlIGZpcnN0IG9uZSkuDQoNClllcywgSSB3aWxsIGZpeCBpdCBh
+bmQgcmVzZW5kLg0KDQo+IA0KPiAkIHNjcmlwdHMvY2hlY2twYXRjaC5wbCAwMDAxLWNpZnMtc21i
+ZC1Bdm9pZC1hbGxvY2F0aW5nLWlvdi1vbi10aGUtDQo+IHN0YWNrLnBhdGNoDQo+IFdBUk5JTkc6
+IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzDQo+ICM2MDogRklMRTogZnMvY2lmcy9zbWJkaXJlY3Qu
+YzoyMTA2Og0KPiArICAgICAgICBsb2dfd3JpdGUoRVJSLCAiZXhwZWN0ZWQgdGhlIHBkdSBsZW5n
+dGggaW4gMXN0IGlvdiwgYnV0IGdvdA0KPiAweCVsdVxuIiwgcnFzdC0+cnFfaW92WzBdLmlvdl9s
+ZW4pOw0KPiANCj4gRVJST1I6IFByZWZpeGluZyAweCB3aXRoIGRlY2ltYWwgb3V0cHV0IGlzIGRl
+ZmVjdGl2ZQ0KPiAjNjA6IEZJTEU6IGZzL2NpZnMvc21iZGlyZWN0LmM6MjEwNjoNCj4gKyAgICAg
+ICAgbG9nX3dyaXRlKEVSUiwgImV4cGVjdGVkIHRoZSBwZHUgbGVuZ3RoIGluIDFzdCBpb3YsIGJ1
+dCBnb3QNCj4gMHglbHVcbiIsIHJxc3QtPnJxX2lvdlswXS5pb3ZfbGVuKTsNCj4gDQo+IFdBUk5J
+Tkc6IGJyYWNlcyB7fSBhcmUgbm90IG5lY2Vzc2FyeSBmb3Igc2luZ2xlIHN0YXRlbWVudCBibG9j
+a3MNCj4gIzY5OiBGSUxFOiBmcy9jaWZzL3NtYmRpcmVjdC5jOjIxMTI6DQo+ICsgICAgZm9yIChp
+ID0gMDsgaSA8IHJxc3QtPnJxX252ZWMtMTsgaSsrKSB7DQo+ICAgICAgICAgIGJ1ZmxlbiArPSBp
+b3ZbaV0uaW92X2xlbjsNCj4gICAgICB9DQo+IA0KPiB0b3RhbDogMSBlcnJvcnMsIDIgd2Fybmlu
+Z3MsIDY1IGxpbmVzIGNoZWNrZWQNCj4gDQo+IE5PVEU6IEZvciBzb21lIG9mIHRoZSByZXBvcnRl
+ZCBkZWZlY3RzLCBjaGVja3BhdGNoIG1heSBiZSBhYmxlIHRvDQo+ICAgICAgIG1lY2hhbmljYWxs
+eSBjb252ZXJ0IHRvIHRoZSB0eXBpY2FsIHN0eWxlIHVzaW5nIC0tZml4IG9yIC0tZml4LWlucGxh
+Y2UuDQo+IA0KPiAwMDAxLWNpZnMtc21iZC1Bdm9pZC1hbGxvY2F0aW5nLWlvdi1vbi10aGUtc3Rh
+Y2sucGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLA0KPiBwbGVhc2UgcmV2aWV3Lg0KPiANCj4gT24g
+VHVlLCBBcHIgMTcsIDIwMTggYXQgMjoxNyBQTSwgTG9uZyBMaSA8bG9uZ2xpQGxpbnV4b25oeXBl
+cnYuY29tPiB3cm90ZToNCj4gPiBGcm9tOiBMb25nIExpIDxsb25nbGlAbWljcm9zb2Z0LmNvbT4N
+Cj4gPg0KPiA+IEl0J3Mgbm90IG5lY2Vzc2FyeSB0byBhbGxvY2F0ZSBhbm90aGVyIGlvdiB3aGVu
+IGdvaW5nIHRocm91Z2ggdGhlDQo+ID4gYnVmZmVycyBpbiBzbWJkX3NlbmQoKSB0aHJvdWdoIFJE
+TUEgc2VuZC4NCj4gPg0KPiA+IFJlbW92ZSBpdCB0byByZWR1Y2Ugc3RhY2sgc2l6ZS4NCj4gPg0K
+PiA+IFNpZ25lZC1vZmYtYnk6IExvbmcgTGkgPGxvbmdsaUBtaWNyb3NvZnQuY29tPg0KPiA+IENj
+OiBzdGFibGVAdmdlci5rZXJuZWwub3JnDQo+ID4gLS0tDQo+ID4gIGZzL2NpZnMvc21iZGlyZWN0
+LmMgfCAzNiArKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4gPiAgMSBmaWxl
+IGNoYW5nZWQsIDEyIGluc2VydGlvbnMoKyksIDI0IGRlbGV0aW9ucygtKQ0KPiA+DQo+ID4gZGlm
+ZiAtLWdpdCBhL2ZzL2NpZnMvc21iZGlyZWN0LmMgYi9mcy9jaWZzL3NtYmRpcmVjdC5jIGluZGV4
+DQo+ID4gYjVjNmMwZC4uZjU3NWU5YSAxMDA2NDQNCj4gPiAtLS0gYS9mcy9jaWZzL3NtYmRpcmVj
+dC5jDQo+ID4gKysrIGIvZnMvY2lmcy9zbWJkaXJlY3QuYw0KPiA+IEBAIC0yMDg4LDcgKzIwODgs
+NyBAQCBpbnQgc21iZF9zZW5kKHN0cnVjdCBzbWJkX2Nvbm5lY3Rpb24gKmluZm8sDQo+IHN0cnVj
+dCBzbWJfcnFzdCAqcnFzdCkNCj4gPiAgICAgICAgIGludCBzdGFydCwgaSwgajsNCj4gPiAgICAg
+ICAgIGludCBtYXhfaW92X3NpemUgPQ0KPiA+ICAgICAgICAgICAgICAgICBpbmZvLT5tYXhfc2Vu
+ZF9zaXplIC0gc2l6ZW9mKHN0cnVjdCBzbWJkX2RhdGFfdHJhbnNmZXIpOw0KPiA+IC0gICAgICAg
+c3RydWN0IGt2ZWMgaW92W1NNQkRJUkVDVF9NQVhfU0dFXTsNCj4gPiArICAgICAgIHN0cnVjdCBr
+dmVjICppb3Y7DQo+ID4gICAgICAgICBpbnQgcmM7DQo+ID4NCj4gPiAgICAgICAgIGluZm8tPnNt
+YmRfc2VuZF9wZW5kaW5nKys7DQo+ID4gQEAgLTIwOTksMzIgKzIwOTksMjAgQEAgaW50IHNtYmRf
+c2VuZChzdHJ1Y3Qgc21iZF9jb25uZWN0aW9uICppbmZvLA0KPiBzdHJ1Y3Qgc21iX3Jxc3QgKnJx
+c3QpDQo+ID4gICAgICAgICB9DQo+ID4NCj4gPiAgICAgICAgIC8qDQo+ID4gLSAgICAgICAgKiBU
+aGlzIHVzdWFsbHkgbWVhbnMgYSBjb25maWd1cmF0aW9uIGVycm9yDQo+ID4gLSAgICAgICAgKiBX
+ZSB1c2UgUkRNQSByZWFkL3dyaXRlIGZvciBwYWNrZXQgc2l6ZSA+DQo+IHJkbWFfcmVhZHdyaXRl
+X3RocmVzaG9sZA0KPiA+IC0gICAgICAgICogYXMgbG9uZyBhcyBpdCdzIHByb3Blcmx5IGNvbmZp
+Z3VyZWQgd2Ugc2hvdWxkIG5ldmVyIGdldCBpbnRvIHRoaXMNCj4gPiAtICAgICAgICAqIHNpdHVh
+dGlvbg0KPiA+IC0gICAgICAgICovDQo+ID4gLSAgICAgICBpZiAocnFzdC0+cnFfbnZlYyArIHJx
+c3QtPnJxX25wYWdlcyA+IFNNQkRJUkVDVF9NQVhfU0dFKSB7DQo+ID4gLSAgICAgICAgICAgICAg
+IGxvZ193cml0ZShFUlIsICJtYXhpbXVtIHNlbmQgc2VnbWVudCAleCBleGNlZWRpbmcgJXhcbiIs
+DQo+ID4gLSAgICAgICAgICAgICAgICAgICAgICAgIHJxc3QtPnJxX252ZWMgKyBycXN0LT5ycV9u
+cGFnZXMsIFNNQkRJUkVDVF9NQVhfU0dFKTsNCj4gPiAtICAgICAgICAgICAgICAgcmMgPSAtRUlO
+VkFMOw0KPiA+IC0gICAgICAgICAgICAgICBnb3RvIGRvbmU7DQo+ID4gLSAgICAgICB9DQo+ID4g
+LQ0KPiA+IC0gICAgICAgLyoNCj4gPiAtICAgICAgICAqIFJlbW92ZSB0aGUgUkZDMTAwMiBsZW5n
+dGggZGVmaW5lZCBpbiBNUy1TTUIyIHNlY3Rpb24gMi4xDQo+ID4gLSAgICAgICAgKiBJdCBpcyB1
+c2VkIG9ubHkgZm9yIFRDUCB0cmFuc3BvcnQNCj4gPiArICAgICAgICAqIFNraXAgdGhlIFJGQzEw
+MDIgbGVuZ3RoIGRlZmluZWQgaW4gTVMtU01CMiBzZWN0aW9uIDIuMQ0KPiA+ICsgICAgICAgICog
+SXQgaXMgdXNlZCBvbmx5IGZvciBUQ1AgdHJhbnNwb3J0IGluIHRoZSBpb3ZbMF0NCj4gPiAgICAg
+ICAgICAqIEluIGZ1dHVyZSB3ZSBtYXkgd2FudCB0byBhZGQgYSB0cmFuc3BvcnQgbGF5ZXIgdW5k
+ZXIgcHJvdG9jb2wNCj4gPiAgICAgICAgICAqIGxheWVyIHNvIHRoaXMgd2lsbCBvbmx5IGJlIGlz
+c3VlZCB0byBUQ1AgdHJhbnNwb3J0DQo+ID4gICAgICAgICAgKi8NCj4gPiAtICAgICAgIGlvdlsw
+XS5pb3ZfYmFzZSA9IChjaGFyICopcnFzdC0+cnFfaW92WzBdLmlvdl9iYXNlICsgNDsNCj4gPiAt
+ICAgICAgIGlvdlswXS5pb3ZfbGVuID0gcnFzdC0+cnFfaW92WzBdLmlvdl9sZW4gLSA0Ow0KPiA+
+IC0gICAgICAgYnVmbGVuICs9IGlvdlswXS5pb3ZfbGVuOw0KPiA+ICsNCj4gPiArICAgICAgIGlm
+IChycXN0LT5ycV9pb3ZbMF0uaW92X2xlbiAhPSA0KSB7DQo+ID4gKyAgICAgICAgICAgICAgIGxv
+Z193cml0ZShFUlIsICJleHBlY3RlZCB0aGUgcGR1IGxlbmd0aCBpbiAxc3QgaW92LCBidXQgZ290
+DQo+IDB4JWx1XG4iLCBycXN0LT5ycV9pb3ZbMF0uaW92X2xlbik7DQo+ID4gKyAgICAgICAgICAg
+ICAgIHJldHVybiAtRUlOVkFMOw0KPiA+ICsgICAgICAgfQ0KPiA+ICsgICAgICAgaW92ID0gJnJx
+c3QtPnJxX2lvdlsxXTsNCj4gPg0KPiA+ICAgICAgICAgLyogdG90YWwgdXAgaW92IGFycmF5IGZp
+cnN0ICovDQo+ID4gLSAgICAgICBmb3IgKGkgPSAxOyBpIDwgcnFzdC0+cnFfbnZlYzsgaSsrKSB7
+DQo+ID4gLSAgICAgICAgICAgICAgIGlvdltpXS5pb3ZfYmFzZSA9IHJxc3QtPnJxX2lvdltpXS5p
+b3ZfYmFzZTsNCj4gPiAtICAgICAgICAgICAgICAgaW92W2ldLmlvdl9sZW4gPSBycXN0LT5ycV9p
+b3ZbaV0uaW92X2xlbjsNCj4gPiArICAgICAgIGZvciAoaSA9IDA7IGkgPCBycXN0LT5ycV9udmVj
+LTE7IGkrKykgew0KPiA+ICAgICAgICAgICAgICAgICBidWZsZW4gKz0gaW92W2ldLmlvdl9sZW47
+DQo+ID4gICAgICAgICB9DQo+ID4NCj4gPiBAQCAtMjE5NywxNCArMjE4NSwxNCBAQCBpbnQgc21i
+ZF9zZW5kKHN0cnVjdCBzbWJkX2Nvbm5lY3Rpb24gKmluZm8sDQo+IHN0cnVjdCBzbWJfcnFzdCAq
+cnFzdCkNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBnb3RvIGRvbmU7DQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB9DQo+ID4g
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBpKys7DQo+ID4gLSAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBpZiAoaSA9PSBycXN0LT5ycV9udmVjKQ0KPiA+ICsgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgaWYgKGkgPT0gcnFzdC0+cnFfbnZlYy0xKQ0KPiA+ICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBicmVhazsNCj4gPiAgICAgICAgICAg
+ICAgICAgICAgICAgICB9DQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgc3RhcnQgPSBpOw0K
+PiA+ICAgICAgICAgICAgICAgICAgICAgICAgIGJ1ZmxlbiA9IDA7DQo+ID4gICAgICAgICAgICAg
+ICAgIH0gZWxzZSB7DQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgaSsrOw0KPiA+IC0gICAg
+ICAgICAgICAgICAgICAgICAgIGlmIChpID09IHJxc3QtPnJxX252ZWMpIHsNCj4gPiArICAgICAg
+ICAgICAgICAgICAgICAgICBpZiAoaSA9PSBycXN0LT5ycV9udmVjLTEpIHsNCj4gPiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIC8qIHNlbmQgb3V0IGFsbCByZW1haW5pbmcgdmVjcyAq
+Lw0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcmVtYWluaW5nX2RhdGFfbGVu
+Z3RoIC09IGJ1ZmxlbjsNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGxvZ193
+cml0ZShJTkZPLA0KPiA+IC0tDQo+ID4gMi43LjQNCj4gPg0KPiA+IC0tDQo+ID4gVG8gdW5zdWJz
+Y3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJlIGxpbnV4LWNp
+ZnMiDQo+ID4gaW4gdGhlIGJvZHkgb2YgYSBtZXNzYWdlIHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5l
+bC5vcmcgTW9yZQ0KPiBtYWpvcmRvbW8NCj4gPiBpbmZvIGF0DQo+ID4NCj4gaHR0cHM6Ly9uYTAx
+LnNhZmVsaW5rcy5wcm90ZWN0aW9uLm91dGxvb2suY29tLz91cmw9aHR0cCUzQSUyRiUyRnZnZXIu
+aw0KPiA+IGVybmVsLm9yZyUyRm1ham9yZG9tby0NCj4gaW5mby5odG1sJmRhdGE9MDIlN0MwMSU3
+Q2xvbmdsaSU0MG1pY3Jvc29mdC5jb20lDQo+ID4NCj4gN0MyM2ZiZGJiMDU5OGE0OTdmNjI0NzA4
+ZDVhOTJmNjQzNSU3QzcyZjk4OGJmODZmMTQxYWY5MWFiMmQ3Y2QwMTFkDQo+IGI0NyUNCj4gPg0K
+PiA3QzElN0MwJTdDNjM2NjAwOTQzMzgwODg3OTg4JnNkYXRhPWltaDljV0RRUUVYcXhIZFVyQ3VF
+eWtnaUxmS3MNCj4gVUFsMjBqQg0KPiA+IHlQT1M3RnJJJTNEJnJlc2VydmVkPTANCj4gDQo+IA0K
+PiANCj4gLS0NCj4gVGhhbmtzLA0KPiANCj4gU3RldmUNCj4gLS0NCj4gVG8gdW5zdWJzY3JpYmUg
+ZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJlIGxpbnV4LWNpZnMiIGlu
+IHRoZQ0KPiBib2R5IG9mIGEgbWVzc2FnZSB0byBtYWpvcmRvbW9Admdlci5rZXJuZWwub3JnIE1v
+cmUgbWFqb3Jkb21vIGluZm8gYXQNCj4gaHR0cHM6Ly9uYTAxLnNhZmVsaW5rcy5wcm90ZWN0aW9u
+Lm91dGxvb2suY29tLz91cmw9aHR0cCUzQSUyRiUyRnZnZXIua2UNCj4gcm5lbC5vcmclMkZtYWpv
+cmRvbW8tDQo+IGluZm8uaHRtbCZkYXRhPTAyJTdDMDElN0Nsb25nbGklNDBtaWNyb3NvZnQuY29t
+JTdDMjNmYmRiYjA1OThhNDk3Zg0KPiA2MjQ3MDhkNWE5MmY2NDM1JTdDNzJmOTg4YmY4NmYxNDFh
+ZjkxYWIyZDdjZDAxMWRiNDclN0MxJTdDMCU3QzYzDQo+IDY2MDA5NDMzODA4ODc5ODgmc2RhdGE9
+aW1oOWNXRFFRRVhxeEhkVXJDdUV5a2dpTGZLc1VBbDIwakJ5UE9TN0YNCj4gckklM0QmcmVzZXJ2
+ZWQ9MA0K
