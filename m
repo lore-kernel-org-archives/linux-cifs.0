@@ -1,134 +1,115 @@
 From: Steve French <smfrench@gmail.com>
-Subject: Re: [Patch v2 3/6] cifs: smbd: Avoid allocating iov on the stack
-Date: Mon, 23 Apr 2018 10:31:51 -0500
-Message-ID: <CAH2r5mv65CGR04f3Z20aRBufisPon5Ptvqk++zii3YT=GN8epQ@mail.gmail.com>
-References: <20180417191710.14855-1-longli@linuxonhyperv.com> <20180417191710.14855-3-longli@linuxonhyperv.com>
+Subject: Re: [Patch v2 4/6] cifs: smbd: Don't use RDMA read/write when signing
+ is used
+Date: Mon, 23 Apr 2018 10:34:55 -0500
+Message-ID: <CAH2r5msFfBuTb5AF7inHVnA0B=miTc-S3kw_cKV_SfmeEd0_cw@mail.gmail.com>
+References: <20180417191710.14855-1-longli@linuxonhyperv.com> <20180417191710.14855-4-longli@linuxonhyperv.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: CIFS <linux-cifs@vger.kernel.org>,
+Cc: Steve French <sfrench@samba.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
         samba-technical <samba-technical@lists.samba.org>,
         LKML <linux-kernel@vger.kernel.org>, linux-rdma@vger.kernel.org
 To: Long Li <longli@microsoft.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180417191710.14855-3-longli@linuxonhyperv.com>
+In-Reply-To: <20180417191710.14855-4-longli@linuxonhyperv.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Didn't see any obvious problems, but can you fix the checkpatch
-warnings and resend to the list (I am more concerned about the last
-two warnings rather than the first one).
-
-$ scripts/checkpatch.pl 0001-cifs-smbd-Avoid-allocating-iov-on-the-stack.patch
-WARNING: line over 80 characters
-#60: FILE: fs/cifs/smbdirect.c:2106:
-+        log_write(ERR, "expected the pdu length in 1st iov, but got
-0x%lu\n", rqst->rq_iov[0].iov_len);
-
-ERROR: Prefixing 0x with decimal output is defective
-#60: FILE: fs/cifs/smbdirect.c:2106:
-+        log_write(ERR, "expected the pdu length in 1st iov, but got
-0x%lu\n", rqst->rq_iov[0].iov_len);
-
-WARNING: braces {} are not necessary for single statement blocks
-#69: FILE: fs/cifs/smbdirect.c:2112:
-+    for (i = 0; i < rqst->rq_nvec-1; i++) {
-         buflen += iov[i].iov_len;
-     }
-
-total: 1 errors, 2 warnings, 65 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-0001-cifs-smbd-Avoid-allocating-iov-on-the-stack.patch has style
-problems, please review.
+merged into cifs-2.6.git for-next
 
 On Tue, Apr 17, 2018 at 2:17 PM, Long Li <longli@linuxonhyperv.com> wrote:
 > From: Long Li <longli@microsoft.com>
 >
-> It's not necessary to allocate another iov when going through the buffers
-> in smbd_send() through RDMA send.
+> SMB server will not sign data transferred through RDMA read/write. When
+> signing is used, it's a good idea to have all the data signed.
 >
-> Remove it to reduce stack size.
+> In this case, use RDMA send/recv for all data transfers. This will degrade
+> performance as this is not generally configured in RDMA environemnt. So
+> warn the user on signing and RDMA send/recv.
 >
 > Signed-off-by: Long Li <longli@microsoft.com>
 > Cc: stable@vger.kernel.org
 > ---
->  fs/cifs/smbdirect.c | 36 ++++++++++++------------------------
->  1 file changed, 12 insertions(+), 24 deletions(-)
+>  fs/cifs/cifssmb.c |  3 +++
+>  fs/cifs/smb2ops.c | 18 ++++++++++++++----
+>  fs/cifs/smb2pdu.c |  4 ++--
+>  3 files changed, 19 insertions(+), 6 deletions(-)
 >
-> diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-> index b5c6c0d..f575e9a 100644
-> --- a/fs/cifs/smbdirect.c
-> +++ b/fs/cifs/smbdirect.c
-> @@ -2088,7 +2088,7 @@ int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst)
->         int start, i, j;
->         int max_iov_size =
->                 info->max_send_size - sizeof(struct smbd_data_transfer);
-> -       struct kvec iov[SMBDIRECT_MAX_SGE];
-> +       struct kvec *iov;
->         int rc;
->
->         info->smbd_send_pending++;
-> @@ -2099,32 +2099,20 @@ int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst)
+> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> index 6d3e40d..1529a08 100644
+> --- a/fs/cifs/cifssmb.c
+> +++ b/fs/cifs/cifssmb.c
+> @@ -455,6 +455,9 @@ cifs_enable_signing(struct TCP_Server_Info *server, bool mnt_sign_required)
+>                 server->sign = true;
 >         }
 >
->         /*
-> -        * This usually means a configuration error
-> -        * We use RDMA read/write for packet size > rdma_readwrite_threshold
-> -        * as long as it's properly configured we should never get into this
-> -        * situation
-> -        */
-> -       if (rqst->rq_nvec + rqst->rq_npages > SMBDIRECT_MAX_SGE) {
-> -               log_write(ERR, "maximum send segment %x exceeding %x\n",
-> -                        rqst->rq_nvec + rqst->rq_npages, SMBDIRECT_MAX_SGE);
-> -               rc = -EINVAL;
-> -               goto done;
-> -       }
-> -
-> -       /*
-> -        * Remove the RFC1002 length defined in MS-SMB2 section 2.1
-> -        * It is used only for TCP transport
-> +        * Skip the RFC1002 length defined in MS-SMB2 section 2.1
-> +        * It is used only for TCP transport in the iov[0]
->          * In future we may want to add a transport layer under protocol
->          * layer so this will only be issued to TCP transport
->          */
-> -       iov[0].iov_base = (char *)rqst->rq_iov[0].iov_base + 4;
-> -       iov[0].iov_len = rqst->rq_iov[0].iov_len - 4;
-> -       buflen += iov[0].iov_len;
+> +       if (cifs_rdma_enabled(server) && server->sign)
+> +               cifs_dbg(VFS, "Signing is enabled, and RDMA read/write will be disabled");
 > +
-> +       if (rqst->rq_iov[0].iov_len != 4) {
-> +               log_write(ERR, "expected the pdu length in 1st iov, but got 0x%lu\n", rqst->rq_iov[0].iov_len);
-> +               return -EINVAL;
+>         return 0;
+>  }
+>
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index 38ebf3f..b76b858 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -252,9 +252,14 @@ smb2_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
+>         wsize = volume_info->wsize ? volume_info->wsize : CIFS_DEFAULT_IOSIZE;
+>         wsize = min_t(unsigned int, wsize, server->max_write);
+>  #ifdef CONFIG_CIFS_SMB_DIRECT
+> -       if (server->rdma)
+> -               wsize = min_t(unsigned int,
+> +       if (server->rdma) {
+> +               if (server->sign)
+> +                       wsize = min_t(unsigned int,
+> +                               wsize, server->smbd_conn->max_fragmented_send_size);
+> +               else
+> +                       wsize = min_t(unsigned int,
+>                                 wsize, server->smbd_conn->max_readwrite_size);
 > +       }
-> +       iov = &rqst->rq_iov[1];
+>  #endif
+>         if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
+>                 wsize = min_t(unsigned int, wsize, SMB2_MAX_BUFFER_SIZE);
+> @@ -272,9 +277,14 @@ smb2_negotiate_rsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
+>         rsize = volume_info->rsize ? volume_info->rsize : CIFS_DEFAULT_IOSIZE;
+>         rsize = min_t(unsigned int, rsize, server->max_read);
+>  #ifdef CONFIG_CIFS_SMB_DIRECT
+> -       if (server->rdma)
+> -               rsize = min_t(unsigned int,
+> +       if (server->rdma) {
+> +               if (server->sign)
+> +                       rsize = min_t(unsigned int,
+> +                               rsize, server->smbd_conn->max_fragmented_recv_size);
+> +               else
+> +                       rsize = min_t(unsigned int,
+>                                 rsize, server->smbd_conn->max_readwrite_size);
+> +       }
+>  #endif
 >
->         /* total up iov array first */
-> -       for (i = 1; i < rqst->rq_nvec; i++) {
-> -               iov[i].iov_base = rqst->rq_iov[i].iov_base;
-> -               iov[i].iov_len = rqst->rq_iov[i].iov_len;
-> +       for (i = 0; i < rqst->rq_nvec-1; i++) {
->                 buflen += iov[i].iov_len;
->         }
+>         if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index 41625e4..33f612f 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -2595,7 +2595,7 @@ smb2_new_read_req(void **buf, unsigned int *total_len,
+>          * If we want to do a RDMA write, fill in and append
+>          * smbd_buffer_descriptor_v1 to the end of read request
+>          */
+> -       if (server->rdma && rdata &&
+> +       if (server->rdma && rdata && !server->sign &&
+>                 rdata->bytes >= server->smbd_conn->rdma_readwrite_threshold) {
 >
-> @@ -2197,14 +2185,14 @@ int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst)
->                                                 goto done;
->                                 }
->                                 i++;
-> -                               if (i == rqst->rq_nvec)
-> +                               if (i == rqst->rq_nvec-1)
->                                         break;
->                         }
->                         start = i;
->                         buflen = 0;
->                 } else {
->                         i++;
-> -                       if (i == rqst->rq_nvec) {
-> +                       if (i == rqst->rq_nvec-1) {
->                                 /* send out all remaining vecs */
->                                 remaining_data_length -= buflen;
->                                 log_write(INFO,
+>                 struct smbd_buffer_descriptor_v1 *v1;
+> @@ -2973,7 +2973,7 @@ smb2_async_writev(struct cifs_writedata *wdata,
+>          * If we want to do a server RDMA read, fill in and append
+>          * smbd_buffer_descriptor_v1 to the end of write request
+>          */
+> -       if (server->rdma && wdata->bytes >=
+> +       if (server->rdma && !server->sign && wdata->bytes >=
+>                 server->smbd_conn->rdma_readwrite_threshold) {
+>
+>                 struct smbd_buffer_descriptor_v1 *v1;
 > --
 > 2.7.4
 >
