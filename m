@@ -1,38 +1,51 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: linux-next: Signed-off-by missing for commits in the cifs tree
-Date: Mon, 23 Apr 2018 16:52:05 -0500
-Message-ID: <CAH2r5mtHjjMZy8zWcUKFmKsF3X4b1iEt-otbGpiu0-n2G9bohw@mail.gmail.com>
-References: <20180424073840.39b99c2e@canb.auug.org.au>
+From: Matt Redfearn <matt.redfearn@mips.com>
+Subject: [PATCH] cifs: smbd: Fix printk format warning for iov on the stack
+Date: Tue, 24 Apr 2018 10:34:55 +0100
+Message-ID: <1524562495-28137-1-git-send-email-matt.redfearn@mips.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: CIFS <linux-cifs@vger.kernel.org>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
+Content-Type: text/plain
+Cc: Matt Redfearn <matt.redfearn@mips.com>,
+        <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
+        <linux-kernel@vger.kernel.org>, Steve French <sfrench@samba.org>
+To: Long Li <longli@microsoft.com>, Steve French <smfrench@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180424073840.39b99c2e@canb.auug.org.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Fixed - thx
+Commit 4863cc758216 ("cifs: smbd: Avoid allocating iov on the stack")
+(next-20180424) added a warning when the pdu size is not as expected,
+but used a %lu for the printk warning. This results in the following
+warning being emitted from MIPS allyesconfig builds:
 
-On Mon, Apr 23, 2018 at 4:38 PM, Stephen Rothwell <sfr@canb.auug.org.au> wrote:
-> Hi all,
->
-> Commits
->
->   dee4bf3f21d8 ("cifs: smbd: Don't use RDMA read/write when signing is used")
->   553018657de2 ("ifs: smbd: Avoid allocating iov on the stack")
->
-> are missing a Signed-off-by from their committer.
->
-> --
-> Cheers,
-> Stephen Rothwell
+fs/cifs/smbdirect.c:2106:3: warning: format '%lu' expects argument of
+type 'long unsigned int', but argument 4 has type 'size_t' [-Wformat=]
 
+Change the format specifier to %zu for the size_t argument.
 
+Fixes: 4863cc758216 ("cifs: smbd: Avoid allocating iov on the stack")
+Signed-off-by: Matt Redfearn <matt.redfearn@mips.com>
 
+---
+
+This is new in next-20180424. Feel free to squash this if possible
+before it hits master.
+
+---
+ fs/cifs/smbdirect.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+index 24cea63e17f5..c62f7c95683c 100644
+--- a/fs/cifs/smbdirect.c
++++ b/fs/cifs/smbdirect.c
+@@ -2103,7 +2103,7 @@ int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst)
+ 	 */
+ 
+ 	if (rqst->rq_iov[0].iov_len != 4) {
+-		log_write(ERR, "expected the pdu length in 1st iov, but got %lu\n", rqst->rq_iov[0].iov_len);
++		log_write(ERR, "expected the pdu length in 1st iov, but got %zu\n", rqst->rq_iov[0].iov_len);
+ 		return -EINVAL;
+ 	}
+ 	iov = &rqst->rq_iov[1];
 -- 
-Thanks,
-
-Steve
+2.7.4
