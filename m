@@ -1,33 +1,49 @@
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: Re: [PATCH 6/6] IB: make INFINIBAND_ADDR_TRANS configurable
-Date: Thu, 26 Apr 2018 18:26:24 +0000
-Message-ID: <cdbccbcb15ed155243149a6ec3ee540df523990c.camel@wdc.com>
-References: <20180426181935.32977-1-gthelen@google.com>
-         <20180426181935.32977-7-gthelen@google.com>
+From: Tom Talpey <ttalpey@microsoft.com>
+Subject: RE: [PATCH v5] cifs: Allocate validate negotiation request through
+ kmalloc
+Date: Thu, 26 Apr 2018 18:45:53 +0000
+Message-ID: <MWHPR2101MB08097B137B0C9CCEC2E902BDA08E0@MWHPR2101MB0809.namprd21.prod.outlook.com>
+References: <20180425183005.9347-1-longli@linuxonhyperv.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-To: "tarick@google.com" <tarick@google.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "sagi@grimberg.me" <sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>,
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+To: Long Li <longli@microsoft.com>, Steve French <sfrench@samba.org>,
         "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "gthelen@google.com" <gthelen@google.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "sfrench@samba.org" <sfrench@samba.org>,
-        "keith.busch@intel.com" <keith.busch@intel.com>,
-        "jgg@ziepe.ca" <jgg@ziepe.ca>,
-        "dledford@redhat.com" <dledford@redhat.com>
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180426181935.32977-7-gthelen@google.com>
+In-Reply-To: <20180425183005.9347-1-longli@linuxonhyperv.com>
 Content-Language: en-US
-Content-ID: <F63C1884A294C043B05A393659C45726@namprd04.prod.outlook.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-T24gVGh1LCAyMDE4LTA0LTI2IGF0IDExOjE5IC0wNzAwLCBHcmVnIFRoZWxlbiB3cm90ZToNCj4g
-QWxsb3cgSU5GSU5JQkFORCB3aXRob3V0IElORklOSUJBTkRfQUREUl9UUkFOUyBiZWNhdXNlIGZ1
-enppbmcgaGFzIGJlZW4NCj4gZmluZGluZyBmYWlyIG51bWJlciBvZiBDTSBidWdzLiAgU28gcHJv
-dmlkZSBvcHRpb24gdG8gZGlzYWJsZSBpdC4NCg0KUmV2aWV3ZWQtYnk6IEJhcnQgVmFuIEFzc2No
-ZSA8YmFydC52YW5hc3NjaGVAd2RjLmNvbT4NCg0KDQo=
+> -----Original Message-----
+> From: linux-cifs-owner@vger.kernel.org <linux-cifs-owner@vger.kernel.org>=
+ On
+> Behalf Of Long Li
+> Sent: Wednesday, April 25, 2018 2:30 PM
+> To: Steve French <sfrench@samba.org>; linux-cifs@vger.kernel.org; samba-
+> technical@lists.samba.org; linux-kernel@vger.kernel.org; linux-
+> rdma@vger.kernel.org
+> Cc: Long Li <longli@microsoft.com>
+> Subject: [PATCH v5] cifs: Allocate validate negotiation request through k=
+malloc
+>=20
+> From: Long Li <longli@microsoft.com>
+>=20
+> The data buffer allocated on the stack can't be DMA'ed, ib_dma_map_page w=
+ill
+> return an invalid DMA address for a buffer on stack. Even worse, this
+> incorrect address can't be detected by ib_dma_mapping_error. Sending data
+> from this address to hardware will not fail, but the remote peer will get
+> junk data.
+>=20
+> Fix this by allocating the request on the heap in smb3_validate_negotiate=
+.
+>=20
+
+Looks good.
+
+Reviewed-By: Tom Talpey <ttalpey@microsoft.com>
+=20
