@@ -1,68 +1,184 @@
-From: Long Li <longli@microsoft.com>
-Subject: RE: [PATCH 4/5] cifs: smbd: depend on INFINIBAND_ADDR_TRANS
-Date: Thu, 26 Apr 2018 01:14:49 +0000
-Message-ID: <MWHPR2101MB07293DD81DF86317C2A6917ECE8E0@MWHPR2101MB0729.namprd21.prod.outlook.com>
-References: <20180425223412.207127-1-gthelen@google.com>
+From: Greg Thelen <gthelen@google.com>
+Subject: [PATCH 0/6] IB: make INFINIBAND_ADDR_TRANS configurable
+Date: Thu, 26 Apr 2018 11:19:29 -0700
+Message-ID: <20180426181935.32977-1-gthelen@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Cc: Christoph Hellwig <hch@lst.de>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        Tarick Bedeir <tarick@google.com>
-To: Greg Thelen <gthelen@google.com>, Steve French <sfrench@samba.org>,
-        Bart Van Assche <Bart.VanAssche@wdc.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>
+Content-Type: text/plain; charset="UTF-8"
+Cc: linux-rdma@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Greg Thelen <gthelen@google.com>
+To: Bart.VanAssche@wdc.com, hch@lst.de, dledford@redhat.com,
+        jgg@ziepe.ca, axboe@fb.com, keith.busch@intel.com,
+        sagi@grimberg.me, sfrench@samba.org, linux-rdma@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-cifs@vger.kernel.org,
+        linux-kernel@vger.kernel.org, gthelen@google.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180425223412.207127-1-gthelen@google.com>
-Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-> Subject: [PATCH 4/5] cifs: smbd: depend on INFINIBAND_ADDR_TRANS
->=20
-> CIFS_SMB_DIRECT code depends on INFINIBAND_ADDR_TRANS provided
-> symbols.
-> So declare the kconfig dependency.  This is necessary to allow for enabli=
-ng
-> INFINIBAND without INFINIBAND_ADDR_TRANS.
->=20
-> Signed-off-by: Greg Thelen <gthelen@google.com>
-> Cc: Tarick Bedeir <tarick@google.com>
+This series allows for CONFIG_INFINIBAND without
+CONFIG_INFINIBAND_ADDR_TRANS (aka RDMA communication manager).
+Fuzzing has been finding fair number of CM bugs.
+So provide an option to disable it in systems which don't need it.
 
-Reviewed-by: Long Li <longli@microsoft.com>
+Changes since last posting (https://lkml.org/lkml/2018/4/25/1266):
+- added ("ib_srp: depend on INFINIBAND_ADDR_TRANS") patch
 
-> ---
->  fs/cifs/Kconfig | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig index
-> 741749a98614..5f132d59dfc2 100644
-> --- a/fs/cifs/Kconfig
-> +++ b/fs/cifs/Kconfig
-> @@ -197,7 +197,7 @@ config CIFS_SMB311
->=20
->  config CIFS_SMB_DIRECT
->  	bool "SMB Direct support (Experimental)"
-> -	depends on CIFS=3Dm && INFINIBAND || CIFS=3Dy && INFINIBAND=3Dy
-> +	depends on CIFS=3Dm && INFINIBAND && INFINIBAND_ADDR_TRANS
-> || CIFS=3Dy &&
-> +INFINIBAND=3Dy && INFINIBAND_ADDR_TRANS=3Dy
->  	help
->  	  Enables SMB Direct experimental support for SMB 3.0, 3.02 and 3.1.1.
->  	  SMB Direct allows transferring SMB packets over RDMA. If unsure,
-> --
-> 2.17.0.441.gb46fe60e1d-goog
->=20
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in =
-the
-> body of a message to majordomo@vger.kernel.org More majordomo info at
-> https://na01.safelinks.protection.outlook.com/?url=3Dhttp%3A%2F%2Fvger.ke
-> rnel.org%2Fmajordomo-
-> info.html&data=3D02%7C01%7Clongli%40microsoft.com%7C680883705136432b
-> 280b08d5aafcb355%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C63
-> 6602924686676279&sdata=3Dcn1DPTCOpL2%2BBa62wGlUp2dEe8BAzFVPxhfRxf
-> 2N1Ek%3D&reserved=3D0
+This series passed the 0-day builder.
+
+I perfomed manual static analysis of this series based on next-20180424,
+looking for dependencies.
+
+$ git grep -w CONFIG_INFINIBAND_ADDR_TRANS
+drivers/infiniband/core/Makefile:infiniband-$(CONFIG_INFINIBAND_ADDR_TRANS)     := rdma_cm.o
+drivers/infiniband/core/Makefile:user_access-$(CONFIG_INFINIBAND_ADDR_TRANS)    := rdma_ucm.o
+
+$ grep -w -e rdma_cm -e rdma_ucm drivers/infiniband/core/Makefile
+infiniband-$(CONFIG_INFINIBAND_ADDR_TRANS)      := rdma_cm.o
+user_access-$(CONFIG_INFINIBAND_ADDR_TRANS)     := rdma_ucm.o
+rdma_cm-y :=                    cma.o
+rdma_cm-$(CONFIG_INFINIBAND_ADDR_TRANS_CONFIGFS) += cma_configfs.o
+rdma_ucm-y :=                   ucma.o
+
+$ grep EXPORT drivers/infiniband/core/{cma,ucma}.c
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(rdma_event_msg);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(rdma_reject_msg);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(rdma_is_consumer_reject);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(rdma_consumer_reject_data);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(__rdma_create_id);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(rdma_create_qp);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(rdma_destroy_qp);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(rdma_init_qp_attr);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(rdma_destroy_id);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(rdma_get_service_id);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(rdma_read_gids);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(rdma_set_service_type);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(rdma_set_ib_path);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(rdma_resolve_route);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(rdma_resolve_addr);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(rdma_set_reuseaddr);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(rdma_set_afonly);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(rdma_listen);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(rdma_bind_addr);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(rdma_connect);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(__rdma_accept);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(rdma_notify);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(rdma_reject);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(rdma_disconnect);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(rdma_join_multicast);
+drivers/infiniband/core/cma.c:EXPORT_SYMBOL(rdma_leave_multicast);
+
+$ git grep -lw \
+  -e __rdma_accept \
+  -e __rdma_create_id \
+  -e rdma_bind_addr \
+  -e rdma_connect \
+  -e rdma_consumer_reject_data \
+  -e rdma_create_qp \
+  -e rdma_destroy_id \
+  -e rdma_destroy_qp \
+  -e rdma_disconnect \
+  -e rdma_event_msg \
+  -e rdma_get_service_id \
+  -e rdma_init_qp_attr \
+  -e rdma_is_consumer_reject \
+  -e rdma_join_multicast \
+  -e rdma_leave_multicast \
+  -e rdma_listen \
+  -e rdma_notify \
+  -e rdma_read_gids \
+  -e rdma_reject \
+  -e rdma_reject_msg \
+  -e rdma_resolve_addr \
+  -e rdma_resolve_route \
+  -e rdma_set_afonly \
+  -e rdma_set_ib_path \
+  -e rdma_set_reuseaddr \
+  -e rdma_set_service_type
+drivers/infiniband/core/cma.c
+drivers/infiniband/core/ucma.c
+drivers/infiniband/hw/qedr/verbs.c
+drivers/infiniband/ulp/iser/iser_verbs.c
+drivers/infiniband/ulp/isert/ib_isert.c
+drivers/infiniband/ulp/srp/ib_srp.c
+drivers/infiniband/ulp/srpt/ib_srpt.c
+drivers/net/ethernet/qlogic/qed/qed_rdma.c
+drivers/nvme/host/rdma.c
+drivers/nvme/target/rdma.c
+drivers/staging/lustre/lnet/klnds/o2iblnd/o2iblnd.c
+drivers/staging/lustre/lnet/klnds/o2iblnd/o2iblnd_cb.c
+fs/cifs/smbdirect.c
+include/linux/qed/qed_rdma_if.h
+include/rdma/rdma_cm.h
+include/rdma/rdma_cm_ib.h
+net/9p/trans_rdma.c
+net/rds/ib.c
+net/rds/ib_cm.c
+net/rds/rdma_transport.c
+net/sunrpc/xprtrdma/svc_rdma_transport.c
+net/sunrpc/xprtrdma/transport.c
+net/sunrpc/xprtrdma/verbs.c
+
+# analysis of each file:
+drivers/infiniband/hw/qedr/verbs.c
+drivers/net/ethernet/qlogic/qed/qed_rdma.c
+include/linux/qed/qed_rdma_if.h
+  - not a direct function call
+include/rdma/rdma_cm.h
+include/rdma/rdma_cm_ib.h
+  - just prototypes
+drivers/infiniband/core/cma.c
+drivers/infiniband/core/ucma.c
+  - depends on INFINIBAND_ADDR_TRANS
+drivers/infiniband/ulp/iser/iser_verbs.c
+  - depends on INFINIBAND_ISER => INFINIBAND_ADDR_TRANS
+drivers/infiniband/ulp/isert/ib_isert.c
+  - depends on INFINIBAND_ISERT => INFINIBAND_ADDR_TRANS
+drivers/infiniband/ulp/srp/ib_srp.c
+  - depends on INFINIBAND_SRP => INFINIBAND_ADDR_TRANS
+    per this series' "ib_srp: depend on INFINIBAND_ADDR_TRANS"
+drivers/infiniband/ulp/srpt/ib_srpt.c
+  - depends on INFINIBAND_SRPT => INFINIBAND_ADDR_TRANS
+    per this series' "ib_srpt: depend on INFINIBAND_ADDR_TRANS"
+drivers/nvme/host/rdma.c
+  - depends on NVME_RDMA => INFINIBAND_ADDR_TRANS
+    per this series' "nvme: depend on INFINIBAND_ADDR_TRANS"
+drivers/nvme/target/rdma.c
+  - depends on NVME_TARGET_RDMA => INFINIBAND_ADDR_TRANS
+    per this series' "nvmet-rdma: depend on INFINIBAND_ADDR_TRANS"
+drivers/staging/lustre/lnet/klnds/o2iblnd/o2iblnd.c
+drivers/staging/lustre/lnet/klnds/o2iblnd/o2iblnd.h
+drivers/staging/lustre/lnet/klnds/o2iblnd/o2iblnd_cb.c
+  - depends on LNET_XPRT_IB => INFINIBAND_ADDR_TRANS
+fs/cifs/smbdirect.c
+  - depends on CIFS_SMB_DIRECT => INFINIBAND_ADDR_TRANS
+    per this series' "cifs: smbd: depend on INFINIBAND_ADDR_TRANS"
+net/9p/trans_rdma.c
+  - depends on NET_9P_RDMA => INFINIBAND_ADDR_TRANS
+net/rds/ib.c
+net/rds/ib_cm.c
+net/rds/rdma_transport.c
+  - depends on RDS_RDMA => INFINIBAND_ADDR_TRANS
+net/sunrpc/xprtrdma/svc_rdma_transport.c
+net/sunrpc/xprtrdma/transport.c
+net/sunrpc/xprtrdma/verbs.c
+  - depends on SUNRPC_XPRT_RDMA => INFINIBAND_ADDR_TRANS
+
+Greg Thelen (6):
+  nvme: depend on INFINIBAND_ADDR_TRANS
+  nvmet-rdma: depend on INFINIBAND_ADDR_TRANS
+  ib_srpt: depend on INFINIBAND_ADDR_TRANS
+  cifs: smbd: depend on INFINIBAND_ADDR_TRANS
+  ib_srp: depend on INFINIBAND_ADDR_TRANS
+  IB: make INFINIBAND_ADDR_TRANS configurable
+
+ drivers/infiniband/Kconfig          | 5 ++++-
+ drivers/infiniband/ulp/srp/Kconfig  | 2 +-
+ drivers/infiniband/ulp/srpt/Kconfig | 2 +-
+ drivers/nvme/host/Kconfig           | 2 +-
+ drivers/nvme/target/Kconfig         | 2 +-
+ fs/cifs/Kconfig                     | 2 +-
+ 6 files changed, 9 insertions(+), 6 deletions(-)
+
+-- 
+2.17.0.484.g0c8726318c-goog
