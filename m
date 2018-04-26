@@ -1,7 +1,7 @@
 From: Greg Thelen <gthelen@google.com>
-Subject: [PATCH 5/6] ib_srp: depend on INFINIBAND_ADDR_TRANS
-Date: Thu, 26 Apr 2018 11:19:34 -0700
-Message-ID: <20180426181935.32977-6-gthelen@google.com>
+Subject: [PATCH 6/6] IB: make INFINIBAND_ADDR_TRANS configurable
+Date: Thu, 26 Apr 2018 11:19:35 -0700
+Message-ID: <20180426181935.32977-7-gthelen@google.com>
 References: <20180426181935.32977-1-gthelen@google.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -19,27 +19,32 @@ In-Reply-To: <20180426181935.32977-1-gthelen@google.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-INFINIBAND_SRP code depends on INFINIBAND_ADDR_TRANS provided symbols.
-So declare the kconfig dependency.  This is necessary to allow for
-enabling INFINIBAND without INFINIBAND_ADDR_TRANS.
+Allow INFINIBAND without INFINIBAND_ADDR_TRANS because fuzzing has been
+finding fair number of CM bugs.  So provide option to disable it.
 
 Signed-off-by: Greg Thelen <gthelen@google.com>
 Cc: Tarick Bedeir <tarick@google.com>
 ---
- drivers/infiniband/ulp/srp/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/infiniband/Kconfig | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/infiniband/ulp/srp/Kconfig b/drivers/infiniband/ulp/srp/Kconfig
-index c74ee9633041..99db8fe5173a 100644
---- a/drivers/infiniband/ulp/srp/Kconfig
-+++ b/drivers/infiniband/ulp/srp/Kconfig
-@@ -1,6 +1,6 @@
- config INFINIBAND_SRP
- 	tristate "InfiniBand SCSI RDMA Protocol"
--	depends on SCSI
-+	depends on SCSI && INFINIBAND_ADDR_TRANS
- 	select SCSI_SRP_ATTRS
- 	---help---
- 	  Support for the SCSI RDMA Protocol over InfiniBand.  This
+diff --git a/drivers/infiniband/Kconfig b/drivers/infiniband/Kconfig
+index ee270e065ba9..2a972ed6851b 100644
+--- a/drivers/infiniband/Kconfig
++++ b/drivers/infiniband/Kconfig
+@@ -61,9 +61,12 @@ config INFINIBAND_ON_DEMAND_PAGING
+ 	  pages on demand instead.
+ 
+ config INFINIBAND_ADDR_TRANS
+-	bool
++	bool "RDMA/CM"
+ 	depends on INFINIBAND
+ 	default y
++	---help---
++	  Support for RDMA communication manager (CM).
++	  This allows for a generic connection abstraction over RDMA.
+ 
+ config INFINIBAND_ADDR_TRANS_CONFIGFS
+ 	bool
 -- 
 2.17.0.484.g0c8726318c-goog
