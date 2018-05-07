@@ -1,7 +1,7 @@
 From: Long Li <longli@linuxonhyperv.com>
-Subject: [PATCH 5/7] cifs: smbd: Protect memory registration using RCU
-Date: Mon,  7 May 2018 15:20:04 -0700
-Message-ID: <20180507222006.20781-5-longli@linuxonhyperv.com>
+Subject: [PATCH 7/7] cifs: Call MID callback before destroying transport
+Date: Mon,  7 May 2018 15:20:06 -0700
+Message-ID: <20180507222006.20781-7-longli@linuxonhyperv.com>
 References: <20180507222006.20781-1-longli@linuxonhyperv.com>
 Reply-To: longli@microsoft.com
 Cc: Long Li <longli@microsoft.com>
@@ -15,64 +15,77 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-Unlike packet I/O sending path, the memory registration is not locked. They
-need to be protected when doing transport reconnect or shutdown.
+When transport is being destroyed, it's possible that some processes may
+hold memory registrations that need to be deregistred.
 
-It's not necessary to lock for memory deregistration, since at the time the
-transport is already destroyed so it's impossible to pick up the wrong
-transport.
+Call them first so nobody is using transport resources, and it can be
+destroyed.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/smb2pdu.c   | 6 ++++++
- fs/cifs/smbdirect.c | 3 +++
- 2 files changed, 9 insertions(+)
+ fs/cifs/connect.c | 36 +++++++++++++++++++-----------------
+ 1 file changed, 19 insertions(+), 17 deletions(-)
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 8cd164e..09ca098 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -2609,10 +2609,13 @@ smb2_new_read_req(void **buf, unsigned int *total_len,
- 		bool need_invalidate =
- 			io_parms->tcon->ses->server->dialect == SMB30_PROT_ID;
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 5db3e9d..7e7d40e 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -369,22 +369,6 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 	/* do not want to be sending data on a socket we are freeing */
+ 	cifs_dbg(FYI, "%s: tearing down socket\n", __func__);
+ 	mutex_lock(&server->srv_mutex);
+-	if (server->ssocket) {
+-		cifs_dbg(FYI, "State: 0x%x Flags: 0x%lx\n",
+-			 server->ssocket->state, server->ssocket->flags);
+-		kernel_sock_shutdown(server->ssocket, SHUT_WR);
+-		cifs_dbg(FYI, "Post shutdown state: 0x%x Flags: 0x%lx\n",
+-			 server->ssocket->state, server->ssocket->flags);
+-		sock_release(server->ssocket);
+-		server->ssocket = NULL;
+-	} else if (cifs_rdma_enabled(server))
+-		smbd_destroy(server);
+-	server->sequence_number = 0;
+-	server->session_estab = false;
+-	kfree(server->session_key.response);
+-	server->session_key.response = NULL;
+-	server->session_key.len = 0;
+-	server->lstrp = jiffies;
  
-+		rcu_read_lock();
-+		rcu_dereference(server->smbd_conn);
- 		rdata->mr = smbd_register_mr(
- 				server->smbd_conn, rdata->pages,
- 				rdata->nr_pages, rdata->tailsz,
- 				true, need_invalidate);
-+		rcu_read_unlock();
- 		if (!rdata->mr)
- 			return -ENOBUFS;
+ 	/* mark submitted MIDs for retry and issue callback */
+ 	INIT_LIST_HEAD(&retry_list);
+@@ -397,7 +381,6 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 		list_move(&mid_entry->qhead, &retry_list);
+ 	}
+ 	spin_unlock(&GlobalMid_Lock);
+-	mutex_unlock(&server->srv_mutex);
  
-@@ -2986,10 +2989,13 @@ smb2_async_writev(struct cifs_writedata *wdata,
- 		struct smbd_buffer_descriptor_v1 *v1;
- 		bool need_invalidate = server->dialect == SMB30_PROT_ID;
+ 	cifs_dbg(FYI, "%s: issuing mid callbacks\n", __func__);
+ 	list_for_each_safe(tmp, tmp2, &retry_list) {
+@@ -406,6 +389,25 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 		mid_entry->callback(mid_entry);
+ 	}
  
-+		rcu_read_lock();
-+		rcu_dereference(server->smbd_conn);
- 		wdata->mr = smbd_register_mr(
- 				server->smbd_conn, wdata->pages,
- 				wdata->nr_pages, wdata->tailsz,
- 				false, need_invalidate);
-+		rcu_read_unlock();
- 		if (!wdata->mr) {
- 			rc = -ENOBUFS;
- 			goto async_writev_out;
-diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index 74620f5..8c46898 100644
---- a/fs/cifs/smbdirect.c
-+++ b/fs/cifs/smbdirect.c
-@@ -1482,6 +1482,9 @@ void smbd_destroy(struct TCP_Server_Info *server)
- 
- 	info->transport_status = SMBD_DESTROYED;
- 
-+	rcu_assign_pointer(server->smbd_conn, NULL);
-+	synchronize_rcu();
++	if (server->ssocket) {
++		cifs_dbg(FYI, "State: 0x%x Flags: 0x%lx\n",
++			 server->ssocket->state, server->ssocket->flags);
++		kernel_sock_shutdown(server->ssocket, SHUT_WR);
++		cifs_dbg(FYI, "Post shutdown state: 0x%x Flags: 0x%lx\n",
++			 server->ssocket->state, server->ssocket->flags);
++		sock_release(server->ssocket);
++		server->ssocket = NULL;
++	} else if (cifs_rdma_enabled(server))
++		smbd_destroy(server);
++	server->sequence_number = 0;
++	server->session_estab = false;
++	kfree(server->session_key.response);
++	server->session_key.response = NULL;
++	server->session_key.len = 0;
++	server->lstrp = jiffies;
 +
- 	destroy_workqueue(info->workqueue);
- 	kfree(info);
- }
++	mutex_unlock(&server->srv_mutex);
++
+ 	do {
+ 		try_to_freeze();
+ 
 -- 
 2.7.4
