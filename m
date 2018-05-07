@@ -1,7 +1,7 @@
 From: Long Li <longli@linuxonhyperv.com>
-Subject: [PATCH 7/7] cifs: Call MID callback before destroying transport
-Date: Mon,  7 May 2018 15:20:06 -0700
-Message-ID: <20180507222006.20781-7-longli@linuxonhyperv.com>
+Subject: [PATCH 6/7] cifs: smbd: Retry on memory registration failure
+Date: Mon,  7 May 2018 15:20:05 -0700
+Message-ID: <20180507222006.20781-6-longli@linuxonhyperv.com>
 References: <20180507222006.20781-1-longli@linuxonhyperv.com>
 Reply-To: longli@microsoft.com
 Cc: Long Li <longli@microsoft.com>
@@ -15,77 +15,39 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-When transport is being destroyed, it's possible that some processes may
-hold memory registrations that need to be deregistred.
+Memory registration failure doesn't mean this I/O has failed, it means the
+transport is hitting I/O error or needs reconnect. This error is not from
+the server.
 
-Call them first so nobody is using transport resources, and it can be
-destroyed.
+Indicate this error to upper layer, and let upper layer decide how to
+reconnect and proceed with this I/O.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/connect.c | 36 +++++++++++++++++++-----------------
- 1 file changed, 19 insertions(+), 17 deletions(-)
+ fs/cifs/smb2pdu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 5db3e9d..7e7d40e 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -369,22 +369,6 @@ cifs_reconnect(struct TCP_Server_Info *server)
- 	/* do not want to be sending data on a socket we are freeing */
- 	cifs_dbg(FYI, "%s: tearing down socket\n", __func__);
- 	mutex_lock(&server->srv_mutex);
--	if (server->ssocket) {
--		cifs_dbg(FYI, "State: 0x%x Flags: 0x%lx\n",
--			 server->ssocket->state, server->ssocket->flags);
--		kernel_sock_shutdown(server->ssocket, SHUT_WR);
--		cifs_dbg(FYI, "Post shutdown state: 0x%x Flags: 0x%lx\n",
--			 server->ssocket->state, server->ssocket->flags);
--		sock_release(server->ssocket);
--		server->ssocket = NULL;
--	} else if (cifs_rdma_enabled(server))
--		smbd_destroy(server);
--	server->sequence_number = 0;
--	server->session_estab = false;
--	kfree(server->session_key.response);
--	server->session_key.response = NULL;
--	server->session_key.len = 0;
--	server->lstrp = jiffies;
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 09ca098..c72d1fa 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -2617,7 +2617,7 @@ smb2_new_read_req(void **buf, unsigned int *total_len,
+ 				true, need_invalidate);
+ 		rcu_read_unlock();
+ 		if (!rdata->mr)
+-			return -ENOBUFS;
++			return -EAGAIN;
  
- 	/* mark submitted MIDs for retry and issue callback */
- 	INIT_LIST_HEAD(&retry_list);
-@@ -397,7 +381,6 @@ cifs_reconnect(struct TCP_Server_Info *server)
- 		list_move(&mid_entry->qhead, &retry_list);
- 	}
- 	spin_unlock(&GlobalMid_Lock);
--	mutex_unlock(&server->srv_mutex);
- 
- 	cifs_dbg(FYI, "%s: issuing mid callbacks\n", __func__);
- 	list_for_each_safe(tmp, tmp2, &retry_list) {
-@@ -406,6 +389,25 @@ cifs_reconnect(struct TCP_Server_Info *server)
- 		mid_entry->callback(mid_entry);
- 	}
- 
-+	if (server->ssocket) {
-+		cifs_dbg(FYI, "State: 0x%x Flags: 0x%lx\n",
-+			 server->ssocket->state, server->ssocket->flags);
-+		kernel_sock_shutdown(server->ssocket, SHUT_WR);
-+		cifs_dbg(FYI, "Post shutdown state: 0x%x Flags: 0x%lx\n",
-+			 server->ssocket->state, server->ssocket->flags);
-+		sock_release(server->ssocket);
-+		server->ssocket = NULL;
-+	} else if (cifs_rdma_enabled(server))
-+		smbd_destroy(server);
-+	server->sequence_number = 0;
-+	server->session_estab = false;
-+	kfree(server->session_key.response);
-+	server->session_key.response = NULL;
-+	server->session_key.len = 0;
-+	server->lstrp = jiffies;
-+
-+	mutex_unlock(&server->srv_mutex);
-+
- 	do {
- 		try_to_freeze();
- 
+ 		req->Channel = SMB2_CHANNEL_RDMA_V1_INVALIDATE;
+ 		if (need_invalidate)
+@@ -2997,7 +2997,7 @@ smb2_async_writev(struct cifs_writedata *wdata,
+ 				false, need_invalidate);
+ 		rcu_read_unlock();
+ 		if (!wdata->mr) {
+-			rc = -ENOBUFS;
++			rc = -EAGAIN;
+ 			goto async_writev_out;
+ 		}
+ 		req->Length = 0;
 -- 
 2.7.4
