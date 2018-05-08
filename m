@@ -1,270 +1,206 @@
-From: Long Li <longli@linuxonhyperv.com>
-Subject: [PATCH 1/7 v2] cifs: smbd: Make upper layer decide when to destroy the transport
-Date: Tue,  8 May 2018 12:46:56 -0700
-Message-ID: <20180508194656.10586-1-longli@linuxonhyperv.com>
-Reply-To: longli@microsoft.com
-Cc: Long Li <longli@microsoft.com>
-To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-        linux-rdma@vger.kernel.org
+From: Long Li <longli@microsoft.com>
+Subject: RE: [PATCH 5/7] cifs: smbd: Protect memory registration using RCU
+Date: Tue, 8 May 2018 22:16:23 +0000
+Message-ID: <MWHPR2101MB0729D64EBD5E4BAE67C26E7CCE9A0@MWHPR2101MB0729.namprd21.prod.outlook.com>
+References: <20180507222006.20781-5-longli@linuxonhyperv.com>
+ <201805081349.MX5qQDch%fengguang.wu@intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Cc: "kbuild-all@01.org" <kbuild-all@01.org>,
+        Steve French <sfrench@samba.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+To: kbuild test robot <lkp@intel.com>,
+        Long Li <longli@linuxonhyperv.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <201805081349.MX5qQDch%fengguang.wu@intel.com>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-From: Long Li <longli@microsoft.com>
+Hi Steve
 
-On transport recoonect, upper layer CIFS code destroys the current
-transport and then recoonect. This code path is not used by SMBD, in that
-SMBD destroys its transport on RDMA disconnect notification independent of
-CIFS upper layer behavior.
+Please drop this patch. I will find another solution.
 
-This approach adds some costs to SMBD layer to handle transport shutdown
-and restart, and to deal with several racing conditions on reconnecting
-transport.
+The other patches in the series can be reviewed and applied.
 
-Re-work this code path by introducing a new smbd_destroy. This function is
-called form upper layer to ask SMBD to destroy the transport. SMBD will no
-longer need to destroy the transport by itself while worrying about data
-transfer is in progress. The upper layer guarantees the transport is
-locked.
+Long
 
-change log:
-v2: fix build errors when CONFIG_CIFS_SMB_DIRECT is not configured
-
-Signed-off-by: Long Li <longli@microsoft.com>
----
- fs/cifs/connect.c   |   9 ++---
- fs/cifs/smbdirect.c | 114 +++++++++++++++++++++++++++++++++++++++++++---------
- fs/cifs/smbdirect.h |   5 ++-
- 3 files changed, 101 insertions(+), 27 deletions(-)
-
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 83b0234..5db3e9d 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -377,7 +377,8 @@ cifs_reconnect(struct TCP_Server_Info *server)
- 			 server->ssocket->state, server->ssocket->flags);
- 		sock_release(server->ssocket);
- 		server->ssocket = NULL;
--	}
-+	} else if (cifs_rdma_enabled(server))
-+		smbd_destroy(server);
- 	server->sequence_number = 0;
- 	server->session_estab = false;
- 	kfree(server->session_key.response);
-@@ -710,10 +711,8 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
- 	wake_up_all(&server->request_q);
- 	/* give those requests time to exit */
- 	msleep(125);
--	if (cifs_rdma_enabled(server) && server->smbd_conn) {
--		smbd_destroy(server->smbd_conn);
--		server->smbd_conn = NULL;
--	}
-+	if (cifs_rdma_enabled(server))
-+		smbd_destroy(server);
- 	if (server->ssocket) {
- 		sock_release(server->ssocket);
- 		server->ssocket = NULL;
-diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index c62f7c9..1aa2d35 100644
---- a/fs/cifs/smbdirect.c
-+++ b/fs/cifs/smbdirect.c
-@@ -318,6 +318,9 @@ static int smbd_conn_upcall(
- 
- 		info->transport_status = SMBD_DISCONNECTED;
- 		smbd_process_disconnected(info);
-+		wake_up(&info->disconn_wait);
-+		wake_up_interruptible(&info->wait_reassembly_queue);
-+		wake_up_interruptible_all(&info->wait_send_queue);
- 		break;
- 
- 	default:
-@@ -1476,17 +1479,97 @@ static void idle_connection_timer(struct work_struct *work)
- 			info->keep_alive_interval*HZ);
- }
- 
--/* Destroy this SMBD connection, called from upper layer */
--void smbd_destroy(struct smbd_connection *info)
-+/*
-+ * Destroy the transport and related RDMA and memory resources
-+ * Need to go through all the pending counters and make sure on one is using
-+ * the transport while it is destroyed
-+ */
-+void smbd_destroy(struct TCP_Server_Info *server)
- {
-+	struct smbd_connection *info = server->smbd_conn;
-+	struct smbd_response *response;
-+	unsigned long flags;
-+
-+	if (!info) {
-+		log_rdma_event(INFO, "rdma session already destroyed\n");
-+		return;
-+	}
-+
- 	log_rdma_event(INFO, "destroying rdma session\n");
-+	if (info->transport_status != SMBD_DISCONNECTED) {
-+		rdma_disconnect(server->smbd_conn->id);
-+		log_rdma_event(INFO, "wait for transport being disconnected\n");
-+		wait_event(
-+			info->disconn_wait,
-+			info->transport_status == SMBD_DISCONNECTED);
-+	}
- 
--	/* Kick off the disconnection process */
--	smbd_disconnect_rdma_connection(info);
-+	log_rdma_event(INFO, "destroying qp\n");
-+	ib_drain_qp(info->id->qp);
-+	rdma_destroy_qp(info->id);
-+
-+	log_rdma_event(INFO, "cancelling idle timer\n");
-+	cancel_delayed_work_sync(&info->idle_timer_work);
-+	log_rdma_event(INFO, "cancelling send immediate work\n");
-+	cancel_delayed_work_sync(&info->send_immediate_work);
- 
--	log_rdma_event(INFO, "wait for transport being destroyed\n");
--	wait_event(info->wait_destroy,
--		info->transport_status == SMBD_DESTROYED);
-+	log_rdma_event(INFO, "wait for all send posted to IB to finish\n");
-+	wait_event(info->wait_send_pending,
-+		atomic_read(&info->send_pending) == 0);
-+	wait_event(info->wait_send_payload_pending,
-+		atomic_read(&info->send_payload_pending) == 0);
-+
-+	/* It's not posssible for upper layer to get to reassembly */
-+	log_rdma_event(INFO, "drain the reassembly queue\n");
-+	do {
-+		spin_lock_irqsave(&info->reassembly_queue_lock, flags);
-+		response = _get_first_reassembly(info);
-+		if (response) {
-+			list_del(&response->list);
-+			spin_unlock_irqrestore(
-+				&info->reassembly_queue_lock, flags);
-+			put_receive_buffer(info, response);
-+		} else
-+			spin_unlock_irqrestore(
-+				&info->reassembly_queue_lock, flags);
-+	} while (response);
-+	info->reassembly_data_length = 0;
-+
-+	log_rdma_event(INFO, "free receive buffers\n");
-+	wait_event(info->wait_receive_queues,
-+		info->count_receive_queue + info->count_empty_packet_queue
-+			== info->receive_credit_max);
-+	destroy_receive_buffers(info);
-+
-+	/*
-+	 * For performance reasons, memory registration and deregistration
-+	 * are not locked by srv_mutex. It is possible some processes are
-+	 * blocked on transport srv_mutex while holding memory registration.
-+	 * Release the transport srv_mutex to allow them to hit the failure
-+	 * path when sending data, and then release memory registartions.
-+	 */
-+	log_rdma_event(INFO, "freeing mr list\n");
-+	wake_up_interruptible_all(&info->wait_mr);
-+	while (atomic_read(&info->mr_used_count)) {
-+		mutex_unlock(&server->srv_mutex);
-+		msleep(1000);
-+		mutex_lock(&server->srv_mutex);
-+	}
-+	destroy_mr_list(info);
-+
-+	ib_free_cq(info->send_cq);
-+	ib_free_cq(info->recv_cq);
-+	ib_dealloc_pd(info->pd);
-+	rdma_destroy_id(info->id);
-+
-+	/* free mempools */
-+	mempool_destroy(info->request_mempool);
-+	kmem_cache_destroy(info->request_cache);
-+
-+	mempool_destroy(info->response_mempool);
-+	kmem_cache_destroy(info->response_cache);
-+
-+	info->transport_status = SMBD_DESTROYED;
- 
- 	destroy_workqueue(info->workqueue);
- 	kfree(info);
-@@ -1511,17 +1594,9 @@ int smbd_reconnect(struct TCP_Server_Info *server)
- 	 */
- 	if (server->smbd_conn->transport_status == SMBD_CONNECTED) {
- 		log_rdma_event(INFO, "disconnecting transport\n");
--		smbd_disconnect_rdma_connection(server->smbd_conn);
-+		smbd_destroy(server);
- 	}
- 
--	/* wait until the transport is destroyed */
--	if (!wait_event_timeout(server->smbd_conn->wait_destroy,
--		server->smbd_conn->transport_status == SMBD_DESTROYED, 5*HZ))
--		return -EAGAIN;
--
--	destroy_workqueue(server->smbd_conn->workqueue);
--	kfree(server->smbd_conn);
--
- create_conn:
- 	log_rdma_event(INFO, "creating rdma session\n");
- 	server->smbd_conn = smbd_get_connection(
-@@ -1730,12 +1805,13 @@ static struct smbd_connection *_smbd_get_connection(
- 	conn_param.retry_count = SMBD_CM_RETRY;
- 	conn_param.rnr_retry_count = SMBD_CM_RNR_RETRY;
- 	conn_param.flow_control = 0;
--	init_waitqueue_head(&info->wait_destroy);
- 
- 	log_rdma_event(INFO, "connecting to IP %pI4 port %d\n",
- 		&addr_in->sin_addr, port);
- 
- 	init_waitqueue_head(&info->conn_wait);
-+	init_waitqueue_head(&info->disconn_wait);
-+	init_waitqueue_head(&info->wait_reassembly_queue);
- 	rc = rdma_connect(info->id, &conn_param);
- 	if (rc) {
- 		log_rdma_event(ERR, "rdma_connect() failed with %i\n", rc);
-@@ -1759,8 +1835,6 @@ static struct smbd_connection *_smbd_get_connection(
- 	}
- 
- 	init_waitqueue_head(&info->wait_send_queue);
--	init_waitqueue_head(&info->wait_reassembly_queue);
--
- 	INIT_DELAYED_WORK(&info->idle_timer_work, idle_connection_timer);
- 	INIT_DELAYED_WORK(&info->send_immediate_work, send_immediate_work);
- 	queue_delayed_work(info->workqueue, &info->idle_timer_work,
-@@ -1801,7 +1875,7 @@ static struct smbd_connection *_smbd_get_connection(
- 
- allocate_mr_failed:
- 	/* At this point, need to a full transport shutdown */
--	smbd_destroy(info);
-+	smbd_destroy(server);
- 	return NULL;
- 
- negotiation_failed:
-diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
-index f9038da..898d762 100644
---- a/fs/cifs/smbdirect.h
-+++ b/fs/cifs/smbdirect.h
-@@ -71,6 +71,7 @@ struct smbd_connection {
- 	struct completion ri_done;
- 	wait_queue_head_t conn_wait;
- 	wait_queue_head_t wait_destroy;
-+	wait_queue_head_t disconn_wait;
- 
- 	struct completion negotiate_completion;
- 	bool negotiate_done;
-@@ -288,7 +289,7 @@ struct smbd_connection *smbd_get_connection(
- /* Reconnect SMBDirect session */
- int smbd_reconnect(struct TCP_Server_Info *server);
- /* Destroy SMBDirect session */
--void smbd_destroy(struct smbd_connection *info);
-+void smbd_destroy(struct TCP_Server_Info *server);
- 
- /* Interface for carrying upper layer I/O through send/recv */
- int smbd_recv(struct smbd_connection *info, struct msghdr *msg);
-@@ -330,7 +331,7 @@ struct smbd_connection {};
- static inline void *smbd_get_connection(
- 	struct TCP_Server_Info *server, struct sockaddr *dstaddr) {return NULL;}
- static inline int smbd_reconnect(struct TCP_Server_Info *server) {return -1; }
--static inline void smbd_destroy(struct smbd_connection *info) {}
-+static inline void smbd_destroy(struct TCP_Server_Info *server) {}
- static inline int smbd_recv(struct smbd_connection *info, struct msghdr *msg) {return -1; }
- static inline int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst) {return -1; }
- #endif
--- 
-2.7.4
+> -----Original Message-----
+> From: kbuild test robot <lkp@intel.com>
+> Sent: Monday, May 7, 2018 11:36 PM
+> To: Long Li <longli@linuxonhyperv.com>
+> Cc: kbuild-all@01.org; Steve French <sfrench@samba.org>; linux-
+> cifs@vger.kernel.org; samba-technical@lists.samba.org; linux-
+> kernel@vger.kernel.org; linux-rdma@vger.kernel.org; Long Li
+> <longli@microsoft.com>
+> Subject: Re: [PATCH 5/7] cifs: smbd: Protect memory registration using RC=
+U
+>=20
+> Hi Long,
+>=20
+> Thank you for the patch! Perhaps something to improve:
+>=20
+> [auto build test WARNING on cifs/for-next] [also build test WARNING on
+> v4.17-rc4 next-20180507] [if your patch is applied to the wrong git tree,
+> please drop us a note to help improve the system]
+>=20
+> url:
+> https://na01.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fgithub
+> .com%2F0day-ci%2Flinux%2Fcommits%2FLong-Li%2Fcifs-smbd-Make-upper-
+> layer-decide-when-to-destroy-the-transport%2F20180508-
+> 110150&data=3D02%7C01%7Clongli%40microsoft.com%7C56045b01aeae4e53b1
+> 9408d5b4ae0502%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C6366
+> 13581873868980&sdata=3Da1Ds3qI7sRrLCE77Eoasifonm1rUQYi7rdUEnLnGOB4%
+> 3D&reserved=3D0
+> base:   git://git.samba.org/sfrench/cifs-2.6.git for-next
+> reproduce:
+>         # apt-get install sparse
+>         make ARCH=3Dx86_64 allmodconfig
+>         make C=3D1 CF=3D-D__CHECK_ENDIAN__
+>=20
+>=20
+> sparse warnings: (new ones prefixed by >>)
+>=20
+>    fs/cifs/smb2pdu.c:110:47: sparse: expression using sizeof(void)
+>    fs/cifs/smb2pdu.c:681:26: sparse: expression using sizeof(void)
+> >> fs/cifs/smb2pdu.c:2613:17: sparse: incompatible types in comparison
+> >> expression (different address spaces)
+>    fs/cifs/smb2pdu.c:2993:17: sparse: incompatible types in comparison
+> expression (different address spaces)
+>    fs/cifs/smb2pdu.c:3251:23: sparse: expression using sizeof(void)
+>    fs/cifs/smb2pdu.c:3251:23: sparse: expression using sizeof(void)
+>    fs/cifs/smb2pdu.c:3252:23: sparse: expression using sizeof(void)
+>    fs/cifs/smb2pdu.c:3713:17: sparse: expression using sizeof(void)
+>    fs/cifs/smb2pdu.c:3713:17: sparse: expression using sizeof(void)
+>=20
+> vim +2613 fs/cifs/smb2pdu.c
+>=20
+>   2565
+>   2566	/*
+>   2567	 * To form a chain of read requests, any read requests after the f=
+irst
+> should
+>   2568	 * have the end_of_chain boolean set to true.
+>   2569	 */
+>   2570	static int
+>   2571	smb2_new_read_req(void **buf, unsigned int *total_len,
+>   2572		struct cifs_io_parms *io_parms, struct cifs_readdata *rdata,
+>   2573		unsigned int remaining_bytes, int request_type)
+>   2574	{
+>   2575		int rc =3D -EACCES;
+>   2576		struct smb2_read_plain_req *req =3D NULL;
+>   2577		struct smb2_sync_hdr *shdr;
+>   2578		struct TCP_Server_Info *server;
+>   2579
+>   2580		rc =3D smb2_plain_req_init(SMB2_READ, io_parms->tcon, (void
+> **) &req,
+>   2581					 total_len);
+>   2582		if (rc)
+>   2583			return rc;
+>   2584
+>   2585		server =3D io_parms->tcon->ses->server;
+>   2586		if (server =3D=3D NULL)
+>   2587			return -ECONNABORTED;
+>   2588
+>   2589		shdr =3D &req->sync_hdr;
+>   2590		shdr->ProcessId =3D cpu_to_le32(io_parms->pid);
+>   2591
+>   2592		req->PersistentFileId =3D io_parms->persistent_fid;
+>   2593		req->VolatileFileId =3D io_parms->volatile_fid;
+>   2594		req->ReadChannelInfoOffset =3D 0; /* reserved */
+>   2595		req->ReadChannelInfoLength =3D 0; /* reserved */
+>   2596		req->Channel =3D 0; /* reserved */
+>   2597		req->MinimumCount =3D 0;
+>   2598		req->Length =3D cpu_to_le32(io_parms->length);
+>   2599		req->Offset =3D cpu_to_le64(io_parms->offset);
+>   2600	#ifdef CONFIG_CIFS_SMB_DIRECT
+>   2601		/*
+>   2602		 * If we want to do a RDMA write, fill in and append
+>   2603		 * smbd_buffer_descriptor_v1 to the end of read request
+>   2604		 */
+>   2605		if (server->rdma && rdata && !server->sign &&
+>   2606			rdata->bytes >=3D server->smbd_conn-
+> >rdma_readwrite_threshold) {
+>   2607
+>   2608			struct smbd_buffer_descriptor_v1 *v1;
+>   2609			bool need_invalidate =3D
+>   2610				io_parms->tcon->ses->server->dialect =3D=3D
+> SMB30_PROT_ID;
+>   2611
+>   2612			rcu_read_lock();
+> > 2613			rcu_dereference(server->smbd_conn);
+>   2614			rdata->mr =3D smbd_register_mr(
+>   2615					server->smbd_conn, rdata->pages,
+>   2616					rdata->nr_pages, rdata->tailsz,
+>   2617					true, need_invalidate);
+>   2618			rcu_read_unlock();
+>   2619			if (!rdata->mr)
+>   2620				return -ENOBUFS;
+>   2621
+>   2622			req->Channel =3D
+> SMB2_CHANNEL_RDMA_V1_INVALIDATE;
+>   2623			if (need_invalidate)
+>   2624				req->Channel =3D SMB2_CHANNEL_RDMA_V1;
+>   2625			req->ReadChannelInfoOffset =3D
+>   2626				cpu_to_le16(offsetof(struct
+> smb2_read_plain_req, Buffer));
+>   2627			req->ReadChannelInfoLength =3D
+>   2628				cpu_to_le16(sizeof(struct
+> smbd_buffer_descriptor_v1));
+>   2629			v1 =3D (struct smbd_buffer_descriptor_v1 *) &req-
+> >Buffer[0];
+>   2630			v1->offset =3D cpu_to_le64(rdata->mr->mr->iova);
+>   2631			v1->token =3D cpu_to_le32(rdata->mr->mr->rkey);
+>   2632			v1->length =3D cpu_to_le32(rdata->mr->mr->length);
+>   2633
+>   2634			*total_len +=3D sizeof(*v1) - 1;
+>   2635		}
+>   2636	#endif
+>   2637		if (request_type & CHAINED_REQUEST) {
+>   2638			if (!(request_type & END_OF_CHAIN)) {
+>   2639				/* next 8-byte aligned request */
+>   2640				*total_len =3D DIV_ROUND_UP(*total_len, 8) *
+> 8;
+>   2641				shdr->NextCommand =3D
+> cpu_to_le32(*total_len);
+>   2642			} else /* END_OF_CHAIN */
+>   2643				shdr->NextCommand =3D 0;
+>   2644			if (request_type & RELATED_REQUEST) {
+>   2645				shdr->Flags |=3D
+> SMB2_FLAGS_RELATED_OPERATIONS;
+>   2646				/*
+>   2647				 * Related requests use info from previous
+> read request
+>   2648				 * in chain.
+>   2649				 */
+>   2650				shdr->SessionId =3D 0xFFFFFFFF;
+>   2651				shdr->TreeId =3D 0xFFFFFFFF;
+>   2652				req->PersistentFileId =3D 0xFFFFFFFF;
+>   2653				req->VolatileFileId =3D 0xFFFFFFFF;
+>   2654			}
+>   2655		}
+>   2656		if (remaining_bytes > io_parms->length)
+>   2657			req->RemainingBytes =3D
+> cpu_to_le32(remaining_bytes);
+>   2658		else
+>   2659			req->RemainingBytes =3D 0;
+>   2660
+>   2661		*buf =3D req;
+>   2662		return rc;
+>   2663	}
+>   2664
+>=20
+> ---
+> 0-DAY kernel test infrastructure                Open Source Technology Ce=
+nter
+> https://na01.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Flists.=
+01
+> .org%2Fpipermail%2Fkbuild-
+> all&data=3D02%7C01%7Clongli%40microsoft.com%7C56045b01aeae4e53b19408
+> d5b4ae0502%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C63661358
+> 1873868980&sdata=3Dy3BYFeKEayhIfrs6hodamCPCyz8n3YQdN1yX3yXKs80%3D
+> &reserved=3D0                   Intel Corporation
