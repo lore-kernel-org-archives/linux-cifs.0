@@ -1,68 +1,70 @@
-From: Doug Ledford <dledford@redhat.com>
-Subject: Re: [PATCH] IB: remove redundant INFINIBAND kconfig dependencies
-Date: Wed, 09 May 2018 08:54:15 -0400
-Message-ID: <1525870455.11756.367.camel@redhat.com>
-References: <20180504032919.90515-1-gthelen@google.com>
+From: kbuild test robot <lkp@intel.com>
+Subject: [cifs:for-next 12/12] fs/cifs/cifsfs.c:1056:5: sparse: symbol
+ 'cifs_dir_fsync' was not declared. Should it be static?
+Date: Fri, 11 May 2018 08:50:25 +0800
+Message-ID: <201805110802.lpBxehxn%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-OUWj7AIC2e6lj2ww1Maq"
-Cc: linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Greg Thelen <gthelen@google.com>, Jason Gunthorpe <jgg@ziepe.ca>
+Content-Type: text/plain; charset=us-ascii
+Cc: kbuild-all@01.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Pavel Shilovsky <pshilov@microsoft.com>,
+        linux-kernel@vger.kernel.org
+To: Steve French <smfrench@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180504032919.90515-1-gthelen@google.com>
+Content-Disposition: inline
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
+tree:   git://git.samba.org/sfrench/cifs-2.6.git for-next
+head:   c3d5c2a93abfc181d9f274dd5e4b18749dc0643f
+commit: c3d5c2a93abfc181d9f274dd5e4b18749dc0643f [12/12] smb3: directory sync should not return an error
+reproduce:
+        # apt-get install sparse
+        git checkout c3d5c2a93abfc181d9f274dd5e4b18749dc0643f
+        make ARCH=x86_64 allmodconfig
+        make C=1 CF=-D__CHECK_ENDIAN__
 
---=-OUWj7AIC2e6lj2ww1Maq
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2018-05-03 at 20:29 -0700, Greg Thelen wrote:
-> INFINIBAND_ADDR_TRANS depends on INFINIBAND.  So there's no need for
-> options which depend INFINIBAND_ADDR_TRANS to also depend on INFINIBAND.
-> Remove the unnecessary INFINIBAND depends.
->=20
-> Signed-off-by: Greg Thelen <gthelen@google.com>
-> ---
->  drivers/infiniband/ulp/srpt/Kconfig | 2 +-
->  drivers/nvme/host/Kconfig           | 2 +-
->  drivers/nvme/target/Kconfig         | 2 +-
->  drivers/staging/lustre/lnet/Kconfig | 2 +-
->  fs/cifs/Kconfig                     | 2 +-
->  net/9p/Kconfig                      | 2 +-
->  net/rds/Kconfig                     | 2 +-
->  net/sunrpc/Kconfig                  | 2 +-
->  8 files changed, 8 insertions(+), 8 deletions(-)
+sparse warnings: (new ones prefixed by >>)
 
-Thanks.  Since the original changes you submitted went through -rc, I'm
-sending this cleanup there too.
+   fs/cifs/cifsglob.h:1653:41: sparse: symbol 'cifs_tcp_ses_list' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1664:41: sparse: symbol 'cifs_tcp_ses_lock' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1676:28: sparse: symbol 'GlobalCurrentXid' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1677:28: sparse: symbol 'GlobalTotalActiveXid' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1678:28: sparse: symbol 'GlobalMaxActiveXid' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1679:26: sparse: symbol 'GlobalMid_Lock' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1684:24: sparse: symbol 'sesInfoAllocCount' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1685:24: sparse: symbol 'tconInfoAllocCount' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1686:24: sparse: symbol 'tcpSesAllocCount' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1687:24: sparse: symbol 'tcpSesReconnectCount' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1688:24: sparse: symbol 'tconInfoReconnectCount' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1691:24: sparse: symbol 'bufAllocCount' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1693:24: sparse: symbol 'totBufAllocCount' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1694:24: sparse: symbol 'totSmBufAllocCount' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1696:24: sparse: symbol 'smBufAllocCount' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1697:24: sparse: symbol 'midCount' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1700:20: sparse: symbol 'enable_oplocks' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1701:20: sparse: symbol 'lookupCacheEnabled' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1702:28: sparse: symbol 'global_secflags' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1704:28: sparse: symbol 'sign_CIFS_PDUs' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1705:20: sparse: symbol 'linuxExtEnabled' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1706:28: sparse: symbol 'CIFSMaxBufSize' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1707:28: sparse: symbol 'cifs_min_rcv' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1708:28: sparse: symbol 'cifs_min_small' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1709:28: sparse: symbol 'cifs_max_pending' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1712:30: sparse: symbol 'uidtree' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1713:30: sparse: symbol 'gidtree' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1714:26: sparse: symbol 'siduidlock' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1715:26: sparse: symbol 'sidgidlock' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1716:30: sparse: symbol 'siduidtree' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1717:30: sparse: symbol 'sidgidtree' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1718:26: sparse: symbol 'uidsidlock' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1719:26: sparse: symbol 'gidsidlock' was not declared. Should it be static?
+>> fs/cifs/cifsfs.c:1056:5: sparse: symbol 'cifs_dir_fsync' was not declared. Should it be static?
 
---=20
-Doug Ledford <dledford@redhat.com>
-    GPG KeyID: B826A3330E572FDD
-    Key fingerprint =3D AE6B 1BDA 122B 23B4 265B  1274 B826 A333 0E57 2FDD
---=-OUWj7AIC2e6lj2ww1Maq
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
+Please review and possibly fold the followup patch.
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEErmsb2hIrI7QmWxJ0uCajMw5XL90FAlry73cACgkQuCajMw5X
-L90ifQ//WKtQIynf4c/6oOocd/TgRfyfPCFoH7DkhpOJySq2lCam0WQLv39NhlN8
-XPrCCluiKI5zfNQRcmEpUjVA6CGlaqxZGmYXmdrwPjGYVwKXtx4o9Kk5rMpSrtpz
-6/Ox3N9nPv1SZItRPayQvZ63orVAGgKQfTnXsmV9O2cGks2V3PVGf1mLlCESH+r9
-qkw4bwJvT46hx0Uuqzss2+wLrJmOqpTEG4fenFws78OAvHZ4C9B43Jh9nQFRJpP0
-aMf5V+SCzL/doK+4ccPHs1KeyqFeYkv8qhdZvw8FgTrk3VYf9TZEwOeEc6iaimUI
-3R/sXI8LD3Pj33Z6Fq6UPofwPtPUR95TzgRrnIIduH3DSdr1KK20Of4afvAViAi6
-hqwNEmTRtQ1DdnUjhVRJQivWH+x4TaIPeHwbkfJs6yIwptqF6aOAgiFjsoaIggRQ
-WIyzGhLsGMHbvFu1/srzUDoVkkYyV6Uh17kuav0MffwPrrWXpMxK0ceYoS20VUBt
-9Eu3YSVkPKMTn2OYtbtUmlBURjRXrc7y8m8ePGIYJGags0It4i30BEjvge7v7sDR
-J7aG5iAJbqF9BKB/RdzzX5X8Q+yHNNvArt4+GklcZ3uR3f1ZYCfJ1wpGQymn/kGZ
-TyO0/sMxqVIkBOuSdubyibb4C687CQKiDV05uaEiN/UALltkMTg=
-=UJaf
------END PGP SIGNATURE-----
-
---=-OUWj7AIC2e6lj2ww1Maq--
+---
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
