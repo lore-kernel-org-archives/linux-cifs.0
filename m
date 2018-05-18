@@ -1,77 +1,45 @@
 From: Steve French <smfrench@gmail.com>
-Subject: Re: [PATCHv2][SMB3] Add kernel trace support
-Date: Fri, 18 May 2018 13:43:14 -0700
-Message-ID: <CAH2r5muu0Hjx1SwMKm5aRLRa2Cwh6tQ7y0h33C07kkPbkhswFw@mail.gmail.com>
-References: <CAH2r5muobq1gDbGcPE1AYeeKmdFx681=mpCyAZWfSPUa5wLjSQ@mail.gmail.com>
- <20180518184630.axfa7oq4pewb7foj@kazak>
+Subject: Re: [RFC PATCH 09/09] Introduce cache=rdma moutning option
+Date: Fri, 18 May 2018 13:44:44 -0700
+Message-ID: <CAH2r5mtzUJUakbPr_kzrDcqVPC9QuS7K8MXejNz7F=Uii6K5Kg@mail.gmail.com>
+References: <20180518002214.5657-1-longli@linuxonhyperv.com>
+ <20180518002214.5657-10-longli@linuxonhyperv.com> <20180518072631.GA19250@infradead.org>
+ <MWHPR2101MB07297B07D495D66A1C9416FACE900@MWHPR2101MB0729.namprd21.prod.outlook.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Cc: CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>
-To: =?UTF-8?B?UmFscGggQsO2aG1l?= <slow@samba.org>
+Cc: Christoph Hellwig <hch@infradead.org>,
+        Steve French <sfrench@samba.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+To: Long Li <longli@microsoft.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180518184630.axfa7oq4pewb7foj@kazak>
+In-Reply-To: <MWHPR2101MB07297B07D495D66A1C9416FACE900@MWHPR2101MB0729.namprd21.prod.outlook.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Fri, May 18, 2018 at 11:46 AM, Ralph B=C3=B6hme <slow@samba.org> wrote:
-> On Thu, May 17, 2018 at 09:36:36PM -0500, Steve French via samba-technica=
-l wrote:
->> Patch updated with additional tracepoint locations and some formatting
->> improvements. There are some obvious additional tracepoints that could
->> be added, but this should be a reasonable group to start with.
+On Fri, May 18, 2018 at 12:00 PM, Long Li via samba-technical
+<samba-technical@lists.samba.org> wrote:
+>> Subject: Re: [RFC PATCH 09/09] Introduce cache=rdma moutning option
 >>
->> From edc02d6f9dc24963d510c7ef59067428d3b082d3 Mon Sep 17 00:00:00 2001
->> From: Steve French <stfrench@microsoft.com>
->> Date: Thu, 17 May 2018 21:16:55 -0500
->> Subject: [PATCH] smb3: Add ftrace tracepoints for improved SMB3 debuggin=
-g
+>> On Thu, May 17, 2018 at 05:22:14PM -0700, Long Li wrote:
+>> > From: Long Li <longli@microsoft.com>
+>> >
+>> > When cache=rdma is enabled on mount options, CIFS do not allocate
+>> > internal data buffer pages for I/O, data is read/writen directly to user
+>> memory via RDMA.
 >>
->> Although dmesg logs and wireshark network traces can be
->> helpful, being able to dynamically enable/disable tracepoints
->> (in this case via the kernel ftrace mechanism) can also be
->> helpful in more quickly debugging problems, and more
->> selectively tracing the events related to the bug report.
->>
->> This patch adds 12 ftrace tracepoints to cifs.ko for SMB3 events
->> in some obvious locations.  Subsequent patches will add more
->> as needed.
->>
->> Example use:
->>    trace-cmd record -e cifs
->>    <run test case>
->>    trace-cmd show
+>> I don't think this should be an option.  For direct I/O without signing or
+>> encryption CIFS should always use get_user_pages, with or without RDMA.
 >
-> pardon my ignorance, but are these tracepoints usable with other tracing
-> frameworks like Systemtap?
->
-> Last time I checked, Systemtap looked like *the* tool. Is there a generic=
- trace
-> point infrastructure that tracing tools can consume, so we're not tied to
-> ftrace?
+> Yes this should be done for all transport. If there are no objections, I'll send patches to change this.
 
-At the kernel filesystem/mm summit a few recommended using ftrace
-(trace-cmd).  Don't know what
-the thinking is about this vs. systemtap these days.  There was a nice
-three part series
-describing ftrace/trace-cmd on lwn
-(https://old.lwn.net/Articles/365835/) a while ago.
+Would this help/change performance much?
 
-In terms of useability "trace-cmd" looked good to me and much more
-powerful than the
-current dmesg based printk style debugging.
 
-Since the most active file systems (except for cifs.ko) on Linux
-btrfs, xfs, nfs and ext4 (and
-even dax and ocfs2 and nfsd and fscache etc. and of course various
-drivers) already use it, seems like
-it is widely accepted still and overhead is small when not logging (default=
-).
 
---=20
+-- 
 Thanks,
 
 Steve
