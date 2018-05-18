@@ -1,97 +1,59 @@
 From: Long Li <longli@linuxonhyperv.com>
-Subject: [RFC PATCH 02/09] Change wdata alloc to support direct pages
-Date: Thu, 17 May 2018 17:22:07 -0700
-Message-ID: <20180518002214.5657-3-longli@linuxonhyperv.com>
-References: <20180518002214.5657-1-longli@linuxonhyperv.com>
+Subject: [RFC PATCH 00/09] Implement direct user I/O interfaces for RDMA
+Date: Thu, 17 May 2018 17:22:05 -0700
+Message-ID: <20180518002214.5657-1-longli@linuxonhyperv.com>
 Reply-To: longli@microsoft.com
 Cc: Long Li <longli@microsoft.com>
 To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
         linux-rdma@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180518002214.5657-1-longli@linuxonhyperv.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-When using direct pages from user space, there is no need to allocate pages.
+This patchset implements direct user I/O through RDMA.
 
-Just ping those user pages for RDMA.
+In normal code path (even with cache=none), CIFS copies I/O data from
+user-space to kernel-space for security reasons.
 
-Signed-off-by: Long Li <longli@microsoft.com>
----
- fs/cifs/cifsproto.h |  2 +-
- fs/cifs/cifssmb.c   | 10 +++++++---
- fs/cifs/file.c      |  4 ++--
- 3 files changed, 10 insertions(+), 6 deletions(-)
+With this patchset, a new mounting option is introduced to have CIFS pin the 
+user-space buffer into memory and performs I/O through RDMA. This avoids memory
+copy, at the cost of added security risk.
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 365a414..94106b9 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -523,7 +523,7 @@ int cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid);
- int cifs_async_writev(struct cifs_writedata *wdata,
- 		      void (*release)(struct kref *kref));
- void cifs_writev_complete(struct work_struct *work);
--struct cifs_writedata *cifs_writedata_alloc(unsigned int nr_pages,
-+struct cifs_writedata *cifs_writedata_alloc(unsigned int nr_pages, struct page **direct_pages,
- 						work_func_t complete);
- void cifs_writedata_release(struct kref *refcount);
- int cifs_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 1529a08..3b1731d 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -1983,7 +1983,7 @@ cifs_writev_requeue(struct cifs_writedata *wdata)
- 			tailsz = rest_len - (nr_pages - 1) * PAGE_SIZE;
- 		}
+This patchset is RFC. The work is in progress, do not merge.
+
+
+Long Li (9):
+  Introduce offset for the 1st page in data transfer structures
+  Change wdata alloc to support direct pages
+  Change rdata alloc to support direct pages
+  Change function to support offset when reading pages
+  Change RDMA send to regonize page offset in the 1st page
+  Change RDMA recv to support offset in the 1st page
+  Support page offset in memory regsitrations
+  Implement no-copy file I/O interfaces
+  Introduce cache=rdma moutning option
  
--		wdata2 = cifs_writedata_alloc(nr_pages, cifs_writev_complete);
-+		wdata2 = cifs_writedata_alloc(nr_pages, NULL, cifs_writev_complete);
- 		if (!wdata2) {
- 			rc = -ENOMEM;
- 			break;
-@@ -2067,12 +2067,16 @@ cifs_writev_complete(struct work_struct *work)
- }
- 
- struct cifs_writedata *
--cifs_writedata_alloc(unsigned int nr_pages, work_func_t complete)
-+cifs_writedata_alloc(unsigned int nr_pages, struct page **direct_pages, work_func_t complete)
- {
- 	struct cifs_writedata *wdata;
- 
- 	/* writedata + number of page pointers */
--	wdata = kzalloc(sizeof(*wdata) +
-+	if (direct_pages) {
-+		wdata = kzalloc(sizeof(*wdata), GFP_NOFS);
-+		wdata->direct_pages = direct_pages;
-+	} else
-+		wdata = kzalloc(sizeof(*wdata) +
- 			sizeof(struct page *) * nr_pages, GFP_NOFS);
- 	if (wdata != NULL) {
- 		kref_init(&wdata->refcount);
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 23fd430..a6ec896 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -1965,7 +1965,7 @@ wdata_alloc_and_fillpages(pgoff_t tofind, struct address_space *mapping,
- {
- 	struct cifs_writedata *wdata;
- 
--	wdata = cifs_writedata_alloc((unsigned int)tofind,
-+	wdata = cifs_writedata_alloc((unsigned int)tofind, NULL,
- 				     cifs_writev_complete);
- 	if (!wdata)
- 		return NULL;
-@@ -2554,7 +2554,7 @@ cifs_write_from_iter(loff_t offset, size_t len, struct iov_iter *from,
- 			break;
- 
- 		nr_pages = get_numpages(wsize, len, &cur_len);
--		wdata = cifs_writedata_alloc(nr_pages,
-+		wdata = cifs_writedata_alloc(nr_pages, NULL,
- 					     cifs_uncached_writev_complete);
- 		if (!wdata) {
- 			rc = -ENOMEM;
+
+ fs/cifs/cifs_fs_sb.h      |   2 +
+ fs/cifs/cifsfs.c          |  19 +++
+ fs/cifs/cifsfs.h          |   3 +
+ fs/cifs/cifsglob.h        |   6 +
+ fs/cifs/cifsproto.h       |   4 +-
+ fs/cifs/cifssmb.c         |  10 +-
+ fs/cifs/connect.c         |  13 +-
+ fs/cifs/dir.c             |   5 +
+ fs/cifs/file.c            | 351 ++++++++++++++++++++++++++++++++++++++++++----
+ fs/cifs/inode.c           |   4 +-
+ fs/cifs/smb2ops.c         |   2 +-
+ fs/cifs/smb2pdu.c         |  22 ++-
+ fs/cifs/smbdirect.c       | 132 ++++++++++-------
+ fs/cifs/smbdirect.h       |   2 +-
+ fs/read_write.c           |   7 +
+ include/linux/ratelimit.h |   2 +-
+ 16 files changed, 489 insertions(+), 95 deletions(-)
+
 -- 
 2.7.4
