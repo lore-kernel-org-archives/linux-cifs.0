@@ -1,7 +1,7 @@
 From: Long Li <longli@linuxonhyperv.com>
-Subject: [RFC PATCH 08/09] Implement direct file I/O interfaces
-Date: Thu, 17 May 2018 17:22:13 -0700
-Message-ID: <20180518002214.5657-9-longli@linuxonhyperv.com>
+Subject: [RFC PATCH 07/09] Support page offset in memory regsitrations
+Date: Thu, 17 May 2018 17:22:12 -0700
+Message-ID: <20180518002214.5657-8-longli@linuxonhyperv.com>
 References: <20180518002214.5657-1-longli@linuxonhyperv.com>
 Reply-To: longli@microsoft.com
 Cc: Long Li <longli@microsoft.com>
@@ -15,460 +15,206 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-Implement the main filesystem interface for doing read and write. These functions
-don't copy the user data into a kenrel buffer for data transfer. Pages are directly
-pinned and passed to the RDMA transport.
+Now momory registration needs to recognize offset in page when direct transfer is
+used.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/cifsfs.c |  19 ++++
- fs/cifs/cifsfs.h |   3 +
- fs/cifs/file.c   | 322 ++++++++++++++++++++++++++++++++++++++++++++++++++++---
- 3 files changed, 329 insertions(+), 15 deletions(-)
+ fs/cifs/smb2pdu.c   | 19 +++++++++-----
+ fs/cifs/smbdirect.c | 74 +++++++++++++++++++++++++++++++----------------------
+ fs/cifs/smbdirect.h |  2 +-
+ 3 files changed, 57 insertions(+), 38 deletions(-)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index f715609..ba19fed 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -1118,6 +1118,25 @@ const struct file_operations cifs_file_direct_ops = {
- 	.fallocate = cifs_fallocate,
- };
- 
-+const struct file_operations cifs_file_direct_rdma_ops = {
-+	.read_iter = cifs_direct_readv,
-+	.write_iter = cifs_direct_writev,
-+	.open = cifs_open,
-+	.release = cifs_close,
-+	.lock = cifs_lock,
-+	.fsync = cifs_fsync,
-+	.flush = cifs_flush,
-+	.mmap = cifs_file_mmap,
-+	.splice_read = generic_file_splice_read,
-+	.splice_write = iter_file_splice_write,
-+	.unlocked_ioctl  = cifs_ioctl,
-+	.copy_file_range = cifs_copy_file_range,
-+	.clone_file_range = cifs_clone_file_range,
-+	.llseek = cifs_llseek,
-+	.setlease = cifs_setlease,
-+	.fallocate = cifs_fallocate,
-+};
-+
- const struct file_operations cifs_file_nobrl_ops = {
- 	.read_iter = cifs_loose_read_iter,
- 	.write_iter = cifs_file_write_iter,
-diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
-index 013ba2a..223cca8 100644
---- a/fs/cifs/cifsfs.h
-+++ b/fs/cifs/cifsfs.h
-@@ -94,6 +94,7 @@ extern const struct inode_operations cifs_dfs_referral_inode_operations;
- /* Functions related to files and directories */
- extern const struct file_operations cifs_file_ops;
- extern const struct file_operations cifs_file_direct_ops; /* if directio mnt */
-+extern const struct file_operations cifs_file_direct_rdma_ops; /* if directio mnt */
- extern const struct file_operations cifs_file_strict_ops; /* if strictio mnt */
- extern const struct file_operations cifs_file_nobrl_ops; /* no brlocks */
- extern const struct file_operations cifs_file_direct_nobrl_ops;
-@@ -102,8 +103,10 @@ extern int cifs_open(struct inode *inode, struct file *file);
- extern int cifs_close(struct inode *inode, struct file *file);
- extern int cifs_closedir(struct inode *inode, struct file *file);
- extern ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to);
-+extern ssize_t cifs_direct_readv(struct kiocb *iocb, struct iov_iter *to);
- extern ssize_t cifs_strict_readv(struct kiocb *iocb, struct iov_iter *to);
- extern ssize_t cifs_user_writev(struct kiocb *iocb, struct iov_iter *from);
-+extern ssize_t cifs_direct_writev(struct kiocb *iocb, struct iov_iter *from);
- extern ssize_t cifs_strict_writev(struct kiocb *iocb, struct iov_iter *from);
- extern int cifs_lock(struct file *, int, struct file_lock *);
- extern int cifs_fsync(struct file *, loff_t, loff_t, int);
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index e240c7c..0b394db 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -2452,15 +2452,46 @@ cifs_uncached_writedata_release(struct kref *refcount)
- 	int i;
- 	struct cifs_writedata *wdata = container_of(refcount,
- 					struct cifs_writedata, refcount);
-+	struct page **pages = wdata->direct_pages ? wdata->direct_pages : wdata->pages;
- 
- 	kref_put(&wdata->ctx->refcount, cifs_aio_ctx_release);
- 	for (i = 0; i < wdata->nr_pages; i++)
--		put_page(wdata->pages[i]);
-+		put_page(pages[i]);
- 	cifs_writedata_release(refcount);
- }
- 
- static void collect_uncached_write_data(struct cifs_aio_ctx *ctx);
- 
-+static void cifs_direct_writedata_release(struct kref *refcount)
-+{
-+	int i;
-+	struct cifs_writedata *wdata = container_of(refcount,
-+					struct cifs_writedata, refcount);
-+
-+	for (i = 0; i < wdata->nr_pages; i++)
-+		put_page(wdata->direct_pages[i]);
-+	kvfree(wdata->direct_pages);
-+
-+	cifs_writedata_release(refcount);
-+}
-+
-+static void cifs_direct_writev_complete(struct work_struct *work)
-+{
-+	struct cifs_writedata *wdata = container_of(work,
-+					struct cifs_writedata, work);
-+	struct inode *inode = d_inode(wdata->cfile->dentry);
-+	struct cifsInodeInfo *cifsi = CIFS_I(inode);
-+
-+	spin_lock(&inode->i_lock);
-+	cifs_update_eof(cifsi, wdata->offset, wdata->bytes);
-+	if (cifsi->server_eof > inode->i_size)
-+		i_size_write(inode, cifsi->server_eof);
-+	spin_unlock(&inode->i_lock);
-+
-+	complete(&wdata->done);
-+	kref_put(&wdata->refcount, cifs_direct_writedata_release);
-+}
-+
- static void
- cifs_uncached_writev_complete(struct work_struct *work)
- {
-@@ -2703,6 +2734,125 @@ static void collect_uncached_write_data(struct cifs_aio_ctx *ctx)
- 		complete(&ctx->done);
- }
- 
-+ssize_t cifs_direct_writev(struct kiocb *iocb, struct iov_iter *from)
-+{
-+	struct file *file = iocb->ki_filp;
-+	ssize_t total_written = 0;
-+	struct cifsFileInfo *cfile;
-+	struct cifs_tcon *tcon;
-+	struct cifs_sb_info *cifs_sb;
-+	struct TCP_Server_Info *server;
-+	pid_t pid;
-+	unsigned long nr_pages;
-+	loff_t offset = iocb->ki_pos;
-+	size_t len = iov_iter_count(from);
-+	int rc;
-+	struct cifs_writedata *wdata;
-+
-+	rc = generic_write_checks(iocb, from);
-+	if (rc <= 0)
-+		return rc;
-+
-+	cifs_sb = CIFS_FILE_SB(file);
-+	cfile = file->private_data;
-+	tcon = tlink_tcon(cfile->tlink);
-+	server = tcon->ses->server;
-+
-+	if (!server->ops->async_writev)
-+		return -ENOSYS;
-+
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
-+		pid = cfile->pid;
-+	else
-+		pid = current->tgid;
-+
-+	do {
-+		unsigned int wsize, credits;
-+		struct page **pagevec;
-+		size_t start;
-+		ssize_t cur_len;
-+
-+		rc = server->ops->wait_mtu_credits(server, cifs_sb->wsize,
-+						   &wsize, &credits);
-+		if (rc)
-+			break;
-+
-+		cur_len = iov_iter_get_pages_alloc(from, &pagevec, wsize, &start);
-+		if (cur_len < 0) {
-+			cifs_dbg(VFS, "direct_writev couldn't get user pages (rc=%zd) iter type %d iov_offset %lu count %lu\n", cur_len, from->type, from->iov_offset, from->count);
-+			dump_stack();
-+			break;
-+		}
-+		if (cur_len < 0)
-+			break;
-+
-+		nr_pages = (cur_len + start + PAGE_SIZE -1) / PAGE_SIZE;
-+
-+		wdata = cifs_writedata_alloc(nr_pages, pagevec,
-+					     cifs_direct_writev_complete);
-+		if (!wdata) {
-+			rc = -ENOMEM;
-+			add_credits_and_wake_if(server, credits, 0);
-+			break;
-+		}
-+
-+		wdata->nr_pages = nr_pages;
-+		wdata->page_offset = start;
-+		wdata->pagesz = PAGE_SIZE;
-+		wdata->tailsz =
-+			nr_pages > 1 ?
-+			cur_len - (PAGE_SIZE-start) - (nr_pages - 2)*PAGE_SIZE :
-+			cur_len;
-+
-+		wdata->sync_mode = WB_SYNC_ALL;
-+		wdata->offset = (__u64)offset;
-+		wdata->cfile = cifsFileInfo_get(cfile);
-+		wdata->pid = pid;
-+		wdata->bytes = cur_len;
-+		wdata->credits = credits;
-+
-+		kref_get(&wdata->refcount);
-+
-+		if (!wdata->cfile->invalidHandle ||
-+		    !(rc = cifs_reopen_file(wdata->cfile, false)))
-+			rc = server->ops->async_writev(wdata,
-+					cifs_direct_writedata_release);
-+		if (rc) {
-+			add_credits_and_wake_if(server, wdata->credits, 0);
-+			kref_put(&wdata->refcount,
-+				 cifs_writedata_release);
-+			if (rc == -EAGAIN)
-+				continue;
-+			break;
-+		} else
-+			wait_for_completion(&wdata->done);
-+
-+		if (wdata->result) {
-+			rc = wdata->result;
-+			kref_put(&wdata->refcount, cifs_direct_writedata_release);
-+			if (rc == -EAGAIN)
-+				continue;
-+			break;
-+		}
-+
-+		kref_put(&wdata->refcount, cifs_direct_writedata_release);
-+
-+		iov_iter_advance(from, cur_len);
-+		total_written += cur_len;
-+		offset += cur_len;
-+		len -= cur_len;
-+	} while (len);
-+
-+	if (unlikely(!total_written)) {
-+		printk(KERN_ERR "%s: total_written=%ld rc=%d\n", __func__, total_written, rc);
-+		return rc;
-+	}
-+
-+	iocb->ki_pos += total_written;
-+	return total_written;
-+
-+}
-+
- ssize_t cifs_user_writev(struct kiocb *iocb, struct iov_iter *from)
- {
- 	struct file *file = iocb->ki_filp;
-@@ -2942,18 +3092,30 @@ cifs_read_allocate_pages(struct cifs_readdata *rdata, unsigned int nr_pages)
- 	return rc;
- }
- 
-+static void cifs_direct_readdata_release(struct kref *refcount)
-+{
-+	struct cifs_readdata *rdata = container_of(refcount,
-+					struct cifs_readdata, refcount);
-+	unsigned int i;
-+	for (i = 0; i < rdata->nr_pages; i++) {
-+		put_page(rdata->direct_pages[i]);
-+	}
-+	kvfree(rdata->direct_pages);
-+
-+	cifs_readdata_release(refcount);
-+}
-+
- static void
- cifs_uncached_readdata_release(struct kref *refcount)
- {
- 	struct cifs_readdata *rdata = container_of(refcount,
- 					struct cifs_readdata, refcount);
- 	unsigned int i;
-+	struct page **pages = rdata->direct_pages ? rdata->direct_pages : rdata->pages;
- 
- 	kref_put(&rdata->ctx->refcount, cifs_aio_ctx_release);
--	for (i = 0; i < rdata->nr_pages; i++) {
--		put_page(rdata->pages[i]);
--		rdata->pages[i] = NULL;
--	}
-+	for (i = 0; i < rdata->nr_pages; i++)
-+		put_page(pages[i]);
- 	cifs_readdata_release(refcount);
- }
- 
-@@ -3013,30 +3175,32 @@ uncached_fill_pages(struct TCP_Server_Info *server,
- 	int result = 0;
- 	unsigned int i;
- 	unsigned int nr_pages = rdata->nr_pages;
-+	unsigned int page_offset = rdata->page_offset;
- 
- 	rdata->got_bytes = 0;
- 	rdata->tailsz = PAGE_SIZE;
- 	for (i = 0; i < nr_pages; i++) {
--		struct page *page = rdata->pages[i];
-+		struct page *page = rdata->direct_pages ? rdata->direct_pages[i] : rdata->pages[i];
- 		size_t n;
-+		unsigned int segment_size = rdata->pagesz;
-+
-+		if (i == 0)
-+			segment_size -= page_offset;
-+		else
-+			page_offset = 0;
-+
- 
- 		if (len <= 0) {
- 			/* no need to hold page hostage */
--			rdata->pages[i] = NULL;
- 			rdata->nr_pages--;
- 			put_page(page);
- 			continue;
- 		}
- 		n = len;
--		if (len >= PAGE_SIZE) {
-+		if (len >= segment_size)
- 			/* enough data to fill the page */
--			n = PAGE_SIZE;
--			len -= n;
--		} else {
--			zero_user(page, len, PAGE_SIZE - len);
--			rdata->tailsz = len;
--			len = 0;
--		}
-+			n = segment_size;
-+		len -= n;
- 		if (iter)
- 			result = copy_page_from_iter(page, 0, n, iter);
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index fdcf97e..a23c7cb 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -2586,6 +2586,8 @@ smb2_new_read_req(void **buf, unsigned int *total_len,
+ 	req->MinimumCount = 0;
+ 	req->Length = cpu_to_le32(io_parms->length);
+ 	req->Offset = cpu_to_le64(io_parms->offset);
++	if (!rdata->tailsz)
++		rdata->tailsz = rdata->pagesz;
  #ifdef CONFIG_CIFS_SMB_DIRECT
-@@ -3243,6 +3407,134 @@ collect_uncached_read_data(struct cifs_aio_ctx *ctx)
- 		complete(&ctx->done);
- }
+ 	/*
+ 	 * If we want to do a RDMA write, fill in and append
+@@ -2601,8 +2603,8 @@ smb2_new_read_req(void **buf, unsigned int *total_len,
+ 		rcu_read_lock();
+ 		rcu_dereference(server->smbd_conn);
+ 		rdata->mr = smbd_register_mr(
+-				server->smbd_conn, rdata->pages,
+-				rdata->nr_pages, rdata->tailsz,
++				server->smbd_conn, rdata->direct_pages ? rdata->direct_pages : rdata->pages,
++				rdata->nr_pages, rdata->page_offset, rdata->tailsz,
+ 				true, need_invalidate);
+ 		rcu_read_unlock();
+ 		if (!rdata->mr)
+@@ -2967,6 +2969,8 @@ smb2_async_writev(struct cifs_writedata *wdata,
+ 	req->DataOffset = cpu_to_le16(
+ 				offsetof(struct smb2_write_req, Buffer));
+ 	req->RemainingBytes = 0;
++	if (!wdata->tailsz)
++		wdata->tailsz = wdata->pagesz;
+ #ifdef CONFIG_CIFS_SMB_DIRECT
+ 	/*
+ 	 * If we want to do a server RDMA read, fill in and append
+@@ -2981,8 +2985,8 @@ smb2_async_writev(struct cifs_writedata *wdata,
+ 		rcu_read_lock();
+ 		rcu_dereference(server->smbd_conn);
+ 		wdata->mr = smbd_register_mr(
+-				server->smbd_conn, wdata->pages,
+-				wdata->nr_pages, wdata->tailsz,
++				server->smbd_conn, wdata->direct_pages ? wdata->direct_pages : wdata->pages,
++				wdata->nr_pages, wdata->page_offset, wdata->tailsz,
+ 				false, need_invalidate);
+ 		rcu_read_unlock();
+ 		if (!wdata->mr) {
+@@ -2991,8 +2995,11 @@ smb2_async_writev(struct cifs_writedata *wdata,
+ 		}
+ 		req->Length = 0;
+ 		req->DataOffset = 0;
+-		req->RemainingBytes =
+-			cpu_to_le32((wdata->nr_pages-1)*PAGE_SIZE + wdata->tailsz);
++		if (wdata->nr_pages > 1)
++			req->RemainingBytes =
++				cpu_to_le32((wdata->nr_pages-1)*PAGE_SIZE - wdata->page_offset + wdata->tailsz);
++		else
++			req->RemainingBytes = cpu_to_le32(wdata->tailsz);
+ 		req->Channel = SMB2_CHANNEL_RDMA_V1_INVALIDATE;
+ 		if (need_invalidate)
+ 			req->Channel = SMB2_CHANNEL_RDMA_V1;
+diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+index 939c289..bce1e7a 100644
+--- a/fs/cifs/smbdirect.c
++++ b/fs/cifs/smbdirect.c
+@@ -2267,37 +2267,37 @@ static void smbd_mr_recovery_work(struct work_struct *work)
+ 		if (smbdirect_mr->state == MR_INVALIDATED ||
+ 			smbdirect_mr->state == MR_ERROR) {
  
-+static void cifs_direct_readv_complete(struct work_struct *work)
-+{
-+	struct cifs_readdata *rdata = container_of(work, struct cifs_readdata, work);
-+	int i = 0;
-+	unsigned int bytes = 0;
-+
-+	// Set them dirty?
-+	while (bytes < rdata->got_bytes + rdata->page_offset) {
-+		set_page_dirty(rdata->direct_pages[i++]);
-+		bytes += rdata->pagesz;
-+	}
-+	
-+	complete(&rdata->done);
-+	kref_put(&rdata->refcount, cifs_direct_readdata_release);
-+}
-+
-+ssize_t cifs_direct_readv(struct kiocb *iocb, struct iov_iter *to)
-+{
-+	size_t len, cur_len, start;
-+	unsigned int npages, rsize, credits;
-+	struct file *file;
-+	struct cifs_sb_info *cifs_sb;
-+	struct cifsFileInfo *cfile;
-+	struct cifs_tcon *tcon;
-+	struct page **pagevec;
-+	ssize_t rc, total_read = 0;
-+	struct TCP_Server_Info *server;
-+	loff_t offset = iocb->ki_pos;
-+	pid_t pid;
-+	struct cifs_readdata *rdata;
-+	char *buf = to->iov->iov_base;
-+
-+	len = iov_iter_count(to);
-+	if (!len)
-+		return 0;
-+
-+	file = iocb->ki_filp;
-+	cifs_sb = CIFS_FILE_SB(file);
-+	cfile = file->private_data;
-+	tcon = tlink_tcon(cfile->tlink);
-+	server = tcon->ses->server;
-+
-+	if (!server->ops->async_readv)
-+		return -ENOSYS;
-+
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
-+		pid = cfile->pid;
-+	else
-+		pid = current->tgid;
-+
-+	if ((file->f_flags & O_ACCMODE) == O_WRONLY)
-+		cifs_dbg(FYI, "attempting read on write only file instance\n");
-+
-+	do {
-+		rc = server->ops->wait_mtu_credits(server, cifs_sb->rsize,
-+					&rsize, &credits);
-+		if (rc)
-+			break;
-+
-+		cur_len = min_t(const size_t, len, rsize);
-+
-+		rc = iov_iter_get_pages_alloc(to, &pagevec, cur_len, &start);
-+		if (rc < 0) {
-+			cifs_dbg(VFS, "couldn't get user pages (rc=%zd) iter type %d iov_offset %lu count %lu\n", rc, to->type, to->iov_offset, to->count);
-+			dump_stack();
-+			break;
-+		}
-+
-+		rdata = cifs_readdata_alloc(0, pagevec, cifs_direct_readv_complete);
-+		if (!rdata) {
-+			add_credits_and_wake_if(server, credits, 0);
-+			rc = -ENOMEM;
-+			break;
-+		}
-+
-+		npages = (rc + start + PAGE_SIZE-1) / PAGE_SIZE;
-+		rdata->nr_pages = npages;
-+		rdata->page_offset = start;
-+		rdata->pagesz = PAGE_SIZE;
-+		rdata->tailsz = npages > 1 ?
-+				rc-(PAGE_SIZE-start)-(npages-2)*PAGE_SIZE :
-+				rc;
-+		cur_len = rc;
-+
-+		rdata->cfile = cfile;
-+		rdata->offset = offset;
-+		rdata->bytes = rc;
-+		rdata->pid = pid;
-+		rdata->read_into_pages = cifs_uncached_read_into_pages;
-+		rdata->copy_into_pages = cifs_uncached_copy_into_pages;
-+		rdata->credits = credits;
-+
-+		kref_get(&rdata->refcount);
-+
-+		if (!rdata->cfile->invalidHandle ||
-+		    !(rc = cifs_reopen_file(rdata->cfile, true)))
-+			rc = server->ops->async_readv(rdata);
-+
-+		if (rc) {
-+			add_credits_and_wake_if(server, rdata->credits, 0);
-+			kref_put(&rdata->refcount,
-+				 cifs_direct_readdata_release);
-+			if (rc == -EAGAIN)
+-			if (smbdirect_mr->state == MR_INVALIDATED) {
++			/* recover this MR entry */
++			rc = ib_dereg_mr(smbdirect_mr->mr);
++			if (rc) {
++				log_rdma_mr(ERR,
++					"ib_dereg_mr failed rc=%x\n",
++					rc);
++				smbd_disconnect_rdma_connection(info);
 +				continue;
-+		} else
-+			wait_for_completion(&rdata->done);
++			}
 +
-+		rc = rdata->result;
-+		if (rc) {
-+			kref_put(&rdata->refcount, cifs_direct_readdata_release);
-+			if (rc == -EAGAIN)
++			smbdirect_mr->mr = ib_alloc_mr(
++				info->pd, info->mr_type,
++				info->max_frmr_depth);
++			if (IS_ERR(smbdirect_mr->mr)) {
++				log_rdma_mr(ERR,
++					"ib_alloc_mr failed mr_type=%x "
++					"max_frmr_depth=%x\n",
++					info->mr_type,
++					info->max_frmr_depth);
++				smbd_disconnect_rdma_connection(info);
 +				continue;
-+			break;
-+		}
++			}
 +
-+		total_read += rdata->got_bytes;
-+		kref_put(&rdata->refcount, cifs_direct_readdata_release);
-+
-+		iov_iter_advance(to, cur_len);
-+		len -= cur_len;
-+		offset += cur_len;
-+	} while (len);
-+
-+	iocb->ki_pos += total_read;
-+
-+	return total_read;
-+}
-+
- ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to)
++			if (smbdirect_mr->state == MR_INVALIDATED)
+ 				ib_dma_unmap_sg(
+ 					info->id->device, smbdirect_mr->sgl,
+ 					smbdirect_mr->sgl_count,
+ 					smbdirect_mr->dir);
+-				smbdirect_mr->state = MR_READY;
+-			} else if (smbdirect_mr->state == MR_ERROR) {
+-
+-				/* recover this MR entry */
+-				rc = ib_dereg_mr(smbdirect_mr->mr);
+-				if (rc) {
+-					log_rdma_mr(ERR,
+-						"ib_dereg_mr failed rc=%x\n",
+-						rc);
+-					smbd_disconnect_rdma_connection(info);
+-				}
+ 
+-				smbdirect_mr->mr = ib_alloc_mr(
+-					info->pd, info->mr_type,
+-					info->max_frmr_depth);
+-				if (IS_ERR(smbdirect_mr->mr)) {
+-					log_rdma_mr(ERR,
+-						"ib_alloc_mr failed mr_type=%x "
+-						"max_frmr_depth=%x\n",
+-						info->mr_type,
+-						info->max_frmr_depth);
+-					smbd_disconnect_rdma_connection(info);
+-				}
++			smbdirect_mr->state = MR_READY;
+ 
+-				smbdirect_mr->state = MR_READY;
+-			}
+ 			/* smbdirect_mr->state is updated by this function
+ 			 * and is read and updated by I/O issuing CPUs trying
+ 			 * to get a MR, the call to atomic_inc_return
+@@ -2443,7 +2443,7 @@ static struct smbd_mr *get_mr(struct smbd_connection *info)
+  */
+ struct smbd_mr *smbd_register_mr(
+ 	struct smbd_connection *info, struct page *pages[], int num_pages,
+-	int tailsz, bool writing, bool need_invalidate)
++	int offset, int tailsz, bool writing, bool need_invalidate)
  {
- 	struct file *file = iocb->ki_filp;
+ 	struct smbd_mr *smbdirect_mr;
+ 	int rc, i;
+@@ -2466,17 +2466,29 @@ struct smbd_mr *smbd_register_mr(
+ 	smbdirect_mr->sgl_count = num_pages;
+ 	sg_init_table(smbdirect_mr->sgl, num_pages);
+ 
+-	for (i = 0; i < num_pages - 1; i++)
+-		sg_set_page(&smbdirect_mr->sgl[i], pages[i], PAGE_SIZE, 0);
++	log_rdma_mr(INFO, "num_pages=0x%x offset=0x%x tailsz=0x%x\n", num_pages, offset, tailsz);
+ 
++	if (num_pages==1) {
++		sg_set_page(&smbdirect_mr->sgl[0], pages[0], tailsz, offset);
++		goto next;
++	}
++
++	/* We have at least two pages to register */
++	sg_set_page(&smbdirect_mr->sgl[0], pages[0], PAGE_SIZE - offset, offset);
++	i = 1;
++	while (i < num_pages - 1) {
++		sg_set_page(&smbdirect_mr->sgl[i], pages[i], PAGE_SIZE, 0);
++		i++;
++	}
+ 	sg_set_page(&smbdirect_mr->sgl[i], pages[i],
+ 		tailsz ? tailsz : PAGE_SIZE, 0);
+ 
++next:
+ 	dir = writing ? DMA_FROM_DEVICE : DMA_TO_DEVICE;
+ 	smbdirect_mr->dir = dir;
+ 	rc = ib_dma_map_sg(info->id->device, smbdirect_mr->sgl, num_pages, dir);
+ 	if (!rc) {
+-		log_rdma_mr(INFO, "ib_dma_map_sg num_pages=%x dir=%x rc=%x\n",
++		log_rdma_mr(ERR, "ib_dma_map_sg num_pages=%x dir=%x rc=%x\n",
+ 			num_pages, dir, rc);
+ 		goto dma_map_error;
+ 	}
+@@ -2484,8 +2496,8 @@ struct smbd_mr *smbd_register_mr(
+ 	rc = ib_map_mr_sg(smbdirect_mr->mr, smbdirect_mr->sgl, num_pages,
+ 		NULL, PAGE_SIZE);
+ 	if (rc != num_pages) {
+-		log_rdma_mr(INFO,
+-			"ib_map_mr_sg failed rc = %x num_pages = %x\n",
++		log_rdma_mr(ERR,
++			"ib_map_mr_sg failed rc = %d num_pages = %x\n",
+ 			rc, num_pages);
+ 		goto map_mr_error;
+ 	}
+diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
+index f568577..bb1e0c4 100644
+--- a/fs/cifs/smbdirect.h
++++ b/fs/cifs/smbdirect.h
+@@ -314,7 +314,7 @@ struct smbd_mr {
+ /* Interfaces to register and deregister MR for RDMA read/write */
+ struct smbd_mr *smbd_register_mr(
+ 	struct smbd_connection *info, struct page *pages[], int num_pages,
+-	int tailsz, bool writing, bool need_invalidate);
++	int offset, int tailsz, bool writing, bool need_invalidate);
+ int smbd_deregister_mr(struct smbd_mr *mr);
+ 
+ #else
 -- 
 2.7.4
