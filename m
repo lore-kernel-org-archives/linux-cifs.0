@@ -1,110 +1,116 @@
 From: Tom Talpey <tom@talpey.com>
-Subject: Re: [RFC PATCH 02/09] Change wdata alloc to support direct pages
-Date: Fri, 18 May 2018 18:05:10 -0700
-Message-ID: <e8eba448-542b-2e20-506b-a91dc12335c6@talpey.com>
+Subject: Re: [RFC PATCH 00/09] Implement direct user I/O interfaces for RDMA
+Date: Fri, 18 May 2018 17:58:25 -0700
+Message-ID: <d7ff714d-22ac-b011-915c-ed1cc52326ef@talpey.com>
 References: <20180518002214.5657-1-longli@linuxonhyperv.com>
- <20180518002214.5657-3-longli@linuxonhyperv.com>
+ <d5eaf67d-4b0d-9206-a016-67cb3b5a0df8@talpey.com>
+ <MWHPR2101MB0729BFF8F0A397805087C3A4CE900@MWHPR2101MB0729.namprd21.prod.outlook.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-To: longli@microsoft.com, Steve French <sfrench@samba.org>,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+To: Long Li <longli@microsoft.com>, Steve French <sfrench@samba.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180518002214.5657-3-longli@linuxonhyperv.com>
+In-Reply-To: <MWHPR2101MB0729BFF8F0A397805087C3A4CE900@MWHPR2101MB0729.namprd21.prod.outlook.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On 5/17/2018 5:22 PM, Long Li wrote:
-> From: Long Li <longli@microsoft.com>
+On 5/17/2018 11:03 PM, Long Li wrote:
+>> Subject: Re: [RFC PATCH 00/09] Implement direct user I/O interfaces for
+>> RDMA
+>>
+>> On 5/17/2018 8:22 PM, Long Li wrote:
+>>> From: Long Li <longli@microsoft.com>
+>>>
+>>> This patchset implements direct user I/O through RDMA.
+>>>
+>>> In normal code path (even with cache=none), CIFS copies I/O data from
+>>> user-space to kernel-space for security reasons.
+>>>
+>>> With this patchset, a new mounting option is introduced to have CIFS
+>>> pin the user-space buffer into memory and performs I/O through RDMA.
+>>> This avoids memory copy, at the cost of added security risk.
+>>
+>> What's the security risk? This type of direct i/o behavior is not uncommon,
+>> and can certainly be made safe, using the appropriate memory registration
+>> and protection domains. Any risk needs to be stated explicitly, and mitigation
+>> provided, or at least described.
 > 
-> When using direct pages from user space, there is no need to allocate pages.
+> I think it's an assumption that user-mode buffer can't be trusted, so CIFS always copies them into internal buffers, and calculate signature and encryption based on protocol used.
 > 
-> Just ping those user pages for RDMA.
+> With the direct buffer, the user can potentially modify the buffer when signature or encryption is in progress or after they are done.
 
-Did you mean "pin" those user pages? If so, where does that pinning
-occur, it's not in this patch.
+I don't agree that the legacy copying behavior is because the buffer is
+"untrusted". The buffer is the user's data, there's no trust issue here.
+If the user application modifies the buffer while it's being sent, it's
+a violation of the API contract, and the only victim is the application
+itself. Same applies for receiving data. And as pointed out, most all
+storage layers, file and block both, use this strategy for direct i/o.
 
-Perhaps this should just say "point to" those user pages.
+Regarding signing, if the application alters the data then the integrity
+hash will simply do its job and catch the application in the act. Again,
+nothing suffers but the application.
 
-I also don't think this is necessarily only "for RDMA". Perhaps
-there are other transport scenarios where this is advantageous.
+Regarding encryption, I assume you're proposing to encrypt and decrypt
+the data in a kernel buffer, effectively a copy. So in fact, in the
+encryption case there's no need to pin and map the user buffer at all.
+
+I'll mention however that Windows takes the path of not performing
+RDMA placement when encrypting data. It saves nothing, and even adds
+some overhead, because of the need to touch the buffer anyway to
+manage the encryption/decryption.
+
+Bottom line - no security implication for using user buffers directly.
+
+Tom.
 
 
+> I also want to point out that, I choose to implement .read_iter and .write_iter from file_operations to implement direct I/O (CIFS is already doing this for O_DIRECT, so following this code path will avoid a big mess up).  The ideal choice is to implement .direct_IO from address_space_operations that I think eventually we want to move to.
 > 
-> Signed-off-by: Long Li <longli@microsoft.com>
-> ---
->   fs/cifs/cifsproto.h |  2 +-
->   fs/cifs/cifssmb.c   | 10 +++++++---
->   fs/cifs/file.c      |  4 ++--
->   3 files changed, 10 insertions(+), 6 deletions(-)
-> 
-> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index 365a414..94106b9 100644
-> --- a/fs/cifs/cifsproto.h
-> +++ b/fs/cifs/cifsproto.h
-> @@ -523,7 +523,7 @@ int cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid);
->   int cifs_async_writev(struct cifs_writedata *wdata,
->   		      void (*release)(struct kref *kref));
->   void cifs_writev_complete(struct work_struct *work);
-> -struct cifs_writedata *cifs_writedata_alloc(unsigned int nr_pages,
-> +struct cifs_writedata *cifs_writedata_alloc(unsigned int nr_pages, struct page **direct_pages,
->   						work_func_t complete);
->   void cifs_writedata_release(struct kref *refcount);
->   int cifs_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index 1529a08..3b1731d 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -1983,7 +1983,7 @@ cifs_writev_requeue(struct cifs_writedata *wdata)
->   			tailsz = rest_len - (nr_pages - 1) * PAGE_SIZE;
->   		}
->   
-> -		wdata2 = cifs_writedata_alloc(nr_pages, cifs_writev_complete);
-> +		wdata2 = cifs_writedata_alloc(nr_pages, NULL, cifs_writev_complete);
->   		if (!wdata2) {
->   			rc = -ENOMEM;
->   			break;
-> @@ -2067,12 +2067,16 @@ cifs_writev_complete(struct work_struct *work)
->   }
->   
->   struct cifs_writedata *
-> -cifs_writedata_alloc(unsigned int nr_pages, work_func_t complete)
-> +cifs_writedata_alloc(unsigned int nr_pages, struct page **direct_pages, work_func_t complete)
->   {
->   	struct cifs_writedata *wdata;
->   
->   	/* writedata + number of page pointers */
-> -	wdata = kzalloc(sizeof(*wdata) +
-> +	if (direct_pages) {
-> +		wdata = kzalloc(sizeof(*wdata), GFP_NOFS);
-> +		wdata->direct_pages = direct_pages;
-> +	} else
-> +		wdata = kzalloc(sizeof(*wdata) +
->   			sizeof(struct page *) * nr_pages, GFP_NOFS);
->   	if (wdata != NULL) {
->   		kref_init(&wdata->refcount);
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 23fd430..a6ec896 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -1965,7 +1965,7 @@ wdata_alloc_and_fillpages(pgoff_t tofind, struct address_space *mapping,
->   {
->   	struct cifs_writedata *wdata;
->   
-> -	wdata = cifs_writedata_alloc((unsigned int)tofind,
-> +	wdata = cifs_writedata_alloc((unsigned int)tofind, NULL,
->   				     cifs_writev_complete);
->   	if (!wdata)
->   		return NULL;
-> @@ -2554,7 +2554,7 @@ cifs_write_from_iter(loff_t offset, size_t len, struct iov_iter *from,
->   			break;
->   
->   		nr_pages = get_numpages(wsize, len, &cur_len);
-> -		wdata = cifs_writedata_alloc(nr_pages,
-> +		wdata = cifs_writedata_alloc(nr_pages, NULL,
->   					     cifs_uncached_writev_complete);
->   		if (!wdata) {
->   			rc = -ENOMEM;
+>>
+>> Tom.
+>>
+>>>
+>>> This patchset is RFC. The work is in progress, do not merge.
+>>>
+>>>
+>>> Long Li (9):
+>>>     Introduce offset for the 1st page in data transfer structures
+>>>     Change wdata alloc to support direct pages
+>>>     Change rdata alloc to support direct pages
+>>>     Change function to support offset when reading pages
+>>>     Change RDMA send to regonize page offset in the 1st page
+>>>     Change RDMA recv to support offset in the 1st page
+>>>     Support page offset in memory regsitrations
+>>>     Implement no-copy file I/O interfaces
+>>>     Introduce cache=rdma moutning option
+>>>
+>>>
+>>>    fs/cifs/cifs_fs_sb.h      |   2 +
+>>>    fs/cifs/cifsfs.c          |  19 +++
+>>>    fs/cifs/cifsfs.h          |   3 +
+>>>    fs/cifs/cifsglob.h        |   6 +
+>>>    fs/cifs/cifsproto.h       |   4 +-
+>>>    fs/cifs/cifssmb.c         |  10 +-
+>>>    fs/cifs/connect.c         |  13 +-
+>>>    fs/cifs/dir.c             |   5 +
+>>>    fs/cifs/file.c            | 351
+>> ++++++++++++++++++++++++++++++++++++++++++----
+>>>    fs/cifs/inode.c           |   4 +-
+>>>    fs/cifs/smb2ops.c         |   2 +-
+>>>    fs/cifs/smb2pdu.c         |  22 ++-
+>>>    fs/cifs/smbdirect.c       | 132 ++++++++++-------
+>>>    fs/cifs/smbdirect.h       |   2 +-
+>>>    fs/read_write.c           |   7 +
+>>>    include/linux/ratelimit.h |   2 +-
+>>>    16 files changed, 489 insertions(+), 95 deletions(-)
+>>>
+> N�����r��y���b�X��ǧv�^�)޺{.n�+����{��ٚ�{ay�
+ʇڙ�,j��f���h���z�
+�w���
+���j:+v���w�j�m��������zZ+�����ݢj"��!tml=
 > 
