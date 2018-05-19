@@ -1,62 +1,87 @@
-From: Tom Talpey <tom@talpey.com>
-Subject: Re: [RFC PATCH 09/09] Introduce cache=rdma moutning option
-Date: Fri, 18 May 2018 18:20:06 -0700
-Message-ID: <9b1496c1-a2ae-d724-fa0a-518a87be09c1@talpey.com>
+From: Long Li <longli@microsoft.com>
+Subject: RE: [RFC PATCH 05/09] Change RDMA send to regonize page offset in the
+ 1st page
+Date: Sat, 19 May 2018 05:54:26 +0000
+Message-ID: <MWHPR2101MB0729768F05DC55631C07605BCE970@MWHPR2101MB0729.namprd21.prod.outlook.com>
 References: <20180518002214.5657-1-longli@linuxonhyperv.com>
- <20180518002214.5657-10-longli@linuxonhyperv.com>
- <20180518072631.GA19250@infradead.org>
- <MWHPR2101MB07297B07D495D66A1C9416FACE900@MWHPR2101MB0729.namprd21.prod.outlook.com>
- <CAH2r5mtzUJUakbPr_kzrDcqVPC9QuS7K8MXejNz7F=Uii6K5Kg@mail.gmail.com>
- <MWHPR2101MB0729D163B903A0198A85AB4BCE900@MWHPR2101MB0729.namprd21.prod.outlook.com>
+ <20180518002214.5657-6-longli@linuxonhyperv.com>
+ <8a32557a-684a-bf6b-bb1d-3f1f0d5c32c9@talpey.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Christoph Hellwig <hch@infradead.org>,
-        Steve French <sfrench@samba.org>,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+To: Tom Talpey <tom@talpey.com>, Steve French <sfrench@samba.org>,
         "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
         "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-To: Long Li <longli@microsoft.com>, Steve French <smfrench@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <MWHPR2101MB0729D163B903A0198A85AB4BCE900@MWHPR2101MB0729.namprd21.prod.outlook.com>
+In-Reply-To: <8a32557a-684a-bf6b-bb1d-3f1f0d5c32c9@talpey.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On 5/18/2018 1:58 PM, Long Li wrote:
->> Subject: Re: [RFC PATCH 09/09] Introduce cache=rdma moutning option
->>
->> On Fri, May 18, 2018 at 12:00 PM, Long Li via samba-technical <samba-
->> technical@lists.samba.org> wrote:
->>>> Subject: Re: [RFC PATCH 09/09] Introduce cache=rdma moutning option
->>>>
->>>> On Thu, May 17, 2018 at 05:22:14PM -0700, Long Li wrote:
->>>>> From: Long Li <longli@microsoft.com>
->>>>>
->>>>> When cache=rdma is enabled on mount options, CIFS do not allocate
->>>>> internal data buffer pages for I/O, data is read/writen directly to
->>>>> user
->>>> memory via RDMA.
->>>>
->>>> I don't think this should be an option.  For direct I/O without
->>>> signing or encryption CIFS should always use get_user_pages, with or
->> without RDMA.
->>>
->>> Yes this should be done for all transport. If there are no objections, I'll send
->> patches to change this.
->>
->> Would this help/change performance much?
-> 
-> On RDMA, it helps with I/O latency and reduces CPU usage on certain I/O patterns.
-> 
-> But I haven't tested on TCP. Maybe it will help a little bit.
-
-Well, when the application requests direct i/o on a TCP connection,
-you definitely don't want to cache it! So even if the performance
-is different, correctness would dictate doing this.
-
-You probably don't need to pin the buffer in the TCP case, which
-might be worth avoiding.
-
-Tom.
+PiBTdWJqZWN0OiBSZTogW1JGQyBQQVRDSCAwNS8wOV0gQ2hhbmdlIFJETUEgc2VuZCB0byByZWdv
+bml6ZSBwYWdlIG9mZnNldA0KPiBpbiB0aGUgMXN0IHBhZ2UNCj4gDQo+IE9uIDUvMTcvMjAxOCA1
+OjIyIFBNLCBMb25nIExpIHdyb3RlOg0KPiA+IEZyb206IExvbmcgTGkgPGxvbmdsaUBtaWNyb3Nv
+ZnQuY29tPg0KPiANCj4gVGhlcmUncyBhIHR5cG8gInJlY29nbml6ZSIgaW4gdGhlIHBhdGNoIHRp
+dGxlDQo+IA0KPiANCj4gPiBXaGVuIGRvaW5nIFJETUEgc2VuZCwgdGhlIG9mZnNldCBuZWVkcyB0
+byBiZSBjaGVja2VkIGFzIGRhdGEgbWF5IHN0YXJ0DQo+ID4gaW4gYW4gb2Zmc2V0IGluIHRoZSAx
+c3QgcGFnZS4NCj4gDQo+IERvZXNuJ3QgdGhpcyBwYXRjaCBhbHRlciB0aGUgZ2VuZXJpYyBzbWIy
+cGR1LmMgY29kZSB0b28/IEkgdGhpbmsgdGhpcyBzaG91bGQNCj4gbm90ZSAiYW55IiBzZW5kLCBu
+b3QganVzdCBSRE1BPw0KDQpZZXMsIGJ1dCBmb3IgVENQIHRoZSBkaXJlY3RfcGFnZXMgYW5kIHBh
+Z2Vfb2Zmc2V0IGFyZSBhbHdheXMgTlVMTCBhbmQgMCB3aGVuIGNhY2hlPXJkbWEgaXMgaW4gbW91
+bnRpbmcgb3B0aW9ucywgc28gaXQgZG9lc24ndCByZWFsbHkgYWZmZWN0IGhlIFRDUCBjb2RlIHBh
+dGggaW4gdGhpcyBwYXRjaCBzZXQuDQoNClRoaXMgYmVoYXZpb3IgY2FuIGJlIGNoYW5nZWQsIGFu
+ZCBpdCB3aWxsIHdvcmsgd2l0aCBUQ1AgdG9vLg0KDQo+IA0KPiBUb20uDQo+IA0KPiA+DQo+ID4g
+U2lnbmVkLW9mZi1ieTogTG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+ID4gLS0tDQo+
+ID4gICBmcy9jaWZzL3NtYjJwZHUuYyAgIHwgIDMgKystDQo+ID4gICBmcy9jaWZzL3NtYmRpcmVj
+dC5jIHwgMjUgKysrKysrKysrKysrKysrKysrKy0tLS0tLQ0KPiA+ICAgMiBmaWxlcyBjaGFuZ2Vk
+LCAyMSBpbnNlcnRpb25zKCspLCA3IGRlbGV0aW9ucygtKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBh
+L2ZzL2NpZnMvc21iMnBkdS5jIGIvZnMvY2lmcy9zbWIycGR1LmMgaW5kZXgNCj4gPiA1MDk3ZjI4
+Li5mZGNmOTdlIDEwMDY0NA0KPiA+IC0tLSBhL2ZzL2NpZnMvc21iMnBkdS5jDQo+ID4gKysrIGIv
+ZnMvY2lmcy9zbWIycGR1LmMNCj4gPiBAQCAtMzAxNSw3ICszMDE1LDggQEAgc21iMl9hc3luY193
+cml0ZXYoc3RydWN0IGNpZnNfd3JpdGVkYXRhICp3ZGF0YSwNCj4gPg0KPiA+ICAgCXJxc3QucnFf
+aW92ID0gaW92Ow0KPiA+ICAgCXJxc3QucnFfbnZlYyA9IDI7DQo+ID4gLQlycXN0LnJxX3BhZ2Vz
+ID0gd2RhdGEtPnBhZ2VzOw0KPiA+ICsJcnFzdC5ycV9wYWdlcyA9IHdkYXRhLT5kaXJlY3RfcGFn
+ZXMgPyB3ZGF0YS0+ZGlyZWN0X3BhZ2VzIDoNCj4gd2RhdGEtPnBhZ2VzOw0KPiA+ICsJcnFzdC5y
+cV9vZmZzZXQgPSB3ZGF0YS0+cGFnZV9vZmZzZXQ7DQo+ID4gICAJcnFzdC5ycV9ucGFnZXMgPSB3
+ZGF0YS0+bnJfcGFnZXM7DQo+ID4gICAJcnFzdC5ycV9wYWdlc3ogPSB3ZGF0YS0+cGFnZXN6Ow0K
+PiA+ICAgCXJxc3QucnFfdGFpbHN6ID0gd2RhdGEtPnRhaWxzejsNCj4gPiBkaWZmIC0tZ2l0IGEv
+ZnMvY2lmcy9zbWJkaXJlY3QuYyBiL2ZzL2NpZnMvc21iZGlyZWN0LmMgaW5kZXgNCj4gPiBiMGEx
+OTU1Li5iNDY1ODZkIDEwMDY0NA0KPiA+IC0tLSBhL2ZzL2NpZnMvc21iZGlyZWN0LmMNCj4gPiAr
+KysgYi9mcy9jaWZzL3NtYmRpcmVjdC5jDQo+ID4gQEAgLTIwODQsOCArMjA4NCwxMCBAQCBpbnQg
+c21iZF9zZW5kKHN0cnVjdCBzbWJkX2Nvbm5lY3Rpb24gKmluZm8sDQo+ID4gc3RydWN0IHNtYl9y
+cXN0ICpycXN0KQ0KPiA+DQo+ID4gICAJLyogYWRkIGluIHRoZSBwYWdlIGFycmF5IGlmIHRoZXJl
+IGlzIG9uZSAqLw0KPiA+ICAgCWlmIChycXN0LT5ycV9ucGFnZXMpIHsNCj4gPiAtCQlidWZsZW4g
+Kz0gcnFzdC0+cnFfcGFnZXN6ICogKHJxc3QtPnJxX25wYWdlcyAtIDEpOw0KPiA+IC0JCWJ1Zmxl
+biArPSBycXN0LT5ycV90YWlsc3o7DQo+ID4gKwkJaWYgKHJxc3QtPnJxX25wYWdlcyA9PSAxKQ0K
+PiA+ICsJCQlidWZsZW4gKz0gcnFzdC0+cnFfdGFpbHN6Ow0KPiA+ICsJCWVsc2UNCj4gPiArCQkJ
+YnVmbGVuICs9IHJxc3QtPnJxX3BhZ2VzeiAqIChycXN0LT5ycV9ucGFnZXMgLSAxKSAtDQo+ID4g
+K3Jxc3QtPnJxX29mZnNldCArIHJxc3QtPnJxX3RhaWxzejsNCj4gPiAgIAl9DQo+ID4NCj4gPiAg
+IAlpZiAoYnVmbGVuICsgc2l6ZW9mKHN0cnVjdCBzbWJkX2RhdGFfdHJhbnNmZXIpID4gQEAgLTIx
+ODIsOA0KPiA+ICsyMTg0LDE5IEBAIGludCBzbWJkX3NlbmQoc3RydWN0IHNtYmRfY29ubmVjdGlv
+biAqaW5mbywgc3RydWN0DQo+ID4gc21iX3Jxc3QgKnJxc3QpDQo+ID4NCj4gPiAgIAkvKiBub3cg
+c2VuZGluZyBwYWdlcyBpZiB0aGVyZSBhcmUgYW55ICovDQo+ID4gICAJZm9yIChpID0gMDsgaSA8
+IHJxc3QtPnJxX25wYWdlczsgaSsrKSB7DQo+ID4gLQkJYnVmbGVuID0gKGkgPT0gcnFzdC0+cnFf
+bnBhZ2VzLTEpID8NCj4gPiAtCQkJcnFzdC0+cnFfdGFpbHN6IDogcnFzdC0+cnFfcGFnZXN6Ow0K
+PiA+ICsJCXVuc2lnbmVkIGludCBvZmZzZXQgPSAwOw0KPiA+ICsJCWlmIChpID09IDApDQo+ID4g
+KwkJCW9mZnNldCA9IHJxc3QtPnJxX29mZnNldDsNCj4gPiArCQlpZiAocnFzdC0+cnFfbnBhZ2Vz
+ID09IDEgfHwgaSA9PSBycXN0LT5ycV9ucGFnZXMtMSkNCj4gPiArCQkJYnVmbGVuID0gcnFzdC0+
+cnFfdGFpbHN6Ow0KPiA+ICsJCWVsc2Ugew0KPiA+ICsJCQkvKiBXZSBoYXZlIGF0IGxlYXN0IHR3
+byBwYWdlcywgYW5kIHRoaXMgaXMgbm90IHRoZSBsYXN0DQo+IHBhZ2UgKi8NCj4gPiArCQkJaWYg
+KGkgPT0gMCkNCj4gPiArCQkJCWJ1ZmxlbiA9IHJxc3QtPnJxX3BhZ2VzeiAtIHJxc3QtPnJxX29m
+ZnNldDsNCj4gPiArCQkJZWxzZQ0KPiA+ICsJCQkJYnVmbGVuID0gcnFzdC0+cnFfcGFnZXN6Ow0K
+PiA+ICsJCX0NCj4gPiArDQo+ID4gICAJCW52ZWNzID0gKGJ1ZmxlbiArIG1heF9pb3Zfc2l6ZSAt
+IDEpIC8gbWF4X2lvdl9zaXplOw0KPiA+ICAgCQlsb2dfd3JpdGUoSU5GTywgInNlbmRpbmcgcGFn
+ZXMgYnVmbGVuPSVkIG52ZWNzPSVkXG4iLA0KPiA+ICAgCQkJYnVmbGVuLCBudmVjcyk7DQo+ID4g
+QEAgLTIxOTQsOSArMjIwNyw5IEBAIGludCBzbWJkX3NlbmQoc3RydWN0IHNtYmRfY29ubmVjdGlv
+biAqaW5mbywNCj4gc3RydWN0IHNtYl9ycXN0ICpycXN0KQ0KPiA+ICAgCQkJcmVtYWluaW5nX2Rh
+dGFfbGVuZ3RoIC09IHNpemU7DQo+ID4gICAJCQlsb2dfd3JpdGUoSU5GTywgInNlbmRpbmcgcGFn
+ZXMgaT0lZCBvZmZzZXQ9JWQNCj4gc2l6ZT0lZCINCj4gPiAgIAkJCQkiIHJlbWFpbmluZ19kYXRh
+X2xlbmd0aD0lZFxuIiwNCj4gPiAtCQkJCWksIGoqbWF4X2lvdl9zaXplLCBzaXplLA0KPiByZW1h
+aW5pbmdfZGF0YV9sZW5ndGgpOw0KPiA+ICsJCQkJaSwgaiptYXhfaW92X3NpemUrb2Zmc2V0LCBz
+aXplLA0KPiByZW1haW5pbmdfZGF0YV9sZW5ndGgpOw0KPiA+ICAgCQkJcmMgPSBzbWJkX3Bvc3Rf
+c2VuZF9wYWdlKA0KPiA+IC0JCQkJaW5mbywgcnFzdC0+cnFfcGFnZXNbaV0sIGoqbWF4X2lvdl9z
+aXplLA0KPiA+ICsJCQkJaW5mbywgcnFzdC0+cnFfcGFnZXNbaV0sIGoqbWF4X2lvdl9zaXplICsN
+Cj4gb2Zmc2V0LA0KPiA+ICAgCQkJCXNpemUsIHJlbWFpbmluZ19kYXRhX2xlbmd0aCk7DQo+ID4g
+ICAJCQlpZiAocmMpDQo+ID4gICAJCQkJZ290byBkb25lOw0KPiA+DQo=
