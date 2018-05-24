@@ -1,99 +1,67 @@
-From: Dave Chinner <david@fromorbit.com>
-Subject: Re: [PATCHv2][SMB3] Add kernel trace support
-Date: Mon, 21 May 2018 09:17:44 +1000
-Message-ID: <20180520231744.GM10363@dastard>
-References: <CAH2r5muobq1gDbGcPE1AYeeKmdFx681=mpCyAZWfSPUa5wLjSQ@mail.gmail.com>
- <20180518184630.axfa7oq4pewb7foj@kazak>
- <CAH2r5muu0Hjx1SwMKm5aRLRa2Cwh6tQ7y0h33C07kkPbkhswFw@mail.gmail.com>
- <20180519232257.GL10363@dastard>
- <CAH2r5mtFtX4t9-xFRh62DRv=09TJjF2Z6JkbXXF3siaHqZuY2A@mail.gmail.com>
+From: kbuild test robot <lkp@intel.com>
+Subject: [cifs:for-next 16/19] fs/cifs/cifsfs.c:903:25: sparse: symbol
+ 'smb3_fs_type' was not declared. Should it be static?
+Date: Thu, 24 May 2018 16:53:36 +0800
+Message-ID: <201805241613.jA5dMoyL%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: Ralph =?iso-8859-1?Q?B=F6hme?= <slow@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>
-To: Steve French <smfrench@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: kbuild-all@01.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+To: Steve French <stfrench@microsoft.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CAH2r5mtFtX4t9-xFRh62DRv=09TJjF2Z6JkbXXF3siaHqZuY2A@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Sat, May 19, 2018 at 08:56:39PM -0500, Steve French wrote:
-> On Sat, May 19, 2018 at 6:22 PM, Dave Chinner <david@fromorbit.com> wrote:
-> > On Fri, May 18, 2018 at 01:43:14PM -0700, Steve French wrote:
-> >> On Fri, May 18, 2018 at 11:46 AM, Ralph Böhme <slow@samba.org> wrote:
-> >> > On Thu, May 17, 2018 at 09:36:36PM -0500, Steve French via samba-technical wrote:
-> >> >> Patch updated with additional tracepoint locations and some formatting
-> >> >> improvements. There are some obvious additional tracepoints that could
-> >> >> be added, but this should be a reasonable group to start with.
-> >> >>
-> >> >> From edc02d6f9dc24963d510c7ef59067428d3b082d3 Mon Sep 17 00:00:00 2001
-> >> >> From: Steve French <stfrench@microsoft.com>
-> >> >> Date: Thu, 17 May 2018 21:16:55 -0500
-> >> >> Subject: [PATCH] smb3: Add ftrace tracepoints for improved SMB3 debugging
-> >> >>
-> >> >> Although dmesg logs and wireshark network traces can be
-> >> >> helpful, being able to dynamically enable/disable tracepoints
-> >> >> (in this case via the kernel ftrace mechanism) can also be
-> >> >> helpful in more quickly debugging problems, and more
-> >> >> selectively tracing the events related to the bug report.
-> >> >>
-> >> >> This patch adds 12 ftrace tracepoints to cifs.ko for SMB3 events
-> >> >> in some obvious locations.  Subsequent patches will add more
-> >> >> as needed.
-> >> >>
-> >> >> Example use:
-> >> >>    trace-cmd record -e cifs
-> >> >>    <run test case>
-> >> >>    trace-cmd show
-> >> >
-> >> > pardon my ignorance, but are these tracepoints usable with other tracing
-> >> > frameworks like Systemtap?
-> >> >
-> >> > Last time I checked, Systemtap looked like *the* tool.
-> >
-> > Systemtap is great when you have a need for custom tracing. But for
-> > day-to-day kernel development, tracepoints are far more useful
-> > because they are always there and can cover all the common
-> > situations that you need to trace.
-> >
-> > And when it comes to debugging a one-off user problem when the user
-> > knows nothing about systemtap?  Nothing beats asking the user
-> > to run a trace on built-in tracepoints, reproduce the problem and
-> > send the trace report back as per the above example.
-> 
-> Yep - it has already been helpful in debugging problems.
-> 
-> Main problem I hit using the new tracepoints over the past few days
-> was entries being discarded from the buffer - I had a counter leak (now
-> fixed) that xfstest showed ... but about 90% of the entries were dropped.
-> Tried increasing buffer size but might have made things worse not better.
-> Ideas how to force more entries to be saved?
+tree:   git://git.samba.org/sfrench/cifs-2.6.git for-next
+head:   fd65f4d1d6b9daaf5265f965640b221701d088f8
+commit: 64a051adf5911e8a71a46413c60beaf17ce7143d [16/19] smb3: add module alias for smb3 to cifs.ko
+reproduce:
+        # apt-get install sparse
+        git checkout 64a051adf5911e8a71a46413c60beaf17ce7143d
+        make ARCH=x86_64 allmodconfig
+        make C=1 CF=-D__CHECK_ENDIAN__
 
-The only tends to be a problem when you are generating events faster
-than userspace can drain the kernel ring buffer. Generally speaking,
-this happens when you try to trace too many events for userspace to
-drain in the CPU time the kernel assigns it.
 
-I'm guessing that tracing an interrupt driven workload like a
-network protocol this is going to be more of a problem than
-filesystems - it's the perennial "tcpdump/wireshark/etc cannot keep
-up with the incoming packet rate" problem - increasing buffer sizes
-never fixes that problem. :)
+sparse warnings: (new ones prefixed by >>)
 
-Storing the trace data output file on tmpfs can be helpful here, as
-can reducing the number of events to just the layer you need info
-from, filter the specific events you want to see (e.g. filter by
-client/server connection, by process/CPU, etc), set up trigger
-events so tracing doesn't start until you want it to, etc...
+   fs/cifs/cifsglob.h:1658:41: sparse: symbol 'cifs_tcp_ses_list' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1669:41: sparse: symbol 'cifs_tcp_ses_lock' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1681:28: sparse: symbol 'GlobalCurrentXid' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1682:28: sparse: symbol 'GlobalTotalActiveXid' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1683:28: sparse: symbol 'GlobalMaxActiveXid' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1684:26: sparse: symbol 'GlobalMid_Lock' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1689:24: sparse: symbol 'sesInfoAllocCount' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1690:24: sparse: symbol 'tconInfoAllocCount' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1691:24: sparse: symbol 'tcpSesAllocCount' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1692:24: sparse: symbol 'tcpSesReconnectCount' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1693:24: sparse: symbol 'tconInfoReconnectCount' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1696:24: sparse: symbol 'bufAllocCount' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1698:24: sparse: symbol 'totBufAllocCount' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1699:24: sparse: symbol 'totSmBufAllocCount' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1701:24: sparse: symbol 'smBufAllocCount' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1702:24: sparse: symbol 'midCount' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1705:20: sparse: symbol 'enable_oplocks' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1706:20: sparse: symbol 'lookupCacheEnabled' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1707:28: sparse: symbol 'global_secflags' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1709:28: sparse: symbol 'sign_CIFS_PDUs' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1710:20: sparse: symbol 'linuxExtEnabled' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1711:28: sparse: symbol 'CIFSMaxBufSize' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1712:28: sparse: symbol 'cifs_min_rcv' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1713:28: sparse: symbol 'cifs_min_small' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1714:28: sparse: symbol 'cifs_max_pending' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1717:30: sparse: symbol 'uidtree' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1718:30: sparse: symbol 'gidtree' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1719:26: sparse: symbol 'siduidlock' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1720:26: sparse: symbol 'sidgidlock' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1721:30: sparse: symbol 'siduidtree' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1722:30: sparse: symbol 'sidgidtree' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1723:26: sparse: symbol 'uidsidlock' was not declared. Should it be static?
+   fs/cifs/cifsglob.h:1724:26: sparse: symbol 'gidsidlock' was not declared. Should it be static?
+>> fs/cifs/cifsfs.c:903:25: sparse: symbol 'smb3_fs_type' was not declared. Should it be static?
 
-Cheers,
+Please review and possibly fold the followup patch.
 
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+---
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
