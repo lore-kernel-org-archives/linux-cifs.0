@@ -1,7 +1,7 @@
 From: Long Li <longli@linuxonhyperv.com>
-Subject: [Patch v2 08/15] CIFS: SMBD: Support page offset in RDMA send
-Date: Wed, 30 May 2018 12:48:00 -0700
-Message-ID: <20180530194807.31657-9-longli@linuxonhyperv.com>
+Subject: [Patch v2 04/15] CIFS: Add support for direct pages in wdata
+Date: Wed, 30 May 2018 12:47:56 -0700
+Message-ID: <20180530194807.31657-5-longli@linuxonhyperv.com>
 References: <20180530194807.31657-1-longli@linuxonhyperv.com>
 Reply-To: longli@microsoft.com
 Cc: Long Li <longli@microsoft.com>
@@ -15,81 +15,82 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-The RDMA send function needs to look at offset in the request pages, and
-send data starting from there.
+Add a function to allocate wdata without allocating pages for data
+transfer. This gives the caller an option to pass a number of pages that
+point to the data buffer to write to.
+
+wdata is reponsible for free those pages after it's done.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/smbdirect.c | 27 +++++++++++++++++++--------
- 1 file changed, 19 insertions(+), 8 deletions(-)
+ fs/cifs/cifsglob.h  |  2 +-
+ fs/cifs/cifsproto.h |  2 ++
+ fs/cifs/cifssmb.c   | 17 ++++++++++++++---
+ 3 files changed, 17 insertions(+), 4 deletions(-)
 
-diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index c62f7c9..6141e3c 100644
---- a/fs/cifs/smbdirect.c
-+++ b/fs/cifs/smbdirect.c
-@@ -17,6 +17,7 @@
- #include <linux/highmem.h>
- #include "smbdirect.h"
- #include "cifs_debug.h"
-+#include "cifsproto.h"
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 56864a87..7f62c98 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -1205,7 +1205,7 @@ struct cifs_writedata {
+ 	unsigned int			tailsz;
+ 	unsigned int			credits;
+ 	unsigned int			nr_pages;
+-	struct page			*pages[];
++	struct page			**pages;
+ };
  
- static struct smbd_response *get_empty_queue_buffer(
- 		struct smbd_connection *info);
-@@ -2082,7 +2083,7 @@ int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst)
- 	struct kvec vec;
- 	int nvecs;
- 	int size;
--	int buflen = 0, remaining_data_length;
-+	unsigned int buflen = 0, remaining_data_length;
- 	int start, i, j;
- 	int max_iov_size =
- 		info->max_send_size - sizeof(struct smbd_data_transfer);
-@@ -2113,10 +2114,17 @@ int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst)
- 		buflen += iov[i].iov_len;
- 	}
+ /*
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 1f27d8e..7933c5f 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -533,6 +533,8 @@ int cifs_async_writev(struct cifs_writedata *wdata,
+ void cifs_writev_complete(struct work_struct *work);
+ struct cifs_writedata *cifs_writedata_alloc(unsigned int nr_pages,
+ 						work_func_t complete);
++struct cifs_writedata *cifs_writedata_direct_alloc(struct page **pages,
++						work_func_t complete);
+ void cifs_writedata_release(struct kref *refcount);
+ int cifs_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+ 			  struct cifs_sb_info *cifs_sb,
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index c8e4278..5aca336 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -1952,6 +1952,7 @@ cifs_writedata_release(struct kref *refcount)
+ 	if (wdata->cfile)
+ 		cifsFileInfo_put(wdata->cfile);
  
--	/* add in the page array if there is one */
-+	/*
-+	 * Add in the page array if there is one. The caller needs to set
-+	 * rq_tailsz to PAGE_SIZE when the buffer has multiple pages and
-+	 * ends at page boundary
-+	 */
- 	if (rqst->rq_npages) {
--		buflen += rqst->rq_pagesz * (rqst->rq_npages - 1);
--		buflen += rqst->rq_tailsz;
-+		if (rqst->rq_npages == 1)
-+			buflen += rqst->rq_tailsz;
-+		else
-+			buflen += rqst->rq_pagesz * (rqst->rq_npages - 1) -
-+					rqst->rq_offset + rqst->rq_tailsz;
- 	}
++	kvfree(wdata->pages);
+ 	kfree(wdata);
+ }
  
- 	if (buflen + sizeof(struct smbd_data_transfer) >
-@@ -2213,8 +2221,9 @@ int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst)
- 
- 	/* now sending pages if there are any */
- 	for (i = 0; i < rqst->rq_npages; i++) {
--		buflen = (i == rqst->rq_npages-1) ?
--			rqst->rq_tailsz : rqst->rq_pagesz;
-+		unsigned int offset;
+@@ -2075,12 +2076,22 @@ cifs_writev_complete(struct work_struct *work)
+ struct cifs_writedata *
+ cifs_writedata_alloc(unsigned int nr_pages, work_func_t complete)
+ {
++	struct page **pages =
++		kzalloc(sizeof(struct page *) * nr_pages, GFP_NOFS);
++	if (pages)
++		return cifs_writedata_direct_alloc(pages, complete);
 +
-+		rqst_page_get_length(rqst, i, &buflen, &offset);
- 		nvecs = (buflen + max_iov_size - 1) / max_iov_size;
- 		log_write(INFO, "sending pages buflen=%d nvecs=%d\n",
- 			buflen, nvecs);
-@@ -2225,9 +2234,11 @@ int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst)
- 			remaining_data_length -= size;
- 			log_write(INFO, "sending pages i=%d offset=%d size=%d"
- 				" remaining_data_length=%d\n",
--				i, j*max_iov_size, size, remaining_data_length);
-+				i, j*max_iov_size+offset, size,
-+				remaining_data_length);
- 			rc = smbd_post_send_page(
--				info, rqst->rq_pages[i], j*max_iov_size,
-+				info, rqst->rq_pages[i],
-+				j*max_iov_size + offset,
- 				size, remaining_data_length);
- 			if (rc)
- 				goto done;
++	return NULL;
++}
++
++struct cifs_writedata *
++cifs_writedata_direct_alloc(struct page **pages, work_func_t complete)
++{
+ 	struct cifs_writedata *wdata;
+ 
+-	/* writedata + number of page pointers */
+-	wdata = kzalloc(sizeof(*wdata) +
+-			sizeof(struct page *) * nr_pages, GFP_NOFS);
++	wdata = kzalloc(sizeof(*wdata), GFP_NOFS);
+ 	if (wdata != NULL) {
++		wdata->pages = pages;
+ 		kref_init(&wdata->refcount);
+ 		INIT_LIST_HEAD(&wdata->list);
+ 		init_completion(&wdata->done);
 -- 
 2.7.4
