@@ -1,87 +1,96 @@
-From: Greg Thelen <gthelen@google.com>
-Subject: Re: [PATCH] IB: Revert "remove redundant INFINIBAND kconfig dependencies"
-Date: Mon, 28 May 2018 11:02:40 -0700
-Message-ID: <xr931sdv64lb.fsf@gthelen.svl.corp.google.com>
-References: <20180525213123.2113748-1-arnd@arndb.de> <CAHH2K0Ysgi30gHPN8EEdDa+PfSFJLo8=6j-aq=SYy=_h6K0kPg@mail.gmail.com>
- <20180528163949.GA17505@ziepe.ca>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
-Cc: arnd@arndb.de, Doug Ledford <dledford@redhat.com>,
-        Keith Busch <keith.busch@intel.com>, Jens Axboe <axboe@fb.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>, oleg.drokin@intel.com,
-        andreas.dilger@intel.com, jsimmons@infradead.org,
-        gregkh@linuxfoundation.org, Steve French <sfrench@samba.org>,
-        ericvh@gmail.com, rminnich@sandia.gov, lucho@ionkov.net,
-        "David S. Miller" <davem@davemloft.net>,
-        santosh.shilimkar@oracle.com, trond.myklebust@hammerspace.com,
-        anna.schumaker@netapp.com, bfields@fieldses.org,
-        jlayton@kernel.org, Bart Van Assche <bart.vanassche@wdc.com>,
-        linux-rdma@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        linux-nvme@lists.infradead.org, lustre-devel@lists.lustre.org,
-        devel@driverdev.osuosl.org, linux-cifs@vger.kernel.org,
-        samba-techni
-To: Jason Gunthorpe <jgg@ziepe.ca>
+From: Long Li <longli@linuxonhyperv.com>
+Subject: [Patch v2 02/15] CIFS: Add support for direct pages in rdata
+Date: Wed, 30 May 2018 12:47:54 -0700
+Message-ID: <20180530194807.31657-3-longli@linuxonhyperv.com>
+References: <20180530194807.31657-1-longli@linuxonhyperv.com>
+Reply-To: longli@microsoft.com
+Cc: Long Li <longli@microsoft.com>
+To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+        linux-rdma@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180528163949.GA17505@ziepe.ca>
+In-Reply-To: <20180530194807.31657-1-longli@linuxonhyperv.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Jason Gunthorpe <jgg@ziepe.ca> wrote:
+From: Long Li <longli@microsoft.com>
 
-> On Fri, May 25, 2018 at 05:32:52PM -0700, Greg Thelen wrote:
->> On Fri, May 25, 2018 at 2:32 PM Arnd Bergmann <arnd@arndb.de> wrote:
+Add a function to allocate rdata without allocating pages for data
+transfer. This gives the caller an option to pass a number of pages
+that point to the data buffer.
 
->> > Several subsystems depend on INFINIBAND_ADDR_TRANS, which in turn  
->> depends
->> > on INFINIBAND. However, when with CONFIG_INIFIBAND=m, this leads to a
->> > link error when another driver using it is built-in. The
->> > INFINIBAND_ADDR_TRANS dependency is insufficient here as this is
->> > a 'bool' symbol that does not force anything to be a module in turn.
+rdata is still reponsible for free those pages after it's done.
 
->> > fs/cifs/smbdirect.o: In function `smbd_disconnect_rdma_work':
->> > smbdirect.c:(.text+0x1e4): undefined reference to `rdma_disconnect'
->> > net/9p/trans_rdma.o: In function `rdma_request':
->> > trans_rdma.c:(.text+0x7bc): undefined reference to `rdma_disconnect'
->> > net/9p/trans_rdma.o: In function `rdma_destroy_trans':
->> > trans_rdma.c:(.text+0x830): undefined reference to `ib_destroy_qp'
->> > trans_rdma.c:(.text+0x858): undefined reference to `ib_dealloc_pd'
+Signed-off-by: Long Li <longli@microsoft.com>
+---
+ fs/cifs/cifsglob.h |  2 +-
+ fs/cifs/file.c     | 23 ++++++++++++++++++++---
+ 2 files changed, 21 insertions(+), 4 deletions(-)
 
->> > Fixes: 9533b292a7ac ("IB: remove redundant INFINIBAND kconfig
->> dependencies")
->> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-
->> Acked-by: Greg Thelen <gthelen@google.com>
-
->> Sorry for the 9533b292a7ac problem.
->> At this point the in release cycle, I think Arnd's revert is best.
-
->> If there is interest, I've put a little thought into an alternative fix:
->> making INFINIBAND_ADDR_TRANS tristate.  But it's nontrivial.
->> So I prefer this simple revert for now.
-
-> Is that a normal thing to do?
-
-For me: no, it's not normal.  In my use case I merely want to disable
-INFINIBAND_ADDR_TRANS while continuing to use INFINIBAND.  This is
-supported with f7cb7b85be55 ("IB: make INFINIBAND_ADDR_TRANS
-configurable").
-
-During f7cb7b85be55 development https://lkml.org/lkml/2018/4/30/1073
-suggested that we drop dependency on both INFINIBAND and
-INFINIBAND_ADDR_TRANS.  Thus 9533b292a7ac ("IB: remove redundant
-INFINIBAND kconfig dependencies").
-
-But 9533b292a7ac led to the randconfig build errors reported and thus
-("IB: Revert "remove redundant INFINIBAND kconfig dependencies"").
-
-So I see no need to do anything more than apply ("IB: Revert "remove
-redundant INFINIBAND kconfig dependencies"").
-
->> Doug: do you need anything from me on this?
-
-> I can take the revert..
-
-> Jason
-
-Thanks.
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 8d16c3e..56864a87 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -1179,7 +1179,7 @@ struct cifs_readdata {
+ 	unsigned int			tailsz;
+ 	unsigned int			credits;
+ 	unsigned int			nr_pages;
+-	struct page			*pages[];
++	struct page			**pages;
+ };
+ 
+ struct cifs_writedata;
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 23fd430..1c98293 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -2880,13 +2880,13 @@ cifs_strict_writev(struct kiocb *iocb, struct iov_iter *from)
+ }
+ 
+ static struct cifs_readdata *
+-cifs_readdata_alloc(unsigned int nr_pages, work_func_t complete)
++cifs_readdata_direct_alloc(struct page **pages, work_func_t complete)
+ {
+ 	struct cifs_readdata *rdata;
+ 
+-	rdata = kzalloc(sizeof(*rdata) + (sizeof(struct page *) * nr_pages),
+-			GFP_KERNEL);
++	rdata = kzalloc(sizeof(*rdata), GFP_KERNEL);
+ 	if (rdata != NULL) {
++		rdata->pages = pages;
+ 		kref_init(&rdata->refcount);
+ 		INIT_LIST_HEAD(&rdata->list);
+ 		init_completion(&rdata->done);
+@@ -2896,6 +2896,22 @@ cifs_readdata_alloc(unsigned int nr_pages, work_func_t complete)
+ 	return rdata;
+ }
+ 
++static struct cifs_readdata *
++cifs_readdata_alloc(unsigned int nr_pages, work_func_t complete)
++{
++	struct page **pages =
++		kzalloc(sizeof(struct page *) * nr_pages, GFP_KERNEL);
++	struct cifs_readdata *ret = NULL;
++
++	if (pages) {
++		ret = cifs_readdata_direct_alloc(pages, complete);
++		if (!ret)
++			kfree(pages);
++	}
++
++	return ret;
++}
++
+ void
+ cifs_readdata_release(struct kref *refcount)
+ {
+@@ -2910,6 +2926,7 @@ cifs_readdata_release(struct kref *refcount)
+ 	if (rdata->cfile)
+ 		cifsFileInfo_put(rdata->cfile);
+ 
++	kvfree(rdata->pages);
+ 	kfree(rdata);
+ }
+ 
+-- 
+2.7.4
