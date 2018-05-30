@@ -1,7 +1,7 @@
 From: Long Li <longli@linuxonhyperv.com>
-Subject: [Patch v2 13/15] CIFS: Add support for direct I/O read
-Date: Wed, 30 May 2018 12:48:05 -0700
-Message-ID: <20180530194807.31657-14-longli@linuxonhyperv.com>
+Subject: [Patch v2 06/15] CIFS: Introduce helper function to get page offset and length in smb_rqst
+Date: Wed, 30 May 2018 12:47:58 -0700
+Message-ID: <20180530194807.31657-7-longli@linuxonhyperv.com>
 References: <20180530194807.31657-1-longli@linuxonhyperv.com>
 Reply-To: longli@microsoft.com
 Cc: Long Li <longli@microsoft.com>
@@ -15,193 +15,52 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-Implement the function for direct I/O read. It doesn't support AIO, which
-will be implemented in a follow up patch.
+Introduce a function rqst_page_get_length to return the page offset and
+length for a given page in smb_rqst. This function is to be used by
+following patches.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/cifsfs.h |   1 +
- fs/cifs/file.c   | 149 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 150 insertions(+)
+ fs/cifs/cifsproto.h |  3 +++
+ fs/cifs/misc.c      | 17 +++++++++++++++++
+ 2 files changed, 20 insertions(+)
 
-diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
-index 5f02318..7fba9aa 100644
---- a/fs/cifs/cifsfs.h
-+++ b/fs/cifs/cifsfs.h
-@@ -102,6 +102,7 @@ extern int cifs_open(struct inode *inode, struct file *file);
- extern int cifs_close(struct inode *inode, struct file *file);
- extern int cifs_closedir(struct inode *inode, struct file *file);
- extern ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to);
-+extern ssize_t cifs_direct_readv(struct kiocb *iocb, struct iov_iter *to);
- extern ssize_t cifs_strict_readv(struct kiocb *iocb, struct iov_iter *to);
- extern ssize_t cifs_user_writev(struct kiocb *iocb, struct iov_iter *from);
- extern ssize_t cifs_strict_writev(struct kiocb *iocb, struct iov_iter *from);
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 87eece6..e6e6f24 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -2955,6 +2955,18 @@ cifs_read_allocate_pages(struct cifs_readdata *rdata, unsigned int nr_pages)
- 	return rc;
- }
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 7933c5f..89dda14 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -557,4 +557,7 @@ int cifs_alloc_hash(const char *name, struct crypto_shash **shash,
+ 		    struct sdesc **sdesc);
+ void cifs_free_hash(struct crypto_shash **shash, struct sdesc **sdesc);
  
-+static void cifs_direct_readdata_release(struct kref *refcount)
-+{
-+	struct cifs_readdata *rdata = container_of(refcount,
-+					struct cifs_readdata, refcount);
-+	unsigned int i;
++extern void rqst_page_get_length(struct smb_rqst *rqst, unsigned int page,
++				unsigned int *len, unsigned int *offset);
 +
-+	for (i = 0; i < rdata->nr_pages; i++)
-+		put_page(rdata->pages[i]);
-+
-+	cifs_readdata_release(refcount);
-+}
-+
- static void
- cifs_uncached_readdata_release(struct kref *refcount)
- {
-@@ -3267,6 +3279,143 @@ collect_uncached_read_data(struct cifs_aio_ctx *ctx)
- 		complete(&ctx->done);
+ #endif			/* _CIFSPROTO_H */
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index 96849b5..e951417 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -905,3 +905,20 @@ cifs_free_hash(struct crypto_shash **shash, struct sdesc **sdesc)
+ 		crypto_free_shash(*shash);
+ 	*shash = NULL;
  }
- 
-+static void cifs_direct_readv_complete(struct work_struct *work)
++
++/**
++ * rqst_page_get_length - obtain the length and offset for a page in smb_rqst
++ * Input: rqst - a smb_rqst, page - a page index for rqst
++ * Output: *len - the length for this page, *offset - the offset for this page
++ */
++void rqst_page_get_length(struct smb_rqst *rqst, unsigned int page,
++				unsigned int *len, unsigned int *offset)
 +{
-+	struct cifs_readdata *rdata =
-+		container_of(work, struct cifs_readdata, work);
++	*len = rqst->rq_pagesz;
++	*offset = (page == 0) ? rqst->rq_offset : 0;
 +
-+	complete(&rdata->done);
-+	kref_put(&rdata->refcount, cifs_direct_readdata_release);
++	if (rqst->rq_npages == 1 || page == rqst->rq_npages-1)
++		*len = rqst->rq_tailsz;
++	else if (page == 0)
++		*len = rqst->rq_pagesz - rqst->rq_offset;
 +}
-+
-+ssize_t cifs_direct_readv(struct kiocb *iocb, struct iov_iter *to)
-+{
-+	size_t len, cur_len, start;
-+	unsigned int npages, rsize, credits;
-+	struct file *file;
-+	struct cifs_sb_info *cifs_sb;
-+	struct cifsFileInfo *cfile;
-+	struct cifs_tcon *tcon;
-+	struct page **pagevec;
-+	ssize_t rc, total_read = 0;
-+	struct TCP_Server_Info *server;
-+	loff_t offset = iocb->ki_pos;
-+	pid_t pid;
-+	struct cifs_readdata *rdata;
-+
-+	/*
-+	 * iov_iter_get_pages_alloc() doesn't work with ITER_KVEC,
-+	 * fall back to data copy read path
-+	 */
-+	if (to->type & ITER_KVEC) {
-+		cifs_dbg(FYI, "use non-direct cifs_user_readv for kvec I/O\n");
-+		return cifs_user_readv(iocb, to);
-+	}
-+
-+	len = iov_iter_count(to);
-+	if (!len)
-+		return 0;
-+
-+	file = iocb->ki_filp;
-+	cifs_sb = CIFS_FILE_SB(file);
-+	cfile = file->private_data;
-+	tcon = tlink_tcon(cfile->tlink);
-+	server = tcon->ses->server;
-+
-+	if (!server->ops->async_readv)
-+		return -ENOSYS;
-+
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
-+		pid = cfile->pid;
-+	else
-+		pid = current->tgid;
-+
-+	if ((file->f_flags & O_ACCMODE) == O_WRONLY)
-+		cifs_dbg(FYI, "attempting read on write only file instance\n");
-+
-+	do {
-+		rc = server->ops->wait_mtu_credits(server, cifs_sb->rsize,
-+					&rsize, &credits);
-+		if (rc)
-+			break;
-+
-+		cur_len = min_t(const size_t, len, rsize);
-+
-+		rc = iov_iter_get_pages_alloc(to, &pagevec, cur_len, &start);
-+		if (rc < 0) {
-+			cifs_dbg(VFS,
-+				"couldn't get user pages (rc=%zd) iter type %d"
-+				" iov_offset %lu count %lu\n",
-+				rc, to->type, to->iov_offset, to->count);
-+			dump_stack();
-+			break;
-+		}
-+
-+		rdata = cifs_readdata_direct_alloc(
-+				pagevec, cifs_direct_readv_complete);
-+		if (!rdata) {
-+			add_credits_and_wake_if(server, credits, 0);
-+			rc = -ENOMEM;
-+			break;
-+		}
-+
-+		npages = (rc + start + PAGE_SIZE-1) / PAGE_SIZE;
-+		rdata->nr_pages = npages;
-+		rdata->page_offset = start;
-+		rdata->pagesz = PAGE_SIZE;
-+		rdata->tailsz = npages > 1 ?
-+				rc-(PAGE_SIZE-start)-(npages-2)*PAGE_SIZE :
-+				rc;
-+		cur_len = rc;
-+
-+		rdata->cfile = cifsFileInfo_get(cfile);
-+		rdata->offset = offset;
-+		rdata->bytes = rc;
-+		rdata->pid = pid;
-+		rdata->read_into_pages = cifs_uncached_read_into_pages;
-+		rdata->copy_into_pages = cifs_uncached_copy_into_pages;
-+		rdata->credits = credits;
-+
-+		rc = 0;
-+		if (rdata->cfile->invalidHandle)
-+			rc = cifs_reopen_file(rdata->cfile, true);
-+
-+		if (!rc)
-+			rc = server->ops->async_readv(rdata);
-+
-+		if (rc) {
-+			add_credits_and_wake_if(server, rdata->credits, 0);
-+			kref_put(&rdata->refcount,
-+				 cifs_direct_readdata_release);
-+			if (rc == -EAGAIN)
-+				continue;
-+			break;
-+		}
-+
-+		wait_for_completion(&rdata->done);
-+		rc = rdata->result;
-+		if (rc) {
-+			kref_put(
-+				&rdata->refcount,
-+				cifs_direct_readdata_release);
-+			if (rc == -EAGAIN)
-+				continue;
-+			break;
-+		}
-+
-+		total_read += rdata->got_bytes;
-+		kref_put(&rdata->refcount, cifs_direct_readdata_release);
-+
-+		iov_iter_advance(to, cur_len);
-+		len -= cur_len;
-+		offset += cur_len;
-+	} while (len);
-+
-+	iocb->ki_pos += total_read;
-+
-+	return total_read;
-+}
-+
- ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to)
- {
- 	struct file *file = iocb->ki_filp;
 -- 
 2.7.4
