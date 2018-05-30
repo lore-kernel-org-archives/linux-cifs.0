@@ -1,94 +1,126 @@
-From: Long Li <longli@linuxonhyperv.com>
-Subject: [Patch v2 09/15] CIFS: SMBD: Support page offset in RDMA recv
-Date: Wed, 30 May 2018 12:48:01 -0700
-Message-ID: <20180530194807.31657-10-longli@linuxonhyperv.com>
+From: "Ruhl, Michael J" <michael.j.ruhl@intel.com>
+Subject: RE: [Patch v2 02/15] CIFS: Add support for direct pages in rdata
+Date: Wed, 30 May 2018 20:27:57 +0000
+Message-ID: <14063C7AD467DE4B82DEDB5C278E8663B38F01CD@FMSMSX108.amr.corp.intel.com>
 References: <20180530194807.31657-1-longli@linuxonhyperv.com>
-Reply-To: longli@microsoft.com
-Cc: Long Li <longli@microsoft.com>
-To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-        linux-rdma@vger.kernel.org
+ <20180530194807.31657-3-longli@linuxonhyperv.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+To: "longli@microsoft.com" <longli@microsoft.com>,
+        Steve French <sfrench@samba.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180530194807.31657-1-longli@linuxonhyperv.com>
+In-Reply-To: <20180530194807.31657-3-longli@linuxonhyperv.com>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-From: Long Li <longli@microsoft.com>
+>-----Original Message-----
+>From: linux-rdma-owner@vger.kernel.org [mailto:linux-rdma-
+>owner@vger.kernel.org] On Behalf Of Long Li
+>Sent: Wednesday, May 30, 2018 3:48 PM
+>To: Steve French <sfrench@samba.org>; linux-cifs@vger.kernel.org; samba-
+>technical@lists.samba.org; linux-kernel@vger.kernel.org; linux-
+>rdma@vger.kernel.org
+>Cc: Long Li <longli@microsoft.com>
+>Subject: [Patch v2 02/15] CIFS: Add support for direct pages in rdata
+>
+>From: Long Li <longli@microsoft.com>
+>
+>Add a function to allocate rdata without allocating pages for data
+>transfer. This gives the caller an option to pass a number of pages
+>that point to the data buffer.
+>
+>rdata is still reponsible for free those pages after it's done.
+>
+>Signed-off-by: Long Li <longli@microsoft.com>
+>---
+> fs/cifs/cifsglob.h |  2 +-
+> fs/cifs/file.c     | 23 ++++++++++++++++++++---
+> 2 files changed, 21 insertions(+), 4 deletions(-)
+>
+>diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+>index 8d16c3e..56864a87 100644
+>--- a/fs/cifs/cifsglob.h
+>+++ b/fs/cifs/cifsglob.h
+>@@ -1179,7 +1179,7 @@ struct cifs_readdata {
+> 	unsigned int			tailsz;
+> 	unsigned int			credits;
+> 	unsigned int			nr_pages;
+>-	struct page			*pages[];
+>+	struct page			**pages;
+> };
+>
+> struct cifs_writedata;
+>diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+>index 23fd430..1c98293 100644
+>--- a/fs/cifs/file.c
+>+++ b/fs/cifs/file.c
+>@@ -2880,13 +2880,13 @@ cifs_strict_writev(struct kiocb *iocb, struct
+>iov_iter *from)
+> }
+>
+> static struct cifs_readdata *
+>-cifs_readdata_alloc(unsigned int nr_pages, work_func_t complete)
+>+cifs_readdata_direct_alloc(struct page **pages, work_func_t complete)
+> {
+> 	struct cifs_readdata *rdata;
+>
+>-	rdata = kzalloc(sizeof(*rdata) + (sizeof(struct page *) * nr_pages),
+>-			GFP_KERNEL);
+>+	rdata = kzalloc(sizeof(*rdata), GFP_KERNEL);
+> 	if (rdata != NULL) {
+>+		rdata->pages = pages;
+> 		kref_init(&rdata->refcount);
+> 		INIT_LIST_HEAD(&rdata->list);
+> 		init_completion(&rdata->done);
+>@@ -2896,6 +2896,22 @@ cifs_readdata_alloc(unsigned int nr_pages,
+>work_func_t complete)
+> 	return rdata;
+> }
+>
+>+static struct cifs_readdata *
+>+cifs_readdata_alloc(unsigned int nr_pages, work_func_t complete)
+>+{
+>+	struct page **pages =
+>+		kzalloc(sizeof(struct page *) * nr_pages, GFP_KERNEL);
+>+	struct cifs_readdata *ret = NULL;
+>+
+>+	if (pages) {
+>+		ret = cifs_readdata_direct_alloc(pages, complete);
+>+		if (!ret)
+>+			kfree(pages);
+>+	}
+>+
+>+	return ret;
+>+}
+>+
+> void
+> cifs_readdata_release(struct kref *refcount)
+> {
+>@@ -2910,6 +2926,7 @@ cifs_readdata_release(struct kref *refcount)
+> 	if (rdata->cfile)
+> 		cifsFileInfo_put(rdata->cfile);
+>
+>+	kvfree(rdata->pages);
 
-RDMA recv function needs to place data to the correct place starting at
-page offset.
+Is the kvfree() correct?
 
-Signed-off-by: Long Li <longli@microsoft.com>
----
- fs/cifs/smbdirect.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+You use kzalloc() and kfree in cifs_readdata_alloc().
 
-diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index 6141e3c..ba53c52 100644
---- a/fs/cifs/smbdirect.c
-+++ b/fs/cifs/smbdirect.c
-@@ -2004,10 +2004,12 @@ static int smbd_recv_buf(struct smbd_connection *info, char *buf,
-  * return value: actual data read
-  */
- static int smbd_recv_page(struct smbd_connection *info,
--		struct page *page, unsigned int to_read)
-+		struct page *page, unsigned int page_offset,
-+		unsigned int to_read)
- {
- 	int ret;
- 	char *to_address;
-+	void *page_address;
- 
- 	/* make sure we have the page ready for read */
- 	ret = wait_event_interruptible(
-@@ -2015,16 +2017,17 @@ static int smbd_recv_page(struct smbd_connection *info,
- 		info->reassembly_data_length >= to_read ||
- 			info->transport_status != SMBD_CONNECTED);
- 	if (ret)
--		return 0;
-+		return ret;
- 
- 	/* now we can read from reassembly queue and not sleep */
--	to_address = kmap_atomic(page);
-+	page_address = kmap_atomic(page);
-+	to_address = (char *) page_address + page_offset;
- 
- 	log_read(INFO, "reading from page=%p address=%p to_read=%d\n",
- 		page, to_address, to_read);
- 
- 	ret = smbd_recv_buf(info, to_address, to_read);
--	kunmap_atomic(to_address);
-+	kunmap_atomic(page_address);
- 
- 	return ret;
- }
-@@ -2038,7 +2041,7 @@ int smbd_recv(struct smbd_connection *info, struct msghdr *msg)
- {
- 	char *buf;
- 	struct page *page;
--	unsigned int to_read;
-+	unsigned int to_read, page_offset;
- 	int rc;
- 
- 	info->smbd_recv_pending++;
-@@ -2052,15 +2055,16 @@ int smbd_recv(struct smbd_connection *info, struct msghdr *msg)
- 
- 	case READ | ITER_BVEC:
- 		page = msg->msg_iter.bvec->bv_page;
-+		page_offset = msg->msg_iter.bvec->bv_offset;
- 		to_read = msg->msg_iter.bvec->bv_len;
--		rc = smbd_recv_page(info, page, to_read);
-+		rc = smbd_recv_page(info, page, page_offset, to_read);
- 		break;
- 
- 	default:
- 		/* It's a bug in upper layer to get there */
- 		cifs_dbg(VFS, "CIFS: invalid msg type %d\n",
- 			msg->msg_iter.type);
--		rc = -EIO;
-+		rc = -EINVAL;
- 	}
- 
- 	info->smbd_recv_pending--;
--- 
-2.7.4
+Mike
+
+> 	kfree(rdata);
+> }
+>
+>--
+>2.7.4
+>
+>--
+>To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
+>the body of a message to majordomo@vger.kernel.org
+>More majordomo info at  http://vger.kernel.org/majordomo-info.html
