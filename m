@@ -1,153 +1,66 @@
-From: Ben Hutchings <ben@decadent.org.uk>
-Subject: [PATCH 3.16 014/410] cifs: empty TargetInfo leads to crash on
- recovery
-Date: Thu, 07 Jun 2018 15:05:21 +0100
-Message-ID: <lsq.1528380321.274417251@decadent.org.uk>
-References: <lsq.1528380320.647747352@decadent.org.uk>
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: linux-next: manual merge of the cifs tree with Linus' tree
+Date: Thu, 14 Jun 2018 09:01:35 +1000
+Message-ID: <20180614090135.1d71babb@canb.auug.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: akpm@linux-foundation.org, "Steve French" <sfrench@samba.org>,
-        linux-cifs@vger.kernel.org, "Dan Aloni" <dan@kernelim.com>
-To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/mcQV8Nlb9b44/qk3AS7rt9G"; protocol="application/pgp-signature"
+Cc: Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Aurelien Aptel <aaptel@suse.com>
+To: Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <lsq.1528380320.647747352@decadent.org.uk>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-3.16.57-rc1 review patch.  If anyone has any objections, please let me know.
+--Sig_/mcQV8Nlb9b44/qk3AS7rt9G
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-------------------
+Hi all,
 
-From: Dan Aloni <dan@kernelim.com>
+Today's linux-next merge of the cifs tree got a conflict in:
 
-commit cabfb3680f78981d26c078a26e5c748531257ebb upstream.
+  fs/cifs/transport.c
 
-[ resend from Oct 20, 2014, see [1] ]
+between commit:
 
-A trivially patched Samba server (see [2] [3]) can cause a remote kernel
-crash (see [4]) in a client's CIFS kernel module upon session recovery,
-under kernels prior to v4.11.  The server patch can made by a single
-source line modification - returning an empty TargetInfo in an NTLMSSP
-setup negotiation response.
+  6da2ec56059c ("treewide: kmalloc() -> kmalloc_array()")
 
-To reproduce at the client side, the CIFS client can be instructed to
-mount with SMB 2.0, on a share without user/password credentials, e.g:
+from Linus' tree and commit:
 
-     mount -t cifs //[host]/[share] -o vers=2.0,guest [mountpoint]
+  1560d69e21c6 ("cifs: push rfc1002 generation down the stack")
 
-(It may also reproduce with credentials, but I used a simpler
- configuration for the reproduction)
+from the cifs tree.
 
-An demo patch to Samba 4.7.4 is provided in the links provided.
+I fixed it up (the latter removed the code modified by the former) and
+can carry the fix as necessary. This is now fixed as far as linux-next
+is concerned, but any non trivial conflicts should be mentioned to your
+upstream maintainer when your tree is submitted for merging.  You may
+also want to consider cooperating with the maintainer of the conflicting
+tree to minimise any particularly complex conflicts.
 
-As for the client crash itself:
+--=20
+Cheers,
+Stephen Rothwell
 
-When the session is recovered (after a server start/stop, for example),
-the following condition turns out to be true:
+--Sig_/mcQV8Nlb9b44/qk3AS7rt9G
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-     ses->auth_key.len != 0  &&  ses->auth_key.response == NULL
+-----BEGIN PGP SIGNATURE-----
 
-This will cause the following memcpy() in setup_ntlmv2_rsp() to GPF,
-because tiblob == NULL and tilen != 0 (these are the old auth_key values):
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAlshok8ACgkQAVBC80lX
+0GyVVwf/Zu5962r/VKaPnoz1YP+fVgX/pX0ZxnhRduSQzlM02aIo+/TNGPKxy/DJ
+s3J3d543a24CIlUaJnbh77m4U1wRLQNWrv0E0ccOx5y1ZHV7s+lR5zighduAbWCH
+OThIkScNDKzFOAT0iGi0KS1sl6DVQ5PrS6ToICIODGIx2zBBI4zPcewnSn95PsjH
++QXPebqSFdZthuK9jm9SJ6AHTS3tCif9t+GT5oDvCHft+2USjJM0AwJs+z5PmmTc
+4b6inPZ/3sCBoMU3Wc+sTRL0hSZWxpAlLmqRqOfI/jsPn+/PZACwHgu4zPij4a7U
+GCuNwTQjSmSlOjo9/zP4mFG0lQHxbg==
+=TNAm
+-----END PGP SIGNATURE-----
 
-     memcpy(ses->auth_key.response + baselen, tiblob, tilen);
-
-By bisecting, upstream commit cabfb3680f78 ("CIFS: Enable encryption
-during session setup phase") from v4.11 have fixed this issue.
-
-According to my tests, LTS kernels versions 4.4.x and 4.9.x are affected.
-The patch below applies for 4.4.x however a similar patch can be applied
-to 4.9.x and older kernels.
-
-Signed-off-by: Dan Aloni <dan@kernelim.com>
-CC: Steve French <sfrench@samba.org>
-CC: linux-cifs@vger.kernel.org
-CC: linux-kernel@vger.kernel.org
-
-[1]
-https://patchwork.kernel.org/patch/5106391/
-
-[2] (temporary url)
-http://copr-dist-git.fedorainfracloud.org/cgit/alonid/samba-for-client-crash-repro/samba.git/tree/0001-Patch.patch?id=43229c84abe008bfc11aa86f5bacb03a1e54f88c
-
-[3] (temporary url)
-https://copr.fedorainfracloud.org/coprs/alonid/samba-for-client-crash-repro/
-
-[4]
-[ 3414.518134] BUG: unable to handle kernel NULL pointer dereference at           (null)
-[ 3414.518200] IP: memcpy_erms+0x6/0x10
-[ 3414.518227] PGD 0
-
-[ 3414.518252] Oops: 0000 [#1] SMP
-[ 3414.518272] Modules linked in: arc4 md4 cifs rpcsec_gss_krb5 nfsv4 dns_resolver nfs fscache ip6t_rpfilter ip6t_REJECT nf_reject_ipv6 xt_conntrack ip_set nfnetlink ebtable_nat ebtable_broute bridge stp llc ip6table_nat nf_conntrack_ipv6 nf_defrag_ipv6 nf_nat_ipv6 ip6table_mangle ip6table_security ip6table_raw iptable_nat nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4 nf_nat nf_conntrack iptable_mangle iptable_security iptable_raw ebtable_filter ebtables ip6table_filter ip6_tables snd_hda_codec_generic ppdev snd_hda_intel snd_hda_codec crct10dif_pclmul crc32_pclmul snd_hwdep snd_hda_core ghash_clmulni_intel snd_seq snd_seq_device snd_pcm joydev parport_pc tpm_tis parport tpm_tis_core tpm snd_timer snd soundcore qemu_fw_cfg virtio_balloon i2c_piix4 nfsd auth_rpcgss nfs_acl lockd grace sunrpc
-  xfs libcrc32c
-[ 3414.518708]  virtio_blk virtio_console virtio_net qxl drm_kms_helper ttm crc32c_intel drm ata_generic nvme serio_raw nvme_core virtio_pci virtio_ring virtio pata_acpi
-[ 3414.518803] CPU: 3 PID: 1697 Comm: kworker/3:1 Not tainted 4.10.0-rc6-dan-00097-ge765a3d89ede #20
-[ 3414.518852] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-2.fc27 04/01/2014
-[ 3414.518927] Workqueue: cifsiod smb2_reconnect_server [cifs]
-[ 3414.518960] task: ffff8cc6764a4000 task.stack: ffff9bc548808000
-[ 3414.518997] RIP: 0010:memcpy_erms+0x6/0x10
-[ 3414.519021] RSP: 0018:ffff9bc54880bbc8 EFLAGS: 00010296
-[ 3414.519051] RAX: ffff8cc6ba00d8dc RBX: ffff8cc676190400 RCX: 0000000000000010
-[ 3414.519091] RDX: 0000000000000010 RSI: 0000000000000000 RDI: ffff8cc6ba00d8dc
-[ 3414.519130] RBP: ffff9bc54880bc30 R08: ffff9bc54880bb58 R09: ffff9bc54880bb58
-[ 3414.519170] R10: 000000004619520e R11: 00000000f46cd8cf R12: 0000000000000000
-[ 3414.519209] R13: 0000000000000000 R14: ffff8cc6ba00d8a0 R15: 0000000000000010
-[ 3414.519250] FS:  0000000000000000(0000) GS:ffff8cc6bfd80000(0000) knlGS:0000000000000000
-[ 3414.519314] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[ 3414.519347] CR2: 0000000000000000 CR3: 000000007992a000 CR4: 00000000003406e0
-[ 3414.519392] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[ 3414.519431] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[ 3414.519470] Call Trace:
-[ 3414.519510]  ? setup_ntlmv2_rsp+0x124/0xa10 [cifs]
-[ 3414.519553]  build_ntlmssp_auth_blob+0x36/0x310 [cifs]
-[ 3414.519597]  SMB2_sess_auth_rawntlmssp_authenticate+0xc7/0x300 [cifs]
-[ 3414.519646]  SMB2_sess_setup+0x9a/0x140 [cifs]
-[ 3414.519685]  cifs_setup_session+0x78/0x100 [cifs]
-[ 3414.519722]  ? cifs_negotiate_protocol+0x84/0xd0 [cifs]
-[ 3414.519763]  smb2_reconnect+0x308/0x3e0 [cifs]
-[ 3414.519793]  ? __internal_add_timer+0x1f/0x60
-[ 3414.519831]  smb2_reconnect_server+0x187/0x260 [cifs]
-[ 3414.519863]  process_one_work+0x19e/0x440
-[ 3414.519887]  worker_thread+0x4e/0x4a0
-[ 3414.519910]  ? process_one_work+0x440/0x440
-[ 3414.519936]  kthread+0x11e/0x140
-[ 3414.520493]  ? kthread_park+0x90/0x90
-[ 3414.520989]  ret_from_fork+0x2c/0x40
-[ 3414.521450] Code: 78 ff ff ff 90 eb 1e 0f 1f 00 48 89 f8 48 89 d1 48 c1 e9 03 83 e2 07 f3 48 a5 89 d1 f3 a4 c3 66 0f 1f 44 00 00 48 89 f8 48 89 d1 <f3> a4 c3 0f 1f 80 00 00 00 00 48 89 f8 48 83 fa 20 72 7e 40 38
-[ 3414.522488] RIP: memcpy_erms+0x6/0x10 RSP: ffff9bc54880bbc8
-[ 3414.522964] CR2: 0000000000000000
-[ 3414.526127] ---[ end trace bbe4aa1e45cc6c17 ]---
-Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
----
- fs/cifs/smb2pdu.c | 3 +++
- 1 file changed, 3 insertions(+)
-
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -596,6 +596,7 @@ SMB2_sess_setup(const unsigned int xid,
- 	 */
- 	kfree(ses->auth_key.response);
- 	ses->auth_key.response = NULL;
-+	ses->auth_key.len = 0;
- 
- 	/*
- 	 * If memory allocation is successful, caller of this function
-@@ -756,6 +757,7 @@ ssetup_exit:
- 			rc = server->ops->generate_signingkey(ses);
- 			kfree(ses->auth_key.response);
- 			ses->auth_key.response = NULL;
-+			ses->auth_key.len = 0;
- 			if (rc) {
- 				cifs_dbg(FYI,
- 					"SMB3 session key generation failed\n");
-@@ -780,6 +782,7 @@ keygen_exit:
- 	if (!server->sign) {
- 		kfree(ses->auth_key.response);
- 		ses->auth_key.response = NULL;
-+		ses->auth_key.len = 0;
- 	}
- 	kfree(ses->ntlmssp);
- 
+--Sig_/mcQV8Nlb9b44/qk3AS7rt9G--
