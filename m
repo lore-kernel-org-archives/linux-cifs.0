@@ -1,71 +1,47 @@
-From: Ronnie Sahlberg <lsahlber@redhat.com>
-Subject: Re: linux-next: manual merge of the cifs tree with Linus' tree
-Date: Wed, 13 Jun 2018 23:37:42 -0400 (EDT)
-Message-ID: <1114776191.8123837.1528947462817.JavaMail.zimbra@redhat.com>
-References: <20180614090135.1d71babb@canb.auug.org.au> <CAH2r5msZ1Zi-MEqCE2eF-7Y50r=Kh4BUVYc6dwORC0iByJ+tBQ@mail.gmail.com>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Subject: [smb3] unreachable code and memory leaks
+Date: Mon, 18 Jun 2018 08:07:37 -0500
+Message-ID: <20180618130737.GA13880@embeddedor.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Aurelien Aptel <aaptel@suse.com>
-To: Steve French <smfrench@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+To: Steve French <sfrench@samba.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAH2r5msZ1Zi-MEqCE2eF-7Y50r=Kh4BUVYc6dwORC0iByJ+tBQ@mail.gmail.com>
+Content-Disposition: inline
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Steve,
+Hi Steve,
 
-Looks good. It builds and seems to work in my testing.
-Thanks.
+While doing some static analysis I came across the following piece of code at fs/cifs/smb2pdu.c:2017:
 
------ Original Message -----
-From: "Steve French" <smfrench@gmail.com>
-To: "Stephen Rothwell" <sfr@canb.auug.org.au>
-Cc: "CIFS" <linux-cifs@vger.kernel.org>, "Linux-Next Mailing List" <linux-next@vger.kernel.org>, "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>, "Kees Cook" <keescook@chromium.org>, "Ronnie Sahlberg" <lsahlber@redhat.com>, "Aurelien Aptel" <aaptel@suse.com>
-Sent: Thursday, 14 June, 2018 10:40:43 AM
-Subject: Re: linux-next: manual merge of the cifs tree with Linus' tree
+2017                if (n_iov > 2) {
+2018                        struct create_context *ccontext =
+2019                            (struct create_context *)iov[n_iov-1].iov_base;
+2020                        ccontext->Next =
+2021                                cpu_to_le32(iov[n_iov-1].iov_len);
+2022                }
 
-Ronnie,
+The code above is unreachable because n_iov is initialized to 2 and, its value is never updated.
+I'm not sure how to fix this.
 
-I fixed up that patch and repushed to cifs-2.6.git for-next.  Seems
-trivial. Let me know if any issues.
+Also, it seems there are multiple places in which memory allocated for *path* is leaking:
 
-On Wed, Jun 13, 2018 at 6:01 PM, Stephen Rothwell <sfr@canb.auug.org.au> wrote:
-> Hi all,
->
-> Today's linux-next merge of the cifs tree got a conflict in:
->
->   fs/cifs/transport.c
->
-> between commit:
->
->   6da2ec56059c ("treewide: kmalloc() -> kmalloc_array()")
->
-> from Linus' tree and commit:
->
->   1560d69e21c6 ("cifs: push rfc1002 generation down the stack")
->
-> from the cifs tree.
->
-> I fixed it up (the latter removed the code modified by the former) and
-> can carry the fix as necessary. This is now fixed as far as linux-next
-> is concerned, but any non trivial conflicts should be mentioned to your
-> upstream maintainer when your tree is submitted for merging.  You may
-> also want to consider cooperating with the maintainer of the conflicting
-> tree to minimise any particularly complex conflicts.
->
-> --
-> Cheers,
-> Stephen Rothwell
+1946        else
+1947                return -EIO;
 
+1951        if (rc)
+1952                return rc;
 
+1987                if (rc) {
+1988                        cifs_small_buf_release(req);
+1989                        return rc;
+1990                }
 
--- 
-Thanks,
+and more...
 
-Steve
+Thanks
+--
+Gustavo
