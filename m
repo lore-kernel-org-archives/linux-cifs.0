@@ -1,171 +1,34 @@
-From: Steve French <smfrench@gmail.com>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
 Subject: Re: [PATCH] CIFS: fix structurally dead code in smb311_posix_mkdir
-Date: Thu, 21 Jun 2018 11:59:10 -0500
-Message-ID: <CAH2r5mur0tSLZiUkThB8b5fKbaDyguXT87f5J+V1buCv-Ep73g@mail.gmail.com>
+Date: Thu, 21 Jun 2018 12:36:11 -0500
+Message-ID: <8474f81b-2471-db10-1893-dc9784a4f8ee@embeddedor.com>
 References: <20180621133523.GA30313@embeddedor.com>
+ <CAH2r5mur0tSLZiUkThB8b5fKbaDyguXT87f5J+V1buCv-Ep73g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="000000000000c41a7b056f29d63e"
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Cc: Aurelien Aptel <aaptel@suse.com>, Steve French <sfrench@samba.org>,
         CIFS <linux-cifs@vger.kernel.org>,
         samba-technical <samba-technical@lists.samba.org>,
         LKML <linux-kernel@vger.kernel.org>
-To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+To: Steve French <smfrench@gmail.com>,
         Dan Carpenter <dan.carpenter@oracle.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180621133523.GA30313@embeddedor.com>
+In-Reply-To: <CAH2r5mur0tSLZiUkThB8b5fKbaDyguXT87f5J+V1buCv-Ep73g@mail.gmail.com>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
---000000000000c41a7b056f29d63e
-Content-Type: text/plain; charset="UTF-8"
-
-Folded this patch and the equivalent one from Dan in with the comments
-from Aurelien  into one patch and repushed to cifs-2.6.git for-next -
-see attached.
-
-On Thu, Jun 21, 2018 at 8:35 AM, Gustavo A. R. Silva
-<gustavo@embeddedor.com> wrote:
-> Code at line: 1950: rc = -EIO; is unreachable. Hence, the function
-> returns rc with a value of zero and, this is not the actual intention
-> of this particular piece of code.
->
-> Fix this by placing the goto instruction just after the update to rc.
->
-> Addresses-Coverity-ID: 1470124 ("Structurally dead code")
-> Fixes: 5539e9b24a38 ("CIFS: fix memory leak and remove dead code")
-> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
-> ---
->  fs/cifs/smb2pdu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 062a2a5..c9489b1 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -1946,8 +1946,8 @@ int smb311_posix_mkdir(const unsigned int xid, struct inode *inode,
->         if (ses && (ses->server))
->                 server = ses->server;
->         else {
-> -               goto err_free_path;
->                 rc = -EIO;
-> +               goto err_free_path;
->         }
->
->         /* resource #2: request */
-> --
-> 2.7.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
+On 06/21/2018 11:59 AM, Steve French wrote:
+> Folded this patch and the equivalent one from Dan in with the comments
+> from Aurelien  into one patch and repushed to cifs-2.6.git for-next -
+> see attached.
+> 
 
--- 
-Thanks,
+Fine. You can add my Signed-off-by
 
-Steve
-
---000000000000c41a7b056f29d63e
-Content-Type: text/x-patch; charset="US-ASCII";
-	name="0001-CIFS-fix-memory-leak-and-remove-dead-code.patch"
-Content-Disposition: attachment;
-	filename="0001-CIFS-fix-memory-leak-and-remove-dead-code.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_jiosjx850
-
-RnJvbSBmODc3Mzg2ZDM3Mzc1M2M4M2Q3OTFkODIzMjgzNTZjZDk4ODEyZWI4IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBBdXJlbGllbiBBcHRlbCA8YWFwdGVsQHN1c2UuY29tPgpEYXRl
-OiBUdWUsIDE5IEp1biAyMDE4IDE1OjE4OjQ4IC0wNzAwClN1YmplY3Q6IFtQQVRDSCAxLzJdIENJ
-RlM6IGZpeCBtZW1vcnkgbGVhayBhbmQgcmVtb3ZlIGRlYWQgY29kZQoKYWxzbyBmaXhlcyBlcnJv
-ciBjb2RlIGluIHNtYjMxMV9wb3NpeF9ta2RpcigpICh3aGVyZQp0aGUgZXJyb3IgYXNzaWdubWVu
-dCBuZWVkcyB0byBnbyBiZWZvcmUgdGhlIGdvdG8pCmEgdHlwbyB0aGF0IERhbiBDYXJwZW50ZXIg
-YW5kIFBhdWxvIHBvaW50ZWQgb3V0LgoKU2lnbmVkLW9mZi1ieTogQXVyZWxpZW4gQXB0ZWwgPGFh
-cHRlbEBzdXNlLmNvbT4KU2lnbmVkLW9mZi1ieTogRGFuIENhcnBlbnRlciA8ZGFuLmNhcnBlbnRl
-ckBvcmFjbGUuY29tPgpSZXZpZXdlZC1ieTogUGF1bG8gQWxjYW50YXJhIDxwYWxjYW50YXJhQHN1
-c2UuZGU+ClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNv
-bT4KLS0tCiBmcy9jaWZzL3NtYjJwZHUuYyB8IDk5ICsrKysrKysrKysrKysrKysrKysrKysrLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tCiAxIGZpbGUgY2hhbmdlZCwgNDkgaW5zZXJ0aW9ucygrKSwg
-NTAgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9zbWIycGR1LmMgYi9mcy9jaWZz
-L3NtYjJwZHUuYwppbmRleCA4MTBiODU3ODdjOTEuLmVhMTAyZGNhNWYzMyAxMDA2NDQKLS0tIGEv
-ZnMvY2lmcy9zbWIycGR1LmMKKysrIGIvZnMvY2lmcy9zbWIycGR1LmMKQEAgLTE5MzQsMjcgKzE5
-MzQsMzEgQEAgaW50IHNtYjMxMV9wb3NpeF9ta2Rpcihjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBz
-dHJ1Y3QgaW5vZGUgKmlub2RlLAogCWNoYXIgKnBjX2J1ZiA9IE5VTEw7CiAJaW50IGZsYWdzID0g
-MDsKIAl1bnNpZ25lZCBpbnQgdG90YWxfbGVuOwotCV9fbGUxNiAqcGF0aCA9IGNpZnNfY29udmVy
-dF9wYXRoX3RvX3V0ZjE2KGZ1bGxfcGF0aCwgY2lmc19zYik7Ci0KLQlpZiAoIXBhdGgpCi0JCXJl
-dHVybiAtRU5PTUVNOworCV9fbGUxNiAqdXRmMTZfcGF0aCA9IE5VTEw7CiAKIAljaWZzX2RiZyhG
-WUksICJta2RpclxuIik7CiAKKwkvKiByZXNvdXJjZSAjMTogcGF0aCBhbGxvY2F0aW9uICovCisJ
-dXRmMTZfcGF0aCA9IGNpZnNfY29udmVydF9wYXRoX3RvX3V0ZjE2KGZ1bGxfcGF0aCwgY2lmc19z
-Yik7CisJaWYgKCF1dGYxNl9wYXRoKQorCQlyZXR1cm4gLUVOT01FTTsKKwogCWlmIChzZXMgJiYg
-KHNlcy0+c2VydmVyKSkKIAkJc2VydmVyID0gc2VzLT5zZXJ2ZXI7Ci0JZWxzZQotCQlyZXR1cm4g
-LUVJTzsKKwllbHNlIHsKKwkJcmMgPSAtRUlPOworCQlnb3RvIGVycl9mcmVlX3BhdGg7CisJfQog
-CisJLyogcmVzb3VyY2UgIzI6IHJlcXVlc3QgKi8KIAlyYyA9IHNtYjJfcGxhaW5fcmVxX2luaXQo
-U01CMl9DUkVBVEUsIHRjb24sICh2b2lkICoqKSAmcmVxLCAmdG90YWxfbGVuKTsKLQogCWlmIChy
-YykKLQkJcmV0dXJuIHJjOworCQlnb3RvIGVycl9mcmVlX3BhdGg7CisKIAogCWlmIChzbWIzX2Vu
-Y3J5cHRpb25fcmVxdWlyZWQodGNvbikpCiAJCWZsYWdzIHw9IENJRlNfVFJBTlNGT1JNX1JFUTsK
-IAotCiAJcmVxLT5JbXBlcnNvbmF0aW9uTGV2ZWwgPSBJTF9JTVBFUlNPTkFUSU9OOwogCXJlcS0+
-RGVzaXJlZEFjY2VzcyA9IGNwdV90b19sZTMyKEZJTEVfV1JJVEVfQVRUUklCVVRFUyk7CiAJLyog
-RmlsZSBhdHRyaWJ1dGVzIGlnbm9yZWQgb24gb3BlbiAodXNlZCBpbiBjcmVhdGUgdGhvdWdoKSAq
-LwpAQCAtMTk4Myw1MCArMTk4Nyw0NCBAQCBpbnQgc21iMzExX3Bvc2l4X21rZGlyKGNvbnN0IHVu
-c2lnbmVkIGludCB4aWQsIHN0cnVjdCBpbm9kZSAqaW5vZGUsCiAJCXJlcS0+c3luY19oZHIuRmxh
-Z3MgfD0gU01CMl9GTEFHU19ERlNfT1BFUkFUSU9OUzsKIAkJcmMgPSBhbGxvY19wYXRoX3dpdGhf
-dHJlZV9wcmVmaXgoJmNvcHlfcGF0aCwgJmNvcHlfc2l6ZSwKIAkJCQkJCSAmbmFtZV9sZW4sCi0J
-CQkJCQkgdGNvbi0+dHJlZU5hbWUsIHBhdGgpOwotCQlpZiAocmMpIHsKLQkJCWNpZnNfc21hbGxf
-YnVmX3JlbGVhc2UocmVxKTsKLQkJCXJldHVybiByYzsKLQkJfQorCQkJCQkJIHRjb24tPnRyZWVO
-YW1lLCB1dGYxNl9wYXRoKTsKKwkJaWYgKHJjKQorCQkJZ290byBlcnJfZnJlZV9yZXE7CisKIAkJ
-cmVxLT5OYW1lTGVuZ3RoID0gY3B1X3RvX2xlMTYobmFtZV9sZW4gKiAyKTsKIAkJdW5pX3BhdGhf
-bGVuID0gY29weV9zaXplOwotCQlwYXRoID0gY29weV9wYXRoOworCQkvKiBmcmVlIGJlZm9yZSBv
-dmVyd3JpdGluZyByZXNvdXJjZSAqLworCQlrZnJlZSh1dGYxNl9wYXRoKTsKKwkJdXRmMTZfcGF0
-aCA9IGNvcHlfcGF0aDsKIAl9IGVsc2UgewotCQl1bmlfcGF0aF9sZW4gPSAoMiAqIFVuaVN0cm5s
-ZW4oKHdjaGFyX3QgKilwYXRoLCBQQVRIX01BWCkpICsgMjsKKwkJdW5pX3BhdGhfbGVuID0gKDIg
-KiBVbmlTdHJubGVuKCh3Y2hhcl90ICopdXRmMTZfcGF0aCwgUEFUSF9NQVgpKSArIDI7CiAJCS8q
-IE1VU1Qgc2V0IHBhdGggbGVuIChOYW1lTGVuZ3RoKSB0byAwIG9wZW5pbmcgcm9vdCBvZiBzaGFy
-ZSAqLwogCQlyZXEtPk5hbWVMZW5ndGggPSBjcHVfdG9fbGUxNih1bmlfcGF0aF9sZW4gLSAyKTsK
-IAkJaWYgKHVuaV9wYXRoX2xlbiAlIDggIT0gMCkgewogCQkJY29weV9zaXplID0gcm91bmR1cCh1
-bmlfcGF0aF9sZW4sIDgpOwogCQkJY29weV9wYXRoID0ga3phbGxvYyhjb3B5X3NpemUsIEdGUF9L
-RVJORUwpOwogCQkJaWYgKCFjb3B5X3BhdGgpIHsKLQkJCQljaWZzX3NtYWxsX2J1Zl9yZWxlYXNl
-KHJlcSk7Ci0JCQkJcmV0dXJuIC1FTk9NRU07CisJCQkJcmMgPSAtRU5PTUVNOworCQkJCWdvdG8g
-ZXJyX2ZyZWVfcmVxOwogCQkJfQotCQkJbWVtY3B5KChjaGFyICopY29weV9wYXRoLCAoY29uc3Qg
-Y2hhciAqKXBhdGgsCisJCQltZW1jcHkoKGNoYXIgKiljb3B5X3BhdGgsIChjb25zdCBjaGFyICop
-dXRmMTZfcGF0aCwKIAkJCSAgICAgICB1bmlfcGF0aF9sZW4pOwogCQkJdW5pX3BhdGhfbGVuID0g
-Y29weV9zaXplOwotCQkJcGF0aCA9IGNvcHlfcGF0aDsKKwkJCS8qIGZyZWUgYmVmb3JlIG92ZXJ3
-cml0aW5nIHJlc291cmNlICovCisJCQlrZnJlZSh1dGYxNl9wYXRoKTsKKwkJCXV0ZjE2X3BhdGgg
-PSBjb3B5X3BhdGg7CiAJCX0KIAl9CiAKIAlpb3ZbMV0uaW92X2xlbiA9IHVuaV9wYXRoX2xlbjsK
-LQlpb3ZbMV0uaW92X2Jhc2UgPSBwYXRoOworCWlvdlsxXS5pb3ZfYmFzZSA9IHV0ZjE2X3BhdGg7
-CiAJcmVxLT5SZXF1ZXN0ZWRPcGxvY2tMZXZlbCA9IFNNQjJfT1BMT0NLX0xFVkVMX05PTkU7CiAK
-IAlpZiAodGNvbi0+cG9zaXhfZXh0ZW5zaW9ucykgewotCQlpZiAobl9pb3YgPiAyKSB7Ci0JCQlz
-dHJ1Y3QgY3JlYXRlX2NvbnRleHQgKmNjb250ZXh0ID0KLQkJCSAgICAoc3RydWN0IGNyZWF0ZV9j
-b250ZXh0ICopaW92W25faW92LTFdLmlvdl9iYXNlOwotCQkJY2NvbnRleHQtPk5leHQgPQotCQkJ
-CWNwdV90b19sZTMyKGlvdltuX2lvdi0xXS5pb3ZfbGVuKTsKLQkJfQotCisJCS8qIHJlc291cmNl
-ICMzOiBwb3NpeCBidWYgKi8KIAkJcmMgPSBhZGRfcG9zaXhfY29udGV4dChpb3YsICZuX2lvdiwg
-bW9kZSk7Ci0JCWlmIChyYykgewotCQkJY2lmc19zbWFsbF9idWZfcmVsZWFzZShyZXEpOwotCQkJ
-a2ZyZWUoY29weV9wYXRoKTsKLQkJCXJldHVybiByYzsKLQkJfQorCQlpZiAocmMpCisJCQlnb3Rv
-IGVycl9mcmVlX3JlcTsKIAkJcGNfYnVmID0gaW92W25faW92LTFdLmlvdl9iYXNlOwogCX0KIApA
-QCAtMjAzNSwzMiArMjAzMywzMyBAQCBpbnQgc21iMzExX3Bvc2l4X21rZGlyKGNvbnN0IHVuc2ln
-bmVkIGludCB4aWQsIHN0cnVjdCBpbm9kZSAqaW5vZGUsCiAJcnFzdC5ycV9pb3YgPSBpb3Y7CiAJ
-cnFzdC5ycV9udmVjID0gbl9pb3Y7CiAKLQlyYyA9IGNpZnNfc2VuZF9yZWN2KHhpZCwgc2VzLCAm
-cnFzdCwgJnJlc3BfYnVmdHlwZSwgZmxhZ3MsCi0JCQkgICAgJnJzcF9pb3YpOwotCi0JY2lmc19z
-bWFsbF9idWZfcmVsZWFzZShyZXEpOwotCXJzcCA9IChzdHJ1Y3Qgc21iMl9jcmVhdGVfcnNwICop
-cnNwX2lvdi5pb3ZfYmFzZTsKLQotCWlmIChyYyAhPSAwKSB7CisJLyogcmVzb3VyY2UgIzQ6IHJl
-c3BvbnNlIGJ1ZmZlciAqLworCXJjID0gY2lmc19zZW5kX3JlY3YoeGlkLCBzZXMsICZycXN0LCAm
-cmVzcF9idWZ0eXBlLCBmbGFncywgJnJzcF9pb3YpOworCWlmIChyYykgewogCQljaWZzX3N0YXRz
-X2ZhaWxfaW5jKHRjb24sIFNNQjJfQ1JFQVRFX0hFKTsKIAkJdHJhY2Vfc21iM19wb3NpeF9ta2Rp
-cl9lcnIoeGlkLCB0Y29uLT50aWQsIHNlcy0+U3VpZCwKLQkJCQkgICAgQ1JFQVRFX05PVF9GSUxF
-LCBGSUxFX1dSSVRFX0FUVFJJQlVURVMsIHJjKTsKLQkJZ290byBzbWIzMTFfbWtkaXJfZXhpdDsK
-LQl9IGVsc2UKLQkJdHJhY2Vfc21iM19wb3NpeF9ta2Rpcl9kb25lKHhpZCwgcnNwLT5QZXJzaXN0
-ZW50RmlsZUlkLCB0Y29uLT50aWQsCi0JCQkJICAgICBzZXMtPlN1aWQsIENSRUFURV9OT1RfRklM
-RSwKLQkJCQkgICAgIEZJTEVfV1JJVEVfQVRUUklCVVRFUyk7CisJCQkJCSAgIENSRUFURV9OT1Rf
-RklMRSwKKwkJCQkJICAgRklMRV9XUklURV9BVFRSSUJVVEVTLCByYyk7CisJCWdvdG8gZXJyX2Zy
-ZWVfcnNwX2J1ZjsKKwl9CisKKwlyc3AgPSAoc3RydWN0IHNtYjJfY3JlYXRlX3JzcCAqKXJzcF9p
-b3YuaW92X2Jhc2U7CisJdHJhY2Vfc21iM19wb3NpeF9ta2Rpcl9kb25lKHhpZCwgcnNwLT5QZXJz
-aXN0ZW50RmlsZUlkLCB0Y29uLT50aWQsCisJCQkJICAgIHNlcy0+U3VpZCwgQ1JFQVRFX05PVF9G
-SUxFLAorCQkJCSAgICBGSUxFX1dSSVRFX0FUVFJJQlVURVMpOwogCiAJU01CMl9jbG9zZSh4aWQs
-IHRjb24sIHJzcC0+UGVyc2lzdGVudEZpbGVJZCwgcnNwLT5Wb2xhdGlsZUZpbGVJZCk7CiAKIAkv
-KiBFdmVudHVhbGx5IHNhdmUgb2ZmIHBvc2l4IHNwZWNpZmljIHJlc3BvbnNlIGluZm8gYW5kIHRp
-bWVzdGFwcyAqLwogCi1zbWIzMTFfbWtkaXJfZXhpdDoKLQlrZnJlZShjb3B5X3BhdGgpOwotCWtm
-cmVlKHBjX2J1Zik7CitlcnJfZnJlZV9yc3BfYnVmOgogCWZyZWVfcnNwX2J1ZihyZXNwX2J1ZnR5
-cGUsIHJzcCk7CisJa2ZyZWUocGNfYnVmKTsKK2Vycl9mcmVlX3JlcToKKwljaWZzX3NtYWxsX2J1
-Zl9yZWxlYXNlKHJlcSk7CitlcnJfZnJlZV9wYXRoOgorCWtmcmVlKHV0ZjE2X3BhdGgpOwogCXJl
-dHVybiByYzsKLQogfQogI2VuZGlmIC8qIFNNQjMxMSAqLwogCi0tIAoyLjE3LjEKCg==
---000000000000c41a7b056f29d63e--
+Thanks
+--
+Gustavo
