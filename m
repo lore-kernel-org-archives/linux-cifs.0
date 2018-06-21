@@ -1,45 +1,44 @@
-From: Paulo Alcantara <paulo@paulo.ac>
-Subject: Re: [PATCH 1/2] cifs: use timespec64 internally
-Date: Tue, 19 Jun 2018 13:36:31 -0300
-Message-ID: <8736xibunk.fsf@paulo.ac>
-References: <20180619153255.3634720-1-arnd@arndb.de>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Subject: [PATCH] CIFS: fix structurally dead code in smb311_posix_mkdir
+Date: Thu, 21 Jun 2018 08:35:23 -0500
+Message-ID: <20180621133523.GA30313@embeddedor.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: linux-cifs@vger.kernel.org, Kees Cook <keescook@chromium.org>,
- Arnd Bergmann <arnd@arndb.de>, y2038@lists.linaro.org,
- linux-kernel@vger.kernel.org, Long Li <longli@microsoft.com>,
- samba-technical@lists.samba.org, Aurelien Aptel <aaptel@suse.com>,
- Ronnie Sahlberg <lsahlber@redhat.com>, Pavel Shilovsky <pshilov@microsoft.com>
-To: Arnd Bergmann <arnd@arndb.de>, Steve French <sfrench@samba.org>
-Return-path: <y2038-bounces@lists.linaro.org>
-In-Reply-To: <20180619153255.3634720-1-arnd@arndb.de>
-List-Unsubscribe: <https://lists.linaro.org/mailman/options/y2038>,
- <mailto:y2038-request@lists.linaro.org?subject=unsubscribe>
-List-Archive: <http://lists.linaro.org/pipermail/y2038/>
-List-Post: <mailto:y2038@lists.linaro.org>
-List-Help: <mailto:y2038-request@lists.linaro.org?subject=help>
-List-Subscribe: <https://lists.linaro.org/mailman/listinfo/y2038>,
- <mailto:y2038-request@lists.linaro.org?subject=subscribe>
-Errors-To: y2038-bounces@lists.linaro.org
-Sender: "Y2038" <y2038-bounces@lists.linaro.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+To: Aurelien Aptel <aaptel@suse.com>, Steve French <sfrench@samba.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-QXJuZCBCZXJnbWFubiA8YXJuZEBhcm5kYi5kZT4gd3JpdGVzOgoKPiBJbiBjaWZzLCB0aGUgdGlt
-ZXN0YW1wcyBhcmUgc3RvcmVkIGluIG1lbW9yeSBpbiB0aGUgY2lmc19mYXR0ciBzdHJ1Y3R1cmUs
-Cj4gd2hpY2ggdXNlcyB0aGUgZGVwcmVjYXRlZCAndGltZXNwZWMnIHN0cnVjdHVyZS4gTm93IHRo
-YXQgdGhlIFZGUyBjb2RlCj4gaGFzIG1vdmVkIG9uIHRvICd0aW1lc3BlYzY0JywgdGhlIG5leHQg
-c3RlcCBpcyB0byBjaGFuZ2Ugb3ZlciB0aGUgZmF0dHIKPiBhcyB3ZWxsLgo+Cj4gVGhpcyBhbHNv
-IG1ha2VzIDMyLWJpdCBhbmQgNjQtYml0IHN5c3RlbXMgYmVoYXZlIHRoZSBzYW1lIHdheSwgYW5k
-Cj4gbm8gbG9uZ2VyIG92ZXJmbG93IHRoZSAzMi1iaXQgdGltZV90IGluIHllYXIgMjAzOC4KPgo+
-IFNpZ25lZC1vZmYtYnk6IEFybmQgQmVyZ21hbm4gPGFybmRAYXJuZGIuZGU+Cj4gLS0tCj4gIGZz
-L2NpZnMvY2lmc2VuY3J5cHQuYyB8ICA0ICsrLS0KPiAgZnMvY2lmcy9jaWZzZ2xvYi5oICAgIHwg
-IDYgKysrLS0tCj4gIGZzL2NpZnMvY2lmc3Byb3RvLmggICB8ICA2ICsrKy0tLQo+ICBmcy9jaWZz
-L2NpZnNzbWIuYyAgICAgfCAxMiArKysrKystLS0tLS0KPiAgZnMvY2lmcy9pbm9kZS5jICAgICAg
-IHwgMzQgKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLQo+ICBmcy9jaWZzL25ldG1p
-c2MuYyAgICAgfCAxOSArKysrKysrKysrLS0tLS0tLS0tCj4gIDYgZmlsZXMgY2hhbmdlZCwgNDAg
-aW5zZXJ0aW9ucygrKSwgNDEgZGVsZXRpb25zKC0pCgpSZXZpZXdlZC1ieTogUGF1bG8gQWxjYW50
-YXJhIDxwYWxjYW50YXJhQHN1c2UuZGU+CgpUaGFua3MKUGF1bG8KX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX18KWTIwMzggbWFpbGluZyBsaXN0ClkyMDM4QGxp
-c3RzLmxpbmFyby5vcmcKaHR0cHM6Ly9saXN0cy5saW5hcm8ub3JnL21haWxtYW4vbGlzdGluZm8v
-eTIwMzgK
+Code at line: 1950: rc = -EIO; is unreachable. Hence, the function
+returns rc with a value of zero and, this is not the actual intention
+of this particular piece of code.
+
+Fix this by placing the goto instruction just after the update to rc.
+
+Addresses-Coverity-ID: 1470124 ("Structurally dead code")
+Fixes: 5539e9b24a38 ("CIFS: fix memory leak and remove dead code")
+Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+---
+ fs/cifs/smb2pdu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 062a2a5..c9489b1 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1946,8 +1946,8 @@ int smb311_posix_mkdir(const unsigned int xid, struct inode *inode,
+ 	if (ses && (ses->server))
+ 		server = ses->server;
+ 	else {
+-		goto err_free_path;
+ 		rc = -EIO;
++		goto err_free_path;
+ 	}
+ 
+ 	/* resource #2: request */
+-- 
+2.7.4
