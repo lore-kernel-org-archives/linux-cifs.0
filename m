@@ -1,9 +1,9 @@
 From: Tom Talpey <tom@talpey.com>
-Subject: Re: [Patch v2 03/15] CIFS: Use offset when reading pages
-Date: Sat, 23 Jun 2018 21:58:41 -0400
-Message-ID: <a1793647-4a7e-5f03-3c7a-cd0cb930e5bc@talpey.com>
+Subject: Re: [Patch v2 04/15] CIFS: Add support for direct pages in wdata
+Date: Sat, 23 Jun 2018 22:01:59 -0400
+Message-ID: <4edad13c-e257-ff1c-223a-324f484a936a@talpey.com>
 References: <20180530194807.31657-1-longli@linuxonhyperv.com>
- <20180530194807.31657-4-longli@linuxonhyperv.com>
+ <20180530194807.31657-5-longli@linuxonhyperv.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
@@ -11,7 +11,7 @@ To: longli@microsoft.com, Steve French <sfrench@samba.org>,
         linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
         linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180530194807.31657-4-longli@linuxonhyperv.com>
+In-Reply-To: <20180530194807.31657-5-longli@linuxonhyperv.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
@@ -19,210 +19,92 @@ List-Id: linux-cifs.vger.kernel.org
 On 5/30/2018 3:47 PM, Long Li wrote:
 > From: Long Li <longli@microsoft.com>
 > 
-> With offset defined in rdata, transport functions need to look at this
-> offset when reading data into the correct places in pages.
+> Add a function to allocate wdata without allocating pages for data
+> transfer. This gives the caller an option to pass a number of pages that
+> point to the data buffer to write to.
+> 
+> wdata is reponsible for free those pages after it's done.
+
+Same comment as for the earlier patch. "Caller" is responsible for
+"freeing" those pages? Confusing, as worded.
+
 > 
 > Signed-off-by: Long Li <longli@microsoft.com>
 > ---
->   fs/cifs/cifsproto.h |  4 +++-
->   fs/cifs/connect.c   |  5 +++--
->   fs/cifs/file.c      | 52 +++++++++++++++++++++++++++++++++++++---------------
->   fs/cifs/smb2ops.c   |  2 +-
->   fs/cifs/smb2pdu.c   |  1 +
->   5 files changed, 45 insertions(+), 19 deletions(-)
+>   fs/cifs/cifsglob.h  |  2 +-
+>   fs/cifs/cifsproto.h |  2 ++
+>   fs/cifs/cifssmb.c   | 17 ++++++++++++++---
+>   3 files changed, 17 insertions(+), 4 deletions(-)
 > 
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 56864a87..7f62c98 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -1205,7 +1205,7 @@ struct cifs_writedata {
+>   	unsigned int			tailsz;
+>   	unsigned int			credits;
+>   	unsigned int			nr_pages;
+> -	struct page			*pages[];
+> +	struct page			**pages;
+
+Also same comment as for earlier patch, these are syntactically
+equivalent and maybe not needed to change.
+
+>   };
+>   
+>   /*
 > diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index dc80f84..1f27d8e 100644
+> index 1f27d8e..7933c5f 100644
 > --- a/fs/cifs/cifsproto.h
 > +++ b/fs/cifs/cifsproto.h
-> @@ -203,7 +203,9 @@ extern void dequeue_mid(struct mid_q_entry *mid, bool malformed);
->   extern int cifs_read_from_socket(struct TCP_Server_Info *server, char *buf,
->   			         unsigned int to_read);
->   extern int cifs_read_page_from_socket(struct TCP_Server_Info *server,
-> -				      struct page *page, unsigned int to_read);
-> +					struct page *page,
-> +					unsigned int page_offset,
-> +					unsigned int to_read);
->   extern int cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
->   			       struct cifs_sb_info *cifs_sb);
->   extern int cifs_match_super(struct super_block *, void *);
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 83b0234..8501da0 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -594,10 +594,11 @@ cifs_read_from_socket(struct TCP_Server_Info *server, char *buf,
+> @@ -533,6 +533,8 @@ int cifs_async_writev(struct cifs_writedata *wdata,
+>   void cifs_writev_complete(struct work_struct *work);
+>   struct cifs_writedata *cifs_writedata_alloc(unsigned int nr_pages,
+>   						work_func_t complete);
+> +struct cifs_writedata *cifs_writedata_direct_alloc(struct page **pages,
+> +						work_func_t complete);
+>   void cifs_writedata_release(struct kref *refcount);
+>   int cifs_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+>   			  struct cifs_sb_info *cifs_sb,
+> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> index c8e4278..5aca336 100644
+> --- a/fs/cifs/cifssmb.c
+> +++ b/fs/cifs/cifssmb.c
+> @@ -1952,6 +1952,7 @@ cifs_writedata_release(struct kref *refcount)
+>   	if (wdata->cfile)
+>   		cifsFileInfo_put(wdata->cfile);
 >   
->   int
->   cifs_read_page_from_socket(struct TCP_Server_Info *server, struct page *page,
-> -		      unsigned int to_read)
-> +	unsigned int page_offset, unsigned int to_read)
->   {
->   	struct msghdr smb_msg;
-> -	struct bio_vec bv = {.bv_page = page, .bv_len = to_read};
-> +	struct bio_vec bv = {
-> +		.bv_page = page, .bv_len = to_read, .bv_offset = page_offset};
->   	iov_iter_bvec(&smb_msg.msg_iter, READ | ITER_BVEC, &bv, 1, to_read);
->   	return cifs_readv_from_socket(server, &smb_msg);
+> +	kvfree(wdata->pages);
+>   	kfree(wdata);
 >   }
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 1c98293..87eece6 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -3026,12 +3026,20 @@ uncached_fill_pages(struct TCP_Server_Info *server,
->   	int result = 0;
->   	unsigned int i;
->   	unsigned int nr_pages = rdata->nr_pages;
-> +	unsigned int page_offset = rdata->page_offset;
 >   
->   	rdata->got_bytes = 0;
->   	rdata->tailsz = PAGE_SIZE;
->   	for (i = 0; i < nr_pages; i++) {
->   		struct page *page = rdata->pages[i];
->   		size_t n;
-> +		unsigned int segment_size = rdata->pagesz;
-> +
-> +		if (i == 0)
-> +			segment_size -= page_offset;
-> +		else
-> +			page_offset = 0;
-> +
->   
->   		if (len <= 0) {
->   			/* no need to hold page hostage */
-> @@ -3040,24 +3048,25 @@ uncached_fill_pages(struct TCP_Server_Info *server,
->   			put_page(page);
->   			continue;
->   		}
-> +
->   		n = len;
-> -		if (len >= PAGE_SIZE) {
-> +		if (len >= segment_size)
->   			/* enough data to fill the page */
-> -			n = PAGE_SIZE;
-> -			len -= n;
-> -		} else {
-> -			zero_user(page, len, PAGE_SIZE - len);
-> +			n = segment_size;
-> +		else
->   			rdata->tailsz = len;
-> -			len = 0;
-> -		}
-> +		len -= n;
-> +
->   		if (iter)
-> -			result = copy_page_from_iter(page, 0, n, iter);
-> +			result = copy_page_from_iter(
-> +					page, page_offset, n, iter);
->   #ifdef CONFIG_CIFS_SMB_DIRECT
->   		else if (rdata->mr)
->   			result = n;
->   #endif
+> @@ -2075,12 +2076,22 @@ cifs_writev_complete(struct work_struct *work)
+>   struct cifs_writedata *
+>   cifs_writedata_alloc(unsigned int nr_pages, work_func_t complete)
+>   {
+> +	struct page **pages =
+> +		kzalloc(sizeof(struct page *) * nr_pages, GFP_NOFS);
 
-I hadn't noticed this type of xonditional code before. It's kind of ugly
-to modify the data handling code like this. Do you plan to break this
-out into an smbdirect-specific hander, like the cases above and below?
+Why do you do a GFP_NOFS here but GFP_KERNEL in the earlier patch?
 
->   		else
-> -			result = cifs_read_page_from_socket(server, page, n);
-> +			result = cifs_read_page_from_socket(
-> +					server, page, page_offset, n);
->   		if (result < 0)
->   			break;
->   
-> @@ -3130,6 +3139,7 @@ cifs_send_async_read(loff_t offset, size_t len, struct cifsFileInfo *open_file,
->   		rdata->bytes = cur_len;
->   		rdata->pid = pid;
->   		rdata->pagesz = PAGE_SIZE;
-> +		rdata->tailsz = PAGE_SIZE;
->   		rdata->read_into_pages = cifs_uncached_read_into_pages;
->   		rdata->copy_into_pages = cifs_uncached_copy_into_pages;
->   		rdata->credits = credits;
-> @@ -3574,6 +3584,7 @@ readpages_fill_pages(struct TCP_Server_Info *server,
->   	u64 eof;
->   	pgoff_t eof_index;
->   	unsigned int nr_pages = rdata->nr_pages;
-> +	unsigned int page_offset = rdata->page_offset;
->   
->   	/* determine the eof that the server (probably) has */
->   	eof = CIFS_I(rdata->mapping->host)->server_eof;
-> @@ -3584,13 +3595,21 @@ readpages_fill_pages(struct TCP_Server_Info *server,
->   	rdata->tailsz = PAGE_SIZE;
->   	for (i = 0; i < nr_pages; i++) {
->   		struct page *page = rdata->pages[i];
-> -		size_t n = PAGE_SIZE;
-> +		unsigned int to_read = rdata->pagesz;
-> +		size_t n;
+> +	if (pages)
+> +		return cifs_writedata_direct_alloc(pages, complete);
 > +
-> +		if (i == 0)
-> +			to_read -= page_offset;
-> +		else
-> +			page_offset = 0;
+> +	return NULL;
+> +}
 > +
-> +		n = to_read;
+> +struct cifs_writedata *
+> +cifs_writedata_direct_alloc(struct page **pages, work_func_t complete)
+> +{
+>   	struct cifs_writedata *wdata;
 >   
-> -		if (len >= PAGE_SIZE) {
-> -			len -= PAGE_SIZE;
-> +		if (len >= to_read) {
-> +			len -= to_read;
->   		} else if (len > 0) {
->   			/* enough for partial page, fill and zero the rest */
-> -			zero_user(page, len, PAGE_SIZE - len);
-> +			zero_user(page, len + page_offset, to_read - len);
->   			n = rdata->tailsz = len;
->   			len = 0;
->   		} else if (page->index > eof_index) {
-> @@ -3622,13 +3641,15 @@ readpages_fill_pages(struct TCP_Server_Info *server,
->   		}
->   
->   		if (iter)
-> -			result = copy_page_from_iter(page, 0, n, iter);
-> +			result = copy_page_from_iter(
-> +					page, page_offset, n, iter);
->   #ifdef CONFIG_CIFS_SMB_DIRECT
->   		else if (rdata->mr)
->   			result = n;
->   #endif
-
-Ditto previous comment/question.
-
->   		else
-> -			result = cifs_read_page_from_socket(server, page, n);
-> +			result = cifs_read_page_from_socket(
-> +					server, page, page_offset, n);
->   		if (result < 0)
->   			break;
->   
-> @@ -3807,6 +3828,7 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
->   		rdata->bytes = bytes;
->   		rdata->pid = pid;
->   		rdata->pagesz = PAGE_SIZE;
-> +		rdata->tailsz = PAGE_SIZE;
->   		rdata->read_into_pages = cifs_readpages_read_into_pages;
->   		rdata->copy_into_pages = cifs_readpages_copy_into_pages;
->   		rdata->credits = credits;
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 7c0edd2..1fa1c29 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -2467,7 +2467,7 @@ read_data_into_pages(struct TCP_Server_Info *server, struct page **pages,
->   			zero_user(page, len, PAGE_SIZE - len);
->   			len = 0;
->   		}
-> -		length = cifs_read_page_from_socket(server, page, n);
-> +		length = cifs_read_page_from_socket(server, page, 0, n);
->   		if (length < 0)
->   			return length;
->   		server->total_read += length;
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index a02f6b6..f603fbe 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -2683,6 +2683,7 @@ smb2_readv_callback(struct mid_q_entry *mid)
->   	struct smb_rqst rqst = { .rq_iov = rdata->iov,
->   				 .rq_nvec = 2,
->   				 .rq_pages = rdata->pages,
-> +				 .rq_offset = rdata->page_offset,
->   				 .rq_npages = rdata->nr_pages,
->   				 .rq_pagesz = rdata->pagesz,
->   				 .rq_tailsz = rdata->tailsz };
+> -	/* writedata + number of page pointers */
+> -	wdata = kzalloc(sizeof(*wdata) +
+> -			sizeof(struct page *) * nr_pages, GFP_NOFS);
+> +	wdata = kzalloc(sizeof(*wdata), GFP_NOFS);
+>   	if (wdata != NULL) {
+> +		wdata->pages = pages;
+>   		kref_init(&wdata->refcount);
+>   		INIT_LIST_HEAD(&wdata->list);
+>   		init_completion(&wdata->done);
 > 
