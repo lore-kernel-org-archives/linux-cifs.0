@@ -1,9 +1,10 @@
 From: Tom Talpey <tom@talpey.com>
-Subject: Re: [Patch v2 04/15] CIFS: Add support for direct pages in wdata
-Date: Sat, 23 Jun 2018 22:01:59 -0400
-Message-ID: <4edad13c-e257-ff1c-223a-324f484a936a@talpey.com>
+Subject: Re: [Patch v2 05/15] CIFS: Calculate the correct request length based
+ on page offset and tail size
+Date: Sat, 23 Jun 2018 22:07:10 -0400
+Message-ID: <183b5cd5-b12b-de08-7867-c2addf29c974@talpey.com>
 References: <20180530194807.31657-1-longli@linuxonhyperv.com>
- <20180530194807.31657-5-longli@linuxonhyperv.com>
+ <20180530194807.31657-6-longli@linuxonhyperv.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
@@ -11,7 +12,7 @@ To: longli@microsoft.com, Steve French <sfrench@samba.org>,
         linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
         linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180530194807.31657-5-longli@linuxonhyperv.com>
+In-Reply-To: <20180530194807.31657-6-longli@linuxonhyperv.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
@@ -19,92 +20,58 @@ List-Id: linux-cifs.vger.kernel.org
 On 5/30/2018 3:47 PM, Long Li wrote:
 > From: Long Li <longli@microsoft.com>
 > 
-> Add a function to allocate wdata without allocating pages for data
-> transfer. This gives the caller an option to pass a number of pages that
-> point to the data buffer to write to.
-> 
-> wdata is reponsible for free those pages after it's done.
-
-Same comment as for the earlier patch. "Caller" is responsible for
-"freeing" those pages? Confusing, as worded.
-
+> It's possible that the page offset is non-zero in the pages in a request,
+> change the function to calculate the correct data buffer length.
 > 
 > Signed-off-by: Long Li <longli@microsoft.com>
 > ---
->   fs/cifs/cifsglob.h  |  2 +-
->   fs/cifs/cifsproto.h |  2 ++
->   fs/cifs/cifssmb.c   | 17 ++++++++++++++---
->   3 files changed, 17 insertions(+), 4 deletions(-)
+>   fs/cifs/transport.c | 20 +++++++++++++++++---
+>   1 file changed, 17 insertions(+), 3 deletions(-)
 > 
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 56864a87..7f62c98 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -1205,7 +1205,7 @@ struct cifs_writedata {
->   	unsigned int			tailsz;
->   	unsigned int			credits;
->   	unsigned int			nr_pages;
-> -	struct page			*pages[];
-> +	struct page			**pages;
-
-Also same comment as for earlier patch, these are syntactically
-equivalent and maybe not needed to change.
-
->   };
+> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+> index 927226a..d6b5523 100644
+> --- a/fs/cifs/transport.c
+> +++ b/fs/cifs/transport.c
+> @@ -212,10 +212,24 @@ rqst_len(struct smb_rqst *rqst)
+>   	for (i = 0; i < rqst->rq_nvec; i++)
+>   		buflen += iov[i].iov_len;
 >   
->   /*
-> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index 1f27d8e..7933c5f 100644
-> --- a/fs/cifs/cifsproto.h
-> +++ b/fs/cifs/cifsproto.h
-> @@ -533,6 +533,8 @@ int cifs_async_writev(struct cifs_writedata *wdata,
->   void cifs_writev_complete(struct work_struct *work);
->   struct cifs_writedata *cifs_writedata_alloc(unsigned int nr_pages,
->   						work_func_t complete);
-> +struct cifs_writedata *cifs_writedata_direct_alloc(struct page **pages,
-> +						work_func_t complete);
->   void cifs_writedata_release(struct kref *refcount);
->   int cifs_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
->   			  struct cifs_sb_info *cifs_sb,
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index c8e4278..5aca336 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -1952,6 +1952,7 @@ cifs_writedata_release(struct kref *refcount)
->   	if (wdata->cfile)
->   		cifsFileInfo_put(wdata->cfile);
->   
-> +	kvfree(wdata->pages);
->   	kfree(wdata);
->   }
->   
-> @@ -2075,12 +2076,22 @@ cifs_writev_complete(struct work_struct *work)
->   struct cifs_writedata *
->   cifs_writedata_alloc(unsigned int nr_pages, work_func_t complete)
->   {
-> +	struct page **pages =
-> +		kzalloc(sizeof(struct page *) * nr_pages, GFP_NOFS);
+> -	/* add in the page array if there is one */
+> +	/*
+> +	 * Add in the page array if there is one. The caller needs to make
+> +	 * sure rq_offset and rq_tailsz are set correctly. If a buffer of
+> +	 * multiple pages ends at page boundary, rq_tailsz needs to be set to
+> +	 * PAGE_SIZE.
+> +	 */
+>   	if (rqst->rq_npages) {
+> -		buflen += rqst->rq_pagesz * (rqst->rq_npages - 1);
+> -		buflen += rqst->rq_tailsz;
+> +		if (rqst->rq_npages == 1)
+> +			buflen += rqst->rq_tailsz;
+> +		else {
+> +			/*
+> +			 * If there is more than one page, calculate the
+> +			 * buffer length based on rq_offset and rq_tailsz
+> +			 */
+> +			buflen += rqst->rq_pagesz * (rqst->rq_npages - 1) -
+> +					rqst->rq_offset;
+> +			buflen += rqst->rq_tailsz;
+> +		}
 
-Why do you do a GFP_NOFS here but GFP_KERNEL in the earlier patch?
+Wouldn't it be simpler to keep the original code, but then just subtract
+the rq_offset?
 
-> +	if (pages)
-> +		return cifs_writedata_direct_alloc(pages, complete);
-> +
-> +	return NULL;
-> +}
-> +
-> +struct cifs_writedata *
-> +cifs_writedata_direct_alloc(struct page **pages, work_func_t complete)
-> +{
->   	struct cifs_writedata *wdata;
+	buflen += rqst->rq_pagesz * (rqst->rq_npages - 1);
+	buflen += rqst->rq_tailsz;
+	buflen -= rqst->rq_offset;
+
+It's kind of confusing as written. Also, what if it's just one page, but
+has a non-zero offset? Is that somehow not possible? My suggested code
+would take that into account, yours doesn't.
+
+Tom.
+
+>   	}
 >   
-> -	/* writedata + number of page pointers */
-> -	wdata = kzalloc(sizeof(*wdata) +
-> -			sizeof(struct page *) * nr_pages, GFP_NOFS);
-> +	wdata = kzalloc(sizeof(*wdata), GFP_NOFS);
->   	if (wdata != NULL) {
-> +		wdata->pages = pages;
->   		kref_init(&wdata->refcount);
->   		INIT_LIST_HEAD(&wdata->list);
->   		init_completion(&wdata->done);
+>   	return buflen;
 > 
