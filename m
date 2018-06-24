@@ -1,9 +1,9 @@
 From: Tom Talpey <tom@talpey.com>
-Subject: Re: [Patch v2 12/15] CIFS: Pass page offset for encrypting
-Date: Sat, 23 Jun 2018 22:28:43 -0400
-Message-ID: <fd7d65d2-115d-c15b-816c-768e6600f803@talpey.com>
+Subject: Re: [Patch v2 13/15] CIFS: Add support for direct I/O read
+Date: Sat, 23 Jun 2018 22:39:44 -0400
+Message-ID: <c8d8b852-b621-4f83-b127-535a10c0538d@talpey.com>
 References: <20180530194807.31657-1-longli@linuxonhyperv.com>
- <20180530194807.31657-13-longli@linuxonhyperv.com>
+ <20180530194807.31657-14-longli@linuxonhyperv.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
@@ -11,75 +11,222 @@ To: longli@microsoft.com, Steve French <sfrench@samba.org>,
         linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
         linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180530194807.31657-13-longli@linuxonhyperv.com>
+In-Reply-To: <20180530194807.31657-14-longli@linuxonhyperv.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
+
+
 On 5/30/2018 3:48 PM, Long Li wrote:
 > From: Long Li <longli@microsoft.com>
 > 
-> Encryption function needs to read data starting page offset from input
-> buffer.
-> 
-> This doesn't affect decryption path since it allocates its own page
-> buffers.
+> Implement the function for direct I/O read. It doesn't support AIO, which
+> will be implemented in a follow up patch.
 > 
 > Signed-off-by: Long Li <longli@microsoft.com>
 > ---
->   fs/cifs/smb2ops.c | 20 +++++++++++++-------
->   1 file changed, 13 insertions(+), 7 deletions(-)
+>   fs/cifs/cifsfs.h |   1 +
+>   fs/cifs/file.c   | 149 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 150 insertions(+)
 > 
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 1fa1c29..38d19b6 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -2189,9 +2189,10 @@ init_sg(struct smb_rqst *rqst, u8 *sign)
->   		smb2_sg_set_buf(&sg[i], rqst->rq_iov[i].iov_base,
->   						rqst->rq_iov[i].iov_len);
->   	for (j = 0; i < sg_len - 1; i++, j++) {
-> -		unsigned int len = (j < rqst->rq_npages - 1) ? rqst->rq_pagesz
-> -							: rqst->rq_tailsz;
-> -		sg_set_page(&sg[i], rqst->rq_pages[j], len, 0);
-> +		unsigned int len, offset;
-> +
-> +		rqst_page_get_length(rqst, j, &len, &offset);
-> +		sg_set_page(&sg[i], rqst->rq_pages[j], len, offset);
->   	}
->   	smb2_sg_set_buf(&sg[sg_len - 1], sign, SMB2_SIGNATURE_SIZE);
->   	return sg;
-> @@ -2332,6 +2333,7 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, struct smb_rqst *new_rq,
->   		return rc;
+> diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
+> index 5f02318..7fba9aa 100644
+> --- a/fs/cifs/cifsfs.h
+> +++ b/fs/cifs/cifsfs.h
+> @@ -102,6 +102,7 @@ extern int cifs_open(struct inode *inode, struct file *file);
+>   extern int cifs_close(struct inode *inode, struct file *file);
+>   extern int cifs_closedir(struct inode *inode, struct file *file);
+>   extern ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to);
+> +extern ssize_t cifs_direct_readv(struct kiocb *iocb, struct iov_iter *to);
+>   extern ssize_t cifs_strict_readv(struct kiocb *iocb, struct iov_iter *to);
+>   extern ssize_t cifs_user_writev(struct kiocb *iocb, struct iov_iter *from);
+>   extern ssize_t cifs_strict_writev(struct kiocb *iocb, struct iov_iter *from);
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index 87eece6..e6e6f24 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -2955,6 +2955,18 @@ cifs_read_allocate_pages(struct cifs_readdata *rdata, unsigned int nr_pages)
+>   	return rc;
+>   }
 >   
->   	new_rq->rq_pages = pages;
-> +	new_rq->rq_offset = old_rq->rq_offset;
->   	new_rq->rq_npages = old_rq->rq_npages;
->   	new_rq->rq_pagesz = old_rq->rq_pagesz;
->   	new_rq->rq_tailsz = old_rq->rq_tailsz;
-> @@ -2363,10 +2365,14 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, struct smb_rqst *new_rq,
+> +static void cifs_direct_readdata_release(struct kref *refcount)
+> +{
+> +	struct cifs_readdata *rdata = container_of(refcount,
+> +					struct cifs_readdata, refcount);
+> +	unsigned int i;
+> +
+> +	for (i = 0; i < rdata->nr_pages; i++)
+> +		put_page(rdata->pages[i]);
+> +
+> +	cifs_readdata_release(refcount);
+> +}
+> +
+>   static void
+>   cifs_uncached_readdata_release(struct kref *refcount)
+>   {
+> @@ -3267,6 +3279,143 @@ collect_uncached_read_data(struct cifs_aio_ctx *ctx)
+>   		complete(&ctx->done);
+>   }
 >   
->   	/* copy pages form the old */
->   	for (i = 0; i < npages; i++) {
-> -		char *dst = kmap(new_rq->rq_pages[i]);
-> -		char *src = kmap(old_rq->rq_pages[i]);
-> -		unsigned int len = (i < npages - 1) ? new_rq->rq_pagesz :
-> -							new_rq->rq_tailsz;
-> +		char *dst, *src;
-> +		unsigned int offset, len;
+> +static void cifs_direct_readv_complete(struct work_struct *work)
+> +{
+> +	struct cifs_readdata *rdata =
+> +		container_of(work, struct cifs_readdata, work);
 > +
-> +		rqst_page_get_length(new_rq, i, &len, &offset);
+> +	complete(&rdata->done);
+> +	kref_put(&rdata->refcount, cifs_direct_readdata_release);
+> +}
 > +
-> +		dst = (char *) kmap(new_rq->rq_pages[i]) + offset;
-> +		src = (char *) kmap(old_rq->rq_pages[i]) + offset;
+> +ssize_t cifs_direct_readv(struct kiocb *iocb, struct iov_iter *to)
+> +{
+> +	size_t len, cur_len, start;
+> +	unsigned int npages, rsize, credits;
+> +	struct file *file;
+> +	struct cifs_sb_info *cifs_sb;
+> +	struct cifsFileInfo *cfile;
+> +	struct cifs_tcon *tcon;
+> +	struct page **pagevec;
+> +	ssize_t rc, total_read = 0;
+> +	struct TCP_Server_Info *server;
+> +	loff_t offset = iocb->ki_pos;
+> +	pid_t pid;
+> +	struct cifs_readdata *rdata;
+> +
+> +	/*
+> +	 * iov_iter_get_pages_alloc() doesn't work with ITER_KVEC,
+> +	 * fall back to data copy read path
+> +	 */
+> +	if (to->type & ITER_KVEC) {
+> +		cifs_dbg(FYI, "use non-direct cifs_user_readv for kvec I/O\n");
+> +		return cifs_user_readv(iocb, to);
+> +	}
+> +
+> +	len = iov_iter_count(to);
+> +	if (!len)
+> +		return 0;
+> +
+> +	file = iocb->ki_filp;
+> +	cifs_sb = CIFS_FILE_SB(file);
+> +	cfile = file->private_data;
+> +	tcon = tlink_tcon(cfile->tlink);
+> +	server = tcon->ses->server;
+> +
+> +	if (!server->ops->async_readv)
+> +		return -ENOSYS;
+> +
+> +	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
+> +		pid = cfile->pid;
+> +	else
+> +		pid = current->tgid;
+> +
+> +	if ((file->f_flags & O_ACCMODE) == O_WRONLY)
+> +		cifs_dbg(FYI, "attempting read on write only file instance\n");
 
-Ouch! TWO kmap/kunmaps per page of data? Is there not already a kva,
-at least for the destination (message)?
-
-Tom.
-
+Confusing. Maybe "attempting read on write-only filehandle"?
 
 > +
->   		memcpy(dst, src, len);
->   		kunmap(new_rq->rq_pages[i]);
->   		kunmap(old_rq->rq_pages[i]);
+> +	do {
+> +		rc = server->ops->wait_mtu_credits(server, cifs_sb->rsize,
+> +					&rsize, &credits);
+> +		if (rc)
+> +			break;
+> +
+> +		cur_len = min_t(const size_t, len, rsize);
+> +
+> +		rc = iov_iter_get_pages_alloc(to, &pagevec, cur_len, &start);
+> +		if (rc < 0) {
+> +			cifs_dbg(VFS,
+> +				"couldn't get user pages (rc=%zd) iter type %d"
+> +				" iov_offset %lu count %lu\n",
+> +				rc, to->type, to->iov_offset, to->count);
+> +			dump_stack();
+> +			break;
+> +		}
+> +
+> +		rdata = cifs_readdata_direct_alloc(
+> +				pagevec, cifs_direct_readv_complete);
+> +		if (!rdata) {
+> +			add_credits_and_wake_if(server, credits, 0);
+> +			rc = -ENOMEM;
+> +			break;
+> +		}
+> +
+> +		npages = (rc + start + PAGE_SIZE-1) / PAGE_SIZE;
+> +		rdata->nr_pages = npages;
+> +		rdata->page_offset = start;
+> +		rdata->pagesz = PAGE_SIZE;
+> +		rdata->tailsz = npages > 1 ?
+> +				rc-(PAGE_SIZE-start)-(npages-2)*PAGE_SIZE :
+> +				rc;
+
+This expression makes my head hurt. Surely it can be simplified, or
+expressed in a clearer way.
+
+> +		cur_len = rc;
+> +
+> +		rdata->cfile = cifsFileInfo_get(cfile);
+> +		rdata->offset = offset;
+> +		rdata->bytes = rc;
+> +		rdata->pid = pid;
+> +		rdata->read_into_pages = cifs_uncached_read_into_pages;
+> +		rdata->copy_into_pages = cifs_uncached_copy_into_pages;
+> +		rdata->credits = credits;
+> +
+> +		rc = 0;
+> +		if (rdata->cfile->invalidHandle)
+> +			rc = cifs_reopen_file(rdata->cfile, true);
+> +
+> +		if (!rc)
+> +			rc = server->ops->async_readv(rdata);
+> +
+> +		if (rc) {
+
+This whole rc thing is messy. Initializing to zero, setting only in
+one case, then testing the result, then setting it again, is twisted.
+I actually think a goto or two would read much more clearly.
+
+> +			add_credits_and_wake_if(server, rdata->credits, 0);
+> +			kref_put(&rdata->refcount,
+> +				 cifs_direct_readdata_release);
+> +			if (rc == -EAGAIN)
+> +				continue;
+> +			break;
+
+It's worth a comment here that this either breaks or continues the
+entire do {} while (); and btw when it breaks it does *not* return "rc".
+Again, maybe a goto instead of a break?
+
+> +		}
+> +
+> +		wait_for_completion(&rdata->done);
+> +		rc = rdata->result;
+> +		if (rc) {
+> +			kref_put(
+> +				&rdata->refcount,
+> +				cifs_direct_readdata_release);
+> +			if (rc == -EAGAIN)
+> +				continue;
+> +			break;
+
+Ditto.
+
+> +		}
+> +
+> +		total_read += rdata->got_bytes;
+> +		kref_put(&rdata->refcount, cifs_direct_readdata_release);
+> +
+> +		iov_iter_advance(to, cur_len);
+> +		len -= cur_len;
+> +		offset += cur_len;
+> +	} while (len);
+> +
+> +	iocb->ki_pos += total_read;
+> +
+> +	return total_read;
+> +}
+> +
+>   ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to)
+>   {
+>   	struct file *file = iocb->ki_filp;
 > 
