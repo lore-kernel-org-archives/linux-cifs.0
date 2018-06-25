@@ -1,56 +1,196 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: linux-next: build failure after merge of the cifs tree
-Date: Sun, 24 Jun 2018 19:52:42 -0500
-Message-ID: <CAH2r5mu3-5BjqhhG9XO8a3hTW5Gq67WKoVMXRjrcaZ5riFmNfA@mail.gmail.com>
-References: <20180625091531.60fe90e9@canb.auug.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: CIFS <linux-cifs@vger.kernel.org>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180625091531.60fe90e9@canb.auug.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Lars Persson <lars.persson@axis.com>
+Subject: [PATCH v2] cifs: Fix use after free of a mid_q_entry
+Date: Mon, 25 Jun 2018 14:05:25 +0200
+Message-ID: <20180625120525.20413-1-larper@axis.com>
+Cc: Lars Persson <larper@axis.com>, stable@vger.kernel.org
+To: linux-cifs@vger.kernel.org, sfrench@samba.org
+Return-path: <stable-owner@vger.kernel.org>
+Sender: stable-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Should be ok now - It was missing an update that Aurelien and I worked
-on for that patch - so I backed that patch out.   It was also
-suggested that that Kconfig parm and #ifdef be removed since SMB3.11
-is strongly recommended to be set (which would have avoided this as
-well) and will be added to the default list of dialects in the future.
-On Sun, Jun 24, 2018 at 6:15 PM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
->
-> Hi all,
->
-> After merging the cifs tree, today's linux-next build (powerpc
-> ppc64_defconfig) failed like this:
->
-> fs/cifs/smb2ops.c: In function 'smb311_queryfs':
-> fs/cifs/smb2ops.c:1543:11: error: 'struct cifs_tcon' has no member named 'posix_extensions'
->   if (!tcon->posix_extensions)
->            ^~
-> At top level:
-> fs/cifs/smb2ops.c:1534:1: warning: 'smb311_queryfs' defined but not used [-Wunused-function]
->  smb311_queryfs(const unsigned int xid, struct cifs_tcon *tcon,
->  ^~~~~~~~~~~~~~
->
-> Caused by commit
->
->    ("smb3: add support for statfs for smb3.1.1 posix extensions")
->
-> # CONFIG_CIFS_SMB311 is not set
->
-> I have used the cifs tree from next-20180622 for today.
->
-> --
-> Cheers,
-> Stephen Rothwell
+With protocol version 2.0 mounts we have seen crashes with corrupt mid
+entries. Either the server->pending_mid_q list becomes corrupt with a
+cyclic reference in one element or a mid object fetched by the
+demultiplexer thread becomes overwritten during use.
 
+Code review identified a race between the demultiplexer thread and the
+request issuing thread. The demultiplexer thread seems to be written
+with the assumption that it is the sole user of the mid object until
+it calls the mid callback which either wakes the issuer task or
+deletes the mid.
 
+This assumption is not true because the issuer task can be woken up
+earlier by a signal. If the demultiplexer thread has proceeded as far
+as setting the mid_state to MID_RESPONSE_RECEIVED then the issuer
+thread will happily end up calling cifs_delete_mid while the
+demultiplexer thread still is using the mid object.
 
+Inserting a delay in the cifs demultiplexer thread widens the race
+window and makes reproduction of the race very easy:
+
+		if (server->large_buf)
+			buf = server->bigbuf;
+
++		usleep_range(500, 4000);
+
+		server->lstrp = jiffies;
+
+To resolve this I think the proper solution involves putting a
+reference count on the mid object. This patch makes sure that the
+demultiplexer thread holds a reference until it has finished
+processing the transaction.
+
+Cc: stable@vger.kernel.org
+Signed-off-by: Lars Persson <larper@axis.com>
+---
+Patch changelog:
+ V2: Fixed possible use of an uninitialized mid_entry in cifs_demultiplex_thread.
+---
+ fs/cifs/cifsglob.h      |  1 +
+ fs/cifs/cifsproto.h     |  1 +
+ fs/cifs/connect.c       |  8 +++++++-
+ fs/cifs/smb1ops.c       |  1 +
+ fs/cifs/smb2ops.c       |  1 +
+ fs/cifs/smb2transport.c |  1 +
+ fs/cifs/transport.c     | 18 +++++++++++++++++-
+ 7 files changed, 29 insertions(+), 2 deletions(-)
+
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 0543187fe707..0c0b062de2ec 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -1416,6 +1416,7 @@ typedef int (mid_handle_t)(struct TCP_Server_Info *server,
+ /* one of these for every pending CIFS request to the server */
+ struct mid_q_entry {
+ 	struct list_head qhead;	/* mids waiting on reply from this server */
++	struct kref refcount;
+ 	struct TCP_Server_Info *server;	/* server corresponding to this mid */
+ 	__u64 mid;		/* multiplex id */
+ 	__u32 pid;		/* process id */
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index e23eec5372df..7ead1a9ac6fb 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -82,6 +82,7 @@ extern struct mid_q_entry *AllocMidQEntry(const struct smb_hdr *smb_buffer,
+ 					struct TCP_Server_Info *server);
+ extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
+ extern void cifs_delete_mid(struct mid_q_entry *mid);
++extern void cifs_mid_q_entry_release(struct mid_q_entry *midEntry);
+ extern void cifs_wake_up_task(struct mid_q_entry *mid);
+ extern int cifs_handle_standard(struct TCP_Server_Info *server,
+ 				struct mid_q_entry *mid);
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 73496ec316b6..842f45859968 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -924,6 +924,7 @@ cifs_demultiplex_thread(void *p)
+ 				server->pdu_size = next_offset;
+ 		}
+ 
++		mid_entry = NULL;
+ 		if (server->ops->is_transform_hdr &&
+ 		    server->ops->receive_transform &&
+ 		    server->ops->is_transform_hdr(buf)) {
+@@ -938,8 +939,11 @@ cifs_demultiplex_thread(void *p)
+ 				length = mid_entry->receive(server, mid_entry);
+ 		}
+ 
+-		if (length < 0)
++		if (length < 0) {
++			if (mid_entry)
++				cifs_mid_q_entry_release(mid_entry);
+ 			continue;
++		}
+ 
+ 		if (server->large_buf)
+ 			buf = server->bigbuf;
+@@ -956,6 +960,8 @@ cifs_demultiplex_thread(void *p)
+ 
+ 			if (!mid_entry->multiRsp || mid_entry->multiEnd)
+ 				mid_entry->callback(mid_entry);
++
++			cifs_mid_q_entry_release(mid_entry);
+ 		} else if (server->ops->is_oplock_break &&
+ 			   server->ops->is_oplock_break(buf, server)) {
+ 			cifs_dbg(FYI, "Received oplock break\n");
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index aff8ce8ba34d..646dcd149de1 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -107,6 +107,7 @@ cifs_find_mid(struct TCP_Server_Info *server, char *buffer)
+ 		if (compare_mid(mid->mid, buf) &&
+ 		    mid->mid_state == MID_REQUEST_SUBMITTED &&
+ 		    le16_to_cpu(mid->command) == buf->Command) {
++			kref_get(&mid->refcount);
+ 			spin_unlock(&GlobalMid_Lock);
+ 			return mid;
+ 		}
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 22b6449e983d..b7b8ec7df9b1 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -203,6 +203,7 @@ smb2_find_mid(struct TCP_Server_Info *server, char *buf)
+ 		if ((mid->mid == wire_mid) &&
+ 		    (mid->mid_state == MID_REQUEST_SUBMITTED) &&
+ 		    (mid->command == shdr->Command)) {
++			kref_get(&mid->refcount);
+ 			spin_unlock(&GlobalMid_Lock);
+ 			return mid;
+ 		}
+diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+index 4fe06dbc395d..719d55e63d88 100644
+--- a/fs/cifs/smb2transport.c
++++ b/fs/cifs/smb2transport.c
+@@ -587,6 +587,7 @@ smb2_mid_entry_alloc(const struct smb2_sync_hdr *shdr,
+ 
+ 	temp = mempool_alloc(cifs_mid_poolp, GFP_NOFS);
+ 	memset(temp, 0, sizeof(struct mid_q_entry));
++	kref_init(&temp->refcount);
+ 	temp->mid = le64_to_cpu(shdr->MessageId);
+ 	temp->pid = current->pid;
+ 	temp->command = shdr->Command; /* Always LE */
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index fb57dfbfb749..208ecb830466 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -61,6 +61,7 @@ AllocMidQEntry(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
+ 
+ 	temp = mempool_alloc(cifs_mid_poolp, GFP_NOFS);
+ 	memset(temp, 0, sizeof(struct mid_q_entry));
++	kref_init(&temp->refcount);
+ 	temp->mid = get_mid(smb_buffer);
+ 	temp->pid = current->pid;
+ 	temp->command = cpu_to_le16(smb_buffer->Command);
+@@ -82,6 +83,21 @@ AllocMidQEntry(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
+ 	return temp;
+ }
+ 
++static void _cifs_mid_q_entry_release(struct kref *refcount)
++{
++	struct mid_q_entry *mid = container_of(refcount, struct mid_q_entry,
++					       refcount);
++
++	mempool_free(mid, cifs_mid_poolp);
++}
++
++void cifs_mid_q_entry_release(struct mid_q_entry *midEntry)
++{
++	spin_lock(&GlobalMid_Lock);
++	kref_put(&midEntry->refcount, _cifs_mid_q_entry_release);
++	spin_unlock(&GlobalMid_Lock);
++}
++
+ void
+ DeleteMidQEntry(struct mid_q_entry *midEntry)
+ {
+@@ -110,7 +126,7 @@ DeleteMidQEntry(struct mid_q_entry *midEntry)
+ 		}
+ 	}
+ #endif
+-	mempool_free(midEntry, cifs_mid_poolp);
++	cifs_mid_q_entry_release(midEntry);
+ }
+ 
+ void
 -- 
-Thanks,
-
-Steve
+2.17.1
