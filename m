@@ -1,196 +1,86 @@
-From: Lars Persson <lars.persson@axis.com>
-Subject: [PATCH v2] cifs: Fix use after free of a mid_q_entry
-Date: Mon, 25 Jun 2018 14:05:25 +0200
-Message-ID: <20180625120525.20413-1-larper@axis.com>
-Cc: Lars Persson <larper@axis.com>, stable@vger.kernel.org
-To: linux-cifs@vger.kernel.org, sfrench@samba.org
-Return-path: <stable-owner@vger.kernel.org>
-Sender: stable-owner@vger.kernel.org
+From: Long Li <longli@microsoft.com>
+Subject: RE: [Patch v2 02/15] CIFS: Add support for direct pages in rdata
+Date: Mon, 25 Jun 2018 20:25:52 +0000
+Message-ID: <CY4PR2101MB07229D570089E6057F2C8B4BCE4A0@CY4PR2101MB0722.namprd21.prod.outlook.com>
+References: <20180530194807.31657-1-longli@linuxonhyperv.com>
+ <20180530194807.31657-3-longli@linuxonhyperv.com>
+ <67b8afe7-f5e0-b36a-fcc1-87f1ae08eaa4@talpey.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+To: Tom Talpey <tom@talpey.com>, Steve French <sfrench@samba.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <67b8afe7-f5e0-b36a-fcc1-87f1ae08eaa4@talpey.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-With protocol version 2.0 mounts we have seen crashes with corrupt mid
-entries. Either the server->pending_mid_q list becomes corrupt with a
-cyclic reference in one element or a mid object fetched by the
-demultiplexer thread becomes overwritten during use.
-
-Code review identified a race between the demultiplexer thread and the
-request issuing thread. The demultiplexer thread seems to be written
-with the assumption that it is the sole user of the mid object until
-it calls the mid callback which either wakes the issuer task or
-deletes the mid.
-
-This assumption is not true because the issuer task can be woken up
-earlier by a signal. If the demultiplexer thread has proceeded as far
-as setting the mid_state to MID_RESPONSE_RECEIVED then the issuer
-thread will happily end up calling cifs_delete_mid while the
-demultiplexer thread still is using the mid object.
-
-Inserting a delay in the cifs demultiplexer thread widens the race
-window and makes reproduction of the race very easy:
-
-		if (server->large_buf)
-			buf = server->bigbuf;
-
-+		usleep_range(500, 4000);
-
-		server->lstrp = jiffies;
-
-To resolve this I think the proper solution involves putting a
-reference count on the mid object. This patch makes sure that the
-demultiplexer thread holds a reference until it has finished
-processing the transaction.
-
-Cc: stable@vger.kernel.org
-Signed-off-by: Lars Persson <larper@axis.com>
----
-Patch changelog:
- V2: Fixed possible use of an uninitialized mid_entry in cifs_demultiplex_thread.
----
- fs/cifs/cifsglob.h      |  1 +
- fs/cifs/cifsproto.h     |  1 +
- fs/cifs/connect.c       |  8 +++++++-
- fs/cifs/smb1ops.c       |  1 +
- fs/cifs/smb2ops.c       |  1 +
- fs/cifs/smb2transport.c |  1 +
- fs/cifs/transport.c     | 18 +++++++++++++++++-
- 7 files changed, 29 insertions(+), 2 deletions(-)
-
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 0543187fe707..0c0b062de2ec 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -1416,6 +1416,7 @@ typedef int (mid_handle_t)(struct TCP_Server_Info *server,
- /* one of these for every pending CIFS request to the server */
- struct mid_q_entry {
- 	struct list_head qhead;	/* mids waiting on reply from this server */
-+	struct kref refcount;
- 	struct TCP_Server_Info *server;	/* server corresponding to this mid */
- 	__u64 mid;		/* multiplex id */
- 	__u32 pid;		/* process id */
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index e23eec5372df..7ead1a9ac6fb 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -82,6 +82,7 @@ extern struct mid_q_entry *AllocMidQEntry(const struct smb_hdr *smb_buffer,
- 					struct TCP_Server_Info *server);
- extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
- extern void cifs_delete_mid(struct mid_q_entry *mid);
-+extern void cifs_mid_q_entry_release(struct mid_q_entry *midEntry);
- extern void cifs_wake_up_task(struct mid_q_entry *mid);
- extern int cifs_handle_standard(struct TCP_Server_Info *server,
- 				struct mid_q_entry *mid);
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 73496ec316b6..842f45859968 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -924,6 +924,7 @@ cifs_demultiplex_thread(void *p)
- 				server->pdu_size = next_offset;
- 		}
- 
-+		mid_entry = NULL;
- 		if (server->ops->is_transform_hdr &&
- 		    server->ops->receive_transform &&
- 		    server->ops->is_transform_hdr(buf)) {
-@@ -938,8 +939,11 @@ cifs_demultiplex_thread(void *p)
- 				length = mid_entry->receive(server, mid_entry);
- 		}
- 
--		if (length < 0)
-+		if (length < 0) {
-+			if (mid_entry)
-+				cifs_mid_q_entry_release(mid_entry);
- 			continue;
-+		}
- 
- 		if (server->large_buf)
- 			buf = server->bigbuf;
-@@ -956,6 +960,8 @@ cifs_demultiplex_thread(void *p)
- 
- 			if (!mid_entry->multiRsp || mid_entry->multiEnd)
- 				mid_entry->callback(mid_entry);
-+
-+			cifs_mid_q_entry_release(mid_entry);
- 		} else if (server->ops->is_oplock_break &&
- 			   server->ops->is_oplock_break(buf, server)) {
- 			cifs_dbg(FYI, "Received oplock break\n");
-diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index aff8ce8ba34d..646dcd149de1 100644
---- a/fs/cifs/smb1ops.c
-+++ b/fs/cifs/smb1ops.c
-@@ -107,6 +107,7 @@ cifs_find_mid(struct TCP_Server_Info *server, char *buffer)
- 		if (compare_mid(mid->mid, buf) &&
- 		    mid->mid_state == MID_REQUEST_SUBMITTED &&
- 		    le16_to_cpu(mid->command) == buf->Command) {
-+			kref_get(&mid->refcount);
- 			spin_unlock(&GlobalMid_Lock);
- 			return mid;
- 		}
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 22b6449e983d..b7b8ec7df9b1 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -203,6 +203,7 @@ smb2_find_mid(struct TCP_Server_Info *server, char *buf)
- 		if ((mid->mid == wire_mid) &&
- 		    (mid->mid_state == MID_REQUEST_SUBMITTED) &&
- 		    (mid->command == shdr->Command)) {
-+			kref_get(&mid->refcount);
- 			spin_unlock(&GlobalMid_Lock);
- 			return mid;
- 		}
-diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-index 4fe06dbc395d..719d55e63d88 100644
---- a/fs/cifs/smb2transport.c
-+++ b/fs/cifs/smb2transport.c
-@@ -587,6 +587,7 @@ smb2_mid_entry_alloc(const struct smb2_sync_hdr *shdr,
- 
- 	temp = mempool_alloc(cifs_mid_poolp, GFP_NOFS);
- 	memset(temp, 0, sizeof(struct mid_q_entry));
-+	kref_init(&temp->refcount);
- 	temp->mid = le64_to_cpu(shdr->MessageId);
- 	temp->pid = current->pid;
- 	temp->command = shdr->Command; /* Always LE */
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index fb57dfbfb749..208ecb830466 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -61,6 +61,7 @@ AllocMidQEntry(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
- 
- 	temp = mempool_alloc(cifs_mid_poolp, GFP_NOFS);
- 	memset(temp, 0, sizeof(struct mid_q_entry));
-+	kref_init(&temp->refcount);
- 	temp->mid = get_mid(smb_buffer);
- 	temp->pid = current->pid;
- 	temp->command = cpu_to_le16(smb_buffer->Command);
-@@ -82,6 +83,21 @@ AllocMidQEntry(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
- 	return temp;
- }
- 
-+static void _cifs_mid_q_entry_release(struct kref *refcount)
-+{
-+	struct mid_q_entry *mid = container_of(refcount, struct mid_q_entry,
-+					       refcount);
-+
-+	mempool_free(mid, cifs_mid_poolp);
-+}
-+
-+void cifs_mid_q_entry_release(struct mid_q_entry *midEntry)
-+{
-+	spin_lock(&GlobalMid_Lock);
-+	kref_put(&midEntry->refcount, _cifs_mid_q_entry_release);
-+	spin_unlock(&GlobalMid_Lock);
-+}
-+
- void
- DeleteMidQEntry(struct mid_q_entry *midEntry)
- {
-@@ -110,7 +126,7 @@ DeleteMidQEntry(struct mid_q_entry *midEntry)
- 		}
- 	}
- #endif
--	mempool_free(midEntry, cifs_mid_poolp);
-+	cifs_mid_q_entry_release(midEntry);
- }
- 
- void
--- 
-2.17.1
+PiBGcm9tOiBUb20gVGFscGV5IDx0b21AdGFscGV5LmNvbT4NCj4gU2VudDogU2F0dXJkYXksIEp1
+bmUgMjMsIDIwMTggNjo1MCBQTQ0KPiBUbzogTG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+
+OyBTdGV2ZSBGcmVuY2ggPHNmcmVuY2hAc2FtYmEub3JnPjsNCj4gbGludXgtY2lmc0B2Z2VyLmtl
+cm5lbC5vcmc7IHNhbWJhLXRlY2huaWNhbEBsaXN0cy5zYW1iYS5vcmc7IGxpbnV4LQ0KPiBrZXJu
+ZWxAdmdlci5rZXJuZWwub3JnOyBsaW51eC1yZG1hQHZnZXIua2VybmVsLm9yZw0KPiBTdWJqZWN0
+OiBSZTogW1BhdGNoIHYyIDAyLzE1XSBDSUZTOiBBZGQgc3VwcG9ydCBmb3IgZGlyZWN0IHBhZ2Vz
+IGluIHJkYXRhDQo+IA0KPiBPbiA1LzMwLzIwMTggMzo0NyBQTSwgTG9uZyBMaSB3cm90ZToNCj4g
+PiBGcm9tOiBMb25nIExpIDxsb25nbGlAbWljcm9zb2Z0LmNvbT4NCj4gPg0KPiA+IEFkZCBhIGZ1
+bmN0aW9uIHRvIGFsbG9jYXRlIHJkYXRhIHdpdGhvdXQgYWxsb2NhdGluZyBwYWdlcyBmb3IgZGF0
+YQ0KPiA+IHRyYW5zZmVyLiBUaGlzIGdpdmVzIHRoZSBjYWxsZXIgYW4gb3B0aW9uIHRvIHBhc3Mg
+YSBudW1iZXIgb2YgcGFnZXMNCj4gPiB0aGF0IHBvaW50IHRvIHRoZSBkYXRhIGJ1ZmZlci4NCj4g
+Pg0KPiA+IHJkYXRhIGlzIHN0aWxsIHJlcG9uc2libGUgZm9yIGZyZWUgdGhvc2UgcGFnZXMgYWZ0
+ZXIgaXQncyBkb25lLg0KPiANCj4gIkNhbGxlciIgaXMgc3RpbGwgcmVzcG9uc2libGU/IE9yIGlz
+IHRoZSByZGF0YSBzb21laG93IGZyZWVpbmcgaXRzZWxmIHZpYSBhbm90aGVyDQo+IG1lY2hhbmlz
+bT8NCg0KSSBtZWFudCB0byBzYXkgZnJlZSB0aGUgYXJyYXkgInN0cnVjdCBwYWdlICoqcGFnZXMi
+LCBub3QgdGhlIHBhZ2VzIHRoZW1zZWx2ZXMuDQoNCkJlZm9yZSB0aGUgcGF0Y2gsIHRoZSBwYWdl
+IGFycmF5IGlzIGFsbG9jYXRlZCBhdCB0aGUgZW5kIG9mIHRoZSBzdHJ1Y3QgY2lmc19yZWFkZGF0
+YToNCg0KICAgICAgcmRhdGEgPSBremFsbG9jKHNpemVvZigqcmRhdGEpICsgKHNpemVvZihzdHJ1
+Y3QgcGFnZSAqKSAqIG5yX3BhZ2VzKSwNCiAgICAgICAgICAgICAgICAgICAgICAgR0ZQX0tFUk5F
+TCk7DQoNCklmIHRoaXMgaXMgdGhlIGNhc2UsIHRoZXkgYXJlIGF1dG9tYXRpY2FsbHkgZnJlZWQg
+d2hlbiBjaWZzX3JlYWRkYXRhIGlzIGZyZWVkLg0KDQpXaXRoIHRoZSBkaXJlY3QgSS9PIHBhdGNo
+LCB0aGUgcGFnZSBhcnJheSBpcyBoYW5kbGVkIHNlcGFyYXRlbHkuIFNvIHRoZXkgbmVlZCB0byBi
+ZSBmcmVlZCBhZnRlciBiZWluZyB1c2VkLg0KDQo+IA0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTog
+TG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+ID4gLS0tDQo+ID4gICBmcy9jaWZzL2Np
+ZnNnbG9iLmggfCAgMiArLQ0KPiA+ICAgZnMvY2lmcy9maWxlLmMgICAgIHwgMjMgKysrKysrKysr
+KysrKysrKysrKystLS0NCj4gPiAgIDIgZmlsZXMgY2hhbmdlZCwgMjEgaW5zZXJ0aW9ucygrKSwg
+NCBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNnbG9iLmgg
+Yi9mcy9jaWZzL2NpZnNnbG9iLmggaW5kZXgNCj4gPiA4ZDE2YzNlLi41Njg2NGE4NyAxMDA2NDQN
+Cj4gPiAtLS0gYS9mcy9jaWZzL2NpZnNnbG9iLmgNCj4gPiArKysgYi9mcy9jaWZzL2NpZnNnbG9i
+LmgNCj4gPiBAQCAtMTE3OSw3ICsxMTc5LDcgQEAgc3RydWN0IGNpZnNfcmVhZGRhdGEgew0KPiA+
+ICAgCXVuc2lnbmVkIGludAkJCXRhaWxzejsNCj4gPiAgIAl1bnNpZ25lZCBpbnQJCQljcmVkaXRz
+Ow0KPiA+ICAgCXVuc2lnbmVkIGludAkJCW5yX3BhZ2VzOw0KPiA+IC0Jc3RydWN0IHBhZ2UJCQkq
+cGFnZXNbXTsNCj4gPiArCXN0cnVjdCBwYWdlCQkJKipwYWdlczsNCj4gDQo+IFRlY2huaWNhbGx5
+IHNwZWFraW5nLCB0aGVzZSBhcmUgc3ludGFjdGljYWxseSBlcXVpdmFsZW50LiBJdCBtYXkgbm90
+IGJlIHdvcnRoDQo+IGNoYW5naW5nIHRoaXMgaGlzdG9yaWMgZGVmaW5pdGlvbi4NCj4gDQo+IFRv
+bS4NCj4gDQo+IA0KPiA+ICAgfTsNCj4gPg0KPiA+ICAgc3RydWN0IGNpZnNfd3JpdGVkYXRhOw0K
+PiA+IGRpZmYgLS1naXQgYS9mcy9jaWZzL2ZpbGUuYyBiL2ZzL2NpZnMvZmlsZS5jIGluZGV4IDIz
+ZmQ0MzAuLjFjOTgyOTMNCj4gPiAxMDA2NDQNCj4gPiAtLS0gYS9mcy9jaWZzL2ZpbGUuYw0KPiA+
+ICsrKyBiL2ZzL2NpZnMvZmlsZS5jDQo+ID4gQEAgLTI4ODAsMTMgKzI4ODAsMTMgQEAgY2lmc19z
+dHJpY3Rfd3JpdGV2KHN0cnVjdCBraW9jYiAqaW9jYiwgc3RydWN0DQo+IGlvdl9pdGVyICpmcm9t
+KQ0KPiA+ICAgfQ0KPiA+DQo+ID4gICBzdGF0aWMgc3RydWN0IGNpZnNfcmVhZGRhdGEgKg0KPiA+
+IC1jaWZzX3JlYWRkYXRhX2FsbG9jKHVuc2lnbmVkIGludCBucl9wYWdlcywgd29ya19mdW5jX3Qg
+Y29tcGxldGUpDQo+ID4gK2NpZnNfcmVhZGRhdGFfZGlyZWN0X2FsbG9jKHN0cnVjdCBwYWdlICoq
+cGFnZXMsIHdvcmtfZnVuY190IGNvbXBsZXRlKQ0KPiA+ICAgew0KPiA+ICAgCXN0cnVjdCBjaWZz
+X3JlYWRkYXRhICpyZGF0YTsNCj4gPg0KPiA+IC0JcmRhdGEgPSBremFsbG9jKHNpemVvZigqcmRh
+dGEpICsgKHNpemVvZihzdHJ1Y3QgcGFnZSAqKSAqIG5yX3BhZ2VzKSwNCj4gPiAtCQkJR0ZQX0tF
+Uk5FTCk7DQo+ID4gKwlyZGF0YSA9IGt6YWxsb2Moc2l6ZW9mKCpyZGF0YSksIEdGUF9LRVJORUwp
+Ow0KPiA+ICAgCWlmIChyZGF0YSAhPSBOVUxMKSB7DQo+ID4gKwkJcmRhdGEtPnBhZ2VzID0gcGFn
+ZXM7DQo+ID4gICAJCWtyZWZfaW5pdCgmcmRhdGEtPnJlZmNvdW50KTsNCj4gPiAgIAkJSU5JVF9M
+SVNUX0hFQUQoJnJkYXRhLT5saXN0KTsNCj4gPiAgIAkJaW5pdF9jb21wbGV0aW9uKCZyZGF0YS0+
+ZG9uZSk7DQo+ID4gQEAgLTI4OTYsNiArMjg5NiwyMiBAQCBjaWZzX3JlYWRkYXRhX2FsbG9jKHVu
+c2lnbmVkIGludCBucl9wYWdlcywNCj4gd29ya19mdW5jX3QgY29tcGxldGUpDQo+ID4gICAJcmV0
+dXJuIHJkYXRhOw0KPiA+ICAgfQ0KPiA+DQo+ID4gK3N0YXRpYyBzdHJ1Y3QgY2lmc19yZWFkZGF0
+YSAqDQo+ID4gK2NpZnNfcmVhZGRhdGFfYWxsb2ModW5zaWduZWQgaW50IG5yX3BhZ2VzLCB3b3Jr
+X2Z1bmNfdCBjb21wbGV0ZSkgew0KPiA+ICsJc3RydWN0IHBhZ2UgKipwYWdlcyA9DQo+ID4gKwkJ
+a3phbGxvYyhzaXplb2Yoc3RydWN0IHBhZ2UgKikgKiBucl9wYWdlcywgR0ZQX0tFUk5FTCk7DQo+
+ID4gKwlzdHJ1Y3QgY2lmc19yZWFkZGF0YSAqcmV0ID0gTlVMTDsNCj4gPiArDQo+ID4gKwlpZiAo
+cGFnZXMpIHsNCj4gPiArCQlyZXQgPSBjaWZzX3JlYWRkYXRhX2RpcmVjdF9hbGxvYyhwYWdlcywg
+Y29tcGxldGUpOw0KPiA+ICsJCWlmICghcmV0KQ0KPiA+ICsJCQlrZnJlZShwYWdlcyk7DQo+ID4g
+Kwl9DQo+ID4gKw0KPiA+ICsJcmV0dXJuIHJldDsNCj4gPiArfQ0KPiA+ICsNCj4gPiAgIHZvaWQN
+Cj4gPiAgIGNpZnNfcmVhZGRhdGFfcmVsZWFzZShzdHJ1Y3Qga3JlZiAqcmVmY291bnQpDQo+ID4g
+ICB7DQo+ID4gQEAgLTI5MTAsNiArMjkyNiw3IEBAIGNpZnNfcmVhZGRhdGFfcmVsZWFzZShzdHJ1
+Y3Qga3JlZiAqcmVmY291bnQpDQo+ID4gICAJaWYgKHJkYXRhLT5jZmlsZSkNCj4gPiAgIAkJY2lm
+c0ZpbGVJbmZvX3B1dChyZGF0YS0+Y2ZpbGUpOw0KPiA+DQo+ID4gKwlrdmZyZWUocmRhdGEtPnBh
+Z2VzKTsNCj4gPiAgIAlrZnJlZShyZGF0YSk7DQo+ID4gICB9DQo+ID4NCj4gPg0K
