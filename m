@@ -1,79 +1,105 @@
-From: Long Li <longli@microsoft.com>
-Subject: RE: [Patch v2 09/15] CIFS: SMBD: Support page offset in RDMA recv
-Date: Mon, 25 Jun 2018 21:29:17 +0000
-Message-ID: <CY4PR2101MB07221AFF7B75D21C00C60035CE4A0@CY4PR2101MB0722.namprd21.prod.outlook.com>
-References: <20180530194807.31657-1-longli@linuxonhyperv.com>
- <20180530194807.31657-10-longli@linuxonhyperv.com>
- <1e6b7cb0-98e8-d1fd-cb59-d3344fc70b19@talpey.com>
+From: Laura Abbott <labbott@redhat.com>
+Subject: F_OFD_GETLK implemented wrong with CIFS protocol version 2.0+
+Date: Mon, 25 Jun 2018 16:58:26 -0700
+Message-ID: <77967693-040b-734a-8e18-be95d97478b3@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-To: Tom Talpey <tom@talpey.com>, Steve French <sfrench@samba.org>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+        Adam Williamson <awilliam@redhat.com>
+To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1e6b7cb0-98e8-d1fd-cb59-d3344fc70b19@talpey.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-PiBTdWJqZWN0OiBSZTogW1BhdGNoIHYyIDA5LzE1XSBDSUZTOiBTTUJEOiBTdXBwb3J0IHBhZ2Ug
-b2Zmc2V0IGluIFJETUEgcmVjdg0KPiANCj4gT24gNS8zMC8yMDE4IDM6NDggUE0sIExvbmcgTGkg
-d3JvdGU6DQo+ID4gRnJvbTogTG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+ID4NCj4g
-PiBSRE1BIHJlY3YgZnVuY3Rpb24gbmVlZHMgdG8gcGxhY2UgZGF0YSB0byB0aGUgY29ycmVjdCBw
-bGFjZSBzdGFydGluZw0KPiA+IGF0IHBhZ2Ugb2Zmc2V0Lg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1i
-eTogTG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+ID4gLS0tDQo+ID4gICBmcy9jaWZz
-L3NtYmRpcmVjdC5jIHwgMTggKysrKysrKysrKystLS0tLS0tDQo+ID4gICAxIGZpbGUgY2hhbmdl
-ZCwgMTEgaW5zZXJ0aW9ucygrKSwgNyBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IGRpZmYgLS1naXQg
-YS9mcy9jaWZzL3NtYmRpcmVjdC5jIGIvZnMvY2lmcy9zbWJkaXJlY3QuYyBpbmRleA0KPiA+IDYx
-NDFlM2MuLmJhNTNjNTIgMTAwNjQ0DQo+ID4gLS0tIGEvZnMvY2lmcy9zbWJkaXJlY3QuYw0KPiA+
-ICsrKyBiL2ZzL2NpZnMvc21iZGlyZWN0LmMNCj4gPiBAQCAtMjAwNCwxMCArMjAwNCwxMiBAQCBz
-dGF0aWMgaW50IHNtYmRfcmVjdl9idWYoc3RydWN0DQo+IHNtYmRfY29ubmVjdGlvbiAqaW5mbywg
-Y2hhciAqYnVmLA0KPiA+ICAgICogcmV0dXJuIHZhbHVlOiBhY3R1YWwgZGF0YSByZWFkDQo+ID4g
-ICAgKi8NCj4gPiAgIHN0YXRpYyBpbnQgc21iZF9yZWN2X3BhZ2Uoc3RydWN0IHNtYmRfY29ubmVj
-dGlvbiAqaW5mbywNCj4gPiAtCQlzdHJ1Y3QgcGFnZSAqcGFnZSwgdW5zaWduZWQgaW50IHRvX3Jl
-YWQpDQo+ID4gKwkJc3RydWN0IHBhZ2UgKnBhZ2UsIHVuc2lnbmVkIGludCBwYWdlX29mZnNldCwN
-Cj4gPiArCQl1bnNpZ25lZCBpbnQgdG9fcmVhZCkNCj4gPiAgIHsNCj4gPiAgIAlpbnQgcmV0Ow0K
-PiA+ICAgCWNoYXIgKnRvX2FkZHJlc3M7DQo+ID4gKwl2b2lkICpwYWdlX2FkZHJlc3M7DQo+ID4N
-Cj4gPiAgIAkvKiBtYWtlIHN1cmUgd2UgaGF2ZSB0aGUgcGFnZSByZWFkeSBmb3IgcmVhZCAqLw0K
-PiA+ICAgCXJldCA9IHdhaXRfZXZlbnRfaW50ZXJydXB0aWJsZSgNCj4gPiBAQCAtMjAxNSwxNiAr
-MjAxNywxNyBAQCBzdGF0aWMgaW50IHNtYmRfcmVjdl9wYWdlKHN0cnVjdA0KPiBzbWJkX2Nvbm5l
-Y3Rpb24gKmluZm8sDQo+ID4gICAJCWluZm8tPnJlYXNzZW1ibHlfZGF0YV9sZW5ndGggPj0gdG9f
-cmVhZCB8fA0KPiA+ICAgCQkJaW5mby0+dHJhbnNwb3J0X3N0YXR1cyAhPSBTTUJEX0NPTk5FQ1RF
-RCk7DQo+ID4gICAJaWYgKHJldCkNCj4gPiAtCQlyZXR1cm4gMDsNCj4gPiArCQlyZXR1cm4gcmV0
-Ow0KPiA+DQo+ID4gICAJLyogbm93IHdlIGNhbiByZWFkIGZyb20gcmVhc3NlbWJseSBxdWV1ZSBh
-bmQgbm90IHNsZWVwICovDQo+ID4gLQl0b19hZGRyZXNzID0ga21hcF9hdG9taWMocGFnZSk7DQo+
-ID4gKwlwYWdlX2FkZHJlc3MgPSBrbWFwX2F0b21pYyhwYWdlKTsNCj4gPiArCXRvX2FkZHJlc3Mg
-PSAoY2hhciAqKSBwYWdlX2FkZHJlc3MgKyBwYWdlX29mZnNldDsNCj4gPg0KPiA+ICAgCWxvZ19y
-ZWFkKElORk8sICJyZWFkaW5nIGZyb20gcGFnZT0lcCBhZGRyZXNzPSVwIHRvX3JlYWQ9JWRcbiIs
-DQo+ID4gICAJCXBhZ2UsIHRvX2FkZHJlc3MsIHRvX3JlYWQpOw0KPiA+DQo+ID4gICAJcmV0ID0g
-c21iZF9yZWN2X2J1ZihpbmZvLCB0b19hZGRyZXNzLCB0b19yZWFkKTsNCj4gPiAtCWt1bm1hcF9h
-dG9taWModG9fYWRkcmVzcyk7DQo+ID4gKwlrdW5tYXBfYXRvbWljKHBhZ2VfYWRkcmVzcyk7DQo+
-IA0KPiBJcyAicGFnZSIgdHJ1bHkgbm90IG1hcHBlZD8gVGhpcyBrbWFwL2t1bm1hcCBmb3IgZWFj
-aCByZWNlaXZlZCA0S0IgaXMgdmVyeQ0KPiBleHBlbnNpdmUuIElzIHRoZXJlIG5vdCBhIHdheSB0
-byBrZWVwIGEga3ZhIGZvciB0aGUgcmVhc3NlbWJseSBxdWV1ZQ0KPiBzZWdtZW50cz8NCg0KSSB3
-aWxsIGZpbmQgYSB3YXkgdG8gbm90IG1hcCB0aG9zZSB1cHBlciBsYXllciBwYWdlcyB3aGVuIGRv
-aW5nIFJETUEgcmVjZWl2ZS4gVGhlIHJlYXNvbiBmb3IgZG9pbmcgdGhpcyBpcyB0byB1c2UgYSBj
-b21tb24gbGF5ZXIgKHRoYXQgd2lsbCBncmVhdGx5IHNpbXBsaWZpZXMgdGhlIGNvZGUpIGZvciB0
-cmFuc3BvcnQuIEl0J3MgcHJvYmFibHkgYSB3YXN0ZSBvZiB0aW1lIHdoZW4gb25seSBwYWdlcyBh
-cmUgaW52b2x2ZWQsIGFuZCBub3QgbmVlZCB0byBiZSBtYXBwZWQuDQoNCkkgd2lsbCBhZGRyZXNz
-IHRob3NlIGluIGEgc2VwYXJhdGUgcGF0Y2guDQoNCj4gDQo+ID4NCj4gPiAgIAlyZXR1cm4gcmV0
-Ow0KPiA+ICAgfQ0KPiA+IEBAIC0yMDM4LDcgKzIwNDEsNyBAQCBpbnQgc21iZF9yZWN2KHN0cnVj
-dCBzbWJkX2Nvbm5lY3Rpb24gKmluZm8sDQo+IHN0cnVjdCBtc2doZHIgKm1zZykNCj4gPiAgIHsN
-Cj4gPiAgIAljaGFyICpidWY7DQo+ID4gICAJc3RydWN0IHBhZ2UgKnBhZ2U7DQo+ID4gLQl1bnNp
-Z25lZCBpbnQgdG9fcmVhZDsNCj4gPiArCXVuc2lnbmVkIGludCB0b19yZWFkLCBwYWdlX29mZnNl
-dDsNCj4gPiAgIAlpbnQgcmM7DQo+ID4NCj4gPiAgIAlpbmZvLT5zbWJkX3JlY3ZfcGVuZGluZysr
-Ow0KPiA+IEBAIC0yMDUyLDE1ICsyMDU1LDE2IEBAIGludCBzbWJkX3JlY3Yoc3RydWN0IHNtYmRf
-Y29ubmVjdGlvbiAqaW5mbywNCj4gPiBzdHJ1Y3QgbXNnaGRyICptc2cpDQo+ID4NCj4gPiAgIAlj
-YXNlIFJFQUQgfCBJVEVSX0JWRUM6DQo+ID4gICAJCXBhZ2UgPSBtc2ctPm1zZ19pdGVyLmJ2ZWMt
-PmJ2X3BhZ2U7DQo+ID4gKwkJcGFnZV9vZmZzZXQgPSBtc2ctPm1zZ19pdGVyLmJ2ZWMtPmJ2X29m
-ZnNldDsNCj4gPiAgIAkJdG9fcmVhZCA9IG1zZy0+bXNnX2l0ZXIuYnZlYy0+YnZfbGVuOw0KPiA+
-IC0JCXJjID0gc21iZF9yZWN2X3BhZ2UoaW5mbywgcGFnZSwgdG9fcmVhZCk7DQo+ID4gKwkJcmMg
-PSBzbWJkX3JlY3ZfcGFnZShpbmZvLCBwYWdlLCBwYWdlX29mZnNldCwgdG9fcmVhZCk7DQo+ID4g
-ICAJCWJyZWFrOw0KPiA+DQo+ID4gICAJZGVmYXVsdDoNCj4gPiAgIAkJLyogSXQncyBhIGJ1ZyBp
-biB1cHBlciBsYXllciB0byBnZXQgdGhlcmUgKi8NCj4gPiAgIAkJY2lmc19kYmcoVkZTLCAiQ0lG
-UzogaW52YWxpZCBtc2cgdHlwZSAlZFxuIiwNCj4gPiAgIAkJCW1zZy0+bXNnX2l0ZXIudHlwZSk7
-DQo+ID4gLQkJcmMgPSAtRUlPOw0KPiA+ICsJCXJjID0gLUVJTlZBTDsNCj4gPiAgIAl9DQo+ID4N
-Cj4gPiAgIAlpbmZvLT5zbWJkX3JlY3ZfcGVuZGluZy0tOw0KPiA+DQo=
+Hi,
+
+A while back, someone reported a failure on Fedora when trying to boot
+a QEMU image off of a CIFS share. The issue was reduced down to a
+test case (https://bugzilla.redhat.com/show_bug.cgi?id=1484130#c8)
+
+# cat test-ofd-lock.c
+#define _GNU_SOURCE
+#include <errno.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+
+int main(int argc, char **argv)
+{
+     int ret;
+     int fd;
+     struct flock fl = {
+         .l_whence = SEEK_SET,
+         .l_start  = 0,
+         .l_len    = 0,
+         .l_type   = F_RDLCK,
+     };
+     if (argc < 2) {
+             fprintf(stderr, "Usage: %s <file>\n", argv[0]);
+             return 1;
+     }
+     fd = open(argv[1], O_RDWR);
+     if (fd < 0) {
+             perror("open");
+             return errno;
+     }
+     ret = fcntl(fd, F_OFD_SETLK, &fl);
+     if (ret) {
+             perror("setlk");
+             return errno;
+     }
+     fl.l_type = F_WRLCK;
+     ret = fcntl(fd, F_OFD_GETLK, &fl);
+     if (ret) {
+             perror("getlk");
+             return errno;
+     }
+     if (fl.l_type != F_UNLCK) {
+             fprintf(stderr, "get lock test failed\n");
+             return 1;
+     }
+     return 0;
+}
+[root@localhost ~]# make test-ofd-lock
+cc     test-ofd-lock.c   -o test-ofd-lock
+[root@localhost ~]# touch /tmp/test && ./test-ofd-lock /tmp/test
+[root@localhost ~]# echo $?
+0
+[root@localhost ~]# touch /mnt/test && ./test-ofd-lock /mnt/test
+get lock test failed
+[root@localhost ~]# mount | grep /mnt
+//192.168.31.1/tddownload on /mnt type cifs (rw,relatime,vers=3.0,
+cache=strict,username=admin,domain=,uid=0,
+noforceuid,gid=0,noforcegid,addr=192.168.31.1,file_mode=0755,
+dir_mode=0755,nounix,serverino,mapposix,rsize=1048576,
+wsize=1048576,echo_interval=60,actimeo=1,user=admin)
+
+
+As explained by one of the QEMU developers
+(https://bugzilla.redhat.com/show_bug.cgi?id=1484130#c37)
+
+'''
+It is a kernel bug. The code snippet in comment 8 shows clearly that the kernel
+is doing the wrong thing, which cannot be fixed/worked around by QEMU.
+
+In man 2 fcntl:
+
+        F_OFD_GETLK (struct flock *)
+               On input to this call, lock describes an open file description lock
+we would like to place on the file.  If the lock could  be  placed,  fcntl()  does  not
+               actually  place  it,  but  returns F_UNLCK in the l_type field of lock
+and leaves the other fields of the structure unchanged.  If one or more incompatible
+               locks would prevent this lock being placed, then details about one of
+these locks are returned via lock, as described above for F_GETLK.
+
+which is not the case with the new CIFS behaviour.
+''
+
+You can read the full context at https://bugzilla.redhat.com/show_bug.cgi?id=1484130
+
+Any suggestions?
+
+Thanks,
+Laura
