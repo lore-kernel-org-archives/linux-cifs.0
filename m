@@ -1,55 +1,65 @@
-From: Jason Gunthorpe <jgg@ziepe.ca>
-Subject: Re: [Patch v2 02/15] CIFS: Add support for direct pages in rdata
-Date: Mon, 25 Jun 2018 15:01:32 -0600
-Message-ID: <20180625210132.GB5381@ziepe.ca>
+From: Long Li <longli@microsoft.com>
+Subject: RE: [Patch v2 05/15] CIFS: Calculate the correct request length based
+ on page offset and tail size
+Date: Mon, 25 Jun 2018 21:07:05 +0000
+Message-ID: <CY4PR2101MB0722248C0F31E5CDA4CCAEFECE4A0@CY4PR2101MB0722.namprd21.prod.outlook.com>
 References: <20180530194807.31657-1-longli@linuxonhyperv.com>
- <20180530194807.31657-3-longli@linuxonhyperv.com>
- <67b8afe7-f5e0-b36a-fcc1-87f1ae08eaa4@talpey.com>
+ <20180530194807.31657-6-longli@linuxonhyperv.com>
+ <183b5cd5-b12b-de08-7867-c2addf29c974@talpey.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: longli@microsoft.com, Steve French <sfrench@samba.org>,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
-To: Tom Talpey <tom@talpey.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+To: Tom Talpey <tom@talpey.com>, Steve French <sfrench@samba.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <67b8afe7-f5e0-b36a-fcc1-87f1ae08eaa4@talpey.com>
+In-Reply-To: <183b5cd5-b12b-de08-7867-c2addf29c974@talpey.com>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Sat, Jun 23, 2018 at 09:50:20PM -0400, Tom Talpey wrote:
-> On 5/30/2018 3:47 PM, Long Li wrote:
-> >From: Long Li <longli@microsoft.com>
-> >
-> >Add a function to allocate rdata without allocating pages for data
-> >transfer. This gives the caller an option to pass a number of pages
-> >that point to the data buffer.
-> >
-> >rdata is still reponsible for free those pages after it's done.
-> 
-> "Caller" is still responsible? Or is the rdata somehow freeing itself
-> via another mechanism?
-> 
-> >
-> >Signed-off-by: Long Li <longli@microsoft.com>
-> >  fs/cifs/cifsglob.h |  2 +-
-> >  fs/cifs/file.c     | 23 ++++++++++++++++++++---
-> >  2 files changed, 21 insertions(+), 4 deletions(-)
-> >
-> >diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> >index 8d16c3e..56864a87 100644
-> >+++ b/fs/cifs/cifsglob.h
-> >@@ -1179,7 +1179,7 @@ struct cifs_readdata {
-> >  	unsigned int			tailsz;
-> >  	unsigned int			credits;
-> >  	unsigned int			nr_pages;
-> >-	struct page			*pages[];
-> >+	struct page			**pages;
-> 
-> Technically speaking, these are syntactically equivalent. It may not
-> be worth changing this historic definition.
-
-[] is a C99 'flex array', it has a different allocation behavior than
-** and is not interchangeable..
-
-Jason
+PiBTdWJqZWN0OiBSZTogW1BhdGNoIHYyIDA1LzE1XSBDSUZTOiBDYWxjdWxhdGUgdGhlIGNvcnJl
+Y3QgcmVxdWVzdCBsZW5ndGggYmFzZWQNCj4gb24gcGFnZSBvZmZzZXQgYW5kIHRhaWwgc2l6ZQ0K
+PiANCj4gT24gNS8zMC8yMDE4IDM6NDcgUE0sIExvbmcgTGkgd3JvdGU6DQo+ID4gRnJvbTogTG9u
+ZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+ID4NCj4gPiBJdCdzIHBvc3NpYmxlIHRoYXQg
+dGhlIHBhZ2Ugb2Zmc2V0IGlzIG5vbi16ZXJvIGluIHRoZSBwYWdlcyBpbiBhDQo+ID4gcmVxdWVz
+dCwgY2hhbmdlIHRoZSBmdW5jdGlvbiB0byBjYWxjdWxhdGUgdGhlIGNvcnJlY3QgZGF0YSBidWZm
+ZXIgbGVuZ3RoLg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogTG9uZyBMaSA8bG9uZ2xpQG1pY3Jv
+c29mdC5jb20+DQo+ID4gLS0tDQo+ID4gICBmcy9jaWZzL3RyYW5zcG9ydC5jIHwgMjAgKysrKysr
+KysrKysrKysrKystLS0NCj4gPiAgIDEgZmlsZSBjaGFuZ2VkLCAxNyBpbnNlcnRpb25zKCspLCAz
+IGRlbGV0aW9ucygtKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2ZzL2NpZnMvdHJhbnNwb3J0LmMg
+Yi9mcy9jaWZzL3RyYW5zcG9ydC5jIGluZGV4DQo+ID4gOTI3MjI2YS4uZDZiNTUyMyAxMDA2NDQN
+Cj4gPiAtLS0gYS9mcy9jaWZzL3RyYW5zcG9ydC5jDQo+ID4gKysrIGIvZnMvY2lmcy90cmFuc3Bv
+cnQuYw0KPiA+IEBAIC0yMTIsMTAgKzIxMiwyNCBAQCBycXN0X2xlbihzdHJ1Y3Qgc21iX3Jxc3Qg
+KnJxc3QpDQo+ID4gICAJZm9yIChpID0gMDsgaSA8IHJxc3QtPnJxX252ZWM7IGkrKykNCj4gPiAg
+IAkJYnVmbGVuICs9IGlvdltpXS5pb3ZfbGVuOw0KPiA+DQo+ID4gLQkvKiBhZGQgaW4gdGhlIHBh
+Z2UgYXJyYXkgaWYgdGhlcmUgaXMgb25lICovDQo+ID4gKwkvKg0KPiA+ICsJICogQWRkIGluIHRo
+ZSBwYWdlIGFycmF5IGlmIHRoZXJlIGlzIG9uZS4gVGhlIGNhbGxlciBuZWVkcyB0byBtYWtlDQo+
+ID4gKwkgKiBzdXJlIHJxX29mZnNldCBhbmQgcnFfdGFpbHN6IGFyZSBzZXQgY29ycmVjdGx5LiBJ
+ZiBhIGJ1ZmZlciBvZg0KPiA+ICsJICogbXVsdGlwbGUgcGFnZXMgZW5kcyBhdCBwYWdlIGJvdW5k
+YXJ5LCBycV90YWlsc3ogbmVlZHMgdG8gYmUgc2V0IHRvDQo+ID4gKwkgKiBQQUdFX1NJWkUuDQo+
+ID4gKwkgKi8NCj4gPiAgIAlpZiAocnFzdC0+cnFfbnBhZ2VzKSB7DQo+ID4gLQkJYnVmbGVuICs9
+IHJxc3QtPnJxX3BhZ2VzeiAqIChycXN0LT5ycV9ucGFnZXMgLSAxKTsNCj4gPiAtCQlidWZsZW4g
+Kz0gcnFzdC0+cnFfdGFpbHN6Ow0KPiA+ICsJCWlmIChycXN0LT5ycV9ucGFnZXMgPT0gMSkNCj4g
+PiArCQkJYnVmbGVuICs9IHJxc3QtPnJxX3RhaWxzejsNCj4gPiArCQllbHNlIHsNCj4gPiArCQkJ
+LyoNCj4gPiArCQkJICogSWYgdGhlcmUgaXMgbW9yZSB0aGFuIG9uZSBwYWdlLCBjYWxjdWxhdGUg
+dGhlDQo+ID4gKwkJCSAqIGJ1ZmZlciBsZW5ndGggYmFzZWQgb24gcnFfb2Zmc2V0IGFuZCBycV90
+YWlsc3oNCj4gPiArCQkJICovDQo+ID4gKwkJCWJ1ZmxlbiArPSBycXN0LT5ycV9wYWdlc3ogKiAo
+cnFzdC0+cnFfbnBhZ2VzIC0gMSkgLQ0KPiA+ICsJCQkJCXJxc3QtPnJxX29mZnNldDsNCj4gPiAr
+CQkJYnVmbGVuICs9IHJxc3QtPnJxX3RhaWxzejsNCj4gPiArCQl9DQo+IA0KPiBXb3VsZG4ndCBp
+dCBiZSBzaW1wbGVyIHRvIGtlZXAgdGhlIG9yaWdpbmFsIGNvZGUsIGJ1dCB0aGVuIGp1c3Qgc3Vi
+dHJhY3QgdGhlDQo+IHJxX29mZnNldD8NCj4gDQo+IAlidWZsZW4gKz0gcnFzdC0+cnFfcGFnZXN6
+ICogKHJxc3QtPnJxX25wYWdlcyAtIDEpOw0KPiAJYnVmbGVuICs9IHJxc3QtPnJxX3RhaWxzejsN
+Cj4gCWJ1ZmxlbiAtPSBycXN0LT5ycV9vZmZzZXQ7DQo+IA0KPiBJdCdzIGtpbmQgb2YgY29uZnVz
+aW5nIGFzIHdyaXR0ZW4uIEFsc28sIHdoYXQgaWYgaXQncyBqdXN0IG9uZSBwYWdlLCBidXQgaGFz
+IGENCj4gbm9uLXplcm8gb2Zmc2V0PyBJcyB0aGF0IHNvbWVob3cgbm90IHBvc3NpYmxlPyBNeSBz
+dWdnZXN0ZWQgY29kZSB3b3VsZA0KPiB0YWtlIHRoYXQgaW50byBhY2NvdW50LCB5b3VycyBkb2Vz
+bid0Lg0KDQpJIHRoaW5rIEl0IGNhbiBiZSBjaGFuZ2VkIHRvIHRoaXM6DQoNCglidWZsZW4gKz0g
+cnFzdC0+cnFfcGFnZXN6ICogKHJxc3QtPnJxX25wYWdlcyAtIDEpOw0KIAlidWZsZW4gKz0gcnFz
+dC0+cnFfdGFpbHN6Ow0KCWlmIChycXN0LT5ycV9ucGFnZXMgPiAxKQ0KIAkJYnVmbGVuIC09IHJx
+c3QtPnJxX29mZnNldDsNCg0KVGhpcyBsb29rcyBjbGVhbmVyIHRoYW4gYmVmb3JlLg0KDQpXaGVu
+IHRoZXJlIGlzIG9ubHkgb25lIHBhZ2Ugd2l0aCBhIG5vbi16ZXJvIG9mZnNldCwgcnFfdGFpbHN6
+IGlzIHRoZSBhY3R1YWwgZGF0YSBsZW5ndGguDQoNCj4gDQo+IFRvbS4NCj4gDQo+ID4gICAJfQ0K
+PiA+DQo+ID4gICAJcmV0dXJuIGJ1ZmxlbjsNCj4gPg0K
