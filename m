@@ -1,94 +1,55 @@
-From: Long Li <longli@microsoft.com>
-Subject: RE: [Patch v2 04/15] CIFS: Add support for direct pages in wdata
-Date: Mon, 25 Jun 2018 20:34:06 +0000
-Message-ID: <CY4PR2101MB0722C0EBEDF150DCD5E88A8ECE4A0@CY4PR2101MB0722.namprd21.prod.outlook.com>
+From: Jason Gunthorpe <jgg@ziepe.ca>
+Subject: Re: [Patch v2 02/15] CIFS: Add support for direct pages in rdata
+Date: Mon, 25 Jun 2018 15:01:32 -0600
+Message-ID: <20180625210132.GB5381@ziepe.ca>
 References: <20180530194807.31657-1-longli@linuxonhyperv.com>
- <20180530194807.31657-5-longli@linuxonhyperv.com>
- <4edad13c-e257-ff1c-223a-324f484a936a@talpey.com>
+ <20180530194807.31657-3-longli@linuxonhyperv.com>
+ <67b8afe7-f5e0-b36a-fcc1-87f1ae08eaa4@talpey.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-To: Tom Talpey <tom@talpey.com>, Steve French <sfrench@samba.org>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: longli@microsoft.com, Steve French <sfrench@samba.org>,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
+To: Tom Talpey <tom@talpey.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <4edad13c-e257-ff1c-223a-324f484a936a@talpey.com>
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <67b8afe7-f5e0-b36a-fcc1-87f1ae08eaa4@talpey.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-PiBTdWJqZWN0OiBSZTogW1BhdGNoIHYyIDA0LzE1XSBDSUZTOiBBZGQgc3VwcG9ydCBmb3IgZGly
-ZWN0IHBhZ2VzIGluIHdkYXRhDQo+IA0KPiBPbiA1LzMwLzIwMTggMzo0NyBQTSwgTG9uZyBMaSB3
-cm90ZToNCj4gPiBGcm9tOiBMb25nIExpIDxsb25nbGlAbWljcm9zb2Z0LmNvbT4NCj4gPg0KPiA+
-IEFkZCBhIGZ1bmN0aW9uIHRvIGFsbG9jYXRlIHdkYXRhIHdpdGhvdXQgYWxsb2NhdGluZyBwYWdl
-cyBmb3IgZGF0YQ0KPiA+IHRyYW5zZmVyLiBUaGlzIGdpdmVzIHRoZSBjYWxsZXIgYW4gb3B0aW9u
-IHRvIHBhc3MgYSBudW1iZXIgb2YgcGFnZXMNCj4gPiB0aGF0IHBvaW50IHRvIHRoZSBkYXRhIGJ1
-ZmZlciB0byB3cml0ZSB0by4NCj4gPg0KPiA+IHdkYXRhIGlzIHJlcG9uc2libGUgZm9yIGZyZWUg
-dGhvc2UgcGFnZXMgYWZ0ZXIgaXQncyBkb25lLg0KPiANCj4gU2FtZSBjb21tZW50IGFzIGZvciB0
-aGUgZWFybGllciBwYXRjaC4gIkNhbGxlciIgaXMgcmVzcG9uc2libGUgZm9yICJmcmVlaW5nIg0K
-PiB0aG9zZSBwYWdlcz8gQ29uZnVzaW5nLCBhcyB3b3JkZWQuDQo+IA0KPiA+DQo+ID4gU2lnbmVk
-LW9mZi1ieTogTG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+ID4gLS0tDQo+ID4gICBm
-cy9jaWZzL2NpZnNnbG9iLmggIHwgIDIgKy0NCj4gPiAgIGZzL2NpZnMvY2lmc3Byb3RvLmggfCAg
-MiArKw0KPiA+ICAgZnMvY2lmcy9jaWZzc21iLmMgICB8IDE3ICsrKysrKysrKysrKysrLS0tDQo+
-ID4gICAzIGZpbGVzIGNoYW5nZWQsIDE3IGluc2VydGlvbnMoKyksIDQgZGVsZXRpb25zKC0pDQo+
-ID4NCj4gPiBkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jaWZzZ2xvYi5oIGIvZnMvY2lmcy9jaWZzZ2xv
-Yi5oIGluZGV4DQo+ID4gNTY4NjRhODcuLjdmNjJjOTggMTAwNjQ0DQo+ID4gLS0tIGEvZnMvY2lm
-cy9jaWZzZ2xvYi5oDQo+ID4gKysrIGIvZnMvY2lmcy9jaWZzZ2xvYi5oDQo+ID4gQEAgLTEyMDUs
-NyArMTIwNSw3IEBAIHN0cnVjdCBjaWZzX3dyaXRlZGF0YSB7DQo+ID4gICAJdW5zaWduZWQgaW50
-CQkJdGFpbHN6Ow0KPiA+ICAgCXVuc2lnbmVkIGludAkJCWNyZWRpdHM7DQo+ID4gICAJdW5zaWdu
-ZWQgaW50CQkJbnJfcGFnZXM7DQo+ID4gLQlzdHJ1Y3QgcGFnZQkJCSpwYWdlc1tdOw0KPiA+ICsJ
-c3RydWN0IHBhZ2UJCQkqKnBhZ2VzOw0KPiANCj4gQWxzbyBzYW1lIGNvbW1lbnQgYXMgZm9yIGVh
-cmxpZXIgcGF0Y2gsIHRoZXNlIGFyZSBzeW50YWN0aWNhbGx5IGVxdWl2YWxlbnQNCj4gYW5kIG1h
-eWJlIG5vdCBuZWVkZWQgdG8gY2hhbmdlLg0KPiANCj4gPiAgIH07DQo+ID4NCj4gPiAgIC8qDQo+
-ID4gZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc3Byb3RvLmggYi9mcy9jaWZzL2NpZnNwcm90by5o
-IGluZGV4DQo+ID4gMWYyN2Q4ZS4uNzkzM2M1ZiAxMDA2NDQNCj4gPiAtLS0gYS9mcy9jaWZzL2Np
-ZnNwcm90by5oDQo+ID4gKysrIGIvZnMvY2lmcy9jaWZzcHJvdG8uaA0KPiA+IEBAIC01MzMsNiAr
-NTMzLDggQEAgaW50IGNpZnNfYXN5bmNfd3JpdGV2KHN0cnVjdCBjaWZzX3dyaXRlZGF0YSAqd2Rh
-dGEsDQo+ID4gICB2b2lkIGNpZnNfd3JpdGV2X2NvbXBsZXRlKHN0cnVjdCB3b3JrX3N0cnVjdCAq
-d29yayk7DQo+ID4gICBzdHJ1Y3QgY2lmc193cml0ZWRhdGEgKmNpZnNfd3JpdGVkYXRhX2FsbG9j
-KHVuc2lnbmVkIGludCBucl9wYWdlcywNCj4gPiAgIAkJCQkJCXdvcmtfZnVuY190IGNvbXBsZXRl
-KTsNCj4gPiArc3RydWN0IGNpZnNfd3JpdGVkYXRhICpjaWZzX3dyaXRlZGF0YV9kaXJlY3RfYWxs
-b2Moc3RydWN0IHBhZ2UgKipwYWdlcywNCj4gPiArCQkJCQkJd29ya19mdW5jX3QgY29tcGxldGUp
-Ow0KPiA+ICAgdm9pZCBjaWZzX3dyaXRlZGF0YV9yZWxlYXNlKHN0cnVjdCBrcmVmICpyZWZjb3Vu
-dCk7DQo+ID4gICBpbnQgY2lmc19xdWVyeV9tZl9zeW1saW5rKHVuc2lnbmVkIGludCB4aWQsIHN0
-cnVjdCBjaWZzX3Rjb24gKnRjb24sDQo+ID4gICAJCQkgIHN0cnVjdCBjaWZzX3NiX2luZm8gKmNp
-ZnNfc2IsDQo+ID4gZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc3NtYi5jIGIvZnMvY2lmcy9jaWZz
-c21iLmMgaW5kZXgNCj4gPiBjOGU0Mjc4Li41YWNhMzM2IDEwMDY0NA0KPiA+IC0tLSBhL2ZzL2Np
-ZnMvY2lmc3NtYi5jDQo+ID4gKysrIGIvZnMvY2lmcy9jaWZzc21iLmMNCj4gPiBAQCAtMTk1Miw2
-ICsxOTUyLDcgQEAgY2lmc193cml0ZWRhdGFfcmVsZWFzZShzdHJ1Y3Qga3JlZiAqcmVmY291bnQp
-DQo+ID4gICAJaWYgKHdkYXRhLT5jZmlsZSkNCj4gPiAgIAkJY2lmc0ZpbGVJbmZvX3B1dCh3ZGF0
-YS0+Y2ZpbGUpOw0KPiA+DQo+ID4gKwlrdmZyZWUod2RhdGEtPnBhZ2VzKTsNCj4gPiAgIAlrZnJl
-ZSh3ZGF0YSk7DQo+ID4gICB9DQo+ID4NCj4gPiBAQCAtMjA3NSwxMiArMjA3NiwyMiBAQCBjaWZz
-X3dyaXRldl9jb21wbGV0ZShzdHJ1Y3Qgd29ya19zdHJ1Y3QNCj4gKndvcmspDQo+ID4gICBzdHJ1
-Y3QgY2lmc193cml0ZWRhdGEgKg0KPiA+ICAgY2lmc193cml0ZWRhdGFfYWxsb2ModW5zaWduZWQg
-aW50IG5yX3BhZ2VzLCB3b3JrX2Z1bmNfdCBjb21wbGV0ZSkNCj4gPiAgIHsNCj4gPiArCXN0cnVj
-dCBwYWdlICoqcGFnZXMgPQ0KPiA+ICsJCWt6YWxsb2Moc2l6ZW9mKHN0cnVjdCBwYWdlICopICog
-bnJfcGFnZXMsIEdGUF9OT0ZTKTsNCj4gDQo+IFdoeSBkbyB5b3UgZG8gYSBHRlBfTk9GUyBoZXJl
-IGJ1dCBHRlBfS0VSTkVMIGluIHRoZSBlYXJsaWVyIHBhdGNoPw0KDQpUaGlzIGlzIGZvciB0aGUg
-SS9PIHdyaXRlIHBhdGguIFRoZSBlYXJsaWVyIHBhdGNoIGlzIGZvciBJL08gcmVhZCBwYXRoLiBU
-aGlzIGNvZGUgcHJlc2VydmVzIHRoZSBiZWhhdmlvciBmcm9tIHRoZSBidWZmZXIgSS9PIGNvZGUu
-DQoNClRoZSB3cml0ZSBwYXRoIGlzIHBvc3NpYmx5IHVzZWQgd2hlbiBtZW1vcnkgaXMgdW5kZXIg
-cHJlc3N1cmUsIHNvIGl0J3MgYmV0dGVyIG5vdCB0byBjYWxsIEZTIChhbmQgQ0lGUykgdGhhdCBt
-YXkgcmVzdWx0IGluIGEgbG9vcC4NCg0KPiANCj4gPiArCWlmIChwYWdlcykNCj4gPiArCQlyZXR1
-cm4gY2lmc193cml0ZWRhdGFfZGlyZWN0X2FsbG9jKHBhZ2VzLCBjb21wbGV0ZSk7DQo+ID4gKw0K
-PiA+ICsJcmV0dXJuIE5VTEw7DQo+ID4gK30NCj4gPiArDQo+ID4gK3N0cnVjdCBjaWZzX3dyaXRl
-ZGF0YSAqDQo+ID4gK2NpZnNfd3JpdGVkYXRhX2RpcmVjdF9hbGxvYyhzdHJ1Y3QgcGFnZSAqKnBh
-Z2VzLCB3b3JrX2Z1bmNfdA0KPiA+ICtjb21wbGV0ZSkgew0KPiA+ICAgCXN0cnVjdCBjaWZzX3dy
-aXRlZGF0YSAqd2RhdGE7DQo+ID4NCj4gPiAtCS8qIHdyaXRlZGF0YSArIG51bWJlciBvZiBwYWdl
-IHBvaW50ZXJzICovDQo+ID4gLQl3ZGF0YSA9IGt6YWxsb2Moc2l6ZW9mKCp3ZGF0YSkgKw0KPiA+
-IC0JCQlzaXplb2Yoc3RydWN0IHBhZ2UgKikgKiBucl9wYWdlcywgR0ZQX05PRlMpOw0KPiA+ICsJ
-d2RhdGEgPSBremFsbG9jKHNpemVvZigqd2RhdGEpLCBHRlBfTk9GUyk7DQo+ID4gICAJaWYgKHdk
-YXRhICE9IE5VTEwpIHsNCj4gPiArCQl3ZGF0YS0+cGFnZXMgPSBwYWdlczsNCj4gPiAgIAkJa3Jl
-Zl9pbml0KCZ3ZGF0YS0+cmVmY291bnQpOw0KPiA+ICAgCQlJTklUX0xJU1RfSEVBRCgmd2RhdGEt
-Pmxpc3QpOw0KPiA+ICAgCQlpbml0X2NvbXBsZXRpb24oJndkYXRhLT5kb25lKTsNCj4gPg0KPiAt
-LQ0KPiBUbyB1bnN1YnNjcmliZSBmcm9tIHRoaXMgbGlzdDogc2VuZCB0aGUgbGluZSAidW5zdWJz
-Y3JpYmUgbGludXgtY2lmcyIgaW4gdGhlDQo+IGJvZHkgb2YgYSBtZXNzYWdlIHRvIG1ham9yZG9t
-b0B2Z2VyLmtlcm5lbC5vcmcgTW9yZSBtYWpvcmRvbW8gaW5mbyBhdA0KPiBodHRwczovL25hMDEu
-c2FmZWxpbmtzLnByb3RlY3Rpb24ub3V0bG9vay5jb20vP3VybD1odHRwJTNBJTJGJTJGdmdlci5r
-ZQ0KPiBybmVsLm9yZyUyRm1ham9yZG9tby0NCj4gaW5mby5odG1sJmFtcDtkYXRhPTAyJTdDMDEl
-N0Nsb25nbGklNDBtaWNyb3NvZnQuY29tJTdDMjBlMGJjYmRjY2UzDQo+IDQwMjEzM2VlMDhkNWQ5
-NzY3OTc3JTdDNzJmOTg4YmY4NmYxNDFhZjkxYWIyZDdjZDAxMWRiNDclN0MxJTdDMCUNCj4gN0M2
-MzY2NTQwMjUyMjk3NDk1NDkmYW1wO3NkYXRhPXA0UDlBcVM4Y25PSEVyQ0ZjMVhBTGVhWnhIdUI3
-JTJCDQo+IFZPRjEwU2phYXljQUklM0QmYW1wO3Jlc2VydmVkPTANCg==
+On Sat, Jun 23, 2018 at 09:50:20PM -0400, Tom Talpey wrote:
+> On 5/30/2018 3:47 PM, Long Li wrote:
+> >From: Long Li <longli@microsoft.com>
+> >
+> >Add a function to allocate rdata without allocating pages for data
+> >transfer. This gives the caller an option to pass a number of pages
+> >that point to the data buffer.
+> >
+> >rdata is still reponsible for free those pages after it's done.
+> 
+> "Caller" is still responsible? Or is the rdata somehow freeing itself
+> via another mechanism?
+> 
+> >
+> >Signed-off-by: Long Li <longli@microsoft.com>
+> >  fs/cifs/cifsglob.h |  2 +-
+> >  fs/cifs/file.c     | 23 ++++++++++++++++++++---
+> >  2 files changed, 21 insertions(+), 4 deletions(-)
+> >
+> >diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> >index 8d16c3e..56864a87 100644
+> >+++ b/fs/cifs/cifsglob.h
+> >@@ -1179,7 +1179,7 @@ struct cifs_readdata {
+> >  	unsigned int			tailsz;
+> >  	unsigned int			credits;
+> >  	unsigned int			nr_pages;
+> >-	struct page			*pages[];
+> >+	struct page			**pages;
+> 
+> Technically speaking, these are syntactically equivalent. It may not
+> be worth changing this historic definition.
+
+[] is a C99 'flex array', it has a different allocation behavior than
+** and is not interchangeable..
+
+Jason
