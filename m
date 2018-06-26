@@ -1,60 +1,125 @@
-From: Tom Talpey <tom@talpey.com>
-Subject: Re: [Patch v2 02/15] CIFS: Add support for direct pages in rdata
-Date: Tue, 26 Jun 2018 11:13:46 -0400
-Message-ID: <f940d126-237c-963f-f64e-e1eb1e8c6c85@talpey.com>
-References: <20180530194807.31657-1-longli@linuxonhyperv.com>
- <20180530194807.31657-3-longli@linuxonhyperv.com>
- <67b8afe7-f5e0-b36a-fcc1-87f1ae08eaa4@talpey.com>
- <20180625210132.GB5381@ziepe.ca>
+From: Steve French <smfrench@gmail.com>
+Subject: Re: F_OFD_GETLK implemented wrong with CIFS protocol version 2.0+
+Date: Tue, 26 Jun 2018 16:34:28 -0500
+Message-ID: <CAH2r5mvLpR6NOL0ndvPgs=odk6U4-oqmdyyp0eVKc8SbSiaa4w@mail.gmail.com>
+References: <77967693-040b-734a-8e18-be95d97478b3@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: longli@microsoft.com, Steve French <sfrench@samba.org>,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
-To: Jason Gunthorpe <jgg@ziepe.ca>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Steve French <sfrench@samba.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Adam Williamson <awilliam@redhat.com>
+To: labbott@redhat.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180625210132.GB5381@ziepe.ca>
-Content-Language: en-US
+In-Reply-To: <77967693-040b-734a-8e18-be95d97478b3@redhat.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On 6/25/2018 5:01 PM, Jason Gunthorpe wrote:
-> On Sat, Jun 23, 2018 at 09:50:20PM -0400, Tom Talpey wrote:
->> On 5/30/2018 3:47 PM, Long Li wrote:
->>> From: Long Li <longli@microsoft.com>
->>>
->>> Add a function to allocate rdata without allocating pages for data
->>> transfer. This gives the caller an option to pass a number of pages
->>> that point to the data buffer.
->>>
->>> rdata is still reponsible for free those pages after it's done.
->>
->> "Caller" is still responsible? Or is the rdata somehow freeing itself
->> via another mechanism?
->>
->>>
->>> Signed-off-by: Long Li <longli@microsoft.com>
->>>   fs/cifs/cifsglob.h |  2 +-
->>>   fs/cifs/file.c     | 23 ++++++++++++++++++++---
->>>   2 files changed, 21 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
->>> index 8d16c3e..56864a87 100644
->>> +++ b/fs/cifs/cifsglob.h
->>> @@ -1179,7 +1179,7 @@ struct cifs_readdata {
->>>   	unsigned int			tailsz;
->>>   	unsigned int			credits;
->>>   	unsigned int			nr_pages;
->>> -	struct page			*pages[];
->>> +	struct page			**pages;
->>
->> Technically speaking, these are syntactically equivalent. It may not
->> be worth changing this historic definition.
-> 
-> [] is a C99 'flex array', it has a different allocation behavior than
-> ** and is not interchangeable..
+I am glad that there is a fairly simple reproducer, but wondering if
+any of the standard Linux file system functional tests (xfstests) use
+these - if not would be good to add your test case to xfstests so
+these missing features don't slip through.
+On Mon, Jun 25, 2018 at 6:58 PM Laura Abbott <labbott@redhat.com> wrote:
+>
+> Hi,
+>
+> A while back, someone reported a failure on Fedora when trying to boot
+> a QEMU image off of a CIFS share. The issue was reduced down to a
+> test case (https://bugzilla.redhat.com/show_bug.cgi?id=1484130#c8)
+>
+> # cat test-ofd-lock.c
+> #define _GNU_SOURCE
+> #include <errno.h>
+> #include <stdio.h>
+> #include <unistd.h>
+> #include <fcntl.h>
+>
+> int main(int argc, char **argv)
+> {
+>      int ret;
+>      int fd;
+>      struct flock fl = {
+>          .l_whence = SEEK_SET,
+>          .l_start  = 0,
+>          .l_len    = 0,
+>          .l_type   = F_RDLCK,
+>      };
+>      if (argc < 2) {
+>              fprintf(stderr, "Usage: %s <file>\n", argv[0]);
+>              return 1;
+>      }
+>      fd = open(argv[1], O_RDWR);
+>      if (fd < 0) {
+>              perror("open");
+>              return errno;
+>      }
+>      ret = fcntl(fd, F_OFD_SETLK, &fl);
+>      if (ret) {
+>              perror("setlk");
+>              return errno;
+>      }
+>      fl.l_type = F_WRLCK;
+>      ret = fcntl(fd, F_OFD_GETLK, &fl);
+>      if (ret) {
+>              perror("getlk");
+>              return errno;
+>      }
+>      if (fl.l_type != F_UNLCK) {
+>              fprintf(stderr, "get lock test failed\n");
+>              return 1;
+>      }
+>      return 0;
+> }
+> [root@localhost ~]# make test-ofd-lock
+> cc     test-ofd-lock.c   -o test-ofd-lock
+> [root@localhost ~]# touch /tmp/test && ./test-ofd-lock /tmp/test
+> [root@localhost ~]# echo $?
+> 0
+> [root@localhost ~]# touch /mnt/test && ./test-ofd-lock /mnt/test
+> get lock test failed
+> [root@localhost ~]# mount | grep /mnt
+> //192.168.31.1/tddownload on /mnt type cifs (rw,relatime,vers=3.0,
+> cache=strict,username=admin,domain=,uid=0,
+> noforceuid,gid=0,noforcegid,addr=192.168.31.1,file_mode=0755,
+> dir_mode=0755,nounix,serverino,mapposix,rsize=1048576,
+> wsize=1048576,echo_interval=60,actimeo=1,user=admin)
+>
+>
+> As explained by one of the QEMU developers
+> (https://bugzilla.redhat.com/show_bug.cgi?id=1484130#c37)
+>
+> '''
+> It is a kernel bug. The code snippet in comment 8 shows clearly that the kernel
+> is doing the wrong thing, which cannot be fixed/worked around by QEMU.
+>
+> In man 2 fcntl:
+>
+>         F_OFD_GETLK (struct flock *)
+>                On input to this call, lock describes an open file description lock
+> we would like to place on the file.  If the lock could  be  placed,  fcntl()  does  not
+>                actually  place  it,  but  returns F_UNLCK in the l_type field of lock
+> and leaves the other fields of the structure unchanged.  If one or more incompatible
+>                locks would prevent this lock being placed, then details about one of
+> these locks are returned via lock, as described above for F_GETLK.
+>
+> which is not the case with the new CIFS behaviour.
+> ''
+>
+> You can read the full context at https://bugzilla.redhat.com/show_bug.cgi?id=1484130
+>
+> Any suggestions?
+>
+> Thanks,
+> Laura
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-In that case, it's an even better reason to not change the declaration.
 
-Tom.
+
+-- 
+Thanks,
+
+Steve
