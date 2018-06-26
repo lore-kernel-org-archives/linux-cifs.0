@@ -1,152 +1,104 @@
-From: Long Li <longli@microsoft.com>
-Subject: RE: [Patch v2 14/15] CIFS: Add support for direct I/O write
-Date: Tue, 26 Jun 2018 04:39:43 +0000
-Message-ID: <DM5PR2101MB07285F85A018D8C2EFC2D730CE490@DM5PR2101MB0728.namprd21.prod.outlook.com>
+From: Tom Talpey <tom@talpey.com>
+Subject: Re: [Patch v2 06/15] CIFS: Introduce helper function to get page
+ offset and length in smb_rqst
+Date: Tue, 26 Jun 2018 09:16:54 -0400
+Message-ID: <33a2f951-10fd-fa94-4fb1-cade7f72cd77@talpey.com>
 References: <20180530194807.31657-1-longli@linuxonhyperv.com>
- <20180530194807.31657-15-longli@linuxonhyperv.com>
- <9162de67-fc5d-26e9-5882-26377194a2ff@talpey.com>
+ <20180530194807.31657-7-longli@linuxonhyperv.com>
+ <a6613388-0dc5-7646-b71f-75b8bec4e4d9@talpey.com>
+ <CY4PR2101MB0722840106EDFEFBBA42D45FCE4A0@CY4PR2101MB0722.namprd21.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-To: Tom Talpey <tom@talpey.com>, Steve French <sfrench@samba.org>,
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+To: Long Li <longli@microsoft.com>, Steve French <sfrench@samba.org>,
         "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
         "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <9162de67-fc5d-26e9-5882-26377194a2ff@talpey.com>
+In-Reply-To: <CY4PR2101MB0722840106EDFEFBBA42D45FCE4A0@CY4PR2101MB0722.namprd21.prod.outlook.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-PiBTdWJqZWN0OiBSZTogW1BhdGNoIHYyIDE0LzE1XSBDSUZTOiBBZGQgc3VwcG9ydCBmb3IgZGly
-ZWN0IEkvTyB3cml0ZQ0KPiANCj4gT24gNS8zMC8yMDE4IDM6NDggUE0sIExvbmcgTGkgd3JvdGU6
-DQo+ID4gRnJvbTogTG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+ID4NCj4gPiBJbXBs
-ZW1lbnQgdGhlIGZ1bmN0aW9uIGZvciBkaXJlY3QgSS9PIHdyaXRlLiBJdCBkb2Vzbid0IHN1cHBv
-cnQgQUlPLA0KPiA+IHdoaWNoIHdpbGwgYmUgaW1wbGVtZW50ZWQgaW4gYSBmb2xsb3cgdXAgcGF0
-Y2guDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBMb25nIExpIDxsb25nbGlAbWljcm9zb2Z0LmNv
-bT4NCj4gPiAtLS0NCj4gPiAgIGZzL2NpZnMvY2lmc2ZzLmggfCAgIDEgKw0KPiA+ICAgZnMvY2lm
-cy9maWxlLmMgICB8IDE2NQ0KPiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrDQo+ID4gICAyIGZpbGVzIGNoYW5nZWQsIDE2NiBpbnNlcnRpb25z
-KCspDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jaWZzZnMuaCBiL2ZzL2NpZnMvY2lm
-c2ZzLmggaW5kZXgNCj4gPiA3ZmJhOWFhLi5lOWM1MTAzIDEwMDY0NA0KPiA+IC0tLSBhL2ZzL2Np
-ZnMvY2lmc2ZzLmgNCj4gPiArKysgYi9mcy9jaWZzL2NpZnNmcy5oDQo+ID4gQEAgLTEwNSw2ICsx
-MDUsNyBAQCBleHRlcm4gc3NpemVfdCBjaWZzX3VzZXJfcmVhZHYoc3RydWN0IGtpb2NiICppb2Ni
-LA0KPiBzdHJ1Y3QgaW92X2l0ZXIgKnRvKTsNCj4gPiAgIGV4dGVybiBzc2l6ZV90IGNpZnNfZGly
-ZWN0X3JlYWR2KHN0cnVjdCBraW9jYiAqaW9jYiwgc3RydWN0IGlvdl9pdGVyICp0byk7DQo+ID4g
-ICBleHRlcm4gc3NpemVfdCBjaWZzX3N0cmljdF9yZWFkdihzdHJ1Y3Qga2lvY2IgKmlvY2IsIHN0
-cnVjdCBpb3ZfaXRlciAqdG8pOw0KPiA+ICAgZXh0ZXJuIHNzaXplX3QgY2lmc191c2VyX3dyaXRl
-dihzdHJ1Y3Qga2lvY2IgKmlvY2IsIHN0cnVjdCBpb3ZfaXRlcg0KPiA+ICpmcm9tKTsNCj4gPiAr
-ZXh0ZXJuIHNzaXplX3QgY2lmc19kaXJlY3Rfd3JpdGV2KHN0cnVjdCBraW9jYiAqaW9jYiwgc3Ry
-dWN0IGlvdl9pdGVyDQo+ID4gKypmcm9tKTsNCj4gPiAgIGV4dGVybiBzc2l6ZV90IGNpZnNfc3Ry
-aWN0X3dyaXRldihzdHJ1Y3Qga2lvY2IgKmlvY2IsIHN0cnVjdCBpb3ZfaXRlciAqZnJvbSk7DQo+
-ID4gICBleHRlcm4gaW50IGNpZnNfbG9jayhzdHJ1Y3QgZmlsZSAqLCBpbnQsIHN0cnVjdCBmaWxl
-X2xvY2sgKik7DQo+ID4gICBleHRlcm4gaW50IGNpZnNfZnN5bmMoc3RydWN0IGZpbGUgKiwgbG9m
-Zl90LCBsb2ZmX3QsIGludCk7IGRpZmYNCj4gPiAtLWdpdCBhL2ZzL2NpZnMvZmlsZS5jIGIvZnMv
-Y2lmcy9maWxlLmMgaW5kZXggZTZlNmYyNC4uOGMzODViMSAxMDA2NDQNCj4gPiAtLS0gYS9mcy9j
-aWZzL2ZpbGUuYw0KPiA+ICsrKyBiL2ZzL2NpZnMvZmlsZS5jDQo+ID4gQEAgLTI0NjEsNiArMjQ2
-MSwzNSBAQCBjaWZzX3VuY2FjaGVkX3dyaXRlZGF0YV9yZWxlYXNlKHN0cnVjdCBrcmVmDQo+ID4g
-KnJlZmNvdW50KQ0KPiA+DQo+ID4gICBzdGF0aWMgdm9pZCBjb2xsZWN0X3VuY2FjaGVkX3dyaXRl
-X2RhdGEoc3RydWN0IGNpZnNfYWlvX2N0eCAqY3R4KTsNCj4gPg0KPiA+ICtzdGF0aWMgdm9pZCBj
-aWZzX2RpcmVjdF93cml0ZWRhdGFfcmVsZWFzZShzdHJ1Y3Qga3JlZiAqcmVmY291bnQpIHsNCj4g
-PiArCWludCBpOw0KPiA+ICsJc3RydWN0IGNpZnNfd3JpdGVkYXRhICp3ZGF0YSA9IGNvbnRhaW5l
-cl9vZihyZWZjb3VudCwNCj4gPiArCQkJCQlzdHJ1Y3QgY2lmc193cml0ZWRhdGEsIHJlZmNvdW50
-KTsNCj4gPiArDQo+ID4gKwlmb3IgKGkgPSAwOyBpIDwgd2RhdGEtPm5yX3BhZ2VzOyBpKyspDQo+
-ID4gKwkJcHV0X3BhZ2Uod2RhdGEtPnBhZ2VzW2ldKTsNCj4gPiArDQo+ID4gKwljaWZzX3dyaXRl
-ZGF0YV9yZWxlYXNlKHJlZmNvdW50KTsNCj4gPiArfQ0KPiA+ICsNCj4gPiArc3RhdGljIHZvaWQg
-Y2lmc19kaXJlY3Rfd3JpdGV2X2NvbXBsZXRlKHN0cnVjdCB3b3JrX3N0cnVjdCAqd29yaykgew0K
-PiA+ICsJc3RydWN0IGNpZnNfd3JpdGVkYXRhICp3ZGF0YSA9IGNvbnRhaW5lcl9vZih3b3JrLA0K
-PiA+ICsJCQkJCXN0cnVjdCBjaWZzX3dyaXRlZGF0YSwgd29yayk7DQo+ID4gKwlzdHJ1Y3QgaW5v
-ZGUgKmlub2RlID0gZF9pbm9kZSh3ZGF0YS0+Y2ZpbGUtPmRlbnRyeSk7DQo+ID4gKwlzdHJ1Y3Qg
-Y2lmc0lub2RlSW5mbyAqY2lmc2kgPSBDSUZTX0koaW5vZGUpOw0KPiA+ICsNCj4gPiArCXNwaW5f
-bG9jaygmaW5vZGUtPmlfbG9jayk7DQo+ID4gKwljaWZzX3VwZGF0ZV9lb2YoY2lmc2ksIHdkYXRh
-LT5vZmZzZXQsIHdkYXRhLT5ieXRlcyk7DQo+ID4gKwlpZiAoY2lmc2ktPnNlcnZlcl9lb2YgPiBp
-bm9kZS0+aV9zaXplKQ0KPiA+ICsJCWlfc2l6ZV93cml0ZShpbm9kZSwgY2lmc2ktPnNlcnZlcl9l
-b2YpOw0KPiA+ICsJc3Bpbl91bmxvY2soJmlub2RlLT5pX2xvY2spOw0KPiA+ICsNCj4gPiArCWNv
-bXBsZXRlKCZ3ZGF0YS0+ZG9uZSk7DQo+ID4gKwlrcmVmX3B1dCgmd2RhdGEtPnJlZmNvdW50LCBj
-aWZzX2RpcmVjdF93cml0ZWRhdGFfcmVsZWFzZSk7IH0NCj4gPiArDQo+ID4gICBzdGF0aWMgdm9p
-ZA0KPiA+ICAgY2lmc191bmNhY2hlZF93cml0ZXZfY29tcGxldGUoc3RydWN0IHdvcmtfc3RydWN0
-ICp3b3JrKQ0KPiA+ICAgew0KPiA+IEBAIC0yNzAzLDYgKzI3MzIsMTQyIEBAIHN0YXRpYyB2b2lk
-IGNvbGxlY3RfdW5jYWNoZWRfd3JpdGVfZGF0YShzdHJ1Y3QNCj4gY2lmc19haW9fY3R4ICpjdHgp
-DQo+ID4gICAJCWNvbXBsZXRlKCZjdHgtPmRvbmUpOw0KPiA+ICAgfQ0KPiA+DQo+ID4gK3NzaXpl
-X3QgY2lmc19kaXJlY3Rfd3JpdGV2KHN0cnVjdCBraW9jYiAqaW9jYiwgc3RydWN0IGlvdl9pdGVy
-ICpmcm9tKQ0KPiA+ICt7DQo+ID4gKwlzdHJ1Y3QgZmlsZSAqZmlsZSA9IGlvY2ItPmtpX2ZpbHA7
-DQo+ID4gKwlzc2l6ZV90IHRvdGFsX3dyaXR0ZW4gPSAwOw0KPiA+ICsJc3RydWN0IGNpZnNGaWxl
-SW5mbyAqY2ZpbGU7DQo+ID4gKwlzdHJ1Y3QgY2lmc190Y29uICp0Y29uOw0KPiA+ICsJc3RydWN0
-IGNpZnNfc2JfaW5mbyAqY2lmc19zYjsNCj4gPiArCXN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNl
-cnZlcjsNCj4gPiArCXBpZF90IHBpZDsNCj4gPiArCXVuc2lnbmVkIGxvbmcgbnJfcGFnZXM7DQo+
-ID4gKwlsb2ZmX3Qgb2Zmc2V0ID0gaW9jYi0+a2lfcG9zOw0KPiA+ICsJc2l6ZV90IGxlbiA9IGlv
-dl9pdGVyX2NvdW50KGZyb20pOw0KPiA+ICsJaW50IHJjOw0KPiA+ICsJc3RydWN0IGNpZnNfd3Jp
-dGVkYXRhICp3ZGF0YTsNCj4gPiArDQo+ID4gKwkvKg0KPiA+ICsJICogaW92X2l0ZXJfZ2V0X3Bh
-Z2VzX2FsbG9jIGRvZXNuJ3Qgd29yayB3aXRoIElURVJfS1ZFQy4NCj4gPiArCSAqIEluIHRoaXMg
-Y2FzZSwgZmFsbCBiYWNrIHRvIG5vbi1kaXJlY3Qgd3JpdGUgZnVuY3Rpb24uDQo+ID4gKwkgKi8N
-Cj4gPiArCWlmIChmcm9tLT50eXBlICYgSVRFUl9LVkVDKSB7DQo+ID4gKwkJY2lmc19kYmcoRllJ
-LCAidXNlIG5vbi1kaXJlY3QgY2lmc191c2VyX3dyaXRldiBmb3Iga3ZlYw0KPiBJL09cbiIpOw0K
-PiA+ICsJCXJldHVybiBjaWZzX3VzZXJfd3JpdGV2KGlvY2IsIGZyb20pOw0KPiA+ICsJfQ0KPiA+
-ICsNCj4gPiArCXJjID0gZ2VuZXJpY193cml0ZV9jaGVja3MoaW9jYiwgZnJvbSk7DQo+ID4gKwlp
-ZiAocmMgPD0gMCkNCj4gPiArCQlyZXR1cm4gcmM7DQo+ID4gKw0KPiA+ICsJY2lmc19zYiA9IENJ
-RlNfRklMRV9TQihmaWxlKTsNCj4gPiArCWNmaWxlID0gZmlsZS0+cHJpdmF0ZV9kYXRhOw0KPiA+
-ICsJdGNvbiA9IHRsaW5rX3Rjb24oY2ZpbGUtPnRsaW5rKTsNCj4gPiArCXNlcnZlciA9IHRjb24t
-PnNlcy0+c2VydmVyOw0KPiA+ICsNCj4gPiArCWlmICghc2VydmVyLT5vcHMtPmFzeW5jX3dyaXRl
-dikNCj4gPiArCQlyZXR1cm4gLUVOT1NZUzsNCj4gPiArDQo+ID4gKwlpZiAoY2lmc19zYi0+bW50
-X2NpZnNfZmxhZ3MgJiBDSUZTX01PVU5UX1JXUElERk9SV0FSRCkNCj4gPiArCQlwaWQgPSBjZmls
-ZS0+cGlkOw0KPiA+ICsJZWxzZQ0KPiA+ICsJCXBpZCA9IGN1cnJlbnQtPnRnaWQ7DQo+ID4gKw0K
-PiA+ICsJZG8gew0KPiA+ICsJCXVuc2lnbmVkIGludCB3c2l6ZSwgY3JlZGl0czsNCj4gPiArCQlz
-dHJ1Y3QgcGFnZSAqKnBhZ2V2ZWM7DQo+ID4gKwkJc2l6ZV90IHN0YXJ0Ow0KPiA+ICsJCXNzaXpl
-X3QgY3VyX2xlbjsNCj4gPiArDQo+ID4gKwkJcmMgPSBzZXJ2ZXItPm9wcy0+d2FpdF9tdHVfY3Jl
-ZGl0cyhzZXJ2ZXIsIGNpZnNfc2ItPndzaXplLA0KPiA+ICsJCQkJCQkgICAmd3NpemUsICZjcmVk
-aXRzKTsNCj4gPiArCQlpZiAocmMpDQo+ID4gKwkJCWJyZWFrOw0KPiA+ICsNCj4gPiArCQljdXJf
-bGVuID0gaW92X2l0ZXJfZ2V0X3BhZ2VzX2FsbG9jKA0KPiA+ICsJCQkJZnJvbSwgJnBhZ2V2ZWMs
-IHdzaXplLCAmc3RhcnQpOw0KPiA+ICsJCWlmIChjdXJfbGVuIDwgMCkgew0KPiA+ICsJCQljaWZz
-X2RiZyhWRlMsDQo+ID4gKwkJCQkiZGlyZWN0X3dyaXRldiBjb3VsZG4ndCBnZXQgdXNlciBwYWdl
-cyAiDQo+ID4gKwkJCQkiKHJjPSV6ZCkgaXRlciB0eXBlICVkIGlvdl9vZmZzZXQgJWx1IGNvdW50
-Ig0KPiA+ICsJCQkJIiAlbHVcbiIsDQo+ID4gKwkJCQljdXJfbGVuLCBmcm9tLT50eXBlLA0KPiA+
-ICsJCQkJZnJvbS0+aW92X29mZnNldCwgZnJvbS0+Y291bnQpOw0KPiA+ICsJCQlkdW1wX3N0YWNr
-KCk7DQo+ID4gKwkJCWJyZWFrOw0KPiA+ICsJCX0NCj4gPiArCQlpZiAoY3VyX2xlbiA8IDApDQo+
-ID4gKwkJCWJyZWFrOw0KPiANCj4gVGhpcyBjdXJfbGVuIDwgMCB0ZXN0IGlzIHJlZHVuZGFudCB3
-aXRoIHRoZSBwcmlvciBpZigpLCBkZWxldGUuDQo+ID4gKw0KPiA+ICsJCW5yX3BhZ2VzID0gKGN1
-cl9sZW4gKyBzdGFydCArIFBBR0VfU0laRSAtIDEpIC8gUEFHRV9TSVpFOw0KPiANCj4gQW0gSSBt
-aXNyZWFkaW5nLCBvciB3aWxsIHRoaXMgcmV0dXJuIGJlIG9uZSBtb3JlIHBhZ2UgdGhhbiBuZWVk
-ZWQ/IElmIHN0YXJ0DQo+ICh0aGUgZmlyc3QgYnl0ZSBvZmZzZXQpIGlzID4gMCwgbnJfcGFnZXMg
-d2lsbCBhbHJlYWR5IGJlIG9uZS4NCj4gQW5kIGlmIGN1cl9sZW4gaXMgNEtCLCBldmVuIGlmIHN0
-YXJ0IGlzIDAsIG5yX3BhZ2VzIHdpbGwgYmUgdHdvLg0KDQpJIHRoaW5rIHRoZSBjYWxjdWxhdGlv
-biBpcyBjb3JyZWN0LCBhc3N1bWluZyBjdXJfbGVuID4gMC4gKHdoaWNoIHNob3VsZCBiZSB0aGUg
-Y2FzZSBpZiB3ZSByZWFjaCBoZXJlKQ0KDQpJZiBjdXJfbGVuIGlzIDRrYiBhbmQgc3RhcnQgaXMg
-MCwgbnJfcGFnZXMgd2lsbCBiZSAxLg0KDQo+IA0KPiA+ICsNCj4gPiArCQl3ZGF0YSA9IGNpZnNf
-d3JpdGVkYXRhX2RpcmVjdF9hbGxvYyhwYWdldmVjLA0KPiA+ICsJCQkJCSAgICAgY2lmc19kaXJl
-Y3Rfd3JpdGV2X2NvbXBsZXRlKTsNCj4gPiArCQlpZiAoIXdkYXRhKSB7DQo+ID4gKwkJCXJjID0g
-LUVOT01FTTsNCj4gPiArCQkJYWRkX2NyZWRpdHNfYW5kX3dha2VfaWYoc2VydmVyLCBjcmVkaXRz
-LCAwKTsNCj4gPiArCQkJYnJlYWs7DQo+ID4gKwkJfQ0KPiA+ICsNCj4gPiArCQl3ZGF0YS0+bnJf
-cGFnZXMgPSBucl9wYWdlczsNCj4gPiArCQl3ZGF0YS0+cGFnZV9vZmZzZXQgPSBzdGFydDsNCj4g
-PiArCQl3ZGF0YS0+cGFnZXN6ID0gUEFHRV9TSVpFOw0KPiA+ICsJCXdkYXRhLT50YWlsc3ogPQ0K
-PiA+ICsJCQlucl9wYWdlcyA+IDEgPw0KPiA+ICsJCQljdXJfbGVuIC0gKFBBR0VfU0laRSAtIHN0
-YXJ0KSAtDQo+ID4gKwkJCQkobnJfcGFnZXMgLSAyKSAqIFBBR0VfU0laRSA6DQo+ID4gKwkJCWN1
-cl9sZW47DQo+ID4gKw0KPiA+ICsJCXdkYXRhLT5zeW5jX21vZGUgPSBXQl9TWU5DX0FMTDsNCj4g
-PiArCQl3ZGF0YS0+b2Zmc2V0ID0gKF9fdTY0KW9mZnNldDsNCj4gPiArCQl3ZGF0YS0+Y2ZpbGUg
-PSBjaWZzRmlsZUluZm9fZ2V0KGNmaWxlKTsNCj4gPiArCQl3ZGF0YS0+cGlkID0gcGlkOw0KPiA+
-ICsJCXdkYXRhLT5ieXRlcyA9IGN1cl9sZW47DQo+ID4gKwkJd2RhdGEtPmNyZWRpdHMgPSBjcmVk
-aXRzOw0KPiA+ICsNCj4gPiArCQlyYyA9IDA7DQo+ID4gKwkJaWYgKHdkYXRhLT5jZmlsZS0+aW52
-YWxpZEhhbmRsZSkNCj4gPiArCQkJcmMgPSBjaWZzX3Jlb3Blbl9maWxlKHdkYXRhLT5jZmlsZSwg
-ZmFsc2UpOw0KPiA+ICsNCj4gPiArCQlpZiAoIXJjKQ0KPiA+ICsJCQlyYyA9IHNlcnZlci0+b3Bz
-LT5hc3luY193cml0ZXYod2RhdGEsDQo+ID4gKwkJCQkJY2lmc19kaXJlY3Rfd3JpdGVkYXRhX3Jl
-bGVhc2UpOw0KPiA+ICsNCj4gPiArCQlpZiAocmMpIHsNCj4gPiArCQkJYWRkX2NyZWRpdHNfYW5k
-X3dha2VfaWYoc2VydmVyLCB3ZGF0YS0+Y3JlZGl0cywgMCk7DQo+ID4gKwkJCWtyZWZfcHV0KCZ3
-ZGF0YS0+cmVmY291bnQsDQo+ID4gKwkJCQkgY2lmc19kaXJlY3Rfd3JpdGVkYXRhX3JlbGVhc2Up
-Ow0KPiA+ICsJCQlpZiAocmMgPT0gLUVBR0FJTikNCj4gPiArCQkJCWNvbnRpbnVlOw0KPiA+ICsJ
-CQlicmVhazsNCj4gPiArCQl9DQo+IA0KPiBTYW1lIGNvbW1lbnRzIGFzIGZvciBwcmV2aW91cyBw
-YXRjaCByZSB0aGUgaWYgKHJjKSBsYWRkZXIsIGFuZCB0aGUNCj4gYnJlYWsvY29udGludWVzIGJv
-dGggYmVpbmcgYmV0dGVyIGV4cHJlc3NlZCBhcyBjYXJlZnVsIGdvdG8ncy4NCj4gDQo+ID4gKw0K
-PiA+ICsJCXdhaXRfZm9yX2NvbXBsZXRpb24oJndkYXRhLT5kb25lKTsNCj4gPiArCQlpZiAod2Rh
-dGEtPnJlc3VsdCkgew0KPiA+ICsJCQlyYyA9IHdkYXRhLT5yZXN1bHQ7DQo+ID4gKwkJCWtyZWZf
-cHV0KCZ3ZGF0YS0+cmVmY291bnQsDQo+ID4gKwkJCQkJY2lmc19kaXJlY3Rfd3JpdGVkYXRhX3Jl
-bGVhc2UpOw0KPiA+ICsJCQlpZiAocmMgPT0gLUVBR0FJTikNCj4gPiArCQkJCWNvbnRpbnVlOw0K
-PiA+ICsJCQlicmVhazsNCj4gPiArCQl9DQo+ID4gKw0KPiA+ICsJCWtyZWZfcHV0KCZ3ZGF0YS0+
-cmVmY291bnQsIGNpZnNfZGlyZWN0X3dyaXRlZGF0YV9yZWxlYXNlKTsNCj4gPiArDQo+ID4gKwkJ
-aW92X2l0ZXJfYWR2YW5jZShmcm9tLCBjdXJfbGVuKTsNCj4gPiArCQl0b3RhbF93cml0dGVuICs9
-IGN1cl9sZW47DQo+ID4gKwkJb2Zmc2V0ICs9IGN1cl9sZW47DQo+ID4gKwkJbGVuIC09IGN1cl9s
-ZW47DQo+ID4gKwl9IHdoaWxlIChsZW4pOw0KPiA+ICsNCj4gPiArCWlmICh1bmxpa2VseSghdG90
-YWxfd3JpdHRlbikpDQo+ID4gKwkJcmV0dXJuIHJjOw0KPiA+ICsNCj4gPiArCWlvY2ItPmtpX3Bv
-cyArPSB0b3RhbF93cml0dGVuOw0KPiA+ICsJcmV0dXJuIHRvdGFsX3dyaXR0ZW47DQo+ID4gKw0K
-PiA+ICt9DQo+ID4gKw0KPiA+ICAgc3NpemVfdCBjaWZzX3VzZXJfd3JpdGV2KHN0cnVjdCBraW9j
-YiAqaW9jYiwgc3RydWN0IGlvdl9pdGVyICpmcm9tKQ0KPiA+ICAgew0KPiA+ICAgCXN0cnVjdCBm
-aWxlICpmaWxlID0gaW9jYi0+a2lfZmlscDsNCj4gPg0K
+On 6/25/2018 5:14 PM, Long Li wrote:
+>> Subject: Re: [Patch v2 06/15] CIFS: Introduce helper function to get page
+>> offset and length in smb_rqst
+>>
+>> On 5/30/2018 3:47 PM, Long Li wrote:
+>>> From: Long Li <longli@microsoft.com>
+>>>
+>>> Introduce a function rqst_page_get_length to return the page offset
+>>> and length for a given page in smb_rqst. This function is to be used
+>>> by following patches.
+>>>
+>>> Signed-off-by: Long Li <longli@microsoft.com>
+>>> ---
+>>>    fs/cifs/cifsproto.h |  3 +++
+>>>    fs/cifs/misc.c      | 17 +++++++++++++++++
+>>>    2 files changed, 20 insertions(+)
+>>>
+>>> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h index
+>>> 7933c5f..89dda14 100644
+>>> --- a/fs/cifs/cifsproto.h
+>>> +++ b/fs/cifs/cifsproto.h
+>>> @@ -557,4 +557,7 @@ int cifs_alloc_hash(const char *name, struct
+>> crypto_shash **shash,
+>>>    		    struct sdesc **sdesc);
+>>>    void cifs_free_hash(struct crypto_shash **shash, struct sdesc
+>>> **sdesc);
+>>>
+>>> +extern void rqst_page_get_length(struct smb_rqst *rqst, unsigned int
+>> page,
+>>> +				unsigned int *len, unsigned int *offset);
+>>> +
+>>>    #endif			/* _CIFSPROTO_H */
+>>> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c index 96849b5..e951417
+>>> 100644
+>>> --- a/fs/cifs/misc.c
+>>> +++ b/fs/cifs/misc.c
+>>> @@ -905,3 +905,20 @@ cifs_free_hash(struct crypto_shash **shash,
+>> struct sdesc **sdesc)
+>>>    		crypto_free_shash(*shash);
+>>>    	*shash = NULL;
+>>>    }
+>>> +
+>>> +/**
+>>> + * rqst_page_get_length - obtain the length and offset for a page in
+>>> +smb_rqst
+>>> + * Input: rqst - a smb_rqst, page - a page index for rqst
+>>> + * Output: *len - the length for this page, *offset - the offset for
+>>> +this page  */ void rqst_page_get_length(struct smb_rqst *rqst,
+>>> +unsigned int page,
+>>> +				unsigned int *len, unsigned int *offset) {
+>>> +	*len = rqst->rq_pagesz;
+>>> +	*offset = (page == 0) ? rqst->rq_offset : 0;
+>>
+>> Really? Page 0 always has a zero offset??
+> 
+> I think you are misreading this line. The offset for page 0 is rq_offset, the offset for all subsequent pages are 0.
+
+Ah, yes, sorry I did read it incorrectly.
+>>> +
+>>> +	if (rqst->rq_npages == 1 || page == rqst->rq_npages-1)
+>>> +		*len = rqst->rq_tailsz;
+>>> +	else if (page == 0)
+>>> +		*len = rqst->rq_pagesz - rqst->rq_offset; }
+>>>
+>>
+>> This subroutine does what patch 5 does inline. Why not push this patch up in
+>> the sequence and use the helper?
+> 
+> This is actually a little different. This function returns the length and offset for a given page in the request. There might be multiple pages in a request.
+
+Ok, but I still think there is quite a bit of inline computation of
+this stuff that would more clearly and more robustly be done in a set
+of common functions. If someone ever touches the code to support a
+new upper layer, or even integrate with more complex compounding,
+things will get ugly fast.
+
+> The other function calculates the total length of all the pages in a request.
+
+Again, a great candidate for a common set of subroutines, IMO.
+
+Tom.
