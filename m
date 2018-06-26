@@ -1,122 +1,49 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: F_OFD_GETLK implemented wrong with CIFS protocol version 2.0+
-Date: Mon, 25 Jun 2018 22:54:40 -0500
-Message-ID: <CAH2r5muV49o7aTco1757UwuW-c6Fn5r=EW3QMCMfU7FFLZNMTw@mail.gmail.com>
-References: <77967693-040b-734a-8e18-be95d97478b3@redhat.com>
+From: Long Li <longli@microsoft.com>
+Subject: RE: [Patch v2 11/15] CIFS: Pass page offset for calculating signature
+Date: Tue, 26 Jun 2018 04:15:15 +0000
+Message-ID: <DM5PR2101MB0728DDBD53A756B6CEB9EEAECE490@DM5PR2101MB0728.namprd21.prod.outlook.com>
+References: <20180530194807.31657-1-longli@linuxonhyperv.com>
+ <20180530194807.31657-12-longli@linuxonhyperv.com>
+ <7a9ee28d-4c18-c4fd-259b-1feeeb3fb83b@talpey.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Adam Williamson <awilliam@redhat.com>
-To: labbott@redhat.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+To: Tom Talpey <tom@talpey.com>, Steve French <sfrench@samba.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <77967693-040b-734a-8e18-be95d97478b3@redhat.com>
+In-Reply-To: <7a9ee28d-4c18-c4fd-259b-1feeeb3fb83b@talpey.com>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-We are taking a look at this - Ronnie had some ideas.  Probably simply
-not implemented - hopefully not too hard to fix.
-On Mon, Jun 25, 2018 at 6:58 PM Laura Abbott <labbott@redhat.com> wrote:
->
-> Hi,
->
-> A while back, someone reported a failure on Fedora when trying to boot
-> a QEMU image off of a CIFS share. The issue was reduced down to a
-> test case (https://bugzilla.redhat.com/show_bug.cgi?id=1484130#c8)
->
-> # cat test-ofd-lock.c
-> #define _GNU_SOURCE
-> #include <errno.h>
-> #include <stdio.h>
-> #include <unistd.h>
-> #include <fcntl.h>
->
-> int main(int argc, char **argv)
-> {
->      int ret;
->      int fd;
->      struct flock fl = {
->          .l_whence = SEEK_SET,
->          .l_start  = 0,
->          .l_len    = 0,
->          .l_type   = F_RDLCK,
->      };
->      if (argc < 2) {
->              fprintf(stderr, "Usage: %s <file>\n", argv[0]);
->              return 1;
->      }
->      fd = open(argv[1], O_RDWR);
->      if (fd < 0) {
->              perror("open");
->              return errno;
->      }
->      ret = fcntl(fd, F_OFD_SETLK, &fl);
->      if (ret) {
->              perror("setlk");
->              return errno;
->      }
->      fl.l_type = F_WRLCK;
->      ret = fcntl(fd, F_OFD_GETLK, &fl);
->      if (ret) {
->              perror("getlk");
->              return errno;
->      }
->      if (fl.l_type != F_UNLCK) {
->              fprintf(stderr, "get lock test failed\n");
->              return 1;
->      }
->      return 0;
-> }
-> [root@localhost ~]# make test-ofd-lock
-> cc     test-ofd-lock.c   -o test-ofd-lock
-> [root@localhost ~]# touch /tmp/test && ./test-ofd-lock /tmp/test
-> [root@localhost ~]# echo $?
-> 0
-> [root@localhost ~]# touch /mnt/test && ./test-ofd-lock /mnt/test
-> get lock test failed
-> [root@localhost ~]# mount | grep /mnt
-> //192.168.31.1/tddownload on /mnt type cifs (rw,relatime,vers=3.0,
-> cache=strict,username=admin,domain=,uid=0,
-> noforceuid,gid=0,noforcegid,addr=192.168.31.1,file_mode=0755,
-> dir_mode=0755,nounix,serverino,mapposix,rsize=1048576,
-> wsize=1048576,echo_interval=60,actimeo=1,user=admin)
->
->
-> As explained by one of the QEMU developers
-> (https://bugzilla.redhat.com/show_bug.cgi?id=1484130#c37)
->
-> '''
-> It is a kernel bug. The code snippet in comment 8 shows clearly that the kernel
-> is doing the wrong thing, which cannot be fixed/worked around by QEMU.
->
-> In man 2 fcntl:
->
->         F_OFD_GETLK (struct flock *)
->                On input to this call, lock describes an open file description lock
-> we would like to place on the file.  If the lock could  be  placed,  fcntl()  does  not
->                actually  place  it,  but  returns F_UNLCK in the l_type field of lock
-> and leaves the other fields of the structure unchanged.  If one or more incompatible
->                locks would prevent this lock being placed, then details about one of
-> these locks are returned via lock, as described above for F_GETLK.
->
-> which is not the case with the new CIFS behaviour.
-> ''
->
-> You can read the full context at https://bugzilla.redhat.com/show_bug.cgi?id=1484130
->
-> Any suggestions?
->
-> Thanks,
-> Laura
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Thanks,
-
-Steve
+PiBTdWJqZWN0OiBSZTogW1BhdGNoIHYyIDExLzE1XSBDSUZTOiBQYXNzIHBhZ2Ugb2Zmc2V0IGZv
+ciBjYWxjdWxhdGluZyBzaWduYXR1cmUNCj4gDQo+IE9uIDUvMzAvMjAxOCAzOjQ4IFBNLCBMb25n
+IExpIHdyb3RlOg0KPiA+IEZyb206IExvbmcgTGkgPGxvbmdsaUBtaWNyb3NvZnQuY29tPg0KPiA+
+DQo+ID4gV2hlbiBjYWxjdWxhdGluZyBzaWduYXR1cmUgZm9yIHRoZSBwYWNrZXQsIGl0IG5lZWRz
+IHRvIHJlYWQgaW50byB0aGUNCj4gPiBjb3JyZWN0IHBhZ2Ugb2Zmc2V0IGZvciB0aGUgZGF0YS4N
+Cj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IExvbmcgTGkgPGxvbmdsaUBtaWNyb3NvZnQuY29tPg0K
+PiA+IC0tLQ0KPiA+ICAgZnMvY2lmcy9jaWZzZW5jcnlwdC5jIHwgOSArKysrKy0tLS0NCj4gPiAg
+IDEgZmlsZSBjaGFuZ2VkLCA1IGluc2VydGlvbnMoKyksIDQgZGVsZXRpb25zKC0pDQo+ID4NCj4g
+PiBkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jaWZzZW5jcnlwdC5jIGIvZnMvY2lmcy9jaWZzZW5jcnlw
+dC5jIGluZGV4DQo+ID4gYTZlZjA4OC4uZTg4MzAzYyAxMDA2NDQNCj4gPiAtLS0gYS9mcy9jaWZz
+L2NpZnNlbmNyeXB0LmMNCj4gPiArKysgYi9mcy9jaWZzL2NpZnNlbmNyeXB0LmMNCj4gPiBAQCAt
+NjgsMTEgKzY4LDEyIEBAIGludCBfX2NpZnNfY2FsY19zaWduYXR1cmUoc3RydWN0IHNtYl9ycXN0
+ICpycXN0LA0KPiA+DQo+ID4gICAJLyogbm93IGhhc2ggb3ZlciB0aGUgcnFfcGFnZXMgYXJyYXkg
+Ki8NCj4gPiAgIAlmb3IgKGkgPSAwOyBpIDwgcnFzdC0+cnFfbnBhZ2VzOyBpKyspIHsNCj4gPiAt
+CQl2b2lkICprYWRkciA9IGttYXAocnFzdC0+cnFfcGFnZXNbaV0pOw0KPiA+IC0JCXNpemVfdCBs
+ZW4gPSBycXN0LT5ycV9wYWdlc3o7DQo+ID4gKwkJdm9pZCAqa2FkZHI7DQo+ID4gKwkJdW5zaWdu
+ZWQgaW50IGxlbiwgb2Zmc2V0Ow0KPiA+DQo+ID4gLQkJaWYgKGkgPT0gcnFzdC0+cnFfbnBhZ2Vz
+IC0gMSkNCj4gPiAtCQkJbGVuID0gcnFzdC0+cnFfdGFpbHN6Ow0KPiA+ICsJCXJxc3RfcGFnZV9n
+ZXRfbGVuZ3RoKHJxc3QsIGksICZsZW4sICZvZmZzZXQpOw0KPiA+ICsNCj4gPiArCQlrYWRkciA9
+IChjaGFyICopIGttYXAocnFzdC0+cnFfcGFnZXNbaV0pICsgb2Zmc2V0Ow0KPiANCj4gSSBzdXBw
+b3NlIGl0J3MgbW9yZSByb2J1c3QgdG8gbWFwIGEgcGFnZSBhdCBhIHRpbWUsIGJ1dCBpdCdzIHBy
+ZXR0eSBleHBlbnNpdmUuDQo+IElzIHRoaXMgdGhlIG9ubHkgd2F5IHRvIGl0ZXJhdGUgb3ZlciBh
+IHBvdGVudGlhbGx5IHZlcnkgbGFyZ2UgYmxvY2sgb2YgZGF0YT8gRm9yDQo+IGV4YW1wbGUsIGEg
+MU1CIHNlZ21lbnQgbWVhbnMgMjU2IGttYXAva3VubWFwcy4NCg0KSSB3aWxsIGxvb2sgaW50byBu
+b3QgbWFwcGluZyB0aG9zZSBwYWdlcyB3aGlsZSBkb2luZyBJL08uDQoNClRoaXMgY29kZSBwYXRo
+IGlzIGZvciBSRE1BIHNlbmQvcmVjZWl2ZSwgYW5kIGl0J3MgcmFyZWx5IHVzZWQgZm9yIHRyYW5z
+ZmVycmluZyBsYXJnZSBhbW91bnQgb2YgZGF0YS4NCg0KPiANCj4gVG9tLg0KPiANCj4gPg0KPiA+
+ICAgCQljcnlwdG9fc2hhc2hfdXBkYXRlKHNoYXNoLCBrYWRkciwgbGVuKTsNCj4gPg0KPiA+DQo=
