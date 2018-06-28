@@ -1,48 +1,35 @@
-From: Steve French <smfrench@gmail.com>
-Subject: config files and how to have persistent Linux kernel Driver/File
+From: "Theodore Y. Ts'o" <tytso@mit.edu>
+Subject: Re: config files and how to have persistent Linux kernel Driver/File
  System configuration info saved
-Date: Thu, 28 Jun 2018 17:37:15 -0500
-Message-ID: <CAH2r5msV1hBAGgqtMFh6P=OGPV3RKjVAER=5bg-6Y+vW5BEJwQ@mail.gmail.com>
+Date: Thu, 28 Jun 2018 18:58:57 -0400
+Message-ID: <20180628225857.GB1231@thunk.org>
+References: <CAH2r5msV1hBAGgqtMFh6P=OGPV3RKjVAER=5bg-6Y+vW5BEJwQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: LKML <linux-kernel@vger.kernel.org>,
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
         samba-technical <samba-technical@lists.samba.org>,
         CIFS <linux-cifs@vger.kernel.org>
-To: linux-fsdevel <linux-fsdevel@vger.kernel.org>
+To: Steve French <smfrench@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <CAH2r5msV1hBAGgqtMFh6P=OGPV3RKjVAER=5bg-6Y+vW5BEJwQ@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Ronnie brought up an interesting point about the problems consistently
-configuring file systems (or any Linux module for that matter) so that
-reboot doesn't wipe away security or performance tuning changes.
+On Thu, Jun 28, 2018 at 05:37:15PM -0500, Steve French wrote:
+> Ronnie brought up an interesting point about the problems consistently
+> configuring file systems (or any Linux module for that matter) so that
+> reboot doesn't wipe away security or performance tuning changes.
 
-Linux file systems typically allow configuration via various ways (I
-may have left some out) for example:
-- module load parameters (modprobe etc. e.g. for cachefs
-"deferecreate" or "deferlookup" can be configured, as can various
-parms in the nfs or cifs/smb3 modules)
-- Settings via /proc/fs/ or /sys/fs (e.g. /sys/fs/ext4/features)
-- Settings via mount parms
+In general it's considered best practice to make the file system
+auto-tune itself as much as possible, because the sad fact is that
+99.9999% of the customers aren't going to bother to add any tuning
+parameters.  So there hasn't been a push to try to create something
+more complex, because it's generally not needed.
 
-Other than /etc/fstab which is fairly limited,  AFAIK the only file
-system that has persistent configuration in text files is nfs - which
-allows a limited number of mount related settings to be set to
-defaults via nfsmount.conf
+Settings via /sys/fs/ext4 are generally for developers as they try to
+understand how things work, so they can improve the file systems
+defaults / auto-tuning algorithms.
 
-Are there good examples of either text based configuration of Linux
-kernel (preferably file system drivers) e.g. something vaguely like
-/etc/btrfs or an /etc/xfs to set default security or performance
-related parameters consistently over reboot of machine, or even better
-something vaguely like Samba's "net conf" tools for setting
-keyword=value for various types of settings in a somewhat safer way
-(in a registry, which in Samba's case is cluster safe, and fairly
-robust)
-
-What is the recommended way to persist configuration settings for
-Linux drivers across reboot?
-
--- 
-Thanks,
-
-Steve
+						- Ted
