@@ -1,133 +1,63 @@
-From: Paulo Alcantara <paulo@paulo.ac>
-Subject: [PATCH] cifs: Fix infinite loop when using hard mount option
-Date: Thu,  5 Jul 2018 13:46:34 -0300
-Message-ID: <20180705164634.12288-1-paulo@paulo.ac>
-Cc: smfrench@gmail.com, Paulo Alcantara <paulo@paulo.ac>,
-        Paulo Alcantara <palcantara@suse.de>, stable@vger.kernel.org
-To: linux-cifs@vger.kernel.org
+From: =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
+Subject: Re: [PATCH] cifs: Fix slab-out-of-bounds in send_set_info() on SMB2 ACE setting
+Date: Thu, 05 Jul 2018 19:11:48 +0200
+Message-ID: <874lhd7gkr.fsf@suse.com>
+References: <af471807b329692a387ff26e62e1bbca01e1684f.1530783326.git.sbrivio@redhat.com> <87d0w17nu3.fsf@suse.com> <CAH2r5muhkbO45en38894ZzpcMshUJsp7r1X5P9jwizjce7LzuQ@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Cc: sbrivio@redhat.com, Steve French <sfrench@samba.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Ronnie Sahlberg <lsahlber@redhat.com>, jiyin@redhat.com,
+        Pavel Shilovskiy <pshilov@microsoft.com>,
+        Shirish Pargaonkar <shirishpargaonkar@gmail.com>,
+        Stable <stable@vger.kernel.org>
+To: Steve French <smfrench@gmail.com>
 Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <CAH2r5muhkbO45en38894ZzpcMshUJsp7r1X5P9jwizjce7LzuQ@mail.gmail.com>
 Sender: stable-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-For every request we send, whether it is SMB1 or SMB2+, we attempt to
-reconnect tcon (cifs_reconnect_tcon or smb2_reconnect) before carrying
-out the request.
+Steve French <smfrench@gmail.com> writes:
+> On Thu, Jul 5, 2018 at 9:35 AM Aurélien Aptel <aaptel@suse.com> wrote:
+>>
+>> Stefano Brivio <sbrivio@redhat.com> writes:
+>> >       /* BB eventually switch this to SMB2 specific small buf size */
+>> > -     *request_buf = cifs_small_buf_get();
+>> > +     if (smb2_command == SMB2_SET_INFO)
+>> > +             *request_buf = cifs_buf_get();
+>> > +     else
+>> > +             *request_buf = cifs_small_buf_get();
+>> >       if (*request_buf == NULL) {
+>> >               /* BB should we add a retry in here if not a writepage? */
+>> >               return -ENOMEM;
+>> > @@ -3720,7 +3723,7 @@ send_set_info(const unsigned int xid, struct cifs_tcon *tcon,
+>> >
+>> >       rc = cifs_send_recv(xid, ses, &rqst, &resp_buftype, flags,
+>> >                           &rsp_iov);
+>> > -     cifs_small_buf_release(req);
+>> > +     cifs_buf_release(req);
+>> >       rsp = (struct smb2_set_info_rsp *)rsp_iov.iov_base;
+>>
+>> Small and large bufs use different mempools, shouldn't the release func
+>> match the get func?
+>
+> Yes
+>
+> Stefano,
+> Can you respin your patch?  I am hoping this patch addresses a bug I
+> have been seeing
 
-So, while server->tcpStatus != CifsNeedReconnect, we wait for the
-reconnection to succeed on wait_event_interruptible_timeout(). If it
-returns, that means that either the condition was evaluated to true, or
-timeout elapsed, or it was interrupted by a signal.
+I've ran xfstests with the 2 patches on top (smb3 section only again) I
+get good results less failures than v4.17 :)
 
-Since we're not handling the case where the process woke up due to a
-received signal (-ERESTARTSYS), the next call to
-wait_event_interruptible_timeout() will _always_ fail and we end up
-looping forever inside either cifs_reconnect_tcon() or smb2_reconnect().
+Failures: generic/112 generic/123 generic/128 generic/210 generic/323 generic/355 generic/378 generic/469 generic/478 generic/484 generic/486
+Failed 11 of 394 tests
 
-Here's an example of how to trigger that:
 
-$ mount.cifs //foo/share /mnt/test -o
-username=foo,password=foo,vers=1.0,hard
-
-(break connection to server before executing bellow cmd)
-$ stat -f /mnt/test & sleep 140
-[1] 2511
-
-$ ps -aux -q 2511
-USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
-root      2511  0.0  0.0  12892  1008 pts/0    S    12:24   0:00 stat -f
-/mnt/test
-
-$ kill -9 2511
-
-(wait for a while; process is stuck in the kernel)
-$ ps -aux -q 2511
-USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
-root      2511 83.2  0.0  12892  1008 pts/0    R    12:24  30:01 stat -f
-/mnt/test
-
-By using 'hard' mount point means that cifs.ko will keep retrying
-indefinitely, however we must allow the process to be killed otherwise
-it would hang the system.
-
-Signed-off-by: Paulo Alcantara <palcantara@suse.de>
-Cc: stable@vger.kernel.org
----
- fs/cifs/cifssmb.c | 10 ++++++++--
- fs/cifs/smb2pdu.c | 18 ++++++++++++------
- 2 files changed, 20 insertions(+), 8 deletions(-)
-
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index d352da325de3..93408eab92e7 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -157,8 +157,14 @@ cifs_reconnect_tcon(struct cifs_tcon *tcon, int smb_command)
- 	 * greater than cifs socket timeout which is 7 seconds
- 	 */
- 	while (server->tcpStatus == CifsNeedReconnect) {
--		wait_event_interruptible_timeout(server->response_q,
--			(server->tcpStatus != CifsNeedReconnect), 10 * HZ);
-+		rc = wait_event_interruptible_timeout(server->response_q,
-+						      (server->tcpStatus != CifsNeedReconnect),
-+						      10 * HZ);
-+		if (rc < 0) {
-+			cifs_dbg(FYI, "%s: aborting reconnect due to a received"
-+				 " signal by the process\n", __func__);
-+			return -ERESTARTSYS;
-+		}
- 
- 		/* are we still trying to reconnect? */
- 		if (server->tcpStatus != CifsNeedReconnect)
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 810b85787c91..086629b0d59c 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -155,7 +155,7 @@ smb2_hdr_assemble(struct smb2_sync_hdr *shdr, __le16 smb2_cmd,
- static int
- smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon)
- {
--	int rc = 0;
-+	int rc;
- 	struct nls_table *nls_codepage;
- 	struct cifs_ses *ses;
- 	struct TCP_Server_Info *server;
-@@ -166,10 +166,10 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon)
- 	 * for those three - in the calling routine.
- 	 */
- 	if (tcon == NULL)
--		return rc;
-+		return 0;
- 
- 	if (smb2_command == SMB2_TREE_CONNECT)
--		return rc;
-+		return 0;
- 
- 	if (tcon->tidStatus == CifsExiting) {
- 		/*
-@@ -212,8 +212,14 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon)
- 			return -EAGAIN;
- 		}
- 
--		wait_event_interruptible_timeout(server->response_q,
--			(server->tcpStatus != CifsNeedReconnect), 10 * HZ);
-+		rc = wait_event_interruptible_timeout(server->response_q,
-+						      (server->tcpStatus != CifsNeedReconnect),
-+						      10 * HZ);
-+		if (rc < 0) {
-+			cifs_dbg(FYI, "%s: aborting reconnect due to a received"
-+				 " signal by the process\n", __func__);
-+			return -ERESTARTSYS;
-+		}
- 
- 		/* are we still trying to reconnect? */
- 		if (server->tcpStatus != CifsNeedReconnect)
-@@ -231,7 +237,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon)
- 	}
- 
- 	if (!tcon->ses->need_reconnect && !tcon->need_reconnect)
--		return rc;
-+		return 0;
- 
- 	nls_codepage = load_nls_default();
- 
+Cheers,
 -- 
-2.18.0
+Aurélien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
+GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
