@@ -1,82 +1,57 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH] cifs: Fix slab-out-of-bounds in send_set_info() on SMB2
- ACE setting
-Date: Thu, 5 Jul 2018 12:53:23 -0500
-Message-ID: <CAH2r5mtLPyM5GvMKauNcCLUZzfnDJuL9k_xzt5ePdtsCdmOmyg@mail.gmail.com>
-References: <af471807b329692a387ff26e62e1bbca01e1684f.1530783326.git.sbrivio@redhat.com>
- <87d0w17nu3.fsf@suse.com> <20180705165858.7679fc44@epycfail>
+From: Jon Kuhn <jkuhn@barracuda.com>
+Subject: [PATCH] fs/cifs: don't translate SFM_SLASH (U+F026) to backslash
+Date: Mon, 9 Jul 2018 14:33:14 +0000
+Message-ID: <20180709143314.4378-1-jkuhn@barracuda.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Cc: =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
-        Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Ronnie Sahlberg <lsahlber@redhat.com>, jiyin@redhat.com,
-        Pavel Shilovskiy <pshilov@microsoft.com>,
-        Shirish Pargaonkar <shirishpargaonkar@gmail.com>,
-        Stable <stable@vger.kernel.org>
-To: sbrivio@redhat.com
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20180705165858.7679fc44@epycfail>
-Sender: stable-owner@vger.kernel.org
+Content-Type: text/plain
+Cc: Jon Kuhn <jkuhn@barracuda.com>, <linux-cifs@vger.kernel.org>,
+        <samba-technical@lists.samba.org>, <linux-kernel@vger.kernel.org>
+To: Steve French <sfrench@samba.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Reviewed the patch in more detail - and it looks correct am merging
-this and the other fixes for cc:stable today into cifs-2.6.git
-for-next
+When a Mac client saves an item containing a backslash to a file server
+the backslash is represented in the CIFS/SMB protocol as as U+F026.
+Before this change, listing a directory containing an item with a
+backslash in its name will return that item with the backslash
+represented with a true backslash character (U+005C) because
+convert_sfm_character mapped U+F026 to U+005C when interpretting the
+CIFS/SMB protocol response.  However, attempting to open or stat the
+path using a true backslash will result in an error because
+convert_to_sfm_char does not map U+005C back to U+F026 causing the
+CIFS/SMB request to be made with the backslash represented as U+005C.
 
-Thanks for spotting this.
+This change simply prevents the U+F026 to U+005C conversion from
+happenning.  This is analogous to how the code does not do any
+translation of UNI_SLASH (U+F000).
 
+Signed-off-by: Jon Kuhn <jkuhn@barracuda.com>
+---
+ fs/cifs/cifs_unicode.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-On Thu, Jul 5, 2018 at 9:59 AM Stefano Brivio <sbrivio@redhat.com> wrote:
->
-> On Thu, 05 Jul 2018 16:35:00 +0200
-> Aur=C3=A9lien Aptel <aaptel@suse.com> wrote:
->
-> > Stefano Brivio <sbrivio@redhat.com> writes:
-> > >     /* BB eventually switch this to SMB2 specific small buf size */
-> > > -   *request_buf =3D cifs_small_buf_get();
-> > > +   if (smb2_command =3D=3D SMB2_SET_INFO)
-> > > +           *request_buf =3D cifs_buf_get();
-> > > +   else
-> > > +           *request_buf =3D cifs_small_buf_get();
-> > >     if (*request_buf =3D=3D NULL) {
-> > >             /* BB should we add a retry in here if not a writepage? *=
-/
-> > >             return -ENOMEM;
-> > > @@ -3720,7 +3723,7 @@ send_set_info(const unsigned int xid, struct ci=
-fs_tcon *tcon,
-> > >
-> > >     rc =3D cifs_send_recv(xid, ses, &rqst, &resp_buftype, flags,
-> > >                         &rsp_iov);
-> > > -   cifs_small_buf_release(req);
-> > > +   cifs_buf_release(req);
-> > >     rsp =3D (struct smb2_set_info_rsp *)rsp_iov.iov_base;
-> >
-> > Small and large bufs use different mempools, shouldn't the release func
-> > match the get func?
->
-> I think it does: for SMB2_SET_INFO we'll allocate with cifs_buf_get(),
-> which does:
->
->         ret_buf =3D mempool_alloc(cifs_req_poolp, GFP_NOFS);
->
-> and release with cifs_buf_release():
->
->         mempool_free(buf_to_free, cifs_req_poolp);
->
-> am I missing something?
->
-> --
-> Stefano
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/fs/cifs/cifs_unicode.c b/fs/cifs/cifs_unicode.c
+index b380e087..a2b2355e 100644
+--- a/fs/cifs/cifs_unicode.c
++++ b/fs/cifs/cifs_unicode.c
+@@ -105,9 +105,6 @@ convert_sfm_char(const __u16 src_char, char *target)
+ 	case SFM_LESSTHAN:
+ 		*target = '<';
+ 		break;
+-	case SFM_SLASH:
+-		*target = '\\';
+-		break;
+ 	case SFM_SPACE:
+ 		*target = ' ';
+ 		break;
+-- 
+2.17.1
 
 
+===========================================================
+Learn how to protect users, data, and applications with security engineered for the public cloud by Barracuda. http://barracuda.com
 
---=20
-Thanks,
-
-Steve
+DISCLAIMER:
+This e-mail and any attachments to it contain confidential and proprietary material of Barracuda, its affiliates or agents, and is solely for the use of the intended recipient. Any review, use, disclosure, distribution or copying of this transmittal is prohibited except by or on behalf of the intended recipient. If you have received this transmittal in error, please notify the sender and destroy this e-mail and any attachments and all copies, whether electronic or printed.
+===========================================================
