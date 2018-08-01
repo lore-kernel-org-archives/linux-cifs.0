@@ -1,57 +1,51 @@
-From: Jon Kuhn <jkuhn@barracuda.com>
-Subject: [PATCH] fs/cifs: don't translate SFM_SLASH (U+F026) to backslash
-Date: Mon, 9 Jul 2018 14:33:14 +0000
-Message-ID: <20180709143314.4378-1-jkuhn@barracuda.com>
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: linux-next: Signed-off-by missing for commit in the cifs tree
+Date: Wed, 1 Aug 2018 20:58:53 +1000
+Message-ID: <20180801205853.625673fd@canb.auug.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Jon Kuhn <jkuhn@barracuda.com>, <linux-cifs@vger.kernel.org>,
-        <samba-technical@lists.samba.org>, <linux-kernel@vger.kernel.org>
-To: Steve French <sfrench@samba.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/JpVYd+rAL6qq=jwAXf74lML"; protocol="application/pgp-signature"
+Cc: Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-When a Mac client saves an item containing a backslash to a file server
-the backslash is represented in the CIFS/SMB protocol as as U+F026.
-Before this change, listing a directory containing an item with a
-backslash in its name will return that item with the backslash
-represented with a true backslash character (U+005C) because
-convert_sfm_character mapped U+F026 to U+005C when interpretting the
-CIFS/SMB protocol response.  However, attempting to open or stat the
-path using a true backslash will result in an error because
-convert_to_sfm_char does not map U+005C back to U+F026 causing the
-CIFS/SMB request to be made with the backslash represented as U+005C.
+--Sig_/JpVYd+rAL6qq=jwAXf74lML
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-This change simply prevents the U+F026 to U+005C conversion from
-happenning.  This is analogous to how the code does not do any
-translation of UNI_SLASH (U+F000).
+Hi all,
 
-Signed-off-by: Jon Kuhn <jkuhn@barracuda.com>
----
- fs/cifs/cifs_unicode.c | 3 ---
- 1 file changed, 3 deletions(-)
+Commits
 
-diff --git a/fs/cifs/cifs_unicode.c b/fs/cifs/cifs_unicode.c
-index b380e087..a2b2355e 100644
---- a/fs/cifs/cifs_unicode.c
-+++ b/fs/cifs/cifs_unicode.c
-@@ -105,9 +105,6 @@ convert_sfm_char(const __u16 src_char, char *target)
- 	case SFM_LESSTHAN:
- 		*target = '<';
- 		break;
--	case SFM_SLASH:
--		*target = '\\';
--		break;
- 	case SFM_SPACE:
- 		*target = ' ';
- 		break;
--- 
-2.17.1
+  e0afb3ebfcf5 ("cifs: add compound_send_recv()")
+  1bc941970813 ("cifs: make smb_send_rqst take an array of requests")
+  095fe7367830 ("cifs: update init_sg, crypt_message to take an array of rq=
+st")
 
+are missing a Signed-off-by from their committers.
 
-===========================================================
-Learn how to protect users, data, and applications with security engineered for the public cloud by Barracuda. http://barracuda.com
+--=20
+Cheers,
+Stephen Rothwell
 
-DISCLAIMER:
-This e-mail and any attachments to it contain confidential and proprietary material of Barracuda, its affiliates or agents, and is solely for the use of the intended recipient. Any review, use, disclosure, distribution or copying of this transmittal is prohibited except by or on behalf of the intended recipient. If you have received this transmittal in error, please notify the sender and destroy this e-mail and any attachments and all copies, whether electronic or printed.
-===========================================================
+--Sig_/JpVYd+rAL6qq=jwAXf74lML
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAlthkm0ACgkQAVBC80lX
+0GweXAf/e2WI3wLhm+WzW9E5aWtL6y0s23Mc/d5OHd+OJbF+UhaoGpZWU7OXrcAZ
+yy4hn/+qu+Nh8Q0woY0IJNHMqAGCJ7Wxsx8j2s+G/2GmSqUELhR/8OSkVcG/l+Rd
+wZF/8aXnXI7RlX9PLHpPSxtQYJ7qKIY62NStuo/NCmOFwsTdY4lDd4gwege/ZKAU
+jMmPQIs0Do/p9vXTWYe7/0NvFty3ZDzDwaNIgUDKPQQCNv35o5vDpbEDyz/I8pjj
+z/V08tuR3oma9wyAsE0aeQgqPR3GR4qDh2dX1r1Q9V9HL4Z7BbRsSd1Zo39uYePV
+dEZR6/ey17LBMyqxwmuJi+yN0QJuCA==
+=8cdZ
+-----END PGP SIGNATURE-----
+
+--Sig_/JpVYd+rAL6qq=jwAXf74lML--
