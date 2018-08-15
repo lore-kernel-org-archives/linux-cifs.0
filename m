@@ -1,112 +1,118 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH 0/8] cifs compounding
-Date: Thu, 2 Aug 2018 17:54:42 -0700
-Message-ID: <CAH2r5mu_HeKuGieq10DdV0en8=zRj96HdKVSuzO9UYB1Nh3Ukw@mail.gmail.com>
-References: <20180731232618.23586-1-lsahlber@redhat.com> <CAH2r5mvWHnkrQ+zF81_E-KkpVZA3YtZLB_LTk1dmePv0Y3Ktrg@mail.gmail.com>
- <1735951147.19009312.1533165340522.JavaMail.zimbra@redhat.com>
+From: David Howells <dhowells@redhat.com>
+Subject: Should we split the network filesystem setup into two phases?
+Date: Wed, 15 Aug 2018 17:31:25 +0100
+Message-ID: <17763.1534350685@warthog.procyon.org.uk>
+References: <153313703562.13253.5766498657900728120.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: CIFS <linux-cifs@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-To: Ronnie Sahlberg <lsahlber@redhat.com>,
-        samba-technical <samba-technical@lists.samba.org>
+Content-Type: text/plain; charset="us-ascii"
+Cc: dhowells@redhat.com, torvalds@linux-foundation.org,
+        "Eric W. Biederman" <ebiederm@redhat.com>,
+        linux-api@vger.kernel.org, linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net
+To: trond.myklebust@hammerspace.com, anna.schumaker@netapp.com,
+        sfrench@samba.org, steved@redhat.com, viro@zeniv.linux.org.uk
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1735951147.19009312.1533165340522.JavaMail.zimbra@redhat.com>
+In-Reply-To: <153313703562.13253.5766498657900728120.stgit@warthog.procyon.org.uk>
+Content-ID: <17762.1534350685.1@warthog.procyon.org.uk>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Big performance benefit (for this first narrow case) with Ronnie's
-compounding patches (now merged into cifs-2.6.git for-next).   This is
-the first code path enabled for smb3 compounding but looks very
-promising, if we continue to get such dramatic perf improvements (as
-we go forward implementing compounding to help stat, readdir etc.).
-Note that we have seen that Macs are quite aggressive about
-compounding in SMB3 (and Windows benefits a lot as well) so there a
-quite a few future code paths that we can optimize.  It obviously
-helps with more than network latency though, it can reduce server load
-as well.  Additional improvements in handle caching and directory
-leases (currently only implemented for the root directory) will also
-be a big win in the future as they are extended in cifs.ko for SMB3.
+Having just re-ported NFS on top of the new mount API stuff, I find that I
+don't really like the idea of superblocks being separated by communication
+parameters - especially when it might seem reasonable to be able to adjust
+those parameters.
 
-I did some primitive tests with and without Ronnie's patch and it was
-from 40% to 2000% slower before his patch (on the wire).   I tried df
-and stat -f.  Note that stat -f shows the greater benefit (only one
-compounded request on the with his patch, instead of two requests only
-one of which is compounded with df)
+Does it make sense to abstract out the remote peer and allow (a) that to be
+configured separately from any superblocks using it and (b) that to be used to
+create superblocks?
 
-Without his patch:
-local (fast network, to Samba)  ~2/100ths of a second
-remote (Azure, encrypted) - 16th/100ths to 17/100ths of a second
+Note that what a 'remote peer' is would be different for different
+filesystems:
 
-With his patch
-local (fast network, to Samba) ~1/1000 of a second
-remote (Azure, encrypted) ~6/100ths to ~12/100ths (stat -f vs. df)
+ (*) For NFS, it would probably be a named server, with address(es) attached
+     to the name.  In lieu of actually having a name, the initial IP address
+     could be used.
 
-so basically "stat -f" on the root goes from 3 requests to 1 send on
-the wire, while df goes from 4 requests to 2.
+ (*) For CIFS, it would probably be a named server.  I'm not sure if CIFS
+     allows an abstraction for a share that can move about inside a domain.
 
-Good job Ronnie!
-On Wed, Aug 1, 2018 at 4:15 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
->
-> Updated patch.
->
-> Thanks
->
-> ----- Original Message -----
-> From: "Steve French" <smfrench@gmail.com>
-> To: "Ronnie Sahlberg" <lsahlber@redhat.com>
-> Cc: "CIFS" <linux-cifs@vger.kernel.org>
-> Sent: Wednesday, 1 August, 2018 5:19:36 PM
-> Subject: Re: [PATCH 0/8] cifs compounding
->
-> I have merged the first three tentatively, but did a little cleanup of
-> scripts/checkpatch warnings (see attached lightly updated patches).
-> For patch four (update receive encrypted standard) I noticed some
-> endian errors - can you fix them (when I built them I got these sparse
-> warnings)
->
->   CHECK   /home/sfrench/cifs-2.6/fs/cifs/smb2ops.c
-> /home/sfrench/cifs-2.6/fs/cifs/smb2ops.c:3075:66: warning: restricted
-> __le32 degrades to integer
-> /home/sfrench/cifs-2.6/fs/cifs/smb2ops.c:3076:49: warning: restricted
-> __le32 degrades to integer
-> /home/sfrench/cifs-2.6/fs/cifs/smb2ops.c:3079:68: warning: restricted
-> __le32 degrades to integer
-> /home/sfrench/cifs-2.6/fs/cifs/smb2ops.c:3080:49: warning: restricted
-> __le32 degrades to integer
-> /home/sfrench/cifs-2.6/fs/cifs/smb2ops.c:3101:28: warning: invalid
-> assignment: -=
-> /home/sfrench/cifs-2.6/fs/cifs/smb2ops.c:3101:28:    left side has
-> type unsigned int
-> /home/sfrench/cifs-2.6/fs/cifs/smb2ops.c:3101:28:    right side has
-> type restricted __le32
-> /home/sfrench/cifs-2.6/fs/cifs/smb2ops.c:3108:28: warning: restricted
-> __le32 degrades to integer
->
-> Attached are the lightly updated versions of the patches that reduce
-> the checkpatch warnings - but can you cleanup the endian errors in
-> patch 4.
->
->
->
->
-> On Tue, Jul 31, 2018 at 6:26 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
-> >
-> > Steve, All
-> >
-> > An updated patch series based on Pavels feedback.
-> >
->
->
-> --
-> Thanks,
->
-> Steve
+ (*) For AFS, it would be a cell, I think, where the actual fileserver(s) used
+     are a matter of direction from the Volume Location server.
 
+ (*) For 9P and Ceph, I don't really know.
 
+What could be configured?  Well, addresses, ports, timeouts.  Maybe protocol
+level negotiation - though not being able to explicitly specify, say, the
+particular version and minorversion on an NFS share would be problematic for
+backward compatibility.
 
---
-Thanks,
+One advantage it could give us is that it might make it easier if someone asks
+for server X to query userspace in some way for the default parameters for X
+are.
 
-Steve
+What might this look like in terms of userspace?  Well, we could overload the
+new mount API:
+
+	peer1 = fsopen("nfs", FSOPEN_CREATE_PEER);
+	fsconfig(peer1, FSCONFIG_SET_NS, "net", NULL, netns_fd);
+	fsconfig(peer1, FSCONFIG_SET_STRING, "peer_name", "server.home");
+	fsconfig(peer1, FSCONFIG_SET_STRING, "vers", "4.2");
+	fsconfig(peer1, FSCONFIG_SET_STRING, "address", "tcp:192.168.1.1");
+	fsconfig(peer1, FSCONFIG_SET_STRING, "address", "tcp:192.168.1.2");
+	fsconfig(peer1, FSCONFIG_SET_STRING, "timeo", "122");
+	fsconfig(peer1, FSCONFIG_CMD_SET_UP_PEER, NULL, NULL, 0);
+
+	peer2 = fsopen("nfs", FSOPEN_CREATE_PEER);
+	fsconfig(peer2, FSCONFIG_SET_NS, "net", NULL, netns_fd);
+	fsconfig(peer2, FSCONFIG_SET_STRING, "peer_name", "server2.home");
+	fsconfig(peer2, FSCONFIG_SET_STRING, "vers", "3");
+	fsconfig(peer2, FSCONFIG_SET_STRING, "address", "tcp:192.168.1.3");
+	fsconfig(peer2, FSCONFIG_SET_STRING, "address", "udp:192.168.1.4+6001");
+	fsconfig(peer2, FSCONFIG_CMD_SET_UP_PEER, NULL, NULL, 0);
+
+	fs = fsopen("nfs", 0);
+	fsconfig(fs, FSCONFIG_SET_PEER, "peer.1", NULL, peer1);
+	fsconfig(fs, FSCONFIG_SET_PEER, "peer.2", NULL, peer2);
+	fsconfig(fs, FSCONFIG_SET_STRING, "source", "/home/dhowells", 0);
+	m = fsmount(fs, 0, 0);
+
+[Note that Eric's oft-repeated point about the 'creation' operation altering
+ established parameters still stands here.]
+
+You could also then reopen it for configuration, maybe by:
+
+	peer = fspick(AT_FDCWD, "/mnt", FSPICK_PEER);
+
+or:
+
+	peer = fspick(AT_FDCWD, "nfs:server.home", FSPICK_PEER_BY_NAME);
+
+though it might be better to give it its own syscall:
+
+	peer = fspeer("nfs", "server.home", O_CLOEXEC);
+	fsconfig(peer, FSCONFIG_SET_NS, "net", NULL, netns_fd);
+	...
+	fsconfig(peer, FSCONFIG_CMD_SET_UP_PEER, NULL, NULL, 0);
+
+In terms of alternative interfaces, I'm not sure how easy it would be to make
+it like cgroups where you go and create a dir in a special filesystem, say,
+"/sys/peers/nfs", because the peers records and names would have to be network
+namespaced.  Also, it might make it more difficult to use to create a root fs.
+
+On the other hand, being able to adjust the peer configuration by:
+
+	echo 71 >/sys/peers/nfs/server.home/timeo
+
+does have a certain appeal.
+
+Also, netlink might be the right option, but I'm not sure how you'd pin the
+resultant object whilst you make use of it.
+
+A further thought is that is it worth making this idea more general and
+encompassing non-network devices also?  This would run into issues of some
+logical sources being visible across namespaces and but not others.
+
+David
