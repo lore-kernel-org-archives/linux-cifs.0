@@ -1,98 +1,78 @@
-From: Andy Lutomirski <luto@amacapital.net>
+From: Steve French <smfrench@gmail.com>
 Subject: Re: Should we split the network filesystem setup into two phases?
-Date: Wed, 15 Aug 2018 09:51:36 -0700
-Message-ID: <DCE0E619-68F8-4906-8062-68D63DDED665@amacapital.net>
-References: <153313703562.13253.5766498657900728120.stgit@warthog.procyon.org.uk> <17763.1534350685@warthog.procyon.org.uk>
-Mime-Version: 1.0 (1.0)
-Content-Type: text/plain;
-        charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Cc: trond.myklebust@hammerspace.com, anna.schumaker@netapp.com,
-        sfrench@samba.org, steved@redhat.com, viro@zeniv.linux.org.uk,
-        torvalds@linux-foundation.org,
-        "Eric W. Biederman" <ebiederm@redhat.com>,
-        linux-api@vger.kernel.org, linux-security-module@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net
+Date: Wed, 15 Aug 2018 22:51:45 -0500
+Message-ID: <CAH2r5msjAYbXdnmC4Hb5TO155BC2vcMLq7XJ1H37TBiQTcsO7w@mail.gmail.com>
+References: <153313703562.13253.5766498657900728120.stgit@warthog.procyon.org.uk>
+ <17763.1534350685@warthog.procyon.org.uk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Cc: Steve French <sfrench@samba.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        ebiederm@redhat.com, linux-api@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
 To: David Howells <dhowells@redhat.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <17763.1534350685@warthog.procyon.org.uk>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
+This is worth further detailed discussion re:SMB3 as there are some fascinating
+protocol features that might help here, but my first thought is just the obvious
+one - this could help 'DFS' (the global name space feature almost all modern
+CIFS/SMB3 implement) work a little better in the client.  A share can
+be represented by an array of \\server\share\path targets although typically
+only one except in the DFS case  (and server can be an ipv4 or
+ipv6 address or host name (which could have multiple addresses).
+It could be over RDMA, TCP, and even other protocols (as the transport).
 
+There are various examples of DFS referrals in
+https://msdn.microsoft.com/en-us/library/cc227066.aspx section 4.
 
-> On Aug 15, 2018, at 9:31 AM, David Howells <dhowells@redhat.com> wrote:
->=20
-> Having just re-ported NFS on top of the new mount API stuff, I find that I=
+But since SMB3 also supports transparent failover, and "share move"
+and "server move" features, as well as multichannel - I would like
+to better understand the patch set to see if it helps/hurts.
 
-> don't really like the idea of superblocks being separated by communication=
+But until I dive into the patch set more and try it, hard for me to speculate.
+Has anyone looked at the CIFS/SMB3 changes needed?
 
-> parameters - especially when it might seem reasonable to be able to adjust=
-
+On Wed, Aug 15, 2018 at 11:32 AM David Howells <dhowells@redhat.com> wrote:
+>
+> Having just re-ported NFS on top of the new mount API stuff, I find that I
+> don't really like the idea of superblocks being separated by communication
+> parameters - especially when it might seem reasonable to be able to adjust
 > those parameters.
->=20
-> Does it make sense to abstract out the remote peer and allow (a) that to b=
-e
-> configured separately from any superblocks using it and (b) that to be use=
-d to
+>
+> Does it make sense to abstract out the remote peer and allow (a) that to be
+> configured separately from any superblocks using it and (b) that to be used to
 > create superblocks?
->=20
+>
 > Note that what a 'remote peer' is would be different for different
 > filesystems:
+>
+>  (*) For NFS, it would probably be a named server, with address(es) attached
+>      to the name.  In lieu of actually having a name, the initial IP address
+>      could be used.
+>
+>  (*) For CIFS, it would probably be a named server.  I'm not sure if CIFS
+>      allows an abstraction for a share that can move about inside a domain.
 
-...
+CIFS/SMB3 has fairly mature support (in the protocol) for various types
+of share redirection (not just 'DFS' that is supported by most every
+NAS server, and Macs, Windows, Linux clients etc).  There are also
+very interesting features introduced with SMB 3.1.1 allowing 'tree
+connect contexts"
+which some important servers in the last few years implement.
 
-I think this looks rather nice.  But maybe you should generalize the concept=
- of =E2=80=9Cpeer=E2=80=9D so that it works for btrfs too. In the case where=
- you mount two different subvolumes, you=E2=80=99re creating a *something*, a=
-nd you=E2=80=99re then creating a filesystem that references it. It=E2=80=99=
-s almost the same thing.
-
->=20
->=20
+This is worth more discussion - SMB3 (in particular the SMB3.1.1 dialect) has
+a lot of interesting features here.
 
 
->=20
->    fs =3D fsopen("nfs", 0);
->    fsconfig(fs, FSCONFIG_SET_PEER, "peer.1", NULL, peer1);
 
-As you mention below, this seems like it might have namespacing issues.
+-- 
+Thanks,
 
->    =20
-
-> In terms of alternative interfaces, I'm not sure how easy it would be to m=
-ake
-> it like cgroups where you go and create a dir in a special filesystem, say=
-,
-> "/sys/peers/nfs", because the peers records and names would have to be net=
-work
-> namespaced.  Also, it might make it more difficult to use to create a root=
- fs.
->=20
-> On the other hand, being able to adjust the peer configuration by:
->=20
->    echo 71 >/sys/peers/nfs/server.home/timeo
->=20
-> does have a certain appeal.
->=20
-> Also, netlink might be the right option, but I'm not sure how you'd pin th=
-e
-> resultant object whilst you make use of it.
->=20
-
-My suggestion would be to avoid giving these things names at all. I think th=
-at referring to them by fd should be sufficient, especially if you allow the=
-m to be reopened based on a mount that uses them and allow them to get bind-=
-mounted somewhere a la namespaces to make them permanent if needed.
-
-> A further thought is that is it worth making this idea more general and
-> encompassing non-network devices also?  This would run into issues of some=
-
-> logical sources being visible across namespaces and but not others.
-
-Indeed :)
-
-It probably pays to rope a btrfs person into this discussion.
+Steve
