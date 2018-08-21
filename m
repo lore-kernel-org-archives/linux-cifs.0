@@ -1,49 +1,37 @@
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: linux-next: Signed-off-by missing for commit in the cifs tree
-Date: Tue, 21 Aug 2018 14:18:28 +1000
-Message-ID: <20180821141828.1cb8d79b@canb.auug.org.au>
+From: Steve French <smfrench@gmail.com>
+Subject: Re: linux-next: Signed-off-by missing for commit in the cifs tree
+Date: Mon, 20 Aug 2018 23:20:43 -0500
+Message-ID: <CAH2r5mv9SBxdfHhQmREo4HiibgzQpiDpauh5WQdwhGszxVPc7g@mail.gmail.com>
+References: <20180821141828.1cb8d79b@canb.auug.org.au>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- boundary="Sig_/G_xG7BPp_kumybNHs9iYw3_"; protocol="application/pgp-signature"
-Cc: Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: CIFS <linux-cifs@vger.kernel.org>,
+        Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+To: Stephen Rothwell <sfr@canb.auug.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180821141828.1cb8d79b@canb.auug.org.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
---Sig_/G_xG7BPp_kumybNHs9iYw3_
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+fixed
+On Mon, Aug 20, 2018 at 11:18 PM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+>
+> Hi all,
+>
+> Commit
+>
+>   eacb610d8fc4 ("cifs: create a define for how many iovs we need for an SMB2_open()")
+>
+> is missing a Signed-off-by from its committer.
+>
+> --
+> Cheers,
+> Stephen Rothwell
 
-Hi all,
 
-Commit
 
-  eacb610d8fc4 ("cifs: create a define for how many iovs we need for an SMB=
-2_open()")
+-- 
+Thanks,
 
-is missing a Signed-off-by from its committer.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/G_xG7BPp_kumybNHs9iYw3_
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAlt7kpQACgkQAVBC80lX
-0Gz7Owf/WLUa5Wx6wUUHAkqvvNUOZQYRceWB2G/E+IRq8fD0hQ7tNKhY4IbmEVCZ
-lAnh8YnIjJd8woqu2EECDqHDm9FMhQzvtQ3ddHBqDq7Vf4qKJ6xVe6OJNPTx7E5f
-NmWfqBTGhmVDjGTX6cKLsYvo04Nytr2pWX0I/inSPuiqNBNLMDVPnAD0LmNzAo1X
-/N8OLTSIUHEP/MpjkTxftJW3WjD0VR0kZxwjcYz1UTLCkI46rXZ8++LIRvnGyJWg
-9j1L9dsR1/U6BE4cxbeiT2iP9tcO9zQGTiJsifjbsY71LbTeG76Defx7O+CLObrH
-mx+aCd1PatLu3fKMot3TBZz4NAQUMA==
-=vzg2
------END PGP SIGNATURE-----
-
---Sig_/G_xG7BPp_kumybNHs9iYw3_--
+Steve
