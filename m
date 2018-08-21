@@ -1,66 +1,49 @@
-From: Al Viro <viro@ZenIV.linux.org.uk>
-Subject: Re: Should we split the network filesystem setup into two phases?
-Date: Sat, 18 Aug 2018 00:11:31 +0100
-Message-ID: <20180817231131.GI6515@ZenIV.linux.org.uk>
-References: <153313703562.13253.5766498657900728120.stgit@warthog.procyon.org.uk>
- <17763.1534350685@warthog.procyon.org.uk>
- <87pnyiew8x.fsf@xmission.com>
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: linux-next: Signed-off-by missing for commit in the cifs tree
+Date: Tue, 21 Aug 2018 14:18:28 +1000
+Message-ID: <20180821141828.1cb8d79b@canb.auug.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: David Howells <dhowells@redhat.com>,
-        trond.myklebust@hammerspace.com, anna.schumaker@netapp.com,
-        sfrench@samba.org, steved@redhat.com,
-        torvalds@linux-foundation.org,
-        "Eric W. Biederman" <ebiederm@redhat.com>,
-        linux-api@vger.kernel.org, linux-security-module@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net
-To: "Eric W. Biederman" <ebiederm@xmission.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/G_xG7BPp_kumybNHs9iYw3_"; protocol="application/pgp-signature"
+Cc: Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <87pnyiew8x.fsf@xmission.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Thu, Aug 16, 2018 at 12:06:06AM -0500, Eric W. Biederman wrote:
+--Sig_/G_xG7BPp_kumybNHs9iYw3_
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> So I don't think we can completely abandon the option for filesystems
-> to always create a new filesystem instance when mount(8) is called.
+Hi all,
 
-Huh?  If filesystem wants to create a new instance on each ->mount(),
-it can bloody well do so.  Quite a few do - if that fs can handle
-that, more power to it.
+Commit
 
-The problem is what to do with filesystems that *can't* do that.
-You really, really can't have two ext4 (or xfs, etc.) instances over
-the same device at the same time.  Cache coherency, locking, etc.
-will kill you.
+  eacb610d8fc4 ("cifs: create a define for how many iovs we need for an SMB=
+2_open()")
 
-And that's not to mention the joy of defining the semantics of
-having the same ext4 mounted with two logs at the same time ;-)
+is missing a Signed-off-by from its committer.
 
-I've seen "reject unless the options are compatible/identical/whatever",
-but that ignores the real problem with existing policy.  It's *NOT*
-"I've mounted this and got an existing instance with non-matching
-options".  That's a minor annoyance (and back when that decision
-had been made, mount(2) was very definitly root-only).  The real
-problem is different and much worse - it's remount.
+--=20
+Cheers,
+Stephen Rothwell
 
-I have asked to mount something and it had already been mounted,
-with identical options.  OK, so what happens if I do mount -o remount
-on my instance?  *IF* we are operating in the "only sysadmin can
-mount new filesystems", it's not a big deal - there are already
-lots of ways you can shoot yourself in the foot and mount(2) is
-certainly a powerful one.  But if we get to "Joe R. Luser can do
-it in his container", we have a big problem.
+--Sig_/G_xG7BPp_kumybNHs9iYw3_
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-Decision back then had been mostly for usability reasons - it was
-back in 2001 (well before the containermania, userns or anything
-of that sort) and it was more about "how many hoops does one have
-to jump through to get something mounted, assuming the sanity of
-sysadmin doing that?".  If *anything* like userns had been a concern
-back then, it probably would've been different.  However, it's
-17 years too late and if anyone has a functional TARDIS, I can
-easily think of better uses for it...
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAlt7kpQACgkQAVBC80lX
+0Gz7Owf/WLUa5Wx6wUUHAkqvvNUOZQYRceWB2G/E+IRq8fD0hQ7tNKhY4IbmEVCZ
+lAnh8YnIjJd8woqu2EECDqHDm9FMhQzvtQ3ddHBqDq7Vf4qKJ6xVe6OJNPTx7E5f
+NmWfqBTGhmVDjGTX6cKLsYvo04Nytr2pWX0I/inSPuiqNBNLMDVPnAD0LmNzAo1X
+/N8OLTSIUHEP/MpjkTxftJW3WjD0VR0kZxwjcYz1UTLCkI46rXZ8++LIRvnGyJWg
+9j1L9dsR1/U6BE4cxbeiT2iP9tcO9zQGTiJsifjbsY71LbTeG76Defx7O+CLObrH
+mx+aCd1PatLu3fKMot3TBZz4NAQUMA==
+=vzg2
+-----END PGP SIGNATURE-----
+
+--Sig_/G_xG7BPp_kumybNHs9iYw3_--
