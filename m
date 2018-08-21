@@ -1,36 +1,29 @@
 From: Steve French <smfrench@gmail.com>
-Subject: Re: linux-next: Signed-off-by missing for commit in the cifs tree
-Date: Mon, 20 Aug 2018 23:20:43 -0500
-Message-ID: <CAH2r5mv9SBxdfHhQmREo4HiibgzQpiDpauh5WQdwhGszxVPc7g@mail.gmail.com>
-References: <20180821141828.1cb8d79b@canb.auug.org.au>
+Subject: Overview of performance improvements of recent SMB3 compounding patches
+Date: Tue, 21 Aug 2018 13:24:17 -0500
+Message-ID: <CAH2r5mtO6545itRxAV0KW7NSt7ucvxgHOtg8wUZZ0DMHO-V8XQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: CIFS <linux-cifs@vger.kernel.org>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
+To: CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180821141828.1cb8d79b@canb.auug.org.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-fixed
-On Mon, Aug 20, 2018 at 11:18 PM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
->
-> Hi all,
->
-> Commit
->
->   eacb610d8fc4 ("cifs: create a define for how many iovs we need for an SMB2_open()")
->
-> is missing a Signed-off-by from its committer.
->
-> --
-> Cheers,
-> Stephen Rothwell
+In experiments today with Ronnie's most recent compounding patches I
+see the expected significant improvements in create/mkdir/unlink/rmdir
+operations over SMB3 mounts (tests were to Samba but would be similar
+to all modern servers).  See below:
 
+"touch /mnt/file"  goes from 6 request/response pairs to 4 with
+Ronnie's compounding patches
+"rm /mnt/file" from 5 to 2 request/response pairs
+"mkdir /mnt/newdir" 6 pairs to 3 pairs
+"rmdir /mnt/newdir" 6 pairs down to 2 pairs
 
-
+Good job Ronnie!
 -- 
 Thanks,
 
