@@ -1,89 +1,81 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH] fs/cifs: don't translate SFM_SLASH (U+F026) to backslash
-Date: Sun, 26 Aug 2018 20:40:56 -0500
-Message-ID: <CAH2r5muQXJFzut4upVAk-nTFv3qGGOaG+QKLkGgqGA1HitUMGg@mail.gmail.com>
-References: <20180709143314.4378-1-jkuhn@barracuda.com>
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: [PATCH] fs/cifs: suppress a string overflow warning
+Date: Mon, 3 Sep 2018 13:15:58 +1000
+Message-ID: <20180903131558.21cdeb35@canb.auug.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Cc: Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>
-To: jkuhn@barracuda.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/bxKFgXwdVx5Emd=Or=/qrWf"; protocol="application/pgp-signature"
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        Linux-kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Steve French <sfrench@samba.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180709143314.4378-1-jkuhn@barracuda.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Tentatively merged into cifs-2.6.git for-next but would like a little
-more experimentation with it if possible (or description of what
-scenarios/servers have been tried)
-On Mon, Jul 9, 2018 at 9:53 AM Jon Kuhn <jkuhn@barracuda.com> wrote:
->
-> When a Mac client saves an item containing a backslash to a file server
-> the backslash is represented in the CIFS/SMB protocol as as U+F026.
-> Before this change, listing a directory containing an item with a
-> backslash in its name will return that item with the backslash
-> represented with a true backslash character (U+005C) because
-> convert_sfm_character mapped U+F026 to U+005C when interpretting the
-> CIFS/SMB protocol response.  However, attempting to open or stat the
-> path using a true backslash will result in an error because
-> convert_to_sfm_char does not map U+005C back to U+F026 causing the
-> CIFS/SMB request to be made with the backslash represented as U+005C.
->
-> This change simply prevents the U+F026 to U+005C conversion from
-> happenning.  This is analogous to how the code does not do any
-> translation of UNI_SLASH (U+F000).
->
-> Signed-off-by: Jon Kuhn <jkuhn@barracuda.com>
-> ---
->  fs/cifs/cifs_unicode.c | 3 ---
->  1 file changed, 3 deletions(-)
->
-> diff --git a/fs/cifs/cifs_unicode.c b/fs/cifs/cifs_unicode.c
-> index b380e087..a2b2355e 100644
-> --- a/fs/cifs/cifs_unicode.c
-> +++ b/fs/cifs/cifs_unicode.c
-> @@ -105,9 +105,6 @@ convert_sfm_char(const __u16 src_char, char *target)
->         case SFM_LESSTHAN:
->                 *target =3D '<';
->                 break;
-> -       case SFM_SLASH:
-> -               *target =3D '\\';
-> -               break;
->         case SFM_SPACE:
->                 *target =3D ' ';
->                 break;
-> --
-> 2.17.1
->
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> Learn how to protect users, data, and applications with security engineer=
-ed for the public cloud by Barracuda. http://barracuda.com
->
-> DISCLAIMER:
-> This e-mail and any attachments to it contain confidential and proprietar=
-y material of Barracuda, its affiliates or agents, and is solely for the us=
-e of the intended recipient. Any review, use, disclosure, distribution or c=
-opying of this transmittal is prohibited except by or on behalf of the inte=
-nded recipient. If you have received this transmittal in error, please noti=
-fy the sender and destroy this e-mail and any attachments and all copies, w=
-hether electronic or printed.
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+--Sig_/bxKFgXwdVx5Emd=Or=/qrWf
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
+A powerpc build of cifs with gcc v8.2.0 produces this warning:
 
+fs/cifs/cifssmb.c: In function =E2=80=98CIFSSMBNegotiate=E2=80=99:
+fs/cifs/cifssmb.c:605:3: warning: =E2=80=98strncpy=E2=80=99 writing 16 byte=
+s into a region of size 1 overflows the destination [-Wstringop-overflow=3D]
+   strncpy(pSMB->DialectsArray+count, protocols[i].name, 16);
+   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Since we are already doing a strlen() on the source, change the strncpy
+to a memcpy().
+
+Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
+---
+ fs/cifs/cifssmb.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index dc2f4cf08fe9..dcf939cb9d2f 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -601,10 +601,14 @@ CIFSSMBNegotiate(const unsigned int xid, struct cifs_=
+ses *ses)
+ 	}
+=20
+ 	count =3D 0;
++	/*
++	 * We know that all the name entries in the protocols array
++	 * are short (< 16 bytes anyway) and are NUL terminated.
++	 */
+ 	for (i =3D 0; i < CIFS_NUM_PROT; i++) {
+-		strncpy(pSMB->DialectsArray+count, protocols[i].name, 16);
+-		count +=3D strlen(protocols[i].name) + 1;
+-		/* null at end of source and target buffers anyway */
++		size_t len =3D strlen(protocols[i].name) + 1;
++		memcpy(pSMB->DialectsArray+count, protocols[i].name, len);
++		count +=3D len;
+ 	}
+ 	inc_rfc1001_len(pSMB, count);
+ 	pSMB->ByteCount =3D cpu_to_le16(count);
+--=20
+2.19.0.rc1
 
 --=20
-Thanks,
+Cheers,
+Stephen Rothwell
 
-Steve
+--Sig_/bxKFgXwdVx5Emd=Or=/qrWf
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAluMp24ACgkQAVBC80lX
+0GzYjgf+IJhS302zpGn7gwv3y5UBrsWcFA58Ke1DJPbZArJOIC+51Ueuuep5MKWL
+d/fQhR/gPmzQYOlN/MYMvZcCePB0mwQzKvavLdC8RzBvRWpuG7MJHHxXxYN26oYc
+Lys7BFxAhM4TzDMM8oPkiSkCtP8pLZ46WHNBUlZ1vvCDevKBFKzc9bgc/fwQ3MQX
+xkcokPifqUg5Rq/iGCvZdqa6Sxbg4mpMubg7BZjyI2CWWSFNt8ieUwMR0TjjHnWQ
+W+7WDPnYHi0qa7QBvga9KhHwvoLcJO6V8thsHDyoIXht6wBAyulcufPwann63XQI
+eKPr6o/ypEbYsSyS2oevowhdbYM7cA==
+=y+fl
+-----END PGP SIGNATURE-----
+
+--Sig_/bxKFgXwdVx5Emd=Or=/qrWf--
