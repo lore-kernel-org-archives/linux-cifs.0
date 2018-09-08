@@ -1,7 +1,7 @@
 From: Long Li <longli@linuxonhyperv.com>
-Subject: [Patch v3 06/16] CIFS: Introduce helper function to get page offset and length in smb_rqst
-Date: Sat,  8 Sep 2018 02:13:38 +0000
-Message-ID: <20180908021348.19956-7-longli@linuxonhyperv.com>
+Subject: [Patch v3 09/16] CIFS: SMBD: Support page offset in RDMA recv
+Date: Sat,  8 Sep 2018 02:13:41 +0000
+Message-ID: <20180908021348.19956-10-longli@linuxonhyperv.com>
 References: <20180908021348.19956-1-longli@linuxonhyperv.com>
 Reply-To: longli@microsoft.com
 Cc: Long Li <longli@microsoft.com>
@@ -15,52 +15,80 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-Introduce a function rqst_page_get_length to return the page offset and
-length for a given page in smb_rqst. This function is to be used by
-following patches.
+RDMA recv function needs to place data to the correct place starting at
+page offset.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/cifsproto.h |  3 +++
- fs/cifs/misc.c      | 17 +++++++++++++++++
- 2 files changed, 20 insertions(+)
+ fs/cifs/smbdirect.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 7933c5f..89dda14 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -557,4 +557,7 @@ int cifs_alloc_hash(const char *name, struct crypto_shash **shash,
- 		    struct sdesc **sdesc);
- void cifs_free_hash(struct crypto_shash **shash, struct sdesc **sdesc);
+diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+index 6141e3c..ba53c52 100644
+--- a/fs/cifs/smbdirect.c
++++ b/fs/cifs/smbdirect.c
+@@ -2004,10 +2004,12 @@ static int smbd_recv_buf(struct smbd_connection *info, char *buf,
+  * return value: actual data read
+  */
+ static int smbd_recv_page(struct smbd_connection *info,
+-		struct page *page, unsigned int to_read)
++		struct page *page, unsigned int page_offset,
++		unsigned int to_read)
+ {
+ 	int ret;
+ 	char *to_address;
++	void *page_address;
  
-+extern void rqst_page_get_length(struct smb_rqst *rqst, unsigned int page,
-+				unsigned int *len, unsigned int *offset);
-+
- #endif			/* _CIFSPROTO_H */
-diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-index 96849b5..e951417 100644
---- a/fs/cifs/misc.c
-+++ b/fs/cifs/misc.c
-@@ -905,3 +905,20 @@ cifs_free_hash(struct crypto_shash **shash, struct sdesc **sdesc)
- 		crypto_free_shash(*shash);
- 	*shash = NULL;
+ 	/* make sure we have the page ready for read */
+ 	ret = wait_event_interruptible(
+@@ -2015,16 +2017,17 @@ static int smbd_recv_page(struct smbd_connection *info,
+ 		info->reassembly_data_length >= to_read ||
+ 			info->transport_status != SMBD_CONNECTED);
+ 	if (ret)
+-		return 0;
++		return ret;
+ 
+ 	/* now we can read from reassembly queue and not sleep */
+-	to_address = kmap_atomic(page);
++	page_address = kmap_atomic(page);
++	to_address = (char *) page_address + page_offset;
+ 
+ 	log_read(INFO, "reading from page=%p address=%p to_read=%d\n",
+ 		page, to_address, to_read);
+ 
+ 	ret = smbd_recv_buf(info, to_address, to_read);
+-	kunmap_atomic(to_address);
++	kunmap_atomic(page_address);
+ 
+ 	return ret;
  }
-+
-+/**
-+ * rqst_page_get_length - obtain the length and offset for a page in smb_rqst
-+ * Input: rqst - a smb_rqst, page - a page index for rqst
-+ * Output: *len - the length for this page, *offset - the offset for this page
-+ */
-+void rqst_page_get_length(struct smb_rqst *rqst, unsigned int page,
-+				unsigned int *len, unsigned int *offset)
-+{
-+	*len = rqst->rq_pagesz;
-+	*offset = (page == 0) ? rqst->rq_offset : 0;
-+
-+	if (rqst->rq_npages == 1 || page == rqst->rq_npages-1)
-+		*len = rqst->rq_tailsz;
-+	else if (page == 0)
-+		*len = rqst->rq_pagesz - rqst->rq_offset;
-+}
+@@ -2038,7 +2041,7 @@ int smbd_recv(struct smbd_connection *info, struct msghdr *msg)
+ {
+ 	char *buf;
+ 	struct page *page;
+-	unsigned int to_read;
++	unsigned int to_read, page_offset;
+ 	int rc;
+ 
+ 	info->smbd_recv_pending++;
+@@ -2052,15 +2055,16 @@ int smbd_recv(struct smbd_connection *info, struct msghdr *msg)
+ 
+ 	case READ | ITER_BVEC:
+ 		page = msg->msg_iter.bvec->bv_page;
++		page_offset = msg->msg_iter.bvec->bv_offset;
+ 		to_read = msg->msg_iter.bvec->bv_len;
+-		rc = smbd_recv_page(info, page, to_read);
++		rc = smbd_recv_page(info, page, page_offset, to_read);
+ 		break;
+ 
+ 	default:
+ 		/* It's a bug in upper layer to get there */
+ 		cifs_dbg(VFS, "CIFS: invalid msg type %d\n",
+ 			msg->msg_iter.type);
+-		rc = -EIO;
++		rc = -EINVAL;
+ 	}
+ 
+ 	info->smbd_recv_pending--;
 -- 
 2.7.4
