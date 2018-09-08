@@ -1,7 +1,7 @@
 From: Long Li <longli@linuxonhyperv.com>
-Subject: [Patch v3 11/16] CIFS: SMBD: Support page offset in memory registration
-Date: Sat,  8 Sep 2018 02:13:43 +0000
-Message-ID: <20180908021348.19956-12-longli@linuxonhyperv.com>
+Subject: [Patch v3 15/16] CIFS: Add support for direct I/O write
+Date: Sat,  8 Sep 2018 02:13:47 +0000
+Message-ID: <20180908021348.19956-16-longli@linuxonhyperv.com>
 References: <20180908021348.19956-1-longli@linuxonhyperv.com>
 Reply-To: longli@microsoft.com
 Cc: Long Li <longli@microsoft.com>
@@ -15,130 +15,266 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-Change code to pass the correct page offset during memory registration for
-RDMA read/write.
+With direct I/O write, user supplied buffers are pinned to the memory and data
+are transferred directly from user buffers to the transport layer.
+
+Change in v3: added support for kernel AIO
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/smb2pdu.c   | 18 ++++++++++++------
- fs/cifs/smbdirect.c | 29 +++++++++++++++++++++--------
- fs/cifs/smbdirect.h |  2 +-
- 3 files changed, 34 insertions(+), 15 deletions(-)
+ fs/cifs/cifsfs.h |   1 +
+ fs/cifs/file.c   | 195 ++++++++++++++++++++++++++++++++++++++++++++++---------
+ 2 files changed, 165 insertions(+), 31 deletions(-)
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index f603fbe..fc30774 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -2623,8 +2623,8 @@ smb2_new_read_req(void **buf, unsigned int *total_len,
+diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
+index 7fba9aa..e9c5103 100644
+--- a/fs/cifs/cifsfs.h
++++ b/fs/cifs/cifsfs.h
+@@ -105,6 +105,7 @@ extern ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to);
+ extern ssize_t cifs_direct_readv(struct kiocb *iocb, struct iov_iter *to);
+ extern ssize_t cifs_strict_readv(struct kiocb *iocb, struct iov_iter *to);
+ extern ssize_t cifs_user_writev(struct kiocb *iocb, struct iov_iter *from);
++extern ssize_t cifs_direct_writev(struct kiocb *iocb, struct iov_iter *from);
+ extern ssize_t cifs_strict_writev(struct kiocb *iocb, struct iov_iter *from);
+ extern int cifs_lock(struct file *, int, struct file_lock *);
+ extern int cifs_fsync(struct file *, loff_t, loff_t, int);
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 476b2a1..76e0266 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -2537,6 +2537,8 @@ cifs_write_from_iter(loff_t offset, size_t len, struct iov_iter *from,
+ 	loff_t saved_offset = offset;
+ 	pid_t pid;
+ 	struct TCP_Server_Info *server;
++	struct page **pagevec;
++	size_t start;
  
- 		rdata->mr = smbd_register_mr(
- 				server->smbd_conn, rdata->pages,
--				rdata->nr_pages, rdata->tailsz,
--				true, need_invalidate);
-+				rdata->nr_pages, rdata->page_offset,
-+				rdata->tailsz, true, need_invalidate);
- 		if (!rdata->mr)
- 			return -ENOBUFS;
+ 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
+ 		pid = open_file->pid;
+@@ -2553,38 +2555,74 @@ cifs_write_from_iter(loff_t offset, size_t len, struct iov_iter *from,
+ 		if (rc)
+ 			break;
  
-@@ -3013,16 +3013,22 @@ smb2_async_writev(struct cifs_writedata *wdata,
- 
- 		wdata->mr = smbd_register_mr(
- 				server->smbd_conn, wdata->pages,
--				wdata->nr_pages, wdata->tailsz,
--				false, need_invalidate);
-+				wdata->nr_pages, wdata->page_offset,
-+				wdata->tailsz, false, need_invalidate);
- 		if (!wdata->mr) {
- 			rc = -ENOBUFS;
- 			goto async_writev_out;
- 		}
- 		req->Length = 0;
- 		req->DataOffset = 0;
--		req->RemainingBytes =
--			cpu_to_le32((wdata->nr_pages-1)*PAGE_SIZE + wdata->tailsz);
-+		if (wdata->nr_pages > 1)
-+			req->RemainingBytes =
-+				cpu_to_le32(
-+					(wdata->nr_pages - 1) * wdata->pagesz -
-+					wdata->page_offset + wdata->tailsz
-+				);
-+		else
-+			req->RemainingBytes = cpu_to_le32(wdata->tailsz);
- 		req->Channel = SMB2_CHANNEL_RDMA_V1_INVALIDATE;
- 		if (need_invalidate)
- 			req->Channel = SMB2_CHANNEL_RDMA_V1;
-diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index b470cd0..f61daa9 100644
---- a/fs/cifs/smbdirect.c
-+++ b/fs/cifs/smbdirect.c
-@@ -2475,7 +2475,7 @@ static struct smbd_mr *get_mr(struct smbd_connection *info)
-  */
- struct smbd_mr *smbd_register_mr(
- 	struct smbd_connection *info, struct page *pages[], int num_pages,
--	int tailsz, bool writing, bool need_invalidate)
-+	int offset, int tailsz, bool writing, bool need_invalidate)
- {
- 	struct smbd_mr *smbdirect_mr;
- 	int rc, i;
-@@ -2498,17 +2498,30 @@ struct smbd_mr *smbd_register_mr(
- 	smbdirect_mr->sgl_count = num_pages;
- 	sg_init_table(smbdirect_mr->sgl, num_pages);
- 
--	for (i = 0; i < num_pages - 1; i++)
--		sg_set_page(&smbdirect_mr->sgl[i], pages[i], PAGE_SIZE, 0);
-+	log_rdma_mr(INFO, "num_pages=0x%x offset=0x%x tailsz=0x%x\n",
-+			num_pages, offset, tailsz);
+-		nr_pages = get_numpages(wsize, len, &cur_len);
+-		wdata = cifs_writedata_alloc(nr_pages,
++		if (ctx->direct_io) {
++			cur_len = iov_iter_get_pages_alloc(
++				from, &pagevec, wsize, &start);
++			if (cur_len < 0) {
++				cifs_dbg(VFS,
++					"direct_writev couldn't get user pages "
++					"(rc=%zd) iter type %d iov_offset %lu count"
++					" %lu\n",
++					cur_len, from->type,
++					from->iov_offset, from->count);
++				dump_stack();
++				break;
++			}
++			iov_iter_advance(from, cur_len);
 +
-+	if (num_pages == 1) {
-+		sg_set_page(&smbdirect_mr->sgl[0], pages[0], tailsz, offset);
-+		goto skip_multiple_pages;
-+	}
++			nr_pages = (cur_len + start + PAGE_SIZE - 1) / PAGE_SIZE;
++
++			wdata = cifs_writedata_direct_alloc(pagevec,
+ 					     cifs_uncached_writev_complete);
+-		if (!wdata) {
+-			rc = -ENOMEM;
+-			add_credits_and_wake_if(server, credits, 0);
+-			break;
+-		}
++			if (!wdata) {
++				rc = -ENOMEM;
++				add_credits_and_wake_if(server, credits, 0);
++				break;
++			}
  
--	sg_set_page(&smbdirect_mr->sgl[i], pages[i],
--		tailsz ? tailsz : PAGE_SIZE, 0);
-+	/* We have at least two pages to register */
-+	sg_set_page(
-+		&smbdirect_mr->sgl[0], pages[0], PAGE_SIZE - offset, offset);
-+	i = 1;
-+	while (i < num_pages - 1) {
-+		sg_set_page(&smbdirect_mr->sgl[i], pages[i], PAGE_SIZE, 0);
-+		i++;
-+	}
-+	sg_set_page(&smbdirect_mr->sgl[i], pages[i], tailsz, 0);
+-		rc = cifs_write_allocate_pages(wdata->pages, nr_pages);
+-		if (rc) {
+-			kfree(wdata);
+-			add_credits_and_wake_if(server, credits, 0);
+-			break;
+-		}
  
-+skip_multiple_pages:
- 	dir = writing ? DMA_FROM_DEVICE : DMA_TO_DEVICE;
- 	smbdirect_mr->dir = dir;
- 	rc = ib_dma_map_sg(info->id->device, smbdirect_mr->sgl, num_pages, dir);
- 	if (!rc) {
--		log_rdma_mr(INFO, "ib_dma_map_sg num_pages=%x dir=%x rc=%x\n",
-+		log_rdma_mr(ERR, "ib_dma_map_sg num_pages=%x dir=%x rc=%x\n",
- 			num_pages, dir, rc);
- 		goto dma_map_error;
+-		num_pages = nr_pages;
+-		rc = wdata_fill_from_iovec(wdata, from, &cur_len, &num_pages);
+-		if (rc) {
+-			for (i = 0; i < nr_pages; i++)
+-				put_page(wdata->pages[i]);
+-			kfree(wdata);
+-			add_credits_and_wake_if(server, credits, 0);
+-			break;
+-		}
++			wdata->page_offset = start;
++			wdata->tailsz =
++				nr_pages > 1 ?
++					cur_len - (PAGE_SIZE - start) -
++					(nr_pages - 2) * PAGE_SIZE :
++					cur_len;
++		} else {
++			nr_pages = get_numpages(wsize, len, &cur_len);
++			wdata = cifs_writedata_alloc(nr_pages,
++					     cifs_uncached_writev_complete);
++			if (!wdata) {
++				rc = -ENOMEM;
++				add_credits_and_wake_if(server, credits, 0);
++				break;
++			}
+ 
+-		/*
+-		 * Bring nr_pages down to the number of pages we actually used,
+-		 * and free any pages that we didn't use.
+-		 */
+-		for ( ; nr_pages > num_pages; nr_pages--)
+-			put_page(wdata->pages[nr_pages - 1]);
++			rc = cifs_write_allocate_pages(wdata->pages, nr_pages);
++			if (rc) {
++				kfree(wdata);
++				add_credits_and_wake_if(server, credits, 0);
++				break;
++			}
++
++			num_pages = nr_pages;
++			rc = wdata_fill_from_iovec(wdata, from, &cur_len, &num_pages);
++			if (rc) {
++				for (i = 0; i < nr_pages; i++)
++					put_page(wdata->pages[i]);
++				kfree(wdata);
++				add_credits_and_wake_if(server, credits, 0);
++				break;
++			}
++
++			/*
++			 * Bring nr_pages down to the number of pages we actually used,
++			 * and free any pages that we didn't use.
++			 */
++			for ( ; nr_pages > num_pages; nr_pages--)
++				put_page(wdata->pages[nr_pages - 1]);
++
++			wdata->tailsz = cur_len - ((nr_pages - 1) * PAGE_SIZE);
++		}
+ 
+ 		wdata->sync_mode = WB_SYNC_ALL;
+ 		wdata->nr_pages = nr_pages;
+@@ -2593,7 +2631,6 @@ cifs_write_from_iter(loff_t offset, size_t len, struct iov_iter *from,
+ 		wdata->pid = pid;
+ 		wdata->bytes = cur_len;
+ 		wdata->pagesz = PAGE_SIZE;
+-		wdata->tailsz = cur_len - ((nr_pages - 1) * PAGE_SIZE);
+ 		wdata->credits = credits;
+ 		wdata->ctx = ctx;
+ 		kref_get(&ctx->refcount);
+@@ -2687,8 +2724,9 @@ static void collect_uncached_write_data(struct cifs_aio_ctx *ctx)
+ 		kref_put(&wdata->refcount, cifs_uncached_writedata_release);
  	}
-@@ -2516,8 +2529,8 @@ struct smbd_mr *smbd_register_mr(
- 	rc = ib_map_mr_sg(smbdirect_mr->mr, smbdirect_mr->sgl, num_pages,
- 		NULL, PAGE_SIZE);
- 	if (rc != num_pages) {
--		log_rdma_mr(INFO,
--			"ib_map_mr_sg failed rc = %x num_pages = %x\n",
-+		log_rdma_mr(ERR,
-+			"ib_map_mr_sg failed rc = %d num_pages = %x\n",
- 			rc, num_pages);
- 		goto map_mr_error;
- 	}
-diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
-index f9038da..1e419c2 100644
---- a/fs/cifs/smbdirect.h
-+++ b/fs/cifs/smbdirect.h
-@@ -321,7 +321,7 @@ struct smbd_mr {
- /* Interfaces to register and deregister MR for RDMA read/write */
- struct smbd_mr *smbd_register_mr(
- 	struct smbd_connection *info, struct page *pages[], int num_pages,
--	int tailsz, bool writing, bool need_invalidate);
-+	int offset, int tailsz, bool writing, bool need_invalidate);
- int smbd_deregister_mr(struct smbd_mr *mr);
  
- #else
+-	for (i = 0; i < ctx->npages; i++)
+-		put_page(ctx->bv[i].bv_page);
++	if (!ctx->direct_io)
++		for (i = 0; i < ctx->npages; i++)
++			put_page(ctx->bv[i].bv_page);
+ 
+ 	cifs_stats_bytes_written(tcon, ctx->total_len);
+ 	set_bit(CIFS_INO_INVALID_MAPPING, &CIFS_I(dentry->d_inode)->flags);
+@@ -2703,6 +2741,101 @@ static void collect_uncached_write_data(struct cifs_aio_ctx *ctx)
+ 		complete(&ctx->done);
+ }
+ 
++ssize_t cifs_direct_writev(struct kiocb *iocb, struct iov_iter *from)
++{
++	struct file *file = iocb->ki_filp;
++	ssize_t total_written = 0;
++	struct cifsFileInfo *cfile;
++	struct cifs_tcon *tcon;
++	struct cifs_sb_info *cifs_sb;
++	struct TCP_Server_Info *server;
++	size_t len = iov_iter_count(from);
++	int rc;
++	struct cifs_aio_ctx *ctx;
++
++	/*
++	 * iov_iter_get_pages_alloc doesn't work with ITER_KVEC.
++	 * In this case, fall back to non-direct write function.
++	 */
++	if (from->type & ITER_KVEC) {
++		cifs_dbg(FYI, "use non-direct cifs_user_writev for kvec I/O\n");
++		return cifs_user_writev(iocb, from);
++	}
++
++	rc = generic_write_checks(iocb, from);
++	if (rc <= 0)
++		return rc;
++
++	cifs_sb = CIFS_FILE_SB(file);
++	cfile = file->private_data;
++	tcon = tlink_tcon(cfile->tlink);
++	server = tcon->ses->server;
++
++	if (!server->ops->async_writev)
++		return -ENOSYS;
++
++	ctx = cifs_aio_ctx_alloc();
++	if (!ctx)
++		return -ENOMEM;
++
++	ctx->cfile = cifsFileInfo_get(cfile);
++
++	if (!is_sync_kiocb(iocb))
++		ctx->iocb = iocb;
++
++	ctx->pos = iocb->ki_pos;
++
++	ctx->direct_io = true;
++	ctx->iter = *from;
++	ctx->len = len;
++
++	/* grab a lock here due to read response handlers can access ctx */
++	mutex_lock(&ctx->aio_mutex);
++
++	rc = cifs_write_from_iter(iocb->ki_pos, ctx->len, from,
++				  cfile, cifs_sb, &ctx->list, ctx);
++
++	/*
++	 * If at least one write was successfully sent, then discard any rc
++	 * value from the later writes. If the other write succeeds, then
++	 * we'll end up returning whatever was written. If it fails, then
++	 * we'll get a new rc value from that.
++	 */
++	if (!list_empty(&ctx->list))
++		rc = 0;
++
++	mutex_unlock(&ctx->aio_mutex);
++
++	if (rc) {
++		kref_put(&ctx->refcount, cifs_aio_ctx_release);
++		return rc;
++	}
++
++	if (!is_sync_kiocb(iocb)) {
++		kref_put(&ctx->refcount, cifs_aio_ctx_release);
++		return -EIOCBQUEUED;
++	}
++
++	rc = wait_for_completion_killable(&ctx->done);
++	if (rc) {
++		mutex_lock(&ctx->aio_mutex);
++		ctx->rc = rc = -EINTR;
++		total_written = ctx->total_len;
++		mutex_unlock(&ctx->aio_mutex);
++	} else {
++		rc = ctx->rc;
++		total_written = ctx->total_len;
++	}
++
++	kref_put(&ctx->refcount, cifs_aio_ctx_release);
++
++	if (unlikely(!total_written))
++		return rc;
++
++	iocb->ki_pos += total_written;
++	return total_written;
++}
++
+ ssize_t cifs_user_writev(struct kiocb *iocb, struct iov_iter *from)
+ {
+ 	struct file *file = iocb->ki_filp;
 -- 
 2.7.4
