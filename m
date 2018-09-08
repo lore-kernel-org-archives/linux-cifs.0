@@ -1,7 +1,7 @@
 From: Long Li <longli@linuxonhyperv.com>
-Subject: [Patch v3 05/16] CIFS: Calculate the correct request length based on page offset and tail size
-Date: Sat,  8 Sep 2018 02:13:37 +0000
-Message-ID: <20180908021348.19956-6-longli@linuxonhyperv.com>
+Subject: [Patch v3 04/16] CIFS: pass page offset when issuing SMB write
+Date: Sat,  8 Sep 2018 02:13:36 +0000
+Message-ID: <20180908021348.19956-5-longli@linuxonhyperv.com>
 References: <20180908021348.19956-1-longli@linuxonhyperv.com>
 Reply-To: longli@microsoft.com
 Cc: Long Li <longli@microsoft.com>
@@ -15,45 +15,37 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-It's possible that the page offset is non-zero in the pages in a request,
-change the function to calculate the correct data buffer length.
+When issuing SMB writes, pass along the write data page offset to transport.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/transport.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+ fs/cifs/cifssmb.c | 1 +
+ fs/cifs/smb2pdu.c | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 927226a..d6b5523 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -212,10 +212,24 @@ rqst_len(struct smb_rqst *rqst)
- 	for (i = 0; i < rqst->rq_nvec; i++)
- 		buflen += iov[i].iov_len;
- 
--	/* add in the page array if there is one */
-+	/*
-+	 * Add in the page array if there is one. The caller needs to make
-+	 * sure rq_offset and rq_tailsz are set correctly. If a buffer of
-+	 * multiple pages ends at page boundary, rq_tailsz needs to be set to
-+	 * PAGE_SIZE.
-+	 */
- 	if (rqst->rq_npages) {
--		buflen += rqst->rq_pagesz * (rqst->rq_npages - 1);
--		buflen += rqst->rq_tailsz;
-+		if (rqst->rq_npages == 1)
-+			buflen += rqst->rq_tailsz;
-+		else {
-+			/*
-+			 * If there is more than one page, calculate the
-+			 * buffer length based on rq_offset and rq_tailsz
-+			 */
-+			buflen += rqst->rq_pagesz * (rqst->rq_npages - 1) -
-+					rqst->rq_offset;
-+			buflen += rqst->rq_tailsz;
-+		}
- 	}
- 
- 	return buflen;
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 503e0ed..0a57c61 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -2200,6 +2200,7 @@ cifs_async_writev(struct cifs_writedata *wdata,
+ 	rqst.rq_iov = iov;
+ 	rqst.rq_nvec = 2;
+ 	rqst.rq_pages = wdata->pages;
++	rqst.rq_offset = wdata->page_offset;
+ 	rqst.rq_npages = wdata->nr_pages;
+ 	rqst.rq_pagesz = wdata->pagesz;
+ 	rqst.rq_tailsz = wdata->tailsz;
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 6c22da8..f603fbe 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -3046,6 +3046,7 @@ smb2_async_writev(struct cifs_writedata *wdata,
+ 	rqst.rq_iov = iov;
+ 	rqst.rq_nvec = 2;
+ 	rqst.rq_pages = wdata->pages;
++	rqst.rq_offset = wdata->page_offset;
+ 	rqst.rq_npages = wdata->nr_pages;
+ 	rqst.rq_pagesz = wdata->pagesz;
+ 	rqst.rq_tailsz = wdata->tailsz;
 -- 
 2.7.4
