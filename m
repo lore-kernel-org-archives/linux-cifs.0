@@ -1,7 +1,7 @@
 From: Long Li <longli@linuxonhyperv.com>
-Subject: [Patch v3 09/16] CIFS: SMBD: Support page offset in RDMA recv
-Date: Sat,  8 Sep 2018 02:13:41 +0000
-Message-ID: <20180908021348.19956-10-longli@linuxonhyperv.com>
+Subject: [Patch v3 08/16] CIFS: SMBD: Support page offset in RDMA send
+Date: Sat,  8 Sep 2018 02:13:40 +0000
+Message-ID: <20180908021348.19956-9-longli@linuxonhyperv.com>
 References: <20180908021348.19956-1-longli@linuxonhyperv.com>
 Reply-To: longli@microsoft.com
 Cc: Long Li <longli@microsoft.com>
@@ -15,80 +15,81 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-RDMA recv function needs to place data to the correct place starting at
-page offset.
+The RDMA send function needs to look at offset in the request pages, and
+send data starting from there.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/smbdirect.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+ fs/cifs/smbdirect.c | 27 +++++++++++++++++++--------
+ 1 file changed, 19 insertions(+), 8 deletions(-)
 
 diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index 6141e3c..ba53c52 100644
+index c62f7c9..6141e3c 100644
 --- a/fs/cifs/smbdirect.c
 +++ b/fs/cifs/smbdirect.c
-@@ -2004,10 +2004,12 @@ static int smbd_recv_buf(struct smbd_connection *info, char *buf,
-  * return value: actual data read
-  */
- static int smbd_recv_page(struct smbd_connection *info,
--		struct page *page, unsigned int to_read)
-+		struct page *page, unsigned int page_offset,
-+		unsigned int to_read)
- {
- 	int ret;
- 	char *to_address;
-+	void *page_address;
+@@ -17,6 +17,7 @@
+ #include <linux/highmem.h>
+ #include "smbdirect.h"
+ #include "cifs_debug.h"
++#include "cifsproto.h"
  
- 	/* make sure we have the page ready for read */
- 	ret = wait_event_interruptible(
-@@ -2015,16 +2017,17 @@ static int smbd_recv_page(struct smbd_connection *info,
- 		info->reassembly_data_length >= to_read ||
- 			info->transport_status != SMBD_CONNECTED);
- 	if (ret)
--		return 0;
-+		return ret;
- 
- 	/* now we can read from reassembly queue and not sleep */
--	to_address = kmap_atomic(page);
-+	page_address = kmap_atomic(page);
-+	to_address = (char *) page_address + page_offset;
- 
- 	log_read(INFO, "reading from page=%p address=%p to_read=%d\n",
- 		page, to_address, to_read);
- 
- 	ret = smbd_recv_buf(info, to_address, to_read);
--	kunmap_atomic(to_address);
-+	kunmap_atomic(page_address);
- 
- 	return ret;
- }
-@@ -2038,7 +2041,7 @@ int smbd_recv(struct smbd_connection *info, struct msghdr *msg)
- {
- 	char *buf;
- 	struct page *page;
--	unsigned int to_read;
-+	unsigned int to_read, page_offset;
- 	int rc;
- 
- 	info->smbd_recv_pending++;
-@@ -2052,15 +2055,16 @@ int smbd_recv(struct smbd_connection *info, struct msghdr *msg)
- 
- 	case READ | ITER_BVEC:
- 		page = msg->msg_iter.bvec->bv_page;
-+		page_offset = msg->msg_iter.bvec->bv_offset;
- 		to_read = msg->msg_iter.bvec->bv_len;
--		rc = smbd_recv_page(info, page, to_read);
-+		rc = smbd_recv_page(info, page, page_offset, to_read);
- 		break;
- 
- 	default:
- 		/* It's a bug in upper layer to get there */
- 		cifs_dbg(VFS, "CIFS: invalid msg type %d\n",
- 			msg->msg_iter.type);
--		rc = -EIO;
-+		rc = -EINVAL;
+ static struct smbd_response *get_empty_queue_buffer(
+ 		struct smbd_connection *info);
+@@ -2082,7 +2083,7 @@ int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst)
+ 	struct kvec vec;
+ 	int nvecs;
+ 	int size;
+-	int buflen = 0, remaining_data_length;
++	unsigned int buflen = 0, remaining_data_length;
+ 	int start, i, j;
+ 	int max_iov_size =
+ 		info->max_send_size - sizeof(struct smbd_data_transfer);
+@@ -2113,10 +2114,17 @@ int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst)
+ 		buflen += iov[i].iov_len;
  	}
  
- 	info->smbd_recv_pending--;
+-	/* add in the page array if there is one */
++	/*
++	 * Add in the page array if there is one. The caller needs to set
++	 * rq_tailsz to PAGE_SIZE when the buffer has multiple pages and
++	 * ends at page boundary
++	 */
+ 	if (rqst->rq_npages) {
+-		buflen += rqst->rq_pagesz * (rqst->rq_npages - 1);
+-		buflen += rqst->rq_tailsz;
++		if (rqst->rq_npages == 1)
++			buflen += rqst->rq_tailsz;
++		else
++			buflen += rqst->rq_pagesz * (rqst->rq_npages - 1) -
++					rqst->rq_offset + rqst->rq_tailsz;
+ 	}
+ 
+ 	if (buflen + sizeof(struct smbd_data_transfer) >
+@@ -2213,8 +2221,9 @@ int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst)
+ 
+ 	/* now sending pages if there are any */
+ 	for (i = 0; i < rqst->rq_npages; i++) {
+-		buflen = (i == rqst->rq_npages-1) ?
+-			rqst->rq_tailsz : rqst->rq_pagesz;
++		unsigned int offset;
++
++		rqst_page_get_length(rqst, i, &buflen, &offset);
+ 		nvecs = (buflen + max_iov_size - 1) / max_iov_size;
+ 		log_write(INFO, "sending pages buflen=%d nvecs=%d\n",
+ 			buflen, nvecs);
+@@ -2225,9 +2234,11 @@ int smbd_send(struct smbd_connection *info, struct smb_rqst *rqst)
+ 			remaining_data_length -= size;
+ 			log_write(INFO, "sending pages i=%d offset=%d size=%d"
+ 				" remaining_data_length=%d\n",
+-				i, j*max_iov_size, size, remaining_data_length);
++				i, j*max_iov_size+offset, size,
++				remaining_data_length);
+ 			rc = smbd_post_send_page(
+-				info, rqst->rq_pages[i], j*max_iov_size,
++				info, rqst->rq_pages[i],
++				j*max_iov_size + offset,
+ 				size, remaining_data_length);
+ 			if (rc)
+ 				goto done;
 -- 
 2.7.4
