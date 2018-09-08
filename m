@@ -1,7 +1,7 @@
 From: Long Li <longli@linuxonhyperv.com>
-Subject: [Patch v3 13/16] CIFS: Pass page offset for encrypting
-Date: Sat,  8 Sep 2018 02:13:45 +0000
-Message-ID: <20180908021348.19956-14-longli@linuxonhyperv.com>
+Subject: [Patch v3 05/16] CIFS: Calculate the correct request length based on page offset and tail size
+Date: Sat,  8 Sep 2018 02:13:37 +0000
+Message-ID: <20180908021348.19956-6-longli@linuxonhyperv.com>
 References: <20180908021348.19956-1-longli@linuxonhyperv.com>
 Reply-To: longli@microsoft.com
 Cc: Long Li <longli@microsoft.com>
@@ -15,61 +15,45 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-Encryption function needs to read data starting page offset from input
-buffer.
-
-This doesn't affect decryption path since it allocates its own page
-buffers.
+It's possible that the page offset is non-zero in the pages in a request,
+change the function to calculate the correct data buffer length.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/smb2ops.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+ fs/cifs/transport.c | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 1fa1c29..38d19b6 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -2189,9 +2189,10 @@ init_sg(struct smb_rqst *rqst, u8 *sign)
- 		smb2_sg_set_buf(&sg[i], rqst->rq_iov[i].iov_base,
- 						rqst->rq_iov[i].iov_len);
- 	for (j = 0; i < sg_len - 1; i++, j++) {
--		unsigned int len = (j < rqst->rq_npages - 1) ? rqst->rq_pagesz
--							: rqst->rq_tailsz;
--		sg_set_page(&sg[i], rqst->rq_pages[j], len, 0);
-+		unsigned int len, offset;
-+
-+		rqst_page_get_length(rqst, j, &len, &offset);
-+		sg_set_page(&sg[i], rqst->rq_pages[j], len, offset);
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 927226a..d6b5523 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -212,10 +212,24 @@ rqst_len(struct smb_rqst *rqst)
+ 	for (i = 0; i < rqst->rq_nvec; i++)
+ 		buflen += iov[i].iov_len;
+ 
+-	/* add in the page array if there is one */
++	/*
++	 * Add in the page array if there is one. The caller needs to make
++	 * sure rq_offset and rq_tailsz are set correctly. If a buffer of
++	 * multiple pages ends at page boundary, rq_tailsz needs to be set to
++	 * PAGE_SIZE.
++	 */
+ 	if (rqst->rq_npages) {
+-		buflen += rqst->rq_pagesz * (rqst->rq_npages - 1);
+-		buflen += rqst->rq_tailsz;
++		if (rqst->rq_npages == 1)
++			buflen += rqst->rq_tailsz;
++		else {
++			/*
++			 * If there is more than one page, calculate the
++			 * buffer length based on rq_offset and rq_tailsz
++			 */
++			buflen += rqst->rq_pagesz * (rqst->rq_npages - 1) -
++					rqst->rq_offset;
++			buflen += rqst->rq_tailsz;
++		}
  	}
- 	smb2_sg_set_buf(&sg[sg_len - 1], sign, SMB2_SIGNATURE_SIZE);
- 	return sg;
-@@ -2332,6 +2333,7 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, struct smb_rqst *new_rq,
- 		return rc;
  
- 	new_rq->rq_pages = pages;
-+	new_rq->rq_offset = old_rq->rq_offset;
- 	new_rq->rq_npages = old_rq->rq_npages;
- 	new_rq->rq_pagesz = old_rq->rq_pagesz;
- 	new_rq->rq_tailsz = old_rq->rq_tailsz;
-@@ -2363,10 +2365,14 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, struct smb_rqst *new_rq,
- 
- 	/* copy pages form the old */
- 	for (i = 0; i < npages; i++) {
--		char *dst = kmap(new_rq->rq_pages[i]);
--		char *src = kmap(old_rq->rq_pages[i]);
--		unsigned int len = (i < npages - 1) ? new_rq->rq_pagesz :
--							new_rq->rq_tailsz;
-+		char *dst, *src;
-+		unsigned int offset, len;
-+
-+		rqst_page_get_length(new_rq, i, &len, &offset);
-+
-+		dst = (char *) kmap(new_rq->rq_pages[i]) + offset;
-+		src = (char *) kmap(old_rq->rq_pages[i]) + offset;
-+
- 		memcpy(dst, src, len);
- 		kunmap(new_rq->rq_pages[i]);
- 		kunmap(old_rq->rq_pages[i]);
+ 	return buflen;
 -- 
 2.7.4
