@@ -1,36 +1,70 @@
-From: Stefan Metzmacher <metze@samba.org>
-Subject: [PATCH] fs/cifs: require sha512
-Date: Fri,  7 Sep 2018 18:24:17 +0200
-Message-ID: <20180907162417.31977-1-metze@samba.org>
-Cc: Stefan Metzmacher <metze@samba.org>,
-        Stable <stable@vger.kernel.org>, linux-cifs@vger.kernel.org
-To: Steve French <stfrench@microsoft.com>
-Return-path: <stable-owner@vger.kernel.org>
-Sender: stable-owner@vger.kernel.org
+From: Long Li <longli@linuxonhyperv.com>
+Subject: [Patch v3 00/16] CIFS: add support for direct I/O
+Date: Sat,  8 Sep 2018 02:13:32 +0000
+Message-ID: <20180908021348.19956-1-longli@linuxonhyperv.com>
+Reply-To: longli@microsoft.com
+Cc: Long Li <longli@microsoft.com>
+To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+        linux-rdma@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-This got lost in commit 0fdfef9aa7ee68ddd508aef7c98630cfc054f8d6,
-which removed CONFIG_CIFS_SMB311.
+From: Long Li <longli@microsoft.com>
 
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
-Fixes: 0fdfef9aa7ee68ddd ("smb3: simplify code by removing CONFIG_CIFS_SMB311")
-CC: Stable <stable@vger.kernel.org>
-CC: linux-cifs@vger.kernel.org
----
- fs/cifs/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+This patch set implements direct I/O.
 
-diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
-index 35c83fe7dba01..abcd78e332feb 100644
---- a/fs/cifs/Kconfig
-+++ b/fs/cifs/Kconfig
-@@ -6,6 +6,7 @@ config CIFS
- 	select CRYPTO_MD4
- 	select CRYPTO_MD5
- 	select CRYPTO_SHA256
-+	select CRYPTO_SHA512
- 	select CRYPTO_CMAC
- 	select CRYPTO_HMAC
- 	select CRYPTO_ARC4
+In normal code path (even with cache=none), CIFS copies I/O data from
+user-space to kernel-space for security reasons of possible protocol
+required signing and encryption on user data.
+
+With this patch set, CIFS passes the I/O data directly from user-space
+buffer to the transport layer, when file system is mounted with
+"cache-none".
+
+Patch v2 addressed comments from Christoph Hellwig <hch@lst.de> and
+Tom Talpey <ttalpey@microsoft.com> to implement direct I/O for both
+socket and RDMA.
+
+Patch v3 added support for kernel AIO.
+
+
+Long Li (16):
+  CIFS: Add support for direct pages in rdata
+  CIFS: Use offset when reading pages
+  CIFS: Add support for direct pages in wdata
+  CIFS: pass page offset when issuing SMB write
+  CIFS: Calculate the correct request length based on page offset and
+    tail size
+  CIFS: Introduce helper function to get page offset and length in
+    smb_rqst
+  CIFS: When sending data on socket, pass the correct page offset
+  CIFS: SMBD: Support page offset in RDMA send
+  CIFS: SMBD: Support page offset in RDMA recv
+  CIFS: SMBD: Do not call ib_dereg_mr on invalidated memory registration
+  CIFS: SMBD: Support page offset in memory registration
+  CIFS: Pass page offset for calculating signature
+  CIFS: Pass page offset for encrypting
+  CIFS: Add support for direct I/O read
+  CIFS: Add support for direct I/O write
+  CIFS: Add direct I/O functions to file_operations
+
+ fs/cifs/cifsencrypt.c |   9 +-
+ fs/cifs/cifsfs.c      |  10 +-
+ fs/cifs/cifsfs.h      |   2 +
+ fs/cifs/cifsglob.h    |  11 +-
+ fs/cifs/cifsproto.h   |   9 +-
+ fs/cifs/cifssmb.c     |  19 +-
+ fs/cifs/connect.c     |   5 +-
+ fs/cifs/file.c        | 477 ++++++++++++++++++++++++++++++++++++++++++--------
+ fs/cifs/misc.c        |  17 ++
+ fs/cifs/smb2ops.c     |  22 ++-
+ fs/cifs/smb2pdu.c     |  20 ++-
+ fs/cifs/smbdirect.c   | 156 ++++++++++-------
+ fs/cifs/smbdirect.h   |   2 +-
+ fs/cifs/transport.c   |  34 ++--
+ 14 files changed, 606 insertions(+), 187 deletions(-)
+
 -- 
-2.17.1
+2.7.4
