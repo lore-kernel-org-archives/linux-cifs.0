@@ -1,7 +1,7 @@
 From: Long Li <longli@linuxonhyperv.com>
-Subject: [Patch v3 16/16] CIFS: Add direct I/O functions to file_operations
-Date: Sat,  8 Sep 2018 02:13:48 +0000
-Message-ID: <20180908021348.19956-17-longli@linuxonhyperv.com>
+Subject: [Patch v3 13/16] CIFS: Pass page offset for encrypting
+Date: Sat,  8 Sep 2018 02:13:45 +0000
+Message-ID: <20180908021348.19956-14-longli@linuxonhyperv.com>
 References: <20180908021348.19956-1-longli@linuxonhyperv.com>
 Reply-To: longli@microsoft.com
 Cc: Long Li <longli@microsoft.com>
@@ -15,46 +15,61 @@ List-Id: linux-cifs.vger.kernel.org
 
 From: Long Li <longli@microsoft.com>
 
-With direct read/write functions implemented, add them to file_operations.
+Encryption function needs to read data starting page offset from input
+buffer.
 
-Dircet I/O is used under two conditions:
-1. When mounting with "cache=none", CIFS uses direct I/O for all user file
-data transfer.
-2. When opening a file with O_DIRECT, CIFS uses direct I/O for all data
-transfer on this file.
+This doesn't affect decryption path since it allocates its own page
+buffers.
 
 Signed-off-by: Long Li <longli@microsoft.com>
 ---
- fs/cifs/cifsfs.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ fs/cifs/smb2ops.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 62f1662..f18091b 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -1113,9 +1113,8 @@ const struct file_operations cifs_file_strict_ops = {
- };
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 1fa1c29..38d19b6 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -2189,9 +2189,10 @@ init_sg(struct smb_rqst *rqst, u8 *sign)
+ 		smb2_sg_set_buf(&sg[i], rqst->rq_iov[i].iov_base,
+ 						rqst->rq_iov[i].iov_len);
+ 	for (j = 0; i < sg_len - 1; i++, j++) {
+-		unsigned int len = (j < rqst->rq_npages - 1) ? rqst->rq_pagesz
+-							: rqst->rq_tailsz;
+-		sg_set_page(&sg[i], rqst->rq_pages[j], len, 0);
++		unsigned int len, offset;
++
++		rqst_page_get_length(rqst, j, &len, &offset);
++		sg_set_page(&sg[i], rqst->rq_pages[j], len, offset);
+ 	}
+ 	smb2_sg_set_buf(&sg[sg_len - 1], sign, SMB2_SIGNATURE_SIZE);
+ 	return sg;
+@@ -2332,6 +2333,7 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, struct smb_rqst *new_rq,
+ 		return rc;
  
- const struct file_operations cifs_file_direct_ops = {
--	/* BB reevaluate whether they can be done with directio, no cache */
--	.read_iter = cifs_user_readv,
--	.write_iter = cifs_user_writev,
-+	.read_iter = cifs_direct_readv,
-+	.write_iter = cifs_direct_writev,
- 	.open = cifs_open,
- 	.release = cifs_close,
- 	.lock = cifs_lock,
-@@ -1169,9 +1168,8 @@ const struct file_operations cifs_file_strict_nobrl_ops = {
- };
+ 	new_rq->rq_pages = pages;
++	new_rq->rq_offset = old_rq->rq_offset;
+ 	new_rq->rq_npages = old_rq->rq_npages;
+ 	new_rq->rq_pagesz = old_rq->rq_pagesz;
+ 	new_rq->rq_tailsz = old_rq->rq_tailsz;
+@@ -2363,10 +2365,14 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, struct smb_rqst *new_rq,
  
- const struct file_operations cifs_file_direct_nobrl_ops = {
--	/* BB reevaluate whether they can be done with directio, no cache */
--	.read_iter = cifs_user_readv,
--	.write_iter = cifs_user_writev,
-+	.read_iter = cifs_direct_readv,
-+	.write_iter = cifs_direct_writev,
- 	.open = cifs_open,
- 	.release = cifs_close,
- 	.fsync = cifs_fsync,
+ 	/* copy pages form the old */
+ 	for (i = 0; i < npages; i++) {
+-		char *dst = kmap(new_rq->rq_pages[i]);
+-		char *src = kmap(old_rq->rq_pages[i]);
+-		unsigned int len = (i < npages - 1) ? new_rq->rq_pagesz :
+-							new_rq->rq_tailsz;
++		char *dst, *src;
++		unsigned int offset, len;
++
++		rqst_page_get_length(new_rq, i, &len, &offset);
++
++		dst = (char *) kmap(new_rq->rq_pages[i]) + offset;
++		src = (char *) kmap(old_rq->rq_pages[i]) + offset;
++
+ 		memcpy(dst, src, len);
+ 		kunmap(new_rq->rq_pages[i]);
+ 		kunmap(old_rq->rq_pages[i]);
 -- 
 2.7.4
