@@ -1,85 +1,74 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [Patch v3 00/16] CIFS: add support for direct I/O
-Date: Sat, 15 Sep 2018 04:28:09 -0500
-Message-ID: <CAH2r5mtaV-avzB0Ygb7CidVoWaSXQ_5E8F5Ed1RQAyGue43jcw@mail.gmail.com>
+From: Long Li <longli@microsoft.com>
+Subject: RE: [Patch v3 00/16] CIFS: add support for direct I/O
+Date: Sat, 15 Sep 2018 20:57:33 +0000
+Message-ID: <SN4PR2101MB07330E143E443576FBF08AC8CE180@SN4PR2101MB0733.namprd21.prod.outlook.com>
 References: <20180908021348.19956-1-longli@linuxonhyperv.com>
+ <CAH2r5mtaV-avzB0Ygb7CidVoWaSXQ_5E8F5Ed1RQAyGue43jcw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Cc: Steve French <sfrench@samba.org>,
         CIFS <linux-cifs@vger.kernel.org>,
         samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>, linux-rdma@vger.kernel.org
-To: Long Li <longli@microsoft.com>
+        LKML <linux-kernel@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+To: Steve French <smfrench@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180908021348.19956-1-longli@linuxonhyperv.com>
+In-Reply-To: <CAH2r5mtaV-avzB0Ygb7CidVoWaSXQ_5E8F5Ed1RQAyGue43jcw@mail.gmail.com>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-could you rebase these, patch 1 was merged quite a while ago, and
-patch 2 etc. doesn't apply cleanly
-On Fri, Sep 7, 2018 at 9:18 PM Long Li <longli@linuxonhyperv.com> wrote:
->
-> From: Long Li <longli@microsoft.com>
->
-> This patch set implements direct I/O.
->
-> In normal code path (even with cache=none), CIFS copies I/O data from
-> user-space to kernel-space for security reasons of possible protocol
-> required signing and encryption on user data.
->
-> With this patch set, CIFS passes the I/O data directly from user-space
-> buffer to the transport layer, when file system is mounted with
-> "cache-none".
->
-> Patch v2 addressed comments from Christoph Hellwig <hch@lst.de> and
-> Tom Talpey <ttalpey@microsoft.com> to implement direct I/O for both
-> socket and RDMA.
->
-> Patch v3 added support for kernel AIO.
->
->
-> Long Li (16):
->   CIFS: Add support for direct pages in rdata
->   CIFS: Use offset when reading pages
->   CIFS: Add support for direct pages in wdata
->   CIFS: pass page offset when issuing SMB write
->   CIFS: Calculate the correct request length based on page offset and
->     tail size
->   CIFS: Introduce helper function to get page offset and length in
->     smb_rqst
->   CIFS: When sending data on socket, pass the correct page offset
->   CIFS: SMBD: Support page offset in RDMA send
->   CIFS: SMBD: Support page offset in RDMA recv
->   CIFS: SMBD: Do not call ib_dereg_mr on invalidated memory registration
->   CIFS: SMBD: Support page offset in memory registration
->   CIFS: Pass page offset for calculating signature
->   CIFS: Pass page offset for encrypting
->   CIFS: Add support for direct I/O read
->   CIFS: Add support for direct I/O write
->   CIFS: Add direct I/O functions to file_operations
->
->  fs/cifs/cifsencrypt.c |   9 +-
->  fs/cifs/cifsfs.c      |  10 +-
->  fs/cifs/cifsfs.h      |   2 +
->  fs/cifs/cifsglob.h    |  11 +-
->  fs/cifs/cifsproto.h   |   9 +-
->  fs/cifs/cifssmb.c     |  19 +-
->  fs/cifs/connect.c     |   5 +-
->  fs/cifs/file.c        | 477 ++++++++++++++++++++++++++++++++++++++++++--------
->  fs/cifs/misc.c        |  17 ++
->  fs/cifs/smb2ops.c     |  22 ++-
->  fs/cifs/smb2pdu.c     |  20 ++-
->  fs/cifs/smbdirect.c   | 156 ++++++++++-------
->  fs/cifs/smbdirect.h   |   2 +-
->  fs/cifs/transport.c   |  34 ++--
->  14 files changed, 606 insertions(+), 187 deletions(-)
->
-> --
-> 2.7.4
->
-
-
--- 
-Thanks,
-
-Steve
+PiBGcm9tOiBTdGV2ZSBGcmVuY2ggPHNtZnJlbmNoQGdtYWlsLmNvbT4NCj4gU2VudDogU2F0dXJk
+YXksIFNlcHRlbWJlciAxNSwgMjAxOCAyOjI4IEFNDQo+IFRvOiBMb25nIExpIDxsb25nbGlAbWlj
+cm9zb2Z0LmNvbT4NCj4gQ2M6IFN0ZXZlIEZyZW5jaCA8c2ZyZW5jaEBzYW1iYS5vcmc+OyBDSUZT
+IDxsaW51eC1jaWZzQHZnZXIua2VybmVsLm9yZz47DQo+IHNhbWJhLXRlY2huaWNhbCA8c2FtYmEt
+dGVjaG5pY2FsQGxpc3RzLnNhbWJhLm9yZz47IExLTUwgPGxpbnV4LQ0KPiBrZXJuZWxAdmdlci5r
+ZXJuZWwub3JnPjsgbGludXgtcmRtYUB2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IFtQ
+YXRjaCB2MyAwMC8xNl0gQ0lGUzogYWRkIHN1cHBvcnQgZm9yIGRpcmVjdCBJL08NCj4gDQo+IGNv
+dWxkIHlvdSByZWJhc2UgdGhlc2UsIHBhdGNoIDEgd2FzIG1lcmdlZCBxdWl0ZSBhIHdoaWxlIGFn
+bywgYW5kIHBhdGNoIDINCj4gZXRjLiBkb2Vzbid0IGFwcGx5IGNsZWFubHkgDQoNClNvcnJ5LCBJ
+IHdpbGwgcmViYXNlIGFuZCByZXNlbmQuDQoNCg0KT24gRnJpLCBTZXAgNywgMjAxOCBhdCA5OjE4
+IFBNIExvbmcgTGkNCj4gPGxvbmdsaUBsaW51eG9uaHlwZXJ2LmNvbT4gd3JvdGU6DQo+ID4NCj4g
+PiBGcm9tOiBMb25nIExpIDxsb25nbGlAbWljcm9zb2Z0LmNvbT4NCj4gPg0KPiA+IFRoaXMgcGF0
+Y2ggc2V0IGltcGxlbWVudHMgZGlyZWN0IEkvTy4NCj4gPg0KPiA+IEluIG5vcm1hbCBjb2RlIHBh
+dGggKGV2ZW4gd2l0aCBjYWNoZT1ub25lKSwgQ0lGUyBjb3BpZXMgSS9PIGRhdGEgZnJvbQ0KPiA+
+IHVzZXItc3BhY2UgdG8ga2VybmVsLXNwYWNlIGZvciBzZWN1cml0eSByZWFzb25zIG9mIHBvc3Np
+YmxlIHByb3RvY29sDQo+ID4gcmVxdWlyZWQgc2lnbmluZyBhbmQgZW5jcnlwdGlvbiBvbiB1c2Vy
+IGRhdGEuDQo+ID4NCj4gPiBXaXRoIHRoaXMgcGF0Y2ggc2V0LCBDSUZTIHBhc3NlcyB0aGUgSS9P
+IGRhdGEgZGlyZWN0bHkgZnJvbSB1c2VyLXNwYWNlDQo+ID4gYnVmZmVyIHRvIHRoZSB0cmFuc3Bv
+cnQgbGF5ZXIsIHdoZW4gZmlsZSBzeXN0ZW0gaXMgbW91bnRlZCB3aXRoDQo+ID4gImNhY2hlLW5v
+bmUiLg0KPiA+DQo+ID4gUGF0Y2ggdjIgYWRkcmVzc2VkIGNvbW1lbnRzIGZyb20gQ2hyaXN0b3Bo
+IEhlbGx3aWcgPGhjaEBsc3QuZGU+IGFuZA0KPiA+IFRvbSBUYWxwZXkgPHR0YWxwZXlAbWljcm9z
+b2Z0LmNvbT4gdG8gaW1wbGVtZW50IGRpcmVjdCBJL08gZm9yIGJvdGgNCj4gPiBzb2NrZXQgYW5k
+IFJETUEuDQo+ID4NCj4gPiBQYXRjaCB2MyBhZGRlZCBzdXBwb3J0IGZvciBrZXJuZWwgQUlPLg0K
+PiA+DQo+ID4NCj4gPiBMb25nIExpICgxNik6DQo+ID4gICBDSUZTOiBBZGQgc3VwcG9ydCBmb3Ig
+ZGlyZWN0IHBhZ2VzIGluIHJkYXRhDQo+ID4gICBDSUZTOiBVc2Ugb2Zmc2V0IHdoZW4gcmVhZGlu
+ZyBwYWdlcw0KPiA+ICAgQ0lGUzogQWRkIHN1cHBvcnQgZm9yIGRpcmVjdCBwYWdlcyBpbiB3ZGF0
+YQ0KPiA+ICAgQ0lGUzogcGFzcyBwYWdlIG9mZnNldCB3aGVuIGlzc3VpbmcgU01CIHdyaXRlDQo+
+ID4gICBDSUZTOiBDYWxjdWxhdGUgdGhlIGNvcnJlY3QgcmVxdWVzdCBsZW5ndGggYmFzZWQgb24g
+cGFnZSBvZmZzZXQgYW5kDQo+ID4gICAgIHRhaWwgc2l6ZQ0KPiA+ICAgQ0lGUzogSW50cm9kdWNl
+IGhlbHBlciBmdW5jdGlvbiB0byBnZXQgcGFnZSBvZmZzZXQgYW5kIGxlbmd0aCBpbg0KPiA+ICAg
+ICBzbWJfcnFzdA0KPiA+ICAgQ0lGUzogV2hlbiBzZW5kaW5nIGRhdGEgb24gc29ja2V0LCBwYXNz
+IHRoZSBjb3JyZWN0IHBhZ2Ugb2Zmc2V0DQo+ID4gICBDSUZTOiBTTUJEOiBTdXBwb3J0IHBhZ2Ug
+b2Zmc2V0IGluIFJETUEgc2VuZA0KPiA+ICAgQ0lGUzogU01CRDogU3VwcG9ydCBwYWdlIG9mZnNl
+dCBpbiBSRE1BIHJlY3YNCj4gPiAgIENJRlM6IFNNQkQ6IERvIG5vdCBjYWxsIGliX2RlcmVnX21y
+IG9uIGludmFsaWRhdGVkIG1lbW9yeSByZWdpc3RyYXRpb24NCj4gPiAgIENJRlM6IFNNQkQ6IFN1
+cHBvcnQgcGFnZSBvZmZzZXQgaW4gbWVtb3J5IHJlZ2lzdHJhdGlvbg0KPiA+ICAgQ0lGUzogUGFz
+cyBwYWdlIG9mZnNldCBmb3IgY2FsY3VsYXRpbmcgc2lnbmF0dXJlDQo+ID4gICBDSUZTOiBQYXNz
+IHBhZ2Ugb2Zmc2V0IGZvciBlbmNyeXB0aW5nDQo+ID4gICBDSUZTOiBBZGQgc3VwcG9ydCBmb3Ig
+ZGlyZWN0IEkvTyByZWFkDQo+ID4gICBDSUZTOiBBZGQgc3VwcG9ydCBmb3IgZGlyZWN0IEkvTyB3
+cml0ZQ0KPiA+ICAgQ0lGUzogQWRkIGRpcmVjdCBJL08gZnVuY3Rpb25zIHRvIGZpbGVfb3BlcmF0
+aW9ucw0KPiA+DQo+ID4gIGZzL2NpZnMvY2lmc2VuY3J5cHQuYyB8ICAgOSArLQ0KPiA+ICBmcy9j
+aWZzL2NpZnNmcy5jICAgICAgfCAgMTAgKy0NCj4gPiAgZnMvY2lmcy9jaWZzZnMuaCAgICAgIHwg
+ICAyICsNCj4gPiAgZnMvY2lmcy9jaWZzZ2xvYi5oICAgIHwgIDExICstDQo+ID4gIGZzL2NpZnMv
+Y2lmc3Byb3RvLmggICB8ICAgOSArLQ0KPiA+ICBmcy9jaWZzL2NpZnNzbWIuYyAgICAgfCAgMTkg
+Ky0NCj4gPiAgZnMvY2lmcy9jb25uZWN0LmMgICAgIHwgICA1ICstDQo+ID4gIGZzL2NpZnMvZmls
+ZS5jICAgICAgICB8IDQ3Nw0KPiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKystLS0tLS0tLQ0KPiA+ICBmcy9jaWZzL21pc2MuYyAgICAgICAgfCAgMTcgKysNCj4gPiAg
+ZnMvY2lmcy9zbWIyb3BzLmMgICAgIHwgIDIyICsrLQ0KPiA+ICBmcy9jaWZzL3NtYjJwZHUuYyAg
+ICAgfCAgMjAgKystDQo+ID4gIGZzL2NpZnMvc21iZGlyZWN0LmMgICB8IDE1NiArKysrKysrKysr
+LS0tLS0tLQ0KPiA+ICBmcy9jaWZzL3NtYmRpcmVjdC5oICAgfCAgIDIgKy0NCj4gPiAgZnMvY2lm
+cy90cmFuc3BvcnQuYyAgIHwgIDM0ICsrLS0NCj4gPiAgMTQgZmlsZXMgY2hhbmdlZCwgNjA2IGlu
+c2VydGlvbnMoKyksIDE4NyBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IC0tDQo+ID4gMi43LjQNCj4g
+Pg0KPiANCj4gDQo+IC0tDQo+IFRoYW5rcywNCj4gDQo+IFN0ZXZlDQo=
