@@ -1,74 +1,89 @@
-From: Long Li <longli@microsoft.com>
-Subject: RE: [Patch v3 00/16] CIFS: add support for direct I/O
-Date: Sat, 15 Sep 2018 20:57:33 +0000
-Message-ID: <SN4PR2101MB07330E143E443576FBF08AC8CE180@SN4PR2101MB0733.namprd21.prod.outlook.com>
-References: <20180908021348.19956-1-longli@linuxonhyperv.com>
- <CAH2r5mtaV-avzB0Ygb7CidVoWaSXQ_5E8F5Ed1RQAyGue43jcw@mail.gmail.com>
+From: Tom Talpey <tom@talpey.com>
+Subject: Re: [Patch v7 21/22] CIFS: SMBD: Upper layer performs SMB read via
+ RDMA write through memory registration
+Date: Tue, 18 Sep 2018 22:59:50 -0700
+Message-ID: <9b02dadb-d21b-7a8d-7803-910041f66047@talpey.com>
+References: <20171107085514.12693-1-longli@exchange.microsoft.com>
+ <20171107085514.12693-22-longli@exchange.microsoft.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-To: Steve French <smfrench@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Long Li <longli@microsoft.com>
+To: Long Li <longli@exchange.microsoft.com>,
+        Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Tom Talpey <ttalpey@microsoft.com>,
+        Matthew Wilcox <mawilcox@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAH2r5mtaV-avzB0Ygb7CidVoWaSXQ_5E8F5Ed1RQAyGue43jcw@mail.gmail.com>
+In-Reply-To: <20171107085514.12693-22-longli@exchange.microsoft.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-PiBGcm9tOiBTdGV2ZSBGcmVuY2ggPHNtZnJlbmNoQGdtYWlsLmNvbT4NCj4gU2VudDogU2F0dXJk
-YXksIFNlcHRlbWJlciAxNSwgMjAxOCAyOjI4IEFNDQo+IFRvOiBMb25nIExpIDxsb25nbGlAbWlj
-cm9zb2Z0LmNvbT4NCj4gQ2M6IFN0ZXZlIEZyZW5jaCA8c2ZyZW5jaEBzYW1iYS5vcmc+OyBDSUZT
-IDxsaW51eC1jaWZzQHZnZXIua2VybmVsLm9yZz47DQo+IHNhbWJhLXRlY2huaWNhbCA8c2FtYmEt
-dGVjaG5pY2FsQGxpc3RzLnNhbWJhLm9yZz47IExLTUwgPGxpbnV4LQ0KPiBrZXJuZWxAdmdlci5r
-ZXJuZWwub3JnPjsgbGludXgtcmRtYUB2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IFtQ
-YXRjaCB2MyAwMC8xNl0gQ0lGUzogYWRkIHN1cHBvcnQgZm9yIGRpcmVjdCBJL08NCj4gDQo+IGNv
-dWxkIHlvdSByZWJhc2UgdGhlc2UsIHBhdGNoIDEgd2FzIG1lcmdlZCBxdWl0ZSBhIHdoaWxlIGFn
-bywgYW5kIHBhdGNoIDINCj4gZXRjLiBkb2Vzbid0IGFwcGx5IGNsZWFubHkgDQoNClNvcnJ5LCBJ
-IHdpbGwgcmViYXNlIGFuZCByZXNlbmQuDQoNCg0KT24gRnJpLCBTZXAgNywgMjAxOCBhdCA5OjE4
-IFBNIExvbmcgTGkNCj4gPGxvbmdsaUBsaW51eG9uaHlwZXJ2LmNvbT4gd3JvdGU6DQo+ID4NCj4g
-PiBGcm9tOiBMb25nIExpIDxsb25nbGlAbWljcm9zb2Z0LmNvbT4NCj4gPg0KPiA+IFRoaXMgcGF0
-Y2ggc2V0IGltcGxlbWVudHMgZGlyZWN0IEkvTy4NCj4gPg0KPiA+IEluIG5vcm1hbCBjb2RlIHBh
-dGggKGV2ZW4gd2l0aCBjYWNoZT1ub25lKSwgQ0lGUyBjb3BpZXMgSS9PIGRhdGEgZnJvbQ0KPiA+
-IHVzZXItc3BhY2UgdG8ga2VybmVsLXNwYWNlIGZvciBzZWN1cml0eSByZWFzb25zIG9mIHBvc3Np
-YmxlIHByb3RvY29sDQo+ID4gcmVxdWlyZWQgc2lnbmluZyBhbmQgZW5jcnlwdGlvbiBvbiB1c2Vy
-IGRhdGEuDQo+ID4NCj4gPiBXaXRoIHRoaXMgcGF0Y2ggc2V0LCBDSUZTIHBhc3NlcyB0aGUgSS9P
-IGRhdGEgZGlyZWN0bHkgZnJvbSB1c2VyLXNwYWNlDQo+ID4gYnVmZmVyIHRvIHRoZSB0cmFuc3Bv
-cnQgbGF5ZXIsIHdoZW4gZmlsZSBzeXN0ZW0gaXMgbW91bnRlZCB3aXRoDQo+ID4gImNhY2hlLW5v
-bmUiLg0KPiA+DQo+ID4gUGF0Y2ggdjIgYWRkcmVzc2VkIGNvbW1lbnRzIGZyb20gQ2hyaXN0b3Bo
-IEhlbGx3aWcgPGhjaEBsc3QuZGU+IGFuZA0KPiA+IFRvbSBUYWxwZXkgPHR0YWxwZXlAbWljcm9z
-b2Z0LmNvbT4gdG8gaW1wbGVtZW50IGRpcmVjdCBJL08gZm9yIGJvdGgNCj4gPiBzb2NrZXQgYW5k
-IFJETUEuDQo+ID4NCj4gPiBQYXRjaCB2MyBhZGRlZCBzdXBwb3J0IGZvciBrZXJuZWwgQUlPLg0K
-PiA+DQo+ID4NCj4gPiBMb25nIExpICgxNik6DQo+ID4gICBDSUZTOiBBZGQgc3VwcG9ydCBmb3Ig
-ZGlyZWN0IHBhZ2VzIGluIHJkYXRhDQo+ID4gICBDSUZTOiBVc2Ugb2Zmc2V0IHdoZW4gcmVhZGlu
-ZyBwYWdlcw0KPiA+ICAgQ0lGUzogQWRkIHN1cHBvcnQgZm9yIGRpcmVjdCBwYWdlcyBpbiB3ZGF0
-YQ0KPiA+ICAgQ0lGUzogcGFzcyBwYWdlIG9mZnNldCB3aGVuIGlzc3VpbmcgU01CIHdyaXRlDQo+
-ID4gICBDSUZTOiBDYWxjdWxhdGUgdGhlIGNvcnJlY3QgcmVxdWVzdCBsZW5ndGggYmFzZWQgb24g
-cGFnZSBvZmZzZXQgYW5kDQo+ID4gICAgIHRhaWwgc2l6ZQ0KPiA+ICAgQ0lGUzogSW50cm9kdWNl
-IGhlbHBlciBmdW5jdGlvbiB0byBnZXQgcGFnZSBvZmZzZXQgYW5kIGxlbmd0aCBpbg0KPiA+ICAg
-ICBzbWJfcnFzdA0KPiA+ICAgQ0lGUzogV2hlbiBzZW5kaW5nIGRhdGEgb24gc29ja2V0LCBwYXNz
-IHRoZSBjb3JyZWN0IHBhZ2Ugb2Zmc2V0DQo+ID4gICBDSUZTOiBTTUJEOiBTdXBwb3J0IHBhZ2Ug
-b2Zmc2V0IGluIFJETUEgc2VuZA0KPiA+ICAgQ0lGUzogU01CRDogU3VwcG9ydCBwYWdlIG9mZnNl
-dCBpbiBSRE1BIHJlY3YNCj4gPiAgIENJRlM6IFNNQkQ6IERvIG5vdCBjYWxsIGliX2RlcmVnX21y
-IG9uIGludmFsaWRhdGVkIG1lbW9yeSByZWdpc3RyYXRpb24NCj4gPiAgIENJRlM6IFNNQkQ6IFN1
-cHBvcnQgcGFnZSBvZmZzZXQgaW4gbWVtb3J5IHJlZ2lzdHJhdGlvbg0KPiA+ICAgQ0lGUzogUGFz
-cyBwYWdlIG9mZnNldCBmb3IgY2FsY3VsYXRpbmcgc2lnbmF0dXJlDQo+ID4gICBDSUZTOiBQYXNz
-IHBhZ2Ugb2Zmc2V0IGZvciBlbmNyeXB0aW5nDQo+ID4gICBDSUZTOiBBZGQgc3VwcG9ydCBmb3Ig
-ZGlyZWN0IEkvTyByZWFkDQo+ID4gICBDSUZTOiBBZGQgc3VwcG9ydCBmb3IgZGlyZWN0IEkvTyB3
-cml0ZQ0KPiA+ICAgQ0lGUzogQWRkIGRpcmVjdCBJL08gZnVuY3Rpb25zIHRvIGZpbGVfb3BlcmF0
-aW9ucw0KPiA+DQo+ID4gIGZzL2NpZnMvY2lmc2VuY3J5cHQuYyB8ICAgOSArLQ0KPiA+ICBmcy9j
-aWZzL2NpZnNmcy5jICAgICAgfCAgMTAgKy0NCj4gPiAgZnMvY2lmcy9jaWZzZnMuaCAgICAgIHwg
-ICAyICsNCj4gPiAgZnMvY2lmcy9jaWZzZ2xvYi5oICAgIHwgIDExICstDQo+ID4gIGZzL2NpZnMv
-Y2lmc3Byb3RvLmggICB8ICAgOSArLQ0KPiA+ICBmcy9jaWZzL2NpZnNzbWIuYyAgICAgfCAgMTkg
-Ky0NCj4gPiAgZnMvY2lmcy9jb25uZWN0LmMgICAgIHwgICA1ICstDQo+ID4gIGZzL2NpZnMvZmls
-ZS5jICAgICAgICB8IDQ3Nw0KPiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKystLS0tLS0tLQ0KPiA+ICBmcy9jaWZzL21pc2MuYyAgICAgICAgfCAgMTcgKysNCj4gPiAg
-ZnMvY2lmcy9zbWIyb3BzLmMgICAgIHwgIDIyICsrLQ0KPiA+ICBmcy9jaWZzL3NtYjJwZHUuYyAg
-ICAgfCAgMjAgKystDQo+ID4gIGZzL2NpZnMvc21iZGlyZWN0LmMgICB8IDE1NiArKysrKysrKysr
-LS0tLS0tLQ0KPiA+ICBmcy9jaWZzL3NtYmRpcmVjdC5oICAgfCAgIDIgKy0NCj4gPiAgZnMvY2lm
-cy90cmFuc3BvcnQuYyAgIHwgIDM0ICsrLS0NCj4gPiAgMTQgZmlsZXMgY2hhbmdlZCwgNjA2IGlu
-c2VydGlvbnMoKyksIDE4NyBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IC0tDQo+ID4gMi43LjQNCj4g
-Pg0KPiANCj4gDQo+IC0tDQo+IFRoYW5rcywNCj4gDQo+IFN0ZXZlDQo=
+Replying to a very old message, but it's something we
+discussed today at the IOLab event so to capture it:
+
+On 11/7/2017 12:55 AM, Long Li wrote:
+> From: Long Li <longli@microsoft.com>
+> 
+> ---
+>   fs/cifs/file.c    | 17 +++++++++++++++--
+>   fs/cifs/smb2pdu.c | 45 ++++++++++++++++++++++++++++++++++++++++++++-
+>   2 files changed, 59 insertions(+), 3 deletions(-)
+> ...
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index c8afb83..8a5ff90 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -2379,7 +2379,40 @@ smb2_new_read_req(void **buf, unsigned int *total_len,
+>   	req->MinimumCount = 0;
+>   	req->Length = cpu_to_le32(io_parms->length);
+>   	req->Offset = cpu_to_le64(io_parms->offset);
+> +#ifdef CONFIG_CIFS_SMB_DIRECT
+> +	/*
+> +	 * If we want to do a RDMA write, fill in and append
+> +	 * smbd_buffer_descriptor_v1 to the end of read request
+> +	 */
+> +	if (server->rdma && rdata &&
+> +		rdata->bytes >= server->smbd_conn->rdma_readwrite_threshold) {
+> +
+> +		struct smbd_buffer_descriptor_v1 *v1;
+> +		bool need_invalidate =
+> +			io_parms->tcon->ses->server->dialect == SMB30_PROT_ID;
+> +
+> +		rdata->mr = smbd_register_mr(
+> +				server->smbd_conn, rdata->pages,
+> +				rdata->nr_pages, rdata->tailsz,
+> +				true, need_invalidate);
+> +		if (!rdata->mr)
+> +			return -ENOBUFS;
+> +
+> +		req->Channel = SMB2_CHANNEL_RDMA_V1_INVALIDATE;
+> +		if (need_invalidate)
+> +			req->Channel = SMB2_CHANNEL_RDMA_V1;
+> +		req->ReadChannelInfoOffset =
+> +			offsetof(struct smb2_read_plain_req, Buffer);
+> +		req->ReadChannelInfoLength =
+> +			sizeof(struct smbd_buffer_descriptor_v1);
+> +		v1 = (struct smbd_buffer_descriptor_v1 *) &req->Buffer[0];
+> +		v1->offset = rdata->mr->mr->iova;
+
+It's unnecessary, and possibly leaking kernel information, to use
+the IOVA as the offset of a memory region which is registered using
+an FRWR. Because such regions are based on the exact bytes targeted
+by the memory handle, the offset can be set to any value, typically
+zero, but nearly arbitrary. As long as the (offset + length) does
+not wrap or otherwise overflow, offset can be set to anything
+convenient.
+
+Since SMB reads and writes range up to 8MB, I'd suggest zeroing the
+least significant 23 bits, which should guarantee it. The other 41
+bits, party on. You could randomize them, pass some clever identifier
+such as MID sequence, whatever.
+
+Tom.
+
+> +		v1->token = rdata->mr->mr->rkey;
+> +		v1->length = rdata->mr->mr->length;
