@@ -1,76 +1,44 @@
-From: Long Li <longli@microsoft.com>
-Subject: RE: [Patch v7 21/22] CIFS: SMBD: Upper layer performs SMB read via
- RDMA write through memory registration
-Date: Thu, 20 Sep 2018 17:01:27 +0000
-Message-ID: <MWHPR2101MB07299688B64A015CC93E0CB0CE130@MWHPR2101MB0729.namprd21.prod.outlook.com>
-References: <20171107085514.12693-1-longli@exchange.microsoft.com>
- <20171107085514.12693-22-longli@exchange.microsoft.com>
- <9b02dadb-d21b-7a8d-7803-910041f66047@talpey.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-To: Tom Talpey <tom@talpey.com>, Steve French <sfrench@samba.org>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Tom Talpey <ttalpey@microsoft.com>,
-        Matthew Wilcox <mawilcox@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>
+From: Long Li <longli@linuxonhyperv.com>
+Subject: [PATCH V3 (resend) 1/7] CIFS: pass page offsets on SMB1 read/write
+Date: Thu, 20 Sep 2018 21:18:38 +0000
+Message-ID: <20180920211842.13721-1-longli@linuxonhyperv.com>
+Reply-To: longli@microsoft.com
+Cc: Long Li <longli@microsoft.com>
+To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+        linux-rdma@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <9b02dadb-d21b-7a8d-7803-910041f66047@talpey.com>
-Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-PiBTdWJqZWN0OiBSZTogW1BhdGNoIHY3IDIxLzIyXSBDSUZTOiBTTUJEOiBVcHBlciBsYXllciBw
-ZXJmb3JtcyBTTUIgcmVhZCB2aWENCj4gUkRNQSB3cml0ZSB0aHJvdWdoIG1lbW9yeSByZWdpc3Ry
-YXRpb24NCj4gDQo+IFJlcGx5aW5nIHRvIGEgdmVyeSBvbGQgbWVzc2FnZSwgYnV0IGl0J3Mgc29t
-ZXRoaW5nIHdlIGRpc2N1c3NlZCB0b2RheSBhdCB0aGUNCj4gSU9MYWIgZXZlbnQgc28gdG8gY2Fw
-dHVyZSBpdDoNCj4gDQo+IE9uIDExLzcvMjAxNyAxMjo1NSBBTSwgTG9uZyBMaSB3cm90ZToNCj4g
-PiBGcm9tOiBMb25nIExpIDxsb25nbGlAbWljcm9zb2Z0LmNvbT4NCj4gPg0KPiA+IC0tLQ0KPiA+
-ICAgZnMvY2lmcy9maWxlLmMgICAgfCAxNyArKysrKysrKysrKysrKystLQ0KPiA+ICAgZnMvY2lm
-cy9zbWIycGR1LmMgfCA0NQ0KPiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKy0NCj4gPiAgIDIgZmlsZXMgY2hhbmdlZCwgNTkgaW5zZXJ0aW9ucygrKSwgMyBkZWxl
-dGlvbnMoLSkgLi4uDQo+ID4gZGlmZiAtLWdpdCBhL2ZzL2NpZnMvc21iMnBkdS5jIGIvZnMvY2lm
-cy9zbWIycGR1LmMgaW5kZXgNCj4gPiBjOGFmYjgzLi44YTVmZjkwIDEwMDY0NA0KPiA+IC0tLSBh
-L2ZzL2NpZnMvc21iMnBkdS5jDQo+ID4gKysrIGIvZnMvY2lmcy9zbWIycGR1LmMNCj4gPiBAQCAt
-MjM3OSw3ICsyMzc5LDQwIEBAIHNtYjJfbmV3X3JlYWRfcmVxKHZvaWQgKipidWYsIHVuc2lnbmVk
-IGludA0KPiAqdG90YWxfbGVuLA0KPiA+ICAgCXJlcS0+TWluaW11bUNvdW50ID0gMDsNCj4gPiAg
-IAlyZXEtPkxlbmd0aCA9IGNwdV90b19sZTMyKGlvX3Bhcm1zLT5sZW5ndGgpOw0KPiA+ICAgCXJl
-cS0+T2Zmc2V0ID0gY3B1X3RvX2xlNjQoaW9fcGFybXMtPm9mZnNldCk7DQo+ID4gKyNpZmRlZiBD
-T05GSUdfQ0lGU19TTUJfRElSRUNUDQo+ID4gKwkvKg0KPiA+ICsJICogSWYgd2Ugd2FudCB0byBk
-byBhIFJETUEgd3JpdGUsIGZpbGwgaW4gYW5kIGFwcGVuZA0KPiA+ICsJICogc21iZF9idWZmZXJf
-ZGVzY3JpcHRvcl92MSB0byB0aGUgZW5kIG9mIHJlYWQgcmVxdWVzdA0KPiA+ICsJICovDQo+ID4g
-KwlpZiAoc2VydmVyLT5yZG1hICYmIHJkYXRhICYmDQo+ID4gKwkJcmRhdGEtPmJ5dGVzID49IHNl
-cnZlci0+c21iZF9jb25uLQ0KPiA+cmRtYV9yZWFkd3JpdGVfdGhyZXNob2xkKSB7DQo+ID4gKw0K
-PiA+ICsJCXN0cnVjdCBzbWJkX2J1ZmZlcl9kZXNjcmlwdG9yX3YxICp2MTsNCj4gPiArCQlib29s
-IG5lZWRfaW52YWxpZGF0ZSA9DQo+ID4gKwkJCWlvX3Bhcm1zLT50Y29uLT5zZXMtPnNlcnZlci0+
-ZGlhbGVjdCA9PQ0KPiBTTUIzMF9QUk9UX0lEOw0KPiA+ICsNCj4gPiArCQlyZGF0YS0+bXIgPSBz
-bWJkX3JlZ2lzdGVyX21yKA0KPiA+ICsJCQkJc2VydmVyLT5zbWJkX2Nvbm4sIHJkYXRhLT5wYWdl
-cywNCj4gPiArCQkJCXJkYXRhLT5ucl9wYWdlcywgcmRhdGEtPnRhaWxzeiwNCj4gPiArCQkJCXRy
-dWUsIG5lZWRfaW52YWxpZGF0ZSk7DQo+ID4gKwkJaWYgKCFyZGF0YS0+bXIpDQo+ID4gKwkJCXJl
-dHVybiAtRU5PQlVGUzsNCj4gPiArDQo+ID4gKwkJcmVxLT5DaGFubmVsID0gU01CMl9DSEFOTkVM
-X1JETUFfVjFfSU5WQUxJREFURTsNCj4gPiArCQlpZiAobmVlZF9pbnZhbGlkYXRlKQ0KPiA+ICsJ
-CQlyZXEtPkNoYW5uZWwgPSBTTUIyX0NIQU5ORUxfUkRNQV9WMTsNCj4gPiArCQlyZXEtPlJlYWRD
-aGFubmVsSW5mb09mZnNldCA9DQo+ID4gKwkJCW9mZnNldG9mKHN0cnVjdCBzbWIyX3JlYWRfcGxh
-aW5fcmVxLCBCdWZmZXIpOw0KPiA+ICsJCXJlcS0+UmVhZENoYW5uZWxJbmZvTGVuZ3RoID0NCj4g
-PiArCQkJc2l6ZW9mKHN0cnVjdCBzbWJkX2J1ZmZlcl9kZXNjcmlwdG9yX3YxKTsNCj4gPiArCQl2
-MSA9IChzdHJ1Y3Qgc21iZF9idWZmZXJfZGVzY3JpcHRvcl92MSAqKSAmcmVxLT5CdWZmZXJbMF07
-DQo+ID4gKwkJdjEtPm9mZnNldCA9IHJkYXRhLT5tci0+bXItPmlvdmE7DQo+IA0KPiBJdCdzIHVu
-bmVjZXNzYXJ5LCBhbmQgcG9zc2libHkgbGVha2luZyBrZXJuZWwgaW5mb3JtYXRpb24sIHRvIHVz
-ZSB0aGUgSU9WQSBhcw0KPiB0aGUgb2Zmc2V0IG9mIGEgbWVtb3J5IHJlZ2lvbiB3aGljaCBpcyBy
-ZWdpc3RlcmVkIHVzaW5nIGFuIEZSV1IuIEJlY2F1c2UNCj4gc3VjaCByZWdpb25zIGFyZSBiYXNl
-ZCBvbiB0aGUgZXhhY3QgYnl0ZXMgdGFyZ2V0ZWQgYnkgdGhlIG1lbW9yeSBoYW5kbGUsDQo+IHRo
-ZSBvZmZzZXQgY2FuIGJlIHNldCB0byBhbnkgdmFsdWUsIHR5cGljYWxseSB6ZXJvLCBidXQgbmVh
-cmx5IGFyYml0cmFyeS4gQXMgbG9uZw0KPiBhcyB0aGUgKG9mZnNldCArIGxlbmd0aCkgZG9lcyBu
-b3Qgd3JhcCBvciBvdGhlcndpc2Ugb3ZlcmZsb3csIG9mZnNldCBjYW4gYmUNCj4gc2V0IHRvIGFu
-eXRoaW5nIGNvbnZlbmllbnQuDQo+IA0KPiBTaW5jZSBTTUIgcmVhZHMgYW5kIHdyaXRlcyByYW5n
-ZSB1cCB0byA4TUIsIEknZCBzdWdnZXN0IHplcm9pbmcgdGhlIGxlYXN0DQo+IHNpZ25pZmljYW50
-IDIzIGJpdHMsIHdoaWNoIHNob3VsZCBndWFyYW50ZWUgaXQuIFRoZSBvdGhlciA0MSBiaXRzLCBw
-YXJ0eSBvbi4gWW91DQo+IGNvdWxkIHJhbmRvbWl6ZSB0aGVtLCBwYXNzIHNvbWUgY2xldmVyIGlk
-ZW50aWZpZXIgc3VjaCBhcyBNSUQgc2VxdWVuY2UsDQo+IHdoYXRldmVyLg0KPiANCj4gVG9tLg0K
-DQpUaGFua3MgVG9tLiBJIHdpbGwgZml4IHRoaXMuDQoNCj4gDQo+ID4gKwkJdjEtPnRva2VuID0g
-cmRhdGEtPm1yLT5tci0+cmtleTsNCj4gPiArCQl2MS0+bGVuZ3RoID0gcmRhdGEtPm1yLT5tci0+
-bGVuZ3RoOw0K
+From: Long Li <longli@microsoft.com>
+
+When issuing SMB1 read/write, pass the page offset to transport.
+
+Signed-off-by: Long Li <longli@microsoft.com>
+---
+ fs/cifs/cifssmb.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 41329f4..f82fd34 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -1607,6 +1607,7 @@ cifs_readv_callback(struct mid_q_entry *mid)
+ 	struct smb_rqst rqst = { .rq_iov = rdata->iov,
+ 				 .rq_nvec = 2,
+ 				 .rq_pages = rdata->pages,
++				 .rq_offset = rdata->page_offset,
+ 				 .rq_npages = rdata->nr_pages,
+ 				 .rq_pagesz = rdata->pagesz,
+ 				 .rq_tailsz = rdata->tailsz };
+@@ -2210,6 +2211,7 @@ cifs_async_writev(struct cifs_writedata *wdata,
+ 	rqst.rq_iov = iov;
+ 	rqst.rq_nvec = 2;
+ 	rqst.rq_pages = wdata->pages;
++	rqst.rq_offset = wdata->page_offset;
+ 	rqst.rq_npages = wdata->nr_pages;
+ 	rqst.rq_pagesz = wdata->pagesz;
+ 	rqst.rq_tailsz = wdata->tailsz;
+-- 
+2.7.4
