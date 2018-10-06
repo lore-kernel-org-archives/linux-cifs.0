@@ -1,30 +1,35 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH net-next] dns: Allow the dns resolver to retrieve a
- server set
-Date: Thu, 04 Oct 2018 09:42:24 -0700 (PDT)
-Message-ID: <20181004.094224.1068745934757143781.davem@davemloft.net>
-References: <153865967530.25761.13226347009462917363.stgit@warthog.procyon.org.uk>
+From: Steve French <smfrench@gmail.com>
+Subject: Re: [PATCH] fs/cifs: fix uninitialised variable warnings
+Date: Fri, 5 Oct 2018 19:28:49 -0500
+Message-ID: <CAH2r5msx5u4ouE-GuCE4P1LJ3ResLh-mD-3YTCnhBa8pwTCmoA@mail.gmail.com>
+References: <20181003195121.6059-1-garrmcnu@gmail.com> <87va6i5dpo.fsf@suse.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: netdev@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org
-To: dhowells@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Cc: garrmcnu@gmail.com, CIFS <linux-cifs@vger.kernel.org>,
+        Steve French <sfrench@samba.org>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>
+To: =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <153865967530.25761.13226347009462917363.stgit@warthog.procyon.org.uk>
+In-Reply-To: <87va6i5dpo.fsf@suse.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-From: David Howells <dhowells@redhat.com>
-Date: Thu, 04 Oct 2018 14:27:55 +0100
+merged into cifs-2.6.git for-next
+On Thu, Oct 4, 2018 at 3:16 AM Aur=C3=A9lien Aptel <aaptel@suse.com> wrote:
+>
+> Reviewed-by: Aurelien Aptel <aaptel@suse.com>
+> --
+> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+> SUSE Linux GmbH, Maxfeldstra=C3=9Fe 5, 90409 N=C3=BCrnberg, Germany
+> GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton, HRB 21284 (AG N=
+=C3=BCrnberg)
 
-> Allow the DNS resolver to retrieve a set of servers and their associated
-> addresses, ports, preference and weight ratings.
- ...
-> This can then be used to fetch a whole cell's VL-server configuration for
-> AFS, for example.
-> 
-> Signed-off-by: David Howells <dhowells@redhat.com>
 
-Applied, thanks David.
+
+--=20
+Thanks,
+
+Steve
