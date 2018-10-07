@@ -1,70 +1,85 @@
-From: Rodrigo Freire <rfreire@redhat.com>
-Subject: Re: [PATCH v3 0/2] CIFS: Info-level log support, print message when attempting mount.
-Date: Sun, 7 Oct 2018 16:27:21 -0400 (EDT)
-Message-ID: <9006BE8A-38BB-4249-BEBA-C0DB34560885@redhat.com>
+From: Steve French <smfrench@gmail.com>
+Subject: Re: [PATCH v3 0/2] CIFS: Info-level log support, print message when
+ attempting mount.
+Date: Sun, 7 Oct 2018 16:06:35 -0500
+Message-ID: <CAH2r5msPHc4qup7W=9Pt3PTATtEAN8QcgXQ8Y3r1mZdq1=T7xw@mail.gmail.com>
 References: <cover.1538873915.git.rfreire@redhat.com> <CAH2r5muEpTd4xG7oWV5BdA12AOogqscEnFdbUri9C=MFHrN_gQ@mail.gmail.com>
+ <9006BE8A-38BB-4249-BEBA-C0DB34560885@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
-        charset=utf-8
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Cc: LKML <linux-kernel@vger.kernel.org>,
         Steve French <sfrench@samba.org>,
         CIFS <linux-cifs@vger.kernel.org>,
         Pavel Shilovsky <piastryyy@gmail.com>
-To: Steve French <smfrench@gmail.com>
+To: rfreire@redhat.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAH2r5muEpTd4xG7oWV5BdA12AOogqscEnFdbUri9C=MFHrN_gQ@mail.gmail.com>
+In-Reply-To: <9006BE8A-38BB-4249-BEBA-C0DB34560885@redhat.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-VGhhbmtzIFN0ZXZlISBTb3JyeSBmb3Igb3Zlcmxvb2tpbmcgaXQsIHdob29wcy4NCg0KT25lIG1v
-cmUgcXVlc3Rpb247IHdoYXTigJlzIHlvdXIvY29tbXVuaXR5IG9waW5pb24gb24gcmV3cml0aW5n
-IHRoZSBleGlzdGluZyBwcl9ub3RpY2UgdG8gdGhlIG5ldyBjaWZzX2luZm8/DQoNCkkgY291bGQg
-aGFwcGlseSByZXRyb2ZpdCBpdC4NCg0KSGF2ZSBhIGdyZWF0IHdlZWshDQoNCi0gUkYNClNlbnQg
-ZnJvbSBhIG1vYmlsZSBkZXZpY2UNCg0KPiBPbiA3IE9jdCAyMDE4LCBhdCAxNTo1OSwgU3RldmUg
-RnJlbmNoIDxzbWZyZW5jaEBnbWFpbC5jb20+IHdyb3RlOg0KPiANCj4gTWVyZ2VkIGludG8gY2lm
-cy0yLjYuZ2l0IGZvci1uZXh0DQo+IA0KPiBNYWRlIGEgdHJpdmlhbCB0YWIvc3BhY2UgY29ycmVj
-dGlvbiBpbiB0aGUgcGF0Y2ggKHBvaW50ZWQgb3V0IGJ5DQo+IGNoZWNrcGF0Y2gpIGFuZCB0aGVu
-IGFkZGVkIGEgdHJpdmlhbCBmb2xsb3dvbiBwYXRjaCB0byBhZGRyZXNzIGENCj4gY29tbWVudC9z
-dHlsZSAodHJpdmlhbCkNCj4gaXNzdWUgcG9pbnRlZCBvdXQgYnkgY2hlY2twYXRjaCBhbmQgdG8g
-YWRkIGEgbGl0dGxlIG1vcmUgZGV0YWlsZWQNCj4gY29tbWVudHMgYWJvdXQgZ2VuZXJhbGx5IHdo
-ZW4gdG8gdXNlIGVhY2ggZGVidWcgZnVuY3Rpb24uICBJZiBhbnkNCj4gb2JqZWN0aW9ucyBsZXQg
-bWUga25vdy4NCj4gDQo+IA0KPj4gT24gU3VuLCBPY3QgNywgMjAxOCBhdCAxMDoyMSBBTSBSb2Ry
-aWdvIEZyZWlyZSA8cmZyZWlyZUByZWRoYXQuY29tPiB3cm90ZToNCj4+IA0KPj4gSGkgU3RldmUs
-DQo+PiBGcm9tIG91ciBjb252ZXJzYXRpb24gb3ZlciB2MiwgSSBjYW1lIG91dCB3aXRoIHRoaXMg
-djMgcGF0Y2gsIHdoaWNoIEkgYnJva2UNCj4+IGluIHR3byBjb21taXRzOg0KPj4gDQo+PiAqIFRo
-ZSBmaXJzdCBjb21taXQgaW4gY2lmc19kZWJ1Zy5oLCBjcmVhdGluZyB0aGUgY2lmc19pbmZvKCkg
-ZnVuY3Rpb24uDQo+PiAgLSBUaGUgYWltIG9mIHRoaXMgY29tbWl0IGlzIHRvIGFsbG93IHRvIHRo
-ZSBkZXZlbG9wZXIgdG8gYmUgYWJsZSB0byBwcmludA0KPj4gICAgaW5mb3JtYXRpb25hbC1sZXZl
-bCBkYXRhIHdpdGhvdXQgaGF2aW5nIHRvIHVzZSBwcl9pbmZvLCBwcl9ub3RpY2UgZXRjLA0KPj4g
-ICAgaW4gbGluZSB3aXRoIG90aGVyIGZpbGVzeXN0ZW1zLg0KPj4gICAgLiBPbmUgaW50ZXJlc3Rp
-bmcgYW5kIG5vdGV3b3J0aHkgZmVhdHVyZSBvZiBjaWZzX2luZm8oKSBpcyB0aGF0IGl0IGlzDQo+
-PiAgICAgIHRyYW5zcGFyZW50IHRvIHRoZSBDSUZTX0RFQlVHIGNvbmZpZyBzdGF0ZSwgZWl0aGVy
-IGluICJ5IiBvciAibiIuDQo+PiAgICAuIEFsc28sIGJ5IHVzaW5nIEtFUk5fSU5GTyBsZXZlbCwg
-aXQgY2FuIGJlIHNhZmVseSBmaWx0ZXJlZCBieSBhDQo+PiAgICAgIG1haW50YWluZXIgLyBhZG1p
-bmlzdHJhdG9yLCB3aXRob3V0IGNsdXR0ZXJpbmcgdGhlaXIgbG9nIG1vbml0b3JzLA0KPj4gICAg
-ICBzaW5jZSB0aGlzIGlzIGEgbG93IGxldmVsIGFsZXJ0Lg0KPj4gIC0gSSB0b29rIHRoZSBsaWJl
-cnR5IHRvIG5vdCBhZGQgaXQgaW5zaWRlIHRoZSBleGlzdGluZyBwcl9kZWJ1ZywgYmVjYXVzZQ0K
-Pj4gICAgb2YgdGhlIGV2ZW50dWFsIG5lZWQgb2Ygc29tZSBkZXZlbG9wZXIgdG8gcHJpbnQgc3R1
-ZmYgdGhhdCBzaG91bGQgYmUNCj4+ICAgIHByaW50ZWQgbm90IG9ubHkgaW4gQ0lGU19ERUJVRyBt
-b2RlIChhcyB0aGVyZSBhcmUgcGxlbnR5IG9mIHByX25vdGljZQ0KPj4gICAgc2NhdHRlcmVkIG92
-ZXIgdGhlIGNvZGUpLg0KPj4gIC0gQWxzbywgdGhpcyBpcyBub3QgYSBkZWJ1ZyBidXQgYSBpbmZv
-IG1lc3NhZ2UsIHNvIGkgbGlrZWQgY2lmc19pbmZvKCkNCj4+ICAgIG1vcmUgOy0pDQo+PiAgLSBJ
-IHNhdyBwbGVudHkgb2YgcHJfbm90aWNlKCkgaW4gQ0lGUyBjb2RlLCBidXQgSSByZXNpc3RlZCB0
-aGUgdXJnZSB0bw0KPj4gICAgY29udmVydCB0aGVtIHRvIGNpZnNfaW5mbygpLg0KPj4gDQo+PiAq
-IFRoZSBzZWNvbmQgY29tbWl0IGNvbnRhaW5zIHRoZSBjb2RlIHByaW50aW5nIGEgY2lmc19pbmZv
-KCkgd2hlbiBhdHRlbXB0aW5nDQo+PiAgYSBDSUZTIG1vdW50IG9wZXJhdGlvbi4NCj4+IA0KPj4g
-QXBwcmVjaWF0ZSB5b3VyIHJldmlldy4NCj4+IA0KPj4gVjM6IENyZWF0ZWQgYSBuZXcgY2lmc19p
-bmZvKCkgZnVuY3Rpb24sIG1vdmVkIHRoZSBtb3VudCBhdHRlbXB0IG1lc3NhZ2UgdG8NCj4+ICAg
-IGNpZnNfaW5mbw0KPj4gDQo+PiBWMjogQ3JlYXRlZCBhIGxvb3AgdG8gc2VsZWN0IHRoZSByaWdo
-dCBjaWZzX2RiZyBtZXNzYWdlIHRvIGJlIHByaW50ZWQsDQo+PiAgICBjb25zaWRlcmluZyB0aGUg
-Y3VycmVudCBzeXN0ZW0ncyBzY2VuYXJpbywgaW4gb3JkZXIgdG8gYXZvaWQgYQ0KPj4gICAgZHVw
-bGljYXRlIG1lc3NhZ2Ugb3Igc3RyaXBwaW5nIG91dCBpbXBvcnRhbnQgaW5mb3JtYXRpb24gaW4N
-Cj4+ICAgIGRlYnVnLg0KPj4gDQo+PiBSb2RyaWdvIEZyZWlyZSAoMik6DQo+PiAgQ0lGUzogQWRk
-cyBpbmZvcm1hdGlvbi1sZXZlbCBsb2dnaW5nIGZ1bmN0aW9uDQo+PiAgQ0lGUzogUHJpbnQgbWVz
-c2FnZSB3aGVuIGF0dGVtcHRpbmcgYSBtb3VudA0KPj4gDQo+PiBmcy9jaWZzL2NpZnNfZGVidWcu
-aCB8IDE2ICsrKysrKysrKysrKysrKysNCj4+IGZzL2NpZnMvY2lmc2ZzLmMgICAgIHwgIDcgKysr
-KysrLQ0KPj4gZnMvY2lmcy90cmFuc3BvcnQuYyAgfCAgMiArLQ0KPj4gMyBmaWxlcyBjaGFuZ2Vk
-LCAyMyBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQ0KPj4gDQo+PiAtLQ0KPj4gMS44LjMu
-MQ0KPj4gDQo+IA0KPiANCj4gLS0gDQo+IFRoYW5rcywNCj4gDQo+IFN0ZXZlDQo+IDwwMDAxLWNp
-ZnMtbWlub3ItY2xhcmlmaWNhdGlvbi1pbi1jb21tZW50cy5wYXRjaD4NCg==
+On Sun, Oct 7, 2018 at 3:27 PM Rodrigo Freire <rfreire@redhat.com> wrote:
+>
+> Thanks Steve! Sorry for overlooking it, whoops.
+>
+> One more question; what=E2=80=99s your/community opinion on rewriting the=
+ existing pr_notice to the new cifs_info?
+>
+> I could happily retrofit it.
+
+I don't have a strong opinion. The four callers could be changed, but
+my gut reaction
+is that it is a much higher priority to add useful dynamic tracepoints
+(ftrace ie trace-cmd)
+to cifs to make it easier to debug real customer problems that are
+currently awkward to
+debug.   By comparison, even ext4 has over 100 dynamic tracepoints, but lar=
+ger
+file systems like XFS has 500 (!), and nfs (including SunRPC) has about 100=
+.
+
+My guess is that going from our current 28 dynamic trace points (in
+cifs.ko) to double
+that (at least) will happen as developers add tracepoints to help them
+debug real
+problems (and of course it will help developers working on future problems =
+even
+more ...)
+
+
+> > On 7 Oct 2018, at 15:59, Steve French <smfrench@gmail.com> wrote:
+> >
+> > Merged into cifs-2.6.git for-next
+> >
+> > Made a trivial tab/space correction in the patch (pointed out by
+> > checkpatch) and then added a trivial followon patch to address a
+> > comment/style (trivial)
+> > issue pointed out by checkpatch and to add a little more detailed
+> > comments about generally when to use each debug function.  If any
+> > objections let me know.
+> >
+> >
+> >> On Sun, Oct 7, 2018 at 10:21 AM Rodrigo Freire <rfreire@redhat.com> wr=
+ote:
+> >>
+> >> Hi Steve,
+> >> From our conversation over v2, I came out with this v3 patch, which I =
+broke
+> >> in two commits:
+> >>
+> >> * The first commit in cifs_debug.h, creating the cifs_info() function.
+> >>  - The aim of this commit is to allow to the developer to be able to p=
+rint
+> >>    informational-level data without having to use pr_info, pr_notice e=
+tc,
+> >>    in line with other filesystems.
+> >>    . One interesting and noteworthy feature of cifs_info() is that it =
+is
+> >>      transparent to the CIFS_DEBUG config state, either in "y" or "n".
+<snip>
+
+
+--=20
+Thanks,
+
+Steve
