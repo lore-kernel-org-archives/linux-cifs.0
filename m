@@ -1,132 +1,70 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH v3 0/2] CIFS: Info-level log support, print message when
- attempting mount.
-Date: Sun, 7 Oct 2018 13:58:48 -0500
-Message-ID: <CAH2r5muEpTd4xG7oWV5BdA12AOogqscEnFdbUri9C=MFHrN_gQ@mail.gmail.com>
-References: <cover.1538873915.git.rfreire@redhat.com>
+From: Rodrigo Freire <rfreire@redhat.com>
+Subject: Re: [PATCH v3 0/2] CIFS: Info-level log support, print message when attempting mount.
+Date: Sun, 7 Oct 2018 16:27:21 -0400 (EDT)
+Message-ID: <9006BE8A-38BB-4249-BEBA-C0DB34560885@redhat.com>
+References: <cover.1538873915.git.rfreire@redhat.com> <CAH2r5muEpTd4xG7oWV5BdA12AOogqscEnFdbUri9C=MFHrN_gQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="000000000000f772d50577a81857"
+Content-Type: text/plain;
+        charset=utf-8
+Content-Transfer-Encoding: base64
 Cc: LKML <linux-kernel@vger.kernel.org>,
         Steve French <sfrench@samba.org>,
         CIFS <linux-cifs@vger.kernel.org>,
         Pavel Shilovsky <piastryyy@gmail.com>
-To: rfreire@redhat.com
+To: Steve French <smfrench@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <cover.1538873915.git.rfreire@redhat.com>
+In-Reply-To: <CAH2r5muEpTd4xG7oWV5BdA12AOogqscEnFdbUri9C=MFHrN_gQ@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
---000000000000f772d50577a81857
-Content-Type: text/plain; charset="UTF-8"
-
-Merged into cifs-2.6.git for-next
-
-Made a trivial tab/space correction in the patch (pointed out by
-checkpatch) and then added a trivial followon patch to address a
-comment/style (trivial)
-issue pointed out by checkpatch and to add a little more detailed
-comments about generally when to use each debug function.  If any
-objections let me know.
-
-
-On Sun, Oct 7, 2018 at 10:21 AM Rodrigo Freire <rfreire@redhat.com> wrote:
->
-> Hi Steve,
-> From our conversation over v2, I came out with this v3 patch, which I broke
-> in two commits:
->
-> * The first commit in cifs_debug.h, creating the cifs_info() function.
->   - The aim of this commit is to allow to the developer to be able to print
->     informational-level data without having to use pr_info, pr_notice etc,
->     in line with other filesystems.
->     . One interesting and noteworthy feature of cifs_info() is that it is
->       transparent to the CIFS_DEBUG config state, either in "y" or "n".
->     . Also, by using KERN_INFO level, it can be safely filtered by a
->       maintainer / administrator, without cluttering their log monitors,
->       since this is a low level alert.
->   - I took the liberty to not add it inside the existing pr_debug, because
->     of the eventual need of some developer to print stuff that should be
->     printed not only in CIFS_DEBUG mode (as there are plenty of pr_notice
->     scattered over the code).
->   - Also, this is not a debug but a info message, so i liked cifs_info()
->     more ;-)
->   - I saw plenty of pr_notice() in CIFS code, but I resisted the urge to
->     convert them to cifs_info().
->
-> * The second commit contains the code printing a cifs_info() when attempting
->   a CIFS mount operation.
->
-> Appreciate your review.
->
-> V3: Created a new cifs_info() function, moved the mount attempt message to
->     cifs_info
->
-> V2: Created a loop to select the right cifs_dbg message to be printed,
->     considering the current system's scenario, in order to avoid a
->     duplicate message or stripping out important information in
->     debug.
->
-> Rodrigo Freire (2):
->   CIFS: Adds information-level logging function
->   CIFS: Print message when attempting a mount
->
->  fs/cifs/cifs_debug.h | 16 ++++++++++++++++
->  fs/cifs/cifsfs.c     |  7 ++++++-
->  fs/cifs/transport.c  |  2 +-
->  3 files changed, 23 insertions(+), 2 deletions(-)
->
-> --
-> 1.8.3.1
->
-
-
--- 
-Thanks,
-
-Steve
-
---000000000000f772d50577a81857
-Content-Type: text/x-patch; charset="US-ASCII";
-	name="0001-cifs-minor-clarification-in-comments.patch"
-Content-Disposition: attachment;
-	filename="0001-cifs-minor-clarification-in-comments.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_jmz8cyrj0>
-X-Attachment-Id: f_jmz8cyrj0
-
-RnJvbSA0YzkzOTM0NGY5NGEyNzNhMWVhYjg5Y2Y1OGY3NGM5YWQ2OGE4YThkIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFN1biwgNyBPY3QgMjAxOCAxMzo1MjoxOCAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIGNp
-ZnM6IG1pbm9yIGNsYXJpZmljYXRpb24gaW4gY29tbWVudHMKCkNsYXJpZnkgbWVhbmluZyAoaW4g
-Y29tbWVudHMpIG1lYW5pbmcgb2YgdmFyaW91cwpvcHRpb25zIGZvciBkZWJ1ZyBtZXNzYWdlcyBp
-biBjaWZzLmtvLiBBbHNvIGZpeGVkCnRyaXZpYWwgZm9ybWF0dGluZy9zdHlsZSBpc3N1ZSB3aXRo
-IHByZXZpb3VzIHBhdGNoLgoKU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5jaEBt
-aWNyb3NvZnQuY29tPgotLS0KIGZzL2NpZnMvY2lmc19kZWJ1Zy5oIHwgMTIgKysrKysrKysrKysr
-CiBmcy9jaWZzL2NpZnNmcy5jICAgICB8ICA2ICsrKystLQogMiBmaWxlcyBjaGFuZ2VkLCAxNiBp
-bnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc19k
-ZWJ1Zy5oIGIvZnMvY2lmcy9jaWZzX2RlYnVnLmgKaW5kZXggNzJkYjI5ODdlMDY2Li42MzFkYzFi
-YjIxYzEgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvY2lmc19kZWJ1Zy5oCisrKyBiL2ZzL2NpZnMvY2lm
-c19kZWJ1Zy5oCkBAIC00Nyw2ICs0NywxOCBAQCBleHRlcm4gaW50IGNpZnNGWUk7CiAgKi8KICNp
-ZmRlZiBDT05GSUdfQ0lGU19ERUJVRwogCisKKy8qCisgKiBXaGVuIGFkZGluZyB0cmFjZXBvaW50
-cyBhbmQgZGVidWcgbWVzc2FnZXMgd2UgaGF2ZSB2YXJpb3VzIGNob2ljZXMuCisgKiBTb21lIGNv
-bnNpZGVyYXRpb25zOgorICoKKyAqIFVzZSBjaWZzX2RiZyhWRlMsIC4uLikgZm9yIHRoaW5ncyB3
-ZSBhbHdheXMgd2FudCBsb2dnZWQsIGFuZCB0aGUgdXNlciB0byBzZWUKKyAqICAgICBjaWZzX2lu
-Zm8oLi4uKSBzbGlnaHRseSBsZXNzIGltcG9ydGFudCwgYWRtaW4gY2FuIGZpbHRlciB2aWEgbG9n
-bGV2ZWwgPiA2CisgKiAgICAgY2lmc19kYmcoRllJLCAuLi4pIG1pbm9yIGRlYnVnZ2luZyBtZXNz
-YWdlcywgb2ZmIGJ5IGRlZmF1bHQKKyAqICAgICB0cmFjZV9zbWIzXyogIGZ0cmFjZSBmdW5jdGlv
-bnMgYXJlIHByZWZlcnJlZCBmb3IgY29tcGxleCBkZWJ1ZyBtZXNzYWdlcworICogICAgICAgICAg
-ICAgICAgIGludGVuZGVkIGZvciBkZXZlbG9wZXJzIG9yIGV4cGVyaWVuY2VkIGFkbWlucywgb2Zm
-IGJ5IGRlZmF1bHQKKyAqLworCiAvKiBJbmZvcm1hdGlvbiBsZXZlbCBtZXNzYWdlcywgbWlub3Ig
-ZXZlbnRzICovCiAjZGVmaW5lIGNpZnNfaW5mb19mdW5jKHJhdGVmdW5jLCBmbXQsIC4uLikJCQlc
-CiBkbyB7CQkJCQkJCQlcCmRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNmcy5jIGIvZnMvY2lmcy9j
-aWZzZnMuYwppbmRleCBkNzhhMzE1NjA5OTUuLjdkZTk2MDNjNTRmMSAxMDA2NDQKLS0tIGEvZnMv
-Y2lmcy9jaWZzZnMuYworKysgYi9mcy9jaWZzL2NpZnNmcy5jCkBAIC03MTcsOCArNzE3LDEwIEBA
-IGNpZnNfc21iM19kb19tb3VudChzdHJ1Y3QgZmlsZV9zeXN0ZW1fdHlwZSAqZnNfdHlwZSwKIAlz
-dHJ1Y3QgY2lmc19tbnRfZGF0YSBtbnRfZGF0YTsKIAlzdHJ1Y3QgZGVudHJ5ICpyb290OwogCi0J
-LyogUHJpbnRzIGluIEtlcm5lbCAvIENJRlMgbG9nIHRoZSBhdHRlbXB0ZWQgbW91bnQgb3BlcmF0
-aW9uICoKLQkgKglJRiBDSUZTX0RFQlVHICYmIGNpZnNfRllJICovCisJLyoKKwkgKiBQcmludHMg
-aW4gS2VybmVsIC8gQ0lGUyBsb2cgdGhlIGF0dGVtcHRlZCBtb3VudCBvcGVyYXRpb24KKwkgKglJ
-ZiBDSUZTX0RFQlVHICYmIGNpZnNfRllJCisJICovCiAJaWYgKGNpZnNGWUkpCiAJCWNpZnNfZGJn
-KEZZSSwgIkRldm5hbWU6ICVzIGZsYWdzOiAlZFxuIiwgZGV2X25hbWUsIGZsYWdzKTsKIAllbHNl
-Ci0tIAoyLjE3LjEKCg==
---000000000000f772d50577a81857--
+VGhhbmtzIFN0ZXZlISBTb3JyeSBmb3Igb3Zlcmxvb2tpbmcgaXQsIHdob29wcy4NCg0KT25lIG1v
+cmUgcXVlc3Rpb247IHdoYXTigJlzIHlvdXIvY29tbXVuaXR5IG9waW5pb24gb24gcmV3cml0aW5n
+IHRoZSBleGlzdGluZyBwcl9ub3RpY2UgdG8gdGhlIG5ldyBjaWZzX2luZm8/DQoNCkkgY291bGQg
+aGFwcGlseSByZXRyb2ZpdCBpdC4NCg0KSGF2ZSBhIGdyZWF0IHdlZWshDQoNCi0gUkYNClNlbnQg
+ZnJvbSBhIG1vYmlsZSBkZXZpY2UNCg0KPiBPbiA3IE9jdCAyMDE4LCBhdCAxNTo1OSwgU3RldmUg
+RnJlbmNoIDxzbWZyZW5jaEBnbWFpbC5jb20+IHdyb3RlOg0KPiANCj4gTWVyZ2VkIGludG8gY2lm
+cy0yLjYuZ2l0IGZvci1uZXh0DQo+IA0KPiBNYWRlIGEgdHJpdmlhbCB0YWIvc3BhY2UgY29ycmVj
+dGlvbiBpbiB0aGUgcGF0Y2ggKHBvaW50ZWQgb3V0IGJ5DQo+IGNoZWNrcGF0Y2gpIGFuZCB0aGVu
+IGFkZGVkIGEgdHJpdmlhbCBmb2xsb3dvbiBwYXRjaCB0byBhZGRyZXNzIGENCj4gY29tbWVudC9z
+dHlsZSAodHJpdmlhbCkNCj4gaXNzdWUgcG9pbnRlZCBvdXQgYnkgY2hlY2twYXRjaCBhbmQgdG8g
+YWRkIGEgbGl0dGxlIG1vcmUgZGV0YWlsZWQNCj4gY29tbWVudHMgYWJvdXQgZ2VuZXJhbGx5IHdo
+ZW4gdG8gdXNlIGVhY2ggZGVidWcgZnVuY3Rpb24uICBJZiBhbnkNCj4gb2JqZWN0aW9ucyBsZXQg
+bWUga25vdy4NCj4gDQo+IA0KPj4gT24gU3VuLCBPY3QgNywgMjAxOCBhdCAxMDoyMSBBTSBSb2Ry
+aWdvIEZyZWlyZSA8cmZyZWlyZUByZWRoYXQuY29tPiB3cm90ZToNCj4+IA0KPj4gSGkgU3RldmUs
+DQo+PiBGcm9tIG91ciBjb252ZXJzYXRpb24gb3ZlciB2MiwgSSBjYW1lIG91dCB3aXRoIHRoaXMg
+djMgcGF0Y2gsIHdoaWNoIEkgYnJva2UNCj4+IGluIHR3byBjb21taXRzOg0KPj4gDQo+PiAqIFRo
+ZSBmaXJzdCBjb21taXQgaW4gY2lmc19kZWJ1Zy5oLCBjcmVhdGluZyB0aGUgY2lmc19pbmZvKCkg
+ZnVuY3Rpb24uDQo+PiAgLSBUaGUgYWltIG9mIHRoaXMgY29tbWl0IGlzIHRvIGFsbG93IHRvIHRo
+ZSBkZXZlbG9wZXIgdG8gYmUgYWJsZSB0byBwcmludA0KPj4gICAgaW5mb3JtYXRpb25hbC1sZXZl
+bCBkYXRhIHdpdGhvdXQgaGF2aW5nIHRvIHVzZSBwcl9pbmZvLCBwcl9ub3RpY2UgZXRjLA0KPj4g
+ICAgaW4gbGluZSB3aXRoIG90aGVyIGZpbGVzeXN0ZW1zLg0KPj4gICAgLiBPbmUgaW50ZXJlc3Rp
+bmcgYW5kIG5vdGV3b3J0aHkgZmVhdHVyZSBvZiBjaWZzX2luZm8oKSBpcyB0aGF0IGl0IGlzDQo+
+PiAgICAgIHRyYW5zcGFyZW50IHRvIHRoZSBDSUZTX0RFQlVHIGNvbmZpZyBzdGF0ZSwgZWl0aGVy
+IGluICJ5IiBvciAibiIuDQo+PiAgICAuIEFsc28sIGJ5IHVzaW5nIEtFUk5fSU5GTyBsZXZlbCwg
+aXQgY2FuIGJlIHNhZmVseSBmaWx0ZXJlZCBieSBhDQo+PiAgICAgIG1haW50YWluZXIgLyBhZG1p
+bmlzdHJhdG9yLCB3aXRob3V0IGNsdXR0ZXJpbmcgdGhlaXIgbG9nIG1vbml0b3JzLA0KPj4gICAg
+ICBzaW5jZSB0aGlzIGlzIGEgbG93IGxldmVsIGFsZXJ0Lg0KPj4gIC0gSSB0b29rIHRoZSBsaWJl
+cnR5IHRvIG5vdCBhZGQgaXQgaW5zaWRlIHRoZSBleGlzdGluZyBwcl9kZWJ1ZywgYmVjYXVzZQ0K
+Pj4gICAgb2YgdGhlIGV2ZW50dWFsIG5lZWQgb2Ygc29tZSBkZXZlbG9wZXIgdG8gcHJpbnQgc3R1
+ZmYgdGhhdCBzaG91bGQgYmUNCj4+ICAgIHByaW50ZWQgbm90IG9ubHkgaW4gQ0lGU19ERUJVRyBt
+b2RlIChhcyB0aGVyZSBhcmUgcGxlbnR5IG9mIHByX25vdGljZQ0KPj4gICAgc2NhdHRlcmVkIG92
+ZXIgdGhlIGNvZGUpLg0KPj4gIC0gQWxzbywgdGhpcyBpcyBub3QgYSBkZWJ1ZyBidXQgYSBpbmZv
+IG1lc3NhZ2UsIHNvIGkgbGlrZWQgY2lmc19pbmZvKCkNCj4+ICAgIG1vcmUgOy0pDQo+PiAgLSBJ
+IHNhdyBwbGVudHkgb2YgcHJfbm90aWNlKCkgaW4gQ0lGUyBjb2RlLCBidXQgSSByZXNpc3RlZCB0
+aGUgdXJnZSB0bw0KPj4gICAgY29udmVydCB0aGVtIHRvIGNpZnNfaW5mbygpLg0KPj4gDQo+PiAq
+IFRoZSBzZWNvbmQgY29tbWl0IGNvbnRhaW5zIHRoZSBjb2RlIHByaW50aW5nIGEgY2lmc19pbmZv
+KCkgd2hlbiBhdHRlbXB0aW5nDQo+PiAgYSBDSUZTIG1vdW50IG9wZXJhdGlvbi4NCj4+IA0KPj4g
+QXBwcmVjaWF0ZSB5b3VyIHJldmlldy4NCj4+IA0KPj4gVjM6IENyZWF0ZWQgYSBuZXcgY2lmc19p
+bmZvKCkgZnVuY3Rpb24sIG1vdmVkIHRoZSBtb3VudCBhdHRlbXB0IG1lc3NhZ2UgdG8NCj4+ICAg
+IGNpZnNfaW5mbw0KPj4gDQo+PiBWMjogQ3JlYXRlZCBhIGxvb3AgdG8gc2VsZWN0IHRoZSByaWdo
+dCBjaWZzX2RiZyBtZXNzYWdlIHRvIGJlIHByaW50ZWQsDQo+PiAgICBjb25zaWRlcmluZyB0aGUg
+Y3VycmVudCBzeXN0ZW0ncyBzY2VuYXJpbywgaW4gb3JkZXIgdG8gYXZvaWQgYQ0KPj4gICAgZHVw
+bGljYXRlIG1lc3NhZ2Ugb3Igc3RyaXBwaW5nIG91dCBpbXBvcnRhbnQgaW5mb3JtYXRpb24gaW4N
+Cj4+ICAgIGRlYnVnLg0KPj4gDQo+PiBSb2RyaWdvIEZyZWlyZSAoMik6DQo+PiAgQ0lGUzogQWRk
+cyBpbmZvcm1hdGlvbi1sZXZlbCBsb2dnaW5nIGZ1bmN0aW9uDQo+PiAgQ0lGUzogUHJpbnQgbWVz
+c2FnZSB3aGVuIGF0dGVtcHRpbmcgYSBtb3VudA0KPj4gDQo+PiBmcy9jaWZzL2NpZnNfZGVidWcu
+aCB8IDE2ICsrKysrKysrKysrKysrKysNCj4+IGZzL2NpZnMvY2lmc2ZzLmMgICAgIHwgIDcgKysr
+KysrLQ0KPj4gZnMvY2lmcy90cmFuc3BvcnQuYyAgfCAgMiArLQ0KPj4gMyBmaWxlcyBjaGFuZ2Vk
+LCAyMyBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQ0KPj4gDQo+PiAtLQ0KPj4gMS44LjMu
+MQ0KPj4gDQo+IA0KPiANCj4gLS0gDQo+IFRoYW5rcywNCj4gDQo+IFN0ZXZlDQo+IDwwMDAxLWNp
+ZnMtbWlub3ItY2xhcmlmaWNhdGlvbi1pbi1jb21tZW50cy5wYXRjaD4NCg==
