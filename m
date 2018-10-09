@@ -1,32 +1,54 @@
 From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: Re: [PATCH v2] smb2: fix uninitialized variable bug in
+Subject: [PATCH v3] smb2: fix uninitialized variable bug in
  smb2_ioctl_query_info
-Date: Tue, 9 Oct 2018 23:53:17 +0200
-Message-ID: <507142d7-d630-8eb3-9e0a-b2fa90e38d23@embeddedor.com>
-References: <20181009201748.GA21025@embeddedor.com>
- <716967702.32689579.1539121620152.JavaMail.zimbra@redhat.com>
+Date: Wed, 10 Oct 2018 00:02:20 +0200
+Message-ID: <20181009220220.GA24569@embeddedor.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
-To: Ronnie Sahlberg <lsahlber@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+To: Steve French <sfrench@samba.org>,
+        Ronnie Sahlberg <lsahlber@redhat.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <716967702.32689579.1539121620152.JavaMail.zimbra@redhat.com>
-Content-Language: en-GB
+Content-Disposition: inline
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Hey Ronnie,
+There is a potential execution path in which variable *resp_buftype*
+is passed as an argument to function free_rsp_buf(), in which it is
+used in a comparison without being properly initialized previously.
 
-On 10/9/18 11:47 PM, Ronnie Sahlberg wrote:
-> Good catch, but I think it should be :
-> 
-> int resp_buftype = CIFS_NO_BUFFER;
->
+Fix this by initializing variable *resp_buftype* to CIFS_NO_BUFFER
+in order to avoid unpredictable or unintended results.
 
-Oh okay. I'll send v3 shortly.
+Addresses-Coverity-ID: 1473971 ("Uninitialized scalar variable")
+Fixes: c5d25bdb2967 ("cifs: add IOCTL for QUERY_INFO passthrough to userspace")
+Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+---
+Changes in v3:
+ - Initialize resp_buftype to CIFS_NO_BUFFER instead of to -1.
+   Thanks to Ronnie Sahlberg for pointing this out.
 
-Thanks for the feedback.
---
-Gustavo
+Changes in v2:
+ - Fix Coverity and Fixes tag.
+ - Update commit log.
+
+ fs/cifs/smb2ops.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index c6c6450d..8472cb0 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -1133,7 +1133,7 @@ smb2_ioctl_query_info(const unsigned int xid,
+ 	struct smb_rqst rqst;
+ 	struct kvec iov[1];
+ 	struct kvec rsp_iov;
+-	int resp_buftype;
++	int resp_buftype = CIFS_NO_BUFFER;
+ 	struct smb2_query_info_rsp *rsp = NULL;
+ 	void *buffer;
+ 
+-- 
+2.7.4
