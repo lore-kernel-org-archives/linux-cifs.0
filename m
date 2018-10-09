@@ -1,19 +1,31 @@
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [PATCH v2] smb2: fix uninitialized variable bug in
+From: Ronnie Sahlberg <lsahlber@redhat.com>
+Subject: Re: [PATCH v2] smb2: fix uninitialized variable bug in
  smb2_ioctl_query_info
-Date: Tue, 9 Oct 2018 22:17:48 +0200
-Message-ID: <20181009201748.GA21025@embeddedor.com>
+Date: Tue, 9 Oct 2018 17:47:00 -0400 (EDT)
+Message-ID: <716967702.32689579.1539121620152.JavaMail.zimbra@redhat.com>
+References: <20181009201748.GA21025@embeddedor.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To: Steve French <sfrench@samba.org>,
-        Ronnie Sahlberg <lsahlber@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
+In-Reply-To: <20181009201748.GA21025@embeddedor.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
+
+Good catch, but I think it should be :
+
+int resp_buftype = CIFS_NO_BUFFER;
+
+
+----- Original Message -----
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+To: "Steve French" <sfrench@samba.org>, "Ronnie Sahlberg" <lsahlber@redhat.com>
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, linux-kernel@vger.kernel.org, "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Sent: Wednesday, 10 October, 2018 6:17:48 AM
+Subject: [PATCH v2] smb2: fix uninitialized variable bug in smb2_ioctl_query_info
 
 There is a potential execution path in which variable *resp_buftype*
 is passed as an argument to function free_rsp_buf(), in which it is
