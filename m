@@ -1,66 +1,48 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH v3] smb2: fix uninitialized variable bug in smb2_ioctl_query_info
-Date: Tue, 9 Oct 2018 18:11:55 -0500
-Message-ID: <CAH2r5mvMBaC-OMOcVv-ohwFck2fwS7-ZghCtvYithcO54G9uZQ@mail.gmail.com>
-References: <20181009220220.GA24569@embeddedor.com>
+From: "Darrick J. Wong" <darrick.wong@oracle.com>
+Subject: [PATCH v2 00/25] fs: fixes for serious clone/dedupe problems
+Date: Tue, 09 Oct 2018 17:10:38 -0700
+Message-ID: <153913023835.32295.13962696655740190941.stgit@magnolia>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Steve French <sfrench@samba.org>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>
-To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181009220220.GA24569@embeddedor.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: sandeen@redhat.com, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-unionfs@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-mm@kvack.org,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        ocfs2-devel@oss.oracle.com
+To: david@fromorbit.com, darrick.wong@oracle.com
+Return-path: <linux-btrfs-owner@vger.kernel.org>
+Sender: linux-btrfs-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Added Ronnie's reviewed-by and pushed to cifs-2.6.git for-next
-On Tue, Oct 9, 2018 at 5:27 PM Gustavo A. R. Silva
-<gustavo@embeddedor.com> wrote:
->
-> There is a potential execution path in which variable *resp_buftype*
-> is passed as an argument to function free_rsp_buf(), in which it is
-> used in a comparison without being properly initialized previously.
->
-> Fix this by initializing variable *resp_buftype* to CIFS_NO_BUFFER
-> in order to avoid unpredictable or unintended results.
->
-> Addresses-Coverity-ID: 1473971 ("Uninitialized scalar variable")
-> Fixes: c5d25bdb2967 ("cifs: add IOCTL for QUERY_INFO passthrough to userspace")
-> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
-> ---
-> Changes in v3:
->  - Initialize resp_buftype to CIFS_NO_BUFFER instead of to -1.
->    Thanks to Ronnie Sahlberg for pointing this out.
->
-> Changes in v2:
->  - Fix Coverity and Fixes tag.
->  - Update commit log.
->
->  fs/cifs/smb2ops.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index c6c6450d..8472cb0 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -1133,7 +1133,7 @@ smb2_ioctl_query_info(const unsigned int xid,
->         struct smb_rqst rqst;
->         struct kvec iov[1];
->         struct kvec rsp_iov;
-> -       int resp_buftype;
-> +       int resp_buftype = CIFS_NO_BUFFER;
->         struct smb2_query_info_rsp *rsp = NULL;
->         void *buffer;
->
-> --
-> 2.7.4
->
+Hi all,
 
+Dave, Eric, and I have been chasing a stale data exposure bug in the XFS
+reflink implementation, and tracked it down to reflink forgetting to do
+some of the file-extending activities that must happen for regular
+writes.
 
--- 
-Thanks,
+We then started auditing the clone, dedupe, and copyfile code and
+realized that from a file contents perspective, clonerange isn't any
+different from a regular file write.  Unfortunately, we also noticed
+that *unlike* a regular write, clonerange skips a ton of overflow
+checks, such as validating the ranges against s_maxbytes, MAX_NON_LFS,
+and RLIMIT_FSIZE.  We also observed that cloning into a file did not
+strip security privileges (suid, capabilities) like a regular write
+would.  I also noticed that xfs and ocfs2 need to dump the page cache
+before remapping blocks, not after.
 
-Steve
+In fixing the range checking problems I also realized that both dedupe
+and copyfile tell userspace how much of the requested operation was
+acted upon.  Since the range validation can shorten a clone request (or
+we can ENOSPC midway through), we might as well plumb the short
+operation reporting back through the VFS indirection code to userspace.
+
+So, here's the whole giant pile of patches[1] that fix all the problems.
+The patch "generic: test reflink side effects" recently sent to fstests
+exercises the fixes in this series.  Tests are in [2].
+
+--D
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/djwong/xfs-linux.git/log/?h=djwong-devel
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/djwong/xfstests-dev.git/log/?h=djwong-devel
