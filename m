@@ -1,185 +1,50 @@
 From: "Darrick J. Wong" <darrick.wong@oracle.com>
-Subject: [PATCH v2 16/29] vfs: enable remap callers that can handle short
- operations
-Date: Thu, 18 Oct 2018 11:58:11 -0700
-Message-ID: <20181018185811.GY28243@magnolia>
-References: <153981625504.5568.2708520119290577378.stgit@magnolia>
- <153981637217.5568.7500888859511338974.stgit@magnolia>
+Subject: [PATCH v6 00/28] fs: fixes for serious clone/dedupe problems
+Date: Sun, 21 Oct 2018 09:15:03 -0700
+Message-ID: <154013850285.29026.16168387526580596209.stgit@magnolia>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Cc: sandeen@redhat.com, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, Amir Goldstein <amir73il@gmail.com>,
-        linux-unionfs@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-mm@kvack.org, linux-btrfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, ocfs2-devel@oss.oracle.com
-To: david@fromorbit.com
+        linux-cifs@vger.kernel.org, linux-unionfs@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-mm@kvack.org,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        ocfs2-devel@oss.oracle.com
+To: david@fromorbit.com, darrick.wong@oracle.com
 Return-path: <linux-btrfs-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <153981637217.5568.7500888859511338974.stgit@magnolia>
 Sender: linux-btrfs-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-From: Darrick J. Wong <darrick.wong@oracle.com>
+Hi all,
 
-Plumb in a remap flag that enables the filesystem remap handler to
-shorten remapping requests for callers that can handle it.  Now
-copy_file_range can report partial success (in case we run up against
-alignment problems, resource limits, etc.).
+Dave, Eric, and I have been chasing a stale data exposure bug in the XFS
+reflink implementation, and tracked it down to reflink forgetting to do
+some of the file-extending activities that must happen for regular
+writes.
 
-We also enable CAN_SHORTEN for fideduperange to maintain existing
-userspace-visible behavior where xfs/btrfs shorten the dedupe range to
-avoid stale post-eof data exposure.
+We then started auditing the clone, dedupe, and copyfile code and
+realized that from a file contents perspective, clonerange isn't any
+different from a regular file write.  Unfortunately, we also noticed
+that *unlike* a regular write, clonerange skips a ton of overflow
+checks, such as validating the ranges against s_maxbytes, MAX_NON_LFS,
+and RLIMIT_FSIZE.  We also observed that cloning into a file did not
+strip security privileges (suid, capabilities) like a regular write
+would.  I also noticed that xfs and ocfs2 need to dump the page cache
+before remapping blocks, not after.
 
-Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
-Reviewed-by: Amir Goldstein <amir73il@gmail.com>
----
- Documentation/filesystems/vfs.txt |    4 +++-
- fs/read_write.c                   |   28 ++++++++++++++++++++--------
- include/linux/fs.h                |    5 +++--
- mm/filemap.c                      |   11 +++++++----
- 4 files changed, 33 insertions(+), 15 deletions(-)
+In fixing the range checking problems I also realized that both dedupe
+and copyfile tell userspace how much of the requested operation was
+acted upon.  Since the range validation can shorten a clone request (or
+we can ENOSPC midway through), we might as well plumb the short
+operation reporting back through the VFS indirection code to userspace.
+I added a few more cleanups to the xfs code per reviewer suggestions.
 
-diff --git a/Documentation/filesystems/vfs.txt b/Documentation/filesystems/vfs.txt
-index 1bd2919deaca..5f71a252e2e0 100644
---- a/Documentation/filesystems/vfs.txt
-+++ b/Documentation/filesystems/vfs.txt
-@@ -970,7 +970,9 @@ otherwise noted.
- 	negative error code if errors occurred before any bytes were remapped.
- 	The remap_flags parameter accepts REMAP_FILE_* flags.  If
- 	REMAP_FILE_DEDUP is set then the implementation must only remap if the
--	requested file ranges have identical contents.
-+	requested file ranges have identical contents.  If REMAP_CAN_SHORTEN is
-+	set, the caller is ok with the implementation shortening the request
-+	length to satisfy alignment or EOF requirements (or any other reason).
- 
-   fadvise: possibly called by the fadvise64() system call.
- 
-diff --git a/fs/read_write.c b/fs/read_write.c
-index ea30666013b0..c0bcc1a20650 100644
---- a/fs/read_write.c
-+++ b/fs/read_write.c
-@@ -1593,7 +1593,8 @@ ssize_t vfs_copy_file_range(struct file *file_in, loff_t pos_in,
- 
- 		cloned = file_in->f_op->remap_file_range(file_in, pos_in,
- 				file_out, pos_out,
--				min_t(loff_t, MAX_RW_COUNT, len), 0);
-+				min_t(loff_t, MAX_RW_COUNT, len),
-+				REMAP_FILE_CAN_SHORTEN);
- 		if (cloned > 0) {
- 			ret = cloned;
- 			goto done;
-@@ -1721,6 +1722,8 @@ static int remap_verify_area(struct file *file, loff_t pos, loff_t len,
-  * can't meaningfully compare post-EOF contents.
-  *
-  * For clone we only link a partial EOF block above the destination file's EOF.
-+ *
-+ * Shorten the request if possible.
-  */
- static int generic_remap_check_len(struct inode *inode_in,
- 				   struct inode *inode_out,
-@@ -1729,16 +1732,24 @@ static int generic_remap_check_len(struct inode *inode_in,
- 				   unsigned int remap_flags)
- {
- 	u64 blkmask = i_blocksize(inode_in) - 1;
-+	loff_t new_len = *len;
- 
- 	if ((*len & blkmask) == 0)
- 		return 0;
- 
--	if (remap_flags & REMAP_FILE_DEDUP)
--		*len &= ~blkmask;
--	else if (pos_out + *len < i_size_read(inode_out))
--		return -EINVAL;
-+	if ((remap_flags & REMAP_FILE_DEDUP) ||
-+	    pos_out + *len < i_size_read(inode_out))
-+		new_len &= ~blkmask;
- 
--	return 0;
-+	if (new_len == *len)
-+		return 0;
-+
-+	if (remap_flags & REMAP_FILE_CAN_SHORTEN) {
-+		*len = new_len;
-+		return 0;
-+	}
-+
-+	return (remap_flags & REMAP_FILE_DEDUP) ? -EBADE : -EINVAL;
- }
- 
- /*
-@@ -2014,7 +2025,8 @@ loff_t vfs_dedupe_file_range_one(struct file *src_file, loff_t src_pos,
- {
- 	loff_t ret;
- 
--	WARN_ON_ONCE(remap_flags & ~(REMAP_FILE_DEDUP));
-+	WARN_ON_ONCE(remap_flags & ~(REMAP_FILE_DEDUP |
-+				     REMAP_FILE_CAN_SHORTEN));
- 
- 	ret = mnt_want_write_file(dst_file);
- 	if (ret)
-@@ -2115,7 +2127,7 @@ int vfs_dedupe_file_range(struct file *file, struct file_dedupe_range *same)
- 
- 		deduped = vfs_dedupe_file_range_one(file, off, dst_file,
- 						    info->dest_offset, len,
--						    0);
-+						    REMAP_FILE_CAN_SHORTEN);
- 		if (deduped == -EBADE)
- 			info->status = FILE_DEDUPE_RANGE_DIFFERS;
- 		else if (deduped < 0)
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 544ab5083b48..34c22d695011 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -1727,8 +1727,10 @@ struct block_device_operations;
-  * See Documentation/filesystems/vfs.txt for more details about this call.
-  *
-  * REMAP_FILE_DEDUP: only remap if contents identical (i.e. deduplicate)
-+ * REMAP_FILE_CAN_SHORTEN: caller can handle a shortened request
-  */
- #define REMAP_FILE_DEDUP		(1 << 0)
-+#define REMAP_FILE_CAN_SHORTEN		(1 << 1)
- 
- /*
-  * These flags signal that the caller is ok with altering various aspects of
-@@ -1736,9 +1738,8 @@ struct block_device_operations;
-  * implementation; the vfs remap helper functions can take advantage of them.
-  * Flags in this category exist to preserve the quirky behavior of the hoisted
-  * btrfs clone/dedupe ioctls.
-- * There are no flags yet, but subsequent commits will add some.
-  */
--#define REMAP_FILE_ADVISORY		(0)
-+#define REMAP_FILE_ADVISORY		(REMAP_FILE_CAN_SHORTEN)
- 
- struct iov_iter;
- 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 2e4dcebe7253..4b69b6a5d0bf 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -3045,8 +3045,7 @@ int generic_remap_checks(struct file *file_in, loff_t pos_in,
- 		bcount = ALIGN(size_in, bs) - pos_in;
- 	} else {
- 		if (!IS_ALIGNED(count, bs))
--			return -EINVAL;
--
-+			count = ALIGN_DOWN(count, bs);
- 		bcount = count;
- 	}
- 
-@@ -3056,10 +3055,14 @@ int generic_remap_checks(struct file *file_in, loff_t pos_in,
- 	    pos_out < pos_in + bcount)
- 		return -EINVAL;
- 
--	/* For now we don't support changing the length. */
--	if (*req_count != count)
-+	/*
-+	 * We shortened the request but the caller can't deal with that, so
-+	 * bounce the request back to userspace.
-+	 */
-+	if (*req_count != count && !(remap_flags & REMAP_FILE_CAN_SHORTEN))
- 		return -EINVAL;
- 
-+	*req_count = count;
- 	return 0;
- }
- 
+So, here's the whole giant pile of patches[1] that fix all the problems.
+This branch is against current upstream (4.19-rc8).  The patch
+"generic: test reflink side effects" recently sent to fstests exercises
+the fixes in this series.  Tests are in [2].
+
+--D
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/djwong/xfs-linux.git/log/?h=djwong-devel
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/djwong/xfstests-dev.git/log/?h=djwong-devel
