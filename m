@@ -1,170 +1,83 @@
-From: Dave Chinner <david@fromorbit.com>
-Subject: Re: [PATCH v6 00/28] fs: fixes for serious clone/dedupe problems
-Date: Mon, 22 Oct 2018 17:55:42 +1100
-Message-ID: <20181022065542.GZ6311@dastard>
-References: <154013850285.29026.16168387526580596209.stgit@magnolia>
- <20181022022112.GW6311@dastard>
- <20181022043741.GX6311@dastard>
- <20181022045249.GP32577@ZenIV.linux.org.uk>
- <20181022050851.GY6311@dastard>
- <CAOQ4uxhjpieVdDfrATStT8YQZZwX=rrWtiMX=FSXFdHdqsUaDg@mail.gmail.com>
+From: Oleksandr Natalenko <oleksandr@natalenko.name>
+Subject: NULL pointer dereference in SMB2_close_free() with v4.19
+Date: Tue, 23 Oct 2018 21:15:57 +0200
+Message-ID: <c9fcc9109bf55574dba526e1bdab2d6f@natalenko.name>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Al Viro <viro@zeniv.linux.org.uk>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        Eric Sandeen <sandeen@redhat.com>,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        linux-cifs@vger.kernel.org,
-        overlayfs <linux-unionfs@vger.kernel.org>,
-        linux-xfs <linux-xfs@vger.kernel.org>,
-        Linux MM <linux-mm@kvack.org>,
-        Linux Btrfs <linux-btrfs@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        ocfs2-devel@oss.oracle.com
-To: Amir Goldstein <amir73il@gmail.com>
-Return-path: <linux-btrfs-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAOQ4uxhjpieVdDfrATStT8YQZZwX=rrWtiMX=FSXFdHdqsUaDg@mail.gmail.com>
-Sender: linux-btrfs-owner@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Steve French <sfrench@samba.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Mon, Oct 22, 2018 at 08:42:29AM +0300, Amir Goldstein wrote:
-> On Mon, Oct 22, 2018 at 8:09 AM Dave Chinner <david@fromorbit.com> wrote:
-> >
-> > On Mon, Oct 22, 2018 at 05:52:49AM +0100, Al Viro wrote:
-> > > On Mon, Oct 22, 2018 at 03:37:41PM +1100, Dave Chinner wrote:
-> > >
-> > > > Ok, this is a bit of a mess. the patches do not merge cleanly to a
-> > > > 4.19-rc1 base kernel because of all the changes to
-> > > > include/linux/fs.h that have hit the tree after this. There's also
-> > > > failures against Documentation/filesystems/fs.h
-> > > >
-> > > > IOWs, it's not going to get merged through the main XFS tree because
-> > > > I don't have the patience to resolve all the patch application
-> > > > failures, then when it comes to merge make sure all the merge
-> > > > failures end up being resolved correctly.
-> > > >
-> > > > So if I take it through the XFS tree, it will being a standalone
-> > > > branch based on 4.19-rc8 and won't hit linux-next until after the
-> > > > first XFS merge when I can rebase the for-next branch...
-> > >
-> > > How many conflicts does it have with XFS tree?  I can take it via
-> > > vfs.git...
-> >
-> > I gave up after 4 of the first 6 or 7 patches had conflicts in vfs
-> > and documentation code.
-> >
-> > There were changes that went into 4.19-rc7 that changed
-> > {do|vfs}_clone_file_range() prototypes and this patchset hits
-> > prototypes adjacent to that multiple times. There's also a conflicts
-> > against a new f_ops->fadvise method. These all appear to be direct
-> > fallout of fixes needed for all the overlay f_ops changes.
-> >
-> > The XFS changes at the end of the patchset are based on
-> > commits that were merged into -rc7 and -rc8, so if you are using
-> > -rc8 as your base, then it all merges cleanly. There are no
-> > conflicts with the current xfs/for-next branch.
-> >
-> > I've just merged and built it into my test tree (-rc8, xfs/for-next,
-> > djwong/devel) so I can test it properly, but if it merges cleanly
-> > with the vfs tree you are building then that's probably the easiest
-> > way to merge it all...
-> >
-> 
-> Dave,
-> 
-> Pardon my ignorance, but its an opportunity for me to learn a thing
-> or two about kernel development process.
-> 
-> First, I asked Darrick to base his patches on top of -rc8 intentionally
-> to avoid the conflict with "swap names of {do|vfs}_clone_file_range()" (*).
-> My change pre dates his changes so it makes sense.
+Hi.
 
-Actually, I asked him to do that because the critical clone/dedupe
-data corruption bug fixes for XFS that were merged into -rc8. They
-created substantial conflicts with the XFS code being
-rearranged in the patch set, and that wasn't something easy to
-resolve.
+After upgrading to v4.19 I've noticed the following in my dmesg:
 
-But because those XFS commits in 4.19-rc8 are from a stable in a
-topic branch in the xfs tree (xfs-4.19-fixes-1) which is merged into
-the for-next tree before anything else, the XFS changes in Darrick's
-patchset merge cleanly with the XFS for-next branch.
+===
+[10287.637871] BUG: unable to handle kernel NULL pointer dereference at 
+0000000000000000
+[10287.637886] PGD 0 P4D 0
+[10287.637900] Oops: 0000 [#1] PREEMPT SMP PTI
+[10287.637909] CPU: 3 PID: 9321 Comm: file.so Not tainted 4.19.0-pf1 #1
+[10287.637914] Hardware name: Dell Inc.          Vostro 3360/0F5DWF, 
+BIOS A18 09/25/2013
+[10287.637980] RIP: 0010:SMB2_close_free+0x8/0x10 [cifs]
+[10287.637987] Code: 65 48 33 1c 25 28 00 00 00 75 09 48 83 c4 18 5b 5d 
+41 5c c3 e8 d9 d3 8d f9 66 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 8b 
+07 <48> 8b 38 e9 70 42 fe ff 0f 1f 44 00 00 55 48 89 e5 41 57 41 56 49
+[10287.637993] RSP: 0018:ffffa5d589213bb8 EFLAGS: 00010246
+[10287.638000] RAX: 0000000000000000 RBX: ffff990ed85d2800 RCX: 
+0000000000000000
+[10287.638006] RDX: 00000000ffffff90 RSI: 0000000000000206 RDI: 
+ffffa5d589213d68
+[10287.638010] RBP: ffffa5d589213df0 R08: 0000000000021070 R09: 
+0000000000000001
+[10287.638015] R10: 0000000000001553 R11: 0000000000000005 R12: 
+ffffa5d589213c50
+[10287.638020] R13: ffff990ea821e800 R14: ffff990ed2e93800 R15: 
+0000000000000000
+[10287.638027] FS:  00007fb0cef22640(0000) GS:ffff990eef0c0000(0000) 
+knlGS:0000000000000000
+[10287.638036] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[10287.638043] CR2: 0000000000000000 CR3: 000000028fd5a001 CR4: 
+00000000001606e0
+[10287.638050] Call Trace:
+[10287.638112]  smb2_queryfs+0x15b/0x360 [cifs]
+[10287.638130]  ? lookup_fast+0xc8/0x2f0
+[10287.638138]  ? walk_component+0x48/0x2d0
+[10287.638145]  ? legitimize_path.isra.9+0x2d/0x60
+[10287.638151]  ? unlazy_walk+0x50/0xb0
+[10287.638194]  ? cifs_statfs+0xb1/0x300 [cifs]
+[10287.638243]  cifs_statfs+0xb1/0x300 [cifs]
+[10287.638259]  statfs_by_dentry+0x4c/0x70
+[10287.638268]  vfs_statfs+0x16/0xc0
+[10287.638276]  user_statfs+0x54/0xa0
+[10287.638285]  __se_sys_statfs+0x25/0x60
+[10287.638300]  do_syscall_64+0x5b/0x170
+[10287.638310]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+===
 
-What doesn't merge cleanly is all the VFS API and prototype stuff
-that got changed after -rc1 because it's not in the master branch of
-the xfs dev tree.
+This is the SMB client having 2 mountpoints like this:
 
-> What I don't get is why does it need to create a problem?
-> Can you not back merge -rc8 into xfs/for-next (or into vfs/for-next for
-> that matter) and then merge Darrick's patches?
+===
+//1.2.3.4/share on /mnt/share type cifs 
+(rw,nosuid,nodev,relatime,vers=3.0,cache=strict,username=guest,uid=1000,forceuid,gid=1000,forcegid,addr=1.2.3.4,file_mode=0755,dir_mode=0755,soft,nounix,serverino,mapposix,rsize=1048576,wsize=1048576,echo_interval=60,actimeo=1)
+===
 
-Because it forces everyone to move their base kernel forward to test
-the latest fixes. i.e. i forces everyone to rebase their local dev
-trees to -rc8 regardless of whether they want to or not.
+The printout repeats several times, and the call trace is consistent, 
+although ATM I don't know what triggers it. Any ideas on this would be 
+appreciated.
 
-If you're doing work outside the XFS tree, then that forces you to
-rebase everything you are working on, not just modify your XFS
-patches that are affected by the new XFS changes. it also breaks the
-concept of having a baseline for regression tests - force upgrading
-to -rc8 breaks the baseline for comparing just XFS changes.
+I'm going to try reproduce it locally on some VM reliably, but if it is 
+something that is already known, or if there's some patch you'd like me 
+to test, please let me know.
 
-The other reason is topic branches. They need to have a stable base.
-i.e. all your topic branches that get merged in need to be on the
-same base commit so they can be merged and rearranged without
-problems or having to rewrite commits. The for-next tree can move
-forward on a rebase with topic branches if necessary, but  it has
-downsides for downstream developers.
+Thanks.
 
-For example, I can do:
+P.S. Please CC me if answering, I'm not subscribed to the CIFS list.
 
-git reset --hard v4.19-rc8
-git am djw-clone-dedupe-rework
-
-and have it apply cleanly. But I can't turn that into a topic branch
-for merge into linux-xfs/for-next because it's not based on the
-correct branch.  i.e. I need to do this to create a topic branch for
-for-next merge:
-
-git reset --hard linux-xfs/master
-git merge linux-xfs/xfs-4.19-fixes-1
-git am djw-clone-dedupe-rework
-{rejects galore}
-
-I can fix all the rejectsi (boring, tedious, time consuming), but
-then when I go to merge it back into a 4.19-rc8 kernel like so:
-
-git reset --hard v4.19-rc8
-git merge linux-xfs/vfs-4.20-clone-dedupe-rework
-[conflicts!]
-
-I essentially have to revert all of the conflict resolution I just
-did to get it into ithe XFS topic branch. And those conflicts will
-need to be resolved in the upstream merge, too, and by every XFS
-developer who changes their base kernel to >=4.19-rc7.
-
-IOWs, there's downsides everywhere. Yes, we could rebase the entire
-tree on 4.19-rc8, but Linus *really* didn't like dev trees to be
-rebased to a late -rcX just to clean up merge issues like this. He
-wanted to see the development history of the code he was asked to
-pull and wanted to see merge conflicts and resolve them himself so
-he knew who and what was causing problems when merging code. That
-way he nkew in future what changes to allow late in -rcX releases
-and what to defer to after the next merge window.
-
-Co-ordination between tree is important - high level API changes are
-exactly the sort of thing that causes dev tree merge pain late in a
-dev cycle. Hence this sort of thing is best done immediately after
--rc1 when everyone is getting ready to rebase and start their next
-dev cycle and nobody is really affected by the API change.
-
-So, historically speaking, I've done things this way because that's
-how Linus wanted them done to make life easier for both himself and
-everyone who manages a dev tree.
-
-Cheers,
-
-Dave.
 -- 
-Dave Chinner
-david@fromorbit.com
+   Oleksandr Natalenko (post-factum)
