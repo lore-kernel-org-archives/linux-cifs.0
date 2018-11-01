@@ -1,72 +1,60 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [Patch v4 3/3] CIFS: Add direct I/O functions to file_operations
-Date: Wed, 31 Oct 2018 20:41:29 -0500
-Message-ID: <CAH2r5mu0KcrHcfmdBgM4fz7qtrN8xa=A3SRxt+CupnT=iLgR9w@mail.gmail.com>
-References: <20181031221311.2596-1-longli@linuxonhyperv.com> <20181031221311.2596-3-longli@linuxonhyperv.com>
+From: Colin King <colin.king@canonical.com>
+Subject: [PATCH] cifs: don't dereference smb_file_target before null check
+Date: Thu,  1 Nov 2018 13:14:30 +0000
+Message-ID: <20181101131430.28901-1-colin.king@canonical.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>
-To: Long Li <longli@microsoft.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181031221311.2596-3-longli@linuxonhyperv.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-made minor cleanup to patch 1 and 2, added Ronnie's reviewed to patch
-3, and tentatively merged to cifs-2.6.git for-next
-On Wed, Oct 31, 2018 at 5:16 PM Long Li <longli@linuxonhyperv.com> wrote:
->
-> From: Long Li <longli@microsoft.com>
->
-> With direct read/write functions implemented, add them to file_operations.
->
-> Dircet I/O is used under two conditions:
-> 1. When mounting with "cache=none", CIFS uses direct I/O for all user file
-> data transfer.
-> 2. When opening a file with O_DIRECT, CIFS uses direct I/O for all data
-> transfer on this file.
->
-> Signed-off-by: Long Li <longli@microsoft.com>
-> ---
->  fs/cifs/cifsfs.c | 10 ++++------
->  1 file changed, 4 insertions(+), 6 deletions(-)
->
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index 62f1662..f18091b 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -1113,9 +1113,8 @@ const struct file_operations cifs_file_strict_ops = {
->  };
->
->  const struct file_operations cifs_file_direct_ops = {
-> -       /* BB reevaluate whether they can be done with directio, no cache */
-> -       .read_iter = cifs_user_readv,
-> -       .write_iter = cifs_user_writev,
-> +       .read_iter = cifs_direct_readv,
-> +       .write_iter = cifs_direct_writev,
->         .open = cifs_open,
->         .release = cifs_close,
->         .lock = cifs_lock,
-> @@ -1169,9 +1168,8 @@ const struct file_operations cifs_file_strict_nobrl_ops = {
->  };
->
->  const struct file_operations cifs_file_direct_nobrl_ops = {
-> -       /* BB reevaluate whether they can be done with directio, no cache */
-> -       .read_iter = cifs_user_readv,
-> -       .write_iter = cifs_user_writev,
-> +       .read_iter = cifs_direct_readv,
-> +       .write_iter = cifs_direct_writev,
->         .open = cifs_open,
->         .release = cifs_close,
->         .fsync = cifs_fsync,
-> --
-> 2.7.4
->
+From: Colin Ian King <colin.king@canonical.com>
 
+There is a null check on dst_file->private data which suggests
+it can be potentially null. However, before this check, pointer
+smb_file_target is derived from dst_file->private and dereferenced
+in the call to tlink_tcon, hence there is a potential null pointer
+deference.
 
+Fix this by assigning smb_file_target and target_tcon after the
+null pointer sanity checks.
+
+Detected by CoverityScan, CID#1475302 ("Dereference before null check")
+
+Fixes: 04b38d601239 ("vfs: pull btrfs clone API to vfs layer")
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ fs/cifs/cifsfs.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index e46af70153c0..db83938809a5 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -1003,8 +1003,8 @@ static loff_t cifs_remap_file_range(struct file *src_file, loff_t off,
+ 	struct inode *src_inode = file_inode(src_file);
+ 	struct inode *target_inode = file_inode(dst_file);
+ 	struct cifsFileInfo *smb_file_src = src_file->private_data;
+-	struct cifsFileInfo *smb_file_target = dst_file->private_data;
+-	struct cifs_tcon *target_tcon = tlink_tcon(smb_file_target->tlink);
++	struct cifsFileInfo *smb_file_target;
++	struct cifs_tcon *target_tcon;
+ 	unsigned int xid;
+ 	int rc;
+ 
+@@ -1021,6 +1021,9 @@ static loff_t cifs_remap_file_range(struct file *src_file, loff_t off,
+ 		goto out;
+ 	}
+ 
++	smb_file_target = dst_file->private_data;
++	target_tcon = tlink_tcon(smb_file_target->tlink);
++
+ 	/*
+ 	 * Note: cifs case is easier than btrfs since server responsible for
+ 	 * checks for proper open modes and file type and if it wants
 -- 
-Thanks,
-
-Steve
+2.19.1
