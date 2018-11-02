@@ -1,74 +1,74 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH] cifs: don't dereference smb_file_target before null check
-Date: Thu, 1 Nov 2018 09:34:03 -0500
-Message-ID: <CAH2r5mvCPzdmVMMLXY+87stsPXky-GKtJVRuUanyVsGriYKjWw@mail.gmail.com>
-References: <20181101131430.28901-1-colin.king@canonical.com>
+From: Filipe Manana <fdmanana@gmail.com>
+Subject: Re: [PATCH 05/25] vfs: avoid problematic remapping requests into
+ partial EOF block
+Date: Fri, 2 Nov 2018 12:04:39 +0000
+Message-ID: <CAL3q7H5ofBmjh0DmbPH6Rmm523JV9byuBiYj=Jxpc44Kbh+Haw@mail.gmail.com>
+References: <153923113649.5546.9840926895953408273.stgit@magnolia>
+ <153923117420.5546.13317703807467393934.stgit@magnolia> <CAL3q7H7mLvCGpyitJhQ=To-aDvG9k9rxSVi2jSpcALQVj3myzg@mail.gmail.com>
+ <20181015003139.GZ6311@dastard>
+Reply-To: fdmanana@gmail.com
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        kernel-janitors <kernel-janitors@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-To: Colin King <colin.king@canonical.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181101131430.28901-1-colin.king@canonical.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Cc: "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Eric Sandeen <sandeen@redhat.com>, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-unionfs@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-mm@kvack.org,
+        linux-btrfs <linux-btrfs@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        ocfs2-devel@oss.oracle.com
+To: Dave Chinner <david@fromorbit.com>
+Return-path: <linux-btrfs-owner@vger.kernel.org>
+In-Reply-To: <20181015003139.GZ6311@dastard>
+Sender: linux-btrfs-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-merged into cifs-2.6.git for-next
-On Thu, Nov 1, 2018 at 8:14 AM Colin King <colin.king@canonical.com> wrote:
+On Mon, Oct 15, 2018 at 1:31 AM Dave Chinner <david@fromorbit.com> wrote:
 >
-> From: Colin Ian King <colin.king@canonical.com>
+> On Fri, Oct 12, 2018 at 09:22:18PM +0100, Filipe Manana wrote:
+> > On Thu, Oct 11, 2018 at 5:13 AM Darrick J. Wong <darrick.wong@oracle.co=
+m> wrote:
+> > >
+> > > From: Darrick J. Wong <darrick.wong@oracle.com>
+> > >
+> > > A deduplication data corruption is exposed by fstests generic/505 on
+> > > XFS.
+> >
+> > (and btrfs)
+> >
+> > Btw, the generic test I wrote was indeed numbered 505, however it was
+> > never committed and there's now a generic/505 which has nothing to do
+> > with deduplication.
+> > So you should update the changelog to avoid confusion.
 >
-> There is a null check on dst_file->private data which suggests
-> it can be potentially null. However, before this check, pointer
-> smb_file_target is derived from dst_file->private and dereferenced
-> in the call to tlink_tcon, hence there is a potential null pointer
-> deference.
+> What test is it now? And if it hasn't been committed, are you going
+> to update it and repost as it clearly had value....
+
+Sorry, I lost track of this.
+
+So what was the conclusion of the thread where discussion about this
+problem started?
+It wasn't clear to me if a consensus was reached and got lost on that
+long user space dedupe tools discussion between you and Zygo.
+
+The test assumed a fix of rounding down the range and deduping less
+bytes then requested (which ended up included in 4.19 for btrfs).
+
+>From this vfs patch it seems it was decided to return errno -EDADE instead.
+Is this the final decision?
+
 >
-> Fix this by assigning smb_file_target and target_tcon after the
-> null pointer sanity checks.
+> Cheers,
 >
-> Detected by CoverityScan, CID#1475302 ("Dereference before null check")
->
-> Fixes: 04b38d601239 ("vfs: pull btrfs clone API to vfs layer")
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
-> ---
->  fs/cifs/cifsfs.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index e46af70153c0..db83938809a5 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -1003,8 +1003,8 @@ static loff_t cifs_remap_file_range(struct file *src_file, loff_t off,
->         struct inode *src_inode = file_inode(src_file);
->         struct inode *target_inode = file_inode(dst_file);
->         struct cifsFileInfo *smb_file_src = src_file->private_data;
-> -       struct cifsFileInfo *smb_file_target = dst_file->private_data;
-> -       struct cifs_tcon *target_tcon = tlink_tcon(smb_file_target->tlink);
-> +       struct cifsFileInfo *smb_file_target;
-> +       struct cifs_tcon *target_tcon;
->         unsigned int xid;
->         int rc;
->
-> @@ -1021,6 +1021,9 @@ static loff_t cifs_remap_file_range(struct file *src_file, loff_t off,
->                 goto out;
->         }
->
-> +       smb_file_target = dst_file->private_data;
-> +       target_tcon = tlink_tcon(smb_file_target->tlink);
-> +
->         /*
->          * Note: cifs case is easier than btrfs since server responsible for
->          * checks for proper open modes and file type and if it wants
+> Dave.
 > --
-> 2.19.1
->
+> Dave Chinner
+> david@fromorbit.com
 
 
--- 
-Thanks,
 
-Steve
+--=20
+Filipe David Manana,
+
+=E2=80=9CWhether you think you can, or you think you can't =E2=80=94 you're=
+ right.=E2=80=9D
