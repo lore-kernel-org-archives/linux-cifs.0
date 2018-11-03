@@ -1,118 +1,38 @@
-From: Filipe Manana <fdmanana@gmail.com>
-Subject: Re: [PATCH 05/25] vfs: avoid problematic remapping requests into
- partial EOF block
-Date: Fri, 2 Nov 2018 19:05:09 +0000
-Message-ID: <CAL3q7H4mMUqpVr=N5a=ChPBDGNy95VRzfSPX-oB5rzm0yshofQ@mail.gmail.com>
-References: <153923113649.5546.9840926895953408273.stgit@magnolia>
- <153923117420.5546.13317703807467393934.stgit@magnolia> <CAL3q7H7mLvCGpyitJhQ=To-aDvG9k9rxSVi2jSpcALQVj3myzg@mail.gmail.com>
- <20181015003139.GZ6311@dastard> <CAL3q7H5ofBmjh0DmbPH6Rmm523JV9byuBiYj=Jxpc44Kbh+Haw@mail.gmail.com>
- <20181102174229.GA4127@magnolia> <CAL3q7H4MaphXQYnn3rRvc3YQZtiBBq1z61c91-LdNZZVzzLWJg@mail.gmail.com>
-Reply-To: fdmanana@gmail.com
+From: Colin King <colin.king@canonical.com>
+Subject: [PATCH] cifs: clean up indentation, replace spaces with tab
+Date: Sat,  3 Nov 2018 15:59:44 +0000
+Message-ID: <20181103155944.3028-1-colin.king@canonical.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Cc: Dave Chinner <david@fromorbit.com>,
-        Eric Sandeen <sandeen@redhat.com>, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-unionfs@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-mm@kvack.org,
-        linux-btrfs <linux-btrfs@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        ocfs2-devel@oss.oracle.com
-To: "Darrick J. Wong" <darrick.wong@oracle.com>
-Return-path: <linux-btrfs-owner@vger.kernel.org>
-In-Reply-To: <CAL3q7H4MaphXQYnn3rRvc3YQZtiBBq1z61c91-LdNZZVzzLWJg@mail.gmail.com>
-Sender: linux-btrfs-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Fri, Nov 2, 2018 at 6:18 PM Filipe Manana <fdmanana@gmail.com> wrote:
->
-> On Fri, Nov 2, 2018 at 5:42 PM Darrick J. Wong <darrick.wong@oracle.com> =
-wrote:
-> >
-> > On Fri, Nov 02, 2018 at 12:04:39PM +0000, Filipe Manana wrote:
-> > > On Mon, Oct 15, 2018 at 1:31 AM Dave Chinner <david@fromorbit.com> wr=
-ote:
-> > > >
-> > > > On Fri, Oct 12, 2018 at 09:22:18PM +0100, Filipe Manana wrote:
-> > > > > On Thu, Oct 11, 2018 at 5:13 AM Darrick J. Wong <darrick.wong@ora=
-cle.com> wrote:
-> > > > > >
-> > > > > > From: Darrick J. Wong <darrick.wong@oracle.com>
-> > > > > >
-> > > > > > A deduplication data corruption is exposed by fstests generic/5=
-05 on
-> > > > > > XFS.
-> > > > >
-> > > > > (and btrfs)
-> > > > >
-> > > > > Btw, the generic test I wrote was indeed numbered 505, however it=
- was
-> > > > > never committed and there's now a generic/505 which has nothing t=
-o do
-> > > > > with deduplication.
-> > > > > So you should update the changelog to avoid confusion.
-> > > >
-> > > > What test is it now? And if it hasn't been committed, are you going
-> > > > to update it and repost as it clearly had value....
-> > >
-> > > Sorry, I lost track of this.
-> > >
-> > > So what was the conclusion of the thread where discussion about this
-> > > problem started?
-> > > It wasn't clear to me if a consensus was reached and got lost on that
-> > > long user space dedupe tools discussion between you and Zygo.
-> > >
-> > > The test assumed a fix of rounding down the range and deduping less
-> > > bytes then requested (which ended up included in 4.19 for btrfs).
-> > >
-> > > From this vfs patch it seems it was decided to return errno -EDADE in=
-stead.
-> > > Is this the final decision?
-> >
-> > No, I reworked the whole mess to match btrfs-4.19 behavior of deduping
-> > fewer bytes than requested.
->
-> What about cloning?
-> For cloning the issue is still not fixed in btrfs either.
->
-> So was that done in a later version of this patchset or somewhere else?
+From: Colin Ian King <colin.king@canonical.com>
 
-Never mind, found it, it returns -EINVAL.
+Trivial fix to clean up indentation, replace spaces with tab
 
->
-> thanks
->
-> >
-> > --D
-> >
-> > > >
-> > > > Cheers,
-> > > >
-> > > > Dave.
-> > > > --
-> > > > Dave Chinner
-> > > > david@fromorbit.com
-> > >
-> > >
-> > >
-> > > --
-> > > Filipe David Manana,
-> > >
-> > > =E2=80=9CWhether you think you can, or you think you can't =E2=80=94 =
-you're right.=E2=80=9D
->
->
->
-> --
-> Filipe David Manana,
->
-> =E2=80=9CWhether you think you can, or you think you can't =E2=80=94 you'=
-re right.=E2=80=9D
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ fs/cifs/cifsencrypt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-
---=20
-Filipe David Manana,
-
-=E2=80=9CWhether you think you can, or you think you can't =E2=80=94 you're=
- right.=E2=80=9D
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 85b31cfa2f3c..ecdff344e8fe 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -224,7 +224,7 @@ int cifs_verify_signature(struct smb_rqst *rqst,
+ 	if (cifs_pdu->Command == SMB_COM_LOCKING_ANDX) {
+ 		struct smb_com_lock_req *pSMB =
+ 			(struct smb_com_lock_req *)cifs_pdu;
+-	    if (pSMB->LockType & LOCKING_ANDX_OPLOCK_RELEASE)
++		if (pSMB->LockType & LOCKING_ANDX_OPLOCK_RELEASE)
+ 			return 0;
+ 	}
+ 
+-- 
+2.19.1
