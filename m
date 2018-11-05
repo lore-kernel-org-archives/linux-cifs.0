@@ -1,52 +1,48 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH] cifs: clean up indentation, replace spaces with tab
-Date: Sat, 3 Nov 2018 13:22:11 -0500
-Message-ID: <CAH2r5mtejuFDR=y13U3xiGwMOKoP3eOcHzk9midYLcwWp19Dyg@mail.gmail.com>
-References: <20181103155944.3028-1-colin.king@canonical.com>
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: linux-next: Signed-off-by missing for commit in the cifs tree
+Date: Mon, 5 Nov 2018 16:55:30 +1100
+Message-ID: <20181105165530.05bb84d4@canb.auug.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        kernel-janitors <kernel-janitors@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-To: Colin King <colin.king@canonical.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/w/k5aj/uCU24D2s9=fA2aZW"; protocol="application/pgp-signature"
+Cc: Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181103155944.3028-1-colin.king@canonical.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-merged into cifs-2.6.git for-next
-On Sat, Nov 3, 2018 at 11:00 AM Colin King <colin.king@canonical.com> wrote:
->
-> From: Colin Ian King <colin.king@canonical.com>
->
-> Trivial fix to clean up indentation, replace spaces with tab
->
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
-> ---
->  fs/cifs/cifsencrypt.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-> index 85b31cfa2f3c..ecdff344e8fe 100644
-> --- a/fs/cifs/cifsencrypt.c
-> +++ b/fs/cifs/cifsencrypt.c
-> @@ -224,7 +224,7 @@ int cifs_verify_signature(struct smb_rqst *rqst,
->         if (cifs_pdu->Command == SMB_COM_LOCKING_ANDX) {
->                 struct smb_com_lock_req *pSMB =
->                         (struct smb_com_lock_req *)cifs_pdu;
-> -           if (pSMB->LockType & LOCKING_ANDX_OPLOCK_RELEASE)
-> +               if (pSMB->LockType & LOCKING_ANDX_OPLOCK_RELEASE)
->                         return 0;
->         }
->
-> --
-> 2.19.1
->
+--Sig_/w/k5aj/uCU24D2s9=fA2aZW
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
+Hi all,
 
--- 
-Thanks,
+Commit
 
-Steve
+  bf4d4ba7d970 ("cifs: update internal module version number for cifs.ko")
+
+is missing a Signed-off-by from its author and committer.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/w/k5aj/uCU24D2s9=fA2aZW
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAlvf21IACgkQAVBC80lX
+0Gy5bwf9G1zmT+TqSzCknj1YBEs32xjDVOru00NM9YgILWTEo1809WCZxW5CLPrY
+3CC1gGWiQvWDrTaRSRN6F/RUdA0UvIITC28vvGevgVjh+qX7QhGGhbbYiSwWQ+He
+oqF5dTZaAmKnVkvq0x1YFsp0LRQGUGAISXA04a35gFekPjdozTFXOtvyfLf4LQ7X
+scwUC2drM+Mzz6wsbbwZ+HsU+/KMdbGIU33nfUnE2/52lLbos9YpUqpHRwMsE26m
+QqvluXq5lLfOKuVwhBaQYP6VkRq0+QfhyUyXOqYUkoHk8Et/z/73aHdQ7QiadsAx
+XiKhU+No3W2EicyI2LouhFg6Xzvh+A==
+=Z21O
+-----END PGP SIGNATURE-----
+
+--Sig_/w/k5aj/uCU24D2s9=fA2aZW--
