@@ -1,48 +1,64 @@
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: linux-next: Signed-off-by missing for commit in the cifs tree
-Date: Mon, 5 Nov 2018 16:55:30 +1100
-Message-ID: <20181105165530.05bb84d4@canb.auug.org.au>
-Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- boundary="Sig_/w/k5aj/uCU24D2s9=fA2aZW"; protocol="application/pgp-signature"
-Cc: Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
+From: Sasha Levin <sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 02/44] cifs: don't dereference smb_file_target before null check
+Date: Tue, 13 Nov 2018 00:49:08 -0500
+Message-ID: <20181113054950.77898-2-sashal@kernel.org>
+References: <20181113054950.77898-1-sashal@kernel.org>
+Cc: Colin Ian King <colin.king@canonical.com>,
+        Steve French <stfrench@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
+To: stable@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20181113054950.77898-1-sashal@kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
---Sig_/w/k5aj/uCU24D2s9=fA2aZW
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+From: Colin Ian King <colin.king@canonical.com>
 
-Hi all,
+[ Upstream commit 8c6c9bed8773375b1d54ccca2911ec892c59db5d ]
 
-Commit
+There is a null check on dst_file->private data which suggests
+it can be potentially null. However, before this check, pointer
+smb_file_target is derived from dst_file->private and dereferenced
+in the call to tlink_tcon, hence there is a potential null pointer
+deference.
 
-  bf4d4ba7d970 ("cifs: update internal module version number for cifs.ko")
+Fix this by assigning smb_file_target and target_tcon after the
+null pointer sanity checks.
 
-is missing a Signed-off-by from its author and committer.
+Detected by CoverityScan, CID#1475302 ("Dereference before null check")
 
---=20
-Cheers,
-Stephen Rothwell
+Fixes: 04b38d601239 ("vfs: pull btrfs clone API to vfs layer")
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/cifs/cifsfs.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
---Sig_/w/k5aj/uCU24D2s9=fA2aZW
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAlvf21IACgkQAVBC80lX
-0Gy5bwf9G1zmT+TqSzCknj1YBEs32xjDVOru00NM9YgILWTEo1809WCZxW5CLPrY
-3CC1gGWiQvWDrTaRSRN6F/RUdA0UvIITC28vvGevgVjh+qX7QhGGhbbYiSwWQ+He
-oqF5dTZaAmKnVkvq0x1YFsp0LRQGUGAISXA04a35gFekPjdozTFXOtvyfLf4LQ7X
-scwUC2drM+Mzz6wsbbwZ+HsU+/KMdbGIU33nfUnE2/52lLbos9YpUqpHRwMsE26m
-QqvluXq5lLfOKuVwhBaQYP6VkRq0+QfhyUyXOqYUkoHk8Et/z/73aHdQ7QiadsAx
-XiKhU+No3W2EicyI2LouhFg6Xzvh+A==
-=Z21O
------END PGP SIGNATURE-----
-
---Sig_/w/k5aj/uCU24D2s9=fA2aZW--
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 7065426b3280..fb32f3d6925e 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -981,8 +981,8 @@ static int cifs_clone_file_range(struct file *src_file, loff_t off,
+ 	struct inode *src_inode = file_inode(src_file);
+ 	struct inode *target_inode = file_inode(dst_file);
+ 	struct cifsFileInfo *smb_file_src = src_file->private_data;
+-	struct cifsFileInfo *smb_file_target = dst_file->private_data;
+-	struct cifs_tcon *target_tcon = tlink_tcon(smb_file_target->tlink);
++	struct cifsFileInfo *smb_file_target;
++	struct cifs_tcon *target_tcon;
+ 	unsigned int xid;
+ 	int rc;
+ 
+@@ -996,6 +996,9 @@ static int cifs_clone_file_range(struct file *src_file, loff_t off,
+ 		goto out;
+ 	}
+ 
++	smb_file_target = dst_file->private_data;
++	target_tcon = tlink_tcon(smb_file_target->tlink);
++
+ 	/*
+ 	 * Note: cifs case is easier than btrfs since server responsible for
+ 	 * checks for proper open modes and file type and if it wants
+-- 
+2.17.1
