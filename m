@@ -1,14 +1,14 @@
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.14 02/26] cifs: don't dereference smb_file_target before null check
-Date: Tue, 13 Nov 2018 00:51:26 -0500
-Message-ID: <20181113055150.78773-2-sashal@kernel.org>
-References: <20181113055150.78773-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 02/17] cifs: don't dereference smb_file_target before null check
+Date: Tue, 13 Nov 2018 00:52:08 -0500
+Message-ID: <20181113055223.79060-2-sashal@kernel.org>
+References: <20181113055223.79060-1-sashal@kernel.org>
 Cc: Colin Ian King <colin.king@canonical.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
 To: stable@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181113055150.78773-1-sashal@kernel.org>
+In-Reply-To: <20181113055223.79060-1-sashal@kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
@@ -36,10 +36,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 44a7b2dea688..c5fd5abf7206 100644
+index 87658f63b374..be84d49f2406 100644
 --- a/fs/cifs/cifsfs.c
 +++ b/fs/cifs/cifsfs.c
-@@ -933,8 +933,8 @@ static int cifs_clone_file_range(struct file *src_file, loff_t off,
+@@ -927,8 +927,8 @@ static int cifs_clone_file_range(struct file *src_file, loff_t off,
  	struct inode *src_inode = file_inode(src_file);
  	struct inode *target_inode = file_inode(dst_file);
  	struct cifsFileInfo *smb_file_src = src_file->private_data;
@@ -50,7 +50,7 @@ index 44a7b2dea688..c5fd5abf7206 100644
  	unsigned int xid;
  	int rc;
  
-@@ -948,6 +948,9 @@ static int cifs_clone_file_range(struct file *src_file, loff_t off,
+@@ -942,6 +942,9 @@ static int cifs_clone_file_range(struct file *src_file, loff_t off,
  		goto out;
  	}
  
