@@ -1,64 +1,73 @@
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.9 02/17] cifs: don't dereference smb_file_target before null check
-Date: Tue, 13 Nov 2018 00:52:08 -0500
-Message-ID: <20181113055223.79060-2-sashal@kernel.org>
-References: <20181113055223.79060-1-sashal@kernel.org>
-Cc: Colin Ian King <colin.king@canonical.com>,
+Subject: [PATCH AUTOSEL 4.14 03/26] cifs: fix return value for cifs_listxattr
+Date: Tue, 13 Nov 2018 00:51:27 -0500
+Message-ID: <20181113055150.78773-3-sashal@kernel.org>
+References: <20181113055150.78773-1-sashal@kernel.org>
+Cc: Ronnie Sahlberg <lsahlber@redhat.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
 To: stable@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181113055223.79060-1-sashal@kernel.org>
+In-Reply-To: <20181113055150.78773-1-sashal@kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
+From: Ronnie Sahlberg <lsahlber@redhat.com>
 
-[ Upstream commit 8c6c9bed8773375b1d54ccca2911ec892c59db5d ]
+[ Upstream commit 0c5d6cb6643f48ad3775322f3ebab6c7eb67484e ]
 
-There is a null check on dst_file->private data which suggests
-it can be potentially null. However, before this check, pointer
-smb_file_target is derived from dst_file->private and dereferenced
-in the call to tlink_tcon, hence there is a potential null pointer
-deference.
+If the application buffer was too small to fit all the names
+we would still count the number of bytes and return this for
+listxattr. This would then trigger a BUG in usercopy.c
 
-Fix this by assigning smb_file_target and target_tcon after the
-null pointer sanity checks.
+Fix the computation of the size so that we return -ERANGE
+correctly when the buffer is too small.
 
-Detected by CoverityScan, CID#1475302 ("Dereference before null check")
+This fixes the kernel BUG for xfstest generic/377
 
-Fixes: 04b38d601239 ("vfs: pull btrfs clone API to vfs layer")
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
+Reviewed-by: Aurelien Aptel <aaptel@suse.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/cifs/cifsfs.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ fs/cifs/smb2ops.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 87658f63b374..be84d49f2406 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -927,8 +927,8 @@ static int cifs_clone_file_range(struct file *src_file, loff_t off,
- 	struct inode *src_inode = file_inode(src_file);
- 	struct inode *target_inode = file_inode(dst_file);
- 	struct cifsFileInfo *smb_file_src = src_file->private_data;
--	struct cifsFileInfo *smb_file_target = dst_file->private_data;
--	struct cifs_tcon *target_tcon = tlink_tcon(smb_file_target->tlink);
-+	struct cifsFileInfo *smb_file_target;
-+	struct cifs_tcon *target_tcon;
- 	unsigned int xid;
- 	int rc;
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 4e5b05263e4a..3372eedaa94d 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -441,6 +441,7 @@ move_smb2_ea_to_cifs(char *dst, size_t dst_size,
+ 	int rc = 0;
+ 	unsigned int ea_name_len = ea_name ? strlen(ea_name) : 0;
+ 	char *name, *value;
++	size_t buf_size = dst_size;
+ 	size_t name_len, value_len, user_name_len;
  
-@@ -942,6 +942,9 @@ static int cifs_clone_file_range(struct file *src_file, loff_t off,
- 		goto out;
- 	}
+ 	while (src_size > 0) {
+@@ -476,9 +477,10 @@ move_smb2_ea_to_cifs(char *dst, size_t dst_size,
+ 			/* 'user.' plus a terminating null */
+ 			user_name_len = 5 + 1 + name_len;
  
-+	smb_file_target = dst_file->private_data;
-+	target_tcon = tlink_tcon(smb_file_target->tlink);
-+
- 	/*
- 	 * Note: cifs case is easier than btrfs since server responsible for
- 	 * checks for proper open modes and file type and if it wants
+-			rc += user_name_len;
+-
+-			if (dst_size >= user_name_len) {
++			if (buf_size == 0) {
++				/* skip copy - calc size only */
++				rc += user_name_len;
++			} else if (dst_size >= user_name_len) {
+ 				dst_size -= user_name_len;
+ 				memcpy(dst, "user.", 5);
+ 				dst += 5;
+@@ -486,8 +488,7 @@ move_smb2_ea_to_cifs(char *dst, size_t dst_size,
+ 				dst += name_len;
+ 				*dst = 0;
+ 				++dst;
+-			} else if (dst_size == 0) {
+-				/* skip copy - calc size only */
++				rc += user_name_len;
+ 			} else {
+ 				/* stop before overrun buffer */
+ 				rc = -ERANGE;
 -- 
 2.17.1
