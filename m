@@ -1,392 +1,143 @@
-From: Pavel Shilovsky <piastryyy@gmail.com>
-Subject: Re: [Patch v4 2/3] CIFS: Add support for direct I/O write
-Date: Fri, 16 Nov 2018 16:20:44 -0800
-Message-ID: <CAKywueRa8Uw_wSk3DUMk_8b=56OPsDv5uOPwqiYVJU19amL3NQ@mail.gmail.com>
-References: <20181031221311.2596-1-longli@linuxonhyperv.com> <20181031221311.2596-2-longli@linuxonhyperv.com>
+From: Stijn Tintel <stijn@linux-ipv6.be>
+Subject: NULL pointer dereference in smb2_queryfs with v4.19.2
+Date: Tue, 20 Nov 2018 17:27:10 +0200
+Message-ID: <9cdc7319-32f9-8349-a787-99d6ea973669@linux-ipv6.be>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Cc: Steve French <sfrench@samba.org>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Long Li <longli@microsoft.com>
+Cc: samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+To: linux-cifs@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181031221311.2596-2-longli@linuxonhyperv.com>
+Content-Language: en-GB
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-=D1=81=D1=80, 31 =D0=BE=D0=BA=D1=82. 2018 =D0=B3. =D0=B2 15:26, Long Li <lo=
-ngli@linuxonhyperv.com>:
->
-> From: Long Li <longli@microsoft.com>
->
-> With direct I/O write, user supplied buffers are pinned to the memory and=
- data
-> are transferred directly from user buffers to the transport layer.
->
-> Change in v3: add support for kernel AIO
->
-> Change in v4:
-> Refactor common write code to __cifs_writev for direct and non-direct I/O=
-.
-> Retry on direct I/O failure.
->
-> Signed-off-by: Long Li <longli@microsoft.com>
-> ---
->  fs/cifs/cifsfs.h |   1 +
->  fs/cifs/file.c   | 194 +++++++++++++++++++++++++++++++++++++++++++------=
-------
->  2 files changed, 154 insertions(+), 41 deletions(-)
->
-> diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
-> index 7fba9aa..e9c5103 100644
-> --- a/fs/cifs/cifsfs.h
-> +++ b/fs/cifs/cifsfs.h
-> @@ -105,6 +105,7 @@ extern ssize_t cifs_user_readv(struct kiocb *iocb, st=
-ruct iov_iter *to);
->  extern ssize_t cifs_direct_readv(struct kiocb *iocb, struct iov_iter *to=
-);
->  extern ssize_t cifs_strict_readv(struct kiocb *iocb, struct iov_iter *to=
-);
->  extern ssize_t cifs_user_writev(struct kiocb *iocb, struct iov_iter *fro=
-m);
-> +extern ssize_t cifs_direct_writev(struct kiocb *iocb, struct iov_iter *f=
-rom);
->  extern ssize_t cifs_strict_writev(struct kiocb *iocb, struct iov_iter *f=
-rom);
->  extern int cifs_lock(struct file *, int, struct file_lock *);
->  extern int cifs_fsync(struct file *, loff_t, loff_t, int);
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index daab878..1a41c04 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -2524,6 +2524,55 @@ wdata_fill_from_iovec(struct cifs_writedata *wdata=
-, struct iov_iter *from,
->  }
->
->  static int
-> +cifs_resend_wdata(struct cifs_writedata *wdata, struct list_head *wdata_=
-list, struct cifs_aio_ctx *ctx)
-> +{
-> +       int wait_retry =3D 0;
-> +       unsigned int wsize, credits;
-> +       int rc;
-> +       struct TCP_Server_Info *server =3D tlink_tcon(wdata->cfile->tlink=
-)->ses->server;
-> +
-> +       /*
-> +        * Try to resend this wdata, waiting for credits up to 3 seconds.
-> +        * Note: we are attempting to resend the whole wdata not in segme=
-nts
-> +        */
-> +       do {
-> +               rc =3D server->ops->wait_mtu_credits(server, wdata->bytes=
-, &wsize, &credits);
-> +
-> +               if (rc)
-> +                       break;
-> +
-> +               if (wsize < wdata->bytes) {
-> +                       add_credits_and_wake_if(server, credits, 0);
-> +                       msleep(1000);
-> +                       wait_retry++;
-> +               }
-> +       } while (wsize < wdata->bytes && wait_retry < 3);
-> +
-> +       if (wsize < wdata->bytes) {
-> +               rc =3D -EBUSY;
-> +               goto out;
-> +       }
-> +
-> +       rc =3D -EAGAIN;
-> +       while (rc =3D=3D -EAGAIN)
-> +               if (!wdata->cfile->invalidHandle ||
-> +                   !(rc =3D cifs_reopen_file(wdata->cfile, false)))
-> +                       rc =3D server->ops->async_writev(wdata,
-> +                                       cifs_uncached_writedata_release);
-> +
-> +       if (!rc) {
-> +               list_add_tail(&wdata->list, wdata_list);
-> +               return 0;
-> +       }
-> +
-> +       add_credits_and_wake_if(server, wdata->credits, 0);
-> +out:
-> +       kref_put(&wdata->refcount, cifs_uncached_writedata_release);
-> +
-> +       return rc;
-> +}
-> +
-> +static int
->  cifs_write_from_iter(loff_t offset, size_t len, struct iov_iter *from,
->                      struct cifsFileInfo *open_file,
->                      struct cifs_sb_info *cifs_sb, struct list_head *wdat=
-a_list,
-> @@ -2537,6 +2586,8 @@ cifs_write_from_iter(loff_t offset, size_t len, str=
-uct iov_iter *from,
->         loff_t saved_offset =3D offset;
->         pid_t pid;
->         struct TCP_Server_Info *server;
-> +       struct page **pagevec;
-> +       size_t start;
->
->         if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
->                 pid =3D open_file->pid;
-> @@ -2553,38 +2604,74 @@ cifs_write_from_iter(loff_t offset, size_t len, s=
-truct iov_iter *from,
->                 if (rc)
->                         break;
->
-> -               nr_pages =3D get_numpages(wsize, len, &cur_len);
-> -               wdata =3D cifs_writedata_alloc(nr_pages,
-> +               if (ctx->direct_io) {
-> +                       cur_len =3D iov_iter_get_pages_alloc(
-> +                               from, &pagevec, wsize, &start);
-> +                       if (cur_len < 0) {
-> +                               cifs_dbg(VFS,
-> +                                       "direct_writev couldn't get user =
-pages "
-> +                                       "(rc=3D%zd) iter type %d iov_offs=
-et %zd count"
-> +                                       " %zd\n",
-> +                                       cur_len, from->type,
-> +                                       from->iov_offset, from->count);
-> +                               dump_stack();
-> +                               break;
-> +                       }
-> +                       iov_iter_advance(from, cur_len);
-> +
-> +                       nr_pages =3D (cur_len + start + PAGE_SIZE - 1) / =
-PAGE_SIZE;
-> +
-> +                       wdata =3D cifs_writedata_direct_alloc(pagevec,
->                                              cifs_uncached_writev_complet=
-e);
-> -               if (!wdata) {
-> -                       rc =3D -ENOMEM;
-> -                       add_credits_and_wake_if(server, credits, 0);
-> -                       break;
-> -               }
-> +                       if (!wdata) {
-> +                               rc =3D -ENOMEM;
-> +                               add_credits_and_wake_if(server, credits, =
-0);
-> +                               break;
-> +                       }
->
-> -               rc =3D cifs_write_allocate_pages(wdata->pages, nr_pages);
-> -               if (rc) {
-> -                       kfree(wdata);
-> -                       add_credits_and_wake_if(server, credits, 0);
-> -                       break;
-> -               }
->
-> -               num_pages =3D nr_pages;
-> -               rc =3D wdata_fill_from_iovec(wdata, from, &cur_len, &num_=
-pages);
-> -               if (rc) {
-> -                       for (i =3D 0; i < nr_pages; i++)
-> -                               put_page(wdata->pages[i]);
-> -                       kfree(wdata);
-> -                       add_credits_and_wake_if(server, credits, 0);
-> -                       break;
-> -               }
-> +                       wdata->page_offset =3D start;
-> +                       wdata->tailsz =3D
-> +                               nr_pages > 1 ?
-> +                                       cur_len - (PAGE_SIZE - start) -
-> +                                       (nr_pages - 2) * PAGE_SIZE :
-> +                                       cur_len;
-> +               } else {
-> +                       nr_pages =3D get_numpages(wsize, len, &cur_len);
-> +                       wdata =3D cifs_writedata_alloc(nr_pages,
-> +                                            cifs_uncached_writev_complet=
-e);
-> +                       if (!wdata) {
-> +                               rc =3D -ENOMEM;
-> +                               add_credits_and_wake_if(server, credits, =
-0);
-> +                               break;
-> +                       }
->
-> -               /*
-> -                * Bring nr_pages down to the number of pages we actually=
- used,
-> -                * and free any pages that we didn't use.
-> -                */
-> -               for ( ; nr_pages > num_pages; nr_pages--)
-> -                       put_page(wdata->pages[nr_pages - 1]);
-> +                       rc =3D cifs_write_allocate_pages(wdata->pages, nr=
-_pages);
-> +                       if (rc) {
-> +                               kfree(wdata);
-> +                               add_credits_and_wake_if(server, credits, =
-0);
-> +                               break;
-> +                       }
-> +
-> +                       num_pages =3D nr_pages;
-> +                       rc =3D wdata_fill_from_iovec(wdata, from, &cur_le=
-n, &num_pages);
-> +                       if (rc) {
-> +                               for (i =3D 0; i < nr_pages; i++)
-> +                                       put_page(wdata->pages[i]);
-> +                               kfree(wdata);
-> +                               add_credits_and_wake_if(server, credits, =
-0);
-> +                               break;
-> +                       }
-> +
-> +                       /*
-> +                        * Bring nr_pages down to the number of pages we =
-actually used,
-> +                        * and free any pages that we didn't use.
-> +                        */
-> +                       for ( ; nr_pages > num_pages; nr_pages--)
-> +                               put_page(wdata->pages[nr_pages - 1]);
-> +
-> +                       wdata->tailsz =3D cur_len - ((nr_pages - 1) * PAG=
-E_SIZE);
-> +               }
->
->                 wdata->sync_mode =3D WB_SYNC_ALL;
->                 wdata->nr_pages =3D nr_pages;
-> @@ -2593,7 +2680,6 @@ cifs_write_from_iter(loff_t offset, size_t len, str=
-uct iov_iter *from,
->                 wdata->pid =3D pid;
->                 wdata->bytes =3D cur_len;
->                 wdata->pagesz =3D PAGE_SIZE;
-> -               wdata->tailsz =3D cur_len - ((nr_pages - 1) * PAGE_SIZE);
->                 wdata->credits =3D credits;
->                 wdata->ctx =3D ctx;
->                 kref_get(&ctx->refcount);
-> @@ -2668,13 +2754,17 @@ static void collect_uncached_write_data(struct ci=
-fs_aio_ctx *ctx)
->                                 INIT_LIST_HEAD(&tmp_list);
->                                 list_del_init(&wdata->list);
->
-> -                               iov_iter_advance(&tmp_from,
-> +                               if (ctx->direct_io)
-> +                                       rc =3D cifs_resend_wdata(wdata, &=
-tmp_list, ctx);
-> +                               else {
-> +                                       iov_iter_advance(&tmp_from,
->                                                  wdata->offset - ctx->pos=
-);
->
-> -                               rc =3D cifs_write_from_iter(wdata->offset=
-,
-> +                                       rc =3D cifs_write_from_iter(wdata=
-->offset,
->                                                 wdata->bytes, &tmp_from,
->                                                 ctx->cfile, cifs_sb, &tmp=
-_list,
->                                                 ctx);
-> +                               }
->
->                                 list_splice(&tmp_list, &ctx->list);
->
-> @@ -2687,8 +2777,9 @@ static void collect_uncached_write_data(struct cifs=
-_aio_ctx *ctx)
->                 kref_put(&wdata->refcount, cifs_uncached_writedata_releas=
-e);
->         }
->
-> -       for (i =3D 0; i < ctx->npages; i++)
-> -               put_page(ctx->bv[i].bv_page);
-> +       if (!ctx->direct_io)
-> +               for (i =3D 0; i < ctx->npages; i++)
-> +                       put_page(ctx->bv[i].bv_page);
->
->         cifs_stats_bytes_written(tcon, ctx->total_len);
->         set_bit(CIFS_INO_INVALID_MAPPING, &CIFS_I(dentry->d_inode)->flags=
-);
-> @@ -2703,7 +2794,7 @@ static void collect_uncached_write_data(struct cifs=
-_aio_ctx *ctx)
->                 complete(&ctx->done);
->  }
->
-> -ssize_t cifs_user_writev(struct kiocb *iocb, struct iov_iter *from)
-> +static ssize_t __cifs_writev(struct kiocb *iocb, struct iov_iter *from, =
-bool direct)
->  {
->         struct file *file =3D iocb->ki_filp;
->         ssize_t total_written =3D 0;
-> @@ -2712,13 +2803,18 @@ ssize_t cifs_user_writev(struct kiocb *iocb, stru=
-ct iov_iter *from)
->         struct cifs_sb_info *cifs_sb;
->         struct cifs_aio_ctx *ctx;
->         struct iov_iter saved_from =3D *from;
-> +       size_t len =3D iov_iter_count(from);
->         int rc;
->
->         /*
-> -        * BB - optimize the way when signing is disabled. We can drop th=
-is
-> -        * extra memory-to-memory copying and use iovec buffers for const=
-ructing
-> -        * write request.
-> +        * iov_iter_get_pages_alloc doesn't work with ITER_KVEC.
-> +        * In this case, fall back to non-direct write function.
-> +        * this could be improved by getting pages directly in ITER_KVEC
->          */
-> +       if (direct && from->type & ITER_KVEC) {
-> +               cifs_dbg(FYI, "use non-direct cifs_writev for kvec I/O\n"=
-);
-> +               direct =3D false;
-> +       }
->
->         rc =3D generic_write_checks(iocb, from);
->         if (rc <=3D 0)
-> @@ -2742,10 +2838,16 @@ ssize_t cifs_user_writev(struct kiocb *iocb, stru=
-ct iov_iter *from)
->
->         ctx->pos =3D iocb->ki_pos;
->
-> -       rc =3D setup_aio_ctx_iter(ctx, from, WRITE);
-> -       if (rc) {
-> -               kref_put(&ctx->refcount, cifs_aio_ctx_release);
-> -               return rc;
-> +       if (direct) {
-> +               ctx->direct_io =3D true;
-> +               ctx->iter =3D *from;
-> +               ctx->len =3D len;
-> +       } else {
-> +               rc =3D setup_aio_ctx_iter(ctx, from, WRITE);
-> +               if (rc) {
-> +                       kref_put(&ctx->refcount, cifs_aio_ctx_release);
-> +                       return rc;
-> +               }
->         }
->
->         /* grab a lock here due to read response handlers can access ctx =
-*/
-> @@ -2795,6 +2897,16 @@ ssize_t cifs_user_writev(struct kiocb *iocb, struc=
-t iov_iter *from)
->         return total_written;
->  }
->
-> +ssize_t cifs_direct_writev(struct kiocb *iocb, struct iov_iter *from)
-> +{
-> +       return __cifs_writev(iocb, from, true);
-> +}
-> +
-> +ssize_t cifs_user_writev(struct kiocb *iocb, struct iov_iter *from)
-> +{
-> +       return __cifs_writev(iocb, from, false);
-> +}
-> +
->  static ssize_t
->  cifs_writev(struct kiocb *iocb, struct iov_iter *from)
->  {
-> --
-> 2.7.4
->
+Hi,
 
-Did you measure the performance benefit of using O_DIRECT with your
-patches for non-RDMA mode?
+My machine just rebooted after the connection to the Samba server
+hosting a CIFS mount was lost. Kernel version 4.19.2. The oops was
+recorded in pstore:
 
---
-Best regards,
-Pavel Shilovsky
+<3>[533816.847894] CIFS VFS: Server store has not responded in 120
+seconds. Reconnecting...
+<1>[533925.390079] BUG: unable to handle kernel NULL pointer dereference
+at 0000000000000000
+<6>[533925.390082] PGD 0 P4D 0
+<4>[533925.390085] Oops: 0000 [#1] PREEMPT SMP PTI
+<4>[533925.390087] CPU: 1 PID: 30794 Comm: sadc Tainted: P=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
+O=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 4.19.2-gentoo #1
+<4>[533925.390088] Hardware name: System manufacturer System Product
+Name/P9X79 WS, BIOS 4802 06/02/2015
+<4>[533925.390099] RIP: 0010:SMB2_close_free+0x8/0x10 [cifs]
+<4>[533925.390100] Code: 65 48 33 1c 25 28 00 00 00 75 09 48 83 c4 18 5b
+5d 41 5c c3 e8 89 ac 29 e0 66 0f 1f 84 00 00 00 00 00 66 66 66 66 90 48
+8b 07 <48> 8b 38 e9 50 8d fe ff 66 66 66 66 90 4c 8d 54 24 08 48 83 e4 f0
+<4>[533925.390101] RSP: 0018:ffffc9002c2dfbb8 EFLAGS: 00010246
+<4>[533925.390102] RAX: 0000000000000000 RBX: ffff880fae7e5800 RCX:
+0000000000000000
+<4>[533925.390104] RDX: ffff880fdf521180 RSI: 0000000000000206 RDI:
+ffffc9002c2dfd68
+<4>[533925.390105] RBP: ffffc9002c2dfdf0 R08: 0000000000000000 R09:
+00000000002503ee
+<4>[533925.390106] R10: ffffc9002c2dfbc0 R11: 00000000000f4240 R12:
+ffffc9002c2dfc50
+<4>[533925.390107] R13: ffff880fad03a200 R14: ffff880fdf521000 R15:
+0000000000000000
+<4>[533925.390108] FS:=C2=A0 00007fb5cff85740(0000) GS:ffff88100f840000(0=
+000)
+knlGS:0000000000000000
+<4>[533925.390109] CS:=C2=A0 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+<4>[533925.390110] CR2: 0000000000000000 CR3: 0000000118d32001 CR4:
+00000000000626e0
+<4>[533925.390111] Call Trace:
+<4>[533925.390119]=C2=A0 smb2_queryfs+0x162/0x360 [cifs]
+<4>[533925.390124]=C2=A0 ? lookup_fast+0xc8/0x2d0
+<4>[533925.390126]=C2=A0 ? legitimize_path.isra.8+0x28/0x50
+<4>[533925.390127]=C2=A0 ? __vfs_getxattr+0x2a/0x70
+<4>[533925.390130]=C2=A0 ? get_vfs_caps_from_disk+0x65/0x170
+<4>[533925.390135]=C2=A0 ? cifs_statfs+0x97/0x1f0 [cifs]
+<4>[533925.390140]=C2=A0 ? smb2_set_next_command+0x60/0x60 [cifs]
+<4>[533925.390144]=C2=A0 cifs_statfs+0x97/0x1f0 [cifs]
+<4>[533925.390147]=C2=A0 statfs_by_dentry+0x42/0x60
+<4>[533925.390148]=C2=A0 vfs_statfs+0x16/0xc0
+<4>[533925.390150]=C2=A0 user_statfs+0x54/0xa0
+<4>[533925.390151]=C2=A0 __se_sys_statfs+0x25/0x60
+<4>[533925.390153]=C2=A0 do_syscall_64+0x5c/0x160
+<4>[533925.390156]=C2=A0 entry_SYSCALL_64_after_hwframe+0x44/0xa9
+<4>[533925.390158] RIP: 0033:0x7fb5cf8ca467
+<4>[533925.390159] Code: 2c 00 64 c7 00 16 00 00 00 b8 ff ff ff ff eb b8
+e8 6e 4f 02 00 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 b8 89 00 00 00
+0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d f1 e9 2c 00 f7 d8 64 89 01 48
+<4>[533925.390160] RSP: 002b:00007ffc47a0c7f8 EFLAGS: 00000246 ORIG_RAX:
+0000000000000089
+<4>[533925.390162] RAX: ffffffffffffffda RBX: 00007ffc47a0c9a0 RCX:
+00007fb5cf8ca467
+<4>[533925.390163] RDX: 00007ffc47a0c9a9 RSI: 00007ffc47a0c800 RDI:
+00007ffc47a0c9a0
+<4>[533925.390164] RBP: 00007ffc47a0c800 R08: 0000000000000000 R09:
+000000000000000d
+<4>[533925.390165] R10: 00007fb5cfb9a560 R11: 0000000000000246 R12:
+00007ffc47a0c8b0
+<4>[533925.390166] R13: 000000000000000b R14: 0000561829c584d4 R15:
+00007ffc47a0c920
+<4>[533925.390167] Modules linked in: xt_nat hfsplus hfs msdos
+nfnetlink_queue nfnetlink_log cp210x usbserial squashfs cfg80211 drbg
+seqiv xfrm6_mode_tunnel xfrm4_mode_tunnel nvidia_uvm(PO) rfcomm
+xt_CHECKSUM iptable_mangle ipt_REJECT nf_reject_ipv4 xt_tcpudp devlink
+ebtable_filter ebtables ip6table_filter ip6_tables ipt_MASQUERADE
+nf_conntrack_netlink nfnetlink iptable_nat xt_addrtype iptable_filter
+ip_tables bpfilter xt_conntrack x_tables br_netfilter bridge stp llc
+arc4 md4 md5 xfrm_user xfrm4_tunnel tunnel4 ipcomp xfrm_ipcomp esp4 ah4
+af_key cmac xfrm_algo nls_utf8 cifs ccm sctp bnep nvidia_drm(PO)
+algif_skcipher nvidia_modeset(PO) nls_iso8859_1 nls_cp437 vfat fat
+joydev amdkfd iTCO_wdt nvidia(PO) evdev iTCO_vendor_support uinput
+intel_rapl amdgpu snd_hda_codec_realtek x86_pkg_temp_thermal
+intel_powerclamp
+<4>[533925.390197]=C2=A0 snd_hda_codec_hdmi snd_hda_codec_generic
+crct10dif_pclmul crc32_pclmul crc32c_intel ghash_clmulni_intel
+snd_usb_audio pcbc snd_hda_intel chash snd_usbmidi_lib aesni_intel
+snd_hda_codec snd_rawmidi gpu_sched snd_seq_device crypto_simd ttm
+snd_hda_core bcache btusb snd_hwdep drm_kms_helper btrtl cryptd snd_pcm
+btbcm uas glue_helper btintel crc64 drm snd_timer intel_cstate bluetooth
+drm_panel_orientation_quirks snd intel_uncore syscopyarea soundcore
+i2c_i801 efi_pstore wmi_bmof intel_rapl_perf efivars sysfillrect e1000e
+ecdh_generic sysimgblt lpc_ich mei_me fb_sys_fops button firewire_ohci
+sch_fq_codel nct6775 hwmon_vid coretemp openvswitch nsh nf_nat_ipv6
+nf_nat_ipv4 nf_conncount nf_nat nf_conntrack nf_defrag_ipv6
+nf_defrag_ipv4 vhost_net tun vhost tap kvm_intel kvm irqbypass msr cpuid
+<4>[533925.390226]=C2=A0 efivarfs virtio_ring virtio xts aes_x86_64 ecb c=
+bc
+sha1_generic iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi
+bonding vxlan ip6_udp_tunnel udp_tunnel macvlan igb i2c_algo_bit dca
+e1000 fuse overlay nfs lockd grace sunrpc ext4 mbcache jbd2 fscrypto
+multipath linear raid10 raid1 raid0 dm_raid raid456 async_raid6_recov
+async_memcpy async_pq async_xor async_tx md_mod dm_snapshot dm_bufio
+dm_crypt dm_mirror dm_region_hash dm_log dm_mod hid_sony hid_samsung
+hid_petalynx hid_monterey hid_microsoft hid_logitech ff_memless
+hid_gyration hid_ezkey hid_cypress hid_chicony hid_cherry hid_belkin
+hid_apple hid_a4tech hid_generic usbhid ohci_pci ohci_hcd uhci_hcd hid
+arcmsr sr_mod cdrom sg usb_storage xhci_pci ehci_pci xhci_hcd ehci_hcd
+ptp usbcore firewire_core pps_core crc_itu_t usb_common
+<4>[533925.390259] CR2: 0000000000000000
+<4>[533925.390260] ---[ end trace 66b5055ad278750a ]---
+
+CIFS kernel options:
+
+CONFIG_CIFS=3Dm
+# CONFIG_CIFS_STATS2 is not set
+# CONFIG_CIFS_ALLOW_INSECURE_LEGACY is not set
+# CONFIG_CIFS_UPCALL is not set
+CONFIG_CIFS_XATTR=3Dy
+CONFIG_CIFS_POSIX=3Dy
+CONFIG_CIFS_ACL=3Dy
+CONFIG_CIFS_DEBUG=3Dy
+# CONFIG_CIFS_DEBUG2 is not set
+# CONFIG_CIFS_DEBUG_DUMP_KEYS is not set
+CONFIG_CIFS_DFS_UPCALL=3Dy
+# CONFIG_CIFS_FSCACHE is not set
+
+Please include me when replying.
+
+Thanks,
+Stijn
