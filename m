@@ -1,59 +1,63 @@
-From: Steve French <smfrench@gmail.com>
+From: Stephen Rothwell <sfr@canb.auug.org.au>
 Subject: Re: linux-next: build warnings after merge of the cifs tree
-Date: Sun, 25 Nov 2018 18:31:40 -0600
-Message-ID: <CAH2r5mvtFzp=nYK+J92vh9y4tsNLT3rD4a2+mB9LMyWcFN-EHA@mail.gmail.com>
+Date: Mon, 26 Nov 2018 11:52:47 +1100
+Message-ID: <20181126115247.53cbf7be@canb.auug.org.au>
 References: <20181126111415.5cf17f39@canb.auug.org.au>
+        <CAH2r5mvtFzp=nYK+J92vh9y4tsNLT3rD4a2+mB9LMyWcFN-EHA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: CIFS <linux-cifs@vger.kernel.org>, keescook@google.com,
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/914m7+LezhCz7kA/2bBuqhG"; protocol="application/pgp-signature"
+Cc: Sachin Prabhu <sprabhu@redhat.com>,
+        CIFS <linux-cifs@vger.kernel.org>, keescook@google.com,
         Linux-Next Mailing List <linux-next@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>,
-        Sachin Prabhu <sprabhu@redhat.com>
+To: Steve French <smfrench@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181126111415.5cf17f39@canb.auug.org.au>
+In-Reply-To: <CAH2r5mvtFzp=nYK+J92vh9y4tsNLT3rD4a2+mB9LMyWcFN-EHA@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Both of those cases are intentional fallthroughs and there are
-existing comments in the code noting the reasons for them to
-fallthrough
+--Sig_/914m7+LezhCz7kA/2bBuqhG
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-(also can see the reasoning for these in the commits which introduced
-them from Sachin c369c9a4a7c82) and dde2356c84662)
-On Sun, Nov 25, 2018 at 6:14 PM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
->
-> Hi all,
->
-> After merging the cifs tree, today's linux-next build (powerpc
-> ppc64_defconfig) produced these warnings:
->
-> fs/cifs/sess.c: In function 'cifs_select_sectype':
-> fs/cifs/sess.c:527:3: warning: this statement may fall through [-Wimplicit-fallthrough=]
->    switch (requested) {
->    ^~~~~~
-> fs/cifs/sess.c:540:2: note: here
->   case CIFS_NEGFLAVOR_LANMAN:
->   ^~~~
-> fs/cifs/connect.c: In function 'cifs_parse_mount_options':
-> fs/cifs/connect.c:1825:8: warning: this statement may fall through [-Wimplicit-fallthrough=]
->     if (!(tmp_end < end && tmp_end[1] == delim)) {
->         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> fs/cifs/connect.c:1832:3: note: here
->    case Opt_pass:
->    ^~~~
->
-> Exposed by my use of -Wimplicit-fallthrough
->
-> I am not sure why these only turned up now (as opposed to earlier today).
->
-> --
-> Cheers,
-> Stephen Rothwell
+Hi Steve,
 
+On Sun, 25 Nov 2018 18:31:40 -0600 Steve French <smfrench@gmail.com> wrote:
+>
+> Both of those cases are intentional fallthroughs and there are
+> existing comments in the code noting the reasons for them to
+> fallthrough
+>=20
+> (also can see the reasoning for these in the commits which introduced
+> them from Sachin c369c9a4a7c82) and dde2356c84662)
 
+I am not questioning that :-)
 
--- 
-Thanks,
+The gcc warning can be turned off by adding a /* fall through */
+comment at the point the fall through happens.  Kees and others are
+working on the several hundred other places that need annotating.
 
-Steve
+This one just popped up.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/914m7+LezhCz7kA/2bBuqhG
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAlv7Q98ACgkQAVBC80lX
+0GxJXwf/YbJmvqG4cflEZDjeqL/qziZ5xfP7S3vWetuFVBU+fYrAGVxeKhRHmb2F
+6fk3UNhtanCj895jn4xW7JhyKJ3PBkrtwJRcYtnfGR1TwhXvLX/wwGOFi1PqfUKe
+1tdBF29iXUoKik8lqMGUpJFCDpTSems77gMSuvz1I3B5/rMMueXqdLBaQpGROm1q
+/OrNs0yJ89EKiIrGNLH/ii6c5Fx2z66/P6fkx2rO0fACbgJy1V3UimaStofutHJw
+8WyLjhiYzUBnuEnLB8GbBJCIz8iFUw6UnfrZgdXsjpIwxNhPd3t/38oScK+FzWm9
+9eaTlVopq0D91mJbp5BVElIsdjC6aQ==
+=p9lr
+-----END PGP SIGNATURE-----
+
+--Sig_/914m7+LezhCz7kA/2bBuqhG--
