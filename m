@@ -1,22 +1,18 @@
-From: Mike Rapoport <rppt@linux.ibm.com>
+From: Pankaj Gupta <pagupta@redhat.com>
 Subject: Re: [PATCH 2/2] fs: Don't open-code lru_to_page
-Date: Thu, 29 Nov 2018 13:17:24 +0200
-Message-ID: <20181129111723.GD9315@rapoport-lnx>
-References: <20181129075301.29087-1-nborisov@suse.com>
- <20181129075301.29087-2-nborisov@suse.com>
- <20181129081826.GO6923@dhcp22.suse.cz>
- <0921bc8f-b899-4925-51f2-a9f45d4c906a@suse.com>
+Date: Thu, 29 Nov 2018 06:38:40 -0500 (EST)
+Message-ID: <1231450124.37408874.1543491520867.JavaMail.zimbra@redhat.com>
+References: <20181129075301.29087-1-nborisov@suse.com> <20181129075301.29087-2-nborisov@suse.com> <20181129081826.GO6923@dhcp22.suse.cz> <0921bc8f-b899-4925-51f2-a9f45d4c906a@suse.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Cc: Michal Hocko <mhocko@kernel.org>, linux-kernel@vger.kernel.org,
         David Howells <dhowells@redhat.com>, Chris Mason <clm@fb.com>,
         Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>,
-        "Yan, Zheng" <zyan@redhat.com>, Sage Weil <sage@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
+        David Sterba <dsterba@suse.com>, Zheng Yan <zyan@redhat.com>,
+        Sage Weil <sage@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
         Steve French <sfrench@samba.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
+        Theodore Ts'o <tytso@mit.edu>,
         Andreas Dilger <adilger.kernel@dilger.ca>,
         Mark Fasheh <mark@fasheh.com>,
         Joel Becker <jlbec@evilplan.org>,
@@ -27,19 +23,14 @@ Cc: Michal Hocko <mhocko@kernel.org>, linux-kernel@vger.kernel.org,
         Matthew Wilcox <willy@infradead.org>,
         Randy Dunlap <rdunlap@infradead.org>,
         YueHaibing <yuehaibing@huawei.com>,
-        Shakeel Bu
+        Shakeel Butt <shakeelb@
 To: Nikolay Borisov <nborisov@suse.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
 In-Reply-To: <0921bc8f-b899-4925-51f2-a9f45d4c906a@suse.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Thu, Nov 29, 2018 at 10:50:08AM +0200, Nikolay Borisov wrote:
-> 
-> 
-> On 29.11.18 г. 10:18 ч., Michal Hocko wrote:
-> > On Thu 29-11-18 09:52:57, Nikolay Borisov wrote:
+
 > >> There are a bunch of filesystems which essentially open-code lru_to_page
 > >> helper. Change them to using the helper. No functional changes.
 > > 
@@ -48,13 +39,12 @@ On Thu, Nov 29, 2018 at 10:50:08AM +0200, Nikolay Borisov wrote:
 > 
 > No reason, just didn't know how people would react so that's why I chose
 > to send as two separate.
-
-I'm with Michal on this, a single patch seems better here.
-Yet, for either way:
-
-Reviewed-by: Mike Rapoport <rppt@linux.ibm.com>
- 
+> 
 > If I squash them who would be the best person to take them ?
+
+For squashed version:
+Acked-by: Pankaj gupta <pagupta@redhat.com>
+
 > 
 > > 
 > >> Signed-off-by: Nikolay Borisov <nborisov@suse.com>
@@ -63,8 +53,9 @@ Reviewed-by: Mike Rapoport <rppt@linux.ibm.com>
 > > 
 > >> ---
 > >>
-> >> Since this is a mostly mechanical change I've actually batched all of them in 
-> >> a single patch. 
+> >> Since this is a mostly mechanical change I've actually batched all of them
+> >> in
+> >> a single patch.
 > >>
 > >>  fs/afs/file.c        | 5 +++--
 > >>  fs/btrfs/extent_io.c | 2 +-
@@ -88,7 +79,8 @@ Reviewed-by: Mike Rapoport <rppt@linux.ibm.com>
 > >>  #include "internal.h"
 > >>  
 > >>  static int afs_file_mmap(struct file *file, struct vm_area_struct *vma);
-> >> @@ -441,7 +442,7 @@ static int afs_readpages_one(struct file *file, struct address_space *mapping,
+> >> @@ -441,7 +442,7 @@ static int afs_readpages_one(struct file *file, struct
+> >> address_space *mapping,
 > >>  	/* Count the number of contiguous pages at the front of the list.  Note
 > >>  	 * that the list goes prev-wards rather than next-wards.
 > >>  	 */
@@ -97,7 +89,8 @@ Reviewed-by: Mike Rapoport <rppt@linux.ibm.com>
 > >>  	index = first->index + 1;
 > >>  	n = 1;
 > >>  	for (p = first->lru.prev; p != pages; p = p->prev) {
-> >> @@ -473,7 +474,7 @@ static int afs_readpages_one(struct file *file, struct address_space *mapping,
+> >> @@ -473,7 +474,7 @@ static int afs_readpages_one(struct file *file, struct
+> >> address_space *mapping,
 > >>  	 * page at the end of the file.
 > >>  	 */
 > >>  	do {
@@ -110,7 +103,8 @@ Reviewed-by: Mike Rapoport <rppt@linux.ibm.com>
 > >> index 19f4b8fd654f..8332c5f4b1c3 100644
 > >> --- a/fs/btrfs/extent_io.c
 > >> +++ b/fs/btrfs/extent_io.c
-> >> @@ -4104,7 +4104,7 @@ int extent_readpages(struct address_space *mapping, struct list_head *pages,
+> >> @@ -4104,7 +4104,7 @@ int extent_readpages(struct address_space *mapping,
+> >> struct list_head *pages,
 > >>  	u64 prev_em_start = (u64)-1;
 > >>  
 > >>  	for (page_idx = 0; page_idx < nr_pages; page_idx++) {
@@ -123,7 +117,8 @@ Reviewed-by: Mike Rapoport <rppt@linux.ibm.com>
 > >> index 8eade7a993c1..5d0c05e288cc 100644
 > >> --- a/fs/ceph/addr.c
 > >> +++ b/fs/ceph/addr.c
-> >> @@ -306,7 +306,7 @@ static int start_read(struct inode *inode, struct ceph_rw_context *rw_ctx,
+> >> @@ -306,7 +306,7 @@ static int start_read(struct inode *inode, struct
+> >> ceph_rw_context *rw_ctx,
 > >>  	struct ceph_osd_client *osdc =
 > >>  		&ceph_inode_to_client(inode)->client->osdc;
 > >>  	struct ceph_inode_info *ci = ceph_inode(inode);
@@ -132,7 +127,8 @@ Reviewed-by: Mike Rapoport <rppt@linux.ibm.com>
 > >>  	struct ceph_vino vino;
 > >>  	struct ceph_osd_request *req;
 > >>  	u64 off;
-> >> @@ -333,8 +333,7 @@ static int start_read(struct inode *inode, struct ceph_rw_context *rw_ctx,
+> >> @@ -333,8 +333,7 @@ static int start_read(struct inode *inode, struct
+> >> ceph_rw_context *rw_ctx,
 > >>  			if (got)
 > >>  				ceph_put_cap_refs(ci, got);
 > >>  			while (!list_empty(page_list)) {
@@ -154,7 +150,8 @@ Reviewed-by: Mike Rapoport <rppt@linux.ibm.com>
 > >>  #include <asm/div64.h>
 > >>  #include "cifsfs.h"
 > >>  #include "cifspdu.h"
-> >> @@ -3975,7 +3976,7 @@ readpages_get_pages(struct address_space *mapping, struct list_head *page_list,
+> >> @@ -3975,7 +3976,7 @@ readpages_get_pages(struct address_space *mapping,
+> >> struct list_head *page_list,
 > >>  
 > >>  	INIT_LIST_HEAD(tmplist);
 > >>  
@@ -167,7 +164,8 @@ Reviewed-by: Mike Rapoport <rppt@linux.ibm.com>
 > >> index f461d75ac049..6aa282ee455a 100644
 > >> --- a/fs/ext4/readpage.c
 > >> +++ b/fs/ext4/readpage.c
-> >> @@ -128,7 +128,7 @@ int ext4_mpage_readpages(struct address_space *mapping,
+> >> @@ -128,7 +128,7 @@ int ext4_mpage_readpages(struct address_space
+> >> *mapping,
 > >>  
 > >>  		prefetchw(&page->flags);
 > >>  		if (pages) {
@@ -188,7 +186,8 @@ Reviewed-by: Mike Rapoport <rppt@linux.ibm.com>
 > >>  
 > >>  #include <cluster/masklog.h>
 > >>  
-> >> @@ -397,7 +398,7 @@ static int ocfs2_readpages(struct file *filp, struct address_space *mapping,
+> >> @@ -397,7 +398,7 @@ static int ocfs2_readpages(struct file *filp, struct
+> >> address_space *mapping,
 > >>  	 * Check whether a remote node truncated this file - we just
 > >>  	 * drop out in that case as it's not worth handling here.
 > >>  	 */
@@ -223,11 +222,8 @@ Reviewed-by: Mike Rapoport <rppt@linux.ibm.com>
 > >>  		list_del(&victim->lru);
 > >>  		put_page(victim);
 > >>  	}
-> >> -- 
+> >> --
 > >> 2.17.1
 > > 
 > 
-
--- 
-Sincerely yours,
-Mike.
+> 
