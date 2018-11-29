@@ -1,14 +1,13 @@
-From: Michal Hocko <mhocko@kernel.org>
+From: David Hildenbrand <david@redhat.com>
 Subject: Re: [PATCH 2/2] fs: Don't open-code lru_to_page
-Date: Thu, 29 Nov 2018 10:04:50 +0100
-Message-ID: <20181129090450.GR6923@dhcp22.suse.cz>
+Date: Thu, 29 Nov 2018 11:12:07 +0100
+Message-ID: <38bdc5f7-63b5-7276-921f-258ee876c45b@redhat.com>
 References: <20181129075301.29087-1-nborisov@suse.com>
  <20181129075301.29087-2-nborisov@suse.com>
  <20181129081826.GO6923@dhcp22.suse.cz>
- <0921bc8f-b899-4925-51f2-a9f45d4c906a@suse.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Cc: linux-kernel@vger.kernel.org, David Howells <dhowells@redhat.com>,
         Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
         David Sterba <dsterba@suse.com>,
@@ -28,36 +27,37 @@ Cc: linux-kernel@vger.kernel.org, David Howells <dhowells@redhat.com>,
         YueHaibing <yuehaibing@huawei.com>,
         Shakeel Butt <shakeelb@google.com>,
         Dan Willia
-To: Nikolay Borisov <nborisov@suse.com>
+To: Michal Hocko <mhocko@kernel.org>,
+        Nikolay Borisov <nborisov@suse.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <0921bc8f-b899-4925-51f2-a9f45d4c906a@suse.com>
+In-Reply-To: <20181129081826.GO6923@dhcp22.suse.cz>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Thu 29-11-18 10:50:08, Nikolay Borisov wrote:
+On 29.11.18 09:18, Michal Hocko wrote:
+> On Thu 29-11-18 09:52:57, Nikolay Borisov wrote:
+>> There are a bunch of filesystems which essentially open-code lru_to_page
+>> helper. Change them to using the helper. No functional changes.
 > 
+> I would just squash the two into a single patch. It makes the first one
+> more obvious. Or is there any reason to have them separate?
 > 
-> On 29.11.18 г. 10:18 ч., Michal Hocko wrote:
-> > On Thu 29-11-18 09:52:57, Nikolay Borisov wrote:
-> >> There are a bunch of filesystems which essentially open-code lru_to_page
-> >> helper. Change them to using the helper. No functional changes.
-> > 
-> > I would just squash the two into a single patch. It makes the first one
-> > more obvious. Or is there any reason to have them separate?
+>> Signed-off-by: Nikolay Borisov <nborisov@suse.com>
 > 
-> No reason, just didn't know how people would react so that's why I chose
-> to send as two separate.
+> Acked-by: Michal Hocko <mhocko@suse.com>
 
-This is a matter of taste I guess. But I usually prefer to have callers
-along with a new helper in a single patch. This is not a new helper
-per-se but doing it the same way seems reasonable to me. Not that I
-would insist of course. You can use my ack for both patch in case you
-decide to leave it as is.
+mm_inline.h is 99.9% about lru and there is barely anything about lru in
+mm.h. However this simple macro seems to differ from the other inlined
+functions.
 
-> If I squash them who would be the best person to take them ?
+So to the squashed patch
 
-Sounds like a mmotm material to me.
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+
 -- 
-Michal Hocko
-SUSE Labs
+
+Thanks,
+
+David / dhildenb
