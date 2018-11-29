@@ -1,293 +1,198 @@
-From: Long Li <longli@microsoft.com>
-Subject: RE: [Patch v4 2/3] CIFS: Add support for direct I/O write
-Date: Thu, 29 Nov 2018 02:19:58 +0000
-Message-ID: <DM5PR21MB0185F6D521448285371066FECED20@DM5PR21MB0185.namprd21.prod.outlook.com>
-References: <20181031221311.2596-1-longli@linuxonhyperv.com>
- <20181031221311.2596-2-longli@linuxonhyperv.com>
- <CAKywueRa8Uw_wSk3DUMk_8b=56OPsDv5uOPwqiYVJU19amL3NQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Steve French <sfrench@samba.org>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Pavel Shilovsky <piastryyy@gmail.com>
+From: Nikolay Borisov <nborisov@suse.com>
+Subject: [PATCH 2/2] fs: Don't open-code lru_to_page
+Date: Thu, 29 Nov 2018 09:52:57 +0200
+Message-ID: <20181129075301.29087-2-nborisov@suse.com>
+References: <20181129075301.29087-1-nborisov@suse.com>
+Cc: Nikolay Borisov <nborisov@suse.com>,
+        David Howells <dhowells@redhat.com>, Chris Mason <clm@fb.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
+        "Yan, Zheng" <zyan@redhat.com>, Sage Weil <sage@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Steve French <sfrench@samba.org>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Mark Fasheh <mark@fasheh.com>,
+        Joel Becker <jlbec@evilplan.org>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Martin Brandenburg <martin@omnibond.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mike Rapoport <rppt@linux.vnet.ibm.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        YueHaibing <yuehaibing@huawei.com>,
+        Shakeel Butt <shakeelb@google.com>,
+To: linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAKywueRa8Uw_wSk3DUMk_8b=56OPsDv5uOPwqiYVJU19amL3NQ@mail.gmail.com>
-Content-Language: en-US
+In-Reply-To: <20181129075301.29087-1-nborisov@suse.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-PiBTdWJqZWN0OiBSZTogW1BhdGNoIHY0IDIvM10gQ0lGUzogQWRkIHN1cHBvcnQgZm9yIGRpcmVj
-dCBJL08gd3JpdGUNCj4gDQo+INGB0YAsIDMxINC+0LrRgi4gMjAxOCDQsy4g0LIgMTU6MjYsIExv
-bmcgTGkgPGxvbmdsaUBsaW51eG9uaHlwZXJ2LmNvbT46DQo+ID4NCj4gPiBGcm9tOiBMb25nIExp
-IDxsb25nbGlAbWljcm9zb2Z0LmNvbT4NCj4gPg0KPiA+IFdpdGggZGlyZWN0IEkvTyB3cml0ZSwg
-dXNlciBzdXBwbGllZCBidWZmZXJzIGFyZSBwaW5uZWQgdG8gdGhlIG1lbW9yeQ0KPiA+IGFuZCBk
-YXRhIGFyZSB0cmFuc2ZlcnJlZCBkaXJlY3RseSBmcm9tIHVzZXIgYnVmZmVycyB0byB0aGUgdHJh
-bnNwb3J0IGxheWVyLg0KPiA+DQo+ID4gQ2hhbmdlIGluIHYzOiBhZGQgc3VwcG9ydCBmb3Iga2Vy
-bmVsIEFJTw0KPiA+DQo+ID4gQ2hhbmdlIGluIHY0Og0KPiA+IFJlZmFjdG9yIGNvbW1vbiB3cml0
-ZSBjb2RlIHRvIF9fY2lmc193cml0ZXYgZm9yIGRpcmVjdCBhbmQgbm9uLWRpcmVjdCBJL08uDQo+
-ID4gUmV0cnkgb24gZGlyZWN0IEkvTyBmYWlsdXJlLg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTog
-TG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+ID4gLS0tDQo+ID4gIGZzL2NpZnMvY2lm
-c2ZzLmggfCAgIDEgKw0KPiA+ICBmcy9jaWZzL2ZpbGUuYyAgIHwgMTk0ICsrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tDQo+IC0tLS0tLS0tDQo+ID4gIDIgZmls
-ZXMgY2hhbmdlZCwgMTU0IGluc2VydGlvbnMoKyksIDQxIGRlbGV0aW9ucygtKQ0KPiA+DQo+ID4g
-ZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc2ZzLmggYi9mcy9jaWZzL2NpZnNmcy5oIGluZGV4DQo+
-ID4gN2ZiYTlhYS4uZTljNTEwMyAxMDA2NDQNCj4gPiAtLS0gYS9mcy9jaWZzL2NpZnNmcy5oDQo+
-ID4gKysrIGIvZnMvY2lmcy9jaWZzZnMuaA0KPiA+IEBAIC0xMDUsNiArMTA1LDcgQEAgZXh0ZXJu
-IHNzaXplX3QgY2lmc191c2VyX3JlYWR2KHN0cnVjdCBraW9jYiAqaW9jYiwNCj4gPiBzdHJ1Y3Qg
-aW92X2l0ZXIgKnRvKTsgIGV4dGVybiBzc2l6ZV90IGNpZnNfZGlyZWN0X3JlYWR2KHN0cnVjdCBr
-aW9jYg0KPiA+ICppb2NiLCBzdHJ1Y3QgaW92X2l0ZXIgKnRvKTsgIGV4dGVybiBzc2l6ZV90IGNp
-ZnNfc3RyaWN0X3JlYWR2KHN0cnVjdA0KPiA+IGtpb2NiICppb2NiLCBzdHJ1Y3QgaW92X2l0ZXIg
-KnRvKTsgIGV4dGVybiBzc2l6ZV90DQo+ID4gY2lmc191c2VyX3dyaXRldihzdHJ1Y3Qga2lvY2Ig
-KmlvY2IsIHN0cnVjdCBpb3ZfaXRlciAqZnJvbSk7DQo+ID4gK2V4dGVybiBzc2l6ZV90IGNpZnNf
-ZGlyZWN0X3dyaXRldihzdHJ1Y3Qga2lvY2IgKmlvY2IsIHN0cnVjdCBpb3ZfaXRlcg0KPiA+ICsq
-ZnJvbSk7DQo+ID4gIGV4dGVybiBzc2l6ZV90IGNpZnNfc3RyaWN0X3dyaXRldihzdHJ1Y3Qga2lv
-Y2IgKmlvY2IsIHN0cnVjdCBpb3ZfaXRlcg0KPiA+ICpmcm9tKTsgIGV4dGVybiBpbnQgY2lmc19s
-b2NrKHN0cnVjdCBmaWxlICosIGludCwgc3RydWN0IGZpbGVfbG9jayAqKTsNCj4gPiBleHRlcm4g
-aW50IGNpZnNfZnN5bmMoc3RydWN0IGZpbGUgKiwgbG9mZl90LCBsb2ZmX3QsIGludCk7IGRpZmYg
-LS1naXQNCj4gPiBhL2ZzL2NpZnMvZmlsZS5jIGIvZnMvY2lmcy9maWxlLmMgaW5kZXggZGFhYjg3
-OC4uMWE0MWMwNCAxMDA2NDQNCj4gPiAtLS0gYS9mcy9jaWZzL2ZpbGUuYw0KPiA+ICsrKyBiL2Zz
-L2NpZnMvZmlsZS5jDQo+ID4gQEAgLTI1MjQsNiArMjUyNCw1NSBAQCB3ZGF0YV9maWxsX2Zyb21f
-aW92ZWMoc3RydWN0IGNpZnNfd3JpdGVkYXRhDQo+ID4gKndkYXRhLCBzdHJ1Y3QgaW92X2l0ZXIg
-KmZyb20sICB9DQo+ID4NCj4gPiAgc3RhdGljIGludA0KPiA+ICtjaWZzX3Jlc2VuZF93ZGF0YShz
-dHJ1Y3QgY2lmc193cml0ZWRhdGEgKndkYXRhLCBzdHJ1Y3QgbGlzdF9oZWFkDQo+ID4gKyp3ZGF0
-YV9saXN0LCBzdHJ1Y3QgY2lmc19haW9fY3R4ICpjdHgpIHsNCj4gPiArICAgICAgIGludCB3YWl0
-X3JldHJ5ID0gMDsNCj4gPiArICAgICAgIHVuc2lnbmVkIGludCB3c2l6ZSwgY3JlZGl0czsNCj4g
-PiArICAgICAgIGludCByYzsNCj4gPiArICAgICAgIHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNl
-cnZlciA9DQo+ID4gK3RsaW5rX3Rjb24od2RhdGEtPmNmaWxlLT50bGluayktPnNlcy0+c2VydmVy
-Ow0KPiA+ICsNCj4gPiArICAgICAgIC8qDQo+ID4gKyAgICAgICAgKiBUcnkgdG8gcmVzZW5kIHRo
-aXMgd2RhdGEsIHdhaXRpbmcgZm9yIGNyZWRpdHMgdXAgdG8gMyBzZWNvbmRzLg0KPiA+ICsgICAg
-ICAgICogTm90ZTogd2UgYXJlIGF0dGVtcHRpbmcgdG8gcmVzZW5kIHRoZSB3aG9sZSB3ZGF0YSBu
-b3QgaW4NCj4gc2VnbWVudHMNCj4gPiArICAgICAgICAqLw0KPiA+ICsgICAgICAgZG8gew0KPiA+
-ICsgICAgICAgICAgICAgICByYyA9IHNlcnZlci0+b3BzLT53YWl0X210dV9jcmVkaXRzKHNlcnZl
-ciwNCj4gPiArIHdkYXRhLT5ieXRlcywgJndzaXplLCAmY3JlZGl0cyk7DQo+ID4gKw0KPiA+ICsg
-ICAgICAgICAgICAgICBpZiAocmMpDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgYnJlYWs7
-DQo+ID4gKw0KPiA+ICsgICAgICAgICAgICAgICBpZiAod3NpemUgPCB3ZGF0YS0+Ynl0ZXMpIHsN
-Cj4gPiArICAgICAgICAgICAgICAgICAgICAgICBhZGRfY3JlZGl0c19hbmRfd2FrZV9pZihzZXJ2
-ZXIsIGNyZWRpdHMsIDApOw0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgIG1zbGVlcCgxMDAw
-KTsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICB3YWl0X3JldHJ5Kys7DQo+ID4gKyAgICAg
-ICAgICAgICAgIH0NCj4gPiArICAgICAgIH0gd2hpbGUgKHdzaXplIDwgd2RhdGEtPmJ5dGVzICYm
-IHdhaXRfcmV0cnkgPCAzKTsNCj4gPiArDQo+ID4gKyAgICAgICBpZiAod3NpemUgPCB3ZGF0YS0+
-Ynl0ZXMpIHsNCj4gPiArICAgICAgICAgICAgICAgcmMgPSAtRUJVU1k7DQo+ID4gKyAgICAgICAg
-ICAgICAgIGdvdG8gb3V0Ow0KPiA+ICsgICAgICAgfQ0KPiA+ICsNCj4gPiArICAgICAgIHJjID0g
-LUVBR0FJTjsNCj4gPiArICAgICAgIHdoaWxlIChyYyA9PSAtRUFHQUlOKQ0KPiA+ICsgICAgICAg
-ICAgICAgICBpZiAoIXdkYXRhLT5jZmlsZS0+aW52YWxpZEhhbmRsZSB8fA0KPiA+ICsgICAgICAg
-ICAgICAgICAgICAgIShyYyA9IGNpZnNfcmVvcGVuX2ZpbGUod2RhdGEtPmNmaWxlLCBmYWxzZSkp
-KQ0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgIHJjID0gc2VydmVyLT5vcHMtPmFzeW5jX3dy
-aXRldih3ZGF0YSwNCj4gPiArDQo+ID4gKyBjaWZzX3VuY2FjaGVkX3dyaXRlZGF0YV9yZWxlYXNl
-KTsNCj4gPiArDQo+ID4gKyAgICAgICBpZiAoIXJjKSB7DQo+ID4gKyAgICAgICAgICAgICAgIGxp
-c3RfYWRkX3RhaWwoJndkYXRhLT5saXN0LCB3ZGF0YV9saXN0KTsNCj4gPiArICAgICAgICAgICAg
-ICAgcmV0dXJuIDA7DQo+ID4gKyAgICAgICB9DQo+ID4gKw0KPiA+ICsgICAgICAgYWRkX2NyZWRp
-dHNfYW5kX3dha2VfaWYoc2VydmVyLCB3ZGF0YS0+Y3JlZGl0cywgMCk7DQo+ID4gK291dDoNCj4g
-PiArICAgICAgIGtyZWZfcHV0KCZ3ZGF0YS0+cmVmY291bnQsIGNpZnNfdW5jYWNoZWRfd3JpdGVk
-YXRhX3JlbGVhc2UpOw0KPiA+ICsNCj4gPiArICAgICAgIHJldHVybiByYzsNCj4gPiArfQ0KPiA+
-ICsNCj4gPiArc3RhdGljIGludA0KPiA+ICBjaWZzX3dyaXRlX2Zyb21faXRlcihsb2ZmX3Qgb2Zm
-c2V0LCBzaXplX3QgbGVuLCBzdHJ1Y3QgaW92X2l0ZXIgKmZyb20sDQo+ID4gICAgICAgICAgICAg
-ICAgICAgICAgc3RydWN0IGNpZnNGaWxlSW5mbyAqb3Blbl9maWxlLA0KPiA+ICAgICAgICAgICAg
-ICAgICAgICAgIHN0cnVjdCBjaWZzX3NiX2luZm8gKmNpZnNfc2IsIHN0cnVjdCBsaXN0X2hlYWQN
-Cj4gPiAqd2RhdGFfbGlzdCwgQEAgLTI1MzcsNiArMjU4Niw4IEBAIGNpZnNfd3JpdGVfZnJvbV9p
-dGVyKGxvZmZfdCBvZmZzZXQsDQo+IHNpemVfdCBsZW4sIHN0cnVjdCBpb3ZfaXRlciAqZnJvbSwN
-Cj4gPiAgICAgICAgIGxvZmZfdCBzYXZlZF9vZmZzZXQgPSBvZmZzZXQ7DQo+ID4gICAgICAgICBw
-aWRfdCBwaWQ7DQo+ID4gICAgICAgICBzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXI7DQo+
-ID4gKyAgICAgICBzdHJ1Y3QgcGFnZSAqKnBhZ2V2ZWM7DQo+ID4gKyAgICAgICBzaXplX3Qgc3Rh
-cnQ7DQo+ID4NCj4gPiAgICAgICAgIGlmIChjaWZzX3NiLT5tbnRfY2lmc19mbGFncyAmIENJRlNf
-TU9VTlRfUldQSURGT1JXQVJEKQ0KPiA+ICAgICAgICAgICAgICAgICBwaWQgPSBvcGVuX2ZpbGUt
-PnBpZDsNCj4gPiBAQCAtMjU1MywzOCArMjYwNCw3NCBAQCBjaWZzX3dyaXRlX2Zyb21faXRlcihs
-b2ZmX3Qgb2Zmc2V0LCBzaXplX3QgbGVuLA0KPiBzdHJ1Y3QgaW92X2l0ZXIgKmZyb20sDQo+ID4g
-ICAgICAgICAgICAgICAgIGlmIChyYykNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICBicmVh
-azsNCj4gPg0KPiA+IC0gICAgICAgICAgICAgICBucl9wYWdlcyA9IGdldF9udW1wYWdlcyh3c2l6
-ZSwgbGVuLCAmY3VyX2xlbik7DQo+ID4gLSAgICAgICAgICAgICAgIHdkYXRhID0gY2lmc193cml0
-ZWRhdGFfYWxsb2MobnJfcGFnZXMsDQo+ID4gKyAgICAgICAgICAgICAgIGlmIChjdHgtPmRpcmVj
-dF9pbykgew0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgIGN1cl9sZW4gPSBpb3ZfaXRlcl9n
-ZXRfcGFnZXNfYWxsb2MoDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBmcm9t
-LCAmcGFnZXZlYywgd3NpemUsICZzdGFydCk7DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAg
-aWYgKGN1cl9sZW4gPCAwKSB7DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBj
-aWZzX2RiZyhWRlMsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICJkaXJlY3Rfd3JpdGV2IGNvdWxkbid0IGdldCB1c2VyIHBhZ2VzICINCj4gPiArICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIihyYz0lemQpIGl0ZXIgdHlwZSAlZCBpb3Zf
-b2Zmc2V0ICV6ZCBjb3VudCINCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIiAlemRcbiIsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIGN1cl9sZW4sIGZyb20tPnR5cGUsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIGZyb20tPmlvdl9vZmZzZXQsIGZyb20tPmNvdW50KTsNCj4gPiArICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIGR1bXBfc3RhY2soKTsNCj4gPiArICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIGJyZWFrOw0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgIH0N
-Cj4gPiArICAgICAgICAgICAgICAgICAgICAgICBpb3ZfaXRlcl9hZHZhbmNlKGZyb20sIGN1cl9s
-ZW4pOw0KPiA+ICsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICBucl9wYWdlcyA9IChjdXJf
-bGVuICsgc3RhcnQgKyBQQUdFX1NJWkUgLSAxKSAvDQo+ID4gKyBQQUdFX1NJWkU7DQo+ID4gKw0K
-PiA+ICsgICAgICAgICAgICAgICAgICAgICAgIHdkYXRhID0gY2lmc193cml0ZWRhdGFfZGlyZWN0
-X2FsbG9jKHBhZ2V2ZWMsDQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgY2lmc191bmNhY2hlZF93cml0ZXZfY29tcGxldGUpOw0KPiA+IC0gICAgICAgICAg
-ICAgICBpZiAoIXdkYXRhKSB7DQo+ID4gLSAgICAgICAgICAgICAgICAgICAgICAgcmMgPSAtRU5P
-TUVNOw0KPiA+IC0gICAgICAgICAgICAgICAgICAgICAgIGFkZF9jcmVkaXRzX2FuZF93YWtlX2lm
-KHNlcnZlciwgY3JlZGl0cywgMCk7DQo+ID4gLSAgICAgICAgICAgICAgICAgICAgICAgYnJlYWs7
-DQo+ID4gLSAgICAgICAgICAgICAgIH0NCj4gPiArICAgICAgICAgICAgICAgICAgICAgICBpZiAo
-IXdkYXRhKSB7DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICByYyA9IC1FTk9N
-RU07DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBhZGRfY3JlZGl0c19hbmRf
-d2FrZV9pZihzZXJ2ZXIsIGNyZWRpdHMsIDApOw0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgYnJlYWs7DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgfQ0KPiA+DQo+ID4g
-LSAgICAgICAgICAgICAgIHJjID0gY2lmc193cml0ZV9hbGxvY2F0ZV9wYWdlcyh3ZGF0YS0+cGFn
-ZXMsIG5yX3BhZ2VzKTsNCj4gPiAtICAgICAgICAgICAgICAgaWYgKHJjKSB7DQo+ID4gLSAgICAg
-ICAgICAgICAgICAgICAgICAga2ZyZWUod2RhdGEpOw0KPiA+IC0gICAgICAgICAgICAgICAgICAg
-ICAgIGFkZF9jcmVkaXRzX2FuZF93YWtlX2lmKHNlcnZlciwgY3JlZGl0cywgMCk7DQo+ID4gLSAg
-ICAgICAgICAgICAgICAgICAgICAgYnJlYWs7DQo+ID4gLSAgICAgICAgICAgICAgIH0NCj4gPg0K
-PiA+IC0gICAgICAgICAgICAgICBudW1fcGFnZXMgPSBucl9wYWdlczsNCj4gPiAtICAgICAgICAg
-ICAgICAgcmMgPSB3ZGF0YV9maWxsX2Zyb21faW92ZWMod2RhdGEsIGZyb20sICZjdXJfbGVuLCAm
-bnVtX3BhZ2VzKTsNCj4gPiAtICAgICAgICAgICAgICAgaWYgKHJjKSB7DQo+ID4gLSAgICAgICAg
-ICAgICAgICAgICAgICAgZm9yIChpID0gMDsgaSA8IG5yX3BhZ2VzOyBpKyspDQo+ID4gLSAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBwdXRfcGFnZSh3ZGF0YS0+cGFnZXNbaV0pOw0KPiA+
-IC0gICAgICAgICAgICAgICAgICAgICAgIGtmcmVlKHdkYXRhKTsNCj4gPiAtICAgICAgICAgICAg
-ICAgICAgICAgICBhZGRfY3JlZGl0c19hbmRfd2FrZV9pZihzZXJ2ZXIsIGNyZWRpdHMsIDApOw0K
-PiA+IC0gICAgICAgICAgICAgICAgICAgICAgIGJyZWFrOw0KPiA+IC0gICAgICAgICAgICAgICB9
-DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgd2RhdGEtPnBhZ2Vfb2Zmc2V0ID0gc3RhcnQ7
-DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgd2RhdGEtPnRhaWxzeiA9DQo+ID4gKyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBucl9wYWdlcyA+IDEgPw0KPiA+ICsgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjdXJfbGVuIC0gKFBBR0VfU0laRSAtIHN0YXJ0
-KSAtDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIChucl9wYWdl
-cyAtIDIpICogUEFHRV9TSVpFIDoNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgY3VyX2xlbjsNCj4gPiArICAgICAgICAgICAgICAgfSBlbHNlIHsNCj4gPiArICAg
-ICAgICAgICAgICAgICAgICAgICBucl9wYWdlcyA9IGdldF9udW1wYWdlcyh3c2l6ZSwgbGVuLCAm
-Y3VyX2xlbik7DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgd2RhdGEgPSBjaWZzX3dyaXRl
-ZGF0YV9hbGxvYyhucl9wYWdlcywNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBjaWZzX3VuY2FjaGVkX3dyaXRldl9jb21wbGV0ZSk7DQo+ID4gKyAgICAg
-ICAgICAgICAgICAgICAgICAgaWYgKCF3ZGF0YSkgew0KPiA+ICsgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgcmMgPSAtRU5PTUVNOw0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgYWRkX2NyZWRpdHNfYW5kX3dha2VfaWYoc2VydmVyLCBjcmVkaXRzLCAwKTsNCj4gPiAr
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJyZWFrOw0KPiA+ICsgICAgICAgICAgICAg
-ICAgICAgICAgIH0NCj4gPg0KPiA+IC0gICAgICAgICAgICAgICAvKg0KPiA+IC0gICAgICAgICAg
-ICAgICAgKiBCcmluZyBucl9wYWdlcyBkb3duIHRvIHRoZSBudW1iZXIgb2YgcGFnZXMgd2UgYWN0
-dWFsbHkgdXNlZCwNCj4gPiAtICAgICAgICAgICAgICAgICogYW5kIGZyZWUgYW55IHBhZ2VzIHRo
-YXQgd2UgZGlkbid0IHVzZS4NCj4gPiAtICAgICAgICAgICAgICAgICovDQo+ID4gLSAgICAgICAg
-ICAgICAgIGZvciAoIDsgbnJfcGFnZXMgPiBudW1fcGFnZXM7IG5yX3BhZ2VzLS0pDQo+ID4gLSAg
-ICAgICAgICAgICAgICAgICAgICAgcHV0X3BhZ2Uod2RhdGEtPnBhZ2VzW25yX3BhZ2VzIC0gMV0p
-Ow0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgIHJjID0gY2lmc193cml0ZV9hbGxvY2F0ZV9w
-YWdlcyh3ZGF0YS0+cGFnZXMsIG5yX3BhZ2VzKTsNCj4gPiArICAgICAgICAgICAgICAgICAgICAg
-ICBpZiAocmMpIHsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGtmcmVlKHdk
-YXRhKTsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGFkZF9jcmVkaXRzX2Fu
-ZF93YWtlX2lmKHNlcnZlciwgY3JlZGl0cywgMCk7DQo+ID4gKyAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBicmVhazsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICB9DQo+ID4gKw0K
-PiA+ICsgICAgICAgICAgICAgICAgICAgICAgIG51bV9wYWdlcyA9IG5yX3BhZ2VzOw0KPiA+ICsg
-ICAgICAgICAgICAgICAgICAgICAgIHJjID0gd2RhdGFfZmlsbF9mcm9tX2lvdmVjKHdkYXRhLCBm
-cm9tLCAmY3VyX2xlbiwNCj4gJm51bV9wYWdlcyk7DQo+ID4gKyAgICAgICAgICAgICAgICAgICAg
-ICAgaWYgKHJjKSB7DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBmb3IgKGkg
-PSAwOyBpIDwgbnJfcGFnZXM7IGkrKykNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgcHV0X3BhZ2Uod2RhdGEtPnBhZ2VzW2ldKTsNCj4gPiArICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIGtmcmVlKHdkYXRhKTsNCj4gPiArICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIGFkZF9jcmVkaXRzX2FuZF93YWtlX2lmKHNlcnZlciwgY3JlZGl0cywgMCk7
-DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBicmVhazsNCj4gPiArICAgICAg
-ICAgICAgICAgICAgICAgICB9DQo+ID4gKw0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgIC8q
-DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICogQnJpbmcgbnJfcGFnZXMgZG93biB0byB0
-aGUgbnVtYmVyIG9mIHBhZ2VzIHdlIGFjdHVhbGx5DQo+IHVzZWQsDQo+ID4gKyAgICAgICAgICAg
-ICAgICAgICAgICAgICogYW5kIGZyZWUgYW55IHBhZ2VzIHRoYXQgd2UgZGlkbid0IHVzZS4NCj4g
-PiArICAgICAgICAgICAgICAgICAgICAgICAgKi8NCj4gPiArICAgICAgICAgICAgICAgICAgICAg
-ICBmb3IgKCA7IG5yX3BhZ2VzID4gbnVtX3BhZ2VzOyBucl9wYWdlcy0tKQ0KPiA+ICsgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgcHV0X3BhZ2Uod2RhdGEtPnBhZ2VzW25yX3BhZ2VzIC0g
-MV0pOw0KPiA+ICsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICB3ZGF0YS0+dGFpbHN6ID0g
-Y3VyX2xlbiAtICgobnJfcGFnZXMgLSAxKSAqIFBBR0VfU0laRSk7DQo+ID4gKyAgICAgICAgICAg
-ICAgIH0NCj4gPg0KPiA+ICAgICAgICAgICAgICAgICB3ZGF0YS0+c3luY19tb2RlID0gV0JfU1lO
-Q19BTEw7DQo+ID4gICAgICAgICAgICAgICAgIHdkYXRhLT5ucl9wYWdlcyA9IG5yX3BhZ2VzOyBA
-QCAtMjU5Myw3ICsyNjgwLDYgQEANCj4gPiBjaWZzX3dyaXRlX2Zyb21faXRlcihsb2ZmX3Qgb2Zm
-c2V0LCBzaXplX3QgbGVuLCBzdHJ1Y3QgaW92X2l0ZXIgKmZyb20sDQo+ID4gICAgICAgICAgICAg
-ICAgIHdkYXRhLT5waWQgPSBwaWQ7DQo+ID4gICAgICAgICAgICAgICAgIHdkYXRhLT5ieXRlcyA9
-IGN1cl9sZW47DQo+ID4gICAgICAgICAgICAgICAgIHdkYXRhLT5wYWdlc3ogPSBQQUdFX1NJWkU7
-DQo+ID4gLSAgICAgICAgICAgICAgIHdkYXRhLT50YWlsc3ogPSBjdXJfbGVuIC0gKChucl9wYWdl
-cyAtIDEpICogUEFHRV9TSVpFKTsNCj4gPiAgICAgICAgICAgICAgICAgd2RhdGEtPmNyZWRpdHMg
-PSBjcmVkaXRzOw0KPiA+ICAgICAgICAgICAgICAgICB3ZGF0YS0+Y3R4ID0gY3R4Ow0KPiA+ICAg
-ICAgICAgICAgICAgICBrcmVmX2dldCgmY3R4LT5yZWZjb3VudCk7IEBAIC0yNjY4LDEzICsyNzU0
-LDE3IEBADQo+ID4gc3RhdGljIHZvaWQgY29sbGVjdF91bmNhY2hlZF93cml0ZV9kYXRhKHN0cnVj
-dCBjaWZzX2Fpb19jdHggKmN0eCkNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IElOSVRfTElTVF9IRUFEKCZ0bXBfbGlzdCk7DQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBsaXN0X2RlbF9pbml0KCZ3ZGF0YS0+bGlzdCk7DQo+ID4NCj4gPiAtICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIGlvdl9pdGVyX2FkdmFuY2UoJnRtcF9mcm9tLA0KPiA+ICsg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaWYgKGN0eC0+ZGlyZWN0X2lvKQ0KPiA+ICsg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICByYyA9IGNpZnNfcmVzZW5kX3dk
-YXRhKHdkYXRhLCAmdG1wX2xpc3QsIGN0eCk7DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBlbHNlIHsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgaW92X2l0ZXJfYWR2YW5jZSgmdG1wX2Zyb20sDQo+ID4gICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHdkYXRhLT5vZmZzZXQgLQ0KPiA+IGN0eC0+cG9z
-KTsNCj4gPg0KPiA+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcmMgPSBjaWZzX3dy
-aXRlX2Zyb21faXRlcih3ZGF0YS0+b2Zmc2V0LA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICByYyA9DQo+ID4gKyBjaWZzX3dyaXRlX2Zyb21faXRlcih3ZGF0YS0+
-b2Zmc2V0LA0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIHdkYXRhLT5ieXRlcywgJnRtcF9mcm9tLA0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIGN0eC0+Y2ZpbGUsIGNpZnNfc2IsICZ0bXBfbGlzdCwN
-Cj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjdHgp
-Ow0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfQ0KPiA+DQo+ID4gICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBsaXN0X3NwbGljZSgmdG1wX2xpc3QsICZjdHgtPmxp
-c3QpOw0KPiA+DQo+ID4gQEAgLTI2ODcsOCArMjc3Nyw5IEBAIHN0YXRpYyB2b2lkIGNvbGxlY3Rf
-dW5jYWNoZWRfd3JpdGVfZGF0YShzdHJ1Y3QNCj4gY2lmc19haW9fY3R4ICpjdHgpDQo+ID4gICAg
-ICAgICAgICAgICAgIGtyZWZfcHV0KCZ3ZGF0YS0+cmVmY291bnQsIGNpZnNfdW5jYWNoZWRfd3Jp
-dGVkYXRhX3JlbGVhc2UpOw0KPiA+ICAgICAgICAgfQ0KPiA+DQo+ID4gLSAgICAgICBmb3IgKGkg
-PSAwOyBpIDwgY3R4LT5ucGFnZXM7IGkrKykNCj4gPiAtICAgICAgICAgICAgICAgcHV0X3BhZ2Uo
-Y3R4LT5idltpXS5idl9wYWdlKTsNCj4gPiArICAgICAgIGlmICghY3R4LT5kaXJlY3RfaW8pDQo+
-ID4gKyAgICAgICAgICAgICAgIGZvciAoaSA9IDA7IGkgPCBjdHgtPm5wYWdlczsgaSsrKQ0KPiA+
-ICsgICAgICAgICAgICAgICAgICAgICAgIHB1dF9wYWdlKGN0eC0+YnZbaV0uYnZfcGFnZSk7DQo+
-ID4NCj4gPiAgICAgICAgIGNpZnNfc3RhdHNfYnl0ZXNfd3JpdHRlbih0Y29uLCBjdHgtPnRvdGFs
-X2xlbik7DQo+ID4gICAgICAgICBzZXRfYml0KENJRlNfSU5PX0lOVkFMSURfTUFQUElORywNCj4g
-PiAmQ0lGU19JKGRlbnRyeS0+ZF9pbm9kZSktPmZsYWdzKTsgQEAgLTI3MDMsNyArMjc5NCw3IEBA
-IHN0YXRpYyB2b2lkDQo+IGNvbGxlY3RfdW5jYWNoZWRfd3JpdGVfZGF0YShzdHJ1Y3QgY2lmc19h
-aW9fY3R4ICpjdHgpDQo+ID4gICAgICAgICAgICAgICAgIGNvbXBsZXRlKCZjdHgtPmRvbmUpOw0K
-PiA+ICB9DQo+ID4NCj4gPiAtc3NpemVfdCBjaWZzX3VzZXJfd3JpdGV2KHN0cnVjdCBraW9jYiAq
-aW9jYiwgc3RydWN0IGlvdl9pdGVyICpmcm9tKQ0KPiA+ICtzdGF0aWMgc3NpemVfdCBfX2NpZnNf
-d3JpdGV2KHN0cnVjdCBraW9jYiAqaW9jYiwgc3RydWN0IGlvdl9pdGVyDQo+ID4gKypmcm9tLCBi
-b29sIGRpcmVjdCkNCj4gPiAgew0KPiA+ICAgICAgICAgc3RydWN0IGZpbGUgKmZpbGUgPSBpb2Ni
-LT5raV9maWxwOw0KPiA+ICAgICAgICAgc3NpemVfdCB0b3RhbF93cml0dGVuID0gMDsNCj4gPiBA
-QCAtMjcxMiwxMyArMjgwMywxOCBAQCBzc2l6ZV90IGNpZnNfdXNlcl93cml0ZXYoc3RydWN0IGtp
-b2NiICppb2NiLA0KPiBzdHJ1Y3QgaW92X2l0ZXIgKmZyb20pDQo+ID4gICAgICAgICBzdHJ1Y3Qg
-Y2lmc19zYl9pbmZvICpjaWZzX3NiOw0KPiA+ICAgICAgICAgc3RydWN0IGNpZnNfYWlvX2N0eCAq
-Y3R4Ow0KPiA+ICAgICAgICAgc3RydWN0IGlvdl9pdGVyIHNhdmVkX2Zyb20gPSAqZnJvbTsNCj4g
-PiArICAgICAgIHNpemVfdCBsZW4gPSBpb3ZfaXRlcl9jb3VudChmcm9tKTsNCj4gPiAgICAgICAg
-IGludCByYzsNCj4gPg0KPiA+ICAgICAgICAgLyoNCj4gPiAtICAgICAgICAqIEJCIC0gb3B0aW1p
-emUgdGhlIHdheSB3aGVuIHNpZ25pbmcgaXMgZGlzYWJsZWQuIFdlIGNhbiBkcm9wIHRoaXMNCj4g
-PiAtICAgICAgICAqIGV4dHJhIG1lbW9yeS10by1tZW1vcnkgY29weWluZyBhbmQgdXNlIGlvdmVj
-IGJ1ZmZlcnMgZm9yDQo+IGNvbnN0cnVjdGluZw0KPiA+IC0gICAgICAgICogd3JpdGUgcmVxdWVz
-dC4NCj4gPiArICAgICAgICAqIGlvdl9pdGVyX2dldF9wYWdlc19hbGxvYyBkb2Vzbid0IHdvcmsg
-d2l0aCBJVEVSX0tWRUMuDQo+ID4gKyAgICAgICAgKiBJbiB0aGlzIGNhc2UsIGZhbGwgYmFjayB0
-byBub24tZGlyZWN0IHdyaXRlIGZ1bmN0aW9uLg0KPiA+ICsgICAgICAgICogdGhpcyBjb3VsZCBi
-ZSBpbXByb3ZlZCBieSBnZXR0aW5nIHBhZ2VzIGRpcmVjdGx5IGluDQo+ID4gKyBJVEVSX0tWRUMN
-Cj4gPiAgICAgICAgICAqLw0KPiA+ICsgICAgICAgaWYgKGRpcmVjdCAmJiBmcm9tLT50eXBlICYg
-SVRFUl9LVkVDKSB7DQo+ID4gKyAgICAgICAgICAgICAgIGNpZnNfZGJnKEZZSSwgInVzZSBub24t
-ZGlyZWN0IGNpZnNfd3JpdGV2IGZvciBrdmVjIEkvT1xuIik7DQo+ID4gKyAgICAgICAgICAgICAg
-IGRpcmVjdCA9IGZhbHNlOw0KPiA+ICsgICAgICAgfQ0KPiA+DQo+ID4gICAgICAgICByYyA9IGdl
-bmVyaWNfd3JpdGVfY2hlY2tzKGlvY2IsIGZyb20pOw0KPiA+ICAgICAgICAgaWYgKHJjIDw9IDAp
-DQo+ID4gQEAgLTI3NDIsMTAgKzI4MzgsMTYgQEAgc3NpemVfdCBjaWZzX3VzZXJfd3JpdGV2KHN0
-cnVjdCBraW9jYiAqaW9jYiwNCj4gPiBzdHJ1Y3QgaW92X2l0ZXIgKmZyb20pDQo+ID4NCj4gPiAg
-ICAgICAgIGN0eC0+cG9zID0gaW9jYi0+a2lfcG9zOw0KPiA+DQo+ID4gLSAgICAgICByYyA9IHNl
-dHVwX2Fpb19jdHhfaXRlcihjdHgsIGZyb20sIFdSSVRFKTsNCj4gPiAtICAgICAgIGlmIChyYykg
-ew0KPiA+IC0gICAgICAgICAgICAgICBrcmVmX3B1dCgmY3R4LT5yZWZjb3VudCwgY2lmc19haW9f
-Y3R4X3JlbGVhc2UpOw0KPiA+IC0gICAgICAgICAgICAgICByZXR1cm4gcmM7DQo+ID4gKyAgICAg
-ICBpZiAoZGlyZWN0KSB7DQo+ID4gKyAgICAgICAgICAgICAgIGN0eC0+ZGlyZWN0X2lvID0gdHJ1
-ZTsNCj4gPiArICAgICAgICAgICAgICAgY3R4LT5pdGVyID0gKmZyb207DQo+ID4gKyAgICAgICAg
-ICAgICAgIGN0eC0+bGVuID0gbGVuOw0KPiA+ICsgICAgICAgfSBlbHNlIHsNCj4gPiArICAgICAg
-ICAgICAgICAgcmMgPSBzZXR1cF9haW9fY3R4X2l0ZXIoY3R4LCBmcm9tLCBXUklURSk7DQo+ID4g
-KyAgICAgICAgICAgICAgIGlmIChyYykgew0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgIGty
-ZWZfcHV0KCZjdHgtPnJlZmNvdW50LCBjaWZzX2Fpb19jdHhfcmVsZWFzZSk7DQo+ID4gKyAgICAg
-ICAgICAgICAgICAgICAgICAgcmV0dXJuIHJjOw0KPiA+ICsgICAgICAgICAgICAgICB9DQo+ID4g
-ICAgICAgICB9DQo+ID4NCj4gPiAgICAgICAgIC8qIGdyYWIgYSBsb2NrIGhlcmUgZHVlIHRvIHJl
-YWQgcmVzcG9uc2UgaGFuZGxlcnMgY2FuIGFjY2Vzcw0KPiA+IGN0eCAqLyBAQCAtMjc5NSw2ICsy
-ODk3LDE2IEBAIHNzaXplX3QgY2lmc191c2VyX3dyaXRldihzdHJ1Y3Qga2lvY2INCj4gKmlvY2Is
-IHN0cnVjdCBpb3ZfaXRlciAqZnJvbSkNCj4gPiAgICAgICAgIHJldHVybiB0b3RhbF93cml0dGVu
-Ow0KPiA+ICB9DQo+ID4NCj4gPiArc3NpemVfdCBjaWZzX2RpcmVjdF93cml0ZXYoc3RydWN0IGtp
-b2NiICppb2NiLCBzdHJ1Y3QgaW92X2l0ZXIgKmZyb20pDQo+ID4gK3sNCj4gPiArICAgICAgIHJl
-dHVybiBfX2NpZnNfd3JpdGV2KGlvY2IsIGZyb20sIHRydWUpOyB9DQo+ID4gKw0KPiA+ICtzc2l6
-ZV90IGNpZnNfdXNlcl93cml0ZXYoc3RydWN0IGtpb2NiICppb2NiLCBzdHJ1Y3QgaW92X2l0ZXIg
-KmZyb20pIHsNCj4gPiArICAgICAgIHJldHVybiBfX2NpZnNfd3JpdGV2KGlvY2IsIGZyb20sIGZh
-bHNlKTsgfQ0KPiA+ICsNCj4gPiAgc3RhdGljIHNzaXplX3QNCj4gPiAgY2lmc193cml0ZXYoc3Ry
-dWN0IGtpb2NiICppb2NiLCBzdHJ1Y3QgaW92X2l0ZXIgKmZyb20pICB7DQo+ID4gLS0NCj4gPiAy
-LjcuNA0KPiA+DQo+IA0KPiBEaWQgeW91IG1lYXN1cmUgdGhlIHBlcmZvcm1hbmNlIGJlbmVmaXQg
-b2YgdXNpbmcgT19ESVJFQ1Qgd2l0aCB5b3VyDQo+IHBhdGNoZXMgZm9yIG5vbi1SRE1BIG1vZGU/
-DQoNCkhlcmUgYXJlIHNvbWUgb2YgdGhlIHJlc3VsdHMgbWVhc3VyZWQgb24gVENQL0lQIG92ZXIg
-SVBvSUIgNDBHIEluZmluaWJhbmQuIFBsZWFzZSBub3RlIHRoYXQgSVBvSUIgaXMgZG9uZSBpbiBz
-b2Z0d2FyZSBzbyBpdCdzIHNsb3dlciB0aGFuIGEgNDBHIEV0aGVybmV0IE5JQy4NCg0KQWxsIHNl
-cnZlcnMgYXJlIHJ1bm5pbmcgMiBYIEludGVsKFIpIFhlb24oUikgQ1BVIEU1LTI2NTAgdjMgQCAy
-LjMwR0h6LiBUZXN0ZWQgb24gRklPIDY0ayByZWFkIG9yIHdyaXRlIHdpdGggcXVldWUgZGVwdGhz
-IDEgb3IgMTYuIEFsbCB0aGUgdGVzdHMgYXJlIHJ1bm5pbmcgd2l0aCAxIEZJTyBqb2IsIGFuZCB3
-aXRoICJkaXJlY3Q9MSIuDQoNCldpdGhvdXQgZGlyZWN0IEkvTzoNCnJlYWQgNjRrIGQxCTExMzY2
-OUtCL3MNCnJlYWQgNjRrIGQxNgk2MTg0MjhLQi9zDQp3cml0ZSA2NGsgZDEJMTM0OTExS0Ivcw0K
-d3JpdGUgNjRrIGQxNgk0NTcwMDVLQi9zDQoNCldpdGggZGlyZWN0IEkvTzoNCnJlYWQgNjRrIGQx
-CTEyNzEzNEtCL3MNCnJlYWQgNjRrIGQxNgk3MTQ2MjlLQi9zDQp3cml0ZSA2NGsgZDEJMTI5MjY4
-S0Ivcw0Kd3JpdGUgNjRrIGQxNgk0NjEwNTRLQi9zDQoNCkRpcmVjdCBJL08gaW1wcm92ZW1lbnQ6
-DQpyZWFkIDY0ayBkMQkxMSUNCnJlYWQgNjRrIGQxNgkxNSUNCndyaXRlIDY0ayBkMQktNSUNCndy
-aXRlIDY0ayBkMTYJMSUNCg0KDQoNCj4gDQo+IC0tDQo+IEJlc3QgcmVnYXJkcywNCj4gUGF2ZWwg
-U2hpbG92c2t5DQo=
+There are a bunch of filesystems which essentially open-code lru_to_page
+helper. Change them to using the helper. No functional changes.
+
+Signed-off-by: Nikolay Borisov <nborisov@suse.com>
+---
+
+Since this is a mostly mechanical change I've actually batched all of them in 
+a single patch. 
+
+ fs/afs/file.c        | 5 +++--
+ fs/btrfs/extent_io.c | 2 +-
+ fs/ceph/addr.c       | 5 ++---
+ fs/cifs/file.c       | 3 ++-
+ fs/ext4/readpage.c   | 2 +-
+ fs/ocfs2/aops.c      | 3 ++-
+ fs/orangefs/inode.c  | 2 +-
+ mm/swap.c            | 2 +-
+ 8 files changed, 13 insertions(+), 11 deletions(-)
+
+diff --git a/fs/afs/file.c b/fs/afs/file.c
+index d6bc3f5d784b..323ae9912203 100644
+--- a/fs/afs/file.c
++++ b/fs/afs/file.c
+@@ -17,6 +17,7 @@
+ #include <linux/writeback.h>
+ #include <linux/gfp.h>
+ #include <linux/task_io_accounting_ops.h>
++#include <linux/mm.h>
+ #include "internal.h"
+ 
+ static int afs_file_mmap(struct file *file, struct vm_area_struct *vma);
+@@ -441,7 +442,7 @@ static int afs_readpages_one(struct file *file, struct address_space *mapping,
+ 	/* Count the number of contiguous pages at the front of the list.  Note
+ 	 * that the list goes prev-wards rather than next-wards.
+ 	 */
+-	first = list_entry(pages->prev, struct page, lru);
++	first = lru_to_page(pages);
+ 	index = first->index + 1;
+ 	n = 1;
+ 	for (p = first->lru.prev; p != pages; p = p->prev) {
+@@ -473,7 +474,7 @@ static int afs_readpages_one(struct file *file, struct address_space *mapping,
+ 	 * page at the end of the file.
+ 	 */
+ 	do {
+-		page = list_entry(pages->prev, struct page, lru);
++		page = lru_to_page(pages);
+ 		list_del(&page->lru);
+ 		index = page->index;
+ 		if (add_to_page_cache_lru(page, mapping, index,
+diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+index 19f4b8fd654f..8332c5f4b1c3 100644
+--- a/fs/btrfs/extent_io.c
++++ b/fs/btrfs/extent_io.c
+@@ -4104,7 +4104,7 @@ int extent_readpages(struct address_space *mapping, struct list_head *pages,
+ 	u64 prev_em_start = (u64)-1;
+ 
+ 	for (page_idx = 0; page_idx < nr_pages; page_idx++) {
+-		page = list_entry(pages->prev, struct page, lru);
++		page = lru_to_page(pages);
+ 
+ 		prefetchw(&page->flags);
+ 		list_del(&page->lru);
+diff --git a/fs/ceph/addr.c b/fs/ceph/addr.c
+index 8eade7a993c1..5d0c05e288cc 100644
+--- a/fs/ceph/addr.c
++++ b/fs/ceph/addr.c
+@@ -306,7 +306,7 @@ static int start_read(struct inode *inode, struct ceph_rw_context *rw_ctx,
+ 	struct ceph_osd_client *osdc =
+ 		&ceph_inode_to_client(inode)->client->osdc;
+ 	struct ceph_inode_info *ci = ceph_inode(inode);
+-	struct page *page = list_entry(page_list->prev, struct page, lru);
++	struct page *page = lru_to_page(page_list);
+ 	struct ceph_vino vino;
+ 	struct ceph_osd_request *req;
+ 	u64 off;
+@@ -333,8 +333,7 @@ static int start_read(struct inode *inode, struct ceph_rw_context *rw_ctx,
+ 			if (got)
+ 				ceph_put_cap_refs(ci, got);
+ 			while (!list_empty(page_list)) {
+-				page = list_entry(page_list->prev,
+-						  struct page, lru);
++				page = lru_to_page(page_list);
+ 				list_del(&page->lru);
+ 				put_page(page);
+ 			}
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 74c33d5fafc8..b16a4d887d17 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -33,6 +33,7 @@
+ #include <linux/mount.h>
+ #include <linux/slab.h>
+ #include <linux/swap.h>
++#include <linux/mm.h>
+ #include <asm/div64.h>
+ #include "cifsfs.h"
+ #include "cifspdu.h"
+@@ -3975,7 +3976,7 @@ readpages_get_pages(struct address_space *mapping, struct list_head *page_list,
+ 
+ 	INIT_LIST_HEAD(tmplist);
+ 
+-	page = list_entry(page_list->prev, struct page, lru);
++	page = lru_to_page(page_list);
+ 
+ 	/*
+ 	 * Lock the page and put it in the cache. Since no one else
+diff --git a/fs/ext4/readpage.c b/fs/ext4/readpage.c
+index f461d75ac049..6aa282ee455a 100644
+--- a/fs/ext4/readpage.c
++++ b/fs/ext4/readpage.c
+@@ -128,7 +128,7 @@ int ext4_mpage_readpages(struct address_space *mapping,
+ 
+ 		prefetchw(&page->flags);
+ 		if (pages) {
+-			page = list_entry(pages->prev, struct page, lru);
++			page = lru_to_page(pages);
+ 			list_del(&page->lru);
+ 			if (add_to_page_cache_lru(page, mapping, page->index,
+ 				  readahead_gfp_mask(mapping)))
+diff --git a/fs/ocfs2/aops.c b/fs/ocfs2/aops.c
+index eb1ce30412dc..832c1759a09a 100644
+--- a/fs/ocfs2/aops.c
++++ b/fs/ocfs2/aops.c
+@@ -30,6 +30,7 @@
+ #include <linux/quotaops.h>
+ #include <linux/blkdev.h>
+ #include <linux/uio.h>
++#include <linux/mm.h>
+ 
+ #include <cluster/masklog.h>
+ 
+@@ -397,7 +398,7 @@ static int ocfs2_readpages(struct file *filp, struct address_space *mapping,
+ 	 * Check whether a remote node truncated this file - we just
+ 	 * drop out in that case as it's not worth handling here.
+ 	 */
+-	last = list_entry(pages->prev, struct page, lru);
++	last = lru_to_page(pages);
+ 	start = (loff_t)last->index << PAGE_SHIFT;
+ 	if (start >= i_size_read(inode))
+ 		goto out_unlock;
+diff --git a/fs/orangefs/inode.c b/fs/orangefs/inode.c
+index fe53381b26b1..f038235c64bd 100644
+--- a/fs/orangefs/inode.c
++++ b/fs/orangefs/inode.c
+@@ -77,7 +77,7 @@ static int orangefs_readpages(struct file *file,
+ 	for (page_idx = 0; page_idx < nr_pages; page_idx++) {
+ 		struct page *page;
+ 
+-		page = list_entry(pages->prev, struct page, lru);
++		page = lru_to_page(pages);
+ 		list_del(&page->lru);
+ 		if (!add_to_page_cache(page,
+ 				       mapping,
+diff --git a/mm/swap.c b/mm/swap.c
+index aa483719922e..20b9e9d99652 100644
+--- a/mm/swap.c
++++ b/mm/swap.c
+@@ -126,7 +126,7 @@ void put_pages_list(struct list_head *pages)
+ 	while (!list_empty(pages)) {
+ 		struct page *victim;
+ 
+-		victim = list_entry(pages->prev, struct page, lru);
++		victim = lru_to_page(pages);
+ 		list_del(&victim->lru);
+ 		put_page(victim);
+ 	}
+-- 
+2.17.1
