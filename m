@@ -1,567 +1,204 @@
-From: Pavel Shilovsky <piastryyy@gmail.com>
-Subject: Re: [Patch v4 1/3] CIFS: Add support for direct I/O read
-Date: Thu, 29 Nov 2018 15:23:02 -0800
-Message-ID: <CAKywueQWR2k7gNte8ev8UAWv_s-it1jY1sgOLeZP3eQ5pX-qHw@mail.gmail.com>
-References: <20181031221311.2596-1-longli@linuxonhyperv.com>
- <CAKywueSjVA=hwM7QCQqY_g_XNKonGWK9c+q4oHmdm0dWAdZCzg@mail.gmail.com>
- <DM5PR21MB0185227A3633878FF63ABB2BCED10@DM5PR21MB0185.namprd21.prod.outlook.com>
- <CAKywueSHGj7xr709+Xfmtox_RkZtCVgyKDXP3T_gX3N10cQrrQ@mail.gmail.com> <DM5PR21MB0185F99808269901F609DB8DCED20@DM5PR21MB0185.namprd21.prod.outlook.com>
+From: "Yan, Zheng" <ukernel@gmail.com>
+Subject: Re: [PATCH 2/2] fs: Don't open-code lru_to_page
+Date: Fri, 30 Nov 2018 17:11:39 +0800
+Message-ID: <CAAM7YA==GN5epC5BZYVmcXuyZp-reVi+_MdhDrgcOjnVwME6zA@mail.gmail.com>
+References: <20181129075301.29087-1-nborisov@suse.com> <20181129075301.29087-2-nborisov@suse.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Cc: Steve French <sfrench@samba.org>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Long Li <longli@microsoft.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        David Howells <dhowells@redhat.com>, Chris Mason <clm@fb.com>,
+        josef@toxicpanda.com, David Sterba <dsterba@suse.com>,
+        Zheng Yan <zyan@redhat.com>, Sage Weil <sage@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>, sfrench@samba.org,
+        "Theodore Ts'o" <tytso@mit.edu>, adilger.kernel@dilger.ca,
+        mark@fasheh.com, jlbec@evilplan.org, hubcap@omnibond.com,
+        martin@omnibond.com, Andrew Morton <akpm@linux-foundation.org>,
+        rppt@linux.vnet.ibm.com, willy@infradead.org,
+        rdunlap@infradead.org, yuehaibing@huawei.com, shakeelb@google.com,
+        dan.j.williams@intel.com, mhocko@suse.com,
+        linux-afs@lists.infradead.org,
+        linux-btrfs <linux-btrfs@vger.kernel.org>,
+        ceph-devel <ceph-devel@vger.kernel.org>,
+        linux-cifs@vger.kernel.org, samba-technical@
+To: nborisov@suse.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <DM5PR21MB0185F99808269901F609DB8DCED20@DM5PR21MB0185.namprd21.prod.outlook.com>
+In-Reply-To: <20181129075301.29087-2-nborisov@suse.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-=D1=87=D1=82, 29 =D0=BD=D0=BE=D1=8F=D0=B1. 2018 =D0=B3. =D0=B2 14:48, Long =
-Li <longli@microsoft.com>:
+On Thu, Nov 29, 2018 at 3:56 PM Nikolay Borisov <nborisov@suse.com> wrote:
 >
-> > Subject: Re: [Patch v4 1/3] CIFS: Add support for direct I/O read
-> >
-> > =D1=81=D1=80, 28 =D0=BD=D0=BE=D1=8F=D0=B1. 2018 =D0=B3. =D0=B2 15:43, L=
-ong Li <longli@microsoft.com>:
-> > >
-> > > > Subject: Re: [Patch v4 1/3] CIFS: Add support for direct I/O read
-> > > >
-> > > > Hi Long,
-> > > >
-> > > > Please find my comments below.
-> > > >
-> > > >
-> > > > =D1=81=D1=80, 31 =D0=BE=D0=BA=D1=82. 2018 =D0=B3. =D0=B2 15:14, Lon=
-g Li <longli@linuxonhyperv.com>:
-> > > > >
-> > > > > From: Long Li <longli@microsoft.com>
-> > > > >
-> > > > > With direct I/O read, we transfer the data directly from transpor=
-t
-> > > > > layer to the user data buffer.
-> > > > >
-> > > > > Change in v3: add support for kernel AIO
-> > > > >
-> > > > > Change in v4:
-> > > > > Refactor common read code to __cifs_readv for direct and non-dire=
-ct
-> > I/O.
-> > > > > Retry on direct I/O failure.
-> > > > >
-> > > > > Signed-off-by: Long Li <longli@microsoft.com>
-> > > > > ---
-> > > > >  fs/cifs/cifsfs.h   |   1 +
-> > > > >  fs/cifs/cifsglob.h |   5 ++
-> > > > >  fs/cifs/file.c     | 219
-> > +++++++++++++++++++++++++++++++++++++++++++--
-> > > > --------
-> > > > >  3 files changed, 186 insertions(+), 39 deletions(-)
-> > > > >
-> > > > > diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h index
-> > > > > 5f02318..7fba9aa 100644
-> > > > > --- a/fs/cifs/cifsfs.h
-> > > > > +++ b/fs/cifs/cifsfs.h
-> > > > > @@ -102,6 +102,7 @@ extern int cifs_open(struct inode *inode,
-> > > > > struct file *file);  extern int cifs_close(struct inode *inode,
-> > > > > struct file *file);  extern int cifs_closedir(struct inode *inode=
-,
-> > > > > struct file *file);  extern ssize_t cifs_user_readv(struct kiocb
-> > > > > *iocb, struct iov_iter *to);
-> > > > > +extern ssize_t cifs_direct_readv(struct kiocb *iocb, struct
-> > > > > +iov_iter *to);
-> > > > >  extern ssize_t cifs_strict_readv(struct kiocb *iocb, struct
-> > > > > iov_iter *to);  extern ssize_t cifs_user_writev(struct kiocb
-> > > > > *iocb, struct iov_iter *from);  extern ssize_t
-> > > > > cifs_strict_writev(struct kiocb *iocb, struct iov_iter *from);
-> > > > > diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h index
-> > > > > 7f62c98..52248dd 100644
-> > > > > --- a/fs/cifs/cifsglob.h
-> > > > > +++ b/fs/cifs/cifsglob.h
-> > > > > @@ -1146,6 +1146,11 @@ struct cifs_aio_ctx {
-> > > > >         unsigned int            len;
-> > > > >         unsigned int            total_len;
-> > > > >         bool                    should_dirty;
-> > > > > +       /*
-> > > > > +        * Indicates if this aio_ctx is for direct_io,
-> > > > > +        * If yes, iter is a copy of the user passed iov_iter
-> > > > > +        */
-> > > > > +       bool                    direct_io;
-> > > > >  };
-> > > > >
-> > > > >  struct cifs_readdata;
-> > > > > diff --git a/fs/cifs/file.c b/fs/cifs/file.c index
-> > > > > 87eece6..daab878
-> > > > > 100644
-> > > > > --- a/fs/cifs/file.c
-> > > > > +++ b/fs/cifs/file.c
-> > > > > @@ -2965,7 +2965,6 @@ cifs_uncached_readdata_release(struct kref
-> > > > *refcount)
-> > > > >         kref_put(&rdata->ctx->refcount, cifs_aio_ctx_release);
-> > > > >         for (i =3D 0; i < rdata->nr_pages; i++) {
-> > > > >                 put_page(rdata->pages[i]);
-> > > > > -               rdata->pages[i] =3D NULL;
-> > > > >         }
-> > > > >         cifs_readdata_release(refcount);  } @@ -3092,6 +3091,63 @=
-@
-> > > > > cifs_uncached_copy_into_pages(struct TCP_Server_Info *server,
-> > > > >         return uncached_fill_pages(server, rdata, iter,
-> > > > > iter->count); }
-> > > > >
-> > > > > +static int cifs_resend_rdata(struct cifs_readdata *rdata,
-> > > > > +                     struct list_head *rdata_list,
-> > > > > +                     struct cifs_aio_ctx *ctx) {
-> > > > > +       int wait_retry =3D 0;
-> > > > > +       unsigned int rsize, credits;
-> > > > > +       int rc;
-> > > > > +       struct TCP_Server_Info *server =3D
-> > > > > +tlink_tcon(rdata->cfile->tlink)->ses->server;
-> > > > > +
-> > > > > +       /*
-> > > > > +        * Try to resend this rdata, waiting for credits up to 3 =
-seconds.
-> > > > > +        * Note: we are attempting to resend the whole rdata not =
-in
-> > segments
-> > > > > +        */
-> > > > > +       do {
-> > > > > +               rc =3D server->ops->wait_mtu_credits(server, rdat=
-a->bytes,
-> > > > > +                                               &rsize, &credits)=
-;
-> > > > > +
-> > > > > +               if (rc)
-> > > > > +                       break;
-> > > > > +
-> > > > > +               if (rsize < rdata->bytes) {
-> > > > > +                       add_credits_and_wake_if(server, credits, =
-0);
-> > > > > +                       msleep(1000);
-> > > > > +                       wait_retry++;
-> > > > > +               }
-> > > > > +       } while (rsize < rdata->bytes && wait_retry < 3);
-> > > > > +
-> > > > > +       /*
-> > > > > +        * If we can't find enough credits to send this rdata
-> > > > > +        * release the rdata and return failure, this will pass
-> > > > > +        * whatever I/O amount we have finished to VFS.
-> > > > > +        */
-> > > > > +       if (rsize < rdata->bytes) {
-> > > > > +               rc =3D -EBUSY;
-> > > >
-> > > > We don't have enough credits and return EBUSY here...
-> > > >
-> > > > > +               goto out;
-> > > > > +       }
-> > > > > +
-> > > > > +       rc =3D -EAGAIN;
-> > > > > +       while (rc =3D=3D -EAGAIN)
-> > > > > +               if (!rdata->cfile->invalidHandle ||
-> > > > > +                   !(rc =3D cifs_reopen_file(rdata->cfile, true)=
-))
-> > > > > +                       rc =3D server->ops->async_readv(rdata);
-> > > > > +
-> > > > > +       if (!rc) {
-> > > > > +               /* Add to aio pending list */
-> > > > > +               list_add_tail(&rdata->list, rdata_list);
-> > > > > +               return 0;
-> > > > > +       }
-> > > > > +
-> > > > > +       add_credits_and_wake_if(server, rdata->credits, 0);
-> > > > > +out:
-> > > > > +       kref_put(&rdata->refcount,
-> > > > > +               cifs_uncached_readdata_release);
-> > > > > +
-> > > > > +       return rc;
-> > > > > +}
-> > > > > +
-> > > > >  static int
-> > > > >  cifs_send_async_read(loff_t offset, size_t len, struct cifsFileI=
-nfo
-> > *open_file,
-> > > > >                      struct cifs_sb_info *cifs_sb, struct
-> > > > > list_head *rdata_list, @@ -3103,6 +3159,9 @@
-> > > > > cifs_send_async_read(loff_t offset,
-> > > > size_t len, struct cifsFileInfo *open_file,
-> > > > >         int rc;
-> > > > >         pid_t pid;
-> > > > >         struct TCP_Server_Info *server;
-> > > > > +       struct page **pagevec;
-> > > > > +       size_t start;
-> > > > > +       struct iov_iter direct_iov =3D ctx->iter;
-> > > > >
-> > > > >         server =3D tlink_tcon(open_file->tlink)->ses->server;
-> > > > >
-> > > > > @@ -3111,6 +3170,9 @@ cifs_send_async_read(loff_t offset, size_t
-> > > > > len,
-> > > > struct cifsFileInfo *open_file,
-> > > > >         else
-> > > > >                 pid =3D current->tgid;
-> > > > >
-> > > > > +       if (ctx->direct_io)
-> > > > > +               iov_iter_advance(&direct_iov, offset - ctx->pos);
-> > > > > +
-> > > > >         do {
-> > > > >                 rc =3D server->ops->wait_mtu_credits(server, cifs=
-_sb->rsize,
-> > > > >                                                    &rsize,
-> > > > > &credits); @@ -3118,20 +3180,56 @@ cifs_send_async_read(loff_t
-> > > > > offset, size_t len,
-> > > > struct cifsFileInfo *open_file,
-> > > > >                         break;
-> > > > >
-> > > > >                 cur_len =3D min_t(const size_t, len, rsize);
-> > > > > -               npages =3D DIV_ROUND_UP(cur_len, PAGE_SIZE);
-> > > > >
-> > > > > -               /* allocate a readdata struct */
-> > > > > -               rdata =3D cifs_readdata_alloc(npages,
-> > > > > +               if (ctx->direct_io) {
-> > > > > +
-> > > > > +                       cur_len =3D iov_iter_get_pages_alloc(
-> > > > > +                                       &direct_iov, &pagevec,
-> > > > > +                                       cur_len, &start);
-> > > > > +                       if (cur_len < 0) {
-> > > > > +                               cifs_dbg(VFS,
-> > > > > +                                       "couldn't get user pages =
-(cur_len=3D%zd)"
-> > > > > +                                       " iter type %d"
-> > > > > +                                       " iov_offset %zd count %z=
-d\n",
-> > > > > +                                       cur_len, direct_iov.type,=
- direct_iov.iov_offset,
-> > > > > +                                       direct_iov.count);
-> > > > > +                               dump_stack();
-> > > > > +                               break;
-> > > > > +                       }
-> > > > > +                       iov_iter_advance(&direct_iov, cur_len);
-> > > > > +
-> > > > > +                       rdata =3D cifs_readdata_direct_alloc(
-> > > > > +                                       pagevec, cifs_uncached_re=
-adv_complete);
-> > > > > +                       if (!rdata) {
-> > > > > +                               add_credits_and_wake_if(server, c=
-redits, 0);
-> > > > > +                               rc =3D -ENOMEM;
-> > > > > +                               break;
-> > > > > +                       }
-> > > > > +
-> > > > > +                       npages =3D (cur_len + start + PAGE_SIZE-1=
-) / PAGE_SIZE;
-> > > > > +                       rdata->page_offset =3D start;
-> > > > > +                       rdata->tailsz =3D npages > 1 ?
-> > > > > +                               cur_len-(PAGE_SIZE-start)-(npages=
--2)*PAGE_SIZE :
-> > > > > +                               cur_len;
-> > > > > +
-> > > > > +               } else {
-> > > > > +
-> > > > > +                       npages =3D DIV_ROUND_UP(cur_len, PAGE_SIZ=
-E);
-> > > > > +                       /* allocate a readdata struct */
-> > > > > +                       rdata =3D cifs_readdata_alloc(npages,
-> > > > >                                             cifs_uncached_readv_c=
-omplete);
-> > > > > -               if (!rdata) {
-> > > > > -                       add_credits_and_wake_if(server, credits, =
-0);
-> > > > > -                       rc =3D -ENOMEM;
-> > > > > -                       break;
-> > > > > -               }
-> > > > > +                       if (!rdata) {
-> > > > > +                               add_credits_and_wake_if(server, c=
-redits, 0);
-> > > > > +                               rc =3D -ENOMEM;
-> > > > > +                               break;
-> > > > > +                       }
-> > > > >
-> > > > > -               rc =3D cifs_read_allocate_pages(rdata, npages);
-> > > > > -               if (rc)
-> > > > > -                       goto error;
-> > > > > +                       rc =3D cifs_read_allocate_pages(rdata, np=
-ages);
-> > > > > +                       if (rc)
-> > > > > +                               goto error;
-> > > > > +
-> > > > > +                       rdata->tailsz =3D PAGE_SIZE;
-> > > > > +               }
-> > > > >
-> > > > >                 rdata->cfile =3D cifsFileInfo_get(open_file);
-> > > > >                 rdata->nr_pages =3D npages; @@ -3139,7 +3237,6 @@
-> > > > > cifs_send_async_read(loff_t offset, size_t len, struct cifsFileIn=
-fo
-> > *open_file,
-> > > > >                 rdata->bytes =3D cur_len;
-> > > > >                 rdata->pid =3D pid;
-> > > > >                 rdata->pagesz =3D PAGE_SIZE;
-> > > > > -               rdata->tailsz =3D PAGE_SIZE;
-> > > > >                 rdata->read_into_pages =3D cifs_uncached_read_int=
-o_pages;
-> > > > >                 rdata->copy_into_pages =3D cifs_uncached_copy_int=
-o_pages;
-> > > > >                 rdata->credits =3D credits; @@ -3153,9 +3250,11 @=
-@
-> > > > > cifs_send_async_read(loff_t offset, size_t len, struct cifsFileIn=
-fo
-> > *open_file,
-> > > > >                 if (rc) {
-> > > > >                         add_credits_and_wake_if(server, rdata->cr=
-edits, 0);
-> > > > >                         kref_put(&rdata->refcount,
-> > > > > -                                cifs_uncached_readdata_release);
-> > > > > -                       if (rc =3D=3D -EAGAIN)
-> > > > > +                               cifs_uncached_readdata_release);
-> > > > > +                       if (rc =3D=3D -EAGAIN) {
-> > > > > +                               iov_iter_revert(&direct_iov,
-> > > > > + cur_len);
-> > > > >                                 continue;
-> > > > > +                       }
-> > > > >                         break;
-> > > > >                 }
-> > > > >
-> > > > > @@ -3211,45 +3310,62 @@ collect_uncached_read_data(struct
-> > > > cifs_aio_ctx *ctx)
-> > > > >                                  * reading.
-> > > > >                                  */
-> > > > >                                 if (got_bytes && got_bytes < rdat=
-a->bytes) {
-> > > > > -                                       rc =3D cifs_readdata_to_i=
-ov(rdata, to);
-> > > > > +                                       rc =3D 0;
-> > > > > +                                       if (!ctx->direct_io)
-> > > > > +                                               rc =3D
-> > > > > + cifs_readdata_to_iov(rdata, to);
-> > > > >                                         if (rc) {
-> > > > >                                                 kref_put(&rdata->=
-refcount,
-> > > > > -                                               cifs_uncached_rea=
-ddata_release);
-> > > > > +
-> > > > > + cifs_uncached_readdata_release);
-> > > > >                                                 continue;
-> > > > >                                         }
-> > > > >                                 }
-> > > > >
-> > > > > -                               rc =3D cifs_send_async_read(
-> > > > > +                               if (ctx->direct_io) {
-> > > > > +                                       /*
-> > > > > +                                        * Re-use rdata as this i=
-s a
-> > > > > +                                        * direct I/O
-> > > > > +                                        */
-> > > > > +                                       rc =3D cifs_resend_rdata(
-> > > > > +                                               rdata,
-> > > > > +                                               &tmp_list, ctx);
-> > > >
-> > > > ...so we set rc to -EBUSY...
-> > > >
-> > > >
-> > > > > +                               } else {
-> > > > > +                                       rc =3D cifs_send_async_re=
-ad(
-> > > > >                                                 rdata->offset + g=
-ot_bytes,
-> > > > >                                                 rdata->bytes - go=
-t_bytes,
-> > > > >                                                 rdata->cfile, cif=
-s_sb,
-> > > > >                                                 &tmp_list, ctx);
-> > > > >
-> > > > > +                                       kref_put(&rdata->refcount=
-,
-> > > > > +                                               cifs_uncached_rea=
-ddata_release);
-> > > > > +                               }
-> > > > > +
-> > > > >                                 list_splice(&tmp_list,
-> > > > > &ctx->list);
-> > > > >
-> > > > > -                               kref_put(&rdata->refcount,
-> > > > > -                                        cifs_uncached_readdata_r=
-elease);
-> > > > >                                 goto again;
-> > > > >                         } else if (rdata->result)
-> > > > >                                 rc =3D rdata->result;
-> > > > > -                       else
-> > > > > +                       else if (!ctx->direct_io)
-> > > > >                                 rc =3D cifs_readdata_to_iov(rdata=
-,
-> > > > > to);
-> > > > >
-> > > > >                         /* if there was a short read -- discard a=
-nything left */
-> > > > >                         if (rdata->got_bytes && rdata->got_bytes =
-< rdata->bytes)
-> > > > >                                 rc =3D -ENODATA;
-> > > > > +
-> > > > > +                       ctx->total_len +=3D rdata->got_bytes;
-> > > > >                 }
-> > > > >                 list_del_init(&rdata->list);
-> > > > >                 kref_put(&rdata->refcount, cifs_uncached_readdata=
-_release);
-> > > > >         }
-> > > > >
-> > > > > -       for (i =3D 0; i < ctx->npages; i++) {
-> > > > > -               if (ctx->should_dirty)
-> > > > > -                       set_page_dirty(ctx->bv[i].bv_page);
-> > > > > -               put_page(ctx->bv[i].bv_page);
-> > > > > -       }
-> > > > > +       if (!ctx->direct_io) {
-> > > > > +               for (i =3D 0; i < ctx->npages; i++) {
-> > > > > +                       if (ctx->should_dirty)
-> > > > > +                               set_page_dirty(ctx->bv[i].bv_page=
-);
-> > > > > +                       put_page(ctx->bv[i].bv_page);
-> > > > > +               }
-> > > > >
-> > > > > -       ctx->total_len =3D ctx->len - iov_iter_count(to);
-> > > > > +               ctx->total_len =3D ctx->len - iov_iter_count(to);
-> > > > > +       }
-> > > > >
-> > > > >         cifs_stats_bytes_read(tcon, ctx->total_len);
-> > > > >
-> > > > > @@ -3267,18 +3383,27 @@ collect_uncached_read_data(struct
-> > > > cifs_aio_ctx *ctx)
-> > > > >                 complete(&ctx->done);
-> > > >
-> > > > and then ctx->rc is set to -EBUSY too.
-> > > >
-> > > > >  }
-> > > > >
-> > > > > -ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to)
-> > > > > +ssize_t __cifs_readv(struct kiocb *iocb, struct iov_iter *to,
-> > > > > +bool
-> > > > > +direct)
-> > > > >  {
-> > > > > -       struct file *file =3D iocb->ki_filp;
-> > > > > -       ssize_t rc;
-> > > > >         size_t len;
-> > > > > -       ssize_t total_read =3D 0;
-> > > > > -       loff_t offset =3D iocb->ki_pos;
-> > > > > +       struct file *file =3D iocb->ki_filp;
-> > > > >         struct cifs_sb_info *cifs_sb;
-> > > > > -       struct cifs_tcon *tcon;
-> > > > >         struct cifsFileInfo *cfile;
-> > > > > +       struct cifs_tcon *tcon;
-> > > > > +       ssize_t rc, total_read =3D 0;
-> > > > > +       loff_t offset =3D iocb->ki_pos;
-> > > > >         struct cifs_aio_ctx *ctx;
-> > > > >
-> > > > > +       /*
-> > > > > +        * iov_iter_get_pages_alloc() doesn't work with ITER_KVEC=
-,
-> > > > > +        * fall back to data copy read path
-> > > > > +        * this could be improved by getting pages directly in IT=
-ER_KVEC
-> > > > > +        */
-> > > > > +       if (direct && to->type & ITER_KVEC) {
-> > > > > +               cifs_dbg(FYI, "use non-direct cifs_user_readv for=
- kvec I/O\n");
-> > > > > +               direct =3D false;
-> > > > > +       }
-> > > > > +
-> > > > >         len =3D iov_iter_count(to);
-> > > > >         if (!len)
-> > > > >                 return 0;
-> > > > > @@ -3305,14 +3430,20 @@ ssize_t cifs_user_readv(struct kiocb
-> > > > > *iocb,
-> > > > struct iov_iter *to)
-> > > > >         if (to->type =3D=3D ITER_IOVEC)
-> > > > >                 ctx->should_dirty =3D true;
-> > > > >
-> > > > > -       rc =3D setup_aio_ctx_iter(ctx, to, READ);
-> > > > > -       if (rc) {
-> > > > > -               kref_put(&ctx->refcount, cifs_aio_ctx_release);
-> > > > > -               return rc;
-> > > > > +       if (direct) {
-> > > > > +               ctx->pos =3D offset;
-> > > > > +               ctx->direct_io =3D true;
-> > > > > +               ctx->iter =3D *to;
-> > > > > +               ctx->len =3D len;
-> > > > > +       } else {
-> > > > > +               rc =3D setup_aio_ctx_iter(ctx, to, READ);
-> > > > > +               if (rc) {
-> > > > > +                       kref_put(&ctx->refcount, cifs_aio_ctx_rel=
-ease);
-> > > > > +                       return rc;
-> > > > > +               }
-> > > > > +               len =3D ctx->len;
-> > > > >         }
-> > > > >
-> > > > > -       len =3D ctx->len;
-> > > > > -
-> > > > >         /* grab a lock here due to read response handlers can acc=
-ess ctx */
-> > > > >         mutex_lock(&ctx->aio_mutex);
-> > > > >
-> > > > > @@ -3354,6 +3485,16 @@ ssize_t cifs_user_readv(struct kiocb *iocb=
-,
-> > > > struct iov_iter *to)
-> > > > >         return rc;
-> > > >
-> > > > In case of a blocking read we will return -EBUSY to the caller but
-> > > > read man page doesn't say anything about a possibility to return
-> > > > this error code. Is it being mapped somehow by VFS or is there
-> > > > another consideration? The same question applies to the write patch=
- as
-> > well.
-> > >
-> > > Thanks Pavel,  Yes this is a bug.
-> > >
-> > > In practice, the retry logic will rarely get hit. If getting hit, nor=
-mally the
-> > server will give us far more credits for resending this whole packet.
-> > >
-> > > How about just retrying forever (instead of trying 3 times) on this r=
-esend
-> > packet? This will change the code to the same behavior before direct I/=
-O
-> > patches.
-> > >
-> > > e.g.:
-> > >
-> > >         /*
-> > >          * Try to resend this wdata, waiting for credits before sendi=
-ng
-> > >          * Note: we are attempting to resend the whole wdata not in
-> > segments
-> > >          */
-> > >         do {
-> > >                 rc =3D server->ops->wait_mtu_credits(
-> > >                         server, wdata->bytes, &wsize, &credits);
-> > >
-> > >                 if (rc)
-> > >                         break;
-> > >
-> > >                 if (wsize < wdata->bytes) {
-> > >                         add_credits_and_wake_if(server, credits, 0);
-> > >                         msleep(1000);
-> > >                 }
-> > >         } while (wsize < wdata->bytes);
-> > >
-> >
-> > We can do that but it won't be the same behavior because we were using =
-a
-> > partial send:
+> There are a bunch of filesystems which essentially open-code lru_to_page
+> helper. Change them to using the helper. No functional changes.
 >
-> Yes it's a little different.
+> Signed-off-by: Nikolay Borisov <nborisov@suse.com>
+> ---
 >
-> I don't see any ill effects of doing this, other than we may wait for a l=
-ittle longer on a full credit to send the whole packet. In practice the ser=
-ver always offers a full credit on the first call to wait_mtu_credits(), I =
-am yet to see the while loop actually get looped.
+> Since this is a mostly mechanical change I've actually batched all of them in
+> a single patch.
 >
-> The resend path is rarely getting hit in stress tests on TCP, I estimate =
-maybe less than 0.001% on my test setup, the while loop for waiting credits=
- is ever harder to hit that I never see one.
+>  fs/afs/file.c        | 5 +++--
+>  fs/btrfs/extent_io.c | 2 +-
+>  fs/ceph/addr.c       | 5 ++---
+>  fs/cifs/file.c       | 3 ++-
+>  fs/ext4/readpage.c   | 2 +-
+>  fs/ocfs2/aops.c      | 3 ++-
+>  fs/orangefs/inode.c  | 2 +-
+>  mm/swap.c            | 2 +-
+>  8 files changed, 13 insertions(+), 11 deletions(-)
 >
-> On RDMA, the resend path is never used.
+> diff --git a/fs/afs/file.c b/fs/afs/file.c
+> index d6bc3f5d784b..323ae9912203 100644
+> --- a/fs/afs/file.c
+> +++ b/fs/afs/file.c
+> @@ -17,6 +17,7 @@
+>  #include <linux/writeback.h>
+>  #include <linux/gfp.h>
+>  #include <linux/task_io_accounting_ops.h>
+> +#include <linux/mm.h>
+>  #include "internal.h"
+>
+>  static int afs_file_mmap(struct file *file, struct vm_area_struct *vma);
+> @@ -441,7 +442,7 @@ static int afs_readpages_one(struct file *file, struct address_space *mapping,
+>         /* Count the number of contiguous pages at the front of the list.  Note
+>          * that the list goes prev-wards rather than next-wards.
+>          */
+> -       first = list_entry(pages->prev, struct page, lru);
+> +       first = lru_to_page(pages);
+>         index = first->index + 1;
+>         n = 1;
+>         for (p = first->lru.prev; p != pages; p = p->prev) {
+> @@ -473,7 +474,7 @@ static int afs_readpages_one(struct file *file, struct address_space *mapping,
+>          * page at the end of the file.
+>          */
+>         do {
+> -               page = list_entry(pages->prev, struct page, lru);
+> +               page = lru_to_page(pages);
+>                 list_del(&page->lru);
+>                 index = page->index;
+>                 if (add_to_page_cache_lru(page, mapping, index,
+> diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+> index 19f4b8fd654f..8332c5f4b1c3 100644
+> --- a/fs/btrfs/extent_io.c
+> +++ b/fs/btrfs/extent_io.c
+> @@ -4104,7 +4104,7 @@ int extent_readpages(struct address_space *mapping, struct list_head *pages,
+>         u64 prev_em_start = (u64)-1;
+>
+>         for (page_idx = 0; page_idx < nr_pages; page_idx++) {
+> -               page = list_entry(pages->prev, struct page, lru);
+> +               page = lru_to_page(pages);
+>
+>                 prefetchw(&page->flags);
+>                 list_del(&page->lru);
+> diff --git a/fs/ceph/addr.c b/fs/ceph/addr.c
+> index 8eade7a993c1..5d0c05e288cc 100644
+> --- a/fs/ceph/addr.c
+> +++ b/fs/ceph/addr.c
+> @@ -306,7 +306,7 @@ static int start_read(struct inode *inode, struct ceph_rw_context *rw_ctx,
+>         struct ceph_osd_client *osdc =
+>                 &ceph_inode_to_client(inode)->client->osdc;
+>         struct ceph_inode_info *ci = ceph_inode(inode);
+> -       struct page *page = list_entry(page_list->prev, struct page, lru);
+> +       struct page *page = lru_to_page(page_list);
+>         struct ceph_vino vino;
+>         struct ceph_osd_request *req;
+>         u64 off;
+> @@ -333,8 +333,7 @@ static int start_read(struct inode *inode, struct ceph_rw_context *rw_ctx,
+>                         if (got)
+>                                 ceph_put_cap_refs(ci, got);
+>                         while (!list_empty(page_list)) {
+> -                               page = list_entry(page_list->prev,
+> -                                                 struct page, lru);
+> +                               page = lru_to_page(page_list);
+>                                 list_del(&page->lru);
+>                                 put_page(page);
+>                         }
 
-Ok. Another way to fix this is to break the request into several
-smaller ones consuming 1 credit per request - see
-cifs_writev_requeue() function that does the same thing for writes.
+For the ceph patch
 
---
-Best regards,
-Pavel Shilovsky
+Acked-by:: "Yan, Zheng" <zyan@redhat.com
+
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index 74c33d5fafc8..b16a4d887d17 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -33,6 +33,7 @@
+>  #include <linux/mount.h>
+>  #include <linux/slab.h>
+>  #include <linux/swap.h>
+> +#include <linux/mm.h>
+>  #include <asm/div64.h>
+>  #include "cifsfs.h"
+>  #include "cifspdu.h"
+> @@ -3975,7 +3976,7 @@ readpages_get_pages(struct address_space *mapping, struct list_head *page_list,
+>
+>         INIT_LIST_HEAD(tmplist);
+>
+> -       page = list_entry(page_list->prev, struct page, lru);
+> +       page = lru_to_page(page_list);
+>
+>         /*
+>          * Lock the page and put it in the cache. Since no one else
+> diff --git a/fs/ext4/readpage.c b/fs/ext4/readpage.c
+> index f461d75ac049..6aa282ee455a 100644
+> --- a/fs/ext4/readpage.c
+> +++ b/fs/ext4/readpage.c
+> @@ -128,7 +128,7 @@ int ext4_mpage_readpages(struct address_space *mapping,
+>
+>                 prefetchw(&page->flags);
+>                 if (pages) {
+> -                       page = list_entry(pages->prev, struct page, lru);
+> +                       page = lru_to_page(pages);
+>                         list_del(&page->lru);
+>                         if (add_to_page_cache_lru(page, mapping, page->index,
+>                                   readahead_gfp_mask(mapping)))
+> diff --git a/fs/ocfs2/aops.c b/fs/ocfs2/aops.c
+> index eb1ce30412dc..832c1759a09a 100644
+> --- a/fs/ocfs2/aops.c
+> +++ b/fs/ocfs2/aops.c
+> @@ -30,6 +30,7 @@
+>  #include <linux/quotaops.h>
+>  #include <linux/blkdev.h>
+>  #include <linux/uio.h>
+> +#include <linux/mm.h>
+>
+>  #include <cluster/masklog.h>
+>
+> @@ -397,7 +398,7 @@ static int ocfs2_readpages(struct file *filp, struct address_space *mapping,
+>          * Check whether a remote node truncated this file - we just
+>          * drop out in that case as it's not worth handling here.
+>          */
+> -       last = list_entry(pages->prev, struct page, lru);
+> +       last = lru_to_page(pages);
+>         start = (loff_t)last->index << PAGE_SHIFT;
+>         if (start >= i_size_read(inode))
+>                 goto out_unlock;
+> diff --git a/fs/orangefs/inode.c b/fs/orangefs/inode.c
+> index fe53381b26b1..f038235c64bd 100644
+> --- a/fs/orangefs/inode.c
+> +++ b/fs/orangefs/inode.c
+> @@ -77,7 +77,7 @@ static int orangefs_readpages(struct file *file,
+>         for (page_idx = 0; page_idx < nr_pages; page_idx++) {
+>                 struct page *page;
+>
+> -               page = list_entry(pages->prev, struct page, lru);
+> +               page = lru_to_page(pages);
+>                 list_del(&page->lru);
+>                 if (!add_to_page_cache(page,
+>                                        mapping,
+> diff --git a/mm/swap.c b/mm/swap.c
+> index aa483719922e..20b9e9d99652 100644
+> --- a/mm/swap.c
+> +++ b/mm/swap.c
+> @@ -126,7 +126,7 @@ void put_pages_list(struct list_head *pages)
+>         while (!list_empty(pages)) {
+>                 struct page *victim;
+>
+> -               victim = list_entry(pages->prev, struct page, lru);
+> +               victim = lru_to_page(pages);
+>                 list_del(&victim->lru);
+>                 put_page(victim);
+>         }
+> --
+> 2.17.1
+>
