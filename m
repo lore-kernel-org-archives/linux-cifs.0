@@ -1,15 +1,15 @@
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.9 29/34] cifs: In Kconfig CONFIG_CIFS_POSIX needs depends on legacy (insecure cifs)
-Date: Wed, 12 Dec 2018 23:31:55 -0500
-Message-ID: <20181213043200.76295-29-sashal@kernel.org>
-References: <20181213043200.76295-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 21/23] cifs: In Kconfig CONFIG_CIFS_POSIX needs depends on legacy (insecure cifs)
+Date: Wed, 12 Dec 2018 23:32:57 -0500
+Message-ID: <20181213043259.76643-21-sashal@kernel.org>
+References: <20181213043259.76643-1-sashal@kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Cc: Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
 To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181213043200.76295-1-sashal@kernel.org>
+In-Reply-To: <20181213043259.76643-1-sashal@kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
