@@ -1,16 +1,16 @@
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.19 63/73] cifs: In Kconfig CONFIG_CIFS_POSIX needs depends on legacy (insecure cifs)
-Date: Wed, 12 Dec 2018 23:28:28 -0500
-Message-ID: <20181213042838.75160-63-sashal@kernel.org>
-References: <20181213042838.75160-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 29/34] cifs: In Kconfig CONFIG_CIFS_POSIX needs depends on legacy (insecure cifs)
+Date: Wed, 12 Dec 2018 23:31:55 -0500
+Message-ID: <20181213043200.76295-29-sashal@kernel.org>
+References: <20181213043200.76295-1-sashal@kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Cc: Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
 To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20181213042838.75160-1-sashal@kernel.org>
-Sender: stable-owner@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20181213043200.76295-1-sashal@kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
 From: Steve French <stfrench@microsoft.com>
@@ -29,10 +29,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
-index abcd78e332fe..85dadb93c992 100644
+index e7b478b49985..8bef27b8f85d 100644
 --- a/fs/cifs/Kconfig
 +++ b/fs/cifs/Kconfig
-@@ -133,7 +133,7 @@ config CIFS_XATTR
+@@ -111,7 +111,7 @@ config CIFS_XATTR
  
  config CIFS_POSIX
          bool "CIFS POSIX Extensions"
