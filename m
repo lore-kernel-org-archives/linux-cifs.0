@@ -1,45 +1,63 @@
-From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.14 33/41] cifs: In Kconfig CONFIG_CIFS_POSIX needs depends on legacy (insecure cifs)
-Date: Wed, 12 Dec 2018 23:30:46 -0500
-Message-ID: <20181213043054.75891-33-sashal@kernel.org>
-References: <20181213043054.75891-1-sashal@kernel.org>
+From: Long Li <longli@linuxonhyperv.com>
+Subject: [PATCH] CIFS: return correct errors when pinning memory failed for direct I/O
+Date: Sun, 16 Dec 2018 22:41:07 +0000
+Message-ID: <20181216224107.16164-1-longli@linuxonhyperv.com>
+Reply-To: longli@microsoft.com
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Cc: Steve French <stfrench@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
-To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc: Long Li <longli@microsoft.com>, stable@vger.kernel.org,
+        Murphy Zhou <jencce.kernel@gmail.com>
+To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+        linux-rdma@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181213043054.75891-1-sashal@kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-From: Steve French <stfrench@microsoft.com>
+From: Long Li <longli@microsoft.com>
 
-[ Upstream commit 6e785302dad32228819d8066e5376acd15d0e6ba ]
+When pinning memory failed, we should return the correct error code and
+rewind the SMB credits.
 
-Missing a dependency.  Shouldn't show cifs posix extensions
-in Kconfig if CONFIG_CIFS_ALLOW_INSECURE_DIALECTS (ie SMB1
-protocol) is disabled.
-
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Reported-by: Murphy Zhou <jencce.kernel@gmail.com>
+Signed-off-by: Long Li <longli@microsoft.com>
+Cc: stable@vger.kernel.org
+Cc: Murphy Zhou <jencce.kernel@gmail.com>
 ---
- fs/cifs/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/cifs/file.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
-index cb0f1fbe836d..7b95e7971d18 100644
---- a/fs/cifs/Kconfig
-+++ b/fs/cifs/Kconfig
-@@ -121,7 +121,7 @@ config CIFS_XATTR
- 
- config CIFS_POSIX
-         bool "CIFS POSIX Extensions"
--        depends on CIFS_XATTR
-+        depends on CIFS && CIFS_ALLOW_INSECURE_LEGACY && CIFS_XATTR
-         help
-           Enabling this option will cause the cifs client to attempt to
- 	  negotiate a newer dialect with servers, such as Samba 3.0.5
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index c9bc56b..3467351 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -2630,6 +2630,9 @@ cifs_write_from_iter(loff_t offset, size_t len, struct iov_iter *from,
+ 					result, from->type,
+ 					from->iov_offset, from->count);
+ 				dump_stack();
++
++				rc = result;
++				add_credits_and_wake_if(server, credits, 0);
+ 				break;
+ 			}
+ 			cur_len = (size_t)result;
+@@ -3313,13 +3316,16 @@ cifs_send_async_read(loff_t offset, size_t len, struct cifsFileInfo *open_file,
+ 					cur_len, &start);
+ 			if (result < 0) {
+ 				cifs_dbg(VFS,
+-					"couldn't get user pages (cur_len=%zd)"
++					"couldn't get user pages (rc=%zd)"
+ 					" iter type %d"
+ 					" iov_offset %zd count %zd\n",
+ 					result, direct_iov.type,
+ 					direct_iov.iov_offset,
+ 					direct_iov.count);
+ 				dump_stack();
++
++				rc = result;
++				add_credits_and_wake_if(server, credits, 0);
+ 				break;
+ 			}
+ 			cur_len = (size_t)result;
 -- 
-2.19.1
+2.7.4
