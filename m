@@ -1,96 +1,130 @@
-From: Joey Pabalinas <joeypabalinas@gmail.com>
-Subject: Re: [PATCH] CIFS: use the correct length when pinning memory for
- direct I/O for write
-Date: Sun, 16 Dec 2018 15:10:35 -1000
-Message-ID: <20181217011035.ykal46ixowdqyl7h@gmail.com>
-References: <20181216231704.16761-1-longli@linuxonhyperv.com>
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: linux-next: build failure after merge of the y2038 tree
+Date: Mon, 17 Dec 2018 20:11:46 +1100
+Message-ID: <20181217201146.170ca9b4@canb.auug.org.au>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="idxsf4dcv7fappfg"
-Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-        linux-rdma@vger.kernel.org, stable@vger.kernel.org,
-        Joey Pabalinas <joeypabalinas@gmail.com>
-To: longli@microsoft.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/b9PV77FI4lBcRm.5LYedj1L"; protocol="application/pgp-signature"
+Cc: Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Paulo Alcantara <palcantara@suse.de>,
+        Aurelien Aptel <aaptel@suse.com>,
+        Steve French <stfrench@microsoft.com>
+To: Arnd Bergmann <arnd@arndb.de>, Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20181216231704.16761-1-longli@linuxonhyperv.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-
---idxsf4dcv7fappfg
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+--Sig_/b9PV77FI4lBcRm.5LYedj1L
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Dec 16, 2018 at 11:17:04PM +0000, Long Li wrote:
-> From: Long Li <longli@microsoft.com>
->=20
-> The current code attempts to pin memory using the largest possible wsize
-> based on the currect SMB credits. This doesn't cause kernel oops but this=
- is
-> not optimal as we may pin more pages then actually needed.
->=20
-> Fix this by only pinning what are needed for doing this write I/O.
->=20
-> Signed-off-by: Long Li <longli@microsoft.com>
-> Cc: stable@vger.kernel.org
+Hi Arnd,
 
-Looks sane to me.
+After merging the y2038 tree, today's linux-next build (x86_64
+allmodconfig) failed like this:
 
-Reviewed-by: Joey Pabalinas <joeypabalinas@gmail.com>
+fs/cifs/dfs_cache.c: In function 'cache_entry_expired':
+fs/cifs/dfs_cache.c:106:7: error: implicit declaration of function 'current=
+_kernel_time64'; did you mean 'core_kernel_text'? [-Werror=3Dimplicit-funct=
+ion-declaration]
+  ts =3D current_kernel_time64();
+       ^~~~~~~~~~~~~~~~~~~~~
+       core_kernel_text
+fs/cifs/dfs_cache.c:106:5: error: incompatible types when assigning to type=
+ 'struct timespec64' from type 'int'
+  ts =3D current_kernel_time64();
+     ^
+fs/cifs/dfs_cache.c: In function 'get_expire_time':
+fs/cifs/dfs_cache.c:342:24: error: incompatible type for argument 1 of 'tim=
+espec64_add'
+  return timespec64_add(current_kernel_time64(), ts);
+                        ^~~~~~~~~~~~~~~~~~~~~~~
+In file included from include/linux/restart_block.h:10,
+                 from include/linux/thread_info.h:13,
+                 from arch/x86/include/asm/preempt.h:7,
+                 from include/linux/preempt.h:78,
+                 from include/linux/rcupdate.h:40,
+                 from fs/cifs/dfs_cache.c:8:
+include/linux/time64.h:66:66: note: expected 'struct timespec64' but argume=
+nt is of type 'int'
+ static inline struct timespec64 timespec64_add(struct timespec64 lhs,
+                                                ~~~~~~~~~~~~~~~~~~^~~
+fs/cifs/dfs_cache.c:343:1: warning: control reaches end of non-void functio=
+n [-Wreturn-type]
+ }
+ ^
 
-> ---
->  fs/cifs/file.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->=20
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 3467351..c23bf9d 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -2617,11 +2617,13 @@ cifs_write_from_iter(loff_t offset, size_t len, s=
-truct iov_iter *from,
->  		if (rc)
->  			break;
-> =20
-> +		cur_len =3D min_t(const size_t, len, wsize);
-> +
->  		if (ctx->direct_io) {
->  			ssize_t result;
-> =20
->  			result =3D iov_iter_get_pages_alloc(
-> -				from, &pagevec, wsize, &start);
-> +				from, &pagevec, cur_len, &start);
->  			if (result < 0) {
->  				cifs_dbg(VFS,
->  					"direct_writev couldn't get user pages "
-> --=20
-> 2.7.4
->=20
+Caused by commit
+
+  ccea641b6742 ("timekeeping: remove obsolete time accessors")
+
+interacting with commit
+
+  34a44fb160f9 ("cifs: Add DFS cache routines")
+
+from the cifs tree.
+
+I have applied the following merge fix patch (better versions welcome):
+
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Date: Mon, 17 Dec 2018 20:03:28 +1100
+Subject: [PATCH] cifs: update for current_kernel_time64() removal
+
+Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
+---
+ fs/cifs/dfs_cache.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/fs/cifs/dfs_cache.c b/fs/cifs/dfs_cache.c
+index 70f9c9e2175c..d20cc94d7abd 100644
+--- a/fs/cifs/dfs_cache.c
++++ b/fs/cifs/dfs_cache.c
+@@ -103,7 +103,7 @@ static inline bool cache_entry_expired(const struct dfs=
+_cache_entry *ce)
+ {
+ 	struct timespec64 ts;
+=20
+-	ts =3D current_kernel_time64();
++	ktime_get_coarse_real_ts64(&ts);
+ 	return timespec64_compare(&ts, &ce->ce_etime) >=3D 0;
+ }
+=20
+@@ -338,8 +338,10 @@ static inline struct timespec64 get_expire_time(int tt=
+l)
+ 		.tv_sec =3D ttl,
+ 		.tv_nsec =3D 0,
+ 	};
++	struct timespec64 now;
+=20
+-	return timespec64_add(current_kernel_time64(), ts);
++	ktime_get_coarse_real_ts64(&now);
++	return timespec64_add(now, ts);
+ }
+=20
+ /* Allocate a new DFS target */
+--=20
+2.19.1
 
 --=20
 Cheers,
-Joey Pabalinas
+Stephen Rothwell
 
---idxsf4dcv7fappfg
-Content-Type: application/pgp-signature; name="signature.asc"
+--Sig_/b9PV77FI4lBcRm.5LYedj1L
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEENpTlWU2hUK/KMvHp2rGdfm9DtVIFAlwW94oACgkQ2rGdfm9D
-tVJDVw//YlX/0LsP6eZyP08m4OT21ajO8bNIkFqd+jLFVEcIlm/Nk0f+gxxcIwiJ
-y+Xt6rSwl3tyypQKvIh2ba6XdgFM+Ti3O7jb/6oiE0guwLhh1WUA4iQhPgDjBPrJ
-rzvsVaEB2LQpXOzPQd7zFcpvx5wJO8S13ZUpeaSUvA8LpbKQTf0Oh2u6WUOf2guo
-gfMJixovSgbl2kpTiUSd8gqh5Bw51zsyLTFsnE8GFx30liXzZ5zxguMXKPu41rQa
-uWfyK0A1LFzniBL9x0aDciYiL2qZZbyCY1BdKJTwqxFqX6VmHGGNlODguLdYAY6V
-mp3wt2EyXbGwt1yYhhkXEwFgYuNsdYYvZOGLhElIrvMBH27QtX52sPW3pIv2+vS2
-8BZpHyOTuCJ/zC9EsOkK3dyHrCdh9wSk6VDycSKrBfNCDSyNSq1FZJaujzOk6TP+
-uFBO0PDpi222KzBf1LuGVlLOZlHGMbrrZZTpIyFZwLnLP4kh/c0qdJCrdXgyMMYd
-biu/SBjt84+zvGIfLyXuq/5uJYUyesWaTpYWatpg1ohJ5QxIfCJb2B2YdniZ6fad
-m5tB2+E4Hy2xM4NeNiMqYm0dP2KgR8fFzoOe86Aqe/A+ufGAEaMYCh/XWieozVXO
-duE7ft8m5IQk/SgbvpCnhW1lYV3zm0K527wSaumYgxCYxcROs0Q=
-=bRcp
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAlwXaFIACgkQAVBC80lX
+0GxqBQgApHUD43yvLCpA7lqOg9JyNZKwi4uYKwFWOolil5QlsEKxxZqyZYYywhQB
+dyGJ2mf9wH6Kq+pnPQINEnJAido1APqtC6h+0veYgMoDE7ea/AgbdwIiXkQikapp
+UQIpLqUR/6aeqKRaWsHIWBdHqg12blIsrdNczJNhQFvLqCFZ7O/Sm9JR70cHb6KU
+xHwRwNPLSG85bM2rN1QGCHPHngomhe6/j8EB5zlBzvoV9JkHHs7MDOvsrIujFksc
+0zmZu+XTvsL8j2EXjq5ssspxQr2f4dqLI0zyopQdYDtcMQxCAI4UlHIrxhxBs/Ml
+cwOY60WgBWGi79XZ3rD15vxhbnQs7g==
+=XT4/
 -----END PGP SIGNATURE-----
 
---idxsf4dcv7fappfg--
+--Sig_/b9PV77FI4lBcRm.5LYedj1L--
