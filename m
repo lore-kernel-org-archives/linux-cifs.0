@@ -1,77 +1,66 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH] CIFS: return correct errors when pinning memory failed
- for direct I/O
-Date: Mon, 17 Dec 2018 23:07:47 -0600
-Message-ID: <CAH2r5muQVqOy1c0Mk0BBHBND_7oqqhyXUwGVp1M0ek7+onLAJw@mail.gmail.com>
-References: <20181216224107.16164-1-longli@linuxonhyperv.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>, linux-rdma@vger.kernel.org,
-        Stable <stable@vger.kernel.org>, jencce.kernel@gmail.com
-To: Long Li <longli@microsoft.com>
+From: Nicholas Mc Guire <hofrat@osadl.org>
+Subject: [PATCH] cifs: check kzalloc return
+Date: Tue, 18 Dec 2018 17:27:19 +0100
+Message-ID: <1545150439-26055-1-git-send-email-hofrat@osadl.org>
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org, Nicholas Mc Guire <hofrat@osadl.org>
+To: Steve French <sfrench@samba.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181216224107.16164-1-longli@linuxonhyperv.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-merged into cifs-2.6.git for-next
+kzalloc can return NULL so a check is needed. While there is a
+check for ret_buf there is no check for the allocation of
+ret_buf->crfid.fid - this check is thus added. Both call-sites
+of tconInfoAlloc() check for NULL return of tconInfoAlloc()
+so returning NULL on failure of kzalloc() here seems appropriate.
+As the kzalloc() is the only thing here that can fail it is
+moved to the beginning so as not to initialize other resources
+on failure of kzalloc.
 
-On Sun, Dec 16, 2018 at 4:44 PM Long Li <longli@linuxonhyperv.com> wrote:
->
-> From: Long Li <longli@microsoft.com>
->
-> When pinning memory failed, we should return the correct error code and
-> rewind the SMB credits.
->
-> Reported-by: Murphy Zhou <jencce.kernel@gmail.com>
-> Signed-off-by: Long Li <longli@microsoft.com>
-> Cc: stable@vger.kernel.org
-> Cc: Murphy Zhou <jencce.kernel@gmail.com>
-> ---
->  fs/cifs/file.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index c9bc56b..3467351 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -2630,6 +2630,9 @@ cifs_write_from_iter(loff_t offset, size_t len, struct iov_iter *from,
->                                         result, from->type,
->                                         from->iov_offset, from->count);
->                                 dump_stack();
-> +
-> +                               rc = result;
-> +                               add_credits_and_wake_if(server, credits, 0);
->                                 break;
->                         }
->                         cur_len = (size_t)result;
-> @@ -3313,13 +3316,16 @@ cifs_send_async_read(loff_t offset, size_t len, struct cifsFileInfo *open_file,
->                                         cur_len, &start);
->                         if (result < 0) {
->                                 cifs_dbg(VFS,
-> -                                       "couldn't get user pages (cur_len=%zd)"
-> +                                       "couldn't get user pages (rc=%zd)"
->                                         " iter type %d"
->                                         " iov_offset %zd count %zd\n",
->                                         result, direct_iov.type,
->                                         direct_iov.iov_offset,
->                                         direct_iov.count);
->                                 dump_stack();
-> +
-> +                               rc = result;
-> +                               add_credits_and_wake_if(server, credits, 0);
->                                 break;
->                         }
->                         cur_len = (size_t)result;
-> --
-> 2.7.4
->
+Signed-off-by: Nicholas Mc Guire <hofrat@osadl.org>
+Fixes: 3d4ef9a15343 ("smb3: fix redundant opens on root")
+---
 
+Problem located with an experimental coccinelle script
 
+While at it make checkpatch happy by using *ret_buf->crfid.fid
+rather than struct cifs_fid.
+
+Patch was compile tested with: x86_64_defconfig + CIFS=m
+(with some unrelated smatch warnings and some pending cocci fixes)
+
+Patch is against v4.20-rc7 (localversion-next is next-20181218)
+
+ fs/cifs/misc.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index 8a41f4e..59efffe 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -113,6 +113,13 @@ tconInfoAlloc(void)
+ 	struct cifs_tcon *ret_buf;
+ 	ret_buf = kzalloc(sizeof(struct cifs_tcon), GFP_KERNEL);
+ 	if (ret_buf) {
++		ret_buf->crfid.fid = kzalloc(sizeof(*ret_buf->crfid.fid),
++					     GFP_KERNEL);
++		if (!ret_buf->crfid.fid) {
++			kfree(ret_buf);
++			return NULL;
++		}
++
+ 		atomic_inc(&tconInfoAllocCount);
+ 		ret_buf->tidStatus = CifsNew;
+ 		++ret_buf->tc_count;
+@@ -120,8 +127,6 @@ tconInfoAlloc(void)
+ 		INIT_LIST_HEAD(&ret_buf->tcon_list);
+ 		spin_lock_init(&ret_buf->open_file_lock);
+ 		mutex_init(&ret_buf->crfid.fid_mutex);
+-		ret_buf->crfid.fid = kzalloc(sizeof(struct cifs_fid),
+-					     GFP_KERNEL);
+ 		spin_lock_init(&ret_buf->stat_lock);
+ 		atomic_set(&ret_buf->num_local_opens, 0);
+ 		atomic_set(&ret_buf->num_remote_opens, 0);
 -- 
-Thanks,
-
-Steve
+2.1.4
