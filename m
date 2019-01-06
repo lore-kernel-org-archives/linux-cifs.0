@@ -1,113 +1,48 @@
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: cifs large stack allocations
-Date: Thu, 3 Jan 2019 10:54:20 +0100
-Message-ID: <CAMuHMdUh3yjrs91976G_eB2DDtnsN4Vy3qj2LmtpTgZFdpyW7Q@mail.gmail.com>
-References: <git-mailbomb-linux-master-a3a53b7603798fd875e2afbba7e2b9ba6b19c7c7@kernel.org>
+From: Steve French <smfrench@gmail.com>
+Subject: Re: [PATCH] smb3: fix large reads on encrypted connections
+Date: Sun, 6 Jan 2019 10:41:50 -0600
+Message-ID: <CAH2r5ms3sxLLaUGOzaAL8YCMZswk8J6=MwtjjDPB_f78r49GEw@mail.gmail.com>
+References: <20190106105305.GB2964@darth.lan>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: linux-cifs@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Paulo Alcantara <palcantara@suse.de>,
-        Steve French <sfrench@samba.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <git-mailbomb-linux-master-a3a53b7603798fd875e2afbba7e2b9ba6b19c7c7@kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Cc: CIFS <linux-cifs@vger.kernel.org>
+To: Sebastian Kemper <sebastian_ml@gmx.net>,
+        Stable <stable@vger.kernel.org>
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <20190106105305.GB2964@darth.lan>
+Sender: stable-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Hi Paulo,
+On Sun, Jan 6, 2019 at 4:58 AM Sebastian Kemper <sebastian_ml@gmx.net> wrote:
+> Sorry for probably breaking the thread. This is really in reply to Paul
+> Aubrich's patch titled "smb3: fix large reads on encrypted connections".
 
-On Wed, Jan 2, 2019 at 10:24 PM Linux Kernel Mailing List
-<linux-kernel@vger.kernel.org> wrote:
-> Commit:     a3a53b7603798fd875e2afbba7e2b9ba6b19c7c7
-> Parent:     23324407143dd923660378fd9b40b9a711972269
-> Refname:    refs/heads/master
-> Web:        https://git.kernel.org/torvalds/c/a3a53b7603798fd875e2afbba7e2b9ba6b19c7c7
-> Author:     Paulo Alcantara <palcantara@suse.de>
-> AuthorDate: Wed Nov 14 17:20:31 2018 -0200
-> Committer:  Steve French <stfrench@microsoft.com>
-> CommitDate: Fri Dec 28 10:13:11 2018 -0600
+> I browsed linux-cifs and found Paul's patch. With the patch applied the
+> problem is gone, kernel 4.19 works like 4.9 did without encryption.
 >
->     cifs: Add support for failover in smb2_reconnect()
->
->     After a successful failover in cifs_reconnect(), the smb2_reconnect()
->     function will make sure to reconnect every tcon to new target server.
->
->     For SMB2+.
->
->     Signed-off-by: Paulo Alcantara <palcantara@suse.de>
->     Signed-off-by: Aurelien Aptel <aaptel@suse.com>
->     Signed-off-by: Steve French <stfrench@microsoft.com>
+> The patch title suggests that only large reads are not working. Well,
+> considering the cutoff is between 13K and 17K I'd say that encryption on
+> 4.19 for cifs can be considered broken without this patch. It'd be cool
+> if this could make it to stable kernels pronto.
 
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
+Yes - it is a a very important patch, and is merged in and marked for stable
+(for 4.19 and 4.20 kernels). Hopefully can be included soon.
 
-> @@ -152,6 +155,77 @@ out:
->         return;
->  }
->
-> +#ifdef CONFIG_CIFS_DFS_UPCALL
-> +static int __smb2_reconnect(const struct nls_table *nlsc,
-> +                           struct cifs_tcon *tcon)
-> +{
-> +       int rc;
-> +       struct dfs_cache_tgt_list tl;
-> +       struct dfs_cache_tgt_iterator *it = NULL;
-> +       char tree[MAX_TREE_SIZE + 1];
+The good news though is that with the improved test automation that
+Paulo/Aurelien/Ronnie have been doing, we have added more to
+the automated xfstests run before checkin and more importantly
+added various different mount configrations that are much
+broader (used to be only a very small set that ran) and so would have
+caught this (and also other regressions that had made it through over the
+past couple years).
 
-warning: the frame size of 1316 bytes is larger than 1024 bytes
-[-Wframe-larger-than=]
+Now our next challenge is figuring out how to get automated tests for smb3
+to run reasonably regularly against some of the stable kernels and also against
+the full backports of cifs.ko to earlier kernels etc. which some need to get the
+many security, performance and functional improvements over the past year.
 
-MAX_TREE_SIZE = 1284
 
-On Wed, Jan 2, 2019 at 10:24 PM Linux Kernel Mailing List
-<linux-kernel@vger.kernel.org> wrote:
->
-> Commit:     08744015492fec5a30ab8e2779601ae2b1a5e431
-> Parent:     a3a53b7603798fd875e2afbba7e2b9ba6b19c7c7
-> Refname:    refs/heads/master
-> Web:        https://git.kernel.org/torvalds/c/08744015492fec5a30ab8e2779601ae2b1a5e431
-> Author:     Paulo Alcantara <palcantara@suse.de>
-> AuthorDate: Wed Nov 14 17:24:29 2018 -0200
-> Committer:  Steve French <stfrench@microsoft.com>
-> CommitDate: Fri Dec 28 10:13:11 2018 -0600
->
->     cifs: Add support for failover in cifs_reconnect_tcon()
->
->     After a successful failover, the cifs_reconnect_tcon() function will
->     make sure to reconnect every tcon to new target server.
->
->     Same as previous commit but for SMB1 codepath.
->
->     Signed-off-by: Paulo Alcantara <palcantara@suse.de>
->     Reviewed-by: Aurelien Aptel <aaptel@suse.com>
->     Signed-off-by: Steve French <stfrench@microsoft.com>
+-- 
+Thanks,
 
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-
-> @@ -118,6 +121,77 @@ cifs_mark_open_files_invalid(struct cifs_tcon *tcon)
->          */
->  }
->
-> +#ifdef CONFIG_CIFS_DFS_UPCALL
-> +static int __cifs_reconnect_tcon(const struct nls_table *nlsc,
-> +                                struct cifs_tcon *tcon)
-> +{
-> +       int rc;
-> +       struct dfs_cache_tgt_list tl;
-> +       struct dfs_cache_tgt_iterator *it = NULL;
-> +       char tree[MAX_TREE_SIZE + 1];
-
-warning: the frame size of 1316 bytes is larger than 1024 bytes
-[-Wframe-larger-than=]
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Steve
