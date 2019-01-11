@@ -1,76 +1,83 @@
 From: Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH] cifs: fix memory leak of an allocated cifs_ntsd structure
-Date: Tue, 8 Jan 2019 11:46:00 -0600
-Message-ID: <CAH2r5mtR_uoe8ovH=+RBSbS0oRFO7OS-kGwG6n6RBvQfgXaKGw@mail.gmail.com>
-References: <20190107171515.4537-1-colin.king@canonical.com>
- <20190108094249.GF3200@kadam> <2f01add7-06f0-e312-2018-18b056405d6a@canonical.com>
+Subject: Fwd: [PATCH 0/7] SMB3 credit flow control handling and writeback fixes
+Date: Fri, 11 Jan 2019 00:22:05 -0600
+Message-ID: <CAH2r5msHUUrOjOek5dLePs_NKRQ3NYGyYNvMPOt8_DD68Qpeaw@mail.gmail.com>
+References: <1547159098-19011-1-git-send-email-pshilov@microsoft.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Dan Carpenter <dan.carpenter@oracle.com>,
-        Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        kernel-janitors <kernel-janitors@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-To: Colin Ian King <colin.king@canonical.com>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        Pavel Shilovsky <piastryyy@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+To: bfoster@redhat.com, Jeff Layton <jlayton@redhat.com>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <2f01add7-06f0-e312-2018-18b056405d6a@canonical.com>
+In-Reply-To: <1547159098-19011-1-git-send-email-pshilov@microsoft.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Yes - good point.  Will back this out temporarily, and also update
-Aurelien's (unrelated patch) to the later version
+This is an important series, addressing various problems with
+crediting (flow control) but more importantly patches 4 and 7 deal
+with error cases in writeback, in writepages and writepage which may
+be of more general interest.     Brian and Jeff have changed loosely
+related code in the VFS and may have insight into whether additional
+changes would be helpful beyond what Pavel has done in patches 4 and 7
+in this series.
 
-On Tue, Jan 8, 2019 at 3:52 AM Colin Ian King <colin.king@canonical.com> wrote:
->
-> On 08/01/2019 09:42, Dan Carpenter wrote:
-> > On Mon, Jan 07, 2019 at 05:15:15PM +0000, Colin King wrote:
-> >> From: Colin Ian King <colin.king@canonical.com>
-> >>
-> >> The call to SMB2_queary_acl can allocate memory to pntsd and also
-> >> return a failure via a call to SMB2_query_acl (and then query_info).
-> >> This occurs when query_info allocates the structure and then in
-> >> query_info the call to smb2_validate_and_copy_iov fails. Currently the
-> >> failure just returns without kfree'ing pntsd hence causing a memory
-> >> leak.  Fix this by kfree'ing pntsd before returning.
-> >>
-> >> Detected by CoverityScan, CID#1457059 ("Resource Leak")
-> >>
-> >> Fixes: 2f1afe25997f ("cifs: Use smb 2 - 3 and cifsacl mount options getacl functions")
-> >> Signed-off-by: Colin Ian King <colin.king@canonical.com>
-> >> ---
-> >>  fs/cifs/smb2ops.c | 4 +++-
-> >>  1 file changed, 3 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> >> index cf7eb891804f..6d71958ad2cb 100644
-> >> --- a/fs/cifs/smb2ops.c
-> >> +++ b/fs/cifs/smb2ops.c
-> >> @@ -2238,8 +2238,10 @@ get_smb2_acl_by_fid(struct cifs_sb_info *cifs_sb,
-> >>      cifs_put_tlink(tlink);
-> >>
-> >>      cifs_dbg(FYI, "%s: rc = %d ACL len %d\n", __func__, rc, *pacllen);
-> >> -    if (rc)
-> >> +    if (rc) {
-> >> +            kfree(pntsd);
-> >>              return ERR_PTR(rc);
-> >> +    }
-> >
-> > This is a layering violation.  The memory was allocated in query_info()
-> > so it should be freed there instead.  Also if the kmalloc() fails in
-> > query_info() then it should return -ENOMEM instead of success.
-> >
-> > This only affects code which calls SMB2_query_acl().  There are two
-> > callers.  You have fixed one but the other is also buggy because we're
-> > returning uninitialized memory in get_smb2_acl_by_path().
-> >
-> > regards,
-> > dan carpenter
-> >
->
-> Eep. very true. NACK to my fixes and I'll sort out a correct fix later.
->
-> Colin
+---------- Forwarded message ---------
+From: Pavel Shilovsky <piastryyy@gmail.com>
+Date: Thu, Jan 10, 2019 at 4:25 PM
+Subject: [PATCH 0/7] SMB3 credit flow control handling and writeback fixes
+To: <linux-cifs@vger.kernel.org>
+Cc: Steve French <smfrench@gmail.com>, Ronnie Sahlberg <lsahlber@redhat.com>
+
+
+This is the series of patches that address few problems with the current code.
+
+Patch #1 adjusts credits properly for MTU credits if we didn't use all the
+credits taken for an operation. This prevents loosing credits in error paths.
+
+Patch #2 removes resetting credit number to 1 if server didn't grant us
+any credits for the compounding chain. The current code didn't follow
+the protocol correctly.
+
+Patch #3 fixes credits handling for compounded requests by taking
+one credit per part of the chain. All error paths that return credits
+back are fixed accordingly.
+
+Patch #4 fixes hiding EINTR error code returned after an interrupted attemp
+to send SMB packet through the network.
+
+Patch #5 removes wrong assumption that the server grants us one credit
+for a cancelled request and parse the actual response to get the credit
+number.
+
+Patch #6 moves process credits granted by the server in the demultiplex
+thread in order to avoid races with reconnects.
+
+Patch #7 addresses few problems in writeback code, in particular related
+to interrupted error code returned by the transport layer.
+
+Patches #1-4 as marked for stable. Reviews are welcome.
+
+Pavel Shilovsky (7):
+  CIFS: Fix adjustment of credits for MTU requests
+  CIFS: Do not set credits to 1 if the server didn't grant anything
+  CIFS: Fix credit computation for compounded requests
+  CIFS: Do not hide EINTR while sending network packets
+  CIFS: Fix credits calculation for cancelled requests
+  CIFS: Move credit processing to mid callbacks for SMB3
+  CIFS: Fix error paths in writeback code
+
+ fs/cifs/cifsglob.h  |  20 +++++++++
+ fs/cifs/cifssmb.c   |   7 +--
+ fs/cifs/file.c      |  29 ++++++++++---
+ fs/cifs/inode.c     |  10 +++++
+ fs/cifs/smb2pdu.c   |   8 +++-
+ fs/cifs/transport.c | 122 +++++++++++++++++++++++++++++++++++++++-------------
+ 6 files changed, 155 insertions(+), 41 deletions(-)
+
+--
+2.7.4
 
 
 
