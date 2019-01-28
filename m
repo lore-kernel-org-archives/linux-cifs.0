@@ -1,17 +1,17 @@
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.19 226/258] cifs: check ntwrk_buf_start for NULL before dereferencing it
-Date: Mon, 28 Jan 2019 10:58:52 -0500
-Message-ID: <20190128155924.51521-226-sashal@kernel.org>
-References: <20190128155924.51521-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 147/170] cifs: check ntwrk_buf_start for NULL before dereferencing it
+Date: Mon, 28 Jan 2019 11:11:37 -0500
+Message-ID: <20190128161200.55107-147-sashal@kernel.org>
+References: <20190128161200.55107-1-sashal@kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Cc: Ronnie Sahlberg <lsahlber@redhat.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
 To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20190128155924.51521-1-sashal@kernel.org>
-Sender: stable-owner@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20190128161200.55107-1-sashal@kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
 From: Ronnie Sahlberg <lsahlber@redhat.com>
@@ -37,7 +37,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
-index e169e1a5fd35..3925a7bfc74d 100644
+index ef24b4527459..68183872bf8b 100644
 --- a/fs/cifs/readdir.c
 +++ b/fs/cifs/readdir.c
 @@ -655,7 +655,14 @@ find_cifs_entry(const unsigned int xid, struct cifs_tcon *tcon, loff_t pos,
@@ -54,7 +54,7 @@ index e169e1a5fd35..3925a7bfc74d 100644
 +
 +		end_of_smb = cfile->srch_inf.ntwrk_buf_start +
  			server->ops->calc_smb_size(
- 					cfile->srch_inf.ntwrk_buf_start,
- 					server);
+ 					cfile->srch_inf.ntwrk_buf_start);
+ 
 -- 
 2.19.1
