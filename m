@@ -1,8 +1,8 @@
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.20 269/304] cifs: check ntwrk_buf_start for NULL before dereferencing it
-Date: Mon, 28 Jan 2019 10:43:06 -0500
-Message-ID: <20190128154341.47195-269-sashal@kernel.org>
-References: <20190128154341.47195-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 226/258] cifs: check ntwrk_buf_start for NULL before dereferencing it
+Date: Mon, 28 Jan 2019 10:58:52 -0500
+Message-ID: <20190128155924.51521-226-sashal@kernel.org>
+References: <20190128155924.51521-1-sashal@kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Cc: Ronnie Sahlberg <lsahlber@redhat.com>,
@@ -10,7 +10,7 @@ Cc: Ronnie Sahlberg <lsahlber@redhat.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
 To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20190128154341.47195-1-sashal@kernel.org>
+In-Reply-To: <20190128155924.51521-1-sashal@kernel.org>
 Sender: stable-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
