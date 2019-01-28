@@ -1,61 +1,60 @@
-From: Yao Liu <yotta.liu@ucloud.cn>
-Subject: [PATCH] cifs: Fix NULL pointer dereference of devname
-Date: Mon, 28 Jan 2019 19:47:28 +0800
-Message-ID: <1548676048-19626-1-git-send-email-yotta.liu@ucloud.cn>
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-kernel@vger.kernel.org, Yao Liu <yotta.liu@ucloud.cn>
-To: sfrench@samba.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Sasha Levin <sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.20 269/304] cifs: check ntwrk_buf_start for NULL before dereferencing it
+Date: Mon, 28 Jan 2019 10:43:06 -0500
+Message-ID: <20190128154341.47195-269-sashal@kernel.org>
+References: <20190128154341.47195-1-sashal@kernel.org>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Cc: Ronnie Sahlberg <lsahlber@redhat.com>,
+        Steve French <stfrench@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
+To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <20190128154341.47195-1-sashal@kernel.org>
+Sender: stable-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-There is a NULL pointer dereference of devname in strspn()
+From: Ronnie Sahlberg <lsahlber@redhat.com>
 
-The oops looks something like:
+[ Upstream commit 59a63e479ce36a3f24444c3a36efe82b78e4a8e0 ]
 
-  CIFS: Attempting to mount (null)
-  BUG: unable to handle kernel NULL pointer dereference at 0000000000000000
-  ...
-  RIP: 0010:strspn+0x0/0x50
-  ...
-  Call Trace:
-   ? cifs_parse_mount_options+0x222/0x1710 [cifs]
-   ? cifs_get_volume_info+0x2f/0x80 [cifs]
-   cifs_setup_volume_info+0x20/0x190 [cifs]
-   cifs_get_volume_info+0x50/0x80 [cifs]
-   cifs_smb3_do_mount+0x59/0x630 [cifs]
-   ? ida_alloc_range+0x34b/0x3d0
-   cifs_do_mount+0x11/0x20 [cifs]
-   mount_fs+0x52/0x170
-   vfs_kern_mount+0x6b/0x170
-   do_mount+0x216/0xdc0
-   ksys_mount+0x83/0xd0
-   __x64_sys_mount+0x25/0x30
-   do_syscall_64+0x65/0x220
-   entry_SYSCALL_64_after_hwframe+0x49/0xbe
+RHBZ: 1021460
 
-Fix this by adding a NULL check on devname in cifs_parse_devname()
+There is an issue where when multiple threads open/close the same directory
+ntwrk_buf_start might end up being NULL, causing the call to smbCalcSize
+later to oops with a NULL deref.
 
-Signed-off-by: Yao Liu <yotta.liu@ucloud.cn>
+The real bug is why this happens and why this can become NULL for an
+open cfile, which should not be allowed.
+This patch tries to avoid a oops until the time when we fix the underlying
+issue.
+
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/cifs/connect.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ fs/cifs/readdir.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 683310f..39abb18 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1465,6 +1465,11 @@ static int cifs_parse_security_flavors(char *value,
- 	const char *delims = "/\\";
- 	size_t len;
- 
-+	if (unlikely(!devname || !*devname)) {
-+		cifs_dbg(VFS, "Device name not specified.\n");
-+		return -EINVAL;
-+	}
+diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+index e169e1a5fd35..3925a7bfc74d 100644
+--- a/fs/cifs/readdir.c
++++ b/fs/cifs/readdir.c
+@@ -655,7 +655,14 @@ find_cifs_entry(const unsigned int xid, struct cifs_tcon *tcon, loff_t pos,
+ 		/* scan and find it */
+ 		int i;
+ 		char *cur_ent;
+-		char *end_of_smb = cfile->srch_inf.ntwrk_buf_start +
++		char *end_of_smb;
 +
- 	/* make sure we have a valid UNC double delimiter prefix */
- 	len = strspn(devname, delims);
- 	if (len != 2)
++		if (cfile->srch_inf.ntwrk_buf_start == NULL) {
++			cifs_dbg(VFS, "ntwrk_buf_start is NULL during readdir\n");
++			return -EIO;
++		}
++
++		end_of_smb = cfile->srch_inf.ntwrk_buf_start +
+ 			server->ops->calc_smb_size(
+ 					cfile->srch_inf.ntwrk_buf_start,
+ 					server);
 -- 
-1.8.3.1
+2.19.1
