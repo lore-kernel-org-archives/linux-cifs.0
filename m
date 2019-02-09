@@ -1,8 +1,8 @@
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.4 4/4] cifs: Limit memory used by lock request calls to a page
-Date: Sat,  9 Feb 2019 13:50:07 -0500
-Message-ID: <20190209185007.127176-4-sashal@kernel.org>
-References: <20190209185007.127176-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 12/12] cifs: Limit memory used by lock request calls to a page
+Date: Sat,  9 Feb 2019 13:49:52 -0500
+Message-ID: <20190209184952.127009-12-sashal@kernel.org>
+References: <20190209184952.127009-1-sashal@kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Cc: Ross Lagerwall <ross.lagerwall@citrix.com>,
@@ -10,7 +10,7 @@ Cc: Ross Lagerwall <ross.lagerwall@citrix.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
 To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190209185007.127176-1-sashal@kernel.org>
+In-Reply-To: <20190209184952.127009-1-sashal@kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
@@ -34,10 +34,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 12 insertions(+)
 
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 026b399af215..1062e96ee272 100644
+index a3046b6523c8..8ec296308729 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -1081,6 +1081,10 @@ cifs_push_mandatory_locks(struct cifsFileInfo *cfile)
+@@ -1126,6 +1126,10 @@ cifs_push_mandatory_locks(struct cifsFileInfo *cfile)
  		return -EINVAL;
  	}
  
@@ -48,7 +48,7 @@ index 026b399af215..1062e96ee272 100644
  	max_num = (max_buf - sizeof(struct smb_hdr)) /
  						sizeof(LOCKING_ANDX_RANGE);
  	buf = kcalloc(max_num, sizeof(LOCKING_ANDX_RANGE), GFP_KERNEL);
-@@ -1410,6 +1414,10 @@ cifs_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock,
+@@ -1462,6 +1466,10 @@ cifs_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock,
  	if (max_buf < (sizeof(struct smb_hdr) + sizeof(LOCKING_ANDX_RANGE)))
  		return -EINVAL;
  
