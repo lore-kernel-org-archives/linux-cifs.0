@@ -1,17 +1,17 @@
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.9 12/12] cifs: Limit memory used by lock request calls to a page
-Date: Sat,  9 Feb 2019 13:49:52 -0500
-Message-ID: <20190209184952.127009-12-sashal@kernel.org>
-References: <20190209184952.127009-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 16/16] cifs: Limit memory used by lock request calls to a page
+Date: Sat,  9 Feb 2019 13:49:27 -0500
+Message-ID: <20190209184927.126791-16-sashal@kernel.org>
+References: <20190209184927.126791-1-sashal@kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Cc: Ross Lagerwall <ross.lagerwall@citrix.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
 To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190209184952.127009-1-sashal@kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <20190209184927.126791-1-sashal@kernel.org>
+Sender: stable-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
 From: Ross Lagerwall <ross.lagerwall@citrix.com>
@@ -34,10 +34,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 12 insertions(+)
 
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index a3046b6523c8..8ec296308729 100644
+index 1e176e11dbfa..852d7d1dcbbd 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -1126,6 +1126,10 @@ cifs_push_mandatory_locks(struct cifsFileInfo *cfile)
+@@ -1128,6 +1128,10 @@ cifs_push_mandatory_locks(struct cifsFileInfo *cfile)
  		return -EINVAL;
  	}
  
@@ -48,7 +48,7 @@ index a3046b6523c8..8ec296308729 100644
  	max_num = (max_buf - sizeof(struct smb_hdr)) /
  						sizeof(LOCKING_ANDX_RANGE);
  	buf = kcalloc(max_num, sizeof(LOCKING_ANDX_RANGE), GFP_KERNEL);
-@@ -1462,6 +1466,10 @@ cifs_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock,
+@@ -1466,6 +1470,10 @@ cifs_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock,
  	if (max_buf < (sizeof(struct smb_hdr) + sizeof(LOCKING_ANDX_RANGE)))
  		return -EINVAL;
  
@@ -60,10 +60,10 @@ index a3046b6523c8..8ec296308729 100644
  						sizeof(LOCKING_ANDX_RANGE);
  	buf = kcalloc(max_num, sizeof(LOCKING_ANDX_RANGE), GFP_KERNEL);
 diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
-index b7885dc0d9bb..dee5250701de 100644
+index 79078533f807..1add404618f0 100644
 --- a/fs/cifs/smb2file.c
 +++ b/fs/cifs/smb2file.c
-@@ -129,6 +129,8 @@ smb2_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock,
+@@ -130,6 +130,8 @@ smb2_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock,
  	if (max_buf < sizeof(struct smb2_lock_element))
  		return -EINVAL;
  
@@ -72,7 +72,7 @@ index b7885dc0d9bb..dee5250701de 100644
  	max_num = max_buf / sizeof(struct smb2_lock_element);
  	buf = kcalloc(max_num, sizeof(struct smb2_lock_element), GFP_KERNEL);
  	if (!buf)
-@@ -265,6 +267,8 @@ smb2_push_mandatory_locks(struct cifsFileInfo *cfile)
+@@ -266,6 +268,8 @@ smb2_push_mandatory_locks(struct cifsFileInfo *cfile)
  		return -EINVAL;
  	}
  
