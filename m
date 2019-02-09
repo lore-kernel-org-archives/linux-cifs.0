@@ -1,85 +1,112 @@
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.20 38/42] cifs: Limit memory used by lock request calls to a page
-Date: Sat,  9 Feb 2019 13:47:30 -0500
-Message-ID: <20190209184734.125935-38-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.20 39/42] CIFS: Fix credits calculation for cancelled requests
+Date: Sat,  9 Feb 2019 13:47:31 -0500
+Message-ID: <20190209184734.125935-39-sashal@kernel.org>
 References: <20190209184734.125935-1-sashal@kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Cc: Ross Lagerwall <ross.lagerwall@citrix.com>,
+Cc: Pavel Shilovsky <pshilov@microsoft.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
 To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <stable-owner@vger.kernel.org>
 In-Reply-To: <20190209184734.125935-1-sashal@kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: stable-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-From: Ross Lagerwall <ross.lagerwall@citrix.com>
+From: Pavel Shilovsky <pshilov@microsoft.com>
 
-[ Upstream commit 92a8109e4d3a34fb6b115c9098b51767dc933444 ]
+[ Upstream commit 8a26f0f781f56d3016b34a2217e346973d067e7b ]
 
-The code tries to allocate a contiguous buffer with a size supplied by
-the server (maxBuf). This could fail if memory is fragmented since it
-results in high order allocations for commonly used server
-implementations. It is also wasteful since there are probably
-few locks in the usual case. Limit the buffer to be no larger than a
-page to avoid memory allocation failures due to fragmentation.
+If a request is cancelled, we can't assume that the server returns
+1 credit back. Instead we need to wait for a response and process
+the number of credits granted by the server.
 
-Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
+Create a separate mid callback for cancelled request, parse the number
+of credits in a response buffer and add them to the client's credits.
+If the didn't get a response (no response buffer available) assume
+0 credits granted. The latter most probably happens together with
+session reconnect, so the client's credits are adjusted anyway.
+
+Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/cifs/file.c     | 8 ++++++++
- fs/cifs/smb2file.c | 4 ++++
- 2 files changed, 12 insertions(+)
+ fs/cifs/cifsglob.h  |  1 +
+ fs/cifs/transport.c | 28 ++++++++++++++++++++++++++--
+ 2 files changed, 27 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 8431854b129f..116f8af0384f 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -1139,6 +1139,10 @@ cifs_push_mandatory_locks(struct cifsFileInfo *cfile)
- 		return -EINVAL;
- 	}
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 38ab0fca49e1..7a4fae0dc566 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -1426,6 +1426,7 @@ struct mid_q_entry {
+ 	int mid_state;	/* wish this were enum but can not pass to wait_event */
+ 	unsigned int mid_flags;
+ 	__le16 command;		/* smb command code */
++	unsigned int optype;	/* operation type */
+ 	bool large_buf:1;	/* if valid response, is pointer to large buf */
+ 	bool multiRsp:1;	/* multiple trans2 responses for one request  */
+ 	bool multiEnd:1;	/* both received */
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index d51064c1ba42..4dbf62bb51b2 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -785,6 +785,24 @@ cifs_noop_callback(struct mid_q_entry *mid)
+ {
+ }
  
-+	BUILD_BUG_ON(sizeof(struct smb_hdr) + sizeof(LOCKING_ANDX_RANGE) >
-+		     PAGE_SIZE);
-+	max_buf = min_t(unsigned int, max_buf - sizeof(struct smb_hdr),
-+			PAGE_SIZE);
- 	max_num = (max_buf - sizeof(struct smb_hdr)) /
- 						sizeof(LOCKING_ANDX_RANGE);
- 	buf = kcalloc(max_num, sizeof(LOCKING_ANDX_RANGE), GFP_KERNEL);
-@@ -1477,6 +1481,10 @@ cifs_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock,
- 	if (max_buf < (sizeof(struct smb_hdr) + sizeof(LOCKING_ANDX_RANGE)))
- 		return -EINVAL;
++static void
++cifs_cancelled_callback(struct mid_q_entry *mid)
++{
++	struct TCP_Server_Info *server = mid->server;
++	unsigned int optype = mid->optype;
++	unsigned int credits_received = 0;
++
++	if (mid->mid_state == MID_RESPONSE_RECEIVED) {
++		if (mid->resp_buf)
++			credits_received = server->ops->get_credits(mid);
++		else
++			cifs_dbg(FYI, "Bad state for cancelled MID\n");
++	}
++
++	DeleteMidQEntry(mid);
++	add_credits(server, credits_received, optype);
++}
++
+ int
+ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 		   const int flags, const int num_rqst, struct smb_rqst *rqst,
+@@ -860,6 +878,7 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 		}
  
-+	BUILD_BUG_ON(sizeof(struct smb_hdr) + sizeof(LOCKING_ANDX_RANGE) >
-+		     PAGE_SIZE);
-+	max_buf = min_t(unsigned int, max_buf - sizeof(struct smb_hdr),
-+			PAGE_SIZE);
- 	max_num = (max_buf - sizeof(struct smb_hdr)) /
- 						sizeof(LOCKING_ANDX_RANGE);
- 	buf = kcalloc(max_num, sizeof(LOCKING_ANDX_RANGE), GFP_KERNEL);
-diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
-index 2fc3d31967ee..b204e84b87fb 100644
---- a/fs/cifs/smb2file.c
-+++ b/fs/cifs/smb2file.c
-@@ -128,6 +128,8 @@ smb2_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock,
- 	if (max_buf < sizeof(struct smb2_lock_element))
- 		return -EINVAL;
+ 		midQ[i]->mid_state = MID_REQUEST_SUBMITTED;
++		midQ[i]->optype = optype;
+ 		/*
+ 		 * We don't invoke the callback compounds unless it is the last
+ 		 * request.
+@@ -894,15 +913,20 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
  
-+	BUILD_BUG_ON(sizeof(struct smb2_lock_element) > PAGE_SIZE);
-+	max_buf = min_t(unsigned int, max_buf, PAGE_SIZE);
- 	max_num = max_buf / sizeof(struct smb2_lock_element);
- 	buf = kcalloc(max_num, sizeof(struct smb2_lock_element), GFP_KERNEL);
- 	if (!buf)
-@@ -264,6 +266,8 @@ smb2_push_mandatory_locks(struct cifsFileInfo *cfile)
- 		return -EINVAL;
- 	}
- 
-+	BUILD_BUG_ON(sizeof(struct smb2_lock_element) > PAGE_SIZE);
-+	max_buf = min_t(unsigned int, max_buf, PAGE_SIZE);
- 	max_num = max_buf / sizeof(struct smb2_lock_element);
- 	buf = kcalloc(max_num, sizeof(struct smb2_lock_element), GFP_KERNEL);
- 	if (!buf) {
+ 	for (i = 0; i < num_rqst; i++) {
+ 		rc = wait_for_response(ses->server, midQ[i]);
+-		if (rc != 0) {
++		if (rc != 0)
++			break;
++	}
++	if (rc != 0) {
++		for (; i < num_rqst; i++) {
+ 			cifs_dbg(VFS, "Cancelling wait for mid %llu cmd: %d\n",
+ 				 midQ[i]->mid, le16_to_cpu(midQ[i]->command));
+ 			send_cancel(ses->server, &rqst[i], midQ[i]);
+ 			spin_lock(&GlobalMid_Lock);
+ 			if (midQ[i]->mid_state == MID_REQUEST_SUBMITTED) {
+ 				midQ[i]->mid_flags |= MID_WAIT_CANCELLED;
+-				midQ[i]->callback = DeleteMidQEntry;
++				midQ[i]->callback = cifs_cancelled_callback;
+ 				cancelled_mid[i] = true;
++				credits[i] = 0;
+ 			}
+ 			spin_unlock(&GlobalMid_Lock);
+ 		}
 -- 
 2.19.1
