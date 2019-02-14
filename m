@@ -6,96 +6,113 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0873DC4360F
-	for <linux-cifs@archiver.kernel.org>; Thu, 14 Feb 2019 16:57:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B710DC43381
+	for <linux-cifs@archiver.kernel.org>; Thu, 14 Feb 2019 16:58:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CC03C222DA
-	for <linux-cifs@archiver.kernel.org>; Thu, 14 Feb 2019 16:57:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 924A4222DD
+	for <linux-cifs@archiver.kernel.org>; Thu, 14 Feb 2019 16:58:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2502798AbfBNQ5E (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 14 Feb 2019 11:57:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41952 "EHLO mx1.redhat.com"
+        id S2502992AbfBNQ6F (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 14 Feb 2019 11:58:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39528 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2502797AbfBNQ5D (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 14 Feb 2019 11:57:03 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        id S2437165AbfBNQ6F (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 14 Feb 2019 11:58:05 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 7E33F7EBC1;
-        Thu, 14 Feb 2019 16:57:03 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id CE1EA89AD1;
+        Thu, 14 Feb 2019 16:58:04 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-121-129.rdu2.redhat.com [10.10.121.129])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C86EB101960D;
-        Thu, 14 Feb 2019 16:56:52 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0F1E2600C4;
+        Thu, 14 Feb 2019 16:58:00 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
  Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
  Kingdom.
  Registered in England and Wales under Company Registration No. 3798903
-Subject: [RFC PATCH 1/9] keys: Invalidate used request_key authentication
- keys
+Subject: [RFC PATCH 6/9] keys: Garbage collect keys for which the domain has
+ been removed
 From:   David Howells <dhowells@redhat.com>
 To:     keyrings@vger.kernel.org
 Cc:     linux-security-module@vger.kernel.org, linux-nfs@vger.kernel.org,
         linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         rgb@redhat.com, dhowells@redhat.com, linux-kernel@vger.kernel.org
-Date:   Thu, 14 Feb 2019 16:56:50 +0000
-Message-ID: <155016341076.11489.17906138075234365532.stgit@warthog.procyon.org.uk>
+Date:   Thu, 14 Feb 2019 16:58:00 +0000
+Message-ID: <155016348020.11489.15344840955206537503.stgit@warthog.procyon.org.uk>
 In-Reply-To: <155016339876.11489.901851271827069026.stgit@warthog.procyon.org.uk>
 References: <155016339876.11489.901851271827069026.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/unknown-version
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Thu, 14 Feb 2019 16:57:03 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Thu, 14 Feb 2019 16:58:05 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Invalidate used request_key authentication keys rather than revoking them
-so that they get cleaned up immediately rather than potentially hanging
-around.  There doesn't seem any need to keep the revoked keys around.
+If a key operation domain (such as a network namespace) has been removed
+then attempt to garbage collect all the keys that use it.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- security/keys/key.c         |    4 ++--
- security/keys/request_key.c |    2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ include/linux/key.h      |    1 +
+ security/keys/internal.h |    3 ++-
+ security/keys/keyring.c  |   15 +++++++++++++++
+ 3 files changed, 18 insertions(+), 1 deletion(-)
 
-diff --git a/security/keys/key.c b/security/keys/key.c
-index 696f1c092c50..d705b950ce2a 100644
---- a/security/keys/key.c
-+++ b/security/keys/key.c
-@@ -459,7 +459,7 @@ static int __key_instantiate_and_link(struct key *key,
+diff --git a/include/linux/key.h b/include/linux/key.h
+index bb716c33bffe..324753fc3efc 100644
+--- a/include/linux/key.h
++++ b/include/linux/key.h
+@@ -278,6 +278,7 @@ extern void key_revoke(struct key *key);
+ extern void key_invalidate(struct key *key);
+ extern void key_put(struct key *key);
+ extern bool key_put_tag(struct key_tag *tag);
++extern void key_remove_domain(struct key_tag *domain_tag);
  
- 			/* disable the authorisation key */
- 			if (authkey)
--				key_revoke(authkey);
-+				key_invalidate(authkey);
+ static inline struct key *__key_get(struct key *key)
+ {
+diff --git a/security/keys/internal.h b/security/keys/internal.h
+index 3154ba59a2f0..7968c8ebb043 100644
+--- a/security/keys/internal.h
++++ b/security/keys/internal.h
+@@ -203,7 +203,8 @@ static inline bool key_is_dead(const struct key *key, time64_t limit)
+ 	return
+ 		key->flags & ((1 << KEY_FLAG_DEAD) |
+ 			      (1 << KEY_FLAG_INVALIDATED)) ||
+-		(key->expiry > 0 && key->expiry <= limit);
++		(key->expiry > 0 && key->expiry <= limit) ||
++		key->domain_tag->removed;
+ }
  
- 			if (prep->expiry != TIME64_MAX) {
- 				key->expiry = prep->expiry;
-@@ -607,7 +607,7 @@ int key_reject_and_link(struct key *key,
+ /*
+diff --git a/security/keys/keyring.c b/security/keys/keyring.c
+index 0df10221c037..916a52d54e1b 100644
+--- a/security/keys/keyring.c
++++ b/security/keys/keyring.c
+@@ -247,6 +247,21 @@ bool key_put_tag(struct key_tag *tag)
+ 	return false;
+ }
  
- 		/* disable the authorisation key */
- 		if (authkey)
--			key_revoke(authkey);
-+			key_invalidate(authkey);
- 	}
- 
- 	mutex_unlock(&key_construction_mutex);
-diff --git a/security/keys/request_key.c b/security/keys/request_key.c
-index 3f56a312dd35..7e935553af2b 100644
---- a/security/keys/request_key.c
-+++ b/security/keys/request_key.c
-@@ -224,7 +224,7 @@ static int construct_key(struct key *key, const void *callout_info,
- 	/* check that the actor called complete_request_key() prior to
- 	 * returning an error */
- 	WARN_ON(ret < 0 &&
--		!test_bit(KEY_FLAG_REVOKED, &authkey->flags));
-+		!test_bit(KEY_FLAG_INVALIDATED, &authkey->flags));
- 
- 	key_put(authkey);
- 	kleave(" = %d", ret);
++/**
++ * key_remove_domain - Kill off a key domain and gc its keys
++ * @domain_tag: The domain tag to release.
++ *
++ * This marks a domain tag as being dead and releases a ref on it.  If that
++ * wasn't the last reference, the garbage collector is poked to try and delete
++ * all keys that were in the domain.
++ */
++void key_remove_domain(struct key_tag *domain_tag)
++{
++	domain_tag->removed = true;
++	if (!key_put_tag(domain_tag))
++		key_schedule_gc_links();
++}
++
+ /*
+  * Build the next index key chunk.
+  *
 
