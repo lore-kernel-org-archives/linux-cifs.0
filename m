@@ -2,222 +2,256 @@ Return-Path: <SRS0=e9ua=QV=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22E8DC10F05
-	for <linux-cifs@archiver.kernel.org>; Thu, 14 Feb 2019 16:58:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C5DFC43381
+	for <linux-cifs@archiver.kernel.org>; Thu, 14 Feb 2019 16:58:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EFBCB222DD
-	for <linux-cifs@archiver.kernel.org>; Thu, 14 Feb 2019 16:58:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 37A03222DA
+	for <linux-cifs@archiver.kernel.org>; Thu, 14 Feb 2019 16:58:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437117AbfBNQ6W (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 14 Feb 2019 11:58:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52554 "EHLO mx1.redhat.com"
+        id S2502971AbfBNQ6D (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 14 Feb 2019 11:58:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59104 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2395387AbfBNQ6Q (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 14 Feb 2019 11:58:16 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        id S2502928AbfBNQ5z (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 14 Feb 2019 11:57:55 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id CC7A281F2F;
-        Thu, 14 Feb 2019 16:58:15 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id F1D6A37E74;
+        Thu, 14 Feb 2019 16:57:54 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-121-129.rdu2.redhat.com [10.10.121.129])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C7FC1608E3;
-        Thu, 14 Feb 2019 16:58:10 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9E38560C69;
+        Thu, 14 Feb 2019 16:57:48 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
  Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
  Kingdom.
  Registered in England and Wales under Company Registration No. 3798903
-Subject: [RFC PATCH 7/9] keys: Network namespace domain tag
+Subject: [RFC PATCH 5/9] keys: Include target namespace in match criteria
 From:   David Howells <dhowells@redhat.com>
 To:     keyrings@vger.kernel.org
 Cc:     linux-security-module@vger.kernel.org, linux-nfs@vger.kernel.org,
         linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         rgb@redhat.com, dhowells@redhat.com, linux-kernel@vger.kernel.org
-Date:   Thu, 14 Feb 2019 16:58:10 +0000
-Message-ID: <155016349003.11489.982193310795564945.stgit@warthog.procyon.org.uk>
+Date:   Thu, 14 Feb 2019 16:57:47 +0000
+Message-ID: <155016346784.11489.7639781267844538576.stgit@warthog.procyon.org.uk>
 In-Reply-To: <155016339876.11489.901851271827069026.stgit@warthog.procyon.org.uk>
 References: <155016339876.11489.901851271827069026.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/unknown-version
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Thu, 14 Feb 2019 16:58:15 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Thu, 14 Feb 2019 16:57:55 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Create key domain tags for network namespaces and make it possible to
-automatically tag keys that are used by networked services (e.g. AF_RXRPC,
-AFS, DNS) with the default network namespace if not set by the caller.
+Currently a key has a standard matching criteria of { type, description } and
+this is used to only allow keys with unique criteria in a keyring.  This
+means, however, that you cannot have keys with the same type and description
+but a different target namespace in the same keyring.
 
-This allows keys with the same description but in different namespaces to
-coexist within a keyring.
+This is a potential problem for a containerised environment where, say, a
+container is made up of some parts of its mount space involving netfs
+superblocks from two different network namespaces.
+
+This is also a problem for shared system management keyrings such as the DNS
+records keyring or the NFS idmapper keyring that might contain keys from
+different network namespaces.
+
+Fix this by including a namespace component in a key's matching criteria.
+Keyring types are marked to indicate which, if any, namespace is relevant to
+keys of that type, and that namespace is set when the key is created from the
+current task's namespace set.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: netdev@vger.kernel.org
-cc: linux-nfs@vger.kernel.org
-cc: linux-cifs@vger.kernel.org
-cc: linux-afs@lists.infradead.org
 ---
 
- include/linux/key-type.h    |    3 +++
- include/net/net_namespace.h |    4 ++++
- net/core/net_namespace.c    |   18 ++++++++++++++++++
- net/dns_resolver/dns_key.c  |    1 +
- net/rxrpc/key.c             |    2 ++
- security/keys/keyring.c     |    7 ++++++-
- 6 files changed, 34 insertions(+), 1 deletion(-)
+ include/linux/key.h        |   11 +++++++++++
+ security/keys/gc.c         |    2 +-
+ security/keys/key.c        |    1 +
+ security/keys/keyring.c    |   36 ++++++++++++++++++++++++++++++++++--
+ security/keys/persistent.c |    1 +
+ 5 files changed, 48 insertions(+), 3 deletions(-)
 
-diff --git a/include/linux/key-type.h b/include/linux/key-type.h
-index e49d1de0614e..2148a6bf58f1 100644
---- a/include/linux/key-type.h
-+++ b/include/linux/key-type.h
-@@ -74,6 +74,9 @@ struct key_type {
- 	 */
- 	size_t def_datalen;
+diff --git a/include/linux/key.h b/include/linux/key.h
+index b39f5876b66d..bb716c33bffe 100644
+--- a/include/linux/key.h
++++ b/include/linux/key.h
+@@ -82,9 +82,16 @@ struct cred;
  
-+	unsigned int flags;
-+#define KEY_TYPE_NET_DOMAIN	0x00000001 /* Keys of this type have a net namespace domain */
+ struct key_type;
+ struct key_owner;
++struct key_tag;
+ struct keyring_list;
+ struct keyring_name;
+ 
++struct key_tag {
++	struct rcu_head		rcu;
++	refcount_t		usage;
++	bool			removed;	/* T when subject removed */
++};
 +
- 	/* vet a description */
- 	int (*vet_description)(const char *description);
- 
-diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
-index 99d4148e0f90..7b31b9eb461b 100644
---- a/include/net/net_namespace.h
-+++ b/include/net/net_namespace.h
-@@ -44,6 +44,7 @@ struct net_generic;
- struct uevent_sock;
- struct netns_ipvs;
- struct bpf_prog;
-+struct key_subject;
- 
- 
- #define NETDEV_HASHBITS    8
-@@ -69,6 +70,9 @@ struct net {
- 						 */
- 	struct llist_node	cleanup_list;	/* namespaces on death row */
- 
-+#ifdef CONFIG_KEYS
-+	struct key_tag		*key_domain;	/* Key domain of operation tag */
-+#endif
- 	struct user_namespace   *user_ns;	/* Owning user namespace */
- 	struct ucounts		*ucounts;
- 	spinlock_t		nsid_lock;
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index b02fb19df2cc..bcce7728593c 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -38,9 +38,16 @@ EXPORT_SYMBOL_GPL(net_namespace_list);
- DECLARE_RWSEM(net_rwsem);
- EXPORT_SYMBOL_GPL(net_rwsem);
- 
-+#ifdef CONFIG_KEYS
-+static struct key_tag init_net_key_domain = { .usage = REFCOUNT_INIT(1) };
-+#endif
-+
- struct net init_net = {
- 	.count		= REFCOUNT_INIT(1),
- 	.dev_base_head	= LIST_HEAD_INIT(init_net.dev_base_head),
-+#ifdef CONFIG_KEYS
-+	.key_domain	= &init_net_key_domain,
-+#endif
+ struct keyring_index_key {
+ 	/* [!] If this structure is altered, the union in struct key must change too! */
+ 	unsigned long		hash;			/* Hash value */
+@@ -101,6 +108,7 @@ struct keyring_index_key {
+ 		unsigned long x;
+ 	};
+ 	struct key_type		*type;
++	struct key_tag		*domain_tag;	/* Domain of operation */
+ 	const char		*description;
  };
- EXPORT_SYMBOL(init_net);
  
-@@ -385,10 +392,20 @@ static struct net *net_alloc(void)
- 	if (!net)
- 		goto out_free;
+@@ -218,6 +226,7 @@ struct key {
+ 			unsigned long	hash;
+ 			unsigned long	len_desc;
+ 			struct key_type	*type;		/* type of key */
++			struct key_tag	*domain_tag;	/* Domain of operation */
+ 			char		*description;
+ 		};
+ 	};
+@@ -268,6 +277,7 @@ extern struct key *key_alloc(struct key_type *type,
+ extern void key_revoke(struct key *key);
+ extern void key_invalidate(struct key *key);
+ extern void key_put(struct key *key);
++extern bool key_put_tag(struct key_tag *tag);
  
-+#ifdef CONFIG_KEYS
-+	net->key_domain = kzalloc(sizeof(struct key_tag), GFP_KERNEL);
-+	if (!net->key_domain)
-+		goto out_free_2;
-+#endif
-+
- 	rcu_assign_pointer(net->gen, ng);
- out:
- 	return net;
+ static inline struct key *__key_get(struct key *key)
+ {
+@@ -425,6 +435,7 @@ extern void key_init(void);
+ #define key_fsuid_changed(t)		do { } while(0)
+ #define key_fsgid_changed(t)		do { } while(0)
+ #define key_init()			do { } while(0)
++#define key_put_subject(s)		do { } while(0)
  
-+#ifdef CONFIG_KEYS
-+out_free_2:
-+	kmem_cache_free(net_cachep, net);
-+#endif
- out_free:
- 	kfree(ng);
- 	goto out;
-@@ -565,6 +582,7 @@ static void cleanup_net(struct work_struct *work)
- 	list_for_each_entry_safe(net, tmp, &net_exit_list, exit_list) {
- 		list_del_init(&net->exit_list);
- 		dec_net_namespaces(net->ucounts);
-+		key_remove_domain(net->key_domain);
- 		put_user_ns(net->user_ns);
- 		net_drop_ns(net);
- 	}
-diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
-index a65d553e730d..3e1a90669006 100644
---- a/net/dns_resolver/dns_key.c
-+++ b/net/dns_resolver/dns_key.c
-@@ -314,6 +314,7 @@ static long dns_resolver_read(const struct key *key,
+ #endif /* CONFIG_KEYS */
+ #endif /* __KERNEL__ */
+diff --git a/security/keys/gc.c b/security/keys/gc.c
+index 634e96b380e8..83d279fb7793 100644
+--- a/security/keys/gc.c
++++ b/security/keys/gc.c
+@@ -154,7 +154,7 @@ static noinline void key_gc_unused_keys(struct list_head *keys)
+ 			atomic_dec(&key->user->nikeys);
  
- struct key_type key_type_dns_resolver = {
- 	.name		= "dns_resolver",
-+	.flags		= KEY_TYPE_NET_DOMAIN,
- 	.preparse	= dns_resolver_preparse,
- 	.free_preparse	= dns_resolver_free_preparse,
- 	.instantiate	= generic_key_instantiate,
-diff --git a/net/rxrpc/key.c b/net/rxrpc/key.c
-index e7f6b8823eb6..2722189ec273 100644
---- a/net/rxrpc/key.c
-+++ b/net/rxrpc/key.c
-@@ -43,6 +43,7 @@ static long rxrpc_read(const struct key *, char __user *, size_t);
-  */
- struct key_type key_type_rxrpc = {
- 	.name		= "rxrpc",
-+	.flags		= KEY_TYPE_NET_DOMAIN,
- 	.preparse	= rxrpc_preparse,
- 	.free_preparse	= rxrpc_free_preparse,
- 	.instantiate	= generic_key_instantiate,
-@@ -58,6 +59,7 @@ EXPORT_SYMBOL(key_type_rxrpc);
-  */
- struct key_type key_type_rxrpc_s = {
- 	.name		= "rxrpc_s",
-+	.flags		= KEY_TYPE_NET_DOMAIN,
- 	.vet_description = rxrpc_vet_description_s,
- 	.preparse	= rxrpc_preparse_s,
- 	.free_preparse	= rxrpc_free_preparse_s,
+ 		key_user_put(key->user);
+-
++		key_put_tag(key->domain_tag);
+ 		kfree(key->description);
+ 
+ 		memzero_explicit(key, sizeof(*key));
+diff --git a/security/keys/key.c b/security/keys/key.c
+index 1568b0028ba4..8cd0f98e4fa3 100644
+--- a/security/keys/key.c
++++ b/security/keys/key.c
+@@ -317,6 +317,7 @@ struct key *key_alloc(struct key_type *type, const char *desc,
+ 		goto security_error;
+ 
+ 	/* publish the key by giving it a serial number */
++	refcount_inc(&key->domain_tag->usage);
+ 	atomic_inc(&user->nkeys);
+ 	key_alloc_serial(key);
+ 
 diff --git a/security/keys/keyring.c b/security/keys/keyring.c
-index 916a52d54e1b..d16c4470e2a0 100644
+index 11c44ad07b5b..0df10221c037 100644
 --- a/security/keys/keyring.c
 +++ b/security/keys/keyring.c
-@@ -16,10 +16,12 @@
- #include <linux/security.h>
- #include <linux/seq_file.h>
- #include <linux/err.h>
-+#include <linux/nsproxy.h>
- #include <keys/keyring-type.h>
- #include <keys/user-type.h>
- #include <linux/assoc_array_priv.h>
- #include <linux/uaccess.h>
-+#include <net/net_namespace.h>
- #include "internal.h"
+@@ -181,6 +181,9 @@ static void hash_key_type_and_desc(struct keyring_index_key *index_key)
+ 	type = (unsigned long)index_key->type;
+ 	acc = mult_64x32_and_fold(type, desc_len + 13);
+ 	acc = mult_64x32_and_fold(acc, 9207);
++	piece = (unsigned long)index_key->domain_tag;
++	acc = mult_64x32_and_fold(acc, piece);
++	acc = mult_64x32_and_fold(acc, 9207);
+ 
+ 	for (;;) {
+ 		n = desc_len;
+@@ -214,16 +217,36 @@ static void hash_key_type_and_desc(struct keyring_index_key *index_key)
  
  /*
-@@ -226,7 +228,10 @@ void key_set_index_key(struct keyring_index_key *index_key)
- 
+  * Finalise an index key to include a part of the description actually in the
+- * index key and to add in the hash too.
++ * index key, to set the domain tag and to calculate the hash.
+  */
+ void key_set_index_key(struct keyring_index_key *index_key)
+ {
++	static struct key_tag default_domain_tag = { .usage = REFCOUNT_INIT(1), };
+ 	size_t n = min_t(size_t, index_key->desc_len, sizeof(index_key->desc));
++
  	memcpy(index_key->desc, index_key->description, n);
  
--	index_key->domain_tag = &default_domain_tag;
-+	if (index_key->type->flags & KEY_TYPE_NET_DOMAIN)
-+		index_key->domain_tag = current->nsproxy->net_ns->key_domain;
-+	else
-+		index_key->domain_tag = &default_domain_tag;
++	index_key->domain_tag = &default_domain_tag;
  	hash_key_type_and_desc(index_key);
  }
  
++/**
++ * key_put_tag - Release a ref on a tag.
++ * @tag: The tag to release.
++ *
++ * This releases a reference the given tag and returns true if that ref was the
++ * last one.
++ */
++bool key_put_tag(struct key_tag *tag)
++{
++	if (refcount_dec_and_test(&tag->usage)) {
++		kfree_rcu(tag, rcu);
++		return true;
++	}
++
++	return false;
++}
++
+ /*
+  * Build the next index key chunk.
+  *
+@@ -244,8 +267,10 @@ static unsigned long keyring_get_key_chunk(const void *data, int level)
+ 		return index_key->x;
+ 	case 2:
+ 		return (unsigned long)index_key->type;
++	case 3:
++		return (unsigned long)index_key->domain_tag;
+ 	default:
+-		level -= 3;
++		level -= 4;
+ 		if (desc_len <= sizeof(index_key->desc))
+ 			return 0;
+ 
+@@ -274,6 +299,7 @@ static bool keyring_compare_object(const void *object, const void *data)
+ 	const struct key *key = keyring_ptr_to_key(object);
+ 
+ 	return key->index_key.type == index_key->type &&
++		key->index_key.domain_tag == index_key->domain_tag &&
+ 		key->index_key.desc_len == index_key->desc_len &&
+ 		memcmp(key->index_key.description, index_key->description,
+ 		       index_key->desc_len) == 0;
+@@ -315,6 +341,12 @@ static int keyring_diff_objects(const void *object, const void *data)
+ 		goto differ;
+ 	level += sizeof(unsigned long);
+ 
++	seg_a = (unsigned long)a->domain_tag;
++	seg_b = (unsigned long)b->domain_tag;
++	if ((seg_a ^ seg_b) != 0)
++		goto differ;
++	level += sizeof(unsigned long);
++
+ 	i = sizeof(a->desc);
+ 	if (a->desc_len <= i)
+ 		goto same;
+diff --git a/security/keys/persistent.c b/security/keys/persistent.c
+index fc29ec59efa7..c9fbe63adc58 100644
+--- a/security/keys/persistent.c
++++ b/security/keys/persistent.c
+@@ -84,6 +84,7 @@ static long key_get_persistent(struct user_namespace *ns, kuid_t uid,
+ 	long ret;
+ 
+ 	/* Look in the register if it exists */
++	memset(&index_key, 0, sizeof(index_key));
+ 	index_key.type = &key_type_keyring;
+ 	index_key.description = buf;
+ 	index_key.desc_len = sprintf(buf, "_persistent.%u", from_kuid(ns, uid));
 
