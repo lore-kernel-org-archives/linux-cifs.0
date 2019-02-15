@@ -6,39 +6,40 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C360C4360F
-	for <linux-cifs@archiver.kernel.org>; Fri, 15 Feb 2019 16:07:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4458BC10F02
+	for <linux-cifs@archiver.kernel.org>; Fri, 15 Feb 2019 16:08:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 13F6B21927
-	for <linux-cifs@archiver.kernel.org>; Fri, 15 Feb 2019 16:07:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D2C221927
+	for <linux-cifs@archiver.kernel.org>; Fri, 15 Feb 2019 16:08:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388366AbfBOQHp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 15 Feb 2019 11:07:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39694 "EHLO mx1.redhat.com"
+        id S1726277AbfBOQHy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 15 Feb 2019 11:07:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43292 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391310AbfBOQHo (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 15 Feb 2019 11:07:44 -0500
+        id S2388125AbfBOQHy (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 15 Feb 2019 11:07:54 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 76075C0ADB53;
-        Fri, 15 Feb 2019 16:07:44 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id C9913C610C;
+        Fri, 15 Feb 2019 16:07:52 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-121-129.rdu2.redhat.com [10.10.121.129])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8BC5E5D70D;
-        Fri, 15 Feb 2019 16:07:42 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7605D5D70D;
+        Fri, 15 Feb 2019 16:07:50 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
  Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
  Kingdom.
  Registered in England and Wales under Company Registration No. 3798903
-Subject: [RFC PATCH 03/27] containers: Provide /proc/containers
+Subject: [RFC PATCH 04/27] containers: Allow a process to be forked into a
+ container
 From:   David Howells <dhowells@redhat.com>
 To:     keyrings@vger.kernel.org, trond.myklebust@hammerspace.com,
         sfrench@samba.org
 Cc:     linux-security-module@vger.kernel.org, linux-nfs@vger.kernel.org,
         linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         rgb@redhat.com, dhowells@redhat.com, linux-kernel@vger.kernel.org
-Date:   Fri, 15 Feb 2019 16:07:41 +0000
-Message-ID: <155024686175.21651.6141317051029384847.stgit@warthog.procyon.org.uk>
+Date:   Fri, 15 Feb 2019 16:07:49 +0000
+Message-ID: <155024686966.21651.5963892339360034863.stgit@warthog.procyon.org.uk>
 In-Reply-To: <155024683432.21651.14153938339749694146.stgit@warthog.procyon.org.uk>
 References: <155024683432.21651.14153938339749694146.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/unknown-version
@@ -46,159 +47,484 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Fri, 15 Feb 2019 16:07:44 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Fri, 15 Feb 2019 16:07:52 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Provide /proc/containers to view the current container and all the
-containers created within it:
+Allow a single process to be forked directly into a container using a new
+syscall, thereby 'booting' the container:
 
-	# ./foo-container
-	NAME                     USE FL OWNER GROUP
-	<current>                141 01 0     0
-	foo-test                   1 04 0     0
+	pid_t pid = fork_into_container(int container_fd);
 
-I'm not sure whether this is really desirable, though.
+This process will be the 'init' process of the container.
+
+Further attempts to fork into the container will be rejected.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- kernel/container.c |  110 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 110 insertions(+)
+ arch/x86/entry/syscalls/syscall_32.tbl |    1 
+ arch/x86/entry/syscalls/syscall_64.tbl |    1 
+ arch/x86/ia32/sys_ia32.c               |    2 -
+ include/linux/cred.h                   |    3 +
+ include/linux/nsproxy.h                |    7 ++
+ include/linux/sched/task.h             |    3 +
+ include/linux/syscalls.h               |    1 
+ kernel/cred.c                          |   45 +++++++++++++
+ kernel/fork.c                          |  110 ++++++++++++++++++++++++++------
+ kernel/nsproxy.c                       |   11 +++
+ kernel/sys_ni.c                        |    1 
+ 11 files changed, 157 insertions(+), 28 deletions(-)
 
-diff --git a/kernel/container.c b/kernel/container.c
-index ca4012632cfa..1d2cb1c1e9b1 100644
---- a/kernel/container.c
-+++ b/kernel/container.c
-@@ -20,6 +20,7 @@
- #include <linux/syscalls.h>
- #include <linux/printk.h>
- #include <linux/security.h>
-+#include <linux/proc_fs.h>
- #include "namespaces.h"
+diff --git a/arch/x86/entry/syscalls/syscall_32.tbl b/arch/x86/entry/syscalls/syscall_32.tbl
+index 3564814a5d21..8666693510f9 100644
+--- a/arch/x86/entry/syscalls/syscall_32.tbl
++++ b/arch/x86/entry/syscalls/syscall_32.tbl
+@@ -408,3 +408,4 @@
+ 394	i386	mount_notify		sys_mount_notify		__ia32_sys_mount_notify
+ 395	i386	sb_notify		sys_sb_notify			__ia32_sys_sb_notify
+ 396	i386	container_create	sys_container_create		__ia32_sys_container_create
++397	i386	fork_into_container	sys_fork_into_container		__ia32_sys_fork_into_container
+diff --git a/arch/x86/entry/syscalls/syscall_64.tbl b/arch/x86/entry/syscalls/syscall_64.tbl
+index aa6cccbe5271..d40d4790fcb2 100644
+--- a/arch/x86/entry/syscalls/syscall_64.tbl
++++ b/arch/x86/entry/syscalls/syscall_64.tbl
+@@ -353,6 +353,7 @@
+ 342	common	mount_notify		__x64_sys_mount_notify
+ 343	common	sb_notify		__x64_sys_sb_notify
+ 344	common	container_create	__x64_sys_container_create
++345	common	fork_into_container	__x64_sys_fork_into_container
  
- struct container init_container = {
-@@ -69,6 +70,108 @@ void put_container(struct container *c)
- 	}
+ #
+ # x32-specific system call numbers start at 512 to avoid cache impact
+diff --git a/arch/x86/ia32/sys_ia32.c b/arch/x86/ia32/sys_ia32.c
+index a43212036257..080d9e21b697 100644
+--- a/arch/x86/ia32/sys_ia32.c
++++ b/arch/x86/ia32/sys_ia32.c
+@@ -238,5 +238,5 @@ COMPAT_SYSCALL_DEFINE5(x86_clone, unsigned long, clone_flags,
+ 		       unsigned long, tls_val, int __user *, child_tidptr)
+ {
+ 	return _do_fork(clone_flags, newsp, 0, parent_tidptr, child_tidptr,
+-			tls_val);
++			tls_val, NULL);
+ }
+diff --git a/include/linux/cred.h b/include/linux/cred.h
+index 4907c9df86b3..357e743d5d4a 100644
+--- a/include/linux/cred.h
++++ b/include/linux/cred.h
+@@ -23,6 +23,7 @@
+ 
+ struct cred;
+ struct inode;
++struct container;
+ 
+ /*
+  * COW Supplementary groups list
+@@ -155,7 +156,7 @@ struct cred {
+ 
+ extern void __put_cred(struct cred *);
+ extern void exit_creds(struct task_struct *);
+-extern int copy_creds(struct task_struct *, unsigned long);
++extern int copy_creds(struct task_struct *, unsigned long, struct container *);
+ extern const struct cred *get_task_cred(struct task_struct *);
+ extern struct cred *cred_alloc_blank(void);
+ extern struct cred *prepare_creds(void);
+diff --git a/include/linux/nsproxy.h b/include/linux/nsproxy.h
+index 2ae1b1a4d84d..81838ae24a92 100644
+--- a/include/linux/nsproxy.h
++++ b/include/linux/nsproxy.h
+@@ -11,6 +11,7 @@ struct ipc_namespace;
+ struct pid_namespace;
+ struct cgroup_namespace;
+ struct fs_struct;
++struct container;
+ 
+ /*
+  * A structure to contain pointers to all per-process
+@@ -63,9 +64,13 @@ extern struct nsproxy init_nsproxy;
+  *         * /
+  *     task_unlock(task);
+  *
++ *  4. Container namespaces are set at container creation and cannot be
++ *     changed.
++ *
+  */
+ 
+-int copy_namespaces(unsigned long flags, struct task_struct *tsk);
++int copy_namespaces(unsigned long flags, struct task_struct *tsk,
++		    struct container *dest_container);
+ void exit_task_namespaces(struct task_struct *tsk);
+ void switch_task_namespaces(struct task_struct *tsk, struct nsproxy *new);
+ void free_nsproxy(struct nsproxy *ns);
+diff --git a/include/linux/sched/task.h b/include/linux/sched/task.h
+index 44c6f15800ff..bdff71b0fb66 100644
+--- a/include/linux/sched/task.h
++++ b/include/linux/sched/task.h
+@@ -73,7 +73,8 @@ extern void do_group_exit(int);
+ extern void exit_files(struct task_struct *);
+ extern void exit_itimers(struct signal_struct *);
+ 
+-extern long _do_fork(unsigned long, unsigned long, unsigned long, int __user *, int __user *, unsigned long);
++extern long _do_fork(unsigned long, unsigned long, unsigned long, int __user *,
++		     int __user *, unsigned long, struct container *);
+ extern long do_fork(unsigned long, unsigned long, unsigned long, int __user *, int __user *);
+ struct task_struct *fork_idle(int);
+ extern pid_t kernel_thread(int (*fn)(void *), void *arg, unsigned long flags);
+diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
+index dac42098c2dd..15e5cc704df3 100644
+--- a/include/linux/syscalls.h
++++ b/include/linux/syscalls.h
+@@ -946,6 +946,7 @@ asmlinkage long sys_sb_notify(int dfd, const char __user *path,
+ asmlinkage long sys_container_create(const char __user *name, unsigned int flags,
+ 				     unsigned long spare3, unsigned long spare4,
+ 				     unsigned long spare5);
++asmlinkage long sys_fork_into_container(int containerfd);
+ 
+ /*
+  * Architecture-specific system calls
+diff --git a/kernel/cred.c b/kernel/cred.c
+index 21f4a97085b4..f0ee5cec533d 100644
+--- a/kernel/cred.c
++++ b/kernel/cred.c
+@@ -313,6 +313,43 @@ struct cred *prepare_exec_creds(void)
+ 	return new;
  }
  
-+static void *container_proc_start(struct seq_file *m, loff_t *_pos)
++/*
++ * Handle forking a process into a container.
++ */
++static struct cred *copy_container_creds(struct container *dest_container)
 +{
-+	struct container *c = m->private;
-+	struct list_head *p;
-+	loff_t pos = *_pos;
++	struct cred *new;
 +
-+	spin_lock(&c->lock);
++	validate_process_creds();
 +
-+	if (pos <= 1) {
-+		*_pos = 1;
-+		return (void *)1UL; /* Banner on first line */
-+	}
-+
-+	if (pos == 2)
-+		return m->private; /* Current container on second line */
-+
-+	/* Subordinate containers thereafter */
-+	p = c->children.next;
-+	pos--;
-+	for (pos--; pos > 0 && p != &c->children; pos--) {
-+		p = p->next;
-+	}
-+
-+	if (p == &c->children)
++	new = kmem_cache_alloc(cred_jar, GFP_KERNEL);
++	if (!new)
 +		return NULL;
-+	return container_of(p, struct container, child_link);
++
++	kdebug("prepare_creds() alloc %p", new);
++
++	memcpy(new, dest_container->cred, sizeof(struct cred));
++
++	atomic_set(&new->usage, 1);
++	set_cred_subscribers(new, 0);
++	get_group_info(new->group_info);
++	get_uid(new->user);
++	get_user_ns(new->user_ns);
++
++#ifdef CONFIG_SECURITY
++	new->security = NULL;
++#endif
++
++	if (security_prepare_creds(new, dest_container->cred, GFP_KERNEL) < 0)
++		goto error;
++	validate_creds(new);
++	return new;
++
++error:
++	abort_creds(new);
++	return NULL;
 +}
 +
-+static void *container_proc_next(struct seq_file *m, void *v, loff_t *_pos)
-+{
-+	struct container *c = m->private, *vc = v;
-+	struct list_head *p;
-+	loff_t pos = *_pos;
-+
-+	pos++;
-+	*_pos = pos;
-+	if (pos == 2)
-+		return c; /* Current container on second line */
-+
-+	if (pos == 3)
-+		p = &c->children;
+ /*
+  * Copy credentials for the new process created by fork()
+  *
+@@ -322,7 +359,8 @@ struct cred *prepare_exec_creds(void)
+  * The new process gets the current process's subjective credentials as its
+  * objective and subjective credentials
+  */
+-int copy_creds(struct task_struct *p, unsigned long clone_flags)
++int copy_creds(struct task_struct *p, unsigned long clone_flags,
++	       struct container *dest_container)
+ {
+ 	struct cred *new;
+ 	int ret;
+@@ -343,7 +381,10 @@ int copy_creds(struct task_struct *p, unsigned long clone_flags)
+ 		return 0;
+ 	}
+ 
+-	new = prepare_creds();
++	if (dest_container)
++		new = copy_container_creds(dest_container);
 +	else
-+		p = &vc->child_link;
-+	p = p->next;
-+	if (p == &c->children)
-+		return NULL;
-+	return container_of(p, struct container, child_link);
++		new = prepare_creds();
+ 	if (!new)
+ 		return -ENOMEM;
+ 
+diff --git a/kernel/fork.c b/kernel/fork.c
+index 009cf7e63894..71401deb4434 100644
+--- a/kernel/fork.c
++++ b/kernel/fork.c
+@@ -1385,9 +1385,33 @@ static int copy_mm(unsigned long clone_flags, struct task_struct *tsk)
+ 	return retval;
+ }
+ 
+-static int copy_fs(unsigned long clone_flags, struct task_struct *tsk)
++static int copy_fs(unsigned long clone_flags, struct task_struct *tsk,
++		   struct container *dest_container)
+ {
+ 	struct fs_struct *fs = current->fs;
++
++#ifdef CONFIG_CONTAINERS
++	if (dest_container) {
++		fs = kmem_cache_alloc(fs_cachep, GFP_KERNEL);
++		if (!fs)
++			return -ENOMEM;
++
++		fs->users = 1;
++		fs->in_exec = 0;
++		spin_lock_init(&fs->lock);
++		seqcount_init(&fs->seq);
++		fs->umask = 0022;
++
++		spin_lock(&dest_container->lock);
++		fs->pwd = fs->root = dest_container->root;
++		path_get(&fs->root);
++		path_get(&fs->pwd);
++		spin_unlock(&dest_container->lock);
++		tsk->fs = fs;
++		return 0;
++	}
++#endif
++
+ 	if (clone_flags & CLONE_FS) {
+ 		/* tsk->fs is already what we want */
+ 		spin_lock(&fs->lock);
+@@ -1679,7 +1703,8 @@ static __latent_entropy struct task_struct *copy_process(
+ 					struct pid *pid,
+ 					int trace,
+ 					unsigned long tls,
+-					int node)
++					int node,
++					struct container *dest_container)
+ {
+ 	int retval;
+ 	struct task_struct *p;
+@@ -1783,7 +1808,7 @@ static __latent_entropy struct task_struct *copy_process(
+ 	}
+ 	current->flags &= ~PF_NPROC_EXCEEDED;
+ 
+-	retval = copy_creds(p, clone_flags);
++	retval = copy_creds(p, clone_flags, dest_container);
+ 	if (retval < 0)
+ 		goto bad_fork_free;
+ 
+@@ -1905,7 +1930,7 @@ static __latent_entropy struct task_struct *copy_process(
+ 	retval = copy_files(clone_flags, p);
+ 	if (retval)
+ 		goto bad_fork_cleanup_semundo;
+-	retval = copy_fs(clone_flags, p);
++	retval = copy_fs(clone_flags, p, dest_container);
+ 	if (retval)
+ 		goto bad_fork_cleanup_files;
+ 	retval = copy_sighand(clone_flags, p);
+@@ -1917,15 +1942,15 @@ static __latent_entropy struct task_struct *copy_process(
+ 	retval = copy_mm(clone_flags, p);
+ 	if (retval)
+ 		goto bad_fork_cleanup_signal;
+-	retval = copy_namespaces(clone_flags, p);
++	retval = copy_container(clone_flags, p, dest_container);
+ 	if (retval)
+ 		goto bad_fork_cleanup_mm;
+-	retval = copy_container(clone_flags, p, NULL);
++	retval = copy_namespaces(clone_flags, p, dest_container);
+ 	if (retval)
+-		goto bad_fork_cleanup_namespaces;
++		goto bad_fork_cleanup_container;
+ 	retval = copy_io(clone_flags, p);
+ 	if (retval)
+-		goto bad_fork_cleanup_container;
++		goto bad_fork_cleanup_namespaces;
+ 	retval = copy_thread_tls(clone_flags, stack_start, stack_size, p, tls);
+ 	if (retval)
+ 		goto bad_fork_cleanup_io;
+@@ -2124,10 +2149,10 @@ static __latent_entropy struct task_struct *copy_process(
+ bad_fork_cleanup_io:
+ 	if (p->io_context)
+ 		exit_io_context(p);
+-bad_fork_cleanup_container:
+-	exit_container(p);
+ bad_fork_cleanup_namespaces:
+ 	exit_task_namespaces(p);
++bad_fork_cleanup_container:
++	exit_container(p);
+ bad_fork_cleanup_mm:
+ 	if (p->mm)
+ 		mmput(p->mm);
+@@ -2183,7 +2208,7 @@ struct task_struct *fork_idle(int cpu)
+ {
+ 	struct task_struct *task;
+ 	task = copy_process(CLONE_VM, 0, 0, NULL, &init_struct_pid, 0, 0,
+-			    cpu_to_node(cpu));
++			    cpu_to_node(cpu), NULL);
+ 	if (!IS_ERR(task)) {
+ 		init_idle_pids(task);
+ 		init_idle(task, cpu);
+@@ -2195,15 +2220,16 @@ struct task_struct *fork_idle(int cpu)
+ /*
+  *  Ok, this is the main fork-routine.
+  *
+- * It copies the process, and if successful kick-starts
+- * it and waits for it to finish using the VM if required.
++ * It copies the process into the specified container, and if successful
++ * kick-starts it and waits for it to finish using the VM if required.
+  */
+ long _do_fork(unsigned long clone_flags,
+ 	      unsigned long stack_start,
+ 	      unsigned long stack_size,
+ 	      int __user *parent_tidptr,
+ 	      int __user *child_tidptr,
+-	      unsigned long tls)
++	      unsigned long tls,
++	      struct container *dest_container)
+ {
+ 	struct completion vfork;
+ 	struct pid *pid;
+@@ -2229,8 +2255,32 @@ long _do_fork(unsigned long clone_flags,
+ 			trace = 0;
+ 	}
+ 
++	if (dest_container) {
++		/* A process spawned into a container doesn't share anything
++		 * with the parent other than namespaces.
++		 */
++		if (clone_flags & (CLONE_CHILD_CLEARTID |
++				   CLONE_CHILD_SETTID |
++				   CLONE_FILES |
++				   CLONE_FS |
++				   CLONE_IO |
++				   CLONE_PARENT |
++				   CLONE_PARENT_SETTID |
++				   CLONE_PTRACE |
++				   CLONE_SETTLS |
++				   CLONE_SIGHAND |
++				   CLONE_SYSVSEM |
++				   CLONE_THREAD))
++			return -EINVAL;
++
++		/* However, we do have to let kernel threads borrow a VM. */
++		if ((clone_flags & CLONE_VM) && current->mm)
++			return -EINVAL;
++	}
++	
+ 	p = copy_process(clone_flags, stack_start, stack_size,
+-			 child_tidptr, NULL, trace, tls, NUMA_NO_NODE);
++			 child_tidptr, NULL, trace, tls, NUMA_NO_NODE,
++			 dest_container);
+ 	add_latent_entropy();
+ 
+ 	if (IS_ERR(p))
+@@ -2279,7 +2329,7 @@ long do_fork(unsigned long clone_flags,
+ 	      int __user *child_tidptr)
+ {
+ 	return _do_fork(clone_flags, stack_start, stack_size,
+-			parent_tidptr, child_tidptr, 0);
++			parent_tidptr, child_tidptr, 0, NULL);
+ }
+ #endif
+ 
+@@ -2289,14 +2339,14 @@ long do_fork(unsigned long clone_flags,
+ pid_t kernel_thread(int (*fn)(void *), void *arg, unsigned long flags)
+ {
+ 	return _do_fork(flags|CLONE_VM|CLONE_UNTRACED, (unsigned long)fn,
+-		(unsigned long)arg, NULL, NULL, 0);
++			(unsigned long)arg, NULL, NULL, 0, NULL);
+ }
+ 
+ #ifdef __ARCH_WANT_SYS_FORK
+ SYSCALL_DEFINE0(fork)
+ {
+ #ifdef CONFIG_MMU
+-	return _do_fork(SIGCHLD, 0, 0, NULL, NULL, 0);
++	return _do_fork(SIGCHLD, 0, 0, NULL, NULL, 0, NULL);
+ #else
+ 	/* can not support in nommu mode */
+ 	return -EINVAL;
+@@ -2308,7 +2358,26 @@ SYSCALL_DEFINE0(fork)
+ SYSCALL_DEFINE0(vfork)
+ {
+ 	return _do_fork(CLONE_VFORK | CLONE_VM | SIGCHLD, 0,
+-			0, NULL, NULL, 0);
++			0, NULL, NULL, 0, NULL);
 +}
++#endif
 +
-+static void container_proc_stop(struct seq_file *m, void *v)
++#ifdef CONFIG_CONTAINERS
++SYSCALL_DEFINE1(fork_into_container, int, containerfd)
 +{
-+	struct container *c = m->private;
++	struct fd f = fdget(containerfd);
++	int ret;
 +
-+	spin_unlock(&c->lock);
-+}
++	if (!f.file)
++		return -EBADF;
++	ret = -EINVAL;
++	if (is_container_file(f.file)) {
++		struct container *dest_container = f.file->private_data;
 +
-+static int container_proc_show(struct seq_file *m, void *v)
-+{
-+	struct user_namespace *uns = current_user_ns();
-+	struct container *c = v;
-+	const char *name;
-+
-+	if (v == (void *)1UL) {
-+		seq_puts(m, "NAME                               ID USE FL OWNER GROUP\n");
++		ret = _do_fork(SIGCHLD, 0, 0, NULL, NULL, 0, dest_container);
++	}
++	fdput(f);
++	return ret;
+ }
+ #endif
+ 
+@@ -2336,7 +2405,8 @@ SYSCALL_DEFINE5(clone, unsigned long, clone_flags, unsigned long, newsp,
+ 		 unsigned long, tls)
+ #endif
+ {
+-	return _do_fork(clone_flags, newsp, 0, parent_tidptr, child_tidptr, tls);
++	return _do_fork(clone_flags, newsp, 0, parent_tidptr, child_tidptr, tls,
++			NULL);
+ }
+ #endif
+ 
+diff --git a/kernel/nsproxy.c b/kernel/nsproxy.c
+index 4bb5184b3a80..4031075300a4 100644
+--- a/kernel/nsproxy.c
++++ b/kernel/nsproxy.c
+@@ -136,12 +136,19 @@ struct nsproxy *create_new_namespaces(unsigned long flags,
+  * called from clone.  This now handles copy for nsproxy and all
+  * namespaces therein.
+  */
+-int copy_namespaces(unsigned long flags, struct task_struct *tsk)
++int copy_namespaces(unsigned long flags, struct task_struct *tsk,
++		    struct container *dest_container)
+ {
+ 	struct nsproxy *old_ns = tsk->nsproxy;
+ 	struct user_namespace *user_ns = task_cred_xxx(tsk, user_ns);
+ 	struct nsproxy *new_ns;
+ 
++	if (dest_container) {
++		get_nsproxy(dest_container->ns);
++		tsk->nsproxy = dest_container->ns;
 +		return 0;
 +	}
 +
-+	name = (c == m->private) ? "<current>" : c->name;
-+	seq_printf(m, "%-24s %12llu %3u %02lx %5d %5d\n",
-+		   name, c->id, refcount_read(&c->usage), c->flags,
-+		   from_kuid_munged(uns, c->cred->uid),
-+		   from_kgid_munged(uns, c->cred->gid));
-+
-+	return 0;
-+}
-+
-+static const struct seq_operations container_proc_ops = {
-+	.start	= container_proc_start,
-+	.next	= container_proc_next,
-+	.stop	= container_proc_stop,
-+	.show	= container_proc_show,
-+};
-+
-+static int container_proc_open(struct inode *inode, struct file *file)
-+{
-+	struct seq_file *m;
-+	int ret = seq_open(file, &container_proc_ops);
-+
-+	if (ret == 0) {
-+		m = file->private_data;
-+		m->private = current->container;
-+	}
-+	return ret;
-+}
-+
-+static const struct file_operations container_proc_fops = {
-+	.open		= container_proc_open,
-+	.read		= seq_read,
-+	.llseek		= seq_lseek,
-+	.release	= seq_release,
-+};
-+
- /*
-  * Allow the user to poll for the container dying.
-  */
-@@ -345,4 +448,11 @@ SYSCALL_DEFINE5(container_create,
- 	return fd;
- }
+ 	if (likely(!(flags & (CLONE_NEWNS | CLONE_NEWUTS | CLONE_NEWIPC |
+ 			      CLONE_NEWPID | CLONE_NEWNET |
+ 			      CLONE_NEWCGROUP)))) {
+@@ -163,7 +170,7 @@ int copy_namespaces(unsigned long flags, struct task_struct *tsk)
+ 		(CLONE_NEWIPC | CLONE_SYSVSEM)) 
+ 		return -EINVAL;
  
-+static int __init init_container_fs(void)
-+{
-+	proc_create("containers", 0, NULL, &container_proc_fops);
-+	return 0;
-+}
-+fs_initcall(init_container_fs);
-+
- #endif /* CONFIG_CONTAINERS */
+-	new_ns = create_new_namespaces(flags, tsk->nsproxy, user_ns, tsk->fs);
++	new_ns = create_new_namespaces(flags, old_ns, user_ns, tsk->fs);
+ 	if (IS_ERR(new_ns))
+ 		return  PTR_ERR(new_ns);
+ 
+diff --git a/kernel/sys_ni.c b/kernel/sys_ni.c
+index f0455cbb91cf..a23ad529d548 100644
+--- a/kernel/sys_ni.c
++++ b/kernel/sys_ni.c
+@@ -144,6 +144,7 @@ COND_SYSCALL(container_create);
+ /* kernel/exit.c */
+ 
+ /* kernel/fork.c */
++COND_SYSCALL(fork_into_container);
+ 
+ /* kernel/futex.c */
+ COND_SYSCALL(futex);
 
