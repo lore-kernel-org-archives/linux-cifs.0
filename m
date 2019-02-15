@@ -4,47 +4,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C948C43381
-	for <linux-cifs@archiver.kernel.org>; Fri, 15 Feb 2019 02:36:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 327ABC10F06
+	for <linux-cifs@archiver.kernel.org>; Fri, 15 Feb 2019 02:37:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6B40321927
-	for <linux-cifs@archiver.kernel.org>; Fri, 15 Feb 2019 02:36:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 03A8E21927
+	for <linux-cifs@archiver.kernel.org>; Fri, 15 Feb 2019 02:37:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1550198205;
-	bh=3Ofq+yH8oR3dBcfiUcgUXePwhupmTumFtJHdVDIGK4A=;
+	s=default; t=1550198223;
+	bh=OV/rdYHQmSlP/1aWBJ/SzhvP3Wu6ISfOiCoS98We1ns=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=Uqb2FTreERxeJF51kbSrih46pfFPVpuStViYs9AyuU+lqOcaAJnwba5bjey1Gbl/5
-	 apKRBpAbrLfg2PyIyqtIzzCa4+W7cITTnb7zIcShgomlegBSUf4z8kwTCSdB045IQm
-	 j1gcmreln7gsU75gWyuFsW0z2d0776BvC7K33LCU=
+	b=RBqtZ/tC1fMxiz8fznVHtgIjP1YBxAFqmOZz/k2jzllHHsTq9NHZD7p969hoPG+RR
+	 yNSUmE1/Bleet5ck7yr7wsECr1xj1xbG1rfRQZoafdkS3OY7EZke2KQJT1Yax0TAHj
+	 wGkC6+gQi+vL8YaNlPk/QyG3QiXYeY4AVe+AKrRU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727106AbfBOCgg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 14 Feb 2019 21:36:36 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50998 "EHLO mail.kernel.org"
+        id S2390677AbfBOCKi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 14 Feb 2019 21:10:38 -0500
+Received: from mail.kernel.org ([198.145.29.99]:50814 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731925AbfBOCKw (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 14 Feb 2019 21:10:52 -0500
+        id S2390663AbfBOCKi (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 14 Feb 2019 21:10:38 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2BF22222D4;
-        Fri, 15 Feb 2019 02:10:51 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id E206C222A1;
+        Fri, 15 Feb 2019 02:10:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1550196651;
-        bh=3Ofq+yH8oR3dBcfiUcgUXePwhupmTumFtJHdVDIGK4A=;
+        s=default; t=1550196637;
+        bh=OV/rdYHQmSlP/1aWBJ/SzhvP3Wu6ISfOiCoS98We1ns=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=LBacrgFskLC4fbHGk7RB3qC5pZLJIuJRnYrYiw9eKa6oFm+/UDfb3o5tbLh7C3iwH
-         cG4TreYin/5QmgcKnYXvEM/Wld9/wV611+8cMDwIeyxYUR2Hejcl/3zJlBKR+zarUn
-         zQ0Ff9Z345lifmG5z/vUSp5x4617mZYZVbdoOJek=
+        b=MhRroohjxB198FBOP3h/vR35FLzlmNqVhlBSei0920UJksMH0bBzXlN9PNnrgvpuK
+         bmvOj/mpKGQRYfts8oU6/GgrZe+18AIlmT2eR2nGtquKe9lbFfgHKkGy0yRhqvuGYr
+         FgS3L2UuOUmmHnM3sQOM76I2+MXeWs/quXHNehtI=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Pavel Shilovsky <pshilov@microsoft.com>,
+Cc:     Colin Ian King <colin.king@canonical.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.20 65/77] CIFS: Do not assume one credit for async responses
-Date:   Thu, 14 Feb 2019 21:08:43 -0500
-Message-Id: <20190215020855.176727-65-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.20 62/77] cifs: fix memory leak of an allocated cifs_ntsd structure
+Date:   Thu, 14 Feb 2019 21:08:40 -0500
+Message-Id: <20190215020855.176727-62-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190215020855.176727-1-sashal@kernel.org>
 References: <20190215020855.176727-1-sashal@kernel.org>
@@ -56,76 +57,66 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Pavel Shilovsky <pshilov@microsoft.com>
+From: Colin Ian King <colin.king@canonical.com>
 
-[ Upstream commit 0fd1d37b0501efc6e295f56ab55cdaff784aa50c ]
+[ Upstream commit 73aaf920cc72024c4a4460cfa46d56e5014172f3 ]
 
-If we don't receive a response we can't assume that the server
-granted one credit. Assume zero credits in such cases.
+The call to SMB2_queary_acl can allocate memory to pntsd and also
+return a failure via a call to SMB2_query_acl (and then query_info).
+This occurs when query_info allocates the structure and then in
+query_info the call to smb2_validate_and_copy_iov fails. Currently the
+failure just returns without kfree'ing pntsd hence causing a memory
+leak.
 
-Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
-Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
+Currently, *data is allocated if it's not already pointing to a buffer,
+so it needs to be kfree'd only if was allocated in query_info, so the
+fix adds an allocated flag to track this.  Also set *dlen to zero on
+an error just to be safe since *data is kfree'd.
+
+Also set errno to -ENOMEM if the allocation of *data fails.
+
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
+Reviewed-by: Dan Carpener <dan.carpenter@oracle.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/cifs/smb2pdu.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ fs/cifs/smb2pdu.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index d1ae7cdb236d..3c44c51310c4 100644
+index c393ac255af7..d1ae7cdb236d 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -2834,9 +2834,10 @@ smb2_echo_callback(struct mid_q_entry *mid)
- {
- 	struct TCP_Server_Info *server = mid->callback_data;
- 	struct smb2_echo_rsp *rsp = (struct smb2_echo_rsp *)mid->resp_buf;
--	unsigned int credits_received = 1;
-+	unsigned int credits_received = 0;
+@@ -2714,6 +2714,7 @@ query_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 	int resp_buftype = CIFS_NO_BUFFER;
+ 	struct cifs_ses *ses = tcon->ses;
+ 	int flags = 0;
++	bool allocated = false;
  
--	if (mid->mid_state == MID_RESPONSE_RECEIVED)
-+	if (mid->mid_state == MID_RESPONSE_RECEIVED
-+	    || mid->mid_state == MID_RESPONSE_MALFORMED)
- 		credits_received = le16_to_cpu(rsp->sync_hdr.CreditRequest);
+ 	cifs_dbg(FYI, "Query Info\n");
  
- 	DeleteMidQEntry(mid);
-@@ -3093,7 +3094,7 @@ smb2_readv_callback(struct mid_q_entry *mid)
- 	struct TCP_Server_Info *server = tcon->ses->server;
- 	struct smb2_sync_hdr *shdr =
- 				(struct smb2_sync_hdr *)rdata->iov[0].iov_base;
--	unsigned int credits_received = 1;
-+	unsigned int credits_received = 0;
- 	struct smb_rqst rqst = { .rq_iov = rdata->iov,
- 				 .rq_nvec = 2,
- 				 .rq_pages = rdata->pages,
-@@ -3132,6 +3133,9 @@ smb2_readv_callback(struct mid_q_entry *mid)
- 		task_io_account_read(rdata->got_bytes);
- 		cifs_stats_bytes_read(tcon, rdata->got_bytes);
- 		break;
-+	case MID_RESPONSE_MALFORMED:
-+		credits_received = le16_to_cpu(shdr->CreditRequest);
-+		/* fall through */
- 	default:
- 		if (rdata->result != -ENODATA)
- 			rdata->result = -EIO;
-@@ -3325,7 +3329,7 @@ smb2_writev_callback(struct mid_q_entry *mid)
- 	struct cifs_tcon *tcon = tlink_tcon(wdata->cfile->tlink);
- 	unsigned int written;
- 	struct smb2_write_rsp *rsp = (struct smb2_write_rsp *)mid->resp_buf;
--	unsigned int credits_received = 1;
-+	unsigned int credits_received = 0;
+@@ -2753,14 +2754,21 @@ query_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 					"Error %d allocating memory for acl\n",
+ 					rc);
+ 				*dlen = 0;
++				rc = -ENOMEM;
+ 				goto qinf_exit;
+ 			}
++			allocated = true;
+ 		}
+ 	}
  
- 	switch (mid->mid_state) {
- 	case MID_RESPONSE_RECEIVED:
-@@ -3353,6 +3357,9 @@ smb2_writev_callback(struct mid_q_entry *mid)
- 	case MID_RETRY_NEEDED:
- 		wdata->result = -EAGAIN;
- 		break;
-+	case MID_RESPONSE_MALFORMED:
-+		credits_received = le16_to_cpu(rsp->sync_hdr.CreditRequest);
-+		/* fall through */
- 	default:
- 		wdata->result = -EIO;
- 		break;
+ 	rc = smb2_validate_and_copy_iov(le16_to_cpu(rsp->OutputBufferOffset),
+ 					le32_to_cpu(rsp->OutputBufferLength),
+ 					&rsp_iov, min_len, *data);
++	if (rc && allocated) {
++		kfree(*data);
++		*data = NULL;
++		*dlen = 0;
++	}
+ 
+ qinf_exit:
+ 	SMB2_query_info_free(&rqst);
 -- 
 2.19.1
 
