@@ -2,66 +2,63 @@ Return-Path: <SRS0=lRaz=QW=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80747C43381
-	for <linux-cifs@archiver.kernel.org>; Fri, 15 Feb 2019 19:54:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3323AC43381
+	for <linux-cifs@archiver.kernel.org>; Fri, 15 Feb 2019 20:06:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4C7B9214DA
-	for <linux-cifs@archiver.kernel.org>; Fri, 15 Feb 2019 19:54:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE32C21B18
+	for <linux-cifs@archiver.kernel.org>; Fri, 15 Feb 2019 20:06:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SefN0rBG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qsoNwJlN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729810AbfBOTyC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 15 Feb 2019 14:54:02 -0500
-Received: from mail-lj1-f169.google.com ([209.85.208.169]:42665 "EHLO
-        mail-lj1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728750AbfBOTyC (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 15 Feb 2019 14:54:02 -0500
-Received: by mail-lj1-f169.google.com with SMTP id l7-v6so9357348ljg.9
-        for <linux-cifs@vger.kernel.org>; Fri, 15 Feb 2019 11:54:01 -0800 (PST)
+        id S2389186AbfBOUG5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 15 Feb 2019 15:06:57 -0500
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:42192 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726317AbfBOUG5 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 15 Feb 2019 15:06:57 -0500
+Received: by mail-lj1-f195.google.com with SMTP id l7-v6so9386297ljg.9
+        for <linux-cifs@vger.kernel.org>; Fri, 15 Feb 2019 12:06:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=VJlBQsjl5cmeK6fgz1A4EBadtC1yOPBnH+6+KtMJ9xI=;
-        b=SefN0rBGSV+MjH4mJO/nDd34pQR20YGP4ySY5loLfrFiFGXQ6JXaBkxmqNbmr+fTC9
-         mYLhcIinc7zx1uT4X5Iz8FsbEAQ+O6JGjyKXHK2RvDTazOF8eGVR4MfX9Q0BDBZIUah1
-         olxrUHLuc22frybAKI4bCVEs+F22XuIKRjhCaRdk2pRkfMYM70ZhQkHMuLPg4By/hYg1
-         Eo3Nz8n5/516MDj+pV3lDHqrJlp1RRIyLs8EZWtd3I9+JHsbxnSn3XyDVF2GvCqx5dlq
-         jYm6hNDZMRHFaHEHSqgleluvFO1GqWu8C4Zy86Rb6vkcmdT83KnCXSC+spKCM8SgQm2S
-         kOIw==
+        bh=qM5Pv+A871AXMYT5zwobkOLx7kyrv/0K8LPrKyXSulU=;
+        b=qsoNwJlNI1J/u+QIcfbiLvfo5lh7i/pbWfAlNZ5fVz9Eja/vU5dB5Je5HaFlTEjFCh
+         T7HcRSxWTB80OnfKUSUZEYy/CZsnTVEIwK4LwdcdYuIBE9NM7O4H/3jnKLUjECfFETO1
+         qCG8ozcEuYwbT+tIu9UHcl+TmFQS/Om02BHGH0CdwdpDi0oI4dwp1/ajvWCCE8pMMe61
+         QMWKMx7Ui4Qm86b06jswhTJ8JsGrJh0Qcs24eI3JYjD/g0il7ota/IzPuASISXP4W8Xy
+         jnC5hyfB9rlh5xw4chrghx1UuHuW5gJER0xHOcneewnSOGiCl6m1/N7EbYtYgSQAmJPV
+         w1wQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=VJlBQsjl5cmeK6fgz1A4EBadtC1yOPBnH+6+KtMJ9xI=;
-        b=LK3gRoJpE50DtR3JkCJVe5a55V66h6g+X985sOVl+RO6q7hTGufufBEFehcXMBmWIV
-         0+4wSKliXg7PrPDS0yXaTp6sM5xfpdhIoqG/OeILKzsl4AuvK8pzVQ8kTX0H0hvrGhG/
-         PGWc6ipmaFM2gkJRTQeXkyEzLpgbI619a/VDwrPEl0UberTLOvkMNWXyAYk5TShJsSq8
-         7661TGjsqCxhQJqjuMKSEPRT9scqmal+Y4bBoqaadX0QbupbPUBJSp+rgJ2OA+qwlqvt
-         QbQWuUW1DoDucTFQy4/0VmFDrzMUt0FEPcYlLLz46s+jHVFVFa7pcm84evvgyofX8CCk
-         vKxA==
-X-Gm-Message-State: AHQUAuYCNGHQJXb0J7rzPfYyFm/6SEeFB21YkCJC1OfIrmEWPMg228fv
-        +KunrYXNwpF/BzZ1z8nTVvjJMhOQnnSfXfmBd6GhYuc=
-X-Google-Smtp-Source: AHgI3Ibo+C39xis7dhCjZnfE6zZtYXxqGegw87KUnz3o+cICnBuM8AWJyD07ICt5Q+RB4vmFbJZCiN6vO6OswARxhEk=
-X-Received: by 2002:a2e:124e:: with SMTP id t75mr6857383lje.23.1550260440237;
- Fri, 15 Feb 2019 11:54:00 -0800 (PST)
+        bh=qM5Pv+A871AXMYT5zwobkOLx7kyrv/0K8LPrKyXSulU=;
+        b=GWNS4AY3Pj9p2klF8bMf6yeJmGBnyRd2+PyADGfDNPKTvl8cHG7LjpAD6c3b4ZMHTp
+         iYS+TZZVps5WgAv/duspxm9USSMKtFw04SWH9YIanCT7g/uikNm1gMfGHI+c3ArvI55B
+         v0Z4IKH0+2GWEJ1kyePeGwirbAuUw5D8n1rN2QYqmO1Dy/z/XJ3EaMP5QIkrDgsCAgEf
+         G1zL3d8TRKCq24IxKXyMusnftnTaoDZEbwtpcL2dYlhN2wNUcxieExoMB7E000SZ7Rdz
+         JUXefrC9cdVwJg8Lwaffvlyk/6aq9OjbLwfR0SpreEro1/XF4YFh4EUY0cRd29hd2Mbu
+         4leA==
+X-Gm-Message-State: AHQUAuY7PAmMPQb1qA1WH4pQma+YEDo9uKP949MBnD7r5tptHyneBCoE
+        OlHNbRmavhEs7niiVkeXAnm2VkYP1cx8n2McwQ==
+X-Google-Smtp-Source: AHgI3IZoUjod1S3bROw2vRj8c7S+Kh2zO/yR7Fc5rrvOsMX+3YrUlceRqhubszjGk52bVhcfegxQVJlW+w7Zv5IMRcY=
+X-Received: by 2002:a2e:3807:: with SMTP id f7mr5017731lja.9.1550261214937;
+ Fri, 15 Feb 2019 12:06:54 -0800 (PST)
 MIME-Version: 1.0
-References: <CAKywueRwez4Djs50dMityuA=hnE6SMeWUJ8xdTYs+jEhNvdCog@mail.gmail.com>
- <878syhqmny.fsf@suse.com>
-In-Reply-To: <878syhqmny.fsf@suse.com>
+References: <20190215022248.13277-1-kdsouza@redhat.com>
+In-Reply-To: <20190215022248.13277-1-kdsouza@redhat.com>
 From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Fri, 15 Feb 2019 11:53:49 -0800
-Message-ID: <CAKywueQpAMRG0tumuCsUyMTGmERcKTyvF33p2AG1GYf=h1gNoA@mail.gmail.com>
-Subject: Re: [cifs-utils] next branch is updated
-To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
+Date:   Fri, 15 Feb 2019 12:06:43 -0800
+Message-ID: <CAKywueRHazDtwUE5YvCCi5bczqz4mPT7zzUtS4oXOXJYKvG+Lw@mail.gmail.com>
+Subject: Re: [PATCH v4] Update mount.cifs with vers=default mount option and SMBv3.0.2
+To:     "Kenneth D'souza" <kdsouza@redhat.com>
 Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Paulo Alcantara <palcantara@suse.de>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
         Steve French <smfrench@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
@@ -70,15 +67,47 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D0=BF=D1=82, 15 =D1=84=D0=B5=D0=B2=D1=80. 2019 =D0=B3. =D0=B2 04:08, Aur=
-=C3=A9lien Aptel <aaptel@suse.com>:
+=D1=87=D1=82, 14 =D1=84=D0=B5=D0=B2=D1=80. 2019 =D0=B3. =D0=B2 18:22, Kenne=
+th D'souza <kdsouza@redhat.com>:
 >
-> Pavel Shilovsky <piastryyy@gmail.com> writes:
-> > Please take a look in case anything is missed.
+> Add vers=3D3.0.2 as a valid option for SMBv3.0.2 and explain behavior
+> of vers=3Ddefault.
 >
-> Last commit is missing signed off tag, otherwise LGTM.
+> Signed-off-by: Kenneth D'souza <kdsouza@redhat.com>
+> ---
+>  mount.cifs.rst | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/mount.cifs.rst b/mount.cifs.rst
+> index a0faf7f..2ad7f59 100644
+> --- a/mount.cifs.rst
+> +++ b/mount.cifs.rst
+> @@ -591,9 +591,13 @@ vers=3Darg
+>      different dialect (2.000) that is not supported.
+>    - 2.1 - The SMBv2.1 protocol that was introduced in Microsoft Windows =
+7 and Windows Server 2008R2.
+>    - 3.0 - The SMBv3.0 protocol that was introduced in Microsoft Windows =
+8 and Windows Server 2012.
+> -  - 3.02 - The SMBv3.0.2 protocol that was introduced in Microsoft Windo=
+ws 8.1 and Windows Server 2012R2.
+> +  - 3.02 or 3.0.2 - The SMBv3.0.2 protocol that was introduced in Micros=
+oft Windows 8.1 and Windows Server 2012R2.
+>    - 3.1.1 or 3.11 - The SMBv3.1.1 protocol that was introduced in Micros=
+oft Windows Server 2016.
+>    - 3 - The SMBv3.0 protocol version and above.
+> +  - default - Tries to negotiate the highest SMB2+ version supported by =
+both the client and server.
+> +
+> +  If no dialect is specified on mount vers=3Ddefault is used.
+> +  To check ``Dialect`` refer to /proc/fs/cifs/DebugData
+>
+>    Note too that while this option governs the protocol version used, not
+>    all features of each version are available.
+> --
+> 2.17.2
+>
 
-Thanks.
+Merged, thanks.
 
 --
 Best regards,
