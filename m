@@ -2,137 +2,130 @@ Return-Path: <SRS0=jMYF=Q2=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2721C43381
-	for <linux-cifs@archiver.kernel.org>; Tue, 19 Feb 2019 19:46:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AE86C10F00
+	for <linux-cifs@archiver.kernel.org>; Tue, 19 Feb 2019 23:03:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AD8142146F
-	for <linux-cifs@archiver.kernel.org>; Tue, 19 Feb 2019 19:46:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XWiywuuH"
+	by mail.kernel.org (Postfix) with ESMTP id D499B21479
+	for <linux-cifs@archiver.kernel.org>; Tue, 19 Feb 2019 23:03:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725963AbfBSTqi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 19 Feb 2019 14:46:38 -0500
-Received: from mail-lf1-f48.google.com ([209.85.167.48]:42728 "EHLO
-        mail-lf1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725807AbfBSTqi (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 19 Feb 2019 14:46:38 -0500
-Received: by mail-lf1-f48.google.com with SMTP id l10so15697240lfh.9
-        for <linux-cifs@vger.kernel.org>; Tue, 19 Feb 2019 11:46:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=NYqtoNHrossGoHk4kxOOjSKsNjniMTXlrtnZlCi79F8=;
-        b=XWiywuuHRjt4FbS4droX56go/gDdGeWQA28D3SSuA9UhoKur4VoA9/nVIF48YcNdQP
-         jrrrT43cUUIV0cg9dmaggqaKMK1QDy+KVABTSLErdzloZwW76NFrf4w2RumMpaTbx8RI
-         fqO2OoOfevJVx3Aggl37hnrpycfAmnTkVJvoTB0jIMGeIQPjYLh4cXzdg0qoQJyhDSrn
-         iMg5eLSeLCFUenwNaFQNmZ/zfJmUF41wqRNgGR9Fui4n+5DFtWeEnno6/AZedoPtzLk5
-         eQnalR4CpF2aKbFv+OrX4Uaaitjtyn4dnHvMIdjUfRrOfsZpTdx6pQYiLMxCvGoBvZYE
-         2iNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=NYqtoNHrossGoHk4kxOOjSKsNjniMTXlrtnZlCi79F8=;
-        b=c3UAL0ZRMKj0Azj/2E5XozNBodgJ2efpgK3GR4Y3bpE7ukJZf+PQ/+27fUBx+Nzwpo
-         Kn40Hku3Jc36ochuemJBko0gswCE/Rc0In66tN5sNOS13c4kEq+Cupm+HyNixLb9WsYe
-         bsNN/dEwBZQDGPqdL3dAotmSGbF9oMQ/IFFA3rRnITDmjs5nYMcovCUwOfsXgfNx+i9v
-         D1tVfgwYZ23hAtp027F3WJ3fR+u2EznTdEZnYGweB4qUzIMeGmjl1Y3VTWc5hIswV7QU
-         iTFbqRV4+WXxRPQSWTFAdHx13o5cR+4f2Zkwnc4079hmLG4UnibWfrma746G8ji1z6aj
-         aQlg==
-X-Gm-Message-State: AHQUAuauGDUbESX1uDzp4WUKUVIPSk/Po9MQVD+WMl4gn9oxHtddUloZ
-        zuf3ATbR/OfPWNGfMnd7Lkb5RQH9k24N8IwWLS9Ij84=
-X-Google-Smtp-Source: AHgI3IZB+/dKJiJOB4tcOcu1vo5CoFt2jiv2V/Q0gP2ubn/Mp3s5x7G9QgWGjVWiTZAO7fsWJRdigBQFFTAkMT86lcU=
-X-Received: by 2002:a19:d83:: with SMTP id 125mr17487231lfn.159.1550605596211;
- Tue, 19 Feb 2019 11:46:36 -0800 (PST)
+        id S1727091AbfBSXDk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 19 Feb 2019 18:03:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56642 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725972AbfBSXDk (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 19 Feb 2019 18:03:40 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 690D1C058CAD;
+        Tue, 19 Feb 2019 23:03:39 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-121-129.rdu2.redhat.com [10.10.121.129])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 29D5419C57;
+        Tue, 19 Feb 2019 23:03:34 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <8c95213ae0981bd7af928902fcb34d6a9dedaa6f.camel@hammerspace.com>
+References: <8c95213ae0981bd7af928902fcb34d6a9dedaa6f.camel@hammerspace.com> <155024683432.21651.14153938339749694146.stgit@warthog.procyon.org.uk> <155024685321.21651.1504201877881622756.stgit@warthog.procyon.org.uk>
+To:     Trond Myklebust <trondmy@hammerspace.com>
+Cc:     dhowells@redhat.com, "sfrench@samba.org" <sfrench@samba.org>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "rgb@redhat.com" <rgb@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>,
+        "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+Subject: Re: [RFC PATCH 02/27] containers: Implement containers as kernel objects
 MIME-Version: 1.0
-References: <5C6B997B.8050203@tlinx.org>
-In-Reply-To: <5C6B997B.8050203@tlinx.org>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Tue, 19 Feb 2019 11:46:24 -0800
-Message-ID: <CAKywueSgMhDzKOx04_C8X3HEhn_0w6cwM43c3=FXdjCsZ3x9UA@mail.gmail.com>
-Subject: Re: regressions & flakiness make for ugly symlink links
-To:     L A Walsh <cifs@tlinx.org>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <19410.1550617413.1@warthog.procyon.org.uk>
+Date:   Tue, 19 Feb 2019 23:03:33 +0000
+Message-ID: <19411.1550617413@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Tue, 19 Feb 2019 23:03:39 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D0=BF=D0=BD, 18 =D1=84=D0=B5=D0=B2=D1=80. 2019 =D0=B3. =D0=B2 22:16, L A W=
-alsh <cifs@tlinx.org>:
->
->
-> In my Windows root directory I have several links.  This is how
-> they look on the Windows machine's "root".  Several months ago I
-> sent an email to this list complimenting you on how they looked.
-> (without user+group)
->
-> > ll |grep -- '->'
-> lrwxrwxrwx   1           17 Jun 13  2016 Documents -> //Bliss/Documents/
-> lrwxrwxrwx   1            6 Jul 13  2009 Documents and Settings -> /Users=
-/
-> lrwxrwxrwx   1           16 Jun  5  2015 FolderChanger -> /m/FolderChange=
-r/
-> lrwxrwxrwx   1            5 May 13  2017 Home -> Users/
-> lrwxrwxrwx   1           20 Nov  6  2014 Prog -> /Program Files (x86)/
-> lrwxrwxrwx   1           13 Apr 21  2013 Prog64 -> Program Files/
-> lrwxrwxrwx   1           12 Aug  9  2015 ProgD -> /ProgramData/
-> lrwxrwxrwx   1            2 Apr 17  2017 Share -> /s/
-> lrwxrwxrwx   1           22 Aug 22 16:08 Symbols -> //Bliss/Share/Symbols=
-//
-> lrwxrwxrwx   1            7 Mar  1  2018 WINNT -> Windows/
-> lrwxrwxrwx   1            3 May 13  2017 lib64 -> lib/
-> lrwxrwxrwx   1            3 Jan 12  2014 temp -> tmp/
->
-> Now, I'm getting flakiresults -- with them not resolving 1 time,
-> then resolving,  then not again...etc.  By flakey I mean
-> output like random can't access messages, followed by question
-> marks in all fields of links.
->
-> # ll|more
-> ls: cannot access 'D': Operation not supported
-> ls: cannot access 'Documents': Operation not supported
-> ls: cannot access 'FolderChanger': Operation not supported
-> ls: cannot access 'Home': Operation not supported
-> ls: cannot access 'lib64': Operation not supported
-> ls: cannot access 'M': Operation not supported
-> ls: cannot access 'P': Operation not supported
-> ls: cannot access 'pagefile.sys': Device or resource busy
-> ls: cannot access 'Prog64': Operation not supported
-> ls: cannot access 'Share': Operation not supported
-> ls: cannot access 'temp': Operation not supported
-> ls: cannot access 'WINNT': Operation not supported
-> d????????? ?       ?            ? D/
-> d????????? ?       ?            ? Documents/
-> d????????? ?       ?            ? FolderChanger/
-> d????????? ?       ?            ? Home/
-> d????????? ?       ?            ? M/
-> d????????? ?       ?            ? P/
-> d????????? ?       ?            ? Prog64/
-> d????????? ?       ?            ? Share/
-> d????????? ?       ?            ? WINNT/
-> d????????? ?       ?            ? lib64/
-> d????????? ?       ?            ? temp/
->
-> Depending on timing, Sometimes I will get most or all of
-> them appearing the same as they would on windows.
->
-> If I can't resolve them more quickly, is there a know
-> or two to increase cache size and item lifetime?
->
-> Thanks
->
+Trond Myklebust <trondmy@hammerspace.com> wrote:
 
-Which kernel version shows symlinks right and which - wrong?
+> Do we really need a new system call to set up containers? That would
+> force changes to all existing orchestration software.
 
---
-Best regards,
-Pavel Shilovsky
+No, it wouldn't.  Nothing in my patches forces existing orchestration software
+to change, unless it wants to use the new facilities - then it would have to
+be changed anyway, right?  I will grant, though, that the extent of the change
+might vary.
+
+> Given that the main thing we want to achieve is to direct messages from
+> the kernel to an appropriate handler, why not focus on adding
+> functionality to do just that?
+
+Because it's *not* just that that is added here.  There are a number of things
+this patchset (and one it depends on) provides:
+
+ (1) The ability to intercept request_key() upcalls that happen inside a
+     container, filtered by operative namespace.
+
+ (2) The ability to provide a per-container keyring that can hold keys that
+     can be used inside the container without any action on behalf of the
+     denizens of the container.
+
+ (3) The ability to grant permissions to a *container* as a subject, allowing
+     it and its denizens to use, but not necessarily read, modify, link or
+     invalidate a key.
+
+ (4) The ability to create superblocks inside a container with a separate
+     mount namespace from outside, such that they can use the container keys,
+     thereby allowing the root of a container to be on an authenticated
+     filesystem.
+
+> Is there any reason why a syscall to allow an appropriately privileged
+> process to add a keyring-specific message queue to its own
+> user_namespace and obtain a file descriptor to that message queue might
+> not work?
+
+Yes.  That forces the use of a new user_namespace for every container in which
+you want to use any of the above features.  The user_namespace is already way
+too big and intrusive a hammer as it is.
+
+> With such an implementation, the fallback mechanism could be to walk
+> back up the hierarchy of user_namespaces until a message queue is
+> found, and to invoke the existing request_key mechanism if not.
+
+That's definitely wrong.  /sbin/request-key should *not* be spawned if the key
+to be instantiated is not in all the init namespaces.
+
+I went with a container object with namespaces for a reason: initially, it was
+so that the upcall could take place inside of the container's namespaces, but
+now it's do that any request that doesn't match the namespaces on the
+container gets rejected at the boundary - so that some daemon up the chain
+doesn't try servicing a request for which it can't access the config data or
+would end up talking out of the wrong NIC.
+
+I can drop the container object part of it for the moment.
+
+I could instead create 1-3 new namespaces:
+
+ (1) A namespace with an upcall-interception point.
+
+ (2) A namespace with a container keyring.
+
+ (3) A namespace with a subject ID for use in key ACLs.
+
+I think I should also consider adding:
+
+ (4) A namespace with keyring names in it.  I'm leaning towards this not being
+     part of user_namespace because these probably should not be visible
+     between containers.
+
+David
