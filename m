@@ -2,105 +2,96 @@ Return-Path: <SRS0=jMYF=Q2=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 865ACC43381
-	for <linux-cifs@archiver.kernel.org>; Tue, 19 Feb 2019 04:41:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75912C43381
+	for <linux-cifs@archiver.kernel.org>; Tue, 19 Feb 2019 06:16:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 506862173C
-	for <linux-cifs@archiver.kernel.org>; Tue, 19 Feb 2019 04:41:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GhlZ7+15"
+	by mail.kernel.org (Postfix) with ESMTP id 44AE7217D7
+	for <linux-cifs@archiver.kernel.org>; Tue, 19 Feb 2019 06:16:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725767AbfBSElA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 18 Feb 2019 23:41:00 -0500
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:35762 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725764AbfBSEk7 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 18 Feb 2019 23:40:59 -0500
-Received: by mail-pl1-f196.google.com with SMTP id p8so9775415plo.2
-        for <linux-cifs@vger.kernel.org>; Mon, 18 Feb 2019 20:40:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=S3OiiSyO8dAkED1G4YVAMS8OKJdtXmabZ1HLflDP1mI=;
-        b=GhlZ7+15HxXj0ah92nxzLNriZKYUI8eRpfFg85CvQhQxI/sziJYP801Mb3QcvUOAG3
-         sd46PLk1dztCQJPBV/ld9s8pk3PgJyyrtF6AQYqFVgCPWU08EMQAvNrjZ4FXEU8tqir8
-         TvoaGsX0MqBRY/eRwgL8DIjUD5vcp1SLtVtrwHhhOW9WTrD1E2a87Bptwt3RnCks4kDW
-         y4U2UxZoLLQwYG5EB5ieaac31UW9Eu4rkV7k1bLcl8/HJGpViV/9xgRU3tWis1P4nXCQ
-         HfPzYKuFTWoihXN3u/N+MfuHTpMjGzC4R4gDmodCX8Puim4lxCnTHbvwesQtZftrKBmZ
-         ICHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=S3OiiSyO8dAkED1G4YVAMS8OKJdtXmabZ1HLflDP1mI=;
-        b=a+j6t8AXpOwX9w3yiXoj0OjxYlQS9t75uoKrvkw22goZOqi+2WE1klqvW4jezItC2f
-         yuUbGWl+LyizdkuDILx/RrLn06dRSQEQflndAUDmLPhHAtYZctYHNdCnvkxeCeVhh/qn
-         jnzL8mkTWrgUYkGizi23Flu5Ly1ijKCiW8b/U9IkYOSRGV100Bas1p2WGY6uPynft6Ad
-         nM2W0kik1N93M6UwRVTX0DIRqcRhQvNF4BJN07RotG3yuejIBaeDsSSFbigtIibzOv3D
-         w5X3+S0DOwYQIf+skhQ/zUrDdmrxScC2IfNOqKZ2PxtrMAOtRMrUxBH4KVkZglISLYxB
-         zwuw==
-X-Gm-Message-State: AHQUAublL9qCNlCDLqRaf750RfPPpTChrvC+BD01gLK5aBB2WXsJDhyi
-        zOpkaGfmU9fqeXKZ36j5ojjz14Ou1TLufIJtHYs=
-X-Google-Smtp-Source: AHgI3IbvZ2HCtQSTuS8vPSktJZwP+Oa7EKtSnBQ3yv6BeNs4QZskeA0xzxcXxAOFf7e/zLkh9RZ5WnZ+yqtlhRLkYqk=
-X-Received: by 2002:a17:902:822:: with SMTP id 31mr27081849plk.290.1550551259156;
- Mon, 18 Feb 2019 20:40:59 -0800 (PST)
+        id S1725763AbfBSGQb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 19 Feb 2019 01:16:31 -0500
+Received: from ishtar.tlinx.org ([173.164.175.65]:53868 "EHLO
+        Ishtar.sc.tlinx.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725730AbfBSGQb (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 19 Feb 2019 01:16:31 -0500
+X-Greylist: delayed 1473 seconds by postgrey-1.27 at vger.kernel.org; Tue, 19 Feb 2019 01:16:31 EST
+Received: from [192.168.3.12] (Athenae [192.168.3.12])
+        by Ishtar.sc.tlinx.org (8.14.7/8.14.4/SuSE Linux 0.8) with ESMTP id x1J5ptcT022313
+        for <linux-cifs@vger.kernel.org>; Mon, 18 Feb 2019 21:51:58 -0800
+Message-ID: <5C6B997B.8050203@tlinx.org>
+Date:   Mon, 18 Feb 2019 21:51:55 -0800
+From:   L A Walsh <cifs@tlinx.org>
+User-Agent: Thunderbird
 MIME-Version: 1.0
-References: <20190219014343.29526-1-kdsouza@redhat.com>
-In-Reply-To: <20190219014343.29526-1-kdsouza@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 18 Feb 2019 22:40:47 -0600
-Message-ID: <CAH2r5musFyuqHofaeEtjd5ecK95x-60ByZ=Zi=fAXVLMXG=Y9Q@mail.gmail.com>
-Subject: Re: [PATCH] getcifsacl: Do not go to parse_sec_desc if getxattr fails.
-To:     "Kenneth D'souza" <kdsouza@redhat.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        Pavel Shilovsky <piastryyy@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Subject: regressions & flakiness make for ugly symlink links
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Reviewed-by: Steve French <stfrench@microsoft.com>
 
-On Mon, Feb 18, 2019 at 7:43 PM Kenneth D'souza <kdsouza@redhat.com> wrote:
->
-> Add more to the error message by printing the filename and error.
->
-> Signed-off-by: Kenneth D'souza <kdsouza@redhat.com>
-> ---
->  getcifsacl.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
->
-> diff --git a/getcifsacl.c b/getcifsacl.c
-> index f08cdea..7f6e673 100644
-> --- a/getcifsacl.c
-> +++ b/getcifsacl.c
-> @@ -399,7 +399,12 @@ cifsacl:
->                         bufsize += BUFSIZE;
->                         goto cifsacl;
->                 } else
-> -                       printf("getxattr error: %d\n", errno);
-> +               {
-> +                       fprintf(stderr, "getxattr failed on %s: %s\n", filename, strerror(errno) );
-> +                       free(attrval);
-> +                       ret = -1;
-> +                       goto out;
-> +               }
->         }
->
->         parse_sec_desc((struct cifs_ntsd *)attrval, attrlen, raw);
-> --
-> 2.20.1
->
+In my Windows root directory I have several links.  This is how
+they look on the Windows machine's "root".  Several months ago I
+sent an email to this list complimenting you on how they looked.
+(without user+group)
+
+> ll |grep -- '->'
+lrwxrwxrwx   1           17 Jun 13  2016 Documents -> //Bliss/Documents/
+lrwxrwxrwx   1            6 Jul 13  2009 Documents and Settings -> /Users/
+lrwxrwxrwx   1           16 Jun  5  2015 FolderChanger -> /m/FolderChanger/
+lrwxrwxrwx   1            5 May 13  2017 Home -> Users/
+lrwxrwxrwx   1           20 Nov  6  2014 Prog -> /Program Files (x86)/
+lrwxrwxrwx   1           13 Apr 21  2013 Prog64 -> Program Files/
+lrwxrwxrwx   1           12 Aug  9  2015 ProgD -> /ProgramData/
+lrwxrwxrwx   1            2 Apr 17  2017 Share -> /s/
+lrwxrwxrwx   1           22 Aug 22 16:08 Symbols -> //Bliss/Share/Symbols//
+lrwxrwxrwx   1            7 Mar  1  2018 WINNT -> Windows/
+lrwxrwxrwx   1            3 May 13  2017 lib64 -> lib/
+lrwxrwxrwx   1            3 Jan 12  2014 temp -> tmp/
+
+Now, I'm getting flakiresults -- with them not resolving 1 time,
+then resolving,  then not again...etc.  By flakey I mean
+output like random can't access messages, followed by question
+marks in all fields of links.
+
+# ll|more
+ls: cannot access 'D': Operation not supported
+ls: cannot access 'Documents': Operation not supported
+ls: cannot access 'FolderChanger': Operation not supported
+ls: cannot access 'Home': Operation not supported
+ls: cannot access 'lib64': Operation not supported
+ls: cannot access 'M': Operation not supported
+ls: cannot access 'P': Operation not supported
+ls: cannot access 'pagefile.sys': Device or resource busy
+ls: cannot access 'Prog64': Operation not supported
+ls: cannot access 'Share': Operation not supported
+ls: cannot access 'temp': Operation not supported
+ls: cannot access 'WINNT': Operation not supported
+d????????? ?       ?            ? D/
+d????????? ?       ?            ? Documents/
+d????????? ?       ?            ? FolderChanger/
+d????????? ?       ?            ? Home/
+d????????? ?       ?            ? M/
+d????????? ?       ?            ? P/
+d????????? ?       ?            ? Prog64/
+d????????? ?       ?            ? Share/
+d????????? ?       ?            ? WINNT/
+d????????? ?       ?            ? lib64/
+d????????? ?       ?            ? temp/
+
+Depending on timing, Sometimes I will get most or all of
+them appearing the same as they would on windows.
+
+If I can't resolve them more quickly, is there a know
+or two to increase cache size and item lifetime?
+
+Thanks
 
 
--- 
-Thanks,
 
-Steve
