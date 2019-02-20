@@ -2,171 +2,123 @@ Return-Path: <SRS0=PjUO=Q3=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77401C43381
-	for <linux-cifs@archiver.kernel.org>; Wed, 20 Feb 2019 06:12:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65C60C43381
+	for <linux-cifs@archiver.kernel.org>; Wed, 20 Feb 2019 06:57:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 50F9C2147A
-	for <linux-cifs@archiver.kernel.org>; Wed, 20 Feb 2019 06:12:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3685E2087B
+	for <linux-cifs@archiver.kernel.org>; Wed, 20 Feb 2019 06:57:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=paul-moore-com.20150623.gappssmtp.com header.i=@paul-moore-com.20150623.gappssmtp.com header.b="OcCZh083"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726682AbfBTGMB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 20 Feb 2019 01:12:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44450 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726808AbfBTGMA (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 20 Feb 2019 01:12:00 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 3430C155AC;
-        Wed, 20 Feb 2019 06:12:00 +0000 (UTC)
-Received: from test1135.test.redhat.com (vpn2-54-96.bne.redhat.com [10.64.54.96])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 89A79600C0;
-        Wed, 20 Feb 2019 06:11:59 +0000 (UTC)
-From:   Ronnie Sahlberg <lsahlber@redhat.com>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Steve French <smfrench@gmail.com>,
-        Pavel Shilovsky <pshilov@microsoft.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>
-Subject: [PATCH 2/2] cifs: simplify how we handle credits in compond_send_recv()
-Date:   Wed, 20 Feb 2019 16:11:45 +1000
-Message-Id: <20190220061145.28241-3-lsahlber@redhat.com>
-In-Reply-To: <20190220061145.28241-1-lsahlber@redhat.com>
-References: <20190220061145.28241-1-lsahlber@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Wed, 20 Feb 2019 06:12:00 +0000 (UTC)
+        id S1726771AbfBTG5s (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 20 Feb 2019 01:57:48 -0500
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:36494 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726437AbfBTG5s (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 20 Feb 2019 01:57:48 -0500
+Received: by mail-lj1-f194.google.com with SMTP id g11-v6so19853674ljk.3
+        for <linux-cifs@vger.kernel.org>; Tue, 19 Feb 2019 22:57:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ncoDYnqxH3gs9Sc4jdqZc699sEVY31p6X34ojqSqzzM=;
+        b=OcCZh083AzJ6sYc48woP23gRRbpaNKLC68TAdlArP77RO3+mrjVrj/iw4ZpWg3rNV3
+         29swcTzY/zTMAOqxs45u579zp81oWJDiOwSJh6tom9D/tAOgnuzVSLlkcuqb8zkvn041
+         kOisgtVcvn0D2ldK2m99xkgmKknYygp1QYdTxOKnNijCZ/APmJ7hGFeM3e3VsCDdMErt
+         wx0sR0iBJ+9HphZXJkooMsrO2GYHiQuoD7D0L5Nb1CAmiVGw+uEgE5SHW+LeT4H60qrm
+         snbkENIP97Ktg8O/dDr3jUbp95t4Oa9ezjlJLisfHr/j4+wT/VqcxY16IMT2kuOtYSUn
+         LRcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ncoDYnqxH3gs9Sc4jdqZc699sEVY31p6X34ojqSqzzM=;
+        b=e4Qe5lZrd/K0B6falE0OS2dML3V8lJbqIgG8twBDCDxeqqrh00Zrt3ISvkYKTFnqiC
+         Zi6+FH5b8fZXM2LlDQqfYkFjsI70OrvGy/wMz3azKuQcgHuIjYvSGldU5ytPlBpntfxB
+         7xJrqMZs3Xx6fEk33fWrRn8Hojz1gArWRf2PwuZieD85Cy5VAdej7R5E2To0oQ2H4b7Y
+         tiEmlANjuSyJsZbhNBzPBNN3R0bcVi0KDgDDFPtsSMIWR/dcDxct3s8dsVycTMIinD3u
+         870FRxzlypc6OeG0qoORbyaLHDBe99TNDc/Waq2m/0fCwKgFdCJTTnqYtp9UWog05rQo
+         1L2Q==
+X-Gm-Message-State: AHQUAuZO4B7vyPiUQHu16uW4tdMPsQjpuqE8bhTjUXViNLHucQO/yMQe
+        dxqHVQW0IJ3Pb5CbbfCMCQMpWmJZCaD6/JQ5uFnq
+X-Google-Smtp-Source: AHgI3IYNFpwogVRQTUBcod7un1tdomwmO6KB9Kx4d3EN4057kTMV12Wev9+tRhU4ylfg5rpiF1lmm8LPwJmAQFU2rTo=
+X-Received: by 2002:a2e:2419:: with SMTP id k25mr8500519ljk.38.1550645865873;
+ Tue, 19 Feb 2019 22:57:45 -0800 (PST)
+MIME-Version: 1.0
+References: <1550432358.2809.21.camel@HansenPartnership.com>
+ <155024683432.21651.14153938339749694146.stgit@warthog.procyon.org.uk>
+ <155024685321.21651.1504201877881622756.stgit@warthog.procyon.org.uk>
+ <19562.1550617574@warthog.procyon.org.uk> <1550629220.11684.3.camel@HansenPartnership.com>
+ <054c1e762d28306abd4db9c42fb1c5f4261332fd.camel@themaw.net> <1550634367.11684.6.camel@HansenPartnership.com>
+In-Reply-To: <1550634367.11684.6.camel@HansenPartnership.com>
+From:   Paul Moore <paul@paul-moore.com>
+Date:   Wed, 20 Feb 2019 01:57:34 -0500
+Message-ID: <CAHC9VhQga+bSVEyKbAtfxDsV9RqK5Hv6h-cbs4ArQ3KedxvgpQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 02/27] containers: Implement containers as kernel objects
+To:     James Bottomley <James.Bottomley@hansenpartnership.com>
+Cc:     Ian Kent <raven@themaw.net>, David Howells <dhowells@redhat.com>,
+        keyrings@vger.kernel.org, trond.myklebust@hammerspace.com,
+        sfrench@samba.org, linux-security-module@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, rgb@redhat.com,
+        linux-kernel@vger.kernel.org,
+        containers@lists.linux-foundation.org, cgroups@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Since we can now wait for multiple requests atimically in
-wait_for_free_request() we can now greatly simplify the handling
-of the credits in this function.
+On Tue, Feb 19, 2019 at 10:46 PM James Bottomley
+<James.Bottomley@hansenpartnership.com> wrote:
+> On Wed, 2019-02-20 at 11:04 +0800, Ian Kent wrote:
+> > On Tue, 2019-02-19 at 18:20 -0800, James Bottomley wrote:
+> > > On Tue, 2019-02-19 at 23:06 +0000, David Howells wrote:
+> > > > James Bottomley <James.Bottomley@HansenPartnership.com> wrote:
+> > > >
+> > > > > I thought we got agreement years ago that containers don't
+> > > > > exist in Linux as a single entity: they're currently a
+> > > > > collection of cgroups and namespaces some of which may and some
+> > > > > of which may not be local to the entity the orchestration
+> > > > > system thinks of as a "container".
+> > > >
+> > > > I wasn't party to that agreement and don't feel particularly
+> > > > bound by it.
+> > >
+> > > That's not at all relevant, is it?  The point is we have widespread
+> > > uses of namespaces and cgroups that span containers today meaning
+> > > that a "container id" becomes a problematic concept.  What we
+> > > finally got to with the audit people was an unmodifiable label
+> > > which the orchestration system can set ... can't you just use that?
+> >
+> > Sorry James, I fail to see how assigning an id to a collection of
+> > objects constitutes a problem or how that could restrict the way a
+> > container is used.
+>
+> Rather than rehash the whole argument again, what's the reason you
+> can't use the audit label?  It seems to do what you want in a way that
+> doesn't cause problems.  If you can just use it there's little point
+> arguing over what is effectively a moot issue.
 
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
----
- fs/cifs/transport.c | 74 ++++++++++-------------------------------------------
- 1 file changed, 13 insertions(+), 61 deletions(-)
+Ignoring for a moment whether or not the audit container ID is
+applicable here, one of the things I've been focused on with the audit
+container ID work is trying to make it difficult for other subsystems
+to use it.  I've taken this stance not because I don't think something
+like a container ID would be useful outside the audit subsystem, but
+rather because I'm afraid of how it might be abused by other
+subsystems and that abuse might threaten the existence of the audit
+container ID.
 
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 8ce5b6e787c6..b8f2643048e3 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -871,7 +871,6 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
- 		{ .value = 0, .instance = 0 }
- 	};
- 	unsigned int instance;
--	unsigned int first_instance = 0;
- 	char *buf;
- 
- 	timeout = flags & CIFS_TIMEOUT_MASK;
-@@ -898,71 +897,28 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
- 			spin_unlock(&ses->server->req_lock);
- 			return -ENOTSUPP;
- 		}
--	} else {
--		/* enough credits to send the whole compounded request */
--		ses->server->credits -= num_rqst;
--		ses->server->in_flight += num_rqst;
--		first_instance = ses->server->reconnect_instance;
- 	}
- 	spin_unlock(&ses->server->req_lock);
- 
--	if (first_instance) {
--		cifs_dbg(FYI, "Acquired %d credits at once\n", num_rqst);
--		for (i = 0; i < num_rqst; i++) {
--			credits[i].value = 1;
--			credits[i].instance = first_instance;
--		}
--		goto setup_rqsts;
--	}
--
- 	/*
--	 * There are not enough credits to send the whole compound request but
--	 * there are requests in flight that may bring credits from the server.
-+	 * Wait for all the requests to become available.
- 	 * This approach still leaves the possibility to be stuck waiting for
- 	 * credits if the server doesn't grant credits to the outstanding
--	 * requests. This should be fixed by returning immediately and letting
--	 * a caller fallback to sequential commands instead of compounding.
--	 * Ensure we obtain 1 credit per request in the compound chain.
-+	 * requests and if the client is completely idle, not generating any
-+	 * other requests.
-+	 * This can be handled by the eventual session reconnect.
- 	 */
--	for (i = 0; i < num_rqst; i++) {
--		rc = wait_for_free_request(ses->server, timeout, 1, optype,
--					   &instance);
-+	rc = wait_for_free_request(ses->server, timeout, num_rqst, optype,
-+				   &instance);
- 
--		if (rc == 0) {
--			credits[i].value = 1;
--			credits[i].instance = instance;
--			/*
--			 * All parts of the compound chain must get credits from
--			 * the same session, otherwise we may end up using more
--			 * credits than the server granted. If there were
--			 * reconnects in between, return -EAGAIN and let callers
--			 * handle it.
--			 */
--			if (i == 0)
--				first_instance = instance;
--			else if (first_instance != instance) {
--				i++;
--				rc = -EAGAIN;
--			}
--		}
-+	if (rc)
-+		return rc;
- 
--		if (rc) {
--			/*
--			 * We haven't sent an SMB packet to the server yet but
--			 * we already obtained credits for i requests in the
--			 * compound chain - need to return those credits back
--			 * for future use. Note that we need to call add_credits
--			 * multiple times to match the way we obtained credits
--			 * in the first place and to account for in flight
--			 * requests correctly.
--			 */
--			for (j = 0; j < i; j++)
--				add_credits(ses->server, &credits[j], optype);
--			return rc;
--		}
-+	for (i = 0; i < num_rqst; i++) {
-+		credits[i].value = 1;
-+		credits[i].instance = instance;
- 	}
- 
--setup_rqsts:
- 	/*
- 	 * Make sure that we sign in the same order that we send on this socket
- 	 * and avoid races inside tcp sendmsg code that could cause corruption
-@@ -973,17 +929,13 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
- 
- 	/*
- 	 * All the parts of the compound chain belong obtained credits from the
--	 * same session (see the appropriate checks above). In the same time
--	 * there might be reconnects after those checks but before we acquired
--	 * the srv_mutex. We can not use credits obtained from the previous
-+	 * same session. We can not use credits obtained from the previous
- 	 * session to send this request. Check if there were reconnects after
- 	 * we obtained credits and return -EAGAIN in such cases to let callers
- 	 * handle it.
- 	 */
--	if (first_instance != ses->server->reconnect_instance) {
-+	if (instance != ses->server->reconnect_instance) {
- 		mutex_unlock(&ses->server->srv_mutex);
--		for (j = 0; j < num_rqst; j++)
--			add_credits(ses->server, &credits[j], optype);
- 		return -EAGAIN;
- 	}
- 
+If there is a willingness to implement a general kernel container ID
+that behaves similarly to how the audit container ID is envisioned,
+I'd much rather do that then implement something which is audit
+specific.
+
 -- 
-2.13.6
-
+paul moore
+www.paul-moore.com
