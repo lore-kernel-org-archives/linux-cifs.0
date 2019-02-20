@@ -2,115 +2,113 @@ Return-Path: <SRS0=PjUO=Q3=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D49DC43381
-	for <linux-cifs@archiver.kernel.org>; Wed, 20 Feb 2019 18:54:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ED62C43381
+	for <linux-cifs@archiver.kernel.org>; Wed, 20 Feb 2019 19:48:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0553F20859
-	for <linux-cifs@archiver.kernel.org>; Wed, 20 Feb 2019 18:54:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s7E0osEA"
+	by mail.kernel.org (Postfix) with ESMTP id 0CFE62086A
+	for <linux-cifs@archiver.kernel.org>; Wed, 20 Feb 2019 19:48:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726152AbfBTSya (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 20 Feb 2019 13:54:30 -0500
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:40872 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726074AbfBTSya (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 20 Feb 2019 13:54:30 -0500
-Received: by mail-pg1-f195.google.com with SMTP id u9so8788022pgo.7;
-        Wed, 20 Feb 2019 10:54:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=69pGSLtiMeij6RrqmuPcnfvevvsbPQnAzvM0pX/lRJQ=;
-        b=s7E0osEAFwsHekLYnw/y3dlP7Il7WkaQAXshiisgS12vLkdvmZleHZ+T2YF+DtdsmJ
-         Kt9Q1+xLCHXKgZoD08EQLnHscRc2Y0LkF3sTB8idSGQrPVr4I1dvV2koHBYgFO6VJ88Q
-         Ooo87w1aXfcQ53CYCvVCN83wDa9aYk35s3+ZKIf1ZOqnteFcvI010F8s2WDDAJCNFiFS
-         Ug0WMtR8+QH0GE5y/2OfOh1UCuBYszTnOwyWi+Eif21ROJfD+CJ3C8o1lBxwWd1ORKMk
-         iEzdZ8P0QMATmlzg9/fGhXeJBgjEAzwgYmR+/7QeUumexwkX1LrM/idRUyYSeAgqLQ7z
-         EFLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=69pGSLtiMeij6RrqmuPcnfvevvsbPQnAzvM0pX/lRJQ=;
-        b=PY3lAuQI+CDC8FyxT2ymI0E9Ijh/CSvIxfkGgSkthaJ8M33Ei6f9uLT1XU8kXEL+b6
-         4HGrOW3RVTDtvDEaJ+BanuNJA1W8GiVBr93cu3c8/y22vTlWgzrFGvZeCAmmOWggNFSa
-         zXW6geUSUZclmmdkv+jKVJB/WtLJ6tAo9OnTJAf6btQkMU2usW0prVHVHCcDGA2R3QfE
-         QViP/5HnsTphD/PClA7xGRgC547AVzKB9qwWqbJhhPD8bVmgmixSgxrLdGyCwEqw0Zrs
-         oldtyxm0p+eFMTsJUnv8JHoXrmoMh8u6UNIZ2qDh4+AkqhYnDoBd9sJ4+SvO9SM4pUu0
-         J+uA==
-X-Gm-Message-State: AHQUAuZLHJPmabKwv90RCLUQ7FUgdAzyVXfUlFXHeQZweWJTp+3OQaWe
-        VK/EwPZA6i+kXOxmsPQkRDtzbfin47aqeVE5xiU=
-X-Google-Smtp-Source: AHgI3IYijhMPcSrLGWJB49zHSbNC3Rl83F7L9YOfWRVl7jTC04ZbxDqJVh+kb4Oz+GXpDTyvopcjLr3AH0gWVHuOFcE=
-X-Received: by 2002:a63:8743:: with SMTP id i64mr30503042pge.69.1550688868538;
- Wed, 20 Feb 2019 10:54:28 -0800 (PST)
+        id S1726017AbfBTTsP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 20 Feb 2019 14:48:15 -0500
+Received: from ishtar.tlinx.org ([173.164.175.65]:38570 "EHLO
+        Ishtar.sc.tlinx.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725798AbfBTTsP (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 20 Feb 2019 14:48:15 -0500
+Received: from [192.168.3.12] (Athenae [192.168.3.12])
+        by Ishtar.sc.tlinx.org (8.14.7/8.14.4/SuSE Linux 0.8) with ESMTP id x1KJmBGW041192;
+        Wed, 20 Feb 2019 11:48:13 -0800
+Message-ID: <5C6DAEFC.2060909@tlinx.org>
+Date:   Wed, 20 Feb 2019 11:48:12 -0800
+From:   L A Walsh <cifs@tlinx.org>
+User-Agent: Thunderbird
 MIME-Version: 1.0
-References: <155024683432.21651.14153938339749694146.stgit@warthog.procyon.org.uk>
- <8736ojybw7.fsf@xmission.com> <22055.1550619729@warthog.procyon.org.uk>
-In-Reply-To: <22055.1550619729@warthog.procyon.org.uk>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 20 Feb 2019 12:54:17 -0600
-Message-ID: <CAH2r5muChuoHAM-AhBhTRkp=Lz0onyPa63MpV0qgm1TQKF=R5Q@mail.gmail.com>
-Subject: Re: [RFC PATCH 00/27] Containers and using authenticated filesystems
-To:     David Howells <dhowells@redhat.com>
-Cc:     "Eric W. Biederman" <ebiederm@xmission.com>,
-        keyrings@vger.kernel.org, trond.myklebust@hammerspace.com,
-        Steve French <sfrench@samba.org>,
-        linux-security-module@vger.kernel.org, linux-nfs@vger.kernel.org,
-        CIFS <linux-cifs@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>, rgb@redhat.com,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Containers <containers@lists.linux-foundation.org>,
-        Linux API <linux-api@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     Pavel Shilovsky <piastryyy@gmail.com>
+CC:     linux-cifs <linux-cifs@vger.kernel.org>
+Subject: Re: regressions & flakiness make for ugly symlink links
+References: <5C6B997B.8050203@tlinx.org> <CAKywueSgMhDzKOx04_C8X3HEhn_0w6cwM43c3=FXdjCsZ3x9UA@mail.gmail.com>
+In-Reply-To: <CAKywueSgMhDzKOx04_C8X3HEhn_0w6cwM43c3=FXdjCsZ3x9UA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Feb 19, 2019 at 5:42 PM David Howells <dhowells@redhat.com> wrote:
+On 2/19/2019 11:46 AM, Pavel Shilovsky wrote:
+> пн, 18 февр. 2019 г. в 22:16, L A Walsh <cifs@tlinx.org>:
+>   
+>> In my Windows root directory I have several links...
+>> lrwxrwxrwx   1           17 Jun 13  2016 Documents -> //Bliss/Documents/    
+>> lrwxrwxrwx   1           20 Nov  6  2014 Prog -> /Program Files (x86)/
+>> lrwxrwxrwx   1           13 Apr 21  2013 Prog64 -> Program Files/
+>> lrwxrwxrwx   1           12 Aug  9  2015 ProgD -> /ProgramData/
+>>     
+...
+>> ---
+>>
+>> Now, I'm getting flaki results -- with them not resolving 1 time,
+>> then resolving,  then not again...etc
+>>
+>> # ll|more
+>> ls: cannot access 'Documents': Operation not supported
+>> ...
+>> ls: cannot access 'Prog64': Operation not supported
+>> ...
+---
+>> d????????? ?       ?            ? Documents/
+>> ...
+>> d????????? ?       ?            ? Prog64/
+>> ...
+>> Depending on timing, Sometimes I will get most or all of
+>> them appearing the same as they would on windows.
+>>
+>> If I can't resolve them more quickly, is there a know
+>> or two to increase cache size and item lifetime?
+>>     
 >
-> Eric W. Biederman <ebiederm@xmission.com> wrote:
->
-> > So you missed the main mailing lists for discussion of this kind of
-> > thing
->
-> Yeah, sorry about that.  I was primarily aiming it at Trond and Steve as I'd
-> like to consider how to go about interpolating request_key() into NFS and CIFS
-> so that they can make use of the key-related facilities that this makes
-> available with AFS.
+> Which kernel version shows symlinks right and which - wrong?
+>   
+I only recently switched on getting the access info 'live',
+vs. mounting it all as 1 user.  Since it works and doesn't
+work based on what's in the cache, the same kernel can provide
+both symptoms.
 
-I am interested in this discussion because I have gotten various questions
-about using Containers better on SMB3 mounts, and the question about
-doing request_key better comes up **a lot** on SMB3 mounts (not just
-for kerberos, Active Directory), and usability could be improved of some
-of the cifs-utils that cifs.ko depends on.
+I don't remember the exact date I switched, maybe in the 4.19.xx
+series, but at the moment, am running 4.20.3.
 
-Note that various virtualization/container identify features were added to the
-protocol a few years ago (which we don't yet implement in Linux) but which
-probably be **very** useful to followup on how these could be exposed
-to help containers on network mounts in Linux.    See in particular this
-new protocol feature (implemented by various servers including Windows
-but not by Linux client yet) described in the protocol spec (MS-SMB2 section
-2.2.9.2.1) - the "SMB2_REMOTED_IDENTITY_TREE_CONNECT context"
-which can be sent at mount time:
-https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-smb2/ee7ff411-93e0-484f-9f73-31916fee4cb8
+Sometimes after a client reboot, I'll see question marks for all
+files or about 60 entries in the root dir.  Vs. only the symlinks
+where it has to do 2 lookups -- the item and the one pointed to,
+and see about 10-15 entries.
 
-This may be of interest to Samba server developers as well
+I figured that it's a timing prob related to whether or not the entries
+are in some cache, so I need to look more closely at that
+UID<->RID resolution path, but meanwhile, I thought I'd increase
+the cache size and maybe look at the timeout value and if I could
+tolerate a longer timeout.
 
-> > and the maintainer.
->
-> That would be me.  I maintain keyrings.
+So -- don't think it is the kernel version, but the fact that it's
+going a long path to do the lookups -- especially the links --
+and that optimizing that path would likely bring the most benefits.
+
+There used to be documentation about doing the resolution through
+a separate program, but that documenation disappeared as someone
+wrote a .dll to do the resolving, which got plopped in there after
+an accidental system update attempt (long story -- power outage,
+ups needs new batteries, and more).
+
+Anyway, UID/GID<=>RID map is relatively small (<10-15K) with
+long-lived entries.  The server has >100GB mem and the
+client, 92GB.
+
+That's why I wanted to increase the UID<->RID cache size &
+raise the timeout to a long value.  Maybe ideally with a way
+to manually invalidate the cache and/or 1 entry for rare updates.
+
+Thanks!
 
 
--- 
-Thanks,
 
-Steve
