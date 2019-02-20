@@ -2,248 +2,250 @@ Return-Path: <SRS0=PjUO=Q3=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A74F9C43381
-	for <linux-cifs@archiver.kernel.org>; Wed, 20 Feb 2019 23:36:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8855AC43381
+	for <linux-cifs@archiver.kernel.org>; Wed, 20 Feb 2019 23:41:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6A40520855
-	for <linux-cifs@archiver.kernel.org>; Wed, 20 Feb 2019 23:36:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4486A20855
+	for <linux-cifs@archiver.kernel.org>; Wed, 20 Feb 2019 23:41:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ts0uGlKI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KW1m7h3f"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726304AbfBTXgG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 20 Feb 2019 18:36:06 -0500
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:38149 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726126AbfBTXgF (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 20 Feb 2019 18:36:05 -0500
-Received: by mail-pl1-f196.google.com with SMTP id e5so13077625plb.5
-        for <linux-cifs@vger.kernel.org>; Wed, 20 Feb 2019 15:36:05 -0800 (PST)
+        id S1725989AbfBTXl0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 20 Feb 2019 18:41:26 -0500
+Received: from mail-lj1-f174.google.com ([209.85.208.174]:43236 "EHLO
+        mail-lj1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725804AbfBTXlZ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 20 Feb 2019 18:41:25 -0500
+Received: by mail-lj1-f174.google.com with SMTP id z20so21333453ljj.10
+        for <linux-cifs@vger.kernel.org>; Wed, 20 Feb 2019 15:41:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id;
-        bh=gl6wLsK421P2iEH+tnmE/IxRCFPkhT5JDzl0zhLJGi8=;
-        b=Ts0uGlKIK6G4Grd/CnaeqHtFX72mKYPfykUKRhqDmDduJKaj3KW1N/Hs1cH5o0zv9u
-         fVx8oVCAre35QSFHi/AsQeWtNPtIzvr1z7xVnx88nosBiIXZRBuhZnbVT7stixdAIHj5
-         3V77tQeSg8EyD5CZ830+Ukwj6RaF2G1HSCJ4GB4KL+fe5pXDA1gLO5BwgdCkdb+HIJXZ
-         KdC79ifeI4ve6qKbpcSe+nw9nfS4ulw15/dAwedyG/XOVNFMbHSVePOuG4Hn8SfwLd/y
-         Dk9GBdpRydmM+ejeSDh6F/qtW0CEm/EwXeOmvyXNRZBvFBkJl4x6OKL+vzaijUNURcjO
-         1L+A==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=3wLLJXWA884uheSwmCeizg93uci4oR9Rj+vHKHEkMXw=;
+        b=KW1m7h3fDFOjar/wmKl+ZzCQv9KoTWXzhYrDFYunjak6/6X6ZdRYi24GjcZ831siNA
+         ZPCvuQDy2Hz/y1mYzdyoPGHl7N/6YaRaRGe9xiNwYRQt+54ZW4HUNreBEiCzqFV9eNHN
+         uMa/LkitegULt6TaEdrE5DS+zm4a1G8rZ/jR8GZugJ6FvdjUm/oLmIYXQF9sI5eIQ+oH
+         TNp+0UO5UtLdWB/tLhpsSg1UFxOsxclmtCxpunIlZwiyviuVIjLEahT+IQE59pVf7y4Q
+         bamO8LSJgUeEw859tkv6mRS+ykVEZvLbAd/kEqccm6IMASu+njOjH1XqBfGMBixbd3QJ
+         70HQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id;
-        bh=gl6wLsK421P2iEH+tnmE/IxRCFPkhT5JDzl0zhLJGi8=;
-        b=MmM2M9de39xOSUNG8xK07qR3XcZ0t14p5vadafoUv0w1dipDO1YqIsuGSOU24lxeMO
-         c46GaEcb1yyjssh4hOcwCMGH1zMawRKLT12jO76IrUoqqaC8tQGwLm68KN/ROkJNmaxr
-         FozTXz7YzeSANrbQcqjYhOOc//UCXbR8LRwaDouIuyKHUTgTPYuROhmNt/EMD7qDcCL4
-         9z5BKQb7I0l+OdKlHTQ2dMDP6Y0HS/cyO+/cxI8ToTWwkPUx50PPlAeewSk9wAan4J6V
-         wNktIALQBzhOILYqhp+wfJ1XWRRDFL2sQlbJqNiB8KhU88d8H/hOxey+i3mSFMgRhEXr
-         HQ9A==
-X-Gm-Message-State: AHQUAuajCNUdHpL8KWHvEt2W7pHP8m4sOZlb+eHXqrk/cYGzqnc+RPh6
-        CerLPSsQ+DP8svd4/urBe6TnmkQ=
-X-Google-Smtp-Source: AHgI3IaMqkfj6rEzgdp9V8eJcZp0nryiYABi9/EYa09UVwpGwJHT7JogoGBgbklQZ/sRjpZtB7IYcw==
-X-Received: by 2002:a17:902:1105:: with SMTP id d5mr38125933pla.47.1550705764586;
-        Wed, 20 Feb 2019 15:36:04 -0800 (PST)
-Received: from ubuntu-vm.corp.microsoft.com ([2001:4898:80e8:0:a18e:4e9f:6b7c:507d])
-        by smtp.gmail.com with ESMTPSA id f16sm31941550pgg.20.2019.02.20.15.36.03
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Wed, 20 Feb 2019 15:36:03 -0800 (PST)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=3wLLJXWA884uheSwmCeizg93uci4oR9Rj+vHKHEkMXw=;
+        b=B2H+262S8qbUhQHvy8nIhBqdlvs72dFFkfwNwGxhqCevvOSJmQmEO28ouYlEQgWIGp
+         WUzMJMYggoUDlizXuWSsEGa4x/EjC/2I7luygsly43Oa3y8skz4tx8p0gH5phpeyZ/IA
+         p8412Y16uQiaErK6jXZFkuYjHY+A7zKB3letOAjqPYjqMGZOKi36GDa9wgOnwQ3A4BYt
+         tVKFrs6tzjniXsEmuZ4JbtqvJ2ySK1dUnhsJQ/cepY7tw9vkbf7h7ygEEGeIbeZQLPt0
+         H5aJFRyFejQsAkQ0DV9j5dt7FZXGxYtw+czNUAyI91YF/Ngsjpd0qxgpFXYS5a28cwzC
+         m/0w==
+X-Gm-Message-State: AHQUAuZcQKGP6DxOUub0oQJTRputu/Bb3vZZeEqHXpOHqFk6Qo/OGDCw
+        r+ZiiGmQacvBwJrhlV4fFcZXzB4ZFwNpibHYuw==
+X-Google-Smtp-Source: AHgI3IZEwp73V0fo0HTwljSJalBaF2XiQ06RaKqeHGFwtiZAybWIHbMHOWztOLFcZ9QiBxx8Wwvp02PQBU4opCL/mLY=
+X-Received: by 2002:a2e:251:: with SMTP id 78mr16325680ljc.90.1550706082826;
+ Wed, 20 Feb 2019 15:41:22 -0800 (PST)
+MIME-Version: 1.0
+References: <CAH2r5msBMW=pvWiovXeTnVXogwyANArU9zBx4c1S1quGqcz9kg@mail.gmail.com>
+ <CAH2r5mvi5k3=TgX_aGrjVyMjcLr9QOH+EPquXjwYLEHwZFP3YQ@mail.gmail.com>
+ <CAH2r5msHUwbDmftJMHNRrqYMtuf9xdC7qJh+PksgavPvjqVQVg@mail.gmail.com>
+ <CAH2r5mv10VEUntZcYW91eSycdNBobrJYF0pMG4pMPqJm=6UAqg@mail.gmail.com>
+ <CAH2r5muzb8TFBqp-hk=9421pr20nkcafBmbeugCmz1fSJgaDxg@mail.gmail.com>
+ <CAH2r5mt_UaGCpx__CLyJBYZNtZTt=zASixrJiiJ7xe-VYu4UCw@mail.gmail.com> <CAN05THRDW-kQrsBfeGN9DN4Mg2T=Kz3JuCMZEZPVftsdqR9m=Q@mail.gmail.com>
+In-Reply-To: <CAN05THRDW-kQrsBfeGN9DN4Mg2T=Kz3JuCMZEZPVftsdqR9m=Q@mail.gmail.com>
 From:   Pavel Shilovsky <piastryyy@gmail.com>
-X-Google-Original-From: Pavel Shilovsky <pshilov@microsoft.com>
-To:     linux-cifs@vger.kernel.org, smfrench@gmail.com
-Subject: [PATCH] CIFS: Reset current mid to next value in sequence on send failures
-Date:   Wed, 20 Feb 2019 15:35:53 -0800
-Message-Id: <1550705753-15443-1-git-send-email-pshilov@microsoft.com>
-X-Mailer: git-send-email 2.7.4
+Date:   Wed, 20 Feb 2019 15:41:11 -0800
+Message-ID: <CAKywueT4N=LnjAHyHRV-+hehF8x2U4+TguGO2dPojX4t=SqtBA@mail.gmail.com>
+Subject: Re: xfstests and current cifs for-next patch set
+To:     ronnie sahlberg <ronniesahlberg@gmail.com>
+Cc:     Steve French <smfrench@gmail.com>,
+        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-When we hit failures during constructing MIDs or sending PDUs
-through the network, we end up not using the message IDs assigned
-to the packet. The next SMB packet will skip those message IDs and
-continue with the next one. This behavior may lead to a server not
-granting us credits until we use the skipped IDs. Fix this by
-reverting the current ID to the original value if any errors occur
-before we push the packet through the network stack.
+Last time it worked with patches on top of the older tree (~rc4).
+These tests keep failing since then. We should probably apply patches
+on top of rc4 and restart.
 
-This patch fixes the generic/310 test from the xfs-tests.
+--
+Best regards,
+Pavel Shilovsky
 
-Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
----
- fs/cifs/cifsglob.h      | 15 +++++++++++++++
- fs/cifs/smb2ops.c       | 12 ++++++++++++
- fs/cifs/smb2transport.c | 13 +++++++++++--
- fs/cifs/transport.c     |  6 +++++-
- 4 files changed, 43 insertions(+), 3 deletions(-)
-
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 5bf463c..10be31e 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -238,6 +238,8 @@ struct smb_version_operations {
- 	int * (*get_credits_field)(struct TCP_Server_Info *, const int);
- 	unsigned int (*get_credits)(struct mid_q_entry *);
- 	__u64 (*get_next_mid)(struct TCP_Server_Info *);
-+	void (*revert_current_mid)(struct TCP_Server_Info *server,
-+				   const unsigned int val);
- 	/* data offset from read response message */
- 	unsigned int (*read_data_offset)(char *);
- 	/*
-@@ -789,6 +791,19 @@ get_next_mid(struct TCP_Server_Info *server)
- 	return cpu_to_le16(mid);
- }
- 
-+static inline void
-+revert_current_mid(struct TCP_Server_Info *server, const unsigned int val)
-+{
-+	if (server->ops->revert_current_mid)
-+		server->ops->revert_current_mid(server, val);
-+}
-+
-+static inline void
-+dec_current_mid(struct TCP_Server_Info *server)
-+{
-+	return revert_current_mid(server, 1);
-+}
-+
- static inline __u16
- get_mid(const struct smb_hdr *smb)
- {
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 080929a..1243407 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -265,6 +265,14 @@ smb2_get_next_mid(struct TCP_Server_Info *server)
- 	return mid;
- }
- 
-+static void
-+smb2_revert_current_mid(struct TCP_Server_Info *server, const unsigned int val)
-+{
-+	spin_lock(&GlobalMid_Lock);
-+	server->CurrentMid -= val;
-+	spin_unlock(&GlobalMid_Lock);
-+}
-+
- static struct mid_q_entry *
- smb2_find_mid(struct TCP_Server_Info *server, char *buf)
- {
-@@ -3606,6 +3614,7 @@ struct smb_version_operations smb20_operations = {
- 	.get_credits = smb2_get_credits,
- 	.wait_mtu_credits = cifs_wait_mtu_credits,
- 	.get_next_mid = smb2_get_next_mid,
-+	.revert_current_mid = smb2_revert_current_mid,
- 	.read_data_offset = smb2_read_data_offset,
- 	.read_data_length = smb2_read_data_length,
- 	.map_error = map_smb2_to_linux_error,
-@@ -3702,6 +3711,7 @@ struct smb_version_operations smb21_operations = {
- 	.wait_mtu_credits = smb2_wait_mtu_credits,
- 	.adjust_credits = smb2_adjust_credits,
- 	.get_next_mid = smb2_get_next_mid,
-+	.revert_current_mid = smb2_revert_current_mid,
- 	.read_data_offset = smb2_read_data_offset,
- 	.read_data_length = smb2_read_data_length,
- 	.map_error = map_smb2_to_linux_error,
-@@ -3799,6 +3809,7 @@ struct smb_version_operations smb30_operations = {
- 	.wait_mtu_credits = smb2_wait_mtu_credits,
- 	.adjust_credits = smb2_adjust_credits,
- 	.get_next_mid = smb2_get_next_mid,
-+	.revert_current_mid = smb2_revert_current_mid,
- 	.read_data_offset = smb2_read_data_offset,
- 	.read_data_length = smb2_read_data_length,
- 	.map_error = map_smb2_to_linux_error,
-@@ -3905,6 +3916,7 @@ struct smb_version_operations smb311_operations = {
- 	.wait_mtu_credits = smb2_wait_mtu_credits,
- 	.adjust_credits = smb2_adjust_credits,
- 	.get_next_mid = smb2_get_next_mid,
-+	.revert_current_mid = smb2_revert_current_mid,
- 	.read_data_offset = smb2_read_data_offset,
- 	.read_data_length = smb2_read_data_length,
- 	.map_error = map_smb2_to_linux_error,
-diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-index 7b351c6..36baf1b 100644
---- a/fs/cifs/smb2transport.c
-+++ b/fs/cifs/smb2transport.c
-@@ -674,13 +674,18 @@ smb2_setup_request(struct cifs_ses *ses, struct smb_rqst *rqst)
- 	smb2_seq_num_into_buf(ses->server, shdr);
- 
- 	rc = smb2_get_mid_entry(ses, shdr, &mid);
--	if (rc)
-+	if (rc) {
-+		dec_current_mid(ses->server);
- 		return ERR_PTR(rc);
-+	}
-+
- 	rc = smb2_sign_rqst(rqst, ses->server);
- 	if (rc) {
-+		dec_current_mid(ses->server);
- 		cifs_delete_mid(mid);
- 		return ERR_PTR(rc);
- 	}
-+
- 	return mid;
- }
- 
-@@ -690,16 +695,20 @@ smb2_setup_async_request(struct TCP_Server_Info *server, struct smb_rqst *rqst)
- 	int rc;
- 	struct smb2_sync_hdr *shdr =
- 			(struct smb2_sync_hdr *)rqst->rq_iov[0].iov_base;
-+	unsigned int num = le16_to_cpu(shdr->CreditCharge);
- 	struct mid_q_entry *mid;
- 
- 	smb2_seq_num_into_buf(server, shdr);
- 
- 	mid = smb2_mid_entry_alloc(shdr, server);
--	if (mid == NULL)
-+	if (mid == NULL) {
-+		revert_current_mid(server, num);
- 		return ERR_PTR(-ENOMEM);
-+	}
- 
- 	rc = smb2_sign_rqst(rqst, server);
- 	if (rc) {
-+		revert_current_mid(server, num);
- 		DeleteMidQEntry(mid);
- 		return ERR_PTR(rc);
- 	}
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index d4f1224f..849a45d 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -695,6 +695,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
- 	cifs_in_send_dec(server);
- 
- 	if (rc < 0) {
-+		revert_current_mid(server, credits.value);
- 		server->sequence_number -= 2;
- 		cifs_delete_mid(mid);
- 	}
-@@ -988,6 +989,7 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
- 	for (i = 0; i < num_rqst; i++) {
- 		midQ[i] = ses->server->ops->setup_request(ses, &rqst[i]);
- 		if (IS_ERR(midQ[i])) {
-+			revert_current_mid(ses->server, i);
- 			for (j = 0; j < i; j++)
- 				cifs_delete_mid(midQ[j]);
- 			mutex_unlock(&ses->server->srv_mutex);
-@@ -1017,8 +1019,10 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
- 	for (i = 0; i < num_rqst; i++)
- 		cifs_save_when_sent(midQ[i]);
- 
--	if (rc < 0)
-+	if (rc < 0) {
-+		revert_current_mid(ses->server, num_rqst);
- 		ses->server->sequence_number -= 2;
-+	}
- 
- 	mutex_unlock(&ses->server->srv_mutex);
- 
--- 
-2.7.4
-
+=D1=81=D1=80, 20 =D1=84=D0=B5=D0=B2=D1=80. 2019 =D0=B3. =D0=B2 14:47, ronni=
+e sahlberg <ronniesahlberg@gmail.com>:
+>
+> generic/013 and generic/014 failed with timeout.  These tests used to
+> take several minutes.
+>
+> Testing locally,    generic/013 is successful but it takes almost
+> three times longer than it used to just a week ago.
+>
+> On Thu, Feb 21, 2019 at 7:18 AM Steve French <smfrench@gmail.com> wrote:
+> >
+> > Looks like Pavel's latest fix (unrelated to credits it turns out, the
+> > problem in this case was skipping a mid) does fix xfstest 310.   Azure
+> > test bucket passes, no reconnects that I spotted:
+> >
+> > http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/4=
+/builds/94
+> >
+> > Running cifs-testing buildbot bucket now.
+> >
+> > http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2=
+/builds/134
+> >
+> > On Sun, Feb 17, 2019 at 1:30 PM Steve French <smfrench@gmail.com> wrote=
+:
+> > >
+> > > Retrying the same test run it worked.   Rerunning the same set of
+> > > patches but this time with larger (cifs-testing) collection of tests
+> > > on the buildbot
+> > >
+> > > On Sat, Feb 16, 2019 at 10:38 PM Steve French <smfrench@gmail.com> wr=
+ote:
+> > > >
+> > > > The test (310 and subsequent) seemed to start failing with this in =
+dmesg:
+> > > >
+> > > > [root@fedora29 ~]# dmesg
+> > > > [ 2969.016552] CIFS VFS: Cancelling wait for mid 29640 cmd: 14
+> > > > [ 2979.449426] CIFS VFS: disabling echoes and oplocks
+> > > > [ 2999.109655] CIFS VFS: Cancelling wait for mid 1494 cmd: 6
+> > > > [ 3225.207488] CIFS VFS: Server
+> > > > linuxsmb3testshares.file.core.windows.net has not responded in 120
+> > > > seconds. Reconnecting...
+> > > >
+> > > > On Sat, Feb 16, 2019 at 8:30 PM Steve French <smfrench@gmail.com> w=
+rote:
+> > > > >
+> > > > > So (unless there is a random factor involved) - I narrowed it dow=
+n to this patch
+> > > > >
+> > > > > Author: Pavel Shilovsky <pshilov@microsoft.com>
+> > > > > Date:   Wed Jan 16 11:12:41 2019 -0800
+> > > > >
+> > > > >     CIFS: Respect reconnect in MTU credits calculations
+> > > > >
+> > > > >     Every time after a session reconnect we don't need to account=
+ for
+> > > > >     credits obtained in previous sessions. Introduce new struct c=
+ifs_credits
+> > > > >     which contains both credits value and reconnect instance of t=
+he
+> > > > >     time those credits were taken. Modify a routine that add cred=
+its
+> > > > >     back to handle the reconnect instance by assuming zero credit=
+s
+> > > > >     if the reconnect happened after the credits were obtained and
+> > > > >     before we decided to add them back due to some errors during =
+sending.
+> > > > >
+> > > > >     This patch fixes the MTU credits cases. The subsequent patch
+> > > > >     will handle non-MTU ones.
+> > > > >
+> > > > >     Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
+> > > > >     Signed-off-by: Steve French <stfrench@microsoft.com>
+> > > > >
+> > > > >
+> > > > > ---------- Forwarded message ---------
+> > > > > From: Steve French <smfrench@gmail.com>
+> > > > > Date: Sat, Feb 16, 2019 at 6:46 PM
+> > > > > Subject: Re: xfstests and current cifs for-next patch set
+> > > > > To: CIFS <linux-cifs@vger.kernel.org>
+> > > > >
+> > > > >
+> > > > > Narrowed the xfstest 310 possible regression in current for-next =
+down
+> > > > > to three patches, rerunning with this one of the three added (see
+> > > > > http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/buil=
+ders/4/builds/85)
+> > > > >
+> > > > > Author: Pavel Shilovsky <pshilov@microsoft.com>
+> > > > > Date:   Wed Jan 16 11:12:41 2019 -0800
+> > > > >
+> > > > >     CIFS: Respect reconnect in MTU credits calculations
+> > > > >
+> > > > > On Sat, Feb 16, 2019 at 1:40 PM Steve French <smfrench@gmail.com>=
+ wrote:
+> > > > > >
+> > > > > > With 5.0-rc5 and current for-next (29 paches) two tests 310 (re=
+ad and
+> > > > > > readdir simultaneously) and 422 (delayed allocation stat, numbe=
+r of
+> > > > > > blocks) fail I see this in the azure test bucket in the buildbo=
+t).
+> > > > > > see this run: http://smb3-test-rhel-75.southcentralus.cloudapp.=
+azure.com/#/builders/4/builds/80
+> > > > > >
+> > > > > > These don't fail when I select only the first 8 cifs fixes in f=
+or-next
+> > > > > > ontop of 5.0-rc5.  See
+> > > > > > http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/bu=
+ilders/4/builds/82
+> > > > > >  so am trying to narrow it down.    This run (in progress)
+> > > > > > http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/bu=
+ilders/4/builds/83
+> > > > > > has the first 19 (of the 29) cifs patches (ontop of 5.0-rc5 mai=
+nline
+> > > > > > as with the runs above) so we can bisect which commit causes th=
+e
+> > > > > > problem with tests 310 and 422.
+> > > > > >
+> > > > > > This seems unrelated to the problem I see in slightly more curr=
+ent
+> > > > > > mainline (that we can see with no cifs changes) in xfstest 422 =
+that
+> > > > > > was introduced with 5.0-rc6.
+> > > > > >
+> > > > > > Let me know if others (or other scenario problems) see the test=
+s
+> > > > > > 310/422 failure.
+> > > > > >
+> > > > > > --
+> > > > > > Thanks,
+> > > > > >
+> > > > > > Steve
+> > > > >
+> > > > >
+> > > > >
+> > > > > --
+> > > > > Thanks,
+> > > > >
+> > > > > Steve
+> > > > >
+> > > > >
+> > > > > --
+> > > > > Thanks,
+> > > > >
+> > > > > Steve
+> > > >
+> > > >
+> > > >
+> > > > --
+> > > > Thanks,
+> > > >
+> > > > Steve
+> > >
+> > >
+> > >
+> > > --
+> > > Thanks,
+> > >
+> > > Steve
+> >
+> >
+> >
+> > --
+> > Thanks,
+> >
+> > Steve
