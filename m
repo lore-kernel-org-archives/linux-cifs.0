@@ -2,192 +2,230 @@ Return-Path: <SRS0=RVJ6=Q4=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B2A5C43381
-	for <linux-cifs@archiver.kernel.org>; Thu, 21 Feb 2019 17:07:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86C8BC43381
+	for <linux-cifs@archiver.kernel.org>; Thu, 21 Feb 2019 17:59:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5F5812077B
-	for <linux-cifs@archiver.kernel.org>; Thu, 21 Feb 2019 17:07:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 43DAE20836
+	for <linux-cifs@archiver.kernel.org>; Thu, 21 Feb 2019 17:59:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LbJnIn1j"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="GF4IFejA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726075AbfBURHD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 21 Feb 2019 12:07:03 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:39392 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725823AbfBURHC (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 21 Feb 2019 12:07:02 -0500
-Received: by mail-pl1-f193.google.com with SMTP id 101so14469529pld.6
-        for <linux-cifs@vger.kernel.org>; Thu, 21 Feb 2019 09:07:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=XsZPhxdBdlYV34oAYODhqA30vWo4o5xEmRE9ImoE88Y=;
-        b=LbJnIn1jBXkiUflcu49Ctoz2qMmpY79T7lAs3yOJ+Uj8LPwANDqTxpnpKO0SLvbT0t
-         JcN6d0iB/O3P8kQTefVDp+Uq+yRsyY2xpgiLB9TCJBpszOiBToNvqaR9/dLSx9Ab7n8k
-         hrYaoXXYk3aDHZwTfnLvlMFgGZclbPf/Xqs7M9U2t/oCXp+x53VpUe3qVOggl6iOqdfQ
-         mrQfmTL9ldfn3KrySg5bIgRzpcvcUg5K7TAH2Fxxg9vNTPHvDwhqpsbnPTWsBOhxxIMV
-         F/Ak7S4P5836zI4UmIVwblMDcOye1GgJu2GtHMV24pOGuUoNp83NDU2NP3ppRf6vehFT
-         Lotw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=XsZPhxdBdlYV34oAYODhqA30vWo4o5xEmRE9ImoE88Y=;
-        b=gUdqhWrYhjerjl57UBLm1fe0b0HmxrRncC+lgvh2UE7I7c6dBxZ0bdafmqnX4jB5u2
-         vIkgN4wHhTh9K43jHK4uVEc74GGgjn84XdFXZx/1ROge09WGq4wd4xRbKrLue1ZGwyOB
-         29PpME3k8Gx8XynEnxZN7kZUGXR1UkrWH7vD77X7f4JdiyodXX+WvbEEPTm42XFsZCES
-         /AKyAiQ1M6jmAJZHiRp/lkCQ5Vbr1+2ZuZQOTh9FHOUOIUmqof/0WXPOo/BXzSquDQQQ
-         +kyaohObwYdg10Ln/ZlzzSX6pKoy0/U5NrP3c1zqgKlrP67bc+kzu7lBGqyhYs/lkABR
-         ylHQ==
-X-Gm-Message-State: AHQUAubMYnheYmF11F6PH7zIEtM46qCJIvo/KXtOWDtTyAPwrnBgvZbz
-        29tgVqhv/n3KD3w3ddeH0UaLo2nVP/9bIV5ZDez5ig==
-X-Google-Smtp-Source: AHgI3IYBSKRvuo2hYtFA+AzPIhktEEP1rvun9mViAu8CEnmjhp59GcmgJe/yRSRdIOrgIKqKEv3B/KqHK6PSjopB4bM=
-X-Received: by 2002:a17:902:a506:: with SMTP id s6mr10619876plq.24.1550768821390;
- Thu, 21 Feb 2019 09:07:01 -0800 (PST)
-MIME-Version: 1.0
+        id S1728702AbfBUR7j (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 21 Feb 2019 12:59:39 -0500
+Received: from mail-eopbgr710112.outbound.protection.outlook.com ([40.107.71.112]:34631
+        "EHLO NAM05-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725823AbfBUR7i (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 21 Feb 2019 12:59:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rG+K6UjKufe0tDgEv1a2Rik4sFizmbaqbnccGv5x1mk=;
+ b=GF4IFejAgnZFym5ZE9/tz205lyrxx5orazo601lIcUmpYbLFjukFSdDzQfBrbU5Dd+MHhLUzPsgahYM6wbddnMbI/nF86IVTEvtm6aog+Nu6TTF9Qi2S3Hkv0moRinnN4ZAJtE0bion3yAzbmScInoKC7fw4HIM7uImKoZ5AKQA=
+Received: from SN4PR2101MB0736.namprd21.prod.outlook.com (10.167.151.155) by
+ SN4PR2101MB0734.namprd21.prod.outlook.com (10.167.151.153) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1665.4; Thu, 21 Feb 2019 17:59:32 +0000
+Received: from SN4PR2101MB0736.namprd21.prod.outlook.com
+ ([fe80::bdda:b065:93f4:1f21]) by SN4PR2101MB0736.namprd21.prod.outlook.com
+ ([fe80::bdda:b065:93f4:1f21%4]) with mapi id 15.20.1665.000; Thu, 21 Feb 2019
+ 17:59:32 +0000
+From:   Tom Talpey <ttalpey@microsoft.com>
+To:     Steve French <smfrench@gmail.com>,
+        Ross Lagerwall <ross.lagerwall@citrix.com>
+CC:     CIFS <linux-cifs@vger.kernel.org>
+Subject: RE: Failure to reconnect after cluster failvoer
+Thread-Topic: Failure to reconnect after cluster failvoer
+Thread-Index: AQHUygaXWPirxP5U10SRwmEzoXVUbaXqe52AgAAM1GA=
+Date:   Thu, 21 Feb 2019 17:59:31 +0000
+Message-ID: <SN4PR2101MB073663B8E9E7AC98A4D0C992A07E0@SN4PR2101MB0736.namprd21.prod.outlook.com>
 References: <70e91b0b-4bca-60ea-19cf-3df0f49d4e5a@citrix.com>
-In-Reply-To: <70e91b0b-4bca-60ea-19cf-3df0f49d4e5a@citrix.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 21 Feb 2019 11:06:49 -0600
-Message-ID: <CAH2r5mvDFFMhwyKdEGhgb+5-+v2PyuAWpWN9drofXVvj3mQxYQ@mail.gmail.com>
-Subject: Re: Failure to reconnect after cluster failvoer
-To:     Ross Lagerwall <ross.lagerwall@citrix.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+ <CAH2r5mvDFFMhwyKdEGhgb+5-+v2PyuAWpWN9drofXVvj3mQxYQ@mail.gmail.com>
+In-Reply-To: <CAH2r5mvDFFMhwyKdEGhgb+5-+v2PyuAWpWN9drofXVvj3mQxYQ@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Owner=ttalpey@microsoft.com;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2019-02-21T17:59:30.3041660Z;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Application=Microsoft Azure
+ Information Protection;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=1867ea9c-f28c-411c-bd51-5f6431b47e3e;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Extended_MSFT_Method=Automatic
+x-originating-ip: [2001:4898:80e8:8:a9c3:1682:ea93:71b0]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 714399a6-5002-435b-1881-08d6982654e6
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600110)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:SN4PR2101MB0734;
+x-ms-traffictypediagnostic: SN4PR2101MB0734:
+x-microsoft-exchange-diagnostics: =?utf-8?B?MTtTTjRQUjIxMDFNQjA3MzQ7MjM6ZDNja1NpV1I0YzRDVkxpVnI3bkttelY0?=
+ =?utf-8?B?enQ5NlJ2NHQ2V0tCYVJOY1d1Z0VtbzRsMmZZMjdrY2pKUHpRdW9sU1RUSUZD?=
+ =?utf-8?B?OC9Rb01hcDNYajdXcE5FbmtKN2FMZ0trSmR5WjJCbWdnQW5uQVNMeWsrK29W?=
+ =?utf-8?B?K0tHM1BvT0V3M3d0cU45blBISllkVkVqV0p6eWtNeWxsYXI5VittOGlydC9H?=
+ =?utf-8?B?cm15SENqc3Q4bGt5WjBEeWptRWFwdkY4c01zLythSHZDd3BxUjFmNEpTeEJ1?=
+ =?utf-8?B?Zk5MTUtxeHFYaVBSZDBFbCtlV285WGRCVDVTRWNsYkpHSEladytpNFVCM1dE?=
+ =?utf-8?B?eGtoR1ZNSjJXR242OFlWNWIxajZrTThtTzMrWFRlbjhGWkNDck5GbW9ETnUz?=
+ =?utf-8?B?cnFIdkNIdzV5NVpjNkI1c1FWVHV5bDlXUHh3S2tYaTVBcmJGTTU2WDhnUGF6?=
+ =?utf-8?B?MXZmRk5GTkFWUUdMV1YrbXZBNTAzQTByWkRvTklsaEUrTWdodGdibDZPZ3Ax?=
+ =?utf-8?B?QkhuUnhQSHZXVFNZdXNnVXNzQThmNkVqVEVBbHljUS9BaG15RUdwNGVpR0VT?=
+ =?utf-8?B?dmJDVVNhMWkweVY0eXlJbFhWTSswOUlVMWVjdFkwTEgxaElTTVYrWFpRcTRP?=
+ =?utf-8?B?Wnc3ZEJwd1g5UTcxWVdoK1FCbzZYb3p2WDd6cTQ1ekhyUHFvMVJnYmc3cWR3?=
+ =?utf-8?B?MmJxOGtSU3F4bHZ6S05zSWs4OVZhajdzUTZwNlV4NUt1K1M3NUpwRXdsZSty?=
+ =?utf-8?B?cmFUY0Q2OFFrMjBiMnRYanhoZExMUjkyZERlV2J3RWhSdkhIUHJ6TWY5VmdB?=
+ =?utf-8?B?RTJqLzh5Y2hoSXI1NTB0TWNoWGQxV1NGbDU2aXQ1ZEVLakdPdmpjemJkNnhL?=
+ =?utf-8?B?T1FGb3FFV01QcEhpamxmNS9wWWhjLzBvU2s3MjVrcysyNUZBdXRyb0pjQUNU?=
+ =?utf-8?B?ekQ1cGVwRjc1enBGWXkxVHM0OUJIU21wY3MzcEQvdXVWd0ZTaHI0YXJsNzBF?=
+ =?utf-8?B?ODc2NzZOeWZ3NnA1d3ZCNDVmVEhaRWZRVjc2cXgwcEV5UklxbDN5dWFQMWd5?=
+ =?utf-8?B?c3cvYXNqeXdaQUE3TkZoN2FnZWhoc0paaTRaWDdxMmhEaTNVaGRHLy9JZVdx?=
+ =?utf-8?B?YmUwN0pCNmVlREhsQytUdFg3UzM0aDB4YktDSk9oRkRGUTYyZzhKL29ZZ05Z?=
+ =?utf-8?B?K2RyTUJrWERxUjBWQWJGR1NKOVk1Q01PeU01ZldWVjlyWmdTOGJzelhnRFBB?=
+ =?utf-8?B?V3lEVEJYcE1veElGZ0doR2Y0dzNUSk9TWmF0UTdBMG4xQnpvL3owS1MxVFAy?=
+ =?utf-8?B?aktrL2FaQlNpMi9vbXRRUFYvVTU5Q1ZDcXQwZjczNFhDcXlnRThveHY2V25k?=
+ =?utf-8?B?R3oreFROV1pBeC9vck5zNlRZNGdKeUE2bWFoYmdBKzJoN0NzbVdMSzBPRGdt?=
+ =?utf-8?B?VXNEMlZ3RTNYQ3JHVU5PUFVxN3NHbVhYbEhXYnZHZndKaWQxL3BSZEZqRFJz?=
+ =?utf-8?B?Nldwbm9TTXJ2UzNId1Ewdm9tbG4yUnJ1RnNlNmtNbzdLUWRIOWgrekthbUxx?=
+ =?utf-8?B?WTgwQkxTREs1bFVoQ0tMeXFYdENPRlVLb0x1K0hNMG5TcTJpUmVwU3NDOFFr?=
+ =?utf-8?B?QW0wWU1qdUw5dDA4NWwxaDNZQzJaUGZkMUFvdlE2cG5YVEwxQllVeWltZHI0?=
+ =?utf-8?B?Q2JnbWRzMzNEa1ZDeE9kL01hVGpLcE5oL3c1NjVRb29ydjlPRDdaUGNCWVF5?=
+ =?utf-8?B?T050OUovaHhlY2hMNzJEdHhlTHJzRFY4d21oelZLbXY4WUJ0MlJlWDlZckdK?=
+ =?utf-8?B?aHZSZGRFL0ZxNkp5QXJibjZWa0lRVXFBbXc1eDR5VGZnU0NZQlFySExBTU8v?=
+ =?utf-8?B?c0NJMTVHTnBKb28zRHBHbUYxWDBnZjA2OXJ5YTBLVDZzSFVHTGNQUWxSMXVD?=
+ =?utf-8?Q?4w0fL+Fi/7iYfqmJbQD8FTG4BJYfXZzQ=3D?=
+x-microsoft-antispam-prvs: <SN4PR2101MB073421C50EC908A297327659A07E0@SN4PR2101MB0734.namprd21.prod.outlook.com>
+x-forefront-prvs: 09555FB1AD
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(979002)(346002)(366004)(136003)(396003)(39860400002)(376002)(13464003)(189003)(199004)(106356001)(486006)(14444005)(256004)(446003)(8936002)(316002)(11346002)(110136005)(476003)(8990500004)(6436002)(22452003)(10090500001)(46003)(71190400001)(71200400001)(105586002)(478600001)(99286004)(7696005)(4326008)(53546011)(55016002)(9686003)(8676002)(102836004)(186003)(68736007)(74316002)(14454004)(6506007)(53936002)(33656002)(81166006)(229853002)(76176011)(10290500003)(25786009)(81156014)(6346003)(2906002)(5660300002)(6246003)(6116002)(86612001)(305945005)(97736004)(7736002)(86362001)(969003)(989001)(999001)(1009001)(1019001);DIR:OUT;SFP:1102;SCL:1;SRVR:SN4PR2101MB0734;H:SN4PR2101MB0736.namprd21.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: microsoft.com does not designate
+ permitted sender hosts)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=ttalpey@microsoft.com; 
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: IHeMq80tyNPkdy+wa/amv5wLd/Mt86gwJAmAxxWvCXYSivp0JBhqJ8AEnLWDDCX6U2vjLJYWXXK5Z7jV/SMJWpEGoRVY3yDlZ5F3QCnGSinmmuV6hV86/mWmS0fGvGo7pPavZKrZd7gAaH6LfcmDw++XYyeQ8HpacJj8GoqC30LkJ+L1s+qx/qj4sMOY0Kwr4Awr2lvp1H10yyt4b8d51Xy/eYcYU/R3kPoyGAihRcDr873rHgAbeghfNU4SnOY1EfE8/AbEFLm8Cgz6EHeCXPxCo1wnSwBvI0ugow8TW3Ubn4QBQV3hoWjFSzgYa+oq6hO45KpWeDM2gYLTA8vYsBCMzViJQoq4tA8y607Rjmv5lqnhjpmoGgVkK9j/OEQ0W2OERlUQsPCJ7TVGAZ33yYBmOIL3ngQ0gL7xOlBY5bM=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 714399a6-5002-435b-1881-08d6982654e6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Feb 2019 17:59:31.8899
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR2101MB0734
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Couple quick thoughts.
-
-Does this work on current kernels (5.0 for example).
-
-Was thinking about patches that might affect this like:
-- "cifs: connect to servername instead of IP for IPC$ share"
-- "smb3: on reconnect set PreviousSessionId field"
-- Paulo's patches (has cifs-utils coreq) to reconnect to new IP
-address if hostname's IP address changed and his add support for
-failover
-- Paulo's patch to remove trailing slashes from server UNC name
-
-On Thu, Feb 21, 2019 at 10:58 AM Ross Lagerwall
-<ross.lagerwall@citrix.com> wrote:
->
-> Hi,
->
-> I have an issue with SMB cluster failover. There are two Windows 2012 R2
-> Datacenter servers in the cluster. If the primary server is turned off,
-> then the secondary server becomes the primary. However, when this
-> happens the kernel client is not able to recover the mount.
->
-> Here is the reconnection network trace:
->
-> Time      Source       Destination  Protocol Length Info
-> 16.640530 10.71.217.53 10.71.217.50 SMB2     172    Negotiate Protocol
-> Request
-> 16.641723 10.71.217.50 10.71.217.53 SMB2     318    Negotiate Protocol
-> Response
-> 16.641799 10.71.217.53 10.71.217.50 SMB2     190    Session Setup
-> Request, NTLMSSP_NEGOTIATE
-> 16.642148 10.71.217.50 10.71.217.53 SMB2     442    Session Setup
-> Response, Error: STATUS_MORE_PROCESSING_REQUIRED, NTLMSSP_CHALLENGE
-> 16.642201 10.71.217.53 10.71.217.50 SMB2     562    Session Setup
-> Request, NTLMSSP_AUTH, User: clusterad.local7337\Administrator
-> 16.656407 10.71.217.50 10.71.217.53 SMB2     142    Session Setup Response
-> 16.656492 10.71.217.53 10.71.217.50 SMB2     190    Tree Connect Request
-> Tree: \\10.71.217.50\smbshare
-> 16.656916 10.71.217.50 10.71.217.53 SMB2     143    Tree Connect
-> Response, Error: STATUS_BAD_NETWORK_NAME
-> 16.659249 10.71.217.53 10.71.217.50 SMB2     190    Tree Connect Request
-> Tree: \\10.71.217.50\smbshare
-> 16.659635 10.71.217.50 10.71.217.53 SMB2     143    Tree Connect
-> Response, Error: STATUS_BAD_NETWORK_NAME
-> 20.224591 10.71.217.53 10.71.217.50 SMB2     182    Tree Connect Request
-> Tree: \\10.71.217.50\IPC$
-> 20.225344 10.71.217.50 10.71.217.53 SMB2     150    Tree Connect Response
-> 20.225449 10.71.217.53 10.71.217.50 SMB2     216    Ioctl Request
-> FSCTL_VALIDATE_NEGOTIATE_INFO
-> 20.225934 10.71.217.50 10.71.217.53 SMB2     206    Ioctl Response
-> FSCTL_VALIDATE_NEGOTIATE_INFO
-> 20.225975 10.71.217.53 10.71.217.50 SMB2     190    Tree Connect Request
-> Tree: \\10.71.217.50\smbshare
-> 20.226355 10.71.217.50 10.71.217.53 SMB2     143    Tree Connect
-> Response, Error: STATUS_BAD_NETWORK_NAME
-> 22.240595 10.71.217.53 10.71.217.50 SMB2     190    Tree Connect Request
-> Tree: \\10.71.217.50\smbshare
-> 22.241159 10.71.217.50 10.71.217.53 SMB2     143    Tree Connect
-> Response, Error: STATUS_BAD_NETWORK_NAME
-> 24.256590 10.71.217.53 10.71.217.50 SMB2     190    Tree Connect Request
-> Tree: \\10.71.217.50\smbshare
-> 24.257380 10.71.217.50 10.71.217.53 SMB2     143    Tree Connect
-> Response, Error: STATUS_BAD_NETWORK_NAME
-> ...
-> 40.384609 10.71.217.53 10.71.217.50 SMB2     190    Tree Connect Request
-> Tree: \\10.71.217.50\smbshare
-> 40.385135 10.71.217.50 10.71.217.53 SMB2     143    Tree Connect
-> Response, Error: STATUS_BAD_NETWORK_NAME
-> 41.772006 10.71.217.53 10.71.217.50 SMB2     190    Tree Connect Request
-> Tree: \\10.71.217.50\smbshare
-> 41.772562 10.71.217.50 10.71.217.53 SMB2     143    Tree Connect
-> Response, Error: STATUS_NETWORK_NAME_DELETED
-> 41.772641 10.71.217.53 10.71.217.50 SMB2     190    Tree Connect Request
-> Tree: \\10.71.217.50\smbshare
-> 41.773037 10.71.217.50 10.71.217.53 SMB2     143    Tree Connect
-> Response, Error: STATUS_NETWORK_NAME_DELETED
-> 42.400589 10.71.217.53 10.71.217.50 SMB2     190    Tree Connect Request
-> Tree: \\10.71.217.50\smbshare
-> ...
->
-> After the secondary server takes over (presumably once it stops
-> returning STATUS_BAD_NETWORK_NAME), it then returns
-> STATUS_NETWORK_NAME_DELETED indefinitely.
->
-> This can be fixed by delaying the tree connect to IPC$ until after the
-> tree connect to the share succeeds.  The server then no longer returns
-> STATUS_NETWORK_NAME_DELETED and instead responds successfully.  I'm not
-> sure why the server behaves like this and I'm not sure if the client is
-> doing something wrong. I found this out because it used to work on older
-> kernels before b327a717e506 ("CIFS: make IPC a regular tcon").
->
-> Here is the patch that makes it work:
->
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index dba986524917..1f97ed6459bf 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -2864,7 +2864,14 @@ void smb2_reconnect_server(struct work_struct *work)
->
->         spin_unlock(&cifs_tcp_ses_lock);
->
-> +       rc = 0;
->         list_for_each_entry_safe(tcon, tcon2, &tmp_list, rlist) {
-> +               if (rc) {
-> +                       list_del_init(&tcon->rlist);
-> +                       cifs_put_tcon(tcon);
-> +                       continue;
-> +               }
-> +
->                 rc = smb2_reconnect(SMB2_INTERNAL_CMD, tcon);
->                 if (!rc)
->                         cifs_reopen_persistent_handles(tcon);
->
-> Can anyone give any more info on this oddity and whether this is a
-> useful patch?
->
-> Thanks,
-> --
-> Ross Lagerwall
-
-
-
--- 
-Thanks,
-
-Steve
+VGhlIHJlY29ubmVjdCBpcyBhcHBhcmVudGx5IHVzaW5nIGEgZG90dGVkLXF1YWQgYXMgdGhlIHNl
+cnZlcm5hbWUsIGFuZCB5b3UgY2FuIHNlZSB0aGUgYXV0aCBpcyBmb3JjZWQgdG8gTlRMTSBhcyBh
+IGNvbnNlcXVlbmNlLiBJcyB0aGF0IHRoZSB3YXkgeW91IGluaXRpYWxseSBtb3VudGVkIHRoZSBz
+aGFyZSAoaS5lLiBtb3VudCAxMC43MS4yMTcuNTA6L3NtYnNoYXJlIC9tbnQpPyANCg0KLS0tLS1P
+cmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IGxpbnV4LWNpZnMtb3duZXJAdmdlci5rZXJuZWwu
+b3JnIDxsaW51eC1jaWZzLW93bmVyQHZnZXIua2VybmVsLm9yZz4gT24gQmVoYWxmIE9mIFN0ZXZl
+IEZyZW5jaA0KU2VudDogVGh1cnNkYXksIEZlYnJ1YXJ5IDIxLCAyMDE5IDk6MDcgQU0NClRvOiBS
+b3NzIExhZ2Vyd2FsbCA8cm9zcy5sYWdlcndhbGxAY2l0cml4LmNvbT4NCkNjOiBDSUZTIDxsaW51
+eC1jaWZzQHZnZXIua2VybmVsLm9yZz4NClN1YmplY3Q6IFJlOiBGYWlsdXJlIHRvIHJlY29ubmVj
+dCBhZnRlciBjbHVzdGVyIGZhaWx2b2VyDQoNCkNvdXBsZSBxdWljayB0aG91Z2h0cy4NCg0KRG9l
+cyB0aGlzIHdvcmsgb24gY3VycmVudCBrZXJuZWxzICg1LjAgZm9yIGV4YW1wbGUpLg0KDQpXYXMg
+dGhpbmtpbmcgYWJvdXQgcGF0Y2hlcyB0aGF0IG1pZ2h0IGFmZmVjdCB0aGlzIGxpa2U6DQotICJj
+aWZzOiBjb25uZWN0IHRvIHNlcnZlcm5hbWUgaW5zdGVhZCBvZiBJUCBmb3IgSVBDJCBzaGFyZSIN
+Ci0gInNtYjM6IG9uIHJlY29ubmVjdCBzZXQgUHJldmlvdXNTZXNzaW9uSWQgZmllbGQiDQotIFBh
+dWxvJ3MgcGF0Y2hlcyAoaGFzIGNpZnMtdXRpbHMgY29yZXEpIHRvIHJlY29ubmVjdCB0byBuZXcg
+SVANCmFkZHJlc3MgaWYgaG9zdG5hbWUncyBJUCBhZGRyZXNzIGNoYW5nZWQgYW5kIGhpcyBhZGQg
+c3VwcG9ydCBmb3INCmZhaWxvdmVyDQotIFBhdWxvJ3MgcGF0Y2ggdG8gcmVtb3ZlIHRyYWlsaW5n
+IHNsYXNoZXMgZnJvbSBzZXJ2ZXIgVU5DIG5hbWUNCg0KT24gVGh1LCBGZWIgMjEsIDIwMTkgYXQg
+MTA6NTggQU0gUm9zcyBMYWdlcndhbGwNCjxyb3NzLmxhZ2Vyd2FsbEBjaXRyaXguY29tPiB3cm90
+ZToNCj4NCj4gSGksDQo+DQo+IEkgaGF2ZSBhbiBpc3N1ZSB3aXRoIFNNQiBjbHVzdGVyIGZhaWxv
+dmVyLiBUaGVyZSBhcmUgdHdvIFdpbmRvd3MgMjAxMiBSMg0KPiBEYXRhY2VudGVyIHNlcnZlcnMg
+aW4gdGhlIGNsdXN0ZXIuIElmIHRoZSBwcmltYXJ5IHNlcnZlciBpcyB0dXJuZWQgb2ZmLA0KPiB0
+aGVuIHRoZSBzZWNvbmRhcnkgc2VydmVyIGJlY29tZXMgdGhlIHByaW1hcnkuIEhvd2V2ZXIsIHdo
+ZW4gdGhpcw0KPiBoYXBwZW5zIHRoZSBrZXJuZWwgY2xpZW50IGlzIG5vdCBhYmxlIHRvIHJlY292
+ZXIgdGhlIG1vdW50Lg0KPg0KPiBIZXJlIGlzIHRoZSByZWNvbm5lY3Rpb24gbmV0d29yayB0cmFj
+ZToNCj4NCj4gVGltZSAgICAgIFNvdXJjZSAgICAgICBEZXN0aW5hdGlvbiAgUHJvdG9jb2wgTGVu
+Z3RoIEluZm8NCj4gMTYuNjQwNTMwIDEwLjcxLjIxNy41MyAxMC43MS4yMTcuNTAgU01CMiAgICAg
+MTcyICAgIE5lZ290aWF0ZSBQcm90b2NvbA0KPiBSZXF1ZXN0DQo+IDE2LjY0MTcyMyAxMC43MS4y
+MTcuNTAgMTAuNzEuMjE3LjUzIFNNQjIgICAgIDMxOCAgICBOZWdvdGlhdGUgUHJvdG9jb2wNCj4g
+UmVzcG9uc2UNCj4gMTYuNjQxNzk5IDEwLjcxLjIxNy41MyAxMC43MS4yMTcuNTAgU01CMiAgICAg
+MTkwICAgIFNlc3Npb24gU2V0dXANCj4gUmVxdWVzdCwgTlRMTVNTUF9ORUdPVElBVEUNCj4gMTYu
+NjQyMTQ4IDEwLjcxLjIxNy41MCAxMC43MS4yMTcuNTMgU01CMiAgICAgNDQyICAgIFNlc3Npb24g
+U2V0dXANCj4gUmVzcG9uc2UsIEVycm9yOiBTVEFUVVNfTU9SRV9QUk9DRVNTSU5HX1JFUVVJUkVE
+LCBOVExNU1NQX0NIQUxMRU5HRQ0KPiAxNi42NDIyMDEgMTAuNzEuMjE3LjUzIDEwLjcxLjIxNy41
+MCBTTUIyICAgICA1NjIgICAgU2Vzc2lvbiBTZXR1cA0KPiBSZXF1ZXN0LCBOVExNU1NQX0FVVEgs
+IFVzZXI6IGNsdXN0ZXJhZC5sb2NhbDczMzdcQWRtaW5pc3RyYXRvcg0KPiAxNi42NTY0MDcgMTAu
+NzEuMjE3LjUwIDEwLjcxLjIxNy41MyBTTUIyICAgICAxNDIgICAgU2Vzc2lvbiBTZXR1cCBSZXNw
+b25zZQ0KPiAxNi42NTY0OTIgMTAuNzEuMjE3LjUzIDEwLjcxLjIxNy41MCBTTUIyICAgICAxOTAg
+ICAgVHJlZSBDb25uZWN0IFJlcXVlc3QNCj4gVHJlZTogXFwxMC43MS4yMTcuNTBcc21ic2hhcmUN
+Cj4gMTYuNjU2OTE2IDEwLjcxLjIxNy41MCAxMC43MS4yMTcuNTMgU01CMiAgICAgMTQzICAgIFRy
+ZWUgQ29ubmVjdA0KPiBSZXNwb25zZSwgRXJyb3I6IFNUQVRVU19CQURfTkVUV09SS19OQU1FDQo+
+IDE2LjY1OTI0OSAxMC43MS4yMTcuNTMgMTAuNzEuMjE3LjUwIFNNQjIgICAgIDE5MCAgICBUcmVl
+IENvbm5lY3QgUmVxdWVzdA0KPiBUcmVlOiBcXDEwLjcxLjIxNy41MFxzbWJzaGFyZQ0KPiAxNi42
+NTk2MzUgMTAuNzEuMjE3LjUwIDEwLjcxLjIxNy41MyBTTUIyICAgICAxNDMgICAgVHJlZSBDb25u
+ZWN0DQo+IFJlc3BvbnNlLCBFcnJvcjogU1RBVFVTX0JBRF9ORVRXT1JLX05BTUUNCj4gMjAuMjI0
+NTkxIDEwLjcxLjIxNy41MyAxMC43MS4yMTcuNTAgU01CMiAgICAgMTgyICAgIFRyZWUgQ29ubmVj
+dCBSZXF1ZXN0DQo+IFRyZWU6IFxcMTAuNzEuMjE3LjUwXElQQyQNCj4gMjAuMjI1MzQ0IDEwLjcx
+LjIxNy41MCAxMC43MS4yMTcuNTMgU01CMiAgICAgMTUwICAgIFRyZWUgQ29ubmVjdCBSZXNwb25z
+ZQ0KPiAyMC4yMjU0NDkgMTAuNzEuMjE3LjUzIDEwLjcxLjIxNy41MCBTTUIyICAgICAyMTYgICAg
+SW9jdGwgUmVxdWVzdA0KPiBGU0NUTF9WQUxJREFURV9ORUdPVElBVEVfSU5GTw0KPiAyMC4yMjU5
+MzQgMTAuNzEuMjE3LjUwIDEwLjcxLjIxNy41MyBTTUIyICAgICAyMDYgICAgSW9jdGwgUmVzcG9u
+c2UNCj4gRlNDVExfVkFMSURBVEVfTkVHT1RJQVRFX0lORk8NCj4gMjAuMjI1OTc1IDEwLjcxLjIx
+Ny41MyAxMC43MS4yMTcuNTAgU01CMiAgICAgMTkwICAgIFRyZWUgQ29ubmVjdCBSZXF1ZXN0DQo+
+IFRyZWU6IFxcMTAuNzEuMjE3LjUwXHNtYnNoYXJlDQo+IDIwLjIyNjM1NSAxMC43MS4yMTcuNTAg
+MTAuNzEuMjE3LjUzIFNNQjIgICAgIDE0MyAgICBUcmVlIENvbm5lY3QNCj4gUmVzcG9uc2UsIEVy
+cm9yOiBTVEFUVVNfQkFEX05FVFdPUktfTkFNRQ0KPiAyMi4yNDA1OTUgMTAuNzEuMjE3LjUzIDEw
+LjcxLjIxNy41MCBTTUIyICAgICAxOTAgICAgVHJlZSBDb25uZWN0IFJlcXVlc3QNCj4gVHJlZTog
+XFwxMC43MS4yMTcuNTBcc21ic2hhcmUNCj4gMjIuMjQxMTU5IDEwLjcxLjIxNy41MCAxMC43MS4y
+MTcuNTMgU01CMiAgICAgMTQzICAgIFRyZWUgQ29ubmVjdA0KPiBSZXNwb25zZSwgRXJyb3I6IFNU
+QVRVU19CQURfTkVUV09SS19OQU1FDQo+IDI0LjI1NjU5MCAxMC43MS4yMTcuNTMgMTAuNzEuMjE3
+LjUwIFNNQjIgICAgIDE5MCAgICBUcmVlIENvbm5lY3QgUmVxdWVzdA0KPiBUcmVlOiBcXDEwLjcx
+LjIxNy41MFxzbWJzaGFyZQ0KPiAyNC4yNTczODAgMTAuNzEuMjE3LjUwIDEwLjcxLjIxNy41MyBT
+TUIyICAgICAxNDMgICAgVHJlZSBDb25uZWN0DQo+IFJlc3BvbnNlLCBFcnJvcjogU1RBVFVTX0JB
+RF9ORVRXT1JLX05BTUUNCj4gLi4uDQo+IDQwLjM4NDYwOSAxMC43MS4yMTcuNTMgMTAuNzEuMjE3
+LjUwIFNNQjIgICAgIDE5MCAgICBUcmVlIENvbm5lY3QgUmVxdWVzdA0KPiBUcmVlOiBcXDEwLjcx
+LjIxNy41MFxzbWJzaGFyZQ0KPiA0MC4zODUxMzUgMTAuNzEuMjE3LjUwIDEwLjcxLjIxNy41MyBT
+TUIyICAgICAxNDMgICAgVHJlZSBDb25uZWN0DQo+IFJlc3BvbnNlLCBFcnJvcjogU1RBVFVTX0JB
+RF9ORVRXT1JLX05BTUUNCj4gNDEuNzcyMDA2IDEwLjcxLjIxNy41MyAxMC43MS4yMTcuNTAgU01C
+MiAgICAgMTkwICAgIFRyZWUgQ29ubmVjdCBSZXF1ZXN0DQo+IFRyZWU6IFxcMTAuNzEuMjE3LjUw
+XHNtYnNoYXJlDQo+IDQxLjc3MjU2MiAxMC43MS4yMTcuNTAgMTAuNzEuMjE3LjUzIFNNQjIgICAg
+IDE0MyAgICBUcmVlIENvbm5lY3QNCj4gUmVzcG9uc2UsIEVycm9yOiBTVEFUVVNfTkVUV09SS19O
+QU1FX0RFTEVURUQNCj4gNDEuNzcyNjQxIDEwLjcxLjIxNy41MyAxMC43MS4yMTcuNTAgU01CMiAg
+ICAgMTkwICAgIFRyZWUgQ29ubmVjdCBSZXF1ZXN0DQo+IFRyZWU6IFxcMTAuNzEuMjE3LjUwXHNt
+YnNoYXJlDQo+IDQxLjc3MzAzNyAxMC43MS4yMTcuNTAgMTAuNzEuMjE3LjUzIFNNQjIgICAgIDE0
+MyAgICBUcmVlIENvbm5lY3QNCj4gUmVzcG9uc2UsIEVycm9yOiBTVEFUVVNfTkVUV09SS19OQU1F
+X0RFTEVURUQNCj4gNDIuNDAwNTg5IDEwLjcxLjIxNy41MyAxMC43MS4yMTcuNTAgU01CMiAgICAg
+MTkwICAgIFRyZWUgQ29ubmVjdCBSZXF1ZXN0DQo+IFRyZWU6IFxcMTAuNzEuMjE3LjUwXHNtYnNo
+YXJlDQo+IC4uLg0KPg0KPiBBZnRlciB0aGUgc2Vjb25kYXJ5IHNlcnZlciB0YWtlcyBvdmVyIChw
+cmVzdW1hYmx5IG9uY2UgaXQgc3RvcHMNCj4gcmV0dXJuaW5nIFNUQVRVU19CQURfTkVUV09SS19O
+QU1FKSwgaXQgdGhlbiByZXR1cm5zDQo+IFNUQVRVU19ORVRXT1JLX05BTUVfREVMRVRFRCBpbmRl
+ZmluaXRlbHkuDQo+DQo+IFRoaXMgY2FuIGJlIGZpeGVkIGJ5IGRlbGF5aW5nIHRoZSB0cmVlIGNv
+bm5lY3QgdG8gSVBDJCB1bnRpbCBhZnRlciB0aGUNCj4gdHJlZSBjb25uZWN0IHRvIHRoZSBzaGFy
+ZSBzdWNjZWVkcy4gIFRoZSBzZXJ2ZXIgdGhlbiBubyBsb25nZXIgcmV0dXJucw0KPiBTVEFUVVNf
+TkVUV09SS19OQU1FX0RFTEVURUQgYW5kIGluc3RlYWQgcmVzcG9uZHMgc3VjY2Vzc2Z1bGx5LiAg
+SSdtIG5vdA0KPiBzdXJlIHdoeSB0aGUgc2VydmVyIGJlaGF2ZXMgbGlrZSB0aGlzIGFuZCBJJ20g
+bm90IHN1cmUgaWYgdGhlIGNsaWVudCBpcw0KPiBkb2luZyBzb21ldGhpbmcgd3JvbmcuIEkgZm91
+bmQgdGhpcyBvdXQgYmVjYXVzZSBpdCB1c2VkIHRvIHdvcmsgb24gb2xkZXINCj4ga2VybmVscyBi
+ZWZvcmUgYjMyN2E3MTdlNTA2ICgiQ0lGUzogbWFrZSBJUEMgYSByZWd1bGFyIHRjb24iKS4NCj4N
+Cj4gSGVyZSBpcyB0aGUgcGF0Y2ggdGhhdCBtYWtlcyBpdCB3b3JrOg0KPg0KPiBkaWZmIC0tZ2l0
+IGEvZnMvY2lmcy9zbWIycGR1LmMgYi9mcy9jaWZzL3NtYjJwZHUuYw0KPiBpbmRleCBkYmE5ODY1
+MjQ5MTcuLjFmOTdlZDY0NTliZiAxMDA2NDQNCj4gLS0tIGEvZnMvY2lmcy9zbWIycGR1LmMNCj4g
+KysrIGIvZnMvY2lmcy9zbWIycGR1LmMNCj4gQEAgLTI4NjQsNyArMjg2NCwxNCBAQCB2b2lkIHNt
+YjJfcmVjb25uZWN0X3NlcnZlcihzdHJ1Y3Qgd29ya19zdHJ1Y3QgKndvcmspDQo+DQo+ICAgICAg
+ICAgc3Bpbl91bmxvY2soJmNpZnNfdGNwX3Nlc19sb2NrKTsNCj4NCj4gKyAgICAgICByYyA9IDA7
+DQo+ICAgICAgICAgbGlzdF9mb3JfZWFjaF9lbnRyeV9zYWZlKHRjb24sIHRjb24yLCAmdG1wX2xp
+c3QsIHJsaXN0KSB7DQo+ICsgICAgICAgICAgICAgICBpZiAocmMpIHsNCj4gKyAgICAgICAgICAg
+ICAgICAgICAgICAgbGlzdF9kZWxfaW5pdCgmdGNvbi0+cmxpc3QpOw0KPiArICAgICAgICAgICAg
+ICAgICAgICAgICBjaWZzX3B1dF90Y29uKHRjb24pOw0KPiArICAgICAgICAgICAgICAgICAgICAg
+ICBjb250aW51ZTsNCj4gKyAgICAgICAgICAgICAgIH0NCj4gKw0KPiAgICAgICAgICAgICAgICAg
+cmMgPSBzbWIyX3JlY29ubmVjdChTTUIyX0lOVEVSTkFMX0NNRCwgdGNvbik7DQo+ICAgICAgICAg
+ICAgICAgICBpZiAoIXJjKQ0KPiAgICAgICAgICAgICAgICAgICAgICAgICBjaWZzX3Jlb3Blbl9w
+ZXJzaXN0ZW50X2hhbmRsZXModGNvbik7DQo+DQo+IENhbiBhbnlvbmUgZ2l2ZSBhbnkgbW9yZSBp
+bmZvIG9uIHRoaXMgb2RkaXR5IGFuZCB3aGV0aGVyIHRoaXMgaXMgYQ0KPiB1c2VmdWwgcGF0Y2g/
+DQo+DQo+IFRoYW5rcywNCj4gLS0NCj4gUm9zcyBMYWdlcndhbGwNCg0KDQoNCi0tIA0KVGhhbmtz
+LA0KDQpTdGV2ZQ0K
