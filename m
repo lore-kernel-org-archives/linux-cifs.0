@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55661C43381
-	for <linux-cifs@archiver.kernel.org>; Thu, 21 Feb 2019 03:41:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0160FC43381
+	for <linux-cifs@archiver.kernel.org>; Thu, 21 Feb 2019 04:00:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1066720651
-	for <linux-cifs@archiver.kernel.org>; Thu, 21 Feb 2019 03:41:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE8B0214AF
+	for <linux-cifs@archiver.kernel.org>; Thu, 21 Feb 2019 04:00:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZmMJiQBI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lQpUqh/u"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726121AbfBUDl0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 20 Feb 2019 22:41:26 -0500
-Received: from mail-pl1-f180.google.com ([209.85.214.180]:46814 "EHLO
-        mail-pl1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726016AbfBUDl0 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 20 Feb 2019 22:41:26 -0500
-Received: by mail-pl1-f180.google.com with SMTP id o6so13410571pls.13
-        for <linux-cifs@vger.kernel.org>; Wed, 20 Feb 2019 19:41:26 -0800 (PST)
+        id S1726172AbfBUEAv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 20 Feb 2019 23:00:51 -0500
+Received: from mail-pf1-f176.google.com ([209.85.210.176]:36402 "EHLO
+        mail-pf1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726121AbfBUEAv (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 20 Feb 2019 23:00:51 -0500
+Received: by mail-pf1-f176.google.com with SMTP id n22so13068916pfa.3
+        for <linux-cifs@vger.kernel.org>; Wed, 20 Feb 2019 20:00:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=LXE4j4ndQNexyjXa4iXHkAYLx3qMvfJu8mjRYGOYQ5w=;
-        b=ZmMJiQBI2WysHq+DbfXIE8+fYqD3au2jCWH3hL6qvs6Aah61OjPyNynAMayl91o7Nh
-         wzRpAtag0sWBRqVo2enXsWSUbj4+mZsiHEKTzEMHBYPzGgv9/qRTptwbw4cJ12Yww+At
-         8AhjwAoSm3yFGibuUCtsTpou2CZsphDQPCj3txQ1y13jQ6/t1Jnd9f4FSOXOKYURNabt
-         hM4eOj9dsx0PDMDKFz3/xPEU63GHqeyHMElGhMdjMtJ2tMvvcUvdZifWnAQMDKbZ+M7i
-         ev8Ctq+14elSzeZYYcQt+fgEKq/0nuiyOMeR1hUo+7A/RIQ5QRu+VlZ6x/b7xNyV0ETM
-         VDNg==
+        bh=2O1Nz1wpeBV2WH1LvIFgNunsMoxf4MbWnNa3wXJ15LU=;
+        b=lQpUqh/u95jFGMIl6Di9fJeB1iqjYPcC9CyQ7zEylgazm3WSC2ujy/klwY3XqYYcLQ
+         22Z8seOCgyNH1wTCF+GDyQDBgMppLA0oOcGzU0uNInc5+sFFadG35BS//kbp34CSt4R9
+         imy1SFDy25ByKXOonQMmn/st83sHA05Gk9F7rfWjD0G8biYgJJgxRUkljcNvBZxVoJer
+         n1I4wol4VjRUWMiuSzxtRyepWBsoBe/IVl0ApZvWlQbGIb6p0M5YFk/nnxuPcpYSncBp
+         xMb+tj8F2fUUUtt4z0FsmQUr6B2cVyOfnnIuRXJWudsKFPhL0d5/f85hpNZMJNxum8A3
+         f/WQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=LXE4j4ndQNexyjXa4iXHkAYLx3qMvfJu8mjRYGOYQ5w=;
-        b=K7UW6Mo3f94PVvGu8OFRoAPERAFNij4rid+cPi2GaYN95OGUdG1vWt3NOUl14XyJVo
-         gsPsQqMEnwwA4jX5VJkaSh3QBwEKeIoZKowwxtaTxk4d80nP4p+pZSGvitQtRQr3w5Zu
-         ZJcgNGQmyqVjO8cBwJxFIvZWuW49iCKPHML5hehzQHcR8SIPDElw3iDte/vccElZ+E2m
-         KuBFVHxK6IPm1gBBf7jElNbxjYP8eJ19dCrfIC4HQnww9urebqQv/F+Bvpkexi6LrXPh
-         Yrnsu4urkWxPcvRAKAXV+oaS611/skonYc5Ny0sX/SnC+oSlwu/xR6kkLFRXJIOFDBNt
-         Fj4w==
-X-Gm-Message-State: AHQUAuY4ZMpQKc20tHfRVwoyFp8C2PtbJZUkAqPUFiKTiYG7CyRDYAVJ
-        SLt2jfJryd/iBPiRuko670TGYqaQkd+CAQ72X7qtgg==
-X-Google-Smtp-Source: AHgI3IZmERAeGbI0Ln3TWGFbIdvTGx4XepgdJ+c7X4EW7/SgHGjmjpDvo6h2G2MeqRx0mq3T91NL9PmFg9V8tsyWo6U=
-X-Received: by 2002:a17:902:822:: with SMTP id 31mr38389021plk.290.1550720485215;
- Wed, 20 Feb 2019 19:41:25 -0800 (PST)
+        bh=2O1Nz1wpeBV2WH1LvIFgNunsMoxf4MbWnNa3wXJ15LU=;
+        b=EUJHPNvT/PXK0YSavBhEJ/ouwuqHBokky6SgDXeuFHG6WFh8LQoLvnoa9aqtO40HJw
+         +Ctdd0LbIF0lAYCnuZcgydhib9mDKtLUeaCtai+HBvrEU+I/fLPL3BOfnkNG+4y3r8qm
+         mhd0O4GrGFS6vbRqlYtbWQsawIPgNgB21V94BL8B1DkhgTypmjn84SrtgrwLFSl5Nfld
+         WEGYdLI2XhE6glpgDlfK0UdyiWZiDKMsq6JtN3ykRhZOLsMwPHl4Tu/gCrU7O9hBeJp+
+         ZBeH67u/G2Oop8LVE7xREqvt6WwccLPhE90orlhEl5yMu5l2JXLyy8mldmWmUCk/Nz2D
+         t3GQ==
+X-Gm-Message-State: AHQUAubihGWg9KuhM9wUSOVIbBfuAhm+rzMIy6nD5pFj4B6XM07nAXqP
+        3ZZzJKyMmwn6AsVzQhUyad0htPfm3kYae1kG00ynxQ==
+X-Google-Smtp-Source: AHgI3IZjm7QOMPwKMQXuQiOQ8ka151pImeTr/a5Xctg+ckSRGc/NpmrEIY7tP/jF38Sy8t4lsl3qVmQtxnWSIGPkt5w=
+X-Received: by 2002:a63:2c8a:: with SMTP id s132mr32599922pgs.440.1550721649779;
+ Wed, 20 Feb 2019 20:00:49 -0800 (PST)
 MIME-Version: 1.0
 References: <CAH2r5msBMW=pvWiovXeTnVXogwyANArU9zBx4c1S1quGqcz9kg@mail.gmail.com>
  <CAH2r5mvi5k3=TgX_aGrjVyMjcLr9QOH+EPquXjwYLEHwZFP3YQ@mail.gmail.com>
@@ -64,8 +64,8 @@ References: <CAH2r5msBMW=pvWiovXeTnVXogwyANArU9zBx4c1S1quGqcz9kg@mail.gmail.com>
  <CAN05THTSFf23JdkY0=seh9SbO6y1qXcQ2XGreG+ZpJWhOWG0=Q@mail.gmail.com> <CAH2r5mvBtCG_TwjOa9AqAZDeq+EEjWqR2tYaG_6NZYjQaZrMHw@mail.gmail.com>
 In-Reply-To: <CAH2r5mvBtCG_TwjOa9AqAZDeq+EEjWqR2tYaG_6NZYjQaZrMHw@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 20 Feb 2019 21:41:13 -0600
-Message-ID: <CAH2r5mtLyC-LutGR5bLXiMjjZrEthMhNB1-47JXN+tztht+RTg@mail.gmail.com>
+Date:   Wed, 20 Feb 2019 22:00:38 -0600
+Message-ID: <CAH2r5mvZHgoUePpZGGikWpqQbjoNGXg_pR6tE1DxUjnPBpcztw@mail.gmail.com>
 Subject: Re: xfstests and current cifs for-next patch set
 To:     ronnie sahlberg <ronniesahlberg@gmail.com>
 Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
@@ -79,12 +79,9 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I tried it with 1MB and 2MB i/o size and it worked so will change the
-patch from 4MB blocksize (which is optimal for some cases) to 2MB
-which doesn't cause these problems and at least is optimal for other
-use cases.  Let me know if you see perf difference.  I saw the same
-run time (with/without patch) for 014, test 490 worked (same time as
-well) and 13 was 1 second slower.
+The reason 490 seems to be failing is that it is using the blocksize
+as allocation size and then doing truncate/seek.  Could be buggy test
+case but easier to just set it to 2MB which solves both problems.
 
 On Wed, Feb 20, 2019 at 8:31 PM Steve French <smfrench@gmail.com> wrote:
 >
