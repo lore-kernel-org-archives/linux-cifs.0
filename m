@@ -6,48 +6,48 @@ X-Spam-Status: No, score=-9.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1D76C43381
-	for <linux-cifs@archiver.kernel.org>; Sat, 23 Feb 2019 21:19:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9705BC4360F
+	for <linux-cifs@archiver.kernel.org>; Sat, 23 Feb 2019 21:23:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8109B205C9
-	for <linux-cifs@archiver.kernel.org>; Sat, 23 Feb 2019 21:19:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5D25320651
+	for <linux-cifs@archiver.kernel.org>; Sat, 23 Feb 2019 21:23:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1550956756;
-	bh=tK/c9XNB7dyw5U4oD/9OpsHySHhRH+qDAbKob+NkCpc=;
+	s=default; t=1550957021;
+	bh=A0UKc2ZGWAth2d+21AzkXptWPAlV+ToNfIfMlt/wiqk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=qUV/RsVIiDDjDWVuRYsdnLy9hwTkbuD0Q/4YykPlK+r3S2MbwgaxffzX9f+K1K0mh
-	 KXPtl1WQz6vkwvm9s7A3s0RwOclL62UGaEZDaNuBKkIcZmAZXmxoazmX7U6LeV5Xze
-	 vHKSyo7PWnNMl/XS29Vt1tGu9gB1WSR1XSDsSe3g=
+	b=Sp18ucxahIZTXDawFr5g4pPA6YJUoydfqK0+i8a9GfSzmnI2whCRNSbeWLIaN8Sng
+	 s/YgG73mFo3gS27E6VpIEPWojX8/jQDIgiRhGvWQbgzIWUn1S98DTLT9y0iwGYhWW2
+	 TAely/V15YvwSEl2v4CE2fE7O9CyH4jNRcRvKXoc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729188AbfBWVTH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 23 Feb 2019 16:19:07 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45078 "EHLO mail.kernel.org"
+        id S1729206AbfBWVXa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 23 Feb 2019 16:23:30 -0500
+Received: from mail.kernel.org ([198.145.29.99]:43348 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729191AbfBWVJ1 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sat, 23 Feb 2019 16:09:27 -0500
+        id S1728579AbfBWVIE (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Sat, 23 Feb 2019 16:08:04 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1B6582085A;
-        Sat, 23 Feb 2019 21:09:26 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id C4C0820855;
+        Sat, 23 Feb 2019 21:08:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1550956166;
-        bh=tK/c9XNB7dyw5U4oD/9OpsHySHhRH+qDAbKob+NkCpc=;
+        s=default; t=1550956083;
+        bh=A0UKc2ZGWAth2d+21AzkXptWPAlV+ToNfIfMlt/wiqk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=iXK1NMILMwQbjKQZgFO3M0fhXUGo3nQ+Hq3hnwwEUAlFnGELSC1BlQ4qQl3kw/x2P
-         LaGYLKWzm5o46kl9lAbSmA3HgLdQLXrqYyhsNtJvMMe0NTfkMb1BYB4cWUKt19CCTX
-         HqJHCo+/Jvj0/yl2fsqm3uCfx5wTQW9a9BSwTnrQ=
+        b=TBWDWJRy2r9qkzn8dMbyom4Ivnv+kCfcBZedc/yAnOQqQHSXR7kLPayBj2KWD1zy2
+         pEtjczreoRHzQyZNRNtEwlhfiG7xYK81j5sQQgwsr3h5a9vBPVJ7Uv0jl5ban48gb3
+         zJDUTw1RlCsO7zbRDUtcSmDULhAxK8lWP51mWGsc=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 33/45] cifs: fix computation for MAX_SMB2_HDR_SIZE
-Date:   Sat, 23 Feb 2019 16:08:23 -0500
-Message-Id: <20190223210835.201708-33-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 52/65] cifs: fix computation for MAX_SMB2_HDR_SIZE
+Date:   Sat, 23 Feb 2019 16:06:27 -0500
+Message-Id: <20190223210640.200911-52-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190223210835.201708-1-sashal@kernel.org>
-References: <20190223210835.201708-1-sashal@kernel.org>
+In-Reply-To: <20190223210640.200911-1-sashal@kernel.org>
+References: <20190223210640.200911-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -71,7 +71,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index e524540597256..bad458a2b579e 100644
+index 8fb7887f2b3d9..437257d1116f0 100644
 --- a/fs/cifs/smb2pdu.h
 +++ b/fs/cifs/smb2pdu.h
 @@ -84,8 +84,8 @@
