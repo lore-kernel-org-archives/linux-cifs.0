@@ -7,71 +7,82 @@ X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6814CC43381
-	for <linux-cifs@archiver.kernel.org>; Mon, 25 Feb 2019 07:25:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D618C43381
+	for <linux-cifs@archiver.kernel.org>; Mon, 25 Feb 2019 07:26:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 335DA2087C
-	for <linux-cifs@archiver.kernel.org>; Mon, 25 Feb 2019 07:25:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE1F72087C
+	for <linux-cifs@archiver.kernel.org>; Mon, 25 Feb 2019 07:26:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nNztlUKH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OETEe/f0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728557AbfBYHZQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 25 Feb 2019 02:25:16 -0500
-Received: from mail-pf1-f176.google.com ([209.85.210.176]:43941 "EHLO
-        mail-pf1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728544AbfBYHZQ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 25 Feb 2019 02:25:16 -0500
-Received: by mail-pf1-f176.google.com with SMTP id q17so4060321pfh.10
-        for <linux-cifs@vger.kernel.org>; Sun, 24 Feb 2019 23:25:16 -0800 (PST)
+        id S1728544AbfBYH0S (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 25 Feb 2019 02:26:18 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:42113 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728217AbfBYH0S (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 25 Feb 2019 02:26:18 -0500
+Received: by mail-pg1-f196.google.com with SMTP id b2so4066106pgl.9
+        for <linux-cifs@vger.kernel.org>; Sun, 24 Feb 2019 23:26:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=TT4qCg7WK3T/yLV9u1pWRKTgv7iEJTqMjjAL2uhRv50=;
-        b=nNztlUKHPdFBY0VRb5qjHjhWPOB3Tx42QsYtzpq6MVUJ8OR8Q73anOnuSR3+fkZYBV
-         /DOzAts26EnZL4xsGecUT/35gBrZ3f1CnHg6qMH8+YeywzzDDDIzJ+M3OuI+YryMaJ4D
-         DN/Hl1MrREjvXryJl9htWC8/eQ4h5yvJC3/eojWtqtwHUsS+L/IMxbYocssPDSLsMi3q
-         jPO+vmq4yu+90GXtSzO1ZUY6eN1UV9APVD1HO/Cuy+ur/Bt2ppC5uj1fP573SvrSWcuM
-         cOxHGTtBPLIKoig/7uMtIUPG+aReHJoNPNrZk/Elon0SyyrgWD0rXk7qbAhFdKm2gADr
-         ZsOg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=jWc8aSwCH47nuTyggFuQCnQnH9g6qTolsFnmQjrX/GE=;
+        b=OETEe/f0dS5qSkRW/yHYUjm6LNHqGSRNGzePN0Q9/8aR2PlqWfEYhUVvTrQjG6f6nR
+         UutCUfzddajHaahiGxPzu5IWHe511jr3mFlP6z3RPakzAgIDJ/BDPLQK5C00NVu7wB47
+         Fp4i7mEBChkoJsLCIPDzDIBCApzde7g4QVej3EPDmUtsqZ02wPQbacOjKHGDMMpwphUh
+         FDRJCMI/YiEy4AANzkqlPOdwe8mAZUfD/BrioeUeP9740lMNTffb9ybTnZejqaZWT+gK
+         YceBLlSDr4lF5bCc0bO35LLAUUUu2c8m1ICZuORW3OJwQY7hseVESWQyH0BXQDGFZEjw
+         2wFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=TT4qCg7WK3T/yLV9u1pWRKTgv7iEJTqMjjAL2uhRv50=;
-        b=Fp79ij5ALgMW6ALBor9qaTfmr8LF9tjT8fPvJ7Ne1p7CVlpkM4QZLnhjfwphro090M
-         o+fez9K3rrX1D6hUSlXlg8RjXDB/sIL8dmlk4ngB9krLnFsiwWg+4ILMHlWf1m3Xj3PI
-         b8wXzgeSrxXKeHpRHVu0pit36Wyt+uNZcLyGSQ2uasLwKDsQf09JowGWUvOWmDr6TjIp
-         kMtUR2fg9KskXlRH3Sy4YEoszy7wyVPBkaMpU3iimXnm+vsMAwx5WhZNjgmFc0mVyHD+
-         Cy+53ZMQy4VA6ksjd61yaROUtZrmZ4K5DQSUlcLPdwiklPXc4eMwpVIGBDvYkoWes878
-         Lcow==
-X-Gm-Message-State: AHQUAuYSyClSrWZK9FoTWz3todyBXfeN4NvLlrLuoPjX7K3U0pjr9/C9
-        /uJABnvLZtHH7BjQ5GzwoQhYcanwAsf2J1VOf3JOyJ38
-X-Google-Smtp-Source: AHgI3Ib/wkSZi+EPUm15SXt5HAtvMFoMmiqGAAT1/RNzTQNmxQcTL0aPfb6I+XOK8xS2Acq48RRcr0RuZyrL5ptBNo8=
-X-Received: by 2002:a63:8743:: with SMTP id i64mr13613197pge.69.1551079515657;
- Sun, 24 Feb 2019 23:25:15 -0800 (PST)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=jWc8aSwCH47nuTyggFuQCnQnH9g6qTolsFnmQjrX/GE=;
+        b=hSN0mlglJjSwsvP/K1M8xP6r7rOW1jP1V7xh7JpDp1jjBUGyFto4AUC0Kg/jeJtFo3
+         1CNupPgnLMz5jt9T2FhK7BQ4xP1VKCQiH/3AWS/SFXzQishbJs8n5/9zUBwRj7DfLVoK
+         F27DBP2HwUJ+Ro4YRcc8JiBrKQcB4v1RfDJalT8yNTqb5sEK91fkF1onI6ZyIPbZBqCO
+         WfXe+nnViq1l2VK4aM5Q9LGq4bSUg68j4wbysvTbRHs61aKoLqGq0VmuBjWBmgwOLFUZ
+         I7sUcGedXXbsB+TT7nSsNyhcaTGOw55fWWHLLBezjkBlgYVu5KZcjp7rclEde2Y5YjMl
+         U4QA==
+X-Gm-Message-State: AHQUAuay6nL9T6rJD0+tBiHCyaCIehc1k9rhJAXtuQumvIW88vm54ljI
+        TPS3vBgezifF+qaVydzeNisu81Z9Svy3880jmr8=
+X-Google-Smtp-Source: AHgI3IZ6n4Ej8c8NH93SPAbL310kLXZazyx4PN9TRkOgAHRrXeeSm4Tri49K5BQEyW4W9xoQY3XWAglpLR7quIJ5LJQ=
+X-Received: by 2002:a62:12d5:: with SMTP id 82mr18868528pfs.255.1551079577629;
+ Sun, 24 Feb 2019 23:26:17 -0800 (PST)
 MIME-Version: 1.0
+References: <CAH2r5msoRSXFj=SM54Dg7A74yMj9X1XB=S8JY1zM=FgH13qzog@mail.gmail.com>
+ <b3ffde7e-b8b1-b44c-a440-bcd2d1c9ca0b@samba.org>
+In-Reply-To: <b3ffde7e-b8b1-b44c-a440-bcd2d1c9ca0b@samba.org>
 From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 25 Feb 2019 01:25:04 -0600
-Message-ID: <CAH2r5mt+4p=KBumSV3aqE35my8ypnLy9NDJnEyTuh_vg4kP6VQ@mail.gmail.com>
-Subject: Testing your tree with Linux client
-To:     Jeremy Allison <jra@samba.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+Date:   Mon, 25 Feb 2019 01:26:05 -0600
+Message-ID: <CAH2r5muat94zgOLN6rqUF5pfFWfq=TN2FAJrEXLPtus9WCa78g@mail.gmail.com>
+Subject: Re: Update POSIX negotiate context during negprot to include GUID
+To:     Stefan Metzmacher <metze@samba.org>
+Cc:     Jeremy Allison <jra@samba.org>, CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Other than the world write flag being masked off (0777--> 0775) and
-the setuid/setgid/sticky bits being masked off, file create also
-looked fine.  See the local view of newly created files
+On Mon, Feb 25, 2019 at 1:22 AM Stefan Metzmacher <metze@samba.org> wrote:
+>
+> Am 25.02.19 um 01:01 schrieb Steve French via samba-technical:
+> > As requested - updated the POSIX negotiate context to include the GUID
+> > of the only supported POSIX open/create context.
+> >
+> > Let me know if any objections..
+>
+> Don't you need to change POSIX_CTXT_DATA_LEN?
 
--rwxr-xr--  1 testuser testuser          0 Feb 24 20:15 01754
--r--r-----  1 testuser testuser          0 Feb 24 20:15 0440
--rwxr-----  1 testuser testuser          0 Feb 24 20:15 0740
--rwxrwx---  1 testuser testuser          0 Feb 24 20:15 0770
--rwxrwxr-x  1 testuser testuser          0 Feb 24 20:15 0777
--rwxrwx---  1 testuser testuser          0 Feb 24 20:15 07770
+Isn't 16 bytes correct (at least one GUID - in this case matching the
+POSIX open context GUID)?  The patch included this change:
+
+-#define POSIX_CTXT_DATA_LEN    8
++#define POSIX_CTXT_DATA_LEN    16
+
 
 
 -- 
