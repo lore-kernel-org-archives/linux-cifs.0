@@ -6,35 +6,36 @@ X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44A54C43381
-	for <linux-cifs@archiver.kernel.org>; Mon, 25 Feb 2019 07:40:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46C56C43381
+	for <linux-cifs@archiver.kernel.org>; Mon, 25 Feb 2019 07:43:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B51FC2084D
-	for <linux-cifs@archiver.kernel.org>; Mon, 25 Feb 2019 07:40:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA9EB20842
+	for <linux-cifs@archiver.kernel.org>; Mon, 25 Feb 2019 07:43:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samba.org header.i=@samba.org header.b="nzv6S9hg"
+	dkim=pass (1024-bit key) header.d=samba.org header.i=@samba.org header.b="TlLMXGnF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725877AbfBYHkx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 25 Feb 2019 02:40:53 -0500
-Received: from hr2.samba.org ([144.76.82.148]:23594 "EHLO hr2.samba.org"
+        id S1726017AbfBYHno (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 25 Feb 2019 02:43:44 -0500
+Received: from hr2.samba.org ([144.76.82.148]:24192 "EHLO hr2.samba.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725863AbfBYHkw (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 25 Feb 2019 02:40:52 -0500
-X-Greylist: delayed 1090 seconds by postgrey-1.27 at vger.kernel.org; Mon, 25 Feb 2019 02:40:48 EST
+        id S1725900AbfBYHnm (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 25 Feb 2019 02:43:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
          s=42627210; h=Date:Message-ID:From:Cc:To;
-        bh=79DJPyXT1+/PpJ/EXq/KizQFGZ44JBsbq0YrJujIpHk=; b=nzv6S9hg80K02VCzUC2ylYwZzV
-        hsdf5quEVyeXfQXd88YgfLuO2ClQ/H+AppUazzRQ2SKCU+jlTfUYIvwRCrvW4kqiSZiXZyTt9Mqy5
-        2O+piRMM1US/wsZpiyqkMx2tBAqCvHuODAARLfDUaUe8PoYiRQR9pNoMA2c77yM7+DNA=;
+        bh=XzI3e5bxT/UkQTLvMnPNhm5fKq64OE0rcj0DqqaerT8=; b=TlLMXGnFbxJOQkV9Rw+Y6LsOvg
+        Zt1oN+9YUNJUuFqv5g2Ic1M9orCVHiR4lnc/jwg/qon5WfKWigZVZ5by4wJ08BGpUwwicVY32LTuQ
+        MNm4f6Ulmsodne5WLK/NsLj4OKSL/bIuIqItnhyBBjH7IOy/7+d/UNE0dfjy0hGcu2Bk=;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
         by hr2.samba.org with esmtpsa (TLS1.2:ECDHE_ECDSA_CHACHA20_POLY1305:256)
         (Exim)
-        id 1gyAaz-0002fu-6T; Mon, 25 Feb 2019 07:22:37 +0000
-Subject: Re: Update POSIX negotiate context during negprot to include GUID
-To:     Steve French <smfrench@gmail.com>, Jeremy Allison <jra@samba.org>
+        id 1gyAvL-0002tn-Er; Mon, 25 Feb 2019 07:43:39 +0000
+To:     Steve French <smfrench@gmail.com>
 Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
+        samba-technical <samba-technical@lists.samba.org>,
+        Jeremy Allison <jra@samba.org>
 References: <CAH2r5msoRSXFj=SM54Dg7A74yMj9X1XB=S8JY1zM=FgH13qzog@mail.gmail.com>
+ <b3ffde7e-b8b1-b44c-a440-bcd2d1c9ca0b@samba.org>
+ <CAH2r5muat94zgOLN6rqUF5pfFWfq=TN2FAJrEXLPtus9WCa78g@mail.gmail.com>
 From:   Stefan Metzmacher <metze@samba.org>
 Openpgp: id=A3D192CE44EF412517BCED646A739B025C6B98D4
 Autocrypt: addr=metze@samba.org; prefer-encrypt=mutual; keydata=
@@ -297,71 +298,114 @@ Autocrypt: addr=metze@samba.org; prefer-encrypt=mutual; keydata=
  Ni4gS17UG0YAZkvjncljeRd6UzGW+Jnep5B4tIYYzmbPnOnA1KhnhRlT5lICc7qvCK+d6cSR
  qwZDheb6YDf6miyYDFqUjGg0jAdZI5/RmaYxSWypa/tHB3ivQnKwKx5T2ud7ORnFESvtSaEg
  TMt9+YYVzXoQcRaCWWvnbFSFeI+4jbgjosLpUEFU7a8H1dVgrrHVj8K1pxc=
-Message-ID: <b3ffde7e-b8b1-b44c-a440-bcd2d1c9ca0b@samba.org>
-Date:   Mon, 25 Feb 2019 08:22:31 +0100
+Subject: Re: Update POSIX negotiate context during negprot to include GUID
+Message-ID: <341721d1-0ac5-3c0f-9ea5-a9bd10816023@samba.org>
+Date:   Mon, 25 Feb 2019 08:43:33 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <CAH2r5msoRSXFj=SM54Dg7A74yMj9X1XB=S8JY1zM=FgH13qzog@mail.gmail.com>
+In-Reply-To: <CAH2r5muat94zgOLN6rqUF5pfFWfq=TN2FAJrEXLPtus9WCa78g@mail.gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha512;
  protocol="application/pgp-signature";
- boundary="yFkUHtD3OK9J2m7Dhm6kQ96lSTktUbDNs"
+ boundary="oNqrzkeeERP5ypm7iE1ZVsiNnEmkjY6Jh"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---yFkUHtD3OK9J2m7Dhm6kQ96lSTktUbDNs
-Content-Type: multipart/mixed; boundary="F1W9l7lBJMIsKMxonfPIGsHtzHaHgXsb9";
+--oNqrzkeeERP5ypm7iE1ZVsiNnEmkjY6Jh
+Content-Type: multipart/mixed; boundary="4b5ZtmkaT24ofT4KDOQj5u5tUf1infMrs";
  protected-headers="v1"
 From: Stefan Metzmacher <metze@samba.org>
-To: Steve French <smfrench@gmail.com>, Jeremy Allison <jra@samba.org>
+To: Steve French <smfrench@gmail.com>
 Cc: CIFS <linux-cifs@vger.kernel.org>,
- samba-technical <samba-technical@lists.samba.org>
-Message-ID: <b3ffde7e-b8b1-b44c-a440-bcd2d1c9ca0b@samba.org>
+ samba-technical <samba-technical@lists.samba.org>,
+ Jeremy Allison <jra@samba.org>
+Message-ID: <341721d1-0ac5-3c0f-9ea5-a9bd10816023@samba.org>
 Subject: Re: Update POSIX negotiate context during negprot to include GUID
 References: <CAH2r5msoRSXFj=SM54Dg7A74yMj9X1XB=S8JY1zM=FgH13qzog@mail.gmail.com>
-In-Reply-To: <CAH2r5msoRSXFj=SM54Dg7A74yMj9X1XB=S8JY1zM=FgH13qzog@mail.gmail.com>
+ <b3ffde7e-b8b1-b44c-a440-bcd2d1c9ca0b@samba.org>
+ <CAH2r5muat94zgOLN6rqUF5pfFWfq=TN2FAJrEXLPtus9WCa78g@mail.gmail.com>
+In-Reply-To: <CAH2r5muat94zgOLN6rqUF5pfFWfq=TN2FAJrEXLPtus9WCa78g@mail.gmail.com>
 
---F1W9l7lBJMIsKMxonfPIGsHtzHaHgXsb9
+--4b5ZtmkaT24ofT4KDOQj5u5tUf1infMrs
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-Am 25.02.19 um 01:01 schrieb Steve French via samba-technical:
-> As requested - updated the POSIX negotiate context to include the GUID
-> of the only supported POSIX open/create context.
+Am 25.02.19 um 08:26 schrieb Steve French via samba-technical:
+> On Mon, Feb 25, 2019 at 1:22 AM Stefan Metzmacher <metze@samba.org> wro=
+te:
+>>
+>> Am 25.02.19 um 01:01 schrieb Steve French via samba-technical:
+>>> As requested - updated the POSIX negotiate context to include the GUI=
+D
+>>> of the only supported POSIX open/create context.
+>>>
+>>> Let me know if any objections..
+>>
+>> Don't you need to change POSIX_CTXT_DATA_LEN?
 >=20
-> Let me know if any objections..
+> Isn't 16 bytes correct (at least one GUID - in this case matching the
+> POSIX open context GUID)?  The patch included this change:
+>=20
+> -#define POSIX_CTXT_DATA_LEN    8
+> +#define POSIX_CTXT_DATA_LEN    16
+>=20
 
-Don't you need to change POSIX_CTXT_DATA_LEN?
+Yes, that correct, I missed that sorry.
+
+Does your client still work without that chance, just sending 8 zero
+bytes? Or does that fail?
+
+I guess it will fail at
+
++               if ((inbuflen % 16) !=3D 0) {
++                       return smbd_smb2_request_error(
++                               req, NT_STATUS_INVALID_PARAMETER);
++               }
+
+I think we need to have something like this before:
+
+     static const uint64_t reserved64;
+     DATA_BLOB reserved =3D data_blob_const(&reserved64,
+sizeof(reserved6464));
+     int cmp;
+
+     cmp =3D data_blob_cmp(&in_posix->data, &reserved_value);
+     if (cmp =3D=3D 0) {
+           inbuf =3D (const uint8_t *)SMB2_CREATE_TAG_POSIX;
+           inbuflen =3D 16;
+           outbuf =3D reserved.blob;
+           outbuflen =3D reserved.length;
+     }
 
 metze
 
 
---F1W9l7lBJMIsKMxonfPIGsHtzHaHgXsb9--
+--4b5ZtmkaT24ofT4KDOQj5u5tUf1infMrs--
 
---yFkUHtD3OK9J2m7Dhm6kQ96lSTktUbDNs
+--oNqrzkeeERP5ypm7iE1ZVsiNnEmkjY6Jh
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEfFbGo3YXpfgryIw9DbX1YShpvVYFAlxzl7cACgkQDbX1YShp
-vVboTQ/+O2TNOr7kBN7CF6UJpFVUcU94cRB4aWVqi28rDNHx6hI6jZ6k95rg4twA
-7wMvh7IB0Ot0m/ZNYs0/3mTMLM+Dg3OcI1jzqdg4HuodZRR1S+QguE2y/IXtUpZl
-zgT7CTJL12trJ1ZoNOBdv3juGUndniYvSzC8lLpIHs0cb/rkIw66vHzn9JyGOa2z
-NTJzvXTohdcekdpq2SOVCnzW4/viQXLtYwA2GAhdPI//YRGYPmCGqmq3Zi10qNte
-ldIY29ZRNwECZbt1sjlBZzQclAq8iqdLjP+zlV/3/WJCCXWTIs5eeNluHzIMyaqX
-66rFZ7ZC33oe2apgoXX3R2vwAmicAtoKYHBBp0+356Dkd3enuZNepeLr6zAzJLZ5
-K2FfrONGZLo0hbty+KmVRupaxIzfc/nrIsB+rlm1g9o9Ov3XEN8cYnJj3KWhWXFl
-XKgVTNYnP/6x8NltWwWSkeuQ61kYYQCa/EZTaG7ZoxjZHeEMLnuQbMQqPw9PdF1Z
-oaLNAw8wk/uOMbRYZwqaYcIuZ8fLu7kCzNSVaYFlZ12xqzKJGbRZVkjKmBCFQTpJ
-QlQn32NQ1ELFLnctd7aBy73bPUfMvyZi0L8H+PnCCXXFx8Q0KP3nupsOX/grwoVA
-koRHPUna5+SEROlODVbs9rPbMe8/Uph+AZQN9oluedx4juOEObg=
-=KQLU
+iQIzBAEBCgAdFiEEfFbGo3YXpfgryIw9DbX1YShpvVYFAlxznKUACgkQDbX1YShp
+vVY1Mw//QsRc/PfGm8NDazZFZupEmtbMfmGnwSPj4HIodflBFa/EpcRJ+sVg/xe3
+nwWswNOPKynDA/IDWzoPkC2KFoyZK4apGTVgPatCAY8lJZ//Wko1QXl55KgONuwo
+NApTOIRyYjp8KiJXGgxjOwijDt26T0HTeIJEYb6b7MZHGGc7VuCU8W4+QYSy94SP
+ymdM54lyhHzS3ksavfDaPBWq8+yi/uYRB7zDo8CyDnG6PWQqD+l/83jGXfPeZt3f
+HOScUPoqvlezil8LyA0T2hXOjwivyrwUEiXNsIl4o1CKCvfC8hhshBKEmsTAHakK
+WbmwggufeARaqYS9Dxwp2rq7AZT3ppV7fYPAwInHBPGS+UXm3BUdbLBQza2FUvIN
+/sOPYBzk3CtQn/tlHFEonfcMf1Ai8OVJ1lg9d7zP6JiDtxvqHu10SVlDea6HqjiV
+hkwl7sdHiSeIGQu7VjbUzZLkglXNroBsieGsfM2FBWRwgBGdMmo3vJ3f4OzB0l7h
+EVppNm/fkrF+IsCeHlDN1jplYXU0CHQAtojgqUB44T8+xTvPm8cfp+SviH7tkYpt
+l7qe4kGTNdDpwM0E6Oedmd+DdTdVGaUs6+YnWkh304Lb9sN+//jx/C557CAFbRVD
+v5AHw3K5Awc0NWKTENtaXp8zAnyIjk7okmHPrcggaUzpU/YjO+Q=
+=0/2F
 -----END PGP SIGNATURE-----
 
---yFkUHtD3OK9J2m7Dhm6kQ96lSTktUbDNs--
+--oNqrzkeeERP5ypm7iE1ZVsiNnEmkjY6Jh--
