@@ -2,237 +2,149 @@ Return-Path: <SRS0=LBnX=RC=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9339AC43381
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Feb 2019 14:17:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DBC3C43381
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Feb 2019 14:17:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3E2112133D
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Feb 2019 14:17:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="JGKeOeQL"
+	by mail.kernel.org (Postfix) with ESMTP id 752D12133D
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Feb 2019 14:17:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728049AbfB0ORA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 27 Feb 2019 09:17:00 -0500
-Received: from mail-eopbgr800105.outbound.protection.outlook.com ([40.107.80.105]:22760
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728462AbfB0OQ7 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 27 Feb 2019 09:16:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5nLzBvhIQV57Fg2fz49SYxujhbeYdKOOAl9v7eT4Dso=;
- b=JGKeOeQLk9yJxAQljDZmhoFTf7+EvN/2x2oG3cvFG84BqhdBMX+ta3Tw5H6aGiS+43BSJrbaNe6hgJowfpe4/sqZhIyefIXWxSUcbldEysKVdwC81njISjb0xAFExZ3VKGJ+mHOk00th+B4LxdBCVc1Iry83I5N1Sy8xAlgFUkw=
-Received: from SN4PR2101MB0736.namprd21.prod.outlook.com (10.167.151.155) by
- SN4PR2101MB0736.namprd21.prod.outlook.com (10.167.151.155) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1686.5; Wed, 27 Feb 2019 14:16:55 +0000
-Received: from SN4PR2101MB0736.namprd21.prod.outlook.com
- ([fe80::bdda:b065:93f4:1f21]) by SN4PR2101MB0736.namprd21.prod.outlook.com
- ([fe80::bdda:b065:93f4:1f21%3]) with mapi id 15.20.1686.004; Wed, 27 Feb 2019
- 14:16:55 +0000
-From:   Tom Talpey <ttalpey@microsoft.com>
-To:     Ross Lagerwall <ross.lagerwall@citrix.com>,
-        Steve French <smfrench@gmail.com>
-CC:     CIFS <linux-cifs@vger.kernel.org>
-Subject: RE: Failure to reconnect after cluster failvoer
-Thread-Topic: Failure to reconnect after cluster failvoer
-Thread-Index: AQHUygaXWPirxP5U10SRwmEzoXVUbaXqe52AgAAM1GCAAYg/AIAAYqyggAQQaoCAAy8ssA==
-Date:   Wed, 27 Feb 2019 14:16:55 +0000
-Message-ID: <SN4PR2101MB07369A08CE6311DFEE31DD8BA0740@SN4PR2101MB0736.namprd21.prod.outlook.com>
-References: <70e91b0b-4bca-60ea-19cf-3df0f49d4e5a@citrix.com>
- <CAH2r5mvDFFMhwyKdEGhgb+5-+v2PyuAWpWN9drofXVvj3mQxYQ@mail.gmail.com>
- <SN4PR2101MB073663B8E9E7AC98A4D0C992A07E0@SN4PR2101MB0736.namprd21.prod.outlook.com>
- <07c8e090-afed-6219-7d24-addfa660d8dd@citrix.com>
- <SN4PR2101MB0736EDA079C01725CBB1A339A07F0@SN4PR2101MB0736.namprd21.prod.outlook.com>
- <4ffc3de4-ecab-d7fb-b160-b34b45ae1f0a@citrix.com>
-In-Reply-To: <4ffc3de4-ecab-d7fb-b160-b34b45ae1f0a@citrix.com>
-Accept-Language: en-US
-Content-Language: en-US
+        id S1730059AbfB0ORm convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 27 Feb 2019 09:17:42 -0500
+Received: from ul-exc-pr-as01.ulaval.ca ([132.203.244.29]:17813 "EHLO
+        ul-exc-pr-as01.ulaval.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728462AbfB0ORl (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 27 Feb 2019 09:17:41 -0500
+Received: from ul-exc-pr-edg01.ulaval.ca ([132.203.244.26])
+  by ul-exc-pr-as01.ulaval.ca with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Feb 2019 09:17:41 -0500
+Received: from UL-EXC-PR-MBX11.ulaval.ca (10.40.67.111) by
+ UL-EXC-PR-EDG01.ulaval.ca (132.203.244.26) with Microsoft SMTP Server (TLS)
+ id 15.0.1395.4; Wed, 27 Feb 2019 09:17:39 -0500
+Received: from UL-EXC-PR-MBX20.ulaval.ca (10.40.67.120) by
+ ul-exc-pr-mbx11.ulaval.ca (10.40.67.111) with Microsoft SMTP Server (TLS) id
+ 15.0.1395.4; Wed, 27 Feb 2019 09:17:39 -0500
+Received: from UL-EXC-PR-MBX20.ulaval.ca ([fe80::5d31:55ba:ae63:96d4]) by
+ UL-EXC-PR-MBX20.ulaval.ca ([fe80::5d31:55ba:ae63:96d4%22]) with mapi id
+ 15.00.1395.000; Wed, 27 Feb 2019 09:17:39 -0500
+From:   =?iso-8859-1?Q?Alexis_Fortin-C=F4t=E9?= 
+        <alexis.fortin-cote.1@ulaval.ca>
+To:     "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+CC:     "Robin P. Blanchard" <robin.blanchard@gmail.com>
+Subject: RE: mount -t cifs fails while smbclient succeed
+Thread-Topic: mount -t cifs fails while smbclient succeed
+Thread-Index: AQHUyrzXfCa6KTecaEaRGQ0BBWS51qXr8SPBgACSrACABzQvuw==
+Date:   Wed, 27 Feb 2019 14:17:39 +0000
+Message-ID: <1551277059649.97069@ulaval.ca>
+References: <637c6227392d4f67b76aa6ebb8b71d0c@UL-EXC-PR-MBX20.ulaval.ca>
+ <1550849364135.34775@ulaval.ca>,<CAJUwKM3kKM-g6L+vAVNUvVbCds6ezFmaB8J2BQT2zWyHBmmc6Q@mail.gmail.com>
+In-Reply-To: <CAJUwKM3kKM-g6L+vAVNUvVbCds6ezFmaB8J2BQT2zWyHBmmc6Q@mail.gmail.com>
+Accept-Language: fr-CA, en-US
+Content-Language: fr-CA
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Owner=ttalpey@microsoft.com;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2019-02-27T14:16:53.9210786Z;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Application=Microsoft Azure
- Information Protection;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=42affa78-4a42-40af-9d47-11e28289f190;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Extended_MSFT_Method=Automatic
-x-originating-ip: [63.138.96.2]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 08655c3d-de72-4877-06d7-08d69cbe3a3b
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600127)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:SN4PR2101MB0736;
-x-ms-traffictypediagnostic: SN4PR2101MB0736:
-x-microsoft-exchange-diagnostics: =?utf-8?B?MTtTTjRQUjIxMDFNQjA3MzY7MjM6MHROeWozeWgxR1hScjk1dHgvVWErbHNK?=
- =?utf-8?B?bVRHaHR2dnJLalh4L09HTHNTV3JWTVRMaDJwMllDbDZBQ2FZTFZSRkFHSlZD?=
- =?utf-8?B?cGU5NVM5VEJobDNlamJYLzRxUnZDTzYvSjlVR1hvdmJCQVdTUlZLOHJLeTZ3?=
- =?utf-8?B?WUdxc0dJalJQcHpUSE5OYTF5UVNrOU8rTnQ0Zi9CaDNNNHlXalRSR0JuOHZr?=
- =?utf-8?B?bXhPeG5aeUthQlA0WmVYd1h5VEdKVEhoeGp2RjI5N00vVlZBc2Z0S2NyVHpX?=
- =?utf-8?B?eWMvL1B3ZThtQm9sN3U4R0V3YkhZOTgzc0R2QmdFRXkrcVcxMjllZE1nZFdr?=
- =?utf-8?B?YmVXVk4xVENJRDR0bjNaUjFBdGgwekR2N2FzSmtSV0dzbk5pVG9Gc1RnRDZh?=
- =?utf-8?B?Y0xwc3p4SDVZN3V3cnQzWGRxakRQUmMrbkd1R2hncFJybXVDbE9hemptMEJw?=
- =?utf-8?B?SzFvSXVNUy9xMXNiSDBHeHZyNmFkb3VFNUIzc2s1MFphMXBrT1NRMGpkMTF0?=
- =?utf-8?B?OEx0aUhyRnRyRS9TNkZxSDI3S3hmNXo1OXBBWUdONkRhc2E3ZnpmZ2xUQnJq?=
- =?utf-8?B?UjRuMStRU1ppR1lXMDVPZFdwMTV0VXFHdkY2eC94MjFmaFAzU1QzcTQ5RHNn?=
- =?utf-8?B?ZWc4T1hQMjFOQmJ2WDBja2lET3lUWGthMmx6MFBQOFNKaGdlUjROT2ZNS0pN?=
- =?utf-8?B?TDRGaHRDUDhGMCs0aE9acytqTnVESEdkZXNERHk5OFN1ZElKeURRRkZkUk9L?=
- =?utf-8?B?Y3R1bVl6WXFhVWpvRmwwMXRHSXMxQTRBZ05sdVV2VU1lUEFEZ25WY3NKMHc2?=
- =?utf-8?B?NWxHcEdzeElyNUV3dFY5RXBadEJTWGk0VFJoc1RwbmM4WUlBaDZPOXIxMitw?=
- =?utf-8?B?T2VBVkpvanFDWEowSGR0eUEwZXY3dTJUdXY4d3BUdkYvNWxQWjExT1VRSkN0?=
- =?utf-8?B?SEdnc2tXbWlTc2lQbVBjVkdYNTRJbWxlWXBzTm5kZ3RFWTEvTkpEelNFUjVq?=
- =?utf-8?B?U2hRMzAxVXJpUk1EaUlxOGFXc25LVFArZGdwbkxHTDFVMk1hL0RLRENFOUlu?=
- =?utf-8?B?Z2ZmRzNYdnh5UmRNWjA3ZEdxNDBjMzdudUlrWmo5VjFVV2g5SzZEZnNTWTc1?=
- =?utf-8?B?djBOOXpFazFKRlJmRldEZnV5QXhzdU1HK1JRRjR4OHRuNHIvUHlzaHF3V3B1?=
- =?utf-8?B?L1JYNTNjMS9FV3JhMG9EQjYveHc0Q1VMbVIxeGtUdmp3NHF4cUhncW8xakJ1?=
- =?utf-8?B?Z1JDaENTeUYxT2xDNVJUcFVIVmRDMzBrN0Z4UHJVcVlXL2JGYnRiNmVrU0Vl?=
- =?utf-8?B?M0w2dmhwQ1NYNXBscHNlN2wvbHc2WDR0a1NNSzZkcjR3WjFBRTEzd0hLMkVR?=
- =?utf-8?B?Nm9NNG90ZC9pMnd2cUFnN3ZkOEtBcmt3RG1tbm8vbWtLbXZIQ3ljQk9CQW5P?=
- =?utf-8?B?WHJIVlJSQjJDdG52SGc0eStjNWxsd0ZPRXM3QVU4ZDZlSjVhRWtobHlhOXQ2?=
- =?utf-8?B?VHJJYkhFdjNRQWJCQmVZVlp1MzF1c1NVckNOQnRXcUpSOXpyYzFoRld6WUVr?=
- =?utf-8?B?NXEzcERVZ3VLNXllYlN4clhxc3hscUU0aldJWnAzV2R6WS8yKzdZdUZ0UVJy?=
- =?utf-8?B?N2JBaEdxMkp6bmFMUVExKzhiZVZmRHpCb25LRWU1bVBzN2JzMHh6czJmZDZs?=
- =?utf-8?B?VGE5TTZsajRRMHp0QUpTeHRPd3FoN0diRWlQb3IrZnovQXVUOUlIdXQvTVZQ?=
- =?utf-8?B?OGhPTFQyaUIrVnZOMC9FN3Mxc0xxWGZFZk9aa0pnYTZ0TktpTnp3OVYxSWs1?=
- =?utf-8?B?UG9jT3VSTkpzdktwSEFWTGJjbnl3MitmOXVUd1ZaYlBzQ0cwbHc3UURhZlBZ?=
- =?utf-8?B?d2pBUk8vSG5aRVR2WFBSMno5YVVGYk9LYmpDMUxTSU1SS3lDTUNXQUtERk8v?=
- =?utf-8?Q?aqAS1TXz93DpUHYhSffOIAqSJa35ZaXo=3D?=
-x-microsoft-antispam-prvs: <SN4PR2101MB073668A8F12CD4330357A183A0740@SN4PR2101MB0736.namprd21.prod.outlook.com>
-x-forefront-prvs: 0961DF5286
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(376002)(39860400002)(136003)(366004)(346002)(199004)(189003)(51914003)(13464003)(55016002)(6436002)(229853002)(66066001)(93886005)(33656002)(26005)(6346003)(186003)(71200400001)(6246003)(71190400001)(9686003)(53936002)(4326008)(14444005)(256004)(25786009)(106356001)(105586002)(14454004)(478600001)(10290500003)(8676002)(68736007)(81156014)(74316002)(8936002)(305945005)(7736002)(6116002)(3846002)(81166006)(8990500004)(316002)(22452003)(110136005)(76176011)(7696005)(2906002)(53546011)(6506007)(102836004)(99286004)(10090500001)(5660300002)(86612001)(11346002)(97736004)(446003)(486006)(52536013)(476003)(86362001);DIR:OUT;SFP:1102;SCL:1;SRVR:SN4PR2101MB0736;H:SN4PR2101MB0736.namprd21.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=ttalpey@microsoft.com; 
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: dNMEo/Aesj7AstIcgECT6PSNWoLcCGstyXFUF1ICpcAfq+Snm5XSHakEHzNYWigofUcPB1CPMLkcKkOr7Jgjdygb9tn2Msl+0AdHs0krhse4itGLA4Kw2bNv0ETnmMvs8Yf779HVrQb3QXtgcM8K1Z1Lvp1DJaHnAUQDbJ3P55OrboZPOjXeg2UZlElbT33/XWI46ByWLI5epQJ0y+8kF6N0ikA0wBZvFSUTvSgWpmydI/jmEVM5gG0/5k3vdhYOTpqLCKPGE44C8+5541tSSHJTyOLCpI6TtgeMUooPlhr1ABMjzh8z7kK8HUZ1eNCATBS4VYWSD7PcJsMHIIOjCbEPKXyH55uMXQapmLUFQJVFs0NEgTQH2OXvUfWSisUAl/IqmYNVP/2LgdlloEVU2we7VQ4g2u7ZvD6+pAL/5JM=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.40.104.18]
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 08655c3d-de72-4877-06d7-08d69cbe3a3b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Feb 2019 14:16:55.2121
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR2101MB0736
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBSb3NzIExhZ2Vyd2FsbCA8cm9z
-cy5sYWdlcndhbGxAY2l0cml4LmNvbT4NCj4gU2VudDogTW9uZGF5LCBGZWJydWFyeSAyNSwgMjAx
-OSA4OjE0IEFNDQo+IFRvOiBUb20gVGFscGV5IDx0dGFscGV5QG1pY3Jvc29mdC5jb20+OyBTdGV2
-ZSBGcmVuY2gNCj4gPHNtZnJlbmNoQGdtYWlsLmNvbT4NCj4gQ2M6IENJRlMgPGxpbnV4LWNpZnNA
-dmdlci5rZXJuZWwub3JnPg0KPiBTdWJqZWN0OiBSZTogRmFpbHVyZSB0byByZWNvbm5lY3QgYWZ0
-ZXIgY2x1c3RlciBmYWlsdm9lcg0KPiANCj4gT24gMi8yMi8xOSAxMToyNSBQTSwgVG9tIFRhbHBl
-eSB3cm90ZToNCj4gPj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPj4gRnJvbTogUm9z
-cyBMYWdlcndhbGwgPHJvc3MubGFnZXJ3YWxsQGNpdHJpeC5jb20+DQo+ID4+IFNlbnQ6IEZyaWRh
-eSwgRmVicnVhcnkgMjIsIDIwMTkgOToxNyBBTQ0KPiA+PiBUbzogVG9tIFRhbHBleSA8dHRhbHBl
-eUBtaWNyb3NvZnQuY29tPjsgU3RldmUgRnJlbmNoDQo+ID4+IDxzbWZyZW5jaEBnbWFpbC5jb20+
-DQo+ID4+IENjOiBDSUZTIDxsaW51eC1jaWZzQHZnZXIua2VybmVsLm9yZz4NCj4gPj4gU3ViamVj
-dDogUmU6IEZhaWx1cmUgdG8gcmVjb25uZWN0IGFmdGVyIGNsdXN0ZXIgZmFpbHZvZXINCj4gPj4N
-Cj4gPj4gT24gMi8yMS8xOSA1OjU5IFBNLCBUb20gVGFscGV5IHdyb3RlOg0KPiA+Pj4gVGhlIHJl
-Y29ubmVjdCBpcyBhcHBhcmVudGx5IHVzaW5nIGEgZG90dGVkLXF1YWQgYXMgdGhlIHNlcnZlcm5h
-bWUsIGFuZA0KPiB5b3UNCj4gPj4gY2FuIHNlZSB0aGUgYXV0aCBpcyBmb3JjZWQgdG8gTlRMTSBh
-cyBhIGNvbnNlcXVlbmNlLiBJcyB0aGF0IHRoZSB3YXkgeW91DQo+ID4+IGluaXRpYWxseSBtb3Vu
-dGVkIHRoZSBzaGFyZSAoaS5lLiBtb3VudCAxMC43MS4yMTcuNTA6L3NtYnNoYXJlIC9tbnQpPw0K
-PiA+Pj4NCj4gPj4+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4+PiBGcm9tOiBsaW51
-eC1jaWZzLW93bmVyQHZnZXIua2VybmVsLm9yZyA8bGludXgtY2lmcy0NCj4gb3duZXJAdmdlci5r
-ZXJuZWwub3JnPg0KPiA+PiBPbiBCZWhhbGYgT2YgU3RldmUgRnJlbmNoDQo+ID4+PiBTZW50OiBU
-aHVyc2RheSwgRmVicnVhcnkgMjEsIDIwMTkgOTowNyBBTQ0KPiA+Pj4gVG86IFJvc3MgTGFnZXJ3
-YWxsIDxyb3NzLmxhZ2Vyd2FsbEBjaXRyaXguY29tPg0KPiA+Pj4gQ2M6IENJRlMgPGxpbnV4LWNp
-ZnNAdmdlci5rZXJuZWwub3JnPg0KPiA+Pj4gU3ViamVjdDogUmU6IEZhaWx1cmUgdG8gcmVjb25u
-ZWN0IGFmdGVyIGNsdXN0ZXIgZmFpbHZvZXINCj4gPj4+DQo+ID4+PiBDb3VwbGUgcXVpY2sgdGhv
-dWdodHMuDQo+ID4+Pg0KPiA+Pj4gRG9lcyB0aGlzIHdvcmsgb24gY3VycmVudCBrZXJuZWxzICg1
-LjAgZm9yIGV4YW1wbGUpLg0KPiA+Pj4NCj4gPj4+IFdhcyB0aGlua2luZyBhYm91dCBwYXRjaGVz
-IHRoYXQgbWlnaHQgYWZmZWN0IHRoaXMgbGlrZToNCj4gPj4+IC0gImNpZnM6IGNvbm5lY3QgdG8g
-c2VydmVybmFtZSBpbnN0ZWFkIG9mIElQIGZvciBJUEMkIHNoYXJlIg0KPiA+Pj4gLSAic21iMzog
-b24gcmVjb25uZWN0IHNldCBQcmV2aW91c1Nlc3Npb25JZCBmaWVsZCINCj4gPj4+IC0gUGF1bG8n
-cyBwYXRjaGVzIChoYXMgY2lmcy11dGlscyBjb3JlcSkgdG8gcmVjb25uZWN0IHRvIG5ldyBJUA0K
-PiA+Pj4gYWRkcmVzcyBpZiBob3N0bmFtZSdzIElQIGFkZHJlc3MgY2hhbmdlZCBhbmQgaGlzIGFk
-ZCBzdXBwb3J0IGZvcg0KPiA+Pj4gZmFpbG92ZXINCj4gPj4+IC0gUGF1bG8ncyBwYXRjaCB0byBy
-ZW1vdmUgdHJhaWxpbmcgc2xhc2hlcyBmcm9tIHNlcnZlciBVTkMgbmFtZQ0KPiA+Pj4NCj4gPj4g
-SSd2ZSByZXByb2R1Y2VkIHRoaXMgd2l0aCA1LjAtcmM3IGFuZCB0aGUgbGF0ZXN0IGNpZnMtdXRp
-bHMgZnJvbSBnaXQuDQo+ID4+IFRoZSBzaGFyZSB3YXMgbW91bnRlZCBhcyBmb2xsb3dzICh5ZXMs
-IGJ5IElQKToNCj4gPj4NCj4gPj4gbW91bnQuY2lmcyAtbw0KPiA+PiB2ZXJzPTMuMCxjYWNoZT1s
-b29zZSxhY3RpbWVvPTAsdXNlcm5hbWU9eCxkb21haW49eSxwYXNzd29yZD16DQo+ID4+ICcvLzEw
-LjcxLjIxNy4zMS9zbWJzaGFyZScgL21udA0KPiA+Pg0KPiA+PiBIZXJlIGlzIHRoZSB0Y3BkdW1w
-IHdoZW4gaXQgZmFpbHMgdG8gcmVjb25uZWN0IHByb3Blcmx5Og0KPiA+IC4uLg0KPiA+Pg0KPiA+
-PiBUaGUgaW5pdGlhbCBjb25uZWN0aW9uIGlzIGF0IHRpbWVzdGFtcCAwcywgcmVjb25uZWN0aW9u
-IGF0IDEzcywNCj4gPj4gU1RBVFVTX05FVFdPUktfTkFNRV9ERUxFVEVEIGF0IDYwcy4NCj4gPj4N
-Cj4gPj4gRm9yIGNvbXBhcmlzb24sIGhlcmUgaXMgYSB0Y3BkdW1wIHVzaW5nIHRoZSAiZml4IiBm
-cm9tIG15IHByZXZpb3VzIG1haWw6DQo+ID4gLi4uDQo+ID4+DQo+ID4+IFRoZSBpbml0aWFsIGNv
-bm5lY3Rpb24gaXMgYXQgdGltZXN0YW1wIDBzLCByZWNvbm5lY3Rpb24gYXQgMzRzLA0KPiA+PiBz
-dWNjZXNzZnVsIHJlYWQgcmVxdWVzdCBhdCAyMTVzLg0KPiA+Pg0KPiA+PiBOb3RlIHRoYXQgdGhl
-IHRyZWUgY29ubmVjdCBmb3IgSVBDJCBvbmx5IGhhcHBlbnMgX2FmdGVyXyB0aGUgdHJlZQ0KPiA+
-PiBjb25uZWN0IGZvciB0aGUgc2hhcmUgc3VjY2VlZHMuDQo+ID4NCj4gPiBUaGFua3MgZm9yIHRo
-ZSBmdWxsIHRyYWNlcywgdGhleSBjbGFyaWZ5IHRoZSBzaXR1YXRpb24uIEJ1dCwgSSBkb27igJl0
-IHNlZSBhbnkNCj4gPiBtZWFuaW5nZnVsIGRpZmZlcmVuY2UgaW4gdGhlIGNsaWVudCBiZWhhdmlv
-ci4gVGhlIG9yZGVyaW5nIG9mIHRoZSB0d28NCj4gPiB0cmVlY29ubmVjdHMgaXMgdGhlIHNhbWUg
-YmV0d2VlbiB0aGUgdHdvIC0gaW5pdGlhbGx5LCAiSVBDJCIgdGhlbg0KPiA+ICJzbWJzaGFyZSIs
-IGFuZCBvbiByZWNvbm5lY3QsIHRoZSBvdGhlciB3YXkgYXJvdW5kLiBTbywgSSdtIHVuY2xlYXIN
-Cj4gPiB3aGV0aGVyIHlvdXIgcGF0Y2ggZGlkIGFueXRoaW5nLg0KPiANCj4gVGhlcmUgaXMgZGVm
-aW5pdGVseSBhIGRpZmZlcmVuY2UuIEJlZm9yZSB0aGUgcGF0Y2gsIG9uIHJlY29ubmVjdCB0aGUg
-Y2xpZW50Og0KDQpJJ20gc3RpbGwgbm90IHNvIHN1cmUgdGhlIGRpZmZlcmVuY2UgaXMgcmVsZXZh
-bnQuIFRoZSB0aW1pbmcgaXMgYSBiaXQgZGlmZmVyZW50LCBidXQNCmluIGl0c2VsZiB0aGUgSVBD
-JCB0cmVlY29ubmVjdCBpc24ndCBhY3R1YWxseSB1c2VkLCBhbmQgaW4gYW55IGNhc2UgaXQgc3Vj
-Y2VlZHMNCmluIGJvdGggc2NlbmFyaW9zLiBTbywgSSdtIHRoaW5raW5nIGl0J3MgZWl0aGVyIHRo
-ZSB0aW1pbmcsIG9yIGNvaW5jaWRlbmNlLg0KDQo+ICogQ29ubmVjdHMgdG8gInNtYnNoYXJlIiB3
-aGljaCBmYWlscw0KPiAqIFRoZW4gY29ubmVjdHMgdG8gIklQQyQiIHdoaWNoIHN1Y2NlZWRzDQo+
-ICogVGhlbiB0cmllcyBhZ2FpbiB0byBjb25uZWN0IHRvIHNtYnNoYXJlIHdoaWNoIGZhaWxzIHJl
-cGVhdGVkbHkNCg0KSGVyZSdzIHdoYXQgSSBzZWU6DQpFdmVudCAvIHRpbWVzdGFtcCAvIGV0Yw0K
-Q29ubmVjdGlvbiBsb3N0IC8gMjUuOTcgLyBTZXJ2ZXIgc2VuZHMgbWFueSBSU1QgdG8gY2xpZW50
-DQpDb25uZWN0aW9uIHJlZXN0YWJsaXNoZWQgLyAzNC4xNw0KVHJlZWNvbm5lY3QgdG8gc21ic2hh
-cmUgLyAzNC4xNyAvIFNUQVRVU19CX05fTiAocmV0cmllcyB3aXRoIHNhbWUgcmVzdWx0IGV2ZXJ5
-IDIgc2VjKQ0KVHJlZWNvbm5lY3QgdG8gSVBDJCAvIDM0LjE4IC8gc3VjY2Vzcw0KVHJlZWNvbm5l
-Y3QgdG8gc21ic2hhcmUgLyA2MC4zOCAvIFNUQVRVU19OX05fRCAoZXRjKQ0KDQo+IEFmdGVyIHRo
-ZSBwYXRjaCwgb24gcmVjb25uZWN0IHRoZSBjbGllbnQ6DQo+IA0KPiAqIENvbm5lY3RzIHRvICJz
-bWJzaGFyZSIgd2hpY2ggZmFpbHMNCj4gKiBUaGVuIHRyaWVzIGFnYWluIHRvIGNvbm5lY3QgdG8g
-InNtYnNoYXJlIiB3aGljaCBzdWNjZWVkcyBhZnRlciBzZXZlcmFsDQo+IHJldHJpZXMNCj4gKiBU
-aGVuIHRyaWVzIHRvIGNvbm5lY3QgdG8gIklQQyQiIHdoaWNoIHN1Y2NlZWRzDQoNClRoaXMgdGlt
-ZToNCkNvbm5lY3Rpb24gbG9zdCAgLyA5LjgxIC8gU2VydmVyIHNlbmRzIFJTVA0KQ29ubmVjdGlv
-biByZWVzdGFibGlzaGVkIC8gOS44MiAvIHN0YXR1cyAweGMwMDAwNDY2IChzb21lIHdlaXJkIGRp
-c2sgaGFyZHdhcmUgc3RhdHVzKQ0KQ29ubmVjdGlvbiBsb3N0IC8gMTMuNTMgLyBTZXJ2ZXIgc2Vu
-ZHMgUlNUDQpDb25uZWN0aW9uIHJlZXN0YWJsaXNoZWQgLyAxMy41Mw0KVHJlZWNvbm5lY3QgdG8g
-c21ic2hhcmUgLyAxMy42MyAvIFNUQVRVU19CX05fTiAocmV0cmllcyB3aXRoIHNhbWUgcmVzdWx0
-IGV2ZXJ5IDIgc2VjKQ0KVHJlZWNvbm5lY3QgdG8gc21ic2hhcmUgLyA0My45MCAvIHN1Y2Nlc3Mg
-KGFib3V0IDMwIHNlY3MsIDE3IHJldHJpZXMgZWxhcHNlZCkNClRyZWVjb25uZWN0IHRvIElQQyQg
-LyA0My45MCAvIHN1Y2Nlc3MNCg0KU28sIHRoZSBtYWluIGVmZmVjdCBvZiB5b3VyIHBhdGNoIGlz
-IHRoYXQgdGhlIElQQyQgYXR0ZW1wdCBoYXBwZW5zIGEgbG90ICpsYXRlciosDQppdCBjZXJ0YWlu
-bHkgZGlkbid0IGFmZmVjdCB0aGUgc3VjY2VzcyBvZiB0aGUgc21ic2hhcmUgdHJlZWNvbm5lY3Qg
-LSBpdCBoYXBwZW5lZA0Kb25seSBhZnRlciB0aGF0IHN1Y2NlZWRlZCEgQW5kIEkgZG9uJ3Qgc2Vl
-IGhvdyBkZWZlcnJpbmcgYW4gdW5yZWxhdGVkIHRyZWVjb25uZWN0DQp3b3VsZCBoZWxwIHRoYXQu
-IEkgYmV0IGl0IHdvdWxkIGhhdmUgdGhlIHNhbWUgcmVzdWx0IGlmIHRoZSBJUEMkIGRpZG4ndCBo
-YXBwZW4gYXQNCmFsbC4NCg0KSSByZWFsbHkgdGhpbmsgdGhlcmUncyBzb21ldGhpbmcgd3Jvbmcg
-d2l0aCB5b3VyIHNlcnZlciwgYW5kIG5vdCBiZWNhdXNlIG9mIGEgYnVnLg0KVW5mb3J0dW5hdGVs
-eSBib3RoIFN0ZXZlIGFuZCBJIGFyZSBhdCBGQVNUJzE5IGFuZCBWYXVsdCBoZXJlIGluIEJvc3Rv
-biwgc28gd2UncmUNCm5vdCBhYmxlIHRvIGdldCBtdWNoIGRvbmUuIEknZCBsb3ZlIHRvIHVuZGVy
-c3RhbmQgdGhpcyBiZXR0ZXIsIHRob3VnaC4uLg0KDQpUb20uDQoNCj4gVGhpcyBzdWJ0bGUgcmVv
-cmRlcmluZyBzb21laG93IG1ha2VzIGl0IHdvcmsuIEl0IG1heSBpbmRlZWQgYmUgYSBzZXJ2ZXIN
-Cj4gYnVnIHJhdGhlciB0aGFuIGEgY2xpZW50IGJ1Zy4gSSB3YXMgaG9waW5nIHNvbWVvbmUgY291
-bGQgc2hlZCBzb21lIGxpZ2h0DQo+IG9uIHRoaXMuDQo+IA0KPiA+DQo+ID4gVGhlIFNUQVRVU19O
-RVRXT1JLX05BTUVfREVMRVRFRCBpcyBhIGNvbnNlcXVlbmNlIG9mIHRoZSBmYWlsZWQNCj4gPiBy
-ZS1lc3RhYmxpc2htZW50IG9mIHRoZSB0cmVlIGNvbm5lY3QsIGFuZCBpcyBub3QgaXRzZWxmIHRo
-ZSBwcm9ibGVtLiBUaGUNCj4gPiBzZXJ2ZXIgaXMgc2ltcGx5IHRpbWluZyBvdXQgdGhlIHRyZWVp
-ZCwgc2luY2UgdGhlIGNsaWVudCBkaWQgbm90IHN1Y2Nlc3NmdWxseQ0KPiA+IHJlY2xhaW0gaXQu
-IFRoZSByZXBlYXRlZCBTVEFUVVNfQkFEX05FVFdPUktfTkFNRSBpcyB0aGUgaXNzdWUuDQo+ID4N
-Cj4gPiBBcmUgeW91IHN1cmUgdGhlIGNsdXN0ZXJlZCBzZXJ2ZXIgaXMgcmVjb3ZlcmluZyBwcm9w
-ZXJseSB3aGVuIHlvdSBhcmUNCj4gPiBmb3JjaW5nIHRoZSBmYWlsb3Zlcj8gRm9yIGV4YW1wbGUs
-IGlmIGl0J3MgYSB0d28tbm9kZSBjbHVzdGVyLCBtYXliZSBub2RlIEENCj4gPiBjYW4gdGFrZSBv
-dmVyIG5vZGUgQiwgYnV0IG5vZGUgQiBoYXMgaXNzdWVzIHRha2luZyBvdmVyIG5vZGUgQS4gSXMg
-dGhlcmUNCj4gPiBhbnl0aGluZyByZWxldmFudCBpbiB0aGUgc2VydmVyIGxvZ3M/DQo+ID4NCj4g
-DQo+IEl0J3MgYSB0d28gbm9kZSBjbHVzdGVyLiBUaGUgYmVoYXZpb3VyIGhhcHBlbnMgcmVsaWFi
-bHkgd2hlbiBmYWlsaW5nDQo+IG92ZXIgZWl0aGVyIHdheS4gQWZ0ZXIgZmFpbG92ZXIsIHRoZSBz
-ZXJ2ZXIgc3RhdGUgaXMgY29uc2lzdGVudC4gRS5nLg0KPiBhZnRlciBhIGZhaWxvdmVyIGZyb20g
-bm9kZSBBIHRvIG5vZGUgQiwgbm9kZSBCIHNob3dzIGl0c2VsZiBhcyB0aGUNCj4gcHJpbWFyeSBz
-ZXJ2ZXIgYW5kIHRoZSBub2RlIEEgaXMgbWFya2VkIGFzIGRvd24uIEkgY291bGRuJ3QgZmluZA0K
-PiBhbnl0aGluZyBpbnRlcmVzdGluZyBpbiB0aGUgc2VydmVyIGxvZ3MuDQo+IA0KPiBUaGFua3Ms
-DQo+IC0tDQo+IFJvc3MgTGFnZXJ3YWxsDQo=
+Hi,
+Thanks for your help.
+But it doesn't seem to be an authentication failure. I tried all sec option. Some clearly failed early (in the wireshark trace) due to authentification problem. Its seems to be able to authenticate with ntlmv2.
+But fails latter in the exchange.
+
+https://pastebin.com/zkRHtTvq
+
+Frame 25 Create Response, Error: STATUS_PATH_NOT_COVERED
+
+Any idea?
+
+Thanks again.
+
+Alex
+
+________________________________________
+De : Robin P. Blanchard <robin.blanchard@gmail.com>
+Envoyé : 22 février 2019 14:13
+À : Alexis Fortin-Côté
+Cc : linux-cifs@vger.kernel.org
+Objet : Re: mount -t cifs fails while smbclient succeed
+
+Compare:
+
+failed: lines 21-42
+
+I think you may need to mount with a different sec option:
+
+
+       sec=
+           Security mode. Allowed values are:
+
+           ·   none - attempt to connection as a null user (no name)
+
+           ·   krb5 - Use Kerberos version 5 authentication
+
+           ·   krb5i - Use Kerberos authentication and forcibly enable packet
+               signing
+
+           ·   ntlm - Use NTLM password hashing
+
+           ·   ntlmi - Use NTLM password hashing and force packet signing
+
+           ·   ntlmv2 - Use NTLMv2 password hashing
+
+           ·   ntlmv2i - Use NTLMv2 password hashing and force packet signing
+
+           ·   ntlmssp - Use NTLMv2 password hashing encapsulated in Raw
+               NTLMSSP message
+
+           ·   ntlmsspi - Use NTLMv2 password hashing encapsulated in Raw
+               NTLMSSP message, and force packet signing
+
+           The default in mainline kernel versions prior to v3.8 was sec=ntlm.
+           In v3.8, the default was changed to sec=ntlmssp.
+
+On Fri, Feb 22, 2019 at 9:30 AM Alexis Fortin-Côté
+<alexis.fortin-cote.1@ulaval.ca> wrote:
+>
+>
+> Hi,
+> I have trouble mounting a windows share on my Ubuntu 18.04 workstation.
+> I've tried every thing I found using google search to no avail.
+>
+> The following smbclient command works, so I know my Username and Password are working
+> smbclient -U ulaval.ca\\alfoc //132.203.235.15/Partages/FSS
+>
+> But the following mount fails with errors :
+> sudo mount -t cifs -o cred=/home/alexis/smbcred,vers=2.0 //fssdc1.fss.ulaval.ca/Partages/FSS/ /home/alexis/win/
+>
+> mount error(22): Invalid argument
+>
+> I've logged the failing and successful trace with wireshark
+> failed : https://pastebin.com/7UTBNgs2
+> success : https://pastebin.com/kQ80vVmr
+>
+> I'm using Kernel 4.20.11-042011-generic
+> I'm not sure about the server configuration, but it looks like its a windows server that support smb vers=1.0 and vers=2.0
+> mount.cifs version: 6.8
+>
+> dmesg with debug information reads when it fails:
+> [ 2021.652324] Status code returned 0xc0000016 STATUS_MORE_PROCESSING_REQUIRED
+> [ 2021.667748] CIFS VFS: DFS capability contradicts DFS flag
+> [ 2021.673168] Status code returned 0xc0000257 STATUS_PATH_NOT_COVERED
+> [ 2021.675001] CIFS VFS: cifs_mount failed w/return code = -22
+>
+> Thanks for helping,
+> Please respond (cc) to this address.
+>
+> Alex
+>
+>
