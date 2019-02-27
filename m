@@ -2,151 +2,156 @@ Return-Path: <SRS0=LBnX=RC=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C630C43381
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Feb 2019 17:54:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E93FC43381
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Feb 2019 19:16:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3A4FF217F5
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Feb 2019 17:54:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1551290050;
-	bh=kspwMt9uaWNH65FXb/F0LswvVhq/mPDrL03nKO/y62o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=T4K+M9pdAdoBr7eFj6LkYsTau6HULujvVBCocq6nAXFAsGzH2tJc9o7H/xF2BS49y
-	 WcVSB74g0YDPRVnhmv4HNVTCcPKdNJFnq2lwa2uPWxi2o8u+gijd7F1clPZDVZsdtl
-	 Oi0Vxac9Lb8BRsDKv894ZIyCyccfcXn5LPM58Z0g=
+	by mail.kernel.org (Postfix) with ESMTP id E14662133D
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Feb 2019 19:16:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eUZmprAV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727240AbfB0RyJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 27 Feb 2019 12:54:09 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45836 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725854AbfB0RyJ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 27 Feb 2019 12:54:09 -0500
-Received: from localhost (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1F829217F5;
-        Wed, 27 Feb 2019 17:54:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1551290048;
-        bh=kspwMt9uaWNH65FXb/F0LswvVhq/mPDrL03nKO/y62o=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=P+/QarotcjOYrS1c5ACqk5a4yTg3rH4ARtRNlldK5a8IdtKcn7Qe6an75N+hubHCW
-         7DMJzyNcOmZQZ7DF3YIlMidZpbHJjEHGw3UwBlSP23cfmy3mD+BxgyaE3kuusXh/sp
-         D9akQN8CkirNA2A573NTy0XWo2ZANDD54sP4AbwA=
-Date:   Wed, 27 Feb 2019 12:54:06 -0500
-From:   Sasha Levin <sashal@kernel.org>
-To:     Pavel Shilovskiy <pshilov@microsoft.com>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        Steven French <Steven.French@microsoft.com>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
-Subject: Re: [PATCH AUTOSEL 4.20 65/77] CIFS: Do not assume one credit for
- async responses
-Message-ID: <20190227175406.GM10616@sasha-vm>
-References: <20190215020855.176727-1-sashal@kernel.org>
- <20190215020855.176727-65-sashal@kernel.org>
- <DM5PR21MB0140327178FA380F6D7DCAC5B6600@DM5PR21MB0140.namprd21.prod.outlook.com>
+        id S1728651AbfB0TQL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 27 Feb 2019 14:16:11 -0500
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:43323 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727240AbfB0TQL (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 27 Feb 2019 14:16:11 -0500
+Received: by mail-lj1-f196.google.com with SMTP id z20so14878440ljj.10
+        for <linux-cifs@vger.kernel.org>; Wed, 27 Feb 2019 11:16:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=Vb2XI+rcxVk4GxxhTa6bVmVVPa13QwUFazNx+pzyxcI=;
+        b=eUZmprAVzKBWXu9O8CQfIoPKquYcLKhV3A6dDy5Fq3ZSnak/J8aHtVqsakHnAuylRf
+         ZOuGYwmqmySObBMEXWbBM+zZHR2NJvGUM+YCdSTs1cGuD7WmcfU00A49wUyyI1wsgzWV
+         40fdzUI+acGprsWR+cjmRJVSyW+sDV8s4dtuDbFksq5RzK72fl0DgLpBY+dvs2wwyi1v
+         7xfkRLRmUig9+3u5RVxxvsnJXgRORNSkCz+xYMLfhg1xB59sBgNRpAoyMcMo/W16XW9/
+         Yqe7npWO0YELO6FC3sLCjj2XcqklWNj0GR5H9VsdX3BPFLRmqE111PQmNGYZk7kXsTDg
+         8Adg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Vb2XI+rcxVk4GxxhTa6bVmVVPa13QwUFazNx+pzyxcI=;
+        b=LT95afZDQ6qECASFEyCJ76yLIxuZgm2R1R8sp40ij9OAZ/CYzgiraQejD9CejyXKW7
+         sJyKonObUMjMNCw0xsM9vEGxIpi46xKsSLYGgFIYtqC13UKYda7G+CyOJn4ZIeP5bes0
+         080jFMBDJxN7MnbP+v+VwZgl2VMHAftCmajNc6/ugaXFN9/1IFmbrU0YJyNJIXxaS5xM
+         BCp+ARkDYslzegDrpzbAbEB4NMIcLD8sNN9rKbnQur7SduJk24bygIwJd8hpqsMEzZZa
+         ZQQxYcdb4i4qoxY+FEx3yjm80IDPg9ELT+n4a2YLycNj7Ut3GWc+gYK0j2BzvyGq+gMG
+         Z8Bw==
+X-Gm-Message-State: APjAAAW1iphUAlj3JxgG/peq73iFyZoKx7lxMQlm8yp2mdWI2PCUAhJk
+        8wFvMW26l+M4CpHtPVA51+fNM8PE9bv2evbteSbH8FI=
+X-Google-Smtp-Source: APXvYqyZbFU6QalFb8x4jLkejbIgjdmzM6tyWU6/eW33PehMb9tYWd4wTm+M5gJX4A2ecFDnIFA7/AD9ftibssWKaUk=
+X-Received: by 2002:a2e:124e:: with SMTP id t75mr2417214lje.23.1551294968927;
+ Wed, 27 Feb 2019 11:16:08 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <DM5PR21MB0140327178FA380F6D7DCAC5B6600@DM5PR21MB0140.namprd21.prod.outlook.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <CAH2r5muZ4EQuFSsBA8FtMuj7_fbtUz+LT62bArMS0O0T=0pk0w@mail.gmail.com>
+In-Reply-To: <CAH2r5muZ4EQuFSsBA8FtMuj7_fbtUz+LT62bArMS0O0T=0pk0w@mail.gmail.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Wed, 27 Feb 2019 11:15:57 -0800
+Message-ID: <CAKywueR_qigDha60n48ofOSUBKNoF3bdY_7qbdAYJa423iERUQ@mail.gmail.com>
+Subject: Re: [PATCH] add dynamic trace points for compounded query/setinfo paths
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Feb 15, 2019 at 08:10:47PM +0000, Pavel Shilovskiy wrote:
->чт, 14 февр. 2019 г. в 18:40, Sasha Levin <sashal@kernel.org>:
->>
->> From: Pavel Shilovsky <pshilov@microsoft.com>
->>
->> [ Upstream commit 0fd1d37b0501efc6e295f56ab55cdaff784aa50c ]
->>
->> If we don't receive a response we can't assume that the server
->> granted one credit. Assume zero credits in such cases.
->>
->> Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
->> Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
->> Signed-off-by: Steve French <stfrench@microsoft.com>
->> Signed-off-by: Sasha Levin <sashal@kernel.org>
->> ---
->>  fs/cifs/smb2pdu.c | 15 +++++++++++----
->>  1 file changed, 11 insertions(+), 4 deletions(-)
->>
->> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
->> index d1ae7cdb236d..3c44c51310c4 100644
->> --- a/fs/cifs/smb2pdu.c
->> +++ b/fs/cifs/smb2pdu.c
->> @@ -2834,9 +2834,10 @@ smb2_echo_callback(struct mid_q_entry *mid)
->>  {
->>         struct TCP_Server_Info *server = mid->callback_data;
->>         struct smb2_echo_rsp *rsp = (struct smb2_echo_rsp *)mid->resp_buf;
->> -       unsigned int credits_received = 1;
->> +       unsigned int credits_received = 0;
->>
->> -       if (mid->mid_state == MID_RESPONSE_RECEIVED)
->> +       if (mid->mid_state == MID_RESPONSE_RECEIVED
->> +           || mid->mid_state == MID_RESPONSE_MALFORMED)
->>                 credits_received = le16_to_cpu(rsp->sync_hdr.CreditRequest);
->>
->>         DeleteMidQEntry(mid);
->> @@ -3093,7 +3094,7 @@ smb2_readv_callback(struct mid_q_entry *mid)
->>         struct TCP_Server_Info *server = tcon->ses->server;
->>         struct smb2_sync_hdr *shdr =
->>                                 (struct smb2_sync_hdr *)rdata->iov[0].iov_base;
->> -       unsigned int credits_received = 1;
->> +       unsigned int credits_received = 0;
->>         struct smb_rqst rqst = { .rq_iov = rdata->iov,
->>                                  .rq_nvec = 2,
->>                                  .rq_pages = rdata->pages,
->> @@ -3132,6 +3133,9 @@ smb2_readv_callback(struct mid_q_entry *mid)
->>                 task_io_account_read(rdata->got_bytes);
->>                 cifs_stats_bytes_read(tcon, rdata->got_bytes);
->>                 break;
->> +       case MID_RESPONSE_MALFORMED:
->> +               credits_received = le16_to_cpu(shdr->CreditRequest);
->> +               /* fall through */
->>         default:
->>                 if (rdata->result != -ENODATA)
->>                         rdata->result = -EIO;
->> @@ -3325,7 +3329,7 @@ smb2_writev_callback(struct mid_q_entry *mid)
->>         struct cifs_tcon *tcon = tlink_tcon(wdata->cfile->tlink);
->>         unsigned int written;
->>         struct smb2_write_rsp *rsp = (struct smb2_write_rsp *)mid->resp_buf;
->> -       unsigned int credits_received = 1;
->> +       unsigned int credits_received = 0;
->>
->>         switch (mid->mid_state) {
->>         case MID_RESPONSE_RECEIVED:
->> @@ -3353,6 +3357,9 @@ smb2_writev_callback(struct mid_q_entry *mid)
->>         case MID_RETRY_NEEDED:
->>                 wdata->result = -EAGAIN;
->>                 break;
->> +       case MID_RESPONSE_MALFORMED:
->> +               credits_received = le16_to_cpu(rsp->sync_hdr.CreditRequest);
->> +               /* fall through */
->>         default:
->>                 wdata->result = -EIO;
->>                 break;
->> --
->> 2.19.1
->>
+=D0=B2=D1=82, 26 =D1=84=D0=B5=D0=B2=D1=80. 2019 =D0=B3. =D0=B2 22:06, Steve=
+ French <smfrench@gmail.com>:
 >
->Can you also apply the following patch to 4.20.y and 4.19.y, please?
+> Add tracepoints for enter/exit (error or done without error)
+> for compounded query_info and set_info
 >
->https://patchwork.ozlabs.org/patch/1030180/
+> Sample output (trace-cmd record -e smb3_*compound*):
+>     touch-30074 [005] .... 33989.459514: smb3_set_info_compound_enter:
+> xid=3D8 sid=3D0xbe534a7e tid=3D0x82c96a43
+>     touch-30074 [005] .N.. 33989.471834: smb3_set_info_compound_done:
+> xid=3D8 sid=3D0xbe534a7e tid=3D0x82c96a43
+>     mkdir-30076 [007] .... 33999.239926:
+> smb3_query_info_compound_enter: xid=3D10 sid=3D0xbe534a7e tid=3D0x82c96a4=
+3
+>     mkdir-30076 [007] .... 33999.247180:
+> smb3_query_info_compound_done: xid=3D10 sid=3D0xbe534a7e tid=3D0x82c96a43
+>
 
-I'll queue it up for the next cycle as it has dependencies on stable@
-commits that didn't make it in yet and I don't want to mess up with
-Greg's flow. Thanks you!
+ case SMB2_OP_RENAME:
+  case SMB2_OP_RMDIR:
+  case SMB2_OP_SET_EOF:
++ if (rqst[1].rq_iov)
++ SMB2_set_info_free(&rqst[1]);
++ if (rqst[2].rq_iov)
++ SMB2_close_free(&rqst[2]);
++ break;
+  case SMB2_OP_SET_INFO:
+  if (rqst[1].rq_iov)
+  SMB2_set_info_free(&rqst[1]);
+  if (rqst[2].rq_iov)
+  SMB2_close_free(&rqst[2]);
++ if (rc)
++ trace_smb3_set_info_compound_err(xid, tcon->tid,
++    ses->Suid, rc);
++ else
++ trace_smb3_set_info_compound_done(xid, tcon->tid,
++    ses->Suid);
+  break;
+  }
+
+This approach will require to duplicate code:
+
++ if (rqst[1].rq_iov)
++ SMB2_set_info_free(&rqst[1]);
++ if (rqst[2].rq_iov)
++ SMB2_close_free(&rqst[2]);
++ break;
+
+for all set_info commands once we start tracing them.
+
+How about to create a helper function for it? Something like:
+
+  case SMB2_OP_RENAME:
+  case SMB2_OP_RMDIR:
+  case SMB2_OP_SET_EOF:
+  case SMB2_OP_SET_INFO:
++    trace_set_info_compound(command, xid, tcon->tid, ses->Suid, rc);
+      if (rqst[1].rq_iov)
+          SMB2_set_info_free(&rqst[1]);
+      if (rqst[2].rq_iov)
+          SMB2_close_free(&rqst[2]);
+      break;
+  }
+
+and when gradually add more trace points once we implement them.
+
+void trace_set_info_compound(xid, tcon->tid, ses->Suid, rc)
+{
+    switch (command) {
+/*
+ * BB - add the following trace points:
+ * case SMB2_OP_HARDLINK:
+ * case SMB2_OP_RENAME:
+ * case SMB2_OP_RMDIR:
+ * case SMB2_OP_SET_EOF:
+ */
+    case SMB2_OP_SET_INFO:
+          if (rc)
+              trace_smb3_set_info_compound_err(xid, tcon->tid, ses->Suid, r=
+c);
+         else
+              trace_smb3_set_info_compound_done(xid, tcon->tid, ses->Suid);
+         break;
+    }
+}
 
 --
-Thanks,
-Sasha
+Best regards,
+Pavel Shilovsky
