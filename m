@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E93FC43381
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Feb 2019 19:16:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8778BC43381
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Feb 2019 19:18:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E14662133D
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Feb 2019 19:16:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4F0762133D
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Feb 2019 19:18:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eUZmprAV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S8vAfOZW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728651AbfB0TQL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 27 Feb 2019 14:16:11 -0500
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:43323 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727240AbfB0TQL (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 27 Feb 2019 14:16:11 -0500
-Received: by mail-lj1-f196.google.com with SMTP id z20so14878440ljj.10
-        for <linux-cifs@vger.kernel.org>; Wed, 27 Feb 2019 11:16:09 -0800 (PST)
+        id S1726419AbfB0TSs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 27 Feb 2019 14:18:48 -0500
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:35161 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726397AbfB0TSr (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 27 Feb 2019 14:18:47 -0500
+Received: by mail-lj1-f193.google.com with SMTP id t13so10529492lji.2
+        for <linux-cifs@vger.kernel.org>; Wed, 27 Feb 2019 11:18:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=Vb2XI+rcxVk4GxxhTa6bVmVVPa13QwUFazNx+pzyxcI=;
-        b=eUZmprAVzKBWXu9O8CQfIoPKquYcLKhV3A6dDy5Fq3ZSnak/J8aHtVqsakHnAuylRf
-         ZOuGYwmqmySObBMEXWbBM+zZHR2NJvGUM+YCdSTs1cGuD7WmcfU00A49wUyyI1wsgzWV
-         40fdzUI+acGprsWR+cjmRJVSyW+sDV8s4dtuDbFksq5RzK72fl0DgLpBY+dvs2wwyi1v
-         7xfkRLRmUig9+3u5RVxxvsnJXgRORNSkCz+xYMLfhg1xB59sBgNRpAoyMcMo/W16XW9/
-         Yqe7npWO0YELO6FC3sLCjj2XcqklWNj0GR5H9VsdX3BPFLRmqE111PQmNGYZk7kXsTDg
-         8Adg==
+        bh=n/+ff/0maiZc8d6m/71qUayLVD18+66JUVgQBPAHUJ8=;
+        b=S8vAfOZWZsbaTHVVYpkSFfhxhxs7nWrFPpmjd6ECziR30pQEpfmLny3eKnuDpjxDIB
+         i3OiCIMcNQzdoDklPJAOJPxWFMPBoIGHFs8QYyBhyf7mVA6AkU9oiEg1b5fZx45njsX7
+         9PnprsrweZTBFKnaVq4emMHnFbA4mepwkTi1Q+nJO7+TTn3Y1suylYpPIDps79Wsupyv
+         AJQFkJZ0ho5FAC8ntHwpFj67xsglP4Ph/t2enJgI9if5dQQYAdNcW13hknx2g+n4zig/
+         7J3Z1jTJzQEj105fep6QbLzmaS66P9HKhBVpCaP8ill2ctDWo37GW+SdXmFSG6IjMOuD
+         Mpmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Vb2XI+rcxVk4GxxhTa6bVmVVPa13QwUFazNx+pzyxcI=;
-        b=LT95afZDQ6qECASFEyCJ76yLIxuZgm2R1R8sp40ij9OAZ/CYzgiraQejD9CejyXKW7
-         sJyKonObUMjMNCw0xsM9vEGxIpi46xKsSLYGgFIYtqC13UKYda7G+CyOJn4ZIeP5bes0
-         080jFMBDJxN7MnbP+v+VwZgl2VMHAftCmajNc6/ugaXFN9/1IFmbrU0YJyNJIXxaS5xM
-         BCp+ARkDYslzegDrpzbAbEB4NMIcLD8sNN9rKbnQur7SduJk24bygIwJd8hpqsMEzZZa
-         ZQQxYcdb4i4qoxY+FEx3yjm80IDPg9ELT+n4a2YLycNj7Ut3GWc+gYK0j2BzvyGq+gMG
-         Z8Bw==
-X-Gm-Message-State: APjAAAW1iphUAlj3JxgG/peq73iFyZoKx7lxMQlm8yp2mdWI2PCUAhJk
-        8wFvMW26l+M4CpHtPVA51+fNM8PE9bv2evbteSbH8FI=
-X-Google-Smtp-Source: APXvYqyZbFU6QalFb8x4jLkejbIgjdmzM6tyWU6/eW33PehMb9tYWd4wTm+M5gJX4A2ecFDnIFA7/AD9ftibssWKaUk=
-X-Received: by 2002:a2e:124e:: with SMTP id t75mr2417214lje.23.1551294968927;
- Wed, 27 Feb 2019 11:16:08 -0800 (PST)
+        bh=n/+ff/0maiZc8d6m/71qUayLVD18+66JUVgQBPAHUJ8=;
+        b=aVsoIYebcG89QoINwf8zKtzNTP4rgiMT3d7Qr/adqsirTlV1C40hODjb0x/e06gLd9
+         DYWpzX3XVvzNLuubj7B2VPcRn/OFMluMkI/iueDZ8gHiroNyzF/owJvFAeianmcWUEgj
+         IzYOi74fV9qiCeOYr1tFi1E9UHCOYZgBvIJVIMfIzpMGMd0DJfTEsgaO+UJOFBBI9E2o
+         xcyKI0ajExPwJRP86xDgSI8T8vswdh0P38dUyifeoPVhqAWF8B4Etr3LjiDwuloDdrfh
+         x4af2q/WN2coYcWchV5dlK5oBnsvZgxMrNv90zyaIIrHG/DoUBBK25fOYoVZwRn4vU/t
+         3Y1Q==
+X-Gm-Message-State: AHQUAuZIy2UbZX/bbfTe4ffzJWI/xN6cla5Y69a4EBpRGr7Faoe9Ve9+
+        nAFVVMOvRRxiKiLCcJkxKdAc1QI39Zn7rWKEgA==
+X-Google-Smtp-Source: AHgI3IYXVHaVQJP4WP8s2hfGFsGt2I0vaxI3Ra4wF24nS5dqkaRKc745ntE547VLcsE2nfWEwATcVOtoDxQBgofIXqw=
+X-Received: by 2002:a2e:9056:: with SMTP id n22mr2337369ljg.132.1551295125715;
+ Wed, 27 Feb 2019 11:18:45 -0800 (PST)
 MIME-Version: 1.0
-References: <CAH2r5muZ4EQuFSsBA8FtMuj7_fbtUz+LT62bArMS0O0T=0pk0w@mail.gmail.com>
-In-Reply-To: <CAH2r5muZ4EQuFSsBA8FtMuj7_fbtUz+LT62bArMS0O0T=0pk0w@mail.gmail.com>
+References: <CAH2r5mt3CWn08J-iS8qQEN5LukVSCO5QUvYoFfqkUP-+Ynn59A@mail.gmail.com>
+In-Reply-To: <CAH2r5mt3CWn08J-iS8qQEN5LukVSCO5QUvYoFfqkUP-+Ynn59A@mail.gmail.com>
 From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Wed, 27 Feb 2019 11:15:57 -0800
-Message-ID: <CAKywueR_qigDha60n48ofOSUBKNoF3bdY_7qbdAYJa423iERUQ@mail.gmail.com>
-Subject: Re: [PATCH] add dynamic trace points for compounded query/setinfo paths
+Date:   Wed, 27 Feb 2019 11:18:34 -0800
+Message-ID: <CAKywueSRUeHsRXL1se_PcBONFK1NvCKr4S1hAcQMzyWMGQhkdA@mail.gmail.com>
+Subject: Re: [PATCH] smb3: add dynamic trace point for query_info_enter/done
 To:     Steve French <smfrench@gmail.com>
 Cc:     CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
@@ -66,91 +66,43 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D0=B2=D1=82, 26 =D1=84=D0=B5=D0=B2=D1=80. 2019 =D0=B3. =D0=B2 22:06, Steve=
+=D0=B2=D1=82, 26 =D1=84=D0=B5=D0=B2=D1=80. 2019 =D0=B3. =D0=B2 20:05, Steve=
  French <smfrench@gmail.com>:
 >
-> Add tracepoints for enter/exit (error or done without error)
-> for compounded query_info and set_info
+> Adds dynamic trace points for the query_info_enter
+> and query_info_done (no error) case.  We only had one on query_info
+> errors in existing code.  These two tracepoints are for the
+> non-compounded query_info paths.
 >
-> Sample output (trace-cmd record -e smb3_*compound*):
->     touch-30074 [005] .... 33989.459514: smb3_set_info_compound_enter:
-> xid=3D8 sid=3D0xbe534a7e tid=3D0x82c96a43
->     touch-30074 [005] .N.. 33989.471834: smb3_set_info_compound_done:
-> xid=3D8 sid=3D0xbe534a7e tid=3D0x82c96a43
->     mkdir-30076 [007] .... 33999.239926:
-> smb3_query_info_compound_enter: xid=3D10 sid=3D0xbe534a7e tid=3D0x82c96a4=
-3
->     mkdir-30076 [007] .... 33999.247180:
-> smb3_query_info_compound_done: xid=3D10 sid=3D0xbe534a7e tid=3D0x82c96a43
+> Sample output (after doing: trace-cmd record -e smb3_query_info*)
 >
+> # trace-cmd show
+> # tracer: nop
+> #
+> #                              _-----=3D> irqs-off
+> #                             / _----=3D> need-resched
+> #                            | / _---=3D> hardirq/softirq
+> #                            || / _--=3D> preempt-depth
+> #                            ||| /     delay
+> #           TASK-PID   CPU#  ||||    TIMESTAMP  FUNCTION
+> #              | |       |   ||||       |         |
+>               ls-24140 [001] .... 27811.866068: smb3_query_info_enter:
+> xid=3D7 sid=3D0xd2d00587 tid=3D0xb5441939 fid=3D0xcf082bac class=3D18 typ=
+e=3D0x1
+>               ls-24140 [001] .... 27811.867656: smb3_query_info_done:
+> xid=3D7 sid=3D0xd2d00587 tid=3D0xb5441939 fid=3D0xcf082bac class=3D18 typ=
+e=3D0x1
+>       getcifsacl-24149 [005] .... 27854.759873: smb3_query_info_enter:
+> xid=3D15 sid=3D0xd2d00587 tid=3D0xb5441939 fid=3D0x99896e72 class=3D0 typ=
+e=3D0x3
+>       getcifsacl-24149 [005] .... 27854.761730: smb3_query_info_done:
+> xid=3D15 sid=3D0xd2d00587 tid=3D0xb5441939 fid=3D0x99896e72 class=3D0 typ=
+e=3D0x3
 
- case SMB2_OP_RENAME:
-  case SMB2_OP_RMDIR:
-  case SMB2_OP_SET_EOF:
-+ if (rqst[1].rq_iov)
-+ SMB2_set_info_free(&rqst[1]);
-+ if (rqst[2].rq_iov)
-+ SMB2_close_free(&rqst[2]);
-+ break;
-  case SMB2_OP_SET_INFO:
-  if (rqst[1].rq_iov)
-  SMB2_set_info_free(&rqst[1]);
-  if (rqst[2].rq_iov)
-  SMB2_close_free(&rqst[2]);
-+ if (rc)
-+ trace_smb3_set_info_compound_err(xid, tcon->tid,
-+    ses->Suid, rc);
-+ else
-+ trace_smb3_set_info_compound_done(xid, tcon->tid,
-+    ses->Suid);
-  break;
-  }
+Don't we need to trace errors after smb2_validate_and_copy_iov (the
+same way we do for query_dir)? Other than that the patch looks good.
 
-This approach will require to duplicate code:
-
-+ if (rqst[1].rq_iov)
-+ SMB2_set_info_free(&rqst[1]);
-+ if (rqst[2].rq_iov)
-+ SMB2_close_free(&rqst[2]);
-+ break;
-
-for all set_info commands once we start tracing them.
-
-How about to create a helper function for it? Something like:
-
-  case SMB2_OP_RENAME:
-  case SMB2_OP_RMDIR:
-  case SMB2_OP_SET_EOF:
-  case SMB2_OP_SET_INFO:
-+    trace_set_info_compound(command, xid, tcon->tid, ses->Suid, rc);
-      if (rqst[1].rq_iov)
-          SMB2_set_info_free(&rqst[1]);
-      if (rqst[2].rq_iov)
-          SMB2_close_free(&rqst[2]);
-      break;
-  }
-
-and when gradually add more trace points once we implement them.
-
-void trace_set_info_compound(xid, tcon->tid, ses->Suid, rc)
-{
-    switch (command) {
-/*
- * BB - add the following trace points:
- * case SMB2_OP_HARDLINK:
- * case SMB2_OP_RENAME:
- * case SMB2_OP_RMDIR:
- * case SMB2_OP_SET_EOF:
- */
-    case SMB2_OP_SET_INFO:
-          if (rc)
-              trace_smb3_set_info_compound_err(xid, tcon->tid, ses->Suid, r=
-c);
-         else
-              trace_smb3_set_info_compound_done(xid, tcon->tid, ses->Suid);
-         break;
-    }
-}
+Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
 
 --
 Best regards,
