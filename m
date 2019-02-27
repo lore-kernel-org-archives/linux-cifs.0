@@ -2,63 +2,71 @@ Return-Path: <SRS0=LBnX=RC=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CB25C43381
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Feb 2019 19:30:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09166C43381
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Feb 2019 19:39:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4EAD42133D
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Feb 2019 19:30:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CC07D213A2
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Feb 2019 19:39:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sy+x/4Tr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KkNQpld5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729994AbfB0Tac (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 27 Feb 2019 14:30:32 -0500
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:37234 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726419AbfB0Tac (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 27 Feb 2019 14:30:32 -0500
-Received: by mail-lj1-f195.google.com with SMTP id a17so14906832ljd.4
-        for <linux-cifs@vger.kernel.org>; Wed, 27 Feb 2019 11:30:30 -0800 (PST)
+        id S1728751AbfB0Tjq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 27 Feb 2019 14:39:46 -0500
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:35340 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728651AbfB0Tjq (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 27 Feb 2019 14:39:46 -0500
+Received: by mail-lf1-f68.google.com with SMTP id m73so7780000lfa.2;
+        Wed, 27 Feb 2019 11:39:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=KGTPQ31YHzlLwRzpWCXcTwqcb35KpjKVp/7MCWGe7Jc=;
-        b=Sy+x/4Tr661zHKIaixc/KrShGZaMLLeCoFw7xiKsrmxn4Sp4rE1H+XZ3Oc3r77RBVI
-         gsPq4IIz4Kql0VUMS1IOe0bcYXVe1Utao4h026UY/6Mscikzqayg75Pkjl9ll+9gNKDa
-         3GtnYOtU6VzXF0gXliHPvm3YhfEfneXfV0RFDtt033QL+sCRaie4pbbgKjwiqSs4jMIT
-         8knxx/Wm2Zn3rWwL4/3Xpi08CZm3BB23TKvwf42LS+b6UQG2YFtWCcvmeAgaBr2z32Bq
-         rHYnOAfwqPDqeD3bNN0U1LdvN9nfUz0z2Z3lS/gWgLVBfTjuBPh5+uSD6Fgcph5NyTVJ
-         46vQ==
+        bh=481JWPdvQD4ABxmlLiRK3qPOb3BKyUezI917Cf7u/bk=;
+        b=KkNQpld5WRWI8eWr3cCeV3MdwDHJQgZDGFanGme7sE+G48jrx0Jodff1BQ/G8hsYIL
+         K6KwVFQtdf+cod5G4KtEvvtwRXt6D2YkxxUiYXZTkAU+sIdw7plzit900LLbpuxbinPr
+         qnoGFr7DYTwMLiAqjC0gxoc70folIJkL1bixeEP/yagQCK0d1L7zLGY0LGK6fUV5llfS
+         7XjmsjwX8W5nbiO10MRCGuX51pDe9/KY2IqMRRqbxo0yalWhclkG4o13v1zprp6HCvsn
+         jvcsR3okkQHFq9/jTmFPhn5KUAkf/TJ8lgy0wQYEHevbmd1gpqsRuNJa4C34OS8GAxpl
+         C14w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=KGTPQ31YHzlLwRzpWCXcTwqcb35KpjKVp/7MCWGe7Jc=;
-        b=D7Cy7cziCWPd3BZiUHfumBEoZQQYmM6JjkgoK5dqGsPogErn+JfEJfx1n+lYAnHYCe
-         UkmerFnmxdSlWFuoBQAemmvdcJagq0k0L2ouTT9jvXqwX1P7oX1LV46hw6Iiv1THMTWG
-         wkbAHZCXrkQdgTVcmeKBO5ZPHh5a7IsIQKD4dCZarA7I3Zw96+NG9xSHwJQxgRoV24DU
-         HQ0HL4kgNG4vdn56zpUPGdaKwqhkR62BjYvr98gWAL09dNg9/vTbHTtb5yahJ+9g2Hk6
-         iVxxTkt8y3DCcJesJBE9nfCW2PGMBnHLlWIdNWOjspEFCIbJ6WfGqRIM7Yj9+BRXV2A7
-         bqYQ==
-X-Gm-Message-State: AHQUAuaqh98AZmVWfHSwxPVRzCCwJqmxM8B7+FiJhVUovpGYcaid++Bk
-        4cijcI4F2B+RilHhMb3mWGl0nvbbrZDFQyCtQsHks0E=
-X-Google-Smtp-Source: APXvYqyCoPBp4/7F42DCyZpPGnOIO5vKv6CWDurFgtiobOltmevpyd1fyIhrZPwsd8x2so2Da+FXS0Bx+Q9W5nEHVnY=
-X-Received: by 2002:a2e:251:: with SMTP id 78mr2405711ljc.90.1551295829713;
- Wed, 27 Feb 2019 11:30:29 -0800 (PST)
+        bh=481JWPdvQD4ABxmlLiRK3qPOb3BKyUezI917Cf7u/bk=;
+        b=JzWAcFQm5F2XWPpfgHlZt7qi/yfXtUkGUpO5p3QNlisEEk1SE7J2vFK9gRmNy406A7
+         mXG/uwPJODOvcFxnH/sdJtp2/K5iX0JxMCCmQnn8BDlwzTPyqMyxVAJQcBUfTXe48MjX
+         K1WceT9haBxaTT/lojihfvdwkivgrHbbSTGzeWWauOZbSVTPQ1UvPsdydWsC0zWtrmE2
+         ECb5OWHixbrzkB88m5n4RYvr3NJELNyz2k9sARN3JObzsOy1MAGbXVBLZiK5OCk6PfGt
+         ybQ24dWaue4DsO4POcLpnPBdET+4/t5n1Dwgm24i+L+YFfFbhEVdKzZu/FC5OejCadMu
+         m/Nw==
+X-Gm-Message-State: AHQUAuY0mue8b6VF5gOW3jA41fjrttMIYUjYwDDnppYJ+Ck+hIzu9PG+
+        FOO81FhQRHJTDUoAf8mDatbB/BURBYNzBP1JNA==
+X-Google-Smtp-Source: AHgI3IavqjK7a3rQPhN7EZ46g+wCNCnRh9fqpRFJsH4BtCGhW5iacmD1tzWXl1ki+VZ7jQgRXEfut2RIRLS0R0IcyNk=
+X-Received: by 2002:ac2:4192:: with SMTP id z18mr1834980lfh.39.1551296382720;
+ Wed, 27 Feb 2019 11:39:42 -0800 (PST)
 MIME-Version: 1.0
-References: <CAH2r5mt_bKGxNVCchmwCo-J7T_WqZRW+HXsn=V7c57_s6cBgxA@mail.gmail.com>
-In-Reply-To: <CAH2r5mt_bKGxNVCchmwCo-J7T_WqZRW+HXsn=V7c57_s6cBgxA@mail.gmail.com>
+References: <20190215020855.176727-1-sashal@kernel.org> <20190215020855.176727-65-sashal@kernel.org>
+ <DM5PR21MB0140327178FA380F6D7DCAC5B6600@DM5PR21MB0140.namprd21.prod.outlook.com>
+ <20190227175406.GM10616@sasha-vm>
+In-Reply-To: <20190227175406.GM10616@sasha-vm>
 From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Wed, 27 Feb 2019 11:30:18 -0800
-Message-ID: <CAKywueRw7aBj3AhSADbU1pSWuTNa=7LKaXWNPrhB6isf2x-DWw@mail.gmail.com>
-Subject: Re: [PATCH] Add a dynamic tracepoint for smb3_cmd_enter
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
+Date:   Wed, 27 Feb 2019 11:39:31 -0800
+Message-ID: <CAKywueT1fm2F1ggeRZhjGxZgd=k1Hy_1Ns4Eom3hLq-oaRnBvA@mail.gmail.com>
+Subject: Re: [PATCH AUTOSEL 4.20 65/77] CIFS: Do not assume one credit for
+ async responses
+To:     Sasha Levin <sashal@kernel.org>
+Cc:     Pavel Shilovskiy <pshilov@microsoft.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>,
+        Steven French <Steven.French@microsoft.com>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
@@ -66,131 +74,105 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D0=B2=D1=82, 26 =D1=84=D0=B5=D0=B2=D1=80. 2019 =D0=B3. =D0=B2 19:28, Steve=
- French <smfrench@gmail.com>:
+=D1=81=D1=80, 27 =D1=84=D0=B5=D0=B2=D1=80. 2019 =D0=B3. =D0=B2 09:54, Sasha=
+ Levin <sashal@kernel.org>:
 >
-> Allow tracing before sending a command (add an smb3_cmd_enter)
-> on the wire - this allows us to look in much more detail at response
-> times (between request and response).
+> On Fri, Feb 15, 2019 at 08:10:47PM +0000, Pavel Shilovskiy wrote:
+> >=D1=87=D1=82, 14 =D1=84=D0=B5=D0=B2=D1=80. 2019 =D0=B3. =D0=B2 18:40, Sa=
+sha Levin <sashal@kernel.org>:
+> >>
+> >> From: Pavel Shilovsky <pshilov@microsoft.com>
+> >>
+> >> [ Upstream commit 0fd1d37b0501efc6e295f56ab55cdaff784aa50c ]
+> >>
+> >> If we don't receive a response we can't assume that the server
+> >> granted one credit. Assume zero credits in such cases.
+> >>
+> >> Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
+> >> Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> >> Signed-off-by: Steve French <stfrench@microsoft.com>
+> >> Signed-off-by: Sasha Levin <sashal@kernel.org>
+> >> ---
+> >>  fs/cifs/smb2pdu.c | 15 +++++++++++----
+> >>  1 file changed, 11 insertions(+), 4 deletions(-)
+> >>
+> >> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> >> index d1ae7cdb236d..3c44c51310c4 100644
+> >> --- a/fs/cifs/smb2pdu.c
+> >> +++ b/fs/cifs/smb2pdu.c
+> >> @@ -2834,9 +2834,10 @@ smb2_echo_callback(struct mid_q_entry *mid)
+> >>  {
+> >>         struct TCP_Server_Info *server =3D mid->callback_data;
+> >>         struct smb2_echo_rsp *rsp =3D (struct smb2_echo_rsp *)mid->res=
+p_buf;
+> >> -       unsigned int credits_received =3D 1;
+> >> +       unsigned int credits_received =3D 0;
+> >>
+> >> -       if (mid->mid_state =3D=3D MID_RESPONSE_RECEIVED)
+> >> +       if (mid->mid_state =3D=3D MID_RESPONSE_RECEIVED
+> >> +           || mid->mid_state =3D=3D MID_RESPONSE_MALFORMED)
+> >>                 credits_received =3D le16_to_cpu(rsp->sync_hdr.CreditR=
+equest);
+> >>
+> >>         DeleteMidQEntry(mid);
+> >> @@ -3093,7 +3094,7 @@ smb2_readv_callback(struct mid_q_entry *mid)
+> >>         struct TCP_Server_Info *server =3D tcon->ses->server;
+> >>         struct smb2_sync_hdr *shdr =3D
+> >>                                 (struct smb2_sync_hdr *)rdata->iov[0].=
+iov_base;
+> >> -       unsigned int credits_received =3D 1;
+> >> +       unsigned int credits_received =3D 0;
+> >>         struct smb_rqst rqst =3D { .rq_iov =3D rdata->iov,
+> >>                                  .rq_nvec =3D 2,
+> >>                                  .rq_pages =3D rdata->pages,
+> >> @@ -3132,6 +3133,9 @@ smb2_readv_callback(struct mid_q_entry *mid)
+> >>                 task_io_account_read(rdata->got_bytes);
+> >>                 cifs_stats_bytes_read(tcon, rdata->got_bytes);
+> >>                 break;
+> >> +       case MID_RESPONSE_MALFORMED:
+> >> +               credits_received =3D le16_to_cpu(shdr->CreditRequest);
+> >> +               /* fall through */
+> >>         default:
+> >>                 if (rdata->result !=3D -ENODATA)
+> >>                         rdata->result =3D -EIO;
+> >> @@ -3325,7 +3329,7 @@ smb2_writev_callback(struct mid_q_entry *mid)
+> >>         struct cifs_tcon *tcon =3D tlink_tcon(wdata->cfile->tlink);
+> >>         unsigned int written;
+> >>         struct smb2_write_rsp *rsp =3D (struct smb2_write_rsp *)mid->r=
+esp_buf;
+> >> -       unsigned int credits_received =3D 1;
+> >> +       unsigned int credits_received =3D 0;
+> >>
+> >>         switch (mid->mid_state) {
+> >>         case MID_RESPONSE_RECEIVED:
+> >> @@ -3353,6 +3357,9 @@ smb2_writev_callback(struct mid_q_entry *mid)
+> >>         case MID_RETRY_NEEDED:
+> >>                 wdata->result =3D -EAGAIN;
+> >>                 break;
+> >> +       case MID_RESPONSE_MALFORMED:
+> >> +               credits_received =3D le16_to_cpu(rsp->sync_hdr.CreditR=
+equest);
+> >> +               /* fall through */
+> >>         default:
+> >>                 wdata->result =3D -EIO;
+> >>                 break;
+> >> --
+> >> 2.19.1
+> >>
+> >
+> >Can you also apply the following patch to 4.20.y and 4.19.y, please?
+> >
+> >https://patchwork.ozlabs.org/patch/1030180/
 >
-> See below sample output from doing
->
->     trace-cmd record -e smb3*cmd*
->
-> in one window and then "trace-cmd show" in another
->
-> #           TASK-PID   CPU#  ||||    TIMESTAMP  FUNCTION
-> #              | |       |   ||||       |         |
->            mkdir-22002 [001] .... 25557.965367: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D5 mid=3D28
->            mkdir-22002 [001] .... 25557.965370: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D16 mid=3D29
->            mkdir-22002 [001] .... 25557.965371: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D6 mid=3D30
->            mkdir-22002 [002] .... 25557.972623: smb3_cmd_done:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D5 mid=3D28
->            mkdir-22002 [002] .... 25557.972625: smb3_cmd_done:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D16 mid=3D29
->            mkdir-22002 [002] .... 25557.972626: smb3_cmd_done:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D6 mid=3D30
->               rm-22003 [001] .... 25563.125131: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D5 mid=3D31
->               rm-22003 [001] .... 25563.125134: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D16 mid=3D32
->               rm-22003 [001] .... 25563.125135: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D6 mid=3D33
->               rm-22003 [001] .... 25563.134590: smb3_cmd_err:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D5 mid=3D31 status=3D0xc0000034 rc=
-=3D-2
->               rm-22003 [001] .... 25563.134643: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D5 mid=3D34
+> I'll queue it up for the next cycle as it has dependencies on stable@
+> commits that didn't make it in yet and I don't want to mess up with
+> Greg's flow. Thanks you!
 
-smb3_cmd_enter trace point is called 3 times for mids 31, 32 and 33
-and only mid 31 is logged with smb3_cmd_err. This is happening because
-we skip processing mids in compound_send_recv() once the hit a
-failure. We need to fix compound_send_recv() to be able to log all the
-mids in the compounded chain in a case of error but this is out of
-scope of this patch.
+It seems that this one has already been merged to 4.20.11:
+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=
+=3Dlinux-4.20.y&id=3D7cb453e5a88169b2a5cec1e00778fc969efd1a77
 
->               rm-22003 [001] .... 25563.134645: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D16 mid=3D35
->               rm-22003 [001] .... 25563.134646: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D6 mid=3D36
->               rm-22003 [001] .... 25563.138544: smb3_cmd_err:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D5 mid=3D34 status=3D0xc0000034 rc=
-=3D-2
->               dd-22004 [005] .... 25567.863084: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D5 mid=3D37
->               dd-22004 [005] .... 25567.869415: smb3_cmd_done:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D5 mid=3D37
->               dd-22004 [005] .... 25567.869424: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D16 mid=3D38
->               dd-22004 [005] .... 25567.870319: smb3_cmd_done:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D16 mid=3D38
->               dd-22004 [005] .... 25567.870369: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D17 mid=3D39
->               dd-22004 [005] .... 25567.871073: smb3_cmd_done:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D17 mid=3D39
->               dd-22004 [005] .... 25567.871094: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D5 mid=3D40
->               dd-22004 [005] .... 25567.871095: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D17 mid=3D41
->               dd-22004 [005] .... 25567.871096: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D6 mid=3D42
->               dd-22004 [006] .... 25567.882760: smb3_cmd_done:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D5 mid=3D40
->               dd-22004 [006] .... 25567.882763: smb3_cmd_done:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D17 mid=3D41
->               dd-22004 [006] .... 25567.882764: smb3_cmd_done:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D6 mid=3D42
->               dd-22004 [006] .... 25567.882876: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D9 mid=3D43
->            cifsd-21979 [007] .... 25567.884150: smb3_cmd_done:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D9 mid=3D43
->               dd-22004 [006] .... 25567.884278: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D9 mid=3D44
->            cifsd-21979 [007] .... 25567.885189: smb3_cmd_done:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D9 mid=3D44
->               dd-22004 [006] .... 25567.885299: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D9 mid=3D45
->            cifsd-21979 [007] .... 25567.886174: smb3_cmd_done:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D9 mid=3D45
->               dd-22004 [006] .... 25567.886283: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D9 mid=3D46
->            cifsd-21979 [007] .... 25567.887145: smb3_cmd_done:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D9 mid=3D46
->               dd-22004 [006] .... 25567.887269: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D6 mid=3D47
->               dd-22004 [006] .... 25567.889631: smb3_cmd_done:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D6 mid=3D47
->               ls-22009 [005] .... 25613.476023: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D16 mid=3D48
->               ls-22009 [005] .... 25613.477997: smb3_cmd_done:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D16 mid=3D48
->               ls-22009 [005] .... 25613.478067: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D5 mid=3D49
->               ls-22009 [006] .... 25613.485037: smb3_cmd_done:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D5 mid=3D49
->               ls-22009 [006] .... 25613.485048: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D14 mid=3D50
->               ls-22009 [006] .... 25613.490983: smb3_cmd_done:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D14 mid=3D50
->               ls-22009 [006] .... 25613.491151: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D14 mid=3D51
->               ls-22009 [006] .... 25613.491898: smb3_cmd_err:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D14 mid=3D51 status=3D0x80000006 r=
-c=3D-61
->               ls-22009 [006] .... 25613.491947: smb3_cmd_enter:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D6 mid=3D52
->               ls-22009 [006] .... 25613.494271: smb3_cmd_done:
-> sid=3D0xf3f1eab7 tid=3D0xe3c55496 cmd=3D6 mid=3D52
->
-
-Thanks, now we have a great tool to start analyzing client latency.
-The more advanced step would be to start aggregate latency numbers and
-count percentiles (especially for specific commands).
-
-Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+So, between those two stable kernels only 4.19 doesn't have the patch.
 
 --
 Best regards,
