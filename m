@@ -2,149 +2,151 @@ Return-Path: <SRS0=LBnX=RC=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DBC3C43381
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Feb 2019 14:17:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C630C43381
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Feb 2019 17:54:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 752D12133D
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Feb 2019 14:17:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3A4FF217F5
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Feb 2019 17:54:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1551290050;
+	bh=kspwMt9uaWNH65FXb/F0LswvVhq/mPDrL03nKO/y62o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=T4K+M9pdAdoBr7eFj6LkYsTau6HULujvVBCocq6nAXFAsGzH2tJc9o7H/xF2BS49y
+	 WcVSB74g0YDPRVnhmv4HNVTCcPKdNJFnq2lwa2uPWxi2o8u+gijd7F1clPZDVZsdtl
+	 Oi0Vxac9Lb8BRsDKv894ZIyCyccfcXn5LPM58Z0g=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730059AbfB0ORm convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 27 Feb 2019 09:17:42 -0500
-Received: from ul-exc-pr-as01.ulaval.ca ([132.203.244.29]:17813 "EHLO
-        ul-exc-pr-as01.ulaval.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728462AbfB0ORl (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 27 Feb 2019 09:17:41 -0500
-Received: from ul-exc-pr-edg01.ulaval.ca ([132.203.244.26])
-  by ul-exc-pr-as01.ulaval.ca with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Feb 2019 09:17:41 -0500
-Received: from UL-EXC-PR-MBX11.ulaval.ca (10.40.67.111) by
- UL-EXC-PR-EDG01.ulaval.ca (132.203.244.26) with Microsoft SMTP Server (TLS)
- id 15.0.1395.4; Wed, 27 Feb 2019 09:17:39 -0500
-Received: from UL-EXC-PR-MBX20.ulaval.ca (10.40.67.120) by
- ul-exc-pr-mbx11.ulaval.ca (10.40.67.111) with Microsoft SMTP Server (TLS) id
- 15.0.1395.4; Wed, 27 Feb 2019 09:17:39 -0500
-Received: from UL-EXC-PR-MBX20.ulaval.ca ([fe80::5d31:55ba:ae63:96d4]) by
- UL-EXC-PR-MBX20.ulaval.ca ([fe80::5d31:55ba:ae63:96d4%22]) with mapi id
- 15.00.1395.000; Wed, 27 Feb 2019 09:17:39 -0500
-From:   =?iso-8859-1?Q?Alexis_Fortin-C=F4t=E9?= 
-        <alexis.fortin-cote.1@ulaval.ca>
-To:     "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
-CC:     "Robin P. Blanchard" <robin.blanchard@gmail.com>
-Subject: RE: mount -t cifs fails while smbclient succeed
-Thread-Topic: mount -t cifs fails while smbclient succeed
-Thread-Index: AQHUyrzXfCa6KTecaEaRGQ0BBWS51qXr8SPBgACSrACABzQvuw==
-Date:   Wed, 27 Feb 2019 14:17:39 +0000
-Message-ID: <1551277059649.97069@ulaval.ca>
-References: <637c6227392d4f67b76aa6ebb8b71d0c@UL-EXC-PR-MBX20.ulaval.ca>
- <1550849364135.34775@ulaval.ca>,<CAJUwKM3kKM-g6L+vAVNUvVbCds6ezFmaB8J2BQT2zWyHBmmc6Q@mail.gmail.com>
-In-Reply-To: <CAJUwKM3kKM-g6L+vAVNUvVbCds6ezFmaB8J2BQT2zWyHBmmc6Q@mail.gmail.com>
-Accept-Language: fr-CA, en-US
-Content-Language: fr-CA
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.40.104.18]
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
+        id S1727240AbfB0RyJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 27 Feb 2019 12:54:09 -0500
+Received: from mail.kernel.org ([198.145.29.99]:45836 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725854AbfB0RyJ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 27 Feb 2019 12:54:09 -0500
+Received: from localhost (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1F829217F5;
+        Wed, 27 Feb 2019 17:54:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1551290048;
+        bh=kspwMt9uaWNH65FXb/F0LswvVhq/mPDrL03nKO/y62o=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=P+/QarotcjOYrS1c5ACqk5a4yTg3rH4ARtRNlldK5a8IdtKcn7Qe6an75N+hubHCW
+         7DMJzyNcOmZQZ7DF3YIlMidZpbHJjEHGw3UwBlSP23cfmy3mD+BxgyaE3kuusXh/sp
+         D9akQN8CkirNA2A573NTy0XWo2ZANDD54sP4AbwA=
+Date:   Wed, 27 Feb 2019 12:54:06 -0500
+From:   Sasha Levin <sashal@kernel.org>
+To:     Pavel Shilovskiy <pshilov@microsoft.com>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>,
+        Steven French <Steven.French@microsoft.com>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+Subject: Re: [PATCH AUTOSEL 4.20 65/77] CIFS: Do not assume one credit for
+ async responses
+Message-ID: <20190227175406.GM10616@sasha-vm>
+References: <20190215020855.176727-1-sashal@kernel.org>
+ <20190215020855.176727-65-sashal@kernel.org>
+ <DM5PR21MB0140327178FA380F6D7DCAC5B6600@DM5PR21MB0140.namprd21.prod.outlook.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <DM5PR21MB0140327178FA380F6D7DCAC5B6600@DM5PR21MB0140.namprd21.prod.outlook.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi,
-Thanks for your help.
-But it doesn't seem to be an authentication failure. I tried all sec option. Some clearly failed early (in the wireshark trace) due to authentification problem. Its seems to be able to authenticate with ntlmv2.
-But fails latter in the exchange.
-
-https://pastebin.com/zkRHtTvq
-
-Frame 25 Create Response, Error: STATUS_PATH_NOT_COVERED
-
-Any idea?
-
-Thanks again.
-
-Alex
-
-________________________________________
-De : Robin P. Blanchard <robin.blanchard@gmail.com>
-Envoyé : 22 février 2019 14:13
-À : Alexis Fortin-Côté
-Cc : linux-cifs@vger.kernel.org
-Objet : Re: mount -t cifs fails while smbclient succeed
-
-Compare:
-
-failed: lines 21-42
-
-I think you may need to mount with a different sec option:
-
-
-       sec=
-           Security mode. Allowed values are:
-
-           ·   none - attempt to connection as a null user (no name)
-
-           ·   krb5 - Use Kerberos version 5 authentication
-
-           ·   krb5i - Use Kerberos authentication and forcibly enable packet
-               signing
-
-           ·   ntlm - Use NTLM password hashing
-
-           ·   ntlmi - Use NTLM password hashing and force packet signing
-
-           ·   ntlmv2 - Use NTLMv2 password hashing
-
-           ·   ntlmv2i - Use NTLMv2 password hashing and force packet signing
-
-           ·   ntlmssp - Use NTLMv2 password hashing encapsulated in Raw
-               NTLMSSP message
-
-           ·   ntlmsspi - Use NTLMv2 password hashing encapsulated in Raw
-               NTLMSSP message, and force packet signing
-
-           The default in mainline kernel versions prior to v3.8 was sec=ntlm.
-           In v3.8, the default was changed to sec=ntlmssp.
-
-On Fri, Feb 22, 2019 at 9:30 AM Alexis Fortin-Côté
-<alexis.fortin-cote.1@ulaval.ca> wrote:
+On Fri, Feb 15, 2019 at 08:10:47PM +0000, Pavel Shilovskiy wrote:
+>Ñ‡Ñ‚, 14 Ñ„ÐµÐ²Ñ€. 2019 Ð³. Ð² 18:40, Sasha Levin <sashal@kernel.org>:
+>>
+>> From: Pavel Shilovsky <pshilov@microsoft.com>
+>>
+>> [ Upstream commit 0fd1d37b0501efc6e295f56ab55cdaff784aa50c ]
+>>
+>> If we don't receive a response we can't assume that the server
+>> granted one credit. Assume zero credits in such cases.
+>>
+>> Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
+>> Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
+>> Signed-off-by: Steve French <stfrench@microsoft.com>
+>> Signed-off-by: Sasha Levin <sashal@kernel.org>
+>> ---
+>>  fs/cifs/smb2pdu.c | 15 +++++++++++----
+>>  1 file changed, 11 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+>> index d1ae7cdb236d..3c44c51310c4 100644
+>> --- a/fs/cifs/smb2pdu.c
+>> +++ b/fs/cifs/smb2pdu.c
+>> @@ -2834,9 +2834,10 @@ smb2_echo_callback(struct mid_q_entry *mid)
+>>  {
+>>         struct TCP_Server_Info *server = mid->callback_data;
+>>         struct smb2_echo_rsp *rsp = (struct smb2_echo_rsp *)mid->resp_buf;
+>> -       unsigned int credits_received = 1;
+>> +       unsigned int credits_received = 0;
+>>
+>> -       if (mid->mid_state == MID_RESPONSE_RECEIVED)
+>> +       if (mid->mid_state == MID_RESPONSE_RECEIVED
+>> +           || mid->mid_state == MID_RESPONSE_MALFORMED)
+>>                 credits_received = le16_to_cpu(rsp->sync_hdr.CreditRequest);
+>>
+>>         DeleteMidQEntry(mid);
+>> @@ -3093,7 +3094,7 @@ smb2_readv_callback(struct mid_q_entry *mid)
+>>         struct TCP_Server_Info *server = tcon->ses->server;
+>>         struct smb2_sync_hdr *shdr =
+>>                                 (struct smb2_sync_hdr *)rdata->iov[0].iov_base;
+>> -       unsigned int credits_received = 1;
+>> +       unsigned int credits_received = 0;
+>>         struct smb_rqst rqst = { .rq_iov = rdata->iov,
+>>                                  .rq_nvec = 2,
+>>                                  .rq_pages = rdata->pages,
+>> @@ -3132,6 +3133,9 @@ smb2_readv_callback(struct mid_q_entry *mid)
+>>                 task_io_account_read(rdata->got_bytes);
+>>                 cifs_stats_bytes_read(tcon, rdata->got_bytes);
+>>                 break;
+>> +       case MID_RESPONSE_MALFORMED:
+>> +               credits_received = le16_to_cpu(shdr->CreditRequest);
+>> +               /* fall through */
+>>         default:
+>>                 if (rdata->result != -ENODATA)
+>>                         rdata->result = -EIO;
+>> @@ -3325,7 +3329,7 @@ smb2_writev_callback(struct mid_q_entry *mid)
+>>         struct cifs_tcon *tcon = tlink_tcon(wdata->cfile->tlink);
+>>         unsigned int written;
+>>         struct smb2_write_rsp *rsp = (struct smb2_write_rsp *)mid->resp_buf;
+>> -       unsigned int credits_received = 1;
+>> +       unsigned int credits_received = 0;
+>>
+>>         switch (mid->mid_state) {
+>>         case MID_RESPONSE_RECEIVED:
+>> @@ -3353,6 +3357,9 @@ smb2_writev_callback(struct mid_q_entry *mid)
+>>         case MID_RETRY_NEEDED:
+>>                 wdata->result = -EAGAIN;
+>>                 break;
+>> +       case MID_RESPONSE_MALFORMED:
+>> +               credits_received = le16_to_cpu(rsp->sync_hdr.CreditRequest);
+>> +               /* fall through */
+>>         default:
+>>                 wdata->result = -EIO;
+>>                 break;
+>> --
+>> 2.19.1
+>>
 >
+>Can you also apply the following patch to 4.20.y and 4.19.y, please?
 >
-> Hi,
-> I have trouble mounting a windows share on my Ubuntu 18.04 workstation.
-> I've tried every thing I found using google search to no avail.
->
-> The following smbclient command works, so I know my Username and Password are working
-> smbclient -U ulaval.ca\\alfoc //132.203.235.15/Partages/FSS
->
-> But the following mount fails with errors :
-> sudo mount -t cifs -o cred=/home/alexis/smbcred,vers=2.0 //fssdc1.fss.ulaval.ca/Partages/FSS/ /home/alexis/win/
->
-> mount error(22): Invalid argument
->
-> I've logged the failing and successful trace with wireshark
-> failed : https://pastebin.com/7UTBNgs2
-> success : https://pastebin.com/kQ80vVmr
->
-> I'm using Kernel 4.20.11-042011-generic
-> I'm not sure about the server configuration, but it looks like its a windows server that support smb vers=1.0 and vers=2.0
-> mount.cifs version: 6.8
->
-> dmesg with debug information reads when it fails:
-> [ 2021.652324] Status code returned 0xc0000016 STATUS_MORE_PROCESSING_REQUIRED
-> [ 2021.667748] CIFS VFS: DFS capability contradicts DFS flag
-> [ 2021.673168] Status code returned 0xc0000257 STATUS_PATH_NOT_COVERED
-> [ 2021.675001] CIFS VFS: cifs_mount failed w/return code = -22
->
-> Thanks for helping,
-> Please respond (cc) to this address.
->
-> Alex
->
->
+>https://patchwork.ozlabs.org/patch/1030180/
+
+I'll queue it up for the next cycle as it has dependencies on stable@
+commits that didn't make it in yet and I don't want to mess up with
+Greg's flow. Thanks you!
+
+--
+Thanks,
+Sasha
