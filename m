@@ -6,171 +6,87 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08ED3C43381
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 Feb 2019 06:24:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E08F6C43381
+	for <linux-cifs@archiver.kernel.org>; Thu, 28 Feb 2019 06:24:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D43FC21850
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 Feb 2019 06:24:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF91821850
+	for <linux-cifs@archiver.kernel.org>; Thu, 28 Feb 2019 06:24:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726096AbfB1GYU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 28 Feb 2019 01:24:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49932 "EHLO mx1.redhat.com"
+        id S1730730AbfB1GYW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 28 Feb 2019 01:24:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59300 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725988AbfB1GYU (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 28 Feb 2019 01:24:20 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        id S1725988AbfB1GYW (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 28 Feb 2019 01:24:22 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 5506930248D;
-        Thu, 28 Feb 2019 06:24:20 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 47B1E30C6D6D;
+        Thu, 28 Feb 2019 06:24:22 +0000 (UTC)
 Received: from test1135.test.redhat.com (vpn2-54-37.bne.redhat.com [10.64.54.37])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AB0B6427B;
-        Thu, 28 Feb 2019 06:24:19 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9D1701001DE8;
+        Thu, 28 Feb 2019 06:24:21 +0000 (UTC)
 From:   Ronnie Sahlberg <lsahlber@redhat.com>
 To:     linux-cifs <linux-cifs@vger.kernel.org>
 Cc:     Steve French <smfrench@gmail.com>,
         Pavel Shilovsky <pshilov@microsoft.com>,
         Ronnie Sahlberg <lsahlber@redhat.com>
-Subject: [PATCH 1/5] cifs: change wait_for_free_request() to take flags as argument
-Date:   Thu, 28 Feb 2019 16:24:01 +1000
-Message-Id: <20190228062405.32107-2-lsahlber@redhat.com>
+Subject: [PATCH 4/5] cifs: prevent starvation in wait_for_free_credits for multi-credit requests
+Date:   Thu, 28 Feb 2019 16:24:04 +1000
+Message-Id: <20190228062405.32107-5-lsahlber@redhat.com>
 In-Reply-To: <20190228062405.32107-1-lsahlber@redhat.com>
 References: <20190228062405.32107-1-lsahlber@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Thu, 28 Feb 2019 06:24:20 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Thu, 28 Feb 2019 06:24:22 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-and compute timeout and optyp from it.
+Reserve the last MAX_COMPOUND credits for any request asking for >1 credit.
+This is to prevent future compound requests from becoming starved while waiting
+for potentially many requests is there is a large number of concurrent
+singe-credit requests.
 
 Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
 ---
- fs/cifs/transport.c | 33 +++++++++++++++++----------------
- 1 file changed, 17 insertions(+), 16 deletions(-)
+ fs/cifs/transport.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
 diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 849a45d7d732..5c4becefde4b 100644
+index baf15194aa3d..4ff832fce2e9 100644
 --- a/fs/cifs/transport.c
 +++ b/fs/cifs/transport.c
-@@ -529,15 +529,20 @@ wait_for_free_credits(struct TCP_Server_Info *server, const int timeout,
- }
+@@ -520,6 +520,29 @@ wait_for_free_credits(struct TCP_Server_Info *server, const int num_credits,
+ 			}
  
- static int
--wait_for_free_request(struct TCP_Server_Info *server, const int timeout,
--		      const int optype, unsigned int *instance)
-+wait_for_free_request(struct TCP_Server_Info *server, const int flags,
-+		      unsigned int *instance)
- {
- 	int *val;
-+	int timeout, optype;
+ 			/*
++			 * For normal commands, reserve the last MAX_COMPOUND
++			 * credits to compound requests.
++			 * Otherwise these compounds could be permanently
++			 * starved for credits by single-credit requests.
++			 *
++			 * To prevent spinning CPU, block this thread until
++			 * there are >MAX_COMPOUND credits available.
++			 */
++			if (!optype && num_credits == 1 &&
++			    *credits <= MAX_COMPOUND) {
++				spin_unlock(&server->req_lock);
++				cifs_num_waiters_inc(server);
++				rc = wait_event_killable(server->request_q,
++					has_credits(server, credits,
++						    MAX_COMPOUND + 1));
++				cifs_num_waiters_dec(server);
++				if (rc)
++					return rc;
++				spin_lock(&server->req_lock);
++				continue;
++			}
 +
-+	timeout = flags & CIFS_TIMEOUT_MASK;
-+	optype = flags & CIFS_OP_MASK;
- 
- 	val = server->ops->get_credits_field(server, optype);
- 	/* Since an echo is already inflight, no need to wait to send another */
- 	if (*val <= 0 && optype == CIFS_ECHO_OP)
- 		return -EAGAIN;
-+
- 	return wait_for_free_credits(server, timeout, val, instance);
- }
- 
-@@ -637,16 +642,16 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
- 		mid_handle_t *handle, void *cbdata, const int flags,
- 		const struct cifs_credits *exist_credits)
- {
--	int rc, timeout, optype;
-+	int rc;
- 	struct mid_q_entry *mid;
- 	struct cifs_credits credits = { .value = 0, .instance = 0 };
- 	unsigned int instance;
-+	int optype;
- 
--	timeout = flags & CIFS_TIMEOUT_MASK;
- 	optype = flags & CIFS_OP_MASK;
- 
- 	if ((flags & CIFS_HAS_CREDITS) == 0) {
--		rc = wait_for_free_request(server, timeout, optype, &instance);
-+		rc = wait_for_free_request(server, flags, &instance);
- 		if (rc)
- 			return rc;
- 		credits.value = 1;
-@@ -862,8 +867,7 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
- 		   const int flags, const int num_rqst, struct smb_rqst *rqst,
- 		   int *resp_buf_type, struct kvec *resp_iov)
- {
--	int i, j, rc = 0;
--	int timeout, optype;
-+	int i, j, optype, rc = 0;
- 	struct mid_q_entry *midQ[MAX_COMPOUND];
- 	bool cancelled_mid[MAX_COMPOUND] = {false};
- 	struct cifs_credits credits[MAX_COMPOUND] = {
-@@ -873,7 +877,6 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
- 	unsigned int first_instance = 0;
- 	char *buf;
- 
--	timeout = flags & CIFS_TIMEOUT_MASK;
- 	optype = flags & CIFS_OP_MASK;
- 
- 	for (i = 0; i < num_rqst; i++)
-@@ -924,8 +927,7 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
- 	 * Ensure we obtain 1 credit per request in the compound chain.
- 	 */
- 	for (i = 0; i < num_rqst; i++) {
--		rc = wait_for_free_request(ses->server, timeout, optype,
--					   &instance);
-+		rc = wait_for_free_request(ses->server, flags, &instance);
- 
- 		if (rc == 0) {
- 			credits[i].value = 1;
-@@ -1048,7 +1050,7 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
- 		smb311_update_preauth_hash(ses, rqst[0].rq_iov,
- 					   rqst[0].rq_nvec);
- 
--	if (timeout == CIFS_ASYNC_OP)
-+	if ((flags & CIFS_TIMEOUT_MASK) == CIFS_ASYNC_OP)
- 		goto out;
- 
- 	for (i = 0; i < num_rqst; i++) {
-@@ -1185,7 +1187,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
- int
- SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 	    struct smb_hdr *in_buf, struct smb_hdr *out_buf,
--	    int *pbytes_returned, const int timeout)
-+	    int *pbytes_returned, const int flags)
- {
- 	int rc = 0;
- 	struct mid_q_entry *midQ;
-@@ -1216,7 +1218,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 		return -EIO;
- 	}
- 
--	rc = wait_for_free_request(ses->server, timeout, 0, &credits.instance);
-+	rc = wait_for_free_request(ses->server, flags, &credits.instance);
- 	if (rc)
- 		return rc;
- 
-@@ -1255,7 +1257,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 	if (rc < 0)
- 		goto out;
- 
--	if (timeout == CIFS_ASYNC_OP)
-+	if ((flags & CIFS_TIMEOUT_MASK) == CIFS_ASYNC_OP)
- 		goto out;
- 
- 	rc = wait_for_response(ses->server, midQ);
-@@ -1358,8 +1360,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 		return -EIO;
- 	}
- 
--	rc = wait_for_free_request(ses->server, CIFS_BLOCKING_OP, 0,
--				   &instance);
-+	rc = wait_for_free_request(ses->server, CIFS_BLOCKING_OP, &instance);
- 	if (rc)
- 		return rc;
- 
++			/*
+ 			 * Can not count locking commands against total
+ 			 * as they are allowed to block on server.
+ 			 */
 -- 
 2.13.6
 
