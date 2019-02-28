@@ -2,153 +2,119 @@ Return-Path: <SRS0=HnFe=RD=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEBF0C43381
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 Feb 2019 05:44:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FFA4C43381
+	for <linux-cifs@archiver.kernel.org>; Thu, 28 Feb 2019 05:49:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A9A86206B8
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 Feb 2019 05:44:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 288D62083D
+	for <linux-cifs@archiver.kernel.org>; Thu, 28 Feb 2019 05:49:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="muciqd5V"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fbMslhX6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730263AbfB1Fo2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 28 Feb 2019 00:44:28 -0500
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:42830 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725862AbfB1Fo2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 28 Feb 2019 00:44:28 -0500
-Received: by mail-pg1-f196.google.com with SMTP id b2so9132344pgl.9;
-        Wed, 27 Feb 2019 21:44:27 -0800 (PST)
+        id S1730612AbfB1Ftr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 28 Feb 2019 00:49:47 -0500
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:33870 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725862AbfB1Ftr (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 28 Feb 2019 00:49:47 -0500
+Received: by mail-pl1-f196.google.com with SMTP id d15so9203783plr.1;
+        Wed, 27 Feb 2019 21:49:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=kPKaM/wVu0wENlWjhvWM4RJ2peaamOVUwtIcYrhOH2M=;
-        b=muciqd5VcXHq0UgaSxyVGqu8Fwt9PbQzUUQLIdJFDPL0UlC41rI4NPFAkbhZf83whf
-         94SFREZMsTNEdUfNt6YB1Cnyil9Cdg8v62LigsGLlfDf5icrfAYlJnY4T4bYTyEfhRGq
-         BKhD0xbVHhAd962GtH/sotucC1dO85E5lo9nWI19q88uYM+P+79GM1fl43hBcDg3/b9f
-         ggdN82zauOFzYgQBc/WBxMKVCOX1IJzz5UxfLp/F0WxCV7aCTSaySQrqA6YEvpJgU0W/
-         8jUxvgZ50nm7WJ8VWINTZpBk4Lrww2eQ8lOhRmJP3d0C/bb/MPlHk/bvE+ghQhsXbfEE
-         xRGQ==
+        bh=QLb5BtAHtBejceR8+wPasoxwq+0zBA9K4Oc3oeTDWws=;
+        b=fbMslhX6jVjQj+/cY28+spXJ7jlicyOtMNoIJiWMxGWUD3cjo/h74enkYFpwILAcBq
+         twe7ak8rEHKXIPn1bNZzoEz5jAt74Ed/Q+Y+Wq6Mtbv40hBKLe0QBlZM0fywReGtoJ/l
+         fY61w4C9uAeOowGDRdGhxm4zI+1NmwkJiROQaStorqA1++N16TlPpfYnosWOWCvMeEaD
+         0SlsNPkr0yRJUC7XFYWcq2CqhSzY2Y58edBBKBdHT2yu+clsHGNY3hu0e09ArRY9gB36
+         asdie3RJJLCqwbhYna0MR1E368SAiaU/SXfC1QUwuvFxcqcGy8gBcbgxjWAqAFtehs55
+         c6UQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=kPKaM/wVu0wENlWjhvWM4RJ2peaamOVUwtIcYrhOH2M=;
-        b=UfC1hFbdV4AKMnky2En4vzuO8J8IY7Mp/F1IhcX/3dTghRjCFGU50F//uVkTzP0Uzj
-         7Gou9+/8Kmnblda/QtNZe/f5bvn1lD2s41hKYlnATPy6HO/Xsiqh0p8Y9trHtKmlY+Zq
-         fUKjOdrS5Ab7bGmY6y6lCi7naf6GjZzSPbSDZC4x8RMG5O0idHh6firSP4z3yMJu/nf9
-         m1AgBgV0bCU0WBCAc5VT5V9bbdJFWAvkkCpcFLJUXCFmwuJEEKYzFjxK6r6Pf+hwfGgR
-         78RT06dNPKHXoJC95mGtjlPZBSq7qI/4H6RDrZmNuvxuI9NvV7+knpTOJYe+EW9Kvr5r
-         wRLQ==
-X-Gm-Message-State: AHQUAuaElATSZAOJ4eST0JsN4OF0OM0A8/APqQzwjFM7KzdzlxRbYzGw
-        y5LHOrlHi+D1KuWG/SQOwlv02QjZjhQ4Snvf2ws=
-X-Google-Smtp-Source: AHgI3IaKnQSswnsaHYhPSUtp7AxVPXbJsbQei87wRYbohZn+qLOg8jJ+Lt5s3a0VS4nIqawEIK5E0CQcoZaXPfSyZqI=
-X-Received: by 2002:a65:42c6:: with SMTP id l6mr4463163pgp.344.1551332666820;
- Wed, 27 Feb 2019 21:44:26 -0800 (PST)
+        bh=QLb5BtAHtBejceR8+wPasoxwq+0zBA9K4Oc3oeTDWws=;
+        b=GUt9fGBgMNhgiKT4L5OER0BpDErk7QdknYpj2cwOoXNZ80gaCpJwjEAMCA4+I7yLsZ
+         eV+MRIysgy2YSwwO7V0cPIv+yncKFYClol9UazO4LJ2NCT4QKOx4RQBVSOxCTaIea8li
+         varYB3kvOKg2+NOaCyOkduFc47C+KnYMxEID9xpx85815uBxo1J+luLqJ35umVIuvBHl
+         qyv14Dy4wxDBiMf1EetolMXRlopNVMLY4wXWRh9qcgu8QummndVGu8xA1PBkQd7e1CRh
+         kxhUxKmz9x9d8+An6o8OBtR+rdl89gqaoS0RTdA8HoTWviIbr3zilLMA94pmFLpmP+eD
+         vYgQ==
+X-Gm-Message-State: AHQUAubzJJrD7jxI82iBEUsP9EnwLBudKKJTMR9hCXcEhwmkDzQOr76w
+        Xe4zMkWB5tS1MvkmtkFnbFPyl7yRhIa2+L3Fceg=
+X-Google-Smtp-Source: AHgI3IaXYGqSsEvLtauMUT6fuGhlq/VTDg42wxNmh8OPWuSXJqHU612IDVq83Qh42FHvCrPo1DZ+rmWluLHAuSoA0XA=
+X-Received: by 2002:a17:902:42e4:: with SMTP id h91mr6347059pld.18.1551332986591;
+ Wed, 27 Feb 2019 21:49:46 -0800 (PST)
 MIME-Version: 1.0
-References: <20190228052659.GA3253@kadam>
-In-Reply-To: <20190228052659.GA3253@kadam>
+References: <CAN05THSpSLnGF84S0a0+qu=UHw8HArKbuChmP7usRqKNChNC8w@mail.gmail.com>
+ <20190227202156.GB23505@fieldses.org>
+In-Reply-To: <20190227202156.GB23505@fieldses.org>
 From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 27 Feb 2019 23:44:14 -0600
-Message-ID: <CAH2r5ms1+5Kj_qmWx3oww7Af_rfiCSBbkGos_gqieqH7jW98BQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: Clean up an error code in cifs_root_iget()
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        kernel-janitors <kernel-janitors@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
+Date:   Wed, 27 Feb 2019 23:49:35 -0600
+Message-ID: <CAH2r5mud5qLQqww6p18VoUmRPdoxibrrtfPEA1NuZ+=Xo7nG=g@mail.gmail.com>
+Subject: Re: [LSF/MM TOPIC] Using buildbot for automated testing of CIFS.KO
+To:     "J. Bruce Fields" <bfields@fieldses.org>
+Cc:     ronnie sahlberg <ronniesahlberg@gmail.com>,
+        lsf-pc@lists.linux-foundation.org,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Won't that change behavior and cause the success case (server returned
-0, and does support POSIX and &inode pointer is ok) to now return
--EINVAL.
-
-Before if rc was 0 and inode was filled in we wouldn't execute this else block:
-
-    } else if (rc) {
-        iget_failed(inode);
-        inode = ERR_PTR(rc);
-    }
-
-But with your change, won't we return EINVAL for the success case?
-
-How about just changing:
-
-iget_no_retry:
-    if (!inode) {
-        inode = ERR_PTR(rc);
-        goto out;
-    }
-
-to
-
-iget_no_retry:
-    if (!inode) {
-        if (rc == 0)
-              rc = -EINVAL;
-        inode = ERR_PTR(rc);
-        goto out;
-    }
-
-
-
-On Wed, Feb 27, 2019 at 11:28 PM Dan Carpenter via samba-technical
-<samba-technical@lists.samba.org> wrote:
+On Wed, Feb 27, 2019 at 2:22 PM J. Bruce Fields <bfields@fieldses.org> wrote:
 >
-> This patch silences a Smatch warning:
+> On Wed, Feb 27, 2019 at 05:22:07PM +1000, ronnie sahlberg wrote:
+> > Hi Folks,
+> >
+> > I am Ronnie Sahlberg, CIFS.KO developer at RedHat.
+> > I want to come to LSF/MM to talk CIFS and network protocols with
+> > colleagues in the FS world.
+> >
+> > I have an idea for an informal talk I would like to give:
+> > "Automated testing of kernel fs modules using buildbot. Experiences so
+> > far in CIFS land."
+> >
+> > This would be a practical presentation showing examples of a system we
+> > implemented recently
+> > for cifs.ko to have a standard set of tests to run to ensure quality
+> > and (hopefully) avoidance
+> > of regressions for the patches that are sent to Linus for the CIFS.KO module.
+> >
+> > At this point we are starting to see very promising results on fixing
+> > bugs before they hit Linus tree.
+> > I would like to show and talk about how we set this up and why we did
+> > it this way.
+> >
+> > To see what it looks like right now, this is what I think will go as a
+> > pull request when the next merge window opens:
+> > http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/137
+> > http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/4/builds/98
 >
-> fs/cifs/inode.c:1094 cifs_root_iget() warn: passing zero to 'ERR_PTR'
+> Am I reading right--did one of those tests take twice as long as the
+> other?  I wonder why?
 >
-> The shouldn't have a noticeable effect on runtime, it's basically
-> a cleanup.  The code is checking to ensure that cifs_get_inode_info_unix()
-> returns -EOPNOTSUPP when we have the UNIX extensions.  From the patch
-> description in commit b5b374eab11e ("Workaround Mac server problem")
-> this affects Macs.
->
-> Presumably most of the time "rc" is zero, which means we return
-> ERR_PTR(0) which is NULL.  This cifs_root_iget() function is only called
-> from cifs_read_super() and if we return NULL that causes d_make_root()
-> to return NULL so in the end we fail with -ENOMEM.
->
-> After this patch is applied we instead return with -EINVAL.
->
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-> ---
->  fs/cifs/inode.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> index 0f53ecb071ac..e40c554bb2f3 100644
-> --- a/fs/cifs/inode.c
-> +++ b/fs/cifs/inode.c
-> @@ -1080,8 +1080,10 @@ struct inode *cifs_root_iget(struct super_block *sb)
->         if (tcon->unix_ext) {
->                 rc = cifs_get_inode_info_unix(&inode, path, sb, xid);
->                 /* some servers mistakenly claim POSIX support */
-> -               if (rc != -EOPNOTSUPP)
-> +               if (rc != -EOPNOTSUPP) {
-> +                       rc = -EINVAL;
->                         goto iget_no_retry;
-> +               }
->                 cifs_dbg(VFS, "server does not support POSIX extensions");
->                 tcon->unix_ext = false;
->         }
-> --
-> 2.17.1
->
->
+> Just curious.  Always happy to hear about other folks' test setups.
+
+No - these runs were quite different - two distinct groups of tests.
+"cifs-testing" group is longer and tests to three types of server
+targets, while the "azure" target tests 67 of the xfstests to Azure
+server target (albeit with different configurations for some of the
+tests).  There is an additional test group for "DFS" (Global Name
+Space) and we will probably add more.
+
+A big hole right now is lack of RDMA ("SMBDirect") tests - in part due
+to lack of good options for emulated RDMA in virtual machines.
 
 
---
+-- 
 Thanks,
 
 Steve
