@@ -6,87 +6,185 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E08F6C43381
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 Feb 2019 06:24:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D745C43381
+	for <linux-cifs@archiver.kernel.org>; Thu, 28 Feb 2019 06:24:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AF91821850
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 Feb 2019 06:24:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1581421850
+	for <linux-cifs@archiver.kernel.org>; Thu, 28 Feb 2019 06:24:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730730AbfB1GYW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 28 Feb 2019 01:24:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59300 "EHLO mx1.redhat.com"
+        id S1730732AbfB1GYY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 28 Feb 2019 01:24:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32882 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725988AbfB1GYW (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 28 Feb 2019 01:24:22 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        id S1725988AbfB1GYY (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 28 Feb 2019 01:24:24 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 47B1E30C6D6D;
-        Thu, 28 Feb 2019 06:24:22 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 33B3730B27CE;
+        Thu, 28 Feb 2019 06:24:24 +0000 (UTC)
 Received: from test1135.test.redhat.com (vpn2-54-37.bne.redhat.com [10.64.54.37])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9D1701001DE8;
-        Thu, 28 Feb 2019 06:24:21 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 914496198B;
+        Thu, 28 Feb 2019 06:24:23 +0000 (UTC)
 From:   Ronnie Sahlberg <lsahlber@redhat.com>
 To:     linux-cifs <linux-cifs@vger.kernel.org>
 Cc:     Steve French <smfrench@gmail.com>,
         Pavel Shilovsky <pshilov@microsoft.com>,
         Ronnie Sahlberg <lsahlber@redhat.com>
-Subject: [PATCH 4/5] cifs: prevent starvation in wait_for_free_credits for multi-credit requests
-Date:   Thu, 28 Feb 2019 16:24:04 +1000
-Message-Id: <20190228062405.32107-5-lsahlber@redhat.com>
+Subject: [PATCH 5/5] cifs: simplify how we handle credits in compond_send_recv()
+Date:   Thu, 28 Feb 2019 16:24:05 +1000
+Message-Id: <20190228062405.32107-6-lsahlber@redhat.com>
 In-Reply-To: <20190228062405.32107-1-lsahlber@redhat.com>
 References: <20190228062405.32107-1-lsahlber@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Thu, 28 Feb 2019 06:24:22 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Thu, 28 Feb 2019 06:24:24 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Reserve the last MAX_COMPOUND credits for any request asking for >1 credit.
-This is to prevent future compound requests from becoming starved while waiting
-for potentially many requests is there is a large number of concurrent
-singe-credit requests.
+Since we can now wait for multiple requests atomically in
+wait_for_free_request() we can now greatly simplify the handling
+of the credits in this function.
+
+This fixes a potential deadlock where many concurrent compound requests
+could each have reserved 1 or 2 credits each but are all blocked
+waiting for the final credits they need to be able to issue the requests
+to the server.
 
 Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
 ---
- fs/cifs/transport.c | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+ fs/cifs/transport.c | 81 +++++++++++++----------------------------------------
+ 1 file changed, 20 insertions(+), 61 deletions(-)
 
 diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index baf15194aa3d..4ff832fce2e9 100644
+index 4ff832fce2e9..e46b534bf007 100644
 --- a/fs/cifs/transport.c
 +++ b/fs/cifs/transport.c
-@@ -520,6 +520,29 @@ wait_for_free_credits(struct TCP_Server_Info *server, const int num_credits,
- 			}
+@@ -567,6 +567,13 @@ wait_for_free_request(struct TCP_Server_Info *server, const int flags,
+ 	return wait_for_free_credits(server, 1, flags, instance);
+ }
  
- 			/*
-+			 * For normal commands, reserve the last MAX_COMPOUND
-+			 * credits to compound requests.
-+			 * Otherwise these compounds could be permanently
-+			 * starved for credits by single-credit requests.
-+			 *
-+			 * To prevent spinning CPU, block this thread until
-+			 * there are >MAX_COMPOUND credits available.
-+			 */
-+			if (!optype && num_credits == 1 &&
-+			    *credits <= MAX_COMPOUND) {
-+				spin_unlock(&server->req_lock);
-+				cifs_num_waiters_inc(server);
-+				rc = wait_event_killable(server->request_q,
-+					has_credits(server, credits,
-+						    MAX_COMPOUND + 1));
-+				cifs_num_waiters_dec(server);
-+				if (rc)
-+					return rc;
-+				spin_lock(&server->req_lock);
-+				continue;
-+			}
++static int
++wait_for_compound_request(struct TCP_Server_Info *server, int num,
++			  const int flags, unsigned int *instance)
++{
++	return wait_for_free_credits(server, num, flags, instance);
++}
 +
-+			/*
- 			 * Can not count locking commands against total
- 			 * as they are allowed to block on server.
- 			 */
+ int
+ cifs_wait_mtu_credits(struct TCP_Server_Info *server, unsigned int size,
+ 		      unsigned int *num, struct cifs_credits *credits)
+@@ -895,7 +902,6 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 		{ .value = 0, .instance = 0 }
+ 	};
+ 	unsigned int instance;
+-	unsigned int first_instance = 0;
+ 	char *buf;
+ 
+ 	optype = flags & CIFS_OP_MASK;
+@@ -921,70 +927,27 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 			spin_unlock(&ses->server->req_lock);
+ 			return -ENOTSUPP;
+ 		}
+-	} else {
+-		/* enough credits to send the whole compounded request */
+-		ses->server->credits -= num_rqst;
+-		ses->server->in_flight += num_rqst;
+-		first_instance = ses->server->reconnect_instance;
+ 	}
+ 	spin_unlock(&ses->server->req_lock);
+ 
+-	if (first_instance) {
+-		cifs_dbg(FYI, "Acquired %d credits at once\n", num_rqst);
+-		for (i = 0; i < num_rqst; i++) {
+-			credits[i].value = 1;
+-			credits[i].instance = first_instance;
+-		}
+-		goto setup_rqsts;
+-	}
+-
+ 	/*
+-	 * There are not enough credits to send the whole compound request but
+-	 * there are requests in flight that may bring credits from the server.
++	 * Wait for all the requests to become available.
+ 	 * This approach still leaves the possibility to be stuck waiting for
+ 	 * credits if the server doesn't grant credits to the outstanding
+-	 * requests. This should be fixed by returning immediately and letting
+-	 * a caller fallback to sequential commands instead of compounding.
+-	 * Ensure we obtain 1 credit per request in the compound chain.
++	 * requests and if the client is completely idle, not generating any
++	 * other requests.
++	 * This can be handled by the eventual session reconnect.
+ 	 */
+-	for (i = 0; i < num_rqst; i++) {
+-		rc = wait_for_free_request(ses->server, flags, &instance);
+-
+-		if (rc == 0) {
+-			credits[i].value = 1;
+-			credits[i].instance = instance;
+-			/*
+-			 * All parts of the compound chain must get credits from
+-			 * the same session, otherwise we may end up using more
+-			 * credits than the server granted. If there were
+-			 * reconnects in between, return -EAGAIN and let callers
+-			 * handle it.
+-			 */
+-			if (i == 0)
+-				first_instance = instance;
+-			else if (first_instance != instance) {
+-				i++;
+-				rc = -EAGAIN;
+-			}
+-		}
++	rc = wait_for_compound_request(ses->server, num_rqst, flags,
++				       &instance);
++	if (rc)
++		return rc;
+ 
+-		if (rc) {
+-			/*
+-			 * We haven't sent an SMB packet to the server yet but
+-			 * we already obtained credits for i requests in the
+-			 * compound chain - need to return those credits back
+-			 * for future use. Note that we need to call add_credits
+-			 * multiple times to match the way we obtained credits
+-			 * in the first place and to account for in flight
+-			 * requests correctly.
+-			 */
+-			for (j = 0; j < i; j++)
+-				add_credits(ses->server, &credits[j], optype);
+-			return rc;
+-		}
++	for (i = 0; i < num_rqst; i++) {
++		credits[i].value = 1;
++		credits[i].instance = instance;
+ 	}
+ 
+-setup_rqsts:
+ 	/*
+ 	 * Make sure that we sign in the same order that we send on this socket
+ 	 * and avoid races inside tcp sendmsg code that could cause corruption
+@@ -995,17 +958,13 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 
+ 	/*
+ 	 * All the parts of the compound chain belong obtained credits from the
+-	 * same session (see the appropriate checks above). In the same time
+-	 * there might be reconnects after those checks but before we acquired
+-	 * the srv_mutex. We can not use credits obtained from the previous
++	 * same session. We can not use credits obtained from the previous
+ 	 * session to send this request. Check if there were reconnects after
+ 	 * we obtained credits and return -EAGAIN in such cases to let callers
+ 	 * handle it.
+ 	 */
+-	if (first_instance != ses->server->reconnect_instance) {
++	if (instance != ses->server->reconnect_instance) {
+ 		mutex_unlock(&ses->server->srv_mutex);
+-		for (j = 0; j < num_rqst; j++)
+-			add_credits(ses->server, &credits[j], optype);
+ 		return -EAGAIN;
+ 	}
+ 
 -- 
 2.13.6
 
