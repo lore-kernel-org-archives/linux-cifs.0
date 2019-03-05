@@ -2,122 +2,77 @@ Return-Path: <SRS0=9/Pd=RI=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5961C43381
-	for <linux-cifs@archiver.kernel.org>; Tue,  5 Mar 2019 06:14:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CBCFC43381
+	for <linux-cifs@archiver.kernel.org>; Tue,  5 Mar 2019 06:57:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6FF5B2082C
-	for <linux-cifs@archiver.kernel.org>; Tue,  5 Mar 2019 06:14:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D01E02075B
+	for <linux-cifs@archiver.kernel.org>; Tue,  5 Mar 2019 06:57:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GvZ4oaCN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GSlxXxex"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726301AbfCEGOr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 5 Mar 2019 01:14:47 -0500
-Received: from mail-pg1-f176.google.com ([209.85.215.176]:46200 "EHLO
-        mail-pg1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726026AbfCEGOr (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 5 Mar 2019 01:14:47 -0500
-Received: by mail-pg1-f176.google.com with SMTP id 196so4880302pgf.13
-        for <linux-cifs@vger.kernel.org>; Mon, 04 Mar 2019 22:14:47 -0800 (PST)
+        id S1725818AbfCEG5B (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 5 Mar 2019 01:57:01 -0500
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:33340 "EHLO
+        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725782AbfCEG5B (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 5 Mar 2019 01:57:01 -0500
+Received: by mail-qt1-f193.google.com with SMTP id z39so7969234qtz.0
+        for <linux-cifs@vger.kernel.org>; Mon, 04 Mar 2019 22:57:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=IPVZabYIsEdw0yGIPjDuXb27q54PK5zqb5weCbYA5CU=;
-        b=GvZ4oaCNICS1nGpO75V4Zg98+ioEkffwkLE+7VfQTLyUPFGztNcZnEQKmtsd7zzmfs
-         ri1ghQKZgq2rXgW8hcd/XxH+Duhitd/1SxzYtwccbKwAzgtZkHaDz2jQgC/izchx0ahW
-         GddGCRSIq0qV9mJUUtWmyxqgchEfD/MDdNVTUksoWdj24zciDOX5frwO+pt5LTUs1jL6
-         H/ETMllGUH58farqHqQHvfZj5CjB6URrxdTiPVrYpIvOTwovDwEnZXwLFpiG37dDYzQj
-         UlSvyLFgk7c4QpcKmQljlX282bVHnvGBlbUZC1wsBkzK8MwNb18SKKZOveVi0QIZd09b
-         zJHw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=IzjhAwUgk9eL3MLEsra7w5ilPM3WNz51CbG8Vc+xZWk=;
+        b=GSlxXxexxCch467/Uo5MbActfioRGFrQQGAoijpT6o6xCh2z9QT1aYar96NJLNIU21
+         SPYKDwXbmldX1wn8Qd5Z9fqEwqbJmSCHJvCkxKQ6xfcHG8UzpLwlt61vo6MW1J/l6K9v
+         CbOpSpTJrr5SKk75OgavpyOvh0A8YavuZM/okzfiZMQHMdDeVYAG6HSFuXAcVFnNKy5W
+         HMRTZ4IfnOdV9u5VNhHWynkrolwqzMfVDqfazIB4qpRyGH0GNTAueIr7pEesdkolx6C6
+         A+OFuNQg2Yg5CjeQJdtn9mq24XO0AuvRVUuvrVI7xVbgo9NLSk1/pcRHINWCIJeNy435
+         rOFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=IPVZabYIsEdw0yGIPjDuXb27q54PK5zqb5weCbYA5CU=;
-        b=rN88XqORAm+UEVZwGzy+cApkjc6b+5RQgOZeSKKpbcbbCNi/ZkaDPHH2GzF8yJ2lB8
-         AYPK7H4hFXLTGjYvpetUt2s9aT3l4YwtD4o9zlhPnpNGfZLcBvQ4de8KVTnnMURVYuQl
-         csADsZB0edaQYUubVx74Q/h4eIj7Y1hnPYDS+j8fgguWGzf1lmwN/03Q4o1Z7dTnNAkY
-         NZpqb4O1UlvhyScNTyGU4djA3+bPfbKixkC0xWmhEqANahfzxM0zilJXORaTsJGSnSmh
-         cZKNf1zTMaXWDJ5awsvgDuDVUkKW3tFPvAEIIaPDPZfnexHY10h1L6IrBDvLQs/OUsWA
-         KErQ==
-X-Gm-Message-State: APjAAAV1SIbS5uHMooywrMv3TD8jzTKHHodO2zO10AMGCL9Qx7C2yYLh
-        mKj2Qxo6/4aEVqhzi+80N0/IKSt3cn2Twnrj95kIbg==
-X-Google-Smtp-Source: APXvYqzTFY27/wxa7JMieD+9o1Ve3NaqLz0JKCC0AemFfv+K+FkXmsRNf3ojzzUc9w8pBLEKJspnaOrZMhlDNXn0+4M=
-X-Received: by 2002:a63:1053:: with SMTP id 19mr22391296pgq.55.1551766486617;
- Mon, 04 Mar 2019 22:14:46 -0800 (PST)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=IzjhAwUgk9eL3MLEsra7w5ilPM3WNz51CbG8Vc+xZWk=;
+        b=sWQ/VqIiWY6/2mL4RSHvVcs0O331UUqbnouwVf2jCqLLnd6I0HkiRuJSauLhrRmE3M
+         JyqiugT4h/ET+/fj8XK4q36TwVLOhzn1ik6bgZOHmQL1mOGTuDdLrp1MDUuSGQ5ZwZxN
+         mWzj2vGDw+QOgn63UYNqYoZK2mR7rJ1rIofj9OxpXhhqxASrz5pIHAvAum5IyvH6nKrN
+         4LUTVjYF5i5xXObD/XOFqgT61p2fkZvCEj1vtcfuRi9aBl+geCSNFx8xHvtqFM4NGkTc
+         MLnXCKEnBpyHbbvjgr79mH3qBLKiIfJjLDDYC86StInuC7WnhUFgBLbZrw7LM6aBcT6e
+         Tp9A==
+X-Gm-Message-State: APjAAAV/Rx9QS9UH1P4r5OCTe5hOOa9D13gJnlwiV+iRByzi/Ch+ImE4
+        TdXrLjUHRl288tGhkbwRjV54BsaLFC85OZT4LnoR5g==
+X-Google-Smtp-Source: APXvYqzhrL5HxJXFku3oUSItH2GtYD7AcCSqfMzios5/p5X+v9hXWSaREXEbGM3RkHsV57zeelwBmsdAuZ7kxhDQFXk=
+X-Received: by 2002:a0c:93ab:: with SMTP id f40mr950795qvf.59.1551769020412;
+ Mon, 04 Mar 2019 22:57:00 -0800 (PST)
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 5 Mar 2019 00:14:34 -0600
-Message-ID: <CAH2r5msqeMuatKpE2Kg6A+935zJ+yeocVHQTipQechbbgNrEXw@mail.gmail.com>
-Subject: [PATCH] CIFS: fix FSCTL_SET_REPARSE_POINT SMB2_ioctl() call
-To:     CIFS <linux-cifs@vger.kernel.org>
-Cc:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Content-Type: multipart/mixed; boundary="00000000000035c33e058352ca0e"
+References: <CAH2r5msqeMuatKpE2Kg6A+935zJ+yeocVHQTipQechbbgNrEXw@mail.gmail.com>
+In-Reply-To: <CAH2r5msqeMuatKpE2Kg6A+935zJ+yeocVHQTipQechbbgNrEXw@mail.gmail.com>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Tue, 5 Mar 2019 16:56:48 +1000
+Message-ID: <CAN05THSogb2yjwTN4GaofNaCNHN_A7-xj90gpQZio5tNY1x41g@mail.gmail.com>
+Subject: Re: [PATCH] CIFS: fix FSCTL_SET_REPARSE_POINT SMB2_ioctl() call
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---00000000000035c33e058352ca0e
-Content-Type: text/plain; charset="UTF-8"
+Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
 
-merged Aurelien's small patch (attached) into cifs-2.6.git for-next
-
--- 
-Thanks,
-
-Steve
-
---00000000000035c33e058352ca0e
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-CIFS-fix-FSCTL_SET_REPARSE_POINT-SMB2_ioctl-call.patch"
-Content-Disposition: attachment; 
-	filename="0001-CIFS-fix-FSCTL_SET_REPARSE_POINT-SMB2_ioctl-call.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_jsvdoxcz0>
-X-Attachment-Id: f_jsvdoxcz0
-
-RnJvbSA3NzhkODFiNjVlNGQ1OTYyNTE5NDMwMDI1MjJkOTRhN2M2ZmJjZjY5IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBBdXJlbGllbiBBcHRlbCA8YWFwdGVsQHN1c2UuY29tPgpEYXRl
-OiBNb24sIDQgTWFyIDIwMTkgMTg6NTA6MTggKzAxMDAKU3ViamVjdDogW1BBVENIXSBDSUZTOiBm
-aXggRlNDVExfU0VUX1JFUEFSU0VfUE9JTlQgU01CMl9pb2N0bCgpIGNhbGwKCldpdGhvdXQgdGhp
-cyBjaGFuZ2UgdGhlIGlvY3RsKCkgZmFpbHMgd2l0aCBJTlZBTElEX1BBUkFNRVRFUi4KU2luY2Ug
-U0VUX1JFUEFSU0VfUE9JTlQgaGFzIG5vIG91dHB1dCwgc2V0IHRoZSBtYXggb3V0cHV0IHJlc3Bv
-bnNlCnNpemUgdG8gemVyby4KCltNUy1TTUIyXSByZWFkcyAzLjMuNS4xNSBSZWNlaXZpbmcgYW4g
-U01CMiBJT0NUTCBSZXF1ZXN0CgpJZiBlaXRoZXIgSW5wdXRDb3VudCwgTWF4SW5wdXRSZXNwb25z
-ZSwgb3IgTWF4T3V0cHV0UmVzcG9uc2UgaXMKZ3JlYXRlciB0aGFuIENvbm5lY3Rpb24uTWF4VHJh
-bnNhY3RTaXplLCB0aGUgc2VydmVyIFNIT1VMRDwzMDY+IGZhaWwKdGhlIHJlcXVlc3Qgd2l0aCBT
-VEFUVVNfSU5WQUxJRF9QQVJBTUVURVIuCgpUaGUgc2VydmVyIE1VU1QgZmFpbCB0aGUgcmVxdWVz
-dCB3aXRoIFNUQVRVU19JTlZBTElEX1BBUkFNRVRFUiBpbiB0aGUgZm9sbG93aW5nIGNhc2VzOgoK
-KiBJZiBJbnB1dE9mZnNldCBpcyBncmVhdGVyIHRoYW4gemVybyBidXQgbGVzcyB0aGFuIChzaXpl
-IG9mIFNNQjIKICBoZWFkZXIgKyBzaXplIG9mIHRoZSBTTUIyIElPQ1RMIHJlcXVlc3Qgbm90IGlu
-Y2x1ZGluZyBCdWZmZXIpIG9yCiAgaWYgSW5wdXRPZmZzZXQgaXMgZ3JlYXRlciB0aGFuIChzaXpl
-IG9mIFNNQjIgaGVhZGVyICsgc2l6ZSBvZiB0aGUKICBTTUIyIElPQ1RMIHJlcXVlc3QpLgoKKiBJ
-ZiBPdXRwdXRPZmZzZXQgaXMgZ3JlYXRlciB0aGFuIHplcm8gYnV0IGxlc3MgdGhhbiAoc2l6ZSBv
-ZiBTTUIyCiAgaGVhZGVyICsgc2l6ZSBvZiB0aGUgU01CMiBJT0NUTCByZXF1ZXN0IG5vdCBpbmNs
-dWRpbmcgQnVmZmVyKSBvciBpZgogIE91dHB1dE9mZnNldCBpcyBncmVhdGVyIHRoYW4gKHNpemUg
-b2YgU01CMiBoZWFkZXIgKyBzaXplIG9mIHRoZSBTTUIyCiAgSU9DVEwgcmVxdWVzdCkuCgoqIElm
-IChJbnB1dE9mZnNldCArIElucHV0Q291bnQpIGlzIGdyZWF0ZXIgdGhhbiAoc2l6ZSBvZiBTTUIy
-IGhlYWRlciArCiAgc2l6ZSBvZiB0aGUgU01CMiBJT0NUTCByZXF1ZXN0KS4KCiogSWYgKE91dHB1
-dE9mZnNldCArIE91dHB1dENvdW50KSBpcyBncmVhdGVyIHRoYW4gKHNpemUgb2YgU01CMiBoZWFk
-ZXIKICArIHNpemUgb2YgdGhlIFNNQjIgSU9DVEwgcmVxdWVzdCkuCgoqIElmIE91dHB1dENvdW50
-IGlzIGdyZWF0ZXIgdGhhbiB6ZXJvIGFuZCBPdXRwdXRPZmZzZXQgaXMgbGVzcwogIHRoYW4gKElu
-cHV0T2Zmc2V0ICsgSW5wdXRDb3VudCkuCgpTaWduZWQtb2ZmLWJ5OiBBdXJlbGllbiBBcHRlbCA8
-YWFwdGVsQHN1c2UuY29tPgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1p
-Y3Jvc29mdC5jb20+Ci0tLQogZnMvY2lmcy9zbWIycGR1LmMgfCA1ICsrKystCiAxIGZpbGUgY2hh
-bmdlZCwgNCBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvZnMvY2lm
-cy9zbWIycGR1LmMgYi9mcy9jaWZzL3NtYjJwZHUuYwppbmRleCA3MzMwMjE1NjYzNTYuLmNhY2Rm
-OWJmOWVmMyAxMDA2NDQKLS0tIGEvZnMvY2lmcy9zbWIycGR1LmMKKysrIGIvZnMvY2lmcy9zbWIy
-cGR1LmMKQEAgLTI1MzksNyArMjUzOSwxMCBAQCBTTUIyX2lvY3RsKGNvbnN0IHVuc2lnbmVkIGlu
-dCB4aWQsIHN0cnVjdCBjaWZzX3Rjb24gKnRjb24sIHU2NCBwZXJzaXN0ZW50X2ZpZCwKIAkgKiBp
-biByZXNwb25zZXMgKGV4Y2VwdCBmb3IgcmVhZCByZXNwb25zZXMgd2hpY2ggY2FuIGJlIGJpZ2dl
-ci4KIAkgKiBXZSBtYXkgd2FudCB0byBidW1wIHRoaXMgbGltaXQgdXAKIAkgKi8KLQlyZXEtPk1h
-eE91dHB1dFJlc3BvbnNlID0gY3B1X3RvX2xlMzIoQ0lGU01heEJ1ZlNpemUpOworCWlmIChvcGNv
-ZGUgPT0gRlNDVExfU0VUX1JFUEFSU0VfUE9JTlQpCisJCXJlcS0+TWF4T3V0cHV0UmVzcG9uc2Ug
-PSBjcHVfdG9fbGUzMigwKTsKKwllbHNlCisJCXJlcS0+TWF4T3V0cHV0UmVzcG9uc2UgPSBjcHVf
-dG9fbGUzMihDSUZTTWF4QnVmU2l6ZSk7CiAKIAlpZiAoaXNfZnNjdGwpCiAJCXJlcS0+RmxhZ3Mg
-PSBjcHVfdG9fbGUzMihTTUIyXzBfSU9DVExfSVNfRlNDVEwpOwotLSAKMi4xNy4xCgo=
---00000000000035c33e058352ca0e--
+On Tue, Mar 5, 2019 at 4:16 PM Steve French <smfrench@gmail.com> wrote:
+>
+> merged Aurelien's small patch (attached) into cifs-2.6.git for-next
+>
+> --
+> Thanks,
+>
+> Steve
