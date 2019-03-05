@@ -5,31 +5,31 @@ X-Spam-Level:
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 628F8C43381
-	for <linux-cifs@archiver.kernel.org>; Tue,  5 Mar 2019 11:47:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 636E5C43381
+	for <linux-cifs@archiver.kernel.org>; Tue,  5 Mar 2019 15:01:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3B55E206DD
-	for <linux-cifs@archiver.kernel.org>; Tue,  5 Mar 2019 11:47:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 35B5C205C9
+	for <linux-cifs@archiver.kernel.org>; Tue,  5 Mar 2019 15:01:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727831AbfCELru convert rfc822-to-8bit (ORCPT
+        id S1728336AbfCEPBC convert rfc822-to-8bit (ORCPT
         <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 5 Mar 2019 06:47:50 -0500
-Received: from mx2.suse.de ([195.135.220.15]:33484 "EHLO mx1.suse.de"
+        Tue, 5 Mar 2019 10:01:02 -0500
+Received: from mx2.suse.de ([195.135.220.15]:37738 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726150AbfCELru (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 5 Mar 2019 06:47:50 -0500
+        id S1728148AbfCEPBC (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 5 Mar 2019 10:01:02 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 7192CAF33;
-        Tue,  5 Mar 2019 11:47:49 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id A61C8AED4;
+        Tue,  5 Mar 2019 15:01:01 +0000 (UTC)
 From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
 To:     Steve French <smfrench@gmail.com>,
         CIFS <linux-cifs@vger.kernel.org>
 Subject: Re: [PATCH] CIFS: fix FSCTL_SET_REPARSE_POINT SMB2_ioctl() call
-In-Reply-To: <CAH2r5msqeMuatKpE2Kg6A+935zJ+yeocVHQTipQechbbgNrEXw@mail.gmail.com>
-References: <CAH2r5msqeMuatKpE2Kg6A+935zJ+yeocVHQTipQechbbgNrEXw@mail.gmail.com>
-Date:   Tue, 05 Mar 2019 12:47:46 +0100
-Message-ID: <87woldmtjx.fsf@suse.com>
+In-Reply-To: <87woldmtjx.fsf@suse.com>
+References: <CAH2r5msqeMuatKpE2Kg6A+935zJ+yeocVHQTipQechbbgNrEXw@mail.gmail.com> <87woldmtjx.fsf@suse.com>
+Date:   Tue, 05 Mar 2019 16:00:59 +0100
+Message-ID: <87r2blmklw.fsf@suse.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8BIT
@@ -38,54 +38,30 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Steve French <smfrench@gmail.com> writes:
-> Without this change the ioctl() fails with INVALID_PARAMETER.
-> Since SET_REPARSE_POINT has no output, set the max output response
-> size to zero.
+Aurélien Aptel <aaptel@suse.com> writes:
+> So it seems to me only possible explanation is the first, i.e.
+> MaxOutputResponse > Connection.MaxTransactSize, somehow.
 
-Note that this is more of a work around, I didn't intend to send this
-yet. I haven't tried to figure out which cases we were violating and
-where was the underlying issue.
+So I've dumped a few fields:
 
-> If either InputCount, MaxInputResponse, or MaxOutputResponse is
-> greater than Connection.MaxTransactSize, the server SHOULD<306> fail
-> the request with STATUS_INVALID_PARAMETER.
+Connection.MaxTransactSize is set by the server in NEGPROT response.
 
-possible
+Against my WS2016, MaxTransactSize = 8388608
 
-> The server MUST fail the request with STATUS_INVALID_PARAMETER in the following cases:
->
-> * If InputOffset is greater than zero but less than (size of SMB2
->   header + size of the SMB2 IOCTL request not including Buffer) or
->   if InputOffset is greater than (size of SMB2 header + size of the
->   SMB2 IOCTL request).
+But we do this:
 
-input related, nope
+	server->maxBuf = min_t(unsigned int, le32_to_cpu(rsp->MaxTransactSize),
+			       SMB2_MAX_BUFFER_SIZE);
 
-> * If OutputOffset is greater than zero but less than (size of SMB2
->   header + size of the SMB2 IOCTL request not including Buffer) or if
->   OutputOffset is greater than (size of SMB2 header + size of the SMB2
->   IOCTL request).
+Since SMB2_MAX_BUFFER_SIZE = 65536, maxBuf is effectively SMB2_MAX_BUFFER_SIZE
 
-doesn't involve MaxOutputResponse, nope
+And finally, the value used for ioctl MaxOutputResponse is
+CIFSMaxBufSize, which is 16384.
 
-> * If (InputOffset + InputCount) is greater than (size of SMB2 header +
->   size of the SMB2 IOCTL request).
-
-input related, nope
-
-> * If (OutputOffset + OutputCount) is greater than (size of SMB2 header
->   + size of the SMB2 IOCTL request).
-
-doesn't involve MaxOutputResponse, nope
-
-> * If OutputCount is greater than zero and OutputOffset is less
->   than (InputOffset + InputCount).
-
-doesn't involve MaxOutputResponse, nope
-
-So it seems to me only possible explanation is the first, i.e.
-MaxOutputResponse > Connection.MaxTransactSize, somehow.
+I've tried setting MaxOutputResponse to server->maxBuf or
+Connection.MaxTransactSize but it always fails the same way... so I
+don't know. I guess it must say somewhere that ioctl() with no output
+should set MaxOutputResponse to zero?
 
 -- 
 Aurélien Aptel / SUSE Labs Samba Team
