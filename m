@@ -1,276 +1,113 @@
-Return-Path: <SRS0=vRfO=RH=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=9/Pd=RI=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AD10C43381
-	for <linux-cifs@archiver.kernel.org>; Mon,  4 Mar 2019 22:06:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15DCEC43381
+	for <linux-cifs@archiver.kernel.org>; Tue,  5 Mar 2019 01:48:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 27FBD2070B
-	for <linux-cifs@archiver.kernel.org>; Mon,  4 Mar 2019 22:06:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D57FC206B6
+	for <linux-cifs@archiver.kernel.org>; Tue,  5 Mar 2019 01:48:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vglZPSid"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lC9RslzQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726158AbfCDWGM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 4 Mar 2019 17:06:12 -0500
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:37526 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726038AbfCDWGM (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 4 Mar 2019 17:06:12 -0500
-Received: by mail-lf1-f68.google.com with SMTP id z196so4650327lff.4
-        for <linux-cifs@vger.kernel.org>; Mon, 04 Mar 2019 14:06:10 -0800 (PST)
+        id S1726096AbfCEBsJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 4 Mar 2019 20:48:09 -0500
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:44219 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726066AbfCEBsJ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 4 Mar 2019 20:48:09 -0500
+Received: by mail-pf1-f193.google.com with SMTP id a3so4362873pff.11
+        for <linux-cifs@vger.kernel.org>; Mon, 04 Mar 2019 17:48:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=Lhb7/lDprkCpURPsaI8FZIthSoNfEkaS9fH9fK32EXg=;
-        b=vglZPSidqPC5NonGLyWOFqoEhcKr7wt1xjKLvrZU3DGFfjvkhhoHJx9XEVvTrKF/oU
-         JZzGPF+AzWK6QPiyPBiUmQRZwZpggXPhxC8HRsx7op8FMce6PjRm7RVS9zJEbRS6AhW5
-         gSSWfipST6M3SKqcAqzAn3Llj99Yr75XeS9UfRzMbc9STZNJU44HQP/q17PdkMqmjvQN
-         1wBDRHUAkhdl06mD13Lv1TyMBNiSexuF4NvnqWh5ZDVuwJXw4Wbm9UOA3eiDnBgbjsxW
-         GIVoELb6q2IewRMcrF5vYuHxaxLxRpS0qUugh2jWre0zOxFTNuC49Dwj8Z8ieRlkQLON
-         1SfA==
+        h=from:to:cc:subject:date:message-id;
+        bh=Can4H29Q3ejASXFiT++BZu4BbfjNyHVeu+ayDMCQ3RU=;
+        b=lC9RslzQ8nz2n9yhMVeCmmVu0ttsPoFucRDghyGwuA/13gFMQ/RkqQauAY3SpqzUh9
+         UjD9riWG+Pi1YBQeH9DW4u4fWhimpJim7SpubIk9BS/1rnBEg9MwrABZt3DFg+ZlAB0g
+         ohmW14RxXg0/tkO8w7U1FvxnWrb6enf9AC1Ot3nU6l4hqmw/oIhzZazkzP+wHYFW2YY7
+         As43IEihlzZsOrKaCQY5lGaJbpU+VcQZ3AJvEjL5FZcflTt2nu/lDjf0db3+quX63BkE
+         byJHsuy7C5/dVCL3uLFmhg34gWbVYsy/Vk6djmhT29sKKrpaObJvk7qe7z3l+x2QeD8b
+         Dx4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Lhb7/lDprkCpURPsaI8FZIthSoNfEkaS9fH9fK32EXg=;
-        b=KxwITBqQhJ9eA2VahNzKhju6rISgHs148BjyL7ZPAqz1Z2kbK9dxnHprxY/N0JdM00
-         ZhZizALsWe1gDml7AKz370iLItYXUm7rNPzE92CG1vM6xJYYzMpbnxEoCH6WUb4P8juT
-         jmiX77VT12JghxkkjHbhlLQ4blqofFf7W+ZCJ+onf4L20efieTHDuoi2DNR0ba7c50JM
-         zWNQUbpmGpbHwINNzWagVrwSK6ZeMYjbWiEj3cymkcjhJZ/tE7QipLgu5eM3MPoiVRY/
-         Q39pIXfvzkYlTDcj3wGgiSCiqFva7Xx0svhjp7IyruLKvIUoY+GDORdh/Am68Fs9dteO
-         Z9XQ==
-X-Gm-Message-State: APjAAAUbSwyKJ37p+XABNaMHVBH19PkWpbhDyiC/3Bq/BxqdZQQG+1Yy
-        dqvyXFVq9ROtcQIUbn6YkV7W4QdhJpFBPiOpYTrYcFk=
-X-Google-Smtp-Source: APXvYqy8c8IideopB+v+FReCjGFXXrgGvDxvJf83q2eUZ1xYvmWoze7euT4evmFvx7C/3RZcqNgn9UiGrvWp1i424F8=
-X-Received: by 2002:a19:f506:: with SMTP id j6mr622159lfb.159.1551737169116;
- Mon, 04 Mar 2019 14:06:09 -0800 (PST)
-MIME-Version: 1.0
-References: <1551493567-97156-1-git-send-email-pshilov@microsoft.com>
-In-Reply-To: <1551493567-97156-1-git-send-email-pshilov@microsoft.com>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=Can4H29Q3ejASXFiT++BZu4BbfjNyHVeu+ayDMCQ3RU=;
+        b=e+ptrbpG0HXBFAR55aDUtndUZvJ5xUl7mwGLPf41ostiL9xw1aVY4itNVpNx7zmx2i
+         Zpam1fyXsWaJkCvE5szNeBsol2mB4aS1XP/BZclo7z6VygUk7leO13qv+gsNNL0FiW/X
+         ynrZMz+ZChhUdd4kXlwvI73Cpl37+8Kxa1oMuD5rH0BEf1M3UD0P5p774NXD1KkHQCts
+         OX1IuHmG4ApCKgcqLrMRbOxqIJupUiJs7sLWwLCD8OUIkYgjYjI6aTkit9piJrH3c/De
+         57MebWHLIDMmAnpCtIOq6unIujw9UWMnD7f4GobDeTjBIhG8bgSWyIwWpELOYGlIkVss
+         YgaQ==
+X-Gm-Message-State: AHQUAua0u5aKHyYxzDWxpzCQy+xS3SNrcEwW6YZT5VGdeSB4aRq4CZVM
+        NaJGdTIfye7BsrrJ0dQXuXZgCmo=
+X-Google-Smtp-Source: AHgI3Ibn+SlQnc+jhB7JEkEv6hM5gZyCYhUXFDv4pQcXMFIXacDhBLKMi8fwAgG3dYp2vmOzGkLW9Q==
+X-Received: by 2002:a62:38d4:: with SMTP id f203mr22691553pfa.143.1551750488017;
+        Mon, 04 Mar 2019 17:48:08 -0800 (PST)
+Received: from ubuntu-vm.corp.microsoft.com ([2001:4898:80e8:a:a184:4e9f:6b7c:507d])
+        by smtp.gmail.com with ESMTPSA id y7sm10273649pge.35.2019.03.04.17.48.07
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Mon, 04 Mar 2019 17:48:07 -0800 (PST)
 From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Mon, 4 Mar 2019 14:05:57 -0800
-Message-ID: <CAKywueQG+LeYVWq1PNn_GbwxLaC8iEOZaDHvqW+HZD8D-=BrmA@mail.gmail.com>
-Subject: Re: [PATCH v3] CIFS: Do not skip SMB2 message IDs on send failures
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Steve French <smfrench@gmail.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Google-Original-From: Pavel Shilovsky <pshilov@microsoft.com>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com
+Subject: [PATCH] CIFS: Fix read after write for files with read caching
+Date:   Mon,  4 Mar 2019 17:48:01 -0800
+Message-Id: <1551750481-17919-1-git-send-email-pshilov@microsoft.com>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D0=BF=D1=82, 1 =D0=BC=D0=B0=D1=80. 2019 =D0=B3. =D0=B2 18:26, Pavel Shilov=
-sky <piastryyy@gmail.com>:
->
-> When we hit failures during constructing MIDs or sending PDUs
-> through the network, we end up not using message IDs assigned
-> to the packet. The next SMB packet will skip those message IDs
-> and continue with the next one. This behavior may lead to a server
-> not granting us credits until we use the skipped IDs. Fix this by
-> reverting the current ID to the original value if any errors occur
-> before we push the packet through the network stack.
->
-> This patch fixes the generic/310 test from the xfs-tests.
->
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
-> ---
->  fs/cifs/cifsglob.h      | 18 ++++++++++++++++++
->  fs/cifs/smb2ops.c       | 12 ++++++++++++
->  fs/cifs/smb2transport.c | 12 ++++++++++--
->  fs/cifs/transport.c     |  6 +++++-
->  4 files changed, 45 insertions(+), 3 deletions(-)
->
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 33264f9a..fe4eed1 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -236,6 +236,8 @@ struct smb_version_operations {
->         int * (*get_credits_field)(struct TCP_Server_Info *, const int);
->         unsigned int (*get_credits)(struct mid_q_entry *);
->         __u64 (*get_next_mid)(struct TCP_Server_Info *);
-> +       void (*revert_current_mid)(struct TCP_Server_Info *server,
-> +                                  const unsigned int val);
->         /* data offset from read response message */
->         unsigned int (*read_data_offset)(char *);
->         /*
-> @@ -771,6 +773,22 @@ get_next_mid(struct TCP_Server_Info *server)
->         return cpu_to_le16(mid);
->  }
->
-> +static inline void
-> +revert_current_mid(struct TCP_Server_Info *server, const unsigned int va=
-l)
-> +{
-> +       if (server->ops->revert_current_mid)
-> +               server->ops->revert_current_mid(server, val);
-> +}
-> +
-> +static inline void
-> +revert_current_mid_from_hdr(struct TCP_Server_Info *server,
-> +                           const struct smb2_sync_hdr *shdr)
-> +{
-> +       unsigned int num =3D le16_to_cpu(shdr->CreditCharge);
-> +
-> +       return revert_current_mid(server, num > 0 ? num : 1);
-> +}
-> +
->  static inline __u16
->  get_mid(const struct smb_hdr *smb)
->  {
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 1670494..254d602 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -219,6 +219,14 @@ smb2_get_next_mid(struct TCP_Server_Info *server)
->         return mid;
->  }
->
-> +static void
-> +smb2_revert_current_mid(struct TCP_Server_Info *server, const unsigned i=
-nt val)
-> +{
-> +       spin_lock(&GlobalMid_Lock);
-> +       server->CurrentMid -=3D val;
-> +       spin_unlock(&GlobalMid_Lock);
-> +}
-> +
->  static struct mid_q_entry *
->  smb2_find_mid(struct TCP_Server_Info *server, char *buf)
->  {
-> @@ -3560,6 +3568,7 @@ struct smb_version_operations smb20_operations =3D =
-{
->         .get_credits =3D smb2_get_credits,
->         .wait_mtu_credits =3D cifs_wait_mtu_credits,
->         .get_next_mid =3D smb2_get_next_mid,
-> +       .revert_current_mid =3D smb2_revert_current_mid,
->         .read_data_offset =3D smb2_read_data_offset,
->         .read_data_length =3D smb2_read_data_length,
->         .map_error =3D map_smb2_to_linux_error,
-> @@ -3655,6 +3664,7 @@ struct smb_version_operations smb21_operations =3D =
-{
->         .get_credits =3D smb2_get_credits,
->         .wait_mtu_credits =3D smb2_wait_mtu_credits,
->         .get_next_mid =3D smb2_get_next_mid,
-> +       .revert_current_mid =3D smb2_revert_current_mid,
->         .read_data_offset =3D smb2_read_data_offset,
->         .read_data_length =3D smb2_read_data_length,
->         .map_error =3D map_smb2_to_linux_error,
-> @@ -3751,6 +3761,7 @@ struct smb_version_operations smb30_operations =3D =
-{
->         .get_credits =3D smb2_get_credits,
->         .wait_mtu_credits =3D smb2_wait_mtu_credits,
->         .get_next_mid =3D smb2_get_next_mid,
-> +       .revert_current_mid =3D smb2_revert_current_mid,
->         .read_data_offset =3D smb2_read_data_offset,
->         .read_data_length =3D smb2_read_data_length,
->         .map_error =3D map_smb2_to_linux_error,
-> @@ -3856,6 +3867,7 @@ struct smb_version_operations smb311_operations =3D=
- {
->         .get_credits =3D smb2_get_credits,
->         .wait_mtu_credits =3D smb2_wait_mtu_credits,
->         .get_next_mid =3D smb2_get_next_mid,
-> +       .revert_current_mid =3D smb2_revert_current_mid,
->         .read_data_offset =3D smb2_read_data_offset,
->         .read_data_length =3D smb2_read_data_length,
->         .map_error =3D map_smb2_to_linux_error,
-> diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-> index 7b351c6..5609c0b 100644
-> --- a/fs/cifs/smb2transport.c
-> +++ b/fs/cifs/smb2transport.c
-> @@ -674,13 +674,18 @@ smb2_setup_request(struct cifs_ses *ses, struct smb=
-_rqst *rqst)
->         smb2_seq_num_into_buf(ses->server, shdr);
->
->         rc =3D smb2_get_mid_entry(ses, shdr, &mid);
-> -       if (rc)
-> +       if (rc) {
-> +               revert_current_mid_from_hdr(ses->server, shdr);
->                 return ERR_PTR(rc);
-> +       }
-> +
->         rc =3D smb2_sign_rqst(rqst, ses->server);
->         if (rc) {
-> +               revert_current_mid_from_hdr(ses->server, shdr);
->                 cifs_delete_mid(mid);
->                 return ERR_PTR(rc);
->         }
-> +
->         return mid;
->  }
->
-> @@ -695,11 +700,14 @@ smb2_setup_async_request(struct TCP_Server_Info *se=
-rver, struct smb_rqst *rqst)
->         smb2_seq_num_into_buf(server, shdr);
->
->         mid =3D smb2_mid_entry_alloc(shdr, server);
-> -       if (mid =3D=3D NULL)
-> +       if (mid =3D=3D NULL) {
-> +               revert_current_mid_from_hdr(server, shdr);
->                 return ERR_PTR(-ENOMEM);
-> +       }
->
->         rc =3D smb2_sign_rqst(rqst, server);
->         if (rc) {
-> +               revert_current_mid_from_hdr(server, shdr);
->                 DeleteMidQEntry(mid);
->                 return ERR_PTR(rc);
->         }
-> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> index 53532bd..d680c7b 100644
-> --- a/fs/cifs/transport.c
-> +++ b/fs/cifs/transport.c
-> @@ -647,6 +647,7 @@ cifs_call_async(struct TCP_Server_Info *server, struc=
-t smb_rqst *rqst,
->         cifs_in_send_dec(server);
->
->         if (rc < 0) {
-> +               revert_current_mid_from_hdr(server, rqst->rq_iov[0].iov_b=
-ase);
->                 server->sequence_number -=3D 2;
->                 cifs_delete_mid(mid);
->         }
-> @@ -868,6 +869,7 @@ compound_send_recv(const unsigned int xid, struct cif=
-s_ses *ses,
->         for (i =3D 0; i < num_rqst; i++) {
->                 midQ[i] =3D ses->server->ops->setup_request(ses, &rqst[i]=
-);
->                 if (IS_ERR(midQ[i])) {
-> +                       revert_current_mid(ses->server, i);
->                         for (j =3D 0; j < i; j++)
->                                 cifs_delete_mid(midQ[j]);
->                         mutex_unlock(&ses->server->srv_mutex);
-> @@ -897,8 +899,10 @@ compound_send_recv(const unsigned int xid, struct ci=
-fs_ses *ses,
->         for (i =3D 0; i < num_rqst; i++)
->                 cifs_save_when_sent(midQ[i]);
->
-> -       if (rc < 0)
-> +       if (rc < 0) {
-> +               revert_current_mid(ses->server, num_rqst);
->                 ses->server->sequence_number -=3D 2;
-> +       }
->
->         mutex_unlock(&ses->server->srv_mutex);
->
-> --
-> 2.7.4
->
+When we have a READ lease for a file and have just issued a write
+operation to the server we need to purge the cache and set oplock/lease
+level to NONE to avoid reading stale data. Currently we do that
+only if a write operation succedeed thus not covering cases when
+a request was sent to the server but a negative error code was
+returned later for some other reasons (e.g. -EIOCBQUEUED or -EINTR).
+Fix this by turning off caching regardless of the error code being
+returned.
 
-posted V4 with the following changes since V3:
+The patches fixes generic tests 075 and 112 from the xfs-tests.
 
-- fixed mid miscalculation for encrypted requests in cifs_call_async
-- added mid->credits to contain the number of credits consumed by the mid
-- prevented server->CurrentMid to go negative and then be converted to u64
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
+---
+ fs/cifs/file.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
---
-Best regards,
-Pavel Shilovsky
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 9b53f33..4c144c1 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -3096,14 +3096,16 @@ cifs_strict_writev(struct kiocb *iocb, struct iov_iter *from)
+ 	 * these pages but not on the region from pos to ppos+len-1.
+ 	 */
+ 	written = cifs_user_writev(iocb, from);
+-	if (written > 0 && CIFS_CACHE_READ(cinode)) {
++	if (CIFS_CACHE_READ(cinode)) {
+ 		/*
+-		 * Windows 7 server can delay breaking level2 oplock if a write
+-		 * request comes - break it on the client to prevent reading
+-		 * an old data.
++		 * We have read level caching and we have just sent a write
++		 * request to the server thus making data in the cache stale.
++		 * Zap the cache and set oplock/lease level to NONE to avoid
++		 * reading stale data from the cache. All subsequent read
++		 * operations will read new data from the server.
+ 		 */
+ 		cifs_zap_mapping(inode);
+-		cifs_dbg(FYI, "Set no oplock for inode=%p after a write operation\n",
++		cifs_dbg(FYI, "Set Oplock/Lease to NONE for inode=%p after write\n",
+ 			 inode);
+ 		cinode->oplock = 0;
+ 	}
+-- 
+2.7.4
+
