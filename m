@@ -2,114 +2,238 @@ Return-Path: <SRS0=9/Pd=RI=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1767C43381
-	for <linux-cifs@archiver.kernel.org>; Tue,  5 Mar 2019 15:49:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 993BEC43381
+	for <linux-cifs@archiver.kernel.org>; Tue,  5 Mar 2019 19:47:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9518620657
-	for <linux-cifs@archiver.kernel.org>; Tue,  5 Mar 2019 15:49:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 55840205F4
+	for <linux-cifs@archiver.kernel.org>; Tue,  5 Mar 2019 19:47:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="VKBKgv5k"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="utZcjm22"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726877AbfCEPtL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 5 Mar 2019 10:49:11 -0500
-Received: from mail-eopbgr820118.outbound.protection.outlook.com ([40.107.82.118]:23872
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728415AbfCEPtK (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 5 Mar 2019 10:49:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OHr7dVUQ/a0JoLosmg3m1AT3w6Ki6+5jiXqdIPCa/B8=;
- b=VKBKgv5kqosnQ9e5DjR3aLlJlq4lTTjOZLSOpQeNAs9shJH7VfueHXw21i9op0fbPz4GRCmjO7qQG8QG2EiUJ25aMaWmq0fzOYuj4ScnhgNfYJJX+WmTg60BJtIwMEDGtLOQGq4oLF2/oY0zZFbnXxnSuswcUSQiR6cVHsk95hk=
-Received: from SN4PR2101MB0736.namprd21.prod.outlook.com (10.167.151.155) by
- SN4PR2101MB0736.namprd21.prod.outlook.com (10.167.151.155) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1709.5; Tue, 5 Mar 2019 15:49:06 +0000
-Received: from SN4PR2101MB0736.namprd21.prod.outlook.com
- ([fe80::bdda:b065:93f4:1f21]) by SN4PR2101MB0736.namprd21.prod.outlook.com
- ([fe80::bdda:b065:93f4:1f21%3]) with mapi id 15.20.1709.005; Tue, 5 Mar 2019
- 15:49:06 +0000
-From:   Tom Talpey <ttalpey@microsoft.com>
-To:     =?utf-8?B?QXVyw6lsaWVuIEFwdGVs?= <aaptel@suse.com>,
-        Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Subject: RE: [PATCH] CIFS: fix FSCTL_SET_REPARSE_POINT SMB2_ioctl() call
-Thread-Topic: [PATCH] CIFS: fix FSCTL_SET_REPARSE_POINT SMB2_ioctl() call
-Thread-Index: AQHU0xq9XyKFsslMSEicH2eqt3gs6KX87EoAgAA1/ICAAAssAIAAAGAA
-Date:   Tue, 5 Mar 2019 15:49:05 +0000
-Message-ID: <SN4PR2101MB07366E71DC73195C78008628A0720@SN4PR2101MB0736.namprd21.prod.outlook.com>
-References: <CAH2r5msqeMuatKpE2Kg6A+935zJ+yeocVHQTipQechbbgNrEXw@mail.gmail.com>
- <87woldmtjx.fsf@suse.com> <87r2blmklw.fsf@suse.com> <87o96pmir9.fsf@suse.com>
-In-Reply-To: <87o96pmir9.fsf@suse.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Owner=ttalpey@microsoft.com;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2019-03-05T15:49:04.1928908Z;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Application=Microsoft Azure
- Information Protection;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=cef06c16-1624-4cc7-b6e4-6dd9f0843d3b;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Extended_MSFT_Method=Automatic
-x-originating-ip: [24.218.182.144]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c01166e9-0179-4041-552d-08d6a1821942
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600127)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:SN4PR2101MB0736;
-x-ms-traffictypediagnostic: SN4PR2101MB0736:
-x-microsoft-antispam-prvs: <SN4PR2101MB0736C10CAD5195CFE6EF03C8A0720@SN4PR2101MB0736.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
-x-forefront-prvs: 0967749BC1
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(39860400002)(376002)(136003)(366004)(396003)(346002)(13464003)(189003)(199004)(5660300002)(105586002)(14454004)(106356001)(68736007)(66574012)(74316002)(486006)(476003)(86612001)(81166006)(478600001)(305945005)(8936002)(97736004)(53546011)(52536013)(8676002)(22452003)(86362001)(10290500003)(7736002)(81156014)(9686003)(6436002)(229853002)(7696005)(33656002)(53936002)(6246003)(76176011)(11346002)(6506007)(2906002)(102836004)(99286004)(446003)(55016002)(10090500001)(71200400001)(71190400001)(8990500004)(110136005)(186003)(93886005)(6346003)(6116002)(14444005)(66066001)(256004)(3846002)(26005)(25786009)(316002);DIR:OUT;SFP:1102;SCL:1;SRVR:SN4PR2101MB0736;H:SN4PR2101MB0736.namprd21.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=ttalpey@microsoft.com; 
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: VNfaPUe5BNK3MhhqsK1TVVt2AsUsU84/mnVPKcdNk7FWEMPIg9ZtY5Yo4t2+YcqNAp/4DTNg9TibpyMOMGvU0jm82B6tzB6tjupeMzHqEh7skfnj/i0qO4ebdOwgNCAe6g/mQbQOz20SS4bMLtjVruBJ9jQDVe2xvGFl1Ds8nJEhvWZSnNdNoUMMnipkkcqT7xPz8NxM9MsY0Me09doN9t2xDJi+wkckS/Z91z7EqU+w4pPWScxrobzrCAsA/pwkVn0etL4bgc7d2keqkqt4+9RS09ONdlzboa+DdRETb0VZzDtp6Oy01wSctQGktosEOsfMYCupfsp4cKxB6DpacZA8H3EK8UO0eiqdjbXwS95TWk11RTROvVqyst6Etn4mmgbPBXhVDeV3Lx73dg1dcuW4fK2tRYaZQYGH1/a1lqI=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1727275AbfCETrr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 5 Mar 2019 14:47:47 -0500
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:40594 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727049AbfCETrq (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 5 Mar 2019 14:47:46 -0500
+Received: by mail-lf1-f66.google.com with SMTP id a8so7091898lfi.7;
+        Tue, 05 Mar 2019 11:47:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=y4q+SwP7kq/NYVMAc3APu14t6XSfAfthk0RviBN41Sw=;
+        b=utZcjm22QN8UdOLE5Iu20Ny1EMwVeEXmjCZQUWx2X21mWdNU2lfezFjntwWGVpN+ua
+         EE4obMm6yAMKB4mEoNGXS7rIhLAAnXdm1TGDLbOxQs4Kf/XQVescDTBl+q0bvvz4ZJ8a
+         1U0nZC+6bRR1lvfPY2VvD4ll4/JfM634xCegRSZUpsMJm44GBXAgppb53N2m1ZcLjKCw
+         q8BhuPMSvvxWYjMO/IcoqAfCD+nQ9bquDZRVSkZwWf7nOyCTo9iFE/F5nwNI2hPGrjTg
+         tzgvJ9k7yzr056t5QzvLJgiHLJ5fpKLWh1fWiU4wgViMCkP7akcwsMIw2ndU/1QKGBT7
+         U4OA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=y4q+SwP7kq/NYVMAc3APu14t6XSfAfthk0RviBN41Sw=;
+        b=ECrpoCGBEZE6MZn1Y6Oj2ModMYivukp9BGGcH/vwNbPgxqIWlQnEZhOW+gQmCNc+3K
+         iB3kTN8Q2gI1P6lNWEtoNpvmIpARlDvHPxuJWivEVQSlO5VS5TX2qM0usA+r0YEK8nba
+         tFqCJZYRoY5exIO1nVkbJli3HUmWjY0l6ccSgVR8Nn+Muu7CXrpAVvPljce4BFZcXQiA
+         kdn8ZVS77x7fpCqJtXFfvdvquysso99ZUkesNp0Cf3JF7IL8zwlFR4kpBukUxWAIqJ0Y
+         BdLRoysebZ0Khv0ceXiOgH6cul/mEJaSysDbiyPHktRRVkm6GA0ZxHCVtAQie20al1En
+         2rGQ==
+X-Gm-Message-State: APjAAAX8OBrQz4g6LUDjOvfpyAdnGjzKJ2N+se6uf728IbjZbEbCPGGd
+        dI5LJJztH1NscBfEZvv41O8ojnKAm52KRXbej9Hh/Ko=
+X-Google-Smtp-Source: APXvYqwmukTZ8D/v1jk6TDVnS+a/3mCa8DrbWWDzU2E8XMwuVmeNn7rEw6265K6LqWrXmqCQhtFY4cP8Js+LI6rRSKs=
+X-Received: by 2002:a19:520e:: with SMTP id m14mr1731604lfb.64.1551815263538;
+ Tue, 05 Mar 2019 11:47:43 -0800 (PST)
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c01166e9-0179-4041-552d-08d6a1821942
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Mar 2019 15:49:05.9492
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR2101MB0736
+References: <20190302025146.2935-1-longli@linuxonhyperv.com>
+In-Reply-To: <20190302025146.2935-1-longli@linuxonhyperv.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Tue, 5 Mar 2019 11:47:32 -0800
+Message-ID: <CAKywueRMhjoN3HiuF-WW=4Yt8kn-XA5t7uXWGveD8DT+vY=qGg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] CIFS: Fix a bug with re-sending wdata when transport
+ returning -EAGAIN
+To:     Long Li <longli@microsoft.com>
+Cc:     Steve French <sfrench@samba.org>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-rdma@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51eC1jaWZzLW93bmVyQHZn
-ZXIua2VybmVsLm9yZyA8bGludXgtY2lmcy1vd25lckB2Z2VyLmtlcm5lbC5vcmc+IE9uDQo+IEJl
-aGFsZiBPZiBBdXLDqWxpZW4gQXB0ZWwNCj4gU2VudDogVHVlc2RheSwgTWFyY2ggNSwgMjAxOSAx
-MDo0MSBBTQ0KPiBUbzogU3RldmUgRnJlbmNoIDxzbWZyZW5jaEBnbWFpbC5jb20+OyBDSUZTIDxs
-aW51eC1jaWZzQHZnZXIua2VybmVsLm9yZz4NCj4gU3ViamVjdDogUmU6IFtQQVRDSF0gQ0lGUzog
-Zml4IEZTQ1RMX1NFVF9SRVBBUlNFX1BPSU5UIFNNQjJfaW9jdGwoKSBjYWxsDQo+IA0KPiBBdXLD
-qWxpZW4gQXB0ZWwgPGFhcHRlbEBzdXNlLmNvbT4gd3JpdGVzOg0KPiA+IEkndmUgdHJpZWQgc2V0
-dGluZyBNYXhPdXRwdXRSZXNwb25zZSB0byBzZXJ2ZXItPm1heEJ1ZiBvcg0KPiA+IENvbm5lY3Rp
-b24uTWF4VHJhbnNhY3RTaXplIGJ1dCBpdCBhbHdheXMgZmFpbHMgdGhlIHNhbWUgd2F5Li4uIHNv
-IEkNCj4gPiBkb24ndCBrbm93LiBJIGd1ZXNzIGl0IG11c3Qgc2F5IHNvbWV3aGVyZSB0aGF0IGlv
-Y3RsKCkgd2l0aCBubyBvdXRwdXQNCj4gPiBzaG91bGQgc2V0IE1heE91dHB1dFJlc3BvbnNlIHRv
-IHplcm8/DQo+IA0KPiBJJ3ZlIGp1c3QgY2hlY2tlZCB3aGF0IFdpbmRvd3MgZG9lcyBhbmQgaXQg
-c2VlbXMgdG8gYmUgdGhhdCBhcw0KPiB3ZWxsLiBDcmVhdGluZyBhIHN5bWxpbmsgKG1rbGluayBs
-aW5rIHRhcmdldCkgbWFrZXMgYW4NCj4gaW9jdGwoU0VUX1JFUEFSU0VfUE9JTlQpIHdpdGggTWF4
-T3V0cHV0UmVzcG9uc2Ugc2V0IHRvIDAuDQo+IA0KPiBTbyBJIHdvdWxkIGtlZXAgdGhpcyBwYXRj
-aCBhcyBpcy4NCg0KUmVtZW1iZXIgdGhhdCBpbiBhZGRpdGlvbiB0byB0aGUgU01CIHNlcnZlciB2
-YWxpZGF0aW9uLCB0aGUgcmVxdWVzdCBnb2VzDQp0byB0aGUgZmlsZXN5c3RlbSwgd2hpY2ggaGFz
-IGl0cyBvd24gdmFsaWRhdGlvbiBhbmQgZXJyb3Igc3RhdHVzIHJldHVybnMuIFRoZQ0KU1RBVFVT
-X0lOVkFMSURfUEFSQU1FVEVSIGNhbiBjb21lIGJhY2sgZnJvbSBhbnkgbGF5ZXIuDQoNCklmIHRo
-ZSBNYXhPdXRwdXRSZXNwb25zZSAhPSAwIHNldF9yZXBhcnNlX3BvaW50IGJlaGF2aW9yIGlzbid0
-IGNvdmVyZWQNCmluIGVpdGhlciBNUy1TTUIyIG9yIE1TLUZTQSwgSSdtIGhhcHB5IHRvIHRha2Ug
-YSBkb2MgYnVnLg0KDQpUb20uDQo=
+=D0=BF=D1=82, 1 =D0=BC=D0=B0=D1=80. 2019 =D0=B3. =D0=B2 19:04, Long Li <lon=
+gli@linuxonhyperv.com>:
+>
+> From: Long Li <longli@microsoft.com>
+>
+> When sending a wdata, transport may return -EAGAIN. In this case
+> we should re-obtain credits because the session may have been
+> reconnected.
+>
+> Signed-off-by: Long Li <longli@microsoft.com>
+> ---
+>  fs/cifs/file.c | 61 +++++++++++++++++++++++++-------------------------
+>  1 file changed, 31 insertions(+), 30 deletions(-)
+>
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index 9b53f33137b3..08e73759d6ec 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -2620,43 +2620,44 @@ cifs_resend_wdata(struct cifs_writedata *wdata, s=
+truct list_head *wdata_list,
+>         struct TCP_Server_Info *server =3D
+>                 tlink_tcon(wdata->cfile->tlink)->ses->server;
+>
+> -       /*
+> -        * Wait for credits to resend this wdata.
+> -        * Note: we are attempting to resend the whole wdata not in segme=
+nts
+> -        */
+>         do {
+> -               rc =3D server->ops->wait_mtu_credits(server, wdata->bytes=
+, &wsize,
+> -                                                  &credits);
+> -
+> -               if (rc)
+> -                       goto out;
+> -
+> -               if (wsize < wdata->bytes) {
+> -                       add_credits_and_wake_if(server, &credits, 0);
+> -                       msleep(1000);
+> -               }
+> -       } while (wsize < wdata->bytes);
+> +               /*
+> +                * Wait for credits to resend this wdata.
+> +                * Note: we are attempting to resend the whole wdata not =
+in
+> +                * segments
+> +                */
+> +               do {
+> +                       rc =3D server->ops->wait_mtu_credits(server, wdat=
+a->bytes,
+> +                                               &wsize, &credits);
+
+The steps in write/read codepaths have been recently re-ordered: now
+we need to first check the open handle, re-open it if needed and then
+attempt to get credits. This approach avoid a possibility to be stuck
+waiting for credits because generally cifs_reopen_file() may need a
+lot of credits to complete (up to 2 SMB2_CREATE commands and arbitrary
+number of SMB2_LOCK commands).
+
+Please look at this loop as an example:
+https://git.samba.org/?p=3Dsfrench/cifs-2.6.git;a=3Dblob;f=3Dfs/cifs/file.c=
+;h=3Dbf864123093162c7ef5cd49ee08d8b40ad7938c8;hb=3D778d81b65e4d596251943002=
+522d94a7c6fbcf69#l2690
+
+> +                       if (rc)
+> +                               goto fail;
+> +
+> +                       if (wsize < wdata->bytes) {
+> +                               add_credits_and_wake_if(server, &credits,=
+ 0);
+> +                               msleep(1000);
+> +                       }
+> +               } while (wsize < wdata->bytes);
+>
+> -       wdata->credits =3D credits;
+> -       rc =3D -EAGAIN;
+> -       while (rc =3D=3D -EAGAIN) {
+> +               wdata->credits =3D credits;
+
+let's call adjust_credits before calling async_writev() as in the example a=
+bove.
+
+>                 rc =3D 0;
+>                 if (wdata->cfile->invalidHandle)
+>                         rc =3D cifs_reopen_file(wdata->cfile, false);
+>                 if (!rc)
+>                         rc =3D server->ops->async_writev(wdata,
+> -                                       cifs_uncached_writedata_release);
+> -       }
+> +                               cifs_uncached_writedata_release);
+>
+> -       if (!rc) {
+> -               list_add_tail(&wdata->list, wdata_list);
+> -               return 0;
+> -       }
+> +               /* If the write was successfully sent, we are done */
+> +               if (!rc) {
+> +                       list_add_tail(&wdata->list, wdata_list);
+> +                       return 0;
+> +               }
+>
+> -       add_credits_and_wake_if(server, &wdata->credits, 0);
+> -out:
+> -       kref_put(&wdata->refcount, cifs_uncached_writedata_release);
+> +               /* Roll back credits and retry if needed */
+> +               add_credits_and_wake_if(server, &wdata->credits, 0);
+> +       } while (rc =3D=3D -EAGAIN);
+
+I don't think there is a need for the nested loop here. How about just do:
+
+do {
+    if (wdata->cfile->invalidHandle) {
+         rc =3D cifs_reopen_file(...);
+         if (rc) break;
+    }
+
+    // get_credits
+    // if not enough credits - wait and continue the loop.
+
+    rc =3D adjust_credits(...);
+    if (!rc) {
+         if (wdata->cfile->invalidHandle)
+             // set rc, put credits and continue the loop.
+        else
+            // send async write
+    }
+    // handle write errors
+} while(rc =3D=3D -EAGAIN);
+
+
+>
+> +fail:
+> +       kref_put(&wdata->refcount, cifs_uncached_writedata_release);
+>         return rc;
+>  }
+>
+> @@ -2884,12 +2885,12 @@ static void collect_uncached_write_data(struct ci=
+fs_aio_ctx *ctx)
+>                                                 wdata->bytes, &tmp_from,
+>                                                 ctx->cfile, cifs_sb, &tmp=
+_list,
+>                                                 ctx);
+> +
+> +                                       kref_put(&wdata->refcount,
+> +                                               cifs_uncached_writedata_r=
+elease);
+>                                 }
+>
+>                                 list_splice(&tmp_list, &ctx->list);
+> -
+> -                               kref_put(&wdata->refcount,
+> -                                        cifs_uncached_writedata_release)=
+;
+>                                 goto restart_loop;
+>                         }
+>                 }
+> --
+> 2.17.1
+>
+
+The similar concepts applies for async reads as well.
+
+--
+Best regards,
+Pavel Shilovsky
