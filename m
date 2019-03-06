@@ -2,188 +2,221 @@ Return-Path: <SRS0=yoc9=RJ=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35604C43381
-	for <linux-cifs@archiver.kernel.org>; Wed,  6 Mar 2019 17:33:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1373C43381
+	for <linux-cifs@archiver.kernel.org>; Wed,  6 Mar 2019 18:24:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EDF46206DD
-	for <linux-cifs@archiver.kernel.org>; Wed,  6 Mar 2019 17:33:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V6zneZHf"
+	by mail.kernel.org (Postfix) with ESMTP id 84537205F4
+	for <linux-cifs@archiver.kernel.org>; Wed,  6 Mar 2019 18:24:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727847AbfCFRdD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 6 Mar 2019 12:33:03 -0500
-Received: from mail-lf1-f67.google.com ([209.85.167.67]:45213 "EHLO
-        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726705AbfCFRdD (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 6 Mar 2019 12:33:03 -0500
-Received: by mail-lf1-f67.google.com with SMTP id f16so9533499lfk.12
-        for <linux-cifs@vger.kernel.org>; Wed, 06 Mar 2019 09:33:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=ib1W+EyW3GnDBTusFKMW85ESOf3gOHJ0j4zdaWz/row=;
-        b=V6zneZHfJdPeye8U9BzOeTBXtQQVlX+Om6p9wZ4hlE5qhIdTP4iIwTrp4dXJHAx8kv
-         tCEKLDBPsrmYcLsTayOZWGwfgdHQW54fP+F+gzrHQKN4kc5MekqMDEbFS9hW1DQXrYaM
-         NfYSczzmA7MDrbtAUv/8uZsuB2ffyODW1uDsC0xNSqYDGZbfIykp2sdLXzJMPiKRyGsE
-         43PhVZtPahpIAmkfqZSkqxute1oDoJVfFHnhWynV8AsXCKYpF8vBBYuo8MmmvKRp8Sq7
-         k3gaf+g6i3HME7CDWce3DzdVtbZf4+ybNscyvXmo7ziqLctw4FCNtVqVIBUDaKfh3R4H
-         OJGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=ib1W+EyW3GnDBTusFKMW85ESOf3gOHJ0j4zdaWz/row=;
-        b=M6VhFns9/StRGJOf6J4ry+1LNYL5/UfXzE4kWHvAUpdVEc6XUv96PHT8xQIQ1vGg4U
-         39Ljhy6Wtuz3Ebdur7epyysEI3RFXFx15Ql8r6Z8r905sJg9fPbGO5UC+hdAS4CSjvWW
-         tzRhqL+Vdal9wy4EwLDLBnzyLBstmw57oJXDZc7cD19ikpKLG9eYvFxvGt2Y+7CnTosz
-         rufjmCkQ7JVDQWLiNHi7hc958ZumVNTapcKY1hEYfJlQlVs6X6xQV6lXc0kbgczUeJ7Z
-         IMy+O6wQymrv2UifgRkSEFqZ62fLAOLnsBzoZfJvl6/4Jt1WBZaZvdiGnUB4rEZEpUD2
-         n3WA==
-X-Gm-Message-State: APjAAAVL/lKUCgrTnyo1oAnt0Lpe9tRZd6uqqzQnPBtIbFmeOX8XZpf0
-        9+caEvWabjsJn5UNSA4JMnIBBddnOeM9oVv8yA==
-X-Google-Smtp-Source: APXvYqxDgj3VlLu1PoEcxywr8ApPjKZHgKxFExFa7PGAj6jCsW7Yi6mG5N5bH83dkWo9RerBOWNO6iyX3QNYd8sjUYs=
-X-Received: by 2002:a19:2d44:: with SMTP id t4mr4412106lft.90.1551893580752;
- Wed, 06 Mar 2019 09:33:00 -0800 (PST)
-MIME-Version: 1.0
-References: <20190306041546.10419-1-lsahlber@redhat.com> <20190306041546.10419-6-lsahlber@redhat.com>
-In-Reply-To: <20190306041546.10419-6-lsahlber@redhat.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Wed, 6 Mar 2019 09:32:48 -0800
-Message-ID: <CAKywueRFjXs160fV2m-jsNPtLnBvqaHWJmJZ+SN5+yhjbtVmtA@mail.gmail.com>
-Subject: Re: [PATCH 5/6] cifs: add a timeout argument to wait_for_free_credits
-To:     Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Steve French <smfrench@gmail.com>,
-        Pavel Shilovsky <pshilov@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        id S1726196AbfCFSYR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 6 Mar 2019 13:24:17 -0500
+Received: from mout.kundenserver.de ([212.227.126.135]:51553 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725747AbfCFSYQ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 6 Mar 2019 13:24:16 -0500
+Received: from orion.localdomain ([95.118.27.116]) by mrelayeu.kundenserver.de
+ (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis) id
+ 1MMoXE-1hKN333nhk-00ImC7; Wed, 06 Mar 2019 19:24:13 +0100
+From:   "Enrico Weigelt, metux IT consult" <info@metux.net>
+To:     linux-kernel@vger.kernel.org
+Cc:     linux-cifs@vger.kernel.org
+Subject: [PATCH] fs: cifs: Kconfig: pedantic cleanups
+Date:   Wed,  6 Mar 2019 19:24:12 +0100
+Message-Id: <1551896652-26579-1-git-send-email-info@metux.net>
+X-Mailer: git-send-email 1.9.1
+X-Provags-ID: V03:K1:XGwuXoc9uG61PVfE+cT3OKDDckGJTZVpUa1ny4++Sa0ue0M7w6W
+ IpPbSBy8brbGMTxKu72rLTI4K0EWlCKme5fcvA8JSlBGnKjpkzC/3n+7FVWyfhTmAo88s2b
+ zukfcd1qZuXYs+67e1kkuPtMk+tZeNAkTl1WcHOJ2wi4xeiUf9gWbYKX0Tq7/qnxpPEfAvo
+ SlY6y88fda1gdQy7WE4aw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:gLzIxaadsOE=:xLIbTYPzwBDBnYf0tJ8F2u
+ 3M8d1bCVUNoqSYx/XqPURp7EyXiV/oDreSGaChazmJPB3MfF6XBU0cNfc4kPS0yhw6Oh9RT/o
+ jbBXvRIZWg+GZb2qyZOSzcUIQnYtp7G1yUo6eK9J041yQJEDuMB4qszaRz4DxdjPaMDWqE2zh
+ at0HFCRRwPHFgAvG8dL5jju5IijDufYGxNfUlQ8bYdoA0iZEvZOaeamhmb5R2UTyHdpADGxUF
+ NpBKrpmyb078e88k93RDZf6bwQDiEwD4xD5PceZCpFiOGYfiaslKiCYBkG06tX9lQvvYBvRX1
+ QB7qZBCfWLaUj1Cf2I5+ZVsNeHDsK2C5gmKwXxsS414bJcmZ1TLT3AyllLSx7tFxo8SIny5ZE
+ GQIaKuJU6B5kfeCoALvnynez5UqG7QPg5eSqu+HBYTtg9UoBztvEbXnhuZ4l3davzoBM+cyMl
+ yJvo/60QQuA9vholK4ScVh9yI++vsSkTjRUQtK0vV0UdIpFLpaiWDm18oo43MsFCh683a7Tra
+ /DwxFo0U4yf1NQszuRGS6KO+niJnh4uXF+RGBvrhb+vcYYVRwbfZejR2OH9gDGrm2BpnZw9lF
+ z3h5d85ghaR9rOy49NF0LPHjeOWMTRmzPRLdn4YrVpqoLFs8a9ZBvmQvvjQHkSFqXI6IPupc1
+ DTmisOtxCvxvPMMjEFiFPQYnTXIwPFdVqkzTD+5gs4HdICRGHuhNJcngIkRRHvv9lTQzIJzpf
+ 9N/HmK6ewCY2bfsGyPxwOCLwfB6y4LTg0a381w==
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D0=B2=D1=82, 5 =D0=BC=D0=B0=D1=80. 2019 =D0=B3. =D0=B2 21:45, Ronnie Sahlb=
-erg <lsahlber@redhat.com>:
->
-> A negative timeout is the same as the current behaviour, i.e. no timeout.
->
-> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> ---
->  fs/cifs/transport.c | 40 ++++++++++++++++++++++++++++++----------
->  1 file changed, 30 insertions(+), 10 deletions(-)
->
-> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> index f4ec9635dab2..3263e8b3a57d 100644
-> --- a/fs/cifs/transport.c
-> +++ b/fs/cifs/transport.c
-> @@ -478,11 +478,18 @@ smb_send(struct TCP_Server_Info *server, struct smb=
-_hdr *smb_buffer,
->
->  static int
->  wait_for_free_credits(struct TCP_Server_Info *server, const int num_cred=
-its,
-> -                     const int flags, unsigned int *instance)
-> +                     const int timeout, const int flags,
-> +                     unsigned int *instance)
->  {
->         int rc;
->         int *credits;
->         int optype;
-> +       long int t;
-> +
-> +       if (timeout < 0)
-> +               t =3D MAX_JIFFY_OFFSET;
-> +       else
-> +               t =3D msecs_to_jiffies(timeout);
->
->         optype =3D flags & CIFS_OP_MASK;
->
-> @@ -507,11 +514,16 @@ wait_for_free_credits(struct TCP_Server_Info *serve=
-r, const int num_credits,
->                 if (*credits < num_credits) {
->                         spin_unlock(&server->req_lock);
->                         cifs_num_waiters_inc(server);
-> -                       rc =3D wait_event_killable(server->request_q,
-> -                               has_credits(server, credits, num_credits)=
-);
-> +                       rc =3D wait_event_killable_timeout(server->reques=
-t_q,
-> +                               has_credits(server, credits, num_credits)=
-, t);
->                         cifs_num_waiters_dec(server);
-> -                       if (rc)
-> -                               return rc;
-> +                       if (!rc) {
-> +                               cifs_dbg(VFS, "wait timed out after %d ms=
-\n",
-> +                                        timeout);
-> +                               return -EAGAIN;
+Signed-off-by: Enrico Weigelt, metux IT consult <info@metux.net>
+---
+ fs/cifs/Kconfig | 120 ++++++++++++++++++++++++++++----------------------------
+ 1 file changed, 60 insertions(+), 60 deletions(-)
 
-It would be hard to distinguish different EAGAIN reasons in the upper
-layers. As of now we use EAGAIN as retryable error indicating the
-upper layer to retry. This case is different because the retry most
-likely won't help and the sequential fallback is needed. In
-compound_send_recv() we return -ENOTSUPP if there is not enough
-credits to satisfy compounding and the number of requests in flight
-doesn't promise to get new credits in future.
+diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
+index f1ddc9d..76724ef 100644
+--- a/fs/cifs/Kconfig
++++ b/fs/cifs/Kconfig
+@@ -117,25 +117,25 @@ config CIFS_UPCALL
+ 	  secure Kerberos authentication is required). If unsure, say Y.
+ 
+ config CIFS_XATTR
+-        bool "CIFS extended attributes"
+-        depends on CIFS
+-        help
+-          Extended attributes are name:value pairs associated with inodes by
+-          the kernel or by users (see the attr(5) manual page for details).
+-          CIFS maps the name of extended attributes beginning with the user
+-          namespace prefix to SMB/CIFS EAs.  EAs are stored on Windows
+-          servers without the user namespace prefix, but their names are
+-          seen by Linux cifs clients prefaced by the user namespace prefix.
+-          The system namespace (used by some filesystems to store ACLs) is
+-          not supported at this time.
+-
+-          If unsure, say Y.
++	bool "CIFS extended attributes"
++	depends on CIFS
++	help
++	  Extended attributes are name:value pairs associated with inodes by
++	  the kernel or by users (see the attr(5) manual page for details).
++	  CIFS maps the name of extended attributes beginning with the user
++	  namespace prefix to SMB/CIFS EAs.  EAs are stored on Windows
++	  servers without the user namespace prefix, but their names are
++	  seen by Linux cifs clients prefaced by the user namespace prefix.
++	  The system namespace (used by some filesystems to store ACLs) is
++	  not supported at this time.
++
++	  If unsure, say Y.
+ 
+ config CIFS_POSIX
+-        bool "CIFS POSIX Extensions"
+-        depends on CIFS && CIFS_ALLOW_INSECURE_LEGACY && CIFS_XATTR
+-        help
+-          Enabling this option will cause the cifs client to attempt to
++	bool "CIFS POSIX Extensions"
++	depends on CIFS && CIFS_ALLOW_INSECURE_LEGACY && CIFS_XATTR
++	help
++	  Enabling this option will cause the cifs client to attempt to
+ 	  negotiate a newer dialect with servers, such as Samba 3.0.5
+ 	  or later, that optionally can handle more POSIX like (rather
+ 	  than Windows like) file behavior.  It also enables
+@@ -144,61 +144,62 @@ config CIFS_POSIX
+ 	  CIFS POSIX ACL support.  If unsure, say N.
+ 
+ config CIFS_ACL
+-	  bool "Provide CIFS ACL support"
+-	  depends on CIFS_XATTR && KEYS
+-	  help
+-	    Allows fetching CIFS/NTFS ACL from the server.  The DACL blob
+-	    is handed over to the application/caller.  See the man
+-	    page for getcifsacl for more information.  If unsure, say Y.
++	bool "Provide CIFS ACL support"
++	depends on CIFS_XATTR && KEYS
++	help
++	  Allows fetching CIFS/NTFS ACL from the server.  The DACL blob
++	  is handed over to the application/caller.  See the man
++	  page for getcifsacl for more information.  If unsure, say Y.
+ 
+ config CIFS_DEBUG
+ 	bool "Enable CIFS debugging routines"
+ 	default y
+ 	depends on CIFS
+ 	help
+-	   Enabling this option adds helpful debugging messages to
+-	   the cifs code which increases the size of the cifs module.
+-	   If unsure, say Y.
++	  Enabling this option adds helpful debugging messages to
++	  the cifs code which increases the size of the cifs module.
++	  If unsure, say Y.
++
+ config CIFS_DEBUG2
+ 	bool "Enable additional CIFS debugging routines"
+ 	depends on CIFS_DEBUG
+ 	help
+-	   Enabling this option adds a few more debugging routines
+-	   to the cifs code which slightly increases the size of
+-	   the cifs module and can cause additional logging of debug
+-	   messages in some error paths, slowing performance. This
+-	   option can be turned off unless you are debugging
+-	   cifs problems.  If unsure, say N.
++	  Enabling this option adds a few more debugging routines
++	  to the cifs code which slightly increases the size of
++	  the cifs module and can cause additional logging of debug
++	  messages in some error paths, slowing performance. This
++	  option can be turned off unless you are debugging
++	  cifs problems.  If unsure, say N.
+ 
+ config CIFS_DEBUG_DUMP_KEYS
+ 	bool "Dump encryption keys for offline decryption (Unsafe)"
+ 	depends on CIFS_DEBUG
+ 	help
+-	   Enabling this will dump the encryption and decryption keys
+-	   used to communicate on an encrypted share connection on the
+-	   console. This allows Wireshark to decrypt and dissect
+-	   encrypted network captures. Enable this carefully.
+-	   If unsure, say N.
++	  Enabling this will dump the encryption and decryption keys
++	  used to communicate on an encrypted share connection on the
++	  console. This allows Wireshark to decrypt and dissect
++	  encrypted network captures. Enable this carefully.
++	  If unsure, say N.
+ 
+ config CIFS_DFS_UPCALL
+-	  bool "DFS feature support"
+-	  depends on CIFS && KEYS
+-	  select DNS_RESOLVER
+-	  help
+-	    Distributed File System (DFS) support is used to access shares
+-	    transparently in an enterprise name space, even if the share
+-	    moves to a different server.  This feature also enables
+-	    an upcall mechanism for CIFS which contacts userspace helper
+-	    utilities to provide server name resolution (host names to
+-	    IP addresses) which is needed in order to reconnect to
+-	    servers if their addresses change or for implicit mounts of
+-	    DFS junction points. If unsure, say Y.
++	bool "DFS feature support"
++	depends on CIFS && KEYS
++	select DNS_RESOLVER
++	help
++	  Distributed File System (DFS) support is used to access shares
++	  transparently in an enterprise name space, even if the share
++	  moves to a different server.  This feature also enables
++	  an upcall mechanism for CIFS which contacts userspace helper
++	  utilities to provide server name resolution (host names to
++	  IP addresses) which is needed in order to reconnect to
++	  servers if their addresses change or for implicit mounts of
++	  DFS junction points. If unsure, say Y.
+ 
+ config CIFS_NFSD_EXPORT
+-	  bool "Allow nfsd to export CIFS file system"
+-	  depends on CIFS && BROKEN
+-	  help
+-	   Allows NFS server to export a CIFS mounted share (nfsd over cifs)
++	bool "Allow nfsd to export CIFS file system"
++	depends on CIFS && BROKEN
++	help
++	  Allows NFS server to export a CIFS mounted share (nfsd over cifs)
+ 
+ config CIFS_SMB_DIRECT
+ 	bool "SMB Direct support (Experimental)"
+@@ -209,10 +210,9 @@ config CIFS_SMB_DIRECT
+ 	  say N.
+ 
+ config CIFS_FSCACHE
+-	  bool "Provide CIFS client caching support"
+-	  depends on CIFS=m && FSCACHE || CIFS=y && FSCACHE=y
+-	  help
+-	    Makes CIFS FS-Cache capable. Say Y here if you want your CIFS data
+-	    to be cached locally on disk through the general filesystem cache
+-	    manager. If unsure, say N.
+-
++	bool "Provide CIFS client caching support"
++	depends on CIFS=m && FSCACHE || CIFS=y && FSCACHE=y
++	help
++	  Makes CIFS FS-Cache capable. Say Y here if you want your CIFS data
++	  to be cached locally on disk through the general filesystem cache
++	  manager. If unsure, say N.
+-- 
+1.9.1
 
-I suggest to return the same error code here (-ENOTSUPP). Probably
-this particular error code isn't ideal choice and suggestions to
-change it are welcome.
-
-> +                       }
-> +                       if (rc =3D=3D -ERESTARTSYS)
-> +                               return -ERESTARTSYS;
->                         spin_lock(&server->req_lock);
->                 } else {
->                         if (server->tcpStatus =3D=3D CifsExiting) {
-> @@ -537,12 +549,19 @@ wait_for_free_credits(struct TCP_Server_Info *serve=
-r, const int num_credits,
->                             *credits <=3D MAX_COMPOUND) {
->                                 spin_unlock(&server->req_lock);
->                                 cifs_num_waiters_inc(server);
-> -                               rc =3D wait_event_killable(server->reques=
-t_q,
-> +                               rc =3D wait_event_killable_timeout(
-> +                                       server->request_q,
->                                         has_credits(server, credits,
-> -                                                   MAX_COMPOUND + 1));
-> +                                                   MAX_COMPOUND + 1),
-> +                                       t);
->                                 cifs_num_waiters_dec(server);
-> -                               if (rc)
-> -                                       return rc;
-> +                               if (!rc) {
-> +                                       cifs_dbg(VFS, "wait timed out aft=
-er %d ms\n",
-> +                                                timeout);
-> +                                       return -EAGAIN;
-> +                               }
-> +                               if (rc =3D=3D -ERESTARTSYS)
-> +                                       return -ERESTARTSYS;
->                                 spin_lock(&server->req_lock);
->                                 continue;
->                         }
-> @@ -569,7 +588,8 @@ static int
->  wait_for_free_request(struct TCP_Server_Info *server, const int flags,
->                       unsigned int *instance)
->  {
-> -       return wait_for_free_credits(server, 1, flags, instance);
-> +       return wait_for_free_credits(server, 1, -1, flags,
-> +                                    instance);
->  }
->
->  int
-> --
-> 2.13.6
->
-
---
-Best regards,
-Pavel Shilovsky
