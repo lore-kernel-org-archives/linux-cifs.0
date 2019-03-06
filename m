@@ -6,48 +6,53 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1373C43381
-	for <linux-cifs@archiver.kernel.org>; Wed,  6 Mar 2019 18:24:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B4FBC43381
+	for <linux-cifs@archiver.kernel.org>; Wed,  6 Mar 2019 22:23:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 84537205F4
-	for <linux-cifs@archiver.kernel.org>; Wed,  6 Mar 2019 18:24:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6034820684
+	for <linux-cifs@archiver.kernel.org>; Wed,  6 Mar 2019 22:23:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726196AbfCFSYR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 6 Mar 2019 13:24:17 -0500
-Received: from mout.kundenserver.de ([212.227.126.135]:51553 "EHLO
+        id S1726196AbfCFWXG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 6 Mar 2019 17:23:06 -0500
+Received: from mout.kundenserver.de ([212.227.126.135]:53917 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725747AbfCFSYQ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 6 Mar 2019 13:24:16 -0500
+        with ESMTP id S1726293AbfCFWXG (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 6 Mar 2019 17:23:06 -0500
 Received: from orion.localdomain ([95.118.27.116]) by mrelayeu.kundenserver.de
- (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis) id
- 1MMoXE-1hKN333nhk-00ImC7; Wed, 06 Mar 2019 19:24:13 +0100
+ (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis) id
+ 1MBjA4-1hDmxs3AXU-00CAdP; Wed, 06 Mar 2019 23:23:00 +0100
 From:   "Enrico Weigelt, metux IT consult" <info@metux.net>
 To:     linux-kernel@vger.kernel.org
 Cc:     linux-cifs@vger.kernel.org
-Subject: [PATCH] fs: cifs: Kconfig: pedantic cleanups
-Date:   Wed,  6 Mar 2019 19:24:12 +0100
-Message-Id: <1551896652-26579-1-git-send-email-info@metux.net>
+Subject: [PATCH v2] fs: cifs: Kconfig: pedantic formatting
+Date:   Wed,  6 Mar 2019 23:22:59 +0100
+Message-Id: <1551910979-1026-1-git-send-email-info@metux.net>
 X-Mailer: git-send-email 1.9.1
-X-Provags-ID: V03:K1:XGwuXoc9uG61PVfE+cT3OKDDckGJTZVpUa1ny4++Sa0ue0M7w6W
- IpPbSBy8brbGMTxKu72rLTI4K0EWlCKme5fcvA8JSlBGnKjpkzC/3n+7FVWyfhTmAo88s2b
- zukfcd1qZuXYs+67e1kkuPtMk+tZeNAkTl1WcHOJ2wi4xeiUf9gWbYKX0Tq7/qnxpPEfAvo
- SlY6y88fda1gdQy7WE4aw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:gLzIxaadsOE=:xLIbTYPzwBDBnYf0tJ8F2u
- 3M8d1bCVUNoqSYx/XqPURp7EyXiV/oDreSGaChazmJPB3MfF6XBU0cNfc4kPS0yhw6Oh9RT/o
- jbBXvRIZWg+GZb2qyZOSzcUIQnYtp7G1yUo6eK9J041yQJEDuMB4qszaRz4DxdjPaMDWqE2zh
- at0HFCRRwPHFgAvG8dL5jju5IijDufYGxNfUlQ8bYdoA0iZEvZOaeamhmb5R2UTyHdpADGxUF
- NpBKrpmyb078e88k93RDZf6bwQDiEwD4xD5PceZCpFiOGYfiaslKiCYBkG06tX9lQvvYBvRX1
- QB7qZBCfWLaUj1Cf2I5+ZVsNeHDsK2C5gmKwXxsS414bJcmZ1TLT3AyllLSx7tFxo8SIny5ZE
- GQIaKuJU6B5kfeCoALvnynez5UqG7QPg5eSqu+HBYTtg9UoBztvEbXnhuZ4l3davzoBM+cyMl
- yJvo/60QQuA9vholK4ScVh9yI++vsSkTjRUQtK0vV0UdIpFLpaiWDm18oo43MsFCh683a7Tra
- /DwxFo0U4yf1NQszuRGS6KO+niJnh4uXF+RGBvrhb+vcYYVRwbfZejR2OH9gDGrm2BpnZw9lF
- z3h5d85ghaR9rOy49NF0LPHjeOWMTRmzPRLdn4YrVpqoLFs8a9ZBvmQvvjQHkSFqXI6IPupc1
- DTmisOtxCvxvPMMjEFiFPQYnTXIwPFdVqkzTD+5gs4HdICRGHuhNJcngIkRRHvv9lTQzIJzpf
- 9N/HmK6ewCY2bfsGyPxwOCLwfB6y4LTg0a381w==
+In-Reply-To: <1551896652-26579-1-git-send-email-info@metux.net>
+References: <1551896652-26579-1-git-send-email-info@metux.net>
+X-Provags-ID: V03:K1:Ez81XChpMwND3AzaUOrABKKXQSnfKrwPmGY42WkP+K8+qcdgrTT
+ WabrX+p9J62OcUAg43M2ZWUUzOZKCU+IPfh2jY+BZYWbYxn8RMDMdkrZWIkA1Aa+WzbAn0L
+ v0wa0gAYq34DekhMMQcXtwz/VIC4MTczWRVfFpIWLMonPBVcNKFkXX4zdVXt0Lmr3dZ/3qT
+ 1jzEquJYNmo2dp4IH021Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:o3ziDoIMevo=:cWOTuTaSdRjeJN7Yy/+qpP
+ C0zKsweNlJMyQQB/kZMIFz8Aq1WXFblTQecN3iJTsXYNa/bywPX1ffJwz/eFQ4M+ZQ0yFxlvB
+ 37sAnkUDz5qFd99hGi48m+9Fglj8K5/vnoyEec9w5/56uf5KbnAr5ox4PhJW0BZUBV5AjkwFA
+ Xz2KzriZug47Vh6B2Tl72IKk6F8A3OB6iD0DDvGLvoHiCRpliX/oAUk2Ti36Osr+xSodbUVMm
+ hES+UERf39eB/rwosasiuVYCXhAE2qBlw1wbOXCeZWYqpT3B2jsFjvNF5t4dJCb/Oz3/T8vvL
+ 51d3OGtpdj0Ym9SZY4oq0e/2qphBHHOlW6w/zduaQ+LA3ki/9Y/NPDQ10S6UZTgv+LUHuF3I0
+ Dxole+Tu9KTTvdb/n3LidV8zL/sat+DZOfFXgnOJl9UYuhQMhdPgEh/bEHMMsTe+R+LGRc91F
+ CT7shfMRkymnwi9IkS21XEx+hxSHAigKjdkAh5LnCGaW66r0x1+AzODhoEexKm6kN4ng/l2tZ
+ J0+0W/GAQs9ajTJ2zL996IiP4XA9J+rMbqCaTemX5M94DjYLbtn5esmBnvCgbIGPvjNiavCHG
+ V3KL17VZpuTy33L7lYTJDfrKvAAdPc8LP264o33XQrOBrxPc1Mgpg1ks8CNnAVHLcnQhGXrb/
+ uPxQCjAUmysk7evsoNWhM9AImXMKvSEkD7djkrjswHvU8sKZA17VvAvVhz2dhR8C5LIu60Fx2
+ lsCWnX0XLZXPF6XUZ4V5xdWdJfO/5j3vX6rMEA==
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
+
+Formatting of Kconfig files doesn't look so pretty, so just
+take damp cloth and clean it up.
 
 Signed-off-by: Enrico Weigelt, metux IT consult <info@metux.net>
 ---
