@@ -2,266 +2,277 @@ Return-Path: <SRS0=yoc9=RJ=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F2F8C43381
-	for <linux-cifs@archiver.kernel.org>; Wed,  6 Mar 2019 04:36:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60C2DC43381
+	for <linux-cifs@archiver.kernel.org>; Wed,  6 Mar 2019 17:27:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 289EA20663
-	for <linux-cifs@archiver.kernel.org>; Wed,  6 Mar 2019 04:36:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 15D1320842
+	for <linux-cifs@archiver.kernel.org>; Wed,  6 Mar 2019 17:27:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bOgj44Ep"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AMHBDlRD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726766AbfCFEg2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 5 Mar 2019 23:36:28 -0500
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:32927 "EHLO
-        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726655AbfCFEg2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 5 Mar 2019 23:36:28 -0500
-Received: by mail-qk1-f196.google.com with SMTP id x9so6107915qkf.0
-        for <linux-cifs@vger.kernel.org>; Tue, 05 Mar 2019 20:36:27 -0800 (PST)
+        id S1729868AbfCFR1A (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 6 Mar 2019 12:27:00 -0500
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:39338 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726608AbfCFR1A (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 6 Mar 2019 12:27:00 -0500
+Received: by mail-lj1-f195.google.com with SMTP id g80so11624560ljg.6
+        for <linux-cifs@vger.kernel.org>; Wed, 06 Mar 2019 09:26:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=UfP9B0bi24jVuZjVRQw9j22cEcnQT4nKy9vqUJMJBPg=;
-        b=bOgj44EpcGGvqb7vSsnmaiyOFSod5yYL8VTvqs50FHTLsFBcnqMziEn1e3FWcK8TCE
-         hicLf6Ql0gM1zO7qKxBUa4o3EbjPKJOxb3vQ4eBSc0zlHvEGwQazszWlcXfXHK3aRRn9
-         X8vTuKGMWssMxfBjTa9C2TtaL7I1ihC+K+2zw8VrQ1OwIvls3XzG1nNfM7OpoBGWuY+W
-         VQjMQKBF9VXjYSgU9iPnHzPeLG/sXKZUx90F+qq3g7K9iEiQ12ofPmjdS/qVVq8mSaoJ
-         10NOr1xmR6/Ii6YwzeRpAyJZt93ZnoGCUfBnI019WkRuvckJH4upbCENJdT5HL+gUHqT
-         UBJQ==
+         :cc:content-transfer-encoding;
+        bh=PgwqaCS0LnYcGYSa2/tixsvpTi4BYybK9QPKLeX2dKw=;
+        b=AMHBDlRDI4H68Bl536dpcHufFmroyxjOz3WA4LShlaPL1A17GKDjW29F0I2832fgWl
+         pgPdiiitBICrlWjPiqNxHB8WOJZ46Ety8li6Kl7H3CDilC0ya2s6lRuh2ayKF43DU/BR
+         nWAWxboVM1qmFX2m12Y/5QfvC7m4kqrsA9E/eIF551sRMpPlK1Ntf0WpmSHKW7yeJtaD
+         uDPzwMJ0UestQzRxmgnbkZenHMvqbilBSNFP79AnzwcXhs+qeyd5i2lc6ZrTOM6JwWMY
+         eaNPct36ygB/4Szl3Nynh43+j8jZFAXfZj3Kg4BhbFauqSqFvMV/i/UUIYgXrEuaR9k6
+         W9Og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=UfP9B0bi24jVuZjVRQw9j22cEcnQT4nKy9vqUJMJBPg=;
-        b=P06wrdqB2H8ZWfHs5kMwpjBZHG5hVZ4GsApB80f+Tz94W90GubyQln3s+0nNizJsbI
-         6mmgcCLW8R5qrLLei1TNjTreapzFSFf1A42QFf0PP/jMPet5bRrEPxaH9wdlTOJykLzp
-         1r/KPKzgfQitAj3W8/Ur4wMyrn0xgGfyUaQvR5/2ji90LnmFVTFQ5s6OjU5hzcA9sJdD
-         TlwpEx9lJe6M7uC3XLMzKW/Atrpn6SclHF9dR3GwqfQrPx2uwBZ23jw1oZs8EcpFpWK6
-         LVXNajGowSVtDkK+KWxHaCeBnQs0A1qPA47g8pfEHUO/RxNoLDh6EJ1QxG+qTq6YNTgv
-         rumg==
-X-Gm-Message-State: APjAAAUUhePS0+fjcWKyRZEtcoR07BMCjMuWYIDR6GXDlDFGB3bsWgC6
-        FbILpKJi/46hS9i3wjYJ57USmZL8iwe7DahEnU4=
-X-Google-Smtp-Source: APXvYqw4Dc2a+Pr2G09JvphISOnyXJ57wwP1RIcEW4p4v12oOSsOsrZp578RS5XuhBHaefNzlrSqKiTakTURVUcMeIk=
-X-Received: by 2002:ae9:dd04:: with SMTP id r4mr4141578qkf.187.1551846986848;
- Tue, 05 Mar 2019 20:36:26 -0800 (PST)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=PgwqaCS0LnYcGYSa2/tixsvpTi4BYybK9QPKLeX2dKw=;
+        b=l73bHHXBXNKCnkacMs5IRh1ii4qS0bzEzHEACO50k+1R17GlCQuRUz848FPM0Id25i
+         PTWo/GSV1CB7c0zpFmHu+qBbeoZEKetFI2fGqMpgwCtJPDMGc6fLeWxa2ABflTwmIIMx
+         dwqRYMBk02R7nSR0ixX7+iyIbhpPm+x5TVADLLDPXvx6ZGrfqDLiLBGDhO9ySY4JftYS
+         92jxzZ/XvsoDHZXPBWvy+XjWjXVskCnfc1COkjW2l6wDZ9SWSohVVHtGQfxZY+a4P3XT
+         vUXTis5EMFK2KQ2QbkbyIFCSjOVWIwCj5M1m77w1SDAOeKAtVioFsu4XdGWXWVQ3x7QS
+         Ytog==
+X-Gm-Message-State: APjAAAVujz6RfSCxkRvaCgna6ubwmnctL9NDCOKSwmE5ceHYTLK6lRvP
+        HYM4nASgeKbhyxN45P88t3g8QtfzcCEF0jP7bA==
+X-Google-Smtp-Source: APXvYqzwewCqmifFImjTCyn5wQI6iSCzGGsW1hQyMnPCVz4wUioMB/IpirQpqNnLUn3fIt74RGVEtc58+Lyw7W6vLYM=
+X-Received: by 2002:a2e:8644:: with SMTP id i4mr1983522ljj.192.1551893217245;
+ Wed, 06 Mar 2019 09:26:57 -0800 (PST)
 MIME-Version: 1.0
-References: <20190220061145.28241-1-lsahlber@redhat.com> <20190220061145.28241-2-lsahlber@redhat.com>
- <CAKywueQEnaPfdCBRz4AJk8FAFDTfr5UC60wiM=7av3f9U050=A@mail.gmail.com>
- <CAN05THRN=QaC_taKTHyVF8m=bJPLtQCgBe6_qnhhXzWUh=p_Hg@mail.gmail.com> <CAKywueQDpS8h236Kw4YD14Qq8c=u68Fp4eGDQ7CRwRiHF7_Qnw@mail.gmail.com>
-In-Reply-To: <CAKywueQDpS8h236Kw4YD14Qq8c=u68Fp4eGDQ7CRwRiHF7_Qnw@mail.gmail.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Wed, 6 Mar 2019 14:36:15 +1000
-Message-ID: <CAN05THT72cXU1XOp1YF34zgDyNesrxG1+XUkLswP0iBLGQS_WA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] cifs: change wait_for_free_request to take number of
- requests to wait for
-To:     Pavel Shilovsky <piastryyy@gmail.com>
-Cc:     Steve French <smfrench@gmail.com>, Jeremy Allison <jra@samba.org>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        Pavel Shilovsky <pshilov@microsoft.com>,
-        samba-technical <samba-technical@lists.samba.org>
+References: <20190306041546.10419-1-lsahlber@redhat.com> <20190306041546.10419-7-lsahlber@redhat.com>
+In-Reply-To: <20190306041546.10419-7-lsahlber@redhat.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Wed, 6 Mar 2019 09:26:45 -0800
+Message-ID: <CAKywueS=r-F5KmSWWC-vKgPH0Eq_3J8fJbBho0qGWr_9PFT=SA@mail.gmail.com>
+Subject: Re: [PATCH 6/6] cifs: simplify how we handle credits in compond_send_recv()
+To:     Ronnie Sahlberg <lsahlber@redhat.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>,
+        Pavel Shilovsky <pshilov@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Mar 6, 2019 at 12:15 PM Pavel Shilovsky <piastryyy@gmail.com> wrote:
+=D0=B2=D1=82, 5 =D0=BC=D0=B0=D1=80. 2019 =D0=B3. =D0=B2 21:44, Ronnie Sahlb=
+erg <lsahlber@redhat.com>:
 >
-> On Wed, Feb 27, 2019 at 09:12 PM, ronnie sahlberg
-> <ronniesahlberg@gmail.com> wrote:
-> >
-> > On Thu, Feb 21, 2019 at 11:39 AM Pavel Shilovsky <piastryyy@gmail.com> wrote:
-> > >
-> ...
-> > >
-> > > Waiting for more than one credit without a timeout is a source of
-> > > possibility to be stuck. We already have 'timeout' argument which
-> > > contains some part of flags passed to transport layer from PDU. We
-> > > might consider renaming 'optype' argument into flags and use 'timeout'
-> > > with its true meaning - timeout of the waiting for credits.
-> > >
-> > > Once implemented, we can define some default period of time which we
-> > > can *afford* to wait for credits and then fall back to sequential code
-> > > if we timed out.
-> > >
-> > > I also suggest to add another function wait_for_compound_credits and
-> > > make wait_for_free_request calls it - doesn't require changes to all
-> > > the places where the latter is being used.
-> >
-> > Thanks, I am reworking it and will resend shortly.
-> > Passing flags down into these functions instead of timeout/optype
-> > makes sense and I will do that.
-> >
-> > I am not sure we need to add a timeout to represent a deadline after
-> > we return -EAGAIN or similar.
-> > But for sure we need to prevent waiting atomically for >1 credits to
-> > block forever.
+> Since we can now wait for multiple requests atomically in
+> wait_for_free_request() we can now greatly simplify the handling
+> of the credits in this function.
 >
-> (adding Jeremy to comment and cc'ing samba-technical)
+> This fixes a potential deadlock where many concurrent compound requests
+> could each have reserved 1 or 2 credits each but are all blocked
+> waiting for the final credits they need to be able to issue the requests
+> to the server.
 >
-> Thanks for taking a look at this.
->
-> If we don't set a timeout on waiting for several credits at once, we
-> may end up waiting forever. It is only a matter of what is a
-> possibility to be stuck. We can try to guess if the server is going to
-> grant us more or not in future by analyzing the number of requests in
-> flight or other parameters but we can't say for sure because the spec
-> doesn't say anything about minimal number of credits. This means that
-> under certain conditions the server may end up giving us a very few
-> credits that won't be enough to do compounding.
->
-> Those conditions might be different but from the top of the head I can
-> give an example of a highly loaded file server with thousands of
-> active connections that experiences CPU and/or memory pressure and
-> decides to limit the number of credits per connection. That's why I do
-> think that the ability to set a timeout on waiting is essential. We
-> can start with something between 100ms and 1s (and even making it
-> auto-tunable - let's say a couple round trips to the server) and then
-> decide what is the best (or even make it configurable).
->
-> > This could happen in two scenarios, the first would be if the number
-> > of free credits are persistently pegged at <=1 credits
-> > due to persistent and massive number of threads causing single credits
-> > SMB2 I/O.
-> > I.e. we are constantly starved for multi-credit requests.
-> >
-> > The second would be if we get stuck at <=1 available credits even when
-> > the session is idle.
-> > This would be a bug and the best is probably to let the reconnect
-> > eventually happen and thus force the credits to be in sync again
-> > between server and client.
-> > So I don't think we need t do anything explicit for that case here.
-> >
-> > The first case is a genuine case, but I think we can handle that in a
-> > different way instead of switching back to a "grab one credit at a
-> > time" like we have now.
-> > In that scenario we would have a different problem that is  there
-> > could be so many concurrent calls for compounded operations requiring
-> > >=3 credits each
-> > that we eventually consume MAX_CREDITS number of credits across these
-> > threads. Each thread having already allocated one of more credits less
-> > that it needs for the full compound
-> > and the the threads are now all deadlocked each waiting for one or
-> > more credits that will never become available.
-> > Making the allocation of credits for a compound allocate all of them
-> > atomically solves this type of deadlock, but would be prone to the
-> > credits starvation issue.
->
-> The approach of grabbing one credit in a time was a temporary work
-> around that didn't require a lot of code changes and was easier to be
-> pushed to stable kernels. There are no doubts that it left a
-> possibility to be stuck and we need a proper solution to handle
-> compound requests.
->
-> > The way I propose to solve the credits starvation problem for
-> > compounds is something like this (I haven't coded it yet so I dont
-> > know exactly what it will look like)
-> > * After the session has been fully established, we should be able to
-> > assume we WILL have a whole bunch of credits available.
-> > Modulo a hypothetical situation where the sever will just never grant
-> > us more than 1 or 2 credits in total. I don't think this is a
-> > reasonable situation we need to worry too much about and maybe the
-> > right thing to do here is just to block all compound
-> > operations until we get a session reconnect where hopefully the server
-> > will be more reasonable.
-> > * We can define a new MAX_CREDITS_FOR_COMPOUND which would be the
-> > largest number of credits that we will ever create a single compound
-> > for.
-> > I think that would be 4 at this stage.
->
-> Note, that we reserve 1 credit for echo request and 1 credit for
-> oplock/lease break ack, so those operations won't be stuck waiting for
-> credits. If the maximum number of requests in the compounded chain is
-> 4, then 5 credits granted by the server will make our client useless
-> for certain operations.
->
-> > * In the loop in wait_for_free_credits(), If this is a request for a
-> > single credit AND iff it is a normal operation, i.e. &CIFS_OP_MASK ==
-> > 0
-> > then we will NOT grant the single credit but continue looping.
-> >
-> > I.e. basically reserving the last MAX_CREDITS_FOR_COMPOUND credits
-> > before we completely run out to only be available for compounds.
-> > That way we do guarantee that compound requests will be making
-> > progress and will not be completely starved by non-compound requests..
-> >
->
-> Trying to reserve MAX_CREDITS_FOR_COMPOUNDING increases latency of
-> single-credit requests. In some workloads compounding won't be even
-> used (let's say it is pure IO workload), so instead of using all the
-> bandwidth available to the client (and the credit bandwidth might be
-> pretty narrow for highly loaded servers) we will end up using only a
-> part of it.
->
-> But it is not only about latency of a single-credit request, it is
-> also about latency of a compounded request itself. Instead of waiting
-> for all the credits for a long period of time we can start making
-> progress by doing sequential operations. If the round trip time is
-> small, the penalty of indefinite waiting instead of going sequential
-> will be rather substantial. That's why waiting only for some
-> reasonable period of time seems like a good option to try: if we have
-> already waited for some reasonable time, let's stop waiting, return
-> special error code and let the upper layer process the request
-> sequentially.
->
-> So, I think that compounding is a great optimization and it is
-> important to try using it as much as possible across the client code.
-> In the same time, the SMB3 client should be capable to handle any
-> workload or scenario that doesn't contradict the spec.
->
-> Thoughts?
+> Set a default timeout of 60 seconds for compounded requests.
 
-Thanks. I have added a, for now, fixed timeout with a rather large value and
-logging a message when we give up waiting for a multi-credit request.
-
-These messages should be good for identifying if/when this happens.
-
-As for switching from multi-credit compound sequences to to
-non-compounded serialized code,
-I don't think we should do that because we would have to duplicate all
-these codepaths. And only to solve
-a pathological issue where performance would already be so poor that
-the share is basically inoperable IMHO.
-
-
-This would only be an issue IFF we have a server that for very long
-timeperiods pegs us with less than
-a handful of credits even on an idle session.
-I think it is fair to wait very long, even indefinitely in this case.
-What we might do is eventually perform a full
-reconnect and hope for a miracle or log something to point we need to
-re-balance our servers.
-
-
-Again, I am not sure if we should switched to single threaded
-un-compouded mode in that situation.
-I would consider it a pathological case where performance and behavior
-would have degraded so
-much that the smb share is almost inoperable.
-
-I would consider this similar to behavior where due to packetloss TCP
-pegs us permanently at a congestion window of 3kb.
-The solution there is not better packet-loss recovery in TCP or tuning
-re-transmission timeouts but fix the underlying network issue
-and prevent this pathological case from happening in the first place.
-
-
-Those are my thoughts. This would be a case where we can log what is
-wrong but the fix should be to prevent the server from
-doing this in the first place.
-
-regards
-ronnie sahlberg
+Thanks for simplifying the compound_send_recv() and adding the
+timeout. Although 60sec seems rather big interval, until we have
+sequential fallback, it is the best we can do I guess.
 
 >
+> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> ---
+>  fs/cifs/transport.c | 82 ++++++++++++++---------------------------------=
+------
+>  1 file changed, 21 insertions(+), 61 deletions(-)
+>
+> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+> index 3263e8b3a57d..f759822dd2f2 100644
+> --- a/fs/cifs/transport.c
+> +++ b/fs/cifs/transport.c
+> @@ -592,6 +592,14 @@ wait_for_free_request(struct TCP_Server_Info *server=
+, const int flags,
+>                                      instance);
+>  }
+>
+> +static int
+> +wait_for_compound_request(struct TCP_Server_Info *server, int num,
+> +                         const int flags, unsigned int *instance)
+> +{
+> +       return wait_for_free_credits(server, num, 60000, flags,
+> +                                    instance);
+> +}
+> +
+>  int
+>  cifs_wait_mtu_credits(struct TCP_Server_Info *server, unsigned int size,
+>                       unsigned int *num, struct cifs_credits *credits)
+> @@ -920,7 +928,6 @@ compound_send_recv(const unsigned int xid, struct cif=
+s_ses *ses,
+>                 { .value =3D 0, .instance =3D 0 }
+>         };
+>         unsigned int instance;
+> -       unsigned int first_instance =3D 0;
+>         char *buf;
+>
+>         optype =3D flags & CIFS_OP_MASK;
+> @@ -946,70 +953,27 @@ compound_send_recv(const unsigned int xid, struct c=
+ifs_ses *ses,
+>                         spin_unlock(&ses->server->req_lock);
+>                         return -ENOTSUPP;
+
+The code above could also be moved into wait_for_free_credits() to
+make compound_send_recv() even smaller.
+
+>                 }
+> -       } else {
+> -               /* enough credits to send the whole compounded request */
+> -               ses->server->credits -=3D num_rqst;
+> -               ses->server->in_flight +=3D num_rqst;
+> -               first_instance =3D ses->server->reconnect_instance;
+>         }
+>         spin_unlock(&ses->server->req_lock);
+>
+> -       if (first_instance) {
+> -               cifs_dbg(FYI, "Acquired %d credits at once\n", num_rqst);
+> -               for (i =3D 0; i < num_rqst; i++) {
+> -                       credits[i].value =3D 1;
+> -                       credits[i].instance =3D first_instance;
+> -               }
+> -               goto setup_rqsts;
+> -       }
+> -
+>         /*
+> -        * There are not enough credits to send the whole compound reques=
+t but
+> -        * there are requests in flight that may bring credits from the s=
+erver.
+> +        * Wait for all the requests to become available.
+>          * This approach still leaves the possibility to be stuck waiting=
+ for
+>          * credits if the server doesn't grant credits to the outstanding
+> -        * requests. This should be fixed by returning immediately and le=
+tting
+> -        * a caller fallback to sequential commands instead of compoundin=
+g.
+> -        * Ensure we obtain 1 credit per request in the compound chain.
+> +        * requests and if the client is completely idle, not generating =
+any
+> +        * other requests.
+> +        * This can be handled by the eventual session reconnect.
+>          */
+> -       for (i =3D 0; i < num_rqst; i++) {
+> -               rc =3D wait_for_free_request(ses->server, flags, &instanc=
+e);
+> -
+> -               if (rc =3D=3D 0) {
+> -                       credits[i].value =3D 1;
+> -                       credits[i].instance =3D instance;
+> -                       /*
+> -                        * All parts of the compound chain must get credi=
+ts from
+> -                        * the same session, otherwise we may end up usin=
+g more
+> -                        * credits than the server granted. If there were
+> -                        * reconnects in between, return -EAGAIN and let =
+callers
+> -                        * handle it.
+> -                        */
+> -                       if (i =3D=3D 0)
+> -                               first_instance =3D instance;
+> -                       else if (first_instance !=3D instance) {
+> -                               i++;
+> -                               rc =3D -EAGAIN;
+> -                       }
+> -               }
+> +       rc =3D wait_for_compound_request(ses->server, num_rqst, flags,
+> +                                      &instance);
+> +       if (rc)
+> +               return rc;
+>
+> -               if (rc) {
+> -                       /*
+> -                        * We haven't sent an SMB packet to the server ye=
+t but
+> -                        * we already obtained credits for i requests in =
+the
+> -                        * compound chain - need to return those credits =
+back
+> -                        * for future use. Note that we need to call add_=
+credits
+> -                        * multiple times to match the way we obtained cr=
+edits
+> -                        * in the first place and to account for in fligh=
+t
+> -                        * requests correctly.
+> -                        */
+> -                       for (j =3D 0; j < i; j++)
+> -                               add_credits(ses->server, &credits[j], opt=
+ype);
+> -                       return rc;
+> -               }
+> +       for (i =3D 0; i < num_rqst; i++) {
+> +               credits[i].value =3D 1;
+> +               credits[i].instance =3D instance;
+>         }
+>
+> -setup_rqsts:
+>         /*
+>          * Make sure that we sign in the same order that we send on this =
+socket
+>          * and avoid races inside tcp sendmsg code that could cause corru=
+ption
+> @@ -1020,17 +984,13 @@ compound_send_recv(const unsigned int xid, struct =
+cifs_ses *ses,
+>
+>         /*
+>          * All the parts of the compound chain belong obtained credits fr=
+om the
+> -        * same session (see the appropriate checks above). In the same t=
+ime
+> -        * there might be reconnects after those checks but before we acq=
+uired
+> -        * the srv_mutex. We can not use credits obtained from the previo=
+us
+> +        * same session. We can not use credits obtained from the previou=
+s
+>          * session to send this request. Check if there were reconnects a=
+fter
+>          * we obtained credits and return -EAGAIN in such cases to let ca=
+llers
+>          * handle it.
+>          */
+> -       if (first_instance !=3D ses->server->reconnect_instance) {
+> +       if (instance !=3D ses->server->reconnect_instance) {
+>                 mutex_unlock(&ses->server->srv_mutex);
+> -               for (j =3D 0; j < num_rqst; j++)
+> -                       add_credits(ses->server, &credits[j], optype);
+
+Why removing this? We obtained credits and increased the number of
+requests in flight but are about to return without sending the request
+- need to return those credits back and adjust the number of requests
+in flight.
+
+I understand it may be confusing because the session changed and
+add_credits won't actually add any credits *but* it will adjust the
+number of requests in flight and possibly re-balance the remaining
+credits in the current session, thus it is still needed to call
+add_credits for all parts of compound chain here.
+
+>                 return -EAGAIN;
+>         }
 >
 > --
-> Best regards,
-> Pavel Shilovsky
+> 2.13.6
+>
+
+
+--
+Best regards,
+Pavel Shilovsky
