@@ -2,201 +2,139 @@ Return-Path: <SRS0=c5gJ=RL=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5031C43381
-	for <linux-cifs@archiver.kernel.org>; Fri,  8 Mar 2019 02:39:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40C30C43381
+	for <linux-cifs@archiver.kernel.org>; Fri,  8 Mar 2019 03:34:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 74E5E2081B
-	for <linux-cifs@archiver.kernel.org>; Fri,  8 Mar 2019 02:39:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ldiJ3Is2"
+	by mail.kernel.org (Postfix) with ESMTP id 122DE20840
+	for <linux-cifs@archiver.kernel.org>; Fri,  8 Mar 2019 03:34:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726299AbfCHCjx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 7 Mar 2019 21:39:53 -0500
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:33968 "EHLO
-        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726283AbfCHCjw (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 7 Mar 2019 21:39:52 -0500
-Received: by mail-qk1-f196.google.com with SMTP id a15so10397626qkc.1
-        for <linux-cifs@vger.kernel.org>; Thu, 07 Mar 2019 18:39:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=zK2pOlYQ/r3uT6j6SLCPrADqWMXDq3rxZdgCuQ6dJQE=;
-        b=ldiJ3Is2H2iqPIZVdldRJnNSwxCF1HCubyH5KpP97SM00Wn291I2yYFLiBd0WT/rK8
-         cCHmwSVAUHLfl3nciJmPBBjwad/vuu589tGTLmBKNJEUFVrOMUznoAJftHE6elEdogRZ
-         sO537cfZV11Lz+k8FsTt/81dh/jtTy/ekr84v4PQHMfwLcgaLQkaLi520FhnKYZBo+GH
-         Tkzb/tA6K8rShj8TjUzN/zRp59e+BdKVVgl97ODVILxCMrHoRL7CeiijsE83FfIt6xg6
-         a9CgtA3nm1SuCfxUZID0E+3kN7dN5uNwc/yibdULyovHl9hrs5pjr0qbL6BSDvZz0Hzv
-         upcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=zK2pOlYQ/r3uT6j6SLCPrADqWMXDq3rxZdgCuQ6dJQE=;
-        b=J3q9P7z46t9x76KLXG/TUg8PAtF/21LIwgivIXvWDMurfMqmnRiCp+jsamzZ6/pXy7
-         rpg2WSLHjhG6jqhk0/CH39DgFJ3jg7J3bpslzt1RFoJfmxxVorl5BxyiT8ANutdQpyXj
-         cOv6HFIbq+iIMLuhazw2HB89zA1bJgl3XUEE5DJueFH5jY/AiUOumT02+J/Saw+IFZKj
-         1hOu2k/j4QZsRsL7qz0CUp50vLoOwNOVbgKIJF4VKyN6FFzWOP9CdRzMZXeLuPwhxy4R
-         l39II5LTywmFsUvGQlK0RnsYWbVkj4FaJLY17Z7pVgBw4xX7DSQCo2jOsa7rNUmE1ogd
-         DrvQ==
-X-Gm-Message-State: APjAAAUNWzP5cXOyN+8BBC20pQOkGUlgpJp2eUaNnKT8W1XRkAgi26Iw
-        MfAR0cGCdvi1hmILmMYMqPhGnbdJM+Q7O7UziRE=
-X-Google-Smtp-Source: APXvYqza+JmkpxcI1UPRHoMoEooalA505aDhpnRyH81mC/8AYDqsaQUiXIVHNKhamFX/yW/Y5gyFdQvwjsX5MwKpjfg=
-X-Received: by 2002:a05:620a:1348:: with SMTP id c8mr12602478qkl.246.1552012791266;
- Thu, 07 Mar 2019 18:39:51 -0800 (PST)
-MIME-Version: 1.0
-References: <20190306041546.10419-1-lsahlber@redhat.com> <20190306041546.10419-6-lsahlber@redhat.com>
- <CAKywueRFjXs160fV2m-jsNPtLnBvqaHWJmJZ+SN5+yhjbtVmtA@mail.gmail.com>
-In-Reply-To: <CAKywueRFjXs160fV2m-jsNPtLnBvqaHWJmJZ+SN5+yhjbtVmtA@mail.gmail.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Fri, 8 Mar 2019 12:39:40 +1000
-Message-ID: <CAN05THR89uDK36mLCBwWAsm2piK2q3kkBJL_vDnnKdp+kXWEuQ@mail.gmail.com>
-Subject: Re: [PATCH 5/6] cifs: add a timeout argument to wait_for_free_credits
-To:     Pavel Shilovsky <piastryyy@gmail.com>
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        Steve French <smfrench@gmail.com>,
-        Pavel Shilovsky <pshilov@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        id S1726274AbfCHDep (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 7 Mar 2019 22:34:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48890 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726270AbfCHDep (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 7 Mar 2019 22:34:45 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 68C7B30642AA;
+        Fri,  8 Mar 2019 03:34:45 +0000 (UTC)
+Received: from test1135.test.redhat.com (vpn2-54-95.bne.redhat.com [10.64.54.95])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C362B600C8;
+        Fri,  8 Mar 2019 03:34:44 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>,
+        Pavel Shilovsky <pshilov@microsoft.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>
+Subject: [PATCH 3/6] cifs: wait_for_free_credits() make it possible to wait for >=1 credits
+Date:   Fri,  8 Mar 2019 12:58:20 +1000
+Message-Id: <20190308025823.24382-4-lsahlber@redhat.com>
+In-Reply-To: <20190308025823.24382-1-lsahlber@redhat.com>
+References: <20190308025823.24382-1-lsahlber@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Fri, 08 Mar 2019 03:34:45 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Mar 7, 2019 at 4:33 AM Pavel Shilovsky <piastryyy@gmail.com> wrote:
->
-> =D0=B2=D1=82, 5 =D0=BC=D0=B0=D1=80. 2019 =D0=B3. =D0=B2 21:45, Ronnie Sah=
-lberg <lsahlber@redhat.com>:
-> >
-> > A negative timeout is the same as the current behaviour, i.e. no timeou=
-t.
-> >
-> > Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> > ---
-> >  fs/cifs/transport.c | 40 ++++++++++++++++++++++++++++++----------
-> >  1 file changed, 30 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> > index f4ec9635dab2..3263e8b3a57d 100644
-> > --- a/fs/cifs/transport.c
-> > +++ b/fs/cifs/transport.c
-> > @@ -478,11 +478,18 @@ smb_send(struct TCP_Server_Info *server, struct s=
-mb_hdr *smb_buffer,
-> >
-> >  static int
-> >  wait_for_free_credits(struct TCP_Server_Info *server, const int num_cr=
-edits,
-> > -                     const int flags, unsigned int *instance)
-> > +                     const int timeout, const int flags,
-> > +                     unsigned int *instance)
-> >  {
-> >         int rc;
-> >         int *credits;
-> >         int optype;
-> > +       long int t;
-> > +
-> > +       if (timeout < 0)
-> > +               t =3D MAX_JIFFY_OFFSET;
-> > +       else
-> > +               t =3D msecs_to_jiffies(timeout);
-> >
-> >         optype =3D flags & CIFS_OP_MASK;
-> >
-> > @@ -507,11 +514,16 @@ wait_for_free_credits(struct TCP_Server_Info *ser=
-ver, const int num_credits,
-> >                 if (*credits < num_credits) {
-> >                         spin_unlock(&server->req_lock);
-> >                         cifs_num_waiters_inc(server);
-> > -                       rc =3D wait_event_killable(server->request_q,
-> > -                               has_credits(server, credits, num_credit=
-s));
-> > +                       rc =3D wait_event_killable_timeout(server->requ=
-est_q,
-> > +                               has_credits(server, credits, num_credit=
-s), t);
-> >                         cifs_num_waiters_dec(server);
-> > -                       if (rc)
-> > -                               return rc;
-> > +                       if (!rc) {
-> > +                               cifs_dbg(VFS, "wait timed out after %d =
-ms\n",
-> > +                                        timeout);
-> > +                               return -EAGAIN;
->
-> It would be hard to distinguish different EAGAIN reasons in the upper
-> layers. As of now we use EAGAIN as retryable error indicating the
-> upper layer to retry. This case is different because the retry most
-> likely won't help and the sequential fallback is needed. In
-> compound_send_recv() we return -ENOTSUPP if there is not enough
-> credits to satisfy compounding and the number of requests in flight
-> doesn't promise to get new credits in future.
->
-> I suggest to return the same error code here (-ENOTSUPP). Probably
-> this particular error code isn't ideal choice and suggestions to
-> change it are welcome.
+Change wait_for_free_credits() to allow waiting for >=1 credits instead of just
+a single credit.
 
-I will do that change.  ENOTSUPP might not be ideal but should be fine for =
-now.
-If/when we need to take special action and start serializing these
-requests we can
-pick a better errno.
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+---
+ fs/cifs/cifsglob.h  |  4 ++--
+ fs/cifs/smb2ops.c   |  2 +-
+ fs/cifs/transport.c | 14 +++++++-------
+ 3 files changed, 10 insertions(+), 10 deletions(-)
 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 31c63e7437fd..bc2bb14b2180 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -734,13 +734,13 @@ in_flight(struct TCP_Server_Info *server)
+ }
+ 
+ static inline bool
+-has_credits(struct TCP_Server_Info *server, int *credits)
++has_credits(struct TCP_Server_Info *server, int *credits, int num_credits)
+ {
+ 	int num;
+ 	spin_lock(&server->req_lock);
+ 	num = *credits;
+ 	spin_unlock(&server->req_lock);
+-	return num > 0;
++	return num >= num_credits;
+ }
+ 
+ static inline void
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 1243407c9546..15bc7953b7a6 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -185,7 +185,7 @@ smb2_wait_mtu_credits(struct TCP_Server_Info *server, unsigned int size,
+ 			spin_unlock(&server->req_lock);
+ 			cifs_num_waiters_inc(server);
+ 			rc = wait_event_killable(server->request_q,
+-					has_credits(server, &server->credits));
++				has_credits(server, &server->credits, 1));
+ 			cifs_num_waiters_dec(server);
+ 			if (rc)
+ 				return rc;
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 8887db2cd582..baf15194aa3d 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -477,8 +477,8 @@ smb_send(struct TCP_Server_Info *server, struct smb_hdr *smb_buffer,
+ }
+ 
+ static int
+-wait_for_free_credits(struct TCP_Server_Info *server, const int flags,
+-		      unsigned int *instance)
++wait_for_free_credits(struct TCP_Server_Info *server, const int num_credits,
++		      const int flags, unsigned int *instance)
+ {
+ 	int rc;
+ 	int *credits;
+@@ -504,11 +504,11 @@ wait_for_free_credits(struct TCP_Server_Info *server, const int flags,
+ 	}
+ 
+ 	while (1) {
+-		if (*credits <= 0) {
++		if (*credits < num_credits) {
+ 			spin_unlock(&server->req_lock);
+ 			cifs_num_waiters_inc(server);
+ 			rc = wait_event_killable(server->request_q,
+-						 has_credits(server, credits));
++				has_credits(server, credits, num_credits));
+ 			cifs_num_waiters_dec(server);
+ 			if (rc)
+ 				return rc;
+@@ -526,8 +526,8 @@ wait_for_free_credits(struct TCP_Server_Info *server, const int flags,
+ 
+ 			/* update # of requests on the wire to server */
+ 			if ((flags & CIFS_TIMEOUT_MASK) != CIFS_BLOCKING_OP) {
+-				*credits -= 1;
+-				server->in_flight++;
++				*credits -= num_credits;
++				server->in_flight += num_credits;
+ 				*instance = server->reconnect_instance;
+ 			}
+ 			spin_unlock(&server->req_lock);
+@@ -541,7 +541,7 @@ static int
+ wait_for_free_request(struct TCP_Server_Info *server, const int flags,
+ 		      unsigned int *instance)
+ {
+-	return wait_for_free_credits(server, flags, instance);
++	return wait_for_free_credits(server, 1, flags, instance);
+ }
+ 
+ int
+-- 
+2.13.6
 
->
-> > +                       }
-> > +                       if (rc =3D=3D -ERESTARTSYS)
-> > +                               return -ERESTARTSYS;
-> >                         spin_lock(&server->req_lock);
-> >                 } else {
-> >                         if (server->tcpStatus =3D=3D CifsExiting) {
-> > @@ -537,12 +549,19 @@ wait_for_free_credits(struct TCP_Server_Info *ser=
-ver, const int num_credits,
-> >                             *credits <=3D MAX_COMPOUND) {
-> >                                 spin_unlock(&server->req_lock);
-> >                                 cifs_num_waiters_inc(server);
-> > -                               rc =3D wait_event_killable(server->requ=
-est_q,
-> > +                               rc =3D wait_event_killable_timeout(
-> > +                                       server->request_q,
-> >                                         has_credits(server, credits,
-> > -                                                   MAX_COMPOUND + 1));
-> > +                                                   MAX_COMPOUND + 1),
-> > +                                       t);
-> >                                 cifs_num_waiters_dec(server);
-> > -                               if (rc)
-> > -                                       return rc;
-> > +                               if (!rc) {
-> > +                                       cifs_dbg(VFS, "wait timed out a=
-fter %d ms\n",
-> > +                                                timeout);
-> > +                                       return -EAGAIN;
-> > +                               }
-> > +                               if (rc =3D=3D -ERESTARTSYS)
-> > +                                       return -ERESTARTSYS;
-> >                                 spin_lock(&server->req_lock);
-> >                                 continue;
-> >                         }
-> > @@ -569,7 +588,8 @@ static int
-> >  wait_for_free_request(struct TCP_Server_Info *server, const int flags,
-> >                       unsigned int *instance)
-> >  {
-> > -       return wait_for_free_credits(server, 1, flags, instance);
-> > +       return wait_for_free_credits(server, 1, -1, flags,
-> > +                                    instance);
-> >  }
-> >
-> >  int
-> > --
-> > 2.13.6
-> >
->
-> --
-> Best regards,
-> Pavel Shilovsky
