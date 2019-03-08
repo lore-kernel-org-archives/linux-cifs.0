@@ -1,77 +1,202 @@
-Return-Path: <SRS0=lAGF=RK=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=c5gJ=RL=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07EEBC43381
-	for <linux-cifs@archiver.kernel.org>; Thu,  7 Mar 2019 14:04:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5031C43381
+	for <linux-cifs@archiver.kernel.org>; Fri,  8 Mar 2019 02:39:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C86CB2081B
-	for <linux-cifs@archiver.kernel.org>; Thu,  7 Mar 2019 14:04:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 74E5E2081B
+	for <linux-cifs@archiver.kernel.org>; Fri,  8 Mar 2019 02:39:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ldiJ3Is2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726161AbfCGOE3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 7 Mar 2019 09:04:29 -0500
-Received: from mout.kundenserver.de ([212.227.126.135]:50435 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726159AbfCGOE3 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 7 Mar 2019 09:04:29 -0500
-Received: from [192.168.1.110] ([77.9.35.131]) by mrelayeu.kundenserver.de
- (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis) id
- 1MyNoa-1gsDwd0iXk-00yghV; Thu, 07 Mar 2019 15:04:27 +0100
-Subject: Re: [PATCH v2] fs: cifs: Kconfig: pedantic formatting
-To:     Steve French <smfrench@gmail.com>,
-        "Enrico Weigelt, metux IT consult" <info@metux.net>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
-References: <1551896652-26579-1-git-send-email-info@metux.net>
- <1551910979-1026-1-git-send-email-info@metux.net>
- <CAH2r5msizwcru6xHMBmrQP8MSci=gNcHo3T6ti+zS-Btj72hQA@mail.gmail.com>
-From:   "Enrico Weigelt, metux IT consult" <lkml@metux.net>
-Organization: metux IT consult
-Message-ID: <c165b745-d092-27c4-f238-59c2c65e4717@metux.net>
-Date:   Thu, 7 Mar 2019 15:04:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux i686 on x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S1726299AbfCHCjx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 7 Mar 2019 21:39:53 -0500
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:33968 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726283AbfCHCjw (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 7 Mar 2019 21:39:52 -0500
+Received: by mail-qk1-f196.google.com with SMTP id a15so10397626qkc.1
+        for <linux-cifs@vger.kernel.org>; Thu, 07 Mar 2019 18:39:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=zK2pOlYQ/r3uT6j6SLCPrADqWMXDq3rxZdgCuQ6dJQE=;
+        b=ldiJ3Is2H2iqPIZVdldRJnNSwxCF1HCubyH5KpP97SM00Wn291I2yYFLiBd0WT/rK8
+         cCHmwSVAUHLfl3nciJmPBBjwad/vuu589tGTLmBKNJEUFVrOMUznoAJftHE6elEdogRZ
+         sO537cfZV11Lz+k8FsTt/81dh/jtTy/ekr84v4PQHMfwLcgaLQkaLi520FhnKYZBo+GH
+         Tkzb/tA6K8rShj8TjUzN/zRp59e+BdKVVgl97ODVILxCMrHoRL7CeiijsE83FfIt6xg6
+         a9CgtA3nm1SuCfxUZID0E+3kN7dN5uNwc/yibdULyovHl9hrs5pjr0qbL6BSDvZz0Hzv
+         upcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=zK2pOlYQ/r3uT6j6SLCPrADqWMXDq3rxZdgCuQ6dJQE=;
+        b=J3q9P7z46t9x76KLXG/TUg8PAtF/21LIwgivIXvWDMurfMqmnRiCp+jsamzZ6/pXy7
+         rpg2WSLHjhG6jqhk0/CH39DgFJ3jg7J3bpslzt1RFoJfmxxVorl5BxyiT8ANutdQpyXj
+         cOv6HFIbq+iIMLuhazw2HB89zA1bJgl3XUEE5DJueFH5jY/AiUOumT02+J/Saw+IFZKj
+         1hOu2k/j4QZsRsL7qz0CUp50vLoOwNOVbgKIJF4VKyN6FFzWOP9CdRzMZXeLuPwhxy4R
+         l39II5LTywmFsUvGQlK0RnsYWbVkj4FaJLY17Z7pVgBw4xX7DSQCo2jOsa7rNUmE1ogd
+         DrvQ==
+X-Gm-Message-State: APjAAAUNWzP5cXOyN+8BBC20pQOkGUlgpJp2eUaNnKT8W1XRkAgi26Iw
+        MfAR0cGCdvi1hmILmMYMqPhGnbdJM+Q7O7UziRE=
+X-Google-Smtp-Source: APXvYqza+JmkpxcI1UPRHoMoEooalA505aDhpnRyH81mC/8AYDqsaQUiXIVHNKhamFX/yW/Y5gyFdQvwjsX5MwKpjfg=
+X-Received: by 2002:a05:620a:1348:: with SMTP id c8mr12602478qkl.246.1552012791266;
+ Thu, 07 Mar 2019 18:39:51 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAH2r5msizwcru6xHMBmrQP8MSci=gNcHo3T6ti+zS-Btj72hQA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:XO/E+n+VZjYrGr7s95WZnAS8ky3vFjsxCL+5PPcr12FfaS/drB1
- tW540EQK3APsoOdBLq98iUdqA/druzhRtPsiiPeqpXmO5jpG8xb5LeRLf4NwYJRp2IR9qW0
- NYFl9FlsJckAiSbAYPsVGvwFytDg3idtw863MsE2tEWSGwy9ir+GDI2OKFwZdrBv/pCCMuh
- Z0isqX9Dz3U6C6VqoZa3Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:+vrOoByVJ8c=:rw028+AeFWMQKlrRTYU6iv
- VraeC9N93Dt4AFshmfAit1cZeHEK2EtBXxkHxB3vEUZoVqzgmio84DcbBsOkldoQ5gaMBqtbk
- PXexKuqS/cEZDQDFfWkCyw9N5o+GZmmIDF7oB8xEqDG9H/Z0Ljh2azWj7109CR4WiKCEGqKK0
- YzKkGtRCDdWq4rt9swmMthcdWEWXIGtt/VT5D+QnpmaYP5W16CW3nYSDA1t3p+HeFMH3JMpm0
- nAJFqkah/SgkQrJr5m7ZJKzQGN8UegdzB5cvOLtLPAqYdQsFB9LWtHOd6VOmXdiLTg+MUd1F0
- Ij8j7p/MIgABybeR/1tf3qx6+xmdwWGLKD65RVuM0LwSxiWIQIBKz059Z1Iei23CB0Pf3+3VO
- Ag7jpFkf3FfQzj2WuO7LyJsSfyBKU520T7V6Qk93Yxsrva8EZspNZGfekRA2+lWa95mFZHDgN
- nroZunjdKSqKoPzXTDt/WKAnKXttLyVSrZaTaO7xw5muEpLVFnpjMeYEtK9DTVKTr3dHCmaO3
- THoS5RPPfAM8x/Tyonsa0K+cNojTbYL7j+3RET6mXxGvURCPOJybZKGmbzFbIdwi4bmr1Dxwv
- gxZB/rwiFBOzdf/u5y+Ny7wHYR1tZtbVZrrGCYf6om+W6m5LhHZwwxpPjZg+RPSwjuVYd9wA9
- wrPZfzA6iBHXTCY/E5Rle8aJOqdieadnVB9IxDaNwP/DI2S4lRDOhqT6/CqoJwHBbFxfWd8oO
- 650Re20EWIh4+8gENV8Uhe9GpOmwEpKxdXU3E9GozYQu8nIu26DaPsZ1u4A=
+References: <20190306041546.10419-1-lsahlber@redhat.com> <20190306041546.10419-6-lsahlber@redhat.com>
+ <CAKywueRFjXs160fV2m-jsNPtLnBvqaHWJmJZ+SN5+yhjbtVmtA@mail.gmail.com>
+In-Reply-To: <CAKywueRFjXs160fV2m-jsNPtLnBvqaHWJmJZ+SN5+yhjbtVmtA@mail.gmail.com>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Fri, 8 Mar 2019 12:39:40 +1000
+Message-ID: <CAN05THR89uDK36mLCBwWAsm2piK2q3kkBJL_vDnnKdp+kXWEuQ@mail.gmail.com>
+Subject: Re: [PATCH 5/6] cifs: add a timeout argument to wait_for_free_credits
+To:     Pavel Shilovsky <piastryyy@gmail.com>
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>,
+        Pavel Shilovsky <pshilov@microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 07.03.19 05:00, Steve French wrote:
-> Is this just converting spaces to tabs?
+On Thu, Mar 7, 2019 at 4:33 AM Pavel Shilovsky <piastryyy@gmail.com> wrote:
+>
+> =D0=B2=D1=82, 5 =D0=BC=D0=B0=D1=80. 2019 =D0=B3. =D0=B2 21:45, Ronnie Sah=
+lberg <lsahlber@redhat.com>:
+> >
+> > A negative timeout is the same as the current behaviour, i.e. no timeou=
+t.
+> >
+> > Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> > ---
+> >  fs/cifs/transport.c | 40 ++++++++++++++++++++++++++++++----------
+> >  1 file changed, 30 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+> > index f4ec9635dab2..3263e8b3a57d 100644
+> > --- a/fs/cifs/transport.c
+> > +++ b/fs/cifs/transport.c
+> > @@ -478,11 +478,18 @@ smb_send(struct TCP_Server_Info *server, struct s=
+mb_hdr *smb_buffer,
+> >
+> >  static int
+> >  wait_for_free_credits(struct TCP_Server_Info *server, const int num_cr=
+edits,
+> > -                     const int flags, unsigned int *instance)
+> > +                     const int timeout, const int flags,
+> > +                     unsigned int *instance)
+> >  {
+> >         int rc;
+> >         int *credits;
+> >         int optype;
+> > +       long int t;
+> > +
+> > +       if (timeout < 0)
+> > +               t =3D MAX_JIFFY_OFFSET;
+> > +       else
+> > +               t =3D msecs_to_jiffies(timeout);
+> >
+> >         optype =3D flags & CIFS_OP_MASK;
+> >
+> > @@ -507,11 +514,16 @@ wait_for_free_credits(struct TCP_Server_Info *ser=
+ver, const int num_credits,
+> >                 if (*credits < num_credits) {
+> >                         spin_unlock(&server->req_lock);
+> >                         cifs_num_waiters_inc(server);
+> > -                       rc =3D wait_event_killable(server->request_q,
+> > -                               has_credits(server, credits, num_credit=
+s));
+> > +                       rc =3D wait_event_killable_timeout(server->requ=
+est_q,
+> > +                               has_credits(server, credits, num_credit=
+s), t);
+> >                         cifs_num_waiters_dec(server);
+> > -                       if (rc)
+> > -                               return rc;
+> > +                       if (!rc) {
+> > +                               cifs_dbg(VFS, "wait timed out after %d =
+ms\n",
+> > +                                        timeout);
+> > +                               return -EAGAIN;
+>
+> It would be hard to distinguish different EAGAIN reasons in the upper
+> layers. As of now we use EAGAIN as retryable error indicating the
+> upper layer to retry. This case is different because the retry most
+> likely won't help and the sequential fallback is needed. In
+> compound_send_recv() we return -ENOTSUPP if there is not enough
+> credits to satisfy compounding and the number of requests in flight
+> doesn't promise to get new credits in future.
+>
+> I suggest to return the same error code here (-ENOTSUPP). Probably
+> this particular error code isn't ideal choice and suggestions to
+> change it are welcome.
 
-Yes, it's just fixing the indentions to be consistent with the
-the rest of the Kconfig files. No semantic changes.
+I will do that change.  ENOTSUPP might not be ideal but should be fine for =
+now.
+If/when we need to take special action and start serializing these
+requests we can
+pick a better errno.
 
-In the longer run, we should patch up checkpatch.pl to check this,
-but that's another story.
 
---mtx
-
--- 
-Enrico Weigelt, metux IT consult
-Free software and Linux embedded engineering
-info@metux.net -- +49-151-27565287
+>
+> > +                       }
+> > +                       if (rc =3D=3D -ERESTARTSYS)
+> > +                               return -ERESTARTSYS;
+> >                         spin_lock(&server->req_lock);
+> >                 } else {
+> >                         if (server->tcpStatus =3D=3D CifsExiting) {
+> > @@ -537,12 +549,19 @@ wait_for_free_credits(struct TCP_Server_Info *ser=
+ver, const int num_credits,
+> >                             *credits <=3D MAX_COMPOUND) {
+> >                                 spin_unlock(&server->req_lock);
+> >                                 cifs_num_waiters_inc(server);
+> > -                               rc =3D wait_event_killable(server->requ=
+est_q,
+> > +                               rc =3D wait_event_killable_timeout(
+> > +                                       server->request_q,
+> >                                         has_credits(server, credits,
+> > -                                                   MAX_COMPOUND + 1));
+> > +                                                   MAX_COMPOUND + 1),
+> > +                                       t);
+> >                                 cifs_num_waiters_dec(server);
+> > -                               if (rc)
+> > -                                       return rc;
+> > +                               if (!rc) {
+> > +                                       cifs_dbg(VFS, "wait timed out a=
+fter %d ms\n",
+> > +                                                timeout);
+> > +                                       return -EAGAIN;
+> > +                               }
+> > +                               if (rc =3D=3D -ERESTARTSYS)
+> > +                                       return -ERESTARTSYS;
+> >                                 spin_lock(&server->req_lock);
+> >                                 continue;
+> >                         }
+> > @@ -569,7 +588,8 @@ static int
+> >  wait_for_free_request(struct TCP_Server_Info *server, const int flags,
+> >                       unsigned int *instance)
+> >  {
+> > -       return wait_for_free_credits(server, 1, flags, instance);
+> > +       return wait_for_free_credits(server, 1, -1, flags,
+> > +                                    instance);
+> >  }
+> >
+> >  int
+> > --
+> > 2.13.6
+> >
+>
+> --
+> Best regards,
+> Pavel Shilovsky
