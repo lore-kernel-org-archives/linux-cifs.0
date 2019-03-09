@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 302DDC43381
-	for <linux-cifs@archiver.kernel.org>; Sat,  9 Mar 2019 00:37:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06A56C43381
+	for <linux-cifs@archiver.kernel.org>; Sat,  9 Mar 2019 00:37:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E0068206DF
-	for <linux-cifs@archiver.kernel.org>; Sat,  9 Mar 2019 00:37:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C7FE4206DF
+	for <linux-cifs@archiver.kernel.org>; Sat,  9 Mar 2019 00:37:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N3pu81Ai"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="urOHCSGZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726324AbfCIAhT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 8 Mar 2019 19:37:19 -0500
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:35207 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726311AbfCIAhT (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 8 Mar 2019 19:37:19 -0500
-Received: by mail-lj1-f193.google.com with SMTP id t13so18928864lji.2
-        for <linux-cifs@vger.kernel.org>; Fri, 08 Mar 2019 16:37:17 -0800 (PST)
+        id S1726334AbfCIAht (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 8 Mar 2019 19:37:49 -0500
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:33987 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726311AbfCIAht (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 8 Mar 2019 19:37:49 -0500
+Received: by mail-lf1-f68.google.com with SMTP id y18so2575113lfe.1
+        for <linux-cifs@vger.kernel.org>; Fri, 08 Mar 2019 16:37:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=wX/1fNoHhhJy4V8G4sb/f0CeBwDhCQPu496mF2LgvlA=;
-        b=N3pu81Ai9UOIJsM8tUr842ceei68d6nZ7ucKB44HpkIZHVBjWe0fNnlPtqnZEPcpNj
-         55k7sAKI3sp4Dc+VJIHeiIhRjbt0SIW85XsrZ1GnDbdriNviwZC0cr9YPbU9qzUgitRk
-         NgEsRqD5NgrSgAopeJskn0y6TCrgs43t6Ya9p4JUAsYCmL8csMIuMJk+Ocj260rMPRg1
-         MS04MkaDWhuujlwYColR8CQciQFWdq9FcDzBfBHpOtd0uqnbvOwcH62yqhIOgv6QJ4I3
-         lMPpgXf70i+08G4SiR0wFbEZQmMNRT8wgYKAS4+axVh1jXSqVOkO6gMXWLWmNIoaXEW0
-         Y/Vg==
+        bh=xnk3efLkwnZbjZg6AjwHHWHS0TI7sojnfmVqmE+P/0o=;
+        b=urOHCSGZDWjMAyaZm5PgCr/nxuv+wd/0NLGmNNKj92NrGjN3OqDOpVyHtmuZ4WdS35
+         tY+4jiYaapG169lIcxKoLvdlUST5ZtEinWqjNqfBFRGwjNs5iedHlBSQxMDKSzDm/ElI
+         zqRftzdLDASgnsxeqY3yDG+3CPl2g1RYvRrNiM/1kqk5no2dP5dqd/OhiyYy4fdThxcx
+         y+NvDLKsjSCZ6RTfr8KicAZ34rniBqh//c+imcj31vTKSuBHD+Mhrk1gi4kbow9jDfDP
+         leqFao4Vur3aSjSndb6lPCBSYYQ/0LMK0rIRC7LbnkNW7pkscbmaHz0V9jcdF09okLCc
+         r/dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=wX/1fNoHhhJy4V8G4sb/f0CeBwDhCQPu496mF2LgvlA=;
-        b=Nj+fEOs90UggRsYP2bgPmVUQJv9wQVLn1MGcTJrXfe/nWNtZuCoy/47MwRGC49tYgX
-         Z6svbIvyZ3MqJdBc1mYd/H4Y35tIPKpGVPRuRWeHOQ3HQwaiZE5I+/bKCymuFcIBYiM0
-         hyO5GjxqLs+9PCCYr2NcIevAs5rCguA9XMMcglnd0ov07lUYwX0lkhXKDvWrzfP2Mf7S
-         kTjWpcBmpi4kp8g2KersAAZU12RORfGrxzlKrJ+ckMuNZkPr7R3unXGkzi5GsMt1yCBi
-         eHEPb/QlvAHaBo005xwD3bHoRSNCFzjVtlJxyw7Zs4hQ0azEXoMh/LNiqH30lHuO8kEq
-         3SBQ==
-X-Gm-Message-State: APjAAAUhh2PiRxlLW6T1XpFqloovfN0moQj+fkt9uxKdakmcUfZ32MVi
-        IrvG1qfxl5P2178OsYU0dEmaWlz71GzM+l8sjQ==
-X-Google-Smtp-Source: APXvYqxFN7A7jnSQvDUlNnwAnZ6VH/kq5J8uMyUwn9JDHKNRAoxH67nNcPnf7nVq7BJDehQghPKRzLPfSM5INREhpsE=
-X-Received: by 2002:a2e:124e:: with SMTP id t75mr10806376lje.23.1552091836870;
- Fri, 08 Mar 2019 16:37:16 -0800 (PST)
+        bh=xnk3efLkwnZbjZg6AjwHHWHS0TI7sojnfmVqmE+P/0o=;
+        b=euJyyp2AhlqCYllJ6E9zPsPYxtkxBhxU8U5VoDViv1RsEJOrFcw+ttB1eAAJf3uour
+         mX/5AVdVEvjZlq64oZ/qFiZUQJn/n+p87NSbeZt4hAITDnOob6DujdCuqbvWpG6Z49zj
+         JohDGt/4SRZ+gd+yhuBKuhI9AZwRYJfDM1qwFeV+oCBs3GU1O6yQSJpqd1VCJeIy5LSm
+         GPto2O5ZaQd0FVh/7faikYPuwFYunQW81NH8F0acUWIsEU3Y0wNwGgGC14LSQd7iwdYg
+         3RuOKbDczQ87CxHtZc6dCz2kcxo6VJS20Frp3tgOXJB0m5M5/zBHEdYjatGIl9edKh54
+         tx1w==
+X-Gm-Message-State: APjAAAVbpI7IvTeVq07+ce+7nGI3W5UQ8t32hBwt08QxYitjrmpWNxNE
+        kYUldnTCdUHLKDaKYhCnpNh/NtVeuVSGoYeewA==
+X-Google-Smtp-Source: APXvYqwixHg1VTVhSmZ4R9mVzrqNtcTqLjfOorSCCCguBwVHoJWibmMkhR76GWrHIqxpHwNaYAhpJcNugzxE6CzNWQQ=
+X-Received: by 2002:a19:2d44:: with SMTP id t4mr11211892lft.90.1552091867242;
+ Fri, 08 Mar 2019 16:37:47 -0800 (PST)
 MIME-Version: 1.0
-References: <20190219014343.29526-1-kdsouza@redhat.com> <CAH2r5musFyuqHofaeEtjd5ecK95x-60ByZ=Zi=fAXVLMXG=Y9Q@mail.gmail.com>
-In-Reply-To: <CAH2r5musFyuqHofaeEtjd5ecK95x-60ByZ=Zi=fAXVLMXG=Y9Q@mail.gmail.com>
+References: <20190221050925.17643-1-kdsouza@redhat.com>
+In-Reply-To: <20190221050925.17643-1-kdsouza@redhat.com>
 From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Fri, 8 Mar 2019 16:37:05 -0800
-Message-ID: <CAKywueQS75=MytRimPXnXusf6tRmGw539vxF-V-M_Zz9K+dzmg@mail.gmail.com>
-Subject: Re: [PATCH] getcifsacl: Do not go to parse_sec_desc if getxattr fails.
-To:     Steve French <smfrench@gmail.com>
-Cc:     "Kenneth D'souza" <kdsouza@redhat.com>,
-        CIFS <linux-cifs@vger.kernel.org>
+Date:   Fri, 8 Mar 2019 16:37:35 -0800
+Message-ID: <CAKywueTVMGC89Bc1v5V1WjA7Ys3CGzTcLxMvnsW-=CU=T3i-4w@mail.gmail.com>
+Subject: Re: [PATCH] getcifsacl: Improve help usage and add -h option.
+To:     "Kenneth D'souza" <kdsouza@redhat.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
@@ -67,44 +67,92 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D0=BF=D0=BD, 18 =D1=84=D0=B5=D0=B2=D1=80. 2019 =D0=B3. =D0=B2 20:40, Steve=
- French <smfrench@gmail.com>:
+=D1=81=D1=80, 20 =D1=84=D0=B5=D0=B2=D1=80. 2019 =D0=B3. =D0=B2 21:09, Kenne=
+th D'souza <kdsouza@redhat.com>:
 >
-> Reviewed-by: Steve French <stfrench@microsoft.com>
+> Call getcifsacl_usage only for -h and default case.
+> For others error out with appropriate message.
 >
-> On Mon, Feb 18, 2019 at 7:43 PM Kenneth D'souza <kdsouza@redhat.com> wrot=
-e:
-> >
-> > Add more to the error message by printing the filename and error.
-> >
-> > Signed-off-by: Kenneth D'souza <kdsouza@redhat.com>
-> > ---
-> >  getcifsacl.c | 7 ++++++-
-> >  1 file changed, 6 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/getcifsacl.c b/getcifsacl.c
-> > index f08cdea..7f6e673 100644
-> > --- a/getcifsacl.c
-> > +++ b/getcifsacl.c
-> > @@ -399,7 +399,12 @@ cifsacl:
-> >                         bufsize +=3D BUFSIZE;
-> >                         goto cifsacl;
-> >                 } else
-> > -                       printf("getxattr error: %d\n", errno);
-> > +               {
-> > +                       fprintf(stderr, "getxattr failed on %s: %s\n", =
-filename, strerror(errno) );
-> > +                       free(attrval);
-> > +                       ret =3D -1;
-> > +                       goto out;
-> > +               }
-> >         }
-> >
-> >         parse_sec_desc((struct cifs_ntsd *)attrval, attrlen, raw);
-> > --
-> > 2.20.1
-> >
-merged, thanks.
+> Signed-off-by: Kenneth D'souza <kdsouza@redhat.com>
+> ---
+>  getcifsacl.c | 30 ++++++++++++++++++++----------
+>  1 file changed, 20 insertions(+), 10 deletions(-)
+>
+> diff --git a/getcifsacl.c b/getcifsacl.c
+> index 7f6e673..850a252 100644
+> --- a/getcifsacl.c
+> +++ b/getcifsacl.c
+> @@ -40,6 +40,7 @@
+>
+>  static void *plugin_handle;
+>  static bool plugin_loaded;
+> +static char *execname;
+>
+>  static void
+>  print_each_ace_mask(uint32_t mask)
+> @@ -331,6 +332,8 @@ getcifsacl_usage(const char *prog)
+>                 prog);
+>         fprintf(stderr, "Usage: %s [option] <file_name>\n", prog);
+>         fprintf(stderr, "Valid options:\n");
+> +       fprintf(stderr, "\t-h   Display this help text\n");
+> +       fprintf(stderr, "\n");
+>         fprintf(stderr, "\t-v   Version of the program\n");
+>         fprintf(stderr, "\n");
+>         fprintf(stderr, "\t-r   Display raw values of the ACE fields\n");
+> @@ -345,8 +348,15 @@ main(const int argc, char *const argv[])
+>         ssize_t attrlen;
+>         size_t bufsize =3D BUFSIZE;
+>         char *filename, *attrval;
+> +       execname =3D basename(argv[0]);
+> +
+> +        if (argc < 2) {
+> +                fprintf(stderr, "%s: you must specify a filename.\n", ex=
+ecname);
+> +                printf("Try `getcifsacl -h' for more information.\n");
+> +                goto out;
+> +        }
+>
+> -       while ((c =3D getopt_long(argc, argv, "r:v", NULL, NULL)) !=3D -1=
+) {
+> +       while ((c =3D getopt_long(argc, argv, "rhv", NULL, NULL)) !=3D -1=
+) {
+>                 switch (c) {
+>                 case 'v':
+>                         printf("Version: %s\n", VERSION);
+> @@ -355,18 +365,18 @@ main(const int argc, char *const argv[])
+>                         raw =3D true;
+>                         break;
+>                 default:
+> -                       break;
+> +                       getcifsacl_usage(execname);
+> +                        goto out;
+> +
+>                 }
+>         }
+>
+> -       if (raw && argc =3D=3D 3)
+> -               filename =3D argv[2];
+> -       else if (argc =3D=3D 2)
+> -               filename =3D argv[1];
+> -       else {
+> -               getcifsacl_usage(basename(argv[0]));
+> -               goto out;
+> -       }
+> +        if (optind >=3D argc) {
+> +               printf("you must specify a filename after options.\n");
+> +               printf("Usage: getcifsacl [option] <file_name>\n");
+> +                goto out;
+> +        } else
+> +              filename=3D argv[optind];
+>
+>         if (!raw && !plugin_loaded) {
+>                 ret =3D init_plugin(&plugin_handle);
+> --
+> 2.20.1
+>
+
+fixed code style and merged, thanks.
+
 --
 Best regards,
 Pavel Shilovsky
