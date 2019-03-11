@@ -1,113 +1,215 @@
-Return-Path: <SRS0=aWno=RN=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=BRhE=RO=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86630C43381
-	for <linux-cifs@archiver.kernel.org>; Sun, 10 Mar 2019 02:32:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 881D3C43381
+	for <linux-cifs@archiver.kernel.org>; Mon, 11 Mar 2019 02:19:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4AA86206DF
-	for <linux-cifs@archiver.kernel.org>; Sun, 10 Mar 2019 02:32:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NDMqvD3S"
+	by mail.kernel.org (Postfix) with ESMTP id 50CD320652
+	for <linux-cifs@archiver.kernel.org>; Mon, 11 Mar 2019 02:19:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726703AbfCJCcE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 9 Mar 2019 21:32:04 -0500
-Received: from mail-pg1-f181.google.com ([209.85.215.181]:34226 "EHLO
-        mail-pg1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726699AbfCJCcE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 9 Mar 2019 21:32:04 -0500
-Received: by mail-pg1-f181.google.com with SMTP id u65so1274798pgc.1
-        for <linux-cifs@vger.kernel.org>; Sat, 09 Mar 2019 18:32:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=5kg9+rzmwy5Gcm8b9W/KQDkvLCJIlcU3ZQEplFCcKJk=;
-        b=NDMqvD3S24mFE4LCyiHeSCBtgwpnRpTLfansW4Rp9gC9pWwyHqvGtZqZq5+lAM15P6
-         ZpiqpnFXCO0DhWy0b6ZdEBDxd4Q/lFAPr8MVNBD/O40PaCxEiOFNW/PO1TKHxMhQuu8o
-         J8JVKw3wtiWaFoPZQg5ESe/MBBxYcoSC8EPh5YCMun314eny6uqKyBOgclhUbyyivaXt
-         ATz3KvZ1AIQRwTFp9/K6HHUbzkUtxHhDn59GauUqMUB+Ypj5NWYtGy8aYBh2Tzp8R0Gy
-         LnM7mwtiTUl8HVjA0HUSHHWQiWDPoAXv78+AUFDEWDFPamhHkCuCQ81kmn9FYS3EvS5v
-         7TYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=5kg9+rzmwy5Gcm8b9W/KQDkvLCJIlcU3ZQEplFCcKJk=;
-        b=n0NeEt6SEBnbSvbZQgI+E6hFZ33bdnI5IQVXFx32UEGwQDmIAwwl117lx9fv1gt6sZ
-         njRYV2NFa8zGSIEXceWF9dnN2jaeTaKwRHojPdhyQCJe3KyZQNxCY7u2602BcYS4Nldy
-         oFWIM7eGILNwdZEghckpoTkN69iiUi1K197rvpJixuqm1pEG1xbv3YjbgiRl28sIC6Qn
-         BenrykTZFAjRNozDYaexrJphHVA/3Vk23WJWguIMxAGjqoeEoGRXndJ9UmduvMt/S/g4
-         yATUo46BJAT3u5DgPuMury7skoFEuxOZjer0tZNrkTrijbx5l+BvaJ28GDJWI2qrKHFa
-         8Uhw==
-X-Gm-Message-State: APjAAAWUNuaAErGmqR4TbacQmG1XDowevFIkorS+tKxLQdgqPmXAT1Ka
-        w7f1lz+GPg/6mEIeqLzn/aoofpDc878oTisf2p+27A==
-X-Google-Smtp-Source: APXvYqzKuEPoc91QCEcoI60zYxeRWnIf0k7/bR6j6Dm82X5JKoi7RwM01S/PkgzSftlmSSqiu6aV8xlNFZam5olk2EY=
-X-Received: by 2002:a62:b2d9:: with SMTP id z86mr26514981pfl.255.1552185123087;
- Sat, 09 Mar 2019 18:32:03 -0800 (PST)
-MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 9 Mar 2019 20:31:51 -0600
-Message-ID: <CAH2r5msdRYgbuz_V5Rb+LGPXc-EweCusoDMePTQPz-fuguaSTA@mail.gmail.com>
-Subject: [PATCH] Add dynamic trace point for timeouts waiting for credits
-To:     CIFS <linux-cifs@vger.kernel.org>
-Cc:     Pavel Shilovsky <piastryyy@gmail.com>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>
-Content-Type: multipart/mixed; boundary="000000000000e345790583b442f1"
+        id S1727215AbfCKCTL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 10 Mar 2019 22:19:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34874 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727099AbfCKCTL (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Sun, 10 Mar 2019 22:19:11 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 06774882F5;
+        Mon, 11 Mar 2019 02:19:11 +0000 (UTC)
+Received: from test1135.test.redhat.com (vpn2-54-95.bne.redhat.com [10.64.54.95])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5AC80600CC;
+        Mon, 11 Mar 2019 02:19:10 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>,
+        Pavel Shilovsky <pshilov@microsoft.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>
+Subject: [PATCH 6/6] cifs: simplify how we handle credits in compond_send_recv()
+Date:   Mon, 11 Mar 2019 12:18:58 +1000
+Message-Id: <20190311021858.1504-1-lsahlber@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Mon, 11 Mar 2019 02:19:11 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000e345790583b442f1
-Content-Type: text/plain; charset="UTF-8"
+Since we can now wait for multiple requests atomically in
+wait_for_free_request() we can now greatly simplify the handling
+of the credits in this function.
 
+This fixes a potential deadlock where many concurrent compound requests
+could each have reserved 1 or 2 credits each but are all blocked
+waiting for the final credits they need to be able to issue the requests
+to the server.
+
+Set a default timeout of 60 seconds for compounded requests.
+
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+---
+ fs/cifs/transport.c | 110 ++++++++++++++++++----------------------------------
+ 1 file changed, 38 insertions(+), 72 deletions(-)
+
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 62c58ce80123..5539c5c8ed75 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -592,6 +592,31 @@ wait_for_free_request(struct TCP_Server_Info *server, const int flags,
+ 				     instance);
+ }
+ 
++static int
++wait_for_compound_request(struct TCP_Server_Info *server, int num,
++			  const int flags, unsigned int *instance)
++{
++	int *credits;
++
++	credits = server->ops->get_credits_field(server, flags & CIFS_OP_MASK);
++
++	spin_lock(&server->req_lock);
++	if (*credits < num) {
++		/*
++		 * Return immediately if not too many requests in flight since
++		 * we will likely be stuck on waiting for credits.
++		 */
++		if (server->in_flight < num - *credits) {
++			spin_unlock(&server->req_lock);
++			return -ENOTSUPP;
++		}
++	}
++	spin_unlock(&server->req_lock);
++
++	return wait_for_free_credits(server, num, 60000, flags,
++				     instance);
++}
++
+ int
+ cifs_wait_mtu_credits(struct TCP_Server_Info *server, unsigned int size,
+ 		      unsigned int *num, struct cifs_credits *credits)
+@@ -920,7 +945,6 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 		{ .value = 0, .instance = 0 }
+ 	};
+ 	unsigned int instance;
+-	unsigned int first_instance = 0;
+ 	char *buf;
+ 
+ 	optype = flags & CIFS_OP_MASK;
+@@ -936,80 +960,24 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 	if (ses->server->tcpStatus == CifsExiting)
+ 		return -ENOENT;
+ 
+-	spin_lock(&ses->server->req_lock);
+-	if (ses->server->credits < num_rqst) {
+-		/*
+-		 * Return immediately if not too many requests in flight since
+-		 * we will likely be stuck on waiting for credits.
+-		 */
+-		if (ses->server->in_flight < num_rqst - ses->server->credits) {
+-			spin_unlock(&ses->server->req_lock);
+-			return -ENOTSUPP;
+-		}
+-	} else {
+-		/* enough credits to send the whole compounded request */
+-		ses->server->credits -= num_rqst;
+-		ses->server->in_flight += num_rqst;
+-		first_instance = ses->server->reconnect_instance;
+-	}
+-	spin_unlock(&ses->server->req_lock);
+-
+-	if (first_instance) {
+-		cifs_dbg(FYI, "Acquired %d credits at once\n", num_rqst);
+-		for (i = 0; i < num_rqst; i++) {
+-			credits[i].value = 1;
+-			credits[i].instance = first_instance;
+-		}
+-		goto setup_rqsts;
+-	}
+-
+ 	/*
+-	 * There are not enough credits to send the whole compound request but
+-	 * there are requests in flight that may bring credits from the server.
++	 * Wait for all the requests to become available.
+ 	 * This approach still leaves the possibility to be stuck waiting for
+ 	 * credits if the server doesn't grant credits to the outstanding
+-	 * requests. This should be fixed by returning immediately and letting
+-	 * a caller fallback to sequential commands instead of compounding.
+-	 * Ensure we obtain 1 credit per request in the compound chain.
++	 * requests and if the client is completely idle, not generating any
++	 * other requests.
++	 * This can be handled by the eventual session reconnect.
+ 	 */
+-	for (i = 0; i < num_rqst; i++) {
+-		rc = wait_for_free_request(ses->server, flags, &instance);
+-
+-		if (rc == 0) {
+-			credits[i].value = 1;
+-			credits[i].instance = instance;
+-			/*
+-			 * All parts of the compound chain must get credits from
+-			 * the same session, otherwise we may end up using more
+-			 * credits than the server granted. If there were
+-			 * reconnects in between, return -EAGAIN and let callers
+-			 * handle it.
+-			 */
+-			if (i == 0)
+-				first_instance = instance;
+-			else if (first_instance != instance) {
+-				i++;
+-				rc = -EAGAIN;
+-			}
+-		}
++	rc = wait_for_compound_request(ses->server, num_rqst, flags,
++				       &instance);
++	if (rc)
++		return rc;
+ 
+-		if (rc) {
+-			/*
+-			 * We haven't sent an SMB packet to the server yet but
+-			 * we already obtained credits for i requests in the
+-			 * compound chain - need to return those credits back
+-			 * for future use. Note that we need to call add_credits
+-			 * multiple times to match the way we obtained credits
+-			 * in the first place and to account for in flight
+-			 * requests correctly.
+-			 */
+-			for (j = 0; j < i; j++)
+-				add_credits(ses->server, &credits[j], optype);
+-			return rc;
+-		}
++	for (i = 0; i < num_rqst; i++) {
++		credits[i].value = 1;
++		credits[i].instance = instance;
+ 	}
+ 
+-setup_rqsts:
+ 	/*
+ 	 * Make sure that we sign in the same order that we send on this socket
+ 	 * and avoid races inside tcp sendmsg code that could cause corruption
+@@ -1020,14 +988,12 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 
+ 	/*
+ 	 * All the parts of the compound chain belong obtained credits from the
+-	 * same session (see the appropriate checks above). In the same time
+-	 * there might be reconnects after those checks but before we acquired
+-	 * the srv_mutex. We can not use credits obtained from the previous
++	 * same session. We can not use credits obtained from the previous
+ 	 * session to send this request. Check if there were reconnects after
+ 	 * we obtained credits and return -EAGAIN in such cases to let callers
+ 	 * handle it.
+ 	 */
+-	if (first_instance != ses->server->reconnect_instance) {
++	if (instance != ses->server->reconnect_instance) {
+ 		mutex_unlock(&ses->server->srv_mutex);
+ 		for (j = 0; j < num_rqst; j++)
+ 			add_credits(ses->server, &credits[j], optype);
 -- 
-Thanks,
+2.13.6
 
-Steve
-
---000000000000e345790583b442f1
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-add-dynamic-tracepoint-for-timeout-waiting-for-.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-add-dynamic-tracepoint-for-timeout-waiting-for-.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_jt2axqw60>
-X-Attachment-Id: f_jt2axqw60
-
-RnJvbSAwNTUxZmU3YzY4MGY1YTNiYjMzYTVjMjhkOGY3MTNkZDU2MjQ2MmI5IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFNhdCwgOSBNYXIgMjAxOSAyMDoyOTo1NSAtMDYwMApTdWJqZWN0OiBbUEFUQ0hdIHNt
-YjM6IGFkZCBkeW5hbWljIHRyYWNlcG9pbnQgZm9yIHRpbWVvdXQgd2FpdGluZyBmb3IgY3JlZGl0
-cwoKVG8gaGVscCBkZWJ1ZyBjcmVkaXQgc3RhcnZhdGlvbiBwcm9ibGVtcyB3aGVyZSB3ZSB0aW1l
-b3V0CndhaXRpbmcgZm9yIHNlcnZlciB0byBncmFudCB0aGUgY2xpZW50IGNyZWRpdHMuCgpTaWdu
-ZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0tLQogZnMv
-Y2lmcy90cmFjZS5oICAgICB8IDEgKwogZnMvY2lmcy90cmFuc3BvcnQuYyB8IDUgKysrKysKIDIg
-ZmlsZXMgY2hhbmdlZCwgNiBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy90cmFj
-ZS5oIGIvZnMvY2lmcy90cmFjZS5oCmluZGV4IGQ4YjA0OWFmYTYwNi4uYzc4ZTk2YzRjYzUzIDEw
-MDY0NAotLS0gYS9mcy9jaWZzL3RyYWNlLmgKKysrIGIvZnMvY2lmcy90cmFjZS5oCkBAIC03MTMs
-NiArNzEzLDcgQEAgREVGSU5FX0VWRU5UKHNtYjNfY3JlZGl0X2NsYXNzLCBzbWIzXyMjbmFtZSwg
-IFwKIAlUUF9BUkdTKGN1cnJtaWQsIGhvc3RuYW1lLCBjcmVkaXRzKSkKIAogREVGSU5FX1NNQjNf
-Q1JFRElUX0VWRU5UKHJlY29ubmVjdF93aXRoX2ludmFsaWRfY3JlZGl0cyk7CitERUZJTkVfU01C
-M19DUkVESVRfRVZFTlQoY3JlZGl0X3RpbWVvdXQpOwogCiAjZW5kaWYgLyogX0NJRlNfVFJBQ0Vf
-SCAqLwogCmRpZmYgLS1naXQgYS9mcy9jaWZzL3RyYW5zcG9ydC5jIGIvZnMvY2lmcy90cmFuc3Bv
-cnQuYwppbmRleCBiM2QwNDAxODE5NWMuLjg3MzFjZmE2NjAyNiAxMDA2NDQKLS0tIGEvZnMvY2lm
-cy90cmFuc3BvcnQuYworKysgYi9mcy9jaWZzL3RyYW5zcG9ydC5jCkBAIC01MjcsNiArNTI3LDgg
-QEAgd2FpdF9mb3JfZnJlZV9jcmVkaXRzKHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciwg
-Y29uc3QgaW50IG51bV9jcmVkaXRzLAogCQkJCWhhc19jcmVkaXRzKHNlcnZlciwgY3JlZGl0cywg
-bnVtX2NyZWRpdHMpLCB0KTsKIAkJCWNpZnNfbnVtX3dhaXRlcnNfZGVjKHNlcnZlcik7CiAJCQlp
-ZiAoIXJjKSB7CisJCQkJdHJhY2Vfc21iM19jcmVkaXRfdGltZW91dChzZXJ2ZXItPkN1cnJlbnRN
-aWQsCisJCQkJCXNlcnZlci0+aG9zdG5hbWUsIG51bV9jcmVkaXRzKTsKIAkJCQljaWZzX2RiZyhW
-RlMsICJ3YWl0IHRpbWVkIG91dCBhZnRlciAlZCBtc1xuIiwKIAkJCQkJIHRpbWVvdXQpOwogCQkJ
-CXJldHVybiAtRU5PVFNVUFA7CkBAIC01NjUsNiArNTY3LDkgQEAgd2FpdF9mb3JfZnJlZV9jcmVk
-aXRzKHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciwgY29uc3QgaW50IG51bV9jcmVkaXRz
-LAogCQkJCQl0KTsKIAkJCQljaWZzX251bV93YWl0ZXJzX2RlYyhzZXJ2ZXIpOwogCQkJCWlmICgh
-cmMpIHsKKwkJCQkJdHJhY2Vfc21iM19jcmVkaXRfdGltZW91dCgKKwkJCQkJCXNlcnZlci0+Q3Vy
-cmVudE1pZCwKKwkJCQkJCXNlcnZlci0+aG9zdG5hbWUsIG51bV9jcmVkaXRzKTsKIAkJCQkJY2lm
-c19kYmcoVkZTLCAid2FpdCB0aW1lZCBvdXQgYWZ0ZXIgJWQgbXNcbiIsCiAJCQkJCQkgdGltZW91
-dCk7CiAJCQkJCXJldHVybiAtRU5PVFNVUFA7Ci0tIAoyLjE3LjEKCg==
---000000000000e345790583b442f1--
