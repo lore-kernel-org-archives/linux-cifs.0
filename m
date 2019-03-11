@@ -2,364 +2,73 @@ Return-Path: <SRS0=BRhE=RO=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D3DFC43381
-	for <linux-cifs@archiver.kernel.org>; Mon, 11 Mar 2019 15:39:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2E3AC43381
+	for <linux-cifs@archiver.kernel.org>; Mon, 11 Mar 2019 17:47:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 16E3821850
-	for <linux-cifs@archiver.kernel.org>; Mon, 11 Mar 2019 15:39:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A9CBE20643
+	for <linux-cifs@archiver.kernel.org>; Mon, 11 Mar 2019 17:47:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="so3lIAaC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SJHj9j4e"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727495AbfCKPjE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 11 Mar 2019 11:39:04 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:39147 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727153AbfCKPjE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 11 Mar 2019 11:39:04 -0400
-Received: by mail-pf1-f193.google.com with SMTP id i20so3962780pfo.6
-        for <linux-cifs@vger.kernel.org>; Mon, 11 Mar 2019 08:39:03 -0700 (PDT)
+        id S1727824AbfCKRrv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 11 Mar 2019 13:47:51 -0400
+Received: from mail-lf1-f45.google.com ([209.85.167.45]:32931 "EHLO
+        mail-lf1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726641AbfCKRru (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 11 Mar 2019 13:47:50 -0400
+Received: by mail-lf1-f45.google.com with SMTP id h71so4116035lfe.0
+        for <linux-cifs@vger.kernel.org>; Mon, 11 Mar 2019 10:47:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=33UccMYmm3PRM8uuGgfIzij34tIfikORruyXMgRFwy4=;
-        b=so3lIAaCcRoOb8tabtpZFYLkITUy7WevqZcAIVnjirELriJXKWLBlqICJfdCwS35+o
-         R0f2Hux3h2L/xpOFOIogPS2zycJ2q063GGMWAmfY79kKzT9lMmK0ppE7gu1W7EmnUw/2
-         1DnOsQFju5QIrrwcbsGgwHti/SnTbLxS+yKrX3UUdVN7saBA3I5gjsCnV65MUQrnUy53
-         9pbjeIziszRquvdIM/aFkY7IcUik1Yj1CuOUPn6x/2ho4Nv0hLKsO4DKdmZAY5LUjDR7
-         pvcLy6M8wOBHy3hokEjgW+l7ZFVKRPJlZvrV1oaYHWV7bJiO/r8HaEN2e2p3RdYgCZWZ
-         V19w==
+        bh=P7o6HTrzG5+qP+qhSGmkrYLSN/8H3VvVojbC6vYmxVU=;
+        b=SJHj9j4ex9byzJxwrA2cA/FMO8ULDEsQa6bx8Ea2gzjMncp5UMo3JF6YCqwWSI8B2k
+         l/ZIibTGKYwViJVCNae/Qjy3OlBpo297acFQGvx+/b9rBsoZHdyryxpwNJzTfSodUgDO
+         +SHmoKTJducfwHNXq4aYviekXjk0erLXpOms05Dm3dxV/eui0iq2ofot/VpReFQIKBdn
+         yMcFfFb4ophSWchmzhzZ7C73OBsU6sqDDcmkUMrhEKroESPCHrIkH9SoMHdFpVh8Amyb
+         TVnOexp3bBb1JNVYuBWqrfxQEGw+Bv+Y6PTeLh86pGo0JHkpUemcNtL2nh6ZL4mmR9nB
+         FEPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=33UccMYmm3PRM8uuGgfIzij34tIfikORruyXMgRFwy4=;
-        b=iB7ooLNnxs6LizhCeuKB18+eyUcilMXQzi65QKCr9s6FA00Sg57ueLuaJN3pICYMUu
-         59RWaFgJz+WffB2esuCCLJAZIeZ5lc/DOPYgZZKo2poMNhkArobGjmix7fmYzfGe7vEa
-         kaA95F+jilgoiHTOyKYS40OHNynRIrHUwJEC4/Z3glsbPiCaQ2v1Vv1iaZbKOJzDHZvk
-         Gbo452Mgf0Pi3Q9QqNSR9IkyOstL5rNFI+F12hH9K49fIp23CAYz9zNEVI1TQzhzEJvD
-         ceDpg9NdFaUo/xs1TQ9LAK2AEQfb/9CoKFFwvwlNajR5ZvbAAyMXrS1gBergbTjwvWLm
-         Y0ig==
-X-Gm-Message-State: APjAAAUO0oyUQJ7gt8OUUpVC2sdhMDZVqbFGqjqEAPR1/TKbgjGYXS+M
-        bj24/I3uqogr9VAx9vraJK2aifH/fK6/SG4bXZ0=
-X-Google-Smtp-Source: APXvYqy5hbnJfzYk/+ST4gn4nhcNpzo031gycFBVwJVLTH3so/pjAsbO/yGl0QsYFlA88lYIFCZxXW1knd3IUnsEKEQ=
-X-Received: by 2002:a63:2c50:: with SMTP id s77mr13477800pgs.440.1552318742953;
- Mon, 11 Mar 2019 08:39:02 -0700 (PDT)
+        bh=P7o6HTrzG5+qP+qhSGmkrYLSN/8H3VvVojbC6vYmxVU=;
+        b=ubXnyAIiQQOZu1cUYH71VFmYlmS0IHSHHBJM0OMDMX5vxQ1PAud1xuN7DydI+ZyY5T
+         dc7vk7sfwZuDVVLtzRFEzC+Hx+4KQXefmnMMCuqqhChzGFgGdpdpVJrcxXnAB058X+Bh
+         nmPd4pmHGc1LZqmJVHrG5mlpflMFNS5j8aA4pMMYWnKWvD7V+kyhpYo/SipeZEQqaDAq
+         iszE5H3GhekBNITm6okTJ8GqtxYhOWGn/yIsNcMVLbyvzKzmQRIgfqO0m95uBLN8t0dq
+         D3B+TmCyRIiMtDYxLaXKMcV9vcvN7gcmZdlNm3f0oQZKLMqiw8YtASYp5hOTm9OAUzet
+         oZ4g==
+X-Gm-Message-State: APjAAAWJAhr6i+tHLx0RZ7G/Cp5f11nsxa4qD4DVoqk+GY97ssd/SBiL
+        DaUTOfp+0i5AJQ0tN2Y+n6kJ/9DpqmBu5dthYGQQGFI=
+X-Google-Smtp-Source: APXvYqzACYJcu0qcCemA2WIDsSbD5EQDaCKKPuTHrmQBB6gtLCzx4uxdPCwN+BxG5OhHFMCVTT/GYfgLtB2aG59GguY=
+X-Received: by 2002:a19:960c:: with SMTP id y12mr2495325lfd.159.1552326468769;
+ Mon, 11 Mar 2019 10:47:48 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190311060025.9750-1-lsahlber@redhat.com> <20190311060025.9750-2-lsahlber@redhat.com>
- <CAN05THRzCvh-yq8Z3p2iearCtsr0O8gWQNJC804eZspZTcWwoQ@mail.gmail.com>
-In-Reply-To: <CAN05THRzCvh-yq8Z3p2iearCtsr0O8gWQNJC804eZspZTcWwoQ@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 11 Mar 2019 10:38:51 -0500
-Message-ID: <CAH2r5mvCf1+ec-6Cg3gB7MqDbDtD1xOeU_kgEU4yXyg3rXgkKg@mail.gmail.com>
-Subject: Re: [PATCH] cifs: cache FILE_ALL_INFO for the shared root handle
-To:     ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        Pavel Shilovsky <pshilov@microsoft.com>
+References: <CAH2r5msdRYgbuz_V5Rb+LGPXc-EweCusoDMePTQPz-fuguaSTA@mail.gmail.com>
+In-Reply-To: <CAH2r5msdRYgbuz_V5Rb+LGPXc-EweCusoDMePTQPz-fuguaSTA@mail.gmail.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Mon, 11 Mar 2019 10:47:37 -0700
+Message-ID: <CAKywueQ7ntS3UHicYeNwKOZ0Bdi1gXrrYvs8ETsuC5TVt7RYaA@mail.gmail.com>
+Subject: Re: [PATCH] Add dynamic trace point for timeouts waiting for credits
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Pavel and I had talked about adding tracing in smb2_compound_op for
-enter/exit since it allows more granularity (and with dynamic tracing,
-overhead is small).  Thoughts?
+Looks good.
 
-On Mon, Mar 11, 2019 at 7:02 AM ronnie sahlberg
-<ronniesahlberg@gmail.com> wrote:
->
-> As a followup discussion.
->
-> We do tracing in SMB2_open() but not in SMB2_open_init().  Perhaps we
-> should change this to do the actual tracing in SMB2_open_init()
-> instead and catch ALL places where we try to open a file.
-> Though, we don't actually have the result of the operation in
-> _open_init() which means we may need to reconsider how we trace these
-> things.
->
-> As we will likely switch more and more things to be compounds, maybe
-> we should not have tracing in SMB2_open() and have it trace
-> trace_smb3_open_err()
->
-> Maybe we should trace "smb2_init : constructing compound"
-> and have trace_smb3_compound_error()
->
->
-> We restructure the tracing to be focused around compounds instead of
-> individual PDUs.
-> I.e. tracing in all the _init() functions, then tracing in
-> compound_send_recv() for success/error.
->
-> Tracing success/error on pdu/compound level instead of individual
-> open/close/read/...  operations.
-> For individual non-compounded commands we can still treat these the
-> same. They are just trivial compounds of one single SMB2 PDU.
->
->
-> On Mon, Mar 11, 2019 at 4:01 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
-> >
-> > When we open the shared root handle also ask for FILE_ALL_INFORMATION since
-> > we can do this at zero cost as part of a compound.
-> > Cache this information as long as the lease is return and serve any
-> > future requests from cache.
-> >
-> > This allows us to serve "stat /<mountpoint>" directly from cache and avoid
-> > a network roundtrip.  Since clients ofthen need to do this quite a lot
-> > this improve performance slightly.
-> >
-> > As an example: xfstest generic/533 performs 43 stat operations on the root
-> > of the share while it is run. Which are eliminated with this patch.
-> >
-> > Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> > ---
-> >  fs/cifs/cifsglob.h  |   3 ++
-> >  fs/cifs/smb2inode.c |  15 ++++---
-> >  fs/cifs/smb2ops.c   | 111 +++++++++++++++++++++++++++++++++++++++++++---------
-> >  fs/cifs/smb2pdu.c   |  12 +++---
-> >  fs/cifs/smb2proto.h |   3 ++
-> >  5 files changed, 116 insertions(+), 28 deletions(-)
-> >
-> > diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> > index f293e052e351..b8360ca221eb 100644
-> > --- a/fs/cifs/cifsglob.h
-> > +++ b/fs/cifs/cifsglob.h
-> > @@ -962,11 +962,14 @@ cap_unix(struct cifs_ses *ses)
-> >
-> >  struct cached_fid {
-> >         bool is_valid:1;        /* Do we have a useable root fid */
-> > +       bool file_all_info_is_valid:1;
-> > +
-> >         struct kref refcount;
-> >         struct cifs_fid *fid;
-> >         struct mutex fid_mutex;
-> >         struct cifs_tcon *tcon;
-> >         struct work_struct lease_break;
-> > +       struct smb2_file_all_info file_all_info;
-> >  };
-> >
-> >  /*
-> > diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
-> > index 01a76bccdb8d..b6e07e2eed10 100644
-> > --- a/fs/cifs/smb2inode.c
-> > +++ b/fs/cifs/smb2inode.c
-> > @@ -309,12 +309,17 @@ smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
-> >                 rc = open_shroot(xid, tcon, &fid);
-> >                 if (rc)
-> >                         goto out;
-> > -               rc = SMB2_query_info(xid, tcon, fid.persistent_fid,
-> > -                                    fid.volatile_fid, smb2_data);
-> > +
-> > +               if (tcon->crfid.file_all_info_is_valid) {
-> > +                       move_smb2_info_to_cifs(data,
-> > +                                              &tcon->crfid.file_all_info);
-> > +               } else {
-> > +                       rc = SMB2_query_info(xid, tcon, fid.persistent_fid,
-> > +                                            fid.volatile_fid, smb2_data);
-> > +                       if (!rc)
-> > +                               move_smb2_info_to_cifs(data, smb2_data);
-> > +               }
-> >                 close_shroot(&tcon->crfid);
-> > -               if (rc)
-> > -                       goto out;
-> > -               move_smb2_info_to_cifs(data, smb2_data);
-> >                 goto out;
-> >         }
-> >
-> > diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> > index 085e91436da7..0d8bf87592ff 100644
-> > --- a/fs/cifs/smb2ops.c
-> > +++ b/fs/cifs/smb2ops.c
-> > @@ -619,6 +619,7 @@ smb2_close_cached_fid(struct kref *ref)
-> >                 SMB2_close(0, cfid->tcon, cfid->fid->persistent_fid,
-> >                            cfid->fid->volatile_fid);
-> >                 cfid->is_valid = false;
-> > +               cfid->file_all_info_is_valid = false;
-> >         }
-> >  }
-> >
-> > @@ -643,9 +644,18 @@ smb2_cached_lease_break(struct work_struct *work)
-> >   */
-> >  int open_shroot(unsigned int xid, struct cifs_tcon *tcon, struct cifs_fid *pfid)
-> >  {
-> > -       struct cifs_open_parms oparams;
-> > -       int rc;
-> > -       __le16 srch_path = 0; /* Null - since an open of top of share */
-> > +       struct cifs_ses *ses = tcon->ses;
-> > +       struct TCP_Server_Info *server = ses->server;
-> > +       struct cifs_open_parms oparms;
-> > +       struct smb2_create_rsp *o_rsp = NULL;
-> > +       struct smb2_query_info_rsp *qi_rsp = NULL;
-> > +       int resp_buftype[2];
-> > +       struct smb_rqst rqst[2];
-> > +       struct kvec rsp_iov[2];
-> > +       struct kvec open_iov[SMB2_CREATE_IOV_SIZE];
-> > +       struct kvec qi_iov[1];
-> > +       int rc, flags = 0;
-> > +       __le16 utf16_path = 0; /* Null - since an open of top of share */
-> >         u8 oplock = SMB2_OPLOCK_LEVEL_II;
-> >
-> >         mutex_lock(&tcon->crfid.fid_mutex);
-> > @@ -657,22 +667,87 @@ int open_shroot(unsigned int xid, struct cifs_tcon *tcon, struct cifs_fid *pfid)
-> >                 return 0;
-> >         }
-> >
-> > -       oparams.tcon = tcon;
-> > -       oparams.create_options = 0;
-> > -       oparams.desired_access = FILE_READ_ATTRIBUTES;
-> > -       oparams.disposition = FILE_OPEN;
-> > -       oparams.fid = pfid;
-> > -       oparams.reconnect = false;
-> > -
-> > -       rc = SMB2_open(xid, &oparams, &srch_path, &oplock, NULL, NULL, NULL);
-> > -       if (rc == 0) {
-> > -               memcpy(tcon->crfid.fid, pfid, sizeof(struct cifs_fid));
-> > -               tcon->crfid.tcon = tcon;
-> > -               tcon->crfid.is_valid = true;
-> > -               kref_init(&tcon->crfid.refcount);
-> > -               kref_get(&tcon->crfid.refcount);
-> > -       }
-> > +       if (smb3_encryption_required(tcon))
-> > +               flags |= CIFS_TRANSFORM_REQ;
-> > +
-> > +       memset(rqst, 0, sizeof(rqst));
-> > +       resp_buftype[0] = resp_buftype[1] = CIFS_NO_BUFFER;
-> > +       memset(rsp_iov, 0, sizeof(rsp_iov));
-> > +
-> > +       /* Open */
-> > +       memset(&open_iov, 0, sizeof(open_iov));
-> > +       rqst[0].rq_iov = open_iov;
-> > +       rqst[0].rq_nvec = SMB2_CREATE_IOV_SIZE;
-> > +
-> > +       oparms.tcon = tcon;
-> > +       oparms.create_options = 0;
-> > +       oparms.desired_access = FILE_READ_ATTRIBUTES;
-> > +       oparms.disposition = FILE_OPEN;
-> > +       oparms.fid = pfid;
-> > +       oparms.reconnect = false;
-> > +
-> > +       rc = SMB2_open_init(tcon, &rqst[0], &oplock, &oparms, &utf16_path);
-> > +       if (rc)
-> > +               goto oshr_exit;
-> > +       smb2_set_next_command(tcon, &rqst[0]);
-> > +
-> > +       memset(&qi_iov, 0, sizeof(qi_iov));
-> > +       rqst[1].rq_iov = qi_iov;
-> > +       rqst[1].rq_nvec = 1;
-> > +
-> > +       rc = SMB2_query_info_init(tcon, &rqst[1], COMPOUND_FID,
-> > +                                 COMPOUND_FID, FILE_ALL_INFORMATION,
-> > +                                 SMB2_O_INFO_FILE, 0,
-> > +                                 sizeof(struct smb2_file_all_info) +
-> > +                                 PATH_MAX * 2, 0, NULL);
-> > +       if (rc)
-> > +               goto oshr_exit;
-> > +
-> > +       smb2_set_related(&rqst[1]);
-> > +
-> > +       rc = compound_send_recv(xid, ses, flags, 2, rqst,
-> > +                               resp_buftype, rsp_iov);
-> > +       if (rc)
-> > +               goto oshr_exit;
-> > +
-> > +       o_rsp = (struct smb2_create_rsp *)rsp_iov[0].iov_base;
-> > +       oparms.fid->persistent_fid = o_rsp->PersistentFileId;
-> > +       oparms.fid->volatile_fid = o_rsp->VolatileFileId;
-> > +#ifdef CONFIG_CIFS_DEBUG2
-> > +       oparms.fid->mid = le64_to_cpu(o_rsp->sync_hdr.MessageId);
-> > +#endif /* CIFS_DEBUG2 */
-> > +
-> > +       if (o_rsp->OplockLevel == SMB2_OPLOCK_LEVEL_LEASE)
-> > +               oplock = smb2_parse_lease_state(server, o_rsp,
-> > +                                               &oparms.fid->epoch,
-> > +                                               oparms.fid->lease_key);
-> > +       else
-> > +               goto oshr_exit;
-> > +
-> > +
-> > +       memcpy(tcon->crfid.fid, pfid, sizeof(struct cifs_fid));
-> > +       tcon->crfid.tcon = tcon;
-> > +       tcon->crfid.is_valid = true;
-> > +       kref_init(&tcon->crfid.refcount);
-> > +       kref_get(&tcon->crfid.refcount);
-> > +
-> > +
-> > +       qi_rsp = (struct smb2_query_info_rsp *)rsp_iov[1].iov_base;
-> > +       rc = smb2_validate_and_copy_iov(
-> > +                               le16_to_cpu(qi_rsp->OutputBufferOffset),
-> > +                               le32_to_cpu(qi_rsp->OutputBufferLength),
-> > +                               &rsp_iov[1], sizeof(struct smb2_file_all_info),
-> > +                               (char *)&tcon->crfid.file_all_info);
-> > +       if (rc)
-> > +               goto oshr_exit;
-> > +       tcon->crfid.file_all_info_is_valid = 1;
-> > +
-> > + oshr_exit:
-> >         mutex_unlock(&tcon->crfid.fid_mutex);
-> > +       SMB2_open_free(&rqst[0]);
-> > +       SMB2_query_info_free(&rqst[1]);
-> > +       free_rsp_buf(resp_buftype[0], rsp_iov[0].iov_base);
-> > +       free_rsp_buf(resp_buftype[1], rsp_iov[1].iov_base);
-> >         return rc;
-> >  }
-> >
-> > diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> > index 60fbe306f604..cfe9fe41ccf5 100644
-> > --- a/fs/cifs/smb2pdu.c
-> > +++ b/fs/cifs/smb2pdu.c
-> > @@ -1797,9 +1797,10 @@ create_reconnect_durable_buf(struct cifs_fid *fid)
-> >         return buf;
-> >  }
-> >
-> > -static __u8
-> > -parse_lease_state(struct TCP_Server_Info *server, struct smb2_create_rsp *rsp,
-> > -                 unsigned int *epoch, char *lease_key)
-> > +__u8
-> > +smb2_parse_lease_state(struct TCP_Server_Info *server,
-> > +                      struct smb2_create_rsp *rsp,
-> > +                      unsigned int *epoch, char *lease_key)
-> >  {
-> >         char *data_offset;
-> >         struct create_context *cc;
-> > @@ -2456,8 +2457,9 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
-> >         }
-> >
-> >         if (rsp->OplockLevel == SMB2_OPLOCK_LEVEL_LEASE)
-> > -               *oplock = parse_lease_state(server, rsp, &oparms->fid->epoch,
-> > -                                           oparms->fid->lease_key);
-> > +               *oplock = smb2_parse_lease_state(server, rsp,
-> > +                                                &oparms->fid->epoch,
-> > +                                                oparms->fid->lease_key);
-> >         else
-> >                 *oplock = rsp->OplockLevel;
-> >  creat_exit:
-> > diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-> > index 87733b27a65f..72cc563c32fe 100644
-> > --- a/fs/cifs/smb2proto.h
-> > +++ b/fs/cifs/smb2proto.h
-> > @@ -223,6 +223,9 @@ extern int smb3_validate_negotiate(const unsigned int, struct cifs_tcon *);
-> >
-> >  extern enum securityEnum smb2_select_sectype(struct TCP_Server_Info *,
-> >                                         enum securityEnum);
-> > +extern __u8 smb2_parse_lease_state(struct TCP_Server_Info *server,
-> > +                                  struct smb2_create_rsp *rsp,
-> > +                                  unsigned int *epoch, char *lease_key);
-> >  extern int smb3_encryption_required(const struct cifs_tcon *tcon);
-> >  extern int smb2_validate_iov(unsigned int offset, unsigned int buffer_length,
-> >                              struct kvec *iov, unsigned int min_buf_size);
-> > --
-> > 2.13.6
-> >
-
-
-
--- 
-Thanks,
-
-Steve
+Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+--
+Best regards,
+Pavel Shilovsky
