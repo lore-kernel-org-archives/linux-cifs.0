@@ -7,282 +7,348 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47C28C43381
-	for <linux-cifs@archiver.kernel.org>; Mon, 11 Mar 2019 17:54:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD26FC43381
+	for <linux-cifs@archiver.kernel.org>; Mon, 11 Mar 2019 21:25:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 10D1220643
-	for <linux-cifs@archiver.kernel.org>; Mon, 11 Mar 2019 17:54:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 78B5E2087C
+	for <linux-cifs@archiver.kernel.org>; Mon, 11 Mar 2019 21:25:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bcfALYXG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oajtc2DA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726675AbfCKRyb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 11 Mar 2019 13:54:31 -0400
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:45731 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727050AbfCKRyb (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 11 Mar 2019 13:54:31 -0400
-Received: by mail-lj1-f193.google.com with SMTP id d24so4878554ljc.12
-        for <linux-cifs@vger.kernel.org>; Mon, 11 Mar 2019 10:54:29 -0700 (PDT)
+        id S1728008AbfCKVZT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 11 Mar 2019 17:25:19 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:34819 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727153AbfCKVZT (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 11 Mar 2019 17:25:19 -0400
+Received: by mail-pg1-f193.google.com with SMTP id e17so107551pgd.2
+        for <linux-cifs@vger.kernel.org>; Mon, 11 Mar 2019 14:25:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=DkxBIGE1rPw2gZFMwL37HlEPX8LfJNvZapAxZtZ/804=;
-        b=bcfALYXGkGMpeHeB8pikBB4D6i0V+hsBc9gEDArUHbOkh882PQ9CablntdEDc6pkMI
-         JkAM5S+74t02Zwz7OzhixyyrykumO7IVsic+tHH/JWVttn6V6SDvykBCmS+GE8lWX/JM
-         iEQ5HeginWI9gD4S54HrTIZtUDjLiaNebkX82atirJHTLsKoVkXgrNFzOA5d2d6NJEH5
-         l37IRAaLiKGXj6skqe83keiGU0tFm0xyJ2WQ9lsL/fq4Arzzk5XP3qKs8VHfMLvvOIyX
-         FT6sCFuR50ODtSw/ab2iSnc1ESInaxF1AyH7pyi4pV0XO50uFgyVpKytBcw49MrOnoJs
-         m2NA==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=gOYI4xaMiMRUJVRp0IyebQAT68sVblRTl/OQI1p/gMw=;
+        b=Oajtc2DAxCH6eq4RmP1X3LAoqyOeEVYpYTwPbk7jl6NKdKeJif9gPi6VkVdtJsr5S7
+         zg9LUx52xlhfNyqcnZnDkF5GeiN/16K891/EBqUv0YjVPusxFH4Qla9q6kP5RHcrRgln
+         QfcPDG59wWGJ0XZJZ/K8R3n/toxwU2Ej5MWFxQNzx+UNGHVoUZ8YsubW1kx9WTE7/6ya
+         aQNyGNz1CQl8HFqR3EWmxwU8JQxPCxCbeIdg9HJD59PLqF0o9dMwdUPwPSB7EFG1kxne
+         wpykCkbxx1+LLQPggRBaSC3MqxztMUDxEwWbsC3292OKzMgReFU77vwp/9DF7vtz4Tv1
+         QZ1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=DkxBIGE1rPw2gZFMwL37HlEPX8LfJNvZapAxZtZ/804=;
-        b=LVOKT/4PzAILkCed3QMzBlNk1l7HqFjRqaPjsdLdqXrrJ45cmPe4rMKuZgpYdcCd7q
-         5TFPHS2QGDqFWigLJyA/rneqv9E2p3TzMGbqwCQvX/mXhjZDDiT4xNJU+p8lGgWH8/Ab
-         pnz6JxvN/ViDj9rMN+JCBDpgUQ8uemqxXG0ftGrwC7We/wlrzte9Q5geuJKwOVR26vXo
-         i7icI6chYdNZtFGDwfBVgKbLbkEO6EKWhl4S1lOOnKeftehwXwpXnYZCTXbQ1fhyak1s
-         Jp/KP4KSohlSBgVSyKajggIR64KWxwyRl9oQJ3NOpMscHTGycBz8o+Hzu1CohLj3zQk6
-         gVmA==
-X-Gm-Message-State: APjAAAVJyheqGesV1Mm2MbF/t/JXJefpPAAbl8eyY2D3h0qeiuL24veo
-        odzwH09SRS+xvFZTlKnsP7OfxG6TG4wxk0ie8w==
-X-Google-Smtp-Source: APXvYqxvPegLaGyMzl3EBK/S9R4kNAcZoE7ZCkj+SnfJe8dSaeAWFIINjzpRiWdTQUtEsre/Jue4k4g/tbTeJTHPUbw=
-X-Received: by 2002:a2e:251:: with SMTP id 78mr17276574ljc.90.1552326868304;
- Mon, 11 Mar 2019 10:54:28 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=gOYI4xaMiMRUJVRp0IyebQAT68sVblRTl/OQI1p/gMw=;
+        b=F1hLaV7m9qnMQT/XUu84mFOGtUGQLnVV0ngJdWdZKLio+MiNN+07hQaCpanSUlMQGW
+         dkgQ5C3MzJHdyO5XUIzdBi8nOcA6YsJ7YhLdc1nEczjd6z46Lz9gg6M9yKkAM6hLXyVf
+         RtkeNHkDLSEPW55mrzGhQevy6gZ8/Y/oRY0UNL21gu3VrYMd8IIF0obBrSR5esg+hfDn
+         nTQFGVDKPsqJ7FZ4ErzwSQm7q9hrlpkdUA9CkG/JnhCBxEYmV+SVokZOKiKzROoRDfZd
+         pj1bCdNf9SXn6HxsFXcVRNJ6k80K5rcUpeh0b8+/YzKgszdQ2b2qySiARnWRT9c5thqj
+         PtTQ==
+X-Gm-Message-State: APjAAAWv6BErpFIhkd4Lt/ILcar1ZUmvggj5fWGyP54UNO+JUPGsT6rZ
+        jrK1uzHc/qeLxC5MPBoEocQXM9QFpePBKs43Wfmh9rTH
+X-Google-Smtp-Source: APXvYqzMVBChEeQ48yYH/heXqItKH3OVSbrTRPstiS9NXjFoqWMToujP83R6q+jCTZGk+1qxKXGHg8xG2acDuvfmQHk=
+X-Received: by 2002:a62:b2d9:: with SMTP id z86mr35262130pfl.255.1552339516046;
+ Mon, 11 Mar 2019 14:25:16 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190311021858.1504-1-lsahlber@redhat.com>
-In-Reply-To: <20190311021858.1504-1-lsahlber@redhat.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Mon, 11 Mar 2019 10:54:16 -0700
-Message-ID: <CAKywueTds6bYqYMTC_LpzfBRJ0sh6+r5kKZJk9EYMKF+3O7g2Q@mail.gmail.com>
-Subject: Re: [PATCH 6/6] cifs: simplify how we handle credits in compond_send_recv()
-To:     Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Steve French <smfrench@gmail.com>,
-        Pavel Shilovsky <pshilov@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From:   Steve French <smfrench@gmail.com>
+Date:   Mon, 11 Mar 2019 16:25:04 -0500
+Message-ID: <CAH2r5muY3xgVW03Mi8N-c4wyZFikzTeZgLDEuGLoXFXNZ-wFHA@mail.gmail.com>
+Subject: [PATCH][SMB3] Add various dynamic tracepoints for compounded operations
+To:     CIFS <linux-cifs@vger.kernel.org>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Pavel Shilovsky <piastryyy@gmail.com>
+Content-Type: multipart/mixed; boundary="0000000000006ce8070583d835e9"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D0=B2=D1=81, 10 =D0=BC=D0=B0=D1=80. 2019 =D0=B3. =D0=B2 20:20, Ronnie Sahl=
-berg <lsahlber@redhat.com>:
->
-> Since we can now wait for multiple requests atomically in
-> wait_for_free_request() we can now greatly simplify the handling
-> of the credits in this function.
->
-> This fixes a potential deadlock where many concurrent compound requests
-> could each have reserved 1 or 2 credits each but are all blocked
-> waiting for the final credits they need to be able to issue the requests
-> to the server.
->
-> Set a default timeout of 60 seconds for compounded requests.
->
-> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> ---
->  fs/cifs/transport.c | 110 ++++++++++++++++++----------------------------=
-------
->  1 file changed, 38 insertions(+), 72 deletions(-)
->
-> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> index 62c58ce80123..5539c5c8ed75 100644
-> --- a/fs/cifs/transport.c
-> +++ b/fs/cifs/transport.c
-> @@ -592,6 +592,31 @@ wait_for_free_request(struct TCP_Server_Info *server=
-, const int flags,
->                                      instance);
->  }
->
-> +static int
-> +wait_for_compound_request(struct TCP_Server_Info *server, int num,
-> +                         const int flags, unsigned int *instance)
-> +{
-> +       int *credits;
-> +
-> +       credits =3D server->ops->get_credits_field(server, flags & CIFS_O=
-P_MASK);
-> +
-> +       spin_lock(&server->req_lock);
-> +       if (*credits < num) {
-> +               /*
-> +                * Return immediately if not too many requests in flight =
-since
-> +                * we will likely be stuck on waiting for credits.
-> +                */
-> +               if (server->in_flight < num - *credits) {
-> +                       spin_unlock(&server->req_lock);
-> +                       return -ENOTSUPP;
-> +               }
-> +       }
-> +       spin_unlock(&server->req_lock);
-> +
-> +       return wait_for_free_credits(server, num, 60000, flags,
-> +                                    instance);
-> +}
-> +
->  int
->  cifs_wait_mtu_credits(struct TCP_Server_Info *server, unsigned int size,
->                       unsigned int *num, struct cifs_credits *credits)
-> @@ -920,7 +945,6 @@ compound_send_recv(const unsigned int xid, struct cif=
-s_ses *ses,
->                 { .value =3D 0, .instance =3D 0 }
->         };
->         unsigned int instance;
-> -       unsigned int first_instance =3D 0;
->         char *buf;
->
->         optype =3D flags & CIFS_OP_MASK;
-> @@ -936,80 +960,24 @@ compound_send_recv(const unsigned int xid, struct c=
-ifs_ses *ses,
->         if (ses->server->tcpStatus =3D=3D CifsExiting)
->                 return -ENOENT;
->
-> -       spin_lock(&ses->server->req_lock);
-> -       if (ses->server->credits < num_rqst) {
-> -               /*
-> -                * Return immediately if not too many requests in flight =
-since
-> -                * we will likely be stuck on waiting for credits.
-> -                */
-> -               if (ses->server->in_flight < num_rqst - ses->server->cred=
-its) {
-> -                       spin_unlock(&ses->server->req_lock);
-> -                       return -ENOTSUPP;
-> -               }
-> -       } else {
-> -               /* enough credits to send the whole compounded request */
-> -               ses->server->credits -=3D num_rqst;
-> -               ses->server->in_flight +=3D num_rqst;
-> -               first_instance =3D ses->server->reconnect_instance;
-> -       }
-> -       spin_unlock(&ses->server->req_lock);
-> -
-> -       if (first_instance) {
-> -               cifs_dbg(FYI, "Acquired %d credits at once\n", num_rqst);
-> -               for (i =3D 0; i < num_rqst; i++) {
-> -                       credits[i].value =3D 1;
-> -                       credits[i].instance =3D first_instance;
-> -               }
-> -               goto setup_rqsts;
-> -       }
-> -
->         /*
-> -        * There are not enough credits to send the whole compound reques=
-t but
-> -        * there are requests in flight that may bring credits from the s=
-erver.
-> +        * Wait for all the requests to become available.
->          * This approach still leaves the possibility to be stuck waiting=
- for
->          * credits if the server doesn't grant credits to the outstanding
-> -        * requests. This should be fixed by returning immediately and le=
-tting
-> -        * a caller fallback to sequential commands instead of compoundin=
-g.
-> -        * Ensure we obtain 1 credit per request in the compound chain.
-> +        * requests and if the client is completely idle, not generating =
-any
-> +        * other requests.
-> +        * This can be handled by the eventual session reconnect.
->          */
-> -       for (i =3D 0; i < num_rqst; i++) {
-> -               rc =3D wait_for_free_request(ses->server, flags, &instanc=
-e);
-> -
-> -               if (rc =3D=3D 0) {
-> -                       credits[i].value =3D 1;
-> -                       credits[i].instance =3D instance;
-> -                       /*
-> -                        * All parts of the compound chain must get credi=
-ts from
-> -                        * the same session, otherwise we may end up usin=
-g more
-> -                        * credits than the server granted. If there were
-> -                        * reconnects in between, return -EAGAIN and let =
-callers
-> -                        * handle it.
-> -                        */
-> -                       if (i =3D=3D 0)
-> -                               first_instance =3D instance;
-> -                       else if (first_instance !=3D instance) {
-> -                               i++;
-> -                               rc =3D -EAGAIN;
-> -                       }
-> -               }
-> +       rc =3D wait_for_compound_request(ses->server, num_rqst, flags,
-> +                                      &instance);
-> +       if (rc)
-> +               return rc;
->
-> -               if (rc) {
-> -                       /*
-> -                        * We haven't sent an SMB packet to the server ye=
-t but
-> -                        * we already obtained credits for i requests in =
-the
-> -                        * compound chain - need to return those credits =
-back
-> -                        * for future use. Note that we need to call add_=
-credits
-> -                        * multiple times to match the way we obtained cr=
-edits
-> -                        * in the first place and to account for in fligh=
-t
-> -                        * requests correctly.
-> -                        */
-> -                       for (j =3D 0; j < i; j++)
-> -                               add_credits(ses->server, &credits[j], opt=
-ype);
-> -                       return rc;
-> -               }
-> +       for (i =3D 0; i < num_rqst; i++) {
-> +               credits[i].value =3D 1;
-> +               credits[i].instance =3D instance;
->         }
->
-> -setup_rqsts:
->         /*
->          * Make sure that we sign in the same order that we send on this =
-socket
->          * and avoid races inside tcp sendmsg code that could cause corru=
-ption
-> @@ -1020,14 +988,12 @@ compound_send_recv(const unsigned int xid, struct =
-cifs_ses *ses,
->
->         /*
->          * All the parts of the compound chain belong obtained credits fr=
-om the
-> -        * same session (see the appropriate checks above). In the same t=
-ime
-> -        * there might be reconnects after those checks but before we acq=
-uired
-> -        * the srv_mutex. We can not use credits obtained from the previo=
-us
-> +        * same session. We can not use credits obtained from the previou=
-s
->          * session to send this request. Check if there were reconnects a=
-fter
->          * we obtained credits and return -EAGAIN in such cases to let ca=
-llers
->          * handle it.
->          */
-> -       if (first_instance !=3D ses->server->reconnect_instance) {
-> +       if (instance !=3D ses->server->reconnect_instance) {
->                 mutex_unlock(&ses->server->srv_mutex);
->                 for (j =3D 0; j < num_rqst; j++)
->                         add_credits(ses->server, &credits[j], optype);
-> --
-> 2.13.6
->
+--0000000000006ce8070583d835e9
+Content-Type: text/plain; charset="UTF-8"
 
-Thanks for fixing it!
+Sample output from tracing various newly added dynamic trace points
+(with this patch)
 
-Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+(trace-cmd  record -e *query_info_co* -e smb3_hardlink* -e
+smb3_rename* -e smb3_set_eof* -e smb3_set_info_co* -e smb3_mkdir* -e
+smb3_delete*)
 
---
-Best regards,
-Pavel Shilovsky
+# entries-in-buffer/entries-written: 44/44   #P:8
+#
+#                              _-----=> irqs-off
+#                             / _----=> need-resched
+#                            | / _---=> hardirq/softirq
+#                            || / _--=> preempt-depth
+#                            ||| /     delay
+#           TASK-PID   CPU#  ||||    TIMESTAMP  FUNCTION
+#              | |       |   ||||       |         |
+     gvfsd-trash-2224  [004] .... 333095.401381:
+smb3_query_info_compound_enter: xid=5 sid=0xbb2583e9 tid=0xe7ab49dc
+     gvfsd-trash-2224  [002] .... 333095.402056:
+smb3_query_info_compound_err: xid=5 sid=0xbb2583e9 tid=0xe7ab49dc
+rc=-2
+     gvfsd-trash-2224  [002] .... 333095.402189:
+smb3_query_info_compound_enter: xid=6 sid=0xbb2583e9 tid=0xe7ab49dc
+     gvfsd-trash-2224  [002] .... 333095.402688:
+smb3_query_info_compound_err: xid=6 sid=0xbb2583e9 tid=0xe7ab49dc
+rc=-2
+           mkdir-16324 [002] .... 333123.559043:
+smb3_query_info_compound_enter: xid=7 sid=0xbb2583e9 tid=0xe7ab49dc
+           mkdir-16324 [003] .... 333123.559654:
+smb3_query_info_compound_err: xid=7 sid=0xbb2583e9 tid=0xe7ab49dc
+rc=-2
+           mkdir-16324 [003] .... 333123.559673: smb3_mkdir_enter:
+xid=8 sid=0xbb2583e9 tid=0xe7ab49dc
+           mkdir-16324 [003] .... 333123.560748: smb3_mkdir_done:
+xid=8 sid=0xbb2583e9 tid=0xe7ab49dc
+           mkdir-16324 [003] .... 333123.560763:
+smb3_query_info_compound_enter: xid=8 sid=0xbb2583e9 tid=0xe7ab49dc
+           mkdir-16324 [003] .... 333123.561516:
+smb3_query_info_compound_done: xid=8 sid=0xbb2583e9 tid=0xe7ab49dc
+           mkdir-16325 [002] .... 333126.841897:
+smb3_query_info_compound_enter: xid=9 sid=0xbb2583e9 tid=0xe7ab49dc
+           mkdir-16325 [003] .... 333126.842580:
+smb3_query_info_compound_err: xid=9 sid=0xbb2583e9 tid=0xe7ab49dc
+rc=-2
+           mkdir-16325 [003] .... 333126.842601: smb3_mkdir_enter:
+xid=10 sid=0xbb2583e9 tid=0xe7ab49dc
+           mkdir-16325 [003] .... 333126.843513: smb3_mkdir_done:
+xid=10 sid=0xbb2583e9 tid=0xe7ab49dc
+           mkdir-16325 [003] .... 333126.843529:
+smb3_query_info_compound_enter: xid=10 sid=0xbb2583e9 tid=0xe7ab49dc
+           mkdir-16325 [003] .... 333126.844251:
+smb3_query_info_compound_done: xid=10 sid=0xbb2583e9 tid=0xe7ab49dc
+           mkdir-16326 [000] .... 333129.858413:
+smb3_query_info_compound_enter: xid=11 sid=0xbb2583e9 tid=0xe7ab49dc
+           mkdir-16326 [000] .... 333129.859193:
+smb3_query_info_compound_done: xid=11 sid=0xbb2583e9 tid=0xe7ab49dc
+           rmdir-16328 [007] .... 333138.828049:
+smb3_query_info_compound_enter: xid=12 sid=0xbb2583e9 tid=0xe7ab49dc
+           rmdir-16328 [007] .... 333138.828827:
+smb3_query_info_compound_done: xid=12 sid=0xbb2583e9 tid=0xe7ab49dc
+           rmdir-16329 [006] .... 333141.388154:
+smb3_query_info_compound_enter: xid=14 sid=0xbb2583e9 tid=0xe7ab49dc
+           rmdir-16329 [006] .... 333141.388813:
+smb3_query_info_compound_err: xid=14 sid=0xbb2583e9 tid=0xe7ab49dc
+rc=-2
+              rm-16340 [006] .... 333157.935975:
+smb3_query_info_compound_enter: xid=15 sid=0xbb2583e9 tid=0xe7ab49dc
+              rm-16340 [006] .... 333157.936607:
+smb3_query_info_compound_err: xid=15 sid=0xbb2583e9 tid=0xe7ab49dc
+rc=-2
+              rm-16340 [006] .... 333157.936652:
+smb3_query_info_compound_enter: xid=16 sid=0xbb2583e9 tid=0xe7ab49dc
+              rm-16340 [006] .... 333157.937146:
+smb3_query_info_compound_err: xid=16 sid=0xbb2583e9 tid=0xe7ab49dc
+rc=-2
+           touch-16349 [005] .... 333184.932302:
+smb3_set_info_compound_enter: xid=18 sid=0xbb2583e9 tid=0xe7ab49dc
+           touch-16349 [005] .... 333184.938303:
+smb3_set_info_compound_done: xid=18 sid=0xbb2583e9 tid=0xe7ab49dc
+              rm-16350 [003] .... 333187.920309:
+smb3_query_info_compound_enter: xid=20 sid=0xbb2583e9 tid=0xe7ab49dc
+              rm-16350 [003] .... 333187.920999:
+smb3_query_info_compound_done: xid=20 sid=0xbb2583e9 tid=0xe7ab49dc
+              rm-16350 [003] .... 333187.921043: smb3_delete_enter:
+xid=21 sid=0xbb2583e9 tid=0xe7ab49dc
+              rm-16350 [003] .... 333187.921870: smb3_delete_done:
+xid=21 sid=0xbb2583e9 tid=0xe7ab49dc
+           touch-16361 [005] .... 333237.447252:
+smb3_set_info_compound_enter: xid=23 sid=0xbb2583e9 tid=0xe7ab49dc
+           touch-16361 [005] .... 333237.448044:
+smb3_set_info_compound_done: xid=23 sid=0xbb2583e9 tid=0xe7ab49dc
+              ln-16366 [000] .... 333250.734035:
+smb3_query_info_compound_enter: xid=25 sid=0xbb2583e9 tid=0xe7ab49dc
+              ln-16366 [001] .... 333250.734689:
+smb3_query_info_compound_err: xid=25 sid=0xbb2583e9 tid=0xe7ab49dc
+rc=-2
+              ln-16366 [001] .... 333250.734735:
+smb3_query_info_compound_enter: xid=26 sid=0xbb2583e9 tid=0xe7ab49dc
+              ln-16366 [001] .... 333250.735368:
+smb3_query_info_compound_done: xid=26 sid=0xbb2583e9 tid=0xe7ab49dc
+              ln-16366 [001] .... 333250.735413:
+smb3_query_info_compound_enter: xid=27 sid=0xbb2583e9 tid=0xe7ab49dc
+              ln-16366 [001] .... 333250.735947:
+smb3_query_info_compound_err: xid=27 sid=0xbb2583e9 tid=0xe7ab49dc
+rc=-2
+              ln-16366 [001] .... 333250.735973: smb3_hardlink_enter:
+xid=28 sid=0xbb2583e9 tid=0xe7ab49dc
+              ln-16366 [001] .... 333250.736679: smb3_hardlink_done:
+xid=28 sid=0xbb2583e9 tid=0xe7ab49dc
+           gmain-2225  [000] .... 333250.736855:
+smb3_query_info_compound_enter: xid=29 sid=0xbb2583e9 tid=0xe7ab49dc
+           gmain-2225  [001] .... 333250.737527:
+smb3_query_info_compound_done: xid=29 sid=0xbb2583e9 tid=0xe7ab49dc
+
+
+-- 
+Thanks,
+
+Steve
+
+--0000000000006ce8070583d835e9
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smb3-Add-dynamic-trace-points-for-various-compounded.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-Add-dynamic-trace-points-for-various-compounded.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_jt4uuppu0>
+X-Attachment-Id: f_jt4uuppu0
+
+RnJvbSBhYjdkYmZiZWZlMDZmNTFiMGZlOWE1ZWRiZGFiOTM0NjliYzg5NmYxIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IE1vbiwgMTEgTWFyIDIwMTkgMTY6MjA6MTcgLTA1MDAKU3ViamVjdDogW1BBVENIXSBb
+c21iM10gQWRkIGR5bmFtaWMgdHJhY2UgcG9pbnRzIGZvciB2YXJpb3VzIGNvbXBvdW5kZWQgc21i
+Mwogb3BzCgpBZGRzIHRyYWNlIHBvaW50cyBmb3IgZW50ZXIgYW5kIGV4aXQgKGRvbmUgdnMuIGVy
+cm9yKSBmb3I6Cgpjb21wb3VuZGVkIHF1ZXJ5IGFuZCBzZXRpbmZvLCBoYXJkbGluaywgcmVuYW1l
+LCBta2Rpciwgcm1kaXIsCnNldF9lb2YsIGRlbGV0ZSAodW5saW5rKQoKU2lnbmVkLW9mZi1ieTog
+U3RldmUgRnJlbmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL2NpZnMvc21iMmlu
+b2RlLmMgfCA3MSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0KIGZzL2Np
+ZnMvdHJhY2UuaCAgICAgfCA4MiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysKIDIgZmlsZXMgY2hhbmdlZCwgMTQ4IGluc2VydGlvbnMoKyksIDUgZGVsZXRpb25z
+KC0pCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9zbWIyaW5vZGUuYyBiL2ZzL2NpZnMvc21iMmlub2Rl
+LmMKaW5kZXggMDFhNzZiY2NkYjhkLi5mM2RlYjU5NjI1YzAgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMv
+c21iMmlub2RlLmMKKysrIGIvZnMvY2lmcy9zbWIyaW5vZGUuYwpAQCAtMzcsNiArMzcsMTYgQEAK
+ICNpbmNsdWRlICJzbWIycGR1LmgiCiAjaW5jbHVkZSAic21iMnByb3RvLmgiCiAKK3N0YXRpYyB2
+b2lkCitmcmVlX3NldF9pbmZfY29tcG91bmQoc3RydWN0IHNtYl9ycXN0ICpycXN0KQoreworCWlm
+IChycXN0WzFdLnJxX2lvdikKKwkJU01CMl9zZXRfaW5mb19mcmVlKCZycXN0WzFdKTsKKwlpZiAo
+cnFzdFsyXS5ycV9pb3YpCisJCVNNQjJfY2xvc2VfZnJlZSgmcnFzdFsyXSk7Cit9CisKKwogc3Rh
+dGljIGludAogc21iMl9jb21wb3VuZF9vcChjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1Y3Qg
+Y2lmc190Y29uICp0Y29uLAogCQkgc3RydWN0IGNpZnNfc2JfaW5mbyAqY2lmc19zYiwgY29uc3Qg
+Y2hhciAqZnVsbF9wYXRoLApAQCAtMTA0LDcgKzExNCw2IEBAIHNtYjJfY29tcG91bmRfb3AoY29u
+c3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGNpZnNfdGNvbiAqdGNvbiwKIAkJbWVtc2V0KCZx
+aV9pb3YsIDAsIHNpemVvZihxaV9pb3YpKTsKIAkJcnFzdFtudW1fcnFzdF0ucnFfaW92ID0gcWlf
+aW92OwogCQlycXN0W251bV9ycXN0XS5ycV9udmVjID0gMTsKLQogCQlyYyA9IFNNQjJfcXVlcnlf
+aW5mb19pbml0KHRjb24sICZycXN0W251bV9ycXN0XSwgQ09NUE9VTkRfRklELAogCQkJCUNPTVBP
+VU5EX0ZJRCwgRklMRV9BTExfSU5GT1JNQVRJT04sCiAJCQkJU01CMl9PX0lORk9fRklMRSwgMCwK
+QEAgLTExMiwxNCArMTIxLDE3IEBAIHNtYjJfY29tcG91bmRfb3AoY29uc3QgdW5zaWduZWQgaW50
+IHhpZCwgc3RydWN0IGNpZnNfdGNvbiAqdGNvbiwKIAkJCQkJICBQQVRIX01BWCAqIDIsIDAsIE5V
+TEwpOwogCQlzbWIyX3NldF9uZXh0X2NvbW1hbmQodGNvbiwgJnJxc3RbbnVtX3Jxc3RdKTsKIAkJ
+c21iMl9zZXRfcmVsYXRlZCgmcnFzdFtudW1fcnFzdCsrXSk7CisJCXRyYWNlX3NtYjNfcXVlcnlf
+aW5mb19jb21wb3VuZF9lbnRlcih4aWQsIHNlcy0+U3VpZCwgdGNvbi0+dGlkKTsKIAkJYnJlYWs7
+CiAJY2FzZSBTTUIyX09QX0RFTEVURToKKwkJdHJhY2Vfc21iM19kZWxldGVfZW50ZXIoeGlkLCBz
+ZXMtPlN1aWQsIHRjb24tPnRpZCk7CiAJCWJyZWFrOwogCWNhc2UgU01CMl9PUF9NS0RJUjoKIAkJ
+LyoKIAkJICogRGlyZWN0b3JpZXMgYXJlIGNyZWF0ZWQgdGhyb3VnaCBwYXJhbWV0ZXJzIGluIHRo
+ZQogCQkgKiBTTUIyX29wZW4oKSBjYWxsLgogCQkgKi8KKwkJdHJhY2Vfc21iM19ta2Rpcl9lbnRl
+cih4aWQsIHNlcy0+U3VpZCwgdGNvbi0+dGlkKTsKIAkJYnJlYWs7CiAJY2FzZSBTTUIyX09QX1JN
+RElSOgogCQltZW1zZXQoJnNpX2lvdiwgMCwgc2l6ZW9mKHNpX2lvdikpOwpAQCAtMTM1LDYgKzE0
+Nyw3IEBAIHNtYjJfY29tcG91bmRfb3AoY29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGNp
+ZnNfdGNvbiAqdGNvbiwKIAkJCQkJU01CMl9PX0lORk9fRklMRSwgMCwgZGF0YSwgc2l6ZSk7CiAJ
+CXNtYjJfc2V0X25leHRfY29tbWFuZCh0Y29uLCAmcnFzdFtudW1fcnFzdF0pOwogCQlzbWIyX3Nl
+dF9yZWxhdGVkKCZycXN0W251bV9ycXN0KytdKTsKKwkJdHJhY2Vfc21iM19ybWRpcl9lbnRlcih4
+aWQsIHNlcy0+U3VpZCwgdGNvbi0+dGlkKTsKIAkJYnJlYWs7CiAJY2FzZSBTTUIyX09QX1NFVF9F
+T0Y6CiAJCW1lbXNldCgmc2lfaW92LCAwLCBzaXplb2Yoc2lfaW92KSk7CkBAIC0xNTAsNiArMTYz
+LDcgQEAgc21iMl9jb21wb3VuZF9vcChjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1Y3QgY2lm
+c190Y29uICp0Y29uLAogCQkJCQlTTUIyX09fSU5GT19GSUxFLCAwLCBkYXRhLCBzaXplKTsKIAkJ
+c21iMl9zZXRfbmV4dF9jb21tYW5kKHRjb24sICZycXN0W251bV9ycXN0XSk7CiAJCXNtYjJfc2V0
+X3JlbGF0ZWQoJnJxc3RbbnVtX3Jxc3QrK10pOworCQl0cmFjZV9zbWIzX3NldF9lb2ZfZW50ZXIo
+eGlkLCBzZXMtPlN1aWQsIHRjb24tPnRpZCk7CiAJCWJyZWFrOwogCWNhc2UgU01CMl9PUF9TRVRf
+SU5GTzoKIAkJbWVtc2V0KCZzaV9pb3YsIDAsIHNpemVvZihzaV9pb3YpKTsKQEAgLTE2Niw2ICsx
+ODAsNyBAQCBzbWIyX2NvbXBvdW5kX29wKGNvbnN0IHVuc2lnbmVkIGludCB4aWQsIHN0cnVjdCBj
+aWZzX3Rjb24gKnRjb24sCiAJCQkJCVNNQjJfT19JTkZPX0ZJTEUsIDAsIGRhdGEsIHNpemUpOwog
+CQlzbWIyX3NldF9uZXh0X2NvbW1hbmQodGNvbiwgJnJxc3RbbnVtX3Jxc3RdKTsKIAkJc21iMl9z
+ZXRfcmVsYXRlZCgmcnFzdFtudW1fcnFzdCsrXSk7CisJCXRyYWNlX3NtYjNfc2V0X2luZm9fY29t
+cG91bmRfZW50ZXIoeGlkLCBzZXMtPlN1aWQsIHRjb24tPnRpZCk7CiAJCWJyZWFrOwogCWNhc2Ug
+U01CMl9PUF9SRU5BTUU6CiAJCW1lbXNldCgmc2lfaW92LCAwLCBzaXplb2Yoc2lfaW92KSk7CkBA
+IC0xOTAsNiArMjA1LDcgQEAgc21iMl9jb21wb3VuZF9vcChjb25zdCB1bnNpZ25lZCBpbnQgeGlk
+LCBzdHJ1Y3QgY2lmc190Y29uICp0Y29uLAogCQkJCQlTTUIyX09fSU5GT19GSUxFLCAwLCBkYXRh
+LCBzaXplKTsKIAkJc21iMl9zZXRfbmV4dF9jb21tYW5kKHRjb24sICZycXN0W251bV9ycXN0XSk7
+CiAJCXNtYjJfc2V0X3JlbGF0ZWQoJnJxc3RbbnVtX3Jxc3QrK10pOworCQl0cmFjZV9zbWIzX3Jl
+bmFtZV9lbnRlcih4aWQsIHNlcy0+U3VpZCwgdGNvbi0+dGlkKTsKIAkJYnJlYWs7CiAJY2FzZSBT
+TUIyX09QX0hBUkRMSU5LOgogCQltZW1zZXQoJnNpX2lvdiwgMCwgc2l6ZW9mKHNpX2lvdikpOwpA
+QCAtMjE0LDYgKzIzMCw3IEBAIHNtYjJfY29tcG91bmRfb3AoY29uc3QgdW5zaWduZWQgaW50IHhp
+ZCwgc3RydWN0IGNpZnNfdGNvbiAqdGNvbiwKIAkJCQkJU01CMl9PX0lORk9fRklMRSwgMCwgZGF0
+YSwgc2l6ZSk7CiAJCXNtYjJfc2V0X25leHRfY29tbWFuZCh0Y29uLCAmcnFzdFtudW1fcnFzdF0p
+OwogCQlzbWIyX3NldF9yZWxhdGVkKCZycXN0W251bV9ycXN0KytdKTsKKwkJdHJhY2Vfc21iM19o
+YXJkbGlua19lbnRlcih4aWQsIHNlcy0+U3VpZCwgdGNvbi0+dGlkKTsKIAkJYnJlYWs7CiAJZGVm
+YXVsdDoKIAkJY2lmc19kYmcoVkZTLCAiSW52YWxpZCBjb21tYW5kXG4iKTsKQEAgLTI1MiwyMSAr
+MjY5LDY1IEBAIHNtYjJfY29tcG91bmRfb3AoY29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0
+IGNpZnNfdGNvbiAqdGNvbiwKIAkJCVNNQjJfcXVlcnlfaW5mb19mcmVlKCZycXN0WzFdKTsKIAkJ
+aWYgKHJxc3RbMl0ucnFfaW92KQogCQkJU01CMl9jbG9zZV9mcmVlKCZycXN0WzJdKTsKKwkJaWYg
+KHJjKQorCQkJdHJhY2Vfc21iM19xdWVyeV9pbmZvX2NvbXBvdW5kX2Vycih4aWQsICBzZXMtPlN1
+aWQsCisJCQkJCQkJICAgdGNvbi0+dGlkLCByYyk7CisJCWVsc2UKKwkJCXRyYWNlX3NtYjNfcXVl
+cnlfaW5mb19jb21wb3VuZF9kb25lKHhpZCwgc2VzLT5TdWlkLAorCQkJCQkJCSAgICB0Y29uLT50
+aWQpOwogCQlicmVhazsKIAljYXNlIFNNQjJfT1BfREVMRVRFOgorCQlpZiAocmMpCisJCQl0cmFj
+ZV9zbWIzX2RlbGV0ZV9lcnIoeGlkLCAgc2VzLT5TdWlkLCB0Y29uLT50aWQsIHJjKTsKKwkJZWxz
+ZQorCQkJdHJhY2Vfc21iM19kZWxldGVfZG9uZSh4aWQsIHNlcy0+U3VpZCwgdGNvbi0+dGlkKTsK
+KwkJaWYgKHJxc3RbMV0ucnFfaW92KQorCQkJU01CMl9jbG9zZV9mcmVlKCZycXN0WzFdKTsKKwkJ
+YnJlYWs7CiAJY2FzZSBTTUIyX09QX01LRElSOgorCQlpZiAocmMpCisJCQl0cmFjZV9zbWIzX21r
+ZGlyX2Vycih4aWQsICBzZXMtPlN1aWQsIHRjb24tPnRpZCwgcmMpOworCQllbHNlCisJCQl0cmFj
+ZV9zbWIzX21rZGlyX2RvbmUoeGlkLCBzZXMtPlN1aWQsIHRjb24tPnRpZCk7CiAJCWlmIChycXN0
+WzFdLnJxX2lvdikKIAkJCVNNQjJfY2xvc2VfZnJlZSgmcnFzdFsxXSk7CiAJCWJyZWFrOwogCWNh
+c2UgU01CMl9PUF9IQVJETElOSzoKKwkJaWYgKHJjKQorCQkJdHJhY2Vfc21iM19oYXJkbGlua19l
+cnIoeGlkLCAgc2VzLT5TdWlkLCB0Y29uLT50aWQsIHJjKTsKKwkJZWxzZQorCQkJdHJhY2Vfc21i
+M19oYXJkbGlua19kb25lKHhpZCwgc2VzLT5TdWlkLCB0Y29uLT50aWQpOworCQlmcmVlX3NldF9p
+bmZfY29tcG91bmQocnFzdCk7CisJCWJyZWFrOwogCWNhc2UgU01CMl9PUF9SRU5BTUU6CisJCWlm
+IChyYykKKwkJCXRyYWNlX3NtYjNfcmVuYW1lX2Vycih4aWQsICBzZXMtPlN1aWQsIHRjb24tPnRp
+ZCwgcmMpOworCQllbHNlCisJCQl0cmFjZV9zbWIzX3JlbmFtZV9kb25lKHhpZCwgc2VzLT5TdWlk
+LCB0Y29uLT50aWQpOworCQlmcmVlX3NldF9pbmZfY29tcG91bmQocnFzdCk7CisJCWJyZWFrOwog
+CWNhc2UgU01CMl9PUF9STURJUjoKKwkJaWYgKHJjKQorCQkJdHJhY2Vfc21iM19ybWRpcl9lcnIo
+eGlkLCAgc2VzLT5TdWlkLCB0Y29uLT50aWQsIHJjKTsKKwkJZWxzZQorCQkJdHJhY2Vfc21iM19y
+bWRpcl9kb25lKHhpZCwgc2VzLT5TdWlkLCB0Y29uLT50aWQpOworCQlmcmVlX3NldF9pbmZfY29t
+cG91bmQocnFzdCk7CisJCWJyZWFrOwogCWNhc2UgU01CMl9PUF9TRVRfRU9GOgorCQlpZiAocmMp
+CisJCQl0cmFjZV9zbWIzX3NldF9lb2ZfZXJyKHhpZCwgIHNlcy0+U3VpZCwgdGNvbi0+dGlkLCBy
+Yyk7CisJCWVsc2UKKwkJCXRyYWNlX3NtYjNfc2V0X2VvZl9kb25lKHhpZCwgc2VzLT5TdWlkLCB0
+Y29uLT50aWQpOworCQlmcmVlX3NldF9pbmZfY29tcG91bmQocnFzdCk7CisJCWJyZWFrOwogCWNh
+c2UgU01CMl9PUF9TRVRfSU5GTzoKLQkJaWYgKHJxc3RbMV0ucnFfaW92KQotCQkJU01CMl9zZXRf
+aW5mb19mcmVlKCZycXN0WzFdKTsKLQkJaWYgKHJxc3RbMl0ucnFfaW92KQotCQkJU01CMl9jbG9z
+ZV9mcmVlKCZycXN0WzJdKTsKKwkJaWYgKHJjKQorCQkJdHJhY2Vfc21iM19zZXRfaW5mb19jb21w
+b3VuZF9lcnIoeGlkLCAgc2VzLT5TdWlkLAorCQkJCQkJCSB0Y29uLT50aWQsIHJjKTsKKwkJZWxz
+ZQorCQkJdHJhY2Vfc21iM19zZXRfaW5mb19jb21wb3VuZF9kb25lKHhpZCwgc2VzLT5TdWlkLAor
+CQkJCQkJCSAgdGNvbi0+dGlkKTsKKwkJZnJlZV9zZXRfaW5mX2NvbXBvdW5kKHJxc3QpOwogCQli
+cmVhazsKIAl9CiAJZnJlZV9yc3BfYnVmKHJlc3BfYnVmdHlwZVswXSwgcnNwX2lvdlswXS5pb3Zf
+YmFzZSk7CmRpZmYgLS1naXQgYS9mcy9jaWZzL3RyYWNlLmggYi9mcy9jaWZzL3RyYWNlLmgKaW5k
+ZXggYzc4ZTk2YzRjYzUzLi4wNDU1ZmM3ZTUyMzUgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvdHJhY2Uu
+aAorKysgYi9mcy9jaWZzL3RyYWNlLmgKQEAgLTI0Miw2ICsyNDIsODggQEAgREVGSU5FX1NNQjNf
+SU5GX0VSUl9FVkVOVChxdWVyeV9pbmZvX2Vycik7CiBERUZJTkVfU01CM19JTkZfRVJSX0VWRU5U
+KHNldF9pbmZvX2Vycik7CiBERUZJTkVfU01CM19JTkZfRVJSX0VWRU5UKGZzY3RsX2Vycik7CiAK
+K0RFQ0xBUkVfRVZFTlRfQ0xBU1Moc21iM19pbmZfY29tcG91bmRfZW50ZXJfY2xhc3MsCisJVFBf
+UFJPVE8odW5zaWduZWQgaW50IHhpZCwKKwkJX191MzIJdGlkLAorCQlfX3U2NAlzZXNpZCksCisJ
+VFBfQVJHUyh4aWQsIHRpZCwgc2VzaWQpLAorCVRQX1NUUlVDVF9fZW50cnkoCisJCV9fZmllbGQo
+dW5zaWduZWQgaW50LCB4aWQpCisJCV9fZmllbGQoX191MzIsIHRpZCkKKwkJX19maWVsZChfX3U2
+NCwgc2VzaWQpCisJKSwKKwlUUF9mYXN0X2Fzc2lnbigKKwkJX19lbnRyeS0+eGlkID0geGlkOwor
+CQlfX2VudHJ5LT50aWQgPSB0aWQ7CisJCV9fZW50cnktPnNlc2lkID0gc2VzaWQ7CisJKSwKKwlU
+UF9wcmludGsoInhpZD0ldSBzaWQ9MHglbGx4IHRpZD0weCV4IiwKKwkJX19lbnRyeS0+eGlkLCBf
+X2VudHJ5LT5zZXNpZCwgX19lbnRyeS0+dGlkKQorKQorCisjZGVmaW5lIERFRklORV9TTUIzX0lO
+Rl9DT01QT1VORF9FTlRFUl9FVkVOVChuYW1lKSAgICAgXAorREVGSU5FX0VWRU5UKHNtYjNfaW5m
+X2NvbXBvdW5kX2VudGVyX2NsYXNzLCBzbWIzXyMjbmFtZSwgICAgXAorCVRQX1BST1RPKHVuc2ln
+bmVkIGludCB4aWQsCQlcCisJCV9fdTMyCXRpZCwJCQlcCisJCV9fdTY0CXNlc2lkKSwJCQlcCisJ
+VFBfQVJHUyh4aWQsIHRpZCwgc2VzaWQpKQorCitERUZJTkVfU01CM19JTkZfQ09NUE9VTkRfRU5U
+RVJfRVZFTlQocXVlcnlfaW5mb19jb21wb3VuZF9lbnRlcik7CitERUZJTkVfU01CM19JTkZfQ09N
+UE9VTkRfRU5URVJfRVZFTlQocXVlcnlfaW5mb19jb21wb3VuZF9kb25lKTsKK0RFRklORV9TTUIz
+X0lORl9DT01QT1VORF9FTlRFUl9FVkVOVChoYXJkbGlua19lbnRlcik7CitERUZJTkVfU01CM19J
+TkZfQ09NUE9VTkRfRU5URVJfRVZFTlQoaGFyZGxpbmtfZG9uZSk7CitERUZJTkVfU01CM19JTkZf
+Q09NUE9VTkRfRU5URVJfRVZFTlQocmVuYW1lX2VudGVyKTsKK0RFRklORV9TTUIzX0lORl9DT01Q
+T1VORF9FTlRFUl9FVkVOVChyZW5hbWVfZG9uZSk7CitERUZJTkVfU01CM19JTkZfQ09NUE9VTkRf
+RU5URVJfRVZFTlQocm1kaXJfZW50ZXIpOworREVGSU5FX1NNQjNfSU5GX0NPTVBPVU5EX0VOVEVS
+X0VWRU5UKHJtZGlyX2RvbmUpOworREVGSU5FX1NNQjNfSU5GX0NPTVBPVU5EX0VOVEVSX0VWRU5U
+KHNldF9lb2ZfZW50ZXIpOworREVGSU5FX1NNQjNfSU5GX0NPTVBPVU5EX0VOVEVSX0VWRU5UKHNl
+dF9lb2ZfZG9uZSk7CitERUZJTkVfU01CM19JTkZfQ09NUE9VTkRfRU5URVJfRVZFTlQoc2V0X2lu
+Zm9fY29tcG91bmRfZW50ZXIpOworREVGSU5FX1NNQjNfSU5GX0NPTVBPVU5EX0VOVEVSX0VWRU5U
+KHNldF9pbmZvX2NvbXBvdW5kX2RvbmUpOworREVGSU5FX1NNQjNfSU5GX0NPTVBPVU5EX0VOVEVS
+X0VWRU5UKGRlbGV0ZV9lbnRlcik7CitERUZJTkVfU01CM19JTkZfQ09NUE9VTkRfRU5URVJfRVZF
+TlQoZGVsZXRlX2RvbmUpOworREVGSU5FX1NNQjNfSU5GX0NPTVBPVU5EX0VOVEVSX0VWRU5UKG1r
+ZGlyX2VudGVyKTsKK0RFRklORV9TTUIzX0lORl9DT01QT1VORF9FTlRFUl9FVkVOVChta2Rpcl9k
+b25lKTsKKworREVDTEFSRV9FVkVOVF9DTEFTUyhzbWIzX2luZl9jb21wb3VuZF9lcnJfY2xhc3Ms
+CisJVFBfUFJPVE8odW5zaWduZWQgaW50IHhpZCwKKwkJX191MzIJdGlkLAorCQlfX3U2NAlzZXNp
+ZCwKKwkJaW50CXJjKSwKKwlUUF9BUkdTKHhpZCwgdGlkLCBzZXNpZCwgcmMpLAorCVRQX1NUUlVD
+VF9fZW50cnkoCisJCV9fZmllbGQodW5zaWduZWQgaW50LCB4aWQpCisJCV9fZmllbGQoX191MzIs
+IHRpZCkKKwkJX19maWVsZChfX3U2NCwgc2VzaWQpCisJCV9fZmllbGQoaW50LCByYykKKwkpLAor
+CVRQX2Zhc3RfYXNzaWduKAorCQlfX2VudHJ5LT54aWQgPSB4aWQ7CisJCV9fZW50cnktPnRpZCA9
+IHRpZDsKKwkJX19lbnRyeS0+c2VzaWQgPSBzZXNpZDsKKwkJX19lbnRyeS0+cmMgPSByYzsKKwkp
+LAorCVRQX3ByaW50aygieGlkPSV1IHNpZD0weCVsbHggdGlkPTB4JXggcmM9JWQiLAorCQlfX2Vu
+dHJ5LT54aWQsIF9fZW50cnktPnNlc2lkLCBfX2VudHJ5LT50aWQsIF9fZW50cnktPnJjKQorKQor
+CisjZGVmaW5lIERFRklORV9TTUIzX0lORl9DT01QT1VORF9FUlJfRVZFTlQobmFtZSkgICAgIFwK
+K0RFRklORV9FVkVOVChzbWIzX2luZl9jb21wb3VuZF9lcnJfY2xhc3MsIHNtYjNfIyNuYW1lLCAg
+ICBcCisJVFBfUFJPVE8odW5zaWduZWQgaW50IHhpZCwJCVwKKwkJX191MzIJdGlkLAkJCVwKKwkJ
+X191NjQJc2VzaWQsCQkJXAorCQlpbnQgcmMpLAkJCVwKKwlUUF9BUkdTKHhpZCwgdGlkLCBzZXNp
+ZCwgcmMpKQorCitERUZJTkVfU01CM19JTkZfQ09NUE9VTkRfRVJSX0VWRU5UKHF1ZXJ5X2luZm9f
+Y29tcG91bmRfZXJyKTsKK0RFRklORV9TTUIzX0lORl9DT01QT1VORF9FUlJfRVZFTlQoaGFyZGxp
+bmtfZXJyKTsKK0RFRklORV9TTUIzX0lORl9DT01QT1VORF9FUlJfRVZFTlQocmVuYW1lX2Vycik7
+CitERUZJTkVfU01CM19JTkZfQ09NUE9VTkRfRVJSX0VWRU5UKHJtZGlyX2Vycik7CitERUZJTkVf
+U01CM19JTkZfQ09NUE9VTkRfRVJSX0VWRU5UKHNldF9lb2ZfZXJyKTsKK0RFRklORV9TTUIzX0lO
+Rl9DT01QT1VORF9FUlJfRVZFTlQoc2V0X2luZm9fY29tcG91bmRfZXJyKTsKK0RFRklORV9TTUIz
+X0lORl9DT01QT1VORF9FUlJfRVZFTlQobWtkaXJfZXJyKTsKK0RFRklORV9TTUIzX0lORl9DT01Q
+T1VORF9FUlJfRVZFTlQoZGVsZXRlX2Vycik7CisKIC8qCiAgKiBGb3IgbG9nZ2luZyBTTUIzIFN0
+YXR1cyBjb2RlIGFuZCBDb21tYW5kIGZvciByZXNwb25zZXMgd2hpY2ggcmV0dXJuIGVycm9ycwog
+ICovCi0tIAoyLjE3LjEKCg==
+--0000000000006ce8070583d835e9--
