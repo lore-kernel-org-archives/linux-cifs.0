@@ -2,427 +2,115 @@ Return-Path: <SRS0=AEBP=RP=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 129FDC43381
-	for <linux-cifs@archiver.kernel.org>; Tue, 12 Mar 2019 06:06:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78C93C43381
+	for <linux-cifs@archiver.kernel.org>; Tue, 12 Mar 2019 06:48:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B6F4A2171F
-	for <linux-cifs@archiver.kernel.org>; Tue, 12 Mar 2019 06:06:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B5FC2147C
+	for <linux-cifs@archiver.kernel.org>; Tue, 12 Mar 2019 06:48:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e1+0Rf5c"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nvENbqSN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727374AbfCLGG0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 12 Mar 2019 02:06:26 -0400
-Received: from mail-qk1-f174.google.com ([209.85.222.174]:36920 "EHLO
-        mail-qk1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727327AbfCLGGY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 12 Mar 2019 02:06:24 -0400
-Received: by mail-qk1-f174.google.com with SMTP id c1so771368qkk.4
-        for <linux-cifs@vger.kernel.org>; Mon, 11 Mar 2019 23:06:22 -0700 (PDT)
+        id S1726633AbfCLGsW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 12 Mar 2019 02:48:22 -0400
+Received: from mail-pf1-f178.google.com ([209.85.210.178]:43661 "EHLO
+        mail-pf1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726218AbfCLGsV (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 12 Mar 2019 02:48:21 -0400
+Received: by mail-pf1-f178.google.com with SMTP id q17so1107011pfh.10
+        for <linux-cifs@vger.kernel.org>; Mon, 11 Mar 2019 23:48:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=zx57ChuZERDu8Pu17GtOaxpsyoj0eQZeU37h0+69vTs=;
-        b=e1+0Rf5cVtbbHGuFi8tNtB14rJ67Dxl1tIDhrGNWnqJh4QG60UCzcTtZNua97HUtCH
-         bq1Zcl6M76hHLTooTdiIlBkFBRPTDfrqlCcmstyy4mTdDkliLo6eUE7li43WPS3GIkmY
-         JwbV1b3WeS18Jh+3HA9LgMGQ/hsYIVgyHk7z64q74aXO+SHj56OPBPsBa9AWom3JAf4u
-         mK/5JEhdAe3RlNdNGBu8300k//MVfToMmWVuzsZeSadWV1a55YpN9AsnZxEe+KWxZ295
-         V5ObsGfCOl8/q/8o5qkbDTnqAjiNRwbhWzU5g9U2J9Vrxhr/FlFl9DtXk9BQJWKCxF3r
-         VDPg==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=8m1D54tuRSoZ+icsMp+oG548NnlbDkDou5YNP2pg43Q=;
+        b=nvENbqSNZ2H+EIjWoZvv2vZT0/G0STw02ZsrMZnab6a+oO7vNjou+/NF0IIruAfZv0
+         X7tukyBQxUXthcsr11UVg9BWtaXM1YkwV3Lc9CzzsQ4Uo1LIHeLavA9NVTT+t/um7l8p
+         LdYspDevIK/+4VUOliRXTK08V4Q7KGtW9+YjaIuQIJ0m+yf3Hf8dRpYbzDGWyfj8gK3l
+         akqwzXVbfXDaas7DE9QQDjPriy5tygo19LhkQfcTLn2LaMiY31+HYUUE4xZ8yTyq1mL1
+         pr2GRX5yptUDDyWOZaScRyDWVF3seMaLBncw4qxwt9vaB2yzO4I3gGTzpvLUfaj6RMQ6
+         kwCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=zx57ChuZERDu8Pu17GtOaxpsyoj0eQZeU37h0+69vTs=;
-        b=giZLwqPxG+X1DVGSBrGtgGAWPSEalMSj3MEF6MUNlwAI4+6H9S53NeVnn4XQDz1fPX
-         jIKq7wJjs6YX60dDmc1lnLQ/jzT8/T8TRHgYOM16V4Eh5ZLOOwY6QqZrZF6mApe5QddG
-         rHbQyBH/4zlIIZTxDuGskN9wU1lc19VoXgpM+gvJcxwGzTRPbSxyl4TrLw9OTiJkYIZ/
-         irNPMxi6LtrLHBD2AjQ5fk68pOsp1McFIix83Qa5MtgYcmkLZTmZuR0Yma3au+sKr29B
-         a5RwX02V0qjsSwW38iINvyqsmlyqMlnCCrmROztQMxnSfNueKBoIFDLGtMXUxKE/F4Lr
-         7MXA==
-X-Gm-Message-State: APjAAAXkq1LoGwoUfdAfEe9s8ixGAFzOI7g1rNeu+sCgXqmB6lnKbrYm
-        8zTOnzKvGR72T1b2MGc6tTeh+na+04elDdZTsSE=
-X-Google-Smtp-Source: APXvYqw9g02Rh4uZc3k0L55+ICv6rjGFoPHE8ksT/m2MmwvLmHoocB6MsJdFBuBKlUDwvm8S8hkgI29J5Qwsi4YQsKY=
-X-Received: by 2002:a37:6812:: with SMTP id d18mr9190971qkc.28.1552370781649;
- Mon, 11 Mar 2019 23:06:21 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=8m1D54tuRSoZ+icsMp+oG548NnlbDkDou5YNP2pg43Q=;
+        b=Q/mip5LdcFgH1DI1OUXLh6pAFOM73P+DHlBL5NPf7z5JaRnEeqHt8DsTZ3FtvaNX4W
+         0RBVPQoxlXbiSWtyAvjl/5Qy+Lhx+AEZQNk1uf99lODOKhOWb/2lOf5hayT3nYR0zATQ
+         EEMatMJt+aK+d63OnSVCoeSZPHFB8+YOnqpy8BuhC2B1zr6PmTvCW11Z/qHJ11thKytw
+         KWd2c5mVDhCFbH7bYcQzRYQD1iErdxJpMDaH5Esv6gNFS5+iYIALYLVjPxJcLAf7jTlu
+         iaVO21cwsYGnUa9fcqyjpjVKbSOsZyjrzhlkE7XA+Lmb5SHB7sSygYN5H1ymuLVrYwk1
+         prUQ==
+X-Gm-Message-State: APjAAAWqbT5x4rAQPlWUvT0haZ1wiFJae0+gh496aLhb5gMydbmEuAaq
+        Qn7NmyYtfRPx1XWSpzG5cBXcVso0QP6CY8EQac8MQ5EE
+X-Google-Smtp-Source: APXvYqwNPG3Xv9DhBYuE5tYOTsssmwz6Hdunl0yTqlAdjTxmWCwz+NMB81V2csky3FWCnhR5Sm1bUd40D8+RBiMiPRQ=
+X-Received: by 2002:a62:5385:: with SMTP id h127mr36469858pfb.10.1552373300142;
+ Mon, 11 Mar 2019 23:48:20 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5muY3xgVW03Mi8N-c4wyZFikzTeZgLDEuGLoXFXNZ-wFHA@mail.gmail.com>
- <CAKywueR9-_yYVA4YfycxfH_jog0xQKhgoQeFG6nhLws4TLC8Tg@mail.gmail.com>
- <CAH2r5mv+6N=p183kFpYnFGo7ixcu1TkCjBvWnct=1M91kH3_WA@mail.gmail.com> <CAH2r5mv2Cp8YseCF1rz0dH8tvPYZ1+dCykupzVv_S81f2gPMJg@mail.gmail.com>
-In-Reply-To: <CAH2r5mv2Cp8YseCF1rz0dH8tvPYZ1+dCykupzVv_S81f2gPMJg@mail.gmail.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Tue, 12 Mar 2019 16:06:07 +1000
-Message-ID: <CAN05THQt3se9xsbhKOsA4ZxhuZpe_SnkTAisTP0AnpKsb-jfOQ@mail.gmail.com>
-Subject: Re: [PATCH][SMB3] Add various dynamic tracepoints for compounded operations
-To:     Steve French <smfrench@gmail.com>
-Cc:     Pavel Shilovsky <piastryyy@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 12 Mar 2019 01:48:08 -0500
+Message-ID: <CAH2r5msYoxFjc-H=xw5L+-q3ZCoLAaAei=QjjAVF4dj=Ymepmg@mail.gmail.com>
+Subject: [PATCH] smb: Display volume serial number for shares in /proc/fs/cifs/DebugData
+To:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="0000000000001d41bd0583e01369"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hmm.
+--0000000000001d41bd0583e01369
+Content-Type: text/plain; charset="UTF-8"
 
-I don't think this is the wrong layer to add the tracing.
-Instead of adding the tracing in say smb2_compound_op(), where we
-create the compound,
-I think it will be better to add the tracing down in the leaf
-functions, i.e. down in SMB2_open_init(), SMB2_query_info_init(), ...
+Can be helpful for debugging
 
-That way we know that we will always have tracing for all opens/closes/...
+Add volume serial number to /proc/fs/cifs/DebugData info on each share e.g.:
 
-But then what to do about the trace_smb3_..._err()/trace_smb3_..._done() ca=
-lls ?
-These I think should be moved down and handled inside compound_send_recv().
-That way we can have one single place where we call the appropriate
-_err()/_done() functions
-and we know that we will catch every single completed function.
+    Shares:
+    0) IPC: \\localhost\IPC$ Mounts: 1 DevInfo: 0x0 Attributes: 0x0
+    PathComponentMax: 0 Status: 1 type: 0 Serial Number: 0x0
+    Share Capabilities: None    Share Flags: 0x0
+    tid: 0xf13518ce    Maximal Access: 0x1f00a9
 
-I.e. just put it in a single place instead of in every single call-site.
-In compound_send_recv we can just loop over all the responses, cast it
-to a smb2_hdr structure, looka at both the command code as well as the
-status code and call the appropriate xys_err() or xyz_done() functions
-as needed.
-
-Let me show an example of what I mean for a open/query/close compound :
-
-trace_smb3_open_enter(xid=3D5, filename=3D"foo", ...)   from SMB2_open_init=
-()
-trace_smb3_query_info_enter(xid=3D5,... ) from SMB2_query_info_init()
-trace_smb3_close_enter(xid=3D5, ...) from SMB2_close_init()
-(maybe have additional tracing in compound_send_recv() that we are
-about to send xid=3D5 to the wire)
-trace_smb3_open_done(xid=3D5, ...) from compound_send_recv()
-trace_smb3_query_info_done(xid=3D5, ...) from compound_send_recv()
-trace_smb3_close_done(xid=3D5, ...) from compound_send_recv()
+    1) \\localhost\scratch Mounts: 1 DevInfo: 0x20 Attributes: 0x1006f
+    PathComponentMax: 255 Status: 1 type: DISK Serial Number: 0xd50e5aa0
+    Share Capabilities: None Aligned, Partition Aligned,    Share Flags: 0x0
+    tid: 0xb792fd24    Optimal sector size: 0x200    Maximal Access: 0x1f01ff
 
 
-Now, we would not be able to immediately see the actual filename
-anywhere else than in the initial trace_smb3_open_enter() since we no
-longer have that available at the callsites that I suggest but do we
-actually need that?
-We can search on xid  and match it all up.
-Worst comes to it we could write a simple small tool that would
-post-process the tracefile and add in these decorations. I.e. track
-the xid numbers and the filename=3D"foo" from the open_enter()
-tracepoint and just inject them in all other tracepoints
-where xid=3D5.
-It would even have the benefit in that the log messages themselves
-would become smaller since they would no longer need to contain the
-filename for every single tracepoint.
-Smaller is better :-)
+-- 
+Thanks,
 
-That post-processing tool could also much around in /proc/fs/cifs  and
-replace the decorations for ses->Suid, tcon->tid witht he actuall name
-for the server and the share.
+Steve
 
+--0000000000001d41bd0583e01369
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smb3-display-volume-serial-number-for-shares-in-proc.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-display-volume-serial-number-for-shares-in-proc.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_jt5eruy40>
+X-Attachment-Id: f_jt5eruy40
 
-Just adding the _done()/_err() tracing to compound_send_recv() and we
-will get tracing for every command completion today and in the future.
-
-
-
-
-
-On Tue, Mar 12, 2019 at 3:35 PM Steve French <smfrench@gmail.com> wrote:
->
-> Version 2 of the patch attached.   Here is sample output from running it:
->
-> # entries-in-buffer/entries-written: 32/32   #P:8
-> #
-> #                              _-----=3D> irqs-off
-> #                             / _----=3D> need-resched
-> #                            | / _---=3D> hardirq/softirq
-> #                            || / _--=3D> preempt-depth
-> #                            ||| /     delay
-> #           TASK-PID   CPU#  ||||    TIMESTAMP  FUNCTION
-> #              | |       |   ||||       |         |
->            mkdir-31324 [001] .... 362773.434903:
-> smb3_query_info_compound_enter: xid=3D7 sid=3D0xdd73f8cb tid=3D0x65257d36
-> path=3D\newdir
->            mkdir-31324 [002] .... 362773.435588:
-> smb3_query_info_compound_err: xid=3D7 sid=3D0xdd73f8cb tid=3D0x65257d36
-> path=3D\newdir rc=3D-2
->            mkdir-31324 [002] .... 362773.435607: smb3_mkdir_enter:
-> xid=3D8 sid=3D0xdd73f8cb tid=3D0x65257d36 path=3D\newdir
->            mkdir-31324 [002] .... 362773.436643: smb3_mkdir_done:
-> xid=3D8 sid=3D0xdd73f8cb tid=3D0x65257d36 path=3D\newdir
->            mkdir-31324 [002] .... 362773.436659:
-> smb3_query_info_compound_enter: xid=3D8 sid=3D0xdd73f8cb tid=3D0x65257d36
-> path=3D\newdir
->            mkdir-31324 [002] .... 362773.437414:
-> smb3_query_info_compound_done: xid=3D8 sid=3D0xdd73f8cb tid=3D0x65257d36
-> path=3D\newdir
->            mkdir-31326 [006] .... 362775.812007:
-> smb3_query_info_compound_enter: xid=3D9 sid=3D0xdd73f8cb tid=3D0x65257d36
-> path=3D\newdir
->            mkdir-31326 [006] .... 362775.812796:
-> smb3_query_info_compound_done: xid=3D9 sid=3D0xdd73f8cb tid=3D0x65257d36
-> path=3D\newdir
->            rmdir-31327 [003] .... 362781.753333:
-> smb3_query_info_compound_enter: xid=3D10 sid=3D0xdd73f8cb tid=3D0x65257d3=
-6
-> path=3D\newdir
->            rmdir-31327 [003] .... 362781.754057:
-> smb3_query_info_compound_done: xid=3D10 sid=3D0xdd73f8cb tid=3D0x65257d36
-> path=3D\newdir
->            rmdir-31327 [003] .... 362781.754080: smb3_rmdir_enter:
-> xid=3D11 sid=3D0xdd73f8cb tid=3D0x65257d36 path=3D\newdir
->            rmdir-31327 [003] .... 362781.755143: smb3_rmdir_done:
-> xid=3D11 sid=3D0xdd73f8cb tid=3D0x65257d36 path=3D\newdir
->            touch-31328 [006] .... 362793.339620:
-> smb3_set_info_compound_enter: xid=3D13 sid=3D0xdd73f8cb tid=3D0x65257d36
-> path=3D\newfile
->            touch-31328 [006] .... 362793.340342:
-> smb3_set_info_compound_done: xid=3D13 sid=3D0xdd73f8cb tid=3D0x65257d36
-> path=3D\newfile
->               ln-31329 [002] .... 362800.848959:
-> smb3_query_info_compound_enter: xid=3D15 sid=3D0xdd73f8cb tid=3D0x65257d3=
-6
-> path=3D\linknewfile
->               ln-31329 [002] .... 362800.849624:
-> smb3_query_info_compound_err: xid=3D15 sid=3D0xdd73f8cb tid=3D0x65257d36
-> path=3D\linknewfile rc=3D-2
->               ln-31329 [002] .... 362800.849656:
-> smb3_query_info_compound_enter: xid=3D16 sid=3D0xdd73f8cb tid=3D0x65257d3=
-6
-> path=3D\newfile
->               ln-31329 [003] .... 362800.850318:
-> smb3_query_info_compound_done: xid=3D16 sid=3D0xdd73f8cb tid=3D0x65257d36
-> path=3D\newfile
->               ln-31329 [003] .... 362800.850370:
-> smb3_query_info_compound_enter: xid=3D17 sid=3D0xdd73f8cb tid=3D0x65257d3=
-6
-> path=3D\linknewfile
->               ln-31329 [003] .... 362800.850918:
-> smb3_query_info_compound_err: xid=3D17 sid=3D0xdd73f8cb tid=3D0x65257d36
-> path=3D\linknewfile rc=3D-2
->               ln-31329 [003] .... 362800.850940: smb3_hardlink_enter:
-> xid=3D18 sid=3D0xdd73f8cb tid=3D0x65257d36 path=3D\newfile
->               ln-31329 [003] .... 362800.851669: smb3_hardlink_done:
-> xid=3D18 sid=3D0xdd73f8cb tid=3D0x65257d36 path=3D\newfile
->            gmain-2225  [004] .... 362800.851847:
-> smb3_query_info_compound_enter: xid=3D19 sid=3D0xdd73f8cb tid=3D0x65257d3=
-6
-> path=3D\linknewfile
->            gmain-2225  [005] .... 362800.852345:
-> smb3_query_info_compound_done: xid=3D19 sid=3D0xdd73f8cb tid=3D0x65257d36
-> path=3D\linknewfile
->               rm-31330 [003] .... 362806.483029:
-> smb3_query_info_compound_enter: xid=3D20 sid=3D0xdd73f8cb tid=3D0x65257d3=
-6
-> path=3D\badfile
->               rm-31330 [003] .... 362806.483654:
-> smb3_query_info_compound_err: xid=3D20 sid=3D0xdd73f8cb tid=3D0x65257d36
-> path=3D\badfile rc=3D-2
->               rm-31330 [003] .... 362806.483704:
-> smb3_query_info_compound_enter: xid=3D21 sid=3D0xdd73f8cb tid=3D0x65257d3=
-6
-> path=3D\badfile
->               rm-31330 [003] .... 362806.484296:
-> smb3_query_info_compound_err: xid=3D21 sid=3D0xdd73f8cb tid=3D0x65257d36
-> path=3D\badfile rc=3D-2
->               rm-31335 [004] .... 362811.895827:
-> smb3_query_info_compound_enter: xid=3D22 sid=3D0xdd73f8cb tid=3D0x65257d3=
-6
-> path=3D\newfile
->               rm-31335 [005] .... 362811.896533:
-> smb3_query_info_compound_done: xid=3D22 sid=3D0xdd73f8cb tid=3D0x65257d36
-> path=3D\newfile
->               rm-31335 [005] .... 362811.896575: smb3_delete_enter:
-> xid=3D23 sid=3D0xdd73f8cb tid=3D0x65257d36 path=3D\newfile
->               rm-31335 [005] .... 362811.897364: smb3_delete_done:
-> xid=3D23 sid=3D0xdd73f8cb tid=3D0x65257d36 path=3D\newfile
->
-> On Mon, Mar 11, 2019 at 5:31 PM Steve French <smfrench@gmail.com> wrote:
-> >
-> > On Mon, Mar 11, 2019 at 5:18 PM Pavel Shilovsky <piastryyy@gmail.com> w=
-rote:
-> > >
-> > > =D0=BF=D0=BD, 11 =D0=BC=D0=B0=D1=80. 2019 =D0=B3. =D0=B2 14:25, Steve=
- French <smfrench@gmail.com>:
-> > > >
-> > > > Sample output from tracing various newly added dynamic trace points
-> > > > (with this patch)
-> > > >
-> > > > (trace-cmd  record -e *query_info_co* -e smb3_hardlink* -e
-> > > > smb3_rename* -e smb3_set_eof* -e smb3_set_info_co* -e smb3_mkdir* -=
-e
-> > > > smb3_delete*)
-> > > >
-> > > > # entries-in-buffer/entries-written: 44/44   #P:8
-> > > > #
-> > > > #                              _-----=3D> irqs-off
-> > > > #                             / _----=3D> need-resched
-> > > > #                            | / _---=3D> hardirq/softirq
-> > > > #                            || / _--=3D> preempt-depth
-> > > > #                            ||| /     delay
-> > > > #           TASK-PID   CPU#  ||||    TIMESTAMP  FUNCTION
-> > > > #              | |       |   ||||       |         |
-> > > >      gvfsd-trash-2224  [004] .... 333095.401381:
-> > > > smb3_query_info_compound_enter: xid=3D5 sid=3D0xbb2583e9 tid=3D0xe7=
-ab49dc
-> > > >      gvfsd-trash-2224  [002] .... 333095.402056:
-> > > > smb3_query_info_compound_err: xid=3D5 sid=3D0xbb2583e9 tid=3D0xe7ab=
-49dc
-> > > > rc=3D-2
-> > > >      gvfsd-trash-2224  [002] .... 333095.402189:
-> > > > smb3_query_info_compound_enter: xid=3D6 sid=3D0xbb2583e9 tid=3D0xe7=
-ab49dc
-> > > >      gvfsd-trash-2224  [002] .... 333095.402688:
-> > > > smb3_query_info_compound_err: xid=3D6 sid=3D0xbb2583e9 tid=3D0xe7ab=
-49dc
-> > > > rc=3D-2
-> > > >            mkdir-16324 [002] .... 333123.559043:
-> > > > smb3_query_info_compound_enter: xid=3D7 sid=3D0xbb2583e9 tid=3D0xe7=
-ab49dc
-> > > >            mkdir-16324 [003] .... 333123.559654:
-> > > > smb3_query_info_compound_err: xid=3D7 sid=3D0xbb2583e9 tid=3D0xe7ab=
-49dc
-> > > > rc=3D-2
-> > > >            mkdir-16324 [003] .... 333123.559673: smb3_mkdir_enter:
-> > > > xid=3D8 sid=3D0xbb2583e9 tid=3D0xe7ab49dc
-> > > >            mkdir-16324 [003] .... 333123.560748: smb3_mkdir_done:
-> > > > xid=3D8 sid=3D0xbb2583e9 tid=3D0xe7ab49dc
-> > > >            mkdir-16324 [003] .... 333123.560763:
-> > > > smb3_query_info_compound_enter: xid=3D8 sid=3D0xbb2583e9 tid=3D0xe7=
-ab49dc
-> > > >            mkdir-16324 [003] .... 333123.561516:
-> > > > smb3_query_info_compound_done: xid=3D8 sid=3D0xbb2583e9 tid=3D0xe7a=
-b49dc
-> > > >            mkdir-16325 [002] .... 333126.841897:
-> > > > smb3_query_info_compound_enter: xid=3D9 sid=3D0xbb2583e9 tid=3D0xe7=
-ab49dc
-> > > >            mkdir-16325 [003] .... 333126.842580:
-> > > > smb3_query_info_compound_err: xid=3D9 sid=3D0xbb2583e9 tid=3D0xe7ab=
-49dc
-> > > > rc=3D-2
-> > > >            mkdir-16325 [003] .... 333126.842601: smb3_mkdir_enter:
-> > > > xid=3D10 sid=3D0xbb2583e9 tid=3D0xe7ab49dc
-> > > >            mkdir-16325 [003] .... 333126.843513: smb3_mkdir_done:
-> > > > xid=3D10 sid=3D0xbb2583e9 tid=3D0xe7ab49dc
-> > > >            mkdir-16325 [003] .... 333126.843529:
-> > > > smb3_query_info_compound_enter: xid=3D10 sid=3D0xbb2583e9 tid=3D0xe=
-7ab49dc
-> > > >            mkdir-16325 [003] .... 333126.844251:
-> > > > smb3_query_info_compound_done: xid=3D10 sid=3D0xbb2583e9 tid=3D0xe7=
-ab49dc
-> > > >            mkdir-16326 [000] .... 333129.858413:
-> > > > smb3_query_info_compound_enter: xid=3D11 sid=3D0xbb2583e9 tid=3D0xe=
-7ab49dc
-> > > >            mkdir-16326 [000] .... 333129.859193:
-> > > > smb3_query_info_compound_done: xid=3D11 sid=3D0xbb2583e9 tid=3D0xe7=
-ab49dc
-> > > >            rmdir-16328 [007] .... 333138.828049:
-> > > > smb3_query_info_compound_enter: xid=3D12 sid=3D0xbb2583e9 tid=3D0xe=
-7ab49dc
-> > > >            rmdir-16328 [007] .... 333138.828827:
-> > > > smb3_query_info_compound_done: xid=3D12 sid=3D0xbb2583e9 tid=3D0xe7=
-ab49dc
-> > > >            rmdir-16329 [006] .... 333141.388154:
-> > > > smb3_query_info_compound_enter: xid=3D14 sid=3D0xbb2583e9 tid=3D0xe=
-7ab49dc
-> > > >            rmdir-16329 [006] .... 333141.388813:
-> > > > smb3_query_info_compound_err: xid=3D14 sid=3D0xbb2583e9 tid=3D0xe7a=
-b49dc
-> > > > rc=3D-2
-> > > >               rm-16340 [006] .... 333157.935975:
-> > > > smb3_query_info_compound_enter: xid=3D15 sid=3D0xbb2583e9 tid=3D0xe=
-7ab49dc
-> > > >               rm-16340 [006] .... 333157.936607:
-> > > > smb3_query_info_compound_err: xid=3D15 sid=3D0xbb2583e9 tid=3D0xe7a=
-b49dc
-> > > > rc=3D-2
-> > > >               rm-16340 [006] .... 333157.936652:
-> > > > smb3_query_info_compound_enter: xid=3D16 sid=3D0xbb2583e9 tid=3D0xe=
-7ab49dc
-> > > >               rm-16340 [006] .... 333157.937146:
-> > > > smb3_query_info_compound_err: xid=3D16 sid=3D0xbb2583e9 tid=3D0xe7a=
-b49dc
-> > > > rc=3D-2
-> > > >            touch-16349 [005] .... 333184.932302:
-> > > > smb3_set_info_compound_enter: xid=3D18 sid=3D0xbb2583e9 tid=3D0xe7a=
-b49dc
-> > > >            touch-16349 [005] .... 333184.938303:
-> > > > smb3_set_info_compound_done: xid=3D18 sid=3D0xbb2583e9 tid=3D0xe7ab=
-49dc
-> > > >               rm-16350 [003] .... 333187.920309:
-> > > > smb3_query_info_compound_enter: xid=3D20 sid=3D0xbb2583e9 tid=3D0xe=
-7ab49dc
-> > > >               rm-16350 [003] .... 333187.920999:
-> > > > smb3_query_info_compound_done: xid=3D20 sid=3D0xbb2583e9 tid=3D0xe7=
-ab49dc
-> > > >               rm-16350 [003] .... 333187.921043: smb3_delete_enter:
-> > > > xid=3D21 sid=3D0xbb2583e9 tid=3D0xe7ab49dc
-> > > >               rm-16350 [003] .... 333187.921870: smb3_delete_done:
-> > > > xid=3D21 sid=3D0xbb2583e9 tid=3D0xe7ab49dc
-> > > >            touch-16361 [005] .... 333237.447252:
-> > > > smb3_set_info_compound_enter: xid=3D23 sid=3D0xbb2583e9 tid=3D0xe7a=
-b49dc
-> > > >            touch-16361 [005] .... 333237.448044:
-> > > > smb3_set_info_compound_done: xid=3D23 sid=3D0xbb2583e9 tid=3D0xe7ab=
-49dc
-> > > >               ln-16366 [000] .... 333250.734035:
-> > > > smb3_query_info_compound_enter: xid=3D25 sid=3D0xbb2583e9 tid=3D0xe=
-7ab49dc
-> > > >               ln-16366 [001] .... 333250.734689:
-> > > > smb3_query_info_compound_err: xid=3D25 sid=3D0xbb2583e9 tid=3D0xe7a=
-b49dc
-> > > > rc=3D-2
-> > > >               ln-16366 [001] .... 333250.734735:
-> > > > smb3_query_info_compound_enter: xid=3D26 sid=3D0xbb2583e9 tid=3D0xe=
-7ab49dc
-> > > >               ln-16366 [001] .... 333250.735368:
-> > > > smb3_query_info_compound_done: xid=3D26 sid=3D0xbb2583e9 tid=3D0xe7=
-ab49dc
-> > > >               ln-16366 [001] .... 333250.735413:
-> > > > smb3_query_info_compound_enter: xid=3D27 sid=3D0xbb2583e9 tid=3D0xe=
-7ab49dc
-> > > >               ln-16366 [001] .... 333250.735947:
-> > > > smb3_query_info_compound_err: xid=3D27 sid=3D0xbb2583e9 tid=3D0xe7a=
-b49dc
-> > > > rc=3D-2
-> > > >               ln-16366 [001] .... 333250.735973: smb3_hardlink_ente=
-r:
-> > > > xid=3D28 sid=3D0xbb2583e9 tid=3D0xe7ab49dc
-> > > >               ln-16366 [001] .... 333250.736679: smb3_hardlink_done=
-:
-> > > > xid=3D28 sid=3D0xbb2583e9 tid=3D0xe7ab49dc
-> > > >            gmain-2225  [000] .... 333250.736855:
-> > > > smb3_query_info_compound_enter: xid=3D29 sid=3D0xbb2583e9 tid=3D0xe=
-7ab49dc
-> > > >            gmain-2225  [001] .... 333250.737527:
-> > > > smb3_query_info_compound_done: xid=3D29 sid=3D0xbb2583e9 tid=3D0xe7=
-ab49dc
-> > >
-> > > Let's add full paths to the logs to increase usability - this way we
-> > > can match logs with particular actions in the user space.
-> >
-> > ok - will add
-> >
-> > > Also please don't remove the blank line - the 2nd change in the patch=
-:
-> >
-> > That was a typo - will fix
-> >
-> >
-> >
-> > --
-> > Thanks,
-> >
-> > Steve
->
->
->
-> --
-> Thanks,
->
-> Steve
+RnJvbSBiNmYwYjEwNDgyYWM2ZDJhMWI5NjhiNzM2ZGU1YzA0OWM2MGY4MjkxIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFR1ZSwgMTIgTWFyIDIwMTkgMDE6Mjk6MDMgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
+bWIzOiBkaXNwbGF5IHZvbHVtZSBzZXJpYWwgbnVtYmVyIGZvciBzaGFyZXMgaW4KIC9wcm9jL2Zz
+L2NpZnMvRGVidWdEYXRhCgpJdCBjYW4gYmUgaGVscGZ1bCBmb3IgZGVidWdnaW5nLiAgQWNjb3Jk
+aW5nIHRvIE1TLUZTQ0M6CgoiQSAzMi1iaXQgdW5zaWduZWQgaW50ZWdlciB0aGF0IGNvbnRhaW5z
+IHRoZSBzZXJpYWwgbnVtYmVyIG9mIHRoZQp2b2x1bWUuIFRoZSBzZXJpYWwgbnVtYmVyIGlzIGFu
+IG9wYXF1ZSB2YWx1ZSBnZW5lcmF0ZWQgYnkgdGhlIGZpbGUKc3lzdGVtIGF0IGZvcm1hdCB0aW1l
+IgoKU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgot
+LS0KIGZzL2NpZnMvY2lmc19kZWJ1Zy5jIHwgMyArKysKIDEgZmlsZSBjaGFuZ2VkLCAzIGluc2Vy
+dGlvbnMoKykKCmRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNfZGVidWcuYyBiL2ZzL2NpZnMvY2lm
+c19kZWJ1Zy5jCmluZGV4IGZhZWIxNDUyY2MyZC4uMTNjMTI4OGIwNGE3IDEwMDY0NAotLS0gYS9m
+cy9jaWZzL2NpZnNfZGVidWcuYworKysgYi9mcy9jaWZzL2NpZnNfZGVidWcuYwpAQCAtMTE1LDYg
+KzExNSw5IEBAIHN0YXRpYyB2b2lkIGNpZnNfZGVidWdfdGNvbihzdHJ1Y3Qgc2VxX2ZpbGUgKm0s
+IHN0cnVjdCBjaWZzX3Rjb24gKnRjb24pCiAJCXNlcV9wdXRzKG0sICIgdHlwZTogQ0RST00gIik7
+CiAJZWxzZQogCQlzZXFfcHJpbnRmKG0sICIgdHlwZTogJWQgIiwgZGV2X3R5cGUpOworCisJc2Vx
+X3ByaW50ZihtLCAiU2VyaWFsIE51bWJlcjogMHgleCIsIHRjb24tPnZvbF9zZXJpYWxfbnVtYmVy
+KTsKKwogCWlmICgodGNvbi0+c2VhbCkgfHwKIAkgICAgKHRjb24tPnNlcy0+c2Vzc2lvbl9mbGFn
+cyAmIFNNQjJfU0VTU0lPTl9GTEFHX0VOQ1JZUFRfREFUQSkgfHwKIAkgICAgKHRjb24tPnNoYXJl
+X2ZsYWdzICYgU0hJMTAwNV9GTEFHU19FTkNSWVBUX0RBVEEpKQotLSAKMi4xNy4xCgo=
+--0000000000001d41bd0583e01369--
