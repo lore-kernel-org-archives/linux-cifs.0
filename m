@@ -2,68 +2,67 @@ Return-Path: <SRS0=AEBP=RP=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64B40C43381
-	for <linux-cifs@archiver.kernel.org>; Tue, 12 Mar 2019 21:51:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E40E0C43381
+	for <linux-cifs@archiver.kernel.org>; Tue, 12 Mar 2019 21:57:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 30C432077B
-	for <linux-cifs@archiver.kernel.org>; Tue, 12 Mar 2019 21:51:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A0012147C
+	for <linux-cifs@archiver.kernel.org>; Tue, 12 Mar 2019 21:57:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tZessrpg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jd1czdMB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726534AbfCLVvU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 12 Mar 2019 17:51:20 -0400
-Received: from mail-lf1-f67.google.com ([209.85.167.67]:34922 "EHLO
-        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726329AbfCLVvU (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 12 Mar 2019 17:51:20 -0400
-Received: by mail-lf1-f67.google.com with SMTP id h6so3255722lfc.2
-        for <linux-cifs@vger.kernel.org>; Tue, 12 Mar 2019 14:51:19 -0700 (PDT)
+        id S1726438AbfCLV5m (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 12 Mar 2019 17:57:42 -0400
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:43414 "EHLO
+        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726388AbfCLV5m (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 12 Mar 2019 17:57:42 -0400
+Received: by mail-qk1-f193.google.com with SMTP id s26so2457513qkm.10
+        for <linux-cifs@vger.kernel.org>; Tue, 12 Mar 2019 14:57:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=rtMb2vNdLeL+9PcNKq9MuIwBXaeHGfFYJrENnxkvS7g=;
-        b=tZessrpgjmpg2wrq2+WWyz42o+/XrR5j6szI3PjNptCYR3WdzVfwfv8YOdfLKeGp5M
-         jA+2p1LJc6e2vR4063uBsXvaCwmVIVO64tqaAQBZyyeMvEl1WBNJFVavl5I9dlts9wUs
-         Cl5Gr/M/uJG4OVFhAaFZE+dxVjKRPJDgDTFtghRMgmvvwAbjm/QhhMufhsgzIVhy8iRX
-         X24voYlKqP96pCzVUbepXfa7wpRSuS5ai63RQQoNcYdDMpeStdb5EjfJG6DnFC8FSeic
-         oDq8ATGIuAuTh1FXk+3+ueSG47TIVdI2Hom/pxnnIWlS3GUwxW0jG9eaoxxOlN2jOPOm
-         sMlA==
+        bh=U0BqZxc86eUdKwav9b84R3kgi+IVXVaQnQlWkdrxTJE=;
+        b=Jd1czdMBJmpyqmvZq20oFwFOs+pgvOG4dqW48waqX2ejUl02FZkUTlBaagKC5xrG4u
+         1JLr+ybIY+ABVUzix3sfbcDNxL8fD6hvkfVDiR3QGxxn+oP6zGYHg1hQYD+FOTPgsFsF
+         zHPGNLfRGZ2JYh3Vajv3k4GI4xlfzrBZP/+BtULrUUavcWlpbNKkqdV/UsZZmKdUISeV
+         lMX1z0V6G3n+2vynVhSb62fvvwk9fzU0Vw7rIsBDcjDsBL3hrhMXHtZ/GCbQ+9geZbyn
+         7PJONevuL/BuhxG4rtPl7kRqXwWpY//hKekjFqfkuQbuxk6G3vraVY9vE2PAwJbLBWQ2
+         yZ0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=rtMb2vNdLeL+9PcNKq9MuIwBXaeHGfFYJrENnxkvS7g=;
-        b=IqYP+NfYR/4Ul1PLbhe4nfvuSv22jynRYNDbsUt1QWAIqxVdY589B6GoOR9HQpVYeY
-         3LEMGq2dqS80zEUfZqWfb0ZALLqpFZ7GTuHpXPf59EGjtg2PtjiAv9LeT1Y5ZDuWyQZv
-         0QNISTS8Bms/CRfnWA7wONBzX7N1VUpYkOebG2oQJE4Gl3p+TqiWZpotxokHD03CVYJS
-         tTOg+ey1dEe5PvoIrZ9LelJphaR/2wj9Ztr6hUwt1OZmRggaBYdPcqcSf2lzT7jDTJG3
-         pTyNoNideew71ANHWMDmYhjCqSnBwf9Gr5eZA5P4Ty0bWq3toKbMuCobCRupXQ25+ag+
-         gjOg==
-X-Gm-Message-State: APjAAAVMI3pUSyClx4yNkO9BbsTqu9OAuXfnCL9h6vslUwMJcb3btNzN
-        /OgmvZcWoOju8r+nxiezMuKRnkF/z7Co7xKWrQ==
-X-Google-Smtp-Source: APXvYqySJnAkBfnIn3LWLpAJfunUKAvyziAyLLdyPznKXUrEr3s4jsMZdfcKwfPKihrgIOiZOf6L0Niey5DB/gewLiA=
-X-Received: by 2002:ac2:4474:: with SMTP id y20mr7575903lfl.42.1552427478388;
- Tue, 12 Mar 2019 14:51:18 -0700 (PDT)
+        bh=U0BqZxc86eUdKwav9b84R3kgi+IVXVaQnQlWkdrxTJE=;
+        b=SOe0uv+ezQw+t9UChXcpzjhz7hoxhFyhQHy2Hkofdofvmn2LvsTL8UXOTzP9v+mUeN
+         Lq5bsJBl5trqK1VUyF4qv+xK4vbZ/rADrAtanDhIXchEgg27NUCQimZgYzrqWjq5XCVw
+         beXX/FA4cBoUX6feqU80+gxPKiAhZoXLut1nCVVlCaQcD9VfsRBjOiPBsAXZvBVinXTo
+         foqlxAq3YpTCU9pTkM+FkWZKsJ1DvtdJg5s8IoNAIbN/7dZ1B0mbDEsmxAwvrz0KcPXu
+         5hfzTm5Dyo4E4OadHSf6vDl3MMgHFurbF4UUk3Xs2l/kjsVvTjcKk03xdio32U8JbzKC
+         Mf9A==
+X-Gm-Message-State: APjAAAUFAaYja8iJdZN1df5Lreuf2RAdHVGRXXSPwmPgb8zi+1HDA4gC
+        oMDUHfHw00FkkoyD+Ftye5RXaD+xQZCET/nWaUY=
+X-Google-Smtp-Source: APXvYqzPAspwX2FTi+i+KpZEEeLZPA2wPQkunHJWkTBF09TwBkwb51XOI88LcK6Sid0gFhE8s48qlkA3LlTycSA4NSU=
+X-Received: by 2002:ae9:dd04:: with SMTP id r4mr29107655qkf.187.1552427860557;
+ Tue, 12 Mar 2019 14:57:40 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5muY3xgVW03Mi8N-c4wyZFikzTeZgLDEuGLoXFXNZ-wFHA@mail.gmail.com>
- <CAKywueR9-_yYVA4YfycxfH_jog0xQKhgoQeFG6nhLws4TLC8Tg@mail.gmail.com>
- <CAH2r5mv+6N=p183kFpYnFGo7ixcu1TkCjBvWnct=1M91kH3_WA@mail.gmail.com>
- <CAH2r5mv2Cp8YseCF1rz0dH8tvPYZ1+dCykupzVv_S81f2gPMJg@mail.gmail.com>
- <CAN05THQt3se9xsbhKOsA4ZxhuZpe_SnkTAisTP0AnpKsb-jfOQ@mail.gmail.com> <CAH2r5mvVA6Ov2sL-crNgeT91MeLeAZTJtNW6dZSnhh=ATzvjTQ@mail.gmail.com>
-In-Reply-To: <CAH2r5mvVA6Ov2sL-crNgeT91MeLeAZTJtNW6dZSnhh=ATzvjTQ@mail.gmail.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Tue, 12 Mar 2019 14:51:07 -0700
-Message-ID: <CAKywueR=hkkkPHeR-jfj21bbcvgOBP6Y-QaHPP7wB4Neyk5mMQ@mail.gmail.com>
-Subject: Re: [PATCH][SMB3] Add various dynamic tracepoints for compounded operations
-To:     Steve French <smfrench@gmail.com>
-Cc:     ronnie sahlberg <ronniesahlberg@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
+References: <20190311060025.9750-1-lsahlber@redhat.com> <20190311060025.9750-2-lsahlber@redhat.com>
+ <CAKywueQ0bE5CZLVBvYMttPzFtbN6zVNv+0oEddaETsmxjOJkuw@mail.gmail.com>
+In-Reply-To: <CAKywueQ0bE5CZLVBvYMttPzFtbN6zVNv+0oEddaETsmxjOJkuw@mail.gmail.com>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Wed, 13 Mar 2019 07:57:29 +1000
+Message-ID: <CAN05THSz1RrTTsp6c4-beX7STZF9tm1NcSnq7Hi2bG+Ou5m34w@mail.gmail.com>
+Subject: Re: [PATCH] cifs: cache FILE_ALL_INFO for the shared root handle
+To:     Pavel Shilovsky <piastryyy@gmail.com>
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>,
+        Pavel Shilovsky <pshilov@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
@@ -71,78 +70,313 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I actually like the idea proposed in the patch: this way we will be
-able to track logical operations better. In a case we need a deeper
-logging we already have mid traces which contains MID, TID, SID and
-CMD - everything you need to trace individual SMB packet regardless of
-whether it is a part of compounding chain or not.
-
-Now in order to match both logical operation and SMB packets traces we
-need something common - like XID. Currently we do not propagate XID
-down to the transport layer, let's do that - this way we can trace
-individual system call from the very beginning to the completeness on
-every layer inside cifs.ko.
-
-=D0=B2=D1=82, 12 =D0=BC=D0=B0=D1=80. 2019 =D0=B3. =D0=B2 00:19, Steve Frenc=
-h <smfrench@gmail.com>:
+On Tue, Mar 12, 2019 at 9:19 AM Pavel Shilovsky <piastryyy@gmail.com> wrote=
+:
 >
-> The general feeling I am getting from tracing the compounding is that
-> we have to have the more granular tracing available
-> (similar to this patch), and also (with followon patch) add noisier
-> optional trace points lower down (that are generic) that we turn on
-> less frequently (in particular when the filename is not good enough
-> and we must have the xid - even if it makes the trace very noisy)
+> =D0=B2=D1=81, 10 =D0=BC=D0=B0=D1=80. 2019 =D0=B3. =D0=B2 23:01, Ronnie Sa=
+hlberg <lsahlber@redhat.com>:
+> >
+> > When we open the shared root handle also ask for FILE_ALL_INFORMATION s=
+ince
+> > we can do this at zero cost as part of a compound.
+> > Cache this information as long as the lease is return and serve any
+> > future requests from cache.
+> >
+> > This allows us to serve "stat /<mountpoint>" directly from cache and av=
+oid
+> > a network roundtrip.  Since clients ofthen need to do this quite a lot
+> > this improve performance slightly.
+> >
+> > As an example: xfstest generic/533 performs 43 stat operations on the r=
+oot
+> > of the share while it is run. Which are eliminated with this patch.
+> >
+> > Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> > ---
+> >  fs/cifs/cifsglob.h  |   3 ++
+> >  fs/cifs/smb2inode.c |  15 ++++---
+> >  fs/cifs/smb2ops.c   | 111 +++++++++++++++++++++++++++++++++++++++++++-=
+--------
+> >  fs/cifs/smb2pdu.c   |  12 +++---
+> >  fs/cifs/smb2proto.h |   3 ++
+> >  5 files changed, 116 insertions(+), 28 deletions(-)
+> >
+> > diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> > index f293e052e351..b8360ca221eb 100644
+> > --- a/fs/cifs/cifsglob.h
+> > +++ b/fs/cifs/cifsglob.h
+> > @@ -962,11 +962,14 @@ cap_unix(struct cifs_ses *ses)
+> >
+> >  struct cached_fid {
+> >         bool is_valid:1;        /* Do we have a useable root fid */
+> > +       bool file_all_info_is_valid:1;
+> > +
+> >         struct kref refcount;
+> >         struct cifs_fid *fid;
+> >         struct mutex fid_mutex;
+> >         struct cifs_tcon *tcon;
+> >         struct work_struct lease_break;
+> > +       struct smb2_file_all_info file_all_info;
 >
+> The structure contains Name[1] - length of 1 byte...
 >
-> On Tue, Mar 12, 2019 at 1:06 AM ronnie sahlberg
-> <ronniesahlberg@gmail.com> wrote:
+> >  };
 > >
-> > Hmm.
+> >  /*
+> > diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+> > index 01a76bccdb8d..b6e07e2eed10 100644
+> > --- a/fs/cifs/smb2inode.c
+> > +++ b/fs/cifs/smb2inode.c
+> > @@ -309,12 +309,17 @@ smb2_query_path_info(const unsigned int xid, stru=
+ct cifs_tcon *tcon,
+> >                 rc =3D open_shroot(xid, tcon, &fid);
+> >                 if (rc)
+> >                         goto out;
+> > -               rc =3D SMB2_query_info(xid, tcon, fid.persistent_fid,
+> > -                                    fid.volatile_fid, smb2_data);
+> > +
+> > +               if (tcon->crfid.file_all_info_is_valid) {
+> > +                       move_smb2_info_to_cifs(data,
+> > +                                              &tcon->crfid.file_all_in=
+fo);
+> > +               } else {
+> > +                       rc =3D SMB2_query_info(xid, tcon, fid.persisten=
+t_fid,
+> > +                                            fid.volatile_fid, smb2_dat=
+a);
+> > +                       if (!rc)
+> > +                               move_smb2_info_to_cifs(data, smb2_data)=
+;
+> > +               }
+> >                 close_shroot(&tcon->crfid);
+> > -               if (rc)
+> > -                       goto out;
+> > -               move_smb2_info_to_cifs(data, smb2_data);
+> >                 goto out;
+> >         }
 > >
-> > I don't think this is the wrong layer to add the tracing.
-> > Instead of adding the tracing in say smb2_compound_op(), where we
-> > create the compound,
-> > I think it will be better to add the tracing down in the leaf
-> > functions, i.e. down in SMB2_open_init(), SMB2_query_info_init(), ...
+> > diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> > index 085e91436da7..0d8bf87592ff 100644
+> > --- a/fs/cifs/smb2ops.c
+> > +++ b/fs/cifs/smb2ops.c
+> > @@ -619,6 +619,7 @@ smb2_close_cached_fid(struct kref *ref)
+> >                 SMB2_close(0, cfid->tcon, cfid->fid->persistent_fid,
+> >                            cfid->fid->volatile_fid);
+> >                 cfid->is_valid =3D false;
+> > +               cfid->file_all_info_is_valid =3D false;
+> >         }
+> >  }
 > >
-> > That way we know that we will always have tracing for all opens/closes/=
-...
+> > @@ -643,9 +644,18 @@ smb2_cached_lease_break(struct work_struct *work)
+> >   */
+> >  int open_shroot(unsigned int xid, struct cifs_tcon *tcon, struct cifs_=
+fid *pfid)
+> >  {
+> > -       struct cifs_open_parms oparams;
+> > -       int rc;
+> > -       __le16 srch_path =3D 0; /* Null - since an open of top of share=
+ */
+> > +       struct cifs_ses *ses =3D tcon->ses;
+> > +       struct TCP_Server_Info *server =3D ses->server;
+> > +       struct cifs_open_parms oparms;
+> > +       struct smb2_create_rsp *o_rsp =3D NULL;
+> > +       struct smb2_query_info_rsp *qi_rsp =3D NULL;
+> > +       int resp_buftype[2];
+> > +       struct smb_rqst rqst[2];
+> > +       struct kvec rsp_iov[2];
+> > +       struct kvec open_iov[SMB2_CREATE_IOV_SIZE];
+> > +       struct kvec qi_iov[1];
+> > +       int rc, flags =3D 0;
+> > +       __le16 utf16_path =3D 0; /* Null - since an open of top of shar=
+e */
+> >         u8 oplock =3D SMB2_OPLOCK_LEVEL_II;
 > >
-> > But then what to do about the trace_smb3_..._err()/trace_smb3_..._done(=
-) calls ?
-> > These I think should be moved down and handled inside compound_send_rec=
-v().
-> > That way we can have one single place where we call the appropriate
-> > _err()/_done() functions
-> > and we know that we will catch every single completed function.
+> >         mutex_lock(&tcon->crfid.fid_mutex);
+> > @@ -657,22 +667,87 @@ int open_shroot(unsigned int xid, struct cifs_tco=
+n *tcon, struct cifs_fid *pfid)
+> >                 return 0;
+> >         }
 > >
-> > I.e. just put it in a single place instead of in every single call-site=
-.
-> > In compound_send_recv we can just loop over all the responses, cast it
-> > to a smb2_hdr structure, looka at both the command code as well as the
-> > status code and call the appropriate xys_err() or xyz_done() functions
-> > as needed.
-> >
-> > Let me show an example of what I mean for a open/query/close compound :
-> >
-> > trace_smb3_open_enter(xid=3D5, filename=3D"foo", ...)   from SMB2_open_=
-init()
-> > trace_smb3_query_info_enter(xid=3D5,... ) from SMB2_query_info_init()
-> > trace_smb3_close_enter(xid=3D5, ...) from SMB2_close_init()
-> > (maybe have additional tracing in compound_send_recv() that we are
-> > about to send xid=3D5 to the wire)
-> > trace_smb3_open_done(xid=3D5, ...) from compound_send_recv()
-> > trace_smb3_query_info_done(xid=3D5, ...) from compound_send_recv()
-> > trace_smb3_close_done(xid=3D5, ...) from compound_send_recv()
-> >
+> > -       oparams.tcon =3D tcon;
+> > -       oparams.create_options =3D 0;
+> > -       oparams.desired_access =3D FILE_READ_ATTRIBUTES;
+> > -       oparams.disposition =3D FILE_OPEN;
+> > -       oparams.fid =3D pfid;
+> > -       oparams.reconnect =3D false;
+> > -
+> > -       rc =3D SMB2_open(xid, &oparams, &srch_path, &oplock, NULL, NULL=
+, NULL);
+> > -       if (rc =3D=3D 0) {
+> > -               memcpy(tcon->crfid.fid, pfid, sizeof(struct cifs_fid));
+> > -               tcon->crfid.tcon =3D tcon;
+> > -               tcon->crfid.is_valid =3D true;
+> > -               kref_init(&tcon->crfid.refcount);
+> > -               kref_get(&tcon->crfid.refcount);
+> > -       }
+> > +       if (smb3_encryption_required(tcon))
+> > +               flags |=3D CIFS_TRANSFORM_REQ;
+> > +
+> > +       memset(rqst, 0, sizeof(rqst));
+> > +       resp_buftype[0] =3D resp_buftype[1] =3D CIFS_NO_BUFFER;
+> > +       memset(rsp_iov, 0, sizeof(rsp_iov));
+> > +
+> > +       /* Open */
+> > +       memset(&open_iov, 0, sizeof(open_iov));
+> > +       rqst[0].rq_iov =3D open_iov;
+> > +       rqst[0].rq_nvec =3D SMB2_CREATE_IOV_SIZE;
+> > +
+> > +       oparms.tcon =3D tcon;
+> > +       oparms.create_options =3D 0;
+> > +       oparms.desired_access =3D FILE_READ_ATTRIBUTES;
+> > +       oparms.disposition =3D FILE_OPEN;
+> > +       oparms.fid =3D pfid;
+> > +       oparms.reconnect =3D false;
+> > +
+> > +       rc =3D SMB2_open_init(tcon, &rqst[0], &oplock, &oparms, &utf16_=
+path);
+> > +       if (rc)
+> > +               goto oshr_exit;
+> > +       smb2_set_next_command(tcon, &rqst[0]);
+> > +
+> > +       memset(&qi_iov, 0, sizeof(qi_iov));
+> > +       rqst[1].rq_iov =3D qi_iov;
+> > +       rqst[1].rq_nvec =3D 1;
+> > +
+> > +       rc =3D SMB2_query_info_init(tcon, &rqst[1], COMPOUND_FID,
+> > +                                 COMPOUND_FID, FILE_ALL_INFORMATION,
+> > +                                 SMB2_O_INFO_FILE, 0,
+> > +                                 sizeof(struct smb2_file_all_info) +
+> > +                                 PATH_MAX * 2, 0, NULL);
+>
+> ...but OutputLenght is sizeof(struct smb2_file_all_info) + PATH_MAX * 2.
+>
+> > +       if (rc)
+> > +               goto oshr_exit;
+> > +
+> > +       smb2_set_related(&rqst[1]);
+> > +
+> > +       rc =3D compound_send_recv(xid, ses, flags, 2, rqst,
+> > +                               resp_buftype, rsp_iov);
+> > +       if (rc)
+> > +               goto oshr_exit;
+> > +
+> > +       o_rsp =3D (struct smb2_create_rsp *)rsp_iov[0].iov_base;
+> > +       oparms.fid->persistent_fid =3D o_rsp->PersistentFileId;
+> > +       oparms.fid->volatile_fid =3D o_rsp->VolatileFileId;
+> > +#ifdef CONFIG_CIFS_DEBUG2
+> > +       oparms.fid->mid =3D le64_to_cpu(o_rsp->sync_hdr.MessageId);
+> > +#endif /* CIFS_DEBUG2 */
+> > +
+> > +       if (o_rsp->OplockLevel =3D=3D SMB2_OPLOCK_LEVEL_LEASE)
+> > +               oplock =3D smb2_parse_lease_state(server, o_rsp,
+> > +                                               &oparms.fid->epoch,
+> > +                                               oparms.fid->lease_key);
+> > +       else
+> > +               goto oshr_exit;
+> > +
+> > +
+> > +       memcpy(tcon->crfid.fid, pfid, sizeof(struct cifs_fid));
+> > +       tcon->crfid.tcon =3D tcon;
+> > +       tcon->crfid.is_valid =3D true;
+> > +       kref_init(&tcon->crfid.refcount);
+> > +       kref_get(&tcon->crfid.refcount);
+> > +
+> > +
+> > +       qi_rsp =3D (struct smb2_query_info_rsp *)rsp_iov[1].iov_base;
+> > +       rc =3D smb2_validate_and_copy_iov(
+> > +                               le16_to_cpu(qi_rsp->OutputBufferOffset)=
+,
+> > +                               le32_to_cpu(qi_rsp->OutputBufferLength)=
+,
+> > +                               &rsp_iov[1], sizeof(struct smb2_file_al=
+l_info),
+> > +                               (char *)&tcon->crfid.file_all_info);
+>
+> so, the above call will cause buffer overflow. Please include PATH_MAX
+> * 2 bytes into the structure to hold the name or even make a pointer
+> for the info.
 
-As pointed above we already have a similar tracing inside
-compound_send_recv and other transport layer functions - command level
-tracing. The only problem is that we do not log failure cases when we
-didn't send the packet - we only log server responses in
-map_smb2_to_linux_error. This is another area of the tracing where a
-fix is needed.
+Thanks.
+I changed it to clamp the length to sizeof(struct smb2_file_all_info)
+since we never actually need or use the name.
 
---
-Best regards,
-Pavel Shilovsky
+>
+> > +       if (rc)
+> > +               goto oshr_exit;
+> > +       tcon->crfid.file_all_info_is_valid =3D 1;
+> > +
+> > + oshr_exit:
+> >         mutex_unlock(&tcon->crfid.fid_mutex);
+> > +       SMB2_open_free(&rqst[0]);
+> > +       SMB2_query_info_free(&rqst[1]);
+> > +       free_rsp_buf(resp_buftype[0], rsp_iov[0].iov_base);
+> > +       free_rsp_buf(resp_buftype[1], rsp_iov[1].iov_base);
+> >         return rc;
+> >  }
+> >
+> > diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> > index 60fbe306f604..cfe9fe41ccf5 100644
+> > --- a/fs/cifs/smb2pdu.c
+> > +++ b/fs/cifs/smb2pdu.c
+> > @@ -1797,9 +1797,10 @@ create_reconnect_durable_buf(struct cifs_fid *fi=
+d)
+> >         return buf;
+> >  }
+> >
+> > -static __u8
+> > -parse_lease_state(struct TCP_Server_Info *server, struct smb2_create_r=
+sp *rsp,
+> > -                 unsigned int *epoch, char *lease_key)
+> > +__u8
+> > +smb2_parse_lease_state(struct TCP_Server_Info *server,
+> > +                      struct smb2_create_rsp *rsp,
+> > +                      unsigned int *epoch, char *lease_key)
+> >  {
+> >         char *data_offset;
+> >         struct create_context *cc;
+> > @@ -2456,8 +2457,9 @@ SMB2_open(const unsigned int xid, struct cifs_ope=
+n_parms *oparms, __le16 *path,
+> >         }
+> >
+> >         if (rsp->OplockLevel =3D=3D SMB2_OPLOCK_LEVEL_LEASE)
+> > -               *oplock =3D parse_lease_state(server, rsp, &oparms->fid=
+->epoch,
+> > -                                           oparms->fid->lease_key);
+> > +               *oplock =3D smb2_parse_lease_state(server, rsp,
+> > +                                                &oparms->fid->epoch,
+> > +                                                oparms->fid->lease_key=
+);
+> >         else
+> >                 *oplock =3D rsp->OplockLevel;
+> >  creat_exit:
+> > diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+> > index 87733b27a65f..72cc563c32fe 100644
+> > --- a/fs/cifs/smb2proto.h
+> > +++ b/fs/cifs/smb2proto.h
+> > @@ -223,6 +223,9 @@ extern int smb3_validate_negotiate(const unsigned i=
+nt, struct cifs_tcon *);
+> >
+> >  extern enum securityEnum smb2_select_sectype(struct TCP_Server_Info *,
+> >                                         enum securityEnum);
+> > +extern __u8 smb2_parse_lease_state(struct TCP_Server_Info *server,
+> > +                                  struct smb2_create_rsp *rsp,
+> > +                                  unsigned int *epoch, char *lease_key=
+);
+> >  extern int smb3_encryption_required(const struct cifs_tcon *tcon);
+> >  extern int smb2_validate_iov(unsigned int offset, unsigned int buffer_=
+length,
+> >                              struct kvec *iov, unsigned int min_buf_siz=
+e);
+> > --
+> > 2.13.6
+> >
+>
+> In general we should probably need to set oplock/lease level on the
+> inode of the root, so the existing caching mechanism (see
+> cifs_inode_need_reval in inode.c) can handle stat calls, so they don't
+> reach to query_path_info(). But it seems to be out of scope of this
+> patch and might be done separately.
+>
+> --
+> Best regards,
+> Pavel Shilovsky
