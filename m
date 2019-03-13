@@ -2,82 +2,103 @@ Return-Path: <SRS0=HHpq=RQ=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9D14C43381
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 Mar 2019 22:05:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B0A1C43381
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 Mar 2019 22:14:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8A9852087C
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 Mar 2019 22:05:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 17A4921019
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 Mar 2019 22:14:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="llixkYcC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fi3Ge+JO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726560AbfCMWFb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 13 Mar 2019 18:05:31 -0400
-Received: from mail-pg1-f171.google.com ([209.85.215.171]:40765 "EHLO
-        mail-pg1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726559AbfCMWFb (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 13 Mar 2019 18:05:31 -0400
-Received: by mail-pg1-f171.google.com with SMTP id u9so2480729pgo.7
-        for <linux-cifs@vger.kernel.org>; Wed, 13 Mar 2019 15:05:30 -0700 (PDT)
+        id S1726442AbfCMWOd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 13 Mar 2019 18:14:33 -0400
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:35169 "EHLO
+        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726420AbfCMWOd (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 13 Mar 2019 18:14:33 -0400
+Received: by mail-qt1-f193.google.com with SMTP id h39so3898479qte.2;
+        Wed, 13 Mar 2019 15:14:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=6JL2GoO4TltYxFSFRXLXB8VwfyHkqkxi54ZNtS8X50k=;
-        b=llixkYcCT32WQlJ5ATa9/7xl8AhoyeR9LLDmw2lOnAyQsPG7D6yYUFmWXleuRTdEU3
-         uUtMo8vlb0vCmVqyNecZqRTQDMGUsGA7YeSeTTDne8BVbAdtIN33q2jExdB1G8zcV1dY
-         s+dBpYg2Nd0nkbGHl+SkpGQ5wvSx/Z3z1MOtfsQAF2HAHbd8hw0xGTY2xN03NXvbMr3j
-         wbwYR2N7V4oRdZFxUP4kl7ZwKfRxePOzY/ma4TStQy1RT7GfSyAZNbl6WJ1oz5uNZ+dM
-         Oen0bafHpdWuS+ug9MBkwpyF6yn2n+aafDRUfZdgu+wq0t91tW7yF+BcjFt5I7CzYBYN
-         L3EQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=pSeST17t3RS04gASTvmKouC23Uer3g+QIxo7NXIdLL4=;
+        b=fi3Ge+JOEd2F3d/WCT0EiRoSeZYUByR8Fs/+BJkaCeMW5Mz/qve4JY0MrlCXno4ByQ
+         P09jrMF8uT6NhoOwC7qMbHd7vQD9kQsF/0NOf0Q7Q4vp0ZP+FdgbGSCtEqwJX1+uUrMp
+         06deZRTsGtQTuI0B+VRwSgnwYswTPmdM/Noev5fFL8Y5nHMYxCqpCjguSrtoHTFr8VxO
+         Mb7cvdhzk0p7YbnEruy7r//KjVjr4MIAFiMws/B0g8+klFoE5zPI5d8MJvlw06OfxtRl
+         1pSSLBbPQBLiNhRuq+Dd2kFEZkUPSIiHm80grF/LyK55pgC76t3BS9qxhiZukO1/SvJI
+         IPDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=6JL2GoO4TltYxFSFRXLXB8VwfyHkqkxi54ZNtS8X50k=;
-        b=FFpdJztYSnbQoOXttBC0heabUZikR9Phfu87VUuPawV61umFkZq6WfOYftZkHfB8A7
-         eWMOUps1FDww5SfFtKV/m4ZJDlTiQ65vALpPs8EJRUiIgndfeAZZ7zQWafGMq+FfwP9h
-         oCT2gow3f1+O/6NAUqhUqzq5kCQt/5xy3uK4dJ7+VqWZktTmKufnoEse4rm08kWl/HKo
-         5Kea6FV+65ALDBrVa5wXZ/y+cEeZo52ChVRwO59iOt6AgWsq1jXVyfa4ywNh9sUfZlPk
-         UxzvlnE3tYZg6A95hEBlL/AJz803BViMk8b/v376zEaFXMVgV3Ui5zg60GMdDKuFOHX5
-         Wbrg==
-X-Gm-Message-State: APjAAAXUTF508MN7xMRzCd1Va6kFp0jXLESjmXIZrJcIDg23iUhXxAJN
-        Xe4Ijxv5eWDbqZhqO8MCTSepK7wudnm2qoS4RVI=
-X-Google-Smtp-Source: APXvYqwHxVY2ZtB2Uv/so5rYeUGcdPCAWPgN1d7FFdkYS/5RfP/e9M9bHS9xYU8ICrO2uHAkHiO6N8cK7Yr7RJ7ewaA=
-X-Received: by 2002:a63:544f:: with SMTP id e15mr2475086pgm.344.1552514730218;
- Wed, 13 Mar 2019 15:05:30 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=pSeST17t3RS04gASTvmKouC23Uer3g+QIxo7NXIdLL4=;
+        b=m/baMePMM+x7Th4lFrbRBDiudSbo9jn/ulIkQUAd5fOQ00PMcZcgpesiEgntgCVqbR
+         TJVv2rxwRd1WJkBScHavTjbSdBsILkNBF5R4oxxDKtNTg2mIYCDjsYLYKUkgZ6nVbTNI
+         qpe3NeAZcQn7iy3bTH6lAt/8uYrbS8l/k6ZAssHxtusllUw2yqU3QglcyPCQHtG5nxus
+         Usf33UFI8E1nVzYO6DH2xdPbMSDl/Qr9TiqHzB/D54ZiR7sVr87ChF8sW/DI0wE9M3WW
+         kERG21xpHxce4CzvD1Wl7ovHXRjvOJDZMA70c2KZgIMVbl0J08kJbuaTgN+dt7pW+lQJ
+         LXQg==
+X-Gm-Message-State: APjAAAUavA7813EsbDwRDaShn9egw02pHP652ld2Cq/Ko9TEUr/ihGYX
+        BPmqs3XNvc8HHEb4jRJVqh6hPD6UZobzDj6GE7CY/A==
+X-Google-Smtp-Source: APXvYqwaC1I3oqg2djOxajVrmIT8HH8hEmLhvc9wslX4sglFbwc2pd7hwx6JJs2cjIPXeFeTLJANEIpsWJAk3Sm8ZsU=
+X-Received: by 2002:ac8:3957:: with SMTP id t23mr13499678qtb.331.1552515272616;
+ Wed, 13 Mar 2019 15:14:32 -0700 (PDT)
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 13 Mar 2019 17:05:19 -0500
-Message-ID: <CAH2r5ms0Q2UDyhVS9=c5JNSq9qbz_DRxohtQDGdokzyLtpbT5A@mail.gmail.com>
-Subject: Coverity Warnings and RDMA logging
-To:     Long Li <longli@microsoft.com>, CIFS <linux-cifs@vger.kernel.org>
+References: <CAH2r5muaceyqkrbXB7Bt-qv_vtVqZEmpafJa6B2+8kyRsK7ftQ@mail.gmail.com>
+In-Reply-To: <CAH2r5muaceyqkrbXB7Bt-qv_vtVqZEmpafJa6B2+8kyRsK7ftQ@mail.gmail.com>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Thu, 14 Mar 2019 08:14:21 +1000
+Message-ID: <CAN05THR2MpsVC9LwDfFDPA4nD9VWjKeF25Nsi2vJ=gC6=mNqVQ@mail.gmail.com>
+Subject: Re: [PATCH] [CIFS] Remove unneeded statements pointed out by Coverity
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-12 of the Coverity warnings against cifs.ko are related to RDMA
-logging, and are harmless, but would be nice to remove.  "log_rdma" is
-called from "log_rdma_mr" with level set to ERR (ie zero).   So it
-confuses coverity who sees an always true statement not realizing that
-it could be a little cleaner to call it this way than to remove the
-error by calling "cifs_dbg(VFS, ....)" directly (which would remove
-the warning.   Perhaps better would be to create a log_rdma_mr_err
-which calls cifs_dbg correctly without the if statement.
+reviewed by me
 
-
-#define log_rdma(level, class, fmt, args...)                            \
-do {                                                                    \
-        if (level <= smbd_logging_level || class & smbd_logging_class)  \
-                cifs_dbg(VFS, "%s:%d " fmt, __func__, __LINE__, ##args);\
-} while (0)
-
-Thoughts?   This is not a bug but 12 coverity warnings are noisy
--- 
-Thanks,
-
-Steve
+On Thu, Mar 14, 2019 at 7:53 AM Steve French <smfrench@gmail.com> wrote:
+>
+> cifs: remove unused value pointed out by Coverity
+>
+> Detected by CoverityScan CID#1438719 ("Unused Value")
+>
+> buf is reset again before being used so these two lines of code
+> are useless.
+>
+> Signed-off-by: Steve French <stfrench@microsoft.com>
+> ---
+>  fs/cifs/connect.c | 4 ----
+>  1 file changed, 4 deletions(-)
+>
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index b95db2b593cb..a8e9738db691 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -1191,10 +1191,6 @@ cifs_demultiplex_thread(void *p)
+>              continue;
+>          }
+>
+> -        if (server->large_buf)
+> -            buf = server->bigbuf;
+> -
+> -
+>          server->lstrp = jiffies;
+>
+>          for (i = 0; i < num_mids; i++) {
+>
+> --
+> Thanks,
+>
+> Steve
