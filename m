@@ -2,301 +2,183 @@ Return-Path: <SRS0=HHpq=RQ=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7B60C43381
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 Mar 2019 05:39:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC097C43381
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 Mar 2019 06:43:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 94BD8217F5
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 Mar 2019 05:39:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B24DF2070D
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 Mar 2019 06:43:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ucbMlplW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dqyay50G"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726694AbfCMFjn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 13 Mar 2019 01:39:43 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:42272 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726629AbfCMFjn (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 13 Mar 2019 01:39:43 -0400
-Received: by mail-pg1-f194.google.com with SMTP id b2so687358pgl.9
-        for <linux-cifs@vger.kernel.org>; Tue, 12 Mar 2019 22:39:42 -0700 (PDT)
+        id S1727089AbfCMGne (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 13 Mar 2019 02:43:34 -0400
+Received: from mail-pf1-f180.google.com ([209.85.210.180]:36367 "EHLO
+        mail-pf1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727080AbfCMGnd (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 13 Mar 2019 02:43:33 -0400
+Received: by mail-pf1-f180.google.com with SMTP id n22so700647pfa.3
+        for <linux-cifs@vger.kernel.org>; Tue, 12 Mar 2019 23:43:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=d+YpxpCWXKdv8x4IoUxzBunE/St6dcPWlmYY6Wzp71w=;
-        b=ucbMlplWkHHtbyXgbfzihZZsoxgG/Yyy4kxE6vQ/HIP38OSauVho1NfakBoDTdE8K4
-         3XEW3/AORkDa1/e2Z5bAm4RVwZMlamf4f1mYE+OtFxr8foD8Zpv6nBt7nItSId7fDjX9
-         4vsSiNwQkUFdJWCFBOUaTB+mLuiFQ1XJ1odzVCNVLjsS8AF1/mJBvqj9w1IHo4tfVwWR
-         TbJw4v8wzqeg/98xtCqoHXHM6BbdbJLwsEogXmUIURnsbdSei3WVnFyl5rQZ2fmGHxZ7
-         xkSeWj6kyOU3sujrsu4Onqb/7AEZD1xKLwPT66eGc/lksY3yNDmFqFzHbHQwMBS1AvnB
-         TG7w==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=h2Ln+QIBR47s8dWdmAzdo3QGPkGCjYrY/uYfg10Z20s=;
+        b=dqyay50GqOnECifvVhsm7AqB+Ankv76M6NOck1tPRcwgL3JNrlnbmyjcFnChMrfXsA
+         TbDOxBf5xZ3S/osXNLLnR2UXoHPTfpx17PLRJSmM8zuuydYYRqikQ+yF04TB+FeVRD5g
+         3/hBYLrlb/L6nDS4sr03AOqs6cCfGH+XOSwI0kq8/PcPJ++Qpz4bXGL2VKPKJlfd35iu
+         gK9MbY/0mhA56A8/2EluNB5hOBuPaHJpdSj2A1q8GS4OvlsSAlCxD3BEJ8c7CoG0gzgk
+         Spc/e7Xm81izkU+o5NqkQN7M2279gDb4hnJkBhE/kEj7Oc6e8Shg0XNiYCcl0k+UMsfb
+         F4JA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=d+YpxpCWXKdv8x4IoUxzBunE/St6dcPWlmYY6Wzp71w=;
-        b=ieUpSVylJ5VX7dWU8k3BLK45WEwK63Y+aZiSRHnmO16/yTT3mxX2v0j4aAChnHPanO
-         kkJSO5t9uhU8WL3jX/hhLzfbnj9JQJDg8GDHZjGRzJFEivhqSfknEr1oundob9ObXNoT
-         2/dPPjpjPoUdALGZNYwvfvXgQ35klxgq9VzC6iYaxIeCbVaTkUixS/7G71MDJnHUMSBI
-         HIamt+swly1kN2cKsItC7Y4jK2/hc/rFuUJIUDvQTB4KYLj7AbbJezfutrOF7n+xmJc6
-         57+7JDjI1NIkja4bIQNmB554bMNf3VApEYRM/MyIzsd/OIa49RsH2x4NOe12jCvvGNiP
-         Zyog==
-X-Gm-Message-State: APjAAAX2491GFc9IUpyLgpUqU7SjRQJmp51V4i/0+eyygWKHkeJMxxem
-        OfugUsedVhuN3TvA4pCcYXwryiduJBFu833W1Xo=
-X-Google-Smtp-Source: APXvYqzEP1SynBWAn7J/YLDUw4CGRWEqn0RMH6eRjUrssvu0121TppR6ff0WnsIbEKBWJHg076f+i827bOpkiqz5nHc=
-X-Received: by 2002:a63:540c:: with SMTP id i12mr169579pgb.69.1552455581683;
- Tue, 12 Mar 2019 22:39:41 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=h2Ln+QIBR47s8dWdmAzdo3QGPkGCjYrY/uYfg10Z20s=;
+        b=jFSIlmliRC8MYkkHIQVZRhPTL06qCG9Nb3RUTJsEzkIe/YJGpPMwZUcKSPYLYigmwU
+         bC92YQDgCnKP8ttvu1y5lVvJhQ3LNxZfq9t1yphDQG6vg5sicpI60PfZEX6izb0Da5xK
+         9UPgxdRO8hu/cXw1Mue2SZy58rCT9Vn+RXUMWRSnDHKl0trUicZUw1rQZmCMCwuBsr2P
+         dKiQc266opqWkRL9sumAjcKpwdvzwiXLXqRDph1ijmBrO3GNGi7Vd+VF8eLaexm984YH
+         bPQ972BtwwlVPgLitlojKsNpMxqRT3W3rpdYj1Qx7wldiO/nozd7fdlgbDe/B33BgcD9
+         SWbA==
+X-Gm-Message-State: APjAAAXKMYU3+PbRAv9ME0Np1mRKeDj5FweihbjWRqTStnyxImmKUswt
+        VSdLmB8rO5vYWbBXDQ4lp1yd3mJJHV+ifPWBsCE=
+X-Google-Smtp-Source: APXvYqxaRb4Mw/BSTaXSLChfyxv4sSit61QcH6RNxpMj2bKWtLliQL+8caBfyJ3lyB0gJ2kpUa4g6EINBGoWbpWG0Qs=
+X-Received: by 2002:a17:902:b618:: with SMTP id b24mr42092232pls.73.1552459412531;
+ Tue, 12 Mar 2019 23:43:32 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5muY3xgVW03Mi8N-c4wyZFikzTeZgLDEuGLoXFXNZ-wFHA@mail.gmail.com>
- <CAKywueR9-_yYVA4YfycxfH_jog0xQKhgoQeFG6nhLws4TLC8Tg@mail.gmail.com>
- <CAH2r5mv+6N=p183kFpYnFGo7ixcu1TkCjBvWnct=1M91kH3_WA@mail.gmail.com>
- <CAH2r5mv2Cp8YseCF1rz0dH8tvPYZ1+dCykupzVv_S81f2gPMJg@mail.gmail.com>
- <CAN05THQt3se9xsbhKOsA4ZxhuZpe_SnkTAisTP0AnpKsb-jfOQ@mail.gmail.com>
- <CAH2r5mvVA6Ov2sL-crNgeT91MeLeAZTJtNW6dZSnhh=ATzvjTQ@mail.gmail.com>
- <CAKywueR=hkkkPHeR-jfj21bbcvgOBP6Y-QaHPP7wB4Neyk5mMQ@mail.gmail.com>
- <CAH2r5msK48GgjKgJWJf0QA1N6ZV_+3fShmJJSBbmQ87Kk30+mw@mail.gmail.com> <CAN05THRfS+LA0FNhkGpQje-oOQRrG7ynUqB+8ZqXsVyrFUTPPw@mail.gmail.com>
-In-Reply-To: <CAN05THRfS+LA0FNhkGpQje-oOQRrG7ynUqB+8ZqXsVyrFUTPPw@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 13 Mar 2019 00:39:30 -0500
-Message-ID: <CAH2r5msE2_qqzQSku0QUb94DmstwaSaXFn2mHH3raqS8snXxkQ@mail.gmail.com>
-Subject: Re: [PATCH][SMB3] Add various dynamic tracepoints for compounded operations
-To:     ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc:     Pavel Shilovsky <piastryyy@gmail.com>,
+Date:   Wed, 13 Mar 2019 01:43:21 -0500
+Message-ID: <CAH2r5mu_adiGYpgLO_UUAjmS=tXBtYi1Q7EZK_PD7o_a9ChMaA@mail.gmail.com>
+Subject: [PATCH] add dynamic tracepoints for two simple falloc and zero range
+To:     ronnie sahlberg <ronniesahlberg@gmail.com>,
         CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/mixed; boundary="000000000000d00b0c0583f41fed"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I agree that we could use macros to shrink this - but as long as it is
-readable, seems fine to me.
+--000000000000d00b0c0583f41fed
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Mar 13, 2019 at 12:38 AM ronnie sahlberg
-<ronniesahlberg@gmail.com> wrote:
->
-> Reviewed-by me.
->
-> Only issue is that it is very verbose like this :
-> + if (rc)
-> + trace_smb3_rmdir_err(xid,  ses->Suid, tcon->tid, rc);
-> + else
-> + trace_smb3_rmdir_done(xid, ses->Suid, tcon->tid);
->
-> We can do this late but this pattern can be simplified to a single
-> line with a macro.
-> It is always rc that decides which tracepoint we use, and the error
-> path tracepoint has a small subset of the arguments,except for rc,
-> than the _done tracepoint have.
-> So the macro could take both rc as well as all the arguments for _done as=
- this :
->
-> TRACE_SMB3_RMDIR_END(rc, xid, suid, tid)
->
-> which then expands to the four lines of code.
-> We can do that later, just to reduce the amount of emacs real-estate
-> these lines take up.
->
->
-> On Wed, Mar 13, 2019 at 3:03 PM Steve French <smfrench@gmail.com> wrote:
-> >
-> > Version 3 of the patch attached.   Sample output below:
-> > (trace-cmd  record -e *query_info_co* -e smb3_hardlink* -e
-> > smb3_rename* -e smb3_set_eof* -e smb3_set_info_co* -e smb3_mkdir* -e
-> > smb3_delete* -e smb3_rmdir*)
-> >
-> >            mkdir-17927 [003] .... 447434.636544:
-> > smb3_query_info_compound_enter: xid=3D7 sid=3D0x7dc5fd6f tid=3D0xc79687=
-32
-> > path=3D\newdir
-> >            mkdir-17927 [003] .... 447434.637240:
-> > smb3_query_info_compound_err: xid=3D7 sid=3D0x7dc5fd6f tid=3D0xc7968732
-> > rc=3D-2
-> >            mkdir-17942 [000] .... 447446.807606:
-> > smb3_query_info_compound_enter: xid=3D8 sid=3D0x7dc5fd6f tid=3D0xc79687=
-32
-> > path=3D\newdir
-> >            mkdir-17942 [000] .... 447446.808233:
-> > smb3_query_info_compound_err: xid=3D8 sid=3D0x7dc5fd6f tid=3D0xc7968732
-> > rc=3D-2
-> >            mkdir-17942 [000] .... 447446.808251: smb3_mkdir_enter:
-> > xid=3D9 sid=3D0x7dc5fd6f tid=3D0xc7968732 path=3D\newdir
-> >            mkdir-17942 [000] .... 447446.809161: smb3_mkdir_done:
-> > xid=3D9 sid=3D0x7dc5fd6f tid=3D0xc7968732
-> >            mkdir-17942 [000] .... 447446.809178:
-> > smb3_query_info_compound_enter: xid=3D9 sid=3D0x7dc5fd6f tid=3D0xc79687=
-32
-> > path=3D\newdir
-> >            mkdir-17942 [000] .... 447446.809979:
-> > smb3_query_info_compound_done: xid=3D9 sid=3D0x7dc5fd6f tid=3D0xc796873=
-2
-> >            rmdir-17943 [001] .... 447451.374029:
-> > smb3_query_info_compound_enter: xid=3D10 sid=3D0x7dc5fd6f tid=3D0xc7968=
-732
-> > path=3D\baddir
-> >            rmdir-17943 [001] .... 447451.379621:
-> > smb3_query_info_compound_err: xid=3D10 sid=3D0x7dc5fd6f tid=3D0xc796873=
-2
-> > rc=3D-2
-> >            rmdir-17944 [001] .... 447456.088795:
-> > smb3_query_info_compound_enter: xid=3D11 sid=3D0x7dc5fd6f tid=3D0xc7968=
-732
-> > path=3D\newdir
-> >            rmdir-17944 [001] .... 447456.089615:
-> > smb3_query_info_compound_done: xid=3D11 sid=3D0x7dc5fd6f tid=3D0xc79687=
-32
-> >            rmdir-17944 [001] .... 447456.089640: smb3_rmdir_enter:
-> > xid=3D12 sid=3D0x7dc5fd6f tid=3D0xc7968732 path=3D\newdir
-> >            rmdir-17944 [001] .... 447456.090651: smb3_rmdir_done:
-> > xid=3D12 sid=3D0x7dc5fd6f tid=3D0xc7968732
-> >            touch-17945 [006] .... 447460.575789:
-> > smb3_set_info_compound_enter: xid=3D14 sid=3D0x7dc5fd6f tid=3D0xc796873=
-2
-> > path=3D\file
-> >            touch-17945 [006] .... 447460.576571:
-> > smb3_set_info_compound_done: xid=3D14 sid=3D0x7dc5fd6f tid=3D0xc7968732
-> >               ln-17946 [001] .... 447468.254480:
-> > smb3_query_info_compound_enter: xid=3D16 sid=3D0x7dc5fd6f tid=3D0xc7968=
-732
-> > path=3D\linkedfile
-> >               ln-17946 [001] .... 447468.255082:
-> > smb3_query_info_compound_err: xid=3D16 sid=3D0x7dc5fd6f tid=3D0xc796873=
-2
-> > rc=3D-2
-> >               ln-17946 [001] .... 447468.255118:
-> > smb3_query_info_compound_enter: xid=3D17 sid=3D0x7dc5fd6f tid=3D0xc7968=
-732
-> > path=3D\file
-> >               ln-17946 [001] .... 447468.255715:
-> > smb3_query_info_compound_done: xid=3D17 sid=3D0x7dc5fd6f tid=3D0xc79687=
-32
-> >               ln-17946 [001] .... 447468.255760:
-> > smb3_query_info_compound_enter: xid=3D18 sid=3D0x7dc5fd6f tid=3D0xc7968=
-732
-> > path=3D\linkedfile
-> >               ln-17946 [001] .... 447468.256254:
-> > smb3_query_info_compound_err: xid=3D18 sid=3D0x7dc5fd6f tid=3D0xc796873=
-2
-> > rc=3D-2
-> >               ln-17946 [001] .... 447468.256277: smb3_hardlink_enter:
-> > xid=3D19 sid=3D0x7dc5fd6f tid=3D0xc7968732 path=3D\file
-> >               ln-17946 [001] .... 447468.256954: smb3_hardlink_done:
-> > xid=3D19 sid=3D0x7dc5fd6f tid=3D0xc7968732
-> >            gmain-2225  [004] .... 447468.257130:
-> > smb3_query_info_compound_enter: xid=3D20 sid=3D0x7dc5fd6f tid=3D0xc7968=
-732
-> > path=3D\linkedfile
-> >            gmain-2225  [005] .... 447468.257788:
-> > smb3_query_info_compound_done: xid=3D20 sid=3D0x7dc5fd6f tid=3D0xc79687=
-32
-> >
-> > On Tue, Mar 12, 2019 at 4:51 PM Pavel Shilovsky <piastryyy@gmail.com> w=
-rote:
-> > >
-> > > I actually like the idea proposed in the patch: this way we will be
-> > > able to track logical operations better. In a case we need a deeper
-> > > logging we already have mid traces which contains MID, TID, SID and
-> > > CMD - everything you need to trace individual SMB packet regardless o=
-f
-> > > whether it is a part of compounding chain or not.
-> > >
-> > > Now in order to match both logical operation and SMB packets traces w=
-e
-> > > need something common - like XID. Currently we do not propagate XID
-> > > down to the transport layer, let's do that - this way we can trace
-> > > individual system call from the very beginning to the completeness on
-> > > every layer inside cifs.ko.
-> > >
-> > > =D0=B2=D1=82, 12 =D0=BC=D0=B0=D1=80. 2019 =D0=B3. =D0=B2 00:19, Steve=
- French <smfrench@gmail.com>:
-> > > >
-> > > > The general feeling I am getting from tracing the compounding is th=
-at
-> > > > we have to have the more granular tracing available
-> > > > (similar to this patch), and also (with followon patch) add noisier
-> > > > optional trace points lower down (that are generic) that we turn on
-> > > > less frequently (in particular when the filename is not good enough
-> > > > and we must have the xid - even if it makes the trace very noisy)
-> > > >
-> > > >
-> > > > On Tue, Mar 12, 2019 at 1:06 AM ronnie sahlberg
-> > > > <ronniesahlberg@gmail.com> wrote:
-> > > > >
-> > > > > Hmm.
-> > > > >
-> > > > > I don't think this is the wrong layer to add the tracing.
-> > > > > Instead of adding the tracing in say smb2_compound_op(), where we
-> > > > > create the compound,
-> > > > > I think it will be better to add the tracing down in the leaf
-> > > > > functions, i.e. down in SMB2_open_init(), SMB2_query_info_init(),=
- ...
-> > > > >
-> > > > > That way we know that we will always have tracing for all opens/c=
-loses/...
-> > > > >
-> > > > > But then what to do about the trace_smb3_..._err()/trace_smb3_...=
-_done() calls ?
-> > > > > These I think should be moved down and handled inside compound_se=
-nd_recv().
-> > > > > That way we can have one single place where we call the appropria=
-te
-> > > > > _err()/_done() functions
-> > > > > and we know that we will catch every single completed function.
-> > > > >
-> > > > > I.e. just put it in a single place instead of in every single cal=
-l-site.
-> > > > > In compound_send_recv we can just loop over all the responses, ca=
-st it
-> > > > > to a smb2_hdr structure, looka at both the command code as well a=
-s the
-> > > > > status code and call the appropriate xys_err() or xyz_done() func=
-tions
-> > > > > as needed.
-> > > > >
-> > > > > Let me show an example of what I mean for a open/query/close comp=
-ound :
-> > > > >
-> > > > > trace_smb3_open_enter(xid=3D5, filename=3D"foo", ...)   from SMB2=
-_open_init()
-> > > > > trace_smb3_query_info_enter(xid=3D5,... ) from SMB2_query_info_in=
-it()
-> > > > > trace_smb3_close_enter(xid=3D5, ...) from SMB2_close_init()
-> > > > > (maybe have additional tracing in compound_send_recv() that we ar=
-e
-> > > > > about to send xid=3D5 to the wire)
-> > > > > trace_smb3_open_done(xid=3D5, ...) from compound_send_recv()
-> > > > > trace_smb3_query_info_done(xid=3D5, ...) from compound_send_recv(=
-)
-> > > > > trace_smb3_close_done(xid=3D5, ...) from compound_send_recv()
-> > > > >
-> > >
-> > > As pointed above we already have a similar tracing inside
-> > > compound_send_recv and other transport layer functions - command leve=
-l
-> > > tracing. The only problem is that we do not log failure cases when we
-> > > didn't send the packet - we only log server responses in
-> > > map_smb2_to_linux_error. This is another area of the tracing where a
-> > > fix is needed.
-> > >
-> > > --
-> > > Best regards,
-> > > Pavel Shilovsky
-> >
-> >
-> >
-> > --
-> > Thanks,
-> >
-> > Steve
+Sample output (trace-cmd record -e *smb3*falloc* -e *smb3*zero*):
+
+#           TASK-PID   CPU#  ||||    TIMESTAMP  FUNCTION
+#              | |       |   ||||       |         |
+       fallocate-25699 [002] .... 453345.398491: smb3_falloc_enter:
+xid=8 sid=0xa342bb96 tid=0xd2a49757 fid=0x93514326 offset=0x0
+len=0x200000
+       fallocate-25699 [002] .... 453345.398494: smb3_falloc_err:
+xid=8 sid=0xa342bb96 tid=0xd2a49757 fid=0x93514326 offset=0x0
+len=0x200000 rc=-95
+       fallocate-25738 [006] .... 453408.813356: smb3_zero_enter:
+xid=12 sid=0xa342bb96 tid=0xd2a49757 fid=0x9fe7e532 offset=0x2710
+len=0x64
+       fallocate-25738 [006] .... 453408.813359: smb3_zero_err:
+xid=12 sid=0xa342bb96 tid=0xd2a49757 fid=0x9fe7e532 offset=0x2710
+len=0x64 rc=-95
 
 
-
---=20
+-- 
 Thanks,
 
 Steve
+
+--000000000000d00b0c0583f41fed
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smb3-add-dynamic-tracepoints-for-simple-fallocate-an.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-add-dynamic-tracepoints-for-simple-fallocate-an.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_jt6u8qod0>
+X-Attachment-Id: f_jt6u8qod0
+
+RnJvbSBmNTA1MmI5MTQxMzQ2YzIyY2RjODNlNWI2NzE4NjQ4ZmM1NDcwZTU4IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFdlZCwgMTMgTWFyIDIwMTkgMDE6NDE6NDkgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
+bWIzOiBhZGQgZHluYW1pYyB0cmFjZXBvaW50cyBmb3Igc2ltcGxlIGZhbGxvY2F0ZSBhbmQgemVy
+bwogcmFuZ2UKCkNhbiBiZSBoZWxwZnVsIGluIGRlYnVnZ2luZyB2YXJpb3VzIHhmc3Rlc3RzIHRo
+YXQgYXJlIGN1cnJlbnRseQpza2lwcGVkIG9yIGZhaWxpbmcgZHVlIHRvIG1pc3NpbmcgZmVhdHVy
+ZXMgaW4gb3VyIGN1cnJlbnQKaW1wbGVtZW50YXRpb24gb2YgZmFsbG9jYXRlLgoKU2lnbmVkLW9m
+Zi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL2NpZnMv
+c21iMm9wcy5jIHwgMzIgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysKIGZzL2NpZnMv
+dHJhY2UuaCAgIHwgIDYgKysrKysrCiAyIGZpbGVzIGNoYW5nZWQsIDM4IGluc2VydGlvbnMoKykK
+CmRpZmYgLS1naXQgYS9mcy9jaWZzL3NtYjJvcHMuYyBiL2ZzL2NpZnMvc21iMm9wcy5jCmluZGV4
+IGJkM2QyMjg4MTYxYy4uODIzYTU4NTUwZGZkIDEwMDY0NAotLS0gYS9mcy9jaWZzL3NtYjJvcHMu
+YworKysgYi9mcy9jaWZzL3NtYjJvcHMuYwpAQCAtMjU3MSwxMCArMjU3MSwxNiBAQCBzdGF0aWMg
+bG9uZyBzbWIzX3plcm9fcmFuZ2Uoc3RydWN0IGZpbGUgKmZpbGUsIHN0cnVjdCBjaWZzX3Rjb24g
+KnRjb24sCiAJaW5vZGUgPSBkX2lub2RlKGNmaWxlLT5kZW50cnkpOwogCWNpZnNpID0gQ0lGU19J
+KGlub2RlKTsKIAorICAgICAgICB0cmFjZV9zbWIzX3plcm9fZW50ZXIoeGlkLCBjZmlsZS0+Zmlk
+LnBlcnNpc3RlbnRfZmlkLCB0Y29uLT50aWQsCisJCQkgICAgICBzZXMtPlN1aWQsIG9mZnNldCwg
+bGVuKTsKKworCiAJLyogaWYgZmlsZSBub3Qgb3Bsb2NrZWQgY2FuJ3QgYmUgc3VyZSB3aGV0aGVy
+IGFza2luZyB0byBleHRlbmQgc2l6ZSAqLwogCWlmICghQ0lGU19DQUNIRV9SRUFEKGNpZnNpKSkK
+IAkJaWYgKGtlZXBfc2l6ZSA9PSBmYWxzZSkgewogCQkJcmMgPSAtRU9QTk9UU1VQUDsKKwkJCXRy
+YWNlX3NtYjNfemVyb19lcnIoeGlkLCBjZmlsZS0+ZmlkLnBlcnNpc3RlbnRfZmlkLAorCQkJCXRj
+b24tPnRpZCwgc2VzLT5TdWlkLCBvZmZzZXQsIGxlbiwgcmMpOwogCQkJZnJlZV94aWQoeGlkKTsK
+IAkJCXJldHVybiByYzsKIAkJfQpAQCAtMjU4NSw2ICsyNTkxLDggQEAgc3RhdGljIGxvbmcgc21i
+M196ZXJvX3JhbmdlKHN0cnVjdCBmaWxlICpmaWxlLCBzdHJ1Y3QgY2lmc190Y29uICp0Y29uLAog
+CSAqLwogCWlmICghKGNpZnNpLT5jaWZzQXR0cnMgJiBGSUxFX0FUVFJJQlVURV9TUEFSU0VfRklM
+RSkpIHsKIAkJcmMgPSAtRU9QTk9UU1VQUDsKKwkJdHJhY2Vfc21iM196ZXJvX2Vycih4aWQsIGNm
+aWxlLT5maWQucGVyc2lzdGVudF9maWQsIHRjb24tPnRpZCwKKwkJCSAgICAgIHNlcy0+U3VpZCwg
+b2Zmc2V0LCBsZW4sIHJjKTsKIAkJZnJlZV94aWQoeGlkKTsKIAkJcmV0dXJuIHJjOwogCX0KQEAg
+LTI2NDQsNiArMjY1MiwxMiBAQCBzdGF0aWMgbG9uZyBzbWIzX3plcm9fcmFuZ2Uoc3RydWN0IGZp
+bGUgKmZpbGUsIHN0cnVjdCBjaWZzX3Rjb24gKnRjb24sCiAJZnJlZV9yc3BfYnVmKHJlc3BfYnVm
+dHlwZVswXSwgcnNwX2lvdlswXS5pb3ZfYmFzZSk7CiAJZnJlZV9yc3BfYnVmKHJlc3BfYnVmdHlw
+ZVsxXSwgcnNwX2lvdlsxXS5pb3ZfYmFzZSk7CiAJZnJlZV94aWQoeGlkKTsKKwlpZiAocmMpCisJ
+CXRyYWNlX3NtYjNfemVyb19lcnIoeGlkLCBjZmlsZS0+ZmlkLnBlcnNpc3RlbnRfZmlkLCB0Y29u
+LT50aWQsCisJCQkgICAgICBzZXMtPlN1aWQsIG9mZnNldCwgbGVuLCByYyk7CisJZWxzZQorCQl0
+cmFjZV9zbWIzX3plcm9fZG9uZSh4aWQsIGNmaWxlLT5maWQucGVyc2lzdGVudF9maWQsIHRjb24t
+PnRpZCwKKwkJCSAgICAgIHNlcy0+U3VpZCwgb2Zmc2V0LCBsZW4pOwogCXJldHVybiByYzsKIH0K
+IApAQCAtMjY5OCw5ICsyNzEyLDEzIEBAIHN0YXRpYyBsb25nIHNtYjNfc2ltcGxlX2ZhbGxvYyhz
+dHJ1Y3QgZmlsZSAqZmlsZSwgc3RydWN0IGNpZnNfdGNvbiAqdGNvbiwKIAlpbm9kZSA9IGRfaW5v
+ZGUoY2ZpbGUtPmRlbnRyeSk7CiAJY2lmc2kgPSBDSUZTX0koaW5vZGUpOwogCisJdHJhY2Vfc21i
+M19mYWxsb2NfZW50ZXIoeGlkLCBjZmlsZS0+ZmlkLnBlcnNpc3RlbnRfZmlkLCB0Y29uLT50aWQs
+CisJCQkJdGNvbi0+c2VzLT5TdWlkLCBvZmYsIGxlbik7CiAJLyogaWYgZmlsZSBub3Qgb3Bsb2Nr
+ZWQgY2FuJ3QgYmUgc3VyZSB3aGV0aGVyIGFza2luZyB0byBleHRlbmQgc2l6ZSAqLwogCWlmICgh
+Q0lGU19DQUNIRV9SRUFEKGNpZnNpKSkKIAkJaWYgKGtlZXBfc2l6ZSA9PSBmYWxzZSkgeworCQkJ
+dHJhY2Vfc21iM19mYWxsb2NfZXJyKHhpZCwgY2ZpbGUtPmZpZC5wZXJzaXN0ZW50X2ZpZCwKKwkJ
+CQl0Y29uLT50aWQsIHRjb24tPnNlcy0+U3VpZCwgb2ZmLCBsZW4sIHJjKTsKIAkJCWZyZWVfeGlk
+KHhpZCk7CiAJCQlyZXR1cm4gcmM7CiAJCX0KQEAgLTI3MjAsNiArMjczOCwxMiBAQCBzdGF0aWMg
+bG9uZyBzbWIzX3NpbXBsZV9mYWxsb2Moc3RydWN0IGZpbGUgKmZpbGUsIHN0cnVjdCBjaWZzX3Rj
+b24gKnRjb24sCiAJCS8qIEJCOiBpbiBmdXR1cmUgYWRkIGVsc2UgY2xhdXNlIHRvIGV4dGVuZCBm
+aWxlICovCiAJCWVsc2UKIAkJCXJjID0gLUVPUE5PVFNVUFA7CisJCWlmIChyYykKKwkJCXRyYWNl
+X3NtYjNfZmFsbG9jX2Vycih4aWQsIGNmaWxlLT5maWQucGVyc2lzdGVudF9maWQsCisJCQkJdGNv
+bi0+dGlkLCB0Y29uLT5zZXMtPlN1aWQsIG9mZiwgbGVuLCByYyk7CisJCWVsc2UKKwkJCXRyYWNl
+X3NtYjNfZmFsbG9jX2RvbmUoeGlkLCBjZmlsZS0+ZmlkLnBlcnNpc3RlbnRfZmlkLAorCQkJCXRj
+b24tPnRpZCwgdGNvbi0+c2VzLT5TdWlkLCBvZmYsIGxlbik7CiAJCWZyZWVfeGlkKHhpZCk7CiAJ
+CXJldHVybiByYzsKIAl9CkBAIC0yNzM1LDYgKzI3NTksOCBAQCBzdGF0aWMgbG9uZyBzbWIzX3Np
+bXBsZV9mYWxsb2Moc3RydWN0IGZpbGUgKmZpbGUsIHN0cnVjdCBjaWZzX3Rjb24gKnRjb24sCiAJ
+CSAqLwogCQlpZiAoKG9mZiA+IDgxOTIpIHx8IChvZmYgKyBsZW4gKyA4MTkyIDwgaV9zaXplX3Jl
+YWQoaW5vZGUpKSkgewogCQkJcmMgPSAtRU9QTk9UU1VQUDsKKwkJCXRyYWNlX3NtYjNfZmFsbG9j
+X2Vycih4aWQsIGNmaWxlLT5maWQucGVyc2lzdGVudF9maWQsCisJCQkJdGNvbi0+dGlkLCB0Y29u
+LT5zZXMtPlN1aWQsIG9mZiwgbGVuLCByYyk7CiAJCQlmcmVlX3hpZCh4aWQpOwogCQkJcmV0dXJu
+IHJjOwogCQl9CkBAIC0yNzQzLDYgKzI3NjksMTIgQEAgc3RhdGljIGxvbmcgc21iM19zaW1wbGVf
+ZmFsbG9jKHN0cnVjdCBmaWxlICpmaWxlLCBzdHJ1Y3QgY2lmc190Y29uICp0Y29uLAogCX0KIAkv
+KiBCQjogZWxzZSAuLi4gaW4gZnV0dXJlIGFkZCBjb2RlIHRvIGV4dGVuZCBmaWxlIGFuZCBzZXQg
+c3BhcnNlICovCiAKKwlpZiAocmMpCisJCXRyYWNlX3NtYjNfZmFsbG9jX2Vycih4aWQsIGNmaWxl
+LT5maWQucGVyc2lzdGVudF9maWQsIHRjb24tPnRpZCwKKwkJCQl0Y29uLT5zZXMtPlN1aWQsIG9m
+ZiwgbGVuLCByYyk7CisJZWxzZQorCQl0cmFjZV9zbWIzX2ZhbGxvY19kb25lKHhpZCwgY2ZpbGUt
+PmZpZC5wZXJzaXN0ZW50X2ZpZCwgdGNvbi0+dGlkLAorCQkJCXRjb24tPnNlcy0+U3VpZCwgb2Zm
+LCBsZW4pOwogCiAJZnJlZV94aWQoeGlkKTsKIAlyZXR1cm4gcmM7CmRpZmYgLS1naXQgYS9mcy9j
+aWZzL3RyYWNlLmggYi9mcy9jaWZzL3RyYWNlLmgKaW5kZXggMzBiZjUxYzdlOGZlLi5mYTIyNmRl
+NDhlZjMgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvdHJhY2UuaAorKysgYi9mcy9jaWZzL3RyYWNlLmgK
+QEAgLTU5LDYgKzU5LDggQEAgREVGSU5FX0VWRU5UKHNtYjNfcndfZXJyX2NsYXNzLCBzbWIzXyMj
+bmFtZSwgICAgXAogREVGSU5FX1NNQjNfUldfRVJSX0VWRU5UKHdyaXRlX2Vycik7CiBERUZJTkVf
+U01CM19SV19FUlJfRVZFTlQocmVhZF9lcnIpOwogREVGSU5FX1NNQjNfUldfRVJSX0VWRU5UKHF1
+ZXJ5X2Rpcl9lcnIpOworREVGSU5FX1NNQjNfUldfRVJSX0VWRU5UKHplcm9fZXJyKTsKK0RFRklO
+RV9TTUIzX1JXX0VSUl9FVkVOVChmYWxsb2NfZXJyKTsKIAogCiAvKiBGb3IgbG9nZ2luZyBzdWNj
+ZXNzZnVsIHJlYWQgb3Igd3JpdGUgKi8KQEAgLTEwNCw5ICsxMDYsMTMgQEAgREVGSU5FX0VWRU5U
+KHNtYjNfcndfZG9uZV9jbGFzcywgc21iM18jI25hbWUsICAgXAogREVGSU5FX1NNQjNfUldfRE9O
+RV9FVkVOVCh3cml0ZV9lbnRlcik7CiBERUZJTkVfU01CM19SV19ET05FX0VWRU5UKHJlYWRfZW50
+ZXIpOwogREVGSU5FX1NNQjNfUldfRE9ORV9FVkVOVChxdWVyeV9kaXJfZW50ZXIpOworREVGSU5F
+X1NNQjNfUldfRE9ORV9FVkVOVCh6ZXJvX2VudGVyKTsKK0RFRklORV9TTUIzX1JXX0RPTkVfRVZF
+TlQoZmFsbG9jX2VudGVyKTsKIERFRklORV9TTUIzX1JXX0RPTkVfRVZFTlQod3JpdGVfZG9uZSk7
+CiBERUZJTkVfU01CM19SV19ET05FX0VWRU5UKHJlYWRfZG9uZSk7CiBERUZJTkVfU01CM19SV19E
+T05FX0VWRU5UKHF1ZXJ5X2Rpcl9kb25lKTsKK0RFRklORV9TTUIzX1JXX0RPTkVfRVZFTlQoemVy
+b19kb25lKTsKK0RFRklORV9TTUIzX1JXX0RPTkVfRVZFTlQoZmFsbG9jX2RvbmUpOwogCiAvKgog
+ICogRm9yIGhhbmRsZSBiYXNlZCBjYWxscyBvdGhlciB0aGFuIHJlYWQgYW5kIHdyaXRlLCBhbmQg
+Z2V0L3NldCBpbmZvCi0tIAoyLjE3LjEKCg==
+--000000000000d00b0c0583f41fed--
