@@ -2,168 +2,169 @@ Return-Path: <SRS0=S2FA=RS=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74AAFC43381
-	for <linux-cifs@archiver.kernel.org>; Fri, 15 Mar 2019 06:22:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E83BC43381
+	for <linux-cifs@archiver.kernel.org>; Fri, 15 Mar 2019 07:56:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5198521872
-	for <linux-cifs@archiver.kernel.org>; Fri, 15 Mar 2019 06:22:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC4EA21872
+	for <linux-cifs@archiver.kernel.org>; Fri, 15 Mar 2019 07:56:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727231AbfCOGW1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 15 Mar 2019 02:22:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36810 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727179AbfCOGW0 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 15 Mar 2019 02:22:26 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A5FE03082DDD;
-        Fri, 15 Mar 2019 06:22:26 +0000 (UTC)
-Received: from test1135.test.redhat.com (vpn2-54-111.bne.redhat.com [10.64.54.111])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0900619C56;
-        Fri, 15 Mar 2019 06:22:25 +0000 (UTC)
-From:   Ronnie Sahlberg <lsahlber@redhat.com>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Steve French <smfrench@gmail.com>,
-        Pavel Shilovsky <pshilov@microsoft.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>
-Subject: [PATCH] smbinfo: add fsctl-getobjid support
-Date:   Fri, 15 Mar 2019 16:22:15 +1000
-Message-Id: <20190315062215.29499-2-lsahlber@redhat.com>
-In-Reply-To: <20190315062215.29499-1-lsahlber@redhat.com>
-References: <20190315062215.29499-1-lsahlber@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Fri, 15 Mar 2019 06:22:26 +0000 (UTC)
+        id S1727557AbfCOH4Q (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 15 Mar 2019 03:56:16 -0400
+Received: from a2nlsmtp01-05.prod.iad2.secureserver.net ([198.71.225.49]:57274
+        "EHLO a2nlsmtp01-05.prod.iad2.secureserver.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727476AbfCOH4Q (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 15 Mar 2019 03:56:16 -0400
+Received: from linuxonhyperv2.linuxonhyperv.com ([107.180.71.197])
+        by : HOSTING RELAY : with ESMTP
+        id 4hgQhpap6vHD34hgQhNjov; Fri, 15 Mar 2019 00:55:14 -0700
+x-originating-ip: 107.180.71.197
+Received: from longli by linuxonhyperv2.linuxonhyperv.com with local (Exim 4.91)
+        (envelope-from <longli@linuxonhyperv2.linuxonhyperv.com>)
+        id 1h4hgP-0007EK-Tr; Fri, 15 Mar 2019 00:55:13 -0700
+From:   Long Li <longli@linuxonhyperv.com>
+To:     Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+Cc:     Long Li <longli@microsoft.com>
+Subject: [Patch v2 1/2] CIFS: Fix an issue with re-sending wdata when transport returning -EAGAIN
+Date:   Fri, 15 Mar 2019 07:54:59 +0000
+Message-Id: <20190315075500.27747-1-longli@linuxonhyperv.com>
+X-Mailer: git-send-email 2.19.1
+MIME-Version: 1.0
+Reply-To: longli@microsoft.com
+Content-Transfer-Encoding: 8bit
+X-CMAE-Envelope: MS4wfKSI2fFxYg5Qun/7wIhri5PIZGr2XNF22LqVqfCnTFxGfzj9P7zCbasGBF5174eRc/S1BWP1Psy5GSg9Nd4DV8JpawczHGCWUjN0E7XIEwIrDq2vEMC4
+ uOzgj/hRXHf3JAASo/ShJaVC8IzfDZX/I2eF6yJxJFTDQzp+KCGRimcT62mHOa9vSkGki5Duk+mCF5phplT3dDkPadfi8F8XL8useBbQEHw0b8YbsgRChy/F
+ em+O3sfsX9sAm2WLw7ThdzM4fqd5IRITXP+LDDe4ampIxQSHmYBe4ZolE7y/UuOyg/mw1lFIsX+xlHFu0eJmV/KvBS25GXlGpzKERiwTbNJyn5psFK+cETuZ
+ vk9KhnvB1fFoaMzOGSsMtbiUHN8p7Q==
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This will print the ObjectID buffer for the object.
-This is an example on how to fetch FSCTL data for an object using
-the passthrough API.
+From: Long Li <longli@microsoft.com>
 
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+When sending a wdata, transport may return -EAGAIN. In this case
+we should re-obtain credits because the session may have been
+reconnected.
+
+Change in v2: adjust_credits before re-sending
+
+Signed-off-by: Long Li <longli@microsoft.com>
 ---
- smbinfo.c   | 73 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- smbinfo.rst |  2 ++
- 2 files changed, 75 insertions(+)
+ fs/cifs/file.c | 77 ++++++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 45 insertions(+), 32 deletions(-)
 
-diff --git a/smbinfo.c b/smbinfo.c
-index 6b63f9d..215842c 100644
---- a/smbinfo.c
-+++ b/smbinfo.c
-@@ -39,6 +39,11 @@
- #include <inttypes.h>
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 9b53f33137b3..321df1d27422 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -2620,43 +2620,56 @@ cifs_resend_wdata(struct cifs_writedata *wdata, struct list_head *wdata_list,
+ 	struct TCP_Server_Info *server =
+ 		tlink_tcon(wdata->cfile->tlink)->ses->server;
  
- #define CIFS_IOCTL_MAGIC 0xCF
+-	/*
+-	 * Wait for credits to resend this wdata.
+-	 * Note: we are attempting to resend the whole wdata not in segments
+-	 */
+ 	do {
+-		rc = server->ops->wait_mtu_credits(server, wdata->bytes, &wsize,
+-						   &credits);
++		if (wdata->cfile->invalidHandle) {
++			rc = cifs_reopen_file(wdata->cfile, false);
++			if (rc == -EAGAIN)
++				continue;
++			else if (rc)
++				break;
++		}
+ 
+-		if (rc)
+-			goto out;
+ 
+-		if (wsize < wdata->bytes) {
+-			add_credits_and_wake_if(server, &credits, 0);
+-			msleep(1000);
+-		}
+-	} while (wsize < wdata->bytes);
++		/*
++		 * Wait for credits to resend this wdata.
++		 * Note: we are attempting to resend the whole wdata not in
++		 * segments
++		 */
++		do {
++			rc = server->ops->wait_mtu_credits(server, wdata->bytes,
++						&wsize, &credits);
++			if (rc)
++				goto fail;
 +
-+/* query_info flags */
-+#define PASSTHRU_QUERY_INFO     0x00000000
-+#define PASSTHRU_FSCTL          0x00000001
++			if (wsize < wdata->bytes) {
++				add_credits_and_wake_if(server, &credits, 0);
++				msleep(1000);
++			}
++		} while (wsize < wdata->bytes);
++		wdata->credits = credits;
+ 
+-	wdata->credits = credits;
+-	rc = -EAGAIN;
+-	while (rc == -EAGAIN) {
+-		rc = 0;
+-		if (wdata->cfile->invalidHandle)
+-			rc = cifs_reopen_file(wdata->cfile, false);
+-		if (!rc)
+-			rc = server->ops->async_writev(wdata,
++		rc = adjust_credits(server, &wdata->credits, wdata->bytes);
 +
- struct smb_query_info {
-         uint32_t   info_type;
-         uint32_t   file_info_class;
-@@ -170,6 +175,72 @@ print_bits(uint32_t mask, struct bit_string *bs)
++		if (!rc) {
++			if (wdata->cfile->invalidHandle)
++				rc = -EAGAIN;
++			else
++				rc = server->ops->async_writev(wdata,
+ 					cifs_uncached_writedata_release);
+-	}
++		}
+ 
+-	if (!rc) {
+-		list_add_tail(&wdata->list, wdata_list);
+-		return 0;
+-	}
++		/* If the write was successfully sent, we are done */
++		if (!rc) {
++			list_add_tail(&wdata->list, wdata_list);
++			return 0;
++		}
+ 
+-	add_credits_and_wake_if(server, &wdata->credits, 0);
+-out:
+-	kref_put(&wdata->refcount, cifs_uncached_writedata_release);
++		/* Roll back credits and retry if needed */
++		add_credits_and_wake_if(server, &wdata->credits, 0);
++	} while (rc == -EAGAIN);
+ 
++fail:
++	kref_put(&wdata->refcount, cifs_uncached_writedata_release);
+ 	return rc;
  }
  
- static void
-+print_guid(uint8_t *sd)
-+{
-+	uint32_t u32;
-+	uint16_t u16;
-+	int i;
+@@ -2884,12 +2897,12 @@ static void collect_uncached_write_data(struct cifs_aio_ctx *ctx)
+ 						wdata->bytes, &tmp_from,
+ 						ctx->cfile, cifs_sb, &tmp_list,
+ 						ctx);
 +
-+	memcpy(&u32, &sd[0], 4);
-+	printf("%08x-", le32toh(u32));
-+
-+	memcpy(&u16, &sd[4], 2);
-+	printf("%04x-", le16toh(u16));
-+
-+	memcpy(&u16, &sd[6], 2);
-+	printf("%04x-", le16toh(u16));
-+
-+	printf("%02x%02x-", sd[8], sd[9]);
-+	for (i = 0; i < 6; i++)
-+		printf("%02x", sd[10 + i]);
-+}
-+
-+static void
-+print_objidbuf(uint8_t *sd)
-+{
-+	printf("Object-ID: ");
-+	print_guid(&sd[0]);
-+	printf("\n");
-+
-+	printf("Birth-Volume-ID: ");
-+	print_guid(&sd[16]);
-+	printf("\n");
-+
-+	printf("Birth-Object-ID: ");
-+	print_guid(&sd[32]);
-+	printf("\n");
-+
-+	printf("Domain-ID: ");
-+	print_guid(&sd[48]);
-+	printf("\n");
-+}
-+
-+static void
-+fsctlgetobjid(int f)
-+{
-+	struct smb_query_info *qi;
-+	struct stat st;
-+
-+	fstat(f, &st);
-+
-+	qi = malloc(sizeof(struct smb_query_info) + 64);
-+	memset(qi, 0, sizeof(qi) + 64);
-+	qi->info_type = 0x9009c;
-+	qi->file_info_class = 0;
-+	qi->additional_information = 0;
-+	qi->input_buffer_length = 64;
-+	qi->flags = PASSTHRU_FSCTL;
-+
-+	if (ioctl(f, CIFS_QUERY_INFO, qi) < 0) {
-+		fprintf(stderr, "ioctl failed with %s\n", strerror(errno));
-+		exit(1);
-+	}
-+	print_objidbuf((uint8_t *)(&qi[1]));
-+
-+	free(qi);
-+}
-+
-+static void
- print_fileaccessinfo(uint8_t *sd, int type)
- {
-         uint32_t access_flags;
-@@ -951,6 +1022,8 @@ int main(int argc, char *argv[])
-                 secdesc(f);
-         else if (!strcmp(argv[optind], "quota"))
-                 quota(f);
-+        else if (!strcmp(argv[1], "fsctl-getobjid"))
-+                fsctlgetobjid(f);
-         else {
-                 fprintf(stderr, "Unknown command %s\n", argv[optind]);
-                 exit(1);
-diff --git a/smbinfo.rst b/smbinfo.rst
-index 9bfd313..fd7f0ff 100644
---- a/smbinfo.rst
-+++ b/smbinfo.rst
-@@ -62,6 +62,8 @@ COMMAND
++					kref_put(&wdata->refcount,
++						cifs_uncached_writedata_release);
+ 				}
  
- `filestandardinfo`: Prints the FileStandardInformation class
- 
-+`fsctl-getobjid`: Prints the ObjectID
-+
- `quota`: Print the quota for the volume in the form
- - SID Length
- - Change Time
+ 				list_splice(&tmp_list, &ctx->list);
+-
+-				kref_put(&wdata->refcount,
+-					 cifs_uncached_writedata_release);
+ 				goto restart_loop;
+ 			}
+ 		}
 -- 
-2.13.6
+2.14.1
 
