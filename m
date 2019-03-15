@@ -1,362 +1,163 @@
-Return-Path: <SRS0=3edS=RR=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=S2FA=RS=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C95BC43381
-	for <linux-cifs@archiver.kernel.org>; Thu, 14 Mar 2019 18:40:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2AE1C43381
+	for <linux-cifs@archiver.kernel.org>; Fri, 15 Mar 2019 00:21:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1A6012077B
-	for <linux-cifs@archiver.kernel.org>; Thu, 14 Mar 2019 18:40:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8838721873
+	for <linux-cifs@archiver.kernel.org>; Fri, 15 Mar 2019 00:21:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bLvhAeuT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aVdufyIu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727507AbfCNSkU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 14 Mar 2019 14:40:20 -0400
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:43728 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726936AbfCNSkU (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 14 Mar 2019 14:40:20 -0400
-Received: by mail-lf1-f66.google.com with SMTP id g7so5006557lfh.10
-        for <linux-cifs@vger.kernel.org>; Thu, 14 Mar 2019 11:40:18 -0700 (PDT)
+        id S1727603AbfCOAVn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 14 Mar 2019 20:21:43 -0400
+Received: from mail-pg1-f176.google.com ([209.85.215.176]:35637 "EHLO
+        mail-pg1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727332AbfCOAVn (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 14 Mar 2019 20:21:43 -0400
+Received: by mail-pg1-f176.google.com with SMTP id e17so5130284pgd.2
+        for <linux-cifs@vger.kernel.org>; Thu, 14 Mar 2019 17:21:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=lT9eWGwXWzTzuD6aw7b9KrpWZTYdsAqfCNuWnWeNWos=;
-        b=bLvhAeuTkBnLm5koV4BMaTP2GfjCPUDsku6sS4D+uYyT3XxpMT3kZMuZ83kN6VKth+
-         YqsVyfRTWZnoSnaJLZC6FMknwJ2deLj5rAmcyDmj7NvbizEZe/I8e9kjJhdyj/d0n0Ll
-         RruCUGvrMEqkr4aOnlt1Dk1enz7feeiotFeTp+QQFXjU9PBmaM6pFyxTmp4CnJZHQcgw
-         1j/9K6y0msoFxqh/Lh36fh3zMD3mxw2I0rrB2qRk8A8f79WSVZgrWmjnlYSPLmWTHTkY
-         9WwY0kEu7LP73WzAO3wMv6ladew7TQv0+1j0sDQeEVndy+sPZW/hvVp7IyQQ0YHYjNWF
-         0g4Q==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=CPnlFNf1PIk3YiY8CRjoJoVELXWMUs/B2X/31THIKDk=;
+        b=aVdufyIuIPuYarSsrEHCiXacuw5YjEdG2TRH/1CV8xxfHU/y1ITVlUso/i1EM+WWEq
+         Oh3B4lXzsaEytO1mvGhdGFWSSQFx/qCZoXDuXhxPfl0Yomh7lUpYajDWReeiK20R4aEo
+         Tx555Q44pYDYSdl+u6CXiZbnW/VM63M4uUYnWPQrwgId6sHx6m7Z8WQnoOc80BmYBVtD
+         DN9j+NHFiF2Bh2UNSsDbzXy2qJ7/i18sQGEsrRBH2iECG68IMmSPl6KNZAuleuIXPqUq
+         Sl3PYXFr5NVBMkDqVNmCj1gKjwMuODChb6KxbV68QsTpJw+btq+PFm6/dKkOW3elDwK8
+         Z2Gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=lT9eWGwXWzTzuD6aw7b9KrpWZTYdsAqfCNuWnWeNWos=;
-        b=FmSJqtldaMlCucB2MEVZcmM5/RxZBHXluw1PuPmDvxHq5x4YyOxGluOqZIrlGfpuBh
-         9IAdKxZFtadvI+oXsAc7fAZOP+QjH6SmF3OqeM4uCvyieHAawVU+lQIZVSIipnZ+JYBy
-         0NK9uMEzdKdiS+kdusEyMfqKWRhKqjiQ3gw1qIPefryHuk3sI9dvUWm78g1zSbVb7hVt
-         knJUuVCn+ZEnu0HeA1SmRmVY88W4Z3CdGTEhYsCqtlI0Ya64VAf/dauI7kx1JSJKeM7w
-         GXU3zJeML5eNrhgxp7dsD+uLAeU9KL5wlD09+81WcZwD/FUJaWJDlSUE3upZsUxtN8Na
-         ZvJg==
-X-Gm-Message-State: APjAAAXu7Ewh4UQ3PPaql87JMlkwzcGDe1bEH/vWwnCLKwZNcj6w00nV
-        EDIuG3i5q4AmoJ6pbq9dxv8tNhD3UdqD3XiWJ38iY9E=
-X-Google-Smtp-Source: APXvYqyps/qjb4yb07IGv3htNYLyN7jUGHnDQnE8nquAoWgMfd9HvceneK3uwg58B8C5LRGm54iiJ8bUFMvWUl1ULgA=
-X-Received: by 2002:a19:2d44:: with SMTP id t4mr27383430lft.90.1552588817127;
- Thu, 14 Mar 2019 11:40:17 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=CPnlFNf1PIk3YiY8CRjoJoVELXWMUs/B2X/31THIKDk=;
+        b=MYIz1gEemHBXyOb+7bYomREp36C1qqMB9Z4wSnLTWrf3eufG9ncxp/uGfJITHmcHq+
+         hqdXsnnQne80vRLPjD9st8pyY7DfTZRQmS+Vrap5kTMlTOK3StOq9Vw3x1XLR1r2Q851
+         +Zpi30XWMZmVFHcwvLBmxBF1kN0/D2CT3MJAKqN3GSYAohIaFhf293JEv3zdRpUmYSvo
+         W8HGE5W5IYd+VFtQKOi/VeQ9Fbm0t8CJmxwQIBx6Po/4Jc4xr70sx6NhpDnJ/cmwtAWn
+         0XUm+XTHMdbwAwhRLAodT6ExVm1A1hVizoUUFxNy0PgJ8s0cztUDT/XLnK/4FqAWPEam
+         6G4g==
+X-Gm-Message-State: APjAAAVMnnG3cs5/gzBu4LRAaHsg21zdz2XubHpqsvZw0u7oK8drUL4X
+        D4VKs8qUZSMAS5Ld98NrKSUCC1SE3YbCBab9bj0KxsQd
+X-Google-Smtp-Source: APXvYqwoSKYJkawdjQ4V/oICO3LqmN0aSvFwfg3PhNUKiaFyYmZal82G0CzofJF80F4x7Mu4JD6qw/kmGSJcPDH1T14=
+X-Received: by 2002:a17:902:147:: with SMTP id 65mr1162683plb.18.1552609301382;
+ Thu, 14 Mar 2019 17:21:41 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190314142503.GA21260@sh-el5.eng.rdu2.redhat.com> <CAN05THTmpk5qs1eM-SK3kF0Ofn8Q=aJen9t6Cww72Y9fvsfgog@mail.gmail.com>
-In-Reply-To: <CAN05THTmpk5qs1eM-SK3kF0Ofn8Q=aJen9t6Cww72Y9fvsfgog@mail.gmail.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Thu, 14 Mar 2019 11:40:06 -0700
-Message-ID: <CAKywueTkWiEuux17PM5f7=myRiDUoqZJNkrUGw-ZvscXnPu=dw@mail.gmail.com>
-Subject: Re: [5.0+ CIFS regression] fsstress hang on CIFS
-To:     Murphy Zhou <jencce.kernel@gmail.com>,
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 14 Mar 2019 19:21:29 -0500
+Message-ID: <CAH2r5ms=Mb8Ogx2+5jdzXOkTwfexKB0Xn=ukb6LroBbq2F+Q=Q@mail.gmail.com>
+Subject: [SMB3] [PATCH] Pass through FSCTL for tools like smbinfo
+To:     CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
         ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Steve French <sfrench@samba.org>,
-        Pavel Shilovsky <pshilov@microsoft.com>,
-        Long Li <longli@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/mixed; boundary="000000000000e28ee505841705ca"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D1=87=D1=82, 14 =D0=BC=D0=B0=D1=80. 2019 =D0=B3. =D0=B2 09:14, ronnie sahl=
-berg <ronniesahlberg@gmail.com>:
->
-> On Fri, Mar 15, 2019 at 12:25 AM Murphy Zhou <jencce.kernel@gmail.com> wr=
-ote:
-> >
-> > Hi,
-> >
-> > xfstests generic/013 on CIFS hangs on Linus tree now.
-> >
-> > Bisect points to
-> >
-> > commit 7091bcaba9f34c83e1e6f418b6de5c6d987571da (HEAD, refs/bisect/bad)
-> > Author: Pavel Shilovsky <pshilov@microsoft.com>
-> > Date:   Wed Jan 30 16:58:09 2019 -0800
-> >
-> >     CIFS: Try to acquire credits at once for compound requests
-> >
-> > as the first bad commit.
-> >
-> > It should be easy to reproduce.
->
-> I built a kernel at 7091bcaba9f34c83e1e6
-> and it passes generic/013 against a windows2016 server for me.
->
-> It could be a configuration difference.  What are the mount options
-> you use and what server do you use?
->
-> The code in the commit you find has been majorly re-worked in the
-> for-next branch: https://github.com/smfrench/smb3-kernel
-> Can you try cherry-picking these patches and see if the problem remains ?
->
-> https://github.com/smfrench/smb3-kernel/commit/4b62ba8c7e9380f7274e3b4c90=
-d41ab5e329ba08
-> https://github.com/smfrench/smb3-kernel/commit/e2d79dccc7929257f7a2c824b3=
-97092de596b5c1
-> https://github.com/smfrench/smb3-kernel/commit/15736c7f36cd55ef8c4e5df65c=
-1a97ecd4b6e44f
-> https://github.com/smfrench/smb3-kernel/commit/1bb731eaf331cec630a0371db2=
-d0b79d5344d1e3
-> https://github.com/smfrench/smb3-kernel/commit/a32fd3e57c3b15b456bbf39235=
-d6555a88e20600
-> https://github.com/smfrench/smb3-kernel/commit/9ed2d4dce312973e2f998d520f=
-8c976c899e0dd9
->
->
->
-> regards
-> ronnie sahlberg
->
->
->
-> >
-> > Thanks,
-> > M
-> >
-> > dmesg:
-> > run fstests generic/013 at 2019-03-14 09:51:56
-> > INFO: task kworker/3:1:104 blocked for more than 120 seconds.
-> >       Not tainted 5.0.0-bisect-7091bcaba9f3+ #15
-> > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messag=
-e.
-> > kworker/3:1     D    0   104      2 0x80000000
-> > Workqueue: cifsiod cifs_uncached_writev_complete [cifs]
-> > Call Trace:
-> >  ? __schedule+0x24e/0x860
-> >  schedule+0x28/0x70
-> >  schedule_preempt_disabled+0xa/0x10
-> >  __mutex_lock.isra.8+0x2d0/0x4b0
-> >  cifs_uncached_writev_complete+0xcd/0x570 [cifs]
-> >  ? __switch_to_asm+0x40/0x70
-> >  ? __switch_to_asm+0x40/0x70
-> >  ? __switch_to_asm+0x34/0x70
-> >  ? __switch_to_asm+0x40/0x70
-> >  process_one_work+0x1a1/0x3a0
-> >  worker_thread+0x30/0x380
-> >  ? mod_delayed_work_on+0x90/0x90
-> >  kthread+0x112/0x130
-> >  ? __kthread_parkme+0x70/0x70
-> >  ret_from_fork+0x35/0x40
-> > INFO: task kworker/5:1:106 blocked for more than 120 seconds.
-> >       Not tainted 5.0.0-bisect-7091bcaba9f3+ #15
-> > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messag=
-e.
-> > kworker/5:1     D    0   106      2 0x80000000
-> > Workqueue: cifsiod cifs_uncached_writev_complete [cifs]
-> > Call Trace:
-> >  ? __schedule+0x24e/0x860
-> >  ? ttwu_do_wakeup+0x19/0x140
-> >  schedule+0x28/0x70
-> >  schedule_preempt_disabled+0xa/0x10
-> >  __mutex_lock.isra.8+0x2d0/0x4b0
-> >  cifs_uncached_writev_complete+0xcd/0x570 [cifs]
-> >  ? __switch_to_asm+0x40/0x70
-> >  ? __switch_to_asm+0x34/0x70
-> >  ? __switch_to_asm+0x40/0x70
-> >  process_one_work+0x1a1/0x3a0
-> >  worker_thread+0x30/0x380
-> >  ? mod_delayed_work_on+0x90/0x90
-> >  kthread+0x112/0x130
-> >  ? __kthread_parkme+0x70/0x70
-> >  ret_from_fork+0x35/0x40
-> > INFO: task kworker/7:1:108 blocked for more than 120 seconds.
-> >       Not tainted 5.0.0-bisect-7091bcaba9f3+ #15
-> > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messag=
-e.
-> > kworker/7:1     D    0   108      2 0x80000000
-> > Workqueue: cifsiod cifs_uncached_writev_complete [cifs]
-> > Call Trace:
-> >  ? __schedule+0x24e/0x860
-> >  ? ttwu_do_wakeup+0x19/0x140
-> >  schedule+0x28/0x70
-> >  schedule_preempt_disabled+0xa/0x10
-> >  __mutex_lock.isra.8+0x2d0/0x4b0
-> >  cifs_uncached_writev_complete+0xcd/0x570 [cifs]
-> >  ? __switch_to_asm+0x40/0x70
-> >  ? __switch_to_asm+0x40/0x70
-> >  ? __switch_to_asm+0x34/0x70
-> >  ? __switch_to_asm+0x40/0x70
-> >  process_one_work+0x1a1/0x3a0
-> >  worker_thread+0x30/0x380
-> >  ? mod_delayed_work_on+0x90/0x90
-> >  kthread+0x112/0x130
-> >  ? __kthread_parkme+0x70/0x70
-> >  ret_from_fork+0x35/0x40
-> > INFO: task kworker/7:3:391 blocked for more than 120 seconds.
-> >       Not tainted 5.0.0-bisect-7091bcaba9f3+ #15
-> > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messag=
-e.
-> > kworker/7:3     D    0   391      2 0x80000000
-> > Workqueue: cifsiod cifs_uncached_writev_complete [cifs]
-> > Call Trace:
-> >  ? __schedule+0x24e/0x860
-> >  ? ttwu_do_wakeup+0x19/0x140
-> >  schedule+0x28/0x70
-> >  schedule_preempt_disabled+0xa/0x10
-> >  __mutex_lock.isra.8+0x2d0/0x4b0
-> >  cifs_uncached_writev_complete+0xcd/0x570 [cifs]
-> >  ? __switch_to_asm+0x40/0x70
-> >  ? __switch_to_asm+0x40/0x70
-> >  ? __switch_to_asm+0x34/0x70
-> >  ? __switch_to_asm+0x40/0x70
-> >  process_one_work+0x1a1/0x3a0
-> >  worker_thread+0x30/0x380
-> >  ? mod_delayed_work_on+0x90/0x90
-> >  kthread+0x112/0x130
-> >  ? __kthread_parkme+0x70/0x70
-> >  ret_from_fork+0x35/0x40
-> > INFO: task kworker/1:3:807 blocked for more than 120 seconds.
-> >       Not tainted 5.0.0-bisect-7091bcaba9f3+ #15
-> > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messag=
-e.
-> > kworker/1:3     D    0   807      2 0x80000000
-> > Workqueue: cifsiod cifs_uncached_writev_complete [cifs]
-> > Call Trace:
-> >  ? __schedule+0x24e/0x860
-> >  schedule+0x28/0x70
-> >  schedule_preempt_disabled+0xa/0x10
-> >  __mutex_lock.isra.8+0x2d0/0x4b0
-> >  cifs_uncached_writev_complete+0xcd/0x570 [cifs]
-> >  ? __switch_to_asm+0x40/0x70
-> >  ? __switch_to_asm+0x40/0x70
-> >  ? __switch_to_asm+0x34/0x70
-> >  ? __switch_to_asm+0x40/0x70
-> >  process_one_work+0x1a1/0x3a0
-> >  worker_thread+0x30/0x380
-> >  ? mod_delayed_work_on+0x90/0x90
-> >  kthread+0x112/0x130
-> >  ? __kthread_parkme+0x70/0x70
-> >  ret_from_fork+0x35/0x40
-> > INFO: task kworker/13:2:1077 blocked for more than 120 seconds.
-> >       Not tainted 5.0.0-bisect-7091bcaba9f3+ #15
-> > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messag=
-e.
-> > kworker/13:2    D    0  1077      2 0x80000080
-> > Workqueue: cifsiod cifs_uncached_readv_complete [cifs]
-> > Call Trace:
-> >  ? __schedule+0x24e/0x860
-> >  schedule+0x28/0x70
-> >  schedule_preempt_disabled+0xa/0x10
-> >  __mutex_lock.isra.8+0x2d0/0x4b0
-> >  ? __switch_to_asm+0x40/0x70
-> >  cifs_uncached_readv_complete+0x78/0x4d0 [cifs]
-> >  ? __switch_to_asm+0x34/0x70
-> >  process_one_work+0x1a1/0x3a0
-> >  worker_thread+0x30/0x380
-> >  ? mod_delayed_work_on+0x90/0x90
-> >  kthread+0x112/0x130
-> >  ? __kthread_parkme+0x70/0x70
-> >  ret_from_fork+0x35/0x40
-> > INFO: task kworker/3:0:1910 blocked for more than 120 seconds.
-> >       Not tainted 5.0.0-bisect-7091bcaba9f3+ #15
-> > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messag=
-e.
-> > kworker/3:0     D    0  1910      2 0x80000080
-> > Workqueue: cifsiod cifs_uncached_writev_complete [cifs]
-> > Call Trace:
-> >  ? __schedule+0x24e/0x860
-> >  schedule+0x28/0x70
-> >  schedule_preempt_disabled+0xa/0x10
-> >  __mutex_lock.isra.8+0x2d0/0x4b0
-> >  cifs_uncached_writev_complete+0xcd/0x570 [cifs]
-> >  ? __switch_to_asm+0x40/0x70
-> >  ? __switch_to_asm+0x40/0x70
-> >  ? __switch_to_asm+0x34/0x70
-> >  ? __switch_to_asm+0x40/0x70
-> >  process_one_work+0x1a1/0x3a0
-> >  worker_thread+0x30/0x380
-> >  ? mod_delayed_work_on+0x90/0x90
-> >  kthread+0x112/0x130
-> >  ? __kthread_parkme+0x70/0x70
-> >  ret_from_fork+0x35/0x40
-> > INFO: task kworker/5:5:3930 blocked for more than 120 seconds.
-> >       Not tainted 5.0.0-bisect-7091bcaba9f3+ #15
-> > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messag=
-e.
-> > kworker/5:5     D    0  3930      2 0x80000080
-> > Workqueue: cifsiod cifs_uncached_writev_complete [cifs]
-> > Call Trace:
-> >  ? __schedule+0x24e/0x860
-> >  schedule+0x28/0x70
-> >  schedule_preempt_disabled+0xa/0x10
-> >  __mutex_lock.isra.8+0x2d0/0x4b0
-> >  cifs_uncached_writev_complete+0xcd/0x570 [cifs]
-> >  ? __switch_to_asm+0x40/0x70
-> >  ? __switch_to_asm+0x40/0x70
-> >  ? __switch_to_asm+0x34/0x70
-> >  ? __switch_to_asm+0x40/0x70
-> >  process_one_work+0x1a1/0x3a0
-> >  worker_thread+0x30/0x380
-> >  ? mod_delayed_work_on+0x90/0x90
-> >  kthread+0x112/0x130
-> >  ? __kthread_parkme+0x70/0x70
-> >  ret_from_fork+0x35/0x40
-> > INFO: task kworker/1:2:3932 blocked for more than 120 seconds.
-> >       Not tainted 5.0.0-bisect-7091bcaba9f3+ #15
-> > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messag=
-e.
-> > kworker/1:2     D    0  3932      2 0x80000080
-> > Workqueue: cifsiod cifs_uncached_readv_complete [cifs]
-> > Call Trace:
-> >  ? __schedule+0x24e/0x860
-> >  schedule+0x28/0x70
-> >  schedule_preempt_disabled+0xa/0x10
-> >  __mutex_lock.isra.8+0x2d0/0x4b0
-> >  ? __switch_to_asm+0x40/0x70
-> >  cifs_uncached_readv_complete+0x78/0x4d0 [cifs]
-> >  ? __switch_to_asm+0x34/0x70
-> >  process_one_work+0x1a1/0x3a0
-> >  worker_thread+0x30/0x380
-> >  ? mod_delayed_work_on+0x90/0x90
-> >  kthread+0x112/0x130
-> >  ? __kthread_parkme+0x70/0x70
-> >  ret_from_fork+0x35/0x40
-> > INFO: task kworker/1:5:3934 blocked for more than 120 seconds.
-> >       Not tainted 5.0.0-bisect-7091bcaba9f3+ #15
-> > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messag=
-e.
-> > kworker/1:5     D    0  3934      2 0x80000080
-> > Workqueue: cifsiod cifs_uncached_readv_complete [cifs]
-> > Call Trace:
-> >  ? __schedule+0x24e/0x860
-> >  schedule+0x28/0x70
-> >  schedule_preempt_disabled+0xa/0x10
-> >  __mutex_lock.isra.8+0x2d0/0x4b0
-> >  ? __switch_to_asm+0x40/0x70
-> >  cifs_uncached_readv_complete+0x78/0x4d0 [cifs]
-> >  ? __switch_to_asm+0x34/0x70
-> >  process_one_work+0x1a1/0x3a0
-> >  worker_thread+0x30/0x380
-> >  ? mod_delayed_work_on+0x90/0x90
-> >  kthread+0x112/0x130
-> >  ? __kthread_parkme+0x70/0x70
-> >  ret_from_fork+0x35/0x40
+--000000000000e28ee505841705ca
+Content-Type: text/plain; charset="UTF-8"
 
-(cc'ing Long)
+Forwarding Ronnie's patch to the broader list
 
-I think this is one more occurrence of the known bug in the direct IO
-resend code path: the process is most likely stuck in
-cifs_resend_wdata thus not allowing other process to acquire the
-mutex. We had two patches fixing it that is currently being re-worked:
+For debugging purposes we often have to be able to query
+additional information only available via SMB3 FSCTL
+from the server from user space tools (e.g. like
+cifs-utils's smbinfo).  See MS-FSCC and MS-SMB2 protocol
+specifications for more details.
 
-https://patchwork.kernel.org/patch/10836349/
-https://patchwork.kernel.org/patch/10836355/
+-- 
+Thanks,
 
-But you can try them out to see if they fix your issue.
+Steve
 
---
-Best regards,
-Pavel Shilovsky
+--000000000000e28ee505841705ca
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-SMB3-Allow-SMB3-FSCTL-queries-to-be-sent-to-server-f.patch"
+Content-Disposition: attachment; 
+	filename="0001-SMB3-Allow-SMB3-FSCTL-queries-to-be-sent-to-server-f.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_jt9baa1h0>
+X-Attachment-Id: f_jt9baa1h0
+
+RnJvbSA3NWVjZmUzYzkxZDViMzFlNjI3ZGVkOTM2YzUzMzFiODM0MzZlYTcyIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBSb25uaWUgU2FobGJlcmcgPGxzYWhsYmVyQHJlZGhhdC5jb20+
+CkRhdGU6IEZyaSwgMTUgTWFyIDIwMTkgMDk6MDc6MjIgKzEwMDAKU3ViamVjdDogW1BBVENIXSBT
+TUIzOiBBbGxvdyBTTUIzIEZTQ1RMIHF1ZXJpZXMgdG8gYmUgc2VudCB0byBzZXJ2ZXIgZnJvbQog
+dG9vbHMKCkZvciBkZWJ1Z2dpbmcgcHVycG9zZXMgd2Ugb2Z0ZW4gaGF2ZSB0byBiZSBhYmxlIHRv
+IHF1ZXJ5CmFkZGl0aW9uYWwgaW5mb3JtYXRpb24gb25seSBhdmFpbGFibGUgdmlhIFNNQjMgRlND
+VEwKZnJvbSB0aGUgc2VydmVyIGZyb20gdXNlciBzcGFjZSB0b29scyAoZS5nLiBsaWtlCmNpZnMt
+dXRpbHMncyBzbWJpbmZvKS4gIFNlZSBNUy1GU0NDIGFuZCBNUy1TTUIyIHByb3RvY29sCnNwZWNp
+ZmljYXRpb25zIGZvciBtb3JlIGRldGFpbHMuCgpTaWduZWQtb2ZmLWJ5OiBSb25uaWUgU2FobGJl
+cmcgPGxzYWhsYmVyQHJlZGhhdC5jb20+ClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3Rm
+cmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9jaWZzL3NtYjJvcHMuYyB8IDYyICsrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tCiAxIGZpbGUgY2hhbmdlZCwg
+NDYgaW5zZXJ0aW9ucygrKSwgMTYgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9z
+bWIyb3BzLmMgYi9mcy9jaWZzL3NtYjJvcHMuYwppbmRleCAxYzhkMzY4NGJiOGIuLjgxMDI0MDlk
+MTBlNCAxMDA2NDQKLS0tIGEvZnMvY2lmcy9zbWIyb3BzLmMKKysrIGIvZnMvY2lmcy9zbWIyb3Bz
+LmMKQEAgLTEzMzAsNyArMTMzMCw4IEBAIHNtYjJfaW9jdGxfcXVlcnlfaW5mbyhjb25zdCB1bnNp
+Z25lZCBpbnQgeGlkLAogCXN0cnVjdCBzbWJfcXVlcnlfaW5mbyBfX3VzZXIgKnBxaTsKIAlpbnQg
+cmMgPSAwOwogCWludCBmbGFncyA9IDA7Ci0Jc3RydWN0IHNtYjJfcXVlcnlfaW5mb19yc3AgKnJz
+cCA9IE5VTEw7CisJc3RydWN0IHNtYjJfcXVlcnlfaW5mb19yc3AgKnFpX3JzcCA9IE5VTEw7CisJ
+c3RydWN0IHNtYjJfaW9jdGxfcnNwICppb19yc3AgPSBOVUxMOwogCXZvaWQgKmJ1ZmZlciA9IE5V
+TEw7CiAJc3RydWN0IHNtYl9ycXN0IHJxc3RbM107CiAJaW50IHJlc3BfYnVmdHlwZVszXTsKQEAg
+LTEzNDAsNiArMTM0MSw3IEBAIHNtYjJfaW9jdGxfcXVlcnlfaW5mbyhjb25zdCB1bnNpZ25lZCBp
+bnQgeGlkLAogCXU4IG9wbG9jayA9IFNNQjJfT1BMT0NLX0xFVkVMX05PTkU7CiAJc3RydWN0IGNp
+ZnNfZmlkIGZpZDsKIAlzdHJ1Y3Qga3ZlYyBxaV9pb3ZbMV07CisJc3RydWN0IGt2ZWMgaW9faW92
+W1NNQjJfSU9DVExfSU9WX1NJWkVdOwogCXN0cnVjdCBrdmVjIGNsb3NlX2lvdlsxXTsKIAogCW1l
+bXNldChycXN0LCAwLCBzaXplb2YocnFzdCkpOwpAQCAtMTM5NCw4ICsxMzk2LDE2IEBAIHNtYjJf
+aW9jdGxfcXVlcnlfaW5mbyhjb25zdCB1bnNpZ25lZCBpbnQgeGlkLAogCQkvKiBDYW4gZXZlbnR1
+YWxseSByZWxheCBwZXJtIGNoZWNrIHNpbmNlIHNlcnZlciBlbmZvcmNlcyB0b28gKi8KIAkJaWYg
+KCFjYXBhYmxlKENBUF9TWVNfQURNSU4pKQogCQkJcmMgPSAtRVBFUk07Ci0JCWVsc2UgIC8qIFRC
+RDogQWRkIGNvZGUgdG8gY29tcG91bmQgRlNDVEwgKi8KLQkJCXJjID0gLUVPUE5PVFNVUFA7CisJ
+CWVsc2UgIHsKKwkJCW1lbXNldCgmaW9faW92LCAwLCBzaXplb2YoaW9faW92KSk7CisJCQlycXN0
+WzFdLnJxX2lvdiA9IGlvX2lvdjsKKwkJCXJxc3RbMV0ucnFfbnZlYyA9IFNNQjJfSU9DVExfSU9W
+X1NJWkU7CisKKwkJCXJjID0gU01CMl9pb2N0bF9pbml0KHRjb24sICZycXN0WzFdLAorCQkJCQkg
+ICAgIENPTVBPVU5EX0ZJRCwgQ09NUE9VTkRfRklELAorCQkJCQkgICAgIHFpLmluZm9fdHlwZSwg
+dHJ1ZSwgTlVMTCwKKwkJCQkJICAgICAwKTsKKwkJfQogCX0gZWxzZSBpZiAocWkuZmxhZ3MgPT0g
+UEFTU1RIUlVfUVVFUllfSU5GTykgewogCQltZW1zZXQoJnFpX2lvdiwgMCwgc2l6ZW9mKHFpX2lv
+dikpOwogCQlycXN0WzFdLnJxX2lvdiA9IHFpX2lvdjsKQEAgLTE0MzAsMjQgKzE0NDAsNDQgQEAg
+c21iMl9pb2N0bF9xdWVyeV9pbmZvKGNvbnN0IHVuc2lnbmVkIGludCB4aWQsCiAJCQkJcmVzcF9i
+dWZ0eXBlLCByc3BfaW92KTsKIAlpZiAocmMpCiAJCWdvdG8gaXFpbmZfZXhpdDsKLQlwcWkgPSAo
+c3RydWN0IHNtYl9xdWVyeV9pbmZvIF9fdXNlciAqKWFyZzsKLQlyc3AgPSAoc3RydWN0IHNtYjJf
+cXVlcnlfaW5mb19yc3AgKilyc3BfaW92WzFdLmlvdl9iYXNlOwotCWlmIChsZTMyX3RvX2NwdShy
+c3AtPk91dHB1dEJ1ZmZlckxlbmd0aCkgPCBxaS5pbnB1dF9idWZmZXJfbGVuZ3RoKQotCQlxaS5p
+bnB1dF9idWZmZXJfbGVuZ3RoID0gbGUzMl90b19jcHUocnNwLT5PdXRwdXRCdWZmZXJMZW5ndGgp
+OwotCWlmIChjb3B5X3RvX3VzZXIoJnBxaS0+aW5wdXRfYnVmZmVyX2xlbmd0aCwgJnFpLmlucHV0
+X2J1ZmZlcl9sZW5ndGgsCi0JCQkgc2l6ZW9mKHFpLmlucHV0X2J1ZmZlcl9sZW5ndGgpKSkgewot
+CQlyYyA9IC1FRkFVTFQ7Ci0JCWdvdG8gaXFpbmZfZXhpdDsKLQl9Ci0JaWYgKGNvcHlfdG9fdXNl
+cihwcWkgKyAxLCByc3AtPkJ1ZmZlciwgcWkuaW5wdXRfYnVmZmVyX2xlbmd0aCkpIHsKLQkJcmMg
+PSAtRUZBVUxUOwotCQlnb3RvIGlxaW5mX2V4aXQ7CisJaWYgKHFpLmZsYWdzICYgUEFTU1RIUlVf
+RlNDVEwpIHsKKwkJcHFpID0gKHN0cnVjdCBzbWJfcXVlcnlfaW5mbyBfX3VzZXIgKilhcmc7CisJ
+CWlvX3JzcCA9IChzdHJ1Y3Qgc21iMl9pb2N0bF9yc3AgKilyc3BfaW92WzFdLmlvdl9iYXNlOwor
+CQlpZiAobGUzMl90b19jcHUoaW9fcnNwLT5PdXRwdXRDb3VudCkgPCBxaS5pbnB1dF9idWZmZXJf
+bGVuZ3RoKQorCQkJcWkuaW5wdXRfYnVmZmVyX2xlbmd0aCA9IGxlMzJfdG9fY3B1KGlvX3JzcC0+
+T3V0cHV0Q291bnQpOworCQlpZiAoY29weV90b191c2VyKCZwcWktPmlucHV0X2J1ZmZlcl9sZW5n
+dGgsICZxaS5pbnB1dF9idWZmZXJfbGVuZ3RoLAorCQkJCSBzaXplb2YocWkuaW5wdXRfYnVmZmVy
+X2xlbmd0aCkpKSB7CisJCQlyYyA9IC1FRkFVTFQ7CisJCQlnb3RvIGlxaW5mX2V4aXQ7CisJCX0K
+KwkJaWYgKGNvcHlfdG9fdXNlcihwcWkgKyAxLCAmaW9fcnNwWzFdLCBxaS5pbnB1dF9idWZmZXJf
+bGVuZ3RoKSkgeworCQkJcmMgPSAtRUZBVUxUOworCQkJZ290byBpcWluZl9leGl0OworCQl9CisJ
+fSBlbHNlIHsKKwkJcHFpID0gKHN0cnVjdCBzbWJfcXVlcnlfaW5mbyBfX3VzZXIgKilhcmc7CisJ
+CXFpX3JzcCA9IChzdHJ1Y3Qgc21iMl9xdWVyeV9pbmZvX3JzcCAqKXJzcF9pb3ZbMV0uaW92X2Jh
+c2U7CisJCWlmIChsZTMyX3RvX2NwdShxaV9yc3AtPk91dHB1dEJ1ZmZlckxlbmd0aCkgPCBxaS5p
+bnB1dF9idWZmZXJfbGVuZ3RoKQorCQkJcWkuaW5wdXRfYnVmZmVyX2xlbmd0aCA9IGxlMzJfdG9f
+Y3B1KHFpX3JzcC0+T3V0cHV0QnVmZmVyTGVuZ3RoKTsKKwkJaWYgKGNvcHlfdG9fdXNlcigmcHFp
+LT5pbnB1dF9idWZmZXJfbGVuZ3RoLCAmcWkuaW5wdXRfYnVmZmVyX2xlbmd0aCwKKwkJCQkgc2l6
+ZW9mKHFpLmlucHV0X2J1ZmZlcl9sZW5ndGgpKSkgeworCQkJcmMgPSAtRUZBVUxUOworCQkJZ290
+byBpcWluZl9leGl0OworCQl9CisJCWlmIChjb3B5X3RvX3VzZXIocHFpICsgMSwgcWlfcnNwLT5C
+dWZmZXIsIHFpLmlucHV0X2J1ZmZlcl9sZW5ndGgpKSB7CisJCQlyYyA9IC1FRkFVTFQ7CisJCQln
+b3RvIGlxaW5mX2V4aXQ7CisJCX0KIAl9CiAKICBpcWluZl9leGl0OgogCWtmcmVlKGJ1ZmZlcik7
+CiAJU01CMl9vcGVuX2ZyZWUoJnJxc3RbMF0pOwotCVNNQjJfcXVlcnlfaW5mb19mcmVlKCZycXN0
+WzFdKTsKKwlpZiAocWkuZmxhZ3MgJiBQQVNTVEhSVV9GU0NUTCkKKwkJU01CMl9pb2N0bF9mcmVl
+KCZycXN0WzFdKTsKKwllbHNlCisJCVNNQjJfcXVlcnlfaW5mb19mcmVlKCZycXN0WzFdKTsKKwog
+CVNNQjJfY2xvc2VfZnJlZSgmcnFzdFsyXSk7CiAJZnJlZV9yc3BfYnVmKHJlc3BfYnVmdHlwZVsw
+XSwgcnNwX2lvdlswXS5pb3ZfYmFzZSk7CiAJZnJlZV9yc3BfYnVmKHJlc3BfYnVmdHlwZVsxXSwg
+cnNwX2lvdlsxXS5pb3ZfYmFzZSk7Ci0tIAoyLjE3LjEKCg==
+--000000000000e28ee505841705ca--
