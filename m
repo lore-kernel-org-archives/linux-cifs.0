@@ -2,142 +2,124 @@ Return-Path: <SRS0=S2FA=RS=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEE01C43381
-	for <linux-cifs@archiver.kernel.org>; Fri, 15 Mar 2019 14:29:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5AB3C43381
+	for <linux-cifs@archiver.kernel.org>; Fri, 15 Mar 2019 23:39:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ABD1F21871
-	for <linux-cifs@archiver.kernel.org>; Fri, 15 Mar 2019 14:29:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AC841218AC
+	for <linux-cifs@archiver.kernel.org>; Fri, 15 Mar 2019 23:39:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jnbkgcBx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jnrIjdh3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729253AbfCOO3p (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 15 Mar 2019 10:29:45 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:46223 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729241AbfCOO3o (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 15 Mar 2019 10:29:44 -0400
-Received: by mail-pg1-f194.google.com with SMTP id a22so6567969pgg.13;
-        Fri, 15 Mar 2019 07:29:44 -0700 (PDT)
+        id S1727104AbfCOXje (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 15 Mar 2019 19:39:34 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:42473 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726744AbfCOXje (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 15 Mar 2019 19:39:34 -0400
+Received: by mail-pf1-f196.google.com with SMTP id r15so4604933pfn.9;
+        Fri, 15 Mar 2019 16:39:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:date:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=4jF0JNP0GEqFOCSeN3PTMsB/S2NPfTdpmeL7nyzg8d8=;
-        b=jnbkgcBx5qjzYQYNsGJD9AfeYBhtS8woMivA6lfEb9oJoIsH2B0Vuhzz+uhKwsXqFK
-         pCIDGoXueOhzRXMdbmY7YWaCxGBTb4+6aBtjoQyWb8XLLDAOsbRXfyQKBh+ZArI3bN+T
-         HRaaBWmR17SnPSOvmYRxtv7r8R3CKPSEFcJq0uM/PNlsILDQD9RxDGj0lEpUId0LqcT6
-         RjaQxxFAkjZN7+lW2oQEBLEBL8SXb7zsPO1/Y2IrJoNu55qQGTgzDDKpe5gvc4pCOW3H
-         GxewOdt95fVQHdqAhUO2eMt1tuTRDhJo6y3PsiyYVBLzTOsaRFQessz0AsdPi4bmGGPz
-         gJ8Q==
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=ieiWMsHRfGRpU22N8QrO5nSbBviY91mvVJqNPmZ+hH4=;
+        b=jnrIjdh3RPF4jQXt5KlgDiVsS/fJuonLz7nvw203otB6LyzXrE8hkpsO0FXdS+b4F3
+         aDUqOPewqPAWEswFf00zZPpwv+elvcj25vdib+73qbtQ7vA+j+dw78A0156nAqvnpx+M
+         cmcljjkMcKpapaiFtsAV0XnZGsKYa1Abh2N3Vo8luRfDH6x/1tBOanAcngodlmKQdvoO
+         rr1r+z6Uwb3Y/avGTvTRKoM8PiknZwMEeE7bKVJGmvXd6K+Y2kRQb7WOGGnv2mEsNL+9
+         5iGcEFei5gtRApSSafB3+lFweQVCK3UaUrt6jH4D9Pr3K0DMHZVi1Ubr7j1zkM9ODYV+
+         G+ZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:date:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=4jF0JNP0GEqFOCSeN3PTMsB/S2NPfTdpmeL7nyzg8d8=;
-        b=Ii99lzNmB6zqUpyesxF2uj8udsAfEMnJk/882//+oWdFUum2UQxIqfTqZCY7Blvggb
-         uwgHLtthYEtnQwGAmRVNinajUXqD9QxGkqKfguWglI8SPQJzrZVanUaE9s6yYVMTTKPD
-         Pz5/2Mnr/bkcblZECu5kRG2SUZ/vvnmFmChePgksoATLNYG/aZXm0902S3KKvGvVC0HN
-         vzYn2mdWsh6LLJ312ewWBLaQXcmVvGR5tZAkNJkWIurBNKQmEhwGc+8I/zLpqYv2slkz
-         RNIeFB5REXv6zs9br9lVnvpqBPIIL3Hj9boZp0+yrlzZtQGSLtF5hRZwXdqlLP+ORWDy
-         Fuaw==
-X-Gm-Message-State: APjAAAXM8cNi5am70fFNbKGm5d1dkSVa+hAyW41ILuYR1YerSbaVTd4Y
-        i/UigJ11FzX6MrZToPXygJA=
-X-Google-Smtp-Source: APXvYqzgF09sr9Zx7QYz3ctV43TClDZ//0dgxZz4aYiRBzeNEM7oxmeRAvXtAxMdPw16yK1yQcxv5Q==
-X-Received: by 2002:a65:424d:: with SMTP id d13mr3720798pgq.203.1552660183557;
-        Fri, 15 Mar 2019 07:29:43 -0700 (PDT)
-Received: from localhost ([121.137.63.184])
-        by smtp.gmail.com with ESMTPSA id m3sm2639905pgp.85.2019.03.15.07.29.41
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 15 Mar 2019 07:29:41 -0700 (PDT)
-From:   Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
-X-Google-Original-From: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-Date:   Fri, 15 Mar 2019 23:29:38 +0900
-To:     David Laight <David.Laight@aculab.com>
-Cc:     'Sergey Senozhatsky' <sergey.senozhatsky.work@gmail.com>,
-        Steve French <sfrench@samba.org>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
-Subject: Re: [PATCH 2/2] cifs: don't use __constant_cpu_to_le32()
-Message-ID: <20190315142938.GA32256@tigerII.localdomain>
-References: <20190314061716.19892-1-sergey.senozhatsky@gmail.com>
- <20190314061716.19892-2-sergey.senozhatsky@gmail.com>
- <757dbafbdadb45f6a3de728ecfd05c5d@AcuMS.aculab.com>
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=ieiWMsHRfGRpU22N8QrO5nSbBviY91mvVJqNPmZ+hH4=;
+        b=PgsOgWhwvcsla/jZV96FmJoIeuZpGeSc91R/nWYXukN8BuGXdmR8TpZM33NAmD9Y1q
+         pGBBDAawcgPySHytzDhNZKM2V3Gsu7wM721B5kwypTAILF82jQ6ZWorWkQ2SY3ypEhwz
+         gP2VK24s7gNVEfXbAPXqhlryHQxekwewyQZ0gnCfMKIol9c9iaEUld97q6ab2wz3J8Ds
+         0+zFcz+QERdzBM61lmoTganWKT0wOX0G5Ck/0ZFryhXrEOmnmCqfj7nA4qdRTAV/h56R
+         wmUQcFxjSmYtFkyN5MsS3XyhQ9J7DtPEAx/t1zvtpw0PMxtrNBPTWX9sEGuTXGEuvatl
+         rTZw==
+X-Gm-Message-State: APjAAAUI0TRlIF3wS1jVmqx6iLVianYjEbmkhlkV5b4I/bS07nPDFdOg
+        qZStwwXVQBnvH+jrOLLUHm9YyWCIdE0Nompa1E+SavNx
+X-Google-Smtp-Source: APXvYqy5lhcfE8A+eviAGyGMSxeX3CsHfum8ufqS0RLrPFy7N5baxhFXYYNvmN59qsTXdIYPinMAzbdIPuRtjJGShMA=
+X-Received: by 2002:aa7:8d42:: with SMTP id s2mr6749881pfe.116.1552693172864;
+ Fri, 15 Mar 2019 16:39:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <757dbafbdadb45f6a3de728ecfd05c5d@AcuMS.aculab.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 15 Mar 2019 18:39:21 -0500
+Message-ID: <CAH2r5mvDGcGD=GP+-5984DJ9U_cYLWvkMsJORX4LZ7_1sVKpgw@mail.gmail.com>
+Subject: [GIT] SMB3 Fixes and debugging improvements
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On (03/15/19 12:31), David Laight wrote:
-> From: Sergey Senozhatsky
-> > 
-> > cpu_to_le32() is capable enough to detect __builtin_constant_p()
-> > and to use an appropriate compile time ___constant_swahb32()
-> > function.
-> > 
-> > So we can use cpu_to_le32() instead of __constant_cpu_to_le32().
-> 
-> Unless any code tries to use them as case statement labels.
+Please pull the following changes since commit
+f261c4e529dac5608a604d3dd3ae1cd2adf23c89:
 
-What is the problem?
+  Merge branch 'akpm' (patches from Andrew) (2019-03-14 15:10:10 -0700)
 
-For compile time constants cpu_to_le32() should do the same thing
-as __constant_cpu_to_le32().
+are available in the Git repository at:
 
-There seems a whole bunch of cpu_to_XX compile time constants which
-are used in case statement labels
+  git://git.samba.org/sfrench/cifs-2.6.git tags/5.1-rc-smb3
 
-include/linux/sunrpc/xdr.h:#define      rpc_msg_accepted        cpu_to_be32(RPC_MSG_ACCEPTED)
-include/linux/sunrpc/xdr.h:#define      rpc_success             cpu_to_be32(RPC_SUCCESS)
-include/linux/sunrpc/xdr.h:#define      rpc_prog_unavail        cpu_to_be32(RPC_PROG_UNAVAIL)
-include/linux/sunrpc/xdr.h:#define      rpc_prog_mismatch       cpu_to_be32(RPC_PROG_MISMATCH)
-include/linux/sunrpc/xdr.h:#define      rpc_proc_unavail        cpu_to_be32(RPC_PROC_UNAVAIL)
-include/linux/sunrpc/xdr.h:#define      rpc_garbage_args        cpu_to_be32(RPC_GARBAGE_ARGS)
-include/linux/sunrpc/xdr.h:#define      rpc_system_err          cpu_to_be32(RPC_SYSTEM_ERR)
-include/linux/sunrpc/xdr.h:#define      rpc_drop_reply          cpu_to_be32(RPC_DROP_REPLY)
-include/linux/sunrpc/xdr.h:#define      rpc_mismatch            cpu_to_be32(RPC_MISMATCH)
-include/linux/sunrpc/xdr.h:#define      rpc_auth_error          cpu_to_be32(RPC_AUTH_ERROR)
-include/linux/sunrpc/xdr.h:#define      rpc_auth_ok             cpu_to_be32(RPC_AUTH_OK)
-include/linux/sunrpc/xdr.h:#define      rpc_autherr_badcred     cpu_to_be32(RPC_AUTH_BADCRED)
-include/linux/sunrpc/xdr.h:#define      rpc_autherr_rejectedcred cpu_to_be32(RPC_AUTH_REJECTEDCRED)
-include/linux/sunrpc/xdr.h:#define      rpc_autherr_badverf     cpu_to_be32(RPC_AUTH_BADVERF)
-include/linux/sunrpc/xdr.h:#define      rpc_autherr_rejectedverf cpu_to_be32(RPC_AUTH_REJECTEDVERF)
-include/linux/sunrpc/xdr.h:#define      rpc_autherr_tooweak     cpu_to_be32(RPC_AUTH_TOOWEAK)
+for you to fetch changes up to bc31d0cdcfbadb6258b45db97e93b1c83822ba33:
+
+  CIFS: fix POSIX lock leak and invalid ptr deref (2019-03-14 19:32:36 -0500)
+
+----------------------------------------------------------------
+- Various additional dynamic tracing tracepoints
+- Debugging improvements (including ability to query the server via
+SMB3 fsctl from userspace tools which can help with stats and
+debugging)
+- One minor performance improvement (root directory inode caching)
+- Crediting (SMB3 flow control) fixes
+- Some cleanup (docs and to mknod)
+- Important fixes: one to smb3 implementation of fallocate zero range
+(which fixes three xfstests) and a POSIX lock fix
+----------------------------------------------------------------
+Aurelien Aptel (2):
+      CIFS: make mknod() an smb_version_op
+      CIFS: fix POSIX lock leak and invalid ptr deref
+
+Ronnie Sahlberg (11):
+      cifs: change wait_for_free_request() to take flags as argument
+      cifs: pass flags down into wait_for_free_credits()
+      cifs: wait_for_free_credits() make it possible to wait for >=1 credits
+      cifs: prevent starvation in wait_for_free_credits for
+multi-credit requests
+      cifs: add a timeout argument to wait_for_free_credits
+      cifs: simplify how we handle credits in compound_send_recv()
+      cifs: cache FILE_ALL_INFO for the shared root handle
+      cifs: add SMB2_ioctl_init/free helpers to be used with compounding
+      cifs: fix smb3_zero_range so it can expand the file-size when required
+      cifs: fix incorrect handling of smb2_set_sparse() return in
+smb3_simple_falloc
+      SMB3: Allow SMB3 FSCTL queries to be sent to server from tools
+
+Steve French (9):
+      smb3: display security information in /proc/fs/cifs/DebugData
+more accurately
+      smb3: add dynamic tracepoint for timeout waiting for credits
+      smb3: display volume serial number for shares in /proc/fs/cifs/DebugData
+      smb3: Add dynamic trace points for various compounded smb3 ops
+      smb3: add dynamic tracepoints for simple fallocate and zero range
+      SMB3: passthru query info doesn't check for SMB3 FSCTL passthru
+      cifs: remove unused value pointed out by Coverity
+      cifs: minor documentation updates
+      smb2: fix typo in definition of a few error flags
 
 
-net/sunrpc/clnt.c
+-- 
+Thanks,
 
-2479         switch (*p) {
-2480         case rpc_success:
-2481                 return 0;
-2482         case rpc_prog_unavail:
-2483                 trace_rpc__prog_unavail(task);
-2484                 error = -EPFNOSUPPORT;
-2485                 goto out_err;
-2486         case rpc_prog_mismatch:
-2487                 trace_rpc__prog_mismatch(task);
-2488                 error = -EPROTONOSUPPORT;
-2489                 goto out_err;
-2490         case rpc_proc_unavail:
-2491                 trace_rpc__proc_unavail(task);
-2492                 error = -EOPNOTSUPP;
-2493                 goto out_err;
-2494         case rpc_garbage_args:
-2495                 trace_rpc__garbage_args(task);
-2496                 break;
-2497         default:
-2498                 trace_rpc__unparsable(task);
-2499         }
-
-	-ss
+Steve
