@@ -7,61 +7,60 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33CBEC43381
-	for <linux-cifs@archiver.kernel.org>; Tue, 19 Mar 2019 12:29:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 880D5C43381
+	for <linux-cifs@archiver.kernel.org>; Tue, 19 Mar 2019 12:34:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EB63720857
-	for <linux-cifs@archiver.kernel.org>; Tue, 19 Mar 2019 12:29:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4DAD020857
+	for <linux-cifs@archiver.kernel.org>; Tue, 19 Mar 2019 12:34:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b0qBB4/n"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K6lUb0dZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726731AbfCSM30 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 19 Mar 2019 08:29:26 -0400
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:40187 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726688AbfCSM30 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 19 Mar 2019 08:29:26 -0400
-Received: by mail-qt1-f193.google.com with SMTP id x12so5683819qts.7
-        for <linux-cifs@vger.kernel.org>; Tue, 19 Mar 2019 05:29:25 -0700 (PDT)
+        id S1726573AbfCSMeZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 19 Mar 2019 08:34:25 -0400
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:44572 "EHLO
+        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726002AbfCSMeZ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 19 Mar 2019 08:34:25 -0400
+Received: by mail-qk1-f193.google.com with SMTP id m65so4082423qkl.11
+        for <linux-cifs@vger.kernel.org>; Tue, 19 Mar 2019 05:34:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=FzQ6QOw6C5U0L7BdexUHt0L8xpKGNGzO4VgubAiY+xY=;
-        b=b0qBB4/nQJdZCtF1YhTAPILi5Ik2PLOpEI+jceV7xG4CA+7WC7J98meTfuXZ8eG6en
-         4aLXaSQAkvwbgs6Upb7bNSyOiHYJMokIM4UcjCU9WJ8JncpEaoIbHsIfaYCXmxEpg6Vg
-         alrnVuASgCDywL/5PEifZpUHWHjm5FabT35uw7gmmi04+rGOGUeUjxLlxX1W3lZS00Cq
-         6Vz2WuuG6+r8vzoN2kCErmQDt053Kpd6hMTfbQVxDySKdhu9RUQaZTbcgqmXkBYwczOZ
-         Xwrdf9cMrngxEEF595DXnpYfF/02OkjEWfhwyKmpaV1IowrGqCSWm7claeRlZRnxV8Jn
-         xCzQ==
+        bh=IovUeGzQvueca/Un843adG8ZDeaxwYvZSGT7yA9yiW0=;
+        b=K6lUb0dZoFTVwXCxxY0pZ3NnCl1JztWpSWKsHYHKS2dL2yR7okuQoKFRcl9MiJ61eh
+         SQCVjHg/h6vpESTMufzMQXe/wAwYdJaGVIMq9vrXGneiXFCfyf+8fs9ppGXcu4+vo/jB
+         B4TANa1Xp1fWhRUiOOM5eE/I5Kbu28HzX72aPcDMGQdqY7pz7o2yjg7Pqqff1vKUPcE2
+         kRYcr+v1HXPjFNqWPjKrDToLb8pLc9tilOFI8ZPeB1NiO90JVeEY7tZJOqpZ5/XnFhMA
+         7L55z29b5j5Ebzeu/qTf+1NTQtiMxTZXJEhgHhglq+3Kxfxe2zXeDidYhrpSF2Q5snKc
+         CgGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=FzQ6QOw6C5U0L7BdexUHt0L8xpKGNGzO4VgubAiY+xY=;
-        b=ob17NXbDTUJk2S76DDV/aS8ahbuNbFh0M1/i7LxRPfFi/1+3uJ9gqSjzW9rFNd0KJG
-         zQSSLGQ4P2Gv48xYkb0iT+Vg8aWw6g5XEBVYj6bcFYcDnqVKLqdUqKCyg6+IQZKFZTgY
-         Eq40WvfgP/zkP8awwGwdbRM5d+fEewxENjwjyWpiCFrxek2vAt/6+5Ik4CKF5d+aQVU0
-         lbQt/mpVA7VGGk6NAdreUaDXwlsHM2rq+hR4d3t6V22YIGESpRZGZTOTkRARwlfhes+S
-         sGXbhQpl1ETeDT+Md4tvVDNDeC2PckndzfsPVYl8rJABBiSG7Ja5KOSUyr8Cq91Dsebm
-         Qr4A==
-X-Gm-Message-State: APjAAAUNnAGyTY4cjoHWfkZhfH4FBj2PRXzgG6VSV+CNrLpVolk7x3R3
-        CMxwQqsGXnU9lz7QqBeNefsL3OUt509qr89m3C85xQ==
-X-Google-Smtp-Source: APXvYqzBFqirUARFHhAtspzjaod6XrpznlCwuYL3QH8ymjWheP7cIFOiVW9YbHdEvHqWOB7H9mgTzXKfLD+QhjgFBGs=
-X-Received: by 2002:a0c:d20d:: with SMTP id m13mr1609018qvh.165.1552998564894;
- Tue, 19 Mar 2019 05:29:24 -0700 (PDT)
+        bh=IovUeGzQvueca/Un843adG8ZDeaxwYvZSGT7yA9yiW0=;
+        b=UJwEOOFADZS46fWfwNKwh+Xx9yy7TBG0gpTmm7eCH3hkR7UEX54T5Otd+WjVy10kb+
+         WiMvkemVnmeL2Fya5kr8Zpi5mEkMBmQUgmFMOPRvqEBnu6nLd+dBTLzb1XxtyaX7gdnW
+         kb39O7znSs9LqbpyQTl3QnmtaZ1Kwu6wNuejbyThybxa2zKznoXRGSYD5xjC4pqIRzSY
+         ndivll3vyrRz0siQXl799voPot4ryv4iOX41nWyRCo9SmiSy8bcC8MFl7cBOdhCbU32k
+         yA1ZPXAaVcF8hXQxeKHnotQu1W+CPJEjYpfYLN50CNNtEG5scrS7YwJHEHtdftz8UOiM
+         qLBw==
+X-Gm-Message-State: APjAAAUegxG6ZEfT07V8VrdHKSqgmqhi8erS3iu7iFt7zD1tue1zVf/I
+        qvoeNmp9Qx4iJKaNxF7eQylrhrrPmtY6mTzwpkE=
+X-Google-Smtp-Source: APXvYqyYLensCGXvGlPrdNgWaTr0JiugUXNPABgqnEFh90bPK7/6l327y0oo1EkYATOPmYVMqJdob662ZUV3DjxhUbs=
+X-Received: by 2002:a05:620a:16d1:: with SMTP id a17mr1637044qkn.92.1552998864234;
+ Tue, 19 Mar 2019 05:34:24 -0700 (PDT)
 MIME-Version: 1.0
 References: <CADJHv_sGr3Oz7zTW5KQMgg93+Fgkaw1NVrEMEKmnCTCcHPHveg@mail.gmail.com>
- <CAH2r5mv01St0qCDXqe2EN2eRt5h=EvcEnn4zcEb2QobA7bWcRw@mail.gmail.com>
-In-Reply-To: <CAH2r5mv01St0qCDXqe2EN2eRt5h=EvcEnn4zcEb2QobA7bWcRw@mail.gmail.com>
+ <CAN05THRDtr1WQqSwqNG7azy+Qst5H1+8XGrZNGNocr_O_jf7LA@mail.gmail.com>
+In-Reply-To: <CAN05THRDtr1WQqSwqNG7azy+Qst5H1+8XGrZNGNocr_O_jf7LA@mail.gmail.com>
 From:   Murphy Zhou <jencce.kernel@gmail.com>
-Date:   Tue, 19 Mar 2019 20:29:13 +0800
-Message-ID: <CADJHv_voKOSU9Z-ZVOnv8ZoJ79ut8yTKP9hzbe-F2k2dLdSXDg@mail.gmail.com>
+Date:   Tue, 19 Mar 2019 20:34:11 +0800
+Message-ID: <CADJHv_uTw3yi1UJRVde_KKrF4GnJWNUp1TuZUiHceFzbO7H4KA@mail.gmail.com>
 Subject: Re: [5.1-rc1 CIFS regression] detected buffer overflow in strcat in
  smb21_set_oplock_level (xfstests generic/446)
-To:     Steve French <smfrench@gmail.com>
+To:     ronnie sahlberg <ronniesahlberg@gmail.com>
 Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
         Pavel Shilovsky <piastryyy@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
@@ -69,24 +68,28 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Mar 19, 2019 at 3:39 AM Steve French <smfrench@gmail.com> wrote:
->
-> Thanks for the update - it will be very helpful if we can make sure
-> that when something like this is found that we add a simple (hopefully
-> a test that adds less than 1 minute to execution time) xfstest or
-> script that we can add to tests/cifs in xfstests that will ensure that
-> we never regress that scenario in the future.
-Sure. That's true.
->
-> We are trying to add more and more tests to the 'buildbot'
-> (http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com) to
-> continue to improve automated functional test verification for cifs.ko
-> (it has already been an enormous help just in the last few months)
+Hi,
 
-Great!
+On Tue, Mar 19, 2019 at 9:09 AM ronnie sahlberg
+<ronniesahlberg@gmail.com> wrote:
+>
+> Hi,
+>
+> I tested generic/446 on both my machine as well as our buildbot using
+> Steves current for-next branch and it passes without crashing.
+> I have added this test to our buildbot so we will continue to run it
+> for every patch moving forward.
+Looping a few times will reproduce.
+>
+> Can you test if you still get crashes if you use Steve's for-next branch ?
+
+Yes. The same panic on the 5th loop.
+
+Thanks,
+M
 
 >
-> On Mon, Mar 18, 2019 at 1:21 AM Murphy Zhou <jencce.kernel@gmail.com> wrote:
+> On Mon, Mar 18, 2019 at 4:20 PM Murphy Zhou <jencce.kernel@gmail.com> wrote:
 > >
 > > Hi,
 > >
@@ -190,10 +193,3 @@ Great!
 > >
 > > Thanks,
 > > M
->
->
->
-> --
-> Thanks,
->
-> Steve
