@@ -2,117 +2,96 @@ Return-Path: <SRS0=fxvP=RX=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2E1DC43381
-	for <linux-cifs@archiver.kernel.org>; Wed, 20 Mar 2019 13:52:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0FE4C43381
+	for <linux-cifs@archiver.kernel.org>; Wed, 20 Mar 2019 18:40:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 702E021850
-	for <linux-cifs@archiver.kernel.org>; Wed, 20 Mar 2019 13:52:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="CN5B1qls"
+	by mail.kernel.org (Postfix) with ESMTP id 7FF7D2146E
+	for <linux-cifs@archiver.kernel.org>; Wed, 20 Mar 2019 18:40:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726303AbfCTNwQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 20 Mar 2019 09:52:16 -0400
-Received: from mail-eopbgr680104.outbound.protection.outlook.com ([40.107.68.104]:38720
-        "EHLO NAM04-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726239AbfCTNwP (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 20 Mar 2019 09:52:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=w5RgDSLCOir+g1Qbp1Vz4KMMppJ6awwuwZdomZkcchM=;
- b=CN5B1qlsI7m8NBkxqtVD6INAjKZGqWJiFqUWRI/1S9QdtgpMeS4esocUiG78wH/OSiYXSylWnSvNyFOy7xDz0hHGMlLakNxRPz1vkERd3NaLxGo7Mn/DM4wTExb9wVEJpkPGN8Q+WoeFeFg0+0n+UJ9r2h22hWzcH1FGYfZB45U=
-Received: from SN4PR2101MB0736.namprd21.prod.outlook.com (10.167.151.155) by
- SN4PR2101MB0815.namprd21.prod.outlook.com (10.167.151.157) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1750.7; Wed, 20 Mar 2019 13:52:11 +0000
-Received: from SN4PR2101MB0736.namprd21.prod.outlook.com
- ([fe80::804d:6cd0:c000:791c]) by SN4PR2101MB0736.namprd21.prod.outlook.com
- ([fe80::804d:6cd0:c000:791c%3]) with mapi id 15.20.1750.005; Wed, 20 Mar 2019
- 13:52:11 +0000
-From:   Tom Talpey <ttalpey@microsoft.com>
-To:     =?utf-8?B?QXVyw6lsaWVuIEFwdGVs?= <aaptel@samba.org>,
-        Stefan Metzmacher <metze@samba.org>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
-        Steve French <smfrench@gmail.com>
-CC:     CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
-Subject: RE: Buildbot cifs/smb3 testing improvements
-Thread-Topic: Buildbot cifs/smb3 testing improvements
-Thread-Index: AQHU3sOC4OnwWEzSh0GqHSpasc+0FqYUK5AAgAACMoCAACHogIAAOYZg
-Date:   Wed, 20 Mar 2019 13:52:11 +0000
-Message-ID: <SN4PR2101MB0736DEDE79137997EC1B63DEA0410@SN4PR2101MB0736.namprd21.prod.outlook.com>
-References: <CAH2r5msUqScwN99iUnyEKBYOic4fMCpnjFmc=dfaJJax0XnxdA@mail.gmail.com>
- <CAN05THTHPoTiYOZN55rVaxDhy0U8SmfQ_UJX6CpoDLyjK9edkQ@mail.gmail.com>
- <3915ebdc-50d7-62d4-3433-47df38e78f94@samba.org> <874l7x6e4a.fsf@suse.com>
-In-Reply-To: <874l7x6e4a.fsf@suse.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Owner=ttalpey@microsoft.com;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2019-03-20T13:52:09.5532957Z;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Application=Microsoft Azure
- Information Protection;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=a788c3a6-8d87-4cb7-b4ab-966bc2273684;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Extended_MSFT_Method=Automatic
-x-originating-ip: [198.214.84.177]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 229ceee6-2268-4bb7-af25-08d6ad3b4036
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600127)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:SN4PR2101MB0815;
-x-ms-traffictypediagnostic: SN4PR2101MB0815:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <SN4PR2101MB08159AFACE6D0FA1FB0D07EBA0410@SN4PR2101MB0815.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3968;
-x-forefront-prvs: 098291215C
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(39860400002)(396003)(366004)(136003)(376002)(346002)(189003)(199004)(13464003)(66574012)(4326008)(10290500003)(6246003)(11346002)(4744005)(71190400001)(6506007)(71200400001)(99286004)(81166006)(256004)(102836004)(8676002)(476003)(53546011)(305945005)(8990500004)(76176011)(446003)(93886005)(229853002)(7736002)(14444005)(74316002)(7696005)(52536014)(81156014)(25786009)(53936002)(86612001)(3846002)(54906003)(6116002)(110136005)(66066001)(97736004)(966005)(6306002)(26005)(478600001)(186003)(316002)(33656002)(55016002)(9686003)(106356001)(2906002)(5660300002)(6346003)(10090500001)(14454004)(68736007)(6436002)(86362001)(8936002)(105586002)(22452003)(486006);DIR:OUT;SFP:1102;SCL:1;SRVR:SN4PR2101MB0815;H:SN4PR2101MB0736.namprd21.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=ttalpey@microsoft.com; 
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: RXKn2nonMaIK8lioQ1aOU0pdCYuWUiAvzIojRbByJT/8J7ZlscELpGLhSX6Qzx7mFql2q53QOuGCGpVaqclrz8Duz69iSY7yshJmKgcQjDYz9rUywSjP2MTYCpZmOhLD78fDe2BNM+YIwvSgW7S+qtlHMqpBPvTfHKZEfmmsF6azOPfD7h7ygzJsqjKdGoZdP6bBZmJ1kMH6F/LA2Ji3wB+QWfLUA1QjmB0cNHR/DKsJWBKJZHp4wqnYBb2sS5YbMTLT56I4VTKOvPoyfBzktLH1nD4gYaj+/BqgG9vBtAdfD/LwGFDsFbXmoKSdSDUmX0HJ0rMSbTYh3yPYlJE5N84rZU1YKuL3oXERsGl72Uu+UM4m0PhalcYVg+GLj1x5MOVU+BBeyjKLj89y4wgobLkdII0tlHkmFmHI4hf2HHk=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1727361AbfCTSkG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 20 Mar 2019 14:40:06 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:52924 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727162AbfCTSkG (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 20 Mar 2019 14:40:06 -0400
+Received: from mail-oi1-f198.google.com ([209.85.167.198])
+        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+        (Exim 4.76)
+        (envelope-from <andreas.hasenack@canonical.com>)
+        id 1h6g8B-0002LF-Vm
+        for linux-cifs@vger.kernel.org; Wed, 20 Mar 2019 18:40:04 +0000
+Received: by mail-oi1-f198.google.com with SMTP id d198so1572352oih.6
+        for <linux-cifs@vger.kernel.org>; Wed, 20 Mar 2019 11:40:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=W8hiAXVmDg35iiYVJDSDWMUjAQEZXdaD3HYZJ11sVjk=;
+        b=EYKOB+SloOLeqko1eGMAu3gcKueBh+fKBDPacJDq0wQOfXSkPQjCXC9abE/gSupYup
+         8w9PD1XOdWmVMXMzcfoNMG1jbqR5n6aBXG78sjvKZuInv8jqDGjbnMMwipEjCCXSOr8c
+         rEojxEkExag6UMyWFRwMoxjFgqceeZkjST2OBXwhzrFzdN1RDvlvf2K4JY52gVsGQ6RR
+         jJ7B2MWXKFq2F1Qjve5qJs20GJ7o+e0XBHmv7ErPTy7CDmI/+DfLMHWPu0g0T8SJzX9P
+         va2J0U5mccvtAmchATmOZ3Wo82Lzy31HhbYCYTA/RSgSfFUlbfWv93wj9AB6yM5n5Huz
+         Nmbw==
+X-Gm-Message-State: APjAAAWp3O0FXJuojk74SPlVKT/AFhciL36RQhnuO4NDB6jMgpSX3CdF
+        HCr6nFA8JYG3xBtkyoODXWHPrpYiGEYaHVGZUg5WPn9xI8ZvKL0uweKnJtqjJnjePmKPWcihGgy
+        W/wB7DrVPRMCN1fksafu7WLRdQhDNvHea26t+NFtAnV1xDPHloI2UxMg=
+X-Received: by 2002:a9d:7207:: with SMTP id u7mr7234442otj.48.1553107202768;
+        Wed, 20 Mar 2019 11:40:02 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyms2d4ulDpK4D0BYg1bv3S8zC9kPSWDtwd3ZvQefYC4PSQE1r/bVltKTXheScqA85NO4j9bbn7anXK30emhjg=
+X-Received: by 2002:a9d:7207:: with SMTP id u7mr7234423otj.48.1553107202505;
+ Wed, 20 Mar 2019 11:40:02 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 229ceee6-2268-4bb7-af25-08d6ad3b4036
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Mar 2019 13:52:11.0267
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR2101MB0815
+From:   Andreas Hasenack <andreas@canonical.com>
+Date:   Wed, 20 Mar 2019 15:39:51 -0300
+Message-ID: <CANYNYEFJos5tzAyN7kdHKaAVeV_cD8QF8=wAs4XXhu9PXWgE3A@mail.gmail.com>
+Subject: "Bad SMB2 signature for message" with kernel 5.0.0, works with 4.19.0
+To:     linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51eC1jaWZzLW93bmVyQHZn
-ZXIua2VybmVsLm9yZyA8bGludXgtY2lmcy1vd25lckB2Z2VyLmtlcm5lbC5vcmc+IE9uDQo+IEJl
-aGFsZiBPZiBBdXLDqWxpZW4gQXB0ZWwNCj4gU2VudDogV2VkbmVzZGF5LCBNYXJjaCAyMCwgMjAx
-OSA1OjIxIEFNDQo+IFRvOiBTdGVmYW4gTWV0em1hY2hlciA8bWV0emVAc2FtYmEub3JnPjsgcm9u
-bmllIHNhaGxiZXJnDQo+IDxyb25uaWVzYWhsYmVyZ0BnbWFpbC5jb20+OyBTdGV2ZSBGcmVuY2gg
-PHNtZnJlbmNoQGdtYWlsLmNvbT4NCj4gQ2M6IENJRlMgPGxpbnV4LWNpZnNAdmdlci5rZXJuZWwu
-b3JnPjsgc2FtYmEtdGVjaG5pY2FsIDxzYW1iYS0NCj4gdGVjaG5pY2FsQGxpc3RzLnNhbWJhLm9y
-Zz4NCj4gU3ViamVjdDogUmU6IEJ1aWxkYm90IGNpZnMvc21iMyB0ZXN0aW5nIGltcHJvdmVtZW50
-cw0KPiANCj4gU3RlZmFuIE1ldHptYWNoZXIgPG1ldHplQHNhbWJhLm9yZz4gd3JpdGVzOg0KPiA+
-IFNvIGZhciBJIHdhc24ndCBhYmxlIHRvIHVzZSB0aGUgdXBzdHJlYW0gY2lmcy5rbyB3aXRoIHNt
-YmRpcmVjdCB3aXRoIGFueQ0KPiA+IGtpbmQgb2YgUkRNQSBkcml2ZXIgYXQgYWxsIGFnYWluc3Qg
-V2luZG93cy4NCj4gDQo+IEkndmUgbWFuYWdlZCB0byB0ZXN0IGl0IGxhc3QgeWVhciBvbiBhY3R1
-YWwgaGFyZHdhcmUgYWdhaW5zdA0KPiBXaW5kb3dzLiBZb3Ugc2hvdWxkIGFzayBMb25nIExpLCBo
-ZSBpcyBzdGlsbCB3b3JraW5nIG9uIGl0Lg0KDQpGWUksIHRoZSBTb2Z0IGlXQVJQIGNvZGUgaXMg
-dmVyeSBjbG9zZSB0byBiZWluZyByZWFkeSB0byBnbyB1cHN0cmVhbSwgaXQgbWF5IHByb3ZpZGUg
-YW5vdGhlciAoYW5kIGxlc3MgYnVnZ3kpIHRlc3Qgb3Bwb3J0dW5pdHkgdGhhbiBTb2Z0IFJvQ0Uu
-IEknbSBhdCB0aGUgT3BlbiBGYWJyaWNzIFdvcmtzaG9wIHJpZ2h0IG5vdyB3aXRoIEJlcm5hcmQg
-TWV0emxlciwgdGhlIFNJVyBhdXRob3IsIGFuZCBjYW4gY2hhdCB3aXRoIGhpbSBhbmQgb3RoZXIg
-UkRNQSBtYWludGFpbmVycyBhYm91dCB0aGlzLg0KDQpodHRwczovL3d3dy5zcGluaWNzLm5ldC9s
-aXN0cy9saW51eC1yZG1hL21zZzc1NzE4Lmh0bWwNCg0KVG9tLg0KDQo=
+Hi,
+
+I can't mount a share as guest using SMB2 or higher when running the
+5.0.0 kernel (ubuntu's 5.0.0-7.8 specifically). When I switch to a
+4.19.x kernel (4.19.0-12-generic), then it works.
+
+This is the mount command and output:
+root@ubuntu:~# mount //localhost/pub /mnt -o guest
+mount error(13): Permission denied
+Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
+
+The share is a simple one:
+[pub]
+path = /pub
+guest ok = yes
+
+The server logs this:
+[2019/03/20 18:24:46.245816,  0]
+../../libcli/smb/smb2_signing.c:169(smb2_signing_check_pdu)
+  Bad SMB2 signature for message
+[2019/03/20 18:24:46.245860,  0] ../../lib/util/util.c:508(dump_data)
+  [0000] 2D 60 1F CA 49 06 92 B0   69 06 60 82 42 39 21 F8   -`..I... i.`.B9!.
+[2019/03/20 18:24:46.245894,  0] ../../lib/util/util.c:508(dump_data)
+  [0000] 75 F8 77 09 63 D5 4A 7B   9F 91 51 93 6D 12 6F 6F   u.w.c.J{ ..Q.m.oo
+
+Here is a dmesg output with cifs debugging enabled:
+https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1821053/+attachment/5247960/+files/dmesg.txt
+
+That output was from a kernel running patch
+https://git.kernel.org/pub/scm/linux/kernel/git/stable/stable-queue.git/tree/queue-5.0/cifs-do-not-skip-smb2-message-ids-on-send-failures.patch,
+just a quick attempt to see if that fixed it, but it didn't.
+
+mount.cifs is version 6.8
+
+Server is samba 4.10.0.
+
+Is this a known issue?
+
+Thanks!
