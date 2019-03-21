@@ -2,159 +2,119 @@ Return-Path: <SRS0=O53D=RY=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F193CC43381
-	for <linux-cifs@archiver.kernel.org>; Thu, 21 Mar 2019 15:36:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77AD6C43381
+	for <linux-cifs@archiver.kernel.org>; Thu, 21 Mar 2019 17:13:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B98CF218D8
-	for <linux-cifs@archiver.kernel.org>; Thu, 21 Mar 2019 15:36:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vY30PQQZ"
+	by mail.kernel.org (Postfix) with ESMTP id 4EFB521900
+	for <linux-cifs@archiver.kernel.org>; Thu, 21 Mar 2019 17:13:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728071AbfCUPg4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 21 Mar 2019 11:36:56 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:41465 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725985AbfCUPg4 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 21 Mar 2019 11:36:56 -0400
-Received: by mail-pg1-f193.google.com with SMTP id k11so4436975pgb.8;
-        Thu, 21 Mar 2019 08:36:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=j4fvwkVJh0wpXfB/RiGZt+BfaQu8aC8tDzBcZLnVOpY=;
-        b=vY30PQQZQc73U4x1Z5MikhifLjL8HhyDM8ZqTEmwJVRhgMnm0BKSefdRAGF3c48x4n
-         FCfjtmTq35D9GL2uPgBbOFiOFH+jePpqIRGlp46MLC4IgCmJ5o3mDc4G+MWIktiANH0A
-         MwsSUoU50x6xh0PrAM6hDHcXNfJgL2sMjZE+Sc5sNRezBXamPnCitxaN6tyeUxq9kY1E
-         8CrshHmnoLEfJ4qjfu8y1Y7MedQKz5k3mibm10iD7yqwWmeTMrNcjxGQqSNmRCSkfXuw
-         OI8VPv3axJ/ZSnzIhhDUTk1WOSIhk/ZNf2ef8hXrJ5JmP/3Id8tjwCsGG8wxnzZ07ACY
-         kCUg==
+        id S1728078AbfCURNd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 21 Mar 2019 13:13:33 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:50848 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726787AbfCURNc (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 21 Mar 2019 13:13:32 -0400
+Received: from mail-ot1-f70.google.com ([209.85.210.70])
+        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+        (Exim 4.76)
+        (envelope-from <andreas.hasenack@canonical.com>)
+        id 1h71Fz-0004mG-2a
+        for linux-cifs@vger.kernel.org; Thu, 21 Mar 2019 17:13:31 +0000
+Received: by mail-ot1-f70.google.com with SMTP id q26so3390310otf.19
+        for <linux-cifs@vger.kernel.org>; Thu, 21 Mar 2019 10:13:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=j4fvwkVJh0wpXfB/RiGZt+BfaQu8aC8tDzBcZLnVOpY=;
-        b=ICRLTvWpcaRLOPqVqBXtrjhVkMjCudrZHlQfAx4PzEpp+H9IwuAlrC4StuVdBj+Rw4
-         itMdwWlq1nLPzNDSH96CrznJqdtKWqXQVLxYSMaj5vwULMLruIOWN4kLMYZChk1G8bAo
-         EMm7OKrieeTE1zrq2CXU6T7V+VtfYvIY2KxChthG95l7/5oGi8E4RaIQrOFyfkayQYc7
-         i/P+wDJYMBtKvu0Eay1LBb6O564vJEe8cGwxxGd0xeupAWSKAvPJB5+h5afRFFjBRL46
-         JnS0EA2HquC3mrLBksxSzPwo9bHU8EkvriKYSoDunSV8rw4EiEfMtuaSXpJiTR86pafm
-         FIkg==
-X-Gm-Message-State: APjAAAXraFczMw7uKORp8R2YJwzsfYOMQd1d73ao4LBAE3dSeqPppfJS
-        i6YllOBBJ0t6rK1FPmEIwbcQw6LdJ6WQG2udvGw=
-X-Google-Smtp-Source: APXvYqwch2BjxYtMxq3KIirKe+SSRDCp98YYxj2emUlwGVKHzmoxTqHL33IoMQjnWK3r6kyyf71ByP0XX9SeyQ6G0Ag=
-X-Received: by 2002:a63:544f:: with SMTP id e15mr3972919pgm.344.1553182614407;
- Thu, 21 Mar 2019 08:36:54 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=L4TBTrihcW1OmDzz12SSIsxvMxaFLq4QVEW6CGs8Jt4=;
+        b=ZQ1w3kRpz5g2o64TFACjxSunG9C8CG7YP5Di3TtwX65OpkO4noNg+M42AcD1BZPLLh
+         A/U1aEHPgFMZJrLaBFjyh9qAqIk34Jt4nmAphs3qwelg8v/mUe2sJBTDiNOR+h/Z84K2
+         S0pjnpYzrLzrcJK3DiRm0lSHG1GGrx7zkfSGaSLwPd7zRtBqzq1h1kO0Ek7ZhI8twJXw
+         n/dY4xEppulxfB6sgUT7+bV4EVG0CBjfg6fJkn5gf8qhgqL4U7MvlVaiI5ExldGWIb8N
+         8uBP3iCXMGRAPyiabQk7yajc3wEgkX4wlGkMmboCVDgDnLq7e5HXoHMHw3HBXtRVzDX4
+         1JAg==
+X-Gm-Message-State: APjAAAUal6O16OwkJIwE+L7dyWq6N2JOf4FVZlDLUEyhtitwq1t+dcPO
+        J+/vXOFXENxTnLp8pKjmHgQKuIDKf0a3dYE0xctlVozx98/T//19T0czHou4QzCty4M6R/o+TEP
+        M240i+E/06iMqFbNk7a1UBRjvN9a/rvkD8UMvoA9oTUQnNGQHy6GTNj0=
+X-Received: by 2002:aca:5902:: with SMTP id n2mr267344oib.110.1553188409967;
+        Thu, 21 Mar 2019 10:13:29 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyqSUmnDr8g5HhzI6yBsF2DDqdr/FGJ+XzeLeq2ZDzovPIy/8pQT75iXyoqUjvU3EYyix+U1qrrOaIgY2V7h+s=
+X-Received: by 2002:aca:5902:: with SMTP id n2mr267322oib.110.1553188409594;
+ Thu, 21 Mar 2019 10:13:29 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190321045902.14326-1-lsahlber@redhat.com> <87imwc4fhj.fsf@suse.com>
-In-Reply-To: <87imwc4fhj.fsf@suse.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 21 Mar 2019 10:36:42 -0500
-Message-ID: <CAH2r5ms8wDwCDP5o=GrcOsmNmReBHPdhq-Tat7UDkaVv-oKAWQ@mail.gmail.com>
+References: <20190321045902.14326-1-lsahlber@redhat.com>
+In-Reply-To: <20190321045902.14326-1-lsahlber@redhat.com>
+From:   Andreas Hasenack <andreas@canonical.com>
+Date:   Thu, 21 Mar 2019 14:13:18 -0300
+Message-ID: <CANYNYEHur0w8iNZBHUbc=NJopAH84gLb5k-Wv1ShU9--qREoCw@mail.gmail.com>
 Subject: Re: [PATCH] cifs: allow guest mounts to work for smb3.11
-To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
+To:     Ronnie Sahlberg <lsahlber@redhat.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>,
         Stable <stable@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I added the commit tag and cleaned up the related checkpatch warning.
+Hello Ronnie,
 
-I don't know of any other locations where we have to make a similar
-change as this is the only place where we (on the client) forced
-signing to be on for a request when the user (or server) didn't
-request it (due to the requirement in MS-SMB2 that tree connect be
-signed).  In the other places you noted, the client or server would
-have forced signing on ("sign" mount option or "server signing =3D
-mandatory" for example).
-
-On Thu, Mar 21, 2019 at 6:46 AM Aur=C3=A9lien Aptel <aaptel@suse.com> wrote=
-:
+On Thu, Mar 21, 2019 at 1:59 AM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
 >
-> Ronnie Sahlberg <lsahlber@redhat.com> writes:
+> Fix Guest/Anonymous sessions so that they work with SMB 3.11.
 >
-> > Fix Guest/Anonymous sessions so that they work with SMB 3.11.
-> >
-> > In git commit 6188f28 tightened the conditions and forced signing for
-> > the SMB2-TreeConnect commands as per MS-SMB2.
+> In git commit 6188f28 tightened the conditions and forced signing for
+> the SMB2-TreeConnect commands as per MS-SMB2.
+> However, this should only apply to normal user sessions and not for
+> Guest/Anonumous sessions.
 >
-> We could add a
+> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> CC: Stable <stable@vger.kernel.org>
+> ---
+>  fs/cifs/smb2pdu.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
 >
->     Fixes: 6188f28bf608 ("Tree connect for SMB3.1.1 must be signed for no=
-n-encrypted shares")
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index c399e09b76e6..8e4a1da95418 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -1628,9 +1628,13 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+>         iov[1].iov_base = unc_path;
+>         iov[1].iov_len = unc_path_len;
 >
-> tag in the commit message.
-> >
-> > -     /* 3.11 tcon req must be signed if not encrypted. See MS-SMB2 3.2=
-.4.1.1 */
-> > +     /*
-> > +      * 3.11 tcon req must be signed if not encrypted. See MS-SMB2 3.2=
-.4.1.1
-> > +      * unless it is guest or anonymous user. See MS-SMB2 3.2.5.3.1
-> > +      */
-> >       if ((ses->server->dialect =3D=3D SMB311_PROT_ID) &&
-> > -         !smb3_encryption_required(tcon))
-> > +         !smb3_encryption_required(tcon) &&
-> > +         !(ses->session_flags & (SMB2_SESSION_FLAG_IS_GUEST|SMB2_SESSI=
-ON_FLAG_IS_NULL)))
-> >               req->sync_hdr.Flags |=3D SMB2_FLAGS_SIGNED;
-> >
-> >       memset(&rqst, 0, sizeof(struct smb_rqst));
+> -       /* 3.11 tcon req must be signed if not encrypted. See MS-SMB2 3.2.4.1.1 */
+> +       /*
+> +        * 3.11 tcon req must be signed if not encrypted. See MS-SMB2 3.2.4.1.1
+> +        * unless it is guest or anonymous user. See MS-SMB2 3.2.5.3.1
+> +        */
+>         if ((ses->server->dialect == SMB311_PROT_ID) &&
+> -           !smb3_encryption_required(tcon))
+> +           !smb3_encryption_required(tcon) &&
+> +           !(ses->session_flags & (SMB2_SESSION_FLAG_IS_GUEST|SMB2_SESSION_FLAG_IS_NULL)))
+>                 req->sync_hdr.Flags |= SMB2_FLAGS_SIGNED;
 >
-> I suspect there might more (and/or better) places to check. If you grep f=
-or
-> SMB2_FLAGS_SIGNED there are a couple of other places that should be
-> considered:
->
-> smb2_hdr_assemble() { ...
->         if (tcon->ses && tcon->ses->server && tcon->ses->server->sign &&
->             !smb3_encryption_required(tcon))
->                 shdr->Flags |=3D SMB2_FLAGS_SIGNED;
-> ...
-> }
->
-> cifs_get_smb_ses() { ...
->         ses->sectype =3D volume_info->sectype;
->         ses->sign =3D volume_info->sign;
->
->         mutex_lock(&ses->session_mutex);
->         rc =3D cifs_negotiate_protocol(xid, ses);
->         if (!rc)
->                 rc =3D cifs_setup_session(xid, ses, volume_info->local_nl=
-s);
->         mutex_unlock(&ses->session_mutex);
->         if (rc)
->                 goto get_ses_fail;
-> ...
-> }
->
-> After negprot and before sess setup we already know the protocol version =
-so I guess there
-> could be some patch there as well.
->
-> See also SMB2_logoff(), SMB2_ioctl_init(), cifs_enable_signing()
->
-> Cheers,
+>         memset(&rqst, 0, sizeof(struct smb_rqst));
 > --
-> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-> SUSE Linux GmbH, Maxfeldstra=C3=9Fe 5, 90409 N=C3=BCrnberg, Germany
-> GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton, HRB 21284 (AG N=
-=C3=BCrnberg)
+> 2.13.6
+>
 
 
+I tried this patch with an ubuntu kernel
+(https://people.canonical.com/~tyhicks/disco-cifs.2/ specifically) but
+it didn't work, I'm still getting failures with smb3.11 and a guest
+mount.
 
---=20
-Thanks,
+Maybe I'm missing some other fix, or a more up-to-date kernel? Shall I
+try with a self-compiled upstream one?
 
-Steve
+dmesg: http://paste.ubuntu.com/p/JGhCsgBVcb/
+
+server logs (debug level 5, samba 4.10.0):
+log.: http://paste.ubuntu.com/p/jMDJ8DBfRM/
+log.smbd: http://paste.ubuntu.com/p/Z9W5z28BP9/
+smb.conf: http://paste.ubuntu.com/p/9HpSyFq8n8/
