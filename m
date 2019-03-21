@@ -5,89 +5,71 @@ X-Spam-Level:
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CD21C43381
-	for <linux-cifs@archiver.kernel.org>; Thu, 21 Mar 2019 12:25:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94EA1C43381
+	for <linux-cifs@archiver.kernel.org>; Thu, 21 Mar 2019 12:26:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D68CF218D8
-	for <linux-cifs@archiver.kernel.org>; Thu, 21 Mar 2019 12:25:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 62C31218D8
+	for <linux-cifs@archiver.kernel.org>; Thu, 21 Mar 2019 12:26:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728223AbfCUMZK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 21 Mar 2019 08:25:10 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:42846 "EHLO
+        id S1728111AbfCUM0J (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 21 Mar 2019 08:26:09 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:42865 "EHLO
         youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728111AbfCUMZJ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 21 Mar 2019 08:25:09 -0400
-Received: from mail-oi1-f200.google.com ([209.85.167.200])
+        with ESMTP id S1728013AbfCUM0I (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 21 Mar 2019 08:26:08 -0400
+Received: from mail-ot1-f69.google.com ([209.85.210.69])
         by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
         (Exim 4.76)
         (envelope-from <andreas.hasenack@canonical.com>)
-        id 1h6wkt-00036B-Se
-        for linux-cifs@vger.kernel.org; Thu, 21 Mar 2019 12:25:08 +0000
-Received: by mail-oi1-f200.google.com with SMTP id 1so2419155oii.1
-        for <linux-cifs@vger.kernel.org>; Thu, 21 Mar 2019 05:25:07 -0700 (PDT)
+        id 1h6wlq-00038y-Sz
+        for linux-cifs@vger.kernel.org; Thu, 21 Mar 2019 12:26:07 +0000
+Received: by mail-ot1-f69.google.com with SMTP id x8so2945286otg.17
+        for <linux-cifs@vger.kernel.org>; Thu, 21 Mar 2019 05:26:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=iTVWsDSv3Sq7B1q2CnxjYRAXW0NUSe927Wv2Smi6lXs=;
-        b=prgDj1oaVbYoUEqbs69xFYoYZfxQzJsyZ3sqUbqv327VzKrgHycT0Z1E80kOpwydrQ
-         44v7eJcRoan3Ci56LYOCynIzCpF5IePU72PjVtfaT6OcZ+MYuGWlI1fwp77tLJxQX2NV
-         ahwmiAthe5vn/Atz3goJuKy6PUZdXbvVbrfCWb2fwrWJGW9DhoCOCR2SviUrsNHTIdVP
-         NXqUfiFEa2Pu9hY81sVq3nW6KrNtJJgwF6pFLL54PdiMcicaCAJpvjoHxfTX+p+1M7Ee
-         D4+vlteRhzFm/p3kmCGi+zB9L2R7fcB7gNDMfHyj0yJlkFw8bdfh2kufm811Hg9mEFi5
-         3OAA==
-X-Gm-Message-State: APjAAAW+cG4K2hHRnFmzrpoBz4ef8qDio1QZrUU9/wC/DAFAK9jk8wze
-        UgvNFkOvfG62O38DJX62TPe+PqEGxcxPT7h7NiJW7KtMwOeHomQgs05PsCLsnY5nymMlz672MMf
-        oIBUc0eJs9vAWjOVFwubYFGU9uZtJUMfJHxP9TxE9phVRC8i4HKCAsjk=
-X-Received: by 2002:a9d:3635:: with SMTP id w50mr2069445otb.301.1553171106870;
-        Thu, 21 Mar 2019 05:25:06 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxvvnRRFydYenXLppf35zGLTaXFeZrwm5cwIjcEkeUqCuPnyHfdyDBcC42bt0tKHGtXSPqBgj9FJuf4+9IkeKA=
-X-Received: by 2002:a9d:3635:: with SMTP id w50mr2069435otb.301.1553171106648;
- Thu, 21 Mar 2019 05:25:06 -0700 (PDT)
+        bh=Ws2Psd/8zuzwO7kWeYJ/C3YcGh12RxBZQuK6sc6RFo8=;
+        b=mTqBzk0QsoWg9cuf8RQvNc0JXiYDWzHH0LY0cWZev6cpn5Zu2wp/ks4DHUkjuqIGbE
+         CSeixzZWnIHiwf6eip53LNbjL4JGQ4Ic54WdluvO/sjSOy1TEmoXJzHL/XjkojaZp5IU
+         VYjzEI4QbUQXpWEtNRGb2rPPSodDbvI2iI9bw1OTXV+fHI2lvLmy8L9APiM/QIXQ3dFm
+         8b8CZrbsaLNvVcNVfFxs1mGCSI+8+unWLuc4Rpzl+Dm2/pvRtePlW5C6Xfjxubxomd/T
+         DReAKPUTgrnlAUpSVf/5dilZpkaegEYpos9HmFXcwHOgBEODx/sL6PH0OyhyN32F6g+g
+         xUCg==
+X-Gm-Message-State: APjAAAVKMLMOc727jKNMzt47gEWRAC15gpDcJd33r2U6VQpNEyrQZZaQ
+        qZQrD3aMACjOT1Ls4s6kG5I550xgxlR3NdyqkhCsAc7+MFMHxYyK6GSBjuvUDmTmUxryBDWOYGl
+        9/wRyO21MjWv2lwz0x1ufJ0xLYskBs0KJjZq5EjzDBj7iLxX+6Sg0nV4=
+X-Received: by 2002:aca:3885:: with SMTP id f127mr1881110oia.96.1553171165873;
+        Thu, 21 Mar 2019 05:26:05 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwY8LqYbArBtidwCZG0b4Z4MtumMN+XSolEZVt8xCXXVnO8yM6sVBCWKqQxQr4JO0/4+GeA6U9Avv2ZGuKhc2s=
+X-Received: by 2002:aca:3885:: with SMTP id f127mr1881102oia.96.1553171165651;
+ Thu, 21 Mar 2019 05:26:05 -0700 (PDT)
 MIME-Version: 1.0
 References: <CANYNYEFJos5tzAyN7kdHKaAVeV_cD8QF8=wAs4XXhu9PXWgE3A@mail.gmail.com>
- <CAH2r5mvm+pFsaGU1dQrkLJQ0O6ggkOff0yYLe6VV9m4RgpyfUA@mail.gmail.com>
-In-Reply-To: <CAH2r5mvm+pFsaGU1dQrkLJQ0O6ggkOff0yYLe6VV9m4RgpyfUA@mail.gmail.com>
+ <CAN05THQb3-p=XX=WpCxv1zfP4e3sBLMY54bg+n=wy9HQCOiJiw@mail.gmail.com>
+In-Reply-To: <CAN05THQb3-p=XX=WpCxv1zfP4e3sBLMY54bg+n=wy9HQCOiJiw@mail.gmail.com>
 From:   Andreas Hasenack <andreas@canonical.com>
-Date:   Thu, 21 Mar 2019 09:24:55 -0300
-Message-ID: <CANYNYEHAS7cKF5wUEu673xaBZeY73C+z+kThahHzsiC+d8barg@mail.gmail.com>
+Date:   Thu, 21 Mar 2019 09:25:54 -0300
+Message-ID: <CANYNYEH3qVQA_05H-FeJdRgQe81O8gaULXuCGz42e_nKVgMnkg@mail.gmail.com>
 Subject: Re: "Bad SMB2 signature for message" with kernel 5.0.0, works with 4.19.0
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
+To:     ronnie sahlberg <ronniesahlberg@gmail.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hello Steve,
+Hello Ronnie,
 
-On Wed, Mar 20, 2019 at 10:44 PM Steve French <smfrench@gmail.com> wrote:
+On Thu, Mar 21, 2019 at 2:03 AM ronnie sahlberg
+<ronniesahlberg@gmail.com> wrote:
 >
-> Looks like you have "server signing = mandatory" in
-> /etc/samba/smb.conf on the server.  Is that true?  That (in theory)
-> should not work with guest according to the protocol specification but
-> I am comparing with 4.19 behavior to see what changed (maybe we
-> ignored 'sign' if guest?)
+> Hi Andreas.
+> I have reproduced the issue and sent a patch to the list.
+> It should show up shortly with the title "cifs: allow guest mounts to
+> work for smb3.11"
+>
+> Can you try that patch and verify that it fixes the issue?
 
-I have the defaults for samba 4.10:
-root@ubuntu:~# testparm -sv|grep signing
-Load smb config files from /etc/samba/smb.conf
-Loaded services file OK.
-Server role: ROLE_STANDALONE
-
-client ipc signing = default
-client signing = default
-server signing = default
-
-According to the manpage[1], "server signing = default" means:
-"""
-           By default, and when smb signing is set to default, smb
-signing is required when server role is active directory domain
-controller and disabled otherwise.
-"""
-
-So it should be disabled in this case.
-
-
-1. https://www.samba.org/samba/docs/current/man-html/smb.conf.5.html#idm8588
+Thanks for this, I will try it and report back.
