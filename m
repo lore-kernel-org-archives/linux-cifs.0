@@ -5,232 +5,67 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95AEAC43381
-	for <linux-cifs@archiver.kernel.org>; Sat, 23 Mar 2019 00:42:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A154FC43381
+	for <linux-cifs@archiver.kernel.org>; Sat, 23 Mar 2019 01:01:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 54A0821925
-	for <linux-cifs@archiver.kernel.org>; Sat, 23 Mar 2019 00:42:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6687221925
+	for <linux-cifs@archiver.kernel.org>; Sat, 23 Mar 2019 01:01:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b92rM2kW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HIX64bNb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727429AbfCWAmI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 22 Mar 2019 20:42:08 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:40525 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726589AbfCWAmH (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 22 Mar 2019 20:42:07 -0400
-Received: by mail-pf1-f195.google.com with SMTP id c207so2593362pfc.7;
-        Fri, 22 Mar 2019 17:42:07 -0700 (PDT)
+        id S1727526AbfCWBB5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 22 Mar 2019 21:01:57 -0400
+Received: from mail-pf1-f177.google.com ([209.85.210.177]:42198 "EHLO
+        mail-pf1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727512AbfCWBB4 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 22 Mar 2019 21:01:56 -0400
+Received: by mail-pf1-f177.google.com with SMTP id r15so2604282pfn.9
+        for <linux-cifs@vger.kernel.org>; Fri, 22 Mar 2019 18:01:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=EvANPA4cQu3tFGIrZH8K9g5xvSJnhOZO/zjy+8DcW0A=;
-        b=b92rM2kWkAQnUSCT73Pw3MC1/w9IcAYfLsLQj59x0q1u1tOxYjR1Ep/PVi9OcbOuFa
-         IJTyHDo74flY5M2FhG0b5gV6QEKIs+OXEzX7yHpdqITahsh34KhuTfROAM1EayFOkBqK
-         1WC0fxfwBh+4F5UAIbfgQ3Sd+WLdgTqa6URPOV/iZC6IgnLNIpfi3/p7toLzNy5SF+hL
-         QEdfqXPAkziYPpKD8RP5vj+cui3WmOAp4JwIoFoIZU5p5mTvnPE4YjTWqm1ay75vXgd0
-         qKw4Nc1B2ycEosHtQ5kz7wE+j/6QRccp+0rzFvc3I5nWqW7Q+8WXRPtupEZmRpcv+HFK
-         ga0A==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=08a8WZ5tv1n5kaK1zgbkhVuInfOhmCeXnWIJ9t7CUEc=;
+        b=HIX64bNb8K3+Jd8bpxLZnXGWGupXyA+H9Qm63/Xz2v2kUEUzcCZKVjXC3HL63pQCUE
+         ivZLIpGPt23qQUOmrO/ogImiCDKf/WziRQGOiZ86CB4KsIRwEFOaLvhFo97J17IlHhqm
+         M59UW6JFA2ig4JERf2HuPoM+peZhmNVEgx14n9RbrXjJMDYmyWtokNucB+zAAO8G3bj9
+         ei5i+q55hIpkAwBgBhvH4LjQB2YYT3hMMaa99iflqSiJqQ55k6L4/mG0VnQKCgvTMSFZ
+         UCuHQ8Tw3x+IBBcwK60uqqAlmgNxWdOM1JAwjnrOii2nERqPweFqnLWFZ6e3SXjz8vKd
+         W43g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=EvANPA4cQu3tFGIrZH8K9g5xvSJnhOZO/zjy+8DcW0A=;
-        b=m02oMWy62jkuG0BgPyRM0Sn4wFQo//C4ry1PwqU7DvxmGZtThCD1qTPCiYmZOU2dg1
-         tn1cSDMTzArhRH4X1m/ovWyuprwr/Q21+WDKPFNSNAcKHga9NWFyJHuT21XPWSVcuJv7
-         xhL8zBARIFAtMx32WIdnsDN9nHIZoK+oRBJiGipBzzI901IwiDDLoCfMN3oYLv459hDN
-         2Wpo7RgD+cZJCJ/J6preYLvY07GsqygpC5xAZOkBZsdLWWi5A3iMZ503gzbLIXI/qwuH
-         9UWnNbwdemqTFfkVTvIfy6AQokOVJTL+D6fwx3RTHdOHWHpsBxLyXtF3Z9rsBKu2DUx4
-         9OOw==
-X-Gm-Message-State: APjAAAWZrVgl3ycXGidQ9ahob3igUAU4adr1nNtqGVkINoSqvkBNYWpf
-        o2g/cWhnNgGAI+UunSgeQaMdtbznmwTVtDgxU4g=
-X-Google-Smtp-Source: APXvYqw8/CqBBSFCK0VCySshEfwkJIMTcaENWx84q5wBYkeOo+FyX2CyXPfoldEVP4TPIbNiZ8g1iVz/g1m9fgavbOg=
-X-Received: by 2002:a63:c06:: with SMTP id b6mr11765787pgl.440.1553301726617;
- Fri, 22 Mar 2019 17:42:06 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=08a8WZ5tv1n5kaK1zgbkhVuInfOhmCeXnWIJ9t7CUEc=;
+        b=GuT6ysAHho5f/37J7IFKsJwWDjWvwIhCSloBnqjpdIclNsDtXBF7TX8UIQi0UeNLIo
+         WkDkzCRu6VDkoUKBHuAPpKgwpYtfn/owq0eVDzjLrfn+g/SpeTTl2Qv3cPoFDF4WJey+
+         mwLNmGBB4uCH5DX6dmp8IkZnqbK0pVhGgRoH78/qAAKoC3b0ZonahVA88p6Nx3OjOezz
+         JfNvYeq9B9tIYNHQHsvGFjKx/wbjR7n+rjnQqlsldWGveZWeU+bXc6trZzFZDUZcbteV
+         5tIb1IdD+p0VVJXHnltxwtTI8/5pGtJbYBvpV1CFyMIBLFcq5j0maJxOTR949dhbgQ1b
+         h9Pg==
+X-Gm-Message-State: APjAAAWt9JuVZY5zm2okWfTFrr47ROPUDePf1OeGLaszT3wKGBx0jvS9
+        +ruCc0tZ7S7Kh2KWhg4VNelPb/B9t+ugsgUmzwY=
+X-Google-Smtp-Source: APXvYqwa1bJfPmIosCWnLwIvjCjGQOyS+4Hpxl/Q0nIZPsIQmf/A4a54SDVygFo3lBceEoI4AMGH4z+K8JxcCyhT4/E=
+X-Received: by 2002:a63:c06:: with SMTP id b6mr11824672pgl.440.1553302915519;
+ Fri, 22 Mar 2019 18:01:55 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190321045902.14326-1-lsahlber@redhat.com> <CANYNYEHur0w8iNZBHUbc=NJopAH84gLb5k-Wv1ShU9--qREoCw@mail.gmail.com>
- <CAN05THSL-KCQ6QNm2fUERY1oHWC_jgfdWHuEO_0gnwLMM3TX1A@mail.gmail.com>
- <CAH2r5mua942M3C=8Mionj_JbjRm5LRm+=+f1SW3404a-k6naFQ@mail.gmail.com> <SN4PR2101MB07363664AD92F12AFB733698A05C0@SN4PR2101MB0736.namprd21.prod.outlook.com>
-In-Reply-To: <SN4PR2101MB07363664AD92F12AFB733698A05C0@SN4PR2101MB0736.namprd21.prod.outlook.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 22 Mar 2019 19:41:54 -0500
-Message-ID: <CAH2r5msRHNSkJy7D=C4gn3aVWSA_Ur1zkdM_c_2mhv+uKMG3zQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: allow guest mounts to work for smb3.11
-To:     Tom Talpey <ttalpey@microsoft.com>
-Cc:     ronnie sahlberg <ronniesahlberg@gmail.com>,
-        Andreas Hasenack <andreas@canonical.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        Stable <stable@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Date:   Fri, 22 Mar 2019 20:01:43 -0500
+Message-ID: <CAH2r5mvRk9dCu3cwYNrCY8L2jUGR92vKjjiAniMqyPjvzCrV9A@mail.gmail.com>
+Subject: [PATCH] Fix guest smb3.1.1 mounts to Samba
+To:     ronnie sahlberg <ronniesahlberg@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="00000000000082356a0584b88456"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The reason we didn't see this before SMB3.1.1 is that in
-smb3_validate_negotiate we had this check:
+--00000000000082356a0584b88456
+Content-Type: text/plain; charset="UTF-8"
 
-        if (tcon->ses->user_name == NULL) {
-                cifs_dbg(FYI, "Can't validate negotiate: null user mount\n");
-                return 0; /* validation requires signing */
-        }
-
-Sounds like we should add the identical check in the smb3.1.1 tcon
-check that Ronnie's earlier patch fixed (but only for Windows)
-
-
-
-On Fri, Mar 22, 2019 at 7:20 PM Tom Talpey <ttalpey@microsoft.com> wrote:
->
-> > -----Original Message-----
-> > From: linux-cifs-owner@vger.kernel.org <linux-cifs-owner@vger.kernel.org> On
-> > Behalf Of Steve French
-> > Sent: Friday, March 22, 2019 7:30 PM
-> > To: ronnie sahlberg <ronniesahlberg@gmail.com>
-> > Cc: Andreas Hasenack <andreas@canonical.com>; Ronnie Sahlberg
-> > <lsahlber@redhat.com>; linux-cifs <linux-cifs@vger.kernel.org>; Stable
-> > <stable@vger.kernel.org>
-> > Subject: Re: [PATCH] cifs: allow guest mounts to work for smb3.11
-> >
-> > I tried to Samba with guest mount and noted that Samba server did not
-> > set the guest or null flags in the session setup response so we still
-> > marked tcon as signed even with guest mount in my quick test (to Samba
-> > 4.10)
->
-> This gets to the point of my earlier comment. The flags and dialect etc
-> are all fine to check, but the code is setting the SIGNED bit before it
-> actually signs. Shouldn't it be verifying that it has a valid signing key
-> before it does this?
->
-> Another point to make here is that the SESSION_IS_GUEST is entirely
-> the server's choice. Basically, what it means is the server arbitrarily
-> authenticated the user as a guest, regardless of how the client attempted
-> to log in. If it's set, then absolutely the client should forget that it ever
-> attempted to authenticate as a given principal (and not sign, encrypt, etc).
-> However, if it's clear, and the server made the user "guest", then:
->
->  a) the server is arguably buggy
->  b) the signing failure is by protocol design.
->
-> Tom.
->
-> > On Thu, Mar 21, 2019 at 2:54 PM ronnie sahlberg
-> > <ronniesahlberg@gmail.com> wrote:
-> > >
-> > > On Fri, Mar 22, 2019 at 3:13 AM Andreas Hasenack
-> > <andreas@canonical.com> wrote:
-> > > >
-> > > > Hello Ronnie,
-> > > >
-> > > > On Thu, Mar 21, 2019 at 1:59 AM Ronnie Sahlberg <lsahlber@redhat.com>
-> > wrote:
-> > > > >
-> > > > > Fix Guest/Anonymous sessions so that they work with SMB 3.11.
-> > > > >
-> > > > > In git commit 6188f28 tightened the conditions and forced signing for
-> > > > > the SMB2-TreeConnect commands as per MS-SMB2.
-> > > > > However, this should only apply to normal user sessions and not for
-> > > > > Guest/Anonumous sessions.
-> > > > >
-> > > > > Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> > > > > CC: Stable <stable@vger.kernel.org>
-> > > > > ---
-> > > > >  fs/cifs/smb2pdu.c | 8 ++++++--
-> > > > >  1 file changed, 6 insertions(+), 2 deletions(-)
-> > > > >
-> > > > > diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> > > > > index c399e09b76e6..8e4a1da95418 100644
-> > > > > --- a/fs/cifs/smb2pdu.c
-> > > > > +++ b/fs/cifs/smb2pdu.c
-> > > > > @@ -1628,9 +1628,13 @@ SMB2_tcon(const unsigned int xid, struct
-> > cifs_ses *ses, const char *tree,
-> > > > >         iov[1].iov_base = unc_path;
-> > > > >         iov[1].iov_len = unc_path_len;
-> > > > >
-> > > > > -       /* 3.11 tcon req must be signed if not encrypted. See MS-SMB2
-> > 3.2.4.1.1 */
-> > > > > +       /*
-> > > > > +        * 3.11 tcon req must be signed if not encrypted. See MS-SMB2
-> > 3.2.4.1.1
-> > > > > +        * unless it is guest or anonymous user. See MS-SMB2 3.2.5.3.1
-> > > > > +        */
-> > > > >         if ((ses->server->dialect == SMB311_PROT_ID) &&
-> > > > > -           !smb3_encryption_required(tcon))
-> > > > > +           !smb3_encryption_required(tcon) &&
-> > > > > +           !(ses->session_flags &
-> > (SMB2_SESSION_FLAG_IS_GUEST|SMB2_SESSION_FLAG_IS_NULL)))
-> > > > >                 req->sync_hdr.Flags |= SMB2_FLAGS_SIGNED;
-> > > > >
-> > > > >         memset(&rqst, 0, sizeof(struct smb_rqst));
-> > > > > --
-> > > > > 2.13.6
-> > > > >
-> > > >
-> > > >
-> > > > I tried this patch with an ubuntu kernel
-> > > >
-> > (https://nam06.safelinks.protection.outlook.com/?url=https:%2F%2Fpeople.can
-> > onical.com%2F~tyhicks%2Fdisco-
-> > cifs.2%2F&amp;data=02%7C01%7Cttalpey%40microsoft.com%7C3cc97bf9482
-> > 747afd16d08d6af1e62ff%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0
-> > %7C636888942385347937&amp;sdata=i0kUZ4yinqjgvsDDc0N6LBTPlLt8DeNnt
-> > WW1PhS0xVg%3D&amp;reserved=0 specifically) but
-> > > > it didn't work, I'm still getting failures with smb3.11 and a guest
-> > > > mount.
-> > > >
-> > > > Maybe I'm missing some other fix, or a more up-to-date kernel? Shall I
-> > > > try with a self-compiled upstream one?
-> > >
-> > > Try with the current version of Steve's for-next branch plus this patch.
-> > > I could reproduce the failure with 3.11 on for-next
-> > > but when I added this patch then the mount was successful.
-> > >
-> > > At least that would verify that the current for-net works for you (or not).
-> > > There may be other things missing in older kernels that broke 3.11 guest
-> > mounts,
-> > > but lets check if for-next works first.
-> > >
-> > > Regards
-> > > Ronnie Sahlberg
-> > >
-> > > >
-> > > > dmesg:
-> > https://nam06.safelinks.protection.outlook.com/?url=http%3A%2F%2Fpaste.ub
-> > untu.com%2Fp%2FJGhCsgBVcb%2F&amp;data=02%7C01%7Cttalpey%40micros
-> > oft.com%7C3cc97bf9482747afd16d08d6af1e62ff%7C72f988bf86f141af91ab2d
-> > 7cd011db47%7C1%7C0%7C636888942385347937&amp;sdata=r5eMhXks%2F
-> > quoNzzhFahCKjMOE22fFlVCluwmRLWpmOc%3D&amp;reserved=0
-> > > >
-> > > > server logs (debug level 5, samba 4.10.0):
-> > > > log.:
-> > https://nam06.safelinks.protection.outlook.com/?url=http%3A%2F%2Fpaste.ub
-> > untu.com%2Fp%2FjMDJ8DBfRM%2F&amp;data=02%7C01%7Cttalpey%40micr
-> > osoft.com%7C3cc97bf9482747afd16d08d6af1e62ff%7C72f988bf86f141af91ab
-> > 2d7cd011db47%7C1%7C0%7C636888942385347937&amp;sdata=4owqPDbgc
-> > FOjQU%2BEt2aB1P77hFHbIuzoxOkdpX5X2eE%3D&amp;reserved=0
-> > > > log.smbd:
-> > https://nam06.safelinks.protection.outlook.com/?url=http%3A%2F%2Fpaste.ub
-> > untu.com%2Fp%2FZ9W5z28BP9%2F&amp;data=02%7C01%7Cttalpey%40micr
-> > osoft.com%7C3cc97bf9482747afd16d08d6af1e62ff%7C72f988bf86f141af91ab
-> > 2d7cd011db47%7C1%7C0%7C636888942385357938&amp;sdata=66Ng0qrdbt
-> > AwVirxqN3uWjEaFrRi1w6XGcX%2BZITmkOM%3D&amp;reserved=0
-> > > > smb.conf:
-> > https://nam06.safelinks.protection.outlook.com/?url=http%3A%2F%2Fpaste.ub
-> > untu.com%2Fp%2F9HpSyFq8n8%2F&amp;data=02%7C01%7Cttalpey%40micro
-> > soft.com%7C3cc97bf9482747afd16d08d6af1e62ff%7C72f988bf86f141af91ab2
-> > d7cd011db47%7C1%7C0%7C636888942385357938&amp;sdata=U4dqv23dZN
-> > KgaDAR2TbEmsrnkR6EnqejdVTPVLpIjKk%3D&amp;reserved=0
-> >
-> >
-> >
-> > --
-> > Thanks,
-> >
-> > Steve
+Add to Ronnie's patch check for null user so we can handle guest
+mounts for 3.1.1 to Samba as well
 
 
 
@@ -238,3 +73,53 @@ On Fri, Mar 22, 2019 at 7:20 PM Tom Talpey <ttalpey@microsoft.com> wrote:
 Thanks,
 
 Steve
+
+--00000000000082356a0584b88456
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-SMB3-Fix-SMB3.1.1-guest-mounts-to-Samba.patch"
+Content-Disposition: attachment; 
+	filename="0001-SMB3-Fix-SMB3.1.1-guest-mounts-to-Samba.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_jtksfxdb0>
+X-Attachment-Id: f_jtksfxdb0
+
+RnJvbSA1ZjM3N2RkMDgyZmUyNGNlZDdmZDVhOGQzMWQ3ZmFjM2FmNTY4NmI5IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IEZyaSwgMjIgTWFyIDIwMTkgMTk6NTI6MjkgLTA1MDAKU3ViamVjdDogW1BBVENIXSBT
+TUIzOiBGaXggU01CMy4xLjEgZ3Vlc3QgbW91bnRzIHRvIFNhbWJhCgpXb3JrYXJvdW5kIHByb2Js
+ZW0gd2l0aCBTYW1iYSByZXNwb25zZXMgdG8gU01CMy4xLjEKbnVsbCB1c2VyIChndWVzdCkgbW91
+bnRzLiAgVGhlIHNlcnZlciBkb2Vzbid0IHNldCB0aGUKZXhwZWN0ZWQgZmxhZyBpbiB0aGUgc2Vz
+c2lvbiBzZXR1cCByZXNwb25zZSBzbyB3ZSBoYXZlCnRvIGRvIGEgc2ltaWxhciBjaGVjayB0byB3
+aGF0IGlzIGRvbmUgaW4gc21iM192YWxpZGF0ZV9uZWdvdGlhdGUKd2hlcmUgd2UgYWxzbyBjaGVj
+ayBpZiB0aGUgdXNlciBpcyBhIG51bGwgdXNlci4KCk5vdGUgdGhhdCB0aGUgY29tbWl0IGJlbG93
+IHRpZ2h0ZW5lZCB0aGUgY29uZGl0aW9ucyBhbmQgZm9yY2VkIHNpZ25pbmcKZm9yIHRoZSBTTUIy
+LVRyZWVDb25uZWN0IGNvbW1hbmRzIGFzIHBlciBNUy1TTUIyLgpIb3dldmVyLCB0aGlzIHNob3Vs
+ZCBvbmx5IGFwcGx5IHRvIG5vcm1hbCB1c2VyIHNlc3Npb25zIGFuZCBub3QgZm9yCmNhc2VzIHdo
+ZXJlIHRoZXJlIGlzIG5vIHVzZXIgKGV2ZW4gaWYgc2VydmVyIGZvcmdldHMgdG8gc2V0IHRoZSBm
+bGFnCmluIHRoZSByZXNwb25zZSkgc2luY2Ugd2UgZG9uJ3QgaGF2ZSBhbnl0aGluZyB1c2VmdWwg
+dG8gc2lnbiB3aXRoLgpUaGlzIGlzIGVzcGVjaWFsbHkgaW1wb3J0YW50IG5vdyB0aGF0IHRoZSBt
+b3JlIHNlY3VyZSBTTUIzLjEuMSBwcm90b2NvbAppcyBpbiB0aGUgZGVmYXVsdCBkaWFsZWN0IGxp
+c3QuCgpBbiBlYXJsaWVyIHBhdGNoICgiY2lmczogYWxsb3cgZ3Vlc3QgbW91bnRzIHRvIHdvcmsg
+Zm9yIHNtYjMuMTEiKSBmaXhlZAp0aGUgZ3Vlc3QgbW91bnRzIHRvIFdpbmRvd3MuCgogICAgRml4
+ZXM6IDYxODhmMjhiZjYwOCAoIlRyZWUgY29ubmVjdCBmb3IgU01CMy4xLjEgbXVzdCBiZSBzaWdu
+ZWQgZm9yIG5vbi1lbmNyeXB0ZWQgc2hhcmVzIikKClJldmlld2VkLWJ5OiBSb25uaWUgU2FobGJl
+cmcgPGxzYWhsYmVyQHJlZGhhdC5jb20+CkNDOiBTdGFibGUgPHN0YWJsZUB2Z2VyLmtlcm5lbC5v
+cmc+ClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4K
+LS0tCiBmcy9jaWZzL3NtYjJwZHUuYyB8IDUgKysrKy0KIDEgZmlsZSBjaGFuZ2VkLCA0IGluc2Vy
+dGlvbnMoKyksIDEgZGVsZXRpb24oLSkKCmRpZmYgLS1naXQgYS9mcy9jaWZzL3NtYjJwZHUuYyBi
+L2ZzL2NpZnMvc21iMnBkdS5jCmluZGV4IDhlNGExZGE5NTQxOC4uNGNkZjI2ZTM5NDI2IDEwMDY0
+NAotLS0gYS9mcy9jaWZzL3NtYjJwZHUuYworKysgYi9mcy9jaWZzL3NtYjJwZHUuYwpAQCAtMTYz
+MSwxMCArMTYzMSwxMyBAQCBTTUIyX3Rjb24oY29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0
+IGNpZnNfc2VzICpzZXMsIGNvbnN0IGNoYXIgKnRyZWUsCiAJLyoKIAkgKiAzLjExIHRjb24gcmVx
+IG11c3QgYmUgc2lnbmVkIGlmIG5vdCBlbmNyeXB0ZWQuIFNlZSBNUy1TTUIyIDMuMi40LjEuMQog
+CSAqIHVubGVzcyBpdCBpcyBndWVzdCBvciBhbm9ueW1vdXMgdXNlci4gU2VlIE1TLVNNQjIgMy4y
+LjUuMy4xCisJICogKFNhbWJhIHNlcnZlcnMgZG9uJ3QgYWx3YXlzIHNldCB0aGUgZmxhZyBzbyBh
+bHNvIGNoZWNrIGlmIG51bGwgdXNlcikKIAkgKi8KIAlpZiAoKHNlcy0+c2VydmVyLT5kaWFsZWN0
+ID09IFNNQjMxMV9QUk9UX0lEKSAmJgogCSAgICAhc21iM19lbmNyeXB0aW9uX3JlcXVpcmVkKHRj
+b24pICYmCi0JICAgICEoc2VzLT5zZXNzaW9uX2ZsYWdzICYgKFNNQjJfU0VTU0lPTl9GTEFHX0lT
+X0dVRVNUfFNNQjJfU0VTU0lPTl9GTEFHX0lTX05VTEwpKSkKKwkgICAgIShzZXMtPnNlc3Npb25f
+ZmxhZ3MgJgorCQkgICAgKFNNQjJfU0VTU0lPTl9GTEFHX0lTX0dVRVNUfFNNQjJfU0VTU0lPTl9G
+TEFHX0lTX05VTEwpKSAmJgorCSAgICAoc2VzLT51c2VyX25hbWUgIT0gTlVMTCkpCiAJCXJlcS0+
+c3luY19oZHIuRmxhZ3MgfD0gU01CMl9GTEFHU19TSUdORUQ7CiAKIAltZW1zZXQoJnJxc3QsIDAs
+IHNpemVvZihzdHJ1Y3Qgc21iX3Jxc3QpKTsKLS0gCjIuMTcuMQoK
+--00000000000082356a0584b88456--
