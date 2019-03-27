@@ -2,53 +2,51 @@ Return-Path: <SRS0=fS5U=R6=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1739BC43381
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Mar 2019 18:45:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3878C10F00
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Mar 2019 18:45:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D9F9121741
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Mar 2019 18:45:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B75D621734
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Mar 2019 18:45:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1553712300;
-	bh=Wx4K19VWgKdz8f8eVQ3LSqNd+JtTaHE1dDcsz2Vg66w=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=pMXF61yRkipwogTwCE3LsHRvZv0QKLh4HgcGCALxOl/I/6KTRAoxBsUaomWXtTxp3
-	 DE7nRV6IqYWfswKA7nTowLSAu6N59Tb2jAefymxG0nEYpmQ2yVVsNAnqNDjJNGw7v0
-	 LLjlp+4vZXquzTT6nZhutgxXxp2goW1OrCr54Fmk=
+	s=default; t=1553712348;
+	bh=U4CiV+ioGH/dcKLRmYaLfTSXZZa2MIWhH0NZhUyTPuw=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=yY5GLwcl2uuZqbeFfm6i+Is/4RmxLqZWT1nFJwDrf573IwHkZm5BSDguAfQ0x0NLL
+	 ok8DuGRyGbOVACxfwAQBrPmqEV7VKvxFUNOR1S1ZalK9Db5eMZVGFldFKeVGY3OolS
+	 n8gpbob/61bM9FhcgMbvcJWMr4AkaPXEoRPscQhU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391048AbfC0Son (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 27 Mar 2019 14:44:43 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39034 "EHLO mail.kernel.org"
+        id S2390687AbfC0SUo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 27 Mar 2019 14:20:44 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38364 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391090AbfC0SVN (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 27 Mar 2019 14:21:13 -0400
+        id S2390996AbfC0SUn (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 27 Mar 2019 14:20:43 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8B20D2070B;
-        Wed, 27 Mar 2019 18:21:11 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id B8E7F2063F;
+        Wed, 27 Mar 2019 18:20:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1553710872;
-        bh=Wx4K19VWgKdz8f8eVQ3LSqNd+JtTaHE1dDcsz2Vg66w=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=K2iTs6DA89HlFnFCQiZIhFSFse6NKjJrzQIzCTY2OtXNjRNhKiELepNIDB8wVAwuU
-         918Ce0wRSQNsFX28owxWg8PsWGNXUCBu1VM/1IQzIiloP0O9+qIX1XDQlizh5Vm+qX
-         z1vBL59rRAeY05cZIoeaN6ds4vToADjCs+PSOmhY=
+        s=default; t=1553710842;
+        bh=U4CiV+ioGH/dcKLRmYaLfTSXZZa2MIWhH0NZhUyTPuw=;
+        h=From:To:Cc:Subject:Date:From;
+        b=bYgCCPLd8e4qWQ9Tj31vEdCJt9bb4HtnU8sHkY9uNrHs5fDMGuZ4ZnsHCX/yLYUMv
+         iFm9guvauXigkI5DpkbHLYfsjBt9Y8gxnP9xESCvkHXThMOllMBGmqDLVU1shibUlU
+         KtvCpqtFt33e86ubypi+O5VCX+T0iWgXcrAQbBi4=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Louis Taylor <louis@kragniz.eu>,
+Cc:     Aurelien Aptel <aaptel@suse.com>, NeilBrown <neil@brown.name>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 17/87] cifs: use correct format characters
-Date:   Wed, 27 Mar 2019 14:19:30 -0400
-Message-Id: <20190327182040.17444-17-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 01/87] CIFS: fix POSIX lock leak and invalid ptr deref
+Date:   Wed, 27 Mar 2019 14:19:14 -0400
+Message-Id: <20190327182040.17444-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190327182040.17444-1-sashal@kernel.org>
-References: <20190327182040.17444-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -57,80 +55,147 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Louis Taylor <louis@kragniz.eu>
+From: Aurelien Aptel <aaptel@suse.com>
 
-[ Upstream commit 259594bea574e515a148171b5cd84ce5cbdc028a ]
+[ Upstream commit bc31d0cdcfbadb6258b45db97e93b1c83822ba33 ]
 
-When compiling with -Wformat, clang emits the following warnings:
+We have a customer reporting crashes in lock_get_status() with many
+"Leaked POSIX lock" messages preceeding the crash.
 
-fs/cifs/smb1ops.c:312:20: warning: format specifies type 'unsigned
-short' but the argument has type 'unsigned int' [-Wformat]
-                         tgt_total_cnt, total_in_tgt);
-                                        ^~~~~~~~~~~~
+ Leaked POSIX lock on dev=0x0:0x56 ...
+ Leaked POSIX lock on dev=0x0:0x56 ...
+ Leaked POSIX lock on dev=0x0:0x56 ...
+ Leaked POSIX lock on dev=0x0:0x53 ...
+ Leaked POSIX lock on dev=0x0:0x53 ...
+ Leaked POSIX lock on dev=0x0:0x53 ...
+ Leaked POSIX lock on dev=0x0:0x53 ...
+ POSIX: fl_owner=ffff8900e7b79380 fl_flags=0x1 fl_type=0x1 fl_pid=20709
+ Leaked POSIX lock on dev=0x0:0x4b ino...
+ Leaked locks on dev=0x0:0x4b ino=0xf911400000029:
+ POSIX: fl_owner=ffff89f41c870e00 fl_flags=0x1 fl_type=0x1 fl_pid=19592
+ stack segment: 0000 [#1] SMP
+ Modules linked in: binfmt_misc msr tcp_diag udp_diag inet_diag unix_diag af_packet_diag netlink_diag rpcsec_gss_krb5 arc4 ecb auth_rpcgss nfsv4 md4 nfs nls_utf8 lockd grace cifs sunrpc ccm dns_resolver fscache af_packet iscsi_ibft iscsi_boot_sysfs vmw_vsock_vmci_transport vsock xfs libcrc32c sb_edac edac_core crct10dif_pclmul crc32_pclmul ghash_clmulni_intel drbg ansi_cprng vmw_balloon aesni_intel aes_x86_64 lrw gf128mul glue_helper ablk_helper cryptd joydev pcspkr vmxnet3 i2c_piix4 vmw_vmci shpchp fjes processor button ac btrfs xor raid6_pq sr_mod cdrom ata_generic sd_mod ata_piix vmwgfx crc32c_intel drm_kms_helper syscopyarea sysfillrect sysimgblt fb_sys_fops ttm serio_raw ahci libahci drm libata vmw_pvscsi sg dm_multipath dm_mod scsi_dh_rdac scsi_dh_emc scsi_dh_alua scsi_mod autofs4
 
-fs/cifs/cifs_dfs_ref.c:289:4: warning: format specifies type 'short'
-but the argument has type 'int' [-Wformat]
-                 ref->flags, ref->server_type);
-                 ^~~~~~~~~~
+ Supported: Yes
+ CPU: 6 PID: 28250 Comm: lsof Not tainted 4.4.156-94.64-default #1
+ Hardware name: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform, BIOS 6.00 04/05/2016
+ task: ffff88a345f28740 ti: ffff88c74005c000 task.ti: ffff88c74005c000
+ RIP: 0010:[<ffffffff8125dcab>]  [<ffffffff8125dcab>] lock_get_status+0x9b/0x3b0
+ RSP: 0018:ffff88c74005fd90  EFLAGS: 00010202
+ RAX: ffff89bde83e20ae RBX: ffff89e870003d18 RCX: 0000000049534f50
+ RDX: ffffffff81a3541f RSI: ffffffff81a3544e RDI: ffff89bde83e20ae
+ RBP: 0026252423222120 R08: 0000000020584953 R09: 000000000000ffff
+ R10: 0000000000000000 R11: ffff88c74005fc70 R12: ffff89e5ca7b1340
+ R13: 00000000000050e5 R14: ffff89e870003d30 R15: ffff89e5ca7b1340
+ FS:  00007fafd64be800(0000) GS:ffff89f41fd00000(0000) knlGS:0000000000000000
+ CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+ CR2: 0000000001c80018 CR3: 000000a522048000 CR4: 0000000000360670
+ DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+ DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+ Stack:
+  0000000000000208 ffffffff81a3d6b6 ffff89e870003d30 ffff89e870003d18
+  ffff89e5ca7b1340 ffff89f41738d7c0 ffff89e870003d30 ffff89e5ca7b1340
+  ffffffff8125e08f 0000000000000000 ffff89bc22b67d00 ffff88c74005ff28
+ Call Trace:
+  [<ffffffff8125e08f>] locks_show+0x2f/0x70
+  [<ffffffff81230ad1>] seq_read+0x251/0x3a0
+  [<ffffffff81275bbc>] proc_reg_read+0x3c/0x70
+  [<ffffffff8120e456>] __vfs_read+0x26/0x140
+  [<ffffffff8120e9da>] vfs_read+0x7a/0x120
+  [<ffffffff8120faf2>] SyS_read+0x42/0xa0
+  [<ffffffff8161cbc3>] entry_SYSCALL_64_fastpath+0x1e/0xb7
 
-fs/cifs/cifs_dfs_ref.c:289:16: warning: format specifies type 'short'
-but the argument has type 'int' [-Wformat]
-                 ref->flags, ref->server_type);
-                             ^~~~~~~~~~~~~~~~
+When Linux closes a FD (close(), close-on-exec, dup2(), ...) it calls
+filp_close() which also removes all posix locks.
 
-fs/cifs/cifs_dfs_ref.c:291:4: warning: format specifies type 'short'
-but the argument has type 'int' [-Wformat]
-                 ref->ref_flag, ref->path_consumed);
-                 ^~~~~~~~~~~~~
+The lock struct is initialized like so in filp_close() and passed
+down to cifs
 
-fs/cifs/cifs_dfs_ref.c:291:19: warning: format specifies type 'short'
-but the argument has type 'int' [-Wformat]
-                 ref->ref_flag, ref->path_consumed);
-                                ^~~~~~~~~~~~~~~~~~
-The types of these arguments are unconditionally defined, so this patch
-updates the format character to the correct ones for ints and unsigned
-ints.
+	...
+        lock.fl_type = F_UNLCK;
+        lock.fl_flags = FL_POSIX | FL_CLOSE;
+        lock.fl_start = 0;
+        lock.fl_end = OFFSET_MAX;
+	...
 
-Link: https://github.com/ClangBuiltLinux/linux/issues/378
+Note the FL_CLOSE flag, which hints the VFS code that this unlocking
+is done for closing the fd.
 
-Signed-off-by: Louis Taylor <louis@kragniz.eu>
+filp_close()
+  locks_remove_posix(filp, id);
+    vfs_lock_file(filp, F_SETLK, &lock, NULL);
+      return filp->f_op->lock(filp, cmd, fl) => cifs_lock()
+        rc = cifs_setlk(file, flock, type, wait_flag, posix_lck, lock, unlock, xid);
+          rc = server->ops->mand_unlock_range(cfile, flock, xid);
+          if (flock->fl_flags & FL_POSIX && !rc)
+                  rc = locks_lock_file_wait(file, flock)
+
+Notice how we don't call locks_lock_file_wait() which does the
+generic VFS lock/unlock/wait work on the inode if rc != 0.
+
+If we are closing the handle, the SMB server is supposed to remove any
+locks associated with it. Similarly, cifs.ko frees and wakes up any
+lock and lock waiter when closing the file:
+
+cifs_close()
+  cifsFileInfo_put(file->private_data)
+	/*
+	 * Delete any outstanding lock records. We'll lose them when the file
+	 * is closed anyway.
+	 */
+	down_write(&cifsi->lock_sem);
+	list_for_each_entry_safe(li, tmp, &cifs_file->llist->locks, llist) {
+		list_del(&li->llist);
+		cifs_del_lock_waiters(li);
+		kfree(li);
+	}
+	list_del(&cifs_file->llist->llist);
+	kfree(cifs_file->llist);
+	up_write(&cifsi->lock_sem);
+
+So we can safely ignore unlocking failures in cifs_lock() if they
+happen with the FL_CLOSE flag hint set as both the server and the
+client take care of it during the actual closing.
+
+This is not a proper fix for the unlocking failure but it's safe and
+it seems to prevent the lock leakages and crashes the customer
+experiences.
+
+Signed-off-by: Aurelien Aptel <aaptel@suse.com>
+Signed-off-by: NeilBrown <neil@brown.name>
 Signed-off-by: Steve French <stfrench@microsoft.com>
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+Acked-by: Pavel Shilovsky <pshilov@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/cifs/cifs_dfs_ref.c | 4 ++--
- fs/cifs/smb1ops.c      | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ fs/cifs/file.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/fs/cifs/cifs_dfs_ref.c b/fs/cifs/cifs_dfs_ref.c
-index 9156be545b0f..4660208132a2 100644
---- a/fs/cifs/cifs_dfs_ref.c
-+++ b/fs/cifs/cifs_dfs_ref.c
-@@ -271,9 +271,9 @@ static void dump_referral(const struct dfs_info3_param *ref)
- {
- 	cifs_dbg(FYI, "DFS: ref path: %s\n", ref->path_name);
- 	cifs_dbg(FYI, "DFS: node path: %s\n", ref->node_name);
--	cifs_dbg(FYI, "DFS: fl: %hd, srv_type: %hd\n",
-+	cifs_dbg(FYI, "DFS: fl: %d, srv_type: %d\n",
- 		 ref->flags, ref->server_type);
--	cifs_dbg(FYI, "DFS: ref_flags: %hd, path_consumed: %hd\n",
-+	cifs_dbg(FYI, "DFS: ref_flags: %d, path_consumed: %d\n",
- 		 ref->ref_flag, ref->path_consumed);
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 1c5099fffaec..7d295bf283ca 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1627,8 +1627,20 @@ cifs_setlk(struct file *file, struct file_lock *flock, __u32 type,
+ 		rc = server->ops->mand_unlock_range(cfile, flock, xid);
+ 
+ out:
+-	if (flock->fl_flags & FL_POSIX && !rc)
++	if (flock->fl_flags & FL_POSIX) {
++		/*
++		 * If this is a request to remove all locks because we
++		 * are closing the file, it doesn't matter if the
++		 * unlocking failed as both cifs.ko and the SMB server
++		 * remove the lock on file close
++		 */
++		if (rc) {
++			cifs_dbg(VFS, "%s failed rc=%d\n", __func__, rc);
++			if (!(flock->fl_flags & FL_CLOSE))
++				return rc;
++		}
+ 		rc = locks_lock_file_wait(file, flock);
++	}
+ 	return rc;
  }
  
-diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index efd72e1fae74..f7a9adab0b84 100644
---- a/fs/cifs/smb1ops.c
-+++ b/fs/cifs/smb1ops.c
-@@ -305,7 +305,7 @@ coalesce_t2(char *second_buf, struct smb_hdr *target_hdr)
- 	remaining = tgt_total_cnt - total_in_tgt;
- 
- 	if (remaining < 0) {
--		cifs_dbg(FYI, "Server sent too much data. tgt_total_cnt=%hu total_in_tgt=%hu\n",
-+		cifs_dbg(FYI, "Server sent too much data. tgt_total_cnt=%hu total_in_tgt=%u\n",
- 			 tgt_total_cnt, total_in_tgt);
- 		return -EPROTO;
- 	}
 -- 
 2.19.1
 
