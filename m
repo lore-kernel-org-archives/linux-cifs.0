@@ -4,48 +4,47 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA665C10F00
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Mar 2019 19:30:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0327C43381
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Mar 2019 19:30:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A435E2075C
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Mar 2019 19:30:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AFAD72075C
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Mar 2019 19:30:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1553715033;
-	bh=Ii7mdWLM0X85/ZxY9kH/FvQqPRcWFcHxIESPoDg5v24=;
+	s=default; t=1553715047;
+	bh=slGkVjFL3LpAiH1xQquQ8NgUeVdDJIVdqTTaX78/7NQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=pUpYJiVxy8Z86cHQBgu5e9VyxPPIP+i4dfObe7JjBWekTEHw7xeG5Exeh93sH7H+j
-	 HQmxHwBhfNOIaJ9DL0BNVjgDHRsJm0qNGtV1qt8kWzZys6zC/fmcNsLiVyPN+ZNnbN
-	 5lquZxLMa8pSddO1oN7Lu60xjwsGBZm/y4TOm1Tk=
+	b=LBzIep2/a1jkmJg7Fz+pOlh4YgA81og8GB867x66HBMyop213qjhUqzM2Sqf5nBYp
+	 kuJCLU8JzkvFqJ2AlX6KO+DeW/1dxj/COT63rbzc300JUyRnh82KKrGoF2owSYmS6I
+	 +6BfWzJeM52sXUXHXV18bHdv6SpDPAlmoyNvNjqM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728703AbfC0SDb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 27 Mar 2019 14:03:31 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43784 "EHLO mail.kernel.org"
+        id S1729546AbfC0Tam (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 27 Mar 2019 15:30:42 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43726 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732498AbfC0SD3 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 27 Mar 2019 14:03:29 -0400
+        id S1732444AbfC0SD2 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 27 Mar 2019 14:03:28 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0603E2075C;
-        Wed, 27 Mar 2019 18:03:27 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id E7A042177E;
+        Wed, 27 Mar 2019 18:03:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1553709808;
-        bh=Ii7mdWLM0X85/ZxY9kH/FvQqPRcWFcHxIESPoDg5v24=;
+        s=default; t=1553709807;
+        bh=slGkVjFL3LpAiH1xQquQ8NgUeVdDJIVdqTTaX78/7NQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=oN7iWcaO8+SviWcrISm9Memxy8Qn/T4xjZPgIA3UzfQcGWvFl4Y8BRrOlER2k6LFU
-         cEUAqyxBmmlVGJ/hubJO2jYNhFsxUWPLR3/cshVsLn94I1A/aJoUqXtH5nZtLZaI+2
-         FHDZM8Cto4YfcOPgvy/7yb3M31qSQxAcFlkt6hlU=
+        b=dRevXqIPHPivG/l3WzusUwI9w7Lf3xBgE3UIHCT0um/MSW5St6PO6C9jwmqKeUdoE
+         Mqisv9YqRZ8oCaJclqi5E7q/nLwecl/+wqcN9wv3YRO23s2DGPEe2AFofCqIJK0r7u
+         OpinAlb0vyUxY6670N0JqOzM24yFH09UC90bP7A4=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Yao Liu <yotta.liu@ucloud.cn>,
+Cc:     Namjae Jeon <linkinjeon@gmail.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.0 050/262] cifs: Fix NULL pointer dereference of devname
-Date:   Wed, 27 Mar 2019 13:58:25 -0400
-Message-Id: <20190327180158.10245-50-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.0 049/262] cifs: Accept validate negotiate if server return NT_STATUS_NOT_SUPPORTED
+Date:   Wed, 27 Mar 2019 13:58:24 -0400
+Message-Id: <20190327180158.10245-49-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190327180158.10245-1-sashal@kernel.org>
 References: <20190327180158.10245-1-sashal@kernel.org>
@@ -57,60 +56,54 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Yao Liu <yotta.liu@ucloud.cn>
+From: Namjae Jeon <linkinjeon@gmail.com>
 
-[ Upstream commit 68e2672f8fbd1e04982b8d2798dd318bf2515dd2 ]
+[ Upstream commit 969ae8e8d4ee54c99134d3895f2adf96047f5bee ]
 
-There is a NULL pointer dereference of devname in strspn()
+Old windows version or Netapp SMB server will return
+NT_STATUS_NOT_SUPPORTED since they do not allow or implement
+FSCTL_VALIDATE_NEGOTIATE_INFO. The client should accept the response
+provided it's properly signed.
 
-The oops looks something like:
+See
+https://blogs.msdn.microsoft.com/openspecification/2012/06/28/smb3-secure-dialect-negotiation/
 
-  CIFS: Attempting to mount (null)
-  BUG: unable to handle kernel NULL pointer dereference at 0000000000000000
-  ...
-  RIP: 0010:strspn+0x0/0x50
-  ...
-  Call Trace:
-   ? cifs_parse_mount_options+0x222/0x1710 [cifs]
-   ? cifs_get_volume_info+0x2f/0x80 [cifs]
-   cifs_setup_volume_info+0x20/0x190 [cifs]
-   cifs_get_volume_info+0x50/0x80 [cifs]
-   cifs_smb3_do_mount+0x59/0x630 [cifs]
-   ? ida_alloc_range+0x34b/0x3d0
-   cifs_do_mount+0x11/0x20 [cifs]
-   mount_fs+0x52/0x170
-   vfs_kern_mount+0x6b/0x170
-   do_mount+0x216/0xdc0
-   ksys_mount+0x83/0xd0
-   __x64_sys_mount+0x25/0x30
-   do_syscall_64+0x65/0x220
-   entry_SYSCALL_64_after_hwframe+0x49/0xbe
+and
 
-Fix this by adding a NULL check on devname in cifs_parse_devname()
+MS-SMB2 validate negotiate response processing:
+https://msdn.microsoft.com/en-us/library/hh880630.aspx
 
-Signed-off-by: Yao Liu <yotta.liu@ucloud.cn>
+Samba client had already handled it.
+https://bugzilla.samba.org/attachment.cgi?id=13285&action=edit
+
+Signed-off-by: Namjae Jeon <linkinjeon@gmail.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/cifs/connect.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ fs/cifs/smb2pdu.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index e61cd2938c9e..9d4e60123db4 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1487,6 +1487,11 @@ cifs_parse_devname(const char *devname, struct smb_vol *vol)
- 	const char *delims = "/\\";
- 	size_t len;
- 
-+	if (unlikely(!devname || !*devname)) {
-+		cifs_dbg(VFS, "Device name not specified.\n");
-+		return -EINVAL;
-+	}
-+
- 	/* make sure we have a valid UNC double delimiter prefix */
- 	len = strspn(devname, delims);
- 	if (len != 2)
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 77b3aaa39b35..4efeb2a02ea4 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -986,8 +986,14 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
+ 	rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
+ 		FSCTL_VALIDATE_NEGOTIATE_INFO, true /* is_fsctl */,
+ 		(char *)pneg_inbuf, inbuflen, (char **)&pneg_rsp, &rsplen);
+-
+-	if (rc != 0) {
++	if (rc == -EOPNOTSUPP) {
++		/*
++		 * Old Windows versions or Netapp SMB server can return
++		 * not supported error. Client should accept it.
++		 */
++		cifs_dbg(VFS, "Server does not support validate negotiate\n");
++		return 0;
++	} else if (rc != 0) {
+ 		cifs_dbg(VFS, "validate protocol negotiate failed: %d\n", rc);
+ 		rc = -EIO;
+ 		goto out_free_inbuf;
 -- 
 2.19.1
 
