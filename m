@@ -2,50 +2,50 @@ Return-Path: <SRS0=fS5U=R6=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70227C10F00
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Mar 2019 19:09:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4372C43381
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Mar 2019 19:09:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 38CC5206BA
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Mar 2019 19:09:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 82E332064A
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Mar 2019 19:09:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1553713772;
-	bh=wmxQHaeLkHacdbMMKk9oisRROQuJp1F3Vqco2GYVFXU=;
+	s=default; t=1553713776;
+	bh=u3CRxpgToGmPwbSK91SAutfKoxOTWv/P6PfXRvSay+w=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=Va3Ik6pCY7zGVyBW+zhn/vWA4VosUdFPpKwHKU+x7tnVljlCZeqI+Ja3v0AvOmUcd
-	 RNV7TtGofyYbKX4lbb/5zlskLB3kZAT2pat7kf2JKgkU1EQ1SwU3Ac8M5lGPasAsE8
-	 1W/h1PC2s3T5wEJwtdjvU3iY74JA+RnFCy6aF/tk=
+	b=LDRS8y8Wdn1/4hVSlsbMU53bP0ANsFJ7b3ibSfpx7p/rLvpNRTqA+r9P1WxrEmrJA
+	 WhCMnuWY2sWmrG1qQ5HFWkXRa49Mn0KOFv4PoMwr5yNmR+kiu9oPijb8qrJI0fu8R6
+	 PCupx6xoN3gLVFY3+hdXRxkrlVFCaR60pPrhyprY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387734AbfC0TJZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 27 Mar 2019 15:09:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53876 "EHLO mail.kernel.org"
+        id S2389024AbfC0SLb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 27 Mar 2019 14:11:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53858 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389035AbfC0SLd (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 27 Mar 2019 14:11:33 -0400
+        id S2388031AbfC0SLa (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 27 Mar 2019 14:11:30 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5AF9E2054F;
-        Wed, 27 Mar 2019 18:11:32 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 0104A21741;
+        Wed, 27 Mar 2019 18:11:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1553710293;
-        bh=wmxQHaeLkHacdbMMKk9oisRROQuJp1F3Vqco2GYVFXU=;
+        s=default; t=1553710289;
+        bh=u3CRxpgToGmPwbSK91SAutfKoxOTWv/P6PfXRvSay+w=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Xzp5QwCpryEzY5RctLD7WxczGLKJ4Btpl2ORm5/0ZEhSxfzJD5CpYTHucXhqJxtwY
-         YUTgsBJWU3RU+9LcoAmbKrj4foD62D9okxJGFwQpTok6QVn7eFvkO7esqCueZUAtzb
-         C9/tgbQphHO5Ok1n/en2ENAM1CGsiTHr902MGur8=
+        b=Fty47f6YMBvqmrGjd4tKxlhMrAkTf9N324lYU8bhtFIH+eJcGaBQxh0CBVZubwWXL
+         2oFd6ivAPYGTd4XPRC2k5B+ktUOUKmN2kuBeJ8aJMhijORfFO+R1DqZyIRUF4Km0a/
+         r3Z5Y8Fn/aE/l/0KbR+S/AGislR74fYZeUp6kKuM=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Namjae Jeon <linkinjeon@gmail.com>,
+Cc:     Louis Taylor <louis@kragniz.eu>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 038/192] cifs: Accept validate negotiate if server return NT_STATUS_NOT_SUPPORTED
-Date:   Wed, 27 Mar 2019 14:07:50 -0400
-Message-Id: <20190327181025.13507-38-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 035/192] cifs: use correct format characters
+Date:   Wed, 27 Mar 2019 14:07:47 -0400
+Message-Id: <20190327181025.13507-35-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190327181025.13507-1-sashal@kernel.org>
 References: <20190327181025.13507-1-sashal@kernel.org>
@@ -57,54 +57,80 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Namjae Jeon <linkinjeon@gmail.com>
+From: Louis Taylor <louis@kragniz.eu>
 
-[ Upstream commit 969ae8e8d4ee54c99134d3895f2adf96047f5bee ]
+[ Upstream commit 259594bea574e515a148171b5cd84ce5cbdc028a ]
 
-Old windows version or Netapp SMB server will return
-NT_STATUS_NOT_SUPPORTED since they do not allow or implement
-FSCTL_VALIDATE_NEGOTIATE_INFO. The client should accept the response
-provided it's properly signed.
+When compiling with -Wformat, clang emits the following warnings:
 
-See
-https://blogs.msdn.microsoft.com/openspecification/2012/06/28/smb3-secure-dialect-negotiation/
+fs/cifs/smb1ops.c:312:20: warning: format specifies type 'unsigned
+short' but the argument has type 'unsigned int' [-Wformat]
+                         tgt_total_cnt, total_in_tgt);
+                                        ^~~~~~~~~~~~
 
-and
+fs/cifs/cifs_dfs_ref.c:289:4: warning: format specifies type 'short'
+but the argument has type 'int' [-Wformat]
+                 ref->flags, ref->server_type);
+                 ^~~~~~~~~~
 
-MS-SMB2 validate negotiate response processing:
-https://msdn.microsoft.com/en-us/library/hh880630.aspx
+fs/cifs/cifs_dfs_ref.c:289:16: warning: format specifies type 'short'
+but the argument has type 'int' [-Wformat]
+                 ref->flags, ref->server_type);
+                             ^~~~~~~~~~~~~~~~
 
-Samba client had already handled it.
-https://bugzilla.samba.org/attachment.cgi?id=13285&action=edit
+fs/cifs/cifs_dfs_ref.c:291:4: warning: format specifies type 'short'
+but the argument has type 'int' [-Wformat]
+                 ref->ref_flag, ref->path_consumed);
+                 ^~~~~~~~~~~~~
 
-Signed-off-by: Namjae Jeon <linkinjeon@gmail.com>
+fs/cifs/cifs_dfs_ref.c:291:19: warning: format specifies type 'short'
+but the argument has type 'int' [-Wformat]
+                 ref->ref_flag, ref->path_consumed);
+                                ^~~~~~~~~~~~~~~~~~
+The types of these arguments are unconditionally defined, so this patch
+updates the format character to the correct ones for ints and unsigned
+ints.
+
+Link: https://github.com/ClangBuiltLinux/linux/issues/378
+
+Signed-off-by: Louis Taylor <louis@kragniz.eu>
 Signed-off-by: Steve French <stfrench@microsoft.com>
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/cifs/smb2pdu.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ fs/cifs/cifs_dfs_ref.c | 4 ++--
+ fs/cifs/smb1ops.c      | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index a2d701775c49..073dd1ad1fe1 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -881,8 +881,14 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
- 	rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
- 		FSCTL_VALIDATE_NEGOTIATE_INFO, true /* is_fsctl */,
- 		(char *)pneg_inbuf, inbuflen, (char **)&pneg_rsp, &rsplen);
--
--	if (rc != 0) {
-+	if (rc == -EOPNOTSUPP) {
-+		/*
-+		 * Old Windows versions or Netapp SMB server can return
-+		 * not supported error. Client should accept it.
-+		 */
-+		cifs_dbg(VFS, "Server does not support validate negotiate\n");
-+		return 0;
-+	} else if (rc != 0) {
- 		cifs_dbg(VFS, "validate protocol negotiate failed: %d\n", rc);
- 		rc = -EIO;
- 		goto out_free_inbuf;
+diff --git a/fs/cifs/cifs_dfs_ref.c b/fs/cifs/cifs_dfs_ref.c
+index 6b61df117fd4..563e2f6268c3 100644
+--- a/fs/cifs/cifs_dfs_ref.c
++++ b/fs/cifs/cifs_dfs_ref.c
+@@ -271,9 +271,9 @@ static void dump_referral(const struct dfs_info3_param *ref)
+ {
+ 	cifs_dbg(FYI, "DFS: ref path: %s\n", ref->path_name);
+ 	cifs_dbg(FYI, "DFS: node path: %s\n", ref->node_name);
+-	cifs_dbg(FYI, "DFS: fl: %hd, srv_type: %hd\n",
++	cifs_dbg(FYI, "DFS: fl: %d, srv_type: %d\n",
+ 		 ref->flags, ref->server_type);
+-	cifs_dbg(FYI, "DFS: ref_flags: %hd, path_consumed: %hd\n",
++	cifs_dbg(FYI, "DFS: ref_flags: %d, path_consumed: %d\n",
+ 		 ref->ref_flag, ref->path_consumed);
+ }
+ 
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index 378151e09e91..47db8eb6cbcf 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -308,7 +308,7 @@ coalesce_t2(char *second_buf, struct smb_hdr *target_hdr)
+ 	remaining = tgt_total_cnt - total_in_tgt;
+ 
+ 	if (remaining < 0) {
+-		cifs_dbg(FYI, "Server sent too much data. tgt_total_cnt=%hu total_in_tgt=%hu\n",
++		cifs_dbg(FYI, "Server sent too much data. tgt_total_cnt=%hu total_in_tgt=%u\n",
+ 			 tgt_total_cnt, total_in_tgt);
+ 		return -EPROTO;
+ 	}
 -- 
 2.19.1
 
