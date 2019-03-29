@@ -5,263 +5,194 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FC0DC43381
-	for <linux-cifs@archiver.kernel.org>; Fri, 29 Mar 2019 18:20:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 966B6C10F05
+	for <linux-cifs@archiver.kernel.org>; Fri, 29 Mar 2019 18:44:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4F76F2184C
-	for <linux-cifs@archiver.kernel.org>; Fri, 29 Mar 2019 18:20:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 611C52184D
+	for <linux-cifs@archiver.kernel.org>; Fri, 29 Mar 2019 18:44:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jg69dXIH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SzhZxDDv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729950AbfC2SUa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 29 Mar 2019 14:20:30 -0400
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:35619 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729949AbfC2SUa (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 29 Mar 2019 14:20:30 -0400
-Received: by mail-lj1-f195.google.com with SMTP id t4so2819686ljc.2
-        for <linux-cifs@vger.kernel.org>; Fri, 29 Mar 2019 11:20:28 -0700 (PDT)
+        id S1730049AbfC2Sov (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 29 Mar 2019 14:44:51 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:43791 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729840AbfC2Sov (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 29 Mar 2019 14:44:51 -0400
+Received: by mail-pl1-f195.google.com with SMTP id m10so1421680plt.10;
+        Fri, 29 Mar 2019 11:44:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=s9qyz+v1KLTje4S4WeQU7q6ybOz9QHLeH2FqttEDl9Q=;
-        b=Jg69dXIHlrIh53bLtZon0Fa+qu14Sj3wb6EPHPc2mG0eCsIkimtJL8EJX66KCSnnB3
-         giBg7Njko4Ip6nB/zsawHqBwiz7MjeImb6491bbCt+sFLn4mnTVG0B5xVuJdBPTog1LS
-         KvkKSiuvPrFN3diwVA6g5IUB3tN4xS41648IXlcO0MpOGKxN7gu0AIW03oWknlRPoUH6
-         mJw0Y3M5cBZXxnBxI++cTPMFe+eNG6hFBlIbJmr5UYyTI+s5vY/dp8Aw9NDAddkcLqxA
-         07qgkHsxPTYPvw3VugG+Ijnp+CnBbEY78b0Lk6h4WBHvvR0e1OqEJahqRnMj2HdAh2vP
-         EovA==
+         :cc;
+        bh=fT+1oDk1L4yB7bo6xrGyyD45JpUX3jBf5ZuKDzlFL18=;
+        b=SzhZxDDv0OzYOc85vA+FbpQfGPrXhfjOIoEIYUw6H18OR9aj5pjmGqtZ9CKRMdWTJz
+         I+m0ObdqCussVT4riM9J49FmVCAzAZQb1iXJ3QJoXbA9QYBTyYn+Az0gM2VWeT8puMGt
+         DVKHID3UVVNnPVqlBJQUQYVNh/p3rT0KelnaMhRyRYMsKVzfdDhfOtTLNl7q7C7xq3wu
+         fEBxItvoZZ+3cunZ6Z86xO+4mEsNsqhaycIkmg6CY3OWk0s1juKCOSNmkIRdEPNHFcWH
+         aKqf62DHm5pYOnF+qw9RbqpZjekhp4DKKX4sBQfTLjz8QTKSqCuWzEgrp574VJTX17he
+         CUlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=s9qyz+v1KLTje4S4WeQU7q6ybOz9QHLeH2FqttEDl9Q=;
-        b=HCxs+8nyKVac1kbOQ9xK4lJ0Dy5vjn1CHi+YZRcL1MGM1FcASd+JhTTa77i6vNg+u3
-         PR+nrenyd74blvO2ZytUSTnGxT8u6Z6dodeGgc1C1gnLfsTUTPoakwWUNz0411bfIsEN
-         JjQbaAyn0fsACwyArZKh1pFZbhPDO57J+fmNGf9t0PrCCC7n+2nMqpsgJltLzupzs8tx
-         uZ22EXARDdfCY5F69jsCcrvX5VQXwqhIzS6B22/4u2IfDW8cc9vGmQ/OpKUtxnVV4vzF
-         Po16JGJxqKUFtcsIB9NYxFXU0ihJ9i8kKZvQn24cYzDjaY5hTbqWx9EIOFiP56P6GCaP
-         +h/Q==
-X-Gm-Message-State: APjAAAURV2dj3bgTmLUqJrhwE32Jqp9wPPoZ0fvRzimoBGJemhu5WL5c
-        pbOe+b/mbD5twqHSmLs/0cognBGCu9xRNkhKjaUV2Do=
-X-Google-Smtp-Source: APXvYqxHYN4BI/bj7W/w17WUvliEAft064jzMirnPKCkYGXjkvyo0F3Dgx3TbElIHsXhYtGdagzLtmfUtf0JpmiPlX8=
-X-Received: by 2002:a2e:9585:: with SMTP id w5mr10639514ljh.132.1553883627316;
- Fri, 29 Mar 2019 11:20:27 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=fT+1oDk1L4yB7bo6xrGyyD45JpUX3jBf5ZuKDzlFL18=;
+        b=Gq+rS+xcsC7djcg6JqYZL2cg1D+O/K3c7TIYeU9wX5V4pPWRM3jtABDme8/UJyIaSo
+         sbecAXLgj+7Um407R2qiLd/z/2NVZji+8PDayuIw/kZZzUfvjqHZrmIOXgr7Y7oVufzP
+         jHSwgljfWhvZxPqtERjJ1e5mvNFClHoLwaXLf1MGwMvumGdsY30P5nt74RHC7irk8ilQ
+         VpUnnZOym52J2vXPBV6USuYPoCC5o2utfhl3ubp6ejMl7Pe/5f3Fl/9HN35l+3r7KaK/
+         lkIHD9EOeE8FI2LdRFa4WUP5hZ59gBLC0F2WmY9ukDJsscl1Lz1PbcC632CRZF5pU7Au
+         pW/g==
+X-Gm-Message-State: APjAAAUt7ZFeh52Po3kIdbgBqboB3kCHZJhMv5xwiDJ/dv93C+RoiEdP
+        vXyfqclgL9rlvtDtl9oIbpFPphPsDZq9vK/hDBmcbA==
+X-Google-Smtp-Source: APXvYqx2JkMyGVOYmnHLMmwPCyXPfJ5acnmLmz/fCpu5T7MaoCTdKOusMzskZv/BBPkq2XhqAzhW6q6I6fD/oDX91ms=
+X-Received: by 2002:a17:902:2b8b:: with SMTP id l11mr51715889plb.18.1553885090182;
+ Fri, 29 Mar 2019 11:44:50 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190329094912.15409-1-aaptel@suse.com>
-In-Reply-To: <20190329094912.15409-1-aaptel@suse.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Fri, 29 Mar 2019 11:20:15 -0700
-Message-ID: <CAKywueSGjv95AnBgYL9454WKUq--y2T2wigtCzDNLHXEZa6Edw@mail.gmail.com>
-Subject: Re: [PATCH v3] CIFS: keep FileInfo handle live during oplock break
-To:     Aurelien Aptel <aaptel@suse.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+References: <CAH2r5mvQ+KmoBgoxT51SRMpCXZ4OFwg+B1x_SD3DFkcrUcdZQQ@mail.gmail.com>
+ <20190328170219.29c72cbf@echidna.suse.de> <CAH2r5mvb=SbYV9Qmt=n_ht7toPgKs03Y2oHXpJE7=_byptstKg@mail.gmail.com>
+In-Reply-To: <CAH2r5mvb=SbYV9Qmt=n_ht7toPgKs03Y2oHXpJE7=_byptstKg@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 29 Mar 2019 13:44:38 -0500
+Message-ID: <CAH2r5mvyt0rjrtzvZOMeJvHF7FK3LM_pyr7pv2PxzH1n9CxZaQ@mail.gmail.com>
+Subject: Re: [PATCH][smbinfo cifsutils]
+To:     David Disseldorp <ddiss@suse.de>
+Cc:     samba-technical <samba-technical@lists.samba.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Pavel Shilovsky <piastryyy@gmail.com>
+Content-Type: multipart/mixed; boundary="000000000000d2ac6a058540106a"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D0=BF=D1=82, 29 =D0=BC=D0=B0=D1=80. 2019 =D0=B3. =D0=B2 02:49, Aurelien Ap=
-tel <aaptel@suse.com>:
+--000000000000d2ac6a058540106a
+Content-Type: text/plain; charset="UTF-8"
+
+Added man page update for this new smbinfo parm
+
+
+On Fri, Mar 29, 2019 at 3:14 AM Steve French <smfrench@gmail.com> wrote:
 >
-> In the oplock break handler, writing pending changes from pages puts
-> the FileInfo handle. If the refcount reaches zero it closes the handle
-> and waits for any oplock break handler to return, thus causing a deadlock=
-.
+> As requested I changed the buffer size malloced to be more obvious -
+> in this case to match exactly what is returned from the first call (ie
+> snapshot length + the sizeof the snapshot info structure which
+> precedes the snapshot list, ie 16 bytes).  The snapshot array size is
+> 12 bytes, but rounding it to 8 byte boundary causes the minimum to be
+> 16 bytes.
 >
-> To prevent this situation:
+> On Thu, Mar 28, 2019 at 11:02 AM David Disseldorp <ddiss@suse.de> wrote:
+> >
+> > On Thu, 28 Mar 2019 05:05:35 -0500, Steve French wrote:
+> >
+> > > +     /* Now that we know the size, query the list from the server */
+> > > +
+> > > +     /* Make sure the buf size is big enough even to handle unexpected server behavior */
+> > > +     buf = malloc(snap_inf.snapshot_array_size + 300);
+> >
+> > The buffer length calculations seem pretty arbitrary here, wouldn't it
+> > make sense to use something like the following (with a maximum limit)?
+> > sizeof(struct smb_snapshot_array) +
+> >         (snap_inf.number_of_snapshots * GMT_TOKEN_LEN)
+> >
+> > Cheers, David
 >
-> * We add a wait flag to cifsFileInfo_put() to decide whether we should
->   wait for running/pending oplock break handlers
 >
-> * We keep an additionnal reference of the SMB FileInfo handle so that
->   for the rest of the handler putting the handle won't close it.
->   - The ref is bumped everytime we queue the handler via the
->     cifs_queue_oplock_break() helper.
->   - The ref is decremented at the end of the handler
 >
-> This bug was triggered by xfstest 464.
->
-> Signed-off-by: Aurelien Aptel <aaptel@suse.com>
-> ---
-> changes since v2:
->
-> * add _cifsFileInfo_put() and make cifsFileInfo_put() a wrapper of it
->
-> fs/cifs/cifsglob.h |  2 ++
->  fs/cifs/file.c     | 30 +++++++++++++++++++++++++-----
->  fs/cifs/misc.c     | 25 +++++++++++++++++++++++--
->  fs/cifs/smb2misc.c |  6 +++---
->  4 files changed, 53 insertions(+), 10 deletions(-)
->
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 38feae812b47..ce0b1e8bc50c 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -1325,6 +1325,7 @@ cifsFileInfo_get_locked(struct cifsFileInfo *cifs_f=
-ile)
->  }
->
->  struct cifsFileInfo *cifsFileInfo_get(struct cifsFileInfo *cifs_file);
-> +void _cifsFileInfo_put(struct cifsFileInfo *cifs_file, bool wait_oplock_=
-hdlr);
->  void cifsFileInfo_put(struct cifsFileInfo *cifs_file);
->
->  #define CIFS_CACHE_READ_FLG    1
-> @@ -1847,6 +1848,7 @@ GLOBAL_EXTERN spinlock_t gidsidlock;
->  #endif /* CONFIG_CIFS_ACL */
->
->  void cifs_oplock_break(struct work_struct *work);
-> +void cifs_queue_oplock_break(struct cifsFileInfo *cfile);
->
->  extern const struct slow_work_ops cifs_oplock_break_ops;
->  extern struct workqueue_struct *cifsiod_wq;
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 89006e044973..9c0ccc06d172 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -360,12 +360,30 @@ cifsFileInfo_get(struct cifsFileInfo *cifs_file)
->         return cifs_file;
->  }
->
-> -/*
-> - * Release a reference on the file private data. This may involve closin=
-g
-> - * the filehandle out on the server. Must be called without holding
-> - * tcon->open_file_lock and cifs_file->file_info_lock.
-> +/**
-> + * cifsFileInfo_put - release a reference of file priv data
-> + *
-> + * Always potentially wait for oplock handler. See _cifsFileInfo_put().
->   */
->  void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
-> +{
-> +       _cifsFileInfo_put(cifs_file, true);
-> +}
-> +
-> +/**
-> + * _cifsFileInfo_put - release a reference of file priv data
-> + *
-> + * This may involve closing the filehandle @cifs_file out on the
-> + * server. Must be called without holding tcon->open_file_lock and
-> + * cifs_file->file_info_lock.
-> + *
-> + * If @wait_for_oplock_handler is true and we are releasing the last
-> + * reference, wait for any running oplock break handler of the file
-> + * and cancel any pending one. If calling this function from the
-> + * oplock break handler, you need to pass false.
-> + *
-> + */
-> +void _cifsFileInfo_put(struct cifsFileInfo *cifs_file, bool wait_oplock_=
-handler)
->  {
->         struct inode *inode =3D d_inode(cifs_file->dentry);
->         struct cifs_tcon *tcon =3D tlink_tcon(cifs_file->tlink);
-> @@ -414,7 +432,8 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
->
->         spin_unlock(&tcon->open_file_lock);
->
-> -       oplock_break_cancelled =3D cancel_work_sync(&cifs_file->oplock_br=
-eak);
-> +       oplock_break_cancelled =3D wait_oplock_handler ?
-> +               cancel_work_sync(&cifs_file->oplock_break) : false;
->
->         if (!tcon->need_reconnect && !cifs_file->invalidHandle) {
->                 struct TCP_Server_Info *server =3D tcon->ses->server;
-> @@ -4603,6 +4622,7 @@ void cifs_oplock_break(struct work_struct *work)
->                                                              cinode);
->                 cifs_dbg(FYI, "Oplock release rc =3D %d\n", rc);
->         }
-> +       _cifsFileInfo_put(cfile, false /* do not wait for ourself */);
->         cifs_done_oplock_break(cinode);
->  }
->
-> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-> index bee203055b30..1e1626a2cfc3 100644
-> --- a/fs/cifs/misc.c
-> +++ b/fs/cifs/misc.c
-> @@ -501,8 +501,7 @@ is_valid_oplock_break(char *buffer, struct TCP_Server=
-_Info *srv)
->                                            CIFS_INODE_DOWNGRADE_OPLOCK_TO=
-_L2,
->                                            &pCifsInode->flags);
->
-> -                               queue_work(cifsoplockd_wq,
-> -                                          &netfile->oplock_break);
-> +                               cifs_queue_oplock_break(netfile);
->                                 netfile->oplock_break_cancelled =3D false=
-;
->
->                                 spin_unlock(&tcon->open_file_lock);
-> @@ -607,6 +606,28 @@ void cifs_put_writer(struct cifsInodeInfo *cinode)
->         spin_unlock(&cinode->writers_lock);
->  }
->
-> +/**
-> + * cifs_queue_oplock_break - queue the oplock break handler for cfile
-> + *
-> + * This function is called from the demultiplex thread when it
-> + * receives an oplock break for @cfile.
-> + *
-> + * Assumes the tcon->open_file_lock is held.
-> + * Assumes cfile->file_info_lock is NOT held.
-> + */
-> +void cifs_queue_oplock_break(struct cifsFileInfo *cfile)
-> +{
-> +       /*
-> +        * Bump the handle refcount now while we hold the
-> +        * open_file_lock to enforce the validity of it for the oplock
-> +        * break handler. The matching put is done at the end of the
-> +        * handler.
-> +        */
-> +       cifsFileInfo_get(cfile);
-> +
-> +       queue_work(cifsoplockd_wq, &cfile->oplock_break);
-> +}
-> +
->  void cifs_done_oplock_break(struct cifsInodeInfo *cinode)
->  {
->         clear_bit(CIFS_INODE_PENDING_OPLOCK_BREAK, &cinode->flags);
-> diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-> index 0e3570e40ff8..e311f58dc1c8 100644
-> --- a/fs/cifs/smb2misc.c
-> +++ b/fs/cifs/smb2misc.c
-> @@ -555,7 +555,7 @@ smb2_tcon_has_lease(struct cifs_tcon *tcon, struct sm=
-b2_lease_break *rsp,
->                         clear_bit(CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2,
->                                   &cinode->flags);
->
-> -               queue_work(cifsoplockd_wq, &cfile->oplock_break);
-> +               cifs_queue_oplock_break(cfile);
->                 kfree(lw);
->                 return true;
->         }
-> @@ -712,8 +712,8 @@ smb2_is_valid_oplock_break(char *buffer, struct TCP_S=
-erver_Info *server)
->                                            CIFS_INODE_DOWNGRADE_OPLOCK_TO=
-_L2,
->                                            &cinode->flags);
->                                 spin_unlock(&cfile->file_info_lock);
-> -                               queue_work(cifsoplockd_wq,
-> -                                          &cfile->oplock_break);
-> +
-> +                               cifs_queue_oplock_break(cfile);
->
->                                 spin_unlock(&tcon->open_file_lock);
->                                 spin_unlock(&cifs_tcp_ses_lock);
 > --
-> 2.16.4
+> Thanks,
 >
+> Steve
 
-Looks good, thanks!
 
-Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
 
---
-Best regards,
-Pavel Shilovsky
+-- 
+Thanks,
+
+Steve
+
+--000000000000d2ac6a058540106a
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smbinfo-Add-ability-to-query-snapshots-previous-vers.patch"
+Content-Disposition: attachment; 
+	filename="0001-smbinfo-Add-ability-to-query-snapshots-previous-vers.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_jtuf1yug0>
+X-Attachment-Id: f_jtuf1yug0
+
+RnJvbSA0NmU5NTE3MTA1YTdjOWNiYjc0NGJlYTBlNzFmYjM1Yzc4MWEwYTYyIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IEZyaSwgMjkgTWFyIDIwMTkgMDM6MDU6NTUgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
+bWJpbmZvOiBBZGQgYWJpbGl0eSB0byBxdWVyeSBzbmFwc2hvdHMgKHByZXZpb3VzIHZlcnNpb25z
+KQoKICJzbWJpbmZvIGxpc3Qtc25hcHNob3RzIgoKU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNo
+IDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgpSZXZpZXdlZC1ieTogUm9ubmllIFNhaGxiZXJnIDxs
+c2FobGJlckByZWRoYXQuY29tPgotLS0KIHNtYmluZm8uYyAgIHwgODcgKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysKIHNtYmluZm8ucnN0IHwgIDIg
+KysKIDIgZmlsZXMgY2hhbmdlZCwgODkgaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL3NtYmlu
+Zm8uYyBiL3NtYmluZm8uYwppbmRleCAzM2ZjYTk1Li43Y2ZmYjg0IDEwMDY0NAotLS0gYS9zbWJp
+bmZvLmMKKysrIGIvc21iaW5mby5jCkBAIC04OSw2ICs4OSw4IEBAIHVzYWdlKGNoYXIgKm5hbWUp
+CiAJCSIgICAgICBQcmludHMgdGhlIHNlY3VyaXR5IGRlc2NyaXB0b3IgZm9yIGEgY2lmcyBmaWxl
+LlxuIgogCQkiICBxdW90YTpcbiIKIAkJIiAgICAgIFByaW50cyB0aGUgcXVvdGEgZm9yIGEgY2lm
+cyBmaWxlLlxuIgorCQkiICBsaXN0LXNuYXBzaG90czpcbiIKKwkJIiAgICAgIExpc3QgdGhlIHBy
+ZXZpb3VzIHZlcnNpb25zIG9mIHRoZSB2b2x1bWUgdGhhdCBiYWNrcyB0aGlzIGZpbGUuXG4iCiAJ
+CSIgIGZzY3RsLWdldG9iamlkOlxuIgogCQkiICAgICAgUHJpbnRzIHRoZSBvYmplY3RpZCBvZiB0
+aGUgZmlsZSBhbmQgR1VJRCBvZiB0aGUgdW5kZXJseWluZyB2b2x1bWUuXG4iLAogCQluYW1lKTsK
+QEAgLTk2Niw2ICs5NjgsODkgQEAgcXVvdGEoaW50IGYpCiAJZnJlZShxaSk7CiB9CiAKKworc3Ry
+dWN0IHNtYl9zbmFwc2hvdF9hcnJheSB7CisJaW50MzJfdAludW1iZXJfb2Zfc25hcHNob3RzOwor
+CWludDMyX3QJbnVtYmVyX29mX3NuYXBzaG90c19yZXR1cm5lZDsKKwlpbnQzMl90CXNuYXBzaG90
+X2FycmF5X3NpemU7CisJY2hhciBzbmFwc2hvdF9kYXRhWzBdOworfTsKKworCitzdGF0aWMgdm9p
+ZCBwcmludF9zbmFwc2hvdHMoc3RydWN0IHNtYl9zbmFwc2hvdF9hcnJheSAqcHNuYXApCit7CisJ
+aW50IGN1cnJlbnRfc25hcHNob3RfZW50cnkgPSAwOworCisJcHJpbnRmKCJOdW1iZXIgb2Ygc25h
+cHNob3RzOiAlZCBOdW1iZXIgb2Ygc25hcHNob3RzIHJldHVybmVkOiAlZFxuIiwKKwkJcHNuYXAt
+Pm51bWJlcl9vZl9zbmFwc2hvdHMsCisJCXBzbmFwLT5udW1iZXJfb2Zfc25hcHNob3RzX3JldHVy
+bmVkKTsKKwlwcmludGYoIlNuYXBzaG90IGxpc3Q6Iik7CisKKwlmb3IgKGludCBpID0gMDsgaSA8
+IHBzbmFwLT5zbmFwc2hvdF9hcnJheV9zaXplOyBpKyspIHsKKwkJaWYgKHBzbmFwLT5zbmFwc2hv
+dF9kYXRhW2ldID09ICdAJykgeworCQkJY3VycmVudF9zbmFwc2hvdF9lbnRyeSsrOworCQkJcHJp
+bnRmKCJcbiVkKSAiLCBjdXJyZW50X3NuYXBzaG90X2VudHJ5KTsKKwkJfQorCQlwcmludGYoIiVj
+IiwgcHNuYXAtPnNuYXBzaG90X2RhdGFbaV0pOworCX0KKwlwcmludGYoIlxuIik7Cit9CisKKyNk
+ZWZpbmUgQ0lGU19FTlVNRVJBVEVfU05BUFNIT1RTIF9JT1IoQ0lGU19JT0NUTF9NQUdJQywgNiwg
+c3RydWN0IHNtYl9zbmFwc2hvdF9hcnJheSkKKworI2RlZmluZSBNSU5fU05BUFNIT1RfQVJSQVlf
+U0laRSAxNiAvKiBTZWUgTVMtU01CMiBzZWN0aW9uIDMuMy41LjE1LjEgKi8KKworc3RhdGljIHZv
+aWQKK2xpc3Rfc25hcHNob3RzKGludCBmKQoreworCisJc3RydWN0IHNtYl9zbmFwc2hvdF9hcnJh
+eSBzbmFwX2luZjsKKwlzdHJ1Y3Qgc21iX3NuYXBzaG90X2FycmF5ICpidWY7CisKKwkvKgorCSAq
+IFdoZW4gZmlyc3QgZmllbGQgaW4gc3RydWN0dXJlIHdlIHBhc3MgaW4gaGVyZSBpcyB6ZXJvLCBj
+aWZzLmtvIGNhbgorCSAqIHJlY29nbml6ZSB0aGF0IHRoaXMgaXMgdGhlIGZpcnN0IHF1ZXJ5IGFu
+ZCB0aGF0IGl0IG11c3Qgc2V0IHRoZSBTTUIzCisJICogRlNDVEwgcmVzcG9uc2UgYnVmZmVyIHNp
+emUgKGluIHRoZSByZXF1ZXN0KSB0byBleGFjdGx5IDE2IGJ5dGVzCisJICogKHdoaWNoIGlzIHJl
+cXVpcmVkIGJ5IHNvbWUgc2VydmVycyB0byBwcm9jZXNzIHRoZSBpbml0aWFsIHF1ZXJ5KQorCSAq
+LworCXNuYXBfaW5mLm51bWJlcl9vZl9zbmFwc2hvdHMgPSAwOworCXNuYXBfaW5mLm51bWJlcl9v
+Zl9zbmFwc2hvdHNfcmV0dXJuZWQgPSAwOworCXNuYXBfaW5mLnNuYXBzaG90X2FycmF5X3NpemUg
+PSBzaXplb2Yoc3RydWN0IHNtYl9zbmFwc2hvdF9hcnJheSk7CisKKwkvKiBRdWVyeSB0aGUgbnVt
+YmVyIG9mIHNuYXBzaG90cyBzbyB3ZSBrbm93IGhvdyBtdWNoIHRvIGFsbG9jYXRlICovCisJaWYg
+KGlvY3RsKGYsIENJRlNfRU5VTUVSQVRFX1NOQVBTSE9UUywgJnNuYXBfaW5mKSA8IDApIHsKKwkJ
+ZnByaW50ZihzdGRlcnIsICJRdWVyeWluZyBzbmFwc2hvdHMgZmFpbGVkIHdpdGggJXNcbiIsIHN0
+cmVycm9yKGVycm5vKSk7CisJCWV4aXQoMSk7CisJfQorCisJaWYgKHNuYXBfaW5mLm51bWJlcl9v
+Zl9zbmFwc2hvdHMgPT0gMCkKKwkJcmV0dXJuOworCisJLyogTm93IHRoYXQgd2Uga25vdyB0aGUg
+c2l6ZSwgcXVlcnkgdGhlIGxpc3QgZnJvbSB0aGUgc2VydmVyICovCisKKwlidWYgPSBtYWxsb2Mo
+c25hcF9pbmYuc25hcHNob3RfYXJyYXlfc2l6ZSArIE1JTl9TTkFQU0hPVF9BUlJBWV9TSVpFKTsK
+KworCWlmIChidWYgPT0gTlVMTCkgeworCQlwcmludGYoIkZhaWxlZCwgb3V0IG9mIG1lbW9yeS5c
+biIpOworCQlleGl0KDEpOworCX0KKwkvKgorCSAqIGZpcnN0IHBhcm0gaXMgbm9uLXplcm8gd2hp
+Y2ggYWxsb3dzIGNpZnMua28gdG8gcmVjb2duaXplIHRoYXQgdGhpcyBpcworCSAqIHRoZSBzZWNv
+bmQgcXVlcnkgKGl0IGhhcyB0byBzZXQgcmVzcG9uc2UgYnVmIHNpemUgbGFyZ2VyKQorCSAqLwor
+CWJ1Zi0+bnVtYmVyX29mX3NuYXBzaG90cyA9IHNuYXBfaW5mLm51bWJlcl9vZl9zbmFwc2hvdHM7
+CisKKwlidWYtPnNuYXBzaG90X2FycmF5X3NpemUgPSBzbmFwX2luZi5zbmFwc2hvdF9hcnJheV9z
+aXplOworCisJaWYgKGlvY3RsKGYsIENJRlNfRU5VTUVSQVRFX1NOQVBTSE9UUywgYnVmKSA8IDAp
+IHsKKwkJZnByaW50ZihzdGRlcnIsICJRdWVyeWluZyBzbmFwc2hvdHMgZmFpbGVkIHdpdGggJXNc
+biIsIHN0cmVycm9yKGVycm5vKSk7CisJCWV4aXQoMSk7CisJfQorCisJcHJpbnRfc25hcHNob3Rz
+KGJ1Zik7CisJZnJlZShidWYpOworfQorCiBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJndltd
+KQogewogCWludCBjOwpAQCAtMTAxNiw2ICsxMTAxLDggQEAgaW50IG1haW4oaW50IGFyZ2MsIGNo
+YXIgKmFyZ3ZbXSkKIAkJc2VjZGVzYyhmKTsKIAllbHNlIGlmICghc3RyY21wKGFyZ3Zbb3B0aW5k
+XSwgInF1b3RhIikpCiAJCXF1b3RhKGYpOworCWVsc2UgaWYgKCFzdHJjbXAoYXJndltvcHRpbmRd
+LCAibGlzdC1zbmFwc2hvdHMiKSkKKwkJbGlzdF9zbmFwc2hvdHMoZik7CiAJZWxzZSBpZiAoIXN0
+cmNtcChhcmd2WzFdLCAiZnNjdGwtZ2V0b2JqaWQiKSkKIAkJZnNjdGxnZXRvYmppZChmKTsKIAll
+bHNlIHsKZGlmZiAtLWdpdCBhL3NtYmluZm8ucnN0IGIvc21iaW5mby5yc3QKaW5kZXggZmQ3ZjBm
+Zi4uMGM5NjA1MCAxMDA2NDQKLS0tIGEvc21iaW5mby5yc3QKKysrIGIvc21iaW5mby5yc3QKQEAg
+LTY0LDYgKzY0LDggQEAgQ09NTUFORAogCiBgZnNjdGwtZ2V0b2JqaWRgOiBQcmludHMgdGhlIE9i
+amVjdElECiAKK2BsaXN0LXNuYXBzaG90c2A6IExpc3RzIHRoZSBwcmV2aW91cyB2ZXJzaW9ucyBv
+ZiB0aGUgdm9sdW1lIHRoYXQgYmFja3MgdGhpcyBmaWxlCisKIGBxdW90YWA6IFByaW50IHRoZSBx
+dW90YSBmb3IgdGhlIHZvbHVtZSBpbiB0aGUgZm9ybQogLSBTSUQgTGVuZ3RoCiAtIENoYW5nZSBU
+aW1lCi0tIAoyLjE3LjEKCg==
+--000000000000d2ac6a058540106a--
