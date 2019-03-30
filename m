@@ -4,49 +4,49 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B952EC4360F
-	for <linux-cifs@archiver.kernel.org>; Sat, 30 Mar 2019 01:32:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFA0FC10F05
+	for <linux-cifs@archiver.kernel.org>; Sat, 30 Mar 2019 01:35:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8A7EF218E2
-	for <linux-cifs@archiver.kernel.org>; Sat, 30 Mar 2019 01:32:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9153E2183F
+	for <linux-cifs@archiver.kernel.org>; Sat, 30 Mar 2019 01:35:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1553909533;
-	bh=Qv5aealfddI2YBCXVAk7A0IzRyydbcaAY3WKEawdfnc=;
+	s=default; t=1553909743;
+	bh=+VIIgFlXfqldsNDNi6GUWQoRwvXcI2ASgOGIi6l84hM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=HykHIr7mcNY8/B4hI+CSgPcbjFsDYIECjO7UexyThGGNE0k13NT6bImchUYVdpMrJ
-	 2yuZI5q0DF0pwcFcq1FIFVP/bg2GelWqNqWWV9/7DFgPpmWnClIluHLMFMnFM7eFfp
-	 9DjYcU/PT6xwUZDPPy1Nn9idwx2U8eIQpRmhI4bY=
+	b=fflq3ocajnupFo4W/Wri5qzBgGZedsyF7LpPkNZwmYMmWhphaC+UqcGG7lh+75IBi
+	 9E1t9QUG0/igmluoPi7H1wOHOcsxH4tNRLnkYT3AP5OP5i3CzUR9YwOVWotbM0YIYU
+	 z+zEpWkPr1ND0AxpdYTUXLC+pY8jS0rn0wKSdhZ0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732290AbfC3BcM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 29 Mar 2019 21:32:12 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40124 "EHLO mail.kernel.org"
+        id S1732090AbfC3Bbj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 29 Mar 2019 21:31:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39324 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732244AbfC3BcL (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 29 Mar 2019 21:32:11 -0400
+        id S1732080AbfC3Bbi (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 29 Mar 2019 21:31:38 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id ADD53218FC;
-        Sat, 30 Mar 2019 01:32:09 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id D2EFB21773;
+        Sat, 30 Mar 2019 01:31:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1553909530;
-        bh=Qv5aealfddI2YBCXVAk7A0IzRyydbcaAY3WKEawdfnc=;
+        s=default; t=1553909497;
+        bh=+VIIgFlXfqldsNDNi6GUWQoRwvXcI2ASgOGIi6l84hM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=RwFWkPgqzBKdvdf8xKqUXoH0Qo10csipsDlz8ctCzrsxx6sbk3DIdNKbupQGGKNBm
-         vIovzUlN66kvhNXugW5fa3/8HOD9e9bKD+Bgf0a+82bSnznACKpD552Qs8v2BPL5Mg
-         5NGCn7FbEhWtljnxO+WMRX83frp9eAFth4O7Gdfw=
+        b=UDFwQsxyCzrXl+baT2NJCWlUrVZMsX+PRtF6cEuSY1+m/wo+hzcgTZAFfR6H8EGXH
+         VVjcoeh6dT5IqqUYebhLRnO02pAz2M5TlFFKckmR0EB18r8+COwXwBD3LRuakeRvqj
+         Xhc3oZ8S3lEsXQIklfJTfLs4OUYHoi/hK70Lu9GE=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 08/16] cifs: fallback to older infolevels on findfirst queryinfo retry
-Date:   Fri, 29 Mar 2019 21:31:52 -0400
-Message-Id: <20190330013200.1130-8-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 10/21] cifs: fallback to older infolevels on findfirst queryinfo retry
+Date:   Fri, 29 Mar 2019 21:31:01 -0400
+Message-Id: <20190330013112.784-10-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190330013200.1130-1-sashal@kernel.org>
-References: <20190330013200.1130-1-sashal@kernel.org>
+In-Reply-To: <20190330013112.784-1-sashal@kernel.org>
+References: <20190330013112.784-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -74,14 +74,14 @@ See kernel bugzilla 201435
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/cifs/inode.c | 69 +++++++++++++++++++++++++++----------------------
- 1 file changed, 38 insertions(+), 31 deletions(-)
+ fs/cifs/inode.c | 67 +++++++++++++++++++++++++++----------------------
+ 1 file changed, 37 insertions(+), 30 deletions(-)
 
 diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 5c3187df9ab9..d8bd8dd36211 100644
+index 57c938ffeb6e..a8a2fc9ae056 100644
 --- a/fs/cifs/inode.c
 +++ b/fs/cifs/inode.c
-@@ -759,43 +759,50 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+@@ -771,43 +771,50 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
  	} else if ((rc == -EACCES) && backup_cred(cifs_sb) &&
  		   (strcmp(server->vals->version_string, SMB1_VERSION_STRING)
  		      == 0)) {
@@ -90,19 +90,18 @@ index 5c3187df9ab9..d8bd8dd36211 100644
 -			 * sent if needed on open and there is no path based
 -			 * FindFirst operation to use to retry with
 -			 */
--
++		/*
++		 * For SMB2 and later the backup intent flag is already
++		 * sent if needed on open and there is no path based
++		 * FindFirst operation to use to retry with
++		 */
+ 
 -			srchinf = kzalloc(sizeof(struct cifs_search_info),
 -						GFP_KERNEL);
 -			if (srchinf == NULL) {
 -				rc = -ENOMEM;
 -				goto cgii_exit;
 -			}
-+		/*
-+		 * For SMB2 and later the backup intent flag is already
-+		 * sent if needed on open and there is no path based
-+		 * FindFirst operation to use to retry with
-+		 */
-+
 +		srchinf = kzalloc(sizeof(struct cifs_search_info),
 +					GFP_KERNEL);
 +		if (srchinf == NULL) {
