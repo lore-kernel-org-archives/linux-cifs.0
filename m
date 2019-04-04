@@ -2,598 +2,844 @@ Return-Path: <SRS0=TNZY=SG=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89C60C4360F
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Apr 2019 16:59:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0238C4360F
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 Apr 2019 17:17:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 34AEE206DD
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Apr 2019 16:59:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3FE7E206BA
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 Apr 2019 17:17:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OaUckRNy"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=paulo.ac header.i=@paulo.ac header.b="ASKKhKyn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727415AbfDDQ7T (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 4 Apr 2019 12:59:19 -0400
-Received: from mail-lj1-f170.google.com ([209.85.208.170]:46330 "EHLO
-        mail-lj1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727051AbfDDQ7T (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 4 Apr 2019 12:59:19 -0400
-Received: by mail-lj1-f170.google.com with SMTP id h21so2707783ljk.13
-        for <linux-cifs@vger.kernel.org>; Thu, 04 Apr 2019 09:59:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=PK7aQ5HlFHbq40emi6xBhFowhTutB+1pb4YkDKWz3uE=;
-        b=OaUckRNyhlG25kX4XLWbw+TfNI36SoXJ29irJXovzKZiz1lYgkqdl7NeQMp2fl1fiB
-         BxHPB/nQtjj064VIpMGWQ4A3wL1CvNdekak5/hs8/F41i+e/i6lRZZzy451+TRYVyKcV
-         6ywGJaNdzoWjFp36vit6joeRZOTyZ1GI2TrDqOvS9Cfdy/Lr5nIJ1TYRPM3PkDy+noQ2
-         FAZEbG0jbimWhCz7X7SWMurkjvOnm7wvPxDbwel3wOGbQiXYBwmMmci8IpG2QCqvj2Og
-         rhrhDdbqJrufVg0+Za148UJ2CdwJJfHKNQGGzCuCsXNKs8fc4giqkkDCKFgExTPdMZx8
-         VeqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=PK7aQ5HlFHbq40emi6xBhFowhTutB+1pb4YkDKWz3uE=;
-        b=YOKdNrWx+tlr1krlr5Z31pJok5wdc4pL6gvFs/mtdXzpKZYmSdg7cy7HNfjLsRgqYw
-         rDDiGCIu/S5C0Uj285oKYvGaYHb4hLUJpUX/ZF92a7yH9wcBua73lZGhQ2AO1DR76z89
-         PtLfKIYDpKUgVAmm6FvKT1yjFOhLR1RfF3es6y7Id5KBj9HQKffeSAliq0Zv6F2UVOBI
-         GCuPIwlHXeZnbTCh3GBZ8/tvC6ntuJwJKfUB36bklN19rtGcLZKiujuqbwBalCNNZ8aP
-         8+nBGgKxhr6X6uxlTaCYG5OoAQvc4/HnP6KA1LpJfvx9Nykjo6S3d5IzWeVfTWccx18g
-         oVsw==
-X-Gm-Message-State: APjAAAW6AanO/FufKKs8IVmI7ok6rcpkiNr4GOygsVgh38GzLrvTwfxc
-        o31IFdvbbBIAMptx1b7Mw6hCnY5IPY/uuHtdhA==
-X-Google-Smtp-Source: APXvYqwmKrknAmPDIVvPxtCj7WCmwn/4K5zZQ1lldurbZxIoUJkenT3N3UjIFh7sxXgrVuXoI9wTvpCZYo+hGCPxtog=
-X-Received: by 2002:a2e:3207:: with SMTP id y7mr4290440ljy.117.1554397155397;
- Thu, 04 Apr 2019 09:59:15 -0700 (PDT)
-MIME-Version: 1.0
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Thu, 4 Apr 2019 09:59:04 -0700
-Message-ID: <CAKywueQXe4QZyTZBi+HjXhD5LJKrOWOHmKAhfRP0B7rYO2RXew@mail.gmail.com>
-Subject: current patches for cifs-utils release
-To:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
-        Paulo Alcantara <paulo@paulo.ac>,
+        id S1728650AbfDDRRV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 4 Apr 2019 13:17:21 -0400
+Received: from mail.paulo.ac ([51.15.136.203]:50288 "EHLO mail.paulo.ac"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727152AbfDDRRV (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 4 Apr 2019 13:17:21 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by mail.paulo.ac (Postfix) with ESMTP id 0D7A11C17C7
+        for <linux-cifs@vger.kernel.org>; Thu,  4 Apr 2019 17:17:17 +0000 (UTC)
+X-Amavis-Alert: BAD HEADER SECTION, Duplicate header field: "Cc"
+From:   Paulo Alcantara <paulo@paulo.ac>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=paulo.ac; s=201902;
+        t=1554398236; bh=W9TUw15msX7A7/kf3TeNT+eYBjQsMs6NG8bNg/mYV3E=;
+        h=From:To:Cc:Cc:Subject:In-Reply-To:References:Date:From;
+        b=ASKKhKynK5r980diLGE9wPwbPF6ZmzNEUT/UuhsUPzLRCubky1lU2+0pRjOagA6yf
+         bNNL6QFIofvx48fC++ufQv2kqhB0eP0mftxB385FQqX7T4+ASCjft8+OAb45hQ0gJs
+         ACI+LrGTspisCfSNHqiIGhJqx8GtxrmYzkTWXczZjq2k5ilZYPZE83o2jvPaPY+P7M
+         /vgNO90yYNffbganGLpJkhwK0hx4bNDEC7XDUoYxg363paB5BMGDpkrsN7XqXogY+6
+         4HNBn7uSzlinYtotWTZWjQN8hf8mCfFGtkfJmwVCEnVdoiuTay8knj7eRJdQEH5gfo
+         AXpo4/h53Gm4Q==
+To:     Pavel Shilovsky <piastryyy@gmail.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>,
         Steve French <smfrench@gmail.com>
 Cc:     linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="0000000000004a79950585b74a15"
+Subject: Re: current patches for cifs-utils release
+In-Reply-To: <CAKywueQXe4QZyTZBi+HjXhD5LJKrOWOHmKAhfRP0B7rYO2RXew@mail.gmail.com>
+References: <CAKywueQXe4QZyTZBi+HjXhD5LJKrOWOHmKAhfRP0B7rYO2RXew@mail.gmail.com>
+Date:   Thu, 04 Apr 2019 14:16:54 -0300
+Message-ID: <875zrtg06x.fsf@paulo.ac>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha512; protocol="application/pgp-signature"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---0000000000004a79950585b74a15
-Content-Type: text/plain; charset="UTF-8"
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+Hi,
 
-for-next branch is updated with the patches in attachments (resulting
-of merging some of the patches and fixing up some minor style
-problems):
+Pavel Shilovsky <piastryyy@gmail.com> writes:
 
-https://github.com/piastry/cifs-utils/commits/next
+> Hi all,
+>
+> for-next branch is updated with the patches in attachments (resulting
+> of merging some of the patches and fixing up some minor style
+> problems):
+>
+> https://github.com/piastry/cifs-utils/commits/next
+>
+> Please take a look if anything is missed.
 
-Please take a look if anything is missed.
+Looks good to me. Thanks!
 
---
-Best regards,
-Pavel Shilovsky
+Reviewed-by: Paulo Alcantara <palcantara@suse.de>
 
---0000000000004a79950585b74a15
-Content-Type: application/octet-stream; 
-	name="0001-smbinfo-Add-ability-to-query-snapshots-previous-vers.patch"
-Content-Disposition: attachment; 
-	filename="0001-smbinfo-Add-ability-to-query-snapshots-previous-vers.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ju2vpx550>
-X-Attachment-Id: f_ju2vpx550
+cheers,
+Paulo
 
-RnJvbSA3Y2YxNjRiMGZiZGRjYzM0MzIyNmRmN2UwOTZlY2Q4MjA4MGYzMzUwIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IEZyaSwgMjkgTWFyIDIwMTkgMDM6MDU6NTUgLTA1MDAKU3ViamVjdDogW1BBVENIIDEv
-N10gc21iaW5mbzogQWRkIGFiaWxpdHkgdG8gcXVlcnkgc25hcHNob3RzIChwcmV2aW91cwogdmVy
-c2lvbnMpCgogInNtYmluZm8gbGlzdC1zbmFwc2hvdHMiCgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBG
-cmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+ClNpZ25lZC1vZmYtYnk6IFBhdmVsIFNoaWxv
-dnNreSA8cHNoaWxvdkBtaWNyb3NvZnQuY29tPgotLS0KIHNtYmluZm8uYyAgIHwgMTA4ICsrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLQog
-c21iaW5mby5yc3QgfCAgIDIgKysKIDIgZmlsZXMgY2hhbmdlZCwgMTA5IGluc2VydGlvbnMoKyks
-IDEgZGVsZXRpb24oLSkKCmRpZmYgLS1naXQgYS9zbWJpbmZvLmMgYi9zbWJpbmZvLmMKaW5kZXgg
-MzNmY2E5NS4uYWRmZDg1ZSAxMDA2NDQKLS0tIGEvc21iaW5mby5jCisrKyBiL3NtYmluZm8uYwpA
-QCAtODksNiArODksOCBAQCB1c2FnZShjaGFyICpuYW1lKQogCQkiICAgICAgUHJpbnRzIHRoZSBz
-ZWN1cml0eSBkZXNjcmlwdG9yIGZvciBhIGNpZnMgZmlsZS5cbiIKIAkJIiAgcXVvdGE6XG4iCiAJ
-CSIgICAgICBQcmludHMgdGhlIHF1b3RhIGZvciBhIGNpZnMgZmlsZS5cbiIKKwkJIiAgbGlzdC1z
-bmFwc2hvdHM6XG4iCisJCSIgICAgICBMaXN0IHRoZSBwcmV2aW91cyB2ZXJzaW9ucyBvZiB0aGUg
-dm9sdW1lIHRoYXQgYmFja3MgdGhpcyBmaWxlLlxuIgogCQkiICBmc2N0bC1nZXRvYmppZDpcbiIK
-IAkJIiAgICAgIFByaW50cyB0aGUgb2JqZWN0aWQgb2YgdGhlIGZpbGUgYW5kIEdVSUQgb2YgdGhl
-IHVuZGVybHlpbmcgdm9sdW1lLlxuIiwKIAkJbmFtZSk7CkBAIC04ODIsNyArODg0LDYgQEAgcHJp
-bnRfcXVvdGEodW5zaWduZWQgY2hhciAqc2QpCiAJdWludDMyX3QgdTMyLCBuZW87CiAJdWludDY0
-X3QgdTY0OwogCXN0cnVjdCB0aW1ldmFsIHR2OwotCXN0cnVjdCB0bTsKIAlpbnQgaSwgb2ZmID0g
-MDsKIAogb25lX21vcmU6CkBAIC05NjYsNiArOTY3LDEwOSBAQCBxdW90YShpbnQgZikKIAlmcmVl
-KHFpKTsKIH0KIAorCitzdHJ1Y3Qgc21iX3NuYXBzaG90X2FycmF5IHsKKwlpbnQzMl90CW51bWJl
-cl9vZl9zbmFwc2hvdHM7CisJaW50MzJfdAludW1iZXJfb2Zfc25hcHNob3RzX3JldHVybmVkOwor
-CWludDMyX3QJc25hcHNob3RfYXJyYXlfc2l6ZTsKKwljaGFyIHNuYXBzaG90X2RhdGFbMF07Cit9
-OworCisKKyNkZWZpbmUgR01UX05BTUVfTEVOIDI0IC8qIGxlbmd0aCBvZiBhIEBHTVQtIG5hbWUg
-Ki8KKyNkZWZpbmUgR01UX0ZPUk1BVCAiQEdNVC0lWS4lbS4lZC0lSC4lTS4lUyIKKworI2RlZmlu
-ZSBOVEZTX1RJTUVfT0ZGU0VUICgodW5zaWduZWQgbG9uZyBsb25nKSgzNjkqMzY1ICsgODkpICog
-MjQgKiAzNjAwICogMTAwMDAwMDApCisKK3N0YXRpYyB2b2lkIHByaW50X3NuYXBzaG90cyhzdHJ1
-Y3Qgc21iX3NuYXBzaG90X2FycmF5ICpwc25hcCkKK3sKKwlpbnQgY3VycmVudF9zbmFwc2hvdF9l
-bnRyeSA9IDA7CisJY2hhciBnbXRfdG9rZW5bR01UX05BTUVfTEVOICsgMV0gPSB7MH07CisJaW50
-IGk7CisJaW50IGogPSAwOworCXN0cnVjdCB0bSB0bTsKKwl1bnNpZ25lZCBsb25nIGxvbmcgZGNl
-X3RpbWU7CisKKwlwcmludGYoIk51bWJlciBvZiBzbmFwc2hvdHM6ICVkIE51bWJlciBvZiBzbmFw
-c2hvdHMgcmV0dXJuZWQ6ICVkXG4iLAorCQlwc25hcC0+bnVtYmVyX29mX3NuYXBzaG90cywKKwkJ
-cHNuYXAtPm51bWJlcl9vZl9zbmFwc2hvdHNfcmV0dXJuZWQpOworCXByaW50ZigiU25hcHNob3Qg
-bGlzdCBpbiBHTVQgKENvb3JkaW5hdGVkIFVUQyBUaW1lKSBhbmQgU01CIGZvcm1hdCAoMTAwIG5h
-bm9zZWNvbmQgdW5pdHMgbmVlZGVkIGZvciBzbmFwc2hvdCBtb3VudHMpOiIpOworCWZvciAoaSA9
-IDA7IGkgPCBwc25hcC0+c25hcHNob3RfYXJyYXlfc2l6ZTsgaSsrKSB7CisJCWlmIChwc25hcC0+
-c25hcHNob3RfZGF0YVtpXSA9PSAnQCcpIHsKKwkJCWogPSAwOworCQkJY3VycmVudF9zbmFwc2hv
-dF9lbnRyeSsrOworCQkJcHJpbnRmKCJcbiVkKSBHTVQ6IiwgY3VycmVudF9zbmFwc2hvdF9lbnRy
-eSk7CisJCX0KKwkJaWYgKHBzbmFwLT5zbmFwc2hvdF9kYXRhW2ldICE9IDApIHsKKwkJCWdtdF90
-b2tlbltqXSA9IHBzbmFwLT5zbmFwc2hvdF9kYXRhW2ldOworCQkJaisrOworCQl9CisJCWlmIChq
-ID09IEdNVF9OQU1FX0xFTikgeworCQkJcHJpbnRmKCIlcyIsIGdtdF90b2tlbik7CisJCQlqID0g
-MDsKKwkJCXN0cnB0aW1lKGdtdF90b2tlbiwgR01UX0ZPUk1BVCwgJnRtKTsKKwkJCWRjZV90aW1l
-ID0gdGltZWdtKCZ0bSkgKiAxMDAwMDAwMCArIE5URlNfVElNRV9PRkZTRVQ7CisJCQlwcmludGYo
-IlxuICAgU01CMzolbGx1IiwgZGNlX3RpbWUpOworCQl9CisJfQorCXByaW50ZigiXG4iKTsKK30K
-KworI2RlZmluZSBDSUZTX0VOVU1FUkFURV9TTkFQU0hPVFMgX0lPUihDSUZTX0lPQ1RMX01BR0lD
-LCA2LCBzdHJ1Y3Qgc21iX3NuYXBzaG90X2FycmF5KQorCisjZGVmaW5lIE1JTl9TTkFQU0hPVF9B
-UlJBWV9TSVpFIDE2IC8qIFNlZSBNUy1TTUIyIHNlY3Rpb24gMy4zLjUuMTUuMSAqLworCitzdGF0
-aWMgdm9pZAorbGlzdF9zbmFwc2hvdHMoaW50IGYpCit7CisKKwlzdHJ1Y3Qgc21iX3NuYXBzaG90
-X2FycmF5IHNuYXBfaW5mOworCXN0cnVjdCBzbWJfc25hcHNob3RfYXJyYXkgKmJ1ZjsKKworCS8q
-CisJICogV2hlbiBmaXJzdCBmaWVsZCBpbiBzdHJ1Y3R1cmUgd2UgcGFzcyBpbiBoZXJlIGlzIHpl
-cm8sIGNpZnMua28gY2FuCisJICogcmVjb2duaXplIHRoYXQgdGhpcyBpcyB0aGUgZmlyc3QgcXVl
-cnkgYW5kIHRoYXQgaXQgbXVzdCBzZXQgdGhlIFNNQjMKKwkgKiBGU0NUTCByZXNwb25zZSBidWZm
-ZXIgc2l6ZSAoaW4gdGhlIHJlcXVlc3QpIHRvIGV4YWN0bHkgMTYgYnl0ZXMKKwkgKiAod2hpY2gg
-aXMgcmVxdWlyZWQgYnkgc29tZSBzZXJ2ZXJzIHRvIHByb2Nlc3MgdGhlIGluaXRpYWwgcXVlcnkp
-CisJICovCisJc25hcF9pbmYubnVtYmVyX29mX3NuYXBzaG90cyA9IDA7CisJc25hcF9pbmYubnVt
-YmVyX29mX3NuYXBzaG90c19yZXR1cm5lZCA9IDA7CisJc25hcF9pbmYuc25hcHNob3RfYXJyYXlf
-c2l6ZSA9IHNpemVvZihzdHJ1Y3Qgc21iX3NuYXBzaG90X2FycmF5KTsKKworCS8qIFF1ZXJ5IHRo
-ZSBudW1iZXIgb2Ygc25hcHNob3RzIHNvIHdlIGtub3cgaG93IG11Y2ggdG8gYWxsb2NhdGUgKi8K
-KwlpZiAoaW9jdGwoZiwgQ0lGU19FTlVNRVJBVEVfU05BUFNIT1RTLCAmc25hcF9pbmYpIDwgMCkg
-eworCQlmcHJpbnRmKHN0ZGVyciwgIlF1ZXJ5aW5nIHNuYXBzaG90cyBmYWlsZWQgd2l0aCAlc1xu
-Iiwgc3RyZXJyb3IoZXJybm8pKTsKKwkJZXhpdCgxKTsKKwl9CisKKwlpZiAoc25hcF9pbmYubnVt
-YmVyX29mX3NuYXBzaG90cyA9PSAwKQorCQlyZXR1cm47CisKKwkvKiBOb3cgdGhhdCB3ZSBrbm93
-IHRoZSBzaXplLCBxdWVyeSB0aGUgbGlzdCBmcm9tIHRoZSBzZXJ2ZXIgKi8KKworCWJ1ZiA9IG1h
-bGxvYyhzbmFwX2luZi5zbmFwc2hvdF9hcnJheV9zaXplICsgTUlOX1NOQVBTSE9UX0FSUkFZX1NJ
-WkUpOworCisJaWYgKGJ1ZiA9PSBOVUxMKSB7CisJCXByaW50ZigiRmFpbGVkLCBvdXQgb2YgbWVt
-b3J5LlxuIik7CisJCWV4aXQoMSk7CisJfQorCS8qCisJICogZmlyc3QgcGFybSBpcyBub24temVy
-byB3aGljaCBhbGxvd3MgY2lmcy5rbyB0byByZWNvZ25pemUgdGhhdCB0aGlzIGlzCisJICogdGhl
-IHNlY29uZCBxdWVyeSAoaXQgaGFzIHRvIHNldCByZXNwb25zZSBidWYgc2l6ZSBsYXJnZXIpCisJ
-ICovCisJYnVmLT5udW1iZXJfb2Zfc25hcHNob3RzID0gc25hcF9pbmYubnVtYmVyX29mX3NuYXBz
-aG90czsKKworCWJ1Zi0+c25hcHNob3RfYXJyYXlfc2l6ZSA9IHNuYXBfaW5mLnNuYXBzaG90X2Fy
-cmF5X3NpemU7CisKKwlpZiAoaW9jdGwoZiwgQ0lGU19FTlVNRVJBVEVfU05BUFNIT1RTLCBidWYp
-IDwgMCkgeworCQlmcHJpbnRmKHN0ZGVyciwgIlF1ZXJ5aW5nIHNuYXBzaG90cyBmYWlsZWQgd2l0
-aCAlc1xuIiwgc3RyZXJyb3IoZXJybm8pKTsKKwkJZXhpdCgxKTsKKwl9CisKKwlwcmludF9zbmFw
-c2hvdHMoYnVmKTsKKwlmcmVlKGJ1Zik7Cit9CisKIGludCBtYWluKGludCBhcmdjLCBjaGFyICph
-cmd2W10pCiB7CiAJaW50IGM7CkBAIC0xMDE2LDYgKzExMjAsOCBAQCBpbnQgbWFpbihpbnQgYXJn
-YywgY2hhciAqYXJndltdKQogCQlzZWNkZXNjKGYpOwogCWVsc2UgaWYgKCFzdHJjbXAoYXJndltv
-cHRpbmRdLCAicXVvdGEiKSkKIAkJcXVvdGEoZik7CisJZWxzZSBpZiAoIXN0cmNtcChhcmd2W29w
-dGluZF0sICJsaXN0LXNuYXBzaG90cyIpKQorCQlsaXN0X3NuYXBzaG90cyhmKTsKIAllbHNlIGlm
-ICghc3RyY21wKGFyZ3ZbMV0sICJmc2N0bC1nZXRvYmppZCIpKQogCQlmc2N0bGdldG9iamlkKGYp
-OwogCWVsc2UgewpkaWZmIC0tZ2l0IGEvc21iaW5mby5yc3QgYi9zbWJpbmZvLnJzdAppbmRleCBm
-ZDdmMGZmLi4wYzk2MDUwIDEwMDY0NAotLS0gYS9zbWJpbmZvLnJzdAorKysgYi9zbWJpbmZvLnJz
-dApAQCAtNjQsNiArNjQsOCBAQCBDT01NQU5ECiAKIGBmc2N0bC1nZXRvYmppZGA6IFByaW50cyB0
-aGUgT2JqZWN0SUQKIAorYGxpc3Qtc25hcHNob3RzYDogTGlzdHMgdGhlIHByZXZpb3VzIHZlcnNp
-b25zIG9mIHRoZSB2b2x1bWUgdGhhdCBiYWNrcyB0aGlzIGZpbGUKKwogYHF1b3RhYDogUHJpbnQg
-dGhlIHF1b3RhIGZvciB0aGUgdm9sdW1lIGluIHRoZSBmb3JtCiAtIFNJRCBMZW5ndGgKIC0gQ2hh
-bmdlIFRpbWUKLS0gCjIuNy40Cgo=
---0000000000004a79950585b74a15
-Content-Type: application/octet-stream; 
-	name="0005-mount.cifs-detect-GMT-format-of-snapshot-version.patch"
-Content-Disposition: attachment; 
-	filename="0005-mount.cifs-detect-GMT-format-of-snapshot-version.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ju2vpx644>
-X-Attachment-Id: f_ju2vpx644
+>
+> --
+> Best regards,
+> Pavel Shilovsky
+> From 7cf164b0fbddcc343226df7e096ecd82080f3350 Mon Sep 17 00:00:00 2001
+> From: Steve French <stfrench@microsoft.com>
+> Date: Fri, 29 Mar 2019 03:05:55 -0500
+> Subject: [PATCH 1/7] smbinfo: Add ability to query snapshots (previous
+>  versions)
+>
+>  "smbinfo list-snapshots"
+>
+> Signed-off-by: Steve French <stfrench@microsoft.com>
+> Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
+> ---
+>  smbinfo.c   | 108 ++++++++++++++++++++++++++++++++++++++++++++++++++++++=
++++++-
+>  smbinfo.rst |   2 ++
+>  2 files changed, 109 insertions(+), 1 deletion(-)
+>
+> diff --git a/smbinfo.c b/smbinfo.c
+> index 33fca95..adfd85e 100644
+> --- a/smbinfo.c
+> +++ b/smbinfo.c
+> @@ -89,6 +89,8 @@ usage(char *name)
+>  		"      Prints the security descriptor for a cifs file.\n"
+>  		"  quota:\n"
+>  		"      Prints the quota for a cifs file.\n"
+> +		"  list-snapshots:\n"
+> +		"      List the previous versions of the volume that backs this file.\=
+n"
+>  		"  fsctl-getobjid:\n"
+>  		"      Prints the objectid of the file and GUID of the underlying volu=
+me.\n",
+>  		name);
+> @@ -882,7 +884,6 @@ print_quota(unsigned char *sd)
+>  	uint32_t u32, neo;
+>  	uint64_t u64;
+>  	struct timeval tv;
+> -	struct tm;
+>  	int i, off =3D 0;
+>=20=20
+>  one_more:
+> @@ -966,6 +967,109 @@ quota(int f)
+>  	free(qi);
+>  }
+>=20=20
+> +
+> +struct smb_snapshot_array {
+> +	int32_t	number_of_snapshots;
+> +	int32_t	number_of_snapshots_returned;
+> +	int32_t	snapshot_array_size;
+> +	char snapshot_data[0];
+> +};
+> +
+> +
+> +#define GMT_NAME_LEN 24 /* length of a @GMT- name */
+> +#define GMT_FORMAT "@GMT-%Y.%m.%d-%H.%M.%S"
+> +
+> +#define NTFS_TIME_OFFSET ((unsigned long long)(369*365 + 89) * 24 * 3600=
+ * 10000000)
+> +
+> +static void print_snapshots(struct smb_snapshot_array *psnap)
+> +{
+> +	int current_snapshot_entry =3D 0;
+> +	char gmt_token[GMT_NAME_LEN + 1] =3D {0};
+> +	int i;
+> +	int j =3D 0;
+> +	struct tm tm;
+> +	unsigned long long dce_time;
+> +
+> +	printf("Number of snapshots: %d Number of snapshots returned: %d\n",
+> +		psnap->number_of_snapshots,
+> +		psnap->number_of_snapshots_returned);
+> +	printf("Snapshot list in GMT (Coordinated UTC Time) and SMB format (100=
+ nanosecond units needed for snapshot mounts):");
+> +	for (i =3D 0; i < psnap->snapshot_array_size; i++) {
+> +		if (psnap->snapshot_data[i] =3D=3D '@') {
+> +			j =3D 0;
+> +			current_snapshot_entry++;
+> +			printf("\n%d) GMT:", current_snapshot_entry);
+> +		}
+> +		if (psnap->snapshot_data[i] !=3D 0) {
+> +			gmt_token[j] =3D psnap->snapshot_data[i];
+> +			j++;
+> +		}
+> +		if (j =3D=3D GMT_NAME_LEN) {
+> +			printf("%s", gmt_token);
+> +			j =3D 0;
+> +			strptime(gmt_token, GMT_FORMAT, &tm);
+> +			dce_time =3D timegm(&tm) * 10000000 + NTFS_TIME_OFFSET;
+> +			printf("\n   SMB3:%llu", dce_time);
+> +		}
+> +	}
+> +	printf("\n");
+> +}
+> +
+> +#define CIFS_ENUMERATE_SNAPSHOTS _IOR(CIFS_IOCTL_MAGIC, 6, struct smb_sn=
+apshot_array)
+> +
+> +#define MIN_SNAPSHOT_ARRAY_SIZE 16 /* See MS-SMB2 section 3.3.5.15.1 */
+> +
+> +static void
+> +list_snapshots(int f)
+> +{
+> +
+> +	struct smb_snapshot_array snap_inf;
+> +	struct smb_snapshot_array *buf;
+> +
+> +	/*
+> +	 * When first field in structure we pass in here is zero, cifs.ko can
+> +	 * recognize that this is the first query and that it must set the SMB3
+> +	 * FSCTL response buffer size (in the request) to exactly 16 bytes
+> +	 * (which is required by some servers to process the initial query)
+> +	 */
+> +	snap_inf.number_of_snapshots =3D 0;
+> +	snap_inf.number_of_snapshots_returned =3D 0;
+> +	snap_inf.snapshot_array_size =3D sizeof(struct smb_snapshot_array);
+> +
+> +	/* Query the number of snapshots so we know how much to allocate */
+> +	if (ioctl(f, CIFS_ENUMERATE_SNAPSHOTS, &snap_inf) < 0) {
+> +		fprintf(stderr, "Querying snapshots failed with %s\n", strerror(errno)=
+);
+> +		exit(1);
+> +	}
+> +
+> +	if (snap_inf.number_of_snapshots =3D=3D 0)
+> +		return;
+> +
+> +	/* Now that we know the size, query the list from the server */
+> +
+> +	buf =3D malloc(snap_inf.snapshot_array_size + MIN_SNAPSHOT_ARRAY_SIZE);
+> +
+> +	if (buf =3D=3D NULL) {
+> +		printf("Failed, out of memory.\n");
+> +		exit(1);
+> +	}
+> +	/*
+> +	 * first parm is non-zero which allows cifs.ko to recognize that this is
+> +	 * the second query (it has to set response buf size larger)
+> +	 */
+> +	buf->number_of_snapshots =3D snap_inf.number_of_snapshots;
+> +
+> +	buf->snapshot_array_size =3D snap_inf.snapshot_array_size;
+> +
+> +	if (ioctl(f, CIFS_ENUMERATE_SNAPSHOTS, buf) < 0) {
+> +		fprintf(stderr, "Querying snapshots failed with %s\n", strerror(errno)=
+);
+> +		exit(1);
+> +	}
+> +
+> +	print_snapshots(buf);
+> +	free(buf);
+> +}
+> +
+>  int main(int argc, char *argv[])
+>  {
+>  	int c;
+> @@ -1016,6 +1120,8 @@ int main(int argc, char *argv[])
+>  		secdesc(f);
+>  	else if (!strcmp(argv[optind], "quota"))
+>  		quota(f);
+> +	else if (!strcmp(argv[optind], "list-snapshots"))
+> +		list_snapshots(f);
+>  	else if (!strcmp(argv[1], "fsctl-getobjid"))
+>  		fsctlgetobjid(f);
+>  	else {
+> diff --git a/smbinfo.rst b/smbinfo.rst
+> index fd7f0ff..0c96050 100644
+> --- a/smbinfo.rst
+> +++ b/smbinfo.rst
+> @@ -64,6 +64,8 @@ COMMAND
+>=20=20
+>  `fsctl-getobjid`: Prints the ObjectID
+>=20=20
+> +`list-snapshots`: Lists the previous versions of the volume that backs t=
+his file
+> +
+>  `quota`: Print the quota for the volume in the form
+>  - SID Length
+>  - Change Time
+> --=20
+> 2.7.4
+>
+> From e8b8bb5fa61c53b05975650194da24786c4a4f32 Mon Sep 17 00:00:00 2001
+> From: Pavel Shilovsky <pshilov@microsoft.com>
+> Date: Wed, 3 Apr 2019 22:42:10 +0000
+> Subject: [PATCH 5/7] mount.cifs: detect GMT format of snapshot version
+>
+> In order to provide an easy way to access snapshots a GMT
+> token string should be allowed as a "snapshot" mount option
+> argument, not SMB 100-nanoseconds time only. Detect if the
+> argument is in GMT format and convert it to SMB 100-nanoseconds
+> time before passing to the kernel.
+>
+> Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
+> ---
+>  mount.cifs.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 47 insertions(+), 7 deletions(-)
+>
+> diff --git a/mount.cifs.c b/mount.cifs.c
+> index c6a1bd6..b3235e4 100644
+> --- a/mount.cifs.c
+> +++ b/mount.cifs.c
+> @@ -43,6 +43,7 @@
+>  #include <limits.h>
+>  #include <paths.h>
+>  #include <libgen.h>
+> +#include <time.h>
+>  #include <sys/mman.h>
+>  #include <sys/wait.h>
+>  #ifdef HAVE_SYS_FSUID_H
+> @@ -161,10 +162,16 @@
+>  #define OPT_BKUPUID    30
+>  #define OPT_BKUPGID    31
+>  #define OPT_NOFAIL     32
+> +#define OPT_SNAPSHOT   33
+>=20=20
+>  #define MNT_TMP_FILE "/.mtab.cifs.XXXXXX"
+>=20=20
+> -/* struct for holding parsed mount info for use by privleged process */
+> +#define GMT_NAME_LEN 24 /* length of a @GMT- name */
+> +#define GMT_FORMAT "@GMT-%Y.%m.%d-%H.%M.%S"
+> +
+> +#define NTFS_TIME_OFFSET ((unsigned long long)(369*365 + 89) * 24 * 3600=
+ * 10000000)
+> +
+> +/* struct for holding parsed mount info for use by privileged process */
+>  struct parsed_mount_info {
+>  	unsigned long flags;
+>  	char host[NI_MAXHOST + 1];
+> @@ -271,9 +278,9 @@ static int mount_usage(FILE * stream)
+>  	fprintf(stream,
+>  		"\n\tcache=3D<strict|none|loose>,nounix,cifsacl,sec=3D<authentication =
+mechanism>,");
+>  	fprintf(stream,
+> -		"\n\tsign,seal,fsc,snapshot=3D<time>,nosharesock,persistenthandles,res=
+ilienthandles,");
+> +		"\n\tsign,seal,fsc,snapshot=3D<token|time>,nosharesock,persistenthandl=
+es,");
+>  	fprintf(stream,
+> -		"\n\trdma,vers=3D<smb_dialect>,cruid");
+> +		"\n\tresilienthandles,rdma,vers=3D<smb_dialect>,cruid");
+>  	fprintf(stream,
+>  		"\n\nOptions not needed for servers supporting CIFS Unix extensions");
+>  	fprintf(stream,
+> @@ -773,6 +780,8 @@ static int parse_opt_token(const char *token)
+>  		return OPT_NOFAIL;
+>  	if (strncmp(token, "x-", 2) =3D=3D 0)
+>  		return OPT_IGNORE;
+> +	if (strncmp(token, "snapshot", 8) =3D=3D 0)
+> +		return OPT_SNAPSHOT;
+>=20=20
+>  	return OPT_ERROR;
+>  }
+> @@ -793,16 +802,19 @@ parse_options(const char *data, struct parsed_mount=
+_info *parsed_info)
+>  	int got_uid =3D 0;
+>  	int got_cruid =3D 0;
+>  	int got_gid =3D 0;
+> +	int got_snapshot =3D 0;
+>  	uid_t uid, cruid =3D 0, bkupuid =3D 0;
+>  	gid_t gid, bkupgid =3D 0;
+>  	char *ep;
+>  	struct passwd *pw;
+>  	struct group *gr;
+>  	/*
+> -	 * max 32-bit uint in decimal is 4294967295 which is 10 chars wide
+> -	 * +1 for NULL, and +1 for good measure
+> +	 * max 64-bit uint in decimal is 18446744073709551615 which is 20 chars
+> +	 * wide +1 for NULL, and +1 for good measure
+>  	 */
+> -	char txtbuf[12];
+> +	char txtbuf[22];
+> +	unsigned long long snapshot;
+> +	struct tm tm;
+>=20=20
+>  	/* make sure we're starting from beginning */
+>  	out[0] =3D '\0';
+> @@ -1130,6 +1142,19 @@ parse_options(const char *data, struct parsed_moun=
+t_info *parsed_info)
+>  		case OPT_NOFAIL:
+>  			parsed_info->nofail =3D 1;
+>  			goto nocopy;
+> +		case OPT_SNAPSHOT:
+> +			if (!value || !*value)
+> +				goto nocopy;
+> +			if (strncmp(value, "@GMT-", 5))
+> +				break;
+> +			if ((strlen(value) !=3D GMT_NAME_LEN) ||
+> +			    (strptime(value, GMT_FORMAT, &tm) =3D=3D NULL)) {
+> +				fprintf(stderr, "bad snapshot token\n");
+> +				return EX_USAGE;
+> +			}
+> +			snapshot =3D timegm(&tm) * 10000000 + NTFS_TIME_OFFSET;
+> +			got_snapshot =3D 1;
+> +			goto nocopy;
+>  		}
+>=20=20
+>  		/* check size before copying option to buffer */
+> @@ -1225,7 +1250,7 @@ nocopy:
+>  	if (got_bkupgid) {
+>  		word_len =3D snprintf(txtbuf, sizeof(txtbuf), "%u", bkupgid);
+>=20=20
+> -		/* comma + "backkupgid=3D" + terminating NULL =3D=3D 12 */
+> +		/* comma + "backupgid=3D" + terminating NULL =3D=3D 12 */
+>  		if (out_len + word_len + 12 > MAX_OPTIONS_LEN) {
+>  			fprintf(stderr, "Options string too long\n");
+>  			return EX_USAGE;
+> @@ -1237,6 +1262,21 @@ nocopy:
+>  		}
+>  		snprintf(out + out_len, word_len + 11, "backupgid=3D%s", txtbuf);
+>  	}
+> +	if (got_snapshot) {
+> +		word_len =3D snprintf(txtbuf, sizeof(txtbuf), "%llu", snapshot);
+> +
+> +		/* comma + "snapshot=3D" + terminating NULL =3D=3D 11 */
+> +		if (out_len + word_len + 11 > MAX_OPTIONS_LEN) {
+> +			fprintf(stderr, "Options string too long\n");
+> +			return EX_USAGE;
+> +		}
+> +
+> +		if (out_len) {
+> +			strlcat(out, ",", MAX_OPTIONS_LEN);
+> +			out_len++;
+> +		}
+> +		snprintf(out + out_len, word_len + 11, "snapshot=3D%s", txtbuf);
+> +	}
+>=20=20
+>  	return 0;
+>  }
+> --=20
+> 2.7.4
+>
+> From 6ef851043c4a36be0b0657d4d3cf3a1ab9be6efb Mon Sep 17 00:00:00 2001
+> From: Pavel Shilovsky <pshilov@microsoft.com>
+> Date: Wed, 3 Apr 2019 12:24:33 -0700
+> Subject: [PATCH 4/7] mount.cifs: add more options to help message
+>
+> Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
+> ---
+>  mount.cifs.c | 12 +++++++-----
+>  1 file changed, 7 insertions(+), 5 deletions(-)
+>
+> diff --git a/mount.cifs.c b/mount.cifs.c
+> index d921fed..c6a1bd6 100644
+> --- a/mount.cifs.c
+> +++ b/mount.cifs.c
+> @@ -267,13 +267,13 @@ static int mount_usage(FILE * stream)
+>  	fprintf(stream,
+>  		"\n\tsep=3D<char>,iocharset=3D<codepage>,suid,nosuid,exec,noexec,serve=
+rino,");
+>  	fprintf(stream,
+> -		"\n\tmapchars,nomapchars,nolock,servernetbiosname=3D<SRV_RFC1001NAME>"=
+);
+> +		"\n\tnoserverino,mapchars,nomapchars,nolock,servernetbiosname=3D<SRV_R=
+FC1001NAME>");
+>  	fprintf(stream,
+> -		"\n\tdirectio,nounix,cifsacl,sec=3D<authentication mechanism>,sign,sea=
+l,fsc,");
+> +		"\n\tcache=3D<strict|none|loose>,nounix,cifsacl,sec=3D<authentication =
+mechanism>,");
+>  	fprintf(stream,
+> -		"\n\tsnapshot=3D<time>,nosharesock,persistenthandles,resilienthandles,=
+rdma,");
+> +		"\n\tsign,seal,fsc,snapshot=3D<time>,nosharesock,persistenthandles,res=
+ilienthandles,");
+>  	fprintf(stream,
+> -		"\n\tvers=3D<smb_dialect>,cruid");
+> +		"\n\trdma,vers=3D<smb_dialect>,cruid");
+>  	fprintf(stream,
+>  		"\n\nOptions not needed for servers supporting CIFS Unix extensions");
+>  	fprintf(stream,
+> @@ -290,7 +290,9 @@ static int mount_usage(FILE * stream)
+>  	fprintf(stream,
+>  		"\n\tnointr,ignorecase,noposixpaths,noacl,prefixpath=3D<path>,nobrl,");
+>  	fprintf(stream,
+> -		"\n\techo_interval=3D<seconds>,actimeo=3D<seconds>,max_credits=3D<cred=
+its>");
+> +		"\n\techo_interval=3D<seconds>,actimeo=3D<seconds>,max_credits=3D<cred=
+its>,");
+> +	fprintf(stream,
+> +		"\n\tbsize=3D<size>");
+>  	fprintf(stream,
+>  		"\n\nOptions are described in more detail in the manual page");
+>  	fprintf(stream, "\n\tman 8 mount.cifs\n");
+> --=20
+> 2.7.4
+>
+> From 213a508997303dfead74154edf9d137e911e84a0 Mon Sep 17 00:00:00 2001
+> From: Pavel Shilovsky <pshilov@microsoft.com>
+> Date: Tue, 2 Apr 2019 11:40:40 -0700
+> Subject: [PATCH 2/7] smbinfo: make argument order consistent
+>
+> Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
+> ---
+>  smbinfo.c | 24 ++++++++++++------------
+>  1 file changed, 12 insertions(+), 12 deletions(-)
+>
+> diff --git a/smbinfo.c b/smbinfo.c
+> index adfd85e..f9de7fd 100644
+> --- a/smbinfo.c
+> +++ b/smbinfo.c
+> @@ -85,14 +85,14 @@ usage(char *name)
+>  		"      Prints FilePositionInfo for a cifs file.\n"
+>  		"  filestandardinfo:\n"
+>  		"      Prints FileStandardInfo for a cifs file.\n"
+> -		"  secdesc:\n"
+> -		"      Prints the security descriptor for a cifs file.\n"
+> -		"  quota:\n"
+> -		"      Prints the quota for a cifs file.\n"
+> +		"  fsctl-getobjid:\n"
+> +		"      Prints the objectid of the file and GUID of the underlying volu=
+me.\n"
+>  		"  list-snapshots:\n"
+>  		"      List the previous versions of the volume that backs this file.\=
+n"
+> -		"  fsctl-getobjid:\n"
+> -		"      Prints the objectid of the file and GUID of the underlying volu=
+me.\n",
+> +		"  quota:\n"
+> +		"      Prints the quota for a cifs file.\n"
+> +		"  secdesc:\n"
+> +		"      Prints the security descriptor for a cifs file.\n",
+>  		name);
+>  	exit(1);
+>  }
+> @@ -1116,14 +1116,14 @@ int main(int argc, char *argv[])
+>  		filepositioninfo(f);
+>  	else if (!strcmp(argv[optind], "filestandardinfo"))
+>  		filestandardinfo(f);
+> -	else if (!strcmp(argv[optind], "secdesc"))
+> -		secdesc(f);
+> -	else if (!strcmp(argv[optind], "quota"))
+> -		quota(f);
+> +	else if (!strcmp(argv[optind], "fsctl-getobjid"))
+> +		fsctlgetobjid(f);
+>  	else if (!strcmp(argv[optind], "list-snapshots"))
+>  		list_snapshots(f);
+> -	else if (!strcmp(argv[1], "fsctl-getobjid"))
+> -		fsctlgetobjid(f);
+> +	else if (!strcmp(argv[optind], "quota"))
+> +		quota(f);
+> +	else if (!strcmp(argv[optind], "secdesc"))
+> +		secdesc(f);
+>  	else {
+>  		fprintf(stderr, "Unknown command %s\n", argv[optind]);
+>  		exit(1);
+> --=20
+> 2.7.4
+>
+> From 6396a77eac26b3bf15f0fdfb187282aa7d0a5bcf Mon Sep 17 00:00:00 2001
+> From: Steve French <stfrench@microsoft.com>
+> Date: Tue, 2 Apr 2019 21:18:27 -0500
+> Subject: [PATCH 3/7] mount.cifs Add various missing parms from the help t=
+ext
+>
+> When you type mount.cifs --help there were more than 40 mount parms
+> missing. Add 12 of the more common ones to what is displayed by help.
+>
+> Signed-off-by: Steve French <stfrench@microsoft.com>
+> ---
+>  mount.cifs.c | 14 +++++++++++---
+>  1 file changed, 11 insertions(+), 3 deletions(-)
+>
+> diff --git a/mount.cifs.c b/mount.cifs.c
+> index 9370f2e..d921fed 100644
+> --- a/mount.cifs.c
+> +++ b/mount.cifs.c
+> @@ -269,20 +269,28 @@ static int mount_usage(FILE * stream)
+>  	fprintf(stream,
+>  		"\n\tmapchars,nomapchars,nolock,servernetbiosname=3D<SRV_RFC1001NAME>"=
+);
+>  	fprintf(stream,
+> -		"\n\tdirectio,nounix,cifsacl,sec=3D<authentication mechanism>,sign,sea=
+l,fsc");
+> +		"\n\tdirectio,nounix,cifsacl,sec=3D<authentication mechanism>,sign,sea=
+l,fsc,");
+> +	fprintf(stream,
+> +		"\n\tsnapshot=3D<time>,nosharesock,persistenthandles,resilienthandles,=
+rdma,");
+> +	fprintf(stream,
+> +		"\n\tvers=3D<smb_dialect>,cruid");
+>  	fprintf(stream,
+>  		"\n\nOptions not needed for servers supporting CIFS Unix extensions");
+>  	fprintf(stream,
+>  		"\n\t(e.g. unneeded for mounts to most Samba versions):");
+>  	fprintf(stream,
+> -		"\n\tuid=3D<uid>,gid=3D<gid>,dir_mode=3D<mode>,file_mode=3D<mode>,sfu"=
+);
+> +		"\n\tuid=3D<uid>,gid=3D<gid>,dir_mode=3D<mode>,file_mode=3D<mode>,sfu,=
+");
+> +	fprintf(stream,
+> +		"\n\tmfsymlinks,idsfromsid");
+>  	fprintf(stream, "\n\nRarely used options:");
+>  	fprintf(stream,
+>  		"\n\tport=3D<tcpport>,rsize=3D<size>,wsize=3D<size>,unc=3D<unc_name>,i=
+p=3D<ip_address>,");
+>  	fprintf(stream,
+>  		"\n\tdev,nodev,nouser_xattr,netbiosname=3D<OUR_RFC1001NAME>,hard,soft,=
+intr,");
+>  	fprintf(stream,
+> -		"\n\tnointr,ignorecase,noposixpaths,noacl,prefixpath=3D<path>,nobrl");
+> +		"\n\tnointr,ignorecase,noposixpaths,noacl,prefixpath=3D<path>,nobrl,");
+> +	fprintf(stream,
+> +		"\n\techo_interval=3D<seconds>,actimeo=3D<seconds>,max_credits=3D<cred=
+its>");
+>  	fprintf(stream,
+>  		"\n\nOptions are described in more detail in the manual page");
+>  	fprintf(stream, "\n\tman 8 mount.cifs\n");
+> --=20
+> 2.7.4
+>
+> From 19c1bb71de9f58bb5b1fbc78ab468f80df62ee57 Mon Sep 17 00:00:00 2001
+> From: Steve French <stfrench@microsoft.com>
+> Date: Wed, 3 Apr 2019 23:46:34 -0500
+> Subject: [PATCH 6/7] Update man page for mount.cifs to add new options
+>
+> Add description of "snapshot" and "handletimeout" mount
+> options and a security section noting that the use of
+> cifs is discouraged, and various minor updates.
+>
+> Signed-off-by: Steve French <stfrench@microsoft.com>
+> Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
+> ---
+>  mount.cifs.rst | 98 +++++++++++++++++++++++++++++++++++-----------------=
+------
+>  1 file changed, 60 insertions(+), 38 deletions(-)
+>
+> diff --git a/mount.cifs.rst b/mount.cifs.rst
+> index f64d1f1..8ba6e7b 100644
+> --- a/mount.cifs.rst
+> +++ b/mount.cifs.rst
+> @@ -15,13 +15,13 @@ SYNOPSIS
+>=20=20
+>  This tool is part of the cifs-utils suite.
+>=20=20
+> -``mount.cifs`` mounts a Linux CIFS filesystem. It is usually invoked
+> -indirectly by the mount(8) command when using the "-t cifs"
+> +``mount.cifs`` mounts a CIFS or SMB3 filesystem from Linux. It is
+> +usually invoked indirectly by the mount(8) command when using the "-t ci=
+fs"
+>  option. This command only works in Linux, and the kernel must support
+> -the cifs filesystem. The CIFS protocol is the successor to the SMB
+> -protocol and is supported by most Windows servers and many other
+> -commercial servers and Network Attached Storage appliances as well as
+> -by the popular Open Source server Samba.
+> +the cifs filesystem. The SMB3 protocol is the successor to the CIFS (SMB)
+> +protocol and is supported by most Windows servers, Azure (cloud storage),
+> +Macs and many other commercial servers and Network Attached Storage
+> +appliances as well as by the popular Open Source server Samba.
+>=20=20
+>  The mount.cifs utility attaches the UNC name (exported network
+>  resource) specified as service (using ``//server/share`` syntax, where
+> @@ -266,6 +266,13 @@ handlecache
+>  nohandlecache
+>    Disable caching of the share root directory handle.
+>=20=20
+> +handletimeout=3Darg
+> +  The time (in milliseconds) for which the server should reserve the han=
+dle after
+> +  a failover waiting for the client to reconnect.  When mounting with
+> +  resilienthandles or persistenthandles mount option, or when their use =
+is
+> +  requested by the server (continuous availability shares) then this par=
+ameter
+> +  overrides the server default handle timeout (which for most servers is=
+ 120 seconds).
+> +
+>  rwpidforward
+>    Forward pid of a process who opened a file to any read or write
+>    operation on that file. This prevent applications like wine(1) from
+> @@ -387,6 +394,12 @@ persistenthandles
+>  nopersistenthandles
+>    (default) Disable persistent handles.
+>=20=20
+> +snapshot=3Dtime
+> +   Mount a specific snapshot of the remote share. ``time`` must be a
+> +   positive integer identifying the snapshot requested (in 100-nanosecond
+> +   units that have elapsed since January 1, 1601, or alternatively it can
+> +   be specified in GMT format e.g. @GMT-2019.03.27-20.52.19)
+> +
+>  nobrl
+>    Do not send byte range lock requests to the server. This is necessary
+>    for certain applications that break with cifs style mandatory byte
+> @@ -401,7 +414,7 @@ locallease
+>    Check cached leases locally instead of querying the server.
+>=20=20
+>  sfu
+> -  When the CIFS Unix Extensions are not negotiated, attempt to create
+> +  When the CIFS or SMB3 Unix Extensions are not negotiated, attempt to c=
+reate
+>    device files and fifos in a format compatible with Services for Unix
+>    (SFU). In addition retrieve bits 10-12 of the mode via the
+>    ``SETFILEBITS`` extended attribute (as SFU does). In the future the
+> @@ -450,11 +463,11 @@ noserverino
+>=20=20
+>    See section `INODE NUMBERS`_ for more information.
+>=20=20
+> -unix|linux
+> +posix|unix|linux
+>    (default) Enable Unix Extensions for this mount. Requires CIFS
+>    (vers=3D1.0) or SMB3.1.1 (vers=3D3.1.1) and a server supporting them.
+>=20=20
+> -nounix|nolinux
+> +noposix|nounix|nolinux
+>    Disable the Unix Extensions for this mount. This can be useful in
+>    order to turn off multiple settings at once. This includes POSIX acls,
+>    POSIX locks, POSIX paths, symlink support and retrieving
+> @@ -479,38 +492,35 @@ nosharesock
+>    Do not try to reuse sockets if the system is already connected to
+>    the server via an existing mount point. This will make the client
+>    always make a new connection to the server no matter what he is
+> -  already connected to.
+> +  already connected to. This can be useful in simulating multiple
+> +  clients connecting to the same server, as each mount point
+> +  will use a different TCP socket.
+>=20=20
+>  noblocksend
+>    Send data on the socket using non blocking operations (MSG_DONTWAIT fl=
+ag).
+>=20=20
+>  rsize=3Dbytes
+>    Maximum amount of data that the kernel will request in a read request
+> -  in bytes. Prior to kernel 3.2.0, the default was 16k, and the maximum
+> -  size was limited by the ``CIFSMaxBufSize`` module parameter. As of
+> -  kernel 3.2.0, the behavior varies according to whether POSIX
+> -  extensions are enabled on the mount and the server supports large
+> -  POSIX reads. If they are, then the default is 1M, and the maximum is
+> -  16M. If they are not supported by the server, then the default is 60k
+> -  and the maximum is around 127k. The reason for the 60k is because it's
+> -  the maximum size read that windows servers can fill. Note that this
+> -  value is a maximum, and the client may settle on a smaller size to
+> -  accommodate what the server supports. In kernels prior to 3.2.0, no
+> -  negotiation is performed.
+> +  in bytes. Maximum size that servers will accept is typically 8MB for S=
+MB3
+> +  or later dialects. Default requested during mount is 4MB. Prior to the=
+ 4.20
+> +  kernel the default requested was 1MB. Prior to the SMB2.1 dialect the
+> +  maximum was usually 64K.
+>=20=20
+>  wsize=3Dbytes
+>    Maximum amount of data that the kernel will send in a write request in
+> -  bytes. Prior to kernel 3.0.0, the default and maximum was 57344 (14 \*
+> -  4096 pages). As of 3.0.0, the default depends on whether the client
+> -  and server negotiate large writes via POSIX extensions. If they do,
+> -  then the default is 1M, and the maximum allowed is 16M. If they do
+> -  not, then the default is 65536 and the maximum allowed is 131007. Note
+> -  that this value is just a starting point for negotiation in 3.0.0 and
+> -  up. The client and server may negotiate this size downward according
+> -  to the server's capabilities. In kernels prior to 3.0.0, no
+> -  negotiation is performed. It can end up with an existing superblock if
+> -  this value isn't specified or it's greater or equal than the existing
+> -  one.
+> +  bytes. Maximum size that servers will accept is typically 8MB for SMB3
+> +  or later dialects. Default requested during mount is 4MB. Prior to the=
+ 4.20
+> +  kernel the default requested was 1MB. Prior to the SMB2.1 dialect the
+> +  maximum was usually 64K.
+> +
+> +bsize=3Dbytes
+> +  Override the default blocksize (1MB) reported on SMB3 files (requires
+> +  kernel version of 5.1 or later). Prior to kernel version 5.1, the
+> +  blocksize was always reported as 16K instead of 1MB (and was not
+> +  configurable) which can hurt the performance of tools like cp and scp
+> +  (especially for uncached I/O) which decide on the read and write size
+> +  to use for file copies based on the inode blocksize. bsize may not be
+> +  less than 16K or greater than 16M.
+>=20=20
+>  max_credits=3Dn
+>    Maximum credits the SMB2 client can have. Default is 32000. Must be
+> @@ -885,14 +895,26 @@ CONFIGURATION
+>  The primary mechanism for making configuration changes and for reading
+>  debug information for the cifs vfs is via the Linux /proc
+>  filesystem. In the directory */proc/fs/cifs* are various
+> -configuration files and pseudo files which can display debug
+> -information. There are additional startup options such as maximum
+> -buffer size and number of buffers which only may be set when the
+> +configuration files and pseudo files which can display debug information
+> +and performance statistics. There are additional startup options such as
+> +maximum buffer size and number of buffers which only may be set when the
+>  kernel cifs vfs (cifs.ko module) is loaded. These can be seen by
+>  running the ``modinfo`` utility against the file cifs.ko which will
+>  list the options that may be passed to cifs during module installation
+>  (device driver load). For more information see the kernel file
+> -*fs/cifs/README*.
+> +*fs/cifs/README*. When configuring dynamic tracing (trace-cmd)
+> +note that the list of SMB3 events which can be enabled can be seen at:
+> +*/sys/kernel/debug/tracing/events/cifs/*.
+> +
+> +********
+> +SECURITY
+> +********
+> +
+> +The use of SMB2.1 or later (including the latest dialect SMB3.1.1)
+> +is recommended for improved security and SMB1 is no longer requested
+> +by default at mount time. Old dialects such as CIFS (SMB1, ie vers=3D1.0)
+> +have much weaker security. Use of CIFS (SMB1) can be disabled by
+> +modprobe cifs disable_legacy_dialects=3Dy.
+>=20=20
+>  ****
+>  BUGS
+> @@ -913,8 +935,8 @@ bugs (minimum: mount.cifs (try ``mount.cifs -V``), ke=
+rnel (see
+>  VERSION
+>  *******
+>=20=20
+> -This man page is correct for version 1.74 of the cifs vfs filesystem
+> -(roughly Linux kernel 3.0).
+> +This man page is correct for version 2.18 of the cifs vfs filesystem
+> +(roughly Linux kernel 5.0).
+>=20=20
+>  ********
+>  SEE ALSO
+> --=20
+> 2.7.4
+>
+> From 7047e57bcb343ad867728fbddc5a4da29d7ae9fc Mon Sep 17 00:00:00 2001
+> From: Pavel Shilovsky <pshilov@microsoft.com>
+> Date: Thu, 4 Apr 2019 16:25:30 +0000
+> Subject: [PATCH 7/7] mount.cifs.rst: mention kernel version for snapshots
+>
+> Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
+> ---
+>  mount.cifs.rst | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/mount.cifs.rst b/mount.cifs.rst
+> index 8ba6e7b..02016e0 100644
+> --- a/mount.cifs.rst
+> +++ b/mount.cifs.rst
+> @@ -398,7 +398,8 @@ snapshot=3Dtime
+>     Mount a specific snapshot of the remote share. ``time`` must be a
+>     positive integer identifying the snapshot requested (in 100-nanosecond
+>     units that have elapsed since January 1, 1601, or alternatively it can
+> -   be specified in GMT format e.g. @GMT-2019.03.27-20.52.19)
+> +   be specified in GMT format e.g. @GMT-2019.03.27-20.52.19). Supported
+> +   in the Linux kernel starting from v4.19.
+>=20=20
+>  nobrl
+>    Do not send byte range lock requests to the server. This is necessary
+> --=20
+> 2.7.4
 
-RnJvbSBlOGI4YmI1ZmE2MWM1M2IwNTk3NTY1MDE5NGRhMjQ3ODZjNGE0ZjMyIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBQYXZlbCBTaGlsb3Zza3kgPHBzaGlsb3ZAbWljcm9zb2Z0LmNv
-bT4KRGF0ZTogV2VkLCAzIEFwciAyMDE5IDIyOjQyOjEwICswMDAwClN1YmplY3Q6IFtQQVRDSCA1
-LzddIG1vdW50LmNpZnM6IGRldGVjdCBHTVQgZm9ybWF0IG9mIHNuYXBzaG90IHZlcnNpb24KCklu
-IG9yZGVyIHRvIHByb3ZpZGUgYW4gZWFzeSB3YXkgdG8gYWNjZXNzIHNuYXBzaG90cyBhIEdNVAp0
-b2tlbiBzdHJpbmcgc2hvdWxkIGJlIGFsbG93ZWQgYXMgYSAic25hcHNob3QiIG1vdW50IG9wdGlv
-bgphcmd1bWVudCwgbm90IFNNQiAxMDAtbmFub3NlY29uZHMgdGltZSBvbmx5LiBEZXRlY3QgaWYg
-dGhlCmFyZ3VtZW50IGlzIGluIEdNVCBmb3JtYXQgYW5kIGNvbnZlcnQgaXQgdG8gU01CIDEwMC1u
-YW5vc2Vjb25kcwp0aW1lIGJlZm9yZSBwYXNzaW5nIHRvIHRoZSBrZXJuZWwuCgpTaWduZWQtb2Zm
-LWJ5OiBQYXZlbCBTaGlsb3Zza3kgPHBzaGlsb3ZAbWljcm9zb2Z0LmNvbT4KLS0tCiBtb3VudC5j
-aWZzLmMgfCA1NCArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-Ky0tLS0tLS0KIDEgZmlsZSBjaGFuZ2VkLCA0NyBpbnNlcnRpb25zKCspLCA3IGRlbGV0aW9ucygt
-KQoKZGlmZiAtLWdpdCBhL21vdW50LmNpZnMuYyBiL21vdW50LmNpZnMuYwppbmRleCBjNmExYmQ2
-Li5iMzIzNWU0IDEwMDY0NAotLS0gYS9tb3VudC5jaWZzLmMKKysrIGIvbW91bnQuY2lmcy5jCkBA
-IC00Myw2ICs0Myw3IEBACiAjaW5jbHVkZSA8bGltaXRzLmg+CiAjaW5jbHVkZSA8cGF0aHMuaD4K
-ICNpbmNsdWRlIDxsaWJnZW4uaD4KKyNpbmNsdWRlIDx0aW1lLmg+CiAjaW5jbHVkZSA8c3lzL21t
-YW4uaD4KICNpbmNsdWRlIDxzeXMvd2FpdC5oPgogI2lmZGVmIEhBVkVfU1lTX0ZTVUlEX0gKQEAg
-LTE2MSwxMCArMTYyLDE2IEBACiAjZGVmaW5lIE9QVF9CS1VQVUlEICAgIDMwCiAjZGVmaW5lIE9Q
-VF9CS1VQR0lEICAgIDMxCiAjZGVmaW5lIE9QVF9OT0ZBSUwgICAgIDMyCisjZGVmaW5lIE9QVF9T
-TkFQU0hPVCAgIDMzCiAKICNkZWZpbmUgTU5UX1RNUF9GSUxFICIvLm10YWIuY2lmcy5YWFhYWFgi
-CiAKLS8qIHN0cnVjdCBmb3IgaG9sZGluZyBwYXJzZWQgbW91bnQgaW5mbyBmb3IgdXNlIGJ5IHBy
-aXZsZWdlZCBwcm9jZXNzICovCisjZGVmaW5lIEdNVF9OQU1FX0xFTiAyNCAvKiBsZW5ndGggb2Yg
-YSBAR01ULSBuYW1lICovCisjZGVmaW5lIEdNVF9GT1JNQVQgIkBHTVQtJVkuJW0uJWQtJUguJU0u
-JVMiCisKKyNkZWZpbmUgTlRGU19USU1FX09GRlNFVCAoKHVuc2lnbmVkIGxvbmcgbG9uZykoMzY5
-KjM2NSArIDg5KSAqIDI0ICogMzYwMCAqIDEwMDAwMDAwKQorCisvKiBzdHJ1Y3QgZm9yIGhvbGRp
-bmcgcGFyc2VkIG1vdW50IGluZm8gZm9yIHVzZSBieSBwcml2aWxlZ2VkIHByb2Nlc3MgKi8KIHN0
-cnVjdCBwYXJzZWRfbW91bnRfaW5mbyB7CiAJdW5zaWduZWQgbG9uZyBmbGFnczsKIAljaGFyIGhv
-c3RbTklfTUFYSE9TVCArIDFdOwpAQCAtMjcxLDkgKzI3OCw5IEBAIHN0YXRpYyBpbnQgbW91bnRf
-dXNhZ2UoRklMRSAqIHN0cmVhbSkKIAlmcHJpbnRmKHN0cmVhbSwKIAkJIlxuXHRjYWNoZT08c3Ry
-aWN0fG5vbmV8bG9vc2U+LG5vdW5peCxjaWZzYWNsLHNlYz08YXV0aGVudGljYXRpb24gbWVjaGFu
-aXNtPiwiKTsKIAlmcHJpbnRmKHN0cmVhbSwKLQkJIlxuXHRzaWduLHNlYWwsZnNjLHNuYXBzaG90
-PTx0aW1lPixub3NoYXJlc29jayxwZXJzaXN0ZW50aGFuZGxlcyxyZXNpbGllbnRoYW5kbGVzLCIp
-OworCQkiXG5cdHNpZ24sc2VhbCxmc2Msc25hcHNob3Q9PHRva2VufHRpbWU+LG5vc2hhcmVzb2Nr
-LHBlcnNpc3RlbnRoYW5kbGVzLCIpOwogCWZwcmludGYoc3RyZWFtLAotCQkiXG5cdHJkbWEsdmVy
-cz08c21iX2RpYWxlY3Q+LGNydWlkIik7CisJCSJcblx0cmVzaWxpZW50aGFuZGxlcyxyZG1hLHZl
-cnM9PHNtYl9kaWFsZWN0PixjcnVpZCIpOwogCWZwcmludGYoc3RyZWFtLAogCQkiXG5cbk9wdGlv
-bnMgbm90IG5lZWRlZCBmb3Igc2VydmVycyBzdXBwb3J0aW5nIENJRlMgVW5peCBleHRlbnNpb25z
-Iik7CiAJZnByaW50ZihzdHJlYW0sCkBAIC03NzMsNiArNzgwLDggQEAgc3RhdGljIGludCBwYXJz
-ZV9vcHRfdG9rZW4oY29uc3QgY2hhciAqdG9rZW4pCiAJCXJldHVybiBPUFRfTk9GQUlMOwogCWlm
-IChzdHJuY21wKHRva2VuLCAieC0iLCAyKSA9PSAwKQogCQlyZXR1cm4gT1BUX0lHTk9SRTsKKwlp
-ZiAoc3RybmNtcCh0b2tlbiwgInNuYXBzaG90IiwgOCkgPT0gMCkKKwkJcmV0dXJuIE9QVF9TTkFQ
-U0hPVDsKIAogCXJldHVybiBPUFRfRVJST1I7CiB9CkBAIC03OTMsMTYgKzgwMiwxOSBAQCBwYXJz
-ZV9vcHRpb25zKGNvbnN0IGNoYXIgKmRhdGEsIHN0cnVjdCBwYXJzZWRfbW91bnRfaW5mbyAqcGFy
-c2VkX2luZm8pCiAJaW50IGdvdF91aWQgPSAwOwogCWludCBnb3RfY3J1aWQgPSAwOwogCWludCBn
-b3RfZ2lkID0gMDsKKwlpbnQgZ290X3NuYXBzaG90ID0gMDsKIAl1aWRfdCB1aWQsIGNydWlkID0g
-MCwgYmt1cHVpZCA9IDA7CiAJZ2lkX3QgZ2lkLCBia3VwZ2lkID0gMDsKIAljaGFyICplcDsKIAlz
-dHJ1Y3QgcGFzc3dkICpwdzsKIAlzdHJ1Y3QgZ3JvdXAgKmdyOwogCS8qCi0JICogbWF4IDMyLWJp
-dCB1aW50IGluIGRlY2ltYWwgaXMgNDI5NDk2NzI5NSB3aGljaCBpcyAxMCBjaGFycyB3aWRlCi0J
-ICogKzEgZm9yIE5VTEwsIGFuZCArMSBmb3IgZ29vZCBtZWFzdXJlCisJICogbWF4IDY0LWJpdCB1
-aW50IGluIGRlY2ltYWwgaXMgMTg0NDY3NDQwNzM3MDk1NTE2MTUgd2hpY2ggaXMgMjAgY2hhcnMK
-KwkgKiB3aWRlICsxIGZvciBOVUxMLCBhbmQgKzEgZm9yIGdvb2QgbWVhc3VyZQogCSAqLwotCWNo
-YXIgdHh0YnVmWzEyXTsKKwljaGFyIHR4dGJ1ZlsyMl07CisJdW5zaWduZWQgbG9uZyBsb25nIHNu
-YXBzaG90OworCXN0cnVjdCB0bSB0bTsKIAogCS8qIG1ha2Ugc3VyZSB3ZSdyZSBzdGFydGluZyBm
-cm9tIGJlZ2lubmluZyAqLwogCW91dFswXSA9ICdcMCc7CkBAIC0xMTMwLDYgKzExNDIsMTkgQEAg
-cGFyc2Vfb3B0aW9ucyhjb25zdCBjaGFyICpkYXRhLCBzdHJ1Y3QgcGFyc2VkX21vdW50X2luZm8g
-KnBhcnNlZF9pbmZvKQogCQljYXNlIE9QVF9OT0ZBSUw6CiAJCQlwYXJzZWRfaW5mby0+bm9mYWls
-ID0gMTsKIAkJCWdvdG8gbm9jb3B5OworCQljYXNlIE9QVF9TTkFQU0hPVDoKKwkJCWlmICghdmFs
-dWUgfHwgISp2YWx1ZSkKKwkJCQlnb3RvIG5vY29weTsKKwkJCWlmIChzdHJuY21wKHZhbHVlLCAi
-QEdNVC0iLCA1KSkKKwkJCQlicmVhazsKKwkJCWlmICgoc3RybGVuKHZhbHVlKSAhPSBHTVRfTkFN
-RV9MRU4pIHx8CisJCQkgICAgKHN0cnB0aW1lKHZhbHVlLCBHTVRfRk9STUFULCAmdG0pID09IE5V
-TEwpKSB7CisJCQkJZnByaW50ZihzdGRlcnIsICJiYWQgc25hcHNob3QgdG9rZW5cbiIpOworCQkJ
-CXJldHVybiBFWF9VU0FHRTsKKwkJCX0KKwkJCXNuYXBzaG90ID0gdGltZWdtKCZ0bSkgKiAxMDAw
-MDAwMCArIE5URlNfVElNRV9PRkZTRVQ7CisJCQlnb3Rfc25hcHNob3QgPSAxOworCQkJZ290byBu
-b2NvcHk7CiAJCX0KIAogCQkvKiBjaGVjayBzaXplIGJlZm9yZSBjb3B5aW5nIG9wdGlvbiB0byBi
-dWZmZXIgKi8KQEAgLTEyMjUsNyArMTI1MCw3IEBAIG5vY29weToKIAlpZiAoZ290X2JrdXBnaWQp
-IHsKIAkJd29yZF9sZW4gPSBzbnByaW50Zih0eHRidWYsIHNpemVvZih0eHRidWYpLCAiJXUiLCBi
-a3VwZ2lkKTsKIAotCQkvKiBjb21tYSArICJiYWNra3VwZ2lkPSIgKyB0ZXJtaW5hdGluZyBOVUxM
-ID09IDEyICovCisJCS8qIGNvbW1hICsgImJhY2t1cGdpZD0iICsgdGVybWluYXRpbmcgTlVMTCA9
-PSAxMiAqLwogCQlpZiAob3V0X2xlbiArIHdvcmRfbGVuICsgMTIgPiBNQVhfT1BUSU9OU19MRU4p
-IHsKIAkJCWZwcmludGYoc3RkZXJyLCAiT3B0aW9ucyBzdHJpbmcgdG9vIGxvbmdcbiIpOwogCQkJ
-cmV0dXJuIEVYX1VTQUdFOwpAQCAtMTIzNyw2ICsxMjYyLDIxIEBAIG5vY29weToKIAkJfQogCQlz
-bnByaW50ZihvdXQgKyBvdXRfbGVuLCB3b3JkX2xlbiArIDExLCAiYmFja3VwZ2lkPSVzIiwgdHh0
-YnVmKTsKIAl9CisJaWYgKGdvdF9zbmFwc2hvdCkgeworCQl3b3JkX2xlbiA9IHNucHJpbnRmKHR4
-dGJ1Ziwgc2l6ZW9mKHR4dGJ1ZiksICIlbGx1Iiwgc25hcHNob3QpOworCisJCS8qIGNvbW1hICsg
-InNuYXBzaG90PSIgKyB0ZXJtaW5hdGluZyBOVUxMID09IDExICovCisJCWlmIChvdXRfbGVuICsg
-d29yZF9sZW4gKyAxMSA+IE1BWF9PUFRJT05TX0xFTikgeworCQkJZnByaW50ZihzdGRlcnIsICJP
-cHRpb25zIHN0cmluZyB0b28gbG9uZ1xuIik7CisJCQlyZXR1cm4gRVhfVVNBR0U7CisJCX0KKwor
-CQlpZiAob3V0X2xlbikgeworCQkJc3RybGNhdChvdXQsICIsIiwgTUFYX09QVElPTlNfTEVOKTsK
-KwkJCW91dF9sZW4rKzsKKwkJfQorCQlzbnByaW50ZihvdXQgKyBvdXRfbGVuLCB3b3JkX2xlbiAr
-IDExLCAic25hcHNob3Q9JXMiLCB0eHRidWYpOworCX0KIAogCXJldHVybiAwOwogfQotLSAKMi43
-LjQKCg==
---0000000000004a79950585b74a15
-Content-Type: application/octet-stream; 
-	name="0004-mount.cifs-add-more-options-to-help-message.patch"
-Content-Disposition: attachment; 
-	filename="0004-mount.cifs-add-more-options-to-help-message.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ju2vpx603>
-X-Attachment-Id: f_ju2vpx603
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-RnJvbSA2ZWY4NTEwNDNjNGEzNmJlMGIwNjU3ZDRkM2NmM2ExYWI5YmU2ZWZiIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBQYXZlbCBTaGlsb3Zza3kgPHBzaGlsb3ZAbWljcm9zb2Z0LmNv
-bT4KRGF0ZTogV2VkLCAzIEFwciAyMDE5IDEyOjI0OjMzIC0wNzAwClN1YmplY3Q6IFtQQVRDSCA0
-LzddIG1vdW50LmNpZnM6IGFkZCBtb3JlIG9wdGlvbnMgdG8gaGVscCBtZXNzYWdlCgpTaWduZWQt
-b2ZmLWJ5OiBQYXZlbCBTaGlsb3Zza3kgPHBzaGlsb3ZAbWljcm9zb2Z0LmNvbT4KLS0tCiBtb3Vu
-dC5jaWZzLmMgfCAxMiArKysrKysrLS0tLS0KIDEgZmlsZSBjaGFuZ2VkLCA3IGluc2VydGlvbnMo
-KyksIDUgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvbW91bnQuY2lmcy5jIGIvbW91bnQuY2lm
-cy5jCmluZGV4IGQ5MjFmZWQuLmM2YTFiZDYgMTAwNjQ0Ci0tLSBhL21vdW50LmNpZnMuYworKysg
-Yi9tb3VudC5jaWZzLmMKQEAgLTI2NywxMyArMjY3LDEzIEBAIHN0YXRpYyBpbnQgbW91bnRfdXNh
-Z2UoRklMRSAqIHN0cmVhbSkKIAlmcHJpbnRmKHN0cmVhbSwKIAkJIlxuXHRzZXA9PGNoYXI+LGlv
-Y2hhcnNldD08Y29kZXBhZ2U+LHN1aWQsbm9zdWlkLGV4ZWMsbm9leGVjLHNlcnZlcmlubywiKTsK
-IAlmcHJpbnRmKHN0cmVhbSwKLQkJIlxuXHRtYXBjaGFycyxub21hcGNoYXJzLG5vbG9jayxzZXJ2
-ZXJuZXRiaW9zbmFtZT08U1JWX1JGQzEwMDFOQU1FPiIpOworCQkiXG5cdG5vc2VydmVyaW5vLG1h
-cGNoYXJzLG5vbWFwY2hhcnMsbm9sb2NrLHNlcnZlcm5ldGJpb3NuYW1lPTxTUlZfUkZDMTAwMU5B
-TUU+Iik7CiAJZnByaW50ZihzdHJlYW0sCi0JCSJcblx0ZGlyZWN0aW8sbm91bml4LGNpZnNhY2ws
-c2VjPTxhdXRoZW50aWNhdGlvbiBtZWNoYW5pc20+LHNpZ24sc2VhbCxmc2MsIik7CisJCSJcblx0
-Y2FjaGU9PHN0cmljdHxub25lfGxvb3NlPixub3VuaXgsY2lmc2FjbCxzZWM9PGF1dGhlbnRpY2F0
-aW9uIG1lY2hhbmlzbT4sIik7CiAJZnByaW50ZihzdHJlYW0sCi0JCSJcblx0c25hcHNob3Q9PHRp
-bWU+LG5vc2hhcmVzb2NrLHBlcnNpc3RlbnRoYW5kbGVzLHJlc2lsaWVudGhhbmRsZXMscmRtYSwi
-KTsKKwkJIlxuXHRzaWduLHNlYWwsZnNjLHNuYXBzaG90PTx0aW1lPixub3NoYXJlc29jayxwZXJz
-aXN0ZW50aGFuZGxlcyxyZXNpbGllbnRoYW5kbGVzLCIpOwogCWZwcmludGYoc3RyZWFtLAotCQki
-XG5cdHZlcnM9PHNtYl9kaWFsZWN0PixjcnVpZCIpOworCQkiXG5cdHJkbWEsdmVycz08c21iX2Rp
-YWxlY3Q+LGNydWlkIik7CiAJZnByaW50ZihzdHJlYW0sCiAJCSJcblxuT3B0aW9ucyBub3QgbmVl
-ZGVkIGZvciBzZXJ2ZXJzIHN1cHBvcnRpbmcgQ0lGUyBVbml4IGV4dGVuc2lvbnMiKTsKIAlmcHJp
-bnRmKHN0cmVhbSwKQEAgLTI5MCw3ICsyOTAsOSBAQCBzdGF0aWMgaW50IG1vdW50X3VzYWdlKEZJ
-TEUgKiBzdHJlYW0pCiAJZnByaW50ZihzdHJlYW0sCiAJCSJcblx0bm9pbnRyLGlnbm9yZWNhc2Us
-bm9wb3NpeHBhdGhzLG5vYWNsLHByZWZpeHBhdGg9PHBhdGg+LG5vYnJsLCIpOwogCWZwcmludGYo
-c3RyZWFtLAotCQkiXG5cdGVjaG9faW50ZXJ2YWw9PHNlY29uZHM+LGFjdGltZW89PHNlY29uZHM+
-LG1heF9jcmVkaXRzPTxjcmVkaXRzPiIpOworCQkiXG5cdGVjaG9faW50ZXJ2YWw9PHNlY29uZHM+
-LGFjdGltZW89PHNlY29uZHM+LG1heF9jcmVkaXRzPTxjcmVkaXRzPiwiKTsKKwlmcHJpbnRmKHN0
-cmVhbSwKKwkJIlxuXHRic2l6ZT08c2l6ZT4iKTsKIAlmcHJpbnRmKHN0cmVhbSwKIAkJIlxuXG5P
-cHRpb25zIGFyZSBkZXNjcmliZWQgaW4gbW9yZSBkZXRhaWwgaW4gdGhlIG1hbnVhbCBwYWdlIik7
-CiAJZnByaW50ZihzdHJlYW0sICJcblx0bWFuIDggbW91bnQuY2lmc1xuIik7Ci0tIAoyLjcuNAoK
---0000000000004a79950585b74a15
-Content-Type: application/octet-stream; 
-	name="0002-smbinfo-make-argument-order-consistent.patch"
-Content-Disposition: attachment; 
-	filename="0002-smbinfo-make-argument-order-consistent.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ju2vpx5s1>
-X-Attachment-Id: f_ju2vpx5s1
+-----BEGIN PGP SIGNATURE-----
 
-RnJvbSAyMTNhNTA4OTk3MzAzZGZlYWQ3NDE1NGVkZjlkMTM3ZTkxMWU4NGEwIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBQYXZlbCBTaGlsb3Zza3kgPHBzaGlsb3ZAbWljcm9zb2Z0LmNv
-bT4KRGF0ZTogVHVlLCAyIEFwciAyMDE5IDExOjQwOjQwIC0wNzAwClN1YmplY3Q6IFtQQVRDSCAy
-LzddIHNtYmluZm86IG1ha2UgYXJndW1lbnQgb3JkZXIgY29uc2lzdGVudAoKU2lnbmVkLW9mZi1i
-eTogUGF2ZWwgU2hpbG92c2t5IDxwc2hpbG92QG1pY3Jvc29mdC5jb20+Ci0tLQogc21iaW5mby5j
-IHwgMjQgKysrKysrKysrKysrLS0tLS0tLS0tLS0tCiAxIGZpbGUgY2hhbmdlZCwgMTIgaW5zZXJ0
-aW9ucygrKSwgMTIgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvc21iaW5mby5jIGIvc21iaW5m
-by5jCmluZGV4IGFkZmQ4NWUuLmY5ZGU3ZmQgMTAwNjQ0Ci0tLSBhL3NtYmluZm8uYworKysgYi9z
-bWJpbmZvLmMKQEAgLTg1LDE0ICs4NSwxNCBAQCB1c2FnZShjaGFyICpuYW1lKQogCQkiICAgICAg
-UHJpbnRzIEZpbGVQb3NpdGlvbkluZm8gZm9yIGEgY2lmcyBmaWxlLlxuIgogCQkiICBmaWxlc3Rh
-bmRhcmRpbmZvOlxuIgogCQkiICAgICAgUHJpbnRzIEZpbGVTdGFuZGFyZEluZm8gZm9yIGEgY2lm
-cyBmaWxlLlxuIgotCQkiICBzZWNkZXNjOlxuIgotCQkiICAgICAgUHJpbnRzIHRoZSBzZWN1cml0
-eSBkZXNjcmlwdG9yIGZvciBhIGNpZnMgZmlsZS5cbiIKLQkJIiAgcXVvdGE6XG4iCi0JCSIgICAg
-ICBQcmludHMgdGhlIHF1b3RhIGZvciBhIGNpZnMgZmlsZS5cbiIKKwkJIiAgZnNjdGwtZ2V0b2Jq
-aWQ6XG4iCisJCSIgICAgICBQcmludHMgdGhlIG9iamVjdGlkIG9mIHRoZSBmaWxlIGFuZCBHVUlE
-IG9mIHRoZSB1bmRlcmx5aW5nIHZvbHVtZS5cbiIKIAkJIiAgbGlzdC1zbmFwc2hvdHM6XG4iCiAJ
-CSIgICAgICBMaXN0IHRoZSBwcmV2aW91cyB2ZXJzaW9ucyBvZiB0aGUgdm9sdW1lIHRoYXQgYmFj
-a3MgdGhpcyBmaWxlLlxuIgotCQkiICBmc2N0bC1nZXRvYmppZDpcbiIKLQkJIiAgICAgIFByaW50
-cyB0aGUgb2JqZWN0aWQgb2YgdGhlIGZpbGUgYW5kIEdVSUQgb2YgdGhlIHVuZGVybHlpbmcgdm9s
-dW1lLlxuIiwKKwkJIiAgcXVvdGE6XG4iCisJCSIgICAgICBQcmludHMgdGhlIHF1b3RhIGZvciBh
-IGNpZnMgZmlsZS5cbiIKKwkJIiAgc2VjZGVzYzpcbiIKKwkJIiAgICAgIFByaW50cyB0aGUgc2Vj
-dXJpdHkgZGVzY3JpcHRvciBmb3IgYSBjaWZzIGZpbGUuXG4iLAogCQluYW1lKTsKIAlleGl0KDEp
-OwogfQpAQCAtMTExNiwxNCArMTExNiwxNCBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJn
-dltdKQogCQlmaWxlcG9zaXRpb25pbmZvKGYpOwogCWVsc2UgaWYgKCFzdHJjbXAoYXJndltvcHRp
-bmRdLCAiZmlsZXN0YW5kYXJkaW5mbyIpKQogCQlmaWxlc3RhbmRhcmRpbmZvKGYpOwotCWVsc2Ug
-aWYgKCFzdHJjbXAoYXJndltvcHRpbmRdLCAic2VjZGVzYyIpKQotCQlzZWNkZXNjKGYpOwotCWVs
-c2UgaWYgKCFzdHJjbXAoYXJndltvcHRpbmRdLCAicXVvdGEiKSkKLQkJcXVvdGEoZik7CisJZWxz
-ZSBpZiAoIXN0cmNtcChhcmd2W29wdGluZF0sICJmc2N0bC1nZXRvYmppZCIpKQorCQlmc2N0bGdl
-dG9iamlkKGYpOwogCWVsc2UgaWYgKCFzdHJjbXAoYXJndltvcHRpbmRdLCAibGlzdC1zbmFwc2hv
-dHMiKSkKIAkJbGlzdF9zbmFwc2hvdHMoZik7Ci0JZWxzZSBpZiAoIXN0cmNtcChhcmd2WzFdLCAi
-ZnNjdGwtZ2V0b2JqaWQiKSkKLQkJZnNjdGxnZXRvYmppZChmKTsKKwllbHNlIGlmICghc3RyY21w
-KGFyZ3Zbb3B0aW5kXSwgInF1b3RhIikpCisJCXF1b3RhKGYpOworCWVsc2UgaWYgKCFzdHJjbXAo
-YXJndltvcHRpbmRdLCAic2VjZGVzYyIpKQorCQlzZWNkZXNjKGYpOwogCWVsc2UgewogCQlmcHJp
-bnRmKHN0ZGVyciwgIlVua25vd24gY29tbWFuZCAlc1xuIiwgYXJndltvcHRpbmRdKTsKIAkJZXhp
-dCgxKTsKLS0gCjIuNy40Cgo=
---0000000000004a79950585b74a15
-Content-Type: application/octet-stream; 
-	name="0003-mount.cifs-Add-various-missing-parms-from-the-help-t.patch"
-Content-Disposition: attachment; 
-	filename="0003-mount.cifs-Add-various-missing-parms-from-the-help-t.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ju2vpx5w2>
-X-Attachment-Id: f_ju2vpx5w2
-
-RnJvbSA2Mzk2YTc3ZWFjMjZiM2JmMTVmMGZkZmIxODcyODJhYTdkMGE1YmNmIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFR1ZSwgMiBBcHIgMjAxOSAyMToxODoyNyAtMDUwMApTdWJqZWN0OiBbUEFUQ0ggMy83
-XSBtb3VudC5jaWZzIEFkZCB2YXJpb3VzIG1pc3NpbmcgcGFybXMgZnJvbSB0aGUgaGVscCB0ZXh0
-CgpXaGVuIHlvdSB0eXBlIG1vdW50LmNpZnMgLS1oZWxwIHRoZXJlIHdlcmUgbW9yZSB0aGFuIDQw
-IG1vdW50IHBhcm1zCm1pc3NpbmcuIEFkZCAxMiBvZiB0aGUgbW9yZSBjb21tb24gb25lcyB0byB3
-aGF0IGlzIGRpc3BsYXllZCBieSBoZWxwLgoKU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxz
-dGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIG1vdW50LmNpZnMuYyB8IDE0ICsrKysrKysrKysr
-LS0tCiAxIGZpbGUgY2hhbmdlZCwgMTEgaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkKCmRp
-ZmYgLS1naXQgYS9tb3VudC5jaWZzLmMgYi9tb3VudC5jaWZzLmMKaW5kZXggOTM3MGYyZS4uZDky
-MWZlZCAxMDA2NDQKLS0tIGEvbW91bnQuY2lmcy5jCisrKyBiL21vdW50LmNpZnMuYwpAQCAtMjY5
-LDIwICsyNjksMjggQEAgc3RhdGljIGludCBtb3VudF91c2FnZShGSUxFICogc3RyZWFtKQogCWZw
-cmludGYoc3RyZWFtLAogCQkiXG5cdG1hcGNoYXJzLG5vbWFwY2hhcnMsbm9sb2NrLHNlcnZlcm5l
-dGJpb3NuYW1lPTxTUlZfUkZDMTAwMU5BTUU+Iik7CiAJZnByaW50ZihzdHJlYW0sCi0JCSJcblx0
-ZGlyZWN0aW8sbm91bml4LGNpZnNhY2wsc2VjPTxhdXRoZW50aWNhdGlvbiBtZWNoYW5pc20+LHNp
-Z24sc2VhbCxmc2MiKTsKKwkJIlxuXHRkaXJlY3Rpbyxub3VuaXgsY2lmc2FjbCxzZWM9PGF1dGhl
-bnRpY2F0aW9uIG1lY2hhbmlzbT4sc2lnbixzZWFsLGZzYywiKTsKKwlmcHJpbnRmKHN0cmVhbSwK
-KwkJIlxuXHRzbmFwc2hvdD08dGltZT4sbm9zaGFyZXNvY2sscGVyc2lzdGVudGhhbmRsZXMscmVz
-aWxpZW50aGFuZGxlcyxyZG1hLCIpOworCWZwcmludGYoc3RyZWFtLAorCQkiXG5cdHZlcnM9PHNt
-Yl9kaWFsZWN0PixjcnVpZCIpOwogCWZwcmludGYoc3RyZWFtLAogCQkiXG5cbk9wdGlvbnMgbm90
-IG5lZWRlZCBmb3Igc2VydmVycyBzdXBwb3J0aW5nIENJRlMgVW5peCBleHRlbnNpb25zIik7CiAJ
-ZnByaW50ZihzdHJlYW0sCiAJCSJcblx0KGUuZy4gdW5uZWVkZWQgZm9yIG1vdW50cyB0byBtb3N0
-IFNhbWJhIHZlcnNpb25zKToiKTsKIAlmcHJpbnRmKHN0cmVhbSwKLQkJIlxuXHR1aWQ9PHVpZD4s
-Z2lkPTxnaWQ+LGRpcl9tb2RlPTxtb2RlPixmaWxlX21vZGU9PG1vZGU+LHNmdSIpOworCQkiXG5c
-dHVpZD08dWlkPixnaWQ9PGdpZD4sZGlyX21vZGU9PG1vZGU+LGZpbGVfbW9kZT08bW9kZT4sc2Z1
-LCIpOworCWZwcmludGYoc3RyZWFtLAorCQkiXG5cdG1mc3ltbGlua3MsaWRzZnJvbXNpZCIpOwog
-CWZwcmludGYoc3RyZWFtLCAiXG5cblJhcmVseSB1c2VkIG9wdGlvbnM6Iik7CiAJZnByaW50Zihz
-dHJlYW0sCiAJCSJcblx0cG9ydD08dGNwcG9ydD4scnNpemU9PHNpemU+LHdzaXplPTxzaXplPix1
-bmM9PHVuY19uYW1lPixpcD08aXBfYWRkcmVzcz4sIik7CiAJZnByaW50ZihzdHJlYW0sCiAJCSJc
-blx0ZGV2LG5vZGV2LG5vdXNlcl94YXR0cixuZXRiaW9zbmFtZT08T1VSX1JGQzEwMDFOQU1FPixo
-YXJkLHNvZnQsaW50ciwiKTsKIAlmcHJpbnRmKHN0cmVhbSwKLQkJIlxuXHRub2ludHIsaWdub3Jl
-Y2FzZSxub3Bvc2l4cGF0aHMsbm9hY2wscHJlZml4cGF0aD08cGF0aD4sbm9icmwiKTsKKwkJIlxu
-XHRub2ludHIsaWdub3JlY2FzZSxub3Bvc2l4cGF0aHMsbm9hY2wscHJlZml4cGF0aD08cGF0aD4s
-bm9icmwsIik7CisJZnByaW50ZihzdHJlYW0sCisJCSJcblx0ZWNob19pbnRlcnZhbD08c2Vjb25k
-cz4sYWN0aW1lbz08c2Vjb25kcz4sbWF4X2NyZWRpdHM9PGNyZWRpdHM+Iik7CiAJZnByaW50Zihz
-dHJlYW0sCiAJCSJcblxuT3B0aW9ucyBhcmUgZGVzY3JpYmVkIGluIG1vcmUgZGV0YWlsIGluIHRo
-ZSBtYW51YWwgcGFnZSIpOwogCWZwcmludGYoc3RyZWFtLCAiXG5cdG1hbiA4IG1vdW50LmNpZnNc
-biIpOwotLSAKMi43LjQKCg==
---0000000000004a79950585b74a15
-Content-Type: application/octet-stream; 
-	name="0006-Update-man-page-for-mount.cifs-to-add-new-options.patch"
-Content-Disposition: attachment; 
-	filename="0006-Update-man-page-for-mount.cifs-to-add-new-options.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ju2vtm055>
-X-Attachment-Id: f_ju2vtm055
-
-RnJvbSAxOWMxYmI3MWRlOWY1OGJiNWIxZmJjNzhhYjQ2OGY4MGRmNjJlZTU3IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFdlZCwgMyBBcHIgMjAxOSAyMzo0NjozNCAtMDUwMApTdWJqZWN0OiBbUEFUQ0ggNi83
-XSBVcGRhdGUgbWFuIHBhZ2UgZm9yIG1vdW50LmNpZnMgdG8gYWRkIG5ldyBvcHRpb25zCgpBZGQg
-ZGVzY3JpcHRpb24gb2YgInNuYXBzaG90IiBhbmQgImhhbmRsZXRpbWVvdXQiIG1vdW50Cm9wdGlv
-bnMgYW5kIGEgc2VjdXJpdHkgc2VjdGlvbiBub3RpbmcgdGhhdCB0aGUgdXNlIG9mCmNpZnMgaXMg
-ZGlzY291cmFnZWQsIGFuZCB2YXJpb3VzIG1pbm9yIHVwZGF0ZXMuCgpTaWduZWQtb2ZmLWJ5OiBT
-dGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+ClNpZ25lZC1vZmYtYnk6IFBhdmVs
-IFNoaWxvdnNreSA8cHNoaWxvdkBtaWNyb3NvZnQuY29tPgotLS0KIG1vdW50LmNpZnMucnN0IHwg
-OTggKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLQogMSBmaWxlIGNoYW5nZWQsIDYwIGluc2VydGlvbnMoKyksIDM4IGRlbGV0aW9ucygtKQoK
-ZGlmZiAtLWdpdCBhL21vdW50LmNpZnMucnN0IGIvbW91bnQuY2lmcy5yc3QKaW5kZXggZjY0ZDFm
-MS4uOGJhNmU3YiAxMDA2NDQKLS0tIGEvbW91bnQuY2lmcy5yc3QKKysrIGIvbW91bnQuY2lmcy5y
-c3QKQEAgLTE1LDEzICsxNSwxMyBAQCBTWU5PUFNJUwogCiBUaGlzIHRvb2wgaXMgcGFydCBvZiB0
-aGUgY2lmcy11dGlscyBzdWl0ZS4KIAotYGBtb3VudC5jaWZzYGAgbW91bnRzIGEgTGludXggQ0lG
-UyBmaWxlc3lzdGVtLiBJdCBpcyB1c3VhbGx5IGludm9rZWQKLWluZGlyZWN0bHkgYnkgdGhlIG1v
-dW50KDgpIGNvbW1hbmQgd2hlbiB1c2luZyB0aGUgIi10IGNpZnMiCitgYG1vdW50LmNpZnNgYCBt
-b3VudHMgYSBDSUZTIG9yIFNNQjMgZmlsZXN5c3RlbSBmcm9tIExpbnV4LiBJdCBpcwordXN1YWxs
-eSBpbnZva2VkIGluZGlyZWN0bHkgYnkgdGhlIG1vdW50KDgpIGNvbW1hbmQgd2hlbiB1c2luZyB0
-aGUgIi10IGNpZnMiCiBvcHRpb24uIFRoaXMgY29tbWFuZCBvbmx5IHdvcmtzIGluIExpbnV4LCBh
-bmQgdGhlIGtlcm5lbCBtdXN0IHN1cHBvcnQKLXRoZSBjaWZzIGZpbGVzeXN0ZW0uIFRoZSBDSUZT
-IHByb3RvY29sIGlzIHRoZSBzdWNjZXNzb3IgdG8gdGhlIFNNQgotcHJvdG9jb2wgYW5kIGlzIHN1
-cHBvcnRlZCBieSBtb3N0IFdpbmRvd3Mgc2VydmVycyBhbmQgbWFueSBvdGhlcgotY29tbWVyY2lh
-bCBzZXJ2ZXJzIGFuZCBOZXR3b3JrIEF0dGFjaGVkIFN0b3JhZ2UgYXBwbGlhbmNlcyBhcyB3ZWxs
-IGFzCi1ieSB0aGUgcG9wdWxhciBPcGVuIFNvdXJjZSBzZXJ2ZXIgU2FtYmEuCit0aGUgY2lmcyBm
-aWxlc3lzdGVtLiBUaGUgU01CMyBwcm90b2NvbCBpcyB0aGUgc3VjY2Vzc29yIHRvIHRoZSBDSUZT
-IChTTUIpCitwcm90b2NvbCBhbmQgaXMgc3VwcG9ydGVkIGJ5IG1vc3QgV2luZG93cyBzZXJ2ZXJz
-LCBBenVyZSAoY2xvdWQgc3RvcmFnZSksCitNYWNzIGFuZCBtYW55IG90aGVyIGNvbW1lcmNpYWwg
-c2VydmVycyBhbmQgTmV0d29yayBBdHRhY2hlZCBTdG9yYWdlCithcHBsaWFuY2VzIGFzIHdlbGwg
-YXMgYnkgdGhlIHBvcHVsYXIgT3BlbiBTb3VyY2Ugc2VydmVyIFNhbWJhLgogCiBUaGUgbW91bnQu
-Y2lmcyB1dGlsaXR5IGF0dGFjaGVzIHRoZSBVTkMgbmFtZSAoZXhwb3J0ZWQgbmV0d29yawogcmVz
-b3VyY2UpIHNwZWNpZmllZCBhcyBzZXJ2aWNlICh1c2luZyBgYC8vc2VydmVyL3NoYXJlYGAgc3lu
-dGF4LCB3aGVyZQpAQCAtMjY2LDYgKzI2NiwxMyBAQCBoYW5kbGVjYWNoZQogbm9oYW5kbGVjYWNo
-ZQogICBEaXNhYmxlIGNhY2hpbmcgb2YgdGhlIHNoYXJlIHJvb3QgZGlyZWN0b3J5IGhhbmRsZS4K
-IAoraGFuZGxldGltZW91dD1hcmcKKyAgVGhlIHRpbWUgKGluIG1pbGxpc2Vjb25kcykgZm9yIHdo
-aWNoIHRoZSBzZXJ2ZXIgc2hvdWxkIHJlc2VydmUgdGhlIGhhbmRsZSBhZnRlcgorICBhIGZhaWxv
-dmVyIHdhaXRpbmcgZm9yIHRoZSBjbGllbnQgdG8gcmVjb25uZWN0LiAgV2hlbiBtb3VudGluZyB3
-aXRoCisgIHJlc2lsaWVudGhhbmRsZXMgb3IgcGVyc2lzdGVudGhhbmRsZXMgbW91bnQgb3B0aW9u
-LCBvciB3aGVuIHRoZWlyIHVzZSBpcworICByZXF1ZXN0ZWQgYnkgdGhlIHNlcnZlciAoY29udGlu
-dW91cyBhdmFpbGFiaWxpdHkgc2hhcmVzKSB0aGVuIHRoaXMgcGFyYW1ldGVyCisgIG92ZXJyaWRl
-cyB0aGUgc2VydmVyIGRlZmF1bHQgaGFuZGxlIHRpbWVvdXQgKHdoaWNoIGZvciBtb3N0IHNlcnZl
-cnMgaXMgMTIwIHNlY29uZHMpLgorCiByd3BpZGZvcndhcmQKICAgRm9yd2FyZCBwaWQgb2YgYSBw
-cm9jZXNzIHdobyBvcGVuZWQgYSBmaWxlIHRvIGFueSByZWFkIG9yIHdyaXRlCiAgIG9wZXJhdGlv
-biBvbiB0aGF0IGZpbGUuIFRoaXMgcHJldmVudCBhcHBsaWNhdGlvbnMgbGlrZSB3aW5lKDEpIGZy
-b20KQEAgLTM4Nyw2ICszOTQsMTIgQEAgcGVyc2lzdGVudGhhbmRsZXMKIG5vcGVyc2lzdGVudGhh
-bmRsZXMKICAgKGRlZmF1bHQpIERpc2FibGUgcGVyc2lzdGVudCBoYW5kbGVzLgogCitzbmFwc2hv
-dD10aW1lCisgICBNb3VudCBhIHNwZWNpZmljIHNuYXBzaG90IG9mIHRoZSByZW1vdGUgc2hhcmUu
-IGBgdGltZWBgIG11c3QgYmUgYQorICAgcG9zaXRpdmUgaW50ZWdlciBpZGVudGlmeWluZyB0aGUg
-c25hcHNob3QgcmVxdWVzdGVkIChpbiAxMDAtbmFub3NlY29uZAorICAgdW5pdHMgdGhhdCBoYXZl
-IGVsYXBzZWQgc2luY2UgSmFudWFyeSAxLCAxNjAxLCBvciBhbHRlcm5hdGl2ZWx5IGl0IGNhbgor
-ICAgYmUgc3BlY2lmaWVkIGluIEdNVCBmb3JtYXQgZS5nLiBAR01ULTIwMTkuMDMuMjctMjAuNTIu
-MTkpCisKIG5vYnJsCiAgIERvIG5vdCBzZW5kIGJ5dGUgcmFuZ2UgbG9jayByZXF1ZXN0cyB0byB0
-aGUgc2VydmVyLiBUaGlzIGlzIG5lY2Vzc2FyeQogICBmb3IgY2VydGFpbiBhcHBsaWNhdGlvbnMg
-dGhhdCBicmVhayB3aXRoIGNpZnMgc3R5bGUgbWFuZGF0b3J5IGJ5dGUKQEAgLTQwMSw3ICs0MTQs
-NyBAQCBsb2NhbGxlYXNlCiAgIENoZWNrIGNhY2hlZCBsZWFzZXMgbG9jYWxseSBpbnN0ZWFkIG9m
-IHF1ZXJ5aW5nIHRoZSBzZXJ2ZXIuCiAKIHNmdQotICBXaGVuIHRoZSBDSUZTIFVuaXggRXh0ZW5z
-aW9ucyBhcmUgbm90IG5lZ290aWF0ZWQsIGF0dGVtcHQgdG8gY3JlYXRlCisgIFdoZW4gdGhlIENJ
-RlMgb3IgU01CMyBVbml4IEV4dGVuc2lvbnMgYXJlIG5vdCBuZWdvdGlhdGVkLCBhdHRlbXB0IHRv
-IGNyZWF0ZQogICBkZXZpY2UgZmlsZXMgYW5kIGZpZm9zIGluIGEgZm9ybWF0IGNvbXBhdGlibGUg
-d2l0aCBTZXJ2aWNlcyBmb3IgVW5peAogICAoU0ZVKS4gSW4gYWRkaXRpb24gcmV0cmlldmUgYml0
-cyAxMC0xMiBvZiB0aGUgbW9kZSB2aWEgdGhlCiAgIGBgU0VURklMRUJJVFNgYCBleHRlbmRlZCBh
-dHRyaWJ1dGUgKGFzIFNGVSBkb2VzKS4gSW4gdGhlIGZ1dHVyZSB0aGUKQEAgLTQ1MCwxMSArNDYz
-LDExIEBAIG5vc2VydmVyaW5vCiAKICAgU2VlIHNlY3Rpb24gYElOT0RFIE5VTUJFUlNgXyBmb3Ig
-bW9yZSBpbmZvcm1hdGlvbi4KIAotdW5peHxsaW51eAorcG9zaXh8dW5peHxsaW51eAogICAoZGVm
-YXVsdCkgRW5hYmxlIFVuaXggRXh0ZW5zaW9ucyBmb3IgdGhpcyBtb3VudC4gUmVxdWlyZXMgQ0lG
-UwogICAodmVycz0xLjApIG9yIFNNQjMuMS4xICh2ZXJzPTMuMS4xKSBhbmQgYSBzZXJ2ZXIgc3Vw
-cG9ydGluZyB0aGVtLgogCi1ub3VuaXh8bm9saW51eAorbm9wb3NpeHxub3VuaXh8bm9saW51eAog
-ICBEaXNhYmxlIHRoZSBVbml4IEV4dGVuc2lvbnMgZm9yIHRoaXMgbW91bnQuIFRoaXMgY2FuIGJl
-IHVzZWZ1bCBpbgogICBvcmRlciB0byB0dXJuIG9mZiBtdWx0aXBsZSBzZXR0aW5ncyBhdCBvbmNl
-LiBUaGlzIGluY2x1ZGVzIFBPU0lYIGFjbHMsCiAgIFBPU0lYIGxvY2tzLCBQT1NJWCBwYXRocywg
-c3ltbGluayBzdXBwb3J0IGFuZCByZXRyaWV2aW5nCkBAIC00NzksMzggKzQ5MiwzNSBAQCBub3No
-YXJlc29jawogICBEbyBub3QgdHJ5IHRvIHJldXNlIHNvY2tldHMgaWYgdGhlIHN5c3RlbSBpcyBh
-bHJlYWR5IGNvbm5lY3RlZCB0bwogICB0aGUgc2VydmVyIHZpYSBhbiBleGlzdGluZyBtb3VudCBw
-b2ludC4gVGhpcyB3aWxsIG1ha2UgdGhlIGNsaWVudAogICBhbHdheXMgbWFrZSBhIG5ldyBjb25u
-ZWN0aW9uIHRvIHRoZSBzZXJ2ZXIgbm8gbWF0dGVyIHdoYXQgaGUgaXMKLSAgYWxyZWFkeSBjb25u
-ZWN0ZWQgdG8uCisgIGFscmVhZHkgY29ubmVjdGVkIHRvLiBUaGlzIGNhbiBiZSB1c2VmdWwgaW4g
-c2ltdWxhdGluZyBtdWx0aXBsZQorICBjbGllbnRzIGNvbm5lY3RpbmcgdG8gdGhlIHNhbWUgc2Vy
-dmVyLCBhcyBlYWNoIG1vdW50IHBvaW50CisgIHdpbGwgdXNlIGEgZGlmZmVyZW50IFRDUCBzb2Nr
-ZXQuCiAKIG5vYmxvY2tzZW5kCiAgIFNlbmQgZGF0YSBvbiB0aGUgc29ja2V0IHVzaW5nIG5vbiBi
-bG9ja2luZyBvcGVyYXRpb25zIChNU0dfRE9OVFdBSVQgZmxhZykuCiAKIHJzaXplPWJ5dGVzCiAg
-IE1heGltdW0gYW1vdW50IG9mIGRhdGEgdGhhdCB0aGUga2VybmVsIHdpbGwgcmVxdWVzdCBpbiBh
-IHJlYWQgcmVxdWVzdAotICBpbiBieXRlcy4gUHJpb3IgdG8ga2VybmVsIDMuMi4wLCB0aGUgZGVm
-YXVsdCB3YXMgMTZrLCBhbmQgdGhlIG1heGltdW0KLSAgc2l6ZSB3YXMgbGltaXRlZCBieSB0aGUg
-YGBDSUZTTWF4QnVmU2l6ZWBgIG1vZHVsZSBwYXJhbWV0ZXIuIEFzIG9mCi0gIGtlcm5lbCAzLjIu
-MCwgdGhlIGJlaGF2aW9yIHZhcmllcyBhY2NvcmRpbmcgdG8gd2hldGhlciBQT1NJWAotICBleHRl
-bnNpb25zIGFyZSBlbmFibGVkIG9uIHRoZSBtb3VudCBhbmQgdGhlIHNlcnZlciBzdXBwb3J0cyBs
-YXJnZQotICBQT1NJWCByZWFkcy4gSWYgdGhleSBhcmUsIHRoZW4gdGhlIGRlZmF1bHQgaXMgMU0s
-IGFuZCB0aGUgbWF4aW11bSBpcwotICAxNk0uIElmIHRoZXkgYXJlIG5vdCBzdXBwb3J0ZWQgYnkg
-dGhlIHNlcnZlciwgdGhlbiB0aGUgZGVmYXVsdCBpcyA2MGsKLSAgYW5kIHRoZSBtYXhpbXVtIGlz
-IGFyb3VuZCAxMjdrLiBUaGUgcmVhc29uIGZvciB0aGUgNjBrIGlzIGJlY2F1c2UgaXQncwotICB0
-aGUgbWF4aW11bSBzaXplIHJlYWQgdGhhdCB3aW5kb3dzIHNlcnZlcnMgY2FuIGZpbGwuIE5vdGUg
-dGhhdCB0aGlzCi0gIHZhbHVlIGlzIGEgbWF4aW11bSwgYW5kIHRoZSBjbGllbnQgbWF5IHNldHRs
-ZSBvbiBhIHNtYWxsZXIgc2l6ZSB0bwotICBhY2NvbW1vZGF0ZSB3aGF0IHRoZSBzZXJ2ZXIgc3Vw
-cG9ydHMuIEluIGtlcm5lbHMgcHJpb3IgdG8gMy4yLjAsIG5vCi0gIG5lZ290aWF0aW9uIGlzIHBl
-cmZvcm1lZC4KKyAgaW4gYnl0ZXMuIE1heGltdW0gc2l6ZSB0aGF0IHNlcnZlcnMgd2lsbCBhY2Nl
-cHQgaXMgdHlwaWNhbGx5IDhNQiBmb3IgU01CMworICBvciBsYXRlciBkaWFsZWN0cy4gRGVmYXVs
-dCByZXF1ZXN0ZWQgZHVyaW5nIG1vdW50IGlzIDRNQi4gUHJpb3IgdG8gdGhlIDQuMjAKKyAga2Vy
-bmVsIHRoZSBkZWZhdWx0IHJlcXVlc3RlZCB3YXMgMU1CLiBQcmlvciB0byB0aGUgU01CMi4xIGRp
-YWxlY3QgdGhlCisgIG1heGltdW0gd2FzIHVzdWFsbHkgNjRLLgogCiB3c2l6ZT1ieXRlcwogICBN
-YXhpbXVtIGFtb3VudCBvZiBkYXRhIHRoYXQgdGhlIGtlcm5lbCB3aWxsIHNlbmQgaW4gYSB3cml0
-ZSByZXF1ZXN0IGluCi0gIGJ5dGVzLiBQcmlvciB0byBrZXJuZWwgMy4wLjAsIHRoZSBkZWZhdWx0
-IGFuZCBtYXhpbXVtIHdhcyA1NzM0NCAoMTQgXCoKLSAgNDA5NiBwYWdlcykuIEFzIG9mIDMuMC4w
-LCB0aGUgZGVmYXVsdCBkZXBlbmRzIG9uIHdoZXRoZXIgdGhlIGNsaWVudAotICBhbmQgc2VydmVy
-IG5lZ290aWF0ZSBsYXJnZSB3cml0ZXMgdmlhIFBPU0lYIGV4dGVuc2lvbnMuIElmIHRoZXkgZG8s
-Ci0gIHRoZW4gdGhlIGRlZmF1bHQgaXMgMU0sIGFuZCB0aGUgbWF4aW11bSBhbGxvd2VkIGlzIDE2
-TS4gSWYgdGhleSBkbwotICBub3QsIHRoZW4gdGhlIGRlZmF1bHQgaXMgNjU1MzYgYW5kIHRoZSBt
-YXhpbXVtIGFsbG93ZWQgaXMgMTMxMDA3LiBOb3RlCi0gIHRoYXQgdGhpcyB2YWx1ZSBpcyBqdXN0
-IGEgc3RhcnRpbmcgcG9pbnQgZm9yIG5lZ290aWF0aW9uIGluIDMuMC4wIGFuZAotICB1cC4gVGhl
-IGNsaWVudCBhbmQgc2VydmVyIG1heSBuZWdvdGlhdGUgdGhpcyBzaXplIGRvd253YXJkIGFjY29y
-ZGluZwotICB0byB0aGUgc2VydmVyJ3MgY2FwYWJpbGl0aWVzLiBJbiBrZXJuZWxzIHByaW9yIHRv
-IDMuMC4wLCBubwotICBuZWdvdGlhdGlvbiBpcyBwZXJmb3JtZWQuIEl0IGNhbiBlbmQgdXAgd2l0
-aCBhbiBleGlzdGluZyBzdXBlcmJsb2NrIGlmCi0gIHRoaXMgdmFsdWUgaXNuJ3Qgc3BlY2lmaWVk
-IG9yIGl0J3MgZ3JlYXRlciBvciBlcXVhbCB0aGFuIHRoZSBleGlzdGluZwotICBvbmUuCisgIGJ5
-dGVzLiBNYXhpbXVtIHNpemUgdGhhdCBzZXJ2ZXJzIHdpbGwgYWNjZXB0IGlzIHR5cGljYWxseSA4
-TUIgZm9yIFNNQjMKKyAgb3IgbGF0ZXIgZGlhbGVjdHMuIERlZmF1bHQgcmVxdWVzdGVkIGR1cmlu
-ZyBtb3VudCBpcyA0TUIuIFByaW9yIHRvIHRoZSA0LjIwCisgIGtlcm5lbCB0aGUgZGVmYXVsdCBy
-ZXF1ZXN0ZWQgd2FzIDFNQi4gUHJpb3IgdG8gdGhlIFNNQjIuMSBkaWFsZWN0IHRoZQorICBtYXhp
-bXVtIHdhcyB1c3VhbGx5IDY0Sy4KKworYnNpemU9Ynl0ZXMKKyAgT3ZlcnJpZGUgdGhlIGRlZmF1
-bHQgYmxvY2tzaXplICgxTUIpIHJlcG9ydGVkIG9uIFNNQjMgZmlsZXMgKHJlcXVpcmVzCisgIGtl
-cm5lbCB2ZXJzaW9uIG9mIDUuMSBvciBsYXRlcikuIFByaW9yIHRvIGtlcm5lbCB2ZXJzaW9uIDUu
-MSwgdGhlCisgIGJsb2Nrc2l6ZSB3YXMgYWx3YXlzIHJlcG9ydGVkIGFzIDE2SyBpbnN0ZWFkIG9m
-IDFNQiAoYW5kIHdhcyBub3QKKyAgY29uZmlndXJhYmxlKSB3aGljaCBjYW4gaHVydCB0aGUgcGVy
-Zm9ybWFuY2Ugb2YgdG9vbHMgbGlrZSBjcCBhbmQgc2NwCisgIChlc3BlY2lhbGx5IGZvciB1bmNh
-Y2hlZCBJL08pIHdoaWNoIGRlY2lkZSBvbiB0aGUgcmVhZCBhbmQgd3JpdGUgc2l6ZQorICB0byB1
-c2UgZm9yIGZpbGUgY29waWVzIGJhc2VkIG9uIHRoZSBpbm9kZSBibG9ja3NpemUuIGJzaXplIG1h
-eSBub3QgYmUKKyAgbGVzcyB0aGFuIDE2SyBvciBncmVhdGVyIHRoYW4gMTZNLgogCiBtYXhfY3Jl
-ZGl0cz1uCiAgIE1heGltdW0gY3JlZGl0cyB0aGUgU01CMiBjbGllbnQgY2FuIGhhdmUuIERlZmF1
-bHQgaXMgMzIwMDAuIE11c3QgYmUKQEAgLTg4NSwxNCArODk1LDI2IEBAIENPTkZJR1VSQVRJT04K
-IFRoZSBwcmltYXJ5IG1lY2hhbmlzbSBmb3IgbWFraW5nIGNvbmZpZ3VyYXRpb24gY2hhbmdlcyBh
-bmQgZm9yIHJlYWRpbmcKIGRlYnVnIGluZm9ybWF0aW9uIGZvciB0aGUgY2lmcyB2ZnMgaXMgdmlh
-IHRoZSBMaW51eCAvcHJvYwogZmlsZXN5c3RlbS4gSW4gdGhlIGRpcmVjdG9yeSAqL3Byb2MvZnMv
-Y2lmcyogYXJlIHZhcmlvdXMKLWNvbmZpZ3VyYXRpb24gZmlsZXMgYW5kIHBzZXVkbyBmaWxlcyB3
-aGljaCBjYW4gZGlzcGxheSBkZWJ1ZwotaW5mb3JtYXRpb24uIFRoZXJlIGFyZSBhZGRpdGlvbmFs
-IHN0YXJ0dXAgb3B0aW9ucyBzdWNoIGFzIG1heGltdW0KLWJ1ZmZlciBzaXplIGFuZCBudW1iZXIg
-b2YgYnVmZmVycyB3aGljaCBvbmx5IG1heSBiZSBzZXQgd2hlbiB0aGUKK2NvbmZpZ3VyYXRpb24g
-ZmlsZXMgYW5kIHBzZXVkbyBmaWxlcyB3aGljaCBjYW4gZGlzcGxheSBkZWJ1ZyBpbmZvcm1hdGlv
-bgorYW5kIHBlcmZvcm1hbmNlIHN0YXRpc3RpY3MuIFRoZXJlIGFyZSBhZGRpdGlvbmFsIHN0YXJ0
-dXAgb3B0aW9ucyBzdWNoIGFzCittYXhpbXVtIGJ1ZmZlciBzaXplIGFuZCBudW1iZXIgb2YgYnVm
-ZmVycyB3aGljaCBvbmx5IG1heSBiZSBzZXQgd2hlbiB0aGUKIGtlcm5lbCBjaWZzIHZmcyAoY2lm
-cy5rbyBtb2R1bGUpIGlzIGxvYWRlZC4gVGhlc2UgY2FuIGJlIHNlZW4gYnkKIHJ1bm5pbmcgdGhl
-IGBgbW9kaW5mb2BgIHV0aWxpdHkgYWdhaW5zdCB0aGUgZmlsZSBjaWZzLmtvIHdoaWNoIHdpbGwK
-IGxpc3QgdGhlIG9wdGlvbnMgdGhhdCBtYXkgYmUgcGFzc2VkIHRvIGNpZnMgZHVyaW5nIG1vZHVs
-ZSBpbnN0YWxsYXRpb24KIChkZXZpY2UgZHJpdmVyIGxvYWQpLiBGb3IgbW9yZSBpbmZvcm1hdGlv
-biBzZWUgdGhlIGtlcm5lbCBmaWxlCi0qZnMvY2lmcy9SRUFETUUqLgorKmZzL2NpZnMvUkVBRE1F
-Ki4gV2hlbiBjb25maWd1cmluZyBkeW5hbWljIHRyYWNpbmcgKHRyYWNlLWNtZCkKK25vdGUgdGhh
-dCB0aGUgbGlzdCBvZiBTTUIzIGV2ZW50cyB3aGljaCBjYW4gYmUgZW5hYmxlZCBjYW4gYmUgc2Vl
-biBhdDoKKyovc3lzL2tlcm5lbC9kZWJ1Zy90cmFjaW5nL2V2ZW50cy9jaWZzLyouCisKKyoqKioq
-KioqCitTRUNVUklUWQorKioqKioqKioKKworVGhlIHVzZSBvZiBTTUIyLjEgb3IgbGF0ZXIgKGlu
-Y2x1ZGluZyB0aGUgbGF0ZXN0IGRpYWxlY3QgU01CMy4xLjEpCitpcyByZWNvbW1lbmRlZCBmb3Ig
-aW1wcm92ZWQgc2VjdXJpdHkgYW5kIFNNQjEgaXMgbm8gbG9uZ2VyIHJlcXVlc3RlZAorYnkgZGVm
-YXVsdCBhdCBtb3VudCB0aW1lLiBPbGQgZGlhbGVjdHMgc3VjaCBhcyBDSUZTIChTTUIxLCBpZSB2
-ZXJzPTEuMCkKK2hhdmUgbXVjaCB3ZWFrZXIgc2VjdXJpdHkuIFVzZSBvZiBDSUZTIChTTUIxKSBj
-YW4gYmUgZGlzYWJsZWQgYnkKK21vZHByb2JlIGNpZnMgZGlzYWJsZV9sZWdhY3lfZGlhbGVjdHM9
-eS4KIAogKioqKgogQlVHUwpAQCAtOTEzLDggKzkzNSw4IEBAIGJ1Z3MgKG1pbmltdW06IG1vdW50
-LmNpZnMgKHRyeSBgYG1vdW50LmNpZnMgLVZgYCksIGtlcm5lbCAoc2VlCiBWRVJTSU9OCiAqKioq
-KioqCiAKLVRoaXMgbWFuIHBhZ2UgaXMgY29ycmVjdCBmb3IgdmVyc2lvbiAxLjc0IG9mIHRoZSBj
-aWZzIHZmcyBmaWxlc3lzdGVtCi0ocm91Z2hseSBMaW51eCBrZXJuZWwgMy4wKS4KK1RoaXMgbWFu
-IHBhZ2UgaXMgY29ycmVjdCBmb3IgdmVyc2lvbiAyLjE4IG9mIHRoZSBjaWZzIHZmcyBmaWxlc3lz
-dGVtCisocm91Z2hseSBMaW51eCBrZXJuZWwgNS4wKS4KIAogKioqKioqKioKIFNFRSBBTFNPCi0t
-IAoyLjcuNAoK
---0000000000004a79950585b74a15
-Content-Type: application/octet-stream; 
-	name="0007-mount.cifs.rst-mention-kernel-version-for-snapshots.patch"
-Content-Disposition: attachment; 
-	filename="0007-mount.cifs.rst-mention-kernel-version-for-snapshots.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ju2vtm086>
-X-Attachment-Id: f_ju2vtm086
-
-RnJvbSA3MDQ3ZTU3YmNiMzQzYWQ4Njc3MjhmYmRkYzVhNGRhMjlkN2FlOWZjIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBQYXZlbCBTaGlsb3Zza3kgPHBzaGlsb3ZAbWljcm9zb2Z0LmNv
-bT4KRGF0ZTogVGh1LCA0IEFwciAyMDE5IDE2OjI1OjMwICswMDAwClN1YmplY3Q6IFtQQVRDSCA3
-LzddIG1vdW50LmNpZnMucnN0OiBtZW50aW9uIGtlcm5lbCB2ZXJzaW9uIGZvciBzbmFwc2hvdHMK
-ClNpZ25lZC1vZmYtYnk6IFBhdmVsIFNoaWxvdnNreSA8cHNoaWxvdkBtaWNyb3NvZnQuY29tPgot
-LS0KIG1vdW50LmNpZnMucnN0IHwgMyArKy0KIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMo
-KyksIDEgZGVsZXRpb24oLSkKCmRpZmYgLS1naXQgYS9tb3VudC5jaWZzLnJzdCBiL21vdW50LmNp
-ZnMucnN0CmluZGV4IDhiYTZlN2IuLjAyMDE2ZTAgMTAwNjQ0Ci0tLSBhL21vdW50LmNpZnMucnN0
-CisrKyBiL21vdW50LmNpZnMucnN0CkBAIC0zOTgsNyArMzk4LDggQEAgc25hcHNob3Q9dGltZQog
-ICAgTW91bnQgYSBzcGVjaWZpYyBzbmFwc2hvdCBvZiB0aGUgcmVtb3RlIHNoYXJlLiBgYHRpbWVg
-YCBtdXN0IGJlIGEKICAgIHBvc2l0aXZlIGludGVnZXIgaWRlbnRpZnlpbmcgdGhlIHNuYXBzaG90
-IHJlcXVlc3RlZCAoaW4gMTAwLW5hbm9zZWNvbmQKICAgIHVuaXRzIHRoYXQgaGF2ZSBlbGFwc2Vk
-IHNpbmNlIEphbnVhcnkgMSwgMTYwMSwgb3IgYWx0ZXJuYXRpdmVseSBpdCBjYW4KLSAgIGJlIHNw
-ZWNpZmllZCBpbiBHTVQgZm9ybWF0IGUuZy4gQEdNVC0yMDE5LjAzLjI3LTIwLjUyLjE5KQorICAg
-YmUgc3BlY2lmaWVkIGluIEdNVCBmb3JtYXQgZS5nLiBAR01ULTIwMTkuMDMuMjctMjAuNTIuMTkp
-LiBTdXBwb3J0ZWQKKyAgIGluIHRoZSBMaW51eCBrZXJuZWwgc3RhcnRpbmcgZnJvbSB2NC4xOS4K
-IAogbm9icmwKICAgRG8gbm90IHNlbmQgYnl0ZSByYW5nZSBsb2NrIHJlcXVlc3RzIHRvIHRoZSBz
-ZXJ2ZXIuIFRoaXMgaXMgbmVjZXNzYXJ5Ci0tIAoyLjcuNAoK
---0000000000004a79950585b74a15--
+iQIzBAEBCgAdFiEERoXdH1qkUp3jTzChVeljQjyMrg0FAlymPAcACgkQVeljQjyM
+rg2/cA/9FqNI2X6ULznx8iNUArzLJIFGHflwdVL+4CQ5LQctqvyddsjuj6FeNUNb
+6akrlOl5IM6HLtSv9MWhamX9S8V31nbSbF7hj9FyMACzbUDDs9r6qgj+bHKB/91T
+9V0ZjQv9un1tJQ03h8iGAry42n5+e8S8xliLgaZCSOFRaZf2NRmT/4BF9RgA8eEq
+SJJG5xCzC2pAasqCkOJhFYIaWF5Em+LTkBKJySUC2XsE9jFrWg0GhBO+32IXuaWr
+yJYVL/OlT6HRv3jpUxalSquQXUuenPZ6loWqfFrirAF7Qf3asRQeUD6XufMr7GGD
+H66FpDj7aaOiiYhKmzXyOamQIpssSiffsuDrjiYK4ueB7Odr/qABhY7VzHPb9iU5
+WOFbHvQDxbE/B8vuZCi7UzZgXdn47zV4EzSOlnmXmD+xmh2fucusqzGYDNXfwulg
+8zgZ4nw/kHdYawdx0/1dZXJAVBl0/dijg3AH4DG0TNnPXNZZ/QZTDAYapTqG92cz
+4DEzqWIzmVv2krNvPioEk2gmuPpFkR5fv7oI7eeJuW+lXtcJY4vLzzNYzKMdeWNR
+H48bO0+nRCoGfJV7SBB3CIsLBBl1PIKFM4BqVs32m1W+Y/Uwn0odXNrkgKJLzrFr
+zjSc+UKQO1MlNwNyKLDOjOU4P4HH63UShnm1IzxEGdKGLhMIKcg=
+=/tb+
+-----END PGP SIGNATURE-----
+--=-=-=--
