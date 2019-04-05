@@ -2,204 +2,314 @@ Return-Path: <SRS0=n6BV=SH=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8262CC282CE
-	for <linux-cifs@archiver.kernel.org>; Fri,  5 Apr 2019 18:42:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3F6FC282CE
+	for <linux-cifs@archiver.kernel.org>; Fri,  5 Apr 2019 21:37:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 19E582146F
-	for <linux-cifs@archiver.kernel.org>; Fri,  5 Apr 2019 18:42:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samba.org header.i=@samba.org header.b="iNCbEniw"
+	by mail.kernel.org (Postfix) with ESMTP id A2A4E21726
+	for <linux-cifs@archiver.kernel.org>; Fri,  5 Apr 2019 21:37:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731542AbfDESmg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 5 Apr 2019 14:42:36 -0400
-Received: from hr2.samba.org ([144.76.82.148]:54002 "EHLO hr2.samba.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731589AbfDESmg (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 5 Apr 2019 14:42:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-         s=42627210; h=Date:Message-ID:From:Cc:To;
-        bh=/vZSnkMt3bwzHS6mIzf9lmM95pV++bJ3f04ne6Uls1M=; b=iNCbEniwaAZXCwQgMnZd5SB7+h
-        CDiCyj0qu3844QaMuBOWBj0OZEuhA9mAVMxyUrn0nDl+D5Qnq6z5pXr7P5LcemS4wOnvsDXwypuZO
-        9kfoG8qSupCrsDTuUGeA0RzczzBD/aHtPJyOSGWiOe38fU2GuYGAmDdDkFkds7rsl8z0=;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-        by hr2.samba.org with esmtpsa (TLS1.2:ECDHE_ECDSA_CHACHA20_POLY1305:256)
-        (Exim)
-        id 1hCTnM-0000ao-ES; Fri, 05 Apr 2019 18:42:32 +0000
-To:     samba@lists.samba.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel@suse.com>,
-        Paulo Alcantara <paulo@paulo.ac>,
-        Steve French <smfrench@gmail.com>,
-        Hank Leininger <hlein@korelogic.com>,
-        Kenneth D'souza <kdsouza@redhat.com>,
-        Alexander Bokovoy <ab@samba.org>,
-        Pavel Shilovsky <pshilov@microsoft.com>
-From:   Pavel Shilovsky <pshilovsky@samba.org>
-Subject: cifs-utils release 6.9 ready for download
-Message-ID: <c7904840-d370-10ca-1db5-c874cccd2da7@samba.org>
-Date:   Fri, 5 Apr 2019 11:42:29 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1726204AbfDEVhp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 5 Apr 2019 17:37:45 -0400
+Received: from a2nlsmtp01-03.prod.iad2.secureserver.net ([198.71.225.37]:53672
+        "EHLO a2nlsmtp01-03.prod.iad2.secureserver.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725973AbfDEVhp (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 5 Apr 2019 17:37:45 -0400
+Received: from linuxonhyperv2.linuxonhyperv.com ([107.180.71.197])
+        by : HOSTING RELAY : with ESMTP
+        id CWVvhh1UqiCMnCWVvhowpd; Fri, 05 Apr 2019 14:36:43 -0700
+x-originating-ip: 107.180.71.197
+Received: from longli by linuxonhyperv2.linuxonhyperv.com with local (Exim 4.91)
+        (envelope-from <longli@linuxonhyperv2.linuxonhyperv.com>)
+        id 1hCWVv-0006Lw-2r; Fri, 05 Apr 2019 14:36:43 -0700
+From:   Long Li <longli@linuxonhyperv.com>
+To:     Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+Cc:     Long Li <longli@microsoft.com>
+Subject: [Patch (resend) 1/5] cifs: smbd: Don't destroy transport on RDMA disconnect
+Date:   Fri,  5 Apr 2019 21:36:31 +0000
+Message-Id: <20190405213635.24383-1-longli@linuxonhyperv.com>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: ru
+Reply-To: longli@microsoft.com
 Content-Transfer-Encoding: 8bit
+X-CMAE-Envelope: MS4wfEk+qRx/dCxIImn/vsS34Cf9Zf7yd+fapvd7fsuU8+aPsqRI3OHmP3vmGRVZzjZ1v8uFJ0ZT2A/1RxTJKBG3T49cT6XN1TQdImyjjSjP/1mVzGsiVJ5m
+ 5mimR5WipjRf3OnYOAGb2f04M8Kx6jFd/rg2xdE0XHAT0UkLGp9/crBMGgbaxQ5feeqZ3ts/sM5rXmKw2I+mikMX4LmVMNgWtPgLEOxx6ycy+wuVv6kEmPuL
+ gQ+zLDqoREyvM4nbtKpubWrV74G1DPqXe1ciP++9A3ACHmgu8qaptIGmhXc219PGHBRZXPh4ByQXvVpE3/EdZp60hrCkHuAgfT6LHcjOQkZlLqHdXqzrk/Io
+ rU6GSTtrXi4bDH6NyNh/qdK/T0tsqg==
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This is a big release that contains many functional changes that are 
-aligned with the recent work done in the Linux SMB3 kernel client. These 
-changes mostly aim to improve user experience by unlocking new features
-available in modern SMB3 servers:
+From: Long Li <longli@microsoft.com>
 
-- smbinfo utility is added to query various kinds of information from 
-the server (objectId, snapshots, different FileInfo* classes and other 
-metadata)
-- server IP change is supported by expiring DNS key resolver entries
-- get/setcifsacl tools are improved to handle unexpected behavior
-- share snapshot are allowed to be specified by a GMT token or SMB 
-100-nanoseconds time
-- various new mount option are documented: bsize, handletimeout, 
-handlecache, rdma, max_credits and others
+Now upper layer is handling the transport shutdown and reconnect, remove
+the code that handling transport shutdown on RDMA disconnect.
 
-webpage:    https://wiki.samba.org/index.php/LinuxCIFS_utils
-tarball:    https://download.samba.org/pub/linux-cifs/cifs-utils/
-git:        git://git.samba.org/cifs-utils.git
-gitweb:     http://git.samba.org/?p=cifs-utils.git;a=summary
+Signed-off-by: Long Li <longli@microsoft.com>
+---
+ fs/cifs/cifs_debug.c |   8 ++--
+ fs/cifs/smbdirect.c  | 120 +++------------------------------------------------
+ fs/cifs/smbdirect.h  |   9 ----
+ 3 files changed, 10 insertions(+), 127 deletions(-)
 
-Detailed list of changes since 6.8 was released:
+diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+index 19ed9ab..5ff0b3d 100644
+--- a/fs/cifs/cifs_debug.c
++++ b/fs/cifs/cifs_debug.c
+@@ -312,12 +312,10 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+ 			atomic_read(&server->smbd_conn->send_credits),
+ 			atomic_read(&server->smbd_conn->receive_credits),
+ 			server->smbd_conn->receive_credit_target);
+-		seq_printf(m, "\nPending send_pending: %x send_payload_pending:"
+-			" %x smbd_send_pending: %x smbd_recv_pending: %x",
++		seq_printf(m, "\nPending send_pending: %x "
++			"send_payload_pending: %x",
+ 			atomic_read(&server->smbd_conn->send_pending),
+-			atomic_read(&server->smbd_conn->send_payload_pending),
+-			server->smbd_conn->smbd_send_pending,
+-			server->smbd_conn->smbd_recv_pending);
++			atomic_read(&server->smbd_conn->send_payload_pending));
+ 		seq_printf(m, "\nReceive buffers count_receive_queue: %x "
+ 			"count_empty_packet_queue: %x",
+ 			server->smbd_conn->count_receive_queue,
+diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+index 06449cf..7259427 100644
+--- a/fs/cifs/smbdirect.c
++++ b/fs/cifs/smbdirect.c
+@@ -164,95 +164,6 @@ do {									\
+ #define log_rdma_mr(level, fmt, args...) \
+ 		log_rdma(level, LOG_RDMA_MR, fmt, ##args)
+ 
+-/*
+- * Destroy the transport and related RDMA and memory resources
+- * Need to go through all the pending counters and make sure on one is using
+- * the transport while it is destroyed
+- */
+-static void smbd_destroy_rdma_work(struct work_struct *work)
+-{
+-	struct smbd_response *response;
+-	struct smbd_connection *info =
+-		container_of(work, struct smbd_connection, destroy_work);
+-	unsigned long flags;
+-
+-	log_rdma_event(INFO, "destroying qp\n");
+-	ib_drain_qp(info->id->qp);
+-	rdma_destroy_qp(info->id);
+-
+-	/* Unblock all I/O waiting on the send queue */
+-	wake_up_interruptible_all(&info->wait_send_queue);
+-
+-	log_rdma_event(INFO, "cancelling idle timer\n");
+-	cancel_delayed_work_sync(&info->idle_timer_work);
+-	log_rdma_event(INFO, "cancelling send immediate work\n");
+-	cancel_delayed_work_sync(&info->send_immediate_work);
+-
+-	log_rdma_event(INFO, "wait for all send to finish\n");
+-	wait_event(info->wait_smbd_send_pending,
+-		info->smbd_send_pending == 0);
+-
+-	log_rdma_event(INFO, "wait for all recv to finish\n");
+-	wake_up_interruptible(&info->wait_reassembly_queue);
+-	wait_event(info->wait_smbd_recv_pending,
+-		info->smbd_recv_pending == 0);
+-
+-	log_rdma_event(INFO, "wait for all send posted to IB to finish\n");
+-	wait_event(info->wait_send_pending,
+-		atomic_read(&info->send_pending) == 0);
+-	wait_event(info->wait_send_payload_pending,
+-		atomic_read(&info->send_payload_pending) == 0);
+-
+-	log_rdma_event(INFO, "freeing mr list\n");
+-	wake_up_interruptible_all(&info->wait_mr);
+-	wait_event(info->wait_for_mr_cleanup,
+-		atomic_read(&info->mr_used_count) == 0);
+-	destroy_mr_list(info);
+-
+-	/* It's not posssible for upper layer to get to reassembly */
+-	log_rdma_event(INFO, "drain the reassembly queue\n");
+-	do {
+-		spin_lock_irqsave(&info->reassembly_queue_lock, flags);
+-		response = _get_first_reassembly(info);
+-		if (response) {
+-			list_del(&response->list);
+-			spin_unlock_irqrestore(
+-				&info->reassembly_queue_lock, flags);
+-			put_receive_buffer(info, response);
+-		} else
+-			spin_unlock_irqrestore(&info->reassembly_queue_lock, flags);
+-	} while (response);
+-
+-	info->reassembly_data_length = 0;
+-
+-	log_rdma_event(INFO, "free receive buffers\n");
+-	wait_event(info->wait_receive_queues,
+-		info->count_receive_queue + info->count_empty_packet_queue
+-			== info->receive_credit_max);
+-	destroy_receive_buffers(info);
+-
+-	ib_free_cq(info->send_cq);
+-	ib_free_cq(info->recv_cq);
+-	ib_dealloc_pd(info->pd);
+-	rdma_destroy_id(info->id);
+-
+-	/* free mempools */
+-	mempool_destroy(info->request_mempool);
+-	kmem_cache_destroy(info->request_cache);
+-
+-	mempool_destroy(info->response_mempool);
+-	kmem_cache_destroy(info->response_cache);
+-
+-	info->transport_status = SMBD_DESTROYED;
+-	wake_up_all(&info->wait_destroy);
+-}
+-
+-static int smbd_process_disconnected(struct smbd_connection *info)
+-{
+-	schedule_work(&info->destroy_work);
+-	return 0;
+-}
+-
+ static void smbd_disconnect_rdma_work(struct work_struct *work)
+ {
+ 	struct smbd_connection *info =
+@@ -319,8 +230,7 @@ static int smbd_conn_upcall(
+ 		}
+ 
+ 		info->transport_status = SMBD_DISCONNECTED;
+-		smbd_process_disconnected(info);
+-		wake_up(&info->disconn_wait);
++		wake_up_interruptible(&info->disconn_wait);
+ 		wake_up_interruptible(&info->wait_reassembly_queue);
+ 		wake_up_interruptible_all(&info->wait_send_queue);
+ 		break;
+@@ -1501,7 +1411,7 @@ void smbd_destroy(struct TCP_Server_Info *server)
+ 	if (info->transport_status != SMBD_DISCONNECTED) {
+ 		rdma_disconnect(server->smbd_conn->id);
+ 		log_rdma_event(INFO, "wait for transport being disconnected\n");
+-		wait_event(
++		wait_event_interruptible(
+ 			info->disconn_wait,
+ 			info->transport_status == SMBD_DISCONNECTED);
+ 	}
+@@ -1849,12 +1759,6 @@ static struct smbd_connection *_smbd_get_connection(
+ 	queue_delayed_work(info->workqueue, &info->idle_timer_work,
+ 		info->keep_alive_interval*HZ);
+ 
+-	init_waitqueue_head(&info->wait_smbd_send_pending);
+-	info->smbd_send_pending = 0;
+-
+-	init_waitqueue_head(&info->wait_smbd_recv_pending);
+-	info->smbd_recv_pending = 0;
+-
+ 	init_waitqueue_head(&info->wait_send_pending);
+ 	atomic_set(&info->send_pending, 0);
+ 
+@@ -1862,7 +1766,6 @@ static struct smbd_connection *_smbd_get_connection(
+ 	atomic_set(&info->send_payload_pending, 0);
+ 
+ 	INIT_WORK(&info->disconnect_work, smbd_disconnect_rdma_work);
+-	INIT_WORK(&info->destroy_work, smbd_destroy_rdma_work);
+ 	INIT_WORK(&info->recv_done_work, smbd_recv_done_work);
+ 	INIT_WORK(&info->post_send_credits_work, smbd_post_send_credits);
+ 	info->new_credits_offered = 0;
+@@ -1956,11 +1859,6 @@ static int smbd_recv_buf(struct smbd_connection *info, char *buf,
+ 	int rc;
+ 
+ again:
+-	if (info->transport_status != SMBD_CONNECTED) {
+-		log_read(ERR, "disconnected\n");
+-		return -ENODEV;
+-	}
+-
+ 	/*
+ 	 * No need to hold the reassembly queue lock all the time as we are
+ 	 * the only one reading from the front of the queue. The transport
+@@ -2076,6 +1974,11 @@ static int smbd_recv_buf(struct smbd_connection *info, char *buf,
+ 	if (rc)
+ 		return -ENODEV;
+ 
++	if (info->transport_status != SMBD_CONNECTED) {
++		log_read(ERR, "disconnected\n");
++		return 0;
++	}
++
+ 	goto again;
+ }
+ 
+@@ -2126,8 +2029,6 @@ int smbd_recv(struct smbd_connection *info, struct msghdr *msg)
+ 	unsigned int to_read, page_offset;
+ 	int rc;
+ 
+-	info->smbd_recv_pending++;
+-
+ 	if (iov_iter_rw(&msg->msg_iter) == WRITE) {
+ 		/* It's a bug in upper layer to get there */
+ 		cifs_dbg(VFS, "CIFS: invalid msg iter dir %u\n",
+@@ -2158,9 +2059,6 @@ int smbd_recv(struct smbd_connection *info, struct msghdr *msg)
+ 	}
+ 
+ out:
+-	info->smbd_recv_pending--;
+-	wake_up(&info->wait_smbd_recv_pending);
+-
+ 	/* SMBDirect will read it all or nothing */
+ 	if (rc > 0)
+ 		msg->msg_iter.count = 0;
+@@ -2186,7 +2084,6 @@ int smbd_send(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ 	struct kvec *iov;
+ 	int rc;
+ 
+-	info->smbd_send_pending++;
+ 	if (info->transport_status != SMBD_CONNECTED) {
+ 		rc = -ENODEV;
+ 		goto done;
+@@ -2342,9 +2239,6 @@ int smbd_send(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ 	wait_event(info->wait_send_payload_pending,
+ 		atomic_read(&info->send_payload_pending) == 0);
+ 
+-	info->smbd_send_pending--;
+-	wake_up(&info->wait_smbd_send_pending);
+-
+ 	return rc;
+ }
+ 
+diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
+index 73cc923..a3c7b3d 100644
+--- a/fs/cifs/smbdirect.h
++++ b/fs/cifs/smbdirect.h
+@@ -70,13 +70,11 @@ struct smbd_connection {
+ 	int ri_rc;
+ 	struct completion ri_done;
+ 	wait_queue_head_t conn_wait;
+-	wait_queue_head_t wait_destroy;
+ 	wait_queue_head_t disconn_wait;
+ 
+ 	struct completion negotiate_completion;
+ 	bool negotiate_done;
+ 
+-	struct work_struct destroy_work;
+ 	struct work_struct disconnect_work;
+ 	struct work_struct recv_done_work;
+ 	struct work_struct post_send_credits_work;
+@@ -124,13 +122,6 @@ struct smbd_connection {
+ 	wait_queue_head_t wait_for_mr_cleanup;
+ 
+ 	/* Activity accoutning */
+-	/* Pending reqeusts issued from upper layer */
+-	int smbd_send_pending;
+-	wait_queue_head_t wait_smbd_send_pending;
+-
+-	int smbd_recv_pending;
+-	wait_queue_head_t wait_smbd_recv_pending;
+-
+ 	atomic_t send_pending;
+ 	wait_queue_head_t wait_send_pending;
+ 	atomic_t send_payload_pending;
+-- 
+2.7.4
 
-9a8c21a cifs-utils: bump version to 6.9
-aee01e0 smbinfo: use constant for input buffer length
-204c6b6 Fix authors and maintainers
-70f3cda mount.cifs.rst: mention kernel version for snapshots
-cbdd655 Update man page for mount.cifs to add new options
-c52be34 mount.cifs: detect GMT format of snapshot version
-b6cb671 mount.cifs: add more options to help message
-83c6472 mount.cifs Add various missing parms from the help text
-9890747 smbinfo: make argument order consistent
-74ae053 smbinfo: Add ability to query snapshots (previous versions)
-49eb190 smbinfo: missing help for fsctl-getobjid
-2244e10 cifs.upcall: fix a compiler warning
-fb33ba3 smbinfo: add fsctl-getobjid support
-f9f5d42 smbinfo: fix code style
-0feb1a8 setcifsacl: fix adding ACE when owner sid in unexpected location
-1191a6c smbinfo: decode the ACEs
-ea9b99c getcifsacl: Improve help usage and add -h option.
-670f416 getcifsacl: Do not go to parse_sec_desc if getxattr fails.
-b3f78f6 mount.cifs.rst: update vers=3.1.1 option description
-d93cabc Update mount.cifs with vers=default mount option and SMBv3.0.2
-3f197a3 Added rst2man.py to the search list.
-3a00449 mount.cifs: be more verbose and helpful regarding mount errors
-b101af7 cifs: Allow DNS resolver key to expire
-7090217 smbinfo: add FileFsFullSizeInformation
-858ac4d smbinfo: Update the usage text with the new infolevels
-db9d117 smbinfo: update help text
-0ca46db smbinfo: Add more File*Information classes
-f0c95ea smbinfo.rst: document kernel version
-3eb33a1 smbinfo: add a utility to display smb specific information about 
-objects
-3c7e8c3 mount.cifs.rst: document vers=3.02 mount option
-439cd76 mount.cifs.rst: document vers=3 mount option
-06503ef mount.cifs.rst: more cleanups
-77b028c checkopts: report duplicated options in man page
-a389756 cifs-utils: support rst2man-3
-7325a01 mount.cifs.rst: document missing options, correct wrong ones
-97209a5 checkopts: add python script to cross check mount options
-03a3296 manpage: update mount.cifs manpage with info about rdma option
-bfcbfaa mount.cifs.rst: document new (no)handlecache mount option
-81dcfb2 docs: cleanup rst formating
-
-Summary:
-
-Alexander Bokovoy (1):
-       cifs-utils: support rst2man-3
-
-Aurelien Aptel (6):
-       docs: cleanup rst formating
-       mount.cifs.rst: document new (no)handlecache mount option
-       checkopts: report duplicated options in man page
-       mount.cifs.rst: more cleanups
-       smbinfo.rst: document kernel version
-       mount.cifs: be more verbose and helpful regarding mount errors
-
-Aurélien Aptel (2):
-       checkopts: add python script to cross check mount options
-       mount.cifs.rst: document missing options, correct wrong ones
-
-Hank Leininger (1):
-       Added rst2man.py to the search list.
-
-Kenneth D'souza (3):
-       Update mount.cifs with vers=default mount option and SMBv3.0.2
-       getcifsacl: Do not go to parse_sec_desc if getxattr fails.
-       getcifsacl: Improve help usage and add -h option.
-       manpage: update mount.cifs manpage with info about rdma option
-
-Paulo Alcantara (1):
-       cifs: Allow DNS resolver key to expire
-
-Pavel Shilovsky (12):
-       mount.cifs.rst: document vers=3 mount option
-       mount.cifs.rst: document vers=3.02 mount option
-       mount.cifs.rst: update vers=3.1.1 option description
-       smbinfo: fix code style
-       cifs.upcall: fix a compiler warning
-       smbinfo: make argument order consistent
-       mount.cifs: add more options to help message
-       mount.cifs: detect GMT format of snapshot version
-       mount.cifs.rst: mention kernel version for snapshots
-       Fix authors and maintainers
-       smbinfo: use constant for input buffer length
-       cifs-utils: bump version to 6.9
-
-Ronnie Sahlberg (6):
-       smbinfo: add a utility to display smb specific information about 
-objects
-       smbinfo: Add more File*Information classes
-       smbinfo: Update the usage text with the new infolevels
-       smbinfo: add FileFsFullSizeInformation
-       smbinfo: decode the ACEs
-       smbinfo: add fsctl-getobjid support
-
-Steve French (6):
-       smbinfo: update help text
-       setcifsacl: fix adding ACE when owner sid in unexpected location
-       smbinfo: missing help for fsctl-getobjid
-       smbinfo: Add ability to query snapshots (previous versions)
-       mount.cifs Add various missing parms from the help text
-       Update man page for mount.cifs to add new options
-
-  AUTHORS            |    3 +-
-  Makefile.am        |    8 +-
-  README             |    2 +-
-  checkopts          |  253 +++++++++++++++++++
-  cifs.idmap.rst.in  |   71 ++----
-  cifs.upcall.c      |   83 +++++--
-  cifs.upcall.rst.in |  203 ++++++----------
-  cifscreds.rst      |   92 +++----
-  configure.ac       |   14 +-
-  getcifsacl.c       |   35 ++-
-  getcifsacl.rst.in  |   40 +--
-  idmapwb.rst.in     |   19 +-
-  mount.cifs.c       |   80 +++++-
-  mount.cifs.rst     |  259 +++++++++++++-------
-  pam_cifscreds.rst  |   61 ++---
-  setcifsacl.c       |   29 ++-
-  setcifsacl.rst.in  |  143 +++--------
-  smbinfo.c          | 1134 
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  smbinfo.rst        |  108 +++++++++
-  19 files changed, 2067 insertions(+), 570 deletions(-)
-  create mode 100755 checkopts
-  create mode 100644 smbinfo.c
-  create mode 100644 smbinfo.rst
-
-Thanks to everyone who contributed to the release!
