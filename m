@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 394F3C4360F
-	for <linux-cifs@archiver.kernel.org>; Fri,  5 Apr 2019 16:08:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 025CCC282CE
+	for <linux-cifs@archiver.kernel.org>; Fri,  5 Apr 2019 17:06:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 080EE204EC
-	for <linux-cifs@archiver.kernel.org>; Fri,  5 Apr 2019 16:08:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C5E9D206C0
+	for <linux-cifs@archiver.kernel.org>; Fri,  5 Apr 2019 17:06:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JmVXdGRm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HolLUotR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731087AbfDEQIH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 5 Apr 2019 12:08:07 -0400
-Received: from mail-lj1-f180.google.com ([209.85.208.180]:44779 "EHLO
-        mail-lj1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726135AbfDEQIH (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 5 Apr 2019 12:08:07 -0400
-Received: by mail-lj1-f180.google.com with SMTP id h16so5710122ljg.11
-        for <linux-cifs@vger.kernel.org>; Fri, 05 Apr 2019 09:08:06 -0700 (PDT)
+        id S1730565AbfDERGP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 5 Apr 2019 13:06:15 -0400
+Received: from mail-pl1-f170.google.com ([209.85.214.170]:35022 "EHLO
+        mail-pl1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730492AbfDERGP (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 5 Apr 2019 13:06:15 -0400
+Received: by mail-pl1-f170.google.com with SMTP id w24so3364868plp.2
+        for <linux-cifs@vger.kernel.org>; Fri, 05 Apr 2019 10:06:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=tDBSo7niIByD/BOvtgLUkFqQyqtGLsoosIa+5xvOxrQ=;
-        b=JmVXdGRmkLuHp0ASO/Jh3rJroo/SZ9u9zyIWThBs/p5Og90w7RMkzhzjq9gGG31tdy
-         AxaYSd3x7hFiCd7v5DG3a9BRXcOD29L6M94N3Ap2Udc/3FALPz25efTe8CV+/uvREBjp
-         FnUsm1VCHodrMU4zLCA5hZCykStHnuhBI2leszDviOW3w3PZa8cumGyVJhwaa2X4y0p9
-         RPWXqdELlPNelrMnfczKGDexCXmUCmCMkh8KQF07+rbpRr9O8N5tcY1DtxXHWo0shrlP
-         7ZzAOixrFJtKFlfwzNezepotUwsUW7FnUiowwcF+oj5sNtoB79LqWmg41CXK54PdBFFo
-         gX0A==
+        bh=XdSFLNfVCx2ESuMBQMKs/kaDYB5JB3XDvXjIG/8iy40=;
+        b=HolLUotRrEaquIJdL9jtGohFTTLYaE5PnkdgAirB5GC39nhMcilw6jyM7PXtqwxeRa
+         SbJYIaIUmC8/zb3oSssKrnk9IFu0F/89+KeCzTXNFA0kYenRd6ygFIdnLsFdpAL5ft4v
+         ilUr0VQStCKCvfY7jPm0rDHBGD2evCFTzadDNdcP++7fTiRufTTMVUs8r17eoec+qjCL
+         gbfAAcMt4ea1OEqlL7LkWJ7u3EAE776Iv/r6RuUQ2b2OT7ezIX9tqJk8dxWpuOxKgJWp
+         bRF6bcVsvOP5Pv7YCHuxUBT6nGlVE7gXvq8JyCWbmAvMZNPesiZkGrNy+c0+d9o3EutU
+         QeiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=tDBSo7niIByD/BOvtgLUkFqQyqtGLsoosIa+5xvOxrQ=;
-        b=VcsSNpqUAQgUsYY8RdOXOAyYGHSl/11/gfdxnqthYINzUSGaZB9gEt/jwUnSbjL+qO
-         kB+2p6tg37KhzurK55MtjJANUNeMD3/bMdQH6u1OdBgkyDx42fYyObZNIYv71LTbPoun
-         WVeqKuG+Pv0mjK/iFYpyQnWg6oxvHl0Qg1zwNIW2yTawDuD/uu0LhevdqsNMI3JSo0+3
-         mI4RrQpPOQlf8OleT61sCcBt+ypQ1p6QidbgVSQsid0G73GJKXbEh6eMYpd/qjiWU8n+
-         u4NCV5OVPvTfLawpDT+OQF5prebS1wb4KJVYhPrpKT0fXa62SUiJXKfvfEXooZgKNT9a
-         WMsQ==
-X-Gm-Message-State: APjAAAX1CqSmwpQI+pLO1NLpYcomva8rMthIyk/Nas1TKE15yOLIJ2qj
-        rPOhgNgYgzb94lPB1w7TonyOjMd4vCShq+gODg==
-X-Google-Smtp-Source: APXvYqw/sZLNRvKX68J0dUO4SI6zitPpxFmJuzYU2eHZ33KxtHeYiU450PyHXQ9TVC2wwXFrOznpXzqZZG8/dstCkR0=
-X-Received: by 2002:a2e:6c0f:: with SMTP id h15mr7237996ljc.155.1554480485458;
- Fri, 05 Apr 2019 09:08:05 -0700 (PDT)
+        bh=XdSFLNfVCx2ESuMBQMKs/kaDYB5JB3XDvXjIG/8iy40=;
+        b=JrlZdoFjWD32mlTt6NwvgJU+7EBALYVXz8IIQa3RSZR1GBq3JRmrT7aSgcJ/YXo8Ke
+         6ADBUP1eksj58fug0VjdkrlnHauJnHp/1RQQEnLgoALEtAo6debIYBmCN1HvrxIgn3AU
+         4hU+7KYD/69cvmn1tzyoUQVS6taEvMFuL4bQamrUXAVEDSR181l3fJIdcMPtb71JgC9t
+         vioW72eUukfDMPjVEzlhQX/lXT+ojsrUI4HqWZ3/Ch4W5TdVOuVp5629cZq1/XeYiTCv
+         ZWI/3IkHymBYuF6xQr3Vftx/sWuwleIHyHQ8WTeBvD/aK8mTATcDNhxR2KeG5xsfA0hU
+         4+5g==
+X-Gm-Message-State: APjAAAUpqZt+EqN9THz7qtbszqCOzVNb3lGDJq/91jaglmtndFXWsHdL
+        4dhT+AIktN8LmmzwEy+5Ru0NxplHZGEPVyuLrXrsnA==
+X-Google-Smtp-Source: APXvYqxFMvfar7piAOOzkmW1Q6Cc7aS908TEhocfhyzzsIuL4c3bNSTbYSQm75U/ltMF5VmOVzxJxK1MJVKUnmytJC0=
+X-Received: by 2002:a17:902:9006:: with SMTP id a6mr13690423plp.259.1554483974009;
+ Fri, 05 Apr 2019 10:06:14 -0700 (PDT)
 MIME-Version: 1.0
 References: <CAH2r5mstkeagNZzxMZQdritnU53jsVOWW2kMN8bcfN2fL7CCOA@mail.gmail.com>
  <87sguwsse1.fsf@suse.com>
 In-Reply-To: <87sguwsse1.fsf@suse.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Fri, 5 Apr 2019 09:07:53 -0700
-Message-ID: <CAKywueQbRG4HJOJ29fWBBZxW4_RbtMYAq7en1F=1zE+Jpt6w0A@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 5 Apr 2019 12:06:02 -0500
+Message-ID: <CAH2r5mv31SDxx-2shASYouH1XJdxBY_mVJp5t9_UpHX=uY3AYg@mail.gmail.com>
 Subject: Re: Add smb3 mount helper
 To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Cc:     Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        Pavel Shilovsky <piastryyy@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
@@ -69,8 +69,13 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D0=BF=D1=82, 5 =D0=B0=D0=BF=D1=80. 2019 =D0=B3. =D0=B2 02:39, Aur=C3=A9lie=
-n Aptel <aaptel@suse.com>:
+Yes - we could move common code to a common C file - would be fairly
+easy to reduce most of the duplicated code (and can do the diff
+between the two mount.cifs.c vs mount.smb3.c)  - goal is also to
+behave differently for the two (we don't want to show/display/use
+obsolete options in the mount.smb3.c flavor of the mount helper)
+
+On Fri, Apr 5, 2019 at 4:39 AM Aur=C3=A9lien Aptel <aaptel@suse.com> wrote:
 >
 > Steve French <smfrench@gmail.com> writes:
 > >     We want to encourage use of more secure SMB3, and don't want
@@ -87,9 +92,17 @@ n Aptel <aaptel@suse.com>:
 > code to a separate file.
 >
 >
+> Cheers,
+> --
+> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+> SUSE Linux GmbH, Maxfeldstra=C3=9Fe 5, 90409 N=C3=BCrnberg, Germany
+> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 21284 (AG N=C3=
+=BCrnberg)
 
-Agree. I suggest to move the common code to a separate file.
 
---
-Best regards,
-Pavel Shilovsky
+
+--=20
+Thanks,
+
+Steve
