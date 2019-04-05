@@ -2,53 +2,62 @@ Return-Path: <SRS0=n6BV=SH=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECFC7C10F13
-	for <linux-cifs@archiver.kernel.org>; Fri,  5 Apr 2019 06:13:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47341C4360F
+	for <linux-cifs@archiver.kernel.org>; Fri,  5 Apr 2019 09:39:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C751F217D7
-	for <linux-cifs@archiver.kernel.org>; Fri,  5 Apr 2019 06:13:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1AC7421738
+	for <linux-cifs@archiver.kernel.org>; Fri,  5 Apr 2019 09:39:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726231AbfDEGNO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 5 Apr 2019 02:13:14 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:33994 "EHLO huawei.com"
+        id S1730224AbfDEJjV convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 5 Apr 2019 05:39:21 -0400
+Received: from mx2.suse.de ([195.135.220.15]:43508 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726594AbfDEGNO (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 5 Apr 2019 02:13:14 -0400
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 51040A21748A5F7FB0BC;
-        Fri,  5 Apr 2019 14:13:12 +0800 (CST)
-Received: from RH5885H-V3.huawei.com (10.90.53.225) by
- DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
- 14.3.408.0; Fri, 5 Apr 2019 14:13:01 +0800
-From:   ZhangXiaoxu <zhangxiaoxu5@huawei.com>
-To:     <sfrench@samba.org>, <linux-cifs@vger.kernel.org>,
-        <samba-technical@lists.samba.org>, <zhangxiaoxu5@huawei.com>
-Subject: [PATCH 0/2] Fix KASAN use-after free in SMB2_write and SMB2_read
-Date:   Fri, 5 Apr 2019 14:17:20 +0800
-Message-ID: <1554445042-98793-1-git-send-email-zhangxiaoxu5@huawei.com>
-X-Mailer: git-send-email 2.7.4
+        id S1729833AbfDEJjV (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 5 Apr 2019 05:39:21 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 1B6C1AC38;
+        Fri,  5 Apr 2019 09:39:20 +0000 (UTC)
+From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
+To:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        Pavel Shilovsky <piastryyy@gmail.com>
+Subject: Re: Add smb3 mount helper
+In-Reply-To: <CAH2r5mstkeagNZzxMZQdritnU53jsVOWW2kMN8bcfN2fL7CCOA@mail.gmail.com>
+References: <CAH2r5mstkeagNZzxMZQdritnU53jsVOWW2kMN8bcfN2fL7CCOA@mail.gmail.com>
+Date:   Fri, 05 Apr 2019 11:39:18 +0200
+Message-ID: <87sguwsse1.fsf@suse.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.90.53.225]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The trace function use the 'req' after released.
+Steve French <smfrench@gmail.com> writes:
+>     We want to encourage use of more secure SMB3, and don't want
+>     people using cifs and this new helper makes it less confusing:
+>          "mount -t smb3"
+>     rather than
+>          "mount -t cifs"
+>     Users can still mount the old way, but if they use smb3 mount
+>     helper (mount.smb3 or "mount -t smb3") it will be less confusing
+>     and less likely to use older insecure dialects.
 
-ZhangXiaoxu (2):
-  cifs: Fix use-after-free in SMB2_write
-  cifs: Fix use-after-free in SMB2_read
+I don't think duplicating the source is a good idea. Could we just make
+a symlink or hardlink at installation? Alternatively move the common
+code to a separate file.
 
- fs/cifs/smb2pdu.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
 
+Cheers,
 -- 
-2.7.4
-
+Aurélien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
+GF: Felix Imendörffer, Mary Higgins, Sri Rasiah HRB 21284 (AG Nürnberg)
