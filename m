@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46CD2C10F13
-	for <linux-cifs@archiver.kernel.org>; Mon,  8 Apr 2019 23:09:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4E2BC10F13
+	for <linux-cifs@archiver.kernel.org>; Mon,  8 Apr 2019 23:09:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 111F920879
-	for <linux-cifs@archiver.kernel.org>; Mon,  8 Apr 2019 23:09:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A09D520879
+	for <linux-cifs@archiver.kernel.org>; Mon,  8 Apr 2019 23:09:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RDnJ4Yaf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ApFie4sO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726517AbfDHXJg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 8 Apr 2019 19:09:36 -0400
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:43607 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726068AbfDHXJg (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 8 Apr 2019 19:09:36 -0400
-Received: by mail-lj1-f196.google.com with SMTP id f18so12748842lja.10
-        for <linux-cifs@vger.kernel.org>; Mon, 08 Apr 2019 16:09:35 -0700 (PDT)
+        id S1726523AbfDHXJv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 8 Apr 2019 19:09:51 -0400
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:35152 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726068AbfDHXJv (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 8 Apr 2019 19:09:51 -0400
+Received: by mail-lf1-f66.google.com with SMTP id u21so10805318lfu.2
+        for <linux-cifs@vger.kernel.org>; Mon, 08 Apr 2019 16:09:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=qypRg32lj7o5iOEc2Bka7mHvyo8oM+qnqBCOIl4PKPw=;
-        b=RDnJ4YafzKf1T0aEA0rHMlqT9HqkTs25NOFOG3+nXiYuJENVKwJMsIflXe2ZTtmMzq
-         jpEt1Pwes+1jKNkEdHesHrFf7F8Ms86/20dT7Q4+l9u2jPykrquYZrIrwXjlSk3j+ong
-         NCggNx18jslZBfeYAwB/hXbw9BNXAGOjArZzdTYokY2pKDPjK2BrLWsIGVL/5+84X/kg
-         Blhr1UzlPbxdynMPubYQdL6iSUfCeAVCbgzWjHONukJ1UUOMkhJu/3An8Q2kSR00yXGs
-         Rdioaup2/SUduXbgqba3EuHt/mXNpU+ssNEMPMBaMnI8XVNqnuFaRxJVvQux+GhcYlWQ
-         6EAA==
+        bh=oZypvvBWy5hdemJNpj60lF42wN2r4NWpKLUJoJMO7Z8=;
+        b=ApFie4sOM6C7iXqOgsWumS5KI+eBmoha1obmb+vnEvqJtQJoyEgKndJXoEHCTBL+rl
+         tO/PcLwHQX8f9wxSDYxEW6Ql27sTZ/Gqn2SuEy21pihcTTJigUulDZsuL7n9WZhfV9E4
+         LFbZ7KOF2sN+YeI4EuIH1OALlvFZHXLAE0xLHYuqx2h07eehZJsf9FZ7z/szQ26SfBwL
+         IQzXSZ9QD7gkbkgs/wzfPLaNma9f+QvwrKsQsX8R/eODW79ePv90Ag5N5oxZhkOvgbq9
+         5UpXIqwgpxjoBRqFcX6gIEwI1SbC1Zv0d+Ciwd9SD7CfVOzl1fux40OZ1B3zKAEAFnTz
+         Ad7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=qypRg32lj7o5iOEc2Bka7mHvyo8oM+qnqBCOIl4PKPw=;
-        b=EO7abERxuQ/H5E2LY7wIQAVKiUkB0/vYeqM4kQLoSA3LzS41eS/wTOpC6Gaf+mb4hD
-         imJuPG8KzoAdNa2Dd9DywEK1qsmBaHACNPhCO+f4d5rCXGyQ7GfatNHnzRBrYHz0UqjC
-         06dejHV9qVht7OLT9W7BmX4GxDG/mgzyqkJCSG3IUqScXfoszDNv+x2vNhxkwY2uLjRZ
-         iodn2MiGJA6EobFBtZiVVRPTNKZNGgxSIMr60scrIOF/qoXzN9nTGAkqXnd6PNhImze5
-         o+HSrIIQ5Hn41dKWK8/5kiD/lUGEoq9u4kEQStesrY1odC0POwidhXg5yWQglRq5xlyp
-         xtaQ==
-X-Gm-Message-State: APjAAAWQZj2cYWY8Q74nsXOzm5SkzwjOd0ir5q0A2jpnTiCBMNdjF1O6
-        qe5+I4UxiTtyOqU81V9voqEkGPqTaVyZ3C+Cfw==
-X-Google-Smtp-Source: APXvYqwpHpDsyYIG5HHQ3QB9Ka/eILNn8nSeux11+k51FEfEg6D3B+JNOQ6O4tiyG53yH7IR1jRnYosIzwm6jzhSrlM=
-X-Received: by 2002:a2e:1257:: with SMTP id t84mr18302057lje.115.1554764974477;
- Mon, 08 Apr 2019 16:09:34 -0700 (PDT)
+        bh=oZypvvBWy5hdemJNpj60lF42wN2r4NWpKLUJoJMO7Z8=;
+        b=qHf30MIDP9x8oNcN9agjIOhp+qZ4AJz8entPNZZl7caKiHBiqBDeOc8b+b6o6/0AoN
+         vsD++w9Mt3KHE1751Vlk+J1zE8Yq+4WyY4DQcO/mh1NjC7lJ/AP9fi1eJ/eIfIOLbpYr
+         3PTN5/Sw9KI3EQdNASx73JE/5x64ovB9jlpKtqv0Mvl9VJDF7Qd2LdlTLcVE2qqE743y
+         nfhjLz6HhakV8vZ+ndgeSxdLS1SVhtTcHxz6RSY72UAhqqoGdCTCuyvO/HTtW6M+l2ce
+         owkkcBVTUcudqHD+oH9RPD7s3qSP+sMP56Y3drTvbASevoXvB80OEmVHrLhs5Zp6+FVO
+         jlfQ==
+X-Gm-Message-State: APjAAAUODvhftP1HElLhGlaQblaMzhzxzH6hiMd39ljYS6mgOMgSmeUp
+        PV9RiCTgVJabiA5rbi9NF6cxWAPZxFGTwfOi+w==
+X-Google-Smtp-Source: APXvYqwiHeuQCM99yt9ODerrl8WcLWtck+fuxjkM1fuwKFFzHV6Ssu+eFyd1NnrAe8WRl5TJPd5i4WwpBEajZI/jMQQ=
+X-Received: by 2002:ac2:530a:: with SMTP id c10mr14920963lfh.45.1554764989318;
+ Mon, 08 Apr 2019 16:09:49 -0700 (PDT)
 MIME-Version: 1.0
-References: <1554690154-34236-1-git-send-email-zhangxiaoxu5@huawei.com> <1554690154-34236-2-git-send-email-zhangxiaoxu5@huawei.com>
-In-Reply-To: <1554690154-34236-2-git-send-email-zhangxiaoxu5@huawei.com>
+References: <1554690154-34236-1-git-send-email-zhangxiaoxu5@huawei.com> <1554690154-34236-3-git-send-email-zhangxiaoxu5@huawei.com>
+In-Reply-To: <1554690154-34236-3-git-send-email-zhangxiaoxu5@huawei.com>
 From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Mon, 8 Apr 2019 16:09:23 -0700
-Message-ID: <CAKywueQKFOb_9b_=_xLUBk37KcoN+OatSUaLsKLf-xdTfMbxNg@mail.gmail.com>
-Subject: Re: [PATCH v3 1/2] cifs: Fix use-after-free in SMB2_write
+Date:   Mon, 8 Apr 2019 16:09:38 -0700
+Message-ID: <CAKywueRz+qrV9TxH9NA0RJ+WoFrGte9nj2k1o6X2idKP5rgdpw@mail.gmail.com>
+Subject: Re: [PATCH v3 2/2] cifs: Fix use-after-free in SMB2_read
 To:     ZhangXiaoxu <zhangxiaoxu5@huawei.com>
 Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
         Steve French <sfrench@samba.org>,
@@ -72,8 +72,8 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 <zhangxiaoxu5@huawei.com>:
 >
 > There is a KASAN use-after-free:
-> BUG: KASAN: use-after-free in SMB2_write+0x1342/0x1580
-> Read of size 8 at addr ffff8880b6a8e450 by task ln/4196
+> BUG: KASAN: use-after-free in SMB2_read+0x1136/0x1190
+> Read of size 8 at addr ffff8880b4e45e50 by task ln/1009
 >
 > Should not release the 'req' because it will use in the trace.
 >
@@ -83,31 +83,34 @@ ing)
 > cc: stable@vger.kernel.org (v4.18+)
 > Signed-off-by: ZhangXiaoxu <zhangxiaoxu5@huawei.com>
 > ---
->  fs/cifs/smb2pdu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  fs/cifs/smb2pdu.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
 > diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 0f14471..fca5b0a 100644
+> index fca5b0a..b8f7262 100644
 > --- a/fs/cifs/smb2pdu.c
 > +++ b/fs/cifs/smb2pdu.c
-> @@ -3772,7 +3772,6 @@ SMB2_write(const unsigned int xid, struct cifs_io_p=
-arms *io_parms,
+> @@ -3451,8 +3451,6 @@ SMB2_read(const unsigned int xid, struct cifs_io_pa=
+rms *io_parms,
+>         rqst.rq_nvec =3D 1;
 >
->         rc =3D cifs_send_recv(xid, io_parms->tcon->ses, &rqst,
->                             &resp_buftype, flags, &rsp_iov);
+>         rc =3D cifs_send_recv(xid, ses, &rqst, &resp_buftype, flags, &rsp=
+_iov);
 > -       cifs_small_buf_release(req);
->         rsp =3D (struct smb2_write_rsp *)rsp_iov.iov_base;
+> -
+>         rsp =3D (struct smb2_read_rsp *)rsp_iov.iov_base;
 >
 >         if (rc) {
-> @@ -3790,6 +3789,7 @@ SMB2_write(const unsigned int xid, struct cifs_io_p=
-arms *io_parms,
->                                      io_parms->offset, *nbytes);
->         }
+> @@ -3474,6 +3472,8 @@ SMB2_read(const unsigned int xid, struct cifs_io_pa=
+rms *io_parms,
+>                                     io_parms->tcon->tid, ses->Suid,
+>                                     io_parms->offset, io_parms->length);
 >
 > +       cifs_small_buf_release(req);
->         free_rsp_buf(resp_buftype, rsp);
->         return rc;
->  }
+> +
+>         *nbytes =3D le32_to_cpu(rsp->DataLength);
+>         if ((*nbytes > CIFS_MAX_MSGSIZE) ||
+>             (*nbytes > io_parms->length)) {
 > --
 > 2.7.4
 >
