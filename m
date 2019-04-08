@@ -1,115 +1,124 @@
-Return-Path: <SRS0=1DbD=SJ=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=JvIj=SK=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D1B5C10F0E
-	for <linux-cifs@archiver.kernel.org>; Sun,  7 Apr 2019 03:28:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8352C10F0E
+	for <linux-cifs@archiver.kernel.org>; Mon,  8 Apr 2019 02:15:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4168820880
-	for <linux-cifs@archiver.kernel.org>; Sun,  7 Apr 2019 03:28:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y9l2CDKS"
+	by mail.kernel.org (Postfix) with ESMTP id B494920880
+	for <linux-cifs@archiver.kernel.org>; Mon,  8 Apr 2019 02:15:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726245AbfDGD2Z (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 6 Apr 2019 23:28:25 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:40134 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726202AbfDGD2Z (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 6 Apr 2019 23:28:25 -0400
-Received: by mail-pg1-f193.google.com with SMTP id d31so749642pgl.7
-        for <linux-cifs@vger.kernel.org>; Sat, 06 Apr 2019 20:28:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ZiJoZy2vrXoItvRAuotJxrKAhRSc1Mjx4GdmiBTDpLo=;
-        b=Y9l2CDKSA94o2m+marFjVhFIUtDfcWCmkr26De8pPDkuSDdVmLSSxl/jygI/mvdc03
-         sTsdT2pERZGWxzsFTzVY+Zqq/QDCYAdUfA/WkR8J3dbNt2Mbt5M4iLh5uP7PHffYAZK1
-         qnYL7QfpWjVT7o9+BfG5qABpz9X5KgwZyrd7BrkyDwhGsDYbu91IzojXmgctIATpHfcL
-         SY4SGWirX5jnMHvzpu/wKo802KSaSiAennus5UfrYomA+3e4lmRIkIi8z56SY4MMYVEl
-         1bJ8c8UUMGVv4cuccMNjxDfQlt04dramGsXFkGsfeYn/7E7ypl2cAubHlqx8muorcQki
-         vUBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ZiJoZy2vrXoItvRAuotJxrKAhRSc1Mjx4GdmiBTDpLo=;
-        b=LfpnUo0OBcyMNA1pQY4Gaduzwm26WX7kTl7V6AVG9EZmNwgjEpMbVbx9vMmxAN5LSW
-         gr48R2qF0VDEs1fv9oliqWZMtsc0EZ368h3uQsp1pzTLSTGxxkDNNlV9Bd13V1DhO9MD
-         2yRzSmLQade5qxUf7oZp7d11fO3LAwrvoWOHnLslU4qAXkoIWJ8QPQjG0EyZgM7MiPWu
-         FpC5LFSgQP5QRFjG6Q6v1dkB/O98SsvCPLLWP6KebG9l1e70EfGi2mMzlZ+KnBF6SM+8
-         v9RcU+5Ma0cTlRnFfT1GbUroxsIge2430RnNV6TiNMDQ/cwhLq0Mx3t/VNiME/oRMtJ3
-         Rqqg==
-X-Gm-Message-State: APjAAAVLgqptg8HnVg48Hwu372n1E92VsU+qSy2wGO1FbMU8zjs4m7fJ
-        WRbjlmscSxxTL8AX/9dGKelPhMR0EK+q/a+4tq0=
-X-Google-Smtp-Source: APXvYqyUxiMnvS6889l7Gvi+mBvY94Kldz6fFOm8MrO2s50WVrjxdRpLSoNpRIc4NUAEiNxT+yxXO+NTD1ax4cFPWtM=
-X-Received: by 2002:a63:525f:: with SMTP id s31mr20855950pgl.172.1554607704595;
- Sat, 06 Apr 2019 20:28:24 -0700 (PDT)
+        id S1726486AbfDHCPA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 7 Apr 2019 22:15:00 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:6703 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726461AbfDHCPA (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Sun, 7 Apr 2019 22:15:00 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 43B8D7007B1C29E97734;
+        Mon,  8 Apr 2019 10:14:58 +0800 (CST)
+Received: from RH5885H-V3.huawei.com (10.90.53.225) by
+ DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
+ 14.3.408.0; Mon, 8 Apr 2019 10:14:48 +0800
+From:   ZhangXiaoxu <zhangxiaoxu5@huawei.com>
+To:     <linux-cifs@vger.kernel.org>, <sfrench@samba.org>,
+        <samba-technical@lists.samba.org>, <zhangxiaoxu5@huawei.com>
+Subject: [PATCH v4] cifs: Fix lease buffer length error
+Date:   Mon, 8 Apr 2019 10:19:10 +0800
+Message-ID: <1554689950-30863-1-git-send-email-zhangxiaoxu5@huawei.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-References: <1554536859-139778-1-git-send-email-zhangxiaoxu5@huawei.com> <1554536859-139778-2-git-send-email-zhangxiaoxu5@huawei.com>
-In-Reply-To: <1554536859-139778-2-git-send-email-zhangxiaoxu5@huawei.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 6 Apr 2019 22:28:12 -0500
-Message-ID: <CAH2r5msQJ1KjAf5P0WiRWX+Kcj-UU=UK1yjkWT-ZZ6_KXsykBg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] cifs: Fix use-after-free in SMB2_write
-To:     ZhangXiaoxu <zhangxiaoxu5@huawei.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        Steve French <sfrench@samba.org>,
-        samba-technical <samba-technical@lists.samba.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Originating-IP: [10.90.53.225]
+X-CFilter-Loop: Reflected
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Presumably cc: stable v4.18+
+There is a KASAN slab-out-of-bounds:
+BUG: KASAN: slab-out-of-bounds in _copy_from_iter_full+0x783/0xaa0
+Read of size 80 at addr ffff88810c35e180 by task mount.cifs/539
 
-On Sat, Apr 6, 2019 at 2:45 AM ZhangXiaoxu <zhangxiaoxu5@huawei.com> wrote:
->
-> There is a KASAN use-after-free:
-> BUG: KASAN: use-after-free in SMB2_write+0x1342/0x1580
-> Read of size 8 at addr ffff8880b6a8e450 by task ln/4196
->
-> Should not release the 'req' because it will use in the trace.
->
-> Fixes: eccb4422cf97(smb3: Add ftrace tracepoints for improved SMB3 debugging)
->
-> Signed-off-by: ZhangXiaoxu <zhangxiaoxu5@huawei.com>
-> ---
->  fs/cifs/smb2pdu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 21ac19f..6cf4e88 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -3752,7 +3752,6 @@ SMB2_write(const unsigned int xid, struct cifs_io_parms *io_parms,
->
->         rc = cifs_send_recv(xid, io_parms->tcon->ses, &rqst,
->                             &resp_buftype, flags, &rsp_iov);
-> -       cifs_small_buf_release(req);
->         rsp = (struct smb2_write_rsp *)rsp_iov.iov_base;
->
->         if (rc) {
-> @@ -3770,6 +3769,7 @@ SMB2_write(const unsigned int xid, struct cifs_io_parms *io_parms,
->                                      io_parms->offset, *nbytes);
->         }
->
-> +       cifs_small_buf_release(req);
->         free_rsp_buf(resp_buftype, rsp);
->         return rc;
->  }
-> --
-> 2.7.4
->
+CPU: 1 PID: 539 Comm: mount.cifs Not tainted 4.19 #10
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+            rel-1.12.0-0-ga698c8995f-prebuilt.qemu.org 04/01/2014
+Call Trace:
+ dump_stack+0xdd/0x12a
+ print_address_description+0xa7/0x540
+ kasan_report+0x1ff/0x550
+ check_memory_region+0x2f1/0x310
+ memcpy+0x2f/0x80
+ _copy_from_iter_full+0x783/0xaa0
+ tcp_sendmsg_locked+0x1840/0x4140
+ tcp_sendmsg+0x37/0x60
+ inet_sendmsg+0x18c/0x490
+ sock_sendmsg+0xae/0x130
+ smb_send_kvec+0x29c/0x520
+ __smb_send_rqst+0x3ef/0xc60
+ smb_send_rqst+0x25a/0x2e0
+ compound_send_recv+0x9e8/0x2af0
+ cifs_send_recv+0x24/0x30
+ SMB2_open+0x35e/0x1620
+ open_shroot+0x27b/0x490
+ smb2_open_op_close+0x4e1/0x590
+ smb2_query_path_info+0x2ac/0x650
+ cifs_get_inode_info+0x1058/0x28f0
+ cifs_root_iget+0x3bb/0xf80
+ cifs_smb3_do_mount+0xe00/0x14c0
+ cifs_do_mount+0x15/0x20
+ mount_fs+0x5e/0x290
+ vfs_kern_mount+0x88/0x460
+ do_mount+0x398/0x31e0
+ ksys_mount+0xc6/0x150
+ __x64_sys_mount+0xea/0x190
+ do_syscall_64+0x122/0x590
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
 
+It can be reproduced by the following step:
+  1. samba configured with: server max protocol = SMB2_10
+  2. mount -o vers=default
 
+When parse the mount version parameter, the 'ops' and 'vals'
+was setted to smb30,  if negotiate result is smb21, just
+update the 'ops' to smb21, but the 'vals' is still smb30.
+When add lease context, the iov_base is allocated with smb21
+ops, but the iov_len is initiallited with the smb30. Because
+the iov_len is longer than iov_base, when send the message,
+copy array out of bounds.
+
+we need to keep the 'ops' and 'vals' consistent.
+
+Fixes: 9764c02fcbad(SMB3: Add support for multidialect negotiate (SMB2.1 and later))
+Fixes: d5c7076b772a(smb3: add smb3.1.1 to default dialect list)
+
+cc: stable@vger.kernel.org (v4.14+)
+Signed-off-by: ZhangXiaoxu <zhangxiaoxu5@huawei.com>
+---
+ fs/cifs/smb2pdu.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 21ad01d..0f14471 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -832,8 +832,11 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
+ 		} else if (rsp->DialectRevision == cpu_to_le16(SMB21_PROT_ID)) {
+ 			/* ops set to 3.0 by default for default so update */
+ 			ses->server->ops = &smb21_operations;
+-		} else if (rsp->DialectRevision == cpu_to_le16(SMB311_PROT_ID))
++			ses->server->vals = &smb21_values;
++		} else if (rsp->DialectRevision == cpu_to_le16(SMB311_PROT_ID)) {
+ 			ses->server->ops = &smb311_operations;
++			ses->server->vals = &smb311_values;
++		}
+ 	} else if (le16_to_cpu(rsp->DialectRevision) !=
+ 				ses->server->vals->protocol_id) {
+ 		/* if requested single dialect ensure returned dialect matched */
 -- 
-Thanks,
+2.7.4
 
-Steve
