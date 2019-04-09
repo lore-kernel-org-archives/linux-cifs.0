@@ -2,197 +2,496 @@ Return-Path: <SRS0=suyG=SL=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00796C10F13
-	for <linux-cifs@archiver.kernel.org>; Tue,  9 Apr 2019 00:29:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6FFDC10F13
+	for <linux-cifs@archiver.kernel.org>; Tue,  9 Apr 2019 02:39:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C2381213F2
-	for <linux-cifs@archiver.kernel.org>; Tue,  9 Apr 2019 00:29:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GfOEgO22"
+	by mail.kernel.org (Postfix) with ESMTP id 9305820880
+	for <linux-cifs@archiver.kernel.org>; Tue,  9 Apr 2019 02:39:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726349AbfDIA3f (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 8 Apr 2019 20:29:35 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:41365 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726068AbfDIA3f (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 8 Apr 2019 20:29:35 -0400
-Received: by mail-pg1-f196.google.com with SMTP id f6so8230877pgs.8
-        for <linux-cifs@vger.kernel.org>; Mon, 08 Apr 2019 17:29:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=2wYgpwm52p7oSkJ9uNjOWyk7Cvrjl3T+B8HQYE0rdSA=;
-        b=GfOEgO22UCM64mOBnUz/cJjJzXzIgR+ovrIOnkhTEyfpZtkiiiFm7DvydthVQueCSj
-         i3C1G2c4E9X61u2OWwVFUxKJwd1JZDj5t8VCLOrVbK2Qal4NXU/NXNH35OuRG+NH0yOz
-         UqA6WvlQoRL8CDSXqbnknHDkLX/2A10V+cqZuY84B+CMo9RGEWd06hcZw5VbZS94NaLj
-         TsE/yH0M1Xh4G64PNdrp8Ne5V09JXWpyiN8JbesYHO4+txNK6vtDNd7ucf0h1tITUrhk
-         PsK7VI463IVIBR81QEF6bccpf72YmazSMQu+hZC3dKAA6+9uOn7wQyl7R6nCobjz7FRq
-         ycLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=2wYgpwm52p7oSkJ9uNjOWyk7Cvrjl3T+B8HQYE0rdSA=;
-        b=XiOjcQDKtyCCJcGoEbriMFIteCWBUe7YkeCLHoWQ7QmlEc/LlC4PA5BUNUWWkquViy
-         DMHTWxiB2DA3vqFajSoDmektN4HHLoBWAyiGV2aO6/Ryj9vq2L5krVjiUJzuGnbW+NrT
-         +LYyw//Nt3cBnKXzgtdmx33LxAk8VgyPxsidzpd8JOwzd6ptJPK7zIA5atQe0V2jieyW
-         Ifp/pEOu8318bZimfoHN6oZCvENO5lt2RwaorC4YT7L3mG1bz3xLhsEZvg2oWEeVMmuj
-         9y9DSHSb7/ht+Po/A86Ra8+PqfyNayINV4WarKdv1R4mrTwFecdZUTzX3zjzHcT54Fqf
-         2tlA==
-X-Gm-Message-State: APjAAAVTmt1uaoVIzPBe6JeIXHx0v/uR1m8hoD39iiNEqGtUaP0HFet2
-        Yj3g3cP5RnlTZyTfeSbVg9TDrO20JIUdToqFSkc=
-X-Google-Smtp-Source: APXvYqwN1OT/4eCr98Es+sKptO4EpUXMhs31Skz44g1/X6eooESQ2ZkPK2doavVdI9O60bkKuTpESaIHyV3BIIUF3UI=
-X-Received: by 2002:a63:525f:: with SMTP id s31mr31273918pgl.172.1554769774271;
- Mon, 08 Apr 2019 17:29:34 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190408145942.6448-1-jlayton@kernel.org> <CAH2r5mubno4Mbb4E3wKoPJ0-va7F2HjG--pk+o-BOwjM=zMprQ@mail.gmail.com>
- <CAH2r5msbqFGJ1tFXxowaXtBqPRLUMYwuj0WMEKn8qEDrsRkWqA@mail.gmail.com> <CAKywueRyAc00eXHPLTLx1hHqKfJKAPAWA+c6uh3n8LReq-Ce5w@mail.gmail.com>
-In-Reply-To: <CAKywueRyAc00eXHPLTLx1hHqKfJKAPAWA+c6uh3n8LReq-Ce5w@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 8 Apr 2019 19:29:22 -0500
-Message-ID: <CAH2r5musOpBpu0XXg2_ztrHkAFtXBor2aJV6=3gud12Q1xCbCw@mail.gmail.com>
-Subject: Re: [RFC PATCH] cifs: remove superfluous inode_lock in cifs_{strict_}fsync
-To:     Pavel Shilovsky <piastryyy@gmail.com>
-Cc:     Jeff Layton <jlayton@kernel.org>, CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        id S1726461AbfDICjj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 8 Apr 2019 22:39:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52176 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726456AbfDICji (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 8 Apr 2019 22:39:38 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 1E27C3078DD7;
+        Tue,  9 Apr 2019 02:39:38 +0000 (UTC)
+Received: from test1135.test.redhat.com (vpn2-54-110.bne.redhat.com [10.64.54.110])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 063F55D719;
+        Tue,  9 Apr 2019 02:39:36 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>,
+        Pavel Shilovsky <pshilov@microsoft.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>
+Subject: [PATCH] secdesc-ui.py: a UI to view the security descriptors on SMB2+ shares
+Date:   Tue,  9 Apr 2019 12:39:29 +1000
+Message-Id: <20190409023929.15098-2-lsahlber@redhat.com>
+In-Reply-To: <20190409023929.15098-1-lsahlber@redhat.com>
+References: <20190409023929.15098-1-lsahlber@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Tue, 09 Apr 2019 02:39:38 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-It passed automated testing (the most recent test bucket run was
-http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/4/bui=
-lds/141
-but it also passed the other test group
-http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/bui=
-lds/185)
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+---
+ secdesc-ui.py | 437 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 437 insertions(+)
+ create mode 100755 secdesc-ui.py
 
+diff --git a/secdesc-ui.py b/secdesc-ui.py
+new file mode 100755
+index 0000000..26db582
+--- /dev/null
++++ b/secdesc-ui.py
+@@ -0,0 +1,437 @@
++#!/usr/bin/env python
++# coding: utf-8
++
++import array
++import enum
++import fcntl
++import os
++import struct
++import stat
++import sys
++from Tkinter import *
++
++FULL_CONTROL = 0x001f01ff
++EWRITE = 0x00000116
++ALL_READ_BITS = 0x00020089
++EREAD = 0x001200a9
++CHANGE = 0x001301bf
++
++TRAV_EXEC = 0x00100020
++LIST_READ = 0x00100001
++READ_ATTR = 0x00100080
++READ_XATT = 0x00100008
++CREA_WRIT = 0x00100002
++CREA_APPE = 0x00100004
++WRIT_ATTR = 0x00100100
++WRIT_XATT = 0x00100010
++DELE = 0x00110000
++READ_PERM = 0x00120000
++CHAN_PERM = 0x00140000
++TAKE_OWNR = 0x00180000
++
++class App:
++	def __init__(self, root, sd, is_dir):
++		self.sd = sd
++                self.is_dir = is_dir
++		self.tf = Frame(bd=1)
++		self.tf.grid(columnspan=5, rowspan=5, padx=5, pady=5)
++
++		# Owner
++		Label(self.tf, text='Owner: %s' % (self.sd.owner)).grid(row=0, column=0, columnspan=6, sticky='W')
++
++		# Group 
++		Label(self.tf, text='Group: %s' % (self.sd.group)).grid(row=1, column=0, columnspan=6, sticky='W')
++
++		self.sb = Scrollbar(self.tf, orient=VERTICAL)
++		self.lb = Listbox(self.tf, height=5, selectmode=SINGLE,
++				yscrollcommand=self.sb.set)
++		self.sb.config(command=self.lb.yview)
++		self.sb.grid(row=2, column=1, sticky='NS')
++		self.lb.grid(row=2, column=0, sticky='W')
++
++                max = 0
++		for idx, item in enumerate(self.sd.dacl.ace):
++			if item.type != 0 and item.type != 1:
++				continue
++                        sid = '%s %s' % ("ALLOW" if item.type == 0 else "DENY", item.sid)
++                        if max > len(sid):
++                                max = len(sid)
++			self.lb.insert(idx, sid)
++			if not self.lb.curselection():
++				self.lb.selection_set(idx)
++                self.lb.config(width=max)
++                self.lb.bind("<Double-Button-1>", self.select_sid)
++
++		self.bas = Button(self.tf, text='Basic', relief=SUNKEN,
++			command=self.click_bas)
++		self.bas.grid(row=2, column=2, sticky='NW')
++
++		self.adv = Button(self.tf, text='Advanced',
++			command=self.click_adv)
++		self.adv.grid(row=2, column=3, sticky='NW')
++
++		# Basic Panel
++		self.bf_bas = Frame(master=self.tf, bd=1)
++		self.bf_bas.grid(row=3, column=0, columnspan=4, padx=5, pady=5)
++		self.bf_bas_name = Label(self.bf_bas, text='')
++		self.bf_bas_name.grid(row=0, column=0, columnspan=2, sticky='W')
++
++                row = 1
++		self.bf_bas_fc=Checkbutton(self.bf_bas, text='Full Control')
++		self.bf_bas_fc.grid(row=row, column=0, sticky='W')
++		self.bf_bas_fc.config(state=DISABLED)
++                row += 1
++
++		self.bf_bas_mo=Checkbutton(self.bf_bas, text='Modify')
++		self.bf_bas_mo.grid(row=row, column=0, sticky='W')
++		self.bf_bas_mo.config(state=DISABLED)
++                row += 1
++
++		self.bf_bas_re=Checkbutton(self.bf_bas, text='Read & Execute')
++		self.bf_bas_re.grid(row=row, column=0, sticky='W')
++		self.bf_bas_re.config(state=DISABLED)
++                row += 1
++
++		self.bf_bas_rd=Checkbutton(self.bf_bas, text='Read')
++		self.bf_bas_rd.grid(row=row, column=0, sticky='W')
++		self.bf_bas_rd.config(state=DISABLED)
++                row += 1
++
++		self.bf_bas_wr=Checkbutton(self.bf_bas, text='Write')
++		self.bf_bas_wr.grid(row=row, column=0, sticky='W')
++		self.bf_bas_wr.config(state=DISABLED)
++                row += 1
++
++		self.bf_bas_sp=Checkbutton(self.bf_bas, text='Special')
++		self.bf_bas_sp.grid(row=row, column=0, sticky='W')
++		self.bf_bas_sp.config(state=DISABLED)
++                row += 1
++
++		self.show_bas = True
++		self.update_bf_bas()
++	
++		# Advanced Panel	
++		self.bf_adv = Frame(master=self.tf, bd=1)
++		self.bf_adv.grid(row=3, column=0, columnspan=4, padx=5, pady=5)
++		self.bf_adv_name = Label(self.bf_adv, text='')
++		self.bf_adv_name.grid(row=0, column=0, columnspan=2, sticky='W')
++                
++                row = 1
++		self.bf_adv_fc=Checkbutton(self.bf_adv, text='Full Control')
++		self.bf_adv_fc.grid(row=row, column=0, sticky='W')
++		self.bf_adv_fc.config(state=DISABLED)
++                row += 1
++
++		self.bf_adv_te=Checkbutton(self.bf_adv, text='Traverse-folder/execute-file')
++		self.bf_adv_te.grid(row=row, column=0, sticky='W')
++		self.bf_adv_te.config(state=DISABLED)
++                row += 1
++
++		self.bf_adv_lr=Checkbutton(self.bf_adv, text='List-folder/read-data')
++		self.bf_adv_lr.grid(row=row, column=0, sticky='W')
++		self.bf_adv_lr.config(state=DISABLED)
++                row += 1
++
++		self.bf_adv_ra=Checkbutton(self.bf_adv, text='Read-Attributes')
++		self.bf_adv_ra.grid(row=row, column=0, sticky='W')
++		self.bf_adv_ra.config(state=DISABLED)
++                row += 1
++
++		self.bf_adv_re=Checkbutton(self.bf_adv, text='Read-Extended-Attributes')
++		self.bf_adv_re.grid(row=row, column=0, sticky='W')
++		self.bf_adv_re.config(state=DISABLED)
++                row += 1
++
++		self.bf_adv_cw=Checkbutton(self.bf_adv, text='Create-files/write-data')
++		self.bf_adv_cw.grid(row=row, column=0, sticky='W')
++		self.bf_adv_cw.config(state=DISABLED)
++                row += 1
++
++		self.bf_adv_ca=Checkbutton(self.bf_adv, text='Create-folders/append-data')
++		self.bf_adv_ca.grid(row=row, column=0, sticky='W')
++		self.bf_adv_ca.config(state=DISABLED)
++                row += 1
++
++                row = 1
++		self.bf_adv_wa=Checkbutton(self.bf_adv, text='Write-Attributes')
++		self.bf_adv_wa.grid(row=row, column=1, sticky='W')
++		self.bf_adv_wa.config(state=DISABLED)
++                row += 1
++
++		self.bf_adv_we=Checkbutton(self.bf_adv, text='Write-Extended-Attributes')
++		self.bf_adv_we.grid(row=row, column=1, sticky='W')
++		self.bf_adv_we.config(state=DISABLED)
++                row += 1
++
++		self.bf_adv_de=Checkbutton(self.bf_adv, text='Delete')
++		self.bf_adv_de.grid(row=row, column=1, sticky='W')
++		self.bf_adv_de.config(state=DISABLED)
++                row += 1
++
++		self.bf_adv_rp=Checkbutton(self.bf_adv, text='Read-Permissions')
++		self.bf_adv_rp.grid(row=row, column=1, sticky='W')
++		self.bf_adv_rp.config(state=DISABLED)
++                row += 1
++
++		self.bf_adv_cp=Checkbutton(self.bf_adv, text='Change-Permissions')
++		self.bf_adv_cp.grid(row=row, column=1, sticky='W')
++		self.bf_adv_cp.config(state=DISABLED)
++                row += 1
++
++		self.bf_adv_to=Checkbutton(self.bf_adv, text='Take-Ownership')
++		self.bf_adv_to.grid(row=row, column=1, sticky='W')
++		self.bf_adv_to.config(state=DISABLED)
++                row += 1
++
++		self.bf_adv.grid_remove()
++
++	def select_sid(self, event):
++                self.click_bas()
++
++	def click_bas(self):
++		self.adv.config(relief=RAISED)
++		self.bas.config(relief=SUNKEN)
++		self.bf_adv.grid_remove()
++		self.update_bf_bas()
++		self.bf_bas.grid()
++		self.show_bas = True
++
++	def click_adv(self):
++		self.adv.config(relief=SUNKEN)
++		self.bas.config(relief=RAISED)
++		self.bf_bas.grid_remove()
++		self.update_bf_adv()
++		self.bf_adv.grid()
++		self.show_bas = False
++
++	def update_bf_adv(self):
++		ace = self.sd.dacl.ace[self.lb.curselection()[0]]
++		self.bf_adv_name.config(text='Advanced Permissions for %s' % (ace.sid))
++		if ace.mask == FULL_CONTROL:
++			self.bf_adv_fc.select()
++		else:
++			self.bf_adv_fc.deselect()
++		if ace.mask & TRAV_EXEC == TRAV_EXEC:
++			self.bf_adv_te.select()
++		else:
++			self.bf_adv_te.deselect()
++		if ace.mask & LIST_READ == LIST_READ:
++			self.bf_adv_lr.select()
++		else:
++			self.bf_adv_lr.deselect()
++		if ace.mask & READ_ATTR == READ_ATTR:
++			self.bf_adv_ra.select()
++		else:
++			self.bf_adv_ra.deselect()
++		if ace.mask & READ_XATT == READ_XATT:
++			self.bf_adv_re.select()
++		else:
++			self.bf_adv_re.deselect()
++		if ace.mask & CREA_WRIT == CREA_WRIT:
++			self.bf_adv_cw.select()
++		else:
++			self.bf_adv_cw.deselect()
++		if ace.mask & CREA_APPE == CREA_APPE:
++			self.bf_adv_ca.select()
++		else:
++			self.bf_adv_ca.deselect()
++		if ace.mask & WRIT_ATTR == WRIT_ATTR:
++			self.bf_adv_wa.select()
++		else:
++			self.bf_adv_wa.deselect()
++		if ace.mask & WRIT_XATT == WRIT_XATT:
++			self.bf_adv_we.select()
++		else:
++			self.bf_adv_we.deselect()
++		if ace.mask & DELE == DELE:
++			self.bf_adv_de.select()
++		else:
++			self.bf_adv_de.deselect()
++		if ace.mask & READ_PERM == READ_PERM:
++			self.bf_adv_rp.select()
++		else:
++			self.bf_adv_rp.deselect()
++		if ace.mask & CHAN_PERM == CHAN_PERM:
++			self.bf_adv_rp.select()
++		else:
++			self.bf_adv_rp.deselect()
++		if ace.mask & TAKE_OWNR == TAKE_OWNR:
++			self.bf_adv_to.select()
++		else:
++			self.bf_adv_to.deselect()
++
++	def update_bf_bas(self):
++		ace = self.sd.dacl.ace[self.lb.curselection()[0]]
++		self.bf_bas_name.config(text='Permissions for %s' % (ace.sid))
++		tmp = ace.mask
++		if ace.mask == FULL_CONTROL:
++			self.bf_bas_fc.select()
++			tmp &= ~FULL_CONTROL
++		else:
++			self.bf_bas_fc.deselect()
++		if ace.mask & CHANGE == CHANGE:
++			self.bf_bas_mo.select()
++			tmp &= ~CHANGE
++		else:
++			self.bf_bas_mo.deselect()
++		if ace.mask & EREAD == EREAD:
++			self.bf_bas_re.select()
++			tmp &= ~EREAD
++		else:
++			self.bf_bas_re.deselect()
++		if ace.mask & ALL_READ_BITS == ALL_READ_BITS:
++			self.bf_bas_rd.select()
++			tmp &= ~ALL_READ_BITS
++		else:
++			self.bf_bas_rd.deselect()
++		if ace.mask & EWRITE == EWRITE:
++			self.bf_bas_wr.select()
++			tmp &= ~EWRITE
++		else:
++			self.bf_bas_wr.deselect()
++		if tmp:
++			self.bf_bas_sp.select()
++		else:
++			self.bf_bas_sp.deselect()
++
++CIFS_QUERY_INFO = 0xc018cf07
++
++def usage():
++        print "Usage: %s <filename>" % (sys.argv[0])
++        sys.exit()
++
++
++class SID:
++        '''
++        SID implements a Windows Security Identifier as per MS-DTYP:2.4.2.
++        '''
++        def __init__(self, buf):
++                self.sub_authority_count = buf[1]
++                self.buffer = buf[:8 + self.sub_authority_count * 4]
++                self.revision = self.buffer[0]
++                if self.revision != 1:
++                        raise ValueError('SID Revision %d not supported' %
++                                         (self.revision))
++                self.identifier_authority = 0
++                for x in self.buffer[2:8]:
++                        self.identifier_authority = self.identifier_authority * 256 + x
++                self.sub_authority = []
++                for i in range(self.sub_authority_count):
++                        self.sub_authority.append(struct.unpack_from('<I', self.buffer, 8 + 4 * i)[0])
++
++        def __str__(self):
++                s = "S-%u-%u" % (self.revision, self.identifier_authority)
++
++                for x in self.sub_authority:
++                        s += '-%u' % x
++                return s
++
++
++class ACE:
++        '''
++        ACE implements a Windows ACE as per MS-DTYP:2.4.4.
++        '''
++        def __init__(self, buf):
++                self.type = buf[0]
++                self.flags = buf[1]
++                self.size = struct.unpack_from('<H', buf, 2)[0]
++                self.raw = buf[:self.size]
++                if self.type in [0, 1]:
++                        self.mask = struct.unpack_from('<I', buf, 4)[0]
++                        self.sid = SID(buf[8:])
++
++        def __str__(self):
++                s = 'Type:0x%02x ' % (self.type)
++                s += 'Flags:0x%02x ' % (self.flags)
++                if self.type in [0, 1]:
++                        s += 'Mask:0x%02x SID:%s' % (self.mask, self.sid)
++                else:
++                        for i in self.raw[4:]:
++                                s += '%02x' % (i)
++
++                return s
++
++        class Type(enum.Enum):
++                ALLOWED = 0
++                DENIED = 1
++
++                def __str__(self):
++                        return self.name
++
++
++class ACL:
++        '''
++        ACL implements a Windows ACL as per MS-DTYP:2.4.5.
++        '''
++        def __init__(self, buf):
++                self.revision = buf[0]
++                if self.revision != 2 and self.revision != 4:
++                        raise ValueError('ACL Revision %d '
++                                         'not supported' % (self.revision))
++                acl = buf[8:8 + struct.unpack_from('<H', buf, 2)[0]]
++                self.ace = []
++                for i in range(struct.unpack_from('<H', buf, 4)[0]):
++                        ace = ACE(acl)
++                        self.ace.append(ace)
++                        acl = acl[ace.size:]
++
++        def __str__(self):
++                s = 'Revision:0x%02x\n' % (self.revision)
++                for ace in self.ace:
++                        s += '%s\n' % (ace)
++                return s
++
++
++class SecurityDescriptor:
++        '''
++        SecurityDescriptor implements a Windows Security Descriptor as per
++        MS-DTYP:2.4.6.
++        '''
++        def __init__(self, buf):
++                self.revision = buf[0]
++                if self.revision != 1:
++                        raise ValueError('Security Descriptor Revision %d '
++                                         'not supported' % (self.revision))
++                self.control = struct.unpack_from('<H', buf, 2)
++
++                self.owner = SID(buf[struct.unpack_from('<I', buf, 4)[0]:])
++                self.group = SID(buf[struct.unpack_from('<I', buf, 8)[0]:])
++
++                self.dacl = ACL(buf[struct.unpack_from('<I', buf, 16)[0]:])
++
++        def __str__(self):
++                s = 'Revision:%u\n' % (self.revision)
++                s += 'Control:0x%04x\n' % (self.control)
++                s += 'Owner:%s\n' % (self.owner)
++                s += 'Group:%s\n' % (self.group)
++                s += 'DACL:\n%s' % (self.dacl)
++                return s
++
++
++def main():
++        if len(sys.argv) != 2:
++                usage()
++
++        buf = array.array('B', [0] * 16384)
++
++        struct.pack_into('<I', buf, 0, 3) # InfoType: Security
++        struct.pack_into('<I', buf, 8, 7) # AddInfo: Group/Owner/Dacl
++        struct.pack_into('<I', buf, 16, 16384) # InputBufferLength
++        
++        f = os.open(sys.argv[1], os.O_RDONLY)
++        st = os.fstat(f)
++        fcntl.ioctl(f, CIFS_QUERY_INFO, buf, 1)
++	os.close(f)
++
++        s = struct.unpack_from('<I', buf, 16)
++
++        sd = SecurityDescriptor(buf[24:24 + s[0]])
++
++        root = Tk()
++        app = App(root, sd, stat.S_ISDIR(st.st_mode))
++        root.mainloop()
++
++
++if __name__ == "__main__":
++	main()
++
+-- 
+2.13.6
 
-On Mon, Apr 8, 2019 at 6:09 PM Pavel Shilovsky <piastryyy@gmail.com> wrote:
->
-> Acked-by: Pavel Shilovsky <pshilov@microsoft.com>
->
-> --
-> Best regards,
-> Pavel Shilovsky
->
-> =D0=BF=D0=BD, 8 =D0=B0=D0=BF=D1=80. 2019 =D0=B3. =D0=B2 09:06, Steve Fren=
-ch <smfrench@gmail.com>:
-> >
-> > Restarted the automated tests after updating for-next and added this pa=
-tch ontop
-> >
-> > http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2=
-/builds/185
-> >
-> > On Mon, Apr 8, 2019 at 10:29 AM Steve French <smfrench@gmail.com> wrote=
-:
-> > >
-> > > Kicked off automated tests with this patch included - see
-> > > http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders=
-/2/builds/184
-> > >  (I will kick off other test buckets later)
-> > >
-> > > On Mon, Apr 8, 2019 at 9:59 AM Jeff Layton <jlayton@kernel.org> wrote=
-:
-> > > >
-> > > > Originally, filemap_write_and_wait took the i_mutex internally, but
-> > > > commit 02c24a82187d pushed the mutex acquisition into the individua=
-l
-> > > > fsync routines, leaving it up to the subsystem maintainers to remov=
-e
-> > > > it if it wasn't needed.
-> > > >
-> > > > For cifs, I see no reason to take the inode_lock here. All of the
-> > > > operations inside that lock are protected in other ways.
-> > > >
-> > > > Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> > > > ---
-> > > >  fs/cifs/file.c | 5 -----
-> > > >  1 file changed, 5 deletions(-)
-> > > >
-> > > > Steve, would you or someone else be able to test this?
-> > > >
-> > > > I'm proposing a similar patch for kcephfs. I don't have an appropri=
-ate
-> > > > test rig at the moment, and I was hoping someone more involved with
-> > > > cifs.ko development these days may be able to do so.
-> > > >
-> > > > Thanks,
-> > > > Jeff
-> > > >
-> > > > diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> > > > index 89006e044973..c4b84fd423c3 100644
-> > > > --- a/fs/cifs/file.c
-> > > > +++ b/fs/cifs/file.c
-> > > > @@ -2424,7 +2424,6 @@ int cifs_strict_fsync(struct file *file, loff=
-_t start, loff_t end,
-> > > >         rc =3D file_write_and_wait_range(file, start, end);
-> > > >         if (rc)
-> > > >                 return rc;
-> > > > -       inode_lock(inode);
-> > > >
-> > > >         xid =3D get_xid();
-> > > >
-> > > > @@ -2449,7 +2448,6 @@ int cifs_strict_fsync(struct file *file, loff=
-_t start, loff_t end,
-> > > >         }
-> > > >
-> > > >         free_xid(xid);
-> > > > -       inode_unlock(inode);
-> > > >         return rc;
-> > > >  }
-> > > >
-> > > > @@ -2461,12 +2459,10 @@ int cifs_fsync(struct file *file, loff_t st=
-art, loff_t end, int datasync)
-> > > >         struct TCP_Server_Info *server;
-> > > >         struct cifsFileInfo *smbfile =3D file->private_data;
-> > > >         struct cifs_sb_info *cifs_sb =3D CIFS_FILE_SB(file);
-> > > > -       struct inode *inode =3D file->f_mapping->host;
-> > > >
-> > > >         rc =3D file_write_and_wait_range(file, start, end);
-> > > >         if (rc)
-> > > >                 return rc;
-> > > > -       inode_lock(inode);
-> > > >
-> > > >         xid =3D get_xid();
-> > > >
-> > > > @@ -2483,7 +2479,6 @@ int cifs_fsync(struct file *file, loff_t star=
-t, loff_t end, int datasync)
-> > > >         }
-> > > >
-> > > >         free_xid(xid);
-> > > > -       inode_unlock(inode);
-> > > >         return rc;
-> > > >  }
-> > > >
-> > > > --
-> > > > 2.20.1
-> > > >
-> > >
-> > >
-> > > --
-> > > Thanks,
-> > >
-> > > Steve
-> >
-> >
-> >
-> > --
-> > Thanks,
-> >
-> > Steve
-
-
-
---=20
-Thanks,
-
-Steve
