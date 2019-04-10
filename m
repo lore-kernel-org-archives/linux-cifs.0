@@ -2,172 +2,579 @@ Return-Path: <SRS0=49Qs=SM=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-11.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25973C10F11
-	for <linux-cifs@archiver.kernel.org>; Wed, 10 Apr 2019 17:27:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3613AC10F11
+	for <linux-cifs@archiver.kernel.org>; Wed, 10 Apr 2019 19:33:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E64C620830
-	for <linux-cifs@archiver.kernel.org>; Wed, 10 Apr 2019 17:27:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E5B192070D
+	for <linux-cifs@archiver.kernel.org>; Wed, 10 Apr 2019 19:33:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cjXpTd5w"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L5F6YGnJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729209AbfDJR1b (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 10 Apr 2019 13:27:31 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:38103 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728749AbfDJR1b (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 10 Apr 2019 13:27:31 -0400
-Received: by mail-pl1-f196.google.com with SMTP id f36so1843263plb.5
-        for <linux-cifs@vger.kernel.org>; Wed, 10 Apr 2019 10:27:31 -0700 (PDT)
+        id S1725982AbfDJTdR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 10 Apr 2019 15:33:17 -0400
+Received: from mail-lf1-f41.google.com ([209.85.167.41]:43989 "EHLO
+        mail-lf1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726096AbfDJTdR (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 10 Apr 2019 15:33:17 -0400
+Received: by mail-lf1-f41.google.com with SMTP id g7so2701969lfh.10
+        for <linux-cifs@vger.kernel.org>; Wed, 10 Apr 2019 12:33:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=mhGR40Wjk05aHvo5VY75GSrrfKh7dELYt9zDQYR1jQc=;
-        b=cjXpTd5wZLp58UW7TpeUEnhADYMpoDMBkk7EL8W3ZWWZUkREAoOIKjC8Ja8h0XtjNt
-         p2JHyAq10xDqEo5VM2lgZhBKq6JBIaWd3So/x+w/ZVevNHLRdR1Vn55wVsvuQ/IkbPEG
-         gaobtSIS7/V2+98j16oGcat8XQFPhBC+UOUw07AWz9NJDBjA3K0TE59JjLQeaniHl8js
-         S+UHa44YZ0iDCTkoeggXPH2UjyNLIFDZjiZGxZz0ZbVVUi+VkisbEqK/3n9hFAA84RZ8
-         I5BGdFSIyTpZOZUEiQmw0Xn4IMf/GPK7IueDpcyIRsn+/0fRqUYF8u4lfqEKVrVJzI+8
-         8yfA==
+         :cc:content-transfer-encoding;
+        bh=UEBX0734gIt8oH8P/8QRPIZN9oTDmPJAQHu2EA4j70M=;
+        b=L5F6YGnJRWED1FV364Ys0G342qFe1AJ77PzODyFWRj1cQ/SBTEIEUeCvoH5Kok07JB
+         fr5gF+JnXcIwHX1kMk12msXrMI2trh/GcgGdepHeXhlAm+2x4ZxO90Tt4a5o6J0x4mgY
+         ZnqLTFPm06gs/8fndgOWTc+ZvZStmKkqmwgWQTLkjpzTwo0r77bYpQFJcRqgbsqPTQPG
+         5Tc/LplajbxoJ3jt1I3zm0nhW/m61jSZtY81z3sG9NL95tX4tMnbCKC0uq+okPn1kIqR
+         pAEa8z0KuWG7oKowif2T5RYn1f3g7Jkx+N02hCIXXKnkpFG/jSSBP4mV9PeCDOoWW3iD
+         QYzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=mhGR40Wjk05aHvo5VY75GSrrfKh7dELYt9zDQYR1jQc=;
-        b=FscTZ/cWDP6mXSeZhQafk+C/pUQHJicHLhn8uBOPBATs/6yICn3cKnqNArjyrUJCgz
-         VwJWcNSSTXVDvlHYI7PGMxVbqt7835qNGu0hl0Tx2eI3dCYsbWmOglUi7/usuUjWtrpH
-         XQ2eT5Epbtm7OlYA7yoNGjnYVQExuw0rd/2X5kA/36g2weAmQVDmqB2BlVFGkyEVwvpP
-         MsEcf7/tt7ufKslrCr54pWS/vC7KBsuYKSg0UoSHkQojnZJZyoH9fN3Ax1yruOXmxhkb
-         SEjY4IFTgVj1vHZVgmRanuI7Z2bGyMimFFL7OvLfp6KctrUNIb1E7yAMojUNQLwac98l
-         8g+A==
-X-Gm-Message-State: APjAAAXhXfv/twadnwBV7mgyQDfe5ZPTx1rKht8J180ji6FWJisgqyQu
-        +sVWmrbIsXewCtBoEzSGE2zdcUC15T/Tq5qvq6E=
-X-Google-Smtp-Source: APXvYqzaKiKhcirAwK4LKpUIS/3i8eDE06EI5DaIK5p+8LdMlYIU6siE8Up3wNSFEcFcC8inEJyZqCwIm+2LAIMHMQo=
-X-Received: by 2002:a17:902:28e9:: with SMTP id f96mr23993692plb.190.1554917250449;
- Wed, 10 Apr 2019 10:27:30 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=UEBX0734gIt8oH8P/8QRPIZN9oTDmPJAQHu2EA4j70M=;
+        b=Yf/eyvfkPynLsBKOR1n9/JQP6fCYYkMBpelfztpMfL041WxEkvFpxgjrbIafjmiWdK
+         pUc3s9yedsNJFfvYIX0khpfWmzKM8uXfoKevbL1wJbhQlErLz1X8ZgkUcsAvBSXW73bg
+         6Xd8RxZ/7cUbqdR8kHWXwpeAh/HVSfDB0gyg0fE6pLUUiKoERGrLt3+jRk/xpXB3xcYL
+         MFdUNW8YZyJ1p8GgF7GLmRCgqR+9YtQDCTMVYUB8oy0Eg1eAiu3rqBy2DLIPNJrVn91+
+         14dO/ZyS30W3KP2gCiEWoS02nf9Z/Z8bfrEnTAqnkWTyrG1vIEn8OzKOLWSLTRmig0+E
+         1jvw==
+X-Gm-Message-State: APjAAAUD5w/b8zLb9hRf8o0fwFoNTGGzzBRjbHrGYqq2EKoRb2/4v9Pq
+        6elTIi6940CA0CaNnW3zFkaIk0YLwk4BH4W1tQ==
+X-Google-Smtp-Source: APXvYqxZCVC2peNJI3SMMXiSj7Ub/eQIc0Y4kPuwlM8vbaMSMIJHar4HfL0tpblk3E3Et5S8VZnh10+SCHxnOnowqeY=
+X-Received: by 2002:ac2:4563:: with SMTP id k3mr23532342lfm.101.1554924794270;
+ Wed, 10 Apr 2019 12:33:14 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190410014158.27517-1-xifeng@redhat.com> <CAH2r5mvPYod-H0CVt7WEij1neO3fPu9h22Yi-EG=Wfqo-0F44w@mail.gmail.com>
- <1065228238.2702965.1554867616002.JavaMail.zimbra@redhat.com> <992655431.2748492.1554889616432.JavaMail.zimbra@redhat.com>
-In-Reply-To: <992655431.2748492.1554889616432.JavaMail.zimbra@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 10 Apr 2019 12:27:16 -0500
-Message-ID: <CAH2r5mtLZ-xhFntJCF389_2wEM1rnUboMfFORgiJv2j1QSDFCQ@mail.gmail.com>
-Subject: Re: [PATCH v2] CIFS: display noacl in the mount options
-To:     Xiaoli Feng <xifeng@redhat.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        "fengxiaoli0714@gmai.com" <fengxiaoli0714@gmail.com>
+References: <20190409023929.15098-1-lsahlber@redhat.com> <20190409023929.15098-2-lsahlber@redhat.com>
+In-Reply-To: <20190409023929.15098-2-lsahlber@redhat.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Wed, 10 Apr 2019 12:33:02 -0700
+Message-ID: <CAKywueRivv_i-c6TYi_-eWEsCvhFCw+DAzP=afpfH6EpxsJUhA@mail.gmail.com>
+Subject: Re: [PATCH] secdesc-ui.py: a UI to view the security descriptors on
+ SMB2+ shares
+To:     Ronnie Sahlberg <lsahlber@redhat.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>,
+        Pavel Shilovsky <pshilov@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Apr 10, 2019 at 4:46 AM Xiaoli Feng <xifeng@redhat.com> wrote:
+=D0=BF=D0=BD, 8 =D0=B0=D0=BF=D1=80. 2019 =D0=B3. =D0=B2 19:44, Ronnie Sahlb=
+erg <lsahlber@redhat.com>:
 >
+> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> ---
+>  secdesc-ui.py | 437 ++++++++++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  1 file changed, 437 insertions(+)
+>  create mode 100755 secdesc-ui.py
 >
-> Maybe we should change the option "acl|noacl" to "posixacl|noposixacl".
+> diff --git a/secdesc-ui.py b/secdesc-ui.py
+> new file mode 100755
+> index 0000000..26db582
+> --- /dev/null
+> +++ b/secdesc-ui.py
+> @@ -0,0 +1,437 @@
+> +#!/usr/bin/env python
+> +# coding: utf-8
+> +
+> +import array
+> +import enum
+> +import fcntl
+> +import os
+> +import struct
+> +import stat
+> +import sys
+> +from Tkinter import *
+> +
+> +FULL_CONTROL =3D 0x001f01ff
+> +EWRITE =3D 0x00000116
+> +ALL_READ_BITS =3D 0x00020089
+> +EREAD =3D 0x001200a9
+> +CHANGE =3D 0x001301bf
+> +
+> +TRAV_EXEC =3D 0x00100020
+> +LIST_READ =3D 0x00100001
+> +READ_ATTR =3D 0x00100080
+> +READ_XATT =3D 0x00100008
+> +CREA_WRIT =3D 0x00100002
+> +CREA_APPE =3D 0x00100004
+> +WRIT_ATTR =3D 0x00100100
+> +WRIT_XATT =3D 0x00100010
+> +DELE =3D 0x00110000
+> +READ_PERM =3D 0x00120000
+> +CHAN_PERM =3D 0x00140000
+> +TAKE_OWNR =3D 0x00180000
+> +
+> +class App:
+> +       def __init__(self, root, sd, is_dir):
+> +               self.sd =3D sd
+> +                self.is_dir =3D is_dir
+> +               self.tf =3D Frame(bd=3D1)
+> +               self.tf.grid(columnspan=3D5, rowspan=3D5, padx=3D5, pady=
+=3D5)
+> +
+> +               # Owner
+> +               Label(self.tf, text=3D'Owner: %s' % (self.sd.owner)).grid=
+(row=3D0, column=3D0, columnspan=3D6, sticky=3D'W')
+> +
+> +               # Group
+> +               Label(self.tf, text=3D'Group: %s' % (self.sd.group)).grid=
+(row=3D1, column=3D0, columnspan=3D6, sticky=3D'W')
+> +
+> +               self.sb =3D Scrollbar(self.tf, orient=3DVERTICAL)
+> +               self.lb =3D Listbox(self.tf, height=3D5, selectmode=3DSIN=
+GLE,
+> +                               yscrollcommand=3Dself.sb.set)
+> +               self.sb.config(command=3Dself.lb.yview)
+> +               self.sb.grid(row=3D2, column=3D1, sticky=3D'NS')
+> +               self.lb.grid(row=3D2, column=3D0, sticky=3D'W')
+> +
+> +                max =3D 0
+> +               for idx, item in enumerate(self.sd.dacl.ace):
+> +                       if item.type !=3D 0 and item.type !=3D 1:
+> +                               continue
+> +                        sid =3D '%s %s' % ("ALLOW" if item.type =3D=3D 0=
+ else "DENY", item.sid)
+> +                        if max > len(sid):
+> +                                max =3D len(sid)
+> +                       self.lb.insert(idx, sid)
+> +                       if not self.lb.curselection():
+> +                               self.lb.selection_set(idx)
+> +                self.lb.config(width=3Dmax)
+> +                self.lb.bind("<Double-Button-1>", self.select_sid)
+> +
+> +               self.bas =3D Button(self.tf, text=3D'Basic', relief=3DSUN=
+KEN,
+> +                       command=3Dself.click_bas)
+> +               self.bas.grid(row=3D2, column=3D2, sticky=3D'NW')
+> +
+> +               self.adv =3D Button(self.tf, text=3D'Advanced',
+> +                       command=3Dself.click_adv)
+> +               self.adv.grid(row=3D2, column=3D3, sticky=3D'NW')
+> +
+> +               # Basic Panel
+> +               self.bf_bas =3D Frame(master=3Dself.tf, bd=3D1)
+> +               self.bf_bas.grid(row=3D3, column=3D0, columnspan=3D4, pad=
+x=3D5, pady=3D5)
+> +               self.bf_bas_name =3D Label(self.bf_bas, text=3D'')
+> +               self.bf_bas_name.grid(row=3D0, column=3D0, columnspan=3D2=
+, sticky=3D'W')
+> +
+> +                row =3D 1
+> +               self.bf_bas_fc=3DCheckbutton(self.bf_bas, text=3D'Full Co=
+ntrol')
+> +               self.bf_bas_fc.grid(row=3Drow, column=3D0, sticky=3D'W')
+> +               self.bf_bas_fc.config(state=3DDISABLED)
+> +                row +=3D 1
+> +
+> +               self.bf_bas_mo=3DCheckbutton(self.bf_bas, text=3D'Modify'=
+)
+> +               self.bf_bas_mo.grid(row=3Drow, column=3D0, sticky=3D'W')
+> +               self.bf_bas_mo.config(state=3DDISABLED)
+> +                row +=3D 1
+> +
+> +               self.bf_bas_re=3DCheckbutton(self.bf_bas, text=3D'Read & =
+Execute')
+> +               self.bf_bas_re.grid(row=3Drow, column=3D0, sticky=3D'W')
+> +               self.bf_bas_re.config(state=3DDISABLED)
+> +                row +=3D 1
+> +
+> +               self.bf_bas_rd=3DCheckbutton(self.bf_bas, text=3D'Read')
+> +               self.bf_bas_rd.grid(row=3Drow, column=3D0, sticky=3D'W')
+> +               self.bf_bas_rd.config(state=3DDISABLED)
+> +                row +=3D 1
+> +
+> +               self.bf_bas_wr=3DCheckbutton(self.bf_bas, text=3D'Write')
+> +               self.bf_bas_wr.grid(row=3Drow, column=3D0, sticky=3D'W')
+> +               self.bf_bas_wr.config(state=3DDISABLED)
+> +                row +=3D 1
+> +
+> +               self.bf_bas_sp=3DCheckbutton(self.bf_bas, text=3D'Special=
+')
+> +               self.bf_bas_sp.grid(row=3Drow, column=3D0, sticky=3D'W')
+> +               self.bf_bas_sp.config(state=3DDISABLED)
+> +                row +=3D 1
+> +
+> +               self.show_bas =3D True
+> +               self.update_bf_bas()
+> +
+> +               # Advanced Panel
+> +               self.bf_adv =3D Frame(master=3Dself.tf, bd=3D1)
+> +               self.bf_adv.grid(row=3D3, column=3D0, columnspan=3D4, pad=
+x=3D5, pady=3D5)
+> +               self.bf_adv_name =3D Label(self.bf_adv, text=3D'')
+> +               self.bf_adv_name.grid(row=3D0, column=3D0, columnspan=3D2=
+, sticky=3D'W')
+> +
+> +                row =3D 1
+> +               self.bf_adv_fc=3DCheckbutton(self.bf_adv, text=3D'Full Co=
+ntrol')
+> +               self.bf_adv_fc.grid(row=3Drow, column=3D0, sticky=3D'W')
+> +               self.bf_adv_fc.config(state=3DDISABLED)
+> +                row +=3D 1
+> +
+> +               self.bf_adv_te=3DCheckbutton(self.bf_adv, text=3D'Travers=
+e-folder/execute-file')
+> +               self.bf_adv_te.grid(row=3Drow, column=3D0, sticky=3D'W')
+> +               self.bf_adv_te.config(state=3DDISABLED)
+> +                row +=3D 1
+> +
+> +               self.bf_adv_lr=3DCheckbutton(self.bf_adv, text=3D'List-fo=
+lder/read-data')
+> +               self.bf_adv_lr.grid(row=3Drow, column=3D0, sticky=3D'W')
+> +               self.bf_adv_lr.config(state=3DDISABLED)
+> +                row +=3D 1
+> +
+> +               self.bf_adv_ra=3DCheckbutton(self.bf_adv, text=3D'Read-At=
+tributes')
+> +               self.bf_adv_ra.grid(row=3Drow, column=3D0, sticky=3D'W')
+> +               self.bf_adv_ra.config(state=3DDISABLED)
+> +                row +=3D 1
+> +
+> +               self.bf_adv_re=3DCheckbutton(self.bf_adv, text=3D'Read-Ex=
+tended-Attributes')
+> +               self.bf_adv_re.grid(row=3Drow, column=3D0, sticky=3D'W')
+> +               self.bf_adv_re.config(state=3DDISABLED)
+> +                row +=3D 1
+> +
+> +               self.bf_adv_cw=3DCheckbutton(self.bf_adv, text=3D'Create-=
+files/write-data')
+> +               self.bf_adv_cw.grid(row=3Drow, column=3D0, sticky=3D'W')
+> +               self.bf_adv_cw.config(state=3DDISABLED)
+> +                row +=3D 1
+> +
+> +               self.bf_adv_ca=3DCheckbutton(self.bf_adv, text=3D'Create-=
+folders/append-data')
+> +               self.bf_adv_ca.grid(row=3Drow, column=3D0, sticky=3D'W')
+> +               self.bf_adv_ca.config(state=3DDISABLED)
+> +                row +=3D 1
+> +
+> +                row =3D 1
+> +               self.bf_adv_wa=3DCheckbutton(self.bf_adv, text=3D'Write-A=
+ttributes')
+> +               self.bf_adv_wa.grid(row=3Drow, column=3D1, sticky=3D'W')
+> +               self.bf_adv_wa.config(state=3DDISABLED)
+> +                row +=3D 1
+> +
+> +               self.bf_adv_we=3DCheckbutton(self.bf_adv, text=3D'Write-E=
+xtended-Attributes')
+> +               self.bf_adv_we.grid(row=3Drow, column=3D1, sticky=3D'W')
+> +               self.bf_adv_we.config(state=3DDISABLED)
+> +                row +=3D 1
+> +
+> +               self.bf_adv_de=3DCheckbutton(self.bf_adv, text=3D'Delete'=
+)
+> +               self.bf_adv_de.grid(row=3Drow, column=3D1, sticky=3D'W')
+> +               self.bf_adv_de.config(state=3DDISABLED)
+> +                row +=3D 1
+> +
+> +               self.bf_adv_rp=3DCheckbutton(self.bf_adv, text=3D'Read-Pe=
+rmissions')
+> +               self.bf_adv_rp.grid(row=3Drow, column=3D1, sticky=3D'W')
+> +               self.bf_adv_rp.config(state=3DDISABLED)
+> +                row +=3D 1
+> +
+> +               self.bf_adv_cp=3DCheckbutton(self.bf_adv, text=3D'Change-=
+Permissions')
+> +               self.bf_adv_cp.grid(row=3Drow, column=3D1, sticky=3D'W')
+> +               self.bf_adv_cp.config(state=3DDISABLED)
+> +                row +=3D 1
+> +
+> +               self.bf_adv_to=3DCheckbutton(self.bf_adv, text=3D'Take-Ow=
+nership')
+> +               self.bf_adv_to.grid(row=3Drow, column=3D1, sticky=3D'W')
+> +               self.bf_adv_to.config(state=3DDISABLED)
+> +                row +=3D 1
+> +
+> +               self.bf_adv.grid_remove()
+> +
+> +       def select_sid(self, event):
+> +                self.click_bas()
+> +
+> +       def click_bas(self):
+> +               self.adv.config(relief=3DRAISED)
+> +               self.bas.config(relief=3DSUNKEN)
+> +               self.bf_adv.grid_remove()
+> +               self.update_bf_bas()
+> +               self.bf_bas.grid()
+> +               self.show_bas =3D True
+> +
+> +       def click_adv(self):
+> +               self.adv.config(relief=3DSUNKEN)
+> +               self.bas.config(relief=3DRAISED)
+> +               self.bf_bas.grid_remove()
+> +               self.update_bf_adv()
+> +               self.bf_adv.grid()
+> +               self.show_bas =3D False
+> +
+> +       def update_bf_adv(self):
+> +               ace =3D self.sd.dacl.ace[self.lb.curselection()[0]]
+> +               self.bf_adv_name.config(text=3D'Advanced Permissions for =
+%s' % (ace.sid))
+> +               if ace.mask =3D=3D FULL_CONTROL:
+> +                       self.bf_adv_fc.select()
+> +               else:
+> +                       self.bf_adv_fc.deselect()
+> +               if ace.mask & TRAV_EXEC =3D=3D TRAV_EXEC:
+> +                       self.bf_adv_te.select()
+> +               else:
+> +                       self.bf_adv_te.deselect()
+> +               if ace.mask & LIST_READ =3D=3D LIST_READ:
+> +                       self.bf_adv_lr.select()
+> +               else:
+> +                       self.bf_adv_lr.deselect()
+> +               if ace.mask & READ_ATTR =3D=3D READ_ATTR:
+> +                       self.bf_adv_ra.select()
+> +               else:
+> +                       self.bf_adv_ra.deselect()
+> +               if ace.mask & READ_XATT =3D=3D READ_XATT:
+> +                       self.bf_adv_re.select()
+> +               else:
+> +                       self.bf_adv_re.deselect()
+> +               if ace.mask & CREA_WRIT =3D=3D CREA_WRIT:
+> +                       self.bf_adv_cw.select()
+> +               else:
+> +                       self.bf_adv_cw.deselect()
+> +               if ace.mask & CREA_APPE =3D=3D CREA_APPE:
+> +                       self.bf_adv_ca.select()
+> +               else:
+> +                       self.bf_adv_ca.deselect()
+> +               if ace.mask & WRIT_ATTR =3D=3D WRIT_ATTR:
+> +                       self.bf_adv_wa.select()
+> +               else:
+> +                       self.bf_adv_wa.deselect()
+> +               if ace.mask & WRIT_XATT =3D=3D WRIT_XATT:
+> +                       self.bf_adv_we.select()
+> +               else:
+> +                       self.bf_adv_we.deselect()
+> +               if ace.mask & DELE =3D=3D DELE:
+> +                       self.bf_adv_de.select()
+> +               else:
+> +                       self.bf_adv_de.deselect()
+> +               if ace.mask & READ_PERM =3D=3D READ_PERM:
+> +                       self.bf_adv_rp.select()
+> +               else:
+> +                       self.bf_adv_rp.deselect()
+> +               if ace.mask & CHAN_PERM =3D=3D CHAN_PERM:
+> +                       self.bf_adv_rp.select()
+> +               else:
+> +                       self.bf_adv_rp.deselect()
+> +               if ace.mask & TAKE_OWNR =3D=3D TAKE_OWNR:
+> +                       self.bf_adv_to.select()
+> +               else:
+> +                       self.bf_adv_to.deselect()
+> +
+> +       def update_bf_bas(self):
+> +               ace =3D self.sd.dacl.ace[self.lb.curselection()[0]]
+> +               self.bf_bas_name.config(text=3D'Permissions for %s' % (ac=
+e.sid))
+> +               tmp =3D ace.mask
+> +               if ace.mask =3D=3D FULL_CONTROL:
+> +                       self.bf_bas_fc.select()
+> +                       tmp &=3D ~FULL_CONTROL
+> +               else:
+> +                       self.bf_bas_fc.deselect()
+> +               if ace.mask & CHANGE =3D=3D CHANGE:
+> +                       self.bf_bas_mo.select()
+> +                       tmp &=3D ~CHANGE
+> +               else:
+> +                       self.bf_bas_mo.deselect()
+> +               if ace.mask & EREAD =3D=3D EREAD:
+> +                       self.bf_bas_re.select()
+> +                       tmp &=3D ~EREAD
+> +               else:
+> +                       self.bf_bas_re.deselect()
+> +               if ace.mask & ALL_READ_BITS =3D=3D ALL_READ_BITS:
+> +                       self.bf_bas_rd.select()
+> +                       tmp &=3D ~ALL_READ_BITS
+> +               else:
+> +                       self.bf_bas_rd.deselect()
+> +               if ace.mask & EWRITE =3D=3D EWRITE:
+> +                       self.bf_bas_wr.select()
+> +                       tmp &=3D ~EWRITE
+> +               else:
+> +                       self.bf_bas_wr.deselect()
+> +               if tmp:
+> +                       self.bf_bas_sp.select()
+> +               else:
+> +                       self.bf_bas_sp.deselect()
+> +
+> +CIFS_QUERY_INFO =3D 0xc018cf07
+> +
+> +def usage():
+> +        print "Usage: %s <filename>" % (sys.argv[0])
+> +        sys.exit()
+> +
+> +
+> +class SID:
+> +        '''
+> +        SID implements a Windows Security Identifier as per MS-DTYP:2.4.=
+2.
+> +        '''
+> +        def __init__(self, buf):
+> +                self.sub_authority_count =3D buf[1]
+> +                self.buffer =3D buf[:8 + self.sub_authority_count * 4]
+> +                self.revision =3D self.buffer[0]
+> +                if self.revision !=3D 1:
+> +                        raise ValueError('SID Revision %d not supported'=
+ %
+> +                                         (self.revision))
+> +                self.identifier_authority =3D 0
+> +                for x in self.buffer[2:8]:
+> +                        self.identifier_authority =3D self.identifier_au=
+thority * 256 + x
+> +                self.sub_authority =3D []
+> +                for i in range(self.sub_authority_count):
+> +                        self.sub_authority.append(struct.unpack_from('<I=
+', self.buffer, 8 + 4 * i)[0])
+> +
+> +        def __str__(self):
+> +                s =3D "S-%u-%u" % (self.revision, self.identifier_author=
+ity)
+> +
+> +                for x in self.sub_authority:
+> +                        s +=3D '-%u' % x
+> +                return s
+> +
+> +
+> +class ACE:
+> +        '''
+> +        ACE implements a Windows ACE as per MS-DTYP:2.4.4.
+> +        '''
+> +        def __init__(self, buf):
+> +                self.type =3D buf[0]
+> +                self.flags =3D buf[1]
+> +                self.size =3D struct.unpack_from('<H', buf, 2)[0]
+> +                self.raw =3D buf[:self.size]
+> +                if self.type in [0, 1]:
+> +                        self.mask =3D struct.unpack_from('<I', buf, 4)[0=
+]
+> +                        self.sid =3D SID(buf[8:])
+> +
+> +        def __str__(self):
+> +                s =3D 'Type:0x%02x ' % (self.type)
+> +                s +=3D 'Flags:0x%02x ' % (self.flags)
+> +                if self.type in [0, 1]:
+> +                        s +=3D 'Mask:0x%02x SID:%s' % (self.mask, self.s=
+id)
+> +                else:
+> +                        for i in self.raw[4:]:
+> +                                s +=3D '%02x' % (i)
+> +
+> +                return s
+> +
+> +        class Type(enum.Enum):
+> +                ALLOWED =3D 0
+> +                DENIED =3D 1
+> +
+> +                def __str__(self):
+> +                        return self.name
+> +
+> +
+> +class ACL:
+> +        '''
+> +        ACL implements a Windows ACL as per MS-DTYP:2.4.5.
+> +        '''
+> +        def __init__(self, buf):
+> +                self.revision =3D buf[0]
+> +                if self.revision !=3D 2 and self.revision !=3D 4:
+> +                        raise ValueError('ACL Revision %d '
+> +                                         'not supported' % (self.revisio=
+n))
+> +                acl =3D buf[8:8 + struct.unpack_from('<H', buf, 2)[0]]
+> +                self.ace =3D []
+> +                for i in range(struct.unpack_from('<H', buf, 4)[0]):
+> +                        ace =3D ACE(acl)
+> +                        self.ace.append(ace)
+> +                        acl =3D acl[ace.size:]
+> +
+> +        def __str__(self):
+> +                s =3D 'Revision:0x%02x\n' % (self.revision)
+> +                for ace in self.ace:
+> +                        s +=3D '%s\n' % (ace)
+> +                return s
+> +
+> +
+> +class SecurityDescriptor:
+> +        '''
+> +        SecurityDescriptor implements a Windows Security Descriptor as p=
+er
+> +        MS-DTYP:2.4.6.
+> +        '''
+> +        def __init__(self, buf):
+> +                self.revision =3D buf[0]
+> +                if self.revision !=3D 1:
+> +                        raise ValueError('Security Descriptor Revision %=
+d '
+> +                                         'not supported' % (self.revisio=
+n))
+> +                self.control =3D struct.unpack_from('<H', buf, 2)
+> +
+> +                self.owner =3D SID(buf[struct.unpack_from('<I', buf, 4)[=
+0]:])
+> +                self.group =3D SID(buf[struct.unpack_from('<I', buf, 8)[=
+0]:])
+> +
+> +                self.dacl =3D ACL(buf[struct.unpack_from('<I', buf, 16)[=
+0]:])
+> +
+> +        def __str__(self):
+> +                s =3D 'Revision:%u\n' % (self.revision)
+> +                s +=3D 'Control:0x%04x\n' % (self.control)
+> +                s +=3D 'Owner:%s\n' % (self.owner)
+> +                s +=3D 'Group:%s\n' % (self.group)
+> +                s +=3D 'DACL:\n%s' % (self.dacl)
+> +                return s
+> +
+> +
+> +def main():
+> +        if len(sys.argv) !=3D 2:
+> +                usage()
+> +
+> +        buf =3D array.array('B', [0] * 16384)
+> +
+> +        struct.pack_into('<I', buf, 0, 3) # InfoType: Security
+> +        struct.pack_into('<I', buf, 8, 7) # AddInfo: Group/Owner/Dacl
+> +        struct.pack_into('<I', buf, 16, 16384) # InputBufferLength
+> +
+> +        f =3D os.open(sys.argv[1], os.O_RDONLY)
+> +        st =3D os.fstat(f)
+> +        fcntl.ioctl(f, CIFS_QUERY_INFO, buf, 1)
+> +       os.close(f)
+> +
+> +        s =3D struct.unpack_from('<I', buf, 16)
+> +
+> +        sd =3D SecurityDescriptor(buf[24:24 + s[0]])
+> +
+> +        root =3D Tk()
+> +        app =3D App(root, sd, stat.S_ISDIR(st.st_mode))
+> +        root.mainloop()
+> +
+> +
+> +if __name__ =3D=3D "__main__":
+> +       main()
+> +
+> --
+> 2.13.6
+>
 
-That could be better although I lean toward waiting until we
-experiment a little more with the SMB3.1.1 POSIX Extensions and any
-additional mount options for them.
+Fixed minor code style problems and merged. Thanks.
 
+https://github.com/piastry/cifs-utils/commit/0009157e9db4dc1f9f8ab66feebea2=
+d7d12014b1
 
-> ----- Original Message -----
-> > From: "Xiaoli Feng" <xifeng@redhat.com>
-> > To: "Steve French" <smfrench@gmail.com>
-> > Cc: "CIFS" <linux-cifs@vger.kernel.org>, "fengxiaoli0714@gmai.com" <fengxiaoli0714@gmail.com>
-> > Sent: Wednesday, April 10, 2019 11:40:16 AM
-> > Subject: Re: [PATCH v2] CIFS: display noacl in the mount options
-> >
-> > Yes, could get users confused. But from the Man page:
-> >
-> >        noacl  Do not allow POSIX ACL operations even if server would support
-> >        them.
-> >               The  CIFS  client  can get and set POSIX ACLs (getfacl,
-> >               setfacl) to Samba servers version 3.0.10 and later. Setting
-> >               POSIX ACLs requires enabling both CIFS_XATTR and then
-> >               CIFS_POSIX support in the CIFS configuration options when
-> >               building the cifs module. POSIX ACL support can be disabled on
-> >               a per mount basis by specifying noacl on mount.
-> >
-> >        cifsacl
-> >               This option is used to map CIFS/NTFS ACLs to/from Linux
-> >               permission bits, map SIDs to/from UIDs and GIDs, and get and
-> >               set Security Descriptors.
-> >               See section on CIFS/NTFS ACL, SID/UID/GID MAPPING, SECURITY
-> >               DESCRIPTORS for more information.
-> >
-> > These two options are for different ACL. There is still a option "acl". It
-> > also can be mounted with cifsacl together for SMB1.0.
-> > There are some errors in my commit log. Should say "smb2.0+ don't support
-> > POSIX ACL". What do you think about this patch? It also
-> > makes sense if doesn't display "noacl".
-> >
-> > ----- Original Message -----
-> > > From: "Steve French" <smfrench@gmail.com>
-> > > To: "XiaoLi Feng" <xifeng@redhat.com>
-> > > Cc: "CIFS" <linux-cifs@vger.kernel.org>, "fengxiaoli0714@gmai.com"
-> > > <fengxiaoli0714@gmail.com>
-> > > Sent: Wednesday, April 10, 2019 10:56:19 AM
-> > > Subject: Re: [PATCH v2] CIFS: display noacl in the mount options
-> > >
-> > > Could this get users confused who mount with "cifsacl" and see "noacl" as
-> > > well?
-> > >
-> > > Also this is really saying no support for "POSIX (draft standard) ACL
-> > > support" not no support for SMB3 ACL (or similarly "RichACL" or NFS
-> > > ACL or ... NTFS ACL or ... which are somewhat similar and common).
-> > >
-> > > Could get confusing
-> > >
-> > > On Tue, Apr 9, 2019 at 8:43 PM XiaoLi Feng <xifeng@redhat.com> wrote:
-> > > >
-> > > > From: "fengxiaoli0714@gmai.com" <fengxiaoli0714@gmail.com>
-> > > >
-> > > > The mount option noacl aren't shown in /proc/mounts
-> > > > even if they are mounted successfully. And smb2.0+
-> > > > don't support ACL. Display noacl acquiescently if ACL
-> > > > is unsupported.
-> > > >
-> > > > Signed-off-by: fengxiaoli0714@gmai.com <fengxiaoli0714@gmail.com>
-> > > > ---
-> > > >  fs/cifs/cifsfs.c | 2 ++
-> > > >  1 file changed, 2 insertions(+)
-> > > >
-> > > > diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> > > > index f9b71c12cc9f..80ee4fbcd25b 100644
-> > > > --- a/fs/cifs/cifsfs.c
-> > > > +++ b/fs/cifs/cifsfs.c
-> > > > @@ -535,6 +535,8 @@ cifs_show_options(struct seq_file *s, struct dentry
-> > > > *root)
-> > > >                 seq_puts(s, ",dynperm");
-> > > >         if (root->d_sb->s_flags & SB_POSIXACL)
-> > > >                 seq_puts(s, ",acl");
-> > > > +       else
-> > > > +               seq_puts(s, ",noacl");
-> > > >         if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MF_SYMLINKS)
-> > > >                 seq_puts(s, ",mfsymlinks");
-> > > >         if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_FSCACHE)
-> > > > --
-> > > > 2.18.1
-> > > >
-> > >
-> > >
-> > > --
-> > > Thanks,
-> > >
-> > > Steve
-> > >
-> >
-
-
-
--- 
-Thanks,
-
-Steve
+--
+Best regards,
+Pavel Shilovsky
