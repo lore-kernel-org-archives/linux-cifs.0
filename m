@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A140BC10F11
-	for <linux-cifs@archiver.kernel.org>; Thu, 11 Apr 2019 02:48:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E9B3C10F13
+	for <linux-cifs@archiver.kernel.org>; Thu, 11 Apr 2019 17:49:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6E214206DF
-	for <linux-cifs@archiver.kernel.org>; Thu, 11 Apr 2019 02:48:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3D44A2077C
+	for <linux-cifs@archiver.kernel.org>; Thu, 11 Apr 2019 17:49:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dg3Te66p"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LgDudOnt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726638AbfDKCsy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 10 Apr 2019 22:48:54 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:43934 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725981AbfDKCsx (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 10 Apr 2019 22:48:53 -0400
-Received: by mail-pf1-f193.google.com with SMTP id c8so2639196pfd.10;
-        Wed, 10 Apr 2019 19:48:53 -0700 (PDT)
+        id S1726661AbfDKRtT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 11 Apr 2019 13:49:19 -0400
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:40706 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726538AbfDKRtT (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 11 Apr 2019 13:49:19 -0400
+Received: by mail-lf1-f66.google.com with SMTP id a28so5379374lfo.7;
+        Thu, 11 Apr 2019 10:49:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Sdva2oyqaplkf1GRVeL/SMW70s7hCUxzVKBozYE4QPA=;
-        b=Dg3Te66pVoX9glxYX5v+25zPz2HA2TY1IREfUGioeiqaXXwW9UqUSGdrXHtJ07GNmA
-         GNGo0BGwPC/nOL958AFdyPDI29NejLryEd4L6yRzQ/6JcUCK2dKOVtviC/nbyRuhbjwS
-         noR1vVsOvYB0N2L1sypPr19Bto/zYZRUw43llwOHG5L5mlF1YRmniY867SllGWjASfah
-         d/Uvu8v44T7q0CHkcSDnmLLv+IRIwPw15Lz+02BiI2hNMtB6dpRaG7BEl8CoVvHcnDfI
-         XL43PLrcrHjYzTkXczUZ1OgemEoNHFymPG8kxnpS8cW3UzSqHlppiK8fwVNROBtUC5J8
-         cgFw==
+         :cc:content-transfer-encoding;
+        bh=fVie9LZCJMpV2qm2o+ePpQuBYYn/j4gk8/yJQovPvTA=;
+        b=LgDudOntYEawLVRB0vo9tQEX4PwRlrKTlrDckgM/q/ov16BZsxWqsPqob7NSjtaJfu
+         2z6KbrCy4eKxA24dH6bcF7pNI6t8Dc1K/OeacSOhNahzwD9tpCYM7ZvjxR2Z3yug2Hz8
+         4AHf9roZBs5xAoa2UmlGQF9s1cRWU25ft2/7LabASV2HbTY1cIp6n/HzvzB1VP8pMkWv
+         FJxPoaKwBIFWzTw7EaR/1cVav9iGbu/Oow+FFWBdmOLbjHSlz07zHGvSSiLSmRPgKgej
+         ED8Xyrv1XNlVxn4OYVNerAXd1ZhzozSHkxo8+XYoWMq9r3thg2a/bdSH1GSiDD96HqDY
+         5HwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Sdva2oyqaplkf1GRVeL/SMW70s7hCUxzVKBozYE4QPA=;
-        b=JTOhS/V7Aa6hWibN0qCifPKlEXB6EFY310sXsfHK3NYQHOkdI+846Kh2iIFAClZvc/
-         f6Pl07wjI/Lcz78HVmYZChw5z/8Gb3h8UOJl4/sL//cjVA/sJvWCUvITK4Sk/FYri4ob
-         kBRAbhdmQxyMNn8hDcgSU+p6zgK9APS40D2u6eIalYQFws0k8hta40uiQ77OxBF80gHR
-         XtKf/5XDKtOrG+Q0w3sNEAp5urTZWZAYgJI47d7/aLZj9TWT/yDoZfHV0Emi3X21T6de
-         zW2E1JJfJesovOnOcCLbBoLF/W4kISvEDpSg4w6hRklzsi2rnCPnDeCc59KF1dtXlian
-         MiAQ==
-X-Gm-Message-State: APjAAAX6TxGsoovqLMoh4kMZ6yh6Ldow2bEoXdBdsO8EBlxLUCg1XzuI
-        YsfRSq+0kaAzTlfxVeqA++L//509LN9HqIN+yVv0sg==
-X-Google-Smtp-Source: APXvYqxm90rSWnMyUFEXBszjM4rB5Az4a1J0wggq7NBzZXjWaSrbnhHGu5nlhZorD3AoICmEbwh56s17c9tUTc0b4hY=
-X-Received: by 2002:a62:59cb:: with SMTP id k72mr47791388pfj.111.1554950932986;
- Wed, 10 Apr 2019 19:48:52 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=fVie9LZCJMpV2qm2o+ePpQuBYYn/j4gk8/yJQovPvTA=;
+        b=FqoZ3Afv66iujXlmKL1E/4SGYfEirftnb1wtFKwhoBgYe+LK8wMpYxSru2vZeevEzD
+         CCzxo3OfT2O0+M/Pwre/Hlriz9uegfXTvoj4VryYYVpUGp1mQCTXCUWXRq4QGTFm1DuT
+         Wta0hFfHEGpbqgbS4u2PU/49Q6iYti4wpKkx7z1M0c9b4CkMydqB75DsebpMdbuIzvrK
+         4qP+6H5JiNVjKMULFOZ0Y2/Y2iuUNvLreWN8PDXEkhRF5MI3hMfGACnPHiUyXERZVytK
+         0VJGwhUInOwEa8yvp9WyWpe9im8egxFQgPhYERkuDS2A1/Ty4bDoywU6fFi4GtSFXCV9
+         wxfA==
+X-Gm-Message-State: APjAAAWPCM4DHkS1cIxvV2x48Vx0BCY3NqOM0utbkMChcTehcLlRjKty
+        6HjY7yULmZ2Ts348ntKlM2UreRfGwz0PNf473FjBK1s=
+X-Google-Smtp-Source: APXvYqwO55TMEmHZ9raH7d5ODDl6uX78DZ0hznD9SSvojhPqpJquBuBlIKokuMIGEMg12WLIGTPnOaPlypa3ZOujc2g=
+X-Received: by 2002:ac2:530a:: with SMTP id c10mr25392350lfh.45.1555004957342;
+ Thu, 11 Apr 2019 10:49:17 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190411022017.24942-1-lsahlber@redhat.com> <20190411022017.24942-2-lsahlber@redhat.com>
 In-Reply-To: <20190411022017.24942-2-lsahlber@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 10 Apr 2019 21:48:41 -0500
-Message-ID: <CAH2r5ms0+y4sYJdw=FHMS3Yfz10Fp6zovvZqMDCPdZnOkmo5Pw@mail.gmail.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Thu, 11 Apr 2019 10:49:06 -0700
+Message-ID: <CAKywueQOJd__BpyF_eki0_KbLvZFYRhtKRkaDo_oWwU6080OYg@mail.gmail.com>
 Subject: Re: [PATCH] cifs: Add support for FSCTL passthrough that write data
  to the server
 To:     Ronnie Sahlberg <lsahlber@redhat.com>
@@ -63,14 +63,14 @@ Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
         Steve French <smfrench@gmail.com>,
         Stable <stable@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tentatively merged into cifs-2.6.git for-next
-
-On Wed, Apr 10, 2019 at 9:20 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
+=D1=81=D1=80, 10 =D0=B0=D0=BF=D1=80. 2019 =D0=B3. =D0=B2 19:21, Ronnie Sahl=
+berg <lsahlber@redhat.com>:
 >
 > Add support to pass a blob to the server in FSCTL passthrough.
 >
@@ -85,80 +85,26 @@ On Wed, Apr 10, 2019 at 9:20 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
 > --- a/fs/cifs/smb2ops.c
 > +++ b/fs/cifs/smb2ops.c
 > @@ -1382,6 +1382,18 @@ smb2_ioctl_query_info(const unsigned int xid,
->         oparms.fid = &fid;
->         oparms.reconnect = false;
+>         oparms.fid =3D &fid;
+>         oparms.reconnect =3D false;
 >
 > +       /*
-> +        * FSCTL codes encode the special access they need in the fsctl code.
+> +        * FSCTL codes encode the special access they need in the fsctl c=
+ode.
 > +        */
 > +       if (qi.flags & PASSTHRU_FSCTL) {
 > +               switch (qi.info_type & FSCTL_DEVICE_ACCESS_MASK) {
 > +               case FSCTL_DEVICE_ACCESS_FILE_READ_WRITE_ACCESS:
-> +                       oparms.desired_access = FILE_READ_DATA | FILE_WRITE_DATA | FILE_READ_ATTRIBUTES | SYNCHRONIZE;
+> +                       oparms.desired_access =3D FILE_READ_DATA | FILE_W=
+RITE_DATA | FILE_READ_ATTRIBUTES | SYNCHRONIZE;
 > +                       ;
-> +                       break;
-> +               }
-> +       }
-> +
->         rc = SMB2_open_init(tcon, &rqst[0], &oplock, &oparms, path);
->         if (rc)
->                 goto iqinf_exit;
-> @@ -1399,8 +1411,9 @@ smb2_ioctl_query_info(const unsigned int xid,
->
->                         rc = SMB2_ioctl_init(tcon, &rqst[1],
->                                              COMPOUND_FID, COMPOUND_FID,
-> -                                            qi.info_type, true, NULL,
-> -                                            0, CIFSMaxBufSize);
-> +                                            qi.info_type, true, buffer,
-> +                                            qi.output_buffer_length,
-> +                                            CIFSMaxBufSize);
->                 }
->         } else if (qi.flags == PASSTHRU_QUERY_INFO) {
->                 memset(&qi_iov, 0, sizeof(qi_iov));
-> diff --git a/fs/cifs/smbfsctl.h b/fs/cifs/smbfsctl.h
-> index f996daeea271..9b3459b9a5ce 100644
-> --- a/fs/cifs/smbfsctl.h
-> +++ b/fs/cifs/smbfsctl.h
-> @@ -35,6 +35,33 @@
->   * below). Additional detail on less common ones can be found in MS-FSCC
->   * section 2.3.
->   */
-> +
-> +/*
-> + * FSCTL values are 32 bits and are constructed as
-> + * <device 16bits> <access 2bits> <function 12bits> <method 2bits>
-> + */
-> +/* Device */
-> +#define FSCTL_DEVICE_DFS                 (0x0006 << 16)
-> +#define FSCTL_DEVICE_FILE_SYSTEM         (0x0009 << 16)
-> +#define FSCTL_DEVICE_NAMED_PIPE          (0x0011 << 16)
-> +#define FSCTL_DEVICE_NETWORK_FILE_SYSTEM (0x0014 << 16)
-> +#define FSCTL_DEVICE_MASK                0xffff0000
-> +/* Access */
-> +#define FSCTL_DEVICE_ACCESS_FILE_ANY_ACCESS        (0x00 << 14)
-> +#define FSCTL_DEVICE_ACCESS_FILE_READ_ACCESS       (0x01 << 14)
-> +#define FSCTL_DEVICE_ACCESS_FILE_WRITE_ACCESS      (0x02 << 14)
-> +#define FSCTL_DEVICE_ACCESS_FILE_READ_WRITE_ACCESS (0x03 << 14)
-> +#define FSCTL_DEVICE_ACCESS_MASK                   0x0000c000
-> +/* Function */
-> +#define FSCTL_DEVICE_FUNCTION_MASK       0x00003ffc
-> +/* Method */
-> +#define FSCTL_DEVICE_METHOD_BUFFERED   0x00
-> +#define FSCTL_DEVICE_METHOD_IN_DIRECT  0x01
-> +#define FSCTL_DEVICE_METHOD_OUT_DIRECT 0x02
-> +#define FSCTL_DEVICE_METHOD_NEITHER    0x03
-> +#define FSCTL_DEVICE_METHOD_MASK       0x00000003
-> +
-> +
->  #define FSCTL_DFS_GET_REFERRALS      0x00060194
->  #define FSCTL_DFS_GET_REFERRALS_EX   0x000601B0
->  #define FSCTL_REQUEST_OPLOCK_LEVEL_1 0x00090000
-> --
-> 2.13.6
->
 
+This extra ":" looks unnecessary. Don't we need to add cases for
++#define FSCTL_DEVICE_ACCESS_FILE_ANY_ACCESS        (0x00 << 14)
++#define FSCTL_DEVICE_ACCESS_FILE_READ_ACCESS       (0x01 << 14)
++#define FSCTL_DEVICE_ACCESS_FILE_WRITE_ACCESS      (0x02 << 14)
+?
 
--- 
-Thanks,
-
-Steve
+--
+Best regards,
+Pavel Shilovsky
