@@ -2,130 +2,127 @@ Return-Path: <SRS0=pabO=SN=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D086BC10F13
-	for <linux-cifs@archiver.kernel.org>; Thu, 11 Apr 2019 20:02:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68271C10F13
+	for <linux-cifs@archiver.kernel.org>; Thu, 11 Apr 2019 21:09:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9BDEA20850
-	for <linux-cifs@archiver.kernel.org>; Thu, 11 Apr 2019 20:02:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fI+kbDNu"
+	by mail.kernel.org (Postfix) with ESMTP id 3AB0B20850
+	for <linux-cifs@archiver.kernel.org>; Thu, 11 Apr 2019 21:09:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726588AbfDKUC0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 11 Apr 2019 16:02:26 -0400
-Received: from mail-it1-f193.google.com ([209.85.166.193]:36641 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726577AbfDKUC0 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 11 Apr 2019 16:02:26 -0400
-Received: by mail-it1-f193.google.com with SMTP id y10so11684017itc.1
-        for <linux-cifs@vger.kernel.org>; Thu, 11 Apr 2019 13:02:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=odbhAaiFuN6VMck8KiMn8C2eC5YXyuf4V7h3+cjgiQY=;
-        b=fI+kbDNu4bvEgNPBfILgzJ2imvASk2icNsUO/G+mYPFnrjOyg9RGgiyqpagmAPmcRw
-         Pe1uBse42z+x/NtvjGsSl5vJ/Q7LVbcSSQKY4q4bAvglOC0aDO3VtNRzdB4bSECsktwK
-         SG89rZLniB4dT2q9CdQHRiWbRG1ELFq3FHsBWRKKr2gf7R97s2pmy9p7xe72tJx9udRq
-         sQhi6SgppFJb8YUS6xqJgSLyQzitI7abQ8JxRm8BVgZc+Yka9Jcamb7FJSipB/Nu4whm
-         u09xj3g60iYKpRnbFi0+MXaWWNZQzX/7EOHj265DatnrxOycjXX4Nsz+j69CoY6a0tur
-         zGzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=odbhAaiFuN6VMck8KiMn8C2eC5YXyuf4V7h3+cjgiQY=;
-        b=A+VYkfGT+SPtyKayUNyXmg+R3BC+Ga0JTVMtR2EhWaOJyoDce2inYhp5KmGZqub0SC
-         MSZwtpjimY6EhHW3RVEhq43H3N51zIhhg+zgpCLILvtS22TKUKFX/22kXFLf8tk3OQCZ
-         r+N8UX+SHRLeSg3JAzK0GXlPqvtQEeKjxizkF0z6Je2oum9W+7ClDPYsMWzwvSiqDVKE
-         Wxv2P+cnkiTP2l8RiMVq5BUbOqvvYecPX0BAdyA6MpUEjQx22QW3iR4tROywNvNKaeGW
-         8jT3mVdBGHk+PA8EZRH3JekrJlxqxwpaROEh1TkslTioJZOJcjpaZEfaNajCJx+m83I3
-         02Fg==
-X-Gm-Message-State: APjAAAWgkIN4infc3DP/xGDe82mJr8CIpdibSXZAFG2RAldrU3ycsXon
-        zxZkVjKUd61JGV9c548b5L9ldZj0ceAhVnIUFhEQJw==
-X-Google-Smtp-Source: APXvYqxRkrgnFH2lu6ZTkiY8623tXb2lOgTPFA79dTltP0+JdL4j76c3vQTUgRVTNTfEMv0OwkYuyWw4G3744U4lgMk=
-X-Received: by 2002:a24:549:: with SMTP id 70mr8884186itl.108.1555012945410;
- Thu, 11 Apr 2019 13:02:25 -0700 (PDT)
+        id S1727280AbfDKVJW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 11 Apr 2019 17:09:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54348 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726773AbfDKVJV (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 11 Apr 2019 17:09:21 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 700C8B082E;
+        Thu, 11 Apr 2019 21:09:21 +0000 (UTC)
+Received: from localhost.localdomain.com (unknown [10.20.6.236])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4A8945C219;
+        Thu, 11 Apr 2019 21:09:11 +0000 (UTC)
+From:   jglisse@redhat.com
+To:     linux-kernel@vger.kernel.org
+Cc:     =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org, John Hubbard <jhubbard@nvidia.com>,
+        Jan Kara <jack@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Ming Lei <ming.lei@redhat.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Matthew Wilcox <willy@infradead.org>,
+        Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, Ilya Dryomov <idryomov@gmail.com>,
+        Sage Weil <sage@redhat.com>, Alex Elder <elder@kernel.org>,
+        ceph-devel@vger.kernel.org
+Subject: [PATCH v1 14/15] fs: use bvec_set_gup_page() where appropriate
+Date:   Thu, 11 Apr 2019 17:08:33 -0400
+Message-Id: <20190411210834.4105-15-jglisse@redhat.com>
+In-Reply-To: <20190411210834.4105-1-jglisse@redhat.com>
+References: <20190411210834.4105-1-jglisse@redhat.com>
 MIME-Version: 1.0
-References: <20190411022017.24942-1-lsahlber@redhat.com> <20190411022017.24942-2-lsahlber@redhat.com>
- <CAKywueQOJd__BpyF_eki0_KbLvZFYRhtKRkaDo_oWwU6080OYg@mail.gmail.com> <CAH2r5mtvQgiit-s_YQLksOmmcJ5AMb4_uYQNfcm2ubBeZS_Ukg@mail.gmail.com>
-In-Reply-To: <CAH2r5mtvQgiit-s_YQLksOmmcJ5AMb4_uYQNfcm2ubBeZS_Ukg@mail.gmail.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Fri, 12 Apr 2019 06:02:14 +1000
-Message-ID: <CAN05THQa4KNKSJCU-F6JYf10HxXsWnKvVJSTHeytq8Avjho2jQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: Add support for FSCTL passthrough that write data
- to the server
-To:     Steve French <smfrench@gmail.com>
-Cc:     Pavel Shilovsky <piastryyy@gmail.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Thu, 11 Apr 2019 21:09:21 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Apr 12, 2019 at 4:57 AM Steve French <smfrench@gmail.com> wrote:
->
-> How about this small followon patch to address this?
+From: Jérôme Glisse <jglisse@redhat.com>
 
-Looks reasonable.
+When we get a page reference through get_user_page*() we want to keep
+track of that and bvec now has the ability to do so. Convert code to
+use bvec_set_gup_page() where appropriate.
 
-Reviewed-by me
+Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
+Cc: linux-fsdevel@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+Cc: linux-mm@kvack.org
+Cc: John Hubbard <jhubbard@nvidia.com>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Dan Williams <dan.j.williams@intel.com>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Dave Chinner <david@fromorbit.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Matthew Wilcox <willy@infradead.org>
+Cc: Steve French <sfrench@samba.org>
+Cc: linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org
+Cc: Ilya Dryomov <idryomov@gmail.com>
+Cc: Sage Weil <sage@redhat.com>
+Cc: Alex Elder <elder@kernel.org>
+Cc: ceph-devel@vger.kernel.org
+---
+ fs/ceph/file.c | 3 +++
+ fs/cifs/misc.c | 6 +++++-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
->
->
-> On Thu, Apr 11, 2019 at 12:49 PM Pavel Shilovsky <piastryyy@gmail.com> wr=
-ote:
-> >
-> > =D1=81=D1=80, 10 =D0=B0=D0=BF=D1=80. 2019 =D0=B3. =D0=B2 19:21, Ronnie =
-Sahlberg <lsahlber@redhat.com>:
-> > >
-> > > Add support to pass a blob to the server in FSCTL passthrough.
-> > >
-> > > Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> > > ---
-> > >  fs/cifs/smb2ops.c  | 17 +++++++++++++++--
-> > >  fs/cifs/smbfsctl.h | 27 +++++++++++++++++++++++++++
-> > >  2 files changed, 42 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> > > index 83a100dd2497..bb7522b882ea 100644
-> > > --- a/fs/cifs/smb2ops.c
-> > > +++ b/fs/cifs/smb2ops.c
-> > > @@ -1382,6 +1382,18 @@ smb2_ioctl_query_info(const unsigned int xid,
-> > >         oparms.fid =3D &fid;
-> > >         oparms.reconnect =3D false;
-> > >
-> > > +       /*
-> > > +        * FSCTL codes encode the special access they need in the fsc=
-tl code.
-> > > +        */
-> > > +       if (qi.flags & PASSTHRU_FSCTL) {
-> > > +               switch (qi.info_type & FSCTL_DEVICE_ACCESS_MASK) {
-> > > +               case FSCTL_DEVICE_ACCESS_FILE_READ_WRITE_ACCESS:
-> > > +                       oparms.desired_access =3D FILE_READ_DATA | FI=
-LE_WRITE_DATA | FILE_READ_ATTRIBUTES | SYNCHRONIZE;
-> > > +                       ;
-> >
-> > This extra ":" looks unnecessary. Don't we need to add cases for
-> > +#define FSCTL_DEVICE_ACCESS_FILE_ANY_ACCESS        (0x00 << 14)
-> > +#define FSCTL_DEVICE_ACCESS_FILE_READ_ACCESS       (0x01 << 14)
-> > +#define FSCTL_DEVICE_ACCESS_FILE_WRITE_ACCESS      (0x02 << 14)
-> > ?
-> >
-> > --
-> > Best regards,
-> > Pavel Shilovsky
->
->
->
-> --
-> Thanks,
->
-> Steve
+diff --git a/fs/ceph/file.c b/fs/ceph/file.c
+index d5561662b902..6c5b85f01721 100644
+--- a/fs/ceph/file.c
++++ b/fs/ceph/file.c
+@@ -104,6 +104,9 @@ static ssize_t __iter_get_bvecs(struct iov_iter *iter, size_t maxsize,
+ 				min_t(int, bytes, PAGE_SIZE - start),
+ 				start);
+ 
++			/* Is iov_iter_get_pages() using GUP ? */
++			if (iov_iter_get_pages_use_gup(iter))
++				bvec_set_gup_page(&bv, pages[idx]);
+ 			bvecs[bvec_idx] = bv;
+ 			bytes -= bv.bv_len;
+ 			start = 0;
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index bc77a4a5f1af..e10d9f0f5874 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -883,7 +883,11 @@ setup_aio_ctx_iter(struct cifs_aio_ctx *ctx, struct iov_iter *iter, int rw)
+ 
+ 		for (i = 0; i < cur_npages; i++) {
+ 			len = rc > PAGE_SIZE ? PAGE_SIZE : rc;
+-			bvec_set_page(&bv[npages + i], pages[i]);
++			/* Is iov_iter_get_pages() using GUP ? */
++			if (iov_iter_get_pages_use_gup(iter))
++				bvec_set_gup_page(&bv[npages + i], pages[i]);
++			else
++				bvec_set_page(&bv[npages + i], pages[i]);
+ 			bv[npages + i].bv_offset = start;
+ 			bv[npages + i].bv_len = len - start;
+ 			rc -= len;
+-- 
+2.20.1
+
