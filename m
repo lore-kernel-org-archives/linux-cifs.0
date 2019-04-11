@@ -5,206 +5,160 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9348C10F11
-	for <linux-cifs@archiver.kernel.org>; Thu, 11 Apr 2019 02:47:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A140BC10F11
+	for <linux-cifs@archiver.kernel.org>; Thu, 11 Apr 2019 02:48:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6834B206DF
-	for <linux-cifs@archiver.kernel.org>; Thu, 11 Apr 2019 02:47:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E214206DF
+	for <linux-cifs@archiver.kernel.org>; Thu, 11 Apr 2019 02:48:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bbuGdjgI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dg3Te66p"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726615AbfDKCrO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 10 Apr 2019 22:47:14 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:33549 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726536AbfDKCrO (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 10 Apr 2019 22:47:14 -0400
-Received: by mail-pg1-f196.google.com with SMTP id k19so2736115pgh.0;
-        Wed, 10 Apr 2019 19:47:13 -0700 (PDT)
+        id S1726638AbfDKCsy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 10 Apr 2019 22:48:54 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:43934 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725981AbfDKCsx (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 10 Apr 2019 22:48:53 -0400
+Received: by mail-pf1-f193.google.com with SMTP id c8so2639196pfd.10;
+        Wed, 10 Apr 2019 19:48:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=WPkfQuLclK667SiAGvmJhQ63UQ9GZ00hj/awcwsw5dA=;
-        b=bbuGdjgIxOfTR4MdjXCaLJ0L7kKpDEyIgwD4MzlqLKcqYnMJ/urPhALzznXb/jHoFU
-         0aXS5HR194d9z0fCwHmdvVWADWmjbmcIWDQaTPU6+roEZl8sOzjpr9es1ZFIqTpQJ9XZ
-         us9MgA3LR+pWO4bejnQF02Yja/inAsdPaQ+o7Tgzs5O9hI8W/YLhqXQk11/fpb5D4Tcq
-         Vu9T4N+tWrGeLTj7w1NFAM9ZrRsM6YlRbVpzfBdqQszxuY9tt+1Py27vc/th4trneSK6
-         rsZdlmwFa+9xuFkGsPaxaBOtr/beXKlt+w5RMmAQxVCuaW63oE28jMQfKWAw6Id7GKXe
-         V3mg==
+         :cc;
+        bh=Sdva2oyqaplkf1GRVeL/SMW70s7hCUxzVKBozYE4QPA=;
+        b=Dg3Te66pVoX9glxYX5v+25zPz2HA2TY1IREfUGioeiqaXXwW9UqUSGdrXHtJ07GNmA
+         GNGo0BGwPC/nOL958AFdyPDI29NejLryEd4L6yRzQ/6JcUCK2dKOVtviC/nbyRuhbjwS
+         noR1vVsOvYB0N2L1sypPr19Bto/zYZRUw43llwOHG5L5mlF1YRmniY867SllGWjASfah
+         d/Uvu8v44T7q0CHkcSDnmLLv+IRIwPw15Lz+02BiI2hNMtB6dpRaG7BEl8CoVvHcnDfI
+         XL43PLrcrHjYzTkXczUZ1OgemEoNHFymPG8kxnpS8cW3UzSqHlppiK8fwVNROBtUC5J8
+         cgFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=WPkfQuLclK667SiAGvmJhQ63UQ9GZ00hj/awcwsw5dA=;
-        b=aAr3MfSfMUNnT7JQ3V9UsqV1RbquZ3jOKINevXOHzqaWQ2ITJYYKV+3yzUNhFP4T/f
-         UTbW7CBw1dXwvvJOQqp/BVjJpw1+O6x0FtDi1Owam+N0w/zmNQWkmyfnpiG5UpYCaV5v
-         kNPL6WBgggQacsy1tlhuzUmqhKNDFdWozJdy6rvVZL7X3fUFsy7qoyjMJrDADDyxq9h+
-         JOPC2knn2hU62c8WUqOCQMoueExMpsx84uOpalg19VJbG6EsbHOHQBwxnxgCNxUl1SrA
-         Hy/6Q2Gbw2YJ/A54PcPFPAhVD3hmzyFSUU50SHVPQ4e61BbjZ+mvlNsBBiqGDixOc63I
-         jQHw==
-X-Gm-Message-State: APjAAAWRB3oL4z8MpmZiFn1qSrNzYaDuzdZRHnOQ3AfTUREKMrQhVpnL
-        mrkwruxcYycIPSOjKB8dL8Xik6IhEMKQXEAS/1I=
-X-Google-Smtp-Source: APXvYqz3vRf/nS4aP18oHtyJeLtlxQuWE/cWpaQymroj3f03ZeRiGlhWHXCcnrWp9VnTjVkK90nxxxpVMlWs79DexvQ=
-X-Received: by 2002:aa7:8c13:: with SMTP id c19mr46739064pfd.225.1554950832979;
- Wed, 10 Apr 2019 19:47:12 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=Sdva2oyqaplkf1GRVeL/SMW70s7hCUxzVKBozYE4QPA=;
+        b=JTOhS/V7Aa6hWibN0qCifPKlEXB6EFY310sXsfHK3NYQHOkdI+846Kh2iIFAClZvc/
+         f6Pl07wjI/Lcz78HVmYZChw5z/8Gb3h8UOJl4/sL//cjVA/sJvWCUvITK4Sk/FYri4ob
+         kBRAbhdmQxyMNn8hDcgSU+p6zgK9APS40D2u6eIalYQFws0k8hta40uiQ77OxBF80gHR
+         XtKf/5XDKtOrG+Q0w3sNEAp5urTZWZAYgJI47d7/aLZj9TWT/yDoZfHV0Emi3X21T6de
+         zW2E1JJfJesovOnOcCLbBoLF/W4kISvEDpSg4w6hRklzsi2rnCPnDeCc59KF1dtXlian
+         MiAQ==
+X-Gm-Message-State: APjAAAX6TxGsoovqLMoh4kMZ6yh6Ldow2bEoXdBdsO8EBlxLUCg1XzuI
+        YsfRSq+0kaAzTlfxVeqA++L//509LN9HqIN+yVv0sg==
+X-Google-Smtp-Source: APXvYqxm90rSWnMyUFEXBszjM4rB5Az4a1J0wggq7NBzZXjWaSrbnhHGu5nlhZorD3AoICmEbwh56s17c9tUTc0b4hY=
+X-Received: by 2002:a62:59cb:: with SMTP id k72mr47791388pfj.111.1554950932986;
+ Wed, 10 Apr 2019 19:48:52 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190410193747.25302-1-jglisse@redhat.com>
-In-Reply-To: <20190410193747.25302-1-jglisse@redhat.com>
+References: <20190411022017.24942-1-lsahlber@redhat.com> <20190411022017.24942-2-lsahlber@redhat.com>
+In-Reply-To: <20190411022017.24942-2-lsahlber@redhat.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 10 Apr 2019 21:47:01 -0500
-Message-ID: <CAH2r5ms-Y3FWhrabPEFt7T8MvC8Pwi1jjPFS7viWWRzx5rbVDw@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix page reference leak with readv/writev
-To:     jglisse@redhat.com
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
+Date:   Wed, 10 Apr 2019 21:48:41 -0500
+Message-ID: <CAH2r5ms0+y4sYJdw=FHMS3Yfz10Fp6zovvZqMDCPdZnOkmo5Pw@mail.gmail.com>
+Subject: Re: [PATCH] cifs: Add support for FSCTL passthrough that write data
+ to the server
+To:     Ronnie Sahlberg <lsahlber@redhat.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>,
         Stable <stable@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-How was this discovered? Does it address a reported user problem?
+tentatively merged into cifs-2.6.git for-next
 
-On Wed, Apr 10, 2019 at 2:38 PM <jglisse@redhat.com> wrote:
+On Wed, Apr 10, 2019 at 9:20 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
 >
-> From: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
+> Add support to pass a blob to the server in FSCTL passthrough.
 >
-> CIFS can leak pages reference gotten through GUP (get_user_pages*()
-> through iov_iter_get_pages()). This happen if cifs_send_async_read()
-> or cifs_write_from_iter() calls fail from within __cifs_readv() and
-> __cifs_writev() respectively. This patch move page unreference to
-> cifs_aio_ctx_release() which will happens on all code paths this is
-> all simpler to follow for correctness.
->
-> Signed-off-by: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
-> Cc: Steve French <sfrench@samba.org>
-> Cc: linux-cifs@vger.kernel.org
-> Cc: samba-technical@lists.samba.org
-> Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-> Cc: linux-fsdevel@vger.kernel.org
-> Cc: Linus Torvalds <torvalds@linux-foundation.org>
-> Cc: Stable <stable@vger.kernel.org>
+> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
 > ---
->  fs/cifs/file.c | 15 +--------------
->  fs/cifs/misc.c | 23 ++++++++++++++++++++++-
->  2 files changed, 23 insertions(+), 15 deletions(-)
+>  fs/cifs/smb2ops.c  | 17 +++++++++++++++--
+>  fs/cifs/smbfsctl.h | 27 +++++++++++++++++++++++++++
+>  2 files changed, 42 insertions(+), 2 deletions(-)
 >
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 89006e044973..a756a4d3f70f 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -2858,7 +2858,6 @@ static void collect_uncached_write_data(struct cifs=
-_aio_ctx *ctx)
->         struct cifs_tcon *tcon;
->         struct cifs_sb_info *cifs_sb;
->         struct dentry *dentry =3D ctx->cfile->dentry;
-> -       unsigned int i;
->         int rc;
->
->         tcon =3D tlink_tcon(ctx->cfile->tlink);
-> @@ -2922,10 +2921,6 @@ static void collect_uncached_write_data(struct cif=
-s_aio_ctx *ctx)
->                 kref_put(&wdata->refcount, cifs_uncached_writedata_releas=
-e);
->         }
->
-> -       if (!ctx->direct_io)
-> -               for (i =3D 0; i < ctx->npages; i++)
-> -                       put_page(ctx->bv[i].bv_page);
-> -
->         cifs_stats_bytes_written(tcon, ctx->total_len);
->         set_bit(CIFS_INO_INVALID_MAPPING, &CIFS_I(dentry->d_inode)->flags=
-);
->
-> @@ -3563,7 +3558,6 @@ collect_uncached_read_data(struct cifs_aio_ctx *ctx=
-)
->         struct iov_iter *to =3D &ctx->iter;
->         struct cifs_sb_info *cifs_sb;
->         struct cifs_tcon *tcon;
-> -       unsigned int i;
->         int rc;
->
->         tcon =3D tlink_tcon(ctx->cfile->tlink);
-> @@ -3647,15 +3641,8 @@ collect_uncached_read_data(struct cifs_aio_ctx *ct=
-x)
->                 kref_put(&rdata->refcount, cifs_uncached_readdata_release=
-);
->         }
->
-> -       if (!ctx->direct_io) {
-> -               for (i =3D 0; i < ctx->npages; i++) {
-> -                       if (ctx->should_dirty)
-> -                               set_page_dirty(ctx->bv[i].bv_page);
-> -                       put_page(ctx->bv[i].bv_page);
-> -               }
-> -
-> +       if (!ctx->direct_io)
->                 ctx->total_len =3D ctx->len - iov_iter_count(to);
-> -       }
->
->         /* mask nodata case */
->         if (rc =3D=3D -ENODATA)
-> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-> index bee203055b30..9bc0d17a9d77 100644
-> --- a/fs/cifs/misc.c
-> +++ b/fs/cifs/misc.c
-> @@ -768,6 +768,11 @@ cifs_aio_ctx_alloc(void)
->  {
->         struct cifs_aio_ctx *ctx;
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index 83a100dd2497..bb7522b882ea 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -1382,6 +1382,18 @@ smb2_ioctl_query_info(const unsigned int xid,
+>         oparms.fid = &fid;
+>         oparms.reconnect = false;
 >
 > +       /*
-> +        * Must use kzalloc to initialize ctx->bv to NULL and ctx->direct=
-_io
-> +        * to false so that we know when we have to unreference pages wit=
-hin
-> +        * cifs_aio_ctx_release()
+> +        * FSCTL codes encode the special access they need in the fsctl code.
 > +        */
->         ctx =3D kzalloc(sizeof(struct cifs_aio_ctx), GFP_KERNEL);
->         if (!ctx)
->                 return NULL;
-> @@ -786,7 +791,23 @@ cifs_aio_ctx_release(struct kref *refcount)
->                                         struct cifs_aio_ctx, refcount);
->
->         cifsFileInfo_put(ctx->cfile);
-> -       kvfree(ctx->bv);
-> +
-> +       /*
-> +        * ctx->bv is only set if setup_aio_ctx_iter() was call successfu=
-ly
-> +        * which means that iov_iter_get_pages() was a success and thus t=
-hat
-> +        * we have taken reference on pages.
-> +        */
-> +       if (ctx->bv) {
-> +               unsigned i;
-> +
-> +               for (i =3D 0; i < ctx->npages; i++) {
-> +                       if (ctx->should_dirty)
-> +                               set_page_dirty(ctx->bv[i].bv_page);
-> +                       put_page(ctx->bv[i].bv_page);
+> +       if (qi.flags & PASSTHRU_FSCTL) {
+> +               switch (qi.info_type & FSCTL_DEVICE_ACCESS_MASK) {
+> +               case FSCTL_DEVICE_ACCESS_FILE_READ_WRITE_ACCESS:
+> +                       oparms.desired_access = FILE_READ_DATA | FILE_WRITE_DATA | FILE_READ_ATTRIBUTES | SYNCHRONIZE;
+> +                       ;
+> +                       break;
 > +               }
-> +               kvfree(ctx->bv);
 > +       }
 > +
->         kfree(ctx);
->  }
+>         rc = SMB2_open_init(tcon, &rqst[0], &oplock, &oparms, path);
+>         if (rc)
+>                 goto iqinf_exit;
+> @@ -1399,8 +1411,9 @@ smb2_ioctl_query_info(const unsigned int xid,
 >
+>                         rc = SMB2_ioctl_init(tcon, &rqst[1],
+>                                              COMPOUND_FID, COMPOUND_FID,
+> -                                            qi.info_type, true, NULL,
+> -                                            0, CIFSMaxBufSize);
+> +                                            qi.info_type, true, buffer,
+> +                                            qi.output_buffer_length,
+> +                                            CIFSMaxBufSize);
+>                 }
+>         } else if (qi.flags == PASSTHRU_QUERY_INFO) {
+>                 memset(&qi_iov, 0, sizeof(qi_iov));
+> diff --git a/fs/cifs/smbfsctl.h b/fs/cifs/smbfsctl.h
+> index f996daeea271..9b3459b9a5ce 100644
+> --- a/fs/cifs/smbfsctl.h
+> +++ b/fs/cifs/smbfsctl.h
+> @@ -35,6 +35,33 @@
+>   * below). Additional detail on less common ones can be found in MS-FSCC
+>   * section 2.3.
+>   */
+> +
+> +/*
+> + * FSCTL values are 32 bits and are constructed as
+> + * <device 16bits> <access 2bits> <function 12bits> <method 2bits>
+> + */
+> +/* Device */
+> +#define FSCTL_DEVICE_DFS                 (0x0006 << 16)
+> +#define FSCTL_DEVICE_FILE_SYSTEM         (0x0009 << 16)
+> +#define FSCTL_DEVICE_NAMED_PIPE          (0x0011 << 16)
+> +#define FSCTL_DEVICE_NETWORK_FILE_SYSTEM (0x0014 << 16)
+> +#define FSCTL_DEVICE_MASK                0xffff0000
+> +/* Access */
+> +#define FSCTL_DEVICE_ACCESS_FILE_ANY_ACCESS        (0x00 << 14)
+> +#define FSCTL_DEVICE_ACCESS_FILE_READ_ACCESS       (0x01 << 14)
+> +#define FSCTL_DEVICE_ACCESS_FILE_WRITE_ACCESS      (0x02 << 14)
+> +#define FSCTL_DEVICE_ACCESS_FILE_READ_WRITE_ACCESS (0x03 << 14)
+> +#define FSCTL_DEVICE_ACCESS_MASK                   0x0000c000
+> +/* Function */
+> +#define FSCTL_DEVICE_FUNCTION_MASK       0x00003ffc
+> +/* Method */
+> +#define FSCTL_DEVICE_METHOD_BUFFERED   0x00
+> +#define FSCTL_DEVICE_METHOD_IN_DIRECT  0x01
+> +#define FSCTL_DEVICE_METHOD_OUT_DIRECT 0x02
+> +#define FSCTL_DEVICE_METHOD_NEITHER    0x03
+> +#define FSCTL_DEVICE_METHOD_MASK       0x00000003
+> +
+> +
+>  #define FSCTL_DFS_GET_REFERRALS      0x00060194
+>  #define FSCTL_DFS_GET_REFERRALS_EX   0x000601B0
+>  #define FSCTL_REQUEST_OPLOCK_LEVEL_1 0x00090000
 > --
-> 2.20.1
+> 2.13.6
 >
 
 
---=20
+-- 
 Thanks,
 
 Steve
