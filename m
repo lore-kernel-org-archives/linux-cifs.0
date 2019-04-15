@@ -2,123 +2,207 @@ Return-Path: <SRS0=GStD=SR=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33443C10F13
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Apr 2019 02:30:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 162E8C10F0E
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 Apr 2019 21:50:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 02063206B6
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Apr 2019 02:30:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DE80B206B6
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 Apr 2019 21:50:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726120AbfDOCay convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 14 Apr 2019 22:30:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56954 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725775AbfDOCay (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sun, 14 Apr 2019 22:30:54 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 131AD308FE8F
-        for <linux-cifs@vger.kernel.org>; Mon, 15 Apr 2019 02:30:54 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0A7F860123
-        for <linux-cifs@vger.kernel.org>; Mon, 15 Apr 2019 02:30:54 +0000 (UTC)
-Received: from zmail23.collab.prod.int.phx2.redhat.com (zmail23.collab.prod.int.phx2.redhat.com [10.5.83.28])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 023673FB10
-        for <linux-cifs@vger.kernel.org>; Mon, 15 Apr 2019 02:30:54 +0000 (UTC)
-Date:   Sun, 14 Apr 2019 22:30:53 -0400 (EDT)
-From:   Xiaoli Feng <xifeng@redhat.com>
-To:     CIFS <linux-cifs@vger.kernel.org>
-Message-ID: <510628530.3487503.1555295453817.JavaMail.zimbra@redhat.com>
-In-Reply-To: <359361880.3486881.1555294820885.JavaMail.zimbra@redhat.com>
-Subject: [regression]: CIFS: block in wait_for_free_credits when open file
- for SMB1.0
+        id S1726609AbfDOVu3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 15 Apr 2019 17:50:29 -0400
+Received: from a2nlsmtp01-02.prod.iad2.secureserver.net ([198.71.225.36]:41236
+        "EHLO a2nlsmtp01-02.prod.iad2.secureserver.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725804AbfDOVu3 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 15 Apr 2019 17:50:29 -0400
+Received: from linuxonhyperv2.linuxonhyperv.com ([107.180.71.197])
+        by : HOSTING RELAY : with ESMTP
+        id G9Tjh0al5O5E5G9Tjhswsi; Mon, 15 Apr 2019 14:49:27 -0700
+x-originating-ip: 107.180.71.197
+Received: from longli by linuxonhyperv2.linuxonhyperv.com with local (Exim 4.91)
+        (envelope-from <longli@linuxonhyperv2.linuxonhyperv.com>)
+        id 1hG9Tj-0003Ob-DH; Mon, 15 Apr 2019 14:49:27 -0700
+From:   Long Li <longli@linuxonhyperv.com>
+To:     Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+Cc:     Long Li <longli@microsoft.com>
+Subject: [PATCH] cifs: smbd: take an array of reqeusts when sending upper layer data
+Date:   Mon, 15 Apr 2019 14:49:17 -0700
+Message-Id: <20190415214917.13011-1-longli@linuxonhyperv.com>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-X-Originating-IP: [10.66.12.126, 10.4.195.23]
-Thread-Topic: : CIFS: block in wait_for_free_credits when open file for SMB1.0
-Thread-Index: uc6LxSQeP6si3r2rXj7bXEntlukyzQ==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Mon, 15 Apr 2019 02:30:54 +0000 (UTC)
+Reply-To: longli@microsoft.com
+Content-Transfer-Encoding: 8bit
+X-CMAE-Envelope: MS4wfBRg41gQAKvk5l1EFTc0RL26pOvYIzTzOKYRq6beTkOBT83szseJe8t+h3DS0ioNpkvGbqmxysNN3X8ML8hkb7U+2M5QrTbg3PxzSHH0+Fl9CMHt0axW
+ yXM4IbmcvQVKCH+qg6Xgxf9ReBFO+5BnFUb+aERsBRzdttViLkMU5AB++2w+qmgI1bmhU4Qf2w56k8JCr59HHAc74fyZFcX7QG5wWLQYc3OyguS9Q/L3IbHN
+ vsznCUDhuR8Sz/lZ/NEuX/XzOpbQk8Fed/eFd61UQvN0E/KlmvoZv3m81Snbo1N3JqTfsk2p3VNqVm1mcXYLfeGvUDETpo/2p23J/A2CZhPBpOkvASsvOeOp
+ 3rpGuXmPCuP8dFrma3YPOVP9KP1HTA==
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi,
+From: Long Li <longli@microsoft.com>
 
-Setup samba server on v5.1-rc3 and mount it in local with vers=1.0. Use the reproducer below to test if open file succesffully after unlink.
-The process blocked in wait_for_free_credits and never return. SMB2.0+ don't have this issue because of
+To support compounding, __smb_send_rqst() now sends an array of requests to
+the transport layer.
+Change smbd_send() to take an array of requests, and send them in as few
+packets as possible.
 
-  https://bugzilla.kernel.org/show_bug.cgi?id=203271
+Signed-off-by: Long Li <longli@microsoft.com>
+---
+ fs/cifs/smbdirect.c | 55 +++++++++++++++++++++++++++--------------------------
+ fs/cifs/smbdirect.h |  3 ++-
+ fs/cifs/transport.c |  2 +-
+ 3 files changed, 31 insertions(+), 29 deletions(-)
 
-It's a regression issue. Testing pass on v4.9-rc8 but start failed after v5.0.
-
-[<0>] wait_for_free_credits+0x258/0x460 [cifs]
-[<0>] SendReceive+0xcd/0x360 [cifs]
-[<0>] CIFSPOSIXCreate+0x1bf/0x440 [cifs]
-[<0>] cifs_posix_open+0x1ee/0x300 [cifs]
-[<0>] cifs_do_create+0x447/0x710 [cifs]
-[<0>] cifs_atomic_open+0x1ab/0x530 [cifs]
-[<0>] path_openat+0xd54/0x1670
-[<0>] do_filp_open+0x93/0x100
-[<0>] do_sys_open+0x186/0x220
-[<0>] do_syscall_64+0x55/0x1a0
-[<0>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
-[<0>] 0xffffffffffffffff
-
-reproducer.c:
-#define _GNU_SOURCE            
-#include <fcntl.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/file.h>
-#include <errno.h>
-void test()
-{
-    int fd;
-    int ret;
-
-    fd = open("./testfile",O_RDWR|O_CREAT,0644);
-    printf("errno=%d\n",errno);
-    if (fd < 0)
-    {
-        perror("open failed");
-        exit(1);
-    }
-    ret = unlink("./testfile");
-    if (ret < 0)
-    {
-        perror("unlink failed");
-        exit(1);
-    }
-    //add close(fd) here, then does not block.
-}
-int main(int argc, char **argv)
-{
-    int index=50;
-    while(index)
-    {
-        index--;
-        printf("loop %d\n",index);
-        test();
-    }
-    return 0;
-}
-
-
-I reported it in https://bugzilla.kernel.org/show_bug.cgi?id=203269
-
+diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+index b95354c..272bdf8 100644
+--- a/fs/cifs/smbdirect.c
++++ b/fs/cifs/smbdirect.c
+@@ -2075,7 +2075,8 @@ int smbd_recv(struct smbd_connection *info, struct msghdr *msg)
+  * rqst: the data to write
+  * return value: 0 if successfully write, otherwise error code
+  */
+-int smbd_send(struct TCP_Server_Info *server, struct smb_rqst *rqst)
++int smbd_send(struct TCP_Server_Info *server,
++	int num_rqst, struct smb_rqst *rqst_array)
+ {
+ 	struct smbd_connection *info = server->smbd_conn;
+ 	struct kvec vec;
+@@ -2087,6 +2088,8 @@ int smbd_send(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ 		info->max_send_size - sizeof(struct smbd_data_transfer);
+ 	struct kvec *iov;
+ 	int rc;
++	struct smb_rqst *rqst;
++	int rqst_idx;
+ 
+ 	if (info->transport_status != SMBD_CONNECTED) {
+ 		rc = -EAGAIN;
+@@ -2094,46 +2097,40 @@ int smbd_send(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ 	}
+ 
+ 	/*
+-	 * Skip the RFC1002 length defined in MS-SMB2 section 2.1
+-	 * It is used only for TCP transport in the iov[0]
+-	 * In future we may want to add a transport layer under protocol
+-	 * layer so this will only be issued to TCP transport
+-	 */
+-
+-	if (rqst->rq_iov[0].iov_len != 4) {
+-		log_write(ERR, "expected the pdu length in 1st iov, but got %zu\n", rqst->rq_iov[0].iov_len);
+-		return -EINVAL;
+-	}
+-
+-	/*
+ 	 * Add in the page array if there is one. The caller needs to set
+ 	 * rq_tailsz to PAGE_SIZE when the buffer has multiple pages and
+ 	 * ends at page boundary
+ 	 */
+-	buflen = smb_rqst_len(server, rqst);
++	remaining_data_length = 0;
++	for (i = 0; i < num_rqst; i++)
++		remaining_data_length += smb_rqst_len(server, &rqst_array[i]);
+ 
+-	if (buflen + sizeof(struct smbd_data_transfer) >
++	if (remaining_data_length + sizeof(struct smbd_data_transfer) >
+ 		info->max_fragmented_send_size) {
+ 		log_write(ERR, "payload size %d > max size %d\n",
+-			buflen, info->max_fragmented_send_size);
++			remaining_data_length, info->max_fragmented_send_size);
+ 		rc = -EINVAL;
+ 		goto done;
+ 	}
+ 
+-	iov = &rqst->rq_iov[1];
++	rqst_idx = 0;
++
++next_rqst:
++	rqst = &rqst_array[rqst_idx];
++	iov = rqst->rq_iov;
+ 
+-	cifs_dbg(FYI, "Sending smb (RDMA): smb_len=%u\n", buflen);
+-	for (i = 0; i < rqst->rq_nvec-1; i++)
++	cifs_dbg(FYI, "Sending smb (RDMA): idx=%d smb_len=%lu\n",
++		rqst_idx, smb_rqst_len(server, rqst));
++	for (i = 0; i < rqst->rq_nvec; i++)
+ 		dump_smb(iov[i].iov_base, iov[i].iov_len);
+ 
+-	remaining_data_length = buflen;
+ 
+-	log_write(INFO, "rqst->rq_nvec=%d rqst->rq_npages=%d rq_pagesz=%d "
+-		"rq_tailsz=%d buflen=%d\n",
+-		rqst->rq_nvec, rqst->rq_npages, rqst->rq_pagesz,
+-		rqst->rq_tailsz, buflen);
++	log_write(INFO, "rqst_idx=%d nvec=%d rqst->rq_npages=%d rq_pagesz=%d "
++		"rq_tailsz=%d buflen=%lu\n",
++		rqst_idx, rqst->rq_nvec, rqst->rq_npages, rqst->rq_pagesz,
++		rqst->rq_tailsz, smb_rqst_len(server, rqst));
+ 
+-	start = i = iov[0].iov_len ? 0 : 1;
++	start = i = 0;
+ 	buflen = 0;
+ 	while (true) {
+ 		buflen += iov[i].iov_len;
+@@ -2181,14 +2178,14 @@ int smbd_send(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ 						goto done;
+ 				}
+ 				i++;
+-				if (i == rqst->rq_nvec-1)
++				if (i == rqst->rq_nvec)
+ 					break;
+ 			}
+ 			start = i;
+ 			buflen = 0;
+ 		} else {
+ 			i++;
+-			if (i == rqst->rq_nvec-1) {
++			if (i == rqst->rq_nvec) {
+ 				/* send out all remaining vecs */
+ 				remaining_data_length -= buflen;
+ 				log_write(INFO,
+@@ -2232,6 +2229,10 @@ int smbd_send(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ 		}
+ 	}
+ 
++	rqst_idx++;
++	if (rqst_idx < num_rqst)
++		goto next_rqst;
++
+ done:
+ 	/*
+ 	 * As an optimization, we don't wait for individual I/O to finish
+diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
+index a3c7b3d..9ee7cbf 100644
+--- a/fs/cifs/smbdirect.h
++++ b/fs/cifs/smbdirect.h
+@@ -284,7 +284,8 @@ void smbd_destroy(struct TCP_Server_Info *server);
+ 
+ /* Interface for carrying upper layer I/O through send/recv */
+ int smbd_recv(struct smbd_connection *info, struct msghdr *msg);
+-int smbd_send(struct TCP_Server_Info *server, struct smb_rqst *rqst);
++int smbd_send(struct TCP_Server_Info *server,
++	int num_rqst, struct smb_rqst *rqst);
+ 
+ enum mr_state {
+ 	MR_READY,
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 65d9f3e..5c59c49 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -319,7 +319,7 @@ __smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
+ 	__be32 rfc1002_marker;
+ 
+ 	if (cifs_rdma_enabled(server) && server->smbd_conn) {
+-		rc = smbd_send(server, rqst);
++		rc = smbd_send(server, num_rqst, rqst);
+ 		goto smbd_done;
+ 	}
+ 
 -- 
-Best regards!
-XiaoLi Feng 冯小丽
+2.7.4
 
-Red Hat Software (Beijing) Co.,Ltd
-filesystem-qe Team
-IRC:xifeng，#channel: fs-qe
-Tel:+86-10-8388112
-9/F, Raycom
