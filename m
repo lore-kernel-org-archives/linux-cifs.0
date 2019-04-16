@@ -1,208 +1,129 @@
-Return-Path: <SRS0=GStD=SR=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=txT2=SS=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 162E8C10F0E
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Apr 2019 21:50:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E2DBC10F0E
+	for <linux-cifs@archiver.kernel.org>; Tue, 16 Apr 2019 00:20:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DE80B206B6
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Apr 2019 21:50:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 28FA62084B
+	for <linux-cifs@archiver.kernel.org>; Tue, 16 Apr 2019 00:20:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726609AbfDOVu3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 15 Apr 2019 17:50:29 -0400
-Received: from a2nlsmtp01-02.prod.iad2.secureserver.net ([198.71.225.36]:41236
-        "EHLO a2nlsmtp01-02.prod.iad2.secureserver.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725804AbfDOVu3 (ORCPT
+        id S1728036AbfDPAUJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 15 Apr 2019 20:20:09 -0400
+Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:33961 "EHLO
+        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727938AbfDPAUJ (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 15 Apr 2019 17:50:29 -0400
-Received: from linuxonhyperv2.linuxonhyperv.com ([107.180.71.197])
-        by : HOSTING RELAY : with ESMTP
-        id G9Tjh0al5O5E5G9Tjhswsi; Mon, 15 Apr 2019 14:49:27 -0700
-x-originating-ip: 107.180.71.197
-Received: from longli by linuxonhyperv2.linuxonhyperv.com with local (Exim 4.91)
-        (envelope-from <longli@linuxonhyperv2.linuxonhyperv.com>)
-        id 1hG9Tj-0003Ob-DH; Mon, 15 Apr 2019 14:49:27 -0700
-From:   Long Li <longli@linuxonhyperv.com>
-To:     Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
-Cc:     Long Li <longli@microsoft.com>
-Subject: [PATCH] cifs: smbd: take an array of reqeusts when sending upper layer data
-Date:   Mon, 15 Apr 2019 14:49:17 -0700
-Message-Id: <20190415214917.13011-1-longli@linuxonhyperv.com>
-X-Mailer: git-send-email 2.19.1
+        Mon, 15 Apr 2019 20:20:09 -0400
+X-Greylist: delayed 1172 seconds by postgrey-1.27 at vger.kernel.org; Mon, 15 Apr 2019 20:20:07 EDT
+Received: from dread.disaster.area (pa49-195-160-97.pa.nsw.optusnet.com.au [49.195.160.97])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 6CF0A43B815;
+        Tue, 16 Apr 2019 10:00:23 +1000 (AEST)
+Received: from dave by dread.disaster.area with local (Exim 4.92)
+        (envelope-from <david@fromorbit.com>)
+        id 1hGBWQ-0001Bf-TP; Tue, 16 Apr 2019 10:00:22 +1000
+Date:   Tue, 16 Apr 2019 10:00:22 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     jglisse@redhat.com
+Cc:     linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-mm@kvack.org,
+        John Hubbard <jhubbard@nvidia.com>, Jan Kara <jack@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Ming Lei <ming.lei@redhat.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Matthew Wilcox <willy@infradead.org>,
+        Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, Yan Zheng <zyan@redhat.com>,
+        Sage Weil <sage@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
+        Alex Elder <elder@kernel.org>, ceph-devel@vger.kernel.org,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Martin Brandenburg <martin@omnibond.com>,
+        devel@lists.orangefs.org,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        v9fs-developer@lists.sourceforge.net, Coly Li <colyli@suse.de>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        linux-bcache@vger.kernel.org,
+        Ernesto A =?iso-8859-1?Q?=2E_Fern=E1ndez?= 
+        <ernesto.mnd.fernandez@gmail.com>
+Subject: Re: [PATCH v1 00/15] Keep track of GUPed pages in fs and block
+Message-ID: <20190416000022.GA1454@dread.disaster.area>
+References: <20190411210834.4105-1-jglisse@redhat.com>
 MIME-Version: 1.0
-Reply-To: longli@microsoft.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CMAE-Envelope: MS4wfBRg41gQAKvk5l1EFTc0RL26pOvYIzTzOKYRq6beTkOBT83szseJe8t+h3DS0ioNpkvGbqmxysNN3X8ML8hkb7U+2M5QrTbg3PxzSHH0+Fl9CMHt0axW
- yXM4IbmcvQVKCH+qg6Xgxf9ReBFO+5BnFUb+aERsBRzdttViLkMU5AB++2w+qmgI1bmhU4Qf2w56k8JCr59HHAc74fyZFcX7QG5wWLQYc3OyguS9Q/L3IbHN
- vsznCUDhuR8Sz/lZ/NEuX/XzOpbQk8Fed/eFd61UQvN0E/KlmvoZv3m81Snbo1N3JqTfsk2p3VNqVm1mcXYLfeGvUDETpo/2p23J/A2CZhPBpOkvASsvOeOp
- 3rpGuXmPCuP8dFrma3YPOVP9KP1HTA==
+In-Reply-To: <20190411210834.4105-1-jglisse@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.2 cv=FNpr/6gs c=1 sm=1 tr=0 cx=a_idp_d
+        a=EHa8gIBQe3daEtuMEU8ptg==:117 a=EHa8gIBQe3daEtuMEU8ptg==:17
+        a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=8nJEP1OIZ-IA:10 a=oexKYjalfGEA:10
+        a=20KFwNOVAAAA:8 a=7-415B0cAAAA:8 a=8ER2NWrdpJKUM3wQwksA:9
+        a=wPNLvfGTeEIA:10 a=biEYGPWJfzWAr4FL6Ov7:22
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Long Li <longli@microsoft.com>
+On Thu, Apr 11, 2019 at 05:08:19PM -0400, jglisse@redhat.com wrote:
+> From: Jérôme Glisse <jglisse@redhat.com>
+> 
+> This patchset depends on various small fixes [1] and also on patchset
+> which introduce put_user_page*() [2] and thus is 5.3 material as those
+> pre-requisite will get in 5.2 at best. Nonetheless i am posting it now
+> so that it can get review and comments on how and what should be done
+> to test things.
+> 
+> For various reasons [2] [3] we want to track page reference through GUP
+> differently than "regular" page reference. Thus we need to keep track
+> of how we got a page within the block and fs layer. To do so this patch-
+> set change the bio_bvec struct to store a pfn and flags instead of a
+> direct pointer to a page. This way we can flag page that are coming from
+> GUP.
+> 
+> This patchset is divided as follow:
+>     - First part of the patchset is just small cleanup i believe they
+>       can go in as his assuming people are ok with them.
+>     - Second part convert bio_vec->bv_page to bio_vec->bv_pfn this is
+>       done in multi-step, first we replace all direct dereference of
+>       the field by call to inline helper, then we introduce macro for
+>       bio_bvec that are initialized on the stack. Finaly we change the
+>       bv_page field to bv_pfn.
+>     - Third part replace put_page(bv_page(bio_vec)) with a new helper
+>       which will use put_user_page() when the page in the bio_vec is
+>       coming from GUP.
+>     - Fourth part update BIO to use bv_set_user_page() for page that
+>       are coming from GUP this means updating bio_add_page*() to pass
+>       down the origin of the page (GUP or not).
+>     - Fith part convert few more places that directly use bvec_io or
+>       BIO.
+> 
+> Note that after this patchset they are still places in the kernel where
+> we should use put_user_page*(). The intention is to separate that task
+> in chewable chunk (driver by driver, sub-system by sub-system).
+> 
+> 
+> I have only lightly tested this patchset (branch [4]) on my desktop and
+> have not seen anything obviously wrong but i might have miss something.
+> What kind of test suite should i run to stress test the vfs/block layer
+> around DIO and BIO ?
 
-To support compounding, __smb_send_rqst() now sends an array of requests to
-the transport layer.
-Change smbd_send() to take an array of requests, and send them in as few
-packets as possible.
+Such widespread changes need full correctness tests run on them. I'd
+suggest fstests (auto group) be run on all the filesystems it
+supports that are affected by the changes in the patchset. Given you
+touched bio_add_page() here, that's probably all of them....
 
-Signed-off-by: Long Li <longli@microsoft.com>
----
- fs/cifs/smbdirect.c | 55 +++++++++++++++++++++++++++--------------------------
- fs/cifs/smbdirect.h |  3 ++-
- fs/cifs/transport.c |  2 +-
- 3 files changed, 31 insertions(+), 29 deletions(-)
+Cheers,
 
-diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index b95354c..272bdf8 100644
---- a/fs/cifs/smbdirect.c
-+++ b/fs/cifs/smbdirect.c
-@@ -2075,7 +2075,8 @@ int smbd_recv(struct smbd_connection *info, struct msghdr *msg)
-  * rqst: the data to write
-  * return value: 0 if successfully write, otherwise error code
-  */
--int smbd_send(struct TCP_Server_Info *server, struct smb_rqst *rqst)
-+int smbd_send(struct TCP_Server_Info *server,
-+	int num_rqst, struct smb_rqst *rqst_array)
- {
- 	struct smbd_connection *info = server->smbd_conn;
- 	struct kvec vec;
-@@ -2087,6 +2088,8 @@ int smbd_send(struct TCP_Server_Info *server, struct smb_rqst *rqst)
- 		info->max_send_size - sizeof(struct smbd_data_transfer);
- 	struct kvec *iov;
- 	int rc;
-+	struct smb_rqst *rqst;
-+	int rqst_idx;
- 
- 	if (info->transport_status != SMBD_CONNECTED) {
- 		rc = -EAGAIN;
-@@ -2094,46 +2097,40 @@ int smbd_send(struct TCP_Server_Info *server, struct smb_rqst *rqst)
- 	}
- 
- 	/*
--	 * Skip the RFC1002 length defined in MS-SMB2 section 2.1
--	 * It is used only for TCP transport in the iov[0]
--	 * In future we may want to add a transport layer under protocol
--	 * layer so this will only be issued to TCP transport
--	 */
--
--	if (rqst->rq_iov[0].iov_len != 4) {
--		log_write(ERR, "expected the pdu length in 1st iov, but got %zu\n", rqst->rq_iov[0].iov_len);
--		return -EINVAL;
--	}
--
--	/*
- 	 * Add in the page array if there is one. The caller needs to set
- 	 * rq_tailsz to PAGE_SIZE when the buffer has multiple pages and
- 	 * ends at page boundary
- 	 */
--	buflen = smb_rqst_len(server, rqst);
-+	remaining_data_length = 0;
-+	for (i = 0; i < num_rqst; i++)
-+		remaining_data_length += smb_rqst_len(server, &rqst_array[i]);
- 
--	if (buflen + sizeof(struct smbd_data_transfer) >
-+	if (remaining_data_length + sizeof(struct smbd_data_transfer) >
- 		info->max_fragmented_send_size) {
- 		log_write(ERR, "payload size %d > max size %d\n",
--			buflen, info->max_fragmented_send_size);
-+			remaining_data_length, info->max_fragmented_send_size);
- 		rc = -EINVAL;
- 		goto done;
- 	}
- 
--	iov = &rqst->rq_iov[1];
-+	rqst_idx = 0;
-+
-+next_rqst:
-+	rqst = &rqst_array[rqst_idx];
-+	iov = rqst->rq_iov;
- 
--	cifs_dbg(FYI, "Sending smb (RDMA): smb_len=%u\n", buflen);
--	for (i = 0; i < rqst->rq_nvec-1; i++)
-+	cifs_dbg(FYI, "Sending smb (RDMA): idx=%d smb_len=%lu\n",
-+		rqst_idx, smb_rqst_len(server, rqst));
-+	for (i = 0; i < rqst->rq_nvec; i++)
- 		dump_smb(iov[i].iov_base, iov[i].iov_len);
- 
--	remaining_data_length = buflen;
- 
--	log_write(INFO, "rqst->rq_nvec=%d rqst->rq_npages=%d rq_pagesz=%d "
--		"rq_tailsz=%d buflen=%d\n",
--		rqst->rq_nvec, rqst->rq_npages, rqst->rq_pagesz,
--		rqst->rq_tailsz, buflen);
-+	log_write(INFO, "rqst_idx=%d nvec=%d rqst->rq_npages=%d rq_pagesz=%d "
-+		"rq_tailsz=%d buflen=%lu\n",
-+		rqst_idx, rqst->rq_nvec, rqst->rq_npages, rqst->rq_pagesz,
-+		rqst->rq_tailsz, smb_rqst_len(server, rqst));
- 
--	start = i = iov[0].iov_len ? 0 : 1;
-+	start = i = 0;
- 	buflen = 0;
- 	while (true) {
- 		buflen += iov[i].iov_len;
-@@ -2181,14 +2178,14 @@ int smbd_send(struct TCP_Server_Info *server, struct smb_rqst *rqst)
- 						goto done;
- 				}
- 				i++;
--				if (i == rqst->rq_nvec-1)
-+				if (i == rqst->rq_nvec)
- 					break;
- 			}
- 			start = i;
- 			buflen = 0;
- 		} else {
- 			i++;
--			if (i == rqst->rq_nvec-1) {
-+			if (i == rqst->rq_nvec) {
- 				/* send out all remaining vecs */
- 				remaining_data_length -= buflen;
- 				log_write(INFO,
-@@ -2232,6 +2229,10 @@ int smbd_send(struct TCP_Server_Info *server, struct smb_rqst *rqst)
- 		}
- 	}
- 
-+	rqst_idx++;
-+	if (rqst_idx < num_rqst)
-+		goto next_rqst;
-+
- done:
- 	/*
- 	 * As an optimization, we don't wait for individual I/O to finish
-diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
-index a3c7b3d..9ee7cbf 100644
---- a/fs/cifs/smbdirect.h
-+++ b/fs/cifs/smbdirect.h
-@@ -284,7 +284,8 @@ void smbd_destroy(struct TCP_Server_Info *server);
- 
- /* Interface for carrying upper layer I/O through send/recv */
- int smbd_recv(struct smbd_connection *info, struct msghdr *msg);
--int smbd_send(struct TCP_Server_Info *server, struct smb_rqst *rqst);
-+int smbd_send(struct TCP_Server_Info *server,
-+	int num_rqst, struct smb_rqst *rqst);
- 
- enum mr_state {
- 	MR_READY,
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 65d9f3e..5c59c49 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -319,7 +319,7 @@ __smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
- 	__be32 rfc1002_marker;
- 
- 	if (cifs_rdma_enabled(server) && server->smbd_conn) {
--		rc = smbd_send(server, rqst);
-+		rc = smbd_send(server, num_rqst, rqst);
- 		goto smbd_done;
- 	}
- 
+Dave.
 -- 
-2.7.4
-
+Dave Chinner
+david@fromorbit.com
