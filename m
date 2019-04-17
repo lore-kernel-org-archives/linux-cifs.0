@@ -2,238 +2,141 @@ Return-Path: <SRS0=xEhF=ST=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 404B9C282DC
-	for <linux-cifs@archiver.kernel.org>; Wed, 17 Apr 2019 06:34:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81184C282DA
+	for <linux-cifs@archiver.kernel.org>; Wed, 17 Apr 2019 06:37:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1062D20693
-	for <linux-cifs@archiver.kernel.org>; Wed, 17 Apr 2019 06:34:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4F20B20835
+	for <linux-cifs@archiver.kernel.org>; Wed, 17 Apr 2019 06:37:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SO+bnceG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729366AbfDQGeY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 17 Apr 2019 02:34:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56352 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725767AbfDQGeY (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 17 Apr 2019 02:34:24 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9B66E307D914;
-        Wed, 17 Apr 2019 06:34:23 +0000 (UTC)
-Received: from test1135.test.redhat.com (vpn2-54-110.bne.redhat.com [10.64.54.110])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0691360C62;
-        Wed, 17 Apr 2019 06:34:20 +0000 (UTC)
-From:   Ronnie Sahlberg <lsahlber@redhat.com>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Steve French <smfrench@gmail.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>
-Subject: [PATCH] cifs: add SEEK_HOLE/SEEK_DATA support
-Date:   Wed, 17 Apr 2019 16:34:10 +1000
-Message-Id: <20190417063410.6371-1-lsahlber@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Wed, 17 Apr 2019 06:34:23 +0000 (UTC)
+        id S1729806AbfDQGg7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 17 Apr 2019 02:36:59 -0400
+Received: from mail-it1-f193.google.com ([209.85.166.193]:39595 "EHLO
+        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725767AbfDQGg7 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 17 Apr 2019 02:36:59 -0400
+Received: by mail-it1-f193.google.com with SMTP id 139so2659351ita.4
+        for <linux-cifs@vger.kernel.org>; Tue, 16 Apr 2019 23:36:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=STmsc8huRghGEZKHqsb9Oic3K+QDQaKzBbh9GFYEV0w=;
+        b=SO+bnceGdal/zOlCc7H0W06XlFOxgIMXbDWPBHOIOpE/tICHZ7QreMxXvww7JDaBDH
+         cIqxn3HCChGCGNXCXxK4kIoghvQg1/xdl8kbX4jK8yOEDcXtpg9qKWbvnR5oxaYh0A3T
+         39eSJ6B2mNSxPsWUlbQxhC1IPOoQw5BMQ1mtFbxPXSaqvyrndUhqezMYY5o4hLbk/+zJ
+         B7E0iElGCqxonO32xCTfkflj5VdcXXGlpKfk3nsRH8wVyJe6zwJvhHE7zgAbWy5w3ORL
+         HQIF1vdYOCtkics1BmXXD2T+Bbabrel7gCfTSVkIUFFzrEcF+y3JmbaN2VQ6IZozolsy
+         h65w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=STmsc8huRghGEZKHqsb9Oic3K+QDQaKzBbh9GFYEV0w=;
+        b=bndeXVH1krIdkJCVkaaLZ2OlAU+mb9muvYt22HmqRz6TBUEvoP8amuRpRNu89CWCFM
+         og+ZElkYJfldcFQso4qMRn9ZIl5hWr/ktkmBkNon0/RNaFbheodVXZeIRwHHxP9wdn3Q
+         5dHALISvIv3eaWOQrlH8lq4zTKQ6rAPlcA57oDrfAF0y+YJbRQoAZvP+CSxrAHlFCcQh
+         e1W3edyrb79TdOTHiFaGIikBDw5gLc4CF03OB5vzdNLkFyrNY8HVl5nPF3WbbwpejWke
+         hXLE8NkId0Vrz4dh87lnQtzPL3liPYrEkFKE7UvZqKE7vISU2PIM1NJexM7KgwuHOn1z
+         0Y3Q==
+X-Gm-Message-State: APjAAAV7R3/QPhls7RBI4DVFgOc+Wi19rugDo/Am5Tzf31dfru21/VMP
+        LQpUHQMv/9K08RHmC7shjEkXcgk7MektXXGmQWs=
+X-Google-Smtp-Source: APXvYqxNoamYHMtykZnBiEnACuvAXPeoPuHp8qj35Q98fuF9TjB1sUMph7HzP+i1n82n4ih1r86+Is23YB3ap9dr36Y=
+X-Received: by 2002:a24:650d:: with SMTP id u13mr21795029itb.1.1555483018582;
+ Tue, 16 Apr 2019 23:36:58 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190415021352.30854-1-lsahlber@redhat.com> <20190415021352.30854-2-lsahlber@redhat.com>
+ <BN8PR21MB11867D56B51DB9EA88747F68A0240@BN8PR21MB1186.namprd21.prod.outlook.com>
+In-Reply-To: <BN8PR21MB11867D56B51DB9EA88747F68A0240@BN8PR21MB1186.namprd21.prod.outlook.com>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Wed, 17 Apr 2019 16:36:47 +1000
+Message-ID: <CAN05THRrjbcD670+w+QbYOPEVu3hniBfUNnxYfEm-Fv=rgE=5w@mail.gmail.com>
+Subject: Re: [PATCH] cifs: fix bi-directional fsctl passthrough calls
+To:     Tom Talpey <ttalpey@microsoft.com>
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
----
- fs/cifs/cifsfs.c   |  9 ++++++++
- fs/cifs/cifsglob.h |  2 ++
- fs/cifs/smb2ops.c  | 65 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2pdu.c  |  7 +++++-
- fs/cifs/smb2pdu.h  |  5 +++++
- fs/cifs/smbfsctl.h |  2 +-
- 6 files changed, 88 insertions(+), 2 deletions(-)
+On Wed, Apr 17, 2019 at 6:31 AM Tom Talpey <ttalpey@microsoft.com> wrote:
+>
+> > -----Original Message-----
+> > From: linux-cifs-owner@vger.kernel.org <linux-cifs-owner@vger.kernel.org> On
+> > Behalf Of Ronnie Sahlberg
+> > Sent: Sunday, April 14, 2019 10:14 PM
+> > To: linux-cifs <linux-cifs@vger.kernel.org>
+> > Cc: Steve French <smfrench@gmail.com>; Ronnie Sahlberg
+> > <lsahlber@redhat.com>
+> > Subject: [PATCH] cifs: fix bi-directional fsctl passthrough calls
+> >
+> > SMB2 Ioctl responses from servers may respond with both the request blob
+> > from
+> > the client followed by the actual reply blob for ioctls that are bi-directional.
+> >
+> > In that case we can not assume that the reply blob comes immediately after
+> > the
+> > ioctl response structure.
+> >
+> > This fixes FSCTLs such as SMB2:FSCTL_QUERY_ALLOCATED_RANGES
+> >
+> > Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> > ---
+> >  fs/cifs/smb2ops.c | 9 ++++++++-
+> >  1 file changed, 8 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> > index 0b7e2be2a781..2824b97c5869 100644
+> > --- a/fs/cifs/smb2ops.c
+> > +++ b/fs/cifs/smb2ops.c
+> > @@ -1462,12 +1462,19 @@ smb2_ioctl_query_info(const unsigned int xid,
+> >               io_rsp = (struct smb2_ioctl_rsp *)rsp_iov[1].iov_base;
+> >               if (le32_to_cpu(io_rsp->OutputCount) <
+> > qi.input_buffer_length)
+> >                       qi.input_buffer_length = le32_to_cpu(io_rsp-
+> > >OutputCount);
+> > +             if (qi.input_buffer_length > 0 &&
+> > +                 le32_to_cpu(io_rsp->OutputOffset) + qi.input_buffer_length
+> > > rsp_iov[1].iov_len) {
+>
+> I hope this isn't a dumb question, but I can't readily figure it out due to
+> multiple layers of #include nesting. Is le32_to_cpu() signed or unsigned?
+> If it's signed, this validation could still be attacked.
+>
+> And second question, is the fsctl output payload always guaranteed to land
+> in rsp_iov[1]?
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 07fdf1771add..a00ef6c6a988 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -884,6 +884,9 @@ static ssize_t cifs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 
- static loff_t cifs_llseek(struct file *file, loff_t offset, int whence)
- {
-+	struct cifsFileInfo *cfile = file->private_data;
-+	struct cifs_tcon *tcon;
-+
- 	/*
- 	 * whence == SEEK_END || SEEK_DATA || SEEK_HOLE => we must revalidate
- 	 * the cached file length
-@@ -915,6 +918,12 @@ static loff_t cifs_llseek(struct file *file, loff_t offset, int whence)
- 		if (rc < 0)
- 			return (loff_t)rc;
- 	}
-+	if (cfile && cfile->tlink) {
-+		tcon = tlink_tcon(cfile->tlink);
-+		if (tcon->ses->server->ops->llseek)
-+			return tcon->ses->server->ops->llseek(file, tcon,
-+							      offset, whence);
-+	}
- 	return generic_file_llseek(file, offset, whence);
- }
- 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 0dc55f4e6929..828772da5fa4 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -493,6 +493,8 @@ struct smb_version_operations {
- 			 char *full_path,
- 			 umode_t mode,
- 			 dev_t device_number);
-+	/* version specific llseek implementation */
-+	loff_t (*llseek)(struct file *, struct cifs_tcon *, loff_t, int);
- };
- 
- struct smb_version_values {
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 2824b97c5869..dc36316b9bd5 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -2872,6 +2872,69 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
- 	return rc;
- }
- 
-+static loff_t smb3_llseek(struct file *file, struct cifs_tcon *tcon, loff_t offset, int whence)
-+{
-+	struct cifsFileInfo *cfile = file->private_data;
-+	struct cifsInodeInfo *cifsi;
-+	struct inode *inode;
-+	int rc = 0;
-+	struct fsctl_query_allocate_ranges in_data, *out_data = NULL;
-+	u32 out_data_len;
-+	unsigned int xid;
-+
-+	if (whence != SEEK_HOLE && whence != SEEK_DATA)
-+		return generic_file_llseek(file, offset, whence);
-+
-+	inode = d_inode(cfile->dentry);
-+	cifsi = CIFS_I(inode);
-+
-+	if (offset < 0 || offset > i_size_read(inode))
-+		return -ENXIO;
-+
-+	if (!(cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE)) {
-+		if (whence == SEEK_HOLE)
-+			offset = i_size_read(inode);
-+		else
-+			offset = offset;
-+		goto lseek_exit;
-+	}
-+
-+	in_data.file_offset = cpu_to_le64(offset);
-+	in_data.length = cpu_to_le64(i_size_read(inode));
-+
-+	xid = get_xid();
-+	rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
-+			cfile->fid.volatile_fid,
-+			FSCTL_QUERY_ALLOCATED_RANGES, true,
-+			(char *)&in_data, sizeof(in_data),
-+			sizeof(struct fsctl_query_allocate_ranges),
-+			(char **)&out_data, &out_data_len);
-+	free_xid(xid);
-+	if (rc == -E2BIG)
-+		rc = 0;
-+	if (rc)
-+		goto lseek_exit;
-+
-+	if (out_data_len < sizeof(struct fsctl_query_allocate_ranges)) {
-+		rc = -EINVAL;
-+		goto lseek_exit;
-+	}
-+	if (whence == SEEK_DATA) {
-+		offset = le64_to_cpu(out_data->file_offset);
-+		goto lseek_exit;
-+	}
-+	if (offset < le64_to_cpu(out_data->file_offset))
-+		goto lseek_exit;
-+
-+	offset = le64_to_cpu(out_data->file_offset) + le64_to_cpu(out_data->length);
-+
-+ lseek_exit:
-+	kfree(out_data);
-+	if (!rc)
-+		return vfs_setpos(file, offset, inode->i_sb->s_maxbytes);
-+	else
-+		return rc;
-+}
- 
- static long smb3_fallocate(struct file *file, struct cifs_tcon *tcon, int mode,
- 			   loff_t off, loff_t len)
-@@ -4247,6 +4310,7 @@ struct smb_version_operations smb30_operations = {
- 	.next_header = smb2_next_header,
- 	.ioctl_query_info = smb2_ioctl_query_info,
- 	.make_node = smb2_make_node,
-+	.llseek = smb3_llseek,
- };
- 
- struct smb_version_operations smb311_operations = {
-@@ -4356,6 +4420,7 @@ struct smb_version_operations smb311_operations = {
- 	.next_header = smb2_next_header,
- 	.ioctl_query_info = smb2_ioctl_query_info,
- 	.make_node = smb2_make_node,
-+	.llseek = smb3_llseek,
- };
- 
- struct smb_version_values smb20_values = {
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 99a015e980d2..ac92d066c724 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -2625,7 +2625,7 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
- 		trace_smb3_fsctl_err(xid, persistent_fid, tcon->tid,
- 				ses->Suid, 0, opcode, rc);
- 
--	if ((rc != 0) && (rc != -EINVAL)) {
-+	if ((rc != 0) && (rc != -EINVAL) && (rc != -E2BIG)) {
- 		cifs_stats_fail_inc(tcon, SMB2_IOCTL_HE);
- 		goto ioctl_exit;
- 	} else if (rc == -EINVAL) {
-@@ -2634,6 +2634,11 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
- 			cifs_stats_fail_inc(tcon, SMB2_IOCTL_HE);
- 			goto ioctl_exit;
- 		}
-+	} else if (rc == -E2BIG) {
-+		if (opcode != FSCTL_QUERY_ALLOCATED_RANGES) {
-+			cifs_stats_fail_inc(tcon, SMB2_IOCTL_HE);
-+			goto ioctl_exit;
-+		}
- 	}
- 
- 	/* check if caller wants to look at return data or just return rc */
-diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index ee8977688e21..3a29db740fe6 100644
---- a/fs/cifs/smb2pdu.h
-+++ b/fs/cifs/smb2pdu.h
-@@ -842,6 +842,11 @@ struct fsctl_get_integrity_information_rsp {
- 	__le32	ClusterSizeInBytes;
- } __packed;
- 
-+struct fsctl_query_allocate_ranges {
-+	__le64	file_offset;
-+	__le64	length;
-+} __packed;
-+
- /* Integrity ChecksumAlgorithm choices for above */
- #define	CHECKSUM_TYPE_NONE	0x0000
- #define	CHECKSUM_TYPE_CRC64	0x0002
-diff --git a/fs/cifs/smbfsctl.h b/fs/cifs/smbfsctl.h
-index 9b3459b9a5ce..08628e6a42ac 100644
---- a/fs/cifs/smbfsctl.h
-+++ b/fs/cifs/smbfsctl.h
-@@ -103,7 +103,7 @@
- #define FSCTL_SET_ZERO_ON_DEALLOC    0x00090194 /* BB add struct */
- #define FSCTL_SET_SHORT_NAME_BEHAVIOR 0x000901B4 /* BB add struct */
- #define FSCTL_GET_INTEGRITY_INFORMATION 0x0009027C
--#define FSCTL_QUERY_ALLOCATED_RANGES 0x000940CF /* BB add struct */
-+#define FSCTL_QUERY_ALLOCATED_RANGES 0x000940CF
- #define FSCTL_SET_DEFECT_MANAGEMENT  0x00098134 /* BB add struct */
- #define FSCTL_FILE_LEVEL_TRIM        0x00098208 /* BB add struct */
- #define FSCTL_DUPLICATE_EXTENTS_TO_FILE 0x00098344
--- 
-2.13.6
+Yes. It will always land in rsp_iov[1].
 
+>
+> Tom.
+>
+> > +                     rc = -EFAULT;
+> > +                     goto iqinf_exit;
+> > +             }
+> >               if (copy_to_user(&pqi->input_buffer_length,
+> > &qi.input_buffer_length,
+> >                                sizeof(qi.input_buffer_length))) {
+> >                       rc = -EFAULT;
+> >                       goto iqinf_exit;
+> >               }
+> > -             if (copy_to_user(pqi + 1, &io_rsp[1], qi.input_buffer_length)) {
+> > +             if (copy_to_user((char *)pqi + sizeof(struct smb_query_info),
+> > +                              (char *)io_rsp + le32_to_cpu(io_rsp-
+> > >OutputOffset),
+> > +                              qi.input_buffer_length)) {
+> >                       rc = -EFAULT;
+> >                       goto iqinf_exit;
+> >               }
+> > --
+> > 2.13.6
+>
