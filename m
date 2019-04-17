@@ -2,165 +2,109 @@ Return-Path: <SRS0=xEhF=ST=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78380C282DA
-	for <linux-cifs@archiver.kernel.org>; Wed, 17 Apr 2019 17:19:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9145AC282DA
+	for <linux-cifs@archiver.kernel.org>; Wed, 17 Apr 2019 19:40:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 516912064A
-	for <linux-cifs@archiver.kernel.org>; Wed, 17 Apr 2019 17:19:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A35520651
+	for <linux-cifs@archiver.kernel.org>; Wed, 17 Apr 2019 19:40:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TeUNVa81"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732321AbfDQRTQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 17 Apr 2019 13:19:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37810 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729395AbfDQRTP (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 17 Apr 2019 13:19:15 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 78987F74D4;
-        Wed, 17 Apr 2019 17:19:15 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-116-59.sin2.redhat.com [10.67.116.59])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2E8B660C66;
-        Wed, 17 Apr 2019 17:19:12 +0000 (UTC)
-From:   Kenneth D'souza <kdsouza@redhat.com>
-To:     linux-cifs@vger.kernel.org
-Cc:     piastryyy@gmail.com
-Subject: [PATCH] getcifsacl: Add support to accept more paths
-Date:   Wed, 17 Apr 2019 22:49:09 +0530
-Message-Id: <20190417171909.803-1-kdsouza@redhat.com>
+        id S1733244AbfDQTki (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 17 Apr 2019 15:40:38 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:40854 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732958AbfDQTki (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 17 Apr 2019 15:40:38 -0400
+Received: by mail-pl1-f195.google.com with SMTP id b3so12501049plr.7
+        for <linux-cifs@vger.kernel.org>; Wed, 17 Apr 2019 12:40:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=FPc9o1VZ1fz2fL5ntZYjeZh+D0FODwyTyUnJ3vl+M+c=;
+        b=TeUNVa81g0hkpLb2zCNZnw+sIyytWdOb4fpa5TCF/80/HCkXl1yknwhF0haGBwIAck
+         SWCd2enTfGFPXO8Q/K8ZmGylVtIoonVGMqCQQd3HThDU8CYb35qZc/J1eN6cIlOgi7dV
+         /2H8D597Nh136jTHaktzSZz9//K+QPmxP52eyNCA5VZiiVqjeKbjIUlTCvDx2Dbecnmd
+         yyr7u+uaIr88aDU4ick5ZrypWd2mhU2CuXyPzjhLHpKDgr4rCNHkkLwcuiPIKI4DXguc
+         kfNjR3F8Cx9drsO7BB/h5iWId2Vn1L0bam/hvsMNslx/hqXaMNYmecbQvEcGDnVqablv
+         lmwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=FPc9o1VZ1fz2fL5ntZYjeZh+D0FODwyTyUnJ3vl+M+c=;
+        b=l0uCf4WuKNzhiDMJ8+kP+Q8di/pDquMWux2lGKtN8jxH//Q8JAOCCECzJK5fFPROec
+         YXTZT5CiFz7X/LeFQhX+GPUmguVjFKqd9ZQQ2VeMyO5SRzqIIdqw0unJ6r8BKeTFbZk7
+         SG/bhE5/40VUwoXqZWwTvlDyQGsNrt+C5/FxkNIvds47XpEsy4puCLM6dqgyHAeM3iJX
+         fHF+l8cEvg5eY93zW3fN90JTm4AAg/ldRq21oJ3363E/K7R2RjPnG1DGDTJ8yhIlu4eK
+         tV290lMLT4VEPFovpN13BJ6ZpW1hw7+oOT0WkZHuxpnxYl1B1O9qlHHmybz7xkd9p/Fr
+         8swg==
+X-Gm-Message-State: APjAAAWCaDIMxlHg/hzUscesA0Jd+Pk9viSrxUS5SZoZJNBXqLT92mFr
+        2VG4Qk2QrAIu8tOwNPsoPhv1fGtO6up/j8kxago=
+X-Google-Smtp-Source: APXvYqzy0Fjd2PtpNFCGyOArjhOhhroqmroD4X2a9YHreTTfy6a2Dd+5Dfff86Blh3eZNw5/PXFSQXlpKQA51YjVRGE=
+X-Received: by 2002:a17:902:2ae6:: with SMTP id j93mr73856346plb.18.1555530037703;
+ Wed, 17 Apr 2019 12:40:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Wed, 17 Apr 2019 17:19:15 +0000 (UTC)
+From:   Steve French <smfrench@gmail.com>
+Date:   Wed, 17 Apr 2019 14:40:26 -0500
+Message-ID: <CAH2r5mtuPCiGMV+oFMxDXzP_ior8iYm_ZQHQvS1+CyNN4dkRRw@mail.gmail.com>
+Subject: [GIT PULL] SMB3 Fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Accept more than one path on the getcifsacl command line.
+Please pull the following changes since commit
+618d919cae2fcaadc752f27ddac8b939da8b441a:
 
-Signed-off-by: Kenneth D'souza <kdsouza@redhat.com>
----
- getcifsacl.c | 82 +++++++++++++++++++++++++++++-----------------------
- 1 file changed, 46 insertions(+), 36 deletions(-)
+  Merge tag 'libnvdimm-fixes-5.1-rc6' of
+git://git.kernel.org/pub/scm/linux/kernel/git/nvdimm/nvdimm
+(2019-04-15 16:48:51 -0700)
 
-diff --git a/getcifsacl.c b/getcifsacl.c
-index fc78881..df3099d 100644
---- a/getcifsacl.c
-+++ b/getcifsacl.c
-@@ -340,14 +340,54 @@ getcifsacl_usage(const char *prog)
- 	fprintf(stderr, "\nRefer to getcifsacl(1) manpage for details\n");
- }
- 
-+static void
-+getcifsacl(const char *filename , bool raw)
-+{
-+	ssize_t attrlen;
-+	size_t bufsize = BUFSIZE;
-+        char *attrval;
-+        int failed = 0;
-+cifsacl:
-+	if (bufsize >= XATTR_SIZE_MAX) {
-+		printf("buffer to allocate exceeds max size of %d\n",
-+				XATTR_SIZE_MAX);
-+		exit(1);
-+	}
-+
-+	attrval = malloc(bufsize * sizeof(char));
-+	if (!attrval) {
-+		printf("error allocating memory for attribute value buffer\n");
-+		exit(1);
-+	}
-+
-+	attrlen = getxattr(filename, ATTRNAME, attrval, bufsize);
-+	if (attrlen == -1) {
-+		if (errno == ERANGE) {
-+			free(attrval);
-+			bufsize += BUFSIZE;
-+			goto cifsacl;
-+                } else
-+                {
-+                  fprintf(stderr, "Failed to getxattr %s: %s\n", filename, strerror(errno) );
-+                    failed = -1;
-+                }
-+        }
-+
-+        if (failed == 0)
-+        {
-+        printf("# filename: %s\n", filename);
-+        parse_sec_desc((struct cifs_ntsd *)attrval, attrlen, raw);
-+	printf("\n");
-+        }
-+        free(attrval);
-+
-+}
-+
- int
- main(const int argc, char *const argv[])
- {
- 	int c, ret = 0;
- 	bool raw = false;
--	ssize_t attrlen;
--	size_t bufsize = BUFSIZE;
--	char *filename, *attrval;
- 	execname = basename(argv[0]);
- 
- 	if (argc < 2) {
-@@ -374,8 +414,7 @@ main(const int argc, char *const argv[])
- 		printf("you must specify a filename after options.\n");
- 		printf("Usage: getcifsacl [option] <file_name>\n");
- 		goto out;
--	} else
--		filename = argv[optind];
-+	}
- 
- 	if (!raw && !plugin_loaded) {
- 		ret = init_plugin(&plugin_handle);
-@@ -386,38 +425,9 @@ main(const int argc, char *const argv[])
- 			plugin_loaded = true;
- 	}
- 
--cifsacl:
--	if (bufsize >= XATTR_SIZE_MAX) {
--		printf("buffer to allocate exceeds max size of %d\n",
--				XATTR_SIZE_MAX);
--		ret = -1;
--		goto out;
--	}
--
--	attrval = malloc(bufsize * sizeof(char));
--	if (!attrval) {
--		printf("error allocating memory for attribute value buffer\n");
--		ret = -1;
--		goto out;
--	}
--
--	attrlen = getxattr(filename, ATTRNAME, attrval, bufsize);
--	if (attrlen == -1) {
--		if (errno == ERANGE) {
--			free(attrval);
--			bufsize += BUFSIZE;
--			goto cifsacl;
--		} else {
--			fprintf(stderr, "getxattr failed on %s: %s\n", filename, strerror(errno) );
--			free(attrval);
--			ret = -1;
--			goto out;
--		}
--	}
--
--	parse_sec_desc((struct cifs_ntsd *)attrval, attrlen, raw);
-+	for(; optind < argc; optind++)
-+		getcifsacl(argv[optind], raw);
- 
--	free(attrval);
- out:
- 	if (plugin_loaded)
- 		exit_plugin(plugin_handle);
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git tags/5.1-rc5-smb3-fixes
+
+for you to fetch changes up to b98749cac4a695f084a5ff076f4510b23e353ecd:
+
+  CIFS: keep FileInfo handle live during oplock break (2019-04-16
+09:38:38 -0500)
+
+----------------------------------------------------------------
+Five small SMB3 fixes, all also for stable: an important fix for an
+oplock (lease) bug, a handle leak fix, and fixes for 3 bugs spotted by
+KASAN
+
+----------------------------------------------------------------
+Aurelien Aptel (1):
+      CIFS: keep FileInfo handle live during oplock break
+
+Ronnie Sahlberg (1):
+      cifs: fix handle leak in smb2_query_symlink()
+
+ZhangXiaoxu (3):
+      cifs: Fix use-after-free in SMB2_write
+      cifs: Fix use-after-free in SMB2_read
+      cifs: Fix lease buffer length error
+
+ fs/cifs/cifsglob.h |  2 ++
+ fs/cifs/file.c     | 30 +++++++++++++++++++++++++-----
+ fs/cifs/misc.c     | 25 +++++++++++++++++++++++--
+ fs/cifs/smb2misc.c |  6 +++---
+ fs/cifs/smb2ops.c  |  2 ++
+ fs/cifs/smb2pdu.c  | 11 +++++++----
+ 6 files changed, 62 insertions(+), 14 deletions(-)
+
+
 -- 
-2.20.1
+Thanks,
 
+Steve
