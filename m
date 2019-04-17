@@ -2,156 +2,165 @@ Return-Path: <SRS0=xEhF=ST=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C0EC282DC
-	for <linux-cifs@archiver.kernel.org>; Wed, 17 Apr 2019 13:50:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78380C282DA
+	for <linux-cifs@archiver.kernel.org>; Wed, 17 Apr 2019 17:19:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 016F220872
-	for <linux-cifs@archiver.kernel.org>; Wed, 17 Apr 2019 13:50:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VHep33TN"
+	by mail.kernel.org (Postfix) with ESMTP id 516912064A
+	for <linux-cifs@archiver.kernel.org>; Wed, 17 Apr 2019 17:19:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732315AbfDQNuI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 17 Apr 2019 09:50:08 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:46108 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729453AbfDQNuH (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 17 Apr 2019 09:50:07 -0400
-Received: by mail-pf1-f194.google.com with SMTP id 9so12114639pfj.13
-        for <linux-cifs@vger.kernel.org>; Wed, 17 Apr 2019 06:50:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=WKX0Fpfw+NApY93/fExIhWXn/N/Dk+s13h6EJ37ZgIQ=;
-        b=VHep33TN5yo3RX7Dc6YzLOe+CIjDXDiQqAFSnkBAYFFSl5cnDrmRjZ5xUDSBCN/O5D
-         1uhGPPBr+aiOZaXwDA/3i+opXH4hbPe4ttAh8T2ww+V85fAsAOReeikQeUnGJfEA61uL
-         0o0a00YcUNMokkWpAt9GzBvsbSA4xOBtfY4QsnejGTAuyEwD8MgQfE/sL2GgtDmJktVV
-         CG8uDBKEfJYhi6KDosanbkaQmqxs8HZLDQpxZWhOdypUVcG+AaghUf8ZHle17VP0Rzek
-         wCDl/f98IDutuL72apQQ1mJj/WJXi5p1Zeu56Td2fLvvjcofwNTaRu0pfWwBseQiUyAW
-         18gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=WKX0Fpfw+NApY93/fExIhWXn/N/Dk+s13h6EJ37ZgIQ=;
-        b=Z4PhW8KErvktzO3j6QnBmDw1xV0qZ9rQzNIpkOl7Dv3iZJk0IdYyvMjQHPor+ea1SO
-         RWBcU/HbLRRFK/0SQoxXr1gqek0xuoPAr+kO9Y88LURCZr5PhReoj33K7WTZXT9jbTVw
-         VjJ4FZPnHThzP/0jf5Eho7IdLuQ1/RkyzrTyVWi2ePCI2BL3mOk0yMubCcAi6wyRET0t
-         eKhe8QZMoG9rQab6vgKo7CjF+a4u8nJZRWFDdzVsVJh8uQvheMQ/dh5QuunqxlBxyqqx
-         KPrxNvPV1o6MUzX1Bi1MaZsEYHLmyNVn03NRMGXLs1lknJWZUoett0ao7ZLwP7s81LwB
-         DBZw==
-X-Gm-Message-State: APjAAAXAhRG+e8U3GJKrfuZ56T0bHVYsFrSjHQVb00cCQVNvBbOrxuxe
-        ozLrwH+/HLmf+s0t4OKV2+iVsU5ZV2bhtB453WWhnA==
-X-Google-Smtp-Source: APXvYqw4ALsoAubIClB37Xp+BcdNikY1MMsymqENx+uUOD20tN0l2XAY3PEHadY5NTW8XxI8zyz8tHc9S72D5slcfdk=
-X-Received: by 2002:a63:4e64:: with SMTP id o36mr84543318pgl.213.1555509006272;
- Wed, 17 Apr 2019 06:50:06 -0700 (PDT)
+        id S1732321AbfDQRTQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 17 Apr 2019 13:19:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37810 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729395AbfDQRTP (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 17 Apr 2019 13:19:15 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 78987F74D4;
+        Wed, 17 Apr 2019 17:19:15 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-116-59.sin2.redhat.com [10.67.116.59])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2E8B660C66;
+        Wed, 17 Apr 2019 17:19:12 +0000 (UTC)
+From:   Kenneth D'souza <kdsouza@redhat.com>
+To:     linux-cifs@vger.kernel.org
+Cc:     piastryyy@gmail.com
+Subject: [PATCH] getcifsacl: Add support to accept more paths
+Date:   Wed, 17 Apr 2019 22:49:09 +0530
+Message-Id: <20190417171909.803-1-kdsouza@redhat.com>
 MIME-Version: 1.0
-References: <359361880.3486881.1555294820885.JavaMail.zimbra@redhat.com> <510628530.3487503.1555295453817.JavaMail.zimbra@redhat.com>
-In-Reply-To: <510628530.3487503.1555295453817.JavaMail.zimbra@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 17 Apr 2019 08:49:54 -0500
-Message-ID: <CAH2r5msb+euA-qCumXcQnRk3vw_9=Jm6MznE1t22YaRYKcrXkw@mail.gmail.com>
-Subject: Re: [regression]: CIFS: block in wait_for_free_credits when open file
- for SMB1.0
-To:     Xiaoli Feng <xifeng@redhat.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Wed, 17 Apr 2019 17:19:15 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Ronnie's patch fixed this and I have merged into cifs-2.6.git for-next
-and added cc:stable
+Accept more than one path on the getcifsacl command line.
 
-On Sun, Apr 14, 2019 at 9:31 PM Xiaoli Feng <xifeng@redhat.com> wrote:
->
-> Hi,
->
-> Setup samba server on v5.1-rc3 and mount it in local with vers=3D1.0. Use=
- the reproducer below to test if open file succesffully after unlink.
-> The process blocked in wait_for_free_credits and never return. SMB2.0+ do=
-n't have this issue because of
->
->   https://bugzilla.kernel.org/show_bug.cgi?id=3D203271
->
-> It's a regression issue. Testing pass on v4.9-rc8 but start failed after =
-v5.0.
->
-> [<0>] wait_for_free_credits+0x258/0x460 [cifs]
-> [<0>] SendReceive+0xcd/0x360 [cifs]
-> [<0>] CIFSPOSIXCreate+0x1bf/0x440 [cifs]
-> [<0>] cifs_posix_open+0x1ee/0x300 [cifs]
-> [<0>] cifs_do_create+0x447/0x710 [cifs]
-> [<0>] cifs_atomic_open+0x1ab/0x530 [cifs]
-> [<0>] path_openat+0xd54/0x1670
-> [<0>] do_filp_open+0x93/0x100
-> [<0>] do_sys_open+0x186/0x220
-> [<0>] do_syscall_64+0x55/0x1a0
-> [<0>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> [<0>] 0xffffffffffffffff
->
-> reproducer.c:
-> #define _GNU_SOURCE
-> #include <fcntl.h>
-> #include <stdlib.h>
-> #include <stdio.h>
-> #include <sys/file.h>
-> #include <errno.h>
-> void test()
-> {
->     int fd;
->     int ret;
->
->     fd =3D open("./testfile",O_RDWR|O_CREAT,0644);
->     printf("errno=3D%d\n",errno);
->     if (fd < 0)
->     {
->         perror("open failed");
->         exit(1);
->     }
->     ret =3D unlink("./testfile");
->     if (ret < 0)
->     {
->         perror("unlink failed");
->         exit(1);
->     }
->     //add close(fd) here, then does not block.
-> }
-> int main(int argc, char **argv)
-> {
->     int index=3D50;
->     while(index)
->     {
->         index--;
->         printf("loop %d\n",index);
->         test();
->     }
->     return 0;
-> }
->
->
-> I reported it in https://bugzilla.kernel.org/show_bug.cgi?id=3D203269
->
-> --
-> Best regards!
-> XiaoLi Feng =E5=86=AF=E5=B0=8F=E4=B8=BD
->
-> Red Hat Software (Beijing) Co.,Ltd
-> filesystem-qe Team
-> IRC:xifeng=EF=BC=8C#channel: fs-qe
-> Tel:+86-10-8388112
-> 9/F, Raycom
+Signed-off-by: Kenneth D'souza <kdsouza@redhat.com>
+---
+ getcifsacl.c | 82 +++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 46 insertions(+), 36 deletions(-)
 
+diff --git a/getcifsacl.c b/getcifsacl.c
+index fc78881..df3099d 100644
+--- a/getcifsacl.c
++++ b/getcifsacl.c
+@@ -340,14 +340,54 @@ getcifsacl_usage(const char *prog)
+ 	fprintf(stderr, "\nRefer to getcifsacl(1) manpage for details\n");
+ }
+ 
++static void
++getcifsacl(const char *filename , bool raw)
++{
++	ssize_t attrlen;
++	size_t bufsize = BUFSIZE;
++        char *attrval;
++        int failed = 0;
++cifsacl:
++	if (bufsize >= XATTR_SIZE_MAX) {
++		printf("buffer to allocate exceeds max size of %d\n",
++				XATTR_SIZE_MAX);
++		exit(1);
++	}
++
++	attrval = malloc(bufsize * sizeof(char));
++	if (!attrval) {
++		printf("error allocating memory for attribute value buffer\n");
++		exit(1);
++	}
++
++	attrlen = getxattr(filename, ATTRNAME, attrval, bufsize);
++	if (attrlen == -1) {
++		if (errno == ERANGE) {
++			free(attrval);
++			bufsize += BUFSIZE;
++			goto cifsacl;
++                } else
++                {
++                  fprintf(stderr, "Failed to getxattr %s: %s\n", filename, strerror(errno) );
++                    failed = -1;
++                }
++        }
++
++        if (failed == 0)
++        {
++        printf("# filename: %s\n", filename);
++        parse_sec_desc((struct cifs_ntsd *)attrval, attrlen, raw);
++	printf("\n");
++        }
++        free(attrval);
++
++}
++
+ int
+ main(const int argc, char *const argv[])
+ {
+ 	int c, ret = 0;
+ 	bool raw = false;
+-	ssize_t attrlen;
+-	size_t bufsize = BUFSIZE;
+-	char *filename, *attrval;
+ 	execname = basename(argv[0]);
+ 
+ 	if (argc < 2) {
+@@ -374,8 +414,7 @@ main(const int argc, char *const argv[])
+ 		printf("you must specify a filename after options.\n");
+ 		printf("Usage: getcifsacl [option] <file_name>\n");
+ 		goto out;
+-	} else
+-		filename = argv[optind];
++	}
+ 
+ 	if (!raw && !plugin_loaded) {
+ 		ret = init_plugin(&plugin_handle);
+@@ -386,38 +425,9 @@ main(const int argc, char *const argv[])
+ 			plugin_loaded = true;
+ 	}
+ 
+-cifsacl:
+-	if (bufsize >= XATTR_SIZE_MAX) {
+-		printf("buffer to allocate exceeds max size of %d\n",
+-				XATTR_SIZE_MAX);
+-		ret = -1;
+-		goto out;
+-	}
+-
+-	attrval = malloc(bufsize * sizeof(char));
+-	if (!attrval) {
+-		printf("error allocating memory for attribute value buffer\n");
+-		ret = -1;
+-		goto out;
+-	}
+-
+-	attrlen = getxattr(filename, ATTRNAME, attrval, bufsize);
+-	if (attrlen == -1) {
+-		if (errno == ERANGE) {
+-			free(attrval);
+-			bufsize += BUFSIZE;
+-			goto cifsacl;
+-		} else {
+-			fprintf(stderr, "getxattr failed on %s: %s\n", filename, strerror(errno) );
+-			free(attrval);
+-			ret = -1;
+-			goto out;
+-		}
+-	}
+-
+-	parse_sec_desc((struct cifs_ntsd *)attrval, attrlen, raw);
++	for(; optind < argc; optind++)
++		getcifsacl(argv[optind], raw);
+ 
+-	free(attrval);
+ out:
+ 	if (plugin_loaded)
+ 		exit_plugin(plugin_handle);
+-- 
+2.20.1
 
-
---=20
-Thanks,
-
-Steve
