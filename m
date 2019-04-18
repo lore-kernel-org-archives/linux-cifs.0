@@ -2,113 +2,180 @@ Return-Path: <SRS0=zBrE=SU=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0C07C10F0E
-	for <linux-cifs@archiver.kernel.org>; Thu, 18 Apr 2019 18:28:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 355CAC282DD
+	for <linux-cifs@archiver.kernel.org>; Thu, 18 Apr 2019 18:29:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 771F220643
-	for <linux-cifs@archiver.kernel.org>; Thu, 18 Apr 2019 18:28:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB21020643
+	for <linux-cifs@archiver.kernel.org>; Thu, 18 Apr 2019 18:29:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="Pi+d5jcD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oLPx8VA6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390463AbfDRS2S (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 18 Apr 2019 14:28:18 -0400
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:38302 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390932AbfDRSD3 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 18 Apr 2019 14:03:29 -0400
-Received: by mail-ot1-f66.google.com with SMTP id e80so2453979ote.5
-        for <linux-cifs@vger.kernel.org>; Thu, 18 Apr 2019 11:03:29 -0700 (PDT)
+        id S2391084AbfDRS3m (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 18 Apr 2019 14:29:42 -0400
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:34208 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390851AbfDRS3i (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 18 Apr 2019 14:29:38 -0400
+Received: by mail-lf1-f65.google.com with SMTP id h5so2360725lfm.1
+        for <linux-cifs@vger.kernel.org>; Thu, 18 Apr 2019 11:29:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=mE/aKnKM07J0Pu0N2LzFy/Q/VzfI3mw7PzAs98ACEDg=;
-        b=Pi+d5jcDSHcAWLBXnKRmKYoO1iabyeSTCoyHSoTOFhkKyRX8hG7BC/wJxV3ZiaaTHg
-         gqUwMreZZXfYu6yxSY7fNS7+AsxCZBLdai0E/tgX6dakt1Vg7YlSVn+Kd4PHdtbWvxpF
-         TSE8bBAh2jy9I7OZP0MbdtJ8NCo7BAmZBkwOAOr+qoYXbL1jhwkEAvy/iZ54jbMkgpV4
-         rBamBDXT4Dgdgo3L1ust6B79WCBZ4JuMx34GdC915WYRLYth1m5lgCn2Db3Xc95wXzsu
-         UUa6wvLnoXjP1x2Yymhffr1xJqHpgJqMCmXfQUe0Pi5RFu42SttM5KWp/xKnctdKTUYZ
-         OPrg==
+         :cc:content-transfer-encoding;
+        bh=5x8ecmOQ+nMekaBL2L/49wFQUG5KPhFJyxjn6HRs67g=;
+        b=oLPx8VA6i/rXLK3KAwUuu2+UxV8+C4nnnFhPq9JrKUJ4ZEAjJy2N0MuDhGkk2dzZTY
+         s6zLqsnzsMmKatIQs8JiQbuKTSbJiMuP2bhwNBPJXz8K2SM7w9JeCHmZagPtBWqnEuOH
+         gtt/X6fXtExMf0Imf9pTvXmUr/jjfhZUBy8o6r4XVJIrRGf3D9fLz/PBSOG+BWaMt6w2
+         /TjuLb2zXOAgLvI2zwFjWYq65rJ3yGEXyM4z5aT25SPBXq6TXL7hS6gnouD2cozYbtUy
+         h6UIk8ssgbnabeHezsLUqNHQm2C4gaEP4tT6QixwF4NSHnQt14ytfJXzl/gHPbm2Xggj
+         aJgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=mE/aKnKM07J0Pu0N2LzFy/Q/VzfI3mw7PzAs98ACEDg=;
-        b=RJInC3vhMG0b+5JKcK3SuaO1sJb5dQwuwUVPiwBkkXVONq1saSpC/fVWgonw6xa44q
-         guFoSAF6CgEkZzHAxBBrT2bNJzevhkxc0Bxmdua9GCN7cwjG4S7TvEV/gTuBsBzE9DKQ
-         LP9UNkNXgjLIqvmf60OdHTxkvATbEMjLyZNK8XJDb8wHw0Yk1cEhANqYuCznzIrAGD9j
-         3hAAqFy/z1pOMzgQWD8TLzw5DcWzulKKQmbR1PvI/f0R3//cUFJXlWXmLkTi+3EQDlFV
-         nSFKNaqzYLIM3b6kD9xwH0mcF6PExz6GtZk+Xl0dQax+2NEEpuCJOr+VLt3JRFEmP61B
-         7Gwg==
-X-Gm-Message-State: APjAAAUcR14W2CobqSk1w07g63RBW8O9S9U7rvMbEKG2qh4aEU/RY73m
-        BgUWPC74o5op7l2lYSclVmkL29jLu+7HCJHHYIQrCA==
-X-Google-Smtp-Source: APXvYqx4tO5lZ9wTPWxuvQfWFmrPptbNCa+xEdfDv7AiLwjobEZcCsrg/NKC/qicGh9+cjnVUqPevHsybbd7Ng30nHg=
-X-Received: by 2002:a9d:27e3:: with SMTP id c90mr60419177otb.214.1555610608522;
- Thu, 18 Apr 2019 11:03:28 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=5x8ecmOQ+nMekaBL2L/49wFQUG5KPhFJyxjn6HRs67g=;
+        b=kgMjv4fliEWCbZPrnSIZ+/+6n0GceVh/BL5sGO+soVJiNxkXsEUhl1MikGlKBgz4sw
+         2F4bC0UPcDY9xdbeO71wyMpKJBiq/tXwmEwlWMEK3SgdlrFbNeiHQnFFMAfL1oC0iAKq
+         0aSHZBGOG+UUY4MvOEcZSjhV08D9C4g0fu1gOYB3es0JeFCOO0Q70vnZ9sakHELzJWAs
+         eJzqozI4Ior8MI6wgoxm9itbwiVELybBUKTYXlELQtsvDEt5ppnTzaI2lsucuxgT7TPF
+         Ugn24ln/UjBBwIWatl75KH5Br78l7DT8CUWL6aV5cjFpJ3V4LyFNRq7exLK9fL/2VKAS
+         9JjQ==
+X-Gm-Message-State: APjAAAV6vDXqn3GIMupjSJ2XXRY73MOZm3l7dyI9IOTXM2pzlAqFyTyl
+        yJqLUnlM+Q8lBUZnaMhNwkhEiVhZfuVa8+wTng==
+X-Google-Smtp-Source: APXvYqz0xXjfvr6HE5q8T+GCYX8ifRryjeZtno0+gbpnz3wq/RqtITJthj5DiqlEXpS1vHx5cHq4+b3OCK8ppzFsQT0=
+X-Received: by 2002:a19:7911:: with SMTP id u17mr19740115lfc.90.1555612176399;
+ Thu, 18 Apr 2019 11:29:36 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190411210834.4105-1-jglisse@redhat.com> <2c124cc4-b97e-ee28-2926-305bc6bc74bd@plexistor.com>
- <20190416185922.GA12818@kmo-pixel> <CAPcyv4jLrQ6evLAJzsASh=H6Tzx8E1oiF+YR3L2fOpbZYNUWGg@mail.gmail.com>
- <20190416194936.GD21526@redhat.com> <CAPcyv4i-YHH+dH8za1i1aMcHzQXfovVSrRFp_nfa-KYN-XhAvw@mail.gmail.com>
- <20190417222858.GA4146@redhat.com> <20190418104205.GA28541@quack2.suse.cz>
-In-Reply-To: <20190418104205.GA28541@quack2.suse.cz>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Thu, 18 Apr 2019 11:03:16 -0700
-Message-ID: <CAPcyv4iSyM2r5fv=p4B=h=1sR8Zok3gxb1BVsQOy6FHmQtjGCg@mail.gmail.com>
-Subject: Re: [PATCH v1 00/15] Keep track of GUPed pages in fs and block
-To:     Jan Kara <jack@suse.cz>
-Cc:     Jerome Glisse <jglisse@redhat.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Boaz Harrosh <boaz@plexistor.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block@vger.kernel.org, Linux MM <linux-mm@kvack.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Ming Lei <ming.lei@redhat.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Matthew Wilcox <willy@infradead.org>,
-        Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, Yan Zheng <zyan@redhat.com>,
-        Sage Weil <sage@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
-        Alex Elder <elder@kernel.org>, ceph-devel@vger.kernel.org,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Martin Brandenburg <martin@omnibond.com>,
-        devel@lists.orangefs.org,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        v9fs-developer@lists.sourceforge.net, Coly Li <colyli@suse.de>,
-        linux-bcache@vger.kernel.org,
-        =?UTF-8?Q?Ernesto_A=2E_Fern=C3=A1ndez?= 
-        <ernesto.mnd.fernandez@gmail.com>
+References: <20190417100646.14547-1-kdsouza@redhat.com>
+In-Reply-To: <20190417100646.14547-1-kdsouza@redhat.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Thu, 18 Apr 2019 11:29:25 -0700
+Message-ID: <CAKywueT418L7kUzGHRkSOpv4cS_X2ZXdag_A2BEm5uaTTnA3UA@mail.gmail.com>
+Subject: Re: [PATCH] smbinfo: Improve help usage and add -h option.
+To:     "Kenneth D'souza" <kdsouza@redhat.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Apr 18, 2019 at 3:42 AM Jan Kara <jack@suse.cz> wrote:
-> > Except that this solution (biasing everyone in bio) would _more complex_
-> > it is only conceptualy appealing. The changes are on the other hand much
-> > deeper and much riskier but you decided to ignore that and focus on some-
-> > thing i was just giving as an example.
+=D1=81=D1=80, 17 =D0=B0=D0=BF=D1=80. 2019 =D0=B3. =D0=B2 03:06, Kenneth D's=
+ouza <kdsouza@redhat.com>:
 >
-> Yeah, after going and reading several places like fs/iomap.c, fs/mpage.c,
-> drivers/md/dm-io.c I agree with you. The places that are not doing direct
-> IO usually just don't hold any page reference that could be directly
-> attributed to the bio (and they don't drop it when bio finishes). They
-> rather use other means (like PageLocked, PageWriteback) to make sure the
-> page stays alive so mandating gup-pin reference for all pages attached to a
-> bio would require a lot of reworking of places that are not related to our
-> problem and currently work just fine. So I withdraw my suggestion. Nice in
-> theory, too much work in practice ;).
+> Call usage only for -h case. This avoids cluttering the screen with long
+> help output.
+> As we are adding more options to the utility, the end error is just hidde=
+n.
+> Call short_usage wherever necessary.
+>
+> Signed-off-by: Kenneth D'souza <kdsouza@redhat.com>
+> ---
+>  smbinfo.c   | 27 ++++++++++++++++++++++-----
+>  smbinfo.rst |  5 ++++-
+>  2 files changed, 26 insertions(+), 6 deletions(-)
+>
+> diff --git a/smbinfo.c b/smbinfo.c
+> index 4bc503a..8c8f43f 100644
+> --- a/smbinfo.c
+> +++ b/smbinfo.c
+> @@ -64,6 +64,8 @@ usage(char *name)
+>  {
+>         fprintf(stderr, "Usage: %s [-V] <command> <file>\n"
+>                 "-V for verbose output\n"
+> +               "-h display this help text\n"
+> +               "-v print smbinfo version\n"
+>                 "Commands are\n"
+>                 "  fileaccessinfo:\n"
+>                 "      Prints FileAccessInfo for a cifs file.\n"
+> @@ -97,6 +99,14 @@ usage(char *name)
+>         exit(1);
+>  }
+>
+> +static void
+> +short_usage(char *name)
+> +{
+> +       fprintf(stderr, "Usage: %s [-v] [-V] <command> <file>\n"
+> +               "Try 'smbinfo -h' for more information.\n", name);
+> +                exit(1);
+> +}
+> +
+>  static void
+>  win_to_timeval(uint64_t smb2_time, struct timeval *tv)
+>  {
+> @@ -1075,7 +1085,11 @@ int main(int argc, char *argv[])
+>         int c;
+>         int f;
+>
+> -       while ((c =3D getopt_long(argc, argv, "vV", NULL, NULL)) !=3D -1)=
+ {
+> +       if (argc < 2) {
+> +               short_usage(argv[0]);
+> +       }
+> +
+> +       while ((c =3D getopt_long(argc, argv, "vVh", NULL, NULL)) !=3D -1=
+) {
+>                 switch (c) {
+>                 case 'v':
+>                         printf("smbinfo version %s\n", VERSION);
+> @@ -1083,15 +1097,18 @@ int main(int argc, char *argv[])
+>                 case 'V':
+>                         verbose =3D 1;
+>                         break;
+> -               default:
+> +               case 'h':
+>                         usage(argv[0]);
+> +                       break;
+> +               default:
+> +                       short_usage(argv[0]);
+>                 }
+>         }
+>
+> -       if (optind >=3D argc - 1)
+> -               usage(argv[0]);
+> +       if (optind >=3D argc -1)
+> +               short_usage(argv[0]);
+>
+> -       if ((f =3D open(argv[optind + 1], O_RDONLY)) < 0) {
+> +       if ((f =3D open(argv[optind + 1 ], O_RDONLY)) < 0) {
+>                 fprintf(stderr, "Failed to open %s\n", argv[optind + 1]);
+>                 exit(1);
+>         }
+> diff --git a/smbinfo.rst b/smbinfo.rst
+> index 0c96050..be4c829 100644
+> --- a/smbinfo.rst
+> +++ b/smbinfo.rst
+> @@ -11,7 +11,7 @@ Userspace helper to display SMB-specific file informati=
+on for the Linux SMB clie
+>  SYNOPSIS
+>  ********
+>
+> -  smbinfo [-v] [-V] {command} {file system object}
+> +  smbinfo [-v] [-h] [-V] {command} {file system object}
+>
+>  ***********
+>  DESCRIPTION
+> @@ -38,6 +38,9 @@ OPTIONS
+>  -V
+>    Verbose output.
+>
+> +-h
+> +  Print help explaining the command line options.
+> +
+>  *******
+>  COMMAND
+>  *******
+> --
+> 2.20.1
+>
 
-Is it though? We already have BIO_NO_PAGE_REF, so it seems it would be
-a useful cleanup to have all locations that don't participate in page
-references use that existing flag and then teach all other locations
-to use gup-pinned pages.
+Merged, thanks.
+--
+Best regards,
+Pavel Shilovsky
