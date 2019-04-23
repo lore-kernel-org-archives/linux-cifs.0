@@ -7,61 +7,60 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20554C10F03
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Apr 2019 17:51:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 244BEC10F03
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Apr 2019 18:03:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E2333214AE
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Apr 2019 17:51:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DFDB220685
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Apr 2019 18:03:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rzo7g6FN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eJbW3JQz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728687AbfDWRvN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 23 Apr 2019 13:51:13 -0400
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:38745 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728646AbfDWRvN (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 Apr 2019 13:51:13 -0400
-Received: by mail-lf1-f68.google.com with SMTP id v1so3635367lfg.5;
-        Tue, 23 Apr 2019 10:51:11 -0700 (PDT)
+        id S1728504AbfDWSDH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 23 Apr 2019 14:03:07 -0400
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:41070 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727745AbfDWSDH (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 Apr 2019 14:03:07 -0400
+Received: by mail-lf1-f65.google.com with SMTP id t30so12450730lfd.8
+        for <linux-cifs@vger.kernel.org>; Tue, 23 Apr 2019 11:03:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=f5Fmvo/naDY8w89X2OHTxjqQNn6kydSqcO0oSmsNCfE=;
-        b=Rzo7g6FNS7W0oBKeB+IQXrG1zN7xNy9AqSYQMU74LaxfLxoQ9AehmHpP3uDhHN87uT
-         erPG7TvEug1PnYWeEqgXydOz/7ZD9WAC+udDxXDVBOj8xlHjvpPh+DIGN/jzpubGGEUt
-         nR2YGEK8pV2Rl1VUAGZVQXIPE31ApB1P3RXVxgDCWYymp+6Pb+TKHFiniWMndFvSJjDi
-         /17eS7SH8hKI6n4tIJsrLMUbwjlZ8cV0/vWpAZt7DhveQJIjgDur5p1Qo9YJMba8Q5Yn
-         NzhZAJXUKs5dwqwuI3wH3CebjyQDsOKuHKyRa1dXvSTlCTINrGVrNB2FSzfw7KZPtfa/
-         oBrQ==
+        bh=SYoc0BN0Jbe95iTj5s6u4ayhICEyInZn5H6TDih1uec=;
+        b=eJbW3JQzD49BcVhnYJ/cObxgj6PHHnur9ukRl3iInq7SuWCp23+HECevroYCUrIUCY
+         xPmNhIVkXelkdiUMWltUwztxtrqyfCM4gpecVXf08pGWLeF4kjGsVu5uM+jZP6x6bLaH
+         /J1+s32BNXMgsA73Phgzc1qcwqixGL3l0Jivs4Y3+cKhZhKgXgiaegRlyEry2H5w65a2
+         O7Wv2QKovkCUJ0RYq3cnhzGzSPqa6UzEtA8kBp0oMvhOM9eyv41dFGx0+TOdRFThgcvI
+         eANsxfG+dsRDnqDK/FCxEjeOwibs/IBwlkj9wHnYztquOPTgHk18b5kYp74AOtRP+s2I
+         aVWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=f5Fmvo/naDY8w89X2OHTxjqQNn6kydSqcO0oSmsNCfE=;
-        b=KfPKWFxkggnTKni0yKZnmHoqBM4+YKiuB+irzqbBUWlRkbz9XES8ZIFgy6BSrU8vSA
-         OcQND4VzpybAUxS7OoiNT2Jut1rAW9Cj+zajncrm8v0zY1VM7sJCGzOwroyLk9q0WWkS
-         kZ6/L66wM+Q3YKLhTe9MRJDtzLoV9CYjLylrNTx0iPu0qjFXh2jD+gao6YqHkJnoyIMS
-         UMUabbPZEGapgHnl1mK5Vx5na3niW7h94znkS5CUkGWGHy53SNT3bW7UZlxVijfsAiCm
-         W5ia865lw6ZExxl5nvn1xJMp++ViwL+w3meSTBjSqemH3DLxdvb5SqL0Cin+PllAuS1u
-         XBsA==
-X-Gm-Message-State: APjAAAUpkAZsAEjXnj4CvkhTP+6SMuqL7sXoZbS70x16MTCzfLnlt2/u
-        JJn+ckJ8INRHfA+ODXq1v04ccHlBo8+Nf0thrQ==
-X-Google-Smtp-Source: APXvYqwxEu7cReQODx27WgnTSOl+T+xlUl5td3IyAfxiIE78NZm4bc71eZXkwRSy1CAZpX7HQT53fXlgbSz2rCN1iRQ=
-X-Received: by 2002:ac2:5609:: with SMTP id v9mr14147248lfd.159.1556041870972;
- Tue, 23 Apr 2019 10:51:10 -0700 (PDT)
+        bh=SYoc0BN0Jbe95iTj5s6u4ayhICEyInZn5H6TDih1uec=;
+        b=muvUtgKdSHdIdWxg4NdvdYt9daA0kbikY6hufMZOYwWEaS3oaKXWmGpXHM610k1nGj
+         fh2tsmaT21DLD8BDFM8SwsMZtAntzQUsjEBnYTyAGUUpXEtcE1X26mGvu00Qn0fvZUPS
+         m7OLucq36vQ633UNLKPgTiybHjTpZ1nthsfxahaIDnaWpMLesCi0uWqIwUxcFfEBAeEQ
+         +b/BlEQovCcimHNdMw9m5UhuRSsihxRWeur1pvB7RMqq8aERos5OG6rKmULM+L7TQXtj
+         rlUqv9TYd8ImstWpav+4k9zRNolcy43gm6EtRt5HSnXrBxZsy/6dgCRNrYJmUxDMqeNe
+         1hMg==
+X-Gm-Message-State: APjAAAWa2sp8/xlDxJrZu+uMd+3s+ovu0BBLSn2Y/PV/kPYBMYBrK6aU
+        9qozUvVF+Af21XqfwDDrYGmrYXhuI7SFBultTw==
+X-Google-Smtp-Source: APXvYqxBhZTDPVDNyz4sOHniXjbaXjEw6890KdvttcMrywOI6+ugWW48adK1sg7rt1Q58GOByR3VGUOYI80oBNojSAo=
+X-Received: by 2002:ac2:52b1:: with SMTP id r17mr6678023lfm.39.1556042584993;
+ Tue, 23 Apr 2019 11:03:04 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190423063945.28996-1-lsahlber@redhat.com>
-In-Reply-To: <20190423063945.28996-1-lsahlber@redhat.com>
+References: <20190423032749.30799-1-lsahlber@redhat.com>
+In-Reply-To: <20190423032749.30799-1-lsahlber@redhat.com>
 From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Tue, 23 Apr 2019 10:50:59 -0700
-Message-ID: <CAKywueTUG+tFLgR0GzxE6XaU2FGxYnJ8dxvGgT20=RfRD7OBRg@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix memory leak in SMB2_read
+Date:   Tue, 23 Apr 2019 11:02:53 -0700
+Message-ID: <CAKywueQCViFC3W083J6tb=-oMP2iHAdm89oG73W+hAn451s4ig@mail.gmail.com>
+Subject: Re: [PATCH] cifs: fix credits leak for SMB1 oplock breaks
 To:     Ronnie Sahlberg <lsahlber@redhat.com>
 Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
         Steve French <smfrench@gmail.com>,
-        Pavel Shilovsky <pshilov@microsoft.com>,
-        Stable <stable@vger.kernel.org>
+        Pavel Shilovsky <pshilov@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
@@ -69,40 +68,113 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D0=BF=D0=BD, 22 =D0=B0=D0=BF=D1=80. 2019 =D0=B3. =D0=B2 23:40, Ronnie Sahl=
+=D0=BF=D0=BD, 22 =D0=B0=D0=BF=D1=80. 2019 =D0=B3. =D0=B2 21:40, Ronnie Sahl=
 berg <lsahlber@redhat.com>:
 >
-> Commit 088aaf17aa79300cab14dbee2569c58cfafd7d6e introduced a leak where
-> if SMB2_read() returned an error we would return without feeing the reque=
-st
-> buffer.
->
-> Cc: Stable <stable@vger.kernel.org>
 > Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
 > ---
->  fs/cifs/smb2pdu.c | 1 +
->  1 file changed, 1 insertion(+)
+>  fs/cifs/transport.c | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
 >
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 463c9298cd67..a932dccafc5b 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -3463,6 +3463,7 @@ SMB2_read(const unsigned int xid, struct cifs_io_pa=
-rms *io_parms,
->                                     io_parms->tcon->tid, ses->Suid,
->                                     io_parms->offset, 0);
->                 free_rsp_buf(resp_buftype, rsp_iov.iov_base);
-> +               cifs_small_buf_release(req);
->                 return rc =3D=3D -ENODATA ? 0 : rc;
->         } else
->                 trace_smb3_read_done(xid, req->PersistentFileId,
+> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+> index 5c59c498f56a..3b80884ddf0f 100644
+> --- a/fs/cifs/transport.c
+> +++ b/fs/cifs/transport.c
+> @@ -971,7 +971,7 @@ compound_send_recv(const unsigned int xid, struct cif=
+s_ses *ses,
+>                    const int flags, const int num_rqst, struct smb_rqst *=
+rqst,
+>                    int *resp_buf_type, struct kvec *resp_iov)
+>  {
+> -       int i, j, optype, rc =3D 0;
+> +       int i, j, optype, opmask, rc =3D 0;
+>         struct mid_q_entry *midQ[MAX_COMPOUND];
+>         bool cancelled_mid[MAX_COMPOUND] =3D {false};
+>         struct cifs_credits credits[MAX_COMPOUND] =3D {
+> @@ -981,6 +981,7 @@ compound_send_recv(const unsigned int xid, struct cif=
+s_ses *ses,
+>         char *buf;
+>
+>         optype =3D flags & CIFS_OP_MASK;
+> +       opmask =3D flags & (CIFS_ASYNC_OP|CIFS_NO_RESP);
+>
+>         for (i =3D 0; i < num_rqst; i++)
+>                 resp_buf_type[i] =3D CIFS_NO_BUFFER;  /* no response buf =
+yet */
+> @@ -1073,8 +1074,13 @@ compound_send_recv(const unsigned int xid, struct =
+cifs_ses *ses,
+>
+>         mutex_unlock(&ses->server->srv_mutex);
+>
+> -       if (rc < 0) {
+> -               /* Sending failed for some reason - return credits back *=
+/
+> +       /*
+> +        * If sending failed for some reason or it is an oplock break tha=
+t we
+> +        * will not receive a response to - return credits back
+> +        */
+> +       if (rc < 0 ||
+> +           (optype =3D=3D CIFS_OBREAK_OP &&
+> +            opmask =3D=3D (CIFS_ASYNC_OP|CIFS_NO_RESP))) {
+>                 for (i =3D 0; i < num_rqst; i++)
+>                         add_credits(ses->server, &credits[i], optype);
+>                 goto out;
 > --
 > 2.13.6
 >
+Thanks for looking into it. Let's me clarify the defines here because
+their names are not straightforward and require changes:
 
-Looks good.
+#define   CIFS_ASYNC_OP         2    /* do not wait for response */
 
-Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+meaning that we don't need a response - probably there won't be a one
+(in SMB1 Oplock case). This is confusing because we also have
+cifs_call_async that does asynchronous processing of the responses.
+
+#define   CIFS_NO_RESP      0x040    /* no response buffer required */
+
+meaning that a response buffer is not needed but the error code is.
+
+The problem with SMB1 oplocks was introduced when credits calculation
+was moved to the demultiplex thread. The server might not respond to
+such a request at all - that's why it is a special case.
+
+So, CIFS_NO_RESP flags should be handled like we do today - no changes
+are needed here. We wait for a response but just do not return a
+buffer to the caller. CIFS_ASYNC_OP handling has a bug that it missed
+to add credits back once we send such a request. Prior to credit
+movement to the demultiplex thread label "out" has the code to add
+credits back. So I think the only fix that is needed here is:
+
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 5c59c49..26e249d 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -1095,8 +1095,11 @@ compound_send_recv(const unsigned int xid,
+struct cifs_ses *ses,
+                smb311_update_preauth_hash(ses, rqst[0].rq_iov,
+                                           rqst[0].rq_nvec);
+
+-       if ((flags & CIFS_TIMEOUT_MASK) =3D=3D CIFS_ASYNC_OP)
++       if ((flags & CIFS_TIMEOUT_MASK) =3D=3D CIFS_ASYNC_OP) {
++               for (i =3D 0; i < num_rqst; i++)
++                       add_credits(ses->server, &credits[i], optype);
+                goto out;
++       }
+
+        for (i =3D 0; i < num_rqst; i++) {
+                rc =3D wait_for_response(ses->server, midQ[i]);
+
+It worked locally against Samba server for me.
+
+I would also suggest as a separate change to rename:
+
+CIFS_ASYNC_OP to CIFS_NO_WAIT, and
+
+CIFS_NO_RESP to CIFS_NO_RESP_BUF
+
+to reflect the exact meanings.
 
 --
 Best regards,
