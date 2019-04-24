@@ -2,413 +2,204 @@ Return-Path: <SRS0=97vz=S2=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0A9EC282E1
-	for <linux-cifs@archiver.kernel.org>; Wed, 24 Apr 2019 16:15:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3768C10F11
+	for <linux-cifs@archiver.kernel.org>; Wed, 24 Apr 2019 19:09:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 98A4021901
-	for <linux-cifs@archiver.kernel.org>; Wed, 24 Apr 2019 16:15:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 689EC2175B
+	for <linux-cifs@archiver.kernel.org>; Wed, 24 Apr 2019 19:09:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rPRdVCdx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732593AbfDXQPK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 24 Apr 2019 12:15:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47522 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732229AbfDXQPJ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 24 Apr 2019 12:15:09 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 4CBF4306E5FB;
-        Wed, 24 Apr 2019 16:15:09 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-121-98.rdu2.redhat.com [10.10.121.98])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4495519729;
-        Wed, 24 Apr 2019 16:15:01 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
- Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
- Kingdom.
- Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 11/11] keys: Pass the network namespace into request_key
- mechanism
-From:   David Howells <dhowells@redhat.com>
-To:     ebiederm@xmission.com
-Cc:     netdev@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-afs@lists.infradead.org,
-        keyrings@vger.kernel.org, dhowells@redhat.com,
-        linux-security-module@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        dwalsh@redhat.com, vgoyal@redhat.com
-Date:   Wed, 24 Apr 2019 17:15:00 +0100
-Message-ID: <155612250048.8564.4366853478854432104.stgit@warthog.procyon.org.uk>
-In-Reply-To: <155612240208.8564.13865046977065545591.stgit@warthog.procyon.org.uk>
-References: <155612240208.8564.13865046977065545591.stgit@warthog.procyon.org.uk>
-User-Agent: StGit/unknown-version
+        id S1729320AbfDXTJ4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 24 Apr 2019 15:09:56 -0400
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:37002 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727459AbfDXTJz (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 24 Apr 2019 15:09:55 -0400
+Received: by mail-lf1-f65.google.com with SMTP id h126so4897020lfh.4;
+        Wed, 24 Apr 2019 12:09:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=6k0hAFc2DRIye5Fv2Jz6AR2EVYYSQF4aAKZfcEEK4V4=;
+        b=rPRdVCdx071xmpPg+Xmd0OxYQ0ksZ1xu3elB5Smq/1BHyx22vOOmdNxdRqTZ1cHnOH
+         DIDfjxCH/YbF60nKNVxhotUvcMUV6mhcHnHM4CYEIy17HswGW+QTNkcd/MSS5/I62nIx
+         KtX3vOwvEp14xMCRvixXKTgJlDOh9eoDskD8QGkFWBhesdLFJmGQH0afQGafCvVf1fyb
+         zEF0DyLIQt/yrE/TaNrSANfcT5Awg9hpq8eXrOzejSYI7JppNR5796sEbL2ytZqttyQp
+         qVNzWTOVrGQ3sPjTVvi/GUsNRXA+8oM23jrkMKUjHTuzFUZ2Ta6MFyWMkgZ9EgH3YexN
+         RCjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=6k0hAFc2DRIye5Fv2Jz6AR2EVYYSQF4aAKZfcEEK4V4=;
+        b=ZshlQtMSpF4kIIcB2Nkl458ZWC12DGJC9ayC0gOV791DItHewKWDbfgtF6W27ikwdB
+         yymSx20trFuL5Y4bNU6nxONEAFfBd+dSWgK6poWRLl+tNJAjr25AMTQJSjugVuasT8Ta
+         iem3yDAnBkULun6huNz1PNwvoGUfjdPrmSe99+bEzNwWcl0YgdFwAbSdcZkzZtdH8YSg
+         3z7NdIZ65VnJRhJ4kldpwxJfKDGCEdxgnwD0Fwe3617bOeYqmHNsiCM1BePYLV7AHJ51
+         QOfW43n9wV+A3M23EmPoj5BJlUBNrWKdT3LUhL+qfqzyAUHNSiuTcRFsm410KRuj1Env
+         nHgw==
+X-Gm-Message-State: APjAAAUHz4s516SssOppL0OVNzo17fmN6lg3TRMG2DURyl+0BsNrUfs5
+        k0Yy7ghE2HqJg+luR8uUd7M4Oh6V5OK8AYEhsg==
+X-Google-Smtp-Source: APXvYqx5/VP+j6WsVj441n7DbIbILoSZ3CSkFsBbTyWxmngCYUL5nTokCMU4i4pHnatiaghYDCkKx4sQpv55nF96un0=
+X-Received: by 2002:a19:c113:: with SMTP id r19mr18455110lff.64.1556132992853;
+ Wed, 24 Apr 2019 12:09:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Wed, 24 Apr 2019 16:15:09 +0000 (UTC)
+References: <20190422163424.19402-1-jlayton@kernel.org> <20190422163424.19402-2-jlayton@kernel.org>
+ <87wojl61s5.fsf@notabene.neil.brown.name> <20190424135854.GB20542@fieldses.org>
+ <2b131f18-1df4-790c-a548-3155a0677c34@RedHat.com> <20190424154735.GC20542@fieldses.org>
+In-Reply-To: <20190424154735.GC20542@fieldses.org>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Wed, 24 Apr 2019 12:09:41 -0700
+Message-ID: <CAKywueQBSwecUpr7CerLSzFT07F55sLC3vF=xFMV13uCn5_iOA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] nfsd: wake waiters blocked on file_lock before
+ deleting it
+To:     "J. Bruce Fields" <bfields@fieldses.org>
+Cc:     Steve Dickson <SteveD@redhat.com>, NeilBrown <neilb@suse.com>,
+        Jeff Layton <jlayton@kernel.org>, slawek1211@gmail.com,
+        Linux NFS Mailing list <linux-nfs@vger.kernel.org>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Create a request_key_net() function and use it to pass the network
-namespace domain tag into DNS revolver keys and rxrpc/AFS keys so that keys
-for different domains can coexist in the same keyring.
+Yes, I think there is a bug here, thanks!
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: netdev@vger.kernel.org
-cc: linux-nfs@vger.kernel.org
-cc: linux-cifs@vger.kernel.org
-cc: linux-afs@lists.infradead.org
----
+If cinode->can_cache_brlcks is false we should return 1 but the code
+will return 0 if coming from the "try_again" label. We also need to
+call locks_delete_block unconditionally at the end of the function.
 
- fs/afs/addr_list.c           |    4 +--
- fs/afs/dynroot.c             |    7 +++--
- fs/cifs/dns_resolve.c        |    3 +-
- fs/nfs/dns_resolve.c         |    2 +
- include/linux/dns_resolver.h |    3 +-
- include/linux/key.h          |    6 ++++
- net/ceph/messenger.c         |    3 +-
- net/dns_resolver/dns_query.c |    6 +++-
- net/rxrpc/key.c              |    4 +--
- security/keys/internal.h     |    1 +
- security/keys/keyctl.c       |    2 +
- security/keys/keyring.c      |   11 +++++---
- security/keys/request_key.c  |   58 ++++++++++++++++++++++++++++++++++++++----
- 13 files changed, 86 insertions(+), 24 deletions(-)
+--
+Best regards,
+Pavel Shilovsky
 
-diff --git a/fs/afs/addr_list.c b/fs/afs/addr_list.c
-index 967db336d11a..bf8ddac5f402 100644
---- a/fs/afs/addr_list.c
-+++ b/fs/afs/addr_list.c
-@@ -250,8 +250,8 @@ struct afs_vlserver_list *afs_dns_query(struct afs_cell *cell, time64_t *_expiry
- 
- 	_enter("%s", cell->name);
- 
--	ret = dns_query("afsdb", cell->name, cell->name_len, "srv=1",
--			&result, _expiry);
-+	ret = dns_query(cell->net->net, "afsdb", cell->name, cell->name_len,
-+			"srv=1", &result, _expiry);
- 	if (ret < 0) {
- 		_leave(" = %d [dns]", ret);
- 		return ERR_PTR(ret);
-diff --git a/fs/afs/dynroot.c b/fs/afs/dynroot.c
-index a9ba81ddf154..07d010cd28e2 100644
---- a/fs/afs/dynroot.c
-+++ b/fs/afs/dynroot.c
-@@ -28,6 +28,7 @@ const struct file_operations afs_dynroot_file_operations = {
- static int afs_probe_cell_name(struct dentry *dentry)
- {
- 	struct afs_cell *cell;
-+	struct afs_net *net = afs_d2net(dentry);
- 	const char *name = dentry->d_name.name;
- 	size_t len = dentry->d_name.len;
- 	int ret;
-@@ -40,13 +41,13 @@ static int afs_probe_cell_name(struct dentry *dentry)
- 		len--;
- 	}
- 
--	cell = afs_lookup_cell_rcu(afs_d2net(dentry), name, len);
-+	cell = afs_lookup_cell_rcu(net, name, len);
- 	if (!IS_ERR(cell)) {
--		afs_put_cell(afs_d2net(dentry), cell);
-+		afs_put_cell(net, cell);
- 		return 0;
- 	}
- 
--	ret = dns_query("afsdb", name, len, "srv=1", NULL, NULL);
-+	ret = dns_query(net->net, "afsdb", name, len, "srv=1", NULL, NULL);
- 	if (ret == -ENODATA)
- 		ret = -EDESTADDRREQ;
- 	return ret;
-diff --git a/fs/cifs/dns_resolve.c b/fs/cifs/dns_resolve.c
-index 7ede7306599f..1239aa1b5d27 100644
---- a/fs/cifs/dns_resolve.c
-+++ b/fs/cifs/dns_resolve.c
-@@ -77,7 +77,8 @@ dns_resolve_server_name_to_ip(const char *unc, char **ip_addr)
- 		goto name_is_IP_address;
- 
- 	/* Perform the upcall */
--	rc = dns_query(NULL, hostname, len, NULL, ip_addr, NULL);
-+	rc = dns_query(current->nsproxy->net_ns, NULL, hostname, len,
-+		       NULL, ip_addr, NULL);
- 	if (rc < 0)
- 		cifs_dbg(FYI, "%s: unable to resolve: %*.*s\n",
- 			 __func__, len, len, hostname);
-diff --git a/fs/nfs/dns_resolve.c b/fs/nfs/dns_resolve.c
-index a7d3df85736d..8611d4b81b0e 100644
---- a/fs/nfs/dns_resolve.c
-+++ b/fs/nfs/dns_resolve.c
-@@ -22,7 +22,7 @@ ssize_t nfs_dns_resolve_name(struct net *net, char *name, size_t namelen,
- 	char *ip_addr = NULL;
- 	int ip_len;
- 
--	ip_len = dns_query(NULL, name, namelen, NULL, &ip_addr, NULL);
-+	ip_len = dns_query(net, NULL, name, namelen, NULL, &ip_addr, NULL);
- 	if (ip_len > 0)
- 		ret = rpc_pton(net, ip_addr, ip_len, sa, salen);
- 	else
-diff --git a/include/linux/dns_resolver.h b/include/linux/dns_resolver.h
-index 34a744a1bafc..3855395fa3c0 100644
---- a/include/linux/dns_resolver.h
-+++ b/include/linux/dns_resolver.h
-@@ -26,7 +26,8 @@
- 
- #include <uapi/linux/dns_resolver.h>
- 
--extern int dns_query(const char *type, const char *name, size_t namelen,
-+struct net;
-+extern int dns_query(struct net *net, const char *type, const char *name, size_t namelen,
- 		     const char *options, char **_result, time64_t *_expiry);
- 
- #endif /* _LINUX_DNS_RESOLVER_H */
-diff --git a/include/linux/key.h b/include/linux/key.h
-index e79802d4c928..5cc4440ccb68 100644
---- a/include/linux/key.h
-+++ b/include/linux/key.h
-@@ -36,6 +36,7 @@ typedef int32_t key_serial_t;
- typedef uint32_t key_perm_t;
- 
- struct key;
-+struct net;
- 
- #ifdef CONFIG_KEYS
- 
-@@ -306,6 +307,11 @@ extern struct key *request_key_with_auxdata(struct key_type *type,
- 					    size_t callout_len,
- 					    void *aux);
- 
-+extern struct key *request_key_net(struct key_type *type,
-+				   const char *description,
-+				   struct net *net,
-+				   const char *callout_info);
-+
- extern int wait_for_key_construction(struct key *key, bool intr);
- 
- extern int key_validate(const struct key *key);
-diff --git a/net/ceph/messenger.c b/net/ceph/messenger.c
-index 7e71b0df1fbc..d4549d42675b 100644
---- a/net/ceph/messenger.c
-+++ b/net/ceph/messenger.c
-@@ -1885,7 +1885,8 @@ static int ceph_dns_resolve_name(const char *name, size_t namelen,
- 		return -EINVAL;
- 
- 	/* do dns_resolve upcall */
--	ip_len = dns_query(NULL, name, end - name, NULL, &ip_addr, NULL);
-+	ip_len = dns_query(current->nsproxy->net_ns,
-+			   NULL, name, end - name, NULL, &ip_addr, NULL);
- 	if (ip_len > 0)
- 		ret = ceph_pton(ip_addr, ip_len, ss, -1, NULL);
- 	else
-diff --git a/net/dns_resolver/dns_query.c b/net/dns_resolver/dns_query.c
-index 76338c38738a..d88ea98da63e 100644
---- a/net/dns_resolver/dns_query.c
-+++ b/net/dns_resolver/dns_query.c
-@@ -48,6 +48,7 @@
- 
- /**
-  * dns_query - Query the DNS
-+ * @net: The network namespace to operate in.
-  * @type: Query type (or NULL for straight host->IP lookup)
-  * @name: Name to look up
-  * @namelen: Length of name
-@@ -68,7 +69,8 @@
-  *
-  * Returns the size of the result on success, -ve error code otherwise.
-  */
--int dns_query(const char *type, const char *name, size_t namelen,
-+int dns_query(struct net *net,
-+	      const char *type, const char *name, size_t namelen,
- 	      const char *options, char **_result, time64_t *_expiry)
- {
- 	struct key *rkey;
-@@ -122,7 +124,7 @@ int dns_query(const char *type, const char *name, size_t namelen,
- 	 * add_key() to preinstall malicious redirections
- 	 */
- 	saved_cred = override_creds(dns_resolver_cache);
--	rkey = request_key(&key_type_dns_resolver, desc, options);
-+	rkey = request_key_net(&key_type_dns_resolver, desc, net, options);
- 	revert_creds(saved_cred);
- 	kfree(desc);
- 	if (IS_ERR(rkey)) {
-diff --git a/net/rxrpc/key.c b/net/rxrpc/key.c
-index 2722189ec273..1cc6b0c6cc42 100644
---- a/net/rxrpc/key.c
-+++ b/net/rxrpc/key.c
-@@ -914,7 +914,7 @@ int rxrpc_request_key(struct rxrpc_sock *rx, char __user *optval, int optlen)
- 	if (IS_ERR(description))
- 		return PTR_ERR(description);
- 
--	key = request_key(&key_type_rxrpc, description, NULL);
-+	key = request_key_net(&key_type_rxrpc, description, sock_net(&rx->sk), NULL);
- 	if (IS_ERR(key)) {
- 		kfree(description);
- 		_leave(" = %ld", PTR_ERR(key));
-@@ -945,7 +945,7 @@ int rxrpc_server_keyring(struct rxrpc_sock *rx, char __user *optval,
- 	if (IS_ERR(description))
- 		return PTR_ERR(description);
- 
--	key = request_key(&key_type_keyring, description, NULL);
-+	key = request_key_net(&key_type_keyring, description, sock_net(&rx->sk), NULL);
- 	if (IS_ERR(key)) {
- 		kfree(description);
- 		_leave(" = %ld", PTR_ERR(key));
-diff --git a/security/keys/internal.h b/security/keys/internal.h
-index c07fcc756fdd..1fc8c283bdf4 100644
---- a/security/keys/internal.h
-+++ b/security/keys/internal.h
-@@ -152,6 +152,7 @@ extern int install_session_keyring_to_cred(struct cred *, struct key *);
- 
- extern struct key *request_key_and_link(struct key_type *type,
- 					const char *description,
-+					struct key_tag *domain_tag,
- 					const void *callout_info,
- 					size_t callout_len,
- 					void *aux,
-diff --git a/security/keys/keyctl.c b/security/keys/keyctl.c
-index d2023d550bd6..29c4fa71616b 100644
---- a/security/keys/keyctl.c
-+++ b/security/keys/keyctl.c
-@@ -210,7 +210,7 @@ SYSCALL_DEFINE4(request_key, const char __user *, _type,
- 	}
- 
- 	/* do the search */
--	key = request_key_and_link(ktype, description, callout_info,
-+	key = request_key_and_link(ktype, description, NULL, callout_info,
- 				   callout_len, NULL, key_ref_to_ptr(dest_ref),
- 				   KEY_ALLOC_IN_QUOTA);
- 	if (IS_ERR(key)) {
-diff --git a/security/keys/keyring.c b/security/keys/keyring.c
-index ffa368594a03..2597ae756191 100644
---- a/security/keys/keyring.c
-+++ b/security/keys/keyring.c
-@@ -222,10 +222,13 @@ void key_set_index_key(struct keyring_index_key *index_key)
- 
- 	memcpy(index_key->desc, index_key->description, n);
- 
--	if (index_key->type->flags & KEY_TYPE_NET_DOMAIN)
--		index_key->domain_tag = current->nsproxy->net_ns->key_domain;
--	else
--		index_key->domain_tag = &default_domain_tag;
-+	if (!index_key->domain_tag) {
-+		if (index_key->type->flags & KEY_TYPE_NET_DOMAIN)
-+			index_key->domain_tag = current->nsproxy->net_ns->key_domain;
-+		else
-+			index_key->domain_tag = &default_domain_tag;
-+	}
-+
- 	hash_key_type_and_desc(index_key);
- }
- 
-diff --git a/security/keys/request_key.c b/security/keys/request_key.c
-index d95627888f5a..4cc27eee9795 100644
---- a/security/keys/request_key.c
-+++ b/security/keys/request_key.c
-@@ -17,6 +17,7 @@
- #include <linux/err.h>
- #include <linux/keyctl.h>
- #include <linux/slab.h>
-+#include <net/net_namespace.h>
- #include "internal.h"
- #include <keys/request_key_auth-type.h>
- 
-@@ -502,16 +503,18 @@ static struct key *construct_key_and_link(struct keyring_search_context *ctx,
-  * request_key_and_link - Request a key and cache it in a keyring.
-  * @type: The type of key we want.
-  * @description: The searchable description of the key.
-+ * @domain_tag: The domain in which the key operates.
-  * @callout_info: The data to pass to the instantiation upcall (or NULL).
-  * @callout_len: The length of callout_info.
-  * @aux: Auxiliary data for the upcall.
-  * @dest_keyring: Where to cache the key.
-  * @flags: Flags to key_alloc().
-  *
-- * A key matching the specified criteria is searched for in the process's
-- * keyrings and returned with its usage count incremented if found.  Otherwise,
-- * if callout_info is not NULL, a key will be allocated and some service
-- * (probably in userspace) will be asked to instantiate it.
-+ * A key matching the specified criteria (type, description, domain_tag) is
-+ * searched for in the process's keyrings and returned with its usage count
-+ * incremented if found.  Otherwise, if callout_info is not NULL, a key will be
-+ * allocated and some service (probably in userspace) will be asked to
-+ * instantiate it.
-  *
-  * If successfully found or created, the key will be linked to the destination
-  * keyring if one is provided.
-@@ -527,6 +530,7 @@ static struct key *construct_key_and_link(struct keyring_search_context *ctx,
-  */
- struct key *request_key_and_link(struct key_type *type,
- 				 const char *description,
-+				 struct key_tag *domain_tag,
- 				 const void *callout_info,
- 				 size_t callout_len,
- 				 void *aux,
-@@ -645,7 +649,8 @@ struct key *request_key(struct key_type *type,
- 
- 	if (callout_info)
- 		callout_len = strlen(callout_info);
--	key = request_key_and_link(type, description, callout_info, callout_len,
-+	key = request_key_and_link(type, description, NULL,
-+				   callout_info, callout_len,
- 				   NULL, NULL, KEY_ALLOC_IN_QUOTA);
- 	if (!IS_ERR(key)) {
- 		ret = wait_for_key_construction(key, false);
-@@ -681,7 +686,8 @@ struct key *request_key_with_auxdata(struct key_type *type,
- 	struct key *key;
- 	int ret;
- 
--	key = request_key_and_link(type, description, callout_info, callout_len,
-+	key = request_key_and_link(type, description, NULL,
-+				   callout_info, callout_len,
- 				   aux, NULL, KEY_ALLOC_IN_QUOTA);
- 	if (!IS_ERR(key)) {
- 		ret = wait_for_key_construction(key, false);
-@@ -693,3 +699,43 @@ struct key *request_key_with_auxdata(struct key_type *type,
- 	return key;
- }
- EXPORT_SYMBOL(request_key_with_auxdata);
-+
-+/**
-+ * request_key_net - Request a key for a net namespace and wait for construction
-+ * @type: Type of key.
-+ * @description: The searchable description of the key.
-+ * @net: The network namespace that is the key's domain of operation.
-+ * @callout_info: The data to pass to the instantiation upcall (or NULL).
-+ *
-+ * As for request_key() except that it does not add the returned key to a
-+ * keyring if found, new keys are always allocated in the user's quota, the
-+ * callout_info must be a NUL-terminated string and no auxiliary data can be
-+ * passed.  Only keys that operate the specified network namespace are used.
-+ *
-+ * Furthermore, it then works as wait_for_key_construction() to wait for the
-+ * completion of keys undergoing construction with a non-interruptible wait.
-+ */
-+struct key *request_key_net(struct key_type *type,
-+			    const char *description,
-+			    struct net *net,
-+			    const char *callout_info)
-+{
-+	struct key *key;
-+	size_t callout_len = 0;
-+	int ret;
-+
-+	if (callout_info)
-+		callout_len = strlen(callout_info);
-+	key = request_key_and_link(type, description, net->key_domain,
-+				   callout_info, callout_len,
-+				   NULL, NULL, KEY_ALLOC_IN_QUOTA);
-+	if (!IS_ERR(key)) {
-+		ret = wait_for_key_construction(key, false);
-+		if (ret < 0) {
-+			key_put(key);
-+			return ERR_PTR(ret);
-+		}
-+	}
-+	return key;
-+}
-+EXPORT_SYMBOL(request_key_net);
-
+=D1=81=D1=80, 24 =D0=B0=D0=BF=D1=80. 2019 =D0=B3. =D0=B2 08:48, J. Bruce Fi=
+elds <bfields@fieldses.org>:
+>
+> On Wed, Apr 24, 2019 at 11:29:59AM -0400, Steve Dickson wrote:
+> >
+> >
+> > On 4/24/19 9:58 AM, J. Bruce Fields wrote:
+> > > Steve, see Neil's comment, is there a cifs bug here?
+> > Looking into it...
+>
+> I was thinking Steve French, though I'm sure he wouldn't mind if you
+> fixed cifs bugs.  Too many Steves!
+>
+> --b.
+>
+> >
+> > steved.
+> > >
+> > > --b.
+> > >
+> > > On Tue, Apr 23, 2019 at 09:47:06AM +1000, NeilBrown wrote:
+> > >> On Mon, Apr 22 2019, Jeff Layton wrote:
+> > >>
+> > >>> After a blocked nfsd file_lock request is deleted, knfsd will send =
+a
+> > >>> callback to the client and then free the request. Commit 16306a61d3=
+b7
+> > >>> ("fs/locks: always delete_block after waiting.") changed it such th=
+at
+> > >>> locks_delete_block is always called on a request after it is awoken=
+,
+> > >>> but that patch missed fixing up blocked nfsd request handling.
+> > >>>
+> > >>> Call locks_delete_block on the block to wake up any locks still blo=
+cked
+> > >>> on the nfsd lock request before freeing it. Some of its callers alr=
+eady
+> > >>> do this however, so just remove those calls.
+> > >>>
+> > >>> URL: https://bugzilla.kernel.org/show_bug.cgi?id=3D203363
+> > >>> Fixes: 16306a61d3b7 ("fs/locks: always delete_block after waiting."=
+)
+> > >>> Reported-by: Slawomir Pryczek <slawek1211@gmail.com>
+> > >>> Cc: Neil Brown <neilb@suse.com>
+> > >>> Cc: stable@vger.kernel.org
+> > >>> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> > >>> ---
+> > >>>  fs/nfsd/nfs4state.c | 3 +--
+> > >>>  1 file changed, 1 insertion(+), 2 deletions(-)
+> > >>>
+> > >>> diff --git a/fs/nfsd/nfs4state.c b/fs/nfsd/nfs4state.c
+> > >>> index 6a45fb00c5fc..e87e15df2044 100644
+> > >>> --- a/fs/nfsd/nfs4state.c
+> > >>> +++ b/fs/nfsd/nfs4state.c
+> > >>> @@ -265,6 +265,7 @@ find_or_allocate_block(struct nfs4_lockowner *l=
+o, struct knfsd_fh *fh,
+> > >>>  static void
+> > >>>  free_blocked_lock(struct nfsd4_blocked_lock *nbl)
+> > >>>  {
+> > >>> + locks_delete_block(&nbl->nbl_lock);
+> > >>>   locks_release_private(&nbl->nbl_lock);
+> > >>
+> > >> Thanks for tracking this down.
+> > >>
+> > >> An implication of this bug and fix is that we need to be particularl=
+y
+> > >> careful to make sure locks_delete_block() is called on all relevant
+> > >> paths.
+> > >> Can we make that easier?  My first thought was to include the call i=
+n
+> > >> locks_release_private, but lockd calls the two quite separately and =
+it
+> > >> certainly seems appropriate that locks_delete_block should be called
+> > >> asap, but locks_release_private() can be delayed.
+> > >>
+> > >> Also cifs calls locks_delete_block, but never calls
+> > >> locks_release_private, so it wouldn't help there.
+> > >>
+> > >> Looking at cifs, I think there is a call missing there too.
+> > >> cifs_posix_lock_set() *doesn't* always call locks_delete_block() aft=
+er
+> > >> waiting.  In particular, if ->can_cache_brlcks becomes true while
+> > >> waiting then I don't think the behaviour is right.... though I'm not
+> > >> sure it is right for other reasons.  It looks like the return value
+> > >> should be 1 in that case, but it'll be zero.
+> > >>
+> > >> But back to my question about making it easier, move the BUG_ON()
+> > >> calls from locks_free_lock() into locks_release_private().
+> > >>
+> > >> ??
+> > >>
+> > >> Thanks,
+> > >> NeilBrown
+> > >>
+> > >>
+> > >>>   kfree(nbl);
+> > >>>  }
+> > >>> @@ -293,7 +294,6 @@ remove_blocked_locks(struct nfs4_lockowner *lo)
+> > >>>           nbl =3D list_first_entry(&reaplist, struct nfsd4_blocked_=
+lock,
+> > >>>                                   nbl_lru);
+> > >>>           list_del_init(&nbl->nbl_lru);
+> > >>> -         locks_delete_block(&nbl->nbl_lock);
+> > >>>           free_blocked_lock(nbl);
+> > >>>   }
+> > >>>  }
+> > >>> @@ -4863,7 +4863,6 @@ nfs4_laundromat(struct nfsd_net *nn)
+> > >>>           nbl =3D list_first_entry(&reaplist,
+> > >>>                                   struct nfsd4_blocked_lock, nbl_lr=
+u);
+> > >>>           list_del_init(&nbl->nbl_lru);
+> > >>> -         locks_delete_block(&nbl->nbl_lock);
+> > >>>           free_blocked_lock(nbl);
+> > >>>   }
+> > >>>  out:
+> > >>> --
+> > >>> 2.20.1
+> > >
+> > >
