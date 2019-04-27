@@ -7,190 +7,162 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4004C43219
-	for <linux-cifs@archiver.kernel.org>; Sat, 27 Apr 2019 03:43:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 409F7C43218
+	for <linux-cifs@archiver.kernel.org>; Sat, 27 Apr 2019 08:08:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 764BB208C2
-	for <linux-cifs@archiver.kernel.org>; Sat, 27 Apr 2019 03:43:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 01810206E0
+	for <linux-cifs@archiver.kernel.org>; Sat, 27 Apr 2019 08:08:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rOIAjWke"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u0bQQTCc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727268AbfD0Dne (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 26 Apr 2019 23:43:34 -0400
-Received: from mail-pf1-f182.google.com ([209.85.210.182]:44410 "EHLO
-        mail-pf1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727016AbfD0Dne (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 26 Apr 2019 23:43:34 -0400
-Received: by mail-pf1-f182.google.com with SMTP id y13so2597639pfm.11
-        for <linux-cifs@vger.kernel.org>; Fri, 26 Apr 2019 20:43:34 -0700 (PDT)
+        id S1725875AbfD0IIn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 27 Apr 2019 04:08:43 -0400
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:39419 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725871AbfD0IIn (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 27 Apr 2019 04:08:43 -0400
+Received: by mail-qk1-f196.google.com with SMTP id f125so3294138qke.6
+        for <linux-cifs@vger.kernel.org>; Sat, 27 Apr 2019 01:08:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=sZbCaZd62RS0HQMtWC9xQRU9LnEXwU3GPpKJ1bKnoJA=;
-        b=rOIAjWkezocb9LriJ43gCCSPA2z2AYHoJ1gXJ3oNcF2+xLjzZhbj/wdrOLtjd6LKZq
-         XnftfjmwUgQjrKsGoPa1AskWLnL8myeiNO3GCFKrT4NsmsvjKMmMjgP7mcIvUPUDlVb+
-         BApicCX/+SFFDRy3E0Dfj81koz5RqrCTlRaVgAJxPrwJrFFHv2gTcPM8xlPu4bpGurus
-         STyxYJlNTP54FTFjneE8hui66Y0lkAdqcB5MHm2B9AJNSaFK+iRfo2CLel08yx3CcRqA
-         Z1OFVhlpUDPjs9UZQavwPN4gPBXBp5gQzVSLGHycJhTeixuUMmwqd8/iHPshT/dNUN07
-         K/xA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=ERU8cviK4Ntmj1GmBaU4abMIRobGJWMaaCBtEECyBYg=;
+        b=u0bQQTCcbEXSSCo2plE4zKCtW9xQeTfqD5D0CLMHEsPyFJpmhSuKBlrUxNct8VW5Fz
+         fgDi4YDvNyrOXOpMQPI3GiW31I4XvHBzjUMeDjUpBPefsG5SLfcEG80wm5UYIMWK5Z6t
+         YaAA9CXCbQfIRs0ZYtwfRqJaeC8agZ1J95MNw2LyYzG83lUTO7E6K8+OBkHlermRstjH
+         lX/HcZZ+EITtL+24z0syXlo9fCs/PhRMwx3pL5NknDxz3zdRuHukRJ1Vug/ZtmaSoKjC
+         yOMdZcRwpW9uXS7XauaWW9y9fXLXfWg0nOBX4oAgKbwsOFhhsCKjs0fWJxntle4D1leM
+         AaiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=sZbCaZd62RS0HQMtWC9xQRU9LnEXwU3GPpKJ1bKnoJA=;
-        b=r0iUu7KPRywmqVJ87oHpRcKKa6eednLd1qFAE6xdt2Hr+gdRYJ3akcHIT+C4Wbb70z
-         6wvgoWn4yAa5qdJ0Ycag7j4f5m/rWJ7e3InhTtIIFtbAsUTpc023dXYKDNFk9oWpFkxv
-         nn7oGKunpQPnHZ2FAv/HmyAN+uwYXUnRcZBrFbGzKOc4FYwL+Wjg0/AKt0Xo8WrsWcv5
-         2N9donsLJAufot2JLatanaIU74Oe9nwJcSk+fvu1vfMMKWTHJBcFcZazz6hkstsKREi+
-         pOmeQbeDnQ2itSWO8V+b3cE1S/bgBdEB62UC6Ge1KV8eyQ/w+rGLgMVOVnZzCtPo3eNp
-         iLqQ==
-X-Gm-Message-State: APjAAAVrGR6Ibb6xUP4uRUiW6ZRPoy0MwbauMoIkUJFizgBKZdNxgrU1
-        U8kpMUWguKJ3TTI0ieybFfVitWlz7g6V44NUbxpI2BmZ
-X-Google-Smtp-Source: APXvYqx/gKxIw8coVqotCs0Qyl3DkTIPwjGV+5l30fi9VuYSqY7oeTrEX9eW8vYvNtys7WlRSecimE9ry2+wdAJTeBU=
-X-Received: by 2002:a62:528b:: with SMTP id g133mr5306107pfb.246.1556336613339;
- Fri, 26 Apr 2019 20:43:33 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=ERU8cviK4Ntmj1GmBaU4abMIRobGJWMaaCBtEECyBYg=;
+        b=JHPCMxSzfjHl0qL05UaVIvERFRSJlxLChHWPKXsCCMJoKPBFmRna1FWstJeMPTojyB
+         erUOg9tmJgM+0e5h9KcK8V/QjwX+leE73hH/tDvr5pbAyze7SUYtsKqtyvTli9XezbBx
+         5EOVBt3rEnUMpDhg78idaIEPHemNco7H24Ry9F4wLcsInvsSi2wYmznYvtR0zrIfHcoB
+         QggzAHzRCU6285mTNqk1ryEPrUyyWrPzv1pObg7X7+riwp408aFC2X03k9ej6w0iIjg1
+         9zVSg6cpdIozQVrBCHY9W2he7IQIFj7tH3h3HWiyUW71P2ivAcPsu2b6NgaOKSEJBX6X
+         KCww==
+X-Gm-Message-State: APjAAAVXAcnul8oEnXlW4EKKFzpbGGyogL2pdsB8hjizUir9s4OsAcGd
+        inEcNqVj8lhqrbWDy4lA7/KASs/4U+TfNk3uNX0=
+X-Google-Smtp-Source: APXvYqyOhU5GOROh6wgX/4mYAcZIrmZQbB4364BLfVJQvK2BIb8U1ZOPFkqv5UR7/wn4ASznGl52Uf9IxGKTrEPL9JE=
+X-Received: by 2002:a37:4757:: with SMTP id u84mr37603221qka.275.1556352522068;
+ Sat, 27 Apr 2019 01:08:42 -0700 (PDT)
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 26 Apr 2019 20:43:22 -0700
-Message-ID: <CAH2r5mvtY513PT8dQDUthvRMGSggOD-nROg6r0Rt5MMNUnGUaA@mail.gmail.com>
-Subject: Add support for new Compression Negotiate Context
-To:     CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
-Content-Type: multipart/mixed; boundary="000000000000fd614905877ada9e"
+References: <20190426003223.4763-1-lsahlber@redhat.com> <20190426003223.4763-2-lsahlber@redhat.com>
+ <CAKywueSHDP06n+5a-z-Q3wB1nRSrceMDLLTYx+EsCtpoS_iTYA@mail.gmail.com>
+In-Reply-To: <CAKywueSHDP06n+5a-z-Q3wB1nRSrceMDLLTYx+EsCtpoS_iTYA@mail.gmail.com>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Sat, 27 Apr 2019 18:08:31 +1000
+Message-ID: <CAN05THRcm_tatCNex7DbuHNfcYkJnower3pAyPbsZ+HmiCqWtA@mail.gmail.com>
+Subject: Re: [PATCH] cifs: fix credits leak for SMB1 oplock breaks
+To:     Pavel Shilovsky <piastryyy@gmail.com>
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>,
+        Pavel Shilovsky <pshilov@microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000fd614905877ada9e
-Content-Type: text/plain; charset="UTF-8"
+On Sat, Apr 27, 2019 at 2:38 AM Pavel Shilovsky <piastryyy@gmail.com> wrote=
+:
+>
+> =D1=87=D1=82, 25 =D0=B0=D0=BF=D1=80. 2019 =D0=B3. =D0=B2 18:43, Ronnie Sa=
+hlberg <lsahlber@redhat.com>:
+> >
+> > Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> > ---
+> >  fs/cifs/cifsglob.h  |  1 +
+> >  fs/cifs/cifssmb.c   |  2 +-
+> >  fs/cifs/transport.c | 10 +++++-----
+> >  3 files changed, 7 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> > index 621640195713..7a65124f70f9 100644
+> > --- a/fs/cifs/cifsglob.h
+> > +++ b/fs/cifs/cifsglob.h
+> > @@ -1701,6 +1701,7 @@ static inline bool is_retryable_error(int error)
+> >
+> >  #define   CIFS_HAS_CREDITS 0x0400    /* already has credits */
+> >  #define   CIFS_TRANSFORM_REQ 0x0800    /* transform request before sen=
+ding */
+> > +#define   CIFS_NO_SRV_RSP    0x1000    /* there is no server response =
+*/
+> >
+> >  /* Security Flags: indicate type of session setup needed */
+> >  #define   CIFSSEC_MAY_SIGN     0x00001
+> > diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> > index f43747c062a7..6050851edcb8 100644
+> > --- a/fs/cifs/cifssmb.c
+> > +++ b/fs/cifs/cifssmb.c
+> > @@ -2540,7 +2540,7 @@ CIFSSMBLock(const unsigned int xid, struct cifs_t=
+con *tcon,
+> >
+> >         if (lockType =3D=3D LOCKING_ANDX_OPLOCK_RELEASE) {
+> >                 /* no response expected */
+> > -               flags =3D CIFS_ASYNC_OP | CIFS_OBREAK_OP;
+> > +               flags =3D CIFS_NO_SRV_RSP | CIFS_ASYNC_OP | CIFS_OBREAK=
+_OP;
+> >                 pSMB->Timeout =3D 0;
+> >         } else if (waitFlag) {
+> >                 flags =3D CIFS_BLOCKING_OP; /* blocking operation, no t=
+imeout */
+> > diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+> > index 5c59c498f56a..5573e38b13f3 100644
+> > --- a/fs/cifs/transport.c
+> > +++ b/fs/cifs/transport.c
+> > @@ -1073,8 +1073,11 @@ compound_send_recv(const unsigned int xid, struc=
+t cifs_ses *ses,
+> >
+> >         mutex_unlock(&ses->server->srv_mutex);
+> >
+> > -       if (rc < 0) {
+> > -               /* Sending failed for some reason - return credits back=
+ */
+> > +       /*
+> > +        * If sending failed for some reason or it is an oplock break t=
+hat we
+>
+> probably indicate that it is SMB1 oplock break?
+>
+> > +        * will not receive a response to - return credits back
+> > +        */
+> > +       if (rc < 0 || (flags & CIFS_NO_SRV_RSP)) {
+> >                 for (i =3D 0; i < num_rqst; i++)
+> >                         add_credits(ses->server, &credits[i], optype);
+>
+> A no-op callback is still needed to be set here or above for
+> CIFS_NO_SRV_RSP requests. Otherwise we may end up adding credits
+> twice: here and in the demultiplex thread.
 
-Add support to negotiate the compression context, and also saved off
-to display in /proc/fs/cifs/DebugData.  Future patch will add use for
-it on the wire.
-
-Note in /proc/fs/cifs/DebugData below (mounted to Windows 10) it defaulted
-to LZ77 compression algorithm.  See MS-SMB2 2.2.3.1 and and MS-XCA
-
-Servers:
-Number of credits: 326 Dialect 0x311 COMPRESS_LZ77 signed
-1) Name: 192.168.92.17 Uses: 1 Capability: 0x300067    Session Status:
-1 TCP status: 1 Instance: 1
+I don't think we need one. Since there will never be a reply we will
+never invoke the callback from the demultiplex thread.
 
 
--- 
-Thanks,
-
-Steve
-
---000000000000fd614905877ada9e
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-Negotiate-and-save-preferred-compression-algori.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-Negotiate-and-save-preferred-compression-algori.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_juyymi9t0>
-X-Attachment-Id: f_juyymi9t0
-
-RnJvbSA3Zjg3YzZmYWY1NDcwNzFlMGU1MDNmNDMxMTM0OTAyNTQxMWUzZmRmIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHNtZnJlbmNoQGdtYWlsLmNvbT4KRGF0
-ZTogRnJpLCAyNiBBcHIgMjAxOSAyMDozNjowOCAtMDcwMApTdWJqZWN0OiBbUEFUQ0hdIFtzbWIz
-XSBOZWdvdGlhdGUgYW5kIHNhdmUgcHJlZmVycmVkIGNvbXByZXNzaW9uIGFsZ29yaXRobXMKCk5l
-dyBuZWdvdGlhdGUgY29udGV4dCAoMykgYWxsb3dzIHRoZSBzZXJ2ZXIgYW5kIGNsaWVudCB0bwpu
-ZWdvdGlhdGUgd2hpY2ggY29tcHJlc3Npb24gYWxnb3JpdGhtcyB0byB1c2UuIEFkZCBzdXBwb3J0
-CmZvciB0aGlzIGFuZCBzYXZlIGl0IG9mZiBpbiB0aGUgc2VydmVyIHN0cnVjdHVyZS4KCkFsc28g
-bm93IGRpc3BsYXllZCBpbiAvcHJvYy9mcy9jaWZzL0RlYnVnRGF0YSAoc2VlIGJlbG93IGV4YW1w
-bGUKdG8gV2luZG93cyAxMCkgd2hlcmUgY29tcHJlc3Npb24gYWxnb2lydGhtICJMWjc3IiB3YXMg
-bmVnb3RpYXRlZDoKClNlcnZlcnM6Ck51bWJlciBvZiBjcmVkaXRzOiAzMjYgRGlhbGVjdCAweDMx
-MSBDT01QUkVTU19MWjc3IHNpZ25lZAoxKSBOYW1lOiAxOTIuMTY4LjkyLjE3IFVzZXM6IDEgQ2Fw
-YWJpbGl0eTogMHgzMDAwNjcJU2Vzc2lvbiBTdGF0dXM6IDEgVENQIHN0YXR1czogMSBJbnN0YW5j
-ZTogMQoKU2VlIE1TLVhDQSBhbmQgTVMtU01CMiAyLjIuMy4xIGZvciBtb3JlIGRldGFpbHMuCgpT
-aWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0tLQog
-ZnMvY2lmcy9jaWZzX2RlYnVnLmMgfCAgNiArKysrKysKIGZzL2NpZnMvY2lmc2dsb2IuaCAgIHwg
-IDEgKwogZnMvY2lmcy9zbWIycGR1LmMgICAgfCA0NyArKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrLQogZnMvY2lmcy9zbWIycGR1LmggICAgfCAgNyArKysrKy0tCiA0
-IGZpbGVzIGNoYW5nZWQsIDU4IGluc2VydGlvbnMoKyksIDMgZGVsZXRpb25zKC0pCgpkaWZmIC0t
-Z2l0IGEvZnMvY2lmcy9jaWZzX2RlYnVnLmMgYi9mcy9jaWZzL2NpZnNfZGVidWcuYwppbmRleCA1
-ZmYwYjNkNGM0ODQuLjZhNjlmMTFhYWNmNyAxMDA2NDQKLS0tIGEvZnMvY2lmcy9jaWZzX2RlYnVn
-LmMKKysrIGIvZnMvY2lmcy9jaWZzX2RlYnVnLmMKQEAgLTMzMiw2ICszMzIsMTIgQEAgc3RhdGlj
-IGludCBjaWZzX2RlYnVnX2RhdGFfcHJvY19zaG93KHN0cnVjdCBzZXFfZmlsZSAqbSwgdm9pZCAq
-dikKICNlbmRpZgogCQlzZXFfcHJpbnRmKG0sICJcbk51bWJlciBvZiBjcmVkaXRzOiAlZCBEaWFs
-ZWN0IDB4JXgiLAogCQkJc2VydmVyLT5jcmVkaXRzLCAgc2VydmVyLT5kaWFsZWN0KTsKKwkJaWYg
-KHNlcnZlci0+Y29tcHJlc3NfYWxnb3JpdGhtID09IFNNQjNfQ09NUFJFU1NfTFpOVDEpCisJCQlz
-ZXFfcHJpbnRmKG0sICIgQ09NUFJFU1NfTFpOVDEiKTsKKwkJZWxzZSBpZiAoc2VydmVyLT5jb21w
-cmVzc19hbGdvcml0aG0gPT0gU01CM19DT01QUkVTU19MWjc3KQorCQkJc2VxX3ByaW50ZihtLCAi
-IENPTVBSRVNTX0xaNzciKTsKKwkJZWxzZSBpZiAoc2VydmVyLT5jb21wcmVzc19hbGdvcml0aG0g
-PT0gU01CM19DT01QUkVTU19MWjc3X0hVRkYpCisJCQlzZXFfcHJpbnRmKG0sICIgQ09NUFJFU1Nf
-TFo3N19IVUZGIik7CiAJCWlmIChzZXJ2ZXItPnNpZ24pCiAJCQlzZXFfcHJpbnRmKG0sICIgc2ln
-bmVkIik7CiAJCWlmIChzZXJ2ZXItPnBvc2l4X2V4dF9zdXBwb3J0ZWQpCmRpZmYgLS1naXQgYS9m
-cy9jaWZzL2NpZnNnbG9iLmggYi9mcy9jaWZzL2NpZnNnbG9iLmgKaW5kZXggNWZmZTBlNTM4Y2Vj
-Li5kMjQ0YmNmYjQyNTIgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvY2lmc2dsb2IuaAorKysgYi9mcy9j
-aWZzL2NpZnNnbG9iLmgKQEAgLTczNCw2ICs3MzQsNyBAQCBzdHJ1Y3QgVENQX1NlcnZlcl9JbmZv
-IHsKICNlbmRpZiAvKiBTVEFUUzIgKi8KIAl1bnNpZ25lZCBpbnQJbWF4X3JlYWQ7CiAJdW5zaWdu
-ZWQgaW50CW1heF93cml0ZTsKKwlfX3UxNgljb21wcmVzc19hbGdvcml0aG07CiAJX19sZTE2CWNp
-cGhlcl90eXBlOwogCSAvKiBzYXZlIGluaXRpdGFsIG5lZ3Byb3QgaGFzaCAqLwogCV9fdTgJcHJl
-YXV0aF9zaGFfaGFzaFtTTUIyX1BSRUFVVEhfSEFTSF9TSVpFXTsKZGlmZiAtLWdpdCBhL2ZzL2Np
-ZnMvc21iMnBkdS5jIGIvZnMvY2lmcy9zbWIycGR1LmMKaW5kZXggNjM0ODAwYzBiYzA2Li44MmUy
-YTI3YmNjYzAgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvc21iMnBkdS5jCisrKyBiL2ZzL2NpZnMvc21i
-MnBkdS5jCkBAIC00NzIsNiArNDcyLDE5IEBAIGJ1aWxkX3ByZWF1dGhfY3R4dChzdHJ1Y3Qgc21i
-Ml9wcmVhdXRoX25lZ19jb250ZXh0ICpwbmVnX2N0eHQpCiAJcG5lZ19jdHh0LT5IYXNoQWxnb3Jp
-dGhtcyA9IFNNQjJfUFJFQVVUSF9JTlRFR1JJVFlfU0hBNTEyOwogfQogCitzdGF0aWMgdm9pZAor
-YnVpbGRfY29tcHJlc3Npb25fY3R4dChzdHJ1Y3Qgc21iMl9jb21wcmVzc2lvbl9jYXBhYmlsaXRp
-ZXNfY29udGV4dCAqcG5lZ19jdHh0KQoreworCXBuZWdfY3R4dC0+Q29udGV4dFR5cGUgPSBTTUIy
-X0NPTVBSRVNTSU9OX0NBUEFCSUxJVElFUzsKKwlwbmVnX2N0eHQtPkRhdGFMZW5ndGggPQorCQlj
-cHVfdG9fbGUxNihzaXplb2Yoc3RydWN0IHNtYjJfY29tcHJlc3Npb25fY2FwYWJpbGl0aWVzX2Nv
-bnRleHQpCisJCQkgIC0gc2l6ZW9mKHN0cnVjdCBzbWIyX25lZ19jb250ZXh0KSk7CisJcG5lZ19j
-dHh0LT5Db21wcmVzc2lvbkFsZ29yaXRobUNvdW50ID0gY3B1X3RvX2xlMTYoMyk7CisJcG5lZ19j
-dHh0LT5Db21wcmVzc2lvbkFsZ29yaXRobXNbMF0gPSBTTUIzX0NPTVBSRVNTX0xaNzc7CisJcG5l
-Z19jdHh0LT5Db21wcmVzc2lvbkFsZ29yaXRobXNbMV0gPSBTTUIzX0NPTVBSRVNTX0xaNzdfSFVG
-RjsKKwlwbmVnX2N0eHQtPkNvbXByZXNzaW9uQWxnb3JpdGhtc1syXSA9IFNNQjNfQ09NUFJFU1Nf
-TFpOVDE7Cit9CisKIHN0YXRpYyB2b2lkCiBidWlsZF9lbmNyeXB0X2N0eHQoc3RydWN0IHNtYjJf
-ZW5jcnlwdGlvbl9uZWdfY29udGV4dCAqcG5lZ19jdHh0KQogewpAQCAtNTM4LDEwICs1NTEsMTcg
-QEAgYXNzZW1ibGVfbmVnX2NvbnRleHRzKHN0cnVjdCBzbWIyX25lZ290aWF0ZV9yZXEgKnJlcSwK
-IAkqdG90YWxfbGVuICs9IGN0eHRfbGVuOwogCXBuZWdfY3R4dCArPSBjdHh0X2xlbjsKIAorCWJ1
-aWxkX2NvbXByZXNzaW9uX2N0eHQoKHN0cnVjdCBzbWIyX2NvbXByZXNzaW9uX2NhcGFiaWxpdGll
-c19jb250ZXh0ICopCisJCQkJcG5lZ19jdHh0KTsKKwljdHh0X2xlbiA9IERJVl9ST1VORF9VUCgK
-KwkJc2l6ZW9mKHN0cnVjdCBzbWIyX2NvbXByZXNzaW9uX2NhcGFiaWxpdGllc19jb250ZXh0KSwg
-OCkgKiA4OworCSp0b3RhbF9sZW4gKz0gY3R4dF9sZW47CisJcG5lZ19jdHh0ICs9IGN0eHRfbGVu
-OworCiAJYnVpbGRfcG9zaXhfY3R4dCgoc3RydWN0IHNtYjJfcG9zaXhfbmVnX2NvbnRleHQgKilw
-bmVnX2N0eHQpOwogCSp0b3RhbF9sZW4gKz0gc2l6ZW9mKHN0cnVjdCBzbWIyX3Bvc2l4X25lZ19j
-b250ZXh0KTsKIAotCXJlcS0+TmVnb3RpYXRlQ29udGV4dENvdW50ID0gY3B1X3RvX2xlMTYoMyk7
-CisJcmVxLT5OZWdvdGlhdGVDb250ZXh0Q291bnQgPSBjcHVfdG9fbGUxNig0KTsKIH0KIAogc3Rh
-dGljIHZvaWQgZGVjb2RlX3ByZWF1dGhfY29udGV4dChzdHJ1Y3Qgc21iMl9wcmVhdXRoX25lZ19j
-b250ZXh0ICpjdHh0KQpAQCAtNTU5LDYgKzU3OSwyOCBAQCBzdGF0aWMgdm9pZCBkZWNvZGVfcHJl
-YXV0aF9jb250ZXh0KHN0cnVjdCBzbWIyX3ByZWF1dGhfbmVnX2NvbnRleHQgKmN0eHQpCiAJCXBy
-aW50a19vbmNlKEtFUk5fV0FSTklORyAidW5rbm93biBTTUIzIGhhc2ggYWxnb3JpdGhtXG4iKTsK
-IH0KIAorc3RhdGljIHZvaWQgZGVjb2RlX2NvbXByZXNzX2N0eChzdHJ1Y3QgVENQX1NlcnZlcl9J
-bmZvICpzZXJ2ZXIsCisJCQkgc3RydWN0IHNtYjJfY29tcHJlc3Npb25fY2FwYWJpbGl0aWVzX2Nv
-bnRleHQgKmN0eHQpCit7CisJdW5zaWduZWQgaW50IGxlbiA9IGxlMTZfdG9fY3B1KGN0eHQtPkRh
-dGFMZW5ndGgpOworCisJLyogc2l6ZW9mIGNvbXByZXNzIGNvbnRleHQgaXMgYSBvbmUgZWxlbWVu
-dCBjb21wcmVzc2lvbiBjYXBiaWxpdHkgc3RydWN0ICovCisJaWYgKGxlbiA8IDEwKSB7CisJCXBy
-aW50a19vbmNlKEtFUk5fV0FSTklORyAic2VydmVyIHNlbnQgYmFkIGNvbXByZXNzaW9uIGNudHh0
-XG4iKTsKKwkJcmV0dXJuOworCX0KKwlpZiAobGUxNl90b19jcHUoY3R4dC0+Q29tcHJlc3Npb25B
-bGdvcml0aG1Db3VudCkgIT0gMSkgeworCQlwcmludGtfb25jZShLRVJOX1dBUk5JTkcgImlsbGVn
-YWwgU01CMyBjb21wcmVzcyBhbGdvcml0aG0gY291bnRcbiIpOworCQlyZXR1cm47CisJfQorCWlm
-IChsZTE2X3RvX2NwdShjdHh0LT5Db21wcmVzc2lvbkFsZ29yaXRobXNbMF0pID4gMykgeworCQlw
-cmludGtfb25jZShLRVJOX1dBUk5JTkcgInVua25vd24gY29tcHJlc3Npb24gYWxnb3JpdGhtXG4i
-KTsKKwkJcmV0dXJuOworCX0KKwlzZXJ2ZXItPmNvbXByZXNzX2FsZ29yaXRobSA9CisJCWxlMTZf
-dG9fY3B1KGN0eHQtPkNvbXByZXNzaW9uQWxnb3JpdGhtc1swXSk7Cit9CisKIHN0YXRpYyBpbnQg
-ZGVjb2RlX2VuY3J5cHRfY3R4KHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciwKIAkJCSAg
-ICAgIHN0cnVjdCBzbWIyX2VuY3J5cHRpb25fbmVnX2NvbnRleHQgKmN0eHQpCiB7CkBAIC02MjMs
-NiArNjY1LDkgQEAgc3RhdGljIGludCBzbWIzMTFfZGVjb2RlX25lZ19jb250ZXh0KHN0cnVjdCBz
-bWIyX25lZ290aWF0ZV9yc3AgKnJzcCwKIAkJZWxzZSBpZiAocGN0eC0+Q29udGV4dFR5cGUgPT0g
-U01CMl9FTkNSWVBUSU9OX0NBUEFCSUxJVElFUykKIAkJCXJjID0gZGVjb2RlX2VuY3J5cHRfY3R4
-KHNlcnZlciwKIAkJCQkoc3RydWN0IHNtYjJfZW5jcnlwdGlvbl9uZWdfY29udGV4dCAqKXBjdHgp
-OworCQllbHNlIGlmIChwY3R4LT5Db250ZXh0VHlwZSA9PSBTTUIyX0NPTVBSRVNTSU9OX0NBUEFC
-SUxJVElFUykKKwkJCWRlY29kZV9jb21wcmVzc19jdHgoc2VydmVyLAorCQkJCShzdHJ1Y3Qgc21i
-Ml9jb21wcmVzc2lvbl9jYXBhYmlsaXRpZXNfY29udGV4dCAqKXBjdHgpOwogCQllbHNlIGlmIChw
-Y3R4LT5Db250ZXh0VHlwZSA9PSBTTUIyX1BPU0lYX0VYVEVOU0lPTlNfQVZBSUxBQkxFKQogCQkJ
-c2VydmVyLT5wb3NpeF9leHRfc3VwcG9ydGVkID0gdHJ1ZTsKIAkJZWxzZQpkaWZmIC0tZ2l0IGEv
-ZnMvY2lmcy9zbWIycGR1LmggYi9mcy9jaWZzL3NtYjJwZHUuaAppbmRleCA4MjY4NmU5ZDllMDUu
-LmFmYTgzN2IzNDIyNiAxMDA2NDQKLS0tIGEvZnMvY2lmcy9zbWIycGR1LmgKKysrIGIvZnMvY2lm
-cy9zbWIycGR1LmgKQEAgLTMwMywxMCArMzAzLDEzIEBAIHN0cnVjdCBzbWIyX2VuY3J5cHRpb25f
-bmVnX2NvbnRleHQgewogI2RlZmluZSBTTUIzX0NPTVBSRVNTX0xaNzdfSFVGRgkweDAwMDMKIAog
-c3RydWN0IHNtYjJfY29tcHJlc3Npb25fY2FwYWJpbGl0aWVzX2NvbnRleHQgeworCV9fbGUxNglD
-b250ZXh0VHlwZTsgLyogMyAqLworCV9fbGUxNiAgRGF0YUxlbmd0aDsKKwlfX3UzMglSZXNlcnZl
-ZDsKIAlfX2xlMTYJQ29tcHJlc3Npb25BbGdvcml0aG1Db3VudDsKIAlfX3UxNglQYWRkaW5nOwot
-CV9fdTMyCVJlc2VydmVkOwotCV9fdTE2CUNvbXByZXNzaW9uQWxnb3JpdGhtc1sxXTsKKwlfX3Uz
-MglSZXNlcnZlZDE7CisJX191MTYJQ29tcHJlc3Npb25BbGdvcml0aG1zWzNdOwogfSBfX3BhY2tl
-ZDsKIAogLyoKLS0gCjIuMTcuMQoK
---000000000000fd614905877ada9e--
+>
+> >                 goto out;
+> > @@ -1095,9 +1098,6 @@ compound_send_recv(const unsigned int xid, struct=
+ cifs_ses *ses,
+> >                 smb311_update_preauth_hash(ses, rqst[0].rq_iov,
+> >                                            rqst[0].rq_nvec);
+> >
+> > -       if ((flags & CIFS_TIMEOUT_MASK) =3D=3D CIFS_ASYNC_OP)
+> > -               goto out;
+> > -
+> >         for (i =3D 0; i < num_rqst; i++) {
+> >                 rc =3D wait_for_response(ses->server, midQ[i]);
+> >                 if (rc !=3D 0)
+> > --
+> > 2.13.6
+> >
+>
+>
+> --
+> Best regards,
+> Pavel Shilovsky
