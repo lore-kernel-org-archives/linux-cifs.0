@@ -2,239 +2,87 @@ Return-Path: <SRS0=PRx5=TA=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0BF4C43219
-	for <linux-cifs@archiver.kernel.org>; Tue, 30 Apr 2019 15:08:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7D5AC43219
+	for <linux-cifs@archiver.kernel.org>; Tue, 30 Apr 2019 15:52:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7DD9B21707
-	for <linux-cifs@archiver.kernel.org>; Tue, 30 Apr 2019 15:08:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8DA7220835
+	for <linux-cifs@archiver.kernel.org>; Tue, 30 Apr 2019 15:52:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N2A4SQtJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726804AbfD3PIJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 30 Apr 2019 11:08:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49010 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726050AbfD3PII (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 30 Apr 2019 11:08:08 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A6B48F74BC;
-        Tue, 30 Apr 2019 15:08:07 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-120-61.rdu2.redhat.com [10.10.120.61])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 48F8E7C825;
-        Tue, 30 Apr 2019 15:08:05 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
- Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
- Kingdom.
- Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 10/11] keys: Network namespace domain tag [ver #2]
-From:   David Howells <dhowells@redhat.com>
-To:     ebiederm@xmission.com
-Cc:     netdev@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-afs@lists.infradead.org,
-        keyrings@vger.kernel.org, dhowells@redhat.com,
-        linux-security-module@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        dwalsh@redhat.com, vgoyal@redhat.com
-Date:   Tue, 30 Apr 2019 16:08:04 +0100
-Message-ID: <155663688450.31331.10931596489401135897.stgit@warthog.procyon.org.uk>
-In-Reply-To: <155663679069.31331.3777091898004242996.stgit@warthog.procyon.org.uk>
-References: <155663679069.31331.3777091898004242996.stgit@warthog.procyon.org.uk>
-User-Agent: StGit/unknown-version
+        id S1726014AbfD3Pwd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 30 Apr 2019 11:52:33 -0400
+Received: from mail-pl1-f181.google.com ([209.85.214.181]:35976 "EHLO
+        mail-pl1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725930AbfD3Pwd (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 Apr 2019 11:52:33 -0400
+Received: by mail-pl1-f181.google.com with SMTP id w20so6305289plq.3
+        for <linux-cifs@vger.kernel.org>; Tue, 30 Apr 2019 08:52:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=JENNT/zMh7cjuzo3wyN9F1O/GbACKbzf2WjWeWhoVrA=;
+        b=N2A4SQtJ9c08ymo+fvhcZO32PrCqXYzx3pxffh3RhordqE9FbtGhoxPYi4w4q5D1Ci
+         v1X+vxKzFL4+roTfOQvu484DgTBCqCaQuzI+23dwW4RPHx4D7Ga66PhburiFidX9Wvf5
+         9n2PIQzGooB+sqrlWIZEgbpKw4lM0/8u7z1YWCBTORr3D1NjxvrM43/Gb2pc1/IXvvdU
+         eG1EUqCAQ2JnHgcugp/Ih4YmPE7b7U+DnhwYyiVINyTeOQf8Rw4/s9lCcy9HrKEzdiX+
+         ESfrlt72e3TqlCfe5jAFiBYe9/umgxx5vpv6mThOSNymlKqc2woW5qL7AbarJfzq5sVn
+         k3VA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=JENNT/zMh7cjuzo3wyN9F1O/GbACKbzf2WjWeWhoVrA=;
+        b=UTEB+ynpKl3+ePO4nEF7YpgtGHE2RgKLyX+IH1KP9L+hVX/Cgs6W1br7c6JnFN7KnR
+         Jh/r5gwYXpfsk2WMhI736V3mK6DFFL8aBQUIzGaYHA7VWVUOntT+8bLjUc6TwnkIxrwU
+         57EEtZCisl5eVwH46dQTgimsqd+DsCdbKbCHcedNix2wDrxMtjdcscnSHwzcQX2nN4jT
+         rp83aJ3MPXVii3Ow+HJUWrM/z/DcB4nlGLeb/xucc8C9TeI3CTBFB9O2UtTaj+qT/1rU
+         NeRvd40zXzNhRhfuKVzw4v6aucwOqqIKfL+uee40wj/5+mG2aH91pXlmBxmWCkFh4Bj/
+         Xe4Q==
+X-Gm-Message-State: APjAAAUZkI4Cl5QaLEtqeu8TPFW2I6KjEwhXsxBYad80oHeleutlDnsC
+        gh5t1reK0JXe7dNoitr/YCJ6qDK0AZr1BpG13hq+AYoXJJw=
+X-Google-Smtp-Source: APXvYqzqQ0B2d6mU6lh1kXQ75INbI04E8Ur6adjrx6fFWQHFwQr/xy/UKMIOE2tETU90kEPWKR7wGD357j3fH6STQuQ=
+X-Received: by 2002:a17:902:b105:: with SMTP id q5mr13950901plr.290.1556639552027;
+ Tue, 30 Apr 2019 08:52:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Tue, 30 Apr 2019 15:08:07 +0000 (UTC)
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 30 Apr 2019 10:52:21 -0500
+Message-ID: <CAH2r5mtxU3aONRMaZLKEMPBWydDZgjSiBS07sHXXK0zUeBmUdQ@mail.gmail.com>
+Subject: Tests 112 and 469
+To:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Create key domain tags for network namespaces and make it possible to
-automatically tag keys that are used by networked services (e.g. AF_RXRPC,
-AFS, DNS) with the default network namespace if not set by the caller.
+This patch is odd because it fails xfstests 112 and 469 to Azure, even
+though Azure doesn't support the operation so should skip the same
+part of the test with or without Ronnie's patch and tests should work.
 
-This allows keys with the same description but in different namespaces to
-coexist within a keyring.
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: netdev@vger.kernel.org
-cc: linux-nfs@vger.kernel.org
-cc: linux-cifs@vger.kernel.org
-cc: linux-afs@lists.infradead.org
----
+commit d008b979e8e6196ab3f916ca076448f5c9f527f3 (HEAD, origin/for-next)
+Author: Ronnie Sahlberg <lsahlber@redhat.com>
+Date:   Fri Apr 12 09:56:23 2019 +1000
 
- include/linux/key-type.h    |    3 +++
- include/linux/key.h         |    1 +
- include/net/net_namespace.h |    4 ++++
- net/core/net_namespace.c    |   19 +++++++++++++++++++
- net/dns_resolver/dns_key.c  |    1 +
- net/rxrpc/key.c             |    2 ++
- security/keys/keyring.c     |    7 ++++++-
- 7 files changed, 36 insertions(+), 1 deletion(-)
+    cifs: zero-range does not require the file is sparse
 
-diff --git a/include/linux/key-type.h b/include/linux/key-type.h
-index e49d1de0614e..2148a6bf58f1 100644
---- a/include/linux/key-type.h
-+++ b/include/linux/key-type.h
-@@ -74,6 +74,9 @@ struct key_type {
- 	 */
- 	size_t def_datalen;
- 
-+	unsigned int flags;
-+#define KEY_TYPE_NET_DOMAIN	0x00000001 /* Keys of this type have a net namespace domain */
-+
- 	/* vet a description */
- 	int (*vet_description)(const char *description);
- 
-diff --git a/include/linux/key.h b/include/linux/key.h
-index c22e64b9bd91..24db72f3839e 100644
---- a/include/linux/key.h
-+++ b/include/linux/key.h
-@@ -440,6 +440,7 @@ extern void key_init(void);
- #define key_init()			do { } while(0)
- #define key_free_user_ns(ns)		do { } while(0)
- #define key_put_subject(s)		do { } while(0)
-+#define key_remove_domain(d)		do { } while(0)
- 
- #endif /* CONFIG_KEYS */
- #endif /* __KERNEL__ */
-diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
-index a68ced28d8f4..b96de08a3ace 100644
---- a/include/net/net_namespace.h
-+++ b/include/net/net_namespace.h
-@@ -45,6 +45,7 @@ struct net_generic;
- struct uevent_sock;
- struct netns_ipvs;
- struct bpf_prog;
-+struct key_subject;
- 
- 
- #define NETDEV_HASHBITS    8
-@@ -70,6 +71,9 @@ struct net {
- 						 */
- 	struct llist_node	cleanup_list;	/* namespaces on death row */
- 
-+#ifdef CONFIG_KEYS
-+	struct key_tag		*key_domain;	/* Key domain of operation tag */
-+#endif
- 	struct user_namespace   *user_ns;	/* Owning user namespace */
- 	struct ucounts		*ucounts;
- 	spinlock_t		nsid_lock;
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index 17f36317363d..a7b38f1d5762 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -38,9 +38,16 @@ EXPORT_SYMBOL_GPL(net_namespace_list);
- DECLARE_RWSEM(net_rwsem);
- EXPORT_SYMBOL_GPL(net_rwsem);
- 
-+#ifdef CONFIG_KEYS
-+static struct key_tag init_net_key_domain = { .usage = REFCOUNT_INIT(1) };
-+#endif
-+
- struct net init_net = {
- 	.count		= REFCOUNT_INIT(1),
- 	.dev_base_head	= LIST_HEAD_INIT(init_net.dev_base_head),
-+#ifdef CONFIG_KEYS
-+	.key_domain	= &init_net_key_domain,
-+#endif
- };
- EXPORT_SYMBOL(init_net);
- 
-@@ -385,10 +392,21 @@ static struct net *net_alloc(void)
- 	if (!net)
- 		goto out_free;
- 
-+#ifdef CONFIG_KEYS
-+	net->key_domain = kzalloc(sizeof(struct key_tag), GFP_KERNEL);
-+	if (!net->key_domain)
-+		goto out_free_2;
-+	refcount_set(&net->key_domain->usage, 1);
-+#endif
-+
- 	rcu_assign_pointer(net->gen, ng);
- out:
- 	return net;
- 
-+#ifdef CONFIG_KEYS
-+out_free_2:
-+	kmem_cache_free(net_cachep, net);
-+#endif
- out_free:
- 	kfree(ng);
- 	goto out;
-@@ -565,6 +583,7 @@ static void cleanup_net(struct work_struct *work)
- 	list_for_each_entry_safe(net, tmp, &net_exit_list, exit_list) {
- 		list_del_init(&net->exit_list);
- 		dec_net_namespaces(net->ucounts);
-+		key_remove_domain(net->key_domain);
- 		put_user_ns(net->user_ns);
- 		net_drop_ns(net);
- 	}
-diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
-index a65d553e730d..3e1a90669006 100644
---- a/net/dns_resolver/dns_key.c
-+++ b/net/dns_resolver/dns_key.c
-@@ -314,6 +314,7 @@ static long dns_resolver_read(const struct key *key,
- 
- struct key_type key_type_dns_resolver = {
- 	.name		= "dns_resolver",
-+	.flags		= KEY_TYPE_NET_DOMAIN,
- 	.preparse	= dns_resolver_preparse,
- 	.free_preparse	= dns_resolver_free_preparse,
- 	.instantiate	= generic_key_instantiate,
-diff --git a/net/rxrpc/key.c b/net/rxrpc/key.c
-index e7f6b8823eb6..2722189ec273 100644
---- a/net/rxrpc/key.c
-+++ b/net/rxrpc/key.c
-@@ -43,6 +43,7 @@ static long rxrpc_read(const struct key *, char __user *, size_t);
-  */
- struct key_type key_type_rxrpc = {
- 	.name		= "rxrpc",
-+	.flags		= KEY_TYPE_NET_DOMAIN,
- 	.preparse	= rxrpc_preparse,
- 	.free_preparse	= rxrpc_free_preparse,
- 	.instantiate	= generic_key_instantiate,
-@@ -58,6 +59,7 @@ EXPORT_SYMBOL(key_type_rxrpc);
-  */
- struct key_type key_type_rxrpc_s = {
- 	.name		= "rxrpc_s",
-+	.flags		= KEY_TYPE_NET_DOMAIN,
- 	.vet_description = rxrpc_vet_description_s,
- 	.preparse	= rxrpc_preparse_s,
- 	.free_preparse	= rxrpc_free_preparse_s,
-diff --git a/security/keys/keyring.c b/security/keys/keyring.c
-index d2ad27535624..ffa368594a03 100644
---- a/security/keys/keyring.c
-+++ b/security/keys/keyring.c
-@@ -17,10 +17,12 @@
- #include <linux/seq_file.h>
- #include <linux/err.h>
- #include <linux/user_namespace.h>
-+#include <linux/nsproxy.h>
- #include <keys/keyring-type.h>
- #include <keys/user-type.h>
- #include <linux/assoc_array_priv.h>
- #include <linux/uaccess.h>
-+#include <net/net_namespace.h>
- #include "internal.h"
- 
- /*
-@@ -220,7 +222,10 @@ void key_set_index_key(struct keyring_index_key *index_key)
- 
- 	memcpy(index_key->desc, index_key->description, n);
- 
--	index_key->domain_tag = &default_domain_tag;
-+	if (index_key->type->flags & KEY_TYPE_NET_DOMAIN)
-+		index_key->domain_tag = current->nsproxy->net_ns->key_domain;
-+	else
-+		index_key->domain_tag = &default_domain_tag;
- 	hash_key_type_and_desc(index_key);
- }
- 
+    Remove the conditional to fail zero-range if the file is not
+flagged as sparse.
+    You can still zero out a range in SMB2 even for non-sparse files.
 
+    Tested with stock windows16 server.
+
+    Fixes 5 xfstests (033, 149, 155, 180, 349)
+
+    Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+
+
+-- 
+Thanks,
+
+Steve
