@@ -2,181 +2,170 @@ Return-Path: <SRS0=PRx5=TA=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37868C04AA8
-	for <linux-cifs@archiver.kernel.org>; Tue, 30 Apr 2019 11:56:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96EF0C04AA6
+	for <linux-cifs@archiver.kernel.org>; Tue, 30 Apr 2019 15:06:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 093D72075E
-	for <linux-cifs@archiver.kernel.org>; Tue, 30 Apr 2019 11:56:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1556625413;
-	bh=0PDFe32l2J+JXZU23rkNgpJGbpdv8x+Mxo14+BuAzpI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=hiP76sF+TwPzSxI4klNpYSgQeQhMUJVJ+fQno/N8KMxQiSCer0JdVwEQ5UpeMTfHf
-	 XvVuxynZlHc2iDg4MNe5ZH/YGW4Gw2PhxG80ki5CYoHbahUj5zJgZ+oGe0UpAZt6aU
-	 v789GDKovonJmhuRBI5/1nxrZRl8kAL15FxgpMxo=
+	by mail.kernel.org (Postfix) with ESMTP id 676FC20652
+	for <linux-cifs@archiver.kernel.org>; Tue, 30 Apr 2019 15:06:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730522AbfD3Ls1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 30 Apr 2019 07:48:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34504 "EHLO mail.kernel.org"
+        id S1726280AbfD3PGj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 30 Apr 2019 11:06:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43850 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730846AbfD3Ls0 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 30 Apr 2019 07:48:26 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1726101AbfD3PGi (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 30 Apr 2019 11:06:38 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id BB5522054F;
-        Tue, 30 Apr 2019 11:48:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1556624905;
-        bh=0PDFe32l2J+JXZU23rkNgpJGbpdv8x+Mxo14+BuAzpI=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=yTRUF36xfqLa8eX0xyEf1Wdh3i1ZuVAoMNiM8uY9T/JL9CCh+YPrJ/4Yf6DqYfZ0U
-         hgKtV7Sw19CF5ETKM18Kh5RHXr0PGwjS39k+aISoUustHXBZq+yzvYmPazis0QYDmA
-         Um+OnGay/sDQWvYl6HLt5PMYWcdli1IirLrTusnk=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Steve French <stfrench@microsoft.com>,
-        Pavel Shilovsky <pshilov@microsoft.com>
-Subject: [PATCH 5.0 09/89] cifs: fix page reference leak with readv/writev
-Date:   Tue, 30 Apr 2019 13:38:00 +0200
-Message-Id: <20190430113610.196430694@linuxfoundation.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190430113609.741196396@linuxfoundation.org>
-References: <20190430113609.741196396@linuxfoundation.org>
-User-Agent: quilt/0.66
+        by mx1.redhat.com (Postfix) with ESMTPS id 550DE83F3B;
+        Tue, 30 Apr 2019 15:06:38 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-61.rdu2.redhat.com [10.10.120.61])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F006B600C2;
+        Tue, 30 Apr 2019 15:06:32 +0000 (UTC)
+Subject: [PATCH 00/11] keys: Namespacing [ver #2]
+From:   David Howells <dhowells@redhat.com>
+To:     ebiederm@xmission.com
+Cc:     linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
+        Jann Horn <jannh@google.com>, keyrings@vger.kernel.org,
+        dhowells@redhat.com, linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dwalsh@redhat.com, vgoyal@redhat.com
+Date:   Tue, 30 Apr 2019 16:06:31 +0100
+Message-ID: <155663679069.31331.3777091898004242996.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Tue, 30 Apr 2019 15:06:38 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Jérôme Glisse <jglisse@redhat.com>
 
-commit 13f5938d8264b5501368523c4513ff26608a33e8 upstream.
+Here are some patches to make keys and keyrings more namespace aware.  Note
+that the branch is dependent on security/next-general.
 
-CIFS can leak pages reference gotten through GUP (get_user_pages*()
-through iov_iter_get_pages()). This happen if cifs_send_async_read()
-or cifs_write_from_iter() calls fail from within __cifs_readv() and
-__cifs_writev() respectively. This patch move page unreference to
-cifs_aio_ctx_release() which will happens on all code paths this is
-all simpler to follow for correctness.
+Firstly some miscellaneous patches to make the process easier:
 
-Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
-Cc: Steve French <sfrench@samba.org>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-fsdevel@vger.kernel.org
-Cc: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Stable <stable@vger.kernel.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+ (1) Invalidate rather than revoke request_key() authentication keys to
+     recycle them more quickly.
 
+ (2) Remove request_key_async*() as they aren't used and would have to be
+     namespaced.
+
+ (3) Simplify key index_key handling so that the word-sized chunks
+     assoc_array requires don't have to be shifted about, making it easier
+     to add more bits into the key.
+
+ (4) Cache the hash value so that we don't have to calculate on every key
+     we examine during a search (it involves a bunch of multiplications).
+
+ (5) Allow keying_search() to search non-recursively.
+
+Then the main patches:
+
+ (6) Make it so that keyring names are per-user_namespace from the point of
+     view of KEYCTL_JOIN_SESSION_KEYRING so that they're not accessible
+     cross-user_namespace.
+
+ (7) Move the user and user-session keyrings to the user_namespace rather
+     than the user_struct.  This prevents them propagating directly across
+     user_namespaces boundaries (ie. the KEY_SPEC_* flags will only pick
+     from the current user_namespace).
+
+ (8) Make it possible to include the target namespace in which the key shall
+     operate in the index_key.  This will allow the possibility of multiple
+     keys with the same description, but different target domains to be held
+     in the same keyring.
+
+ (9) Make it so that keys are implicitly invalidated by removal of a domain
+     tag, causing them to be garbage collected.
+
+(10) Institute a network namespace domain tag that allows keys to be
+     differentiated by the network namespace in which they operate.  New keys
+     that are of a type marked 'KEY_TYPE_NET_DOMAIN' are assigned the network
+     domain in force when they are created.
+
+(11) Make it so that the desired network namespace can be handed down into the
+     request_key() mechanism.  This allows AFS, NFS, etc. to request keys
+     specific to the network namespace of the superblock.
+
+     This also means that the keys in the DNS record cache are thenceforth
+     namespaced, provided network filesystems pass the appropriate network
+     namespace down into dns_query().
+
+     For DNS, AFS and NFS are good; CIFS and Ceph are not.  Other cache
+     keyrings, such as idmapper keyrings, also need to set the domain tag.
+
+
+Changes:
+
+V2 fixes:
+ - Missing initialisation of net key_domain usage count.
+ - Missing barriering on the keyring register pointer.
+ - Use snprintf() rather than sprintf().
+ - Incorrect error handling in search_my_process_keyrings().
+ - Incorrect error handling in call_sbin_request_key().
+
+The patches can be found on the following branch:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-namespace
+
+David
 ---
- fs/cifs/file.c |   15 +--------------
- fs/cifs/misc.c |   23 ++++++++++++++++++++++-
- 2 files changed, 23 insertions(+), 15 deletions(-)
+David Howells (11):
+      keys: Invalidate used request_key authentication keys
+      keys: Kill off request_key_async{,_with_auxdata}
+      keys: Simplify key description management
+      keys: Cache the hash value to avoid lots of recalculation
+      keys: Add a 'recurse' flag for keyring searches
+      keys: Namespace keyring names
+      keys: Move the user and user-session keyrings to the user_namespace
+      keys: Include target namespace in match criteria
+      keys: Garbage collect keys for which the domain has been removed
+      keys: Network namespace domain tag
+      keys: Pass the network namespace into request_key mechanism
 
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -2796,7 +2796,6 @@ static void collect_uncached_write_data(
- 	struct cifs_tcon *tcon;
- 	struct cifs_sb_info *cifs_sb;
- 	struct dentry *dentry = ctx->cfile->dentry;
--	unsigned int i;
- 	int rc;
- 
- 	tcon = tlink_tcon(ctx->cfile->tlink);
-@@ -2860,10 +2859,6 @@ restart_loop:
- 		kref_put(&wdata->refcount, cifs_uncached_writedata_release);
- 	}
- 
--	if (!ctx->direct_io)
--		for (i = 0; i < ctx->npages; i++)
--			put_page(ctx->bv[i].bv_page);
--
- 	cifs_stats_bytes_written(tcon, ctx->total_len);
- 	set_bit(CIFS_INO_INVALID_MAPPING, &CIFS_I(dentry->d_inode)->flags);
- 
-@@ -3472,7 +3467,6 @@ collect_uncached_read_data(struct cifs_a
- 	struct iov_iter *to = &ctx->iter;
- 	struct cifs_sb_info *cifs_sb;
- 	struct cifs_tcon *tcon;
--	unsigned int i;
- 	int rc;
- 
- 	tcon = tlink_tcon(ctx->cfile->tlink);
-@@ -3556,15 +3550,8 @@ again:
- 		kref_put(&rdata->refcount, cifs_uncached_readdata_release);
- 	}
- 
--	if (!ctx->direct_io) {
--		for (i = 0; i < ctx->npages; i++) {
--			if (ctx->should_dirty)
--				set_page_dirty(ctx->bv[i].bv_page);
--			put_page(ctx->bv[i].bv_page);
--		}
--
-+	if (!ctx->direct_io)
- 		ctx->total_len = ctx->len - iov_iter_count(to);
--	}
- 
- 	cifs_stats_bytes_read(tcon, ctx->total_len);
- 
---- a/fs/cifs/misc.c
-+++ b/fs/cifs/misc.c
-@@ -789,6 +789,11 @@ cifs_aio_ctx_alloc(void)
- {
- 	struct cifs_aio_ctx *ctx;
- 
-+	/*
-+	 * Must use kzalloc to initialize ctx->bv to NULL and ctx->direct_io
-+	 * to false so that we know when we have to unreference pages within
-+	 * cifs_aio_ctx_release()
-+	 */
- 	ctx = kzalloc(sizeof(struct cifs_aio_ctx), GFP_KERNEL);
- 	if (!ctx)
- 		return NULL;
-@@ -807,7 +812,23 @@ cifs_aio_ctx_release(struct kref *refcou
- 					struct cifs_aio_ctx, refcount);
- 
- 	cifsFileInfo_put(ctx->cfile);
--	kvfree(ctx->bv);
-+
-+	/*
-+	 * ctx->bv is only set if setup_aio_ctx_iter() was call successfuly
-+	 * which means that iov_iter_get_pages() was a success and thus that
-+	 * we have taken reference on pages.
-+	 */
-+	if (ctx->bv) {
-+		unsigned i;
-+
-+		for (i = 0; i < ctx->npages; i++) {
-+			if (ctx->should_dirty)
-+				set_page_dirty(ctx->bv[i].bv_page);
-+			put_page(ctx->bv[i].bv_page);
-+		}
-+		kvfree(ctx->bv);
-+	}
-+
- 	kfree(ctx);
- }
- 
 
+ Documentation/security/keys/core.rst     |   10 +
+ certs/blacklist.c                        |    2 
+ crypto/asymmetric_keys/asymmetric_type.c |    2 
+ fs/afs/addr_list.c                       |    4 
+ fs/afs/dynroot.c                         |    7 -
+ fs/cifs/dns_resolve.c                    |    3 
+ fs/nfs/dns_resolve.c                     |    2 
+ include/linux/dns_resolver.h             |    3 
+ include/linux/key-type.h                 |    3 
+ include/linux/key.h                      |   50 ++++--
+ include/linux/sched/user.h               |   14 --
+ include/linux/user_namespace.h           |   12 +
+ include/net/net_namespace.h              |    4 
+ kernel/user.c                            |   10 -
+ kernel/user_namespace.c                  |    9 -
+ lib/digsig.c                             |    2 
+ net/ceph/messenger.c                     |    3 
+ net/core/net_namespace.c                 |   19 ++
+ net/dns_resolver/dns_key.c               |    1 
+ net/dns_resolver/dns_query.c             |    6 -
+ net/rxrpc/key.c                          |    6 -
+ net/rxrpc/security.c                     |    2 
+ security/integrity/digsig_asymmetric.c   |    4 
+ security/keys/gc.c                       |    2 
+ security/keys/internal.h                 |   10 +
+ security/keys/key.c                      |    9 +
+ security/keys/keyctl.c                   |    4 
+ security/keys/keyring.c                  |  263 +++++++++++++++++-------------
+ security/keys/persistent.c               |   10 +
+ security/keys/proc.c                     |    3 
+ security/keys/process_keys.c             |  252 ++++++++++++++++++-----------
+ security/keys/request_key.c              |  113 +++++++------
+ security/keys/request_key_auth.c         |    3 
+ 33 files changed, 508 insertions(+), 339 deletions(-)
 
