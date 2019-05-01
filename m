@@ -1,88 +1,117 @@
-Return-Path: <SRS0=PRx5=TA=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=Yxz/=TB=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7D5AC43219
-	for <linux-cifs@archiver.kernel.org>; Tue, 30 Apr 2019 15:52:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B27CC43219
+	for <linux-cifs@archiver.kernel.org>; Wed,  1 May 2019 02:03:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8DA7220835
-	for <linux-cifs@archiver.kernel.org>; Tue, 30 Apr 2019 15:52:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N2A4SQtJ"
+	by mail.kernel.org (Postfix) with ESMTP id 11AE120866
+	for <linux-cifs@archiver.kernel.org>; Wed,  1 May 2019 02:03:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726014AbfD3Pwd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 30 Apr 2019 11:52:33 -0400
-Received: from mail-pl1-f181.google.com ([209.85.214.181]:35976 "EHLO
-        mail-pl1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725930AbfD3Pwd (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 Apr 2019 11:52:33 -0400
-Received: by mail-pl1-f181.google.com with SMTP id w20so6305289plq.3
-        for <linux-cifs@vger.kernel.org>; Tue, 30 Apr 2019 08:52:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=JENNT/zMh7cjuzo3wyN9F1O/GbACKbzf2WjWeWhoVrA=;
-        b=N2A4SQtJ9c08ymo+fvhcZO32PrCqXYzx3pxffh3RhordqE9FbtGhoxPYi4w4q5D1Ci
-         v1X+vxKzFL4+roTfOQvu484DgTBCqCaQuzI+23dwW4RPHx4D7Ga66PhburiFidX9Wvf5
-         9n2PIQzGooB+sqrlWIZEgbpKw4lM0/8u7z1YWCBTORr3D1NjxvrM43/Gb2pc1/IXvvdU
-         eG1EUqCAQ2JnHgcugp/Ih4YmPE7b7U+DnhwYyiVINyTeOQf8Rw4/s9lCcy9HrKEzdiX+
-         ESfrlt72e3TqlCfe5jAFiBYe9/umgxx5vpv6mThOSNymlKqc2woW5qL7AbarJfzq5sVn
-         k3VA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=JENNT/zMh7cjuzo3wyN9F1O/GbACKbzf2WjWeWhoVrA=;
-        b=UTEB+ynpKl3+ePO4nEF7YpgtGHE2RgKLyX+IH1KP9L+hVX/Cgs6W1br7c6JnFN7KnR
-         Jh/r5gwYXpfsk2WMhI736V3mK6DFFL8aBQUIzGaYHA7VWVUOntT+8bLjUc6TwnkIxrwU
-         57EEtZCisl5eVwH46dQTgimsqd+DsCdbKbCHcedNix2wDrxMtjdcscnSHwzcQX2nN4jT
-         rp83aJ3MPXVii3Ow+HJUWrM/z/DcB4nlGLeb/xucc8C9TeI3CTBFB9O2UtTaj+qT/1rU
-         NeRvd40zXzNhRhfuKVzw4v6aucwOqqIKfL+uee40wj/5+mG2aH91pXlmBxmWCkFh4Bj/
-         Xe4Q==
-X-Gm-Message-State: APjAAAUZkI4Cl5QaLEtqeu8TPFW2I6KjEwhXsxBYad80oHeleutlDnsC
-        gh5t1reK0JXe7dNoitr/YCJ6qDK0AZr1BpG13hq+AYoXJJw=
-X-Google-Smtp-Source: APXvYqzqQ0B2d6mU6lh1kXQ75INbI04E8Ur6adjrx6fFWQHFwQr/xy/UKMIOE2tETU90kEPWKR7wGD357j3fH6STQuQ=
-X-Received: by 2002:a17:902:b105:: with SMTP id q5mr13950901plr.290.1556639552027;
- Tue, 30 Apr 2019 08:52:32 -0700 (PDT)
-MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 30 Apr 2019 10:52:21 -0500
-Message-ID: <CAH2r5mtxU3aONRMaZLKEMPBWydDZgjSiBS07sHXXK0zUeBmUdQ@mail.gmail.com>
-Subject: Tests 112 and 469
-To:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        id S1726559AbfEACDw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 30 Apr 2019 22:03:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43444 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726115AbfEACDw (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 30 Apr 2019 22:03:52 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 1553330832C2;
+        Wed,  1 May 2019 02:03:52 +0000 (UTC)
+Received: from test1135.test.redhat.com (vpn2-54-54.bne.redhat.com [10.64.54.54])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6E48318A46;
+        Wed,  1 May 2019 02:03:51 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>, Stable <stable@vger.kernel.org>,
+        Pavel Shilovsky <pshilov@microsoft.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>
+Subject: [PATCH] cifs: fix credits leak for SMB1 oplock breaks
+Date:   Wed,  1 May 2019 12:03:41 +1000
+Message-Id: <20190501020341.9146-1-lsahlber@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Wed, 01 May 2019 02:03:52 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This patch is odd because it fails xfstests 112 and 469 to Azure, even
-though Azure doesn't support the operation so should skip the same
-part of the test with or without Ronnie's patch and tests should work.
+For SMB1 oplock breaks we would grab one credit while sending the PDU
+but we would never relese the credit back since we will never receive a
+response to this from the server. Eventuallt this would lead to a hang
+once all credits are leaked.
 
+Fix this by defining a new flag CIFS_NO_SRV_RSP which indicates that there
+is no server response to this command and thus we need to add any credits back
+immediately after sending the PDU.
 
-commit d008b979e8e6196ab3f916ca076448f5c9f527f3 (HEAD, origin/for-next)
-Author: Ronnie Sahlberg <lsahlber@redhat.com>
-Date:   Fri Apr 12 09:56:23 2019 +1000
+CC: Stable <stable@vger.kernel.org> #v5.0+
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+---
+ fs/cifs/cifsglob.h  |  1 +
+ fs/cifs/cifssmb.c   |  2 +-
+ fs/cifs/transport.c | 10 +++++-----
+ 3 files changed, 7 insertions(+), 6 deletions(-)
 
-    cifs: zero-range does not require the file is sparse
-
-    Remove the conditional to fail zero-range if the file is not
-flagged as sparse.
-    You can still zero out a range in SMB2 even for non-sparse files.
-
-    Tested with stock windows16 server.
-
-    Fixes 5 xfstests (033, 149, 155, 180, 349)
-
-    Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-
-
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 621640195713..7a65124f70f9 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -1701,6 +1701,7 @@ static inline bool is_retryable_error(int error)
+ 
+ #define   CIFS_HAS_CREDITS 0x0400    /* already has credits */
+ #define   CIFS_TRANSFORM_REQ 0x0800    /* transform request before sending */
++#define   CIFS_NO_SRV_RSP    0x1000    /* there is no server response */
+ 
+ /* Security Flags: indicate type of session setup needed */
+ #define   CIFSSEC_MAY_SIGN	0x00001
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index f43747c062a7..6050851edcb8 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -2540,7 +2540,7 @@ CIFSSMBLock(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	if (lockType == LOCKING_ANDX_OPLOCK_RELEASE) {
+ 		/* no response expected */
+-		flags = CIFS_ASYNC_OP | CIFS_OBREAK_OP;
++		flags = CIFS_NO_SRV_RSP | CIFS_ASYNC_OP | CIFS_OBREAK_OP;
+ 		pSMB->Timeout = 0;
+ 	} else if (waitFlag) {
+ 		flags = CIFS_BLOCKING_OP; /* blocking operation, no timeout */
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 5c59c498f56a..5573e38b13f3 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -1073,8 +1073,11 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 
+ 	mutex_unlock(&ses->server->srv_mutex);
+ 
+-	if (rc < 0) {
+-		/* Sending failed for some reason - return credits back */
++	/*
++	 * If sending failed for some reason or it is an oplock break that we
++	 * will not receive a response to - return credits back
++	 */
++	if (rc < 0 || (flags & CIFS_NO_SRV_RSP)) {
+ 		for (i = 0; i < num_rqst; i++)
+ 			add_credits(ses->server, &credits[i], optype);
+ 		goto out;
+@@ -1095,9 +1098,6 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 		smb311_update_preauth_hash(ses, rqst[0].rq_iov,
+ 					   rqst[0].rq_nvec);
+ 
+-	if ((flags & CIFS_TIMEOUT_MASK) == CIFS_ASYNC_OP)
+-		goto out;
+-
+ 	for (i = 0; i < num_rqst; i++) {
+ 		rc = wait_for_response(ses->server, midQ[i]);
+ 		if (rc != 0)
 -- 
-Thanks,
+2.13.6
 
-Steve
