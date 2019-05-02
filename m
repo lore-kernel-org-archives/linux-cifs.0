@@ -1,108 +1,147 @@
-Return-Path: <SRS0=Yxz/=TB=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=G37X=TC=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1587DC43219
-	for <linux-cifs@archiver.kernel.org>; Wed,  1 May 2019 15:36:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0AA1C43219
+	for <linux-cifs@archiver.kernel.org>; Thu,  2 May 2019 05:53:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D989D208C3
-	for <linux-cifs@archiver.kernel.org>; Wed,  1 May 2019 15:36:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LP9NRNoA"
+	by mail.kernel.org (Postfix) with ESMTP id 8942F2081C
+	for <linux-cifs@archiver.kernel.org>; Thu,  2 May 2019 05:53:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726586AbfEAPgJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 1 May 2019 11:36:09 -0400
-Received: from mail-pl1-f181.google.com ([209.85.214.181]:32981 "EHLO
-        mail-pl1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726579AbfEAPgJ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 May 2019 11:36:09 -0400
-Received: by mail-pl1-f181.google.com with SMTP id y3so7499621plp.0
-        for <linux-cifs@vger.kernel.org>; Wed, 01 May 2019 08:36:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=swugMe8TeMhTfpmnJWAJYHeG1IlveAd0mG2zpm5gwAc=;
-        b=LP9NRNoAwV9o/wOGUluwaFXEkB9k0nhVwJlOQfDw2m+V6AstxJdMn0sDE2RsMm7tis
-         MyIs9TtE4REHRLp/qNkIKu6NEBlJzVoGDk0TX1B8T4NxiK6E5//kC8KlfGJFHHg0kXjz
-         u9Iggoy0wijsLP5ByI9Yyl/C0y07QBfCwu5S/GNrdWeifqb+sRv90khV1d5Ni9lFEjXL
-         ZUsnsyCKVOtJCyY6tw+DS92ySmBQihO79QL/HyKrixqzH+54ZixZonjuz/lMYBfiRvcz
-         Yfvnic5XfJIiQj7Ge3DQzsRRO+GrybBiMZkGMFgqYycF/bvn925A9y7v6T7HUdlDtsw4
-         0xlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=swugMe8TeMhTfpmnJWAJYHeG1IlveAd0mG2zpm5gwAc=;
-        b=c0WcCOveAmHThhAT9FWShSCMth6CNEGHnskTD6FZzz+vKVqtoy1cAHc7KjkRQZgO0e
-         s8y423a5Flth3JjwNyGgz29XpZoKRxJoR9XM/52AK/GREcuwBrgtfvEjQQlS0na3MDbG
-         q6ZpK436LQ5Kb5cfz9vbN0JaY0R0fVJzZpuXEHFeKf+L7VD8wArmTZABZgrZk2uvY6+E
-         UGZOAhGYbh4D3CCQAFC9T5EmGDywMgcwLg2JcDnbe8x02lvngej9FTsuB4GeDIV+KiDn
-         MfCMkbL7m5tU1NKSL6Kqk1up7f+ibWmjMfDFYyau8MdW6ZCpCNtU8uBQCsCF3557vvGx
-         BYVw==
-X-Gm-Message-State: APjAAAWjWCBXj02zEWg5qL40Fcf0WHevuJj8Ff05idbC5NbZsIeWBq95
-        SMrXMBPpOQ93VKeU1MjDFuRIE3UUK/arhP8cg8QYHfAh
-X-Google-Smtp-Source: APXvYqyO6IHkXo9FJCnvezNoBeS4P6MmQOQ9leW9aiNzauHyBHZ6ZYca7+NRguMP5qq6DaNsVEhLbTighGs1QHy8HWQ=
-X-Received: by 2002:a17:902:8609:: with SMTP id f9mr10715537plo.32.1556724968277;
- Wed, 01 May 2019 08:36:08 -0700 (PDT)
-MIME-Version: 1.0
-References: <1666985748.6396792.1556614132673.JavaMail.zimbra@redhat.com> <151404631.6398428.1556614866154.JavaMail.zimbra@redhat.com>
-In-Reply-To: <151404631.6398428.1556614866154.JavaMail.zimbra@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 1 May 2019 10:35:54 -0500
-Message-ID: <CAH2r5mt-2bzR38t5VyNDsjV2YxOpTkNBhTKsVwP5QFqD9OjGjQ@mail.gmail.com>
-Subject: Re: Memory alignment requirement for Direct/IO
-To:     Xiaoli Feng <xifeng@redhat.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        id S1725764AbfEBFxG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 2 May 2019 01:53:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35812 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725763AbfEBFxG (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 2 May 2019 01:53:06 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C74A637E7B;
+        Thu,  2 May 2019 05:53:05 +0000 (UTC)
+Received: from test1135.test.redhat.com (vpn2-54-54.bne.redhat.com [10.64.54.54])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2A1078A299;
+        Thu,  2 May 2019 05:53:04 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>
+Subject: [PATCH] cifs: fix smb3_zero_range for Azure
+Date:   Thu,  2 May 2019 15:52:57 +1000
+Message-Id: <20190502055257.31219-1-lsahlber@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Thu, 02 May 2019 05:53:05 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I would expect direct i/o to work with unaligned reads over SMB3 mounts.
+For zero-range that also extend the file we were sending this as a
+compound of two different operations; a fsctl to set-zero-data for the range
+and then an additional set-info to extend the file size.
+This does not work for Azure since it does not support this fsctl which leads
+to fallocate(FALLOC_FL_ZERO_RANGE) failing but still changing the file size.
 
-Let me know if you see different behavior to any servers.
+To fix this we un-compound this and send these two operations as separate
+commands, firsat one command to set-zero-data for the range and it this
+was successful we proceed to send a set-info to update the file size.
 
-On Tue, Apr 30, 2019 at 4:01 AM Xiaoli Feng <xifeng@redhat.com> wrote:
->
-> Hello,
->
-> I setup samba server in upstream  and mount it in local with cache=3Dnone=
-,vers=3D3.11. Then test
-> the Direct/IO function like this:
->
-> fd=3Dopen(fname, O_DIRECT | O_RDWR | O_CREAT, 0666))
-> lseek(fd, 0, SEEK_SET);
-> read(fd, buf, 1);
->
-> For local filesystem such as XFS, "read" will be failed because XFS has 5=
-12Byte memory aligment
-> for Direct/IO. But it's success for cifs. I don't know if it's expected. =
-Could anybody tell me
-> more about Direct/IO for cifs?
->
-> Thanks.
->
-> --
-> Best regards!
-> XiaoLi Feng =E5=86=AF=E5=B0=8F=E4=B8=BD
->
-> Red Hat Software (Beijing) Co.,Ltd
-> filesystem-qe Team
-> IRC:xifeng=EF=BC=8C#channel: fs-qe
-> Tel:+86-10-8388112
-> 9/F, Raycom
+This fixes xfstest generic/469 for Azure servers.
 
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+---
+ fs/cifs/smb2ops.c | 54 +++++++-----------------------------------------------
+ 1 file changed, 7 insertions(+), 47 deletions(-)
 
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 9b7a2f448591..860dd1696830 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -2648,16 +2648,8 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
+ 	struct cifsInodeInfo *cifsi;
+ 	struct cifsFileInfo *cfile = file->private_data;
+ 	struct file_zero_data_information fsctl_buf;
+-	struct smb_rqst rqst[2];
+-	int resp_buftype[2];
+-	struct kvec rsp_iov[2];
+-	struct kvec io_iov[SMB2_IOCTL_IOV_SIZE];
+-	struct kvec si_iov[1];
+-	unsigned int size[1];
+-	void *data[1];
+ 	long rc;
+ 	unsigned int xid;
+-	int num = 0, flags = 0;
+ 	__le64 eof;
+ 
+ 	xid = get_xid();
+@@ -2684,22 +2676,11 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
+ 	fsctl_buf.FileOffset = cpu_to_le64(offset);
+ 	fsctl_buf.BeyondFinalZero = cpu_to_le64(offset + len);
+ 
+-	if (smb3_encryption_required(tcon))
+-		flags |= CIFS_TRANSFORM_REQ;
+-
+-	memset(rqst, 0, sizeof(rqst));
+-	resp_buftype[0] = resp_buftype[1] = CIFS_NO_BUFFER;
+-	memset(rsp_iov, 0, sizeof(rsp_iov));
+-
+-
+-	memset(&io_iov, 0, sizeof(io_iov));
+-	rqst[num].rq_iov = io_iov;
+-	rqst[num].rq_nvec = SMB2_IOCTL_IOV_SIZE;
+-	rc = SMB2_ioctl_init(tcon, &rqst[num++], cfile->fid.persistent_fid,
+-			     cfile->fid.volatile_fid, FSCTL_SET_ZERO_DATA,
+-			     true /* is_fctl */, (char *)&fsctl_buf,
+-			     sizeof(struct file_zero_data_information),
+-			     CIFSMaxBufSize);
++	rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
++			cfile->fid.volatile_fid, FSCTL_SET_ZERO_DATA, true,
++			(char *)&fsctl_buf,
++			sizeof(struct file_zero_data_information),
++			0, NULL, NULL);
+ 	if (rc)
+ 		goto zero_range_exit;
+ 
+@@ -2707,33 +2688,12 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
+ 	 * do we also need to change the size of the file?
+ 	 */
+ 	if (keep_size == false && i_size_read(inode) < offset + len) {
+-		smb2_set_next_command(tcon, &rqst[0]);
+-
+-		memset(&si_iov, 0, sizeof(si_iov));
+-		rqst[num].rq_iov = si_iov;
+-		rqst[num].rq_nvec = 1;
+-
+ 		eof = cpu_to_le64(offset + len);
+-		size[0] = 8; /* sizeof __le64 */
+-		data[0] = &eof;
+-
+-		rc = SMB2_set_info_init(tcon, &rqst[num++],
+-					cfile->fid.persistent_fid,
+-					cfile->fid.persistent_fid,
+-					current->tgid,
+-					FILE_END_OF_FILE_INFORMATION,
+-					SMB2_O_INFO_FILE, 0, data, size);
+-		smb2_set_related(&rqst[1]);
++		rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
++				  cfile->fid.volatile_fid, cfile->pid, &eof);
+ 	}
+ 
+-	rc = compound_send_recv(xid, ses, flags, num, rqst,
+-				resp_buftype, rsp_iov);
+-
+  zero_range_exit:
+-	SMB2_ioctl_free(&rqst[0]);
+-	SMB2_set_info_free(&rqst[1]);
+-	free_rsp_buf(resp_buftype[0], rsp_iov[0].iov_base);
+-	free_rsp_buf(resp_buftype[1], rsp_iov[1].iov_base);
+ 	free_xid(xid);
+ 	if (rc)
+ 		trace_smb3_zero_err(xid, cfile->fid.persistent_fid, tcon->tid,
+-- 
+2.13.6
 
---=20
-Thanks,
-
-Steve
