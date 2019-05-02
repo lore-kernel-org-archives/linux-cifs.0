@@ -2,146 +2,130 @@ Return-Path: <SRS0=G37X=TC=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0AA1C43219
-	for <linux-cifs@archiver.kernel.org>; Thu,  2 May 2019 05:53:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7F0AC43219
+	for <linux-cifs@archiver.kernel.org>; Thu,  2 May 2019 15:13:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8942F2081C
-	for <linux-cifs@archiver.kernel.org>; Thu,  2 May 2019 05:53:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A1FB520675
+	for <linux-cifs@archiver.kernel.org>; Thu,  2 May 2019 15:13:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JlolP3VN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725764AbfEBFxG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 2 May 2019 01:53:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35812 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725763AbfEBFxG (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 2 May 2019 01:53:06 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id C74A637E7B;
-        Thu,  2 May 2019 05:53:05 +0000 (UTC)
-Received: from test1135.test.redhat.com (vpn2-54-54.bne.redhat.com [10.64.54.54])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2A1078A299;
-        Thu,  2 May 2019 05:53:04 +0000 (UTC)
-From:   Ronnie Sahlberg <lsahlber@redhat.com>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Steve French <smfrench@gmail.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>
-Subject: [PATCH] cifs: fix smb3_zero_range for Azure
-Date:   Thu,  2 May 2019 15:52:57 +1000
-Message-Id: <20190502055257.31219-1-lsahlber@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Thu, 02 May 2019 05:53:05 +0000 (UTC)
+        id S1726533AbfEBPNg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 2 May 2019 11:13:36 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:33493 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726508AbfEBPNg (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 2 May 2019 11:13:36 -0400
+Received: by mail-pl1-f194.google.com with SMTP id y3so1184641plp.0
+        for <linux-cifs@vger.kernel.org>; Thu, 02 May 2019 08:13:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ytkeotxqZMK+Pphx8YBNVSrBa2jJYvjrofY1/wEO/Ns=;
+        b=JlolP3VNtmB3piHgYExaILh0eaeOxzoKa+o453ZqajfxAFvKoQc6BLCOE75V5ReScE
+         refIkDa20vnCkTZiqEkYTvrI0jqEEh2AXSNySkCe7iI69qIbcjROTlYKzM4Ba57b+FQK
+         02eBqdG37b38nBHCUVa9VLn9HTBOMFWMyQdTySHfwJgHS4PKg6+SzgakucErnmOLwuJo
+         unnkASs6OnyWNP7qUB6BkC/H/MbJGmRJo2OSfr/7YlN2upBwcECQSdIes8RZkmzxzvE7
+         agwihi4+d5t4uoL7qz6h0+NH6Z7J6XEuyJKC+OdEBIDw7Bk1CYl9bQM5B+GxKZ8u2nvD
+         KUiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ytkeotxqZMK+Pphx8YBNVSrBa2jJYvjrofY1/wEO/Ns=;
+        b=oWaQ0oGEztB2vBsObwYoRgKxA85TS6bh2A3MI0hQJsWphyXsymb/A+EGy5NbE8n/X5
+         UWyyuhzzr4lS2seHmOn8Ww4BW8VngZVYTDaCdcKKFBGUy52j8bHe34BTMZLSFdoNsgjt
+         zN8QnhoKjp4ej2BMK8cagBUNWchbJZAWtIoibxrb3jOgfK13EPIfW4213c+zpIXD+/2s
+         BDBFBLx3zWpKBtcVcpfRiKVSG3sReEOntrmeLXwZBQIRylyvu/tJQrCFH8f3QIT2p7W2
+         Pi0jnyo5LC37R9OOHlZCMflxLwJxxd1yqNSIywy/8hydK3RSo8fI/dpBSfIFLS6xgTbT
+         5Pzw==
+X-Gm-Message-State: APjAAAUV47wtfh2qS4gUoUU+r+HiibTM4xuNfIO5PB1HpepLgiUX+el9
+        NbwDw9W+Zny1BqejJ4dpFBgbAfD1y7xL9U8CE8k=
+X-Google-Smtp-Source: APXvYqxRaVJ1ZvMD65K8iaD0idLyT/VtUkYbZ8zzx61uHRVijYtv/xeXUpqjfHikDuVpgLwynuVM9Erapx7YybujNYo=
+X-Received: by 2002:a17:902:b617:: with SMTP id b23mr4120030pls.73.1556810015180;
+ Thu, 02 May 2019 08:13:35 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190501205541.GC30899@veci.piliscsaba.redhat.com>
+In-Reply-To: <20190501205541.GC30899@veci.piliscsaba.redhat.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 2 May 2019 10:13:23 -0500
+Message-ID: <CAH2r5mt+j9ozVuvNB8qZ=KmnHHqT4Vyd6f_jKVY2232aECH04w@mail.gmail.com>
+Subject: Re: [RFC PATCH] network fs notification
+To:     Miklos Szeredi <miklos@szeredi.hu>,
+        CIFS <linux-cifs@vger.kernel.org>
+Cc:     Jan Kara <jack@suse.cz>, Amir Goldstein <amir73il@gmail.com>,
+        samba-technical <samba-technical@lists.samba.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-For zero-range that also extend the file we were sending this as a
-compound of two different operations; a fsctl to set-zero-data for the range
-and then an additional set-info to extend the file size.
-This does not work for Azure since it does not support this fsctl which leads
-to fallocate(FALLOC_FL_ZERO_RANGE) failing but still changing the file size.
+Adding linux-cifs
 
-To fix this we un-compound this and send these two operations as separate
-commands, firsat one command to set-zero-data for the range and it this
-was successful we proceed to send a set-info to update the file size.
+Will take a look today - looks promising
 
-This fixes xfstest generic/469 for Azure servers.
+On Wed, May 1, 2019 at 3:55 PM Miklos Szeredi <miklos@szeredi.hu> wrote:
+>
+> This is a really really trivial first iteration, but I think it's enough to
+> try out CIFS notification support.  Doesn't deal with mark deletion, but
+> that's best effort anyway: fsnotify() will filter out unneeded events.
+>
+> Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
+> ---
+>  fs/notify/fanotify/fanotify_user.c |    6 +++++-
+>  fs/notify/inotify/inotify_user.c   |    2 ++
+>  include/linux/fs.h                 |    1 +
+>  3 files changed, 8 insertions(+), 1 deletion(-)
+>
+> --- a/fs/notify/fanotify/fanotify_user.c
+> +++ b/fs/notify/fanotify/fanotify_user.c
+> @@ -1041,9 +1041,13 @@ static int do_fanotify_mark(int fanotify
+>                 else if (mark_type == FAN_MARK_FILESYSTEM)
+>                         ret = fanotify_add_sb_mark(group, mnt->mnt_sb, mask,
+>                                                    flags, fsid);
+> -               else
+> +               else {
+>                         ret = fanotify_add_inode_mark(group, inode, mask,
+>                                                       flags, fsid);
+> +
+> +                       if (!ret && inode->i_op->notify_update)
+> +                               inode->i_op->notify_update(inode);
+> +               }
+>                 break;
+>         case FAN_MARK_REMOVE:
+>                 if (mark_type == FAN_MARK_MOUNT)
+> --- a/fs/notify/inotify/inotify_user.c
+> +++ b/fs/notify/inotify/inotify_user.c
+> @@ -754,6 +754,8 @@ SYSCALL_DEFINE3(inotify_add_watch, int,
+>
+>         /* create/update an inode mark */
+>         ret = inotify_update_watch(group, inode, mask);
+> +       if (!ret && inode->i_op->notify_update)
+> +               inode->i_op->notify_update(inode);
+>         path_put(&path);
+>  fput_and_out:
+>         fdput(f);
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -1852,6 +1852,7 @@ struct inode_operations {
+>                            umode_t create_mode);
+>         int (*tmpfile) (struct inode *, struct dentry *, umode_t);
+>         int (*set_acl)(struct inode *, struct posix_acl *, int);
+> +       void (*notify_update)(struct inode *inode);
+>  } ____cacheline_aligned;
+>
+>  static inline ssize_t call_read_iter(struct file *file, struct kiocb *kio,
 
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
----
- fs/cifs/smb2ops.c | 54 +++++++-----------------------------------------------
- 1 file changed, 7 insertions(+), 47 deletions(-)
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 9b7a2f448591..860dd1696830 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -2648,16 +2648,8 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
- 	struct cifsInodeInfo *cifsi;
- 	struct cifsFileInfo *cfile = file->private_data;
- 	struct file_zero_data_information fsctl_buf;
--	struct smb_rqst rqst[2];
--	int resp_buftype[2];
--	struct kvec rsp_iov[2];
--	struct kvec io_iov[SMB2_IOCTL_IOV_SIZE];
--	struct kvec si_iov[1];
--	unsigned int size[1];
--	void *data[1];
- 	long rc;
- 	unsigned int xid;
--	int num = 0, flags = 0;
- 	__le64 eof;
- 
- 	xid = get_xid();
-@@ -2684,22 +2676,11 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
- 	fsctl_buf.FileOffset = cpu_to_le64(offset);
- 	fsctl_buf.BeyondFinalZero = cpu_to_le64(offset + len);
- 
--	if (smb3_encryption_required(tcon))
--		flags |= CIFS_TRANSFORM_REQ;
--
--	memset(rqst, 0, sizeof(rqst));
--	resp_buftype[0] = resp_buftype[1] = CIFS_NO_BUFFER;
--	memset(rsp_iov, 0, sizeof(rsp_iov));
--
--
--	memset(&io_iov, 0, sizeof(io_iov));
--	rqst[num].rq_iov = io_iov;
--	rqst[num].rq_nvec = SMB2_IOCTL_IOV_SIZE;
--	rc = SMB2_ioctl_init(tcon, &rqst[num++], cfile->fid.persistent_fid,
--			     cfile->fid.volatile_fid, FSCTL_SET_ZERO_DATA,
--			     true /* is_fctl */, (char *)&fsctl_buf,
--			     sizeof(struct file_zero_data_information),
--			     CIFSMaxBufSize);
-+	rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
-+			cfile->fid.volatile_fid, FSCTL_SET_ZERO_DATA, true,
-+			(char *)&fsctl_buf,
-+			sizeof(struct file_zero_data_information),
-+			0, NULL, NULL);
- 	if (rc)
- 		goto zero_range_exit;
- 
-@@ -2707,33 +2688,12 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
- 	 * do we also need to change the size of the file?
- 	 */
- 	if (keep_size == false && i_size_read(inode) < offset + len) {
--		smb2_set_next_command(tcon, &rqst[0]);
--
--		memset(&si_iov, 0, sizeof(si_iov));
--		rqst[num].rq_iov = si_iov;
--		rqst[num].rq_nvec = 1;
--
- 		eof = cpu_to_le64(offset + len);
--		size[0] = 8; /* sizeof __le64 */
--		data[0] = &eof;
--
--		rc = SMB2_set_info_init(tcon, &rqst[num++],
--					cfile->fid.persistent_fid,
--					cfile->fid.persistent_fid,
--					current->tgid,
--					FILE_END_OF_FILE_INFORMATION,
--					SMB2_O_INFO_FILE, 0, data, size);
--		smb2_set_related(&rqst[1]);
-+		rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
-+				  cfile->fid.volatile_fid, cfile->pid, &eof);
- 	}
- 
--	rc = compound_send_recv(xid, ses, flags, num, rqst,
--				resp_buftype, rsp_iov);
--
-  zero_range_exit:
--	SMB2_ioctl_free(&rqst[0]);
--	SMB2_set_info_free(&rqst[1]);
--	free_rsp_buf(resp_buftype[0], rsp_iov[0].iov_base);
--	free_rsp_buf(resp_buftype[1], rsp_iov[1].iov_base);
- 	free_xid(xid);
- 	if (rc)
- 		trace_smb3_zero_err(xid, cfile->fid.persistent_fid, tcon->tid,
+
 -- 
-2.13.6
+Thanks,
 
+Steve
