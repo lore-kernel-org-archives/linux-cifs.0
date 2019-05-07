@@ -2,93 +2,71 @@ Return-Path: <SRS0=vQ6B=TH=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	T_DKIMWL_WL_HIGH,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BFF0C004C9
-	for <linux-cifs@archiver.kernel.org>; Tue,  7 May 2019 05:48:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08681C004C9
+	for <linux-cifs@archiver.kernel.org>; Tue,  7 May 2019 06:09:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 20ED0204FD
-	for <linux-cifs@archiver.kernel.org>; Tue,  7 May 2019 05:48:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1557208082;
-	bh=pBvqJq9KybAlgRuI+BIKTZnJZ7Dwrfn+zeyx2dxlZIU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=PtRql0ApE0MQkEYbLsOnrCm9P84EFCE+X3GxMryfyZ131UYAdFWo9Ey3YHyh4fVJb
-	 KrSRRCHChOqzcNGuvxMMkaeTx74jWnHjmiQ787dvwEbf4pReMgCJy1pY9QnabWi1sy
-	 8jZ4FpJdRwJqq/paPyZVDgvmjb/y6xb+0TCuFtaE=
+	by mail.kernel.org (Postfix) with ESMTP id D6E272087F
+	for <linux-cifs@archiver.kernel.org>; Tue,  7 May 2019 06:09:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729253AbfEGFlB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 7 May 2019 01:41:01 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60452 "EHLO mail.kernel.org"
+        id S1726008AbfEGGJm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 7 May 2019 02:09:42 -0400
+Received: from mx1.chost.de ([5.175.28.52]:33198 "EHLO mx1.chost.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725926AbfEGFk7 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 7 May 2019 01:40:59 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 520B521655;
-        Tue,  7 May 2019 05:40:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1557207659;
-        bh=pBvqJq9KybAlgRuI+BIKTZnJZ7Dwrfn+zeyx2dxlZIU=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=T42delRmi2wBgbDfyxBMZ6WZzE5ry98vfjZiuseRezLA93j6WOx0cXskBkpBncmIR
-         6XuXkJNZWqg//23ppKb/9cXh8WKDtfVZMEsTr4kqY2AaC0SlVcwUPVv1jKsDrDGluv
-         fkCs77r+dFZk8owF7pC2EDh72mmeaA8St3H/LL0U=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        Pavel Shilovsky <pshilov@microsoft.com>,
-        Steve French <stfrench@microsoft.com>,
-        Sasha Levin <alexander.levin@microsoft.com>,
-        linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 83/95] cifs: fix memory leak in SMB2_read
-Date:   Tue,  7 May 2019 01:38:12 -0400
-Message-Id: <20190507053826.31622-83-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190507053826.31622-1-sashal@kernel.org>
-References: <20190507053826.31622-1-sashal@kernel.org>
-MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+        id S1725780AbfEGGJm (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 7 May 2019 02:09:42 -0400
+Received: from vm002.chost.de ([::ffff:192.168.122.102])
+  by mx1.chost.de with SMTP; Tue, 07 May 2019 08:10:28 +0200
+  id 000000000133ACB4.000000005CD12154.00006711
+Received: by vm002.chost.de (sSMTP sendmail emulation); Tue, 07 May 2019 08:10:28 +0200
+Date:   Tue, 7 May 2019 08:10:28 +0200
+From:   Christoph Probst <kernel@probst.it>
+To:     Steve French <smfrench@gmail.com>
+Cc:     Pavel Shilovsky <pavel.shilovsky@gmail.com>,
+        Jeremy Allison <jra@samba.org>,
+        Steve French <sfrench@samba.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] cifs: fix strcat buffer overflow in
+ smb21_set_oplock_level()
+Message-ID: <20190507061028.GP28577@netzpunkt.org>
+References: <1557155792-2703-1-git-send-email-kernel@probst.it>
+ <CAH2r5mtdpOvcE25P2UuNFpOwsNyFiBWRQELQFui+FJGVOOBV8w@mail.gmail.com>
+ <20190506165658.GA168433@jra4>
+ <CAH2r5msK6yNNm_QbdsFZuB5uS0iNRuqe8gSDKvVAiR0N6E3MWg@mail.gmail.com>
+ <CAKywueR6DcfkzGcZUgydV4n6F4MKDEOvtCaM-gQSonX02tA9tg@mail.gmail.com>
+ <CAH2r5ms+RAoe_1c=dUYL=yCs3KWAvqoB00-T4SEpyTjRKiwA6A@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <CAH2r5ms+RAoe_1c=dUYL=yCs3KWAvqoB00-T4SEpyTjRKiwA6A@mail.gmail.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Ronnie Sahlberg <lsahlber@redhat.com>
 
-[ Upstream commit 05fd5c2c61732152a6bddc318aae62d7e436629b ]
+Steve French schrieb am 06.05.2019 um 23:18 Uhr:
 
-Commit 088aaf17aa79300cab14dbee2569c58cfafd7d6e introduced a leak where
-if SMB2_read() returned an error we would return without freeing the
-request buffer.
+> On Mon, May 6, 2019 at 2:03 PM Pavel Shilovsky
+> <pavel.shilovsky@gmail.com> wrote:
+> >
+> > The patch itself is fine but I think we have a bigger problem here:
+> 
+> Good point.  Perhaps make update to the same patch to include both changes
 
-Cc: Stable <stable@vger.kernel.org>
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
----
- fs/cifs/smb2pdu.c | 1 +
- 1 file changed, 1 insertion(+)
+I'll update my patch to implement the change suggested by Pavel.
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index fd2d199dd413..7936eac5a38a 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -2699,6 +2699,7 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
- 			cifs_dbg(VFS, "Send error in read = %d\n", rc);
- 		}
- 		free_rsp_buf(resp_buftype, rsp_iov.iov_base);
-+		cifs_small_buf_release(req);
- 		return rc == -ENODATA ? 0 : rc;
- 	}
- 
--- 
-2.20.1
+I'll also switch the strcat to strncat and use strncpy in the "None"-case.
+
+Regards,
+Christoph
+
+
 
