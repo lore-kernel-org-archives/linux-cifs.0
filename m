@@ -2,82 +2,89 @@ Return-Path: <SRS0=vQ6B=TH=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC96BC004C9
-	for <linux-cifs@archiver.kernel.org>; Tue,  7 May 2019 11:02:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FC24C004C9
+	for <linux-cifs@archiver.kernel.org>; Tue,  7 May 2019 15:16:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 907E1204FD
-	for <linux-cifs@archiver.kernel.org>; Tue,  7 May 2019 11:02:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 62173205ED
+	for <linux-cifs@archiver.kernel.org>; Tue,  7 May 2019 15:16:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726280AbfEGLCW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 7 May 2019 07:02:22 -0400
-Received: from eu-smtp-delivery-151.mimecast.com ([146.101.78.151]:44209 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725844AbfEGLCV (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 7 May 2019 07:02:21 -0400
-Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- uk-mta-133-Z7LvMtpWPb6Dn71eQDRXAA-1; Tue, 07 May 2019 12:02:18 +0100
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
- Server (TLS) id 15.0.1347.2; Tue, 7 May 2019 12:02:17 +0100
-Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
- AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
- Tue, 7 May 2019 12:02:17 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Christoph Probst' <kernel@probst.it>,
-        Steve French <smfrench@gmail.com>
-CC:     Pavel Shilovsky <pavel.shilovsky@gmail.com>,
-        Jeremy Allison <jra@samba.org>,
-        Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH] cifs: fix strcat buffer overflow in
- smb21_set_oplock_level()
-Thread-Topic: [PATCH] cifs: fix strcat buffer overflow in
- smb21_set_oplock_level()
-Thread-Index: AQHVBJvh1o1b9HpHQUCQA02eCi68YKZffshw
-Date:   Tue, 7 May 2019 11:02:17 +0000
-Message-ID: <e83726b3537a46fa84249c4caabbe839@AcuMS.aculab.com>
-References: <1557155792-2703-1-git-send-email-kernel@probst.it>
- <CAH2r5mtdpOvcE25P2UuNFpOwsNyFiBWRQELQFui+FJGVOOBV8w@mail.gmail.com>
- <20190506165658.GA168433@jra4>
- <CAH2r5msK6yNNm_QbdsFZuB5uS0iNRuqe8gSDKvVAiR0N6E3MWg@mail.gmail.com>
- <CAKywueR6DcfkzGcZUgydV4n6F4MKDEOvtCaM-gQSonX02tA9tg@mail.gmail.com>
- <CAH2r5ms+RAoe_1c=dUYL=yCs3KWAvqoB00-T4SEpyTjRKiwA6A@mail.gmail.com>
- <20190507061028.GP28577@netzpunkt.org>
-In-Reply-To: <20190507061028.GP28577@netzpunkt.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
-MIME-Version: 1.0
-X-MC-Unique: Z7LvMtpWPb6Dn71eQDRXAA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+        id S1726561AbfEGPQv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 7 May 2019 11:16:51 -0400
+Received: from mx1.chost.de ([5.175.28.52]:53029 "EHLO mx1.chost.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726348AbfEGPQv (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 7 May 2019 11:16:51 -0400
+Received: from vm002.chost.de ([::ffff:192.168.122.102])
+  by mx1.chost.de with SMTP; Tue, 07 May 2019 17:17:39 +0200
+  id 000000000133ACDA.000000005CD1A193.00003808
+Received: by vm002.chost.de (sSMTP sendmail emulation); Tue, 07 May 2019 17:17:38 +0200
+From:   Christoph Probst <kernel@probst.it>
+To:     linux-cifs@vger.kernel.org
+Cc:     Steve French <sfrench@samba.org>, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org, Christoph Probst <kernel@probst.it>
+Subject: [PATCH v2] cifs: fix strcat buffer overflow and reduce raciness in smb21_set_oplock_level()
+Date:   Tue,  7 May 2019 17:16:40 +0200
+Message-Id: <1557242200-26194-1-git-send-email-kernel@probst.it>
+X-Mailer: git-send-email 2.1.4
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-RnJvbTogQ2hyaXN0b3BoIFByb2JzdA0KPiBTZW50OiAwNyBNYXkgMjAxOSAwNzoxMA0KPiBTdGV2
-ZSBGcmVuY2ggc2NocmllYiBhbSAwNi4wNS4yMDE5IHVtIDIzOjE4IFVocjoNCj4gDQo+ID4gT24g
-TW9uLCBNYXkgNiwgMjAxOSBhdCAyOjAzIFBNIFBhdmVsIFNoaWxvdnNreQ0KPiA+IDxwYXZlbC5z
-aGlsb3Zza3lAZ21haWwuY29tPiB3cm90ZToNCj4gPiA+DQo+ID4gPiBUaGUgcGF0Y2ggaXRzZWxm
-IGlzIGZpbmUgYnV0IEkgdGhpbmsgd2UgaGF2ZSBhIGJpZ2dlciBwcm9ibGVtIGhlcmU6DQo+ID4N
-Cj4gPiBHb29kIHBvaW50LiAgUGVyaGFwcyBtYWtlIHVwZGF0ZSB0byB0aGUgc2FtZSBwYXRjaCB0
-byBpbmNsdWRlIGJvdGggY2hhbmdlcw0KPiANCj4gSSdsbCB1cGRhdGUgbXkgcGF0Y2ggdG8gaW1w
-bGVtZW50IHRoZSBjaGFuZ2Ugc3VnZ2VzdGVkIGJ5IFBhdmVsLg0KPiANCj4gSSdsbCBhbHNvIHN3
-aXRjaCB0aGUgc3RyY2F0IHRvIHN0cm5jYXQgYW5kIHVzZSBzdHJuY3B5IGluIHRoZSAiTm9uZSIt
-Y2FzZS4NCg0Kc3RybmNhdCgpIGlzIG5ldmVyIHRoZSBmdW5jdGlvbiB5b3UgYXJlIGxvb2tpbmcg
-Zm9yLg0KVGhlICduJyBpcyB0aGUgbWF4aW11bSBudW1iZXIgb2YgYnl0ZXMgdG8gY29weSwgbm90
-IHRoZSBsZW5ndGgNCm9mIHRoZSB0YXJnZXQgYnVmZmVyLg0KDQoJRGF2aWQNCg0KLQ0KUmVnaXN0
-ZXJlZCBBZGRyZXNzIExha2VzaWRlLCBCcmFtbGV5IFJvYWQsIE1vdW50IEZhcm0sIE1pbHRvbiBL
-ZXluZXMsIE1LMSAxUFQsIFVLDQpSZWdpc3RyYXRpb24gTm86IDEzOTczODYgKFdhbGVzKQ0K
+Change strcat to strncpy in the "None" case to fix a buffer overflow
+when cinode->oplock is reset to 0 by another thread accessing the same
+cinode. It is never valid to append "None" to any other message.
+
+Consolidate multiple writes to cinode->oplock to reduce raciness.
+
+Signed-off-by: Christoph Probst <kernel@probst.it>
+---
+ fs/cifs/smb2ops.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index c36ff0d..aa61dcf 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -2917,26 +2917,28 @@ smb21_set_oplock_level(struct cifsInodeInfo *cinode, __u32 oplock,
+ 		       unsigned int epoch, bool *purge_cache)
+ {
+ 	char message[5] = {0};
++	unsigned int new_oplock = 0;
+ 
+ 	oplock &= 0xFF;
+ 	if (oplock == SMB2_OPLOCK_LEVEL_NOCHANGE)
+ 		return;
+ 
+-	cinode->oplock = 0;
+ 	if (oplock & SMB2_LEASE_READ_CACHING_HE) {
+-		cinode->oplock |= CIFS_CACHE_READ_FLG;
++		new_oplock |= CIFS_CACHE_READ_FLG;
+ 		strcat(message, "R");
+ 	}
+ 	if (oplock & SMB2_LEASE_HANDLE_CACHING_HE) {
+-		cinode->oplock |= CIFS_CACHE_HANDLE_FLG;
++		new_oplock |= CIFS_CACHE_HANDLE_FLG;
+ 		strcat(message, "H");
+ 	}
+ 	if (oplock & SMB2_LEASE_WRITE_CACHING_HE) {
+-		cinode->oplock |= CIFS_CACHE_WRITE_FLG;
++		new_oplock |= CIFS_CACHE_WRITE_FLG;
+ 		strcat(message, "W");
+ 	}
+-	if (!cinode->oplock)
+-		strcat(message, "None");
++	if (!new_oplock)
++		strncpy(message, "None", sizeof(message));
++
++	cinode->oplock = new_oplock;
+ 	cifs_dbg(FYI, "%s Lease granted on inode %p\n", message,
+ 		 &cinode->vfs_inode);
+ }
+-- 
+2.1.4
 
