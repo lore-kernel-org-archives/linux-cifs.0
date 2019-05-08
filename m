@@ -2,206 +2,169 @@ Return-Path: <SRS0=nxME=TI=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 484F0C04AAD
-	for <linux-cifs@archiver.kernel.org>; Wed,  8 May 2019 08:23:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50AEBC04A6B
+	for <linux-cifs@archiver.kernel.org>; Wed,  8 May 2019 18:32:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 21AD321479
-	for <linux-cifs@archiver.kernel.org>; Wed,  8 May 2019 08:23:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A0FF205C9
+	for <linux-cifs@archiver.kernel.org>; Wed,  8 May 2019 18:32:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O+8Jx8jc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726082AbfEHIXv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 8 May 2019 04:23:51 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:36153 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726747AbfEHIXv (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 8 May 2019 04:23:51 -0400
-Received: from mail-pl1-f199.google.com ([209.85.214.199])
-        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-        (Exim 4.76)
-        (envelope-from <kai.heng.feng@canonical.com>)
-        id 1hOHrg-0008J8-7n
-        for linux-cifs@vger.kernel.org; Wed, 08 May 2019 08:23:48 +0000
-Received: by mail-pl1-f199.google.com with SMTP id s19so11095589plp.6
-        for <linux-cifs@vger.kernel.org>; Wed, 08 May 2019 01:23:48 -0700 (PDT)
+        id S1729272AbfEHScr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 8 May 2019 14:32:47 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:35484 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729278AbfEHScr (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 8 May 2019 14:32:47 -0400
+Received: by mail-pf1-f195.google.com with SMTP id t87so10352297pfa.2;
+        Wed, 08 May 2019 11:32:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=Q/xfg+nFGLhPsGBWl9LacPjF3U7jjM06H75mJzsV2Q0=;
+        b=O+8Jx8jcGtkDWgQF5nFQioz658bj+cLJrSm07lLlrnbp3uJE1Gtsu3a+FAEUTPQutZ
+         YN2+2H/uS1o+z6k13VMwXoQjq+to1/uWKLHAlZPf9PMxOsUZ45JsOOLY2rsBScBo3hF8
+         8rCAmDgc5Ajnm/t949yqMSAEhwXDdi+ls+FWEaM9y1XD434UspTi/XANIWIpiUNjA5Uq
+         bhe8g7tGmbDEH2UFF7Oo5W7uPZkmiLXGVy3psqK07G+Qk7Nuqb0dYnkVE/4KQ+e5UKz8
+         99Mygt6uyy27PX9tNDNZtHU5LHY6OEHWENnzQVCnpTS7jOmnzOXDwHVE1gQCFH+mPN52
+         o/vQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=PEIP3gzGSTUOPGUL36azQMiRELQm/3Z3XxB+EuCVXM4=;
-        b=ROwMh6OOTZI2hxunkkkoa2Fk1DfD6g7KMhI4NgNlc5dx9fwsIvzRrkkoF+ZJW77Ark
-         tEwxepPZ9/o1JcBEayAHnpvFCD+ZE+BzRg7FeEOdXlFXEZasoAWEH/QK/kJJ2MFKOwGk
-         wjZ1bW5bK+whL96F0n84/I8QQw33SlJz0zVHZP+Rm/9TB/OYpkXWuzP0cJ+jhzICBuHg
-         odoB6YX2Eo7PnSQh+wc0UwDKFhpRmtj/ik8IWLcHrM7xBwgvbKZRSwtJAnVU0y7fxGyR
-         0SMaEFF14R3j41w2Y9+1PzTSZp7yKgcIltIsfvGO5qQKEKlFLQY1tUew6Q+8tj+2mhfi
-         zhGQ==
-X-Gm-Message-State: APjAAAXkJjtcoRVTUkVVEP70J/kkGdlyB6iRsJ7vdN5Q2k8IHIQ/LxIB
-        SRYxBxZAmLFyf1o7/VFPE97+XZEYDUI8PO82fVYYtS5MIONwbDzVQuq1Ht5fK1HsITVKBl+enrc
-        prAjpCciHmQdy9AhHXAVHEhspyBQQLCgq+iYF1Ic=
-X-Received: by 2002:a63:3dcf:: with SMTP id k198mr25762684pga.60.1557303826938;
-        Wed, 08 May 2019 01:23:46 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyxzhLHFuD0/5jYnF7tVi3Faefw6K5WL0tRgY1tpWQhiz2W2YgPkH4OzkcSI8SRr949cSYYKw==
-X-Received: by 2002:a63:3dcf:: with SMTP id k198mr25762653pga.60.1557303826650;
-        Wed, 08 May 2019 01:23:46 -0700 (PDT)
-Received: from 2001-b011-380f-14b9-cd39-5529-36b9-d37f.dynamic-ip6.hinet.net (2001-b011-380f-14b9-cd39-5529-36b9-d37f.dynamic-ip6.hinet.net. [2001:b011:380f:14b9:cd39:5529:36b9:d37f])
-        by smtp.gmail.com with ESMTPSA id e23sm19429414pfi.159.2019.05.08.01.23.44
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 08 May 2019 01:23:45 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8;
-        delsp=yes;
-        format=flowed
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCH v2] cifs: fix strcat buffer overflow and reduce raciness
- in smb21_set_oplock_level()
-From:   Kai-Heng Feng <kai.heng.feng@canonical.com>
-In-Reply-To: <CAKywueSJCs2B2cGmZvGNfxDU7KNvkBOsuyuaOSV=3GWG80f+kw@mail.gmail.com>
-Date:   Wed, 8 May 2019 16:23:42 +0800
-Cc:     Steve French <smfrench@gmail.com>,
-        Christoph Probst <kernel@probst.it>,
-        Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Transfer-Encoding: 8bit
-Message-Id: <A4165E00-AA20-4550-96FE-651271B7091B@canonical.com>
-References: <1557242200-26194-1-git-send-email-kernel@probst.it>
- <CAH2r5mtqkHYbHJkf_LbAjhujnNRQP6Zmkmqhj1dUHomwsc3e=w@mail.gmail.com>
- <CAKywueSJCs2B2cGmZvGNfxDU7KNvkBOsuyuaOSV=3GWG80f+kw@mail.gmail.com>
-To:     Pavel Shilovsky <piastryyy@gmail.com>
-X-Mailer: Apple Mail (2.3445.104.8)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=Q/xfg+nFGLhPsGBWl9LacPjF3U7jjM06H75mJzsV2Q0=;
+        b=RI6ITcX53crEr3ZJ5n4PxU9xOjSOAA0Y0LvCLvYJJKDczPLW3gEYuA4OLgXVUANXZg
+         NdQhNykYNlXmpg+3pUYUfX/H9B/QrQsXHp7+mquZwv7vaHSR/WfdwEKrizCnyJoFfTcl
+         YYsMiY2AztAAkq8i4CiTs0KMbd03d7Qv0t2FRc5rbZS4cLPIdPOicDuJm5p/WamH3fMq
+         fhwYxEDe5ewgpAgb3fomGB8OZVZRTDwGSTDUHIbUvjI1eVNT+yNAwidee26N8lzWwMox
+         kCxbp8GRLtgrHIq0eah4E+yPlD1RQp8OtUosc7mdC9yVDRbhUWE9fmWiYN1gcGX8a5SW
+         IM3w==
+X-Gm-Message-State: APjAAAXlJKuEjS+Jt9ctruZEaHWGH9SMiCMnbCiUt40+C00g0TtLy4nD
+        RZrRFHhZ4Y7es3tXgYL7D5YRfQ+djlbh/ki9ettpHPfZ
+X-Google-Smtp-Source: APXvYqwADUUxUTdF7fGUVlq+RIXr2nmGzMCbzcpUeBSut5zQOkNNZVPNkSFqhOfNHe3dERpdFVLtRIkyZLYB+5SO/ts=
+X-Received: by 2002:a62:2fc7:: with SMTP id v190mr49717413pfv.10.1557340366290;
+ Wed, 08 May 2019 11:32:46 -0700 (PDT)
+MIME-Version: 1.0
+From:   Steve French <smfrench@gmail.com>
+Date:   Wed, 8 May 2019 13:32:35 -0500
+Message-ID: <CAH2r5mv=4JsaF-8v=U4JR3jrOyPfhtUsJPogNudLejDh09xGSA@mail.gmail.com>
+Subject: [GIT PULL] CIFS/SMB3 fixes
+To:     CIFS <linux-cifs@vger.kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-at 02:28, Pavel Shilovsky <piastryyy@gmail.com> wrote:
+Please pull the following changes since commit
+d3511f53bb2475f2a4e8460bee5a1ae6dea2a433:
 
-> вт, 7 мая 2019 г. в 09:13, Steve French via samba-technical
-> <samba-technical@lists.samba.org>:
->> merged into cifs-2.6.git for-next
->>
->> On Tue, May 7, 2019 at 10:17 AM Christoph Probst via samba-technical
->> <samba-technical@lists.samba.org> wrote:
->>> Change strcat to strncpy in the "None" case to fix a buffer overflow
->>> when cinode->oplock is reset to 0 by another thread accessing the same
->>> cinode. It is never valid to append "None" to any other message.
->>>
->>> Consolidate multiple writes to cinode->oplock to reduce raciness.
->>>
->>> Signed-off-by: Christoph Probst <kernel@probst.it>
->>> ---
->>>  fs/cifs/smb2ops.c | 14 ++++++++------
->>>  1 file changed, 8 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
->>> index c36ff0d..aa61dcf 100644
->>> --- a/fs/cifs/smb2ops.c
->>> +++ b/fs/cifs/smb2ops.c
->>> @@ -2917,26 +2917,28 @@ smb21_set_oplock_level(struct cifsInodeInfo  
->>> *cinode, __u32 oplock,
->>>                        unsigned int epoch, bool *purge_cache)
->>>  {
->>>         char message[5] = {0};
->>> +       unsigned int new_oplock = 0;
->>>
->>>         oplock &= 0xFF;
->>>         if (oplock == SMB2_OPLOCK_LEVEL_NOCHANGE)
->>>                 return;
->>>
->>> -       cinode->oplock = 0;
->>>         if (oplock & SMB2_LEASE_READ_CACHING_HE) {
->>> -               cinode->oplock |= CIFS_CACHE_READ_FLG;
->>> +               new_oplock |= CIFS_CACHE_READ_FLG;
->>>                 strcat(message, "R");
->>>         }
->>>         if (oplock & SMB2_LEASE_HANDLE_CACHING_HE) {
->>> -               cinode->oplock |= CIFS_CACHE_HANDLE_FLG;
->>> +               new_oplock |= CIFS_CACHE_HANDLE_FLG;
->>>                 strcat(message, "H");
->>>         }
->>>         if (oplock & SMB2_LEASE_WRITE_CACHING_HE) {
->>> -               cinode->oplock |= CIFS_CACHE_WRITE_FLG;
->>> +               new_oplock |= CIFS_CACHE_WRITE_FLG;
->>>                 strcat(message, "W");
->>>         }
->>> -       if (!cinode->oplock)
->>> -               strcat(message, "None");
->>> +       if (!new_oplock)
->>> +               strncpy(message, "None", sizeof(message));
->>> +
->>> +       cinode->oplock = new_oplock;
->>>         cifs_dbg(FYI, "%s Lease granted on inode %p\n", message,
->>>                  &cinode->vfs_inode);
->>>  }
->>> --
->>> 2.1.4
->
+  Merge branch 'parisc-5.2-1' of
+git://git.kernel.org/pub/scm/linux/kernel/git/deller/parisc-linux
+(2019-05-07 19:34:17 -0700)
 
-Doesn’t the race still happen, but implicitly here?
-cinode->oplock = new_oplock;
+are available in the Git repository at:
 
-Is it possible to just introduce a lock to force its proper ordering?
-e.g.
+  git://git.samba.org/sfrench/cifs-2.6.git tags/5.2-smb3
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index bf5b8264e119..a3c3c6156d17 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -267,6 +267,7 @@ cifs_alloc_inode(struct super_block *sb)
-          * server, can not assume caching of file data or metadata.
-          */
-         cifs_set_oplock_level(cifs_inode, 0);
-+       mutex_init(&cifs_inode->oplock_mutex);
-         cifs_inode->flags = 0;
-         spin_lock_init(&cifs_inode->writers_lock);
-         cifs_inode->writers = 0;
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 37b5ddf27ff1..6dfd4ab16c4f 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -1214,6 +1214,7 @@ struct cifsInodeInfo {
-         struct list_head openFileList;
-         __u32 cifsAttrs; /* e.g. DOS archive bit, sparse, compressed, system */
-         unsigned int oplock;            /* oplock/lease level we have */
-+       struct mutex oplock_mutex;
-         unsigned int epoch;             /* used to track lease state changes */
-  #define CIFS_INODE_PENDING_OPLOCK_BREAK   (0) /* oplock break in progress */
-  #define CIFS_INODE_PENDING_WRITERS       (1) /* Writes in progress */
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index b20063cf774f..796b23712e71 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -1901,6 +1901,7 @@ smb21_set_oplock_level(struct cifsInodeInfo *cinode,  
-__u32 oplock,
-         if (oplock == SMB2_OPLOCK_LEVEL_NOCHANGE)
-                 return;
- 
-+       mutex_lock(&cinode->oplock_mutex);
-         cinode->oplock = 0;
-         if (oplock & SMB2_LEASE_READ_CACHING_HE) {
-                 cinode->oplock |= CIFS_CACHE_READ_FLG;
-@@ -1916,6 +1917,8 @@ smb21_set_oplock_level(struct cifsInodeInfo *cinode,  
-__u32 oplock,
-         }
-         if (!cinode->oplock)
-                 strcat(message, "None");
-+       mutex_unlock(&cinode->oplock_mutex);
-+
-         cifs_dbg(FYI, "%s Lease granted on inode %p\n", message,
-                  &cinode->vfs_inode);
-  }
+for you to fetch changes up to cb4f7bf6be10b35510e6b2e60f80d85ebc22a578:
 
-Kai-Heng
+  cifs: update module internal version number (2019-05-07 23:24:56 -0500)
 
-> Thanks for cleaning it up!
->
-> Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
->
-> --
-> Best regards,
-> Pavel Shilovsky
+----------------------------------------------------------------
+CIFS/SMB3 changes, three for stable, adds fiemap support, improves
+zero-range support, and includes various RDMA (smb direct fixes).  Our
+build verification tests passed (and continue to be extended to
+include more tests).  See e.g. our 'buildbot' results at:
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/199
+
+Have an additional set of fixes (for improved handling of sparse
+files, mode bits, POSIX extensions) that are still being tested that
+are not included in this pull request but I expect to send in the next
+week.
+----------------------------------------------------------------
+Aurelien Aptel (1):
+      CIFS: check CIFS_MOUNT_NO_DFS when trying to reuse existing sb
+
+Christoph Probst (1):
+      cifs: fix strcat buffer overflow and reduce raciness in
+smb21_set_oplock_level()
+
+Jeff Layton (1):
+      cifs: remove superfluous inode_lock in cifs_{strict_}fsync
+
+Kenneth D'souza (1):
+      CIFS: Show locallease in /proc/mounts for cifs shares mounted
+with locallease feature.
+
+Long Li (7):
+      smbd: Make upper layer decide when to destroy the transport
+      cifs: smbd: Don't destroy transport on RDMA disconnect
+      cifs: smbd: Return EINTR when interrupted
+      cifs: smbd: Indicate to retry on transport sending failure
+      cifs: smbd: Retry on memory registration failure
+      cifs: Call MID callback before destroying transport
+      cifs: smbd: take an array of reqeusts when sending upper layer data
+
+Paulo Alcantara (SUSE) (1):
+      cifs: Fix DFS cache refresher for DFS links
+
+Ronnie Sahlberg (8):
+      cifs: Add support for FSCTL passthrough that write data to the server
+      cifs: fix bi-directional fsctl passthrough calls
+      cifs: add fiemap support
+      cifs: zero-range does not require the file is sparse
+      cifs: fix smb3_zero_range for Azure
+      cifs: fix credits leak for SMB1 oplock breaks
+      cifs: rename and clarify CIFS_ASYNC_OP and CIFS_NO_RESP
+      SMB3: Clean up query symlink when reparse point
+
+Sergey Senozhatsky (1):
+      cifs: don't use __constant_cpu_to_le32()
+
+Steve French (8):
+      SMB3: Track total time spent on roundtrips for each SMB3 command
+      SMB3: update comment to clarify enumerating snapshots
+      SMB3: Add handling for different FSCTL access flags
+      SMB3: Add defines for new negotiate contexts
+      Add new flag on SMB3.1.1 read
+      smb3: Add protocol structs for change notify support
+      Negotiate and save preferred compression algorithms
+      cifs: update module internal version number
+
+ fs/cifs/cifs_debug.c |   33 +-
+ fs/cifs/cifsfs.c     |    3 +
+ fs/cifs/cifsfs.h     |    4 +-
+ fs/cifs/cifsglob.h   |   27 +-
+ fs/cifs/cifsproto.h  |    9 +
+ fs/cifs/cifssmb.c    |   98 +--
+ fs/cifs/connect.c    |   63 +-
+ fs/cifs/dfs_cache.c  |  140 ++++-
+ fs/cifs/dfs_cache.h  |    5 +-
+ fs/cifs/file.c       |    5 -
+ fs/cifs/inode.c      |   37 ++
+ fs/cifs/link.c       |   13 +-
+ fs/cifs/smb1ops.c    |    9 +-
+ fs/cifs/smb2ops.c    |  309 ++++++---
+ fs/cifs/smb2pdu.c    |   72 ++-
+ fs/cifs/smb2pdu.h    |   71 +++
+ fs/cifs/smb2status.h | 3480
+++++++++++++++++++++++++++++++++++++++++++++++++++---------------------------------------------------
+ fs/cifs/smbdirect.c  |  292 ++++-----
+ fs/cifs/smbdirect.h  |   19 +-
+ fs/cifs/smbfsctl.h   |   29 +-
+ fs/cifs/transport.c  |   48 +-
+ 21 files changed, 2582 insertions(+), 2184 deletions(-)
 
 
+-- 
+Thanks,
+
+Steve
