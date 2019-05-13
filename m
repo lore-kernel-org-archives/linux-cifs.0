@@ -2,96 +2,80 @@ Return-Path: <SRS0=ZeIh=TN=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FB38C04AB1
-	for <linux-cifs@archiver.kernel.org>; Mon, 13 May 2019 04:37:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA423C04AA7
+	for <linux-cifs@archiver.kernel.org>; Mon, 13 May 2019 14:34:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C6F8F208C3
-	for <linux-cifs@archiver.kernel.org>; Mon, 13 May 2019 04:37:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o7QFSTOc"
+	by mail.kernel.org (Postfix) with ESMTP id A7E31208C3
+	for <linux-cifs@archiver.kernel.org>; Mon, 13 May 2019 14:34:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726259AbfEMEh6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 13 May 2019 00:37:58 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:41223 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726179AbfEMEh6 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 13 May 2019 00:37:58 -0400
-Received: by mail-pl1-f195.google.com with SMTP id f12so3771974plt.8
-        for <linux-cifs@vger.kernel.org>; Sun, 12 May 2019 21:37:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=uN76rzsR6XIOXkPQKNnLRUo/BDTPg9zCC6/UcXuUZI8=;
-        b=o7QFSTOcNm4mQP6iTWPz5iaVt7pBSkI6iLZWZmkGknbBQ93s2E7Vlmyh3HPA8xP6oo
-         /6Fd255/GjkWuNiX7xRhMOpcVdswYseXVvEiP24p/ggHJjSjgVgC+o4aXE6dhyhsFCEy
-         tgmSMmCGAvIgplqW0cnRubKmednj6JzqV0CQDEra7JCPRIkiVK45NEwUodsdq78sug5w
-         G0L4M0lxs3huHu8H7XkfOGlBJXaiwycjWNA5ksmmUWbFJEvLlb7+yi/nT1Bzg3Gtfxrp
-         EtAzVr6X9w6KoasJAmlbgTGTvL6qaRP+ajHS7TeYHGTBPAZIpk8oHKXr06E2KoFYrQt1
-         l8mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=uN76rzsR6XIOXkPQKNnLRUo/BDTPg9zCC6/UcXuUZI8=;
-        b=gnUfxQyPzj121fr01z2lMfDzQxTUIgDuDOnFetRlJqtiqwPVZEHp49N+pJ62zyVEYv
-         OPyK0EYZ20zGlYxlWMDMldmnSbhzuCdMLSiaLHi/h3ijJPuSqvuNJgFaVxsGgS0V+41N
-         WRLiQpSSQ54bcL/Mtl5htmPGSVO8BwvlJEn+7jLf3iBFs2qvMSopHtybMM8NRV3uZ2U+
-         mn9F6hyWklXh00JYrs73igYtOrHCrnGe3f4PNbjYk79udpEXSNnvHYSPX8kj9rsZzJ+v
-         FwSoYJyGNTNuKgJfscZ9ujo6vG8WRtnzhLHV9CqJZBv+yDBxsY3izqx8amvKHH1hMqDa
-         wGjQ==
-X-Gm-Message-State: APjAAAWBxOgreJD2AyMSPzGZaCwgpyhOzMhzHhuJfI2Ula4iIXtaEd9b
-        sOBc7k1tMcI7oMTfv6Na9ToKals4tI3m2LFk580wJw==
-X-Google-Smtp-Source: APXvYqzAxKXk8qNPvQJSmFIe1zIzeaDumv69YbLhctsTZtma175UMwn0QdHdnuzA5PFsY0h5UzqinImBrj0dO7oNSA0=
-X-Received: by 2002:a17:902:2beb:: with SMTP id l98mr26268794plb.290.1557722277234;
- Sun, 12 May 2019 21:37:57 -0700 (PDT)
+        id S1729629AbfEMOeQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 13 May 2019 10:34:16 -0400
+Received: from mx2.suse.de ([195.135.220.15]:34478 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729561AbfEMOeQ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 13 May 2019 10:34:16 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 1A58CABE9;
+        Mon, 13 May 2019 14:34:15 +0000 (UTC)
+Date:   Mon, 13 May 2019 16:34:13 +0200
+From:   Petr Vorel <pvorel@suse.cz>
+To:     Murphy Zhou <xzhou@redhat.com>
+Cc:     ltp@lists.linux.it, linux-cifs@vger.kernel.org
+Subject: Re: [LTP] [PATCH] safe_setuid: skip if testing on CIFS
+Message-ID: <20190513143413.GA4568@dell5510>
+Reply-To: Petr Vorel <pvorel@suse.cz>
+References: <20190510043845.4977-1-xzhou@redhat.com>
 MIME-Version: 1.0
-References: <20190513012417.2603-1-lsahlber@redhat.com>
-In-Reply-To: <20190513012417.2603-1-lsahlber@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 12 May 2019 23:37:44 -0500
-Message-ID: <CAH2r5ms4b_BDu9W3nTiYZopWS-A8Vf3s=vnOx3iJHNP+mgL1KQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: use the right include for signal_pending()
-To:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190510043845.4977-1-xzhou@redhat.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-merged into cif-2.6.git for-next
+Hi Murphy,
 
-On Sun, May 12, 2019 at 8:24 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
->
-> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> ---
->  fs/cifs/transport.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> index 9a16ff4b9f5e..60661b3f983a 100644
-> --- a/fs/cifs/transport.c
-> +++ b/fs/cifs/transport.c
-> @@ -33,7 +33,7 @@
->  #include <linux/uaccess.h>
->  #include <asm/processor.h>
->  #include <linux/mempool.h>
-> -#include <linux/signal.h>
-> +#include <linux/sched/signal.h>
->  #include "cifspdu.h"
->  #include "cifsglob.h"
->  #include "cifsproto.h"
-> --
-> 2.13.6
->
+> As CIFS is not supporting setuid operations.
+Any reference to this?
+fs/cifs/cifsfs.c and other parts of kernel cifs works with CIFS_MOUNT_SET_UID.
+Also samba_setreuid() from lib/util/setid.c from samba git (I guess used in
+samba libraries works with SYS_setreuid syscall or setreuid() libc wrapper.
+What am I missing?
 
+> diff --git a/lib/tst_safe_macros.c b/lib/tst_safe_macros.c
+> index 0e59a3f98..36941ec0b 100644
+> --- a/lib/tst_safe_macros.c
+> +++ b/lib/tst_safe_macros.c
+> @@ -111,6 +111,7 @@ int safe_setreuid(const char *file, const int lineno,
+>  		  uid_t ruid, uid_t euid)
+>  {
+>  	int rval;
+> +	long fs_type;
 
--- 
-Thanks,
+>  	rval = setreuid(ruid, euid);
+>  	if (rval == -1) {
+> @@ -119,6 +120,13 @@ int safe_setreuid(const char *file, const int lineno,
+>  			 (long)ruid, (long)euid);
+>  	}
 
-Steve
+> +	fs_type = tst_fs_type(".");
+> +	if (fs_type == TST_CIFS_MAGIC) {
+> +		tst_brk_(file, lineno, TCONF,
+> +			 "setreuid is not supported on %s filesystem",
+> +			 tst_fs_type_name(fs_type));
+> +	}
+I guess this check should be before setreuid() As it's in safe_seteuid() and
+safe_setuid()
+> +
+>  	return rval;
+>  }
+
+Kind regards,
+Petr
