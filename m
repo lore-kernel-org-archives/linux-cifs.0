@@ -6,37 +6,37 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 341A1C04AB4
-	for <linux-cifs@archiver.kernel.org>; Tue, 14 May 2019 21:33:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B0C6C04AB7
+	for <linux-cifs@archiver.kernel.org>; Tue, 14 May 2019 21:34:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0EB1020862
-	for <linux-cifs@archiver.kernel.org>; Tue, 14 May 2019 21:33:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA91120862
+	for <linux-cifs@archiver.kernel.org>; Tue, 14 May 2019 21:34:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726513AbfENVd6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 14 May 2019 17:33:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39906 "EHLO mx1.redhat.com"
+        id S1726519AbfENVeC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 14 May 2019 17:34:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39914 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726089AbfENVd6 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 14 May 2019 17:33:58 -0400
+        id S1726089AbfENVeC (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 14 May 2019 17:34:02 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 2BF78307D96D;
-        Tue, 14 May 2019 21:33:58 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id F06C1307D8BE;
+        Tue, 14 May 2019 21:34:01 +0000 (UTC)
 Received: from test1135.test.redhat.com (vpn2-54-44.bne.redhat.com [10.64.54.44])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8B4F85D6A6;
-        Tue, 14 May 2019 21:33:57 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5C3F35D6A6;
+        Tue, 14 May 2019 21:33:59 +0000 (UTC)
 From:   Ronnie Sahlberg <lsahlber@redhat.com>
 To:     linux-cifs <linux-cifs@vger.kernel.org>
 Cc:     Steve French <smfrench@gmail.com>,
         Ronnie Sahlberg <lsahlber@redhat.com>
 Subject: [PATCH] cifs: add support for SEEK_DATA and SEEK_HOLE
-Date:   Wed, 15 May 2019 07:17:02 +1000
-Message-Id: <20190514211702.19269-2-lsahlber@redhat.com>
-In-Reply-To: <20190514211702.19269-1-lsahlber@redhat.com>
-References: <20190514211702.19269-1-lsahlber@redhat.com>
+Date:   Wed, 15 May 2019 07:33:46 +1000
+Message-Id: <20190514213346.25337-2-lsahlber@redhat.com>
+In-Reply-To: <20190514213346.25337-1-lsahlber@redhat.com>
+References: <20190514213346.25337-1-lsahlber@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Tue, 14 May 2019 21:33:58 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Tue, 14 May 2019 21:34:02 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
