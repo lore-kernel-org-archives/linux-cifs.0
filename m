@@ -2,111 +2,188 @@ Return-Path: <SRS0=yfiR=TU=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C92E1C04AB4
-	for <linux-cifs@archiver.kernel.org>; Mon, 20 May 2019 01:20:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C1E3C46460
+	for <linux-cifs@archiver.kernel.org>; Mon, 20 May 2019 09:10:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 853B3206B6
-	for <linux-cifs@archiver.kernel.org>; Mon, 20 May 2019 01:20:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D4A9120859
+	for <linux-cifs@archiver.kernel.org>; Mon, 20 May 2019 09:10:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XdL3IWjA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xv0hYodw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729763AbfETBUa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 19 May 2019 21:20:30 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:46513 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726741AbfETBUa (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 19 May 2019 21:20:30 -0400
-Received: by mail-pg1-f195.google.com with SMTP id t187so5912272pgb.13;
-        Sun, 19 May 2019 18:20:29 -0700 (PDT)
+        id S1731116AbfETJKx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 20 May 2019 05:10:53 -0400
+Received: from mail-yw1-f66.google.com ([209.85.161.66]:37235 "EHLO
+        mail-yw1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726169AbfETJKx (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 20 May 2019 05:10:53 -0400
+Received: by mail-yw1-f66.google.com with SMTP id 186so5573443ywo.4;
+        Mon, 20 May 2019 02:10:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=dLGowd605TGgiEF9LE+kSadzQc7KbvCMX2YqZwW09gY=;
-        b=XdL3IWjAD1FV+MhMS67oSDrUskQtqgM7vvr4+6/AJ0ASseWPJxbwHSzZaepORKwrR6
-         CWxsdrla0ghPoAKf1VKpMtVswkSEL5Y4Me+UnJFPDMJ9nbJ0U/Nbu2SsUGUh4oKYhkrm
-         +tdGobM3RlgQ5v4HI/EVGpr0DB57dQBMn7h1eZFhrYlykkqTWxy1BU5QiAhK8dHKSn7U
-         aGAXLYo4fbCTBWT2IPU+/6801/bpnaBb0Y6ZyPX9pAqEpm3nKCD13hbuXsrj7Gb0DMC5
-         a8rd1iSGNviyHsSPiVmKIg6zrOmPCsltalEcnS5s04EgEuOE+diFsiyNopzSBZjthIIt
-         SRKg==
+        bh=WO0nb0i3TlfUEi3Ta1dEHoPzpd1bYnb4mrBSpQaLWfM=;
+        b=Xv0hYodwAou2zdmZxFJFkZxUeVf2epBSGZOWi2TyQkrLXK8DUAYF+ifb6tHe6uP1uJ
+         WpIFKZqzTWDvwDlxDgVUR8RUElqV6b5mzhbhGUonKzOHzxIGbAfME2G07FUKU2zb8XCl
+         kT1nIN4zh1LvcCTOmQeYmbJG6jMj8IX+OyaJ8uYq9msIUvr1n6BVU/Sg7iEt7A4rJZP6
+         l26TIYtOAS+ByK2yoLoRUFW6ywzCkUOPdHMh3A2VoVhAUIp59Ikd0eZefAk8OcUUmC+J
+         3YaaybhHqRgI1WA7XetpaCtWYUokDERoaOGtAXYMBoxHzFRbsI9JbgMJv2bUzKnpSM0z
+         P/NA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=dLGowd605TGgiEF9LE+kSadzQc7KbvCMX2YqZwW09gY=;
-        b=jJrfJvVQGME+HBYTkwD56L0XQ4oU3DTtwafvyuBDg7IIRnQ/uAU+wSVqsVVksH31+d
-         1pI070hcNHvOMAnfKGUaw/GLSWAdx5b+cr/YY/O7l7tyfZSffZCNdxCaWvh0M4mJfMOr
-         UaHu35J3gzfJ6Gqe8nTjwEdn/zWIkPmIYuKfxmABnZlM3p5herzRY4BNLvJomHdlTJdU
-         I2dGkqTpGzasi3gyBskUxIoESolRRInrLWTYubgnOm4VgxLpOAcEtQQqZmG/iS2Gy21h
-         xVT89XxPhxjP2oDhpF+A2LKhGGTmzt5mJ+Uuds6nbGpi4u+rTkytDl80gMZwzLLe+5g7
-         5xtg==
-X-Gm-Message-State: APjAAAUBH8wicDrAVQjnFUm0Jj7vefJZTOSE7MVEvwkPDruUUHGO+Peu
-        mQUypahz5RuWIX2x+p9V7DeLopZPrvwkRxLxLwMzjQ==
-X-Google-Smtp-Source: APXvYqw7Ze0TS0tXKiVTrOqkkzcY/f2Enpq+/Q7SuIXcZOdzLP+S/wVb8jcgB218cBW61fSaAICw6itdksz96UWv7eY=
-X-Received: by 2002:a62:2b82:: with SMTP id r124mr68797198pfr.235.1558315229268;
- Sun, 19 May 2019 18:20:29 -0700 (PDT)
+        bh=WO0nb0i3TlfUEi3Ta1dEHoPzpd1bYnb4mrBSpQaLWfM=;
+        b=eYOrWPR030iZWhZsRO0nHPUDOy0pzDriqNlX+sKWBZby3Ji9YGGc87StT9RnAQ/TXO
+         AagjbZVMpq26aOytdZYrIc7WuZ0WdocDRLEFkCqyC7kXZfR+Oh0jZhOlMfknZEmujUO0
+         kJA63vcExrdeQqXHTykQK6sis2Oh3sgIKvm8u8mOPelb8/vI0xfbhu2Z5+0uW7mKmAxI
+         Hm/vmTIHzDXVibEGk1n6ufvEMwuwr70B9q5kK8YsKNy1KutuQM8TaCTpgOs++Ohur4v2
+         R8AZNt7cXviajV4v3ilLFMJZYUtSn5cM2TYfEbq8RRk/JXFpuw51pmYPAQpF+XGQ+QlA
+         QsKA==
+X-Gm-Message-State: APjAAAWDxyTf561eOQec2t30li/AH1aVq3RHTkjaqjfTQV8KpfSwcfcG
+        G3MmSfn7vxLwSDhD2eCoQFldiaHjGjR9oxu2QalVkUpS
+X-Google-Smtp-Source: APXvYqx9mTAu+qQpn6hP0ibWMhR1UvqszSsJ9fuDVbqrSlIwIjiQ3UEY9jsYVs6CD9h8EHaHcN+sZy7TcOhwoQejgec=
+X-Received: by 2002:a81:3344:: with SMTP id z65mr2829786ywz.294.1558343451573;
+ Mon, 20 May 2019 02:10:51 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190517081233.11764-1-colin.king@canonical.com>
-In-Reply-To: <20190517081233.11764-1-colin.king@canonical.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 19 May 2019 20:20:18 -0500
-Message-ID: <CAH2r5muO=GLx2Hh77rTPqCZ1yP6a0r5yjSEu5j58o__Mni1bsQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix memory leak of pneg_inbuf on -EOPNOTSUPP ioctl case
-To:     Colin King <colin.king@canonical.com>
-Cc:     Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        kernel-janitors <kernel-janitors@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+References: <20181203083416.28978-1-david@fromorbit.com> <20181203083416.28978-2-david@fromorbit.com>
+ <CAOQ4uxhOQY8M5rbgHKREN5qpeDGHv0-xK3r37Lj6XfqFoE4qjg@mail.gmail.com>
+ <20181204151332.GA32245@infradead.org> <20181204212948.GO6311@dastard>
+ <CAN-5tyGU=y5JO5UNcmn3rX1gRyK_UxjQvQ+kCsP34_NT2-mQ_A@mail.gmail.com> <20181204223102.GR6311@dastard>
+In-Reply-To: <20181204223102.GR6311@dastard>
+From:   Amir Goldstein <amir73il@gmail.com>
+Date:   Mon, 20 May 2019 12:10:39 +0300
+Message-ID: <CAOQ4uxhPoJ2vOwGN7PFWkD6+_zdTeMAhT4KphnyktaQ23zqvBw@mail.gmail.com>
+Subject: Re: [PATCH 01/11] vfs: copy_file_range source range over EOF should fail
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     Olga Kornievskaia <olga.kornievskaia@gmail.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        linux-nfs <linux-nfs@vger.kernel.org>,
+        overlayfs <linux-unionfs@vger.kernel.org>,
+        ceph-devel@vger.kernel.org, CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-merged into cifs-2.6.git for-next (and added cc:stable #v5.1)
+On Wed, Dec 5, 2018 at 12:31 AM Dave Chinner <david@fromorbit.com> wrote:
+>
+> On Tue, Dec 04, 2018 at 04:47:18PM -0500, Olga Kornievskaia wrote:
+> > On Tue, Dec 4, 2018 at 4:35 PM Dave Chinner <david@fromorbit.com> wrote:
+> > >
+> > > On Tue, Dec 04, 2018 at 07:13:32AM -0800, Christoph Hellwig wrote:
+> > > > On Mon, Dec 03, 2018 at 02:46:20PM +0200, Amir Goldstein wrote:
+> > > > > > From: Dave Chinner <dchinner@redhat.com>
+> > > > > >
+> > > > > > The man page says:
+> > > > > >
+> > > > > > EINVAL Requested range extends beyond the end of the source file
+> > > > > >
+> > > > > > But the current behaviour is that copy_file_range does a short
+> > > > > > copy up to the source file EOF. Fix the kernel behaviour to match
+> > > > > > the behaviour described in the man page.
+> > > >
+> > > > I think the behavior implemented is a lot more useful than the one
+> > > > documented..
+> > >
+> > > The current behaviour is really nasty. Because copy_file_range() can
+> > > return short copies, the caller has to implement a loop to ensure
+> > > the range hey want get copied.  When the source range you are
+> > > trying to copy overlaps source EOF, this loop:
+> > >
+> > >         while (len > 0) {
+> > >                 ret = copy_file_range(... len ...)
+> > >                 ...
+> > >                 off_in += ret;
+> > >                 off_out += ret;
+> > >                 len -= ret;
+> > >         }
+> > >
+> > > Currently the fallback code copies up to the end of the source file
+> > > on the first copy and then fails the second copy with EINVAL because
+> > > the source range is now completely beyond EOF.
+> > >
+> > > So, from an application perspective, did the copy succeed or did it
+> > > fail?
+> > >
+> > > Existing tools that exercise copy_file_range (like xfs_io) consider
+> > > this a failure, because the second copy_file_range() call returns
+> > > EINVAL and not some "there is no more to copy" marker like read()
+> > > returning 0 bytes when attempting to read beyond EOF.
+> > >
+> > > IOWs, we cannot tell the difference between a real error and a short
+> > > copy because the input range spans EOF and it was silently
+> > > shortened. That's the API problem we need to fix here - the existing
+> > > behaviour is really crappy for applications. Erroring out
+> > > immmediately is one solution, and it's what the man page says should
+> > > happen so that is what I implemented.
+> > >
+> > > Realistically, though, I think an attempt to read beyond EOF for the
+> > > copy should result in behaviour like read() (i.e. return 0 bytes),
+> > > not EINVAL. The existing behaviour needs to change, though.
+> >
+> > There are two checks to consider
+> > 1. pos_in >= EOF should return EINVAL
+> > 2. however what's perhaps should be relaxed is pos_in+len >= EOF
+> > should return a short copy.
+> >
+> > Having check#1 enforced allows to us to differentiate between a real
+> > error and a short copy.
+>
+> That's what the code does right now and *exactly what I'm trying to
+> fix* because it EINVAL is ambiguous and not an indicator that we've
+> reached the end of the source file. EINVAL can indicate several
+> different errors, so it really has to be treated as a "copy failed"
+> error by applications.
+>
+> Have a look at read/pread() - they return 0 in this case to indicate
+> a short read, and the value of zero is explicitly defined as meaning
+> "read position is beyond EOF".  Applications know straight away that
+> there is no more data to be read and there was no error, so can
+> terminate on a successful short read.
+>
+> We need to allow applications to terminate copy loops on a
+> successful short copy. IOWs, applications need to either:
+>
+>         - get an immediate error saying the range is invalid rather
+>           than doing a short copy (as per the man page); or
+>         - have an explicit marker to say "no more data to be copied"
+>
+> Applications need the "no more data to copy" case to be explicit and
+> unambiguous so they can make sane decisions about whether a short
+> copy was successful because the file was shorter than expected or
+> whether a short copy was a result of a real error being encountered.
+> The current behaviour is largely unusable for applications because
+> they have to guess at the reason for EINVAL part way through a
+> copy....
+>
 
-On Fri, May 17, 2019 at 3:42 AM Colin King <colin.king@canonical.com> wrote:
->
-> From: Colin Ian King <colin.king@canonical.com>
->
-> Currently in the case where SMB2_ioctl returns the -EOPNOTSUPP error
-> there is a memory leak of pneg_inbuf. Fix this by returning via
-> the out_free_inbuf exit path that will perform the relevant kfree.
->
-> Addresses-Coverity: ("Resource leak")
-> Fixes: 969ae8e8d4ee ("cifs: Accept validate negotiate if server return NT_STATUS_NOT_SUPPORTED")
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
-> ---
->  fs/cifs/smb2pdu.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 710ceb875161..5b8d1482ffbd 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -1054,7 +1054,8 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
->                  * not supported error. Client should accept it.
->                  */
->                 cifs_dbg(VFS, "Server does not support validate negotiate\n");
-> -               return 0;
-> +               rc = 0;
-> +               goto out_free_inbuf;
->         } else if (rc != 0) {
->                 cifs_dbg(VFS, "validate protocol negotiate failed: %d\n", rc);
->                 rc = -EIO;
-> --
-> 2.20.1
->
+Dave,
 
+I went a head and implemented the desired behavior.
+However, while testing I observed that the desired behavior is already
+the existing behavior. For example, trying to copy 10 bytes from a 2 bytes file,
+xfs_io copy loop ends as expected:
+copy_file_range(4, [0], 3, [0], 10, 0)  = 2
+copy_file_range(4, [2], 3, [2], 8, 0)   = 0
 
--- 
+This was tested on ext4 and xfs with reflink on recent kernel as well as on
+v4.20-rc1 (era of original patch set).
+
+Where and how did you observe the EINVAL behavior described above?
+(besides man page that is). There are even xfstests (which you modified)
+that verify the return 0 for past EOF behavior.
+
+For now, I am just dropping this patch from the patch series.
+Let me know if I am missing something.
+
 Thanks,
-
-Steve
+Amir.
