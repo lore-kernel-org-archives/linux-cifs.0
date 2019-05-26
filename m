@@ -1,210 +1,280 @@
-Return-Path: <SRS0=6DZW=TZ=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=Bfbm=T2=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A00BCC07542
-	for <linux-cifs@archiver.kernel.org>; Sat, 25 May 2019 22:36:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CB0AC46460
+	for <linux-cifs@archiver.kernel.org>; Sun, 26 May 2019 06:11:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4DA1C2075E
-	for <linux-cifs@archiver.kernel.org>; Sat, 25 May 2019 22:36:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4480620815
+	for <linux-cifs@archiver.kernel.org>; Sun, 26 May 2019 06:11:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G4qv4yss"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qZUVMDlL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726187AbfEYWf7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 25 May 2019 18:35:59 -0400
-Received: from mail-vs1-f47.google.com ([209.85.217.47]:36375 "EHLO
-        mail-vs1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725989AbfEYWf7 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 25 May 2019 18:35:59 -0400
-Received: by mail-vs1-f47.google.com with SMTP id l20so8271704vsp.3
-        for <linux-cifs@vger.kernel.org>; Sat, 25 May 2019 15:35:58 -0700 (PDT)
+        id S1727607AbfEZGLS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 26 May 2019 02:11:18 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:39172 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726131AbfEZGLS (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 26 May 2019 02:11:18 -0400
+Received: by mail-wr1-f67.google.com with SMTP id e2so4888465wrv.6;
+        Sat, 25 May 2019 23:11:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=3yXjbWerqXcHUYa+TCJJdoQqGeMhHAiIgNdsitC+Gls=;
-        b=G4qv4yssviRrZ/apbmCTipqLL3KKedhIGQCwXTgRYySin+c8NtEQVXvBphsa+asFLU
-         BBnl1EfuSWgCakpS55FZ0sGfdX5InChgk0QE81mHlvAEIs3kZiKGMEF+RHJCmKXVtmTZ
-         l4NMr826nCEVLI+lJYfBSMlkHLLisV2greejRYmT60n9LoA8yIr8miNVkVyi4A3B5JET
-         Q5OSvow/e+5LLUdKk5RFhIaOECjs2biRZbrrTvFQoURpc/koFNkS6NoY1iATkUsR/ocg
-         86guIaRlW80ErhMnWUCpXlQJUJWZnTKMBOqDpvKuCGhmBkb88xeyFE/n2w5V/86bYHza
-         9j9w==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=jgXNJIA/nufnSnu4+ud/rPiS77zTsD8AMGRWTfgrrqI=;
+        b=qZUVMDlLTY5u48xqKNt2w8xJCocDSQbQTiZpComnmGilfzawivtwGXUU3h9ENBawCi
+         v9IO2altJLQZSSvTAYMD6KlL/uPXq+bNFosUyAhXpNGgBp2usMGu6bklaSO5c1eRheq2
+         wQhaEo6jbwDgC+SBq4e+WLKrXUetgCTslUeKJrquC7i5u85YS9nrkXN+QH2wd12DMK5d
+         ltOWV0AMfKHGWKhDn/SOOSAL8IQuMr3fZHH9im1KiYyzZH+9dtb6tH7w41jgfjLSOOEz
+         Kjj3iFQP/6GfWPlckFwHUJrTFh2Snj2KU6Fn5wYAy/esVDztvqHrcw5mzCfGgvjciFyJ
+         U5LQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=3yXjbWerqXcHUYa+TCJJdoQqGeMhHAiIgNdsitC+Gls=;
-        b=sUx2UsRfIeiuOxtUfp+wg4W8oQRGRO1x9z2Rs80US1r4cktlr6oNBGAQkbTWu9JgIE
-         yL1U9lOdbII8o8DnHUZREaF2+Q6+5/6UA5vT6w2q/+hyXzCSWCuKwFLQO3RlFW9EECtb
-         o3dOONLZDfTraNNmm2RXL+B4lgW9zce93YVyY4vFf+uPVhMBP/HOKyWxJ4WDhWdQpTqj
-         eRvOA6wqnDbd+BGAOudAljKnB172Yzqk1+bEOuV5dOEpip/lIxgk4In9947GqbCt+7OV
-         I1RexUaLsrAim9UIcfqEBZ49lX1zCc4WoU0O1PLjz8pUbL7kLJWo7CrT+7iqZ7QvmTQ0
-         NdAQ==
-X-Gm-Message-State: APjAAAWnmbjSHCovNk8S/bvhBhc6LIwRlUdG8ON+wAVDIEynG7+ltV6L
-        4b2qu19pP0KvXbFgMA7+Q71YxTl7YrS/h/8zQCSYjoEpdpg=
-X-Google-Smtp-Source: APXvYqzgfH7gBUyr1yuiXJJXbew/LxJpjK6taqDT/RiSKp4hJzwVydkp2tAGlnI/Q8PSlsainHo6UW8zcCjYPASAZ3E=
-X-Received: by 2002:a67:ef45:: with SMTP id k5mr36013915vsr.105.1558823757884;
- Sat, 25 May 2019 15:35:57 -0700 (PDT)
-MIME-Version: 1.0
-From:   Adam Richter <adamrichter4@gmail.com>
-Date:   Sat, 25 May 2019 15:35:47 -0700
-Message-ID: <CAGn-TgiGah++0ibn3vjM+bvBkJa3XttxA12k+Qa4PGME89CTOQ@mail.gmail.com>
-Subject: [PATCH] cifs-utils: smbinfo.c: probably harmless wrong memset sizes +
- printf format correction
-To:     linux-cifs@vger.kernel.org
-Content-Type: multipart/mixed; boundary="0000000000005b58710589bdf0fd"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=jgXNJIA/nufnSnu4+ud/rPiS77zTsD8AMGRWTfgrrqI=;
+        b=LKik462Ay4N+azunjrAXm7xGrdY5A85h3zqV2WDeWJXpMIn6FZU+SCY+YpAmjqClLp
+         YlDICDgQPNIqEbzKj+JN34p/Qa4Isfl6e/YHeRLZLQwzlE6y8e4yN18BlMCLRuBVGAy6
+         rGlwAakDBhyJsK2A27IHRuxTAcfrcT4B1sH2WrVwydD06Gu0VHpJVKGOQzFb2yimbm0m
+         eXjndP/dyLDiU7/2jsvRPoVayM7w8EyGSTZD+ms/ocltdsGfAkS0yTHgVebokC+96Opa
+         GS031k50wCHWivD3zH4pyaTAY6JdofPdK4oqzKlcDNAaqW/hhC/+hlmF3jvvuXrb71LA
+         g+sw==
+X-Gm-Message-State: APjAAAWIEGTf14hpKbIUQgZYeHE3UIoCzTENypcRK41EFNMGhE9A2WPu
+        0W4doB8Mfz0NuYnaixE7irs=
+X-Google-Smtp-Source: APXvYqxBB82jF58w2www0dce/6FsyXzVsg1H1geXVnY2uwxAbw5pTgWOEPJAcKprd0J4DWnKAtngVA==
+X-Received: by 2002:adf:8023:: with SMTP id 32mr6413925wrk.18.1558851075589;
+        Sat, 25 May 2019 23:11:15 -0700 (PDT)
+Received: from localhost.localdomain ([5.102.238.208])
+        by smtp.gmail.com with ESMTPSA id a124sm5302943wmh.3.2019.05.25.23.11.13
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 25 May 2019 23:11:15 -0700 (PDT)
+From:   Amir Goldstein <amir73il@gmail.com>
+To:     "Darrick J . Wong" <darrick.wong@oracle.com>
+Cc:     Dave Chinner <david@fromorbit.com>, Christoph Hellwig <hch@lst.de>,
+        Olga Kornievskaia <olga.kornievskaia@gmail.com>,
+        Luis Henriques <lhenriques@suse.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        ceph-devel@vger.kernel.org, linux-api@vger.kernel.org,
+        Dave Chinner <dchinner@redhat.com>
+Subject: [PATCH v2 2/8] vfs: no fallback for ->copy_file_range
+Date:   Sun, 26 May 2019 09:10:53 +0300
+Message-Id: <20190526061100.21761-3-amir73il@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190526061100.21761-1-amir73il@gmail.com>
+References: <20190526061100.21761-1-amir73il@gmail.com>
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---0000000000005b58710589bdf0fd
-Content-Type: text/plain; charset="UTF-8"
+From: Dave Chinner <dchinner@redhat.com>
 
-The attached patch is my attempt at fixing two possibly harmless
-complaints from "cppcheck --enable=warning" from the cifs-utils git
-master branch version of smbinfo.c.
+Now that we have generic_copy_file_range(), remove it as a fallback
+case when offloads fail. This puts the responsibility for executing
+fallbacks on the filesystems that implement ->copy_file_range and
+allows us to add operational validity checks to
+generic_copy_file_range().
 
-1. A printf format should have been "%u" instead of "%d" in print_quota.
+Rework vfs_copy_file_range() to call a new do_copy_file_range()
+helper to exceute the copying callout, and move calls to
+generic_file_copy_range() into filesystem methods where they
+currently return failures.
 
-2. An incorrect size was being passed to memset in thirteen nearly
-identical places, each using "sizeof(qi)" when "sizeof(*qi)".  I am
-not sure but I think these mistakes were probably harmless because the
-memset calls might all be unnecessary and the sizes passed to each
-memset call might never have been larger than it was supposed to be.
+[Amir] overlayfs is not responsible of executing the fallback.
+It is the responsibility of the underlying filesystem.
 
-Because each of the effected memset calls was immediately preceded by
-the malloc which allocated the data structure and because they each
-ignored the possibility that malloc could fail, I made a function,
-xmalloc0 to combine allocating the memory, zeroing it and exiting with
-a non-zero exit value and a failure message on allocation failure
-(which appears to be a fine way to handle the error in this program).
-The function uses calloc, which could introduce an unnecessary
-multiply, in the hopes that some calloc implementations may avoid the
-memset in the case of freshly allocated memory from mmap, which would
-probably be the case in this program, although I do not know if any
-calloc implementations make this optimization.  Anyhow, at least this
-way, the size of the data structure is only computed once in the
-source code.
+Signed-off-by: Dave Chinner <dchinner@redhat.com>
+Signed-off-by: Amir Goldstein <amir73il@gmail.com>
+---
+ fs/ceph/file.c    | 21 ++++++++++++++++++---
+ fs/cifs/cifsfs.c  |  4 ++++
+ fs/fuse/file.c    | 21 ++++++++++++++++++---
+ fs/nfs/nfs4file.c | 20 +++++++++++++++++---
+ fs/read_write.c   | 25 ++++++++++++++++---------
+ 5 files changed, 73 insertions(+), 18 deletions(-)
 
-I realize that these memory allocations may all be for small data
-structures that should be allocated on the stack and also may not need
-to be cleared to all zeroes, but I did not want to delve into coding
-style conventions for stack allocation in the CIFS source tree, and I
-was not 100% certain that clearing the allocated memory was
-unnecessary, although I do see other lines that explicitly initialize
-some field in that that allocated memory to zero.  So, please feel
-free to replace my changes with something better or one that involves
-less code churn.
+diff --git a/fs/ceph/file.c b/fs/ceph/file.c
+index 305daf043eb0..e87f7b2023af 100644
+--- a/fs/ceph/file.c
++++ b/fs/ceph/file.c
+@@ -1889,9 +1889,9 @@ static int is_file_size_ok(struct inode *src_inode, struct inode *dst_inode,
+ 	return 0;
+ }
+ 
+-static ssize_t ceph_copy_file_range(struct file *src_file, loff_t src_off,
+-				    struct file *dst_file, loff_t dst_off,
+-				    size_t len, unsigned int flags)
++static ssize_t __ceph_copy_file_range(struct file *src_file, loff_t src_off,
++				      struct file *dst_file, loff_t dst_off,
++				      size_t len, unsigned int flags)
+ {
+ 	struct inode *src_inode = file_inode(src_file);
+ 	struct inode *dst_inode = file_inode(dst_file);
+@@ -2100,6 +2100,21 @@ static ssize_t ceph_copy_file_range(struct file *src_file, loff_t src_off,
+ 	return ret;
+ }
+ 
++static ssize_t ceph_copy_file_range(struct file *src_file, loff_t src_off,
++				    struct file *dst_file, loff_t dst_off,
++				    size_t len, unsigned int flags)
++{
++	ssize_t ret;
++
++	ret = __ceph_copy_file_range(src_file, src_off, dst_file, dst_off,
++				     len, flags);
++
++	if (ret == -EOPNOTSUPP)
++		ret = generic_copy_file_range(src_file, src_off, dst_file,
++					      dst_off, len, flags);
++	return ret;
++}
++
+ const struct file_operations ceph_file_fops = {
+ 	.open = ceph_open,
+ 	.release = ceph_release,
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index f5fcd6360056..c65823270313 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -1148,6 +1148,10 @@ static ssize_t cifs_copy_file_range(struct file *src_file, loff_t off,
+ 	rc = cifs_file_copychunk_range(xid, src_file, off, dst_file, destoff,
+ 					len, flags);
+ 	free_xid(xid);
++
++	if (rc == -EOPNOTSUPP)
++		rc = generic_copy_file_range(src_file, off, dst_file,
++					     destoff, len, flags);
+ 	return rc;
+ }
+ 
+diff --git a/fs/fuse/file.c b/fs/fuse/file.c
+index 3959f08279e6..e03901ae729b 100644
+--- a/fs/fuse/file.c
++++ b/fs/fuse/file.c
+@@ -3097,9 +3097,9 @@ static long fuse_file_fallocate(struct file *file, int mode, loff_t offset,
+ 	return err;
+ }
+ 
+-static ssize_t fuse_copy_file_range(struct file *file_in, loff_t pos_in,
+-				    struct file *file_out, loff_t pos_out,
+-				    size_t len, unsigned int flags)
++static ssize_t __fuse_copy_file_range(struct file *file_in, loff_t pos_in,
++				      struct file *file_out, loff_t pos_out,
++				      size_t len, unsigned int flags)
+ {
+ 	struct fuse_file *ff_in = file_in->private_data;
+ 	struct fuse_file *ff_out = file_out->private_data;
+@@ -3173,6 +3173,21 @@ static ssize_t fuse_copy_file_range(struct file *file_in, loff_t pos_in,
+ 	return err;
+ }
+ 
++static ssize_t fuse_copy_file_range(struct file *src_file, loff_t src_off,
++				    struct file *dst_file, loff_t dst_off,
++				    size_t len, unsigned int flags)
++{
++	ssize_t ret;
++
++	ret = __fuse_copy_file_range(src_file, src_off, dst_file, dst_off,
++				     len, flags);
++
++	if (ret == -EOPNOTSUPP)
++		ret = generic_copy_file_range(src_file, src_off, dst_file,
++					      dst_off, len, flags);
++	return ret;
++}
++
+ static const struct file_operations fuse_file_operations = {
+ 	.llseek		= fuse_file_llseek,
+ 	.read_iter	= fuse_file_read_iter,
+diff --git a/fs/nfs/nfs4file.c b/fs/nfs/nfs4file.c
+index cf42a8b939e3..4842f3ab3161 100644
+--- a/fs/nfs/nfs4file.c
++++ b/fs/nfs/nfs4file.c
+@@ -129,9 +129,9 @@ nfs4_file_flush(struct file *file, fl_owner_t id)
+ }
+ 
+ #ifdef CONFIG_NFS_V4_2
+-static ssize_t nfs4_copy_file_range(struct file *file_in, loff_t pos_in,
+-				    struct file *file_out, loff_t pos_out,
+-				    size_t count, unsigned int flags)
++static ssize_t __nfs4_copy_file_range(struct file *file_in, loff_t pos_in,
++				      struct file *file_out, loff_t pos_out,
++				      size_t count, unsigned int flags)
+ {
+ 	if (!nfs_server_capable(file_inode(file_out), NFS_CAP_COPY))
+ 		return -EOPNOTSUPP;
+@@ -140,6 +140,20 @@ static ssize_t nfs4_copy_file_range(struct file *file_in, loff_t pos_in,
+ 	return nfs42_proc_copy(file_in, pos_in, file_out, pos_out, count);
+ }
+ 
++static ssize_t nfs4_copy_file_range(struct file *file_in, loff_t pos_in,
++				    struct file *file_out, loff_t pos_out,
++				    size_t count, unsigned int flags)
++{
++	ssize_t ret;
++
++	ret = __nfs4_copy_file_range(file_in, pos_in, file_out, pos_out, count,
++				     flags);
++	if (ret == -EOPNOTSUPP)
++		ret = generic_copy_file_range(file_in, pos_in, file_out,
++					      pos_out, count, flags);
++	return ret;
++}
++
+ static loff_t nfs4_file_llseek(struct file *filep, loff_t offset, int whence)
+ {
+ 	loff_t ret;
+diff --git a/fs/read_write.c b/fs/read_write.c
+index 676b02fae589..b63dcb4e4fe9 100644
+--- a/fs/read_write.c
++++ b/fs/read_write.c
+@@ -1595,6 +1595,19 @@ ssize_t generic_copy_file_range(struct file *file_in, loff_t pos_in,
+ }
+ EXPORT_SYMBOL(generic_copy_file_range);
+ 
++static ssize_t do_copy_file_range(struct file *file_in, loff_t pos_in,
++				  struct file *file_out, loff_t pos_out,
++				  size_t len, unsigned int flags)
++{
++	if (file_out->f_op->copy_file_range)
++		return file_out->f_op->copy_file_range(file_in, pos_in,
++						       file_out, pos_out,
++						       len, flags);
++
++	return generic_copy_file_range(file_in, pos_in, file_out, pos_out, len,
++				       flags);
++}
++
+ /*
+  * copy_file_range() differs from regular file read and write in that it
+  * specifically allows return partial success.  When it does so is up to
+@@ -1655,15 +1668,9 @@ ssize_t vfs_copy_file_range(struct file *file_in, loff_t pos_in,
+ 		}
+ 	}
+ 
+-	if (file_out->f_op->copy_file_range) {
+-		ret = file_out->f_op->copy_file_range(file_in, pos_in, file_out,
+-						      pos_out, len, flags);
+-		if (ret != -EOPNOTSUPP)
+-			goto done;
+-	}
+-
+-	ret = generic_copy_file_range(file_in, pos_in, file_out, pos_out, len,
+-				      flags);
++	ret = do_copy_file_range(file_in, pos_in, file_out, pos_out, len,
++				flags);
++	WARN_ON_ONCE(ret == -EOPNOTSUPP);
+ done:
+ 	if (ret > 0) {
+ 		fsnotify_access(file_in);
+-- 
+2.17.1
 
-I should also warn that my only testing of these changes was to make
-sure that "cppcheck --enable=warning" no longer complains, that the
-file compiled without complaint (with cifs-utils standard "-Wall
--Wextra" arguments) and that "./smbinfo quote /dev/null" got past the
-memory allocation to the (correct) ioctl error for /dev/null.
-
-Also, I am not a CIFS developer and this may be the first time I have
-submitted a patch, certainly the first time I remember, so please
-forgive me and feel free to instruct me if I should be following some
-different process to submit this patch.
-
-Thanks in advance for considering this patch submission.
-
-Adam
-
---0000000000005b58710589bdf0fd
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="cifs-utils.smbinfo.memset_and_printf.diff"
-Content-Disposition: attachment; 
-	filename="cifs-utils.smbinfo.memset_and_printf.diff"
-Content-Transfer-Encoding: base64
-Content-ID: <f_jw43c2ek0>
-X-Attachment-Id: f_jw43c2ek0
-
-LS0tIGNpZnMtdXRpbHMvc21iaW5mby5jLm9yaWcJMjAxOS0wNS0yNSAxNDoxOTo1Ni43NTg0NzQ1
-ODggLTA3MDAKKysrIGNpZnMtdXRpbHMvc21iaW5mby5jCTIwMTktMDUtMjUgMTQ6MjY6MjIuNjMz
-MjU2OTEzIC0wNzAwCkBAIC05Nyw2ICs5NywxOCBAQCB1c2FnZShjaGFyICpuYW1lKQogCWV4aXQo
-MSk7CiB9CiAKK3N0YXRpYyB2b2lkICoKK3htYWxsb2MwKHNpemVfdCBuYnl0ZXMpCit7CisJdm9p
-ZCAqcmVzdWx0ID0gY2FsbG9jKDEsIG5ieXRlcyk7CisJaWYgKHJlc3VsdCA9PSBOVUxMKSB7CisJ
-CWZwcmludGYoc3RkZXJyLCAiJXM6IGZhaWxlZCB0byBhbGxvY2F0ZSAlenUgYnl0ZXMuXG4iLAor
-CQkJX19mdW5jX18sIG5ieXRlcyk7CisJCWV4aXQoMSk7CisJfQorCXJldHVybiByZXN1bHQ7Cit9
-CisKIHN0YXRpYyB2b2lkCiB3aW5fdG9fdGltZXZhbCh1aW50NjRfdCBzbWIyX3RpbWUsIHN0cnVj
-dCB0aW1ldmFsICp0dikKIHsKQEAgLTIyNSw4ICsyMzcsNyBAQCBmc2N0bGdldG9iamlkKGludCBm
-KQogCiAJZnN0YXQoZiwgJnN0KTsKIAotCXFpID0gbWFsbG9jKHNpemVvZihzdHJ1Y3Qgc21iX3F1
-ZXJ5X2luZm8pICsgNjQpOwotCW1lbXNldChxaSwgMCwgc2l6ZW9mKHFpKSArIDY0KTsKKwlxaSA9
-IHhtYWxsb2MwKHNpemVvZihzdHJ1Y3Qgc21iX3F1ZXJ5X2luZm8pICsgNjQpOwogCXFpLT5pbmZv
-X3R5cGUgPSAweDkwMDljOwogCXFpLT5maWxlX2luZm9fY2xhc3MgPSAwOwogCXFpLT5hZGRpdGlv
-bmFsX2luZm9ybWF0aW9uID0gMDsKQEAgLTI2OCw4ICsyNzksNyBAQCBmaWxlYWNjZXNzaW5mbyhp
-bnQgZikKIAogCWZzdGF0KGYsICZzdCk7CiAKLQlxaSA9IG1hbGxvYyhzaXplb2Yoc3RydWN0IHNt
-Yl9xdWVyeV9pbmZvKSArIDQpOwotCW1lbXNldChxaSwgMCwgc2l6ZW9mKHFpKSArIDQpOworCXFp
-ID0geG1hbGxvYzAoc2l6ZW9mKHN0cnVjdCBzbWJfcXVlcnlfaW5mbykgKyA0KTsKIAlxaS0+aW5m
-b190eXBlID0gMHgwMTsKIAlxaS0+ZmlsZV9pbmZvX2NsYXNzID0gODsKIAlxaS0+YWRkaXRpb25h
-bF9pbmZvcm1hdGlvbiA9IDA7CkBAIC0zMjIsOCArMzMyLDcgQEAgZmlsZWFsaWduaW5mbyhpbnQg
-ZikKIHsKIAlzdHJ1Y3Qgc21iX3F1ZXJ5X2luZm8gKnFpOwogCi0JcWkgPSBtYWxsb2Moc2l6ZW9m
-KHN0cnVjdCBzbWJfcXVlcnlfaW5mbykgKyA0KTsKLQltZW1zZXQocWksIDAsIHNpemVvZihxaSkg
-KyA0KTsKKwlxaSA9IHhtYWxsb2MwKHNpemVvZihzdHJ1Y3Qgc21iX3F1ZXJ5X2luZm8pICsgNCk7
-CiAJcWktPmluZm9fdHlwZSA9IDB4MDE7CiAJcWktPmZpbGVfaW5mb19jbGFzcyA9IDE3OwogCXFp
-LT5hZGRpdGlvbmFsX2luZm9ybWF0aW9uID0gMDsKQEAgLTM5Miw4ICs0MDEsNyBAQCBmaWxlYmFz
-aWNpbmZvKGludCBmKQogewogCXN0cnVjdCBzbWJfcXVlcnlfaW5mbyAqcWk7CiAKLQlxaSA9IG1h
-bGxvYyhzaXplb2Yoc3RydWN0IHNtYl9xdWVyeV9pbmZvKSArIDQwKTsKLQltZW1zZXQocWksIDAs
-IHNpemVvZihxaSkgKyA0MCk7CisJcWkgPSB4bWFsbG9jMChzaXplb2Yoc3RydWN0IHNtYl9xdWVy
-eV9pbmZvKSArIDQwKTsKIAlxaS0+aW5mb190eXBlID0gMHgwMTsKIAlxaS0+ZmlsZV9pbmZvX2Ns
-YXNzID0gNDsKIAlxaS0+YWRkaXRpb25hbF9pbmZvcm1hdGlvbiA9IDA7CkBAIC00MzIsOCArNDQw
-LDcgQEAgZmlsZXN0YW5kYXJkaW5mbyhpbnQgZikKIHsKIAlzdHJ1Y3Qgc21iX3F1ZXJ5X2luZm8g
-KnFpOwogCi0JcWkgPSBtYWxsb2Moc2l6ZW9mKHN0cnVjdCBzbWJfcXVlcnlfaW5mbykgKyAyNCk7
-Ci0JbWVtc2V0KHFpLCAwLCBzaXplb2YocWkpICsgMjQpOworCXFpID0geG1hbGxvYzAoc2l6ZW9m
-KHN0cnVjdCBzbWJfcXVlcnlfaW5mbykgKyAyNCk7CiAJcWktPmluZm9fdHlwZSA9IDB4MDE7CiAJ
-cWktPmZpbGVfaW5mb19jbGFzcyA9IDU7CiAJcWktPmFkZGl0aW9uYWxfaW5mb3JtYXRpb24gPSAw
-OwpAQCAtNDYyLDggKzQ2OSw3IEBAIGZpbGVpbnRlcm5hbGluZm8oaW50IGYpCiB7CiAJc3RydWN0
-IHNtYl9xdWVyeV9pbmZvICpxaTsKIAotCXFpID0gbWFsbG9jKHNpemVvZihzdHJ1Y3Qgc21iX3F1
-ZXJ5X2luZm8pICsgOCk7Ci0JbWVtc2V0KHFpLCAwLCBzaXplb2YocWkpICsgOCk7CisJcWkgPSB4
-bWFsbG9jMChzaXplb2Yoc3RydWN0IHNtYl9xdWVyeV9pbmZvKSArIDgpOwogCXFpLT5pbmZvX3R5
-cGUgPSAweDAxOwogCXFpLT5maWxlX2luZm9fY2xhc3MgPSA2OwogCXFpLT5hZGRpdGlvbmFsX2lu
-Zm9ybWF0aW9uID0gMDsKQEAgLTUwNSw4ICs1MTEsNyBAQCBmaWxlbW9kZWluZm8oaW50IGYpCiB7
-CiAJc3RydWN0IHNtYl9xdWVyeV9pbmZvICpxaTsKIAotCXFpID0gbWFsbG9jKHNpemVvZihzdHJ1
-Y3Qgc21iX3F1ZXJ5X2luZm8pICsgNCk7Ci0JbWVtc2V0KHFpLCAwLCBzaXplb2YocWkpICsgNCk7
-CisJcWkgPSB4bWFsbG9jMChzaXplb2Yoc3RydWN0IHNtYl9xdWVyeV9pbmZvKSArIDQpOwogCXFp
-LT5pbmZvX3R5cGUgPSAweDAxOwogCXFpLT5maWxlX2luZm9fY2xhc3MgPSAxNjsKIAlxaS0+YWRk
-aXRpb25hbF9pbmZvcm1hdGlvbiA9IDA7CkBAIC01MzUsOCArNTQwLDcgQEAgZmlsZXBvc2l0aW9u
-aW5mbyhpbnQgZikKIHsKIAlzdHJ1Y3Qgc21iX3F1ZXJ5X2luZm8gKnFpOwogCi0JcWkgPSBtYWxs
-b2Moc2l6ZW9mKHN0cnVjdCBzbWJfcXVlcnlfaW5mbykgKyA4KTsKLQltZW1zZXQocWksIDAsIHNp
-emVvZihxaSkgKyA4KTsKKwlxaSA9IHhtYWxsb2MwKHNpemVvZihzdHJ1Y3Qgc21iX3F1ZXJ5X2lu
-Zm8pICsgOCk7CiAJcWktPmluZm9fdHlwZSA9IDB4MDE7CiAJcWktPmZpbGVfaW5mb19jbGFzcyA9
-IDE0OwogCXFpLT5hZGRpdGlvbmFsX2luZm9ybWF0aW9uID0gMDsKQEAgLTU2NSw4ICs1NjksNyBA
-QCBmaWxlZWFpbmZvKGludCBmKQogewogCXN0cnVjdCBzbWJfcXVlcnlfaW5mbyAqcWk7CiAKLQlx
-aSA9IG1hbGxvYyhzaXplb2Yoc3RydWN0IHNtYl9xdWVyeV9pbmZvKSArIDQpOwotCW1lbXNldChx
-aSwgMCwgc2l6ZW9mKHFpKSArIDQpOworCXFpID0geG1hbGxvYzAoc2l6ZW9mKHN0cnVjdCBzbWJf
-cXVlcnlfaW5mbykgKyA0KTsKIAlxaS0+aW5mb190eXBlID0gMHgwMTsKIAlxaS0+ZmlsZV9pbmZv
-X2NsYXNzID0gNzsKIAlxaS0+YWRkaXRpb25hbF9pbmZvcm1hdGlvbiA9IDA7CkBAIC02MTAsOCAr
-NjEzLDcgQEAgZmlsZWZzZnVsbHNpemVpbmZvKGludCBmKQogewogCXN0cnVjdCBzbWJfcXVlcnlf
-aW5mbyAqcWk7CiAKLQlxaSA9IG1hbGxvYyhzaXplb2Yoc3RydWN0IHNtYl9xdWVyeV9pbmZvKSAr
-IDMyKTsKLQltZW1zZXQocWksIDAsIHNpemVvZihxaSkgKyAzMik7CisJcWkgPSB4bWFsbG9jMChz
-aXplb2Yoc3RydWN0IHNtYl9xdWVyeV9pbmZvKSArIDMyKTsKIAlxaS0+aW5mb190eXBlID0gMHgw
-MjsKIAlxaS0+ZmlsZV9pbmZvX2NsYXNzID0gNzsKIAlxaS0+YWRkaXRpb25hbF9pbmZvcm1hdGlv
-biA9IDA7CkBAIC02MzQsOCArNjM2LDcgQEAgZmlsZWFsbGluZm8oaW50IGYpCiAKIAlmc3RhdChm
-LCAmc3QpOwogCi0JcWkgPSBtYWxsb2Moc2l6ZW9mKHN0cnVjdCBzbWJfcXVlcnlfaW5mbykgKyBJ
-TlBVVF9CVUZGRVJfTEVOR1RIKTsKLQltZW1zZXQocWksIDAsIHNpemVvZihxaSkgKyBJTlBVVF9C
-VUZGRVJfTEVOR1RIKTsKKwlxaSA9IHhtYWxsb2MwKHNpemVvZihzdHJ1Y3Qgc21iX3F1ZXJ5X2lu
-Zm8pICsgSU5QVVRfQlVGRkVSX0xFTkdUSCk7CiAJcWktPmluZm9fdHlwZSA9IDB4MDE7CiAJcWkt
-PmZpbGVfaW5mb19jbGFzcyA9IDE4OwogCXFpLT5hZGRpdGlvbmFsX2luZm9ybWF0aW9uID0gMDsK
-QEAgLTg2Miw4ICs4NjMsNyBAQCBzZWNkZXNjKGludCBmKQogCiAJZnN0YXQoZiwgJnN0KTsKIAot
-CXFpID0gbWFsbG9jKHNpemVvZihzdHJ1Y3Qgc21iX3F1ZXJ5X2luZm8pICsgSU5QVVRfQlVGRkVS
-X0xFTkdUSCk7Ci0JbWVtc2V0KHFpLCAwLCBzaXplb2YocWkpICsgSU5QVVRfQlVGRkVSX0xFTkdU
-SCk7CisJcWkgPSB4bWFsbG9jMChzaXplb2Yoc3RydWN0IHNtYl9xdWVyeV9pbmZvKSArIElOUFVU
-X0JVRkZFUl9MRU5HVEgpOwogCXFpLT5pbmZvX3R5cGUgPSAweDAzOwogCXFpLT5maWxlX2luZm9f
-Y2xhc3MgPSAwOwogCXFpLT5hZGRpdGlvbmFsX2luZm9ybWF0aW9uID0gMHgwMDAwMDAwNzsgLyog
-T3duZXIsIEdyb3VwLCBEYWNsICovCkBAIC04OTIsNyArODkyLDcgQEAgb25lX21vcmU6CiAKIAlt
-ZW1jcHkoJnUzMiwgJnNkW29mZiArIDRdLCA0KTsKIAl1MzIgPSBsZTMydG9oKHUzMik7Ci0JcHJp
-bnRmKCJTSUQgTGVuZ3RoICVkXG4iLCB1MzIpOworCXByaW50ZigiU0lEIExlbmd0aCAldVxuIiwg
-dTMyKTsKIAogCW1lbWNweSgmdTY0LCAmc2Rbb2ZmICsgOF0sIDgpOwogCXdpbl90b190aW1ldmFs
-KGxlNjR0b2godTY0KSwgJnR2KTsKQEAgLTk0MSw4ICs5NDEsNyBAQCBxdW90YShpbnQgZikKIAlj
-aGFyICpidWY7CiAJaW50IGk7CiAKLQlxaSA9IG1hbGxvYyhzaXplb2Yoc3RydWN0IHNtYl9xdWVy
-eV9pbmZvKSArIElOUFVUX0JVRkZFUl9MRU5HVEgpOwotCW1lbXNldChxaSwgMCwgc2l6ZW9mKHN0
-cnVjdCBzbWJfcXVlcnlfaW5mbykgKyBJTlBVVF9CVUZGRVJfTEVOR1RIKTsKKwlxaSA9IHhtYWxs
-b2MwKHNpemVvZihzdHJ1Y3Qgc21iX3F1ZXJ5X2luZm8pICsgSU5QVVRfQlVGRkVSX0xFTkdUSCk7
-CiAJcWktPmluZm9fdHlwZSA9IDB4MDQ7CiAJcWktPmZpbGVfaW5mb19jbGFzcyA9IDA7CiAJcWkt
-PmFkZGl0aW9uYWxfaW5mb3JtYXRpb24gPSAwOyAvKiBPd25lciwgR3JvdXAsIERhY2wgKi8K
---0000000000005b58710589bdf0fd--
