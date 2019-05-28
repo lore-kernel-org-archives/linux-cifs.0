@@ -3,67 +3,110 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D472C04AB6
-	for <linux-cifs@archiver.kernel.org>; Tue, 28 May 2019 07:38:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7881C04E84
+	for <linux-cifs@archiver.kernel.org>; Tue, 28 May 2019 08:53:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F04042075B
-	for <linux-cifs@archiver.kernel.org>; Tue, 28 May 2019 07:38:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BB3EE2075C
+	for <linux-cifs@archiver.kernel.org>; Tue, 28 May 2019 08:53:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727349AbfE1HiQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 28 May 2019 03:38:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55690 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726203AbfE1HiQ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 28 May 2019 03:38:16 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 189C030842B2;
-        Tue, 28 May 2019 07:38:16 +0000 (UTC)
-Received: from idlethread.redhat.com (ovpn-116-19.ams2.redhat.com [10.36.116.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2F63C2718B;
-        Tue, 28 May 2019 07:38:14 +0000 (UTC)
-From:   Roberto Bergantinos Corpas <rbergant@redhat.com>
-To:     sfrench@samba.org
-Cc:     linux-cifs@vger.kernel.org
-Subject: [PATCH] CIFS: cifs_read_allocate_pages: don't iterate through whole page array on ENOMEM
-Date:   Tue, 28 May 2019 09:38:14 +0200
-Message-Id: <20190528073814.984-1-rbergant@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Tue, 28 May 2019 07:38:16 +0000 (UTC)
+        id S1726686AbfE1IxY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 28 May 2019 04:53:24 -0400
+Received: from mx2.suse.de ([195.135.220.15]:42388 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726649AbfE1IxY (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 28 May 2019 04:53:24 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 3CFCCAF1C;
+        Tue, 28 May 2019 08:53:22 +0000 (UTC)
+From:   Luis Henriques <lhenriques@suse.com>
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     Amir Goldstein <amir73il@gmail.com>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Olga Kornievskaia <olga.kornievskaia@gmail.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        ceph-devel@vger.kernel.org, linux-api@vger.kernel.org,
+        Dave Chinner <dchinner@redhat.com>
+Subject: Re: [PATCH v2 6/8] vfs: copy_file_range should update file timestamps
+References: <20190526061100.21761-1-amir73il@gmail.com>
+        <20190526061100.21761-7-amir73il@gmail.com>
+        <20190527143539.GA14980@hermes.olymp>
+        <20190527220513.GB29573@dread.disaster.area>
+Date:   Tue, 28 May 2019 09:53:20 +0100
+In-Reply-To: <20190527220513.GB29573@dread.disaster.area> (Dave Chinner's
+        message of "Tue, 28 May 2019 08:05:13 +1000")
+Message-ID: <875zpvrmdb.fsf@suse.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
- In cifs_read_allocate_pages, in case of ENOMEM, we go through
-whole rdata->pages array but we have failed the allocation before
-nr_pages, therefore we may end up calling put_page with NULL
-pointer, causing oops
+Dave Chinner <david@fromorbit.com> writes:
 
-Signed-off-by: Roberto Bergantinos Corpas <rbergant@redhat.com>
----
- fs/cifs/file.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+> On Mon, May 27, 2019 at 03:35:39PM +0100, Luis Henriques wrote:
+>> On Sun, May 26, 2019 at 09:10:57AM +0300, Amir Goldstein wrote:
+>> > From: Dave Chinner <dchinner@redhat.com>
+>> > 
+>> > Timestamps are not updated right now, so programs looking for
+>> > timestamp updates for file modifications (like rsync) will not
+>> > detect that files have changed. We are also accessing the source
+>> > data when doing a copy (but not when cloning) so we need to update
+>> > atime on the source file as well.
+>> > 
+>> > Signed-off-by: Dave Chinner <dchinner@redhat.com>
+>> > Signed-off-by: Amir Goldstein <amir73il@gmail.com>
+>> > ---
+>> >  fs/read_write.c | 10 ++++++++++
+>> >  1 file changed, 10 insertions(+)
+>> > 
+>> > diff --git a/fs/read_write.c b/fs/read_write.c
+>> > index e16bcafc0da2..4b23a86aacd9 100644
+>> > --- a/fs/read_write.c
+>> > +++ b/fs/read_write.c
+>> > @@ -1576,6 +1576,16 @@ int generic_copy_file_range_prep(struct file *file_in, struct file *file_out)
+>> >  
+>> >  	WARN_ON_ONCE(!inode_is_locked(file_inode(file_out)));
+>> >  
+>> > +	/* Update source timestamps, because we are accessing file data */
+>> > +	file_accessed(file_in);
+>> > +
+>> > +	/* Update destination timestamps, since we can alter file contents. */
+>> > +	if (!(file_out->f_mode & FMODE_NOCMTIME)) {
+>> > +		ret = file_update_time(file_out);
+>> > +		if (ret)
+>> > +			return ret;
+>> > +	}
+>> > +
+>> 
+>> Is this the right place for updating the timestamps?  I see that in same
+>> cases we may be updating the timestamp even if there was an error and no
+>> copy was performed.  For example, if file_remove_privs fails.
+>
+> It's the same place we do it for read - file_accessed() is called
+> before we do the IO - and the same place for write -
+> file_update_time() is called before we copy data into the pagecache
+> or do direct IO. As such, it really doesn't matter if it is before
+> or after file_remove_privs() - the IO can still fail for many
+> reasons after we've updated the timestamps and in some of the
+> failure cases (e.g. we failed the sync at the end of an O_DSYNC
+> buffered write) we still want the timestamps to be modified because
+> the data and/or user visible metadata /may/ have been changed.
+>
+> cfr operates under the same constraints as read() and write(), so we
+> need to update the timestamps up front regardless of whether the
+> copy ends up succeeding or not....
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index ce9a5be11df5..06e27ac6d82c 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -3216,7 +3216,9 @@ cifs_read_allocate_pages(struct cifs_readdata *rdata, unsigned int nr_pages)
- 	}
- 
- 	if (rc) {
--		for (i = 0; i < nr_pages; i++) {
-+		unsigned int nr_page_failed = i;
-+
-+		for (i = 0; i < nr_page_failed; i++) {
- 			put_page(rdata->pages[i]);
- 			rdata->pages[i] = NULL;
- 		}
+Great, thanks for explaining it.  It now makes sense, even for
+consistency, to have this operation here.
+
+Cheers,
 -- 
-2.14.5
-
+Luis
