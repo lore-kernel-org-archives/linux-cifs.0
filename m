@@ -2,60 +2,57 @@ Return-Path: <SRS0=XALz=T5=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH,UNPARSEABLE_RELAY,
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AB6DC28CC2
-	for <linux-cifs@archiver.kernel.org>; Wed, 29 May 2019 17:44:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57B36C46470
+	for <linux-cifs@archiver.kernel.org>; Wed, 29 May 2019 18:24:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 20C3A23FF1
-	for <linux-cifs@archiver.kernel.org>; Wed, 29 May 2019 17:44:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 33DEA24067
+	for <linux-cifs@archiver.kernel.org>; Wed, 29 May 2019 18:24:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ifWmmDQA"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="dm0D6anY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726808AbfE2Rnf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 29 May 2019 13:43:35 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:45616 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725917AbfE2Rne (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 May 2019 13:43:34 -0400
-Received: by mail-wr1-f67.google.com with SMTP id b18so2360045wrq.12;
-        Wed, 29 May 2019 10:43:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=+W6U4ETnLrYkikxbMk/wh3iIEZoEwtztQ/QLH5NUi74=;
-        b=ifWmmDQAHCoqZv+08IMNQwcl3vT3mFrhJwtgx0agF0t1rv94ZjdJ+1/Qz2ZzkxgdRB
-         /Y26IvD4wlwQG9KgP9CXtHCTvmJRonYuD82WRCqSW3cVVLKQUSD06tAHq1E4g1bc5WM8
-         gJQX28nF2uFE2SQ5owL/3qfbYYlT8++wQSY5mtq7/YeujWf6vskMAhyiT3hdreh/2RU8
-         eMgDzSvHQY6YdZUg3117teWUwhTRKSBCJzYnnM08WvqGBtL00+xkBqVhkG2f9H8xZrDF
-         C8p8tKwIYlc3zdB2mBorWe4t1CLUi6V2xrJNrDzA8/6PGo+6fki/LBFdp+it0PsRhlMP
-         aigQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=+W6U4ETnLrYkikxbMk/wh3iIEZoEwtztQ/QLH5NUi74=;
-        b=WDAWwTxJhOkmdehPyIcikBf1V2AKRPzQEgatP3mc00/wdlMcGCbBc8HD8IsZ+PSm8r
-         0uN4WYzodEI3FXH1mnS4LHZ5vQi6B2jiSNvIw7GhJk6mpY4g+8DQZa0iu2nmAub97/4r
-         TqIVDvqYK9QkikW/zUnbyv0ck/Csn4ZsIJ7TlWXok/07j7wUzf5Ojf42Lav7hYJsG6P6
-         qD8v7sbbq6pTcBqSllA4PPbuWYHU9UBsMbEPzcz4bDugoig0+tWvoZdVQX5n3ldkq+2O
-         M/C8cA+9eP9/L3/iSegeH9smYLIW8zNKg5pcWUOzU5vkBRkANallu47IRqfAQhK19FX0
-         vAMg==
-X-Gm-Message-State: APjAAAVXl5mOeRvssX/Yfm7wNb00zM7kRdW3QcdpZUdNVNzeKi19lVcn
-        d0vcVHhjhYDTlmuOU3NY3NU=
-X-Google-Smtp-Source: APXvYqxXy6efjOTuKd1UtXyaOx74f+byvZTB6d49G9ysXIZOw2+uyuPsS68sOCEIr723KC7lixtdDw==
-X-Received: by 2002:a05:6000:110:: with SMTP id o16mr2703551wrx.200.1559151811898;
-        Wed, 29 May 2019 10:43:31 -0700 (PDT)
-Received: from localhost.localdomain ([5.102.238.208])
-        by smtp.gmail.com with ESMTPSA id k125sm31702wmb.34.2019.05.29.10.43.30
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 29 May 2019 10:43:31 -0700 (PDT)
-From:   Amir Goldstein <amir73il@gmail.com>
-To:     "Darrick J . Wong" <darrick.wong@oracle.com>
+        id S1727386AbfE2SYD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 29 May 2019 14:24:03 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:41622 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725917AbfE2SYD (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 May 2019 14:24:03 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4TIId0B057287;
+        Wed, 29 May 2019 18:23:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2018-07-02;
+ bh=yN96siC97bGXA079KpRQnuL10xuxNSq6s0e4DVZw93g=;
+ b=dm0D6anYXBe3K+MCrPSny+6dBQfMjrQSywoSfiBo+7YRlux+5udixTmWCQU2Kv8Ko5Op
+ lzCZuyWjvRyHPtAyWmSMQgz4OzeVT4gbdTGsf+YhsMGUALgOrVLtR1SuH8SPA21kpd+E
+ 9VEaI1PfsAgINy3s6Iq+euau3Z0KOSpRUIAtwX/Vy+vIzwOoKLlHjnbzMTVP2hXavYFz
+ c/uoqIDLaYFGpOc+iI8twzL/4the59e8ruSQ7EX+Aelv+pxR07Bxm9yrc9Z2y90YqdXX
+ 2z1TIYls/h1xntFYYk54HOUzHTIVMKDLxjSO/G/Ttlk2jNvIwe4ZSm5nu4sFzl3/DcK4 Ww== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2130.oracle.com with ESMTP id 2spu7dky0w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 29 May 2019 18:23:25 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4TIMNnZ014114;
+        Wed, 29 May 2019 18:23:25 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3020.oracle.com with ESMTP id 2sqh73vccs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 29 May 2019 18:23:25 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x4TINMLW025084;
+        Wed, 29 May 2019 18:23:22 GMT
+Received: from localhost (/67.169.218.210)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 29 May 2019 11:23:22 -0700
+Date:   Wed, 29 May 2019 11:23:19 -0700
+From:   "Darrick J. Wong" <darrick.wong@oracle.com>
+To:     Amir Goldstein <amir73il@gmail.com>
 Cc:     Dave Chinner <david@fromorbit.com>, Christoph Hellwig <hch@lst.de>,
         linux-xfs@vger.kernel.org,
         Olga Kornievskaia <olga.kornievskaia@gmail.com>,
@@ -63,219 +60,127 @@ Cc:     Dave Chinner <david@fromorbit.com>, Christoph Hellwig <hch@lst.de>,
         Al Viro <viro@zeniv.linux.org.uk>,
         linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
         ceph-devel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, Dave Chinner <dchinner@redhat.com>
-Subject: [PATCH v3 02/13] vfs: no fallback for ->copy_file_range
-Date:   Wed, 29 May 2019 20:43:06 +0300
-Message-Id: <20190529174318.22424-3-amir73il@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190529174318.22424-1-amir73il@gmail.com>
+        linux-cifs@vger.kernel.org
+Subject: Re: [PATCH v3 04/13] vfs: remove redundant checks from
+ generic_remap_checks()
+Message-ID: <20190529182319.GD5231@magnolia>
 References: <20190529174318.22424-1-amir73il@gmail.com>
+ <20190529174318.22424-5-amir73il@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190529174318.22424-5-amir73il@gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9272 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1905290118
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9272 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1905290118
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Dave Chinner <dchinner@redhat.com>
+On Wed, May 29, 2019 at 08:43:08PM +0300, Amir Goldstein wrote:
+> The access limit checks on input file range in generic_remap_checks()
+> are redundant because the input file size is guaranteied to be within
 
-Now that we have generic_copy_file_range(), remove it as a fallback
-case when offloads fail. This puts the responsibility for executing
-fallbacks on the filesystems that implement ->copy_file_range and
-allows us to add operational validity checks to
-generic_copy_file_range().
+"guaranteed"...
 
-Rework vfs_copy_file_range() to call a new do_copy_file_range()
-helper to execute the copying callout, and move calls to
-generic_file_copy_range() into filesystem methods where they
-currently return failures.
+> limits and pos+len are already checked to be within input file size.
+> 
+> Beyond the fact that the check cannot fail, if it would have failed,
+> it could return -EFBIG for input file range error. There is no precedent
+> for that. -EFBIG is returned in syscalls that would change file length.
+> 
+> With that call removed, we can fold generic_access_check_limits() into
+> generic_write_check_limits().
+> 
+> Signed-off-by: Amir Goldstein <amir73il@gmail.com>
 
-[Amir] overlayfs is not responsible of executing the fallback.
-It is the responsibility of the underlying filesystem.
-
-Signed-off-by: Dave Chinner <dchinner@redhat.com>
-Signed-off-by: Amir Goldstein <amir73il@gmail.com>
+Once the changelog is fixed,
 Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
----
- fs/ceph/file.c    | 21 ++++++++++++++++++---
- fs/cifs/cifsfs.c  |  4 ++++
- fs/fuse/file.c    | 21 ++++++++++++++++++---
- fs/nfs/nfs4file.c | 20 +++++++++++++++++---
- fs/read_write.c   | 25 ++++++++++++++++---------
- 5 files changed, 73 insertions(+), 18 deletions(-)
 
-diff --git a/fs/ceph/file.c b/fs/ceph/file.c
-index 305daf043eb0..e87f7b2023af 100644
---- a/fs/ceph/file.c
-+++ b/fs/ceph/file.c
-@@ -1889,9 +1889,9 @@ static int is_file_size_ok(struct inode *src_inode, struct inode *dst_inode,
- 	return 0;
- }
- 
--static ssize_t ceph_copy_file_range(struct file *src_file, loff_t src_off,
--				    struct file *dst_file, loff_t dst_off,
--				    size_t len, unsigned int flags)
-+static ssize_t __ceph_copy_file_range(struct file *src_file, loff_t src_off,
-+				      struct file *dst_file, loff_t dst_off,
-+				      size_t len, unsigned int flags)
- {
- 	struct inode *src_inode = file_inode(src_file);
- 	struct inode *dst_inode = file_inode(dst_file);
-@@ -2100,6 +2100,21 @@ static ssize_t ceph_copy_file_range(struct file *src_file, loff_t src_off,
- 	return ret;
- }
- 
-+static ssize_t ceph_copy_file_range(struct file *src_file, loff_t src_off,
-+				    struct file *dst_file, loff_t dst_off,
-+				    size_t len, unsigned int flags)
-+{
-+	ssize_t ret;
-+
-+	ret = __ceph_copy_file_range(src_file, src_off, dst_file, dst_off,
-+				     len, flags);
-+
-+	if (ret == -EOPNOTSUPP)
-+		ret = generic_copy_file_range(src_file, src_off, dst_file,
-+					      dst_off, len, flags);
-+	return ret;
-+}
-+
- const struct file_operations ceph_file_fops = {
- 	.open = ceph_open,
- 	.release = ceph_release,
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index f5fcd6360056..c65823270313 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -1148,6 +1148,10 @@ static ssize_t cifs_copy_file_range(struct file *src_file, loff_t off,
- 	rc = cifs_file_copychunk_range(xid, src_file, off, dst_file, destoff,
- 					len, flags);
- 	free_xid(xid);
-+
-+	if (rc == -EOPNOTSUPP)
-+		rc = generic_copy_file_range(src_file, off, dst_file,
-+					     destoff, len, flags);
- 	return rc;
- }
- 
-diff --git a/fs/fuse/file.c b/fs/fuse/file.c
-index 3959f08279e6..e03901ae729b 100644
---- a/fs/fuse/file.c
-+++ b/fs/fuse/file.c
-@@ -3097,9 +3097,9 @@ static long fuse_file_fallocate(struct file *file, int mode, loff_t offset,
- 	return err;
- }
- 
--static ssize_t fuse_copy_file_range(struct file *file_in, loff_t pos_in,
--				    struct file *file_out, loff_t pos_out,
--				    size_t len, unsigned int flags)
-+static ssize_t __fuse_copy_file_range(struct file *file_in, loff_t pos_in,
-+				      struct file *file_out, loff_t pos_out,
-+				      size_t len, unsigned int flags)
- {
- 	struct fuse_file *ff_in = file_in->private_data;
- 	struct fuse_file *ff_out = file_out->private_data;
-@@ -3173,6 +3173,21 @@ static ssize_t fuse_copy_file_range(struct file *file_in, loff_t pos_in,
- 	return err;
- }
- 
-+static ssize_t fuse_copy_file_range(struct file *src_file, loff_t src_off,
-+				    struct file *dst_file, loff_t dst_off,
-+				    size_t len, unsigned int flags)
-+{
-+	ssize_t ret;
-+
-+	ret = __fuse_copy_file_range(src_file, src_off, dst_file, dst_off,
-+				     len, flags);
-+
-+	if (ret == -EOPNOTSUPP)
-+		ret = generic_copy_file_range(src_file, src_off, dst_file,
-+					      dst_off, len, flags);
-+	return ret;
-+}
-+
- static const struct file_operations fuse_file_operations = {
- 	.llseek		= fuse_file_llseek,
- 	.read_iter	= fuse_file_read_iter,
-diff --git a/fs/nfs/nfs4file.c b/fs/nfs/nfs4file.c
-index cf42a8b939e3..4842f3ab3161 100644
---- a/fs/nfs/nfs4file.c
-+++ b/fs/nfs/nfs4file.c
-@@ -129,9 +129,9 @@ nfs4_file_flush(struct file *file, fl_owner_t id)
- }
- 
- #ifdef CONFIG_NFS_V4_2
--static ssize_t nfs4_copy_file_range(struct file *file_in, loff_t pos_in,
--				    struct file *file_out, loff_t pos_out,
--				    size_t count, unsigned int flags)
-+static ssize_t __nfs4_copy_file_range(struct file *file_in, loff_t pos_in,
-+				      struct file *file_out, loff_t pos_out,
-+				      size_t count, unsigned int flags)
- {
- 	if (!nfs_server_capable(file_inode(file_out), NFS_CAP_COPY))
- 		return -EOPNOTSUPP;
-@@ -140,6 +140,20 @@ static ssize_t nfs4_copy_file_range(struct file *file_in, loff_t pos_in,
- 	return nfs42_proc_copy(file_in, pos_in, file_out, pos_out, count);
- }
- 
-+static ssize_t nfs4_copy_file_range(struct file *file_in, loff_t pos_in,
-+				    struct file *file_out, loff_t pos_out,
-+				    size_t count, unsigned int flags)
-+{
-+	ssize_t ret;
-+
-+	ret = __nfs4_copy_file_range(file_in, pos_in, file_out, pos_out, count,
-+				     flags);
-+	if (ret == -EOPNOTSUPP)
-+		ret = generic_copy_file_range(file_in, pos_in, file_out,
-+					      pos_out, count, flags);
-+	return ret;
-+}
-+
- static loff_t nfs4_file_llseek(struct file *filep, loff_t offset, int whence)
- {
- 	loff_t ret;
-diff --git a/fs/read_write.c b/fs/read_write.c
-index 676b02fae589..b63dcb4e4fe9 100644
---- a/fs/read_write.c
-+++ b/fs/read_write.c
-@@ -1595,6 +1595,19 @@ ssize_t generic_copy_file_range(struct file *file_in, loff_t pos_in,
- }
- EXPORT_SYMBOL(generic_copy_file_range);
- 
-+static ssize_t do_copy_file_range(struct file *file_in, loff_t pos_in,
-+				  struct file *file_out, loff_t pos_out,
-+				  size_t len, unsigned int flags)
-+{
-+	if (file_out->f_op->copy_file_range)
-+		return file_out->f_op->copy_file_range(file_in, pos_in,
-+						       file_out, pos_out,
-+						       len, flags);
-+
-+	return generic_copy_file_range(file_in, pos_in, file_out, pos_out, len,
-+				       flags);
-+}
-+
- /*
-  * copy_file_range() differs from regular file read and write in that it
-  * specifically allows return partial success.  When it does so is up to
-@@ -1655,15 +1668,9 @@ ssize_t vfs_copy_file_range(struct file *file_in, loff_t pos_in,
- 		}
- 	}
- 
--	if (file_out->f_op->copy_file_range) {
--		ret = file_out->f_op->copy_file_range(file_in, pos_in, file_out,
--						      pos_out, len, flags);
--		if (ret != -EOPNOTSUPP)
--			goto done;
--	}
--
--	ret = generic_copy_file_range(file_in, pos_in, file_out, pos_out, len,
--				      flags);
-+	ret = do_copy_file_range(file_in, pos_in, file_out, pos_out, len,
-+				flags);
-+	WARN_ON_ONCE(ret == -EOPNOTSUPP);
- done:
- 	if (ret > 0) {
- 		fsnotify_access(file_in);
--- 
-2.17.1
+--D
 
+> ---
+>  mm/filemap.c | 33 ++++++++++++---------------------
+>  1 file changed, 12 insertions(+), 21 deletions(-)
+> 
+> diff --git a/mm/filemap.c b/mm/filemap.c
+> index a38619a4a6af..44361928bbb0 100644
+> --- a/mm/filemap.c
+> +++ b/mm/filemap.c
+> @@ -2895,24 +2895,11 @@ EXPORT_SYMBOL(read_cache_page_gfp);
+>   * LFS limits.  If pos is under the limit it becomes a short access.  If it
+>   * exceeds the limit we return -EFBIG.
+>   */
+> -static int generic_access_check_limits(struct file *file, loff_t pos,
+> -				       loff_t *count)
+> -{
+> -	struct inode *inode = file->f_mapping->host;
+> -	loff_t max_size = inode->i_sb->s_maxbytes;
+> -
+> -	if (!(file->f_flags & O_LARGEFILE))
+> -		max_size = MAX_NON_LFS;
+> -
+> -	if (unlikely(pos >= max_size))
+> -		return -EFBIG;
+> -	*count = min(*count, max_size - pos);
+> -	return 0;
+> -}
+> -
+>  static int generic_write_check_limits(struct file *file, loff_t pos,
+>  				      loff_t *count)
+>  {
+> +	struct inode *inode = file->f_mapping->host;
+> +	loff_t max_size = inode->i_sb->s_maxbytes;
+>  	loff_t limit = rlimit(RLIMIT_FSIZE);
+>  
+>  	if (limit != RLIM_INFINITY) {
+> @@ -2923,7 +2910,15 @@ static int generic_write_check_limits(struct file *file, loff_t pos,
+>  		*count = min(*count, limit - pos);
+>  	}
+>  
+> -	return generic_access_check_limits(file, pos, count);
+> +	if (!(file->f_flags & O_LARGEFILE))
+> +		max_size = MAX_NON_LFS;
+> +
+> +	if (unlikely(pos >= max_size))
+> +		return -EFBIG;
+> +
+> +	*count = min(*count, max_size - pos);
+> +
+> +	return 0;
+>  }
+>  
+>  /*
+> @@ -2963,7 +2958,7 @@ EXPORT_SYMBOL(generic_write_checks);
+>  /*
+>   * Performs necessary checks before doing a clone.
+>   *
+> - * Can adjust amount of bytes to clone.
+> + * Can adjust amount of bytes to clone via @req_count argument.
+>   * Returns appropriate error code that caller should return or
+>   * zero in case the clone should be allowed.
+>   */
+> @@ -3001,10 +2996,6 @@ int generic_remap_checks(struct file *file_in, loff_t pos_in,
+>  		return -EINVAL;
+>  	count = min(count, size_in - (uint64_t)pos_in);
+>  
+> -	ret = generic_access_check_limits(file_in, pos_in, &count);
+> -	if (ret)
+> -		return ret;
+> -
+>  	ret = generic_write_check_limits(file_out, pos_out, &count);
+>  	if (ret)
+>  		return ret;
+> -- 
+> 2.17.1
+> 
