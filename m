@@ -2,112 +2,152 @@ Return-Path: <SRS0=XALz=T5=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EBECC46470
-	for <linux-cifs@archiver.kernel.org>; Wed, 29 May 2019 16:20:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A68AAC28CC0
+	for <linux-cifs@archiver.kernel.org>; Wed, 29 May 2019 17:43:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DC42523D55
-	for <linux-cifs@archiver.kernel.org>; Wed, 29 May 2019 16:20:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 81F0223FF1
+	for <linux-cifs@archiver.kernel.org>; Wed, 29 May 2019 17:43:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jQSFEpXt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f17Sh1HP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727169AbfE2QUj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 29 May 2019 12:20:39 -0400
-Received: from mail-yw1-f68.google.com ([209.85.161.68]:42244 "EHLO
-        mail-yw1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726162AbfE2QUi (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 May 2019 12:20:38 -0400
-Received: by mail-yw1-f68.google.com with SMTP id s5so1302966ywd.9;
-        Wed, 29 May 2019 09:20:38 -0700 (PDT)
+        id S1725956AbfE2Rna (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 29 May 2019 13:43:30 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:38020 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725917AbfE2Rna (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 May 2019 13:43:30 -0400
+Received: by mail-wr1-f66.google.com with SMTP id d18so2396174wrs.5;
+        Wed, 29 May 2019 10:43:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qgWFwBbqc/TIeFx+G72gp5eLEUxfA2pK5OKuDEowGKc=;
-        b=jQSFEpXtckdK15GU+zOhWiGnSetf0KAzWuZb58/zupTyFnbmFnkOKY/iSToYuQyN5L
-         MkI6aVdlMmOcfKlg9ISJwKI+z1ZDwj3q5XuMNWjHeIXgiskwej8PInH6I/oXzzsCBq0X
-         QbUBwy1a+RM+qyUmZ3+hCoLNYZVgX+YehA8iiDIrxLJdqHnITrrPL3YC/9ZjncB+SoBO
-         Nk6bungjzgZ15oeBYTgVV/FQhatnWgz1WrbbG7rU6pRlMWg7bIMhim8quPwHVPp4GVxW
-         9qzJHOnagZq48iB2ZR7WXJ1NaV6qWYsbq4NZfDfLWONADgwARn6tkDmxfZLQCSgbrmFg
-         Zt2Q==
+        h=from:to:cc:subject:date:message-id;
+        bh=SUYnB2bg4AR5y4HlcGNuWGzeCbLRgpuJBmh6fn5CpA4=;
+        b=f17Sh1HPDc9bYMG1afQL0SErA2OLPo6bzs0M+RgImWRrvuYAE6X+IRRxhBfn2W8n0E
+         GHV5S3VSKLum2UZG2m5jEEwK8YJoCH6NU8hq8TTgEr1vT6rIGaAS1my/czWl8uffAP0/
+         Cu2fC0uC3HP8OIJi+W6ZBzEcsH05bCQsoWY2DcsxobER2+mSj7/5QtCDqY7JLuPOvPdz
+         9YN5j/7+voP6EZ0q9aJ/GFALf7QeTIaoY8iWAKvRTcYOr6KnA96A+TZwu1T/A/V1q5GD
+         hxkR7JeYoG95+ckNoW0Loz5RBtdwNSSwHXQUyeOgzTHAdWjwQpffAZZeHtflgtnYlu0v
+         QDZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qgWFwBbqc/TIeFx+G72gp5eLEUxfA2pK5OKuDEowGKc=;
-        b=Lqn2X94KepSJd87ksswKtyzwVgccWw7Y0ZkNyo27lHSc4qDB2nbwa65qxVzMtf9i8q
-         ui7cUCm70p1bXExouRJmbtf00MLwwaioZFeZoKzLL2aE5IstHZahK1Wv6wX+fZJy2d+/
-         o4XS4HUvlN3odpqUTrk9LWP6+rIeVXUIsg+tsIrRlO4uLUH2arlvVkUY13DHYaVjh5/p
-         wqSwf7gVuNDKz8e2k3o1Jrm0mQ/DPn8zL+mSCtS2vNzB6Y2Arr+Oa8Cu9Ajn1CvX3XYZ
-         bnrKqaVXecAtBdVLSjAlv38bSNYBf5Qzq8m7IKiam2vmxewV/EBt9XHmOwRePRm45OxU
-         M+yg==
-X-Gm-Message-State: APjAAAVNgpmDxwzXkWdrPY/LzDATgpDEsiD+vqLNlipNWCRMthJIyfT1
-        eOanGB7BEiTCmkK/VGdZogsK7WcL1F4aDpWiiy0=
-X-Google-Smtp-Source: APXvYqzzgbRrTpnULwe/IoxAzcoJVne1h/bBy2qlyUlmguuG3+RHGMFZemo93QUU34JXx68hkctDvcHbDw8oHipDSVE=
-X-Received: by 2002:a81:3797:: with SMTP id e145mr53153276ywa.25.1559146832803;
- Wed, 29 May 2019 09:20:32 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190526061100.21761-1-amir73il@gmail.com> <20190526061100.21761-10-amir73il@gmail.com>
- <20190528164844.GJ5221@magnolia>
-In-Reply-To: <20190528164844.GJ5221@magnolia>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=SUYnB2bg4AR5y4HlcGNuWGzeCbLRgpuJBmh6fn5CpA4=;
+        b=qxQcZ7L8a0kPUxyDe7dxpZBc6DpickgHPFEu1mzucgzgLCq37HfZr5CvRlUshF8h2g
+         ArBrim/vZtlJ7EbFWJ7qgW3ifAwy3xq4DcXGJoIWpj1ByO/d2w7yfUJV7GnK7IcvOGNI
+         6r/sRgYTlSLYMVV//F/fYPVYOuAZe+QxrifOBlUtaW+1bGDBBQadImUxGWIyp7XHllfM
+         7mfOVddkfap5Ehg4+h8uWc3x/YmI8bUSSiHaBrrQ3S8LYKm7IQsuvHg2Puu04OUoWHpf
+         nRJxEMjWA0UEJBmTcMNglYKm6hCGtThuv6adeq8GxXIBk6UKS/gXAGd0nGAJKCy3ZWdA
+         iUjg==
+X-Gm-Message-State: APjAAAVzkUH9n5/ITQUGy3IP6XQloCOZM2w5Jmky3/E8PwLLH5uuWRjO
+        X6ULJpAM2qCOovs9dntWIcs=
+X-Google-Smtp-Source: APXvYqwXQ8E44dxbKym/mvJKG8Qiroxs57QOiLNMp3g+8QBMB71+VtDnIZNwSmjflXVUKuCFoplM6g==
+X-Received: by 2002:a5d:6b03:: with SMTP id v3mr22768077wrw.309.1559151807660;
+        Wed, 29 May 2019 10:43:27 -0700 (PDT)
+Received: from localhost.localdomain ([5.102.238.208])
+        by smtp.gmail.com with ESMTPSA id k125sm31702wmb.34.2019.05.29.10.43.25
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 29 May 2019 10:43:26 -0700 (PDT)
 From:   Amir Goldstein <amir73il@gmail.com>
-Date:   Wed, 29 May 2019 19:20:21 +0300
-Message-ID: <CAOQ4uxiWxkmvtK6qX6T5cOAFeTb3Oo9xocG+yY24RaMftnJ2tQ@mail.gmail.com>
-Subject: Re: [PATCH v2 9/8] man-pages: copy_file_range updates
-To:     "Darrick J. Wong" <darrick.wong@oracle.com>
+To:     "Darrick J . Wong" <darrick.wong@oracle.com>
 Cc:     Dave Chinner <david@fromorbit.com>, Christoph Hellwig <hch@lst.de>,
+        linux-xfs@vger.kernel.org,
         Olga Kornievskaia <olga.kornievskaia@gmail.com>,
         Luis Henriques <lhenriques@suse.com>,
         Al Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-xfs <linux-xfs@vger.kernel.org>,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>, ceph-devel@vger.kernel.org,
-        linux-api@vger.kernel.org, Dave Chinner <dchinner@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        ceph-devel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org
+Subject: [PATCH v3 00/13] Fixes for major copy_file_range() issues
+Date:   Wed, 29 May 2019 20:43:04 +0300
+Message-Id: <20190529174318.22424-1-amir73il@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-> > +A major rework of the kernel implementation occurred in 5.3. Areas of the API
-> > +that weren't clearly defined were clarified and the API bounds are much more
-> > +strictly checked than on earlier kernels. Applications should target the
-> > +behaviour and requirements of 5.3 kernels.
->
-> Are there any weird cases where a program targetting 5.3 behavior would
-> fail or get stuck in an infinite loop on a 5.2 kernel?
+Hi Darrick,
 
-I don't think so. When Dave wrote this paragraph the behavior was changed
-from short copy to EINVAL. That would have been a problem to maintain
-old vs. new copy loops, but now the behavior  did not change in that respect.
+Following is a re-work of Dave Chinner's copy_file_range() patches.
+This v3 patch set is based on your feedback to v2 [1].
 
->
-> Particularly since glibc spat out a copy_file_range fallback for 2.29
-> that tries to emulate the kernel behavior 100%.  It even refuses
-> cross-filesystem copies (because hey, we documented that :() even though
-> that's perfectly fine for a userspace implementation.
->
-> TBH I suspect that we ought to get the glibc developers to remove the
-> "no cross device copies" code from their implementation and then update
-> the manpage to say that cross device copies are supposed to be
-> supported all the time, at least as of glibc 2.(futureversion).
+NOTE that this work changes user visible behavior of copy_file_range(2)!
+It introduces new errors for cases that were not checked before and it
+allows cross-device copy by default. After this work, cifs copy offload
+should be possible between two shares on the same server, but I did not
+check this functionality.
 
-I don't see a problem with copy_file_range() returning EXDEV.
-That is why I left EXDEV in the man page.
-Tools should know how to deal with EXDEV by now.
-If you are running on a new kernel, you get better likelihood
-for copy_file_range() to do clone or in-kernel copy for you.
+Patches 1-3 have your Reviewed-by.
+Patches 4-5 have been slightly amended to address your comments.
+Patch 6 adds the new helper you requested dubbed file_modified().
+Patch 7 uses the helper in xfs - unrelated to copy_file_range().
+Patches 8-12 use the helper for various fs's ->copy_file_range().
+Patch 13 (unmodified) has your Reviewed-by, because the bits that
+you approved are those that matter to most filesystems (i.e. the
+fallback logic).
 
->
-> Anyways, thanks for taking on the c_f_r cleanup! :)
->
+The man page update patch (again, mostly Dave's work) is appended
+to the series with fixes to your review comments.
 
-Sure, get ready for another round ;-)
-
-Thanks for the review!
+Thanks,
 Amir.
+
+[1] https://lore.kernel.org/linux-fsdevel/20190526061100.21761-1-amir73il@gmail.com/
+
+Changes since v2:
+- Re-order generic_remap_checks() fix patch before
+  forking generic_copy_file_checks()
+- Document @req_count helper argument (Darrick)
+- Fold generic_access_check_limits() (Darrick)
+- Added file_modified() helper (Darrick)
+- Added xfs patch to use file_modified() helper
+- Drop generic_copy_file_range_prep() helper
+- Per filesystem patch for file_modified()/file_accessed()
+- Post copy file_remove_privs() for ceph/generic (Darrick)
+
+Changes since v1:
+- Short read instead of EINVAL (Christoph)
+- generic_file_rw_checks() helper (Darrick)
+- generic_copy_file_range_prep() helper (Christoph)
+- Not calling ->remap_file_range() with different sb
+- Not calling ->copy_file_range() with different fs type
+- Remove changes to overlayfs
+- Extra fix to clone/dedupe checks
+
+Amir Goldstein (11):
+  vfs: introduce generic_file_rw_checks()
+  vfs: remove redundant checks from generic_remap_checks()
+  vfs: add missing checks to copy_file_range
+  vfs: introduce file_modified() helper
+  xfs: use file_modified() helper
+  vfs: copy_file_range needs to strip setuid bits and update timestamps
+  ceph: copy_file_range needs to strip setuid bits and update timestamps
+  cifs: copy_file_range needs to strip setuid bits and update timestamps
+  fuse: copy_file_range needs to strip setuid bits and update timestamps
+  nfs: copy_file_range needs to strip setuid bits and update timestamps
+  vfs: allow copy_file_range to copy across devices
+
+Dave Chinner (2):
+  vfs: introduce generic_copy_file_range()
+  vfs: no fallback for ->copy_file_range
+
+ fs/ceph/file.c     |  40 ++++++++++++-
+ fs/cifs/cifsfs.c   |  15 ++++-
+ fs/fuse/file.c     |  29 ++++++++-
+ fs/inode.c         |  20 +++++++
+ fs/nfs/nfs42proc.c |   9 ++-
+ fs/nfs/nfs4file.c  |  23 ++++++-
+ fs/read_write.c    | 145 ++++++++++++++++++++++++++++-----------------
+ fs/xfs/xfs_file.c  |  15 +----
+ include/linux/fs.h |   9 +++
+ mm/filemap.c       | 110 +++++++++++++++++++++++++++-------
+ 10 files changed, 309 insertions(+), 106 deletions(-)
+
+-- 
+2.17.1
+
