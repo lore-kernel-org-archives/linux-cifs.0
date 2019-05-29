@@ -4,104 +4,110 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 554F3C04AB3
-	for <linux-cifs@archiver.kernel.org>; Wed, 29 May 2019 03:25:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EBECC46470
+	for <linux-cifs@archiver.kernel.org>; Wed, 29 May 2019 16:20:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 18B2720657
-	for <linux-cifs@archiver.kernel.org>; Wed, 29 May 2019 03:25:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC42523D55
+	for <linux-cifs@archiver.kernel.org>; Wed, 29 May 2019 16:20:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DRPwuWuL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jQSFEpXt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725855AbfE2DZF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 28 May 2019 23:25:05 -0400
-Received: from mail-qt1-f177.google.com ([209.85.160.177]:37667 "EHLO
-        mail-qt1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725828AbfE2DZF (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 28 May 2019 23:25:05 -0400
-Received: by mail-qt1-f177.google.com with SMTP id y57so879328qtk.4;
-        Tue, 28 May 2019 20:25:04 -0700 (PDT)
+        id S1727169AbfE2QUj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 29 May 2019 12:20:39 -0400
+Received: from mail-yw1-f68.google.com ([209.85.161.68]:42244 "EHLO
+        mail-yw1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726162AbfE2QUi (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 May 2019 12:20:38 -0400
+Received: by mail-yw1-f68.google.com with SMTP id s5so1302966ywd.9;
+        Wed, 29 May 2019 09:20:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=f7jMmQ805XOFY1RecqIVsVKw8Wv7KaR0RUM1pyfgUNQ=;
-        b=DRPwuWuL/d0tw86uQzToWiIfQ6wc0zZIS1jaaw/T8sWSFM2acw763vSGft/xi08iad
-         gxVSzCzu4SiHbDcCByxnp+8ennWhTV7bJUvkVOHf8t9anDxPkjTl4v7zo0l0XAqGPIqP
-         bNkq83uEEqbU9XzGdw397olRRzw8BbutNaGU11FOqwlCe7ZJ/F2rwz2zWzVYQXXa6IZY
-         nsjIUElDgKDMN6gHNSd8NRPExxhlj7BQIhvJnlm5zj9t67LGy4odr81zPvCkDBQAOft3
-         9z+UmPdCI9K+n33dM/ZNjYTrlBxjGHcSnUNdk0539NvzeN64vrdJs6LAYL+03+redAYa
-         EpDg==
+        bh=qgWFwBbqc/TIeFx+G72gp5eLEUxfA2pK5OKuDEowGKc=;
+        b=jQSFEpXtckdK15GU+zOhWiGnSetf0KAzWuZb58/zupTyFnbmFnkOKY/iSToYuQyN5L
+         MkI6aVdlMmOcfKlg9ISJwKI+z1ZDwj3q5XuMNWjHeIXgiskwej8PInH6I/oXzzsCBq0X
+         QbUBwy1a+RM+qyUmZ3+hCoLNYZVgX+YehA8iiDIrxLJdqHnITrrPL3YC/9ZjncB+SoBO
+         Nk6bungjzgZ15oeBYTgVV/FQhatnWgz1WrbbG7rU6pRlMWg7bIMhim8quPwHVPp4GVxW
+         9qzJHOnagZq48iB2ZR7WXJ1NaV6qWYsbq4NZfDfLWONADgwARn6tkDmxfZLQCSgbrmFg
+         Zt2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=f7jMmQ805XOFY1RecqIVsVKw8Wv7KaR0RUM1pyfgUNQ=;
-        b=B7Rvs/9tml6yJHoDRPyKaRGc2A+9aUNxtCyZxq+AAuAMdsy3wLJ5kQZLEOZMU+q2jA
-         8eoLfhM2bPezFQIpKCNqaoeIGv/pklOTzXjEvYqd22Iab/AtHc8LKuuvCiDCMtXxr2xc
-         vq76WVgqx2DnB0rhGyVwWkKM+/6cwCmK+z0VwzG5euUdQkZKbac06f0MdacpTQ4daB5U
-         +YQu8n026TGr+P8JKHG/SNSahKx7nsoildMu9IDQE+znhG5P8FqwZYK7l1/LeZ3Hm54E
-         WUjcP6dNk0c/C7qO/Sk8fRfSl8i5lEbg0W9lMeUoZtHDGC2ct1Hpat687Glbb6pIHKzX
-         kufQ==
-X-Gm-Message-State: APjAAAXV2qJI76RlOGiWn3FWFSwE6tfJaPWzEUJXh6RHxgHPgz/Z9GKB
-        btP6sz0xCFN/hw0z+jfpHNX0M9zcAqiAJU+sHJZeww==
-X-Google-Smtp-Source: APXvYqyQaS4Gps42wNqA6MZscB8fnWZF+JqILV/ghhZz4CwMVOpKhu6zOI1HDLjhfBZY/kYQI+K1ISr4PAR0c2W0bFw=
-X-Received: by 2002:ac8:1205:: with SMTP id x5mr86437682qti.284.1559100304524;
- Tue, 28 May 2019 20:25:04 -0700 (PDT)
+        bh=qgWFwBbqc/TIeFx+G72gp5eLEUxfA2pK5OKuDEowGKc=;
+        b=Lqn2X94KepSJd87ksswKtyzwVgccWw7Y0ZkNyo27lHSc4qDB2nbwa65qxVzMtf9i8q
+         ui7cUCm70p1bXExouRJmbtf00MLwwaioZFeZoKzLL2aE5IstHZahK1Wv6wX+fZJy2d+/
+         o4XS4HUvlN3odpqUTrk9LWP6+rIeVXUIsg+tsIrRlO4uLUH2arlvVkUY13DHYaVjh5/p
+         wqSwf7gVuNDKz8e2k3o1Jrm0mQ/DPn8zL+mSCtS2vNzB6Y2Arr+Oa8Cu9Ajn1CvX3XYZ
+         bnrKqaVXecAtBdVLSjAlv38bSNYBf5Qzq8m7IKiam2vmxewV/EBt9XHmOwRePRm45OxU
+         M+yg==
+X-Gm-Message-State: APjAAAVNgpmDxwzXkWdrPY/LzDATgpDEsiD+vqLNlipNWCRMthJIyfT1
+        eOanGB7BEiTCmkK/VGdZogsK7WcL1F4aDpWiiy0=
+X-Google-Smtp-Source: APXvYqzzgbRrTpnULwe/IoxAzcoJVne1h/bBy2qlyUlmguuG3+RHGMFZemo93QUU34JXx68hkctDvcHbDw8oHipDSVE=
+X-Received: by 2002:a81:3797:: with SMTP id e145mr53153276ywa.25.1559146832803;
+ Wed, 29 May 2019 09:20:32 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190524142713.360c0c10@canb.auug.org.au> <CAH2r5msm9TfC8f5WNOyD-9g01u9m-UNPuk_XPp3Ykhc4u7+Rtg@mail.gmail.com>
-In-Reply-To: <CAH2r5msm9TfC8f5WNOyD-9g01u9m-UNPuk_XPp3Ykhc4u7+Rtg@mail.gmail.com>
-From:   Murphy Zhou <jencce.kernel@gmail.com>
-Date:   Wed, 29 May 2019 11:24:52 +0800
-Message-ID: <CADJHv_tzocJ6heXoAa176zJU+8cP+3t8bXqxQDjZ4rm_FOiA=g@mail.gmail.com>
-Subject: Re: linux-next: Fixes tag needs some work in the cifs tree
-To:     Steve French <smfrench@gmail.com>
-Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+References: <20190526061100.21761-1-amir73il@gmail.com> <20190526061100.21761-10-amir73il@gmail.com>
+ <20190528164844.GJ5221@magnolia>
+In-Reply-To: <20190528164844.GJ5221@magnolia>
+From:   Amir Goldstein <amir73il@gmail.com>
+Date:   Wed, 29 May 2019 19:20:21 +0300
+Message-ID: <CAOQ4uxiWxkmvtK6qX6T5cOAFeTb3Oo9xocG+yY24RaMftnJ2tQ@mail.gmail.com>
+Subject: Re: [PATCH v2 9/8] man-pages: copy_file_range updates
+To:     "Darrick J. Wong" <darrick.wong@oracle.com>
+Cc:     Dave Chinner <david@fromorbit.com>, Christoph Hellwig <hch@lst.de>,
+        Olga Kornievskaia <olga.kornievskaia@gmail.com>,
+        Luis Henriques <lhenriques@suse.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>, ceph-devel@vger.kernel.org,
+        linux-api@vger.kernel.org, Dave Chinner <dchinner@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, May 24, 2019 at 10:14 PM Steve French <smfrench@gmail.com> wrote:
+> > +A major rework of the kernel implementation occurred in 5.3. Areas of the API
+> > +that weren't clearly defined were clarified and the API bounds are much more
+> > +strictly checked than on earlier kernels. Applications should target the
+> > +behaviour and requirements of 5.3 kernels.
 >
-> fixed and repushed to cifs-2.6.git for-next
+> Are there any weird cases where a program targetting 5.3 behavior would
+> fail or get stuck in an infinite loop on a 5.2 kernel?
 
-Thanks!
+I don't think so. When Dave wrote this paragraph the behavior was changed
+from short copy to EINVAL. That would have been a problem to maintain
+old vs. new copy loops, but now the behavior  did not change in that respect.
 
-[resend including mail lists]
+>
+> Particularly since glibc spat out a copy_file_range fallback for 2.29
+> that tries to emulate the kernel behavior 100%.  It even refuses
+> cross-filesystem copies (because hey, we documented that :() even though
+> that's perfectly fine for a userspace implementation.
+>
+> TBH I suspect that we ought to get the glibc developers to remove the
+> "no cross device copies" code from their implementation and then update
+> the manpage to say that cross device copies are supposed to be
+> supported all the time, at least as of glibc 2.(futureversion).
+
+I don't see a problem with copy_file_range() returning EXDEV.
+That is why I left EXDEV in the man page.
+Tools should know how to deal with EXDEV by now.
+If you are running on a new kernel, you get better likelihood
+for copy_file_range() to do clone or in-kernel copy for you.
 
 >
-> On Thu, May 23, 2019 at 11:27 PM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
-> >
-> > Hi all,
-> >
-> > In commit
-> >
-> >   f875253b5fe6 ("fs/cifs/smb2pdu.c: fix buffer free in SMB2_ioctl_free")
-> >
-> > Fixes tag
-> >
-> >   Fixes: 2c87d6a ("cifs: Allocate memory for all iovs in smb2_ioctl")
-> >
-> > has these problem(s):
-> >
-> >   - SHA1 should be at least 12 digits long
-> >     Can be fixed by setting core.abbrev to 12 (or more) or (for git v2.11
-> >     or later) just making sure it is not set (or set to "auto").
-> >
-> > --
-> > Cheers,
-> > Stephen Rothwell
+> Anyways, thanks for taking on the c_f_r cleanup! :)
 >
->
->
-> --
-> Thanks,
->
-> Steve
+
+Sure, get ready for another round ;-)
+
+Thanks for the review!
+Amir.
