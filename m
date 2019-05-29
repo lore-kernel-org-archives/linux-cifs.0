@@ -5,55 +5,55 @@ X-Spam-Level:
 X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 992ABC28CC1
-	for <linux-cifs@archiver.kernel.org>; Wed, 29 May 2019 17:43:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 369E0C28CC0
+	for <linux-cifs@archiver.kernel.org>; Wed, 29 May 2019 17:43:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 74C8623FF1
-	for <linux-cifs@archiver.kernel.org>; Wed, 29 May 2019 17:43:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E47B23FF1
+	for <linux-cifs@archiver.kernel.org>; Wed, 29 May 2019 17:43:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KirtEW/O"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z9LHyUj5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726245AbfE2Rnd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 29 May 2019 13:43:33 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:33882 "EHLO
+        id S1727058AbfE2Rni (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 29 May 2019 13:43:38 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:33888 "EHLO
         mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726205AbfE2Rnc (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 May 2019 13:43:32 -0400
-Received: by mail-wr1-f66.google.com with SMTP id f8so2421338wrt.1;
-        Wed, 29 May 2019 10:43:30 -0700 (PDT)
+        with ESMTP id S1726205AbfE2Rng (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 May 2019 13:43:36 -0400
+Received: by mail-wr1-f66.google.com with SMTP id f8so2421462wrt.1;
+        Wed, 29 May 2019 10:43:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=7z+URgKWKe9baBNXTRuiwAT8xxeo4lu6F54jeoU5vwA=;
-        b=KirtEW/OGmn/qiY+9wme5Gh5KIVAoljOuFx+nMJamoVSeYIrxdiMzYn5QLUjJMNJI6
-         uozf24MrBZM0dh6RM6ilar+ioPNQplygnIYbQIwa/ooqLWPqBuBrhlnV2e3V9HQ4h/U9
-         XehykFGHiUsLCVmkzhfm/g2TAxLfNksM6q/YBky875wc79vfxcR/woBE98CUs3G1oZJD
-         YwkLoRKuk/Piz4QruovX3eZYqXkGG8szNks90JbPDg8zJiAYTUAqJ/4w4TO0qDTuFFAn
-         jrtwm0R+s8pM5yemqSKfFpK++gJfbK3DIbyxZfQfY74slW/PepSLQZFSEs5z6x0xMAoU
-         +5gg==
+        bh=zD+G66icCrS83U+p0kj1jVa8Ed5aOLuiZE56AA1YrhI=;
+        b=Z9LHyUj59Y12ZR+Ao4t5/5+xyqVIk8lVXWbZ4hILxnDlXw/qwRjvT0vpNwtyzms1T0
+         q+dIWdkAKD96I6hJiKbGULkPjl92hP4jGG4S5O4q+UlkLid/slyuTzXCB8NSV6WMipTt
+         S5D5KcbnNdqxOiMi7FsZme7IewipQxtmpw6JPQIYWgVOUaAAceLpWZsBLDLkUMWIfCXm
+         7ae2W+DPyfUurY0ze8fEKjQUHDgPaHAOky0S2MEAsJjzWTsY+wr3Qf+jW6osRkijiYJh
+         colYvqc+mkTOrZ5F6LrcHdmQ6TTNP0RBzXHLRUNSxgT7M333jr5DZlUL1Nzm6E4hrRW5
+         taYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=7z+URgKWKe9baBNXTRuiwAT8xxeo4lu6F54jeoU5vwA=;
-        b=ddMImk2vUJtWqV1qabtcdIqysuUbwayZ5EOFZHOAlumZ4lzec7wM03HWvnIPIAuN5Y
-         xT+QLeu1KJ21CZOu04ElVQxkpYtITOR1VMwBWBzb5Ow3kw9e7DYa3uUefljVwr+nHODU
-         1Q8NqsdPCr2UlFtVzgRNODb9zn1xXOjUdTTW6ivfR/S6D7BuWbrORrSYz8wYxvlXvYKr
-         pAzrVjuc84GWH0vPiF8dAtIGi9F0BnCay0cReA6sIDBs+TkY86d9jDgLahun0OkLJpF5
-         n6NR3Cu2SgefkAO8NPieQpO6Baq0NS+b/0T+Boc5WBgYcQwz0sopHnQ2zbdqQrYfmJqD
-         KXDA==
-X-Gm-Message-State: APjAAAUQ8O8/W7qf6gvnsogKDFVx6LjS4qXdHha4UlNruS68uWBXEriY
-        o1OcyO9vQ1l5ponwQ/iZH64=
-X-Google-Smtp-Source: APXvYqyjgzK5zYt1nLkJV1PTASxLCO9v2WEdLQlqLK3u4kKgGoubOcok7hkiDoMtwj/6Q0nO7aqF6A==
-X-Received: by 2002:adf:8bc5:: with SMTP id w5mr41103202wra.132.1559151809932;
-        Wed, 29 May 2019 10:43:29 -0700 (PDT)
+        bh=zD+G66icCrS83U+p0kj1jVa8Ed5aOLuiZE56AA1YrhI=;
+        b=Jdo8RDqvjjiEurWx2l7FoY/adcvLNNK6fS5fxJMmuAYPmCYyGCXGllYI04L4PZABST
+         ym+C2/sfylxesF/mcDGOGbqRjpQaZwo6GXm7FcQshJpZgTqbhx5vLLT+9QDU8hng49DI
+         tB1cp8SvGZiNakA0vppcy0cdrRC33fSj2BI4w1zgaY543NqtxAZ73ILif3hjnbT3DvEq
+         GO7WjshUnvRIY7UhZt9hGP1ON9BOtP5NfqlpfvneOq1phW1+2N5knIRZtKu3fnn4yR1Z
+         2gPAker0AQUak7SJcXzr3okqHQgPujTOSkElOHtMvNNJau6WNFcwNKapUOonbhRM2Tf9
+         4THQ==
+X-Gm-Message-State: APjAAAVRva5d9T1VwkKcUy7AZ9foA5uLe2Aj011axTf1InUeZBFeCN/u
+        6+pFKsK0DZ5/2THJ895xs5w=
+X-Google-Smtp-Source: APXvYqxhYgcBdlCl44oCcOLk+zJm2JWkD4cbQhiZTLoRJrYTK4hwNO5GToNdbW2BBB87VD/hMMGxog==
+X-Received: by 2002:adf:e945:: with SMTP id m5mr9491208wrn.90.1559151814028;
+        Wed, 29 May 2019 10:43:34 -0700 (PDT)
 Received: from localhost.localdomain ([5.102.238.208])
-        by smtp.gmail.com with ESMTPSA id k125sm31702wmb.34.2019.05.29.10.43.27
+        by smtp.gmail.com with ESMTPSA id k125sm31702wmb.34.2019.05.29.10.43.32
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 29 May 2019 10:43:29 -0700 (PDT)
+        Wed, 29 May 2019 10:43:33 -0700 (PDT)
 From:   Amir Goldstein <amir73il@gmail.com>
 To:     "Darrick J . Wong" <darrick.wong@oracle.com>
 Cc:     Dave Chinner <david@fromorbit.com>, Christoph Hellwig <hch@lst.de>,
@@ -63,10 +63,10 @@ Cc:     Dave Chinner <david@fromorbit.com>, Christoph Hellwig <hch@lst.de>,
         Al Viro <viro@zeniv.linux.org.uk>,
         linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
         ceph-devel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, Dave Chinner <dchinner@redhat.com>
-Subject: [PATCH v3 01/13] vfs: introduce generic_copy_file_range()
-Date:   Wed, 29 May 2019 20:43:05 +0300
-Message-Id: <20190529174318.22424-2-amir73il@gmail.com>
+        linux-cifs@vger.kernel.org
+Subject: [PATCH v3 03/13] vfs: introduce generic_file_rw_checks()
+Date:   Wed, 29 May 2019 20:43:07 +0300
+Message-Id: <20190529174318.22424-4-amir73il@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190529174318.22424-1-amir73il@gmail.com>
 References: <20190529174318.22424-1-amir73il@gmail.com>
@@ -75,93 +75,144 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Dave Chinner <dchinner@redhat.com>
+Factor out helper with some checks on in/out file that are
+common to clone_file_range and copy_file_range.
 
-Right now if vfs_copy_file_range() does not use any offload
-mechanism, it falls back to calling do_splice_direct(). This fails
-to do basic sanity checks on the files being copied. Before we
-start adding this necessarily functionality to the fallback path,
-separate it out into generic_copy_file_range().
-
-generic_copy_file_range() has the same prototype as
-->copy_file_range() so that filesystems can use it in their custom
-->copy_file_range() method if they so choose.
-
-Signed-off-by: Dave Chinner <dchinner@redhat.com>
+Suggested-by: Darrick J. Wong <darrick.wong@oracle.com>
 Signed-off-by: Amir Goldstein <amir73il@gmail.com>
 Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
 ---
- fs/read_write.c    | 35 ++++++++++++++++++++++++++++++++---
- include/linux/fs.h |  3 +++
- 2 files changed, 35 insertions(+), 3 deletions(-)
+ fs/read_write.c    | 38 +++++++++++---------------------------
+ include/linux/fs.h |  1 +
+ mm/filemap.c       | 24 ++++++++++++++++++++++++
+ 3 files changed, 36 insertions(+), 27 deletions(-)
 
 diff --git a/fs/read_write.c b/fs/read_write.c
-index c543d965e288..676b02fae589 100644
+index b63dcb4e4fe9..f1900bdb3127 100644
 --- a/fs/read_write.c
 +++ b/fs/read_write.c
-@@ -1565,6 +1565,36 @@ COMPAT_SYSCALL_DEFINE4(sendfile64, int, out_fd, int, in_fd,
- }
- #endif
+@@ -1617,17 +1617,18 @@ ssize_t vfs_copy_file_range(struct file *file_in, loff_t pos_in,
+ 			    struct file *file_out, loff_t pos_out,
+ 			    size_t len, unsigned int flags)
+ {
+-	struct inode *inode_in = file_inode(file_in);
+-	struct inode *inode_out = file_inode(file_out);
+ 	ssize_t ret;
  
-+/**
-+ * generic_copy_file_range - copy data between two files
-+ * @file_in:	file structure to read from
-+ * @pos_in:	file offset to read from
-+ * @file_out:	file structure to write data to
-+ * @pos_out:	file offset to write data to
-+ * @len:	amount of data to copy
-+ * @flags:	copy flags
-+ *
-+ * This is a generic filesystem helper to copy data from one file to another.
-+ * It has no constraints on the source or destination file owners - the files
-+ * can belong to different superblocks and different filesystem types. Short
-+ * copies are allowed.
-+ *
-+ * This should be called from the @file_out filesystem, as per the
-+ * ->copy_file_range() method.
-+ *
-+ * Returns the number of bytes copied or a negative error indicating the
-+ * failure.
-+ */
-+
-+ssize_t generic_copy_file_range(struct file *file_in, loff_t pos_in,
-+				struct file *file_out, loff_t pos_out,
-+				size_t len, unsigned int flags)
-+{
-+	return do_splice_direct(file_in, &pos_in, file_out, &pos_out,
-+				len > MAX_RW_COUNT ? MAX_RW_COUNT : len, 0);
-+}
-+EXPORT_SYMBOL(generic_copy_file_range);
-+
- /*
-  * copy_file_range() differs from regular file read and write in that it
-  * specifically allows return partial success.  When it does so is up to
-@@ -1632,9 +1662,8 @@ ssize_t vfs_copy_file_range(struct file *file_in, loff_t pos_in,
- 			goto done;
- 	}
+ 	if (flags != 0)
+ 		return -EINVAL;
  
--	ret = do_splice_direct(file_in, &pos_in, file_out, &pos_out,
--			len > MAX_RW_COUNT ? MAX_RW_COUNT : len, 0);
+-	if (S_ISDIR(inode_in->i_mode) || S_ISDIR(inode_out->i_mode))
+-		return -EISDIR;
+-	if (!S_ISREG(inode_in->i_mode) || !S_ISREG(inode_out->i_mode))
+-		return -EINVAL;
++	/* this could be relaxed once a method supports cross-fs copies */
++	if (file_inode(file_in)->i_sb != file_inode(file_out)->i_sb)
++		return -EXDEV;
++
++	ret = generic_file_rw_checks(file_in, file_out);
++	if (unlikely(ret))
++		return ret;
+ 
+ 	ret = rw_verify_area(READ, file_in, &pos_in, len);
+ 	if (unlikely(ret))
+@@ -1637,15 +1638,6 @@ ssize_t vfs_copy_file_range(struct file *file_in, loff_t pos_in,
+ 	if (unlikely(ret))
+ 		return ret;
+ 
+-	if (!(file_in->f_mode & FMODE_READ) ||
+-	    !(file_out->f_mode & FMODE_WRITE) ||
+-	    (file_out->f_flags & O_APPEND))
+-		return -EBADF;
 -
-+	ret = generic_copy_file_range(file_in, pos_in, file_out, pos_out, len,
-+				      flags);
- done:
- 	if (ret > 0) {
- 		fsnotify_access(file_in);
+-	/* this could be relaxed once a method supports cross-fs copies */
+-	if (inode_in->i_sb != inode_out->i_sb)
+-		return -EXDEV;
+-
+ 	if (len == 0)
+ 		return 0;
+ 
+@@ -2013,29 +2005,21 @@ loff_t do_clone_file_range(struct file *file_in, loff_t pos_in,
+ 			   struct file *file_out, loff_t pos_out,
+ 			   loff_t len, unsigned int remap_flags)
+ {
+-	struct inode *inode_in = file_inode(file_in);
+-	struct inode *inode_out = file_inode(file_out);
+ 	loff_t ret;
+ 
+ 	WARN_ON_ONCE(remap_flags & REMAP_FILE_DEDUP);
+ 
+-	if (S_ISDIR(inode_in->i_mode) || S_ISDIR(inode_out->i_mode))
+-		return -EISDIR;
+-	if (!S_ISREG(inode_in->i_mode) || !S_ISREG(inode_out->i_mode))
+-		return -EINVAL;
+-
+ 	/*
+ 	 * FICLONE/FICLONERANGE ioctls enforce that src and dest files are on
+ 	 * the same mount. Practically, they only need to be on the same file
+ 	 * system.
+ 	 */
+-	if (inode_in->i_sb != inode_out->i_sb)
++	if (file_inode(file_in)->i_sb != file_inode(file_out)->i_sb)
+ 		return -EXDEV;
+ 
+-	if (!(file_in->f_mode & FMODE_READ) ||
+-	    !(file_out->f_mode & FMODE_WRITE) ||
+-	    (file_out->f_flags & O_APPEND))
+-		return -EBADF;
++	ret = generic_file_rw_checks(file_in, file_out);
++	if (ret < 0)
++		return ret;
+ 
+ 	if (!file_in->f_op->remap_file_range)
+ 		return -EOPNOTSUPP;
 diff --git a/include/linux/fs.h b/include/linux/fs.h
-index f7fdfe93e25d..ea17858310ff 100644
+index ea17858310ff..89b9b73eb581 100644
 --- a/include/linux/fs.h
 +++ b/include/linux/fs.h
-@@ -1889,6 +1889,9 @@ extern ssize_t vfs_readv(struct file *, const struct iovec __user *,
- 		unsigned long, loff_t *, rwf_t);
- extern ssize_t vfs_copy_file_range(struct file *, loff_t , struct file *,
- 				   loff_t, size_t, unsigned int);
-+extern ssize_t generic_copy_file_range(struct file *file_in, loff_t pos_in,
-+				       struct file *file_out, loff_t pos_out,
-+				       size_t len, unsigned int flags);
- extern int generic_remap_file_range_prep(struct file *file_in, loff_t pos_in,
- 					 struct file *file_out, loff_t pos_out,
- 					 loff_t *count,
+@@ -3049,6 +3049,7 @@ extern ssize_t generic_write_checks(struct kiocb *, struct iov_iter *);
+ extern int generic_remap_checks(struct file *file_in, loff_t pos_in,
+ 				struct file *file_out, loff_t pos_out,
+ 				loff_t *count, unsigned int remap_flags);
++extern int generic_file_rw_checks(struct file *file_in, struct file *file_out);
+ extern ssize_t generic_file_read_iter(struct kiocb *, struct iov_iter *);
+ extern ssize_t __generic_file_write_iter(struct kiocb *, struct iov_iter *);
+ extern ssize_t generic_file_write_iter(struct kiocb *, struct iov_iter *);
+diff --git a/mm/filemap.c b/mm/filemap.c
+index df2006ba0cfa..a38619a4a6af 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -3041,6 +3041,30 @@ int generic_remap_checks(struct file *file_in, loff_t pos_in,
+ 	return 0;
+ }
+ 
++
++/*
++ * Performs common checks before doing a file copy/clone
++ * from @file_in to @file_out.
++ */
++int generic_file_rw_checks(struct file *file_in, struct file *file_out)
++{
++	struct inode *inode_in = file_inode(file_in);
++	struct inode *inode_out = file_inode(file_out);
++
++	/* Don't copy dirs, pipes, sockets... */
++	if (S_ISDIR(inode_in->i_mode) || S_ISDIR(inode_out->i_mode))
++		return -EISDIR;
++	if (!S_ISREG(inode_in->i_mode) || !S_ISREG(inode_out->i_mode))
++		return -EINVAL;
++
++	if (!(file_in->f_mode & FMODE_READ) ||
++	    !(file_out->f_mode & FMODE_WRITE) ||
++	    (file_out->f_flags & O_APPEND))
++		return -EBADF;
++
++	return 0;
++}
++
+ int pagecache_write_begin(struct file *file, struct address_space *mapping,
+ 				loff_t pos, unsigned len, unsigned flags,
+ 				struct page **pagep, void **fsdata)
 -- 
 2.17.1
 
