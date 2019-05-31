@@ -2,222 +2,138 @@ Return-Path: <SRS0=zOxz=T7=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC9ABC28CC3
-	for <linux-cifs@archiver.kernel.org>; Fri, 31 May 2019 15:35:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76283C28CC2
+	for <linux-cifs@archiver.kernel.org>; Fri, 31 May 2019 16:47:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9C50C26A55
-	for <linux-cifs@archiver.kernel.org>; Fri, 31 May 2019 15:35:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 48A6F26C6C
+	for <linux-cifs@archiver.kernel.org>; Fri, 31 May 2019 16:47:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fIGCn/9f"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qja3g2NC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726718AbfEaPf4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 31 May 2019 11:35:56 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:45757 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726697AbfEaPfz (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 31 May 2019 11:35:55 -0400
-Received: by mail-io1-f67.google.com with SMTP id e3so8501693ioc.12;
-        Fri, 31 May 2019 08:35:55 -0700 (PDT)
+        id S1726981AbfEaQrL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 31 May 2019 12:47:11 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:33894 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726550AbfEaQrL (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 31 May 2019 12:47:11 -0400
+Received: by mail-wm1-f67.google.com with SMTP id w9so289813wmd.1;
+        Fri, 31 May 2019 09:47:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/1xcsN5I7JMXzyxIvwv3Zvd0oaku/MBapYLHv6XIR6I=;
-        b=fIGCn/9f2KV+QHMLhlU264rsPpE+TdF8mE4LNIBM2T6XzAL4NjkVo6JKAQfeCX821M
-         99RoQ/asfyXwpyNe1AyNUnqgmGZbH/wEI4q1UDGknaLbfEv9BCajJbycujVj2wocEq/+
-         g7MEeC08n8iw2MY6aBv1Pv2PqAs4k2zhVwVCrV1QMnwStysxprusY9R5LEF+hriNDZSV
-         tZELSy68mnIL8bgqjNQoZRGNp5OOxyXr+bJQ7tyWQ6Iggp6EpD5IGRWwGlv3mNe1L1pQ
-         xHeSXTLT/Sz1IDeLiRYy9Dkag/U5/APaT0ciwmge1JA8UiZTeVcY73n04lD8E6IHQ1sW
-         i98g==
+        h=from:to:cc:subject:date:message-id;
+        bh=MhsubWC4mV416H7ev/f+wsOGbdjmqcgClTA9LQel2KA=;
+        b=Qja3g2NCZ8pzXs4nnsjUMAmzJ/b2jGOjx5X9orj2Imviax6qoh16l16QajqHedjgfm
+         Od7lQejJVo0S8pQrkGp3WPAw255HfVqTbJ6nWPK2Gwcmv0OGE9Lj22qO3avbr9ewX1Aa
+         8CgWJp1DCvxaXiJ6cHNJNAs3OPkL0o6m9VrwUSRlWACKzwewAVMs3Z2k6PafMDSPZ5IN
+         CH2i7FU+/l6FDh8wBhWuzW2TSRBh+MVyxy8YQbC2pTbGsOhZXg/KtSL6HhTqtEwRAOwF
+         GZSoJHNMUxxrMmJXreiboAfz5dflLQjlLhJQZqd8a0JSFgjILXzCsRv5/4UvxFhhDds5
+         tVBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/1xcsN5I7JMXzyxIvwv3Zvd0oaku/MBapYLHv6XIR6I=;
-        b=syDd5igZIwHF0BfEdHnSCma6nMpzQTE++n6BJQgI58QSwQUqi1+GRKnL8f3MTSYhhb
-         jXRae9l9NWGRVYonaHzOkqUx5zwOPprcfT84pnFlqMcLrdZFTevrOmwHCJQMMFIM2SSC
-         SjnQCj9QG+QZ0gK4nu599gdbGsnIwQ/+Rhr7kVcvA/qbu6DxGMnszB40+WwVITU5qZys
-         TU07oFNSUfdpFOA/D7qagfp4rfGm+MqQQzCL5yz3WP2vaXk+pA5078IaxWmV2lyclHGZ
-         NfviKH/V7UkBd49/sEJyJMfPh1g6Vh3/SCkSYBPK1VVJk2G38nw7tiqWuDwquTnRneGu
-         kihA==
-X-Gm-Message-State: APjAAAWEssVV3hVWBgp1D7RHuBgZ0vuOSoxSXPQwENHaqsBICDgg3ceY
-        S+VDHurkD4WIB9AjuaJWmWnowIe+5ItyuMygBg==
-X-Google-Smtp-Source: APXvYqyPQvGi2nN8Wvfm14NMf5caf30rzhZJrsSwpCAYphwwGgPEUmqhtwx+4n+pyBXddVSEi8IY8Y/EYVSwhqFJEA0=
-X-Received: by 2002:a5d:851a:: with SMTP id q26mr6647916ion.246.1559316954381;
- Fri, 31 May 2019 08:35:54 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190530094147.14512-1-xzhou@redhat.com> <20190530152606.GA5383@magnolia>
- <20190530155851.GB5383@magnolia> <CAN-5tyFoNJrQTn1ZkNsmaBd=yn2kWpZObGe8ka6CDFxcHaXP6w@mail.gmail.com>
-In-Reply-To: <CAN-5tyFoNJrQTn1ZkNsmaBd=yn2kWpZObGe8ka6CDFxcHaXP6w@mail.gmail.com>
-From:   Trond Myklebust <trondmy@gmail.com>
-Date:   Fri, 31 May 2019 11:35:43 -0400
-Message-ID: <CAABAsM6OtgsWS4VVTouDfPLePWE_JAyozwzUn3O-HSMF64J7wg@mail.gmail.com>
-Subject: Re: NFS & CIFS support dedupe now?? Was: Re: [PATCH] generic/517:
- notrun on NFS due to unaligned dedupe in test
-To:     Olga Kornievskaia <aglo@umich.edu>
-Cc:     "Darrick J. Wong" <darrick.wong@oracle.com>, sfrench@samba.org,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        fengxiaoli0714@gmail.com, fstests@vger.kernel.org,
-        Murphy Zhou <xzhou@redhat.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        linux-nfs <linux-nfs@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=MhsubWC4mV416H7ev/f+wsOGbdjmqcgClTA9LQel2KA=;
+        b=jv8KtmyqCNqp30o8CFFy9hsYklD+I3MQ75KnaltU/GTZmJiX2ij9XbhO6tY1xWyIMN
+         Ct8Qi6iTfMMht1OaBqw0qvl2PU6b5MnQRUY8AcoXZtot6PXCOczvfSH522/Oyc+Sbe1s
+         IKgji7q8x7MsFJu/crUcJpasJyHFGQVg50JuqASvOLwzIZjcU+6sgHX7ayov8YKygFj8
+         /0TcK468WmPz1ADTCfW94zB9aOY0NolLyHd06YyynnbaWsvrBJvLVOG6xDLxQa3lCTbF
+         YvkaLMn4xw8j6mMM6sCNjuFLF7J7Cv2L8qnSMqFjl69aqL1W5j3cMwTakomFsucQcWVI
+         +qJw==
+X-Gm-Message-State: APjAAAUiZ8RJMwjaBLAw988s5n4qpBOrg7Sdv+156Z3YC5RHzS5ddN+e
+        kk2NEBBHIztSYH9cIa7NhkP7bY1I
+X-Google-Smtp-Source: APXvYqwrWKUHoyIiO6IqzhrXGZ//z2DcvLEE8mmWl2p3KUw9joXPaNuumflzmpwwksiAVuWEwF1a3w==
+X-Received: by 2002:a1c:7c17:: with SMTP id x23mr6265197wmc.45.1559321228837;
+        Fri, 31 May 2019 09:47:08 -0700 (PDT)
+Received: from localhost.localdomain ([5.102.238.208])
+        by smtp.gmail.com with ESMTPSA id n5sm7669593wrj.27.2019.05.31.09.47.07
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 31 May 2019 09:47:08 -0700 (PDT)
+From:   Amir Goldstein <amir73il@gmail.com>
+To:     "Darrick J . Wong" <darrick.wong@oracle.com>
+Cc:     Dave Chinner <david@fromorbit.com>, Christoph Hellwig <hch@lst.de>,
+        linux-xfs@vger.kernel.org,
+        Olga Kornievskaia <olga.kornievskaia@gmail.com>,
+        Luis Henriques <lhenriques@suse.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        ceph-devel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org
+Subject: [PATCH v4 0/9] Fixes for major copy_file_range() issues
+Date:   Fri, 31 May 2019 19:46:52 +0300
+Message-Id: <20190531164701.15112-1-amir73il@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, 31 May 2019 at 11:25, Olga Kornievskaia <aglo@umich.edu> wrote:
->
-> On Thu, May 30, 2019 at 12:02 PM Darrick J. Wong
-> <darrick.wong@oracle.com> wrote:
-> >
-> > Hi everyone,
-> >
-> > Murphy Zhou sent a patch to generic/517 in fstests to fix a dedupe
-> > failure he was seeing on NFS:
-> >
-> > On Thu, May 30, 2019 at 05:41:47PM +0800, Murphy Zhou wrote:
-> > > NFSv4.2 could pass _require_scratch_dedupe, since the test offset and
-> > > size are aligned, while generic/517 is performing unaligned dedupe.
-> > > NFS does not support unaligned dedupe now, returns EINVAL.
-> > >
-> > > Signed-off-by: Murphy Zhou <xzhou@redhat.com>
-> > > ---
-> > >  tests/generic/517 | 1 +
-> > >  1 file changed, 1 insertion(+)
-> > >
-> > > diff --git a/tests/generic/517 b/tests/generic/517
-> > > index 601bb24e..23665782 100755
-> > > --- a/tests/generic/517
-> > > +++ b/tests/generic/517
-> > > @@ -30,6 +30,7 @@ _cleanup()
-> > >  _supported_fs generic
-> > >  _supported_os Linux
-> > >  _require_scratch_dedupe
-> > > +$FSTYP == "nfs"  && _notrun "NFS can't handle unaligned deduplication"
-> >
-> > I was surprised to see a dedupe fix for NFS since (at least to my
-> > knowledge) neither of these two network filesystems actually support
-> > server-side deduplication commands, and therefore the
-> > _require_scratch_dedupe should have _notrun the test.
-> >
-> > Then I looked at fs/nfs/nfs4file.c:
-> >
-> > static loff_t nfs42_remap_file_range(struct file *src_file, loff_t src_off,
-> >                 struct file *dst_file, loff_t dst_off, loff_t count,
-> >                 unsigned int remap_flags)
-> > {
-> >         <local variable declarations>
-> >
-> >         if (remap_flags & ~(REMAP_FILE_DEDUP | REMAP_FILE_ADVISORY))
-> >                 return -EINVAL;
-> >
-> >         <check alignment, lock inodes, flush pending writes>
-> >
-> >         ret = nfs42_proc_clone(src_file, dst_file, src_off, dst_off, count);
-> >
-> > The NFS client code will accept REMAP_FILE_DEDUP through remap_flags,
-> > which is how dedupe requests are sent to filesystems nowadays.  The nfs
-> > client code does not itself compare the file contents, but it does issue
-> > a CLONE command to the NFS server.  The end result, AFAICT, is that a
-> > user program can write 'A's to file1, 'B's to file2, issue a dedup
-> > ioctl to the kernel, and have a block of 'B's mapped into file1.  That's
-> > broken behavior, according to the dedup ioctl manpage.
-> >
-> > Notice how remap_flags is checked but is not included in the
-> > nfs42_proc_clone call?  That's how I conclude that the NFS client cannot
-> > possibly be sending the dedup request to the server.
-> >
-> > The same goes for fs/cifs/cifsfs.c:
-> >
-> > static loff_t cifs_remap_file_range(struct file *src_file, loff_t off,
-> >                 struct file *dst_file, loff_t destoff, loff_t len,
-> >                 unsigned int remap_flags)
-> > {
-> >         <local variable declarations>
-> >
-> >         if (remap_flags & ~(REMAP_FILE_DEDUP | REMAP_FILE_ADVISORY))
-> >                 return -EINVAL;
-> >
-> >         <check files, lock inodes, flush pages>
-> >
-> >         if (target_tcon->ses->server->ops->duplicate_extents)
-> >                 rc = target_tcon->ses->server->ops->duplicate_extents(xid,
-> >                         smb_file_src, smb_file_target, off, len, destoff);
-> >         else
-> >                 rc = -EOPNOTSUPP;
-> >
-> > Again, remap_flags is checked here but it has no influence over the
-> > ->duplicate_extents call.
-> >
-> > Next I got to thinking that when I reworked the clone/dedupe code last
-> > year, I didn't include REMAP_FILE_DEDUP support for cifs or nfs, because
-> > as far as I knew, neither protocol supports a verb for deduplication.
-> > The remap_flags checks were modified to allow REMAP_FILE_DEDUP in
-> > commits ce96e888fe48e (NFS) and b073a08016a10 (CIFS) with this
-> > justification (the cifs commit has a similar message):
-> >
-> > "Subject: Fix nfs4.2 return -EINVAL when do dedupe operation
-> >
-> > "dedupe_file_range operations is combiled into remap_file_range.
-> > "    But in nfs42_remap_file_range, it's skiped for dedupe operations.
-> > "    Before this patch:
-> > "      # dd if=/dev/zero of=nfs/file bs=1M count=1
-> > "      # xfs_io -c "dedupe nfs/file 4k 64k 4k" nfs/file
-> > "      XFS_IOC_FILE_EXTENT_SAME: Invalid argument
-> > "    After this patch:
-> > "      # dd if=/dev/zero of=nfs/file bs=1M count=1
-> > "      # xfs_io -c "dedupe nfs/file 4k 64k 4k" nfs/file
-> > "      deduped 4096/4096 bytes at offset 65536
-> > "      4 KiB, 1 ops; 0.0046 sec (865.988 KiB/sec and 216.4971 ops/sec)"
-> >
-> > This sort of looks like monkeypatching to make an error message go away.
-> > One could argue that this ought to return EOPNOSUPP instead of EINVAL,
-> > and maybe that's what should've happened.
-> >
-> > So, uh, do NFS and CIFS both support server-side dedupe now, or are
-> > these patches just plain wrong?
-> >
-> > No, they're just wrong, because I can corrupt files like so on NFS:
-> >
-> > $ rm -rf urk moo
-> > $ xfs_io -f -c "pwrite -S 0x58 0 31048" urk
-> > wrote 31048/31048 bytes at offset 0
-> > 30 KiB, 8 ops; 0.0000 sec (569.417 MiB/sec and 153846.1538 ops/sec)
-> > $ xfs_io -f -c "pwrite -S 0x59 0 31048" moo
-> > wrote 31048/31048 bytes at offset 0
-> > 30 KiB, 8 ops; 0.0001 sec (177.303 MiB/sec and 47904.1916 ops/sec)
-> > $ md5sum urk moo
-> > 37d3713e5f9c4fe0f8a1f813b27cb284  urk
-> > a5b6f953f27aa17e42450ff4674fa2df  moo
-> > $ xfs_io -c "dedupe urk 0 0 4096" moo
-> > deduped 4096/4096 bytes at offset 0
-> > 4 KiB, 1 ops; 0.0012 sec (3.054 MiB/sec and 781.8608 ops/sec)
-> > $ md5sum urk moo
-> > 37d3713e5f9c4fe0f8a1f813b27cb284  urk
-> > 2c992d70131c489da954f1d96d8c456e  moo
-> >
-> > (Not sure about cifs, since I don't have a Windows Server handy)
-> >
-> > I'm not an expert in CIFS or NFS, so I'm asking: do either support
-> > dedupe or is this a kernel bug?
->
-> NFS does not support dedupe and only supports cloning (whole) files.
+Hi Darrick,
 
-That is not quite true. It does support range based cloning, and can
-even support cloning parts of a file onto itself (as long as the
-source and target ranges do not overlap). However it does not support
-the kind of conditional cloning that I understand from Darrick is
-needed for dedup.
+Following is a re-work of Dave Chinner's copy_file_range() patches.
+This v4 patch set includes review tags and excludes the individual
+filesystem fixes that are not related to cross-device copy.
+Those patches will be sent to maintainers seperately once the
+dependency patch is made available on a public branch.
 
-Cheers
-  Trond
+I did include the FUSE patch in this posting since we got an ACK
+from Miklos. You may take it or leave it.
+
+Thanks,
+Amir.
+
+Changes since v3:
+- Drop per filesystem patch for file_modified()/file_accessed()
+- Fix wrong likely()
+- Add Reviewed-by tags
+
+Changes since v2:
+- Re-order generic_remap_checks() fix patch before
+  forking generic_copy_file_checks()
+- Document @req_count helper argument (Darrick)
+- Fold generic_access_check_limits() (Darrick)
+- Added file_modified() helper (Darrick)
+- Added xfs patch to use file_modified() helper
+- Drop generic_copy_file_range_prep() helper
+- Per filesystem patch for file_modified()/file_accessed()
+- Post copy file_remove_privs() for ceph/generic (Darrick)
+
+Changes since v1:
+- Short read instead of EINVAL (Christoph)
+- generic_file_rw_checks() helper (Darrick)
+- generic_copy_file_range_prep() helper (Christoph)
+- Not calling ->remap_file_range() with different sb
+- Not calling ->copy_file_range() with different fs type
+- Remove changes to overlayfs
+- Extra fix to clone/dedupe checks
+
+Amir Goldstein (7):
+  vfs: introduce generic_file_rw_checks()
+  vfs: remove redundant checks from generic_remap_checks()
+  vfs: add missing checks to copy_file_range
+  vfs: introduce file_modified() helper
+  xfs: use file_modified() helper
+  vfs: allow copy_file_range to copy across devices
+  fuse: copy_file_range needs to strip setuid bits and update timestamps
+
+Dave Chinner (2):
+  vfs: introduce generic_copy_file_range()
+  vfs: no fallback for ->copy_file_range
+
+ fs/ceph/file.c     |  23 +++++++--
+ fs/cifs/cifsfs.c   |   4 ++
+ fs/fuse/file.c     |  29 +++++++++--
+ fs/inode.c         |  20 +++++++
+ fs/nfs/nfs4file.c  |  23 +++++++--
+ fs/read_write.c    | 126 +++++++++++++++++++++++++--------------------
+ fs/xfs/xfs_file.c  |  15 +-----
+ include/linux/fs.h |   9 ++++
+ mm/filemap.c       | 110 +++++++++++++++++++++++++++++++--------
+ 9 files changed, 259 insertions(+), 100 deletions(-)
+
+-- 
+2.17.1
+
