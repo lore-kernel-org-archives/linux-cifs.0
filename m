@@ -1,4 +1,4 @@
-Return-Path: <SRS0=aXsT=UC=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=Dd8Q=UD=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -7,233 +7,295 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FC28C04AB5
-	for <linux-cifs@archiver.kernel.org>; Mon,  3 Jun 2019 23:50:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DDD4C282CE
+	for <linux-cifs@archiver.kernel.org>; Tue,  4 Jun 2019 04:11:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4089126329
-	for <linux-cifs@archiver.kernel.org>; Mon,  3 Jun 2019 23:50:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2E7D124C97
+	for <linux-cifs@archiver.kernel.org>; Tue,  4 Jun 2019 04:11:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LHYWuGHq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nCoSj671"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726229AbfFCXul (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 3 Jun 2019 19:50:41 -0400
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:42727 "EHLO
-        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726216AbfFCXul (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 3 Jun 2019 19:50:41 -0400
-Received: by mail-lj1-f194.google.com with SMTP id t28so6781013lje.9
-        for <linux-cifs@vger.kernel.org>; Mon, 03 Jun 2019 16:50:40 -0700 (PDT)
+        id S1726286AbfFDELy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 4 Jun 2019 00:11:54 -0400
+Received: from mail-yb1-f196.google.com ([209.85.219.196]:41950 "EHLO
+        mail-yb1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725267AbfFDELy (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 4 Jun 2019 00:11:54 -0400
+Received: by mail-yb1-f196.google.com with SMTP id d2so7444417ybh.8;
+        Mon, 03 Jun 2019 21:11:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=JILy2Kwt5n5MgxuDI12h7mbqak8nD3cD0IpJivyH09k=;
-        b=LHYWuGHq+CIPVFUEjAPYYTj37QJBHvwhypSonW+GSc6hclrpWmeJkWh+phrcGaizQs
-         qi5lJ9EfvqvlPjHqVMbnStoed5riKRGXH/c2QL9+8vQx8mOSGoJKSql5Qs13ex/27rFT
-         NhomMNGTTs8LKcTAwidJgvw0xLuVhJ9BxtWLTqcJFdRQVws518cCpMXgyYPuo7Gom25g
-         m4XAM+h9J1QIBNgGVSVeC4+bIN8kN2sgjI3JVkPx/YMAeG4CnNn1qpQGPTisKHuWpw1v
-         NMCIFbmkHLtIhc7lxN2pKXc6bO9f6rq/8PwaWfUba75TlO4Zs6K7Ri0JYqugpe4Ni7AV
-         dzeg==
+         :cc;
+        bh=GiXYhf/KYBm+yKWNmNHreRstmpry2l5webf9eh8jDYg=;
+        b=nCoSj671i82M1oynA0o8CM084JJNDqjdDfLZZJmREHgFONnl+kW2+USpnqRpruYHyp
+         Pf7so4+XL+MXH+2VSehb5vIE+ZhwvUUAu2oQsq7VRkTVlYM4mEk8+g0heYLAetNa2K5z
+         jA3DZdtgg8eIiYlz9jZznU0eREJgA8LSeu+TK73Rjq1wDIhD0XI3AIyyKPdH6H5SjtrK
+         cEmRza+aYBu+0Xh3GAREmis9jz3rGscQs4qGb4yA7rAeeLPXIMqqbEbXdRBkBiMfh8n7
+         uu3Z6Ne6Fo+xr3RlO7+G+7u6haIQFBb4payvw8KmqZDEXqaFPywzdBoCywTUfC8RjIoE
+         rqiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=JILy2Kwt5n5MgxuDI12h7mbqak8nD3cD0IpJivyH09k=;
-        b=V5FAlX2TQZA70Y44qU9yzpPCevw1yt8J1tH/mV4EuzziyXDtjOTV6oqbsHx2QMW8sW
-         wwZKPNAGNzQXysuf48x4TJK41sjwFE6zFU3G7EFJsFjDPXJ0vZdnLdzPpSHU15wtlprf
-         9mRh//pTDOcVgv92CDHWCAZpFt8c/GqNOtlK7UvYRL0GY9s0j+upC7Rrj6K+H6b2ivbB
-         n3lkjS9x2HErAPQyrK8/NuB/alicbwpMOrOiHskXfBg+f6pyW33njZpamZzO+x/AsX+h
-         FIMWJ4VUiTG92dAO9KtBCPqZsjgoN6zGWgOj5OX+t3UxW4buDWlOoQislO0L7jhzIcIt
-         Ab2A==
-X-Gm-Message-State: APjAAAU/l4JmMdnSy8ekKmO3loS7wdUNkLL2VPoMvpvVjo7ErooNzV8k
-        ch1hnArmftVyfOHWSPVibEC7lEiEp7FoRcih8Q==
-X-Google-Smtp-Source: APXvYqzRmuhn6VXxvZG149zobtX5rYNnJAidIKP+N1E6ccRu5bun4DyPXFZ7DtV7lgnoBe1kseUrOat8wATG4x7uJNo=
-X-Received: by 2002:a2e:8583:: with SMTP id b3mr15256506lji.136.1559605839243;
- Mon, 03 Jun 2019 16:50:39 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=GiXYhf/KYBm+yKWNmNHreRstmpry2l5webf9eh8jDYg=;
+        b=di5YqzS3kw7NXVl161rYyl/ShfAYcuj7QoNW8oBP/e5zXao0zhozj2DfyFr6AuOET6
+         G5wIs4cwQ/wki7xdtstr3Dk04bHvUF5XjACteENZthNGwHTJIM0eLSCJzY78sAmVRM3h
+         2p9Ph49dWW6ZFvMleGeCj8Q7vAzdYfE819Fw46vq/oEG5Z/NveXePKTK1g7eOE+PI5cj
+         2EM6pbSn1PMLceMHGZMODawX/qeq9P5KdN8fcrYpxoJH7CE0zXhTF6HABbUN+6wtHaUb
+         /qKt/ZMgSJRPDbCE/B0uDBLcQ9Di1dghzZBSAxHkqQbgFHDpXYYVjlytUSlLiK66o9UN
+         v6Bg==
+X-Gm-Message-State: APjAAAX21oWFIllhCYx5p1GLWCiCfVcTr8oj1hP3ZF7xuR8aeRGtaD5d
+        xbScTRj5ZmjxuVoS+Z7IkL/pyAAHJHFZSyFXx1g=
+X-Google-Smtp-Source: APXvYqx+Ml1TOubdve9+7Jc6qldfoWjeamIEqBzgGRWPt6Osis+a6esFHpOMJgl+Uwrf7MWEJjaIs58k8ua3FGgOG7c=
+X-Received: by 2002:a25:4489:: with SMTP id r131mr13733327yba.14.1559621512767;
+ Mon, 03 Jun 2019 21:11:52 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190603075922.27266-1-lsahlber@redhat.com> <CAKywueRZ-QVi1dZc2WMSZAT-9YVhS6Soy4jbaauP6ds+x-a9bA@mail.gmail.com>
- <CAN05THSmjLxZtJeb33XLddHR-nhzsTNxrBAbj8DzpJZ31X7qJg@mail.gmail.com>
-In-Reply-To: <CAN05THSmjLxZtJeb33XLddHR-nhzsTNxrBAbj8DzpJZ31X7qJg@mail.gmail.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Mon, 3 Jun 2019 16:50:27 -0700
-Message-ID: <CAKywueS1q4dWNdm7dDryM7iSSoL2YhJE5XywtnMDdD8=W_Yh_g@mail.gmail.com>
-Subject: Re: [PATCH] cifs: add global spinlock for the openFileList
-To:     ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        Steve French <smfrench@gmail.com>
+References: <20190529174318.22424-1-amir73il@gmail.com> <20190529174318.22424-14-amir73il@gmail.com>
+ <CAN-5tyF9OnRsF_dgtx8aUGFB5tUUs=JK1wzXvRGo3za8jfpJdQ@mail.gmail.com>
+ <CAOQ4uxh_0RVus56Ao_tFXCHdM6dsTrk=MsSBs1p7NjX4eJZkbg@mail.gmail.com> <CAN-5tyFMOxjUrzBFf3OE+5P8pnh0Q-ngUWCmU2eFB1WKFyGPQw@mail.gmail.com>
+In-Reply-To: <CAN-5tyFMOxjUrzBFf3OE+5P8pnh0Q-ngUWCmU2eFB1WKFyGPQw@mail.gmail.com>
+From:   Amir Goldstein <amir73il@gmail.com>
+Date:   Tue, 4 Jun 2019 07:11:39 +0300
+Message-ID: <CAOQ4uxg4f2+xb-_xyCV4RYS_1Gyht9W2dWoLgHoWJMxU7B8wHw@mail.gmail.com>
+Subject: Re: [PATCH v3 13/13] vfs: allow copy_file_range to copy across devices
+To:     Olga Kornievskaia <olga.kornievskaia@gmail.com>
+Cc:     "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Christoph Hellwig <hch@lst.de>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        Luis Henriques <lhenriques@suse.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        ceph-devel@vger.kernel.org, linux-nfs <linux-nfs@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Steve French <stfrench@microsoft.com>,
+        Dave Chinner <dchinner@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D0=BF=D0=BD, 3 =D0=B8=D1=8E=D0=BD. 2019 =D0=B3. =D0=B2 16:21, ronnie sahlb=
-erg <ronniesahlberg@gmail.com>:
+On Mon, Jun 3, 2019 at 11:39 PM Olga Kornievskaia
+<olga.kornievskaia@gmail.com> wrote:
 >
-> On Tue, Jun 4, 2019 at 3:55 AM Pavel Shilovsky <piastryyy@gmail.com> wrot=
-e:
+> On Wed, May 29, 2019 at 5:03 PM Amir Goldstein <amir73il@gmail.com> wrote:
 > >
-> > =D0=BF=D0=BD, 3 =D0=B8=D1=8E=D0=BD. 2019 =D0=B3. =D0=B2 01:02, Ronnie S=
-ahlberg <lsahlber@redhat.com>:
+> > On Wed, May 29, 2019 at 11:09 PM Olga Kornievskaia
+> > <olga.kornievskaia@gmail.com> wrote:
 > > >
-> > > We can not depend on the tcon->open_file_lock here since in multiuser=
- mode
-> > > we may have the same file/inode open via multiple different tcons.
+> > > On Wed, May 29, 2019 at 1:43 PM Amir Goldstein <amir73il@gmail.com> wrote:
+> > > >
+> > > > We want to enable cross-filesystem copy_file_range functionality
+> > > > where possible, so push the "same superblock only" checks down to
+> > > > the individual filesystem callouts so they can make their own
+> > > > decisions about cross-superblock copy offload and fallack to
+> > > > generic_copy_file_range() for cross-superblock copy.
+> > > >
+> > > > [Amir] We do not call ->remap_file_range() in case the inodes are not
+> > > > on the same sb and do not call ->copy_file_range() in case the inodes
+> > > > are not on the same filesystem type.
+> > > >
+> > > > This changes behavior of the copy_file_range(2) syscall, which will
+> > > > now allow cross filesystem in-kernel copy.  CIFS already supports
+> > > > cross-superblock copy, between two shares to the same server. This
+> > > > functionality will now be available via the copy_file_range(2) syscall.
+> > > >
+> > > > Cc: Steve French <stfrench@microsoft.com>
+> > > > Signed-off-by: Dave Chinner <dchinner@redhat.com>
+> > > > Signed-off-by: Amir Goldstein <amir73il@gmail.com>
+> > > > Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
+> > > > ---
+> > > >  fs/ceph/file.c    |  4 +++-
+> > > >  fs/cifs/cifsfs.c  |  2 +-
+> > > >  fs/fuse/file.c    |  5 ++++-
+> > > >  fs/nfs/nfs4file.c |  5 ++++-
+> > > >  fs/read_write.c   | 20 ++++++++++++++------
+> > > >  5 files changed, 26 insertions(+), 10 deletions(-)
+> > > >
+> > > > diff --git a/fs/ceph/file.c b/fs/ceph/file.c
+> > > > index 8a70708e1aca..e9614d686301 100644
+> > > > --- a/fs/ceph/file.c
+> > > > +++ b/fs/ceph/file.c
+> > > > @@ -1909,6 +1909,8 @@ static ssize_t __ceph_copy_file_range(struct file *src_file, loff_t src_off,
+> > > >
+> > > >         if (src_inode == dst_inode)
+> > > >                 return -EINVAL;
+> > > > +       if (src_inode->i_sb != dst_inode->i_sb)
+> > > > +               return -EXDEV;
+> > > >         if (ceph_snap(dst_inode) != CEPH_NOSNAP)
+> > > >                 return -EROFS;
+> > > >
+> > > > @@ -2126,7 +2128,7 @@ static ssize_t ceph_copy_file_range(struct file *src_file, loff_t src_off,
+> > > >         ret = __ceph_copy_file_range(src_file, src_off, dst_file, dst_off,
+> > > >                                      len, flags);
+> > > >
+> > > > -       if (ret == -EOPNOTSUPP)
+> > > > +       if (ret == -EOPNOTSUPP || ret == -EXDEV)
+> > > >                 ret = generic_copy_file_range(src_file, src_off, dst_file,
+> > > >                                               dst_off, len, flags);
+> > > >         return ret;
+> > > > diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> > > > index ab6c5c24146d..83956452c108 100644
+> > > > --- a/fs/cifs/cifsfs.c
+> > > > +++ b/fs/cifs/cifsfs.c
+> > > > @@ -1154,7 +1154,7 @@ static ssize_t cifs_copy_file_range(struct file *src_file, loff_t off,
+> > > >                                         len, flags);
+> > > >         free_xid(xid);
+> > > >
+> > > > -       if (rc == -EOPNOTSUPP)
+> > > > +       if (rc == -EOPNOTSUPP || rc == -EXDEV)
+> > > >                 rc = generic_copy_file_range(src_file, off, dst_file,
+> > > >                                              destoff, len, flags);
+> > > >         return rc;
+> > > > diff --git a/fs/fuse/file.c b/fs/fuse/file.c
+> > > > index 7f33d68f66d9..eab00cd089e8 100644
+> > > > --- a/fs/fuse/file.c
+> > > > +++ b/fs/fuse/file.c
+> > > > @@ -3126,6 +3126,9 @@ static ssize_t __fuse_copy_file_range(struct file *file_in, loff_t pos_in,
+> > > >         if (fc->no_copy_file_range)
+> > > >                 return -EOPNOTSUPP;
+> > > >
+> > > > +       if (file_inode(file_in)->i_sb != file_inode(file_out)->i_sb)
+> > > > +               return -EXDEV;
+> > > > +
+> > > >         inode_lock(inode_out);
+> > > >
+> > > >         err = file_modified(file_out);
+> > > > @@ -3187,7 +3190,7 @@ static ssize_t fuse_copy_file_range(struct file *src_file, loff_t src_off,
+> > > >         ret = __fuse_copy_file_range(src_file, src_off, dst_file, dst_off,
+> > > >                                      len, flags);
+> > > >
+> > > > -       if (ret == -EOPNOTSUPP)
+> > > > +       if (ret == -EOPNOTSUPP || ret == -EXDEV)
+> > > >                 ret = generic_copy_file_range(src_file, src_off, dst_file,
+> > > >                                               dst_off, len, flags);
+> > > >         return ret;
+> > > > diff --git a/fs/nfs/nfs4file.c b/fs/nfs/nfs4file.c
+> > > > index 4842f3ab3161..f4157eb1f69d 100644
+> > > > --- a/fs/nfs/nfs4file.c
+> > > > +++ b/fs/nfs/nfs4file.c
+> > > > @@ -133,6 +133,9 @@ static ssize_t __nfs4_copy_file_range(struct file *file_in, loff_t pos_in,
+> > > >                                       struct file *file_out, loff_t pos_out,
+> > > >                                       size_t count, unsigned int flags)
+> > > >  {
+> > > > +       /* Only offload copy if superblock is the same */
+> > > > +       if (file_inode(file_in)->i_sb != file_inode(file_out)->i_sb)
+> > > > +               return -EXDEV;
+> > > >         if (!nfs_server_capable(file_inode(file_out), NFS_CAP_COPY))
+> > > >                 return -EOPNOTSUPP;
+> > > >         if (file_inode(file_in) == file_inode(file_out))
+> > > > @@ -148,7 +151,7 @@ static ssize_t nfs4_copy_file_range(struct file *file_in, loff_t pos_in,
+> > > >
+> > > >         ret = __nfs4_copy_file_range(file_in, pos_in, file_out, pos_out, count,
+> > > >                                      flags);
+> > > > -       if (ret == -EOPNOTSUPP)
+> > > > +       if (ret == -EOPNOTSUPP || ret == -EXDEV)
+> > > >                 ret = generic_copy_file_range(file_in, pos_in, file_out,
+> > > >                                               pos_out, count, flags);
+> > > >         return ret;
+> > > > diff --git a/fs/read_write.c b/fs/read_write.c
+> > > > index 706ea5f276a7..d8930bb735cb 100644
+> > > > --- a/fs/read_write.c
+> > > > +++ b/fs/read_write.c
+> > > > @@ -1618,7 +1618,18 @@ static ssize_t do_copy_file_range(struct file *file_in, loff_t pos_in,
+> > > >                                   struct file *file_out, loff_t pos_out,
+> > > >                                   size_t len, unsigned int flags)
+> > > >  {
+> > > > -       if (file_out->f_op->copy_file_range)
+> > > > +       /*
+> > > > +        * Although we now allow filesystems to handle cross sb copy, passing
+> > > > +        * an inode of the wrong filesystem type to filesystem operation can
+> > > > +        * often result in an attempt to dereference the wrong concrete inode
+> > > > +        * struct, so avoid doing that until we really have a good reason.
+> > > > +        * The incentive for passing inode from different sb to filesystem is
+> > > > +        * NFS cross server copy and for that use case, enforcing same
+> > > > +        * filesystem type is acceptable.
+> > > > +        */
+> > > > +       if (file_out->f_op->copy_file_range &&
+> > > > +           file_inode(file_in)->i_sb->s_type ==
+> > > > +           file_inode(file_out)->i_sb->s_type)
+
+I can change that to:
+
++       if (file_out->f_op->copy_file_range &&
++           file_out->f_op->copy_file_range ==
++           file_in->f_op->copy_file_range)
+
+That should be fine for nfs that uses same copy_file_range()
+method for all different s_type.
+
 > > >
-> > > The current code is race prone and will crash if one user deletes a f=
-ile
-> > > at the same time a different user opens/create the file.
+> > > While I'm not sure how much I care (vs wanting at least this much of
+> > > cross device copy available) but in NFS there are several NFS
+> > > file_system_type defined which would disallow a copy between them
+> > > (like nfs4_remote_fs_type, nfs4_remote_referral_fs_type, and good old
+> > > nfs4_fs_type).
 > > >
-> > > RHBZ:  1580165
+> > > One idea would be to push the check into the filesystems themselves.
 > > >
-> > > Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> > > ---
-> > >  fs/cifs/cifsfs.c   |  1 +
-> > >  fs/cifs/cifsglob.h |  5 +++++
-> > >  fs/cifs/file.c     | 12 ++++++++++--
-> > >  3 files changed, 16 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> > > index f5fcd6360056..20cc4eaa7a49 100644
-> > > --- a/fs/cifs/cifsfs.c
-> > > +++ b/fs/cifs/cifsfs.c
-> > > @@ -1459,6 +1459,7 @@ init_cifs(void)
-> > >         GlobalTotalActiveXid =3D 0;
-> > >         GlobalMaxActiveXid =3D 0;
-> > >         spin_lock_init(&cifs_tcp_ses_lock);
-> > > +       spin_lock_init(&cifs_list_lock);
-> > >         spin_lock_init(&GlobalMid_Lock);
-> > >
-> > >         cifs_lock_secret =3D get_random_u32();
-> > > diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> > > index 334ff5f9c3f3..807b7cd7d48d 100644
-> > > --- a/fs/cifs/cifsglob.h
-> > > +++ b/fs/cifs/cifsglob.h
-> > > @@ -1817,6 +1817,11 @@ GLOBAL_EXTERN struct list_head           cifs_=
-tcp_ses_list;
-> > >   * structure order is cifs_socket-->cifs_ses-->cifs_tcon-->cifs_file
-> > >   */
-> > >  GLOBAL_EXTERN spinlock_t               cifs_tcp_ses_lock;
-> > > +/*
-> > > + * This lock protects the cifsInodeInfo->openFileList as well as
-> > > + * cifsFileInfo->flist|tlist.
-> > > + */
-> > > +GLOBAL_EXTERN spinlock_t               cifs_list_lock;
-> > >
-> > >  #ifdef CONFIG_CIFS_DNOTIFY_EXPERIMENTAL /* unused temporarily */
-> > >  /* Outstanding dir notify requests */
-> > > diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> > > index 06e27ac6d82c..8e96a5ae83bf 100644
-> > > --- a/fs/cifs/file.c
-> > > +++ b/fs/cifs/file.c
-> > > @@ -338,10 +338,12 @@ cifs_new_fileinfo(struct cifs_fid *fid, struct =
-file *file,
-> > >         atomic_inc(&tcon->num_local_opens);
-> > >
-> > >         /* if readable file instance put first in list*/
-> > > +       spin_lock(&cifs_list_lock);
-> > >         if (file->f_mode & FMODE_READ)
-> > >                 list_add(&cfile->flist, &cinode->openFileList);
-> > >         else
-> > >                 list_add_tail(&cfile->flist, &cinode->openFileList);
-> > > +       spin_unlock(&cifs_list_lock);
 > >
-> > You are protecting cinode->openFileList here - this should be a lock
-> > per inode structure.
-> >
-> > >         spin_unlock(&tcon->open_file_lock);
-> > >
-> > >         if (fid->purge_cache)
-> > > @@ -413,8 +415,10 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs=
-_file, bool wait_oplock_handler)
-> > >         cifs_add_pending_open_locked(&fid, cifs_file->tlink, &open);
-> > >
-> > >         /* remove it from the lists */
-> > > +       spin_lock(&cifs_list_lock);
-> > >         list_del(&cifs_file->flist);
-> >
-> > The same here - inode lock.
-> >
-> >
-> > >         list_del(&cifs_file->tlist);
-> >
-> > It is a list per tcon - existing tcon lock is protecting here.
-> >
-> > > +       spin_unlock(&cifs_list_lock);
-> > >         atomic_dec(&tcon->num_local_opens);
-> > >
-> > >         if (list_empty(&cifsi->openFileList)) {
-> > > @@ -1459,8 +1463,10 @@ void
-> > >  cifs_move_llist(struct list_head *source, struct list_head *dest)
-> > >  {
-> > >         struct list_head *li, *tmp;
-> > > +       spin_lock(&cifs_list_lock);
-> > >         list_for_each_safe(li, tmp, source)
-> > >                 list_move(li, dest);
-> > > +       spin_unlock(&cifs_list_lock);
-> > >  }
-> > >
-> > >  void
-> > > @@ -1469,7 +1475,9 @@ cifs_free_llist(struct list_head *llist)
-> > >         struct cifsLockInfo *li, *tmp;
-> > >         list_for_each_entry_safe(li, tmp, llist, llist) {
-> > >                 cifs_del_lock_waiters(li);
-> > > +               spin_lock(&cifs_list_lock);
-> > >                 list_del(&li->llist);
-> > > +               spin_unlock(&cifs_list_lock);
-> > >                 kfree(li);
-> > >         }
-> > >  }
-> >
-> > Above two functions operate on lists of locks of inode's files - all
-> > protected by cifsi->lock_sem.
-> >
-> > > @@ -1950,9 +1958,9 @@ cifs_get_writable_file(struct cifsInodeInfo *ci=
-fs_inode, bool fsuid_only,
-> > >                         return 0;
-> > >                 }
-> > >
-> > > -               spin_lock(&tcon->open_file_lock);
-> > > +               spin_lock(&cifs_list_lock);
-> > >                 list_move_tail(&inv_file->flist, &cifs_inode->openFil=
-eList);
-> > > -               spin_unlock(&tcon->open_file_lock);
-> > > +               spin_unlock(&cifs_list_lock);
-> >
-> > inode lock.
-> >
-> > >                 cifsFileInfo_put(inv_file);
-> > >                 ++refind;
-> > >                 inv_file =3D NULL;
-> > > --
-> > > 2.13.6
-> > >
-> >
-> > What is the reasoning under using a global spin lock? Global locking
-> > is always a source of performance problems and should be avoided as
-> > much as possible.
+> > That will require more delicate patches to filesystems.
+> > Are you saying there is a *good* reason to do that now?
+> > Is nfs copy offload expected to be between different types of nfs
+> > file_system_type?
 >
-> In multiuser each user has their own tcon  so if user A and user B
-> does a list_add/list_del at the same time
-> they are not protected against eachother sicne A and B use different
-> tcon->open_file_list spinlocks :-(
-
-In this case both users still have the common thing to lock - inode,
-so, locking should be a part of the inode structure to not slow access
-to other files on the file system.
-
-We also need to agree on the locking order here - tcon first and inode
-second looks fine unless anybody has objections.
-
+> So I had to setup a test case to perhaps give you a good reason. An
+> NFS server might have an export that's a referral to another server.
+> In this case the NFS client gets an ERR_MOVED and would mount the 2nd
+> server. It shows up as a submount and it would have a different file
+> system type. Having that check would prevent the NFS client from doing
+> an NFS copy_file_range between those 2 servers and instead VFS would
+> fallback to the generic_copy_file_range.
 >
-> I will do the other changes you suggest later today and re-send
+> So why is hard(er) to push the check that ->s_types are the same for
+> the input and output files into the filesystems like it's done in this
+> patch with the ->i_sb checks?
 
-Thanks for spotting the problem! It seems that multiuser mounts don't
-have that much of usage but *theoretically* this is a right way to
-setup SMB authorization on Linux.
+It's not harder, its fragile.
+See, in vfs, file_in and file_out are abstract file objects and only generic
+file interface are used. This is no longer the case inside filesystem code.
 
---
-Best regards,
-Pavel Shilovsky
+If passed a file object of different fs, almost all the filesystem in question
+will barf (as you noticed yourself), because they try to access nfs specific
+file object fields:
+
+ssize_t nfs42_proc_copy(struct file *src, loff_t pos_src,
+                        struct file *dst, loff_t pos_dst,
+                        size_t count)
+{
+        struct nfs_server *server = NFS_SERVER(file_inode(dst));
+
+ssize_t cifs_file_copychunk_range(unsigned int xid,
+                                struct file *src_file, loff_t off,
+                                struct file *dst_file, loff_t destoff,
+                                size_t len, unsigned int flags)
+{
+        struct inode *src_inode = file_inode(src_file);
+...
+       if (!src_file->private_data || !dst_file->private_data) {
+                rc = -EBADF;
+                cifs_dbg(VFS, "missing cifsFileInfo on copy range src file\n");
+                goto out;
+        }
+...
+       smb_file_src = src_file->private_data;
+        src_tcon = tlink_tcon(smb_file_src->tlink);
+
+So first of all, all the present filesystems that support copy_file_range
+will have no be sanitized to verify file_in is an object of their own type
+before dereferencing private fields. That's doable, but it still leaves
+future filesystems volnurable to making this mistake. It is also quite
+fragile to test, because file objects coming from most fs will have NULL
+private_data, so it may take a very specific type of input file to reveal
+bugs in implementations.
+
+All in all, I prefer to keep it safe. As long as we don't really need
+filesystems
+to handle copy of file_in from a different fs, let's keep it simple and resolve
+the specific nfs issue by testing for same ->copy_file_range pointer.
+
+Thanks,
+Amir.
