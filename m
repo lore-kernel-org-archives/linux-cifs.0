@@ -4,60 +4,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C816C28CC5
-	for <linux-cifs@archiver.kernel.org>; Wed,  5 Jun 2019 14:17:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3D24C28CC5
+	for <linux-cifs@archiver.kernel.org>; Wed,  5 Jun 2019 21:14:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1D6E520870
-	for <linux-cifs@archiver.kernel.org>; Wed,  5 Jun 2019 14:17:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 812DB2075B
+	for <linux-cifs@archiver.kernel.org>; Wed,  5 Jun 2019 21:14:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728116AbfFEOQu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 5 Jun 2019 10:16:50 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:34572 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728039AbfFEOQt (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 5 Jun 2019 10:16:49 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id CE617A54197404E79077;
-        Wed,  5 Jun 2019 22:16:45 +0800 (CST)
-Received: from localhost.localdomain.localdomain (10.175.113.25) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.439.0; Wed, 5 Jun 2019 22:16:35 +0800
-From:   Kefeng Wang <wangkefeng.wang@huawei.com>
-To:     <linux-kernel@vger.kernel.org>
-CC:     Kefeng Wang <wangkefeng.wang@huawei.com>,
-        Steve French <stfrench@microsoft.com>,
-        <linux-cifs@vger.kernel.org>
-Subject: [PATCH] fs: cifs: Drop unlikely before IS_ERR(_OR_NULL)
-Date:   Wed, 5 Jun 2019 22:24:25 +0800
-Message-ID: <20190605142428.84784-2-wangkefeng.wang@huawei.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190605142428.84784-1-wangkefeng.wang@huawei.com>
-References: <20190605142428.84784-1-wangkefeng.wang@huawei.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.113.25]
-X-CFilter-Loop: Reflected
+        id S1726510AbfFEVOM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 5 Jun 2019 17:14:12 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:45451 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726305AbfFEVOM (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 5 Jun 2019 17:14:12 -0400
+Received: from orion.localdomain ([77.2.1.21]) by mrelayeu.kundenserver.de
+ (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis) id
+ 1MMp08-1hICqU2EL6-00Ijls; Wed, 05 Jun 2019 23:14:10 +0200
+From:   "Enrico Weigelt, metux IT consult" <info@metux.net>
+To:     linux-kernel@vger.kernel.org
+Cc:     linux-cifs@vger.kernel.org
+Subject: [PATCH] fs: cifs: drop unneeded likely() call around IS_ERR()
+Date:   Wed,  5 Jun 2019 23:14:09 +0200
+Message-Id: <1559769249-22011-1-git-send-email-info@metux.net>
+X-Mailer: git-send-email 1.9.1
+X-Provags-ID: V03:K1:qkVUq1ddLyADe4tmyATA1skl2fayfUJ70B3v6uWiplTRnUk/fQe
+ YLua2/cyRO1xn/l5xQ3kPnw6k862E/uBTZ+J8O+2soe8KvxPOAl7LMkW/ko439On/cli+Gn
+ eyX2WJMch+5rurK9eMHCK5WjxQk/vfcZBfql+BlR4FYb0oUdtnCFmqnyQ1Y6UCLEARrgYY4
+ d54jCDL8ux0MFpMJA1KWQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:bZqIPo62mx4=:BxMCWN3lSz9NydUk7ItuDF
+ naR2fsU5d1IsuB7DG0eO5GmtUbUbHy2otvDYTrK5W46m3hKgvEpUTV7vVSTAgXecB/f9omY/Z
+ HCojY+e4xM/zmR9veGM6PMHFDS1LRXZHZcZh/7AteRcq6ZgWcoLe4ZYHnINosnfwbfNXyLyFh
+ tN7K2+PDH7j0M2DWwMlX1ywptk3/65eosTeXNo7b9DCZH5k/n8gZDOS9+BmkwceEBi2ZyyD+G
+ 66QebDvIRufmeoAtULpPQ1gr3Ti90ZN9YwDpQe22AmZ3hVEqQSgv437bkwgRyJMfqu/PUHugb
+ ljgMBRB1+StnYM13TMDucAg4sJwBmfbFwCm9YGRIxNgWhGXm/Vc+77aq3uJ4E2lkllVtxVxhd
+ nUppaBDcQhgSf/UufEGUPuOUSMtAOanUauX49qSaSz/wEPKfdl1UpwVVGYfhyxowG5wmkWGlx
+ cEkXrPu9w/mP3jl6yTqognKtzmetb5xWAVD8gRZGWdaAo/fUeKWMfWai/gqzSCOvTdZwMjPPo
+ EnSY2DfBC8+5sRWD1oH/LP01KNWwE1wS3AripvvDN87XeknlfoJ0MkSCPjcPg5jfZVEDR0qgU
+ Eek5yBVdJC/O6fuLVMjL7W+p600lWyp1pgmW0X3/PzvU8QqfFopRv0IPqPUDy9WuMTnRfIua6
+ 7mCjh3sNVLsXDlx1i26LgJ2KYR9NUM+titGWMWq9UrGRqH+Z5wCpXf0/bTprmznQCKXXArl0F
+ ZXpqqROuxKsgODal0E5W/42/LR3ooktwsYy3AA==
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-IS_ERR(_OR_NULL) already contain an 'unlikely' compiler flag,
-so no need to do that again from its callers. Drop it.
+From: Enrico Weigelt <info@metux.net>
 
-Cc: Steve French <stfrench@microsoft.com>
-Cc: linux-cifs@vger.kernel.org
-Signed-off-by: Kefeng Wang <wangkefeng.wang@huawei.com>
+IS_ERR() already calls unlikely(), so this extra unlikely() call
+around IS_ERR() is not needed.
+
+Signed-off-by: Enrico Weigelt <info@metux.net>
 ---
  fs/cifs/dfs_cache.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/fs/cifs/dfs_cache.c b/fs/cifs/dfs_cache.c
-index e3e1c13df439..1692c0c6c23a 100644
+index e3e1c13..1692c0c 100644
 --- a/fs/cifs/dfs_cache.c
 +++ b/fs/cifs/dfs_cache.c
 @@ -492,7 +492,7 @@ static struct dfs_cache_entry *__find_cache_entry(unsigned int hash,
@@ -70,5 +73,5 @@ index e3e1c13df439..1692c0c6c23a 100644
  				return ERR_CAST(name);
  			}
 -- 
-2.20.1
+1.9.1
 
