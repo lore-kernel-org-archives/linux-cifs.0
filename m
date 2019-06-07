@@ -1,325 +1,213 @@
-Return-Path: <SRS0=Xphx=UF=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=jrt1=UG=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C4A2C28D19
-	for <linux-cifs@archiver.kernel.org>; Thu,  6 Jun 2019 05:27:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF857C2BCA1
+	for <linux-cifs@archiver.kernel.org>; Fri,  7 Jun 2019 20:23:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 753B520874
-	for <linux-cifs@archiver.kernel.org>; Thu,  6 Jun 2019 05:27:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9350620868
+	for <linux-cifs@archiver.kernel.org>; Fri,  7 Jun 2019 20:23:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kCPD8Adt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HubCRacH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726379AbfFFF1R (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 6 Jun 2019 01:27:17 -0400
-Received: from mail-yb1-f193.google.com ([209.85.219.193]:35280 "EHLO
-        mail-yb1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725766AbfFFF1R (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 6 Jun 2019 01:27:17 -0400
-Received: by mail-yb1-f193.google.com with SMTP id v17so498297ybm.2;
-        Wed, 05 Jun 2019 22:27:16 -0700 (PDT)
+        id S1729677AbfFGUXn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 7 Jun 2019 16:23:43 -0400
+Received: from mail-pl1-f181.google.com ([209.85.214.181]:45623 "EHLO
+        mail-pl1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729345AbfFGUXn (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 7 Jun 2019 16:23:43 -0400
+Received: by mail-pl1-f181.google.com with SMTP id bi6so836321plb.12
+        for <linux-cifs@vger.kernel.org>; Fri, 07 Jun 2019 13:23:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=cH18P0lYJBIafEiZHtnIeY32n1bLZASXFJUvEtv8gks=;
-        b=kCPD8Adtp3fBRhIbIr5PG8z35Zc+u8KzCXHrEpCjDz4qlsdyUwvCrzPK7eAzE8mINJ
-         tFvTN+1wK4AGsP33H9CMRFqhqFqyIHvaUQQvaVwX2LwQUHDgVMWRXC77W6NbTDIOR6lD
-         HfBHL+lXcKo4lFZwa2iChqZlxH03qgASfnIE65bHJmMZRZvwaayG4wl1w8v/JQwXCXhY
-         f63MQHw+7JngjQLurz+gZhlxq9NpuKkv07e0RqY003e3ZWGphP004hyTdou6FquxRfWH
-         5bo/i/GIrZnFkRTaeB/3lGuiDAbeU+04RQX4M8tQBt6h59CTGs5ytfwMfattxDIg3OgI
-         BCbg==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=+Ph/P+aMyTVBBlMtGSxpuwyoARzDz0vtltO+wZhBOEY=;
+        b=HubCRacH1axPdEHp/w8vC34pB9Ej36JlZeXyR3MgBdcSphRX3aw55SE9srv6E74FLb
+         NWELkW25enTINjJNKOMoYY+52gof4vEAg6kEW3p0pHCnPEfClpYUJBNVVrp9X+p4t7N4
+         +4IpJWLtGcvv2Ixy5VTem5k+5TvYjUKGERhU4AVTrplLY1E14cuugBWKJLx+Ip4lHwvR
+         ywzS2FotC0X4ArJWL4v/6B2e3MiNpKOwNk8ZN1navy7kE8g3GtHgXRMsRHnckv6s/Ap1
+         xA1682k5X7CrabDSQ4a39/xRkPo0WqapGbt3qbm3qQsnBD/3+VnLyblJoVzAuatoYUEd
+         a1EQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=cH18P0lYJBIafEiZHtnIeY32n1bLZASXFJUvEtv8gks=;
-        b=ShfYWer7/5vqJx1wjojvPwvomA8qnGLDsSpnRmFQWPpxLqu/jpEopZ810iWfHCXBbZ
-         Wn/Dy79zXfk4fU8ePN+jVGaENogyKw1SXHzMe6aqIv5LY6rWx5p9MebOp24Ey3fbSY02
-         Mxkp62Q6g62gQgvwFElr/Vxn4Ky1gsEcOYvZ7JClCWiiIK6muDtZ9dpUrK3dMrlK2NCU
-         UB7rX77zeYK8DXlgUKT0T2X0mYHO6OP2+22UdROMQXz+Ue5G6zwnwU/yswLWD1lRYFh5
-         2vtlj57CkoucVXqzvA8MwuRO6MV4Ua7D25/23FkIVGmwUy2VaCzlT6Kjbdt9qRGiYfyE
-         wUMQ==
-X-Gm-Message-State: APjAAAXlFXc7P7gzp85w8QnrIjwBzXBtdLtSrSxecww++zUjK9h3DyZe
-        PZrvvOspwtXiSQ+PtZI/H0Ss8nqVSPThVi+NiB8=
-X-Google-Smtp-Source: APXvYqzkIvarASnKKEhZ9NUQJIu/frR5qKauax+SEAHdnni3v8klGfTeb354ul/JiyY9dq7Nd5e3anW5l8Qcx7IVmgI=
-X-Received: by 2002:a05:6902:4c3:: with SMTP id v3mr20755732ybs.144.1559798835891;
- Wed, 05 Jun 2019 22:27:15 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=+Ph/P+aMyTVBBlMtGSxpuwyoARzDz0vtltO+wZhBOEY=;
+        b=kKLR+G4dKhqfBhpWP0lPWxsCmh2vntk8n++Um/GV2bpgYJa4pR7HC4nYjYWHF+V22i
+         D0OWj4MR0p/2tRKg1K88aNcnMq85fexJubsWghZ6kMyM3EjqyUcWODd/nlseJ+MSsXEa
+         fcgITnVpaZDkqv4uaUAoehTtXN8bjkG5Zwe/dXehpHCSnm49eD0QEg2RUqEsSkysTyah
+         ur2hQ2JE9r5utCPAfFfVlhCm9R6i4EqrzmtGuI9oQhzHQq8iSYU2xmns8ZDDChl/YL9c
+         vIqFS3Mh/tQJsX9hRZp6Ye1hrac6orvtpEhysfPac6/pi2jEyiVJPDJR0duvcMMkMAoL
+         gjpg==
+X-Gm-Message-State: APjAAAUjWTFxweeNJQ2uPfPRjl/mvhFcwX5ey14Js0Au3LTRlJ19Tebz
+        Gqkmh0TytS7mMlHJ/aZawWNtOQXtBHMjB79u0+CH/bT1
+X-Google-Smtp-Source: APXvYqzmGIpn512iQXzwziJHhdyM3s5VJ9sDGJ8jPV331CRB2F+HD2oUPzcAiGFdvw2PHy2Mf/P+vMjgrLCP13Cnf7E=
+X-Received: by 2002:a17:902:728b:: with SMTP id d11mr28303949pll.78.1559939021753;
+ Fri, 07 Jun 2019 13:23:41 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190604135632.1487-1-amir73il@gmail.com> <CAN-5tyFBd4mJ84C2J9dwG_iYeEDN0tX86DjW4oaV7yscj4VR7g@mail.gmail.com>
- <CAH2r5mtbmXx6g7zf+C8cg8sT6WJKAoH=93nk5O5mLxpBzTHPTg@mail.gmail.com>
-In-Reply-To: <CAH2r5mtbmXx6g7zf+C8cg8sT6WJKAoH=93nk5O5mLxpBzTHPTg@mail.gmail.com>
-From:   Amir Goldstein <amir73il@gmail.com>
-Date:   Thu, 6 Jun 2019 07:27:04 +0200
-Message-ID: <CAOQ4uxih=W2gtRaHGnMMtqdcQSp4=xUeZq8JOaCq=uWpr82aqA@mail.gmail.com>
-Subject: Re: [PATCH v5 8/9] vfs: allow copy_file_range to copy across devices
-To:     Steve French <smfrench@gmail.com>
-Cc:     Olga Kornievskaia <olga.kornievskaia@gmail.com>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Christoph Hellwig <hch@lst.de>,
-        linux-xfs <linux-xfs@vger.kernel.org>,
-        Luis Henriques <lhenriques@suse.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux API <linux-api@vger.kernel.org>,
-        ceph-devel@vger.kernel.org, linux-nfs <linux-nfs@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Steve French <stfrench@microsoft.com>,
-        Dave Chinner <dchinner@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 7 Jun 2019 15:23:30 -0500
+Message-ID: <CAH2r5mvA3t2Nm4F=LuBwHkN+E19pHuiLaSv0JV9SMNYvZrxAiQ@mail.gmail.com>
+Subject: [SMB3.1.1] Faster crypto (GCM) for Linux kernel SMB3.1.1 mounts
+To:     CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>
+Content-Type: multipart/mixed; boundary="00000000000043f8e9058ac19bf6"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Jun 6, 2019 at 2:31 AM Steve French <smfrench@gmail.com> wrote:
->
-> I tried the patchset and new xfstests with cifs.ko and looks like the
-> copy_file_range patches are fine
+--00000000000043f8e9058ac19bf6
+Content-Type: text/plain; charset="UTF-8"
 
-Glad to hear!
+I am seeing more than double the performance of copy to Samba on
+encrypted mount with this two patch set, and 80%+ faster on copy from
+Samba server (when running Ralph's GCM capable experimental branch of
+Samba)
 
-Just to clarify that you are referring to the latest patch version.
-If you took patch v5 (that you replied to) and the rest of the patches from v4,
-that was correct.
+Patches to update the kernel client (cifs.ko) attached:
 
-You can compare to my github branch if in any doubt (or just test my branch):
-https://github.com/amir73il/linux/commits/copy_file_range-v5
-NOTE that the github branch has a CIFS patch that was not included in
-v4 posting to Darrick ("cifs: copy_file_range needs to strip setuid bits ..."),
-because I decided this patch should be sent directly to you later.
-Please do include this patch in you CIFS tests.
+-- 
+Thanks,
 
+Steve
 
->
-> 1) xfs_io copy_range worked fine (once I fixed a bug I found in
-> cifs.ko in the "match_server" function)
-> 2) the new xfstest 989 requires other features (swapfiles) which I can
-> add and 990 requires new xfsprogs presumably (xfs_io in current Ubuntu
-> doesn't seem to include xfs_io chmod)
+--00000000000043f8e9058ac19bf6
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-SMB3-Add-SMB3.1.1-GCM-to-negotiated-crypto-algorigth.patch"
+Content-Disposition: attachment; 
+	filename="0001-SMB3-Add-SMB3.1.1-GCM-to-negotiated-crypto-algorigth.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_jwmjdagf0>
+X-Attachment-Id: f_jwmjdagf0
 
-It's true, you would need minimum version xfs_io 4.20 to run that test,
-but I am less worried about testing bounds checks with CIFS, as all bounds
-checks are performed before entering cifs code.
+RnJvbSBlZGRhZGY5NzM2MTM1MzU5MjM2YjAwNDAzOTBhN2FlMWVhMWQyYjVlIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IEZyaSwgNyBKdW4gMjAxOSAwODo1OTo0MCAtMDUwMApTdWJqZWN0OiBbUEFUQ0ggMS8y
+XSBTTUIzOiBBZGQgU01CMy4xLjEgR0NNIHRvIG5lZ290aWF0ZWQgY3J5cHRvIGFsZ29yaWd0aG1z
+CgpHQ00gaXMgZmFzdGVyLiBSZXF1ZXN0IGl0IGR1cmluZyBuZWdvdGlhdGUgcHJvdG9jb2wuCkZv
+bGxvd29uIHBhdGNoIHdpbGwgYWRkIGNhbGxvdXRzIHRvIEdDTSBjcnlwdG8KClNpZ25lZC1vZmYt
+Ynk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9jaWZzL3Nt
+YjJvcHMuYyB8IDQgKystLQogZnMvY2lmcy9zbWIycGR1LmMgfCA4ICsrKystLS0tCiBmcy9jaWZz
+L3NtYjJwZHUuaCB8IDQgKystLQogMyBmaWxlcyBjaGFuZ2VkLCA4IGluc2VydGlvbnMoKyksIDgg
+ZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9zbWIyb3BzLmMgYi9mcy9jaWZzL3Nt
+YjJvcHMuYwppbmRleCBlOTIxZTY1MTE3MjguLjdmYTk1OTI5YzhmYyAxMDA2NDQKLS0tIGEvZnMv
+Y2lmcy9zbWIyb3BzLmMKKysrIGIvZnMvY2lmcy9zbWIyb3BzLmMKQEAgLTMzMzMsNyArMzMzMyw3
+IEBAIGZpbGxfdHJhbnNmb3JtX2hkcihzdHJ1Y3Qgc21iMl90cmFuc2Zvcm1faGRyICp0cl9oZHIs
+IHVuc2lnbmVkIGludCBvcmlnX2xlbiwKIAl0cl9oZHItPlByb3RvY29sSWQgPSBTTUIyX1RSQU5T
+Rk9STV9QUk9UT19OVU07CiAJdHJfaGRyLT5PcmlnaW5hbE1lc3NhZ2VTaXplID0gY3B1X3RvX2xl
+MzIob3JpZ19sZW4pOwogCXRyX2hkci0+RmxhZ3MgPSBjcHVfdG9fbGUxNigweDAxKTsKLQlnZXRf
+cmFuZG9tX2J5dGVzKCZ0cl9oZHItPk5vbmNlLCBTTUIzX0FFUzEyOENNTV9OT05DRSk7CisJZ2V0
+X3JhbmRvbV9ieXRlcygmdHJfaGRyLT5Ob25jZSwgU01CM19BRVMxMjhDQ01fTk9OQ0UpOwogCW1l
+bWNweSgmdHJfaGRyLT5TZXNzaW9uSWQsICZzaGRyLT5TZXNzaW9uSWQsIDgpOwogfQogCkBAIC0z
+NDkyLDcgKzM0OTIsNyBAQCBjcnlwdF9tZXNzYWdlKHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNl
+cnZlciwgaW50IG51bV9ycXN0LAogCQlnb3RvIGZyZWVfc2c7CiAJfQogCWl2WzBdID0gMzsKLQlt
+ZW1jcHkoaXYgKyAxLCAoY2hhciAqKXRyX2hkci0+Tm9uY2UsIFNNQjNfQUVTMTI4Q01NX05PTkNF
+KTsKKwltZW1jcHkoaXYgKyAxLCAoY2hhciAqKXRyX2hkci0+Tm9uY2UsIFNNQjNfQUVTMTI4Q0NN
+X05PTkNFKTsKIAogCWFlYWRfcmVxdWVzdF9zZXRfY3J5cHQocmVxLCBzZywgc2csIGNyeXB0X2xl
+biwgaXYpOwogCWFlYWRfcmVxdWVzdF9zZXRfYWQocmVxLCBhc3NvY19kYXRhX2xlbik7CmRpZmYg
+LS1naXQgYS9mcy9jaWZzL3NtYjJwZHUuYyBiL2ZzL2NpZnMvc21iMnBkdS5jCmluZGV4IGFiOGRj
+NzNkMjI4Mi4uOWFmZWYwZWFhMWM0IDEwMDY0NAotLS0gYS9mcy9jaWZzL3NtYjJwZHUuYworKysg
+Yi9mcy9jaWZzL3NtYjJwZHUuYwpAQCAtNDg5LDEwICs0ODksMTAgQEAgc3RhdGljIHZvaWQKIGJ1
+aWxkX2VuY3J5cHRfY3R4dChzdHJ1Y3Qgc21iMl9lbmNyeXB0aW9uX25lZ19jb250ZXh0ICpwbmVn
+X2N0eHQpCiB7CiAJcG5lZ19jdHh0LT5Db250ZXh0VHlwZSA9IFNNQjJfRU5DUllQVElPTl9DQVBB
+QklMSVRJRVM7Ci0JcG5lZ19jdHh0LT5EYXRhTGVuZ3RoID0gY3B1X3RvX2xlMTYoNCk7IC8qIENp
+cGhlciBDb3VudCArIGxlMTYgY2lwaGVyICovCi0JcG5lZ19jdHh0LT5DaXBoZXJDb3VudCA9IGNw
+dV90b19sZTE2KDEpOwotLyogcG5lZ19jdHh0LT5DaXBoZXJzWzBdID0gU01CMl9FTkNSWVBUSU9O
+X0FFUzEyOF9HQ007Ki8gLyogbm90IHN1cHBvcnRlZCB5ZXQgKi8KLQlwbmVnX2N0eHQtPkNpcGhl
+cnNbMF0gPSBTTUIyX0VOQ1JZUFRJT05fQUVTMTI4X0NDTTsKKwlwbmVnX2N0eHQtPkRhdGFMZW5n
+dGggPSBjcHVfdG9fbGUxNig2KTsgLyogQ2lwaGVyIENvdW50ICsgbGUxNiBjaXBoZXIgKi8KKwlw
+bmVnX2N0eHQtPkNpcGhlckNvdW50ID0gY3B1X3RvX2xlMTYoMik7CisJcG5lZ19jdHh0LT5DaXBo
+ZXJzWzBdID0gU01CMl9FTkNSWVBUSU9OX0FFUzEyOF9HQ007CisJcG5lZ19jdHh0LT5DaXBoZXJz
+WzFdID0gU01CMl9FTkNSWVBUSU9OX0FFUzEyOF9DQ007CiB9CiAKIHN0YXRpYyB2b2lkCmRpZmYg
+LS1naXQgYS9mcy9jaWZzL3NtYjJwZHUuaCBiL2ZzL2NpZnMvc21iMnBkdS5oCmluZGV4IGM3ZDU4
+MTNiZWJkOC4uZDNhNjRjZjgxMmQ5IDEwMDY0NAotLS0gYS9mcy9jaWZzL3NtYjJwZHUuaAorKysg
+Yi9mcy9jaWZzL3NtYjJwZHUuaApAQCAtMTIzLDcgKzEyMyw3IEBAIHN0cnVjdCBzbWIyX3N5bmNf
+cGR1IHsKIAlfX2xlMTYgU3RydWN0dXJlU2l6ZTI7IC8qIHNpemUgb2Ygd2N0IGFyZWEgKHZhcmll
+cywgcmVxdWVzdCBzcGVjaWZpYykgKi8KIH0gX19wYWNrZWQ7CiAKLSNkZWZpbmUgU01CM19BRVMx
+MjhDTU1fTk9OQ0UgMTEKKyNkZWZpbmUgU01CM19BRVMxMjhDQ01fTk9OQ0UgMTEKICNkZWZpbmUg
+U01CM19BRVMxMjhHQ01fTk9OQ0UgMTIKIAogc3RydWN0IHNtYjJfdHJhbnNmb3JtX2hkciB7CkBA
+IC0yOTMsNyArMjkzLDcgQEAgc3RydWN0IHNtYjJfZW5jcnlwdGlvbl9uZWdfY29udGV4dCB7CiAJ
+X19sZTE2CURhdGFMZW5ndGg7CiAJX19sZTMyCVJlc2VydmVkOwogCV9fbGUxNglDaXBoZXJDb3Vu
+dDsgLyogQUVTLTEyOC1HQ00gYW5kIEFFUy0xMjgtQ0NNICovCi0JX19sZTE2CUNpcGhlcnNbMV07
+IC8qIENpcGhlcnNbMF0gc2luY2Ugb25seSBvbmUgdXNlZCBub3cgKi8KKwlfX2xlMTYJQ2lwaGVy
+c1syXTsKIH0gX19wYWNrZWQ7CiAKIC8qIFNlZSBNUy1TTUIyIDIuMi4zLjEuMyAqLwotLSAKMi4y
+MC4xCgo=
+--00000000000043f8e9058ac19bf6
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0002-SMB3-Add-SMB3.1.1-GCM-crypto-to-the-encrypt-and-decr.patch"
+Content-Disposition: attachment; 
+	filename="0002-SMB3-Add-SMB3.1.1-GCM-crypto-to-the-encrypt-and-decr.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_jwmjdagu1>
+X-Attachment-Id: f_jwmjdagu1
 
-BTW, checking for xfs_io chmod was in xfstests patches v2:
-https://github.com/amir73il/xfstests/commits/copy_file_range-v2
-I since posted v3. Actually not much changed, but checking for an even
-newer (only just posted) feature of xfs_io:
-https://github.com/amir73il/xfstests/commits/copy_file_range-v3
-So you are not any better with this version w.r.t test 990.
-
-> generic/989    [not run] swapfiles are not supported
-
-Expected not to run on cifs
-
-> generic/990    [not run] xfs_io chmod support is missing
-
-Expected not to with old xfs_io
-
->
-> Are there other xfstests that you would like me to run (other than the
-> 3 in the 900 series)?
-
-Yes, please run tests group "-g copy_range", namely 430..434
-
-Also, the "900 series" had 4 tests not 3, so not sure which tests did run?
-Did 991 (cross-device copy) run? That is THE test to run and cifs is THE
-filesystem to test with to actually exercise filesystem implementation of
-server side cross-device (i.e. cross-share) copy.
-
-Thanks!
-Amir.
-
-
-> On Tue, Jun 4, 2019 at 3:43 PM Olga Kornievskaia
-> <olga.kornievskaia@gmail.com> wrote:
-> >
-> > On Tue, Jun 4, 2019 at 9:56 AM Amir Goldstein <amir73il@gmail.com> wrote:
-> > >
-> > > We want to enable cross-filesystem copy_file_range functionality
-> > > where possible, so push the "same superblock only" checks down to
-> > > the individual filesystem callouts so they can make their own
-> > > decisions about cross-superblock copy offload and fallack to
-> > > generic_copy_file_range() for cross-superblock copy.
-> > >
-> > > [Amir] We do not call ->remap_file_range() in case the files are not
-> > > on the same sb and do not call ->copy_file_range() in case the files
-> > > do not belong to the same filesystem driver.
-> > >
-> > > This changes behavior of the copy_file_range(2) syscall, which will
-> > > now allow cross filesystem in-kernel copy.  CIFS already supports
-> > > cross-superblock copy, between two shares to the same server. This
-> > > functionality will now be available via the copy_file_range(2) syscall.
-> > >
-> > > Cc: Steve French <stfrench@microsoft.com>
-> > > Signed-off-by: Dave Chinner <dchinner@redhat.com>
-> > > Signed-off-by: Amir Goldstein <amir73il@gmail.com>
-> > > ---
-> > >
-> > > Darrick,
-> > >
-> > > Per feedback from Olga, I am sending a modified version of this patch
-> > > to address cross file_system_type copy issue in nfs.
-> > >
-> >
-> > Thanks Amir, this works for NFS with referrals.
-> >
-> > > For the sake of global warming I am not re-posting the entire patch set.
-> > > I removed your RVB because of the change.
-> > >
-> > > Thanks,
-> > > Amir.
-> > >
-> > > Changes since v4:
-> > > - Check "same filesystem driver" by comapring ->copy_file_range()
-> > >   function pointer
-> > >
-> > >  fs/ceph/file.c    |  4 +++-
-> > >  fs/cifs/cifsfs.c  |  2 +-
-> > >  fs/fuse/file.c    |  5 ++++-
-> > >  fs/nfs/nfs4file.c |  5 ++++-
-> > >  fs/read_write.c   | 18 ++++++++++++------
-> > >  5 files changed, 24 insertions(+), 10 deletions(-)
-> > >
-> > > diff --git a/fs/ceph/file.c b/fs/ceph/file.c
-> > > index e87f7b2023af..4cd41ed5cc53 100644
-> > > --- a/fs/ceph/file.c
-> > > +++ b/fs/ceph/file.c
-> > > @@ -1909,6 +1909,8 @@ static ssize_t __ceph_copy_file_range(struct file *src_file, loff_t src_off,
-> > >
-> > >         if (src_inode == dst_inode)
-> > >                 return -EINVAL;
-> > > +       if (src_inode->i_sb != dst_inode->i_sb)
-> > > +               return -EXDEV;
-> > >         if (ceph_snap(dst_inode) != CEPH_NOSNAP)
-> > >                 return -EROFS;
-> > >
-> > > @@ -2109,7 +2111,7 @@ static ssize_t ceph_copy_file_range(struct file *src_file, loff_t src_off,
-> > >         ret = __ceph_copy_file_range(src_file, src_off, dst_file, dst_off,
-> > >                                      len, flags);
-> > >
-> > > -       if (ret == -EOPNOTSUPP)
-> > > +       if (ret == -EOPNOTSUPP || ret == -EXDEV)
-> > >                 ret = generic_copy_file_range(src_file, src_off, dst_file,
-> > >                                               dst_off, len, flags);
-> > >         return ret;
-> > > diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> > > index c65823270313..f11eea6125c1 100644
-> > > --- a/fs/cifs/cifsfs.c
-> > > +++ b/fs/cifs/cifsfs.c
-> > > @@ -1149,7 +1149,7 @@ static ssize_t cifs_copy_file_range(struct file *src_file, loff_t off,
-> > >                                         len, flags);
-> > >         free_xid(xid);
-> > >
-> > > -       if (rc == -EOPNOTSUPP)
-> > > +       if (rc == -EOPNOTSUPP || rc == -EXDEV)
-> > >                 rc = generic_copy_file_range(src_file, off, dst_file,
-> > >                                              destoff, len, flags);
-> > >         return rc;
-> > > diff --git a/fs/fuse/file.c b/fs/fuse/file.c
-> > > index e03901ae729b..569baf286835 100644
-> > > --- a/fs/fuse/file.c
-> > > +++ b/fs/fuse/file.c
-> > > @@ -3126,6 +3126,9 @@ static ssize_t __fuse_copy_file_range(struct file *file_in, loff_t pos_in,
-> > >         if (fc->no_copy_file_range)
-> > >                 return -EOPNOTSUPP;
-> > >
-> > > +       if (file_inode(file_in)->i_sb != file_inode(file_out)->i_sb)
-> > > +               return -EXDEV;
-> > > +
-> > >         inode_lock(inode_out);
-> > >
-> > >         if (fc->writeback_cache) {
-> > > @@ -3182,7 +3185,7 @@ static ssize_t fuse_copy_file_range(struct file *src_file, loff_t src_off,
-> > >         ret = __fuse_copy_file_range(src_file, src_off, dst_file, dst_off,
-> > >                                      len, flags);
-> > >
-> > > -       if (ret == -EOPNOTSUPP)
-> > > +       if (ret == -EOPNOTSUPP || ret == -EXDEV)
-> > >                 ret = generic_copy_file_range(src_file, src_off, dst_file,
-> > >                                               dst_off, len, flags);
-> > >         return ret;
-> > > diff --git a/fs/nfs/nfs4file.c b/fs/nfs/nfs4file.c
-> > > index 4842f3ab3161..f4157eb1f69d 100644
-> > > --- a/fs/nfs/nfs4file.c
-> > > +++ b/fs/nfs/nfs4file.c
-> > > @@ -133,6 +133,9 @@ static ssize_t __nfs4_copy_file_range(struct file *file_in, loff_t pos_in,
-> > >                                       struct file *file_out, loff_t pos_out,
-> > >                                       size_t count, unsigned int flags)
-> > >  {
-> > > +       /* Only offload copy if superblock is the same */
-> > > +       if (file_inode(file_in)->i_sb != file_inode(file_out)->i_sb)
-> > > +               return -EXDEV;
-> > >         if (!nfs_server_capable(file_inode(file_out), NFS_CAP_COPY))
-> > >                 return -EOPNOTSUPP;
-> > >         if (file_inode(file_in) == file_inode(file_out))
-> > > @@ -148,7 +151,7 @@ static ssize_t nfs4_copy_file_range(struct file *file_in, loff_t pos_in,
-> > >
-> > >         ret = __nfs4_copy_file_range(file_in, pos_in, file_out, pos_out, count,
-> > >                                      flags);
-> > > -       if (ret == -EOPNOTSUPP)
-> > > +       if (ret == -EOPNOTSUPP || ret == -EXDEV)
-> > >                 ret = generic_copy_file_range(file_in, pos_in, file_out,
-> > >                                               pos_out, count, flags);
-> > >         return ret;
-> > > diff --git a/fs/read_write.c b/fs/read_write.c
-> > > index cec7e7b1f693..bb594c8f4404 100644
-> > > --- a/fs/read_write.c
-> > > +++ b/fs/read_write.c
-> > > @@ -1599,7 +1599,16 @@ static ssize_t do_copy_file_range(struct file *file_in, loff_t pos_in,
-> > >                                   struct file *file_out, loff_t pos_out,
-> > >                                   size_t len, unsigned int flags)
-> > >  {
-> > > -       if (file_out->f_op->copy_file_range)
-> > > +       /*
-> > > +        * Although we now allow filesystems to handle cross sb copy, passing
-> > > +        * a file of the wrong filesystem type to filesystem driver can result
-> > > +        * in an attempt to dereference the wrong type of ->private_data, so
-> > > +        * avoid doing that until we really have a good reason.
-> > > +        * NFS has several different file_system_type's, but they all end up
-> > > +        * using the same ->copy_file_range() function pointer.
-> > > +        */
-> > > +       if (file_out->f_op->copy_file_range &&
-> > > +           file_out->f_op->copy_file_range == file_in->f_op->copy_file_range)
-> > >                 return file_out->f_op->copy_file_range(file_in, pos_in,
-> > >                                                        file_out, pos_out,
-> > >                                                        len, flags);
-> > > @@ -1622,10 +1631,6 @@ ssize_t vfs_copy_file_range(struct file *file_in, loff_t pos_in,
-> > >         if (flags != 0)
-> > >                 return -EINVAL;
-> > >
-> > > -       /* this could be relaxed once a method supports cross-fs copies */
-> > > -       if (file_inode(file_in)->i_sb != file_inode(file_out)->i_sb)
-> > > -               return -EXDEV;
-> > > -
-> > >         ret = generic_copy_file_checks(file_in, pos_in, file_out, pos_out, &len,
-> > >                                        flags);
-> > >         if (unlikely(ret))
-> > > @@ -1648,7 +1653,8 @@ ssize_t vfs_copy_file_range(struct file *file_in, loff_t pos_in,
-> > >          * Try cloning first, this is supported by more file systems, and
-> > >          * more efficient if both clone and copy are supported (e.g. NFS).
-> > >          */
-> > > -       if (file_in->f_op->remap_file_range) {
-> > > +       if (file_in->f_op->remap_file_range &&
-> > > +           file_inode(file_in)->i_sb == file_inode(file_out)->i_sb) {
-> > >                 loff_t cloned;
-> > >
-> > >                 cloned = file_in->f_op->remap_file_range(file_in, pos_in,
-> > > --
-> > > 2.17.1
-> > >
->
->
->
-> --
-> Thanks,
->
-> Steve
+RnJvbSAxZGM4NTFhNDUyZWJiYzE5MWI3NTBmZWU4ZmI0MWRhNDVkOWIyMGZiIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IEZyaSwgNyBKdW4gMjAxOSAxNToxNjoxMCAtMDUwMApTdWJqZWN0OiBbUEFUQ0ggMi8y
+XSBbU01CM10gQWRkIFNNQjMuMS4xIEdDTSBjcnlwdG8gdG8gdGhlIGVuY3J5cHQgYW5kIGRlY3J5
+cHQKIGZ1bmN0aW9ucwoKU01CMy4xLjEgR0NNIHBlcmZvcm1zIG11Y2ggYmV0dGVyIHRoYW4gdGhl
+IG9sZGVyIENDTSBkZWZhdWx0Ogptb3JlIHRoYW4gdHdpY2UgYXMgZmFzdCBpbiB0aGUgd3JpdGUg
+cGF0Y2ggKGNvcHkgdG8gdGhlIFNhbWJhCnNlcnZlciBvbiBsb2NhbGhvc3QgZm9yIGV4YW1wbGUp
+IGFuZCA4MCUgZmFzdGVyIG9uIHRoZSByZWFkCnBhdGNoIChjb3B5IGZyb20gdGhlIHNlcnZlciku
+CgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0t
+LQogZnMvY2lmcy9zbWIyb3BzLmMgICAgICAgfCAxOCArKysrKysrKysrKysrLS0tLS0KIGZzL2Np
+ZnMvc21iMnRyYW5zcG9ydC5jIHwgMTAgKysrKysrKystLQogMiBmaWxlcyBjaGFuZ2VkLCAyMSBp
+bnNlcnRpb25zKCspLCA3IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvc21iMm9w
+cy5jIGIvZnMvY2lmcy9zbWIyb3BzLmMKaW5kZXggN2ZhOTU5MjljOGZjLi5hOGUyOGI5NTVjNjkg
+MTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvc21iMm9wcy5jCisrKyBiL2ZzL2NpZnMvc21iMm9wcy5jCkBA
+IC0zMzI0LDcgKzMzMjQsNyBAQCBzbWIyX2Rpcl9uZWVkc19jbG9zZShzdHJ1Y3QgY2lmc0ZpbGVJ
+bmZvICpjZmlsZSkKIAogc3RhdGljIHZvaWQKIGZpbGxfdHJhbnNmb3JtX2hkcihzdHJ1Y3Qgc21i
+Ml90cmFuc2Zvcm1faGRyICp0cl9oZHIsIHVuc2lnbmVkIGludCBvcmlnX2xlbiwKLQkJICAgc3Ry
+dWN0IHNtYl9ycXN0ICpvbGRfcnEpCisJCSAgIHN0cnVjdCBzbWJfcnFzdCAqb2xkX3JxLCBzdHJ1
+Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIpCiB7CiAJc3RydWN0IHNtYjJfc3luY19oZHIgKnNo
+ZHIgPQogCQkJKHN0cnVjdCBzbWIyX3N5bmNfaGRyICopb2xkX3JxLT5ycV9pb3ZbMF0uaW92X2Jh
+c2U7CkBAIC0zMzMzLDcgKzMzMzMsMTAgQEAgZmlsbF90cmFuc2Zvcm1faGRyKHN0cnVjdCBzbWIy
+X3RyYW5zZm9ybV9oZHIgKnRyX2hkciwgdW5zaWduZWQgaW50IG9yaWdfbGVuLAogCXRyX2hkci0+
+UHJvdG9jb2xJZCA9IFNNQjJfVFJBTlNGT1JNX1BST1RPX05VTTsKIAl0cl9oZHItPk9yaWdpbmFs
+TWVzc2FnZVNpemUgPSBjcHVfdG9fbGUzMihvcmlnX2xlbik7CiAJdHJfaGRyLT5GbGFncyA9IGNw
+dV90b19sZTE2KDB4MDEpOwotCWdldF9yYW5kb21fYnl0ZXMoJnRyX2hkci0+Tm9uY2UsIFNNQjNf
+QUVTMTI4Q0NNX05PTkNFKTsKKwlpZiAoc2VydmVyLT5jaXBoZXJfdHlwZSA9PSBTTUIyX0VOQ1JZ
+UFRJT05fQUVTMTI4X0dDTSkKKwkJZ2V0X3JhbmRvbV9ieXRlcygmdHJfaGRyLT5Ob25jZSwgU01C
+M19BRVMxMjhHQ01fTk9OQ0UpOworCWVsc2UKKwkJZ2V0X3JhbmRvbV9ieXRlcygmdHJfaGRyLT5O
+b25jZSwgU01CM19BRVMxMjhDQ01fTk9OQ0UpOwogCW1lbWNweSgmdHJfaGRyLT5TZXNzaW9uSWQs
+ICZzaGRyLT5TZXNzaW9uSWQsIDgpOwogfQogCkBAIC0zNDkxLDggKzM0OTQsMTMgQEAgY3J5cHRf
+bWVzc2FnZShzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIsIGludCBudW1fcnFzdCwKIAkJ
+cmMgPSAtRU5PTUVNOwogCQlnb3RvIGZyZWVfc2c7CiAJfQotCWl2WzBdID0gMzsKLQltZW1jcHko
+aXYgKyAxLCAoY2hhciAqKXRyX2hkci0+Tm9uY2UsIFNNQjNfQUVTMTI4Q0NNX05PTkNFKTsKKwor
+CWlmIChzZXJ2ZXItPmNpcGhlcl90eXBlID09IFNNQjJfRU5DUllQVElPTl9BRVMxMjhfR0NNKQor
+CQltZW1jcHkoaXYsIChjaGFyICopdHJfaGRyLT5Ob25jZSwgU01CM19BRVMxMjhHQ01fTk9OQ0Up
+OworCWVsc2UgeworCQlpdlswXSA9IDM7CisJCW1lbWNweShpdiArIDEsIChjaGFyICopdHJfaGRy
+LT5Ob25jZSwgU01CM19BRVMxMjhDQ01fTk9OQ0UpOworCX0KIAogCWFlYWRfcmVxdWVzdF9zZXRf
+Y3J5cHQocmVxLCBzZywgc2csIGNyeXB0X2xlbiwgaXYpOwogCWFlYWRfcmVxdWVzdF9zZXRfYWQo
+cmVxLCBhc3NvY19kYXRhX2xlbik7CkBAIC0zNTkyLDcgKzM2MDAsNyBAQCBzbWIzX2luaXRfdHJh
+bnNmb3JtX3JxKHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciwgaW50IG51bV9ycXN0LAog
+CX0KIAogCS8qIGZpbGwgdGhlIDFzdCBpb3Ygd2l0aCBhIHRyYW5zZm9ybSBoZWFkZXIgKi8KLQlm
+aWxsX3RyYW5zZm9ybV9oZHIodHJfaGRyLCBvcmlnX2xlbiwgb2xkX3JxKTsKKwlmaWxsX3RyYW5z
+Zm9ybV9oZHIodHJfaGRyLCBvcmlnX2xlbiwgb2xkX3JxLCBzZXJ2ZXIpOwogCiAJcmMgPSBjcnlw
+dF9tZXNzYWdlKHNlcnZlciwgbnVtX3Jxc3QsIG5ld19ycSwgMSk7CiAJY2lmc19kYmcoRllJLCAi
+RW5jcnlwdCBtZXNzYWdlIHJldHVybmVkICVkXG4iLCByYyk7CmRpZmYgLS1naXQgYS9mcy9jaWZz
+L3NtYjJ0cmFuc3BvcnQuYyBiL2ZzL2NpZnMvc21iMnRyYW5zcG9ydC5jCmluZGV4IGQxMTgxNTcy
+NzU4Yi4uMWNjYmNmOWMyYzNiIDEwMDY0NAotLS0gYS9mcy9jaWZzL3NtYjJ0cmFuc3BvcnQuYwor
+KysgYi9mcy9jaWZzL3NtYjJ0cmFuc3BvcnQuYwpAQCAtNzM0LDcgKzczNCwxMCBAQCBzbWIzX2Ny
+eXB0b19hZWFkX2FsbG9jYXRlKHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlcikKIAlzdHJ1
+Y3QgY3J5cHRvX2FlYWQgKnRmbTsKIAogCWlmICghc2VydmVyLT5zZWNtZWNoLmNjbWFlc2VuY3J5
+cHQpIHsKLQkJdGZtID0gY3J5cHRvX2FsbG9jX2FlYWQoImNjbShhZXMpIiwgMCwgMCk7CisJCWlm
+IChzZXJ2ZXItPmNpcGhlcl90eXBlID09IFNNQjJfRU5DUllQVElPTl9BRVMxMjhfR0NNKQorCQkJ
+dGZtID0gY3J5cHRvX2FsbG9jX2FlYWQoImdjbShhZXMpIiwgMCwgMCk7CisJCWVsc2UKKwkJCXRm
+bSA9IGNyeXB0b19hbGxvY19hZWFkKCJjY20oYWVzKSIsIDAsIDApOwogCQlpZiAoSVNfRVJSKHRm
+bSkpIHsKIAkJCWNpZnNfZGJnKFZGUywgIiVzOiBGYWlsZWQgdG8gYWxsb2MgZW5jcnlwdCBhZWFk
+XG4iLAogCQkJCSBfX2Z1bmNfXyk7CkBAIC03NDQsNyArNzQ3LDEwIEBAIHNtYjNfY3J5cHRvX2Fl
+YWRfYWxsb2NhdGUoc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyKQogCX0KIAogCWlmICgh
+c2VydmVyLT5zZWNtZWNoLmNjbWFlc2RlY3J5cHQpIHsKLQkJdGZtID0gY3J5cHRvX2FsbG9jX2Fl
+YWQoImNjbShhZXMpIiwgMCwgMCk7CisJCWlmIChzZXJ2ZXItPmNpcGhlcl90eXBlID09IFNNQjJf
+RU5DUllQVElPTl9BRVMxMjhfR0NNKQorCQkJdGZtID0gY3J5cHRvX2FsbG9jX2FlYWQoImdjbShh
+ZXMpIiwgMCwgMCk7CisJCWVsc2UKKwkJCXRmbSA9IGNyeXB0b19hbGxvY19hZWFkKCJjY20oYWVz
+KSIsIDAsIDApOwogCQlpZiAoSVNfRVJSKHRmbSkpIHsKIAkJCWNyeXB0b19mcmVlX2FlYWQoc2Vy
+dmVyLT5zZWNtZWNoLmNjbWFlc2VuY3J5cHQpOwogCQkJc2VydmVyLT5zZWNtZWNoLmNjbWFlc2Vu
+Y3J5cHQgPSBOVUxMOwotLSAKMi4yMC4xCgo=
+--00000000000043f8e9058ac19bf6--
