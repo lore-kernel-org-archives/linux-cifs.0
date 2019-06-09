@@ -1,101 +1,191 @@
-Return-Path: <SRS0=ivIE=UH=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=1kIp=UI=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,T_DKIMWL_WL_HIGH,USER_AGENT_GIT autolearn=unavailable
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ECCEC468BE
-	for <linux-cifs@archiver.kernel.org>; Sat,  8 Jun 2019 11:52:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D2F3C468BE
+	for <linux-cifs@archiver.kernel.org>; Sun,  9 Jun 2019 11:55:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D351821537
-	for <linux-cifs@archiver.kernel.org>; Sat,  8 Jun 2019 11:52:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1559994765;
-	bh=GwuOu9Wad7QfE3781L/fhBg8S+ksQM9htQI31ptw/qc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=G3IO9e8Kuy4BUdiqEuWrP++FDQ0DQbPoCuybr1GDhCFcKbjdP+Jwd+z84xuldVHYh
-	 AiYOIZGIg4h6wGJkraf5Ae0k9TIOQZSI85/3p7QHJV4n2IuK+7ifqvEmMN9IDSMwkg
-	 S9Eg/DyRuNnZnyHjHShQyezI+M397i6b1L2hupm8=
+	by mail.kernel.org (Postfix) with ESMTP id 1551820673
+	for <linux-cifs@archiver.kernel.org>; Sun,  9 Jun 2019 11:55:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OLPdHgSz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727314AbfFHLli (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 8 Jun 2019 07:41:38 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58700 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728117AbfFHLlU (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sat, 8 Jun 2019 07:41:20 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 83E6A214D8;
-        Sat,  8 Jun 2019 11:41:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1559994080;
-        bh=GwuOu9Wad7QfE3781L/fhBg8S+ksQM9htQI31ptw/qc=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=UG3A1G8fT+vWB7cacLMbcYHVUTTSJXkGCRIaIfBIk7bc/0BA95BmYX0faFauRBIeH
-         AIjoF71btkFBDVsyi4uv7Wp2/TNB7UmgUvpEtK8388gFv+oW1vU3MR9csBq0yO+2ca
-         77Z/uR3zRG9Pt/p1Cw6ajuvjFuth7wQ3EwYgYxJw=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Gen Zhang <blackgod016574@gmail.com>,
-        Paulo Alcantara <palcantara@suse.de>,
-        Steve French <stfrench@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.1 51/70] dfs_cache: fix a wrong use of kfree in flush_cache_ent()
-Date:   Sat,  8 Jun 2019 07:39:30 -0400
-Message-Id: <20190608113950.8033-51-sashal@kernel.org>
+        id S1728492AbfFILzZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 9 Jun 2019 07:55:25 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:33737 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728488AbfFILzX (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 9 Jun 2019 07:55:23 -0400
+Received: by mail-wr1-f68.google.com with SMTP id n9so6412426wru.0
+        for <linux-cifs@vger.kernel.org>; Sun, 09 Jun 2019 04:55:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=FtvYOYxztxbWsU9/lKjUQ/gy5B0HYQB6YbiXWNKXOpM=;
+        b=OLPdHgSzFB1MTVBS8K5hN47PvE3j+y5cIZLb7UZa7CDVK/icDJolMMoWsbaqWXQv90
+         x1Uyb3jdC/qOgYOZQ4n3JzM6V4z8GVqcsfslB8g9iYALbttFmCPU2yRlCiE4arLI81o7
+         Rr3soYdiw5TX3oCMUthupMc3zsVq9Ad57qRFRZQQxZIGiqVAM2IhLjLFrh9wRIKBjuew
+         rvDgmxUQ56Im6FRBJaaiRkGTHQ9C8rt/xhVuevjCHhB5MzDPnGsovMws+nUtovpB1qkO
+         V5pvXQgOVA2g4BWXViD89dSuaqk781I1QwjuBTxSU8vCS/LSbirAgatG5S38vvcf1Ock
+         wYlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=FtvYOYxztxbWsU9/lKjUQ/gy5B0HYQB6YbiXWNKXOpM=;
+        b=ac2NOz9DVtTtpIlHHGPxpPPG5H9c03QihcvN71++i3Ad/rAvk8KRiD69Yoax23TaUm
+         oos4qj3HwdVVAV0LGfgF74YaEciYby37v2tZfp/Gl4M1ZMFAUmS7GWGMpVUxNdeaNKGV
+         N6yFUFPWToZL+kaJBuFGQ0gVFJXOVQ9P5IQQ8toyplMcQwb4EKgTzHLroT+Bpy/6vLAg
+         Wm2PRBIGHdmVFswNjJHtiqgosYZCbfxGlpHcsDICa+eyrd3uTEGHIRc57vM9EAjjR2vy
+         LLnjkMmguehSt8KNEAECAjYpPih0t7BXkVVZ/3D8LVjEKI/Zpz8IagfUcNI40B5r04B2
+         iwmg==
+X-Gm-Message-State: APjAAAUrScvmvBJKY2O/A5YDFbvY6hnCjz5OuOkRaP6JP0eKjgENzBDJ
+        v9lmBIpKBrpFBiUjCDX4CcL/LQ==
+X-Google-Smtp-Source: APXvYqxR1SuLRGdvvcOW64SwAvu34cyQ9oV2pSjirjwOLYDt3nQxxcAHR+7t7VDu1SnT8gANF4WaPw==
+X-Received: by 2002:adf:ee48:: with SMTP id w8mr18631727wro.308.1560081321031;
+        Sun, 09 Jun 2019 04:55:21 -0700 (PDT)
+Received: from sudo.home ([2a01:cb1d:112:6f00:5129:23cd:5870:89d4])
+        by smtp.gmail.com with ESMTPSA id r5sm14954317wrg.10.2019.06.09.04.55.20
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 09 Jun 2019 04:55:20 -0700 (PDT)
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@google.com>, linux-cifs@vger.kernel.org,
+        Steve French <sfrench@samba.org>
+Subject: [PATCH v2 7/7] fs: cifs: switch to RC4 library interface
+Date:   Sun,  9 Jun 2019 13:55:09 +0200
+Message-Id: <20190609115509.26260-8-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190608113950.8033-1-sashal@kernel.org>
-References: <20190608113950.8033-1-sashal@kernel.org>
+In-Reply-To: <20190609115509.26260-1-ard.biesheuvel@linaro.org>
+References: <20190609115509.26260-1-ard.biesheuvel@linaro.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Gen Zhang <blackgod016574@gmail.com>
+The CIFS code uses the sync skcipher API to invoke the ecb(arc4) skcipher,
+of which only a single generic C code implementation exists. This means
+that going through all the trouble of using scatterlists etc buys us
+very little, and we're better off just invoking the arc4 library directly.
 
-[ Upstream commit 50fbc13dc12666f3604dc2555a47fc8c4e29162b ]
-
-In flush_cache_ent(), 'ce->ce_path' is allocated by kstrdup_const().
-It should be freed by kfree_const(), rather than kfree().
-
-Signed-off-by: Gen Zhang <blackgod016574@gmail.com>
-Reviewed-by: Paulo Alcantara <palcantara@suse.de>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Cc: linux-cifs@vger.kernel.org
+Cc: Steve French <sfrench@samba.org>
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- fs/cifs/dfs_cache.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ fs/cifs/Kconfig       |  2 +-
+ fs/cifs/cifsencrypt.c | 50 +++++---------------
+ 2 files changed, 13 insertions(+), 39 deletions(-)
 
-diff --git a/fs/cifs/dfs_cache.c b/fs/cifs/dfs_cache.c
-index 09b7d0d4f6e4..007cfa39be5f 100644
---- a/fs/cifs/dfs_cache.c
-+++ b/fs/cifs/dfs_cache.c
-@@ -131,7 +131,7 @@ static inline void flush_cache_ent(struct dfs_cache_entry *ce)
- 		return;
+diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
+index aae2b8b2adf5..523e9ea78a28 100644
+--- a/fs/cifs/Kconfig
++++ b/fs/cifs/Kconfig
+@@ -10,7 +10,7 @@ config CIFS
+ 	select CRYPTO_SHA512
+ 	select CRYPTO_CMAC
+ 	select CRYPTO_HMAC
+-	select CRYPTO_ARC4
++	select CRYPTO_LIB_ARC4
+ 	select CRYPTO_AEAD2
+ 	select CRYPTO_CCM
+ 	select CRYPTO_ECB
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index d2a05e46d6f5..d0ab5a38e5d2 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -33,7 +33,7 @@
+ #include <linux/ctype.h>
+ #include <linux/random.h>
+ #include <linux/highmem.h>
+-#include <crypto/skcipher.h>
++#include <crypto/arc4.h>
+ #include <crypto/aead.h>
  
- 	hlist_del_init_rcu(&ce->ce_hlist);
--	kfree(ce->ce_path);
-+	kfree_const(ce->ce_path);
- 	free_tgts(ce);
- 	dfs_cache_count--;
- 	call_rcu(&ce->ce_rcu, free_cache_entry);
-@@ -421,7 +421,7 @@ alloc_cache_entry(const char *path, const struct dfs_info3_param *refs,
+ int __cifs_calc_signature(struct smb_rqst *rqst,
+@@ -772,11 +772,9 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ int
+ calc_seckey(struct cifs_ses *ses)
+ {
+-	int rc;
+-	struct crypto_skcipher *tfm_arc4;
+-	struct scatterlist sgin, sgout;
+-	struct skcipher_request *req;
++	struct crypto_arc4_ctx *ctx_arc4;
+ 	unsigned char *sec_key;
++	int rc = 0;
  
- 	rc = copy_ref_data(refs, numrefs, ce, NULL);
- 	if (rc) {
--		kfree(ce->ce_path);
-+		kfree_const(ce->ce_path);
- 		kmem_cache_free(dfs_cache_slab, ce);
- 		ce = ERR_PTR(rc);
+ 	sec_key = kmalloc(CIFS_SESS_KEY_SIZE, GFP_KERNEL);
+ 	if (sec_key == NULL)
+@@ -784,49 +782,25 @@ calc_seckey(struct cifs_ses *ses)
+ 
+ 	get_random_bytes(sec_key, CIFS_SESS_KEY_SIZE);
+ 
+-	tfm_arc4 = crypto_alloc_skcipher("ecb(arc4)", 0, CRYPTO_ALG_ASYNC);
+-	if (IS_ERR(tfm_arc4)) {
+-		rc = PTR_ERR(tfm_arc4);
+-		cifs_dbg(VFS, "could not allocate crypto API arc4\n");
+-		goto out;
+-	}
+-
+-	rc = crypto_skcipher_setkey(tfm_arc4, ses->auth_key.response,
+-					CIFS_SESS_KEY_SIZE);
+-	if (rc) {
+-		cifs_dbg(VFS, "%s: Could not set response as a key\n",
+-			 __func__);
+-		goto out_free_cipher;
+-	}
+-
+-	req = skcipher_request_alloc(tfm_arc4, GFP_KERNEL);
+-	if (!req) {
++	ctx_arc4 = kmalloc(sizeof(*ctx_arc4), GFP_KERNEL);
++	if (!ctx_arc4) {
+ 		rc = -ENOMEM;
+-		cifs_dbg(VFS, "could not allocate crypto API arc4 request\n");
+-		goto out_free_cipher;
++		cifs_dbg(VFS, "could not allocate arc4 context\n");
++		goto out;
  	}
+ 
+-	sg_init_one(&sgin, sec_key, CIFS_SESS_KEY_SIZE);
+-	sg_init_one(&sgout, ses->ntlmssp->ciphertext, CIFS_CPHTXT_SIZE);
+-
+-	skcipher_request_set_callback(req, 0, NULL, NULL);
+-	skcipher_request_set_crypt(req, &sgin, &sgout, CIFS_CPHTXT_SIZE, NULL);
+-
+-	rc = crypto_skcipher_encrypt(req);
+-	skcipher_request_free(req);
+-	if (rc) {
+-		cifs_dbg(VFS, "could not encrypt session key rc: %d\n", rc);
+-		goto out_free_cipher;
+-	}
++	crypto_arc4_set_key(ctx_arc4, ses->auth_key.response,
++			    CIFS_SESS_KEY_SIZE);
++	crypto_arc4_crypt(ctx_arc4, ses->ntlmssp->ciphertext, sec_key,
++			  CIFS_CPHTXT_SIZE);
+ 
+ 	/* make secondary_key/nonce as session key */
+ 	memcpy(ses->auth_key.response, sec_key, CIFS_SESS_KEY_SIZE);
+ 	/* and make len as that of session key only */
+ 	ses->auth_key.len = CIFS_SESS_KEY_SIZE;
+ 
+-out_free_cipher:
+-	crypto_free_skcipher(tfm_arc4);
+ out:
++	kfree(ctx_arc4);
+ 	kfree(sec_key);
+ 	return rc;
+ }
 -- 
 2.20.1
 
