@@ -2,148 +2,147 @@ Return-Path: <SRS0=PPE7=UJ=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E220C43218
-	for <linux-cifs@archiver.kernel.org>; Mon, 10 Jun 2019 18:02:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3599FC43218
+	for <linux-cifs@archiver.kernel.org>; Mon, 10 Jun 2019 18:41:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4374F207E0
-	for <linux-cifs@archiver.kernel.org>; Mon, 10 Jun 2019 18:02:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0DFEF20820
+	for <linux-cifs@archiver.kernel.org>; Mon, 10 Jun 2019 18:41:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="z5hPzYT2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EFEXdP50"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388509AbfFJSCd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 10 Jun 2019 14:02:33 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:38198 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388411AbfFJSCd (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 Jun 2019 14:02:33 -0400
-Received: by mail-io1-f66.google.com with SMTP id k13so7614906iop.5
-        for <linux-cifs@vger.kernel.org>; Mon, 10 Jun 2019 11:02:33 -0700 (PDT)
+        id S2387500AbfFJSls (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 10 Jun 2019 14:41:48 -0400
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:33986 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387398AbfFJSls (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 Jun 2019 14:41:48 -0400
+Received: by mail-lj1-f193.google.com with SMTP id p17so1691972ljg.1
+        for <linux-cifs@vger.kernel.org>; Mon, 10 Jun 2019 11:41:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Lu5N6/KNKD5VUMrQnVAhjjyYsb/Sww0cQNsD4HFG8x0=;
-        b=z5hPzYT2Cdbtva6C58RE41cxsrcMsv0vxVCPx4m2X2A/lgngiPmRmtP3bScRThxGoA
-         ReyWGClTftzlU4GHQ5fCVB4b75b2pFiH4japkADHJIcsst+9HuIsliuzKvebha22eUwW
-         dwSZBJvN6f2rh720IMcjhI4ZvjVYFWhjd91X/Y9u06dgGPQK3mggUeshMMxWc12o9sfz
-         W4UDRnK5sZrc9atVMjVJcBejVjzIX3pniK0vUlK7o7Fsuft+O13LazxrqPnikfih+z4B
-         a8jeZ1Ge8jBzB+48Uc+PsHtmy5Il+rOqvre1/rPTSD5s2YLLqQ4BFSz1D7X7XW6snjWp
-         6ZGw==
+         :cc:content-transfer-encoding;
+        bh=0e/wXB6iKEf9NA7GLfSgaL66CAw0BN8n2LgazPFsgqE=;
+        b=EFEXdP50YvGjiQ+cTlf007oFpVQD5AxybRKQ+qHhK8Pq4Ok0YqK+pIOeYQV1hUpm2x
+         2eHol7S5pxsmeVCWUjDKaEYaR8TwMWrdWooXFskXSSgzojS+LqJJEbMm+Oui9Zj/6NzM
+         bQm+lv5miKkyvqtwYJ5kpRa/7e+4+l4h7sMiX3WXYmdAQzMw4A9fvQWlLPYu6qXeL01q
+         JycPNYaa+XYJGKhTrtPatzKG1AJ7a1FrYwAgA8nUzhmrw8ToabNlHfvfo7eh3ojTMlGh
+         PYdUVj7xc2t6WqdG2tDj0EJZK0PkNW2hyqkteUsAjNv2QCCRG6XC9FvUJgfO2DasKyfO
+         6IjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Lu5N6/KNKD5VUMrQnVAhjjyYsb/Sww0cQNsD4HFG8x0=;
-        b=La4oPKQN+v2pQZaiD+jvR0W0hPCsabmaBEs4zwCrrFbkqueISCCnP/RWOtySFQy6F5
-         Y3sKQswFzMVlAuYWaeKZAuq/1bb4W6dxql226di3OmKFREvmpGCrmzbVxioVZJtiXL8f
-         fnf91MRegM3LORZ54YAquswqIUUC/xQynzWiBoOkCwxUb6g8L1Dam5eoRchnJfLub1O0
-         dzx+veFY2JdYs+GwiFQDaa5VtdtOwiYifHEXbN7lkjoeXY6Kp1X0gz/9sn6sB2L0R8qG
-         ZwRbJw4ICy14JDADCmPVvnHDGmDA9Lxc7JBKFFAcRyxRlnL/kw84E1SEVMge1vYuwbfO
-         y9+g==
-X-Gm-Message-State: APjAAAVTM3oAalZoE8CdKSdXoDOw31EKOhjMJHuq53gdePEv1NUv9qzc
-        1gnk5+M0joTa7Apt2m0Fn7zCTRGUBd1l8LmRqFRlSA==
-X-Google-Smtp-Source: APXvYqzUnWMa+z+DRqz2950vmd2LSpei9FFUcY/5BboA6W08ZPUTd64l5PXt5AsdkJhMfvGWJ50cBsiFnuF38jxh1nw=
-X-Received: by 2002:a05:6602:98:: with SMTP id h24mr102795iob.49.1560189752879;
- Mon, 10 Jun 2019 11:02:32 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=0e/wXB6iKEf9NA7GLfSgaL66CAw0BN8n2LgazPFsgqE=;
+        b=RjtwwK9w/lZPjpykJed9OGr0JJ0nnX1TM7M2a0JChaOMeyrsFRFIpQZ7vuSi0CKDQS
+         eByCrXUPYtR8ZakbzMhEMe5vbjeFELZtcTbCfwkDH72wv1cv2/c1g4RAS9fsDdTEBI6S
+         YWn1/yQS2DWLfhwn9SlzSBS+XLiXI0zmG+HBHiGBzE1OVfB1ko2Uoq/q8RAA6t82BDMz
+         DBEkMATkPTPJh98guvtRiFocYgymMMG5HBhpiE9Csb3oAntQfLPk56/wp2vkj8VKP9ND
+         IRegRIcRIYI1NmGMjVspi1wad+M9qOxLfYzfgSCRHkIEJrCZPn5gxd4DLW02In23eeY3
+         sMxg==
+X-Gm-Message-State: APjAAAV+ib6XQBt/ZogBMCb5rlBUsJvBcvemH9TjmmXYM4ZPQesagfyE
+        LvFk4s6pvQsdPITj9E7In6Rfpf7yIp70c0Mc4dKUtvk=
+X-Google-Smtp-Source: APXvYqyNepGwHstN79Fag6D/tkNZK7ffXvlhsB8OugtaMjG8ZSBrc5z8sRyJ5wgcJmlVJCXcBgLjtsRSzklnz5/dHF4=
+X-Received: by 2002:a2e:9e8e:: with SMTP id f14mr13105957ljk.120.1560192106798;
+ Mon, 10 Jun 2019 11:41:46 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190609115509.26260-1-ard.biesheuvel@linaro.org>
- <20190609115509.26260-8-ard.biesheuvel@linaro.org> <CAH2r5mvQmY8onx6y2Y1aJOuWP9AsK52EJ=cXiJ7hdYPWrLp6uA@mail.gmail.com>
- <20190610161736.GB63833@gmail.com> <CAH2r5mu+87PZEZTMKsaFKDg9Z4i4axB6g9BA8JW823dFKWmSuQ@mail.gmail.com>
-In-Reply-To: <CAH2r5mu+87PZEZTMKsaFKDg9Z4i4axB6g9BA8JW823dFKWmSuQ@mail.gmail.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Mon, 10 Jun 2019 20:02:20 +0200
-Message-ID: <CAKv+Gu8n2Vc5uE6Q0V+Hu8swB5Oxp9ViEQXTQqFqSHHKw7NGsQ@mail.gmail.com>
-Subject: Re: [PATCH v2 7/7] fs: cifs: switch to RC4 library interface
+References: <CAH2r5mvRQj1hyDbBY8DTMtDShr2uxmJqYWWJg+H=iO3RUDc3oQ@mail.gmail.com>
+In-Reply-To: <CAH2r5mvRQj1hyDbBY8DTMtDShr2uxmJqYWWJg+H=iO3RUDc3oQ@mail.gmail.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Mon, 10 Jun 2019 11:41:35 -0700
+Message-ID: <CAKywueRHrFjuJOxPv=L1H2Ju4_A7SPUQ15VzH8DKn9sh3LeCzw@mail.gmail.com>
+Subject: Re: [PATCH][CIFS] Fix match_server check to allow for multidialect negotiate
 To:     Steve French <smfrench@gmail.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Steve French <sfrench@samba.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, 10 Jun 2019 at 19:54, Steve French <smfrench@gmail.com> wrote:
+=D1=81=D0=B1, 8 =D0=B8=D1=8E=D0=BD. 2019 =D0=B3. =D0=B2 02:06, Steve French=
+ <smfrench@gmail.com>:
 >
-> On Mon, Jun 10, 2019 at 11:17 AM Eric Biggers <ebiggers@kernel.org> wrote:
-> >
-> > Hi Steve,
-> >
-> > On Sun, Jun 09, 2019 at 05:03:25PM -0500, Steve French wrote:
-> > > Probably harmless to change this code path (build_ntlmssp_auth_blob is
-> > > called at session negotiation time so shouldn't have much of a
-> > > performance impact).
-> > >
-> > > On the other hand if we can find optimizations in the encryption and
-> > > signing paths, that would be really helpful.   There was a lot of
-> > > focus on encryption performance at SambaXP last week.
-> > >
-> > > Andreas from Redhat gave a talk on the improvements in Samba with TLS
-> > > implementation of AES-GCM.   I added the cifs client implementation of
-> > > AES-GCM and notice it is now faster to encrypt packets than sign them
-> > > (performance is about 2 to 3 times faster now with GCM).
-> > >
-> > > On Sun, Jun 9, 2019 at 6:57 AM Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> > > >
-> > > > The CIFS code uses the sync skcipher API to invoke the ecb(arc4) skcipher,
-> > > > of which only a single generic C code implementation exists. This means
-> > > > that going through all the trouble of using scatterlists etc buys us
-> > > > very little, and we're better off just invoking the arc4 library directly.
-> >
-> > This patch only changes RC4 encryption, and to be clear it actually *improves*
-> > the performance of the RC4 encryption, since it removes unnecessary
-> > abstractions.  I'd really hope that people wouldn't care either way, though,
-> > since RC4 is insecure and should not be used.
-> >
-> > Also it seems that fs/cifs/ supports AES-CCM but not AES-GCM?
-> >
-> > /* pneg_ctxt->Ciphers[0] = SMB2_ENCRYPTION_AES128_GCM;*/ /* not supported yet */
-> >         pneg_ctxt->Ciphers[0] = SMB2_ENCRYPTION_AES128_CCM;
-> >
-> > AES-GCM is usually faster than AES-CCM, so if you want to improve performance,
-> > switching from CCM to GCM would do that.
-> >
-> > - Eric
+> When using multidialect negotiate (default or allowing any smb3
+> dialect via vers=3D3)
+> allow matching on existing server session.  Before this fix if you mount
+> a second time to a different share on the same server, we will only reuse
+> the existing smb session if a single dialect is requested (e.g. specifyin=
+g
+> vers=3D2.1 or vers=3D3.0 or vers=3D3.1.1 on the mount command). If a defa=
+ult mount
+> (e.g. not specifying vers=3D) is done then we will create a new socket
+> connection and SMB3 (or SMB3.1.1) session each time we connect to a
+> different share
+> on the same server rather than reusing the existing one.
 >
-> Yes - when I tested the GCM code in cifs.ko last week (the two patches
-> are currently
-> in the cifs-2.6.git for-next branch and thus in linux-next and are
-> attached), I was astounded
-> at the improvement - encryption with GCM is now faster than signing,
-> and copy is more
-> than twice as fast as encryption was before with CCM (assuming a fast
-> enough network so
-> that the network is not the bottleneck).  We see more benefit in the write path
-> (copy to server) than the read path (copy from server) but even the
-> read path gets
-> 80% benefit in my tests, and with the addition of multichannel support
-> in the next
-> few months, we should see copy from server on SMB3.1.1 mounts
-> improving even more.
+> Signed-off-by: Steve French <stfrench@microsoft.com>
+> ---
+>  fs/cifs/connect.c | 21 +++++++++++++++++++--
+>  1 file changed, 19 insertions(+), 2 deletions(-)
 >
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 8c4121da624e..6200207565db 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -2542,8 +2542,25 @@ static int match_server(struct TCP_Server_Info
+> *server, struct smb_vol *vol)
+>      if (vol->nosharesock)
+>          return 0;
+>
+> -    /* BB update this for smb3any and default case */
+> -    if ((server->vals !=3D vol->vals) || (server->ops !=3D vol->ops))
+> +    /* If multidialect negotiation see if existing sessions match one */
+> +    if (strcmp(vol->vals->version_string, SMB3ANY_VERSION_STRING) =3D=3D=
+ 0) {
+> +        if (server->vals->protocol_id =3D=3D SMB20_PROT_ID)
+> +            return 0;
+> +        else if (server->vals->protocol_id =3D=3D SMB21_PROT_ID)
+> +            return 0;
+> +        else if (strcmp(server->vals->version_string,
+> +             SMB1_VERSION_STRING) =3D=3D 0)
+> +            return 0;
+> +        /* else SMB3 or later, which is fine */
 
-I assume this was tested on high end x86 silicon? The CBCMAC path in
-CCM is strictly sequential, so on systems with deep pipelines, you
-lose a lot of speed there. For arm64, I implemented a CCM driver that
-does the encryption and authentication in parallel, which mitigates
-most of the performance hit, but even then, you will still be running
-with a underutilized pipeline (unless you are using low end silicon
-which only has a 2 cycle latency for AES instructions)
+May be better to check
 
-> Any other ideas how to improve the encryption or signing in the read
-> or write path
-> in cifs.ko would be appreciated.   We still are slower than Windows, probably in
-> part due to holding mutexes longer in sending the frame across the network
-> (including signing or encryption) which limits parallelism somewhat.
+if (server->vals->protocol_id < SMB30_PROT_ID)
+    return 0;
+
+? SMB1 case should work too because protocol_id is 0.
+
+
+> +    } else if (strcmp(vol->vals->version_string,
+> +           SMBDEFAULT_VERSION_STRING) =3D=3D 0) {
+> +        if (server->vals->protocol_id =3D=3D SMB20_PROT_ID)
+> +            return 0;
+> +        else if (strcmp(server->vals->version_string,
+> +             SMB1_VERSION_STRING) =3D=3D 0)
+> +            return 0;
+
+and here the same way:
+
+if (server->vals->protocol_id < SMB21_PROT_ID)
+    return 0;
+
+> +        /* else SMB2.1 or later, which is fine */
+> +    } else if ((server->vals !=3D vol->vals) || (server->ops !=3D vol->o=
+ps))
+>          return 0;
 >
+>      if (!net_eq(cifs_net_ns(server), current->nsproxy->net_ns))
+> --
+> 2.20.1
 
-It all depends on whether crypto is still the bottleneck in this case.
+In this case we can avoid nested IFs - should be cleaner I guess.
+
+
+--
+Best regards,
+Pavel Shilovsky
