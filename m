@@ -2,141 +2,176 @@ Return-Path: <SRS0=PPE7=UJ=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C404C4321A
-	for <linux-cifs@archiver.kernel.org>; Mon, 10 Jun 2019 20:39:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE036C4321A
+	for <linux-cifs@archiver.kernel.org>; Mon, 10 Jun 2019 21:36:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5E45F206E0
-	for <linux-cifs@archiver.kernel.org>; Mon, 10 Jun 2019 20:39:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8CAA220859
+	for <linux-cifs@archiver.kernel.org>; Mon, 10 Jun 2019 21:36:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NhlNZfOG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L6Eh5bpP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389725AbfFJUjy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 10 Jun 2019 16:39:54 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:35594 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389331AbfFJUjy (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 Jun 2019 16:39:54 -0400
-Received: by mail-pg1-f194.google.com with SMTP id s27so5644488pgl.2;
-        Mon, 10 Jun 2019 13:39:54 -0700 (PDT)
+        id S2389362AbfFJVgl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 10 Jun 2019 17:36:41 -0400
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:35183 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389193AbfFJVgk (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 Jun 2019 17:36:40 -0400
+Received: by mail-lf1-f67.google.com with SMTP id a25so7721964lfg.2;
+        Mon, 10 Jun 2019 14:36:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=p22jka5+YJm6qPKEtZtbCvfH4UahOct5JWkXMZAH0cw=;
-        b=NhlNZfOGNT+ejmzCAz0X2gLGOPNXE1tFxrO+5Oj/L+OS5tuMH21fIGZKoaTbYtZX8H
-         daUxxWC/BTvz/kX0XQ4pBxdJ0EFhImt0cW3c26wyyXOCkvzoBgAq/xPuWo52m/Q4tyUn
-         TYSIhrTGu3PlLE6l2cUoMV3sfWg2E4NhGDP691EZBvDzrCGJLk/Bh9ocZzv+DbI/w3Ty
-         47gWJIxQd8QMWFw4U4IkAzb0qEmz4nEXCQTUDfTCQPGak79+b7ZwhALqViyU4C7JBTog
-         mRMoj433l7CaPSZ6g97SdcdNBfyPlZM1rOEkhHnHFSKLfqJhvYUtqz/0Rwz6v7mY1etM
-         +gGA==
+         :cc:content-transfer-encoding;
+        bh=2Rej20kkjw1s6/NuDHFu1LSDaaDgc1B6na4Qh5mIGHs=;
+        b=L6Eh5bpPWDqJrRce6jr/YH8nhvi/ovn0+AYXzz5QTitpTydy6iYBFM2uCaoCPxy8MR
+         7BMOYGbzvodQO+yyCeR65DhQivdRkCq4Jp+aiq+GGsHi+fATvmwgir/fm4SN7MY8wkfS
+         NfRDuIBdcD7GJncvmlEpCD3hOX6MW4FMVLOXx/ZeARuAYNRCY1K6jMlAMxOsbYZ0adNG
+         UvEShVw09af4P+j1qFD0AGR1rJ5Et8WdYoFA2VlUGjr87WcZCFoR4uVdf/WchsljKjTW
+         pbVqpVamEJz+CMEee//5x14YRccws585QDEd/+vowv0UD6/v4QCqALx5NbQpmULiJCEO
+         R5og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=p22jka5+YJm6qPKEtZtbCvfH4UahOct5JWkXMZAH0cw=;
-        b=Rs5I2Tq7NcvFJX5dOZ72XDyW/zRuyj3iRmWMKuDuxoBocuNNIN2a9K8erhN8yN4MaF
-         lbYK88s9An1OjqBE0xRoqEPjxTfzFO/eN9GMoGZoQ3khUA42nYTvN/t48/XKG7Dzn7z+
-         MEnFKc3ouNrUtlbu18c3ClQ5pnDtkw/inmKhkAn8mqI6912aaeXKQbBEzJozql2+6TEE
-         d5J0fzIL9K5Vg76d32ktIIGXpAVprsfFUexmOgUqXq/yQRlW53DXMsHNxjicE49ee/Fk
-         LOxEl+gGsaDhZpVZsjFBYyu8nK+jL12NZgylMHfKOw3PxpbxB4a1hTpJTCg917faIBKc
-         ermw==
-X-Gm-Message-State: APjAAAX8cYv0OwaAWuKUZyKYHlK45YhxoVD+UQSTUNYNHlDwzZkHqB8+
-        WYEQqT3a7JS6+xHxx5hK4O0xNq3Z6V2pP3iX4X3Dxg==
-X-Google-Smtp-Source: APXvYqyZhAA7zOt0YTe9pldYkl5YKoHrILFJnrdT5QuwZKl3z0twfCRhTTw/lergT/D0q15rr+nXHbuIOJhZze1DeOA=
-X-Received: by 2002:a62:f20b:: with SMTP id m11mr23937722pfh.125.1560199193677;
- Mon, 10 Jun 2019 13:39:53 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=2Rej20kkjw1s6/NuDHFu1LSDaaDgc1B6na4Qh5mIGHs=;
+        b=byDCRiFsxKPemnGuYIRzdNqOxDxNR2QuKGpBtNfINA6Dy10FRsoasmStZTu6S4PuEP
+         8l+UMn0DuiZSF79Hg+qa/y275hb8ORwbMWke2NtBv2uBfZ7dgqj1fWpCFbyRFiS3f/fU
+         zMvbcUmumPA1dGRIVnNfXCjoAzC5Wncwggqq5X4hjwab4YVVUOV0eRNXvereimCscvTT
+         GFbi9J0jsZzs3nV3jyTBermc+EJ7gq51U2lx3JPgfOzstv549YHVOrmbgZH6udV5Wv65
+         BA7xL/53VU2ICzYJDu4N3M3oMUCPJHY33LG2EvB8MmPHBzDJzofKT79mBSRxM0V68T6k
+         BEyQ==
+X-Gm-Message-State: APjAAAWO7ualVPqNLP8Cef3K65EQDXaXOaMkXE198rfJccArJKW7XE5R
+        mNTFAtdBk+W+8c0G1KFVHMXKgrXguSce4qLpog==
+X-Google-Smtp-Source: APXvYqz54F65u6CC5duv+2R12GYljJD63jzmRJrt6QlWfV7LDv+uhHtjZ4Gevb5DD6itm52SgZ2gCAFTbh1GzNV1ZEA=
+X-Received: by 2002:a05:6512:1d2:: with SMTP id f18mr35036178lfp.173.1560202598429;
+ Mon, 10 Jun 2019 14:36:38 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190610173657.4655-1-amir73il@gmail.com>
-In-Reply-To: <20190610173657.4655-1-amir73il@gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 10 Jun 2019 15:39:42 -0500
-Message-ID: <CAH2r5mtQObwvdtaNr31fd-wDpjrZi5YLZ+ZcaW0ECVvTR-ByXQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: copy_file_range needs to strip setuid bits and
- update timestamps
-To:     Amir Goldstein <amir73il@gmail.com>
-Cc:     "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Christoph Hellwig <hch@lst.de>,
-        linux-xfs <linux-xfs@vger.kernel.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+References: <20190605003838.13101-1-lsahlber@redhat.com>
+In-Reply-To: <20190605003838.13101-1-lsahlber@redhat.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Mon, 10 Jun 2019 14:36:27 -0700
+Message-ID: <CAKywueRYC2dm83zWCgrOVJc7J5s+UdMh-5NnF0sUOJ69NQ3qvQ@mail.gmail.com>
+Subject: Re: [PATCH] cifs: add spinlock for the openFileList to cifsInodeInfo
+To:     Ronnie Sahlberg <lsahlber@redhat.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>,
+        Stable <stable@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Looks good in my testing so far - but also want to do a little more
-testing with the copy_file_range xfstest cases because your patches
-fixed one additional test (not cross mount copy) so we can understand
-why it fixed that test case.
-
-On Mon, Jun 10, 2019 at 12:37 PM Amir Goldstein <amir73il@gmail.com> wrote:
+=D0=B2=D1=82, 4 =D0=B8=D1=8E=D0=BD. 2019 =D0=B3. =D0=B2 17:42, Ronnie Sahlb=
+erg <lsahlber@redhat.com>:
 >
-> cifs has both source and destination inodes locked throughout the copy.
-> Like ->write_iter(), we update mtime and strip setuid bits of destination
-> file before copy and like ->read_iter(), we update atime of source file
-> after copy.
+> We can not depend on the tcon->open_file_lock here since in multiuser mod=
+e
+> we may have the same file/inode open via multiple different tcons.
 >
-> Signed-off-by: Amir Goldstein <amir73il@gmail.com>
+> The current code is race prone and will crash if one user deletes a file
+> at the same time a different user opens/create the file.
+>
+> To avoid this we need to have a spinlock attached to the inode and not th=
+e tcon.
+>
+> RHBZ:  1580165
+>
+> CC: Stable <stable@vger.kernel.org>
+> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
 > ---
->
-> Hi Steve,
->
-> Please apply this patch to you cifs branch after merging Darrick's
-> copy-file-range-fixes branch from:
->         git://git.kernel.org/pub/scm/fs/xfs/xfs-linux.git
->
-> Thanks,
-> Amir.
->
->  fs/cifs/cifsfs.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
+>  fs/cifs/cifsfs.c   | 1 +
+>  fs/cifs/cifsglob.h | 1 +
+>  fs/cifs/file.c     | 8 ++++++--
+>  3 files changed, 8 insertions(+), 2 deletions(-)
 >
 > diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index f11eea6125c1..83956452c108 100644
+> index f5fcd6360056..65d9771e49f9 100644
 > --- a/fs/cifs/cifsfs.c
 > +++ b/fs/cifs/cifsfs.c
-> @@ -1096,6 +1096,10 @@ ssize_t cifs_file_copychunk_range(unsigned int xid,
->                 goto out;
->         }
+> @@ -303,6 +303,7 @@ cifs_alloc_inode(struct super_block *sb)
+>         cifs_inode->uniqueid =3D 0;
+>         cifs_inode->createtime =3D 0;
+>         cifs_inode->epoch =3D 0;
+> +       spin_lock_init(&cifs_inode->open_file_lock);
+>         generate_random_uuid(cifs_inode->lease_key);
 >
-> +       rc = -EOPNOTSUPP;
-> +       if (!target_tcon->ses->server->ops->copychunk_range)
-> +               goto out;
-> +
 >         /*
->          * Note: cifs case is easier than btrfs since server responsible for
->          * checks for proper open modes and file type and if it wants
-> @@ -1107,11 +1111,12 @@ ssize_t cifs_file_copychunk_range(unsigned int xid,
->         /* should we flush first and last page first */
->         truncate_inode_pages(&target_inode->i_data, 0);
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 334ff5f9c3f3..733ddd5fd480 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -1377,6 +1377,7 @@ struct cifsInodeInfo {
+>         struct rw_semaphore lock_sem;   /* protect the fields above */
+>         /* BB add in lists for dirty pages i.e. write caching info for op=
+lock */
+>         struct list_head openFileList;
+> +       spinlock_t      open_file_lock; /* protects openFileList */
+>         __u32 cifsAttrs; /* e.g. DOS archive bit, sparse, compressed, sys=
+tem */
+>         unsigned int oplock;            /* oplock/lease level we have */
+>         unsigned int epoch;             /* used to track lease state chan=
+ges */
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index 06e27ac6d82c..97090693d182 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -338,10 +338,12 @@ cifs_new_fileinfo(struct cifs_fid *fid, struct file=
+ *file,
+>         atomic_inc(&tcon->num_local_opens);
 >
-> -       if (target_tcon->ses->server->ops->copychunk_range)
-> +       rc = file_modified(dst_file);
-> +       if (!rc)
->                 rc = target_tcon->ses->server->ops->copychunk_range(xid,
->                         smb_file_src, smb_file_target, off, len, destoff);
-> -       else
-> -               rc = -EOPNOTSUPP;
-> +
-> +       file_accessed(src_file);
+>         /* if readable file instance put first in list*/
+> +       spin_lock(&cinode->open_file_lock);
+>         if (file->f_mode & FMODE_READ)
+>                 list_add(&cfile->flist, &cinode->openFileList);
+>         else
+>                 list_add_tail(&cfile->flist, &cinode->openFileList);
+> +       spin_unlock(&cinode->open_file_lock);
+>         spin_unlock(&tcon->open_file_lock);
 >
->         /* force revalidate of size and timestamps of target file now
->          * that target is updated on the server
+>         if (fid->purge_cache)
+> @@ -413,7 +415,9 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs_file=
+, bool wait_oplock_handler)
+>         cifs_add_pending_open_locked(&fid, cifs_file->tlink, &open);
+>
+>         /* remove it from the lists */
+> +       spin_lock(&cifsi->open_file_lock);
+>         list_del(&cifs_file->flist);
+> +       spin_unlock(&cifsi->open_file_lock);
+>         list_del(&cifs_file->tlist);
+>         atomic_dec(&tcon->num_local_opens);
+>
+> @@ -1950,9 +1954,9 @@ cifs_get_writable_file(struct cifsInodeInfo *cifs_i=
+node, bool fsuid_only,
+>                         return 0;
+>                 }
+>
+> -               spin_lock(&tcon->open_file_lock);
+> +               spin_lock(&cifs_inode->open_file_lock);
+>                 list_move_tail(&inv_file->flist, &cifs_inode->openFileLis=
+t);
+> -               spin_unlock(&tcon->open_file_lock);
+> +               spin_unlock(&cifs_inode->open_file_lock);
+>                 cifsFileInfo_put(inv_file);
+>                 ++refind;
+>                 inv_file =3D NULL;
 > --
-> 2.17.1
+> 2.13.6
 >
 
+Thanks for the patch. Looks good to me.
 
--- 
-Thanks,
+Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
 
-Steve
+I would only add a comment telling what an order of the locks should
+be: cifs_tcon.open_file_lock and then cifsInodeInfo.open_file_lock.
+
+--
+Best regards,
+Pavel Shilovsky
