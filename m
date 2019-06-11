@@ -2,80 +2,133 @@ Return-Path: <SRS0=/HTR=UK=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH,
+	UNPARSEABLE_RELAY,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D53C6C43218
-	for <linux-cifs@archiver.kernel.org>; Tue, 11 Jun 2019 00:41:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74DE5C43218
+	for <linux-cifs@archiver.kernel.org>; Tue, 11 Jun 2019 01:11:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A0BFD206BA
-	for <linux-cifs@archiver.kernel.org>; Tue, 11 Jun 2019 00:41:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4455C2086A
+	for <linux-cifs@archiver.kernel.org>; Tue, 11 Jun 2019 01:11:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dqql54mL"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="33ZGoC/l"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728790AbfFKAlU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 10 Jun 2019 20:41:20 -0400
-Received: from mail-lf1-f44.google.com ([209.85.167.44]:33300 "EHLO
-        mail-lf1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728645AbfFKAlT (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 Jun 2019 20:41:19 -0400
-Received: by mail-lf1-f44.google.com with SMTP id y17so7952777lfe.0
-        for <linux-cifs@vger.kernel.org>; Mon, 10 Jun 2019 17:41:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=LTh7h4fwgu/IdLNqhRirFuzkrJkPBdU70QJ+oK60Rks=;
-        b=dqql54mLFx32R5XqDQvMgr1zgOL1adNKtsldm+Xn8K8GouJsDRX4S73PXI/+STxyDX
-         hBgjfzpoxjwIMcXlOo9cBhUm8jKkW9C9F9sQFHmQsZHiH+PQXtT0g0u5qFGBy9O3BS90
-         3YxLTQSULLMQW8dOFzd6eyIDOsD8Uv/cCX9qGjPPticpg0FIvqxINFV5aOdrKezs/Y27
-         Jp/BqevykAP6yt9BGqJh2WCk3H8JN42JiykLvykGnumfQAw9a83o+rg6h6H318pde0kp
-         5llUGdc3eU6inqwuXrk6OoMNWHcBqbvCWKW+J7xxcHijORey5RxFFB1HP+TUccIFlPcV
-         yHdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=LTh7h4fwgu/IdLNqhRirFuzkrJkPBdU70QJ+oK60Rks=;
-        b=JRio7MeL9oV6MZrrxg1o6Q/P/vwfkY0tZRIrzWWW6SasjgK36Cjwu6yk3mp9oFlbMK
-         5F+8ZegKahgklPf9vvi3Ajg52wRgXI2iEP6e0brFtZu8arz2DNJxAJM+Rrz7CZqn02pA
-         /HzyBwFGMxqrB5QhIwJ74+v+h/D/53OmWGJRZs2EeqtVbqlKp6YivMj+jFn6RTnB3kb/
-         2+5sBrTtLbI6shTYGEksp5vSAI6VOxJ6Bc7FVR7T9Vv1xYTdJjjWXTKrg6Ui8HZN7wxm
-         Gg502U8p0aIvjxFeZ9eCceQ7fARf2U13F4cYhgXwFRU7lYxTb7TDk8nlThp3XH3TfGvk
-         qEag==
-X-Gm-Message-State: APjAAAV5MUlmLGMWQNclc+hQKlfVwf80EAw9nFuEulYY03+s7mddbIaj
-        4REFajDUJzpx3LZOL2t1IBGdiEX9PtyBGjo1ig==
-X-Google-Smtp-Source: APXvYqx4Wsa/kcO/OivCXZfzgGN/lguwrntS2svHyv0Cu7GknbQV9ZTBr2qZpd2QQAlDN4YqQ8WhLgeFFtvar2lueHQ=
-X-Received: by 2002:a19:700b:: with SMTP id h11mr35137919lfc.25.1560213678086;
- Mon, 10 Jun 2019 17:41:18 -0700 (PDT)
+        id S2390353AbfFKBLp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 10 Jun 2019 21:11:45 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:34454 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389723AbfFKBLo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 Jun 2019 21:11:44 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5B19VIQ022049;
+        Tue, 11 Jun 2019 01:11:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2018-07-02;
+ bh=lzmnRyVJuFqwl45UFunpqytAMq9T3uRA+URKP40OMIY=;
+ b=33ZGoC/l5chmmKWpEWXTsFlnijGzGTpGhno0cpjPSW9yUvatjP9YGxG5wxTi+FYzkioC
+ Kfth1XWU8vE9/qVqdgOX0+AJgpv1vLPKw41OqbKIkq5rhFiBgC2i+zvl6ilaDFaAVaKp
+ 2V3dFv9jarLwu6lrYeDhvMJNkCSrSlXoFfvDD9CIxZJQ9K0TtIwPj6Pr3TsUJHgZ0VTl
+ rvvE4/Vr5i3PuTN2wKwmu0s/C+f3Rr/C6dtIw3TIH8TLMfscwtqTyBoGfMlfIrV4jsFT
+ cVUCIUzQQxCdjzsW+0pytPuGLOOS+HtKz8BB49qD2sgMyniXkYt4Yf2YyhlTX9VkT3a1 eg== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2120.oracle.com with ESMTP id 2t05nqhxqf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 11 Jun 2019 01:11:36 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5B1ApE7109506;
+        Tue, 11 Jun 2019 01:11:35 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 2t04hy2unr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 11 Jun 2019 01:11:35 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5B1BYjU005890;
+        Tue, 11 Jun 2019 01:11:34 GMT
+Received: from localhost (/67.169.218.210)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 10 Jun 2019 18:11:34 -0700
+Date:   Mon, 10 Jun 2019 18:11:32 -0700
+From:   "Darrick J. Wong" <darrick.wong@oracle.com>
+To:     Amir Goldstein <amir73il@gmail.com>
+Cc:     Miklos Szeredi <miklos@szeredi.hu>,
+        Anna Schumaker <Anna.Schumaker@netapp.com>,
+        Steve French <smfrench@gmail.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        xfs <linux-xfs@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Olga Kornievskaia <olga.kornievskaia@gmail.com>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Dave Chinner <david@fromorbit.com>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>, ceph-devel@vger.kernel.org
+Subject: Re: [ANNOUNCE] xfs-linux: copy-file-range-fixes updated to
+ fe0da9c09b2d
+Message-ID: <20190611011132.GP1871505@magnolia>
+References: <20190610160624.GG1871505@magnolia>
+ <CAOQ4uxhkE_TsN7XMBgzxVhEYDw+gZEOOCiZzn9otVwQtB-XHeA@mail.gmail.com>
 MIME-Version: 1.0
-References: <CAH2r5mvA3t2Nm4F=LuBwHkN+E19pHuiLaSv0JV9SMNYvZrxAiQ@mail.gmail.com>
- <CAKywueTTp_jQqhND0gpLhffNeXudPUjkWHGEze33+=6oVWhLpw@mail.gmail.com> <CAH2r5mvo5YbDd5Pqu6XcMBAW+4rPX0ZZU9RBj=NWLEFTp4L+-w@mail.gmail.com>
-In-Reply-To: <CAH2r5mvo5YbDd5Pqu6XcMBAW+4rPX0ZZU9RBj=NWLEFTp4L+-w@mail.gmail.com>
-From:   Pavel Shilovsky <pavel.shilovsky@gmail.com>
-Date:   Mon, 10 Jun 2019 17:41:06 -0700
-Message-ID: <CAKywueRauK_Lf_NMKJgKr46tLMOgJyk6iWcsMuPx74EJ3cGz=g@mail.gmail.com>
-Subject: Re: [SMB3.1.1] Faster crypto (GCM) for Linux kernel SMB3.1.1 mounts
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOQ4uxhkE_TsN7XMBgzxVhEYDw+gZEOOCiZzn9otVwQtB-XHeA@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9284 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906110004
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9284 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906110004
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D0=BF=D0=BD, 10 =D0=B8=D1=8E=D0=BD. 2019 =D0=B3. =D0=B2 15:34, Steve Frenc=
-h <smfrench@gmail.com>:
->
-> Updated the patch with Pavel's suggestion and added reviewed by and
-> repushed to cifs-2.6.git for-next.
->
+On Mon, Jun 10, 2019 at 08:14:08PM +0300, Amir Goldstein wrote:
+> +CC affected maintainers
+> 
+> On Mon, Jun 10, 2019 at 7:06 PM Darrick J. Wong <darrick.wong@oracle.com> wrote:
+> >
+> > Hi folks,
+> >
+> > The copy-file-range-fixes branch of the xfs-linux repository at:
+> >
+> >         git://git.kernel.org/pub/scm/fs/xfs/xfs-linux.git
+> >
+> > has just been updated.  This is a common branch from which everyone else
+> > can create their own copy-file-range fix branches for 5.3.  When you
+> > send your pull request to Linus please let him know that the fixes
+> > stream out from here like some kind of hydra. :)
+> 
+> Thanks Darrick!
+> Should we also request to include this branch in linux-next?
 
-Looks good. Thanks!
+Yeah, I was going to do that after 24h (i.e. it'll be in Wednesday's
+-next) to see if anyone had any last minute "ZOMG this patch has to be
+changed" screaming.
 
-Best regards,
-Pavel Shilovskiy
+> Attention nfs/cifs/fuse/ceph maintainers!
+> This branch includes changes to your filesystems.
+> At lease nfs/cifs/ceph have been tested with these changes and the
+> new xfstests.
+> 
+> I think it would be preferred if you merge Darrick's branch into your
+> 5.3 branch as soon as you have one ready to reduce chances of
+> conflicts down the road.
+> 
+> I will be sending out 2 more patches to cifs/ceph, which depend on
+> this branch directly to maintainers.
+
+Noted.
+
+--D
+
+> Thanks,
+> Amir.
