@@ -2,126 +2,103 @@ Return-Path: <SRS0=/HTR=UK=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH,UNPARSEABLE_RELAY,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7FE5C4321B
-	for <linux-cifs@archiver.kernel.org>; Tue, 11 Jun 2019 03:29:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DBB1C4321A
+	for <linux-cifs@archiver.kernel.org>; Tue, 11 Jun 2019 04:54:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8E9BB20896
-	for <linux-cifs@archiver.kernel.org>; Tue, 11 Jun 2019 03:29:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2E1702086D
+	for <linux-cifs@archiver.kernel.org>; Tue, 11 Jun 2019 04:54:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="YEzplyH+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rPS5CsAr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390934AbfFKD3n (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 10 Jun 2019 23:29:43 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:39764 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390856AbfFKD3n (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 Jun 2019 23:29:43 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5B3Saoi128547;
-        Tue, 11 Jun 2019 03:29:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2018-07-02;
- bh=1ZrnmwAZMwf7yVrJ6H2vQT5nz7XKRKDkWftJBAoXNTk=;
- b=YEzplyH+yeq8DAFFJDKCkNGxoA2VlqCsjYLGCEIkXVhfq7GJziiuBftrXS5spbHf4+op
- TNcwZuW1DR6YjLuc6u7MDM/7KOPcpwngpoedrdikT2s7WUF5YokX5OG9NOcmTs7n6G2C
- Ky//2CBYA9A4oUyDPYmNioHrWy7qgJ+2J398HoODybvfzRC75V2CKlJPpZXfU0UOu8uz
- C+7dfJwoS8cxO5vpOBf63gZin9cxS2MSUKAj3YuPmjSCzdASz76x0wcgTaKofvYuh5YA
- XnnixYmzoNp110iPX9bKioEVePmtHD3pgA49HO0uJ3Wsl93l9PCU2xmOER7W1RnApIQg 4g== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2130.oracle.com with ESMTP id 2t02hejhu8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Jun 2019 03:29:31 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5B3Spvr099895;
-        Tue, 11 Jun 2019 03:29:30 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3020.oracle.com with ESMTP id 2t1jph74n3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Jun 2019 03:29:30 +0000
-Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5B3TSjp010593;
-        Tue, 11 Jun 2019 03:29:29 GMT
-Received: from localhost (/67.169.218.210)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 10 Jun 2019 20:29:28 -0700
-Date:   Mon, 10 Jun 2019 20:29:26 -0700
-From:   "Darrick J. Wong" <darrick.wong@oracle.com>
-To:     "Theodore Ts'o" <tytso@mit.edu>
-Cc:     Amir Goldstein <amir73il@gmail.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Christoph Hellwig <hch@lst.de>, linux-xfs@vger.kernel.org,
-        Olga Kornievskaia <olga.kornievskaia@gmail.com>,
-        Luis Henriques <lhenriques@suse.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        ceph-devel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org
-Subject: Re: [PATCH] vfs: allow copy_file_range from a swapfile
-Message-ID: <20190611032926.GA1872778@magnolia>
-References: <20190610172606.4119-1-amir73il@gmail.com>
- <20190611011612.GQ1871505@magnolia>
- <20190611025108.GB2774@mit.edu>
+        id S2390497AbfFKEyI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 11 Jun 2019 00:54:08 -0400
+Received: from mail-yw1-f68.google.com ([209.85.161.68]:44377 "EHLO
+        mail-yw1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390081AbfFKEyI (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 11 Jun 2019 00:54:08 -0400
+Received: by mail-yw1-f68.google.com with SMTP id m80so4719889ywd.11;
+        Mon, 10 Jun 2019 21:54:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=D92Lz/Rh1BjfGyZLx2L116GMHEBQEUp5CKPjNSyHoUk=;
+        b=rPS5CsArH+Bzwfq5EDZF5xGqZbhZoG2pAaknhbcp8NyHHQ6vj+Z0WoQmsl6Bi/3YQ/
+         pzLOky5EBYzgoxdd+Rjk7PJvYqhsy5PejSbTQSObxBI8wIqv32VuVyLEEpHmH1pI/CQ7
+         KmS3MzYHiMUeVzmWvZyHx1HTtIF3WHFyXiHWC1fLieNUz08CvIOgOF/WI9JsjlqYb4ea
+         pfYRCRhOwOGO0G/aiRlSD1hkcI2LuyRzrCTVMYBYKe7KfXcarIj3nqq/HeF3ZjQepGEe
+         tgevCsZTmhdLIJ0rwlmh10UFYJ5BKdJFg3SAudt0prMheLwFdHV0wKxVD8cA/HHhFL66
+         xQ3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=D92Lz/Rh1BjfGyZLx2L116GMHEBQEUp5CKPjNSyHoUk=;
+        b=s9dr9N0Rx/1Jw01cQIe8nr9J1yr2UFuoP4NHcJVoCM6hVJbd+HbSfsseCUz8YBBOGR
+         g6V1iblytOM8nmHPlFzgFV3Wnf4ztstT2I9rnApe2c0jDrsntUxWCIW1MznSQ9EsiMTQ
+         2H8KAjEClxTj7ZKbQ8ek8XCGbXImu9EE3JTMEXsrMKboGfibvsHtr+v/8+c/QiGa38ZX
+         5m/3BJp/XOwXJmweKiQ4Wv7YaiNsg7pt0WhCgb0C2wVs9lxHhoPWwJbwhdmsbdhgoUzG
+         2su48xjFv5DJRj4Nn/DHJEfZeXql2vBH2BiIccJGxAwU/k0D6PXHBYji2LaOrQksRhvf
+         xRBA==
+X-Gm-Message-State: APjAAAVIJDJEpzeo67etHxNL6q7ihLz3WX4ITnaQwgXul5+Pl36KbdzO
+        6lupT3CUpfNyLjQk4URHel57y+RMJXcU+CIdxYU=
+X-Google-Smtp-Source: APXvYqysoQxnVQnmDBMIdj+2gL43pCM2fbflJVzJqN2J/q+GkMQYDjobm6hf9NO6lFGIwNQktmpvK3BtEu2XSAZ3EK8=
+X-Received: by 2002:a81:13d4:: with SMTP id 203mr8438355ywt.181.1560228847407;
+ Mon, 10 Jun 2019 21:54:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190611025108.GB2774@mit.edu>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9284 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906110022
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9284 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906110022
+References: <20190610173657.4655-1-amir73il@gmail.com> <CAH2r5mtQObwvdtaNr31fd-wDpjrZi5YLZ+ZcaW0ECVvTR-ByXQ@mail.gmail.com>
+In-Reply-To: <CAH2r5mtQObwvdtaNr31fd-wDpjrZi5YLZ+ZcaW0ECVvTR-ByXQ@mail.gmail.com>
+From:   Amir Goldstein <amir73il@gmail.com>
+Date:   Tue, 11 Jun 2019 07:53:55 +0300
+Message-ID: <CAOQ4uxhS6153+bo+JKen7E++1cNquGG2Eir1uc37UEcGFyck5w@mail.gmail.com>
+Subject: Re: [PATCH] cifs: copy_file_range needs to strip setuid bits and
+ update timestamps
+To:     Steve French <smfrench@gmail.com>
+Cc:     "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Christoph Hellwig <hch@lst.de>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Jun 10, 2019 at 10:51:08PM -0400, Theodore Ts'o wrote:
-> On Mon, Jun 10, 2019 at 06:16:12PM -0700, Darrick J. Wong wrote:
-> > On Mon, Jun 10, 2019 at 08:26:06PM +0300, Amir Goldstein wrote:
-> > > read(2) is allowed from a swapfile, so copy_file_range(2) should
-> > > be allowed as well.
-> > > 
-> > > Reported-by: Theodore Ts'o <tytso@mit.edu>
-> > > Fixes: 96e6e8f4a68d ("vfs: add missing checks to copy_file_range")
-> > > Signed-off-by: Amir Goldstein <amir73il@gmail.com>
-> > > ---
-> > > 
-> > > Darrick,
-> > > 
-> > > This fixes the generic/554 issue reported by Ted.
-> > 
-> > Frankly I think we should go the other way -- non-root doesn't get to
-> > copy from or read from swap files.
-> 
-> The issue is that without this patch, *root* doesn't get to copy from
-> swap files.  Non-root shouldn't have access via Unix permissions.  We
+On Mon, Jun 10, 2019 at 11:39 PM Steve French <smfrench@gmail.com> wrote:
+>
+> Looks good in my testing so far - but also want to do a little more
+> testing with the copy_file_range xfstest cases because your patches
+> fixed one additional test (not cross mount copy) so we can understand
+> why it fixed that test case.
 
-I'm not sure even root should have that privilege - it's a swap file,
-and until you swapoff, it's owned by the kernel and we shouldn't let
-backup programs copy your swapped out credit card numbers onto tape.
+I know which of my patches fixed generic/43[01].
+It was 96e6e8f4a68d ("vfs: add missing checks to copy_file_range")
+More specifically this code:
 
-> could add a special case if we don't trust system administrators to be
-> able to set the Unix permissions correctly, I suppose, but we don't do
-> that for block devices when they are mounted....
+        /* Shorten the copy to EOF */
+        size_in = i_size_read(inode_in);
+        if (pos_in >= size_in)
+                count = 0;
+        else
+                count = min(count, size_in - (uint64_t)pos_in);
 
-...and administrators often mkfs over mounted filesystems because we let
-them read and write block devices.  Granted I tried to fix that once and
-LVM totally stopped working...
+If CIFS sends an out of range value of copy length to Windows server,
+server replies with an error. That is inconsistent with the semantics of
+copy_file_range(2) syscall, which expects "short copy", hence need
+to shorten length before passing on to server.
 
---D
+I verified with Aurelien that this is the case and I was under the impression
+that he was going to create a similar local fix to cifs code for stable.
+I thought he told you, so I forgot to report back myself.
 
-> 
-> 					- Ted
+Thanks,
+Amir.
