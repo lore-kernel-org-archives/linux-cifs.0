@@ -2,119 +2,194 @@ Return-Path: <SRS0=/HTR=UK=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76222C43218
-	for <linux-cifs@archiver.kernel.org>; Tue, 11 Jun 2019 05:44:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E18BC4321B
+	for <linux-cifs@archiver.kernel.org>; Tue, 11 Jun 2019 13:48:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4A55420896
-	for <linux-cifs@archiver.kernel.org>; Tue, 11 Jun 2019 05:44:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 462B720896
+	for <linux-cifs@archiver.kernel.org>; Tue, 11 Jun 2019 13:48:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tqE/SaqE"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Jpyybqlu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391264AbfFKFo4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 11 Jun 2019 01:44:56 -0400
-Received: from mail-yw1-f68.google.com ([209.85.161.68]:35427 "EHLO
-        mail-yw1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390492AbfFKFo4 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 11 Jun 2019 01:44:56 -0400
-Received: by mail-yw1-f68.google.com with SMTP id k128so4781167ywf.2;
-        Mon, 10 Jun 2019 22:44:55 -0700 (PDT)
+        id S2391217AbfFKNsF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 11 Jun 2019 09:48:05 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:50263 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390327AbfFKNsE (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 11 Jun 2019 09:48:04 -0400
+Received: by mail-wm1-f65.google.com with SMTP id c66so3054314wmf.0
+        for <linux-cifs@vger.kernel.org>; Tue, 11 Jun 2019 06:48:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+w1TZXVPXsAmWyQMupPIi48Y5cj/qlmRQ3y3C88Myg4=;
-        b=tqE/SaqExmYL4SMawkSvR1uHrcqw8SMH1s/cJ7q9WPOatVmT/TZY8anoN7pplN+vKM
-         DC79ie7sC/M9+HEx8JXaPg9YBJNp6YY9zZm2SCuxKY4w8CTo7MUoWFtKHIy5kfqzYFXI
-         qhUC1t+ShVl2ERMvbVuk5aGyysYeGRzuAGf675wNvodmAkYZ3mFtpZ9Rm/ymuQn9Yq7j
-         9ZIhjzmj3PYrzpcstKORlAe9IsO9jr/Ub/zaf/4o2MdWmlbAbiB9lwYAJVldk1VtXs8R
-         vlliNsbZCTTteugJKE7zhWAtaB+b6y3nrhEy+DM2Fn+QZT+L8F8G5VUGtCZZMALA7mbK
-         sNiw==
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=2CZ7XNP6ncpKBw0YJudQO1JgyRd0fuR40ry6DWOpcj4=;
+        b=Jpyybqlurfd8p8HkRweWx9A0ZRZRilrim08I8+62egJ0xAS8tiahGPiVz7xuNNXCBg
+         6nCHBPnqGNKdvljtQN9d1ojCYrj5nfQwrvCnKva3USqRdCqmYd3Komp1ou8KiqViYDQp
+         Y47OauyVN8Fzy4YQxyG90+u2pC9mcRjt7BiKS0kTyG9Sk8HZQ/8dbxiGdoKRWVu7HaxD
+         tQiw4lsxthogrO0uShmlz2yz68rPA2p/vNfA55oQAH/nTEEte46iJRn3S+Zbj5aU+4Ve
+         V+AclEU688L+c2wmvK445FKZBCHYQCq3jMQKNoYDWdskNjbYLPJj+NY61LIH1l1/gZC3
+         RMIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+w1TZXVPXsAmWyQMupPIi48Y5cj/qlmRQ3y3C88Myg4=;
-        b=N4Q2dFQ/B20xgQT45emAhsWMIW5222tRSxIWCaUi+cE6n45OvjbP0cG5BkYLzaR61t
-         9yyzH41JPrI3EZHCfF25OwctLh+7+ECkDYOUumDKiqzNiDANO9iO+AhHFq59mmKTf6vC
-         SR20oLVbiycJsyvIHR0/eHfcDdrwBWYAOcYMhRiuNkTJlBWVb7ekc2j5zO9YwkijluFO
-         OdQI8Xurh7p2TM2TAGSoWHU3mF+A1/Aa2NmQes1PWYnRq6LzUf0v3+zCpf/QUP4As0jT
-         /UbakFRyj12WUn4oMKr6SHdhQ6f4WaQSUxoan87+NXdUOkznHk0nv9eQ0UKaH2/yK9WT
-         QJVQ==
-X-Gm-Message-State: APjAAAU1EAZcH3rHzqdJWPOfhbDo30zxme0JG0lHHtC3dvvPfv558NgA
-        P8BbjA0dB3CJEtXYB/ktfIOAg8pySbyyStOLUHY=
-X-Google-Smtp-Source: APXvYqxaOnnDdwQIbxvN92XjnTF13G1VugiR0ALHYbo83TKOwzt20Rlu0lyS+T4g9LQ5XiGl77pGfZBFYWDZJGR6Qz4=
-X-Received: by 2002:a81:13d4:: with SMTP id 203mr8531169ywt.181.1560231894888;
- Mon, 10 Jun 2019 22:44:54 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=2CZ7XNP6ncpKBw0YJudQO1JgyRd0fuR40ry6DWOpcj4=;
+        b=C+snfwXPynyboX7X1DEklyBO1VY+A1T06XOmr6l/Xy/uC/6apH+D/xhF1XvtkBltrZ
+         AEcH2TbW57PSw0yaePih2kZTWBZyRzpQ/5MY1DNwzQ4nhZr1hJD2QWhFCuCjBxdH/EUq
+         XuiXvHvFZu9KC4GJ6NN/O8lELvhckP0s/T+xUZbWFSv0sqh9CumrPs2jB38aMmCVE/zZ
+         gjxSDRnGMro977r6Uf4nix/kdqaZqQu9Sqgl/UwfgubTMEHIktojb/HuVBEjLCttm+O3
+         6HnRuFSyGvCFsutewD9p2YugpImnIlspxco50OsWk/V8l9Y90R5dLKTmy9qM/IBc7vW4
+         c/Mw==
+X-Gm-Message-State: APjAAAWgOmIVny8CKdLEVfD+etPm5Tvp/iMUqdvjl/6GHNCRQWCNSnJA
+        kL2i7uQ0JnkFzLcVnil/mJ+HFA==
+X-Google-Smtp-Source: APXvYqykFvdzrVY18edtq46qoHfHf3p2RGGd1PJ7mo4pHhVHCSHHI4aen/Ca4c6s/pQLyrvXyxHavw==
+X-Received: by 2002:a1c:2e09:: with SMTP id u9mr18173175wmu.137.1560260883273;
+        Tue, 11 Jun 2019 06:48:03 -0700 (PDT)
+Received: from sudo.home ([2a01:cb1d:112:6f00:24bb:7f31:25fe:43a7])
+        by smtp.gmail.com with ESMTPSA id o126sm3964305wmo.31.2019.06.11.06.48.02
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 11 Jun 2019 06:48:02 -0700 (PDT)
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@google.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>
+Subject: [PATCH v3 7/7] fs: cifs: switch to RC4 library interface
+Date:   Tue, 11 Jun 2019 15:47:50 +0200
+Message-Id: <20190611134750.2974-8-ard.biesheuvel@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190611134750.2974-1-ard.biesheuvel@linaro.org>
+References: <20190611134750.2974-1-ard.biesheuvel@linaro.org>
 MIME-Version: 1.0
-References: <20190610172606.4119-1-amir73il@gmail.com> <20190611011612.GQ1871505@magnolia>
- <20190611025108.GB2774@mit.edu> <20190611032926.GA1872778@magnolia>
-In-Reply-To: <20190611032926.GA1872778@magnolia>
-From:   Amir Goldstein <amir73il@gmail.com>
-Date:   Tue, 11 Jun 2019 08:44:43 +0300
-Message-ID: <CAOQ4uxgAgKhp55VGzBZ=ODKg5ztbJCB+WiFceXZjvw9=ecPdGw@mail.gmail.com>
-Subject: Re: [PATCH] vfs: allow copy_file_range from a swapfile
-To:     "Darrick J. Wong" <darrick.wong@oracle.com>
-Cc:     "Theodore Ts'o" <tytso@mit.edu>,
-        Dave Chinner <david@fromorbit.com>,
-        Christoph Hellwig <hch@lst.de>,
-        linux-xfs <linux-xfs@vger.kernel.org>,
-        Olga Kornievskaia <olga.kornievskaia@gmail.com>,
-        Luis Henriques <lhenriques@suse.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux API <linux-api@vger.kernel.org>,
-        ceph-devel@vger.kernel.org,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Jun 11, 2019 at 6:29 AM Darrick J. Wong <darrick.wong@oracle.com> wrote:
->
-> On Mon, Jun 10, 2019 at 10:51:08PM -0400, Theodore Ts'o wrote:
-> > On Mon, Jun 10, 2019 at 06:16:12PM -0700, Darrick J. Wong wrote:
-> > > On Mon, Jun 10, 2019 at 08:26:06PM +0300, Amir Goldstein wrote:
-> > > > read(2) is allowed from a swapfile, so copy_file_range(2) should
-> > > > be allowed as well.
-> > > >
-> > > > Reported-by: Theodore Ts'o <tytso@mit.edu>
-> > > > Fixes: 96e6e8f4a68d ("vfs: add missing checks to copy_file_range")
-> > > > Signed-off-by: Amir Goldstein <amir73il@gmail.com>
-> > > > ---
-> > > >
-> > > > Darrick,
-> > > >
-> > > > This fixes the generic/554 issue reported by Ted.
-> > >
-> > > Frankly I think we should go the other way -- non-root doesn't get to
-> > > copy from or read from swap files.
-> >
-> > The issue is that without this patch, *root* doesn't get to copy from
-> > swap files.  Non-root shouldn't have access via Unix permissions.  We
->
-> I'm not sure even root should have that privilege - it's a swap file,
-> and until you swapoff, it's owned by the kernel and we shouldn't let
-> backup programs copy your swapped out credit card numbers onto tape.
->
+The CIFS code uses the sync skcipher API to invoke the ecb(arc4) skcipher,
+of which only a single generic C code implementation exists. This means
+that going through all the trouble of using scatterlists etc buys us
+very little, and we're better off just invoking the arc4 library directly.
 
-I am not a security expert and I do not want to be, but I believe it's
-better to have a complete security model before plugging random
-"security holes".
+Cc: linux-cifs@vger.kernel.org
+Cc: Steve French <sfrench@samba.org>
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ fs/cifs/Kconfig       |  2 +-
+ fs/cifs/cifsencrypt.c | 53 ++++++--------------
+ 2 files changed, 16 insertions(+), 39 deletions(-)
 
-That said. I don't have a strong feeling about allowing copy_file_range
-from swap file. If someone complains and they have a valid use case,
-we can always relax it then.
+diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
+index aae2b8b2adf5..523e9ea78a28 100644
+--- a/fs/cifs/Kconfig
++++ b/fs/cifs/Kconfig
+@@ -10,7 +10,7 @@ config CIFS
+ 	select CRYPTO_SHA512
+ 	select CRYPTO_CMAC
+ 	select CRYPTO_HMAC
+-	select CRYPTO_ARC4
++	select CRYPTO_LIB_ARC4
+ 	select CRYPTO_AEAD2
+ 	select CRYPTO_CCM
+ 	select CRYPTO_ECB
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index d2a05e46d6f5..3b7b5e83493d 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -33,7 +33,8 @@
+ #include <linux/ctype.h>
+ #include <linux/random.h>
+ #include <linux/highmem.h>
+-#include <crypto/skcipher.h>
++#include <linux/fips.h>
++#include <crypto/arc4.h>
+ #include <crypto/aead.h>
+ 
+ int __cifs_calc_signature(struct smb_rqst *rqst,
+@@ -772,11 +773,12 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ int
+ calc_seckey(struct cifs_ses *ses)
+ {
+-	int rc;
+-	struct crypto_skcipher *tfm_arc4;
+-	struct scatterlist sgin, sgout;
+-	struct skcipher_request *req;
++	struct arc4_ctx *ctx_arc4;
+ 	unsigned char *sec_key;
++	int rc = 0;
++
++	if (fips_enabled)
++		return -ENODEV;
+ 
+ 	sec_key = kmalloc(CIFS_SESS_KEY_SIZE, GFP_KERNEL);
+ 	if (sec_key == NULL)
+@@ -784,49 +786,24 @@ calc_seckey(struct cifs_ses *ses)
+ 
+ 	get_random_bytes(sec_key, CIFS_SESS_KEY_SIZE);
+ 
+-	tfm_arc4 = crypto_alloc_skcipher("ecb(arc4)", 0, CRYPTO_ALG_ASYNC);
+-	if (IS_ERR(tfm_arc4)) {
+-		rc = PTR_ERR(tfm_arc4);
+-		cifs_dbg(VFS, "could not allocate crypto API arc4\n");
+-		goto out;
+-	}
+-
+-	rc = crypto_skcipher_setkey(tfm_arc4, ses->auth_key.response,
+-					CIFS_SESS_KEY_SIZE);
+-	if (rc) {
+-		cifs_dbg(VFS, "%s: Could not set response as a key\n",
+-			 __func__);
+-		goto out_free_cipher;
+-	}
+-
+-	req = skcipher_request_alloc(tfm_arc4, GFP_KERNEL);
+-	if (!req) {
++	ctx_arc4 = kmalloc(sizeof(*ctx_arc4), GFP_KERNEL);
++	if (!ctx_arc4) {
+ 		rc = -ENOMEM;
+-		cifs_dbg(VFS, "could not allocate crypto API arc4 request\n");
+-		goto out_free_cipher;
++		cifs_dbg(VFS, "could not allocate arc4 context\n");
++		goto out;
+ 	}
+ 
+-	sg_init_one(&sgin, sec_key, CIFS_SESS_KEY_SIZE);
+-	sg_init_one(&sgout, ses->ntlmssp->ciphertext, CIFS_CPHTXT_SIZE);
+-
+-	skcipher_request_set_callback(req, 0, NULL, NULL);
+-	skcipher_request_set_crypt(req, &sgin, &sgout, CIFS_CPHTXT_SIZE, NULL);
+-
+-	rc = crypto_skcipher_encrypt(req);
+-	skcipher_request_free(req);
+-	if (rc) {
+-		cifs_dbg(VFS, "could not encrypt session key rc: %d\n", rc);
+-		goto out_free_cipher;
+-	}
++	arc4_setkey(ctx_arc4, ses->auth_key.response, CIFS_SESS_KEY_SIZE);
++	arc4_crypt(ctx_arc4, ses->ntlmssp->ciphertext, sec_key,
++		   CIFS_CPHTXT_SIZE);
+ 
+ 	/* make secondary_key/nonce as session key */
+ 	memcpy(ses->auth_key.response, sec_key, CIFS_SESS_KEY_SIZE);
+ 	/* and make len as that of session key only */
+ 	ses->auth_key.len = CIFS_SESS_KEY_SIZE;
+ 
+-out_free_cipher:
+-	crypto_free_skcipher(tfm_arc4);
+ out:
++	kfree(ctx_arc4);
+ 	kfree(sec_key);
+ 	return rc;
+ }
+-- 
+2.20.1
 
-Anyway, as you saw, I removed the test case from xfstest, leaving
-the behavior (as far as the testsuite cares) undefined.
-
-Thanks,
-Amir.
