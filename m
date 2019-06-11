@@ -2,363 +2,157 @@ Return-Path: <SRS0=/HTR=UK=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-4.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FSL_HELO_FAKE,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH,USER_AGENT_MUTT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0472C43218
-	for <linux-cifs@archiver.kernel.org>; Tue, 11 Jun 2019 14:47:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08B65C4321A
+	for <linux-cifs@archiver.kernel.org>; Tue, 11 Jun 2019 18:17:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 910682054F
-	for <linux-cifs@archiver.kernel.org>; Tue, 11 Jun 2019 14:47:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D805D2173C
+	for <linux-cifs@archiver.kernel.org>; Tue, 11 Jun 2019 18:17:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1560277058;
+	bh=FxnF+wQyVdil82o5E43BjgW8tBRCdoFPNiymJQAFTMQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=bqrp7HUaib2xtXS641/zp5y0E1VO5Gx6l6u3GOjTV8lqObXVbp6iEJPhhthPYlqjn
+	 cnLbCIjK6m1QnesuBC8tHko5MXawTgL78H4hUD9nBCyfIj4YIbn2Nnm2CK1WrLekcJ
+	 HXoNCsO0ig5HaIEWvDwv1cfc5LjfBdzeuH12EoH8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389777AbfFKOrw convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 11 Jun 2019 10:47:52 -0400
-Received: from mx2.suse.de ([195.135.220.15]:50932 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2389454AbfFKOrw (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 11 Jun 2019 10:47:52 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 3AAB6ABD2
-        for <linux-cifs@vger.kernel.org>; Tue, 11 Jun 2019 14:47:49 +0000 (UTC)
-From:   aaptel@suse.com (=?utf-8?Q?Aur=C3=A9lien?= Aptel)
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Subject: [WIP] multichannel
-Date:   Tue, 11 Jun 2019 16:47:48 +0200
-Message-ID: <87pnnkkwkr.fsf@suse.com>
+        id S2406994AbfFKSRi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 11 Jun 2019 14:17:38 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54394 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2405802AbfFKSRi (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 11 Jun 2019 14:17:38 -0400
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5114E2173B;
+        Tue, 11 Jun 2019 18:17:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1560277057;
+        bh=FxnF+wQyVdil82o5E43BjgW8tBRCdoFPNiymJQAFTMQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=mhH3vm77R+20PcKpYYWCp6rQC44fgIWt0r3L7R8qHGrlyB5/L4MzMup2Hw8z2dEvS
+         oHl5MZ2fx4GhESiZSzB+lC+hsEOZh6fTzq8N8OgAVzJRvW71Rh4Wf3jcy71JbLohBq
+         /HQ+XRQlmpnhZbg3+2mKRL7roktN+XvsjubwgAVQ=
+Date:   Tue, 11 Jun 2019 11:17:35 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>
+Subject: Re: [PATCH v3 7/7] fs: cifs: switch to RC4 library interface
+Message-ID: <20190611181735.GE66728@gmail.com>
+References: <20190611134750.2974-1-ard.biesheuvel@linaro.org>
+ <20190611134750.2974-8-ard.biesheuvel@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190611134750.2974-8-ard.biesheuvel@linaro.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi,
+On Tue, Jun 11, 2019 at 03:47:50PM +0200, Ard Biesheuvel wrote:
+> The CIFS code uses the sync skcipher API to invoke the ecb(arc4) skcipher,
+> of which only a single generic C code implementation exists. This means
+> that going through all the trouble of using scatterlists etc buys us
+> very little, and we're better off just invoking the arc4 library directly.
+> 
+> Cc: linux-cifs@vger.kernel.org
+> Cc: Steve French <sfrench@samba.org>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+>  fs/cifs/Kconfig       |  2 +-
+>  fs/cifs/cifsencrypt.c | 53 ++++++--------------
+>  2 files changed, 16 insertions(+), 39 deletions(-)
+> 
+> diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
+> index aae2b8b2adf5..523e9ea78a28 100644
+> --- a/fs/cifs/Kconfig
+> +++ b/fs/cifs/Kconfig
+> @@ -10,7 +10,7 @@ config CIFS
+>  	select CRYPTO_SHA512
+>  	select CRYPTO_CMAC
+>  	select CRYPTO_HMAC
+> -	select CRYPTO_ARC4
+> +	select CRYPTO_LIB_ARC4
+>  	select CRYPTO_AEAD2
+>  	select CRYPTO_CCM
+>  	select CRYPTO_ECB
 
-Since I was asked about my multichannel progress at SambaXP I thought I
-would send the current state of the code as a WIP for maybe early
-feedback. I've discussed it already a bit with Pavel last year when I
-was working on it.
+Since the "arc4" module is no longer needed, the
 
-I've sort of resurected my multichannel branch and put it on github.
-It is based on cifs as of last year so in the middle of compounding and
-before the DFS failover (which refactored a lot of reconnection code and
-mount code).
+	MODULE_SOFTDEP("pre: arc4");
 
-Also I now understand cifs reconnection code enough to know that the
-multichannel recon code is most likely wrong and needs to be rewritten
-:)
+in fs/cifs/cifsfs.c should be removed too.
 
-I'm juggling large backports for SUSE, debugging customer bugs, the
-POSIX extensions reparse point stuff, being a GSoC mentor this summer
-and it seems I'm never finishing anything which is pretty
-frustrating... anyway (/rant)
+(Note that it doesn't need a soft dependency on libarc4 instead, since the cifs
+module will link directly to it.)
 
-Code is *old* but available on my github on the multichannel-v2 branch
-as a big single "wip" commit...
+> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+> index d2a05e46d6f5..3b7b5e83493d 100644
+> --- a/fs/cifs/cifsencrypt.c
+> +++ b/fs/cifs/cifsencrypt.c
+> @@ -33,7 +33,8 @@
+>  #include <linux/ctype.h>
+>  #include <linux/random.h>
+>  #include <linux/highmem.h>
+> -#include <crypto/skcipher.h>
+> +#include <linux/fips.h>
+> +#include <crypto/arc4.h>
+>  #include <crypto/aead.h>
+>  
+>  int __cifs_calc_signature(struct smb_rqst *rqst,
+> @@ -772,11 +773,12 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
+>  int
+>  calc_seckey(struct cifs_ses *ses)
+>  {
+> -	int rc;
+> -	struct crypto_skcipher *tfm_arc4;
+> -	struct scatterlist sgin, sgout;
+> -	struct skcipher_request *req;
+> +	struct arc4_ctx *ctx_arc4;
+>  	unsigned char *sec_key;
+> +	int rc = 0;
+> +
+> +	if (fips_enabled)
+> +		return -ENODEV;
+>  
+>  	sec_key = kmalloc(CIFS_SESS_KEY_SIZE, GFP_KERNEL);
+>  	if (sec_key == NULL)
 
-https://github.com/aaptel/linux.git multichan-v2
+sec_key should be moved back to the stack now, basically reverting this commit:
 
-https://github.com/aaptel/linux/commit/bcc0ac27a03e100a5f444ab012cc27711919cf74
+	commit 5f4b55699aaff1028468e3f53853d781cdafedd6
+	Author: Sachin Prabhu <sprabhu@redhat.com>
+	Date:   Mon Oct 17 16:40:22 2016 -0400
 
-Here is a *simplified* overview of the changes:
+	    CIFS: Fix BUG() in calc_seckey()
 
-Datastructure changes
-=====================
+It was only moved to the heap because it had to go in a scatterlist.
 
-I've added an array of cifs_chan inside cifs_ses.
-I could have added an array of TCP_Server_Info but since a channel uses
-a different signing key and signing keys are stored in cifs_ses I needed
-the extra struct.
+> +	arc4_setkey(ctx_arc4, ses->auth_key.response, CIFS_SESS_KEY_SIZE);
+> +	arc4_crypt(ctx_arc4, ses->ntlmssp->ciphertext, sec_key,
+> +		   CIFS_CPHTXT_SIZE);
+>  
+>  	/* make secondary_key/nonce as session key */
+>  	memcpy(ses->auth_key.response, sec_key, CIFS_SESS_KEY_SIZE);
+>  	/* and make len as that of session key only */
+>  	ses->auth_key.len = CIFS_SESS_KEY_SIZE;
+>  
+> -out_free_cipher:
+> -	crypto_free_skcipher(tfm_arc4);
+>  out:
+> +	kfree(ctx_arc4);
 
-+struct cifs_chan {
-+       struct TCP_Server_Info *server;
-+       __u8 signkey[SMB3_SIGN_KEY_SIZE];
-+};
+Should be kzfree().
 
-...
-
-@@ -881,12 +890,15 @@ struct cifs_ses {
-        bool sign;              /* is signing required? */
-        bool need_reconnect:1; /* connection reset, uid now invalid */
-        bool domainAuto:1;
-+       bool binding:1; /* are we binding the session? */
-        __u16 session_flags;
-        __u8 smb3signingkey[SMB3_SIGN_KEY_SIZE];
-        __u8 smb3encryptionkey[SMB3_SIGN_KEY_SIZE];
-        __u8 smb3decryptionkey[SMB3_SIGN_KEY_SIZE];
-        __u8 preauth_sha_hash[SMB2_PREAUTH_HASH_SIZE];
- 
-@@ -900,8 +912,22 @@ struct cifs_ses {
-        struct cifs_server_iface *iface_list;
-        size_t iface_count;
-        unsigned long iface_last_update; /* jiffies */
-+
-+#define CIFS_MAX_CHANNELS 16
-+       struct cifs_chan chans[CIFS_MAX_CHANNELS];
-+       size_t chan_count;
-+       size_t chan_max;
- };
-
-The "main" channel is still ses->server (copied to ses->chans[0] for
-convinience too)
-
-Sending-to-the-wire code changes
-================================
-
-When sending something on the wire, instead of sending it to ses->server
-we send it to a random one instead for now:
-
-@@ -809,7 +810,16 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
- 
-+       if (!ses->binding) {
-+               uint index = ((unsigned)get_random_int()) % ses->chan_count;
-+               cifs_dbg(VFS, "XXX: send/recv: using random channel %d", index);
-+               server = ses->chans[index].server;
-+       } else {
-+               cifs_dbg(VFS, "XXX: send/recv: binding, using last serv");
-+               server = cifs_ses_server(ses);
-+       }
-
-Couple of func in that code path take a ses as input but really only use
-server properties (we are doing the low-level work of sending after all)
-so I had to refactor things a bit to pass just the server, or pass ses
-AND server (and remove ses->server usage).
-
-Session establishment code changes
-==================================
-
-Currently a lot of the code to initialize a connection & session uses
-the cifs_ses as input. But depending on if we are opening a new session
-or a new channel we need to use different server pointers. So I've added
-a "binding" flag in cifs_ses and this helper function that returns the
-current server a session should use (only in the sess establishment code
-path):
-
-+static inline
-+struct TCP_Server_Info *cifs_ses_server(struct cifs_ses *ses)
-+{
-+       if (ses->binding)
-+               return ses->chans[ses->chan_count].server;
-                 //                ^^^^^return the last channel (always the new one)
-+       else
-+               return ses->server;
-+}
-+
-
-Which needs to be used in all the code related to establishing a
-session. A lot of changes are basically turning this:
-
-void foo(struct cifs_ses *ses, ...)
-{
-    ses->server->...;
-    func(ses->server, ...);
-    ...
-}
-
-into this:
-
-void foo(struct cifs_ses *ses, ...)
-{
-    TCP_Server_Info *server = cifs_ses_server(ses);
-
-    server->...;
-    func(server, ...);
-    ...
-}
-
-Mount code changes
-==================
-
-- "max_channels=N"
-  Sets the max number of channel (set this to 2 or more to get extra
-  connections)
-  
-- "[no]multichannel"
-  enables multichannel, without this max_channel will be ignored.
-
-The reason for those 2 steps is so that user can enable multichannel
-without having to know the details of how it works. Right now we decide
-manually via max_channels but in the future it could be dynamic.
-
-After doing cifs_mount() sucessfully we call cifs_try_adding_channels()
-which will open as many channels as it can.
-
-+/* returns number of channels added */
-+int cifs_try_adding_channels(struct cifs_ses *ses)
-+{
-+       int old_chan_count = ses->chan_count;
-+       int left = ses->chan_max - ses->chan_count;
-+       int i = 0;
-+       int rc = 0;
-+
-+       if (left <= 0) {
-+               cifs_dbg(FYI,
-+                        "ses already at max_channels (%zu), nothing to open\n",
-+                        ses->chan_max);
-+               return 0;
-+       }
-+
-+       if (ses->server->dialect != SMB311_PROT_ID) {
-+               cifs_dbg(VFS, "multichannel is not supported on this protocol version, use 3.1.1\n");
-+               return 0;
-+       }
-+
-+       /* ifaces are sorted by speed, try them in order */
-+       for (i = 0; left > 0 && i < ses->iface_count; i++) {
-+               struct cifs_server_iface *iface;
-+
-+               iface = &ses->iface_list[i];
-+               if (is_ses_using_iface(ses, iface) && !iface->rss_capable)
-+                       continue;
-+
-+               rc = cifs_ses_add_channel(ses, iface);
-+               if (rc) {
-+                       cifs_dbg(FYI, "failed to open extra channel\n");
-+                       continue;
-+               }
-+
-+               cifs_dbg(FYI, "sucessfully opened new channel\n");
-+               left--;
-+       }
-+
-+       /*
-+        * TODO: if we still have channels left to open try to connect
-+        * to same RSS-capable iface multiple times
-+        */
-+
-+       return ses->chan_count - old_chan_count;
-+}
-
-
-Which in turns calls cifs_ses_add_chanel() to add a channel to an
-existing session by connecting to iface:
-
-+cifs_ses_add_channel(struct cifs_ses *ses, struct cifs_server_iface *iface)
-+{
-+       struct cifs_chan *chan;
-+       struct smb_vol vol = {0};
-+       const char unc_fmt[] = "\\%s\\foo";
-+       char unc[sizeof(unc_fmt)+SERVER_NAME_LEN_WITH_NULL] = {0};
-+       struct sockaddr_in *ipv4 = (struct sockaddr_in *)&iface->sockaddr;
-+       struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)&iface->sockaddr;
-+       int rc;
-+       unsigned int xid = get_xid();
-+
-+       cifs_dbg(FYI, "adding channel to ses %p (speed:%zu bps rdma:%s ",
-+                ses, iface->speed, iface->rdma_capable ? "yes" : "no");
-+       if (iface->sockaddr.ss_family == AF_INET)
-+               cifs_dbg(FYI, "ip:%pI4)\n", &ipv4->sin_addr);
-+       else
-+               cifs_dbg(FYI, "ip:%pI6)\n", &ipv6->sin6_addr);
-+
-+       /*
-+        * Setup a smb_vol with mostly the same info as the existing
-+        * session and overwrite it with the requested iface data.
-+        *
-+        * We need to setup at least the fields used for negprot and
-+        * sesssetup.
-+        *
-+        * We only need the volume here, so we can reuse memory from
-+        * the session and server without caring about memory
-+        * management.
-+        */
-+
-+       /* Always make new connection for now (TODO?) */
-+       vol.nosharesock = true;
-+
-+       /* Auth */
-+       vol.domainauto = ses->domainAuto;
-+       vol.domainname = ses->domainName;
-+       vol.username = ses->user_name;
-+       vol.password = ses->password;
-+       vol.sectype = ses->sectype;
-+       vol.sign = ses->sign;
-+
-+       /* UNC and paths */
-+       /* XXX: Use ses->server->hostname? */
-+       sprintf(unc, unc_fmt, ses->serverName);
-+       vol.UNC = unc;
-+       vol.prepath = "";
-+
-+       /* Require SMB3.1.1 */
-+       vol.vals = &smb311_values;
-+       vol.ops = &smb311_operations;
-+
-+       vol.noblocksnd = ses->server->noblocksnd;
-+       vol.noautotune = ses->server->noautotune;
-+       vol.sockopt_tcp_nodelay = ses->server->tcp_nodelay;
-+       vol.echo_interval = ses->server->echo_interval / HZ;
-+
-+       /*
-+        * This will be used for encoding/decoding user/domain/pw
-+        * during sess setup auth.
-+        *
-+        * XXX: We use the default for simplicity but the proper way
-+        * would be to use the one that ses used, which is not
-+        * stored. This might break when dealing with non-ascii
-+        * strings.
-+        */
-+       vol.local_nls = load_nls_default();
-+
-+       /* Use RDMA if possible */
-+       vol.rdma = iface->rdma_capable;
-+       memcpy(&vol.dstaddr, &iface->sockaddr, sizeof(struct sockaddr_storage));
-+
-+       mutex_lock(&ses->session_mutex);
-+
-+       chan = &ses->chans[ses->chan_count];
-+       chan->server = cifs_get_tcp_session(&vol);
-+       if (IS_ERR(chan->server)) {
-+               rc = PTR_ERR(chan->server);
-+               chan->server = NULL;
-+               goto out;
-+       }
-+
-+       /*
-+        * We need to allocate the server crypto now as we will need
-+        * to sign packets before we generate the channel signing key
-+        * (we sign with the session key)
-+        */
-+       rc = smb311_crypto_shash_allocate(chan->server);
-
-
-Locking
-=======
-
-I'm not sure things are race-free. The ses->binding flag could be an
-issue.
-
-For signing, we need to have access to the session a channel belongs
-to... but we actually cannot walk "up" from the server to the
-session. So I decided to walk "down" from the global
-cifs_tcp_ses_list. But that requires taking the global spinlock for each
-packet we sign. Probably not good for parallelism. See
-smb2_find_global_smb_ses() usages.
-
-
-Testing
-=======
-
-I have only tested this on a simple Win 2016 VM. Just add network
-interfaces to the VM, Windows automatically lists them back when doing a
-FSCTL_QUERY_INTERFACE.
-
-Then mount from linux with -o multichannel,max_channels=2
-
-Look at DebugData, network traces or dmesg for runtime info.
-
-I have not made many any benchmark, reconnection tests, DFS tests,
-or compounding tests so this really is WIP but I'm very interested in
-people trying it anyway :)
-
-Cheers,
--- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah HRB 21284 (AG Nürnberg)
-
+- Eric
