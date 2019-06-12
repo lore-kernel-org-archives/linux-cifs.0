@@ -2,244 +2,213 @@ Return-Path: <SRS0=Mq7t=UL=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 760AFC31E46
-	for <linux-cifs@archiver.kernel.org>; Wed, 12 Jun 2019 16:19:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFADBC31E48
+	for <linux-cifs@archiver.kernel.org>; Wed, 12 Jun 2019 16:20:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 480472082C
-	for <linux-cifs@archiver.kernel.org>; Wed, 12 Jun 2019 16:19:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97E322082C
+	for <linux-cifs@archiver.kernel.org>; Wed, 12 Jun 2019 16:20:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="s5cC4TI0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730455AbfFLQTE convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 12 Jun 2019 12:19:04 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:45458 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727126AbfFLQTD (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 12 Jun 2019 12:19:03 -0400
-Received: by mail-pf1-f195.google.com with SMTP id s11so9927397pfm.12
-        for <linux-cifs@vger.kernel.org>; Wed, 12 Jun 2019 09:19:03 -0700 (PDT)
+        id S2404608AbfFLQUQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 12 Jun 2019 12:20:16 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:33353 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730745AbfFLQUQ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 12 Jun 2019 12:20:16 -0400
+Received: by mail-wr1-f68.google.com with SMTP id n9so17630490wru.0
+        for <linux-cifs@vger.kernel.org>; Wed, 12 Jun 2019 09:20:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=pcVl9rz8wdPQIbvWbTWkIx9A5zksK1bSEdXxVyTfU04=;
+        b=s5cC4TI0lnWPK+GDgtrqTDlet2i0OPiORYXE+/Ic638xklkCAjsb0spBQVUHFdfzWj
+         unvV4+WlGu6/AcBM6M1We7Yok27ESfVZnoYBYkfSrreFoVn8wWC+I4ZDQP2tXRMBO0U+
+         qy/drraE5GCMBp9DiNE9ST9DBfh5h2QVwRcLu2UIMzFcI70qqiywL7jR/jNd0aDF2DNQ
+         su/xTA9KGcirsoaFVrbDj3XhmQnIrSImK8LIBLH26S7E2XQwa0RldV9q1FhIWEuOrHBT
+         +07mqQnQ+m0NpPloOXJeNxhBzXJAHrTlTJRbkH8VHUthdxMJUXi2AXgxyFBTzkfKfqpR
+         z47Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=ZjdJe4gBZrPxnTp7SijcV/Guu3HhLfsYEucbCciiFYs=;
-        b=m2UgA/A9Hda0Ezt2ZxQ9i83iA7B24AecyiojfDjw9Q21woGI8w4JE4mCv18gQAsFjV
-         K9a2Zo2PjiyaPwk59H3d+Odh2IFL5IBdhNCVZ6OnMMrzIdTRVe9jIT4DljLGpJ/RQIxo
-         delUJCw2jiNAntM3sEIDH/y2sVxTZdLrzB0NUA1tRBBZjkNFh40uPGJyfmhMKknI5Sr1
-         fq69perdJz4x4tbm05XLN/BVo2XboeDKYgpjQgM9lCKSl0x6F1N+N35dIr5haykdujV2
-         z/t/LjTn5UWgZtHGSjEqGoRUrIyhSxaW62bDvAv9iTcUuFzzyWafB8YU254m5aI7/PQw
-         CC+A==
-X-Gm-Message-State: APjAAAUkpceSHfZRBvv+O0xDBntUdEd7DOIvXljK7C8WKKvl8rYsdzfH
-        Rgyu2yS2r7W4s2S7GkJxk1RkfpqE+K1zTI3DRgqmnw==
-X-Google-Smtp-Source: APXvYqxqCEYTyAbNLSA9uPcB2GIGfeuC6PJvJPspUFGl+wc7JGq5B/OVJpHghBmO9pcsDiTgsOf6YC0J48w/i6Ke8Is=
-X-Received: by 2002:a17:90a:1a0d:: with SMTP id 13mr27504881pjk.99.1560356342724;
- Wed, 12 Jun 2019 09:19:02 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=pcVl9rz8wdPQIbvWbTWkIx9A5zksK1bSEdXxVyTfU04=;
+        b=dHhL4LV2nD4X+tO5jaqjDvWEaQIWdcaVPcjaYNeWKOCiqjEHKhHm7d5rGqrm7mi/Cu
+         ARvflQW1fMKf2w6d8wzM/2WYC04deKouumpgzFYf01Nazuno5Qjv44G4XnIy/t/j+nB9
+         ue/UQFmw+fkciprnjTLpAHnCU6MB+P53F9fflpfYYOhxOASSE60IERrD+Iv+ANvol9GQ
+         ihirj+mdXp1+uf2Z5eARKu5MPcOrdKMbilgliqMy899AbxIa3FF9p2GRaN79b4YCgAGV
+         rayBl9bvKD48qyRy00hbWPrDrYyKuABs4lRWSK7Wqca2QFDYtoRHX9EbfovG4S4N6waE
+         nfAw==
+X-Gm-Message-State: APjAAAUaO7XaNaJo6s3nB0J2awe4SIwOSQ3RZgLzB/wnhGzIM20nd937
+        fC3YHkN4E277aXdPrDAiTyF1JCj1g9juHA==
+X-Google-Smtp-Source: APXvYqwXPB1T9vJUrdJh9D51oSoiSJLgkpmi95fZgaP6KWetUp946YSZKxBQ4CjakZ2I5oIfgt+VUA==
+X-Received: by 2002:a5d:43c9:: with SMTP id v9mr54497358wrr.70.1560356413425;
+        Wed, 12 Jun 2019 09:20:13 -0700 (PDT)
+Received: from sudo.home ([2a01:cb1d:112:6f00:353a:f33a:a393:3ada])
+        by smtp.gmail.com with ESMTPSA id c16sm70172wrr.53.2019.06.12.09.20.12
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 12 Jun 2019 09:20:12 -0700 (PDT)
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@google.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>
+Subject: [PATCH v5 7/7] fs: cifs: switch to RC4 library interface
+Date:   Wed, 12 Jun 2019 18:19:59 +0200
+Message-Id: <20190612161959.30478-8-ard.biesheuvel@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190612161959.30478-1-ard.biesheuvel@linaro.org>
+References: <20190612161959.30478-1-ard.biesheuvel@linaro.org>
 MIME-Version: 1.0
-References: <CALe0_75rQHY5em=YEvT-K64uOnWzAeg8p=ZZtH1WhEFzk4nNmg@mail.gmail.com>
- <CAH2r5muMo6LCEW1fTP4bGtf7aXggzs_YthRdB=qYnPg5EUEsJQ@mail.gmail.com>
- <20190123003029.GA235078@jra3> <20190124110829.GC20089@sernet.de>
- <20190124170341.GA104839@jra3> <20190124170945.wsasncusduwg3zbp@kazak>
- <CALe0_75-64OXgeWb6kQu6R1bA2OM9shJ=YQvbPnm6EJ_zHjbiQ@mail.gmail.com>
- <20190124201433.bibu3k2fo7h2bdep@kazak> <CALe0_74ZEDEafvyWqWqCD74TBO5Pyq=G=jb0AMcCmAwmP0OZYQ@mail.gmail.com>
- <20190124224927.GB252624@jra3>
-In-Reply-To: <20190124224927.GB252624@jra3>
-From:   Jacob Shivers <jshivers@redhat.com>
-Date:   Wed, 12 Jun 2019 12:18:26 -0400
-Message-ID: <CALe0_76rHGUedvRHvEyYvROPp8fPtvM9unkw7-gsLG2CPYxasw@mail.gmail.com>
-Subject: Re: Fwd: SMB2 not respecting mtime values
-To:     Jeremy Allison <jra@samba.org>
-Cc:     =?UTF-8?B?UmFscGggQsO2aG1l?= <slow@samba.org>,
-        Steve French <smfrench@gmail.com>,
-        samba-technical <samba-technical@lists.samba.org>,
-        linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 8bit
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I finally got around to making some time for this and I this is indeed
-a server side issue.
-The SMB client is using the appropriate file handles when setting
-atime and mtime and the server initially reports the desired mtime.
-The server only slightly later reports a mtime matching that of ctime.
+The CIFS code uses the sync skcipher API to invoke the ecb(arc4) skcipher,
+of which only a single generic C code implementation exists. This means
+that going through all the trouble of using scatterlists etc buys us
+very little, and we're better off just invoking the arc4 library directly.
 
-$ tshark -tad -n -r cp_p-testing-3.16.66.pcap -Y 'smb2.pid == 0xf2d'
--T fields -e frame.number -e smb2.fid -e smb2.last_access.time -e
-smb2.last_write.time -e _ws.col.Info -E header=y | tr '\t' '#' |
-column -t -s '#'
-frame.number  smb2.fid
-smb2.last_access.time                smb2.last_write.time
-   _ws.col.Info
-170
-                                                       Create Request
-File: test_file-data
-171
-                                                       Create
-Response, Error: STATUS_OBJECT_NAME_NOT_FOUND
-173           00000000-0000-0000-0000-000000000000
-                                                       Create Request
-File: test_file-data
-174           5981ad82-0000-0000-1d86-2dcf00000000  May 27, 2019
-20:16:03.862513400 EDT  May 27, 2019 20:16:03.862513400 EDT  Create
-Response File: test_file-data
-175           5981ad82-0000-0000-1d86-2dcf00000000
-                                                       GetInfo Request
-FILE_INFO/SMB2_FILE_INTERNAL_INFO File: test_file-data
-176
-                                                       GetInfo
-Response
-177           5981ad82-0000-0000-1d86-2dcf00000000
-                                                       Write Request
-Len:12 Off:0 File: test_file-data
-178
-                                                       Write Response
-179
-                                                       Create Request
-File: test_file-data
-180           b8fa5b2d-0000-0000-d86e-38bf00000000  May 27, 2019
-20:16:03.862513400 EDT  May 27, 2019 20:16:03.862513400 EDT  Create
-Response File: test_file-data
-181           b8fa5b2d-0000-0000-d86e-38bf00000000  Oct 31, 2018
-00:00:00.000000000 EDT  Oct 31, 2018 00:00:00.000000000 EDT  SetInfo
-Request FILE_INFO/SMB2_FILE_BASIC_INFO File: test_file-data
-182
-                                                       SetInfo
-Response
-183           b8fa5b2d-0000-0000-d86e-38bf00000000
-                                                       Close Request
-File: test_file-data
-184                                                 Dec 31, 1969
-19:00:00.000000000 EST  Dec 31, 1969 19:00:00.000000000 EST  Close
-Response
-185
-                                                       Create Request
-File: test_file-data
-186           f7323833-0000-0000-5d04-6e1d00000000  Oct 31, 2018
-00:00:00.000000000 EDT  Oct 31, 2018 00:00:00.000000000 EDT  Create
-Response File: test_file-data
-187           f7323833-0000-0000-5d04-6e1d00000000  Dec 31, 1969
-19:00:00.000000000 EST  Dec 31, 1969 19:00:00.000000000 EST  SetInfo
-Request FILE_INFO/SMB2_FILE_BASIC_INFO File: test_file-data
-188
-                                                       SetInfo
-Response
-189           f7323833-0000-0000-5d04-6e1d00000000
-                                                       Close Request
-File: test_file-data
-190                                                 Dec 31, 1969
-19:00:00.000000000 EST  Dec 31, 1969 19:00:00.000000000 EST  Close
-Response
-191           5981ad82-0000-0000-1d86-2dcf00000000
-                                                       Close Request
-File: test_file-data
-192                                                 Dec 31, 1969
-19:00:00.000000000 EST  Dec 31, 1969 19:00:00.000000000 EST  Close
-Response
+This also reverts commit 5f4b55699aaf ("CIFS: Fix BUG() in calc_seckey()"),
+since it is no longer necessary to allocate sec_key on the heap.
 
+Cc: linux-cifs@vger.kernel.org
+Cc: Steve French <sfrench@samba.org>
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ fs/cifs/Kconfig       |  2 +-
+ fs/cifs/cifsencrypt.c | 62 +++++---------------
+ fs/cifs/cifsfs.c      |  1 -
+ 3 files changed, 17 insertions(+), 48 deletions(-)
 
-$ tshark -tad -n -r cp_p-testing-3.16.66.pcap -Y 'smb2.cmd == find' -O
-smb2 | sed '/test_file-data/,/test_file-data/ !d'
-            FileIdBothDirectoryInfo: test_file-data
-                Next Offset: 0
-                File Index: 0x00000000
-                Create: May 27, 2019 20:16:03.862513400 EDT
-                Last Access: Oct 31, 2018 00:00:00.000000000 EDT
-                Last Write: May 27, 2019 20:16:03.872393500 EDT
-                Last Change: May 27, 2019 20:16:03.872393500 EDT
-                End Of File: 12
-                Allocation Size: 1048576
-                File Attributes: 0x00000020
-                    .... .... .... .... .... .... .... ...0 = Read
-Only: NOT read only
-                    .... .... .... .... .... .... .... ..0. = Hidden: NOT hidden
-                    .... .... .... .... .... .... .... .0.. = System:
-NOT a system file/dir
-                    .... .... .... .... .... .... .... 0... = Volume
-ID: NOT a volume ID
-                    .... .... .... .... .... .... ...0 .... =
-Directory: NOT a directory
-                    .... .... .... .... .... .... ..1. .... = Archive:
-Modified since last ARCHIVE
-                    .... .... .... .... .... .... .0.. .... = Device:
-NOT a device
-                    .... .... .... .... .... .... 0... .... = Normal:
-Has some attribute set
-                    .... .... .... .... .... ...0 .... .... =
-Temporary: NOT a temporary file
-                    .... .... .... .... .... ..0. .... .... = Sparse:
-NOT a sparse file
-                    .... .... .... .... .... .0.. .... .... = Reparse
-Point: Does NOT have an associated reparse point
-                    .... .... .... .... .... 0... .... .... =
-Compressed: Uncompressed
-                    .... .... .... .... ...0 .... .... .... = Offline: Online
-                    .... .... .... .... ..0. .... .... .... = Content
-Indexed: NOT content indexed
-                    .... .... .... .... .0.. .... .... .... =
-Encrypted: This is NOT an encrypted file
-                Filename Length: 28
-                EA Size: 60
-                Reserved: 00000000
-                File Id: 0x0000000000052b02
-                Filename: test_file-data
+diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
+index aae2b8b2adf5..523e9ea78a28 100644
+--- a/fs/cifs/Kconfig
++++ b/fs/cifs/Kconfig
+@@ -10,7 +10,7 @@ config CIFS
+ 	select CRYPTO_SHA512
+ 	select CRYPTO_CMAC
+ 	select CRYPTO_HMAC
+-	select CRYPTO_ARC4
++	select CRYPTO_LIB_ARC4
+ 	select CRYPTO_AEAD2
+ 	select CRYPTO_CCM
+ 	select CRYPTO_ECB
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index d2a05e46d6f5..97b7497c13ef 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -33,7 +33,8 @@
+ #include <linux/ctype.h>
+ #include <linux/random.h>
+ #include <linux/highmem.h>
+-#include <crypto/skcipher.h>
++#include <linux/fips.h>
++#include <crypto/arc4.h>
+ #include <crypto/aead.h>
+ 
+ int __cifs_calc_signature(struct smb_rqst *rqst,
+@@ -772,63 +773,32 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ int
+ calc_seckey(struct cifs_ses *ses)
+ {
+-	int rc;
+-	struct crypto_skcipher *tfm_arc4;
+-	struct scatterlist sgin, sgout;
+-	struct skcipher_request *req;
+-	unsigned char *sec_key;
++	unsigned char sec_key[CIFS_SESS_KEY_SIZE]; /* a nonce */
++	struct arc4_ctx *ctx_arc4;
+ 
+-	sec_key = kmalloc(CIFS_SESS_KEY_SIZE, GFP_KERNEL);
+-	if (sec_key == NULL)
+-		return -ENOMEM;
++	if (fips_enabled)
++		return -ENODEV;
+ 
+ 	get_random_bytes(sec_key, CIFS_SESS_KEY_SIZE);
+ 
+-	tfm_arc4 = crypto_alloc_skcipher("ecb(arc4)", 0, CRYPTO_ALG_ASYNC);
+-	if (IS_ERR(tfm_arc4)) {
+-		rc = PTR_ERR(tfm_arc4);
+-		cifs_dbg(VFS, "could not allocate crypto API arc4\n");
+-		goto out;
+-	}
+-
+-	rc = crypto_skcipher_setkey(tfm_arc4, ses->auth_key.response,
+-					CIFS_SESS_KEY_SIZE);
+-	if (rc) {
+-		cifs_dbg(VFS, "%s: Could not set response as a key\n",
+-			 __func__);
+-		goto out_free_cipher;
+-	}
+-
+-	req = skcipher_request_alloc(tfm_arc4, GFP_KERNEL);
+-	if (!req) {
+-		rc = -ENOMEM;
+-		cifs_dbg(VFS, "could not allocate crypto API arc4 request\n");
+-		goto out_free_cipher;
++	ctx_arc4 = kmalloc(sizeof(*ctx_arc4), GFP_KERNEL);
++	if (!ctx_arc4) {
++		cifs_dbg(VFS, "could not allocate arc4 context\n");
++		return -ENOMEM;
+ 	}
+ 
+-	sg_init_one(&sgin, sec_key, CIFS_SESS_KEY_SIZE);
+-	sg_init_one(&sgout, ses->ntlmssp->ciphertext, CIFS_CPHTXT_SIZE);
+-
+-	skcipher_request_set_callback(req, 0, NULL, NULL);
+-	skcipher_request_set_crypt(req, &sgin, &sgout, CIFS_CPHTXT_SIZE, NULL);
+-
+-	rc = crypto_skcipher_encrypt(req);
+-	skcipher_request_free(req);
+-	if (rc) {
+-		cifs_dbg(VFS, "could not encrypt session key rc: %d\n", rc);
+-		goto out_free_cipher;
+-	}
++	arc4_setkey(ctx_arc4, ses->auth_key.response, CIFS_SESS_KEY_SIZE);
++	arc4_crypt(ctx_arc4, ses->ntlmssp->ciphertext, sec_key,
++		   CIFS_CPHTXT_SIZE);
+ 
+ 	/* make secondary_key/nonce as session key */
+ 	memcpy(ses->auth_key.response, sec_key, CIFS_SESS_KEY_SIZE);
+ 	/* and make len as that of session key only */
+ 	ses->auth_key.len = CIFS_SESS_KEY_SIZE;
+ 
+-out_free_cipher:
+-	crypto_free_skcipher(tfm_arc4);
+-out:
+-	kfree(sec_key);
+-	return rc;
++	memzero_explicit(sec_key, CIFS_SESS_KEY_SIZE);
++	kzfree(ctx_arc4);
++	return 0;
+ }
+ 
+ void
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index f5fcd6360056..e55afaf9e5a3 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -1590,7 +1590,6 @@ MODULE_DESCRIPTION
+ 	("VFS to access SMB3 servers e.g. Samba, Macs, Azure and Windows (and "
+ 	"also older servers complying with the SNIA CIFS Specification)");
+ MODULE_VERSION(CIFS_VERSION);
+-MODULE_SOFTDEP("pre: arc4");
+ MODULE_SOFTDEP("pre: des");
+ MODULE_SOFTDEP("pre: ecb");
+ MODULE_SOFTDEP("pre: hmac");
+-- 
+2.20.1
 
-I've added additional notes, strace, and pcap data to both kenel and
-samba bugzillas that seem applicable to this:
-
-  ** Bug 198967 - Modification times not preserved correctly **
-  https://bugzilla.kernel.org/show_bug.cgi?id=198967
-
-  ** Bug 13594 - smbd write time handling differs compared to recent
-Windows releases **
-  https://bugzilla.samba.org/show_bug.cgi?id=13594
-
-The earlier comments about filehandle do not apply as the atime used
-the same filehandle and the filehandle used is what should be used for
-compound operations.
-
-For context, Samba is matching behavior in Windows 2k16.
-
-
-On Thu, Jan 24, 2019 at 5:49 PM Jeremy Allison <jra@samba.org> wrote:
->
-> On Thu, Jan 24, 2019 at 05:47:24PM -0500, Jacob Shivers wrote:
-> > On Thu, Jan 24, 2019 at 3:14 PM Ralph Böhme <slow@samba.org> wrote:
-> > >
-> > > On Thu, Jan 24, 2019 at 12:24:53PM -0500, Jacob Shivers wrote:
-> > > >On Thu, Jan 24, 2019 at 12:11 PM Ralph Böhme via samba-technical
-> > > ><samba-technical@lists.samba.org> wrote:
-> > > >>
-> > > >> On Thu, Jan 24, 2019 at 09:03:41AM -0800, Jeremy Allison via samba-technical wrote:
-> > > >> >Maybe. Changing meta-data semantics on write is fraught with danger,
-> > > >> >and we don't even do that for SMB1 unix extensions. So let's not
-> > > >> >add contraints we don't understand yet please.
-> > > >> >
-> > > >> >My money is on a client bug, as always :-).
-> > > >>
-> > > >> fwiw, just in case you were not aware of this one:
-> > > >>
-> > > >> https://bugzilla.samba.org/show_bug.cgi?id=13594
-> > > >>
-> > > >> We also seem to have a bug that a set-eof on a handle with
-> > > >> set-eof-size=existing-size doesn't flush a pending write time update. At least
-> > > >> newer Windows server seem to do that.
-> > > >
-> > > >This seems like what the issue is.
-> > > >The SMB server is uptime mtime after the server actually flushes to
-> > > >stable storage.
-> > >
-> > > not quite, but still a client bug. :) The client uses a second handle to set the
-> > > mtime, it should use the first handle. Or open the second handle after closing
-> > > the first one where it did the write.
-> >
-> > Ahh.
-> >
-> > Thank you very much for your help and for narrowing down the problem
-> > to a client side bug :)
->
-> Bingo ! I claim my 5 euro :-) :-).
