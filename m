@@ -1,264 +1,144 @@
-Return-Path: <SRS0=wGVY=UO=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=cOZT=UP=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A28AC31E50
-	for <linux-cifs@archiver.kernel.org>; Sat, 15 Jun 2019 17:38:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C271DC31E49
+	for <linux-cifs@archiver.kernel.org>; Sun, 16 Jun 2019 04:18:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0F18F20868
-	for <linux-cifs@archiver.kernel.org>; Sat, 15 Jun 2019 17:38:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 81AAA216C8
+	for <linux-cifs@archiver.kernel.org>; Sun, 16 Jun 2019 04:18:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pt6kDmt5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725796AbfFORiZ convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 15 Jun 2019 13:38:25 -0400
-Received: from mail-pg1-f169.google.com ([209.85.215.169]:37170 "EHLO
-        mail-pg1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725270AbfFORiZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 15 Jun 2019 13:38:25 -0400
-Received: by mail-pg1-f169.google.com with SMTP id 20so3401382pgr.4
-        for <linux-cifs@vger.kernel.org>; Sat, 15 Jun 2019 10:38:25 -0700 (PDT)
+        id S1725821AbfFPES5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 16 Jun 2019 00:18:57 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:36200 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725773AbfFPES5 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 16 Jun 2019 00:18:57 -0400
+Received: by mail-pg1-f194.google.com with SMTP id f21so3878607pgi.3
+        for <linux-cifs@vger.kernel.org>; Sat, 15 Jun 2019 21:18:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=oXBwVztjAj88fXMXyJXoMrO0OxhqbdJmzdfqog0uSSE=;
+        b=Pt6kDmt5IrfWPgAx+wNy2N6HN8ArpCuDlocDfs3TAbejcYeTVht9QoCUcPyV57NUam
+         N5i1uTXYCede/nPFfI5e03di2At0yKMB/LIXB3wn5e9ZogHXyzH/bQzjUaB8BYcaBi80
+         uPjsU3435fRxySRPyyQwSYzJeXwE2vhZ7eyUjTf9rxA1VzJKcJxsQihkPsMhIZVbBk9n
+         QAGjApSgIXmyKWNAE3iWjd6QF5Bsb17+fausBZeuU+CU4guVUZKNHl3khLYm5p4Tgaa9
+         teIczMAHe21GXZ4kZ5+Eog8t9enZHi9W39KSDBhAdUt+fKwID6gRYC5ktrzMRn+im3oe
+         97Qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=VPSGeapLbblMTfU7JbBrVgKQtg994svKjx4xrjIvlUo=;
-        b=Nv+Bw7va+R2RdLhm1Pr0hTwHoPJvPQ5DhupsB8RkAWF2juNK12RjoAWnFE40TLwhnv
-         ZKN59syff6a7H24oTY9ybs6tlOvUDgfkIeENtfoiocOa6OJn8V+Qf1tLry2nWE/B1xMD
-         jqGKwwgD6R8gWsqy7xn95RstvrkFpOvZy0HOU+EPFo/XTCuGtZh2QYD6c7MV0NROJNIz
-         +nQB2qDTuUY2a/K6YE74Ir4cdgeU+l08DVH75eE4j7i9z6Zp3iyTspkUsRwa2W2dOfCW
-         MxlQwOKTlR4NerTVTGNzlKq7mR8h4K6z3btK95JsRnPTMqbSqI1KCtxaABuaJbMMOLVQ
-         zDBg==
-X-Gm-Message-State: APjAAAVB2spX0jUDvUz+zCbdBMmI6PF2nYHaTCpI4XXSW2joea5CSWd1
-        CmOxxm7iLHKjP4O1fTK66Ngj+WIlswOESXavvzIURnZg
-X-Google-Smtp-Source: APXvYqyOW59FRhIJxsnBhHDiAAJz6lb++uHNrV25iUcRFf7B69NVVRAJciPvvVOroIdPRSarbchPHZemhfuosW0m6k8=
-X-Received: by 2002:a17:90a:ca11:: with SMTP id x17mr17484391pjt.107.1560620304511;
- Sat, 15 Jun 2019 10:38:24 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=oXBwVztjAj88fXMXyJXoMrO0OxhqbdJmzdfqog0uSSE=;
+        b=EfzTkGbYx0Rl3Ay1P3+9/c2hak5jMcyxCro75WYqns4GF5h+sWYIDdyiL0suSAOIZM
+         Z19FP3tnWdNy8/nbg6tumQ/pkqlbjTGy3Cgj8uJZjZcXu43oxyyHSqauY6LmyZNuWfb5
+         FIwTrkLKEyCu3YZnbzzwgl06o/wK95hKa35+Kd8cF1Uara3tR8FFXaeL9eV7BWAXy1k+
+         hNYAzX+3KgRLMYPORYNjhF3xo10yGhh3eckF2GaIabFDzYMvd5ahsDz7bZmPqQvxvG60
+         CMEz+fJ/45FYyFGEZK6Twp0lb7+FpsMoHvh9Xo7QMoC1X7SHHLcsG9sGCSuDrJNfS9UT
+         yVnw==
+X-Gm-Message-State: APjAAAUHjLTjDkOxgRfD2ZPzctP86NcUrcWPXzPAin5g7W3ICr3F1EGU
+        QxK4F+FoFY5uXvzumlvp/ha3ZcRjzkSiCqS+qes4fEVv
+X-Google-Smtp-Source: APXvYqxzlSZtZDSVHGB8zqWrd5hLzgGuHsxnuQfoor5TBaxgLdYtM/187Dkkw64kfK8OjTRdfOt1P+9SupB7K0CtIbc=
+X-Received: by 2002:a17:90a:2385:: with SMTP id g5mr19764693pje.12.1560658736328;
+ Sat, 15 Jun 2019 21:18:56 -0700 (PDT)
 MIME-Version: 1.0
-References: <CALe0_75rQHY5em=YEvT-K64uOnWzAeg8p=ZZtH1WhEFzk4nNmg@mail.gmail.com>
- <CAH2r5muMo6LCEW1fTP4bGtf7aXggzs_YthRdB=qYnPg5EUEsJQ@mail.gmail.com>
- <20190123003029.GA235078@jra3> <20190124110829.GC20089@sernet.de>
- <20190124170341.GA104839@jra3> <20190124170945.wsasncusduwg3zbp@kazak>
- <CALe0_75-64OXgeWb6kQu6R1bA2OM9shJ=YQvbPnm6EJ_zHjbiQ@mail.gmail.com>
- <20190124201433.bibu3k2fo7h2bdep@kazak> <CALe0_74ZEDEafvyWqWqCD74TBO5Pyq=G=jb0AMcCmAwmP0OZYQ@mail.gmail.com>
- <20190124224927.GB252624@jra3> <CALe0_76rHGUedvRHvEyYvROPp8fPtvM9unkw7-gsLG2CPYxasw@mail.gmail.com>
- <CAH2r5ms36rp_5c4VaKFOSLEWGNEYXtt2h_HCdLJjhrDXVEnHTw@mail.gmail.com>
-In-Reply-To: <CAH2r5ms36rp_5c4VaKFOSLEWGNEYXtt2h_HCdLJjhrDXVEnHTw@mail.gmail.com>
-From:   Jacob Shivers <jshivers@redhat.com>
-Date:   Sat, 15 Jun 2019 13:37:48 -0400
-Message-ID: <CALe0_74P7HgKPseZommk7u9ixMfQA-cAid1EYDymfC0TLaDBQg@mail.gmail.com>
-Subject: Re: Fwd: SMB2 not respecting mtime values
-To:     Steve French <smfrench@gmail.com>
-Cc:     Jeremy Allison <jra@samba.org>,
-        =?UTF-8?B?UmFscGggQsO2aG1l?= <slow@samba.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 15 Jun 2019 23:18:45 -0500
+Message-ID: <CAH2r5mvo9sWf8VoPb8puCDh4HM6WnrMgjs+HyhUzqEZXtuQwtA@mail.gmail.com>
+Subject: NT_STATUS_INSUFFICIENT_RESOURCES and retrying writes to Windows 10 servers
+To:     Pavel Shilovsky <piastryyy@gmail.com>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Paulo Alcantara <paulo@paulo.ac>,
+        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Also confirming that mtime is preserved when copying to a Windows 2k19 server.
-Windows OS pre 2k16 and 10 are impacted and Samba is impacted.
+By default large file copy to Windows 10 can return MANY potentially
+retryable errors on write (which we don't retry from the Linux cifs
+client) which can cause cp to fail.
 
-On Thu, Jun 13, 2019 at 4:56 PM Steve French <smfrench@gmail.com> wrote:
->
-> I verified that Jacob is correct.   Works (mtime preserved) to Windows
-> 10 server, but fails to Samba 4.10 server (mtime not preserved after
-> being set).
->
-> On Wed, Jun 12, 2019 at 11:19 AM Jacob Shivers <jshivers@redhat.com> wrote:
-> >
-> > I finally got around to making some time for this and I this is indeed
-> > a server side issue.
-> > The SMB client is using the appropriate file handles when setting
-> > atime and mtime and the server initially reports the desired mtime.
-> > The server only slightly later reports a mtime matching that of ctime.
-> >
-> > $ tshark -tad -n -r cp_p-testing-3.16.66.pcap -Y 'smb2.pid == 0xf2d'
-> > -T fields -e frame.number -e smb2.fid -e smb2.last_access.time -e
-> > smb2.last_write.time -e _ws.col.Info -E header=y | tr '\t' '#' |
-> > column -t -s '#'
-> > frame.number  smb2.fid
-> > smb2.last_access.time                smb2.last_write.time
-> >    _ws.col.Info
-> > 170
-> >                                                        Create Request
-> > File: test_file-data
-> > 171
-> >                                                        Create
-> > Response, Error: STATUS_OBJECT_NAME_NOT_FOUND
-> > 173           00000000-0000-0000-0000-000000000000
-> >                                                        Create Request
-> > File: test_file-data
-> > 174           5981ad82-0000-0000-1d86-2dcf00000000  May 27, 2019
-> > 20:16:03.862513400 EDT  May 27, 2019 20:16:03.862513400 EDT  Create
-> > Response File: test_file-data
-> > 175           5981ad82-0000-0000-1d86-2dcf00000000
-> >                                                        GetInfo Request
-> > FILE_INFO/SMB2_FILE_INTERNAL_INFO File: test_file-data
-> > 176
-> >                                                        GetInfo
-> > Response
-> > 177           5981ad82-0000-0000-1d86-2dcf00000000
-> >                                                        Write Request
-> > Len:12 Off:0 File: test_file-data
-> > 178
-> >                                                        Write Response
-> > 179
-> >                                                        Create Request
-> > File: test_file-data
-> > 180           b8fa5b2d-0000-0000-d86e-38bf00000000  May 27, 2019
-> > 20:16:03.862513400 EDT  May 27, 2019 20:16:03.862513400 EDT  Create
-> > Response File: test_file-data
-> > 181           b8fa5b2d-0000-0000-d86e-38bf00000000  Oct 31, 2018
-> > 00:00:00.000000000 EDT  Oct 31, 2018 00:00:00.000000000 EDT  SetInfo
-> > Request FILE_INFO/SMB2_FILE_BASIC_INFO File: test_file-data
-> > 182
-> >                                                        SetInfo
-> > Response
-> > 183           b8fa5b2d-0000-0000-d86e-38bf00000000
-> >                                                        Close Request
-> > File: test_file-data
-> > 184                                                 Dec 31, 1969
-> > 19:00:00.000000000 EST  Dec 31, 1969 19:00:00.000000000 EST  Close
-> > Response
-> > 185
-> >                                                        Create Request
-> > File: test_file-data
-> > 186           f7323833-0000-0000-5d04-6e1d00000000  Oct 31, 2018
-> > 00:00:00.000000000 EDT  Oct 31, 2018 00:00:00.000000000 EDT  Create
-> > Response File: test_file-data
-> > 187           f7323833-0000-0000-5d04-6e1d00000000  Dec 31, 1969
-> > 19:00:00.000000000 EST  Dec 31, 1969 19:00:00.000000000 EST  SetInfo
-> > Request FILE_INFO/SMB2_FILE_BASIC_INFO File: test_file-data
-> > 188
-> >                                                        SetInfo
-> > Response
-> > 189           f7323833-0000-0000-5d04-6e1d00000000
-> >                                                        Close Request
-> > File: test_file-data
-> > 190                                                 Dec 31, 1969
-> > 19:00:00.000000000 EST  Dec 31, 1969 19:00:00.000000000 EST  Close
-> > Response
-> > 191           5981ad82-0000-0000-1d86-2dcf00000000
-> >                                                        Close Request
-> > File: test_file-data
-> > 192                                                 Dec 31, 1969
-> > 19:00:00.000000000 EST  Dec 31, 1969 19:00:00.000000000 EST  Close
-> > Response
-> >
-> >
-> > $ tshark -tad -n -r cp_p-testing-3.16.66.pcap -Y 'smb2.cmd == find' -O
-> > smb2 | sed '/test_file-data/,/test_file-data/ !d'
-> >             FileIdBothDirectoryInfo: test_file-data
-> >                 Next Offset: 0
-> >                 File Index: 0x00000000
-> >                 Create: May 27, 2019 20:16:03.862513400 EDT
-> >                 Last Access: Oct 31, 2018 00:00:00.000000000 EDT
-> >                 Last Write: May 27, 2019 20:16:03.872393500 EDT
-> >                 Last Change: May 27, 2019 20:16:03.872393500 EDT
-> >                 End Of File: 12
-> >                 Allocation Size: 1048576
-> >                 File Attributes: 0x00000020
-> >                     .... .... .... .... .... .... .... ...0 = Read
-> > Only: NOT read only
-> >                     .... .... .... .... .... .... .... ..0. = Hidden: NOT hidden
-> >                     .... .... .... .... .... .... .... .0.. = System:
-> > NOT a system file/dir
-> >                     .... .... .... .... .... .... .... 0... = Volume
-> > ID: NOT a volume ID
-> >                     .... .... .... .... .... .... ...0 .... =
-> > Directory: NOT a directory
-> >                     .... .... .... .... .... .... ..1. .... = Archive:
-> > Modified since last ARCHIVE
-> >                     .... .... .... .... .... .... .0.. .... = Device:
-> > NOT a device
-> >                     .... .... .... .... .... .... 0... .... = Normal:
-> > Has some attribute set
-> >                     .... .... .... .... .... ...0 .... .... =
-> > Temporary: NOT a temporary file
-> >                     .... .... .... .... .... ..0. .... .... = Sparse:
-> > NOT a sparse file
-> >                     .... .... .... .... .... .0.. .... .... = Reparse
-> > Point: Does NOT have an associated reparse point
-> >                     .... .... .... .... .... 0... .... .... =
-> > Compressed: Uncompressed
-> >                     .... .... .... .... ...0 .... .... .... = Offline: Online
-> >                     .... .... .... .... ..0. .... .... .... = Content
-> > Indexed: NOT content indexed
-> >                     .... .... .... .... .0.. .... .... .... =
-> > Encrypted: This is NOT an encrypted file
-> >                 Filename Length: 28
-> >                 EA Size: 60
-> >                 Reserved: 00000000
-> >                 File Id: 0x0000000000052b02
-> >                 Filename: test_file-data
-> >
-> > I've added additional notes, strace, and pcap data to both kenel and
-> > samba bugzillas that seem applicable to this:
-> >
-> >   ** Bug 198967 - Modification times not preserved correctly **
-> >   https://bugzilla.kernel.org/show_bug.cgi?id=198967
-> >
-> >   ** Bug 13594 - smbd write time handling differs compared to recent
-> > Windows releases **
-> >   https://bugzilla.samba.org/show_bug.cgi?id=13594
-> >
-> > The earlier comments about filehandle do not apply as the atime used
-> > the same filehandle and the filehandle used is what should be used for
-> > compound operations.
-> >
-> > For context, Samba is matching behavior in Windows 2k16.
-> >
-> >
-> > On Thu, Jan 24, 2019 at 5:49 PM Jeremy Allison <jra@samba.org> wrote:
-> > >
-> > > On Thu, Jan 24, 2019 at 05:47:24PM -0500, Jacob Shivers wrote:
-> > > > On Thu, Jan 24, 2019 at 3:14 PM Ralph Böhme <slow@samba.org> wrote:
-> > > > >
-> > > > > On Thu, Jan 24, 2019 at 12:24:53PM -0500, Jacob Shivers wrote:
-> > > > > >On Thu, Jan 24, 2019 at 12:11 PM Ralph Böhme via samba-technical
-> > > > > ><samba-technical@lists.samba.org> wrote:
-> > > > > >>
-> > > > > >> On Thu, Jan 24, 2019 at 09:03:41AM -0800, Jeremy Allison via samba-technical wrote:
-> > > > > >> >Maybe. Changing meta-data semantics on write is fraught with danger,
-> > > > > >> >and we don't even do that for SMB1 unix extensions. So let's not
-> > > > > >> >add contraints we don't understand yet please.
-> > > > > >> >
-> > > > > >> >My money is on a client bug, as always :-).
-> > > > > >>
-> > > > > >> fwiw, just in case you were not aware of this one:
-> > > > > >>
-> > > > > >> https://bugzilla.samba.org/show_bug.cgi?id=13594
-> > > > > >>
-> > > > > >> We also seem to have a bug that a set-eof on a handle with
-> > > > > >> set-eof-size=existing-size doesn't flush a pending write time update. At least
-> > > > > >> newer Windows server seem to do that.
-> > > > > >
-> > > > > >This seems like what the issue is.
-> > > > > >The SMB server is uptime mtime after the server actually flushes to
-> > > > > >stable storage.
-> > > > >
-> > > > > not quite, but still a client bug. :) The client uses a second handle to set the
-> > > > > mtime, it should use the first handle. Or open the second handle after closing
-> > > > > the first one where it did the write.
-> > > >
-> > > > Ahh.
-> > > >
-> > > > Thank you very much for your help and for narrowing down the problem
-> > > > to a client side bug :)
-> > >
-> > > Bingo ! I claim my 5 euro :-) :-).
->
->
->
-> --
-> Thanks,
->
-> Steve
+It did look like my patch for the problem worked (see below).  Windows
+10 returns *A LOT* (about 1/3 of writes in some cases I tried) of
+NT_STATUS_INSUFFICIENT_RESOURCES errors (presumably due to the
+'blocking operation credit' max of 64 in Windows 10 - see note 203 of
+MS-SMB2).
+
+"<203> Section 3.3.4.2: Windows-based servers enforce a configurable
+blocking operation credit,
+which defaults to 64 on Windows Vista SP1, Windows 7, Windows 8,
+Windows 8.1, and, Windows 10,
+and defaults to 512 on Windows Server 2008, Windows Server 2008 R2,
+Windows Server 2012 ..."
+
+This patch did seem to work around the problem, but perhaps we should
+use far fewer credits when mounting to Windows 10 even though they are
+giving us enough credits for more? Or change how we do writes to not
+do synchronous writes? I haven't seen this problem to Windows 2016 or
+2019 but perhaps the explanation on note 203  is all we need to know
+... ie that clients can enforce a lower limit than 512
+
+~/cifs-2.6/fs/cifs$ git diff -a
+diff --git a/fs/cifs/smb2maperror.c b/fs/cifs/smb2maperror.c
+index e32c264e3adb..82ade16c9501 100644
+--- a/fs/cifs/smb2maperror.c
++++ b/fs/cifs/smb2maperror.c
+@@ -457,7 +457,7 @@ static const struct status_to_posix_error
+smb2_error_map_table[] = {
+        {STATUS_FILE_INVALID, -EIO, "STATUS_FILE_INVALID"},
+        {STATUS_ALLOTTED_SPACE_EXCEEDED, -EIO,
+        "STATUS_ALLOTTED_SPACE_EXCEEDED"},
+-       {STATUS_INSUFFICIENT_RESOURCES, -EREMOTEIO,
++       {STATUS_INSUFFICIENT_RESOURCES, -EAGAIN,
+                                "STATUS_INSUFFICIENT_RESOURCES"},
+        {STATUS_DFS_EXIT_PATH_FOUND, -EIO, "STATUS_DFS_EXIT_PATH_FOUND"},
+        {STATUS_DEVICE_DATA_ERROR, -EIO, "STATUS_DEVICE_DATA_ERROR"},
+
+
+e.g. see the number of write errors in my 8GB copy in my test below
+
+# cat /proc/fs/cifs/Stats
+Resources in use
+CIFS Session: 1
+Share (unique mount targets): 2
+SMB Request/Response Buffer: 1 Pool size: 5
+SMB Small Req/Resp Buffer: 1 Pool size: 30
+Operations (MIDs): 0
+
+0 session 0 share reconnects
+Total vfs operations: 363 maximum at one time: 2
+
+1) \\10.0.3.4\public-share
+SMBs: 14879
+Bytes read: 0  Bytes written: 8589934592
+Open files: 2 total (local), 0 open on server
+TreeConnects: 3 total 0 failed
+TreeDisconnects: 0 total 0 failed
+Creates: 12 total 0 failed
+Closes: 10 total 0 failed
+Flushes: 0 total 0 failed
+Reads: 0 total 0 failed
+Writes: 14838 total 5624 failed
+...
+
+Any thoughts?
+
+Any risk that we could run into places where EAGAIN would not be
+handled (there are SMB3 commands other than read and write where
+NT_STATUS_INSUFFICIENT_RESOURCES could be returned in theory)
+
+-- 
+Thanks,
+
+Steve
