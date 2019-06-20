@@ -2,94 +2,75 @@ Return-Path: <SRS0=yIrz=UT=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5234DC43613
-	for <linux-cifs@archiver.kernel.org>; Thu, 20 Jun 2019 05:46:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7466BC43613
+	for <linux-cifs@archiver.kernel.org>; Thu, 20 Jun 2019 06:40:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 27FC4208CB
-	for <linux-cifs@archiver.kernel.org>; Thu, 20 Jun 2019 05:46:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P14P/qz5"
+	by mail.kernel.org (Postfix) with ESMTP id 528B120665
+	for <linux-cifs@archiver.kernel.org>; Thu, 20 Jun 2019 06:40:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725889AbfFTFqs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 20 Jun 2019 01:46:48 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:44716 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725857AbfFTFqs (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 20 Jun 2019 01:46:48 -0400
-Received: by mail-pl1-f193.google.com with SMTP id t7so900579plr.11;
-        Wed, 19 Jun 2019 22:46:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Xqza1RteE+yZnsf6TJJy8YfLugJSOmuDDR38PN1bfrc=;
-        b=P14P/qz5XwxUgQH5ZKcLdhJIchj1Br+vuXZXjsECJ9duC6sW8+e7sQHuxcONHn1Bm2
-         pA1wS928va/XyNAnqV8jxGFj33duinqRHd+tnhZojxeriad5MIUXDtAhqhCqlao5K4Ni
-         M3To3kpv9PkqlPQyy4I2tOR94IL0aZt7YULOfgS8gm+i0KDT8MjxZj2H5+VIpdnYJFWn
-         gO5H2E0sLnob/zyruQUTb8237C3Ag0szk4YSU5+y+7lTEB0KC59CwBkJYLRvFP98qVIZ
-         qltVM70znWuEiY9ZokJuMnLs6VsoN5tQrKrM25yreSajOqKYaYnZbgzZsVbOQ1CbuHL/
-         3Seg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Xqza1RteE+yZnsf6TJJy8YfLugJSOmuDDR38PN1bfrc=;
-        b=Eufdd9oFLq+PArlawYEyu+qxPCMbY+cQeYN+uLfIirAyHvqNGIuodyCKZGzOGphwLE
-         /1mI3x/WllGY3NluWl3dMYdqT/5l5FLKsfb0KlfKVAOrFQ+dZUpecqFHHY3wtoWBULvN
-         VIgxc62tWj/DZCh4TbxrVpsd+gMFxYyD7eXS6iPO3AihXI97ZVRpZEhJ7TD9bzFuvQnI
-         b4VdntKC8ltJrkD98bTcTLA7EhJmaAd8mqItcyTZAIf6izd/dTlPVMZr5bM9JN/pVuTg
-         AyCRtmt7y1rnIWaO7mqVuPwQuXsf9DvpA/bZreTqqGt5FwyJ7D3fH//MIDAJGkIZ0Tez
-         HkCA==
-X-Gm-Message-State: APjAAAWgl6W715O0s9aC5PCP86mXGyO89rt7cNyyL6zU9BRentUEuH8O
-        o+PVCsDmuZGh939n5hmJynnwaIuiiZ5n8qPCFQQ=
-X-Google-Smtp-Source: APXvYqyBWIon8FQ32Ge0RTteBZ33psUWVbLEsMlRpTFDS2mZSgvHNpNjiHi3y69kR/hpO4Mc2qv9m2iBUKKaSHQIpfU=
-X-Received: by 2002:a17:902:8543:: with SMTP id d3mr528215plo.78.1561009607478;
- Wed, 19 Jun 2019 22:46:47 -0700 (PDT)
+        id S1726124AbfFTGk1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 20 Jun 2019 02:40:27 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:39766 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726084AbfFTGk0 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 20 Jun 2019 02:40:26 -0400
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1hdqkD-0000lS-Oz; Thu, 20 Jun 2019 14:40:25 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1hdqkB-0000KR-7G; Thu, 20 Jun 2019 14:40:23 +0800
+Date:   Thu, 20 Jun 2019 14:40:23 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Steve French <stfrench@microsoft.com>, linux-cifs@vger.kernel.org
+Cc:     Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: cifs: Fix tracing build error with O=
+Message-ID: <20190620064023.cwvcj5g4rgnmkmmn@gondor.apana.org.au>
 MIME-Version: 1.0
-References: <CAH2r5ms8f_wTwBVofvdRF=tNH2NJHvJC6sWYCJyG6E5PVGTwZQ@mail.gmail.com>
- <CAOQ4uxhC9x-quL0O9CYaqQ6_uX3yW_3PgW=a68AJboB4pjqz1w@mail.gmail.com>
-In-Reply-To: <CAOQ4uxhC9x-quL0O9CYaqQ6_uX3yW_3PgW=a68AJboB4pjqz1w@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 20 Jun 2019 00:46:35 -0500
-Message-ID: <CAH2r5mtUK0AD=igA3fsmJC=ktWodWEhonytbaWHgvaNrt5H8dg@mail.gmail.com>
-Subject: Re: [SMB3][PATCH] fix copy_file_range when copying beyond end of
- source file
-To:     Amir Goldstein <amir73il@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Jun 20, 2019 at 12:28 AM Amir Goldstein <amir73il@gmail.com> wrote:
->
-> On Thu, Jun 20, 2019 at 4:44 AM Steve French <smfrench@gmail.com> wrote:
-> >
-> > Patch attached fixes the case where copy_file_range over an SMB3 mount
-> > tries to go beyond the end of file of the source file.  This fixes
-> > xfstests generic/430 and generic/431
-> >
-> > Amir's patches had added a similar change in the VFS layer...
->
-> BTW, Steve, do you intend to pull Darrick's copy-file-range-fixes
-> branch for 5.3 and add the extra cifs "file_modified" patch?
->
-> Thanks,
-> Amir.
+Currently if you build the kernel with O= then fs/cifs fails with:
 
-Yes - that seems reasonable to me
+$ make O=build
+...
+  CC [M]  fs/cifs/trace.o
+In file included from ../fs/cifs/trace.h:846:0,
+                 from ../fs/cifs/trace.c:8:
+../include/trace/define_trace.h:95:43: fatal error: ./trace.h: No such file or directory
+ #include TRACE_INCLUDE(TRACE_INCLUDE_FILE)
+                                           ^
+compilation terminated.
 
+The reason is that -I$(src) expands to -Ifs/cifs which does not
+work with O=.  This patch fixes it by adding srctree to the front.
 
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/fs/cifs/Makefile b/fs/cifs/Makefile
+index 51af69a1a328..616163deee18 100644
+--- a/fs/cifs/Makefile
++++ b/fs/cifs/Makefile
+@@ -2,7 +2,7 @@
+ #
+ # Makefile for Linux CIFS/SMB2/SMB3 VFS client
+ #
+-ccflags-y += -I$(src)		# needed for trace events
++ccflags-y += -I$(srctree)/$(src)		# needed for trace events
+ obj-$(CONFIG_CIFS) += cifs.o
+ 
+ cifs-y := trace.o cifsfs.o cifssmb.o cifs_debug.o connect.o dir.o file.o \
 -- 
-Thanks,
-
-Steve
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
