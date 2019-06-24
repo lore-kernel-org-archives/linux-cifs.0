@@ -2,79 +2,92 @@ Return-Path: <SRS0=OUxG=UX=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C2FFC43613
-	for <linux-cifs@archiver.kernel.org>; Mon, 24 Jun 2019 19:02:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07B85C43613
+	for <linux-cifs@archiver.kernel.org>; Mon, 24 Jun 2019 19:07:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1DB9E20663
-	for <linux-cifs@archiver.kernel.org>; Mon, 24 Jun 2019 19:02:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BEF3E20663
+	for <linux-cifs@archiver.kernel.org>; Mon, 24 Jun 2019 19:07:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samba.org header.i=@samba.org header.b="iNYrUYfg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LVew9pMa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728404AbfFXTCn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 24 Jun 2019 15:02:43 -0400
-Received: from hr2.samba.org ([144.76.82.148]:47524 "EHLO hr2.samba.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727912AbfFXTCn (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 24 Jun 2019 15:02:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-         s=42627210; h=Message-ID:Cc:To:From:Date;
-        bh=sXmv0rmoVJ0UFhnTzdQARYWS7+Af9W+ln3++XJeZKAs=; b=iNYrUYfgQAIWFuayPUnKySmHiw
-        YneD7/bY4dVAGsbyNkk8Fn85qG8PTJgo3YYcDdKxkzlTYA8ZzG7p0cM54IsKvNIbG/LdFaKe7oukk
-        YEFJx7mrMdFmW/Tar4sdcTklsurJo16/wVZzChdC986WjCgbhukwGYyRRa6J5DJMObpw=;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-        by hr2.samba.org with esmtpsa (TLS1.2:ECDHE_ECDSA_CHACHA20_POLY1305:256)
-        (Exim)
-        id 1hfUEi-0001Rc-KK; Mon, 24 Jun 2019 19:02:41 +0000
-Date:   Mon, 24 Jun 2019 12:02:37 -0700
-From:   Jeremy Allison <jra@samba.org>
-To:     ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc:     Steve French <smfrench@gmail.com>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
-Subject: Re: xfstest 531 and unlink of open file
-Message-ID: <20190624190237.GD3690@jeremy-ThinkPad-X1>
-Reply-To: Jeremy Allison <jra@samba.org>
-References: <CAH2r5mv+oqGxZRkV_ROqdauNW0CYJ7X9uJCk+uYmercJ4De41w@mail.gmail.com>
- <CAN05THTqP+_uSEPq2FqBEnV8FeuutaHASznH6iBDS=C0hCD=kQ@mail.gmail.com>
+        id S1729039AbfFXTHJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 24 Jun 2019 15:07:09 -0400
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:34124 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726599AbfFXTHJ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 24 Jun 2019 15:07:09 -0400
+Received: by mail-lf1-f66.google.com with SMTP id y198so10867816lfa.1
+        for <linux-cifs@vger.kernel.org>; Mon, 24 Jun 2019 12:07:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=rJia6rsurMt3iChC0Zc+7fFHTzWy8U6qXnydOeaoTyo=;
+        b=LVew9pMa6coXyzv1A6fkEuhA5QYIdV/BeOo6yY3HFk40GVrt1fESrk2+tOoJaRbyzk
+         Zx7kazqtRapliP8n2Sq5641wUI7VDcZaHoEdPQZYO46wysqDI3FahkVDYS9mAdEbJ5TS
+         Av0fs4tZLD5cz+C+iODRLTUMrxIHO7692a+6zIDp1Y1LP55JNwBHSf/41bOJAGtWyf4/
+         zkHMhlD6k/ck1mNRc+XGEo1ctjUZRbCo+OtiM3Tucd43lTo6VptjfHLeUlFXx9KrGatH
+         DUsC/VqEL9+tibNhETCTH+VWnVyaBjc00PI3URP5FypfcHEHmueg13jvzd3jfGnI2F+A
+         ybtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=rJia6rsurMt3iChC0Zc+7fFHTzWy8U6qXnydOeaoTyo=;
+        b=SZORFjs9BfAeS3RPsOm71tRisa8A7DBQ9FglH91R6Gg3hfhPXi75Qq6ell9LVHWVr6
+         RAQgVbXaWNVnOoXh4W56zziwDV2OWxkq51IqTlkTBEUC2mL6X8Br4obHLNw4LDJeqEy4
+         QirVoy3o2F1ohP0xiKBPmjCkV5JXueBWt4y3cUUdvEpKkrWtYllBEZrMrLwK1myBJciO
+         KB/AcFYwm26FrCLKB+Sx4tfiEmY0ycmTpxuSJr00fOY9NHENHgYR32fb/Hh8jM/Ocz3u
+         OG+CYfzAYGlYhMQwQD2/7NuAMlnsNUXGN5PLbVqNOTl1HjclonRdaUPXaoDvGDQhe5r7
+         D4bg==
+X-Gm-Message-State: APjAAAW9nF/eE1/6HEFpZtusb2KJPJs42Hdg096e7HRSCCfXW34o/Iw+
+        zs5Sa9yD/XyNyFccAhxz4uSkKbjYEiT0bTZ8Uw==
+X-Google-Smtp-Source: APXvYqzvAx2Q9wBIwfU2JNIu68rzbXHusoHaqBVDCasimzxNOVspIvy5emGSm36+QpRNlS3saztcltt1t9dw0nZZPIs=
+X-Received: by 2002:a19:7110:: with SMTP id m16mr77013843lfc.4.1561403227288;
+ Mon, 24 Jun 2019 12:07:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAN05THTqP+_uSEPq2FqBEnV8FeuutaHASznH6iBDS=C0hCD=kQ@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+References: <CAH2r5mvN2LQG_eWhfes3_tpBwhmg-Q=+L7U+=xFHb4W01_wVJg@mail.gmail.com>
+In-Reply-To: <CAH2r5mvN2LQG_eWhfes3_tpBwhmg-Q=+L7U+=xFHb4W01_wVJg@mail.gmail.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Mon, 24 Jun 2019 12:06:56 -0700
+Message-ID: <CAKywueR8h1ipuWQYZAph729O9f05tUEC2+kzf9RwKTyWgqtV_Q@mail.gmail.com>
+Subject: Re: [SMB3][PATCH] add mount option to allow retrieving POSIX mode
+ from special ACE
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Jun 24, 2019 at 01:44:53PM +1000, ronnie sahlberg via samba-technical wrote:
-> On Mon, Jun 24, 2019 at 1:23 PM Steve French <smfrench@gmail.com> wrote:
-> >
-> > Xioli created a fairly simple unlink test failure reproducer loosely
-> > related to xfstest 531 (see
-> > https://bugzilla.kernel.org/show_bug.cgi?id=203271) which unlinks an
-> > open file then tries to create a file with the same name before
-> > closing the first file (which fails over SMB3/SMB3.11 mounts with
-> > STATUS_DELETE_PENDING).
-> >
-> > Presumably we could work around this by a "silly-rename" trick.
-> > During delete we set delete on close for the file, then close it but
-> > presumably we could check first if the file is open by another local
-> > process and if so try to rename it?
-> >
-> > Ideas?
-> 
-> The test is to check "can you unlink and recreate a file while someone
-> (else) is holding it open?"
-> 
-> I don't think you can rename() a file while other folks have it open :-(
-> This is likely a place where NTFS is too different from Posix that we
-> can't get full 100% posix semantics.
+Can't we use the existing idfromsid for this purpose? We already have
+a plenty of mount options and the list keeps growing.
 
-Yeah, this is one of the places you need SMB3+ POSIX extensions
-(and even there we fail it if a Windows open exists on the same
-handle).
+--
+Best regards,
+Pavel Shilovsky
+
+=D0=BF=D0=BD, 24 =D0=B8=D1=8E=D0=BD. 2019 =D0=B3. =D0=B2 00:20, Steve Frenc=
+h <smfrench@gmail.com>:
+>
+> See e.g. https://docs.microsoft.com/en-us/previous-versions/windows/it-pr=
+o/windows-server-2008-R2-and-2008/hh509017(v=3Dws.10)
+>
+> where it describes use of an ACE with special SID S-1-5-88-3 to store the=
+ mode.
+>
+> Followon patches will add the support for chmod and query_info (stat)
+>
+>
+>
+> --
+> Thanks,
+>
+> Steve
