@@ -2,185 +2,79 @@ Return-Path: <SRS0=OUxG=UX=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2CC9C43613
-	for <linux-cifs@archiver.kernel.org>; Mon, 24 Jun 2019 18:29:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C2FFC43613
+	for <linux-cifs@archiver.kernel.org>; Mon, 24 Jun 2019 19:02:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BACD920645
-	for <linux-cifs@archiver.kernel.org>; Mon, 24 Jun 2019 18:29:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1DB9E20663
+	for <linux-cifs@archiver.kernel.org>; Mon, 24 Jun 2019 19:02:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bLc62iPZ"
+	dkim=pass (1024-bit key) header.d=samba.org header.i=@samba.org header.b="iNYrUYfg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728175AbfFXS3d (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 24 Jun 2019 14:29:33 -0400
-Received: from mail-pf1-f173.google.com ([209.85.210.173]:35860 "EHLO
-        mail-pf1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726885AbfFXS3d (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 24 Jun 2019 14:29:33 -0400
-Received: by mail-pf1-f173.google.com with SMTP id r7so8020571pfl.3
-        for <linux-cifs@vger.kernel.org>; Mon, 24 Jun 2019 11:29:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=yumXNhr1oecb8v5SyoMBA4cZByIKLjbj0HRrSF+i1t8=;
-        b=bLc62iPZSi/jfA83nytmhgI7n1R6wQZpB+S3XZMrQRzg66NJHcDcCQRC09L4eUx/Cr
-         BWYPVG3K/w9zIT6bpD6EnP/hcl/F53ZiTkpetmigt8JpZJjAJjs0w7RPdICT+ipYXC5d
-         lS307r9bBz6UGg3Vm6Z5pVhrcGUOLciU/gUUnfI4u6ncg6sHoHiiZzCts9CbbsiPMRIW
-         HTk+/jJ4fkq0mPOv601jY8yHMYcR6JIY4ihnLDfE2pdeom4skjSzu892XL2wBEfWVV7g
-         r+WzE6Q0y4GgG+b8kqiVEdFVAdod1r6eLK9zUYaZOXG/JVGOA3Foi1JCigt77FH5RlMC
-         g//A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=yumXNhr1oecb8v5SyoMBA4cZByIKLjbj0HRrSF+i1t8=;
-        b=AJQPZsxd3tlN9GF88IAyes/BxEFuqouN5gtBnyNvbo9JiQQNDxPDmqkKgrQfvPpXvQ
-         M0MvL9q8EsZxWsrxrxhbqiKFHYveIRyfbmjbJ+FKzbV/KSrQT8qBPeTME8lhWuxq8bHO
-         QkUsqkD8dyQ4cYjLakkpe288XufUNQrVsGUK1ZU/UYEFm7rFzifrtVyHS3zcq5X4Zy1I
-         rq0J4XtW4UqcRc+grDbwucv/Dhg93rvjzQLX18VPyTbf/NrQ0PaB6UL/8pdOD2F31rE1
-         A+O6CuBk6CO8h07zy67G5x/8+VkCia/1JM/tu+Qdtg95D/At2K1RMV+hH4296j8LThDR
-         5/nA==
-X-Gm-Message-State: APjAAAVi1yGCSn5DI95CJ8JdFAfnfq6NXEUSAlP/ZBgErtLWRCAxUjp1
-        J4Bec2ubcM/E3Dhgn+zo1ZgmW9fGVmKkEtm2FnjsXA==
-X-Google-Smtp-Source: APXvYqzijLRuRn5zzI+2WgpBcUz7wcmTqoX9yGDTwQWVIaw3cS+xJYFLqVMv65JkrHMv9lq8BcG91hgiDh9cdSMhoMI=
-X-Received: by 2002:a17:90a:360c:: with SMTP id s12mr26895272pjb.30.1561400972037;
- Mon, 24 Jun 2019 11:29:32 -0700 (PDT)
+        id S1728404AbfFXTCn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 24 Jun 2019 15:02:43 -0400
+Received: from hr2.samba.org ([144.76.82.148]:47524 "EHLO hr2.samba.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727912AbfFXTCn (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 24 Jun 2019 15:02:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+         s=42627210; h=Message-ID:Cc:To:From:Date;
+        bh=sXmv0rmoVJ0UFhnTzdQARYWS7+Af9W+ln3++XJeZKAs=; b=iNYrUYfgQAIWFuayPUnKySmHiw
+        YneD7/bY4dVAGsbyNkk8Fn85qG8PTJgo3YYcDdKxkzlTYA8ZzG7p0cM54IsKvNIbG/LdFaKe7oukk
+        YEFJx7mrMdFmW/Tar4sdcTklsurJo16/wVZzChdC986WjCgbhukwGYyRRa6J5DJMObpw=;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+        by hr2.samba.org with esmtpsa (TLS1.2:ECDHE_ECDSA_CHACHA20_POLY1305:256)
+        (Exim)
+        id 1hfUEi-0001Rc-KK; Mon, 24 Jun 2019 19:02:41 +0000
+Date:   Mon, 24 Jun 2019 12:02:37 -0700
+From:   Jeremy Allison <jra@samba.org>
+To:     ronnie sahlberg <ronniesahlberg@gmail.com>
+Cc:     Steve French <smfrench@gmail.com>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>
+Subject: Re: xfstest 531 and unlink of open file
+Message-ID: <20190624190237.GD3690@jeremy-ThinkPad-X1>
+Reply-To: Jeremy Allison <jra@samba.org>
+References: <CAH2r5mv+oqGxZRkV_ROqdauNW0CYJ7X9uJCk+uYmercJ4De41w@mail.gmail.com>
+ <CAN05THTqP+_uSEPq2FqBEnV8FeuutaHASznH6iBDS=C0hCD=kQ@mail.gmail.com>
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 24 Jun 2019 13:29:21 -0500
-Message-ID: <CAH2r5mvobnG1wvyk-ymMKKUCRsAzn2ky8jA8YguFFaUjsVihGw@mail.gmail.com>
-Subject: Minor cleanup of compound_send_recv
-To:     CIFS <linux-cifs@vger.kernel.org>
-Cc:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Content-Type: multipart/mixed; boundary="0000000000004a91cf058c15fea5"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAN05THTqP+_uSEPq2FqBEnV8FeuutaHASznH6iBDS=C0hCD=kQ@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---0000000000004a91cf058c15fea5
-Content-Type: text/plain; charset="UTF-8"
+On Mon, Jun 24, 2019 at 01:44:53PM +1000, ronnie sahlberg via samba-technical wrote:
+> On Mon, Jun 24, 2019 at 1:23 PM Steve French <smfrench@gmail.com> wrote:
+> >
+> > Xioli created a fairly simple unlink test failure reproducer loosely
+> > related to xfstest 531 (see
+> > https://bugzilla.kernel.org/show_bug.cgi?id=203271) which unlinks an
+> > open file then tries to create a file with the same name before
+> > closing the first file (which fails over SMB3/SMB3.11 mounts with
+> > STATUS_DELETE_PENDING).
+> >
+> > Presumably we could work around this by a "silly-rename" trick.
+> > During delete we set delete on close for the file, then close it but
+> > presumably we could check first if the file is open by another local
+> > process and if so try to rename it?
+> >
+> > Ideas?
+> 
+> The test is to check "can you unlink and recreate a file while someone
+> (else) is holding it open?"
+> 
+> I don't think you can rename() a file while other folks have it open :-(
+> This is likely a place where NTFS is too different from Posix that we
+> can't get full 100% posix semantics.
 
-In Aurelien's earlier patch series I noticed a cleanup (converting
-ses->server to a local variable server=ses->server) which made code
-easier to read in this function.  This doesn't require compounding but
-probably helps his
-
-
-
--- 
-Thanks,
-
-Steve
-
---0000000000004a91cf058c15fea5
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-minor-cleanup-of-compound_send_recv.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-minor-cleanup-of-compound_send_recv.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_jxapsmem0>
-X-Attachment-Id: f_jxapsmem0
-
-RnJvbSAxMTM1YTVmYzA4ZjQ1ZjkxOGE2OGIzYTYwNGFlMzQ3Y2Q3MGYzOTIxIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBBdXJlbGllbiBBcHRlbCA8YWFwdGVsQHN1c2UuY29tPgpEYXRl
-OiBNb24sIDI0IEp1biAyMDE5IDEzOjAwOjEyIC0wNTAwClN1YmplY3Q6IFtQQVRDSF0gc21iMzog
-bWlub3IgY2xlYW51cCBvZiBjb21wb3VuZF9zZW5kX3JlY3YKClRyaXZpYWwgY2xlYW51cC4gV2ls
-bCBtYWtlIGZ1dHVyZSBtdWx0aWNoYW5uZWwgY29kZSBzbWFsbGVyCmFzIHdlbGwuCgpTaWduZWQt
-b2ZmLWJ5OiBBdXJlbGllbiBBcHRlbCA8YWFwdGVsQHN1c2UuY29tPgotLS0KIGZzL2NpZnMvdHJh
-bnNwb3J0LmMgfCA0NiArKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0KIDEgZmlsZSBjaGFuZ2VkLCAyNCBpbnNlcnRpb25zKCspLCAyMiBkZWxldGlvbnMoLSkKCmRp
-ZmYgLS1naXQgYS9mcy9jaWZzL3RyYW5zcG9ydC5jIGIvZnMvY2lmcy90cmFuc3BvcnQuYwppbmRl
-eCA2MDY2MWIzZjk4M2EuLjVkNmQ0NGJmZTEwYSAxMDA2NDQKLS0tIGEvZnMvY2lmcy90cmFuc3Bv
-cnQuYworKysgYi9mcy9jaWZzL3RyYW5zcG9ydC5jCkBAIC05NzksNiArOTc5LDcgQEAgY29tcG91
-bmRfc2VuZF9yZWN2KGNvbnN0IHVuc2lnbmVkIGludCB4aWQsIHN0cnVjdCBjaWZzX3NlcyAqc2Vz
-LAogCX07CiAJdW5zaWduZWQgaW50IGluc3RhbmNlOwogCWNoYXIgKmJ1ZjsKKwlzdHJ1Y3QgVENQ
-X1NlcnZlcl9JbmZvICpzZXJ2ZXI7CiAKIAlvcHR5cGUgPSBmbGFncyAmIENJRlNfT1BfTUFTSzsK
-IApAQCAtOTkwLDcgKzk5MSw4IEBAIGNvbXBvdW5kX3NlbmRfcmVjdihjb25zdCB1bnNpZ25lZCBp
-bnQgeGlkLCBzdHJ1Y3QgY2lmc19zZXMgKnNlcywKIAkJcmV0dXJuIC1FSU87CiAJfQogCi0JaWYg
-KHNlcy0+c2VydmVyLT50Y3BTdGF0dXMgPT0gQ2lmc0V4aXRpbmcpCisJc2VydmVyID0gc2VzLT5z
-ZXJ2ZXI7CisJaWYgKHNlcnZlci0+dGNwU3RhdHVzID09IENpZnNFeGl0aW5nKQogCQlyZXR1cm4g
-LUVOT0VOVDsKIAogCS8qCkBAIC0xMDAxLDcgKzEwMDMsNyBAQCBjb21wb3VuZF9zZW5kX3JlY3Yo
-Y29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGNpZnNfc2VzICpzZXMsCiAJICogb3RoZXIg
-cmVxdWVzdHMuCiAJICogVGhpcyBjYW4gYmUgaGFuZGxlZCBieSB0aGUgZXZlbnR1YWwgc2Vzc2lv
-biByZWNvbm5lY3QuCiAJICovCi0JcmMgPSB3YWl0X2Zvcl9jb21wb3VuZF9yZXF1ZXN0KHNlcy0+
-c2VydmVyLCBudW1fcnFzdCwgZmxhZ3MsCisJcmMgPSB3YWl0X2Zvcl9jb21wb3VuZF9yZXF1ZXN0
-KHNlcnZlciwgbnVtX3Jxc3QsIGZsYWdzLAogCQkJCSAgICAgICAmaW5zdGFuY2UpOwogCWlmIChy
-YykKIAkJcmV0dXJuIHJjOwpAQCAtMTAxNyw3ICsxMDE5LDcgQEAgY29tcG91bmRfc2VuZF9yZWN2
-KGNvbnN0IHVuc2lnbmVkIGludCB4aWQsIHN0cnVjdCBjaWZzX3NlcyAqc2VzLAogCSAqIG9mIHNt
-YiBkYXRhLgogCSAqLwogCi0JbXV0ZXhfbG9jaygmc2VzLT5zZXJ2ZXItPnNydl9tdXRleCk7CisJ
-bXV0ZXhfbG9jaygmc2VydmVyLT5zcnZfbXV0ZXgpOwogCiAJLyoKIAkgKiBBbGwgdGhlIHBhcnRz
-IG9mIHRoZSBjb21wb3VuZCBjaGFpbiBiZWxvbmcgb2J0YWluZWQgY3JlZGl0cyBmcm9tIHRoZQpA
-QCAtMTAyNiwyNCArMTAyOCwyNCBAQCBjb21wb3VuZF9zZW5kX3JlY3YoY29uc3QgdW5zaWduZWQg
-aW50IHhpZCwgc3RydWN0IGNpZnNfc2VzICpzZXMsCiAJICogd2Ugb2J0YWluZWQgY3JlZGl0cyBh
-bmQgcmV0dXJuIC1FQUdBSU4gaW4gc3VjaCBjYXNlcyB0byBsZXQgY2FsbGVycwogCSAqIGhhbmRs
-ZSBpdC4KIAkgKi8KLQlpZiAoaW5zdGFuY2UgIT0gc2VzLT5zZXJ2ZXItPnJlY29ubmVjdF9pbnN0
-YW5jZSkgewotCQltdXRleF91bmxvY2soJnNlcy0+c2VydmVyLT5zcnZfbXV0ZXgpOworCWlmIChp
-bnN0YW5jZSAhPSBzZXJ2ZXItPnJlY29ubmVjdF9pbnN0YW5jZSkgeworCQltdXRleF91bmxvY2so
-JnNlcnZlci0+c3J2X211dGV4KTsKIAkJZm9yIChqID0gMDsgaiA8IG51bV9ycXN0OyBqKyspCi0J
-CQlhZGRfY3JlZGl0cyhzZXMtPnNlcnZlciwgJmNyZWRpdHNbal0sIG9wdHlwZSk7CisJCQlhZGRf
-Y3JlZGl0cyhzZXJ2ZXIsICZjcmVkaXRzW2pdLCBvcHR5cGUpOwogCQlyZXR1cm4gLUVBR0FJTjsK
-IAl9CiAKIAlmb3IgKGkgPSAwOyBpIDwgbnVtX3Jxc3Q7IGkrKykgewotCQltaWRRW2ldID0gc2Vz
-LT5zZXJ2ZXItPm9wcy0+c2V0dXBfcmVxdWVzdChzZXMsICZycXN0W2ldKTsKKwkJbWlkUVtpXSA9
-IHNlcnZlci0+b3BzLT5zZXR1cF9yZXF1ZXN0KHNlcywgJnJxc3RbaV0pOwogCQlpZiAoSVNfRVJS
-KG1pZFFbaV0pKSB7Ci0JCQlyZXZlcnRfY3VycmVudF9taWQoc2VzLT5zZXJ2ZXIsIGkpOworCQkJ
-cmV2ZXJ0X2N1cnJlbnRfbWlkKHNlcnZlciwgaSk7CiAJCQlmb3IgKGogPSAwOyBqIDwgaTsgaisr
-KQogCQkJCWNpZnNfZGVsZXRlX21pZChtaWRRW2pdKTsKLQkJCW11dGV4X3VubG9jaygmc2VzLT5z
-ZXJ2ZXItPnNydl9tdXRleCk7CisJCQltdXRleF91bmxvY2soJnNlcnZlci0+c3J2X211dGV4KTsK
-IAogCQkJLyogVXBkYXRlICMgb2YgcmVxdWVzdHMgb24gd2lyZSB0byBzZXJ2ZXIgKi8KIAkJCWZv
-ciAoaiA9IDA7IGogPCBudW1fcnFzdDsgaisrKQotCQkJCWFkZF9jcmVkaXRzKHNlcy0+c2VydmVy
-LCAmY3JlZGl0c1tqXSwgb3B0eXBlKTsKKwkJCQlhZGRfY3JlZGl0cyhzZXJ2ZXIsICZjcmVkaXRz
-W2pdLCBvcHR5cGUpOwogCQkJcmV0dXJuIFBUUl9FUlIobWlkUVtpXSk7CiAJCX0KIApAQCAtMTA1
-OSwxOSArMTA2MSwxOSBAQCBjb21wb3VuZF9zZW5kX3JlY3YoY29uc3QgdW5zaWduZWQgaW50IHhp
-ZCwgc3RydWN0IGNpZnNfc2VzICpzZXMsCiAJCWVsc2UKIAkJCW1pZFFbaV0tPmNhbGxiYWNrID0g
-Y2lmc19jb21wb3VuZF9sYXN0X2NhbGxiYWNrOwogCX0KLQljaWZzX2luX3NlbmRfaW5jKHNlcy0+
-c2VydmVyKTsKLQlyYyA9IHNtYl9zZW5kX3Jxc3Qoc2VzLT5zZXJ2ZXIsIG51bV9ycXN0LCBycXN0
-LCBmbGFncyk7Ci0JY2lmc19pbl9zZW5kX2RlYyhzZXMtPnNlcnZlcik7CisJY2lmc19pbl9zZW5k
-X2luYyhzZXJ2ZXIpOworCXJjID0gc21iX3NlbmRfcnFzdChzZXJ2ZXIsIG51bV9ycXN0LCBycXN0
-LCBmbGFncyk7CisJY2lmc19pbl9zZW5kX2RlYyhzZXJ2ZXIpOwogCiAJZm9yIChpID0gMDsgaSA8
-IG51bV9ycXN0OyBpKyspCiAJCWNpZnNfc2F2ZV93aGVuX3NlbnQobWlkUVtpXSk7CiAKIAlpZiAo
-cmMgPCAwKSB7Ci0JCXJldmVydF9jdXJyZW50X21pZChzZXMtPnNlcnZlciwgbnVtX3Jxc3QpOwot
-CQlzZXMtPnNlcnZlci0+c2VxdWVuY2VfbnVtYmVyIC09IDI7CisJCXJldmVydF9jdXJyZW50X21p
-ZChzZXJ2ZXIsIG51bV9ycXN0KTsKKwkJc2VydmVyLT5zZXF1ZW5jZV9udW1iZXIgLT0gMjsKIAl9
-CiAKLQltdXRleF91bmxvY2soJnNlcy0+c2VydmVyLT5zcnZfbXV0ZXgpOworCW11dGV4X3VubG9j
-aygmc2VydmVyLT5zcnZfbXV0ZXgpOwogCiAJLyoKIAkgKiBJZiBzZW5kaW5nIGZhaWxlZCBmb3Ig
-c29tZSByZWFzb24gb3IgaXQgaXMgYW4gb3Bsb2NrIGJyZWFrIHRoYXQgd2UKQEAgLTEwNzksNyAr
-MTA4MSw3IEBAIGNvbXBvdW5kX3NlbmRfcmVjdihjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1
-Y3QgY2lmc19zZXMgKnNlcywKIAkgKi8KIAlpZiAocmMgPCAwIHx8IChmbGFncyAmIENJRlNfTk9f
-U1JWX1JTUCkpIHsKIAkJZm9yIChpID0gMDsgaSA8IG51bV9ycXN0OyBpKyspCi0JCQlhZGRfY3Jl
-ZGl0cyhzZXMtPnNlcnZlciwgJmNyZWRpdHNbaV0sIG9wdHlwZSk7CisJCQlhZGRfY3JlZGl0cyhz
-ZXJ2ZXIsICZjcmVkaXRzW2ldLCBvcHR5cGUpOwogCQlnb3RvIG91dDsKIAl9CiAKQEAgLTEwOTks
-NyArMTEwMSw3IEBAIGNvbXBvdW5kX3NlbmRfcmVjdihjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBz
-dHJ1Y3QgY2lmc19zZXMgKnNlcywKIAkJCQkJICAgcnFzdFswXS5ycV9udmVjKTsKIAogCWZvciAo
-aSA9IDA7IGkgPCBudW1fcnFzdDsgaSsrKSB7Ci0JCXJjID0gd2FpdF9mb3JfcmVzcG9uc2Uoc2Vz
-LT5zZXJ2ZXIsIG1pZFFbaV0pOworCQlyYyA9IHdhaXRfZm9yX3Jlc3BvbnNlKHNlcnZlciwgbWlk
-UVtpXSk7CiAJCWlmIChyYyAhPSAwKQogCQkJYnJlYWs7CiAJfQpAQCAtMTEwNyw3ICsxMTA5LDcg
-QEAgY29tcG91bmRfc2VuZF9yZWN2KGNvbnN0IHVuc2lnbmVkIGludCB4aWQsIHN0cnVjdCBjaWZz
-X3NlcyAqc2VzLAogCQlmb3IgKDsgaSA8IG51bV9ycXN0OyBpKyspIHsKIAkJCWNpZnNfZGJnKFZG
-UywgIkNhbmNlbGxpbmcgd2FpdCBmb3IgbWlkICVsbHUgY21kOiAlZFxuIiwKIAkJCQkgbWlkUVtp
-XS0+bWlkLCBsZTE2X3RvX2NwdShtaWRRW2ldLT5jb21tYW5kKSk7Ci0JCQlzZW5kX2NhbmNlbChz
-ZXMtPnNlcnZlciwgJnJxc3RbaV0sIG1pZFFbaV0pOworCQkJc2VuZF9jYW5jZWwoc2VydmVyLCAm
-cnFzdFtpXSwgbWlkUVtpXSk7CiAJCQlzcGluX2xvY2soJkdsb2JhbE1pZF9Mb2NrKTsKIAkJCWlm
-IChtaWRRW2ldLT5taWRfc3RhdGUgPT0gTUlEX1JFUVVFU1RfU1VCTUlUVEVEKSB7CiAJCQkJbWlk
-UVtpXS0+bWlkX2ZsYWdzIHw9IE1JRF9XQUlUX0NBTkNFTExFRDsKQEAgLTExMjMsNyArMTEyNSw3
-IEBAIGNvbXBvdW5kX3NlbmRfcmVjdihjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1Y3QgY2lm
-c19zZXMgKnNlcywKIAkJaWYgKHJjIDwgMCkKIAkJCWdvdG8gb3V0OwogCi0JCXJjID0gY2lmc19z
-eW5jX21pZF9yZXN1bHQobWlkUVtpXSwgc2VzLT5zZXJ2ZXIpOworCQlyYyA9IGNpZnNfc3luY19t
-aWRfcmVzdWx0KG1pZFFbaV0sIHNlcnZlcik7CiAJCWlmIChyYyAhPSAwKSB7CiAJCQkvKiBtYXJr
-IHRoaXMgbWlkIGFzIGNhbmNlbGxlZCB0byBub3QgZnJlZSBpdCBiZWxvdyAqLwogCQkJY2FuY2Vs
-bGVkX21pZFtpXSA9IHRydWU7CkBAIC0xMTQwLDE0ICsxMTQyLDE0IEBAIGNvbXBvdW5kX3NlbmRf
-cmVjdihjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1Y3QgY2lmc19zZXMgKnNlcywKIAkJYnVm
-ID0gKGNoYXIgKiltaWRRW2ldLT5yZXNwX2J1ZjsKIAkJcmVzcF9pb3ZbaV0uaW92X2Jhc2UgPSBi
-dWY7CiAJCXJlc3BfaW92W2ldLmlvdl9sZW4gPSBtaWRRW2ldLT5yZXNwX2J1Zl9zaXplICsKLQkJ
-CXNlcy0+c2VydmVyLT52YWxzLT5oZWFkZXJfcHJlYW1ibGVfc2l6ZTsKKwkJCXNlcnZlci0+dmFs
-cy0+aGVhZGVyX3ByZWFtYmxlX3NpemU7CiAKIAkJaWYgKG1pZFFbaV0tPmxhcmdlX2J1ZikKIAkJ
-CXJlc3BfYnVmX3R5cGVbaV0gPSBDSUZTX0xBUkdFX0JVRkZFUjsKIAkJZWxzZQogCQkJcmVzcF9i
-dWZfdHlwZVtpXSA9IENJRlNfU01BTExfQlVGRkVSOwogCi0JCXJjID0gc2VzLT5zZXJ2ZXItPm9w
-cy0+Y2hlY2tfcmVjZWl2ZShtaWRRW2ldLCBzZXMtPnNlcnZlciwKKwkJcmMgPSBzZXJ2ZXItPm9w
-cy0+Y2hlY2tfcmVjZWl2ZShtaWRRW2ldLCBzZXJ2ZXIsCiAJCQkJCQkgICAgIGZsYWdzICYgQ0lG
-U19MT0dfRVJST1IpOwogCiAJCS8qIG1hcmsgaXQgc28gYnVmIHdpbGwgbm90IGJlIGZyZWVkIGJ5
-IGNpZnNfZGVsZXRlX21pZCAqLwotLSAKMi4yMC4xCgo=
---0000000000004a91cf058c15fea5--
+Yeah, this is one of the places you need SMB3+ POSIX extensions
+(and even there we fail it if a Windows open exists on the same
+handle).
