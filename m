@@ -7,89 +7,82 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E3B8C4646B
-	for <linux-cifs@archiver.kernel.org>; Mon, 24 Jun 2019 21:37:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48857C4646B
+	for <linux-cifs@archiver.kernel.org>; Mon, 24 Jun 2019 21:41:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3783420663
-	for <linux-cifs@archiver.kernel.org>; Mon, 24 Jun 2019 21:37:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1818A204FD
+	for <linux-cifs@archiver.kernel.org>; Mon, 24 Jun 2019 21:41:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BLUTVUkx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ilmf6fGP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728924AbfFXVhH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 24 Jun 2019 17:37:07 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:40899 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726376AbfFXVhH (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 24 Jun 2019 17:37:07 -0400
-Received: by mail-io1-f68.google.com with SMTP id n5so187286ioc.7
-        for <linux-cifs@vger.kernel.org>; Mon, 24 Jun 2019 14:37:07 -0700 (PDT)
+        id S1728505AbfFXVl1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 24 Jun 2019 17:41:27 -0400
+Received: from mail-io1-f52.google.com ([209.85.166.52]:34901 "EHLO
+        mail-io1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728303AbfFXVl1 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 24 Jun 2019 17:41:27 -0400
+Received: by mail-io1-f52.google.com with SMTP id m24so1670420ioo.2
+        for <linux-cifs@vger.kernel.org>; Mon, 24 Jun 2019 14:41:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=e5N+5qxMjFwWKHLcQ7T7a2+5aIzVq4QQH0lGNWKe1Pw=;
-        b=BLUTVUkxhlIngUCqa8zag/pA9Twf7nG0FNLRugd+LMYcY0Z5Hg0080tPue6DKQQmXQ
-         MTb6G5AylWwy4N7xunMscgzfGGjwYFvJvqZjJfYYrJphmx4zgGnG8x98kQZsCrbDb+hm
-         ivKxkWgHqW974rZnCaQwHoZns0QgM7KBOofN/bQaW/g/44n+AVlo2ul5/OICdDTIChGh
-         brfpvCELvBtL1xPO+Z+rPrYioBS+S6Lsw7apbbFNThvPBHWx/7fGy4yNfIg0S/pGJm/g
-         3v+jdApko5+HsVfS4Vhafa+W9D/jHh5kXXX3Ln9pCtIUbBPx4Q8IQB6H2tVfewdLNY25
-         77Kw==
+        bh=/ww83orLgDhYYq1rwPjnguW7XEtyJHhRZRrehTG7Vok=;
+        b=ilmf6fGPkRI8jXOddsH4m97YedEc3pk9GPZsgnwD9OLt2KFFzGAdX6xBtzjcpwARo+
+         x4EHFt0XfSxYJDQAGFud6Z2R7kd7LuDQKV2iwYOHAIFs79vmIWwciWEb9C3HMJyPpp4K
+         2KpL3UWDwSEm4CS8U4SPSufBhEk4p/ZBDhFQeBGFPqc6eKLGsLlMvEWalUh9diAYsPtT
+         Ma7bXxrW3Wj6bGmOV91VSLRaFk35Z7m/y3YuTyrs06ER11MTF1ZzNoqU0OydLFBzb6LA
+         X0F+BKObRxCfalETyG6KYXWIqHhGcPE1j/swJRpiNxsABcdwQ0dVQhDlt4MkF8xj1qwW
+         pzsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=e5N+5qxMjFwWKHLcQ7T7a2+5aIzVq4QQH0lGNWKe1Pw=;
-        b=HyYZTbar70ug1Y7ephnfqwfs8nn0MjNiVoaLQjaDHtD1/LuNZoUvugHDhyrD5ocGNf
-         lST9MDC3uhEJu6F50x9n9wiSHO6Fu9Z/JnCzvTct7D/mH3y8MnKIMQlsSnKBb44lQ5eF
-         t6HKDbJsavzUr7f8LOwUNX4YmLSmXoJDTcqqXRNT9MiM0qQT6Vu6y8NHeQHKYJ+7E4C8
-         BZpiP/3aeycQpDBeGyqLrLuosnsUhCWrkoib/jG8mKO3qlrMdRIqnMyRHnKIqZtiBUGE
-         jZTuvQzi9OMcYSAhHKylnEkFIM/gCTuq92YnrEe1PJSm8QQVYYiM2buVHlYS0mz1Fyo0
-         vBcg==
-X-Gm-Message-State: APjAAAXLRuplRPrTyi7whqG2nrSsOOlp5rvqVGO2KnA+QR3L4E1OmdeN
-        8qTny6/bxN371/Q8q81zBSEnuBk7kINY3ZhcC/aD4A==
-X-Google-Smtp-Source: APXvYqzKyHEmIIjCpz5zk/X1ISnn07afV+LK+ooYfayU8jXsndbxyG8xxXoFNiISMVt11/I31RfJZvb56vXC71Ri/WE=
-X-Received: by 2002:a6b:641a:: with SMTP id t26mr13638944iog.3.1561412226918;
- Mon, 24 Jun 2019 14:37:06 -0700 (PDT)
+        bh=/ww83orLgDhYYq1rwPjnguW7XEtyJHhRZRrehTG7Vok=;
+        b=m6mGZd4xQrzd5DtwtxuzNTGKK8qk/SC+4uXT/RMEmhLaDtdAQF7LFOaQMFAxYipsUo
+         ExImF0JUivTaqSIKeTCXJIFHjfcc3ddLJQifnYef94nvavklf7b92rzDZbHVFSQkjPPa
+         whdXVDOnbkp36D7xC0NjZYYjzB4gWAN3hZFNaszJw91myk/lr5SQ1kfecrlNQobFFvib
+         b3lPXjqSiAcMnsRMLfZFiV93I7cCuD3ExA6URpSjho9XpBs9O9M6jADTr3TdSXqMge6r
+         OcbmPM1BR/VOWG0GzVcDC0debMhT0nQWDADDdIIkbpED5Qshtez7+LP/V/OXJ+jKEfoc
+         YffA==
+X-Gm-Message-State: APjAAAUB76z0Ae9bUFvexDvICRNSiCwShzcYqRnta+d7Drl8/bq7rluj
+        CaO5AJMcRwYoVNJzSFS5e5JSYHdLDRvn1V/BYC4=
+X-Google-Smtp-Source: APXvYqzXz3cPZz2KY4LXduMHEe6aPau9OZUYEo5Qlk/zWZsbzaDqz8AFCZTLrLTnrVol0pKHWYI6D2MwlX3V3/Gljek=
+X-Received: by 2002:a02:9f84:: with SMTP id a4mr32688517jam.20.1561412486784;
+ Mon, 24 Jun 2019 14:41:26 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5mvN2LQG_eWhfes3_tpBwhmg-Q=+L7U+=xFHb4W01_wVJg@mail.gmail.com>
- <CAH2r5muF+bppZPXFKq2qMc=muVEmg30455M_EXjDZhf6r_i0tQ@mail.gmail.com>
-In-Reply-To: <CAH2r5muF+bppZPXFKq2qMc=muVEmg30455M_EXjDZhf6r_i0tQ@mail.gmail.com>
+References: <CAH2r5mvobnG1wvyk-ymMKKUCRsAzn2ky8jA8YguFFaUjsVihGw@mail.gmail.com>
+In-Reply-To: <CAH2r5mvobnG1wvyk-ymMKKUCRsAzn2ky8jA8YguFFaUjsVihGw@mail.gmail.com>
 From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Tue, 25 Jun 2019 07:36:55 +1000
-Message-ID: <CAN05THR4Ocmhe6pfCeDaVa+tKRy4t+r3pMtkwLOy0X5VJCw1rg@mail.gmail.com>
-Subject: Re: [SMB3][PATCH] add mount option to allow retrieving POSIX mode
- from special ACE
+Date:   Tue, 25 Jun 2019 07:41:15 +1000
+Message-ID: <CAN05THSyPoune8RoZ27Az42Os+1chJWWrRwZn9KTmQ3iHJV2EA@mail.gmail.com>
+Subject: Re: Minor cleanup of compound_send_recv
 To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+On Tue, Jun 25, 2019 at 7:24 AM Steve French <smfrench@gmail.com> wrote:
+>
+> In Aurelien's earlier patch series I noticed a cleanup (converting
+> ses->server to a local variable server=ses->server) which made code
+> easier to read in this function.  This doesn't require compounding but
+> probably helps his
+>
+
+LGTM.
+
+Possibly initialize server where you declare it as we do that for
+*server almost everywhere else :
+
++ struct TCP_Server_Info *server = ses->server;
+
 Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
 
-On Tue, Jun 25, 2019 at 7:22 AM Steve French <smfrench@gmail.com> wrote:
->
-> I missed a couple lines in the earlier version of this patch that I
-> sent last night - updated one attached.
->
->
-> On Mon, Jun 24, 2019 at 2:11 AM Steve French <smfrench@gmail.com> wrote:
-> >
-> > See e.g. https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/hh509017(v=ws.10)
-> >
-> > where it describes use of an ACE with special SID S-1-5-88-3 to store the mode.
-> >
-> > Followon patches will add the support for chmod and query_info (stat)
-> >
-> >
-> >
-> > --
-> > Thanks,
-> >
-> > Steve
->
 >
 >
 > --
