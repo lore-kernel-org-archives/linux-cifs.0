@@ -4,37 +4,37 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D954C48BD3
-	for <linux-cifs@archiver.kernel.org>; Thu, 27 Jun 2019 02:21:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D135C48BD7
+	for <linux-cifs@archiver.kernel.org>; Thu, 27 Jun 2019 04:57:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1F8C921726
-	for <linux-cifs@archiver.kernel.org>; Thu, 27 Jun 2019 02:21:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F02EF218A2
+	for <linux-cifs@archiver.kernel.org>; Thu, 27 Jun 2019 04:57:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726900AbfF0CV4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 26 Jun 2019 22:21:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60128 "EHLO mx1.redhat.com"
+        id S1725787AbfF0E5M (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 27 Jun 2019 00:57:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33748 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726817AbfF0CV4 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 26 Jun 2019 22:21:56 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        id S1725385AbfF0E5M (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 27 Jun 2019 00:57:12 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 10DDA3082AF2;
-        Thu, 27 Jun 2019 02:21:56 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 9B6FF36807;
+        Thu, 27 Jun 2019 04:57:11 +0000 (UTC)
 Received: from test1135.test.redhat.com (vpn2-54-99.bne.redhat.com [10.64.54.99])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 643A160856;
-        Thu, 27 Jun 2019 02:21:55 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F1FDC5D9C6;
+        Thu, 27 Jun 2019 04:57:10 +0000 (UTC)
 From:   Ronnie Sahlberg <lsahlber@redhat.com>
 To:     linux-cifs <linux-cifs@vger.kernel.org>
 Cc:     Steve French <smfrench@gmail.com>, Stable <stable@vger.kernel.org>,
         Ronnie Sahlberg <lsahlber@redhat.com>
 Subject: [PATCH] cifs: fix crash for querying symlinks stored as reparse-points
-Date:   Thu, 27 Jun 2019 12:21:47 +1000
-Message-Id: <20190627022147.5723-1-lsahlber@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Thu, 27 Jun 2019 02:21:56 +0000 (UTC)
+Date:   Thu, 27 Jun 2019 14:57:02 +1000
+Message-Id: <20190627045702.8701-1-lsahlber@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Thu, 27 Jun 2019 04:57:11 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
@@ -61,11 +61,11 @@ CC: Stable <stable@vger.kernel.org>
 Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
 ---
  fs/cifs/smb2ops.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++++++----
- fs/cifs/smb2pdu.h | 14 +++++++++++-
- 2 files changed, 73 insertions(+), 5 deletions(-)
+ fs/cifs/smb2pdu.h | 16 +++++++++++++-
+ 2 files changed, 75 insertions(+), 5 deletions(-)
 
 diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index e921e6511728..f59758edd0f7 100644
+index e921e6511728..74c826007069 100644
 --- a/fs/cifs/smb2ops.c
 +++ b/fs/cifs/smb2ops.c
 @@ -2385,6 +2385,41 @@ smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
@@ -82,7 +82,7 @@ index e921e6511728..f59758edd0f7 100644
 +	unsigned int sub_offset;
 +
 +	/* We only handle Symbolic Link : MS-FSCC 2.1.2.4 */
-+	if (!(le32_to_cpu(symlink_buf->ReparseTag) & 0x80000000)) {
++	if (le32_to_cpu(symlink_buf->ReparseTag) != REPARSE_TAG_SYMLINK) {
 +		cifs_dbg(VFS, "srv returned invalid symlink buffer\n");
 +		return -EIO;
 +	}
@@ -166,10 +166,19 @@ index e921e6511728..f59758edd0f7 100644
  	}
  
 diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index c7d5813bebd8..858353d20c39 100644
+index c7d5813bebd8..31f7c56e0ed8 100644
 --- a/fs/cifs/smb2pdu.h
 +++ b/fs/cifs/smb2pdu.h
-@@ -914,7 +914,19 @@ struct reparse_mount_point_data_buffer {
+@@ -888,6 +888,8 @@ struct file_allocated_range_buffer {
+ 
+ /* struct fsctl_reparse_info_req is empty, only response structs (see below) */
+ 
++#define REPARSE_TAG_SYMLINK 0xa000000c
++
+ struct reparse_data_buffer {
+ 	__le32	ReparseTag;
+ 	__le16	ReparseDataLength;
+@@ -914,7 +916,19 @@ struct reparse_mount_point_data_buffer {
  	__u8	PathBuffer[0]; /* Variable Length */
  } __packed;
  
