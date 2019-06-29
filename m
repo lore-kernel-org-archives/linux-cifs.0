@@ -2,178 +2,88 @@ Return-Path: <SRS0=BNJn=U4=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 492BDC5B57A
-	for <linux-cifs@archiver.kernel.org>; Sat, 29 Jun 2019 09:30:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50F2DC4321A
+	for <linux-cifs@archiver.kernel.org>; Sat, 29 Jun 2019 18:04:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 298B4215EA
-	for <linux-cifs@archiver.kernel.org>; Sat, 29 Jun 2019 09:30:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 296D7215EA
+	for <linux-cifs@archiver.kernel.org>; Sat, 29 Jun 2019 18:04:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N1mqsBMB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727066AbfF2JaX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 29 Jun 2019 05:30:23 -0400
-Received: from mx2.suse.de ([195.135.220.15]:49808 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726888AbfF2JaW (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sat, 29 Jun 2019 05:30:22 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 3C40CAF04;
-        Sat, 29 Jun 2019 09:30:20 +0000 (UTC)
-Date:   Sat, 29 Jun 2019 11:30:18 +0200
-From:   Jean Delvare <jdelvare@suse.de>
-To:     Lucas De Marchi <lucas.de.marchi@gmail.com>
-Cc:     Harald Hoyer <harald@redhat.com>, linux-modules@vger.kernel.org,
-        Pavel Shilovsky <pshilov@microsoft.com>,
-        linux-cifs@vger.kernel.org
-Subject: Re: multiple softdeps
-Message-ID: <20190629113018.22c9c95c@endymion>
-In-Reply-To: <20190628162517.GA24484@ldmartin-desk1>
-References: <0bfb6f60-0042-f6be-24ed-7803b6ac759c@redhat.com>
-        <20190628162517.GA24484@ldmartin-desk1>
-Organization: SUSE Linux
-X-Mailer: Claws Mail 3.13.2 (GTK+ 2.24.31; x86_64-suse-linux-gnu)
+        id S1726903AbfF2SEt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 29 Jun 2019 14:04:49 -0400
+Received: from mail-pf1-f176.google.com ([209.85.210.176]:44071 "EHLO
+        mail-pf1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726864AbfF2SEt (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 29 Jun 2019 14:04:49 -0400
+Received: by mail-pf1-f176.google.com with SMTP id t16so4514284pfe.11
+        for <linux-cifs@vger.kernel.org>; Sat, 29 Jun 2019 11:04:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=XXj3ujn7pwYQUI/kAKz1/N8bEa5iygjSrKCwyHDSDTM=;
+        b=N1mqsBMBUvPTfFUd82+laerFRDcRUATRkoyEFnMIfgRGVRBuui6Fz3bvy05zAG0B+g
+         IWvR8tZ8tTFD8FY9hW6oSF47Q4wCb1I7Vj6nJSsSgGEVa2peU3EmXXmpcjSUkACsUSAj
+         fVAeLlVGpWZg0QIQIGKISF/vDNwHPQiEgGhTp2G6MojQwTSHZAYoYFx0fvAoXZg0eTBs
+         nlPlvVkgV7iJHHGItEg7abKdc7gWqKbIIX8vPUsOFH/y04MmBMsCkN7FHK6uhlRi2SrV
+         WKBkWgHXD3GwcBFw5BCHkAY4SC6Zu60OiMpDLn+PHteXhIje1JaJvH9B7ADz6CK3ju08
+         e91w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=XXj3ujn7pwYQUI/kAKz1/N8bEa5iygjSrKCwyHDSDTM=;
+        b=q0EqmtyuyqFS+pP4vuU3O3gcSouHDFqcdjjILDcfjF9FXkThkEACx8Ok8QKMzLCt1A
+         1iWbctGR8uFnfezYMqx2wx0XC0oPLxfvlG382CJOV9e/KcWt6WZzLV5Q3SIpYU86hPP5
+         BatA4Xf7YGw83yy+xPvnfX1XmUW6VAqF5OywjlbX+TGDu6fKjucsnSPDXpvUhZ6tPZWU
+         dFgP61hUX5L8fbyM1UKxkWfGPD5V4Mu1Ghch/LwwiF2bt7eQNXlYFDG/GonXkndMZ9c+
+         pqfAxE1fAAr1w2LKurjjxID6iZg7ps9cubepdFcgqU3onvnrxMxxi5iXY5HHvCy7H1eX
+         htOA==
+X-Gm-Message-State: APjAAAVgx1X6QMQ+KrbZsxD40y7R+TumQKEuMaxz9JLjicywbT5pIbyg
+        dILZV9dPNfh+gxaAJU35hFY=
+X-Google-Smtp-Source: APXvYqx3K6BvfWnbx+fFxbgy55iW8BWs2VXURwl9YDCZjSNV801g5PLVSoVkkmLwRT638LPkOu1QWg==
+X-Received: by 2002:a65:4085:: with SMTP id t5mr15850811pgp.109.1561831489041;
+        Sat, 29 Jun 2019 11:04:49 -0700 (PDT)
+Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id f186sm6044221pfb.5.2019.06.29.11.04.47
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 29 Jun 2019 11:04:47 -0700 (PDT)
+Date:   Sat, 29 Jun 2019 11:04:46 -0700
+From:   Guenter Roeck <linux@roeck-us.net>
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: [PATCH][CIFS] simplify code by removing CONFIG_CIFS_ACL ifdef
+Message-ID: <20190629180446.GA14534@roeck-us.net>
+References: <CAH2r5mtSKQtFRNHpiiPDqCwGGLNgooj_1zZiyG=5N+cpA0bQ2w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAH2r5mtSKQtFRNHpiiPDqCwGGLNgooj_1zZiyG=5N+cpA0bQ2w@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Lucas, Harald,
-
-On Fri, 28 Jun 2019 09:25:17 -0700, Lucas De Marchi wrote:
-> +cifs, +Jean, +Pavel
+On Mon, Jun 24, 2019 at 01:47:16AM -0500, Steve French wrote:
+> SMB3 ACL support is needed for many use cases now and should not be
+> ifdeffed out, even for SMB1 (CIFS).  Remove the CONFIG_CIFS_ACL
+> ifdef so ACL support is always built into cifs.ko
 > 
-> On Fri, Jun 28, 2019 at 03:16:35PM +0200, Harald Hoyer wrote:
-> >Hi,
-> >
-> >could you please enlighten me about kernel module softdeps?
-> >
-> >$ modinfo cifs | grep soft
-> >softdep:        pre: ccm
-> >softdep:        pre: aead2
-> >softdep:        pre: sha512
-> >softdep:        pre: sha256
-> >softdep:        pre: cmac
-> >softdep:        pre: aes
-> >softdep:        pre: nls
-> >softdep:        pre: md5
-> >softdep:        pre: md4
-> >softdep:        pre: hmac
-> >softdep:        pre: ecb
-> >softdep:        pre: des
-> >softdep:        pre: arc4
-> >
-> >$ grep cifs /lib/modules/$(uname -r)/modules.softdep
-> >softdep cifs pre: ccm
-> >softdep cifs pre: aead2
-> >softdep cifs pre: sha512
-> >softdep cifs pre: sha256
-> >softdep cifs pre: cmac
-> >softdep cifs pre: aes
-> >softdep cifs pre: nls
-> >softdep cifs pre: md5
-> >softdep cifs pre: md4
-> >softdep cifs pre: hmac
-> >softdep cifs pre: ecb
-> >softdep cifs pre: des
-> >softdep cifs pre: arc4  
-> 
-> this is your bug. Multiple softdeps are not additive to the previous
-> configuration, we never supported that. Commit b9be76d585d4 ("cifs: Add
+> Signed-off-by: Steve French <stfrench@microsoft.com>
 
-That's my fault then, sorry about that. At the time I submitted the
-patch, there was no occurrence of module having multiple softdeps, so I
-didn't know how it should be done. It was some time ago and I don't
-remember the details though, and I have no trace of why I worked on
-this in the first place.
+This patch results in:
 
-Apparently I'm not the only one confused as I see driver
-pcengines-apuv2 has exactly the same problem. I'll send a patch for
-that one.
+cifs/cifsacl.c:36:15: error: variable 'cifs_idmap_key_acl' has initializer but incomplete type
+ static struct key_acl cifs_idmap_key_acl = {
+               ^~~~~~~
+fs/cifs/cifsacl.c:37:3: error: 'struct key_acl' has no member named 'usage'
 
-If multiple softdep statements are not supported then shouldn't we
-prevent them from happening, either with a link-time check, or with a
-checkpatch test? I have no idea how to implement such a check though.
+if CONFIG_KEYS=n and CONFIG_CIFS!=n (eg arm:nhk8815_defconfig).
 
-> soft dependencies") added it for the wrong reasons actually. A sotfdep
-> means kmod will actually load those dependencies before loading the
-> module (or fail to load it if those dependencies don't exist).
-
-That's my definition of a regular (not soft) dependency. If failing
-soft pre dependencies are fatal, how do they differ from regular
-dependencies? Only because they are listed explicitly instead of being
-determined from symbol use?
-
-FWIW modprobe.d(5) mentions "optional modules" and insists that the
-main module is still usable without them, so my understanding was that
-a modprobe would be attempted on soft deps but a failure would be
-ignored.
-
-> Besides the wrong commit message, if that is indeed what is desired, the
-> fix would be:
-
-The commit message may sound wrong to you but the (fixed version of the
-patch) still solves the problem (including all potentially needed
-modules in initrd even when there are no hard dependencies) at least as
-a side effect. If you think that softdeps are not how the problem
-should be solved, then how do you think it should be solved? I
-understand that pre-loading all cipher and hash modules is not
-efficient, but we still need to ensure that they all make it to the
-initrd in case they are needed.
-
-Or we could decide that cifs in initrd is not supported? To be honest
-I'm not sure why people would do that. Samba mounts do not seem
-appropriate for system or home partitions anyway... So maybe I tried to
-solve a problem which nobody had in the first place. Can the CIFS
-people please share their views on that? That's also a question for
-Harald: Harald, what were you doing with the cifs driver which led you
-to discovering this bug?
-
-> --------8<--------------
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index 65d9771e49f9..4f1f744ea3cd 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -1591,18 +1591,6 @@ MODULE_DESCRIPTION
->  	("VFS to access SMB3 servers e.g. Samba, Macs, Azure and Windows (and "
->  	"also older servers complying with the SNIA CIFS Specification)");
->  MODULE_VERSION(CIFS_VERSION);
-> -MODULE_SOFTDEP("pre: arc4");
-> -MODULE_SOFTDEP("pre: des");
-> -MODULE_SOFTDEP("pre: ecb");
-> -MODULE_SOFTDEP("pre: hmac");
-> -MODULE_SOFTDEP("pre: md4");
-> -MODULE_SOFTDEP("pre: md5");
-> -MODULE_SOFTDEP("pre: nls");
-> -MODULE_SOFTDEP("pre: aes");
-> -MODULE_SOFTDEP("pre: cmac");
-> -MODULE_SOFTDEP("pre: sha256");
-> -MODULE_SOFTDEP("pre: sha512");
-> -MODULE_SOFTDEP("pre: aead2");
-> -MODULE_SOFTDEP("pre: ccm");
-> +MODULE_SOFTDEP("pre: arc4 des ecb hmac md4 md5 nls aes cmac sha256 sha512 aead2 ccm");
->  module_init(init_cifs)
->  module_exit(exit_cifs)
-> --------8<--------------
-> 
-> I guess we could actually implement additive deps, e.g. by using
-> "pre+:" or something else. But I think the right thing to do for now is
-> to apply something like above to cifs and propagate it to stable.
-
-Patch looks sane, thanks.
-
-Reviewed-by: Jean Delvare <jdelvare@suse.de>
-
-Are you going to submit it or should I?
-
-Alternatively the initial patch could be reverted, depending on the
-answer to my question above.
-
--- 
-Jean Delvare
-SUSE L3 Support
+Guenter
