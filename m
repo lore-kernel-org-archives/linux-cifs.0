@@ -2,103 +2,89 @@ Return-Path: <SRS0=Wa1n=VA=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F4BCC0650E
-	for <linux-cifs@archiver.kernel.org>; Wed,  3 Jul 2019 16:31:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AE0EC0650E
+	for <linux-cifs@archiver.kernel.org>; Wed,  3 Jul 2019 18:21:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 54FF8218A0
-	for <linux-cifs@archiver.kernel.org>; Wed,  3 Jul 2019 16:31:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m8KinkxP"
+	by mail.kernel.org (Postfix) with ESMTP id 187192080C
+	for <linux-cifs@archiver.kernel.org>; Wed,  3 Jul 2019 18:21:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727027AbfGCQbD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 3 Jul 2019 12:31:03 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:37927 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726989AbfGCQbC (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 3 Jul 2019 12:31:02 -0400
-Received: by mail-pg1-f193.google.com with SMTP id z75so1511749pgz.5;
-        Wed, 03 Jul 2019 09:31:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=BupW8djDuFe89cHMmRkInscHcPGdbc7VTC98zH01S3U=;
-        b=m8KinkxPC+pzBURKLRIVZhFrk0msuXXzw46KVzKl5hT0vtQMAmO0XE7gYTVNKhX0KB
-         0rTP9eTaAjOch9pVE4RThGvROv1kVUXG0QDbI7CUu+QtcZH1FdEgteMmSSP1/8ey5Tqn
-         dvsZJwDaj37WZsth4bdzMBEAC8i43AMxFyEO/3EofBlAF4HszFuKsyzoKuRa7wlRqY3m
-         nmocrMiDgGKNh7pUi8vpMkXAdY8bl2ILWycSQz505Su9S+ToXAds+WatABepWWRSR29v
-         CgtvwRApZDl4lIgytR/0upLZO7/eGMWzd49R6T/oqVzBIZXykLCsaf7sgyNc8wxxFzrE
-         0wvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=BupW8djDuFe89cHMmRkInscHcPGdbc7VTC98zH01S3U=;
-        b=UczH6oqw8yx388sKRNNRS0ZozvwmPfBrc+FohG6Y6u4kg2YIR7JzMsywWzdeYGMT37
-         Mg85p5xDtaocsl8m3mkaVGS5/6KJzSixS+HUX6dvDwg9t2r3fEHndvvMIMPziX9FHUfg
-         19PYG0voiARmC2wVJUeVNxGcCAM+apZL5iYhQz2PGqc2QsVCdmvSX0KGgZP32iTlEkrA
-         E5p3GaKptJVrtqaiNk3msp9t+4xCvafbXxOrB0EoRJfPKJg2fODJbHP7+voTnQnaNai0
-         tR9sk9zbySShgwxn53hjsbqHlvKJmGN3XDGG1aMDpoSsugG3F4rZwIaH+xb+yP+zETZ5
-         DZWg==
-X-Gm-Message-State: APjAAAUZWFDiFocCppB87k2C1uuV9GfhB0uCFs1LU9XyipfiyC6J/Eqw
-        rfDfsP2S42Y5/WWLwsWjc7/Hy+BvmUI=
-X-Google-Smtp-Source: APXvYqxaavQzYeHjjLCFemiIHIKk5tCet9e/YcV/odaiBQtb8oEyDBqbY3gJE/TnQDWKPT0GXgdMMA==
-X-Received: by 2002:a63:fa0d:: with SMTP id y13mr37846873pgh.258.1562171462276;
-        Wed, 03 Jul 2019 09:31:02 -0700 (PDT)
-Received: from hfq-skylake.ipads-lab.se.sjtu.edu.cn ([202.120.40.82])
-        by smtp.googlemail.com with ESMTPSA id 137sm6206838pfz.112.2019.07.03.09.30.59
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 03 Jul 2019 09:31:01 -0700 (PDT)
-From:   Fuqian Huang <huangfq.daxian@gmail.com>
-Cc:     Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-        Fuqian Huang <huangfq.daxian@gmail.com>
-Subject: [PATCH v2 26/35] cifs: Use kmemdup rather than duplicating its implementation
-Date:   Thu,  4 Jul 2019 00:30:50 +0800
-Message-Id: <20190703163050.577-1-huangfq.daxian@gmail.com>
-X-Mailer: git-send-email 2.11.0
-To:     unlisted-recipients:; (no To-header on input)
+        id S1726430AbfGCSVE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 3 Jul 2019 14:21:04 -0400
+Received: from mail.prodrive-technologies.com ([212.61.153.67]:49241 "EHLO
+        mail.prodrive-technologies.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725933AbfGCSVE (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 3 Jul 2019 14:21:04 -0400
+X-Greylist: delayed 540 seconds by postgrey-1.27 at vger.kernel.org; Wed, 03 Jul 2019 14:21:03 EDT
+Received: from mail.prodrive-technologies.com (localhost.localdomain [127.0.0.1])
+        by localhost (Email Security Appliance) with SMTP id 30BF7330A2_D1CEFF2B
+        for <linux-cifs@vger.kernel.org>; Wed,  3 Jul 2019 18:12:02 +0000 (GMT)
+Received: from mail.prodrive-technologies.com (exc03.bk.prodrive.nl [10.1.1.212])
+        (using TLSv1.2 with cipher AES256-GCM-SHA384 (256/256 bits))
+        (Client CN "mail.prodrive-technologies.com", Issuer "Prodrive Technologies B.V. OV SSL Issuing CA" (verified OK))
+        by mail.prodrive-technologies.com (Sophos Email Appliance) with ESMTPS id 156E731064_D1CEFF2F
+        for <linux-cifs@vger.kernel.org>; Wed,  3 Jul 2019 18:12:02 +0000 (GMT)
+Received: from [10.10.164.15] (10.10.164.15) by EXC03.bk.prodrive.nl
+ (10.1.1.212) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1591.10; Wed, 3
+ Jul 2019 20:12:01 +0200
+To:     <linux-cifs@vger.kernel.org>
+From:   Martijn de Gouw <martijn.de.gouw@prodrive-technologies.com>
+Subject: Many processes end up in uninterruptible sleep accessing cifs mounts
+Organization: Prodrive Technologies
+Message-ID: <684ed01c-cbca-2716-bc28-b0a59a0f8521@prodrive-technologies.com>
+Date:   Wed, 3 Jul 2019 20:12:01 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EXC03.bk.prodrive.nl (10.1.1.212) To EXC03.bk.prodrive.nl
+ (10.1.1.212)
+X-SASI-RCODE: 200
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-kmemdup is introduced to duplicate a region of memory in a neat way.
-Rather than kmalloc/kzalloc + memcpy, which the programmer needs to
-write the size twice (sometimes lead to mistakes), kmemdup improves
-readability, leads to smaller code and also reduce the chances of mistakes.
-Suggestion to use kmemdup rather than using kmalloc/kzalloc + memcpy.
+Hi,
 
-Signed-off-by: Fuqian Huang <huangfq.daxian@gmail.com>
----
-Changes in v2:
-  - Fix a typo in commit message (memset -> memcpy)
+On our production servers, we have a lot of issues with cifs mounts.
+All mounts are mounted via the dfs shares on our domain controller.
+We have mounts using sec=krb5, sec=ntlmssp and sec=krb5,multiuser
 
- fs/cifs/smb2pdu.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+All mounts are vers=3.0.
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 75311a8a68bf..ab8dc73d2282 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -2550,12 +2550,11 @@ SMB2_ioctl_init(struct cifs_tcon *tcon, struct smb_rqst *rqst,
- 		 * indatalen is usually small at a couple of bytes max, so
- 		 * just allocate through generic pool
- 		 */
--		in_data_buf = kmalloc(indatalen, GFP_NOFS);
-+		in_data_buf = kmemdup(in_data, indatalen, GFP_NOFS);
- 		if (!in_data_buf) {
- 			cifs_small_buf_release(req);
- 			return -ENOMEM;
- 		}
--		memcpy(in_data_buf, in_data, indatalen);
- 	}
- 
- 	req->CtlCode = cpu_to_le32(opcode);
+One of the symptoms is that our monitoring system complains about not 
+being able to stat() every now and then, the next scraping cycle, stat() 
+works again. Even when the mounts are not accesses at all.
+
+Also, lot of applications get stuck on either accessing data on the 
+mounts, or performing stat() like operations on the mounts.
+
+For us, the worst part is that applications end up in 'D'. The number of 
+'D' processes pile up really quickly, blocking users from performing 
+their work.
+
+We are running Linux 4.20.17 SMP PREEMPT on all machines. We tried 
+upgrading to > 5.x, but caused even more problems and kernel hangs.
+
+I do not really have a clue where to start debugging. I enabled kernel 
+debug options suggested on the wiki, but the amount of logging is 
+immense now.
+
+Can you provide any pointers where to look or start debugging?
+Or any help on how to kill those D processes and get our Linux servers 
+stable again?
+
+Regards, Martijn de Gouw
 -- 
-2.11.0
-
+Martijn de Gouw
+Designer
+Prodrive Technologies
+Mobile: +31 63 17 76 161
+Phone:  +31 40 26 76 200
