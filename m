@@ -2,89 +2,86 @@ Return-Path: <SRS0=Wa1n=VA=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AE0EC0650E
-	for <linux-cifs@archiver.kernel.org>; Wed,  3 Jul 2019 18:21:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E66FCC0650E
+	for <linux-cifs@archiver.kernel.org>; Wed,  3 Jul 2019 19:17:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 187192080C
-	for <linux-cifs@archiver.kernel.org>; Wed,  3 Jul 2019 18:21:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BA224218A4
+	for <linux-cifs@archiver.kernel.org>; Wed,  3 Jul 2019 19:17:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726430AbfGCSVE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 3 Jul 2019 14:21:04 -0400
-Received: from mail.prodrive-technologies.com ([212.61.153.67]:49241 "EHLO
-        mail.prodrive-technologies.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725933AbfGCSVE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 3 Jul 2019 14:21:04 -0400
-X-Greylist: delayed 540 seconds by postgrey-1.27 at vger.kernel.org; Wed, 03 Jul 2019 14:21:03 EDT
-Received: from mail.prodrive-technologies.com (localhost.localdomain [127.0.0.1])
-        by localhost (Email Security Appliance) with SMTP id 30BF7330A2_D1CEFF2B
-        for <linux-cifs@vger.kernel.org>; Wed,  3 Jul 2019 18:12:02 +0000 (GMT)
-Received: from mail.prodrive-technologies.com (exc03.bk.prodrive.nl [10.1.1.212])
-        (using TLSv1.2 with cipher AES256-GCM-SHA384 (256/256 bits))
-        (Client CN "mail.prodrive-technologies.com", Issuer "Prodrive Technologies B.V. OV SSL Issuing CA" (verified OK))
-        by mail.prodrive-technologies.com (Sophos Email Appliance) with ESMTPS id 156E731064_D1CEFF2F
-        for <linux-cifs@vger.kernel.org>; Wed,  3 Jul 2019 18:12:02 +0000 (GMT)
-Received: from [10.10.164.15] (10.10.164.15) by EXC03.bk.prodrive.nl
- (10.1.1.212) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1591.10; Wed, 3
- Jul 2019 20:12:01 +0200
-To:     <linux-cifs@vger.kernel.org>
-From:   Martijn de Gouw <martijn.de.gouw@prodrive-technologies.com>
-Subject: Many processes end up in uninterruptible sleep accessing cifs mounts
-Organization: Prodrive Technologies
-Message-ID: <684ed01c-cbca-2716-bc28-b0a59a0f8521@prodrive-technologies.com>
-Date:   Wed, 3 Jul 2019 20:12:01 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1726656AbfGCTRJ convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 3 Jul 2019 15:17:09 -0400
+Received: from mx2.suse.de ([195.135.220.15]:60144 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726574AbfGCTRJ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 3 Jul 2019 15:17:09 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 3C1FAAE20;
+        Wed,  3 Jul 2019 19:17:08 +0000 (UTC)
+From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
+To:     Martijn de Gouw <martijn.de.gouw@prodrive-technologies.com>,
+        linux-cifs@vger.kernel.org
+Subject: Re: Many processes end up in uninterruptible sleep accessing cifs mounts
+In-Reply-To: <684ed01c-cbca-2716-bc28-b0a59a0f8521@prodrive-technologies.com>
+References: <684ed01c-cbca-2716-bc28-b0a59a0f8521@prodrive-technologies.com>
+Date:   Wed, 03 Jul 2019 21:17:06 +0200
+Message-ID: <875zojx70t.fsf@suse.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EXC03.bk.prodrive.nl (10.1.1.212) To EXC03.bk.prodrive.nl
- (10.1.1.212)
-X-SASI-RCODE: 200
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi,
+Hi Martijn,
 
-On our production servers, we have a lot of issues with cifs mounts.
-All mounts are mounted via the dfs shares on our domain controller.
-We have mounts using sec=krb5, sec=ntlmssp and sec=krb5,multiuser
+Martijn de Gouw <martijn.de.gouw@prodrive-technologies.com> writes:
+> One of the symptoms is that our monitoring system complains about not 
+> being able to stat() every now and then, the next scraping cycle, stat() 
+> works again. Even when the mounts are not accesses at all.
+>
+> Also, lot of applications get stuck on either accessing data on the 
+> mounts, or performing stat() like operations on the mounts.
+>
+> For us, the worst part is that applications end up in 'D'. The number of 
+> 'D' processes pile up really quickly, blocking users from performing 
+> their work.
 
-All mounts are vers=3.0.
+Gah, sorry to hear. Thanks for the report.
 
-One of the symptoms is that our monitoring system complains about not 
-being able to stat() every now and then, the next scraping cycle, stat() 
-works again. Even when the mounts are not accesses at all.
+If you could pin down a specific way to reproduce some of those hangs
+that would be of great help.
 
-Also, lot of applications get stuck on either accessing data on the 
-mounts, or performing stat() like operations on the mounts.
+> We are running Linux 4.20.17 SMP PREEMPT on all machines. We tried 
+> upgrading to > 5.x, but caused even more problems and kernel hangs.
 
-For us, the worst part is that applications end up in 'D'. The number of 
-'D' processes pile up really quickly, blocking users from performing 
-their work.
+5.0 and 5.1 really fixed a lot of issues with credits and reconnection.
 
-We are running Linux 4.20.17 SMP PREEMPT on all machines. We tried 
-upgrading to > 5.x, but caused even more problems and kernel hangs.
+> I do not really have a clue where to start debugging. I enabled kernel 
+> debug options suggested on the wiki, but the amount of logging is 
+> immense now.
 
-I do not really have a clue where to start debugging. I enabled kernel 
-debug options suggested on the wiki, but the amount of logging is 
-immense now.
+Yes that is normal.
 
-Can you provide any pointers where to look or start debugging?
-Or any help on how to kill those D processes and get our Linux servers 
-stable again?
+> Can you provide any pointers where to look or start debugging?
+> Or any help on how to kill those D processes and get our Linux servers 
+> stable again?
 
-Regards, Martijn de Gouw
+Are there any kernel oops/panic with stack traces and register dumps in
+the log?
+
+You can inspect the kernel stack trace of the hung processes (to see where
+they are stuck) by printing the file /proc/<pid>/stack.
+
+Cheers,
 -- 
-Martijn de Gouw
-Designer
-Prodrive Technologies
-Mobile: +31 63 17 76 161
-Phone:  +31 40 26 76 200
+Aurélien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
+GF: Felix Imendörffer, Mary Higgins, Sri Rasiah HRB 21284 (AG Nürnberg)
