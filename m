@@ -4,63 +4,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C80D4C0651F
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Jul 2019 20:52:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D9FEC0651F
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 Jul 2019 21:08:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 932C52189E
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Jul 2019 20:52:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5ED3E20659
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 Jul 2019 21:08:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mk2Tc5Ue"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U/AassZK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727091AbfGDUwc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 4 Jul 2019 16:52:32 -0400
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:34491 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726871AbfGDUwc (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 4 Jul 2019 16:52:32 -0400
-Received: by mail-lj1-f196.google.com with SMTP id p17so7255987ljg.1
-        for <linux-cifs@vger.kernel.org>; Thu, 04 Jul 2019 13:52:30 -0700 (PDT)
+        id S1726900AbfGDVIS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 4 Jul 2019 17:08:18 -0400
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:45091 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726871AbfGDVIR (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 4 Jul 2019 17:08:17 -0400
+Received: by mail-lf1-f67.google.com with SMTP id u10so4961084lfm.12
+        for <linux-cifs@vger.kernel.org>; Thu, 04 Jul 2019 14:08:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=O8+vZnySTLStsMY/cgZ+DKGHYYdnzS3NOdX5X7V50Tg=;
-        b=mk2Tc5UeUm1pEyrT7RztEkJ6rL/ush+YAQ+6W3N4n8j3mXHojjRgmVoKQ8VnZxfjCw
-         sMK7MvQU5jS9+e5UNfh3SRFww9/9cKwdhZZNYUX935yWt4S0BxZb6hPsOsNQDqIJOrmb
-         wxdtAnUPBI6TazUrz3UaYA6n1ZMi9a0RFTw17frVRYYo/pr3xPfNXiLZHo9f+kkIznIr
-         igOIF9mPEWvScb/cdsE0KCFhwfZ3J2aCZ8+csthMj36bXzg6/nGwQN4mo7b4igNeTcWd
-         PbOQopaSFl+O/GXcH/1l/hUiNLUMoMgfgX3W8qx6WDpobhMkHb1MVy7bpiGwfCQI+swe
-         oAHQ==
+        bh=OFepJf0HRUsDqi2lQGNpJ3ZgpbP6Pq3HjiFWKOeBJ3Q=;
+        b=U/AassZKZ+D9gHOjPMLVEzT2ASJddyqakAGhpMneZ8w8k7befLNkDpR5wdtBeYNqZ0
+         VXwX3Fx+nb+FngB9aW12rP22TV76rGbcRCe8hhvgFXBnBFZ3IUDFDLaUscw6xEvfeiq7
+         rhKazpqqyC84CHcAH3SGea5S9alH72vkMTxYeANrysSGPVgOuhgbg8kbbH4nr/QsTNAH
+         c+DsJNSVHY4lk3FkoTCBO7V7HotETLE+xRw79fethzLQKFNZbK71VLnxeSO62pCnLY5C
+         TNQ6EcXwLsvzyVvg5ydBWXW9j7mnO01ZbuP5BG1ykxCsyst4tybR7qSNBQLK+Bc4qWgW
+         BNdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=O8+vZnySTLStsMY/cgZ+DKGHYYdnzS3NOdX5X7V50Tg=;
-        b=ivnqrnRY4jaHukB8zknJWm9dd7fSvJPYdqWKrA3t3Uop1HU8vgTTyQUHz18VyLSdOF
-         bZ5XGW+Ezy5h8qA2my7w04tEUepXm6SkX+UjM9wdZEbYUxfi3Q8gBaY73A4oBjA+foQl
-         t6xWqHycGWLpYmy/hSPxagHr1LkicJ45M3zGoBRj0Cy4N7c3HGESJccylvgoWaco/MiU
-         YPBXflVCbKqBmMhA6j6uQ8A/TeJkDrVoAYuqyG7nd+YpT6fFbqQsChfKFSzY64446p5i
-         YGDs94LJ9ovH9hgiVrFsAwn95G9twuAGGBKt4n/mspwJ5UurgCJAycvrYqpPpWa0ddUB
-         tskw==
-X-Gm-Message-State: APjAAAUu/+elOMnPuw+7t8GeUSu6UqF0PsDU+AztH23cmH2SA06I76Ib
-        TKXj8G8jn+bowmcezf97Pl+vBh1i26tj6TsUJA==
-X-Google-Smtp-Source: APXvYqxBpTls2KqsevtpdlC3GKIHj047hTPs6kcTvh+9cIzDKscAWQZm7z/DDoeoP9Z9E8+yPc9bn+tLdOqO6IB7FCM=
-X-Received: by 2002:a2e:b167:: with SMTP id a7mr90307ljm.26.1562273549782;
- Thu, 04 Jul 2019 13:52:29 -0700 (PDT)
+        bh=OFepJf0HRUsDqi2lQGNpJ3ZgpbP6Pq3HjiFWKOeBJ3Q=;
+        b=kkpskVpYWpISYHfmTY90DG3hlY3pTVastb3fSRYuYmO+fauFJKke9vtrxIrxEYGvqZ
+         MhGRabuLpY1RXq2pGxjSqrk47bysL2SHk8fzZOVBm9Beb9pZnboCZHKqTFjyuxGRXgbp
+         MtjUMb6jAYHbZsbfJVDxjeYL0MxysZ09JEtQ8TGEJck/BOzgBpGCihfRdPfsYKB2yAiX
+         foe7KofF7VB8gZQuAEkYILYNQ97fJEfnTrSFVgfBymSiMCjMxDAMcK4U1wHoq/TyHavF
+         qntWSmw7Lh5wsJhbGshLrNnbsQSQG2lwYifKgVTS58dO09JH4LxZNpgR6Q6AxwGRmvDR
+         fnXA==
+X-Gm-Message-State: APjAAAXzZWiA9hh8FYdGHZGjBtpRKsOvVhCbA59n2AqFl/XhkpHQxkLi
+        QEP5djGTtLYmFy8aIjcIhYUWfnKoCNAKGtaBSLdW
+X-Google-Smtp-Source: APXvYqw6tOUsFXI1KEtIznHtJJvkhHRxassbrk1XPFEKtfljQ47IXrOL5JywE7iO0tyEUqg6GKFNGjaMQ50ZqTlhPQo=
+X-Received: by 2002:ac2:50cd:: with SMTP id h13mr273472lfm.36.1562274495069;
+ Thu, 04 Jul 2019 14:08:15 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5mvN2LQG_eWhfes3_tpBwhmg-Q=+L7U+=xFHb4W01_wVJg@mail.gmail.com>
- <CAKywueR8h1ipuWQYZAph729O9f05tUEC2+kzf9RwKTyWgqtV_Q@mail.gmail.com> <CAH2r5muoKPQAkSmvjerOb9UCtvBLjdaEjQQ5jfOO=sJnes=C3A@mail.gmail.com>
-In-Reply-To: <CAH2r5muoKPQAkSmvjerOb9UCtvBLjdaEjQQ5jfOO=sJnes=C3A@mail.gmail.com>
+References: <684ed01c-cbca-2716-bc28-b0a59a0f8521@prodrive-technologies.com>
+ <875zojx70t.fsf@suse.com> <1fc4f6d0-6cdc-69a5-4359-23484d6bdfc9@prodrive-technologies.com>
+ <8736jmxcwi.fsf@suse.com>
+In-Reply-To: <8736jmxcwi.fsf@suse.com>
 From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Thu, 4 Jul 2019 13:52:18 -0700
-Message-ID: <CAKywueRpx8tcDb7p+1_vDgCjRZ_0FYOGt8CSQLMa3ixgqxoscQ@mail.gmail.com>
-Subject: Re: [SMB3][PATCH] add mount option to allow retrieving POSIX mode
- from special ACE
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
+Date:   Thu, 4 Jul 2019 14:08:03 -0700
+Message-ID: <CAKywueT2AV5V46ovb25a4287DbS0etuM64VZpkmCFW38abQR4Q@mail.gmail.com>
+Subject: Re: Many processes end up in uninterruptible sleep accessing cifs mounts
+To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Steve French <smfrench@gmail.com>
+Cc:     Martijn de Gouw <martijn.de.gouw@prodrive-technologies.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
@@ -68,98 +71,126 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-These are good points and I agree with the plan.
++ Ronnie, Steve
 
-I would rename the option:
+Good analysis, thanks!
 
-"modefromace" -> ""modefromsid"
-
-to make the naming consistent with the existing "idsfromsid" and match
-the behavior closely: a mode is still technically from the special SID
-and that SID is from the special ACE. Other than that the patch looks
-good.
+One way to fix it is to drop the mutex before entering any PDU
+functions, then acquire it again and double check if any concurrent
+process has already initialize the handle. The complication here is
+that the current kernel diverged from 4.20.y stable kernel in this
+code path, so this would require separate patches for the current and
+stable kernels.
 
 --
 Best regards,
 Pavel Shilovsky
 
-=D0=BF=D0=BD, 24 =D0=B8=D1=8E=D0=BD. 2019 =D0=B3. =D0=B2 13:25, Steve Frenc=
-h <smfrench@gmail.com>:
+=D1=87=D1=82, 4 =D0=B8=D1=8E=D0=BB. 2019 =D0=B3. =D0=B2 04:24, Aur=C3=A9lie=
+n Aptel <aaptel@suse.com>:
 >
-> On Mon, Jun 24, 2019 at 2:07 PM Pavel Shilovsky <piastryyy@gmail.com> wro=
-te:
+> Martijn de Gouw <martijn.de.gouw@prodrive-technologies.com> writes:
+> >> Are there any kernel oops/panic with stack traces and register dumps i=
+n
+> >> the log?
+> >>
+> >> You can inspect the kernel stack trace of the hung processes (to see w=
+here
+> >> they are stuck) by printing the file /proc/<pid>/stack.
 > >
-> > Can't we use the existing idfromsid for this purpose? We already have
-> > a plenty of mount options and the list keeps growing.
+> > These are the stacks of all processes that are D, most of them being df=
+.
+> > I also attached the cifs Stats output below.
 >
-> That is a good question - and I am open to suggestions to remove some
-> mount options but
-> the general problem is that that mount option name could be very confusin=
-g -
-> "idsfromsid" doesn't really imply anything about how we handle
-> mode bits (we could save mode bits even if saving uid owner without
-> using the "idsfromsid"
-> mechanism) we want to allow:
+> Ok thanks. What about Oops or BUG or panic in dmesg logs, did you see
+> any?
 >
-> 1) query mode from special sid if present
-> or
-> 2) query mode from ACL (only check for perms on the three
-> user-owner/group-owner/EVERYONE SIDs), in this case we may chose to
-> mount noperm
-> or
-> 3) the default today - we set mode for files and directories to the
-> permissions supplied as "file_mode" and "dir_mode")
-> We by default do:
->       vol->dir_mode =3D vol->file_mode =3D S_IRUGO | S_IXUGO | S_IWUSR;
-> and we can mount with noperm to disable the client perm checks if the
-> checks on the client are not useful
-> or
-> 4) set the permissions (temporarily) locally only and cache them
-> (dynperm) - typically not recommended.
+> The individual stack dumps are pretty useful. Here is my theory:
 >
-> Where I would like to get to is that we focus strongly on only the
-> first two common use cases:
-> 1) "client focused perm checks"   -  get/set mode from special SID
-> (server permission checks are not important in this case)
-> 2) "server focused perm checks" - get/set the three ACEs
-> (user-owner/group-owner/EVERYONE) in the ACL
+> > pid: 9505
+> > syscall: 4 0x56550a2ec470 0x7ffede42e9a0 0x7ffede42e9a0 0x83a 0x3 0x20
+> > 0x7ffede42e8f8 0x7f7f8928f295
+> > [<0>] open_shroot+0x43/0x200 [cifs]
+> > [<0>] smb2_query_path_info+0x93/0x220 [cifs]
 >
-> I would like to default to idsfromsid (setting the owner with  if
-> looking up owner from Winbind or SSSD or falling back
-> to S-1-22-1 (Unmapped user's special SID) or S-1-5-88-1  (MS-NFS and
-> Apple style unmapped user's special SID).
+> Almost all of the processes have the same stack trace. They are stuck at
+> open_shroot()+0x43 which is probably
 >
-> In a way I would like to remove "idsfromsid" (and do it by default),
-> and add the new mount point to distinguish between
+>     mutex_lock(&tcon->crfid.fid_mutex);
 >
-> "client centric" mode bit evaluation (special mode SID)
-> vs.
-> "server centric" ACL evaluation (where mode bits are mapped into the 3
-> usual ACEs - user/group/other)
+> Then there are only 2 other processes stuck somewhere in the same code pa=
+th
+> (open_shroot) but deeper, meaning they have the locks that the other
+> processes are waiting for:
 >
 >
+> > pid: 22858
+> > syscall: 4 0x564b46285d10 0x7ffcea3f9a80 0x7ffcea3f9a80 0x83a 0x3 0x20
+> > 0x7ffcea3f99d8 0x7f6cc78c7295
+> > [<0>] cifs_mark_open_files_invalid+0x54/0xa0 [cifs]
+> > [<0>] smb2_reconnect+0x2d6/0x4b0 [cifs]
+> > [<0>] smb2_plain_req_init+0x30/0x240 [cifs]
+> > [<0>] SMB2_open_init+0x6d/0x7c0 [cifs]
+> > [<0>] SMB2_open+0x150/0x520 [cifs]
+> > [<0>] open_shroot+0x12f/0x200 [cifs]
+> > [<0>] smb2_query_path_info+0x93/0x220 [cifs]
+> > [<0>] cifs_get_inode_info+0x580/0xb10 [cifs]
+> > [<0>] cifs_revalidate_dentry_attr+0xdc/0x3e0 [cifs]
+> > [<0>] cifs_getattr+0x5b/0x1b0 [cifs]
+> > [<0>] vfs_statx+0x89/0xe0
+> > [<0>] __do_sys_newstat+0x39/0x70
+> > [<0>] do_syscall_64+0x55/0x100
+> > [<0>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> > [<0>] 0xffffffffffffffff
 >
-> > =D0=BF=D0=BD, 24 =D0=B8=D1=8E=D0=BD. 2019 =D0=B3. =D0=B2 00:20, Steve F=
-rench <smfrench@gmail.com>:
-> > >
-> > > See e.g. https://docs.microsoft.com/en-us/previous-versions/windows/i=
-t-pro/windows-server-2008-R2-and-2008/hh509017(v=3Dws.10)
-> > >
-> > > where it describes use of an ACE with special SID S-1-5-88-3 to store=
- the mode.
-> > >
-> > > Followon patches will add the support for chmod and query_info (stat)
-> > >
-> > >
-> > >
-> > > --
-> > > Thanks,
-> > >
-> > > Steve
 >
+> > pid: 20027
+> > syscall: 4 0x55a3c7d767d0 0x7ffe51432ab0 0x7ffe51432ab0 0x83a
+> > 0x55a3c7d75c40 0x20 0x7ffe51432a08 0x7f5f7c4e7295
+> > [<0>] cifs_mark_open_files_invalid+0x54/0xa0 [cifs]
+> > [<0>] smb2_reconnect+0x2d6/0x4b0 [cifs]
+> > [<0>] smb2_plain_req_init+0x30/0x240 [cifs]
+> > [<0>] SMB2_open_init+0x6d/0x7c0 [cifs]
+> > [<0>] SMB2_open+0x150/0x520 [cifs]
+> > [<0>] open_shroot+0x12f/0x200 [cifs]
+> > [<0>] smb2_query_path_info+0x93/0x220 [cifs]
+> > [<0>] cifs_get_inode_info+0x580/0xb10 [cifs]
+> > [<0>] cifs_revalidate_dentry_attr+0xdc/0x3e0 [cifs]
+> > [<0>] cifs_getattr+0x5b/0x1b0 [cifs]
+> > [<0>] vfs_statx+0x89/0xe0
+> > [<0>] __do_sys_newstat+0x39/0x70
+> > [<0>] do_syscall_64+0x55/0x100
+> > [<0>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> > [<0>] 0xffffffffffffffff
 >
+> Due to timeouts maybe the Open request needs
+> to reconnect the server/ses/tcon and to do this it calls
+> cifs_mark_open_files_invalid() and gets stuck somewhere there.
 >
+>         spin_lock(&tcon->open_file_lock);
+>         list_for_each_safe(tmp, tmp1, &tcon->openFileList) {
+>                 open_file =3D list_entry(tmp, struct cifsFileInfo, tlist)=
+;
+>                 open_file->invalidHandle =3D true;
+>                 open_file->oplock_break_cancelled =3D true;
+>         }
+>         spin_unlock(&tcon->open_file_lock);
+>
+>         mutex_lock(&tcon->crfid.fid_mutex); <=3D=3D=3D most likely here
+>         tcon->crfid.is_valid =3D false;
+>         memset(tcon->crfid.fid, 0, sizeof(struct cifs_fid));
+>         mutex_unlock(&tcon->crfid.fid_mutex);
+>
+> I think these processes are trying to lock the same lock twice: one in
+> open_shroot() and since Open ends up having to reconnect, once again in
+> mark_open_files_invalid(). I think it's the same lock because I don't
+> see why the tcon pointers would be different in those 2 spots. Kernel
+> mutexes are not reentrant so this is a deadlock.
+>
+> Cheers,
 > --
-> Thanks,
->
-> Steve
+> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+> SUSE Linux GmbH, Maxfeldstra=C3=9Fe 5, 90409 N=C3=BCrnberg, Germany
+> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 21284 (AG N=C3=
+=BCrnberg)
