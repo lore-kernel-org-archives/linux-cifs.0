@@ -2,110 +2,176 @@ Return-Path: <SRS0=j5Ui=VC=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE07EC46499
-	for <linux-cifs@archiver.kernel.org>; Fri,  5 Jul 2019 21:08:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A47CC46499
+	for <linux-cifs@archiver.kernel.org>; Fri,  5 Jul 2019 21:21:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9147A20449
-	for <linux-cifs@archiver.kernel.org>; Fri,  5 Jul 2019 21:08:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tq26O8K8"
+	by mail.kernel.org (Postfix) with ESMTP id 6457C21738
+	for <linux-cifs@archiver.kernel.org>; Fri,  5 Jul 2019 21:21:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727992AbfGEVI3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 5 Jul 2019 17:08:29 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:43071 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727055AbfGEVI3 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 5 Jul 2019 17:08:29 -0400
-Received: by mail-io1-f66.google.com with SMTP id k20so21737333ios.10
-        for <linux-cifs@vger.kernel.org>; Fri, 05 Jul 2019 14:08:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=bHPZs46MZLP/nb1nFED/utSRLX8tkXM5+Opy01eL4Z8=;
-        b=Tq26O8K8RKVVTuvbdYTqa16w75JaZVIx7KUru0Ls8p47gKPPzmc6kzrML52gWCuSpb
-         hLoyZ1ou5SY9QsitPDTDDJG8RVZ2pGsp4ejPRKqEzpfcl0xiBiZItCO0gibqNVD5qy83
-         AC4xjbuD/zAIJQBpTx2iHEj/Gs9bJRWr+kKrAOOi9RJgCV5El0XLdwu35Lmmyd4dJMk7
-         01MiJHt0v49JcSweqC4bQ5724xGf1BLsxhJhOm8/qCoC38chvv5As48ri0yK2P1wx056
-         KSubE5dF/St4zTq6vx2H0IeyD9pYC5kDJX/F4AnI57mSENPZuetMfb1qQEwiTFWiozYO
-         kOug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=bHPZs46MZLP/nb1nFED/utSRLX8tkXM5+Opy01eL4Z8=;
-        b=j4kscAkRp5sFbiFVm1TRKZAQU65uLhg8Xwl6fjF5BWOIJjB8CbIIgPYwWZHrbuMmy8
-         hi3Pbp7nF/rMfEcJTllXQSNWa+Enu5lJsTzk1carwdTyCPgzGbBfXOnzga4BsuQahFEG
-         rzlb0yzKoTIp5Yx1oEJaGMZD6TLZxJ1pPZoUvHyGoNSPXA2yLsDbbYtwBlgz3kyCiELd
-         Dpwd6cwbzH09Lr6XBsAFD71/CqJp7i2MLKIfjjYJpdN/ekjf4wxPp7bVn8mYJ0moPppZ
-         K3/Ww3/tMTVaM5/A8OHL4GB/GXeQSb8HAYy1ggAVn323gY4MDVr4qKXr7hUwzPfwLoRQ
-         daOg==
-X-Gm-Message-State: APjAAAWe7sPHXttazfPeQHXwmfix/tdqPdh9GR+au5tc59WjNBn+bQ/T
-        88odOJda+Uz/qheFh4Gt/3JbqZbRT2BAR3X7qjg=
-X-Google-Smtp-Source: APXvYqzsgVu3+BquHCjiome1tQNICc2Y5WxB2myx4Uh+xViDTAbiTLAkl+O9hs/LyQjuXVNj1NjOTMJa48VIMb7D5jA=
-X-Received: by 2002:a6b:3883:: with SMTP id f125mr6406815ioa.109.1562360908409;
- Fri, 05 Jul 2019 14:08:28 -0700 (PDT)
+        id S1728248AbfGEVUy convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 5 Jul 2019 17:20:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50928 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726505AbfGEVUy (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 5 Jul 2019 17:20:54 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 573CA87628;
+        Fri,  5 Jul 2019 21:20:48 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-9.rdu2.redhat.com [10.10.120.9])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0D6354C7;
+        Fri,  5 Jul 2019 21:20:44 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+To:     torvalds@linux-foundation.org
+cc:     dhowells@redhat.com, jmorris@namei.org, ebiederm@xmission.com,
+        dwalsh@redhat.com, keyrings@vger.kernel.org,
+        netdev@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-afs@vger.kernel.org,
+        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [GIT PULL] Keys: Set 3 - Keyrings namespacing for 5.3
 MIME-Version: 1.0
-References: <20190705204308.10039-1-lsahlber@redhat.com> <CAH2r5msoNnX0ZQ2GKMzoa8_-J1kukbQ=uiAC4m=w7XM86b-uZA@mail.gmail.com>
-In-Reply-To: <CAH2r5msoNnX0ZQ2GKMzoa8_-J1kukbQ=uiAC4m=w7XM86b-uZA@mail.gmail.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Sat, 6 Jul 2019 07:08:17 +1000
-Message-ID: <CAN05THTONV2j-6r1rF--9BQfOdfA-8Ou2O1hmTNwcB=xd7gYqA@mail.gmail.com>
-Subject: Re: [PATCH] cifs: always add credits back for unsolicited PDUs
-To:     Steve French <smfrench@gmail.com>
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <27849.1562361644.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: 8BIT
+Date:   Fri, 05 Jul 2019 22:20:44 +0100
+Message-ID: <27850.1562361644@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Fri, 05 Jul 2019 21:20:53 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Sat, Jul 6, 2019 at 7:04 AM Steve French <smfrench@gmail.com> wrote:
->
-> Thoughts on stable?
+Here's my third block of keyrings changes for the next merge window.
 
-Yeah, maybe. It should be very rare that this would trigger but it
-could and would lead to a hung connection.
+These patches help make keys and keyrings more namespace aware.  Firstly
+some miscellaneous patches to make the process easier:
 
->
-> On Fri, Jul 5, 2019 at 3:43 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
-> >
-> > not just if CONFIG_CIFS_DEBUG2 is enabled.
-> >
-> > Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> > ---
-> >  fs/cifs/connect.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> > index 8c4121da624e..11adca981263 100644
-> > --- a/fs/cifs/connect.c
-> > +++ b/fs/cifs/connect.c
-> > @@ -1221,11 +1221,11 @@ cifs_demultiplex_thread(void *p)
-> >                                          atomic_read(&midCount));
-> >                                 cifs_dump_mem("Received Data is: ", bufs[i],
-> >                                               HEADER_SIZE(server));
-> > +                               smb2_add_credits_from_hdr(bufs[i], server);
-> >  #ifdef CONFIG_CIFS_DEBUG2
-> >                                 if (server->ops->dump_detail)
-> >                                         server->ops->dump_detail(bufs[i],
-> >                                                                  server);
-> > -                               smb2_add_credits_from_hdr(bufs[i], server);
-> >                                 cifs_dump_mids(server);
-> >  #endif /* CIFS_DEBUG2 */
-> >                         }
-> > --
-> > 2.13.6
-> >
->
->
-> --
-> Thanks,
->
-> Steve
+ (1) Simplify key index_key handling so that the word-sized chunks
+     assoc_array requires don't have to be shifted about, making it easier
+     to add more bits into the key.
+
+ (2) Cache the hash value in the key so that we don't have to calculate on
+     every key we examine during a search (it involves a bunch of
+     multiplications).
+
+ (3) Allow keying_search() to search non-recursively.
+
+Then the main patches:
+
+ (4) Make it so that keyring names are per-user_namespace from the point of
+     view of KEYCTL_JOIN_SESSION_KEYRING so that they're not accessible
+     cross-user_namespace.
+
+     keyctl_capabilities() shows KEYCTL_CAPS1_NS_KEYRING_NAME for this.
+
+ (5) Move the user and user-session keyrings to the user_namespace rather
+     than the user_struct.  This prevents them propagating directly across
+     user_namespaces boundaries (ie. the KEY_SPEC_* flags will only pick
+     from the current user_namespace).
+
+ (6) Make it possible to include the target namespace in which the key shall
+     operate in the index_key.  This will allow the possibility of multiple
+     keys with the same description, but different target domains to be held
+     in the same keyring.
+
+     keyctl_capabilities() shows KEYCTL_CAPS1_NS_KEY_TAG for this.
+
+ (7) Make it so that keys are implicitly invalidated by removal of a domain
+     tag, causing them to be garbage collected.
+
+ (8) Institute a network namespace domain tag that allows keys to be
+     differentiated by the network namespace in which they operate.  New keys
+     that are of a type marked 'KEY_TYPE_NET_DOMAIN' are assigned the network
+     domain in force when they are created.
+
+ (9) Make it so that the desired network namespace can be handed down into the
+     request_key() mechanism.  This allows AFS, NFS, etc. to request keys
+     specific to the network namespace of the superblock.
+
+     This also means that the keys in the DNS record cache are thenceforth
+     namespaced, provided network filesystems pass the appropriate network
+     namespace down into dns_query().
+
+     For DNS, AFS and NFS are good, whilst CIFS and Ceph are not.  Other
+     cache keyrings, such as idmapper keyrings, also need to set the domain
+     tag - for which they need access to the network namespace of the
+     superblock.
+
+David
+---
+The following changes since commit 3b8c4a08a471d56ecaaca939c972fdf5b8255629:
+
+  keys: Kill off request_key_async{,_with_auxdata} (2019-06-26 20:58:13 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags/keys-namespace-20190627
+
+for you to fetch changes up to a58946c158a040068e7c94dc1d58bbd273258068:
+
+  keys: Pass the network namespace into request_key mechanism (2019-06-27 23:02:12 +0100)
+
+----------------------------------------------------------------
+Keyrings namespacing
+
+----------------------------------------------------------------
+David Howells (9):
+      keys: Simplify key description management
+      keys: Cache the hash value to avoid lots of recalculation
+      keys: Add a 'recurse' flag for keyring searches
+      keys: Namespace keyring names
+      keys: Move the user and user-session keyrings to the user_namespace
+      keys: Include target namespace in match criteria
+      keys: Garbage collect keys for which the domain has been removed
+      keys: Network namespace domain tag
+      keys: Pass the network namespace into request_key mechanism
+
+ Documentation/security/keys/core.rst        |  38 ++--
+ Documentation/security/keys/request-key.rst |  29 ++-
+ certs/blacklist.c                           |   2 +-
+ crypto/asymmetric_keys/asymmetric_type.c    |   2 +-
+ fs/afs/addr_list.c                          |   4 +-
+ fs/afs/dynroot.c                            |   8 +-
+ fs/cifs/dns_resolve.c                       |   3 +-
+ fs/nfs/dns_resolve.c                        |   3 +-
+ fs/nfs/nfs4idmap.c                          |   2 +-
+ include/linux/dns_resolver.h                |   3 +-
+ include/linux/key-type.h                    |   3 +
+ include/linux/key.h                         |  81 ++++++++-
+ include/linux/sched/user.h                  |  14 --
+ include/linux/user_namespace.h              |  12 +-
+ include/net/net_namespace.h                 |   3 +
+ include/uapi/linux/keyctl.h                 |   2 +
+ kernel/user.c                               |   8 +-
+ kernel/user_namespace.c                     |   9 +-
+ lib/digsig.c                                |   2 +-
+ net/ceph/messenger.c                        |   3 +-
+ net/core/net_namespace.c                    |  20 +++
+ net/dns_resolver/dns_key.c                  |   1 +
+ net/dns_resolver/dns_query.c                |   7 +-
+ net/rxrpc/key.c                             |   6 +-
+ net/rxrpc/security.c                        |   2 +-
+ security/integrity/digsig_asymmetric.c      |   4 +-
+ security/keys/gc.c                          |   2 +-
+ security/keys/internal.h                    |  10 +-
+ security/keys/key.c                         |   5 +-
+ security/keys/keyctl.c                      |   8 +-
+ security/keys/keyring.c                     | 263 ++++++++++++++++------------
+ security/keys/persistent.c                  |  10 +-
+ security/keys/proc.c                        |   3 +-
+ security/keys/process_keys.c                | 262 +++++++++++++++++----------
+ security/keys/request_key.c                 |  62 ++++---
+ security/keys/request_key_auth.c            |   3 +-
+ 36 files changed, 589 insertions(+), 310 deletions(-)
