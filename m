@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AB6EC46499
-	for <linux-cifs@archiver.kernel.org>; Fri,  5 Jul 2019 20:53:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28C76C46499
+	for <linux-cifs@archiver.kernel.org>; Fri,  5 Jul 2019 21:07:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0161E20693
-	for <linux-cifs@archiver.kernel.org>; Fri,  5 Jul 2019 20:53:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0154721670
+	for <linux-cifs@archiver.kernel.org>; Fri,  5 Jul 2019 21:07:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gZMji0Zm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vE8p7x+g"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727008AbfGEUxH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 5 Jul 2019 16:53:07 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:37977 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725813AbfGEUxH (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 5 Jul 2019 16:53:07 -0400
-Received: by mail-pl1-f194.google.com with SMTP id 9so5095150ple.5
-        for <linux-cifs@vger.kernel.org>; Fri, 05 Jul 2019 13:53:07 -0700 (PDT)
+        id S1727121AbfGEVHs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 5 Jul 2019 17:07:48 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:46829 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727873AbfGEVHs (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 5 Jul 2019 17:07:48 -0400
+Received: by mail-pl1-f193.google.com with SMTP id c2so3533536plz.13
+        for <linux-cifs@vger.kernel.org>; Fri, 05 Jul 2019 14:07:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=yvjsA0xutB1OqtMtQgXtsBfdWkGY37LjHSsC0axHs4Y=;
-        b=gZMji0ZmQfOlCy2wCGEN6U/TjLDwasgNWnSo4m5yc82JIGKjWS6WSifrNtz5F3VwSB
-         9wV8nCWZKwfi9x/b7V8CrhN/9frV6Fqy6oSAZZ9ti0C9qtjNMbtGak9XEXRnR/8kyfu2
-         g+HLVEA2GAymt6DccFhQjShggvuVQqxYUyZhoIwd1na+NQ2gzhAjrR8SClwLofyhyfEe
-         ruOJiJagqcHwmcYV5uijKtLWqJ7iRl9MGHd+W77RK9CJ7SLaCDDdXEfgBdi+AD1NpR2C
-         wV+lO4NKI6hXzkhnu7BS7I/oMjjSw7+uK/Zpt+5MLfOtzloEb0033HjM0ortoNt7rDc3
-         ap5g==
+        bh=aQsZ8tnSw2A6Y/hR9pk5Ii1SWprFEaj5sUW2qdiBjb0=;
+        b=vE8p7x+g6svDFfMkuP3xVIotcLsMLnzQ68/8LP+Pxg+Dnu/W8CySoBZLDFRstnZKwJ
+         nVsSHOjyIyCj5djk+ya8E4wmBxHSGwgBxYdQAwp7yM8vPGUnjWrDc5IXdNvr9q9bPWAS
+         rhCdqgiW/n/hFkSnduFDKe3IAXrbLQala6cx71ohgNjzcACQuO81/YthpSpXWueGWQOA
+         6nkHQeiQ6WRowGKTZJBLiF+TbI2PkkCGJr8sHy7iX2lr36eQnNmD3mhDEaO7hI4pNGGo
+         AKlSZ3TnWTZ5FVEhtmT0EeWH3a9YdT3uWBZavTffEO5mTUS4W0T4BI4YV0yma59AuJ19
+         3GZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=yvjsA0xutB1OqtMtQgXtsBfdWkGY37LjHSsC0axHs4Y=;
-        b=JfzVIRAfCJhaMzy5kBRHakiHS7ugpSLV0yqos63CyP8pXOcrnyCk4CUasN9tcgBFFZ
-         UGVzNb8Sd0AcbjfygxAXs6wLJjkTRWSzqTag3FYwj+VI72oS0WylS2/JireKdM3BUmA8
-         LYYUk4f+3CiDPma8WEPN+abje3DJZ2nuOu5liNFgEFb7hpLiYO5IwKmkBb30yb++m1x7
-         EiC+uICx+BNli8AeAtnEVQjw6+IVLawd7bwgUCQdmjOMDxIhbqXKc+DA839U6nGYO+TF
-         u+uQu+YWZWnpDby6MxGJLyXXfU1mO39JVuvJ3lDtV9J02/11k5tXEM91Del943AC4TYk
-         XPdw==
-X-Gm-Message-State: APjAAAWUDnWBeAqcJgw67QlEVc6G3Hprr0BeUi+HsnJ49qjmkipBgVcd
-        UZsPSYvXpXy4t9ucXLaUr9cXLjPlgqdBkGlkwyCzlWve
-X-Google-Smtp-Source: APXvYqybkmXn3WXOamjlRSdZh80oKxURkv1uCzjrLUxbrhjydOJ96+z7T7Ay5Mv034oVSY0vGEfMLCtbpZHWzl8EqLM=
-X-Received: by 2002:a17:902:2a29:: with SMTP id i38mr7856216plb.46.1562359986811;
- Fri, 05 Jul 2019 13:53:06 -0700 (PDT)
+        bh=aQsZ8tnSw2A6Y/hR9pk5Ii1SWprFEaj5sUW2qdiBjb0=;
+        b=EC5hurhI6uCiYNlIixhy5GbMdyylY9frMfvDrrP9gFESl0JerjatdEhajcGCxZtWtY
+         4eLkznY2TYCzap244rgP4qN5N13KI1JuvFhD8sq77mautgDRB/hI8WRMofEh8n4MfZKQ
+         V/E7ZKm1FY+t/IcNVX2izSh8DRwaX2MDLQpTVr4jjmOihkH7wJ3cqVSX8acIPsIZmSDB
+         U/09RsplGV+wiuLHYJczOVbDCkdD6G9uCIpMwpvLKYkEl7QIvwLMGX6yp/iW5hXYSZCz
+         m6lR5G6KBvOl6c1d193wK74ZV4cYeY9F97TKzkMXzwF5H8YggKwbjobSGUWxpc/8beqV
+         nz5A==
+X-Gm-Message-State: APjAAAWXNFYeuEbc7iwDbsc2CIyAiATKP2HeAKIMjkjEU3/1eEIsLvQe
+        exIrjPqtKB10wz6m5W/w6DcXU7Nfg/jzFhsauBd+R/9c
+X-Google-Smtp-Source: APXvYqy6GyvOi/QHr6FjZGGcDbejOfAs5FkcQhYcWay0wR/8VHYMHR7+iN2mEXucUe9Q+eft7PouafSD76gZbPeHa88=
+X-Received: by 2002:a17:902:20b:: with SMTP id 11mr7975959plc.78.1562360867875;
+ Fri, 05 Jul 2019 14:07:47 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190705204308.10039-1-lsahlber@redhat.com>
 In-Reply-To: <20190705204308.10039-1-lsahlber@redhat.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 5 Jul 2019 15:52:55 -0500
-Message-ID: <CAH2r5msoNnX0ZQ2GKMzoa8_-J1kukbQ=uiAC4m=w7XM86b-uZA@mail.gmail.com>
+Date:   Fri, 5 Jul 2019 16:07:36 -0500
+Message-ID: <CAH2r5muJNCpjxvD0PoHo2jbg8uG9fivAcyuK2K+CtQRztsmV7Q@mail.gmail.com>
 Subject: Re: [PATCH] cifs: always add credits back for unsolicited PDUs
 To:     Ronnie Sahlberg <lsahlber@redhat.com>
 Cc:     linux-cifs <linux-cifs@vger.kernel.org>
@@ -65,7 +65,7 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Thoughts on stable?
+Tentatively merged these two patches into cifs-2.6.git for-next pending testing
 
 On Fri, Jul 5, 2019 at 3:43 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
 >
