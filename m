@@ -4,67 +4,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AC2AC0650E
-	for <linux-cifs@archiver.kernel.org>; Sat,  6 Jul 2019 16:41:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6822BC0650E
+	for <linux-cifs@archiver.kernel.org>; Sat,  6 Jul 2019 16:49:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 39ECB20836
-	for <linux-cifs@archiver.kernel.org>; Sat,  6 Jul 2019 16:41:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2349A20836
+	for <linux-cifs@archiver.kernel.org>; Sat,  6 Jul 2019 16:49:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JQwjnYqm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LF1zULUj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726698AbfGFQlK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 6 Jul 2019 12:41:10 -0400
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:35785 "EHLO
+        id S1727096AbfGFQt1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 6 Jul 2019 12:49:27 -0400
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:40467 "EHLO
         mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726522AbfGFQlK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 6 Jul 2019 12:41:10 -0400
-Received: by mail-lf1-f68.google.com with SMTP id p197so8187995lfa.2
-        for <linux-cifs@vger.kernel.org>; Sat, 06 Jul 2019 09:41:06 -0700 (PDT)
+        with ESMTP id S1726522AbfGFQt1 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 6 Jul 2019 12:49:27 -0400
+Received: by mail-lf1-f68.google.com with SMTP id b17so4583747lff.7
+        for <linux-cifs@vger.kernel.org>; Sat, 06 Jul 2019 09:49:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=ln6R3Vv2YNplTvlcIQTY1NoRjhrHs3+hznZRDChwS3E=;
-        b=JQwjnYqmhehhtPTu/+Yo0uPNCjmz1XOpIv18tMFsS3FkfcLibDjaEqFs3J/HWvBw7j
-         QwMZU7Pv2EidRICcjPxRq3+jE5Ziq3tzGECBLd3Tv0s6lDrVSlH4H3b0QmAhBOmlp3uP
-         ItjmFZ/77yK0VBGWWaR4Nh5YdoQFZ5P/bwbC3HmXckahH+heFqb5XN7GWKl27ilU3d0W
-         i/zkYC455FdOED5/ioKDFNMI9EkfLIgbf7H3Z5rDvKr9imQpADSfrFQ0f/UV1zdCTHbi
-         ZX5QeMAlDBBZNNt/WjE0vSxkGriq++wf+NIr0zIoRwYUwmmX9o3nFFM6mn136A8qWMww
-         5gzg==
+        bh=EQKk8phXhfoAAScbmlOB3WDQQ959VprJ1CGmJErkRok=;
+        b=LF1zULUjNTayuzQ+S0KocDaHGCDKHnkbQMA/SV8R+Qh4cvGbXqc5vg3C07yVE1twTC
+         p2CwjA/OOLdtdsSwQmYgcXHWcs5pzLZxNfSxgd9dmMRQn1jt4HMuwugPqsWdFwvcYzfj
+         uqtrh344BJcsVj0N5ClKfLakn7h2xU02XDL9Qkr3AfdGWI+S51+ASCDrOcaYAcHCne2Q
+         ykrN+PjHxB3HKu3Pyr3FKFXj1N85MOQd1iH9ZBcwCYC62EG03HhYXGmyFORpUTWQ9JXh
+         FQLK4nKrtZELxa5XTQBg/bpOoEfexFVvCQl1KDyA7C0ErtnnLJKrX7d9ZAEyrtzPo62A
+         qvRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=ln6R3Vv2YNplTvlcIQTY1NoRjhrHs3+hznZRDChwS3E=;
-        b=YMM+wTO1gh6CmVKVeLWon8APVjdu+2SxOYB7ULRJM4eCzFuxsiUfHzD3hlnf8CW+TB
-         m8ckYDnRLLsjZo02g2b1/ihKX/LB7ryva32FT9XJSCAbkGKlfdIFKZCnf4GHPPivU5Ag
-         dEKt0RhGC2QqAsTss7oo4NPvJ050w56PUocWTXLwrwDuNg2fK7zaHU0kzBsGgKYbx65j
-         Z9tK1PvwJIP2eJq1mqmkL9NuXBtbMISXMD/BtAal96sS40OjMvODMrzxCOUzH+H2k/rq
-         NkGGyDgfDSqcYiyBUo7XO49uNnrafQM/u75sGQoZJ1BGGFy66W/7AFsPRlfXMrdp+t3q
-         o5Ug==
-X-Gm-Message-State: APjAAAWDhtyWe0d/66pkFdb1rXWmFklO5T46mfO6HuVUfy5NAXh19e09
-        k52wy1FCUj2WY+Oc1oDL7v2VFWz/etDyf/NjHA==
-X-Google-Smtp-Source: APXvYqzgiTNOEhAN2u8EAAuLHWlMzH8qJgFnrPcV3urhGSkX+v21Iko7VloPR0+XyxwUvp4qmL2+V+Bg4aJMi6HlecQ=
-X-Received: by 2002:a05:6512:1d2:: with SMTP id f18mr4462725lfp.173.1562431264731;
- Sat, 06 Jul 2019 09:41:04 -0700 (PDT)
+        bh=EQKk8phXhfoAAScbmlOB3WDQQ959VprJ1CGmJErkRok=;
+        b=tiAOn4YsoPxyQ4g4GrXCqIZPtOisMMgP95mNhUdQg13JlMcDPfjCrYIFmMnb6tbU0R
+         9D5Uao0yiLnSPPLQWWb1r0rQm78LKzrWycS2cEyhz5lB72tE/kQzZiXIaJgctoP/gsmB
+         EBIRWpqXP1NdDmEw3zkOjjMmB53nl5WMKh/09CsJzHh2TDEQBkq95j0qG/VyYguye7qZ
+         aQUB00rNjF0PMkHLhkxND7kMXL0SVlRNLi5Skv1gEovXbhdflk//VgLIz/boqR6K9Nu5
+         UzWqcQxOSbU7uN2ZRHK9Qe8kKbxf45HmENFxXh6xaW1PXc2U1Vb+CzCuYt0RVEdu7JOh
+         CFiA==
+X-Gm-Message-State: APjAAAUVtd0UTCf9Q04eCN+ZdckzeaUIQPxnUB8ZlgCB1vBqVU5PDy2U
+        bQ3+83DskFZNBwkFEc/vgz66PnQJDzWO1CGZqoyrGiE=
+X-Google-Smtp-Source: APXvYqy8Bvl+E8pfwYIzWizm+ZPfToVFwRy/hu+k6zwvL3qKSIx41mBz4sK+v+cgxsZyWX7Ou52T1jKBaryKu6Dqh+4=
+X-Received: by 2002:ac2:52ac:: with SMTP id r12mr2025552lfm.54.1562431764078;
+ Sat, 06 Jul 2019 09:49:24 -0700 (PDT)
 MIME-Version: 1.0
-References: <684ed01c-cbca-2716-bc28-b0a59a0f8521@prodrive-technologies.com>
- <875zojx70t.fsf@suse.com> <1fc4f6d0-6cdc-69a5-4359-23484d6bdfc9@prodrive-technologies.com>
- <8736jmxcwi.fsf@suse.com> <5d4fd393-9c6c-c407-462e-441cd46bbdd8@prodrive-technologies.com>
- <CAKywueTpgXyFMxveRj6Hm-=vuCC6xh1z0W9bqAFcpCiREe6Vwg@mail.gmail.com>
- <325128ce-6ef7-9a18-a626-ee3505037c2c@prodrive-technologies.com> <CAH2r5mtXc+K5AMFFRmvPwyAx1kc2eciDKsHF_Sx2p+sjtYrtCw@mail.gmail.com>
-In-Reply-To: <CAH2r5mtXc+K5AMFFRmvPwyAx1kc2eciDKsHF_Sx2p+sjtYrtCw@mail.gmail.com>
+References: <CAPWvxscPxF-bEy8ybgT5fSjxNbA7tf1_mXEoo5LOr79qRoukmg@mail.gmail.com>
+ <CAKywueQnekHWsAzo4s+5ON2W9siLiPh8G-FHB0aCN+xrgJt4vA@mail.gmail.com> <CAPWvxsdTbq8jwTN+2syjsiZwCGGNMvmr+j8sS_ucnKe-TNLDzA@mail.gmail.com>
+In-Reply-To: <CAPWvxsdTbq8jwTN+2syjsiZwCGGNMvmr+j8sS_ucnKe-TNLDzA@mail.gmail.com>
 From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Sat, 6 Jul 2019 09:40:53 -0700
-Message-ID: <CAKywueSgkKtWTw0TXvYhAmCR7zJDnE9toTDvZ_-0BM7bNy_f0A@mail.gmail.com>
-Subject: Re: Many processes end up in uninterruptible sleep accessing cifs mounts
-To:     Steve French <smfrench@gmail.com>
-Cc:     Martijn de Gouw <martijn.de.gouw@prodrive-technologies.com>,
-        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>
+Date:   Sat, 6 Jul 2019 09:49:12 -0700
+Message-ID: <CAKywueRUpSEgmV4MAAGFsBOR7opYqjAU4cwj5SjmTX-1NbVJgA@mail.gmail.com>
+Subject: Re: General protection faults in cifs_reconnect with Azure Files
+To:     Luke Carrier <luke@carrier.im>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
@@ -72,1001 +67,231 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Martijn, thanks for the traces. This is a deadlock as mentioned by Aurelien=
-:
+=D1=81=D0=B1, 6 =D0=B8=D1=8E=D0=BB. 2019 =D0=B3. =D0=B2 05:32, Luke Carrier=
+ <luke@carrier.im>:
+>
+> Hi Pavel,
+>
+> Thanks for the prompt response.
+>
+> Under the 5.1.0 kernel we observed slightly different oopses, again
+> during reconnection:
+>
+> [   64.118926] CIFS VFS: Send error in SessSetup =3D -11
+> [  107.638988] CIFS VFS: Send error in SessSetup =3D -11
+> [  138.487142] CIFS VFS: Send error in SessSetup =3D -11
+> [  148.599239] CIFS VFS: Send error in SessSetup =3D -11
+> [  186.685967] CIFS VFS: Send error in SessSetup =3D -11
+> [  193.450272] CIFS VFS: Send error in SessSetup =3D -11
+> [  364.918259] INFO: task kworker/3:2:271 blocked for more than 120 secon=
+ds.
+> [  364.924765]       Not tainted 5.1.0-050100-generic #201905052130
+> [  364.931458] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
+> disables this message.
+> [  364.939006] kworker/3:2     D    0   271      2 0x80000000
+> [  364.939043] Workqueue: cifsiod smb2_reconnect_server [cifs]
+> [  364.939049] Call Trace:
+> [  364.939057]  __schedule+0x2d3/0x840
+> [  364.939061]  ? wake_up_klogd+0x34/0x40
+> [  364.939063]  schedule+0x2c/0x70
+> [  364.939066]  schedule_preempt_disabled+0xe/0x10
+> [  364.939071]  __mutex_lock.isra.10+0x2e4/0x4c0
+> [  364.939074]  ? printk+0x58/0x6f
+> [  364.939079]  __mutex_lock_slowpath+0x13/0x20
+> [  364.939081]  mutex_lock+0x2c/0x30
+> [  364.939098]  smb2_reconnect.part.22+0xea/0x7c0 [cifs]
+> [  364.939103]  ? lock_timer_base+0x6b/0x90
+> [  364.939116]  ? cifs_put_tcon.part.45+0x162/0x1e0 [cifs]
+> [  364.939149]  smb2_reconnect_server+0x190/0x2a0 [cifs]
+> [  364.939154]  process_one_work+0x20f/0x410
+> [  364.939155]  worker_thread+0x34/0x400
+> [  364.939157]  kthread+0x120/0x140
+> [  364.939158]  ? process_one_work+0x410/0x410
+> [  364.939160]  ? __kthread_parkme+0x70/0x70
+> [  364.939161]  ret_from_fork+0x35/0x40
+> [  364.939184] INFO: task php-fpm7.2:1913 blocked for more than 120 secon=
+ds.
+> [  364.944595]       Not tainted 5.1.0-050100-generic #201905052130
+> [  364.949987] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
+> disables this message.
+> [  364.957078] php-fpm7.2      D    0  1913   1325 0x00000000
+> [  364.957079] Call Trace:
+> [  364.957083]  __schedule+0x2d3/0x840
+> [  364.957086]  ? __d_alloc+0x122/0x1d0
+> [  364.957090]  schedule+0x2c/0x70
+> [  364.957094]  d_alloc_parallel+0x3df/0x490
+> [  364.957096]  ? __switch_to_asm+0x34/0x70
+> [  364.957100]  ? wake_up_q+0x80/0x80
+> [  364.957105]  __lookup_slow+0x71/0x150
+> [  364.957107]  lookup_slow+0x3a/0x60
+> [  364.957108]  walk_component+0x1bf/0x330
+> [  364.957110]  ? link_path_walk.part.42+0x61/0x540
+> [  364.957112]  path_lookupat.isra.45+0x6d/0x220
+> [  364.957114]  filename_lookup.part.61+0xa0/0x170
+> [  364.957118]  ? __check_object_size+0x166/0x192
+> [  364.957121]  ? strncpy_from_user+0x56/0x1b0
+> [  364.957123]  user_path_at_empty+0x3e/0x50
+> [  364.957125]  vfs_statx+0x76/0xe0
+> [  364.957126]  __do_sys_newstat+0x3d/0x70
+> [  364.957129]  ? handle_mm_fault+0xe1/0x210
+> [  364.957133]  ? __do_page_fault+0x259/0x4b0
+> [  364.957136]  __x64_sys_newstat+0x16/0x20
+> [  364.957141]  do_syscall_64+0x5a/0x110
+> [  364.957145]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> [  364.957165] RIP: 0033:0x7f3a2ff5f775
+> [  364.957171] Code: Bad RIP value.
+> [  364.957171] RSP: 002b:00007ffdada63d48 EFLAGS: 00000246 ORIG_RAX:
+> 0000000000000004
+> [  364.957173] RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 00007f3a2=
+ff5f775
+> [  364.957173] RDX: 00007ffdada63ed0 RSI: 00007ffdada63ed0 RDI: 00007f3a1=
+6eeff78
+> [  364.957174] RBP: 00007f3a16eeff78 R08: 000000000000ffff R09: 000000000=
+0000020
+> [  364.957174] R10: 00007f3a2ffdd2e0 R11: 0000000000000246 R12: 000000000=
+0000000
+> [  364.957175] R13: 00007ffdada63ed0 R14: 00000000fffffffb R15: 000000000=
+0000000
+> [  364.957179] INFO: task php-fpm7.2:1926 blocked for more than 120 secon=
+ds.
+> [  364.963025]       Not tainted 5.1.0-050100-generic #201905052130
+> [  364.968886] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
+> disables this message.
+> [  364.976107] php-fpm7.2      D    0  1926   1325 0x00000000
+> [  364.976109] Call Trace:
+> [  364.976113]  __schedule+0x2d3/0x840
+> [  364.976115]  schedule+0x2c/0x70
+> [  364.976119]  schedule_preempt_disabled+0xe/0x10
+> [  364.976123]  __mutex_lock.isra.10+0x2e4/0x4c0
+> [  364.976127]  ? del_timer_sync+0x39/0x40
+> [  364.976130]  __mutex_lock_slowpath+0x13/0x20
+> [  364.976132]  mutex_lock+0x2c/0x30
+> [  364.976188]  smb2_reconnect.part.22+0xea/0x7c0 [cifs]
+> [  364.976210]  ? wait_woken+0x80/0x80
+> [  364.976223]  smb2_plain_req_init+0x3e/0x270 [cifs]
+> [  364.976238]  SMB2_open_init+0x69/0x760 [cifs]
+> [  364.976249]  ? cifs_get_inode_info+0x28f/0xb30 [cifs]
+> [  364.976263]  open_shroot+0x21e/0x4a0 [cifs]
+> [  364.976277]  smb2_query_path_info+0x133/0x1f0 [cifs]
+> [  364.976291]  ? smb2_query_path_info+0x133/0x1f0 [cifs]
+> [  364.976294]  ? _cond_resched+0x19/0x30
+> [  364.976297]  ? kmem_cache_alloc_trace+0x150/0x1d0
+> [  364.976308]  cifs_get_inode_info+0x2df/0xb30 [cifs]
+> [  364.976319]  ? build_path_from_dentry_optional_prefix+0xc4/0x400 [cifs=
+]
+> [  364.976351]  cifs_revalidate_dentry_attr+0xd5/0x360 [cifs]
+> [  364.976362]  cifs_getattr+0x5a/0x1a0 [cifs]
+> [  364.976365]  vfs_getattr_nosec+0x98/0xc0
+> [  364.976366]  vfs_getattr+0x36/0x40
+> [  364.976368]  vfs_statx+0x8d/0xe0
+> [  364.976369]  __do_sys_newstat+0x3d/0x70
+> [  364.976370]  __x64_sys_newstat+0x16/0x20
+> [  364.976372]  do_syscall_64+0x5a/0x110
+> [  364.976374]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> [  364.976375] RIP: 0033:0x7f3a2ff5f775
+> [  364.976377] Code: Bad RIP value.
+> [  364.976378] RSP: 002b:00007ffdada62ec8 EFLAGS: 00000246 ORIG_RAX:
+> 0000000000000004
+> [  364.976379] RAX: ffffffffffffffda RBX: 00007f3a16eeff78 RCX: 00007f3a2=
+ff5f775
+> [  364.976379] RDX: 00007ffdada62ef0 RSI: 00007ffdada62ef0 RDI: 00007ffda=
+da62f80
+> [  364.976380] RBP: 0000000000000021 R08: 0000000000c3dfc8 R09: 000000000=
+000017b
+> [  364.976381] R10: 00007ffdada60e10 R11: 0000000000000246 R12: 00007ffda=
+da62f81
+> [  364.976381] R13: 0000000000000000 R14: 00007ffdada62f99 R15: 00007ffda=
+da62f80
+> [  364.976384] INFO: task php-fpm7.2:1933 blocked for more than 120 secon=
+ds.
+> [  364.981953]       Not tainted 5.1.0-050100-generic #201905052130
+> [  364.986915] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
+> disables this message.
+> [  364.993572] php-fpm7.2      D    0  1933   1325 0x80000000
+> [  364.993574] Call Trace:
+> [  364.993578]  __schedule+0x2d3/0x840
+> [  364.993598]  schedule+0x2c/0x70
+> [  364.993600]  schedule_preempt_disabled+0xe/0x10
+> [  364.993601]  __mutex_lock.isra.10+0x2e4/0x4c0
+> [  364.993603]  __mutex_lock_slowpath+0x13/0x20
+> [  364.993605]  mutex_lock+0x2c/0x30
+> [  364.993617]  cifs_mark_open_files_invalid+0x5b/0xa0 [cifs]
+> [  364.993633]  smb2_reconnect.part.22+0x131/0x7c0 [cifs]
+> [  364.993638]  ? kmem_cache_alloc_trace+0x150/0x1d0
+> [  364.993641]  ? char2uni+0x29/0x70 [nls_utf8]
+> [  364.993658]  smb2_plain_req_init+0x3e/0x270 [cifs]
+> [  364.993673]  SMB2_open_init+0x69/0x760 [cifs]
+> [  364.993687]  ? cifs_convert_path_to_utf16+0x7a/0xb0 [cifs]
+> [  364.993701]  smb2_compound_op+0x189/0x1930 [cifs]
+> [  364.993706]  ? prep_new_page+0x99/0x130
+> [  364.993709]  ? get_page_from_freelist+0xeed/0x1350
+> [  364.993711]  ? __alloc_pages_nodemask+0x16a/0x330
+> [  364.993724]  smb2_query_path_info+0xc8/0x1f0 [cifs]
+> [  364.993737]  ? smb2_query_path_info+0xc8/0x1f0 [cifs]
+> [  364.993740]  ? _cond_resched+0x19/0x30
+> [  364.993741]  ? kmem_cache_alloc_trace+0x150/0x1d0
+> [  364.993752]  cifs_get_inode_info+0x2df/0xb30 [cifs]
+> [  364.993753]  ? kmem_cache_alloc+0x15c/0x1c0
+> [  364.993795]  ? build_path_from_dentry_optional_prefix+0x12f/0x400 [cif=
+s]
+> [  364.993819]  cifs_lookup+0xf3/0x7b0 [cifs]
+> [  364.993823]  __lookup_slow+0x9b/0x150
+> [  364.993825]  lookup_slow+0x3a/0x60
+> [  364.993826]  walk_component+0x1bf/0x330
+> [  364.993828]  ? link_path_walk.part.42+0x61/0x540
+> [  364.993830]  path_lookupat.isra.45+0x6d/0x220
+> [  364.993833]  filename_lookup.part.61+0xa0/0x170
+> [  364.993835]  ? __check_object_size+0x166/0x192
+> [  364.993837]  ? strncpy_from_user+0x56/0x1b0
+> [  364.993839]  user_path_at_empty+0x3e/0x50
+> [  364.993841]  vfs_statx+0x76/0xe0
+> [  364.993843]  __do_sys_newstat+0x3d/0x70
+> [  364.993845]  __x64_sys_newstat+0x16/0x20
+> [  364.993847]  do_syscall_64+0x5a/0x110
+> [  364.993850]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> [  364.993851] RIP: 0033:0x7f3a2ff5f775
+> [  364.993862] Code: Bad RIP value.
+> [  364.993862] RSP: 002b:00007ffdada63d48 EFLAGS: 00000246 ORIG_RAX:
+> 0000000000000004
+> [  364.993864] RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 00007f3a2=
+ff5f775
+> [  364.993865] RDX: 00007ffdada63ed0 RSI: 00007ffdada63ed0 RDI: 00007f3a1=
+6eeff78
+> [  364.993866] RBP: 00007f3a16eeff78 R08: 000000000000ffff R09: 000000000=
+0000020
+> [  364.993867] R10: 00007f3a2ffdd2e0 R11: 0000000000000246 R12: 000000000=
+0000000
+> [  364.993867] R13: 00007ffdada63ed0 R14: 00000000fffffffb R15: 000000000=
+0000000
+>
+> We had been experiencing different faults under 4.18 (the current stable =
+in
+> Ubuntu 18.04 LTS), but had never seen a call trace that directly implicat=
+ed
+> memory management. If it's worth sharing these oopses I can, but I suspec=
+t
+> it's better to work backwards through the Ubuntu mainline kernel images t=
+o
+> try and isolate this fault than to dig through fairly ancient kernels?
+>
+> Cheers,
+> Luke
+>
 
-[36247.368103] INFO: task puppet:3836 blocked for more than 120 seconds.
-[36247.368119]       Tainted: G            E     4.20.17-pd-4.20.y #2019061=
-1
-[36247.368135] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-disables this message.
-[36247.368158] puppet          D    0  3836    541 0x00000000
-[36247.368159] Call Trace:
-[36247.368161]  ? __schedule+0x338/0x850
-[36247.368163]  schedule+0x3c/0x90
-[36247.368164]  schedule_preempt_disabled+0x14/0x20
-[36247.368165]  __mutex_lock.isra.7+0x19f/0x540
-[36247.368166]  ? __switch_to_asm+0x34/0x70
-[36247.368167]  ? __switch_to_asm+0x40/0x70
-[36247.368169]  ? try_module_get+0x68/0x100
-[36247.368178]  ? smb2_reconnect+0x1d7/0x4b0 [cifs]
-[36247.368186]  smb2_reconnect+0x1d7/0x4b0 [cifs]
-[36247.368188]  ? _raw_spin_unlock_irq+0x1d/0x30
-[36247.368189]  ? finish_task_switch+0x7d/0x290
-[36247.368190]  ? __switch_to_asm+0x40/0x70
-[36247.368198]  smb2_plain_req_init+0x30/0x240 [cifs]
-[36247.368199]  ? _raw_spin_lock_irqsave+0x25/0x50
-[36247.368208]  SMB2_open_init+0x6d/0x7c0 [cifs]
-[36247.368209]  ? _raw_spin_lock+0x13/0x30
-[36247.368218]  ? cifs_mid_q_entry_release+0x15/0x40 [cifs]
-[36247.368227]  ? SMB2_open+0x150/0x520 [cifs]
-[36247.368235]  SMB2_open+0x150/0x520 [cifs]
-[36247.368238]  ? sched_clock+0x5/0x10
-[36247.368247]  ? open_shroot+0x12f/0x200 [cifs]
-[36247.368255]  open_shroot+0x12f/0x200 [cifs]
-[36247.368258]  ? __follow_mount_rcu.isra.31+0x3c/0xf0
-[36247.368267]  smb2_query_path_info+0x93/0x220 [cifs]
-[36247.368269]  ? walk_component+0x48/0x360
-[36247.368278]  cifs_get_inode_info+0x580/0xb10 [cifs]
-[36247.368286]  ? filename_lookup+0xf8/0x1a0
-[36247.368294]  ? build_path_from_dentry_optional_prefix+0x1e9/0x440 [cifs]
-[36247.368303]  cifs_revalidate_dentry_attr+0xdc/0x3e0 [cifs]
-[36247.368311]  cifs_getattr+0x5b/0x1b0 [cifs]
-[36247.368313]  vfs_statx+0x89/0xe0
-[36247.368315]  __do_sys_newlstat+0x39/0x70
-[36247.368318]  do_syscall_64+0x55/0x100
-[36247.368320]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-[36247.368321] RIP: 0033:0x7f562d3a0335
-[36247.368323] Code: Bad RIP value.
+Hi Luke,
 
-This looks urgent to fix - we have a parallel thread with the similar
-problem observed on 5.1 kernel. In order to fix it we need to drop
-open shroot mutex before going into SMB2_open_init and other PDU
-functions.
+The issue you are observing on the 5.1 kernel seems similar to the
+issue in the parallel thread in the mailing list. So, this might be a
+deadlock problem. Please try to mount with "nohandlecache" mount
+option to see if it helps.
 
-You can try to work around this by specifying "nohandlecache" mount option.
+It also worth to mention, that the problem reported on 5.2-rc kernel
+was a different one and we still don't know what may be a reason for
+that.
+
+About digging old kernels - I agree, better not to do it. It is easier
+to debug the current kernel and to work backward through the images.
 
 --
 Best regards,
 Pavel Shilovsky
-
-=D1=81=D0=B1, 6 =D0=B8=D1=8E=D0=BB. 2019 =D0=B3. =D0=B2 06:05, Steve French=
- <smfrench@gmail.com>:
->
-> Are we sure this isn't something really simple like the server IP
-> address changing?  Remember in 5.0 kernel (also updated cifs-utils)
-> the code to allow failover when server's IP address changes was added.
->
-> On Sat, Jul 6, 2019 at 6:12 AM Martijn de Gouw
-> <martijn.de.gouw@prodrive-technologies.com> wrote:
-> >
-> > Hi Pavel,
-> >
-> > On 04-07-2019 23:34, Pavel Shilovsky wrote:
-> > > Hi Martijn,
-> > >
-> > > Thanks for reporting the problem. Have you tried v5.1.5 kernel and
-> > > above? That one has many reconnect fixes. If yes, could you please
-> > > provide the kernel stack / panic traces when running new versions of
-> > > the kernel?
-> >
-> > I can try to run them for a while on a less critical server. But even i=
-f that machine runs fine, there is not really a guarantee the cifs issue we=
- have right now is solved for our critical machines, causing me to be very =
-hesitated to upgrade those.
-> >
-> > Btw, here is another kernel dump, generated today. Please note that on =
-this machine the cifs mounts are not really used, all 'action'
-> > performed on these mounts is the check if they are still mounted (by pu=
-ppet).
-> >
-> >
-> > [36247.367572] INFO: task node_exporter:3567 blocked for more than 120 =
-seconds.
-> > [36247.367613]       Tainted: G            E     4.20.17-pd-4.20.y #201=
-90611
-> > [36247.367630] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disab=
-les this message.
-> > [36247.367648] node_exporter   D    0  3567      1 0x00000000
-> > [36247.367650] Call Trace:
-> > [36247.367668]  ? __schedule+0x338/0x850
-> > [36247.367671]  ? preempt_count_add+0x67/0xb0
-> > [36247.367673]  schedule+0x3c/0x90
-> > [36247.367675]  schedule_preempt_disabled+0x14/0x20
-> > [36247.367676]  __mutex_lock.isra.7+0x19f/0x540
-> > [36247.367680]  ? try_module_get+0x68/0x100
-> > [36247.367792]  ? smb2_reconnect+0x1d7/0x4b0 [cifs]
-> > [36247.367803]  smb2_reconnect+0x1d7/0x4b0 [cifs]
-> > [36247.367824]  smb2_plain_req_init+0x30/0x240 [cifs]
-> > [36247.367826]  ? __switch_to_asm+0x34/0x70
-> > [36247.367827]  ? __switch_to_asm+0x40/0x70
-> > [36247.367836]  SMB2_open_init+0x6d/0x7c0 [cifs]
-> > [36247.367846]  ? smb2_queryfs+0x13d/0x350 [cifs]
-> > [36247.367848]  ? lookup_fast+0xc8/0x2e0
-> > [36247.367857]  smb2_queryfs+0x13d/0x350 [cifs]
-> > [36247.367861]  ? lookup_fast+0xc8/0x2e0
-> > [36247.367863]  ? ___cache_free+0x31/0x2e0
-> > [36247.367865]  ? terminate_walk+0x93/0x100
-> > [36247.367873]  ? cifs_statfs+0xad/0x300 [cifs]
-> > [36247.367880]  cifs_statfs+0xad/0x300 [cifs]
-> > [36247.367894]  statfs_by_dentry+0x6a/0x90
-> > [36247.367895]  vfs_statfs+0x16/0xc0
-> > [36247.367897]  user_statfs+0x50/0xa0
-> > [36247.367898]  __do_sys_statfs+0x20/0x50
-> > [36247.367902]  do_syscall_64+0x55/0x100
-> > [36247.367903]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> > [36247.367905] RIP: 0033:0x4a5c20
-> > [36247.367936] Code: Bad RIP value.
-> > [36247.367937] RSP: 002b:000000c0003ef490 EFLAGS: 00000206 ORIG_RAX: 00=
-00000000000089
-> > [36247.367938] RAX: ffffffffffffffda RBX: 000000c00002a000 RCX: 0000000=
-0004a5c20
-> > [36247.367939] RDX: 0000000000000000 RSI: 000000c0003ef5c0 RDI: 000000c=
-0004510e0
-> > [36247.367940] RBP: 000000c0003ef4f0 R08: 0000000000000000 R09: 0000000=
-000000000
-> > [36247.367940] R10: 0000000000000000 R11: 0000000000000206 R12: fffffff=
-fffffffff
-> > [36247.367941] R13: 0000000000000088 R14: 0000000000000087 R15: 0000000=
-000000100
-> > [36247.367954] INFO: task kworker/1:2:32265 blocked for more than 120 s=
-econds.
-> > [36247.367973]       Tainted: G            E     4.20.17-pd-4.20.y #201=
-90611
-> > [36247.367989] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disab=
-les this message.
-> > [36247.368008] kworker/1:2     D    0 32265      2 0x80000000
-> > [36247.368020] Workqueue: cifsiod smb2_reconnect_server [cifs]
-> > [36247.368021] Call Trace:
-> > [36247.368023]  ? __schedule+0x338/0x850
-> > [36247.368025]  schedule+0x3c/0x90
-> > [36247.368026]  schedule_preempt_disabled+0x14/0x20
-> > [36247.368028]  __mutex_lock.isra.7+0x19f/0x540
-> > [36247.368037]  ? SMB2_sess_auth_rawntlmssp_authenticate+0x69/0x170 [ci=
-fs]
-> > [36247.368046]  ? SMB2_sess_setup+0x17f/0x2c0 [cifs]
-> > [36247.368054]  ? cifs_mark_open_files_invalid+0x54/0xa0 [cifs]
-> > [36247.368055]  ? _raw_spin_unlock+0x16/0x30
-> > [36247.368062]  cifs_mark_open_files_invalid+0x54/0xa0 [cifs]
-> > [36247.368071]  smb2_reconnect+0x2d6/0x4b0 [cifs]
-> > [36247.368073]  ? _raw_spin_unlock+0x16/0x30
-> > [36247.368074]  ? preempt_count_add+0x67/0xb0
-> > [36247.368083]  smb2_reconnect_server+0x1bb/0x350 [cifs]
-> > [36247.368090]  process_one_work+0x188/0x3a0
-> > [36247.368092]  worker_thread+0x4c/0x3a0
-> > [36247.368094]  ? preempt_count_add+0x67/0xb0
-> > [36247.368095]  ? process_one_work+0x3a0/0x3a0
-> > [36247.368097]  kthread+0xf8/0x130
-> > [36247.368099]  ? kthread_create_worker_on_cpu+0x70/0x70
-> > [36247.368101]  ret_from_fork+0x35/0x40
-> > [36247.368103] INFO: task puppet:3836 blocked for more than 120 seconds=
-.
-> > [36247.368119]       Tainted: G            E     4.20.17-pd-4.20.y #201=
-90611
-> > [36247.368135] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disab=
-les this message.
-> > [36247.368158] puppet          D    0  3836    541 0x00000000
-> > [36247.368159] Call Trace:
-> > [36247.368161]  ? __schedule+0x338/0x850
-> > [36247.368163]  schedule+0x3c/0x90
-> > [36247.368164]  schedule_preempt_disabled+0x14/0x20
-> > [36247.368165]  __mutex_lock.isra.7+0x19f/0x540
-> > [36247.368166]  ? __switch_to_asm+0x34/0x70
-> > [36247.368167]  ? __switch_to_asm+0x40/0x70
-> > [36247.368169]  ? try_module_get+0x68/0x100
-> > [36247.368178]  ? smb2_reconnect+0x1d7/0x4b0 [cifs]
-> > [36247.368186]  smb2_reconnect+0x1d7/0x4b0 [cifs]
-> > [36247.368188]  ? _raw_spin_unlock_irq+0x1d/0x30
-> > [36247.368189]  ? finish_task_switch+0x7d/0x290
-> > [36247.368190]  ? __switch_to_asm+0x40/0x70
-> > [36247.368198]  smb2_plain_req_init+0x30/0x240 [cifs]
-> > [36247.368199]  ? _raw_spin_lock_irqsave+0x25/0x50
-> > [36247.368208]  SMB2_open_init+0x6d/0x7c0 [cifs]
-> > [36247.368209]  ? _raw_spin_lock+0x13/0x30
-> > [36247.368218]  ? cifs_mid_q_entry_release+0x15/0x40 [cifs]
-> > [36247.368227]  ? SMB2_open+0x150/0x520 [cifs]
-> > [36247.368235]  SMB2_open+0x150/0x520 [cifs]
-> > [36247.368238]  ? sched_clock+0x5/0x10
-> > [36247.368247]  ? open_shroot+0x12f/0x200 [cifs]
-> > [36247.368255]  open_shroot+0x12f/0x200 [cifs]
-> > [36247.368258]  ? __follow_mount_rcu.isra.31+0x3c/0xf0
-> > [36247.368267]  smb2_query_path_info+0x93/0x220 [cifs]
-> > [36247.368269]  ? walk_component+0x48/0x360
-> > [36247.368278]  cifs_get_inode_info+0x580/0xb10 [cifs]
-> > [36247.368286]  ? filename_lookup+0xf8/0x1a0
-> > [36247.368294]  ? build_path_from_dentry_optional_prefix+0x1e9/0x440 [c=
-ifs]
-> > [36247.368303]  cifs_revalidate_dentry_attr+0xdc/0x3e0 [cifs]
-> > [36247.368311]  cifs_getattr+0x5b/0x1b0 [cifs]
-> > [36247.368313]  vfs_statx+0x89/0xe0
-> > [36247.368315]  __do_sys_newlstat+0x39/0x70
-> > [36247.368318]  do_syscall_64+0x55/0x100
-> > [36247.368320]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> > [36247.368321] RIP: 0033:0x7f562d3a0335
-> > [36247.368323] Code: Bad RIP value.
-> > [36247.368324] RSP: 002b:00007ffc6bbc4398 EFLAGS: 00000246 ORIG_RAX: 00=
-00000000000006
-> > [36247.368325] RAX: ffffffffffffffda RBX: 00007ffc6bbc43b0 RCX: 00007f5=
-62d3a0335
-> > [36247.368326] RDX: 00007ffc6bbc43b0 RSI: 00007ffc6bbc43b0 RDI: 000055e=
-4e5e1bd50
-> > [36247.368326] RBP: 000055e4e2eb65e0 R08: 0000000000000002 R09: 000055e=
-4e2eb69e0
-> > [36247.368327] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000=
-000000001
-> > [36247.368328] R13: 000055e4e2ef7258 R14: 000055e4e2ef8810 R15: 000055e=
-4e2f92ad0
-> > [36368.186922] INFO: task node_exporter:3567 blocked for more than 120 =
-seconds.
-> > [36368.186988]       Tainted: G            E     4.20.17-pd-4.20.y #201=
-90611
-> > [36368.187039] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disab=
-les this message.
-> > [36368.187097] node_exporter   D    0  3567      1 0x00000000
-> > [36368.187102] Call Trace:
-> > [36368.187117]  ? __schedule+0x338/0x850
-> > [36368.187123]  ? preempt_count_add+0x67/0xb0
-> > [36368.187128]  schedule+0x3c/0x90
-> > [36368.187133]  schedule_preempt_disabled+0x14/0x20
-> > [36368.187138]  __mutex_lock.isra.7+0x19f/0x540
-> > [36368.187175]  ? try_module_get+0x68/0x100
-> > [36368.187232]  ? smb2_reconnect+0x1d7/0x4b0 [cifs]
-> > [36368.187265]  smb2_reconnect+0x1d7/0x4b0 [cifs]
-> > [36368.187300]  smb2_plain_req_init+0x30/0x240 [cifs]
-> > [36368.187304]  ? __switch_to_asm+0x34/0x70
-> > [36368.187307]  ? __switch_to_asm+0x40/0x70
-> > [36368.187337]  SMB2_open_init+0x6d/0x7c0 [cifs]
-> > [36368.187372]  ? smb2_queryfs+0x13d/0x350 [cifs]
-> > [36368.187375]  ? lookup_fast+0xc8/0x2e0
-> > [36368.187405]  smb2_queryfs+0x13d/0x350 [cifs]
-> > [36368.187410]  ? lookup_fast+0xc8/0x2e0
-> > [36368.187416]  ? ___cache_free+0x31/0x2e0
-> > [36368.187421]  ? terminate_walk+0x93/0x100
-> > [36368.187449]  ? cifs_statfs+0xad/0x300 [cifs]
-> > [36368.187471]  cifs_statfs+0xad/0x300 [cifs]
-> > [36368.187477]  statfs_by_dentry+0x6a/0x90
-> > [36368.187482]  vfs_statfs+0x16/0xc0
-> > [36368.187486]  user_statfs+0x50/0xa0
-> > [36368.187491]  __do_sys_statfs+0x20/0x50
-> > [36368.187499]  do_syscall_64+0x55/0x100
-> > [36368.187503]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> > [36368.187507] RIP: 0033:0x4a5c20
-> > [36368.187517] Code: Bad RIP value.
-> > [36368.187519] RSP: 002b:000000c0003ef490 EFLAGS: 00000206 ORIG_RAX: 00=
-00000000000089
-> > [36368.187523] RAX: ffffffffffffffda RBX: 000000c00002a000 RCX: 0000000=
-0004a5c20
-> > [36368.187526] RDX: 0000000000000000 RSI: 000000c0003ef5c0 RDI: 000000c=
-0004510e0
-> > [36368.187528] RBP: 000000c0003ef4f0 R08: 0000000000000000 R09: 0000000=
-000000000
-> > [36368.187530] R10: 0000000000000000 R11: 0000000000000206 R12: fffffff=
-fffffffff
-> > [36368.187532] R13: 0000000000000088 R14: 0000000000000087 R15: 0000000=
-000000100
-> > [36368.187572] INFO: task kworker/1:2:32265 blocked for more than 120 s=
-econds.
-> > [36368.187627]       Tainted: G            E     4.20.17-pd-4.20.y #201=
-90611
-> > [36368.187677] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disab=
-les this message.
-> > [36368.187735] kworker/1:2     D    0 32265      2 0x80000000
-> > [36368.187771] Workqueue: cifsiod smb2_reconnect_server [cifs]
-> > [36368.187773] Call Trace:
-> > [36368.187780]  ? __schedule+0x338/0x850
-> > [36368.187785]  schedule+0x3c/0x90
-> > [36368.187790]  schedule_preempt_disabled+0x14/0x20
-> > [36368.187795]  __mutex_lock.isra.7+0x19f/0x540
-> > [36368.187826]  ? SMB2_sess_auth_rawntlmssp_authenticate+0x69/0x170 [ci=
-fs]
-> > [36368.187855]  ? SMB2_sess_setup+0x17f/0x2c0 [cifs]
-> > [36368.187880]  ? cifs_mark_open_files_invalid+0x54/0xa0 [cifs]
-> > [36368.187885]  ? _raw_spin_unlock+0x16/0x30
-> > [36368.187908]  cifs_mark_open_files_invalid+0x54/0xa0 [cifs]
-> > [36368.187936]  smb2_reconnect+0x2d6/0x4b0 [cifs]
-> > [36368.187942]  ? _raw_spin_unlock+0x16/0x30
-> > [36368.187947]  ? preempt_count_add+0x67/0xb0
-> > [36368.187976]  smb2_reconnect_server+0x1bb/0x350 [cifs]
-> > [36368.187984]  process_one_work+0x188/0x3a0
-> > [36368.187990]  worker_thread+0x4c/0x3a0
-> > [36368.187994]  ? preempt_count_add+0x67/0xb0
-> > [36368.187998]  ? process_one_work+0x3a0/0x3a0
-> > [36368.188001]  kthread+0xf8/0x130
-> > [36368.188005]  ? kthread_create_worker_on_cpu+0x70/0x70
-> > [36368.188009]  ret_from_fork+0x35/0x40
-> > [36368.188014] INFO: task puppet:3836 blocked for more than 120 seconds=
-.
-> > [36368.188064]       Tainted: G            E     4.20.17-pd-4.20.y #201=
-90611
-> > [36368.188114] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disab=
-les this message.
-> > [36368.188182] puppet          D    0  3836    541 0x00000000
-> > [36368.188186] Call Trace:
-> > [36368.188191]  ? __schedule+0x338/0x850
-> > [36368.188196]  schedule+0x3c/0x90
-> > [36368.188200]  schedule_preempt_disabled+0x14/0x20
-> > [36368.188205]  __mutex_lock.isra.7+0x19f/0x540
-> > [36368.188208]  ? __switch_to_asm+0x34/0x70
-> > [36368.188211]  ? __switch_to_asm+0x40/0x70
-> > [36368.188215]  ? try_module_get+0x68/0x100
-> > [36368.188244]  ? smb2_reconnect+0x1d7/0x4b0 [cifs]
-> > [36368.188271]  smb2_reconnect+0x1d7/0x4b0 [cifs]
-> > [36368.188277]  ? _raw_spin_unlock_irq+0x1d/0x30
-> > [36368.188280]  ? finish_task_switch+0x7d/0x290
-> > [36368.188283]  ? __switch_to_asm+0x40/0x70
-> > [36368.188310]  smb2_plain_req_init+0x30/0x240 [cifs]
-> > [36368.188314]  ? _raw_spin_lock_irqsave+0x25/0x50
-> > [36368.188342]  SMB2_open_init+0x6d/0x7c0 [cifs]
-> > [36368.188346]  ? _raw_spin_lock+0x13/0x30
-> > [36368.188376]  ? cifs_mid_q_entry_release+0x15/0x40 [cifs]
-> > [36368.188405]  ? SMB2_open+0x150/0x520 [cifs]
-> > [36368.188432]  SMB2_open+0x150/0x520 [cifs]
-> > [36368.188440]  ? sched_clock+0x5/0x10
-> > [36368.188470]  ? open_shroot+0x12f/0x200 [cifs]
-> > [36368.188497]  open_shroot+0x12f/0x200 [cifs]
-> > [36368.188503]  ? __follow_mount_rcu.isra.31+0x3c/0xf0
-> > [36368.188534]  smb2_query_path_info+0x93/0x220 [cifs]
-> > [36368.188539]  ? walk_component+0x48/0x360
-> > [36368.188569]  cifs_get_inode_info+0x580/0xb10 [cifs]
-> > [36368.188574]  ? filename_lookup+0xf8/0x1a0
-> > [36368.188601]  ? build_path_from_dentry_optional_prefix+0x1e9/0x440 [c=
-ifs]
-> > [36368.188630]  cifs_revalidate_dentry_attr+0xdc/0x3e0 [cifs]
-> > [36368.188659]  cifs_getattr+0x5b/0x1b0 [cifs]
-> > [36368.188664]  vfs_statx+0x89/0xe0
-> > [36368.188670]  __do_sys_newlstat+0x39/0x70
-> > [36368.188677]  do_syscall_64+0x55/0x100
-> > [36368.188681]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> > [36368.188684] RIP: 0033:0x7f562d3a0335
-> > [36368.188689] Code: Bad RIP value.
-> > [36368.188691] RSP: 002b:00007ffc6bbc4398 EFLAGS: 00000246 ORIG_RAX: 00=
-00000000000006
-> > [36368.188695] RAX: ffffffffffffffda RBX: 00007ffc6bbc43b0 RCX: 00007f5=
-62d3a0335
-> > [36368.188696] RDX: 00007ffc6bbc43b0 RSI: 00007ffc6bbc43b0 RDI: 000055e=
-4e5e1bd50
-> > [36368.188698] RBP: 000055e4e2eb65e0 R08: 0000000000000002 R09: 000055e=
-4e2eb69e0
-> > [36368.188700] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000=
-000000001
-> > [36368.188702] R13: 000055e4e2ef7258 R14: 000055e4e2ef8810 R15: 000055e=
-4e2f92ad0
-> > [36489.006262] INFO: task node_exporter:3567 blocked for more than 120 =
-seconds.
-> > [36489.006300]       Tainted: G            E     4.20.17-pd-4.20.y #201=
-90611
-> > [36489.006329] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disab=
-les this message.
-> > [36489.006458] node_exporter   D    0  3567      1 0x00000000
-> > [36489.006461] Call Trace:
-> > [36489.006470]  ? __schedule+0x338/0x850
-> > [36489.006474]  ? preempt_count_add+0x67/0xb0
-> > [36489.006476]  schedule+0x3c/0x90
-> > [36489.006478]  schedule_preempt_disabled+0x14/0x20
-> > [36489.006480]  __mutex_lock.isra.7+0x19f/0x540
-> > [36489.006485]  ? try_module_get+0x68/0x100
-> > [36489.006515]  ? smb2_reconnect+0x1d7/0x4b0 [cifs]
-> > [36489.006531]  smb2_reconnect+0x1d7/0x4b0 [cifs]
-> > [36489.006547]  smb2_plain_req_init+0x30/0x240 [cifs]
-> > [36489.006549]  ? __switch_to_asm+0x34/0x70
-> > [36489.006550]  ? __switch_to_asm+0x40/0x70
-> > [36489.006565]  SMB2_open_init+0x6d/0x7c0 [cifs]
-> > [36489.006581]  ? smb2_queryfs+0x13d/0x350 [cifs]
-> > [36489.006583]  ? lookup_fast+0xc8/0x2e0
-> > [36489.006597]  smb2_queryfs+0x13d/0x350 [cifs]
-> > [36489.006599]  ? lookup_fast+0xc8/0x2e0
-> > [36489.006602]  ? ___cache_free+0x31/0x2e0
-> > [36489.006604]  ? terminate_walk+0x93/0x100
-> > [36489.006619]  ? cifs_statfs+0xad/0x300 [cifs]
-> > [36489.006632]  cifs_statfs+0xad/0x300 [cifs]
-> > [36489.006635]  statfs_by_dentry+0x6a/0x90
-> > [36489.006637]  vfs_statfs+0x16/0xc0
-> > [36489.006639]  user_statfs+0x50/0xa0
-> > [36489.006641]  __do_sys_statfs+0x20/0x50
-> > [36489.006645]  do_syscall_64+0x55/0x100
-> > [36489.006647]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> > [36489.006649] RIP: 0033:0x4a5c20
-> > [36489.006654] Code: Bad RIP value.
-> > [36489.006655] RSP: 002b:000000c0003ef490 EFLAGS: 00000206 ORIG_RAX: 00=
-00000000000089
-> > [36489.006657] RAX: ffffffffffffffda RBX: 000000c00002a000 RCX: 0000000=
-0004a5c20
-> > [36489.006658] RDX: 0000000000000000 RSI: 000000c0003ef5c0 RDI: 000000c=
-0004510e0
-> > [36489.006659] RBP: 000000c0003ef4f0 R08: 0000000000000000 R09: 0000000=
-000000000
-> > [36489.006660] R10: 0000000000000000 R11: 0000000000000206 R12: fffffff=
-fffffffff
-> > [36489.006661] R13: 0000000000000088 R14: 0000000000000087 R15: 0000000=
-000000100
-> > [36489.006675] INFO: task kworker/1:2:32265 blocked for more than 120 s=
-econds.
-> > [36489.006812]       Tainted: G            E     4.20.17-pd-4.20.y #201=
-90611
-> > [36489.006940] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disab=
-les this message.
-> > [36489.007076] kworker/1:2     D    0 32265      2 0x80000000
-> > [36489.007100] Workqueue: cifsiod smb2_reconnect_server [cifs]
-> > [36489.007101] Call Trace:
-> > [36489.007105]  ? __schedule+0x338/0x850
-> > [36489.007107]  schedule+0x3c/0x90
-> > [36489.007109]  schedule_preempt_disabled+0x14/0x20
-> > [36489.007111]  __mutex_lock.isra.7+0x19f/0x540
-> > [36489.007124]  ? SMB2_sess_auth_rawntlmssp_authenticate+0x69/0x170 [ci=
-fs]
-> > [36489.007134]  ? SMB2_sess_setup+0x17f/0x2c0 [cifs]
-> > [36489.007141]  ? cifs_mark_open_files_invalid+0x54/0xa0 [cifs]
-> > [36489.007143]  ? _raw_spin_unlock+0x16/0x30
-> > [36489.007150]  cifs_mark_open_files_invalid+0x54/0xa0 [cifs]
-> > [36489.007159]  smb2_reconnect+0x2d6/0x4b0 [cifs]
-> > [36489.007161]  ? _raw_spin_unlock+0x16/0x30
-> > [36489.007163]  ? preempt_count_add+0x67/0xb0
-> > [36489.007172]  smb2_reconnect_server+0x1bb/0x350 [cifs]
-> > [36489.007176]  process_one_work+0x188/0x3a0
-> > [36489.007178]  worker_thread+0x4c/0x3a0
-> > [36489.007179]  ? preempt_count_add+0x67/0xb0
-> > [36489.007180]  ? process_one_work+0x3a0/0x3a0
-> > [36489.007181]  kthread+0xf8/0x130
-> > [36489.007183]  ? kthread_create_worker_on_cpu+0x70/0x70
-> > [36489.007184]  ret_from_fork+0x35/0x40
-> > [36489.007186] INFO: task puppet:3836 blocked for more than 120 seconds=
-.
-> > [36489.007294]       Tainted: G            E     4.20.17-pd-4.20.y #201=
-90611
-> > [36489.007409] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disab=
-les this message.
-> > [36489.007540] puppet          D    0  3836    541 0x00000000
-> > [36489.007541] Call Trace:
-> > [36489.007545]  ? __schedule+0x338/0x850
-> > [36489.007548]  schedule+0x3c/0x90
-> > [36489.007550]  schedule_preempt_disabled+0x14/0x20
-> > [36489.007552]  __mutex_lock.isra.7+0x19f/0x540
-> > [36489.007553]  ? __switch_to_asm+0x34/0x70
-> > [36489.007555]  ? __switch_to_asm+0x40/0x70
-> > [36489.007558]  ? try_module_get+0x68/0x100
-> > [36489.007580]  ? smb2_reconnect+0x1d7/0x4b0 [cifs]
-> > [36489.007594]  smb2_reconnect+0x1d7/0x4b0 [cifs]
-> > [36489.007596]  ? _raw_spin_unlock_irq+0x1d/0x30
-> > [36489.007598]  ? finish_task_switch+0x7d/0x290
-> > [36489.007600]  ? __switch_to_asm+0x40/0x70
-> > [36489.007613]  smb2_plain_req_init+0x30/0x240 [cifs]
-> > [36489.007615]  ? _raw_spin_lock_irqsave+0x25/0x50
-> > [36489.007628]  SMB2_open_init+0x6d/0x7c0 [cifs]
-> > [36489.007630]  ? _raw_spin_lock+0x13/0x30
-> > [36489.007644]  ? cifs_mid_q_entry_release+0x15/0x40 [cifs]
-> > [36489.007658]  ? SMB2_open+0x150/0x520 [cifs]
-> > [36489.007672]  SMB2_open+0x150/0x520 [cifs]
-> > [36489.007677]  ? sched_clock+0x5/0x10
-> > [36489.007692]  ? open_shroot+0x12f/0x200 [cifs]
-> > [36489.007707]  open_shroot+0x12f/0x200 [cifs]
-> > [36489.007711]  ? __follow_mount_rcu.isra.31+0x3c/0xf0
-> > [36489.007727]  smb2_query_path_info+0x93/0x220 [cifs]
-> > [36489.007729]  ? walk_component+0x48/0x360
-> > [36489.007745]  cifs_get_inode_info+0x580/0xb10 [cifs]
-> > [36489.007748]  ? filename_lookup+0xf8/0x1a0
-> > [36489.007762]  ? build_path_from_dentry_optional_prefix+0x1e9/0x440 [c=
-ifs]
-> > [36489.007778]  cifs_revalidate_dentry_attr+0xdc/0x3e0 [cifs]
-> > [36489.007791]  cifs_getattr+0x5b/0x1b0 [cifs]
-> > [36489.007794]  vfs_statx+0x89/0xe0
-> > [36489.007797]  __do_sys_newlstat+0x39/0x70
-> > [36489.007801]  do_syscall_64+0x55/0x100
-> > [36489.007802]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> > [36489.007805] RIP: 0033:0x7f562d3a0335
-> > [36489.007808] Code: Bad RIP value.
-> > [36489.007809] RSP: 002b:00007ffc6bbc4398 EFLAGS: 00000246 ORIG_RAX: 00=
-00000000000006
-> > [36489.007811] RAX: ffffffffffffffda RBX: 00007ffc6bbc43b0 RCX: 00007f5=
-62d3a0335
-> > [36489.007812] RDX: 00007ffc6bbc43b0 RSI: 00007ffc6bbc43b0 RDI: 000055e=
-4e5e1bd50
-> > [36489.007813] RBP: 000055e4e2eb65e0 R08: 0000000000000002 R09: 000055e=
-4e2eb69e0
-> > [36489.007814] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000=
-000000001
-> > [36489.007815] R13: 000055e4e2ef7258 R14: 000055e4e2ef8810 R15: 000055e=
-4e2f92ad0
-> > [36609.825705] INFO: task node_exporter:3567 blocked for more than 120 =
-seconds.
-> > [36609.825836]       Tainted: G            E     4.20.17-pd-4.20.y #201=
-90611
-> > [36609.825869] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disab=
-les this message.
-> > [36609.825908] node_exporter   D    0  3567      1 0x00000000
-> > [36609.825910] Call Trace:
-> > [36609.825919]  ? __schedule+0x338/0x850
-> > [36609.825922]  ? preempt_count_add+0x67/0xb0
-> > [36609.825925]  schedule+0x3c/0x90
-> > [36609.825927]  schedule_preempt_disabled+0x14/0x20
-> > [36609.825929]  __mutex_lock.isra.7+0x19f/0x540
-> > [36609.825933]  ? try_module_get+0x68/0x100
-> > [36609.825960]  ? smb2_reconnect+0x1d7/0x4b0 [cifs]
-> > [36609.825979]  smb2_reconnect+0x1d7/0x4b0 [cifs]
-> > [36609.825999]  smb2_plain_req_init+0x30/0x240 [cifs]
-> > [36609.826001]  ? __switch_to_asm+0x34/0x70
-> > [36609.826002]  ? __switch_to_asm+0x40/0x70
-> > [36609.826020]  SMB2_open_init+0x6d/0x7c0 [cifs]
-> > [36609.826039]  ? smb2_queryfs+0x13d/0x350 [cifs]
-> > [36609.826040]  ? lookup_fast+0xc8/0x2e0
-> > [36609.826057]  smb2_queryfs+0x13d/0x350 [cifs]
-> > [36609.826060]  ? lookup_fast+0xc8/0x2e0
-> > [36609.826064]  ? ___cache_free+0x31/0x2e0
-> > [36609.826066]  ? terminate_walk+0x93/0x100
-> > [36609.826084]  ? cifs_statfs+0xad/0x300 [cifs]
-> > [36609.826099]  cifs_statfs+0xad/0x300 [cifs]
-> > [36609.826103]  statfs_by_dentry+0x6a/0x90
-> > [36609.826104]  vfs_statfs+0x16/0xc0
-> > [36609.826106]  user_statfs+0x50/0xa0
-> > [36609.826108]  __do_sys_statfs+0x20/0x50
-> > [36609.826113]  do_syscall_64+0x55/0x100
-> > [36609.826115]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> > [36609.826117] RIP: 0033:0x4a5c20
-> > [36609.826123] Code: Bad RIP value.
-> > [36609.826124] RSP: 002b:000000c0003ef490 EFLAGS: 00000206 ORIG_RAX: 00=
-00000000000089
-> > [36609.826126] RAX: ffffffffffffffda RBX: 000000c00002a000 RCX: 0000000=
-0004a5c20
-> > [36609.826127] RDX: 0000000000000000 RSI: 000000c0003ef5c0 RDI: 000000c=
-0004510e0
-> > [36609.826128] RBP: 000000c0003ef4f0 R08: 0000000000000000 R09: 0000000=
-000000000
-> > [36609.826129] R10: 0000000000000000 R11: 0000000000000206 R12: fffffff=
-fffffffff
-> > [36609.826130] R13: 0000000000000088 R14: 0000000000000087 R15: 0000000=
-000000100
-> > [73117.654990] CIFS VFS: Send error in SessSetup =3D -126
-> >
-> > Regards, Martijn
-> >
-> > >
-> > > --
-> > > Best regards,
-> > > Pavel Shilovsky
-> > >
-> > > =D1=87=D1=82, 4 =D0=B8=D1=8E=D0=BB. 2019 =D0=B3. =D0=B2 06:36, Martij=
-n de Gouw
-> > > <martijn.de.gouw@prodrive-technologies.com>:
-> > >>
-> > >> Hi,
-> > >>
-> > >> On 04-07-2019 13:22, Aur=C3=A9lien Aptel wrote:
-> > >>> Martijn de Gouw <martijn.de.gouw@prodrive-technologies.com> writes:
-> > >>>>> Are there any kernel oops/panic with stack traces and register du=
-mps in
-> > >>>>> the log?
-> > >>>>>
-> > >>>>> You can inspect the kernel stack trace of the hung processes (to =
-see where
-> > >>>>> they are stuck) by printing the file /proc/<pid>/stack.
-> > >>>>
-> > >>>> These are the stacks of all processes that are D, most of them bei=
-ng df.
-> > >>>> I also attached the cifs Stats output below.
-> > >>>
-> > >>> Ok thanks. What about Oops or BUG or panic in dmesg logs, did you s=
-ee
-> > >>> any?
-> > >>
-> > >> I did find the following messages in the dmesg of one of the servers=
-:
-> > >>
-> > >> [    4.797893] FS-Cache: Duplicate cookie detected
-> > >> [    4.797915] FS-Cache: O-cookie c=3D000000001a791554 [p=3D00000000=
-fb6f31ee fl=3D222 nc=3D0 na=3D1]
-> > >> [    4.797934] FS-Cache: O-cookie d=3D0000000020a06fab n=3D000000006=
-54600e7
-> > >> [    4.797949] FS-Cache: O-key=3D[8] '020001bd0a010102'
-> > >> [    4.797963] FS-Cache: N-cookie c=3D000000005d0bf4a5 [p=3D00000000=
-fb6f31ee fl=3D2 nc=3D0 na=3D1]
-> > >> [    4.797982] FS-Cache: N-cookie d=3D0000000020a06fab n=3D000000004=
-e1e47aa
-> > >> [    4.797997] FS-Cache: N-key=3D[8] '020001bd0a010102'
-> > >> [    4.798643] FS-Cache: Duplicate cookie detected
-> > >> [    4.798659] FS-Cache: O-cookie c=3D000000001a791554 [p=3D00000000=
-fb6f31ee fl=3D222 nc=3D0 na=3D1]
-> > >> [    4.798679] FS-Cache: O-cookie d=3D0000000020a06fab n=3D000000006=
-54600e7
-> > >> [    4.798695] FS-Cache: O-key=3D[8] '020001bd0a010102'
-> > >> [    4.798714] FS-Cache: N-cookie c=3D00000000cbe44971 [p=3D00000000=
-fb6f31ee fl=3D2 nc=3D0 na=3D1]
-> > >> [    4.798733] FS-Cache: N-cookie d=3D0000000020a06fab n=3D00000000a=
-b0e78a6
-> > >> [    4.798747] FS-Cache: N-key=3D[8] '020001bd0a010102'
-> > >> [    4.906667] FS-Cache: Netfs 'nfs' registered for caching
-> > >> [12738.729173] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [99125.480751] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [185517.295175] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [250515.749714] kernel tried to execute NX-protected page - exploit =
-attempt? (uid: 0)
-> > >> [250515.749740] BUG: unable to handle kernel paging request at ffff8=
-ec52a6fe1d0
-> > >> [250515.749757] PGD 1b2602067 P4D 1b2602067 PUD 42dbff063 PMD 42a357=
-063 PTE 800000042a6fe063
-> > >> [250515.749779] Oops: 0011 [#1] PREEMPT SMP PTI
-> > >> [250515.749792] CPU: 1 PID: 796 Comm: cifsd Tainted: G            E =
-    4.20.17-pd-4.20.y #20190611
-> > >> [250515.749812] Hardware name: VMware, Inc. VMware Virtual Platform/=
-440BX Desktop Reference Platform, BIOS 6.00 09/19/2018
-> > >> [250515.749844] RIP: 0010:0xffff8ec52a6fe1d0
-> > >> [250515.749860] Code: ff ff 00 00 00 00 fd 01 00 00 00 7d 00 00 01 0=
-0 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0=
-0 00 <d0> e1 6f 2a c5 8e ff ff d0 e1 6f 2a c5 8e ff ff 80 70 82 2b c5 8e
-> > >> [250515.749914] RSP: 0018:ffff9e60c2e2bdc0 EFLAGS: 00010202
-> > >> [250515.749927] RAX: ffff8ec52a6fe1d0 RBX: ffff8ec526fce800 RCX: dea=
-d000000000200
-> > >> [250515.749944] RDX: ffff8ec52d3e6800 RSI: 0000000000000246 RDI: fff=
-f8ec52a6fe198
-> > >> [250515.749962] RBP: ffff8ec52d3e6800 R08: 0000000000000002 R09: fff=
-f8ec52a6fe170
-> > >> [250515.749979] R10: ffff9e60c2e2bc10 R11: ffff8ec527088000 R12: fff=
-f8ec526fce9c0
-> > >> [250515.749997] R13: ffff8ec52d3e6800 R14: ffff9e60c2e2bdd8 R15: fff=
-f8ec52d3e6b80
-> > >> [250515.750014] FS:  0000000000000000(0000) GS:ffff8ec52fa80000(0000=
-) knlGS:0000000000000000
-> > >> [250515.750033] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > >> [250515.750048] CR2: ffff8ec52a6fe1d0 CR3: 000000042a53c005 CR4: 000=
-00000003606e0
-> > >> [250515.750100] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000=
-0000000000000
-> > >> [250515.750102] CIFS VFS: No task to wake, unknown frame received! N=
-umMids 3
-> > >> [250515.750119] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 000=
-0000000000400
-> > >> [250515.750120] Call Trace:
-> > >> [250515.750149] 00000000: 424d53fe 00010040 00000000 00000005  .SMB@=
-...........
-> > >> [250515.750193]  ? cifs_reconnect+0x337/0x880 [cifs]
-> > >> [250515.750201]  ? cifs_handle_standard+0x169/0x190 [cifs]
-> > >> [250515.750216] 00000010: 10000009 00000098 00000db2 00000000  .....=
-...........
-> > >> [250515.750234]  ? cifs_demultiplex_thread+0x9e5/0xbc0 [cifs]
-> > >> [250515.750240] 00000020: 0000025c 00000001 640002e9 0000c81d  \....=
-......d....
-> > >> [250515.750259]  ? finish_task_switch+0x7d/0x290
-> > >> [250515.750271] 00000030: 5a9e63f3 6204a9b0 587058e3 0d45419b  .c.Z.=
-..b.XpX.AE.
-> > >> [250515.750295]  ? cifs_handle_standard+0x190/0x190 [cifs]
-> > >> [250515.750728] CIFS VFS: No task to wake, unknown frame received! N=
-umMids 3
-> > >> [250515.751200]  ? kthread+0xf8/0x130
-> > >> [250515.751639] 00000000: 424d53fe 00010040 00000000 00000010  .SMB@=
-...........
-> > >> [250515.752102]  ? kthread_create_worker_on_cpu+0x70/0x70
-> > >> [250515.752554] 00000010: 0000000d 00000068 00000db3 00000000  ....h=
-...........
-> > >> [250515.752997]  ? ret_from_fork+0x35/0x40
-> > >> [250515.753429] 00000020: 0000025c 00000001 640002e9 0000c81d  \....=
-......d....
-> > >> [250515.753874] Modules linked in: cpufreq_userspace(E) cpufreq_powe=
-rsave(E) cpufreq_conservative(E) arc4(E) ecb(E) md4(E) nfsv3(E) nfs_acl(E) =
-nfs(E) sha512_ssse3(E) sha512_generic(E) lockd(E) cmac(E) grace(E) hmac(E) =
-nls_utf8(E) cifs(E) ccm(E) dns_resolver(E) fscache(E) vmw_vsock_vmci_transp=
-ort(E) vsock(E) sb_edac(E) crct10dif_pclmul(E) crc32_pclmul(E) ghash_clmuln=
-i_intel(E) aesni_intel(E) vmw_balloon(E) aes_x86_64(E) joydev(E) evdev(E) c=
-rypto_simd(E) vmwgfx(E) serio_raw(E) cryptd(E) glue_helper(E) ttm(E) sg(E) =
-vmw_vmci(E) drm_kms_helper(E) drm(E) button(E) ac(E) auth_rpcgss(E) sunrpc(=
-E) ip_tables(E) x_tables(E) autofs4(E) ext4(E) crc32c_generic(E) crc16(E) m=
-bcache(E) jbd2(E) sr_mod(E) cdrom(E) ata_generic(E) sd_mod(E) ata_piix(E) c=
-rc32c_intel(E) psmouse(E) libata(E) vmw_pvscsi(E) vmxnet3(E) scsi_mod(E) i2=
-c_piix4(E)
-> > >> [250515.754336] 00000030: 49d4fd21 858665a2 fde5288f 01d2d919  !..I.=
-e...(......
-> > >> [250515.754766] CR2: ffff8ec52a6fe1d0
-> > >> [250515.758927] CIFS VFS: No task to wake, unknown frame received! N=
-umMids 3
-> > >> [250515.759389] ---[ end trace 92ea62cd080150de ]---
-> > >> [250515.759879] 00000000: 424d53fe 00010040 00000000 00030006  .SMB@=
-...........
-> > >> [250515.760357] RIP: 0010:0xffff8ec52a6fe1d0
-> > >> [250515.761841] Code: ff ff 00 00 00 00 fd 01 00 00 00 7d 00 00 01 0=
-0 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0=
-0 00 <d0> e1 6f 2a c5 8e ff ff d0 e1 6f 2a c5 8e ff ff 80 70 82 2b c5 8e
-> > >> [250515.763287] RSP: 0018:ffff9e60c2e2bdc0 EFLAGS: 00010202
-> > >> [250515.763778] RAX: ffff8ec52a6fe1d0 RBX: ffff8ec526fce800 RCX: dea=
-d000000000200
-> > >> [250515.764060] 00000010: 0000000d 00000000 00000db4 00000000  .....=
-...........
-> > >> [250515.764310] RDX: ffff8ec52d3e6800 RSI: 0000000000000246 RDI: fff=
-f8ec52a6fe198
-> > >> [250515.764311] RBP: ffff8ec52d3e6800 R08: 0000000000000002 R09: fff=
-f8ec52a6fe170
-> > >> [250515.764312] R10: ffff9e60c2e2bc10 R11: ffff8ec527088000 R12: fff=
-f8ec526fce9c0
-> > >> [250515.764314] R13: ffff8ec52d3e6800 R14: ffff9e60c2e2bdd8 R15: fff=
-f8ec52d3e6b80
-> > >> [250515.765491] 00000020: 0000025c 00000001 640002e9 0000c81d  \....=
-......d....
-> > >> [250515.765836] FS:  0000000000000000(0000) GS:ffff8ec52fa80000(0000=
-) knlGS:0000000000000000
-> > >> [250515.767899] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > >> [250515.768367] CR2: ffff8ec52a6fe1d0 CR3: 000000042a53c005 CR4: 000=
-00000003606e0
-> > >> [250515.768919] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000=
-0000000000000
-> > >> [250515.769419] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 000=
-0000000000400
-> > >> [250515.769591] 00000030: 879543e1 572c0574 e53861ba 97ccc40b  .C..t=
-.,W.a8.....
-> > >> [271909.743603] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [358301.908585] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [444693.566453] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [531086.090040] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [617477.785390] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [703869.556705] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [790261.656853] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [876653.496928] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [963045.816742] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [1049437.566219] CIFS VFS: Send error in SessSetup =3D -126
-> > >>
-> > >>
-> > >> And from another server:
-> > >> [    4.253091] FS-Cache: Duplicate cookie detected
-> > >> [    4.253120] FS-Cache: O-cookie c=3D000000004cc29d26 [p=3D00000000=
-17dbbbc0 fl=3D222 nc=3D0 na=3D1]
-> > >> [    4.253153] FS-Cache: O-cookie d=3D00000000e8e68765 n=3D000000001=
-2869fa7
-> > >> [    4.253179] FS-Cache: O-key=3D[8] '020001bd0a010102'
-> > >> [    4.253201] FS-Cache: N-cookie c=3D00000000c3bbbddd [p=3D00000000=
-17dbbbc0 fl=3D2 nc=3D0 na=3D1]
-> > >> [    4.253235] FS-Cache: N-cookie d=3D00000000e8e68765 n=3D000000003=
-35882b3
-> > >> [    4.253262] FS-Cache: N-key=3D[8] '020001bd0a010102'
-> > >> [    4.254107] FS-Cache: Duplicate cookie detected
-> > >> [    4.254130] FS-Cache: O-cookie c=3D000000004cc29d26 [p=3D00000000=
-17dbbbc0 fl=3D222 nc=3D0 na=3D1]
-> > >> [    4.254161] FS-Cache: O-cookie d=3D00000000e8e68765 n=3D000000001=
-2869fa7
-> > >> [    4.254185] FS-Cache: O-key=3D[8] '020001bd0a010102'
-> > >> [    4.254230] FS-Cache: N-cookie c=3D000000000ec2f0bb [p=3D00000000=
-17dbbbc0 fl=3D2 nc=3D0 na=3D1]
-> > >> [    4.254261] FS-Cache: N-cookie d=3D00000000e8e68765 n=3D000000002=
-4706210
-> > >> [    4.254285] FS-Cache: N-key=3D[8] '020001bd0a010102'
-> > >> [    4.329147] CIFS VFS: BAD_NETWORK_NAME: \\stor02.bk.prodrive.nl\u=
-serdata$
-> > >> [    4.330107] CIFS VFS: cifs_mount failed w/return code =3D -2
-> > >> [65206.127542] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [151597.808064] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [237989.956447] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [324380.937984] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [402750.869518] kernel tried to execute NX-protected page - exploit =
-attempt? (uid: 0)
-> > >> [402750.869594] BUG: unable to handle kernel paging request at ffff9=
-09bf61609d0
-> > >> [402750.869650] PGD 1ac02067 P4D 1ac02067 PUD 1385f5063 PMD 13614206=
-3 PTE 8000000136160063
-> > >> [402750.869716] Oops: 0011 [#1] PREEMPT SMP PTI
-> > >> [402750.869753] CPU: 0 PID: 797 Comm: cifsd Tainted: G            E =
-    4.20.17-pd-4.20.y #20190611
-> > >> [402750.869818] Hardware name: VMware, Inc. VMware Virtual Platform/=
-440BX Desktop Reference Platform, BIOS 6.00 09/19/2018
-> > >> [402750.869926] CIFS VFS: No task to wake, unknown frame received! N=
-umMids 3
-> > >> [402750.869947] RIP: 0010:0xffff909bf61609d0
-> > >> [402750.870013] 00000000: 424d53fe 00010040 00000000 00000005  .SMB@=
-...........
-> > >> [402750.870198] Code: ff ff 00 00 00 00 4e 01 00 00 00 7d 00 00 03 0=
-0 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0=
-0 00 <d0> 09 16 f6 9b 90 ff ff d0 09 16 f6 9b 90 ff ff c0 40 1f f2 9b 90
-> > >> [402750.870275] 00000010: 10000009 00000098 000002b5 00000000  .....=
-...........
-> > >> [402750.870450] RSP: 0000:ffffa18d41adbd28 EFLAGS: 00010202
-> > >> [402750.870469] 00000020: 000001cd 00000001 44000cd9 0000c824  .....=
-......D$...
-> > >> [402750.870509] RAX: ffff909bf61609d0 RBX: ffff909bf6c3f800 RCX: dea=
-d000000000200
-> > >> [402750.870511] RDX: ffff909bf74fa980 RSI: 0000000000000246 RDI: fff=
-f909bf6160998
-> > >> [402750.870530] 00000030: 79955e4a 0dacb8eb 025edebd 4efa7788  J^.y.=
-.....^..w.N
-> > >> [402750.870582] RBP: ffff909bf74fa980 R08: 0000000000000000 R09: fff=
-f909bf6c3f970
-> > >> [402750.870585] R10: ffffa18d406a7cc0 R11: 0000000000000000 R12: fff=
-f909bf6c3f9c0
-> > >> [402750.870605] CIFS VFS: No task to wake, unknown frame received! N=
-umMids 3
-> > >> [402750.870656] R13: ffff909bf74fa980 R14: ffffa18d41adbd40 R15: fff=
-f909bf74fa100
-> > >> [402750.870660] FS:  0000000000000000(0000) GS:ffff909bf9c00000(0000=
-) knlGS:0000000000000000
-> > >> [402750.870677] 00000000: 424d53fe 00010040 00000000 00000010  .SMB@=
-...........
-> > >> [402750.870731] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > >> [402750.870733] CR2: ffff909bf61609d0 CR3: 0000000136e56004 CR4: 000=
-00000003606f0
-> > >> [402750.870752] 00000010: 0000000d 00000068 000002b6 00000000  ....h=
-...........
-> > >> [402750.870888] 00000020: 000001cd 00000001 44000cd9 0000c824  .....=
-......D$...
-> > >> [402750.870894] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000=
-0000000000000
-> > >> [402750.870907] 00000030: f063942a cae9f6e1 d5327c26 91fc6f33  *.c..=
-...&|2.3o..
-> > >> [402750.872321] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 000=
-0000000000400
-> > >> [402750.872324] Call Trace:
-> > >> [402750.872381]  ? cifs_reconnect+0x337/0x880 [cifs]
-> > >> [402750.872410]  ? cifs_readv_from_socket+0x211/0x260 [cifs]
-> > >> [402750.875687]  ? cifs_read_from_socket+0x4a/0x70 [cifs]
-> > >> [402750.876128]  ? _raw_spin_unlock_irqrestore+0x20/0x40
-> > >> [402750.876555]  ? try_to_wake_up+0x54/0x540
-> > >> [402750.876991]  ? cifs_small_buf_get+0x16/0x20 [cifs]
-> > >> [402750.877426]  ? cifs_demultiplex_thread+0xdd/0xbc0 [cifs]
-> > >> [402750.877834]  ? finish_task_switch+0x7d/0x290
-> > >> [402750.878252]  ? cifs_handle_standard+0x190/0x190 [cifs]
-> > >> [402750.878651]  ? kthread+0xf8/0x130
-> > >> [402750.879034]  ? kthread_create_worker_on_cpu+0x70/0x70
-> > >> [402750.879412]  ? ret_from_fork+0x35/0x40
-> > >> [402750.879786] Modules linked in: cpufreq_conservative(E) cpufreq_p=
-owersave(E) cpufreq_userspace(E) arc4(E) ecb(E) md4(E) sha512_ssse3(E) sha5=
-12_generic(E) cmac(E) hmac(E) nfsv3(E) nfs_acl(E) nls_utf8(E) nfs(E) lockd(=
-E) grace(E) cifs(E) ccm(E) dns_resolver(E) fscache(E) sb_edac(E) crct10dif_=
-pclmul(E) crc32_pclmul(E) ghash_clmulni_intel(E) aesni_intel(E) aes_x86_64(=
-E) crypto_simd(E) joydev(E) cryptd(E) vmw_balloon(E) evdev(E) glue_helper(E=
-) serio_raw(E) vmwgfx(E) ttm(E) drm_kms_helper(E) sg(E) drm(E) vmw_vsock_vm=
-ci_transport(E) vsock(E) vmw_vmci(E) ac(E) button(E) auth_rpcgss(E) sunrpc(=
-E) ip_tables(E) x_tables(E) autofs4(E) ext4(E) crc32c_generic(E) crc16(E) m=
-bcache(E) jbd2(E) sr_mod(E) cdrom(E) sd_mod(E) ata_generic(E) ata_piix(E) v=
-mw_pvscsi(E) libata(E) crc32c_intel(E) psmouse(E) vmxnet3(E) i2c_piix4(E) s=
-csi_mod(E)
-> > >> [402750.883384] CR2: ffff909bf61609d0
-> > >> [402750.883783] ---[ end trace 08b06875e82513eb ]---
-> > >> [402750.884200] RIP: 0010:0xffff909bf61609d0
-> > >> [402750.884598] Code: ff ff 00 00 00 00 52 01 00 00 00 7d 00 00 02 0=
-0 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0=
-0 00 <d0> 09 16 f6 9b 90 ff ff d0 09 16 f6 9b 90 ff ff c0 40 1f f2 9b 90
-> > >> [402750.885822] RSP: 0000:ffffa18d41adbd28 EFLAGS: 00010202
-> > >> [402750.886229] RAX: ffff909bf61609d0 RBX: ffff909bf6c3f800 RCX: dea=
-d000000000200
-> > >> [402750.886651] RDX: ffff909bf74fa980 RSI: 0000000000000246 RDI: fff=
-f909bf6160998
-> > >> [402750.887065] RBP: ffff909bf74fa980 R08: 0000000000000000 R09: fff=
-f909bf6c3f970
-> > >> [402750.887478] R10: ffffa18d406a7cc0 R11: 0000000000000000 R12: fff=
-f909bf6c3f9c0
-> > >> [402750.887883] R13: ffff909bf74fa980 R14: ffffa18d41adbd40 R15: fff=
-f909bf74fa100
-> > >> [402750.888285] FS:  0000000000000000(0000) GS:ffff909bf9c00000(0000=
-) knlGS:0000000000000000
-> > >> [402750.888692] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > >> [402750.889093] CR2: ffff909bf61609d0 CR3: 0000000136e56004 CR4: 000=
-00000003606f0
-> > >> [402750.889559] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000=
-0000000000000
-> > >> [402750.889972] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 000=
-0000000000400
-> > >> [410772.901264] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [497165.194662] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [583557.492304] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [669948.937016] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [756341.390112] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [842733.557002] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [929125.303428] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [1015516.629380] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [1101908.464697] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [1188300.531261] CIFS VFS: Send error in SessSetup =3D -126
-> > >> [1274692.583049] CIFS VFS: Send error in SessSetup =3D -126
-> > >>
-> > >>
-> > >>>
-> > >>> The individual stack dumps are pretty useful. Here is my theory:
-> > >>>
-> > >>>> pid: 9505
-> > >>>> syscall: 4 0x56550a2ec470 0x7ffede42e9a0 0x7ffede42e9a0 0x83a 0x3 =
-0x20
-> > >>>> 0x7ffede42e8f8 0x7f7f8928f295
-> > >>>> [<0>] open_shroot+0x43/0x200 [cifs]
-> > >>>> [<0>] smb2_query_path_info+0x93/0x220 [cifs]
-> > >>>
-> > >>> Almost all of the processes have the same stack trace. They are stu=
-ck at
-> > >>> open_shroot()+0x43 which is probably
-> > >>>
-> > >>>       mutex_lock(&tcon->crfid.fid_mutex);
-> > >>>
-> > >>> Then there are only 2 other processes stuck somewhere in the same c=
-ode path
-> > >>> (open_shroot) but deeper, meaning they have the locks that the othe=
-r
-> > >>> processes are waiting for:
-> > >>>
-> > >>>
-> > >>>> pid: 22858
-> > >>>> syscall: 4 0x564b46285d10 0x7ffcea3f9a80 0x7ffcea3f9a80 0x83a 0x3 =
-0x20
-> > >>>> 0x7ffcea3f99d8 0x7f6cc78c7295
-> > >>>> [<0>] cifs_mark_open_files_invalid+0x54/0xa0 [cifs]
-> > >>>> [<0>] smb2_reconnect+0x2d6/0x4b0 [cifs]
-> > >>>> [<0>] smb2_plain_req_init+0x30/0x240 [cifs]
-> > >>>> [<0>] SMB2_open_init+0x6d/0x7c0 [cifs]
-> > >>>> [<0>] SMB2_open+0x150/0x520 [cifs]
-> > >>>> [<0>] open_shroot+0x12f/0x200 [cifs]
-> > >>>> [<0>] smb2_query_path_info+0x93/0x220 [cifs]
-> > >>>> [<0>] cifs_get_inode_info+0x580/0xb10 [cifs]
-> > >>>> [<0>] cifs_revalidate_dentry_attr+0xdc/0x3e0 [cifs]
-> > >>>> [<0>] cifs_getattr+0x5b/0x1b0 [cifs]
-> > >>>> [<0>] vfs_statx+0x89/0xe0
-> > >>>> [<0>] __do_sys_newstat+0x39/0x70
-> > >>>> [<0>] do_syscall_64+0x55/0x100
-> > >>>> [<0>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> > >>>> [<0>] 0xffffffffffffffff
-> > >>>
-> > >>>
-> > >>>> pid: 20027
-> > >>>> syscall: 4 0x55a3c7d767d0 0x7ffe51432ab0 0x7ffe51432ab0 0x83a
-> > >>>> 0x55a3c7d75c40 0x20 0x7ffe51432a08 0x7f5f7c4e7295
-> > >>>> [<0>] cifs_mark_open_files_invalid+0x54/0xa0 [cifs]
-> > >>>> [<0>] smb2_reconnect+0x2d6/0x4b0 [cifs]
-> > >>>> [<0>] smb2_plain_req_init+0x30/0x240 [cifs]
-> > >>>> [<0>] SMB2_open_init+0x6d/0x7c0 [cifs]
-> > >>>> [<0>] SMB2_open+0x150/0x520 [cifs]
-> > >>>> [<0>] open_shroot+0x12f/0x200 [cifs]
-> > >>>> [<0>] smb2_query_path_info+0x93/0x220 [cifs]
-> > >>>> [<0>] cifs_get_inode_info+0x580/0xb10 [cifs]
-> > >>>> [<0>] cifs_revalidate_dentry_attr+0xdc/0x3e0 [cifs]
-> > >>>> [<0>] cifs_getattr+0x5b/0x1b0 [cifs]
-> > >>>> [<0>] vfs_statx+0x89/0xe0
-> > >>>> [<0>] __do_sys_newstat+0x39/0x70
-> > >>>> [<0>] do_syscall_64+0x55/0x100
-> > >>>> [<0>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> > >>>> [<0>] 0xffffffffffffffff
-> > >>>
-> > >>> Due to timeouts maybe the Open request needs
-> > >>> to reconnect the server/ses/tcon and to do this it calls
-> > >>> cifs_mark_open_files_invalid() and gets stuck somewhere there.
-> > >>>
-> > >>>           spin_lock(&tcon->open_file_lock);
-> > >>>           list_for_each_safe(tmp, tmp1, &tcon->openFileList) {
-> > >>>                   open_file =3D list_entry(tmp, struct cifsFileInfo=
-, tlist);
-> > >>>                   open_file->invalidHandle =3D true;
-> > >>>                   open_file->oplock_break_cancelled =3D true;
-> > >>>           }
-> > >>>           spin_unlock(&tcon->open_file_lock);
-> > >>>
-> > >>>           mutex_lock(&tcon->crfid.fid_mutex); <=3D=3D=3D most likel=
-y here
-> > >>>           tcon->crfid.is_valid =3D false;
-> > >>>           memset(tcon->crfid.fid, 0, sizeof(struct cifs_fid));
-> > >>>           mutex_unlock(&tcon->crfid.fid_mutex);
-> > >>>
-> > >>> I think these processes are trying to lock the same lock twice: one=
- in
-> > >>> open_shroot() and since Open ends up having to reconnect, once agai=
-n in
-> > >>> mark_open_files_invalid(). I think it's the same lock because I don=
-'t
-> > >>> see why the tcon pointers would be different in those 2 spots. Kern=
-el
-> > >>> mutexes are not reentrant so this is a deadlock.
-> > >>
-> > >> Is there anything we can do about this? Is this maybe already fixed =
-in newer kernels?
-> > >>
-> > >> Regards, Martijn
-> > >>
-> > >>>
-> > >>> Cheers,
-> > >>>
-> > >>
-> > >> --
-> > >> Martijn de Gouw
-> > >> Designer
-> > >> Prodrive Technologies
-> > >> Mobile: +31 63 17 76 161
-> > >> Phone:  +31 40 26 76 200
-> >
-> > --
-> > Martijn de Gouw
-> > Designer
-> > Prodrive Technologies
-> > Mobile: +31 63 17 76 161
-> > Phone:  +31 40 26 76 200
->
->
->
-> --
-> Thanks,
->
-> Steve
