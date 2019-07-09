@@ -2,117 +2,71 @@ Return-Path: <SRS0=dv7Q=VG=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2874C606CF
-	for <linux-cifs@archiver.kernel.org>; Tue,  9 Jul 2019 03:05:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0016C606B0
+	for <linux-cifs@archiver.kernel.org>; Tue,  9 Jul 2019 03:15:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A303F21537
-	for <linux-cifs@archiver.kernel.org>; Tue,  9 Jul 2019 03:05:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IF97BRae"
+	by mail.kernel.org (Postfix) with ESMTP id CA0EC216C4
+	for <linux-cifs@archiver.kernel.org>; Tue,  9 Jul 2019 03:15:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1562642123;
+	bh=ffJpmiG3YCVrmSdb4Ds3CGUQgDaz+9N4x55s4P3dlvo=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=InmNzm/dlyEoH47KxMxMjEhxCjvy6wW7WvlbMVUEFVAwoEwMcna3iLXmBHRDPapSv
+	 ycCTDh+ZGphfWDh+mm97Fp60GZjlvbQ4YfoT2ERjQrKsULgQJFMbPEFCReRzyXt3/o
+	 8f0qckCaNatmO1fj1pofQ2xy/5p7/Q378PDtI2zU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726294AbfGIDFm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 8 Jul 2019 23:05:42 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:37988 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725886AbfGIDFm (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 8 Jul 2019 23:05:42 -0400
-Received: by mail-pg1-f196.google.com with SMTP id z75so8667207pgz.5
-        for <linux-cifs@vger.kernel.org>; Mon, 08 Jul 2019 20:05:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=tiWaU7TfU0pQNcsbZ7N8JOiB7ELuuZjC1ij1j/n4vOE=;
-        b=IF97BRaeYc7JmBBoSOwTzDoiDYRpYdzOutBYtVgbNHZr7cfAWF5VjMiYlHZam++5VG
-         5FFZ3j5194zg42sMLmuCVb1NU2ZPqKAEBzbRgtRr9mcIIKsWDr80fZU88eGZEbVIruK9
-         5JRwxD8g+JcZEutLAp0zhtkZabTeMZ3VdJcDbGf8ZehANW04Jj6mZT4ZBTFHkIzvwS2e
-         C5v3UgrIwRhKed0lHszWubtxd/pDN5m0aeTsN8/ZL8A8m5N50p+nBBE0L9lrRKXOz++t
-         MzU72G5uSNgX1zVRCu4cU2BgnZMbcp+Spdw+OVFqGLhgZAnGgTrAoHLf2s9ZvXCR0z3g
-         1GWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=tiWaU7TfU0pQNcsbZ7N8JOiB7ELuuZjC1ij1j/n4vOE=;
-        b=jwYG9Q4TYkf4GIABTZeoVeGqoetOMpdQoABq9+lxSMNftOz6dfnpJR0wTbiICGlo06
-         18TxJWZb73aOI89MwlESbTHx6wQHxy/TML8cEWjz8nTnBCRkuVTFrzdfxlnBmyqHDeXq
-         lNf5e6hZ7AInzCFJt6onP7/RCcXezbWmwJ06VX80XV38954EY1zcCqrqHV56bvG41Lge
-         3L+xYcHhrT/mTjAaMjKUX4dJ2e+d5uf0SU0qvmiVcZdHs80UKTrKtHNMNBRu5qJX7Nev
-         HoI3pKUmjeyTNAacWYBqMAPy0maVk0KmZAr7H7FXQ/4fz9V60SBpuRHx+ViWBMh+OoQw
-         TAPw==
-X-Gm-Message-State: APjAAAW+R+czv896EVY6YKs2SAZ4q0SP0gDtaauOIqOEYapznUd49M5w
-        J60r4KsgxUyGvWFrCx5S+z6/8wxc6jsLrDtn5nI51GKq
-X-Google-Smtp-Source: APXvYqxYyviDYn1gDzwyDHikLJ7twH40CZs6jIV8oaZVYHn0bcdtDDEpcvbWhYnIv4RsHDxbQe3ztXcREvGbOuRr9K8=
-X-Received: by 2002:a65:6454:: with SMTP id s20mr27714389pgv.15.1562641541388;
- Mon, 08 Jul 2019 20:05:41 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAO3V83L1Q9jCLBsjHgFE1jw2PPi_sHtQz4geDKC4jEPWkhNYBg@mail.gmail.com>
- <CAO3V83+iZRAQRZ5YzivPS3di0QM=-dJOg8rnVK1icUuuESd+=g@mail.gmail.com>
-In-Reply-To: <CAO3V83+iZRAQRZ5YzivPS3di0QM=-dJOg8rnVK1icUuuESd+=g@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 8 Jul 2019 22:05:32 -0500
-Message-ID: <CAH2r5muXeKhfTgovqD1uQw_yRbstqj4M9NExqmtp0ZqZ6Dx4VA@mail.gmail.com>
-Subject: Re: mount.cifs fails but smbclient succeeds
-To:     Wout Mertens <wout.mertens@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        id S1726072AbfGIDPE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 8 Jul 2019 23:15:04 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60868 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726569AbfGIDPE (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 8 Jul 2019 23:15:04 -0400
+Subject: Re: [GIT PULL] Keys: Set 4 - Key ACLs for 5.3
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1562642102;
+        bh=ffJpmiG3YCVrmSdb4Ds3CGUQgDaz+9N4x55s4P3dlvo=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=gquIdpoSw1zf4tIdWE/tortMRjaZsdQquNItwfubAGAx7ABS6Jg++fZscnR0BnsTY
+         IBuaA0rawGY1tLdIcROynx/7Ndt8b7dpg8G33y+ze2Xv6bNom2fBgUYdFNSu1/eoIZ
+         WpG6iyy5q1f4L2tWwnRPvv2jW+B6HfkehCwoYY2E=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <28477.1562362239@warthog.procyon.org.uk>
+References: <28477.1562362239@warthog.procyon.org.uk>
+X-PR-Tracked-List-Id: <linux-nfs.vger.kernel.org>
+X-PR-Tracked-Message-Id: <28477.1562362239@warthog.procyon.org.uk>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git
+ tags/keys-acl-20190703
+X-PR-Tracked-Commit-Id: 7a1ade847596dadc94b37e49f8c03f167fd71748
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 0f75ef6a9cff49ff612f7ce0578bced9d0b38325
+Message-Id: <156264210283.2709.18395042155936707106.pr-tracker-bot@kernel.org>
+Date:   Tue, 09 Jul 2019 03:15:02 +0000
+To:     David Howells <dhowells@redhat.com>
+Cc:     torvalds@linux-foundation.org, dhowells@redhat.com,
+        jmorris@namei.org, keyrings@vger.kernel.org,
+        netdev@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-What kernel version? Note that we did make a change late last year in
-how we report the server name component of the UNC name during tree
-connection so could be useful to try with reasonably recent kernel -
-perhaps 5.1 kernel if possible as an experiment
+The pull request you sent on Fri, 05 Jul 2019 22:30:39 +0100:
 
-What server type?
+> git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags/keys-acl-20190703
 
-On Mon, Jul 8, 2019 at 7:52 PM Wout Mertens <wout.mertens@gmail.com> wrote:
->
-> Hi,
->
-> I need to mount a file server that I only have credentials for and
-> know nothing about.
->
-> I have a completely vanilla setup without /etc/smb.conf, nor any Samba
-> service running; only the samba client binaries are installed. The
-> credentials are domain, username, password; Kerberos is not being used
-> as confirmed by the smbclient debug output.
->
-> When I connect using
->
->     smbclient -A credentials.txt //corp.local/mnt
->
-> it works fine. The name corp.local resolves using DNS and I can browse
-> the datastore.
->
-> When I mount using
->
->  mount -vvvvv -t cifs //corp.local/mnt --verbose
-> -overs=3,credentials=credentials.txt,sec=ntlmssp /mnt
->
-> I see that I get a STATUS_BAD_NETWORK_NAME back. If I change the
-> credentials, I get a logon error, and if I change the mount name, I
-> get a missing file error. So it seems that the path and the
-> credentials are correct. If I change the version to 1, it fails in
-> some other way. If I change the sec to ntlm, it complains about
-> authentication.
->
-> Any suggestions? This is driving me crazy :-/
->
-> Many thanks!
->
-> Wout.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/0f75ef6a9cff49ff612f7ce0578bced9d0b38325
 
-
+Thank you!
 
 -- 
-Thanks,
-
-Steve
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
