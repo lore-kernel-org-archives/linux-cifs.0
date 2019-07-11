@@ -2,115 +2,99 @@ Return-Path: <SRS0=SUdu=VI=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B03F7C74A41
-	for <linux-cifs@archiver.kernel.org>; Thu, 11 Jul 2019 03:07:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEA0EC74A45
+	for <linux-cifs@archiver.kernel.org>; Thu, 11 Jul 2019 03:47:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8C61121019
-	for <linux-cifs@archiver.kernel.org>; Thu, 11 Jul 2019 03:07:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8D42C20872
+	for <linux-cifs@archiver.kernel.org>; Thu, 11 Jul 2019 03:47:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726353AbfGKDHg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 10 Jul 2019 23:07:36 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:18080 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727482AbfGKDHf (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 10 Jul 2019 23:07:35 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6B37Ugn098865
-        for <linux-cifs@vger.kernel.org>; Wed, 10 Jul 2019 23:07:34 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2tnubu2scf-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-cifs@vger.kernel.org>; Wed, 10 Jul 2019 23:07:34 -0400
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-cifs@vger.kernel.org> from <zohar@linux.ibm.com>;
-        Thu, 11 Jul 2019 04:07:31 +0100
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 11 Jul 2019 04:07:28 +0100
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6B37F0p35652076
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 11 Jul 2019 03:07:15 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E5429A405B;
-        Thu, 11 Jul 2019 03:07:27 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 735A7A4054;
-        Thu, 11 Jul 2019 03:07:26 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.80.110.74])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 11 Jul 2019 03:07:26 +0000 (GMT)
-Subject: Re: [GIT PULL] Keys: Set 4 - Key ACLs for 5.3
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        David Howells <dhowells@redhat.com>,
-        James Morris <jmorris@namei.org>, keyrings@vger.kernel.org,
-        Netdev <netdev@vger.kernel.org>, linux-nfs@vger.kernel.org,
-        CIFS <linux-cifs@vger.kernel.org>, linux-afs@lists.infradead.org,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-integrity@vger.kernel.org,
-        LSM List <linux-security-module@vger.kernel.org>,
-        Linux List Kernel Mailing <linux-kernel@vger.kernel.org>
-Date:   Wed, 10 Jul 2019 23:07:15 -0400
-In-Reply-To: <CAHk-=wiFti6=K2fyAYhx-PSX9ovQPJUNp0FMdV0pDaO_pSx9MQ@mail.gmail.com>
-References: <28477.1562362239@warthog.procyon.org.uk>
-         <CAHk-=wjxoeMJfeBahnWH=9zShKp2bsVy527vo3_y8HfOdhwAAw@mail.gmail.com>
-         <20190710194620.GA83443@gmail.com> <20190710201552.GB83443@gmail.com>
-         <CAHk-=wiFti6=K2fyAYhx-PSX9ovQPJUNp0FMdV0pDaO_pSx9MQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.20.5 (3.20.5-1.fc24) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19071103-4275-0000-0000-0000034BBC6E
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19071103-4276-0000-0000-0000385BC1F1
-Message-Id: <1562814435.4014.11.camel@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-10_08:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1907110035
+        id S1727174AbfGKDrH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 10 Jul 2019 23:47:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50942 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725977AbfGKDrH (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 10 Jul 2019 23:47:07 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 43E5C308A963;
+        Thu, 11 Jul 2019 03:47:07 +0000 (UTC)
+Received: from test1135.test.redhat.com (vpn2-54-113.bne.redhat.com [10.64.54.113])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7A6C61001B10;
+        Thu, 11 Jul 2019 03:47:06 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>,
+        Aurelien Aptel <aaptel@suse.com>,
+        Paulo Alcantara <paulo@paulo.ac>,
+        Ronnie Sahlberg <lsahlber@redhat.com>
+Subject: [PATCH] cifs: fix crash in cifs_dfs_do_automount
+Date:   Thu, 11 Jul 2019 13:46:58 +1000
+Message-Id: <20190711034658.21485-1-lsahlber@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Thu, 11 Jul 2019 03:47:07 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Linus,
+RHBZ: 1649907
 
-On Wed, 2019-07-10 at 18:59 -0700, Linus Torvalds wrote:
-> Anyway, since it does seem like David is offline, I've just reverted
-> this from my tree, and will be continuing my normal merge window pull
-> requests (the other issues I have seen have fixes in their respective
-> trees).
+Fix a crash that happens while attempting to mount a DFS referral from the same server on the root of a filesystem.
 
-Sorry for the delay.  An exception is needed for loading builtin keys
-"KEY_ALLOC_BUILT_IN" onto a keyring that is not writable by userspace.
- The following works, but probably is not how David would handle the
-exception.
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+---
+ fs/cifs/connect.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/security/keys/key.c b/security/keys/key.c
-index 519211a996e7..a99332c1e014 100644
---- a/security/keys/key.c
-+++ b/security/keys/key.c
-@@ -896,7 +896,7 @@ key_ref_t key_create_or_update(key_ref_t keyring_ref,
-        /* if we're going to allocate a new key, we're going to have
-         * to modify the keyring */
-        ret = key_permission(keyring_ref, KEY_NEED_WRITE);
--       if (ret < 0) {
-+       if (ret < 0 && !(flags & KEY_ALLOC_BUILT_IN)) {
-                key_ref = ERR_PTR(ret);
-                goto error_link_end;
-        }
-
-Mimi
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 8ad8bbe8003b..9b0f9f346c5b 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -4484,11 +4484,13 @@ cifs_are_all_path_components_accessible(struct TCP_Server_Info *server,
+ 					unsigned int xid,
+ 					struct cifs_tcon *tcon,
+ 					struct cifs_sb_info *cifs_sb,
+-					char *full_path)
++					char *full_path,
++					int added_treename)
+ {
+ 	int rc;
+ 	char *s;
+ 	char sep, tmp;
++	int skip = added_treename ? 1 : 0;
+ 
+ 	sep = CIFS_DIR_SEP(cifs_sb);
+ 	s = full_path;
+@@ -4503,7 +4505,13 @@ cifs_are_all_path_components_accessible(struct TCP_Server_Info *server,
+ 		/* next separator */
+ 		while (*s && *s != sep)
+ 			s++;
+-
++		/* if the treename is added, we then have to skip the first
++		 * part within the separators
++		 */
++		if (skip) {
++			skip = 0;
++			continue;
++		}
+ 		/*
+ 		 * temporarily null-terminate the path at the end of
+ 		 * the current component
+@@ -4551,8 +4559,7 @@ static int is_path_remote(struct cifs_sb_info *cifs_sb, struct smb_vol *vol,
+ 
+ 	if (rc != -EREMOTE) {
+ 		rc = cifs_are_all_path_components_accessible(server, xid, tcon,
+-							     cifs_sb,
+-							     full_path);
++			cifs_sb, full_path, tcon->Flags & SMB_SHARE_IS_IN_DFS);
+ 		if (rc != 0) {
+ 			cifs_dbg(VFS, "cannot query dirs between root and final path, "
+ 				 "enabling CIFS_MOUNT_USE_PREFIX_PATH\n");
+-- 
+2.13.6
 
