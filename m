@@ -2,99 +2,97 @@ Return-Path: <SRS0=SUdu=VI=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEA0EC74A45
-	for <linux-cifs@archiver.kernel.org>; Thu, 11 Jul 2019 03:47:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29449C74A35
+	for <linux-cifs@archiver.kernel.org>; Thu, 11 Jul 2019 15:16:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8D42C20872
-	for <linux-cifs@archiver.kernel.org>; Thu, 11 Jul 2019 03:47:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F1CA121019
+	for <linux-cifs@archiver.kernel.org>; Thu, 11 Jul 2019 15:16:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A5mxARRE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727174AbfGKDrH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 10 Jul 2019 23:47:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50942 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725977AbfGKDrH (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 10 Jul 2019 23:47:07 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 43E5C308A963;
-        Thu, 11 Jul 2019 03:47:07 +0000 (UTC)
-Received: from test1135.test.redhat.com (vpn2-54-113.bne.redhat.com [10.64.54.113])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7A6C61001B10;
-        Thu, 11 Jul 2019 03:47:06 +0000 (UTC)
-From:   Ronnie Sahlberg <lsahlber@redhat.com>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Steve French <smfrench@gmail.com>,
-        Aurelien Aptel <aaptel@suse.com>,
-        Paulo Alcantara <paulo@paulo.ac>,
-        Ronnie Sahlberg <lsahlber@redhat.com>
-Subject: [PATCH] cifs: fix crash in cifs_dfs_do_automount
-Date:   Thu, 11 Jul 2019 13:46:58 +1000
-Message-Id: <20190711034658.21485-1-lsahlber@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Thu, 11 Jul 2019 03:47:07 +0000 (UTC)
+        id S1728491AbfGKPQP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 11 Jul 2019 11:16:15 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:42063 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728194AbfGKPQP (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 11 Jul 2019 11:16:15 -0400
+Received: by mail-pl1-f193.google.com with SMTP id ay6so3188411plb.9;
+        Thu, 11 Jul 2019 08:16:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=6x7b8VajcF1DGZElO1FQVch8twXC3YkscWrtgn58UY8=;
+        b=A5mxARREPEkiKsbxlHp+gfYMUQ6nJsUDXqeHSlHmKq4pp/M/ywFUqyeJEJxXQpsLms
+         5Ldr5iiVCIyrbdXWwqbs07G/Cq8tAVKiSETXNajAVFqCxb0O1w9gnr9RA2bokGmG6AZr
+         1qkz8vnfK4C59iUMTCTV90VqgmSSWR32h02BqNH0U6U5ffOCzZopi+0EuYJxMqONqgV/
+         Z5PeaO3U1ncnxbL9X+3iod0JeAw4jZ/oTZUJh1ntv7qt8L431GAX4xny7tjp5Ry7ZdNT
+         NTHy16YkadYlqAAULylQMdVAmGJgBgf89PBcATyFTHZp0eSvXwBfzIT5PIJTYA//pU89
+         2ALQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=6x7b8VajcF1DGZElO1FQVch8twXC3YkscWrtgn58UY8=;
+        b=ZrrDFRCDJzzeOuHXeE9DcWqAaM6omUAPxmscraZ8E9Hq6wFeDZXVNdmwnuBEOGmcme
+         7CfN46LGkyOYmk9Qc9KrkW0icfWi3ee8vFHysq9T7uSh35F3Y/9Zjb8rAT8ey3370LPp
+         sKD2r+P07U4f5GgT0jlViipLxRavSC8ECtl4VngpMjA53OPlqHXbgBJZs67wxLC+zEkZ
+         3XtMCMjgcI1hN3/tsglkJ4QDDLnrizdxL+yyZWpslrqNgQv8OcT2M6aIJPO4J3MyWz7R
+         lozy44Ioyu7SAaSvqwetbOokD+RBmkITpvdYlGaeQDo3DFprwF1+mfmLCKpCaetKBfb9
+         7S0Q==
+X-Gm-Message-State: APjAAAUGCVN/J0DDiQ0TAdX5SFrWiDEIbnJaHAvUkPu9tH2Yc0A7T7En
+        5MnzIQAyIRpSPPWv3MY/WmYB8aJNOsfcRXnWQq+UdJQu
+X-Google-Smtp-Source: APXvYqx98rqgVyjHmH1F+2j2JGK+j/Ul+Qm3OthdCFiY7dv6BKzfiiOdtWg8KoDQoyJgxhlluB0WCps3D9b0Gi6duoI=
+X-Received: by 2002:a17:902:20b:: with SMTP id 11mr5344610plc.78.1562858174222;
+ Thu, 11 Jul 2019 08:16:14 -0700 (PDT)
+MIME-Version: 1.0
+References: <CAH2r5ms8f_wTwBVofvdRF=tNH2NJHvJC6sWYCJyG6E5PVGTwZQ@mail.gmail.com>
+In-Reply-To: <CAH2r5ms8f_wTwBVofvdRF=tNH2NJHvJC6sWYCJyG6E5PVGTwZQ@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 11 Jul 2019 10:16:03 -0500
+Message-ID: <CAH2r5muC=cEH1u2L+UvSJ8vsrrQ2LV68yojgVYUAP7MDx3Y1Mw@mail.gmail.com>
+Subject: Re: [SMB3][PATCH] fix copy_file_range when copying beyond end of
+ source file
+To:     CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-RHBZ: 1649907
+I noticed that the copy_file_range patches were merged (which is good)
 
-Fix a crash that happens while attempting to mount a DFS referral from the same server on the root of a filesystem.
+On Wed, Jun 19, 2019 at 8:44 PM Steve French <smfrench@gmail.com> wrote:
+>
+> Patch attached fixes the case where copy_file_range over an SMB3 mount
+> tries to go beyond the end of file of the source file.  This fixes
+> xfstests generic/430 and generic/431
+>
+> Amir's patches had added a similar change in the VFS layer, but
+> presumably harmless to have the check in cifs.ko as well to ensure
+> that we don't try to copy beyond end of the source file (otherwise
+> SMB3 servers will return an error on copychunk rather than doing the
+> partial copy (up to end of the source file) that copy_file_range
+> expects).
+>
+>
+>
+> --
+> Thanks,
+>
+> Steve
 
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
----
- fs/cifs/connect.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 8ad8bbe8003b..9b0f9f346c5b 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -4484,11 +4484,13 @@ cifs_are_all_path_components_accessible(struct TCP_Server_Info *server,
- 					unsigned int xid,
- 					struct cifs_tcon *tcon,
- 					struct cifs_sb_info *cifs_sb,
--					char *full_path)
-+					char *full_path,
-+					int added_treename)
- {
- 	int rc;
- 	char *s;
- 	char sep, tmp;
-+	int skip = added_treename ? 1 : 0;
- 
- 	sep = CIFS_DIR_SEP(cifs_sb);
- 	s = full_path;
-@@ -4503,7 +4505,13 @@ cifs_are_all_path_components_accessible(struct TCP_Server_Info *server,
- 		/* next separator */
- 		while (*s && *s != sep)
- 			s++;
--
-+		/* if the treename is added, we then have to skip the first
-+		 * part within the separators
-+		 */
-+		if (skip) {
-+			skip = 0;
-+			continue;
-+		}
- 		/*
- 		 * temporarily null-terminate the path at the end of
- 		 * the current component
-@@ -4551,8 +4559,7 @@ static int is_path_remote(struct cifs_sb_info *cifs_sb, struct smb_vol *vol,
- 
- 	if (rc != -EREMOTE) {
- 		rc = cifs_are_all_path_components_accessible(server, xid, tcon,
--							     cifs_sb,
--							     full_path);
-+			cifs_sb, full_path, tcon->Flags & SMB_SHARE_IS_IN_DFS);
- 		if (rc != 0) {
- 			cifs_dbg(VFS, "cannot query dirs between root and final path, "
- 				 "enabling CIFS_MOUNT_USE_PREFIX_PATH\n");
+
 -- 
-2.13.6
+Thanks,
 
+Steve
