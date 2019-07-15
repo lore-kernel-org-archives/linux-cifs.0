@@ -1,173 +1,104 @@
-Return-Path: <SRS0=skBP=VK=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=c4TP=VM=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EC06C71142
-	for <linux-cifs@archiver.kernel.org>; Sat, 13 Jul 2019 17:10:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B61A4C7618E
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 Jul 2019 07:50:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 35F6220850
-	for <linux-cifs@archiver.kernel.org>; Sat, 13 Jul 2019 17:10:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B1BF20838
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 Jul 2019 07:50:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uxu/Lm7+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jtFWvSgg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727901AbfGMRKe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 13 Jul 2019 13:10:34 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:39129 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727784AbfGMRKe (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 13 Jul 2019 13:10:34 -0400
-Received: by mail-pg1-f194.google.com with SMTP id u17so5886676pgi.6
-        for <linux-cifs@vger.kernel.org>; Sat, 13 Jul 2019 10:10:34 -0700 (PDT)
+        id S1726975AbfGOHuo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 15 Jul 2019 03:50:44 -0400
+Received: from mail-yw1-f68.google.com ([209.85.161.68]:33297 "EHLO
+        mail-yw1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726170AbfGOHuo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 15 Jul 2019 03:50:44 -0400
+Received: by mail-yw1-f68.google.com with SMTP id l124so7074873ywd.0;
+        Mon, 15 Jul 2019 00:50:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=kJE7bizIQ2gnF6OwfpjOODvP++2+HSd4uM9HA9JCgG0=;
-        b=Uxu/Lm7+eOyAFxsXhOMg0iDbq5Efyo/SbdNVIj4FYhJieJKrHSINZufBYskXVKHFxK
-         xCRAphdAak+TBozc9J5j34rpcAfE4iDCWnV3+AzvFdHN5FotKWsTew6Hri6E+BT+l7vL
-         87BfJwaVHW96yaqvOm2cSnigPEQzeexhTgnOvxaiQ6KUtILVob4fUMuvOCFxVfzAZ4ym
-         QnE2lh6vlFxfhkwS2Hp39hoNbhCZ/6w/e7WQu8m4j1IKMLz2HL0XF/oGuM5GmkzYj552
-         zyvshs4bnNHba2MNQa6uNHvtegVznbCGDBzISiEgJ6JQct32g8E3AWPLZ9QPZzSjUZMS
-         qblA==
+         :cc;
+        bh=2PPKKiy4TOkySs84erSTaGPrR7iQ7CdeTu3bd/bWAIQ=;
+        b=jtFWvSggLjAdlRoLceRlD3L8mhrjoJM+b0hNi6SVyoUIjpIXh+1F1+YFQT/gTco5dG
+         YOxQod8ltqERqXGxaHtsPX6i9FbySs8UfKp7XsGbfrYXJWBGYgnA1baouQncNkf4apuu
+         QiZzFEcrjgqh2/rbw4fMJ2mE1x8tbTBoWLxa5m7hWHCUP97jGjeL0Yoc5PEplVb4Ocsi
+         0IMYSmkyG/2z7OFEi/xdE4IA+v56nG3HEecfIDojLpKKF9Loav6H1bw4KCprkvAq2fNl
+         JbbqfG9sP3mybUuHsb8iDiJBjasVnMssEQALlAHSOBpclwfIaZwZ9SOx6HWFrJnrgCHP
+         3z4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=kJE7bizIQ2gnF6OwfpjOODvP++2+HSd4uM9HA9JCgG0=;
-        b=VmqAY9MqfRptBifNGueijmRmFRTAq3Rf1LMzLo+z6A75jFRwucZASFjbpsQrrdqCPV
-         3ue45LDBqAnE+TOYBVktpAJtklo9b5F0XTDJyQ/mWfUUrBZBOQNl5Stw11BT7cD2pluc
-         VY99ZNatoQ06WSrv/7yMTZifLCMlOs3cP/c5gjFQg2FH9WvObLAF+sUVIuBIY5PisGDW
-         TOkTAfw87zkhU03WMWKtRWxJtAyVqpZGVVtZXfZQCnMrtlxGTGbnCTT23bnsGF1gW3xc
-         SV2BNr6ZmYGVbd2HrIXhfK8UPjmmBcMav5EatbUSAWwJsNEuUUvah/UInrmF7VvUA8vd
-         DqXA==
-X-Gm-Message-State: APjAAAULDobeqGLlZOxE474LwMC51LzbxEc6U/rPJRfrUkBOgrKqH5MW
-        c2AG4jZAtKMUpcpV1oRQ1I8fs47NMCB6OTEgo+s=
-X-Google-Smtp-Source: APXvYqyIo6ES9XkrUcaQiWM/Tm3wFTlECsp5c1qZ7KAX2UZpI29o5KNwRyf4ADKTn8jn21O0aohH/06o2v1NTtfYWvQ=
-X-Received: by 2002:a65:6454:: with SMTP id s20mr17762728pgv.15.1563037833694;
- Sat, 13 Jul 2019 10:10:33 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=2PPKKiy4TOkySs84erSTaGPrR7iQ7CdeTu3bd/bWAIQ=;
+        b=DmTZnizGocCjRg7zINPh8aR/iqY2kSPlSM0sywe4SESL7iKOFeeE4mmlqj8PYjyh9G
+         lej2wg8owvRv6UAdsg6+fvdx+bAqWG3RdrIH24rge12OSBtTKpveXotRFpzPTKVOu/bR
+         aggHFGs1y8AZxxbO0WodlhdgsALfXBP9DxxzK8Y2JWnBHtQyJPkjbxnc7CNPTqj7sHSc
+         t+GgCTWyGT3Y7l9tCwhhxbAYAbFsOmWUT0x7Coj55m3B9irbLfTWJs12ymYllfZIwjkE
+         Q93PsRxSHsetPtcKPwAqNBFVw8KXKe09jZmAeaSEk1PwF6I5sf/mRFUyp1g1Iv94Uauy
+         njLA==
+X-Gm-Message-State: APjAAAXne7RJlj+oZJKHsChg7+AB2DWI+twZJV/K8Uiyg6LTqzrXUgpu
+        R7a9m3gUsgrqQZhYwJcodv04aSJ5vfIH5f7HDd4=
+X-Google-Smtp-Source: APXvYqxlHNixHRSxJaTHsrNyfNsQ/iEjX941UVv5ReMsihu6kuOIKxsk1kVQyd+N4jh7C6Kvt7BZ7YjXMrjrZ/jqRf8=
+X-Received: by 2002:a81:3c12:: with SMTP id j18mr15450493ywa.294.1563177042978;
+ Mon, 15 Jul 2019 00:50:42 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190711034658.21485-1-lsahlber@redhat.com> <87lfx34reu.fsf@suse.com>
-In-Reply-To: <87lfx34reu.fsf@suse.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 13 Jul 2019 12:10:22 -0500
-Message-ID: <CAH2r5mupzWee6zhapCmrYOg6EwN4ia_=GpNgApfyRwfAJCeBpQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix crash in cifs_dfs_do_automount
-To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        Paulo Alcantara <paulo@paulo.ac>
+References: <CAH2r5ms8f_wTwBVofvdRF=tNH2NJHvJC6sWYCJyG6E5PVGTwZQ@mail.gmail.com>
+ <CAH2r5muC=cEH1u2L+UvSJ8vsrrQ2LV68yojgVYUAP7MDx3Y1Mw@mail.gmail.com> <CAH2r5mu0yMPX+JFrWvnciYdWVRxGYgPsSX2UKOj2O70-bxzrsw@mail.gmail.com>
+In-Reply-To: <CAH2r5mu0yMPX+JFrWvnciYdWVRxGYgPsSX2UKOj2O70-bxzrsw@mail.gmail.com>
+From:   Amir Goldstein <amir73il@gmail.com>
+Date:   Mon, 15 Jul 2019 10:50:31 +0300
+Message-ID: <CAOQ4uxiQC9_OnrdzV+XniFeTDorAe-YHxWEC5c9pT_mxa62JxQ@mail.gmail.com>
+Subject: Re: [SMB3][PATCH] fix copy_file_range when copying beyond end of
+ source file
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-fixed comment and pushed to cifs-2.6.git for-next
+On Thu, Jul 11, 2019 at 6:19 PM Steve French <smfrench@gmail.com> wrote:
+>
+> I noticed that the copy_file_range patches were merged (which is good)
+> - see below.
+>
+> Anything else to merge for the changes to cifs.ko that we discussed
+> earlier.
 
-On Fri, Jul 12, 2019 at 2:56 AM Aur=C3=A9lien Aptel <aaptel@suse.com> wrote=
-:
->
-> Hi Ronnie,
->
-> Ronnie Sahlberg <lsahlber@redhat.com> writes:
->
-> > RHBZ: 1649907
-> >
-> > Fix a crash that happens while attempting to mount a DFS referral from =
-the same server on the root of a filesystem.
-> >
-> > Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> > ---
-> >  fs/cifs/connect.c | 15 +++++++++++----
-> >  1 file changed, 11 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> > index 8ad8bbe8003b..9b0f9f346c5b 100644
-> > --- a/fs/cifs/connect.c
-> > +++ b/fs/cifs/connect.c
-> > @@ -4484,11 +4484,13 @@ cifs_are_all_path_components_accessible(struct =
-TCP_Server_Info *server,
-> >                                       unsigned int xid,
-> >                                       struct cifs_tcon *tcon,
-> >                                       struct cifs_sb_info *cifs_sb,
-> > -                                     char *full_path)
-> > +                                     char *full_path,
-> > +                                     int added_treename)
-> >  {
-> >       int rc;
-> >       char *s;
-> >       char sep, tmp;
-> > +     int skip =3D added_treename ? 1 : 0;
-> >
-> >       sep =3D CIFS_DIR_SEP(cifs_sb);
-> >       s =3D full_path;
-> > @@ -4503,7 +4505,13 @@ cifs_are_all_path_components_accessible(struct T=
-CP_Server_Info *server,
-> >               /* next separator */
-> >               while (*s && *s !=3D sep)
-> >                       s++;
-> > -
-> > +             /* if the treename is added, we then have to skip the fir=
-st
-> > +              * part within the separators
-> > +              */
->
-> Nitpicking (Steve can probably fix this when he applies) but comment
-> style should be
->
-> /*
->  * foo
->  */
->
->
-> > +             if (skip) {
-> > +                     skip =3D 0;
-> > +                     continue;
-> > +             }
-> >               /*
-> >                * temporarily null-terminate the path at the end of
-> >                * the current component
-> > @@ -4551,8 +4559,7 @@ static int is_path_remote(struct cifs_sb_info *ci=
-fs_sb, struct smb_vol *vol,
-> >
-> >       if (rc !=3D -EREMOTE) {
-> >               rc =3D cifs_are_all_path_components_accessible(server, xi=
-d, tcon,
-> > -                                                          cifs_sb,
-> > -                                                          full_path);
-> > +                     cifs_sb, full_path, tcon->Flags & SMB_SHARE_IS_IN=
-_DFS);
->
-> Just FYI this flag is just set in SMB1. Can we test this change in the bu=
-ildbot?
->
-> >               if (rc !=3D 0) {
-> >                       cifs_dbg(VFS, "cannot query dirs between root and=
- final path, "
-> >                                "enabling CIFS_MOUNT_USE_PREFIX_PATH\n")=
-;
-> > --
-> > 2.13.6
-> >
-> >
->
-> Cheers,
-> --
-> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-> SUSE Linux GmbH, Maxfeldstra=C3=9Fe 5, 90409 N=C3=BCrnberg, Germany
-> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 21284 (AG N=C3=
-=BCrnberg)
+There was the cifs patch that I sent you:
 
+cifs: copy_file_range needs to strip setuid bits and update timestamps
 
+That was not included in Darrick's branch.
 
---=20
+> I wasn't sure about the "SMB3: fix copy file when beyond
+> size of source" patch - it may be redundant.  I will need to check
+
+It is redundant, but if you plan to forward a patch to stable, it
+will be easier for you to forward just the CIFS patch, so up to you.
+I am not sure if and when I will get to testing and forwarding
+copy_file_range patches to stable. Not sure it makes sense.
+
+> with current mainline.  Anything else needed for the enabling of
+> copy_file_range cross mount etc.
+
+The mtime update patch is not *needed* for enabling of
+copy_file_range cross mount. It is a correctness patch.
+So copy_file_range cross mount should work in mainline
+with cifs as long as other cifs related bugs have been fixed.
+
 Thanks,
-
-Steve
+Amir.
