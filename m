@@ -2,103 +2,109 @@ Return-Path: <SRS0=c4TP=VM=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B61A4C7618E
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Jul 2019 07:50:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF070C7618F
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 Jul 2019 14:19:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7B1BF20838
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Jul 2019 07:50:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jtFWvSgg"
+	by mail.kernel.org (Postfix) with ESMTP id C4F5220651
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 Jul 2019 14:19:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1563200356;
+	bh=ycggOkc9DEYnBVnGgU+uoiSvOob3Bl168DfW2wA4MVA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=MG3lj61uv0N98qxNJNkBwFvkIDten82CID2JWKHi1LdBlytbFUG7XAW9wxqH5XcON
+	 0j3dx3GtRMxqZRm57FA/aVZn4O1N79v9J7ny8xOMblMjr/5rkF/dOXX2a4/7Kq+Big
+	 BWhXfrh/NAAWH+H3Pjlc0rsqlcpGOusB6NALxxq0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726975AbfGOHuo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 15 Jul 2019 03:50:44 -0400
-Received: from mail-yw1-f68.google.com ([209.85.161.68]:33297 "EHLO
-        mail-yw1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726170AbfGOHuo (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 15 Jul 2019 03:50:44 -0400
-Received: by mail-yw1-f68.google.com with SMTP id l124so7074873ywd.0;
-        Mon, 15 Jul 2019 00:50:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=2PPKKiy4TOkySs84erSTaGPrR7iQ7CdeTu3bd/bWAIQ=;
-        b=jtFWvSggLjAdlRoLceRlD3L8mhrjoJM+b0hNi6SVyoUIjpIXh+1F1+YFQT/gTco5dG
-         YOxQod8ltqERqXGxaHtsPX6i9FbySs8UfKp7XsGbfrYXJWBGYgnA1baouQncNkf4apuu
-         QiZzFEcrjgqh2/rbw4fMJ2mE1x8tbTBoWLxa5m7hWHCUP97jGjeL0Yoc5PEplVb4Ocsi
-         0IMYSmkyG/2z7OFEi/xdE4IA+v56nG3HEecfIDojLpKKF9Loav6H1bw4KCprkvAq2fNl
-         JbbqfG9sP3mybUuHsb8iDiJBjasVnMssEQALlAHSOBpclwfIaZwZ9SOx6HWFrJnrgCHP
-         3z4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=2PPKKiy4TOkySs84erSTaGPrR7iQ7CdeTu3bd/bWAIQ=;
-        b=DmTZnizGocCjRg7zINPh8aR/iqY2kSPlSM0sywe4SESL7iKOFeeE4mmlqj8PYjyh9G
-         lej2wg8owvRv6UAdsg6+fvdx+bAqWG3RdrIH24rge12OSBtTKpveXotRFpzPTKVOu/bR
-         aggHFGs1y8AZxxbO0WodlhdgsALfXBP9DxxzK8Y2JWnBHtQyJPkjbxnc7CNPTqj7sHSc
-         t+GgCTWyGT3Y7l9tCwhhxbAYAbFsOmWUT0x7Coj55m3B9irbLfTWJs12ymYllfZIwjkE
-         Q93PsRxSHsetPtcKPwAqNBFVw8KXKe09jZmAeaSEk1PwF6I5sf/mRFUyp1g1Iv94Uauy
-         njLA==
-X-Gm-Message-State: APjAAAXne7RJlj+oZJKHsChg7+AB2DWI+twZJV/K8Uiyg6LTqzrXUgpu
-        R7a9m3gUsgrqQZhYwJcodv04aSJ5vfIH5f7HDd4=
-X-Google-Smtp-Source: APXvYqxlHNixHRSxJaTHsrNyfNsQ/iEjX941UVv5ReMsihu6kuOIKxsk1kVQyd+N4jh7C6Kvt7BZ7YjXMrjrZ/jqRf8=
-X-Received: by 2002:a81:3c12:: with SMTP id j18mr15450493ywa.294.1563177042978;
- Mon, 15 Jul 2019 00:50:42 -0700 (PDT)
+        id S2390058AbfGOOTQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 15 Jul 2019 10:19:16 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40544 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2390053AbfGOOTO (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 15 Jul 2019 10:19:14 -0400
+Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 550DD212F5;
+        Mon, 15 Jul 2019 14:19:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1563200353;
+        bh=ycggOkc9DEYnBVnGgU+uoiSvOob3Bl168DfW2wA4MVA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=ovchs0c436UMbKH7ix38qIWAjp2jelGMfY6ksh+pTN4zXAbGGLMiThpWH3xbI8qoN
+         DClwi9z25fAkUnwGGtQCKH0LuV8zmDxRE1xj4Lqk3u0vdTx3oYqTZsJeoqOdR/jaq6
+         3mkDJICNq7gv4MlA0HwHHxQRh4dcqGRB8pQ3lfFk=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     "Eric W. Biederman" <ebiederm@xmission.com>,
+        Namjae Jeon <namjae.jeon@samsung.com>,
+        Jeff Layton <jlayton@primarydata.com>,
+        Steve French <smfrench@gmail.com>,
+        Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 022/158] signal/cifs: Fix cifs_put_tcp_session to call send_sig instead of force_sig
+Date:   Mon, 15 Jul 2019 10:15:53 -0400
+Message-Id: <20190715141809.8445-22-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190715141809.8445-1-sashal@kernel.org>
+References: <20190715141809.8445-1-sashal@kernel.org>
 MIME-Version: 1.0
-References: <CAH2r5ms8f_wTwBVofvdRF=tNH2NJHvJC6sWYCJyG6E5PVGTwZQ@mail.gmail.com>
- <CAH2r5muC=cEH1u2L+UvSJ8vsrrQ2LV68yojgVYUAP7MDx3Y1Mw@mail.gmail.com> <CAH2r5mu0yMPX+JFrWvnciYdWVRxGYgPsSX2UKOj2O70-bxzrsw@mail.gmail.com>
-In-Reply-To: <CAH2r5mu0yMPX+JFrWvnciYdWVRxGYgPsSX2UKOj2O70-bxzrsw@mail.gmail.com>
-From:   Amir Goldstein <amir73il@gmail.com>
-Date:   Mon, 15 Jul 2019 10:50:31 +0300
-Message-ID: <CAOQ4uxiQC9_OnrdzV+XniFeTDorAe-YHxWEC5c9pT_mxa62JxQ@mail.gmail.com>
-Subject: Re: [SMB3][PATCH] fix copy_file_range when copying beyond end of
- source file
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Jul 11, 2019 at 6:19 PM Steve French <smfrench@gmail.com> wrote:
->
-> I noticed that the copy_file_range patches were merged (which is good)
-> - see below.
->
-> Anything else to merge for the changes to cifs.ko that we discussed
-> earlier.
+From: "Eric W. Biederman" <ebiederm@xmission.com>
 
-There was the cifs patch that I sent you:
+[ Upstream commit 72abe3bcf0911d69b46c1e8bdb5612675e0ac42c ]
 
-cifs: copy_file_range needs to strip setuid bits and update timestamps
+The locking in force_sig_info is not prepared to deal with a task that
+exits or execs (as sighand may change).  The is not a locking problem
+in force_sig as force_sig is only built to handle synchronous
+exceptions.
 
-That was not included in Darrick's branch.
+Further the function force_sig_info changes the signal state if the
+signal is ignored, or blocked or if SIGNAL_UNKILLABLE will prevent the
+delivery of the signal.  The signal SIGKILL can not be ignored and can
+not be blocked and SIGNAL_UNKILLABLE won't prevent it from being
+delivered.
 
-> I wasn't sure about the "SMB3: fix copy file when beyond
-> size of source" patch - it may be redundant.  I will need to check
+So using force_sig rather than send_sig for SIGKILL is confusing
+and pointless.
 
-It is redundant, but if you plan to forward a patch to stable, it
-will be easier for you to forward just the CIFS patch, so up to you.
-I am not sure if and when I will get to testing and forwarding
-copy_file_range patches to stable. Not sure it makes sense.
+Because it won't impact the sending of the signal and and because
+using force_sig is wrong, replace force_sig with send_sig.
 
-> with current mainline.  Anything else needed for the enabling of
-> copy_file_range cross mount etc.
+Cc: Namjae Jeon <namjae.jeon@samsung.com>
+Cc: Jeff Layton <jlayton@primarydata.com>
+Cc: Steve French <smfrench@gmail.com>
+Fixes: a5c3e1c725af ("Revert "cifs: No need to send SIGKILL to demux_thread during umount"")
+Fixes: e7ddee9037e7 ("cifs: disable sharing session and tcon and add new TCP sharing code")
+Signed-off-by: "Eric W. Biederman" <ebiederm@xmission.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/cifs/connect.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The mtime update patch is not *needed* for enabling of
-copy_file_range cross mount. It is a correctness patch.
-So copy_file_range cross mount should work in mainline
-with cifs as long as other cifs related bugs have been fixed.
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index f31339db45fd..82b3af47bce3 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -2428,7 +2428,7 @@ cifs_put_tcp_session(struct TCP_Server_Info *server, int from_reconnect)
+ 
+ 	task = xchg(&server->tsk, NULL);
+ 	if (task)
+-		force_sig(SIGKILL, task);
++		send_sig(SIGKILL, task, 1);
+ }
+ 
+ static struct TCP_Server_Info *
+-- 
+2.20.1
 
-Thanks,
-Amir.
