@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26394C76196
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Jul 2019 14:46:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C09FEC76191
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 Jul 2019 15:05:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EA2CE20C01
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Jul 2019 14:46:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C2BE2054F
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 Jul 2019 15:05:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563202018;
-	bh=yODrA0hK8ycIo4dt4jubQN4zLeQJPeZ3Gl6sLcbXUGU=;
+	s=default; t=1563203139;
+	bh=PDzKh+qSG8uO1hfW4zgcF1/RIF6lSfKaWjzjmnzVINc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=kYELxNtP1aHb0Cgu4B06htV/H2noyf4oWVQ+aZYEgjhJciRmuHCSl14g4H9/dHpUr
-	 eo0UnU4DqLpqGMR2IvtkTjtjcRDw5gaSGKPMCC5WgABEtVjGkTJj6JkMrQJlDkvoaH
-	 4nlw7Sw98IY/YEB+llyySZULsSbXsHLizJ0/Zets=
+	b=1AOwUmOJEztHDzePQHu8hbFRw4eHXeZVzfZMWSnPPjNb6CcsARtqPIQ7vgu4przQh
+	 07MgUmzTPZd2qFH8Gz9POTcCdAKBbDy9yL89OSEKBIeiBEB496DWxdy1NWEL1Ojycy
+	 lxrffnNBFbEbqWEePnfucfLGy4n92eJJ+NFbyDLc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404464AbfGOOhW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 15 Jul 2019 10:37:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58998 "EHLO mail.kernel.org"
+        id S2387813AbfGOOFc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 15 Jul 2019 10:05:32 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52084 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2404383AbfGOOhW (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 15 Jul 2019 10:37:22 -0400
+        id S2388084AbfGOOFb (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 15 Jul 2019 10:05:31 -0400
 Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E04FD204FD;
-        Mon, 15 Jul 2019 14:37:19 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 456812081C;
+        Mon, 15 Jul 2019 14:05:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563201441;
-        bh=yODrA0hK8ycIo4dt4jubQN4zLeQJPeZ3Gl6sLcbXUGU=;
+        s=default; t=1563199530;
+        bh=PDzKh+qSG8uO1hfW4zgcF1/RIF6lSfKaWjzjmnzVINc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=UX5CZc4gqt3FpLvaj7pIEKwZnyMPb0FvHN4EgzqtmLpttgrYQZ//HSo+BnDxIBcZT
-         C1zHloqWmrVJis+ITbQ7K9sx+DWXOOLxm5UopayteOatj/eh8ItitDfqqH1LVRdk7o
-         U6JNq4np3eLl8dD+AcTKf+mtC4VyYkvweFxrpM24=
+        b=bZ7QPvl23s+Ek5VovtwHsi6+/ppY79mdivOPAEBfve6isHYBlBR3xDRj2t9u67JEo
+         BMLdVnEQ5A0rIU2BUiL8vnBWaq2qet3u7LYWgiLFbMPMGUwmoIxX69ZHscJqf24emh
+         tvMkttqkzW0Z94y53ZmV9fKErvqzWwxqwowvT34k=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     "Eric W. Biederman" <ebiederm@xmission.com>,
@@ -45,12 +45,12 @@ Cc:     "Eric W. Biederman" <ebiederm@xmission.com>,
         Jeff Layton <jlayton@primarydata.com>,
         Steve French <smfrench@gmail.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 14/73] signal/cifs: Fix cifs_put_tcp_session to call send_sig instead of force_sig
-Date:   Mon, 15 Jul 2019 10:35:30 -0400
-Message-Id: <20190715143629.10893-14-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.1 034/219] signal/cifs: Fix cifs_put_tcp_session to call send_sig instead of force_sig
+Date:   Mon, 15 Jul 2019 10:00:35 -0400
+Message-Id: <20190715140341.6443-34-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190715143629.10893-1-sashal@kernel.org>
-References: <20190715143629.10893-1-sashal@kernel.org>
+In-Reply-To: <20190715140341.6443-1-sashal@kernel.org>
+References: <20190715140341.6443-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -93,10 +93,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index f291ed0c155d..d1019cbf7a52 100644
+index e9507fba0b36..10851bb74253 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -2221,7 +2221,7 @@ cifs_put_tcp_session(struct TCP_Server_Info *server, int from_reconnect)
+@@ -2625,7 +2625,7 @@ cifs_put_tcp_session(struct TCP_Server_Info *server, int from_reconnect)
  
  	task = xchg(&server->tsk, NULL);
  	if (task)
