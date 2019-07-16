@@ -2,155 +2,106 @@ Return-Path: <SRS0=queM=VN=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45A68C76191
-	for <linux-cifs@archiver.kernel.org>; Tue, 16 Jul 2019 00:42:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDE50C76191
+	for <linux-cifs@archiver.kernel.org>; Tue, 16 Jul 2019 03:06:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 236B020880
-	for <linux-cifs@archiver.kernel.org>; Tue, 16 Jul 2019 00:42:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9BD152080A
+	for <linux-cifs@archiver.kernel.org>; Tue, 16 Jul 2019 03:06:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TX6xwPpa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730623AbfGPAmC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 15 Jul 2019 20:42:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34774 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730383AbfGPAmC (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 15 Jul 2019 20:42:02 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 7B23C3082E0E;
-        Tue, 16 Jul 2019 00:42:02 +0000 (UTC)
-Received: from test1135.test.redhat.com (vpn2-54-77.bne.redhat.com [10.64.54.77])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D033C5D968;
-        Tue, 16 Jul 2019 00:42:01 +0000 (UTC)
-From:   Ronnie Sahlberg <lsahlber@redhat.com>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Steve French <smfrench@gmail.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Stable <stable@vger.kernel.org>
-Subject: [PATCH] cifs: fix crash in smb2_compound_op()/smb2_set_next_command()
-Date:   Tue, 16 Jul 2019 10:41:46 +1000
-Message-Id: <20190716004146.13668-1-lsahlber@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Tue, 16 Jul 2019 00:42:02 +0000 (UTC)
+        id S1730356AbfGPDGX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 15 Jul 2019 23:06:23 -0400
+Received: from mail-pl1-f174.google.com ([209.85.214.174]:40344 "EHLO
+        mail-pl1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728256AbfGPDGX (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 15 Jul 2019 23:06:23 -0400
+Received: by mail-pl1-f174.google.com with SMTP id a93so9306733pla.7
+        for <linux-cifs@vger.kernel.org>; Mon, 15 Jul 2019 20:06:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=ISDcDGUTk2/tqhKYeJw8UmYKp3pALcnWgmL7jCPj7YY=;
+        b=TX6xwPpalpIxp2bV1XANTWj4OeSFZeIlrx9BaJOXOHXe2xJE+tbgx+Vx2MTi7X5mw8
+         zVv6qdebZNBn3BzBqUd3mGlN0rfKIdh6OkChl+SOexf4HazWTJVq/4uCs+RUvBjj3oOA
+         AvtgphXX2fhUiSwtn7lVLzRpWfoZueR6FDnh2oEUI8+tBulK4wzBMR2lywquF2YDSRtl
+         49k33RGI4H/mtsu3PvbL2jBFuV5XFcBGVqTa4Neqv5vt/esMbfv6JnezoyiKLnBGQ4GO
+         JQZYTSTo5VGJKj9a3olom7+5gxp8PzEL7qOuLLuwH1s5a1kvAhoM1PUYJNvkWm5+mG/b
+         Rdzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=ISDcDGUTk2/tqhKYeJw8UmYKp3pALcnWgmL7jCPj7YY=;
+        b=ky2YqZFmHDW2LErh0IMildxkN5s93Z+LC83QseAKXrzNF1ju0RRiH/eTuPvJjro1gB
+         XSFgl8oXWienx33VQRQNlkJj1xwWqb/XFBRRNRu5pQxFd4z3c6LhxZaMEtFY/iFHfXci
+         8GAghXUGA0MHMy1JZyi1goz7vJirTL903+cKSJzQGX8wsklT8T4T4y4EDT6DWTg+f+vs
+         UB8lFA1JeH3DmMOgsnUWO9BkVvr6dWgjOauRTmvEvGV1LzBHjViKa4bP0YkXaaJMv43v
+         VT30UEGYtKtKJ0MTu9zXKTaaumHwnK+mXI7wo4i2E+xXJijgO1KjF1gfJcRklHAX8A5Q
+         DSMA==
+X-Gm-Message-State: APjAAAU7xJ8HHl/Y9Xp1sWD5Dq2/8fCbRWP1Dyfnx+lj9drxoNnf/x3j
+        hsNYkEbjjkEBRt0f//5Nv+cPi1v5lBPZoKkmZyZysHdI
+X-Google-Smtp-Source: APXvYqyxYTsKeYJKpUHlo6Y3LPtMjQsfNyGsUgH5XqWWgVvkq9QYYK3TatbqbsRELUWE95WFg6OjWrqwetjW6xZjPQQ=
+X-Received: by 2002:a17:902:2a29:: with SMTP id i38mr32500125plb.46.1563246382139;
+ Mon, 15 Jul 2019 20:06:22 -0700 (PDT)
+MIME-Version: 1.0
+From:   Steve French <smfrench@gmail.com>
+Date:   Mon, 15 Jul 2019 22:06:11 -0500
+Message-ID: <CAH2r5mtkLjmjiT7QYLsGKqVHwx4JBU5=e68gTEztQ5BDCg0PWA@mail.gmail.com>
+Subject: [PATCH][SMB3] CONFIG_CIFS_SMB_DIRECT no longer experimental
+To:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="0000000000004df102058dc3a974"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-RHBZ: 1722704
+--0000000000004df102058dc3a974
+Content-Type: text/plain; charset="UTF-8"
 
-In low memory situations the various SMB2_*_init() functions can fail
-to allocate a request PDU and thus leave the request iovector as NULL.
+Long Li has made good progress in fixing remaining xfstest results
+over rdma smb3 mounts
 
-If we don't check the return code for failure we end up calling
-smb2_set_next_command() with a NULL iovector causing a crash when it tries
-to dereference it.
 
-CC: Stable <stable@vger.kernel.org>
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
----
- fs/cifs/smb2inode.c | 12 ++++++++++++
- fs/cifs/smb2ops.c   | 11 ++++++++++-
- 2 files changed, 22 insertions(+), 1 deletion(-)
 
-diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
-index 278405d26c47..d8d9cdfa30b6 100644
---- a/fs/cifs/smb2inode.c
-+++ b/fs/cifs/smb2inode.c
-@@ -120,6 +120,8 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
- 				SMB2_O_INFO_FILE, 0,
- 				sizeof(struct smb2_file_all_info) +
- 					  PATH_MAX * 2, 0, NULL);
-+		if (rc)
-+			goto finished;
- 		smb2_set_next_command(tcon, &rqst[num_rqst]);
- 		smb2_set_related(&rqst[num_rqst++]);
- 		trace_smb3_query_info_compound_enter(xid, ses->Suid, tcon->tid,
-@@ -147,6 +149,8 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
- 					COMPOUND_FID, current->tgid,
- 					FILE_DISPOSITION_INFORMATION,
- 					SMB2_O_INFO_FILE, 0, data, size);
-+		if (rc)
-+			goto finished;
- 		smb2_set_next_command(tcon, &rqst[num_rqst]);
- 		smb2_set_related(&rqst[num_rqst++]);
- 		trace_smb3_rmdir_enter(xid, ses->Suid, tcon->tid, full_path);
-@@ -163,6 +167,8 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
- 					COMPOUND_FID, current->tgid,
- 					FILE_END_OF_FILE_INFORMATION,
- 					SMB2_O_INFO_FILE, 0, data, size);
-+		if (rc)
-+			goto finished;
- 		smb2_set_next_command(tcon, &rqst[num_rqst]);
- 		smb2_set_related(&rqst[num_rqst++]);
- 		trace_smb3_set_eof_enter(xid, ses->Suid, tcon->tid, full_path);
-@@ -180,6 +186,8 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
- 					COMPOUND_FID, current->tgid,
- 					FILE_BASIC_INFORMATION,
- 					SMB2_O_INFO_FILE, 0, data, size);
-+		if (rc)
-+			goto finished;
- 		smb2_set_next_command(tcon, &rqst[num_rqst]);
- 		smb2_set_related(&rqst[num_rqst++]);
- 		trace_smb3_set_info_compound_enter(xid, ses->Suid, tcon->tid,
-@@ -206,6 +214,8 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
- 					COMPOUND_FID, current->tgid,
- 					FILE_RENAME_INFORMATION,
- 					SMB2_O_INFO_FILE, 0, data, size);
-+		if (rc)
-+			goto finished;
- 		smb2_set_next_command(tcon, &rqst[num_rqst]);
- 		smb2_set_related(&rqst[num_rqst++]);
- 		trace_smb3_rename_enter(xid, ses->Suid, tcon->tid, full_path);
-@@ -231,6 +241,8 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
- 					COMPOUND_FID, current->tgid,
- 					FILE_LINK_INFORMATION,
- 					SMB2_O_INFO_FILE, 0, data, size);
-+		if (rc)
-+			goto finished;
- 		smb2_set_next_command(tcon, &rqst[num_rqst]);
- 		smb2_set_related(&rqst[num_rqst++]);
- 		trace_smb3_hardlink_enter(xid, ses->Suid, tcon->tid, full_path);
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 4b0b14946343..462890f4cb9c 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -2027,6 +2027,10 @@ smb2_set_related(struct smb_rqst *rqst)
- 	struct smb2_sync_hdr *shdr;
- 
- 	shdr = (struct smb2_sync_hdr *)(rqst->rq_iov[0].iov_base);
-+	if (shdr == NULL) {
-+		cifs_dbg(FYI, "shdr NULL in smb2_set_related\n");
-+		return;
-+	}
- 	shdr->Flags |= SMB2_FLAGS_RELATED_OPERATIONS;
- }
- 
-@@ -2041,6 +2045,12 @@ smb2_set_next_command(struct cifs_tcon *tcon, struct smb_rqst *rqst)
- 	unsigned long len = smb_rqst_len(server, rqst);
- 	int i, num_padding;
- 
-+	shdr = (struct smb2_sync_hdr *)(rqst->rq_iov[0].iov_base);
-+	if (shdr == NULL) {
-+		cifs_dbg(FYI, "shdr NULL in smb2_set_next_command\n");
-+		return;
-+	}
-+
- 	/* SMB headers in a compound are 8 byte aligned. */
- 
- 	/* No padding needed */
-@@ -2080,7 +2090,6 @@ smb2_set_next_command(struct cifs_tcon *tcon, struct smb_rqst *rqst)
- 	}
- 
-  finished:
--	shdr = (struct smb2_sync_hdr *)(rqst->rq_iov[0].iov_base);
- 	shdr->NextCommand = cpu_to_le32(len);
- }
- 
 -- 
-2.13.6
+Thanks,
 
+Steve
+
+--0000000000004df102058dc3a974
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smb3-smbdirect-no-longer-experimental.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-smbdirect-no-longer-experimental.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_jy58issm0>
+X-Attachment-Id: f_jy58issm0
+
+RnJvbSA5ZmZmODgwNDc4N2Q1OWEzYjY4OGNlM2UwM2EyMzEyNzViNjFlY2RhIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IE1vbiwgMTUgSnVsIDIwMTkgMjE6NTk6NDEgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
+bWIzOiBzbWJkaXJlY3Qgbm8gbG9uZ2VyIGV4cGVyaW1lbnRhbAoKY2xhcmlmeSBLY29uZmlnIHRv
+IGluZGljYXRlIHRoYXQgc21iIGRpcmVjdAooU01CMyBvdmVyIFJETUEpIGlzIG5vIGxvbmdlciBl
+eHBlcmltZW50YWwuCgpPdmVyIHRoZSBsYXN0IHRocmVlIHJlbGVhc2VzIExvbmcgTGkgaGFzCmZp
+eGVkIHZhcmlvdXMgcHJvYmxlbXMgdW5jb3ZlcmVkIGJ5IHhmc3Rlc3RpbmcuCgpTaWduZWQtb2Zm
+LWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvY2lmcy9L
+Y29uZmlnIHwgNCArKy0tCiAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCspLCAyIGRlbGV0
+aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvS2NvbmZpZyBiL2ZzL2NpZnMvS2NvbmZpZwpp
+bmRleCBlMzljMTUyNjdiYjQuLmQ2ZjcxZTNjNDc0OSAxMDA2NDQKLS0tIGEvZnMvY2lmcy9LY29u
+ZmlnCisrKyBiL2ZzL2NpZnMvS2NvbmZpZwpAQCAtMTk3LDEwICsxOTcsMTAgQEAgY29uZmlnIENJ
+RlNfTkZTRF9FWFBPUlQKIAkgIEFsbG93cyBORlMgc2VydmVyIHRvIGV4cG9ydCBhIENJRlMgbW91
+bnRlZCBzaGFyZSAobmZzZCBvdmVyIGNpZnMpCiAKIGNvbmZpZyBDSUZTX1NNQl9ESVJFQ1QKLQli
+b29sICJTTUIgRGlyZWN0IHN1cHBvcnQgKEV4cGVyaW1lbnRhbCkiCisJYm9vbCAiU01CIERpcmVj
+dCBzdXBwb3J0IgogCWRlcGVuZHMgb24gQ0lGUz1tICYmIElORklOSUJBTkQgJiYgSU5GSU5JQkFO
+RF9BRERSX1RSQU5TIHx8IENJRlM9eSAmJiBJTkZJTklCQU5EPXkgJiYgSU5GSU5JQkFORF9BRERS
+X1RSQU5TPXkKIAloZWxwCi0JICBFbmFibGVzIFNNQiBEaXJlY3QgZXhwZXJpbWVudGFsIHN1cHBv
+cnQgZm9yIFNNQiAzLjAsIDMuMDIgYW5kIDMuMS4xLgorCSAgRW5hYmxlcyBTTUIgRGlyZWN0IHN1
+cHBvcnQgZm9yIFNNQiAzLjAsIDMuMDIgYW5kIDMuMS4xLgogCSAgU01CIERpcmVjdCBhbGxvd3Mg
+dHJhbnNmZXJyaW5nIFNNQiBwYWNrZXRzIG92ZXIgUkRNQS4gSWYgdW5zdXJlLAogCSAgc2F5IE4u
+CiAKLS0gCjIuMjAuMQoK
+--0000000000004df102058dc3a974--
