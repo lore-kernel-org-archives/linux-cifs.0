@@ -1,122 +1,157 @@
-Return-Path: <SRS0=queM=VN=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=9NYC=VO=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF631C7618F
-	for <linux-cifs@archiver.kernel.org>; Tue, 16 Jul 2019 22:05:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF8AAC7618F
+	for <linux-cifs@archiver.kernel.org>; Wed, 17 Jul 2019 00:03:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A46702173B
-	for <linux-cifs@archiver.kernel.org>; Tue, 16 Jul 2019 22:05:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66C9D2184E
+	for <linux-cifs@archiver.kernel.org>; Wed, 17 Jul 2019 00:03:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=paulo.ac header.i=@paulo.ac header.b="RRK9oiUy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nWjYiwIs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728699AbfGPWFL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 16 Jul 2019 18:05:11 -0400
-Received: from mx.paulo.ac ([212.47.230.6]:38588 "EHLO mx.paulo.ac"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728434AbfGPWFL (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 16 Jul 2019 18:05:11 -0400
-From:   "Paulo Alcantara (SUSE)" <paulo@paulo.ac>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=paulo.ac; s=dkim;
-        t=1563314708;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ictppub2W6BvEyEBopdH3SZbJ5aGmAVfnP2JIdC5ziw=;
-        b=RRK9oiUyWgvvZ/IptYF9PLQ1xizKsYLrwKwdM/sLiJ4LwBHd8XofxhGldej303oKtXQQfe
-        k8KBbOd7blWlT7ev+0JFnmuIPc2NCVh+2YqSjvGYzJ1qZjulFlwCHa4W9mbjNTpPrbacQg
-        FH/hyTm+f935hk/0BrGf3jt8tGxIcqfL7FJxurplRQBjDE9E40G+Oy8jz81+Ylhs1nP8SK
-        l52OjYtJ6OCWYDbmg7yjWkE1q6w3kUU2DQjLXE3L3VcRw0G+0nS8To0SSKU7NVojW4DFW1
-        HXAM1aAspoZg0OGq6Mj9udcjc1mkQIsyOT5bJc3jpzo27lZ3/bE3p4ITSWaMdA==
-To:     linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Cc:     "Paulo Alcantara (SUSE)" <paulo@paulo.ac>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
-Subject: [PATCH 3/3] ipconfig: Handle CONFIG_CIFS_ROOT option
-Date:   Tue, 16 Jul 2019 19:04:52 -0300
-Message-Id: <20190716220452.3382-3-paulo@paulo.ac>
-In-Reply-To: <20190716220452.3382-1-paulo@paulo.ac>
-References: <20190716220452.3382-1-paulo@paulo.ac>
+        id S1728597AbfGQADB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 16 Jul 2019 20:03:01 -0400
+Received: from mail-pl1-f177.google.com ([209.85.214.177]:42649 "EHLO
+        mail-pl1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728235AbfGQADB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 16 Jul 2019 20:03:01 -0400
+Received: by mail-pl1-f177.google.com with SMTP id ay6so10940269plb.9;
+        Tue, 16 Jul 2019 17:03:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=6qtRzCGL7WK76UGXP+HRSEdebM0ElpllvtXWv0KXh+k=;
+        b=nWjYiwIsvy2m3ZL48akqQF57rrKGmA7iHENDwP7ja3iIPEnx4yLNgcyPw45fgGN6WU
+         hOPHtq1nrWg/CKWr4kHxDMbniajrAdM+lV3/1iP7iGwSACLOkYGUmYGKZDUVJ/a6mHng
+         SCbDA1m9DQ8T0kx/tAVkTaOir1dVZcVYzaY/GkMorX5UYoccoh5P7Gk9iHouPR5XYG7A
+         vdkPC7pflDxuH9jHiPhMI9bB0uSpcmpuICdTopZDtYfdDqcCbxu3D3aKvEFYeZTM8uFl
+         5xmsq0TJ1U3WJEbRpEo/3bmxk4wTJF/UZpuzGTXjcNQH8HkzLt4Bi0nf82fr99d4SChE
+         tdXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=6qtRzCGL7WK76UGXP+HRSEdebM0ElpllvtXWv0KXh+k=;
+        b=tE/BLB/GwS9C+iikyOX7fuSJxDtogzlIlooGAkImh0Y8R3VNj7cEiFRzAAq6bt6Raf
+         hQ8OeEGFmbqMRf6rWo30vKy07uN/UNtiP4ojoG35/fZ12KWDCKlqqG4xkerlDA0FInuv
+         dtuvyrfJWq/ZGU9FNKE51MMzW1G7a427gwhbm9qKp8XvCGpK9jec85QiRrIdr4ZtAF/n
+         b2FKBGvu8wuv4TcuKjrcDc8sm5oC/91MZIE7MVvBVu9OyWJvXM0sau2nhXGwPsk+j3Dn
+         Ab0cPrZFYfUDXiJyAHyFBJtJdfIWcSYj70F4ZWOXEPyAF80Sq690tAK1uXToUnTyepLR
+         HZ5w==
+X-Gm-Message-State: APjAAAVu73QsnCnVYjYafzR0FZGqxPvT2vJXDk3OyXBLIXLPHL4jcz2U
+        Go7GXt0Nzv+GexvoUneqoi42gr98qixu6m4/vw3zNyXu
+X-Google-Smtp-Source: APXvYqzYlcIxK8DZAZ2lJxHm/qKgtSlmbXhMo9AJTr27xxbj04/ojlCXKhVcZag7HFx5+gp4CxGkjhFZ1tyc7dmO4NY=
+X-Received: by 2002:a17:902:20b:: with SMTP id 11mr39595363plc.78.1563321779919;
+ Tue, 16 Jul 2019 17:02:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=paulo.ac;
-        s=dkim; t=1563314708;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ictppub2W6BvEyEBopdH3SZbJ5aGmAVfnP2JIdC5ziw=;
-        b=bLKUuVJo6GT8idBQcj0ehE0y7QFPEkaxkOZ0kwllhiWtA7HnpAo6lhnfnIcsPHf9TCbrAj
-        eDtQ3NuIYaKC/+nGDEjqy0T26HuGz/9dbFhkZfh09aswnTe/kxG5C5KwEDVoZsUjFqAMFb
-        K2Jtpq5NBFn6uda5ipXFtrA2+LJHbK6U5rnfjdeAbzW5pWoVJdL9zfENlkhbdexDNqL5h+
-        Q+N7TGVouFj2LvXed/7yxAzGtwhTMM4y68ZM0vG/fc7F20DYgDbL2Gl3dcZP72jA8hl5O8
-        MIsqaa4PuyCZ+zfvXIUvQlNrivQxH8wHqUz2vojcM51dKgxtZaHtCLYzf5ZDOA==
-ARC-Seal: i=1; s=dkim; d=paulo.ac; t=1563314708; a=rsa-sha256; cv=none;
-        b=Hd94DInN7pquLG+VckLfeKAMelmvmcLpX9PDLQ3GvfpZmvF5CesyE37/jRjVhp+Z0oc40p
-        Fj75WuMwybyNgTVmnXil68dC7naIkejRtge+yaeg7WeGbbkraPbOsh0YT3myBsQIdfz/Wj
-        kLpOPj6CWf9Fhypsv/cl3rCjWzXY+JGTEZau2fDKxq1OvKl0yvqCNUIKgp6YxXdCboewIu
-        zMaMxBvsYiDztIV8J7fzpLUdYBPjBpAZdAl7uQG2vQ3yTqBky92T+bDKOrK9Enc/iFkzED
-        67ehmAvO2elJPA++R9Hbty8hBGa6J2W8d99nPqI28oJboQSzIXqL6Up6nBv9Mw==
-ARC-Authentication-Results: i=1;
-        mx.paulo.ac;
-        auth=pass smtp.auth=paulo smtp.mailfrom=paulo@paulo.ac
-Authentication-Results: mx.paulo.ac;
-        auth=pass smtp.auth=paulo smtp.mailfrom=paulo@paulo.ac
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 16 Jul 2019 19:02:48 -0500
+Message-ID: <CAH2r5mtXjyUP6_h86o5GmKxZ2syubbnc2-L95ctf96=TvBnbyA@mail.gmail.com>
+Subject: [PATCH][CIFS] Add flock support
+To:     linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="0000000000005cd052058dd5373c"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The experimental root file system support in cifs.ko relies on
-ipconfig to set up the network stack and then accessing the SMB share
-that contains the rootfs files.
+--0000000000005cd052058dd5373c
+Content-Type: text/plain; charset="UTF-8"
 
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
-Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
-Signed-off-by: Paulo Alcantara (SUSE) <paulo@paulo.ac>
----
- net/ipv4/ipconfig.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+The attached patch adds support for flock support similar to AFS, NFS etc.
 
-diff --git a/net/ipv4/ipconfig.c b/net/ipv4/ipconfig.c
-index 9bcca08efec9..32e20b758b68 100644
---- a/net/ipv4/ipconfig.c
-+++ b/net/ipv4/ipconfig.c
-@@ -1483,10 +1483,10 @@ static int __init ip_auto_config(void)
- 	 * missing values.
- 	 */
- 	if (ic_myaddr == NONE ||
--#ifdef CONFIG_ROOT_NFS
-+#if defined(CONFIG_ROOT_NFS) || defined(CONFIG_CIFS_ROOT)
- 	    (root_server_addr == NONE &&
- 	     ic_servaddr == NONE &&
--	     ROOT_DEV == Root_NFS) ||
-+	     (ROOT_DEV == Root_NFS || ROOT_DEV == Root_CIFS)) ||
- #endif
- 	    ic_first_dev->next) {
- #ifdef IPCONFIG_DYNAMIC
-@@ -1513,6 +1513,12 @@ static int __init ip_auto_config(void)
- 				goto try_try_again;
- 			}
- #endif
-+#ifdef CONFIG_CIFS_ROOT
-+			if (ROOT_DEV == Root_CIFS) {
-+				pr_err("IP-Config: Retrying forever (CIFS root)...\n");
-+				goto try_try_again;
-+			}
-+#endif
- 
- 			if (--retries) {
- 				pr_err("IP-Config: Reopening network devices...\n");
+Although the patch did seem to work in my experiments with flock, I did notice
+that xfstest generic/504 fails because /proc/locks is not updated by cifs.ko
+after a successful lock.  Any idea which helper function does that?
+
+
 -- 
-2.22.0
+Thanks,
 
+Steve
+
+--0000000000005cd052058dd5373c
+Content-Type: text/x-patch; charset="US-ASCII"; name="0001-cifs-add-support-for-flock.patch"
+Content-Disposition: attachment; 
+	filename="0001-cifs-add-support-for-flock.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_jy6hex8u0>
+X-Attachment-Id: f_jy6hex8u0
+
+RnJvbSA5ZGU4ZTY4YThhYjBjN2U1OTA4MDg3NGYwNWIxZGYzNzQ3N2NmNjkxIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFR1ZSwgMTYgSnVsIDIwMTkgMTg6NTU6MzggLTA1MDAKU3ViamVjdDogW1BBVENIXSBj
+aWZzOiBhZGQgc3VwcG9ydCBmb3IgZmxvY2sKClRoZSBmbG9jayBzeXN0ZW0gY2FsbCBsb2NrcyB0
+aGUgd2hvbGUgZmlsZSByYXRoZXIgdGhhbiBhIGJ5dGUKcmFuZ2UgYW5kIGlzIGN1cnJlbnRseSBl
+bXVsYXRlZCBieSB2YXJpb3VzIG90aGVyIGZpbGUgc3lzdGVtcwpieSBzaW1wbHkgc2VuZGluZyBh
+IGJ5dGUgcmFuZ2UgbG9jayBmb3IgdGhlIHdob2xlIGZpbGUuCgpUaGlzIHZlcnNpb24gb2YgdGhl
+IHBhdGNoIG5lZWRzIGEgbWlub3IgdXBkYXRlIHRvIHBhc3MKeGZzdGVzdCBnZW5lcmljLzUwNCAo
+d2UgbmVlZCB0byBmaWd1cmUgb3V0IGhvdyB0byB1cGRhdGUKL3Byb2MvbG9ja3MgYWZ0ZXIgYW4g
+ZmxvY2sgY2FsbCBpcyBncmFudGVkKQoKU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZy
+ZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL2NpZnMvY2lmc2ZzLmMgfCAgMyArKysKIGZzL2Np
+ZnMvY2lmc2ZzLmggfCAgMSArCiBmcy9jaWZzL2ZpbGUuYyAgIHwgNTQgKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrCiAzIGZpbGVzIGNoYW5nZWQsIDU4IGlu
+c2VydGlvbnMoKykKCmRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNmcy5jIGIvZnMvY2lmcy9jaWZz
+ZnMuYwppbmRleCAzMjBjN2E2ZmQzMTguLmE2NzRmNTJiMDQwMyAxMDA2NDQKLS0tIGEvZnMvY2lm
+cy9jaWZzZnMuYworKysgYi9mcy9jaWZzL2NpZnNmcy5jCkBAIC0xMTY4LDYgKzExNjgsNyBAQCBj
+b25zdCBzdHJ1Y3QgZmlsZV9vcGVyYXRpb25zIGNpZnNfZmlsZV9vcHMgPSB7CiAJLm9wZW4gPSBj
+aWZzX29wZW4sCiAJLnJlbGVhc2UgPSBjaWZzX2Nsb3NlLAogCS5sb2NrID0gY2lmc19sb2NrLAor
+CS5mbG9jayA9IGNpZnNfZmxvY2ssCiAJLmZzeW5jID0gY2lmc19mc3luYywKIAkuZmx1c2ggPSBj
+aWZzX2ZsdXNoLAogCS5tbWFwICA9IGNpZnNfZmlsZV9tbWFwLApAQCAtMTE4Nyw2ICsxMTg4LDcg
+QEAgY29uc3Qgc3RydWN0IGZpbGVfb3BlcmF0aW9ucyBjaWZzX2ZpbGVfc3RyaWN0X29wcyA9IHsK
+IAkub3BlbiA9IGNpZnNfb3BlbiwKIAkucmVsZWFzZSA9IGNpZnNfY2xvc2UsCiAJLmxvY2sgPSBj
+aWZzX2xvY2ssCisJLmZsb2NrID0gY2lmc19mbG9jaywKIAkuZnN5bmMgPSBjaWZzX3N0cmljdF9m
+c3luYywKIAkuZmx1c2ggPSBjaWZzX2ZsdXNoLAogCS5tbWFwID0gY2lmc19maWxlX3N0cmljdF9t
+bWFwLApAQCAtMTIwNiw2ICsxMjA4LDcgQEAgY29uc3Qgc3RydWN0IGZpbGVfb3BlcmF0aW9ucyBj
+aWZzX2ZpbGVfZGlyZWN0X29wcyA9IHsKIAkub3BlbiA9IGNpZnNfb3BlbiwKIAkucmVsZWFzZSA9
+IGNpZnNfY2xvc2UsCiAJLmxvY2sgPSBjaWZzX2xvY2ssCisJLmZsb2NrID0gY2lmc19mbG9jaywK
+IAkuZnN5bmMgPSBjaWZzX2ZzeW5jLAogCS5mbHVzaCA9IGNpZnNfZmx1c2gsCiAJLm1tYXAgPSBj
+aWZzX2ZpbGVfbW1hcCwKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc2ZzLmggYi9mcy9jaWZzL2Np
+ZnNmcy5oCmluZGV4IGFlYTAwNTcwMzc4NS4uMjYyZjcwOTgyMmVlIDEwMDY0NAotLS0gYS9mcy9j
+aWZzL2NpZnNmcy5oCisrKyBiL2ZzL2NpZnMvY2lmc2ZzLmgKQEAgLTEwOCw2ICsxMDgsNyBAQCBl
+eHRlcm4gc3NpemVfdCBjaWZzX3N0cmljdF9yZWFkdihzdHJ1Y3Qga2lvY2IgKmlvY2IsIHN0cnVj
+dCBpb3ZfaXRlciAqdG8pOwogZXh0ZXJuIHNzaXplX3QgY2lmc191c2VyX3dyaXRldihzdHJ1Y3Qg
+a2lvY2IgKmlvY2IsIHN0cnVjdCBpb3ZfaXRlciAqZnJvbSk7CiBleHRlcm4gc3NpemVfdCBjaWZz
+X2RpcmVjdF93cml0ZXYoc3RydWN0IGtpb2NiICppb2NiLCBzdHJ1Y3QgaW92X2l0ZXIgKmZyb20p
+OwogZXh0ZXJuIHNzaXplX3QgY2lmc19zdHJpY3Rfd3JpdGV2KHN0cnVjdCBraW9jYiAqaW9jYiwg
+c3RydWN0IGlvdl9pdGVyICpmcm9tKTsKK2V4dGVybiBpbnQgY2lmc19mbG9jayhzdHJ1Y3QgZmls
+ZSAqZmlsZSwgaW50IGNtZCwgc3RydWN0IGZpbGVfbG9jayAqZmwpOwogZXh0ZXJuIGludCBjaWZz
+X2xvY2soc3RydWN0IGZpbGUgKiwgaW50LCBzdHJ1Y3QgZmlsZV9sb2NrICopOwogZXh0ZXJuIGlu
+dCBjaWZzX2ZzeW5jKHN0cnVjdCBmaWxlICosIGxvZmZfdCwgbG9mZl90LCBpbnQpOwogZXh0ZXJu
+IGludCBjaWZzX3N0cmljdF9mc3luYyhzdHJ1Y3QgZmlsZSAqLCBsb2ZmX3QsIGxvZmZfdCwgaW50
+KTsKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvZmlsZS5jIGIvZnMvY2lmcy9maWxlLmMKaW5kZXggOTcw
+OTA2OTNkMTgyLi42NDE5Mjc3NTVkMGIgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvZmlsZS5jCisrKyBi
+L2ZzL2NpZnMvZmlsZS5jCkBAIC0xNjg1LDYgKzE2ODUsNjAgQEAgY2lmc19zZXRsayhzdHJ1Y3Qg
+ZmlsZSAqZmlsZSwgc3RydWN0IGZpbGVfbG9jayAqZmxvY2ssIF9fdTMyIHR5cGUsCiAJcmV0dXJu
+IHJjOwogfQogCitpbnQgY2lmc19mbG9jayhzdHJ1Y3QgZmlsZSAqZmlsZSwgaW50IGNtZCwgc3Ry
+dWN0IGZpbGVfbG9jayAqZmwpCit7CisJaW50IHJjLCB4aWQ7CisJaW50IGxvY2sgPSAwLCB1bmxv
+Y2sgPSAwOworCWJvb2wgd2FpdF9mbGFnID0gZmFsc2U7CisJYm9vbCBwb3NpeF9sY2sgPSBmYWxz
+ZTsKKwlzdHJ1Y3QgY2lmc19zYl9pbmZvICpjaWZzX3NiOworCXN0cnVjdCBjaWZzX3Rjb24gKnRj
+b247CisJc3RydWN0IGNpZnNJbm9kZUluZm8gKmNpbm9kZTsKKwlzdHJ1Y3QgY2lmc0ZpbGVJbmZv
+ICpjZmlsZTsKKwlfX3UxNiBuZXRmaWQ7CisJX191MzIgdHlwZTsKKworCXJjID0gLUVBQ0NFUzsK
+Kwl4aWQgPSBnZXRfeGlkKCk7CisKKwlpZiAoIShmbC0+ZmxfZmxhZ3MgJiBGTF9GTE9DSykpIHsK
+KwkJY2lmc19kYmcoVkZTLCAicmV0IG5vbG9ja1xuIik7CisJCXJldHVybiAtRU5PTENLOworCX0K
+KworCWNmaWxlID0gKHN0cnVjdCBjaWZzRmlsZUluZm8gKilmaWxlLT5wcml2YXRlX2RhdGE7CisJ
+dGNvbiA9IHRsaW5rX3Rjb24oY2ZpbGUtPnRsaW5rKTsKKworCWNpZnNfcmVhZF9mbG9jayhmbCwg
+JnR5cGUsICZsb2NrLCAmdW5sb2NrLCAmd2FpdF9mbGFnLAorCQkJdGNvbi0+c2VzLT5zZXJ2ZXIp
+OworCWNpZnNfc2IgPSBDSUZTX0ZJTEVfU0IoZmlsZSk7CisJbmV0ZmlkID0gY2ZpbGUtPmZpZC5u
+ZXRmaWQ7CisJY2lub2RlID0gQ0lGU19JKGZpbGVfaW5vZGUoZmlsZSkpOworCisJaWYgKGNhcF91
+bml4KHRjb24tPnNlcykgJiYKKwkgICAgKENJRlNfVU5JWF9GQ05UTF9DQVAgJiBsZTY0X3RvX2Nw
+dSh0Y29uLT5mc1VuaXhJbmZvLkNhcGFiaWxpdHkpKSAmJgorCSAgICAoKGNpZnNfc2ItPm1udF9j
+aWZzX2ZsYWdzICYgQ0lGU19NT1VOVF9OT1BPU0lYQlJMKSA9PSAwKSkKKwkJcG9zaXhfbGNrID0g
+dHJ1ZTsKKworCWlmICghbG9jayAmJiAhdW5sb2NrKSB7CisJCS8qCisJCSAqIGlmIG5vIGxvY2sg
+b3IgdW5sb2NrIHRoZW4gbm90aGluZyB0byBkbyBzaW5jZSB3ZSBkbyBub3QKKwkJICoga25vdyB3
+aGF0IGl0IGlzCisJCSAqLworCQljaWZzX2RiZyhWRlMsICJyZXR1cm4gRkxPQ0sgRU9QTk9UU1VQ
+UFxuIik7CisJCWZyZWVfeGlkKHhpZCk7CisJCXJldHVybiAtRU9QTk9UU1VQUDsKKwl9CisKKwly
+YyA9IGNpZnNfc2V0bGsoZmlsZSwgZmwsIHR5cGUsIHdhaXRfZmxhZywgcG9zaXhfbGNrLCBsb2Nr
+LCB1bmxvY2ssCisJCQl4aWQpOworCWZyZWVfeGlkKHhpZCk7CisJY2lmc19kYmcoVkZTLCAiRkxP
+Q0sgcmMgPSAlZFxuIiwgcmMpOworCXJldHVybiByYzsKKworCit9CisKIGludCBjaWZzX2xvY2so
+c3RydWN0IGZpbGUgKmZpbGUsIGludCBjbWQsIHN0cnVjdCBmaWxlX2xvY2sgKmZsb2NrKQogewog
+CWludCByYywgeGlkOwotLSAKMi4yMC4xCgo=
+--0000000000005cd052058dd5373c--
