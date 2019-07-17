@@ -7,58 +7,59 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65F29C7618F
-	for <linux-cifs@archiver.kernel.org>; Wed, 17 Jul 2019 18:38:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 865E9C7618F
+	for <linux-cifs@archiver.kernel.org>; Wed, 17 Jul 2019 18:44:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EACE721743
-	for <linux-cifs@archiver.kernel.org>; Wed, 17 Jul 2019 18:38:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 566FB21743
+	for <linux-cifs@archiver.kernel.org>; Wed, 17 Jul 2019 18:44:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UoJVX/Tr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X7vNzkcx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727402AbfGQSiF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 17 Jul 2019 14:38:05 -0400
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:35310 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727271AbfGQSiF (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 17 Jul 2019 14:38:05 -0400
-Received: by mail-lf1-f68.google.com with SMTP id p197so17244413lfa.2
-        for <linux-cifs@vger.kernel.org>; Wed, 17 Jul 2019 11:38:03 -0700 (PDT)
+        id S1727444AbfGQSoR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 17 Jul 2019 14:44:17 -0400
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:46250 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727377AbfGQSoR (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 17 Jul 2019 14:44:17 -0400
+Received: by mail-lf1-f67.google.com with SMTP id z15so12981128lfh.13
+        for <linux-cifs@vger.kernel.org>; Wed, 17 Jul 2019 11:44:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=VB1G3pCaUULAGooLNr9VIqPraYsMXILmS3Zmdg/gOiA=;
-        b=UoJVX/TreSCn3s9QTWbesqUWS2Baj7S+IZ8sWJbcnlhiVqlk9nMOe9B+PY0alvEEKj
-         6WZtvFZ/M+oVP53blPYe6H87IW8pZ9N/EGyHv/orasdtPK3pwSLRV4vjX41MxiTegcOx
-         YFwt2f9aZZ3QfrBomDW6DQ1VK6fLc6jOzr98ilfwH+gtiXX8pqDXUyvWo1Zo2POiozQl
-         lu2G7qLvZ2EfsyzBzHYuKIzu+7fPSVZcrT/1iSNtepTdk9DK5Sy9i439yI0ctGZLoUi4
-         y0uKzb2JeV6OGQpmUGlx4RlW7Qg2s420xHBNuX9LOwnCVLdcjFRZt2aP62ek8pmT8YbY
-         fdsQ==
+        bh=0K4kpTnoL9C9WK/r2cUcElmtmKsNm6JdAxdKxqrOFi4=;
+        b=X7vNzkcx5V/hvOAEdjysbXXf6FAmfiJkz/mid7FV+ql42GNMkGuDFy7INE4/1SdFC/
+         57/zkAma10eXU96WSTILcyPGVoJXmL2ZA8VoFAlkHkwjUeS+4d3NUyk9iajkBFYH8ofx
+         8x+aAHubMloYXDQrPU4JHS2eL26s2vgEoMAWSThWW23iaLHcfxxbZXBk0RGSl8jBt4ox
+         vJYrCK9C62HOmzvjlffy+eF8Q49H+v8V95LnewhQDb8aXslxPmG8T3QT8VUAG6+FaIDV
+         L7qx8vrba2F5bTBXhAKaMdCpgwoz79yADc4xBYJqtBvU5E7oa+t3Y54jkadZTu8OAoFH
+         4+0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=VB1G3pCaUULAGooLNr9VIqPraYsMXILmS3Zmdg/gOiA=;
-        b=bniTn//7fvpb6U8TIl1N101jNI32Tz/Sunc4mb2evyWe9H/+Mmvj0mHZX+Llv5eat+
-         Wuo4UvISV3RlQFZBlaYpCz5r9YumYKqpP3Es2+yd6wn6ni5lgzyztkzT5RTw/JmJ7T8t
-         eMeiuIIrUncGgHmklfMQtDj16nESEWvJMCQLjd6higumW8xNNw14vZbpvY8whtF4GcgS
-         t5lgyPRhY7ptEv7z22N/pwGqnf3O21LesK/KX27eZUOzX2fmeTivaPw1/T8azLM/sBAH
-         +jwxQjZPk+D6cybpE3Vo8wj9xCBbdd2U2BWPVVJttTY6PDBiorGy3jqYzm33OmV+DTfn
-         bA2A==
-X-Gm-Message-State: APjAAAUUR3IwlEy6R1uMXUjdOcxi5MCVsZmUoXaLHWm+/XRD+JBMK4eM
-        xYtQrw//hZXncMM3XGRKbRaN1XvDsd7gWbRmDw==
-X-Google-Smtp-Source: APXvYqywO8Rqjxpx8PeTShOoc+Vflz7toA9Pfmtls94b6hzpF8uoiS/uAbtneJXJ86Ujf4a9b/mC5lXkVXYmi4iSQNM=
-X-Received: by 2002:ac2:50cd:: with SMTP id h13mr19147673lfm.36.1563388683213;
- Wed, 17 Jul 2019 11:38:03 -0700 (PDT)
+        bh=0K4kpTnoL9C9WK/r2cUcElmtmKsNm6JdAxdKxqrOFi4=;
+        b=TjLifrrfLC2K6z7UWTE8lIjLAXaQQ3mLzP75jmP281aHaEHVnrsvTSF3ZKQylpyCzh
+         bw/6a+vicfTleMAftHAJSQZ1bFNE1zcv7dBVfLptKW1cRIaLEcHXauHdctk4T/NzkJwX
+         7MgPfDFfXzpFj9lx+6XFBBduCLzRwUm8zVTbQCREgS2zWLeWP+FyhfCEACXpwnMo3pVf
+         njjzYzAp9bSt0f6/GbQEXCWhOrd3CqHVrOiKcvD8uVqG1KJkSFTctHNaXKrGN1xdMBlM
+         G3oXOghA1g+DdZTku2c8JrLnto2OKDxymi6qPvH8jImOijROUUGt4nPSSA8CCUkJe0Mj
+         HKgQ==
+X-Gm-Message-State: APjAAAXkk3VDFLRqmc82mVhgOz2fybGxfL5wLrQGhjCAYXgAbqnw3HOu
+        uE0FYDHjF8VBwCqWF9CBhgQ9vBVdGTK+j9A2Mg==
+X-Google-Smtp-Source: APXvYqxnvEtXMjFg86zqiW3/RDBmTC5WpEEk9snhuixP+E0BAP4NZ3SnTcfEPUgaD3avqUHvw/4xZIyZtv4xmo+ODFo=
+X-Received: by 2002:ac2:5337:: with SMTP id f23mr19094846lfh.15.1563389055983;
+ Wed, 17 Jul 2019 11:44:15 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190717104628.21400-1-aaptel@suse.com>
-In-Reply-To: <20190717104628.21400-1-aaptel@suse.com>
+References: <20190716032349.10711-1-lsahlber@redhat.com>
+In-Reply-To: <20190716032349.10711-1-lsahlber@redhat.com>
 From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Wed, 17 Jul 2019 11:37:52 -0700
-Message-ID: <CAKywueQqyb7r_pDvrxYv7btTuvUBV7DjEZJWdNt-n_np5T80ww@mail.gmail.com>
-Subject: Re: [PATCH v1] CIFS: fix deadlock in cached root handling
-To:     Aurelien Aptel <aaptel@suse.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+Date:   Wed, 17 Jul 2019 11:44:04 -0700
+Message-ID: <CAKywueTNf7eTbbmcT=uO8JNrqZC2ZSLDFugw6TOwXWSJm_5zGw@mail.gmail.com>
+Subject: Re: [PATCH] cifs: flush before set-info if we have writeable handles
+To:     Ronnie Sahlberg <lsahlber@redhat.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
@@ -66,106 +67,89 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Looks good.
+=D0=BF=D0=BD, 15 =D0=B8=D1=8E=D0=BB. 2019 =D0=B3. =D0=B2 20:24, Ronnie Sahl=
+berg <lsahlber@redhat.com>:
+>
+> Servers can defer destaging any data and updating the mtime until close()=
+.
+> This means that if we do a setinfo to modify the mtime while other handle=
+s
+> are open for write the server may overwrite our setinfo timestamps when
+> if flushes the file on close() of the writeable handle.
+>
+> To avoid this we add an explicit flush() before any attempts to use setin=
+fo
+> and update the mtime IF we have writeable handles open.
+>
+> This makes "cp -p" preserve the mtime when copying files to some smb serv=
+ers.
+>
+> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> ---
+>  fs/cifs/smb2inode.c | 18 +++++++++++++++++-
+>  1 file changed, 17 insertions(+), 1 deletion(-)
+>
+> diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+> index 278405d26c47..a3603ec3a086 100644
+> --- a/fs/cifs/smb2inode.c
+> +++ b/fs/cifs/smb2inode.c
+> @@ -516,7 +516,11 @@ smb2_set_file_info(struct inode *inode, const char *=
+full_path,
+>  {
+>         struct cifs_sb_info *cifs_sb =3D CIFS_SB(inode->i_sb);
+>         struct tcon_link *tlink;
+> +       struct cifs_tcon *tcon;
+> +       struct TCP_Server_Info *server;
+>         int rc;
+> +       struct cifsInodeInfo *cifsi;
+> +       struct cifsFileInfo *wrcfile;
+>
+>         if ((buf->CreationTime =3D=3D 0) && (buf->LastAccessTime =3D=3D 0=
+) &&
+>             (buf->LastWriteTime =3D=3D 0) && (buf->ChangeTime =3D=3D 0) &=
+&
+> @@ -527,7 +531,19 @@ smb2_set_file_info(struct inode *inode, const char *=
+full_path,
+>         if (IS_ERR(tlink))
+>                 return PTR_ERR(tlink);
+>
+> -       rc =3D smb2_compound_op(xid, tlink_tcon(tlink), cifs_sb, full_pat=
+h,
+> +       tcon =3D tlink_tcon(tlink);
+> +       server =3D tcon->ses->server;
+> +
+> +       if (buf->LastWriteTime) {
+> +               cifsi =3D CIFS_I(inode);
+> +               wrcfile =3D find_writable_file(cifsi, false);
 
-Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+use get_writable_file instead - this will allow us to get a real RC.
+if -EBADF is returned then no writable handle and should proceed
+normally, otherwise let's fail setattr.
+
+> +               if (wrcfile) {
+> +                       filemap_write_and_wait(inode->i_mapping);
+
+If the above function returns error, the same problem that you are
+trying to fix appears. If an error happen, we should fail setattr to
+avoid corruption of timestamps.
+
+> +                       server->ops->flush(xid, tcon, &wrcfile->fid);
+
+the same logic applies to flush call - need to fail setattr if an error occ=
+ured.
+
+> +                       cifsFileInfo_put(wrcfile);
+> +               }
+> +       }
+> +       rc =3D smb2_compound_op(xid, tcon, cifs_sb, full_path,
+>                               FILE_WRITE_ATTRIBUTES, FILE_OPEN, 0, buf,
+>                               SMB2_OP_SET_INFO);
+>         cifs_put_tlink(tlink);
+> --
+> 2.13.6
+>
+
 
 --
 Best regards,
 Pavel Shilovsky
-
-=D1=81=D1=80, 17 =D0=B8=D1=8E=D0=BB. 2019 =D0=B3. =D0=B2 03:46, Aurelien Ap=
-tel <aaptel@suse.com>:
->
-> Prevent deadlock between open_shroot() and
-> cifs_mark_open_files_invalid() by releasing the lock before entering
-> SMB2_open, taking it again after and checking if we still need to use
-> the result.
->
-> Link: https://lore.kernel.org/linux-cifs/684ed01c-cbca-2716-bc28-b0a59a0f=
-8521@prodrive-technologies.com/T/#u
-> Fixes: 3d4ef9a15343 ("smb3: fix redundant opens on root")
-> Signed-off-by: Aurelien Aptel <aaptel@suse.com>
-> ---
->
-> this is the for-next version of the patch I sent in the thread
-> https://lore.kernel.org/linux-cifs/684ed01c-cbca-2716-bc28-b0a59a0f8521@p=
-rodrive-technologies.com/T/#u
->
->
->  fs/cifs/smb2ops.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 45 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 6cb4def11ebe..8202c996b55e 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -694,8 +694,51 @@ int open_shroot(unsigned int xid, struct cifs_tcon *=
-tcon, struct cifs_fid *pfid)
->
->         smb2_set_related(&rqst[1]);
->
-> +       /*
-> +        * We do not hold the lock for the open because in case
-> +        * SMB2_open needs to reconnect, it will end up calling
-> +        * cifs_mark_open_files_invalid() which takes the lock again
-> +        * thus causing a deadlock
-> +        */
-> +
-> +       mutex_unlock(&tcon->crfid.fid_mutex);
->         rc =3D compound_send_recv(xid, ses, flags, 2, rqst,
->                                 resp_buftype, rsp_iov);
-> +       mutex_lock(&tcon->crfid.fid_mutex);
-> +
-> +       /*
-> +        * Now we need to check again as the cached root might have
-> +        * been successfully re-opened from a concurrent process
-> +        */
-> +
-> +       if (tcon->crfid.is_valid) {
-> +               /* work was already done */
-> +
-> +               /* stash fids for close() later */
-> +               struct cifs_fid fid =3D {
-> +                       .persistent_fid =3D pfid->persistent_fid,
-> +                       .volatile_fid =3D pfid->volatile_fid,
-> +               };
-> +
-> +               /*
-> +                * caller expects this func to set pfid to a valid
-> +                * cached root, so we copy the existing one and get a
-> +                * reference.
-> +                */
-> +               memcpy(pfid, tcon->crfid.fid, sizeof(*pfid));
-> +               kref_get(&tcon->crfid.refcount);
-> +
-> +               mutex_unlock(&tcon->crfid.fid_mutex);
-> +
-> +               if (rc =3D=3D 0) {
-> +                       /* close extra handle outside of crit sec */
-> +                       SMB2_close(xid, tcon, fid.persistent_fid, fid.vol=
-atile_fid);
-> +               }
-> +              goto oshr_free;
-> +       }
-> +
-> +       /* Cached root is still invalid, continue normaly */
-> +
->         if (rc)
->                 goto oshr_exit;
->
-> @@ -729,8 +772,9 @@ int open_shroot(unsigned int xid, struct cifs_tcon *t=
-con, struct cifs_fid *pfid)
->                                 (char *)&tcon->crfid.file_all_info))
->                 tcon->crfid.file_all_info_is_valid =3D 1;
->
-> - oshr_exit:
-> +oshr_exit:
->         mutex_unlock(&tcon->crfid.fid_mutex);
-> +oshr_free:
->         SMB2_open_free(&rqst[0]);
->         SMB2_query_info_free(&rqst[1]);
->         free_rsp_buf(resp_buftype[0], rsp_iov[0].iov_base);
-> --
-> 2.16.4
->
