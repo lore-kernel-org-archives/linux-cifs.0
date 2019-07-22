@@ -2,29 +2,29 @@ Return-Path: <SRS0=uMGe=VT=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3E02C76194
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 Jul 2019 11:08:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1076DC76197
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 Jul 2019 11:08:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 77C6F22296
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 Jul 2019 11:08:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF4FC20821
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 Jul 2019 11:08:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563793682;
-	bh=p9yU8gfCbOY0r2jMrMJdTyeMxExllYfB6b8VX11+12k=;
+	s=default; t=1563793689;
+	bh=edXYnkeSeLyw7z/3m5e6W4hSCPSrcMqY8VW8GLtxSVg=;
 	h=From:Cc:Subject:Date:In-Reply-To:References:To:List-ID:From;
-	b=FcEi82MbQ1qcBJrwHU1AU2fG5SM5oVPdtcTEdSaxEylXuI7A5Xq99aX9RYdAbHP3T
-	 BaXDmBVupM0UhONCCqYjIOFb+AP3zI3LD3M+PNLlQZSuFdnyHCf3q8FlMbH1owgeIo
-	 u5He6iDnha0grUWPwSUFTN9ikpWzpJiuYh0jhD0U=
+	b=YEWaoeRGEgJCokYUlbnQmPOOz0OsbkoJzgj2ZOVCRJubL0/OizthRcKjrDlOqa8Yv
+	 gnUQUhjz62Up3YL1jdifHOPANhIqRxk9Jrw9hwOHpF1HpSmUJhQ3yzP5Qvb9pjtTDj
+	 zkr79bHZ61gkW3QbIkm0IDUp2g/eVY3thy07FcEU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729834AbfGVLIA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 22 Jul 2019 07:08:00 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:35540 "EHLO
+        id S1729869AbfGVLIJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 22 Jul 2019 07:08:09 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:35554 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729828AbfGVLH7 (ORCPT
+        with ESMTP id S1729832AbfGVLH7 (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 Jul 2019 07:07:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
@@ -32,26 +32,29 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
         Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=DaUjc3klK2gf9apIP4fNNTEfMQO6klQ0GaFtTg+qH1o=; b=iOJdx+srcustX31xM0xQ7sJGkZ
-        H6td2qXyUsMBVUU3tSvWYydkGi/aoq+8XRiaST14xjjckMQI5MZlNgQEbQ94hHLRWbQYBbo1tO0cn
-        A0LQm9btsP87If6uiWKdxV2gnUzC5wxhX89TSHk9BFzBZdawvkFxhJC3WM/AKrNqgimajRRFF8PCT
-        7MEVjrwUAdxO9eIN4KxdSat3O1oRojyAN5OVL6m2VAHJiCWbSfP2T9zPeTBjfeFU/VA7kno86XmeH
-        7V0l8LNl8/V+ViKhtY3kloIyWI5LWouwBXiwPMliw6OOaldIHs6/6yqGXPnfQwjvgERM0vwqYYOmn
-        a5SjAGQQ==;
+        bh=AS5oxtIdo2yG09411/sIu1r84zBQ65Tq3DN/Tw97Q3I=; b=KQtnhzelgtCOjykf4X/wmsmthe
+        vwKSBc8Slqm/Em4pBgQCuY5vrdmMSj2BrFDZ8UzAhToyj6TasMxX54nmDjyUVIF57ywWAY/poC/RE
+        ZisqG6sD4WK/VEZei77B6pg7MIwtOJffs02wrd8wfRDwMhSeEIGUmX6tM7OXtaM6gSpnWcseL8m8O
+        2Is8FMHcToyp7Nf5Z8thvk/ubuCSV6na7Zsa08VzVGWw762fzOcxhm+zc/BRHzEAjuJIRlCcuDARx
+        POGO4i8dW12OzwwxMSCbXHhZrNALAvl6T9Qtg/F8nTjl1cyX/H1tuhBGVxcL744pkDT276rTZZ6s4
+        lv9c4r/g==;
 Received: from 177.157.124.3.dynamic.adsl.gvt.net.br ([177.157.124.3] helo=bombadil.infradead.org)
         by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
-        id 1hpWAe-000250-Hm; Mon, 22 Jul 2019 11:07:57 +0000
+        id 1hpWAe-000252-HC; Mon, 22 Jul 2019 11:07:57 +0000
 Received: from mchehab by bombadil.infradead.org with local (Exim 4.92)
         (envelope-from <mchehab@bombadil.infradead.org>)
-        id 1hpWAa-00041L-AH; Mon, 22 Jul 2019 08:07:52 -0300
+        id 1hpWAa-00041Q-B7; Mon, 22 Jul 2019 08:07:52 -0300
 From:   Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
 Cc:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
         Steve French <sfrench@samba.org>,
-        Jonathan Corbet <corbet@lwn.net>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-doc@vger.kernel.org
-Subject: [PATCH 12/22] docs: fs: cifs: convert to ReST and add to admin-guide book
-Date:   Mon, 22 Jul 2019 08:07:39 -0300
-Message-Id: <c3517ca1e2e74bda6ce76888b4356fa882e40cea.1563792334.git.mchehab+samsung@kernel.org>
+        Mike Marshall <hubcap@omnibond.com>,
+        Martin Brandenburg <martin@omnibond.com>,
+        linux-doc@vger.kernel.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, devel@lists.orangefs.org
+Subject: [PATCH 13/22] docs: fs: convert docs without extension to ReST
+Date:   Mon, 22 Jul 2019 08:07:40 -0300
+Message-Id: <1254cdba5f4e8254a4ead829502d07d8d7cff3d2.1563792334.git.mchehab+samsung@kernel.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <cover.1563792333.git.mchehab+samsung@kernel.org>
 References: <cover.1563792333.git.mchehab+samsung@kernel.org>
@@ -63,1426 +66,919 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The filenames for cifs documentation is not using the same
-convention as almost all Kernel documents is using. So,
-rename them to a more appropriate name. Then, manually convert
-the documentation files for CIFS to ReST.
+There are 3 remaining files without an extension inside the fs docs
+dir.
 
-By doing a manual conversion, we can preserve the original
-author's style, while making it to look more like the other
-Kernel documents.
+Manually convert them to ReST.
 
-Most of the conversion here is trivial. The most complex one was
-the README file (which was renamed to usage.rst).
+In the case of the nfs/exporting.rst file, as the nfs docs
+aren't ported yet, I opted to convert and add a :orphan: there,
+with should be removed when it gets added into a nfs-specific
+part of the fs documentation.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
 ---
- .../AUTHORS => admin-guide/cifs/authors.rst}  |  64 +-
- .../CHANGES => admin-guide/cifs/changes.rst}  |   4 +
- Documentation/admin-guide/cifs/index.rst      |  21 +
- .../cifs/introduction.rst}                    |   8 +
- .../cifs/TODO => admin-guide/cifs/todo.rst}   |  87 +--
- .../README => admin-guide/cifs/usage.rst}     | 560 +++++++++++-------
- .../cifs/winucase_convert.pl                  |   0
- Documentation/admin-guide/index.rst           |   1 +
- MAINTAINERS                                   |   2 +-
- 9 files changed, 460 insertions(+), 287 deletions(-)
- rename Documentation/{filesystems/cifs/AUTHORS => admin-guide/cifs/authors.rst} (60%)
- rename Documentation/{filesystems/cifs/CHANGES => admin-guide/cifs/changes.rst} (91%)
- create mode 100644 Documentation/admin-guide/cifs/index.rst
- rename Documentation/{filesystems/cifs/cifs.txt => admin-guide/cifs/introduction.rst} (98%)
- rename Documentation/{filesystems/cifs/TODO => admin-guide/cifs/todo.rst} (58%)
- rename Documentation/{filesystems/cifs/README => admin-guide/cifs/usage.rst} (72%)
- rename Documentation/{filesystems => admin-guide}/cifs/winucase_convert.pl (100%)
+ ...irectory-locking => directory-locking.rst} |  40 ++-
+ Documentation/filesystems/index.rst           |   2 +
+ .../filesystems/{Locking => locking.rst}      | 257 ++++++++++++------
+ .../nfs/{Exporting => exporting.rst}          |  31 ++-
+ Documentation/filesystems/vfs.rst             |   2 +-
+ fs/cifs/export.c                              |   2 +-
+ fs/exportfs/expfs.c                           |   2 +-
+ fs/isofs/export.c                             |   2 +-
+ fs/orangefs/file.c                            |   2 +-
+ include/linux/dcache.h                        |   2 +-
+ include/linux/exportfs.h                      |   2 +-
+ 11 files changed, 225 insertions(+), 119 deletions(-)
+ rename Documentation/filesystems/{directory-locking => directory-locking.rst} (86%)
+ rename Documentation/filesystems/{Locking => locking.rst} (79%)
+ rename Documentation/filesystems/nfs/{Exporting => exporting.rst} (91%)
 
-diff --git a/Documentation/filesystems/cifs/AUTHORS b/Documentation/admin-guide/cifs/authors.rst
-similarity index 60%
-rename from Documentation/filesystems/cifs/AUTHORS
-rename to Documentation/admin-guide/cifs/authors.rst
-index 75865da2ce14..b02d6dd6c070 100644
---- a/Documentation/filesystems/cifs/AUTHORS
-+++ b/Documentation/admin-guide/cifs/authors.rst
-@@ -1,5 +1,10 @@
-+=======
-+Authors
-+=======
+diff --git a/Documentation/filesystems/directory-locking b/Documentation/filesystems/directory-locking.rst
+similarity index 86%
+rename from Documentation/filesystems/directory-locking
+rename to Documentation/filesystems/directory-locking.rst
+index 4e32cb961e5b..de12016ee419 100644
+--- a/Documentation/filesystems/directory-locking
++++ b/Documentation/filesystems/directory-locking.rst
+@@ -1,12 +1,17 @@
+-	Locking scheme used for directory operations is based on two
++=================
++Directory Locking
++=================
 +
- Original Author
--===============
-+---------------
 +
- Steve French (sfrench@samba.org)
++Locking scheme used for directory operations is based on two
+ kinds of locks - per-inode (->i_rwsem) and per-filesystem
+ (->s_vfs_rename_mutex).
  
- The author wishes to express his appreciation and thanks to:
-@@ -12,7 +17,7 @@ side of the original CIFS Unix extensions and reviewing and implementing
- portions of the newer CIFS POSIX extensions into the Samba 3 file server. Thank
- Dave Boutcher of IBM Rochester (author of the OS/400 smb/cifs filesystem client)
- for proving years ago that very good smb/cifs clients could be done on Unix-like
--operating systems.  Volker Lendecke, Andrew Tridgell, Urban Widmark, John 
-+operating systems.  Volker Lendecke, Andrew Tridgell, Urban Widmark, John
- Newbigin and others for their work on the Linux smbfs module.  Thanks to
- the other members of the Storage Network Industry Association CIFS Technical
- Workgroup for their work specifying this highly complex protocol and finally
-@@ -20,33 +25,34 @@ thanks to the Samba team for their technical advice and encouragement.
+-	When taking the i_rwsem on multiple non-directory objects, we
++When taking the i_rwsem on multiple non-directory objects, we
+ always acquire the locks in order by increasing address.  We'll call
+ that "inode pointer" order in the following.
  
- Patch Contributors
- ------------------
--Zwane Mwaikambo
--Andi Kleen
--Amrut Joshi
--Shobhit Dayal
--Sergey Vlasov
--Richard Hughes
--Yury Umanets
--Mark Hamzy (for some of the early cifs IPv6 work)
--Domen Puncer
--Jesper Juhl (in particular for lots of whitespace/formatting cleanup)
--Vince Negri and Dave Stahl (for finding an important caching bug)
--Adrian Bunk (kcalloc cleanups)
--Miklos Szeredi 
--Kazeon team for various fixes especially for 2.4 version.
--Asser Ferno (Change Notify support)
--Shaggy (Dave Kleikamp) for innumerable small fs suggestions and some good cleanup
--Gunter Kukkukk (testing and suggestions for support of old servers)
--Igor Mammedov (DFS support)
--Jeff Layton (many, many fixes, as well as great work on the cifs Kerberos code)
--Scott Lovenberg
--Pavel Shilovsky (for great work adding SMB2 support, and various SMB3 features)
--Aurelien Aptel (for DFS SMB3 work and some key bug fixes)
--Ronnie Sahlberg (for SMB3 xattr work, bug fixes, and lots of great work on compounding)
--Shirish Pargaonkar (for many ACL patches over the years)
--Sachin Prabhu (many bug fixes, including for reconnect, copy offload and security)
--Paulo Alcantara
--Long Li (some great work on RDMA, SMB Direct)
+-	For our purposes all operations fall in 5 classes:
++For our purposes all operations fall in 5 classes:
+ 
+ 1) read access.  Locking rules: caller locks directory we are accessing.
+ The lock is taken shared.
+@@ -27,25 +32,29 @@ NB: we might get away with locking the the source (and target in exchange
+ case) shared.
+ 
+ 5) link creation.  Locking rules:
 +
-+- Zwane Mwaikambo
-+- Andi Kleen
-+- Amrut Joshi
-+- Shobhit Dayal
-+- Sergey Vlasov
-+- Richard Hughes
-+- Yury Umanets
-+- Mark Hamzy (for some of the early cifs IPv6 work)
-+- Domen Puncer
-+- Jesper Juhl (in particular for lots of whitespace/formatting cleanup)
-+- Vince Negri and Dave Stahl (for finding an important caching bug)
-+- Adrian Bunk (kcalloc cleanups)
-+- Miklos Szeredi
-+- Kazeon team for various fixes especially for 2.4 version.
-+- Asser Ferno (Change Notify support)
-+- Shaggy (Dave Kleikamp) for innumerable small fs suggestions and some good cleanup
-+- Gunter Kukkukk (testing and suggestions for support of old servers)
-+- Igor Mammedov (DFS support)
-+- Jeff Layton (many, many fixes, as well as great work on the cifs Kerberos code)
-+- Scott Lovenberg
-+- Pavel Shilovsky (for great work adding SMB2 support, and various SMB3 features)
-+- Aurelien Aptel (for DFS SMB3 work and some key bug fixes)
-+- Ronnie Sahlberg (for SMB3 xattr work, bug fixes, and lots of great work on compounding)
-+- Shirish Pargaonkar (for many ACL patches over the years)
-+- Sachin Prabhu (many bug fixes, including for reconnect, copy offload and security)
-+- Paulo Alcantara
-+- Long Li (some great work on RDMA, SMB Direct)
- 
- 
- Test case and Bug Report contributors
-diff --git a/Documentation/filesystems/cifs/CHANGES b/Documentation/admin-guide/cifs/changes.rst
-similarity index 91%
-rename from Documentation/filesystems/cifs/CHANGES
-rename to Documentation/admin-guide/cifs/changes.rst
-index 1df7f4910eb2..71f2ecb62299 100644
---- a/Documentation/filesystems/cifs/CHANGES
-+++ b/Documentation/admin-guide/cifs/changes.rst
-@@ -1,3 +1,7 @@
-+=======
-+Changes
-+=======
+ 	* lock parent
+ 	* check that source is not a directory
+ 	* lock source
+ 	* call the method.
 +
- See https://wiki.samba.org/index.php/LinuxCIFSKernel for summary
- information (that may be easier to read than parsing the output of
- "git log fs/cifs") about fixes/improvements to CIFS/SMB2/SMB3 support (changes
-diff --git a/Documentation/admin-guide/cifs/index.rst b/Documentation/admin-guide/cifs/index.rst
-new file mode 100644
-index 000000000000..fad5268635f5
---- /dev/null
-+++ b/Documentation/admin-guide/cifs/index.rst
-@@ -0,0 +1,21 @@
-+.. SPDX-License-Identifier: GPL-2.0
+ All locks are exclusive.
+ 
+ 6) cross-directory rename.  The trickiest in the whole bunch.  Locking
+ rules:
 +
-+====
-+CIFS
-+====
+ 	* lock the filesystem
+ 	* lock parents in "ancestors first" order.
+ 	* find source and target.
+ 	* if old parent is equal to or is a descendent of target
+-		fail with -ENOTEMPTY
++	  fail with -ENOTEMPTY
+ 	* if new parent is equal to or is a descendent of source
+-		fail with -ELOOP
++	  fail with -ELOOP
+ 	* If it's an exchange, lock both the source and the target.
+ 	* If the target exists, lock it.  If the source is a non-directory,
+ 	  lock it.  If we need to lock both, do so in inode pointer order.
+ 	* call the method.
 +
-+.. toctree::
-+   :maxdepth: 2
+ All ->i_rwsem are taken exclusive.  Again, we might get away with locking
+ the the source (and target in exchange case) shared.
+ 
+@@ -54,10 +63,11 @@ read, modified or removed by method will be locked by caller.
+ 
+ 
+ If no directory is its own ancestor, the scheme above is deadlock-free.
 +
-+   introduction
-+   usage
-+   todo
-+   changes
-+   authors
-+
-+.. only::  subproject and html
-+
-+   Indices
-+   =======
-+
-+   * :ref:`genindex`
-diff --git a/Documentation/filesystems/cifs/cifs.txt b/Documentation/admin-guide/cifs/introduction.rst
-similarity index 98%
-rename from Documentation/filesystems/cifs/cifs.txt
-rename to Documentation/admin-guide/cifs/introduction.rst
-index 1be3d21c286e..0b98f672d36f 100644
---- a/Documentation/filesystems/cifs/cifs.txt
-+++ b/Documentation/admin-guide/cifs/introduction.rst
-@@ -1,3 +1,7 @@
-+============
-+Introduction
-+============
-+
-   This is the client VFS module for the SMB3 NAS protocol as well
-   as for older dialects such as the Common Internet File System (CIFS)
-   protocol which was the successor to the Server Message Block
-@@ -33,7 +37,9 @@
-   tools (including smbinfo and setcifsacl) that can be obtained from
+ Proof:
  
-       https://git.samba.org/?p=cifs-utils.git
-+
-   or
-+
-       git://git.samba.org/cifs-utils.git
+ 	First of all, at any moment we have a partial ordering of the
+-objects - A < B iff A is an ancestor of B.
++	objects - A < B iff A is an ancestor of B.
  
-   mount.cifs should be installed in the directory with the other mount helpers.
-@@ -41,5 +47,7 @@
-   For more information on the module see the project wiki page at
+ 	That ordering can change.  However, the following is true:
  
-       https://wiki.samba.org/index.php/LinuxCIFS
-+
-   and
-+
-       https://wiki.samba.org/index.php/LinuxCIFS_utils
-diff --git a/Documentation/filesystems/cifs/TODO b/Documentation/admin-guide/cifs/todo.rst
-similarity index 58%
-rename from Documentation/filesystems/cifs/TODO
-rename to Documentation/admin-guide/cifs/todo.rst
-index 9267f3fb131f..95f18e8c9b8a 100644
---- a/Documentation/filesystems/cifs/TODO
-+++ b/Documentation/admin-guide/cifs/todo.rst
-@@ -1,3 +1,7 @@
-+====
-+TODO
-+====
-+
- Version 2.14 December 21, 2018
+@@ -77,32 +87,32 @@ objects - A < B iff A is an ancestor of B.
+     non-directory object, except renames, which take locks on source and
+     target in inode pointer order in the case they are not directories.)
  
- A Partial List of Missing Features
-@@ -8,6 +12,7 @@ for visible, important contributions to this module.  Here
- is a partial list of the known problems and missing features:
+-	Now consider the minimal deadlock.  Each process is blocked on
++Now consider the minimal deadlock.  Each process is blocked on
+ attempt to acquire some lock and already holds at least one lock.  Let's
+ consider the set of contended locks.  First of all, filesystem lock is
+ not contended, since any process blocked on it is not holding any locks.
+ Thus all processes are blocked on ->i_rwsem.
  
- a) SMB3 (and SMB3.1.1) missing optional features:
-+
-    - multichannel (started), integration with RDMA
-    - directory leases (improved metadata caching), started (root dir only)
-    - T10 copy offload ie "ODX" (copy chunk, and "Duplicate Extents" ioctl
-@@ -16,45 +21,46 @@ a) SMB3 (and SMB3.1.1) missing optional features:
- b) improved sparse file support
+-	By (3), any process holding a non-directory lock can only be
++By (3), any process holding a non-directory lock can only be
+ waiting on another non-directory lock with a larger address.  Therefore
+ the process holding the "largest" such lock can always make progress, and
+ non-directory objects are not included in the set of contended locks.
  
- c) Directory entry caching relies on a 1 second timer, rather than
--using Directory Leases, currently only the root file handle is cached longer
-+   using Directory Leases, currently only the root file handle is cached longer
+-	Thus link creation can't be a part of deadlock - it can't be
++Thus link creation can't be a part of deadlock - it can't be
+ blocked on source and it means that it doesn't hold any locks.
  
- d) quota support (needs minor kernel change since quota calls
--to make it to network filesystems or deviceless filesystems)
-+   to make it to network filesystems or deviceless filesystems)
+-	Any contended object is either held by cross-directory rename or
++Any contended object is either held by cross-directory rename or
+ has a child that is also contended.  Indeed, suppose that it is held by
+ operation other than cross-directory rename.  Then the lock this operation
+ is blocked on belongs to child of that object due to (1).
  
- e) Additional use cases where we use "compoounding" (e.g. open/query/close
--and open/setinfo/close) to reduce the number of roundtrips, and also
--open to reduce redundant opens (using deferred close and reference counts more).
-+   and open/setinfo/close) to reduce the number of roundtrips, and also
-+   open to reduce redundant opens (using deferred close and reference counts
-+   more).
+-	It means that one of the operations is cross-directory rename.
++It means that one of the operations is cross-directory rename.
+ Otherwise the set of contended objects would be infinite - each of them
+ would have a contended child and we had assumed that no object is its
+ own descendent.  Moreover, there is exactly one cross-directory rename
+ (see above).
  
- f) Finish inotify support so kde and gnome file list windows
--will autorefresh (partially complete by Asser). Needs minor kernel
--vfs change to support removing D_NOTIFY on a file.   
-+   will autorefresh (partially complete by Asser). Needs minor kernel
-+   vfs change to support removing D_NOTIFY on a file.
- 
- g) Add GUI tool to configure /proc/fs/cifs settings and for display of
--the CIFS statistics (started)
-+   the CIFS statistics (started)
- 
- h) implement support for security and trusted categories of xattrs
--(requires minor protocol extension) to enable better support for SELINUX
-+   (requires minor protocol extension) to enable better support for SELINUX
- 
- i) Add support for tree connect contexts (see MS-SMB2) a new SMB3.1.1 protocol
-    feature (may be especially useful for virtualization).
- 
- j) Create UID mapping facility so server UIDs can be mapped on a per
--mount or a per server basis to client UIDs or nobody if no mapping
--exists. Also better integration with winbind for resolving SID owners
-+   mount or a per server basis to client UIDs or nobody if no mapping
-+   exists. Also better integration with winbind for resolving SID owners
- 
- k) Add tools to take advantage of more smb3 specific ioctls and features
--(passthrough ioctl/fsctl for sending various SMB3 fsctls to the server
--is in progress, and a passthrough query_info call is already implemented
--in cifs.ko to allow smb3 info levels queries to be sent from userspace)
-+   (passthrough ioctl/fsctl for sending various SMB3 fsctls to the server
-+   is in progress, and a passthrough query_info call is already implemented
-+   in cifs.ko to allow smb3 info levels queries to be sent from userspace)
- 
- l) encrypted file support
- 
- m) improved stats gathering tools (perhaps integration with nfsometer?)
--to extend and make easier to use what is currently in /proc/fs/cifs/Stats
-+   to extend and make easier to use what is currently in /proc/fs/cifs/Stats
- 
--n) allow setting more NTFS/SMB3 file attributes remotely (currently limited to compressed
--file attribute via chflags) and improve user space tools for managing and
--viewing them.
-+n) allow setting more NTFS/SMB3 file attributes remotely (currently limited to
-+   compressed file attribute via chflags) and improve user space tools for
-+   managing and viewing them.
- 
- o) mount helper GUI (to simplify the various configuration options on mount)
- 
-@@ -65,55 +71,56 @@ p) Add support for witness protocol (perhaps ioctl to cifs.ko from user space
-    different servers, and the server we are connected to has gone down.
- 
- q) Allow mount.cifs to be more verbose in reporting errors with dialect
--or unsupported feature errors.
-+   or unsupported feature errors.
- 
- r) updating cifs documentation, and user guide.
- 
- s) Addressing bugs found by running a broader set of xfstests in standard
--file system xfstest suite.
-+   file system xfstest suite.
- 
- t) split cifs and smb3 support into separate modules so legacy (and less
--secure) CIFS dialect can be disabled in environments that don't need it
--and simplify the code.
-+   secure) CIFS dialect can be disabled in environments that don't need it
-+   and simplify the code.
- 
- v) POSIX Extensions for SMB3.1.1 (started, create and mkdir support added
--so far).
-+   so far).
- 
- w) Add support for additional strong encryption types, and additional spnego
--authentication mechanisms (see MS-SMB2)
-+   authentication mechanisms (see MS-SMB2)
-+
-+Known Bugs
-+==========
- 
--KNOWN BUGS
--====================================
- See http://bugzilla.samba.org - search on product "CifsVFS" for
- current bug list.  Also check http://bugzilla.kernel.org (Product = File System, Component = CIFS)
- 
- 1) existing symbolic links (Windows reparse points) are recognized but
--can not be created remotely. They are implemented for Samba and those that
--support the CIFS Unix extensions, although earlier versions of Samba
--overly restrict the pathnames.
-+   can not be created remotely. They are implemented for Samba and those that
-+   support the CIFS Unix extensions, although earlier versions of Samba
-+   overly restrict the pathnames.
- 2) follow_link and readdir code does not follow dfs junctions
--but recognizes them
-+   but recognizes them
- 
- Misc testing to do
- ==================
- 1) check out max path names and max path name components against various server
--types. Try nested symlinks (8 deep). Return max path name in stat -f information
-+   types. Try nested symlinks (8 deep). Return max path name in stat -f information
- 
- 2) Improve xfstest's cifs/smb3 enablement and adapt xfstests where needed to test
--cifs/smb3 better
-+   cifs/smb3 better
- 
--3) Additional performance testing and optimization using iozone and similar - 
--there are some easy changes that can be done to parallelize sequential writes,
--and when signing is disabled to request larger read sizes (larger than 
--negotiated size) and send larger write sizes to modern servers.
-+3) Additional performance testing and optimization using iozone and similar -
-+   there are some easy changes that can be done to parallelize sequential writes,
-+   and when signing is disabled to request larger read sizes (larger than
-+   negotiated size) and send larger write sizes to modern servers.
- 
- 4) More exhaustively test against less common servers
- 
- 5) Continue to extend the smb3 "buildbot" which does automated xfstesting
--against Windows, Samba and Azure currently - to add additional tests and
--to allow the buildbot to execute the tests faster. The URL for the
--buildbot is: http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com
-+   against Windows, Samba and Azure currently - to add additional tests and
-+   to allow the buildbot to execute the tests faster. The URL for the
-+   buildbot is: http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com
- 
- 6) Address various coverity warnings (most are not bugs per-se, but
--the more warnings are addressed, the easier it is to spot real
--problems that static analyzers will point out in the future).
-+   the more warnings are addressed, the easier it is to spot real
-+   problems that static analyzers will point out in the future).
-diff --git a/Documentation/filesystems/cifs/README b/Documentation/admin-guide/cifs/usage.rst
-similarity index 72%
-rename from Documentation/filesystems/cifs/README
-rename to Documentation/admin-guide/cifs/usage.rst
-index 4a804619cff2..d3fb67b8a976 100644
---- a/Documentation/filesystems/cifs/README
-+++ b/Documentation/admin-guide/cifs/usage.rst
-@@ -1,53 +1,61 @@
-+=====
-+Usage
-+=====
-+
- This module supports the SMB3 family of advanced network protocols (as well
- as older dialects, originally called "CIFS" or SMB1).
- 
- The CIFS VFS module for Linux supports many advanced network filesystem
- features such as hierarchical DFS like namespace, hardlinks, locking and more.
--It was designed to comply with the SNIA CIFS Technical Reference (which 
--supersedes the 1992 X/Open SMB Standard) as well as to perform best practice 
--practical interoperability with Windows 2000, Windows XP, Samba and equivalent 
-+It was designed to comply with the SNIA CIFS Technical Reference (which
-+supersedes the 1992 X/Open SMB Standard) as well as to perform best practice
-+practical interoperability with Windows 2000, Windows XP, Samba and equivalent
- servers.  This code was developed in participation with the Protocol Freedom
- Information Foundation.  CIFS and now SMB3 has now become a defacto
- standard for interoperating between Macs and Windows and major NAS appliances.
- 
- Please see
--  MS-SMB2 (for detailed SMB2/SMB3/SMB3.1.1 protocol specification)
--  http://protocolfreedom.org/ and
--  http://samba.org/samba/PFIF/
-+MS-SMB2 (for detailed SMB2/SMB3/SMB3.1.1 protocol specification)
-+http://protocolfreedom.org/ and
-+http://samba.org/samba/PFIF/
- for more details.
+-	Consider the object blocking the cross-directory rename.  One
++Consider the object blocking the cross-directory rename.  One
+ of its descendents is locked by cross-directory rename (otherwise we
+ would again have an infinite set of contended objects).  But that
+ means that cross-directory rename is taking locks out of order.  Due
+@@ -112,7 +122,7 @@ try to acquire lock on descendent before the lock on ancestor.
+ Contradiction.  I.e.  deadlock is impossible.  Q.E.D.
  
  
- For questions or bug reports please contact:
-+
-     smfrench@gmail.com
+-	These operations are guaranteed to avoid loop creation.  Indeed,
++These operations are guaranteed to avoid loop creation.  Indeed,
+ the only operation that could introduce loops is cross-directory rename.
+ Since the only new (parent, child) pair added by rename() is (new parent,
+ source), such loop would have to contain these objects and the rest of it
+@@ -123,13 +133,13 @@ new parent had been equal to or a descendent of source since the moment when
+ we had acquired filesystem lock and rename() would fail with -ELOOP in that
+ case.
  
- See the project page at: https://wiki.samba.org/index.php/LinuxCIFS_utils
+-	While this locking scheme works for arbitrary DAGs, it relies on
++While this locking scheme works for arbitrary DAGs, it relies on
+ ability to check that directory is a descendent of another object.  Current
+ implementation assumes that directory graph is a tree.  This assumption is
+ also preserved by all operations (cross-directory rename on a tree that would
+ not introduce a cycle will leave it a tree and link() fails for directories).
  
--Build instructions:
-+Build instructions
- ==================
-+
- For Linux:
-+
- 1) Download the kernel (e.g. from http://www.kernel.org)
--and change directory into the top of the kernel directory tree
--(e.g. /usr/src/linux-2.5.73)
-+   and change directory into the top of the kernel directory tree
-+   (e.g. /usr/src/linux-2.5.73)
- 2) make menuconfig (or make xconfig)
- 3) select cifs from within the network filesystem choices
- 4) save and exit
- 5) make
+-	Notice that "directory" in the above == "anything that might have
++Notice that "directory" in the above == "anything that might have
+ children", so if we are going to introduce hybrid objects we will need
+ either to make sure that link(2) doesn't work for them or to make changes
+ in is_subdir() that would make it work even in presence of such beasts.
+diff --git a/Documentation/filesystems/index.rst b/Documentation/filesystems/index.rst
+index 2de2fe2ab078..08320c35d03b 100644
+--- a/Documentation/filesystems/index.rst
++++ b/Documentation/filesystems/index.rst
+@@ -20,6 +20,8 @@ algorithms work.
+    path-lookup
+    api-summary
+    splice
++   locking
++   directory-locking
  
- 
--Installation instructions:
-+Installation instructions
+ Filesystem support layers
  =========================
+diff --git a/Documentation/filesystems/Locking b/Documentation/filesystems/locking.rst
+similarity index 79%
+rename from Documentation/filesystems/Locking
+rename to Documentation/filesystems/locking.rst
+index 204dd3ea36bb..fc3a0704553c 100644
+--- a/Documentation/filesystems/Locking
++++ b/Documentation/filesystems/locking.rst
+@@ -1,14 +1,22 @@
+-	The text below describes the locking rules for VFS-related methods.
++=======
++Locking
++=======
 +
- If you have built the CIFS vfs as module (successfully) simply
--type "make modules_install" (or if you prefer, manually copy the file to
-+type ``make modules_install`` (or if you prefer, manually copy the file to
- the modules directory e.g. /lib/modules/2.4.10-4GB/kernel/fs/cifs/cifs.ko).
++The text below describes the locking rules for VFS-related methods.
+ It is (believed to be) up-to-date. *Please*, if you change anything in
+ prototypes or locking protocols - update this file. And update the relevant
+ instances in the tree, don't leave that to maintainers of filesystems/devices/
+ etc. At the very least, put the list of dubious cases in the end of this file.
+ Don't turn it into log - maintainers of out-of-the-tree code are supposed to
+ be able to use diff(1).
+-	Thing currently missing here: socket operations. Alexey?
  
- If you have built the CIFS vfs into the kernel itself, follow the instructions
- for your distribution on how to install a new kernel (usually you
--would simply type "make install").
-+would simply type ``make install``).
- 
- If you do not have the utility mount.cifs (in the Samba 4.x source tree and on
- the CIFS VFS web site) copy it to the same directory in which mount helpers
- reside (usually /sbin).  Although the helper software is not
--required, mount.cifs is recommended.  Most distros include a "cifs-utils"
-+required, mount.cifs is recommended.  Most distros include a ``cifs-utils``
- package that includes this utility so it is recommended to install this.
- 
- Note that running the Winbind pam/nss module (logon service) on all of your
-@@ -57,13 +65,16 @@ found at cifs-utils.git on git.samba.org
- 
- If cifs is built as a module, then the size and number of network buffers
- and maximum number of simultaneous requests to one server can be configured.
--Changing these from their defaults is not recommended. By executing modinfo
-+Changing these from their defaults is not recommended. By executing modinfo::
+---------------------------- dentry_operations --------------------------
+-prototypes:
++Thing currently missing here: socket operations. Alexey?
 +
- 	modinfo kernel/fs/cifs/cifs.ko
++dentry_operations
++=================
 +
- on kernel/fs/cifs/cifs.ko the list of configuration changes that can be made
- at module initialization time (by running insmod cifs.ko) can be seen.
- 
- Recommendations
- ===============
++prototypes::
 +
- To improve security the SMB2.1 dialect or later (usually will get SMB3) is now
- the new default. To use old dialects (e.g. to mount Windows XP) use "vers=1.0"
- on mount (or vers=2.0 for Windows Vista).  Note that the CIFS (vers=1.0) is
-@@ -72,156 +83,168 @@ many advanced security features such as downgrade attack detection
- and encrypted shares and stronger signing and authentication algorithms.
- There are additional mount options that may be helpful for SMB3 to get
- improved POSIX behavior (NB: can use vers=3.0 to force only SMB3, never 2.1):
--     "mfsymlinks" and "cifsacl" and "idsfromsid"
+ 	int (*d_revalidate)(struct dentry *, unsigned int);
+ 	int (*d_weak_revalidate)(struct dentry *, unsigned int);
+ 	int (*d_hash)(const struct dentry *, struct qstr *);
+@@ -24,23 +32,30 @@ prototypes:
+ 	struct dentry *(*d_real)(struct dentry *, const struct inode *);
+ 
+ locking rules:
+-		rename_lock	->d_lock	may block	rcu-walk
+-d_revalidate:	no		no		yes (ref-walk)	maybe
+-d_weak_revalidate:no		no		yes	 	no
+-d_hash		no		no		no		maybe
+-d_compare:	yes		no		no		maybe
+-d_delete:	no		yes		no		no
+-d_init:	no		no		yes		no
+-d_release:	no		no		yes		no
+-d_prune:        no              yes             no              no
+-d_iput:		no		no		yes		no
+-d_dname:	no		no		no		no
+-d_automount:	no		no		yes		no
+-d_manage:	no		no		yes (ref-walk)	maybe
+-d_real		no		no		yes 		no
+ 
+---------------------------- inode_operations --------------------------- 
+-prototypes:
++================== ===========	========	==============	========
++ops		   rename_lock	->d_lock	may block	rcu-walk
++================== ===========	========	==============	========
++d_revalidate:	   no		no		yes (ref-walk)	maybe
++d_weak_revalidate: no		no		yes	 	no
++d_hash		   no		no		no		maybe
++d_compare:	   yes		no		no		maybe
++d_delete:	   no		yes		no		no
++d_init:		   no		no		yes		no
++d_release:	   no		no		yes		no
++d_prune:           no		yes		no		no
++d_iput:		   no		no		yes		no
++d_dname:	   no		no		no		no
++d_automount:	   no		no		yes		no
++d_manage:	   no		no		yes (ref-walk)	maybe
++d_real		   no		no		yes 		no
++================== ===========	========	==============	========
 +
-+     ``mfsymlinks`` and ``cifsacl`` and ``idsfromsid``
- 
- Allowing User Mounts
- ====================
++inode_operations
++================
 +
- To permit users to mount and unmount over directories they own is possible
- with the cifs vfs.  A way to enable such mounting is to mark the mount.cifs
--utility as suid (e.g. "chmod +s /sbin/mount.cifs). To enable users to 
-+utility as suid (e.g. ``chmod +s /sbin/mount.cifs``). To enable users to
- umount shares they mount requires
++prototypes::
 +
- 1) mount.cifs version 1.4 or later
- 2) an entry for the share in /etc/fstab indicating that a user may
--unmount it e.g.
--//server/usersharename  /mnt/username cifs user 0 0
-+   unmount it e.g.::
+ 	int (*create) (struct inode *,struct dentry *,umode_t, bool);
+ 	struct dentry * (*lookup) (struct inode *,struct dentry *, unsigned int);
+ 	int (*link) (struct dentry *,struct inode *,struct dentry *);
+@@ -68,7 +83,10 @@ prototypes:
  
--Note that when the mount.cifs utility is run suid (allowing user mounts), 
--in order to reduce risks, the "nosuid" mount flag is passed in on mount to
-+     //server/usersharename  /mnt/username cifs user 0 0
+ locking rules:
+ 	all may block
+-		i_rwsem(inode)
 +
-+Note that when the mount.cifs utility is run suid (allowing user mounts),
-+in order to reduce risks, the ``nosuid`` mount flag is passed in on mount to
- disallow execution of an suid program mounted on the remote target.
- When mount is executed as root, nosuid is not passed in by default,
- and execution of suid programs on the remote target would be enabled
--by default. This can be changed, as with nfs and other filesystems, 
--by simply specifying "nosuid" among the mount options. For user mounts 
--though to be able to pass the suid flag to mount requires rebuilding 
-+by default. This can be changed, as with nfs and other filesystems,
-+by simply specifying ``nosuid`` among the mount options. For user mounts
-+though to be able to pass the suid flag to mount requires rebuilding
- mount.cifs with the following flag: CIFS_ALLOW_USR_SUID
++============	=============================================
++ops		i_rwsem(inode)
++============	=============================================
+ lookup:		shared
+ create:		exclusive
+ link:		exclusive (both)
+@@ -89,17 +107,21 @@ fiemap:		no
+ update_time:	no
+ atomic_open:	exclusive
+ tmpfile:	no
++============	=============================================
  
- There is a corresponding manual page for cifs mounting in the Samba 3.0 and
--later source tree in docs/manpages/mount.cifs.8 
-+later source tree in docs/manpages/mount.cifs.8
  
- Allowing User Unmounts
- ======================
+ 	Additionally, ->rmdir(), ->unlink() and ->rename() have ->i_rwsem
+ 	exclusive on victim.
+ 	cross-directory ->rename() has (per-superblock) ->s_vfs_rename_sem.
+ 
+-See Documentation/filesystems/directory-locking for more detailed discussion
++See Documentation/filesystems/directory-locking.rst for more detailed discussion
+ of the locking scheme for directory operations.
+ 
+------------------------ xattr_handler operations -----------------------
+-prototypes:
++xattr_handler operations
++========================
 +
- To permit users to ummount directories that they have user mounted (see above),
--the utility umount.cifs may be used.  It may be invoked directly, or if 
-+the utility umount.cifs may be used.  It may be invoked directly, or if
- umount.cifs is placed in /sbin, umount can invoke the cifs umount helper
- (at least for most versions of the umount utility) for umount of cifs
- mounts, unless umount is invoked with -i (which will avoid invoking a umount
- helper). As with mount.cifs, to enable user unmounts umount.cifs must be marked
--as suid (e.g. "chmod +s /sbin/umount.cifs") or equivalent (some distributions
-+as suid (e.g. ``chmod +s /sbin/umount.cifs``) or equivalent (some distributions
- allow adding entries to a file to the /etc/permissions file to achieve the
- equivalent suid effect).  For this utility to succeed the target path
- must be a cifs mount, and the uid of the current user must match the uid
- of the user who mounted the resource.
- 
--Also note that the customary way of allowing user mounts and unmounts is 
-+Also note that the customary way of allowing user mounts and unmounts is
- (instead of using mount.cifs and unmount.cifs as suid) to add a line
- to the file /etc/fstab for each //server/share you wish to mount, but
- this can become unwieldy when potential mount targets include many
- or  unpredictable UNC names.
- 
--Samba Considerations 
-+Samba Considerations
- ====================
++prototypes::
 +
- Most current servers support SMB2.1 and SMB3 which are more secure,
- but there are useful protocol extensions for the older less secure CIFS
- dialect, so to get the maximum benefit if mounting using the older dialect
- (CIFS/SMB1), we recommend using a server that supports the SNIA CIFS
- Unix Extensions standard (e.g. almost any  version of Samba ie version
- 2.2.5 or later) but the CIFS vfs works fine with a wide variety of CIFS servers.
--Note that uid, gid and file permissions will display default values if you do 
--not have a server that supports the Unix extensions for CIFS (such as Samba 
--2.2.5 or later).  To enable the Unix CIFS Extensions in the Samba server, add 
--the line: 
-+Note that uid, gid and file permissions will display default values if you do
-+not have a server that supports the Unix extensions for CIFS (such as Samba
-+2.2.5 or later).  To enable the Unix CIFS Extensions in the Samba server, add
-+the line::
+ 	bool (*list)(struct dentry *dentry);
+ 	int (*get)(const struct xattr_handler *handler, struct dentry *dentry,
+ 		   struct inode *inode, const char *name, void *buffer,
+@@ -110,13 +132,20 @@ prototypes:
  
- 	unix extensions = yes
--	
--to your smb.conf file on the server.  Note that the following smb.conf settings 
--are also useful (on the Samba server) when the majority of clients are Unix or 
--Linux: 
+ locking rules:
+ 	all may block
+-		i_rwsem(inode)
 +
-+to your smb.conf file on the server.  Note that the following smb.conf settings
-+are also useful (on the Samba server) when the majority of clients are Unix or
-+Linux::
- 
- 	case sensitive = yes
--	delete readonly = yes 
-+	delete readonly = yes
- 	ea support = yes
- 
- Note that server ea support is required for supporting xattrs from the Linux
--cifs client, and that EA support is present in later versions of Samba (e.g. 
-+cifs client, and that EA support is present in later versions of Samba (e.g.
- 3.0.6 and later (also EA support works in all versions of Windows, at least to
- shares on NTFS filesystems).  Extended Attribute (xattr) support is an optional
- feature of most Linux filesystems which may require enabling via
- make menuconfig. Client support for extended attributes (user xattr) can be
--disabled on a per-mount basis by specifying "nouser_xattr" on mount.
-+disabled on a per-mount basis by specifying ``nouser_xattr`` on mount.
- 
- The CIFS client can get and set POSIX ACLs (getfacl, setfacl) to Samba servers
--version 3.10 and later.  Setting POSIX ACLs requires enabling both XATTR and 
-+version 3.10 and later.  Setting POSIX ACLs requires enabling both XATTR and
- then POSIX support in the CIFS configuration options when building the cifs
- module.  POSIX ACL support can be disabled on a per mount basic by specifying
--"noacl" on mount.
-- 
--Some administrators may want to change Samba's smb.conf "map archive" and 
--"create mask" parameters from the default.  Unless the create mask is changed
-+``noacl`` on mount.
++=====		==============
++ops		i_rwsem(inode)
++=====		==============
+ list:		no
+ get:		no
+ set:		exclusive
++=====		==============
 +
-+Some administrators may want to change Samba's smb.conf ``map archive`` and
-+``create mask`` parameters from the default.  Unless the create mask is changed
- newly created files can end up with an unnecessarily restrictive default mode,
- which may not be what you want, although if the CIFS Unix extensions are
- enabled on the server and client, subsequent setattr calls (e.g. chmod) can
--fix the mode.  Note that creating special devices (mknod) remotely 
--may require specifying a mkdev function to Samba if you are not using 
-+fix the mode.  Note that creating special devices (mknod) remotely
-+may require specifying a mkdev function to Samba if you are not using
- Samba 3.0.6 or later.  For more information on these see the manual pages
--("man smb.conf") on the Samba server system.  Note that the cifs vfs,
--unlike the smbfs vfs, does not read the smb.conf on the client system 
--(the few optional settings are passed in on mount via -o parameters instead).  
-+(``man smb.conf``) on the Samba server system.  Note that the cifs vfs,
-+unlike the smbfs vfs, does not read the smb.conf on the client system
-+(the few optional settings are passed in on mount via -o parameters instead).
- Note that Samba 2.2.7 or later includes a fix that allows the CIFS VFS to delete
--open files (required for strict POSIX compliance).  Windows Servers already 
-+open files (required for strict POSIX compliance).  Windows Servers already
- supported this feature. Samba server does not allow symlinks that refer to files
- outside of the share, so in Samba versions prior to 3.0.6, most symlinks to
--files with absolute paths (ie beginning with slash) such as:
-+files with absolute paths (ie beginning with slash) such as::
++super_operations
++================
 +
- 	 ln -s /mnt/foo bar
--would be forbidden. Samba 3.0.6 server or later includes the ability to create 
--such symlinks safely by converting unsafe symlinks (ie symlinks to server 
++prototypes::
+ 
+---------------------------- super_operations ---------------------------
+-prototypes:
+ 	struct inode *(*alloc_inode)(struct super_block *sb);
+ 	void (*free_inode)(struct inode *);
+ 	void (*destroy_inode)(struct inode *);
+@@ -138,7 +167,10 @@ prototypes:
+ 
+ locking rules:
+ 	All may block [not true, see below]
+-			s_umount
 +
-+would be forbidden. Samba 3.0.6 server or later includes the ability to create
-+such symlinks safely by converting unsafe symlinks (ie symlinks to server
- files that are outside of the share) to a samba specific format on the server
- that is ignored by local server applications and non-cifs clients and that will
- not be traversed by the Samba server).  This is opaque to the Linux client
- application using the cifs vfs. Absolute symlinks will work to Samba 3.0.5 or
- later, but only for remote clients using the CIFS Unix extensions, and will
- be invisbile to Windows clients and typically will not affect local
--applications running on the same server as Samba.  
-+applications running on the same server as Samba.
++======================	============	========================
++ops			s_umount	note
++======================	============	========================
+ alloc_inode:
+ free_inode:				called from RCU callback
+ destroy_inode:
+@@ -157,6 +189,7 @@ show_options:		no		(namespace_sem)
+ quota_read:		no		(see below)
+ quota_write:		no		(see below)
+ bdev_try_to_free_page:	no		(see below)
++======================	============	========================
  
--Use instructions:
-+Use instructions
- ================
--Once the CIFS VFS support is built into the kernel or installed as a module 
+ ->statfs() has s_umount (shared) when called by ustat(2) (native or
+ compat), but that's an accident of bad API; s_umount is used to pin
+@@ -164,31 +197,44 @@ the superblock down when we only have dev_t given us by userland to
+ identify the superblock.  Everything else (statfs(), fstatfs(), etc.)
+ doesn't hold it when calling ->statfs() - superblock is pinned down
+ by resolving the pathname passed to syscall.
 +
-+Once the CIFS VFS support is built into the kernel or installed as a module
- (cifs.ko), you can use mount syntax like the following to access Samba or
--Mac or Windows servers:
-+Mac or Windows servers::
- 
-   mount -t cifs //9.53.216.11/e$ /mnt -o username=myname,password=mypassword
- 
- Before -o the option -v may be specified to make the mount.cifs
--mount helper display the mount steps more verbosely.  
-+mount helper display the mount steps more verbosely.
- After -o the following commonly used cifs vfs specific options
--are supported:
-+are supported::
- 
-   username=<username>
-   password=<password>
-   domain=<domain name>
--  
+ ->quota_read() and ->quota_write() functions are both guaranteed to
+ be the only ones operating on the quota file by the quota code (via
+ dqio_sem) (unless an admin really wants to screw up something and
+ writes to quota files with quotas on). For other details about locking
+ see also dquot_operations section.
 +
- Other cifs mount options are described below.  Use of TCP names (in addition to
- ip addresses) is available if the mount helper (mount.cifs) is installed. If
- you do not trust the server to which are mounted, or if you do not have
- cifs signing enabled (and the physical network is insecure), consider use
--of the standard mount options "noexec" and "nosuid" to reduce the risk of 
-+of the standard mount options ``noexec`` and ``nosuid`` to reduce the risk of
- running an altered binary on your local system (downloaded from a hostile server
- or altered by a hostile router).
+ ->bdev_try_to_free_page is called from the ->releasepage handler of
+ the block device inode.  See there for more details.
  
- Although mounting using format corresponding to the CIFS URL specification is
- not possible in mount.cifs yet, it is possible to use an alternate format
- for the server and sharename (which is somewhat similar to NFS style mount
--syntax) instead of the more widely used UNC format (i.e. \\server\share):
-+syntax) instead of the more widely used UNC format (i.e. \\server\share)::
+---------------------------- file_system_type ---------------------------
+-prototypes:
++file_system_type
++================
 +
-   mount -t cifs tcp_name_of_server:share_name /mnt -o user=myname,pass=mypasswd
++prototypes::
++
+ 	struct dentry *(*mount) (struct file_system_type *, int,
+ 		       const char *, void *);
+ 	void (*kill_sb) (struct super_block *);
++
+ locking rules:
+-		may block
++
++=======		=========
++ops		may block
++=======		=========
+ mount		yes
+ kill_sb		yes
++=======		=========
  
- When using the mount helper mount.cifs, passwords may be specified via alternate
--mechanisms, instead of specifying it after -o using the normal "pass=" syntax
-+mechanisms, instead of specifying it after -o using the normal ``pass=`` syntax
- on the command line:
- 1) By including it in a credential file. Specify credentials=filename as one
--of the mount options. Credential files contain two lines
--        username=someuser
--        password=your_password
-+of the mount options. Credential files contain two lines::
+ ->mount() returns ERR_PTR or the root dentry; its superblock should be locked
+ on return.
 +
-+	username=someuser
-+	password=your_password
-+
- 2) By specifying the password in the PASSWD environment variable (similarly
--the user name can be taken from the USER environment variable).
-+   the user name can be taken from the USER environment variable).
- 3) By specifying the password in a file by name via PASSWD_FILE
- 4) By specifying the password in a file by file descriptor via PASSWD_FD
+ ->kill_sb() takes a write-locked superblock, does all shutdown work on it,
+ unlocks and drops the reference.
  
-@@ -229,39 +252,47 @@ If no password is provided, mount.cifs will prompt for password entry
- 
- Restrictions
- ============
--Servers must support either "pure-TCP" (port 445 TCP/IP CIFS connections) or RFC 
--1001/1002 support for "Netbios-Over-TCP/IP." This is not likely to be a 
+---------------------------- address_space_operations --------------------------
+-prototypes:
++address_space_operations
++========================
++prototypes::
 +
-+Servers must support either "pure-TCP" (port 445 TCP/IP CIFS connections) or RFC
-+1001/1002 support for "Netbios-Over-TCP/IP." This is not likely to be a
- problem as most servers support this.
+ 	int (*writepage)(struct page *page, struct writeback_control *wbc);
+ 	int (*readpage)(struct file *, struct page *);
+ 	int (*writepages)(struct address_space *, struct writeback_control *);
+@@ -218,14 +264,16 @@ prototypes:
+ locking rules:
+ 	All except set_page_dirty and freepage may block
  
- Valid filenames differ between Windows and Linux.  Windows typically restricts
--filenames which contain certain reserved characters (e.g.the character : 
-+filenames which contain certain reserved characters (e.g.the character :
- which is used to delimit the beginning of a stream name by Windows), while
- Linux allows a slightly wider set of valid characters in filenames. Windows
- servers can remap such characters when an explicit mapping is specified in
--the Server's registry.  Samba starting with version 3.10 will allow such 
-+the Server's registry.  Samba starting with version 3.10 will allow such
- filenames (ie those which contain valid Linux characters, which normally
- would be forbidden for Windows/CIFS semantics) as long as the server is
- configured for Unix Extensions (and the client has not disabled
- /proc/fs/cifs/LinuxExtensionsEnabled). In addition the mount option
--"mapposix" can be used on CIFS (vers=1.0) to force the mapping of
-+``mapposix`` can be used on CIFS (vers=1.0) to force the mapping of
- illegal Windows/NTFS/SMB characters to a remap range (this mount parm
--is the default for SMB3). This remap ("mapposix") range is also
-+is the default for SMB3). This remap (``mapposix``) range is also
- compatible with Mac (and "Services for Mac" on some older Windows).
+-			PageLocked(page)	i_rwsem
++======================	======================== =========
++ops			PageLocked(page)	 i_rwsem
++======================	======================== =========
+ writepage:		yes, unlocks (see below)
+ readpage:		yes, unlocks
+ writepages:
+ set_page_dirty		no
+ readpages:
+-write_begin:		locks the page		exclusive
+-write_end:		yes, unlocks		exclusive
++write_begin:		locks the page		 exclusive
++write_end:		yes, unlocks		 exclusive
+ bmap:
+ invalidatepage:		yes
+ releasepage:		yes
+@@ -239,17 +287,18 @@ is_partially_uptodate:	yes
+ error_remove_page:	yes
+ swap_activate:		no
+ swap_deactivate:	no
++======================	======================== =========
  
- CIFS VFS Mount Options
- ======================
- A partial list of the supported mount options follows:
--  username	The user name to use when trying to establish
-+
-+  username
-+		The user name to use when trying to establish
- 		the CIFS session.
--  password	The user password.  If the mount helper is
-+  password
-+		The user password.  If the mount helper is
- 		installed, the user will be prompted for password
- 		if not supplied.
--  ip		The ip address of the target server
--  unc		The target server Universal Network Name (export) to 
--		mount.	
--  domain	Set the SMB/CIFS workgroup name prepended to the
-+  ip
-+		The ip address of the target server
-+  unc
-+		The target server Universal Network Name (export) to
-+		mount.
-+  domain
-+		Set the SMB/CIFS workgroup name prepended to the
- 		username during CIFS session establishment
--  forceuid	Set the default uid for inodes to the uid
-+  forceuid
-+		Set the default uid for inodes to the uid
- 		passed in on mount. For mounts to servers
- 		which do support the CIFS Unix extensions, such as a
- 		properly configured Samba server, the server provides
-@@ -276,32 +307,39 @@ A partial list of the supported mount options follows:
- 		extensions, the default uid (and gid) returned on lookup
- 		of existing files will be the uid (gid) of the person
- 		who executed the mount (root, except when mount.cifs
--		is configured setuid for user mounts) unless the "uid=" 
-+		is configured setuid for user mounts) unless the ``uid=``
- 		(gid) mount option is specified. Also note that permission
- 		checks (authorization checks) on accesses to a file occur
- 		at the server, but there are cases in which an administrator
- 		may want to restrict at the client as well.  For those
- 		servers which do not report a uid/gid owner
- 		(such as Windows), permissions can also be checked at the
--		client, and a crude form of client side permission checking 
--		can be enabled by specifying file_mode and dir_mode on 
-+		client, and a crude form of client side permission checking
-+		can be enabled by specifying file_mode and dir_mode on
- 		the client.  (default)
--  forcegid	(similar to above but for the groupid instead of uid) (default)
--  noforceuid	Fill in file owner information (uid) by requesting it from
-+  forcegid
-+		(similar to above but for the groupid instead of uid) (default)
-+  noforceuid
-+		Fill in file owner information (uid) by requesting it from
- 		the server if possible. With this option, the value given in
- 		the uid= option (on mount) will only be used if the server
- 		can not support returning uids on inodes.
--  noforcegid	(similar to above but for the group owner, gid, instead of uid)
--  uid		Set the default uid for inodes, and indicate to the
-+  noforcegid
-+		(similar to above but for the group owner, gid, instead of uid)
-+  uid
-+		Set the default uid for inodes, and indicate to the
- 		cifs kernel driver which local user mounted. If the server
- 		supports the unix extensions the default uid is
- 		not used to fill in the owner fields of inodes (files)
--		unless the "forceuid" parameter is specified.
--  gid		Set the default gid for inodes (similar to above).
--  file_mode     If CIFS Unix extensions are not supported by the server
-+		unless the ``forceuid`` parameter is specified.
-+  gid
-+		Set the default gid for inodes (similar to above).
-+  file_mode
-+		If CIFS Unix extensions are not supported by the server
- 		this overrides the default mode for file inodes.
--  fsc		Enable local disk caching using FS-Cache (off by default). This
--  		option could be useful to improve performance on a slow link,
-+  fsc
-+		Enable local disk caching using FS-Cache (off by default). This
-+		option could be useful to improve performance on a slow link,
- 		heavily loaded server and/or network where reading from the
- 		disk is faster than reading from the server (over the network).
- 		This could also impact scalability positively as the
-@@ -310,18 +348,22 @@ A partial list of the supported mount options follows:
- 		type workloads. So, you need to consider carefully your
- 		workload/scenario before using this option. Currently, local
- 		disk caching is functional for CIFS files opened as read-only.
--  dir_mode      If CIFS Unix extensions are not supported by the server 
-+  dir_mode
-+		If CIFS Unix extensions are not supported by the server
- 		this overrides the default mode for directory inodes.
--  port		attempt to contact the server on this tcp port, before
-+  port
-+		attempt to contact the server on this tcp port, before
- 		trying the usual ports (port 445, then 139).
--  iocharset     Codepage used to convert local path names to and from
-+  iocharset
-+		Codepage used to convert local path names to and from
- 		Unicode. Unicode is used by default for network path
- 		names if the server supports it.  If iocharset is
- 		not specified then the nls_default specified
- 		during the local client kernel build will be used.
- 		If server does not support Unicode, this parameter is
- 		unused.
--  rsize		default read size (usually 16K). The client currently
-+  rsize
-+		default read size (usually 16K). The client currently
- 		can not use rsize larger than CIFSMaxBufSize. CIFSMaxBufSize
- 		defaults to 16K and may be changed (from 8K to the maximum
- 		kmalloc size allowed by your kernel) at module install time
-@@ -333,10 +375,12 @@ A partial list of the supported mount options follows:
- 		newer servers (e.g. Samba 3.0.26 or later) do. rsize can be
- 		set from a minimum of 2048 to a maximum of 130048 (127K or
- 		CIFSMaxBufSize, whichever is smaller)
--  wsize		default write size (default 57344)
-+  wsize
-+		default write size (default 57344)
- 		maximum wsize currently allowed by CIFS is 57344 (fourteen
- 		4096 byte pages)
--  actimeo=n	attribute cache timeout in seconds (default 1 second).
-+  actimeo=n
-+		attribute cache timeout in seconds (default 1 second).
- 		After this timeout, the cifs client requests fresh attribute
- 		information from the server. This option allows to tune the
- 		attribute cache timeout to suit the workload needs. Shorter
-@@ -345,49 +389,67 @@ A partial list of the supported mount options follows:
- 		of calls to the server at the expense of less stricter cache
- 		coherency checks (i.e. incorrect attribute cache for a short
- 		period of time).
--  rw		mount the network share read-write (note that the
-+  rw
-+		mount the network share read-write (note that the
- 		server may still consider the share read-only)
--  ro		mount network share read-only
--  version	used to distinguish different versions of the
-+  ro
-+		mount network share read-only
-+  version
-+		used to distinguish different versions of the
- 		mount helper utility (not typically needed)
--  sep		if first mount option (after the -o), overrides
-+  sep
-+		if first mount option (after the -o), overrides
- 		the comma as the separator between the mount
--		parms. e.g.
-+		parms. e.g.::
-+
- 			-o user=myname,password=mypassword,domain=mydom
--		could be passed instead with period as the separator by
-+
-+		could be passed instead with period as the separator by::
-+
- 			-o sep=.user=myname.password=mypassword.domain=mydom
-+
- 		this might be useful when comma is contained within username
- 		or password or domain. This option is less important
- 		when the cifs mount helper cifs.mount (version 1.1 or later)
- 		is used.
--  nosuid        Do not allow remote executables with the suid bit 
-+  nosuid
-+		Do not allow remote executables with the suid bit
- 		program to be executed.  This is only meaningful for mounts
- 		to servers such as Samba which support the CIFS Unix Extensions.
- 		If you do not trust the servers in your network (your mount
- 		targets) it is recommended that you specify this option for
- 		greater security.
--  exec		Permit execution of binaries on the mount.
--  noexec	Do not permit execution of binaries on the mount.
--  dev		Recognize block devices on the remote mount.
--  nodev		Do not recognize devices on the remote mount.
--  suid          Allow remote files on this mountpoint with suid enabled to 
-+  exec
-+		Permit execution of binaries on the mount.
-+  noexec
-+		Do not permit execution of binaries on the mount.
-+  dev
-+		Recognize block devices on the remote mount.
-+  nodev
-+		Do not recognize devices on the remote mount.
-+  suid
-+		Allow remote files on this mountpoint with suid enabled to
- 		be executed (default for mounts when executed as root,
- 		nosuid is default for user mounts).
--  credentials   Although ignored by the cifs kernel component, it is used by 
-+  credentials
-+		Although ignored by the cifs kernel component, it is used by
- 		the mount helper, mount.cifs. When mount.cifs is installed it
--		opens and reads the credential file specified in order  
-+		opens and reads the credential file specified in order
- 		to obtain the userid and password arguments which are passed to
- 		the cifs vfs.
--  guest         Although ignored by the kernel component, the mount.cifs
-+  guest
-+		Although ignored by the kernel component, the mount.cifs
- 		mount helper will not prompt the user for a password
- 		if guest is specified on the mount options.  If no
- 		password is specified a null password will be used.
--  perm          Client does permission checks (vfs_permission check of uid
-+  perm
-+		Client does permission checks (vfs_permission check of uid
- 		and gid of the file against the mode and desired operation),
- 		Note that this is in addition to the normal ACL check on the
--		target machine done by the server software. 
-+		target machine done by the server software.
- 		Client permission checking is enabled by default.
--  noperm        Client does not do permission checks.  This can expose
-+  noperm
-+		Client does not do permission checks.  This can expose
- 		files on this mount to access by other users on the local
- 		client system. It is typically only needed when the server
- 		supports the CIFS Unix Extensions but the UIDs/GIDs on the
-@@ -399,7 +461,8 @@ A partial list of the supported mount options follows:
- 		Note that this does not affect the normal ACL check on the
- 		target machine done by the server software (of the server
- 		ACL against the user name provided at mount time).
--  serverino	Use server's inode numbers instead of generating automatically
-+  serverino
-+		Use server's inode numbers instead of generating automatically
- 		incrementing inode numbers on the client.  Although this will
- 		make it easier to spot hardlinked files (as they will have
- 		the same inode numbers) and inode numbers may be persistent,
-@@ -412,14 +475,16 @@ A partial list of the supported mount options follows:
- 		or the CIFS Unix Extensions equivalent and for those
- 		this mount option will have no effect.  Exporting cifs mounts
- 		under nfsd requires this mount option on the cifs mount.
--		This is now the default if server supports the 
-+		This is now the default if server supports the
- 		required network operation.
--  noserverino   Client generates inode numbers (rather than using the actual one
-+  noserverino
-+		Client generates inode numbers (rather than using the actual one
- 		from the server). These inode numbers will vary after
- 		unmount or reboot which can confuse some applications,
- 		but not all server filesystems support unique inode
- 		numbers.
--  setuids       If the CIFS Unix extensions are negotiated with the server
-+  setuids
-+		If the CIFS Unix extensions are negotiated with the server
- 		the client will attempt to set the effective uid and gid of
- 		the local process on newly created files, directories, and
- 		devices (create, mkdir, mknod).  If the CIFS Unix Extensions
-@@ -427,9 +492,10 @@ A partial list of the supported mount options follows:
- 		instead of using the default uid and gid specified on
- 		the mount, cache the new file's uid and gid locally which means
- 		that the uid for the file can change when the inode is
--	        reloaded (or the user remounts the share).
--  nosetuids     The client will not attempt to set the uid and gid on
--		on newly created files, directories, and devices (create, 
-+		reloaded (or the user remounts the share).
-+  nosetuids
-+		The client will not attempt to set the uid and gid on
-+		on newly created files, directories, and devices (create,
- 		mkdir, mknod) which will result in the server setting the
- 		uid and gid to the default (usually the server uid of the
- 		user who mounted the share).  Letting the server (rather than
-@@ -437,38 +503,49 @@ A partial list of the supported mount options follows:
- 		Unix Extensions are not negotiated then the uid and gid for
- 		new files will appear to be the uid (gid) of the mounter or the
- 		uid (gid) parameter specified on the mount.
--  netbiosname   When mounting to servers via port 139, specifies the RFC1001
--		source name to use to represent the client netbios machine 
-+  netbiosname
-+		When mounting to servers via port 139, specifies the RFC1001
-+		source name to use to represent the client netbios machine
- 		name when doing the RFC1001 netbios session initialize.
--  direct        Do not do inode data caching on files opened on this mount.
-+  direct
-+		Do not do inode data caching on files opened on this mount.
- 		This precludes mmapping files on this mount. In some cases
- 		with fast networks and little or no caching benefits on the
- 		client (e.g. when the application is doing large sequential
--		reads bigger than page size without rereading the same data) 
-+		reads bigger than page size without rereading the same data)
- 		this can provide better performance than the default
--		behavior which caches reads (readahead) and writes 
--		(writebehind) through the local Linux client pagecache 
-+		behavior which caches reads (readahead) and writes
-+		(writebehind) through the local Linux client pagecache
- 		if oplock (caching token) is granted and held. Note that
- 		direct allows write operations larger than page size
- 		to be sent to the server.
--  strictcache   Use for switching on strict cache mode. In this mode the
-+  strictcache
-+		Use for switching on strict cache mode. In this mode the
- 		client read from the cache all the time it has Oplock Level II,
- 		otherwise - read from the server. All written data are stored
- 		in the cache, but if the client doesn't have Exclusive Oplock,
- 		it writes the data to the server.
--  rwpidforward  Forward pid of a process who opened a file to any read or write
-+  rwpidforward
-+		Forward pid of a process who opened a file to any read or write
- 		operation on that file. This prevent applications like WINE
- 		from failing on read and write if we use mandatory brlock style.
--  acl   	Allow setfacl and getfacl to manage posix ACLs if server
-+  acl
-+		Allow setfacl and getfacl to manage posix ACLs if server
- 		supports them.  (default)
--  noacl 	Do not allow setfacl and getfacl calls on this mount
--  user_xattr    Allow getting and setting user xattrs (those attributes whose
--		name begins with "user." or "os2.") as OS/2 EAs (extended
-+  noacl
-+		Do not allow setfacl and getfacl calls on this mount
-+  user_xattr
-+		Allow getting and setting user xattrs (those attributes whose
-+		name begins with ``user.`` or ``os2.``) as OS/2 EAs (extended
- 		attributes) to the server.  This allows support of the
- 		setfattr and getfattr utilities. (default)
--  nouser_xattr  Do not allow getfattr/setfattr to get/set/list xattrs 
--  mapchars      Translate six of the seven reserved characters (not backslash)
-+  nouser_xattr
-+		Do not allow getfattr/setfattr to get/set/list xattrs
-+  mapchars
-+		Translate six of the seven reserved characters (not backslash)::
-+
- 			*?<>|:
-+
- 		to the remap range (above 0xF000), which also
- 		allows the CIFS client to recognize files created with
- 		such characters by Windows's POSIX emulation. This can
-@@ -477,39 +554,47 @@ A partial list of the supported mount options follows:
- 		whose names contain any of these seven characters).
- 		This has no effect if the server does not support
- 		Unicode on the wire.
-- nomapchars     Do not translate any of these seven characters (default).
-- nocase         Request case insensitive path name matching (case
-+  nomapchars
-+		Do not translate any of these seven characters (default).
-+  nocase
-+		Request case insensitive path name matching (case
- 		sensitive is the default if the server supports it).
--		(mount option "ignorecase" is identical to "nocase")
-- posixpaths     If CIFS Unix extensions are supported, attempt to
-+		(mount option ``ignorecase`` is identical to ``nocase``)
-+  posixpaths
-+		If CIFS Unix extensions are supported, attempt to
- 		negotiate posix path name support which allows certain
- 		characters forbidden in typical CIFS filenames, without
- 		requiring remapping. (default)
-- noposixpaths   If CIFS Unix extensions are supported, do not request
-+  noposixpaths
-+		If CIFS Unix extensions are supported, do not request
- 		posix path name support (this may cause servers to
- 		reject creatingfile with certain reserved characters).
-- nounix         Disable the CIFS Unix Extensions for this mount (tree
-+  nounix
-+		Disable the CIFS Unix Extensions for this mount (tree
- 		connection). This is rarely needed, but it may be useful
- 		in order to turn off multiple settings all at once (ie
- 		posix acls, posix locks, posix paths, symlink support
- 		and retrieving uids/gids/mode from the server) or to
- 		work around a bug in server which implement the Unix
- 		Extensions.
-- nobrl          Do not send byte range lock requests to the server.
-+  nobrl
-+		Do not send byte range lock requests to the server.
- 		This is necessary for certain applications that break
- 		with cifs style mandatory byte range locks (and most
- 		cifs servers do not yet support requesting advisory
- 		byte range locks).
-- forcemandatorylock Even if the server supports posix (advisory) byte range
-+  forcemandatorylock
-+		Even if the server supports posix (advisory) byte range
- 		locking, send only mandatory lock requests.  For some
- 		(presumably rare) applications, originally coded for
- 		DOS/Windows, which require Windows style mandatory byte range
- 		locking, they may be able to take advantage of this option,
- 		forcing the cifs client to only send mandatory locks
- 		even if the cifs server would support posix advisory locks.
--		"forcemand" is accepted as a shorter form of this mount
-+		``forcemand`` is accepted as a shorter form of this mount
- 		option.
-- nostrictsync   If this mount option is set, when an application does an
-+  nostrictsync
-+		If this mount option is set, when an application does an
- 		fsync call then the cifs client does not send an SMB Flush
- 		to the server (to force the server to write all dirty data
- 		for this file immediately to disk), although cifs still sends
-@@ -522,41 +607,50 @@ A partial list of the supported mount options follows:
- 		crash.  If this mount option is not set, by default cifs will
- 		send an SMB flush request (and wait for a response) on every
- 		fsync call.
-- nodfs          Disable DFS (global name space support) even if the
-+  nodfs
-+		Disable DFS (global name space support) even if the
- 		server claims to support it.  This can help work around
- 		a problem with parsing of DFS paths with Samba server
- 		versions 3.0.24 and 3.0.25.
-- remount        remount the share (often used to change from ro to rw mounts
--	        or vice versa)
-- cifsacl        Report mode bits (e.g. on stat) based on the Windows ACL for
--	        the file. (EXPERIMENTAL)
-- servern        Specify the server 's netbios name (RFC1001 name) to use
--		when attempting to setup a session to the server. 
-+  remount
-+		remount the share (often used to change from ro to rw mounts
-+		or vice versa)
-+  cifsacl
-+		Report mode bits (e.g. on stat) based on the Windows ACL for
-+		the file. (EXPERIMENTAL)
-+  servern
-+		Specify the server 's netbios name (RFC1001 name) to use
-+		when attempting to setup a session to the server.
- 		This is needed for mounting to some older servers (such
- 		as OS/2 or Windows 98 and Windows ME) since they do not
- 		support a default server name.  A server name can be up
- 		to 15 characters long and is usually uppercased.
-- sfu            When the CIFS Unix Extensions are not negotiated, attempt to
-+  sfu
-+		When the CIFS Unix Extensions are not negotiated, attempt to
- 		create device files and fifos in a format compatible with
- 		Services for Unix (SFU).  In addition retrieve bits 10-12
- 		of the mode via the SETFILEBITS extended attribute (as
- 		SFU does).  In the future the bottom 9 bits of the
- 		mode also will be emulated using queries of the security
- 		descriptor (ACL).
-- mfsymlinks     Enable support for Minshall+French symlinks
-+  mfsymlinks
-+		Enable support for Minshall+French symlinks
- 		(see http://wiki.samba.org/index.php/UNIX_Extensions#Minshall.2BFrench_symlinks)
- 		This option is ignored when specified together with the
- 		'sfu' option. Minshall+French symlinks are used even if
- 		the server supports the CIFS Unix Extensions.
-- sign           Must use packet signing (helps avoid unwanted data modification
-+  sign
-+		Must use packet signing (helps avoid unwanted data modification
- 		by intermediate systems in the route).  Note that signing
- 		does not work with lanman or plaintext authentication.
-- seal           Must seal (encrypt) all data on this mounted share before
-+  seal
-+		Must seal (encrypt) all data on this mounted share before
- 		sending on the network.  Requires support for Unix Extensions.
- 		Note that this differs from the sign mount option in that it
- 		causes encryption of data sent over this mounted share but other
- 		shares mounted to the same server are unaffected.
-- locallease     This option is rarely needed. Fcntl F_SETLEASE is
-+  locallease
-+		This option is rarely needed. Fcntl F_SETLEASE is
- 		used by some applications such as Samba and NFSv4 server to
- 		check to see whether a file is cacheable.  CIFS has no way
- 		to explicitly request a lease, but can check whether a file
-@@ -569,51 +663,73 @@ A partial list of the supported mount options follows:
- 		will allow the cifs client to check for leases (only) locally
- 		for files which are not oplocked instead of denying leases
- 		in that case. (EXPERIMENTAL)
-- sec            Security mode.  Allowed values are:
--			none	attempt to connection as a null user (no name)
--			krb5    Use Kerberos version 5 authentication
--			krb5i   Use Kerberos authentication and packet signing
--			ntlm    Use NTLM password hashing (default)
--			ntlmi   Use NTLM password hashing with signing (if
-+  sec
-+		Security mode.  Allowed values are:
-+
-+			none
-+				attempt to connection as a null user (no name)
-+			krb5
-+				Use Kerberos version 5 authentication
-+			krb5i
-+				Use Kerberos authentication and packet signing
-+			ntlm
-+				Use NTLM password hashing (default)
-+			ntlmi
-+				Use NTLM password hashing with signing (if
- 				/proc/fs/cifs/PacketSigningEnabled on or if
--				server requires signing also can be the default) 
--			ntlmv2  Use NTLMv2 password hashing      
--			ntlmv2i Use NTLMv2 password hashing with packet signing
--			lanman  (if configured in kernel config) use older
-+				server requires signing also can be the default)
-+			ntlmv2
-+				Use NTLMv2 password hashing
-+			ntlmv2i
-+				Use NTLMv2 password hashing with packet signing
-+			lanman
-+				(if configured in kernel config) use older
- 				lanman hash
--hard		Retry file operations if server is not responding
--soft		Limit retries to unresponsive servers (usually only
-+  hard
-+		Retry file operations if server is not responding
-+  soft
-+		Limit retries to unresponsive servers (usually only
- 		one retry) before returning an error.  (default)
+-	->write_begin(), ->write_end() and ->readpage() may be called from
++->write_begin(), ->write_end() and ->readpage() may be called from
+ the request handler (/dev/loop).
  
- The mount.cifs mount helper also accepts a few mount options before -o
- including:
+-	->readpage() unlocks the page, either synchronously or via I/O
++->readpage() unlocks the page, either synchronously or via I/O
+ completion.
  
-+=============== ===============================================================
- 	-S      take password from stdin (equivalent to setting the environment
--		variable "PASSWD_FD=0"
-+		variable ``PASSWD_FD=0``
- 	-V      print mount.cifs version
- 	-?      display simple usage information
-+=============== ===============================================================
+-	->readpages() populates the pagecache with the passed pages and starts
++->readpages() populates the pagecache with the passed pages and starts
+ I/O against them.  They come unlocked upon I/O completion.
  
- With most 2.6 kernel versions of modutils, the version of the cifs kernel
- module can be displayed via modinfo.
+-	->writepage() is used for two purposes: for "memory cleansing" and for
++->writepage() is used for two purposes: for "memory cleansing" and for
+ "sync".  These are quite different operations and the behaviour may differ
+ depending upon the mode.
  
- Misc /proc/fs/cifs Flags and Debug Info
- =======================================
+@@ -297,70 +346,81 @@ will leave the page itself marked clean but it will be tagged as dirty in the
+ radix tree.  This incoherency can lead to all sorts of hard-to-debug problems
+ in the filesystem like having dirty inodes at umount and losing written data.
+ 
+-	->writepages() is used for periodic writeback and for syscall-initiated
++->writepages() is used for periodic writeback and for syscall-initiated
+ sync operations.  The address_space should start I/O against at least
+-*nr_to_write pages.  *nr_to_write must be decremented for each page which is
+-written.  The address_space implementation may write more (or less) pages
+-than *nr_to_write asks for, but it should try to be reasonably close.  If
+-nr_to_write is NULL, all dirty pages must be written.
++``*nr_to_write`` pages.  ``*nr_to_write`` must be decremented for each page
++which is written.  The address_space implementation may write more (or less)
++pages than ``*nr_to_write`` asks for, but it should try to be reasonably close.
++If nr_to_write is NULL, all dirty pages must be written.
+ 
+ writepages should _only_ write pages which are present on
+ mapping->io_pages.
+ 
+-	->set_page_dirty() is called from various places in the kernel
++->set_page_dirty() is called from various places in the kernel
+ when the target page is marked as needing writeback.  It may be called
+ under spinlock (it cannot block) and is sometimes called with the page
+ not locked.
+ 
+-	->bmap() is currently used by legacy ioctl() (FIBMAP) provided by some
++->bmap() is currently used by legacy ioctl() (FIBMAP) provided by some
+ filesystems and by the swapper. The latter will eventually go away.  Please,
+ keep it that way and don't breed new callers.
+ 
+-	->invalidatepage() is called when the filesystem must attempt to drop
++->invalidatepage() is called when the filesystem must attempt to drop
+ some or all of the buffers from the page when it is being truncated. It
+ returns zero on success. If ->invalidatepage is zero, the kernel uses
+ block_invalidatepage() instead.
+ 
+-	->releasepage() is called when the kernel is about to try to drop the
++->releasepage() is called when the kernel is about to try to drop the
+ buffers from the page in preparation for freeing it.  It returns zero to
+ indicate that the buffers are (or may be) freeable.  If ->releasepage is zero,
+ the kernel assumes that the fs has no private interest in the buffers.
+ 
+-	->freepage() is called when the kernel is done dropping the page
++->freepage() is called when the kernel is done dropping the page
+ from the page cache.
+ 
+-	->launder_page() may be called prior to releasing a page if
++->launder_page() may be called prior to releasing a page if
+ it is still found to be dirty. It returns zero if the page was successfully
+ cleaned, or an error value if not. Note that in order to prevent the page
+ getting mapped back in and redirtied, it needs to be kept locked
+ across the entire operation.
+ 
+-	->swap_activate will be called with a non-zero argument on
++->swap_activate will be called with a non-zero argument on
+ files backing (non block device backed) swapfiles. A return value
+ of zero indicates success, in which case this file can be used for
+ backing swapspace. The swapspace operations will be proxied to the
+ address space operations.
+ 
+-	->swap_deactivate() will be called in the sys_swapoff()
++->swap_deactivate() will be called in the sys_swapoff()
+ path after ->swap_activate() returned success.
+ 
+------------------------ file_lock_operations ------------------------------
+-prototypes:
++file_lock_operations
++====================
 +
- Informational pseudo-files:
++prototypes::
 +
-+======================= =======================================================
- DebugData		Displays information about active CIFS sessions and
- 			shares, features enabled as well as the cifs.ko
- 			version.
- Stats			Lists summary resource usage information as well as per
- 			share statistics.
-+======================= =======================================================
+ 	void (*fl_copy_lock)(struct file_lock *, struct file_lock *);
+ 	void (*fl_release_private)(struct file_lock *);
  
- Configuration pseudo-files:
+ 
+ locking rules:
+-			inode->i_lock	may block
 +
-+======================= =======================================================
- SecurityFlags		Flags which control security negotiation and
- 			also packet signing. Authentication (may/must)
- 			flags (e.g. for NTLM and/or NTLMv2) may be combined with
- 			the signing flags.  Specifying two different password
--			hashing mechanisms (as "must use") on the other hand 
--			does not make much sense. Default flags are 
--				0x07007 
--			(NTLM, NTLMv2 and packet signing allowed).  The maximum 
-+			hashing mechanisms (as "must use") on the other hand
-+			does not make much sense. Default flags are::
++===================	=============	=========
++ops			inode->i_lock	may block
++===================	=============	=========
+ fl_copy_lock:		yes		no
+-fl_release_private:	maybe		maybe[1]
++fl_release_private:	maybe		maybe[1]_
++===================	=============	=========
+ 
+-[1]:	->fl_release_private for flock or POSIX locks is currently allowed
+-to block. Leases however can still be freed while the i_lock is held and
+-so fl_release_private called on a lease should not block.
++.. [1]:
++   ->fl_release_private for flock or POSIX locks is currently allowed
++   to block. Leases however can still be freed while the i_lock is held and
++   so fl_release_private called on a lease should not block.
 +
-+				0x07007
++lock_manager_operations
++=======================
 +
-+			(NTLM, NTLMv2 and packet signing allowed).  The maximum
- 			allowable flags if you want to allow mounts to servers
- 			using weaker password hashes is 0x37037 (lanman,
- 			plaintext, ntlm, ntlmv2, signing allowed).  Some
-@@ -626,21 +742,21 @@ SecurityFlags		Flags which control security negotiation and
- 			laintext passwords using the older lanman dialect
- 			form of the session setup SMB.  (e.g. for authentication
- 			using plain text passwords, set the SecurityFlags
--			to 0x30030):
-- 
--			may use packet signing 				0x00001
--			must use packet signing				0x01001
--			may use NTLM (most common password hash)	0x00002
--			must use NTLM					0x02002
--			may use NTLMv2					0x00004
--			must use NTLMv2					0x04004
--			may use Kerberos security			0x00008
--			must use Kerberos				0x08008
--			may use lanman (weak) password hash  		0x00010
--			must use lanman password hash			0x10010
--			may use plaintext passwords    			0x00020
--			must use plaintext passwords			0x20020
--			(reserved for future packet encryption)		0x00040
-+			to 0x30030)::
++prototypes::
+ 
+------------------------ lock_manager_operations ---------------------------
+-prototypes:
+ 	void (*lm_notify)(struct file_lock *);  /* unblock callback */
+ 	int (*lm_grant)(struct file_lock *, struct file_lock *, int);
+ 	void (*lm_break)(struct file_lock *); /* break_lease callback */
+@@ -368,24 +428,33 @@ prototypes:
+ 
+ locking rules:
+ 
+-			inode->i_lock	blocked_lock_lock	may block
++==========		=============	=================	=========
++ops			inode->i_lock	blocked_lock_lock	may block
++==========		=============	=================	=========
+ lm_notify:		yes		yes			no
+ lm_grant:		no		no			no
+ lm_break:		yes		no			no
+ lm_change		yes		no			no
++==========		=============	=================	=========
 +
-+			  may use packet signing			0x00001
-+			  must use packet signing			0x01001
-+			  may use NTLM (most common password hash)	0x00002
-+			  must use NTLM					0x02002
-+			  may use NTLMv2				0x00004
-+			  must use NTLMv2				0x04004
-+			  may use Kerberos security			0x00008
-+			  must use Kerberos				0x08008
-+			  may use lanman (weak) password hash		0x00010
-+			  must use lanman password hash			0x10010
-+			  may use plaintext passwords			0x00020
-+			  must use plaintext passwords			0x20020
-+			  (reserved for future packet encryption)	0x00040
- 
- cifsFYI			If set to non-zero value, additional debug information
- 			will be logged to the system error log.  This field
-@@ -650,14 +766,19 @@ cifsFYI			If set to non-zero value, additional debug information
- 			Some debugging statements are not compiled into the
- 			cifs kernel unless CONFIG_CIFS_DEBUG2 is enabled in the
- 			kernel configuration. cifsFYI may be set to one or
--			nore of the following flags (7 sets them all):
-+			nore of the following flags (7 sets them all)::
++buffer_head
++===========
 +
-+			  +-----------------------------------------------+------+
-+			  | log cifs informational messages		  | 0x01 |
-+			  +-----------------------------------------------+------+
-+			  | log return codes from cifs entry points	  | 0x02 |
-+			  +-----------------------------------------------+------+
-+			  | log slow responses				  | 0x04 |
-+			  | (ie which take longer than 1 second)	  |      |
-+			  |                                               |      |
-+			  | CONFIG_CIFS_STATS2 must be enabled in .config |      |
-+			  +-----------------------------------------------+------+
++prototypes::
  
--			log cifs informational messages			0x01
--			log return codes from cifs entry points		0x02
--			log slow responses (ie which take longer than 1 second)
--			  CONFIG_CIFS_STATS2 must be enabled in .config	0x04
--				
--				
- traceSMB		If set to one, debug information is logged to the
- 			system error log with the start of smb requests
- 			and responses (default 0)
-@@ -671,24 +792,25 @@ LinuxExtensionsEnabled	If set to one then the client will attempt to
- 			as support symbolic links. If you use servers
- 			such as Samba that support the CIFS Unix
- 			extensions but do not want to use symbolic link
--			support and want to map the uid and gid fields 
--			to values supplied at mount (rather than the 
-+			support and want to map the uid and gid fields
-+			to values supplied at mount (rather than the
- 			actual values, then set this to zero. (default 1)
-+======================= =======================================================
+---------------------------- buffer_head -----------------------------------
+-prototypes:
+ 	void (*b_end_io)(struct buffer_head *bh, int uptodate);
  
--These experimental features and tracing can be enabled by changing flags in 
--/proc/fs/cifs (after the cifs module has been installed or built into the 
--kernel, e.g.  insmod cifs).  To enable a feature set it to 1 e.g.  to enable 
--tracing to the kernel message log type: 
-+These experimental features and tracing can be enabled by changing flags in
-+/proc/fs/cifs (after the cifs module has been installed or built into the
-+kernel, e.g.  insmod cifs).  To enable a feature set it to 1 e.g.  to enable
-+tracing to the kernel message log type::
- 
- 	echo 7 > /proc/fs/cifs/cifsFYI
--	
+ locking rules:
+-	called from interrupts. In other words, extreme care is needed here.
 +
- cifsFYI functions as a bit mask. Setting it to 1 enables additional kernel
- logging of various informational messages.  2 enables logging of non-zero
- SMB return codes while 4 enables logging of requests that take longer
--than one second to complete (except for byte range lock requests). 
-+than one second to complete (except for byte range lock requests).
- Setting it to 4 requires CONFIG_CIFS_STATS2 to be set in kernel configuration
- (.config). Setting it to seven enables all three.  Finally, tracing
--the start of smb requests and responses can be enabled via:
-+the start of smb requests and responses can be enabled via::
++called from interrupts. In other words, extreme care is needed here.
+ bh is locked, but that's all warranties we have here. Currently only RAID1,
+ highmem, fs/buffer.c, and fs/ntfs/aops.c are providing these. Block devices
+ call this method upon the IO completion.
  
- 	echo 1 > /proc/fs/cifs/traceSMB
- 
-@@ -700,10 +822,10 @@ server) SMB3 (or cifs) requests grouped by request type (read, write, close etc.
- Also recorded is the total bytes read and bytes written to the server for
- that share.  Note that due to client caching effects this can be less than the
- number of bytes read and written by the application running on the client.
--Statistics can be reset to zero by "echo 0 > /proc/fs/cifs/Stats" which may be
-+Statistics can be reset to zero by ``echo 0 > /proc/fs/cifs/Stats`` which may be
- useful if comparing performance of two different scenarios.
--	
--Also note that "cat /proc/fs/cifs/DebugData" will display information about
+---------------------------- block_device_operations -----------------------
+-prototypes:
++block_device_operations
++=======================
++prototypes::
 +
-+Also note that ``cat /proc/fs/cifs/DebugData`` will display information about
- the active sessions and the shares that are mounted.
+ 	int (*open) (struct block_device *, fmode_t);
+ 	int (*release) (struct gendisk *, fmode_t);
+ 	int (*ioctl) (struct block_device *, fmode_t, unsigned, unsigned long);
+@@ -399,7 +468,10 @@ prototypes:
+ 	void (*swap_slot_free_notify) (struct block_device *, unsigned long);
  
- Enabling Kerberos (extended security) works but requires version 1.2 or later
-@@ -725,19 +847,23 @@ space to ease network configuration and improve reliability.
+ locking rules:
+-			bd_mutex
++
++======================= ===================
++ops			bd_mutex
++======================= ===================
+ open:			yes
+ release:		yes
+ ioctl:			no
+@@ -410,6 +482,7 @@ unlock_native_capacity:	no
+ revalidate_disk:	no
+ getgeo:			no
+ swap_slot_free_notify:	no	(see below)
++======================= ===================
  
- To use cifs Kerberos and DFS support, the Linux keyutils package should be
- installed and something like the following lines should be added to the
--/etc/request-key.conf file:
-+/etc/request-key.conf file::
+ media_changed, unlock_native_capacity and revalidate_disk are called only from
+ check_disk_change().
+@@ -418,8 +491,11 @@ swap_slot_free_notify is called with swap_lock and sometimes the page lock
+ held.
  
--create cifs.spnego * * /usr/local/sbin/cifs.upcall %k
--create dns_resolver * * /usr/local/sbin/cifs.upcall %k
-+  create cifs.spnego * * /usr/local/sbin/cifs.upcall %k
-+  create dns_resolver * * /usr/local/sbin/cifs.upcall %k
  
- CIFS kernel module parameters
+---------------------------- file_operations -------------------------------
+-prototypes:
++file_operations
++===============
++
++prototypes::
++
+ 	loff_t (*llseek) (struct file *, loff_t, int);
+ 	ssize_t (*read) (struct file *, char __user *, size_t, loff_t *);
+ 	ssize_t (*write) (struct file *, const char __user *, size_t, loff_t *);
+@@ -455,7 +531,6 @@ prototypes:
+ 			size_t, unsigned int);
+ 	int (*setlease)(struct file *, long, struct file_lock **, void **);
+ 	long (*fallocate)(struct file *, int, loff_t, loff_t);
+-};
+ 
+ locking rules:
+ 	All may block.
+@@ -490,8 +565,11 @@ in sys_read() and friends.
+ the lease within the individual filesystem to record the result of the
+ operation
+ 
+---------------------------- dquot_operations -------------------------------
+-prototypes:
++dquot_operations
++================
++
++prototypes::
++
+ 	int (*write_dquot) (struct dquot *);
+ 	int (*acquire_dquot) (struct dquot *);
+ 	int (*release_dquot) (struct dquot *);
+@@ -503,20 +581,26 @@ a proper locking wrt the filesystem and call the generic quota operations.
+ 
+ What filesystem should expect from the generic quota functions:
+ 
+-		FS recursion	Held locks when called
++==============	============	=========================
++ops		FS recursion	Held locks when called
++==============	============	=========================
+ write_dquot:	yes		dqonoff_sem or dqptr_sem
+ acquire_dquot:	yes		dqonoff_sem or dqptr_sem
+ release_dquot:	yes		dqonoff_sem or dqptr_sem
+ mark_dirty:	no		-
+ write_info:	yes		dqonoff_sem
++==============	============	=========================
+ 
+ FS recursion means calling ->quota_read() and ->quota_write() from superblock
+ operations.
+ 
+ More details about quota locking can be found in fs/dquot.c.
+ 
+---------------------------- vm_operations_struct -----------------------------
+-prototypes:
++vm_operations_struct
++====================
++
++prototypes::
++
+ 	void (*open)(struct vm_area_struct*);
+ 	void (*close)(struct vm_area_struct*);
+ 	vm_fault_t (*fault)(struct vm_area_struct*, struct vm_fault *);
+@@ -525,7 +609,10 @@ prototypes:
+ 	int (*access)(struct vm_area_struct *, unsigned long, void*, int, int);
+ 
+ locking rules:
+-		mmap_sem	PageLocked(page)
++
++=============	========	===========================
++ops		mmap_sem	PageLocked(page)
++=============	========	===========================
+ open:		yes
+ close:		yes
+ fault:		yes		can return with page locked
+@@ -533,8 +620,9 @@ map_pages:	yes
+ page_mkwrite:	yes		can return with page locked
+ pfn_mkwrite:	yes
+ access:		yes
++=============	========	===========================
+ 
+-	->fault() is called when a previously not present pte is about
++->fault() is called when a previously not present pte is about
+ to be faulted in. The filesystem must find and return the page associated
+ with the passed in "pgoff" in the vm_fault structure. If it is possible that
+ the page may be truncated and/or invalidated, then the filesystem must lock
+@@ -542,7 +630,7 @@ the page, then ensure it is not already truncated (the page lock will block
+ subsequent truncate), and then return with VM_FAULT_LOCKED, and the page
+ locked. The VM will unlock the page.
+ 
+-	->map_pages() is called when VM asks to map easy accessible pages.
++->map_pages() is called when VM asks to map easy accessible pages.
+ Filesystem should find and map pages associated with offsets from "start_pgoff"
+ till "end_pgoff". ->map_pages() is called with page table locked and must
+ not block.  If it's not possible to reach a page without blocking,
+@@ -551,25 +639,26 @@ page table entry. Pointer to entry associated with the page is passed in
+ "pte" field in vm_fault structure. Pointers to entries for other offsets
+ should be calculated relative to "pte".
+ 
+-	->page_mkwrite() is called when a previously read-only pte is
++->page_mkwrite() is called when a previously read-only pte is
+ about to become writeable. The filesystem again must ensure that there are
+ no truncate/invalidate races, and then return with the page locked. If
+ the page has been truncated, the filesystem should not look up a new page
+ like the ->fault() handler, but simply return with VM_FAULT_NOPAGE, which
+ will cause the VM to retry the fault.
+ 
+-	->pfn_mkwrite() is the same as page_mkwrite but when the pte is
++->pfn_mkwrite() is the same as page_mkwrite but when the pte is
+ VM_PFNMAP or VM_MIXEDMAP with a page-less entry. Expected return is
+ VM_FAULT_NOPAGE. Or one of the VM_FAULT_ERROR types. The default behavior
+ after this call is to make the pte read-write, unless pfn_mkwrite returns
+ an error.
+ 
+-	->access() is called when get_user_pages() fails in
++->access() is called when get_user_pages() fails in
+ access_process_vm(), typically used to debug a process through
+ /proc/pid/mem or ptrace.  This function is needed only for
+ VM_IO | VM_PFNMAP VMAs.
+ 
+-================================================================================
++--------------------------------------------------------------------------------
++
+ 			Dubious stuff
+ 
+ (if you break something or notice that it is broken and do not fix it yourself
+diff --git a/Documentation/filesystems/nfs/Exporting b/Documentation/filesystems/nfs/exporting.rst
+similarity index 91%
+rename from Documentation/filesystems/nfs/Exporting
+rename to Documentation/filesystems/nfs/exporting.rst
+index 63889149f532..33d588a01ace 100644
+--- a/Documentation/filesystems/nfs/Exporting
++++ b/Documentation/filesystems/nfs/exporting.rst
+@@ -1,3 +1,4 @@
++:orphan:
+ 
+ Making Filesystems Exportable
  =============================
- These module parameters can be specified or modified either during the time of
--module loading or during the runtime by using the interface
-+module loading or during the runtime by using the interface::
+@@ -42,9 +43,9 @@ filehandle fragment, there is no automatic creation of a path prefix
+ for the object.  This leads to two related but distinct features of
+ the dcache that are not needed for normal filesystem access.
+ 
+-1/ The dcache must sometimes contain objects that are not part of the
++1. The dcache must sometimes contain objects that are not part of the
+    proper prefix. i.e that are not connected to the root.
+-2/ The dcache must be prepared for a newly found (via ->lookup) directory
++2. The dcache must be prepared for a newly found (via ->lookup) directory
+    to already have a (non-connected) dentry, and must be able to move
+    that dentry into place (based on the parent and name in the
+    ->lookup).   This is particularly needed for directories as
+@@ -52,7 +53,7 @@ the dcache that are not needed for normal filesystem access.
+ 
+ To implement these features, the dcache has:
+ 
+-a/ A dentry flag DCACHE_DISCONNECTED which is set on
++a. A dentry flag DCACHE_DISCONNECTED which is set on
+    any dentry that might not be part of the proper prefix.
+    This is set when anonymous dentries are created, and cleared when a
+    dentry is noticed to be a child of a dentry which is in the proper
+@@ -71,48 +72,52 @@ a/ A dentry flag DCACHE_DISCONNECTED which is set on
+    dentries.  That guarantees that we won't need to hunt them down upon
+    umount.
+ 
+-b/ A primitive for creation of secondary roots - d_obtain_root(inode).
++b. A primitive for creation of secondary roots - d_obtain_root(inode).
+    Those do _not_ bear DCACHE_DISCONNECTED.  They are placed on the
+    per-superblock list (->s_roots), so they can be located at umount
+    time for eviction purposes.
+ 
+-c/ Helper routines to allocate anonymous dentries, and to help attach
++c. Helper routines to allocate anonymous dentries, and to help attach
+    loose directory dentries at lookup time. They are:
 +
- 	/proc/module/cifs/parameters/<param>
+     d_obtain_alias(inode) will return a dentry for the given inode.
+       If the inode already has a dentry, one of those is returned.
++
+       If it doesn't, a new anonymous (IS_ROOT and
+-        DCACHE_DISCONNECTED) dentry is allocated and attached.
++      DCACHE_DISCONNECTED) dentry is allocated and attached.
++
+       In the case of a directory, care is taken that only one dentry
+       can ever be attached.
++
+     d_splice_alias(inode, dentry) will introduce a new dentry into the tree;
+       either the passed-in dentry or a preexisting alias for the given inode
+       (such as an anonymous one created by d_obtain_alias), if appropriate.
+       It returns NULL when the passed-in dentry is used, following the calling
+       convention of ->lookup.
+- 
++
+ Filesystem Issues
+ -----------------
  
--i.e. echo "value" > /sys/module/cifs/parameters/<param>
-+i.e.::
+ For a filesystem to be exportable it must:
+- 
+-   1/ provide the filehandle fragment routines described below.
+-   2/ make sure that d_splice_alias is used rather than d_add
++
++   1. provide the filehandle fragment routines described below.
++   2. make sure that d_splice_alias is used rather than d_add
+       when ->lookup finds an inode for a given parent and name.
  
--1. enable_oplocks - Enable or disable oplocks. Oplocks are enabled by default.
--		    [Y/y/1]. To disable use any of [N/n/0].
-+    echo "value" > /sys/module/cifs/parameters/<param>
+-      If inode is NULL, d_splice_alias(inode, dentry) is equivalent to
++      If inode is NULL, d_splice_alias(inode, dentry) is equivalent to::
  
-+================= ==========================================================
-+1. enable_oplocks Enable or disable oplocks. Oplocks are enabled by default.
-+		  [Y/y/1]. To disable use any of [N/n/0].
-+================= ==========================================================
-diff --git a/Documentation/filesystems/cifs/winucase_convert.pl b/Documentation/admin-guide/cifs/winucase_convert.pl
-similarity index 100%
-rename from Documentation/filesystems/cifs/winucase_convert.pl
-rename to Documentation/admin-guide/cifs/winucase_convert.pl
-diff --git a/Documentation/admin-guide/index.rst b/Documentation/admin-guide/index.rst
-index 3f8f7d564552..4a9de9806eaf 100644
---- a/Documentation/admin-guide/index.rst
-+++ b/Documentation/admin-guide/index.rst
-@@ -80,6 +80,7 @@ configure specific aspects of kernel behavior to your liking.
-    blockdev/index
-    ext4
-    binderfs
-+   cifs/index
-    xfs
-    pm/index
-    thunderbolt
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 4cd39259fcdc..c8c09d4062a1 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -4099,7 +4099,7 @@ L:	samba-technical@lists.samba.org (moderated for non-subscribers)
- W:	http://linux-cifs.samba.org/
- T:	git git://git.samba.org/sfrench/cifs-2.6.git
- S:	Supported
--F:	Documentation/filesystems/cifs/
-+F:	Documentation/admin-guide/cifs/
- F:	fs/cifs/
+ 		d_add(dentry, inode), NULL
  
- COMPACTPCI HOTPLUG CORE
+       Similarly, d_splice_alias(ERR_PTR(err), dentry) = ERR_PTR(err)
+ 
+-      Typically the ->lookup routine will simply end with a:
++      Typically the ->lookup routine will simply end with a::
+ 
+ 		return d_splice_alias(inode, dentry);
+ 	}
+ 
+ 
+ 
+-  A file system implementation declares that instances of the filesystem
++A file system implementation declares that instances of the filesystem
+ are exportable by setting the s_export_op field in the struct
+ super_block.  This field must point to a "struct export_operations"
+ struct which has the following members:
+diff --git a/Documentation/filesystems/vfs.rst b/Documentation/filesystems/vfs.rst
+index 0f85ab21c2ca..7d4d09dd5e6d 100644
+--- a/Documentation/filesystems/vfs.rst
++++ b/Documentation/filesystems/vfs.rst
+@@ -20,7 +20,7 @@ kernel which allows different filesystem implementations to coexist.
+ 
+ VFS system calls open(2), stat(2), read(2), write(2), chmod(2) and so on
+ are called from a process context.  Filesystem locking is described in
+-the document Documentation/filesystems/Locking.
++the document Documentation/filesystems/locking.rst.
+ 
+ 
+ Directory Entry Cache (dcache)
+diff --git a/fs/cifs/export.c b/fs/cifs/export.c
+index ce8b7f677c58..eb0bb8ca8e63 100644
+--- a/fs/cifs/export.c
++++ b/fs/cifs/export.c
+@@ -24,7 +24,7 @@
+  */
+ 
+  /*
+-  * See Documentation/filesystems/nfs/Exporting
++  * See Documentation/filesystems/nfs/exporting.rst
+   * and examples in fs/exportfs
+   *
+   * Since cifs is a network file system, an "fsid" must be included for
+diff --git a/fs/exportfs/expfs.c b/fs/exportfs/expfs.c
+index f0e549783caf..09bc68708d28 100644
+--- a/fs/exportfs/expfs.c
++++ b/fs/exportfs/expfs.c
+@@ -7,7 +7,7 @@
+  * and for mapping back from file handles to dentries.
+  *
+  * For details on why we do all the strange and hairy things in here
+- * take a look at Documentation/filesystems/nfs/Exporting.
++ * take a look at Documentation/filesystems/nfs/exporting.rst.
+  */
+ #include <linux/exportfs.h>
+ #include <linux/fs.h>
+diff --git a/fs/isofs/export.c b/fs/isofs/export.c
+index 85a9093769a9..35768a63fb1d 100644
+--- a/fs/isofs/export.c
++++ b/fs/isofs/export.c
+@@ -10,7 +10,7 @@
+  *
+  * The following files are helpful:
+  *
+- *     Documentation/filesystems/nfs/Exporting
++ *     Documentation/filesystems/nfs/exporting.rst
+  *     fs/exportfs/expfs.c.
+  */
+ 
+diff --git a/fs/orangefs/file.c b/fs/orangefs/file.c
+index 960f9a3c012d..a5612abc0936 100644
+--- a/fs/orangefs/file.c
++++ b/fs/orangefs/file.c
+@@ -555,7 +555,7 @@ static int orangefs_fsync(struct file *file,
+  * Change the file pointer position for an instance of an open file.
+  *
+  * \note If .llseek is overriden, we must acquire lock as described in
+- *       Documentation/filesystems/Locking.
++ *       Documentation/filesystems/locking.rst.
+  *
+  * Future upgrade could support SEEK_DATA and SEEK_HOLE but would
+  * require much changes to the FS
+diff --git a/include/linux/dcache.h b/include/linux/dcache.h
+index 9451011ac014..10090f11ab95 100644
+--- a/include/linux/dcache.h
++++ b/include/linux/dcache.h
+@@ -151,7 +151,7 @@ struct dentry_operations {
+ 
+ /*
+  * Locking rules for dentry_operations callbacks are to be found in
+- * Documentation/filesystems/Locking. Keep it updated!
++ * Documentation/filesystems/locking.rst. Keep it updated!
+  *
+  * FUrther descriptions are found in Documentation/filesystems/vfs.rst.
+  * Keep it updated too!
+diff --git a/include/linux/exportfs.h b/include/linux/exportfs.h
+index 0d3037419bc7..cf6571fc9c01 100644
+--- a/include/linux/exportfs.h
++++ b/include/linux/exportfs.h
+@@ -139,7 +139,7 @@ struct fid {
+  * @get_parent:     find the parent of a given directory
+  * @commit_metadata: commit metadata changes to stable storage
+  *
+- * See Documentation/filesystems/nfs/Exporting for details on how to use
++ * See Documentation/filesystems/nfs/exporting.rst for details on how to use
+  * this interface correctly.
+  *
+  * encode_fh:
 -- 
 2.21.0
 
