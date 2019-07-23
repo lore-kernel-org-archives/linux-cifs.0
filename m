@@ -2,68 +2,131 @@ Return-Path: <SRS0=4+wV=VU=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5B26C7618B
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Jul 2019 15:14:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 602BEC76186
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Jul 2019 23:20:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 892A3218F0
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Jul 2019 15:14:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2CFDF216F4
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Jul 2019 23:20:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HR+P+4Nk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388274AbfGWPOU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 23 Jul 2019 11:14:20 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:56722 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729004AbfGWPOU (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 Jul 2019 11:14:20 -0400
-Received: from 1.general.cking.uk.vpn ([10.172.193.212] helo=localhost)
-        by youngberry.canonical.com with esmtpsa (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-        (Exim 4.76)
-        (envelope-from <colin.king@canonical.com>)
-        id 1hpwPn-0007iA-Lq; Tue, 23 Jul 2019 15:09:19 +0000
-From:   Colin King <colin.king@canonical.com>
-To:     Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] fs: cifs: cifsssmb: remove redundant assignment to variable ret
-Date:   Tue, 23 Jul 2019 16:09:19 +0100
-Message-Id: <20190723150919.15929-1-colin.king@canonical.com>
-X-Mailer: git-send-email 2.20.1
+        id S1726574AbfGWXUm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 23 Jul 2019 19:20:42 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:35090 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726438AbfGWXUm (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 Jul 2019 19:20:42 -0400
+Received: by mail-io1-f68.google.com with SMTP id m24so85588406ioo.2;
+        Tue, 23 Jul 2019 16:20:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=m3Q8+/v4CM0L4GwsZxs2WcaoeWxYZYbtWw39haCd4u4=;
+        b=HR+P+4NkI6L7xuD6IE3T1KWAmh6kZwbsXgyOklLsxPmo6ukom2a/0fQXytbFNr/D8Y
+         lqDWzURxoTxIBYaITAU3s2JrgP8s2H0TxjUGCtnXhTaz5B0F1mPDpCyPdYj7wGRJe3H6
+         27g/1DKaisc3vBoa03E10uywQjzC165RHakPdpik58AMl3WL50Q04qmaiUUJHRiotKWp
+         PkNKBSjAD70BKAX07FpKLGsv2x3YZ8K0A1FdeuYs4vb2B9s5lbJdX0+OrwHbDJ7iJthF
+         ZYsbjPbnVljeFJcKDRvOdN00/9abfdn1vFASucIyavUanKm7UfmC6hamnHITNYT2Pgbo
+         69YQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=m3Q8+/v4CM0L4GwsZxs2WcaoeWxYZYbtWw39haCd4u4=;
+        b=jAwI7VnPN/Z4q5e/CFTfGZTIEHOJebcPVlBbvZv8YfC3FeiX/IU2VZfd7kVxXjH2ab
+         OM9xoCnlnz9/5FdtkMr82wZvVTU20/Y7nEZvuIKfXuGkhO/j1vlX2xpYoC/ha4dYlTig
+         +n1D1DX1RFhJplpYHBHhCMmSlGPwR53+Cf9jYfeJZahxTr15OATltpCJViGFXk+9/GZ9
+         kLx4mUWBsrmPaarA+ytj80VNHxv9Ztv089NPPSrBhRy1qS1eHBpKjjqXV2iBhIDgxbSk
+         WTbOku/d5820CpNZxfGUkrlCABcBONjSSH+YRCYnXwMRhRjS04Aqvx/w7mNGJJS7cz87
+         DZpQ==
+X-Gm-Message-State: APjAAAVb2HR9Ux7FR6FAiRrj8ExjQ27o9F8SlVD5Rmu49nNoTE/JSUdt
+        sQQJIrZDdDcTScNxlywvtaMjvQUEbsdRUtBoF0XPKg==
+X-Google-Smtp-Source: APXvYqx+aFEZ60goSLlOoXFdJx5XHU9KXkvx2zZrHm2ejE2YNuYySG/3ZoSv5C9NRtEed2Swx18zzZXwGdFFDjtnMAE=
+X-Received: by 2002:a5e:9506:: with SMTP id r6mr8685534ioj.219.1563924041597;
+ Tue, 23 Jul 2019 16:20:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+References: <20190715134655.4076-1-sashal@kernel.org> <20190715134655.4076-39-sashal@kernel.org>
+In-Reply-To: <20190715134655.4076-39-sashal@kernel.org>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Wed, 24 Jul 2019 09:20:29 +1000
+Message-ID: <CAN05THSdj8m5g-xG5abYAZ=_PE2xT-RwLtVhKrtxPevJGCSxag@mail.gmail.com>
+Subject: Re: [PATCH AUTOSEL 5.2 039/249] signal/cifs: Fix cifs_put_tcp_session
+ to call send_sig instead of force_sig
+To:     Sasha Levin <sashal@kernel.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Stable <stable@vger.kernel.org>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        Namjae Jeon <namjae.jeon@samsung.com>,
+        Jeff Layton <jlayton@primarydata.com>,
+        Steve French <smfrench@gmail.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
+On Tue, Jul 16, 2019 at 1:15 AM Sasha Levin <sashal@kernel.org> wrote:
+>
+> From: "Eric W. Biederman" <ebiederm@xmission.com>
+>
+> [ Upstream commit 72abe3bcf0911d69b46c1e8bdb5612675e0ac42c ]
+>
+> The locking in force_sig_info is not prepared to deal with a task that
+> exits or execs (as sighand may change).  The is not a locking problem
+> in force_sig as force_sig is only built to handle synchronous
+> exceptions.
+>
+> Further the function force_sig_info changes the signal state if the
+> signal is ignored, or blocked or if SIGNAL_UNKILLABLE will prevent the
+> delivery of the signal.  The signal SIGKILL can not be ignored and can
+> not be blocked and SIGNAL_UNKILLABLE won't prevent it from being
+> delivered.
+>
+> So using force_sig rather than send_sig for SIGKILL is confusing
+> and pointless.
+>
+> Because it won't impact the sending of the signal and and because
+> using force_sig is wrong, replace force_sig with send_sig.
 
-The variable ret is being initialized however this is never read
-and later it is being reassigned to a new value. The initialization
-is redundant and hence can be removed.
+I think this patch broke the cifs module.
+The issue is that the use count is now not updated properly and thus
+it is no longer possible to
+rmmod the module.
 
-Addresses-Coverity: ("Unused Value")
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- fs/cifs/cifssmb.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index e2f95965065d..4bc21e7fd6b4 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -1405,7 +1405,7 @@ int
- CIFS_open(const unsigned int xid, struct cifs_open_parms *oparms, int *oplock,
- 	  FILE_ALL_INFO *buf)
- {
--	int rc = -EACCES;
-+	int rc;
- 	OPEN_REQ *req = NULL;
- 	OPEN_RSP *rsp = NULL;
- 	int bytes_returned;
--- 
-2.20.1
-
+>
+> Cc: Namjae Jeon <namjae.jeon@samsung.com>
+> Cc: Jeff Layton <jlayton@primarydata.com>
+> Cc: Steve French <smfrench@gmail.com>
+> Fixes: a5c3e1c725af ("Revert "cifs: No need to send SIGKILL to demux_thread during umount"")
+> Fixes: e7ddee9037e7 ("cifs: disable sharing session and tcon and add new TCP sharing code")
+> Signed-off-by: "Eric W. Biederman" <ebiederm@xmission.com>
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
+> ---
+>  fs/cifs/connect.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 8dd6637a3cbb..714a359c7c8d 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -2631,7 +2631,7 @@ cifs_put_tcp_session(struct TCP_Server_Info *server, int from_reconnect)
+>
+>         task = xchg(&server->tsk, NULL);
+>         if (task)
+> -               force_sig(SIGKILL, task);
+> +               send_sig(SIGKILL, task, 1);
+>  }
+>
+>  static struct TCP_Server_Info *
+> --
+> 2.20.1
+>
