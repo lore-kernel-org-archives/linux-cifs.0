@@ -8,53 +8,53 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0DCAC76191
-	for <linux-cifs@archiver.kernel.org>; Wed, 24 Jul 2019 04:27:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA20BC7618F
+	for <linux-cifs@archiver.kernel.org>; Wed, 24 Jul 2019 04:27:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 98BD720644
-	for <linux-cifs@archiver.kernel.org>; Wed, 24 Jul 2019 04:27:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 88BBF214AE
+	for <linux-cifs@archiver.kernel.org>; Wed, 24 Jul 2019 04:27:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N74tfFBy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="srCEjuKd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726410AbfGXE0u (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 24 Jul 2019 00:26:50 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:35428 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726351AbfGXEZa (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 24 Jul 2019 00:25:30 -0400
-Received: by mail-pg1-f194.google.com with SMTP id s1so14201142pgr.2;
-        Tue, 23 Jul 2019 21:25:30 -0700 (PDT)
+        id S1726357AbfGXE1J (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 24 Jul 2019 00:27:09 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:46543 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726256AbfGXEZ2 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 24 Jul 2019 00:25:28 -0400
+Received: by mail-pg1-f195.google.com with SMTP id k189so1468587pgk.13;
+        Tue, 23 Jul 2019 21:25:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=sE4MQj+XhMD6UPTZi8xJ0bNX4cYnp7r/5/gkEQk0tas=;
-        b=N74tfFByAZggYZcsUYTvgYBqmp8bGoZSPNbPePQDgI9xHOKtDI+JBR5Z/IiOFQ1dt4
-         oWVFdgGyfImD0LwBldj16IkrMRl7/f0OT/Q4l6ls05QNNVgjJIUWu+aeK2CLI7WrmOO1
-         TCwZxwbVGwL+85kP8X47MDnZlnY5CwsAaw+XO6UEjqntQs8fO4Oc87gAiS/1YP6rdwM3
-         9NVpw94/A/DYK3lq7v7X4QjwLe8vgVS0TAdSk8ZgDg7r0yVNM7SKDo6TuP97iAlISt79
-         gTDmZw4nL2v0p7bxSBy6D4Zi0oq/Mz2I8pSvkTef9m0MiEMvo0WtG93wFrP09qcMFi9e
-         QIZA==
+        bh=VoKYI+UUiS6YcrnvVkznU7iujzeTV7cPJsbn4q5uYok=;
+        b=srCEjuKdmgTtGGJA378IGBXmCqyTbsbIjMqfoeenayBrGBy5vehEwtDrFvuijZFoTd
+         rScSFUBXDFgZSITel7jOkrOPuVU8F5rry3vtfpMM2D7CeG0RrJuH7hgFj+PRndl7N1gW
+         deZirUtKYKLuIRRXAf1U+l262rmyF1+wQhnXfVmQ91LL1+9RzmuQ9g6DIyRbodwSmwkf
+         luAgCx4Jh2U/kIoDrgk0a2bpkEIwsDMjxtnPpArcF/E8dH/PwetBRncfIHEHnvxafXic
+         wOzPw8hX8ys1ZDuhUpTDpwmfZFOimd4ZZ9s54WJn7/lu6Or6c+DjhaXkLZqlThRstapF
+         vwMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=sE4MQj+XhMD6UPTZi8xJ0bNX4cYnp7r/5/gkEQk0tas=;
-        b=iqYADaZtIG7BUtRGDNhhm0cJujxU1dDY8swrKM2zvEA+pV9PZUyC5R9+W9Zc7/SvzK
-         KsJTuu1xjy4PKSIbhtNPPLRu7O5fzLyQsHcaAeUM1hudtJwVplcis7Ror9LYadTQuBog
-         3BWfZgNLA+XhFgSyo+d35y6qoHKbfU/7QUPY0FEDu+rZ6svYQwExjfHa1Va64Bu0Eutx
-         /3FQqE0bSo90WH7Z5mljWp6sLeBrZO8cQNMsWpSPKF3rDyZfFCVkkbZEv3aisrSNNkZL
-         bjI9+aWI7EKqvXzKhGjv/OH6iltPHQHdPD9CfaFbV2+RfrLdPbIAWFyZ+HSCeXuRQFaR
-         RkPw==
-X-Gm-Message-State: APjAAAU10qn9GNfZkl9QGRVAa/uRfjmas9wonDo9j7v0BdG9Jkxu+PgT
-        XeVYF6LWoH+8tZTC3nv6BHU=
-X-Google-Smtp-Source: APXvYqxW3prZwkWHWgnoMEubD7xNwrSIeIAF1uZdix4e6/fDDx4fF84KKWNkiOUj/KQ81cpzXumLMA==
-X-Received: by 2002:a62:4d85:: with SMTP id a127mr9256862pfb.148.1563942329748;
-        Tue, 23 Jul 2019 21:25:29 -0700 (PDT)
+        bh=VoKYI+UUiS6YcrnvVkznU7iujzeTV7cPJsbn4q5uYok=;
+        b=XD+Nfve8tUVvuxREl6qoxvr5Cwjy9J+brs1Bv+dfA7ieaXZzV8FhppIJJx8kgE4bpz
+         /Vnpc9/LQqZ8RB87nEUOpGFZpl8zxuJ3iVY5k9rmBy4UHeDY5bKtdtWn9tyRDHzVJjyF
+         iTANlWi1MfcwPNx12ASHFavDwoYwjdLrhVDdYn52i8T1ghqHMMfdd3Wh5zwnhLs1WoJV
+         fOqOvs+Tvz1RWgYZcYziuFJ1fuw74ebsDpHoqPchKMoej1BGj25dDQq9/BEf04yMzASC
+         RMfOYJhJ3yPW7iZQ0WtaXDb8JSnjNeRDXsapbYrZ6gs3GRzZ6/rj38h1VU2Q8TYHNTP0
+         +gvw==
+X-Gm-Message-State: APjAAAUjXaFwgRlOzpTLqXqvVA19Z6IHikTCv7oY9z7DkGmaAx9cjguL
+        2iaDo05VcsLYyTv6dP7XQzXrTioH
+X-Google-Smtp-Source: APXvYqyK6xSNDGD+vqS3B3uhhp2vi85DZLeiUnQNXlrooXu4OGV2TbsZCsKTXuxuk/1vZZ0xEw9zNg==
+X-Received: by 2002:aa7:9834:: with SMTP id q20mr9351362pfl.196.1563942326983;
+        Tue, 23 Jul 2019 21:25:26 -0700 (PDT)
 Received: from blueforge.nvidia.com (searspoint.nvidia.com. [216.228.112.21])
-        by smtp.gmail.com with ESMTPSA id a15sm34153364pgw.3.2019.07.23.21.25.28
+        by smtp.gmail.com with ESMTPSA id a15sm34153364pgw.3.2019.07.23.21.25.25
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 23 Jul 2019 21:25:29 -0700 (PDT)
+        Tue, 23 Jul 2019 21:25:26 -0700 (PDT)
 From:   john.hubbard@gmail.com
 X-Google-Original-From: jhubbard@nvidia.com
 To:     Andrew Morton <akpm@linux-foundation.org>
@@ -79,15 +79,12 @@ Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
         v9fs-developer@lists.sourceforge.net,
         virtualization@lists.linux-foundation.org,
         =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        John Hubbard <jhubbard@nvidia.com>, Jan Kara <jack@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Ming Lei <ming.lei@redhat.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Boaz Harrosh <boaz@plexistor.com>
-Subject: [PATCH 06/12] fs/nfs: convert put_page() to put_user_page*()
-Date:   Tue, 23 Jul 2019 21:25:12 -0700
-Message-Id: <20190724042518.14363-7-jhubbard@nvidia.com>
+        John Hubbard <jhubbard@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Minwoo Im <minwoo.im.dev@gmail.com>
+Subject: [PATCH 04/12] block: bio_release_pages: convert put_page() to put_user_page*()
+Date:   Tue, 23 Jul 2019 21:25:10 -0700
+Message-Id: <20190724042518.14363-5-jhubbard@nvidia.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190724042518.14363-1-jhubbard@nvidia.com>
 References: <20190724042518.14363-1-jhubbard@nvidia.com>
@@ -109,57 +106,141 @@ release_pages().
 This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
 ("mm: introduce put_user_page*(), placeholder versions").
 
+Changes from Jérôme's original patch:
+    * reworked to be compatible with recent bio_release_pages() changes,
+    * refactored slightly to remove some code duplication,
+    * use an approach that changes fewer bio_check_pages_dirty()
+      callers.
+
 Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
 Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-Cc: linux-fsdevel@vger.kernel.org
-Cc: linux-block@vger.kernel.org
-Cc: linux-mm@kvack.org
-Cc: linux-nfs@vger.kernel.org
-Cc: Jan Kara <jack@suse.cz>
-Cc: Dan Williams <dan.j.williams@intel.com>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Christoph Hellwig <hch@lst.de>
+Cc: Christoph Hellwig <hch@infradead.org>
+Cc: Minwoo Im <minwoo.im.dev@gmail.com>
 Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Dave Chinner <david@fromorbit.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Matthew Wilcox <willy@infradead.org>
-Cc: Boaz Harrosh <boaz@plexistor.com>
-Cc: Trond Myklebust <trond.myklebust@hammerspace.com>
-Cc: Anna Schumaker <anna.schumaker@netapp.com>
 ---
- fs/nfs/direct.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ block/bio.c         | 60 ++++++++++++++++++++++++++++++++++++---------
+ include/linux/bio.h |  1 +
+ 2 files changed, 49 insertions(+), 12 deletions(-)
 
-diff --git a/fs/nfs/direct.c b/fs/nfs/direct.c
-index 0cb442406168..35f30fe2900f 100644
---- a/fs/nfs/direct.c
-+++ b/fs/nfs/direct.c
-@@ -512,7 +512,10 @@ static ssize_t nfs_direct_read_schedule_iovec(struct nfs_direct_req *dreq,
- 			pos += req_len;
- 			dreq->bytes_left -= req_len;
- 		}
--		nfs_direct_release_pages(pagevec, npages);
-+		if (iov_iter_get_pages_use_gup(iter))
-+			put_user_pages(pagevec, npages);
+diff --git a/block/bio.c b/block/bio.c
+index 7675e2de509d..74f9eba2583b 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -844,7 +844,11 @@ void bio_release_pages(struct bio *bio, enum bio_rp_flags_t flags)
+ 	bio_for_each_segment_all(bvec, bio, iter_all) {
+ 		if ((flags & BIO_RP_MARK_DIRTY) && !PageCompound(bvec->bv_page))
+ 			set_page_dirty_lock(bvec->bv_page);
+-		put_page(bvec->bv_page);
++
++		if (flags & BIO_RP_FROM_GUP)
++			put_user_page(bvec->bv_page);
 +		else
-+			nfs_direct_release_pages(pagevec, npages);
- 		kvfree(pagevec);
- 		if (result < 0)
- 			break;
-@@ -935,7 +938,10 @@ static ssize_t nfs_direct_write_schedule_iovec(struct nfs_direct_req *dreq,
- 			pos += req_len;
- 			dreq->bytes_left -= req_len;
- 		}
--		nfs_direct_release_pages(pagevec, npages);
-+		if (iov_iter_get_pages_use_gup(iter))
-+			put_user_pages(pagevec, npages);
-+		else
-+			nfs_direct_release_pages(pagevec, npages);
- 		kvfree(pagevec);
- 		if (result < 0)
- 			break;
++			put_page(bvec->bv_page);
+ 	}
+ }
+ 
+@@ -1667,28 +1671,50 @@ static void bio_dirty_fn(struct work_struct *work);
+ static DECLARE_WORK(bio_dirty_work, bio_dirty_fn);
+ static DEFINE_SPINLOCK(bio_dirty_lock);
+ static struct bio *bio_dirty_list;
++static struct bio *bio_gup_dirty_list;
+ 
+-/*
+- * This runs in process context
+- */
+-static void bio_dirty_fn(struct work_struct *work)
++static void __bio_dirty_fn(struct work_struct *work,
++			   struct bio **dirty_list,
++			   enum bio_rp_flags_t flags)
+ {
+ 	struct bio *bio, *next;
+ 
+ 	spin_lock_irq(&bio_dirty_lock);
+-	next = bio_dirty_list;
+-	bio_dirty_list = NULL;
++	next = *dirty_list;
++	*dirty_list = NULL;
+ 	spin_unlock_irq(&bio_dirty_lock);
+ 
+ 	while ((bio = next) != NULL) {
+ 		next = bio->bi_private;
+ 
+-		bio_release_pages(bio, BIO_RP_MARK_DIRTY);
++		bio_release_pages(bio, BIO_RP_MARK_DIRTY | flags);
+ 		bio_put(bio);
+ 	}
+ }
+ 
+-void bio_check_pages_dirty(struct bio *bio)
++/*
++ * This runs in process context
++ */
++static void bio_dirty_fn(struct work_struct *work)
++{
++	__bio_dirty_fn(work, &bio_dirty_list,     BIO_RP_NORMAL);
++	__bio_dirty_fn(work, &bio_gup_dirty_list, BIO_RP_FROM_GUP);
++}
++
++/**
++ * __bio_check_pages_dirty() - queue up pages on a workqueue to dirty them
++ * @bio: the bio struct containing the pages we should dirty
++ * @from_gup: did the pages in the bio came from GUP (get_user_pages*())
++ *
++ * This will go over all pages in the bio, and for each non dirty page, the
++ * bio is added to a list of bio's that need to get their pages dirtied.
++ *
++ * We also need to know if the pages in the bio are coming from GUP or not,
++ * as GUPed pages need to be released via put_user_page(), instead of
++ * put_page(). Please see Documentation/vm/get_user_pages.rst for details
++ * on that.
++ */
++void __bio_check_pages_dirty(struct bio *bio, bool from_gup)
+ {
+ 	struct bio_vec *bvec;
+ 	unsigned long flags;
+@@ -1699,17 +1725,27 @@ void bio_check_pages_dirty(struct bio *bio)
+ 			goto defer;
+ 	}
+ 
+-	bio_release_pages(bio, BIO_RP_NORMAL);
++	bio_release_pages(bio, from_gup ? BIO_RP_FROM_GUP : BIO_RP_NORMAL);
+ 	bio_put(bio);
+ 	return;
+ defer:
+ 	spin_lock_irqsave(&bio_dirty_lock, flags);
+-	bio->bi_private = bio_dirty_list;
+-	bio_dirty_list = bio;
++	if (from_gup) {
++		bio->bi_private = bio_gup_dirty_list;
++		bio_gup_dirty_list = bio;
++	} else {
++		bio->bi_private = bio_dirty_list;
++		bio_dirty_list = bio;
++	}
+ 	spin_unlock_irqrestore(&bio_dirty_lock, flags);
+ 	schedule_work(&bio_dirty_work);
+ }
+ 
++void bio_check_pages_dirty(struct bio *bio)
++{
++	__bio_check_pages_dirty(bio, false);
++}
++
+ void update_io_ticks(struct hd_struct *part, unsigned long now)
+ {
+ 	unsigned long stamp;
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 2715e55679c1..d68a40c2c9d4 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -444,6 +444,7 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter);
+ enum bio_rp_flags_t {
+ 	BIO_RP_NORMAL		= 0,
+ 	BIO_RP_MARK_DIRTY	= 1,
++	BIO_RP_FROM_GUP		= 2,
+ };
+ 
+ static inline enum bio_rp_flags_t bio_rp_dirty_flag(bool mark_dirty)
 -- 
 2.22.0
 
