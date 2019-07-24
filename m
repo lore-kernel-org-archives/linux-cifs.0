@@ -2,131 +2,113 @@ Return-Path: <SRS0=zjVJ=VV=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73677C7618B
-	for <linux-cifs@archiver.kernel.org>; Wed, 24 Jul 2019 04:35:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1AA8C7618B
+	for <linux-cifs@archiver.kernel.org>; Wed, 24 Jul 2019 04:46:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 481AC21841
-	for <linux-cifs@archiver.kernel.org>; Wed, 24 Jul 2019 04:35:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="Li1yuMA+"
+	by mail.kernel.org (Postfix) with ESMTP id BE1CC227BF
+	for <linux-cifs@archiver.kernel.org>; Wed, 24 Jul 2019 04:46:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726065AbfGXEe7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 24 Jul 2019 00:34:59 -0400
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:19691 "EHLO
-        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725813AbfGXEe6 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 24 Jul 2019 00:34:58 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5d37dfee0000>; Tue, 23 Jul 2019 21:34:55 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Tue, 23 Jul 2019 21:34:57 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Tue, 23 Jul 2019 21:34:57 -0700
-Received: from [10.110.48.28] (172.20.13.39) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 24 Jul
- 2019 04:34:56 +0000
-Subject: Re: [PATCH 07/12] vhost-scsi: convert put_page() to put_user_page*()
-To:     <john.hubbard@gmail.com>, Andrew Morton <akpm@linux-foundation.org>
-CC:     Alexander Viro <viro@zeniv.linux.org.uk>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Matthew Wilcox <willy@infradead.org>, <linux-mm@kvack.org>,
+        id S1726443AbfGXEqM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 24 Jul 2019 00:46:12 -0400
+Received: from out02.mta.xmission.com ([166.70.13.232]:50058 "EHLO
+        out02.mta.xmission.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726107AbfGXEqM (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 24 Jul 2019 00:46:12 -0400
+Received: from in02.mta.xmission.com ([166.70.13.52])
+        by out02.mta.xmission.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.87)
+        (envelope-from <ebiederm@xmission.com>)
+        id 1hq692-0004Q6-CE; Tue, 23 Jul 2019 19:32:40 -0600
+Received: from ip68-227-160-95.om.om.cox.net ([68.227.160.95] helo=x220.xmission.com)
+        by in02.mta.xmission.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.87)
+        (envelope-from <ebiederm@xmission.com>)
+        id 1hq691-0003ye-Le; Tue, 23 Jul 2019 19:32:40 -0600
+From:   ebiederm@xmission.com (Eric W. Biederman)
+To:     Steve French <smfrench@gmail.com>
+Cc:     ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Sasha Levin <sashal@kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
-        <ceph-devel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-cifs@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
-        <linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <samba-technical@lists.samba.org>,
-        <v9fs-developer@lists.sourceforge.net>,
-        <virtualization@lists.linux-foundation.org>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Ming Lei <ming.lei@redhat.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Boaz Harrosh <boaz@plexistor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>
-References: <20190724042518.14363-1-jhubbard@nvidia.com>
- <20190724042518.14363-8-jhubbard@nvidia.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <de40950e-0801-b830-4c48-56e84de0c82b@nvidia.com>
-Date:   Tue, 23 Jul 2019 21:34:56 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Stable <stable@vger.kernel.org>,
+        Namjae Jeon <namjae.jeon@samsung.com>,
+        Jeff Layton <jlayton@primarydata.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>
+References: <20190715134655.4076-1-sashal@kernel.org>
+        <20190715134655.4076-39-sashal@kernel.org>
+        <CAN05THSdj8m5g-xG5abYAZ=_PE2xT-RwLtVhKrtxPevJGCSxag@mail.gmail.com>
+        <CAH2r5mu9ncYa1WTHuuMEk3=4TU5-RBH6nBKME4Bm+dntOtORTQ@mail.gmail.com>
+Date:   Tue, 23 Jul 2019 20:32:33 -0500
+In-Reply-To: <CAH2r5mu9ncYa1WTHuuMEk3=4TU5-RBH6nBKME4Bm+dntOtORTQ@mail.gmail.com>
+        (Steve French's message of "Tue, 23 Jul 2019 19:29:10 -0500")
+Message-ID: <87v9vs43pq.fsf@xmission.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/25.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20190724042518.14363-8-jhubbard@nvidia.com>
-X-Originating-IP: [172.20.13.39]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1563942895; bh=5ycCVDmY+zemv5AT9YYK21afucrRr/p3DH8wHXRCnZg=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=Li1yuMA+fDKyuz/M4SCCN59d7ctSse1jfSTWQ3iZlTsXSlRURMkhcccjz+NjkScvQ
-         OT79Q+110UzH6ATtOAZE9TFWQjw4BLnCG5aUr/CalDFE2cW6KgzaPkPaa2VXwXXnY7
-         5/pADAmNdIG6y4v4o+nIoM+vpWxQn4IxAHbuuW5oIOtDNzIl/y2OpjmtWUHEk+W1aZ
-         olqi7E7lxyXO7wuTmjE0Zl5xPzM6XAPVnnMYc1B16d5wLkxA+Bss3XKDZ67aQwvlKh
-         DZPWPt41q1dZKdSXT2fR0lvzoisF0pX9tRbjvzPB2h5VmCo5KF3WlKIvbrQsfpbBjq
-         ftxyscOjUOrMA==
+Content-Type: text/plain
+X-XM-SPF: eid=1hq691-0003ye-Le;;;mid=<87v9vs43pq.fsf@xmission.com>;;;hst=in02.mta.xmission.com;;;ip=68.227.160.95;;;frm=ebiederm@xmission.com;;;spf=neutral
+X-XM-AID: U2FsdGVkX19WPNvkH+gWSBLcyA8Qu0HmQ+IFY+GAvQc=
+X-SA-Exim-Connect-IP: 68.227.160.95
+X-SA-Exim-Mail-From: ebiederm@xmission.com
+Subject: Re: [PATCH AUTOSEL 5.2 039/249] signal/cifs: Fix cifs_put_tcp_session to call send_sig instead of force_sig
+X-SA-Exim-Version: 4.2.1 (built Thu, 05 May 2016 13:38:54 -0600)
+X-SA-Exim-Scanned: Yes (on in02.mta.xmission.com)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 7/23/19 9:25 PM, john.hubbard@gmail.com wrote:
-> From: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
->=20
-> For pages that were retained via get_user_pages*(), release those pages
-> via the new put_user_page*() routines, instead of via put_page().
->=20
-> This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
-> ("mm: introduce put_user_page*(), placeholder versions").
->=20
-> Changes from J=C3=A9r=C3=B4me's original patch:
->=20
-> * Changed a WARN_ON to a BUG_ON.
->=20
+Steve French <smfrench@gmail.com> writes:
 
-Clearly, the above commit log has it backwards (this is quite my night
-for typos).  Please read that as "changed a BUG_ON to a WARN_ON".
+> Very easy to see what caused the regression with this global change:
+>
+> mount (which launches "cifsd" thread to read the socket)
+> umount (which kills the "cifsd" thread)
+> rmmod   (rmmod now fails since "cifsd" thread is still active)
+>
+> mount launches a thread to read from the socket ("cifsd")
+> umount is supposed to kill that thread (but with the patch
+> "signal/cifs: Fix cifs_put_tcp_session to call send_sig instead of
+> force_sig" that no longer works).  So the regression is that after
+> unmount you still see the "cifsd" thread, and the reason that cifsd
+> thread is still around is that that patch no longer force kills the
+> process (see line 2652 of fs/cifs/connect.c) which regresses module
+> removal.
+>
+> -               force_sig(SIGKILL, task);
+> +               send_sig(SIGKILL, task, 1);
+>
+> The comment in the changeset indicates "The signal SIGKILL can not be
+> ignored" but obviously it can be ignored - at least on 5.3-rc1 it is
+> being ignored.
+>
+> If send_sig(SIGKILL ...) doesn't work and if force_sig(SIGKILL, task)
+> is removed and no longer possible - how do we kill a helper process
+> ...
 
-I'll correct the commit description in next iteration of this patchset.
+I think I see what is happening.  It looks like as well as misuinsg
+force_sig, cifs is also violating the invariant that keeps SIGKILL out
+of the blocked signal set.
 
-...
+For that force_sig will act differently.  I did not consider it because
+that is never supposed to happen.
 
-> +	/*
-> +	 * Here in all cases we should have an IOVEC which use GUP. If that is
-> +	 * not the case then we will wrongly call put_user_page() and the page
-> +	 * refcount will go wrong (this is in vhost_scsi_release_cmd())
-> +	 */
-> +	WARN_ON(!iov_iter_get_pages_use_gup(iter));
-> +
-...
+Can someone test this code below and confirm the issue goes away?
 
-thanks,
---=20
-John Hubbard
-NVIDIA
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 5d6d44bfe10a..2a782ebc7b65 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -347,6 +347,7 @@ __smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
+ 	 */
+ 
+ 	sigfillset(&mask);
++	sigdelset(&mask, SIGKILL);
+ 	sigprocmask(SIG_BLOCK, &mask, &oldmask);
+ 
+ 	/* Generate a rfc1002 marker for SMB2+ */
+
+
+Eric
