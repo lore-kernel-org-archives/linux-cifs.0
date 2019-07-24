@@ -5,56 +5,56 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDB11C7618B
-	for <linux-cifs@archiver.kernel.org>; Wed, 24 Jul 2019 04:25:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E595C7618F
+	for <linux-cifs@archiver.kernel.org>; Wed, 24 Jul 2019 04:26:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A23E322387
-	for <linux-cifs@archiver.kernel.org>; Wed, 24 Jul 2019 04:25:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D6A92080C
+	for <linux-cifs@archiver.kernel.org>; Wed, 24 Jul 2019 04:26:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AJiRp1Us"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rzlDdGXt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726550AbfGXEZj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 24 Jul 2019 00:25:39 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:44293 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726534AbfGXEZj (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 24 Jul 2019 00:25:39 -0400
-Received: by mail-pg1-f193.google.com with SMTP id i18so20511859pgl.11;
-        Tue, 23 Jul 2019 21:25:38 -0700 (PDT)
+        id S1726621AbfGXEZx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 24 Jul 2019 00:25:53 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:33377 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726463AbfGXEZh (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 24 Jul 2019 00:25:37 -0400
+Received: by mail-pl1-f194.google.com with SMTP id c14so21403885plo.0;
+        Tue, 23 Jul 2019 21:25:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=I1wDMaqOj/gzGRufAfLYBvs0e80ibIJerHEY6qRx+9Q=;
-        b=AJiRp1Uswxxxj2fjLfbqacoLwH06WJ9mszsK/zlNhFuhNoSLtvKRmhFo9KLI7JLl8B
-         hxIxG1xThvmkqqGsj4H+PIkZgqzG39WvTfqHCYX31eWH9qZ8HHJptRyRkIYZTdhpSSJA
-         nZA7WnB2fukiDrq9dsIiMnZ4oXRSDbx8C0GrWwEoTfJ4nGsrUGvTe9DUv98TbDoHZftU
-         2sPJK+pDMsCNPpAzyI5pMUhaliFeOadZMdLhzw1frV4a114QmQGutmlMg9ocT4gPTziz
-         ZW1wdryUHfhxRuoKX5pPJ1KukLjcZAbAo24BFz30vzwXdEBQHRvTjXN7uylJkrR8anzL
-         2E2g==
+        bh=ConQbG+Oem1Q8xZVMGorLyFV++CtkhuR2d2QhctIH1U=;
+        b=rzlDdGXtnPNF/N6VGSj5OlnkKQVNzuJZSX88h3k0QaSU7x9XxY6d4zWea62ZR3fNtS
+         gNMZr45iIvfH5HQRUOMwyNN/jLIH836GcUp8Lf+aNFxxaV9vdrr625gCfyA8XZW5PN/Q
+         pwujb2Pq5pgz78btiFjK3sxUmpLDWtYh/fYuVQy1tXkvqQxjANX5Mpn0h7bykgaCkfn1
+         tCFvQq5xWW5YoxVJrXQ4tXX8LNF75ePai0HBYrs+WY7yUOWhn6yI6XBVflq1lgPq7qJv
+         MiEt1P/meAHMnJy5EKWXyM1HfNJ7Mhgk5eJlB+ONmrDSnY2e4Df2D52oQWcyMMCO39pJ
+         Eo+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=I1wDMaqOj/gzGRufAfLYBvs0e80ibIJerHEY6qRx+9Q=;
-        b=Nm9JBfyjZZRpKI39U9r5n8J23vF8EW0fqfdDCkmf9aBgUf4hmqu3GV1JHLRrvCjgav
-         7ajV9Wig5bhzAkmozNLVjrsXLNeK8cSpNsOJpvJzi/44SrZEihQxrUi2mrn3lQvXtPCf
-         VaEnVe5ByQDxiaRNmvbS550+6zgctRHVvxOaMsl6dxz8hdXh4b/EYxcU3YY3Ue83ZlMJ
-         XifOgyxu4jw+pMjT1QMjJHrcDvdzPYMDWqpJ5LfUF9NUM2DmpYx9C0aWg8bbgS5IO0eP
-         Zagn/++uqNhC+hRMg5wNk329CJhJ6RsO7IMsuO3mCl/YIE4Ch1W9QMMpuNii6HGlz9AQ
-         SBlQ==
-X-Gm-Message-State: APjAAAVfcaP/BgUygBi+bAdiEZv1tCKB/k4SLrePn+5mLz4Ph4VhxJL7
-        gt3jOXEyc4mAYsIb6M9ll+4=
-X-Google-Smtp-Source: APXvYqwVZxneCPfv2nDeo72FQ4K0Ri4nG9i/Jh52gTbxtuFDM1ER91LNrK6Q0r6xmbSBuioIPNnbSg==
-X-Received: by 2002:a62:38c6:: with SMTP id f189mr9250236pfa.157.1563942338440;
-        Tue, 23 Jul 2019 21:25:38 -0700 (PDT)
+        bh=ConQbG+Oem1Q8xZVMGorLyFV++CtkhuR2d2QhctIH1U=;
+        b=gqq0hC8pLvpViSGHgy+tAyVN/mm+fRNg+vzn50fDt9BmPpFApXwp5FHuFt+Za9nX9y
+         X21X64CPz2ZYFs1DnLNoJ64aXkp3zvIYLm9t7KYrzIagPwG3Lv1GFQchZ3iowL9bg8P7
+         eTc+qmgj5PArB3EDuImgpFg4p0+OootFwXovyoiivicH95JvGqhyTsRhMbkX824O6bOs
+         Y1EDaVrZ9rBFTnux2Mui27ZM+IeehIXnXHrimHAEY6uY5W3wCGyjln7KNf5ZLG9VzDGJ
+         2HJbm/fqdarLXaHThhhzRYSrfMasmpk+4m13RlLbW2uMNjspcGUkmysgSoNlwC1y/iEG
+         yLCw==
+X-Gm-Message-State: APjAAAWjz9QfEhD2hP8DaeEAwp0/0woWdKGAk9B0L+OcZDvARY1O44zK
+        6Z7AOGZQB2zKOFln9R51UX8=
+X-Google-Smtp-Source: APXvYqyQhtv0FnqZ/I/TW3TWJg4eP/mju41WYZg75l/6hWymbmp//VEgOy1EsZaAb3L+vlqi+tLiHg==
+X-Received: by 2002:a17:902:6b44:: with SMTP id g4mr83239156plt.152.1563942335854;
+        Tue, 23 Jul 2019 21:25:35 -0700 (PDT)
 Received: from blueforge.nvidia.com (searspoint.nvidia.com. [216.228.112.21])
-        by smtp.gmail.com with ESMTPSA id a15sm34153364pgw.3.2019.07.23.21.25.37
+        by smtp.gmail.com with ESMTPSA id a15sm34153364pgw.3.2019.07.23.21.25.34
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 23 Jul 2019 21:25:38 -0700 (PDT)
+        Tue, 23 Jul 2019 21:25:35 -0700 (PDT)
 From:   john.hubbard@gmail.com
 X-Google-Original-From: jhubbard@nvidia.com
 To:     Andrew Morton <akpm@linux-foundation.org>
@@ -78,14 +78,23 @@ Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
         netdev@vger.kernel.org, samba-technical@lists.samba.org,
         v9fs-developer@lists.sourceforge.net,
         virtualization@lists.linux-foundation.org,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH 12/12] fs/ceph: fix a build warning: returning a value from void function
-Date:   Tue, 23 Jul 2019 21:25:18 -0700
-Message-Id: <20190724042518.14363-13-jhubbard@nvidia.com>
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        John Hubbard <jhubbard@nvidia.com>, Jan Kara <jack@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Ming Lei <ming.lei@redhat.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Boaz Harrosh <boaz@plexistor.com>,
+        "Yan, Zheng" <zyan@redhat.com>, Sage Weil <sage@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>
+Subject: [PATCH 10/12] fs/ceph: convert put_page() to put_user_page*()
+Date:   Tue, 23 Jul 2019 21:25:16 -0700
+Message-Id: <20190724042518.14363-11-jhubbard@nvidia.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190724042518.14363-1-jhubbard@nvidia.com>
 References: <20190724042518.14363-1-jhubbard@nvidia.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-NVConfidentiality: public
 Content-Transfer-Encoding: 8bit
 Sender: linux-cifs-owner@vger.kernel.org
@@ -93,29 +102,205 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: John Hubbard <jhubbard@nvidia.com>
+From: Jérôme Glisse <jglisse@redhat.com>
 
-Trivial build warning fix: don't return a value from a function
-whose type is "void".
+For pages that were retained via get_user_pages*(), release those pages
+via the new put_user_page*() routines, instead of via put_page().
 
+This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
+("mm: introduce put_user_page*(), placeholder versions").
+
+Changes from Jérôme's original patch:
+
+* Use the enhanced put_user_pages_dirty_lock().
+
+Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
 Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+Cc: linux-fsdevel@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+Cc: linux-mm@kvack.org
+Cc: ceph-devel@vger.kernel.org
+Cc: Jan Kara <jack@suse.cz>
+Cc: Dan Williams <dan.j.williams@intel.com>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Dave Chinner <david@fromorbit.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Matthew Wilcox <willy@infradead.org>
+Cc: Boaz Harrosh <boaz@plexistor.com>
+Cc: "Yan, Zheng" <zyan@redhat.com>
+Cc: Sage Weil <sage@redhat.com>
+Cc: Ilya Dryomov <idryomov@gmail.com>
 ---
- fs/ceph/debugfs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/ceph/file.c | 62 ++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 48 insertions(+), 14 deletions(-)
 
-diff --git a/fs/ceph/debugfs.c b/fs/ceph/debugfs.c
-index 2eb88ed22993..fa14c8e8761d 100644
---- a/fs/ceph/debugfs.c
-+++ b/fs/ceph/debugfs.c
-@@ -294,7 +294,7 @@ void ceph_fs_debugfs_init(struct ceph_fs_client *fsc)
- 
- void ceph_fs_debugfs_init(struct ceph_fs_client *fsc)
- {
--	return 0;
-+	return;
+diff --git a/fs/ceph/file.c b/fs/ceph/file.c
+index 685a03cc4b77..c628a1f96978 100644
+--- a/fs/ceph/file.c
++++ b/fs/ceph/file.c
+@@ -158,18 +158,26 @@ static ssize_t iter_get_bvecs_alloc(struct iov_iter *iter, size_t maxsize,
+ 	return bytes;
  }
  
- void ceph_fs_debugfs_cleanup(struct ceph_fs_client *fsc)
+-static void put_bvecs(struct bio_vec *bvecs, int num_bvecs, bool should_dirty)
++static void put_bvecs(struct bio_vec *bv, int num_bvecs, bool should_dirty,
++		      bool from_gup)
+ {
+ 	int i;
+ 
++
+ 	for (i = 0; i < num_bvecs; i++) {
+-		if (bvecs[i].bv_page) {
++		if (!bv[i].bv_page)
++			continue;
++
++		if (from_gup) {
++			put_user_pages_dirty_lock(&bv[i].bv_page, 1,
++						  should_dirty);
++		} else {
+ 			if (should_dirty)
+-				set_page_dirty_lock(bvecs[i].bv_page);
+-			put_page(bvecs[i].bv_page);
++				set_page_dirty_lock(bv[i].bv_page);
++			put_page(bv[i].bv_page);
+ 		}
+ 	}
+-	kvfree(bvecs);
++	kvfree(bv);
+ }
+ 
+ /*
+@@ -730,6 +738,7 @@ struct ceph_aio_work {
+ };
+ 
+ static void ceph_aio_retry_work(struct work_struct *work);
++static void ceph_aio_from_gup_retry_work(struct work_struct *work);
+ 
+ static void ceph_aio_complete(struct inode *inode,
+ 			      struct ceph_aio_request *aio_req)
+@@ -774,7 +783,7 @@ static void ceph_aio_complete(struct inode *inode,
+ 	kfree(aio_req);
+ }
+ 
+-static void ceph_aio_complete_req(struct ceph_osd_request *req)
++static void _ceph_aio_complete_req(struct ceph_osd_request *req, bool from_gup)
+ {
+ 	int rc = req->r_result;
+ 	struct inode *inode = req->r_inode;
+@@ -793,7 +802,9 @@ static void ceph_aio_complete_req(struct ceph_osd_request *req)
+ 
+ 		aio_work = kmalloc(sizeof(*aio_work), GFP_NOFS);
+ 		if (aio_work) {
+-			INIT_WORK(&aio_work->work, ceph_aio_retry_work);
++			INIT_WORK(&aio_work->work, from_gup ?
++				  ceph_aio_from_gup_retry_work :
++				  ceph_aio_retry_work);
+ 			aio_work->req = req;
+ 			queue_work(ceph_inode_to_client(inode)->inode_wq,
+ 				   &aio_work->work);
+@@ -830,7 +841,7 @@ static void ceph_aio_complete_req(struct ceph_osd_request *req)
+ 	}
+ 
+ 	put_bvecs(osd_data->bvec_pos.bvecs, osd_data->num_bvecs,
+-		  aio_req->should_dirty);
++		  aio_req->should_dirty, from_gup);
+ 	ceph_osdc_put_request(req);
+ 
+ 	if (rc < 0)
+@@ -840,7 +851,17 @@ static void ceph_aio_complete_req(struct ceph_osd_request *req)
+ 	return;
+ }
+ 
+-static void ceph_aio_retry_work(struct work_struct *work)
++static void ceph_aio_complete_req(struct ceph_osd_request *req)
++{
++	_ceph_aio_complete_req(req, false);
++}
++
++static void ceph_aio_from_gup_complete_req(struct ceph_osd_request *req)
++{
++	_ceph_aio_complete_req(req, true);
++}
++
++static void _ceph_aio_retry_work(struct work_struct *work, bool from_gup)
+ {
+ 	struct ceph_aio_work *aio_work =
+ 		container_of(work, struct ceph_aio_work, work);
+@@ -891,7 +912,8 @@ static void ceph_aio_retry_work(struct work_struct *work)
+ 
+ 	ceph_osdc_put_request(orig_req);
+ 
+-	req->r_callback = ceph_aio_complete_req;
++	req->r_callback = from_gup ? ceph_aio_from_gup_complete_req :
++			  ceph_aio_complete_req;
+ 	req->r_inode = inode;
+ 	req->r_priv = aio_req;
+ 
+@@ -899,13 +921,23 @@ static void ceph_aio_retry_work(struct work_struct *work)
+ out:
+ 	if (ret < 0) {
+ 		req->r_result = ret;
+-		ceph_aio_complete_req(req);
++		_ceph_aio_complete_req(req, from_gup);
+ 	}
+ 
+ 	ceph_put_snap_context(snapc);
+ 	kfree(aio_work);
+ }
+ 
++static void ceph_aio_retry_work(struct work_struct *work)
++{
++	_ceph_aio_retry_work(work, false);
++}
++
++static void ceph_aio_from_gup_retry_work(struct work_struct *work)
++{
++	_ceph_aio_retry_work(work, true);
++}
++
+ static ssize_t
+ ceph_direct_read_write(struct kiocb *iocb, struct iov_iter *iter,
+ 		       struct ceph_snap_context *snapc,
+@@ -927,6 +959,7 @@ ceph_direct_read_write(struct kiocb *iocb, struct iov_iter *iter,
+ 	loff_t pos = iocb->ki_pos;
+ 	bool write = iov_iter_rw(iter) == WRITE;
+ 	bool should_dirty = !write && iter_is_iovec(iter);
++	bool from_gup = iov_iter_get_pages_use_gup(iter);
+ 
+ 	if (write && ceph_snap(file_inode(file)) != CEPH_NOSNAP)
+ 		return -EROFS;
+@@ -1023,7 +1056,8 @@ ceph_direct_read_write(struct kiocb *iocb, struct iov_iter *iter,
+ 			aio_req->num_reqs++;
+ 			atomic_inc(&aio_req->pending_reqs);
+ 
+-			req->r_callback = ceph_aio_complete_req;
++			req->r_callback = !from_gup ? ceph_aio_complete_req :
++					  ceph_aio_from_gup_complete_req;
+ 			req->r_inode = inode;
+ 			req->r_priv = aio_req;
+ 			list_add_tail(&req->r_private_item, &aio_req->osd_reqs);
+@@ -1054,7 +1088,7 @@ ceph_direct_read_write(struct kiocb *iocb, struct iov_iter *iter,
+ 				len = ret;
+ 		}
+ 
+-		put_bvecs(bvecs, num_pages, should_dirty);
++		put_bvecs(bvecs, num_pages, should_dirty, from_gup);
+ 		ceph_osdc_put_request(req);
+ 		if (ret < 0)
+ 			break;
+@@ -1093,7 +1127,7 @@ ceph_direct_read_write(struct kiocb *iocb, struct iov_iter *iter,
+ 							      req, false);
+ 			if (ret < 0) {
+ 				req->r_result = ret;
+-				ceph_aio_complete_req(req);
++				_ceph_aio_complete_req(req, from_gup);
+ 			}
+ 		}
+ 		return -EIOCBQUEUED;
 -- 
 2.22.0
 
