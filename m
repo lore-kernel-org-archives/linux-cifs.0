@@ -2,135 +2,140 @@ Return-Path: <SRS0=zjVJ=VV=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7E5CC76186
-	for <linux-cifs@archiver.kernel.org>; Wed, 24 Jul 2019 20:51:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 272E3C76191
+	for <linux-cifs@archiver.kernel.org>; Wed, 24 Jul 2019 23:23:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9EC8721849
-	for <linux-cifs@archiver.kernel.org>; Wed, 24 Jul 2019 20:51:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F154E21926
+	for <linux-cifs@archiver.kernel.org>; Wed, 24 Jul 2019 23:23:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fCnsLvZS"
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="POKycPna"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387508AbfGXUvQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 24 Jul 2019 16:51:16 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:38226 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387468AbfGXUvP (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 24 Jul 2019 16:51:15 -0400
-Received: by mail-pf1-f195.google.com with SMTP id y15so21525515pfn.5;
-        Wed, 24 Jul 2019 13:51:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Ds6DoMC8+Sm3L+5TDki5vxC1QfgRywL0wnVBt6Olylo=;
-        b=fCnsLvZSkH7Xrin8sHs9P8Nbx7ZrzJMc3/mRQkJ5SbeEHt0Ql1cnLmpplGFrQUpL3x
-         z6yiMlKRqVQWdo9kc8+tZ5tgF+oW0cGGcu5nlUh6a85GS5LaAR7Wxu5XVEzu8Bp4AvHK
-         J/uiPKZpK0IfD83moh3gfjf8qbDayiv0vF15ZeHIyxRMPnNdf6IU6UJdiolEefiL3kLm
-         WmcEKzfLvhcyIt1FmOeh1gAFFjOlICPE+oXOsgyduPLwUjMzhTvWnmOGnIeodbcAc5/D
-         G/spncq7NtH/D+zmJKf0d9fUJ/DAdRZGEQDIBDGjhGXLV7GMMBLbmdC8QC97XDZVMZ65
-         x7/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Ds6DoMC8+Sm3L+5TDki5vxC1QfgRywL0wnVBt6Olylo=;
-        b=QR1LBLbmJ4ZGU/0AIvGeYZp9Y5ZDMSOVexWF0R0Owm7tN4GFJS6PAqWufXwB3tMmlq
-         yuwFU3jaaQGP14uSK5cTtYkexBpatGbO4TuHQyAavEaM8yCa3vT2z6KvU5ud7ulkdLuE
-         gvk7MzVIDThf0CeHhS2ufrbuSTOJb9O+A/iddp4hXI+DCxDONWEKjSL+N4+Qx2FWpke2
-         GLy2UJ27MmZAHTVmE6qUsk4uzM9EMlo4l00gav3gUuYHiNHWF9K8wTh6AR17/GQLsL6u
-         njNGZB5aG5qehpUOP3xwRGGu9eJcgyNBeN/GlfNDW1hXzVCALqfzJjAp/wUjEfv4Uica
-         neSQ==
-X-Gm-Message-State: APjAAAUJ1rZ+vjUfkuIF7tbld3M5xFLScYvNoaIo639MjGnIkdBm43hm
-        Nah9MkVpL9XuOFMOGcBiLrx8TyGbu87H3vfwdYwwjtXWLVU=
-X-Google-Smtp-Source: APXvYqydGZ+58IEZV9P9Wh19Vs31nSeY4KKzrqDPI1rB995ISm8d68W0C99qy8qdBJbaeTksTQ7irwQRG6dfUn4Cuwg=
-X-Received: by 2002:a17:90a:fa07:: with SMTP id cm7mr86827880pjb.138.1564001474948;
- Wed, 24 Jul 2019 13:51:14 -0700 (PDT)
+        id S1727627AbfGXXX0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 24 Jul 2019 19:23:26 -0400
+Received: from hqemgate15.nvidia.com ([216.228.121.64]:2928 "EHLO
+        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726314AbfGXXX0 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 24 Jul 2019 19:23:26 -0400
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5d38e8730000>; Wed, 24 Jul 2019 16:23:31 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate102.nvidia.com (PGP Universal service);
+  Wed, 24 Jul 2019 16:23:23 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate102.nvidia.com on Wed, 24 Jul 2019 16:23:23 -0700
+Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 24 Jul
+ 2019 23:23:22 +0000
+Subject: Re: [PATCH 00/12] block/bio, fs: convert put_page() to
+ put_user_page*()
+To:     Christoph Hellwig <hch@infradead.org>, <john.hubbard@gmail.com>
+CC:     Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Matthew Wilcox <willy@infradead.org>, <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        <ceph-devel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-cifs@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
+        <linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <samba-technical@lists.samba.org>,
+        <v9fs-developer@lists.sourceforge.net>,
+        <virtualization@lists.linux-foundation.org>
+References: <20190724042518.14363-1-jhubbard@nvidia.com>
+ <20190724061750.GA19397@infradead.org>
+X-Nvconfidentiality: public
+From:   John Hubbard <jhubbard@nvidia.com>
+Message-ID: <17f12f3d-981e-a717-c8e5-bfbbfb7ec1a3@nvidia.com>
+Date:   Wed, 24 Jul 2019 16:23:21 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190724191655.268628197@linuxfoundation.org> <20190724191657.444120528@linuxfoundation.org>
-In-Reply-To: <20190724191657.444120528@linuxfoundation.org>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 24 Jul 2019 15:51:04 -0500
-Message-ID: <CAH2r5msdLOSZ7W-PmbasQR8GfxPn2_ZjAJf6DwEX3GKsUbGkgQ@mail.gmail.com>
-Subject: Re: [PATCH 4.19 026/271] signal/cifs: Fix cifs_put_tcp_session to
- call send_sig instead of force_sig
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Stable <stable@vger.kernel.org>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        Sasha Levin <sashal@kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190724061750.GA19397@infradead.org>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1564010611; bh=U/byz8o3kezigETW8hWUjg+JqkNm/y0Q4UHjAnDVaRI=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=POKycPna3sFHaptSpPG8JFNhdv+KWPJt4Fqq7qra/U5uujHxVhga0mA2hyYe3oLWO
+         rvMjdBQgQaYdhe3tYVq3xzWzC7PXLH9gVg6v6GfrdnHKhzPSXOdrUzDa4Sfy+FpWme
+         AYx8XN4QHijtxUQThz9jDsFglp/BwmD6wmVyo2Ou4HoX36ySg8r0DnnWDfRMrkzmXC
+         XvSXsG7L9llJHump4bjV4yoH02Li7EYgdYhEFhGR3d1oO3a9DGx7nb70VEc+guaDrP
+         BAn4DIKE83X0lqImHCnmIIbgjVMdzz9Q4ePUhHR77cnRWD+JGehn4V8I2IYZgTvKbn
+         0ENu9Hbk0xmXw==
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Note that this patch causes a regression (removing cifs module fails,
-due to unmount leaking a thread with this change).
+On 7/23/19 11:17 PM, Christoph Hellwig wrote:
+> On Tue, Jul 23, 2019 at 09:25:06PM -0700, john.hubbard@gmail.com wrote:
+>> * Store, in the iov_iter, a "came from gup (get_user_pages)" parameter.
+>>   Then, use the new iov_iter_get_pages_use_gup() to retrieve it when
+>>   it is time to release the pages. That allows choosing between put_page=
+()
+>>   and put_user_page*().
+>>
+>> * Pass in one more piece of information to bio_release_pages: a "from_gu=
+p"
+>>   parameter. Similar use as above.
+>>
+>> * Change the block layer, and several file systems, to use
+>>   put_user_page*().
+>=20
+> I think we can do this in a simple and better way.  We have 5 ITER_*
+> types.  Of those ITER_DISCARD as the name suggests never uses pages, so
+> we can skip handling it.  ITER_PIPE is rejected =D1=96n the direct I/O pa=
+th,
+> which leaves us with three.
+>=20
+> Out of those ITER_BVEC needs a user page reference, so we want to call
 
-We are testing a workaround to cifs.ko which would be needed if this
-patch were to be backported.
+               ^ ITER_IOVEC, I hope. Otherwise I'm hopeless lost. :)
 
-On Wed, Jul 24, 2019 at 3:02 PM Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
->
-> [ Upstream commit 72abe3bcf0911d69b46c1e8bdb5612675e0ac42c ]
->
-> The locking in force_sig_info is not prepared to deal with a task that
-> exits or execs (as sighand may change).  The is not a locking problem
-> in force_sig as force_sig is only built to handle synchronous
-> exceptions.
->
-> Further the function force_sig_info changes the signal state if the
-> signal is ignored, or blocked or if SIGNAL_UNKILLABLE will prevent the
-> delivery of the signal.  The signal SIGKILL can not be ignored and can
-> not be blocked and SIGNAL_UNKILLABLE won't prevent it from being
-> delivered.
->
-> So using force_sig rather than send_sig for SIGKILL is confusing
-> and pointless.
->
-> Because it won't impact the sending of the signal and and because
-> using force_sig is wrong, replace force_sig with send_sig.
->
-> Cc: Namjae Jeon <namjae.jeon@samsung.com>
-> Cc: Jeff Layton <jlayton@primarydata.com>
-> Cc: Steve French <smfrench@gmail.com>
-> Fixes: a5c3e1c725af ("Revert "cifs: No need to send SIGKILL to demux_thread during umount"")
-> Fixes: e7ddee9037e7 ("cifs: disable sharing session and tcon and add new TCP sharing code")
-> Signed-off-by: "Eric W. Biederman" <ebiederm@xmission.com>
-> Signed-off-by: Sasha Levin <sashal@kernel.org>
-> ---
->  fs/cifs/connect.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index f31339db45fd..82b3af47bce3 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -2428,7 +2428,7 @@ cifs_put_tcp_session(struct TCP_Server_Info *server, int from_reconnect)
->
->         task = xchg(&server->tsk, NULL);
->         if (task)
-> -               force_sig(SIGKILL, task);
-> +               send_sig(SIGKILL, task, 1);
->  }
->
->  static struct TCP_Server_Info *
-> --
-> 2.20.1
->
->
->
+> put_user_page* on it.  ITER_BVEC always already has page reference,
+> which means in the block direct I/O path path we alread don't take
+> a page reference.  We should extent that handling to all other calls
+> of iov_iter_get_pages / iov_iter_get_pages_alloc.  I think we should
+> just reject ITER_KVEC for direct I/O as well as we have no users and
+> it is rather pointless.  Alternatively if we see a use for it the
+> callers should always have a life page reference anyway (or might
+> be on kmalloc memory), so we really should not take a reference either.
+>=20
+> In other words:  the only time we should ever have to put a page in
+> this patch is when they are user pages.  We'll need to clean up
+> various bits of code for that, but that can be done gradually before
+> even getting to the actual put_user_pages conversion.
+>=20
+
+Sounds great. I'm part way into it and it doesn't look too bad. The main
+question is where to scatter various checks and assertions, to keep
+the kvecs out of direct I/0. Or at least keep the gups away from=20
+direct I/0.
 
 
--- 
-Thanks,
-
-Steve
+thanks,
+--=20
+John Hubbard
+NVIDIA
