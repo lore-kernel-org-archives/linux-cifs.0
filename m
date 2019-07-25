@@ -8,60 +8,61 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 818C7C7618B
-	for <linux-cifs@archiver.kernel.org>; Thu, 25 Jul 2019 14:51:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6E29C76190
+	for <linux-cifs@archiver.kernel.org>; Thu, 25 Jul 2019 18:51:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4A64220659
-	for <linux-cifs@archiver.kernel.org>; Thu, 25 Jul 2019 14:51:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 94A5F22BEF
+	for <linux-cifs@archiver.kernel.org>; Thu, 25 Jul 2019 18:51:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FG7kIFyZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s5Q1jSx5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387829AbfGYOvd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 25 Jul 2019 10:51:33 -0400
-Received: from mail-lj1-f176.google.com ([209.85.208.176]:39955 "EHLO
-        mail-lj1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387804AbfGYOvd (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 25 Jul 2019 10:51:33 -0400
-Received: by mail-lj1-f176.google.com with SMTP id m8so14690813lji.7
-        for <linux-cifs@vger.kernel.org>; Thu, 25 Jul 2019 07:51:31 -0700 (PDT)
+        id S1726195AbfGYSvd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 25 Jul 2019 14:51:33 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:45973 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726107AbfGYSvc (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 25 Jul 2019 14:51:32 -0400
+Received: by mail-pf1-f194.google.com with SMTP id r1so23189699pfq.12
+        for <linux-cifs@vger.kernel.org>; Thu, 25 Jul 2019 11:51:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=pUr6qF7tigPZBDQcWwmq6D76HKvP4Jg7BLseOWQs26Y=;
-        b=FG7kIFyZGxkoboqyl8TIVo4lmkx3EbdI64ATp4+0fRuZ+63KlkeLy7qOF1SXHX+ig7
-         9cGVQ78QN9d7yjdMXEUo5YgVv7BWaJIffNnMFmh1gqthzBMwXTt+c37NPzG9tvKUBnpX
-         hbrjqvyvEazcjm6kBzj8wCUtm1H41F7A3HamWdKI2ECgIO/jQ+HvS9T6pCyiAs4dHpJV
-         BmxA7s3Lu4RnkeHq98A7z8ksMzAWrYNXctZ0gVQrNywMG0bSxxzszqnXY/qei2PSOFDv
-         DmZN3kHfTgchINqCQrv0VFWM+nzlbtzUf2k3gsNAhajs5k4MorGm7mmArzPQZNOfvZUT
-         mXpg==
+        bh=ShXp07IhPxqxswl7Kll2yThYng3eon29wJBqeUyllvM=;
+        b=s5Q1jSx5vfls4l0LlJz5i4LTFjQYPIdz8mWL4GrfiFUVTA7cGLP9E9eapoQBAhRS3/
+         EAmFoiqhNK/tVza0Yhk64QZyHI41sYjJw/Ld6uU/vPrRR0Whykd84JzV/zckH33Mxy38
+         witGG3/W/XVOIu91YvOARSrdcriC85v4SSzuMZeGAslZDDOp9y2gVCUdLhUlf6aRLzzb
+         AVltFS5kthmaM18Fs4YnvGPTpUqOO7/21uhEPxPVHPnUdWcUZJECiGj8FlYy1tAFcKNh
+         8e4G0DOEh0m48KsqQXiEPg6XxQDxxWWegRV4vSlvzvXQ2oBPrLCqJy3/K+ufKcQZbyVP
+         5PPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=pUr6qF7tigPZBDQcWwmq6D76HKvP4Jg7BLseOWQs26Y=;
-        b=I+kXxJUa0JHZAjELei6tr5kiRRcEqew89EHoGPa3m8aoo5FTOO0arybKUQqPvnzgMJ
-         7ZxKDZrudKFs5wKAw0VpUyVcUKP78+Nznj7+IXXC9F5ulcxkkNg1MKIhyXBpw4FmuaRS
-         EfyEk5aEmev+tjrigRzXVzIRiIEYK5kx848N0nmky+bJ6sbwp/o5mEZltSd5h4dcj4gZ
-         GFpj2nAT4hIHJ1Q0Ldj+f5EOiFPSwcjkIf5VL7jx/vL7AKblqAf+rWWd2qZC6hkjiWJu
-         M2tF/2Y4r3S/gZuurc6K7yQcnGaU0AEmIOc8uUsrPfaGCU+JFtdGxUlYJtiZAyX1vS+a
-         BPxg==
-X-Gm-Message-State: APjAAAXpHpoQ7f8CcZEsr61kZL9MTodsQesidaQj8aV67onOdwCrxDKM
-        ads1ZK/buu5/7Se0PQzHrv+uF24X0zdZnZjsIpU=
-X-Google-Smtp-Source: APXvYqx8/A1LVsFTYsf4QGfFUN55KrNTDJlZr0Fx4aJmLsz/P+ClE0nYu/G7p12V6etsgEPqCdZartfFPzxgSxbLwog=
-X-Received: by 2002:a2e:9a58:: with SMTP id k24mr46454953ljj.165.1564066290352;
- Thu, 25 Jul 2019 07:51:30 -0700 (PDT)
+        bh=ShXp07IhPxqxswl7Kll2yThYng3eon29wJBqeUyllvM=;
+        b=och05G7hx7YIENH2VD2ynHU29vRMGDudxzf7hPpema7hi0jRpmoQsI4kFKuauS+MOO
+         DzIedtW4NTZTbhP5TKJhvlzVfwqivn30kVwgnc146LWJbPte5BI5cUg5rhbNqrupCfmS
+         cl5zW/DnwQSH54i1Gv59rstNe0f3ewPAAMR/DK0IQCsW5fadelBQmmnm6p0y8EwyBcXy
+         yvbDKZtIEPJ39LG7zYY794uVla/1Sezcule02NrnSn6nNqkEZc/JJWPRREmFetUKZD4v
+         CBf2ix4+D+gx+IG+KgQT2r4CDj/N9D9E2yji93ZGynlLba/1Le3YFKXLIztWptauCS3B
+         Gy7Q==
+X-Gm-Message-State: APjAAAUNnw35iC0JyyCc6qd9Xu7AbHIcsjyi9xph/mMsdrfrQQE/Hl8U
+        mPCrh8kHlnxTOywI5ZqBkgMgtbs7h+jeyn+j43rehXRz+/Q=
+X-Google-Smtp-Source: APXvYqw7M6GJqRsXvNj4NLCyF2OmMe3hXWX1d6lf8SWnW5j7cVEVg1EV2qHBKpG4hI080SwGoXTgssC/+YwAHxH5Mr4=
+X-Received: by 2002:a17:90a:fa07:: with SMTP id cm7mr91419095pjb.138.1564080691601;
+ Thu, 25 Jul 2019 11:51:31 -0700 (PDT)
 MIME-Version: 1.0
 References: <CAO3V83L1Q9jCLBsjHgFE1jw2PPi_sHtQz4geDKC4jEPWkhNYBg@mail.gmail.com>
  <CAO3V83+iZRAQRZ5YzivPS3di0QM=-dJOg8rnVK1icUuuESd+=g@mail.gmail.com>
  <87zhlnvesj.fsf@suse.com> <CAO3V83+dmZNNaDQ14up=SL+pGv7ndiqG0y_rE7ciFyy1oNQCQw@mail.gmail.com>
 In-Reply-To: <CAO3V83+dmZNNaDQ14up=SL+pGv7ndiqG0y_rE7ciFyy1oNQCQw@mail.gmail.com>
-From:   Wout Mertens <wout.mertens@gmail.com>
-Date:   Thu, 25 Jul 2019 16:51:19 +0200
-Message-ID: <CAO3V83+tbZpmXgBUtqzqZ0R5j1OgbpxO5fftXzFughnkDRvhCg@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 25 Jul 2019 13:51:20 -0500
+Message-ID: <CAH2r5mvgbtL2YmqnRrKGQO5z4XRsS9GCTLyH+cDyGEfj0BhNpg@mail.gmail.com>
 Subject: Re: Fwd: mount.cifs fails but smbclient succeeds
-To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
+To:     Wout Mertens <wout.mertens@gmail.com>
+Cc:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
+        CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
@@ -69,17 +70,33 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I installed linux 5.1.19 but that doesn't make a difference. It still
-sets the DFS bit to 0 on the NTLMSSP_NEGOTIATE and then when smbclient
-does a FSCTL_DFS_GET_REFERRALS, mount.cifs does a "Tree connect
-request tree" which fails with "STATUS_BAD_NETWORK_NAME". After that
-failure, it does do a FSCTL_DFS_GET_REFERRALS but it doesn't mount.
+To clarify the differences you see:
+1) on the smb2 session setup requests you see the working client
+(smbclient) setting the SMB2_FLAGS_PRIORITY flags (this shouldn't make
+any difference because it is SMB3.1.1 specific flag unless the server
+negotiated smb3.1.1)
+2) you see CAP_DFS (0x00000001) not CAP_EXTENDED_SECURITY (0x80000000)
+set on the Capabilities field of the session setup response (the
+negotiate protocol request if you specify vers=3D3 or vers=3D3.1 or
+vers=3D3.1.1 or vers=3D3.0 should show these capabilities set on the
+negotiate protocol request:
 
+SMB2_GLOBAL_CAP_DFS | SMB2_GLOBAL_CAP_LEASING |
+SMB2_GLOBAL_CAP_LARGE_MTU | SMB2_GLOBAL_CAP_PERSISTENT_HANDLES |
+SMB2_GLOBAL_CAP_ENCRYPTION | SMB2_GLOBAL_CAP_DIRECTORY_LEASING
 
+Would also be interesting to see if the signing required difference is rela=
+ted.
 
-Wout.
+I could give you a patch that forces the Capabilities field to include
+more flags on session setup - it is easy enough to change the line
+(round line 1181 of smb2pdu.c) - see SMB2_sess_alloc_buffer
 
-On Thu, Jul 25, 2019 at 3:24 PM Wout Mertens <wout.mertens@gmail.com> wrote=
+req->Capabilities =3D 0;
+
+to req_capabilities =3D SMB2_GLOBAL_CAP_DFS;
+
+On Thu, Jul 25, 2019 at 9:12 AM Wout Mertens <wout.mertens@gmail.com> wrote=
 :
 >
 > Thank you so much Aur=C3=A9lien, smbcmp was really helpful!
@@ -184,3 +201,10 @@ e:
 > > SUSE Linux GmbH, Maxfeldstra=C3=9Fe 5, 90409 N=C3=BCrnberg, Germany
 > > GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 21284 (AG N=C3=
 =BCrnberg)
+
+
+
+--=20
+Thanks,
+
+Steve
