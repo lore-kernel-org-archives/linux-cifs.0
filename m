@@ -2,193 +2,133 @@ Return-Path: <SRS0=SjeK=VW=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84C59C76186
-	for <linux-cifs@archiver.kernel.org>; Thu, 25 Jul 2019 00:44:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5389CC7618F
+	for <linux-cifs@archiver.kernel.org>; Thu, 25 Jul 2019 03:09:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4F14C21901
-	for <linux-cifs@archiver.kernel.org>; Thu, 25 Jul 2019 00:44:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="muZVds6s"
+	by mail.kernel.org (Postfix) with ESMTP id 3356E21852
+	for <linux-cifs@archiver.kernel.org>; Thu, 25 Jul 2019 03:09:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387897AbfGYAoo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 24 Jul 2019 20:44:44 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:36430 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387421AbfGYAoo (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 24 Jul 2019 20:44:44 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6P0dlXf171093;
-        Thu, 25 Jul 2019 00:41:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=gv2SPbpkF9xScJE1PHpWHpgE3ifu6hFMD2cmVIyD7TY=;
- b=muZVds6swMHMAuFbMxKchNkOUd8CqTrPV0KBCMC49yrWg/LxnLuU6ow/RmgyiMUnnjmy
- MAiRa6Zm+jzf7B99ZPeMXmyGgQxIYQlCeWqFQqyGoNTjbspAoTiqbjfg4/VmNuRd7Vm5
- HrFVwz2k57PMYa/HPZcBBc0f5omPk+LrAWZPjNDUaWWol7Y67+yRcy8wbGU1Wbct1RLH
- zVzTyoIxGQlKet79OucxPmXfLkDZ0FkQP1v/RZBYzmhhy8PDfe/AB0YbSVtLklYjMvP9
- lz6P71WYbBjNCITeo6xlPXLd7l7LVGerjJLbDawimLUiySB/y4c3YF5VO7XLIrxNTkjP MA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 2tx61c0gjv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 25 Jul 2019 00:41:25 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6P0beDT189084;
-        Thu, 25 Jul 2019 00:41:24 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3020.oracle.com with ESMTP id 2tx60yhed4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 25 Jul 2019 00:41:24 +0000
-Received: from abhmp0022.oracle.com (abhmp0022.oracle.com [141.146.116.28])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x6P0fGBA002510;
-        Thu, 25 Jul 2019 00:41:16 GMT
-Received: from [192.168.1.14] (/180.165.87.209)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 24 Jul 2019 17:41:15 -0700
-Subject: Re: [PATCH 00/12] block/bio, fs: convert put_page() to
- put_user_page*()
-To:     john.hubbard@gmail.com, Andrew Morton <akpm@linux-foundation.org>
-Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
-        LKML <linux-kernel@vger.kernel.org>, ceph-devel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
-        netdev@vger.kernel.org, samba-technical@lists.samba.org,
-        v9fs-developer@lists.sourceforge.net,
-        virtualization@lists.linux-foundation.org,
-        John Hubbard <jhubbard@nvidia.com>
-References: <20190724042518.14363-1-jhubbard@nvidia.com>
-From:   Bob Liu <bob.liu@oracle.com>
-Message-ID: <8621066c-e242-c449-eb04-4f2ce6867140@oracle.com>
-Date:   Thu, 25 Jul 2019 08:41:04 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
-MIME-Version: 1.0
-In-Reply-To: <20190724042518.14363-1-jhubbard@nvidia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9328 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1907250003
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9328 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1907250003
+        id S2389671AbfGYDJJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 24 Jul 2019 23:09:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59882 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389532AbfGYDJJ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 24 Jul 2019 23:09:09 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 70CA1307CDFC;
+        Thu, 25 Jul 2019 03:09:09 +0000 (UTC)
+Received: from test1135.test.redhat.com (vpn2-54-100.bne.redhat.com [10.64.54.100])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C6C6419C68;
+        Thu, 25 Jul 2019 03:09:08 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>
+Subject: [PATCH] cifs: add passthrough for smb2 setinfo
+Date:   Thu, 25 Jul 2019 13:08:43 +1000
+Message-Id: <20190725030843.9412-1-lsahlber@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Thu, 25 Jul 2019 03:09:09 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 7/24/19 12:25 PM, john.hubbard@gmail.com wrote:
-> From: John Hubbard <jhubbard@nvidia.com>
-> 
-> Hi,
-> 
-> This is mostly Jerome's work, converting the block/bio and related areas
-> to call put_user_page*() instead of put_page(). Because I've changed
-> Jerome's patches, in some cases significantly, I'd like to get his
-> feedback before we actually leave him listed as the author (he might
-> want to disown some or all of these).
-> 
+Add support to send smb2 set-info commands from userspace.
 
-Could you add some background to the commit log for people don't have the context..
-Why this converting? What's the main differences?
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+---
+ fs/cifs/cifs_ioctl.h |  1 +
+ fs/cifs/smb2ops.c    | 29 +++++++++++++++++++++++++----
+ 2 files changed, 26 insertions(+), 4 deletions(-)
 
-Regards, -Bob
-
-> I added a new patch, in order to make this work with Christoph Hellwig's
-> recent overhaul to bio_release_pages(): "block: bio_release_pages: use
-> flags arg instead of bool".
-> 
-> I've started the series with a patch that I've posted in another
-> series ("mm/gup: add make_dirty arg to put_user_pages_dirty_lock()"[1]),
-> because I'm not sure which of these will go in first, and this allows each
-> to stand alone.
-> 
-> Testing: not much beyond build and boot testing has been done yet. And
-> I'm not set up to even exercise all of it (especially the IB parts) at
-> run time.
-> 
-> Anyway, changes here are:
-> 
-> * Store, in the iov_iter, a "came from gup (get_user_pages)" parameter.
->   Then, use the new iov_iter_get_pages_use_gup() to retrieve it when
->   it is time to release the pages. That allows choosing between put_page()
->   and put_user_page*().
-> 
-> * Pass in one more piece of information to bio_release_pages: a "from_gup"
->   parameter. Similar use as above.
-> 
-> * Change the block layer, and several file systems, to use
->   put_user_page*().
-> 
-> [1] https://urldefense.proofpoint.com/v2/url?u=https-3A__lore.kernel.org_r_20190724012606.25844-2D2-2Djhubbard-40nvidia.com&d=DwIDaQ&c=RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE&r=1ktT0U2YS_I8Zz2o-MS1YcCAzWZ6hFGtyTgvVMGM7gI&m=FpFhv2rjbKCAYGmO6Hy8WJAottr1Qz_mDKDLObQ40FU&s=q-_mX3daEr22WbdZMElc_ZbD8L9oGLD7U0xLeyJ661Y&e= 
->     And please note the correction email that I posted as a follow-up,
->     if you're looking closely at that patch. :) The fixed version is
->     included here.
-> 
-> John Hubbard (3):
->   mm/gup: add make_dirty arg to put_user_pages_dirty_lock()
->   block: bio_release_pages: use flags arg instead of bool
->   fs/ceph: fix a build warning: returning a value from void function
-> 
-> Jérôme Glisse (9):
->   iov_iter: add helper to test if an iter would use GUP v2
->   block: bio_release_pages: convert put_page() to put_user_page*()
->   block_dev: convert put_page() to put_user_page*()
->   fs/nfs: convert put_page() to put_user_page*()
->   vhost-scsi: convert put_page() to put_user_page*()
->   fs/cifs: convert put_page() to put_user_page*()
->   fs/fuse: convert put_page() to put_user_page*()
->   fs/ceph: convert put_page() to put_user_page*()
->   9p/net: convert put_page() to put_user_page*()
-> 
->  block/bio.c                                |  81 ++++++++++++---
->  drivers/infiniband/core/umem.c             |   5 +-
->  drivers/infiniband/hw/hfi1/user_pages.c    |   5 +-
->  drivers/infiniband/hw/qib/qib_user_pages.c |   5 +-
->  drivers/infiniband/hw/usnic/usnic_uiom.c   |   5 +-
->  drivers/infiniband/sw/siw/siw_mem.c        |   8 +-
->  drivers/vhost/scsi.c                       |  13 ++-
->  fs/block_dev.c                             |  22 +++-
->  fs/ceph/debugfs.c                          |   2 +-
->  fs/ceph/file.c                             |  62 ++++++++---
->  fs/cifs/cifsglob.h                         |   3 +
->  fs/cifs/file.c                             |  22 +++-
->  fs/cifs/misc.c                             |  19 +++-
->  fs/direct-io.c                             |   2 +-
->  fs/fuse/dev.c                              |  22 +++-
->  fs/fuse/file.c                             |  53 +++++++---
->  fs/nfs/direct.c                            |  10 +-
->  include/linux/bio.h                        |  22 +++-
->  include/linux/mm.h                         |   5 +-
->  include/linux/uio.h                        |  11 ++
->  mm/gup.c                                   | 115 +++++++++------------
->  net/9p/trans_common.c                      |  14 ++-
->  net/9p/trans_common.h                      |   3 +-
->  net/9p/trans_virtio.c                      |  18 +++-
->  24 files changed, 357 insertions(+), 170 deletions(-)
-> 
+diff --git a/fs/cifs/cifs_ioctl.h b/fs/cifs/cifs_ioctl.h
+index 086ddc5108af..6c3bd07868d7 100644
+--- a/fs/cifs/cifs_ioctl.h
++++ b/fs/cifs/cifs_ioctl.h
+@@ -46,6 +46,7 @@ struct smb_snapshot_array {
+ /* query_info flags */
+ #define PASSTHRU_QUERY_INFO	0x00000000
+ #define PASSTHRU_FSCTL		0x00000001
++#define PASSTHRU_SET_INFO	0x00000002
+ struct smb_query_info {
+ 	__u32   info_type;
+ 	__u32   file_info_class;
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 592aa11aaf57..fc464dc20b30 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -1369,7 +1369,10 @@ smb2_ioctl_query_info(const unsigned int xid,
+ 	struct cifs_fid fid;
+ 	struct kvec qi_iov[1];
+ 	struct kvec io_iov[SMB2_IOCTL_IOV_SIZE];
++	struct kvec si_iov[SMB2_SET_INFO_IOV_SIZE];
+ 	struct kvec close_iov[1];
++	unsigned int size[2];
++	void *data[2];
+ 
+ 	memset(rqst, 0, sizeof(rqst));
+ 	resp_buftype[0] = resp_buftype[1] = resp_buftype[2] = CIFS_NO_BUFFER;
+@@ -1404,7 +1407,6 @@ smb2_ioctl_query_info(const unsigned int xid,
+ 
+ 	memset(&oparms, 0, sizeof(oparms));
+ 	oparms.tcon = tcon;
+-	oparms.desired_access = FILE_READ_ATTRIBUTES | READ_CONTROL;
+ 	oparms.disposition = FILE_OPEN;
+ 	if (is_dir)
+ 		oparms.create_options = CREATE_NOT_FILE;
+@@ -1413,9 +1415,6 @@ smb2_ioctl_query_info(const unsigned int xid,
+ 	oparms.fid = &fid;
+ 	oparms.reconnect = false;
+ 
+-	/*
+-	 * FSCTL codes encode the special access they need in the fsctl code.
+-	 */
+ 	if (qi.flags & PASSTHRU_FSCTL) {
+ 		switch (qi.info_type & FSCTL_DEVICE_ACCESS_MASK) {
+ 		case FSCTL_DEVICE_ACCESS_FILE_READ_WRITE_ACCESS:
+@@ -1431,6 +1430,10 @@ smb2_ioctl_query_info(const unsigned int xid,
+ 			oparms.desired_access = GENERIC_WRITE;
+ 			break;
+ 		}
++	} else if (qi.flags & PASSTHRU_SET_INFO) {
++		oparms.desired_access = GENERIC_WRITE;
++	} else {
++		oparms.desired_access = FILE_READ_ATTRIBUTES | READ_CONTROL;
+ 	}
+ 
+ 	rc = SMB2_open_init(tcon, &rqst[0], &oplock, &oparms, path);
+@@ -1454,6 +1457,24 @@ smb2_ioctl_query_info(const unsigned int xid,
+ 					     qi.output_buffer_length,
+ 					     CIFSMaxBufSize);
+ 		}
++	} else if (qi.flags == PASSTHRU_SET_INFO) {
++		/* Can eventually relax perm check since server enforces too */
++		if (!capable(CAP_SYS_ADMIN))
++			rc = -EPERM;
++		else  {
++			memset(&si_iov, 0, sizeof(si_iov));
++			rqst[1].rq_iov = si_iov;
++			rqst[1].rq_nvec = 1;
++
++			size[0] = 8;
++			data[0] = buffer;
++
++			rc = SMB2_set_info_init(tcon, &rqst[1],
++					COMPOUND_FID, COMPOUND_FID,
++					current->tgid,
++					FILE_END_OF_FILE_INFORMATION,
++					SMB2_O_INFO_FILE, 0, data, size);
++		}
+ 	} else if (qi.flags == PASSTHRU_QUERY_INFO) {
+ 		memset(&qi_iov, 0, sizeof(qi_iov));
+ 		rqst[1].rq_iov = qi_iov;
+-- 
+2.13.6
 
