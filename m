@@ -2,168 +2,170 @@ Return-Path: <SRS0=SjeK=VW=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B540BC76190
-	for <linux-cifs@archiver.kernel.org>; Thu, 25 Jul 2019 04:49:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CC59C7618B
+	for <linux-cifs@archiver.kernel.org>; Thu, 25 Jul 2019 13:25:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8A3F52190F
-	for <linux-cifs@archiver.kernel.org>; Thu, 25 Jul 2019 04:49:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C4A82190F
+	for <linux-cifs@archiver.kernel.org>; Thu, 25 Jul 2019 13:25:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F0DJIeB+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P2+Z949f"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390238AbfGYEtk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 25 Jul 2019 00:49:40 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:42619 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390204AbfGYEtj (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 25 Jul 2019 00:49:39 -0400
-Received: by mail-pg1-f196.google.com with SMTP id t132so22335759pgb.9
-        for <linux-cifs@vger.kernel.org>; Wed, 24 Jul 2019 21:49:39 -0700 (PDT)
+        id S1727090AbfGYNZA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 25 Jul 2019 09:25:00 -0400
+Received: from mail-lf1-f41.google.com ([209.85.167.41]:46169 "EHLO
+        mail-lf1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726653AbfGYNY7 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 25 Jul 2019 09:24:59 -0400
+Received: by mail-lf1-f41.google.com with SMTP id z15so30251499lfh.13
+        for <linux-cifs@vger.kernel.org>; Thu, 25 Jul 2019 06:24:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=//+z3x/eqpwOoFdJwYQGA5fYKQHQ8UziR4hGSJfeAsk=;
-        b=F0DJIeB+pZ36AiWlOZKd2AY+y4HphlroeRh2xr/s2OVLwQErBrBUbS9jrqdta6Ke+B
-         sljXvNII5kvAAySswxBC8bkaaTkJvFCT4N6goEVslAqzwqDnc3WuTNi8zyV0o/wUWdpr
-         7MxY+mhZeT21fWDOX5AyzaY+6GRmG2bpx0z8u8JmpKDazNzwWae63BR92Y/WUbe939dy
-         5DJtYEjGJirxpfsrYUzOiKf3HMsKMZmdmmqRfes3Q4YtZdhxoiwLkhVGEL1ODN+En6N2
-         fBXSR7nn5eldiPrHn7gA2HD8tQuyMa91LV/Kqy+i0H4/Zm379h/n6qri+7kKwfgCv8yB
-         8wyQ==
+         :cc:content-transfer-encoding;
+        bh=HF/IqXw/Vpz9m4C58NJz0K6HAN5i01s1ftF5JNhXdtA=;
+        b=P2+Z949fvMsSI03rbgcP7zxp3k+JcqO0agZx9BqExouKK24O471MEcONyk5p4oKOsY
+         sB4EpF6t+yQ7fpTSMyro86l4dguDXcG4/1bktNyKBy3Jdu5eGOXMbcVnCy2sM4mwG0HP
+         h84JY037WOuFAX90hvMPI3kZdiaXGjDGk208gHz7M5QvPOV9kzlRkofCIy7ZPm6Q/5hp
+         Zw6GK74G1BQ+maVeUvXbSuy2y62DbBf8b4SRgd1LtZnpiR98GrlPn7m8KEPjB+Q/L34J
+         u9Jrl1GW/lGbNXTZlwU92nIpsk5xnsUU9W8kG00OQdNsPH58tsVuDMYMjpIHW8nFeU85
+         ifmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=//+z3x/eqpwOoFdJwYQGA5fYKQHQ8UziR4hGSJfeAsk=;
-        b=DZyDtAZWmwyxDMBvN6+RoZKa5fzkivJ3bx+9rcXEhYthDJnz6+ImxJ7hn+Sb06O0Z4
-         uOr3wW1t34NUMYEX2Rc/A8BI+JpORbqzMErmcZ7XPl/u3K4vrUI2ditVHT20zJ45F9O/
-         hEKIvKw3l/g8+fp2uqbk3z+6s4kQyniakg90elcTOCpJxC0J/auCquq43Vozur6OZqEt
-         xz6liESEdEW9dwRxASzbjlVVIs/MmUwwP4FN9QPBPvOyXJxMB4vJFGH93+2sO2S377yQ
-         jKKRD6TfNt0TBtNDu1e+JqgrNd6Qy0Z0oUrpBg7P5hyjTCZQbZwtBcuzqOVg+K91KEZT
-         +Szw==
-X-Gm-Message-State: APjAAAUDPiknRtk7Wy/EM6279RP5Tm634GcOyGmcx3gmvACr9X1eN3IO
-        LUojbAWYfxw67XV0Nqa66RP+JSmdSzzruDTpkiw=
-X-Google-Smtp-Source: APXvYqw6HEiRfT2luQ7ewzXojyf7Rt3uH+z+EOR6yh3AoBQX65auW1zS/u1r1e2v++bmCgD0biXzyqaCXuxn8FDxID0=
-X-Received: by 2002:a17:90a:360c:: with SMTP id s12mr92253537pjb.30.1564030178766;
- Wed, 24 Jul 2019 21:49:38 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=HF/IqXw/Vpz9m4C58NJz0K6HAN5i01s1ftF5JNhXdtA=;
+        b=WJGurlxuMqTseqIgTkJybwEcsgpeuO025i7g7unJSU39SmY1Q1AzibdCOfC/sPlp9L
+         +K/BfKdjIOdlMH9fT+nT5Q5EvzyrYwR9wRnuCNA6HfR5BFDwyOc/eB7kyleN/ukHxEFw
+         zMIdAn0WYIdYS6G9nrdHNX25EgxnV9URp3M5DNTO3mEvCT68UQdplVjhgEC3a6rcL8OW
+         kh6zs2j+ADzNx8wjLLfcvHWKHCUA6VM3ijtxLY1EzmmgGu6IVWL2UuFxMC0x4PxTLwiQ
+         Kr2i8AdmOq6qurfF52E6LZBVR6sPuAv1jknh1xlHI1D93qizTpYmmXPyjjtLpH3zdRoj
+         UsPA==
+X-Gm-Message-State: APjAAAXkNXq1/nQx6r5qRPpK4ovoaAuSXyfV2NVKbjB6P46qh2sAjzFi
+        lqBa7x/ilAV84E8I8SRyNvMEkjAAqrvirikBXv+FUFrc5QyYxQ==
+X-Google-Smtp-Source: APXvYqxpDMjUcbPtuHd/7HiQcirbwD8J0QrtSrauraTLENYkD8TpMYhCyduXDMtwsGAj2r4V1cLemUtCxZIU7z36yJc=
+X-Received: by 2002:ac2:47e8:: with SMTP id b8mr26028196lfp.84.1564061096892;
+ Thu, 25 Jul 2019 06:24:56 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190725030843.9412-1-lsahlber@redhat.com>
-In-Reply-To: <20190725030843.9412-1-lsahlber@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 24 Jul 2019 23:49:27 -0500
-Message-ID: <CAH2r5mu2wMjbDGFOBSWTzqbnTaAe9dM2ys20QaXuZ1maVygcqw@mail.gmail.com>
-Subject: Re: [PATCH] cifs: add passthrough for smb2 setinfo
-To:     Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+References: <CAO3V83L1Q9jCLBsjHgFE1jw2PPi_sHtQz4geDKC4jEPWkhNYBg@mail.gmail.com>
+ <CAO3V83+iZRAQRZ5YzivPS3di0QM=-dJOg8rnVK1icUuuESd+=g@mail.gmail.com> <87zhlnvesj.fsf@suse.com>
+In-Reply-To: <87zhlnvesj.fsf@suse.com>
+From:   Wout Mertens <wout.mertens@gmail.com>
+Date:   Thu, 25 Jul 2019 15:24:45 +0200
+Message-ID: <CAO3V83+dmZNNaDQ14up=SL+pGv7ndiqG0y_rE7ciFyy1oNQCQw@mail.gmail.com>
+Subject: Re: Fwd: mount.cifs fails but smbclient succeeds
+To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tentatively merged into cifs-2.6.git for-next pending more testing
+Thank you so much Aur=C3=A9lien, smbcmp was really helpful!
 
-On Wed, Jul 24, 2019 at 10:09 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
+Is there a way to force mount.cifs to use DFS? (cifs-utils 6.8, kernel 4.19=
+.57)
+
+It turns out that when smbclient connects, it sends that it supports
+DFS, but mount.cifs sends that it does NOT support DFS. Then smbclient
+connects to the host and figures out the correct server to talk to,
+and connects as needed, but mount.cifs just fails to do that.
+
+What I did was to sniff the smbclient traffic for the server that has
+the path I wanted, and then mount that directly using mount.cifs. That
+works, but I'm worried that if they move things around it will break
+again, or maybe they'll split the mount in two servers.
+
+Here's the comparison: (-: smbclient, +: mount.cifs)
+=3D=3D=3D=3D=3D=3D
+smbclient first  has an extra "Negotiate Protocol Request" + Response,
+which the mount.cifs doesn't do. Then there's a common "Negotiate
+Protocol Request" + Response,
+> Session Setup Request, NTLMSSP_NEGOTIATE  (same with the subsequent NTLMS=
+SP_AUTH)
+         Server Component: SMB2
+     SMB2Header Length: 64
+-        Credit Charge: 1
++        Credit Charge: 0
+         Channel Sequence: 0
+         Reserved: 0000
+         Command: Session Setup (1)
+-        Credits requested: 8192
+-        Flags: 0x00000010, Priority
++        Credits requested: 130
++        Flags: 0x00000000
+             .... .... .... .... .... .... .... ...0 =3D Response: This
+is a REQUEST
+             .... .... .... .... .... .... .... ..0. =3D Async command:
+This is a SYNC command
+             .... .... .... .... .... .... .... .0.. =3D Chained: This
+pdu is NOT a chained command
+             .... .... .... .... .... .... .... 0... =3D Signing: This
+pdu is NOT signed
+-            .... .... .... .... .... .... .001 .... =3D Priority: This
+pdu contains a PRIORITY
++            .... .... .... .... .... .... .000 .... =3D Priority: This
+pdu does NOT contain a PRIORITY
+             ...0 .... .... .... .... .... .... .... =3D DFS operation:
+This is a normal operation
+             ..0. .... .... .... .... .... .... .... =3D Replay
+operation: This is NOT a replay operation
+         Chain Offset: 0x00000000
+-        Message ID: Unknown (2)
+-        Process Id: 0x00000000
++        Message ID: Unknown (1)
++        Process Id: 0x000040fc
+[...]
+-        Security mode: 0x01, Signing enabled
+-            .... ...1 =3D Signing enabled: True
+-            .... ..0. =3D Signing required: False
+-        Capabilities: 0x00000001, DFS
+-            .... .... .... .... .... .... .... ...1 =3D DFS: This host
+supports DFS
++        Security mode: 0x02, Signing required
++            .... ...0 =3D Signing enabled: False
++            .... ..1. =3D Signing required: True
++        Capabilities: 0x00000000
++            .... .... .... .... .... .... .... ...0 =3D DFS: This host
+does NOT support DFS
+
+After that, they both do
+
+> Session Setup Response
+> Tree Connect Request Tree: \\corp.local\IPC$
+> Tree Connect Response
+
+and then smclient does
+> Ioctl Request FSCTL_DFS_GET_REFERRALS, File: \corp.local\ib
+but mount.cifs does
+> Ioctl Request FSCTL_VALIDATE_NEGOTIATE_INFO
+=3D=3D=3D=3D=3D=3D
+
+I saw that there were fixes in 5.0 regarding crediting and DFS
+reconnect, would they make a difference?
+
+Wout.
+
+On Tue, Jul 9, 2019 at 9:38 AM Aur=C3=A9lien Aptel <aaptel@suse.com> wrote:
 >
-> Add support to send smb2 set-info commands from userspace.
+> "Wout Mertens" <wout.mertens@gmail.com> writes:
+> > Any suggestions? This is driving me crazy :-/
 >
-> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> ---
->  fs/cifs/cifs_ioctl.h |  1 +
->  fs/cifs/smb2ops.c    | 29 +++++++++++++++++++++++++----
->  2 files changed, 26 insertions(+), 4 deletions(-)
+> If you make a network capture of smbclient connecting and a capture of
+> mount.cifs failing you can use smbcmp [1] to compare them.
 >
-> diff --git a/fs/cifs/cifs_ioctl.h b/fs/cifs/cifs_ioctl.h
-> index 086ddc5108af..6c3bd07868d7 100644
-> --- a/fs/cifs/cifs_ioctl.h
-> +++ b/fs/cifs/cifs_ioctl.h
-> @@ -46,6 +46,7 @@ struct smb_snapshot_array {
->  /* query_info flags */
->  #define PASSTHRU_QUERY_INFO    0x00000000
->  #define PASSTHRU_FSCTL         0x00000001
-> +#define PASSTHRU_SET_INFO      0x00000002
->  struct smb_query_info {
->         __u32   info_type;
->         __u32   file_info_class;
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 592aa11aaf57..fc464dc20b30 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -1369,7 +1369,10 @@ smb2_ioctl_query_info(const unsigned int xid,
->         struct cifs_fid fid;
->         struct kvec qi_iov[1];
->         struct kvec io_iov[SMB2_IOCTL_IOV_SIZE];
-> +       struct kvec si_iov[SMB2_SET_INFO_IOV_SIZE];
->         struct kvec close_iov[1];
-> +       unsigned int size[2];
-> +       void *data[2];
+> https://github.com/aaptel/smbcmp
 >
->         memset(rqst, 0, sizeof(rqst));
->         resp_buftype[0] = resp_buftype[1] = resp_buftype[2] = CIFS_NO_BUFFER;
-> @@ -1404,7 +1407,6 @@ smb2_ioctl_query_info(const unsigned int xid,
->
->         memset(&oparms, 0, sizeof(oparms));
->         oparms.tcon = tcon;
-> -       oparms.desired_access = FILE_READ_ATTRIBUTES | READ_CONTROL;
->         oparms.disposition = FILE_OPEN;
->         if (is_dir)
->                 oparms.create_options = CREATE_NOT_FILE;
-> @@ -1413,9 +1415,6 @@ smb2_ioctl_query_info(const unsigned int xid,
->         oparms.fid = &fid;
->         oparms.reconnect = false;
->
-> -       /*
-> -        * FSCTL codes encode the special access they need in the fsctl code.
-> -        */
->         if (qi.flags & PASSTHRU_FSCTL) {
->                 switch (qi.info_type & FSCTL_DEVICE_ACCESS_MASK) {
->                 case FSCTL_DEVICE_ACCESS_FILE_READ_WRITE_ACCESS:
-> @@ -1431,6 +1430,10 @@ smb2_ioctl_query_info(const unsigned int xid,
->                         oparms.desired_access = GENERIC_WRITE;
->                         break;
->                 }
-> +       } else if (qi.flags & PASSTHRU_SET_INFO) {
-> +               oparms.desired_access = GENERIC_WRITE;
-> +       } else {
-> +               oparms.desired_access = FILE_READ_ATTRIBUTES | READ_CONTROL;
->         }
->
->         rc = SMB2_open_init(tcon, &rqst[0], &oplock, &oparms, path);
-> @@ -1454,6 +1457,24 @@ smb2_ioctl_query_info(const unsigned int xid,
->                                              qi.output_buffer_length,
->                                              CIFSMaxBufSize);
->                 }
-> +       } else if (qi.flags == PASSTHRU_SET_INFO) {
-> +               /* Can eventually relax perm check since server enforces too */
-> +               if (!capable(CAP_SYS_ADMIN))
-> +                       rc = -EPERM;
-> +               else  {
-> +                       memset(&si_iov, 0, sizeof(si_iov));
-> +                       rqst[1].rq_iov = si_iov;
-> +                       rqst[1].rq_nvec = 1;
-> +
-> +                       size[0] = 8;
-> +                       data[0] = buffer;
-> +
-> +                       rc = SMB2_set_info_init(tcon, &rqst[1],
-> +                                       COMPOUND_FID, COMPOUND_FID,
-> +                                       current->tgid,
-> +                                       FILE_END_OF_FILE_INFORMATION,
-> +                                       SMB2_O_INFO_FILE, 0, data, size);
-> +               }
->         } else if (qi.flags == PASSTHRU_QUERY_INFO) {
->                 memset(&qi_iov, 0, sizeof(qi_iov));
->                 rqst[1].rq_iov = qi_iov;
 > --
-> 2.13.6
->
-
-
--- 
-Thanks,
-
-Steve
+> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+> SUSE Linux GmbH, Maxfeldstra=C3=9Fe 5, 90409 N=C3=BCrnberg, Germany
+> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 21284 (AG N=C3=
+=BCrnberg)
