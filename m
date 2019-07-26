@@ -4,48 +4,49 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4697CC76190
-	for <linux-cifs@archiver.kernel.org>; Fri, 26 Jul 2019 13:58:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13FFDC76190
+	for <linux-cifs@archiver.kernel.org>; Fri, 26 Jul 2019 13:59:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 173E922CE5
-	for <linux-cifs@archiver.kernel.org>; Fri, 26 Jul 2019 13:58:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E119D22CE5
+	for <linux-cifs@archiver.kernel.org>; Fri, 26 Jul 2019 13:59:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564149503;
-	bh=2MXhqljQf7IMFqHmhVvDjqDPhscxIYuwMTCiLHA670Q=;
+	s=default; t=1564149569;
+	bh=uIbs0tM0t17lsosykX6s17QGS1UOz8ioMvBtnf/X32M=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=R5sT01gxEzJAsnAi9NplObErfkTOkr+AuvnAy+ZT3LjVHGuWVbGPJxd79PTUJV5ax
-	 gfIkkdAnGOq1ERw3zAXxU/wer2Pk3tai9PR0fLqWMXIEI3y7jF7dychXbwYWWn5Fk3
-	 /c6OuXhWNCYFXh0rTk7aUvXZ8dbWwnTFbjJrBrU4=
+	b=mgKnmExKfxNsXY2kwIzrDed+0+BGElw+dFAdTYpWiF+wAWlOcOL137VYy6RwxZQEr
+	 VIxPC8U1zGFqCIjKSolJhbppZaCvAze5rwrZVI39xU0dfzV9o3106hKGbxqUIfs2Lr
+	 vQZdTstMTzHu1+U0aXRoyOU5gQNKAHNQzRIQ8194=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728437AbfGZN6W (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 26 Jul 2019 09:58:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46850 "EHLO mail.kernel.org"
+        id S2387472AbfGZNkc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 26 Jul 2019 09:40:32 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46552 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387561AbfGZNko (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 26 Jul 2019 09:40:44 -0400
+        id S1727681AbfGZNk3 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 26 Jul 2019 09:40:29 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 95BF222BEF;
-        Fri, 26 Jul 2019 13:40:42 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id C905C22BF5;
+        Fri, 26 Jul 2019 13:40:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564148443;
-        bh=2MXhqljQf7IMFqHmhVvDjqDPhscxIYuwMTCiLHA670Q=;
+        s=default; t=1564148428;
+        bh=uIbs0tM0t17lsosykX6s17QGS1UOz8ioMvBtnf/X32M=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=SSkyK/iocW2pj3MgCUwWeqbjYK6lvSnK1ToWFB8TaueyASCdnjwz/RemsLMC+2Jve
-         eCw3fSuCAuEaqJWCwLbmvUoa1Hly9yH+8D5AlRdnr/ttfAdiJnTpHYnrIidVuZyag4
-         YJZwghLA7ghrUstR2ek3LTx1zzGFC0b5+UGY9Dms=
+        b=FftBAWT4UBRYlUsRHErC51i0REzoW9YSSn/oHmPvUk7OLEtW6mzNl5/0SWX1RdvNy
+         hKaPiaRyhSjdivoam+PdqwY9u8RQeZ7r+tAK4JVBPmVNvKK1OI0PTTq5ny8r7n+G82
+         YU9eWlxHcw5583yhzYY83/+qtE795FxyVMw6IeK4=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        Pavel Shilovsky <pshilov@microsoft.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.2 41/85] cifs: fix crash in cifs_dfs_do_automount
-Date:   Fri, 26 Jul 2019 09:38:51 -0400
-Message-Id: <20190726133936.11177-41-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.2 31/85] cifs: Fix a race condition with cifs_echo_request
+Date:   Fri, 26 Jul 2019 09:38:41 -0400
+Message-Id: <20190726133936.11177-31-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190726133936.11177-1-sashal@kernel.org>
 References: <20190726133936.11177-1-sashal@kernel.org>
@@ -60,64 +61,61 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 From: Ronnie Sahlberg <lsahlber@redhat.com>
 
-[ Upstream commit ce465bf94b70f03136171a62b607864f00093b19 ]
+[ Upstream commit f2caf901c1b7ce65f9e6aef4217e3241039db768 ]
 
-RHBZ: 1649907
+There is a race condition with how we send (or supress and don't send)
+smb echos that will cause the client to incorrectly think the
+server is unresponsive and thus needs to be reconnected.
 
-Fix a crash that happens while attempting to mount a DFS referral from the same server on the root of a filesystem.
+Summary of the race condition:
+ 1) Daisy chaining scheduling creates a gap.
+ 2) If traffic comes unfortunate shortly after
+    the last echo, the planned echo is suppressed.
+ 3) Due to the gap, the next echo transmission is delayed
+    until after the timeout, which is set hard to twice
+    the echo interval.
+
+This is fixed by changing the timeouts from 2 to three times the echo interval.
+
+Detailed description of the bug: https://lutz.donnerhacke.de/eng/Blog/Groundhog-Day-with-SMB-remount
 
 Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/cifs/connect.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+ fs/cifs/connect.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 0872188ce3c6..e508613f09ff 100644
+index 8dd6637a3cbb..0872188ce3c6 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -4459,11 +4459,13 @@ cifs_are_all_path_components_accessible(struct TCP_Server_Info *server,
- 					unsigned int xid,
- 					struct cifs_tcon *tcon,
- 					struct cifs_sb_info *cifs_sb,
--					char *full_path)
-+					char *full_path,
-+					int added_treename)
+@@ -706,10 +706,10 @@ static bool
+ server_unresponsive(struct TCP_Server_Info *server)
  {
- 	int rc;
- 	char *s;
- 	char sep, tmp;
-+	int skip = added_treename ? 1 : 0;
- 
- 	sep = CIFS_DIR_SEP(cifs_sb);
- 	s = full_path;
-@@ -4478,7 +4480,14 @@ cifs_are_all_path_components_accessible(struct TCP_Server_Info *server,
- 		/* next separator */
- 		while (*s && *s != sep)
- 			s++;
--
-+		/*
-+		 * if the treename is added, we then have to skip the first
-+		 * part within the separators
-+		 */
-+		if (skip) {
-+			skip = 0;
-+			continue;
-+		}
- 		/*
- 		 * temporarily null-terminate the path at the end of
- 		 * the current component
-@@ -4526,8 +4535,7 @@ static int is_path_remote(struct cifs_sb_info *cifs_sb, struct smb_vol *vol,
- 
- 	if (rc != -EREMOTE) {
- 		rc = cifs_are_all_path_components_accessible(server, xid, tcon,
--							     cifs_sb,
--							     full_path);
-+			cifs_sb, full_path, tcon->Flags & SMB_SHARE_IS_IN_DFS);
- 		if (rc != 0) {
- 			cifs_dbg(VFS, "cannot query dirs between root and final path, "
- 				 "enabling CIFS_MOUNT_USE_PREFIX_PATH\n");
+ 	/*
+-	 * We need to wait 2 echo intervals to make sure we handle such
++	 * We need to wait 3 echo intervals to make sure we handle such
+ 	 * situations right:
+ 	 * 1s  client sends a normal SMB request
+-	 * 2s  client gets a response
++	 * 3s  client gets a response
+ 	 * 30s echo workqueue job pops, and decides we got a response recently
+ 	 *     and don't need to send another
+ 	 * ...
+@@ -718,9 +718,9 @@ server_unresponsive(struct TCP_Server_Info *server)
+ 	 */
+ 	if ((server->tcpStatus == CifsGood ||
+ 	    server->tcpStatus == CifsNeedNegotiate) &&
+-	    time_after(jiffies, server->lstrp + 2 * server->echo_interval)) {
++	    time_after(jiffies, server->lstrp + 3 * server->echo_interval)) {
+ 		cifs_dbg(VFS, "Server %s has not responded in %lu seconds. Reconnecting...\n",
+-			 server->hostname, (2 * server->echo_interval) / HZ);
++			 server->hostname, (3 * server->echo_interval) / HZ);
+ 		cifs_reconnect(server);
+ 		wake_up(&server->response_q);
+ 		return true;
 -- 
 2.20.1
 
