@@ -2,98 +2,120 @@ Return-Path: <SRS0=vxna=VX=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8818C7618B
-	for <linux-cifs@archiver.kernel.org>; Fri, 26 Jul 2019 13:05:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00EAAC7618B
+	for <linux-cifs@archiver.kernel.org>; Fri, 26 Jul 2019 13:51:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B8A9A218D4
-	for <linux-cifs@archiver.kernel.org>; Fri, 26 Jul 2019 13:05:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CD3AF22CE5
+	for <linux-cifs@archiver.kernel.org>; Fri, 26 Jul 2019 13:51:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564146345;
-	bh=pkotHNdt+yFvlEm4ZJemYwQrX120R837wGXa9j6uZM0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
-	b=xxvMVuH+H9f66TEW9lmNkQ4l86/FGpNJBkcKDktNu3CVCvo35cdE69G/dZ/JifdUp
-	 mYFtMWXFf3AZEHFkmUEb3OqMA3GidmrxKnlQIDBsZe/ceEbHLVihTHu9vfbeZzB6Uo
-	 7EFmZfDafGarRQWjNC7nZraGd2EPBo9jfQ7TQZrg=
+	s=default; t=1564149107;
+	bh=HSCfUKztUyx1dQXphz4lyuty68J8wkhEGnvJNS3JVGw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=Jll1OKPXsBtRf+CaJK4qNvOsdxlZhv19MjMnCP+GDVexKrytL8R0Onny6XCGfILYk
+	 rUcgZVJv8HyjgzjksDeKFxB04kcdmMKnXnqH/2bdEV6dsdiGelzsc8QwD9RfaQtJ8S
+	 mEcum8VvanhKFGpoW/lTgqPSimdtaSxZLvXKvbgo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726260AbfGZNFp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 26 Jul 2019 09:05:45 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:54662 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726086AbfGZNFp (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 26 Jul 2019 09:05:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Subject:Cc:To:
-        From:Date:Sender:Reply-To:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=v25fSyTOpn+HLVJ1/RYUYjo/p2HKkKXuypllJV6JuFU=; b=FGTl2rF5Ekw99U5eWA0qO4ViY
-        ezxgPoNckrfd02rKeR5DfhI5n58vJTcEz7aQ3diHZkRmGndI5Rrlekc33Ay4TibbLOwpG1XKCSloG
-        82pJRxtCcnQvPslNG7xO/8DHeER9qlTWSUhlaF/iNE0YUnkdxnIGvBgg9Brpdp4iVK9JkJjbm0TvY
-        TcCvfrG3NaxcqzRwVsiX1+l5U3fjf1yQEEnGnZRs2iZazrP26MkKBj4gTVChmnzy3Hz3krFh/Kx2g
-        S6dj3Qi5GKN2Rfpl0jR+wq9OXeL8jT6dpW75i/Mr7cpWYS51GnMWuFS7A6xMmFALsHG7f3ly85U0p
-        sDY3Ty9HA==;
-Received: from [179.95.31.157] (helo=coco.lan)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
-        id 1hqzun-0004Yn-F9; Fri, 26 Jul 2019 13:05:42 +0000
-Date:   Fri, 26 Jul 2019 10:05:33 -0300
-From:   Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-To:     Jonathan Corbet <corbet@lwn.net>
-Cc:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-pci@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-scsi@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-hwmon@vger.kernel.org, linux-spi@vger.kernel.org,
-        linux-iio@vger.kernel.org, linux-rtc@vger.kernel.org,
-        netdev@vger.kernel.org, linux-parisc@vger.kernel.org,
-        openrisc@lists.librecores.org, devel@driverdev.osuosl.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        devel@lists.orangefs.org, dmaengine@vger.kernel.org,
-        alsa-devel@alsa-project.org, linux-mips@vger.kernel.org,
-        linux-wireless@vger.kernel.org, rcu@vger.kernel.org
-Subject: Re: [PATCH v2 00/26] ReST conversion of text files without .txt
- extension
-Message-ID: <20190726100521.5d379300@coco.lan>
-In-Reply-To: <cover.1564145354.git.mchehab+samsung@kernel.org>
-References: <cover.1564145354.git.mchehab+samsung@kernel.org>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S2387455AbfGZNvl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 26 Jul 2019 09:51:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51756 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727328AbfGZNnu (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 26 Jul 2019 09:43:50 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8143C22CD3;
+        Fri, 26 Jul 2019 13:43:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1564148629;
+        bh=HSCfUKztUyx1dQXphz4lyuty68J8wkhEGnvJNS3JVGw=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=HlxfCBG4rsbPRTzqEpzZZfP49h9gCfM2W1xoERCjPELQ5z//EuHpyxPfdd1TpZzR0
+         0dCNL09cQTp2Fv9u+tBsW4vqmKLCdpCuLwl82O033FvJLRWBMY0nmhVG3KfJPbE16S
+         AhhxuKthPKnzZzXxvrWs4qu8C6fFQUl/NFr8qsZY=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        Pavel Shilovsky <pshilov@microsoft.com>,
+        Steve French <stfrench@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.14 12/37] cifs: Fix a race condition with cifs_echo_request
+Date:   Fri, 26 Jul 2019 09:43:07 -0400
+Message-Id: <20190726134332.12626-12-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190726134332.12626-1-sashal@kernel.org>
+References: <20190726134332.12626-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Em Fri, 26 Jul 2019 09:51:10 -0300
-Mauro Carvalho Chehab <mchehab+samsung@kernel.org> escreveu:
+From: Ronnie Sahlberg <lsahlber@redhat.com>
 
-> This series converts the text files under Documentation with doesn't end
-> neither .txt or .rst and are not part of ABI or features.
-> 
-> This series is at:
-> 	https://git.linuxtv.org/mchehab/experimental.git/log/?h=rst_for_5_4_v3
-> 
-> And it is based on yesterday's upstream tree.
-> 
-> After this series, we have ~320 files left to be converted to ReST.
-> 
-> v2:
->   - Added 3 files submitted for v5.3 that weren't merged yet;
->   - markdown patch broken into two, per Rob's request;
->   - rebased on the top of upstream master branch
-> 
-> Mauro Carvalho Chehab (26):
+[ Upstream commit f2caf901c1b7ce65f9e6aef4217e3241039db768 ]
 
->   docs: ABI: remove extension from sysfs-class-mic.txt
+There is a race condition with how we send (or supress and don't send)
+smb echos that will cause the client to incorrectly think the
+server is unresponsive and thus needs to be reconnected.
 
-    ^ In time: this one was already merged.
+Summary of the race condition:
+ 1) Daisy chaining scheduling creates a gap.
+ 2) If traffic comes unfortunate shortly after
+    the last echo, the planned echo is suppressed.
+ 3) Due to the gap, the next echo transmission is delayed
+    until after the timeout, which is set hard to twice
+    the echo interval.
 
-Thanks,
-Mauro
+This is fixed by changing the timeouts from 2 to three times the echo interval.
+
+Detailed description of the bug: https://lutz.donnerhacke.de/eng/Blog/Groundhog-Day-with-SMB-remount
+
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/cifs/connect.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 33cd844579ae..57c62ff4e8d6 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -554,10 +554,10 @@ static bool
+ server_unresponsive(struct TCP_Server_Info *server)
+ {
+ 	/*
+-	 * We need to wait 2 echo intervals to make sure we handle such
++	 * We need to wait 3 echo intervals to make sure we handle such
+ 	 * situations right:
+ 	 * 1s  client sends a normal SMB request
+-	 * 2s  client gets a response
++	 * 3s  client gets a response
+ 	 * 30s echo workqueue job pops, and decides we got a response recently
+ 	 *     and don't need to send another
+ 	 * ...
+@@ -566,9 +566,9 @@ server_unresponsive(struct TCP_Server_Info *server)
+ 	 */
+ 	if ((server->tcpStatus == CifsGood ||
+ 	    server->tcpStatus == CifsNeedNegotiate) &&
+-	    time_after(jiffies, server->lstrp + 2 * server->echo_interval)) {
++	    time_after(jiffies, server->lstrp + 3 * server->echo_interval)) {
+ 		cifs_dbg(VFS, "Server %s has not responded in %lu seconds. Reconnecting...\n",
+-			 server->hostname, (2 * server->echo_interval) / HZ);
++			 server->hostname, (3 * server->echo_interval) / HZ);
+ 		cifs_reconnect(server);
+ 		wake_up(&server->response_q);
+ 		return true;
+-- 
+2.20.1
+
