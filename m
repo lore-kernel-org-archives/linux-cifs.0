@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00EAAC7618B
-	for <linux-cifs@archiver.kernel.org>; Fri, 26 Jul 2019 13:51:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95B6AC41514
+	for <linux-cifs@archiver.kernel.org>; Fri, 26 Jul 2019 13:55:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CD3AF22CE5
-	for <linux-cifs@archiver.kernel.org>; Fri, 26 Jul 2019 13:51:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6FF6222CE8
+	for <linux-cifs@archiver.kernel.org>; Fri, 26 Jul 2019 13:55:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564149107;
-	bh=HSCfUKztUyx1dQXphz4lyuty68J8wkhEGnvJNS3JVGw=;
+	s=default; t=1564149302;
+	bh=/EHkBTPJ0LG/YwBarAjxnw94cxUW332nLrdZvvLt+1s=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=Jll1OKPXsBtRf+CaJK4qNvOsdxlZhv19MjMnCP+GDVexKrytL8R0Onny6XCGfILYk
-	 rUcgZVJv8HyjgzjksDeKFxB04kcdmMKnXnqH/2bdEV6dsdiGelzsc8QwD9RfaQtJ8S
-	 mEcum8VvanhKFGpoW/lTgqPSimdtaSxZLvXKvbgo=
+	b=yh3Qu8xDyOmfqbdbRDjGk4xQKXlMbeUlE3wuLpG/s7ekDNoCNyF1NKtzLKZFLshYV
+	 2YYSEcLRbaHj3DT8R32p4amNr059e46EGjHd98F29TPmhQr4nHi4qLN6vZfbRbFmDE
+	 oUV7gdAGxhC7AA6xy1+wDmztaz1xexlRhIbaJI2A=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387455AbfGZNvl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 26 Jul 2019 09:51:41 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51756 "EHLO mail.kernel.org"
+        id S1728324AbfGZNys (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 26 Jul 2019 09:54:48 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50004 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727328AbfGZNnu (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 26 Jul 2019 09:43:50 -0400
+        id S2388005AbfGZNml (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 26 Jul 2019 09:42:41 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8143C22CD3;
-        Fri, 26 Jul 2019 13:43:48 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id F378222CBB;
+        Fri, 26 Jul 2019 13:42:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564148629;
-        bh=HSCfUKztUyx1dQXphz4lyuty68J8wkhEGnvJNS3JVGw=;
+        s=default; t=1564148560;
+        bh=/EHkBTPJ0LG/YwBarAjxnw94cxUW332nLrdZvvLt+1s=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=HlxfCBG4rsbPRTzqEpzZZfP49h9gCfM2W1xoERCjPELQ5z//EuHpyxPfdd1TpZzR0
-         0dCNL09cQTp2Fv9u+tBsW4vqmKLCdpCuLwl82O033FvJLRWBMY0nmhVG3KfJPbE16S
-         AhhxuKthPKnzZzXxvrWs4qu8C6fFQUl/NFr8qsZY=
+        b=r0hbRxaxUU6DnCZSIbBGChCUcFcMJwDFRrmyqXNBb7N+ADY3e5j5vL8DUqz8dtUQ/
+         lL4raZOU6PbYoWHW2tsHlxW+JxvhhPp9mbt2Ytrmw8/Ao8yjvlNJo3WeSkmKSuIWDu
+         bDqiCehN2CUfqgZ1L3YzPYrZFoJIVQwRTs/Z3n9I=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
         Pavel Shilovsky <pshilov@microsoft.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 12/37] cifs: Fix a race condition with cifs_echo_request
-Date:   Fri, 26 Jul 2019 09:43:07 -0400
-Message-Id: <20190726134332.12626-12-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 17/47] cifs: Fix a race condition with cifs_echo_request
+Date:   Fri, 26 Jul 2019 09:41:40 -0400
+Message-Id: <20190726134210.12156-17-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190726134332.12626-1-sashal@kernel.org>
-References: <20190726134332.12626-1-sashal@kernel.org>
+In-Reply-To: <20190726134210.12156-1-sashal@kernel.org>
+References: <20190726134210.12156-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -88,10 +88,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 33cd844579ae..57c62ff4e8d6 100644
+index f31339db45fd..c53a2e86ed54 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -554,10 +554,10 @@ static bool
+@@ -563,10 +563,10 @@ static bool
  server_unresponsive(struct TCP_Server_Info *server)
  {
  	/*
@@ -104,7 +104,7 @@ index 33cd844579ae..57c62ff4e8d6 100644
  	 * 30s echo workqueue job pops, and decides we got a response recently
  	 *     and don't need to send another
  	 * ...
-@@ -566,9 +566,9 @@ server_unresponsive(struct TCP_Server_Info *server)
+@@ -575,9 +575,9 @@ server_unresponsive(struct TCP_Server_Info *server)
  	 */
  	if ((server->tcpStatus == CifsGood ||
  	    server->tcpStatus == CifsNeedNegotiate) &&
