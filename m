@@ -2,385 +2,983 @@ Return-Path: <SRS0=vxna=VX=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,SUBJ_ALL_CAPS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9CCDC7618B
-	for <linux-cifs@archiver.kernel.org>; Fri, 26 Jul 2019 08:28:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B2B2C7618B
+	for <linux-cifs@archiver.kernel.org>; Fri, 26 Jul 2019 12:51:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 76F79216C8
-	for <linux-cifs@archiver.kernel.org>; Fri, 26 Jul 2019 08:28:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samba.org header.i=@samba.org header.b="kuOOs+LB"
+	by mail.kernel.org (Postfix) with ESMTP id F1E2922CD4
+	for <linux-cifs@archiver.kernel.org>; Fri, 26 Jul 2019 12:51:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1564145507;
+	bh=edXYnkeSeLyw7z/3m5e6W4hSCPSrcMqY8VW8GLtxSVg=;
+	h=From:Cc:Subject:Date:In-Reply-To:References:To:List-ID:From;
+	b=EsFprh3XolmvCd/iXRMD6h12ZleZNuALfBQFWKsQqE4yaS3bTRTMdiQE8xG2gkIys
+	 EuSukEK+CJRoA1Vj3zdZiJs9e6PmdJN9lGkmEBzu5BTq9MtXhoOgVBXCFdBYNeNMhi
+	 SD/jEinhOfUUTKfKjH9hmQRtBupAbHcYrfg3VlA8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726103AbfGZI2J (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 26 Jul 2019 04:28:09 -0400
-Received: from hr2.samba.org ([144.76.82.148]:63722 "EHLO hr2.samba.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725815AbfGZI2I (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 26 Jul 2019 04:28:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-         s=42627210; h=Date:Message-ID:From:Cc:To;
-        bh=O3M5h33nbpzP3ppM0/qgP5KbQIAiQGUBoO3ERTsK0j4=; b=kuOOs+LBQQN5OStQle4bvVfKjF
-        q3+FPkNNcTeAXOvtrD1qGsidJks6Y5U3WdeDDUO22qr4cgEV+2tJFcj9dsL5MBnr4uOyMmcdkgeFv
-        M/gaE3RxMK4uGrmfc9NL1fGAXOq7Z2S0TUV2Xv3V1OD+bZfquhmyq345HZLp+NOoW/2E=;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-        by hr2.samba.org with esmtpsa (TLS1.2:ECDHE_ECDSA_CHACHA20_POLY1305:256)
-        (Exim)
-        id 1hqva7-0001FV-Ts; Fri, 26 Jul 2019 08:28:04 +0000
-To:     Steve French <stfrench@microsoft.com>
-References: <e51f32ff-ce54-d015-4ba0-572ec35f3e45@samba.org>
-Cc:     "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        Samba Technical <samba-technical@lists.samba.org>
-From:   Stefan Metzmacher <metze@samba.org>
-Openpgp: id=A3D192CE44EF412517BCED646A739B025C6B98D4
-Autocrypt: addr=metze@samba.org; prefer-encrypt=mutual; keydata=
- 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
-Subject: Re: [MS-SMB2] 2.2.3.1.4 SMB2_NETNAME_NEGOTIATE_CONTEXT_ID
-Message-ID: <a8102b82-046b-c62a-29c9-a61ae563bf34@samba.org>
-Date:   Fri, 26 Jul 2019 10:27:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726581AbfGZMvp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 26 Jul 2019 08:51:45 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:40052 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726705AbfGZMvp (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 26 Jul 2019 08:51:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=AS5oxtIdo2yG09411/sIu1r84zBQ65Tq3DN/Tw97Q3I=; b=TI0pQszGohmMphzecPlNkhP4Aq
+        PPlC7DElneVc+kjzLqLRgp01HAWqWrAujKPryOkHAJE4b2gct/fpBSXlB4ia3mhGNcTQCi/dgtXPO
+        ZV1D8N2yRSgX6V0fbMy1qTVA0NTgCKEoDX6GbdN/v7wdfUxTBTSo7xNOy8G9lIGYWIsZza3lug8iA
+        OWalwl/L9A6QoV8tOlx+idbNcmunOn4AiA1iNSylqXvk2eBeE3kVBxXy8U7PgggKlVtfX33UQVFPA
+        DCeF5dVSFQHBtIE0BYTVtAcFXHKrqNpNQIWRHw8sMLTyi/9nN9ZgropW0fQGKL4mBFiE45FD0WLol
+        Jb+OwTDw==;
+Received: from [179.95.31.157] (helo=bombadil.infradead.org)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
+        id 1hqzhE-0006Aa-I6; Fri, 26 Jul 2019 12:51:41 +0000
+Received: from mchehab by bombadil.infradead.org with local (Exim 4.92)
+        (envelope-from <mchehab@bombadil.infradead.org>)
+        id 1hqzhC-0005bG-C1; Fri, 26 Jul 2019 09:51:38 -0300
+From:   Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+Cc:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Steve French <sfrench@samba.org>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Martin Brandenburg <martin@omnibond.com>,
+        linux-doc@vger.kernel.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, devel@lists.orangefs.org
+Subject: [PATCH v2 17/26] docs: fs: convert docs without extension to ReST
+Date:   Fri, 26 Jul 2019 09:51:27 -0300
+Message-Id: <249ef4abdbac01a82ceebbf751bdcb48181603bd.1564145354.git.mchehab+samsung@kernel.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <cover.1564145354.git.mchehab+samsung@kernel.org>
+References: <cover.1564145354.git.mchehab+samsung@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <e51f32ff-ce54-d015-4ba0-572ec35f3e45@samba.org>
-Content-Type: multipart/signed; micalg=pgp-sha512;
- protocol="application/pgp-signature";
- boundary="zcBAa94398p5g55abZi2YGchSq6cI1N1Y"
+Content-Transfer-Encoding: 8bit
+To:     unlisted-recipients:; (no To-header on input)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---zcBAa94398p5g55abZi2YGchSq6cI1N1Y
-Content-Type: multipart/mixed; boundary="W5qqMwdPgJmIqNugGkzkv8ekgzsq95wvZ";
- protected-headers="v1"
-From: Stefan Metzmacher <metze@samba.org>
-To: Steve French <stfrench@microsoft.com>
-Cc: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
- Samba Technical <samba-technical@lists.samba.org>
-Message-ID: <a8102b82-046b-c62a-29c9-a61ae563bf34@samba.org>
-Subject: Re: [MS-SMB2] 2.2.3.1.4 SMB2_NETNAME_NEGOTIATE_CONTEXT_ID
-References: <e51f32ff-ce54-d015-4ba0-572ec35f3e45@samba.org>
-In-Reply-To: <e51f32ff-ce54-d015-4ba0-572ec35f3e45@samba.org>
+There are 3 remaining files without an extension inside the fs docs
+dir.
 
---W5qqMwdPgJmIqNugGkzkv8ekgzsq95wvZ
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Manually convert them to ReST.
 
-Hi Steve,
+In the case of the nfs/exporting.rst file, as the nfs docs
+aren't ported yet, I opted to convert and add a :orphan: there,
+with should be removed when it gets added into a nfs-specific
+part of the fs documentation.
 
-I just contacted dochelp for this and noticed (from reading the code)
-that the kernel sends null-termination for the
-SMB2_NETNAME_NEGOTIATE_CONTEXT_ID value.
+Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+---
+ ...irectory-locking => directory-locking.rst} |  40 ++-
+ Documentation/filesystems/index.rst           |   2 +
+ .../filesystems/{Locking => locking.rst}      | 257 ++++++++++++------
+ .../nfs/{Exporting => exporting.rst}          |  31 ++-
+ Documentation/filesystems/vfs.rst             |   2 +-
+ fs/cifs/export.c                              |   2 +-
+ fs/exportfs/expfs.c                           |   2 +-
+ fs/isofs/export.c                             |   2 +-
+ fs/orangefs/file.c                            |   2 +-
+ include/linux/dcache.h                        |   2 +-
+ include/linux/exportfs.h                      |   2 +-
+ 11 files changed, 225 insertions(+), 119 deletions(-)
+ rename Documentation/filesystems/{directory-locking => directory-locking.rst} (86%)
+ rename Documentation/filesystems/{Locking => locking.rst} (79%)
+ rename Documentation/filesystems/nfs/{Exporting => exporting.rst} (91%)
 
-I think you should fix that and backport it to stable releases,
-it would be good if all clients would implement it like windows.
+diff --git a/Documentation/filesystems/directory-locking b/Documentation/filesystems/directory-locking.rst
+similarity index 86%
+rename from Documentation/filesystems/directory-locking
+rename to Documentation/filesystems/directory-locking.rst
+index 4e32cb961e5b..de12016ee419 100644
+--- a/Documentation/filesystems/directory-locking
++++ b/Documentation/filesystems/directory-locking.rst
+@@ -1,12 +1,17 @@
+-	Locking scheme used for directory operations is based on two
++=================
++Directory Locking
++=================
++
++
++Locking scheme used for directory operations is based on two
+ kinds of locks - per-inode (->i_rwsem) and per-filesystem
+ (->s_vfs_rename_mutex).
+ 
+-	When taking the i_rwsem on multiple non-directory objects, we
++When taking the i_rwsem on multiple non-directory objects, we
+ always acquire the locks in order by increasing address.  We'll call
+ that "inode pointer" order in the following.
+ 
+-	For our purposes all operations fall in 5 classes:
++For our purposes all operations fall in 5 classes:
+ 
+ 1) read access.  Locking rules: caller locks directory we are accessing.
+ The lock is taken shared.
+@@ -27,25 +32,29 @@ NB: we might get away with locking the the source (and target in exchange
+ case) shared.
+ 
+ 5) link creation.  Locking rules:
++
+ 	* lock parent
+ 	* check that source is not a directory
+ 	* lock source
+ 	* call the method.
++
+ All locks are exclusive.
+ 
+ 6) cross-directory rename.  The trickiest in the whole bunch.  Locking
+ rules:
++
+ 	* lock the filesystem
+ 	* lock parents in "ancestors first" order.
+ 	* find source and target.
+ 	* if old parent is equal to or is a descendent of target
+-		fail with -ENOTEMPTY
++	  fail with -ENOTEMPTY
+ 	* if new parent is equal to or is a descendent of source
+-		fail with -ELOOP
++	  fail with -ELOOP
+ 	* If it's an exchange, lock both the source and the target.
+ 	* If the target exists, lock it.  If the source is a non-directory,
+ 	  lock it.  If we need to lock both, do so in inode pointer order.
+ 	* call the method.
++
+ All ->i_rwsem are taken exclusive.  Again, we might get away with locking
+ the the source (and target in exchange case) shared.
+ 
+@@ -54,10 +63,11 @@ read, modified or removed by method will be locked by caller.
+ 
+ 
+ If no directory is its own ancestor, the scheme above is deadlock-free.
++
+ Proof:
+ 
+ 	First of all, at any moment we have a partial ordering of the
+-objects - A < B iff A is an ancestor of B.
++	objects - A < B iff A is an ancestor of B.
+ 
+ 	That ordering can change.  However, the following is true:
+ 
+@@ -77,32 +87,32 @@ objects - A < B iff A is an ancestor of B.
+     non-directory object, except renames, which take locks on source and
+     target in inode pointer order in the case they are not directories.)
+ 
+-	Now consider the minimal deadlock.  Each process is blocked on
++Now consider the minimal deadlock.  Each process is blocked on
+ attempt to acquire some lock and already holds at least one lock.  Let's
+ consider the set of contended locks.  First of all, filesystem lock is
+ not contended, since any process blocked on it is not holding any locks.
+ Thus all processes are blocked on ->i_rwsem.
+ 
+-	By (3), any process holding a non-directory lock can only be
++By (3), any process holding a non-directory lock can only be
+ waiting on another non-directory lock with a larger address.  Therefore
+ the process holding the "largest" such lock can always make progress, and
+ non-directory objects are not included in the set of contended locks.
+ 
+-	Thus link creation can't be a part of deadlock - it can't be
++Thus link creation can't be a part of deadlock - it can't be
+ blocked on source and it means that it doesn't hold any locks.
+ 
+-	Any contended object is either held by cross-directory rename or
++Any contended object is either held by cross-directory rename or
+ has a child that is also contended.  Indeed, suppose that it is held by
+ operation other than cross-directory rename.  Then the lock this operation
+ is blocked on belongs to child of that object due to (1).
+ 
+-	It means that one of the operations is cross-directory rename.
++It means that one of the operations is cross-directory rename.
+ Otherwise the set of contended objects would be infinite - each of them
+ would have a contended child and we had assumed that no object is its
+ own descendent.  Moreover, there is exactly one cross-directory rename
+ (see above).
+ 
+-	Consider the object blocking the cross-directory rename.  One
++Consider the object blocking the cross-directory rename.  One
+ of its descendents is locked by cross-directory rename (otherwise we
+ would again have an infinite set of contended objects).  But that
+ means that cross-directory rename is taking locks out of order.  Due
+@@ -112,7 +122,7 @@ try to acquire lock on descendent before the lock on ancestor.
+ Contradiction.  I.e.  deadlock is impossible.  Q.E.D.
+ 
+ 
+-	These operations are guaranteed to avoid loop creation.  Indeed,
++These operations are guaranteed to avoid loop creation.  Indeed,
+ the only operation that could introduce loops is cross-directory rename.
+ Since the only new (parent, child) pair added by rename() is (new parent,
+ source), such loop would have to contain these objects and the rest of it
+@@ -123,13 +133,13 @@ new parent had been equal to or a descendent of source since the moment when
+ we had acquired filesystem lock and rename() would fail with -ELOOP in that
+ case.
+ 
+-	While this locking scheme works for arbitrary DAGs, it relies on
++While this locking scheme works for arbitrary DAGs, it relies on
+ ability to check that directory is a descendent of another object.  Current
+ implementation assumes that directory graph is a tree.  This assumption is
+ also preserved by all operations (cross-directory rename on a tree that would
+ not introduce a cycle will leave it a tree and link() fails for directories).
+ 
+-	Notice that "directory" in the above == "anything that might have
++Notice that "directory" in the above == "anything that might have
+ children", so if we are going to introduce hybrid objects we will need
+ either to make sure that link(2) doesn't work for them or to make changes
+ in is_subdir() that would make it work even in presence of such beasts.
+diff --git a/Documentation/filesystems/index.rst b/Documentation/filesystems/index.rst
+index 2de2fe2ab078..08320c35d03b 100644
+--- a/Documentation/filesystems/index.rst
++++ b/Documentation/filesystems/index.rst
+@@ -20,6 +20,8 @@ algorithms work.
+    path-lookup
+    api-summary
+    splice
++   locking
++   directory-locking
+ 
+ Filesystem support layers
+ =========================
+diff --git a/Documentation/filesystems/Locking b/Documentation/filesystems/locking.rst
+similarity index 79%
+rename from Documentation/filesystems/Locking
+rename to Documentation/filesystems/locking.rst
+index 204dd3ea36bb..fc3a0704553c 100644
+--- a/Documentation/filesystems/Locking
++++ b/Documentation/filesystems/locking.rst
+@@ -1,14 +1,22 @@
+-	The text below describes the locking rules for VFS-related methods.
++=======
++Locking
++=======
++
++The text below describes the locking rules for VFS-related methods.
+ It is (believed to be) up-to-date. *Please*, if you change anything in
+ prototypes or locking protocols - update this file. And update the relevant
+ instances in the tree, don't leave that to maintainers of filesystems/devices/
+ etc. At the very least, put the list of dubious cases in the end of this file.
+ Don't turn it into log - maintainers of out-of-the-tree code are supposed to
+ be able to use diff(1).
+-	Thing currently missing here: socket operations. Alexey?
+ 
+---------------------------- dentry_operations --------------------------
+-prototypes:
++Thing currently missing here: socket operations. Alexey?
++
++dentry_operations
++=================
++
++prototypes::
++
+ 	int (*d_revalidate)(struct dentry *, unsigned int);
+ 	int (*d_weak_revalidate)(struct dentry *, unsigned int);
+ 	int (*d_hash)(const struct dentry *, struct qstr *);
+@@ -24,23 +32,30 @@ prototypes:
+ 	struct dentry *(*d_real)(struct dentry *, const struct inode *);
+ 
+ locking rules:
+-		rename_lock	->d_lock	may block	rcu-walk
+-d_revalidate:	no		no		yes (ref-walk)	maybe
+-d_weak_revalidate:no		no		yes	 	no
+-d_hash		no		no		no		maybe
+-d_compare:	yes		no		no		maybe
+-d_delete:	no		yes		no		no
+-d_init:	no		no		yes		no
+-d_release:	no		no		yes		no
+-d_prune:        no              yes             no              no
+-d_iput:		no		no		yes		no
+-d_dname:	no		no		no		no
+-d_automount:	no		no		yes		no
+-d_manage:	no		no		yes (ref-walk)	maybe
+-d_real		no		no		yes 		no
+ 
+---------------------------- inode_operations --------------------------- 
+-prototypes:
++================== ===========	========	==============	========
++ops		   rename_lock	->d_lock	may block	rcu-walk
++================== ===========	========	==============	========
++d_revalidate:	   no		no		yes (ref-walk)	maybe
++d_weak_revalidate: no		no		yes	 	no
++d_hash		   no		no		no		maybe
++d_compare:	   yes		no		no		maybe
++d_delete:	   no		yes		no		no
++d_init:		   no		no		yes		no
++d_release:	   no		no		yes		no
++d_prune:           no		yes		no		no
++d_iput:		   no		no		yes		no
++d_dname:	   no		no		no		no
++d_automount:	   no		no		yes		no
++d_manage:	   no		no		yes (ref-walk)	maybe
++d_real		   no		no		yes 		no
++================== ===========	========	==============	========
++
++inode_operations
++================
++
++prototypes::
++
+ 	int (*create) (struct inode *,struct dentry *,umode_t, bool);
+ 	struct dentry * (*lookup) (struct inode *,struct dentry *, unsigned int);
+ 	int (*link) (struct dentry *,struct inode *,struct dentry *);
+@@ -68,7 +83,10 @@ prototypes:
+ 
+ locking rules:
+ 	all may block
+-		i_rwsem(inode)
++
++============	=============================================
++ops		i_rwsem(inode)
++============	=============================================
+ lookup:		shared
+ create:		exclusive
+ link:		exclusive (both)
+@@ -89,17 +107,21 @@ fiemap:		no
+ update_time:	no
+ atomic_open:	exclusive
+ tmpfile:	no
++============	=============================================
+ 
+ 
+ 	Additionally, ->rmdir(), ->unlink() and ->rename() have ->i_rwsem
+ 	exclusive on victim.
+ 	cross-directory ->rename() has (per-superblock) ->s_vfs_rename_sem.
+ 
+-See Documentation/filesystems/directory-locking for more detailed discussion
++See Documentation/filesystems/directory-locking.rst for more detailed discussion
+ of the locking scheme for directory operations.
+ 
+------------------------ xattr_handler operations -----------------------
+-prototypes:
++xattr_handler operations
++========================
++
++prototypes::
++
+ 	bool (*list)(struct dentry *dentry);
+ 	int (*get)(const struct xattr_handler *handler, struct dentry *dentry,
+ 		   struct inode *inode, const char *name, void *buffer,
+@@ -110,13 +132,20 @@ prototypes:
+ 
+ locking rules:
+ 	all may block
+-		i_rwsem(inode)
++
++=====		==============
++ops		i_rwsem(inode)
++=====		==============
+ list:		no
+ get:		no
+ set:		exclusive
++=====		==============
++
++super_operations
++================
++
++prototypes::
+ 
+---------------------------- super_operations ---------------------------
+-prototypes:
+ 	struct inode *(*alloc_inode)(struct super_block *sb);
+ 	void (*free_inode)(struct inode *);
+ 	void (*destroy_inode)(struct inode *);
+@@ -138,7 +167,10 @@ prototypes:
+ 
+ locking rules:
+ 	All may block [not true, see below]
+-			s_umount
++
++======================	============	========================
++ops			s_umount	note
++======================	============	========================
+ alloc_inode:
+ free_inode:				called from RCU callback
+ destroy_inode:
+@@ -157,6 +189,7 @@ show_options:		no		(namespace_sem)
+ quota_read:		no		(see below)
+ quota_write:		no		(see below)
+ bdev_try_to_free_page:	no		(see below)
++======================	============	========================
+ 
+ ->statfs() has s_umount (shared) when called by ustat(2) (native or
+ compat), but that's an accident of bad API; s_umount is used to pin
+@@ -164,31 +197,44 @@ the superblock down when we only have dev_t given us by userland to
+ identify the superblock.  Everything else (statfs(), fstatfs(), etc.)
+ doesn't hold it when calling ->statfs() - superblock is pinned down
+ by resolving the pathname passed to syscall.
++
+ ->quota_read() and ->quota_write() functions are both guaranteed to
+ be the only ones operating on the quota file by the quota code (via
+ dqio_sem) (unless an admin really wants to screw up something and
+ writes to quota files with quotas on). For other details about locking
+ see also dquot_operations section.
++
+ ->bdev_try_to_free_page is called from the ->releasepage handler of
+ the block device inode.  See there for more details.
+ 
+---------------------------- file_system_type ---------------------------
+-prototypes:
++file_system_type
++================
++
++prototypes::
++
+ 	struct dentry *(*mount) (struct file_system_type *, int,
+ 		       const char *, void *);
+ 	void (*kill_sb) (struct super_block *);
++
+ locking rules:
+-		may block
++
++=======		=========
++ops		may block
++=======		=========
+ mount		yes
+ kill_sb		yes
++=======		=========
+ 
+ ->mount() returns ERR_PTR or the root dentry; its superblock should be locked
+ on return.
++
+ ->kill_sb() takes a write-locked superblock, does all shutdown work on it,
+ unlocks and drops the reference.
+ 
+---------------------------- address_space_operations --------------------------
+-prototypes:
++address_space_operations
++========================
++prototypes::
++
+ 	int (*writepage)(struct page *page, struct writeback_control *wbc);
+ 	int (*readpage)(struct file *, struct page *);
+ 	int (*writepages)(struct address_space *, struct writeback_control *);
+@@ -218,14 +264,16 @@ prototypes:
+ locking rules:
+ 	All except set_page_dirty and freepage may block
+ 
+-			PageLocked(page)	i_rwsem
++======================	======================== =========
++ops			PageLocked(page)	 i_rwsem
++======================	======================== =========
+ writepage:		yes, unlocks (see below)
+ readpage:		yes, unlocks
+ writepages:
+ set_page_dirty		no
+ readpages:
+-write_begin:		locks the page		exclusive
+-write_end:		yes, unlocks		exclusive
++write_begin:		locks the page		 exclusive
++write_end:		yes, unlocks		 exclusive
+ bmap:
+ invalidatepage:		yes
+ releasepage:		yes
+@@ -239,17 +287,18 @@ is_partially_uptodate:	yes
+ error_remove_page:	yes
+ swap_activate:		no
+ swap_deactivate:	no
++======================	======================== =========
+ 
+-	->write_begin(), ->write_end() and ->readpage() may be called from
++->write_begin(), ->write_end() and ->readpage() may be called from
+ the request handler (/dev/loop).
+ 
+-	->readpage() unlocks the page, either synchronously or via I/O
++->readpage() unlocks the page, either synchronously or via I/O
+ completion.
+ 
+-	->readpages() populates the pagecache with the passed pages and starts
++->readpages() populates the pagecache with the passed pages and starts
+ I/O against them.  They come unlocked upon I/O completion.
+ 
+-	->writepage() is used for two purposes: for "memory cleansing" and for
++->writepage() is used for two purposes: for "memory cleansing" and for
+ "sync".  These are quite different operations and the behaviour may differ
+ depending upon the mode.
+ 
+@@ -297,70 +346,81 @@ will leave the page itself marked clean but it will be tagged as dirty in the
+ radix tree.  This incoherency can lead to all sorts of hard-to-debug problems
+ in the filesystem like having dirty inodes at umount and losing written data.
+ 
+-	->writepages() is used for periodic writeback and for syscall-initiated
++->writepages() is used for periodic writeback and for syscall-initiated
+ sync operations.  The address_space should start I/O against at least
+-*nr_to_write pages.  *nr_to_write must be decremented for each page which is
+-written.  The address_space implementation may write more (or less) pages
+-than *nr_to_write asks for, but it should try to be reasonably close.  If
+-nr_to_write is NULL, all dirty pages must be written.
++``*nr_to_write`` pages.  ``*nr_to_write`` must be decremented for each page
++which is written.  The address_space implementation may write more (or less)
++pages than ``*nr_to_write`` asks for, but it should try to be reasonably close.
++If nr_to_write is NULL, all dirty pages must be written.
+ 
+ writepages should _only_ write pages which are present on
+ mapping->io_pages.
+ 
+-	->set_page_dirty() is called from various places in the kernel
++->set_page_dirty() is called from various places in the kernel
+ when the target page is marked as needing writeback.  It may be called
+ under spinlock (it cannot block) and is sometimes called with the page
+ not locked.
+ 
+-	->bmap() is currently used by legacy ioctl() (FIBMAP) provided by some
++->bmap() is currently used by legacy ioctl() (FIBMAP) provided by some
+ filesystems and by the swapper. The latter will eventually go away.  Please,
+ keep it that way and don't breed new callers.
+ 
+-	->invalidatepage() is called when the filesystem must attempt to drop
++->invalidatepage() is called when the filesystem must attempt to drop
+ some or all of the buffers from the page when it is being truncated. It
+ returns zero on success. If ->invalidatepage is zero, the kernel uses
+ block_invalidatepage() instead.
+ 
+-	->releasepage() is called when the kernel is about to try to drop the
++->releasepage() is called when the kernel is about to try to drop the
+ buffers from the page in preparation for freeing it.  It returns zero to
+ indicate that the buffers are (or may be) freeable.  If ->releasepage is zero,
+ the kernel assumes that the fs has no private interest in the buffers.
+ 
+-	->freepage() is called when the kernel is done dropping the page
++->freepage() is called when the kernel is done dropping the page
+ from the page cache.
+ 
+-	->launder_page() may be called prior to releasing a page if
++->launder_page() may be called prior to releasing a page if
+ it is still found to be dirty. It returns zero if the page was successfully
+ cleaned, or an error value if not. Note that in order to prevent the page
+ getting mapped back in and redirtied, it needs to be kept locked
+ across the entire operation.
+ 
+-	->swap_activate will be called with a non-zero argument on
++->swap_activate will be called with a non-zero argument on
+ files backing (non block device backed) swapfiles. A return value
+ of zero indicates success, in which case this file can be used for
+ backing swapspace. The swapspace operations will be proxied to the
+ address space operations.
+ 
+-	->swap_deactivate() will be called in the sys_swapoff()
++->swap_deactivate() will be called in the sys_swapoff()
+ path after ->swap_activate() returned success.
+ 
+------------------------ file_lock_operations ------------------------------
+-prototypes:
++file_lock_operations
++====================
++
++prototypes::
++
+ 	void (*fl_copy_lock)(struct file_lock *, struct file_lock *);
+ 	void (*fl_release_private)(struct file_lock *);
+ 
+ 
+ locking rules:
+-			inode->i_lock	may block
++
++===================	=============	=========
++ops			inode->i_lock	may block
++===================	=============	=========
+ fl_copy_lock:		yes		no
+-fl_release_private:	maybe		maybe[1]
++fl_release_private:	maybe		maybe[1]_
++===================	=============	=========
+ 
+-[1]:	->fl_release_private for flock or POSIX locks is currently allowed
+-to block. Leases however can still be freed while the i_lock is held and
+-so fl_release_private called on a lease should not block.
++.. [1]:
++   ->fl_release_private for flock or POSIX locks is currently allowed
++   to block. Leases however can still be freed while the i_lock is held and
++   so fl_release_private called on a lease should not block.
++
++lock_manager_operations
++=======================
++
++prototypes::
+ 
+------------------------ lock_manager_operations ---------------------------
+-prototypes:
+ 	void (*lm_notify)(struct file_lock *);  /* unblock callback */
+ 	int (*lm_grant)(struct file_lock *, struct file_lock *, int);
+ 	void (*lm_break)(struct file_lock *); /* break_lease callback */
+@@ -368,24 +428,33 @@ prototypes:
+ 
+ locking rules:
+ 
+-			inode->i_lock	blocked_lock_lock	may block
++==========		=============	=================	=========
++ops			inode->i_lock	blocked_lock_lock	may block
++==========		=============	=================	=========
+ lm_notify:		yes		yes			no
+ lm_grant:		no		no			no
+ lm_break:		yes		no			no
+ lm_change		yes		no			no
++==========		=============	=================	=========
++
++buffer_head
++===========
++
++prototypes::
+ 
+---------------------------- buffer_head -----------------------------------
+-prototypes:
+ 	void (*b_end_io)(struct buffer_head *bh, int uptodate);
+ 
+ locking rules:
+-	called from interrupts. In other words, extreme care is needed here.
++
++called from interrupts. In other words, extreme care is needed here.
+ bh is locked, but that's all warranties we have here. Currently only RAID1,
+ highmem, fs/buffer.c, and fs/ntfs/aops.c are providing these. Block devices
+ call this method upon the IO completion.
+ 
+---------------------------- block_device_operations -----------------------
+-prototypes:
++block_device_operations
++=======================
++prototypes::
++
+ 	int (*open) (struct block_device *, fmode_t);
+ 	int (*release) (struct gendisk *, fmode_t);
+ 	int (*ioctl) (struct block_device *, fmode_t, unsigned, unsigned long);
+@@ -399,7 +468,10 @@ prototypes:
+ 	void (*swap_slot_free_notify) (struct block_device *, unsigned long);
+ 
+ locking rules:
+-			bd_mutex
++
++======================= ===================
++ops			bd_mutex
++======================= ===================
+ open:			yes
+ release:		yes
+ ioctl:			no
+@@ -410,6 +482,7 @@ unlock_native_capacity:	no
+ revalidate_disk:	no
+ getgeo:			no
+ swap_slot_free_notify:	no	(see below)
++======================= ===================
+ 
+ media_changed, unlock_native_capacity and revalidate_disk are called only from
+ check_disk_change().
+@@ -418,8 +491,11 @@ swap_slot_free_notify is called with swap_lock and sometimes the page lock
+ held.
+ 
+ 
+---------------------------- file_operations -------------------------------
+-prototypes:
++file_operations
++===============
++
++prototypes::
++
+ 	loff_t (*llseek) (struct file *, loff_t, int);
+ 	ssize_t (*read) (struct file *, char __user *, size_t, loff_t *);
+ 	ssize_t (*write) (struct file *, const char __user *, size_t, loff_t *);
+@@ -455,7 +531,6 @@ prototypes:
+ 			size_t, unsigned int);
+ 	int (*setlease)(struct file *, long, struct file_lock **, void **);
+ 	long (*fallocate)(struct file *, int, loff_t, loff_t);
+-};
+ 
+ locking rules:
+ 	All may block.
+@@ -490,8 +565,11 @@ in sys_read() and friends.
+ the lease within the individual filesystem to record the result of the
+ operation
+ 
+---------------------------- dquot_operations -------------------------------
+-prototypes:
++dquot_operations
++================
++
++prototypes::
++
+ 	int (*write_dquot) (struct dquot *);
+ 	int (*acquire_dquot) (struct dquot *);
+ 	int (*release_dquot) (struct dquot *);
+@@ -503,20 +581,26 @@ a proper locking wrt the filesystem and call the generic quota operations.
+ 
+ What filesystem should expect from the generic quota functions:
+ 
+-		FS recursion	Held locks when called
++==============	============	=========================
++ops		FS recursion	Held locks when called
++==============	============	=========================
+ write_dquot:	yes		dqonoff_sem or dqptr_sem
+ acquire_dquot:	yes		dqonoff_sem or dqptr_sem
+ release_dquot:	yes		dqonoff_sem or dqptr_sem
+ mark_dirty:	no		-
+ write_info:	yes		dqonoff_sem
++==============	============	=========================
+ 
+ FS recursion means calling ->quota_read() and ->quota_write() from superblock
+ operations.
+ 
+ More details about quota locking can be found in fs/dquot.c.
+ 
+---------------------------- vm_operations_struct -----------------------------
+-prototypes:
++vm_operations_struct
++====================
++
++prototypes::
++
+ 	void (*open)(struct vm_area_struct*);
+ 	void (*close)(struct vm_area_struct*);
+ 	vm_fault_t (*fault)(struct vm_area_struct*, struct vm_fault *);
+@@ -525,7 +609,10 @@ prototypes:
+ 	int (*access)(struct vm_area_struct *, unsigned long, void*, int, int);
+ 
+ locking rules:
+-		mmap_sem	PageLocked(page)
++
++=============	========	===========================
++ops		mmap_sem	PageLocked(page)
++=============	========	===========================
+ open:		yes
+ close:		yes
+ fault:		yes		can return with page locked
+@@ -533,8 +620,9 @@ map_pages:	yes
+ page_mkwrite:	yes		can return with page locked
+ pfn_mkwrite:	yes
+ access:		yes
++=============	========	===========================
+ 
+-	->fault() is called when a previously not present pte is about
++->fault() is called when a previously not present pte is about
+ to be faulted in. The filesystem must find and return the page associated
+ with the passed in "pgoff" in the vm_fault structure. If it is possible that
+ the page may be truncated and/or invalidated, then the filesystem must lock
+@@ -542,7 +630,7 @@ the page, then ensure it is not already truncated (the page lock will block
+ subsequent truncate), and then return with VM_FAULT_LOCKED, and the page
+ locked. The VM will unlock the page.
+ 
+-	->map_pages() is called when VM asks to map easy accessible pages.
++->map_pages() is called when VM asks to map easy accessible pages.
+ Filesystem should find and map pages associated with offsets from "start_pgoff"
+ till "end_pgoff". ->map_pages() is called with page table locked and must
+ not block.  If it's not possible to reach a page without blocking,
+@@ -551,25 +639,26 @@ page table entry. Pointer to entry associated with the page is passed in
+ "pte" field in vm_fault structure. Pointers to entries for other offsets
+ should be calculated relative to "pte".
+ 
+-	->page_mkwrite() is called when a previously read-only pte is
++->page_mkwrite() is called when a previously read-only pte is
+ about to become writeable. The filesystem again must ensure that there are
+ no truncate/invalidate races, and then return with the page locked. If
+ the page has been truncated, the filesystem should not look up a new page
+ like the ->fault() handler, but simply return with VM_FAULT_NOPAGE, which
+ will cause the VM to retry the fault.
+ 
+-	->pfn_mkwrite() is the same as page_mkwrite but when the pte is
++->pfn_mkwrite() is the same as page_mkwrite but when the pte is
+ VM_PFNMAP or VM_MIXEDMAP with a page-less entry. Expected return is
+ VM_FAULT_NOPAGE. Or one of the VM_FAULT_ERROR types. The default behavior
+ after this call is to make the pte read-write, unless pfn_mkwrite returns
+ an error.
+ 
+-	->access() is called when get_user_pages() fails in
++->access() is called when get_user_pages() fails in
+ access_process_vm(), typically used to debug a process through
+ /proc/pid/mem or ptrace.  This function is needed only for
+ VM_IO | VM_PFNMAP VMAs.
+ 
+-================================================================================
++--------------------------------------------------------------------------------
++
+ 			Dubious stuff
+ 
+ (if you break something or notice that it is broken and do not fix it yourself
+diff --git a/Documentation/filesystems/nfs/Exporting b/Documentation/filesystems/nfs/exporting.rst
+similarity index 91%
+rename from Documentation/filesystems/nfs/Exporting
+rename to Documentation/filesystems/nfs/exporting.rst
+index 63889149f532..33d588a01ace 100644
+--- a/Documentation/filesystems/nfs/Exporting
++++ b/Documentation/filesystems/nfs/exporting.rst
+@@ -1,3 +1,4 @@
++:orphan:
+ 
+ Making Filesystems Exportable
+ =============================
+@@ -42,9 +43,9 @@ filehandle fragment, there is no automatic creation of a path prefix
+ for the object.  This leads to two related but distinct features of
+ the dcache that are not needed for normal filesystem access.
+ 
+-1/ The dcache must sometimes contain objects that are not part of the
++1. The dcache must sometimes contain objects that are not part of the
+    proper prefix. i.e that are not connected to the root.
+-2/ The dcache must be prepared for a newly found (via ->lookup) directory
++2. The dcache must be prepared for a newly found (via ->lookup) directory
+    to already have a (non-connected) dentry, and must be able to move
+    that dentry into place (based on the parent and name in the
+    ->lookup).   This is particularly needed for directories as
+@@ -52,7 +53,7 @@ the dcache that are not needed for normal filesystem access.
+ 
+ To implement these features, the dcache has:
+ 
+-a/ A dentry flag DCACHE_DISCONNECTED which is set on
++a. A dentry flag DCACHE_DISCONNECTED which is set on
+    any dentry that might not be part of the proper prefix.
+    This is set when anonymous dentries are created, and cleared when a
+    dentry is noticed to be a child of a dentry which is in the proper
+@@ -71,48 +72,52 @@ a/ A dentry flag DCACHE_DISCONNECTED which is set on
+    dentries.  That guarantees that we won't need to hunt them down upon
+    umount.
+ 
+-b/ A primitive for creation of secondary roots - d_obtain_root(inode).
++b. A primitive for creation of secondary roots - d_obtain_root(inode).
+    Those do _not_ bear DCACHE_DISCONNECTED.  They are placed on the
+    per-superblock list (->s_roots), so they can be located at umount
+    time for eviction purposes.
+ 
+-c/ Helper routines to allocate anonymous dentries, and to help attach
++c. Helper routines to allocate anonymous dentries, and to help attach
+    loose directory dentries at lookup time. They are:
++
+     d_obtain_alias(inode) will return a dentry for the given inode.
+       If the inode already has a dentry, one of those is returned.
++
+       If it doesn't, a new anonymous (IS_ROOT and
+-        DCACHE_DISCONNECTED) dentry is allocated and attached.
++      DCACHE_DISCONNECTED) dentry is allocated and attached.
++
+       In the case of a directory, care is taken that only one dentry
+       can ever be attached.
++
+     d_splice_alias(inode, dentry) will introduce a new dentry into the tree;
+       either the passed-in dentry or a preexisting alias for the given inode
+       (such as an anonymous one created by d_obtain_alias), if appropriate.
+       It returns NULL when the passed-in dentry is used, following the calling
+       convention of ->lookup.
+- 
++
+ Filesystem Issues
+ -----------------
+ 
+ For a filesystem to be exportable it must:
+- 
+-   1/ provide the filehandle fragment routines described below.
+-   2/ make sure that d_splice_alias is used rather than d_add
++
++   1. provide the filehandle fragment routines described below.
++   2. make sure that d_splice_alias is used rather than d_add
+       when ->lookup finds an inode for a given parent and name.
+ 
+-      If inode is NULL, d_splice_alias(inode, dentry) is equivalent to
++      If inode is NULL, d_splice_alias(inode, dentry) is equivalent to::
+ 
+ 		d_add(dentry, inode), NULL
+ 
+       Similarly, d_splice_alias(ERR_PTR(err), dentry) = ERR_PTR(err)
+ 
+-      Typically the ->lookup routine will simply end with a:
++      Typically the ->lookup routine will simply end with a::
+ 
+ 		return d_splice_alias(inode, dentry);
+ 	}
+ 
+ 
+ 
+-  A file system implementation declares that instances of the filesystem
++A file system implementation declares that instances of the filesystem
+ are exportable by setting the s_export_op field in the struct
+ super_block.  This field must point to a "struct export_operations"
+ struct which has the following members:
+diff --git a/Documentation/filesystems/vfs.rst b/Documentation/filesystems/vfs.rst
+index 0f85ab21c2ca..7d4d09dd5e6d 100644
+--- a/Documentation/filesystems/vfs.rst
++++ b/Documentation/filesystems/vfs.rst
+@@ -20,7 +20,7 @@ kernel which allows different filesystem implementations to coexist.
+ 
+ VFS system calls open(2), stat(2), read(2), write(2), chmod(2) and so on
+ are called from a process context.  Filesystem locking is described in
+-the document Documentation/filesystems/Locking.
++the document Documentation/filesystems/locking.rst.
+ 
+ 
+ Directory Entry Cache (dcache)
+diff --git a/fs/cifs/export.c b/fs/cifs/export.c
+index ce8b7f677c58..eb0bb8ca8e63 100644
+--- a/fs/cifs/export.c
++++ b/fs/cifs/export.c
+@@ -24,7 +24,7 @@
+  */
+ 
+  /*
+-  * See Documentation/filesystems/nfs/Exporting
++  * See Documentation/filesystems/nfs/exporting.rst
+   * and examples in fs/exportfs
+   *
+   * Since cifs is a network file system, an "fsid" must be included for
+diff --git a/fs/exportfs/expfs.c b/fs/exportfs/expfs.c
+index f0e549783caf..09bc68708d28 100644
+--- a/fs/exportfs/expfs.c
++++ b/fs/exportfs/expfs.c
+@@ -7,7 +7,7 @@
+  * and for mapping back from file handles to dentries.
+  *
+  * For details on why we do all the strange and hairy things in here
+- * take a look at Documentation/filesystems/nfs/Exporting.
++ * take a look at Documentation/filesystems/nfs/exporting.rst.
+  */
+ #include <linux/exportfs.h>
+ #include <linux/fs.h>
+diff --git a/fs/isofs/export.c b/fs/isofs/export.c
+index 85a9093769a9..35768a63fb1d 100644
+--- a/fs/isofs/export.c
++++ b/fs/isofs/export.c
+@@ -10,7 +10,7 @@
+  *
+  * The following files are helpful:
+  *
+- *     Documentation/filesystems/nfs/Exporting
++ *     Documentation/filesystems/nfs/exporting.rst
+  *     fs/exportfs/expfs.c.
+  */
+ 
+diff --git a/fs/orangefs/file.c b/fs/orangefs/file.c
+index 960f9a3c012d..a5612abc0936 100644
+--- a/fs/orangefs/file.c
++++ b/fs/orangefs/file.c
+@@ -555,7 +555,7 @@ static int orangefs_fsync(struct file *file,
+  * Change the file pointer position for an instance of an open file.
+  *
+  * \note If .llseek is overriden, we must acquire lock as described in
+- *       Documentation/filesystems/Locking.
++ *       Documentation/filesystems/locking.rst.
+  *
+  * Future upgrade could support SEEK_DATA and SEEK_HOLE but would
+  * require much changes to the FS
+diff --git a/include/linux/dcache.h b/include/linux/dcache.h
+index 9451011ac014..10090f11ab95 100644
+--- a/include/linux/dcache.h
++++ b/include/linux/dcache.h
+@@ -151,7 +151,7 @@ struct dentry_operations {
+ 
+ /*
+  * Locking rules for dentry_operations callbacks are to be found in
+- * Documentation/filesystems/Locking. Keep it updated!
++ * Documentation/filesystems/locking.rst. Keep it updated!
+  *
+  * FUrther descriptions are found in Documentation/filesystems/vfs.rst.
+  * Keep it updated too!
+diff --git a/include/linux/exportfs.h b/include/linux/exportfs.h
+index 0d3037419bc7..cf6571fc9c01 100644
+--- a/include/linux/exportfs.h
++++ b/include/linux/exportfs.h
+@@ -139,7 +139,7 @@ struct fid {
+  * @get_parent:     find the parent of a given directory
+  * @commit_metadata: commit metadata changes to stable storage
+  *
+- * See Documentation/filesystems/nfs/Exporting for details on how to use
++ * See Documentation/filesystems/nfs/exporting.rst for details on how to use
+  * this interface correctly.
+  *
+  * encode_fh:
+-- 
+2.21.0
 
-I implemented it for Samba here:
-https://gitlab.com/samba-team/samba/merge_requests/666
-
-metze
-
-Am 26.07.19 um 10:22 schrieb Stefan Metzmacher via cifs-protocol:
-> Hi DocHelp,
->=20
-> I just noticed a documentation bug in
-> [MS-SMB2] 2.2.3.1.4 SMB2_NETNAME_NEGOTIATE_CONTEXT_ID:
->=20
->    NetName (variable): A null-terminated Unicode string containing the
->    server name and specified by the client application.
->=20
-> Windows Server 1903 sends the name without null-termination, see the
-> attached capture.
->=20
-> metze
-
-
-
---W5qqMwdPgJmIqNugGkzkv8ekgzsq95wvZ--
-
---zcBAa94398p5g55abZi2YGchSq6cI1N1Y
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEfFbGo3YXpfgryIw9DbX1YShpvVYFAl06uYgACgkQDbX1YShp
-vVZVKg/+JYbvlCketfInETZuIdIdfI8evCQ0Laa2v3A6JewpWz2VeySQ0lz5x9nI
-JlGSYShFE6GN5jQkWlTviT9ZuERCkJPS5wGyl3YFjPXUU7GUPfo6vDPE8ddk0uCp
-AAoyeclRiRr1cNPKXAqdrYJLjPi9Ns4OqXRPE17m4PUgNxRaB202YGUp1IK58Bwt
-7XMV4ivN5SRCxWMYxZf93NwpRhI0PxBnh0jFerFqInGUhu6UpAmNfTBfEfVkp9fl
-/3RXTuB/Ts/JPD99JH2SN7aPjwFPQyfoY/nNG81P5ytwjoH8VNKsa/Lh87p+xJ03
-A7eMyk4riSDlfb7QxmXFdiIul5YUs0QwiPbaHiA7xYuI+6EBff3flAC/B4Bw6m2b
-zONqoy/9Wx2UQtbtLNT8tyzP31aNcZ2t3eATI1OUzw3iLUBHREIVTGTMXcYY4IFQ
-hv+SHGbtmavI5QMwIvsjYug/wCO+TmuonNZWY9Pk0GYMyaxp1n36zwB03DkXCvAn
-WauYhdStUwQ/E/0bQJECtoMx9Qufv/hQf2semcx06j5Jbyl0hplb+fiaoRmNxyAn
-lpQC+cL674+r81+RnstmpW1eKtOggjhQjkdH2E6W+zYZW9qK9bV4zzLfYVzoQCmH
-3+BRta6M6Ns6TYUnNoRXtVnmw69jiQdDGNpCm9X4ACshcQcl0GQ=
-=ChaT
------END PGP SIGNATURE-----
-
---zcBAa94398p5g55abZi2YGchSq6cI1N1Y--
