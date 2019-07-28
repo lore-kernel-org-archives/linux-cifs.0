@@ -1,121 +1,111 @@
-Return-Path: <SRS0=vxna=VX=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=DlwX=VZ=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13FFDC76190
-	for <linux-cifs@archiver.kernel.org>; Fri, 26 Jul 2019 13:59:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58858C433FF
+	for <linux-cifs@archiver.kernel.org>; Sun, 28 Jul 2019 00:08:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E119D22CE5
-	for <linux-cifs@archiver.kernel.org>; Fri, 26 Jul 2019 13:59:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564149569;
-	bh=uIbs0tM0t17lsosykX6s17QGS1UOz8ioMvBtnf/X32M=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=mgKnmExKfxNsXY2kwIzrDed+0+BGElw+dFAdTYpWiF+wAWlOcOL137VYy6RwxZQEr
-	 VIxPC8U1zGFqCIjKSolJhbppZaCvAze5rwrZVI39xU0dfzV9o3106hKGbxqUIfs2Lr
-	 vQZdTstMTzHu1+U0aXRoyOU5gQNKAHNQzRIQ8194=
+	by mail.kernel.org (Postfix) with ESMTP id 258E02086D
+	for <linux-cifs@archiver.kernel.org>; Sun, 28 Jul 2019 00:08:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qb5gCFzj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387472AbfGZNkc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 26 Jul 2019 09:40:32 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46552 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727681AbfGZNk3 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 26 Jul 2019 09:40:29 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C905C22BF5;
-        Fri, 26 Jul 2019 13:40:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564148428;
-        bh=uIbs0tM0t17lsosykX6s17QGS1UOz8ioMvBtnf/X32M=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=FftBAWT4UBRYlUsRHErC51i0REzoW9YSSn/oHmPvUk7OLEtW6mzNl5/0SWX1RdvNy
-         hKaPiaRyhSjdivoam+PdqwY9u8RQeZ7r+tAK4JVBPmVNvKK1OI0PTTq5ny8r7n+G82
-         YU9eWlxHcw5583yhzYY83/+qtE795FxyVMw6IeK4=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        Pavel Shilovsky <pshilov@microsoft.com>,
-        Steve French <stfrench@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.2 31/85] cifs: Fix a race condition with cifs_echo_request
-Date:   Fri, 26 Jul 2019 09:38:41 -0400
-Message-Id: <20190726133936.11177-31-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190726133936.11177-1-sashal@kernel.org>
-References: <20190726133936.11177-1-sashal@kernel.org>
+        id S1726240AbfG1AIb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 27 Jul 2019 20:08:31 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:36615 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725928AbfG1AIb (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 27 Jul 2019 20:08:31 -0400
+Received: by mail-pg1-f193.google.com with SMTP id l21so26443028pgm.3
+        for <linux-cifs@vger.kernel.org>; Sat, 27 Jul 2019 17:08:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=fco8qkjlE6Puhsmc4xymJ+Kj8WlLYKV278v1h6y2g0E=;
+        b=Qb5gCFzjW4kF7RjokI9FBMbXtFRepM6joD+SBnWRzlJgS6dYd6KHSA/+zjlhVqX7WN
+         zkWCsYMrG+4bFjXVxTJW44ha6IJbl1CLzBNbRu3km7YntJvK685xCfkJwWdg7fuNiySy
+         siSiHnHHDkDKkdEzEooxOuiepR4gWxxounyLsOGwVvRPeRriCy0G9recn7pdvighdzaA
+         lWG76A/Jrjt73Xn0YFrH4/YguCX3S/qA3AZnFRfNcwXbhtNEhghsUgA1krAlF7MWTuSV
+         9kRy7TJVj6YdtnhITATxBZFRgpmH5p8XHyeIRAuc0NPdtBy7rAYO1Bn3LcDMyX8VWv2x
+         bozQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=fco8qkjlE6Puhsmc4xymJ+Kj8WlLYKV278v1h6y2g0E=;
+        b=TNhx0WT18FCi0U8TTnbbmos3mdUvBKzSfzByillV8vbbpOJyZ8kNzFM05L8bnPG6d3
+         4vwXUcCEbfck3Sb6HNCT9/stlH2v2GfZU6b4diC6TDM/54WmOdpTK/WD1BI7/9MUEwIk
+         ThdFnj1Lhipe9svERF1YrQh+XRu6thpmZUHq5PCxBwVdw9TKzVtd21YHfNABJ6n2H79v
+         nJjcsvNjK1PzSgDbjUpmTORla2sLclYzZiqa1so2A5oiOiY69sBpKYnatCel9v1JwltO
+         SoL94c5yUEm6eiDUsLk6n0o7zYOPRGTJjMh8ixRSYaAHnteUr/7ccSKJP7+lAHRmYC2e
+         1nWQ==
+X-Gm-Message-State: APjAAAVUhZZbTjvbze1J3Py5+aBW3zt6wv9ZyDQ14M8oDY5a6cp5lpPb
+        KO53YuOHP8x7Sh4GMUvy9ROGXc7v6UlVcmXhonTKh/ANy4c=
+X-Google-Smtp-Source: APXvYqxdFSewoDWdnA0+5tgT5gCdhfsFllbF/RQzLoXSfvyc+f769XX/zGq/TswvA4I4RHf8y5saQtvOUE6VeoiHHOs=
+X-Received: by 2002:a65:6454:: with SMTP id s20mr97822693pgv.15.1564272510313;
+ Sat, 27 Jul 2019 17:08:30 -0700 (PDT)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+References: <CANidX5ScMgPfd_7N9QMTv3+nhzBxtE7tQVhrAncjrH0JG7q4vg@mail.gmail.com>
+In-Reply-To: <CANidX5ScMgPfd_7N9QMTv3+nhzBxtE7tQVhrAncjrH0JG7q4vg@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 27 Jul 2019 19:08:18 -0500
+Message-ID: <CAH2r5msU5Qkxcr-kM5seH_2HoUz=hkO+VDCjdEFCPRZh=a3W7A@mail.gmail.com>
+Subject: Re: Search for advice on testing whether a local CIFS fd closed remotely
+To:     Gefei Li <gefeili.2013@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Ronnie Sahlberg <lsahlber@redhat.com>
+On Fri, Jul 26, 2019 at 3:22 AM Gefei Li <gefeili.2013@gmail.com> wrote:
+>
+> Hi,
+>
+> From some stack overflow result I know that on a local ext4/fat32
+> system, we can test whether a file descriptor is valid through
+> "fcntl(fd, F_GETFD)". But in cifs cases, a fd typically bind a local
+> fd to remote handle, do we have some c function/syscall that can test
+> whether the fd is remotely closed?
+>
+> I've tried some windows way like "ioctl", which works well, and in
+> linux local file system "fcntl" works. Tried to use "fcntl" on kernel
+> 5.1.15, found no server request is received.. Could you please give me
+> some advice on testing whether a fd is remoted closed in CIFS client?
 
-[ Upstream commit f2caf901c1b7ce65f9e6aef4217e3241039db768 ]
+both F_GETFD and F_GETFL look like they check in the local VFS only
+(aren't passed down to the file system, whether ext4 or cifs or even nfs)
+for the value of these flags (see do_fcntl function in fs/fcntl.c)
 
-There is a race condition with how we send (or supress and don't send)
-smb echos that will cause the client to incorrectly think the
-server is unresponsive and thus needs to be reconnected.
+In general an open of a file (over an SMB3 mount) will result in a open
+over a file on the server.   You can see the detailed information on
+the network file handle ("PersistentFileID") open on the server by (on
+the Linux client) doing:
 
-Summary of the race condition:
- 1) Daisy chaining scheduling creates a gap.
- 2) If traffic comes unfortunate shortly after
-    the last echo, the planned echo is suppressed.
- 3) Due to the gap, the next echo transmission is delayed
-    until after the timeout, which is set hard to twice
-    the echo interval.
+       cat /proc/fs/cifs/open_files
 
-This is fixed by changing the timeouts from 2 to three times the echo interval.
+If you were worried about a network crash temporarily closing remote handles
+(in which case you might temporarily have a local handle which is not
+open on the
+server) you could (in theory) do:
 
-Detailed description of the bug: https://lutz.donnerhacke.de/eng/Blog/Groundhog-Day-with-SMB-remount
+      /proc/fs/cifs/Stats | grep "Open files"
 
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/cifs/connect.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+but I did notice a bug (in the processing of one of those counters for
+that /proc file)
+in which we are leaking one of those two counters (the counter is
+informational only
+so presumably not a serious bug) and it can go negative so looking at the count
+of open files on the server may not be as useful.
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 8dd6637a3cbb..0872188ce3c6 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -706,10 +706,10 @@ static bool
- server_unresponsive(struct TCP_Server_Info *server)
- {
- 	/*
--	 * We need to wait 2 echo intervals to make sure we handle such
-+	 * We need to wait 3 echo intervals to make sure we handle such
- 	 * situations right:
- 	 * 1s  client sends a normal SMB request
--	 * 2s  client gets a response
-+	 * 3s  client gets a response
- 	 * 30s echo workqueue job pops, and decides we got a response recently
- 	 *     and don't need to send another
- 	 * ...
-@@ -718,9 +718,9 @@ server_unresponsive(struct TCP_Server_Info *server)
- 	 */
- 	if ((server->tcpStatus == CifsGood ||
- 	    server->tcpStatus == CifsNeedNegotiate) &&
--	    time_after(jiffies, server->lstrp + 2 * server->echo_interval)) {
-+	    time_after(jiffies, server->lstrp + 3 * server->echo_interval)) {
- 		cifs_dbg(VFS, "Server %s has not responded in %lu seconds. Reconnecting...\n",
--			 server->hostname, (2 * server->echo_interval) / HZ);
-+			 server->hostname, (3 * server->echo_interval) / HZ);
- 		cifs_reconnect(server);
- 		wake_up(&server->response_q);
- 		return true;
 -- 
-2.20.1
+Thanks,
 
+Steve
