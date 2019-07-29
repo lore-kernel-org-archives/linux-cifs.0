@@ -2,164 +2,92 @@ Return-Path: <SRS0=0u7K=V2=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 174FDC433FF
-	for <linux-cifs@archiver.kernel.org>; Mon, 29 Jul 2019 16:07:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4301EC7618B
+	for <linux-cifs@archiver.kernel.org>; Mon, 29 Jul 2019 17:10:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D0555206BA
-	for <linux-cifs@archiver.kernel.org>; Mon, 29 Jul 2019 16:07:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hbYCx89r"
+	by mail.kernel.org (Postfix) with ESMTP id 15BC021655
+	for <linux-cifs@archiver.kernel.org>; Mon, 29 Jul 2019 17:10:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1564420222;
+	bh=WXZfFhxm/6xNh9hebjHvhoHEDNNIu4jbigvgxOw6uS0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=Rny8l3EIWmyeAmnBKZNDVQxfMNSJoqmLTNCiU19mPGSsrjF+CMyAXMlH801cK7gWR
+	 WgvTp0VXLCvUSinxY2NhmViFMmOeYVq1dPwBfgXMREMidHIxIlsIQNqjMIxtdsaHwz
+	 M7BeMiQwttXlyG3USYRc9MQ4JbL1buURGsO/GDkw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728516AbfG2QHj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 29 Jul 2019 12:07:39 -0400
-Received: from mail-pl1-f169.google.com ([209.85.214.169]:46348 "EHLO
-        mail-pl1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727796AbfG2QHj (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 29 Jul 2019 12:07:39 -0400
-Received: by mail-pl1-f169.google.com with SMTP id c2so27664328plz.13
-        for <linux-cifs@vger.kernel.org>; Mon, 29 Jul 2019 09:07:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=L+BqzgwxZlFE9/XhA/Z7AVNrQrmz4IpGsvStJOpR64E=;
-        b=hbYCx89r3OJnrbhBIUvQGSSpICZWPdgm7SOLJGy6MQn0sylUu/5wy78px7TEow71zI
-         G93F0RxCVwetOpjHGAail96xpXTposIZLOWLctQv9yg59jEr+ZPqn3kKYeYrDPVbVudK
-         ZEHxyyAclJHo4KXyCGvTVnou42Dxg0oXUa/nRDU8UwT5n8pgleCtvsWdGDt1zsVVo0pM
-         evMLvh1PKzonW8/0z8G7bCPdH+42MCTAttVBIR2WW90EN136eNBQvqCWBUmb8GMzNiEo
-         BC0BVD/ql/osCq8Xaoe9JM8+1z6N1mYZ2F6nzQDZOu+vXkWbilX0COrWuIUELJu1Yp6Z
-         Uzig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=L+BqzgwxZlFE9/XhA/Z7AVNrQrmz4IpGsvStJOpR64E=;
-        b=D/x01IS+DTozHn9uuGMe8IWPnpFsD5Su+Hds8zIi190xhthp7QU0m1UEA0LNkMGRMo
-         VBLoynIu606x+CRan0ZAFiINn6NLQvGr8QsHh9oCY3kjaxSsRALAkyfzMg9SVDHmBrk5
-         gFeMB+zuw3KmZC6MsgZcW1Xly+U3X664XFkcQFEcttFbPIiEXW3uMvmmNMDPq3bJhnJ5
-         C0WI8plQf3Xdi/Qi/0nk7x2pw4cD8Oyzf/wgCof/oMA568kqfh5un8ZP200y1wC5lqLI
-         mkbuM2mU4JvMaBM1fnzQzy468IO8QqgcKTtAuK5SNsp18nVAwumXqW0XorK5SHJ6H/yB
-         aUpg==
-X-Gm-Message-State: APjAAAUiumODHPnSY54x6q64kIRHEfKyaIWDsJTddQgkCRg864b3D8pH
-        jud/KVf1RUJjJfYjvykd7gE1kwF8Wc5ahhjHenDIxocqabs=
-X-Google-Smtp-Source: APXvYqz9HZzCaLYj5au44B1BoMIInnYDFUEXN1EBlV6r2NrUPqvp3BjGarvFZLY/++1zOCsxkux+ak1Eo42HZbs0y5c=
-X-Received: by 2002:a17:902:2a68:: with SMTP id i95mr112932457plb.167.1564416457835;
- Mon, 29 Jul 2019 09:07:37 -0700 (PDT)
+        id S1727617AbfG2RKV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 29 Jul 2019 13:10:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:32802 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726305AbfG2RKV (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 29 Jul 2019 13:10:21 -0400
+Received: from localhost (unknown [77.137.115.125])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9B6E5206BA;
+        Mon, 29 Jul 2019 17:10:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1564420220;
+        bh=WXZfFhxm/6xNh9hebjHvhoHEDNNIu4jbigvgxOw6uS0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=zvZgYkvRo/Nb/7BSWXUMu0NQiOxf4sINcdgMyDAoJDJyx/tmQGJp4kU0S/f3N3Vdh
+         NwuAILNrQQkHQihcUkoxpRQlpHK71vKe9Jc6IwOAEMorn2rDirM1gNoqBfcV+P11+W
+         Fjlv9Tcv+1bTPpsceZ7XBAnLG6xE4MAC4uKbF8W8=
+Date:   Mon, 29 Jul 2019 20:10:16 +0300
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Chuck Lever <chuck.lever@oracle.com>, linux-rdma@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net
+Subject: Re: [PATCH v2] rdma: Enable ib_alloc_cq to spread work over a
+ device's comp_vectors
+Message-ID: <20190729171016.GN4674@mtr-leonro.mtl.com>
+References: <20190728163027.3637.70740.stgit@manet.1015granger.net>
+ <20190729054933.GK4674@mtr-leonro.mtl.com>
+ <20190729141945.GF17990@ziepe.ca>
 MIME-Version: 1.0
-References: <CANidX5ScMgPfd_7N9QMTv3+nhzBxtE7tQVhrAncjrH0JG7q4vg@mail.gmail.com>
- <CAH2r5msU5Qkxcr-kM5seH_2HoUz=hkO+VDCjdEFCPRZh=a3W7A@mail.gmail.com> <CANidX5SRoxMHtm042arPxMUXP1SCoYOkg1SMxYL7RMvzW6mnGA@mail.gmail.com>
-In-Reply-To: <CANidX5SRoxMHtm042arPxMUXP1SCoYOkg1SMxYL7RMvzW6mnGA@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 29 Jul 2019 11:07:26 -0500
-Message-ID: <CAH2r5msVTQKE6CL8V+KfNq+oOKzoH3B4MGiNGmY5gfSD7X-Qqw@mail.gmail.com>
-Subject: Re: Search for advice on testing whether a local CIFS fd closed remotely
-To:     Gefei Li <gefeili.2013@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190729141945.GF17990@ziepe.ca>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Presumably the attempt to close a file (from the Linux client) which
-the server has force closed on their side, would lead to
-/proc/fs/cifs/Stats logging an error on close.   It is an unusual
-situation to have a server force closed a handle in such a way that it
-would return an error on an attempt by an SMB3 client to use it (more
-typical would be for a resource constrained server to expire the
-session and let the client reconnect its open handles as needed).
-
-To test use of directory handles after a force close of server handles
-(ie for the unusual case where the file handle is force closed on the
-server side through some tool, but the client has the file still
-open), you could try something similar to the "PASSTHRU_FSCTL" for
-doing a query info (see e.g. the function fsctlgetobjid in cifs-utils
-package smbinfo.c) after you have left a directory handle open long
-enough for your force close on the server side to be done.
-
-This is an unusual scenario though where you want to have the server
-throw away state (network file handles open on a connection) without
-killing the smb session (in which case the client can reconnect
-transparently).
-
-On Sun, Jul 28, 2019 at 10:03 PM Gefei Li <gefeili.2013@gmail.com> wrote:
+On Mon, Jul 29, 2019 at 11:19:45AM -0300, Jason Gunthorpe wrote:
+> On Mon, Jul 29, 2019 at 08:49:33AM +0300, Leon Romanovsky wrote:
+> > > +/**
+> > > + * ib_alloc_cq_any: Allocate kernel CQ
+> > > + * @dev: The IB device
+> > > + * @private: Private data attached to the CQE
+> > > + * @nr_cqe: Number of CQEs in the CQ
+> > > + * @poll_ctx: Context used for polling the CQ
+> > > + */
+> > > +static inline struct ib_cq *ib_alloc_cq_any(struct ib_device *dev,
+> > > +					    void *private, int nr_cqe,
+> > > +					    enum ib_poll_context poll_ctx)
+> > > +{
+> > > +	return __ib_alloc_cq_any(dev, private, nr_cqe, poll_ctx,
+> > > +				 KBUILD_MODNAME);
+> > > +}
+> >
+> > This should be macro and not inline function, because compiler can be
+> > instructed do not inline functions (there is kconfig option for that)
+> > and it will cause that wrong KBUILD_MODNAME will be inserted (ib_core
+> > instead of ulp).
 >
-> Thanks a lot for the '/proc/fs/cifs/Stats | grep "Open files"' tip,
-> Steve. But it seems not working in my case(not crashing case).
+> No, it can't, a static inline can only be de-inlined within the same
+> compilation unit, so KBUILD_MODNAME can never be mixed up.
 >
-> I have an SMB server that is able to close handles from server side,
-> and if closed remotely I want to check from client side. I've done
-> several experiments:
-> 1. CIFS client open, server side close
->   -  both "/proc/fs/cifs/Stats" and "cat /proc/fs/cifs/open_files"
-> remain unchanged
-> 2. CIFS client open, server side close, client side call "close"
-> function to check fd
->   - "Closes" in "/proc/fs/cifs/Stats" changes "4 total 1 failed"    <-
-> 1 failed due to server side closed?
-> 3. CIFS client open, server side close, client side call "read"
-> function to check fd
->   - EBADF returned while trying to "read", this is what I expect.  But
-> for dir handle and WR-only handles, which function should I use?
+> You only need to use macros of the value changes within the
+> compilation unit.
+
+Thanks, good to know.
+
 >
-> Regards,
-> Gefei
->
-> On Sun, Jul 28, 2019 at 8:08 AM Steve French <smfrench@gmail.com> wrote:
-> >
-> > On Fri, Jul 26, 2019 at 3:22 AM Gefei Li <gefeili.2013@gmail.com> wrote:
-> > >
-> > > Hi,
-> > >
-> > > From some stack overflow result I know that on a local ext4/fat32
-> > > system, we can test whether a file descriptor is valid through
-> > > "fcntl(fd, F_GETFD)". But in cifs cases, a fd typically bind a local
-> > > fd to remote handle, do we have some c function/syscall that can test
-> > > whether the fd is remotely closed?
-> > >
-> > > I've tried some windows way like "ioctl", which works well, and in
-> > > linux local file system "fcntl" works. Tried to use "fcntl" on kernel
-> > > 5.1.15, found no server request is received.. Could you please give me
-> > > some advice on testing whether a fd is remoted closed in CIFS client?
-> >
-> > both F_GETFD and F_GETFL look like they check in the local VFS only
-> > (aren't passed down to the file system, whether ext4 or cifs or even nfs)
-> > for the value of these flags (see do_fcntl function in fs/fcntl.c)
-> >
-> > In general an open of a file (over an SMB3 mount) will result in a open
-> > over a file on the server.   You can see the detailed information on
-> > the network file handle ("PersistentFileID") open on the server by (on
-> > the Linux client) doing:
-> >
-> >        cat /proc/fs/cifs/open_files
-> >
-> > If you were worried about a network crash temporarily closing remote handles
-> > (in which case you might temporarily have a local handle which is not
-> > open on the
-> > server) you could (in theory) do:
-> >
-> >       /proc/fs/cifs/Stats | grep "Open files"
-> >
-> > but I did notice a bug (in the processing of one of those counters for
-> > that /proc file)
-> > in which we are leaking one of those two counters (the counter is
-> > informational only
-> > so presumably not a serious bug) and it can go negative so looking at the count
-> > of open files on the server may not be as useful.
-> >
-> > --
-> > Thanks,
-> >
-> > Steve
-
-
-
--- 
-Thanks,
-
-Steve
+> Jason
