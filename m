@@ -2,375 +2,164 @@ Return-Path: <SRS0=0u7K=V2=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E29BFC7618B
-	for <linux-cifs@archiver.kernel.org>; Mon, 29 Jul 2019 14:24:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 174FDC433FF
+	for <linux-cifs@archiver.kernel.org>; Mon, 29 Jul 2019 16:07:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A2412206DD
-	for <linux-cifs@archiver.kernel.org>; Mon, 29 Jul 2019 14:24:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D0555206BA
+	for <linux-cifs@archiver.kernel.org>; Mon, 29 Jul 2019 16:07:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="RAAkxuTy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hbYCx89r"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727034AbfG2OY3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 29 Jul 2019 10:24:29 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:44552 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726694AbfG2OY3 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 29 Jul 2019 10:24:29 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6TEJBih052691;
-        Mon, 29 Jul 2019 14:24:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2018-07-02; bh=1qdqjCkA/mfxasEl5KR5f7Kd6vzrOzS/W9lw2+2mkzs=;
- b=RAAkxuTyG6ifTCRLKtFDJUpIqGzZ79dmmxg3/jzvPON2motynf2Sr3GDJXAnrHkGhcDh
- wq6JWj6VX9+8JutdIjS1mahVR9gUvru9RP5p5ZWknSgDb9g+a/DPaKT6jcSOBYp38LRg
- SbnuNuH55bCNlPDH25NvVcrVTyRNLkv2kmxAD+KyP5y3/TtDM+GUKZqy5s8YDZmVgJNY
- zZ2dL45o6gF5PGNcrjHR+lvtOaiZXTRoCABXLtomgLFiWid40eARTNbU1jjaHsLndmt8
- 6RzabVfSNb+lghU6SZYKRDv366Zh0AvqbvlCFU3FxZeH4Udu6caQq0pdJ1Cv59WnRNxT sQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2120.oracle.com with ESMTP id 2u0f8qqp4h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 29 Jul 2019 14:24:17 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6TEMraC059576;
-        Mon, 29 Jul 2019 14:24:17 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 2u0xv7hqsw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 29 Jul 2019 14:24:16 +0000
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x6TEOEbt012597;
-        Mon, 29 Jul 2019 14:24:14 GMT
-Received: from anon-dhcp-171.1015granger.net (/68.61.232.219)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 29 Jul 2019 07:24:14 -0700
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH v2] rdma: Enable ib_alloc_cq to spread work over a
- device's comp_vectors
-From:   Chuck Lever <chuck.lever@oracle.com>
-In-Reply-To: <20190729054933.GK4674@mtr-leonro.mtl.com>
-Date:   Mon, 29 Jul 2019 10:24:12 -0400
-Cc:     linux-rdma@vger.kernel.org,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        linux-cifs@vger.kernel.org, v9fs-developer@lists.sourceforge.net
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <9AF784D9-E0B4-473F-9D5F-7858F6FE1FDD@oracle.com>
-References: <20190728163027.3637.70740.stgit@manet.1015granger.net>
- <20190729054933.GK4674@mtr-leonro.mtl.com>
-To:     Leon Romanovsky <leon@kernel.org>
-X-Mailer: Apple Mail (2.3445.104.11)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9333 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1907290165
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9333 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1907290165
+        id S1728516AbfG2QHj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 29 Jul 2019 12:07:39 -0400
+Received: from mail-pl1-f169.google.com ([209.85.214.169]:46348 "EHLO
+        mail-pl1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727796AbfG2QHj (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 29 Jul 2019 12:07:39 -0400
+Received: by mail-pl1-f169.google.com with SMTP id c2so27664328plz.13
+        for <linux-cifs@vger.kernel.org>; Mon, 29 Jul 2019 09:07:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=L+BqzgwxZlFE9/XhA/Z7AVNrQrmz4IpGsvStJOpR64E=;
+        b=hbYCx89r3OJnrbhBIUvQGSSpICZWPdgm7SOLJGy6MQn0sylUu/5wy78px7TEow71zI
+         G93F0RxCVwetOpjHGAail96xpXTposIZLOWLctQv9yg59jEr+ZPqn3kKYeYrDPVbVudK
+         ZEHxyyAclJHo4KXyCGvTVnou42Dxg0oXUa/nRDU8UwT5n8pgleCtvsWdGDt1zsVVo0pM
+         evMLvh1PKzonW8/0z8G7bCPdH+42MCTAttVBIR2WW90EN136eNBQvqCWBUmb8GMzNiEo
+         BC0BVD/ql/osCq8Xaoe9JM8+1z6N1mYZ2F6nzQDZOu+vXkWbilX0COrWuIUELJu1Yp6Z
+         Uzig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=L+BqzgwxZlFE9/XhA/Z7AVNrQrmz4IpGsvStJOpR64E=;
+        b=D/x01IS+DTozHn9uuGMe8IWPnpFsD5Su+Hds8zIi190xhthp7QU0m1UEA0LNkMGRMo
+         VBLoynIu606x+CRan0ZAFiINn6NLQvGr8QsHh9oCY3kjaxSsRALAkyfzMg9SVDHmBrk5
+         gFeMB+zuw3KmZC6MsgZcW1Xly+U3X664XFkcQFEcttFbPIiEXW3uMvmmNMDPq3bJhnJ5
+         C0WI8plQf3Xdi/Qi/0nk7x2pw4cD8Oyzf/wgCof/oMA568kqfh5un8ZP200y1wC5lqLI
+         mkbuM2mU4JvMaBM1fnzQzy468IO8QqgcKTtAuK5SNsp18nVAwumXqW0XorK5SHJ6H/yB
+         aUpg==
+X-Gm-Message-State: APjAAAUiumODHPnSY54x6q64kIRHEfKyaIWDsJTddQgkCRg864b3D8pH
+        jud/KVf1RUJjJfYjvykd7gE1kwF8Wc5ahhjHenDIxocqabs=
+X-Google-Smtp-Source: APXvYqz9HZzCaLYj5au44B1BoMIInnYDFUEXN1EBlV6r2NrUPqvp3BjGarvFZLY/++1zOCsxkux+ak1Eo42HZbs0y5c=
+X-Received: by 2002:a17:902:2a68:: with SMTP id i95mr112932457plb.167.1564416457835;
+ Mon, 29 Jul 2019 09:07:37 -0700 (PDT)
+MIME-Version: 1.0
+References: <CANidX5ScMgPfd_7N9QMTv3+nhzBxtE7tQVhrAncjrH0JG7q4vg@mail.gmail.com>
+ <CAH2r5msU5Qkxcr-kM5seH_2HoUz=hkO+VDCjdEFCPRZh=a3W7A@mail.gmail.com> <CANidX5SRoxMHtm042arPxMUXP1SCoYOkg1SMxYL7RMvzW6mnGA@mail.gmail.com>
+In-Reply-To: <CANidX5SRoxMHtm042arPxMUXP1SCoYOkg1SMxYL7RMvzW6mnGA@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Mon, 29 Jul 2019 11:07:26 -0500
+Message-ID: <CAH2r5msVTQKE6CL8V+KfNq+oOKzoH3B4MGiNGmY5gfSD7X-Qqw@mail.gmail.com>
+Subject: Re: Search for advice on testing whether a local CIFS fd closed remotely
+To:     Gefei Li <gefeili.2013@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+Presumably the attempt to close a file (from the Linux client) which
+the server has force closed on their side, would lead to
+/proc/fs/cifs/Stats logging an error on close.   It is an unusual
+situation to have a server force closed a handle in such a way that it
+would return an error on an attempt by an SMB3 client to use it (more
+typical would be for a resource constrained server to expire the
+session and let the client reconnect its open handles as needed).
 
+To test use of directory handles after a force close of server handles
+(ie for the unusual case where the file handle is force closed on the
+server side through some tool, but the client has the file still
+open), you could try something similar to the "PASSTHRU_FSCTL" for
+doing a query info (see e.g. the function fsctlgetobjid in cifs-utils
+package smbinfo.c) after you have left a directory handle open long
+enough for your force close on the server side to be done.
 
-> On Jul 29, 2019, at 1:49 AM, Leon Romanovsky <leon@kernel.org> wrote:
->=20
-> On Sun, Jul 28, 2019 at 12:30:27PM -0400, Chuck Lever wrote:
->> Send and Receive completion is handled on a single CPU selected at
->> the time each Completion Queue is allocated. Typically this is when
->> an initiator instantiates an RDMA transport, or when a target
->> accepts an RDMA connection.
->>=20
->> Some ULPs cannot open a connection per CPU to spread completion
->> workload across available CPUs and MSI vectors. For such ULPs,
->> provide an API that allows the RDMA core to select a completion
->> vector based on the device's complement of available comp_vecs.
->>=20
->> ULPs that invoke ib_alloc_cq() with only comp_vector 0 are converted
->> to use the new API so that their completion workloads interfere less
->> with each other.
->>=20
->> Suggested-by: H=C3=A5kon Bugge <haakon.bugge@oracle.com>
->> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
->> Cc: <linux-cifs@vger.kernel.org>
->> Cc: <v9fs-developer@lists.sourceforge.net>
->> ---
->> drivers/infiniband/core/cq.c             |   29 =
-+++++++++++++++++++++++++++++
->> drivers/infiniband/ulp/srpt/ib_srpt.c    |    4 ++--
->> fs/cifs/smbdirect.c                      |   10 ++++++----
->> include/rdma/ib_verbs.h                  |   19 +++++++++++++++++++
->> net/9p/trans_rdma.c                      |    6 +++---
->> net/sunrpc/xprtrdma/svc_rdma_transport.c |    8 ++++----
->> net/sunrpc/xprtrdma/verbs.c              |   13 ++++++-------
->> 7 files changed, 69 insertions(+), 20 deletions(-)
->>=20
->> diff --git a/drivers/infiniband/core/cq.c =
-b/drivers/infiniband/core/cq.c
->> index 7c59987..ea3bb0d 100644
->> --- a/drivers/infiniband/core/cq.c
->> +++ b/drivers/infiniband/core/cq.c
->> @@ -253,6 +253,35 @@ struct ib_cq *__ib_alloc_cq_user(struct =
-ib_device *dev, void *private,
->> EXPORT_SYMBOL(__ib_alloc_cq_user);
->>=20
->> /**
->> + * __ib_alloc_cq_any - allocate a completion queue
->> + * @dev:		device to allocate the CQ for
->> + * @private:		driver private data, accessible from =
-cq->cq_context
->> + * @nr_cqe:		number of CQEs to allocate
->> + * @poll_ctx:		context to poll the CQ from.
->> + * @caller:		module owner name.
->> + *
->> + * Attempt to spread ULP Completion Queues over each device's =
-interrupt
->> + * vectors.
->> + */
->> +struct ib_cq *__ib_alloc_cq_any(struct ib_device *dev, void =
-*private,
->> +				int nr_cqe, enum ib_poll_context =
-poll_ctx,
->> +				const char *caller)
->> +{
->> +	static atomic_t counter;
->> +	int comp_vector;
->=20
-> int comp_vector =3D 0;
->=20
->> +
->> +	comp_vector =3D 0;
->=20
-> This assignment is better to be part of initialization.
->=20
->> +	if (dev->num_comp_vectors > 1)
->> +		comp_vector =3D
->> +			atomic_inc_return(&counter) %
->=20
-> Don't we need manage "free list" of comp_vectors? Otherwise we can =
-find
-> ourselves providing already "taken" comp_vector.
+This is an unusual scenario though where you want to have the server
+throw away state (network file handles open on a connection) without
+killing the smb session (in which case the client can reconnect
+transparently).
 
-Many ULPs use only comp_vector 0 today. It is obviously harmless
-to have more than one ULP using the same comp_vector.
-
-The point of this patch is best effort spreading. This algorithm
-has been proposed repeatedly for several years on this list, and
-each time the consensus has been this is simple and good enough.
-
-
-> Just as an example:
-> dev->num_comp_vectors =3D 2
-> num_online_cpus =3D 4
->=20
-> The following combination will give us same comp_vector:
-> 1. ib_alloc_cq_any()
-> 2. ib_alloc_cq_any()
-> 3. ib_free_cq()
-> 4. goto 2
->=20
->> +			min_t(int, dev->num_comp_vectors, =
-num_online_cpus());
->> +
->> +	return __ib_alloc_cq_user(dev, private, nr_cqe, comp_vector, =
-poll_ctx,
->> +				  caller, NULL);
->> +}
->> +EXPORT_SYMBOL(__ib_alloc_cq_any);
->> +
->> +/**
->>  * ib_free_cq_user - free a completion queue
->>  * @cq:		completion queue to free.
->>  * @udata:	User data or NULL for kernel object
->> diff --git a/drivers/infiniband/ulp/srpt/ib_srpt.c =
-b/drivers/infiniband/ulp/srpt/ib_srpt.c
->> index 1a039f1..e25c70a 100644
->> --- a/drivers/infiniband/ulp/srpt/ib_srpt.c
->> +++ b/drivers/infiniband/ulp/srpt/ib_srpt.c
->> @@ -1767,8 +1767,8 @@ static int srpt_create_ch_ib(struct =
-srpt_rdma_ch *ch)
->> 		goto out;
->>=20
->> retry:
->> -	ch->cq =3D ib_alloc_cq(sdev->device, ch, ch->rq_size + sq_size,
->> -			0 /* XXX: spread CQs */, IB_POLL_WORKQUEUE);
->> +	ch->cq =3D ib_alloc_cq_any(sdev->device, ch, ch->rq_size + =
-sq_size,
->> +				 IB_POLL_WORKQUEUE);
->> 	if (IS_ERR(ch->cq)) {
->> 		ret =3D PTR_ERR(ch->cq);
->> 		pr_err("failed to create CQ cqe=3D %d ret=3D %d\n",
->> diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
->> index cd07e53..3c91fa9 100644
->> --- a/fs/cifs/smbdirect.c
->> +++ b/fs/cifs/smbdirect.c
->> @@ -1654,15 +1654,17 @@ static struct smbd_connection =
-*_smbd_get_connection(
->>=20
->> 	info->send_cq =3D NULL;
->> 	info->recv_cq =3D NULL;
->> -	info->send_cq =3D ib_alloc_cq(info->id->device, info,
->> -			info->send_credit_target, 0, IB_POLL_SOFTIRQ);
->> +	info->send_cq =3D
->> +		ib_alloc_cq_any(info->id->device, info,
->> +				info->send_credit_target, =
-IB_POLL_SOFTIRQ);
->> 	if (IS_ERR(info->send_cq)) {
->> 		info->send_cq =3D NULL;
->> 		goto alloc_cq_failed;
->> 	}
->>=20
->> -	info->recv_cq =3D ib_alloc_cq(info->id->device, info,
->> -			info->receive_credit_max, 0, IB_POLL_SOFTIRQ);
->> +	info->recv_cq =3D
->> +		ib_alloc_cq_any(info->id->device, info,
->> +				info->receive_credit_max, =
-IB_POLL_SOFTIRQ);
->> 	if (IS_ERR(info->recv_cq)) {
->> 		info->recv_cq =3D NULL;
->> 		goto alloc_cq_failed;
->> diff --git a/include/rdma/ib_verbs.h b/include/rdma/ib_verbs.h
->> index c5f8a9f..2a1523cc 100644
->> --- a/include/rdma/ib_verbs.h
->> +++ b/include/rdma/ib_verbs.h
->> @@ -3711,6 +3711,25 @@ static inline struct ib_cq *ib_alloc_cq(struct =
-ib_device *dev, void *private,
->> 				NULL);
->> }
->>=20
->> +struct ib_cq *__ib_alloc_cq_any(struct ib_device *dev, void =
-*private,
->> +				int nr_cqe, enum ib_poll_context =
-poll_ctx,
->> +				const char *caller);
->> +
->> +/**
->> + * ib_alloc_cq_any: Allocate kernel CQ
->> + * @dev: The IB device
->> + * @private: Private data attached to the CQE
->> + * @nr_cqe: Number of CQEs in the CQ
->> + * @poll_ctx: Context used for polling the CQ
->> + */
->> +static inline struct ib_cq *ib_alloc_cq_any(struct ib_device *dev,
->> +					    void *private, int nr_cqe,
->> +					    enum ib_poll_context =
-poll_ctx)
->> +{
->> +	return __ib_alloc_cq_any(dev, private, nr_cqe, poll_ctx,
->> +				 KBUILD_MODNAME);
->> +}
->=20
-> This should be macro and not inline function, because compiler can be
-> instructed do not inline functions (there is kconfig option for that)
-> and it will cause that wrong KBUILD_MODNAME will be inserted (ib_core
-> instead of ulp).
->=20
-> And yes, commit c4367a26357b ("IB: Pass uverbs_attr_bundle down ib_x
-> destroy path") did it completely wrong.
-
-My understanding is the same as Jason's.
-
-
->> +
->> /**
->>  * ib_free_cq_user - Free kernel/user CQ
->>  * @cq: The CQ to free
->> diff --git a/net/9p/trans_rdma.c b/net/9p/trans_rdma.c
->> index bac8dad..b21c3c2 100644
->> --- a/net/9p/trans_rdma.c
->> +++ b/net/9p/trans_rdma.c
->> @@ -685,9 +685,9 @@ static int p9_rdma_bind_privport(struct =
-p9_trans_rdma *rdma)
->> 		goto error;
->>=20
->> 	/* Create the Completion Queue */
->> -	rdma->cq =3D ib_alloc_cq(rdma->cm_id->device, client,
->> -			opts.sq_depth + opts.rq_depth + 1,
->> -			0, IB_POLL_SOFTIRQ);
->> +	rdma->cq =3D ib_alloc_cq_any(rdma->cm_id->device, client,
->> +				   opts.sq_depth + opts.rq_depth + 1,
->> +				   IB_POLL_SOFTIRQ);
->> 	if (IS_ERR(rdma->cq))
->> 		goto error;
->>=20
->> diff --git a/net/sunrpc/xprtrdma/svc_rdma_transport.c =
-b/net/sunrpc/xprtrdma/svc_rdma_transport.c
->> index 3fe6651..4d3db6e 100644
->> --- a/net/sunrpc/xprtrdma/svc_rdma_transport.c
->> +++ b/net/sunrpc/xprtrdma/svc_rdma_transport.c
->> @@ -454,14 +454,14 @@ static struct svc_xprt *svc_rdma_accept(struct =
-svc_xprt *xprt)
->> 		dprintk("svcrdma: error creating PD for connect =
-request\n");
->> 		goto errout;
->> 	}
->> -	newxprt->sc_sq_cq =3D ib_alloc_cq(dev, newxprt, =
-newxprt->sc_sq_depth,
->> -					0, IB_POLL_WORKQUEUE);
->> +	newxprt->sc_sq_cq =3D ib_alloc_cq_any(dev, newxprt, =
-newxprt->sc_sq_depth,
->> +					    IB_POLL_WORKQUEUE);
->> 	if (IS_ERR(newxprt->sc_sq_cq)) {
->> 		dprintk("svcrdma: error creating SQ CQ for connect =
-request\n");
->> 		goto errout;
->> 	}
->> -	newxprt->sc_rq_cq =3D ib_alloc_cq(dev, newxprt, rq_depth,
->> -					0, IB_POLL_WORKQUEUE);
->> +	newxprt->sc_rq_cq =3D
->> +		ib_alloc_cq_any(dev, newxprt, rq_depth, =
-IB_POLL_WORKQUEUE);
->> 	if (IS_ERR(newxprt->sc_rq_cq)) {
->> 		dprintk("svcrdma: error creating RQ CQ for connect =
-request\n");
->> 		goto errout;
->> diff --git a/net/sunrpc/xprtrdma/verbs.c =
-b/net/sunrpc/xprtrdma/verbs.c
->> index 805b1f35..b10aa16 100644
->> --- a/net/sunrpc/xprtrdma/verbs.c
->> +++ b/net/sunrpc/xprtrdma/verbs.c
->> @@ -521,18 +521,17 @@ int rpcrdma_ep_create(struct rpcrdma_xprt =
-*r_xprt)
->> 	init_waitqueue_head(&ep->rep_connect_wait);
->> 	ep->rep_receive_count =3D 0;
->>=20
->> -	sendcq =3D ib_alloc_cq(ia->ri_id->device, NULL,
->> -			     ep->rep_attr.cap.max_send_wr + 1,
->> -			     ia->ri_id->device->num_comp_vectors > 1 ? 1 =
-: 0,
->> -			     IB_POLL_WORKQUEUE);
->> +	sendcq =3D ib_alloc_cq_any(ia->ri_id->device, NULL,
->> +				 ep->rep_attr.cap.max_send_wr + 1,
->> +				 IB_POLL_WORKQUEUE);
->> 	if (IS_ERR(sendcq)) {
->> 		rc =3D PTR_ERR(sendcq);
->> 		goto out1;
->> 	}
->>=20
->> -	recvcq =3D ib_alloc_cq(ia->ri_id->device, NULL,
->> -			     ep->rep_attr.cap.max_recv_wr + 1,
->> -			     0, IB_POLL_WORKQUEUE);
->> +	recvcq =3D ib_alloc_cq_any(ia->ri_id->device, NULL,
->> +				 ep->rep_attr.cap.max_recv_wr + 1,
->> +				 IB_POLL_WORKQUEUE);
->> 	if (IS_ERR(recvcq)) {
->> 		rc =3D PTR_ERR(recvcq);
->> 		goto out2;
-
---
-Chuck Lever
+On Sun, Jul 28, 2019 at 10:03 PM Gefei Li <gefeili.2013@gmail.com> wrote:
+>
+> Thanks a lot for the '/proc/fs/cifs/Stats | grep "Open files"' tip,
+> Steve. But it seems not working in my case(not crashing case).
+>
+> I have an SMB server that is able to close handles from server side,
+> and if closed remotely I want to check from client side. I've done
+> several experiments:
+> 1. CIFS client open, server side close
+>   -  both "/proc/fs/cifs/Stats" and "cat /proc/fs/cifs/open_files"
+> remain unchanged
+> 2. CIFS client open, server side close, client side call "close"
+> function to check fd
+>   - "Closes" in "/proc/fs/cifs/Stats" changes "4 total 1 failed"    <-
+> 1 failed due to server side closed?
+> 3. CIFS client open, server side close, client side call "read"
+> function to check fd
+>   - EBADF returned while trying to "read", this is what I expect.  But
+> for dir handle and WR-only handles, which function should I use?
+>
+> Regards,
+> Gefei
+>
+> On Sun, Jul 28, 2019 at 8:08 AM Steve French <smfrench@gmail.com> wrote:
+> >
+> > On Fri, Jul 26, 2019 at 3:22 AM Gefei Li <gefeili.2013@gmail.com> wrote:
+> > >
+> > > Hi,
+> > >
+> > > From some stack overflow result I know that on a local ext4/fat32
+> > > system, we can test whether a file descriptor is valid through
+> > > "fcntl(fd, F_GETFD)". But in cifs cases, a fd typically bind a local
+> > > fd to remote handle, do we have some c function/syscall that can test
+> > > whether the fd is remotely closed?
+> > >
+> > > I've tried some windows way like "ioctl", which works well, and in
+> > > linux local file system "fcntl" works. Tried to use "fcntl" on kernel
+> > > 5.1.15, found no server request is received.. Could you please give me
+> > > some advice on testing whether a fd is remoted closed in CIFS client?
+> >
+> > both F_GETFD and F_GETFL look like they check in the local VFS only
+> > (aren't passed down to the file system, whether ext4 or cifs or even nfs)
+> > for the value of these flags (see do_fcntl function in fs/fcntl.c)
+> >
+> > In general an open of a file (over an SMB3 mount) will result in a open
+> > over a file on the server.   You can see the detailed information on
+> > the network file handle ("PersistentFileID") open on the server by (on
+> > the Linux client) doing:
+> >
+> >        cat /proc/fs/cifs/open_files
+> >
+> > If you were worried about a network crash temporarily closing remote handles
+> > (in which case you might temporarily have a local handle which is not
+> > open on the
+> > server) you could (in theory) do:
+> >
+> >       /proc/fs/cifs/Stats | grep "Open files"
+> >
+> > but I did notice a bug (in the processing of one of those counters for
+> > that /proc file)
+> > in which we are leaking one of those two counters (the counter is
+> > informational only
+> > so presumably not a serious bug) and it can go negative so looking at the count
+> > of open files on the server may not be as useful.
+> >
+> > --
+> > Thanks,
+> >
+> > Steve
 
 
 
+-- 
+Thanks,
+
+Steve
