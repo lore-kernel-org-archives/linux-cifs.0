@@ -2,68 +2,56 @@ Return-Path: <SRS0=3qap=V4=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71E05C433FF
-	for <linux-cifs@archiver.kernel.org>; Wed, 31 Jul 2019 09:05:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9590FC32751
+	for <linux-cifs@archiver.kernel.org>; Wed, 31 Jul 2019 10:09:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5095320693
-	for <linux-cifs@archiver.kernel.org>; Wed, 31 Jul 2019 09:05:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 73F3820657
+	for <linux-cifs@archiver.kernel.org>; Wed, 31 Jul 2019 10:09:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727573AbfGaJF2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 31 Jul 2019 05:05:28 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:35630 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726666AbfGaJF2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 31 Jul 2019 05:05:28 -0400
-Received: from 1.general.cking.uk.vpn ([10.172.193.212] helo=localhost)
-        by youngberry.canonical.com with esmtpsa (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-        (Exim 4.76)
-        (envelope-from <colin.king@canonical.com>)
-        id 1hskY2-0003Hf-Qu; Wed, 31 Jul 2019 09:05:26 +0000
-From:   Colin King <colin.king@canonical.com>
-To:     Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org
+        id S1727267AbfGaKJf convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 31 Jul 2019 06:09:35 -0400
+Received: from mx2.suse.de ([195.135.220.15]:57628 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725866AbfGaKJe (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 31 Jul 2019 06:09:34 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 9759CB08C;
+        Wed, 31 Jul 2019 10:09:33 +0000 (UTC)
+From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
+To:     Colin King <colin.king@canonical.com>,
+        samba-technical@lists.samba.org, Steve French <sfrench@samba.org>,
+        linux-cifs@vger.kernel.org
 Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] cifs: remove redundant assignment to variable rc
-Date:   Wed, 31 Jul 2019 10:05:26 +0100
-Message-Id: <20190731090526.27245-1-colin.king@canonical.com>
-X-Mailer: git-send-email 2.20.1
+Subject: Re: [PATCH] cifs: remove redundant assignment to variable rc
+In-Reply-To: <20190731090526.27245-1-colin.king@canonical.com>
+References: <20190731090526.27245-1-colin.king@canonical.com>
+Date:   Wed, 31 Jul 2019 12:09:31 +0200
+Message-ID: <87r266seg4.fsf@suse.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
+Colin King <colin.king@canonical.com> writes:
+> Variable rc is being initialized with a value that is never read
+> and rc is being re-assigned a little later on. The assignment is
+> redundant and hence can be removed.
 
-Variable rc is being initialized with a value that is never read
-and rc is being re-assigned a little later on. The assignment is
-redundant and hence can be removed.
+I think I would actually rather have rc set to an error by default than
+uninitialized. Just my personal opinion.
 
-Addresses-Coverity: ("Unused value")
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- fs/cifs/smb2pdu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index ee5d74988a9f..a653c429e8dc 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -3617,7 +3617,7 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
- 	  unsigned int *nbytes, char **buf, int *buf_type)
- {
- 	struct smb_rqst rqst;
--	int resp_buftype, rc = -EACCES;
-+	int resp_buftype, rc;
- 	struct smb2_read_plain_req *req = NULL;
- 	struct smb2_read_rsp *rsp = NULL;
- 	struct kvec iov[1];
+Cheers,
 -- 
-2.20.1
-
+Aurélien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Linux GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
+GF: Felix Imendörffer, Mary Higgins, Sri Rasiah HRB 21284 (AG Nürnberg)
