@@ -1,109 +1,87 @@
-Return-Path: <SRS0=HKjj=V3=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=3qap=V4=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42E8EC433FF
-	for <linux-cifs@archiver.kernel.org>; Tue, 30 Jul 2019 15:57:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E87C5C32751
+	for <linux-cifs@archiver.kernel.org>; Wed, 31 Jul 2019 04:34:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1F99920693
-	for <linux-cifs@archiver.kernel.org>; Tue, 30 Jul 2019 15:57:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B8FBD2089E
+	for <linux-cifs@archiver.kernel.org>; Wed, 31 Jul 2019 04:34:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aLl3JIuF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729032AbfG3P5U (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 30 Jul 2019 11:57:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40090 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726363AbfG3P5U (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 30 Jul 2019 11:57:20 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id AD19A300CB0C;
-        Tue, 30 Jul 2019 15:57:17 +0000 (UTC)
-Received: from redhat.com (ovpn-112-36.rdu2.redhat.com [10.10.112.36])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A63655D6A7;
-        Tue, 30 Jul 2019 15:57:05 +0000 (UTC)
-Date:   Tue, 30 Jul 2019 11:57:02 -0400
-From:   Jerome Glisse <jglisse@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Christoph Hellwig <hch@infradead.org>, john.hubbard@gmail.com,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
-        LKML <linux-kernel@vger.kernel.org>, ceph-devel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
-        netdev@vger.kernel.org, samba-technical@lists.samba.org,
-        v9fs-developer@lists.sourceforge.net,
-        virtualization@lists.linux-foundation.org,
-        John Hubbard <jhubbard@nvidia.com>,
-        Minwoo Im <minwoo.im.dev@gmail.com>
-Subject: Re: [PATCH 03/12] block: bio_release_pages: use flags arg instead of
- bool
-Message-ID: <20190730155702.GB10366@redhat.com>
-References: <20190724042518.14363-1-jhubbard@nvidia.com>
- <20190724042518.14363-4-jhubbard@nvidia.com>
- <20190724053053.GA18330@infradead.org>
- <20190729205721.GB3760@redhat.com>
- <20190730102557.GA1700@lst.de>
+        id S1727706AbfGaEeB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 31 Jul 2019 00:34:01 -0400
+Received: from mail-pf1-f173.google.com ([209.85.210.173]:41445 "EHLO
+        mail-pf1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726738AbfGaEeB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 31 Jul 2019 00:34:01 -0400
+Received: by mail-pf1-f173.google.com with SMTP id m30so31100253pff.8
+        for <linux-cifs@vger.kernel.org>; Tue, 30 Jul 2019 21:34:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=gC4XprLLqt9FTRkJoHyN8n8Toskl51c4AyuKF4FwxFY=;
+        b=aLl3JIuFQPiWXvzmYBD3mLY6zpSALVwW9vm6rOtbnxaFmfIpgIVPp0gwD6/KgD2oJD
+         Zfj96HMe79PsOjbg/teCVA/6DZcsO9taKY8Ap9C9PSV/Q1ywvNoXP+koZzMC5NH6y/F7
+         mbpkL0vecetL2z7C0BsB/8hJ7un+4y8V5dWbjElm1bxH39qtbfRSV3c12OlKeobh4FPB
+         NfA9TnxBhZj9h5w0z5PJ77kAcvTmILhxMWL18t0GEBYlAhe1iKIlJ3TD084zTU//UMUr
+         fmqwhq0mhXjcWbiQv/kpZan2ORlh2A5L1Tf/RtWvG14N9/Ui+XeRz/axWVDoNTWJyO/w
+         KTiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=gC4XprLLqt9FTRkJoHyN8n8Toskl51c4AyuKF4FwxFY=;
+        b=JAyXtpz8AAXXludV7lI/VaiUWLmwlHUvMmdCdS7ZYxzmnBoKYpmH673jDyHYWPe7Vs
+         27kUHLVdISfYZ9+nHLYLsI7IhPiKYPz7WOJEUP4/m6ZcnrIPNDzKcwR595RXmZH8PNxT
+         vn7s6du9sD3f/eTl6eMwxo77ywJC9zcd4awSDtY9AMGBV85d1solmbsQF7jdarMN1DfT
+         y8sASrhIp1sw8wofqHPMLrQIujGIQ5zxN/emLnTH1xMdipaBvn8zyNphcOC6orCaKEuw
+         XJ1ytNSK5H5vZD3P++Pu4qYDOdbzSaPbp8YKfdjxpWMc0Y36RG8CIrO3yoEUFg0JGJ3R
+         I+8Q==
+X-Gm-Message-State: APjAAAUyY69KJ3FhtHGpLz+5tIqcDUWF1ssYfp+oUaaVPuZBLTBNL1ay
+        T+liX/f+Lz4sR8AJTNVXQRStVbA1Pu1roCvu1u2MKWYhRis=
+X-Google-Smtp-Source: APXvYqyehxnlAiYo9dEh2bjhSHRVDDlq64wiD+fobmu9pcBsuUI5kJVxME0CVwVWh+iMwCpZipw778Ry9N3pvqP6os8=
+X-Received: by 2002:a63:7245:: with SMTP id c5mr98689282pgn.11.1564547639617;
+ Tue, 30 Jul 2019 21:33:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190730102557.GA1700@lst.de>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Tue, 30 Jul 2019 15:57:19 +0000 (UTC)
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 30 Jul 2019 23:33:48 -0500
+Message-ID: <CAH2r5mvv+UyUGUXKWDgVEoOzBbbOK+PN4y1q_k+Qni5jATC0xg@mail.gmail.com>
+Subject: setting attributes ignores errors setting the mode
+To:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Jul 30, 2019 at 12:25:57PM +0200, Christoph Hellwig wrote:
-> On Mon, Jul 29, 2019 at 04:57:21PM -0400, Jerome Glisse wrote:
-> > > All pages releases by bio_release_pages should come from
-> > > get_get_user_pages, so I don't really see the point here.
-> > 
-> > No they do not all comes from GUP for see various callers
-> > of bio_check_pages_dirty() for instance iomap_dio_zero()
-> > 
-> > I have carefully tracked down all this and i did not do
-> > anyconvertion just for the fun of it :)
-> 
-> Well, the point is _should_ not necessarily do.  iomap_dio_zero adds the
-> ZERO_PAGE, which we by definition don't need to refcount.  So we can
-> mark this bio BIO_NO_PAGE_REF safely after removing the get_page there.
-> 
-> Note that the equivalent in the old direct I/O code, dio_refill_pages,
-> will be a little more complicated as it can match user pages and the
-> ZERO_PAGE in a single bio, so a per-bio flag won't handle it easily.
-> Maybe we just need to use a separate bio there as well.
-> 
-> In general with series like this we should not encode the status quo an
-> pile new hacks upon the old one, but thing where we should be and fix
-> up the old warts while having to wade through all that code.
+If we try to set the mode and (for example) get a sharing violation -
+it looks like the return code is ignored for the wrong cases (ie
+ignored for errors setting size or mode but not for times), if I am
+reading the below correctly (see cifs_setattr_nounix)
 
-Other user can also add page that are not coming from GUP but need to
-have a reference see __blkdev_direct_IO() saddly bio get fill from many
-different places and not always with GUP. So we can not say that all
-pages here are coming from bio. I had a different version of the patchset
-i think that was adding a new release dirty function for GUP versus non
-GUP bio. I posted it a while ago, i will try to dig it up once i am
-back.
+        if (attrs->ia_valid & (ATTR_MTIME|ATTR_ATIME|ATTR_CTIME) ||
+            ((attrs->ia_valid & ATTR_MODE) && dosattr)) {
+                rc = cifs_set_file_info(inode, attrs, xid, full_path, dosattr);
+                /* BB: check for rc = -EOPNOTSUPP and switch to legacy mode */
 
-Cheers,
-Jérôme
+                /* Even if error on time set, no sense failing the call if
+                the server would set the time to a reasonable value anyway,
+                and this check ensures that we are not being called from
+                sys_utimes in which case we ought to fail the call back to
+                the user when the server rejects the call */
+                if ((rc) && (attrs->ia_valid &
+                                (ATTR_MODE | ATTR_GID | ATTR_UID | ATTR_SIZE)))
+                        rc = 0;
+        }
+
+Isn't this backwards? Or am I misreading it?
+-- 
+Thanks,
+
+Steve
