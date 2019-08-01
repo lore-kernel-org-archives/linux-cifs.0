@@ -5,168 +5,108 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1457C19759
-	for <linux-cifs@archiver.kernel.org>; Thu,  1 Aug 2019 17:13:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A70D6C19759
+	for <linux-cifs@archiver.kernel.org>; Thu,  1 Aug 2019 18:05:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 99874204EC
-	for <linux-cifs@archiver.kernel.org>; Thu,  1 Aug 2019 17:13:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4EA312080C
+	for <linux-cifs@archiver.kernel.org>; Thu,  1 Aug 2019 18:05:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lr++wZb3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O3BEhvXL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732327AbfHARNg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 1 Aug 2019 13:13:36 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:33205 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731747AbfHARNg (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 1 Aug 2019 13:13:36 -0400
-Received: by mail-pg1-f193.google.com with SMTP id n190so3119509pgn.0
-        for <linux-cifs@vger.kernel.org>; Thu, 01 Aug 2019 10:13:35 -0700 (PDT)
+        id S1731751AbfHASFc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 1 Aug 2019 14:05:32 -0400
+Received: from mail-pf1-f181.google.com ([209.85.210.181]:45450 "EHLO
+        mail-pf1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731642AbfHASFb (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 1 Aug 2019 14:05:31 -0400
+Received: by mail-pf1-f181.google.com with SMTP id r1so34508440pfq.12
+        for <linux-cifs@vger.kernel.org>; Thu, 01 Aug 2019 11:05:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=5LnDnssFNI2r2iy9SZB32EyFtQAl0/3mPNdPCS0dF4E=;
-        b=Lr++wZb3TCNiBfHGSIk5iX5NVvJq1B2rUgiTsD/BhA88wtFvA1bEHazxfOkwkV6N2W
-         +W6i4FSAx7DNZeQkBsnqXbFgVOIasLz0QoptaeTPzUbCVho1ON8lHKUxcqrVJtZpnzRW
-         xyL0doZcWTB3I6KxODK6lhLtepwjleRipuylcNNyV9UODXyI2Apk59GcJtxpOKHJ53ye
-         VgeIFMWRIP2jtmgJbUFUA6e8fnAeLWv0Tr+zU+itM0p2gXD4MxdDPpu7BNodo8Zc4nm2
-         cUGdEB0UbMGpx9K2uyEtYKKJEgetzp1+OHiCH9jBF+x+xxbF9FJ1dOZfqy1f1j29mm2v
-         6wyw==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=8PVvDn0maAZc6h+BgmIISTOgbBMcqChs55h834excoc=;
+        b=O3BEhvXLyy5WVCfweklv/hkcP+VfRHQ2aTnL84LS8KPfixInzoLpyTkiL1OT4T+eiA
+         XN4ITeDWzp3bZE3OPXHChrCD48rtkdq55G8qCkgfNGeaktCbaAq2+TOt4S/lzLOtsX6+
+         9rLVZ3Cd13nxkFTY84VuE65u50r3wbPsoUKW6NHWvz7UOwX4vGeHoIe+LaGHL+lPDPDZ
+         WuYsdOnYklgC9olmY6fJedhjjcBmyA8qKeZrZ4T/TEI2nLm21s7OEaS91ojD24tSfAhI
+         drhyd3Xj8CBQkmJNPaqI/BRmEBapze+z9VMGWFGKtv5U6wyJS2pv1H+gCcWi71PRNDRF
+         9ZpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=5LnDnssFNI2r2iy9SZB32EyFtQAl0/3mPNdPCS0dF4E=;
-        b=oA0yeJW/prkSANsnL/tjmcijXALGy39bIg+3V0iZ2fPGo0TylhFzcPj196ghkvBjBY
-         EUGPAdUtpcgZksGeja4DbpMHxbaW8CkOtndLLhYZprfXnvOGzVwknInzUjSPghYUT78V
-         gtJyjyzou5Ssb9oOaGexqvj8YHhnp/0xGQN/SzStKydBFWz7D4k+wBDJ4oP2gPNrS6Lk
-         8y27HLSAtuid8h+kVh4JCIVJlHb0IFWbDZvz5kIPpwugtvQ1CC0hzV5F+PUZb5GtUEWl
-         Rg/Lhlc4SHJqoJmT27veVnvPoAHI47/TtQeOXl/zeHJ/SkTeAVr45Qi+YBpllAeRQ8do
-         Cy2g==
-X-Gm-Message-State: APjAAAW16OauokoDMFcdXr0jYXb12H+kkVtO2VQjsFz5jq/8z5CzCCJY
-        31jD65VzQVMuIiefpJmHGET31LN5HwLRXi8Pdeg=
-X-Google-Smtp-Source: APXvYqyBiZAeH63tq3e65AzxEfiBW7+4MBYxO6hEdY80yQd5rhRsrlcrp+JQZ18p5OHRTxuNtJxZu6DJPqs/jY3CdOo=
-X-Received: by 2002:a63:724b:: with SMTP id c11mr41592880pgn.30.1564679614836;
- Thu, 01 Aug 2019 10:13:34 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=8PVvDn0maAZc6h+BgmIISTOgbBMcqChs55h834excoc=;
+        b=YwbnAoXLPcq7eV08IIWH5ImMCghmujYiM5lTONhs4zapBLMij0ASCMs2wrb1G5VuQW
+         eMXUbAhQH76C2wDzmDzfpLVEGksWHKl4oJXCZ7mKrDmufYLubTMwdjIBH454dRD6Oxr9
+         fH1fZO/rgeWMozKdqENw4JGx9kkUZYM3Nd4gR8IODxGzVaJHJHm44SIb0yzzAtklaiIG
+         490OqsST4Y31OYJMBDpWHOy1teTAqKWEC0BJSDQo56OrqPCPwh/3ET9A0ZVnbsCU19w7
+         1YPSQhHr9mrlU5UJeFvn16i8peQCOptR0mkg7L9Xl8AtVTRK9Ukla80mcK2l73fnEsie
+         u3uw==
+X-Gm-Message-State: APjAAAXKK/UYZPQVOC6YKIgnBJaM5N6tBfhFv4SM7RaMwYzejARsayw9
+        UFvgZvaE5PMP9R5v2lo/QxBjdZJayaEXtA5dG6lX9lml
+X-Google-Smtp-Source: APXvYqxAcFbVBakEmMCwnjhh9I2/CC4OG9QP9qQzFWB2RtzUMDR6T8jj8uFyeKv2FOrB8nLWBfWNixoQP4wzB/RNnNw=
+X-Received: by 2002:a63:7245:: with SMTP id c5mr107264130pgn.11.1564682730715;
+ Thu, 01 Aug 2019 11:05:30 -0700 (PDT)
 MIME-Version: 1.0
-References: <380e1b86-1911-b8a5-6b02-276b6d4be4fe@wallix.com> <CAKywueSO=choOsw6THnEnmN4UwhACHU1o1pJX8ypx0wjVTmiKQ@mail.gmail.com>
-In-Reply-To: <CAKywueSO=choOsw6THnEnmN4UwhACHU1o1pJX8ypx0wjVTmiKQ@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 1 Aug 2019 12:13:23 -0500
-Message-ID: <CAH2r5ms1qgpPrB+oOHWF7TVoZ36g3iska1PQ3dBGMrscq2K51g@mail.gmail.com>
-Subject: Re: PROBLEM: Kernel oops when mounting a encryptData CIFS share with CONFIG_DEBUG_VIRTUAL
-To:     Pavel Shilovsky <pavel.shilovsky@gmail.com>
-Cc:     Sebastien Tisserant <stisserant@wallix.com>,
-        Steve French <sfrench@samba.org>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        Cristian Popi <cpopi@wallix.com>,
-        Cyrille Mucchietto <cmucchietto@wallix.com>
-Content-Type: multipart/mixed; boundary="000000000000a15fb3058f115c54"
+Date:   Thu, 1 Aug 2019 13:05:18 -0500
+Message-ID: <CAH2r5mu-4wZ7p4NDyT9k=fdSHfD_fL0tYyNL5mZV2dugWZoXYg@mail.gmail.com>
+Subject: [PATCH][WIP] do not ignore error on setinfo for chmod
+To:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="00000000000059ecfb058f12166a"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000a15fb3058f115c54
+--00000000000059ecfb058f12166a
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Sebastien,
-I cleaned up the patch and merged into cifs-2.6.git - can you
-doublecheck it is correct?
+We were incorrectly skipping errors in some cases in cifs_settattr_nounix
 
 
-On Thu, Jul 25, 2019 at 3:35 PM Pavel Shilovsky
-<pavel.shilovsky@gmail.com> wrote:
->
-> =D1=87=D1=82, 25 =D0=B8=D1=8E=D0=BB. 2019 =D0=B3. =D0=B2 09:57, Sebastien=
- Tisserant via samba-technical
-> <samba-technical@lists.samba.org>:
-> ...
-> >
-> > mount works without CONFIG_DEBUG_VIRTUAL
-> >
-> > If we don't set CONFIG_VMAP_STACK mount works with CONFIG_DEBUG_VIRTUAL
-> >
-> >
-> > We have the following (very quick and dirty) patch :
-> >
-> > Index: linux-4.19.60/fs/cifs/smb2ops.c
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > --- linux-4.19.60.orig/fs/cifs/smb2ops.c
-> > +++ linux-4.19.60/fs/cifs/smb2ops.c
-> > @@ -2545,7 +2545,15 @@ fill_transform_hdr(struct smb2_transform
-> >  static inline void smb2_sg_set_buf(struct scatterlist *sg, const void =
-*buf,
-> >                     unsigned int buflen)
-> >  {
-> > -    sg_set_page(sg, virt_to_page(buf), buflen, offset_in_page(buf));
-> > +      void *addr;
-> > +      /*
-> > +       * VMAP_STACK (at least) puts stack into the vmalloc address spa=
-ce
-> > +      */
-> > +      if (is_vmalloc_addr(buf))
-> > +              addr =3D vmalloc_to_page(buf);
-> > +      else
-> > +              addr =3D virt_to_page(buf);
-> > +      sg_set_page(sg, addr, buflen, offset_in_page(buf));
-> >  }
-> >
-> >  /* Assumes the first rqst has a transform header as the first iov.
-> >
-> >
->
-> Thanks for reporting this. The patch looks good to me. Did you test
-> your scenario all together with it (not only mounting)?
->
->
-> Best regards,
-> Pavel Shilovskiy
-
-
-
---=20
+-- 
 Thanks,
 
 Steve
 
---000000000000a15fb3058f115c54
+--00000000000059ecfb058f12166a
 Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-SMB3-Kernel-oops-mounting-a-encryptData-share-with-C.patch"
+	name="0001-cifs-fix-error-handling-on-chmod.patch"
 Content-Disposition: attachment; 
-	filename="0001-SMB3-Kernel-oops-mounting-a-encryptData-share-with-C.patch"
+	filename="0001-cifs-fix-error-handling-on-chmod.patch"
 Content-Transfer-Encoding: base64
-Content-ID: <f_jysxu1660>
-X-Attachment-Id: f_jysxu1660
+Content-ID: <f_jyszoa0q0>
+X-Attachment-Id: f_jyszoa0q0
 
-RnJvbSBlN2FmZGE2NWJlMzE5ODYzOWRlMGZjZjE3OTZkZGQwYTEwMWUxYWIxIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTZWJhc3RpZW4gVGlzc2VyYW50IDxzdGlzc2VyYW50QHdhbGxp
-eC5jb20+CkRhdGU6IFRodSwgMSBBdWcgMjAxOSAxMjowNjowOCAtMDUwMApTdWJqZWN0OiBbUEFU
-Q0hdIFNNQjM6IEtlcm5lbCBvb3BzIG1vdW50aW5nIGEgZW5jcnlwdERhdGEgc2hhcmUgd2l0aAog
-Q09ORklHX0RFQlVHX1ZJUlRVQUwKCkZpeCBrZXJuZWwgb29wcyB3aGVuIG1vdW50aW5nIGEgZW5j
-cnlwdERhdGEgQ0lGUyBzaGFyZSB3aXRoCkNPTkZJR19ERUJVR19WSVJUVUFMCgpTaWduZWQtb2Zm
-LWJ5OiBTZWJhc3RpZW4gVGlzc2VyYW50IDxzdGlzc2VyYW50QHdhbGxpeC5jb20+ClJldmlld2Vk
-LWJ5OiBQYXZlbCBTaGlsb3Zza3kgPHBzaGlsb3ZAbWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9jaWZz
-L3NtYjJvcHMuYyB8IDEwICsrKysrKysrKy0KIDEgZmlsZSBjaGFuZ2VkLCA5IGluc2VydGlvbnMo
-KyksIDEgZGVsZXRpb24oLSkKCmRpZmYgLS1naXQgYS9mcy9jaWZzL3NtYjJvcHMuYyBiL2ZzL2Np
-ZnMvc21iMm9wcy5jCmluZGV4IGZjNDY0ZGMyMGIzMC4uM2UzMjQzZDcxNTJjIDEwMDY0NAotLS0g
-YS9mcy9jaWZzL3NtYjJvcHMuYworKysgYi9mcy9jaWZzL3NtYjJvcHMuYwpAQCAtMzUxMCw3ICsz
-NTEwLDE1IEBAIGZpbGxfdHJhbnNmb3JtX2hkcihzdHJ1Y3Qgc21iMl90cmFuc2Zvcm1faGRyICp0
-cl9oZHIsIHVuc2lnbmVkIGludCBvcmlnX2xlbiwKIHN0YXRpYyBpbmxpbmUgdm9pZCBzbWIyX3Nn
-X3NldF9idWYoc3RydWN0IHNjYXR0ZXJsaXN0ICpzZywgY29uc3Qgdm9pZCAqYnVmLAogCQkJCSAg
-IHVuc2lnbmVkIGludCBidWZsZW4pCiB7Ci0Jc2dfc2V0X3BhZ2Uoc2csIHZpcnRfdG9fcGFnZShi
-dWYpLCBidWZsZW4sIG9mZnNldF9pbl9wYWdlKGJ1ZikpOworCXZvaWQgKmFkZHI7CisJLyoKKwkg
-KiBWTUFQX1NUQUNLIChhdCBsZWFzdCkgcHV0cyBzdGFjayBpbnRvIHRoZSB2bWFsbG9jIGFkZHJl
-c3Mgc3BhY2UKKwkgKi8KKwlpZiAoaXNfdm1hbGxvY19hZGRyKGJ1ZikpCisJCWFkZHIgPSB2bWFs
-bG9jX3RvX3BhZ2UoYnVmKTsKKwllbHNlCisJCWFkZHIgPSB2aXJ0X3RvX3BhZ2UoYnVmKTsKKwlz
-Z19zZXRfcGFnZShzZywgYWRkciwgYnVmbGVuLCBvZmZzZXRfaW5fcGFnZShidWYpKTsKIH0KIAog
-LyogQXNzdW1lcyB0aGUgZmlyc3QgcnFzdCBoYXMgYSB0cmFuc2Zvcm0gaGVhZGVyIGFzIHRoZSBm
-aXJzdCBpb3YuCi0tIAoyLjIwLjEKCg==
---000000000000a15fb3058f115c54--
+RnJvbSBkODQyMzM4OGUwN2IxNmRjNTA4ZWQ0NTM2Mzc4NzlmNDdiZWJkMWIxIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFRodSwgMSBBdWcgMjAxOSAxMjoyMToxNCAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIGNp
+ZnM6IGZpeCBlcnJvciBoYW5kbGluZyBvbiBjaG1vZAoKV2Ugd2VyZSBpZ25vcmluZyBlcnJvcnMg
+b24gY2htb2QgZHVlIHRvIGluY29ycmVjdCBjaGVjayBvZgp3aGljaCBhdHRyaWJ1dGVzIHdlcmUg
+YmVpbmcgY2hhbmdlZCAoY2VydGFpbiB0aW1lc3RhbXAgc2V0dGluZwplcnJvcnMgY2FuIGJlIHNh
+ZmVseSBpZ25vcmVkIGJ1dCBub3QgY2htb2QpLgoKU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNo
+IDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL2NpZnMvaW5vZGUuYyB8IDE0ICsrKysr
+KysrLS0tLS0tCiAxIGZpbGUgY2hhbmdlZCwgOCBpbnNlcnRpb25zKCspLCA2IGRlbGV0aW9ucygt
+KQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvaW5vZGUuYyBiL2ZzL2NpZnMvaW5vZGUuYwppbmRleCAy
+NmNkZmJmMWUxNjQuLjI1YTVhZWRkYzA5YSAxMDA2NDQKLS0tIGEvZnMvY2lmcy9pbm9kZS5jCisr
+KyBiL2ZzL2NpZnMvaW5vZGUuYwpAQCAtMjU1OSwxMiArMjU1OSwxNCBAQCBjaWZzX3NldGF0dHJf
+bm91bml4KHN0cnVjdCBkZW50cnkgKmRpcmVudHJ5LCBzdHJ1Y3QgaWF0dHIgKmF0dHJzKQogCQkv
+KiBCQjogY2hlY2sgZm9yIHJjID0gLUVPUE5PVFNVUFAgYW5kIHN3aXRjaCB0byBsZWdhY3kgbW9k
+ZSAqLwogCiAJCS8qIEV2ZW4gaWYgZXJyb3Igb24gdGltZSBzZXQsIG5vIHNlbnNlIGZhaWxpbmcg
+dGhlIGNhbGwgaWYKLQkJdGhlIHNlcnZlciB3b3VsZCBzZXQgdGhlIHRpbWUgdG8gYSByZWFzb25h
+YmxlIHZhbHVlIGFueXdheSwKLQkJYW5kIHRoaXMgY2hlY2sgZW5zdXJlcyB0aGF0IHdlIGFyZSBu
+b3QgYmVpbmcgY2FsbGVkIGZyb20KLQkJc3lzX3V0aW1lcyBpbiB3aGljaCBjYXNlIHdlIG91Z2h0
+IHRvIGZhaWwgdGhlIGNhbGwgYmFjayB0bwotCQl0aGUgdXNlciB3aGVuIHRoZSBzZXJ2ZXIgcmVq
+ZWN0cyB0aGUgY2FsbCAqLwotCQlpZiAoKHJjKSAmJiAoYXR0cnMtPmlhX3ZhbGlkICYKLQkJCQko
+QVRUUl9NT0RFIHwgQVRUUl9HSUQgfCBBVFRSX1VJRCB8IEFUVFJfU0laRSkpKQorCQkgKiB0aGUg
+c2VydmVyIHdvdWxkIHNldCB0aGUgdGltZSB0byBhIHJlYXNvbmFibGUgdmFsdWUgYW55d2F5Lgor
+CQkgKiBUT0RPIGNoZWNrIGlmIGNoZWNrIHRvIGVuc3VyZSB0aGF0IGFyZSBub3QgYmVpbmcgY2Fs
+bGVkIGZyb20KKwkJICogc3lzX3V0aW1lcyAoaW4gd2hpY2ggY2FzZSB3ZSBvdWdodCB0byBmYWls
+IHRoZSBjYWxsIHdoZW4gdGhlCisJCSAqIHNlcnZlciByZWplY3RzIHRoZSBjYWxsKSBpcyBjb3Jy
+ZWN0LiBXZSBkbyB3YW50CisJICAgICAgICAgKiB0byByZXR1cm4gYW4gcmMgaWYgZXJyb3Igc2V0
+dGluZyBtb2RlIG9yIG93bmVyIG9yIHNpemUKKwkJICovCisJCWlmIChyYyAmJiAoKGF0dHJzLT5p
+YV92YWxpZCAmCisJCSAgICAgIChBVFRSX01PREUgfCBBVFRSX0dJRCB8IEFUVFJfVUlEIHwgQVRU
+Ul9TSVpFKSkgPT0gMCkpCiAJCQlyYyA9IDA7CiAJfQogCi0tIAoyLjIwLjEKCg==
+--00000000000059ecfb058f12166a--
