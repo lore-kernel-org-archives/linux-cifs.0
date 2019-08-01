@@ -1,132 +1,116 @@
-Return-Path: <SRS0=3qap=V4=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=8TPy=V5=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19EE0C433FF
-	for <linux-cifs@archiver.kernel.org>; Wed, 31 Jul 2019 21:56:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2897C32751
+	for <linux-cifs@archiver.kernel.org>; Thu,  1 Aug 2019 02:02:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E5CAE216C8
-	for <linux-cifs@archiver.kernel.org>; Wed, 31 Jul 2019 21:56:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564610177;
-	bh=K/tOdg0rARIHNKt8myQdNk7juboEm6U9R00/FeIUiBE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=hZMbZYS7my39otyTy1rXgcJaFnk/tw5JDq1q2OT0C4s1hmMQcZxUxSQpA1FExxHI5
-	 tnrfHAjT16TEfQlEfXu1tISu3qBhD41cuT76KPbPS2gHBjmCpOwMFfi613D7jMt30o
-	 MPUEVJ2hunbSCUjnqfgqqVTua/LwBo/XvthHUlx0=
+	by mail.kernel.org (Postfix) with ESMTP id CDCBC20B7C
+	for <linux-cifs@archiver.kernel.org>; Thu,  1 Aug 2019 02:02:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731061AbfGaV4M (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 31 Jul 2019 17:56:12 -0400
-Received: from heliosphere.sirena.org.uk ([172.104.155.198]:42876 "EHLO
-        heliosphere.sirena.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727809AbfGaV4M (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 31 Jul 2019 17:56:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=sirena.org.uk; s=20170815-heliosphere; h=In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=K/tOdg0rARIHNKt8myQdNk7juboEm6U9R00/FeIUiBE=; b=dAQCdVcqawi/p92YlttDZTR93
-        BKyG7tTLWgF7ROCBKJ78mPeMReOpPz03DvX3MgsE3fL4jZKpXbSgEfnsqgHzMIJoSh2RNJNUt/7Vs
-        W4pmxcdPzOCef23B1cmjFfttX03YC386eRlZje3tRqBKZnkd81Qs+16ww3Bey4vn/dVho=;
-Received: from ypsilon.sirena.org.uk ([2001:470:1f1d:6b5::7])
-        by heliosphere.sirena.org.uk with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <broonie@sirena.org.uk>)
-        id 1hswZ4-0003OG-Ci; Wed, 31 Jul 2019 21:55:18 +0000
-Received: by ypsilon.sirena.org.uk (Postfix, from userid 1000)
-        id 1A3322742C6C; Wed, 31 Jul 2019 22:55:17 +0100 (BST)
-Date:   Wed, 31 Jul 2019 22:55:16 +0100
-From:   Mark Brown <broonie@kernel.org>
-To:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-Cc:     Jonathan Corbet <corbet@lwn.net>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        Mauro Carvalho Chehab <mchehab@infradead.org>,
-        linux-kernel@vger.kernel.org, alsa-devel@alsa-project.org,
-        Maxime Ripard <maxime.ripard@bootlin.com>,
-        samba-technical@lists.samba.org, devicetree@vger.kernel.org,
-        Liam Girdwood <lgirdwood@gmail.com>, linux-iio@vger.kernel.org,
-        Lars-Peter Clausen <lars@metafoo.de>,
-        Evgeniy Dushistov <dushistov@mail.ru>,
-        Jonathan Cameron <jic23@kernel.org>,
-        Peter Meerwald-Stadler <pmeerw@pmeerw.net>,
-        Steve French <sfrench@samba.org>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Chen-Yu Tsai <wens@csie.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-cifs@vger.kernel.org, Dave Kleikamp <shaggy@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Evgeniy Polyakov <zbr@ioremap.net>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        jfs-discussion@lists.sourceforge.net,
-        linux-arm-kernel@lists.infradead.org,
-        Hartmut Knaack <knaack.h@gmx.de>, linux-spi@vger.kernel.org
-Subject: Re: [PATCH 0/6] ReST conversion patches not applied yet
-Message-ID: <20190731215516.GM4369@sirena.org.uk>
-References: <cover.1564603513.git.mchehab+samsung@kernel.org>
- <20190731141734.1fa9ce64@lwn.net>
- <20190731202007.GI4369@sirena.org.uk>
- <20190731172613.32d65ad8@coco.lan>
- <20190731203712.GJ4369@sirena.org.uk>
- <20190731182729.01c98cd3@coco.lan>
+        id S1726334AbfHACC6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 31 Jul 2019 22:02:58 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:3286 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726185AbfHACC6 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 31 Jul 2019 22:02:58 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id AF281736122E02F675B2;
+        Thu,  1 Aug 2019 10:02:55 +0800 (CST)
+Received: from [127.0.0.1] (10.184.225.177) by DGGEMS414-HUB.china.huawei.com
+ (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Thu, 1 Aug 2019
+ 10:02:43 +0800
+To:     <linux-cifs@vger.kernel.org>,
+        =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel@suse.com>,
+        <liujiawen10@huawei.com>, <smfrench@gmail.com>,
+        <pshilov@microsoft.com>, <lsahlber@redhat.com>,
+        <kdsouza@redhat.com>, <ab@samba.org>, <palcantara@suse.de>,
+        <liujiawen10@huawei.com>
+From:   Zhiqiang Liu <liuzhiqiang26@huawei.com>
+Subject: [PATCH cifs-utils] mount.cifs.c: fix memory leaks in main func
+CC:     <dujin1@huawei.com>, Mingfangsen <mingfangsen@huawei.com>,
+        zhangsaisai <zhangsaisai@huawei.com>
+Message-ID: <d4bf65ab-42e1-606c-be35-a5cb3b7b77b0@huawei.com>
+Date:   Thu, 1 Aug 2019 10:02:24 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="iKKZt69u2Wx/rspf"
-Content-Disposition: inline
-In-Reply-To: <20190731182729.01c98cd3@coco.lan>
-X-Cookie: FEELINGS are cascading over me!!!
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset="gb18030"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.184.225.177]
+X-CFilter-Loop: Reflected
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+From: Jiawen Liu <liujiawen10@huawei.com>
 
---iKKZt69u2Wx/rspf
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In mount.cifs module, orgoptions and mountpoint in the main func
+point to the memory allocated by func realpath and strndup respectively.
+However, they are not freed before the main func returns so that the
+memory leaks occurred.
 
-On Wed, Jul 31, 2019 at 06:27:29PM -0300, Mauro Carvalho Chehab wrote:
+The memory leak problem is reported by LeakSanitizer tool.
+LeakSanitizer url: "https://github.com/google/sanitizers"
 
-> Meanwhile, if someone needs something that it is at the wrong book, he
-> can just use some search tool to seek what he needs, no matter on
-> what book the relevant information is stored.
+Here I free the pointers orgoptions and mountpoint before main
+func returns.
 
-OTOH it might be weird for the intended audience of the book.
+Fixes£º7549ad5e7126 ("memory leaks: caused by func realpath and strndup")
+Signed-off-by: Jiawen Liu <liujiawen10@huawei.com>
+Reported-by: Jin Du <dujin1@huawei.com>
+Reviewed-by: Saisai Zhang <zhangsaisai@huawei.com>
+---
+ mount.cifs.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-> Mark Brown <broonie@kernel.org> escreveu:
+diff --git a/mount.cifs.c b/mount.cifs.c
+index ae7a899..029f01a 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -1830,6 +1830,7 @@ assemble_mountinfo(struct parsed_mount_info *parsed_info,
+ 	}
 
-> > I don't know if it makes sense to have an embedded developer's
-> > manual as well?
+ assemble_exit:
++	free(orgoptions);
+ 	return rc;
+ }
 
-> Yeah, that's a good question.=20
+@@ -1994,8 +1995,11 @@ int main(int argc, char **argv)
 
-> Jon is planning todo a documentation track at LPC. One of the things
-> that should be discussed, IMO, is how we'll organize the books.
+ 	/* chdir into mountpoint as soon as possible */
+ 	rc = acquire_mountpoint(&mountpoint);
+-	if (rc)
++	if (rc) {
++		free(mountpoint);
++		free(orgoptions);
+ 		return rc;
++	}
 
-I'll be at Plumbers, not sure what the schedule's looking like yet
-though.
+ 	/*
+ 	 * mount.cifs does privilege separation. Most of the code to handle
+@@ -2014,6 +2018,7 @@ int main(int argc, char **argv)
+ 		/* child */
+ 		rc = assemble_mountinfo(parsed_info, thisprogram, mountpoint,
+ 					orig_dev, orgoptions);
++		free(mountpoint);
+ 		return rc;
+ 	} else {
+ 		/* parent */
+@@ -2149,5 +2154,6 @@ mount_exit:
+ 	}
+ 	free(options);
+ 	free(orgoptions);
++	free(mountpoint);
+ 	return rc;
+ }
+-- 
+2.7.4
 
---iKKZt69u2Wx/rspf
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAl1CDkQACgkQJNaLcl1U
-h9DmyQf8CbO6RT3vDVCTbWB0f/yKJ/A87r+D9XnXG94SH0Vqj3KAl/HFsPpl4gyU
-1t9Uo9ZtFC8lSFh29z5fxpIzNkfsanBjnTrJS1lxOvU+DgmoTfXV5+2xa3rel1E0
-oOzMumEUJLWQmAQIaSzObUMvLTHaHZXE9UwveI9WkjfE0k7lsrK4vKzotxGDUk1a
-6B/LdVb+NH3ME369z6GL2hpH6SkNc0jCRYj4PcGud8PTKBqHim7kBI3AeE51lFUV
-Dsr7zD6gH+cbj/GXdXApIDJvlR8bH6LLM/dakss84cM6CvJoD/pd4z9fn2kmUkVY
-5tMO7f2i3x9slM6yQ78bDwGSrn8XIg==
-=1tp/
------END PGP SIGNATURE-----
-
---iKKZt69u2Wx/rspf--
