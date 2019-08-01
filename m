@@ -6,114 +6,137 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93019C19759
-	for <linux-cifs@archiver.kernel.org>; Thu,  1 Aug 2019 14:06:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8427DC19759
+	for <linux-cifs@archiver.kernel.org>; Thu,  1 Aug 2019 14:45:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 52DE220838
-	for <linux-cifs@archiver.kernel.org>; Thu,  1 Aug 2019 14:06:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 615E220665
+	for <linux-cifs@archiver.kernel.org>; Thu,  1 Aug 2019 14:45:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730502AbfHAOGh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 1 Aug 2019 10:06:37 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:55974 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727970AbfHAOGh (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 1 Aug 2019 10:06:37 -0400
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id B5EEAEA3047BCB30CD54;
-        Thu,  1 Aug 2019 22:06:34 +0800 (CST)
-Received: from [127.0.0.1] (10.184.225.177) by DGGEMS404-HUB.china.huawei.com
- (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0; Thu, 1 Aug 2019
- 22:06:24 +0800
-Subject: Re: [PATCH cifs-utils] mount.cifs.c: fix memory leaks in main func
-To:     =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel@suse.com>,
-        <smfrench@gmail.com>, <liujiawen10@huawei.com>,
-        <pshilov@microsoft.com>, <kdsouza@redhat.com>,
-        <lsahlber@redhat.com>, <ab@samba.org>, <palcantara@suse.de>,
-        <linux-cifs@vger.kernel.org>
-CC:     <dujin1@huawei.com>, Mingfangsen <mingfangsen@huawei.com>,
-        zhangsaisai <zhangsaisai@huawei.com>
-References: <d4bf65ab-42e1-606c-be35-a5cb3b7b77b0@huawei.com>
- <87h871s0ty.fsf@suse.com>
-From:   Zhiqiang Liu <liuzhiqiang26@huawei.com>
-Message-ID: <8d637a82-5387-6dc1-caef-0fbc6554e6bc@huawei.com>
-Date:   Thu, 1 Aug 2019 22:06:09 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.0
+        id S1729197AbfHAOpc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 1 Aug 2019 10:45:32 -0400
+Received: from whm03.asteroidpc.com ([204.191.218.21]:44836 "EHLO
+        nathanshearer.ca" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
+        with ESMTP id S1726756AbfHAOpb (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 1 Aug 2019 10:45:31 -0400
+Received: from [204.191.243.35] (port=41538 helo=[172.16.1.42])
+        by whm03.asteroidpc.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+        (Exim 4.92)
+        (envelope-from <mail@nathanshearer.ca>)
+        id 1htCKe-0000BA-Tf; Thu, 01 Aug 2019 08:45:28 -0600
+Subject: Re: Forced to authenticate with "pre-Windows 2000" logon names
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
+References: <e33b9809-b3e2-6ace-6213-f63d8792e6ca@nathanshearer.ca>
+ <CAH2r5msB+OY42b8yqERpzsjeJpnKYpMHeQdu3RPaGPbJBJs-1w@mail.gmail.com>
+From:   Nathan Shearer <mail@nathanshearer.ca>
+Message-ID: <edb2974c-e985-6f76-b711-801812bf8072@nathanshearer.ca>
+Date:   Thu, 1 Aug 2019 08:45:29 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <87h871s0ty.fsf@suse.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAH2r5msB+OY42b8yqERpzsjeJpnKYpMHeQdu3RPaGPbJBJs-1w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.184.225.177]
-X-CFilter-Loop: Reflected
+Content-Language: en-US
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - whm03.asteroidpc.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - nathanshearer.ca
+X-Get-Message-Sender-Via: whm03.asteroidpc.com: authenticated_id: mail@nathanshearer.ca
+X-Authenticated-Sender: whm03.asteroidpc.com: mail@nathanshearer.ca
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 2019/8/1 17:15, Aurélien Aptel wrote:
-> Hi Zhiqiang,
-> 
-> You are on the right list :)
-> 
-> Unfortunately it seems you have sent the exact same patch as before so
-> I'll post my comments again:
-> 
-Thanks for your reply.
-I have just missed your mail with comments. Sorry for that.
-I will modify the patch as your suggestion, then post the v2 patch.
+Hi Steve, thanks for looking into this.
 
-> Zhiqiang Liu <liuzhiqiang26@huawei.com> writes:
->> index ae7a899..029f01a 100644
->> --- a/mount.cifs.c
->> +++ b/mount.cifs.c
->> @@ -1830,6 +1830,7 @@ assemble_mountinfo(struct parsed_mount_info *parsed_info,
->>  	}
->>
->>  assemble_exit:
->> +	free(orgoptions);
->>  	return rc;
->>  }
-> 
-> Since orgoptions is allocated in main() you should also free it
-> there. In fact it is already freed there so the return have to be
-> changed to goto.
-> 
->>
->> @@ -1994,8 +1995,11 @@ int main(int argc, char **argv)
->>
->>  	/* chdir into mountpoint as soon as possible */
->>  	rc = acquire_mountpoint(&mountpoint);
->> -	if (rc)
->> +	if (rc) {
->> +		free(mountpoint);
->> +		free(orgoptions);
->>  		return rc;
->> +	}
-> 
-> Since mountpoint is allocated in acquire_mountpoint() you should free it
-> there if there's an error.
-> 
->>  	/*
->>  	 * mount.cifs does privilege separation. Most of the code to handle
->> @@ -2014,6 +2018,7 @@ int main(int argc, char **argv)
->>  		/* child */
->>  		rc = assemble_mountinfo(parsed_info, thisprogram, mountpoint,
->>  					orig_dev, orgoptions);
->> +		free(mountpoint);
-> 
-> Since this code block is only run by the child I think it's ok to not
-> use goto. Don't forget to free(orgoptions) if you remove it from
-> assemble_mountinfo()
-> 
->>  		return rc;
->>  	} else {
->>  		/* parent */
->> @@ -2149,5 +2154,6 @@ mount_exit:
->>  	}
->>  	free(options);
->>  	free(orgoptions);
->> +	free(mountpoint);
-> 
-> Cheers,
-> 
+The file server(s) I tried are members of a domain. One is a plain file 
+server only, and the other is a domain controller, both are updated 
+Windows Server 2012 installs. My linux system is not a member of the 
+domain, and is an updated Gentoo install:
 
+# cat /proc/fs/cifs/DebugData | grep Version
+CIFS Version 2.20
+
+# cat /proc/version
+Linux version 5.2.2 (root@varws03) (gcc version 8.3.0 (Gentoo 8.3.0-r1 
+p1.1)) #1 SMP PREEMPT Thu Jul 25 09:08:17 MDT 2019
+
+The actual command I am using right now to mount the share only works 
+with the pre-windows 2000 logon name (18 characters):
+
+# mount -v -t cifs -o 
+username=xx-xxxx-xxxxxxxxxx,password=xxxxxxxxxxxxxxxxxxxxxxxx,domain=xxxxxxxx-xxx,vers=3.0 
+'//192.168.100.10/Test Share' /mnt/temp0
+
+If I use the regular logon name (23 characters) I get these errors:
+
+# mount -v -t cifs -o 
+username=xx-xxxx-xxxxxxxxxxyyyyy,password=xxxxxxxxxxxxxxxxxxxxxxxx,domain=xxxxxxxx-xxx,vers=3.0 
+'//192.168.100.10/Test Share' /mnt/temp0
+mount.cifs kernel mount options: 
+ip=192.168.100.10,unc=\\192.168.100.10\Test 
+Share,vers=3.0,user=xx-xxxx-xxxxxxxxxxyyyyy,domain=xxxxxxxx-xxx,pass=********
+mount error(13): Permission denied
+Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
+
+/var/log/messeges
+Aug  1 08:43:06 testclient01 kernel: CIFS: Attempting to mount 
+//192.168.100.10/Test Share
+Aug  1 08:43:07 testclient01 kernel: Status code returned 0xc000006d 
+STATUS_LOGON_FAILURE
+Aug  1 08:43:07 testclient01 kernel: CIFS VFS: Send error in SessSetup = -13
+Aug  1 08:43:07 testclient01 kernel: CIFS VFS: cifs_mount failed 
+w/return code = -13
+
+Is the domain considered part of the 32 character username character 
+limit? My domain is 12 characters, full logon name with the domain would 
+be 35 characters (including the \ separator), while the pre-windows 2000 
+name would be 31 characters with the \ separator.
+
+On 8/1/19 1:50 AM, Steve French wrote:
+> I tried some experiments today with longer usernames (e.g. 32
+> characters, which is the maximum allowed on the Linux distros I
+> tried).   mounting with 32 character usernames worked fine (at least
+> to Samba).  I wouldn't expect anything different to Windows.
+>
+> I don't remember any recent change to add this support so as long as
+> you are running a kernel from the last three or four years, hard to
+> guess what is the issue (if you have evidence like a wireshark trace
+> or debugging information showing the username getting
+> remapped/corrupted when passed down that might be helpful)
+>
+> Can you see the module version (modinfo cifs or "cat
+> /proc/fs/cifs/DebugData | grep Version") and the kernel version
+> ("uname -a")?
+>
+>
+> On Wed, Jul 31, 2019 at 2:39 PM Nathan Shearer <mail@nathanshearer.ca> wrote:
+>> I spent the last two days trying to mount a windows share, and it turns
+>> out it was not a problem with:
+>>
+>>    * share permissions
+>>    * filesystem permissions
+>>    * incorrect password
+>>    * firewalls
+>>    * antivirus software
+>>    * smb version
+>>
+>> But was in fact an issue with the username. The username I had was 23
+>> characters, which is longer than the "pre-Windows 2000" logon name which
+>> is what cifs was using, even with smb vers=3.0. The error was always
+>> status code 0xc000006d STATUS_LOGON_FAILURE which this time was actually
+>> an authentication problem since the client was using the wrong username.
+>>
+>> Is there any plan to support windows usernames in samba/cifs that are
+>> *post* windows 2000 era?
+>>
+>> # mount.cifs -V
+>> mount.cifs version: 6.9
+>>
+>
