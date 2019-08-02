@@ -2,242 +2,137 @@ Return-Path: <SRS0=IbS0=V6=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 405D4C433FF
-	for <linux-cifs@archiver.kernel.org>; Fri,  2 Aug 2019 00:38:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EC26C32750
+	for <linux-cifs@archiver.kernel.org>; Fri,  2 Aug 2019 06:59:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 07FEE2083B
-	for <linux-cifs@archiver.kernel.org>; Fri,  2 Aug 2019 00:38:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 452862087E
+	for <linux-cifs@archiver.kernel.org>; Fri,  2 Aug 2019 06:59:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="XJobggZ5"
+	dkim=pass (1024-bit key) header.d=wallix.onmicrosoft.com header.i=@wallix.onmicrosoft.com header.b="WBKoaJH+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388459AbfHBAiI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 1 Aug 2019 20:38:08 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:39839 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726825AbfHBAiI (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 1 Aug 2019 20:38:08 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4607YS10mXz9sBF;
-        Fri,  2 Aug 2019 10:38:03 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1564706284;
-        bh=JIiX2SDsIiJ0ZidVaj3bi2N9QTRTYubHyhF24hu4qDc=;
-        h=Date:From:To:Cc:Subject:From;
-        b=XJobggZ5lPRTbEk+Pex4FGyV/H8rBEhVkjJG23NPqb41L35Hmwh6eBhxGqaMiVM5J
-         0aHoshn3CEybX0LqWyg/ogQJWoJnNRSjhwDwqMvu4W2TZ0UVcINKwRCxb2sbRU5a82
-         Z8KSqafgQRTE7OcJx4VRhvGAluY5MDZjAGjuv/FgkZPf1svvxMC3QRBpgy6hxBluLy
-         KVm+nj7q/9+mLkpKmjw2xPrcdG/YSlEjv7MBwWuPHjEIJlmdm7FaJp2RMn82GLcD1i
-         JCuov68fsaFxmBLnuPfUH+e5U4fDq4648J8MBLo7tt2fX4XsdHFdnV+iY4EG+wlQHB
-         3H+Sgm1wiszSg==
-Date:   Fri, 2 Aug 2019 10:38:03 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Jonathan Corbet <corbet@lwn.net>,
-        Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-Subject: linux-next: manual merge of the jc_docs tree with the cifs tree
-Message-ID: <20190802103803.7dfb5659@canb.auug.org.au>
+        id S2389249AbfHBG72 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 2 Aug 2019 02:59:28 -0400
+Received: from mail-eopbgr10045.outbound.protection.outlook.com ([40.107.1.45]:14466
+        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1733135AbfHBG71 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 2 Aug 2019 02:59:27 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=U1IA8rlJOIC8gj7xeq67YV2pReCy7NalLIUXhiWE1q9+KBheiN2M+j5mROku3TaT/QpOopp10Ypz+FNstZnDZvhxc765h0/NjgUeUhstayPdjnGV2dwZnw/PR4oZHx+//TCcOg/HMLrVluCM1/RybdbYHaGQFxnGvee/mBQ2FoU2I2hDcySxcwtFEiLEjajm3LdykNUR6Da8Vbwj9L9GVSRSOq1iVH/iN1wBTuJmIc1jZmLCFF3JZZCTQFNNH6wWGjvjwR+Tb4eIGT+L87SgstiGRUxascz1pGwOxnCdm255N8DaCkCpzO4PRUq/4J6zaekYRdA/fi3P4bXPqcN03A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=a1sBj8eVWfmYtq61mrC0Etl/alJwheg8nfae/xJr2X0=;
+ b=HYakVBbrjvYfFZ+FyNdf06GwUN6fC1A5TKcF9+Xh5RadqKzXrRooVcawlU5h42srZwAxMJoZMuYNVgg+kPL4W0+4TxgeXtIECgGrM2I2JQKlPU7Q+A51nr3zhUprBr57hDGA6Ky1hUr4rTodzqQ+Y4PpRcz+oYOo/Kj4j5hicB5eliC2muOeDFSlgazYbflG7Etsu7dQC8QMwy8sW0uVAhWM4Y6SrIc5jfT/KIOJuwkntS2YjzPFL4s4JkHOQpKHcjgUCMJWtA8jBx2vBVqgWLcRUG6rOQ8g/YW4buheL5oSbY8gT4q3F95Gq2C2IQYoyY7AzIxjAUuUINHu5jbQVQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=wallix.com;dmarc=pass action=none
+ header.from=wallix.com;dkim=pass header.d=wallix.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=wallix.onmicrosoft.com; s=selector2-wallix-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=a1sBj8eVWfmYtq61mrC0Etl/alJwheg8nfae/xJr2X0=;
+ b=WBKoaJH+fTXxUq96LZ1VpHnywOqvMVJVHHatmm22J9UnEXFJZc1+sQOxb/fPS5mkO2Do2r2TVJEjYPhzTzpnvNtBXH82dK5b0h2ca/56vuQQ7KOaU4hC2TvWcqZnQlh6J8Fm96DMhHE2O4Vai8KP0STLBPyBu31RTjWJxpd7QCU=
+Received: from VI1PR03MB6190.eurprd03.prod.outlook.com (10.141.128.75) by
+ VI1PR03MB6158.eurprd03.prod.outlook.com (10.141.128.21) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2136.16; Fri, 2 Aug 2019 06:58:38 +0000
+Received: from VI1PR03MB6190.eurprd03.prod.outlook.com
+ ([fe80::4d7c:17b1:9d63:4403]) by VI1PR03MB6190.eurprd03.prod.outlook.com
+ ([fe80::4d7c:17b1:9d63:4403%2]) with mapi id 15.20.2136.010; Fri, 2 Aug 2019
+ 06:58:38 +0000
+From:   Cyrille Mucchietto <cmucchietto@wallix.com>
+To:     Steve French <smfrench@gmail.com>,
+        Pavel Shilovsky <pavel.shilovsky@gmail.com>
+CC:     Sebastien Tisserant <stisserant@wallix.com>,
+        Steve French <sfrench@samba.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        Cristian Popi <cpopi@wallix.com>
+Subject: Re: PROBLEM: Kernel oops when mounting a encryptData CIFS share with
+ CONFIG_DEBUG_VIRTUAL
+Thread-Topic: PROBLEM: Kernel oops when mounting a encryptData CIFS share with
+ CONFIG_DEBUG_VIRTUAL
+Thread-Index: AQHVQwVbrMDmWO2VoUeqR7dMvDyd06bbyvGAgArH3YCAAOaQAA==
+Date:   Fri, 2 Aug 2019 06:58:38 +0000
+Message-ID: <35ee3dd4-19dd-4a27-6160-4080bdeaea48@wallix.com>
+References: <380e1b86-1911-b8a5-6b02-276b6d4be4fe@wallix.com>
+ <CAKywueSO=choOsw6THnEnmN4UwhACHU1o1pJX8ypx0wjVTmiKQ@mail.gmail.com>
+ <CAH2r5ms1qgpPrB+oOHWF7TVoZ36g3iska1PQ3dBGMrscq2K51g@mail.gmail.com>
+In-Reply-To: <CAH2r5ms1qgpPrB+oOHWF7TVoZ36g3iska1PQ3dBGMrscq2K51g@mail.gmail.com>
+Accept-Language: en-150, fr-FR, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: PR2P264CA0042.FRAP264.PROD.OUTLOOK.COM
+ (2603:10a6:101:1::30) To VI1PR03MB6190.eurprd03.prod.outlook.com
+ (2603:10a6:800:142::11)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=cmucchietto@wallix.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [89.87.189.250]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 037bf5ac-b34e-4e7c-ee5c-08d71716d858
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:VI1PR03MB6158;
+x-ms-traffictypediagnostic: VI1PR03MB6158:
+x-microsoft-antispam-prvs: <VI1PR03MB61581DB981AD20E5EF951750C2D90@VI1PR03MB6158.eurprd03.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 011787B9DD
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(376002)(136003)(366004)(396003)(39840400004)(189003)(199004)(25786009)(71190400001)(71200400001)(54906003)(110136005)(6512007)(81156014)(81166006)(68736007)(53546011)(6506007)(386003)(76176011)(102836004)(186003)(31686004)(26005)(4326008)(486006)(36756003)(66066001)(6246003)(476003)(107886003)(8676002)(446003)(52116002)(6436002)(2616005)(99286004)(6486002)(11346002)(5660300002)(256004)(14444005)(3846002)(86362001)(6116002)(14454004)(305945005)(229853002)(7736002)(2906002)(8936002)(53936002)(66946007)(66476007)(66556008)(64756008)(66446008)(316002)(31696002)(478600001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR03MB6158;H:VI1PR03MB6190.eurprd03.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: wallix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: NxCXPojoloFVVufq1OtsY45LaTsABbQ0JN4caHlONFuW92LR1EbLIQUCgXzh1exTxpqWrC1Ri6ZGFJxUZan3lpd1jqUk+JfAvbBDmmkZsXv/0Cth/pPYKG8js38aOg9jd6QFD6EctbB6pBCAbJOZKTvAIgo0qVC/0jsYMuFFTZc1a41+/47vhWXQVLbCbYeMSXgj+3ZiOp7SN1ao3IIZj5iILGQTV9aiCZxLfsUZaUUi99lzf+ANcp5flSaR2EOY303Nl9sJLBN2lkxK/71rUphzIg/t2fZH/HCVYTOIxvIu7IeOtKMiUve3iPgeR8E5VQFitPQP/hZakdGGyWGcHz9JPjlFMxow6dYIAuxAwiLmU5Xv0hAL8W0LM3fk2/fljYGpqGe65EgIrRPUcD138YOaXPu1eav5/J69z5lTuAo=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <CEDA740230A54C4DA0AB0EEACF33A3DB@eurprd03.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/+_A.jVrzZnM3rsLwx//nrgT";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+X-OriginatorOrg: wallix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 037bf5ac-b34e-4e7c-ee5c-08d71716d858
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Aug 2019 06:58:38.4852
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: f6bb2bd8-b6f1-4c26-8e2b-61c79722df19
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: cmucchietto@wallix.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR03MB6158
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---Sig_/+_A.jVrzZnM3rsLwx//nrgT
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-Hi all,
-
-Today's linux-next merge of the jc_docs tree got a conflict in:
-
-  Documentation/admin-guide/cifs/todo.rst
-
-between commit:
-
-  46c8a6b4c39e ("smb3: update TODO list of missing features")
-
-from the cifs tree and commit:
-
-  f139291c7130 ("docs: fs: cifs: convert to ReST and add to admin-guide boo=
-k")
-
-from the jc_docs tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc Documentation/admin-guide/cifs/todo.rst
-index edbbccda1942,95f18e8c9b8a..000000000000
---- a/Documentation/admin-guide/cifs/todo.rst
-+++ b/Documentation/admin-guide/cifs/todo.rst
-@@@ -13,52 -18,49 +18,52 @@@ a) SMB3 (and SMB3.1.1) missing optiona
-     - T10 copy offload ie "ODX" (copy chunk, and "Duplicate Extents" ioctl
-       currently the only two server side copy mechanisms supported)
- =20
- -b) improved sparse file support
- +b) improved sparse file support (fiemap and SEEK_HOLE are implemented
-- but additional features would be supportable by the protocol).
-++   but additional features would be supportable by the protocol).
- =20
-  c) Directory entry caching relies on a 1 second timer, rather than
-- using Directory Leases, currently only the root file handle is cached lon=
-ger
-+    using Directory Leases, currently only the root file handle is cached =
-longer
- =20
-  d) quota support (needs minor kernel change since quota calls
-- to make it to network filesystems or deviceless filesystems)
-+    to make it to network filesystems or deviceless filesystems)
- =20
- -e) Additional use cases where we use "compoounding" (e.g. open/query/close
- -   and open/setinfo/close) to reduce the number of roundtrips, and also
- -   open to reduce redundant opens (using deferred close and reference cou=
-nts
- -   more).
- +e) Additional use cases can be optimized to use "compounding"
-- (e.g. open/query/close and open/setinfo/close) to reduce the number
-- of roundtrips to the server and improve performance. Various cases
-- (stat, statfs, create, unlink, mkdir) already have been improved by
-- using compounding but more can be done.  In addition we could significant=
-ly
-- reduce redundant opens by using deferred close (with handle caching lease=
-s)
-- and better using reference counters on file handles.
-++   (e.g. open/query/close and open/setinfo/close) to reduce the number
-++   of roundtrips to the server and improve performance. Various cases
-++   (stat, statfs, create, unlink, mkdir) already have been improved by
-++   using compounding but more can be done.  In addition we could signific=
-antly
-++   reduce redundant opens by using deferred close (with handle caching le=
-ases)
-++   and better using reference counters on file handles.
- =20
-  f) Finish inotify support so kde and gnome file list windows
-- will autorefresh (partially complete by Asser). Needs minor kernel
-- vfs change to support removing D_NOTIFY on a file.  =20
-+    will autorefresh (partially complete by Asser). Needs minor kernel
-+    vfs change to support removing D_NOTIFY on a file.
- =20
-  g) Add GUI tool to configure /proc/fs/cifs settings and for display of
-- the CIFS statistics (started)
-+    the CIFS statistics (started)
- =20
-  h) implement support for security and trusted categories of xattrs
-- (requires minor protocol extension) to enable better support for SELINUX
-+    (requires minor protocol extension) to enable better support for SELIN=
-UX
- =20
-  i) Add support for tree connect contexts (see MS-SMB2) a new SMB3.1.1 pro=
-tocol
-     feature (may be especially useful for virtualization).
- =20
-  j) Create UID mapping facility so server UIDs can be mapped on a per
-- mount or a per server basis to client UIDs or nobody if no mapping
-- exists. Also better integration with winbind for resolving SID owners
-+    mount or a per server basis to client UIDs or nobody if no mapping
-+    exists. Also better integration with winbind for resolving SID owners
- =20
-  k) Add tools to take advantage of more smb3 specific ioctls and features
-- (passthrough ioctl/fsctl is now implemented in cifs.ko to allow sending
-- various SMB3 fsctls and query info and set info calls directly from user =
-space)
-- Add tools to make setting various non-POSIX metadata attributes easier
-- from tools (e.g. extending what was done in smb-info tool).
- -   (passthrough ioctl/fsctl for sending various SMB3 fsctls to the server
- -   is in progress, and a passthrough query_info call is already implement=
-ed
- -   in cifs.ko to allow smb3 info levels queries to be sent from userspace)
-++   (passthrough ioctl/fsctl is now implemented in cifs.ko to allow sending
-++   various SMB3 fsctls and query info and set info calls directly from us=
-er space)
-++   Add tools to make setting various non-POSIX metadata attributes easier
-++   from tools (e.g. extending what was done in smb-info tool).
- =20
-  l) encrypted file support
- =20
-  m) improved stats gathering tools (perhaps integration with nfsometer?)
-- to extend and make easier to use what is currently in /proc/fs/cifs/Stats
-+    to extend and make easier to use what is currently in /proc/fs/cifs/St=
-ats
- =20
- -n) allow setting more NTFS/SMB3 file attributes remotely (currently limit=
-ed to
- -   compressed file attribute via chflags) and improve user space tools for
- -   managing and viewing them.
- +n) Add support for claims based ACLs ("DAC")
- =20
-  o) mount helper GUI (to simplify the various configuration options on mou=
-nt)
- =20
-@@@ -74,22 -76,21 +79,23 @@@ q) Allow mount.cifs to be more verbose=20
-  r) updating cifs documentation, and user guide.
- =20
-  s) Addressing bugs found by running a broader set of xfstests in standard
-- file system xfstest suite.
-+    file system xfstest suite.
- =20
-  t) split cifs and smb3 support into separate modules so legacy (and less
-- secure) CIFS dialect can be disabled in environments that don't need it
-- and simplify the code.
-+    secure) CIFS dialect can be disabled in environments that don't need it
-+    and simplify the code.
- =20
-  v) POSIX Extensions for SMB3.1.1 (started, create and mkdir support added
-- so far).
-+    so far).
- =20
-  w) Add support for additional strong encryption types, and additional spn=
-ego
-- authentication mechanisms (see MS-SMB2)
-+    authentication mechanisms (see MS-SMB2)
- =20
- +x) Finish support for SMB3.1.1 compression
- +
-- KNOWN BUGS
-- =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+ Known Bugs
-+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+=20
-  See http://bugzilla.samba.org - search on product "CifsVFS" for
-  current bug list.  Also check http://bugzilla.kernel.org (Product =3D Fil=
-e System, Component =3D CIFS)
- =20
-
---Sig_/+_A.jVrzZnM3rsLwx//nrgT
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl1DhesACgkQAVBC80lX
-0Gw0xgf9EmEuxYIBGt1ORw1qJU1oenxQ3ydDPgwtkvgM2Jb+U/m9LnxYsKgkS4lF
-mfmzFa9gTGnSmxkRrilqV3/+EwYvbSTKpAkvyxccbXJa0tYMghGm3V6v3rihNXWb
-bZduT1gpuToV5tOMy9tsQ6RCeHsaq5nqdtacjHKDltC69IAx3WMvzUoMcUB9yyqQ
-WsHwN/LoFJ+Q2g7VDCYn7T8ablJ3ycFaXB14354UYRgKUGw20oU/F89KYI9oXb2W
-3fWIER5x6dVtmFjP6JLuDslGN7NDoHwoNQVRMT9K7p9fiCL1cF3ZvOMtKkNaVlYH
-iyQJk4MSO4Wei/qnRIk79Mjgq9OpZQ==
-=/sns
------END PGP SIGNATURE-----
-
---Sig_/+_A.jVrzZnM3rsLwx//nrgT--
+T24gOC8xLzE5IDc6MTMgUE0sIFN0ZXZlIEZyZW5jaCB3cm90ZToNCj4gU2ViYXN0aWVuLA0KPiBJ
+IGNsZWFuZWQgdXAgdGhlIHBhdGNoIGFuZCBtZXJnZWQgaW50byBjaWZzLTIuNi5naXQgLSBjYW4g
+eW91DQo+IGRvdWJsZWNoZWNrIGl0IGlzIGNvcnJlY3Q/DQoNClNlYmFzdGllbiBpcyBub3QgYXZh
+bGFpYmxlLCBidXQgd2UgY29uZmlybSB0aGF0IHRoaXMgcGF0Y2ggaXMgY29ycmVjdA0KDQpSZWdh
+cmRzLA0KDQpDeXJpbGxlIE11Y2NoaWV0dG8NCg0KDQo+IE9uIFRodSwgSnVsIDI1LCAyMDE5IGF0
+IDM6MzUgUE0gUGF2ZWwgU2hpbG92c2t5DQo+IDxwYXZlbC5zaGlsb3Zza3lAZ21haWwuY29tPiB3
+cm90ZToNCj4+INGH0YIsIDI1INC40Y7Quy4gMjAxOSDQsy4g0LIgMDk6NTcsIFNlYmFzdGllbiBU
+aXNzZXJhbnQgdmlhIHNhbWJhLXRlY2huaWNhbA0KPj4gPHNhbWJhLXRlY2huaWNhbEBsaXN0cy5z
+YW1iYS5vcmc+Og0KPj4gLi4uDQo+Pj4gbW91bnQgd29ya3Mgd2l0aG91dCBDT05GSUdfREVCVUdf
+VklSVFVBTA0KPj4+DQo+Pj4gSWYgd2UgZG9uJ3Qgc2V0IENPTkZJR19WTUFQX1NUQUNLIG1vdW50
+IHdvcmtzIHdpdGggQ09ORklHX0RFQlVHX1ZJUlRVQUwNCj4+Pg0KPj4+DQo+Pj4gV2UgaGF2ZSB0
+aGUgZm9sbG93aW5nICh2ZXJ5IHF1aWNrIGFuZCBkaXJ0eSkgcGF0Y2ggOg0KPj4+DQo+Pj4gSW5k
+ZXg6IGxpbnV4LTQuMTkuNjAvZnMvY2lmcy9zbWIyb3BzLmMNCj4+PiA9PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09DQo+Pj4g
+LS0tIGxpbnV4LTQuMTkuNjAub3JpZy9mcy9jaWZzL3NtYjJvcHMuYw0KPj4+ICsrKyBsaW51eC00
+LjE5LjYwL2ZzL2NpZnMvc21iMm9wcy5jDQo+Pj4gQEAgLTI1NDUsNyArMjU0NSwxNSBAQCBmaWxs
+X3RyYW5zZm9ybV9oZHIoc3RydWN0IHNtYjJfdHJhbnNmb3JtDQo+Pj4gIHN0YXRpYyBpbmxpbmUg
+dm9pZCBzbWIyX3NnX3NldF9idWYoc3RydWN0IHNjYXR0ZXJsaXN0ICpzZywgY29uc3Qgdm9pZCAq
+YnVmLA0KPj4+ICAgICAgICAgICAgICAgICAgICAgdW5zaWduZWQgaW50IGJ1ZmxlbikNCj4+PiAg
+ew0KPj4+IC0gICAgc2dfc2V0X3BhZ2Uoc2csIHZpcnRfdG9fcGFnZShidWYpLCBidWZsZW4sIG9m
+ZnNldF9pbl9wYWdlKGJ1ZikpOw0KPj4+ICsgICAgICB2b2lkICphZGRyOw0KPj4+ICsgICAgICAv
+Kg0KPj4+ICsgICAgICAgKiBWTUFQX1NUQUNLIChhdCBsZWFzdCkgcHV0cyBzdGFjayBpbnRvIHRo
+ZSB2bWFsbG9jIGFkZHJlc3Mgc3BhY2UNCj4+PiArICAgICAgKi8NCj4+PiArICAgICAgaWYgKGlz
+X3ZtYWxsb2NfYWRkcihidWYpKQ0KPj4+ICsgICAgICAgICAgICAgIGFkZHIgPSB2bWFsbG9jX3Rv
+X3BhZ2UoYnVmKTsNCj4+PiArICAgICAgZWxzZQ0KPj4+ICsgICAgICAgICAgICAgIGFkZHIgPSB2
+aXJ0X3RvX3BhZ2UoYnVmKTsNCj4+PiArICAgICAgc2dfc2V0X3BhZ2Uoc2csIGFkZHIsIGJ1Zmxl
+biwgb2Zmc2V0X2luX3BhZ2UoYnVmKSk7DQo+Pj4gIH0NCj4+Pg0KPj4+ICAvKiBBc3N1bWVzIHRo
+ZSBmaXJzdCBycXN0IGhhcyBhIHRyYW5zZm9ybSBoZWFkZXIgYXMgdGhlIGZpcnN0IGlvdi4NCj4+
+Pg0KPj4+DQo+PiBUaGFua3MgZm9yIHJlcG9ydGluZyB0aGlzLiBUaGUgcGF0Y2ggbG9va3MgZ29v
+ZCB0byBtZS4gRGlkIHlvdSB0ZXN0DQo+PiB5b3VyIHNjZW5hcmlvIGFsbCB0b2dldGhlciB3aXRo
+IGl0IChub3Qgb25seSBtb3VudGluZyk/DQo+Pg0KPj4NCj4+IEJlc3QgcmVnYXJkcywNCj4+IFBh
+dmVsIFNoaWxvdnNraXkNCj4+DQo+Pg0K
