@@ -2,229 +2,133 @@ Return-Path: <SRS0=Za1z=WD=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB94CC433FF
-	for <linux-cifs@archiver.kernel.org>; Wed,  7 Aug 2019 16:22:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69E53C433FF
+	for <linux-cifs@archiver.kernel.org>; Wed,  7 Aug 2019 21:34:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 832BC21E6C
-	for <linux-cifs@archiver.kernel.org>; Wed,  7 Aug 2019 16:22:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 367472186A
+	for <linux-cifs@archiver.kernel.org>; Wed,  7 Aug 2019 21:34:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="VIcJ8cli"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e6R5qsBY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388844AbfHGQW6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 7 Aug 2019 12:22:58 -0400
-Received: from mail-eopbgr740100.outbound.protection.outlook.com ([40.107.74.100]:35607
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2387922AbfHGQW5 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 7 Aug 2019 12:22:57 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OjWRxvg1uLqvQxZ+++CVwrdO04/KMcCzs1hdCiGFQkqx5IV3sSF9YthYpwJICwCC9BK0RI9Mf+Dku3+EUp5NNuOFYZRTPAw7sRCI7IMH6IR+QA6Xzu+olJfE5XYAVtE/usIokX3qD4ksYtpfcRaxqDDP+cfBnvJ+cVWIb0VGM7qRUAsA/WFyCm4AvPWy7+NEjO8AiEeMC9OErwNc2u15gYWg6/UBActy2D5V30+XvjQGiwCmk0mL9b/UJBhhY4Sjm+XashMse3FXEYPf/mwtWYBFrazrb+RyyP17zzPHktOEf2k5os+sai7uQSVjTsBkNGmgp/d3Fg+zGLO6ECxqQg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fzeogg3Q14seYQQvPc6c8ODLordFMl8PTjGlqm8tG4A=;
- b=LS4PLYC4TuZAwjGM6ZsncDe4kvGpwNx11Pu0xAa3gr6Vf3mVLoUnXcLcB7LwTT6XkubvyNnsWWFaoZbKWLiXsJF9Ql5knrAqqGECDhGlFvMT0ReBZ3WOD2DtqclrgwmLU6ff0lqz1BC5AaSyCaYNHSHQxdeL8VR8JBA+g5tDprJdNEQ57AE57JQqHuxh0wXmZUwqfhwKOxU9AOoKaQNrrMxop2FKVKX60JdrD3of8wO59nTpqKufVwTlZNLY/pYK5xWwqzGneN5v4ea7iMYXn4ReMvZV2kvWlMWkmqZ2rk0NrhHbZduxlVDcfH9whHT9AjMFKESGO8xD846azJWgfQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fzeogg3Q14seYQQvPc6c8ODLordFMl8PTjGlqm8tG4A=;
- b=VIcJ8cliFcFTd1iNmRhyL7ZowBJBQ7qNlmwLCn/TiaBpwDZBUn3QMMeBw+K89nAEQSoxxIXQsK8MKw4CbfIAQR/zCFHyfZlBn/lYoxTKR6BTT+t49Kafvu0UHAuKMjje9q8lEp+oyC4M+DTHueDKsPIkEjeDP8BYTHl/U0WCL0U=
-Received: from MWHPR2101MB0731.namprd21.prod.outlook.com (10.167.238.165) by
- MWHPR2101MB0875.namprd21.prod.outlook.com (10.167.238.39) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2157.11; Wed, 7 Aug 2019 16:22:53 +0000
-Received: from MWHPR2101MB0731.namprd21.prod.outlook.com
- ([fe80::ac4f:3962:3a92:e9b4]) by MWHPR2101MB0731.namprd21.prod.outlook.com
- ([fe80::ac4f:3962:3a92:e9b4%3]) with mapi id 15.20.2157.011; Wed, 7 Aug 2019
- 16:22:53 +0000
-From:   Tom Talpey <ttalpey@microsoft.com>
-To:     ronnie sahlberg <ronniesahlberg@gmail.com>
-CC:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        Steve French <smfrench@gmail.com>
-Subject: RE: [PATCH] cifs: do not attempt unlink-and-retry-rename for SMB2+
- mounts
-Thread-Topic: [PATCH] cifs: do not attempt unlink-and-retry-rename for SMB2+
- mounts
-Thread-Index: AQHVS9+wyCF12HsmFUi4Qjm9BQ8A9qbuOsbggAByIwCAATKz0A==
-Date:   Wed, 7 Aug 2019 16:22:52 +0000
-Message-ID: <MWHPR2101MB07315D9ECFD8A3E2E5E6A538A0D40@MWHPR2101MB0731.namprd21.prod.outlook.com>
-References: <20190805224639.2322-1-lsahlber@redhat.com>
- <SN4PR2101MB07334B83742BE57988263F7CA0D50@SN4PR2101MB0733.namprd21.prod.outlook.com>
- <CAN05THR6vjA-18S2uGUgAMfher9WBbE6OpKMFDEktGTiXL8B2Q@mail.gmail.com>
-In-Reply-To: <CAN05THR6vjA-18S2uGUgAMfher9WBbE6OpKMFDEktGTiXL8B2Q@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Owner=ttalpey@microsoft.com;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2019-08-07T16:22:51.3194190Z;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Application=Microsoft Azure
- Information Protection;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=7c51c410-309b-490a-94a3-349e5595c6e9;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Extended_MSFT_Method=Automatic
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=ttalpey@microsoft.com; 
-x-originating-ip: [24.218.182.144]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c3bae479-500e-4ce9-b187-08d71b537f6e
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:MWHPR2101MB0875;
-x-ms-traffictypediagnostic: MWHPR2101MB0875:
-x-microsoft-antispam-prvs: <MWHPR2101MB0875FCD9B911F87689725656A0D40@MWHPR2101MB0875.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 01221E3973
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(396003)(346002)(366004)(39860400002)(376002)(136003)(52314003)(54094003)(189003)(199004)(13464003)(51914003)(256004)(66946007)(52536014)(54906003)(64756008)(66476007)(2906002)(6916009)(71200400001)(86362001)(5660300002)(66556008)(76116006)(71190400001)(66446008)(186003)(14444005)(22452003)(3846002)(68736007)(26005)(53936002)(10090500001)(316002)(6116002)(66066001)(9686003)(99286004)(6436002)(10290500003)(8990500004)(7736002)(76176011)(1411001)(486006)(6506007)(53546011)(476003)(478600001)(81156014)(11346002)(14454004)(8936002)(4326008)(25786009)(305945005)(81166006)(55016002)(446003)(74316002)(229853002)(8676002)(6246003)(102836004)(33656002)(7696005);DIR:OUT;SFP:1102;SCL:1;SRVR:MWHPR2101MB0875;H:MWHPR2101MB0731.namprd21.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: Pgpp6+dOlqyxEDmAXFWrVCsbe+NSjyC4yVKJl/p+SzDa392h/mKLeEAH62+TUnnxn/SxpVWhSb0lL2dtwYyA/k2zUPK4gNOOrBMqN9UjmyhXlXeljPbnXODTQZmle9Y9x5fNSRCFYfielgFrJQiw3uB0sjR+d24rmlMCT+GoqFA0p7Xq/hoHM1LXrz0ENAQ3darAoQV/HHbIPIL5wQ+Kdt2mR1fDVy35E5KnjsUJxDta5lPyaB+Uk0FBpofu8oia6meSmv24QIuf36evn4crfqaM8q5kCH2rNEuQyHUZLvtyBchBD+UnDY0eCL/Ah3b0v49ljFPvTKCtYv5dpWl1DEIpahzeo5TQqzjsivFREKKubwtY7f4BfgKtJUKFTElJw5SeWY0MNvMLU0IYCJECA2Myx+43IKo2FlVbJl+s0Ew=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1730182AbfHGVe1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 7 Aug 2019 17:34:27 -0400
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:40190 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728083AbfHGVe1 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 7 Aug 2019 17:34:27 -0400
+Received: by mail-lj1-f196.google.com with SMTP id m8so53262611lji.7
+        for <linux-cifs@vger.kernel.org>; Wed, 07 Aug 2019 14:34:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=u6It/wJHcfmvPEjcfmIsEmaQ0HIA7TwfsYPse4FC2KM=;
+        b=e6R5qsBY7Ygj867MP4t6lybp+oHO8d2blyhGDTQNcXcgFRr9f62CWNa1rzFgGFzxHR
+         kZdaJlZNQhegO6nc/X75867ZVdnbHoDLdsiVEj4wxLfwvu8kz3+qbljiPZ4Rak7F+dc0
+         wrF38qk4AOsB5l+2G0YbHJoO7PAHZ+Qgl8isuoy5KN/2ZF0otwk14JNsJWTWoneXmkF7
+         vE9V4X3s4g3JdzJnpizQQ8LQmvbUnYzsqc11A8cYX2u2oz58KlLM9poap7BawSVwx+tf
+         kdztJOpJNDrdsQEki0EL63AhvBmjb4KmTiMwF4M0XzYQsu0Fv+1dmTI87jkXYTIwJSTU
+         aDoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=u6It/wJHcfmvPEjcfmIsEmaQ0HIA7TwfsYPse4FC2KM=;
+        b=Zr1DVs63Kbv8DCnyzSqrKUg+yBygeRXz8TEgI4qkOPKgSVjc8Mv2kdTqshsnK3UH75
+         b9fzhRvYxojbzMQElq5NrT3OtFi5ZRbCl1CcD5MFtTTF+Rnl9/gtcJZ/doXDFnp3mIwU
+         YYOE4wcYfTNosgBb3LORZwVFu+Rh4hCmiXwNug+ixgKFnEzLtygYkdIlvZZXPtpzMRoB
+         15CTSwyP14MKL6dcgh0Sqn9HVZEGka1srehG1JQh+MaICVtM1RQgwQMqIxTgEwUZ3pNl
+         orSMHOzWqkc5V/SrjTs3I1tsk8QqPsDRmZUI5Lc60GyuIFkif6TzLbp1w+WpZB4bkGm9
+         rjXA==
+X-Gm-Message-State: APjAAAV3FwYqDYIscJ/s6ZCeC6JgYoVm2b0AmhcqEL4eVk9O2lcUhOyT
+        qbZbhzri8bX5ROz78fIqE86J/JrGmh9GfuWRvOcE
+X-Google-Smtp-Source: APXvYqxXW1F51Soah5JzpPbWimJzthiprChySnms36WxE939tiD6FZmhrEkiaFO9ZhT7+sr3eIq9DPk2yjglFYS0JbQ=
+X-Received: by 2002:a2e:730d:: with SMTP id o13mr3631643ljc.81.1565213665828;
+ Wed, 07 Aug 2019 14:34:25 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c3bae479-500e-4ce9-b187-08d71b537f6e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Aug 2019 16:22:52.8202
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: YD3d7z+hfSep6oFnsI8P7G99rUvygw0NhuorIOD/EiTqDwZl2CDnjea4+M7ybt/W/OXiuivgVZ0506HVR8zgtA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR2101MB0875
+References: <CAGn-TgiGah++0ibn3vjM+bvBkJa3XttxA12k+Qa4PGME89CTOQ@mail.gmail.com>
+In-Reply-To: <CAGn-TgiGah++0ibn3vjM+bvBkJa3XttxA12k+Qa4PGME89CTOQ@mail.gmail.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Wed, 7 Aug 2019 14:34:14 -0700
+Message-ID: <CAKywueQEA0gNJ9Xyc7mA7VEHUctWW-CuKS4ei7GHuBb_u6xjkA@mail.gmail.com>
+Subject: Re: [PATCH] cifs-utils: smbinfo.c: probably harmless wrong memset
+ sizes + printf format correction
+To:     Adam Richter <adamrichter4@gmail.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiByb25uaWUgc2FobGJlcmcgPHJv
-bm5pZXNhaGxiZXJnQGdtYWlsLmNvbT4NCj4gU2VudDogVHVlc2RheSwgQXVndXN0IDYsIDIwMTkg
-NjowMCBQTQ0KPiBUbzogVG9tIFRhbHBleSA8dHRhbHBleUBtaWNyb3NvZnQuY29tPg0KPiBDYzog
-Um9ubmllIFNhaGxiZXJnIDxsc2FobGJlckByZWRoYXQuY29tPjsgbGludXgtY2lmcyA8bGludXgt
-DQo+IGNpZnNAdmdlci5rZXJuZWwub3JnPjsgU3RldmUgRnJlbmNoIDxzbWZyZW5jaEBnbWFpbC5j
-b20+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0hdIGNpZnM6IGRvIG5vdCBhdHRlbXB0IHVubGluay1h
-bmQtcmV0cnktcmVuYW1lIGZvciBTTUIyKw0KPiBtb3VudHMNCj4gDQo+IE9uIFdlZCwgQXVnIDcs
-IDIwMTkgYXQgMToxOSBBTSBUb20gVGFscGV5IDx0dGFscGV5QG1pY3Jvc29mdC5jb20+IHdyb3Rl
-Og0KPiA+DQo+ID4gPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+ID4gRnJvbTogbGlu
-dXgtY2lmcy1vd25lckB2Z2VyLmtlcm5lbC5vcmcgPGxpbnV4LWNpZnMtb3duZXJAdmdlci5rZXJu
-ZWwub3JnPg0KPiBPbg0KPiA+ID4gQmVoYWxmIE9mIFJvbm5pZSBTYWhsYmVyZw0KPiA+ID4gU2Vu
-dDogTW9uZGF5LCBBdWd1c3QgNSwgMjAxOSA2OjQ3IFBNDQo+ID4gPiBUbzogbGludXgtY2lmcyA8
-bGludXgtY2lmc0B2Z2VyLmtlcm5lbC5vcmc+DQo+ID4gPiBDYzogU3RldmUgRnJlbmNoIDxzbWZy
-ZW5jaEBnbWFpbC5jb20+OyBSb25uaWUgU2FobGJlcmcNCj4gPiA+IDxsc2FobGJlckByZWRoYXQu
-Y29tPg0KPiA+ID4gU3ViamVjdDogW1BBVENIXSBjaWZzOiBkbyBub3QgYXR0ZW1wdCB1bmxpbmst
-YW5kLXJldHJ5LXJlbmFtZSBmb3IgU01CMisNCj4gPiA+IG1vdW50cw0KPiA+ID4NCj4gPiA+IE5v
-cm1hbGx5IGluIHNtYiB5b3UgY2FuIG5vdCByZW5hbWUgb250b3Agb2YgYSBkZXN0aW5hdGlvbiB0
-aGF0IGlzIGhlbGQNCj4gb3Blbg0KPiA+ID4gZXhjZXB0IGluIFNNQjEgd2hlcmUgdGhpcyBpcyBh
-bGxvd2VkIElGRiB0aGUgZGVsZXRlLW9uLWNsb3NlIGZsYWcgaXMgYWxzbyBzZXQuDQo+ID4NCj4g
-PiBUaGUgRklMRV9ERUxFVEVfT05fQ0xPU0UgZmxhZyBkb2Vzbid0IHJlYWxseSBoYXZlIGFueSBz
-aWduaWZpY2FuY2UgaW4gdGhlDQo+ID4gcHJvdG9jb2wsIGl0IGlzIHBhc3NlZCB0byB0aGUgdW5k
-ZXJseWluZyBmaWxlc3lzdGVtIGV4Y2VwdCBpbiBvbmUgc3BlY2lhbCBjYXNlDQo+ID4gd2hlcmUg
-dGhlIHNlcnZlciB2YWxpZGF0ZXMgdGhhdCB0aGUgREVMRVRFIG9yIEdFTkVSSUMgaXMgZ3JhbnRl
-ZCBvbiB0aGUNCj4gPiBzaGFyZS4gRGlkIHlvdSBmaW5kIHNvbWUgcmVmZXJlbmNlIGluIHRoZSBk
-b2N1bWVudHMgdG8gdGhlIGNvbnRyYXJ5Pw0KPiA+DQo+IA0KPiBObyBidXQgZW1wZXJpY2FsIHRl
-c3RpbmcsIGFuZCB4ZnN0ZXN0cywgc2hvdyBpdC4gSXQgZG9lcyBub3QganVzdA0KPiBhZmZlY3Qg
-cmVuYW1lKCkgYnV0IHRoZSBzYW1lIHRoaW5nIGhhcHBlbnMgd2l0aCAiY3JlYXRlIGFuZCByZXBs
-YWNlIGFuDQo+IGV4aXN0aW5nIGZpbGUiLg0KPiANCj4gVGhlcmUgaXMgZGVmaW5pdGVseSBhIGNv
-bmRpdGlvbmFsIHNvbWV3aGVyZSBpbiB0aGUgU01CIHNlcnZlciB0aGF0DQo+IGFmZmVjdHMgdGhl
-IGJlaGF2aW91ciBvciB0aGUgZGVsZXRlLW9uLWNsb3NlIGZsYWcuDQo+IA0KPiANCj4gVGhpcyBw
-YXJ0aWN1bGFyIHNjZW5hcmlvIGlzIGZvciB0aGUgYmVoYXZpb3VyIHdoZW4gd2UgdHJ5IHRvIHJl
-bmFtZQ0KPiBvbnRvIGFuIGV4aXN0aW5nIGZpbGUgdGhhdCBoYXZlIG9wZW4gaGFuZGxlcy4NCj4g
-VGhlIHByb2Nlc3MgdXNlZCBpbiBjaWZzLmtvIGlzIDoNCj4gDQo+IDEsIFRyeSB0byByZW5hbWUg
-dGhlIGZpbGUuIFRoaXMgZmFpbHMgd2l0aCBBQ0NFU1NfREVOSUVEIGlmIHRoZXJlIGFyZQ0KPiBv
-cGVuIGhhbmRsZXMNCj4gaWYgdGhpcyBmYWlscywgdGhlbiBmYWxsYmFjayB0bw0KPiAyLCBzZXQg
-ZGVsZXRlLW9uLWNsb3NlDQo+IDMsIHRyeSB0aGUgcmVuYW1lIGFnYWluDQo+IA0KPiBJbiBTTUIx
-LCB0aGlzIHdvcmtzLiBJbiBzdGVwIDMgdGhlIGZpbGUgaXMgcmVuYW1lZCBFVkVOIGlmIHRoZXJl
-IGFyZQ0KPiBzdGlsbCBvcGVuIGhhbmRsZXMgdG8gaXQuDQo+IEluIFNNQjIrIHRoaXMgZmFpbHMu
-IElmIHRoZXJlIGFyZSBvcGVuIGhhbmRsZXMgdGhlbiB0aGlzIGZhaWxzIHdpdGgNCj4gREVMRVRF
-X1BFTkRJTkcgYW5kIHRoZSByZW5hbWUgd2lsbCBub3QgaGFwcGVuLg0KPiAodGhlbiBzb21ldGlt
-ZSBsYXRlciB3aGVuIHRoZSBvdGhlciBwcm9jZXNzIGNsb3NlcyBpdHMgaGFuZGxlIHRoZW4gdGhl
-DQo+IGZpbGUgaXMgZGVsZXRlZCkNCj4gDQo+IFRoaXMgc3RpbGwgaGFwcGVucyBpbiB3aW5kb3dz
-IDIwMTYuIERlbGV0ZS1vbi1jbG9zZSBhbmQgb3RoZXIgc2ltaWxhcg0KPiB1bmxpbmsoKSByZWxh
-dGVkIG9wZXJhdGlvbnMNCj4gYmVoYXZlIGRpZmZlcmVudGx5IGJldHdlZW4gU01CMSBhbmQgU01C
-Mi4NCg0KSHVoLiBJJ20gZ29pbmcgdG8gbG9vayBpbnRvIHRoaXMgb24gdGhlIFdpbmRvd3Mgc2lk
-ZS4gSSB3b25kZXIgaWYgc29tZXRoaW5nDQppbiB0aGUgTGludXggY2xpZW50IGlzIGZhbGxpbmcg
-YmFjayB0byB0aGUgYW5jaWVudCBTTUJfQ09NX1JFTkFNRSBvcg0KU01CX0NPTV9ERUxFVEUgb3Bz
-LCB3aGljaCBvZiBjb3Vyc2UgYXJlIHBhdGgtYmFzZWQgYW5kIGV4aGliaXQgZGlmZmVyZW50DQpi
-ZWhhdmlvcnMuIFRoZSBteXN0ZXJ5IGlzIHRoYXQgRklMRV9ERUxFVEVfT05fQ0xPU0UgaXMgbm90
-IHJlbGV2YW50IHRvIHRob3NlLg0KDQpBbnl3YXksIHRoYW5rcyBmb3IgdGhlIHJlcG9ydC4gWW91
-IHdvdWxkbid0IGhhdmUgYSBuZXR3b3JrIHRyYWNlIG9mIHRoZXNlDQpkaWZmZXJlbmNlcywgd291
-bGQgeW91Pw0KDQpUb20uDQoNCj4gPiBJbiBvdGhlciB3b3JkcywgSSB0aGluayB0aGUgZml4IG1h
-eSBiZSBvaywgYnV0IHRoZSBzZXJ2ZXItPnZhbHMtPnByb3RvY29sX2lkICE9DQo+IDANCj4gPiBj
-b25kaXRpb25hbCBtYXkgbmVlZCBtb3JlIHRob3VnaHQuDQo+ID4NCj4gPiBUb20uDQo+ID4NCj4g
-PiA+IFRoaXMgc3BlY2lhbCBjYXNlIGlzIG5vdCBzdXBwb3J0ZWQgaW4gU01CMiBzbyBzaG91bGQg
-bm90IGF0dGVtcHQgdGhlIHVubGluay0NCj4gPiA+IGFuZC10cnktYWdhaW4NCj4gPiA+IHNpbmNl
-IHRoZSByZW5hbWUgd2lsbCBzdGlsbCBmYWlsIGJ1dCB3ZSBub3cgYWxzbyBkZWxldGUgdGhlIGRl
-c3RpbmF0aW9uIGZpbGUuDQo+ID4gPg0KPiA+ID4gU2lnbmVkLW9mZi1ieTogUm9ubmllIFNhaGxi
-ZXJnIDxsc2FobGJlckByZWRoYXQuY29tPg0KPiA+ID4gLS0tDQo+ID4gPiAgZnMvY2lmcy9pbm9k
-ZS5jIHwgMTAgKysrKysrKysrKw0KPiA+ID4gIDEgZmlsZSBjaGFuZ2VkLCAxMCBpbnNlcnRpb25z
-KCspDQo+ID4gPg0KPiA+ID4gZGlmZiAtLWdpdCBhL2ZzL2NpZnMvaW5vZGUuYyBiL2ZzL2NpZnMv
-aW5vZGUuYw0KPiA+ID4gaW5kZXggNTZjYTRiOGNjYWJhLi5mZGVhNDUyNjdhMzkgMTAwNjQ0DQo+
-ID4gPiAtLS0gYS9mcy9jaWZzL2lub2RlLmMNCj4gPiA+ICsrKyBiL2ZzL2NpZnMvaW5vZGUuYw0K
-PiA+ID4gQEAgLTE3NzcsNiArMTc3Nyw3IEBAIGNpZnNfcmVuYW1lMihzdHJ1Y3QgaW5vZGUgKnNv
-dXJjZV9kaXIsIHN0cnVjdA0KPiBkZW50cnkNCj4gPiA+ICpzb3VyY2VfZGVudHJ5LA0KPiA+ID4g
-ICAgICAgRklMRV9VTklYX0JBU0lDX0lORk8gKmluZm9fYnVmX3RhcmdldDsNCj4gPiA+ICAgICAg
-IHVuc2lnbmVkIGludCB4aWQ7DQo+ID4gPiAgICAgICBpbnQgcmMsIHRtcHJjOw0KPiA+ID4gKyAg
-ICAgc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyOw0KPiA+ID4NCj4gPiA+ICAgICAgIGlm
-IChmbGFncyAmIH5SRU5BTUVfTk9SRVBMQUNFKQ0KPiA+ID4gICAgICAgICAgICAgICByZXR1cm4g
-LUVJTlZBTDsNCj4gPiA+IEBAIC0xNzg2LDYgKzE3ODcsNyBAQCBjaWZzX3JlbmFtZTIoc3RydWN0
-IGlub2RlICpzb3VyY2VfZGlyLCBzdHJ1Y3QNCj4gZGVudHJ5DQo+ID4gPiAqc291cmNlX2RlbnRy
-eSwNCj4gPiA+ICAgICAgIGlmIChJU19FUlIodGxpbmspKQ0KPiA+ID4gICAgICAgICAgICAgICBy
-ZXR1cm4gUFRSX0VSUih0bGluayk7DQo+ID4gPiAgICAgICB0Y29uID0gdGxpbmtfdGNvbih0bGlu
-ayk7DQo+ID4gPiArICAgICBzZXJ2ZXIgPSB0Y29uLT5zZXMtPnNlcnZlcjsNCj4gPiA+DQo+ID4g
-PiAgICAgICB4aWQgPSBnZXRfeGlkKCk7DQo+ID4gPg0KPiA+ID4gQEAgLTE4MDksNiArMTgxMSwx
-NCBAQCBjaWZzX3JlbmFtZTIoc3RydWN0IGlub2RlICpzb3VyY2VfZGlyLCBzdHJ1Y3QNCj4gPiA+
-IGRlbnRyeSAqc291cmNlX2RlbnRyeSwNCj4gPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAg
-dG9fbmFtZSk7DQo+ID4gPg0KPiA+ID4gICAgICAgLyoNCj4gPiA+ICsgICAgICAqIERvIG5vdCBh
-dHRlbXB0IHVubGluay10aGVuLXRyeS1yZW5hbWUtYWdhaW4gZm9yIFNNQjIrLg0KPiA+ID4gKyAg
-ICAgICogUmVuYW1pbmcgb250b3Agb2YgYW4gZXhpc3Rpbmcgb3BlbiBmaWxlIElGIHRoZSBkZWxl
-dGUtb24tY2xvc2UNCj4gPiA+ICsgICAgICAqIGZsYWcgaXMgc2V0IGlzIG9ubHkgc3VwcG9ydGVk
-IGZvciBTTUIxLg0KPiA+ID4gKyAgICAgICovDQo+ID4gPiArICAgICBpZiAocmMgPT0gLUVBQ0NF
-UyAmJiBzZXJ2ZXItPnZhbHMtPnByb3RvY29sX2lkICE9IDApDQo+ID4gPiArICAgICAgICAgICAg
-IGdvdG8gY2lmc19yZW5hbWVfZXhpdDsNCj4gPiA+ICsNCj4gPiA+ICsgICAgIC8qDQo+ID4gPiAg
-ICAgICAgKiBOby1yZXBsYWNlIGlzIHRoZSBuYXR1cmFsIGJlaGF2aW9yIGZvciBDSUZTLCBzbyBz
-a2lwIHVubGluayBoYWNrcy4NCj4gPiA+ICAgICAgICAqLw0KPiA+ID4gICAgICAgaWYgKGZsYWdz
-ICYgUkVOQU1FX05PUkVQTEFDRSkNCj4gPiA+IC0tDQo+ID4gPiAyLjEzLjYNCj4gPiA+IFRoaXMg
-c3BlY2lhbCBjYXNlIGlzIG5vdCBzdXBwb3J0ZWQgaW4gU01CMiBzbyBzaG91bGQgbm90IGF0dGVt
-cHQgdGhlIHVubGluay0NCj4gPiA+IGFuZC10cnktYWdhaW4NCj4gPiA+IHNpbmNlIHRoZSByZW5h
-bWUgd2lsbCBzdGlsbCBmYWlsIGJ1dCB3ZSBub3cgYWxzbyBkZWxldGUgdGhlIGRlc3RpbmF0aW9u
-IGZpbGUuDQo+ID4gPg0KPiA+ID4gU2lnbmVkLW9mZi1ieTogUm9ubmllIFNhaGxiZXJnIDxsc2Fo
-bGJlckByZWRoYXQuY29tPg0KPiA+ID4gLS0tDQo+ID4gPiAgZnMvY2lmcy9pbm9kZS5jIHwgMTAg
-KysrKysrKysrKw0KPiA+ID4gIDEgZmlsZSBjaGFuZ2VkLCAxMCBpbnNlcnRpb25zKCspDQo+ID4g
-Pg0KPiA+ID4gZGlmZiAtLWdpdCBhL2ZzL2NpZnMvaW5vZGUuYyBiL2ZzL2NpZnMvaW5vZGUuYw0K
-PiA+ID4gaW5kZXggNTZjYTRiOGNjYWJhLi5mZGVhNDUyNjdhMzkgMTAwNjQ0DQo+ID4gPiAtLS0g
-YS9mcy9jaWZzL2lub2RlLmMNCj4gPiA+ICsrKyBiL2ZzL2NpZnMvaW5vZGUuYw0KPiA+ID4gQEAg
-LTE3NzcsNiArMTc3Nyw3IEBAIGNpZnNfcmVuYW1lMihzdHJ1Y3QgaW5vZGUgKnNvdXJjZV9kaXIs
-IHN0cnVjdA0KPiBkZW50cnkNCj4gPiA+ICpzb3VyY2VfZGVudHJ5LA0KPiA+ID4gICAgICAgRklM
-RV9VTklYX0JBU0lDX0lORk8gKmluZm9fYnVmX3RhcmdldDsNCj4gPiA+ICAgICAgIHVuc2lnbmVk
-IGludCB4aWQ7DQo+ID4gPiAgICAgICBpbnQgcmMsIHRtcHJjOw0KPiA+ID4gKyAgICAgc3RydWN0
-IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyOw0KPiA+ID4NCj4gPiA+ICAgICAgIGlmIChmbGFncyAm
-IH5SRU5BTUVfTk9SRVBMQUNFKQ0KPiA+ID4gICAgICAgICAgICAgICByZXR1cm4gLUVJTlZBTDsN
-Cj4gPiA+IEBAIC0xNzg2LDYgKzE3ODcsNyBAQCBjaWZzX3JlbmFtZTIoc3RydWN0IGlub2RlICpz
-b3VyY2VfZGlyLCBzdHJ1Y3QNCj4gZGVudHJ5DQo+ID4gPiAqc291cmNlX2RlbnRyeSwNCj4gPiA+
-ICAgICAgIGlmIChJU19FUlIodGxpbmspKQ0KPiA+ID4gICAgICAgICAgICAgICByZXR1cm4gUFRS
-X0VSUih0bGluayk7DQo+ID4gPiAgICAgICB0Y29uID0gdGxpbmtfdGNvbih0bGluayk7DQo+ID4g
-PiArICAgICBzZXJ2ZXIgPSB0Y29uLT5zZXMtPnNlcnZlcjsNCj4gPiA+DQo+ID4gPiAgICAgICB4
-aWQgPSBnZXRfeGlkKCk7DQo+ID4gPg0KPiA+ID4gQEAgLTE4MDksNiArMTgxMSwxNCBAQCBjaWZz
-X3JlbmFtZTIoc3RydWN0IGlub2RlICpzb3VyY2VfZGlyLCBzdHJ1Y3QNCj4gPiA+IGRlbnRyeSAq
-c291cmNlX2RlbnRyeSwNCj4gPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgdG9fbmFtZSk7
-DQo+ID4gPg0KPiA+ID4gICAgICAgLyoNCj4gPiA+ICsgICAgICAqIERvIG5vdCBhdHRlbXB0IHVu
-bGluay10aGVuLXRyeS1yZW5hbWUtYWdhaW4gZm9yIFNNQjIrLg0KPiA+ID4gKyAgICAgICogUmVu
-YW1pbmcgb250b3Agb2YgYW4gZXhpc3Rpbmcgb3BlbiBmaWxlIElGIHRoZSBkZWxldGUtb24tY2xv
-c2UNCj4gPiA+ICsgICAgICAqIGZsYWcgaXMgc2V0IGlzIG9ubHkgc3VwcG9ydGVkIGZvciBTTUIx
-Lg0KPiA+ID4gKyAgICAgICovDQo+ID4gPiArICAgICBpZiAocmMgPT0gLUVBQ0NFUyAmJiBzZXJ2
-ZXItPnZhbHMtPnByb3RvY29sX2lkICE9IDApDQo+ID4gPiArICAgICAgICAgICAgIGdvdG8gY2lm
-c19yZW5hbWVfZXhpdDsNCj4gPiA+ICsNCj4gPiA+ICsgICAgIC8qDQo+ID4gPiAgICAgICAgKiBO
-by1yZXBsYWNlIGlzIHRoZSBuYXR1cmFsIGJlaGF2aW9yIGZvciBDSUZTLCBzbyBza2lwIHVubGlu
-ayBoYWNrcy4NCj4gPiA+ICAgICAgICAqLw0KPiA+ID4gICAgICAgaWYgKGZsYWdzICYgUkVOQU1F
-X05PUkVQTEFDRSkNCj4gPiA+IC0tDQo+ID4gPiAyLjEzLjYNCg==
+Hi Adam,
+
+Sorry it took me a while to look at this. The patch itself looks good
+to me. Could you please add an appropriate description, create a patch
+with "git format-patch" command and re-send it to the list? This would
+allow me to merge it quickly. Submitting a PR on github against the
+"next" branch is another good option.
+
+--
+Best regards,
+Pavel Shilovsky
+
+=D1=81=D0=B1, 25 =D0=BC=D0=B0=D1=8F 2019 =D0=B3. =D0=B2 15:36, Adam Richter=
+ <adamrichter4@gmail.com>:
+>
+> The attached patch is my attempt at fixing two possibly harmless
+> complaints from "cppcheck --enable=3Dwarning" from the cifs-utils git
+> master branch version of smbinfo.c.
+>
+> 1. A printf format should have been "%u" instead of "%d" in print_quota.
+>
+> 2. An incorrect size was being passed to memset in thirteen nearly
+> identical places, each using "sizeof(qi)" when "sizeof(*qi)".  I am
+> not sure but I think these mistakes were probably harmless because the
+> memset calls might all be unnecessary and the sizes passed to each
+> memset call might never have been larger than it was supposed to be.
+>
+> Because each of the effected memset calls was immediately preceded by
+> the malloc which allocated the data structure and because they each
+> ignored the possibility that malloc could fail, I made a function,
+> xmalloc0 to combine allocating the memory, zeroing it and exiting with
+> a non-zero exit value and a failure message on allocation failure
+> (which appears to be a fine way to handle the error in this program).
+> The function uses calloc, which could introduce an unnecessary
+> multiply, in the hopes that some calloc implementations may avoid the
+> memset in the case of freshly allocated memory from mmap, which would
+> probably be the case in this program, although I do not know if any
+> calloc implementations make this optimization.  Anyhow, at least this
+> way, the size of the data structure is only computed once in the
+> source code.
+>
+> I realize that these memory allocations may all be for small data
+> structures that should be allocated on the stack and also may not need
+> to be cleared to all zeroes, but I did not want to delve into coding
+> style conventions for stack allocation in the CIFS source tree, and I
+> was not 100% certain that clearing the allocated memory was
+> unnecessary, although I do see other lines that explicitly initialize
+> some field in that that allocated memory to zero.  So, please feel
+> free to replace my changes with something better or one that involves
+> less code churn.
+>
+> I should also warn that my only testing of these changes was to make
+> sure that "cppcheck --enable=3Dwarning" no longer complains, that the
+> file compiled without complaint (with cifs-utils standard "-Wall
+> -Wextra" arguments) and that "./smbinfo quote /dev/null" got past the
+> memory allocation to the (correct) ioctl error for /dev/null.
+>
+> Also, I am not a CIFS developer and this may be the first time I have
+> submitted a patch, certainly the first time I remember, so please
+> forgive me and feel free to instruct me if I should be following some
+> different process to submit this patch.
+>
+> Thanks in advance for considering this patch submission.
+>
+> Adam
