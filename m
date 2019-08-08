@@ -2,155 +2,246 @@ Return-Path: <SRS0=GDvn=WE=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50AB9C433FF
-	for <linux-cifs@archiver.kernel.org>; Thu,  8 Aug 2019 01:07:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 030B9C433FF
+	for <linux-cifs@archiver.kernel.org>; Thu,  8 Aug 2019 02:59:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 26171217D7
-	for <linux-cifs@archiver.kernel.org>; Thu,  8 Aug 2019 01:07:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C2C6F2171F
+	for <linux-cifs@archiver.kernel.org>; Thu,  8 Aug 2019 02:59:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730467AbfHHBHG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 7 Aug 2019 21:07:06 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:48936 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730382AbfHHBHG (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 7 Aug 2019 21:07:06 -0400
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id C2742F747B5D7417ADBB;
-        Thu,  8 Aug 2019 09:07:03 +0800 (CST)
-Received: from [127.0.0.1] (10.184.225.177) by DGGEMS404-HUB.china.huawei.com
- (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0; Thu, 8 Aug 2019
- 09:06:24 +0800
-Subject: Re: [PATCH cifs-utils v2] mount.cifs.c: fix memory leaks in main func
-To:     Pavel Shilovsky <piastryyy@gmail.com>
-CC:     linux-cifs <linux-cifs@vger.kernel.org>,
-        =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel@suse.com>,
-        <liujiawen10@huawei.com>, Steve French <smfrench@gmail.com>,
-        Pavel Shilovskiy <pshilov@microsoft.com>,
-        "Ronnie Sahlberg" <lsahlber@redhat.com>,
-        Kenneth Dsouza <kdsouza@redhat.com>,
-        Alexander Bokovoy <ab@samba.org>,
-        Paulo Alcantara <palcantara@suse.de>, <dujin1@huawei.com>,
-        Mingfangsen <mingfangsen@huawei.com>,
-        zhangsaisai <zhangsaisai@huawei.com>
-References: <0f780b18-0b1c-e2ff-31b1-1d697becd142@huawei.com>
- <CAKywueT6C=O-1tosijf5vm5pg0YozMeEiKP56=unv370L=zzRQ@mail.gmail.com>
- <CAKywueTfnmsZm7scQmDhews_g2TwYw0NRYCstaYnSb_zE91oUA@mail.gmail.com>
-From:   Zhiqiang Liu <liuzhiqiang26@huawei.com>
-Message-ID: <00c2da18-fe7e-5f86-000c-730a27f3b32c@huawei.com>
-Date:   Thu, 8 Aug 2019 09:06:11 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.0
-MIME-Version: 1.0
-In-Reply-To: <CAKywueTfnmsZm7scQmDhews_g2TwYw0NRYCstaYnSb_zE91oUA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.184.225.177]
-X-CFilter-Loop: Reflected
+        id S1728019AbfHHC7F (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 7 Aug 2019 22:59:05 -0400
+Received: from outbound.smtp.vt.edu ([198.82.183.121]:39422 "EHLO
+        omr2.cc.vt.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727984AbfHHC7F (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 7 Aug 2019 22:59:05 -0400
+Received: from mr1.cc.vt.edu (mr1.cc.ipv6.vt.edu [IPv6:2607:b400:92:8300:0:31:1732:8aa4])
+        by omr2.cc.vt.edu (8.14.4/8.14.4) with ESMTP id x782x3Yg012994
+        for <linux-cifs@vger.kernel.org>; Wed, 7 Aug 2019 22:59:03 -0400
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
+        by mr1.cc.vt.edu (8.14.7/8.14.7) with ESMTP id x782wwCl022004
+        for <linux-cifs@vger.kernel.org>; Wed, 7 Aug 2019 22:59:03 -0400
+Received: by mail-qk1-f200.google.com with SMTP id c79so81335724qkg.13
+        for <linux-cifs@vger.kernel.org>; Wed, 07 Aug 2019 19:59:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:mime-version:date
+         :message-id;
+        bh=zLYlHCKM9FGswpyNMjK6L6TymLo3lRrXDEvQNOBcxFo=;
+        b=roKftGsS/mHjSEQcw7bO5bkSf03lbX9HV/vn4YalLOA/rlLUd4yAVuF6rlaccykAcT
+         kbuGQISAZgQJLCl+bYsJ/MfTx4q9lJvbuHUDI+8lAsU3BwMSYPgyOexkvZ+3COBT2MbC
+         U/QrmQLJQLe4pUoOL37Cu3K9U32+iwGIDPlkrmHEUDjsbUZTVx7fQnaOfl78+2k1EWF4
+         l2I/HFWQSDpnr42F7b8/DLt6bW3+JDD6w43WaD2EhidFSBOSFgiM4v/kZJunNLA5Xlq8
+         VBWIbG/Ab7+tEvL0GR0eoMFgv431fofDxTUk2AMBLnkJXMI2bt9Pf/pl40rBgRpnBfnx
+         Uvcw==
+X-Gm-Message-State: APjAAAXclqhM7GvN0CDbtAapvEftpVZhDFlKBuR79fjqPzKlYU4BWmLU
+        GkW1TfSWDXRJLDcBJAG4t0xvnHJg0Y0cCQLJm522TthGpyGWXQWy1l8XI7uLQ6N3JGJH9r5ietQ
+        vV6+J+sAUonuYHYYHXH6gyxtbbW+sTQQn
+X-Received: by 2002:a05:6214:3f0:: with SMTP id cf16mr11221220qvb.211.1565233137915;
+        Wed, 07 Aug 2019 19:58:57 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxGVT1G6h48UB1aM9okZpkv063eU7ZGRdbyHXQF99oG3xhZr3oGbbDxdl/nkv0nFhYuGKlbqw==
+X-Received: by 2002:a05:6214:3f0:: with SMTP id cf16mr11221212qvb.211.1565233137493;
+        Wed, 07 Aug 2019 19:58:57 -0700 (PDT)
+Received: from turing-police ([2601:5c0:c001:4341::359])
+        by smtp.gmail.com with ESMTPSA id f27sm3031586qkl.25.2019.08.07.19.58.56
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Wed, 07 Aug 2019 19:58:56 -0700 (PDT)
+From:   "Valdis =?utf-8?Q?Kl=c4=93tnieks?=" <valdis.kletnieks@vt.edu>
+X-Google-Original-From: "Valdis =?utf-8?Q?Kl=c4=93tnieks?=" <Valdis.Kletnieks@vt.edu>
+X-Mailer: exmh version 2.9.0 11/07/2018 with nmh-1.7+dev
+To:     Steve French <sfrench@samba.org>
+cc:     linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] fs/cifs - clean up 'set but not used' variables.
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Date:   Wed, 07 Aug 2019 22:58:55 -0400
+Message-ID: <39561.1565233135@turing-police>
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 2019/8/8 5:44, Pavel Shilovsky wrote:
-> Merged into "next" with one minor change - removed a trailing white
-> space. Thanks.
-> 
-That is ok. Thank you very much.
+When building with W=1, fs/cifs throws a lot of 'set but not used' messages.
 
-> --
-> Best regards,
-> Pavel Shilovsky
-> 
-> вт, 6 авг. 2019 г. в 09:49, Pavel Shilovsky <piastryyy@gmail.com>:
-> 
->>
->> пн, 5 авг. 2019 г. в 19:36, Zhiqiang Liu <liuzhiqiang26@huawei.com>:
->>>
->>> From: Jiawen Liu <liujiawen10@huawei.com>
->>>
->>> In mount.cifs module, orgoptions and mountpoint in the main func
->>> point to the memory allocated by func realpath and strndup respectively.
->>> However, they are not freed before the main func returns so that the
->>> memory leaks occurred.
->>>
->>> The memory leak problem is reported by LeakSanitizer tool.
->>> LeakSanitizer url: "https://github.com/google/sanitizers"
->>>
->>> Here I free the pointers orgoptions and mountpoint before main
->>> func returns.
->>>
->>> Fixes：7549ad5e7126 ("memory leaks: caused by func realpath and strndup")
->>> Signed-off-by: Jiawen Liu <liujiawen10@huawei.com>
->>> Reported-by: Jin Du <dujin1@huawei.com>
->>> Reviewed-by: Saisai Zhang <zhangsaisai@huawei.com>
->>> Reviewed-by: Aurélien Aptel <aaptel@suse.com>
->>> ---
->>> v1->v2:
->>> - free orgoptions in main func as suggested by Aurélien Aptel
->>> - free mountpoint in acquire_mountpoint func as suggested by Aurélien Aptel
->>>
->>>  mount.cifs.c | 12 ++++++++++--
->>>  1 file changed, 10 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/mount.cifs.c b/mount.cifs.c
->>> index ae7a899..656d353 100644
->>> --- a/mount.cifs.c
->>> +++ b/mount.cifs.c
->>> @@ -1891,7 +1891,10 @@ restore_privs:
->>>                 uid_t __attribute__((unused)) uignore = setfsuid(oldfsuid);
->>>                 gid_t __attribute__((unused)) gignore = setfsgid(oldfsgid);
->>>         }
->>> -
->>> +
->>> +       if (rc) {
->>> +               free(*mountpointp);
->>> +       }
->>>         return rc;
->>>  }
->>>
->>> @@ -1994,8 +1997,10 @@ int main(int argc, char **argv)
->>>
->>>         /* chdir into mountpoint as soon as possible */
->>>         rc = acquire_mountpoint(&mountpoint);
->>> -       if (rc)
->>> +       if (rc) {
->>> +               free(orgoptions);
->>>                 return rc;
->>> +       }
->>>
->>>         /*
->>>          * mount.cifs does privilege separation. Most of the code to handle
->>> @@ -2014,6 +2019,8 @@ int main(int argc, char **argv)
->>>                 /* child */
->>>                 rc = assemble_mountinfo(parsed_info, thisprogram, mountpoint,
->>>                                         orig_dev, orgoptions);
->>> +               free(orgoptions);
->>> +               free(mountpoint);
->>>                 return rc;
->>>         } else {
->>>                 /* parent */
->>> @@ -2149,5 +2156,6 @@ mount_exit:
->>>         }
->>>         free(options);
->>>         free(orgoptions);
->>> +       free(mountpoint);
->>>         return rc;
->>>  }
->>> --
->>> 2.7.4
->>>
->>
->> Thanks for the patch! I will apply it to my github tree shortly.
->>
->> --
->> Best regards,
->> Pavel Shilovsky
-> 
-> .
-> 
+  CC [M]  fs/cifs/file.o
+fs/cifs/file.c: In function 'cifs_lock':
+fs/cifs/file.c:1698:8: warning: variable 'netfid' set but not used [-Wunused-but-set-variable]
+ 1698 |  __u16 netfid;
+      |        ^~~~~~
+fs/cifs/file.c:1696:24: warning: variable 'cinode' set but not used [-Wunused-but-set-variable]
+ 1696 |  struct cifsInodeInfo *cinode;
+      |                        ^~~~~~
+fs/cifs/file.c: In function 'cifs_write':
+fs/cifs/file.c:1767:23: warning: variable 'cifs_sb' set but not used [-Wunused-but-set-variable]
+ 1767 |  struct cifs_sb_info *cifs_sb;
+      |                       ^~~~~~~
+fs/cifs/file.c: In function 'collect_uncached_read_data':
+fs/cifs/file.c:3580:20: warning: variable 'tcon' set but not used [-Wunused-but-set-variable]
+ 3580 |  struct cifs_tcon *tcon;
+      |                    ^~~~
+  CC [M]  fs/cifs/netmisc.o
+fs/cifs/netmisc.c:120:40: warning: 'mapping_table_ERRHRD' defined but not used [-Wunused-const-variable=]
+  120 | static const struct smb_to_posix_error mapping_table_ERRHRD[] = {
+      |                                        ^~~~~~~~~~~~~~~~~~~~
+  CC [M]  fs/cifs/smb2ops.o
+fs/cifs/smb2ops.c: In function 'smb3_punch_hole':
+fs/cifs/smb2ops.c:2942:24: warning: variable 'cifsi' set but not used [-Wunused-but-set-variable]
+ 2942 |  struct cifsInodeInfo *cifsi;
+      |                        ^~~~~
+  CC [M]  fs/cifs/cifsacl.o
+fs/cifs/cifsacl.c: In function 'sid_to_id':
+fs/cifs/cifsacl.c:367:6: warning: variable 'rc' set but not used [-Wunused-but-set-variable]
+  367 |  int rc;
+      |      ^~
+At top level:
+fs/cifs/cifsacl.c:89:30: warning: 'sid_unix_NFS_mode' defined but not used [-Wunused-const-variable=]
+   89 | static const struct cifs_sid sid_unix_NFS_mode = { 1, 2, {0, 0, 0, 0, 0, 5},
+      |                              ^~~~~~~~~~~~~~~~~
+fs/cifs/cifsacl.c:62:30: warning: 'sid_user' defined but not used [-Wunused-const-variable=]
+   62 | static const struct cifs_sid sid_user = {1, 2 , {0, 0, 0, 0, 0, 5}, {} };
+      |                              ^~~~~~~~
+
+Heave the unused stuff over the side.
+
+Signed-off-by: Valdis Kletnieks <valdis.kletnieks@vt.edu>
+
+diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+index 78eed72f3af0..bcd5eb301230 100644
+--- a/fs/cifs/cifsacl.c
++++ b/fs/cifs/cifsacl.c
+@@ -58,8 +58,6 @@ static const struct cifs_sid sid_everyone = {
+ /* security id for Authenticated Users system group */
+ static const struct cifs_sid sid_authusers = {
+ 	1, 1, {0, 0, 0, 0, 0, 5}, {cpu_to_le32(11)} };
+-/* group users */
+-static const struct cifs_sid sid_user = {1, 2 , {0, 0, 0, 0, 0, 5}, {} };
+ 
+ /* S-1-22-1 Unmapped Unix users */
+ static const struct cifs_sid sid_unix_users = {1, 1, {0, 0, 0, 0, 0, 22},
+@@ -85,11 +83,6 @@ static const struct cifs_sid sid_unix_NFS_groups = { 1, 2, {0, 0, 0, 0, 0, 5},
+ 	{cpu_to_le32(88),
+ 	 cpu_to_le32(2), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
+ 
+-/* S-1-5-88-3 Unix mode */
+-static const struct cifs_sid sid_unix_NFS_mode = { 1, 2, {0, 0, 0, 0, 0, 5},
+-	{cpu_to_le32(88),
+-	 cpu_to_le32(3), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} };
+-
+ static const struct cred *root_cred;
+ 
+ static int
+@@ -364,7 +357,6 @@ static int
+ sid_to_id(struct cifs_sb_info *cifs_sb, struct cifs_sid *psid,
+ 		struct cifs_fattr *fattr, uint sidtype)
+ {
+-	int rc;
+ 	struct key *sidkey;
+ 	char *sidstr;
+ 	const struct cred *saved_cred;
+@@ -426,7 +418,6 @@ sid_to_id(struct cifs_sb_info *cifs_sb, struct cifs_sid *psid,
+ 	sidkey = request_key(&cifs_idmap_key_type, sidstr, "",
+ 			     &cifs_idmap_key_acl);
+ 	if (IS_ERR(sidkey)) {
+-		rc = -EINVAL;
+ 		cifs_dbg(FYI, "%s: Can't map SID %s to a %cid\n",
+ 			 __func__, sidstr, sidtype == SIDOWNER ? 'u' : 'g');
+ 		goto out_revert_creds;
+@@ -439,7 +430,6 @@ sid_to_id(struct cifs_sb_info *cifs_sb, struct cifs_sid *psid,
+ 	 */
+ 	BUILD_BUG_ON(sizeof(uid_t) != sizeof(gid_t));
+ 	if (sidkey->datalen != sizeof(uid_t)) {
+-		rc = -EIO;
+ 		cifs_dbg(FYI, "%s: Downcall contained malformed key (datalen=%hu)\n",
+ 			 __func__, sidkey->datalen);
+ 		key_invalidate(sidkey);
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 97090693d182..f16f6d2b5217 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1693,9 +1693,7 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *flock)
+ 	bool posix_lck = false;
+ 	struct cifs_sb_info *cifs_sb;
+ 	struct cifs_tcon *tcon;
+-	struct cifsInodeInfo *cinode;
+ 	struct cifsFileInfo *cfile;
+-	__u16 netfid;
+ 	__u32 type;
+ 
+ 	rc = -EACCES;
+@@ -1711,8 +1709,6 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *flock)
+ 	cifs_read_flock(flock, &type, &lock, &unlock, &wait_flag,
+ 			tcon->ses->server);
+ 	cifs_sb = CIFS_FILE_SB(file);
+-	netfid = cfile->fid.netfid;
+-	cinode = CIFS_I(file_inode(file));
+ 
+ 	if (cap_unix(tcon->ses) &&
+ 	    (CIFS_UNIX_FCNTL_CAP & le64_to_cpu(tcon->fsUnixInfo.Capability)) &&
+@@ -1764,7 +1760,6 @@ cifs_write(struct cifsFileInfo *open_file, __u32 pid, const char *write_data,
+ 	int rc = 0;
+ 	unsigned int bytes_written = 0;
+ 	unsigned int total_written;
+-	struct cifs_sb_info *cifs_sb;
+ 	struct cifs_tcon *tcon;
+ 	struct TCP_Server_Info *server;
+ 	unsigned int xid;
+@@ -1772,8 +1767,6 @@ cifs_write(struct cifsFileInfo *open_file, __u32 pid, const char *write_data,
+ 	struct cifsInodeInfo *cifsi = CIFS_I(d_inode(dentry));
+ 	struct cifs_io_parms io_parms;
+ 
+-	cifs_sb = CIFS_SB(dentry->d_sb);
+-
+ 	cifs_dbg(FYI, "write %zd bytes to offset %lld of %pd\n",
+ 		 write_size, *offset, dentry);
+ 
+@@ -3577,10 +3570,8 @@ collect_uncached_read_data(struct cifs_aio_ctx *ctx)
+ 	struct cifs_readdata *rdata, *tmp;
+ 	struct iov_iter *to = &ctx->iter;
+ 	struct cifs_sb_info *cifs_sb;
+-	struct cifs_tcon *tcon;
+ 	int rc;
+ 
+-	tcon = tlink_tcon(ctx->cfile->tlink);
+ 	cifs_sb = CIFS_SB(ctx->cfile->dentry->d_sb);
+ 
+ 	mutex_lock(&ctx->aio_mutex);
+diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
+index ed92958e842d..657f409d4de0 100644
+--- a/fs/cifs/netmisc.c
++++ b/fs/cifs/netmisc.c
+@@ -117,10 +117,6 @@ static const struct smb_to_posix_error mapping_table_ERRSRV[] = {
+ 	{0, 0}
+ };
+ 
+-static const struct smb_to_posix_error mapping_table_ERRHRD[] = {
+-	{0, 0}
+-};
+-
+ /*
+  * Convert a string containing text IPv4 or IPv6 address to binary form.
+  *
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 64a5864127be..f5bbd1d7753e 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -2939,7 +2939,6 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
+ 			    loff_t offset, loff_t len)
+ {
+ 	struct inode *inode;
+-	struct cifsInodeInfo *cifsi;
+ 	struct cifsFileInfo *cfile = file->private_data;
+ 	struct file_zero_data_information fsctl_buf;
+ 	long rc;
+@@ -2949,7 +2948,6 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
+ 	xid = get_xid();
+ 
+ 	inode = d_inode(cfile->dentry);
+-	cifsi = CIFS_I(inode);
+ 
+ 	/* Need to make file sparse, if not already, before freeing range. */
+ 	/* Consider adding equivalent for compressed since it could also work */
+
 
