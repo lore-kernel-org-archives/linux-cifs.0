@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 390DAC433FF
-	for <linux-cifs@archiver.kernel.org>; Wed, 14 Aug 2019 02:13:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52793C32750
+	for <linux-cifs@archiver.kernel.org>; Wed, 14 Aug 2019 02:17:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 112C32085A
-	for <linux-cifs@archiver.kernel.org>; Wed, 14 Aug 2019 02:13:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A34B208C2
+	for <linux-cifs@archiver.kernel.org>; Wed, 14 Aug 2019 02:17:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1565748833;
-	bh=6IW0LbZ1Rpn2/X1ULoBXggIeNd4mXiLEGia1aydwyCU=;
+	s=default; t=1565749031;
+	bh=I+Et8CHLaDHb5aVf7jBfwWjMAQP/TDM5XArmZyBJHiA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=uiQ0tCnZl8lp+VvNR89JgxRUddjlNLZCY+rfCvHr5I7uSe+n/CIODfqiQs6Yu+IXd
-	 n44oPtMJ2i1YhGxDhLPGyi9wL+5X7JNbN2hMPCkWrT0cQMa8kNc9n9mzzttD5JpKkF
-	 lBUxCcHoVRya9f2c0OB033yrr9PSU9NvGQ/BxE8o=
+	b=Wi655VinOqd9erLLVRCtk3UG5+sUgnXTyqmg/uE4xN7YYVKeQYBMwGt1lGy5bYKnP
+	 U11PtjD20EjFp00e6j4ICqZc4zItJMuIw0DYccB1aD2SGXv80pt3W/qBG2znW/U1ec
+	 qgmyl4MB4DO0Mlk8fhkISQpXKQ7kmc40Uzt4ElHQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728464AbfHNCNv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 13 Aug 2019 22:13:51 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45912 "EHLO mail.kernel.org"
+        id S1729306AbfHNCRK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 13 Aug 2019 22:17:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48508 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728456AbfHNCNv (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 13 Aug 2019 22:13:51 -0400
+        id S1727804AbfHNCRJ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 13 Aug 2019 22:17:09 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 90AF020842;
-        Wed, 14 Aug 2019 02:13:49 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id BE021208C2;
+        Wed, 14 Aug 2019 02:17:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1565748830;
-        bh=6IW0LbZ1Rpn2/X1ULoBXggIeNd4mXiLEGia1aydwyCU=;
+        s=default; t=1565749028;
+        bh=I+Et8CHLaDHb5aVf7jBfwWjMAQP/TDM5XArmZyBJHiA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=VLDiz1MhmbU1B/a29E0qHrinSTihADS5sYQGYpJ5tdsGg8MWxNNSJn5QtjvIHOEmk
-         nRG+1IOe52wcprQk/E/p0iVYYTGZiuWPWvjQAXWXjJrCmHbbfv/mOMHFgIr7QZZxvK
-         GNgiTcEsUiwpb77IZd0rqHTxK1SWY/BhxdXX/adY=
+        b=TCSmyQhHTutR1NAlh2ukJxUmwySfUv2zCNIVweA5/Cxn8MF0XPwFoHobpet53Wd/K
+         jmT7u0TJjLXyjsFzcnuFnrRefkJqdOYowP/uZHAISz3oC1AE2/BVuwRGmZNkubW5sY
+         9tFfMvXHQtWZQCpNvrxofiZezlV3mQDhwQLe/teM=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Pavel Shilovsky <pshilov@microsoft.com>,
         Ronnie Sahlberg <lsahlber@redhat.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.2 090/123] SMB3: Fix potential memory leak when processing compound chain
-Date:   Tue, 13 Aug 2019 22:10:14 -0400
-Message-Id: <20190814021047.14828-90-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 46/68] SMB3: Fix potential memory leak when processing compound chain
+Date:   Tue, 13 Aug 2019 22:15:24 -0400
+Message-Id: <20190814021548.16001-46-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190814021047.14828-1-sashal@kernel.org>
-References: <20190814021047.14828-1-sashal@kernel.org>
+In-Reply-To: <20190814021548.16001-1-sashal@kernel.org>
+References: <20190814021548.16001-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -80,10 +80,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 17 insertions(+), 12 deletions(-)
 
 diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 2ec37dc589a7b..ae10d6e297c3a 100644
+index 0ccf8f9b63a2e..97fdbec54db97 100644
 --- a/fs/cifs/smb2ops.c
 +++ b/fs/cifs/smb2ops.c
-@@ -4015,7 +4015,6 @@ receive_encrypted_standard(struct TCP_Server_Info *server,
+@@ -3121,7 +3121,6 @@ receive_encrypted_standard(struct TCP_Server_Info *server,
  {
  	int ret, length;
  	char *buf = server->smallbuf;
@@ -91,7 +91,7 @@ index 2ec37dc589a7b..ae10d6e297c3a 100644
  	struct smb2_sync_hdr *shdr;
  	unsigned int pdu_length = server->pdu_size;
  	unsigned int buf_size;
-@@ -4045,18 +4044,15 @@ receive_encrypted_standard(struct TCP_Server_Info *server,
+@@ -3151,18 +3150,15 @@ receive_encrypted_standard(struct TCP_Server_Info *server,
  		return length;
  
  	next_is_large = server->large_buf;
@@ -114,7 +114,7 @@ index 2ec37dc589a7b..ae10d6e297c3a 100644
  		       pdu_length - le32_to_cpu(shdr->NextCommand));
  	}
  
-@@ -4085,12 +4081,21 @@ receive_encrypted_standard(struct TCP_Server_Info *server,
+@@ -3191,12 +3187,21 @@ receive_encrypted_standard(struct TCP_Server_Info *server,
  		pdu_length -= le32_to_cpu(shdr->NextCommand);
  		server->large_buf = next_is_large;
  		if (next_is_large)
